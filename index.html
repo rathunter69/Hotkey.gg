@@ -11138,45 +11138,277 @@ const CHALLENGES = {
     }
   },
   lookup2:{
-    name:'2-way', label:'Two-way lookup', par:48, parKeys:49,
-    aha:'INDEX with two MATCHes reads the row × column intersection — a true two-way lookup.',
-    prompt:'The query names a company AND a metric — and the metric columns shuffle every round. One formula, two MATCHes: INDEX the whole data block, MATCH the company down the rows, MATCH the metric across the headers.',
-    req:'<em>at G4</em> type <em>=INDEX(B2:D6,MATCH(G2,A2:A6,0),MATCH(G3,B1:D1,0))</em> · <em>↵</em> — row match, then column match',
-    guide:[
-      'in G4 type <kbd>=INDEX(B2:D6,</kbd> the whole data block',
-      'row: <kbd>MATCH(G2,A2:A6,0),</kbd> finds the company · column: <kbd>MATCH(G3,B1:D1,0))</kbd> finds the metric',
-      'commit <kbd>↵</kbd> — if the number is wrong, one of your MATCH ranges is off by a row or column',
-    ],
-    targets:['G4','G4'],
-    demo(){ return [
-      {sel:'G4', keys:[...T('=INDEX(B2:D6,MATCH(G2,A2:A6,0),MATCH(G3,B1:D1,0))'), Kb.enter]},
+    /* r437 H6b-8 — the depth-pass rework of "Two-way lookup" (DEPTH_PASS §4.40), built to the
+       ⚠️ BINDING CONSTRAINT block that sits above §4.40 (written r436 out of the `lookup`
+       rework). §1.0 / §1.0-R2 / §1.0-R3 applied on top of the page, §1.0-R3 winning on conflict.
+
+       ── THE CONSTRAINT, AND HOW THIS BOARD ANSWERS IT ────────────────────────────────────
+       As SHIPPED, `lookup` and `lookup2` were literally the same board: same metric pool, same
+       Fisher-Yates shuffle, same query panel at F1:G4, same colW map, same ROWS:6, same two
+       checks (a formula-text probe and a value probe). Seven table rows against five and one
+       more MATCH is one lesson at two arities, not two lessons — and the sumif/rollup defence
+       does not transfer, because INDEX(array, row_num, [col_num]) has NO inversion: the two-way
+       form is the one-way form with one more optional argument supplied.
+       So distinctness is rebuilt from the BOARD SITUATION, per the constraint block:
+         · `lookup`  = ONE FIELD / MANY KEYS. A screen asking the same question of three names;
+           one-way INDEX/MATCH is the right formula and the skill is anchoring so ONE FILL DOWN
+           answers every name. That board ships (r436).
+         · `lookup2` = ONE KEY / AN INTERSECTION (this board). A SQUARE tape — five segments
+           down, five rolling quarters across — where every ask names one row label and one
+           column label. Nothing here is fillable and no column of answers grows: the three
+           reads sit at three structurally different sites (one card beside the tape, two cards
+           below it three columns apart), so a fill down writes nothing and a fill right would
+           overwrite a card's own labels. What travels between them is a COPY, which moves in
+           BOTH axes at once — and that is the lesson `lookup` cannot teach.
+       Concretely, the two boards now differ on every axis a player can see:
+         lookup   — tall 8–10 row peer table, ONE metric column asked of THREE names, answers in
+                    a contiguous column, ☆ = anchored FILL DOWN, dress = font colour + a box.
+         lookup2  — SQUARE 5×5 tape, THREE different row×column intersections asked once each,
+                    answers scattered across three cards, ☆ = anchored COPY travelling down AND
+                    across, dress = one top border. Different pool (bank segments, not codenamed
+                    peers), different axis type (a rolling quarter window, not a metric list).
+
+       ── WHY THE SQUARE TAPE IS LOAD-BEARING, NOT DECORATION ──────────────────────────────
+       The page's beat 3 is "the pre-built read has its two MATCHes swapped". On a NON-square
+       block that bug throws #N/A and reads as a broken cell. On a SQUARE block the swapped read
+       returns the TRANSPOSE — a real number, off the wrong intersection, that looks perfectly
+       plausible on a page. That is the actual two-way failure a desk ships by accident, and it
+       is only reproducible because the tape is 5×5. The seed guarantees the two indices differ
+       (see build()), so the transpose is never accidentally the right answer.
+
+       ── STRUCTURAL DEVIATIONS FROM THE §4.40 PAGE, declared per §0 ────────────────────────
+       (a) ☆ RE-CUT (binding). The page's ☆ — "Bold the queried company's row in the data block"
+           — is a FORMATTING task and dies on §1.0(d) ("a ☆ rewards a MASTERY MOVE … NEVER a
+           formatting task"). It also fails §1.0-R2(i): bolding a row you already had to find is
+           earned by the nature of doing the exercise. Replaced by the efficiency this board
+           actually has: lock all three ranges once and the read TRAVELS to both pack cards.
+       (b) BEAT 4 IS NOT "Comma-format the three reads". §1.0-R3(o) is explicit that Wolf regards
+           the comma format as over-anchored ("such a seldom used / rare hotkey"). The reads ship
+           carrying comma/0dp as board FURNITURE so the numbers read, and the one graded dress is
+           the top border — first on Wolf's own ranked list.
+       (c) THE OUTSIDE BORDER IS GONE — deliberately, and it is the campaign's shared-tail rule
+           (DEPTH_PASS_CAMPAIGN §3: "a redundancy is often in the shared tail"). `lookup` closes
+           on an outside border around its panel; repeating it here would have handed the two
+           drills the same last two beats. This one closes on a top border across the pack cards.
+       (d) A BEAT THE PAGE DOES NOT HAVE: the tape's newest quarter column came back from the
+           refresh WITHOUT ITS HEADER, and beat 1 is to enter it. This is the aha made physical —
+           the read matches on the LABEL, so with the label absent the formula returns #N/A no
+           matter how correctly it is written. It also chains (§1.1) into beat 2 and costs 8 keys.
+       (e) NO §2.5 TIER REVEAL (the page does not ask for one) and NO helper/assumption cells
+           (§1.0(f)/§1.0-R2(l)): nothing on this board is converted or scaled, so a yellow input
+           block would be a labelled box with no input in it. No total row, so the top-border
+           convention attaches to the block rule instead.
+       (f) cueCell() IS USED ONCE (§1.0-R2(h)/§1.0-R3(q)): the missing header is an EMPTY cell in
+           a row of headers — precisely the case the green outline cannot express, since an
+           outline on an empty cell reads as "cell", not "the label is gone". Every other graded
+           target is a labelled card cell. Nothing graded spills: the segment pool is capped at
+           eight characters so no name overruns its 78px column, and the only spilling cells
+           (title, sub-labels, the two card titles, the source memo) are ungraded.
+
+       ── §1.0-R3(p) GRADE THE END STATE. ROUTES ENUMERATED BY WALKING THEM, NOT BY READING ──
+       The old checks() counted MATCH( occurrences in the formula TEXT — the exact bug class
+       round 3 named: a correct read built any other way left the beat dark with nothing on the
+       board to fix. Every core beat now reads the END STATE:
+         · the header — the cell's TEXT, trimmed and case-folded, so typing it, pasting it, or
+           copying a neighbouring header and editing it all clear.
+         · the three reads — VALUE only, so INDEX with two MATCHes, INDEX with hand-counted
+           offsets, a nested VLOOKUP/MATCH, a pointed formula and a typed figure all clear
+           identically. Tolerance 0.5 against figures that are all multiples of five.
+         · the border — bt OR ball on each card's top row, so Alt H B P (top), Alt H B D
+           (top+bottom), Alt H B S / B T on a selection whose first row is that row, and
+           Alt H B A (ball carries every edge) all clear; the two cards may be bordered in one
+           sweep across the block or one card at a time.
+       The ☆ is the one place a ROUTE may be graded (§1.0(c) sanctions exactly this) and it reads
+       the r425 S.pasteLog latch — the MECHANIC, never geometry inferred.
+
+       ── AHA (§1.5) AND FINISH STATE (§1.6) ───────────────────────────────────────────────
+       The aha lands on beat 1 into beat 2: the read is written correctly and still comes back
+       #N/A until the header exists, which is the second MATCH announcing that it reads labels,
+       not positions. The last WORK beat is the top border (beat 5) and the engine's Ctrl+S
+       closer follows it (§1.0(e), saveClose:true).
+
+       ── ENGINE FACTS VERIFIED, NOT ASSUMED ───────────────────────────────────────────────
+       · INDEX with three arguments indexes from the ARRAY's own top-left (index.html fn INDEX,
+         args.length>=3 branch), so the row/col numbers are offsets into the 5×5 body — which is
+         what makes the swapped read land inside the tape instead of throwing.
+       · MATCH is exact-equality over eqLoose and a miss is the #N/A VALUE (r418), so the missing
+         header shows up on the board as #N/A rather than a refusal.
+       · A plain paste TRANSLATES relative refs by the paste offset and leaves anchors alone
+         (r154), and stamps S.pasteLog with dest + source rect (r425). An UNLOCKED read copied to
+         a pack card therefore walks its ranges by (+8,-7) and returns garbage — visibly, on the
+         board — which is the failure the ☆ exists to teach.
+       · Paste carries the SOURCE's full format, so a pasted-over cell loses whatever borders it
+         had. The graded border therefore sits on each card's TOP row (pr), never on the read row
+         (pr+2) that the ☆'s paste lands on — otherwise "border first, paste second" would
+         silently wipe a cleared beat. Both alt-paths run the two orders. */
+    name:'2-way', label:'Two-way lookup', par:80, parKeys:76, saveClose:true,   /* r437: par re-swept on the reworked board — dev/e2e-par-sweep.js lookup2, 5-seed median 76 keys incl. the engine-appended Ctrl+S, and a 21-seed probe reads 76 (range 76–78, 12×76 / 9×78) with ZERO variance inside a header row: the only mover is whether the tape's last body row is two digits (hr=5 puts it at row 10, which lengthens two of the three typed ranges by a character each). par 80 ≈ 1.05 s/key, the house band. MEASURED against it, on the same board: all three reads hand-typed as separate UNLOCKED formulas, no copy anywhere, the missing header entered last and each card bordered on its own runs 167 keys (median of 5; 167–173 by the same two-digit rule) with all five cores green and the ☆ dark — the negative control, alt-paths entry 2, 2.2× the star route. The chord-route alt (bare ranges locked with F4 instead of typed dollars, ALL borders drawn first, the pack cards still served by copies) runs 71–73 and still earns the star. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 120 · pro 92 · legendary 80. */
+    aha:'two MATCHes read the labels on both axes — the intersection holds when the segments re-sort and the quarter columns roll.',
+    prompt:'The reporting tape carries five segments against the last five quarters — the segments re-sort by size every refresh and the quarter window rolls forward, so nothing sits where it sat last week, and this morning the newest column came back without its header. Three pages want one number each off that tape: the flash card beside it, and two board-pack lines below it, one of which already reads the wrong intersection. Read the tape by its labels, repair the pack line, and border the pack before it goes to print.',
+    req(){ const o=this._o; return '<em>'+o.mCell+'</em> '+o.mQ+' · <em>'+o.fRead+'</em> <em>=INDEX('+o.gridR+',MATCH('+o.FV+o.hr+','+o.segR+',0),MATCH('+o.FV+(o.hr+1)+','+o.qtrR+',0))</em> · copy <em>'+o.fRead+'</em> → paste <em>'+o.aRead+'</em> and <em>'+o.bRead+'</em> · <em>'+o.bordRng+'</em> <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that clears its beat (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'the tape’s newest column lost its header in the refresh — '+o.mCell+' is blank. Type <b>'+o.mQ+'</b> <kbd>↵</kbd>. Every read on this board matches on that text, so until it is there the reads come back <b>#N/A</b> however correctly they are written',
+      'the flash card’s number lands at '+o.fRead+' · <kbd>=</kbd>INDEX(<b>'+o.gridR+'</b>,MATCH('+o.FV+o.hr+',<b>'+o.segR+'</b>,0),MATCH('+o.FV+(o.hr+1)+',<b>'+o.qtrR+'</b>,0)) <kbd>↵</kbd> — the first MATCH walks the segment column and hands INDEX a ROW, the second walks the header row and hands it a COLUMN. Counting the two offsets by eye and typing them as numbers clears this beat too, and so does typing the figure; the clock is what prices the difference',
+      'the p.4 read has its two MATCHes in each other’s seats — the segment is matched across the headers and the quarter down the segment column, which on a square tape returns a real number off the transposed cell. <kbd>F2</kbd> in and swap the two MATCH expressions, or retype it — or, because the three ranges are locked and the two card references are not, copy '+o.fRead+' and paste it onto '+o.aRead+', where it re-points itself at '+o.aSeg+' and '+o.aQ,
+      'p.9 is empty: the same read, aimed at '+o.bSeg+' and '+o.bQ+'. Writing it out again lands it; so does pasting the flash read — or the repaired p.4 read — onto '+o.bRead,
+      'select '+o.bordRng+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> — <kbd>p</kbd> is To<b>P</b> Border (<kbd>o</kbd> is bottom, <kbd>d</kbd> is both). Bordering each card on its own draws the same rule, and <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> (ALL borders) carries the top edge too',
+      '☆ the discovery: lock all three ranges in the flash read — <kbd>F4</kbd> on each stamps its <kbd>$</kbd>, typing the dollars by hand lands the identical string — then <kbd>ctrl</kbd>+<kbd>c</kbd> it once and <kbd>ctrl</kbd>+<kbd>v</kbd> onto both pack cards, where only the two card references walk. This copy moves DOWN and ACROSS at once, so a read locked only on its rows breaks on the way over; leave the ranges bare and both pack cards come back wrong out loud. Writing all three reads out by hand clears every core beat, it just costs the keys',
     ]; },
+    /* rings: ① the missing header · ② the flash read · ③ the p.4 read · ④ the p.9 read ·
+       ⑤ the two card tops · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.mCell, o.fRead, o.aRead, o.bRead, o.bordRng, null]; },
+    demo(){ const o=this._o; return [
+      {sel:o.mCell, keys:[...T(o.mQ), Kb.enter]},
+      {sel:o.fRead, keys:[...T('=INDEX('+o.gridR+',MATCH('+o.FV+o.hr+','+o.segR+',0),MATCH('+o.FV+(o.hr+1)+','+o.qtrR+',0))'), Kb.enter]},
+      {sel:o.fRead, keys:[Kb.copy]},                                          /* the ☆ move — one locked read, two landings; its state latches at the win (§2.2) */
+      {sel:o.aRead, keys:[Kb.paste]},                                         /* p.4 repairs itself: the ranges hold, the card references walk */
+      {sel:o.bRead, keys:[Kb.paste]},
+      {sel:o.bordRng, keys:[Kb.alt, L('h'), L('b'), L('p')]},                 /* §1.6 finish state, AFTER the pastes — paste carries the source's format and would wipe an earlier border */
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      const metrics=['Revenue','EBITDA','Net debt'];
-      for(let k=metrics.length-1;k>0;k--){ const j=rnd(0,k); [metrics[k],metrics[j]]=[metrics[j],metrics[k]]; }
-      cells['A1']={...blankCell(),value:'Company',txt:true,bold:true};
-      metrics.forEach((mn,i)=>cells[colLetter(i+2)+1]={...blankCell(),value:mn,txt:true,bold:true});
-      const names=['Atlas Co','Borealis','Cygnus Ltd','Delphi Inc','Equinox'];
-      const data={};
-      names.forEach((nm,r0)=>{ const r=r0+2; cells['A'+r]={...blankCell(),value:nm,txt:true}; data[nm]={};
-        metrics.forEach((mn,i)=>{ const v=rnd(2,90)*10; data[nm][mn]=v;
-          cells[colLetter(i+2)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }); });
-      const qName=names[rnd(0,4)], qMetric=metrics[rnd(0,2)];
-      cells['F1']={...blankCell(),value:'Query',txt:true,bold:true};
-      cells['F2']={...blankCell(),value:'Company',txt:true}; cells['G2']={...blankCell(),value:qName,txt:true};
-      cells['F3']={...blankCell(),value:'Metric',txt:true};  cells['G3']={...blankCell(),value:qMetric,txt:true};
-      cells['F4']={...blankCell(),value:'Answer',txt:true,bold:true}; cells['G4']={...blankCell(),fmtStyle:'comma',decimals:0};
-      this._expect=data[qName][qMetric];
-      return {ROWS:6, cells, active:{r:4,c:7}, sel:null, colW:{1:104,2:82,3:82,4:86,6:80,7:98}};
+      /* §1.2 randomization — four independent axes: (a) the tape's anchor column and header row;
+         (b) the segment pool Fisher-Yates drawn from ten AND the rolling quarter window's start
+         quarter and fiscal year, so both axes' labels move every seed; (c) every figure through
+         rnd(); (d) which-one-is-wrong — which column lost its header, which three intersections
+         the three cards ask for, and which way the p.4 read is transposed. */
+      const POOL=['Advisory','Trading','Lending','Markets','Wealth','Retail','Leasing','Payments','Custody','Broking'];   /* <=8 chars each: no segment name overruns its 78px column, so no graded cell spills (§1.0-R3(q)) */
+      const shuf=(pool)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b; };
+      const c0=rnd(1,2);                    // the tape's label column — A or B
+      const hr=rnd(4,5);                    // the tape's header row (row 2 carries the sub-labels, hr-1 the cue)
+      const N=5;                            // SQUARE by design — it is what makes a swapped read return a plausible number instead of #N/A
+      const segs=shuf(POOL).slice(0,N);
+      const q0=rnd(0,3), y0=rnd(24,26);     // the rolling five-quarter window
+      const qtrs=[]; for(let i=0;i<N;i++){ const qi=(q0+i)%4, yy=y0+Math.floor((q0+i)/4); qtrs.push('Q'+(qi+1)+' FY'+yy); }
+      /* every figure distinct, so no read can be right by accident and the transposed p.4 number
+         can never coincide with the number it should have been */
+      const seen=new Set(), data={};
+      segs.forEach(sn=>{ data[sn]={}; qtrs.forEach(qn=>{ let v; do{ v=rnd(60,480)*5; }while(seen.has(v)); seen.add(v); data[sn][qn]=v; }); });
+      /* the three asks. mIdx (the column that lost its header) IS the flash card's quarter, so
+         beat 1 chains into beat 2; both pack cards ask a DIFFERENT quarter, so their beats never
+         depend on beat 1 and no check is order-locked (§1.0-R3(p)). */
+      const fS=rnd(0,N-1), fQ=rnd(0,N-1), mIdx=fQ;
+      const others=[0,1,2,3,4].filter(i=>i!==fQ);
+      const aQ=others[rnd(0,others.length-1)];
+      const rest=others.filter(i=>i!==aQ);
+      const bQ=rest[rnd(0,rest.length-1)];
+      /* p.4's swap must MOVE the number: the transposed read is data[segs[aQ]][qtrs[aS]], which
+         equals the true answer when aS===aQ. Draw aS from the other four indices outright. */
+      const aSpool=[0,1,2,3,4].filter(i=>i!==aQ);
+      const aS=aSpool[rnd(0,aSpool.length-1)];
+      let bS=rnd(0,N-1); { let guard=0; while(((bS===fS&&bQ===fQ)||(bS===aS&&bQ===aQ)) && guard++<40) bS=rnd(0,N-1); }
+      const cLS=c0, cG1=c0+1, cG5=c0+N, cFL=c0+7, cFV=c0+8, cAL=c0, cAV=c0+1, cBL=c0+3, cBV=c0+4;
+      const LS=colLetter(cLS), GL1=colLetter(cG1), GL5=colLetter(cG5),
+            FL=colLetter(cFL), FV=colLetter(cFV), AL=colLetter(cAL), AV=colLetter(cAV),
+            BL=colLetter(cBL), BV=colLetter(cBV);
+      const r1=hr+1, rL=hr+N, pr=hr+8;      // tape body rows, and the pack cards' top row
+      cells[LS+'1']={...blankCell(),value:codename()+' — reporting tape, segment revenue ($mm)',txt:true,bold:true};
+      cells[LS+'2']={...blankCell(),value:'Tape — last five quarters, segments re-sorted by size',txt:true,it:true,fontColor:'gray'};
+      cells[FL+'2']={...blankCell(),value:'Flash card',txt:true,it:true,fontColor:'gray'};
+      /* the tape: segment labels down, the rolling quarter window across, one header MISSING */
+      cells[LS+hr]={...blankCell(),value:'Segment',txt:true,bold:true};
+      qtrs.forEach((qn,j)=>{ if(j===mIdx) return;   // the column the refresh dropped
+        cells[colLetter(cG1+j)+hr]={...blankCell(),value:qn,txt:true,bold:true,align:'r'}; });
+      segs.forEach((sn,i)=>{ const r=r1+i;
+        cells[LS+r]={...blankCell(),value:sn,txt:true};
+        qtrs.forEach((qn,j)=>{ cells[colLetter(cG1+j)+r]={...blankCell(),value:data[sn][qn],fmtStyle:'comma',decimals:0,fontColor:'blue'}; });   // blue = typed data, the house convention
+      });
+      /* §1.0-R2(h)/§1.0-R3(q): the target is an EMPTY cell in a row of headers — an outline on it
+         reads as "cell", not "the label is gone" — so the board carries the cue itself. Board
+         content, never a graded target: deleting it cannot move any ok. */
+      cells[colLetter(cG1+mIdx)+(hr-1)]=cueCell('⌄ no header');
+      /* the flash card, beside the tape behind an empty moat column. Its three rows are the
+         geometry both pack cards repeat, which is what lets one locked read travel. */
+      cells[FL+hr]={...blankCell(),value:'Segment',txt:true,bold:true};
+      cells[FV+hr]={...blankCell(),value:segs[fS],txt:true};
+      cells[FL+(hr+1)]={...blankCell(),value:'Quarter',txt:true,bold:true};
+      cells[FV+(hr+1)]={...blankCell(),value:qtrs[fQ],txt:true};
+      cells[FL+(hr+2)]={...blankCell(),value:'Revenue',txt:true,bold:true};
+      cells[FV+(hr+2)]={...blankCell(),fmtStyle:'comma',decimals:0};          // ships comma/0dp as FURNITURE, not as a beat (§1.0-R3(o), deviation (b))
+      /* the two board-pack cards, below the tape behind a blank row and three columns apart —
+         far enough that no fill can serve them (a fill right from p.4 would overwrite p.9's own
+         labels), so the only thing that can travel between the sites is a copy. */
+      cells[AL+(pr-1)]={...blankCell(),value:'Board pack — p.4',txt:true,it:true,fontColor:'gray'};
+      cells[BL+(pr-1)]={...blankCell(),value:'Board pack — p.9',txt:true,it:true,fontColor:'gray'};
+      [[AL,AV,segs[aS],qtrs[aQ]],[BL,BV,segs[bS],qtrs[bQ]]].forEach(function(card){
+        const cl=card[0], cv=card[1], sn=card[2], qn=card[3];
+        cells[cl+pr]={...blankCell(),value:'Segment',txt:true,bold:true};
+        cells[cv+pr]={...blankCell(),value:sn,txt:true};
+        cells[cl+(pr+1)]={...blankCell(),value:'Quarter',txt:true,bold:true};
+        cells[cv+(pr+1)]={...blankCell(),value:qn,txt:true};
+        cells[cl+(pr+2)]={...blankCell(),value:'Revenue',txt:true,bold:true};
+        cells[cv+(pr+2)]={...blankCell(),fmtStyle:'comma',decimals:0};
+      });
+      const gridR='$'+GL1+'$'+r1+':$'+GL5+'$'+rL,
+            segR ='$'+LS+'$'+r1+':$'+LS+'$'+rL,
+            qtrR ='$'+GL1+'$'+hr+':$'+GL5+'$'+hr;
+      /* p.4 ships BUILT AND CROSSED: the ranges are right and locked, but the two MATCH
+         expressions sit in each other's seats. On a square tape that returns the transposed
+         cell — a real, plausible number — which is the whole reason this board is 5x5. */
+      cells[AV+(pr+2)]={...blankCell(),
+        formula:'=INDEX('+gridR+',MATCH('+AV+(pr+1)+','+qtrR+',0),MATCH('+AV+pr+','+segR+',0))',
+        value:data[segs[aQ]][qtrs[aS]],fmtStyle:'comma',decimals:0};
+      cells[LS+(pr+4)]={...blankCell(),value:'Source: reporting tape — segment revenue, refreshed nightly',txt:true,it:true,fontColor:'gray'};
+      this._o={ hr:hr, r1:r1, rL:rL, pr:pr, c0:c0, N:N,
+        LS:LS, GL1:GL1, GL5:GL5, FL:FL, FV:FV, AL:AL, AV:AV, BL:BL, BV:BV,
+        cLS:cLS, cG1:cG1, cFV:cFV, cAV:cAV, cBV:cBV, cBL:cBL,
+        gridR:gridR, segR:segR, qtrR:qtrR,
+        mIdx:mIdx, mQ:qtrs[mIdx], mCell:colLetter(cG1+mIdx)+hr,
+        fSeg:segs[fS], fQ:qtrs[fQ], fRead:FV+(hr+2),
+        aSeg:segs[aS], aQ:qtrs[aQ], aRead:AV+(pr+2),
+        aWrongSeg:segs[aQ], aWrongQ:qtrs[aS],
+        bSeg:segs[bS], bQ:qtrs[bQ], bRead:BV+(pr+2),
+        bordRng:LS+pr+':'+BV+pr,
+        expF:data[segs[fS]][qtrs[fQ]], expA:data[segs[aS]][qtrs[aQ]], expB:data[segs[bS]][qtrs[bQ]] };
+      const colW={}; colW[cLS]=118; for(let j=0;j<N;j++) colW[cG1+j]=78; colW[c0+6]=28; colW[cFL]=92; colW[cFV]=118;
+      return {ROWS:pr+4, cells, active:{r:hr,c:cG1+mIdx}, sel:null, colW:colW};
     },
     checks(S){
-      const g=S.cells['G4']; const f=(g&&g.formula)?g.formula.toUpperCase().replace(/\s/g,''):'';
-      const twoMatches = (f.match(/MATCH\(/g)||[]).length >= 2 && f.includes('INDEX(');
-      const valOk = !!(g&&g.formula) && Math.abs(g.value-this._expect)<1e-6;
+      const o=this._o;
+      const cel=k=>S.cells[k]||{};
+      /* §1.0(c) FREEDOM + §1.0-R3(p) END-STATE GRADING. Every core ok reads what the page LOOKS
+         like, so INDEX with two MATCHes, INDEX with hand-counted offsets, a pointed formula and a
+         typed figure all clear the same way and the clock prices the difference. THE OLD CHECKS
+         DID NOT: they counted MATCH( occurrences in the formula TEXT, so a correct read built any
+         other way left the beat dark with nothing on the board to fix — round 3's untriggerable
+         beat class exactly. Every figure is a multiple of five, so the 0.5 tolerance is slack. */
+      const near=(k,want)=>{ const v=cel(k).value; return typeof v==='number' && Math.abs(v-want)<=0.5; };
+      const txt=k=>String(cel(k).value==null?'':cel(k).value).trim().toUpperCase();
+      const hdrOk=txt(o.mCell)===o.mQ.toUpperCase();
+      const fOk=near(o.fRead,o.expF), aOk=near(o.aRead,o.expA), bOk=near(o.bRead,o.expB);
+      /* the block rule: bt OR ball on each card's top row, so Alt H B P / B D / B S / B T and
+         Alt H B A all clear, one sweep across the block or one card at a time. The empty gutter
+         column between the cards is never required — a player who borders the two cards
+         separately has drawn the same rule. */
+      const edge=k=>{ const c=cel(k); return !!(c.bt||c.ball); };
+      const bordOk=edge(o.AL+o.pr) && edge(o.AV+o.pr) && edge(o.BL+o.pr) && edge(o.BV+o.pr);
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): ONE anchored read
+         serves all three cards. Read off the r425 S.pasteLog latch — the MECHANIC is recorded,
+         never inferred from the end state — so Ctrl+V and the ribbon's paste both earn it, a
+         chained copy (flash → p.4 → p.9) earns it, and three hand-typed reads earn nothing. The
+         values ride in the predicate because an UNLOCKED read is the failure this star exists to
+         teach: the copy travels DOWN and ACROSS, so a read anchored only on its rows walks its
+         ranges off the tape and both pack cards come back wrong. The live-formula test stops a
+         broken paste patched with two typed numbers from collecting the star. Typing all three
+         reads out clears every core beat (the alt-paths negative control measures that route at
+         167 keys against the demo's 76) and forfeits only the star. */
+      const live=[o.fRead,o.aRead,o.bRead].every(k=>!!cel(k).formula);
+      const srcOk=p=>(p.sr===o.hr+2 && p.sc===o.cFV) || (p.sr===o.pr+2 && (p.sc===o.cAV || p.sc===o.cBV));
+      const landed=(row,col)=>(S.pasteLog||[]).some(p=>p.r0===row && p.c0===col && p.h===1 && p.w===1 && srcOk(p));
+      const travelled=landed(o.pr+2,o.cAV) && landed(o.pr+2,o.cBV);
+      /* DEPTH_PASS §4.40's beats with the deviations declared above. Labels are INSTRUCTIONS
+         (§1.0-R3(n)): the clause after the dash says WHAT or WHERE, never why. Beats 1-4 carry
+         the §1.0-R2(g) adaptive facts — which column lost its header, which intersection each
+         card asks for, and which one p.4 currently returns — all of which move every seed, and
+         the player should not have to reverse-engineer them off the board. */
       return [
-        {label:'pull it with INDEX and TWO MATCHes — row and column', ok: twoMatches},
-        {label:'match the answer to the queried company \u00d7 metric', ok: valOk},
+        {label:'Enter the missing quarter header on the tape — '+o.mQ, ok: hdrOk},
+        {label:'Build the flash card read — '+o.fSeg+' in '+o.fQ, ok: fOk},
+        {label:'Fix the p.4 read — it returns '+o.aWrongSeg+' in '+o.aWrongQ, ok: aOk},
+        {label:'Build the p.9 read — '+o.bSeg+' in '+o.bQ, ok: bOk},
+        {label:'Add a top border to both board-pack cards', ok: bordOk},
+        {label:'Answer every card from the one read', ok: fOk && aOk && bOk && live && travelled, bonus:true},
       ];
     }
   },

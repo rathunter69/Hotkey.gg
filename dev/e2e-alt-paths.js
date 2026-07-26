@@ -317,9 +317,39 @@ const ALTS = [
         {sel:o.LPL+o.hr+':'+o.LPL+(o.hr+4),     keys:[{key:'Alt'},L('h'),L('b'),L('l')]},
         {sel:o.LPV+o.hr+':'+o.LPV+(o.hr+4),     keys:[{key:'Alt'},L('h'),L('b'),L('r')]},
       ]; }` },
-  { key: 'lookup2', name: 'header-inclusive ranges (consistent off-by-one)', moves: `C => [
-      {sel:'G4', keys:[...T('=INDEX(B1:D6,MATCH(G2,A1:A6,0),MATCH(G3,B1:D1,0))'),{key:'Enter'}]},
-    ]` },
+  /* r437 (lookup2 ROUND 3, DEPTH_PASS §4.40 + the ⚠️ BINDING CONSTRAINT block): the r169 entry
+     that used to live here ("header-inclusive ranges") was DELETED — it was hard-wired to the
+     old G4 / B1:D6 board, which no longer exists. ALT 1 = chord-ROUTE alt: the three ranges are
+     typed BARE and locked with F4 instead of typed with dollars, the block is bordered FIRST and
+     with ALL borders rather than a top rule, and the pack cards are served p.9-before-p.4 — the
+     ☆ still fires, because it grades the paste MECHANIC, not the order. ALT 2 = the NEGATIVE
+     CONTROL and op-ORDER alt: three separately hand-typed UNLOCKED reads, no copy anywhere, the
+     missing header entered LAST (so every read is #N/A until the final keystroke re-prices it),
+     and each card bordered on its own with outside borders. All five cores clear; the ☆ must
+     stay dark. Measured: 71-73 keys for ALT 1, 167 for ALT 2, against the demo's 76. */
+  { key: 'lookup2', name: 'chord-ROUTE: bare ranges locked with F4 instead of typed dollars, ALL borders drawn FIRST and one card at a time, pack cards served p.9 before p.4 — the ☆ still fires', moves: `C => { const o=C._o;
+      const g=o.gridR.replace(/[$]/g,''), sg=o.segR.replace(/[$]/g,''), qt=o.qtrR.replace(/[$]/g,'');
+      return [
+        {sel:o.AL+o.pr+':'+o.AV+o.pr, keys:[{key:'Alt'},L('h'),L('b'),L('a')]},           // the rule goes down before any read exists…
+        {sel:o.BL+o.pr+':'+o.BV+o.pr, keys:[{key:'Alt'},L('h'),L('b'),L('a')]},           // …and ALL borders carries the top edge
+        {sel:o.mCell, keys:[...T(o.mQ),{key:'Enter'}]},
+        {sel:o.fRead, keys:[...T('=INDEX('+g),{key:'F4'},...T(',MATCH('+o.FV+o.hr+','+sg),{key:'F4'},
+                             ...T(',0),MATCH('+o.FV+(o.hr+1)+','+qt),{key:'F4'},...T(',0))'),{key:'Enter'}]},
+        {sel:o.fRead, keys:[{key:'c',ctrl:true}]},
+        {sel:o.bRead, keys:[{key:'v',ctrl:true}]},                                        // p.9 lands first this time
+        {sel:o.aRead, keys:[{key:'v',ctrl:true}]},
+      ]; }` },
+  { key: 'lookup2', name: 'NEGATIVE CONTROL / op-ORDER: three UNLOCKED reads hand-typed one at a time with no copy anywhere, the missing header entered LAST, each card bordered on its own — all five cores clear, ☆ dark (167 keys against the demo’s 76)', moves: `C => { const o=C._o;
+      const g=o.gridR.replace(/[$]/g,''), sg=o.segR.replace(/[$]/g,''), qt=o.qtrR.replace(/[$]/g,'');
+      const F=(sc,qc)=>'=INDEX('+g+',MATCH('+sc+','+sg+',0),MATCH('+qc+','+qt+',0))';
+      return [
+        {sel:o.aRead, keys:[...T(F(o.AV+o.pr, o.AV+(o.pr+1))),{key:'Enter'}]},            // p.4 repaired by retyping, before anything else
+        {sel:o.bRead, keys:[...T(F(o.BV+o.pr, o.BV+(o.pr+1))),{key:'Enter'}]},
+        {sel:o.fRead, keys:[...T(F(o.FV+o.hr, o.FV+(o.hr+1))),{key:'Enter'}]},            // still #N/A — its header is not on the board yet
+        {sel:o.AL+o.pr+':'+o.AV+o.pr, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
+        {sel:o.BL+o.pr+':'+o.BV+o.pr, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
+        {sel:o.mCell, keys:[...T(o.mQ),{key:'Enter'}]},                                   // the header LAST: one commit re-prices the flash read
+      ]; }` },
   { key: 'autofit', name: 'run BACKWARDS — totals first as typed addition chains, dress next, then widths right-to-left with the labels last (no fill, so no star)', moves: `C => { const o=C._o;
       const steps=[];
       for(let r=o.r0;r<=o.tr;r++)
