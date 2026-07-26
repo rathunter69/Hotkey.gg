@@ -1600,3 +1600,52 @@ const ALTS = [
         {sel:o.swCell, keys:[...T(String(o.mutIdx)),{key:'Enter'}]},
       ]; }` },
 ];
+
+(async () => {
+  const browser = await chromium.launch({ executablePath: EXE, headless: true });
+  const page = await browser.newPage();
+  await page.addInitScript(() => { try {
+    localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_beta_ok', '1');
+    localStorage.setItem('hk_xlv', '2');
+  } catch (e) {} });
+  const errs = [];
+  page.on('pageerror', e => errs.push(String(e.message).slice(0, 120)));
+  await page.goto(process.env.URL || 'http://127.0.0.1:8791/index.html', { waitUntil: 'load' });   /* r422: URL override — parallel checkouts serve on their own ports (the r421 e2e-guided pattern) */
+  await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof demoKey === 'function');
+  await page.evaluate(() => { try { _pro = true; } catch (e) {} });
+
+  let fails = 0, ran = 0;
+  for (const alt of ALTS) {
+    if (only.length && !only.includes(alt.key)) continue;
+    ran++;
+    let wins = 0; const notes = [];
+    for (let rep = 0; rep < REPS; rep++) {
+      const r = await page.evaluate(({ key, movesSrc }) => {
+        try {
+          document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove());
+          loadChallenge(key);
+          const C = CHALLENGES[key];
+          const moves = eval('(' + movesSrc + ')')(C);
+          for (const mv of moves) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
+          /* r423 §1: saveClose drills close on the universal Ctrl+S beat — every alt route
+             ends with the same save keystroke a player would press (the routes themselves
+             stay chord-diverse; the closer is engine-owned and route-independent) */
+          if (!done && C.saveClose) demoKey({ key: 's', ctrl: true });
+          if (done) return { won: true, keys: keyLog.length };
+          const failing = C.checks(S).filter(x => !x.ok).map(x => x.label);
+          return { won: false, failing };
+        } catch (e) { return { won: false, failing: ['THREW: ' + String(e).slice(0, 100)] }; }
+      }, { key: alt.key, movesSrc: alt.moves });
+      if (r.won) wins++;
+      else notes.push((r.failing || []).join(' | ').slice(0, 160));
+    }
+    const ok = wins === REPS;
+    if (!ok) fails++;
+    console.log((ok ? 'PASS ' : 'FAIL ') + alt.key.padEnd(10) + ' · ' + alt.name + (ok ? '' : '\n       stuck on: ' + notes[0]));
+  }
+  console.log('\nALT PATHS: ' + (fails ? fails + ' FAILURE(S) of ' + ran : 'ALL ' + ran + ' PASS'));
+  if (errs.length) { console.log('PAGE ERRORS: ' + errs.slice(0, 3).join(' · ')); fails++; }
+  await browser.close();
+  process.exit(fails ? 1 : 0);
+})();
