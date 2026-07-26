@@ -769,11 +769,12 @@ DOES NOT EXIST YET.
 ☆ Bold the queried company's row in the data block — mark your source
 **Random:** metric shuffle (exists) + 2 query draws + swap-decoy which-axes + company pool. **Aha:** existing. **Finish:** beat 5. **Clocks:** re-sweep. **Engine:** none.
 
-#### 4.41 recon — "Two systems, one truth" · S
+#### 4.41 recon — "Two systems, one truth" · S — **SHIPPED r437 (depth pass; the page below is the pre-r437 sketch, kept for trace)**
 **Now:** COUNTIF presence + INDEX/MATCH amounts + enter the missing deal + Δ to zero; par 77, chained, zero-check finish. At bar.
 **Language pass + bonus:**
-☆ Color the brought-across deal blue — it was typed, not fed
+☆ ~~Color the brought-across deal blue — it was typed, not fed~~ — **DEAD under §1.0(d)** (a ☆ is a hidden EFFICIENCY, never a formatting task; flagged in advance by the r436 `lookup` agent). It also cannot be promoted to a core beat: the blotter figures ship blue, so the star route lands the colour for free and §1.1 forbids a do-nothing line. RE-CUT AS SHIPPED: **the missing deal carried in ONE paste, name and amount together, sourced from the blotter row** — latched off `S.pasteLog`, so Ctrl+V / Alt H V / the legacy Alt E S dialog all earn it and typing earns nothing.
 **Random/Aha/Finish:** verify axes; existing; Δ=0 closes. **Clocks:** std. **Engine:** none.
+**AS SHIPPED (r437):** 5 core beats — presence column → add the missing deal → Δ vs system column → fix the fat-fingered amount → total the Δ column into a Recon check line that reads 0 (the §1.6 prove-out finish; MODELING_STANDARDS §6's "one visible place"). No formatting beat, deliberately: the bold + top-border total-line pair is `sumif`'s closing tail and §3 of the campaign doc says to cut a shared tail rather than repeat it, so the check line ships pre-dressed. Beat 5 is the ONE place a live formula is required, on the §1.7 "Total = land a live SUM" gloss — verified by probe that a typed `0`, an `=0`, and typed zeros down the whole Δ column all leave it DARK. par 77→92, parKeys 81→88 (flat over 20 seeds). Distinctness against `lookup` is protected structurally, not asserted — see the index.html header and the r437 dev/AUDIT.md entry.
 
 #### 4.42 drill — "Hardcode it" · M (audit shallow #7)
 **Now:** 2 checks (values-onto-self + memo guard, blue font); fixed B3:B8 site.
