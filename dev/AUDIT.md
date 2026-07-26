@@ -7809,6 +7809,14 @@ the §2 ☆-headroom diagnostic was run on the SHIPPED board and passed._
   not, so the demo walks rightward only and the wrap is left undocumented rather than taught; and the
   picker scans the whole range, hidden rows included, so a second column's chip list is not narrowed
   by the first column's filter as it would be in Excel.
+- **A GAP IN THE INVARIANTS, FOUND WHILE WRITING THE LABELS AND LEFT FOR THE ORCHESTRATOR.**
+  §2.8 lists a "closed-verb lint on check labels (first word ∈ §1.7 list; CI warns, human
+  merges)" among the invariants that were to land with the platform batch. It is NOT in
+  dev/check-invariants.js — `grep -n "verb" dev/check-invariants.js` returns nothing. This
+  drill's first beat opened with "Arm the AutoFilter…" through the whole build and nothing
+  flagged it; it now reads "Add the AutoFilter to the header row" ("Arm" is not on the
+  §1.7 closed list and §1.7 says adding a verb takes a doc PR). Worth landing as a C13
+  alongside the ☆-skippability lint already proposed in DEPTH_PASS_CAMPAIGN §6.5.
 - **META:** drills.js desc described the retired board and named the route ("Turn on the filter, open
   the picker — the answer reads itself"); rewritten to the new one. Key, name, label and tab immutable
   — PBs, boards and the generated drills/filterpass.html carry them.

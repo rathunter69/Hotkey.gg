@@ -4769,7 +4769,12 @@ const CHALLENGES = {
          clears 5/5 cores with this dark. */
       const starOk=a1 && (S.filterClears||0)>=1;
       return [
-        {label:'Arm the AutoFilter across the header row', ok: armed},
+        /* §1.7 R1: the label opens with a CLOSED-LIST verb. "Arm" reads better and is the word
+           the prompt and guide use, but it is not on the list and §1.7 says adding one takes a
+           doc PR — so the beat says "Add", which is also what Excel's own UI calls it. (The
+           §2.8 closed-verb lint is still unimplemented in check-invariants.js, so nothing would
+           have caught this; noted in the r438 AUDIT entry.) */
+        {label:'Add the AutoFilter to the header row', ok: armed},
         {label:'Enter the largest '+o.sectorA+' deal size in the screen block', ok: a1},
         {label:'Filter the list to the deals marked '+o.statusX, ok: screenOk},
         {label:'Enter how many deals are marked '+o.statusX, ok: a2},
