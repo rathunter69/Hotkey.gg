@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Roll up the segments — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="SUMIF rollup + live foot + % of total, summary formatted Par 57s, optimal 59 keys. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="Roll a raw ledger up by segment, show every share of the whole, then prove it ties back — a rollup that quietly misses rows still looks like a table full of n">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Roll up the segments — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="SUMIF rollup + live foot + % of total, summary formatted Par 57s, optimal 59 keys. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="Roll a raw ledger up by segment, show every share of the whole, then prove it ties back — a rollup that quietly misses rows still looks like a table full of n">
 <meta property="og:url" content="https://www.hotkey.gg/drills/sumif.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Roll up the segments — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="SUMIF rollup + live foot + % of total, summary formatted Par 57s, optimal 59 keys. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="Roll a raw ledger up by segment, show every share of the whole, then prove it ties back — a rollup that quietly misses rows still looks like a table full of n">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/sumif.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -85,7 +85,7 @@
   .trackhead small{color:var(--faint); font-weight:400; font-size:12px}
   .trackhead .tb{font-size:12.5px; color:var(--muted); font-weight:400; margin-top:4px; line-height:1.55}</style>
 <link rel="stylesheet" href="nav.css?v=210">
-<script src="drills.js?v=296"></script>
+<script src="drills.js?v=298"></script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -93,7 +93,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=310"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Roll up the segments","description":"SUMIF rollup + live foot + % of total, summary formatted","url":"https://www.hotkey.gg/drills/sumif.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas I","teaches":"SUMIF reads the labels for you — one formula rolls up an entire segment.","isPartOf":{"@type":"Course","name":"Spreadsheet Formulas & Data Analysis","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT57S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Roll up the segments","item":"https://www.hotkey.gg/drills/sumif.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Roll up the segments","description":"Roll a raw ledger up by segment, show every share of the whole, then prove it ties back — a rollup that quietly misses rows still looks like a table full of numbers","url":"https://www.hotkey.gg/drills/sumif.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas I","teaches":"a rollup nobody tied out is a rumour — the check is what proves no rows went missing.","isPartOf":{"@type":"Course","name":"Spreadsheet Formulas & Data Analysis","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT76S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Roll up the segments","item":"https://www.hotkey.gg/drills/sumif.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -102,25 +102,28 @@
   <div class="crumbs"><a href="index.html">hotkey.gg</a> / <a href="drills/index.html">drill library</a> / formulas i</div>
   <div class="eyebrow">◆ Formulas I · drill · Spreadsheet Formulas &amp; Data track</div>
   <h1>Roll up the segments</h1>
-  <div class="aha">SUMIF reads the labels for you — one formula rolls up an entire segment.</div>
-  <div class="sub">A raw ledger on the left, a clean summary on the right. Write one SUMIF with anchored ranges and fill it down for the other segments — only the criteria cell moves. Then total the summary with a live SUM, run % of total off an anchored denominator, and bold the total line.</div>
+  <div class="aha">a rollup nobody tied out is a rumour — the check is what proves no rows went missing.</div>
+  <div class="sub">A raw ledger on the left, an empty summary on the right. Roll each segment up out of the ledger, total the summary, and show every segment as a share of the whole. Then prove it: the summary should tie back to the ledger exactly. A rollup that quietly misses rows still looks like a table full of numbers.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=sumif">train this drill →</a>
-    <span class="par">par 57s · optimal 59 keys · keyboard only · free</span>
+    <span class="par">par 76s · optimal 69 keys · keyboard only · free</span>
   </div>
 
   <div class="section-title">The shortcuts in this drill</div>
   <div class="panel">
     <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
     <div class="scb"><div class="sch"><kbd>Ctrl+D</kbd><span class="m">⌘D on mac</span><span class="what">Fill down from the cell above</span></div><div class="use">Build the logic once in the top cell, select down, and stamp it — the standard way to fill a schedule.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt+=</kbd><span class="m">⌥ = on mac</span><span class="what">AutoSum the adjacent range</span></div><div class="use">AutoSum reads the block above or beside the cursor and proposes the SUM — foot rows and columns without typing a formula.</div></div>
     <div class="scb"><div class="sch"><kbd>Ctrl+Shift+%</kbd><span class="m">⌘⇧% on mac</span><span class="what">Percent, 0 decimals</span></div><div class="use">Margins, growth rates, weights — any ratio gets the percent treatment the moment it’s computed.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h 0</kbd><span class="m">⌥ h 0 on mac</span><span class="what">Add a decimal place</span></div><div class="use">Add decimals until the figure carries the precision the page needs.</div></div>
     <div class="scb"><div class="sch"><kbd>Ctrl+B</kbd><span class="m">⌘B on mac</span><span class="what">Bold</span></div><div class="use">Bold marks structure: titles, total rows, anything the reviewer’s eye should land on first.</div></div>
     <div class="scb"><div class="sch"><kbd>Alt h b p</kbd><span class="m">⌥ h b p on mac</span><span class="what">Top border</span></div><div class="use">Top border above a total row — the accounting ruling that says “this line sums the ones above.”</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+S</kbd><span class="m">⌘S on mac</span><span class="what">Save</span></div></div>
     <div class="fnline">functions you'll type: <b style="color:var(--text)">SUMIF()</b> · <b style="color:var(--text)">SUM()</b></div>
   </div>
 
   <div class="section-title">The optimal line</div>
-  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>E2</em> <em>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</em> · fill E2:E4 ↓ · <em>E5</em> <em>=SUM(E2:E4)</em> · <em>F2</em> <em>=E2/$E$5</em> · fill F2:F4 ↓ + <em>ctrl+shift+%</em> · dress D5:E5: <em>ctrl+b</em> + <em>alt h b p</em></div></div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>E2</em> =SUMIF($A$2:$A$11,D2,$B$2:$B$11) · fill ↓ · <em>E5</em> <em>alt+=</em> · <em>F2</em> =share off $E$5 · fill · <em>ctrl+shift+%</em> · total line <em>ctrl+b</em> + <em>alt h b p</em> · check <em>E7</em> · <em>ctrl+s</em></div></div>
 
   <div class="section-title">More Formulas I drills</div>
   <div class="rel">

@@ -1728,9 +1728,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=296"></script>
+<script src="drills.js?v=298"></script>
 
-<script src="drills.js?v=296"></script>
+<script src="drills.js?v=298"></script>
 
 
 
@@ -8802,68 +8802,118 @@ const CHALLENGES = {
   },
 
   sumif:{
-    name:'SUMIF', label:'Roll up the segments', par:57, parKeys:59,
-    aha:'SUMIF reads the labels for you — one formula rolls up an entire segment.',
-    prompt:'A raw ledger on the left, a clean summary on the right. Write one SUMIF with anchored ranges and fill it down for the other segments — only the criteria cell moves. Then total the summary with a live SUM, run % of total off an anchored denominator, and bold the total line.',
-    req:'<em>E2</em> <em>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</em> \u00b7 fill E2:E4 \u2193 \u00b7 <em>E5</em> <em>=SUM(E2:E4)</em> \u00b7 <em>F2</em> <em>=E2/$E$5</em> \u00b7 fill F2:F4 \u2193 + <em>ctrl+shift+%</em> \u00b7 dress D5:E5: <em>ctrl+b</em> + <em>alt h b p</em>',
-    guide:[
-      'the rollup at E2 \u00b7 <kbd>=SUMIF($A$2:$A$10,D2,$B$2:$B$10)</kbd> <kbd>\u21b5</kbd> \u2014 ranges $-locked, criteria walking',
-      'select E2:E4 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 only D2 walks; that is what the anchors buy you',
-      'foot it at E5 \u00b7 <kbd>=SUM(E2:E4)</kbd> \u2014 the summary must tie to the ledger',
-      'mix at F2 \u00b7 <kbd>=E2/$E$5</kbd> \u2014 anchored denominator \u00b7 fill F2:F4 \u2193 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
-      'format the total: select D5:E5 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
-    ],
-    targets:['E2:E4','E5','F2:F4','D5:E5'],
-    demo(){ return [
-      {sel:'E2', keys:[...T('=SUMIF($A$2:$A$10,D2,$B$2:$B$10)'), Kb.enter]},
-      {sel:'E2:E4', keys:[Kb.fillD]},
-      {sel:'E5', keys:[...T('=SUM(E2:E4)'), Kb.enter]},
-      {sel:'F2', keys:[...T('=E2/$E$5'), Kb.enter]},
-      {sel:'F2:F4', keys:[Kb.fillD]},
-      {sel:'F2:F4', keys:[Kb.pct]},
-      {sel:'D5:E5', keys:[Kb.bold]},
-      {sel:'D5:E5', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
+    /* r429 (H6b wave 5, DEPTH_PASS §4.28 + §1.0/§1.0-R2/§1.0-R3): depth-pass rework.
+       JUDGMENT CALLS (per WORKFLOW.md §8):
+       · §1.2 AXES — the page says "verify axes"; there was effectively ONE (the ledger amounts).
+         Segment names, both block sites, the ledger depth and the segment count were all FIXED.
+         Now: site jitter, a 6-deep segment pool, 3-4 segments, an 8-12 row ledger.
+       · §1.0(c) VIOLATION FIXED: core required the SUMIF to carry $-locked ranges
+         (refs('E2',[...,'$A$2:$A$10',...])). Three separately written SUMIFs produce the same
+         numbers, so that was a ROUTE requirement. Core now grades the rollup VALUES; the anchors
+         are taught in guide/req and paid for by the clock.
+       · §4.28's "☆ Add an outside border around the summary block" is a FORMATTING ☆ — dead under
+         §1.0(d), and unlike cagr's it is NOT real work worth promoting (dress is not this drill's
+         lesson). Re-cut to INDEPENDENT PROVE-OUT: the summary TIES back to the raw ledger. That is
+         the actual desk discipline for a rollup — a pivot nobody tied out is a rumour. Second use
+         of the family in c3 (anchor was first) and legal under the r429 spacing rule: five drills
+         apart, and it teaches a different thing (there: an anchor can be silently wrong; here: a
+         rollup can silently MISS rows).
+       · The tie check is what makes the miss visible: if a segment is left out of the summary, the
+         rollups still look like numbers and only the check moves off zero. */
+    name:'SUMIF', label:'Roll up the segments', par:76, parKeys:69, saveClose:true,   /* r429: par re-swept post-rework — 5-seed sweep median 69 keys, 0% drift after retune; par 76s \u2248 1.10 s/key. Was 57/59: the tie-out beat and the variable geometry (3-4 segments, 8-12 ledger rows) both add real typing. */
+    aha:'a rollup nobody tied out is a rumour — the check is what proves no rows went missing.',
+    prompt:'A raw ledger on the left, an empty summary on the right. Roll each segment up out of the ledger, total the summary, and show every segment as a share of the whole. Then prove it: the summary should tie back to the ledger exactly. A rollup that quietly misses rows still looks like a table full of numbers.',
+    req(){ const o=this._o; return '<em>'+o.sumC+o.s0+'</em> =SUMIF($'+o.ledC+'$'+o.l0+':$'+o.ledC+'$'+o.lN+','+o.segC+o.s0+',$'+o.amtC+'$'+o.l0+':$'+o.amtC+'$'+o.lN+') · fill ↓ · <em>'+o.sumC+o.tot+'</em> <em>alt+=</em> · <em>'+o.pctC+o.s0+'</em> =share off $'+o.sumC+'$'+o.tot+' · fill · <em>ctrl+shift+%</em> · total line <em>ctrl+b</em> + <em>alt h b p</em> · check <em>'+o.chk+'</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): labels are OUTCOME lines; the route lives here. */
+    guide(){ const o=this._o; return [
+      'the rollup at <em>'+o.sumC+o.s0+'</em> · <kbd>=SUMIF($'+o.ledC+'$'+o.l0+':$'+o.ledC+'$'+o.lN+','+o.segC+o.s0+',$'+o.amtC+'$'+o.l0+':$'+o.amtC+'$'+o.lN+')</kbd> <kbd>↵</kbd> — both ranges $-locked, only the criteria cell walking · select down to <em>'+o.sumC+o.sN+'</em> · <kbd>ctrl</kbd>+<kbd>d</kbd>',
+      'foot the summary at <em>'+o.sumC+o.tot+'</em> · <kbd>alt</kbd>+<kbd>=</kbd> <kbd>↵</kbd>',
+      'the share at <em>'+o.pctC+o.s0+'</em> · <kbd>=</kbd>'+o.sumC+o.s0+'<kbd>/</kbd>$'+o.sumC+'$'+o.tot+' — anchored denominator · fill down · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd>',
+      'the total line reads as a total — select <em>'+o.segC+o.tot+':'+o.sumC+o.tot+'</em> · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
+      '☆ the discovery: prove it. In <em>'+o.chk+'</em> put the summary total against the ledger’s own sum — <kbd>='+o.sumC+o.tot+'-SUM('+o.amtC+o.l0+':'+o.amtC+o.lN+')</kbd> <kbd>↵</kbd>. Zero means nothing went missing; anything else means a segment never made it into the summary',
+    ]; },
+    targets(){ const o=this._o; return [o.sumC+o.s0+':'+o.sumC+o.sN, o.sumC+o.tot, o.pctC+o.s0+':'+o.pctC+o.sN, o.segC+o.tot+':'+o.sumC+o.tot, o.chk]; },
+    demo(){ const o=this._o; return [
+      {sel:o.sumC+o.s0, keys:[...T('=SUMIF($'+o.ledC+'$'+o.l0+':$'+o.ledC+'$'+o.lN+','+o.segC+o.s0+',$'+o.amtC+'$'+o.l0+':$'+o.amtC+'$'+o.lN+')'), Kb.enter]},
+      {sel:o.sumC+o.s0+':'+o.sumC+o.sN, keys:[Kb.fillD]},
+      {sel:o.sumC+o.tot, keys:[Kb.eq, Kb.enter]},
+      {sel:o.pctC+o.s0, keys:[...T('='+o.sumC+o.s0+'/$'+o.sumC+'$'+o.tot), Kb.enter]},
+      {sel:o.pctC+o.s0+':'+o.pctC+o.sN, keys:[Kb.fillD, Kb.pct, Kb.alt,L('H'),D(0)]},
+      {sel:o.segC+o.tot+':'+o.sumC+o.tot, keys:[Kb.bold, Kb.alt,L('H'),L('B'),L('P')]},
+      /* the ☆ — the tie-out (§2.2: the demo performs the bonus so replay covers it) */
+      {sel:o.chk, keys:[...T('='+o.sumC+o.tot+'-SUM('+o.amtC+o.l0+':'+o.amtC+o.lN+')'), Kb.enter]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:'Ledger',txt:true,bold:true};
-      cells['D1']={...blankCell(),value:'Segment',txt:true,bold:true};
-      cells['E1']={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
-      cells['F1']={...blankCell(),value:'% of total',txt:true,bold:true,align:'r'};
-      const segs=['Freight','Brokerage','Storage'];
-      const sums=[0,0,0];
-      for(let r=2;r<=10;r++){
-        const si=rnd(0,2), amt=rnd(20,140)*5;
-        sums[si]+=amt;
-        cells['A'+r]={...blankCell(),value:segs[si],txt:true};
-        cells['B'+r]={...blankCell(),value:amt,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+      /* §1.2 axes (the page's "verify axes" — there was effectively ONE): (a) site jitter, both
+         blocks slide down together; (b) segment-name pool Fisher-Yates from six + segment COUNT
+         3–4; (c) ledger DEPTH 8–12 rows and every amount through rnd(); (d) which segment leads
+         falls out of the draw, so the share column is never the same shape twice. */
+      const d=rnd(0,2), hr=1+d;
+      const SEGS=shuffle(['Freight','Brokerage','Storage','Last mile','Customs','Warehousing']);
+      const nSeg=rnd(3,4), nLed=rnd(8,12);
+      const segs=SEGS.slice(0,nSeg);
+      const ledC='A', amtC='B', segC='D', sumC='E', pctC='F';
+      const l0=hr+1, lN=hr+nLed;
+      cells[ledC+hr]={...blankCell(),value:'Ledger',txt:true,bold:true};
+      cells[amtC+hr]={...blankCell(),value:'Amount',txt:true,bold:true,align:'r'};
+      cells[segC+hr]={...blankCell(),value:'Segment',txt:true,bold:true};
+      cells[sumC+hr]={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
+      cells[pctC+hr]={...blankCell(),value:'% of total',txt:true,bold:true,align:'r'};
+      const sums=new Array(nSeg).fill(0);
+      /* every segment is guaranteed at least one ledger row — otherwise a share cell divides into
+         a zero rollup and the board teaches nothing */
+      for(let i=0;i<nLed;i++){ const si=i<nSeg? i : rnd(0,nSeg-1);
+        const amt=rnd(20,140)*5; sums[si]+=amt;
+        cells[ledC+(l0+i)]={...blankCell(),value:segs[si],txt:true};
+        cells[amtC+(l0+i)]={...blankCell(),value:amt,fontColor:'blue',fmtStyle:'comma',decimals:0};
       }
-      for(let i=0;i<3;i++){
-        cells['D'+(2+i)]={...blankCell(),value:segs[i],txt:true};
-        cells['E'+(2+i)]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells['F'+(2+i)]={...blankCell(),fmtStyle:'comma',decimals:0};
+      const s0=hr+1, sN=hr+nSeg, tot=hr+nSeg+1;
+      for(let i=0;i<nSeg;i++){
+        cells[segC+(s0+i)]={...blankCell(),value:segs[i],txt:true};
+        cells[sumC+(s0+i)]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[pctC+(s0+i)]={...blankCell(),fmtStyle:'comma',decimals:0};
       }
-      cells['D5']={...blankCell(),value:'Total',txt:true};
-      cells['E5']={...blankCell(),fmtStyle:'comma',decimals:0};
-      this._sums=sums; this._tot=sums[0]+sums[1]+sums[2];
-      return {ROWS:10, cells, active:{r:2,c:5}, sel:null, colW:{1:110,2:80,4:110,5:80,6:80}};
+      cells[segC+tot]={...blankCell(),value:'Total',txt:true};
+      cells[sumC+tot]={...blankCell(),fmtStyle:'comma',decimals:0};
+      const chkRow=tot+2;
+      cells[segC+chkRow]={...blankCell(),value:'Ties to ledger',txt:true};
+      cells[sumC+chkRow]={...blankCell(),fill:'yellow',ball:true,fmtStyle:'comma',decimals:0};
+      this._sums=sums; this._tot=sums.reduce((a,b)=>a+b,0);
+      this._o={ hr:hr, nSeg:nSeg, nLed:nLed, ledC:ledC, amtC:amtC, segC:segC, sumC:sumC, pctC:pctC,
+        l0:l0, lN:lN, s0:s0, sN:sN, tot:tot, chk:sumC+chkRow, chkRow:chkRow };
+      return {ROWS:Math.max(13,Math.max(lN,chkRow)+1), cells, active:{r:s0,c:5}, sel:null,
+        colW:{1:110,2:80,4:110,5:80,6:80}};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase(); return rs.every(x=>f.includes(x)); };
-      const anchOk=refs('E2',['SUMIF','$A$2:$A$10','$B$2:$B$10']);
-      const rollOk=[0,1,2].every(i=>{ const val=v('E'+(2+i)); return val!==null&&Math.abs(val-this._sums[i])<0.5; });
-      const totC=S.cells['E5'];
-      const totOk=!!(totC&&totC.formula&&String(totC.formula).toUpperCase().includes('SUM(')&&Math.abs(totC.value-this._tot)<0.5);
-      const pctOk=[0,1,2].every(i=>{ const c=S.cells['F'+(2+i)];
-        return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-this._sums[i]/this._tot)<1e-3&&c.fmtStyle==='percent'); })
-        && refs('F2',['$E$5']);
-      const dressOk=['D5','E5'].every(k=>{ const c=S.cells[k]; return !!(c&&c.bold&&c.bt); });
+      const o=this._o, cell=k=>S.cells[k]||{};
+      /* §1.0(c): the rollup beat grades VALUES. Three separately written SUMIFs, or even typed
+         totals, produce the same numbers — the anchors are what make ONE formula serve the column,
+         and the clock is what prices the difference. Core must not demand the route. */
+      const rollOk=[...Array(o.nSeg).keys()].every(i=>{ const c=cell(o.sumC+(o.s0+i));
+        return typeof c.value==='number' && Math.abs(c.value-this._sums[i])<0.5; });
+      const totC=cell(o.sumC+o.tot);
+      const totOk=typeof totC.value==='number' && Math.abs(totC.value-this._tot)<0.5;
+      const pctOk=[...Array(o.nSeg).keys()].every(i=>{ const c=cell(o.pctC+(o.s0+i));
+        return typeof c.value==='number' && Math.abs(c.value-this._sums[i]/this._tot)<1e-3
+          && c.fmtStyle==='percent' && (c.decimals|0)===1; });
+      const dressOk=(()=>{ for(let c=4;c<=5;c++){ const x=cell(colLetter(c)+o.tot);
+        if(!x.bold||!x.bt) return false; } return true; })();
+      /* ☆ (§1.0(d) mystery slot · §1.0-R3(o) INDEPENDENT PROVE-OUT — second use in c3, five drills
+         from anchor's and teaching a different failure: there an anchor can be silently wrong, here
+         a rollup can silently MISS rows). A LIVE formula in the check cell reading zero, with the
+         summary actually right. Any route counts (§1.0(c)); leaving the cell empty clears all four
+         cores and wins. */
+      const chk=cell(o.chk);
+      const starOk=!!(chk.formula && typeof chk.value==='number' && Math.abs(chk.value)<0.5
+        && rollOk && totOk);
       return [
-        {label:'build one SUMIF, ranges $-locked \u2014 only the criteria walks the fill', ok: anchOk&&rollOk},
-        {label:'total the summary with a live SUM', ok: totOk},
-        {label:'run % of total off the anchored denominator, all three segments', ok: pctOk},
-        {label:'bold the total line and add a top border above it', ok: dressOk},
+        {label:'Roll each segment up out of the ledger', ok: rollOk},
+        {label:'Total the summary', ok: totOk},
+        {label:'Show every segment as a share of the whole — percent, one decimal', ok: pctOk},
+        {label:'Bold the total line and add a top border above it', ok: dressOk},
+        {label:'☆ the summary tied back to the ledger — the check reads zero, so nothing went missing', ok: starOk, bonus:true},
       ];
     }
   },
@@ -9010,70 +9060,129 @@ const CHALLENGES = {
   },
 
   rollup:{
-    name:'SUMIFS', label:'Cross-tab with SUMIFS', par:65, parKeys:68,
-    aha:'SUMIFS crosses two labels at once — one mixed-anchor formula fills the grid.',
-    prompt:'Roll a raw deal list — segment, region, revenue — up into a segment × region grid. One SUMIFS does it: ranges $-locked, the segment criterion column-locked ($F3), the region criterion row-locked (G$2) — then the same formula fills right and down to build the grid.',
-    req:'<em>G3</em> <em>=SUMIFS($C$3:$C$11,$A$3:$A$11,$F3,$B$3:$B$11,G$2)</em> \u00b7 fill G3:H3 \u2192 \u00b7 fill G3:H4 \u2193 \u00b7 <em>G5</em> <em>=SUM(G3:G4)</em> fill \u2192 \u00b7 dress F5:H5: <em>ctrl+b</em> + <em>alt h b p</em>',
-    guide:[
-      'the cross at G3 \u00b7 <kbd>=SUMIFS($C$3:$C$11,$A$3:$A$11,$F3,$B$3:$B$11,G$2)</kbd> <kbd>\u21b5</kbd> \u2014 sum range first, then each (range, criterion) pair; $F3 walks DOWN only, G$2 walks RIGHT only',
-      'select G3:H3 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u00b7 then G3:H4 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 four live cells from ONE formula; if a number repeats, an anchor is wrong',
-      'foot it: G5 \u00b7 <kbd>=SUM(G3:G4)</kbd> \u00b7 fill G5:H5 \u2192 \u2014 the two feet must re-add the whole tape',
-      'format the total line: select F5:H5 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
-    ],
-    targets:['G3','G3:H4','G5:H5','F5:H5'],
-    demo(){ return [
-      {sel:'G3', keys:[...T('=SUMIFS($C$3:$C$11,$A$3:$A$11,$F3,$B$3:$B$11,G$2)'), Kb.enter]},
-      {sel:'G3:H3', keys:[Kb.fillR]},
-      {sel:'G3:H4', keys:[Kb.fillD]},
-      {sel:'G5', keys:[...T('=SUM(G3:G4)'), Kb.enter]},
-      {sel:'G5:H5', keys:[Kb.fillR]},
-      {sel:'F5:H5', keys:[Kb.bold]},
-      {sel:'F5:H5', keys:[Kb.alt, L('H'), L('B'), L('P')]},
+    /* r429 (H6b wave 5, DEPTH_PASS §4.29 + §1.0/§1.0-R2/§1.0-R3): depth-pass rework.
+       JUDGMENT CALLS (per WORKFLOW.md §8):
+       · §1.0(c) VIOLATION FIXED: core required the SUMIFS to carry the exact mixed anchors
+         ($F3 / G$2). Four separately written SUMIFS produce the same four numbers, so that was a
+         ROUTE requirement. Core now grades the VALUES; the mixed anchors are what let ONE formula
+         fill the grid, and that discipline moved to the ☆ where a route may be graded.
+       · §4.29's "☆ Bold the grid's row and column headers" is a FORMATTING ☆ — dead under §1.0(d).
+         But it IS real work (the axes have to read), so per §1.0-R3(o) it is PROMOTED to core
+         beat 4 rather than deleted. 4 beats → 5.
+       · NEW ☆ = ONE-PASS FILL, 2-D (family's second use in c3; bridge was the first, two drills
+         earlier so not adjacent, and it teaches a different thing: bridge is one fill per ROW,
+         this is one formula spreading in BOTH directions because the anchors are mixed).
+       · §4.29's "verify axes" — segment and region names were HARDCODED and the grid was nailed at
+         F2:H5. Now: pools for both axes, site jitter, and a varying deal-list depth. */
+    name:'SUMIFS', label:'Cross-tab with SUMIFS', par:68, parKeys:62, saveClose:true,   /* r429: par re-swept post-rework — 5-seed sweep median 62 keys, 0% drift after retune; par 68s \u2248 1.10 s/key. Was 65/68 — the promoted axes beat came in, the anchor-route requirement left core. */
+    aha:'mixed anchors are what let one formula spread in two directions — if a cross repeats, an anchor is wrong.',
+    prompt:'A raw deal list — segment, region, revenue — and an empty cross-tab beside it. Fill the grid so every cell reads the revenue for that segment in that region, total the regions across the bottom, and make the axes read. One formula can serve the whole grid if its references are locked the right way; if two crosses come back identical, that is the anchors telling you something.',
+    req(){ const o=this._o; return '<em>'+o.g0+'</em> =SUMIFS($'+o.amtC+'$'+o.l0+':$'+o.amtC+'$'+o.lN+',$'+o.segC+'$'+o.l0+':$'+o.segC+'$'+o.lN+',$'+o.rowC+o.r0+',$'+o.regC+'$'+o.l0+':$'+o.regC+'$'+o.lN+','+o.c0L+'$'+o.hr+') · fill → then ↓ · feet <em>alt+=</em> fill → · headers <em>ctrl+b</em> · total line <em>ctrl+b</em> + <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): labels are OUTCOME lines; the route lives here. */
+    guide(){ const o=this._o; return [
+      'the first cross at <em>'+o.g0+'</em> · <kbd>=SUMIFS($'+o.amtC+'$'+o.l0+':$'+o.amtC+'$'+o.lN+',$'+o.segC+'$'+o.l0+':$'+o.segC+'$'+o.lN+',$'+o.rowC+o.r0+',$'+o.regC+'$'+o.l0+':$'+o.regC+'$'+o.lN+','+o.c0L+'$'+o.hr+')</kbd> <kbd>↵</kbd> — sum range first, then each (range, criterion) pair. <b>$'+o.rowC+o.r0+'</b> walks DOWN only; <b>'+o.c0L+'$'+o.hr+'</b> walks RIGHT only',
+      'select <em>'+o.gridRow0+'</em> · <kbd>ctrl</kbd>+<kbd>r</kbd> · then <em>'+o.grid+'</em> · <kbd>ctrl</kbd>+<kbd>d</kbd> — the whole grid from ONE formula. If a number repeats, an anchor is wrong',
+      'the feet — on <em>'+o.c0L+o.totR+'</em> · <kbd>alt</kbd>+<kbd>=</kbd> <kbd>↵</kbd> · select <em>'+o.feet+'</em> · <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'the axes have to read — select the region headers <em>'+o.colHdr+'</em> and the segment labels <em>'+o.rowHdr+'</em> · <kbd>ctrl</kbd>+<kbd>b</kbd>',
+      'the total line — select <em>'+o.rowC+o.totR+':'+o.cNL+o.totR+'</em> · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
+      '☆ the discovery: lock the ranges, column-lock the segment criterion and row-lock the region one, and a single formula fills the entire grid — right, then down. Four separate formulas get the same numbers and cost you four times the typing',
+    ]; },
+    targets(){ const o=this._o; return [o.g0, o.grid, o.feet, o.colHdr, o.rowC+o.totR+':'+o.cNL+o.totR, o.grid]; },
+    demo(){ const o=this._o; return [
+      {sel:o.g0, keys:[...T('=SUMIFS($'+o.amtC+'$'+o.l0+':$'+o.amtC+'$'+o.lN+',$'+o.segC+'$'+o.l0+':$'+o.segC+'$'+o.lN+',$'+o.rowC+o.r0+',$'+o.regC+'$'+o.l0+':$'+o.regC+'$'+o.lN+','+o.c0L+'$'+o.hr+')'), Kb.enter]},
+      /* the ☆ rides here: ONE formula, two fills — right then down (§2.2) */
+      {sel:o.gridRow0, keys:[Kb.fillR]},
+      {sel:o.grid, keys:[Kb.fillD]},
+      {sel:o.c0L+o.totR, keys:[Kb.eq, Kb.enter]},
+      {sel:o.feet, keys:[Kb.fillR]},
+      {sel:o.colHdr, keys:[Kb.bold]},
+      {sel:o.rowHdr, keys:[Kb.bold]},
+      {sel:o.rowC+o.totR+':'+o.cNL+o.totR, keys:[Kb.bold, Kb.alt,L('H'),L('B'),L('P')]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 deal list, segment \u00d7 region ($mm)',txt:true,bold:true};
-      cells['A2']={...blankCell(),value:'Segment',txt:true,bold:true};
-      cells['B2']={...blankCell(),value:'Region',txt:true,bold:true};
-      cells['C2']={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
-      const SEG=['Retail','Instl'], REG=['Americas','EMEA'];
-      // every combo at least twice, ninth row random \u2014 no empty grid cell on any seed
+      const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+      /* §1.2 axes (the page's "verify axes" — segment/region names were HARDCODED and the grid was
+         nailed at F2:H5): (a) site jitter, the whole page slides down; (b) segment AND region name
+         pools, both Fisher-Yates; (c) every amount + the deal-list DEPTH (each combination twice,
+         plus 1-3 extra rows); (d) which combination the extra rows land on. */
+      const d=rnd(0,2), hr=2+d;
+      const SEG=shuffle(['Retail','Institutional','Wholesale','Direct','Partner']).slice(0,2);
+      const REG=shuffle(['Americas','EMEA','APAC','LatAm']).slice(0,2);
+      const segC='A', regC='B', amtC='C', rowC='F';
+      const c0=7, cN=8, c0L=colLetter(c0), cNL=colLetter(cN);
+      const l0=hr+1;
+      cells['A'+(hr-1)]={...blankCell(),value:codename()+' — deal list, segment × region ($000s)',txt:true,bold:true};
+      cells[segC+hr]={...blankCell(),value:'Segment',txt:true,bold:true};
+      cells[regC+hr]={...blankCell(),value:'Region',txt:true,bold:true};
+      cells[amtC+hr]={...blankCell(),value:'Revenue',txt:true,bold:true,align:'r'};
+      /* every combination appears at least twice — no grid cell is ever empty on any seed */
       const combos=[];
       SEG.forEach(sg=>REG.forEach(rg=>{ combos.push([sg,rg]); combos.push([sg,rg]); }));
-      combos.push([SEG[rnd(0,1)], REG[rnd(0,1)]]);
-      for(let k2=combos.length-1;k2>0;k2--){ const j=rnd(0,k2); [combos[k2],combos[j]]=[combos[j],combos[k2]]; }
+      const extra=rnd(1,3);
+      for(let i=0;i<extra;i++) combos.push([SEG[rnd(0,1)], REG[rnd(0,1)]]);
+      shuffle(combos);
       const tot={};
-      combos.forEach(([sg,rg],i)=>{ const r=3+i, v=rnd(4,60)*10;
-        cells['A'+r]={...blankCell(),value:sg,txt:true};
-        cells['B'+r]={...blankCell(),value:rg,txt:true};
-        cells['C'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        tot[sg+'|'+rg]=(tot[sg+'|'+rg]||0)+v;
-      });
-      cells['F2']={...blankCell(),value:'Cross',txt:true,bold:true};
-      cells['G2']={...blankCell(),value:REG[0],txt:true,bold:true,align:'r'};
-      cells['H2']={...blankCell(),value:REG[1],txt:true,bold:true,align:'r'};
-      cells['F3']={...blankCell(),value:SEG[0],txt:true};
-      cells['F4']={...blankCell(),value:SEG[1],txt:true};
-      cells['F5']={...blankCell(),value:'Total',txt:true};
-      [['G',3],['H',3],['G',4],['H',4],['G',5],['H',5]].forEach(([cl,r])=>cells[cl+r]={...blankCell(),fmtStyle:'comma',decimals:0});
-      this._o={grid:{G3:tot[SEG[0]+'|'+REG[0]]||0, H3:tot[SEG[0]+'|'+REG[1]]||0, G4:tot[SEG[1]+'|'+REG[0]]||0, H4:tot[SEG[1]+'|'+REG[1]]||0}};
-      this._o.feet={G5:this._o.grid.G3+this._o.grid.G4, H5:this._o.grid.H3+this._o.grid.H4};
-      return {ROWS:11, cells, active:{r:3,c:7}, sel:null, colW:{1:76,2:88,3:80,6:70,7:88,8:88}};
+      combos.forEach(([sg,rg],i)=>{ const r=l0+i, v=rnd(4,60)*10;
+        cells[segC+r]={...blankCell(),value:sg,txt:true};
+        cells[regC+r]={...blankCell(),value:rg,txt:true};
+        cells[amtC+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        tot[sg+'|'+rg]=(tot[sg+'|'+rg]||0)+v; });
+      const lN=l0+combos.length-1;
+      const r0=hr+1, r1=hr+2, totR=hr+3;
+      cells[rowC+hr]={...blankCell(),value:'Cross',txt:true,bold:true};
+      cells[c0L+hr]={...blankCell(),value:REG[0],txt:true,align:'r'};   // NOT bold — beat 4
+      cells[cNL+hr]={...blankCell(),value:REG[1],txt:true,align:'r'};
+      cells[rowC+r0]={...blankCell(),value:SEG[0],txt:true};            // NOT bold — beat 4
+      cells[rowC+r1]={...blankCell(),value:SEG[1],txt:true};
+      cells[rowC+totR]={...blankCell(),value:'Total',txt:true};
+      [[c0L,r0],[cNL,r0],[c0L,r1],[cNL,r1],[c0L,totR],[cNL,totR]]
+        .forEach(([cl,r])=>cells[cl+r]={...blankCell(),fmtStyle:'comma',decimals:0});
+      const G={}; G[c0L+r0]=tot[SEG[0]+'|'+REG[0]]||0; G[cNL+r0]=tot[SEG[0]+'|'+REG[1]]||0;
+      G[c0L+r1]=tot[SEG[1]+'|'+REG[0]]||0; G[cNL+r1]=tot[SEG[1]+'|'+REG[1]]||0;
+      this._grid=G;
+      this._feet={}; this._feet[c0L+totR]=G[c0L+r0]+G[c0L+r1]; this._feet[cNL+totR]=G[cNL+r0]+G[cNL+r1];
+      this._o={ hr:hr, segC:segC, regC:regC, amtC:amtC, rowC:rowC, c0L:c0L, cNL:cNL,
+        l0:l0, lN:lN, r0:r0, r1:r1, totR:totR,
+        g0:c0L+r0, gridRow0:c0L+r0+':'+cNL+r0, grid:c0L+r0+':'+cNL+r1,
+        feet:c0L+totR+':'+cNL+totR, colHdr:c0L+hr+':'+cNL+hr, rowHdr:rowC+r0+':'+rowC+r1 };
+      return {ROWS:Math.max(12,Math.max(lN,totR)+1), cells, active:{r:r0,c:c0}, sel:null,
+        colW:{1:96,2:96,3:80,6:96,7:92,8:92}};
     },
     checks(S){
-      const o=this._o;
-      const live=(k,exp)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<0.5); };
-      const g3=S.cells['G3'], f=(g3&&g3.formula)?String(g3.formula).toUpperCase():'';
-      const anchOk=f.includes('SUMIFS')&&f.includes('$C$3:$C$11')&&f.includes('$F3')&&f.includes('G$2');
-      const gridOk=['G3','H3','G4','H4'].every(k=>live(k,o.grid[k]));
-      const feetOk=['G5','H5'].every(k=>{ const c=S.cells[k];
-        return live(k,o.feet[k]) && sumishF(c.formula); });
-      const dressOk=['F5','G5','H5'].every(k=>{ const c=S.cells[k]; return !!(c&&c.bold&&c.bt); });
+      const o=this._o, cell=k=>S.cells[k]||{};
+      /* §1.0(c): VALUES, not routes. Four separately written SUMIFS clear the grid beats — the
+         mixed anchors are what make ONE formula do it, and that is the ☆'s job, not core's. */
+      const near=(k,exp)=>{ const c=cell(k); return typeof c.value==='number' && Math.abs(c.value-exp)<0.5; };
+      const firstOk=near(o.g0, this._grid[o.g0]);
+      const gridOk=Object.keys(this._grid).every(k=>near(k,this._grid[k]));
+      const feetOk=Object.keys(this._feet).every(k=>near(k,this._feet[k]));
+      const axesOk=[o.c0L+o.hr, o.cNL+o.hr, o.rowC+o.r0, o.rowC+o.r1].every(k=>!!cell(k).bold);
+      const dressOk=(()=>{ for(let c=6;c<=8;c++){ const x=cell(colLetter(c)+o.totR);
+        if(!x.bold||!x.bt) return false; } return true; })();
+      /* ☆ (§1.0(d) mystery slot · §1.0-R3(o) ONE-PASS FILL, 2-D — second use of the family in c3;
+         bridge was first, two drills back, and taught one fill per ROW. Here the point is that
+         MIXED anchors let a single formula spread in BOTH directions.) Needs the census — every
+         grid cell a translate of the first — AND fills that covered the row and the block. Four
+         hand-written SUMIFS clear every core (§1.0(c)) and never latch. */
+      const first=cell(o.g0);
+      let census=!!first.formula;
+      if(census){ const R=[o.r0,o.r1], C=[o.c0L,o.cNL];
+        for(let i=0;i<2;i++) for(let j=0;j<2;j++){
+          const c=cell(C[j]+R[i]);
+          if(!c.formula || c.formula!==translateFormula(first.formula,i,j)) census=false; } }
+      const fills=S.fillOps||[];
+      const c0n=o.c0L.charCodeAt(0)-64, cNn=o.cNL.charCodeAt(0)-64;
+      const rightOk=fills.some(f=>f.dir==='right' && f.r1<=o.r0 && f.r2>=o.r0 && f.c1<=c0n && f.c2>=cNn);
+      const downOk=fills.some(f=>f.dir==='down' && f.r1<=o.r0 && f.r2>=o.r1 && f.c1<=c0n && f.c2>=cNn);
+      const starOk=gridOk && census && rightOk && downOk;
       return [
-        {label:'build ONE SUMIFS at G3 \u2014 ranges $-locked, $F3 column-locked, G$2 row-locked', ok: anchOk&&live('G3',o.grid.G3)},
-        {label:'fill the grid from that one formula \u2014 all four crosses live and distinct', ok: gridOk},
-        {label:'total both regions at G5:H5 \u2014 live SUMs that re-add the whole table', ok: feetOk},
-        {label:'bold the total line (F5:H5) and add a top border above it', ok: dressOk},
+        {label:'Build the first cross — that segment’s revenue in that region', ok: firstOk},
+        {label:'Fill the grid — all four crosses live and distinct', ok: gridOk},
+        {label:'Total both regions across the bottom', ok: feetOk},
+        {label:'Bold the grid’s region headers and segment labels — the axes read', ok: axesOk},
+        {label:'Bold the total line and add a top border above it', ok: dressOk},
+        {label:'☆ the whole grid from one formula — locked ranges, and each criterion free in one direction only', ok: starOk, bonus:true},
       ];
     }
   },

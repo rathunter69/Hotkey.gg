@@ -479,15 +479,33 @@ const ALTS = [
       {sel:'A'+(o.h1-1)+':A'+(o.h2+1), keys:[{key:'Alt'},L('h'),L('o'),L('u'),L('o')]},
       {sel:'A'+(o.h1-1), keys:[{key:'Alt'},L('a'),L('h')]},
     ]; }` },
-  { key: 'rollup', name: 'feet FIRST (recalc closes them), criteria pairs swapped, ribbon fills', moves: `C => [
-      {sel:'G5', keys:[...T('=SUM(G3:G4)'),{key:'Enter'}]},
-      {sel:'G5:H5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'F5:H5', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'F5:H5', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:'G3', keys:[...T('=SUMIFS($C$3:$C$11,$B$3:$B$11,G$2,$A$3:$A$11,$F3)'),{key:'Enter'}]},
-      {sel:'G3:H3', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'G3:H4', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-    ]` },
+  /* r429 (DEPTH_PASS §4.29 wave 5): both rollup entries rebuilt — the pre-rework entry hardcoded
+     the F2:H5 grid and a 9-row list (all of it now varies) and predated the promoted axes beat and
+     the ☆. ALT 1 = op-ORDER with the criteria PAIRS SWAPPED (SUMIFS takes them in any order) and
+     ribbon fills — the ☆ must still latch. ALT 2 = the skippability control: four hand-written
+     SUMIFS, no fill anywhere, which is also the §1.0(c) proof that core grades values. */
+  { key: 'rollup', name: 'op-ORDER — feet first, criteria pairs SWAPPED, ribbon fills throughout', moves: `C => { const o=C._o; return [
+      {sel:o.c0L+o.totR, keys:[...T('=SUM('+o.c0L+o.r0+':'+o.c0L+o.r1+')'),{key:'Enter'}]},
+      {sel:o.feet, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.rowC+o.totR+':'+o.cNL+o.totR, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:o.g0, keys:[...T('=SUMIFS($'+o.amtC+'$'+o.l0+':$'+o.amtC+'$'+o.lN+',$'+o.regC+'$'+o.l0+':$'+o.regC+'$'+o.lN+','+o.c0L+'$'+o.hr+',$'+o.segC+'$'+o.l0+':$'+o.segC+'$'+o.lN+',$'+o.rowC+o.r0+')'),{key:'Enter'}]},
+      {sel:o.gridRow0, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.grid, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:o.colHdr, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.rowHdr, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:'A1', keys:[{key:'s',ctrl:true}]},
+    ]; }` },
+  { key: 'rollup', name: 'FREEDOM proof — four hand-written SUMIFS, no anchors, no fill anywhere (☆ forfeited, all five cores clear)', moves: `C => { const o=C._o, mv=[];
+      const R=[o.r0,o.r1], CC=[o.c0L,o.cNL];
+      for(let i=0;i<2;i++) for(let j=0;j<2;j++){
+        mv.push({sel:CC[j]+R[i], keys:[...T('=SUMIFS('+o.amtC+o.l0+':'+o.amtC+o.lN+','+o.segC+o.l0+':'+o.segC+o.lN+','+o.rowC+R[i]+','+o.regC+o.l0+':'+o.regC+o.lN+','+CC[j]+o.hr+')'),{key:'Enter'}]}); }
+      mv.push({sel:o.c0L+o.totR, keys:[...T('=SUM('+o.c0L+o.r0+':'+o.c0L+o.r1+')'),{key:'Enter'}]});
+      mv.push({sel:o.cNL+o.totR, keys:[...T('=SUM('+o.cNL+o.r0+':'+o.cNL+o.r1+')'),{key:'Enter'}]});
+      mv.push({sel:o.colHdr, keys:[{key:'b',ctrl:true}]});
+      mv.push({sel:o.rowHdr, keys:[{key:'b',ctrl:true}]});
+      mv.push({sel:o.rowC+o.totR+':'+o.cNL+o.totR, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+      return mv; }` },
   { key: 'hunt', name: 'totals footed FIRST, ctrl+g route, crimes fixed in reverse', moves: `C => { const o=C._o;
       const steps=[
         {sel:'B8', keys:[...T('=SUM(B3:B7)'),{key:'Enter'}]},
@@ -869,16 +887,31 @@ const ALTS = [
         const dep=r==='11'?(Lc+'10'):(Lc+'11');
         return {sel:cell, keys:[...T('='+dep+'*'+src),{key:'Enter'}]}; };
       return st.slice().reverse().map(mk); }` },
-  { key: 'sumif', name: 'dress FIRST, foot + mix before the rollup exists, ctrl+1 percent, ribbon fills', moves: `C => [
-      {sel:'D5:E5', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'D5:E5', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:'E5', keys:[...T('=SUM(E2:E4)'),{key:'Enter'}]},
-      {sel:'F2', keys:[...T('=E2/$E$5'),{key:'Enter'}]},
-      {sel:'F2:F4', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:'F2:F4', keys:[{key:'1',ctrl:true},L('p')]},
-      {sel:'E2', keys:[...T('=SUMIF($A$2:$A$10,D2,$B$2:$B$10)'),{key:'Enter'}]},
-      {sel:'E2:E4', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-    ]` },
+  /* r429 (DEPTH_PASS §4.28 wave 5): both sumif entries rebuilt — the pre-rework entry hardcoded a
+     fixed 3-segment summary at D2:F4 with a 9-row ledger (all of it now varies) and predated the
+     tie-out ☆. ALT 1 = op-ORDER + ribbon fills. ALT 2 = the skippability control: the check cell
+     left EMPTY, plus the §1.0(c) proof that SEPARATE un-anchored SUMIFs clear the rollup beat. */
+  { key: 'sumif', name: 'op-ORDER — dress first, foot and share before the rollup exists, ribbon fills throughout', moves: `C => { const o=C._o; return [
+      {sel:o.segC+o.tot+':'+o.sumC+o.tot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:o.sumC+o.tot, keys:[...T('=SUM('+o.sumC+o.s0+':'+o.sumC+o.sN+')'),{key:'Enter'}]},
+      {sel:o.pctC+o.s0, keys:[...T('='+o.sumC+o.s0+'/$'+o.sumC+'$'+o.tot),{key:'Enter'}]},
+      {sel:o.pctC+o.s0+':'+o.pctC+o.sN, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:o.pctC+o.s0+':'+o.pctC+o.sN, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
+      {sel:o.sumC+o.s0, keys:[...T('=SUMIF($'+o.ledC+'$'+o.l0+':$'+o.ledC+'$'+o.lN+','+o.segC+o.s0+',$'+o.amtC+'$'+o.l0+':$'+o.amtC+'$'+o.lN+')'),{key:'Enter'}]},
+      {sel:o.sumC+o.s0+':'+o.sumC+o.sN, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:o.chk, keys:[...T('='+o.sumC+o.tot+'-SUM('+o.amtC+o.l0+':'+o.amtC+o.lN+')'),{key:'Enter'}]},
+      {sel:'A1', keys:[{key:'s',ctrl:true}]},
+    ]; }` },
+  { key: 'sumif', name: 'FREEDOM proof — a SEPARATE un-anchored SUMIF per segment, check cell left EMPTY (☆ forfeited, all four cores clear)', moves: `C => { const o=C._o, mv=[];
+      for(let i=0;i<o.nSeg;i++){ const r=o.s0+i;
+        mv.push({sel:o.sumC+r, keys:[...T('=SUMIF('+o.ledC+o.l0+':'+o.ledC+o.lN+','+o.segC+r+','+o.amtC+o.l0+':'+o.amtC+o.lN+')'),{key:'Enter'}]}); }
+      mv.push({sel:o.sumC+o.tot, keys:[{key:'=',alt:true},{key:'Enter'}]});
+      for(let i=0;i<o.nSeg;i++){ const r=o.s0+i;
+        mv.push({sel:o.pctC+r, keys:[...T('='+o.sumC+r+'/'+o.sumC+o.tot),{key:'Enter'}]}); }
+      mv.push({sel:o.pctC+o.s0+':'+o.pctC+o.sN, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
+      mv.push({sel:o.segC+o.tot+':'+o.sumC+o.tot, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+      return mv; }` },
   { key: 'threestmt', name: 'balance sheet BEFORE the CFS — RE roll and check first, cash spine last', moves: `C => [
       {sel:'C13', keys:[...T('=B13+C2'),{key:'Enter'}]},
       {sel:'C13:D13', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},

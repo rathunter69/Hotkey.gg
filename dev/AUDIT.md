@@ -1,5 +1,42 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r429 H6b-5 — sumif + rollup (DEPTH_PASS §4.28/§4.29) — wave 5 at 9 of 12
+_Both drills carried the SAME two defects, which is worth naming as a pattern: a §1.0(c) route
+requirement baked into core, and §1.2 axes that existed on paper but not in the build._
+
+### sumif — "Roll up the segments"
+- **§1.0(c) VIOLATION FIXED:** core required the SUMIF to carry `$`-locked ranges. Three separately
+  written SUMIFs produce the same numbers, so that was a ROUTE requirement. Core now grades the
+  rollup VALUES; the anchors are taught in guide/req and paid for by the clock. **ALT 2 walks a
+  separate un-anchored SUMIF per segment and clears every core** — that is the proof.
+- **§1.2 AXES — the page said "verify axes"; there was effectively ONE** (the ledger amounts).
+  Segment names, both block sites, the ledger depth and the segment count were all fixed. Now:
+  site jitter · a 6-deep segment pool · 3–4 segments · an 8–12 row ledger. Every segment is
+  guaranteed a ledger row, so no share cell ever divides into a zero rollup.
+- **☆ RE-CUT to INDEPENDENT PROVE-OUT** (§4.28's "outside border around the summary" is a formatting
+  ☆, and unlike cagr's it is NOT real work worth promoting — dress is not this drill's lesson):
+  **the summary ties back to the ledger.** That is the actual desk discipline for a rollup — a pivot
+  nobody tied out is a rumour — and it is what makes the failure visible: a rollup that misses rows
+  still looks like a table full of numbers, and only the check moves off zero. Second use of the
+  family in c3 (anchor was first, five drills back) and legal under the r429 spacing rule: it
+  teaches a different failure (there an anchor is silently wrong; here rows silently go missing).
+- **PAR:** 57/59 → **76/69**.
+
+### rollup — "Cross-tab with SUMIFS"
+- **SAME §1.0(c) FIX:** core demanded the exact mixed anchors (`$F3` / `G$2`). Four separately
+  written SUMIFS give the same four numbers. Core now grades VALUES; the mixed-anchor discipline
+  moved to the ☆, where a route MAY be graded.
+- **PROMOTE, DON'T DELETE:** §4.29's "☆ Bold the grid's row and column headers" is a formatting ☆,
+  but the axes genuinely have to read — so it becomes **core beat 4**. 4 beats → 5.
+- **NEW ☆ — ONE-PASS FILL, 2-D** (family's second use in c3; bridge was first, two drills back, and
+  taught one fill per ROW — here the point is that MIXED anchors let a single formula spread in
+  BOTH directions). Needs the census AND fills covering the row and the block.
+- **§1.2 AXES:** segment and region names were HARDCODED and the grid nailed at F2:H5. Now both
+  axes draw from pools, the page jitters, and the deal list varies 9–11 rows.
+- **PAR:** 65/68 → **68/62**.
+- **TESTS (both):** replay 3/3 · depth-contract PASS · guided PASS · alt-paths 2/2 each (all four
+  rebuilt) · par-sweep FLAGGED 0 · invariants clean · full catalog green · drills.js?v=296→298.
+
 ## r429 H6b-5 — cagr + bridge (DEPTH_PASS §4.26/§4.27 + D10) — wave 5 at 7 of 12
 ### cagr — "Compound it, three times"
 - **PROMOTE, DON'T DELETE (§1.0-R3(o)):** the page's "percent-format all three in one pass" ☆ is a
