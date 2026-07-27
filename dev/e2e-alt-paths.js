@@ -413,12 +413,29 @@ const ALTS = [
       ];
       o.sites.slice().reverse().forEach(s=>steps.push({sel:s.k, keys:[...T(s.f),{key:'Enter'}]}));
       return steps; }` },
-  { key: 'center', name: 'title centered ACROSS first, via alt o e', moves: `C => { const o=C._o; return [
-      {sel:'A1:'+o.lc+'1', keys:[{key:'Alt'},L('o'),L('e'),L('a')]},
+  /* r429 (DEPTH_PASS §4.13 wave 4): both center entries rebuilt — the pre-rework pair solved a
+     board with no border beat and an o.tot range that no longer exists. ALT 1 = chord-ROUTE +
+     SUPERSET ☆ proof (a sweep wider than the figure block still latches, then the headers are
+     re-centred over the top); ALT 2 = op-ORDER reversed + the §1.0(c) FREEDOM proof (body and
+     total aligned in two passes — every core clears, the class-sweep ☆ is forfeited). */
+  { key: 'center', name: 'chord-ROUTE — legacy Alt O E A dialog for the title, ribbon bold, and a SUPERSET class sweep (headers re-centred after) that must still latch the ☆', moves: `C => { const o=C._o; return [
+      {sel:'B1:'+o.lc+o.rt, keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
       {sel:o.hdr, keys:[{key:'Alt'},L('h'),L('a'),L('c')]},
       {sel:o.lab, keys:[{key:'Alt'},L('h'),L('a'),L('l')]},
-      {sel:o.tot, keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
-      {sel:o.tot, keys:[{key:'b',ctrl:true}]},
+      {sel:'A'+o.rt+':'+o.lc+o.rt, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:'A'+o.hr+':'+o.lc+o.hr, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
+      {sel:'A1:'+o.lc+'1', keys:[{key:'Alt'},L('o'),L('e'),L('a')]},
+      {sel:'A1', keys:[{key:'s',ctrl:true}]},
+    ]; }` },
+  { key: 'center', name: 'op-ORDER reversed + FREEDOM proof — title/border/bold first, figures and total aligned in TWO passes (☆ forfeited, all six cores clear)', moves: `C => { const o=C._o; return [
+      {sel:'A1:'+o.lc+'1', keys:[{key:'1',ctrl:true},L('A')]},
+      {sel:'A'+o.hr+':'+o.lc+o.hr, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
+      {sel:'A'+o.rt+':'+o.lc+o.rt, keys:[{key:'b',ctrl:true}]},
+      {sel:o.lab, keys:[{key:'Alt'},L('h'),L('a'),L('l')]},
+      {sel:'B'+o.r1+':'+o.lc+(o.rt-1), keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
+      {sel:'B'+o.rt+':'+o.lc+o.rt, keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
+      {sel:o.hdr, keys:[{key:'Alt'},L('h'),L('a'),L('c')]},
+      {sel:'A1', keys:[{key:'s',ctrl:true}]},
     ]; }` },
   { key: 'growth', name: 'bold first, percent via alt h p, CAGR before YoY, algebraic YoY variant', moves: `C => [
       {sel:'B4', keys:[...T('=B2+B3'),{key:'Enter'}]},

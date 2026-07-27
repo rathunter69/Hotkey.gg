@@ -1,5 +1,50 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r429 H6b-4 — center depth-pass rework (DEPTH_PASS §4.13 + §1.0/§1.0-R2/§1.0-R3)
+- **ARTIFACT KEPT (§3.1):** the pipeline summary was already chapter 2's audience-A artifact — only
+  the scenario frame was sharpened (§1.0-R3(n) rule 2: the weekly review pulls from this tab).
+- **☆ SPEC BUG — FOUND AT BUILD, RECORDED, RE-CUT (the §0 escalation path working as designed):**
+  §4.13's first re-cut made the ☆ "centre-across-selection INSTEAD of merging". **The engine has no
+  merge operation at all** — the house anti-merge rule is enforced by OMISSION, not by a competing
+  route — so that ☆ is not a choice a player can decline: it would fall straight out of core beat 6
+  and fail §1.0-R2(i). WITHDRAWN, and the spec page now carries the finding. Title centring stays
+  CORE (beat 6, graded on `ca`).
+- **SHIPPED ☆ — CLASS-SWEEP DISCIPLINE (new family, added to the §1.0-R3(o) list):** the right-align
+  pass carries the figure block AND the total row in ONE selection — the insight being that a total
+  row is numbers and belongs to the same alignment class. Rect-based (superset-tolerant: a sweep
+  wider than the block still latches, proven by ALT 1), so no chord is privileged (§1.0(c)).
+  **Negative control verified: body-then-total in two passes clears every core beat and wins, ☆
+  stays "☆ ?".** Honest deviation flagged in §4.13: c2 now carries three one-selection-shaped ☆s
+  (dress=comma, autofit=width, center=alignment) — different operations, same shape; if the
+  playtest finds them samey, center is the one to re-cut.
+- **BEATS (6 core + ☆ + engine save closer; §1.0(b) outcome-vague):** Center the quarter headers →
+  Left-align the deal names and the Total label → Right-align the quarterly figures and the total
+  row → Bold the total row → **Add a bottom border under the header row (NEW, §4.13)** → Center the
+  title across the table, never merged. Tri-length 7, C9-registered.
+- **BOARD SHIPS MISALIGNED (Wolf's blocksel round-2 law made general):** the figures and the total
+  row arrive LEFT-aligned the way a bad paste really lands — "doesn't help to right align the data
+  if it's already coming right aligned". Probe asserts ZERO pre-right-aligned figures per seed.
+  Also fixed for realism: the **"Total" label joins the LEFT class** with the deal names (it was
+  graded RIGHT pre-rework, which no real pipeline sheet does — §1.0-R3(n) rule 1).
+- **ENGINE HUNK:** `hkFmtLatch('align')` on the Alt H A L/C/R RUN path — the only alignment route
+  the engine has, so the latch is chord-complete by construction. Telemetry only (§1.0(c)).
+- **RANDOM (§1.2 — four axes):** (a) header-row site {2,3}; (b) deal names Fisher-Yates from an
+  8-pool (was 6) + codename(); (c) table SHAPE — 3–5 quarters × 3–5 deals — and all values;
+  (d) which-one-is-broken — the labels arrive centered OR right, varying per seed. All verified
+  varying across 40 builds.
+- **PAR:** 18/15 → **23/20** (5-seed sweep median 20 keys, 0% drift after retune; 1.15 s/key — the
+  alignment-class read plus the stranded-title decision). HOTKEY_PARS mirrored; drills.js?v=285→286
+  across 28 files; drill pages + sitemap + refmap regenerated.
+- **ALTS (§1.8 — both rebuilt; the pre-rework pair solved a board with no border beat and an
+  `o.tot` range that no longer exists):** (1) chord-ROUTE + SUPERSET ☆ proof — legacy **Alt O E A**
+  Format-Cells dialog for the title, ribbon bold Alt H 1, and a class sweep WIDER than the figure
+  block with the headers re-centred over the top (the ☆ must still latch); (2) op-ORDER reversed +
+  FREEDOM proof — title/border/bold first, figures and total in TWO passes (☆ forfeited, six cores
+  clear). 2/2 PASS.
+- **TESTS:** demo-replay center 3/3 ×3 seeds · **`dev/verify-center.js` 14/14** · guided PASS
+  (railed, contained, solvable) · alt-paths 2/2 · par-sweep FLAGGED 0 · static invariants clean
+  incl. C9 center · cache-bump guard clean · full-catalog replay green.
+
 ## r429 H6b-4 — decimals depth-pass rework (DEPTH_PASS §4.12 + §1.0/§1.0-R2/§1.0-R3) — THE FIRST §1.0-R3 DRILL
 _The reference build for the dual-audience real-task law: the first drill whose ARTIFACT was
 converted for audience A, and the first ☆ re-cut under the §1.0-R3(o) sweep._

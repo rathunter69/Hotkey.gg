@@ -538,15 +538,22 @@ a mess.
 5. Add a bottom border under the header row — aligned AND ruled
 6. **Center the title across the table** (PROMOTED TO CORE, r429) — the page banner reads across
    the columns, not out of one cell
-☆ **RE-CUT (r429, §1.0-R3(o)):** the page's ☆ *was* the title centering — a formatting task, dead
-under §1.0(d). The formatting is now CORE beat 6; the ☆ becomes the **TECHNIQUE** inside it:
-**centre-across-selection instead of merging** (`ca`, Ctrl+1 → A). Family: *one-pass discipline* /
-technique discovery. WHY this is a legal ☆ and not a dress chore (r429 judgment, record it in the
-payload): both routes produce an IDENTICAL visible result, so the star cannot fall out of the
-board's look — it grades only WHICH tool the player reached for, and the house anti-merge rule is
-the mastery being rewarded (a merged title breaks sorting, selection and fills downstream — the
-reason desks ban it). Skippability proof: merging the title clears core beat 6 and wins the drill,
-☆ stays "☆ ?"; centre-across earns it. Guide line teaches the merge trap.
+☆ **RE-CUT ×2 (r429).** First cut (centre-across-selection instead of merging) was **WITHDRAWN at
+build time — SPEC BUG, found and recorded r429:** the engine has **no merge operation at all** (the
+house anti-merge rule is enforced by omission, not by a competing route), so "centre-across rather
+than merge" is not a choice a player can decline — it would fall out of core beat 6 automatically
+and fail §1.0-R2(i) skippability. Title centring therefore stays CORE beat 6 (graded on `ca`), and
+the ☆ moves to a different axis.
+**Shipped ☆ — CLASS-SWEEP DISCIPLINE (new family, added to the §1.0-R3(o) list):** the right-align
+pass covers the number block **and the total row in ONE selection** — recognising that the total
+row is numbers and belongs to the same alignment class, instead of aligning the body and then the
+total separately. Latch: `S.fmtOps` `kind:'align'` (r429 engine hunk extension), rect spanning the
+first data row through the total row across the number columns. Skippability proof required:
+aligning body-then-total in two passes clears every core beat and wins, ☆ stays "☆ ?".
+**Family-overlap note (honest deviation, §1.0-R3(o) "vary the family"):** chapter 2 now carries
+three one-selection-shaped ☆s — dress (comma), autofit (width), center (alignment). They differ in
+OPERATION but not in shape. Accepted for this wave and flagged for the playtest: if Wolf finds them
+samey, center is the one to re-cut (it has the weakest claim to the shape).
 **Random:** as-is + title width varies. **Aha:** "numbers right, labels left, headers centered — alignment is information". **Finish:** beat 6. **Clocks:** re-sweep (beat added). **Engine:** ca (center-across) exists (r177).
 
 #### 4.14 autofit — "Fix the squeezed columns" · M
