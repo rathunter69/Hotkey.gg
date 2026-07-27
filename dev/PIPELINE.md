@@ -3,10 +3,10 @@
 ## ⚡ STATE OF THE QUEUE (r429, 2026-07-27 — READ FIRST; supersedes the r417/r420c block below)
 
 **WHERE THE DEPTH PASS STANDS:**
-- **24/81 live drills at the depth-pass standard** (the C9 REWORKED ledger in dev/check-invariants.js
+- **26/81 live drills at the depth-pass standard** (the C9 REWORKED ledger in dev/check-invariants.js
   is the single source of truth): **Foundations (c1) COMPLETE 9/9** (modeltour★ capstone) ·
   **Formatting (c2) COMPLETE 10/10** (gauntlet★ capstone — a clean run opens Formulas I) ·
-  **Formulas I (c3) 5/12** (margin · foot · anchor · percent · growth).
+  **Formulas I (c3) 7/12** (margin · foot · anchor · percent · growth · cagr · bridge).
 - **VERIFICATION IS NOW GENERIC** — `dev/e2e-depth-contract.js` asserts the universal §1 contract
   for every drill on the ledger, and `dev/e2e-alt-paths.js` enforces the **☆-forfeit contract** (an
   alt whose name says "☆ forfeited" MUST clear core with the ☆ dark). A new drill therefore needs
@@ -42,7 +42,7 @@
    SERIALLY in the main checkout, which is how all five of these were done. Two further gotchas:
    worktrees branch from the last COMMIT (commit spec changes before launching), and the workflow's
    `args` arrive JSON-encoded (now normalised in the script).
-1b. **W5 — FORMULAS I (c3) [auto·rolling] — IN FLIGHT, 5 of 12.** ✅ **margin** (comp sets →
+1b. **W5 — FORMULAS I (c3) [auto·rolling] — IN FLIGHT, 7 of 12.** ✅ **margin** (comp sets →
    divisional performance pack, audience A; three ratio asks permuted per seed with §1.0-R2(g)
    adaptive labels; fill-census ☆) · ✅ **foot** (audience-A regional grid; reference-over-retype ☆;
    gained a dress beat and the cross-foot prove-out; par 11→32) · ✅ **anchor** (4-spot site pool,
@@ -50,7 +50,10 @@
    ✅ **percent** (Statement A/B → two named business units; anchoring/fill-census ☆; block A
    un-nailed from C2) · ✅ **growth** (a §1.0(c) violation fixed — core demanded the REFERENCE route,
    so the reference became the ☆; site jitter added).
-   ⏳ **REMAINING FOR A 3-CHAPTER PLAYTEST — 7 drills:** cagr · bridge (D10 rename) · sumif ·
+   ✅ **cagr** (formula-cloning ☆; the percent pass PROMOTED to core) · ✅ **bridge** (the dead memo
+   row became live work, 2 beats → 6; one-pass-fill ☆; D10 complete — and the depth contract caught
+   a site that put the headers on the title row, live since r187).
+   ⏳ **REMAINING FOR A 3-CHAPTER PLAYTEST — 5 drills:** sumif ·
    rollup · fxconvert · cases · **qclose★ (NEW, D1 — the expensive one: a brand-new drill carrying
    the full plumbing row — SPINE, TRACKS + migrate-certificates.sql in the SAME PR, PARS, LB board,
    SEO page — plus the c3 capstone wiring off the gauntlet/modeltour template)**.

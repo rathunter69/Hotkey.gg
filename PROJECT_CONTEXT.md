@@ -19,7 +19,21 @@ without escalating. Spec is now **DEPTH_PASS r429**.
 **ALSO DECIDED:** data retention (closes G10) — 7-day detailed run history, last 5 + expand,
 aggregates permanent. In PIPELINE ⚡ with implementation notes.
 
-**WAVE 5 (Formulas I, c3) OPEN — margin shipped; foot · anchor · percent · growth remain.**
+**WAVE 5 (Formulas I, c3) — 7 of 12 SHIPPED.** margin · foot · anchor · percent · growth · cagr ·
+bridge. **Remaining for the 3-chapter playtest: sumif · rollup · fxconvert · cases · qclose★.**
+`qclose★` is the expensive one — a BRAND-NEW drill (not a rework) carrying the full plumbing row
+(campaign spine, cert tracks + migrate-certificates.sql in the SAME PR, PARS, LB board, SEO page)
+plus the c3 capstone wiring off the gauntlet/modeltour template. Budget it at 2–3 ordinary drills.
+
+**TWO STANDING TRAPS FOR WHOEVER CONTINUES:**
+- **C9 is a STATIC parser — build guide/targets/checks as LITERAL arrays.** `.map()/.push()` reads
+  as `null` and the tri-length guard SILENTLY stops covering the drill. Hit three times now
+  (margin, cagr). It does not fail loudly; it just stops protecting you.
+- **Run `dev/e2e-depth-contract.js` on every new drill.** On its first wave it caught a bridge site
+  that put the year headers on the title row — live since r187, through every prior gate, because
+  nothing measured density until r429.
+
+**PRIOR (wave 5 at the 1-of-12 mark):**
 **margin**: three comp sets → the **divisional performance pack** (audience A). Three DIFFERENT
 ratio asks — margin, growth, asset turnover — **permuted across the tables per seed**, which makes
 §1.0-R2(g) adaptive labels load-bearing rather than decorative (a static label would force the

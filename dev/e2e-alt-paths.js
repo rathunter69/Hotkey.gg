@@ -323,12 +323,32 @@ const ALTS = [
       }
       mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
       return mv; }` },
-  { key: 'bridge', name: 'typed refs (no pointing) + ribbon fill right, geometry-derived', moves: `C => { const o=C._o;
-      const L2=colLetter(o.c0);
+  /* r429 (DEPTH_PASS §4.27 wave 5): both bridge entries rebuilt — the pre-rework entry used o.f /
+     o.rng (gone) and stopped at the EBITDA fill; the drill now grows the revenue line off the memo
+     rates, totals the FY column and dresses the line. ALT 1 = chord-ROUTE, typed refs (no pointing)
+     with the RIBBON fill — the ☆ latch is chord-agnostic so it must still earn. ALT 2 = the
+     skippability control: both rows filled in CHUNKS instead of one pass. */
+  { key: 'bridge', name: 'chord-ROUTE — typed refs (no pointing at all) and ribbon fill right (Alt H F I R); the one-pass ☆ must still latch', moves: `C => { const o=C._o;
+      const CL=j=>colLetter(o.c0+j);
       return [
-        {sel:o.f, keys:[...T('='+L2+(o.hr+1)+'*'+L2+(o.hr+2)),{key:'Enter'}]},
-        {sel:o.rng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.rev2, keys:[...T('='+CL(0)+(o.hr+1)+'*(1+'+CL(1)+(o.hr+5)+')'),{key:'Enter'}]},
+        {sel:o.revRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.eb1, keys:[...T('='+CL(0)+(o.hr+1)+'*'+CL(0)+(o.hr+2)),{key:'Enter'}]},
+        {sel:o.ebRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.fy, keys:[...T('=SUM('+CL(0)+(o.hr+3)+':'+CL(4)+(o.hr+3)+')'),{key:'Enter'}]},
+        {sel:o.ebRow, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
+        {sel:'A1', keys:[{key:'s',ctrl:true}]},
       ]; }` },
+  { key: 'bridge', name: 'FREEDOM proof — both rows filled in CHUNKS, one column at a time (☆ forfeited, all six cores clear)', moves: `C => { const o=C._o, mv=[];
+      const CL=j=>colLetter(o.c0+j);
+      mv.push({sel:o.rev2, keys:[...T('='+CL(0)+(o.hr+1)+'*(1+'+CL(1)+(o.hr+5)+')'),{key:'Enter'}]});
+      for(let j=2;j<=4;j++) mv.push({sel:CL(j-1)+(o.hr+1)+':'+CL(j)+(o.hr+1), keys:[{key:'r',ctrl:true}]});
+      mv.push({sel:o.eb1, keys:[...T('='+CL(0)+(o.hr+1)+'*'+CL(0)+(o.hr+2)),{key:'Enter'}]});
+      for(let j=1;j<=4;j++) mv.push({sel:CL(j-1)+(o.hr+3)+':'+CL(j)+(o.hr+3), keys:[{key:'r',ctrl:true}]});
+      mv.push({sel:o.fy, keys:[{key:'=',alt:true},{key:'Enter'}]});
+      mv.push({sel:o.ebRow, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+      return mv; }` },
   /* r429 (DEPTH_PASS §4.14 wave 4): both autofit entries rebuilt — the pre-rework entry solved a
      two-island board (o.uRng / o.a1 / o.a2 are gone with the headcount-roster rework). ALT 1 =
      op-ORDER + the §1.0(c) FREEDOM proof (widths last, totals TYPED, label columns fitted one at a

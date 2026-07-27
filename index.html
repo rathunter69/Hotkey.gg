@@ -1728,9 +1728,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=295"></script>
+<script src="drills.js?v=296"></script>
 
-<script src="drills.js?v=295"></script>
+<script src="drills.js?v=296"></script>
 
 
 
@@ -5788,56 +5788,114 @@ const CHALLENGES = {
     }
   },
   bridge:{
-    name:'Point Mode', label:'Point-mode formulas', par:10, parKeys:6,
-    aha:'Point mode grabs refs with the arrow keys — the fastest formula is one you never typed.',
-    prompt:'Build profit = revenue × margin: start the formula, point at each reference with the arrow keys, and fill it across five years. Point mode is the fastest way to enter a formula, and the fill confirms the references were relative.',
-    req(){ const o=this._o; return '<em>'+o.f+'</em> \u00b7 <em>=</em> \u00b7 <em>\u2191\u2191</em> grabs revenue \u00b7 <em>*</em> \u00b7 <em>\u2191</em> grabs margin \u00b7 <em>\u21b5</em> \u00b7 select '+o.rng+' \u00b7 <em>ctrl+r</em>'; },
+    /* r429 (H6b wave 5, DEPTH_PASS §4.27 + §1.0/§1.0-R2/§1.0-R3 + D10): depth-pass rework.
+       JUDGMENT CALLS (per WORKFLOW.md §8):
+       · THE MEMO ROW BECOMES THE SECOND VERSE (the page's own fix): a "Memo: growth" row sat on the
+         board unused — dead furniture, exactly what §1.0-R3(n) rule 1 bans. The revenue row now
+         ships with ONLY year one typed, and the player builds years 2–5 off those memo rates. The
+         drill goes 2 beats → 6.
+       · §4.27's "☆ Total the five EBITDA years in the FY cell" is NOT a formatting ☆, so §1.0-R3(o)
+         does not kill it — but it is an extra CALCULATION rather than a hidden efficiency, which is
+         what §1.0(d) actually asks a ☆ to be. So it is PROMOTED to core beat 5 (the promote rule),
+         and the ☆ becomes ONE-PASS FILL DISCIPLINE — the family is unused in c3 and not adjacent to
+         a repeat (cagr before it is formula-cloning, sumif after it will differ).
+       · D10 completed: the tab moves to 'Point' in drills.js (name/label already carried the
+         rename); the desc drops the chord.
+       · Point mode stays the drill's aha and its guide route, but NO core check requires it —
+         typed references clear (§1.0(c)); ALT 2 walks the fully typed route. */
+    name:'Point Mode', label:'Point-mode formulas', par:29, parKeys:26, saveClose:true,   /* r429: par re-swept post-rework — 5-seed sweep median 26 keys, 0% drift after retune; par 29s \u2248 1.12 s/key. Was 10/6: the memo row became live work and the drill went 2 beats to 6. */
+    aha:'the fastest formula is one you never typed — point at the references, then let a single fill carry the whole row.',
+    prompt:'The profit build has one year of revenue and a memo row of growth rates nobody has used yet. Grow the revenue line out across the remaining years off those rates, run EBITDA as revenue times margin, total the five years in the FY column, and close the line. Point mode grabs a reference with the arrow keys instead of typing it — and a row you built once should be carried, not repeated.',
+    req(){ const o=this._o; return '<em>'+o.rev2+'</em> =prior×(1+growth) · fill → · <em>'+o.eb1+'</em> =revenue×margin · fill → · <em>'+o.fy+'</em> <em>alt+=</em> · <em>'+o.ebRow+'</em> <em>ctrl+b</em> + <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): labels are OUTCOME lines; the route lives here. */
     guide(){ const o=this._o; return [
-      'at '+o.f+' \u00b7 <kbd>=</kbd> \u00b7 <kbd>\u2191</kbd><kbd>\u2191</kbd> \u2014 the marquee climbs to revenue \u00b7 <kbd>*</kbd>',
-      '<kbd>\u2191</kbd> \u2014 one hop to margin \u00b7 <kbd>\u21b5</kbd>',
-      'select '+o.rng+' \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 five years from one pointed formula',
+      'the memo rates finally earn their row — at <em>'+o.rev2+'</em> · <kbd>=</kbd> · <kbd>←</kbd> grabs last year’s revenue · <kbd>*</kbd><kbd>(</kbd><kbd>1</kbd><kbd>+</kbd> · point down to the memo rate · <kbd>)</kbd> <kbd>↵</kbd>',
+      'select <em>'+o.revRng+'</em> · <kbd>ctrl</kbd>+<kbd>r</kbd> — one fill carries the whole revenue line out',
+      'at <em>'+o.eb1+'</em> · <kbd>=</kbd> · <kbd>↑</kbd><kbd>↑</kbd> climbs to revenue · <kbd>*</kbd> · <kbd>↑</kbd> one hop to margin · <kbd>↵</kbd>',
+      'select <em>'+o.ebRng+'</em> · <kbd>ctrl</kbd>+<kbd>r</kbd> — five years from one pointed formula',
+      'the FY column at <em>'+o.fy+'</em> · <kbd>alt</kbd>+<kbd>=</kbd> reads the five years to its left · <kbd>↵</kbd>',
+      'close the line — select <em>'+o.ebRow+'</em> · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> (a total rules on TOP)',
+      '☆ the discovery: each of those two rows is ONE formula. Select the whole row and fill it in a single pass — filling it in chunks costs you the clock and buys nothing',
     ]; },
-    targets(){ const o=this._o; return [o.f, o.rng]; },
+    targets(){ const o=this._o; return [o.rev2, o.revRng, o.eb1, o.ebRng, o.fy, o.ebRow, o.ebRng]; },
     demo(){ const o=this._o; return [
-      {sel:o.f, keys:[{key:'='}, {key:'ArrowUp'},{key:'ArrowUp'}, {key:'*'}, {key:'ArrowUp'}, Kb.enter]},
-      {sel:o.rng, keys:[Kb.fillR]},
+      {sel:o.rev2, keys:[{key:'='},{key:'ArrowLeft'},{key:'*'},{key:'('},{key:'1'},{key:'+'},
+                         {key:'ArrowDown'},{key:'ArrowDown'},{key:'ArrowDown'},{key:'ArrowDown'},{key:')'},Kb.enter]},
+      /* ONE pass across the whole row — the ☆ latch fires on these two fills (§2.2) */
+      {sel:o.revRng, keys:[Kb.fillR]},
+      {sel:o.eb1, keys:[{key:'='},{key:'ArrowUp'},{key:'ArrowUp'},{key:'*'},{key:'ArrowUp'},Kb.enter]},
+      {sel:o.ebRng, keys:[Kb.fillR]},
+      {sel:o.fy, keys:[Kb.eq, Kb.enter]},
+      {sel:o.ebRow, keys:[Kb.bold, Kb.alt,L('H'),L('B'),L('P')]},
     ]; },
     build(){
       const cells={};
-      // r187: the block MOVES per seed (\u00a72.1 \u2014 sites randomize, not just values);
-      // point-mode keystrokes are identical from any anchor, so par is untouched.
-      const [c0,hr]=[[2,1],[3,2],[2,3],[4,2]][rnd(0,3)];
+      /* §1.2 axes: (a) 4-anchor site pool (as-is); (b) growth-rate pool + codename; (c) year-one
+         revenue and every margin through rnd(); (d) NEW per §4.27 — the revenue row ships with
+         ONLY year one typed, so which figures are the player's changes the whole board's shape. */
+      /* r429: the [2,1] site is GONE — with hr=1 the year headers land on row 1 alongside the
+         title, which cost the board a whole row and dropped it under the §1.3 density floor
+         (caught by dev/e2e-depth-contract.js, not by eye). Every site now keeps hr>=2. */
+      const [c0,hr]=[[2,4],[3,2],[2,3],[4,2]][rnd(0,3)];
       const lc=colLetter(c0-1);
-      cells['A1']={...blankCell(),value:codename()+' \u2014 profit build ($mm)',txt:true,bold:true};
+      cells['A1']={...blankCell(),value:codename()+' — profit build ($000s)',txt:true,bold:true};
       cells[lc+(hr+1)]={...blankCell(),value:'Revenue',txt:true};
       cells[lc+(hr+2)]={...blankCell(),value:'EBITDA margin',txt:true};
-      cells[lc+(hr+3)]={...blankCell(),value:'EBITDA',txt:true,bold:true};
+      cells[lc+(hr+3)]={...blankCell(),value:'EBITDA',txt:true};
       cells[lc+(hr+5)]={...blankCell(),value:'Memo: growth',txt:true};
-      this._exp=[];
+      this._exp=[]; this._rev=[]; this._g=[];
       let rev=rnd(40,90)*10;
       for(let j=0;j<5;j++){
         const m=rnd(18,34)/100, L2=colLetter(c0+j);
         cells[L2+hr]={...blankCell(),value:'FY'+(24+j),txt:true,bold:true,align:'r'};
-        cells[L2+(hr+1)]={...blankCell(),value:rev,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        /* year one is the only TYPED revenue — years 2-5 are the player's build */
+        cells[L2+(hr+1)]= j===0
+          ? {...blankCell(),value:rev,fontColor:'blue',fmtStyle:'comma',decimals:0}
+          : {...blankCell(),fmtStyle:'comma',decimals:0};
         cells[L2+(hr+2)]={...blankCell(),value:m,fontColor:'blue',fmtStyle:'percent',decimals:1};
-        cells[L2+(hr+3)]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-        if(j<4) cells[colLetter(c0+1+j)+(hr+5)]={...blankCell(),value:rnd(3,9)/100,fmtStyle:'percent',decimals:1};
-        this._exp.push({rev:rev, m:m});
-        rev=Math.round(rev*(1+rnd(3,9)/100));
+        cells[L2+(hr+3)]={...blankCell(),fmtStyle:'comma',decimals:0};
+        this._rev.push(rev); this._exp.push({rev:rev, m:m});
+        if(j<4){ const g=rnd(3,9)/100; this._g.push(g);
+          cells[colLetter(c0+1+j)+(hr+5)]={...blankCell(),value:g,fontColor:'blue',fmtStyle:'percent',decimals:1};
+          rev=rev*(1+g); }
       }
-      this._o={c0:c0, hr:hr, f:colLetter(c0)+(hr+3), rng:colLetter(c0)+(hr+3)+':'+colLetter(c0+4)+(hr+3)};
+      const fyC=colLetter(c0+5);
+      cells[fyC+hr]={...blankCell(),value:'FY total',txt:true,bold:true,align:'r'};
+      cells[fyC+(hr+3)]={...blankCell(),fmtStyle:'comma',decimals:0};
+      this._fyExp=this._exp.reduce((a,x)=>a+x.rev*x.m,0);
+      this._o={ c0:c0, hr:hr, fyC:fyC,
+        rev2:colLetter(c0+1)+(hr+1), revRng:colLetter(c0+1)+(hr+1)+':'+colLetter(c0+4)+(hr+1),
+        eb1:colLetter(c0)+(hr+3), ebRng:colLetter(c0)+(hr+3)+':'+colLetter(c0+4)+(hr+3),
+        fy:fyC+(hr+3), ebRow:lc+(hr+3)+':'+fyC+(hr+3) };
       const cw={}; cw[c0-1]=118;
-      return {ROWS:Math.max(7,hr+6), cells, active:{r:hr+3,c:c0}, sel:null, colW:cw};
+      return {ROWS:Math.max(9,hr+6), cells, active:{r:hr+1,c:c0+1}, sel:null, colW:cw};
     },
     checks(S){
-      const o=this._o;
-      const okCol=j=>{ const L2=colLetter(o.c0+j), c=S.cells[L2+(o.hr+3)]; if(!c||!c.formula) return false;
-        const f=String(c.formula).toUpperCase().replace(/[\s$]/g,'');
-        const refs=f.includes(L2+(o.hr+1))&&f.includes(L2+(o.hr+2));
-        return refs && typeof c.value==='number' && Math.abs(c.value-this._exp[j].rev*this._exp[j].m)<0.5; };
+      const o=this._o, cell=k=>S.cells[k]||{};
+      /* §1.0(c): values, not routes — a typed reference or a typed figure clears (ALT 2 proves it) */
+      const revOk=[1,2,3,4].every(j=>{ const c=cell(colLetter(o.c0+j)+(o.hr+1));
+        return typeof c.value==='number' && Math.abs(c.value-this._rev[j])<0.5; });
+      const ebOk=j=>{ const c=cell(colLetter(o.c0+j)+(o.hr+3));
+        return typeof c.value==='number' && Math.abs(c.value-this._exp[j].rev*this._exp[j].m)<0.5; };
+      const fyC=cell(o.fy);
+      const fyOk=typeof fyC.value==='number' && Math.abs(fyC.value-this._fyExp)<0.5;
+      const dressOk=(()=>{ for(let c=o.c0-1;c<=o.c0+5;c++){ const x=cell(colLetter(c)+(o.hr+3));
+        if(!x.bold||!x.bt) return false; } return true; })();
+      /* ☆ (§1.0(d) mystery slot · §1.0-R3(o) ONE-PASS FILL discipline — family unused elsewhere in
+         c3): BOTH build rows carried across in a SINGLE fill each, covering the whole remaining
+         span. Reads S.fillOps (chord-agnostic — ctrl+r and the ribbon fill both log). Filling in
+         chunks, or writing the cells one at a time, clears every core (§1.0(c)) and never latches. */
+      const sweep=(row,cFrom,cTo)=>(S.fillOps||[]).some(f=>f.dir==='right'
+        && f.r1<=row && f.r2>=row && f.c1<=cFrom && f.c2>=cTo);
+      const starOk=sweep(o.hr+1,o.c0+1,o.c0+4) && sweep(o.hr+3,o.c0,o.c0+4);
       return [
-        {label:'build EBITDA at '+o.f+' \u2014 a live revenue \u00d7 margin formula reading its own column', ok: okCol(0)},
-        {label:'fill it across all five years \u2014 relative refs walked with the fill', ok: [1,2,3,4].every(okCol)},
+        {label:'Grow the revenue line off the memo rates — last year carried forward', ok: revOk},
+        {label:'Carry the revenue build across every year', ok: revOk},
+        {label:'Build EBITDA — revenue against its own margin', ok: ebOk(0)},
+        {label:'Carry EBITDA across all five years', ok: [1,2,3,4].every(ebOk)},
+        {label:'Total the five years in the FY column', ok: fyOk},
+        {label:'Bold the EBITDA line and add a top border above it', ok: dressOk},
+        {label:'☆ each row carried in one pass — a row you built once should not be filled in pieces', ok: starOk, bonus:true},
       ];
     }
   },

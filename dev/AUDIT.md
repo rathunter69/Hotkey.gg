@@ -1,5 +1,39 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r429 H6b-5 — cagr + bridge (DEPTH_PASS §4.26/§4.27 + D10) — wave 5 at 7 of 12
+### cagr — "Compound it, three times"
+- **PROMOTE, DON'T DELETE (§1.0-R3(o)):** the page's "percent-format all three in one pass" ☆ is a
+  formatting bonus and dead — but it is real work, so it becomes **CORE beat 4** and the three rate
+  beats stop demanding the format themselves. 4 beats → 5.
+- **NEW ☆ — FORMULA CLONING** (the copy-translate cousin of gauntlet's format cloning): the three
+  blocks are geometrically IDENTICAL — begin/end/years/answer at fixed offsets every time — so one
+  rate copied onto the other two answer cells lands its own references. That symmetry is now
+  **load-bearing and documented as such in build()**, not incidental. Latches off `S.pasteLog`
+  (≥2 pastes whose destination is an answer cell). Typing all three clears core and wins.
+- **PAR:** 55/57 → **38/34**. The drop is honest — the clone route is far shorter than three typed
+  compoundings.
+
+### bridge — "Point-mode formulas" (D10 complete)
+- **THE DEAD MEMO ROW BECOMES THE SECOND VERSE** (the page's own fix): a "Memo: growth" row sat on
+  the board unused — dead furniture, exactly what §1.0-R3(n) rule 1 bans. The revenue row now ships
+  with ONLY year one typed and the player grows years 2–5 off those rates. **2 beats → 6.**
+- **☆ PROMOTED AND REPLACED:** §4.27's "total the five EBITDA years" ☆ is not a formatting task, so
+  §1.0-R3(o) does not kill it — but it is an extra CALCULATION, not a hidden efficiency, which is
+  what §1.0(d) actually asks for. Promoted to core beat 5; the ☆ becomes **ONE-PASS FILL DISCIPLINE**
+  (family unused elsewhere in c3): both build rows carried across in a SINGLE fill each. Filling in
+  chunks clears every core and never latches — ALT 2 walks exactly that.
+- **🔴 A BOARD DEFECT THE DEPTH CONTRACT CAUGHT THAT EYES DID NOT:** the site pool's `[2,1]` entry
+  put the year headers on row 1 **alongside the title**, costing the board a whole row and dropping
+  it under the §1.3 density floor. It had been there since r187 and survived every prior gate,
+  because nothing measured density until r429. Site pool now keeps hr≥2. **This is the generic
+  contract earning its keep on its first wave.**
+- **PAR:** 10/6 → **29/26**. D10 finished: tab → 'Point', desc de-hinted.
+- **TESTS (both):** replay 3/3 · depth-contract PASS · guided PASS · alt-paths 2/2 each (all four
+  rebuilt) · par-sweep FLAGGED 0 · invariants clean · drills.js?v=294→296.
+- **RECURRING TRAP, worth a standing note:** cagr hit the **C9 static-parser** hole again —
+  guide/targets built with `.map()/.push()` read as `null`, so the tri-length guard silently stops
+  covering the drill. Third occurrence (margin, cagr). **Build these arrays as LITERALS.**
+
 ## r429 H6b-5 — percent + growth (DEPTH_PASS §4.24/§4.25) — wave 5 at 5 of 12
 ### percent — "Common-size both statements"
 - **ARTIFACT:** "Statement A / Statement B" → **two NAMED business units**. "Statement A" is exactly
