@@ -146,7 +146,13 @@ telemetry — `S.fillOps` · `S.pasteOpLog` · `S.pasteLog` · `S.fmtOps` · `S.
   where a pre-playtest page already specced it AND the drill's whole lesson is a thing that can be
   silently wrong (an anchor, a lock, a link). Do not reach for it as a default — §1.0(d)'s "hidden
   EFFICIENCY discoveries" is still the rule, and a chapter should carry this shape at most once.
-A drill's ☆ must not repeat the ☆ of another drill in the SAME chapter — vary the family.
+**Family spacing (amended r429 — the original rule was unachievable):** the first cut said a ☆ must
+not repeat another ☆ in the SAME chapter. With 12-drill chapters and seven families that is
+impossible by the pigeonhole, and pretending otherwise just pushes page authors into inventing
+strained bonuses. The workable rule, same intent: **no two ADJACENT drills share a family, and no
+family appears more than TWICE in a chapter.** Where a family does repeat, the second use must
+differ in what it TEACHES even if the shape rhymes (margin's fill-census is about a ratio being one
+formula; percent's is about the anchor being what makes the fill safe) — say so on the page.
 
 ### 1.1 Beats
 - **4–6 core graded beats + exactly 1 bonus beat** (☆). Core beats win the drill; the bonus never blocks the win (§2.2). Fewer than 4 core beats is allowed ONLY for pure-reflex Foundations drills explicitly marked on their §4 page (none currently are).

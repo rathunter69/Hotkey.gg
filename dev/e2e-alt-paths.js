@@ -302,12 +302,27 @@ const ALTS = [
   { key: 'lookup2', name: 'header-inclusive ranges (consistent off-by-one)', moves: `C => [
       {sel:'G4', keys:[...T('=INDEX(B1:D6,MATCH(G2,A1:A6,0),MATCH(G3,B1:D1,0))'),{key:'Enter'}]},
     ]` },
-  { key: 'percent', name: 'dollars typed by hand, block B first', moves: `C => { const R=C._R; return [
-      {sel:R.pc+R.r0, keys:[...T('='+R.vc+R.r0+'/$'+R.vc+'$'+R.r0),{key:'Enter'}]},
-      {sel:R.pc+R.r0+':'+R.pc+R.rN, keys:[{key:'d',ctrl:true},{key:'%',ctrl:true,shift:true}]},
-      {sel:'C2', keys:[...T('=B2/$B$2'),{key:'Enter'}]},
-      {sel:'C2:C6', keys:[{key:'d',ctrl:true},{key:'%',ctrl:true,shift:true}]},
+  /* r429 (DEPTH_PASS §4.24 wave 5): both percent entries rebuilt — the pre-rework pair hardcoded
+     block A at C2:C6 (both blocks now site-shuffle), used C._R for what is now C._B, and predated
+     the one-decimal requirement, the bold-revenue beat and the ☆. */
+  { key: 'percent', name: 'chord-ROUTE — typed dollar anchors (no F4), unit B first, ribbon percent (Alt H P) and ribbon bold', moves: `C => { const A=C._A, B=C._B; return [
+      {sel:B.pc+B.r0, keys:[...T('='+B.vc+B.r0+'/$'+B.vc+'$'+B.r0),{key:'Enter'}]},
+      {sel:B.pc+B.r0+':'+B.pc+B.rN, keys:[{key:'d',ctrl:true},{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
+      {sel:A.pc+A.r0, keys:[...T('='+A.vc+A.r0+'/$'+A.vc+'$'+A.r0),{key:'Enter'}]},
+      {sel:A.pc+A.r0+':'+A.pc+A.rN, keys:[{key:'d',ctrl:true},{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
+      {sel:A.lc+A.r0+':'+A.pc+A.r0, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:B.lc+B.r0+':'+B.pc+B.r0, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:'A1', keys:[{key:'s',ctrl:true}]},
     ]; }` },
+  { key: 'percent', name: 'FREEDOM proof — every row written by hand with its own anchored formula, no fill at all (☆ forfeited, all five cores clear)', moves: `C => { const mv=[];
+      for(const blk of [C._A, C._B]){
+        for(let i=0;i<blk.n;i++){ const r=blk.r0+i;
+          mv.push({sel:blk.pc+r, keys:[...T('='+blk.vc+r+'/$'+blk.vc+'$'+blk.r0),{key:'Enter'}]}); }
+        mv.push({sel:blk.pc+blk.r0+':'+blk.pc+blk.rN, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
+        mv.push({sel:blk.lc+blk.r0+':'+blk.pc+blk.r0, keys:[{key:'b',ctrl:true}]});
+      }
+      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+      return mv; }` },
   { key: 'bridge', name: 'typed refs (no pointing) + ribbon fill right, geometry-derived', moves: `C => { const o=C._o;
       const L2=colLetter(o.c0);
       return [
@@ -486,16 +501,32 @@ const ALTS = [
       {sel:o.hdr, keys:[{key:'Alt'},L('h'),L('a'),L('c')]},
       {sel:'A1', keys:[{key:'s',ctrl:true}]},
     ]; }` },
-  { key: 'growth', name: 'bold first, percent via alt h p, CAGR before YoY, algebraic YoY variant', moves: `C => [
-      {sel:'B4', keys:[...T('=B2+B3'),{key:'Enter'}]},
-      {sel:'B4:F4', keys:[{key:'r',ctrl:true}]},
-      {sel:'B4:F4', keys:[{key:'b',ctrl:true}]},
-      {sel:'B7', keys:[...T('=(F4/B4)^(1/4)-1'),{key:'Enter'}]},
-      {sel:'B7', keys:[{key:'Alt'},L('h'),L('p')]},
-      {sel:'C5', keys:[...T('=(C4-B4)/B4'),{key:'Enter'}]},
-      {sel:'C5:F5', keys:[{key:'r',ctrl:true}]},
-      {sel:'C5:F5', keys:[{key:'Alt'},L('h'),L('p')]},
-    ]` },
+  /* r429 (DEPTH_PASS §4.25 wave 5): both growth entries rebuilt — the pre-rework entry hardcoded
+     rows 2-7 (the board now jitters) and predated the one-decimal requirement, the top rule and
+     the ☆. ALT 1 = op-ORDER + an ALGEBRAIC YoY variant ((this-last)/last), proving core grades the
+     VALUE not the formula shape. ALT 2 = the skippability control: the CAGR endpoints TYPED. */
+  { key: 'growth', name: 'op-ORDER — dress first, CAGR before YoY, algebraic YoY variant ((this−last)/last) and ribbon percent', moves: `C => { const o=C._o; return [
+      {sel:'B'+o.tot, keys:[...T('=B'+o.s1+'+B'+o.s2),{key:'Enter'}]},
+      {sel:'B'+o.tot+':F'+o.tot, keys:[{key:'r',ctrl:true}]},
+      {sel:'A'+o.tot+':F'+o.tot, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:'B'+o.cagr, keys:[...T('=(F'+o.tot+'/B'+o.tot+')^(1/4)-1'),{key:'Enter'}]},
+      {sel:'B'+o.cagr, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
+      {sel:'C'+o.yoy, keys:[...T('=(C'+o.tot+'-B'+o.tot+')/B'+o.tot),{key:'Enter'}]},
+      {sel:'C'+o.yoy+':F'+o.yoy, keys:[{key:'r',ctrl:true}]},
+      {sel:'C'+o.yoy+':F'+o.yoy, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
+      {sel:'A1', keys:[{key:'s',ctrl:true}]},
+    ]; }` },
+  { key: 'growth', name: 'FREEDOM proof — consolidated totals and the CAGR endpoints TYPED as raw figures (☆ forfeited, all five cores clear)', moves: `C => { const o=C._o, T4=C._tot, mv=[];
+      const COL=['B','C','D','E','F'];
+      for(let i=0;i<5;i++) mv.push({sel:COL[i]+o.tot, keys:[...T(String(T4[i])),{key:'Enter'}]});
+      mv.push({sel:'C'+o.yoy, keys:[...T('=C'+o.tot+'/B'+o.tot+'-1'),{key:'Enter'}]});
+      mv.push({sel:'C'+o.yoy+':F'+o.yoy, keys:[{key:'r',ctrl:true}]});
+      mv.push({sel:'C'+o.yoy+':F'+o.yoy, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
+      mv.push({sel:'B'+o.cagr, keys:[...T('=('+T4[4]+'/'+T4[0]+')^(1/4)-1'),{key:'Enter'}]});
+      mv.push({sel:'B'+o.cagr, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
+      mv.push({sel:'A'+o.tot+':F'+o.tot, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+      return mv; }` },
   { key: 'revolver', name: 'MAX-outside nest, prove-outs bottom-up, border before bold via ribbon', moves: `C => [
       {sel:'B5', keys:[...T('=MAX(0,MIN(B3,B2-B4))'),{key:'Enter'}]},
       {sel:'B5:E5', keys:[{key:'r',ctrl:true}]},

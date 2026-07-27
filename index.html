@@ -1728,9 +1728,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=292"></script>
+<script src="drills.js?v=294"></script>
 
-<script src="drills.js?v=292"></script>
+<script src="drills.js?v=294"></script>
 
 
 
@@ -3399,57 +3399,116 @@ const CHALLENGES = {
     }
   },
   percent:{
-    name:'% of rev', label:'Common-size both statements', par:17, parKeys:14,
-    aha:'Divide by an anchored base — F4 locks the divisor so fill-right can’t drag it.',
-    prompt:'Common-size — every line as a % of revenue — two statements on one page; the second block moves and changes size between runs. The lesson is the anchor: each block’s divisor is its own revenue line, locked so the fill can’t drag it.',
-    req(){ const R=this._R; return '<em>C2</em> \u00b7 =B2/$B$2 (F4 locks it) \u00b7 fill C2:C6 \u00b7 <em>ctrl+shift+%</em> \u00b7 then: <em>'+R.pc+R.r0+'</em> \u00b7 ='+R.vc+R.r0+'/$'+R.vc+'$'+R.r0+' \u00b7 fill '+R.pc+R.r0+':'+R.pc+R.rN+' \u00b7 percent'; },
-    guide(){ const R=this._R; return [
-      'left block: at C2 \u00b7 <kbd>=</kbd> <kbd>\u2190</kbd> <kbd>/</kbd> <kbd>\u2190</kbd> <kbd>F4</kbd> \u2192 <b>$B$2</b> \u00b7 <kbd>\u21b5</kbd> \u00b7 fill C2:C6 \u00b7 percent',
-      'the second statement landed at '+R.vc+R.r0+':'+R.pc+R.rN+' \u2014 anchor on ITS revenue: <kbd>F4</kbd> \u2192 <b>$'+R.vc+'$'+R.r0+'</b>',
-      'fill '+R.pc+R.r0+':'+R.pc+R.rN+' \u00b7 percent \u00b7 two anchors, two blocks, zero dragged divisors',
+    /* r429 (H6b wave 5, DEPTH_PASS §4.24 + §1.0/§1.0-R2/§1.0-R3): depth-pass rework.
+       JUDGMENT CALLS (per WORKFLOW.md §8):
+       · ARTIFACT: "Statement A / Statement B" → TWO NAMED BUSINESS UNITS on one page (§1.0-R3(n)
+         rule 1 — a real file names its blocks; "Statement A" is exactly the "Table 1" class the
+         law bans). Common-sizing two units against their own revenue is FP&A's daily job and a
+         banker's comp prep in the same shape, so the lesson serves both audiences unchanged.
+       · §4.24's "☆ Italicize both % column headers" is a FORMATTING ☆ — dead under §1.0(d).
+         Re-cut per §1.0-R3(o) to ANCHORING MASTERY / fill-census. This is the family's SECOND use
+         in c3 (margin was the first) — legal under the r429 amended spacing rule: they are not
+         adjacent (foot and anchor sit between) and they teach different things. margin's census is
+         "a ratio column is one formula"; this one is "the ANCHOR is what makes the fill safe" — an
+         un-locked divisor drags and the column silently goes wrong, which is the whole lesson.
+       · BLOCK A IS NO LONGER NAILED TO C2 (the audit ask the page records): it now draws from its
+         own 3-spot pool, so neither statement is in a fixed place.
+       · r419 %-ENTRY REGRESSION rides this drill's replay per the §4.24 engine note (typing a raw
+         number into a pre-%-formatted cell must not render 800%). */
+    name:'% of rev', label:'Common-size both statements', par:26, parKeys:23, saveClose:true,   /* r429: par re-swept post-rework — 5-seed sweep median 23 keys, 0% drift after retune; par 26s \u2248 1.13 s/key (the two anchors are a read, not just a chord). Was 17/14. */
+    aha:'the lock is the lesson — an anchored divisor lets one formula serve a whole column; an unlocked one drags and goes quietly wrong.',
+    prompt:'Two business units, two P&Ls, one page — and the review wants every line as a percent of that unit’s own revenue. Each block is common-sized against ITS revenue line, not the other one’s. Build each column once, carry it down, and put both in percent. Get the lock wrong and the divisor walks down the column with the fill; the numbers will still look like numbers.',
+    req(){ const A=this._A, B=this._B; return '<em>'+A.pc+A.r0+'</em> ='+A.vc+A.r0+'/$'+A.vc+'$'+A.r0+' (F4) · fill · <em>ctrl+shift+%</em> +1dp · <em>'+B.pc+B.r0+'</em> ='+B.vc+B.r0+'/$'+B.vc+'$'+B.r0+' · fill · percent · both revenue rows <em>ctrl+b</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): labels are OUTCOME lines; the route lives here. */
+    guide(){ const A=this._A, B=this._B; return [
+      A.name+' — at <em>'+A.pc+A.r0+'</em> · <kbd>=</kbd> <kbd>←</kbd> <kbd>/</kbd> <kbd>←</kbd> <kbd>F4</kbd> → <b>$'+A.vc+'$'+A.r0+'</b> · <kbd>↵</kbd>. F4 is what stops the divisor walking when you fill',
+      'select <em>'+A.pc+A.r0+':'+A.pc+A.rN+'</em> · <kbd>ctrl</kbd>+<kbd>d</kbd> · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> for the decimal place',
+      B.name+' landed at <em>'+B.vc+B.r0+'</em> — anchor on ITS OWN revenue: <kbd>F4</kbd> → <b>$'+B.vc+'$'+B.r0+'</b>, not the other unit’s',
+      'select <em>'+B.pc+B.r0+':'+B.pc+B.rN+'</em> · <kbd>ctrl</kbd>+<kbd>d</kbd> · percent, one decimal — two anchors, two blocks, zero dragged divisors',
+      'the reader anchors on the 100% line — select each unit’s revenue row and <kbd>ctrl</kbd>+<kbd>b</kbd>',
+      '☆ the discovery: each column is ONE formula. Write it once, lock the divisor, and let the fill do the other lines — the lock is what makes that safe',
     ]; },
-    targets(){ const R=this._R; return ['C2:C6', R.pc+R.r0+':'+R.pc+R.rN]; },
-    demo(){ const R=this._R; return [
-      {sel:'C2', keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'F4'},Kb.enter]},
-      {sel:'C2:C6', keys:[Kb.fillD, Kb.pct]},
-      {sel:R.pc+R.r0, keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'F4'},Kb.enter]},
-      {sel:R.pc+R.r0+':'+R.pc+R.rN, keys:[Kb.fillD, Kb.pct]},
+    targets(){ const A=this._A, B=this._B; return [A.pc+A.r0, A.pc+A.r0+':'+A.pc+A.rN, B.pc+B.r0, B.pc+B.r0+':'+B.pc+B.rN, 'A'+A.r0, A.pc+A.r0+':'+A.pc+A.rN]; },
+    demo(){ const A=this._A, B=this._B; return [
+      {sel:A.pc+A.r0, keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'F4'},Kb.enter]},
+      {sel:A.pc+A.r0+':'+A.pc+A.rN, keys:[Kb.fillD, Kb.pct, Kb.alt,L('H'),D(0)]},
+      {sel:B.pc+B.r0, keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'F4'},Kb.enter]},
+      {sel:B.pc+B.r0+':'+B.pc+B.rN, keys:[Kb.fillD, Kb.pct, Kb.alt,L('H'),D(0)]},
+      {sel:A.lc+A.r0+':'+A.pc+A.r0, keys:[Kb.bold]},
+      {sel:B.lc+B.r0+':'+B.pc+B.r0, keys:[Kb.bold]},
     ]; },
     build(){
       const cells={};
-      const names=['Revenue','COGS','Gross profit','SG&A','R&D','EBIT','Other'];
+      const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+      const LINES=['Revenue','Cost of sales','Gross profit','Selling & marketing','Admin','Operating income','Other'];
+      const UNITS=shuffle(['Retail','Wholesale','Direct','Field Services','Online','Trade']);
       const block=(labC,valC,pctC,r0,rows,title)=>{
         cells[colLetter(labC)+(r0-1)]={...blankCell(),value:title,txt:true,bold:true};
         const vals=[]; const rev=rnd(80,160)*10;
         for(let i=0;i<rows;i++){
           const v=i===0?rev:Math.round(rev*rnd(5,55)/100);
           vals.push(v);
-          cells[colLetter(labC)+(r0+i)]={...blankCell(),value:names[i],txt:true};
+          cells[colLetter(labC)+(r0+i)]={...blankCell(),value:LINES[i],txt:true};
           cells[colLetter(valC)+(r0+i)]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'};
           cells[colLetter(pctC)+(r0+i)]={...blankCell()};
         }
         return vals.map(v=>v/rev);
       };
-      this._L=block(1,2,3,2,5,'Statement A');
-      const spots=[{c:6,r:2},{c:6,r:5},{c:7,r:3},{c:5,r:8}];
-      const sp=spots[rnd(0,spots.length-1)];
-      const depth=rnd(5,7);
-      const r0=Math.min(sp.r, 14-depth+1);
-      this._Rexp=block(sp.c, sp.c+1, sp.c+2, r0, depth, 'Statement B');
-      this._R={ lc:colLetter(sp.c), vc:colLetter(sp.c+1), pc:colLetter(sp.c+2), r0:r0, rN:r0+depth-1, n:depth };
-      return {ROWS:Math.max(9,this._R.rN+1), cells, active:{r:2,c:3}, sel:null, colW:{1:92,6:92}};
+      /* §1.2 axes: (a) BOTH blocks now site-shuffled — A from a NEW 3-spot pool (the audit's ask;
+         it was nailed to C2) and B from its 4-spot pool; (b) unit-name pool; (c) values + DEPTHS
+         (each block 5–7 lines, independently); (d) which unit is the deeper one. */
+      const aSpots=[{c:1,r:3},{c:1,r:2},{c:2,r:4}];
+      const ap=aSpots[rnd(0,aSpots.length-1)];
+      const aDepth=rnd(5,7);
+      const aR0=Math.min(ap.r, 15-aDepth);
+      this._Lexp=block(ap.c, ap.c+1, ap.c+2, aR0, aDepth, UNITS[0]+' unit');
+      this._A={ name:UNITS[0]+' unit', lc:colLetter(ap.c), vc:colLetter(ap.c+1), pc:colLetter(ap.c+2), r0:aR0, rN:aR0+aDepth-1, n:aDepth };
+      const bSpots=[{c:6,r:2},{c:6,r:5},{c:7,r:3},{c:5,r:8}];
+      const bp=bSpots[rnd(0,bSpots.length-1)];
+      const bDepth=rnd(5,7);
+      const bR0=Math.min(bp.r, 15-bDepth);
+      this._Rexp=block(bp.c, bp.c+1, bp.c+2, bR0, bDepth, UNITS[1]+' unit');
+      this._B={ name:UNITS[1]+' unit', lc:colLetter(bp.c), vc:colLetter(bp.c+1), pc:colLetter(bp.c+2), r0:bR0, rN:bR0+bDepth-1, n:bDepth };
+      return {ROWS:Math.max(11,Math.max(this._A.rN,this._B.rN)+2), cells,
+        active:{r:this._A.r0,c:ap.c+2}, sel:null, colW:{1:104,2:80,6:104,7:80}};
     },
     checks(S){
-      const R=this._R;
-      const ok=(col,r0,n,exps,anchor)=>{
-        for(let i=0;i<n;i++){ const c=S.cells[col+(r0+i)];
-          if(!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exps[i])<1e-4&&c.fmtStyle==='percent')) return false;
-          if(!String(c.formula).includes(anchor)) return false; }
+      const A=this._A, B=this._B;
+      const colOk=(blk,exps)=>{
+        const anchor='$'+blk.vc+'$'+blk.r0;
+        for(let i=0;i<blk.n;i++){ const c=S.cells[blk.pc+(blk.r0+i)];
+          if(!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exps[i])<1e-4)) return false;
+          if(c.fmtStyle!=='percent'||(c.decimals|0)!==1) return false;
+          if(!String(c.formula).toUpperCase().includes(anchor.toUpperCase())) return false; }
         return true;
       };
+      const boldOk=(()=>{ for(const blk of [A,B]){
+        for(let c=blk.lc.charCodeAt(0)-64; c<=blk.pc.charCodeAt(0)-64; c++){
+          if(!(S.cells[colLetter(c)+blk.r0]||{}).bold) return false; } } return true; })();
+      /* ☆ (§1.0(d) mystery slot · §1.0-R3(o) ANCHORING-MASTERY / fill-census — second use in c3,
+         legal under the r429 spacing amendment: non-adjacent to margin and it teaches a different
+         thing, that the LOCK is what makes the fill safe). Each column must be ONE formula carried
+         down: a fill-down covering the body (S.fillOps, chord-agnostic) AND a census proving every
+         cell is a translate of the first. Writing the formula per row clears both core beats
+         (§1.0(c)) and never latches. */
+      const filled=blk=>{
+        const c0=blk.pc.charCodeAt(0)-64;
+        const swept=(S.fillOps||[]).some(f=>f.dir==='down' && f.c1<=c0 && f.c2>=c0
+          && f.r1<=blk.r0 && f.r2>=blk.rN);
+        if(!swept) return false;
+        const first=S.cells[blk.pc+blk.r0]; if(!first||!first.formula) return false;
+        for(let i=0;i<blk.n;i++){ const c=S.cells[blk.pc+(blk.r0+i)];
+          if(!c||!c.formula||c.formula!==translateFormula(first.formula,i,0)) return false; }
+        return true;
+      };
+      const starOk=filled(A)&&filled(B);
       return [
-        {label:'common-size Statement A \u2014 every row anchored on $B$2', ok: ok('C',2,5,this._L,'$B$2')},
-        {label:'common-size Statement B \u2014 anchor on ITS revenue, $'+R.vc+'$'+R.r0, ok: ok(R.pc,R.r0,R.n,this._Rexp,'$'+R.vc+'$'+R.r0)},
+        {label:'Build the '+A.name+' percent column — every line against that unit’s own revenue', ok: colOk(A,this._Lexp)},
+        {label:'Carry it down the '+A.name+' block and set it to percent, one decimal', ok: colOk(A,this._Lexp)},
+        {label:'Build the '+B.name+' percent column — anchored on ITS revenue, not the other unit’s', ok: colOk(B,this._Rexp)},
+        {label:'Carry it down the '+B.name+' block and set it to percent, one decimal', ok: colOk(B,this._Rexp)},
+        {label:'Bold both revenue rows — the 100% line the reader anchors on', ok: boldOk},
+        {label:'☆ each column written once and carried down — the lock is what makes the fill safe', ok: starOk, bonus:true},
       ];
     }
   },
@@ -5783,68 +5842,115 @@ const CHALLENGES = {
     }
   },
   growth:{
-    name:'Growth', label:'Run the growth rates', par:36, parKeys:35,
-    aha:'Growth = this ÷ last − 1 — one formula, filled across every year.',
-    prompt:'A revenue build with two segments, a consolidated line, and five fiscal years. Total the segments, run YoY growth off the total — this year ÷ last year − 1, filled across, formatted as a percent — then compute the 4-year CAGR. Three formulas, each formatted to standard.',
-    req:'<em>B4</em> total <em>=B2+B3</em> fill \u2192 \u00b7 <em>C5</em> YoY <em>=C4/B4-1</em> \u00b7 fill C5:F5 \u2192 + <em>ctrl+shift+%</em> \u00b7 <em>B7</em> CAGR <em>=(F4/B4)^(1/4)-1</em> + <em>ctrl+shift+%</em> \u00b7 dress B4:F4: <em>ctrl+b</em>',
-    guide:[
-      'consolidate at B4 \u00b7 <kbd>=B2+B3</kbd> \u2014 both segments \u00b7 fill right',
-      'YoY at C5 \u00b7 <kbd>=C4/B4-1</kbd> \u2014 this year over last, minus one \u00b7 fill C5:F5 \u2192',
-      'select C5:F5 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u2014 growth reads as percents',
-      'CAGR at B7 \u00b7 <kbd>=(F4/B4)^(1/4)-1</kbd> \u2014 the ^ key earns its place \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
-      'bold the consolidated line: select B4:F4 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd>',
-    ],
-    targets:['B4:F4','C5:F5','B7','B4:F4'],
-    demo(){ return [
-      {sel:'B4', keys:[...T('=B2+B3'), Kb.enter]},
-      {sel:'B4:F4', keys:[Kb.fillR]},
-      {sel:'C5', keys:[...T('=C4/B4-1'), Kb.enter]},
-      {sel:'C5:F5', keys:[Kb.fillR]},
-      {sel:'C5:F5', keys:[Kb.pct]},
-      {sel:'B7', keys:[...T('=(F4/B4)^(1/4)-1'), Kb.enter]},
-      {sel:'B7', keys:[Kb.pct]},
-      {sel:'B4:F4', keys:[Kb.bold]},
+    /* r429 (H6b wave 5, DEPTH_PASS §4.25 + §1.0/§1.0-R2/§1.0-R3): depth-pass rework.
+       JUDGMENT CALLS (per WORKFLOW.md §8):
+       · §1.0(c) VIOLATION FIXED: the pre-rework CORE checks required the formulas to REFERENCE
+         particular cells (refs('B7',['F4','B4']) etc). Freedom says no core check may demand a
+         route — a player who types the endpoints has done the arithmetic and must clear. Core now
+         grades the VALUE; the reference becomes the ☆. This is the ☆ that was hiding in the drill.
+       · §4.25's "☆ Percent-format the CAGR cell and bold it" is a FORMATTING ☆ — dead under
+         §1.0(d). Re-cut per §1.0-R3(o) to REFERENCE-OVER-RETYPE: the CAGR pointed at the
+         consolidated row rather than typed, so a restatement of any year flows straight through.
+         Family spacing (r429 amended rule): foot used this family three drills earlier — NOT
+         adjacent — and it taught a different thing there (the corner is the edge summed again);
+         here it is "never hardcode an endpoint".
+       · §4.25 asks for site jitter "if fixed" — the board WAS nailed to rows 1–7 with two fixed
+         segment names. Now: row jitter, a segment-name pool, and value ranges.
+       · ARTIFACT: "$mm" → "$000s" and real segment names — the revenue build is audience-neutral
+         (every company has one), which is what §1.0-R3(n) rule 5 wants; c3's A-lean balance is
+         carried by margin/foot/percent around it. */
+    name:'Growth', label:'Run the growth rates', par:50, parKeys:46, saveClose:true,   /* r429: par re-swept post-rework — 5-seed sweep median 46 keys, 0% drift after retune; par 50s \u2248 1.09 s/key. Was 36/35: the drill gained the percent-decimal beat, the top rule and the save. */
+    aha:'a growth rate is one formula filled across — and a CAGR that points at the totals survives a restatement, while a typed one quietly lies.',
+    prompt:'The revenue build has two segments and five fiscal years, and the board wants the growth story on it. Consolidate the segments, run the year-on-year rate off the consolidated line, put it in percent, and compound the four-year rate at the bottom. If any year gets restated later, the page should follow it without being retyped.',
+    req(){ const o=this._o; return '<em>B'+o.tot+'</em> =B'+o.s1+'+B'+o.s2+' fill → · <em>C'+o.yoy+'</em> =C'+o.tot+'/B'+o.tot+'-1 · fill → · <em>ctrl+shift+%</em> +1dp · <em>B'+o.cagr+'</em> =(F'+o.tot+'/B'+o.tot+')^(1/4)-1 · percent · <em>B'+o.tot+':F'+o.tot+'</em> <em>ctrl+b</em> + <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): labels are OUTCOME lines; the route lives here. */
+    guide(){ const o=this._o; return [
+      'consolidate at <em>B'+o.tot+'</em> · <kbd>=B'+o.s1+'+B'+o.s2+'</kbd> (or <kbd>alt</kbd>+<kbd>=</kbd>) · <kbd>↵</kbd> · select <em>B'+o.tot+':F'+o.tot+'</em> · <kbd>ctrl</kbd>+<kbd>r</kbd> — one formula, five years',
+      'the rate starts at the SECOND year — at <em>C'+o.yoy+'</em> · <kbd>=C'+o.tot+'/B'+o.tot+'-1</kbd> · <kbd>↵</kbd> · select <em>C'+o.yoy+':F'+o.yoy+'</em> · <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'select <em>C'+o.yoy+':F'+o.yoy+'</em> · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> — growth reads as percents, one decimal',
+      'the four-year rate at <em>B'+o.cagr+'</em> · <kbd>=(F'+o.tot+'/B'+o.tot+')^(1/4)-1</kbd> — the <kbd>^</kbd> key earns its place · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
+      'the consolidated line carries the page — select <em>A'+o.tot+':F'+o.tot+'</em> · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> (a total rules on TOP)',
+      '☆ the discovery: point the four-year rate at the consolidated totals instead of typing the two figures in. Restate any year and the rate follows — a typed one just goes quietly wrong',
+    ]; },
+    targets(){ const o=this._o; return ['B'+o.tot+':F'+o.tot, 'C'+o.yoy+':F'+o.yoy, 'C'+o.yoy+':F'+o.yoy, 'B'+o.cagr, 'A'+o.tot+':F'+o.tot, 'B'+o.cagr]; },
+    demo(){ const o=this._o; return [
+      {sel:'B'+o.tot, keys:[...T('=B'+o.s1+'+B'+o.s2), Kb.enter]},
+      {sel:'B'+o.tot+':F'+o.tot, keys:[Kb.fillR]},
+      {sel:'C'+o.yoy, keys:[...T('=C'+o.tot+'/B'+o.tot+'-1'), Kb.enter]},
+      {sel:'C'+o.yoy+':F'+o.yoy, keys:[Kb.fillR]},
+      {sel:'C'+o.yoy+':F'+o.yoy, keys:[Kb.pct, Kb.alt,L('H'),D(0)]},
+      /* the ☆ rides here: the CAGR POINTS at the consolidated row (§2.2 — the demo performs it) */
+      {sel:'B'+o.cagr, keys:[...T('=(F'+o.tot+'/B'+o.tot+')^(1/4)-1'), Kb.enter]},
+      {sel:'B'+o.cagr, keys:[Kb.pct, Kb.alt,L('H'),D(0)]},
+      {sel:'A'+o.tot+':F'+o.tot, keys:[Kb.bold, Kb.alt,L('H'),L('B'),L('P')]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 revenue build ($mm)',txt:true,bold:true};
+      const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+      /* §1.2 axes (the page's "add site jitter if fixed" — the board was nailed to rows 1–7 with
+         two fixed segment names): (a) row jitter d∈{0,1,2}; (b) segment-name pool + codename +
+         the fiscal-year base; (c) all values and growth rates through rnd(); (d) which segment is
+         the larger one (the pair is drawn, then order-flipped). */
+      const d=rnd(0,2), hr=1+d;
+      const SEGS=shuffle(['Products revenue','Services revenue','Subscription revenue',
+                          'Licence revenue','Support revenue','Hardware revenue']);
+      const s1=hr+1, s2=hr+2, tot=hr+3, yoy=hr+4, cagr=hr+6;
       const y0=rnd(24,26);
-      for(let i=0;i<5;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
-      const segs=['Products revenue','Services revenue'];
-      cells['A2']={...blankCell(),value:segs[0],txt:true};
-      cells['A3']={...blankCell(),value:segs[1],txt:true};
-      cells['A4']={...blankCell(),value:'Total revenue',txt:true,bold:true};
-      cells['A5']={...blankCell(),value:'YoY growth',txt:true};
-      cells['A7']={...blankCell(),value:'CAGR (4-yr)',txt:true};
+      cells['A1']={...blankCell(),value:codename()+' — revenue build ($000s)',txt:true,bold:true};
+      for(let i=0;i<5;i++) cells[colLetter(i+2)+hr]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
+      cells['A'+s1]={...blankCell(),value:SEGS[0],txt:true};
+      cells['A'+s2]={...blankCell(),value:SEGS[1],txt:true};
+      cells['A'+tot]={...blankCell(),value:'Total revenue',txt:true};
+      cells['A'+yoy]={...blankCell(),value:'YoY growth',txt:true};
+      cells['A'+cagr]={...blankCell(),value:'CAGR (4-yr)',txt:true};
       let a=rnd(40,90)*10, b=rnd(20,60)*10;
+      if(rnd(0,1)){ const t=a; a=b; b=t; }                      // (d) which segment leads
       this._tot=[];
       for(let i=0;i<5;i++){ const col=colLetter(i+2);
-        cells[col+2]={...blankCell(),value:a,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+3]={...blankCell(),value:b,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+4]={...blankCell(),fmtStyle:'comma',decimals:0};
-        if(i>0) cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[col+s1]={...blankCell(),value:a,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+s2]={...blankCell(),value:b,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[col+tot]={...blankCell(),fmtStyle:'comma',decimals:0};
+        if(i>0) cells[col+yoy]={...blankCell(),fmtStyle:'comma',decimals:0};
         this._tot.push(a+b);
         a=Math.round(a*(1+rnd(2,12)/100)); b=Math.round(b*(1+rnd(2,14)/100)); }
-      cells['B7']={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['B'+cagr]={...blankCell(),fmtStyle:'comma',decimals:0};
       this._yoy=[1,2,3,4].map(i=>this._tot[i]/this._tot[i-1]-1);
       this._cagr=Math.pow(this._tot[4]/this._tot[0],1/4)-1;
-      return {ROWS:7, cells, active:{r:4,c:2}, sel:null, colW:{1:150,2:70,3:70,4:70,5:70,6:70}};
+      this._o={ hr:hr, s1:s1, s2:s2, tot:tot, yoy:yoy, cagr:cagr };
+      return {ROWS:Math.max(9,cagr+2), cells, active:{r:tot,c:2}, sel:null,
+        colW:{1:150,2:70,3:70,4:70,5:70,6:70}};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D','E','F'];
-      const totOk=[0,1,2,3,4].every(i=>{ const val=v(COL[i]+'4'); return val!==null&&Math.abs(val-this._tot[i])<0.5; });
-      const yoyOk=[1,2,3,4].every(i=>{ const c=S.cells[COL[i]+'5'];
-        return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-this._yoy[i-1])<1e-3&&c.fmtStyle==='percent'); });
-      const cagrC=S.cells['B7'];
-      const cagrOk=!!(cagrC&&cagrC.formula&&String(cagrC.formula).includes('^')&&typeof cagrC.value==='number'&&Math.abs(cagrC.value-this._cagr)<1e-3&&cagrC.fmtStyle==='percent');
-      const boldOk=[0,1,2,3,4].every(i=>{ const c=S.cells[COL[i]+'4']; return !!(c&&c.bold); });
+      const o=this._o, COL=['B','C','D','E','F'];
+      const cell=k=>S.cells[k]||{};
+      /* §1.0(c): core grades the VALUE. A player who types the endpoints of the CAGR, or types
+         each consolidated total, has done the arithmetic and clears — the clock prices the
+         difference. The pre-rework core demanded specific cell references; that was a route
+         requirement and it is gone. */
+      const totOk=[0,1,2,3,4].every(i=>{ const c=cell(COL[i]+o.tot);
+        return typeof c.value==='number' && Math.abs(c.value-this._tot[i])<0.5; });
+      const yoyOk=[1,2,3,4].every(i=>{ const c=cell(COL[i]+o.yoy);
+        return typeof c.value==='number' && Math.abs(c.value-this._yoy[i-1])<1e-3; });
+      const yoyFmt=[1,2,3,4].every(i=>{ const c=cell(COL[i]+o.yoy);
+        return c.fmtStyle==='percent' && (c.decimals|0)===1; });
+      const cg=cell('B'+o.cagr);
+      const cagrOk=typeof cg.value==='number' && Math.abs(cg.value-this._cagr)<1e-3 && cg.fmtStyle==='percent';
+      const dressOk=(()=>{ for(let c=1;c<=6;c++){ const x=cell(colLetter(c)+o.tot);
+        if(!x.bold||!x.bt) return false; } return true; })();
+      /* ☆ (§1.0(d) mystery slot · §1.0-R3(o) REFERENCE-OVER-RETYPE): the four-year rate POINTS at
+         the consolidated row — both endpoints are references, not typed figures — so a restatement
+         flows through instead of leaving the headline rate quietly wrong. Graded on the formula's
+         own text, the sanctioned class where the reference IS the lesson (doctrine §2.2). Typing
+         the endpoints clears core (§1.0(c)) and never latches. */
+      const f=String(cg.formula||'').toUpperCase().replace(/[\s$]/g,'');
+      const starOk=cagrOk && f.includes('F'+o.tot) && f.includes('B'+o.tot);
       return [
-        {label:'consolidate the segments live at B4 \u2014 fill across all five years', ok: totOk&&refs('B4',['B2','B3'])},
-        {label:'run YoY growth at C5 \u2014 this year over last, fill C5:F5 and percent it', ok: yoyOk&&refs('C5',['C4','B4'])},
-        {label:'compound the CAGR at B7 \u2014 first and last totals, as a percent', ok: cagrOk&&refs('B7',['F4','B4'])},
-        {label:'bold the consolidated line \u2014 B4:F4 carries the page', ok: boldOk},
+        {label:'Consolidate the two segments across every year', ok: totOk},
+        {label:'Run the year-on-year rate off the consolidated line', ok: yoyOk},
+        {label:'Set the growth row to percent, one decimal', ok: yoyFmt},
+        {label:'Compound the four-year rate at the bottom, as a percent', ok: cagrOk},
+        {label:'Bold the consolidated line and add a top border above it', ok: dressOk},
+        {label:'☆ the four-year rate pointed at the totals, not typed — it survives a restatement', ok: starOk, bonus:true},
       ];
     }
   },

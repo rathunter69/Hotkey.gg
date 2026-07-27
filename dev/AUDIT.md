@@ -1,5 +1,44 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r429 H6b-5 — percent + growth (DEPTH_PASS §4.24/§4.25) — wave 5 at 5 of 12
+### percent — "Common-size both statements"
+- **ARTIFACT:** "Statement A / Statement B" → **two NAMED business units**. "Statement A" is exactly
+  the "Table 1" class §1.0-R3(n) rule 1 bans — a real file names its blocks. Common-sizing two units
+  against their own revenue is FP&A's daily job and comp prep in the same shape.
+- **☆ RE-CUT (§4.24's "italicize both % headers" was a formatting ☆):** ANCHORING MASTERY /
+  fill-census — each column ONE formula carried down, the lock being what makes the fill safe.
+  **Second use of the family in c3**, which is legal under the r429 amended spacing rule (below):
+  non-adjacent to margin, and it teaches a different thing (margin: a ratio column is one formula;
+  here: an unlocked divisor walks and the column goes quietly wrong).
+- **BLOCK A UN-NAILED** — it sat at a fixed C2 (the audit ask the page records); both statements now
+  site-shuffle, with independent 5–7 line depths.
+- **PAR:** 17/14 → **26/23** (median 23, 0% drift, 1.13 s/key).
+
+### growth — "Run the growth rates"
+- **§1.0(c) VIOLATION FIXED, and it was hiding the ☆.** The pre-rework CORE checks required the
+  formulas to REFERENCE particular cells (`refs('B7',['F4','B4'])`). Freedom says no core check may
+  demand a route — a player who types the endpoints has done the arithmetic and must clear. Core now
+  grades the VALUE; **the reference became the ☆** (REFERENCE-OVER-RETYPE: a CAGR pointed at the
+  consolidated row survives a restatement, a typed one goes quietly wrong). ALT 2 walks the fully
+  typed route and clears all five cores with the ☆ dark, which is the proof the fix is real.
+- **§4.25's "add site jitter if fixed" applied** — the board was nailed to rows 1–7 with two fixed
+  segment names; now row jitter + a 6-deep segment pool + which segment leads.
+- **PAR:** 36/35 → **50/46** (median 46, 0% drift, 1.09 s/key).
+
+### Spec amendment made in this batch
+- **§1.0-R3(o) ☆-FAMILY SPACING — the original rule was unachievable and is now honest.** It said a
+  ☆ must not repeat another ☆ in the SAME chapter; with 12-drill chapters and seven families that is
+  impossible by the pigeonhole, and it was pushing page authors toward strained bonuses. Amended to:
+  **no two ADJACENT drills share a family, and no family appears more than TWICE per chapter** —
+  and where one repeats, the second use must differ in what it TEACHES even if the shape rhymes,
+  stated on the page. Same intent, reachable.
+- **TESTS (both drills):** replay 3/3 · depth-contract PASS · guided PASS · alt-paths 2/2 each (all
+  four rebuilt — the old pairs hardcoded pre-rework geometry) · par-sweep FLAGGED 0 · invariants
+  clean · full-catalog replay green · drills.js?v=292→294.
+- **ROUTE-CANON NOTE:** the Ctrl+1 dialog has **no percent accelerator** (percent is Alt H P or
+  Ctrl+Shift+%). A first-cut alt assumed Ctrl+1 → P and failed; recorded here so the next author
+  does not re-derive it. Ctrl+1 does carry C (currency), N (comma) and X (the 8.2x multiple).
+
 ## r429 H6b-5 — anchor depth-pass rework (DEPTH_PASS §4.23 + §1.0/§1.0-R2/§1.0-R3 + D12)
 - **ARTIFACT KEPT:** the price × volume grid is already audience-neutral — a pricing grid is a sales
   manager's file and a banker's sensitivity table in the same shape, which is exactly what
