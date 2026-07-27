@@ -18,22 +18,24 @@
   serial assembly; the r427 union-merge incident is the WHY)** + `.claude/workflows/drill-wave.js`.
 
 **THE QUEUE (in order):**
-1. **W4 — FINISH FORMATTING (c2) [auto·M] — IN FLIGHT, 3 of 5 DONE (r429).**
-   ✅ **decimals** (audience-A ops scorecard, column-select ☆) · ✅ **center** (class-sweep ☆, new
-   border beat, board now ships misaligned) · ✅ **autofit** (audience-A headcount roster, one-pass
-   ☆, beats now CHAIN — the player's own totals create the ##### the next beat fixes) ·
-   ✅ **combo** (current-region ☆ — the one ☆ that grades the CHORD; blue-inputs promoted to core).
-   ⏳ **gauntlet★** remains — build to
-   DEPTH_PASS **r429** (§1.0-R3 + the re-cut §4.14/§4.17/§4.20 pages, which already name each
-   drill's artifact, ☆ family, latch telemetry and skippability proof). gauntlet★ flips the c2
-   gate on and follows the modeltour capstone wiring template (AUDIT r425 entry).
-   **NOTE — the parallel wave is BLOCKED:** `.claude/workflows/drill-wave.js` ran on 2026-07-27 and
+1. **✅ W4 — FORMATTING (c2) COMPLETE (r429).** All five shipped, each fully gated with its own
+   mechanics probe: **decimals** (audience-A ops scorecard · column-select ☆) · **center**
+   (class-sweep ☆ · new border beat · board now ships misaligned) · **autofit** (audience-A
+   headcount roster · one-pass ☆ · beats CHAIN — the player's own totals create the #### the next
+   beat fixes) · **combo** (current-region ☆ — the one ☆ that grades the CHORD; blue-inputs
+   promoted to core) · **gauntlet★ THE FORMATTING CAPSTONE** (format-cloning ☆, direction-agnostic;
+   a clean run now opens Formulas I).
+   **Chapter 2 is closed: 10/10 at the standard. Catalog 19/81.** Four new engine telemetry hooks
+   (`fmtOps.dec`, `fmtOps.align`, `widthOps`, `selOps`), all grading-only. **A MISSING CAPSTONE
+   INVARIANT was found and restored** (a silent r427 union-merge casualty — it caught a live par
+   drift on its first run).
+   **NOTE — the parallel wave is BLOCKED:** `.claude/workflows/drill-wave.js` ran 2026-07-27 and
    all five worktree agents failed identically — the harness permission layer stripped every tool
    call's required parameters, so no agent could read or write a byte (zero files touched; each
    correctly refused to improvise and reported the blocker). Until that is fixed, waves build
-   SERIALLY in the main checkout, which is how decimals and center were done. Two further gotchas
-   for whoever resumes: worktrees branch from the last COMMIT, so spec changes must be committed
-   before launching; and the workflow's `args` arrive JSON-encoded (now normalised in the script).
+   SERIALLY in the main checkout, which is how all five of these were done. Two further gotchas:
+   worktrees branch from the last COMMIT (commit spec changes before launching), and the workflow's
+   `args` arrive JSON-encoded (now normalised in the script).
 2. **WOLF PLAYTEST ROUND 3** — the 14 reworked drills + the platform fixes (borders, ribbon
    overlay, cursor anchor). Feedback → §1.0-R3 law integration (spec round, highest-tier work)
    BEFORE wave 5 builds. Also collect: index-UI verification list (AUDIT r426–r427 entry names

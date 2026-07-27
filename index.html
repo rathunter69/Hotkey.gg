@@ -1728,9 +1728,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=288"></script>
+<script src="drills.js?v=289"></script>
 
-<script src="drills.js?v=288"></script>
+<script src="drills.js?v=289"></script>
 
 
 
@@ -2197,78 +2197,120 @@ const CHALLENGES = {
     }
   },
   gauntlet:{
-    name:'Gauntlet', label:'Make it model-ready', par:63, parKeys:66,
-    aha:'Model-ready is one rhythm: bold, comma, border, blue inputs — and the totals in accounting format (Alt H A N).',
-    prompt:'Format both blocks of a raw sources & uses (the two-sided table of where deal money comes from and where it goes): inputs in blue, SUM each total, bold with a top border on both totals, commas at 0 decimals down both money columns, and autofit so nothing clips. Every formatting operation you know, both sides of the page, no mouse.',
-    req(){ const R=this._R; return '<em>keyboard only</em> \u00b7 inputs <em>'+R.srcIn+'</em> + <em>'+R.useIn+'</em> \u2192 alt h f c blue font \u00b7 <em>alt+=</em> both totals \u00b7 <em>ctrl+b</em> + <em>alt h b p</em> both \u00b7 <em>alt h k</em> + <em>alt h 9</em> \u00d72 down both columns \u00b7 <em>alt h a n</em> both totals \u00b7 <em>alt h o i</em> autofit'; },
+    /* r429 (H6b wave 4, DEPTH_PASS §4.20 + §2.4 + §1.0/§1.0-R2/§1.0-R3): depth-pass rework AND
+       the FORMATTING CAPSTONE designation. Capstone wiring follows the modeltour template
+       exactly (AUDIT.md r425 entry): meta.gauntlet.capstone:true · HOTKEY_CAMPAIGN.chapters[1]
+       .capstone:'gauntlet' · HOTKEY_CLOCKS.gauntlet={pass:par×2} · the SHARED hkCapstoneOk
+       predicate (unchanged — one definition, every surface) · picker ★ CAPTAG · both grandfather
+       rules · drill ACCESS never blocked.
+       JUDGMENT CALLS (documented per WORKFLOW.md §8):
+       · ARTIFACT KEPT — sources & uses is the chapter's audience-B summative page (§3.1), and a
+         capstone should be the aspirational artifact. Prompt reframed to §1.0-R3(n) rule 2: it
+         goes in the committee book tonight.
+       · §4.20's "☆ Center the two side headings across their columns" is a FORMATTING ☆ — dead
+         under §1.0(d), and it also rode along with the dress pass, so it failed §1.0-R2(i)
+         skippability too. Re-cut per §1.0-R3(o) to the FORMAT-CLONING family.
+       · THE ACCOUNTING-FORMAT BEAT IS CUT (it was core pre-rework): §4.20's beat list is six
+         lines and §1.1 caps core at six. The ☆ now carries the "both sides end up dressed
+         identically" lesson that the accounting beat half-served, and "Finish at A1" comes in as
+         the §1.6 finish-state beat the page calls for. Alt H A N is still taught in dress.
+       · NO ENGINE HUNK NEEDED (§1.0-R3(o) "prefer existing telemetry"): the r425 S.pasteLog
+         already records kind:'formats' plus the destination rect, so the clone latches off
+         history that already exists. The wave's other three ☆s each needed new telemetry; this
+         one did not, and adding a fourth array would have been gold-plating (§7). */
+    name:'Gauntlet', label:'Make it model-ready', par:47, parKeys:43, saveClose:true,   /* r429: par re-swept post-rework — 5-seed sweep median 43 keys, 0% drift after retune; par 47s \u2248 1.09 s/key, house band. The format-clone route is shorter than dressing both sides, and the accounting beat left. CAPSTONE: HOTKEY_CLOCKS.gauntlet.pass stays in lockstep at par\u00d72 = 94. */
+    aha:'model-ready is a sequence you can run cold — and once one side is dressed, the other side is a paste, not a repeat.',
+    prompt:'The sources & uses goes into the committee book tonight and it is still raw. Blue the typed inputs so a reader can see what was keyed and what was calculated, total both sides, rule the totals off, put separators down the money, clear anything showing ####, and leave the cursor at the top of a clean page. Every formatting operation you know, both sides, no mouse.',
+    req(){ const R=this._R; return 'inputs <em>'+R.srcIn+'</em> + <em>'+R.useIn+'</em> <em>alt h f c</em> blue · <em>alt+=</em> both totals · <em>ctrl+b</em> + <em>alt h b p</em> · <em>alt h k</em> + <em>alt h 9</em> ×2 both columns · <em>alt h o i</em> · <em>ctrl+home</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): check labels are OUTCOME lines — the route lives HERE, per line, chords allowed. */
     guide(){ const R=this._R; return [
-      'both input stacks in blue font: select '+R.srcIn+' \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 Blue <kbd>\u21b5</kbd> \u00b7 then the same on '+R.useIn,
-      'totals with autosum: '+R.srcTot+' \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> <kbd>\u21b5</kbd> \u00b7 then '+R.useTot+' \u00b7 <kbd>alt</kbd>+<kbd>=</kbd> <kbd>\u21b5</kbd>',
-      'dress both totals: <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
-      'commas, 0 decimals, both money bodies: <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> \u00d72',
-      'the two totals in accounting format: <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>n</kbd> \u2014 $ aligned, the S&U convention',
-      'autofit both: <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> \u2014 no #### leaves the desk',
+      'blue marks what a human typed — select <em>'+R.srcIn+'</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> · <kbd>→</kbd>×4 Blue · <kbd>↵</kbd> · then the same on <em>'+R.useIn+'</em>',
+      'a total is a formula, never a typed figure — on <em>'+R.srcTot+'</em> · <kbd>alt</kbd>+<kbd>=</kbd> <kbd>↵</kbd> · then <em>'+R.useTot+'</em> · <kbd>alt</kbd>+<kbd>=</kbd> <kbd>↵</kbd>',
+      'both totals earn their line — <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> on each (the rule goes ABOVE a total, never under it)',
+      'separators down both money columns — select <em>'+R.srcCol+'</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice · same on <em>'+R.useCol+'</em>',
+      'nothing ships showing #### — select both money columns · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd>',
+      'leave it the way you would hand it over — <kbd>ctrl</kbd>+<kbd>home</kbd>: a clean page greets the reader at A1',
+      '☆ the discovery: you dressed one side already. Copy the finished Sources column and paste-special FORMATS onto Uses — the whole dress crosses in one pass, and only the numbers stay each side’s own',
     ]; },
-    targets(){ const R=this._R; return [R.srcIn, R.srcTot, R.srcTot, R.srcCol, R.srcTot, R.srcCol]; },
+    targets(){ const R=this._R; return [R.srcIn, R.srcTot, R.srcTot, R.srcCol, R.srcCol, 'A1', R.useCol]; },
     demo(){ const R=this._R; return [
+      /* Sources dressed FIRST, then the whole dress CROSSES in one paste-formats pass — the ☆
+         latch fires there (§2.2: the demo performs the bonus so replay covers it). */
       {sel:R.srcIn,  keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
-      {sel:R.useIn,  keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
       {sel:R.srcTot, keys:[Kb.eq, Kb.enter]},
       {sel:R.useTot, keys:[Kb.eq, Kb.enter]},
-      {sel:R.srcTot, keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('P')]},
-      {sel:R.useTot, keys:[Kb.bold,Kb.alt,L('H'),L('B'),L('P')]},
-      {sel:R.srcCol, keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
-      {sel:R.useCol, keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
-      {sel:R.srcTot, keys:[Kb.alt,L('H'),L('A'),L('N')]},
-      {sel:R.useTot, keys:[Kb.alt,L('H'),L('A'),L('N')]},
+      {sel:R.srcTot, keys:[Kb.bold, Kb.alt,L('H'),L('B'),L('P')]},
+      {sel:R.srcCol, keys:[Kb.alt,L('H'),L('K'), Kb.alt,L('H'),D(9), Kb.alt,L('H'),D(9)]},
+      {sel:R.srcCol, keys:[Kb.copy]},
+      {sel:R.useCol, keys:[Kb.alt,{key:'e'},{key:'s'},{key:'t'},Kb.enter]},   /* Alt E S T — paste special → Formats */
       {sel:R.srcCol, keys:[Kb.alt,L('H'),L('O'),L('I')]},
       {sel:R.useCol, keys:[Kb.alt,L('H'),L('O'),L('I')]},
+      {sel:'A1',     keys:[{key:'Home',ctrl:true}]},
     ]; },
     build(){
-      /* r155 DENSITY: was a 2\u00d75 strip \u2014 now a real two-sided S&U; every op runs
-         on both blocks (multi-site per the doctrine), labels shuffle per run. */
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 Sources & uses (format it before it ships)',txt:true,bold:true};
+      const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+      cells['A1']={...blankCell(),value:codename()+' — sources & uses (format it before it ships)',txt:true,bold:true};
+      /* §1.2 axes: (a) site jitter r0∈{3,4}; (b) content pools — BOTH label stacks Fisher-Yates
+         from 6-deep pools (was 4 fixed each); (c) values through rnd() + the line COUNT 4–5,
+         which moves the total row and every graded range; (d) which side ships the wider labels
+         (the column that squeezes first varies). */
       const r0=3+rnd(0,1);
-      const srcLbl=['Senior debt','Mezzanine','Sponsor equity','Rollover'];
-      const useLbl=['Purchase equity','Refi existing debt','Fees & OID','Min. cash to BS'];
-      for(let a=srcLbl.length-1;a>0;a--){ const j=rnd(0,a); [srcLbl[a],srcLbl[j]]=[srcLbl[j],srcLbl[a]]; }
-      for(let a=useLbl.length-1;a>0;a--){ const j=rnd(0,a); [useLbl[a],useLbl[j]]=[useLbl[j],useLbl[a]]; }
+      const nL=rnd(4,5);
+      const srcLbl=shuffle(['Senior debt','Mezzanine','Sponsor equity','Rollover equity','Revolver draw','Seller note']).slice(0,nL);
+      const useLbl=shuffle(['Purchase equity','Refi existing debt','Fees & OID','Min. cash to BS','Transaction expenses','Escrow funding']).slice(0,nL);
+      const wideSide=rnd(0,1);                       // (d) which side gets the squeezed column
       cells['A'+r0]={...blankCell(),value:'Sources',txt:true,bold:true};
       cells['D'+r0]={...blankCell(),value:'Uses',txt:true,bold:true};
-      for(let i=0;i<4;i++){ const r=r0+1+i;
+      for(let i=0;i<nL;i++){ const r=r0+1+i;
         cells['A'+r]={...blankCell(),value:srcLbl[i],txt:true};
         cells['B'+r]={...blankCell(),value:rnd(40,260)*1000000};
         cells['D'+r]={...blankCell(),value:useLbl[i],txt:true};
         cells['E'+r]={...blankCell(),value:rnd(40,260)*1000000};
       }
-      cells['A'+(r0+5)]={...blankCell(),value:'Total sources',txt:true};
-      cells['D'+(r0+5)]={...blankCell(),value:'Total uses',txt:true};
-      this._R={ srcIn:'B'+(r0+1)+':B'+(r0+4), useIn:'E'+(r0+1)+':E'+(r0+4),
-        srcTot:'B'+(r0+5), useTot:'E'+(r0+5),
-        srcCol:'B'+(r0+1)+':B'+(r0+5), useCol:'E'+(r0+1)+':E'+(r0+5), r0 };
-      return {ROWS:Math.max(10,r0+6), cells, active:{r:r0+1,c:2}, sel:null, colW:{1:118,4:128}};
+      const tr=r0+nL+1;
+      cells['A'+tr]={...blankCell(),value:'Total sources',txt:true};
+      cells['D'+tr]={...blankCell(),value:'Total uses',txt:true};
+      this._R={ srcIn:'B'+(r0+1)+':B'+(r0+nL), useIn:'E'+(r0+1)+':E'+(r0+nL),
+        srcTot:'B'+tr, useTot:'E'+tr,
+        srcCol:'B'+(r0+1)+':B'+tr, useCol:'E'+(r0+1)+':E'+tr,
+        r0, nL, tr, wideSide };
+      return {ROWS:Math.max(11,tr+2), cells, active:{r:r0+1,c:2}, sel:null,
+        colW:{1:118, 2:wideSide?58:66, 4:128, 5:wideSide?66:58}};
     },
     checks(S){
-      const R=this._R, r0=R.r0;
-      let fill=true;
-      for(let i=1;i<=4;i++){ for(const cL of ['B','E']){ const c=S.cells[cL+(r0+i)];
-        if(!c||c.fontColor!=='blue') fill=false; } }
-      const tS=S.cells['B'+(r0+5)], tU=S.cells['E'+(r0+5)];
-      const sum=!!(tS&&tS.formula&&/^=SUM\(/i.test(tS.formula)) && !!(tU&&tU.formula&&/^=SUM\(/i.test(tU.formula));
-      const tot=!!(tS&&tS.bold&&tS.bt) && !!(tU&&tU.bold&&tU.bt);
-      let cf=true;
-      for(let i=1;i<=4;i++){ for(const cL of ['B','E']){ const c=S.cells[cL+(r0+i)];
-        if(!c||c.fmtStyle!=='comma'||c.decimals!==0) cf=false; } }
-      const acct=!!(tS&&tS.fmtStyle==='acct')&&!!(tU&&tU.fmtStyle==='acct');
+      const R=this._R, r0=R.r0, tr=R.tr;
+      const cell=k=>S.cells[k]||{};
+      let blue=true, cf=true;
+      for(let i=1;i<=R.nL;i++) for(const cL of ['B','E']){ const c=cell(cL+(r0+i));
+        if(c.fontColor!=='blue') blue=false;
+        if(c.fmtStyle!=='comma'||(c.decimals|0)!==0) cf=false; }
+      const tS=cell('B'+tr), tU=cell('E'+tr);
+      const sum=!!(tS.formula&&/^=SUM\(/i.test(tS.formula)) && !!(tU.formula&&/^=SUM\(/i.test(tU.formula));
+      const tot=!!(tS.bold&&tS.bt) && !!(tU.bold&&tU.bt);
       const af=!overflowsCol(S,2)&&!overflowsCol(S,5);
+      const homeOk=blue && sum && tot && cf && af && S.active.r===1 && S.active.c===1;
+      /* ☆ (§1.0(d) mystery slot · §1.0-R3(o) FORMAT-CLONING family): the Uses column dressed by a
+         paste-special-FORMATS pass off the finished Sources column — one motion carries blue,
+         separators, bold and the top rule across, and only the numbers stay each side's own.
+         Reads the r425 S.pasteLog (kind:'formats' + destination rect); NO new telemetry was
+         needed. Dressing both sides by hand clears all six cores and wins the capstone — §2.2:
+         a bonus can NEVER gate anything, and this one sits on the drill that opens Formulas I,
+         so the point is asserted explicitly in dev/verify-gauntlet.js. */
+      /* DIRECTION-AGNOSTIC (r429): dressing Uses first and cloning onto Sources is the same
+         mastery move as the other way round, so either destination column earns it — a ☆ that
+         only recognised one direction would be a route trap of exactly the kind §1.0(c) bans.
+         ALT 2 walks the reverse direction to keep this honest. */
+      const cloned=(S.pasteLog||[]).some(p=>p.kind==='formats'
+        && (p.c0===2||p.c0===5) && p.r0<=r0+1 && (p.r0+p.h-1)>=tr);
       return [
-        {label:'paint the inputs on BOTH stacks blue — blue font marks typed data', ok:fill},
-        {label:'SUM both totals \u2014 one per side', ok:sum},
-        {label:'bold both total rows and add a top border above them', ok:tot},
-        {label:'comma-format both money BODIES, 0 decimals', ok:cf},
-        {label:'cast both totals in accounting format \u2014 the S&U convention', ok:acct},
-        {label:'autofit both sides \u2014 no #### left anywhere', ok:af},
+        {label:'Color the typed inputs blue — both sides of the table', ok: blue},
+        {label:'Total both columns — a live SUM under Sources and another under Uses', ok: sum},
+        {label:'Bold both totals and add a top border above each', ok: tot},
+        {label:'Comma-format both money columns — zero decimals', ok: cf},
+        {label:'Autofit every column that reads ####', ok: af},
+        {label:'Finish at A1 — the page is ready for the book', ok: homeOk},
+        {label:'☆ one side dressed, the other cloned — the whole format crosses in a single paste', ok: cloned, bonus:true},
       ];
     }
   },

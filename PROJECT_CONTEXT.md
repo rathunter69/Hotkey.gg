@@ -19,7 +19,26 @@ without escalating. Spec is now **DEPTH_PASS r429**.
 **ALSO DECIDED:** data retention (closes G10) — 7-day detailed run history, last 5 + expand,
 aggregates permanent. In PIPELINE ⚡ with implementation notes.
 
-**WAVE 4 (finish Formatting c2) — 2 of 5 SHIPPED, both fully gated:**
+**✅ WAVE 4 COMPLETE — CHAPTER 2 (FORMATTING) IS CLOSED, 10/10 at the standard. Catalog 19/81.**
+All five built serially and fully gated, each with its own mechanics probe (`dev/verify-*.js`):
+**decimals** (comps page → audience-A ops scorecard; column-select ☆) · **center** (class-sweep ☆;
+new border beat; board now ships misaligned so the alignment beat is real work) · **autofit**
+(two abstract blocks → audience-A headcount roster; one-pass ☆; the beats now CHAIN — the player's
+own totals create the #### the next beat fixes) · **combo** (current-region ☆ — the one ☆ that
+grades the CHORD, not the rect; the killed formatting ☆ was PROMOTED to core, not deleted) ·
+**gauntlet★ THE FORMATTING CAPSTONE** (format-cloning ☆, direction-agnostic; a clean run opens
+Formulas I; wired off the modeltour template).
+Four new grading-only engine hooks: `fmtOps.dec` · `fmtOps.align` · `widthOps` · `selOps`.
+gauntlet needed none — `S.pasteLog` already carried what its ☆ reads.
+
+**🔴 A MISSING INVARIANT WAS FOUND AND RESTORED:** the capstone-wiring guard the r425 entry records
+and the r427 assembly commit claims it carried forward **was not in the tree** — a silent
+union-merge casualty. No capstone assertion existed when the second capstone was wired. Restored
+and widened (real drill · meta flag · group-last · one chapter each · hkCapstoneOk present ·
+clocks at par×2), and **it caught a live par drift on its first run**. Expect more of this class:
+anything the r427 rebuild touched deserves a look before it is trusted.
+
+**PRIOR (wave 4 at the 2-of-5 mark):**
 - **decimals** — artifact converted comps page → **operations scorecard** (audience A); ☆ re-cut to
   COLUMN-SELECTION discipline; new engine telemetry `hkFmtLatch('dec')`; par 18/15 → 27/24;
   probe `dev/verify-decimals.js` **22/22**.

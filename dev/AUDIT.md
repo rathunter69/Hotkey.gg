@@ -1,5 +1,58 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r429 H6b-4 — gauntlet: the FORMATTING CAPSTONE (DEPTH_PASS §4.20 + §2.4 + §1.0/§1.0-R2/§1.0-R3) — WAVE 4 COMPLETE, CHAPTER 2 CLOSED
+_The second capstone, and the first built off the modeltour template rather than inventing it._
+- **ARTIFACT KEPT (§3.1):** sources & uses — a capstone should be the chapter's aspirational
+  artifact, and S&U is the audience-B summative page. Prompt reframed (committee book tonight).
+- **CAPSTONE WIRING — the modeltour template applied, not re-derived:** `meta.gauntlet.capstone:true`
+  · `HOTKEY_CAMPAIGN.chapters[1].capstone:'gauntlet'` · `HOTKEY_CLOCKS.gauntlet={pass:94}` (par×2)
+  · the SHARED `hkCapstoneOk` predicate untouched (one definition, every surface — the r359 drift
+  lesson) · picker ★ CAPTAG · both grandfather rules · drill ACCESS never blocked. **A clean run
+  now opens Formulas I.**
+- **🔴 MISSING INVARIANT FOUND AND RESTORED — a silent r427 union-merge casualty.** The r425 entry
+  records a capstone-wiring guard added to check-invariants C1, and the r427 assembly commit claims
+  it was carried forward — **it was not in the tree**. No capstone assertion existed when the second
+  capstone was wired. Restored and widened: a designated capstone must be a real drill, carry
+  `meta.capstone:true`, sit LAST in its group, be claimed by exactly one chapter, have
+  `hkCapstoneOk` present, and keep `HOTKEY_CLOCKS[key].pass === par × 2` in lockstep. **It caught a
+  live defect on its first run** — HOTKEY_PARS.gauntlet was still the pre-rework 63 against a
+  clocks value computed from the new par. WORKFLOW §3.3: no invariant, and the bug returns.
+- **BEATS (6 core + ☆ + save closer):** Color the typed inputs blue, both sides → Total both columns
+  → Bold both totals and add a top border above each → Comma-format both money columns → Autofit
+  every column that reads #### → **Finish at A1** (§1.6 finish-state beat; probe asserts it is open
+  until the cursor actually goes home) → Save. Tri-length 7, C9-registered.
+- **☆ RE-CUT (§1.0-R3(o); §4.20's "center the two side headings" was a formatting ☆ that also rode
+  along with the dress pass, failing §1.0-R2(i)):** **FORMAT CLONING** — one side dressed, then the
+  finished money column copied and **paste-special-FORMATS** onto its twin: blue, separators, bold
+  and the top rule all cross in one motion, and only the numbers stay each side's own. Chains the
+  `pastes` lesson into the chapter capstone, which is what a capstone is for.
+  **DIRECTION-AGNOSTIC** — cloning Uses→Sources earns it exactly as Sources→Uses does; a one-way
+  latch would be the route trap §1.0(c) bans. ALT 2 walks the reverse direction to keep it honest.
+- **NO ENGINE HUNK (§1.0-R3(o) "prefer existing telemetry"):** the r425 `S.pasteLog` already records
+  `kind:'formats'` + destination rect. The wave's other three ☆s each needed new telemetry; adding a
+  fourth array here would have been gold-plating (§7). **This is the only wave-4 drill with zero
+  engine change.**
+- **THE CAPSTONE RULE, ASSERTED (§2.2 — a bonus can NEVER gate anything):** dressing both sides BY
+  HAND clears all six cores, **WINS the capstone** (`done===true`) and leaves the ☆ dark. Since this
+  drill gates Formulas I, the point is proven explicitly rather than assumed (verify-gauntlet B1–B3,
+  and ALT 1 walks the same route).
+- **JUDGMENT CALL — the accounting-format beat is CUT** (it was core pre-rework): §4.20's beat list
+  is six lines and §1.1 caps core at six; the ☆ now carries the "both sides end up dressed
+  identically" lesson it half-served, and "Finish at A1" comes in as the finish-state beat the page
+  requires. Alt H A N is still taught in dress.
+- **RANDOM (§1.2 — four axes, was two):** (a) site jitter r0∈{3,4}; (b) BOTH label stacks
+  Fisher-Yates from 6-deep pools (were 4 fixed each); (c) values + line COUNT 4–5, moving the total
+  row and every graded range; (d) which side ships the squeezed column.
+- **PAR:** 63/66 → **47/43** (5-seed sweep median 43 keys, 0% drift after retune; 1.09 s/key). The
+  drop is honest: the clone route is shorter than dressing both sides, and the accounting beat left.
+  HOTKEY_PARS mirrored, clocks kept in lockstep at 94 (invariant-enforced); drills.js?v=288→289.
+- **ALTS (§1.8 — both rebuilt; the old entry hardcoded a 4-line block, graded the retired accounting
+  beat, and predated the home + save beats):** (1) op-ORDER + FREEDOM + the §2.2 capstone proof;
+  (2) REVERSE clone direction. 2/2 PASS.
+- **TESTS:** demo-replay gauntlet 3/3 ×3 seeds · **`dev/verify-gauntlet.js` 22/22** · guided PASS
+  (free/cursor-graded, solvable) · alt-paths 2/2 · par-sweep FLAGGED 0 · invariants clean incl. the
+  RESTORED capstone guard + C9 gauntlet · cache-bump guard clean · full-catalog replay green.
+
 ## r429 H6b-4 — combo depth-pass rework (DEPTH_PASS §4.17 + §1.0/§1.0-R2/§1.0-R3)
 - **ARTIFACT KEPT (§3.1): the raw pasted comp sheet is chapter 2's audience-B drill** — with
   decimals/center/autofit converted to audience A, c2 lands at the 5A/5B the map requires. Prompt

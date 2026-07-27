@@ -857,20 +857,43 @@ const ALTS = [
       {sel:o.num,   keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
       {sel:'A1',    keys:[{key:'s',ctrl:true}]},
     ]; }` },
-  { key: 'gauntlet', name: 'uses side FIRST, typed SUMs (no alt+=), alt h 1 bold, ctrl+shift+! commas', moves: `C => { const R=C._R, r0=R.r0; return [
-      {sel:R.useIn,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-      {sel:R.srcIn,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-      {sel:R.useTot, keys:[...T('=SUM(E'+(r0+1)+':E'+(r0+4)+')'),{key:'Enter'}]},
-      {sel:R.srcTot, keys:[...T('=SUM(B'+(r0+1)+':B'+(r0+4)+')'),{key:'Enter'}]},
-      {sel:R.useTot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:R.srcTot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:R.useCol, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
-      {sel:R.srcCol, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
-      {sel:R.useTot, keys:[{key:'Alt'},L('h'),L('a'),L('n')]},
-      {sel:R.srcTot, keys:[{key:'Alt'},L('h'),L('a'),L('n')]},
-      {sel:R.useCol, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
-      {sel:R.srcCol, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
-    ]; }` },
+  /* r429 (DEPTH_PASS §4.20 wave 4): both gauntlet entries rebuilt — the pre-rework entry
+     hardcoded a 4-line block (nL is now 4-5), graded the retired accounting beat, and predated the
+     finish-at-A1 + save closer. ALT 1 = op-ORDER + the §1.0(c) FREEDOM proof, dressing BOTH sides
+     by hand (all six cores clear, the clone ☆ forfeited — and since this is the c2 CAPSTONE, that
+     doubles as the §2.2 proof that a bonus never gates a chapter). ALT 2 = the REVERSE clone
+     direction (Uses dressed first, formats pasted onto Sources), proving the ☆ is not a one-way
+     route trap. */
+  { key: 'gauntlet', name: 'op-ORDER — uses side FIRST, typed SUMs (no alt+=), ribbon bold, ctrl+shift+! commas, BOTH sides dressed by hand (☆ forfeited, all six cores clear)', moves: `C => { const R=C._R, r0=R.r0, nL=R.nL, tr=R.tr;
+      const BLUE=[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}];
+      return [
+        {sel:R.useIn,  keys:BLUE},
+        {sel:R.srcIn,  keys:BLUE},
+        {sel:R.useTot, keys:[...T('=SUM(E'+(r0+1)+':E'+(r0+nL)+')'),{key:'Enter'}]},
+        {sel:R.srcTot, keys:[...T('=SUM(B'+(r0+1)+':B'+(r0+nL)+')'),{key:'Enter'}]},
+        {sel:R.useTot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
+        {sel:R.srcTot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
+        {sel:R.useCol, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+        {sel:R.srcCol, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+        {sel:R.useCol, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+        {sel:R.srcCol, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+        {sel:'A1',     keys:[{key:'Home',ctrl:true}]},
+        {sel:'A1',     keys:[{key:'s',ctrl:true}]},
+      ]; }` },
+  { key: 'gauntlet', name: 'REVERSE clone — Uses dressed first, formats pasted onto SOURCES (the ☆ must latch in either direction)', moves: `C => { const R=C._R, r0=R.r0, nL=R.nL;
+      return [
+        {sel:R.useIn,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+        {sel:R.useTot, keys:[{key:'Alt'},{key:'='},{key:'Enter'}]},
+        {sel:R.srcTot, keys:[{key:'Alt'},{key:'='},{key:'Enter'}]},
+        {sel:R.useTot, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]},
+        {sel:R.useCol, keys:[{key:'Alt'},L('h'),L('k'),{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+        {sel:R.useCol, keys:[{key:'c',ctrl:true}]},
+        {sel:R.srcCol, keys:[{key:'Alt'},{key:'e'},{key:'s'},{key:'t'},{key:'Enter'}]},
+        {sel:R.useCol, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+        {sel:R.srcCol, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+        {sel:'A1',     keys:[{key:'Home',ctrl:true}]},
+        {sel:'A1',     keys:[{key:'s',ctrl:true}]},
+      ]; }` },
   { key: 'housestyle', name: 'slow-route pass — buried input by eye (no F5, no ☆), ctrl+shift+!/% + decimal walks, typed column width, ribbon bold, masthead LAST', moves: `C => { const R=C._R;
       const BLUE=[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}];
       return [
