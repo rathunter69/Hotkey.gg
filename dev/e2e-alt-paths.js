@@ -832,13 +832,30 @@ const ALTS = [
       {sel:'C7:I7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'B8:I8', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
     ]` },
-  { key: 'combo', name: 'reversed pass — wrap and commas first, ctrl+shift+! + ribbon bold, autofit still last', moves: `C => { const o=C._o; return [
+  /* r429 (DEPTH_PASS §4.17 wave 4): both combo entries rebuilt for the reworked drill (a blue
+     input beat came in as core, and the ☆ moved to the current-region family). ALT 1 = op-ORDER
+     reversed + the §1.0(c) FREEDOM proof — every range hand-selected, so all six cores clear and
+     the chord-graded ☆ is forfeited. ALT 2 = chord-ROUTE — the region grab drives a Ctrl+Shift+!
+     comma pass instead of Alt H K, proving the ☆ latch is not tied to one format chord. */
+  { key: 'combo', name: 'op-ORDER reversed + FREEDOM proof — wrap and commas first, ribbon bold, every range hand-selected (☆ forfeited, all six cores clear)', moves: `C => { const o=C._o; return [
       {sel:o.notes, keys:[{key:'Alt'},L('h'),L('w')]},
       {sel:o.num,   keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
       {sel:o.mh,    keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
       {sel:o.hdr,   keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:o.title, keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:o.num,   keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+      {sel:'A1',    keys:[{key:'s',ctrl:true}]},
+    ]; }` },
+  { key: 'combo', name: 'chord-ROUTE — the Ctrl+A region drives a ctrl+shift+! comma pass (not Alt H K), proving the ☆ latch is chord-agnostic about the FORMAT op', moves: `C => { const o=C._o; return [
+      {sel:o.title, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.hdr,   keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.mh,    keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
+      {sel:'B'+o.r1, keys:[{key:'a',ctrl:true},{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+      {sel:o.notes, keys:[{key:'Alt'},L('h'),L('w')]},
+      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+      {sel:'A1',    keys:[{key:'s',ctrl:true}]},
     ]; }` },
   { key: 'gauntlet', name: 'uses side FIRST, typed SUMs (no alt+=), alt h 1 bold, ctrl+shift+! commas', moves: `C => { const R=C._R, r0=R.r0; return [
       {sel:R.useIn,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},

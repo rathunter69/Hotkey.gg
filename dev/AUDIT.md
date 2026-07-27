@@ -1,5 +1,44 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r429 H6b-4 — combo depth-pass rework (DEPTH_PASS §4.17 + §1.0/§1.0-R2/§1.0-R3)
+- **ARTIFACT KEPT (§3.1): the raw pasted comp sheet is chapter 2's audience-B drill** — with
+  decimals/center/autofit converted to audience A, c2 lands at the 5A/5B the map requires. Prompt
+  reframed to §1.0-R3(n) rule 2 (off the data provider ten minutes ago, MD wants it in the book).
+- **☆ RE-CUT (§1.0-R3(o)) — and the killed ☆ was PROMOTED, not deleted:** §4.17's "Color the pasted
+  inputs blue" is a formatting ☆ (dead under §1.0(d)), but the blue IS real work on a raw paste —
+  it is the house input convention. So it becomes **CORE beat 4**, sequenced directly behind the
+  comma beat that touches the same figures (§1.0(a) format-as-you-go). 6 core + ☆; tri-length 7.
+- **SHIPPED ☆ — CURRENT-REGION family:** the pasted block grabbed with **Ctrl+A** (current region,
+  the r407 engine behaviour) and that block then driving a format pass. **This is the one ☆ in the
+  wave that grades HOW the selection was made** — Wolf's §1.0-R2(i) framing exactly ("reward good
+  habits of using the previously taught hotkeys").
+- **ENGINE HUNK:** new `S.selOps` on the Ctrl+A handler, recording `kind:'region'|'used'` + the
+  resulting rect. A region grab and a hand-drag of the same block are rect-identical, so the CHORD
+  has to record itself. Telemetry only, no core check reads it (§1.0(c)).
+- **☆ DEFECT CAUGHT BY THE PROBE BEFORE IT SHIPPED (the reason drill probes exist):** the first
+  latch was `grabbed && anyBlockFormatPass` — two independently-true conditions, which wrongly
+  rewarded a **bare exploratory Ctrl+A followed by entirely hand-selected formatting**
+  (verify-combo C2). Fixed by making them CAUSALLY linked: the format pass must cover the
+  **grabbed region itself**, which spans the whole contiguous table (company and notes columns
+  included) and therefore can never be satisfied by a drag of just the number block.
+- **NEGATIVE CONTROLS (all verified):** hand-dragging the IDENTICAL rect clears all six cores and
+  leaves the ☆ dark (B2 — the load-bearing case for a chord-graded ☆); a bare Ctrl+A earns nothing
+  (C1); a bare Ctrl+A plus hand-formatting still earns nothing (C2).
+- **RANDOM (§1.2):** (a) header-row site {2,3}; (b) company/metric/note pools all Fisher-Yates;
+  (c) values + metric COUNT 2–3 + row count 4–6; (d) **NEW per §4.17 "add wrap-note position
+  variance"** — which row carries the over-long note varies, so the visible spill moves per seed
+  (6 distinct positions observed over 40 builds).
+- **PAR:** 24/22 → **36/33** (5-seed sweep median 33 keys, 0% drift after retune; 1.09 s/key).
+  HOTKEY_PARS mirrored; drills.js?v=287→288; drill pages + sitemap + refmap regenerated.
+- **FIT-SWEEP:** combo stays EXEMPT (dev/e2e-fit-sweep.js:11) — the #### is the opening state.
+- **ALTS (§1.8 — both rebuilt):** (1) op-ORDER reversed + FREEDOM proof — every range hand-selected
+  (six cores clear, chord-graded ☆ forfeited); (2) chord-ROUTE — the region grab drives a
+  **Ctrl+Shift+!** comma pass instead of Alt H K, proving the ☆ latch is agnostic about WHICH
+  format chord consumes the region. 2/2 PASS.
+- **TESTS:** demo-replay combo 3/3 ×3 seeds (green first run) · **`dev/verify-combo.js` 19/19** ·
+  guided PASS · alt-paths 2/2 · par-sweep FLAGGED 0 · invariants clean incl. C9 combo ·
+  cache-bump guard clean · full-catalog replay green.
+
 ## r429 — index-UI: drill-tab names expanded (ROUND2_FEEDBACK §4c, the first of the two items the r426–r427 reconciliation found genuinely unshipped)
 - Wolf: _"there's room for longer names — 'paste sp.' → 'paste special'; feel it out and expand the
   shortened drill names as space allows."_ All four genuinely-abbreviated tabs expanded:

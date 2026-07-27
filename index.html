@@ -1728,9 +1728,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=287"></script>
+<script src="drills.js?v=288"></script>
 
-<script src="drills.js?v=287"></script>
+<script src="drills.js?v=288"></script>
 
 
 
@@ -2077,23 +2077,47 @@ const CHALLENGES = {
   },
 
   combo:{
-    name:'Combo', label:'Clean the paste', par:24, parKeys:22,
-    aha:'Select the whole range, format once — Alt H chords work a block, not a cell.',
-    prompt:'Format a raw pasted comp sheet end to end: bold the title, capitalize and center the headers, format the figures, rein in the notes column that overruns its neighbors, and widen the columns showing ####. Which metrics appear, and where the block sits, changes every run.',
-    req(){ const o=this._o; return '<em>'+o.title+'</em> + headers <em>'+o.hdr+'</em> → <em>ctrl+b</em> · metric headers <em>'+o.mh+'</em> → <em>alt h a r</em> · figures <em>'+o.num+'</em> → <em>alt h k</em> + <em>alt h 9</em> ×2 · notes <em>'+o.notes+'</em> → <em>alt h w</em> · then <em>alt h o i</em> — no #### ships'; },
+    /* r429 (H6b wave 4, DEPTH_PASS §4.17 + §1.0/§1.0-R2/§1.0-R3): depth-pass rework.
+       JUDGMENT CALLS (documented per WORKFLOW.md §8):
+       · ARTIFACT KEPT — the raw pasted comp sheet is chapter 2's audience-B drill per the §3.1
+         map (decimals/center/autofit went audience A; c2 lands 5A/5B). Only the prompt's frame
+         was sharpened to §1.0-R3(n) rule 2: it came off the data provider ten minutes ago.
+       · §4.17's "☆ Color the pasted inputs blue" is a FORMATTING ☆ — dead under §1.0(d). Per
+         §1.0-R3(o) ("where the killed ☆ was real work, PROMOTE it"), the blue IS real work on a
+         raw paste (the house input convention, taught in dress), so it becomes CORE beat 4,
+         sequenced directly behind the comma beat that touches the same figures (§1.0(a)
+         format-as-you-go). The ☆ moves to the CURRENT-REGION family.
+       · ☆ latch is CHORD-PROVENANCE, not rect shape: a Ctrl+A region grab and a hand-drag of the
+         same block produce an identical rect, so the chord records itself (S.selOps, r429 engine
+         hunk). This is the one ☆ in the wave that grades HOW the selection was made — Wolf's own
+         §1.0-R2(i) framing, "reward good habits of using the previously taught hotkeys". It is
+         also why the ☆ additionally requires the grabbed block to have DRIVEN a format pass:
+         a bare exploratory Ctrl+A must not earn it.
+       · combo stays on the fit-sweep EXEMPT list (dev/e2e-fit-sweep.js:11) — the board is meant
+         to load with #### in the number columns; clearing it is beat 6. */
+    name:'Combo', label:'Clean the paste', par:36, parKeys:33, saveClose:true,   /* r429: par re-swept post-rework — 5-seed sweep median 33 keys, 0% drift after retune; par 36s ≈ 1.09 s/key, house band (metric count varies 2-3, so the pass count moves with the seed) */
+    aha:'a raw paste is one block — grab the region once and the whole sheet takes the format in a single pass.',
+    prompt:'The comp sheet came off the data provider ten minutes ago and the MD wants it in the book tonight. It has landed exactly as raw pastes always do: nothing bold, headers in lower case and hugging the wrong side, figures with no separators and no input colour, the notes column running clean over its neighbours, and half the numbers showing ####. Take it to house standard.',
+    req(){ const o=this._o; return 'title + header row <em>ctrl+b</em> · metric headers <em>'+o.mh+'</em> <em>alt h a r</em> · figures <em>'+o.num+'</em> <em>alt h k</em> + <em>alt h 9</em> ×2 · same figures <em>alt h f c</em> → blue · notes <em>'+o.notes+'</em> <em>alt h w</em> · <em>alt h o i</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): check labels are OUTCOME lines — the route lives HERE, per line, chords allowed. */
     guide(){ const o=this._o; return [
-      'weight first: '+o.title+' · <kbd>ctrl</kbd>+<kbd>b</kbd> · then the header row '+o.hdr+' · <kbd>ctrl</kbd>+<kbd>b</kbd>',
-      'numbers read right-aligned — headers over them too: '+o.mh+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>',
-      'figures to commas: '+o.num+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice',
-      'the notes column wraps instead of spilling: '+o.notes+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>w</kbd>',
-      'last pass, always: select the number columns · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> — nothing ships showing ####',
+      'weight first — the title <em>A1</em> · <kbd>ctrl</kbd>+<kbd>b</kbd> · then the header row <em>'+o.hdr+'</em> · <kbd>ctrl</kbd>+<kbd>b</kbd>',
+      'a header belongs over its numbers — select <em>'+o.mh+'</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>r</kbd>',
+      'the figures — select <em>'+o.num+'</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice: separators in, cents out',
+      'these figures were typed by someone else, not calculated — the house colours typed inputs blue. Same selection · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> · <kbd>→</kbd>×4 Blue · <kbd>↵</kbd>',
+      'the notes run over the page — select <em>'+o.notes+'</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>w</kbd>: the column wraps instead of spilling',
+      'last pass, always — select the number columns · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd>: nothing ships showing ####',
+      '☆ the discovery: a pasted table is one contiguous REGION — <kbd>ctrl</kbd>+<kbd>a</kbd> from inside it grabs the whole block in one keystroke, and that block can drive a format pass without a single drag',
     ]; },
-    targets(){ const o=this._o; return [o.title,o.mh,o.num,o.notes,o.num]; },
+    targets(){ const o=this._o; return [o.title, o.mh, o.num, o.num, o.notes, o.num, o.num]; },
     demo(){ const o=this._o; return [
       {sel:o.title, keys:[Kb.bold]},
       {sel:o.hdr,   keys:[Kb.bold]},
       {sel:o.mh,    keys:[Kb.alt,L('H'),L('A'),L('R')]},
-      {sel:o.num,   keys:[Kb.alt,L('H'),L('K'),Kb.alt,L('H'),D(9),Kb.alt,L('H'),D(9)]},
+      /* the ☆ route: land inside the block, grab the REGION with Ctrl+A, and let that selection
+         drive the comma pass (§2.2 — the demo performs the bonus so replay covers it) */
+      {sel:'B'+o.r1, keys:[{key:'a',ctrl:true}, Kb.alt,L('H'),L('K'), Kb.alt,L('H'),D(9), Kb.alt,L('H'),D(9)]},
+      {sel:o.num,   keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
       {sel:o.notes, keys:[Kb.alt,L('H'),L('W')]},
       {sel:o.num,   keys:[Kb.alt,L('H'),L('O'),L('I')]},
     ]; },
@@ -2106,10 +2130,15 @@ const CHALLENGES = {
       const NOTES=['flagged for review by deal team','pending QoE adjustments','clean — comp set anchor','stub period, annualize','carve-out, normalize','mgmt case only — haircut it','pre-synergy figures'];
       const nrows=rnd(4,6);
       const names=pick(NAMES,nrows), notes=pick(NOTES,nrows);
-      const hr=rnd(2,3);                                       // header row: right under the title, or one blank spacer
+      /* §1.2 axes: (a) header-row site {2,3}; (b) content pools — companies, metrics AND note
+         text all Fisher-Yates; (c) values through rnd() + metric COUNT 2–3 (moves every range);
+         (d) r429 NEW per §4.17 "add wrap-note position variance" — which ROW carries the longest
+         note varies, so the column that visibly spills is not always the same one. */
+      const hr=rnd(2,3);
       const r1=hr+1, r2=hr+nrows;
-      const nc=mets.length;                                    // metric col count
-      const notesCol=colLetter(2+nc);                          // last col
+      const nc=mets.length;
+      const notesCol=colLetter(2+nc);
+      const longAt=rnd(0,nrows-1);                              // (d) which row spills the furthest
       cells['A1']={...blankCell(),value:codename()+' — comp sheet (raw paste)',txt:true};
       cells['A'+hr]={...blankCell(),value:'company',txt:true};
       mets.forEach((mt,i)=>cells[colLetter(2+i)+hr]={...blankCell(),value:mt[0].toLowerCase(),txt:true});
@@ -2117,31 +2146,53 @@ const CHALLENGES = {
       for(let r=r1;r<=r2;r++){
         cells['A'+r]={...blankCell(),value:names[r-r1],txt:true};
         mets.forEach((mt,i)=>cells[colLetter(2+i)+r]={...blankCell(),value:rnd(mt[1],mt[2])*1000});
-        cells[notesCol+r]={...blankCell(),value:notes[r-r1],txt:true};
+        const base=notes[r-r1];
+        cells[notesCol+r]={...blankCell(),value:(r-r1===longAt? base+' — confirm with the deal team before it goes in the book' : base),txt:true};
       }
       const o={ title:'A1', hdr:'A'+hr+':'+notesCol+hr,
         mh:'B'+hr+':'+colLetter(1+nc)+hr,
         num:'B'+r1+':'+colLetter(1+nc)+r2,
         notes:notesCol+r1+':'+notesCol+r2,
-        hr, r1, r2, nc, notesCol };
+        hr, r1, r2, nc, notesCol, longAt };
       this._o=o;
       return {ROWS:Math.max(9,r2+2), cells, active:{r:1,c:1}, sel:null};
     },
     checks(S){
       const o=this._o;
       const cell=k=>S.cells[k]||{};
-      const hdrCells=['A'].concat(Array.from({length:o.nc},(_,i)=>colLetter(2+i))).concat([o.notesCol]);
+      const numCols=Array.from({length:o.nc},(_,i)=>colLetter(2+i));
+      const hdrCells=['A'].concat(numCols).concat([o.notesCol]);
       const hb = hdrCells.every(c=>cell(c+o.hr).bold);
-      const ha = Array.from({length:o.nc},(_,i)=>colLetter(2+i)).every(c=>cell(c+o.hr).align==='r');
-      let cf=true; for(let ci=0;ci<o.nc;ci++) for(let r=o.r1;r<=o.r2;r++){ const x=cell(colLetter(2+ci)+r); if(x.fmtStyle!=='comma'||(x.decimals|0)!==0) cf=false; }
+      const ha = numCols.every(c=>cell(c+o.hr).align==='r');
+      let cf=true, blue=true;
+      for(const c of numCols) for(let r=o.r1;r<=o.r2;r++){ const x=cell(c+r);
+        if(x.fmtStyle!=='comma'||(x.decimals|0)!==0) cf=false;
+        if(x.fontColor!=='blue') blue=false; }
       let wr=true; for(let r=o.r1;r<=o.r2;r++){ if(!cell(o.notesCol+r).wrap) wr=false; }
       let af=true; for(let ci=0;ci<o.nc;ci++){ if(overflowsCol(S,2+ci)) af=false; }
+      /* ☆ (§1.0(d) mystery slot · §1.0-R3(o) CURRENT-REGION family): the pasted block was grabbed
+         with Ctrl+A (kind:'region', r429 S.selOps) AND that block then drove a format pass — a
+         bare exploratory Ctrl+A must not earn it. Hand-dragging the identical rect never latches,
+         which is the whole point: this ☆ grades the CHORD, not the shape (§1.0(c) keeps every
+         core check route-free). */
+      /* The two halves must be CAUSALLY linked, not merely both true: a bare Ctrl+A followed by
+         hand-selected formatting is exactly the case a naive `grabbed && anyFormatPass` would
+         wrongly reward (caught by dev/verify-combo.js C2). So the format pass has to cover the
+         GRABBED REGION itself — the region spans the whole contiguous table (company column and
+         notes column included), which a drag of just the number block never does. */
+      const grabs=(S.selOps||[]).filter(s=>s.kind==='region'
+        && s.r1<=o.r1 && s.r2>=o.r2 && s.c1<=2 && s.c2>=1+o.nc);
+      const grabbed=grabs.length>0;
+      const drove=grabs.some(g=>(S.fmtOps||[]).some(f=>
+        f.r1<=g.r1 && f.r2>=g.r2 && f.c1<=g.c1 && f.c2>=g.c2));
       return [
-        {label:'bold the title and the header row', ok: !!cell('A1').bold && hb},
-        {label:'align the metric headers RIGHT, over their numbers', ok: ha},
-        {label:'comma-format the figures, zero decimals', ok: cf},
-        {label:'wrap the notes — no text running over the page', ok: wr},
-        {label:'autofit the number columns — nothing ships showing ####', ok: af},
+        {label:'Bold the title and the header row', ok: !!cell('A1').bold && hb},
+        {label:'Right-align the metric headers over their numbers', ok: ha},
+        {label:'Comma-format the figures, zero decimals', ok: cf},
+        {label:'Color the figures blue — a pasted number is someone else’s input', ok: blue},
+        {label:'Wrap the notes column — no text running over the page', ok: wr},
+        {label:'Autofit the number columns — nothing ships showing ####', ok: af},
+        {label:'☆ the whole pasted block grabbed in one keystroke and formatted from that selection', ok: grabbed && drove, bonus:true},
       ];
     }
   },
@@ -14285,6 +14336,13 @@ document.addEventListener('keydown',hkRawE=>{
       const isRegion = rg && cur.r1===rg.r1 && cur.c1===rg.c1 && cur.r2===rg.r2 && cur.c2===rg.c2;
       if(rg && !isRegion){ S.sel={r:rg.r1,c:rg.c1}; S.active={r:rg.r2,c:rg.c2}; }
       else { S.sel={r:1,c:1}; S.active={r:u.r,c:u.c}; }
+      /* r429 (DEPTH_PASS §4.17 ☆): SELECTION-PROVENANCE telemetry — combo's ☆ rewards GRABBING the
+         pasted block with Ctrl+A (current region) instead of hand-dragging it. A rect alone cannot
+         tell the two apart, so the chord records itself. Same family and contract as fmtOps /
+         widthOps / fillOps: telemetry only, no core check may read it (§1.0(c)). */
+      try{ const nr=selRange();
+        (S.selOps=S.selOps||[]).push({kind:(rg&&!isRegion)?'region':'used', r1:nr.r1,c1:nr.c1,r2:nr.r2,c2:nr.c2});
+        if(S.selOps.length>240) S.selOps.shift(); }catch(_e){}
       render(); commitAction(); return; }
     if(lk==='c'){ e.preventDefault(); startClock(); logKey('Ctrl+C'); copySel(); render(); checkWin(); return; }   /* r213: a copy can be a drill's goal (navigation) — run the win check; no-op for every other drill */
     if(lk==='x'){ e.preventDefault(); startClock(); logKey('Ctrl+X'); copySel(true); if(S.clipboard) S.clipboard.cut=true; render(); return; }
