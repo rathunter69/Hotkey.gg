@@ -1147,7 +1147,7 @@ const ALTS = [
   for (const alt of ALTS) {
     if (only.length && !only.includes(alt.key)) continue;
     ran++;
-    let wins = 0; const notes = [];
+    let wins = 0, starRuns = 0, bonusRuns = 0; const notes = [];
     for (let rep = 0; rep < REPS; rep++) {
       const r = await page.evaluate(({ key, movesSrc }) => {
         try {
@@ -1160,17 +1160,35 @@ const ALTS = [
              ends with the same save keystroke a player would press (the routes themselves
              stay chord-diverse; the closer is engine-owned and route-independent) */
           if (!done && C.saveClose) demoKey({ key: 's', ctrl: true });
-          if (done) return { won: true, keys: keyLog.length };
-          const failing = C.checks(S).filter(x => !x.ok).map(x => x.label);
-          return { won: false, failing };
+          /* r429: report the ☆ state too. An alt whose NAME says "☆ forfeited" is a drill's
+             NEGATIVE CONTROL for §1.0-R2(i) skippability — it must clear every core beat with the
+             bonus still dark. Enforcing it here means each reworked drill gets its skippability
+             proof from the alt it already ships, instead of a bespoke probe file per drill. */
+          const rows = C.checks(S);
+          const bonus = rows.find(x => x.bonus);
+          const star = !!(bonus && bonus.ok);
+          if (done) return { won: true, keys: keyLog.length, star, hasBonus: !!bonus };
+          const failing = rows.filter(x => !x.ok).map(x => x.label);
+          return { won: false, failing, star, hasBonus: !!bonus };
         } catch (e) { return { won: false, failing: ['THREW: ' + String(e).slice(0, 100)] }; }
       }, { key: alt.key, movesSrc: alt.moves });
       if (r.won) wins++;
       else notes.push((r.failing || []).join(' | ').slice(0, 160));
+      if (r.star) starRuns++;
+      if (r.hasBonus) bonusRuns++;
     }
-    const ok = wins === REPS;
+    let ok = wins === REPS;
+    /* the ☆-forfeit contract (see above): name says forfeited => the ☆ must be dark in EVERY rep */
+    const claimsForfeit = /☆\s*forfeit|forfeit(ed)?\s*(the\s*)?☆|no ☆/i.test(alt.name);
+    let starNote = '';
+    if (claimsForfeit && bonusRuns && starRuns > 0) {
+      ok = false;
+      starNote = '\n       ☆ CONTRACT BROKEN: this alt claims the ☆ is forfeited but EARNED it in '
+        + starRuns + '/' + REPS + ' reps — either the alt is not actually the slow route, or the ☆ latch is too loose';
+    }
     if (!ok) fails++;
-    console.log((ok ? 'PASS ' : 'FAIL ') + alt.key.padEnd(10) + ' · ' + alt.name + (ok ? '' : '\n       stuck on: ' + notes[0]));
+    console.log((ok ? 'PASS ' : 'FAIL ') + alt.key.padEnd(10) + ' · ' + alt.name
+      + (wins === REPS ? '' : '\n       stuck on: ' + notes[0]) + starNote);
   }
   console.log('\nALT PATHS: ' + (fails ? fails + ' FAILURE(S) of ' + ran : 'ALL ' + ran + ' PASS'));
   if (errs.length) { console.log('PAGE ERRORS: ' + errs.slice(0, 3).join(' · ')); fails++; }
