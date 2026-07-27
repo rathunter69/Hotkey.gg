@@ -1,5 +1,58 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r429 H6b-5 — qclose★ (DEPTH_PASS §4.32 + §2.4 + D1) — **CHAPTER 3 COMPLETE (12 of 12)**
+- **A NEW DRILL, NOT A REWORK** — the first one this pass. `qclose` is the **Formulas I capstone**:
+  a quarterly close built cold from a feed, carrying the chapter's five formula shapes in ONE
+  artifact — point (gross profit off the revenue and cost lines), fill (the FY column down every
+  P&L line), lock (the `B$4` margin divisor), grow (quarter on quarter), roll up (the segment
+  SUMIF). That is the §4.32 concept and it is the aha: *a P&L is five shapes run in one breath*.
+- **FULL PLUMBING ROW, all in this one commit** (a new drill costs more than a rework):
+  `drills.js` Formulas I group +`qclose` **last** · `meta.qclose` with `capstone:true` ·
+  `HOTKEY_CAMPAIGN.chapters[2].capstone:'qclose'` · `HOTKEY_CLOCKS.qclose={pass:188}` ·
+  `HOTKEY_PARS.qclose=94` · **`dev/migrate-certificates.sql`'s hardcoded `formulas` array in the
+  SAME PR** (the r359 drift rule — `HK_TRACKS` derives from the group, the SQL does not) ·
+  C9 ledger · a generated SEO page + sitemap entry. The achievement/`HOTKEY_CAPSTONES` rows already
+  named `qclose`, so those needed nothing.
+- **☆ — INDEPENDENT PROVE-OUT, and a DEVIATION recorded out loud.** FY gross profit exists twice
+  over: summed ACROSS the four quarters, and buildable DOWN the FY column as revenue plus cost. The
+  check cell puts one against the other. This is the family's **third** use in c3 (anchor, sumif),
+  past the r429 twice-per-chapter cap. Kept deliberately: **a capstone's job is to close a page, and
+  "does it tie?" is the closing discipline** — for the drill that gates Data & Lookups no other ☆ is
+  honest. Not adjacent to its last use (four drills back) and it teaches a third failure mode
+  (anchor: an anchor can be silently wrong · sumif: a rollup can silently MISS rows · here: two
+  routes to the same number can silently disagree). **Flagged for the playtest** — if c3's ☆s read
+  samey end to end, the knob is the family rule in §1.0-R3(o), not this drill.
+- **§2.2 PROVED, NOT ASSERTED:** this drill gates a chapter, so "a bonus can never gate anything"
+  had to be demonstrated. **ALT 2 leaves the check cell untouched** and clears all six cores —
+  the capstone opens Data & Lookups with the ☆ forfeited. ALT 1 proves the other direction: the tie
+  run the OTHER way round (`=SUM(B:E gp) - F rev - F cogs`) still latches, because §1.0(c) means the
+  ☆ reads the RESULT of the prove-out, not one spelling of it.
+- **§1.0(c) THROUGHOUT:** every core beat grades VALUES. ALT 2 types all twenty-odd figures as raw
+  numbers with no fill anywhere and clears — the clock is what prices the difference.
+- **§1.2 AXES (four):** which FOUR of six operating lines appear · a segment-name pool + codename +
+  fiscal year · every figure through `rnd()` and a 6–9 row ledger · **the margin and growth rows
+  SWAP places**, so the two percent rows are never in a fixed spot and the labels have to be read.
+  30/30 distinct builds.
+- **HARNESS:** `e2e-alt-paths.js` now prints a **`[☆ n/reps]` counter** on every alt that carries a
+  bonus. The ☆-forfeit contract already failed alts that claimed forfeit and earned it; the counter
+  makes the opposite case visible too — an alt meant to EARN the ☆ silently latching 0/3 used to
+  read as a clean PASS. ALT 1 here reads `[☆ 3/3]`, ALT 2 reads `[☆ 0/3]`.
+- **MARKETING COPY CAUGHT BY THE SMOKE GATE:** `index.html` + `About.html` said "81 banker-grade
+  drills" in five meta tags. `drill-count` compares that copy to `menuOrder.length` — now 82.
+- **PAR:** swept fresh at **94/86** (median 86, 0% drift, 1.09 s/key — the same ratio gauntlet★
+  sits at). Capstone clock `pass` in lockstep at par×2 = 188; the restored capstone invariant
+  asserts it.
+- **STALE COMMENT FIXED:** `HOTKEY_CLOCKS.gauntlet` said "par 52 × 2" next to `pass: 94` — the
+  number was right (par 47), the comment was the pre-retune one.
+- **TESTS:** replay 3/3 · **full-catalog replay ALL GREEN** · depth-contract PASS (density 17/20,
+  30/30 distinct) · guided PASS (full sweep 85 PASS) · **alt-paths 2/2 (full sweep 107 PASS)** ·
+  par-sweep FLAGGED 0 · fit-sweep clean (78) · smoke ALL 7 PAGES CLEAN · invariants clean
+  (capstone wiring: 3 designated) · drills.js?v=300→301 · 82 drill pages regenerated.
+  `e2e-depth-mechanics` sits at 150/5 — the 5 failures reproduce identically on HEAD (verified
+  against a clean `git archive` tree), so they are pre-existing and untouched by this drill.
+- **CHAPTER 3 IS DONE.** c1 9/9 (modeltour★) · c2 10/10 (gauntlet★) · c3 12/12 (qclose★) —
+  **31 of 82 drills at the depth-pass standard, and three complete chapters to playtest.**
+
 ## r429 H6b-5 — cases (DEPTH_PASS §4.31) — wave 5 at 11 of 12
 - **🔴 THE CATALOG'S WORST MISALIGNMENT IS CLOSED.** `targets` was **NINE** entries against **SIX**
   checks and `guide` was **FOUR** — so the guided ring landed on the wrong cell from step 2 onward,

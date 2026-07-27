@@ -32,12 +32,13 @@ window.HOTKEY_DRILLS = {
   // Formulas II / Models I / Models II / Full Builds (PRO).
   // r249 — the 6 folded legacy drills (saves, ribbon, polish, format, blue, transpose) were
   // deleted outright, their value covered by survivors (copyover, housestyle, dress, decimals,
-  // the Alt-H drills, pastes). Catalog is 82 grouped drills (Formulas I & II carry 11 each);
+  // the Alt-H drills, pastes). Catalog is 82 grouped drills (Formulas I carries 12 — the r429
+  // capstone add — and Formulas II 11);
   // menuOrder.length is the source of truth — do not hardcode the total elsewhere.
   groups: [
     { name: 'Foundations',    keys: ['navigation', 'filldr', 'pastes', 'blocksel', 'rowops', 'editfix', 'undo', 'copyover', 'modeltour'] },   /* r367: modeltour moved from #2 to capstone — it demands cascades + formatting no fresh player has yet · r424 (D17): colops RETIRED — rowops absorbed it (row AND column structure ops, one drill); the freed slot stays open for a future add */
     { name: 'Formatting',     keys: ['typeset', 'decimals', 'center', 'autofit', 'ruleoff', 'ruleaudit', 'combo', 'dress', 'housestyle', 'gauntlet'] },
-    { name: 'Formulas I',     keys: ['margin', 'foot', 'anchor', 'percent', 'growth', 'cagr', 'bridge', 'sumif', 'rollup', 'fxconvert', 'cases'] },
+    { name: 'Formulas I',     keys: ['margin', 'foot', 'anchor', 'percent', 'growth', 'cagr', 'bridge', 'sumif', 'rollup', 'fxconvert', 'cases', 'qclose'] },   /* r429 H6b-5 (DEPTH_PASS §4.32 / D1): qclose ADDED as the Formulas I capstone — LAST in the group, per §2.4. HK_TRACKS derives from here, so the formulas cert track picks it up automatically; dev/migrate-certificates.sql's hardcoded array is updated in the SAME PR (r359 drift rule). */
     { name: 'Data & Lookups', keys: ['sort', 'scrub', 'grpfold', 'filterpass', 'unhide', 'lookup', 'lookup2', 'recon', 'drill', 'series'] },
     { name: 'Formulas II',    keys: ['audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'wirewalk', 'tieout', 'hunt', 'signerr', 'versionup', 'balance'] },
     { name: 'Models I',       keys: ['wacc', 'fcfbuild', 'dcf', 'comps', 'txncomps', 'football', 'dcfsens', 'retbridge', 'accdil', 'sourcesuses'] },
@@ -128,6 +129,10 @@ window.HOTKEY_DRILLS = {
     rollup:     { name:'SUMIFS',   label:'Cross-tab with SUMIFS', tab:'Cross-tab',   desc:'Cross a deal list into a segment-by-region grid — lock the ranges the right way and one formula spreads both directions; if two crosses come back identical, the anchors are telling you something' },   /* r429 §4.29: desc rewritten for the promoted axes beat; de-hint clean */
     fxconvert:  { name:'FX Convert',label:'Convert with one FX rate',tab:'FX',        desc:'One boxed rate drives a whole euro-to-dollar table — build the conversion so that moving the rate re-prices every figure on the page' },   /* r429 §4.30 + D13: desc de-hinted (chord tokens out) and rewritten for the reworked scope */
     cases:      { name:'Sticky switch',label:'Scenario switch with CHOOSE',tab:'Scenarios', desc:'A real scenario switch — one cell drives the model, and a self-referencing capture row freezes each case as you visit it, so a later revision does not quietly rewrite history' },   /* r429 §4.31: desc rewritten for the reworked scope; de-hint clean */
+    /* r429 H6b-5 (DEPTH_PASS §4.32/§2.4/§3 D1): qclose is a NEW drill and the Formulas I
+       capstone — capstone:true drives the picker's ★ CAPSTONE tag + full-color group ring;
+       the gate itself reads HOTKEY_CAMPAIGN.chapters[2].capstone below. */
+    qclose:     { name:'Close the quarter', label:'Close the quarter', tab:'Close', capstone:true, desc:'The Formulas I capstone — a quarterly close built end to end: gross profit across the quarters, the year down the column, margin and growth underneath, the segment ledger rolled into its memo, and a page that ties. One clean run opens the next track leg' },
     bridge:     { name:'Point Mode',label:'Point-mode formulas',   tab:'Point',       desc:'Grow a revenue line off a memo rate row nobody has used yet, run EBITDA against its own margin, total the years and close the line — a row you built once should be carried, not repeated' },   /* r429 §4.27 + D10 complete: tab -> Point, desc rewritten for the reworked scope; de-hint clean */
     foot:       { name:'Foot',     label:'Foot the table both ways',tab:'Cross-foot', desc:'Total a regional revenue grid in both directions, land the corner where the edges meet, and prove it with a check line that reads exactly zero' },   /* r429 §4.22: desc rewritten for the reworked scope (dress + prove-out beats); de-hint clean */
     balance:    { name:'Balance',  label:'Make it balance',     tab:'Balance',     desc:'2 yrs SUM-footed both sides, check at zero, totals formatted' },
@@ -244,7 +249,7 @@ window.HOTKEY_CAMPAIGN = {
   chapters: [
     { id:'c1', name:'Foundations',            badge:'\ud83c\udf93', xp:150, keys:['navigation','blocksel','filldr','pastes'], capstone:'modeltour' },
     { id:'c2', name:'Formatting',             badge:'\ud83c\udfa8', xp:200, keys:['housestyle','dress','gauntlet'], capstone:'gauntlet' },   /* r429 H6b-4: capstone designated */
-    { id:'c3', name:'Formulas I',             badge:'\u2797',        xp:250, keys:['margin','growth','anchor','sumif'] },
+    { id:'c3', name:'Formulas I',             badge:'\u2797',        xp:250, keys:['margin','growth','anchor','sumif'], capstone:'qclose' },   /* r429 H6b-5: capstone designated */
     { id:'c4', name:'Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','recon','lookup','lookup2'] },
     { id:'c5', name:'Formulas II',            badge:'\ud83e\uddee', xp:450, keys:['audit','balance','hunt','versionup'] },
     { id:'c6', name:'Models I \u00b7 Valuation',    badge:'\ud83c\udfe6', xp:600, keys:['wacc','fcfbuild','dcf','comps'] },
@@ -333,10 +338,11 @@ window.HOTKEY_CLOCKS = {
      gate itself has no clock at all). pro/leg stay derived (par×1.15 / par×1.0). Keep pass in
      lockstep with HOTKEY_PARS.modeltour: pass = par × 2. */
   modeltour: { pass: 70 },
-  gauntlet:  { pass: 94 },   /* r429: par 52 \u00d7 2 \u2014 keep in lockstep with HOTKEY_PARS.gauntlet */
+  gauntlet:  { pass: 94 },   /* r429: par 47 \u00d7 2 \u2014 keep in lockstep with HOTKEY_PARS.gauntlet */
+  qclose:    { pass: 188 },  /* r429 H6b-5: par 94 \u00d7 2 \u2014 keep in lockstep with HOTKEY_PARS.qclose */
 };
 
-window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":38,"undo":29,"copyover":28,"housestyle":44,"ruleoff":31,"ruleaudit":16,"dress":41,"typeset":14,"decimals":27,"center":23,"autofit":36,"combo":36,"gauntlet":47,"margin":45,"foot":32,"percent":26,"growth":50,"cagr":38,"anchor":34,"bridge":29,"sumif":76,"rollup":68,"fxconvert":39,"cases":89,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"wirewalk":10,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
+window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":38,"undo":29,"copyover":28,"housestyle":44,"ruleoff":31,"ruleaudit":16,"dress":41,"typeset":14,"decimals":27,"center":23,"autofit":36,"combo":36,"gauntlet":47,"margin":45,"foot":32,"percent":26,"growth":50,"cagr":38,"anchor":34,"bridge":29,"sumif":76,"rollup":68,"fxconvert":39,"cases":89,"qclose":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"wirewalk":10,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

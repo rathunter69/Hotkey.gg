@@ -817,6 +817,24 @@ wins").
 ☆ Enter the tie check in the check cell — FY gross profit minus the SUM of the quarters reads zero
 **Gate:** clean run opens Data & Lookups. **Random:** value pools + segment pools + which opex lines appear (4 of 6) + margin/growth row order swaps. **Aha:** "a P&L is five formula shapes — point, fill, lock, grow, roll up — run in one breath". **Finish:** beat 6. **Clocks:** measure fresh; expect par ~70–90s; capstone pass=par×2.0. **Engine:** none beyond existing fns. **Plumbing:** D1.
 
+**SHIPPED r429 H6b-5 — built as specced, with one recorded deviation:**
+- **☆ deviation (approved in-session, flagged for playtest):** the page's ☆ is the tie check, which
+  is the INDEPENDENT PROVE-OUT family's **third** use in c3 (anchor §4.23, sumif §4.28) — past the
+  §1.0-R3(o) twice-per-chapter cap. Kept: a capstone's job is to close a page, and *does it tie?* is
+  the closing discipline; for the drill that gates the next chapter no other ☆ is honest. Non-adjacent
+  (four drills from its last use) and it teaches a third failure mode — two routes to the same number
+  can silently disagree. If c3's ☆s read samey at playtest, turn the family rule, not this drill.
+- **☆ shape sharpened vs the page line:** the page said "FY gross profit minus the SUM of the
+  quarters", which is the same number twice and reads as arithmetic. Shipped as the genuinely
+  independent pair — the FY figure summed ACROSS the quarters against the FY column built DOWN as
+  revenue plus cost. Same keystrokes, real prove-out.
+- **§2.2 proved by ALT 2:** the check cell left untouched clears all six cores, so the capstone opens
+  Data & Lookups with the ☆ forfeited. A bonus never gates anything, including a chapter.
+- **Par measured, not estimated:** 94/86 (median 86 keys, 0% drift, 1.09 s/key) — above the page's
+  ~70–90s guess because the memo and the swap-row reading cost real keys. Capstone clock pass=188.
+- **Plumbing D1 discharged in full**, including `dev/migrate-certificates.sql`'s hardcoded `formulas`
+  array in the same commit (r359 drift rule).
+
 ### CH 4 · DATA & LOOKUPS (12)
 
 #### 4.33 sort — "Sort the table" · M (audit shallow #11; r419 row-integrity landed)

@@ -3,10 +3,14 @@
 ## ⚡ STATE OF THE QUEUE (r429, 2026-07-27 — READ FIRST; supersedes the r417/r420c block below)
 
 **WHERE THE DEPTH PASS STANDS:**
-- **30/81 live drills at the depth-pass standard** (the C9 REWORKED ledger in dev/check-invariants.js
+- **31/82 live drills at the depth-pass standard** (the C9 REWORKED ledger in dev/check-invariants.js
   is the single source of truth): **Foundations (c1) COMPLETE 9/9** (modeltour★ capstone) ·
   **Formatting (c2) COMPLETE 10/10** (gauntlet★ capstone — a clean run opens Formulas I) ·
-  **Formulas I (c3) 11/12** — everything except the NEW capstone `qclose★`.
+  **Formulas I (c3) COMPLETE 12/12** (qclose★ capstone — a clean run opens Data & Lookups).
+- **▶ THREE COMPLETE CHAPTERS ARE READY TO PLAYTEST (r429, 2026-07-27).** c1 → c2 → c3 run end to
+  end with all three capstone gates live. The catalog is now **82** drills, not 81: `qclose` is the
+  first NEW drill of the pass (D1) and the marketing copy in index.html/About.html moved with it.
+  Everything from `sort` (c4) onward is still pre-depth-pass — expect the seam to be obvious.
 - **VERIFICATION IS NOW GENERIC** — `dev/e2e-depth-contract.js` asserts the universal §1 contract
   for every drill on the ledger, and `dev/e2e-alt-paths.js` enforces the **☆-forfeit contract** (an
   alt whose name says "☆ forfeited" MUST clear core with the ☆ dark). A new drill therefore needs
@@ -59,10 +63,15 @@
    ✅ **fxconvert** (both audit findings closed — guide 3v5 realigned, and its first ever ALTS).
    ✅ **cases** (the catalog's WORST misalignment closed — targets 9 and guide 4 against 6 checks,
    so the guided ring pointed at the wrong cell from step 2 on; formula-cloning ☆).
-   ⏳ **REMAINING FOR A 3-CHAPTER PLAYTEST — 1 drill:** ~~cases~~ (targets 9 vs checks 6 — the WORST misalignment in the
-   catalog; the guided ring lands on the wrong cell from step 2) · **qclose★ (NEW, D1 — the expensive one: a brand-new drill carrying
-   the full plumbing row — SPINE, TRACKS + migrate-certificates.sql in the SAME PR, PARS, LB board,
-   SEO page — plus the c3 capstone wiring off the gauntlet/modeltour template)**.
+   ✅ **qclose★ THE FORMULAS I CAPSTONE — the pass's first NEW drill.** The chapter's five formula
+   shapes in one artifact (point · fill · lock · grow · roll up); independent-prove-out ☆ (a
+   recorded deviation from the family cap — see AUDIT); par swept fresh at 94/86; the full plumbing
+   row discharged in one commit including `dev/migrate-certificates.sql` (r359 drift rule). ALT 2
+   leaves the check cell empty and still clears every core — **§2.2 proved, not asserted, on the
+   one drill where it matters most.**
+   **✅ CHAPTER 3 IS CLOSED: 12/12 at the standard. Catalog 31/82. W5 COMPLETE.**
+   Harness gained a `[☆ n/reps]` counter on every bonus-carrying alt, so an alt meant to EARN the ☆
+   can no longer latch 0/3 and still read PASS.
    **⚠️ OPEN, WOLF-FACING — PLACEMENT BAND DRIFT (D16 assumption invalidated):** margin's par went
    23→45, moving it mid→LONG where `dress` (41) already sits; the placement set now spans
    short/long/epic with **no mid representative**. It still spans the arc so §5.3 passes, and it was
@@ -79,10 +88,10 @@
    budget for a broader fix-up wave after the playtest than the earlier rounds needed. Collect at
    playtest: §1.0-R3 artifact fit, ☆ discovery rate, clock feel, the c3 prove-out overlap
    (foot core vs anchor ☆), and the two open Wolf-facing items below.
-3. **W5–W7 — FORMULAS I (c3) [auto·rolling]:** ✅ margin · ✅ foot · ✅ anchor → percent · growth,
-   then cagr · bridge · sumif · rollup · fxconvert, then cases + **qclose★ (NEW, D1)** + the D10–D15
-   drills.js meta sweep. First NEW-drill build (qclose) carries the full plumbing row (SPINE,
-   TRACKS+migrate-certificates.sql same-PR, PARS, LB auto, SEO page).
+3. **✅ W5–W7 — FORMULAS I (c3) COMPLETE:** margin · foot · anchor · percent · growth · cagr ·
+   bridge · sumif · rollup · fxconvert · cases · **qclose★ (NEW, D1)**. The D10–D15 drills.js meta
+   sweep landed with the drills that owned each item. **NEXT: c4 — Data & Lookups (10 reworks +
+   vlookup NEW + cleanroom★), the largest remaining chapter.**
 4. **Chapter-by-chapter per DEPTH_PASS §5** — c4 (incl. vlookup NEW + cleanroom★) → **post-c4
    MID-PASS REVIEW (§5.4 #4: par distribution, clock feel, bonus uptake, gate friction)** →
    c5 (redflags★) → c6 (pitchpage★) → c7 (cascade★ move) → **H6b-FB (ch 8) SEPARATE PASS,

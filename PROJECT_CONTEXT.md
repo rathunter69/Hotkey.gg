@@ -5,7 +5,7 @@ standards — READ FIRST; §9 is the wave playbook for Opus-5 sessions, new r428
 **dev/PIPELINE.md's ⚡ r428 header (the live queue)**, dev/AUDIT.md (newest round at the TOP),
 and the dev/ design docs._
 
-## ⚡ NEXT-SESSION HANDOFF (2026-07-27, r429 — THE DUAL-AUDIENCE LAW + WAVE 4 UNDERWAY)
+## ⚡ NEXT-SESSION HANDOFF (2026-07-27, r429 — THE DUAL-AUDIENCE LAW + CHAPTERS 1-3 COMPLETE)
 
 **WOLF'S NEW PRODUCT DIRECTION (2026-07-27), now binding build law:** every drill must read as a
 REAL DESK TASK for **both** audiences — the corporate mid-career professional AND the aspiring
@@ -19,17 +19,31 @@ without escalating. Spec is now **DEPTH_PASS r429**.
 **ALSO DECIDED:** data retention (closes G10) — 7-day detailed run history, last 5 + expand,
 aggregates permanent. In PIPELINE ⚡ with implementation notes.
 
-**WAVE 5 (Formulas I, c3) — 11 of 12 SHIPPED. ONLY `qclose★` REMAINS for a 3-chapter playtest.**
-margin · foot · anchor · percent · growth · cagr · bridge · sumif · rollup · fxconvert · cases.
+**▶▶ THREE COMPLETE CHAPTERS ARE READY TO PLAYTEST. WAVE 5 (Formulas I, c3) IS CLOSED, 12 of 12.**
+margin · foot · anchor · percent · growth · cagr · bridge · sumif · rollup · fxconvert · cases ·
+**qclose★**. With c1 (9/9, modeltour★) and c2 (10/10, gauntlet★) that is **31 of 82 drills at the
+depth-pass standard and an unbroken c1 → c2 → c3 run with all three capstone gates live.**
+Everything from `sort` (c4) onward is still pre-depth-pass — the seam will be obvious, and that is
+expected, not a defect.
 
-**`qclose★` is the one thing standing between you and playtesting three whole chapters**, and it is
-deliberately NOT a rework — it is a BRAND-NEW drill (DEPTH_PASS §4.32, catalog delta D1) carrying:
-the full plumbing row (campaign spine, HK_TRACKS **+ dev/migrate-certificates.sql in the SAME PR**
-per the r359 drift rule, HOTKEY_PARS, a new leaderboard board, an SEO page via build-drill-pages)
-**plus** the c3 capstone wiring off the gauntlet/modeltour template (meta.capstone, chapter
-designation, HOTKEY_CLOCKS pass=par×2, the shared hkCapstoneOk predicate, picker ★ tag, both
-grandfather rules). Budget it at 2–3 ordinary drills. Its §4.32 page is fully specced — six beats,
-a segment-ledger island, a tie-check ☆, and "a clean run opens Data & Lookups".
+**`qclose★` — the pass's FIRST NEW DRILL** (DEPTH_PASS §4.32, catalog delta D1), not a rework. It
+carries the chapter's five formula shapes in one artifact — point (gross profit), fill (the FY
+column), lock (the margin divisor), grow (quarter on quarter), roll up (the segment SUMIF) — and
+the full plumbing row landed in one commit: campaign spine · HK_TRACKS **+ dev/migrate-certificates.sql
+in the SAME PR** (r359 drift rule) · HOTKEY_PARS · SEO page + sitemap · the c3 capstone wiring off
+the gauntlet/modeltour template (meta.capstone, chapter designation, HOTKEY_CLOCKS pass=par×2=188,
+the shared hkCapstoneOk predicate, picker ★ tag, both grandfather rules). Par swept fresh at
+**94/86**. **The catalog is now 82 drills, not 81** — the marketing copy in index.html/About.html
+moved with it (the smoke gate's `drill-count` check caught that, in five meta tags).
+
+**TWO THINGS FROM qclose WORTH CARRYING FORWARD:**
+- **§2.2 is now PROVED on the drill where it matters most.** A bonus can never gate anything —
+  including a chapter. `qclose`'s ALT 2 leaves the ☆ check cell untouched, clears all six cores,
+  and opens Data & Lookups. Every future capstone should ship the same control.
+- **A RECORDED ☆-FAMILY DEVIATION, flagged for the playtest.** The tie-check ☆ is INDEPENDENT
+  PROVE-OUT's third use in c3 (anchor, sumif), past the §1.0-R3(o) twice-per-chapter cap. Kept
+  deliberately: a capstone's job is to close a page, and *does it tie?* is the closing discipline.
+  If c3's ☆s read samey end to end at playtest, **turn the family rule, not this drill.**
 
 **WHAT WAVE 5 KEPT FINDING — a pattern worth expecting in c4 and beyond.** Five of the eleven
 drills had a **§1.0(c) route requirement baked into core** (growth, sumif, rollup, fxconvert, and

@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>hotkey.gg · spreadsheet speedruns</title>
-<meta name="description" content="Keyboard-only Excel training: 81 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="description" content="Keyboard-only Excel training: 82 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="hotkey.gg — train Excel like it's a sport">
-<meta property="og:description" content="Keyboard-only Excel training: 81 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta property="og:description" content="Keyboard-only Excel training: 82 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="hotkey.gg — train Excel like it's a sport">
-<meta name="twitter:description" content="Keyboard-only Excel training: 81 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="twitter:description" content="Keyboard-only Excel training: 82 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"hotkey.gg","alternateName":"hotkey.gg \u2014 Excel shortcut trainer","url":"https://www.hotkey.gg/","description":"An Excel simulator that scores your keyboard speed \u2014 82 drills from navigation to full model builds, with pars, leaderboards, and guided demos."}</script>
@@ -1728,9 +1728,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=300"></script>
+<script src="drills.js?v=301"></script>
 
-<script src="drills.js?v=300"></script>
+<script src="drills.js?v=301"></script>
 
 
 
@@ -9090,6 +9090,160 @@ const CHALLENGES = {
         {label:'Visit every case so the output table fills itself', ok:driverOk && captureOk && snapOk[1] && snapOk[2]},
         {label:'Reset Base growth to '+(this._mutG*100).toFixed(1)+'% and refresh Base — a frozen snapshot only moves when you revisit it', ok:mutApplied && snapOk[0]},
         {label:'☆ the growth pull cloned off the case pull — one row apart, so the references walk themselves', ok:starOk, bonus:true},
+      ];
+    }
+  },
+
+  qclose:{
+    /* r429 (H6b wave 5, DEPTH_PASS §4.32 + §2.4 + §3 D1): THE FORMULAS I CAPSTONE — a NEW drill,
+       not a rework. Capstone wiring follows the modeltour/gauntlet template exactly (AUDIT r425 /
+       r429): meta.capstone:true · HOTKEY_CAMPAIGN.chapters[2].capstone:'qclose' · HOTKEY_CLOCKS
+       pass=par×2 · the SHARED hkCapstoneOk predicate (untouched — one definition, every surface)
+       · picker ★ CAPTAG · both grandfather rules · access never blocked. A clean run opens
+       Data & Lookups.
+       DESIGN NOTES (per WORKFLOW.md §8):
+       · The chapter's five formula shapes in ONE artifact — point (gross profit), fill (the FY
+         column), lock (the margin divisor), grow (quarter on quarter), roll up (the segment
+         SUMIF). That is the §4.32 concept and the aha: a P&L is five shapes run in one breath.
+       · ☆ = the TIE CHECK. FY gross profit arrives two independent ways — summed ACROSS the four
+         quarters, and built DOWN the FY column as revenue plus cost — and they have to agree.
+         This is INDEPENDENT PROVE-OUT's third use in c3 (anchor, sumif). Recorded deviation from
+         the r429 family cap: a capstone's job is to CLOSE a page, and "does it tie?" is the
+         closing discipline — for the drill that gates a chapter, no other ☆ is honest. Flagged
+         for the playtest.
+       · §1.0(c) throughout: every core beat grades VALUES. Typed figures clear; the clock prices
+         the difference. Only the ☆ reads a route (that the check cell is live). */
+    name:'Close the Quarter', label:'Close the quarter', par:94, parKeys:86, saveClose:true,   /* r429 H6b-5: par swept — 5-seed sweep median 86 keys; par 94s ≈ 1.09 s/key, house band (the gauntlet capstone sits at the same ratio). Mirrored in HOTKEY_PARS; CAPSTONE clock keeps HOTKEY_CLOCKS.qclose.pass in lockstep at par×2 = 188. */
+    aha:'a P&L is five formula shapes — point, fill, lock, grow, roll up — run in one breath, and a page that ties is the only one you can send.',
+    prompt:'The quarter is closed and the pack is due. You have a revenue feed, a cost line, four operating lines and a segment ledger — and nothing calculated yet. Build the gross profit line across the quarters, total the year down the column, put the margin and the quarter-on-quarter growth underneath, roll the ledger into the segment memo, and close the page. Everything on it should follow from the feed; nothing on it should be typed twice.',
+    req(){ const o=this._o; return '<em>B'+o.gp+'</em> =B'+o.rev+'+B'+o.cogs+' fill → · <em>F'+o.rev+'</em> <em>alt+=</em> fill ↓ · <em>B'+o.mgn+'</em> =B'+o.gp+'/B$'+o.rev+' fill → percent · <em>C'+o.gro+'</em> =C'+o.rev+'/B'+o.rev+'-1 fill → percent · memo SUMIF fill ↓ · GP line <em>ctrl+b</em> + <em>alt h b p</em> · check <em>'+o.chk+'</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): labels are OUTCOME lines; the route lives here. */
+    guide(){ const o=this._o; return [
+      'gross profit — at <em>B'+o.gp+'</em> · <kbd>=</kbd> point up to revenue · <kbd>+</kbd> · point to the cost line (it is already negative, so you ADD it) · <kbd>↵</kbd> · select <em>B'+o.gp+':E'+o.gp+'</em> · <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'the year — on <em>F'+o.rev+'</em> · <kbd>alt</kbd>+<kbd>=</kbd> reads the four quarters · <kbd>↵</kbd> · select <em>F'+o.rev+':F'+o.gp+'</em> · <kbd>ctrl</kbd>+<kbd>d</kbd>: one SUM down every P&L line',
+      'the margin — at <em>B'+o.mgn+'</em> · <kbd>=B'+o.gp+'/B$'+o.rev+'</kbd> — row-lock the revenue line so the fill cannot drag it off · <kbd>↵</kbd> · fill <em>B'+o.mgn+':F'+o.mgn+'</em> · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd>',
+      'growth starts at the SECOND quarter — <em>C'+o.gro+'</em> · <kbd>=C'+o.rev+'/B'+o.rev+'-1</kbd> · <kbd>↵</kbd> · fill <em>C'+o.gro+':E'+o.gro+'</em> · percent, one decimal',
+      'the segment memo — at <em>B'+o.m0+'</em> · <kbd>=SUMIF($'+o.ledL+'$'+o.ledR0+':$'+o.ledL+'$'+o.ledRN+',A'+o.m0+',$'+o.ledA+'$'+o.ledR0+':$'+o.ledA+'$'+o.ledRN+')</kbd> · <kbd>↵</kbd> · fill down to <em>B'+o.mN+'</em>: the ranges locked, only the segment name walking',
+      'close the page — select <em>A'+o.gp+':F'+o.gp+'</em> · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> (a total rules on TOP)',
+      '☆ the discovery: the FY gross profit exists twice over — summed ACROSS the quarters, and buildable DOWN the column as revenue plus cost. In <em>'+o.chk+'</em> put one against the other: <kbd>=F'+o.gp+'-(F'+o.rev+'+F'+o.cogs+')</kbd>. A page that ties is the only one you can send',
+    ]; },
+    targets(){ const o=this._o; return ['B'+o.gp+':E'+o.gp, 'F'+o.rev+':F'+o.gp, 'B'+o.mgn+':F'+o.mgn, 'C'+o.gro+':E'+o.gro, 'B'+o.m0+':B'+o.mN, 'A'+o.gp+':F'+o.gp, o.chk]; },
+    demo(){ const o=this._o; return [
+      {sel:'B'+o.gp, keys:[...T('=B'+o.rev+'+B'+o.cogs), Kb.enter]},
+      {sel:'B'+o.gp+':E'+o.gp, keys:[Kb.fillR]},
+      {sel:'F'+o.rev, keys:[Kb.eq, Kb.enter]},
+      {sel:'F'+o.rev+':F'+o.gp, keys:[Kb.fillD]},
+      {sel:'B'+o.mgn, keys:[...T('=B'+o.gp+'/B$'+o.rev), Kb.enter]},
+      {sel:'B'+o.mgn+':F'+o.mgn, keys:[Kb.fillR, Kb.pct, Kb.alt,L('H'),D(0)]},
+      {sel:'C'+o.gro, keys:[...T('=C'+o.rev+'/B'+o.rev+'-1'), Kb.enter]},
+      {sel:'C'+o.gro+':E'+o.gro, keys:[Kb.fillR, Kb.pct, Kb.alt,L('H'),D(0)]},
+      {sel:'B'+o.m0, keys:[...T('=SUMIF($'+o.ledL+'$'+o.ledR0+':$'+o.ledL+'$'+o.ledRN+',A'+o.m0+',$'+o.ledA+'$'+o.ledR0+':$'+o.ledA+'$'+o.ledRN+')'), Kb.enter]},
+      {sel:'B'+o.m0+':B'+o.mN, keys:[Kb.fillD]},
+      {sel:'A'+o.gp+':F'+o.gp, keys:[Kb.bold, Kb.alt,L('H'),L('B'),L('P')]},
+      /* the ☆ — the tie-out (§2.2: the demo performs the bonus so replay covers it) */
+      {sel:o.chk, keys:[...T('=F'+o.gp+'-(F'+o.rev+'+F'+o.cogs+')'), Kb.enter]},
+    ]; },
+    build(){
+      const cells={};
+      const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+      /* §1.2 axes (§4.32): (a) which FOUR of six operating lines appear; (b) segment-name pool for
+         the ledger + codename; (c) every figure through rnd() + the ledger DEPTH 6–9 rows;
+         (d) the margin and growth rows SWAP order, so the two percent rows are never in a fixed
+         place and the labels have to be read. */
+      const hr=3, rev=4, cogs=5;
+      const OPEX=shuffle(['Selling','Marketing','Admin','Research','Support','Logistics']).slice(0,4);
+      const op0=6, opN=op0+OPEX.length-1, gp=opN+1;
+      const swap=rnd(0,1);
+      const mgn=swap? gp+2 : gp+1, gro=swap? gp+1 : gp+2;
+      const y=24+rnd(0,3);
+      cells['A1']={...blankCell(),value:codename()+' — quarterly close, FY'+y+' ($000s)',txt:true,bold:true};
+      cells['A'+hr]={...blankCell(),value:'Line item',txt:true,bold:true};
+      for(let j=0;j<4;j++) cells[colLetter(2+j)+hr]={...blankCell(),value:'Q'+(j+1),txt:true,bold:true,align:'r'};
+      cells['F'+hr]={...blankCell(),value:'FY'+y,txt:true,bold:true,align:'r'};
+      const q=[], cg=[];
+      let base=rnd(180,420)*5;
+      cells['A'+rev]={...blankCell(),value:'Revenue',txt:true};
+      cells['A'+cogs]={...blankCell(),value:'Cost of sales',txt:true};
+      for(let j=0;j<4;j++){ const v=Math.round(base*(1+rnd(2,11)/100*j));
+        const c=-Math.round(v*rnd(38,62)/100);
+        q.push(v); cg.push(c);
+        cells[colLetter(2+j)+rev]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[colLetter(2+j)+cogs]={...blankCell(),value:c,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+      const opv=[];
+      OPEX.forEach((n,i)=>{ const r=op0+i; const row=[];
+        cells['A'+r]={...blankCell(),value:n,txt:true};
+        for(let j=0;j<4;j++){ const v=-Math.round(q[j]*rnd(3,11)/100); row.push(v);
+          cells[colLetter(2+j)+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+        cells['F'+r]={...blankCell(),fmtStyle:'comma',decimals:0}; opv.push(row); });
+      cells['F'+rev]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['F'+cogs]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['A'+gp]={...blankCell(),value:'Gross profit',txt:true};
+      for(let j=0;j<4;j++) cells[colLetter(2+j)+gp]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['F'+gp]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['A'+mgn]={...blankCell(),value:'Gross margin',txt:true};
+      for(let c=2;c<=6;c++) cells[colLetter(c)+mgn]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['A'+gro]={...blankCell(),value:'Revenue growth (QoQ)',txt:true};
+      for(let c=3;c<=5;c++) cells[colLetter(c)+gro]={...blankCell(),fmtStyle:'comma',decimals:0};
+      /* the segment ledger island — the SUMIF source, deliberately off to the right so the memo
+         has to reach for it (§4.32 "a small segment ledger island") */
+      const SEGS=shuffle(['Enterprise','Mid-market','SMB','Public sector','Channel']).slice(0,3);
+      const ledL='H', ledA='I', ledR0=hr, nLed=rnd(6,9), ledRN=ledR0+nLed-1;
+      cells[ledL+(hr-1)]={...blankCell(),value:'Segment ledger',txt:true,bold:true};
+      const segTot={};
+      for(let i=0;i<nLed;i++){ const sg=(i<SEGS.length)? SEGS[i] : SEGS[rnd(0,SEGS.length-1)];
+        const v=rnd(20,140)*5; segTot[sg]=(segTot[sg]||0)+v;
+        cells[ledL+(ledR0+i)]={...blankCell(),value:sg,txt:true};
+        cells[ledA+(ledR0+i)]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+      const memoHdr=gro+2, m0=memoHdr+1, mN=m0+SEGS.length-1;
+      cells['A'+memoHdr]={...blankCell(),value:'Segment memo — from the ledger',txt:true,it:true,fontColor:'gray'};
+      SEGS.forEach((n,i)=>{ cells['A'+(m0+i)]={...blankCell(),value:n,txt:true};
+        cells['B'+(m0+i)]={...blankCell(),fmtStyle:'comma',decimals:0}; });
+      const chkRow=mN+2;
+      cells['A'+chkRow]={...blankCell(),value:'Gross profit ties',txt:true};
+      cells['B'+chkRow]={...blankCell(),fill:'yellow',ball:true,fmtStyle:'comma',decimals:0};
+      this._q=q; this._cg=cg; this._opv=opv; this._segTot=segTot; this._segs=SEGS;
+      this._o={ hr:hr, rev:rev, cogs:cogs, op0:op0, opN:opN, gp:gp, mgn:mgn, gro:gro,
+        ledL:ledL, ledA:ledA, ledR0:ledR0, ledRN:ledRN,
+        memoHdr:memoHdr, m0:m0, mN:mN, chk:'B'+chkRow, chkRow:chkRow, swap:swap, y:y };
+      return {ROWS:Math.max(20,chkRow+1), cells, active:{r:gp,c:2}, sel:null,
+        colW:{1:168,2:80,3:80,4:80,5:80,6:88,7:24,8:112,9:80}};
+    },
+    checks(S){
+      const o=this._o, cell=k=>S.cells[k]||{};
+      const near=(k,exp,tol)=>{ const c=cell(k); return typeof c.value==='number' && Math.abs(c.value-exp)<=(tol||0.5); };
+      const gpQ=[0,1,2,3].map(j=>this._q[j]+this._cg[j]);
+      /* §1.0(c): every core beat grades the VALUE. Typed figures clear — the clock prices it. */
+      const gpOk=[0,1,2,3].every(j=>near(colLetter(2+j)+o.gp, gpQ[j]));
+      const fyLines=[[o.rev,this._q],[o.cogs,this._cg]].concat(this._opv.map((row,i)=>[o.op0+i,row]));
+      const fyOk=fyLines.every(([r,vals])=>near('F'+r, vals.reduce((a,b)=>a+b,0)))
+        && near('F'+o.gp, gpQ.reduce((a,b)=>a+b,0));
+      const mgnOk=[0,1,2,3].every(j=>{ const c=cell(colLetter(2+j)+o.mgn);
+        return typeof c.value==='number' && Math.abs(c.value-gpQ[j]/this._q[j])<1e-3
+          && c.fmtStyle==='percent' && (c.decimals|0)===1; })
+        && (()=>{ const c=cell('F'+o.mgn); const fyG=gpQ.reduce((a,b)=>a+b,0), fyR=this._q.reduce((a,b)=>a+b,0);
+          return typeof c.value==='number' && Math.abs(c.value-fyG/fyR)<1e-3 && c.fmtStyle==='percent'; })();
+      const groOk=[1,2,3].every(j=>{ const c=cell(colLetter(2+j)+o.gro);
+        return typeof c.value==='number' && Math.abs(c.value-(this._q[j]/this._q[j-1]-1))<1e-3
+          && c.fmtStyle==='percent' && (c.decimals|0)===1; });
+      const memoOk=this._segs.every((n,i)=>near('B'+(o.m0+i), this._segTot[n]));
+      const dressOk=(()=>{ for(let c=1;c<=6;c++){ const x=cell(colLetter(c)+o.gp);
+        if(!x.bold||!x.bt) return false; } return true; })();
+      /* ☆ (§1.0(d) mystery slot · §1.0-R3(o) INDEPENDENT PROVE-OUT): FY gross profit exists twice
+         over — summed ACROSS the quarters and buildable DOWN the column as revenue plus cost — and
+         the check cell puts one against the other. A LIVE formula reading zero, with the page
+         actually right. §2.2: a bonus can NEVER gate anything, and this drill GATES Data & Lookups,
+         so leaving the check empty must still win — asserted by ALT 2. */
+      const chk=cell(o.chk);
+      const starOk=!!(chk.formula && typeof chk.value==='number' && Math.abs(chk.value)<0.5
+        && gpOk && fyOk);
+      return [
+        {label:'Build the gross profit line across the quarters', ok: gpOk},
+        {label:'Total the year down the FY column', ok: fyOk},
+        {label:'Build the gross margin row — percent, one decimal', ok: mgnOk},
+        {label:'Build the quarter-on-quarter revenue growth row — percent, one decimal', ok: groOk},
+        {label:'Roll the segment ledger into the memo', ok: memoOk},
+        {label:'Bold the gross profit line and add a top border above it', ok: dressOk},
+        {label:'☆ the year’s gross profit proved a second way — across the quarters against down the column', ok: starOk, bonus:true},
       ];
     }
   },

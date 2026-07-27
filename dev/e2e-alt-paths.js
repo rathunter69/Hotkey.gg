@@ -530,6 +530,50 @@ const ALTS = [
       mv.push({sel:o.rowC+o.totR+':'+o.cNL+o.totR, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
       mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
       return mv; }` },
+  /* r429 H6b-5 (DEPTH_PASS §4.32 wave 5): qclose — the Formulas I CAPSTONE, a new drill.
+     ALT 1 = op-ORDER (the two independent rows built FIRST) + ribbon routes throughout
+     (Alt H U S autosum, Alt H F I R/D fills, Alt H P percent, Alt H 1 bold) + a DIFFERENT
+     but equivalent tie formula — the ☆ must still latch, because §1.0(c) means the ☆ reads
+     the RESULT of the prove-out, not one spelling of it. ALT 2 = the §1.0-R2(i) skippability
+     control AND the §1.0(c) freedom proof in one: every figure typed as a raw number, no fill
+     anywhere, check cell left EMPTY. It must clear all six cores and NEVER latch the ☆ —
+     this drill GATES Data & Lookups, and §2.2 says a bonus can never gate anything. */
+  { key: 'qclose', name: 'op-ORDER — memo and growth built FIRST, ribbon routes throughout (alt h u s autosum, alt h f i r/d fills, alt h p percent), tie proved the OTHER way round', moves: `C => { const o=C._o; const mv=[];
+      const seg0=o.m0, segN=o.mN;
+      mv.push({sel:'B'+seg0, keys:[...T('=SUMIF($'+o.ledL+'$'+o.ledR0+':$'+o.ledL+'$'+o.ledRN+',A'+seg0+',$'+o.ledA+'$'+o.ledR0+':$'+o.ledA+'$'+o.ledRN+')'),{key:'Enter'}]});
+      mv.push({sel:'B'+seg0+':B'+segN, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]});
+      mv.push({sel:'C'+o.gro, keys:[...T('=C'+o.rev+'/B'+o.rev+'-1'),{key:'Enter'}]});
+      mv.push({sel:'C'+o.gro+':E'+o.gro, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r'),{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]});
+      mv.push({sel:'B'+o.gp, keys:[...T('=B'+o.rev+'+B'+o.cogs),{key:'Enter'}]});
+      mv.push({sel:'B'+o.gp+':E'+o.gp, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]});
+      mv.push({sel:'F'+o.rev, keys:[{key:'Alt'},L('h'),L('u'),L('s'),{key:'Enter'}]});
+      mv.push({sel:'F'+o.rev+':F'+o.gp, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]});
+      mv.push({sel:'B'+o.mgn, keys:[...T('=B'+o.gp+'/B$'+o.rev),{key:'Enter'}]});
+      mv.push({sel:'B'+o.mgn+':F'+o.mgn, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r'),{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]});
+      mv.push({sel:'A'+o.gp+':F'+o.gp, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]});
+      /* the tie run the other way round — the across-total minus the two column sums */
+      mv.push({sel:o.chk, keys:[...T('=SUM(B'+o.gp+':E'+o.gp+')-F'+o.rev+'-F'+o.cogs),{key:'Enter'}]});
+      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+      return mv; }` },
+  { key: 'qclose', name: 'FREEDOM proof + skippability control — every figure TYPED as a raw number, no fill anywhere, check cell left EMPTY (☆ forfeited, all six cores clear)', moves: `C => { const o=C._o, mv=[];
+      const q=C._q, cg=C._cg, opv=C._opv;
+      const gpQ=[0,1,2,3].map(j=>q[j]+cg[j]);
+      const sum=a=>a.reduce((x,y)=>x+y,0);
+      for(let j=0;j<4;j++) mv.push({sel:colLetter(2+j)+o.gp, keys:[...T(String(gpQ[j])),{key:'Enter'}]});
+      mv.push({sel:'F'+o.rev, keys:[...T(String(sum(q))),{key:'Enter'}]});
+      mv.push({sel:'F'+o.cogs, keys:[...T(String(sum(cg))),{key:'Enter'}]});
+      opv.forEach((row,i)=>mv.push({sel:'F'+(o.op0+i), keys:[...T(String(sum(row))),{key:'Enter'}]}));
+      mv.push({sel:'F'+o.gp, keys:[...T(String(sum(gpQ))),{key:'Enter'}]});
+      for(let j=0;j<4;j++) mv.push({sel:colLetter(2+j)+o.mgn, keys:[...T((gpQ[j]/q[j]).toFixed(8)),{key:'Enter'}]});
+      mv.push({sel:'F'+o.mgn, keys:[...T((sum(gpQ)/sum(q)).toFixed(8)),{key:'Enter'}]});
+      mv.push({sel:'B'+o.mgn+':F'+o.mgn, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
+      for(let j=1;j<4;j++) mv.push({sel:colLetter(2+j)+o.gro, keys:[...T((q[j]/q[j-1]-1).toFixed(8)),{key:'Enter'}]});
+      mv.push({sel:'C'+o.gro+':E'+o.gro, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
+      C._segs.forEach((n,i)=>mv.push({sel:'B'+(o.m0+i), keys:[...T(String(C._segTot[n])),{key:'Enter'}]}));
+      mv.push({sel:'A'+o.gp+':F'+o.gp, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      /* the check cell is never touched — the capstone still opens the next chapter */
+      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+      return mv; }` },
   { key: 'hunt', name: 'totals footed FIRST, ctrl+g route, crimes fixed in reverse', moves: `C => { const o=C._o;
       const steps=[
         {sel:'B8', keys:[...T('=SUM(B3:B7)'),{key:'Enter'}]},
@@ -1361,6 +1405,7 @@ const ALTS = [
     }
     if (!ok) fails++;
     console.log((ok ? 'PASS ' : 'FAIL ') + alt.key.padEnd(10) + ' · ' + alt.name
+      + (bonusRuns ? '  [\u2606 ' + starRuns + '/' + bonusRuns + ']' : '')
       + (wins === REPS ? '' : '\n       stuck on: ' + notes[0]) + starNote);
   }
   console.log('\nALT PATHS: ' + (fails ? fails + ' FAILURE(S) of ' + ran : 'ALL ' + ran + ' PASS'));
