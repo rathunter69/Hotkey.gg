@@ -33,8 +33,17 @@
    MID-PASS REVIEW (§5.4 #4: par distribution, clock feel, bonus uptake, gate friction)** →
    c5 (redflags★) → c6 (pitchpage★) → c7 (cascade★ move) → **H6b-FB (ch 8) SEPARATE PASS,
    Wolf-gated (§5.4 #5)**.
+**✅ DECIDED — DATA RETENTION (Wolf, 2026-07-27, closes G10):** **detailed per-run history is kept
+~7 days**; stats surfaces show the **last 5 runs with an expand/see-more** for the rest of the
+window. **Aggregates are permanent** — PBs, band/medal state, splits attached to a PB, total
+keystrokes/time, achievements, certificates, leaderboard entries. Rationale: the deep run log is a
+debugging/《how am I trending》surface with a short useful life; the aggregates are the player's
+record and must never be lost (r158 no-rug-pull law). Implementation notes for the stats round:
+prune on write (a scheduled purge of `runs` rows older than the window, PB-bearing rows exempt),
+display hardens around "last 5 + expand", and the privacy page gains the retention sentence.
+
 **Wolf-pending (unchanged):** fx dial-up render approval · lean ribbon default-ON · About restyle ·
-data-retention policy (G10) · card customizer 2.0 (item 9 below, screenshot-first).
+card customizer 2.0 (item 9 below, screenshot-first).
 
 ## ⚡ STATE OF THE QUEUE (r417, 2026-07-24 — history; superseded by r428 above)
 _Process standards now live in **dev/WORKFLOW.md** (orchestrator+agent-fleet model, decision

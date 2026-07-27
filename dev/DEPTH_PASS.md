@@ -1,4 +1,10 @@
-# DEPTH_PASS — the catalog rework specification (r420d — playtest round 2 integrated, 2026-07-25)
+# DEPTH_PASS — the catalog rework specification (r429 — the dual-audience real-task law, 2026-07-27)
+_r429 adds **§1.0-R3 (n) the DUAL-AUDIENCE REAL-TASK LAW + (o) the ☆ RE-CUT SWEEP** (Wolf direct
+directive, 2026-07-27 — not a playtest), **§3.1 THE AUDIENCE MAP**, and rewrites the five wave-4
+pages (§4.12 decimals · §4.13 center · §4.14 autofit · §4.17 combo · §4.20 gauntlet★) to both.
+Everything below §1.0-R3 that has NOT been rewritten is a pre-playtest page: its ☆ line is dead on
+arrival and its artifact is unverified against the reality test — the build agent re-cuts both
+under (n)/(o) without escalating. Prior header: r420d — playtest round 2 integrated, 2026-07-25._
 
 _The master build document for the depth pass. Binding inputs: Wolf's locked parameters (PROJECT_CONTEXT "WOLF DECISIONS — DEPTH PASS", 2026-07-24), **Wolf review round 1 (2026-07-24: semantic references over cell ranges · vague-verb ban · Full Builds as a separate build pass · per-beat sub-clocks · all eight taste calls resolved)**, **Wolf PLAYTEST round 1 (2026-07-24, wave 1 — dev/ROUND1_FEEDBACK.md: the §1.0 binding rules, the mystery-☆, the Ctrl+S universal closer, the rowops⊕colops merge, and the five ROUND-2 wave-1 spec pages)**, **Wolf PLAYTEST round 2 (2026-07-25 — dev/ROUND2_FEEDBACK.md: the §1.0-R2 rules — adaptive checklist labels · action-location cues · ☆-as-a-choice · the "re-tie" ban · first-drill nudge · labeled helper stack · the outside-border canon check)**, AUDIT_R417 §A/§D/§G, DRILL_DOCTRINE.md, and the three depth-research reports (finance canon · competitive Excel · course design + language standard). Where a beat descends from a research pattern it is tagged inline, e.g. [Origami Ladder]. Former open taste calls are all RESOLVED and collected in the decision log at the end._
 
@@ -58,6 +64,84 @@ Source: dev/ROUND2_FEEDBACK.md (Wolf's round-2 playtest of the wave-1 rebuilds).
 **(l) HELPER-CELL STANDARD extension (extends §1.0(f)).** Helper/assumption cells are VERTICALLY STACKED and INDIVIDUALLY LABELED — "Helper — 1000s", "Helper — sign flip" — light yellow + all borders, populated. WHY (Wolf, 2026-07-25): "there should be two distinct helper cells vertically stacked. Yellow outline is good … Helper cells should be labeled like 'Helper - 1000s' and 'Helper - sign flip'" — the round-2 board left him staring at unlabeled yellow cells wondering what they were for. The label is adjacent board content (a cell beside/above the helper), seeded by build(), never a graded target.
 
 **(m) OUTSIDE-BORDER CANON (recorded check, 2026-07-25).** Wolf states: outside borders = **Alt H B S** — NOT H B A (H B A = ALL borders). The engine already asserts H B S draws the selection PERIMETER (dev/e2e-audit-parity.js:506, the r302 canon sweep); the engine-UI round is VERIFYING and ALIGNING every drill hint route, reference table, and SEO surface to S=outside / A=all. Any page, guide line, or req teaching H B A for an outside border is wrong — fix on sight and note it in the PR.
+
+### 1.0-R3 THE DUAL-AUDIENCE REAL-TASK LAW (r429, Wolf directive 2026-07-27 — BINDING, same force as §1.0/§1.0-R2; letters continue §1.0-R2's)
+
+Source: Wolf, 2026-07-27 (direct product direction, NOT a playtest): _"Make sure all drills are
+oriented towards the overall platform goal of creating drills similar to real world tasks to
+improve in Excel for both average corporate mid-career professionals and aspiring bankers and
+consultants."_ This is the product's north star written as build law.
+
+**(n) EVERY DRILL IS A REAL TASK, FOR BOTH AUDIENCES.**
+
+**The two audiences, equal weight:**
+- **A · the corporate mid-career professional** — FP&A analyst, ops/finance manager, controller,
+  marketing or supply-chain lead. Lives in budget-vs-actual, headcount plans, department opex,
+  expense and invoice files, pipelines, KPI summaries, project trackers, vendor/price lists.
+- **B · the aspiring banker or consultant** — lives in comps, DCFs, S&U tables, debt schedules,
+  three-statement models, deal pages.
+
+**THE SKILL IS IDENTICAL; ONLY THE ARTIFACT DIFFERS.** A decimal standard, an autofit, a
+structured selection, an anchored reference, a lookup — these are the same craft on a headcount
+roster and on a comps page. So the catalog does NOT split into two tracks: it spans both audiences
+by varying the ARTIFACT drill to drill, per the §3.1 audience map.
+
+**THE REALITY TEST (page authors AND build agents both apply it, every board, every prompt):**
+> _Would a real person, at a real job, with a real reason, produce or fix THIS artifact in Excel
+> this week — and would they recognize the board as their own file?_
+
+If no, the board or the prompt is wrong. Fix it and note the change in the PR.
+
+**Rules that fall out of the test:**
+1. **The board is a real file fragment.** Real column headers, real row labels, real magnitudes,
+   real units, plausible entity/department/product names. BANNED: "Table 1", "Sample data",
+   "Item A/B/C", "Company 1", filler grids of abstract values, and any board whose only purpose is
+   to be somewhere to press a chord. (Sole exception: maze/obstacle boards where coordinates ARE
+   the game — §1.7 R2(a).)
+2. **The prompt carries the real-world frame** (scenario-imperative register, §1.7): WHO needs it,
+   WHY, and what happens next. "Your director needs the Q3 opex variance before Thursday's budget
+   review" · "The VP wants the downside case before the 4pm call". A prompt that describes the
+   Excel operation instead of the situation is a spec bug.
+3. **The task is one a desk actually does** — not an exercise built backwards from a hotkey. If the
+   only answer to "why would anyone do this?" is "to practice Ctrl+B", re-cut the beat around the
+   real motive (house standard, a review, a hand-off, a print deadline, a mistake found).
+4. **Register matches the artifact.** A banking artifact uses desk vocabulary, glossed on first use
+   (§1.7 R7 slang rule). A corporate-generic artifact uses plain business English and NO
+   unexplained finance jargon — audience A must never need a banking glossary to clear a drill in
+   chapters 1–4.
+5. **Neither audience is a guest.** A drill built for audience A must still teach a banker something
+   real (it does — the craft is the same), and vice versa. Never write a board that reads as
+   "the easy one for non-finance people"; the difficulty comes from the Excel work, never from
+   domain trivia.
+
+**Wave-agent duty:** if your §4 page names an artifact that fails the reality test, or names none,
+you rebuild the board to the §3.1 audience map's family for your drill and record the change as a
+spec deviation (§9.2 payload item 8). This is the ONE class of change a build agent may make to its
+board without escalating — because the reality test is objective and this law is Wolf-direct.
+
+**(o) THE ☆ RE-CUT SWEEP (r429 — catalog-wide known defect, stated once so no agent has to ask).**
+Every §4 page written BEFORE the playtest rounds (i.e. everything from §4.12 down that has not been
+rewritten) proposes a FORMATTING bonus — "right-align the header row", "color the inputs blue",
+"bold the title". **§1.0(d) killed that entire class, and §1.0-R2(i) added the skippability test.**
+So: **a pre-playtest page's ☆ line is DEAD ON ARRIVAL.** The build agent re-cuts it to a hidden
+EFFICIENCY discovery without escalating, and records the recipe in its payload. The two tests both
+have to pass: (1) is it a mastery move, not a dress chore? (2) can a player clear every core beat
+without it and without going out of their way? Where the killed ☆ was real work, PROMOTE it to a
+core beat (the r425 editfix/dress/ruleoff precedent) — do not simply delete it.
+
+**The sanctioned ☆ families** (pick the one that fits the drill's own lesson; prefer existing
+telemetry — `S.fillOps` · `S.pasteOpLog` · `S.pasteLog` · `S.fmtOps` · `S.cutMoves` ·
+`S.gotoSpecials`; NEW telemetry is a §9.2 payload item and needs a written justification):
+- **one-pass discipline** — one selection covers the whole job (one comma pass, one italic pass);
+- **structured selection** — Ctrl+Shift+arrow / Ctrl+Space / Ctrl+A current-region to grab the
+  block instead of arrowing it (Wolf's own §1.0-R2(i) example — "reward good habits of using the
+  previously taught hotkeys");
+- **format cloning** — paste-special-FORMATS to carry a finished block's dress onto its twin,
+  instead of re-dressing by hand;
+- **reference over retype** — the repair pointed at the source so it can never drift again;
+- **anchoring mastery** — anchors set so ONE formula fills a whole block;
+- **the operator clipboard** — one paste-special-multiply/divide pass covering every conversion.
+A drill's ☆ must not repeat the ☆ of another drill in the SAME chapter — vary the family.
 
 ### 1.1 Beats
 - **4–6 core graded beats + exactly 1 bonus beat** (☆). Core beats win the drill; the bonus never blocks the win (§2.2). Fewer than 4 core beats is allowed ONLY for pure-reflex Foundations drills explicitly marked on their §4 page (none currently are).
@@ -204,6 +288,35 @@ Every add/designate/move/rename of the pass. Keys are immutable (PBs, leaderboar
 | D17 | **colops → rowops** | **RETIRE colops; rowops ABSORBS it** (playtest round 1, Wolf 2026-07-24) | two thin structure drills teach ONE lesson — row AND column insert/delete + the formatting-inheritance behavior belong in one fulsome drill (§4.5 round 2) | menuOrder/groups c1 −1 (colops key removed); PARS entry removed; TRACKS + migrate-certificates.sql arrays updated in the SAME PR (r359 drift rule); LB board orphaned (history kept; unreachable once the key leaves menuOrder — no migration); SPINE c1 list updated if colops appears; ACH auto via groups; POOL n/a. Catalog 82→81 live; the freed slot stays OPEN for a future add |
 
 Catalog after pass: **87 drills** (82 − 1 retire [D17] + 6 adds), 8 chapters, capstone last in each. Chapter counts: 9 · 10 · 12 · 12 · 12 · 11 · 10 · 11. `menuOrder.length` stays the single source of truth — nothing hardcodes a count (CI already guards).
+
+### 3.1 THE AUDIENCE MAP (r429 — the §1.0-R3(n) law made concrete, chapter by chapter)
+
+How the catalog spans both audiences. **A** = corporate mid-career professional artifacts · **B** =
+banking/consulting artifacts. The SKILL taught never changes with the letter — only the file the
+player is looking at. A chapter's mix is a REQUIREMENT, not a suggestion: a wave agent whose drill
+would leave its chapter lopsided rebuilds to the assigned family.
+
+| ch | chapter | mix | why | artifact families to draw from |
+|----|---------|-----|-----|-------------------------------|
+| 1 | Foundations | **A-lean** (~2:1) | movement, selection and paste are universal; this is where audience A decides the product is for them | monthly actuals, department opex, headcount roster, expense file, order/pipeline extract, price list |
+| 2 | Formatting | **balanced** (~1:1) | formatting is the most universal craft in the catalog AND the most desk-specific in its conventions | A: ops scorecard, KPI summary, budget-vs-actual, headcount, vendor list · B: comps page, S&U, schedule fragment |
+| 3 | Formulas I | **A-lean** (~2:1) | margins, growth, %-of-total, SUMIF are the corporate analyst's daily bread; the banker meets them again in ch 6 | A: regional sales, cost-center rollup, monthly variance, unit economics, budget build · B: comps math, common-size statements |
+| 4 | Data & Lookups | **A-heavy** (~3:1) | messy exports, sorting, filtering, VLOOKUP/INDEX-MATCH reconciliation IS the corporate Excel job | A: CRM/ERP export, employee list, invoice register, SKU master, survey dump, two-system reconciliation |
+| 5 | Formulas II | **balanced** | auditing a broken file is universal; the flagship red-flag pass is a deal artifact | A: a colleague's broken budget file, a handed-over tracker · B: a model with planted errors, a data-room tape |
+| 6 | Models I | **B-heavy** | valuation craft — this is the banker/consultant's specialization | comps, DCF, football field, accretion/dilution, S&U, the valuation page |
+| 7 | Models II | **B** | schedules, revolvers, waterfalls, covenants — desk craft with no corporate-generic twin | debt schedules, LBO returns, cascades, 13-week cash |
+| 8 | Full Builds | **B** | the interview-test endgame the catalog funnels to | three-statement, operating model, LBO build, dashboards |
+
+**Chapter-2 assignment (this wave, r429 — locked):** decimals **A** (ops scorecard) · center **A**
+(pipeline summary, already compliant) · autofit **A** (headcount/department roster — long labels are
+exactly why autofit exists) · combo **B** (raw pasted comp sheet) · gauntlet★ **B** (sources & uses —
+the capstone stays the aspirational artifact). With typeset **A** (memo) and ruleoff/ruleaudit/dress/
+housestyle **B** (P&L and schedule fragments), chapter 2 lands 5A/5B — the balance the law requires.
+
+**When you convert an artifact from B to A, convert the DATA, never the DIFFICULTY.** Same beat
+count, same randomization axes, same par band, same craft. A headcount roster with ragged
+department names is exactly as hard to autofit as a comps page — and it is the file audience A
+actually has open.
 
 Explicitly considered and REJECTED: merging lookup2 into lookup (the one-way → legacy → two-way trilogy is a real progression once D2 lands); deleting series/undo (both clear the bar after rework); splitting pastes (five paste kinds are one lesson, and it already chains); adding F4-repeat-last-action or multi-sheet drills (engine gaps — PIPELINE items, not catalog deltas).
 
@@ -389,24 +502,52 @@ Wolf (2026-07-24): "combine this and the column drill to have a more fulsome dri
 ☆ Underline the memo title — the masthead
 **Random:** add stamp-cell site {B12, D12} + one more memo line from a pool. **Aha:** unchanged. **Finish:** the stamp. **Clocks:** std. **Engine:** none.
 
-#### 4.12 decimals — "The decimals pass" · M
+#### 4.12 decimals — "The decimals pass" · M — **WAVE 4 PAGE (r429: §1.0-R3 artifact + ☆ re-cut)**
 **Now:** house-rule decimals over a comps page; checks ~3, mostly one op family repeated (Alt H 9/0) — §8.3 variety risk.
+**ARTIFACT — audience A (§3.1, converted from the comps page):** the **operations scorecard** a
+finance manager circulates monthly — one row per region or product line, columns: Revenue ($),
+Cost ($), **Inventory turns (x)**, **Gross margin (%)**, and a **Median** read line at the bottom.
+WHY the conversion (r429): the lesson is "a decimal standard is a column property", which is
+audience-neutral; the turns column preserves the exact "8.2x, not 8.20x" beat with a metric a
+corporate operator uses weekly (inventory turns), and chapter 2 needs its A-side balance (§3.1).
+Same beats, same axes, same par band — only the file changed. Scenario frame (§1.0-R3(n) rule 2):
+the scorecard goes out to the leadership team this afternoon and the columns read ragged.
 **Beats:**
 1. Set the dollar columns to zero decimals — house rule
-2. Set the multiples column to one decimal — 8.2x, not 8.20x
-3. Set the percent column to one decimal
+2. Set the turns column to one decimal — 8.2x, not 8.20x
+3. Set the margin column to one decimal
 4. Fix the one cell someone hand-formatted to four decimals — [which] varies (planted defect; find it by eye — the column reads ragged)
 5. Bold the median row and add a top border above it — the read line
-☆ Right-align the header row over its numbers
-**Random:** site jitter + which column carries the planted defect + value pools. **Aha:** "decimals are a column property — one ragged cell breaks the read". **Finish:** beat 5. **Clocks:** re-sweep. **Engine:** none. [Before/After Transform]
+☆ **RE-CUT (r429, §1.0-R3(o) — the page's "right-align the header row" was a formatting ☆, dead
+under §1.0(d)):** **COLUMN-SELECTION DISCIPLINE** — each decimal standard applied to the WHOLE
+column in one pass (Ctrl+Space on the column, then the decimal chord) rather than cell by cell.
+Family: *structured selection* (§1.0-R3(o)); it rewards the column-select habit taught in
+rowops/blocksel — Wolf's own "reward for good habits of using the previously taught hotkeys".
+Latch off existing `S.fmtOps` rects (the r425 dress/typeset precedent — a rect spanning the full
+column body counts; supersets count). Skippability proof required in the payload: cell-by-cell
+decimals clear every core beat and win, ☆ stays "☆ ?".
+**Random:** site jitter + which column carries the planted defect + value pools + region/product name pool. **Aha:** "decimals are a column property — one ragged cell breaks the read". **Finish:** beat 5. **Clocks:** re-sweep. **Engine:** none. [Before/After Transform]
 
 #### 4.13 center — "Set the alignment" · S
 **Now:** 3 alignment passes + bold total, layout randomized. Near bar; thin on finish.
+**ARTIFACT — audience A (§3.1, already compliant):** the **sales pipeline summary** — keep it.
+Scenario frame: the weekly pipeline review deck pulls straight from this tab and the columns are
+a mess.
 **Beats:** keep 1–3 (center headers · left labels · right numbers+totals), then:
 4. Bold the total row — alignment holds through it
 5. Add a bottom border under the header row — aligned AND ruled
-☆ Center the title across the table with Center-Across-Selection — never merge (ctrl+1 A; the house anti-merge rule made a beat)
-**Random:** as-is + title width varies. **Aha:** "numbers right, labels left, headers centered — alignment is information". **Finish:** beat 5. **Clocks:** std. **Engine:** ca (center-across) exists (r177).
+6. **Center the title across the table** (PROMOTED TO CORE, r429) — the page banner reads across
+   the columns, not out of one cell
+☆ **RE-CUT (r429, §1.0-R3(o)):** the page's ☆ *was* the title centering — a formatting task, dead
+under §1.0(d). The formatting is now CORE beat 6; the ☆ becomes the **TECHNIQUE** inside it:
+**centre-across-selection instead of merging** (`ca`, Ctrl+1 → A). Family: *one-pass discipline* /
+technique discovery. WHY this is a legal ☆ and not a dress chore (r429 judgment, record it in the
+payload): both routes produce an IDENTICAL visible result, so the star cannot fall out of the
+board's look — it grades only WHICH tool the player reached for, and the house anti-merge rule is
+the mastery being rewarded (a merged title breaks sorting, selection and fills downstream — the
+reason desks ban it). Skippability proof: merging the title clears core beat 6 and wins the drill,
+☆ stays "☆ ?"; centre-across earns it. Guide line teaches the merge trap.
+**Random:** as-is + title width varies. **Aha:** "numbers right, labels left, headers centered — alignment is information". **Finish:** beat 6. **Clocks:** re-sweep (beat added). **Engine:** ca (center-across) exists (r177).
 
 #### 4.14 autofit — "Fix the squeezed columns" · M
 **Now:** 2 checks (autofit labels vs uniform-width data) — the contrast is the lesson but it's a 2-beat board (audit rank 5).
@@ -416,8 +557,21 @@ Wolf (2026-07-24): "combine this and the column drill to have a more fulsome dri
 3. Total the four quarters in the Total column — the grand figure lands as #####
 4. Autofit the Total column — your own number earns its width (the consequence beat: your OWN figure overflows)
 5. Bold the total and add a top border above it
-☆ Set the title bold and autofit the label column around it
-**Random:** label-block site {A1,F1} (as-is) + data-block row rnd + ragged widths rotate + NEW: which column the SUM lands in. **Aha:** relocates to beat 3→4 — "#### is a width problem, not a number problem". **Finish:** beat 5. **Clocks:** re-sweep. **Engine:** none. [chained per §8.1.4]
+☆ **RE-CUT (r429, §1.0-R3(o) — "set the title bold and autofit the label column" was a formatting
+☆, dead under §1.0(d)):** **ONE-PASS AUTOFIT** — every squeezed label column selected TOGETHER and
+autofitted in a single pass, not column by column. Family: *one-pass discipline*; it is the drill's
+own lesson taken one level up ("autofit is for content" — and content-fitting scales to a
+selection). Latch: prefer existing telemetry; if no width-op log exists, add `S.widthOps` following
+the `S.fmtOps` pattern (grading-only, records prop/rect per autofit or set-width) — that is a §9.2
+payload item and needs the written justification. Skippability proof: column-by-column autofit
+clears every core beat and wins, ☆ stays "☆ ?".
+**ARTIFACT — audience A (§3.1, converted):** the **department headcount roster** — one row per
+department with a long, ragged name ("Customer Success — EMEA", "Regulatory & Compliance"), four
+quarterly headcount columns, and a Total column. WHY (r429): long ragged labels ARE the reason
+autofit exists, and this is the file audience A opens constantly; the "uniform width for print"
+lesson lands harder on a roster that gets printed for a staffing review than on an abstract block.
+Scenario frame: the roster prints for tomorrow's staffing review and half of it reads ####.
+**Random:** label-block site {A1,F1} (as-is) + data-block row rnd + ragged widths rotate + department-name pool + NEW: which column the SUM lands in. **Aha:** relocates to beat 3→4 — "#### is a width problem, not a number problem". **Finish:** beat 5. **Clocks:** re-sweep. **Engine:** none (unless the ☆ needs `S.widthOps`). [chained per §8.1.4]
 
 #### 4.15 ruleoff — "Rule off the schedule" · S
 **Now:** border grammar (line under headers, line above totals, outline the headline) + EBITDA pull-through; r199/r200 literal-border language mostly applied; audit flags residual "box" verb at 2232.
@@ -440,9 +594,23 @@ Wolf (2026-07-24): "combine this and the column drill to have a more fulsome dri
 
 #### 4.17 combo — "Clean the paste" · S
 **Now:** bold/comma/wrap/autofit a pasted table — 4 beats, one artifact; deliberately loads ##### at start (fit-sweep exempt).
+**ARTIFACT — audience B (§3.1, keep):** the **raw pasted comp sheet** — chapter 2's B-side, and the
+paste-arrived-filthy story is exactly a banker's morning. Scenario frame: it came out of the data
+provider ten minutes ago and the MD wants it in the book.
 **Language pass + bonus:**
-☆ Color the pasted inputs blue — the paste arrived black
-**Random:** verify site + content pools; add wrap-note position variance. **Aha:** unchanged. **Finish:** autofit beat closes. **Clocks:** std. **Engine:** none.
+☆ **RE-CUT (r429, §1.0-R3(o) — "color the pasted inputs blue" was a formatting ☆, dead under
+§1.0(d); if the blue is real work on this board, PROMOTE it to a core beat rather than deleting
+it, per (o)):** **CURRENT-REGION SELECTION** — the pasted block grabbed with Ctrl+A
+(current-region, the r219 engine behaviour: first press = the region around the cursor) to drive a
+format pass, instead of arrowing or dragging the range. Family: *structured selection*; a pasted
+block IS a current region, so the drill's own story teaches the chord. Latch: the format-pass rect
+must match the region rect (reuse `S.fmtOps`); if region-selection provenance can't be inferred
+from the rect alone, add minimal `S.selOps` telemetry as a §9.2 payload item with justification.
+Skippability proof: hand-selecting the block clears every core beat and wins, ☆ stays "☆ ?".
+Chapter check (§1.0-R3(o) "vary the family"): decimals uses column-select, combo uses
+current-region, autofit uses one-pass, gauntlet uses format-cloning, center uses technique —
+five distinct families, no repeat.
+**Random:** verify site + content pools; add wrap-note position variance. **Aha:** unchanged. **Finish:** autofit beat closes. **Clocks:** std. **Engine:** none (unless the ☆ needs `S.selOps`).
 
 #### 4.18 dress — "Full formatting pass" · S
 **Now:** 6-ish beats to book-ready; audit flags "Circle"/"Dress"/"rule it" labels (2480–2487) and one lenient CHECK1.
@@ -474,8 +642,20 @@ Wolf (2026-07-24): "combine this and the column drill to have a more fulsome dri
 4. Comma-format both money columns — zero decimals
 5. Autofit every column that reads #####
 6. Finish at A1 — the page is ready for the book
-☆ Center the two side headings across their columns — never merge
-**Gate:** clean run opens Formulas I. **Random:** side widths/labels/values pools + which columns squeeze. **Aha:** "model-ready is a sequence you can run cold — inputs, totals, rules, numbers, widths". **Finish:** beat 6. **Clocks:** capstone pass=par×2.0. **Engine:** none.
+☆ **RE-CUT (r429, §1.0-R3(o) — "center the two side headings" was a formatting ☆, dead under
+§1.0(d); it also failed the §1.0-R2(i) skippability spirit by riding along with the dress pass):**
+**FORMAT CLONING** — the Uses side dressed by copying the finished Sources block and
+paste-special-FORMATS onto its twin, in one pass, instead of re-running every dress by hand on the
+second side. Family: *format cloning*; it chains the `pastes` lesson into the chapter capstone,
+which is exactly what a capstone is for (§2.4), and it is the real move a desk makes on a
+two-sided table. Latch off existing `S.pasteOpLog` (kind=formats, dest rect covering the Uses
+block). Skippability proof required: dressing both sides by hand clears all six core beats and
+wins the capstone — the gate NEVER depends on the ☆ (§2.2: a bonus can never gate anything, and
+this one sits on a gating drill, so the payload must assert it explicitly).
+**ARTIFACT — audience B (§3.1, keep):** **sources & uses** — the capstone stays the aspirational
+deal artifact, and it is the chapter's summative "make it model-ready" page. Scenario frame: the
+S&U goes into the committee book tonight.
+**Gate:** clean run opens Formulas I. **Random:** side widths/labels/values pools + which columns squeeze. **Aha:** "model-ready is a sequence you can run cold — inputs, totals, rules, numbers, widths". **Finish:** beat 6. **Clocks:** capstone pass=par×2.0. **Engine:** none. **Capstone wiring:** follow the modeltour template exactly (AUDIT.md r425 entry) — `meta.gauntlet.capstone:true`, `HOTKEY_CAMPAIGN.chapters[1].capstone:'gauntlet'`, `HOTKEY_CLOCKS.gauntlet={pass:par*2}`, shared `hkCapstoneOk`, picker ★ CAPTAG, both grandfather rules, access never blocked.
 
 ### CH 3 · FORMULAS I (12)
 
