@@ -1728,9 +1728,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=290"></script>
+<script src="drills.js?v=292"></script>
 
-<script src="drills.js?v=290"></script>
+<script src="drills.js?v=292"></script>
 
 
 
@@ -3144,56 +3144,124 @@ const CHALLENGES = {
     }
   },
   anchor:{
-    name:'Anchors', label:'Pin the reference', par:16, parKeys:13,
-    aha:'F4 cycles the anchors — $A$1 locks both, A$1 the row, $A1 the column; one formula fills the grid.',
-    prompt:'Fill a 3×3 revenue grid from one formula. Price points run across the top, volumes down the side. A reference has four lock states — pin the volume column with $B, pin the price row with $3, and the fill builds the other eight cells. The same anchoring runs every sensitivity table later.',
-    req(){ const o=this._o; return '<em>'+o.tl+'</em> · =B'+o.r0+' <em>F4 F4 F4</em> → $B'+o.r0+' · * · C'+o.hr+' <em>F4 F4</em> → C$'+o.hr+' · <em>↵</em> · fill '+o.col+' ↓ · fill '+o.grid+' →'; },
+    /* r429 (H6b wave 5, DEPTH_PASS §4.23 + §1.0/§1.0-R2/§1.0-R3): depth-pass rework.
+       JUDGMENT CALLS (per WORKFLOW.md §8):
+       · ARTIFACT: the price × volume grid stays — it is already audience-neutral (a pricing grid
+         is a sales manager's file and a banker's sensitivity table in the same shape), which is
+         exactly what §1.0-R3(n) rule 5 asks for. Products/segments are the labels; the §3.1 c3
+         A-lean balance is carried by margin/foot/percent/growth around it.
+       · §4.23's ☆ ("enter the check — the far corner as a second, independent read") is KEPT. It
+         is the one pre-playtest ☆ in this wave that is NOT a formatting task, so §1.0-R3(o) does
+         not kill it: it is a skippable mastery DISCIPLINE (all five cores clear without it), and
+         desk doctrine already prizes the independent read. §1.0-R3(o)'s family list gains
+         INDEPENDENT PROVE-OUT for it. NOTE for the playtest: foot's beat 5 is also a prove-out, so
+         c3 now carries the idea twice — once as core, once as a ☆. If that reads repetitive to
+         Wolf, anchor's is the one to re-cut.
+       · ANCHORS ARE GRADED VIA FORMULA TEXT ($B, $row) per the §4.23 note — anchoring IS the
+         lesson, the sanctioned doctrine §2.2 exception to end-state-only grading.
+       · CHECK2 GAINS ITS FILL LATCH (the systemic audit finding the page names): the grid check
+         previously accepted nine hand-typed formulas; it now also requires the census — every
+         grid cell a translate of the corner — so "one formula fills the grid" is actually graded.
+       · D12 de-hint: the drills.js tab moves 'F4' → 'Anchors' and the desc drops the chord. */
+    name:'Anchors', label:'Pin the reference', par:34, parKeys:31, saveClose:true,
+    aha:'a reference has four lock states — pin the right two and one formula prices the whole grid.',
+    prompt:'The pricing grid needs filling: volumes run down the side, price points across the top, and every cell is a volume times a price. Write it ONCE in the top-left corner with the right two locks, and the fill builds the other eight. Then dress it as a quote block and take a second, independent read on the far corner — the same anchoring runs every sensitivity table you will ever build.',
+    req(){ const o=this._o; return '<em>'+o.tl+'</em> · =B'+o.r0+' <em>F4</em>×3 → $B'+o.r0+' · * · '+colLetter(3)+o.hr+' <em>F4</em>×2 → C$'+o.hr+' · <em>↵</em> · fill '+o.col+' ↓ · fill '+o.grid+' → · <em>ctrl+shift+$</em> · <em>alt h b s</em> · check <em>'+o.chk+'</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): labels are OUTCOME lines; the route lives here. */
     guide(){ const o=this._o; return [
-      'at '+o.tl+' · type <kbd>=B'+o.r0+'</kbd> then <kbd>F4</kbd> ×3 — watch it cycle to <b>$B'+o.r0+'</b>: column pinned, row free',
-      '<kbd>*</kbd> · type <kbd>C'+o.hr+'</kbd> then <kbd>F4</kbd> ×2 — <b>C$'+o.hr+'</b>: row pinned, column free · <kbd>↵</kbd>',
-      'select '+o.col+' · <kbd>ctrl</kbd>+<kbd>d</kbd> · select '+o.grid+' · <kbd>ctrl</kbd>+<kbd>r</kbd> — nine prices from one formula',
+      'at <em>'+o.tl+'</em> · type <kbd>=B'+o.r0+'</kbd> then <kbd>F4</kbd> ×3 — watch it cycle to <b>$B'+o.r0+'</b>: column pinned, row free · <kbd>*</kbd> · type <kbd>C'+o.hr+'</kbd> then <kbd>F4</kbd> ×2 — <b>C$'+o.hr+'</b>: row pinned, column free · <kbd>↵</kbd>',
+      'select <em>'+o.col+'</em> · <kbd>ctrl</kbd>+<kbd>d</kbd> — the price reference stays on its row while the volume walks down',
+      'select <em>'+o.grid+'</em> · <kbd>ctrl</kbd>+<kbd>r</kbd> — nine prices, one formula, no retyping',
+      'the grid reads as money — select <em>'+o.grid+'</em> · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>$</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice for whole dollars',
+      'the quote block ships boxed — select <em>'+o.grid+'</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> (S is the OUTSIDE border; A would box every cell)',
+      '☆ the discovery: check your own work. In <em>'+o.chk+'</em> read the far corner a second way — <kbd>=B'+(o.r0+o.n-1)+'*'+o.lastC+o.hr+'</kbd> pointed straight at the two blue inputs. If it does not match the grid, the anchors were wrong',
     ]; },
-    targets(){ const o=this._o; return [o.tl, o.grid]; },
+    targets(){ const o=this._o; return [o.tl, o.col, o.grid, o.grid, o.grid, o.chk]; },
     demo(){ const o=this._o; return [
       {sel:o.tl, keys:[...T('=B'+o.r0), {key:'F4'},{key:'F4'},{key:'F4'}, {key:'*'}, ...T('C'+o.hr), {key:'F4'},{key:'F4'}, Kb.enter]},
       {sel:o.col, keys:[Kb.fillD]},
       {sel:o.grid, keys:[Kb.fillR]},
+      {sel:o.grid, keys:[{key:'$',ctrl:true,shift:true}, Kb.alt,L('H'),D(9), Kb.alt,L('H'),D(9)]},
+      {sel:o.grid, keys:[Kb.alt,L('H'),L('B'),L('S')]},
+      /* the ☆ — the independent read (§2.2: the demo performs the bonus so replay covers it) */
+      {sel:o.chk, keys:[...T('=B'+(o.r0+o.n-1)+'*'+o.lastC+o.hr), Kb.enter]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — revenue grid (price × volume)',txt:true,bold:true};
-      const hr=3, r0=4;
+      const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+      /* §1.2 axes: (a) NEW 4-spot site pool (the audit's "move the grid per seed" ask — it was
+         nailed to C4); (b) product-name pool; (c) price/volume magnitudes; (d) grid DEPTH 3–4
+         rows, which moves the check cell and the far corner every seed. */
+      const spots=[{hr:3,r0:4},{hr:4,r0:5},{hr:5,r0:6},{hr:6,r0:7}];
+      const sp=spots[rnd(0,3)], hr=sp.hr, r0=sp.r0;
+      const n=rnd(3,4);                       // volume rows
+      const nP=3;                             // price points across
+      cells['A1']={...blankCell(),value:codename()+' — pricing grid (volume × price)',txt:true,bold:true};
       cells['A'+hr]={...blankCell(),value:'Price →',txt:true,align:'r'};
-      cells['A'+(r0+3)]={...blankCell(),value:'Volume ↓ col B',txt:true};
+      cells['B'+hr]={...blankCell(),value:'Volume',txt:true,bold:true,align:'r'};
       const base=rnd(20,45);
       this._px=[]; this._vol=[];
-      for(let j=0;j<3;j++){ const p=base+j*rnd(2,5);
-        this._px.push(p);
+      for(let j=0;j<nP;j++){ const p=base+j*rnd(2,5); this._px.push(p);
         cells[colLetter(3+j)+hr]={...blankCell(),value:p,fontColor:'blue',fmtStyle:'currency',decimals:2,align:'r'}; }
-      const pool=['Standard','Plus','Enterprise','Starter','Custom'];
-      for(let k=pool.length-1;k>0;k--){ const j=rnd(0,k); [pool[k],pool[j]]=[pool[j],pool[k]]; }
-      for(let i=0;i<3;i++){ const v=rnd(12,90)*10;
-        this._vol.push(v);
+      const pool=shuffle(['Standard','Plus','Enterprise','Starter','Custom','Trade']).slice(0,n);
+      for(let i=0;i<n;i++){ const v=rnd(12,90)*10; this._vol.push(v);
         cells['A'+(r0+i)]={...blankCell(),value:pool[i],txt:true};
-        cells['B'+(r0+i)]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
-      this._o={ hr:hr, r0:r0, tl:'C'+r0, col:'C'+r0+':C'+(r0+2), grid:'C'+r0+':E'+(r0+2) };
-      return {ROWS:9, cells, active:{r:r0,c:3}, sel:null, colW:{1:110}};
+        cells['B'+(r0+i)]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        for(let j=0;j<nP;j++) cells[colLetter(3+j)+(r0+i)]={...blankCell()};
+      }
+      const lastC=colLetter(2+nP), chkRow=r0+n+1;
+      cells['A'+chkRow]={...blankCell(),value:'Independent check',txt:true};
+      cells[lastC+chkRow]={...blankCell(),fill:'yellow',ball:true,fmtStyle:'currency',decimals:0};
+      this._o={ hr:hr, r0:r0, n:n, nP:nP, lastC:lastC, tl:'C'+r0,
+        col:'C'+r0+':C'+(r0+n-1), grid:'C'+r0+':'+lastC+(r0+n-1),
+        chk:lastC+chkRow, chkRow:chkRow };
+      return {ROWS:Math.max(11,chkRow+2), cells, active:{r:r0,c:3}, sel:null, colW:{1:110}};
     },
     checks(S){
       const o=this._o;
+      const cell=k=>S.cells[k]||{};
       const norm=f=>String(f||'').toUpperCase().replace(/\s/g,'');
-      const first=S.cells[o.tl]||{};
-      const pinOk=/\$B\d+\*[C-E]\$\d+/.test(norm(first.formula))||/[C-E]\$\d+\*\$B\d+/.test(norm(first.formula));
-      let gridOk=true;
-      for(let i=0;i<3;i++) for(let j=0;j<3;j++){
-        const cc=S.cells[colLetter(3+j)+(o.r0+i)];
-        const exp=this._vol[i]*this._px[j];
-        if(!cc||!cc.formula||typeof cc.value!=='number'||Math.abs(cc.value-exp)>0.5){ gridOk=false; }
-        else { const nf=norm(cc.formula); if(!(nf.includes('$B')&&nf.includes('$'+o.hr))) gridOk=false; }
+      const first=cell(o.tl);
+      const nf0=norm(first.formula);
+      const pinOk=/\$B\d+\*[C-F]\$\d+/.test(nf0)||/[C-F]\$\d+\*\$B\d+/.test(nf0);
+      /* CHECK2 now carries its FILL LATCH (the §4.23 systemic finding): every grid cell must be a
+         TRANSLATE of the corner — nine hand-typed formulas no longer pass as "one formula fills
+         the grid". Values and anchors are still graded too. */
+      let gridOk=!!first.formula, census=!!first.formula;
+      for(let i=0;i<o.n;i++) for(let j=0;j<o.nP;j++){
+        const k=colLetter(3+j)+(o.r0+i), cc=cell(k), exp=this._vol[i]*this._px[j];
+        if(!cc.formula||typeof cc.value!=='number'||Math.abs(cc.value-exp)>0.5){ gridOk=false; continue; }
+        const nf=norm(cc.formula);
+        if(!(nf.includes('$B')&&nf.includes('$'+o.hr))) gridOk=false;
+        if(first.formula && cc.formula!==translateFormula(first.formula,i,j)) census=false;
       }
+      const money=(()=>{ for(let i=0;i<o.n;i++) for(let j=0;j<o.nP;j++){ const c=cell(colLetter(3+j)+(o.r0+i));
+        if(c.fmtStyle!=='currency'||(c.decimals|0)!==0) return false; } return true; })();
+      /* outside border: perimeter flags OR per-cell all-borders both count (§1.0-R2(m): S is the
+         outside chord, A is all — either end state ships a boxed block) */
+      const boxed=(()=>{ const r1=o.r0, r2=o.r0+o.n-1, c1=3, c2=2+o.nP;
+        for(let r=r1;r<=r2;r++) for(let c=c1;c<=c2;c++){ const x=cell(colLetter(c)+r);
+          if(x.ball) continue;
+          const needT=r===r1, needB=r===r2, needL=c===c1, needR=c===c2;
+          if(needT&&!x.bt) return false; if(needB&&!x.bb) return false;
+          if(needL&&!x.bl) return false; if(needR&&!x.br) return false; }
+        return true; })();
+      /* ☆ (§1.0(d) mystery slot · §1.0-R3(o) INDEPENDENT PROVE-OUT family — kept from §4.23, the
+         one pre-playtest ☆ in this wave that is not a formatting task): the far corner read a
+         SECOND way, straight off the two blue inputs, and agreeing with the grid. Skippable — all
+         five cores clear without touching the check cell. */
+      const far=cell(o.lastC+(o.r0+o.n-1));
+      const chk=cell(o.chk);
+      const expFar=this._vol[o.n-1]*this._px[o.nP-1];
+      const starOk=!!(chk.formula && typeof chk.value==='number' && Math.abs(chk.value-expFar)<0.5
+        && typeof far.value==='number' && Math.abs(far.value-chk.value)<0.5);
       return [
-        {label:'pin the driver formula both ways — $B locks the volume, $'+o.hr+' locks the price row', ok: pinOk},
-        {label:'fill the grid — all nine cells live, every price × volume right', ok: gridOk},
+        {label:'Build the corner price — the volume column locked, the price row locked', ok: pinOk},
+        {label:'Carry the corner down the volume column — the price reference stays on its row', ok: gridOk && census},
+        {label:'Carry it across the grid — nine prices from one formula', ok: gridOk && census},
+        {label:'Dollar-format the grid — whole dollars', ok: money},
+        {label:'Add an outside border around the grid — the quote block ships', ok: boxed},
+        {label:'☆ the far corner read a second way, straight off the two inputs — and it agrees', ok: starOk, bonus:true},
       ];
     }
   },
@@ -5267,48 +5335,115 @@ const CHALLENGES = {
     }
   },
   foot:{
-    name:'Foot', label:'Foot the table both ways', par:11, parKeys:8,
-    aha:'Alt+= proposes the SUM it sees — total the rows, the columns, and the corner.',
-    prompt:'Total a segment × quarter block in every direction: total each row, total each column, and land the grand total where they meet. AutoSum reads the block and proposes each SUM for you — faster than typing it out. The corner total must tie to both edges.',
-    req:'<em>F2</em> · <em>alt+=</em> <em>↵</em> · fill F2:F5 ↓ · <em>B6</em> · <em>alt+=</em> <em>↵</em> · fill B6:E6 → · <em>F6</em> grand · <em>alt+=</em> <em>↵</em>',
-    guide:[
-      'row totals: F2 · <kbd>alt</kbd>+<kbd>=</kbd> proposes =SUM(B2:E2) — it read the row · <kbd>↵</kbd> · select F2:F5 · <kbd>ctrl</kbd>+<kbd>d</kbd>',
-      'column totals: B6 · <kbd>alt</kbd>+<kbd>=</kbd> proposes =SUM(B2:B5) · <kbd>↵</kbd> · select B6:E6 · <kbd>ctrl</kbd>+<kbd>r</kbd>',
-      'the corner: F6 · <kbd>alt</kbd>+<kbd>=</kbd> — it sums the row totals above, and that must agree with the column edge',
-    ],
-    targets:['F2:F5','B6:E6','F6'],
-    demo(){ return [
-      {sel:'F2', keys:[Kb.eq, Kb.enter]},
-      {sel:'F2:F5', keys:[Kb.fillD]},
-      {sel:'B6', keys:[Kb.eq, Kb.enter]},
-      {sel:'B6:E6', keys:[Kb.fillR]},
-      {sel:'F6', keys:[Kb.eq, Kb.enter]},
+    /* r429 (H6b wave 5, DEPTH_PASS §4.22 + §1.0/§1.0-R2/§1.0-R3): depth-pass rework.
+       JUDGMENT CALLS (per WORKFLOW.md §8):
+       · ARTIFACT: "segment × quarter ($mm)" → REVENUE BY REGION AND QUARTER ($000s) — same matrix,
+         audience-A framing per the §3.1 map (c3 is A-lean 2:1). Cross-footing a grid is the most
+         audience-neutral skill in the catalog; only the units and the row labels changed.
+       · §4.22's "☆ Comma-format the entire block, one pass" is a FORMATTING ☆ — dead under
+         §1.0(d). Re-cut per §1.0-R3(o) to REFERENCE-OVER-RETYPE: the corner built off an EDGE
+         (the Total column or the Total row) instead of re-summing the raw block. That IS the
+         cross-foot insight — the corner is not a third independent total, it is the edge summed
+         once more — and it is genuinely skippable: =SUM(raw block) clears beat 3 all day.
+       · §4.22's language note applied: the prompt's old "never type a SUM" claim is GONE
+         (AutoSum is the guide's route; a typed SUM passes — §1.0(c) Freedom Doctrine, and the
+         AUDIT_R417 §D finding that the copy contradicted what sumishF actually graded).
+       · Beat 5 (the zero check) is the §1.6 finish-state beat: it PROVES the foot rather than
+         dressing it, which is why the aha lands at beat 3 and is banked at beat 5. */
+    name:'Foot', label:'Foot the table both ways', par:32, parKeys:29, saveClose:true,   /* r429: par re-swept post-rework — 5-seed sweep median 29 keys, 0% drift after retune; par 32s \u2248 1.10 s/key. Was 11/8: the drill gained the dress beat, the cross-foot prove-out and a 3-5 \u00d7 3-4 variable block. */
+    aha:'a corner total is not a third opinion — it is the edge, summed once more, and the zero check is what proves it.',
+    prompt:'The regional revenue grid goes into the quarterly pack with no totals on it at all. Total every region across its four quarters, total every quarter down its regions, and land the grand total where the two edges meet. Then prove it: the check line should read exactly zero. AutoSum will read the block and propose each SUM for you, but a formula you type by hand counts the same.',
+    req(){ const o=this._o; return '<em>'+o.tCol+o.r0+'</em> <em>alt+=</em> · fill down · <em>B'+o.tr+'</em> <em>alt+=</em> · fill right · corner <em>'+o.tCol+o.tr+'</em> · Total row + column <em>ctrl+b</em>, row <em>alt h b p</em> · check <em>'+o.chk+'</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): labels are OUTCOME lines; the route lives here. */
+    guide(){ const o=this._o; return [
+      'row totals — on <em>'+o.tCol+o.r0+'</em> · <kbd>alt</kbd>+<kbd>=</kbd> proposes the SUM it reads across the row · <kbd>↵</kbd> · select down to <em>'+o.tCol+(o.tr-1)+'</em> · <kbd>ctrl</kbd>+<kbd>d</kbd>',
+      'column totals — on <em>B'+o.tr+'</em> · <kbd>alt</kbd>+<kbd>=</kbd> · <kbd>↵</kbd> · select across to <em>'+o.lastQ+o.tr+'</em> · <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'the corner at <em>'+o.tCol+o.tr+'</em> — <kbd>alt</kbd>+<kbd>=</kbd> reads the Total column above it; that figure has to agree with the Total row beside it too',
+      'the two totals earn their weight — select the Total row and the Total column · <kbd>ctrl</kbd>+<kbd>b</kbd> · and on the Total row <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> (a total rules on TOP)',
+      'prove it — in <em>'+o.chk+'</em> enter the corner minus the Total column added up on its own: <kbd>='+o.tCol+o.tr+'-SUM('+o.tCol+o.r0+':'+o.tCol+(o.tr-1)+')</kbd> <kbd>↵</kbd>. A footed table reads exactly zero',
+      '☆ the discovery: the corner is not a third total. Sum the EDGE you already built — the Total column (or the Total row) — instead of re-adding the whole block; that is what cross-footing means',
+    ]; },
+    targets(){ const o=this._o; return [o.tCol+o.r0+':'+o.tCol+(o.tr-1), 'B'+o.tr+':'+o.lastQ+o.tr, o.tCol+o.tr, 'A'+o.tr+':'+o.tCol+o.tr, o.chk, o.tCol+o.tr]; },
+    demo(){ const o=this._o; return [
+      {sel:o.tCol+o.r0, keys:[Kb.eq, Kb.enter]},
+      {sel:o.tCol+o.r0+':'+o.tCol+(o.tr-1), keys:[Kb.fillD]},
+      {sel:'B'+o.tr, keys:[Kb.eq, Kb.enter]},
+      {sel:'B'+o.tr+':'+o.lastQ+o.tr, keys:[Kb.fillR]},
+      /* the ☆ route: AutoSum on the corner reads the Total COLUMN above it — the edge, not the
+         raw block (§2.2: the demo performs the bonus so replay covers it) */
+      {sel:o.tCol+o.tr, keys:[Kb.eq, Kb.enter]},
+      {sel:'A'+o.tr+':'+o.tCol+o.tr, keys:[Kb.bold, Kb.alt,L('H'),L('B'),L('P')]},
+      {sel:o.tCol+o.r0+':'+o.tCol+o.tr, keys:[Kb.bold]},
+      {sel:o.chk, keys:[...T('='+o.tCol+o.tr+'-SUM('+o.tCol+o.r0+':'+o.tCol+(o.tr-1)+')'), Kb.enter]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — segment × quarter ($mm)',txt:true,bold:true};
-      const segs=['Industrial','Consumer','Services','Energy'];
-      ['Q1','Q2','Q3','Q4'].forEach((q,j)=>cells[colLetter(2+j)+1]={...blankCell(),value:q,txt:true,bold:true,align:'r'});
-      cells['F1']={...blankCell(),value:'Total',txt:true,bold:true,align:'r'};
-      this._g=0;
-      for(let i=0;i<4;i++){ cells['A'+(2+i)]={...blankCell(),value:segs[i],txt:true};
-        for(let j=0;j<4;j++){ const v=rnd(10,90)*10; this._g+=v;
-          cells[colLetter(2+j)+(2+i)]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
-        cells['F'+(2+i)]={...blankCell(),fmtStyle:'comma',decimals:0}; }
-      cells['A6']={...blankCell(),value:'Total',txt:true,bold:true};
-      for(let j=0;j<4;j++) cells[colLetter(2+j)+6]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
-      cells['F6']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
-      return {ROWS:8, cells, active:{r:2,c:6}, sel:null, colW:{1:104}};
+      const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+      /* §1.2 axes: (a) site from a 3-spot pool (the whole grid slides down); (b) region-name pool
+         Fisher-Yates; (c) every figure through rnd(); (d) BLOCK SIZE — 3–5 regions × 3–4 quarters,
+         which moves the Total row, the Total column, the corner and the check cell every seed. */
+      const d=rnd(0,2), hr=2+d;
+      const nSeg=rnd(3,5), nQ=rnd(3,4);
+      const regions=shuffle(['North','South','Midwest','Northeast','Mountain','Pacific','Southeast']).slice(0,nSeg);
+      const r0=hr+1, tr=hr+nSeg+1, tc=2+nQ, tCol=colLetter(tc), lastQ=colLetter(1+nQ);
+      cells['A1']={...blankCell(),value:codename()+' — revenue by region and quarter ($000s)',txt:true,bold:true};
+      cells['A'+hr]={...blankCell(),value:'Region',txt:true,bold:true};
+      for(let j=0;j<nQ;j++) cells[colLetter(2+j)+hr]={...blankCell(),value:'Q'+(j+1),txt:true,bold:true,align:'r'};
+      cells[tCol+hr]={...blankCell(),value:'Total',txt:true,bold:true,align:'r'};
+      let grand=0; const rowSum=[], colSum=new Array(nQ).fill(0);
+      for(let i=0;i<nSeg;i++){ const r=r0+i; let rs=0;
+        cells['A'+r]={...blankCell(),value:regions[i],txt:true};
+        for(let j=0;j<nQ;j++){ const v=rnd(10,90)*10; rs+=v; colSum[j]+=v; grand+=v;
+          cells[colLetter(2+j)+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0}; }
+        cells[tCol+r]={...blankCell(),fmtStyle:'comma',decimals:0};
+        rowSum.push(rs);
+      }
+      cells['A'+tr]={...blankCell(),value:'Total',txt:true};
+      for(let j=0;j<nQ;j++) cells[colLetter(2+j)+tr]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells[tCol+tr]={...blankCell(),fmtStyle:'comma',decimals:0};
+      /* the prove-out line, labelled on the board (§1.3 labelled targets) and dressed as the
+         §1.0(f) input convention so it reads as a cell that wants something entered */
+      const chkRow=tr+2;
+      cells['A'+chkRow]={...blankCell(),value:'Cross-foot check',txt:true};
+      cells[tCol+chkRow]={...blankCell(),fill:'yellow',ball:true,fmtStyle:'comma',decimals:0};
+      this._o={ hr:hr, r0:r0, tr:tr, nSeg:nSeg, nQ:nQ, tc:tc, tCol:tCol, lastQ:lastQ,
+        chk:tCol+chkRow, chkRow:chkRow, grand:grand, rowSum:rowSum, colSum:colSum };
+      return {ROWS:Math.max(11,chkRow+2), cells, active:{r:r0,c:tc}, sel:null, colW:{1:104}};
     },
     checks(S){
-      const val=k=>{ const c=S.cells[k]; return c&&typeof c.value==='number'?c.value:NaN; };
-      const live=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&sumishF(c.formula)); };
-      const rowOk=r=>live('F'+r)&&Math.abs(val('F'+r)-(val('B'+r)+val('C'+r)+val('D'+r)+val('E'+r)))<1e-6;
-      const colOk=cc=>{ const L2=colLetter(cc); return live(L2+'6')&&Math.abs(val(L2+'6')-(val(L2+'2')+val(L2+'3')+val(L2+'4')+val(L2+'5')))<1e-6; };
+      const o=this._o;
+      const cell=k=>S.cells[k]||{};
+      const val=k=>{ const c=cell(k); return typeof c.value==='number'?c.value:NaN; };
+      const live=k=>{ const c=cell(k); return !!(c.formula && sumishF(c.formula)); };
+      const rowsOk=[...Array(o.nSeg).keys()].every(i=>{ const r=o.r0+i;
+        return live(o.tCol+r) && Math.abs(val(o.tCol+r)-o.rowSum[i])<1e-6; });
+      const colsOk=[...Array(o.nQ).keys()].every(j=>{ const L2=colLetter(2+j);
+        return live(L2+o.tr) && Math.abs(val(L2+o.tr)-o.colSum[j])<1e-6; });
+      const cornerOk=live(o.tCol+o.tr) && Math.abs(val(o.tCol+o.tr)-o.grand)<1e-6;
+      /* beat 4 — the Total ROW rules on top (§1.0(f)); both edges read bold */
+      const dressOk=(()=>{ for(let c=1;c<=o.tc;c++){ const x=cell(colLetter(c)+o.tr); if(!x.bold||!x.bt) return false; }
+        for(let i=0;i<o.nSeg;i++){ if(!cell(o.tCol+(o.r0+i)).bold) return false; } return true; })();
+      /* beat 5 — the prove-out: a LIVE formula in the check cell reading zero (any route: minus a
+         SUM, minus the row-total edge, a subtraction of the two corners — all legal, §1.0(c)) */
+      const chk=cell(o.chk);
+      const chkOk=!!(chk.formula && typeof chk.value==='number' && Math.abs(chk.value)<1e-6 && cornerOk);
+      /* ☆ (§1.0(d) mystery slot · §1.0-R3(o) REFERENCE-OVER-RETYPE family): the corner built off an
+         EDGE — its formula reaches into the Total column or the Total row — instead of re-summing
+         the raw data block. That is what cross-footing means: the corner is the edge summed once
+         more, not a third independent opinion. Re-adding the whole block clears beat 3 and wins
+         (§1.0(c)); it just never latches. Graded on the corner's own formula TEXT, which is the
+         sanctioned exception class (doctrine §2.2 — the reference IS the lesson here). */
+      const cf=String(cell(o.tCol+o.tr).formula||'').toUpperCase().replace(/\s/g,'');
+      const edgeCol=new RegExp('\\$?'+o.tCol+'\\$?\\d+:\\$?'+o.tCol+'\\$?\\d+').test(cf);   // down the Total column
+      const edgeRow=new RegExp('\\$?B\\$?'+o.tr+':\\$?'+o.lastQ+'\\$?'+o.tr).test(cf);      // across the Total row
+      const starOk=cornerOk && (edgeCol||edgeRow);
       return [
-        {label:'total every row down column F — live SUMs, not typed numbers', ok: [2,3,4,5].every(rowOk)},
-        {label:'total every column across row 6 — live SUMs', ok: [2,3,4,5].every(c=>colOk(c))},
-        {label:'tie the corner — F6 must agree with BOTH edges', ok: live('F6')&&Math.abs(val('F6')-this._g)<1e-6},
+        {label:'Total every region across its quarters, down the Total column', ok: rowsOk},
+        {label:'Total every quarter down its regions, across the Total row', ok: colsOk},
+        {label:'Total the corner — it has to agree with both edges', ok: cornerOk},
+        {label:'Bold both totals and add a top border above the Total row', ok: dressOk},
+        {label:'Enter the cross-foot check — a footed table reads exactly zero', ok: chkOk},
+        {label:'☆ the corner summed off an edge you already built, not the whole block again', ok: starOk, bonus:true},
       ];
     }
   },

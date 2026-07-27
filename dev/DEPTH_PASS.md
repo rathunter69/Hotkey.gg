@@ -140,7 +140,12 @@ telemetry — `S.fillOps` · `S.pasteOpLog` · `S.pasteLog` · `S.fmtOps` · `S.
   instead of re-dressing by hand;
 - **reference over retype** — the repair pointed at the source so it can never drift again;
 - **anchoring mastery** — anchors set so ONE formula fills a whole block;
-- **the operator clipboard** — one paste-special-multiply/divide pass covering every conversion.
+- **the operator clipboard** — one paste-special-multiply/divide pass covering every conversion;
+- **independent prove-out** (added r429, anchor §4.23) — the answer read a SECOND, independent way
+  and agreeing. NOT an efficiency, which is why it is the narrow exception: it is admissible only
+  where a pre-playtest page already specced it AND the drill's whole lesson is a thing that can be
+  silently wrong (an anchor, a lock, a link). Do not reach for it as a default — §1.0(d)'s "hidden
+  EFFICIENCY discoveries" is still the rule, and a chapter should carry this shape at most once.
 A drill's ☆ must not repeat the ☆ of another drill in the SAME chapter — vary the family.
 
 ### 1.1 Beats

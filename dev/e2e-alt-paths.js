@@ -231,27 +231,57 @@ const ALTS = [
       {sel:o.mixCol, keys:[{key:'d',ctrl:true}]},
       {sel:o.ratioBlk, keys:[{key:'r',ctrl:true}]},
     ]; }` },
-  { key: 'foot', name: 'typed SUMs (no alt+=), columns before rows', moves: `C => [
-      {sel:'B6', keys:[...T('=SUM(B2:B5)'),{key:'Enter'}]},
-      {sel:'B6:E6', keys:[{key:'r',ctrl:true}]},
-      {sel:'F2', keys:[...T('=SUM(B2:E2)'),{key:'Enter'}]},
-      {sel:'F2:F5', keys:[{key:'d',ctrl:true}]},
-      {sel:'F6', keys:[...T('=SUM(F2:F5)'),{key:'Enter'}]},
-    ]` },
+  /* r429 (DEPTH_PASS §4.22 wave 5): both foot entries rebuilt — the pre-rework pair hardcoded a
+     fixed 4x4 block at B2 (the grid is now 3-5 regions x 3-4 quarters and it moves), and predated
+     the dress beat, the cross-foot prove-out and the ☆. */
+  { key: 'foot', name: 'op-ORDER — columns before rows, typed SUMs (no alt+=), corner off the Total ROW edge (the ☆ must latch on EITHER edge)', moves: `C => { const o=C._o, mv=[];
+      mv.push({sel:'B'+o.tr, keys:[...T('=SUM(B'+o.r0+':B'+(o.tr-1)+')'),{key:'Enter'}]});
+      mv.push({sel:'B'+o.tr+':'+o.lastQ+o.tr, keys:[{key:'r',ctrl:true}]});
+      mv.push({sel:o.tCol+o.r0, keys:[...T('=SUM(B'+o.r0+':'+o.lastQ+o.r0+')'),{key:'Enter'}]});
+      mv.push({sel:o.tCol+o.r0+':'+o.tCol+(o.tr-1), keys:[{key:'d',ctrl:true}]});
+      mv.push({sel:o.tCol+o.tr, keys:[...T('=SUM(B'+o.tr+':'+o.lastQ+o.tr+')'),{key:'Enter'}]});
+      mv.push({sel:'A'+o.tr+':'+o.tCol+o.tr, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      mv.push({sel:o.tCol+o.r0+':'+o.tCol+o.tr, keys:[{key:'b',ctrl:true}]});
+      mv.push({sel:o.chk, keys:[...T('='+o.tCol+o.tr+'-SUM('+o.tCol+o.r0+':'+o.tCol+(o.tr-1)+')'),{key:'Enter'}]});
+      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+      return mv; }` },
+  { key: 'foot', name: 'FREEDOM proof — corner re-summed off the RAW BLOCK and ribbon bold (☆ forfeited, all five cores clear)', moves: `C => { const o=C._o, mv=[];
+      mv.push({sel:o.tCol+o.r0, keys:[{key:'=',alt:true},{key:'Enter'}]});
+      mv.push({sel:o.tCol+o.r0+':'+o.tCol+(o.tr-1), keys:[{key:'d',ctrl:true}]});
+      mv.push({sel:'B'+o.tr, keys:[{key:'=',alt:true},{key:'Enter'}]});
+      mv.push({sel:'B'+o.tr+':'+o.lastQ+o.tr, keys:[{key:'r',ctrl:true}]});
+      mv.push({sel:o.tCol+o.tr, keys:[...T('=SUM(B'+o.r0+':'+o.lastQ+(o.tr-1)+')'),{key:'Enter'}]});
+      mv.push({sel:'A'+o.tr+':'+o.tCol+o.tr, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]});
+      mv.push({sel:o.tCol+o.r0+':'+o.tCol+o.tr, keys:[{key:'Alt'},L('h'),D(1)]});
+      mv.push({sel:o.chk, keys:[...T('='+o.tCol+o.tr+'-SUM('+o.tCol+o.r0+':'+o.tCol+(o.tr-1)+')'),{key:'Enter'}]});
+      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+      return mv; }` },
   /* r429: the r199-era decimals alt is RETIRED — it solved the pre-rework comps board
      (o.evR/o.mR/o.pR are gone with §4.12). Its "columns in a different order" coverage lives on
      inside the two r429 entries below, which also carry the ☆ earn/forfeit controls. */
   /* r424 (D17): the colops entry is gone with the drill — its column-op alternates live on
      inside the two rowops entries above (ribbon vs chord routes, insert-vs-delete order). */
-  { key: 'anchor', name: 'dollars typed by hand — no F4 at all', moves: `C => { const o=C._o; return [
+  /* r429 (DEPTH_PASS §4.23 wave 5): both anchor entries rebuilt — the pre-rework pair stopped at
+     the fill (the drill now carries dollar-format, an outside border and the independent-check ☆),
+     and the grid moved off its nailed C4 site onto a 4-spot pool with 3-4 rows. ALT 1 = chord-ROUTE
+     (typed $ instead of F4, ctrl+1 for the money register, Alt H B A all-borders instead of B S —
+     the boxed check accepts either end state per §1.0-R2(m)). ALT 2 = the skippability control. */
+  { key: 'anchor', name: 'chord-ROUTE — dollars typed by hand (no F4), ctrl+1 money register, Alt H B A all-borders instead of the outside chord', moves: `C => { const o=C._o; return [
       {sel:o.tl, keys:[...T('=$B'+o.r0+'*C$'+o.hr),{key:'Enter'}]},
       {sel:o.col, keys:[{key:'d',ctrl:true}]},
       {sel:o.grid, keys:[{key:'r',ctrl:true}]},
+      {sel:o.grid, keys:[{key:'1',ctrl:true},L('C')]},
+      {sel:o.grid, keys:[{key:'Alt'},L('h'),L('b'),L('a')]},
+      {sel:o.chk, keys:[...T('=B'+(o.r0+o.n-1)+'*'+o.lastC+o.hr),{key:'Enter'}]},
+      {sel:'A1', keys:[{key:'s',ctrl:true}]},
     ]; }` },
-  { key: 'anchor', name: 'pointer mode + F4 (arrows grab the refs)', moves: `C => { const o=C._o; return [
+  { key: 'anchor', name: 'pointer mode + F4, check cell left EMPTY (☆ forfeited, all five cores clear)', moves: `C => { const o=C._o; return [
       {sel:o.tl, keys:[{key:'='},{key:'ArrowLeft'},{key:'F4'},{key:'F4'},{key:'F4'},{key:'*'},{key:'ArrowUp'},{key:'F4'},{key:'F4'},{key:'Enter'}]},
       {sel:o.col, keys:[{key:'d',ctrl:true}]},
       {sel:o.grid, keys:[{key:'r',ctrl:true}]},
+      {sel:o.grid, keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+      {sel:o.grid, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
+      {sel:'A1', keys:[{key:'s',ctrl:true}]},
     ]; }` },
   { key: 'sort', name: 'foot and dress BEFORE sorting, single-column sort resolved via the WARNING (e expand)', moves: `C => { const o=C._o;
       const m=o.range.match(/([A-J])(\\d+):([A-J])(\\d+)/);

@@ -3,10 +3,14 @@
 ## ⚡ STATE OF THE QUEUE (r429, 2026-07-27 — READ FIRST; supersedes the r417/r420c block below)
 
 **WHERE THE DEPTH PASS STANDS:**
-- **20/81 live drills at the depth-pass standard** (the C9 REWORKED ledger in dev/check-invariants.js
+- **22/81 live drills at the depth-pass standard** (the C9 REWORKED ledger in dev/check-invariants.js
   is the single source of truth): **Foundations (c1) COMPLETE 9/9** (modeltour★ capstone) ·
   **Formatting (c2) COMPLETE 10/10** (gauntlet★ capstone — a clean run opens Formulas I) ·
-  **Formulas I (c3) 1/12** (margin).
+  **Formulas I (c3) 3/12** (margin · foot · anchor).
+- **VERIFICATION IS NOW GENERIC** — `dev/e2e-depth-contract.js` asserts the universal §1 contract
+  for every drill on the ledger, and `dev/e2e-alt-paths.js` enforces the **☆-forfeit contract** (an
+  alt whose name says "☆ forfeited" MUST clear core with the ☆ dark). A new drill therefore needs
+  NO bespoke probe file — only its two alts, one of which is the skippability control.
 - **Spec is DEPTH_PASS r429** — §1.0 + §1.0-R2 + **§1.0-R3 (the dual-audience real-task law + the ☆
   re-cut sweep)** + **§3.1 the audience map**. Every pre-playtest §4 page still proposes a FORMATTING
   ☆, a class §1.0(d) killed: re-cut it per §1.0-R3(o), do not ask.
@@ -14,9 +18,6 @@
   `fmtOps.dec` · `fmtOps.align` · `widthOps` · `selOps` (r429), joining r424–r425's `fillOps` ·
   `pasteOpLog` · `pasteLog` · `fmtOps` · `cutMoves` · `gotoSpecials`. **Prefer these before adding
   a new one** — gauntlet's ☆ needed none.
-- Wave-1 ROUND-3 fixes (adaptive labels · action-location cues · re-cut ☆s per §1.0-R2) + the r426
-  border-visibility P0 + the r427 engine round (R2-B2/B4/B5) + index-UI + cosmetics renames + the
-  desk-create-PRO server guard all landed in #242. **Spec is DEPTH_PASS r420d** (§1.0 + §1.0-R2).
 - **DOCS DEBT cleared r428:** the source session died mid-assembly; AUDIT.md now carries a
   r426–r427 reconciliation entry (what's verified vs what isn't), this header is current, and the
   wave process is codified as **WORKFLOW.md §9 (the Opus-5 wave playbook — payload contract,
@@ -41,9 +42,12 @@
    SERIALLY in the main checkout, which is how all five of these were done. Two further gotchas:
    worktrees branch from the last COMMIT (commit spec changes before launching), and the workflow's
    `args` arrive JSON-encoded (now normalised in the script).
-1b. **W5 — FORMULAS I (c3) [auto·rolling] — IN FLIGHT.** ✅ **margin** (comp sets → divisional
-   performance pack, audience A; three DIFFERENT ratio asks permuted per seed with §1.0-R2(g)
-   adaptive labels; fill-census ☆). ⏳ **foot · anchor · percent · growth** remain, then
+1b. **W5 — FORMULAS I (c3) [auto·rolling] — IN FLIGHT, 3 of 12.** ✅ **margin** (comp sets →
+   divisional performance pack, audience A; three ratio asks permuted per seed with §1.0-R2(g)
+   adaptive labels; fill-census ☆) · ✅ **foot** (audience-A regional grid; reference-over-retype ☆;
+   gained a dress beat and the cross-foot prove-out; par 11→32) · ✅ **anchor** (4-spot site pool,
+   the fill-census latch CHECK2 was missing, D12 de-hint; independent-prove-out ☆; par 16→34).
+   ⏳ **percent · growth** remain, then
    cagr/bridge/sumif/rollup/fxconvert, then cases + **qclose★ (NEW, D1)**.
    **⚠️ OPEN, WOLF-FACING — PLACEMENT BAND DRIFT (D16 assumption invalidated):** margin's par went
    23→45, moving it mid→LONG where `dress` (41) already sits; the placement set now spans
@@ -52,12 +56,17 @@
    `sort` is reworked in c4 (par 10s today); if margin and dress both sit long, swap one for a
    mid-band drill. Full note in AUDIT r429 margin entry.
 
-2. **WOLF PLAYTEST ROUND 3** — the 14 reworked drills + the platform fixes (borders, ribbon
-   overlay, cursor anchor). Feedback → §1.0-R3 law integration (spec round, highest-tier work)
-   BEFORE wave 5 builds. Also collect: index-UI verification list (AUDIT r426–r427 entry names
-   R2-B6/B7 + §4c as unverified), clock feel, ☆ discovery rate.
-3. **W5–W7 — FORMULAS I (c3) [auto·rolling]:** margin · foot · anchor · percent · growth, then
-   cagr · bridge · sumif · rollup · fxconvert, then cases + **qclose★ (NEW, D1)** + the D10–D15
+2. **WOLF PLAYTEST — NOW AT THE END OF THE PASS, BY WOLF'S CALL (2026-07-27):** _"I want to
+   playtest the entire suite before providing another round of feedback."_ So the pass runs to
+   completion first and there is no mid-pass gate. **The recorded trade-off** (raised once, Wolf's
+   decision stands): rounds 1 and 2 each rewrote the standard — six binding rules, then seven — and
+   those rules only applied to what was built after them. Deferring feedback to the end means any
+   systemic misread of taste compounds across the remaining drills rather than across five, so
+   budget for a broader fix-up wave after the playtest than the earlier rounds needed. Collect at
+   playtest: §1.0-R3 artifact fit, ☆ discovery rate, clock feel, the c3 prove-out overlap
+   (foot core vs anchor ☆), and the two open Wolf-facing items below.
+3. **W5–W7 — FORMULAS I (c3) [auto·rolling]:** ✅ margin · ✅ foot · ✅ anchor → percent · growth,
+   then cagr · bridge · sumif · rollup · fxconvert, then cases + **qclose★ (NEW, D1)** + the D10–D15
    drills.js meta sweep. First NEW-drill build (qclose) carries the full plumbing row (SPINE,
    TRACKS+migrate-certificates.sql same-PR, PARS, LB auto, SEO page).
 4. **Chapter-by-chapter per DEPTH_PASS §5** — c4 (incl. vlookup NEW + cleanroom★) → **post-c4

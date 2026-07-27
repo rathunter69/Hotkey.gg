@@ -1,5 +1,75 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r429 H6b-5 — anchor depth-pass rework (DEPTH_PASS §4.23 + §1.0/§1.0-R2/§1.0-R3 + D12)
+- **ARTIFACT KEPT:** the price × volume grid is already audience-neutral — a pricing grid is a sales
+  manager's file and a banker's sensitivity table in the same shape, which is exactly what
+  §1.0-R3(n) rule 5 asks for. c3's A-lean balance is carried by margin/foot/percent/growth.
+- **☆ KEPT FROM THE PAGE — the one pre-playtest ☆ in the wave §1.0-R3(o) does NOT kill**, because
+  it is not a formatting task: the far corner read a **second, independent way** off the two blue
+  inputs, and agreeing with the grid. Skippable (all five cores clear untouched — ALT 2 proves it).
+  §1.0-R3(o)'s family list gains **INDEPENDENT PROVE-OUT**, written as a deliberately NARROW
+  exception: admissible only where a page already specced it and the lesson is something that can
+  be silently wrong (an anchor, a lock, a link); at most once per chapter; efficiency stays the rule.
+  **Flagged for the playtest:** foot's beat 5 is also a prove-out, so c3 now carries the idea twice
+  (once core, once ☆). If that reads repetitive, anchor's is the one to re-cut.
+- **CHECK2 GAINS ITS FILL LATCH — the systemic audit finding the page names.** The grid check
+  previously accepted nine hand-typed formulas, so "one formula fills the grid" was claimed but
+  never graded. It now also requires the CENSUS: every grid cell a `translateFormula` of the
+  corner. Anchors stay graded via formula TEXT ($B, $row) per the §4.23 note — the doctrine §2.2
+  exception, since anchoring IS the lesson.
+- **BEATS (5 core + ☆ + save, was 2):** corner with both locks → carry down the volume column →
+  carry across the grid → dollar-format → outside border (the §1.6 finish-state beat; ok accepts
+  perimeter flags OR per-cell all-borders, §1.0-R2(m) S=outside / A=all).
+- **RANDOM (§1.2 — four axes, was two):** **NEW 4-spot site pool** (the audit's "move the grid per
+  seed" ask — it was nailed to C4) · product-name pool · price/volume magnitudes · **grid DEPTH
+  3–4 rows**, which moves the check cell and the far corner every seed.
+- **PAR:** 16/13 → **34/31** (5-seed sweep median 31 keys, 0% drift on the first measure; 1.10 s/key).
+- **D12 APPLIED:** drills.js tab **'F4' → 'Anchors'** and the desc de-hinted (the picker was leaking
+  the answer chord — AUDIT_R417 §D Class-A).
+- **TESTS:** replay 3/3 · **depth-contract PASS** · guided PASS · alt-paths 2/2 (both rebuilt; the
+  old pair stopped at the fill) · par-sweep FLAGGED 0 · invariants clean incl. C9 anchor ·
+  cache-bump clean (drills.js?v=291→292) · full-catalog replay green.
+
+## r429 H6b-5 — foot depth-pass rework (DEPTH_PASS §4.22) + THE THROUGHPUT TOOLING
+- **TOOLING FIRST (the reason the rest of the pass can move):** a bespoke `verify-<key>.js` per
+  drill does not scale to 61 remaining drills, so two generic guards now cover everything the
+  standard already promises:
+  · **`dev/e2e-depth-contract.js`** — the UNIVERSAL contract for every drill on the C9 ledger (read
+    straight out of check-invariants, so it cannot drift): demo clears core AND earns the ☆ · one
+    bonus, dark at load, "☆ ?" rendered, label not leaking · saveClose declared, no hand-written
+    save beat · 4–6 authored core beats · axes actually vary over 30 builds · density floor at the
+    win state · zero page errors.
+  · **`dev/e2e-alt-paths.js` gains the ☆-FORFEIT CONTRACT** — an alt whose NAME says "☆ forfeited"
+    is now ENFORCED as that drill's §1.0-R2(i) skippability control: if it actually earns the ☆,
+    the build fails. Every reworked drill already ships such an alt, so each one now gets its
+    negative-control proof from the alt it already has. No new file per drill.
+  · **First run found two real §1.1 violations:** `blocksel` and `pastes` carry SEVEN authored core
+    beats against the 4–6 cap. **Recorded as documented exceptions, not churned** — Wolf playtested
+    both at that shape in round 2 and signed them off, so his live approval outranks the doc cap.
+    Any OTHER drill over it is a real finding.
+- **ARTIFACT (§3.1 audience A):** "segment × quarter ($mm)" → **revenue by region and quarter
+  ($000s)**. Cross-footing a grid is the most audience-neutral skill in the catalog; only the units
+  and row labels moved.
+- **☆ RE-CUT (§1.0-R3(o); §4.22's "comma-format the entire block, one pass" was a formatting ☆):**
+  **REFERENCE-OVER-RETYPE** — the corner built off an **edge** (the Total column or the Total row)
+  instead of re-summing the raw block. That IS the cross-foot insight: the corner is not a third
+  independent opinion, it is the edge summed once more. Latches on **either** edge (ALT 1 walks the
+  row edge); `=SUM(raw block)` clears beat 3 and wins with the ☆ dark (ALT 2, now contract-enforced).
+- **BEATS (5 core + ☆ + save, was 3):** row totals → column totals → the corner → bold both edges
+  with a TOP rule on the Total row (§1.0(f)) → **the cross-foot check reading exactly zero** (the
+  §1.6 finish-state beat: it PROVES the foot rather than dressing it, which is why the aha lands at
+  beat 3 and is banked at beat 5). The check cell ships labelled and in the §1.0(f) input dress.
+- **LANGUAGE (§4.22's own note):** the prompt's "never type a SUM" claim is GONE — AutoSum is the
+  guide's route and a typed SUM grades the same (§1.0(c), and the AUDIT_R417 §D finding that the
+  copy contradicted what `sumishF` actually accepted).
+- **RANDOM (§1.2 — four axes, was one):** 3-spot site pool · region-name pool · all values ·
+  **block SIZE 3–5 regions × 3–4 quarters**, which moves the Total row, Total column, corner and
+  check cell every seed (the pre-rework board was a fixed 4×4 at B2).
+- **PAR:** 11/8 → **32/29** (5-seed sweep median 29 keys, 0% drift; 1.10 s/key).
+- **TESTS:** replay 3/3 · **depth-contract PASS** · guided PASS · alt-paths 2/2 (both rebuilt; the
+  old pair hardcoded the fixed 4×4) · par-sweep FLAGGED 0 · invariants clean incl. C9 foot ·
+  cache-bump clean (drills.js?v=290→291) · full-catalog replay green.
+
 ## r429 H6b-5 — margin depth-pass rework (DEPTH_PASS §4.21 + §1.0/§1.0-R2/§1.0-R3) — WAVE 5 OPENS (Formulas I)
 - **ARTIFACT CONVERTED (§1.0-R3(n) + §3.1): three comp sets → the DIVISIONAL PERFORMANCE PACK.**
   c3 is where audience A lives (§3.1 A-lean 2:1) and margin opens the chapter. The three asks are
