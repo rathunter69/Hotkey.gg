@@ -692,7 +692,12 @@ const ALTS = [
       {sel:'B14:E14', keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:'B14:E14', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
     ]` },
-  { key: 'cases', name: 'driver built growth-first, model then capture, flip the cases, then the deal-team revision + refresh', moves: `C => { const cap=C._capL, mp=String(Math.round(C._mutG*100)); return [
+  /* r429 (DEPTH_PASS §4.31 wave 5): ALT 1 is the pre-rework entry, renamed and closed with the
+     save — it types BOTH CHOOSE formulas, which makes it exactly the ☆-forfeit control the r429
+     contract now enforces. ALT 2 clones the growth pull by a DIFFERENT paste route
+     (paste-special-FORMULAS rather than plain Ctrl+V), proving the ☆ latch is not tied to one
+     paste kind. */
+  { key: 'cases', name: 'FREEDOM proof — growth-first, BOTH CHOOSE formulas typed by hand (☆ forfeited, all six cores clear)', moves: `C => { const cap=C._capL, mp=String(Math.round(C._mutG*100)); return [
       {sel:'B9', keys:[...T('=CHOOSE($B$3,B6,C6,D6)'),{key:'Enter'}]},
       {sel:'B8', keys:[...T('=CHOOSE($B$3,B5,C5,D5)'),{key:'Enter'}]},
       {sel:'C12', keys:[...T('=B12*(1+$B$9)'),{key:'Enter'}]},
@@ -706,6 +711,24 @@ const ALTS = [
       {sel:'B3', keys:[...T('3'),{key:'Enter'}]},
       {sel:'B6', keys:[...T(mp+'%'),{key:'Enter'}]},
       {sel:'B3', keys:[...T('1'),{key:'Enter'}]},
+      {sel:'A1', keys:[{key:'s',ctrl:true}]},
+    ]; }` },
+  { key: 'cases', name: 'chord-ROUTE — the growth pull cloned via paste-special FORMULAS (Alt E S F), cases visited in reverse; the ☆ must still latch', moves: `C => { const cap=C._capL, mp=String(Math.round(C._mutG*100)); return [
+      {sel:'B8', keys:[...T('=CHOOSE($B$3,B5,C5,D5)'),{key:'Enter'}]},
+      {sel:'B8', keys:[{key:'c',ctrl:true}]},
+      {sel:'B9', keys:[{key:'Alt'},{key:'e'},{key:'s'},{key:'f'},{key:'Enter'}]},
+      {sel:'C12', keys:[...T('=B12*(1+$B$9)'),{key:'Enter'}]},
+      {sel:'C12:F12', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:'C13', keys:[...T('=C12/B12-1'),{key:'Enter'}]},
+      {sel:'C13:F13', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:'C18', keys:[...T('=IF($B$3=C$17,$'+cap+'$12,C18)'),{key:'Enter'}]},
+      {sel:'C18:E18', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:'B3', keys:[...T('3'),{key:'Enter'}]},
+      {sel:'B3', keys:[...T('2'),{key:'Enter'}]},
+      {sel:'B3', keys:[...T('1'),{key:'Enter'}]},
+      {sel:'B6', keys:[...T(mp+'%'),{key:'Enter'}]},
+      {sel:'B3', keys:[...T('1'),{key:'Enter'}]},
+      {sel:'A1', keys:[{key:'s',ctrl:true}]},
     ]; }` },
   { key: 'cfslink', name: 'rule the close FIRST, memo before the corkscrew, alt h p percent, bold last', moves: `C => [
       {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},

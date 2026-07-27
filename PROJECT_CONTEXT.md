@@ -19,7 +19,27 @@ without escalating. Spec is now **DEPTH_PASS r429**.
 **ALSO DECIDED:** data retention (closes G10) — 7-day detailed run history, last 5 + expand,
 aggregates permanent. In PIPELINE ⚡ with implementation notes.
 
-**WAVE 5 (Formulas I, c3) — 7 of 12 SHIPPED.** margin · foot · anchor · percent · growth · cagr ·
+**WAVE 5 (Formulas I, c3) — 11 of 12 SHIPPED. ONLY `qclose★` REMAINS for a 3-chapter playtest.**
+margin · foot · anchor · percent · growth · cagr · bridge · sumif · rollup · fxconvert · cases.
+
+**`qclose★` is the one thing standing between you and playtesting three whole chapters**, and it is
+deliberately NOT a rework — it is a BRAND-NEW drill (DEPTH_PASS §4.32, catalog delta D1) carrying:
+the full plumbing row (campaign spine, HK_TRACKS **+ dev/migrate-certificates.sql in the SAME PR**
+per the r359 drift rule, HOTKEY_PARS, a new leaderboard board, an SEO page via build-drill-pages)
+**plus** the c3 capstone wiring off the gauntlet/modeltour template (meta.capstone, chapter
+designation, HOTKEY_CLOCKS pass=par×2, the shared hkCapstoneOk predicate, picker ★ tag, both
+grandfather rules). Budget it at 2–3 ordinary drills. Its §4.32 page is fully specced — six beats,
+a segment-ledger island, a tie-check ☆, and "a clean run opens Data & Lookups".
+
+**WHAT WAVE 5 KEPT FINDING — a pattern worth expecting in c4 and beyond.** Five of the eleven
+drills had a **§1.0(c) route requirement baked into core** (growth, sumif, rollup, fxconvert, and
+percent's cousin): the check demanded a particular formula TEXT — `$B$3`, `$-locked` ranges, a
+specific reference — when a typed or pasted equivalent produces the same numbers. Every one became
+that drill's ☆, where grading a route is legal. **When you open a c4 drill, look at its core checks
+for formula-text assertions first.** Two others (`bridge`, `sumif`, `rollup`) had §1.2 axes that
+existed on the page but not in the build — fixed sites, fixed names, fixed depths.
+
+**PRIOR (wave 5 at the 7-of-12 mark):** margin · foot · anchor · percent · growth · cagr ·
 bridge. **Remaining for the 3-chapter playtest: sumif · rollup · fxconvert · cases · qclose★.**
 `qclose★` is the expensive one — a BRAND-NEW drill (not a rework) carrying the full plumbing row
 (campaign spine, cert tracks + migrate-certificates.sql in the SAME PR, PARS, LB board, SEO page)

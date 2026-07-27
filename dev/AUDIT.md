@@ -1,5 +1,28 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r429 H6b-5 — cases (DEPTH_PASS §4.31) — wave 5 at 11 of 12
+- **🔴 THE CATALOG'S WORST MISALIGNMENT IS CLOSED.** `targets` was **NINE** entries against **SIX**
+  checks and `guide` was **FOUR** — so the guided ring landed on the wrong cell from step 2 onward,
+  and the hint ladder was off by two for most of the drill. This is the single worst instance of the
+  AUDIT_R417 §C class. All three arrays are now 6+1 and index-aligned.
+- **DOCUMENTED DEVIATION FROM §4.31's PROPOSED BEAT LIST:** the page suggests swapping the
+  model-build and %-growth beats for "enter 2 in the switch" and "bold the output header". That
+  would REDUCE the drill — it is the richest thing in c3 (par 89 after retune, still the chapter's
+  longest by design) and the model-runs-off-the-driver beat is the reason the switch means anything
+  at all. **The six beats are KEPT**; the page's real asks (alignment, a ☆, the language pass) are
+  applied on top. If Wolf wants the shorter shape at playtest it is a small edit from here.
+- **☆ — FORMULA CLONING** (cagr's family, five drills back so non-adjacent, and it teaches something
+  different there): the two CHOOSE formulas differ by **exactly one row**, so the growth pull is the
+  case pull copied down — the references walk themselves. Graded off `S.pasteLog` + a translate
+  census. ALT 2 clones by **paste-special-FORMULAS** instead of plain Ctrl+V, proving the latch is
+  not tied to one paste kind; ALT 1 types both and forfeits.
+- **§1.0(b) LANGUAGE:** every check label rewritten to the outcome form — the formulas moved into
+  guide/req where the route belongs (the labels were literally reciting `=CHOOSE($B$3,B5,C5,D5)`).
+- **PAR:** 94/100 → **89/81** (median 81, 0% drift, 1.10 s/key). The clone route replaces a typed
+  second CHOOSE.
+- **TESTS:** replay 3/3 · depth-contract PASS (density 15/21) · guided PASS · alt-paths 2/2 ·
+  par-sweep FLAGGED 0 · invariants clean · drills.js?v=299→300.
+
 ## r429 H6b-5 — fxconvert (DEPTH_PASS §4.30 + D13) — wave 5 at 10 of 12
 - **BOTH AUDIT FINDINGS THE PAGE NAMES ARE CLOSED:** guide was **3 entries against 5 checks**, so
   from step 2 on every hint pointed at the wrong beat (the AUDIT_R417 §C misalignment class) — now
