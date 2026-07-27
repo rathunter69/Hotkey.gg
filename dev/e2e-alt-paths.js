@@ -1137,13 +1137,25 @@ const ALTS = [
       steps.push({sel:cl(T.c0)+T.r0+':'+cl(T.c0+T.w-1)+(T.r0+T.h-1), keys:[{key:'Home',ctrl:true},{key:'v',ctrl:true}]});
       stepAll(bfs([1,1],[RN,CN]));                                               // A1 → the exit gap → J20, entirely on foot
       return steps; }` },
-  { key: 'cagr', name: 'blocks in reverse, winner flagged mid-run', moves: `C => {
+  /* r429 (DEPTH_PASS §4.26 wave 5): both cagr entries rebuilt — the pre-rework entry predated the
+     promoted percent beat (the format is core now, one decimal) and the clone ☆. */
+  { key: 'cagr', name: 'op-ORDER — blocks in reverse, ribbon percent + ribbon bold, winner flagged last', moves: `C => {
       const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);
       const steps=C._sites.slice().reverse().flatMap(s=>[
         {sel:s.col+s.ans, keys:[...T('=('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1'),{key:'Enter'}]},
-        {sel:s.col+s.ans, keys:[{key:'%',ctrl:true,shift:true}]},
+        {sel:s.col+s.ans, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
       ]);
       steps.push({sel:w.col+w.ans, keys:[{key:'Alt'},L('h'),D(1)]});
+      steps.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+      return steps; }` },
+  { key: 'cagr', name: 'FREEDOM proof — all three rates TYPED, never pasted (☆ forfeited, all five cores clear)', moves: `C => {
+      const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);
+      const steps=C._sites.flatMap(s=>[
+        {sel:s.col+s.ans, keys:[...T('=('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1'),{key:'Enter'}]},
+        {sel:s.col+s.ans, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]},
+      ]);
+      steps.push({sel:w.col+w.ans, keys:[{key:'b',ctrl:true}]});
+      steps.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
       return steps; }` },
   { key: 'wacc', name: 'debt side first — at-Kd before the beta chain', moves: `C => [
       {sel:'B13', keys:[...T('=B9*(1-B6)'),{key:'Enter'}]},
