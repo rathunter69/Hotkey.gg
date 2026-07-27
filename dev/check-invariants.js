@@ -59,6 +59,36 @@ try {
     if (fail === 0) ok(`drills.js: ${valid.size} drills, all campaign/track keys valid, tracks partition the catalog`);
   }
 
+  /* ---- CAPSTONE WIRING (r425 DEPTH_PASS §2.4; RESTORED r429) ----
+     This guard shipped with modeltour in r425 and was LOST in the r427 union-merge rebuild of
+     this file — the r427 commit claims it was carried forward, but no capstone assertion existed
+     in the tree when gauntlet (the second capstone) was wired. Restored, with the c2 designation
+     as its second live case. WORKFLOW §3.3: no invariant, and the bug returns. */
+  const meta = D.meta || {};
+  const flagged = Object.keys(meta).filter(k => meta[k] && meta[k].capstone);
+  const claimed = new Map();
+  for (const c of camp) {
+    if (!c.capstone) continue;
+    const key = c.capstone;
+    if (!valid.has(key)) { bad(`capstone: chapter ${c.id} designates '${key}', which is not a real drill`); continue; }
+    if (!(meta[key] && meta[key].capstone)) bad(`capstone: chapter ${c.id} designates '${key}' but drills.js meta.${key}.capstone is not true (the picker ★ tag reads meta)`);
+    const grp = groups.find(g => (g.keys || []).includes(key));
+    if (!grp) bad(`capstone: '${key}' is in no group`);
+    else if (grp.keys[grp.keys.length - 1] !== key) bad(`capstone: '${key}' must sit LAST in its group '${grp.name}' (capstone-last is uniform, §2.4)`);
+    if (claimed.has(key)) bad(`capstone: '${key}' is claimed by both ${claimed.get(key)} and ${c.id}`);
+    claimed.set(key, c.id);
+  }
+  for (const k of flagged) if (!claimed.has(k)) bad(`capstone: drills.js meta.${k}.capstone is true but no chapter designates it`);
+  if (typeof W.hkCapstoneOk !== 'function') bad('capstone: window.hkCapstoneOk missing — the shared gate predicate every surface reads (§2.4)');
+  const clocks = W.HOTKEY_CLOCKS || {};
+  for (const [key, chId] of claimed) {
+    const cl = clocks[key];
+    if (!cl || typeof cl.pass !== 'number') { bad(`capstone: HOTKEY_CLOCKS.${key} needs a pass clock (§2.4: par×2.0)`); continue; }
+    const par = (W.HOTKEY_PARS || {})[key];
+    if (typeof par === 'number' && cl.pass !== par * 2) bad(`capstone: HOTKEY_CLOCKS.${key}.pass=${cl.pass} but par=${par} — §2.4 wants pass = par × 2 (lockstep)`);
+  }
+  if (claimed.size) ok(`capstone wiring: ${claimed.size} designated (${[...claimed.keys()].join(', ')}) — meta flag, group-last, one chapter each, hkCapstoneOk present, clocks at par×2`);
+
   // HOTKEY_PARS keys are all real drills, and every drill has a par snapshot
   const pars = W.HOTKEY_PARS || {};
   for (const k of Object.keys(pars)) if (!valid.has(k)) bad(`HOTKEY_PARS: '${k}' is not a real drill key`);
@@ -202,7 +232,10 @@ try {
    STATIC counts asserted here stay the hand-written tri-length; C9 asserts the declaration is
    present and that no drill hand-writes the save beat (the engine owns it, exactly once). ---- */
 try {
-  const REWORKED = ['navigation', 'blocksel', 'filldr', 'pastes', 'rowops', 'ruleoff', 'dress', 'copyover', 'editfix', 'ruleaudit', 'housestyle', 'typeset', 'undo', 'modeltour'];   // r422 H6b-1 wave 1
+  const REWORKED = ['navigation', 'blocksel', 'filldr', 'pastes', 'rowops', 'ruleoff', 'dress', 'copyover', 'editfix', 'ruleaudit', 'housestyle', 'typeset', 'undo', 'modeltour',   // r422 H6b-1 wave 1 + r425 waves 2-3
+    'decimals', 'center', 'autofit', 'combo', 'gauntlet',   // r429 H6b wave 4 (DEPTH_PASS §4.12, §4.13, §4.14, §4.17, §4.20 — c2 capstone)
+    'margin', 'foot', 'anchor', 'percent', 'growth', 'cagr', 'bridge', 'sumif', 'rollup', 'fxconvert', 'cases',   // r429 H6b wave 5 (DEPTH_PASS §4.21-§4.31)
+    'qclose'];   // r429 H6b wave 5 (DEPTH_PASS §4.32) — the Formulas I capstone, a NEW drill rather than a rework
   const idx = fs.readFileSync('index.html', 'utf8');
   const start = idx.indexOf('const CHALLENGES = {');
   const end = idx.indexOf('STATE + ENGINE', start);

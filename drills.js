@@ -32,12 +32,13 @@ window.HOTKEY_DRILLS = {
   // Formulas II / Models I / Models II / Full Builds (PRO).
   // r249 — the 6 folded legacy drills (saves, ribbon, polish, format, blue, transpose) were
   // deleted outright, their value covered by survivors (copyover, housestyle, dress, decimals,
-  // the Alt-H drills, pastes). Catalog is 82 grouped drills (Formulas I & II carry 11 each);
+  // the Alt-H drills, pastes). Catalog is 82 grouped drills (Formulas I carries 12 — the r429
+  // capstone add — and Formulas II 11);
   // menuOrder.length is the source of truth — do not hardcode the total elsewhere.
   groups: [
     { name: 'Foundations',    keys: ['navigation', 'filldr', 'pastes', 'blocksel', 'rowops', 'editfix', 'undo', 'copyover', 'modeltour'] },   /* r367: modeltour moved from #2 to capstone — it demands cascades + formatting no fresh player has yet · r424 (D17): colops RETIRED — rowops absorbed it (row AND column structure ops, one drill); the freed slot stays open for a future add */
     { name: 'Formatting',     keys: ['typeset', 'decimals', 'center', 'autofit', 'ruleoff', 'ruleaudit', 'combo', 'dress', 'housestyle', 'gauntlet'] },
-    { name: 'Formulas I',     keys: ['margin', 'foot', 'anchor', 'percent', 'growth', 'cagr', 'bridge', 'sumif', 'rollup', 'fxconvert', 'cases'] },
+    { name: 'Formulas I',     keys: ['margin', 'foot', 'anchor', 'percent', 'growth', 'cagr', 'bridge', 'sumif', 'rollup', 'fxconvert', 'cases', 'qclose'] },   /* r429 H6b-5 (DEPTH_PASS §4.32 / D1): qclose ADDED as the Formulas I capstone — LAST in the group, per §2.4. HK_TRACKS derives from here, so the formulas cert track picks it up automatically; dev/migrate-certificates.sql's hardcoded array is updated in the SAME PR (r359 drift rule). */
     { name: 'Data & Lookups', keys: ['sort', 'scrub', 'grpfold', 'filterpass', 'unhide', 'lookup', 'lookup2', 'recon', 'drill', 'series'] },
     { name: 'Formulas II',    keys: ['audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'wirewalk', 'tieout', 'hunt', 'signerr', 'versionup', 'balance'] },
     { name: 'Models I',       keys: ['wacc', 'fcfbuild', 'dcf', 'comps', 'txncomps', 'football', 'dcfsens', 'retbridge', 'accdil', 'sourcesuses'] },
@@ -57,22 +58,22 @@ window.HOTKEY_DRILLS = {
   meta: {
     // Foundations
     navigation: { name:'Navigate', label:'Navigation maze',     tab:'Nav',         desc:'One long switchback corridor through solid walls — every straightaway is a single shot, every corner one turn. Collect the pips, copy the model data, bring it home to A1, save, and finish at the far corner of the active area — the wall past the model breaks open if you would rather walk there than fly' },   /* r427 (§4.1 round 3): windier serpentine + the carved exit */
-    autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'##### everywhere — autofit the columns to their content' },
+    autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'A headcount roster squeezed to #### — fit the labels to their content, set one width across the quarters for print, then watch your own totals outgrow their column' },   /* r429 §4.14: desc rewritten for the roster rework; de-hint clean */
     rowops:     { name:'Structure', label:'Rebuild the schedule',   tab:'Structure',desc:'Full structural surgery \u2014 insert the missing line and the missing quarter, delete the squatters, and watch every new row and column arrive already dressed' },   /* r424 (D17): absorbed colops \u2014 rows AND columns in one drill */
     filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'Fill down and fill right — one formula, whole block' },
     blocksel:   { name:'Block Select',label:'Assemble and format the summary',tab:'Block', desc:'COPY what stays, CUT what moves — the feeds run in segment order; dress the table as you go and box it whole' },   /* r424 §4.4 round 2: margin note + money formats out; whole-table close in */
     editfix:    { name:'Edit',     label:'Fix the typos in place',  tab:'Edit',     desc:'Three typos, three in-place repairs — never retype a cell' },
     undo:       { name:'Undo',     label:'Undo is a tool',          tab:'Undo',     desc:'Delete big, undo, then delete only what deserved it' },
-    pastes:     { name:'Paste Special',label:'Paste Special everything',tab:'Paste Sp.',desc:'The full paste-special toolkit — transpose, divide, multiply, formats, values' },
+    pastes:     { name:'Paste Special',label:'Paste Special everything',tab:'Paste Special',desc:'The full paste-special toolkit — transpose, divide, multiply, formats, values' },
     waterfall:  { name:'Waterfall', label:'Run the paydown waterfall',  tab:'Waterfall', desc:'3-yr cascade: MIN rations the cash, both tranches roll forward across' },
     cascade:    { name:'Full Waterfall', label:'Run the full cascade',   tab:'Cascade',   desc:'3 tranches \u00d7 4 yrs: seniority MINs, per-tranche roll-forwards, total debt bold with a top border' },
     wk13:       { name:'13-Week Cash', label:'Run the 13-week', tab:'13-Week', desc:'The restructuring staple: a weekly roll-forward, an anchored liquidity cushion, totals on flows only' },
-    liqbridge:  { name:'Liquidity Bridge', label:'Bridge the liquidity \u2014 three cases', tab:'Liq. Bridge', desc:'Cash + undrawn to ending liquidity, Base / Downside / Severe \u2014 read which cases breach' },
+    liqbridge:  { name:'Liquidity Bridge', label:'Bridge the liquidity \u2014 three cases', tab:'Liquidity', desc:'Cash + undrawn to ending liquidity, Base / Downside / Severe \u2014 read which cases breach' },
     covtable:   { name:'Covenant Table',  label:'Run the covenant table', tab:'Covenants', desc:'Net leverage vs a stepping max \u2014 headroom, a real IF flag, MIN pulls the pinch quarter' },
     txncomps:   { name:'Transaction Comps', label:'Run precedent transactions', tab:'Txn Comps', desc:'Multiples paid, the median, and the implied equity' },
     sourcesuses:{ name:'Sources & Uses',       label:'Balance sources and uses',   tab:'S&U',       desc:'Total, plug, check zero — then % of total down both sides' },
-    accdil:     { name:'Accretion/Dilution',   label:'Run accretion / dilution',   tab:'Acc/Dil',   desc:'Combined EPS vs standalone — synergies in, financing drag out' },
-    dcfsens:    { name:'Sensitivity',label:'Run the sensitivity table', tab:'Sens.',     desc:'True mixed anchors — one formula fills the 5×3 WACC × growth grid' },
+    accdil:     { name:'Accretion/Dilution',   label:'Run accretion / dilution',   tab:'Accretion',   desc:'Combined EPS vs standalone — synergies in, financing drag out' },
+    dcfsens:    { name:'Sensitivity',label:'Run the sensitivity table', tab:'Sensitivity',     desc:'True mixed anchors — one formula fills the 5×3 WACC × growth grid' },
     retbridge:  { name:'Returns Bridge',label:'Attribute the returns',     tab:'Returns',   desc:'Growth, multiple, delever — prove the bridge ties with a zero check' },
     football:   { name:'Football',  label:'Build the football field',   tab:'Football',  desc:'Midpoints per method, MIN floor, MAX ceiling — the summary page' },
     copyover:   { name:'Copyover', label:'Chain the hand-offs', tab:'Copy',  desc:'Formulas travel when you copy them \u2014 chain a block, a peeled column, then values-only for the summary' },
@@ -81,14 +82,17 @@ window.HOTKEY_DRILLS = {
     housestyle: { name:'House Style', label:'Clean it to standard', tab:'House Style', desc:'A full cleanup pass: title, headers, blue inputs (one buried), commas, %, the totals ruled with a top border' },
     ruleoff:    { name:'Rule Off',  label:'Rule off the schedule', tab:'Rule Off',  desc:'Accounting rulings: line under headers, line above every total, outline the headline' },
     ruleaudit:  { name:'Ruling Pass', label:'The ruling pass', tab:'Ruling Pass', desc:'The page says done \u2014 the pass disagrees. Exactly 4 ruling breaks hide among the house conventions; find all 4, fix only those', errorCount:4 },   /* r425: \u00a72.3 disclosed-error-count prototype \u2014 errorCount puts the found-k/4 meter on the rail */
-    combo:      { name:'Combo',    label:'Clean the paste',     tab:'Cleanup',     desc:'Bold, comma, wrap and autofit a pasted table' },
+    combo:      { name:'Combo',    label:'Clean the paste',      tab:'Combo',       desc:'A comp sheet straight off the data provider — bold it, align the headers, format and colour the figures, wrap the notes, and clear every ####' },   /* r429 §4.17: desc rewritten for the reworked scope (blue-input beat came in as core); de-hint clean */
     typeset:    { name:'Typeset',  label:'Typeset the memo',    tab:'Typeset',     desc:'Bold the header, unbold the imposter, italicize the memos, strike the discontinued line, date the page' },   /* r425: language pass — the picker names outcomes, not the answer formula */
-    decimals:   { name:'Decimals', label:'The decimals pass',   tab:'Decimals',    desc:'Add and remove decimal places — dollars none, multiples and percents one' },
+    decimals:   { name:'Decimals', label:'The decimals pass',   tab:'Decimals',    desc:'One standard per column on the operations scorecard — whole dollars, one place on turns and margins, and the ragged cell someone left behind' },   /* r429 §4.12: desc rewritten for the audience-A scorecard rework (de-hint clean — no chord tokens) */
     dress:      { name:'Format tab', label:'Full formatting pass', tab:'Format', desc:'Masthead, blue inputs, commas and percents, borders on the lines that matter \u2014 one pass to book-ready' },   /* r425 \u00a74.18 rework: desc matches the 6-beat scope */
     triage:     { name:'Error triage', label:'Error triage \u2014 #REF! #DIV/0! #VALUE!', tab:'Triage', desc:'Three classic breaks \u2014 read the error, rebuild the intent' },
     versionup:  { name:'Roll-forward prep', label:'Replace hardcodes so it rolls forward', tab:'Rollfwd', desc:'Typed answers \u2192 live formulas; v2 must survive new numbers' },
-    center:     { name:'Center',   label:'Set the alignment',   tab:'Align',       desc:'Center, left, right — three alignment passes, house style' },
-    gauntlet:   { name:'Gauntlet', label:'Make it model-ready', tab:'Model',       desc:'A full model-ready formatting pass' },
+    center:     { name:'Center',   label:'Set the alignment',   tab:'Align',       desc:'Headers centered, labels left, figures right — then rule the header row off and read the title across the table without merging' },   /* r429 §4.13: desc rewritten for the reworked scope (border beat + stranded title); de-hint clean */
+    /* r429 H6b-4 (DEPTH_PASS \u00a72.4/\u00a73 D8): gauntlet DESIGNATED the Formatting capstone —
+       capstone:true drives the picker's \u2605 CAPSTONE tag + full-color group ring; the gate
+       itself reads HOTKEY_CAMPAIGN.chapters[1].capstone below. Wiring per the modeltour template. */
+    gauntlet:   { name:'Gauntlet', label:'Make it model-ready', tab:'Gauntlet', capstone:true, desc:'The Formatting capstone \u2014 a raw sources & uses taken to book standard: blue the inputs, total both sides, rule the totals, separators down the money, nothing clipped. One clean run opens the next track leg' },
 
     // Values-hygiene pair — both live in Data & Lookups now
     drill:      { name:'Hardcode', label:'Hardcode it',         tab:'Hardcode',    desc:'Break the links before it ships — paste values in place, painted blue' },
@@ -103,9 +107,9 @@ window.HOTKEY_DRILLS = {
     unhide:     { name:'Unhide',   label:'Unhide the rows',  tab:'Unhide',    desc:'Hidden rows lie \u2014 unhide the sins, group them right, set a real width' },
 
     // Formulas & auditing — spans Formulas I and Formulas II, plus the Models drills
-    margin:     { name:'Margins',  label:'Margins across the page', tab:'Margin',  desc:'EBITDA ÷ revenue, three comp tables — pointed, filled, %' },
-    anchor:     { name:'Anchors',  label:'Pin the reference',       tab:'Anchors', desc:'Cycle the reference locks — one pinned formula prices the whole grid' },
-    growth:     { name:'Growth',   label:'Run the growth rates',tab:'Growth',      desc:'Consolidate, YoY as %, CAGR — a real revenue build' },
+    margin:     { name:'Formula',  label:'Margins across the page',tab:'Margins',   desc:'Three divisions, three different ratio columns — a margin, a growth rate and an asset-turnover figure, each built off the two columns beside it and carried down' },   /* r429 §4.21: desc rewritten for the divisional pack + per-table asks; de-hint clean */
+    anchor:     { name:'Anchors',  label:'Pin the reference',      tab:'Anchors',     desc:'One formula prices a whole grid — lock the right two references, carry it across, dress it as a quote block and take a second read on the corner' },   /* r429 §4.23 + D12: tab F4->Anchors, desc de-hinted and rewritten for the reworked scope */
+    growth:     { name:'Growth',   label:'Run the growth rates',   tab:'Growth',      desc:'Consolidate two segments across five years, run the year-on-year rate off the total, and compound the four-year rate so a restatement flows straight through' },   /* r429 §4.25: desc rewritten for the reworked scope; de-hint clean */
     wacc:       { name:'WACC',     label:'Build the discount rate', tab:'WACC',    desc:'Unlever, relever, CAPM, weight — the full discount-rate build' },
     fcfbuild:   { name:'uFCF',     label:'Build the unlevered FCF', tab:'uFCF',    desc:'EBIT \u2192 less taxes \u2192 NOPAT \u2192 plus D&A, less capex and the NWC build: the row every DCF discounts, filled across five years' },
     dcf:        { name:'DCF',      label:'Discount the cash flows', tab:'DCF',     desc:'Discount factors \u00d7 cash flows build the PV row; the TV reuses the year-5 factor' },
@@ -120,13 +124,17 @@ window.HOTKEY_DRILLS = {
        itself reads HOTKEY_CAMPAIGN.chapters[0].capstone below. */
     modeltour:  { name:'Model Tour', label:'Run the model tour', tab:'Model Tour', capstone:true, desc:'The Foundations capstone \u2014 four subtotals blown to #REF! in a live P&L: rebuild the cascade, land both margin rows, dress the bottom line. One clean run opens the next track leg' },
     revolver:   { name:'Revolver', label:'Sweep the revolver',  tab:'Revolver',    desc:'MIN/MAX sweep ×4 years, then prove out both balances' },
-    cagr:       { name:'CAGR',     label:'Compound it, three times', tab:'CAGR',   desc:'(End÷Begin)^(1÷yrs)−1 — three scattered blocks' },
-    sumif:      { name:'SUMIF',    label:'Roll up the segments',tab:'SUMIF',       desc:'SUMIF rollup + live foot + % of total, summary formatted' },
-    rollup:     { name:'SUMIFS',   label:'Sum on two criteria',      tab:'SUMIFS',      desc:'One mixed-anchor SUMIFS fills the segment \u00d7 region grid' },
-    fxconvert:  { name:'FX Convert', label:'Convert the page \u2014 one anchored rate', tab:'FX', desc:'One bordered EUR\u2192USD rate drives a 2D-filled conversion \u2014 anchored driver, outlined output' },
-    cases:      { name:'Sticky switch', label:'Scenario switch with CHOOSE', tab:'Cases', desc:'A CHOOSE driver reads the switch and repositions the model; a self-referencing IF snapshots each case into the output table' },
-    bridge:     { name:'Bridge',   label:'Build the profit bridge', tab:'Bridge',   desc:'Profit = revenue × margin, fill it across years' },
-    foot:       { name:'Foot',     label:'Total it both ways',  tab:'Cross-foot',  desc:'SUM across and down, tie out the corner' },
+    cagr:       { name:'CAGR',     label:'Compound it, three times',tab:'CAGR',       desc:'Three growth screens scattered across the page, each wanting the same compound rate — work all three, put them in percent, then read your own output and call the winner' },   /* r429 §4.26: desc rewritten for the promoted percent beat; de-hint clean */
+    sumif:      { name:'SUMIF',    label:'Roll up the segments',   tab:'Rollup',      desc:'Roll a raw ledger up by segment, show every share of the whole, then prove it ties back — a rollup that quietly misses rows still looks like a table full of numbers' },   /* r429 §4.28: desc rewritten for the tie-out beat; de-hint clean */
+    rollup:     { name:'SUMIFS',   label:'Cross-tab with SUMIFS', tab:'Cross-tab',   desc:'Cross a deal list into a segment-by-region grid — lock the ranges the right way and one formula spreads both directions; if two crosses come back identical, the anchors are telling you something' },   /* r429 §4.29: desc rewritten for the promoted axes beat; de-hint clean */
+    fxconvert:  { name:'FX Convert',label:'Convert with one FX rate',tab:'FX',        desc:'One boxed rate drives a whole euro-to-dollar table — build the conversion so that moving the rate re-prices every figure on the page' },   /* r429 §4.30 + D13: desc de-hinted (chord tokens out) and rewritten for the reworked scope */
+    cases:      { name:'Sticky switch',label:'Scenario switch with CHOOSE',tab:'Scenarios', desc:'A real scenario switch — one cell drives the model, and a self-referencing capture row freezes each case as you visit it, so a later revision does not quietly rewrite history' },   /* r429 §4.31: desc rewritten for the reworked scope; de-hint clean */
+    /* r429 H6b-5 (DEPTH_PASS §4.32/§2.4/§3 D1): qclose is a NEW drill and the Formulas I
+       capstone — capstone:true drives the picker's ★ CAPSTONE tag + full-color group ring;
+       the gate itself reads HOTKEY_CAMPAIGN.chapters[2].capstone below. */
+    qclose:     { name:'Close the quarter', label:'Close the quarter', tab:'Close', capstone:true, desc:'The Formulas I capstone — a quarterly close built end to end: gross profit across the quarters, the year down the column, margin and growth underneath, the segment ledger rolled into its memo, and a page that ties. One clean run opens the next track leg' },
+    bridge:     { name:'Point Mode',label:'Point-mode formulas',   tab:'Point',       desc:'Grow a revenue line off a memo rate row nobody has used yet, run EBITDA against its own margin, total the years and close the line — a row you built once should be carried, not repeated' },   /* r429 §4.27 + D10 complete: tab -> Point, desc rewritten for the reworked scope; de-hint clean */
+    foot:       { name:'Foot',     label:'Foot the table both ways',tab:'Cross-foot', desc:'Total a regional revenue grid in both directions, land the corner where the edges meet, and prove it with a check line that reads exactly zero' },   /* r429 §4.22: desc rewritten for the reworked scope (dress + prove-out beats); de-hint clean */
     balance:    { name:'Balance',  label:'Make it balance',     tab:'Balance',     desc:'2 yrs SUM-footed both sides, check at zero, totals formatted' },
     audit:      { name:'Review Pass', label:'Review pass \u2014 find what\u2019s broken', tab:'Audit', desc:'Three planted breaks in a real P&L \u2014 find them all' },
     balcheck:   { name:'Make It Tie', label:'Make it tie \u2014 hunt the break', tab:'Make It Tie', desc:'The check row was pasted over \u2014 resurrect it, run both breaks down' },
@@ -136,7 +144,7 @@ window.HOTKEY_DRILLS = {
     hunt:       { name:'Audit',    label:'Hunt the hardcodes',  tab:'Audit',   desc:'Go To Special \u2192 constants \u2014 every number a formula should own lights up' },
     wrapfix:    { name:'IFERROR',  label:'Wrap it or fix it',   tab:'IFERROR', desc:'Wrap the truly missing, fix the merely broken \u2014 never bury errors' },
     signerr:    { name:'Sign Sweep', label:'Flip the signs back', tab:'Signs', desc:'Pasted costs came in positive \u2014 sweep the signs, prove EBIT, margin it' },
-    percent:    { name:'% of Revenue', label:'Common-size both statements', tab:'Common-size', desc:'Both blocks ÷ their OWN revenue, $-locked so the fill can’t drift' },
+    percent:    { name:'% of rev', label:'Common-size both statements',tab:'Common-size', desc:'Two business units on one page, each common-sized against its own revenue — the lock is the lesson: an unanchored divisor walks down the column with the fill' },   /* r429 §4.24: desc rewritten for the two-unit board; de-hint clean */
     intsched:   { name:'Interest', label:'Run the interest schedule', tab:'Interest', desc:'Roll the debt, then rate × the opening balance is cash interest — and EBITDA ÷ interest is the coverage the covenant reads' },
     schedule:   { name:'Schedule', label:'Roll it forward',     tab:'Schedule',    desc:'5-yr roll: linked openings + the accumulated-dep memo' },
     comps:      { name:'Comps',    label:'Run the comps',       tab:'Comps',       desc:'Build the multiples, read the summary \u2014 median, high/low and the LARGE/SMALL trimmed range \u2014 land per share and premium' },
@@ -240,8 +248,8 @@ window.HOTKEY_CAMPAIGN = {
      first; the other seven designate as their chapter's capstone build lands. */
   chapters: [
     { id:'c1', name:'Foundations',            badge:'\ud83c\udf93', xp:150, keys:['navigation','blocksel','filldr','pastes'], capstone:'modeltour' },
-    { id:'c2', name:'Formatting',             badge:'\ud83c\udfa8', xp:200, keys:['housestyle','dress','gauntlet'] },
-    { id:'c3', name:'Formulas I',             badge:'\u2797',        xp:250, keys:['margin','growth','anchor','sumif'] },
+    { id:'c2', name:'Formatting',             badge:'\ud83c\udfa8', xp:200, keys:['housestyle','dress','gauntlet'], capstone:'gauntlet' },   /* r429 H6b-4: capstone designated */
+    { id:'c3', name:'Formulas I',             badge:'\u2797',        xp:250, keys:['margin','growth','anchor','sumif'], capstone:'qclose' },   /* r429 H6b-5: capstone designated */
     { id:'c4', name:'Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','recon','lookup','lookup2'] },
     { id:'c5', name:'Formulas II',            badge:'\ud83e\uddee', xp:450, keys:['audit','balance','hunt','versionup'] },
     { id:'c6', name:'Models I \u00b7 Valuation',    badge:'\ud83c\udfe6', xp:600, keys:['wacc','fcfbuild','dcf','comps'] },
@@ -330,9 +338,11 @@ window.HOTKEY_CLOCKS = {
      gate itself has no clock at all). pro/leg stay derived (par×1.15 / par×1.0). Keep pass in
      lockstep with HOTKEY_PARS.modeltour: pass = par × 2. */
   modeltour: { pass: 70 },
+  gauntlet:  { pass: 94 },   /* r429: par 47 \u00d7 2 \u2014 keep in lockstep with HOTKEY_PARS.gauntlet */
+  qclose:    { pass: 188 },  /* r429 H6b-5: par 94 \u00d7 2 \u2014 keep in lockstep with HOTKEY_PARS.qclose */
 };
 
-window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":38,"undo":29,"copyover":28,"housestyle":44,"ruleoff":31,"ruleaudit":16,"dress":41,"typeset":14,"decimals":18,"center":18,"autofit":15,"combo":24,"gauntlet":63,"margin":23,"foot":11,"percent":17,"growth":36,"cagr":55,"anchor":16,"bridge":10,"sumif":57,"rollup":65,"fxconvert":35,"cases":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"wirewalk":10,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
+window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":38,"undo":29,"copyover":28,"housestyle":44,"ruleoff":31,"ruleaudit":16,"dress":41,"typeset":14,"decimals":27,"center":23,"autofit":36,"combo":36,"gauntlet":47,"margin":45,"foot":32,"percent":26,"growth":50,"cagr":38,"anchor":34,"bridge":29,"sumif":76,"rollup":68,"fxconvert":39,"cases":89,"qclose":94,"sort":10,"scrub":21,"recon":77,"grpfold":15,"filterpass":13,"unhide":15,"lookup":32,"lookup2":48,"drill":18,"series":14,"audit":34,"triage":27,"wrapfix":70,"balcheck":28,"stalelink":28,"wirewalk":10,"tieout":30,"hunt":45,"signerr":22,"versionup":33,"balance":39,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

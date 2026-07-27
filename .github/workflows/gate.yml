@@ -110,6 +110,18 @@ jobs:
       - name: Grid-height regression
         if: steps.scope.outputs.engine == 'true'
         run: node dev/e2e-grid-height.js
+      # r429 H6b-5: the DEPTH-PASS suites join the gate. They were session-only, which is exactly
+      # how e2e-depth-mechanics sat silently RED through all of wave 5 — its `foot` fixture rotted
+      # the moment `foot` was reworked, and nothing on CI was watching. Depth-contract asserts the
+      # universal §1 contract for every drill on the C9 REWORKED ledger; depth-mechanics asserts
+      # the platform mechanics those drills depend on (mystery ☆ display, the Ctrl+S closer,
+      # capstone gating, medal clocks).
+      - name: Depth contract (§1 anatomy, every reworked drill)
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/e2e-depth-contract.js
+      - name: Depth mechanics (☆ display · Ctrl+S closer · capstone gate · clocks)
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/e2e-depth-mechanics.js
       - name: Drill pages in sync
         if: steps.scope.outputs.engine == 'true'
         run: |

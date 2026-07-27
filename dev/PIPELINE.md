@@ -1,6 +1,114 @@
 # PIPELINE — the Fable task queue
 
-## ⚡ STATE OF THE QUEUE (r417, 2026-07-24 — READ FIRST)
+## ⚡ STATE OF THE QUEUE (r429, 2026-07-27 — READ FIRST; supersedes the r417/r420c block below)
+
+**WHERE THE DEPTH PASS STANDS:**
+- **31/82 live drills at the depth-pass standard** (the C9 REWORKED ledger in dev/check-invariants.js
+  is the single source of truth): **Foundations (c1) COMPLETE 9/9** (modeltour★ capstone) ·
+  **Formatting (c2) COMPLETE 10/10** (gauntlet★ capstone — a clean run opens Formulas I) ·
+  **Formulas I (c3) COMPLETE 12/12** (qclose★ capstone — a clean run opens Data & Lookups).
+- **▶ THREE COMPLETE CHAPTERS ARE READY TO PLAYTEST (r429, 2026-07-27).** c1 → c2 → c3 run end to
+  end with all three capstone gates live. The catalog is now **82** drills, not 81: `qclose` is the
+  first NEW drill of the pass (D1) and the marketing copy in index.html/About.html moved with it.
+  Everything from `sort` (c4) onward is still pre-depth-pass — expect the seam to be obvious.
+- **VERIFICATION IS NOW GENERIC** — `dev/e2e-depth-contract.js` asserts the universal §1 contract
+  for every drill on the ledger, and `dev/e2e-alt-paths.js` enforces the **☆-forfeit contract** (an
+  alt whose name says "☆ forfeited" MUST clear core with the ☆ dark). A new drill therefore needs
+  NO bespoke probe file — only its two alts, one of which is the skippability control.
+- **Spec is DEPTH_PASS r429** — §1.0 + §1.0-R2 + **§1.0-R3 (the dual-audience real-task law + the ☆
+  re-cut sweep)** + **§3.1 the audience map**. Every pre-playtest §4 page still proposes a FORMATTING
+  ☆, a class §1.0(d) killed: re-cut it per §1.0-R3(o), do not ask.
+- **Engine telemetry added for ☆ latches (all grading-only, none readable by a core check):**
+  `fmtOps.dec` · `fmtOps.align` · `widthOps` · `selOps` (r429), joining r424–r425's `fillOps` ·
+  `pasteOpLog` · `pasteLog` · `fmtOps` · `cutMoves` · `gotoSpecials`. **Prefer these before adding
+  a new one** — gauntlet's ☆ needed none.
+- **DOCS DEBT cleared r428:** the source session died mid-assembly; AUDIT.md now carries a
+  r426–r427 reconciliation entry (what's verified vs what isn't), this header is current, and the
+  wave process is codified as **WORKFLOW.md §9 (the Opus-5 wave playbook — payload contract,
+  serial assembly; the r427 union-merge incident is the WHY)** + `.claude/workflows/drill-wave.js`.
+
+**THE QUEUE (in order):**
+1. **✅ W4 — FORMATTING (c2) COMPLETE (r429).** All five shipped, each fully gated with its own
+   mechanics probe: **decimals** (audience-A ops scorecard · column-select ☆) · **center**
+   (class-sweep ☆ · new border beat · board now ships misaligned) · **autofit** (audience-A
+   headcount roster · one-pass ☆ · beats CHAIN — the player's own totals create the #### the next
+   beat fixes) · **combo** (current-region ☆ — the one ☆ that grades the CHORD; blue-inputs
+   promoted to core) · **gauntlet★ THE FORMATTING CAPSTONE** (format-cloning ☆, direction-agnostic;
+   a clean run now opens Formulas I).
+   **Chapter 2 is closed: 10/10 at the standard. Catalog 19/81.** Four new engine telemetry hooks
+   (`fmtOps.dec`, `fmtOps.align`, `widthOps`, `selOps`), all grading-only. **A MISSING CAPSTONE
+   INVARIANT was found and restored** (a silent r427 union-merge casualty — it caught a live par
+   drift on its first run).
+   **NOTE — the parallel wave is BLOCKED:** `.claude/workflows/drill-wave.js` ran 2026-07-27 and
+   all five worktree agents failed identically — the harness permission layer stripped every tool
+   call's required parameters, so no agent could read or write a byte (zero files touched; each
+   correctly refused to improvise and reported the blocker). Until that is fixed, waves build
+   SERIALLY in the main checkout, which is how all five of these were done. Two further gotchas:
+   worktrees branch from the last COMMIT (commit spec changes before launching), and the workflow's
+   `args` arrive JSON-encoded (now normalised in the script).
+1b. **W5 — FORMULAS I (c3) [auto·rolling] — IN FLIGHT, 11 of 12.** ✅ **margin** (comp sets →
+   divisional performance pack, audience A; three ratio asks permuted per seed with §1.0-R2(g)
+   adaptive labels; fill-census ☆) · ✅ **foot** (audience-A regional grid; reference-over-retype ☆;
+   gained a dress beat and the cross-foot prove-out; par 11→32) · ✅ **anchor** (4-spot site pool,
+   the fill-census latch CHECK2 was missing, D12 de-hint; independent-prove-out ☆; par 16→34).
+   ✅ **percent** (Statement A/B → two named business units; anchoring/fill-census ☆; block A
+   un-nailed from C2) · ✅ **growth** (a §1.0(c) violation fixed — core demanded the REFERENCE route,
+   so the reference became the ☆; site jitter added).
+   ✅ **cagr** (formula-cloning ☆; the percent pass PROMOTED to core) · ✅ **bridge** (the dead memo
+   row became live work, 2 beats → 6; one-pass-fill ☆; D10 complete — and the depth contract caught
+   a site that put the headers on the title row, live since r187).
+   ✅ **sumif** + ✅ **rollup** (both carried the SAME two defects — a §1.0(c) route requirement
+   baked into core, and §1.2 axes that existed on paper but not in the build; sumif gets a tie-out ☆,
+   rollup a 2-D one-pass ☆ with its axes beat promoted from the dead formatting ☆).
+   ✅ **fxconvert** (both audit findings closed — guide 3v5 realigned, and its first ever ALTS).
+   ✅ **cases** (the catalog's WORST misalignment closed — targets 9 and guide 4 against 6 checks,
+   so the guided ring pointed at the wrong cell from step 2 on; formula-cloning ☆).
+   ✅ **qclose★ THE FORMULAS I CAPSTONE — the pass's first NEW drill.** The chapter's five formula
+   shapes in one artifact (point · fill · lock · grow · roll up); independent-prove-out ☆ (a
+   recorded deviation from the family cap — see AUDIT); par swept fresh at 94/86; the full plumbing
+   row discharged in one commit including `dev/migrate-certificates.sql` (r359 drift rule). ALT 2
+   leaves the check cell empty and still clears every core — **§2.2 proved, not asserted, on the
+   one drill where it matters most.**
+   **✅ CHAPTER 3 IS CLOSED: 12/12 at the standard. Catalog 31/82. W5 COMPLETE.**
+   Harness gained a `[☆ n/reps]` counter on every bonus-carrying alt, so an alt meant to EARN the ☆
+   can no longer latch 0/3 and still read PASS.
+   **⚠️ OPEN, WOLF-FACING — PLACEMENT BAND DRIFT (D16 assumption invalidated):** margin's par went
+   23→45, moving it mid→LONG where `dress` (41) already sits; the placement set now spans
+   short/long/epic with **no mid representative**. It still spans the arc so §5.3 passes, and it was
+   NOT changed unilaterally — HK_PLACEMENT decides ranked placement for every player. Re-check after
+   `sort` is reworked in c4 (par 10s today); if margin and dress both sit long, swap one for a
+   mid-band drill. Full note in AUDIT r429 margin entry.
+
+2. **WOLF PLAYTEST — NOW AT THE END OF THE PASS, BY WOLF'S CALL (2026-07-27):** _"I want to
+   playtest the entire suite before providing another round of feedback."_ So the pass runs to
+   completion first and there is no mid-pass gate. **The recorded trade-off** (raised once, Wolf's
+   decision stands): rounds 1 and 2 each rewrote the standard — six binding rules, then seven — and
+   those rules only applied to what was built after them. Deferring feedback to the end means any
+   systemic misread of taste compounds across the remaining drills rather than across five, so
+   budget for a broader fix-up wave after the playtest than the earlier rounds needed. Collect at
+   playtest: §1.0-R3 artifact fit, ☆ discovery rate, clock feel, the c3 prove-out overlap
+   (foot core vs anchor ☆), and the two open Wolf-facing items below.
+3. **✅ W5–W7 — FORMULAS I (c3) COMPLETE:** margin · foot · anchor · percent · growth · cagr ·
+   bridge · sumif · rollup · fxconvert · cases · **qclose★ (NEW, D1)**. The D10–D15 drills.js meta
+   sweep landed with the drills that owned each item. **NEXT: c4 — Data & Lookups (10 reworks +
+   vlookup NEW + cleanroom★), the largest remaining chapter.**
+4. **Chapter-by-chapter per DEPTH_PASS §5** — c4 (incl. vlookup NEW + cleanroom★) → **post-c4
+   MID-PASS REVIEW (§5.4 #4: par distribution, clock feel, bonus uptake, gate friction)** →
+   c5 (redflags★) → c6 (pitchpage★) → c7 (cascade★ move) → **H6b-FB (ch 8) SEPARATE PASS,
+   Wolf-gated (§5.4 #5)**.
+**✅ DECIDED — DATA RETENTION (Wolf, 2026-07-27, closes G10):** **detailed per-run history is kept
+~7 days**; stats surfaces show the **last 5 runs with an expand/see-more** for the rest of the
+window. **Aggregates are permanent** — PBs, band/medal state, splits attached to a PB, total
+keystrokes/time, achievements, certificates, leaderboard entries. Rationale: the deep run log is a
+debugging/《how am I trending》surface with a short useful life; the aggregates are the player's
+record and must never be lost (r158 no-rug-pull law). Implementation notes for the stats round:
+prune on write (a scheduled purge of `runs` rows older than the window, PB-bearing rows exempt),
+display hardens around "last 5 + expand", and the privacy page gains the retention sentence.
+
+**Wolf-pending (unchanged):** fx dial-up render approval · lean ribbon default-ON · About restyle ·
+card customizer 2.0 (item 9 below, screenshot-first).
+
+## ⚡ STATE OF THE QUEUE (r417, 2026-07-24 — history; superseded by r428 above)
 _Process standards now live in **dev/WORKFLOW.md** (orchestrator+agent-fleet model, decision
 protocol, definition of done, **NEW §8: post-batch briefs · propagation sweeps · model-proof
 specs**). Findings base: **dev/AUDIT_R417.md** (6-domain platform audit, live-verified). One

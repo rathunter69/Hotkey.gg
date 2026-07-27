@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Scenario switch with CHOOSE — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="A CHOOSE driver reads the switch and repositions the model; a self-referencing IF snapshots each case into the output table Par 94s, optimal 100 keys. Free in">
+<meta name="description" content="A real scenario switch — one cell drives the model, and a self-referencing capture row freezes each case as you visit it, so a later revision does not quietly">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Scenario switch with CHOOSE — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="A CHOOSE driver reads the switch and repositions the model; a self-referencing IF snapshots each case into the output table Par 94s, optimal 100 keys. Free in">
+<meta property="og:description" content="A real scenario switch — one cell drives the model, and a self-referencing capture row freezes each case as you visit it, so a later revision does not quietly">
 <meta property="og:url" content="https://www.hotkey.gg/drills/cases.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Scenario switch with CHOOSE — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="A CHOOSE driver reads the switch and repositions the model; a self-referencing IF snapshots each case into the output table Par 94s, optimal 100 keys. Free in">
+<meta name="twitter:description" content="A real scenario switch — one cell drives the model, and a self-referencing capture row freezes each case as you visit it, so a later revision does not quietly">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/cases.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -85,7 +85,7 @@
   .trackhead small{color:var(--faint); font-weight:400; font-size:12px}
   .trackhead .tb{font-size:12.5px; color:var(--muted); font-weight:400; margin-top:4px; line-height:1.55}</style>
 <link rel="stylesheet" href="nav.css?v=210">
-<script src="drills.js?v=284"></script>
+<script src="drills.js?v=301"></script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -93,7 +93,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=310"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Scenario switch with CHOOSE","description":"A CHOOSE driver reads the switch and repositions the model; a self-referencing IF snapshots each case into the output table","url":"https://www.hotkey.gg/drills/cases.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas I","teaches":"A self-referencing IF snapshots each case as you visit it — and FREEZES it: change an assumption afterward and the summary holds the old number until you revisit that case.","isPartOf":{"@type":"Course","name":"Spreadsheet Formulas & Data Analysis","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT94S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Scenario switch with CHOOSE","item":"https://www.hotkey.gg/drills/cases.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Scenario switch with CHOOSE","description":"A real scenario switch — one cell drives the model, and a self-referencing capture row freezes each case as you visit it, so a later revision does not quietly rewrite history","url":"https://www.hotkey.gg/drills/cases.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas I","teaches":"A self-referencing IF snapshots each case as you visit it — and FREEZES it: change an assumption afterward and the summary holds the old number until you revisit that case.","isPartOf":{"@type":"Course","name":"Spreadsheet Formulas & Data Analysis","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT89S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Scenario switch with CHOOSE","item":"https://www.hotkey.gg/drills/cases.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -106,12 +106,15 @@
   <div class="sub">Build a scenario switch the way a real model does it. A driver block reads one cell — the switch — and CHOOSE pulls the active case’s name and growth rate into it, so the model runs off the driver instead of nested IFs. A capture cell reads the locked-year revenue only while its case is live, and otherwise references itself to hold the last value — so the summary shows all three cases side by side.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=cases">train this drill →</a>
-    <span class="par">par 94s · optimal 100 keys · keyboard only · free</span>
+    <span class="par">par 89s · optimal 81 keys · keyboard only · free</span>
   </div>
 
   <div class="section-title">The shortcuts in this drill</div>
   <div class="panel">
+    <div class="scb"><div class="sch"><kbd>Ctrl+C</kbd><span class="m">⌘C on mac</span><span class="what">Copy</span></div><div class="use">Copy starts almost every hand-off — grab a finished block once, then place it in the summary, the deck, or next quarter’s column.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+V</kbd><span class="m">⌘V on mac</span><span class="what">Paste</span></div><div class="use">Plain paste brings everything: values, formulas, formats. Reach for Paste Special when you only want part of it.</div></div>
     <div class="scb"><div class="sch"><kbd>Ctrl+R</kbd><span class="m">⌘R on mac</span><span class="what">Fill right from the cell to the left</span></div><div class="use">Same as fill down, but across — one quarter’s formula becomes the whole year in two keystrokes.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+S</kbd><span class="m">⌘S on mac</span><span class="what">Save</span></div></div>
     <div class="fnline">functions you'll type: <b style="color:var(--text)">CHOOSE()</b> · <b style="color:var(--text)">IF()</b></div>
   </div>
 
@@ -120,15 +123,15 @@
 
   <div class="section-title">More Formulas I drills</div>
   <div class="rel">
-    <a href="drills/margin.html"><div class="rn">Margins across the page</div><div class="rd">EBITDA ÷ revenue, three comp tables — pointed, filled, %</div></a>
-    <a href="drills/foot.html"><div class="rn">Total it both ways</div><div class="rd">SUM across and down, tie out the corner</div></a>
-    <a href="drills/anchor.html"><div class="rn">Pin the reference</div><div class="rd">Cycle the reference locks — one pinned formula prices the whole grid</div></a>
-    <a href="drills/percent.html"><div class="rn">Common-size both statements</div><div class="rd">Both blocks ÷ their OWN revenue, $-locked so the fill can’t drift</div></a>
+    <a href="drills/margin.html"><div class="rn">Margins across the page</div><div class="rd">Three divisions, three different ratio columns — a margin, a growth rate and an asset-turn</div></a>
+    <a href="drills/foot.html"><div class="rn">Foot the table both ways</div><div class="rd">Total a regional revenue grid in both directions, land the corner where the edges meet, an</div></a>
+    <a href="drills/anchor.html"><div class="rn">Pin the reference</div><div class="rd">One formula prices a whole grid — lock the right two references, carry it across, dress it</div></a>
+    <a href="drills/percent.html"><div class="rn">Common-size both statements</div><div class="rd">Two business units on one page, each common-sized against its own revenue — the lock is th</div></a>
   </div>
   <div class="cta-row" style="margin-top:26px">
     <a class="cta" href="drills/fxconvert.html">← FX Convert</a>
-    
-    <a class="cta" href="drills/index.html">all 81 drills</a>
+    <a class="cta" href="drills/qclose.html">Close the quarter →</a>
+    <a class="cta" href="drills/index.html">all 82 drills</a>
   </div>
   <div class="fine">
     Excel is a registered trademark of Microsoft Corporation. hotkey.gg is independent and not affiliated with or endorsed by Microsoft.

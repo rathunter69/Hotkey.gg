@@ -439,27 +439,42 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
 
   console.log('H. medal clocks (§2.1 display layer)');
   {
+    /* r429 H6b-5 FIXTURE ROT FIX: this block used to hardcode `foot` AT PAR 11 and assert the
+       literal strings "pass 0:17 / pro 0:13 / legendary 0:11". `foot` was reworked to par 32 in
+       wave 5, so all four assertions went red against CORRECT engine output and the whole suite
+       has been silently failing ever since. Every remaining chapter re-pars its drills, so a
+       hardcoded par WILL rot again — the expectations are now DERIVED from the live
+       HOTKEY_PARS entry and the fixture is picked at runtime. Nothing here asserts a number a
+       depth-pass rework is allowed to change. */
     const r = await run(() => {
-      window.__clearCel(); hideResults(); loadChallenge('foot');   // par 11
-      const c = hkClocksFor('foot');
+      /* a fixture with NO HOTKEY_CLOCKS override — capstones carry one by design (§2.4), so
+         picking one would test the override path instead of the derivation path */
+      const key = (window.HOTKEY_DRILLS.menuOrder || []).find(k =>
+        CHALLENGES[k] && (window.HOTKEY_PARS || {})[k] && !(window.HOTKEY_CLOCKS || {})[k]);
+      window.__clockKey = key;   // r2 below re-uses the same fixture
+      window.__clearCel(); hideResults(); loadChallenge(key);
+      const par = window.HOTKEY_PARS[key];
+      const c = hkClocksFor(key);
       const ready = (document.getElementById('result') || {}).innerHTML || '';
-      const beat = hkClockBeat('foot', 12);   // between pro (12.65) and legendary (11)
-      window.HOTKEY_CLOCKS.foot = { pass: 100 };
-      const c2 = hkClocksFor('foot');
-      delete window.HOTKEY_CLOCKS.foot;
+      const want = t => 'pass ' + hkClockFmt(c.pass) + ' · pro ' + hkClockFmt(c.pro) +
+                        ' · legendary ' + hkClockFmt(c.leg);
+      const strip = ready.replace(/<[^>]+>/g, '').includes(want());
+      const beat = hkClockBeat(key, (c.pro + c.leg) / 2);   // strictly between pro and legendary
+      window.HOTKEY_CLOCKS[key] = { pass: 100 };
+      const c2 = hkClocksFor(key);
+      delete window.HOTKEY_CLOCKS[key];
       return {
-        pass: c.pass, pro: +c.pro.toFixed(2), leg: c.leg,
-        strip: /pass 0:17/.test(ready) && /pro 0:13/.test(ready) && /legendary 0:11/.test(ready),
-        beatN: beat && beat.beat && beat.beat.n, nextN: beat && beat.next && beat.next.n,
-        oPass: c2.pass, oLeg: c2.leg,
+        key, par, derives: c.pass === par * 1.5 && Math.abs(c.pro - par * 1.15) < 1e-9 && c.leg === par,
+        strip, beatN: beat && beat.beat && beat.beat.n, nextN: beat && beat.next && beat.next.n,
+        oPass: c2.pass, oLeg: c2.leg, wantLeg: par,
       };
     });
-    ok(r.pass === 16.5 && r.pro === 12.65 && r.leg === 11, 'clocks derive pass=par×1.5 · pro=par×1.15 · legendary=par×1.0', r);
+    ok(r.derives, 'clocks derive pass=par×1.5 · pro=par×1.15 · legendary=par×1.0', r);
     ok(r.strip, 'drill-start line carries the three-clock strip', r);
     ok(r.beatN === 'Pro' && r.nextN === 'Legendary', 'clock naming: the one you beat + the next one up', r);
-    ok(r.oPass === 100 && r.oLeg === 11, 'HOTKEY_CLOCKS override wins per field, the rest still derive', r);
+    ok(r.oPass === 100 && r.oLeg === r.wantLeg, 'HOTKEY_CLOCKS override wins per field, the rest still derive', r);
     const r2 = await run(() => {
-      const C = CHALLENGES.foot;
+      const C = CHALLENGES[window.__clockKey];
       for (const mv of C.demo()) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
       const m = document.getElementById('resultsModal');
       const row = m ? m.querySelector('.rm-clock') : null;
@@ -511,16 +526,27 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     ok(r2.lastIsSave, 'demo() gets the Ctrl+S keystroke appended engine-side (replays stay green)', r2);
     ok(r2.coresDone && r2.preDone === false, 'all cores complete — the win gates on the save beat', r2);
     ok(r2.done === true && r2.splitsLen === r2.checksLen, 'Ctrl+S fires the win; the save beat carries a split slot', r2);
+    /* r429 H6b-5 FIXTURE ROT FIX: this used to hardcode `foot` as the non-saveClose fixture.
+       `foot` GAINED saveClose in the wave-5 rework, so Ctrl+S correctly completed the drill and
+       the assertion went red against right behavior. Every depth-pass rework adds saveClose, so
+       the fixture is now chosen at runtime from whatever still lacks it, and the typed cell comes
+       from the board's own active cell rather than a hardcoded C5. When the pass finishes and
+       EVERY drill declares saveClose this contract stops existing — the test says so out loud
+       instead of failing. */
     const r3 = await run(() => {   // non-saveClose drills keep the restart behavior, still swallowed
-      window.__clearCel(); hideResults(); loadChallenge('foot');
-      setDemoSel('C5'); demoKey({ key: '7' }); demoKey({ key: 'Enter' });
+      const key = (window.HOTKEY_DRILLS.menuOrder || []).find(k => CHALLENGES[k] && !CHALLENGES[k].saveClose);
+      if (!key) return { skip: true };
+      window.__clearCel(); hideResults(); loadChallenge(key);
+      const a = S.active, cell = colLetter(a.c) + a.r;
+      setDemoSel(cell); demoKey({ key: '7' }); demoKey({ key: 'Enter' });
       const hadWork = keyLog.length > 0;
       const ev = new KeyboardEvent('keydown', { key: 's', ctrlKey: true, cancelable: true, bubbles: true });
       document.dispatchEvent(ev);
       const fresh = keyLog.length === 0 && done === false;   // loadChallenge wipes the key log — the board restarted
-      return { hadWork, prevented: ev.defaultPrevented, fresh };
+      return { key, hadWork, prevented: ev.defaultPrevented, fresh };
     });
-    ok(r3.hadWork && r3.prevented && r3.fresh, 'non-saveClose drill: Ctrl+S still swallowed + restarts (unchanged contract)', r3);
+    if (r3.skip) console.log('  SKIP non-saveClose drill: every drill now declares saveClose — the contract no longer applies');
+    else ok(r3.hadWork && r3.prevented && r3.fresh, 'non-saveClose drill: Ctrl+S still swallowed + restarts (unchanged contract)', r3);
   }
 
   console.log('J. mystery-☆ display (r423 round-2 §2)');

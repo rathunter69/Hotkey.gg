@@ -202,8 +202,9 @@ Plus, same batch:
 - **In-flight rounds carrying this feedback:** engine-UI round (R2-B1–B4) · index-UI round
   (R2-B5–B7 + §4c) · wave-1 drill ROUND 3 (§2 items) · cosmetics round (§4a/4b/4d, incl. the
   achievements rename batch) · docs (this file + DEPTH_PASS r420d — done).
-- **Wave-2/3 build status:** 5 drills committed (ruleoff · dress · copyover · editfix ·
-  ruleaudit); 4 resuming after a session-limit kill (undo · modeltour · housestyle · typeset).
+- **Wave-2/3 build status (updated r428, 2026-07-26):** ALL NINE landed in PR #242 (ruleoff ·
+  dress · copyover · editfix · ruleaudit · undo · modeltour★ · housestyle · typeset) — see the
+  AUDIT.md r426–r427 reconciliation entry for what shipped verified vs unverified.
 - **Wolf's model note:** the session may run Opus-tier — WORKFLOW.md §8 MODEL-PROOF HANDOFF is
   now live practice, not insurance. Every spec/prompt stays self-contained: rationale inline,
   exact predicates, worked examples; nothing load-bearing in session memory.

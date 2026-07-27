@@ -1,8 +1,164 @@
 # hotkey.gg — PROJECT_CONTEXT (handover / source of truth)
-_Refreshed 2026-07-24 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
+_Refreshed 2026-07-26 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
 New sessions: the repo IS the handover — read this file, **dev/WORKFLOW.md (the process
-standards — READ FIRST, new r417)**, **dev/PIPELINE.md's ⚡ header (the live queue)**,
-dev/AUDIT.md (newest round at the TOP), and the dev/ design docs._
+standards — READ FIRST; §9 is the wave playbook for Opus-5 sessions, new r428)**,
+**dev/PIPELINE.md's ⚡ r428 header (the live queue)**, dev/AUDIT.md (newest round at the TOP),
+and the dev/ design docs._
+
+## ⚡ NEXT-SESSION HANDOFF (2026-07-27, r429 — THE DUAL-AUDIENCE LAW + CHAPTERS 1-3 COMPLETE)
+
+**WOLF'S NEW PRODUCT DIRECTION (2026-07-27), now binding build law:** every drill must read as a
+REAL DESK TASK for **both** audiences — the corporate mid-career professional AND the aspiring
+banker/consultant. Written up as **DEPTH_PASS §1.0-R3(n)** (the reality test, banned artifact
+classes, prompt-frame and register rules) + **§3.1 THE AUDIENCE MAP** (per-chapter A/B mix and
+artifact families, so all 67 remaining drills inherit it). Companion rule **§1.0-R3(o)** states the
+☆ RE-CUT SWEEP once, catalog-wide: **every pre-playtest §4 page proposes a FORMATTING bonus, a
+class §1.0(d) already killed** — build agents re-cut to one of six named efficiency families
+without escalating. Spec is now **DEPTH_PASS r429**.
+
+**ALSO DECIDED:** data retention (closes G10) — 7-day detailed run history, last 5 + expand,
+aggregates permanent. In PIPELINE ⚡ with implementation notes.
+
+**▶▶ THREE COMPLETE CHAPTERS ARE READY TO PLAYTEST. WAVE 5 (Formulas I, c3) IS CLOSED, 12 of 12.**
+margin · foot · anchor · percent · growth · cagr · bridge · sumif · rollup · fxconvert · cases ·
+**qclose★**. With c1 (9/9, modeltour★) and c2 (10/10, gauntlet★) that is **31 of 82 drills at the
+depth-pass standard and an unbroken c1 → c2 → c3 run with all three capstone gates live.**
+Everything from `sort` (c4) onward is still pre-depth-pass — the seam will be obvious, and that is
+expected, not a defect.
+
+**`qclose★` — the pass's FIRST NEW DRILL** (DEPTH_PASS §4.32, catalog delta D1), not a rework. It
+carries the chapter's five formula shapes in one artifact — point (gross profit), fill (the FY
+column), lock (the margin divisor), grow (quarter on quarter), roll up (the segment SUMIF) — and
+the full plumbing row landed in one commit: campaign spine · HK_TRACKS **+ dev/migrate-certificates.sql
+in the SAME PR** (r359 drift rule) · HOTKEY_PARS · SEO page + sitemap · the c3 capstone wiring off
+the gauntlet/modeltour template (meta.capstone, chapter designation, HOTKEY_CLOCKS pass=par×2=188,
+the shared hkCapstoneOk predicate, picker ★ tag, both grandfather rules). Par swept fresh at
+**94/86**. **The catalog is now 82 drills, not 81** — the marketing copy in index.html/About.html
+moved with it (the smoke gate's `drill-count` check caught that, in five meta tags).
+
+**TWO THINGS FROM qclose WORTH CARRYING FORWARD:**
+- **§2.2 is now PROVED on the drill where it matters most.** A bonus can never gate anything —
+  including a chapter. `qclose`'s ALT 2 leaves the ☆ check cell untouched, clears all six cores,
+  and opens Data & Lookups. Every future capstone should ship the same control.
+- **A RECORDED ☆-FAMILY DEVIATION, flagged for the playtest.** The tie-check ☆ is INDEPENDENT
+  PROVE-OUT's third use in c3 (anchor, sumif), past the §1.0-R3(o) twice-per-chapter cap. Kept
+  deliberately: a capstone's job is to close a page, and *does it tie?* is the closing discipline.
+  If c3's ☆s read samey end to end at playtest, **turn the family rule, not this drill.**
+
+**WHAT WAVE 5 KEPT FINDING — a pattern worth expecting in c4 and beyond.** Five of the eleven
+drills had a **§1.0(c) route requirement baked into core** (growth, sumif, rollup, fxconvert, and
+percent's cousin): the check demanded a particular formula TEXT — `$B$3`, `$-locked` ranges, a
+specific reference — when a typed or pasted equivalent produces the same numbers. Every one became
+that drill's ☆, where grading a route is legal. **When you open a c4 drill, look at its core checks
+for formula-text assertions first.** Two others (`bridge`, `sumif`, `rollup`) had §1.2 axes that
+existed on the page but not in the build — fixed sites, fixed names, fixed depths.
+
+**PRIOR (wave 5 at the 7-of-12 mark):** margin · foot · anchor · percent · growth · cagr ·
+bridge. **Remaining for the 3-chapter playtest: sumif · rollup · fxconvert · cases · qclose★.**
+`qclose★` is the expensive one — a BRAND-NEW drill (not a rework) carrying the full plumbing row
+(campaign spine, cert tracks + migrate-certificates.sql in the SAME PR, PARS, LB board, SEO page)
+plus the c3 capstone wiring off the gauntlet/modeltour template. Budget it at 2–3 ordinary drills.
+
+**TWO STANDING TRAPS FOR WHOEVER CONTINUES:**
+- **C9 is a STATIC parser — build guide/targets/checks as LITERAL arrays.** `.map()/.push()` reads
+  as `null` and the tri-length guard SILENTLY stops covering the drill. Hit three times now
+  (margin, cagr). It does not fail loudly; it just stops protecting you.
+- **Run `dev/e2e-depth-contract.js` on every new drill.** On its first wave it caught a bridge site
+  that put the year headers on the title row — live since r187, through every prior gate, because
+  nothing measured density until r429.
+
+**PRIOR (wave 5 at the 1-of-12 mark):**
+**margin**: three comp sets → the **divisional performance pack** (audience A). Three DIFFERENT
+ratio asks — margin, growth, asset turnover — **permuted across the tables per seed**, which makes
+§1.0-R2(g) adaptive labels load-bearing rather than decorative (a static label would force the
+player to reverse-engineer which of three formulas each table wants). ☆ = fill-census. Par 23→45.
+Probe 16/16.
+**Two findings from it that generalise:**
+- **C9 is a STATIC proxy.** Build guide/targets/checks as literal arrays. My first cut used
+  `.map().concat()` and C9 read them as `null` — **the tri-length guard silently stopped covering
+  the drill**. Refactored; worth checking older drills for the same hole.
+- **⚠️ PLACEMENT BAND DRIFT, Wolf-facing, deliberately NOT acted on.** §3 D16 assumed the placement
+  series keeps its band roles through the rework; margin's did not — par 23→45 moved it mid→LONG
+  where `dress` (41) already sits, leaving **no mid representative** (catalog quartiles 28/36/55).
+  It still spans the arc so §5.3 passes. I did not touch HK_PLACEMENT: it decides ranked placement
+  for every player. Re-check once `sort` is reworked in c4 (par 10s today, certain to rise).
+
+**✅ WAVE 4 COMPLETE — CHAPTER 2 (FORMATTING) IS CLOSED, 10/10 at the standard. Catalog 20/81.**
+All five built serially and fully gated, each with its own mechanics probe (`dev/verify-*.js`):
+**decimals** (comps page → audience-A ops scorecard; column-select ☆) · **center** (class-sweep ☆;
+new border beat; board now ships misaligned so the alignment beat is real work) · **autofit**
+(two abstract blocks → audience-A headcount roster; one-pass ☆; the beats now CHAIN — the player's
+own totals create the #### the next beat fixes) · **combo** (current-region ☆ — the one ☆ that
+grades the CHORD, not the rect; the killed formatting ☆ was PROMOTED to core, not deleted) ·
+**gauntlet★ THE FORMATTING CAPSTONE** (format-cloning ☆, direction-agnostic; a clean run opens
+Formulas I; wired off the modeltour template).
+Four new grading-only engine hooks: `fmtOps.dec` · `fmtOps.align` · `widthOps` · `selOps`.
+gauntlet needed none — `S.pasteLog` already carried what its ☆ reads.
+
+**🔴 A MISSING INVARIANT WAS FOUND AND RESTORED:** the capstone-wiring guard the r425 entry records
+and the r427 assembly commit claims it carried forward **was not in the tree** — a silent
+union-merge casualty. No capstone assertion existed when the second capstone was wired. Restored
+and widened (real drill · meta flag · group-last · one chapter each · hkCapstoneOk present ·
+clocks at par×2), and **it caught a live par drift on its first run**. Expect more of this class:
+anything the r427 rebuild touched deserves a look before it is trusted.
+
+**PRIOR (wave 4 at the 2-of-5 mark):**
+- **decimals** — artifact converted comps page → **operations scorecard** (audience A); ☆ re-cut to
+  COLUMN-SELECTION discipline; new engine telemetry `hkFmtLatch('dec')`; par 18/15 → 27/24;
+  probe `dev/verify-decimals.js` **22/22**.
+- **center** — ☆ spec bug FOUND AT BUILD and recorded (the engine has **no merge op**, so
+  "centre-across instead of merging" isn't a declinable choice); re-cut to **CLASS-SWEEP**
+  discipline; new border beat; board now ships **misaligned** so the alignment beat is real work;
+  `hkFmtLatch('align')`; par 18/15 → 23/20; probe `dev/verify-center.js` **14/14**.
+- **REMAINING: autofit · combo · gauntlet★** — their §4 pages are already re-cut (artifact, ☆
+  family, latch telemetry and the required skippability proof are all named). gauntlet★ flips the
+  c2 gate on and follows the modeltour capstone wiring template (AUDIT r425).
+- Catalog now **16/81 at the standard** (C9 ledger is truth). Full-catalog replay green after each
+  engine hunk; smoke 7/7; invariants clean; drills.js **?v=286**.
+
+**⚠️ THE PARALLEL WAVE IS BLOCKED — build serially for now.** `.claude/workflows/drill-wave.js` ran
+2026-07-27 and all five worktree agents failed identically: the harness permission layer stripped
+every tool call's required parameters, so no agent could read or write a byte (zero files touched;
+each correctly refused to improvise and reported the blocker — the §9.2 STOP rule working). Two
+further gotchas fixed/recorded for whoever resumes: worktrees branch from the last **commit** (so
+commit spec changes before launching), and the workflow's `args` arrive JSON-encoded (now
+normalised in the script). decimals and center were built serially in the main checkout.
+
+**ALSO FIXED:** `dev/e2e-smoke.js` was the one suite resolving chromium via the playwright library
+path (a build not installed in this image), so it could not launch without `CHROME` exported by
+hand; pinned like the rest of the fleet. And the r427 index-UI items AUDIT flagged as unrecorded
+were **verified present** (R2-B6 onboarding arrows, R2-B7 picker hard stop, §4c help-text
+legibility, section-completion seal, default fold state) — **two genuinely remain**: tab-name
+expansion ("Paste Sp." → "Paste Special", and Liq. Bridge / Sens. / Acc/Dil) and the selector
+row-width tighten. Full notes in the scratchpad verification file, summarised in AUDIT r426–r427.
+
+## ⚡ PRIOR HANDOFF (2026-07-26, r428 — 48H AUDIT + THE OPUS-5 WAVE PLAYBOOK)
+
+**WHERE THE PRODUCT STANDS (PRs #240–#242 merged + live; spec = DEPTH_PASS r420d):**
+- **14/81 drills at the depth-pass standard** (C9 ledger in dev/check-invariants.js is truth):
+  **Foundations (c1) COMPLETE 9/9 incl. modeltour★ — the FIRST CAPSTONE and the §2.4 wiring
+  template** (shared `hkCapstoneOk`, pass=par×2.0 clocks, picker CAPTAG, grandfather rules).
+  **Formatting (c2) 5/10** (ruleoff · ruleaudit · dress · housestyle · typeset).
+- Wave-1 round-3 fixes (§1.0-R2: adaptive labels, action cues, re-cut ☆s), the r426 border P0,
+  the r427 engine round (cursor anchor / ribbon overlay / border canon), index-UI, cosmetics
+  renames, and the desk-create-PRO migration are all IN. Two migrations deployed with #242.
+- **The r425–r427 session died mid-assembly** — r428 wrote the reconciliation AUDIT entry
+  (what's verified vs NOT: index-UI items R2-B6/B7 + §4c and the two round-3 drill batches
+  have no per-item record; ROUND2_FEEDBACK §2/§4c is the verification checklist).
+
+**THE QUEUE (dev/PIPELINE.md ⚡ r428):** W4 = decimals · center · autofit · combo + gauntlet★
+(closes c2) → Wolf playtest round 3 → §1.0-R3 integration → c3 in three waves (incl. qclose★,
+the first NEW drill, full plumbing row) → chapter-by-chapter with the post-c4 mid-pass review.
+
+**PROCESS (new, binding):** WORKFLOW.md **§9 THE WAVE PLAYBOOK** — build agents own ONLY their
+drill's CHALLENGES block; every shared-file change (drills.js, invariants, ALTS, depth-mechanics,
+telemetry) ships as a paste-ready PAYLOAD applied serially by the orchestrator (the r427
+union-merge corruption is the WHY). `.claude/workflows/drill-wave.js` encodes the launch.
+Opus 5 is the default build tier (specs are model-proof); escalate only for playtest-law
+integration, engine semantics, and security/money work.
+
+**Wolf-pending (unchanged):** fx dial-up render approval · lean ribbon default-ON · About
+restyle · data-retention policy (G10) · card customizer 2.0 (screenshot-first).
 
 ## WOLF DECISIONS — DEPTH PASS (2026-07-24, r419, binding for H6)
 - **Depth target:** EVERY drill to the Foundations bar (4-6 beats, randomized sites, aha,
