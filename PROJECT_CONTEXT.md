@@ -5,7 +5,51 @@ standards — READ FIRST; §9 is the wave playbook for Opus-5 sessions, new r428
 **dev/PIPELINE.md's ⚡ r428 header (the live queue)**, dev/AUDIT.md (newest round at the TOP),
 and the dev/ design docs._
 
-## ⚡ NEXT-SESSION HANDOFF (2026-07-26, r428 — 48H AUDIT + THE OPUS-5 WAVE PLAYBOOK)
+## ⚡ NEXT-SESSION HANDOFF (2026-07-27, r429 — THE DUAL-AUDIENCE LAW + WAVE 4 UNDERWAY)
+
+**WOLF'S NEW PRODUCT DIRECTION (2026-07-27), now binding build law:** every drill must read as a
+REAL DESK TASK for **both** audiences — the corporate mid-career professional AND the aspiring
+banker/consultant. Written up as **DEPTH_PASS §1.0-R3(n)** (the reality test, banned artifact
+classes, prompt-frame and register rules) + **§3.1 THE AUDIENCE MAP** (per-chapter A/B mix and
+artifact families, so all 67 remaining drills inherit it). Companion rule **§1.0-R3(o)** states the
+☆ RE-CUT SWEEP once, catalog-wide: **every pre-playtest §4 page proposes a FORMATTING bonus, a
+class §1.0(d) already killed** — build agents re-cut to one of six named efficiency families
+without escalating. Spec is now **DEPTH_PASS r429**.
+
+**ALSO DECIDED:** data retention (closes G10) — 7-day detailed run history, last 5 + expand,
+aggregates permanent. In PIPELINE ⚡ with implementation notes.
+
+**WAVE 4 (finish Formatting c2) — 2 of 5 SHIPPED, both fully gated:**
+- **decimals** — artifact converted comps page → **operations scorecard** (audience A); ☆ re-cut to
+  COLUMN-SELECTION discipline; new engine telemetry `hkFmtLatch('dec')`; par 18/15 → 27/24;
+  probe `dev/verify-decimals.js` **22/22**.
+- **center** — ☆ spec bug FOUND AT BUILD and recorded (the engine has **no merge op**, so
+  "centre-across instead of merging" isn't a declinable choice); re-cut to **CLASS-SWEEP**
+  discipline; new border beat; board now ships **misaligned** so the alignment beat is real work;
+  `hkFmtLatch('align')`; par 18/15 → 23/20; probe `dev/verify-center.js` **14/14**.
+- **REMAINING: autofit · combo · gauntlet★** — their §4 pages are already re-cut (artifact, ☆
+  family, latch telemetry and the required skippability proof are all named). gauntlet★ flips the
+  c2 gate on and follows the modeltour capstone wiring template (AUDIT r425).
+- Catalog now **16/81 at the standard** (C9 ledger is truth). Full-catalog replay green after each
+  engine hunk; smoke 7/7; invariants clean; drills.js **?v=286**.
+
+**⚠️ THE PARALLEL WAVE IS BLOCKED — build serially for now.** `.claude/workflows/drill-wave.js` ran
+2026-07-27 and all five worktree agents failed identically: the harness permission layer stripped
+every tool call's required parameters, so no agent could read or write a byte (zero files touched;
+each correctly refused to improvise and reported the blocker — the §9.2 STOP rule working). Two
+further gotchas fixed/recorded for whoever resumes: worktrees branch from the last **commit** (so
+commit spec changes before launching), and the workflow's `args` arrive JSON-encoded (now
+normalised in the script). decimals and center were built serially in the main checkout.
+
+**ALSO FIXED:** `dev/e2e-smoke.js` was the one suite resolving chromium via the playwright library
+path (a build not installed in this image), so it could not launch without `CHROME` exported by
+hand; pinned like the rest of the fleet. And the r427 index-UI items AUDIT flagged as unrecorded
+were **verified present** (R2-B6 onboarding arrows, R2-B7 picker hard stop, §4c help-text
+legibility, section-completion seal, default fold state) — **two genuinely remain**: tab-name
+expansion ("Paste Sp." → "Paste Special", and Liq. Bridge / Sens. / Acc/Dil) and the selector
+row-width tighten. Full notes in the scratchpad verification file, summarised in AUDIT r426–r427.
+
+## ⚡ PRIOR HANDOFF (2026-07-26, r428 — 48H AUDIT + THE OPUS-5 WAVE PLAYBOOK)
 
 **WHERE THE PRODUCT STANDS (PRs #240–#242 merged + live; spec = DEPTH_PASS r420d):**
 - **14/81 drills at the depth-pass standard** (C9 ledger in dev/check-invariants.js is truth):
