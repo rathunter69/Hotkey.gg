@@ -673,8 +673,21 @@ S&U goes into the committee book tonight.
 2. Build the growth column in comp set B — this year÷last year−1, filled down, percent
 3. Build the multiple column in comp set C — EV÷EBITDA, filled down, one-decimal x (fmtStyle mult)
 4. Bold the three ratio headers — the page reads its own asks
-☆ Right-align the three ratio headers over their numbers
-**Random:** 4-slot site shuffle (as-is) + which table gets which ask (permute) + peer-name pools. **Aha:** "point ÷ fill ↓ format — the same three chords price any ratio". **Finish:** beat 4. **Clocks:** re-sweep (scope up from 23s). **Engine:** mult format exists. Placement-series member — re-verify HK_PLACEMENT gates after retune (D16).
+☆ **RE-CUT (r429, §1.0-R3(o)) — "right-align the three ratio headers" is a formatting ☆, dead
+under §1.0(d). Shipped ☆ = FILL-CENSUS discipline:** every ratio column written ONCE and filled,
+never retyped row by row. Latch: `S.fillOps` covering each ratio column + a formula census (each
+cell a translate of the column's first). Skippability proof required: typing every formula by hand
+clears all four cores and wins, ☆ stays "☆ ?".
+**ARTIFACT — audience A (§3.1, converted from the three comp sets):** the **divisional performance
+pack** — three named divisions, each its own small table. The three asks stay exactly as specced
+(a percent margin, a percent growth, a one-decimal ×), but on metrics an operator owns: gross
+margin, year-on-year growth, and **asset turnover** (revenue ÷ assets — the real corporate "×"
+metric, and distinct from the inventory turns §4.12 uses). WHY (r429): c3 is the chapter where
+audience A lives (§3.1 A-lean 2:1) and margin is its opening drill; the three formula families and
+the `mult` format are untouched, so the difficulty is identical (§3.1: convert the DATA, never the
+difficulty). Rows go 3–4 per table for more real fill work (Wolf's standing "no four-keystroke
+wins").
+**Random:** 4-slot site shuffle (as-is) + which table gets which ask (permute) + division-name pools + row count 3–4. **Aha:** "point ÷ fill ↓ format — the same three chords price any ratio". **Finish:** beat 4. **Clocks:** re-sweep (scope up from 23s). **Engine:** mult format exists. Placement-series member — re-verify HK_PLACEMENT gates after retune (D16).
 
 #### 4.22 foot — "Total it both ways" · M (audit shallow #9)
 **Now:** 3 checks (rows, columns, corner) on a fixed 4×4 block at B2; prompt bans typed SUM but sumishF accepts (text≠grading, AUDIT §D).

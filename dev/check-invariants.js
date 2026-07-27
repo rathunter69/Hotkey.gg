@@ -233,7 +233,8 @@ try {
    present and that no drill hand-writes the save beat (the engine owns it, exactly once). ---- */
 try {
   const REWORKED = ['navigation', 'blocksel', 'filldr', 'pastes', 'rowops', 'ruleoff', 'dress', 'copyover', 'editfix', 'ruleaudit', 'housestyle', 'typeset', 'undo', 'modeltour',   // r422 H6b-1 wave 1 + r425 waves 2-3
-    'decimals', 'center', 'autofit', 'combo', 'gauntlet'];   // r429 H6b wave 4 (DEPTH_PASS §4.12, §4.13, §4.14, §4.17, §4.20 — c2 capstone)
+    'decimals', 'center', 'autofit', 'combo', 'gauntlet',   // r429 H6b wave 4 (DEPTH_PASS §4.12, §4.13, §4.14, §4.17, §4.20 — c2 capstone)
+    'margin'];   // r429 H6b wave 5 (DEPTH_PASS §4.21)
   const idx = fs.readFileSync('index.html', 'utf8');
   const start = idx.indexOf('const CHALLENGES = {');
   const end = idx.indexOf('STATE + ENGINE', start);

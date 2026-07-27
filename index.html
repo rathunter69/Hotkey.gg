@@ -1728,9 +1728,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=289"></script>
+<script src="drills.js?v=290"></script>
 
-<script src="drills.js?v=289"></script>
+<script src="drills.js?v=290"></script>
 
 
 
@@ -3009,46 +3009,138 @@ const CHALLENGES = {
   },
 
   margin:{
-    name:'Formula', label:'Margins across the page', par:23, parKeys:21,
-    aha:'Point the divide, Ctrl+D fills it down, Ctrl+Shift+% dresses it — a margin column in three chords.',
-    prompt:'Three comp tables (side-by-side peer comparisons), one skill: EBITDA ÷ revenue — the margin every banker quotes — build it by pointing, fill it down, format it as a percent. The tables land in a different spot every run; the sequence is what you’re learning, not the location.',
-    req(){ return this._sites.map((s,i)=>'<em>'+s.m+s.r0+'</em> \u00b7 ='+s.e+s.r0+'/'+s.v+s.r0+' \u00b7 fill '+s.m+s.r0+':'+s.m+(s.r0+2)+' \u00b7 <em>ctrl+shift+%</em>').join(' \u00b7 then '); },
-    guide(){ return ['<b>read the formula bar</b> \u00b7 the moment you type <kbd>=</kbd>, a red <b style="color:#e0574d">\u2715</b> and green <b style="color:#3fae4f">\u2713</b> light up \u2014 the cell is LIVE. Arrow keys now <b>point</b> (grab a cell\u2019s reference); tap <kbd>F2</kbd> to flip to <b>edit</b> (arrows move the cursor inside the text), <kbd>F2</kbd> again to point. <kbd>\u21b5</kbd> commits \u00b7 <kbd>esc</kbd> cancels'].concat(this._sites.map((s,i)=>['table one','table two','table three'][i]+' at <b>'+s.m+s.r0+'</b> \u00b7 point <kbd>='+s.e+s.r0+'/'+s.v+s.r0+'</kbd> <kbd>\u21b5</kbd> \u00b7 fill down \u00d72 \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>'+(i===0?' \u2014 <kbd>ctrl</kbd>+arrows jump between tables':''))); },
-    targets(){ return this._sites.map(s=>s.m+s.r0+':'+s.m+(s.r0+2)); },
+    /* r429 (H6b wave 5, DEPTH_PASS §4.21 + §1.0/§1.0-R2/§1.0-R3): depth-pass rework.
+       JUDGMENT CALLS (documented per WORKFLOW.md §8):
+       · ARTIFACT CONVERTED three comp sets → DIVISIONAL PERFORMANCE PACK (§1.0-R3(n) + the §3.1
+         map: c3 is A-lean 2:1 and margin opens the chapter). The three asks are exactly the ones
+         §4.21 specs — a percent margin, a percent growth, a one-decimal × — but on metrics an
+         operator owns: gross margin, year-on-year growth, and ASSET TURNOVER (revenue ÷ assets,
+         the real corporate "×" and deliberately not the inventory turns §4.12 already uses).
+         Same three formula families, same mult format: the DATA changed, the difficulty did not.
+       · THE ASK VARIES PER TABLE, so §1.0-R2(g) ADAPTIVE LABELS are mandatory here — each check
+         label names THIS seed's division AND its ask. A static "run the ratio column" would make
+         the player reverse-engineer which of three formulas the table wants, which (g) calls a
+         spec bug outright.
+       · §4.21's "☆ Right-align the three ratio headers" is a FORMATTING ☆ — dead under §1.0(d).
+         Re-cut to FILL-CENSUS: each ratio column written once and FILLED, never retyped.
+       · 3–4 rows per table (was a fixed 3) — more real fill work, per Wolf's standing "no
+         four-keystroke wins" note; it also makes the fill-census ☆ worth more than the typing.
+       · Beats bundle build+format per column, which §1.1's tight-pair allowance covers and the
+         pre-rework drill already did; the FORMAT is the outcome the label names (§1.0(b)), the
+         route stays in guide/req/demo. */
+    name:'Formula', label:'Margins across the page', par:45, parKeys:41, saveClose:true,   /* r429: par re-swept post-rework — 5-seed sweep median 41 keys, 0% drift after retune; par 45s \u2248 1.10 s/key. Scope tripled: three DIFFERENT ratio families with their own formats, 3-4 rows each, was one family \u00d73. */
+    aha:'point the divide, fill it down, format the column — the same three chords price any ratio, whichever ratio it is.',
+    prompt:'The divisional pack goes to the operating review and every table is missing its ratio column. Each division asks for a different one — a margin, a growth rate, an asset-turnover figure — and the checklist tells you which is which. Build each one off the two columns beside it, carry it down the table, and put it in the register the reader expects. The tables land in a different spot every run.',
+    req(){ return this._sites.map(s=>'<em>'+s.m+s.r0+'</em> · ='+s.f+' · fill '+s.m+s.r0+':'+s.m+(s.r0+s.n-1)+' · '+s.fmtKey).join(' · then ')+' · headers <em>ctrl+b</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): labels are OUTCOME lines; the route lives here. §1.0-R2(g): the ask is named per seed. */
+    /* LITERAL arrays (not .map/.concat): dev/check-invariants.js C9 is a STATIC proxy that counts
+       top-level elements of the returned array literal, so a computed array reads as null and the
+       tri-length guard silently stops covering this drill. The site count is fixed at three, so
+       spelling the lines out costs nothing and keeps the invariant live. */
+    guide(){ const s=this._sites, g=(x,i)=>x.div+' — point <kbd>='+x.f+'</kbd> <kbd>↵</kbd> in <em>'+x.m+x.r0+'</em> · select down to <em>'+x.m+(x.r0+x.n-1)+'</em> · <kbd>ctrl</kbd>+<kbd>d</kbd> to carry it · then '+x.fmtHint+(i===0?' — <kbd>ctrl</kbd>+arrows jump between tables':'');
+      return [
+        g(s[0],0),
+        g(s[1],1),
+        g(s[2],2),
+        'the page should read its own asks — select the three ratio headers and <kbd>ctrl</kbd>+<kbd>b</kbd> (one table at a time is fine)',
+        '☆ the discovery: a ratio column is ONE formula and a fill — write it once at the top and carry it down; retyping it per row costs you the clock and buys nothing',
+      ]; },
+    targets(){ const s=this._sites, t=x=>x.m+x.r0+':'+x.m+(x.r0+x.n-1);
+      return [
+        t(s[0]),
+        t(s[1]),
+        t(s[2]),
+        s[0].m+(s[0].r0-1),
+        t(s[0]),
+      ]; },
     demo(){ return this._sites.flatMap(s=>[
-      {sel:s.m+s.r0, keys:[{key:'='},{key:'ArrowLeft'},{key:'/'},{key:'ArrowLeft'},{key:'ArrowLeft'},Kb.enter]},
-      {sel:s.m+s.r0+':'+s.m+(s.r0+2), keys:[Kb.fillD, Kb.pct]},
-    ]); },
+      {sel:s.m+s.r0, keys:[...T('='+s.f), Kb.enter]},
+      /* ONE fill per column — the ☆ latch fires on these three (§2.2: the demo performs the bonus) */
+      {sel:s.m+s.r0+':'+s.m+(s.r0+s.n-1), keys:[Kb.fillD]},
+      {sel:s.m+s.r0+':'+s.m+(s.r0+s.n-1), keys:s.fmtKeys},
+    ]).concat(this._sites.map(s=>({sel:s.m+(s.r0-1), keys:[Kb.bold]}))); },
     build(){
       const cells={};
-      const slots=[{r:1,c:2},{r:1,c:7},{r:8,c:2},{r:8,c:7}];
-      for(let k=slots.length-1;k>0;k--){ const j=rnd(0,k); [slots[k],slots[j]]=[slots[j],slots[k]]; }
+      const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+      /* §1.2 axes: (a) 4-slot site shuffle (as-is); (b) division-name pool + row count 3–4;
+         (c) every figure through rnd(); (d) WHICH TABLE GETS WHICH ASK — the three asks are
+         permuted across the three sites, which is also what makes §1.0-R2(g) adaptive labels
+         load-bearing rather than decorative. */
+      const slots=shuffle([{r:1,c:2},{r:1,c:7},{r:8,c:2},{r:8,c:7}]).slice(0,3);
+      const divs=shuffle(['North','South','Central','Western','Eastern','Pacific']).slice(0,3);
+      const asks=shuffle(['margin','growth','turnover']);
       this._sites=[];
-      slots.slice(0,3).forEach((sl,t)=>{
-        const V=colLetter(sl.c), E=colLetter(sl.c+1), M=colLetter(sl.c+2);
-        cells[V+sl.r]={...blankCell(),value:'Comp set '+'ABC'[t],txt:true,bold:true};
-        cells[V+(sl.r+1)]={...blankCell(),value:'Rev',txt:true,bold:true,align:'r'};
-        cells[E+(sl.r+1)]={...blankCell(),value:'EBITDA',txt:true,bold:true,align:'r'};
-        cells[M+(sl.r+1)]={...blankCell(),value:'Margin',txt:true,bold:true,align:'r'};
-        const exps=[];
-        for(let i=0;i<3;i++){
-          const rev=rnd(40,180)*10, ebd=Math.round(rev*rnd(12,38)/100);
-          cells[V+(sl.r+2+i)]={...blankCell(),value:rev,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-          cells[E+(sl.r+2+i)]={...blankCell(),value:ebd,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-          cells[M+(sl.r+2+i)]={...blankCell()};
-          exps.push(ebd/rev);
+      slots.forEach((sl,t)=>{
+        const A=colLetter(sl.c), B=colLetter(sl.c+1), M=colLetter(sl.c+2);
+        const ask=asks[t], div=divs[t], n=rnd(3,4), r0=sl.r+2;
+        cells[A+sl.r]={...blankCell(),value:div+' division',txt:true,bold:true};
+        const spec={
+          margin:   {h1:'Revenue', h2:'Gross profit', h3:'Margin',   fmt:'percent', dec:1},
+          growth:   {h1:'Last year',h2:'This year',   h3:'Growth',   fmt:'percent', dec:1},
+          turnover: {h1:'Revenue', h2:'Assets',       h3:'Turnover', fmt:'mult',    dec:1},
+        }[ask];
+        cells[A+(sl.r+1)]={...blankCell(),value:spec.h1,txt:true,bold:true,align:'r'};
+        cells[B+(sl.r+1)]={...blankCell(),value:spec.h2,txt:true,bold:true,align:'r'};
+        cells[M+(sl.r+1)]={...blankCell(),value:spec.h3,txt:true,align:'r'};   // NOT bold — beat 4
+        const exps=[], prods=[];
+        for(let i=0;i<n;i++){
+          let a,b,exp;
+          if(ask==='margin'){      a=rnd(40,180)*10; b=Math.round(a*rnd(14,42)/100); exp=b/a; }
+          else if(ask==='growth'){ a=rnd(40,180)*10; b=Math.round(a*rnd(104,138)/100); exp=b/a-1; }
+          else {                   a=rnd(60,200)*10; b=Math.round(a/(rnd(11,29)/10)); exp=a/b; }
+          cells[A+(r0+i)]={...blankCell(),value:a,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+          cells[B+(r0+i)]={...blankCell(),value:b,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+          cells[M+(r0+i)]={...blankCell()};
+          exps.push(exp); prods.push([a,b]);
         }
-        this._sites.push({v:V,e:E,m:M,r0:sl.r+2,exps:exps});
+        /* the formula the demo/req/guide teach — the ask decides its shape (the growth one is the
+           only subtraction, which is exactly why the label has to say which table is which) */
+        const f = ask==='growth' ? (B+r0+'/'+A+r0+'-1') : (ask==='margin' ? (B+r0+'/'+A+r0) : (A+r0+'/'+B+r0));
+        this._sites.push({ div:div, ask:ask, a:A, b:B, m:M, r0:r0, n:n, exps:exps, f:f,
+          fmt:spec.fmt, dec:spec.dec, h3:spec.h3,
+          fmtKey: spec.fmt==='percent' ? '<em>ctrl+shift+%</em>' : '<em>alt h a n</em>/one-decimal ×',
+          fmtHint: spec.fmt==='percent' ? '<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> for the decimal place'
+                                        : 'set it to a one-decimal multiple through <kbd>ctrl</kbd>+<kbd>1</kbd>',
+          fmtKeys: spec.fmt==='percent' ? [Kb.pct, Kb.alt,L('H'),D(0)] : [{key:'1',ctrl:true},L('X')] });   /* ctrl+1 → X = the 8.2x multiple register (M is ÷ millions — index.html:10435) */
       });
       const s0=this._sites[0];
-      return {ROWS:12, cells, active:{r:s0.r0, c:s0.m.charCodeAt(0)-64}, sel:null, colW:{1:64}};
+      return {ROWS:13, cells, active:{r:s0.r0, c:s0.m.charCodeAt(0)-64}, sel:null, colW:{1:78,2:88,3:92,6:78,7:88,8:92}};
     },
     checks(S){
-      return this._sites.map((s,i)=>({
-        label:'run comp set '+'ABC'[i]+' \u2014 margins live and percent-formatted ('+s.m+s.r0+':'+s.m+(s.r0+2)+')',
-        ok:[0,1,2].every(j=>{ const c=S.cells[s.m+(s.r0+j)];
-          return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-s.exps[j])<1e-4&&c.fmtStyle==='percent'); })
-      }));
+      const sites=this._sites;
+      const colOk=s=>[...Array(s.n).keys()].every(j=>{ const c=S.cells[s.m+(s.r0+j)];
+        return !!(c && c.formula && typeof c.value==='number' && Math.abs(c.value-s.exps[j])<1e-4
+          && c.fmtStyle===s.fmt && (c.decimals|0)===s.dec); });
+      /* ☆ (§1.0(d) mystery slot · §1.0-R3(o) FILL-CENSUS family): every ratio column written ONCE
+         and FILLED, never retyped row by row. Needs BOTH halves per column: a fill-down op that
+         covers the column body (S.fillOps — the r424 telemetry, chord-agnostic: ctrl+d and the
+         ribbon fill both log) AND a formula CENSUS proving each cell is a translate of the first
+         (so a fill that was later overwritten by hand does not sneak through). Typing every
+         formula clears all four cores and wins (§1.0(c)); it just never latches. */
+      const filled=s=>{
+        const c0=s.m.charCodeAt(0)-64;
+        const swept=(S.fillOps||[]).some(f=>f.dir==='down' && f.c1<=c0 && f.c2>=c0
+          && f.r1<=s.r0 && f.r2>=s.r0+s.n-1);
+        if(!swept) return false;
+        const first=S.cells[s.m+s.r0]; if(!first||!first.formula) return false;
+        return [...Array(s.n).keys()].every(j=>{ const c=S.cells[s.m+(s.r0+j)];
+          if(!c||!c.formula) return false;
+          return c.formula===translateFormula(first.formula,j,0); });
+      };
+      const starOk=sites.every(filled);
+      const hdrOk=sites.every(s=>!!(S.cells[s.m+(s.r0-1)]||{}).bold);
+      /* §1.0-R2(g): the label names THIS seed's division and ask — never "the ratio column". */
+      const askLine={ margin:'gross profit against revenue, as a percent',
+                      growth:'this year against last year, as a percent',
+                      turnover:'revenue against assets, as a one-decimal multiple' };
+      const lab=s=>'Build the '+s.h3+' column in the '+s.div+' division — '+askLine[s.ask];
+      return [
+        {label: lab(sites[0]), ok: colOk(sites[0])},
+        {label: lab(sites[1]), ok: colOk(sites[1])},
+        {label: lab(sites[2]), ok: colOk(sites[2])},
+        {label:'Bold the three ratio headers — the page reads its own asks', ok: hdrOk},
+        {label:'☆ each ratio column written once and carried down — a ratio column is one formula and a fill', ok: starOk, bonus:true},
+      ];
     }
   },
   anchor:{

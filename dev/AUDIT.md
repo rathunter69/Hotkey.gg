@@ -1,5 +1,48 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r429 H6b-5 — margin depth-pass rework (DEPTH_PASS §4.21 + §1.0/§1.0-R2/§1.0-R3) — WAVE 5 OPENS (Formulas I)
+- **ARTIFACT CONVERTED (§1.0-R3(n) + §3.1): three comp sets → the DIVISIONAL PERFORMANCE PACK.**
+  c3 is where audience A lives (§3.1 A-lean 2:1) and margin opens the chapter. The three asks are
+  exactly the ones §4.21 specs — a percent margin, a percent growth, a one-decimal × — but on
+  metrics an operator owns: gross margin, year-on-year growth, and **asset turnover** (revenue ÷
+  assets — the real corporate "×", deliberately not the inventory turns §4.12 already uses). Same
+  three formula families, same `mult` register: the DATA changed, the difficulty did not.
+- **§1.0-R2(g) ADAPTIVE LABELS ARE LOAD-BEARING HERE:** the ask PERMUTES across the three tables per
+  seed, so each label names THIS seed's division and its ratio ("Build the Turnover column in the
+  North division — revenue against assets, as a one-decimal multiple"). A static "run the ratio
+  column" would force the player to reverse-engineer which of three formulas each table wants —
+  (g) calls that a spec bug outright. Probe asserts it over 30 builds (18 division/ask pairs seen).
+- **☆ RE-CUT (§1.0-R3(o); §4.21's "right-align the three ratio headers" was a formatting ☆):**
+  **FILL-CENSUS** — every ratio column written ONCE and filled, never retyped. Needs BOTH halves per
+  column: a fill-down op covering the body (`S.fillOps`, chord-agnostic — ALT 1 earns it off the
+  RIBBON fill) **and** a formula census proving each cell is a `translateFormula` of the first, so a
+  fill later clobbered by hand cannot sneak through (asserted, probe C1). Typing every formula
+  clears all four cores and wins (ALT 2 walks it); it just never latches.
+- **DEPTH:** rows go 3–4 per table (was a fixed 3) — more real fill work, per Wolf's standing "no
+  four-keystroke wins" note, and it makes the ☆ worth more than the typing.
+- **STATIC-INVARIANT LESSON (worth propagating):** the first cut built guide/targets/checks with
+  `.map().concat()`. **C9 is a STATIC proxy** — it counts top-level elements of the returned array
+  LITERAL, so computed arrays read as `null` and **the tri-length guard silently stopped covering
+  the drill** (it reported `checks=3 guide=null targets=null`). Refactored to literals (the site
+  count is fixed at three). Wave agents: return literal arrays, or C9 quietly stops protecting you.
+- **PAR:** 23/21 → **45/41** (5-seed sweep median 41 keys, 0% drift after retune; 1.10 s/key). The
+  jump is honest scope: three DIFFERENT ratio families with their own registers, 3–4 rows each,
+  where the drill previously repeated one family three times (the audit's "shallow #13").
+- **⚠️ PLACEMENT FINDING (D16 assumption INVALIDATED — Wolf-facing, NOT acted on):** §3 D16 says the
+  placement series keeps its band roles after the rework; **margin's did not.** At par 45 it moved
+  mid → LONG, where `dress` (41) already sits, and the set now spans short/long/epic with **no mid
+  representative** (catalog quartiles 28 / 36 / 55). It still spans the arc, so §5.3 passes, but the
+  coverage is lumpier than designed. **Not changed unilaterally — HK_PLACEMENT decides ranked
+  placement for every player.** Recommendation: re-check after `sort` is reworked in c4 (par 10s
+  today, certain to rise); if margin and dress both sit long, swap one for a mid-band drill.
+- **ALTS (§1.8 — both rebuilt; the old entry used the retired single-ask shape and a fixed 3 rows):**
+  (1) op-ORDER reversed + RIBBON fill + the Ctrl+1 dialog for both registers (proves the ☆ latches
+  off a non-Ctrl+D fill); (2) FREEDOM proof — every formula typed row by row, no fill anywhere.
+  2/2 PASS.
+- **TESTS:** demo-replay margin 3/3 ×3 seeds · **`dev/verify-margin.js` 16/16** · guided PASS
+  (railed, contained, solvable) · alt-paths 2/2 · par-sweep FLAGGED 0 · invariants clean incl. C9
+  margin · cache-bump guard clean (drills.js?v=289→290) · full-catalog replay green.
+
 ## r429 H6b-4 — gauntlet: the FORMATTING CAPSTONE (DEPTH_PASS §4.20 + §2.4 + §1.0/§1.0-R2/§1.0-R3) — WAVE 4 COMPLETE, CHAPTER 2 CLOSED
 _The second capstone, and the first built off the modeltour template rather than inventing it._
 - **ARTIFACT KEPT (§3.1):** sources & uses — a capstone should be the chapter's aspirational

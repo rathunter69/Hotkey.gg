@@ -676,11 +676,25 @@ const ALTS = [
       {sel:'B7',  keys:[...T('=B5-B6'),{key:'Enter'}]},
       {sel:'B7:D7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
     ]` },
-  { key: 'margin', name: 'tables in REVERSE, typed refs (no pointing), ribbon fill down + alt h p', moves: `C => C._sites.slice().reverse().flatMap(s => [
-      {sel:s.m+s.r0, keys:[...T('='+s.e+s.r0+'/'+s.v+s.r0),{key:'Enter'}]},
-      {sel:s.m+s.r0+':'+s.m+(s.r0+2), keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:s.m+s.r0+':'+s.m+(s.r0+2), keys:[{key:'Alt'},L('h'),L('p')]},
-    ]) ` },
+  /* r429 (DEPTH_PASS §4.21 wave 5): both margin entries rebuilt — the pre-rework entry used
+     s.e/s.v (one shared EBITDA÷revenue ask) and a fixed 3-row block; the drill now permutes THREE
+     different asks across the tables with 3-4 rows each. ALT 1 = op-ORDER reversed + ribbon fill
+     (the ☆ latch is chord-agnostic, so the ribbon fill must earn it too). ALT 2 = the §1.0(c)
+     FREEDOM proof — every formula TYPED, no fill anywhere, ☆ forfeited, all four cores clear. */
+  { key: 'margin', name: 'op-ORDER reversed + ribbon fill down (Alt H F I D) and the ctrl+1 dialog for both registers — the ☆ must latch off a non-ctrl+d fill', moves: `C => C._sites.slice().reverse().flatMap(s => [
+      {sel:s.m+s.r0, keys:[...T('='+s.f),{key:'Enter'}]},
+      {sel:s.m+s.r0+':'+s.m+(s.r0+s.n-1), keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:s.m+s.r0+':'+s.m+(s.r0+s.n-1), keys: s.fmt==='percent' ? [{key:'1',ctrl:true},L('P')] : [{key:'1',ctrl:true},L('X')]},
+      {sel:s.m+(s.r0-1), keys:[{key:'Alt'},L('h'),D(1)]},
+    ]).concat([{sel:'A1', keys:[{key:'s',ctrl:true}]}]) ` },
+  { key: 'margin', name: 'FREEDOM proof — every formula TYPED row by row, no fill anywhere (☆ forfeited, all four cores clear)', moves: `C => { const mv=[];
+      C._sites.forEach(s=>{ for(let j=0;j<s.n;j++){ const r=s.r0+j;
+        const f = s.ask==='growth' ? (s.b+r+'/'+s.a+r+'-1') : (s.ask==='margin' ? (s.b+r+'/'+s.a+r) : (s.a+r+'/'+s.b+r));
+        mv.push({sel:s.m+r, keys:[...T('='+f),{key:'Enter'}]}); }
+        mv.push({sel:s.m+s.r0+':'+s.m+(s.r0+s.n-1), keys: s.fmt==='percent' ? [{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)] : [{key:'1',ctrl:true},L('X')]});
+        mv.push({sel:s.m+(s.r0-1), keys:[{key:'b',ctrl:true}]}); });
+      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+      return mv; }` },
   { key: 'modeltour', name: 'margins typed as raw VALUES first (no formulas — §1.0(c)), subtotals retyped in place (☆ forfeited), dollar dress after, home last', moves: `C => { const o=C._o, m=C._m, val=C._val, MG=C._marg, mv=[];
       MG.forEach(g=>{ for(let c=2;c<7;c++){ const w=val[g.num][c]/val[3][c];
         mv.push({sel:colLetter(c)+g.r, keys:[...T(w.toFixed(7)),{key:'Enter'}]}); } });

@@ -1,14 +1,19 @@
 # PIPELINE — the Fable task queue
 
-## ⚡ STATE OF THE QUEUE (r428, 2026-07-26 — READ FIRST; supersedes the r417/r420c block below)
+## ⚡ STATE OF THE QUEUE (r429, 2026-07-27 — READ FIRST; supersedes the r417/r420c block below)
 
-**WHERE THE DEPTH PASS STANDS (post PRs #240–#242, all merged to main + live):**
-- **14/81 live drills at the depth-pass standard** (the C9 REWORKED ledger in dev/check-invariants.js
-  is the single source of truth): **Foundations (c1) COMPLETE 9/9** — navigation · filldr · pastes ·
-  blocksel · rowops(⊕colops) · editfix · undo · copyover · **modeltour★ the FIRST CAPSTONE** (the
-  §2.4 wiring template every later chapter inherits: shared `hkCapstoneOk` predicate in drills.js,
-  HOTKEY_CLOCKS pass=par×2.0, picker ★ CAPTAG, both grandfather rules, access-never-blocked).
-  **Formatting (c2) 5/10** — ruleoff · ruleaudit · dress · housestyle · typeset done.
+**WHERE THE DEPTH PASS STANDS:**
+- **20/81 live drills at the depth-pass standard** (the C9 REWORKED ledger in dev/check-invariants.js
+  is the single source of truth): **Foundations (c1) COMPLETE 9/9** (modeltour★ capstone) ·
+  **Formatting (c2) COMPLETE 10/10** (gauntlet★ capstone — a clean run opens Formulas I) ·
+  **Formulas I (c3) 1/12** (margin).
+- **Spec is DEPTH_PASS r429** — §1.0 + §1.0-R2 + **§1.0-R3 (the dual-audience real-task law + the ☆
+  re-cut sweep)** + **§3.1 the audience map**. Every pre-playtest §4 page still proposes a FORMATTING
+  ☆, a class §1.0(d) killed: re-cut it per §1.0-R3(o), do not ask.
+- **Engine telemetry added for ☆ latches (all grading-only, none readable by a core check):**
+  `fmtOps.dec` · `fmtOps.align` · `widthOps` · `selOps` (r429), joining r424–r425's `fillOps` ·
+  `pasteOpLog` · `pasteLog` · `fmtOps` · `cutMoves` · `gotoSpecials`. **Prefer these before adding
+  a new one** — gauntlet's ☆ needed none.
 - Wave-1 ROUND-3 fixes (adaptive labels · action-location cues · re-cut ☆s per §1.0-R2) + the r426
   border-visibility P0 + the r427 engine round (R2-B2/B4/B5) + index-UI + cosmetics renames + the
   desk-create-PRO server guard all landed in #242. **Spec is DEPTH_PASS r420d** (§1.0 + §1.0-R2).
@@ -36,6 +41,17 @@
    SERIALLY in the main checkout, which is how all five of these were done. Two further gotchas:
    worktrees branch from the last COMMIT (commit spec changes before launching), and the workflow's
    `args` arrive JSON-encoded (now normalised in the script).
+1b. **W5 — FORMULAS I (c3) [auto·rolling] — IN FLIGHT.** ✅ **margin** (comp sets → divisional
+   performance pack, audience A; three DIFFERENT ratio asks permuted per seed with §1.0-R2(g)
+   adaptive labels; fill-census ☆). ⏳ **foot · anchor · percent · growth** remain, then
+   cagr/bridge/sumif/rollup/fxconvert, then cases + **qclose★ (NEW, D1)**.
+   **⚠️ OPEN, WOLF-FACING — PLACEMENT BAND DRIFT (D16 assumption invalidated):** margin's par went
+   23→45, moving it mid→LONG where `dress` (41) already sits; the placement set now spans
+   short/long/epic with **no mid representative**. It still spans the arc so §5.3 passes, and it was
+   NOT changed unilaterally — HK_PLACEMENT decides ranked placement for every player. Re-check after
+   `sort` is reworked in c4 (par 10s today); if margin and dress both sit long, swap one for a
+   mid-band drill. Full note in AUDIT r429 margin entry.
+
 2. **WOLF PLAYTEST ROUND 3** — the 14 reworked drills + the platform fixes (borders, ribbon
    overlay, cursor anchor). Feedback → §1.0-R3 law integration (spec round, highest-tier work)
    BEFORE wave 5 builds. Also collect: index-UI verification list (AUDIT r426–r427 entry names

@@ -19,7 +19,23 @@ without escalating. Spec is now **DEPTH_PASS r429**.
 **ALSO DECIDED:** data retention (closes G10) — 7-day detailed run history, last 5 + expand,
 aggregates permanent. In PIPELINE ⚡ with implementation notes.
 
-**✅ WAVE 4 COMPLETE — CHAPTER 2 (FORMATTING) IS CLOSED, 10/10 at the standard. Catalog 19/81.**
+**WAVE 5 (Formulas I, c3) OPEN — margin shipped; foot · anchor · percent · growth remain.**
+**margin**: three comp sets → the **divisional performance pack** (audience A). Three DIFFERENT
+ratio asks — margin, growth, asset turnover — **permuted across the tables per seed**, which makes
+§1.0-R2(g) adaptive labels load-bearing rather than decorative (a static label would force the
+player to reverse-engineer which of three formulas each table wants). ☆ = fill-census. Par 23→45.
+Probe 16/16.
+**Two findings from it that generalise:**
+- **C9 is a STATIC proxy.** Build guide/targets/checks as literal arrays. My first cut used
+  `.map().concat()` and C9 read them as `null` — **the tri-length guard silently stopped covering
+  the drill**. Refactored; worth checking older drills for the same hole.
+- **⚠️ PLACEMENT BAND DRIFT, Wolf-facing, deliberately NOT acted on.** §3 D16 assumed the placement
+  series keeps its band roles through the rework; margin's did not — par 23→45 moved it mid→LONG
+  where `dress` (41) already sits, leaving **no mid representative** (catalog quartiles 28/36/55).
+  It still spans the arc so §5.3 passes. I did not touch HK_PLACEMENT: it decides ranked placement
+  for every player. Re-check once `sort` is reworked in c4 (par 10s today, certain to rise).
+
+**✅ WAVE 4 COMPLETE — CHAPTER 2 (FORMATTING) IS CLOSED, 10/10 at the standard. Catalog 20/81.**
 All five built serially and fully gated, each with its own mechanics probe (`dev/verify-*.js`):
 **decimals** (comps page → audience-A ops scorecard; column-select ☆) · **center** (class-sweep ☆;
 new border beat; board now ships misaligned so the alignment beat is real work) · **autofit**
