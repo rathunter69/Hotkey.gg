@@ -238,11 +238,9 @@ const ALTS = [
       {sel:'F2:F5', keys:[{key:'d',ctrl:true}]},
       {sel:'F6', keys:[...T('=SUM(F2:F5)'),{key:'Enter'}]},
     ]` },
-  { key: 'decimals', name: 'columns walked in reverse order', moves: `C => { const o=C._o; return [
-      {sel:o.pR, keys:[{key:'Alt'},L('h'),D(9), {key:'Alt'},L('h'),D(9)]},
-      {sel:o.mR, keys:[{key:'Alt'},L('h'),D(0)]},
-      {sel:o.evR, keys:[{key:'Alt'},L('h'),D(9), {key:'Alt'},L('h'),D(9)]},
-    ]; }` },
+  /* r429: the r199-era decimals alt is RETIRED — it solved the pre-rework comps board
+     (o.evR/o.mR/o.pR are gone with §4.12). Its "columns in a different order" coverage lives on
+     inside the two r429 entries below, which also carry the ☆ earn/forfeit controls. */
   /* r424 (D17): the colops entry is gone with the drill — its column-op alternates live on
      inside the two rowops entries above (ribbon vs chord routes, insert-vs-delete order). */
   { key: 'anchor', name: 'dollars typed by hand — no F4 at all', moves: `C => { const o=C._o; return [
@@ -865,6 +863,29 @@ const ALTS = [
       const KEY={hdr:[SS].concat(W('h','b','o')), sub1:[SS].concat(W('h','b','p')), sub2:[SS].concat(W('h','b','p')),
                  gbt:[SS].concat(W('h','b','p')), gbold:[SS,{key:'b',ctrl:true}], box:W('h','b','t')};
       return R.defects.map(d=>({sel:SEL[d], keys:KEY[d]})); }` },
+  /* r429 (DEPTH_PASS §4.12 wave 4): decimals rebuilt to the audience-A ops scorecard.
+     ALT 1 = op-ORDER + the §1.0(c) FREEDOM proof (money columns walked cell by cell — every core
+     clears, the column-select ☆ is forfeited). ALT 2 = chord-ROUTE (Ctrl+Space whole-column
+     selections + ribbon bold — the ☆ latch is rect-based, so it must fire on this route too). */
+  { key: 'decimals', name: 'op-ORDER reversed + FREEDOM proof — read line dressed FIRST, margins/turns by body pass, money columns walked CELL BY CELL (☆ forfeited, all cores clear)', moves: `C => { const o=C._o; const mv=[];
+      mv.push({sel:'A'+o.medRow+':'+colLetter(o.lastC)+o.medRow, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      mv.push({sel:o.mgnR,  keys:[{key:'Alt'},L('h'),L('9'),{key:'Alt'},L('h'),L('9')]});
+      mv.push({sel:o.turnR, keys:[{key:'Alt'},L('h'),L('0')]});
+      const fix=[]; for(let k=0;k<o.defPresses;k++) fix.push({key:'Alt'},L('h'),L('9'));
+      mv.push({sel:o.defCell, keys:fix});
+      for(const col of ['B','C']){ for(let i=0;i<o.n;i++){ mv.push({sel:col+(o.hr+1+i), keys:[{key:'Alt'},L('h'),L('9'),{key:'Alt'},L('h'),L('9')]}); }
+        mv.push({sel:col+o.medRow, keys:[{key:'Alt'},L('h'),L('9'),{key:'Alt'},L('h'),L('9')]}); }
+      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+      return mv; }` },
+  { key: 'decimals', name: 'chord-ROUTE — Ctrl+Space whole-column selections + ribbon bold (Alt H 1); the rect-based ☆ must still latch', moves: `C => { const o=C._o; const mv=[];
+      mv.push({sel:'B'+(o.hr+1)+':C'+(o.hr+1), keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('9'),{key:'Alt'},L('h'),L('9')]});
+      mv.push({sel:'D'+(o.hr+1), keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('0')]});
+      mv.push({sel:'E'+(o.hr+1), keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('9'),{key:'Alt'},L('h'),L('9')]});
+      const fix=[]; for(let k=0;k<o.defPresses;k++) fix.push({key:'Alt'},L('h'),L('9'));
+      mv.push({sel:o.defCell, keys:fix});
+      mv.push({sel:'A'+o.medRow+':'+colLetter(o.lastC)+o.medRow, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]});
+      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+      return mv; }` },
   { key: 'ruleoff', name: 'box FIRST, rulings bottom-up, EBITDA typed as VALUES per column (freedom proof — core clears, ☆ forfeited)', moves: `C => { const R=C._R;
       const steps=[
         {sel:R.focus, keys:[{key:'Alt'},L('h'),L('b'),L('t')]},

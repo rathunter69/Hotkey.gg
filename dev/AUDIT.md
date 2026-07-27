@@ -1,5 +1,61 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r429 H6b-4 — decimals depth-pass rework (DEPTH_PASS §4.12 + §1.0/§1.0-R2/§1.0-R3) — THE FIRST §1.0-R3 DRILL
+_The reference build for the dual-audience real-task law: the first drill whose ARTIFACT was
+converted for audience A, and the first ☆ re-cut under the §1.0-R3(o) sweep._
+- **ARTIFACT CONVERTED (§1.0-R3(n) + the §3.1 audience map): comps page → OPERATIONS SCORECARD.**
+  One row per region, columns Revenue · Cost · Turns (x) · Gross margin, with a labelled **Median**
+  read line. WHY: the lesson ("a decimal standard is a column property") is audience-neutral, and
+  **inventory turns** preserves §4.12's exact "8.2x, not 8.20x" beat with a metric a corporate
+  operator reads weekly — chapter 2 needed its A-side balance (§3.1 locks c2 at 5A/5B). Data
+  converted, difficulty NOT: same beat count, MORE axes, same par band. Scenario prompt per
+  §1.0-R3(n) rule 2 (the scorecard goes to the leadership team this afternoon).
+- **BEATS (5 core + mystery ☆ + engine-appended Ctrl+S closer; §1.0(b) outcome-vague):** Set the
+  Revenue and Cost columns to whole dollars → Set the Turns column to one decimal → Set the Gross
+  margin column to one decimal → Fix the one cell in the [seed's column] that reads four decimals
+  → Bold the Median row and add a top border above it (§1.0(f): a total earns the line ABOVE it)
+  → Save your work. Tri-length 6, C9-registered.
+- **☆ RE-CUT (§1.0-R3(o); §4.12's "right-align the header row" was a FORMATTING ☆ — dead under
+  §1.0(d) and it also failed §1.0-R2(i), falling out of any dress pass):** **COLUMN-SELECTION
+  DISCIPLINE** — every standard applied in a pass that SPANS THE WHOLE COLUMN BODY (first data row
+  through the median line). Rect-based like the r425 dress ☆, so supersets count (Ctrl+Space's
+  whole column, or one sweep across both money columns) and no chord is privileged (§1.0(c));
+  cell-by-cell decimals leave single-cell rects and never latch. This is Wolf's own §1.0-R2(i)
+  framing — "reward good habits of using the previously taught hotkeys" (the column-select chord
+  taught in rowops/blocksel).
+- **ENGINE HUNK (§9.2 payload item 6 — justified):** `hkFmtLatch('dec')` added to the Alt H 0 /
+  Alt H 9 ribbon RUN path. No existing telemetry recorded DECIMAL ops — `S.fmtOps` only carried
+  `kind:'comma'` from r425 — so the column-select ☆ had no latch. Same family and same contract as
+  the comma latch: telemetry only, no core check may read it (§1.0(c)). One line, one route family.
+- **THE AHA MADE MECHANICAL:** relative decimal ops SHIFT places, they do not normalise — so a
+  whole-column pass moves the planted 4-place outlier along with everything else (turns 4→5 after
+  the +1 pass; margin 4→2 after the −2 pass) and it still has to be walked home by hand. That is
+  precisely why beat 4 exists, and it is asserted in the probe (§D).
+- **JUDGMENT CALLS (in-code, per WORKFLOW §8):** (1) the pre-playtest page's COLUMN-SHUFFLE axis is
+  dropped — a real scorecard reads Revenue · Cost · Turns · Margin, and §1.0-R3(n) rule 1 outranks
+  a shuffle that makes the board read like an exercise; replaced by four other axes. (2) §1.0-R2(h)
+  action-location cues DELIBERATELY NOT applied to beat 4 — the ragged cell is a HUNT ("find it by
+  eye"), so a board cue would delete the lesson; same carve-out class as §1.7 R2(a). §1.0-R2(g) is
+  still honoured: the label names the seed's COLUMN without spoiling the row.
+- **RANDOM (§1.2 — four axes, was effectively two):** (a) site jitter d∈{0,1}; (b) content pools —
+  regions Fisher-Yates from a 7-pool + codename() + month label; (c) every figure through rnd();
+  (d) which-one-is-broken ×2 — the outlier's COLUMN (turns or margin) and its ROW both vary.
+  Verified live: 7 distinct region draws, 6 distinct defect rows, both defect columns, over 40 builds.
+- **PAR:** 18/15 → **27/24** (5-seed sweep: median 24 keys, **0% drift** after retune; 1.13 s/key —
+  the audit-read premium the hunt beat carries, same band as ruleaudit's 1.14). HOTKEY_PARS
+  mirrored; drills.js?v=284→285 across all 28 files; 82 drill pages + sitemap + refmap regenerated,
+  **byte-stable across two further regenerations**.
+- **META (DoD #6):** drills.js desc rewritten for the scorecard scope, de-hint clean (no chord tokens).
+- **ALTS (§1.8 — both NEW; the r199-era entry RETIRED, it still solved the pre-rework comps board):**
+  (1) op-ORDER + FREEDOM proof — read line dressed FIRST, margins/turns by body pass, money columns
+  walked CELL BY CELL (every core clears, ☆ forfeited); (2) chord-ROUTE — Ctrl+Space whole-column
+  selections + ribbon bold Alt H 1 (proves the rect-based ☆ latches on a different route). 2/2 PASS.
+- **TESTS:** demo-replay decimals 3/3 ×3 seeds · **dedicated probe `dev/verify-decimals.js` 22/22**
+  (☆ earn + negative control, mystery "☆ ?" render + no label leak, the relative-decimal aha,
+  all four axes, board labelling, saveClose, zero page errors) · guided PASS (railed, contained,
+  solvable) · alt-paths 2/2 · par-sweep FLAGGED 0 · fit-sweep ALL CLEAN (77) · static invariants
+  clean incl. C9 decimals · cache-bump guard clean.
+
 ## r426–r427 — RECONCILIATION ENTRY (written r428, 2026-07-26, from the PR #242 record — the source session hit its limit mid-assembly and never wrote these; treat the PR diff as the primary record)
 - **r426 — BORDER P0 (Wolf round-2 playtest, reported twice, R2-B1):** applied cell borders were
   INVISIBLE site-wide — the r413 gridline-softener `#grid td{border-color:…}` (specificity 1,0,1)

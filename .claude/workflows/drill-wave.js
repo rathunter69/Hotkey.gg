@@ -12,24 +12,50 @@ export const meta = {
 // applies payloads SERIALLY per §9.3. Do not "improve" this by letting agents edit
 // drills.js / check-invariants.js / e2e-alt-paths.js / e2e-depth-mechanics.js directly.
 
-if (!Array.isArray(args) || args.length === 0) {
+// Accept a real array OR a JSON-encoded / comma-separated string: some callers stringify args.
+let keys = args
+if (typeof keys === 'string') {
+  const s = keys.trim()
+  try { keys = JSON.parse(s) } catch { keys = s.split(',') }
+}
+if (!Array.isArray(keys)) keys = [keys]
+keys = keys.map((k) => String(k).trim().replace(/^["']|["']$/g, '')).filter(Boolean)
+
+if (keys.length === 0) {
   throw new Error('args must be a non-empty array of drill keys in catalog order, e.g. ["decimals","center","autofit","combo","gauntlet"]')
 }
-if (args.length > 5) throw new Error('Wave cap is 5 drills (WORKFLOW.md §9.4) — split the wave.')
+if (keys.length > 5) throw new Error('Wave cap is 5 drills (WORKFLOW.md §9.4) — split the wave.')
 
 const PROMPT = (key) => `You are a depth-pass drill build agent for hotkey.gg. Your drill key: ${key}.
 
 READ FIRST, in this order (all in the repo — nothing you need lives outside it):
 1. dev/WORKFLOW.md §9 — your ownership law (§9.1) and payload contract (§9.2). Binding.
-2. dev/DEPTH_PASS.md §0 (how to use the doc) + §1 (the anatomy standard — §1.0 and §1.0-R2 are
-   BINDING LAW and win over any older line) + the §2 mechanics your drill consumes + your drill's
-   own §4 page. The §4 beat lines ship as the literal check labels.
+2. dev/DEPTH_PASS.md §0 (how to use the doc) + §1 (the anatomy standard — §1.0, §1.0-R2 and
+   §1.0-R3 are BINDING LAW and win over any older line) + §3.1 (the audience map) + the §2
+   mechanics your drill consumes + your drill's own §4 page. The §4 beat lines ship as the literal
+   check labels.
 3. dev/DRILL_DOCTRINE.md for anything §1 references.
 4. dev/AUDIT.md r425 entries (undo, dress, editfix, modeltour) — your output-quality exemplars,
    including how judgment calls are documented as in-code comments quoting the §-line.
 
-BUILD ${key} to its §4 page with §1.0/§1.0-R2 overlaid. If the page under-specifies something you
-need, STOP and return a SPEC BUG report naming the missing detail — do NOT improvise design.
+BUILD ${key} to its §4 page with §1.0/§1.0-R2/§1.0-R3 overlaid. If the page under-specifies
+something you need, STOP and return a SPEC BUG report naming the missing detail — do NOT improvise
+design.
+
+R429 LAW — READ CAREFULLY, IT CHANGES YOUR PAGE:
+- **§1.0-R3(n) the dual-audience real-task law.** Your board must read as a real file a real person
+  has open at a real job — for BOTH audiences (corporate mid-career professional AND aspiring
+  banker/consultant). Apply the REALITY TEST to your board and prompt. Your §4 page names your
+  drill's assigned ARTIFACT and audience (§3.1 locks chapter 2 at 5A/5B) — build that artifact.
+  Convert the DATA, never the DIFFICULTY: same beat count, same axes, same par band.
+- **§1.0-R3(o) the ☆ re-cut.** Your §4 page's ☆ has ALREADY been re-cut for this wave — it names
+  the bonus family, the latch telemetry to reuse, and the skippability proof you must produce.
+  Do NOT ship a formatting ☆. If your ☆ needs NEW engine telemetry, that is a payload item (§9.2
+  item 6) with a written justification — build it in your worktree, but report it as a payload
+  hunk, do not treat it as yours to keep.
+- Your ☆ must not duplicate another chapter-2 drill's bonus family; your page states which family
+  is yours (decimals=column-select · center=technique/centre-across · autofit=one-pass ·
+  combo=current-region · gauntlet=format-cloning).
 
 OWNERSHIP (WORKFLOW.md §9.1 — hard rule): edit ONLY your drill's CHALLENGES block in index.html
 and, if needed, a dedicated probe script dev/verify-${key}.js. Do NOT edit drills.js,
@@ -49,10 +75,10 @@ median/drift/s-per-key + test matrix + screenshot paths · (8) spec deviations w
 "built to page verbatim".`
 
 phase('Build')
-const results = await parallel(args.map((k) => () =>
+const results = await parallel(keys.map((k) => () =>
   agent(PROMPT(k), { label: `build:${k}`, phase: 'Build', isolation: 'worktree' })
 ))
 
-const missing = args.filter((k, i) => !results[i])
+const missing = keys.filter((k, i) => !results[i])
 if (missing.length) log(`WARNING — no payload returned for: ${missing.join(', ')} (agent killed or errored; re-run those keys)`)
-return { drills: args, payloads: results, missing }
+return { drills: keys, payloads: results, missing }

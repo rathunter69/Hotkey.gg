@@ -1728,9 +1728,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=284"></script>
+<script src="drills.js?v=285"></script>
 
-<script src="drills.js?v=284"></script>
+<script src="drills.js?v=285"></script>
 
 
 
@@ -2647,35 +2647,74 @@ const CHALLENGES = {
     }
   },
   decimals:{
-    name:'Decimals', label:'Standardize the decimals', par:18, parKeys:15,
-    aha:'Alt H 0 adds a decimal, Alt H 9 drops one — dollars take 0, multiples and percents take 1.',
-    prompt:'Standardize the decimals on the comps page (comparable-company multiples — EV/EBITDA and friends). House rule: dollars take no decimals; multiples and percents take one. Add or remove decimal places to work each column to the standard.',
-    req(){ const o=this._o; return '<em>'+o.evR+'</em> · <em>alt h 9</em> ×2 → whole dollars · <em>'+o.mR+'</em> · <em>alt h 0</em> → one place · <em>'+o.pR+'</em> · <em>alt h 9</em> ×2 → one place'; },
+    /* r429 (H6b wave 4, DEPTH_PASS §4.12 + §1.0/§1.0-R2/§1.0-R3 on top): depth-pass rework.
+       JUDGMENT CALLS (documented per WORKFLOW.md §8 — the executor must not have to guess):
+       · ARTIFACT CONVERTED comps page → OPERATIONS SCORECARD per §1.0-R3(n) + the §3.1 audience
+         map, which locks decimals as chapter 2's audience-A drill. The lesson ("a decimal
+         standard is a column property") is audience-neutral; INVENTORY TURNS preserves the
+         page's exact "8.2x, not 8.20x" beat with a metric a corporate operator reads weekly.
+         Data converted, difficulty NOT (§3.1): same beat count, more axes, same par band.
+       · §4.12's "☆ Right-align the header row" is a FORMATTING ☆ — dead under §1.0(d), and it
+         also fails §1.0-R2(i) (it falls out of a dress pass). Re-cut per §1.0-R3(o) to the
+         COLUMN-SELECTION family: every standard applied to the whole column in one pass.
+       · NO COLUMN SHUFFLE (the pre-playtest page's axis): a real scorecard reads
+         Revenue · Cost · Turns · Margin, and §1.0-R3(n) rule 1 outranks a shuffle that would
+         make the board read like an exercise. Replaced with FOUR other axes (see build()), so
+         §1.2's ≥2 is cleared twice over.
+       · §1.0-R2(h) ACTION-LOCATION CUES DELIBERATELY NOT APPLIED to beat 4: the ragged cell is
+         a HUNT — §4.12 says "find it by eye" — so a board cue would delete the lesson. Same
+         carve-out class as §1.7 R2(a) (maze boards, where discovery IS the game). §1.0-R2(g) is
+         still honored: the label names the seed's COLUMN (a real seed fact) without spoiling
+         the row.
+       · Relative decimal ops are WHY beat 4 exists: Alt H 9/0 SHIFT a cell's places, they do
+         not normalize — so a whole-column pass moves the 4-decimal outlier too, and it still
+         has to be walked home by hand. That is the aha, made mechanical. */
+    name:'Decimals', label:'Standardize the decimals', par:27, parKeys:24, saveClose:true,   /* r429: par re-swept post-rework — 5-seed sweep median 24 keys, 0% drift after retune; par 27s ≈ 1.13 s/key, the audit-read premium the hunt beat (find the ragged cell by eye) carries, same band as ruleaudit */
+    aha:'a decimal standard is a column property — and one ragged cell breaks the read for the whole column.',
+    prompt:'The operations scorecard goes out to the leadership team this afternoon and the columns don’t line up — dollars carrying cents, turns with no precision at all, margins running to three places. House standard: dollars whole, turns and margins to one decimal. Someone has also hand-formatted a single cell to four places; it reads ragged against the rest of its column. Work each column to the standard, then rule the read line at the bottom.',
+    req(){ const o=this._o; return '<em>'+o.dollarR+'</em> <em>alt h 9</em> ×2 · <em>'+o.turnR+'</em> <em>alt h 0</em> · <em>'+o.mgnR+'</em> <em>alt h 9</em> ×2 · the ragged cell <em>alt h 9</em> ×'+o.defPresses+' · Median row <em>ctrl+b</em> + <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): check labels are OUTCOME lines — the route lives HERE, per line, chords allowed. */
     guide(){ const o=this._o; return [
-      'dollars first — select '+o.evR+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice: the cents disappear',
-      'multiples — '+o.mR+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd>: 8x becomes 8.2x, one place of precision',
-      'margins — '+o.pR+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice: three places down to one',
+      'dollars first — select <em>'+o.dollarR+'</em> (both money columns in one sweep) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice: the cents disappear',
+      'turns — select <em>'+o.turnR+'</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> once: 8x becomes 8.2x, one place of precision',
+      'margins — select <em>'+o.mgnR+'</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> twice: three places back to one',
+      'the ragged one is in the <em>'+o.defName+'</em> column — land on it and <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> until it reads like its neighbours (the column pass shifted it too — relative ops move, they don’t normalise)',
+      'the read line — select <em>A'+o.medRow+':'+colLetter(o.lastC)+o.medRow+'</em> · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> — bold, ruled on TOP (a total earns the line above it)',
+      '☆ the discovery: the column is the unit, not the cell — one selection per standard (<kbd>ctrl</kbd>+<kbd>space</kbd> grabs a whole column) beats walking it cell by cell',
     ]; },
-    targets(){ const o=this._o; return [o.evR, o.mR, o.pR]; },
+    targets(){ const o=this._o; return [o.dollarR, o.turnR, o.mgnR, o.defCell, 'A'+o.medRow+':'+colLetter(o.lastC)+o.medRow, o.dollarR]; },
     demo(){ const o=this._o; return [
-      {sel:o.evR, keys:[Kb.alt,L('H'),L('9'), Kb.alt,L('H'),L('9')]},
-      {sel:o.mR, keys:[Kb.alt,L('H'),L('0')]},
-      {sel:o.pR, keys:[Kb.alt,L('H'),L('9'), Kb.alt,L('H'),L('9')]},
+      /* one body-spanning pass per standard — the ☆ latch fires on these three (§2.2: the demo
+         performs the bonus so replay covers it), then the outlier is walked home by hand. */
+      {sel:o.dollarR, keys:[Kb.alt,L('H'),L('9'), Kb.alt,L('H'),L('9')]},
+      {sel:o.turnR,   keys:[Kb.alt,L('H'),L('0')]},
+      {sel:o.mgnR,    keys:[Kb.alt,L('H'),L('9'), Kb.alt,L('H'),L('9')]},
+      {sel:o.defCell, keys:o.defFix},
+      {sel:'A'+o.medRow+':'+colLetter(o.lastC)+o.medRow, keys:[Kb.bold, Kb.alt,L('H'),L('B'),L('P')]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — comps page (fix the decimals)',txt:true,bold:true};
-      const hr=3, n=5;
+      const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+      /* §1.2 randomization — FOUR axes: (a) site jitter d∈{0,1} slides the whole scorecard down
+         a row; (b) content pools — region names Fisher-Yates from a 7-pool + codename() + the
+         month label; (c) every figure through rnd(); (d) which-one-is-broken — the ragged cell's
+         COLUMN (turns or margin) and its ROW both vary. Same-seed determinism holds. */
+      const d=rnd(0,1), hr=3+d, n=5;
+      const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+      cells['A1']={...blankCell(),value:codename()+' — operations scorecard',txt:true,bold:true};
+      cells['A'+(hr-1)]={...blankCell(),value:months[rnd(0,11)]+' — by region ($000s)',txt:true,it:true,fontColor:'gray'};
+      const regions=shuffle(['North','South','Midwest','Northeast','Mountain','Pacific','Southeast']).slice(0,n);
+      /* Real scorecard column order (§1.0-R3(n) rule 1) — not shuffled; see the header note. */
       const cols=[
-        {h:'EV ($mm)', style:'comma', dec:2, target:0},
-        {h:'EV/EBITDA', style:'comma', dec:0, target:1},
-        {h:'Margin', style:'percent', dec:3, target:1},
+        {h:'Revenue',      style:'comma',   dec:2, target:0, kind:'money'},
+        {h:'Cost',         style:'comma',   dec:2, target:0, kind:'money'},
+        {h:'Turns (x)',    style:'comma',   dec:0, target:1, kind:'turns'},
+        {h:'Gross margin', style:'percent', dec:3, target:1, kind:'margin'},
       ];
-      for(let k=cols.length-1;k>0;k--){ const j=rnd(0,k); [cols[k],cols[j]]=[cols[j],cols[k]]; }
-      const peers=['Falcon Ind.','Atlas Group','Copper Peak','Summit Co.','Ironline','Redrock Ltd.'];
-      for(let k=peers.length-1;k>0;k--){ const j=rnd(0,k); [peers[k],peers[j]]=[peers[j],peers[k]]; }
-      cells['A'+hr]={...blankCell(),value:'Peer',txt:true,bold:true};
-      for(let i=0;i<n;i++) cells['A'+(hr+1+i)]={...blankCell(),value:peers[i],txt:true};
+      cells['A'+hr]={...blankCell(),value:'Region',txt:true,bold:true};
+      for(let i=0;i<n;i++) cells['A'+(hr+1+i)]={...blankCell(),value:regions[i],txt:true};
+      const medRow=hr+n+1;
+      cells['A'+medRow]={...blankCell(),value:'Median',txt:true};
       this._cols=[];
       cols.forEach((col,j)=>{
         const c=2+j, L2=colLetter(c);
@@ -2683,29 +2722,71 @@ const CHALLENGES = {
         const vals=[];
         for(let i=0;i<n;i++){
           let v;
-          if(col.h==='EV ($mm)') v=rnd(80,900)*10+rnd(0,99)/100;
-          else if(col.h==='EV/EBITDA') v=rnd(55,140)/10;
-          else v=rnd(80,380)/1000;
+          if(col.kind==='money')      v=rnd(180,940)*10+rnd(0,99)/100;
+          else if(col.kind==='turns') v=rnd(38,142)/10;
+          else                        v=rnd(180,470)/1000;
           vals.push(v);
           cells[L2+(hr+1+i)]={...blankCell(),value:v,fmtStyle:col.style,decimals:col.dec};
         }
-        this._cols.push({h:col.h, c:c, L:L2, target:col.target, style:col.style, vals:vals});
+        const sorted=vals.slice().sort((a,b)=>a-b), med=sorted[(n-1)>>1];
+        cells[L2+medRow]={...blankCell(),value:med,fmtStyle:col.style,decimals:col.dec};
+        this._cols.push({h:col.h, c:c, L:L2, target:col.target, style:col.style, dec0:col.dec, vals:vals, med:med});
       });
-      const F=h=>this._cols.find(x=>x.h===h);
-      this._o={ evR:F('EV ($mm)').L+(hr+1)+':'+F('EV ($mm)').L+(hr+n),
-        mR:F('EV/EBITDA').L+(hr+1)+':'+F('EV/EBITDA').L+(hr+n),
-        pR:F('Margin').L+(hr+1)+':'+F('Margin').L+(hr+n), hr:hr, n:n };
-      return {ROWS:Math.max(9,hr+n+1), cells, active:{r:hr+1,c:F('EV ($mm)').c}, sel:null, colW:{1:104,2:92,3:92,4:92}};
+      /* (d) the planted defect — a single hand-formatted cell at FOUR places, in the turns or
+         the margin column (both target 1, so the outlier is visible against its neighbours). */
+      const defCol=this._cols[rnd(2,3)], defI=rnd(0,n-1), defRow=hr+1+defI;
+      cells[defCol.L+defRow].decimals=4;
+      const lastC=1+cols.length;
+      const R=(L2)=>L2+(hr+1)+':'+L2+medRow;   // full column BODY, data rows + the median read line
+      this._o={
+        hr:hr, n:n, medRow:medRow, lastC:lastC,
+        dollarR:'B'+(hr+1)+':C'+medRow,           // both money columns in one sweep
+        turnR:R('D'), mgnR:R('E'),
+        defCell:defCol.L+defRow, defName:defCol.h, defCol:defCol.L, defRow:defRow,
+        /* The outlier's walk home, via Alt H 9 (relative). Press count is 4 − the column's
+           ORIGINAL decimals, NOT 4 − target: the demo runs its whole-column pass first, and a
+           relative op moves the 4-place outlier along with everything else (turns 4→5 after the
+           +1 pass; margin 4→2 after the −2 pass). Landing on target from there is
+           (4 + (target − dec0)) − target = 4 − dec0. This IS the drill's aha, in arithmetic. */
+        defFix:(()=>{ const steps=[]; for(let k=0;k<4-defCol.dec0;k++) steps.push(Kb.alt,L('H'),L('9')); return steps; })(),
+        defPresses:4-defCol.dec0
+      };
+      return {ROWS:Math.max(12,medRow+2), cells, active:{r:hr+1,c:2}, sel:null,
+        colW:{1:112,2:100,3:100,4:88,5:112}};
     },
     checks(S){
       const o=this._o;
-      const colOk=(h,label)=>{ const col=this._cols.find(x=>x.h===h);
-        return col.vals.every((v,i)=>{ const cc=S.cells[col.L+(o.hr+1+i)];
-          return !!(cc&&cc.value===v&&cc.decimals===col.target&&cc.fmtStyle===col.style); }); };
+      const C=h=>this._cols.find(x=>x.h===h);
+      /* every graded cell: value UNTOUCHED (§1.0(c) — this is a formatting drill, the figures
+         are not the player's to edit), style intact, decimals at the column standard. The
+         median read line is part of the column body, so a whole-column pass covers it. */
+      const cellOk=(col,row,val)=>{ const cc=S.cells[col.L+row];
+        return !!(cc && cc.value===val && cc.fmtStyle===col.style && cc.decimals===col.target); };
+      const bodyOk=(h,skipDefect)=>{ const col=C(h);
+        for(let i=0;i<o.n;i++){ const row=o.hr+1+i;
+          if(skipDefect && col.L+row===o.defCell) continue;      // beat 4 owns the outlier
+          if(!cellOk(col,row,col.vals[i])) return false; }
+        return cellOk(col,o.medRow,col.med); };
+      const defOk=(()=>{ const col=C(o.defName), i=o.defRow-(o.hr+1);
+        return cellOk(col,o.defRow,col.vals[i]); })();
+      const medOk=(()=>{ for(let c=1;c<=o.lastC;c++){ const cc=S.cells[colLetter(c)+o.medRow];
+        if(!cc||!cc.bold||!cc.bt) return false; } return true; })();
+      /* ☆ (§1.0(d) mystery slot · §1.0-R3(o) COLUMN-SELECTION family): every one of the four
+         standards applied in a pass that SPANS THE WHOLE COLUMN BODY (first data row through the
+         median line). Rect-based like the r425 dress ☆ — supersets count (Ctrl+Space's whole
+         column, or one sweep across both money columns), so no chord is privileged (§1.0(c));
+         cell-by-cell decimals leave single-cell rects and never latch. Reads S.fmtOps 'dec'
+         entries (r429 engine hunk — hkFmtLatch on the Alt H 0 / Alt H 9 routes). */
+      const spanned=(c)=>(S.fmtOps||[]).some(f=>f.kind==='dec' && f.c1<=c && f.c2>=c
+        && f.r1<=o.hr+1 && f.r2>=o.medRow);
+      const starOk=[2,3,4,5].every(spanned);
       return [
-        {label:'strip the EV column to ZERO decimals — values untouched', ok: colOk('EV ($mm)')},
-        {label:'give the multiples ONE decimal — 8x becomes 8.2x down the column', ok: colOk('EV/EBITDA')},
-        {label:'walk the margins back to ONE decimal place', ok: colOk('Margin')},
+        {label:'Set the Revenue and Cost columns to whole dollars — the house standard', ok: bodyOk('Revenue',false) && bodyOk('Cost',false)},
+        {label:'Set the Turns column to one decimal — 8.2x, not 8x', ok: bodyOk('Turns (x)',true)},
+        {label:'Set the Gross margin column to one decimal', ok: bodyOk('Gross margin',true)},
+        {label:'Fix the one cell in the '+o.defName+' column that reads four decimals', ok: defOk},
+        {label:'Bold the Median row and add a top border above it', ok: medOk},
+        {label:'☆ every standard applied to the whole column in one pass — the column is the unit, not the cell', ok: starOk, bonus:true},
       ];
     }
   },
@@ -12704,6 +12785,7 @@ function applyRibbon(key){
     'HAN':c=>{c.fmtStyle='acct';c.decimals=0;},   // r233: Accounting Number Format — Excel's real Alt H A N keytip (ribbon path, not Ctrl+1)
   };
   if(RUN[np]){ pushUndo(); if(np==='HK') hkFmtLatch('comma');   /* r425: one-pass ☆ telemetry */
+    if(np==='H0'||np==='H9') hkFmtLatch('dec');   /* r429: DECIMAL-op telemetry — decimals' column-select ☆ (DEPTH_PASS §4.12) grades whether a standard was applied across the whole column body. Same family/contract as the r425 comma latch: telemetry only, no core check may read it (§1.0(c)). */
     eachSel(RUN[np]); return exitRibbon(true); }
   // Alt H I R / Alt H D R — ribbon route to row insert/delete. Unlike the Ctrl chord,
   // Excel's ribbon path works on PARTIAL selections (inserts/deletes the touched rows).

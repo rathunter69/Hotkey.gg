@@ -202,7 +202,8 @@ try {
    STATIC counts asserted here stay the hand-written tri-length; C9 asserts the declaration is
    present and that no drill hand-writes the save beat (the engine owns it, exactly once). ---- */
 try {
-  const REWORKED = ['navigation', 'blocksel', 'filldr', 'pastes', 'rowops', 'ruleoff', 'dress', 'copyover', 'editfix', 'ruleaudit', 'housestyle', 'typeset', 'undo', 'modeltour'];   // r422 H6b-1 wave 1
+  const REWORKED = ['navigation', 'blocksel', 'filldr', 'pastes', 'rowops', 'ruleoff', 'dress', 'copyover', 'editfix', 'ruleaudit', 'housestyle', 'typeset', 'undo', 'modeltour',   // r422 H6b-1 wave 1 + r425 waves 2-3
+    'decimals'];   // r429 H6b wave 4 (DEPTH_PASS §4.12)
   const idx = fs.readFileSync('index.html', 'utf8');
   const start = idx.indexOf('const CHALLENGES = {');
   const end = idx.indexOf('STATE + ENGINE', start);
