@@ -266,6 +266,30 @@ const ALTS = [
      and the grid moved off its nailed C4 site onto a 4-spot pool with 3-4 rows. ALT 1 = chord-ROUTE
      (typed $ instead of F4, ctrl+1 for the money register, Alt H B A all-borders instead of B S —
      the boxed check accepts either end state per §1.0-R2(m)). ALT 2 = the skippability control. */
+  /* r429 (DEPTH_PASS §4.30 wave 5): fxconvert had ZERO registered ALTS — one of the two audit
+     findings the page names (the other was guide 3-vs-5, also fixed). Two now, incl. the
+     ☆-forfeit control. */
+  { key: 'fxconvert', name: 'chord-ROUTE — typed $ anchors (no F4), ctrl+1 comma register, ribbon fills; the ☆ must still latch', moves: `C => [
+      {sel:'B3', keys:[...T(C._rateStr),{key:'Enter'}]},
+      {sel:'B3', keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+      {sel:'B3', keys:[{key:'Alt'},L('h'),L('b'),L('a')]},
+      {sel:'B10', keys:[...T('=B6*$B$3'),{key:'Enter'}]},
+      {sel:'B10:F10', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:'B10:F12', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:'B10:F12', keys:[{key:'1',ctrl:true},L('n')]},
+      {sel:'A10:F12', keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
+      {sel:'A1', keys:[{key:'s',ctrl:true}]},
+    ]` },
+  { key: 'fxconvert', name: 'FREEDOM proof — every conversion TYPED with the rate inline, no anchored formula and no fill (☆ forfeited, all five cores clear)', moves: `C => { const mv=[], r=C._rate;
+      mv.push({sel:'B3', keys:[...T(C._rateStr),{key:'Enter'}]});
+      mv.push({sel:'B3', keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]});
+      mv.push({sel:'B3', keys:[{key:'Alt'},L('h'),L('b'),L('a')]});
+      for(let i=0;i<3;i++) for(let j=0;j<5;j++){
+        mv.push({sel:colLetter(2+j)+(10+i), keys:[...T('='+colLetter(2+j)+(6+i)+'*'+C._rateStr),{key:'Enter'}]}); }
+      mv.push({sel:'B10:F12', keys:[{key:'Alt'},L('h'),L('k')]});
+      mv.push({sel:'A10:F12', keys:[{key:'Alt'},L('h'),L('b'),L('s')]});
+      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+      return mv; }` },
   { key: 'anchor', name: 'chord-ROUTE — dollars typed by hand (no F4), ctrl+1 money register, Alt H B A all-borders instead of the outside chord', moves: `C => { const o=C._o; return [
       {sel:o.tl, keys:[...T('=$B'+o.r0+'*C$'+o.hr),{key:'Enter'}]},
       {sel:o.col, keys:[{key:'d',ctrl:true}]},

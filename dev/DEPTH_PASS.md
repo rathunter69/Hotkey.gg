@@ -146,6 +146,18 @@ telemetry — `S.fillOps` · `S.pasteOpLog` · `S.pasteLog` · `S.fmtOps` · `S.
   where a pre-playtest page already specced it AND the drill's whole lesson is a thing that can be
   silently wrong (an anchor, a lock, a link). Do not reach for it as a default — §1.0(d)'s "hidden
   EFFICIENCY discoveries" is still the rule, and a chapter should carry this shape at most once.
+**Family spacing — SECOND amendment (r429, at fxconvert; say it out loud rather than quietly bend
+it a second time).** The cap below forbade a family more than twice per chapter. That is right for
+incidental families and WRONG for a chapter's core craft: c3 is the FORMULAS chapter, and its whole
+thesis is *one formula serves many cells*. A rule that bars the chapter's own thesis from being the
+discovery after its second outing pushes page authors into exactly the strained bonuses the first
+amendment was written to prevent — fxconvert's specced lesson IS "one anchored formula converts
+everything", and any other ☆ there would be invented rather than found. **So: the twice-per-chapter
+cap does not apply to the family that IS that chapter's declared craft (fill-census/anchoring in c3;
+structure ops in c1; dress discipline in c2). Adjacent drills still may never share a family, and a
+recurrence must still teach something the earlier one did not.** Flagged for the playtest: if c3's
+☆s read samey in a row, this is the knob to turn, not the individual drills.
+
 **Family spacing (amended r429 — the original rule was unachievable):** the first cut said a ☆ must
 not repeat another ☆ in the SAME chapter. With 12-drill chapters and seven families that is
 impossible by the pigeonhole, and pretending otherwise just pushes page authors into inventing

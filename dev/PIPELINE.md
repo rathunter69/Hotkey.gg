@@ -3,10 +3,10 @@
 ## ⚡ STATE OF THE QUEUE (r429, 2026-07-27 — READ FIRST; supersedes the r417/r420c block below)
 
 **WHERE THE DEPTH PASS STANDS:**
-- **28/81 live drills at the depth-pass standard** (the C9 REWORKED ledger in dev/check-invariants.js
+- **29/81 live drills at the depth-pass standard** (the C9 REWORKED ledger in dev/check-invariants.js
   is the single source of truth): **Foundations (c1) COMPLETE 9/9** (modeltour★ capstone) ·
   **Formatting (c2) COMPLETE 10/10** (gauntlet★ capstone — a clean run opens Formulas I) ·
-  **Formulas I (c3) 9/12** (margin · foot · anchor · percent · growth · cagr · bridge · sumif · rollup).
+  **Formulas I (c3) 10/12** (margin · foot · anchor · percent · growth · cagr · bridge · sumif · rollup · fxconvert).
 - **VERIFICATION IS NOW GENERIC** — `dev/e2e-depth-contract.js` asserts the universal §1 contract
   for every drill on the ledger, and `dev/e2e-alt-paths.js` enforces the **☆-forfeit contract** (an
   alt whose name says "☆ forfeited" MUST clear core with the ☆ dark). A new drill therefore needs
@@ -42,7 +42,7 @@
    SERIALLY in the main checkout, which is how all five of these were done. Two further gotchas:
    worktrees branch from the last COMMIT (commit spec changes before launching), and the workflow's
    `args` arrive JSON-encoded (now normalised in the script).
-1b. **W5 — FORMULAS I (c3) [auto·rolling] — IN FLIGHT, 9 of 12.** ✅ **margin** (comp sets →
+1b. **W5 — FORMULAS I (c3) [auto·rolling] — IN FLIGHT, 10 of 12.** ✅ **margin** (comp sets →
    divisional performance pack, audience A; three ratio asks permuted per seed with §1.0-R2(g)
    adaptive labels; fill-census ☆) · ✅ **foot** (audience-A regional grid; reference-over-retype ☆;
    gained a dress beat and the cross-foot prove-out; par 11→32) · ✅ **anchor** (4-spot site pool,
@@ -56,8 +56,8 @@
    ✅ **sumif** + ✅ **rollup** (both carried the SAME two defects — a §1.0(c) route requirement
    baked into core, and §1.2 axes that existed on paper but not in the build; sumif gets a tie-out ☆,
    rollup a 2-D one-pass ☆ with its axes beat promoted from the dead formatting ☆).
-   ⏳ **REMAINING FOR A 3-CHAPTER PLAYTEST — 3 drills:** fxconvert (guide 3v5 misalignment + ZERO
-   alts, both audit findings) · cases (targets 9 vs checks 6 — the WORST misalignment in the
+   ✅ **fxconvert** (both audit findings closed — guide 3v5 realigned, and its first ever ALTS).
+   ⏳ **REMAINING FOR A 3-CHAPTER PLAYTEST — 2 drills:** cases (targets 9 vs checks 6 — the WORST misalignment in the
    catalog; the guided ring lands on the wrong cell from step 2) · **qclose★ (NEW, D1 — the expensive one: a brand-new drill carrying
    the full plumbing row — SPINE, TRACKS + migrate-certificates.sql in the SAME PR, PARS, LB board,
    SEO page — plus the c3 capstone wiring off the gauntlet/modeltour template)**.

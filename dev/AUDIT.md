@@ -1,5 +1,33 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r429 H6b-5 — fxconvert (DEPTH_PASS §4.30 + D13) — wave 5 at 10 of 12
+- **BOTH AUDIT FINDINGS THE PAGE NAMES ARE CLOSED:** guide was **3 entries against 5 checks**, so
+  from step 2 on every hint pointed at the wrong beat (the AUDIT_R417 §C misalignment class) — now
+  5+1 index-aligned. And the drill had **ZERO registered ALTS** — now two, including the ☆-forfeit
+  control.
+- **§1.0(c) VIOLATION FIXED (the third of this wave):** core required every USD cell's formula TEXT
+  to contain `$B$3`. Typing the rate inline, or pasting values, produces identical numbers — a
+  ROUTE requirement. Core grades VALUES now; ALT 2 types all fifteen conversions with the rate
+  inline and clears every core.
+- **☆ — the drill's actual lesson, not a dress chore** (§4.30's "bold the rate cell" is a formatting
+  ☆, dead under §1.0(d)): **the whole block from ONE anchored formula**, graded by census + the
+  anchor holding + fills covering the row and the block. The point lands in the label: *move the
+  rate and the page re-prices itself* — the typed route cannot do that, which is exactly why it
+  forfeits.
+- **☆-FAMILY RULE AMENDED A SECOND TIME, out loud rather than quietly bent.** The twice-per-chapter
+  cap is right for incidental families and WRONG for a chapter's core craft: c3 is the FORMULAS
+  chapter and its thesis is *one formula serves many cells*. Barring that from being the discovery
+  after its second outing forces invented bonuses — precisely what the first amendment existed to
+  prevent. **The cap no longer applies to the family that IS the chapter's declared craft;
+  adjacency and teach-something-new still bind.** Flagged for the playtest: if c3's ☆s read samey
+  in a row, this is the knob to turn, not the individual drills.
+- **PAR:** 35/34 → **39/35**. D13 de-hint applied to the desc.
+- **TOOLING GOTCHA WORTH KNOWING:** C9's parser scans the drill's SOURCE TEXT, so writing an example
+  of the pattern it greps for *inside a comment* makes it match the comment instead of the code.
+  Cost a debug cycle; the fix is noted in-source at fxconvert's `targets()`.
+- **TESTS:** replay 3/3 · depth-contract PASS · guided PASS · **alt-paths 2/2 (first ever for this
+  drill)** · par-sweep FLAGGED 0 · invariants clean · drills.js?v=298→299.
+
 ## r429 H6b-5 — sumif + rollup (DEPTH_PASS §4.28/§4.29) — wave 5 at 9 of 12
 _Both drills carried the SAME two defects, which is worth naming as a pattern: a §1.0(c) route
 requirement baked into core, and §1.2 axes that existed on paper but not in the build._

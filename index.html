@@ -1728,9 +1728,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=298"></script>
+<script src="drills.js?v=299"></script>
 
-<script src="drills.js?v=298"></script>
+<script src="drills.js?v=299"></script>
 
 
 
@@ -9187,16 +9187,40 @@ const CHALLENGES = {
     }
   },
   fxconvert:{
-    name:'FX Convert', label:'Convert with one FX rate', par:35, parKeys:34,
+    /* r429 (H6b wave 5, DEPTH_PASS §4.30 + §1.0/§1.0-R2/§1.0-R3): depth-pass rework.
+       JUDGMENT CALLS (per WORKFLOW.md §8):
+       · THE TWO AUDIT FINDINGS THE PAGE NAMES ARE BOTH FIXED: guide was 3 entries against 5 checks
+         (so hints landed on the wrong beats from step 2) — now 5+1 index-aligned; and the drill had
+         ZERO registered ALTS — now two, incl. the ☆-forfeit control.
+       · §1.0(c) VIOLATION FIXED: core required every USD cell's formula TEXT to contain $B$3.
+         Typing the rate inline, or pasting values, produces the same numbers — that was a ROUTE
+         requirement. Core grades VALUES now; the single-anchored-formula discipline moved to the ☆.
+       · §4.30's "☆ Bold the rate cell" is a FORMATTING ☆ — dead under §1.0(d). The ☆ is now the
+         drill's actual lesson: ONE anchored formula converts the whole block.
+       · ☆-FAMILY NOTE: this is fill-census/anchoring's THIRD use in c3, which the r429 second
+         amendment permits — it is the FORMULAS chapter's declared core craft, and any other ☆ here
+         would be invented rather than found. Flagged for the playtest.
+       · D13 de-hint: the drills.js desc drops the chord tokens. */
+    name:'FX Convert', label:'Convert with one FX rate', par:39, parKeys:35, saveClose:true,   /* r429: par re-swept post-rework — 5-seed sweep median 35 keys, 0% drift after retune; par 39s \u2248 1.11 s/key. Was 35/34 (+ the save closer). */
     aha:'One boxed FX rate drives the whole conversion — anchor it with F4, 2D-fill the USD block, and the desk convention gives the driver ALL borders (Alt H B A) while the finished table gets an OUTSIDE border (Alt H B S — S for outSide; A is all).',
     prompt:'Convert the euro revenue table to dollars. Desk convention: the FX rate lives in one cell — typed blue and boxed — and every converted number reads off it. Build the USD block from a single anchored formula, fill right then down, add commas, and outline the finished table instead of ruling a grid of borders.',
     req(){ return 'rate <em>B3</em> → type <em>'+this._rateStr+'</em>, blue (<em>alt h f c</em>), all borders (<em>alt h b a</em>) · <em>B10</em> <em>=B6*$B$3</em> (F4 locks the rate) · fill <em>B10:F10</em> → · fill <em>B10:F12</em> ↓ · commas <em>alt h k</em> · outside border on <em>A10:F12</em> (<em>alt h b s</em>)'; },
+    /* r429: guide rebuilt to 5+1 INDEX-ALIGNED entries (it was 3 against 5 checks — the
+       AUDIT_R417 §C misalignment class: from step 2 on, every hint pointed at the wrong beat). */
     guide(){ return [
-      'the driver: <em>B3</em> · type <kbd>'+this._rateStr+'</kbd> <kbd>↵</kbd> — the desk rate, YOUR hardcode · reselect · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> <kbd>→</kbd>×4 Blue <kbd>↵</kbd> · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> — <em>a</em> is ALL borders, the standalone-input convention; that box says "this cell drives the page"',
-      'one formula converts everything: <em>B10</em> · <kbd>=B6*$B$3</kbd> — <kbd>F4</kbd> pins the rate · <kbd>↵</kbd> · select <em>B10:F10</em> <kbd>ctrl</kbd>+<kbd>r</kbd> · then <em>B10:F12</em> <kbd>ctrl</kbd>+<kbd>d</kbd> — twelve live conversions off one cell',
-      'format the output: still on <em>B10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> commas · then select <em>A10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> — <em>s</em> for out<em>S</em>ide: ONE border around the table’s perimeter; a grid of borders is never the look',
+      'the driver: <em>B3</em> · type <kbd>'+this._rateStr+'</kbd> <kbd>↵</kbd> — the desk rate, YOUR hardcode · reselect · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> <kbd>→</kbd>×4 Blue <kbd>↵</kbd>',
+      'box the driver: still on <em>B3</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> — <em>a</em> is ALL borders, the standalone-input convention; that box says "this cell drives the page"',
+      'one formula converts everything: <em>B10</em> · <kbd>=B6*$B$3</kbd> — <kbd>F4</kbd> pins the rate · <kbd>↵</kbd> · select <em>B10:F10</em> <kbd>ctrl</kbd>+<kbd>r</kbd> · then <em>B10:F12</em> <kbd>ctrl</kbd>+<kbd>d</kbd>',
+      'the output reads as money: still on <em>B10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> — commas, zero decimals',
+      'select <em>A10:F12</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> — <em>s</em> for out<em>S</em>ide: ONE border around the table’s perimeter; a grid of borders is never the look',
+      '☆ the discovery: every converted number should read off the ONE boxed cell. Write it once with the rate anchored and spread it right then down — change the rate afterwards and the whole page re-prices itself',
     ]; },
-    targets:['B3','B3','B10:F12','B10:F12','A10:F12'],
+    /* a FUNCTION returning a literal, not a bare property: C9's static parser only recognises the
+       function form, and a plain assignment reads as null so the tri-length guard stops covering
+       the drill. NOTE also that the parser scans the drill's SOURCE TEXT — do not write an example
+       of the pattern it greps for inside a comment, or it matches the comment instead of the code
+       (that cost a debug cycle here). */
+    targets(){ return ['B3','B3','B10:F12','B10:F12','A10:F12','B10:F12']; },
     demo(){ return [
       {sel:'B3', keys:[...T(this._rateStr), Kb.enter]},
       {sel:'B3', keys:[Kb.alt,L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},
@@ -9235,28 +9259,46 @@ const CHALLENGES = {
       const b3=S.cells['B3'];
       const rateOk=!!(b3 && typeof b3.value==='number' && Math.abs(b3.value-rate)<1e-9 && b3.fontColor==='blue');
       const boxOk=!!(b3 && b3.ball);
-      // one anchored formula, 2D-filled: every USD cell reads $B$3 and its own EUR cell
+      /* §1.0(c): core grades the CONVERTED VALUES. The pre-rework check required every USD cell's
+         formula TEXT to contain $B$3 — but typing the rate inline, or pasting values, gets the same
+         numbers, so that was a ROUTE requirement. The single-anchored-formula discipline is the ☆'s
+         job now (below), where a route may legitimately be graded. */
       let usdOk=true, comOk=true;
       for(let i=0;i<3;i++) for(let j=0;j<5;j++){
         const L=colLetter(2+j), cell=S.cells[L+(10+i)];
-        if(!cell||!cell.formula){ usdOk=false; comOk=false; continue; }
-        const f=cell.formula.toUpperCase().replace(/\s/g,'');
-        if(f.indexOf('$B$3')<0 || f.indexOf(L+(6+i))<0) usdOk=false;
+        if(!cell){ usdOk=false; comOk=false; continue; }
         const want=(typeof b3?.value==='number'?b3.value:rate)*this._eur[i][j];
-        if(Math.abs((cell.value||0)-want)>Math.max(1e-2,Math.abs(want)*1e-6)) usdOk=false;
+        if(typeof cell.value!=='number'||Math.abs(cell.value-want)>Math.max(1e-2,Math.abs(want)*1e-6)) usdOk=false;
         if(cell.fmtStyle!=='comma') comOk=false;
       }
+      /* ☆ (§1.0(d) mystery slot · §1.0-R3(o) fill-census/ANCHORING — the FORMULAS chapter's core
+         craft, third use, permitted by the r429 second family amendment): the whole USD block from
+         ONE anchored formula spread right then down. Needs the census (every cell a translate of
+         B10) AND the anchor holding ($B$3 in the seed formula) AND fills covering the row and the
+         block. Typing fifteen conversions, or pasting values, clears every core (§1.0(c)) and
+         never latches — which is exactly the point: only the anchored build re-prices itself when
+         the rate moves. */
+      const seed=S.cells['B10']||{};
+      let census=!!seed.formula && /\$B\$3/.test(String(seed.formula).toUpperCase().replace(/\s/g,''));
+      if(census){ for(let i=0;i<3;i++) for(let j=0;j<5;j++){
+        const c=S.cells[colLetter(2+j)+(10+i)];
+        if(!c||!c.formula||c.formula!==translateFormula(seed.formula,i,j)) census=false; } }
+      const fo=S.fillOps||[];
+      const rowFill=fo.some(f=>f.dir==='right' && f.r1<=10 && f.r2>=10 && f.c1<=2 && f.c2>=6);
+      const blockFill=fo.some(f=>f.dir==='down' && f.r1<=10 && f.r2>=12 && f.c1<=2 && f.c2>=6);
+      const starOk=usdOk && census && rowFill && blockFill;
       // one OUTLINE around A10:F12 — perimeter only, the desk look
       const outOk=(()=>{ for(let c=1;c<=6;c++){ const t=S.cells[colLetter(c)+'10']||{}, b=S.cells[colLetter(c)+'12']||{};
           if(!t.bt||!b.bb) return false; }
         for(let r=10;r<=12;r++){ const l=S.cells['A'+r]||{}, rr=S.cells['F'+r]||{};
           if(!l.bl||!rr.br) return false; } return true; })();
       return [
-        {label:'type the desk rate '+this._rateStr+' at B3 and blue it — the one hardcode on the page', ok:rateOk},
-        {label:'give the rate cell all borders — the standalone-driver box', ok:boxOk},
-        {label:'convert with ONE formula — B10 =B6*$B$3, anchored, fill right then down (B10:F12)', ok:usdOk},
-        {label:'comma-format the USD block', ok:usdOk&&comOk},
-        {label:'add an outside border around the finished table A10:F12 — one perimeter, never a grid of borders', ok:outOk},
+        {label:'Enter the desk rate '+this._rateStr+' and colour it blue — the one hardcode on the page', ok:rateOk},
+        {label:'Box the rate cell with all borders — the standalone-driver convention', ok:boxOk},
+        {label:'Convert the euro table to dollars — every figure off the boxed rate', ok:usdOk},
+        {label:'Comma-format the dollar block', ok:usdOk&&comOk},
+        {label:'Add an outside border around the finished table — one perimeter, never a grid of borders', ok:outOk},
+        {label:'☆ the whole block from one anchored formula — move the rate and the page re-prices itself', ok:starOk, bonus:true},
       ];
     }
   },
