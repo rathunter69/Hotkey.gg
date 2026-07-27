@@ -41,7 +41,13 @@
   2/2 PASS.
 - **TESTS:** demo-replay margin 3/3 ×3 seeds · **`dev/verify-margin.js` 16/16** · guided PASS
   (railed, contained, solvable) · alt-paths 2/2 · par-sweep FLAGGED 0 · invariants clean incl. C9
-  margin · cache-bump guard clean (drills.js?v=289→290) · full-catalog replay green.
+  margin · cache-bump guard clean (drills.js?v=289→290) · full-catalog replay green · smoke 7/7.
+- **FIT: TARGETED, NOT THE FULL SWEEP — recorded so nobody has to wonder.** The catalog-wide
+  `e2e-fit-sweep` was killed mid-run at session end (it had already run ALL CLEAN earlier in r429,
+  and margin's board is the only one that changed since). In its place margin was checked directly
+  and harder than the sweep does it: **25 seeds at LOAD and the WIN state, zero `#####` in either**
+  (the sweep samples one build per drill at load only). If a future round wants belt-and-braces,
+  re-run `node dev/e2e-fit-sweep.js` — it takes ~5 min and needs no setup beyond the 8791 server.
 
 ## r429 H6b-4 — gauntlet: the FORMATTING CAPSTONE (DEPTH_PASS §4.20 + §2.4 + §1.0/§1.0-R2/§1.0-R3) — WAVE 4 COMPLETE, CHAPTER 2 CLOSED
 _The second capstone, and the first built off the modeltour template rather than inventing it._
