@@ -1728,9 +1728,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=286"></script>
+<script src="drills.js?v=287"></script>
 
-<script src="drills.js?v=286"></script>
+<script src="drills.js?v=287"></script>
 
 
 
@@ -4187,48 +4187,116 @@ const CHALLENGES = {
     }
   },
   autofit:{
-    name:'Autofit', label:'Fix the squeezed columns', par:15, parKeys:12,
-    aha:'Alt H O I autofits to content; a print block wants ONE width — set it with Alt H O W.',
-    prompt:'Two width problems, two different fixes. The label block is squeezed to #### — autofit it to its contents. The four data columns are uneven widths, and autofit would keep them uneven — select across them and set one uniform width of 12. Autofit is for content; a uniform width is for print.',
-    req(){ const o=this._o; return 'select <em>'+o.a1+':'+o.a2+'</em> \u00b7 <em>alt h o i</em> \u2014 fit to content \u00b7 then <em>'+o.uRng+'</em> \u00b7 <em>alt h o w</em> \u2192 <em>12</em> <em>\u21b5</em> \u2014 ONE width across the print block'; },
+    /* r429 (H6b wave 4, DEPTH_PASS §4.14 + §1.0/§1.0-R2/§1.0-R3): depth-pass rework.
+       JUDGMENT CALLS (documented per WORKFLOW.md §8):
+       · ARTIFACT: the two abstract blocks become ONE real file — a DEPARTMENT HEADCOUNT ROSTER
+         (§1.0-R3(n) + the §3.1 audience map, which assigns autofit to audience A). Long ragged
+         department names ARE why autofit exists, and the "uniform width for print" lesson lands
+         harder on a roster that gets printed for a staffing review than on a nameless block.
+         The old board's two disconnected islands could not chain (§1.1); one roster can.
+       · §4.14's "☆ Set the title bold and autofit the label column around it" is a FORMATTING ☆ —
+         dead under §1.0(d). Re-cut per §1.0-R3(o) to the ONE-PASS family: both squeezed label
+         columns fitted in a SINGLE selection.
+       · BEATS NOW CHAIN (§1.1, and the §1.5 aha depends on it): the Total column cannot overflow
+         until the player builds it, so beat 3 CREATES the ##### that beat 4 fixes. The aha is the
+         player's own figure breaking the layout — "#### is a width problem, not a number problem".
+       · The board deliberately LOADS squeezed (columns A/B read #####) — autofit is on the
+         fit-sweep EXEMPT list (dev/e2e-fit-sweep.js:11) because the squeeze IS the lesson. The
+         Total column ships narrow but EMPTY, so its ##### appears only as a consequence.
+       · Beat 3 grades END-STATE VALUES, not formulas (§1.0(c) freedom — the ruleoff precedent):
+         typed totals clear core, slower. The clock prices the difference. */
+    name:'Autofit', label:'Fix the squeezed columns', par:36, parKeys:33, saveClose:true,   /* r429: par re-swept post-rework — 5-seed sweep median 33 keys, 0% drift after retune; par 36s ≈ 1.09 s/key, house band (the roster depth varies 4-6 rows, so the typed SUM + fill dominates) */
+    aha:'##### is a width problem, not a number problem — and the figure that breaks the layout is usually your own.',
+    prompt:'The headcount roster prints for tomorrow’s staffing review and half of it is unreadable. The department and cost-centre columns are squeezed to ####. The four quarter columns are all different widths — autofit would keep them that way, and a print block wants one width. The Total column is empty: total it, and watch what your own figures do to a narrow column.',
+    req(){ const o=this._o; return 'labels <em>A'+o.hr+':B'+o.hr+'</em> <em>alt h o i</em> · quarters <em>'+o.qRng+'</em> <em>alt h o w</em> → <em>12</em> <em>↵</em> · Total column <em>'+o.tCol+(o.hr+1)+'</em> <em>=SUM()</em> + <em>ctrl+d</em> · <em>'+o.tCol+'</em> <em>alt h o i</em> · Total row <em>ctrl+b</em> + <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): check labels are OUTCOME lines — the route lives HERE, per line, chords allowed. */
     guide(){ const o=this._o; return [
-      'the squeezed labels: on '+o.a1+' \u00b7 <kbd>\u21e7</kbd>+<kbd>\u2192</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> \u2014 content decides',
-      'the ragged data block at '+o.uRng+' \u2014 autofit would keep it UNEVEN. Select across it \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>w</kbd> \u00b7 type <kbd>12</kbd> <kbd>\u21b5</kbd> \u2014 one width, clean edge, print-ready',
+      'the squeezed labels — select across <em>A'+o.hr+':B'+o.hr+'</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd>: content decides the width',
+      'the quarter columns are ragged, and autofit would KEEP them ragged — select <em>'+o.qRng+'</em> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>w</kbd> · type <kbd>1</kbd><kbd>2</kbd> <kbd>↵</kbd>: one width, clean edge, print-ready',
+      'the Total column — on <em>'+o.tCol+(o.hr+1)+'</em> write <em>=SUM('+o.q1+(o.hr+1)+':'+o.q4+(o.hr+1)+')</em> <kbd>↵</kbd>, then select down to <em>'+o.tCol+o.rt+'</em> · <kbd>ctrl</kbd>+<kbd>d</kbd> to carry it (the Total row gets one too — that is the company figure)',
+      'now look at what you just made: the Total column is too narrow for its own numbers · select it · <kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>i</kbd> — your own figure earns its width',
+      'the company line — select <em>A'+o.rt+':'+o.tCol+o.rt+'</em> · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>: bold, ruled on TOP (a total earns the line above it)',
+      '☆ the discovery: two squeezed columns, ONE selection — autofit works across a whole selection, so both label columns can be fitted in a single pass instead of one at a time',
     ]; },
-    targets(){ const o=this._o; return [o.a1+':'+o.a2, o.uRng]; },
+    targets(){ const o=this._o; return ['A'+o.hr+':B'+o.hr, o.qRng, o.tCol+(o.hr+1)+':'+o.tCol+o.rt, o.tCol+(o.hr+1)+':'+o.tCol+o.rt, 'A'+o.rt+':'+o.tCol+o.rt, 'A'+o.hr+':B'+o.hr]; },
     demo(){ const o=this._o; return [
-      {sel:o.a1, keys:[{key:'ArrowRight',shift:true}, Kb.alt, {key:'h'}, {key:'o'}, {key:'i'}]},
-      {sel:o.uRng, keys:[Kb.alt, {key:'h'}, {key:'o'}, {key:'w'}, {key:'1'}, {key:'2'}, Kb.enter]},
+      /* ONE pass over BOTH label columns — the ☆ latch fires here (§2.2: the demo performs the
+         bonus so replay covers it). */
+      {sel:'A'+o.hr+':B'+o.hr, keys:[Kb.alt,L('H'),L('O'),L('I')]},
+      {sel:o.qRng, keys:[Kb.alt,L('H'),L('O'),L('W'),{key:'1'},{key:'2'},Kb.enter]},
+      {sel:o.tCol+(o.hr+1), keys:[...T('=SUM('+o.q1+(o.hr+1)+':'+o.q4+(o.hr+1)+')'), Kb.enter]},
+      {sel:o.tCol+(o.hr+1)+':'+o.tCol+o.rt, keys:[{key:'d',ctrl:true}]},
+      /* the consequence beat — the column the player just filled is too narrow for it */
+      {sel:o.tCol+(o.hr+1)+':'+o.tCol+o.rt, keys:[Kb.alt,L('H'),L('O'),L('I')]},
+      {sel:'A'+o.rt+':'+o.tCol+o.rt, keys:[Kb.bold, Kb.alt,L('H'),L('B'),L('P')]},
     ]; },
     build(){
       const cells={};
-      const LBLS=['Consolidated revenue','Adjusted EBITDA build','Working capital detail','Precedent transactions'];
-      const CO=['Northwind Industrial','Cascade Materials','Ironline Logistics','Halcyon Health'];
-      this._rot=rnd(0,3);
-      // block A: squeezed label pair (autofit is RIGHT here)
-      const aSpots=[[1,1],[1,6]]; const A=aSpots[rnd(0,1)];
-      cells[colLetter(A[0])+A[1]]={...blankCell(),value:LBLS[rnd(0,3)],txt:true,bold:true};
-      cells[colLetter(A[0]+1)+A[1]]={...blankCell(),value:'FY202'+rnd(4,8)+'E',txt:true,bold:true};
-      for(let i=1;i<=3;i++){ cells[colLetter(A[0])+(A[1]+i)]={...blankCell(),value:CO[(i-1+this._rot)%4],txt:true};
-        cells[colLetter(A[0]+1)+(A[1]+i)]={...blankCell(),value:rnd(100,999)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'}; }
-      // block B: 4 ragged data columns (uniform width is RIGHT here)
-      const u0=5, uR=rnd(2,4);
-      ['Q1','Q2','Q3','Q4'].forEach((q,i)=>cells[colLetter(u0+i)+uR]={...blankCell(),value:q,txt:true,bold:true,align:'r'});
-      for(let i=0;i<4;i++) for(let j=1;j<=3;j++)
-        cells[colLetter(u0+i)+(uR+j)]={...blankCell(),value:rnd(10,99)*10,fmtStyle:'comma',decimals:0,fontColor:'blue'};
-      const colw={}; [A[0],A[0]+1].forEach(c=>colw[c]=44);
-      const rag=[44,118,62,96]; for(let i=0;i<4;i++) colw[u0+i]=rag[(i+this._rot)%4];
-      this._o={ a1:colLetter(A[0])+A[1], a2:colLetter(A[0]+1)+A[1], ac:[A[0],A[0]+1],
-        uRng:colLetter(u0)+uR+':'+colLetter(u0+3)+uR, uc:[u0,u0+1,u0+2,u0+3] };
-      return {ROWS:10, cells, active:{r:A[1],c:A[0]}, sel:null, colW:colw};
+      const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=rnd(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+      /* §1.2 randomization — FOUR axes: (a) site jitter d∈{0,1} slides the roster down a row;
+         (b) content pools — department names Fisher-Yates from an 8-pool + cost-centre codes +
+         the fiscal year; (c) values through rnd() AND the roster DEPTH (4–6 departments, which
+         moves the total row and every graded range); (d) which-column-is-widest — the ragged
+         quarter widths rotate, so the "autofit would keep them uneven" lesson lands differently. */
+      const d=rnd(0,1), hr=3+d;
+      const DEPTS=['Customer Success','Field Operations','Supply Chain','Data & Analytics',
+                   'Talent Acquisition','Regulatory Affairs','Product Support','Inside Sales'];
+      const nd=rnd(4,6);
+      const depts=shuffle(DEPTS.slice()).slice(0,nd);
+      const rot=rnd(0,3);
+      cells['A1']={...blankCell(),value:'Headcount plan',txt:true,bold:true};
+      cells['B1']={...blankCell(),value:'FY202'+rnd(5,8),txt:true,it:true,fontColor:'gray'};
+      cells['A'+hr]={...blankCell(),value:'Department',txt:true,bold:true};
+      cells['B'+hr]={...blankCell(),value:'Cost centre',txt:true,bold:true};
+      const QC=[3,4,5,6];                                   // C..F — the four quarter columns
+      QC.forEach((c,i)=>cells[colLetter(c)+hr]={...blankCell(),value:'Q'+(i+1),txt:true,bold:true,align:'r'});
+      const tc=7;                                           // G — the Total column, built by the player
+      cells[colLetter(tc)+hr]={...blankCell(),value:'Total',txt:true,bold:true,align:'r'};
+      const qSum=[0,0,0,0];
+      for(let i=0;i<nd;i++){ const r=hr+1+i;
+        cells['A'+r]={...blankCell(),value:depts[i],txt:true};
+        cells['B'+r]={...blankCell(),value:'CC-'+rnd(41,49)+rnd(10,99),txt:true};
+        QC.forEach((c,j)=>{ const v=rnd(40,260); qSum[j]+=v;
+          cells[colLetter(c)+r]={...blankCell(),value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'}; });
+      }
+      const rt=hr+nd+1;
+      cells['A'+rt]={...blankCell(),value:'Total',txt:true};
+      QC.forEach((c,j)=>{ const CL=colLetter(c);
+        cells[CL+rt]={...blankCell(),formula:'=SUM('+CL+(hr+1)+':'+CL+(hr+nd)+')',value:qSum[j],fmtStyle:'comma',decimals:0}; });
+      /* the Total column ships EMPTY but pre-formatted and NARROW — the ##### is a consequence of
+         the player's own beat 3, not something the board hands them (§1.5 aha placement). */
+      for(let r=hr+1;r<=rt;r++) cells[colLetter(tc)+r]={...blankCell(),fmtStyle:'comma',decimals:0};
+      const colw={1:46, 2:46};                              // both label columns squeezed to #####
+      const rag=[44,118,62,96]; QC.forEach((c,i)=>colw[c]=rag[(i+rot)%4]);
+      colw[tc]=38;                                          // too narrow for a four-digit total
+      const expect=[]; for(let i=0;i<nd;i++) expect.push(QC.reduce((s,c)=>s+cells[colLetter(c)+(hr+1+i)].value,0));
+      expect.push(qSum.reduce((a,b)=>a+b,0));               // the company figure on the total row
+      this._o={ hr:hr, nd:nd, rt:rt, tc:tc, tCol:colLetter(tc), qc:QC, rot:rot,
+        q1:colLetter(QC[0]), q4:colLetter(QC[3]),
+        qRng:colLetter(QC[0])+hr+':'+colLetter(QC[3])+hr, expect:expect };
+      return {ROWS:Math.max(12,rt+2), cells, active:{r:hr,c:1}, sel:null, colW:colw};
     },
     checks(S){
-      const w=S._colW||{};
+      const o=this._o, w=S._colW||{};
       const fit=c=>(w[c]||0)>=neededWidth(c)-1;
-      const uW=Math.round(12*7)+5;
+      const uW=Math.round(12*7)+5;                          // Alt H O W 12 → the engine's px conversion
+      /* beat 3 grades END-STATE VALUES (§1.0(c)): a typed total clears it, a SUM clears it, the
+         clock is what prices the difference. */
+      const totalsOk=(()=>{ for(let i=0;i<=o.nd;i++){ const cc=S.cells[o.tCol+(o.hr+1+i)];
+        if(!cc || typeof cc.value!=='number' || Math.abs(cc.value-o.expect[i])>0.5) return false; } return true; })();
+      const rowOk=(()=>{ for(let c=1;c<=o.tc;c++){ const cc=S.cells[colLetter(c)+o.rt];
+        if(!cc||!cc.bold||!cc.bt) return false; } return true; })();
+      /* ☆ (§1.0(d) mystery slot · §1.0-R3(o) ONE-PASS family): BOTH squeezed label columns fitted
+         in a SINGLE autofit selection. Reads S.widthOps (r429 engine hunk) — span-based, so a
+         wider sweep counts too; two separate one-column autofits never latch. */
+      const starOk=(S.widthOps||[]).some(f=>f.kind==='autofit' && f.c1<=1 && f.c2>=2);
       return [
-        {label:'fit the squeezed label pair to its CONTENT \u2014 autofit', ok: this._o.ac.every(fit)},
-        {label:'set the four data columns to ONE width of 12: uniform beats autofit for print', ok: this._o.uc.every(c=>(w[c]||0)===uW)},
+        {label:'Autofit the Department and Cost centre columns — content decides the width', ok: fit(1) && fit(2)},
+        {label:'Set the four quarter columns to one width of 12 — uniform beats autofit for print', ok: o.qc.every(c=>(w[c]||0)===uW)},
+        {label:'Total each department’s four quarters in the Total column, company line included', ok: totalsOk},
+        {label:'Autofit the Total column — your own figures earn their width', ok: totalsOk && fit(o.tc)},
+        {label:'Bold the Total row and add a top border above it', ok: rowOk},
+        {label:'☆ both squeezed columns fitted in one pass — autofit works across a selection, not just a column', ok: starOk, bonus:true},
       ];
     }
   },
@@ -12896,7 +12964,18 @@ function applyRibbon(key){
   // invalid step: back to the tab strip
   path=[]; ribbonNote=''; drawRibbon();
 }
-function autofitCols(){ const r=selRange(); for(let c=r.c1;c<=r.c2;c++) colW[c]=neededWidth(c); }
+/* r429 (DEPTH_PASS §4.14 ☆): COLUMN-WIDTH TELEMETRY — an autofit or an explicit set-width records
+   the COLUMN SPAN it covered on S.widthOps (same family and same contract as S.fmtOps / S.fillOps /
+   pasteOpLog: the mechanic used, not geometry inferred after the fact), so autofit's ONE-PASS ☆ can
+   grade whether every squeezed label column was fitted in a SINGLE selection rather than one at a
+   time. Telemetry only: no core check may ever require it (§1.0(c)). */
+function hkWidthLatch(kind){
+  if(typeof S==='undefined'||!S) return;
+  try{ const r=selRange();
+    (S.widthOps=S.widthOps||[]).push({kind:kind, c1:r.c1, c2:r.c2, n:r.c2-r.c1+1});
+    if(S.widthOps.length>240) S.widthOps.shift(); }catch(e){}
+}
+function autofitCols(){ const r=selRange(); hkWidthLatch('autofit'); for(let c=r.c1;c<=r.c2;c++) colW[c]=neededWidth(c); }
 function doPaste(kind, op){
   if(!S.clipboard) return;
   pushUndo();
@@ -13314,6 +13393,7 @@ function applyColWidth(){
   const n=parseFloat(colwBuf);
   if(isFinite(n) && n>0){
     const r=selRange(); pushUndo();
+    hkWidthLatch('width');   /* r429: width-op telemetry (see hkWidthLatch) */
     const px=Math.max(28, Math.min(220, Math.round(n*7)+5));   // Excel character units \u2192 px, clamped to the grid's sane band
     for(let c=r.c1;c<=r.c2;c++) colW[c]=px;
     S.colwN=(S.colwN||0)+1;

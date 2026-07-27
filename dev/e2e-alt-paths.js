@@ -284,9 +284,28 @@ const ALTS = [
         {sel:o.f, keys:[...T('='+L2+(o.hr+1)+'*'+L2+(o.hr+2)),{key:'Enter'}]},
         {sel:o.rng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       ]; }` },
-  { key: 'autofit', name: 'uniform width FIRST, then content-fit; both via ribbon', moves: `C => { const o=C._o; return [
-      {sel:o.uRng, keys:[{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(2),{key:'Enter'}]},
-      {sel:o.a1+':'+o.a2, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+  /* r429 (DEPTH_PASS §4.14 wave 4): both autofit entries rebuilt — the pre-rework entry solved a
+     two-island board (o.uRng / o.a1 / o.a2 are gone with the headcount-roster rework). ALT 1 =
+     op-ORDER + the §1.0(c) FREEDOM proof (widths last, totals TYPED, label columns fitted one at a
+     time — every core clears, the one-pass ☆ is forfeited). ALT 2 = chord-ROUTE + SUPERSET ☆ proof
+     (a sweep wider than the two label columns still latches, and the quarter widths are re-set
+     afterwards so beat 2 survives the over-wide autofit). */
+  { key: 'autofit', name: 'op-ORDER reversed + FREEDOM proof — TYPED totals, label columns fitted one at a time (☆ forfeited, all five cores clear)', moves: `C => { const o=C._o; const mv=[];
+      for(let i=0;i<=o.nd;i++) mv.push({sel:o.tCol+(o.hr+1+i), keys:[...T(String(o.expect[i])),{key:'Enter'}]});
+      mv.push({sel:'A'+o.rt+':'+o.tCol+o.rt, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      mv.push({sel:'A'+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('i')]});
+      mv.push({sel:'B'+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('i')]});
+      mv.push({sel:o.tCol+(o.hr+1), keys:[{key:'Alt'},L('h'),L('o'),L('i')]});
+      mv.push({sel:o.qRng, keys:[{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(2),{key:'Enter'}]});
+      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+      return mv; }` },
+  { key: 'autofit', name: 'chord-ROUTE + SUPERSET ☆ proof — one autofit across A:G (must latch), quarter widths re-set after, fill-down via the ribbon', moves: `C => { const o=C._o; return [
+      {sel:o.tCol+(o.hr+1), keys:[...T('=SUM('+o.q1+(o.hr+1)+':'+o.q4+(o.hr+1)+')'),{key:'Enter'}]},
+      {sel:o.tCol+(o.hr+1)+':'+o.tCol+o.rt, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:'A'+o.hr+':'+o.tCol+o.rt, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+      {sel:o.qRng, keys:[{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(2),{key:'Enter'}]},
+      {sel:'A'+o.rt+':'+o.tCol+o.rt, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:'A1', keys:[{key:'s',ctrl:true}]},
     ]; }` },
   { key: 'editfix', name: 'range stretched FIRST, drift typed as a number (no ☆), memo mid-run, typos last in reverse', moves: `C => { const o=C._o;
       const steps=[

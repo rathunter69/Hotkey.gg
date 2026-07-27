@@ -18,9 +18,11 @@
   serial assembly; the r427 union-merge incident is the WHY)** + `.claude/workflows/drill-wave.js`.
 
 **THE QUEUE (in order):**
-1. **W4 — FINISH FORMATTING (c2) [auto·M] — IN FLIGHT, 2 of 5 DONE (r429).**
+1. **W4 — FINISH FORMATTING (c2) [auto·M] — IN FLIGHT, 3 of 5 DONE (r429).**
    ✅ **decimals** (audience-A ops scorecard, column-select ☆) · ✅ **center** (class-sweep ☆, new
-   border beat, board now ships misaligned). ⏳ **autofit · combo · gauntlet★** remain — build to
+   border beat, board now ships misaligned) · ✅ **autofit** (audience-A headcount roster, one-pass
+   ☆, beats now CHAIN — the player's own totals create the ##### the next beat fixes).
+   ⏳ **combo · gauntlet★** remain — build to
    DEPTH_PASS **r429** (§1.0-R3 + the re-cut §4.14/§4.17/§4.20 pages, which already name each
    drill's artifact, ☆ family, latch telemetry and skippability proof). gauntlet★ flips the c2
    gate on and follows the modeltour capstone wiring template (AUDIT r425 entry).

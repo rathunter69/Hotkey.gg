@@ -1,5 +1,62 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r429 — index-UI: drill-tab names expanded (ROUND2_FEEDBACK §4c, the first of the two items the r426–r427 reconciliation found genuinely unshipped)
+- Wolf: _"there's room for longer names — 'paste sp.' → 'paste special'; feel it out and expand the
+  shortened drill names as space allows."_ All four genuinely-abbreviated tabs expanded:
+  **Paste Sp. → Paste Special** (his explicit example) · **Liq. Bridge → Liquidity** ·
+  **Sens. → Sensitivity** · **Acc/Dil → Accretion**. Every remaining `tab:` was already a real word.
+- **MEASURED, not eyeballed** (the "feel it out" was done with a ruler): a headless render walks
+  every chapter's bottom tab strip at 1280px and 1100px viewports and checks two failure modes —
+  strip overflow (`scrollWidth > clientWidth`) and per-label ellipsis
+  (`node.scrollWidth > node.clientWidth`). **No overflow and NO clipped label at either width**;
+  the widest strip sits at 1120px inside a 1132px bar. "Paste Special" (13 chars) is the new
+  longest tab, two characters past the prior max ("House Style"/"Ruling Pass", 11).
+- Drill pages + sitemap + refmap regenerated (byte-stable ×2). **STILL OPEN from §4c:** the selector
+  row-width tighten (`.pk-byline .vdr-fname{flex:1}` pushing pb/par hard right) — see
+  dev/R429_INDEXUI_VERIFICATION.md.
+
+## r429 H6b-4 — autofit depth-pass rework (DEPTH_PASS §4.14 + §1.0/§1.0-R2/§1.0-R3)
+- **ARTIFACT (§1.0-R3(n) + §3.1 audience A): two abstract blocks → ONE real file, a DEPARTMENT
+  HEADCOUNT ROSTER.** Department · Cost centre · Q1–Q4 · Total, with a company Total row. WHY: long
+  ragged department names ARE why autofit exists, and "one width for print" lands harder on a roster
+  that prints for a staffing review than on a nameless block. The pre-rework board's two
+  disconnected islands could not chain (§1.1); one roster can — see the consequence chain below.
+- **BEATS NOW CHAIN, and the chain IS the aha (§1.1 + §1.5):** Autofit the Department and Cost
+  centre columns → Set the four quarter columns to one width of 12 → **Total each department's four
+  quarters in the Total column** → **Autofit the Total column — your own figures earn their width**
+  → Bold the Total row and add a top border above it → Save. The Total column ships NARROW but
+  **EMPTY**, so beat 3 CREATES the ##### that beat 4 fixes: the figure that breaks the layout is the
+  player's own. Probe asserts all three states (empty at load → too narrow after the build → beat 4
+  still open until the autofit lands). 5 core + ☆; tri-length 6, C9-registered.
+- **☆ RE-CUT (§1.0-R3(o); §4.14's "set the title bold and autofit the label column" was a FORMATTING
+  ☆, dead under §1.0(d)):** **ONE-PASS AUTOFIT** — both squeezed label columns fitted in a SINGLE
+  selection instead of one at a time. Span-based, so a wider sweep counts (ALT 2 proves a full A:G
+  autofit latches); two separate one-column autofits never do. Negative control verified.
+- **ENGINE HUNK (§9.2 payload item 6 — justified):** new `hkWidthLatch(kind)` + `S.widthOps`,
+  recording the COLUMN SPAN of every autofit (`autofitCols`) and explicit set-width
+  (`applyColWidth`). No width telemetry existed at all — `S.fmtOps` covers number formats only — so
+  the one-pass ☆ had no latch. Same family and contract as fmtOps/fillOps/pasteOpLog: telemetry
+  only, no core check may read it (§1.0(c)).
+- **§1.0(c) FREEDOM:** beat 3 grades END-STATE VALUES (the ruleoff precedent) — typed totals clear
+  core, a SUM clears core, the clock prices the difference. ALT 1 walks the fully-typed route.
+- **RANDOM (§1.2 — four axes, was two):** (a) site jitter d∈{0,1}; (b) department names
+  Fisher-Yates from an 8-pool + cost-centre codes + fiscal year; (c) values AND **roster DEPTH
+  (4–6 departments, which moves the total row and every graded range)**; (d) ragged quarter widths
+  rotate. All verified varying over 40 builds.
+- **PAR:** 15/12 → **36/33** (5-seed sweep median 33 keys, 0% drift after retune; 1.09 s/key, house
+  band). The jump is real scope: the drill went from 2 beats to 5 + a build beat. HOTKEY_PARS
+  mirrored; drills.js?v=286→287; drill pages + sitemap + refmap regenerated.
+- **FIT-SWEEP:** autofit stays on the EXEMPT list (dev/e2e-fit-sweep.js:11) — the squeeze IS the
+  lesson and the board is meant to load with #### in the label columns.
+- **ALTS (§1.8 — both rebuilt; the pre-rework entry solved the two-island board):** (1) op-ORDER
+  reversed + FREEDOM proof — TYPED totals, label columns fitted one at a time (☆ forfeited, five
+  cores clear); (2) chord-ROUTE + SUPERSET ☆ proof — one autofit across A:G (must latch), quarter
+  widths re-set afterwards so beat 2 survives the over-wide autofit, fill-down via the ribbon
+  (Alt H F I D). 2/2 PASS.
+- **TESTS:** demo-replay autofit 3/3 ×3 seeds (green first run) · **`dev/verify-autofit.js` 23/23** ·
+  guided PASS (railed, contained, solvable) · alt-paths 2/2 · par-sweep FLAGGED 0 · static
+  invariants clean incl. C9 autofit · cache-bump guard clean · full-catalog replay green.
+
 ## r429 H6b-4 — center depth-pass rework (DEPTH_PASS §4.13 + §1.0/§1.0-R2/§1.0-R3)
 - **ARTIFACT KEPT (§3.1):** the pipeline summary was already chapter 2's audience-A artifact — only
   the scenario frame was sharpened (§1.0-R3(n) rule 2: the weekly review pulls from this tab).
