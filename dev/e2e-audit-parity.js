@@ -378,17 +378,33 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
 
   console.log('V. SUMIFS + SUMPRODUCT (r188)');
   await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('rollup'); });
+  /* r429 H6b-5 FIXTURE ROT FIX: this block used to READ whatever `rollup` happened to have in
+     A3:C11 and assert SUMPRODUCT against it. `rollup` was reworked in wave 5 and its board is now
+     randomized (site jitter, 8-12 row ledger, shuffled segment pool), so on roughly half of all
+     seeds C3:C6 held a label or a blank instead of a number and the dot product came out NaN —
+     a genuinely flaky gate that passed locally and failed on CI. Section V tests the EVALUATOR,
+     not a board, so it now PLANTS its own operands and asserts against a value computed from the
+     same planted numbers. No drill rework can move it again. */
   const v1 = await run(() => {
+    const SEG=['Retail','Retail','Wholesale','Retail','Wholesale','Retail','Retail','Wholesale','Retail'];
+    const REG=['EMEA','APAC','EMEA','EMEA','APAC','APAC','EMEA','EMEA','EMEA'];
+    const AMT=[120,340,55,880,210,64,730,410,95];
+    for(let i=0;i<9;i++){ const r=3+i;
+      S.cells['A'+r]={...blankCell(), value:SEG[i], txt:true};
+      S.cells['B'+r]={...blankCell(), value:REG[i], txt:true};
+      S.cells['C'+r]={...blankCell(), value:AMT[i]}; }
     S.cells['J1']={...blankCell(), formula:'=SUMIFS(C3:C11,A3:A11,"Retail",B3:B11,"EMEA")'};
     S.cells['J2']={...blankCell(), formula:'=SUMPRODUCT(C3:C6,C3:C6)'};
     S.cells['J3']={...blankCell(), formula:'=SUMIFS(C3:C11,A3:A11,"Nobody",B3:B11,"EMEA")'};
     S.cells['J4']={...blankCell(), formula:'=IFERROR(SUMIFS(C3:C11,A3:A11),-1)'};   // odd args \u2192 error \u2192 fallback
     recalc();
-    let want=0; for(let r=3;r<=11;r++) if(S.cells['A'+r].value==='Retail'&&S.cells['B'+r].value==='EMEA') want+=S.cells['C'+r].value;
-    let dot=0; for(let r=3;r<=6;r++) dot+=S.cells['C'+r].value*S.cells['C'+r].value;
+    let want=0; for(let i=0;i<9;i++) if(SEG[i]==='Retail'&&REG[i]==='EMEA') want+=AMT[i];
+    let dot=0; for(let i=0;i<4;i++) dot+=AMT[i]*AMT[i];
     return { two: Math.abs(S.cells['J1'].value-want)<0.5, dot: Math.abs(S.cells['J2'].value-dot)<0.5,
-      zero: S.cells['J3'].value===0, err: S.cells['J4'].value===-1 };
+      zero: S.cells['J3'].value===0, err: S.cells['J4'].value===-1,
+      wantNonZero: want>0, dotNonZero: dot>0 };
   });
+  ok(v1.wantNonZero && v1.dotNonZero, 'V fixture plants real operands (the assertions cannot pass on zeros)');
   ok(v1.two, 'SUMIFS crosses two criteria correctly');
   ok(v1.dot, 'SUMPRODUCT is a pairwise dot product');
   ok(v1.zero, 'SUMIFS with no match sums to zero');
