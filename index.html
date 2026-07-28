@@ -11360,75 +11360,353 @@ const CHALLENGES = {
     }
   },
   waterfall:{
-    name:'Waterfall', label:'Run the paydown waterfall', par:64, parKeys:67,
+    /* r444 H6b-MODELS-II (DEPTH_PASS §4.72, "Run the paydown waterfall") — the depth-pass
+       rework, built to §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (the later law
+       wins on conflict), with dev/MODELING_STANDARDS.md binding because this is a Models
+       chapter: the MODEL is judged before the keystroke.
+
+       WAS: 4 checks on a ROWS:14 board (the copied-default tell §1.3 names), guide 6 v checks
+       4 v targets 4 — the tri-length break the §4.72 page flags — no ☆, no saveClose, and
+       check labels that named the route in the label ("run free cash flow at B5", "ration the
+       TL paydown with MIN at B8"), which §1.0(b) strips: the label states the OUTCOME, the
+       route lives in guide/req.
+
+       ── ☆-HEADROOM DIAGNOSTIC (CAMPAIGN §2, BOTH parts), run BEFORE the board was designed
+       and re-measured through the live engine afterwards on the shipped board, every
+       selection and navigation keyed, 5 seeds:
+         PART 1 — IS THERE SPREAD? Fastest legal route 73 keys (the demo). Slowest legal route
+           that clears the same six cores — every year-cell typed, no fill and no paste
+           anywhere, the dress walked cell by cell — 209 keys (measured; dev/e2e-alt-paths.js
+           entry 3 is that route, run green ×3 seeds). Spread 2.86×, in the band `lookup` (3.0×)
+           and `cases` (2.68×) shipped on.
+         PART 2 — IS ANY OF IT ☆-LEGAL? This is the half that decides. Of the 136 keys of
+           spread, 8 are the dress done per-cell instead of over one selection — formatting,
+           which §1.0(d) forbids grading. ZERO are chord-vs-ribbon in the §1.0(c) forced-to-
+           clear sense: the engine offers no ribbon route into formula entry, Ctrl+R and
+           Alt H F I R hit the same S.fillOps latch, and Ctrl+C/Ctrl+V and the Alt H V walk
+           both land in S.pasteLog, so a fill is a fill and a paste is a paste however it is
+           reached — and that half is not asserted, it is walked (dev/verify-waterfall.js §B
+           runs the whole board through the ribbon and it wins 5/5 with the ☆ earned). The
+           surviving 128 keys are COPY/FILL-versus-RETYPE — exactly the mastery class §1.0(d)
+           names. Abundant legal headroom. BUILD.
+         ISOLATED MEASUREMENT OF THE ☆ ITSELF (CAMPAIGN §2: measure each move against its own
+           slow alternative, never a combined number): the star move is 5 keys — three to grow
+           the selection over the two senior rows, Ctrl+C, Ctrl+V — and it lands six cells. The
+           same six cells built the ordinary way cost 25 keys (two formulas typed plus a block
+           fill) and 63 keys typed one at a time. 5.0× against the nearest honest alternative.
+         A ☆ MUST NOT DEGRADE THE BOARD (r439 `cases`): the paste carries the SOURCE cells'
+           format. Checked deliberately — the senior paydown row ships plain comma/0dp and the
+           junior paydown row ships plain comma/0dp; the senior ending row ships bold + top
+           border and the junior ending row ships bold + top border. The two blocks are
+           format-identical by construction, so NEITHER route changes the dress the board shipped
+           with — measured per seed in dev/verify-waterfall.js §D (the first cut of that check
+           compared two DIFFERENT seeds by absolute cell key and reported a difference that was
+           an artefact of the corner-jitter axis; suspect the probe, then confirm with your eyes).
+           Confirmed on the win screenshot, not only in the predicate.
+
+       ── DISTINCTNESS (CAMPAIGN §3 discriminator, asked before anything was built). The
+       neighbours are `revolver` (MIN/MAX sweep, cash GIVEN), `cascade` (this chapter's
+       CAPSTONE — three tranches × four years, cash GIVEN) and `debtsched`. Fluency in
+       `revolver` produces a correct first attempt at ONE floor-and-cap sweep and says nothing
+       about seniority: a revolver sweep never has to ask what the tranche above it left
+       behind. Against `cascade` the question is different in kind — a capstone is SUPPOSED to
+       chain its chapter, so overlap there is the design, not a defect. What waterfall owns and
+       cascade does not: the cash available for paydown is BUILT here, not handed over — the
+       operating page (EBITDA, capex, cash interest, cash taxes, working capital) is on the
+       board and the player foots it before a dollar moves. KEEP.
+
+       ── THE UNTRIGGERABLE-BEAT SWEEP (CAMPAIGN §1 class — found by WALKING routes, never by
+       reading predicates). Two live on the shipped board, both grading formula TEXT:
+         (1) THE TL BEAT DEMANDED refs('B8',['MIN(','B5','B7']) — the literal function name and
+             the literal cell refs out of column B's formula string. A player who writes
+             `=MIN($B$5,$B$7)` (the anchoring habit `anchor` and `fxconvert` teach — the $ is
+             stripped, so this one survived) or who builds year 2 first and fills LEFT, or who
+             writes the same rationing as `=IF(B5<B7,B5,B7)` — identical number on the board,
+             identical page — watched the line stay dark with nothing to fix. Probed: board
+             correct to the dollar, check false.
+         (2) THE SECOND-LIEN BEAT DEMANDED refs('B13',['MIN(','B10','B12']) — same class, and
+             worse, because it read column B only and assumed the other two years.
+       Both die here. Every core grades the END STATE (§1.0-R3(p)): the NUMBER standing in
+       every year column, plus — where the label's verb is Build or Total, which §1.7 defines
+       as "land a live formula" — that the cell computes rather than holding a typed constant.
+       No check reads a function name, a range or an anchor out of formula text, and no check
+       reads one column and infers the others. The live-formula conjunct is the doctrine §2.2
+       sanctioned exception ("don't hardcode the answer" IS the lesson) and is required
+       outright by MODELING_STANDARDS §3/§7: a beginning balance that REFERENCES the prior
+       ending rather than repeating it is the corkscrew, and it is legitimately gradeable as
+       end state.
+
+       ── MODELING_STANDARDS CONVENTIONS THIS BOARD FOLLOWS (stated per the Models brief):
+         §1 colour-as-provenance — every typed input ships BLUE (the operating lines, both
+            opening balances); every built cell is black formula ink. No hardcode lives inside
+            a formula anywhere on the page.
+         §1 structure — the built total (cash available for paydown) takes a TOP border, never
+            a rule underneath (§1.0(f) says the same); units are stated in the title ($mm) and
+            restated in the basis memo; the header row wears a bottom border under it
+            (doctrine §2.1b).
+         §2 sign convention — COSTS CARRY THEIR SIGN. Capex, cash interest, cash taxes and the
+            working-capital build ship negative, so cash available is one clean SUM down the
+            column and never a subtraction chain. The convention is stated on the board's own
+            basis memo line, as §2 requires.
+         §3 the roll-forward corkscrew — beginning → paydown → ending, and each year's
+            beginning REFERENCES the prior year's ending. Both tranches. This is the drill.
+         §4 LBO / cash sweep — mandatory-first is out of scope (that is `debtsched`); this is
+            the pure seniority cascade: senior takes MIN(cash, balance), junior takes
+            MIN(what is left, balance), floored by the MIN so no tranche is overpaid.
+         §5 CIRCULARITY, and the SIMPLIFICATION DECLARED: this engine has no iterative calc, so
+            interest is not computed off the balances at all — it arrives as a given operating
+            line. Said out loud on the board's second memo line, as §5/§7 require, so a player
+            never learns the simplification without knowing it is one.
+         §7 the board is a COMPONENT of a build — a paydown schedule fragment, not a model.
+            17 of 20 rows carry content at the win state (85%, §1.3 target ≥60%); the three
+            empty rows are the geometry moats between the operating block, the senior tranche
+            and the junior tranche, and they are load-bearing (a Ctrl+Shift+↓ inside one block
+            must not ride into the next — doctrine §3).
+
+       ── STRUCTURAL DEVIATIONS from the §4.72 page, declared here per §0 (full list in the
+       payload's §8):
+       (1) ☆ RE-CUT, and it is mandatory not optional. The page proposes "Bold the total-
+           paydown row — the cash proves out". Dead three ways: it is a FORMATTING bonus, which
+           §1.0(d) killed outright; it would fall out of the run rather than being a skippable
+           decision (§1.0-R2(i)); and the page is pre-playtest, so §1.0-R4(u) declares its ☆
+           line dead on arrival and instructs the build agent to re-cut without escalating. The
+           re-cut ☆ is the structural discovery the board is shaped around — the junior tranche
+           is the senior tranche one block down, so the senior's two formulas COPIED onto it
+           land the whole junior schedule. §1.0-R4(u) names exactly this family for Models
+           boards ("the richest ones here are structural").
+       (2) THE KILLED ☆'s REAL WORK IS PROMOTED, per §1.0-R4(u)'s "do not simply delete it".
+           What the page's ☆ was reaching for is the row that proves the cash: "Cash after
+           <senior>" is now a CORE beat (beat 5) and it is load-bearing — the junior tranche
+           rations against it.
+       (3) BOARD REBUILT TO THE §1.0-R4(t) REALITY TEST. The old board's cash line was three
+           rows (EBITDA, capex, interest) labelled "Free cash flow", which is not what a credit
+           page calls the number that pays debt. It is now the five-line cash-available build a
+           credit committee actually reads. Models II is audience **B** in the §3.1 map ("no
+           corporate-generic twin"), so the artifact stays a deal page; the reality test is met
+           on register, magnitudes, labels and the memo lines.
+       (4) ROWS 14 → 20 (§1.3, Wolf r440: 20 is floor AND cap). Density 12/14 load-state and
+           win-state identical — the exact tell §1.3 names — is now 17/20 at the win.
+       (5) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): there is no insert point and no empty paste
+           TARGET that the guided ring cannot express — every graded destination is an existing
+           labelled cell in a labelled row. The ☆'s paste lands on the junior tranche's own
+           labelled rows.
+       (6) NO HELPER STACK (§1.0(f)/§1.0-R2(l)): nothing on this page is converted, scaled or
+           assumed — there is no unit mismatch and no sign flip to stage.
+       (7) THE DRESS BEAT IS THE ONLY FORMATTING BEAT AND IT FOLLOWS ITS PARENT (§1.0(a)
+           format-as-you-go): bold + top border on the cash-available row, immediately after
+           the beat that builds it. Bold and top border are #1 and #3 on Wolf's stated
+           priority list (§1.0-R3(o)). Everywhere else the lesson is the cascade, not the
+           dress, so the board SHIPS PRE-DRESSED (doctrine §2.1b) — both ending rows already
+           wear bold + a top border, so the win state is a page you would hand over.
+       (8) FINISH-STATE BEAT (§1.6) is beat 6, the junior tranche closing with its roll-
+           forward — the page's own "Finish: roll-forward closes", kept verbatim. The §1.0(e)
+           save closer follows it (saveClose:true, engine-appended). */
+    name:'Waterfall', label:'Run the paydown waterfall', par:77, parKeys:73, saveClose:true,   /* r444 §4.72 depth pass: par re-swept from scratch (was par 64 / parKeys 67 on the ROWS:14 board with no ☆ and no save closer). dev/e2e-par-sweep.js waterfall, 5-seed median 73 keys including the engine-appended Ctrl+S — and FLAT across seeds by construction: every row index on this board is fixed, so every typed formula is the same length on every draw and only the figures move (the corner-jitter axis changes the column LETTER, never the character count). par 77 ≈ 1.05 s/key, the house band. The count grew with the board: two more operating lines under the cash build, the cash-after row, the dress beat, the ☆'s copy-paste and the save. That lands waterfall between `debtsched` (73) and `cascade` (94) in the chapter band. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 1:56 · pro 1:29 · legendary 1:17. */
     aha:'Paydown follows seniority — each tranche MINs against the cash that’s left.',
-    prompt:'Three years of cash, two tranches (layers of debt — senior gets paid first), strict seniority — and the balances corkscrew: each year opens where the last one closed. Build year 1 top to bottom, link both openings, fill everything right. MIN does the rationing.',
-    req:'<em>B5</em> FCF <em>=SUM(B2:B4)</em> \u00b7 fill B5:D5 \u2192 \u00b7 <em>B8</em> <em>=MIN(B5,B7)</em> \u00b7 <em>B9</em> <em>=B7-B8</em> \u00b7 <em>B10</em> <em>=B5-B8</em> \u00b7 fill B8:D10 \u2192 \u00b7 link <em>C7</em> <em>=B9</em> fill \u2192 \u00b7 <em>B13</em> <em>=MIN(B10,B12)</em> \u00b7 <em>B14</em> <em>=B12-B13</em> \u00b7 fill B13:D14 \u2192 \u00b7 link <em>C12</em> <em>=B14</em> fill \u2192',
-    guide:[
-      'free cash, all years: B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u2014 capex and interest already carry their signs \u00b7 fill B5:D5 \u2192',
-      'year-1 cascade: B8 \u00b7 <kbd>=MIN(B5,B7)</kbd> \u2014 never more than the balance \u00b7 B9 \u00b7 <kbd>=B7-B8</kbd> \u00b7 B10 \u00b7 <kbd>=B5-B8</kbd>',
-      'select B8:D10 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 the rationing walks across',
-      'THE CORKSCREW: C7 \u00b7 <kbd>=B9</kbd> \u00b7 fill C7:D7 \u2014 the loan opens where it closed',
-      'the junior tranche: B13 \u00b7 <kbd>=MIN(B10,B12)</kbd> \u00b7 B14 \u00b7 <kbd>=B12-B13</kbd> \u00b7 fill B13:D14 \u2192',
-      'link the second lien too: C12 \u00b7 <kbd>=B14</kbd> \u00b7 fill C12:D12 \u2192',
-    ],
-    targets:['B5:D5','B8:D9','B13:D13','C12:D12'],
-    demo(){ return [
-      {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
-      {sel:'B5:D5', keys:[Kb.fillR]},
-      {sel:'B8', keys:[...T('=MIN(B5,B7)'), Kb.enter]},
-      {sel:'B9', keys:[...T('=B7-B8'), Kb.enter]},
-      {sel:'B10', keys:[...T('=B5-B8'), Kb.enter]},
-      {sel:'B8:D10', keys:[Kb.fillR]},
-      {sel:'C7', keys:[...T('=B9'), Kb.enter]},
-      {sel:'C7:D7', keys:[Kb.fillR]},
-      {sel:'B13', keys:[...T('=MIN(B10,B12)'), Kb.enter]},
-      {sel:'B14', keys:[...T('=B12-B13'), Kb.enter]},
-      {sel:'B13:D14', keys:[Kb.fillR]},
-      {sel:'C12', keys:[...T('=B14'), Kb.enter]},
-      {sel:'C12:D12', keys:[Kb.fillR]},
+    /* §1.5: the aha's MOMENT is beat 5 landing — the cash-after row reads ZERO in year one,
+       so the junior tranche's MIN pays nothing however large its balance is. The seniority
+       claim stops being a sentence and becomes a number on the board. */
+    prompt:'Credit committee sits Thursday and wants the paydown schedule behind the leverage case. Three years of cash, two tranches (layers of debt, ranked by who gets paid first), strict seniority — the senior loan is repaid before the junior one sees a dollar, and no tranche is ever paid more than it owes. Foot the cash the business actually has for debt first, then walk it down the stack: every year opens where the last one closed.',
+    req(){ const o=this._o; return 'cash <em>'+o.CB+o.rCF+'</em> <em>=SUM('+o.CB+o.rEB+':'+o.CB+o.rWC+')</em> <em>ctrl+r</em> · <em>ctrl+b</em> + <em>alt h b p</em> · senior <em>'+o.CB+o.rSP+'</em> <em>=MIN('+o.CB+o.rCF+','+o.CB+o.rSB+')</em> · <em>'+o.CB+o.rSE+'</em> <em>='+o.CB+o.rSB+'-'+o.CB+o.rSP+'</em> · fill the pair right · <em>'+o.CC+o.rSB+'</em> <em>='+o.CB+o.rSE+'</em> · <em>'+o.CB+o.rCA+'</em> <em>='+o.CB+o.rCF+'-'+o.CB+o.rSP+'</em> <em>ctrl+r</em> · junior: <em>ctrl+c</em> the senior pair → <em>ctrl+v</em> on <em>'+o.CB+o.rJP+'</em> · <em>'+o.CC+o.rJB+'</em> <em>='+o.CB+o.rJE+'</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES only; the route lives HERE, one line per check,
+       chords allowed — and each line names EVERY route that grades, not only the fastest
+       (§1.0-R3(p): a player must never be able to solve the board and not know why a line is
+       still dark). */
+    guide(){ const o=this._o; return [
+      'the five operating lines run row '+o.rEB+' to row '+o.rWC+' and every cost already carries its sign, so this is one clean addition · on '+o.CB+o.rCF+': <kbd>=SUM(</kbd>'+o.CB+o.rEB+':'+o.CB+o.rWC+'<kbd>)</kbd> <kbd>↵</kbd>, or select the five cells through the empty one and press <kbd>alt</kbd>+<kbd>=</kbd>, or add them up by hand — all three land the same number · then take it across: select '+o.CB+o.rCF+':'+o.CD+o.rCF+' and <kbd>ctrl</kbd>+<kbd>r</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> is the same fill). Typing each year lands it too, it only costs the keys',
+      'dress it now rather than at the end — select the row and <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> rules above it (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> boxes the row and <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> borders every edge — both draw that top line, both clear it). Taking the label cell in with the figures is fine',
+      'the senior tranche can never be paid more than it owes: on '+o.CB+o.rSP+' · <kbd>=MIN(</kbd>'+o.CB+o.rCF+'<kbd>,</kbd>'+o.CB+o.rSB+'<kbd>)</kbd> <kbd>↵</kbd> · anchored or not, and <kbd>=IF(</kbd>'+o.CB+o.rCF+'<kbd>&lt;</kbd>'+o.CB+o.rSB+'<kbd>,</kbd>'+o.CB+o.rCF+'<kbd>,</kbd>'+o.CB+o.rSB+'<kbd>)</kbd> grades the same — it is the number that counts, not the function · fill it across the three years',
+      'the corkscrew: the ending is '+o.CB+o.rSB+' less the paydown — on '+o.CB+o.rSE+' · <kbd>=</kbd>'+o.CB+o.rSB+'<kbd>-</kbd>'+o.CB+o.rSP+' · then each later year OPENS at the prior close: on '+o.CC+o.rSB+' · <kbd>=</kbd>'+o.CB+o.rSE+' <kbd>↵</kbd> · fill '+o.CC+o.rSB+':'+o.CD+o.rSB+' right. Point at the cell, never retype the number — a typed opening balance is the classic junior error and the line stays dark for it',
+      'what the senior leaves is what the junior gets: on '+o.CB+o.rCA+' · <kbd>=</kbd>'+o.CB+o.rCF+'<kbd>-</kbd>'+o.CB+o.rSP+' · fill across. In year one it reads zero — that is the whole point of seniority, and the junior tranche is about to feel it',
+      'the junior tranche is the senior tranche one block down: on '+o.CB+o.rJP+' · <kbd>=MIN(</kbd>'+o.CB+o.rCA+'<kbd>,</kbd>'+o.CB+o.rJB+'<kbd>)</kbd> · on '+o.CB+o.rJE+' · <kbd>=</kbd>'+o.CB+o.rJB+'<kbd>-</kbd>'+o.CB+o.rJP+' · fill the pair across · and its openings roll the same way: '+o.CC+o.rJB+' · <kbd>=</kbd>'+o.CB+o.rJE+' · fill right',
+      '☆ the discovery: the junior block sits exactly five rows under the senior one, so the senior pair COPIED lands on it whole — select '+o.CB+o.rSP+':'+o.CD+o.rSE+', <kbd>ctrl</kbd>+<kbd>c</kbd>, stand on '+o.CB+o.rJP+', <kbd>ctrl</kbd>+<kbd>v</kbd>, and every RELATIVE reference walks down with it — anchored refs stay put, so a senior pair written with $ signs lands the senior numbers again (<kbd>alt</kbd> <kbd>h</kbd> <kbd>v</kbd> <kbd>s</kbd> then <kbd>f</kbd> pastes the formulas alone — same star). Typing the junior pair out clears every core beat and forfeits it',
     ]; },
+    /* rings, index-aligned with checks: ① the cash row · ② the same row with its label, since
+       the dress may take the label in · ③ the senior paydown row · ④ the senior corkscrew
+       (openings + endings) · ⑤ the cash-after row · ⑥ the junior tranche · ☆ never ringed
+       (§2.2 — the mystery slot has no rail). */
+    targets(){ const o=this._o; return [
+      o.CB+o.rCF+':'+o.CD+o.rCF,
+      o.CA+o.rCF+':'+o.CD+o.rCF,
+      o.CB+o.rSP+':'+o.CD+o.rSP,
+      o.CB+o.rSB+':'+o.CD+o.rSE,
+      o.CB+o.rCA+':'+o.CD+o.rCA,
+      o.CB+o.rJB+':'+o.CD+o.rJE,
+      null,
+    ]; },
+    /* the demo BUILDS its own selections with Shift+arrow rather than being handed them by
+       setDemoSel, so parKeys measures what a player really pays for the range grabs instead
+       of eliding them (the r438 `series` rule). setDemoSel only parks the cursor on the anchor
+       cell of the next beat. */
+    demo(){ const o=this._o; const R=n=>Array(n).fill({key:'ArrowRight',shift:true}); return [
+      {sel:o.CB+o.rCF, keys:[...T('=SUM('+o.CB+o.rEB+':'+o.CB+o.rWC+')'), Kb.enter]},
+      {sel:o.CB+o.rCF, keys:[...R(2), Kb.fillR]},
+      /* §1.0(a): the row is dressed the moment it exists, never batched at the end */
+      {sel:o.CB+o.rCF, keys:[...R(2), Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+      {sel:o.CB+o.rSP, keys:[...T('=MIN('+o.CB+o.rCF+','+o.CB+o.rSB+')'), Kb.enter]},
+      {sel:o.CB+o.rSE, keys:[...T('='+o.CB+o.rSB+'-'+o.CB+o.rSP), Kb.enter]},
+      {sel:o.CB+o.rSP, keys:[...R(2), {key:'ArrowDown',shift:true}, Kb.fillR]},
+      {sel:o.CC+o.rSB, keys:[...T('='+o.CB+o.rSE), Kb.enter]},
+      {sel:o.CC+o.rSB, keys:[...R(1), Kb.fillR]},
+      {sel:o.CB+o.rCA, keys:[...T('='+o.CB+o.rCF+'-'+o.CB+o.rSP), Kb.enter]},
+      {sel:o.CB+o.rCA, keys:[...R(2), Kb.fillR]},
+      /* ☆ the discovery: the senior pair copied onto the junior tranche, references walking
+         five rows down with it (§1.0-R4(u) structural family) */
+      {sel:o.CB+o.rSP, keys:[...R(2), {key:'ArrowDown',shift:true}, Kb.copy]},
+      {sel:o.CB+o.rJP, keys:[Kb.paste]},
+      {sel:o.CC+o.rJB, keys:[...T('='+o.CB+o.rJE), Kb.enter]},
+      {sel:o.CC+o.rJB, keys:[...R(1), Kb.fillR]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 paydown waterfall ($mm)',txt:true,bold:true};
-      const y0=rnd(24,27);
-      for(let i=0;i<3;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
-      const cx=[],ix=[],eb=[],fcf=[];
-      // r181 SIGNS: capex and interest carry their negative sign on the page,
-      // so FCF is one clean SUM down the column (doctrine \u00a72.4)
-      for(let i=0;i<3;i++){ cx.push(-rnd(5,15)*10); ix.push(-rnd(3,10)*10);
-        const f=rnd(8,30)*10; fcf.push(f); eb.push(f-cx[i]-ix[i]); }
-      const given=[[2,'EBITDA',eb],[3,'Capex',cx],[4,'Cash interest',ix]];
-      given.forEach(([r,n,vs])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
-        for(let i=0;i<3;i++) cells[colLetter(i+2)+r]={...blankCell(),value:vs[i],fontColor:'blue',fmtStyle:'comma',decimals:0}; });
-      // TL sized to exhaust mid-horizon on most seeds \u2014 the cascade has to MOVE
-      const tl=rnd(Math.floor(fcf[0]*0.8/10), Math.floor((fcf[0]+fcf[1])*1.1/10))*10;
-      const rv=rnd(8,30)*10;
-      const labels=[[5,'Free cash flow',1],[7,'Term Loan B, beg.',0],[8,'TL paydown',0],[9,'Term Loan B, end',1],[10,'Cash after TL',0],[12,'Second Lien, beg.',0],[13,'2L paydown',0],[14,'Second Lien, end',1]];
-      labels.forEach(([r,n,b])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:!!b});
-      cells['B7']={...blankCell(),value:tl,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['B12']={...blankCell(),value:rv,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      for(let i=0;i<3;i++){ const col=colLetter(i+2);
-        [5,8,9,10,13,14].forEach(r=>cells[col+r]={...blankCell(),fmtStyle:'comma',decimals:0,bold:(r===5||r===9||r===14)});
-        if(i>0){ cells[col+7]={...blankCell(),fmtStyle:'comma',decimals:0}; cells[col+12]={...blankCell(),fmtStyle:'comma',decimals:0}; }
+      /* §1.2 randomization — FOUR independent axes, and none of them moves the keystroke
+         count, so the par sweep reads flat (the r439 `wrapfix` rule). (a) SITE: this is a
+         full-grid artifact (17 of 20 rows), so per §1.2 the site axis is CORNER JITTER — the
+         whole page anchors at column A or column B. (b) CONTENT: the codename, the fiscal-year
+         base, and which senior/junior tranche pair the deal carries (the check labels
+         interpolate the drawn names — §1.0-R2(g) adaptive labels: the line is precise about
+         THIS seed's fact while staying silent about the route). (c) VALUES: every figure
+         through rnd(). (d) WHICH-YEAR-BITES: the senior tranche is drawn as a multiple of
+         year-one cash, so the year the senior closes and the junior starts being paid moves
+         with the seed. Geometry (five operating lines, two tranches, three years) is constant,
+         which is what keeps every typed formula the same length on every draw. */
+      const c0=rnd(0,1)?1:2;                       // (a) corner jitter: label column A or B
+      const CA=colLetter(c0), CB=colLetter(c0+1), CC=colLetter(c0+2), CD=colLetter(c0+3);
+      const cols=[CB,CC,CD];
+      const y0=rnd(2024,2028);
+      /* the row map is FIXED, and the +5 offset between the senior block and the junior block
+         is the ☆'s whole mechanism: cash source 9→14, opening 11→16, paydown 12→17,
+         ending 13→18. Do not renumber one without the other. */
+      const rEB=4, rCX=5, rIN=6, rTX=7, rWC=8, rCF=9;
+      const rSB=11, rSP=12, rSE=13, rCA=14;
+      const rJB=16, rJP=17, rJE=18;
+      const SEN=['Term Loan B','Term Loan A','Senior Notes'][rnd(0,2)];      // (b) content pools
+      const JUN=['Second Lien','Mezzanine','Holdco PIK'][rnd(0,2)];
+      /* (c) VALUES. MODELING_STANDARDS §2: costs carry their sign, so cash available is one
+         clean SUM and never a subtraction chain. Every cost is drawn as a share of that year's
+         EBITDA and rounded to the nearest 10, which keeps the whole page at three or four
+         digits — comma/0dp at 86px never prints #### (e2e-fit-sweep). */
+      const base=rnd(30,50)*10, step=rnd(2,6)*10;
+      const eb=[],cx=[],ix=[],tx=[],wc=[],cf=[];
+      for(let i=0;i<3;i++){
+        const e=base+i*step;
+        const k=-Math.round(e*rnd(8,16)/1000)*10, n=-Math.round(e*rnd(6,12)/1000)*10;
+        const t=-Math.round(e*rnd(5,10)/1000)*10, w=-Math.round(e*rnd(2,6)/1000)*10;
+        eb.push(e); cx.push(k); ix.push(n); tx.push(t); wc.push(w); cf.push(e+k+n+t+w);
       }
-      this._exp=[]; let tlB=tl, rvB=rv;
-      for(let i=0;i<3;i++){ const f=fcf[i];
-        const pd=Math.min(f,tlB), tlE=tlB-pd, left=f-pd, rpd=Math.min(left,rvB), rvE=rvB-rpd;
-        this._exp.push({fcf:f, tlB:tlB, pd:pd, tlE:tlE, left:left, rpd:rpd, rvB:rvB, rvE:rvE});
-        tlB=tlE; rvB=rvE; }
-      return {ROWS:14, cells, active:{r:5,c:2}, sel:null, colW:{1:150,2:76,3:76,4:76}};
+      /* (d) the senior tranche is sized off year-one cash so the MIN BITES in both directions
+         within one board: year one is CASH-limited (the tranche outlives the cash, so the
+         junior gets exactly nothing — the seniority lesson, visible as a zero), and the year
+         it closes is BALANCE-limited (the MIN stops the paydown at what is still owed and the
+         remainder cascades). */
+      const sen=Math.round(cf[0]*rnd(125,185)/1000)*10;
+      /* the junior is sized off the cash that actually REACHES it, so it is never fully repaid
+         inside the horizon: a schedule whose last ending balance is zero teaches nothing about
+         the roll-forward, and a real second lien does not amortise away in three years. */
+      let probe=sen, reach=0;
+      for(let i=0;i<3;i++){ const p=Math.min(cf[i],probe); probe-=p; reach+=cf[i]-p; }
+      const jun=Math.max(Math.round(Math.max(reach,100)*rnd(115,170)/1000)*10, Math.ceil((reach+10)/10)*10, 100);
+      cells[CA+'1']={...blankCell(),value:codename()+' — paydown waterfall ($mm)',txt:true,bold:true};
+      /* MODELING_STANDARDS §2: the sign convention is STATED on the board, not assumed. */
+      cells[CA+'2']={...blankCell(),value:'Basis: $ in millions · costs carry their sign · cash pays down strictly by seniority',txt:true,it:true,fontColor:'gray'};
+      cells[CA+'3']={...blankCell(),value:'Item',txt:true,bold:true,bb:true};
+      for(let i=0;i<3;i++) cells[cols[i]+'3']={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r',bb:true};   // doctrine §2.1b: a rule under the headers
+      [[rEB,'EBITDA',eb],[rCX,'Capex',cx],[rIN,'Cash interest',ix],[rTX,'Cash taxes',tx],[rWC,'Change in working capital',wc]]
+        .forEach(([r,n,vs])=>{ cells[CA+r]={...blankCell(),value:n,txt:true};
+          for(let i=0;i<3;i++) cells[cols[i]+r]={...blankCell(),value:vs[i],fontColor:'blue',fmtStyle:'comma',decimals:0}; });   // §1 blue = typed input
+      /* the LABEL ships bold like both closing-balance labels do, so the finished page is
+         uniform (doctrine §2.1b, and the win screenshot is what caught the asymmetry). It never
+         pre-clears beat 2: that beat grades the FIGURE cells, and accepts the label being taken
+         into the selection or left out (§1.0-R3(p)). */
+      cells[CA+rCF]={...blankCell(),value:'Cash available for paydown',txt:true,bold:true};
+      /* the cash row ships UNDRESSED — beat 2 is the format-as-you-go dress (§1.0(a)). Every
+         other computed row ships pre-dressed (doctrine §2.1b): the lesson here is the cascade,
+         not the formatting, so the win state is already a page you would hand over. */
+      const blk=(rB,rP,rE,name,open)=>{
+        cells[CA+rB]={...blankCell(),value:name+' — beginning',txt:true};
+        cells[CA+rP]={...blankCell(),value:name+' — paydown',txt:true};
+        cells[CA+rE]={...blankCell(),value:name+' — ending',txt:true,bold:true};
+        cells[CB+rB]={...blankCell(),value:open,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        for(let i=0;i<3;i++){ const col=cols[i];
+          if(i>0) cells[col+rB]={...blankCell(),fmtStyle:'comma',decimals:0};
+          cells[col+rP]={...blankCell(),fmtStyle:'comma',decimals:0};
+          /* both ending rows ship bold + top border, identically — that is what makes the ☆'s
+             paste format-neutral (r439 `cases`: a copy carries the source cell's format). */
+          cells[col+rE]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+        }
+      };
+      blk(rSB,rSP,rSE,SEN,sen);
+      cells[CA+rCA]={...blankCell(),value:'Cash after '+SEN,txt:true};
+      blk(rJB,rJP,rJE,JUN,jun);
+      for(let i=0;i<3;i++) { cells[cols[i]+rCF]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[cols[i]+rCA]={...blankCell(),fmtStyle:'comma',decimals:0}; }
+      /* MODELING_STANDARDS §5/§7: the simplification is DECLARED on the board, so nobody
+         learns it without knowing it is one. */
+      cells[CA+'20']={...blankCell(),value:'Memo: interest is an input on this page, not computed off the balances — no revolver, no circularity',txt:true,it:true,fontColor:'gray'};
+      const exp=[]; let SB=sen, JB=jun;
+      for(let i=0;i<3;i++){
+        const sp=Math.min(cf[i],SB), se=SB-sp, ca=cf[i]-sp;
+        const jp=Math.min(ca,JB), je=JB-jp;
+        exp.push({cf:cf[i], sb:SB, sp:sp, se:se, ca:ca, jb:JB, jp:jp, je:je});
+        SB=se; JB=je;
+      }
+      this._o={CA:CA,CB:CB,CC:CC,CD:CD,c0:c0,cols:cols,SEN:SEN,JUN:JUN,exp:exp,
+               rEB:rEB,rCX:rCX,rIN:rIN,rTX:rTX,rWC:rWC,rCF:rCF,
+               rSB:rSB,rSP:rSP,rSE:rSE,rCA:rCA,rJB:rJB,rJP:rJP,rJE:rJE};
+      /* widths: the longest label is 'Cash available for paydown' (26 glyphs at TXTPX 6.9 plus
+         PAD_TXT = 199px), so 206 clips nothing; the year columns hold at most a five-character
+         comma figure (5 × CHARPX + PAD_NUM = 55px) inside 86. No width verdict is graded on
+         this board, so it takes no part in __noShrink and never re-derives a metric by hand
+         (§1.0-R3(r)). */
+      const colW={}; colW[c0]=206; colW[c0+1]=86; colW[c0+2]=86; colW[c0+3]=86;
+      return {ROWS:20, cells, active:{r:rCF,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<0.5; };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D']; const e=this._exp;
+      const o=this._o, e=o.exp, C=o.cols;
+      /* §1.0-R3(p) END STATE, and nothing but: the NUMBER standing in each year column, plus
+         liveness where the label's verb (Build / Total, §1.7) declares a built line. No
+         predicate reads a function name, a range or an anchor out of formula text — that is
+         the CAMPAIGN §1 bug class, and this drill shipped two of them. */
+      const live=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'); };
+      const near=(k,x)=>{ const c=S.cells[k]; return !!(c&&typeof c.value==='number'&&Math.abs(c.value-x)<0.5); };
+      const rowOk=(r,f)=>[0,1,2].every(i=>live(C[i]+r)&&near(C[i]+r,f(i)));
+      /* the corkscrew: only years two and three are BUILT — year one's opening is the deal's
+         typed blue input and stays a hardcode (MODELING_STANDARDS §1: an assumption is blue). */
+      const rollOk=(r,k)=>[1,2].every(i=>live(C[i]+r)&&near(C[i]+r,e[i][k]));
+      const cfOk=rowOk(o.rCF,i=>e[i].cf);
+      /* §1.0-R3(p), the same class the round-3 dollar-format bug came from: the dress accepts
+         the figures with or without the label cell taken in, and any border route that draws
+         the top edge (Alt H B P / B S / B A all set bt on the top row of the selection). */
+      const dressOk=[0,1,2].every(i=>{ const c=S.cells[C[i]+o.rCF]; return !!(c&&c.bold&&(c.bt||c.ball)); });
+      const spOk=rowOk(o.rSP,i=>e[i].sp);
+      const seOk=rowOk(o.rSE,i=>e[i].se);
+      const caOk=rowOk(o.rCA,i=>e[i].ca);
+      const jpOk=rowOk(o.rJP,i=>e[i].jp);
+      const jeOk=rowOk(o.rJE,i=>e[i].je);
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real skippable decision ·
+         §1.0-R4(u) the structural family): the junior tranche is the senior tranche five rows
+         down, so the senior pair COPIED onto it lands both formulas with every reference
+         translated. Read off the r425 S.pasteLog latch — the MECHANIC, never geometry inferred
+         from the end state — so Ctrl+C/Ctrl+V and the ribbon's formulas-only paste both earn it
+         (§1.0(c) chord-agnostic; note the ribbon route is Alt H V S then F, since Alt H V itself
+         offers only Values and Paste-special — there is no Alt H V F, and the first cut of the
+         alt-path entry assumed there was). A VALUES paste correctly does NOT earn it: values do
+         not translate, so that route lands the SENIOR's figures on the junior rows and the cores
+         are dark anyway (walked in dev/verify-waterfall.js §C). Measured skippable: typing the
+         junior pair and filling it across costs 25 keys against the star's 5, clears all six
+         cores, and leaves the ☆ dark — dev/e2e-alt-paths.js entry 3 is that control, run green
+         ×3 seeds. */
+      const starOk=jpOk&&jeOk&&(S.pasteLog||[]).some(p=>
+        (p.kind==='all'||p.kind==='formulas') &&
+        p.sr===o.rSP && (p.sr+p.sh-1)>=o.rSE && p.r0===o.rJP && p.c0===p.sc);
       return [
-        {label:'run free cash flow at B5 \u2014 one clean SUM, signs carried, fill all three years', ok:[0,1,2].every(i=>near(COL[i]+'5',e[i].fcf))},
-        {label:'ration the TL paydown with MIN at B8, then roll-forward \u2014 each year opens at the prior close', ok:[0,1,2].every(i=>near(COL[i]+'8',e[i].pd)) && refs('B8',['MIN(','B5','B7']) && [1,2].every(i=> refs(COL[i]+'7',[COL[i-1]+'9']) && near(COL[i]+'7',e[i].tlB)) && [0,1,2].every(i=>near(COL[i]+'9',e[i].tlE))},
-        {label:'pass only surviving cash down, then ration the second-lien paydown with MIN at B13', ok:[0,1,2].every(i=>near(COL[i]+'10',e[i].left)) && [0,1,2].every(i=>near(COL[i]+'13',e[i].rpd)) && refs('B13',['MIN(','B10','B12'])},
-        {label:'link the second-lien roll-forward \u2014 open C12:D12 at the prior close, walk the endings out', ok:[1,2].every(i=> refs(COL[i]+'12',[COL[i-1]+'14']) && near(COL[i]+'12',e[i].rvB)) && [0,1,2].every(i=>near(COL[i]+'14',e[i].rvE))},
+        {label:'Total the cash available for paydown — all three years', ok: cfOk},
+        {label:'Bold the cash-available row and add a top border above it', ok: dressOk},
+        {label:'Build the '+o.SEN+' paydown — never more than the balance outstanding', ok: spOk},
+        {label:'Build the '+o.SEN+' roll-forward — each opening is the prior close', ok: seOk&&rollOk(o.rSB,'sb')},
+        {label:'Build the cash left after the '+o.SEN+' — all three years', ok: caOk},
+        {label:'Build the '+o.JUN+' tranche — paydown, closing balance and each opening', ok: jpOk&&jeOk&&rollOk(o.rJB,'jb')},
+        {label:'Copy the '+o.SEN+' pair onto the '+o.JUN+' — one paste, both formulas', ok: starOk, bonus:true},
       ];
     }
   },

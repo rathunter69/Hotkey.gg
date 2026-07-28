@@ -709,23 +709,67 @@ const ALTS = [
         {sel:o.CB+R.cp, keys:[...T('='+o.CB+R.cb+'+'+o.CB+R.dr+'+'+o.CB+R.sw),{key:'Enter'}]},
         {sel:o.CB+R.cp, keys:[SR,SR,SR,...FR]},
       ]; }` },
-  { key: 'waterfall', name: 'corkscrews linked before block fills, narrower fill geometry than the demo', moves: `C => [
-      {sel:'B5', keys:[...T('=SUM(B2:B4)'),{key:'Enter'}]},
-      {sel:'B5:D5', keys:[{key:'r',ctrl:true}]},
-      {sel:'B8', keys:[...T('=MIN(B5,B7)'),{key:'Enter'}]},
-      {sel:'B9', keys:[...T('=B7-B8'),{key:'Enter'}]},
-      {sel:'C7', keys:[...T('=B9'),{key:'Enter'}]},
-      {sel:'C7:D7', keys:[{key:'r',ctrl:true}]},
-      {sel:'B8:D9', keys:[{key:'r',ctrl:true}]},
-      {sel:'B10', keys:[...T('=B5-B8'),{key:'Enter'}]},
-      {sel:'B10:D10', keys:[{key:'r',ctrl:true}]},
-      {sel:'B13', keys:[...T('=MIN(B10,B12)'),{key:'Enter'}]},
-      {sel:'B14', keys:[...T('=B12-B13'),{key:'Enter'}]},
-      {sel:'C12', keys:[...T('=B14'),{key:'Enter'}]},
-      {sel:'C12:D12', keys:[{key:'r',ctrl:true}]},
-      {sel:'B13:D14', keys:[{key:'r',ctrl:true}]},
-    ]` },
-  // --- T24 anti-railroad tranche: order permutations + chord-route swaps ---
+  /* r444 (waterfall depth pass, DEPTH_PASS §4.72): three entries, replacing the one pre-pass
+     entry, which was written against the retired ROWS:14 geometry.
+     ALT 1 = chord-ROUTE alt — every fill walked from the ribbon (Alt H F I R), bold via Alt H 1,
+     the rule via Alt H B A, and the ☆ earned through the Alt H V S paste-special dialog set to
+     Formulas rather than Ctrl+V (§1.0(c): the star is graded off the MECHANIC, so every paste
+     route that TRANSLATES must earn it. Note there is no Alt H V F — Alt H V offers only Values
+     and Paste-special, and the first cut of this entry assumed otherwise and went red).
+     ALT 2 = op-ORDER alt AND the untriggerable-beat regression: the whole cascade is built and
+     filled BEFORE the cash row that feeds it exists (every dependent recalculates when the SUMs
+     land), both corkscrews and the dress come last, and the rationing is written as an IF, not a
+     MIN — the shape the pre-pass predicate locked out by demanding the literal 'MIN(' out of
+     formula text. The ☆ still fires, because the junior block is still reached by a copy.
+     ALT 3 = the §1.0-R2(i) SKIPPABILITY CONTROL and the ☆-headroom denominator: every year-cell
+     typed on its own, no fill and no paste anywhere on the board, the dress walked cell by cell —
+     all six cores clear and the ☆ must stay DARK.
+     MEASURED, 3 seeds each, in the r444 worktree: ALT 1 median 101 keys (☆ 3/3) · ALT 2 median
+     103 (☆ 3/3) · ALT 3 median 209 (☆ 0/3). The demo is 73. */
+  { key: 'waterfall', name: 'RIBBON routes throughout (Alt H F I R fills, Alt H 1 bold, Alt H B A rule) and the ☆ earned by the Alt H V S paste-special dialog set to Formulas', moves: `C => { const o=C._o, R=n=>Array(n).fill({key:'ArrowRight',shift:true}); return [
+      {sel:o.CB+o.rCF, keys:[...T('=SUM('+o.CB+o.rEB+':'+o.CB+o.rWC+')'), {key:'Enter'}]},
+      {sel:o.CB+o.rCF, keys:[...R(2), {key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.CA+o.rCF, keys:[...R(3), {key:'Alt'},L('h'),D(1), {key:'Alt'},L('h'),L('b'),L('a')]},
+      {sel:o.CB+o.rSP, keys:[...T('=MIN('+o.CB+o.rCF+','+o.CB+o.rSB+')'), {key:'Enter'}]},
+      {sel:o.CB+o.rSE, keys:[...T('='+o.CB+o.rSB+'-'+o.CB+o.rSP), {key:'Enter'}]},
+      {sel:o.CB+o.rSP, keys:[...R(2), {key:'ArrowDown',shift:true}, {key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.CC+o.rSB, keys:[...T('='+o.CB+o.rSE), {key:'Enter'}]},
+      {sel:o.CC+o.rSB, keys:[...R(1), {key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.CB+o.rCA, keys:[...T('='+o.CB+o.rCF+'-'+o.CB+o.rSP), {key:'Enter'}]},
+      {sel:o.CB+o.rCA, keys:[...R(2), {key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.CB+o.rSP, keys:[...R(2), {key:'ArrowDown',shift:true}, {key:'c',ctrl:true}]},
+      {sel:o.CB+o.rJP, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('f'),{key:'Enter'}]},
+      {sel:o.CC+o.rJB, keys:[...T('='+o.CB+o.rJE), {key:'Enter'}]},
+      {sel:o.CC+o.rJB, keys:[...R(1), {key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+    ]; }` },
+  { key: 'waterfall', name: 'BOTTOM-UP op order — the tranches built and filled before the cash row that feeds them exists, both corkscrews and the dress last, rationing written as an IF not a MIN', moves: `C => { const o=C._o, R=n=>Array(n).fill({key:'ArrowRight',shift:true}); return [
+      {sel:o.CB+o.rSP, keys:[...T('=IF('+o.CB+o.rCF+'<'+o.CB+o.rSB+','+o.CB+o.rCF+','+o.CB+o.rSB+')'), {key:'Enter'}]},
+      {sel:o.CB+o.rSE, keys:[...T('='+o.CB+o.rSB+'-'+o.CB+o.rSP), {key:'Enter'}]},
+      {sel:o.CB+o.rSP, keys:[...R(2), {key:'ArrowDown',shift:true}, {key:'r',ctrl:true}]},
+      {sel:o.CB+o.rCA, keys:[...T('='+o.CB+o.rCF+'-'+o.CB+o.rSP), {key:'Enter'}]},
+      {sel:o.CB+o.rCA, keys:[...R(2), {key:'r',ctrl:true}]},
+      {sel:o.CB+o.rSP, keys:[...R(2), {key:'ArrowDown',shift:true}, {key:'c',ctrl:true}]},
+      {sel:o.CB+o.rJP, keys:[{key:'v',ctrl:true}]},
+      {sel:o.CC+o.rJB, keys:[...T('='+o.CB+o.rJE), {key:'Enter'}]},
+      {sel:o.CD+o.rJB, keys:[...T('='+o.CC+o.rJE), {key:'Enter'}]},
+      {sel:o.CC+o.rSB, keys:[...T('='+o.CB+o.rSE), {key:'Enter'}]},
+      {sel:o.CD+o.rSB, keys:[...T('='+o.CC+o.rSE), {key:'Enter'}]},
+      {sel:o.CD+o.rCF, keys:[...T('=SUM('+o.CD+o.rEB+':'+o.CD+o.rWC+')'), {key:'Enter'}]},
+      {sel:o.CB+o.rCF, keys:[...T('=SUM('+o.CB+o.rEB+':'+o.CB+o.rWC+')'), {key:'Enter'}]},
+      {sel:o.CC+o.rCF, keys:[...T('=SUM('+o.CC+o.rEB+':'+o.CC+o.rWC+')'), {key:'Enter'}]},
+      {sel:o.CA+o.rCF, keys:[...R(3), {key:'b',ctrl:true}, {key:'Alt'},L('h'),L('b'),L('s')]},
+    ]; }` },
+  { key: 'waterfall', name: 'SLOWEST LEGAL ROUTE, the ☆-skippability control (§1.0-R2(i)): every year-cell typed on its own, no fill and no paste anywhere on the board, the dress walked cell by cell — all six cores clear, ☆ forfeited', moves: `C => { const o=C._o, out=[], Y=[o.CB,o.CC,o.CD];
+      for(let i=0;i<3;i++) out.push({sel:Y[i]+o.rCF, keys:[...T('=SUM('+Y[i]+o.rEB+':'+Y[i]+o.rWC+')'), {key:'Enter'}]});
+      for(let i=0;i<3;i++) out.push({sel:Y[i]+o.rCF, keys:[{key:'b',ctrl:true}, {key:'Alt'},L('h'),L('b'),L('p')]});
+      for(let i=0;i<3;i++) out.push({sel:Y[i]+o.rSP, keys:[...T('=MIN('+Y[i]+o.rCF+','+Y[i]+o.rSB+')'), {key:'Enter'}]});
+      for(let i=0;i<3;i++) out.push({sel:Y[i]+o.rSE, keys:[...T('='+Y[i]+o.rSB+'-'+Y[i]+o.rSP), {key:'Enter'}]});
+      for(let i=1;i<3;i++) out.push({sel:Y[i]+o.rSB, keys:[...T('='+Y[i-1]+o.rSE), {key:'Enter'}]});
+      for(let i=0;i<3;i++) out.push({sel:Y[i]+o.rCA, keys:[...T('='+Y[i]+o.rCF+'-'+Y[i]+o.rSP), {key:'Enter'}]});
+      for(let i=0;i<3;i++) out.push({sel:Y[i]+o.rJP, keys:[...T('=MIN('+Y[i]+o.rCA+','+Y[i]+o.rJB+')'), {key:'Enter'}]});
+      for(let i=0;i<3;i++) out.push({sel:Y[i]+o.rJE, keys:[...T('='+Y[i]+o.rJB+'-'+Y[i]+o.rJP), {key:'Enter'}]});
+      for(let i=1;i<3;i++) out.push({sel:Y[i]+o.rJB, keys:[...T('='+Y[i-1]+o.rJE), {key:'Enter'}]});
+      return out; }` },
   /* r444 (accdil depth pass, DEPTH_PASS §4.65): the shipped entry — "shares side FIRST, drag
      last-but-one, typed addition instead of SUM()" — is DELETED, not patched. It drove the
      one-structure board's fixed cells B7/B8/B11/B12/B13/B14, and no seed produces that geometry
