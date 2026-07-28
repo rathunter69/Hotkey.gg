@@ -780,3 +780,42 @@ broken. What finally settled it was a zoomed screenshot looked at directly. **Wh
 your eyes disagree, believe your eyes and go fix the probe.** (After r440's `hotkey_onboarded`
 omission and r441's hidden rows — this keeps costing rounds, so treat a surprising probe reading
 as suspect by default and confirm it visually before reasoning from it.)
+
+## ⚠️ SPEC COLLISION with main — two different §1.0-R3 (n) laws (found r442)
+
+`main` advanced under PR #243 while it was open: **PR #244 squash-merged an independent
+session's r428–r429**. This is not a merge-mechanics problem. The two branches wrote **different
+binding laws under the same letter**, and each is a real Wolf directive:
+
+| | this branch (#243) | main (#244) |
+|---|---|---|
+| **§1.0-R3 (n)** | **CHECKLIST LINES ARE INSTRUCTIONS, NEVER LESSONS** — playtest round 3, *"ITS JUST THE INSTRUCTIONS … NOT A LESSON!!!"*, enforced by a 31-phrase aphorism lint in `check-invariants.js` | **EVERY DRILL IS A REAL TASK, FOR BOTH AUDIENCES** — the dual-audience real-task law, direct product directive 2026-07-27, plus §3.1 THE AUDIENCE MAP |
+| in the other? | absent from main (law and lint both) | absent from this branch |
+| doc header | r420d, 2026-07-25 | r429, 2026-07-27 |
+
+**Neither branch is a superset.** A take-ours merge silently drops the product's stated north
+star; a take-theirs merge drops the checklist-copy law *and* the CI lint that enforces it.
+Reconciliation must **keep both and renumber** — they are different rules, not two drafts of one.
+
+**And the harder consequence:** the dual-audience law is BUILD LAW dated after this branch's work.
+All **44 depth-passed drills here were built without it** and have never been audited against it.
+That audit is a real obligation, not a formality — (n) asks whether each drill is a task a
+mid-career corporate professional *and* an aspiring banker would actually recognise.
+
+Secondary divergence, mechanical by comparison:
+
+- **The catalog itself disagrees.** `main` still ships `hunt`, `dress`, `growth`, `wirewalk`,
+  `undo`, `copyover`, `grpfold` — all seven retired here on measurements (§2, §3).
+- **103 conflicts in `index.html`** alone; `main` +102KB from base, this branch +569KB.
+- **Files only on main:** `dev/e2e-depth-contract.js`, six `dev/verify-*.js`,
+  `.claude/workflows/drill-wave.js`, `dev/R429_INDEXUI_VERIFICATION.md`.
+- **Files only here:** `DEPTH_PASS_CAMPAIGN.md`, `MODELING_STANDARDS.md`, `check-borders.js`,
+  `check-pause.js`, `fit-flake-hunt.js`, `merge-altpaths.py`.
+- **`gate.yml` needs BOTH sides:** main added `depth-contract` + `depth-mechanics` steps; this
+  branch adds `check-borders` + `check-pause`. All four belong.
+
+**CI is silent until this is resolved** — GitHub does not run `pull_request` workflows for a PR
+with `mergeable_state: "dirty"`, so no push on this branch can be gated until the merge lands.
+
+**Escalated to Wolf; nothing merged, nothing live.** Do not resolve this by picking a side
+mechanically — the letter collision and the 44-drill audit are product calls.
