@@ -232,7 +232,7 @@ try {
    STATIC counts asserted here stay the hand-written tri-length; C9 asserts the declaration is
    present and that no drill hand-writes the save beat (the engine owns it, exactly once). ---- */
 try {
-  const REWORKED = ['navigation', 'blocksel', 'filldr', 'pastes', 'rowops', 'ruleoff', 'editfix', 'ruleaudit', 'housestyle', 'typeset', 'modeltour', 'combo', 'decimals', 'center', 'autofit', 'margin', 'anchor', 'gauntlet', 'foot', 'percent', 'bridge', 'sumif', 'fxconvert', 'cagr', 'lookup', 'scrub', 'sort', 'recon', 'lookup2', 'unhide', 'rollup', 'filterpass', 'series', 'drill', 'stalelink', 'signerr', 'versionup', 'wrapfix', 'cases', 'audit', 'triage', 'balcheck', 'tieout', 'balance', 'wacc', 'fcfbuild', 'dcf', 'comps', 'txncomps', 'football', 'dcfsens', 'retbridge', 'accdil', 'sourcesuses'];   // r422 H6b-1 wave 1 · r440: the last three of Formulas II · r444: Models I opens
+  const REWORKED = ['navigation', 'blocksel', 'filldr', 'pastes', 'rowops', 'ruleoff', 'editfix', 'ruleaudit', 'housestyle', 'typeset', 'modeltour', 'combo', 'decimals', 'center', 'autofit', 'margin', 'anchor', 'gauntlet', 'foot', 'percent', 'bridge', 'sumif', 'fxconvert', 'cagr', 'lookup', 'scrub', 'sort', 'recon', 'lookup2', 'unhide', 'rollup', 'filterpass', 'series', 'drill', 'stalelink', 'signerr', 'versionup', 'wrapfix', 'cases', 'audit', 'triage', 'balcheck', 'tieout', 'balance', 'wacc', 'fcfbuild', 'dcf', 'comps', 'txncomps', 'football', 'dcfsens', 'retbridge', 'accdil', 'sourcesuses', 'schedule'];   // r422 H6b-1 wave 1 · r440: the last three of Formulas II · r444: Models I opens
   const idx = fs.readFileSync('index.html', 'utf8');
   const start = idx.indexOf('const CHALLENGES = {');
   const end = idx.indexOf('STATE + ENGINE', start);

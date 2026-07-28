@@ -1145,16 +1145,34 @@ const ALTS = [
       {sel:o.CC+o.rD,   keys:[...T('='+o.CB+o.rD+'/'+o.CB+o.rTot),{key:'Enter'}]},
       {sel:o.CB+o.rChk, keys:[...T('=-('+o.CB+o.rAct+'-'+o.CB+o.rTot+')'),{key:'Enter'}]},
     ]; }` },
-  { key: 'schedule', name: 'THE LINK laid FIRST, year-1 roll after it, memo last, ribbon fills', moves: `C => [
-      {sel:'C2', keys:[...T('=B5'),{key:'Enter'}]},
-      {sel:'C2:F2', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B5', keys:[...T('=B2+B3+B4'),{key:'Enter'}]},
-      {sel:'B4', keys:[...T('=-B2*$B$9'),{key:'Enter'}]},
-      {sel:'B4:F5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B7', keys:[...T('=-B4'),{key:'Enter'}]},
-      {sel:'C7', keys:[...T('=B7-C4'),{key:'Enter'}]},
-      {sel:'C7:F7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-    ]` },
+  /* r446 (schedule ROUND 1 depth pass, DEPTH_PASS §4.68): REPLACES the single pre-depth-pass
+     entry, which drove the retired ROWS:9 board by hard-coded geometry (B4/B5/C2/B7 — every one
+     of those rows moved). ALT 1 is the chord-ROUTE + op-ORDER alt and still EARNS the ☆ by the
+     ribbon fill door; ALT 2 is the MEASURED negative control — every core clears with the ☆
+     dark, which is the §1.0-R2(i) skippability proof (184 keys against the taught 64). */
+  { key: 'schedule', name: 'AUTOSUM writes the closing line, ribbon fills throughout (alt h f i r), Alt H 1 bold + Alt H B S perimeter rule, memo by expanding anchored SUM filled from year one — ☆ still earned', moves: `C => { const o=C._o, R=o.R;
+      const sr={key:'ArrowRight',shift:true}, sd={key:'ArrowDown',shift:true};
+      const rib=[{key:'Alt'},L('h'),L('f'),L('i'),L('r')];
+      return [
+        {sel:o.CB+R.dep, keys:[...T('=-$'+o.CB+'$'+R.rate+'*'+o.CB+R.beg),{key:'Enter'}]},   // rate FIRST, anchor typed
+        {sel:o.CB+R.beg, keys:[sd,sd,sd,sd,{key:'=',alt:true,code:'Equal'}]},                 // alt+= over the block THROUGH the empty closing cell
+        {sel:o.CC+R.beg, keys:[...T('='+o.CB+R.end),{key:'Enter'}]},
+        {sel:o.CC+R.beg, keys:[sr,sr,sr, ...rib]},
+        {sel:o.CB+R.dep, keys:[sr,sr,sr,sr,sd, ...rib]},                                      // one rectangle over both roll lines
+        {sel:o.CA+R.end, keys:[sr,sr,sr,sr,sr,{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('s')]},   // ribbon bold + OUTSIDE border
+        {sel:o.CB+R.acc, keys:[...T('=$'+o.CB+'$'+R.acc0+'+SUM($'+o.CB+'$'+R.dep+':'+o.CB+R.dep+')'),{key:'Enter'}]},
+        {sel:o.CB+R.acc, keys:[sr,sr,sr,sr, ...rib]},                                         // the expanding anchor fills from YEAR ONE
+      ]; }` },
+  { key: 'schedule', name: 'NEGATIVE CONTROL — every later year typed, rate unanchored, addition chain for the closing line, ALL-BORDERS dress cell by cell, no fill anywhere — all five cores clear, ☆ forfeited', moves: `C => { const o=C._o, R=o.R, Y=o.YC; const mv=[];
+      for(let i=0;i<5;i++){ const c=Y[i], p=Y[i-1];
+        if(i>0) mv.push({sel:c+R.beg, keys:[...T('='+p+R.end),{key:'Enter'}]});
+        mv.push({sel:c+R.dep, keys:[...T('=-'+c+R.beg+'*$'+o.CB+'$'+R.rate),{key:'Enter'}]});
+        mv.push({sel:c+R.end, keys:[...T('='+c+R.beg+'+'+c+R.mnt+'+'+c+R.grw+'+'+c+R.dep),{key:'Enter'}]});
+      }
+      mv.push({sel:Y[0]+R.acc, keys:[...T('=$'+o.CB+'$'+R.acc0+'+'+Y[0]+R.dep),{key:'Enter'}]});
+      for(let i=1;i<5;i++) mv.push({sel:Y[i]+R.acc, keys:[...T('='+Y[i-1]+R.acc+'+'+Y[i]+R.dep),{key:'Enter'}]});
+      for(let i=0;i<5;i++) mv.push({sel:Y[i]+R.end, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('a')]});   // Alt H B A writes ball, never bt — the route the predicate was widened for
+      return mv; }` },
   /* r439: REPLACES the pre-depth-pass signerr alt, which drove the retired 10-row board by
      hard-coded geometry (B10/B8/B4 and C._flips/C._mag, all gone with the rebuild). ALT 1 is the
      chord-ROUTE + op-ORDER alt and EARNS the ☆ by the other paste-special door; ALT 2 is the
