@@ -1504,20 +1504,38 @@ const ALTS = [
       for(let c=o.cN;c>=o.c0;c--) st.push({sel:CL(c)+o.totCostR, keys:[...T('='+CL(c)+o.cost0+'+'+CL(c)+(o.cost0+1)+'+'+CL(c)+o.cost2),{key:'Enter'}]});
       st.push({sel:CL(o.c0)+o.totCostR, keys:[{key:' ',shift:true},{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
       return st; }` },
-  { key: 'wk13', name: 'totals + dress FIRST, cushion before the spine, ribbon fills throughout', moves: `C => [
-      {sel:'J4', keys:[...T('=SUM(B4:I4)'),{key:'Enter'}]},
-      {sel:'J4:J6', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:'B8:I8', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B8:I8', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:'B10', keys:[...T('=B8-$B$12'),{key:'Enter'}]},
-      {sel:'B10:I10', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B6', keys:[...T('=B4-B5'),{key:'Enter'}]},
-      {sel:'B6:I6', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B8', keys:[...T('=B7+B6'),{key:'Enter'}]},
-      {sel:'C7', keys:[...T('=B8'),{key:'Enter'}]},
-      {sel:'C7:I7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B8:I8', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-    ]` },
+  /* r447 (wk13 ROUND 1 depth pass, DEPTH_PASS §4.75): BOTH entries rebuilt and the pre-pass entry
+     DELETED — it drove B6/B8/C7/B10/J4 and the 20-row board moved every one of them. ALT 1 is the
+     chord-ROUTE alt: ribbon walks end to end, the F4 anchor cycle instead of typed dollars, and
+     the ☆ earned from Alt H U S rather than Alt+=. ALT 2 is the op-ORDER alt AND the §1.0-R2(i)
+     SKIPPABILITY CONTROL, measured: the page is built bottom-up with nothing filled, nothing
+     pasted and nothing autosummed anywhere, so all six cores clear with the ☆ DARK. */
+  { key: 'wk13', name: 'RIBBON end to end — Alt H F I R fills, Alt H U S cross-foot + Alt H F I D carry (☆ earned from the ribbon side), F4 anchor cycle, Alt H 1 + Alt H B S box', moves: `C => { const o=C._o;
+      const RB=(...ls)=>[{key:'Alt'}].concat(ls.map(x=>(x>='0'&&x<='9')?D(Number(x)):L(x)));
+      return [
+        {sel:'B'+o.rNET,  keys:[...T('=B'+o.rTR+'-B'+o.rTD),{key:'Enter'}]},
+        {sel:o.netRng,    keys:RB('h','f','i','r')},
+        {sel:'C'+o.rBEG,  keys:[...T('=B'+o.rEND),{key:'Enter'}]},
+        {sel:o.begRng,    keys:RB('h','f','i','r')},
+        {sel:'B'+o.rEND,  keys:[...T('=B'+o.rBEG+'+B'+o.rNET),{key:'Enter'}]},
+        {sel:o.endRng,    keys:RB('h','f','i','r')},
+        {sel:o.endRng,    keys:RB('h','1')},                                        // bold from the ribbon (Alt H 1 is Ctrl+B's twin)
+        {sel:o.endRng,    keys:RB('h','b','s')},                                    // outside border on a one-row selection sets the row's TOP edge — §1.0-R3(p), the beat grades bt OR ball
+        {sel:o.asRng,     keys:RB('h','u','s')},                                    // the ☆: AutoSum's ribbon route, range form, one commit
+        {sel:o.totRng,    keys:RB('h','f','i','d')},
+        {sel:'B'+o.rCUSH, keys:[...T('=B'+o.rEND+'-B'+o.rMIN),{key:'F4'},{key:'Enter'}]},   // F4 once = $B$n — never typed dollars
+        {sel:o.cushRng,   keys:RB('h','f','i','r')},
+      ]; }` },
+  { key: 'wk13', name: 'op ORDER bottom-up + the MEASURED NEGATIVE CONTROL — cushion first, dress before the builds, nothing filled and nothing autosummed: 31 hand-typed formulas and nine typed SUMs (six cores clear, ☆ DARK)', moves: `C => { const o=C._o, CL=['B','C','D','E','F','G','H','I'];
+      const st=[];
+      CL.forEach(c=>st.push({sel:c+o.rCUSH, keys:[...T('='+c+o.rEND+'-B'+o.rMIN),{key:'Enter'}]}));      // relative ref, typed per cell — no anchor needed when nothing is filled
+      st.push({sel:'B'+o.rEND, keys:[{key:' ',shift:true},{key:'b',ctrl:true}]});                        // dress from a full-row Shift+Space grab, BEFORE the row holds a number
+      st.push({sel:'B'+o.rEND, keys:[{key:' ',shift:true},{key:'Alt'},L('h'),L('b'),L('a')]});           // ALL borders — every cell boxed, so the top edge is there
+      CL.forEach(c=>st.push({sel:c+o.rEND, keys:[...T('='+c+o.rBEG+'+'+c+o.rNET),{key:'Enter'}]}));
+      CL.slice(1).forEach((c,i)=>st.push({sel:c+o.rBEG, keys:[...T('='+CL[i]+o.rEND),{key:'Enter'}]}));
+      CL.forEach(c=>st.push({sel:c+o.rNET, keys:[...T('='+c+o.rTR+'-'+c+o.rTD),{key:'Enter'}]}));
+      o.jrows.forEach(r=>st.push({sel:'J'+r, keys:[...T('=SUM(B'+r+':I'+r+')'),{key:'Enter'}]}));
+      return st; }` },
   /* r428 (combo ROUND 2, DEPTH_PASS §4.17): ALT 1 is the chord-ROUTE alt AND the §1.0(c)
      freedom proof for the re-cut ☆ — the slow comma route (ctrl+shift+! then two decimal
      walks), blue picked by walking the swatches the other way, and the width TYPED instead of

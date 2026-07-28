@@ -10823,73 +10823,316 @@ const CHALLENGES = {
     }
   },
   wk13:{
-    name:'13-Week Cash', label:'Run the 13-week', par:45, parKeys:45,
-    aha:'One pattern runs the whole sheet — receipts − disbursements, filled right, rolls cash forward.',
-    prompt:'The front eight weeks of a 13-week cash flow. Receipts and disbursements are in from treasury — you build the spine: net flow each week, the beginning/ending roll-forward, the cushion against minimum liquidity (anchored, so it doesn’t walk), and totals on the flows only.',
-    req:'<em>B6</em> <em>=B4-B5</em> fill \u2192 \u00b7 <em>B8</em> <em>=B7+B6</em> fill \u2192 \u00b7 roll-forward <em>C7</em> <em>=B8</em> fill \u2192 \u00b7 cushion <em>B10</em> <em>=B8-$B$12</em> fill \u2192 \u00b7 totals <em>J4</em> <em>=SUM(B4:I4)</em> + fill J4:J6 \u2193 \u00b7 dress <em>B8:I8</em>: <em>ctrl+b</em> + <em>alt h b p</em>',
-    guide:[
-      'net flow first: B6 \u00b7 <kbd>=B4-B5</kbd> \u2014 receipts less disbursements \u00b7 fill \u2192 to week 8',
-      'ending cash: B8 \u00b7 <kbd>=B7+B6</kbd> \u00b7 fill \u2192 \u00b7 then the roll-forward: C7 \u00b7 <kbd>=B8</kbd> \u2014 next week opens where this one closed \u00b7 fill \u2192',
-      'the cushion: B10 \u00b7 <kbd>=B8-$B$12</kbd> \u2014 minimum liquidity is ANCHORED (<kbd>F4</kbd> locks it) \u00b7 fill \u2192 \u00b7 negative weeks are the whole point of this sheet',
-      'totals on FLOWS only: J4 \u00b7 <kbd>=SUM(B4:I4)</kbd> \u00b7 select J4:J6 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 receipts, disbursements, net. Ending cash gets NO total',
-      'format the answer row: B8:I8 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
-    ],
-    targets:['B6:I6','C7:I7','B8:I8','B10:I10','J4:J6','B8:I8'],
-    demo(){ return [
-      {sel:'B6',  keys:[...T('=B4-B5'), Kb.enter]},
-      {sel:'B6:I6', keys:[Kb.fillR]},
-      {sel:'B8',  keys:[...T('=B7+B6'), Kb.enter]},
-      {sel:'B8:I8', keys:[Kb.fillR]},
-      {sel:'C7',  keys:[...T('=B8'), Kb.enter]},
-      {sel:'C7:I7', keys:[Kb.fillR]},
-      {sel:'B10', keys:[...T('=B8-$B$12'), Kb.enter]},
-      {sel:'B10:I10', keys:[Kb.fillR]},
-      {sel:'J4',  keys:[...T('=SUM(B4:I4)'), Kb.enter]},
-      {sel:'J4:J6', keys:[Kb.fillD]},
-      {sel:'B8:I8', keys:[Kb.bold]},
-      {sel:'B8:I8', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
+    /* r447 H6b (DEPTH_PASS §4.75, with the §1.0 / §1.0-R2 / §1.0-R3 / §1.0-R4 law applied on
+       top — the newest rule wins on conflict). The depth-pass rework of "Run the 13-week".
+       dev/MODELING_STANDARDS.md is BINDING on this board (WORKFLOW.md §9 / DEPTH_PASS_CAMPAIGN
+       §5): a banker judges the MODEL before the keystroke, so the model is stated first.
+
+       THE MODEL (MODELING_STANDARDS conventions this board follows):
+       · §3 THE ROLL-FORWARD, in its canonical order — Net cash flow, Beginning cash, Ending
+         cash — and the beginning cell REFERENCES the prior ending, never repeats it. That link
+         is the lesson; §7 names it as one of the few conventions legitimately gradeable as END
+         STATE, which is why beat 2's verb is "Reference" (§1.7 closed list: "point a formula at
+         an existing output, never retype it") and not "Build". The label makes the requirement
+         readable on its own, so the beat can never be an untriggerable one (§1.0-R3(p)).
+       · §1 COLOUR AS PROVENANCE — blue on every hardcoded input (treasury's weekly figures, the
+         opening cash, the covenant floor), black on every formula, the two assumptions light
+         yellow + all borders and POPULATED (§1.0(f)), vertically stacked and individually named
+         after the assumption itself, not tagged "Helper" (§1.0-R2(l) as amended r430).
+       · §1 STRUCTURE — subtotals wear a TOP border and never a rule underneath (§1.0(f)); units
+         are stated in the title ($000s); negatives print in parentheses (comma format), which is
+         what the trough weeks are for.
+       · §2 SIGN CONVENTION — gross positive flows, net = receipts less disbursements. This is
+         doctrine §2.4's NAMED exemption from the costs-negative house rule ("flow rows
+         explicitly labeled as paired gross flows (13-week receipts / disbursements)"), and §2
+         requires the convention be STATED on the board: row 2 is that basis memo.
+       · §5 CIRCULARITY — not reachable here. There is no interest line on this fragment, so the
+         beginning-balance ruling never has to be invoked; the board is deliberately the cash
+         page of a 13-week and not the debt page (that is `debtsched`).
+       DELIBERATE SIMPLIFICATIONS, stated per §7: no revolver draw and no availability block (the
+       forecast period assumes none, and the row-2 memo says so), no weekly bank-fee accrual, and
+       the horizon is the FRONT EIGHT weeks — the aha names that explicitly rather than letting a
+       player believe a 13-week is eight columns long.
+
+       WHAT THE §4.75 PAGE ASKS FOR, AND WHERE THIS BUILD GOES FURTHER (§0: a build agent makes
+       the call and NAMES it rather than improvising silently — payload item 8 carries the list):
+
+       (1) THE PAGE'S CLASS-B BUG IS FIXED AT THE AHA, VERBATIM. The old line promised thirteen
+           columns on a board that builds eight. The page's replacement ships as written.
+       (2) ☆ RE-CUT (§1.0-R4(u), mandatory — §4.75 predates the playtest rounds). Its bonus was
+           "Comma-format the flow block, zero decimals, one pass": a FORMATTING task, which
+           §1.0(d) killed outright, and on this board it is not even skippable, since the board
+           ships comma-formatted. Re-cut to a hidden EFFICIENCY discovery; the diagnostic below
+           is the measurement that chose it.
+       (3) ROWS 12 → 20 (§1.3 — floor AND cap, Wolf r440). The old board was a 12-row corner of
+           an empty sheet carrying ONE receipts line and ONE disbursements line, which is not
+           what a 13-week looks like: a real one breaks the flows into the lines treasury
+           actually forecasts, and the whole point of the artifact is seeing WHICH line is
+           starving the cushion. 16–18 of 20 rows carry content at the win (80–90%, §1.3 target
+           ≥60%), and the two subtotal rows ship LIVE so the detail is not decoration.
+       (4) §1.0-R4(t) REALITY TEST. Chapter 7 is audience B by the §3.1 map, and a 13-week cash
+           flow for a lender group is the restructuring desk's most-run artifact. Board and
+           prompt carry the real frame: who needs it, why, and what happens Friday.
+
+       ☆-HEADROOM DIAGNOSTIC (DEPTH_PASS_CAMPAIGN §2 — run BEFORE the board was authored, and it
+       changed the design twice):
+       · Candidate A, "build one full week column, then ONE fill-right carries the whole spine
+         across the horizon". The intuitive 13-week star, and DEAD on measurement: 82 keys
+         against the taught route's 47, because typing a redundant second week column costs 34
+         keys to save three fills. That is the `growth` failure exactly — a star route worse than
+         the route it beats — and it is the reason this runs before a board exists, not after.
+       · Candidate B, structured selection (Ctrl+Shift+arrow) to grab a fill rect. Illegal here
+         by geometry, not by taste: every fill rect starts at a cell whose neighbours are EMPTY,
+         so Ctrl+Shift+Right rides to the sheet edge and over-selects the total column.
+       · Candidate C, multi-enter (Ctrl+Enter) over one row: the typed formula plus Ctrl+Enter
+         costs the same keys as the typed formula plus a fill. Zero spread.
+       · Candidate D — SHIPPED. The eight-week total column comes from ONE AutoSum in its ROW
+         form (select a flow line THROUGH its empty total cell; one press writes and commits the
+         cross-foot) plus ONE fill down that column. 3 keys against 13 for the typed
+         =SUM(...) + fill, and against 108 for the nine hand-typed SUMs the same column needs
+         cell by cell. Skippable by construction — typing the SUM clears beat 5 identically,
+         which is what ALT 2 (the measured negative control) proves.
+       WAVE-4 ADDENDUM (r447, orchestrator): chapter 7's first half already carries four
+       FILL-latch stars, so a non-fill family was preferred wherever legal headroom existed —
+       and it did. The discovery here is AUTOSUM (S.autoSumN); the fill conjunct exists only to
+       reject the nine-presses-of-Alt+= route, which is SLOWER than typing and must not be
+       rewarded. Family: one-pass discipline. It rhymes with `scrub` (chapter 4) and teaches the
+       other half: scrub autosums a COLUMN of deals, this cross-foots a ROW of weeks and carries
+       the answer down, which is the move that makes a 13-week's total column cost two ops
+       instead of nine.
+
+       WHAT IS NOT ON THIS BOARD, AND WHY:
+       · NO cueCell() (§1.0-R2(h)/§1.0-R3(q)): every graded target is a LABELED row or the
+         labeled total column, which the green outline expresses exactly. There is no insert
+         point and no empty paste destination for a red cue to point at, and no graded target
+         spills across a neighbour — the only spilling cells (title, basis memo, source memo)
+         are ungraded and sit over empty rows.
+       · NO width verdict is graded, so this drill does not join __noShrink; build() sizes every
+         column to its widest paren-negative on every seed (see the colW note).
+       · NO adaptive check label (§1.0-R2(g)): nothing about the required ACTION varies by seed —
+         the geometry moves, but every beat is the same work on the row its label names.
+
+       ENGINE (read out of the source, not assumed): autoSum()'s RANGE form fires when the
+       selection is a single row (or column) whose LAST cell is empty and whose others hold
+       numbers — it writes the =SUM() committed and stamps S.autoSumN; Alt+= and the ribbon walk
+       Alt H U S both reach it, and neither touches formatting. fillFrom() copies the SOURCE
+       cell's FULL format, which is why the total column ships uniformly dressed (its own left
+       rule, comma, no bold, no top border): a fill down it can never strip the border off a
+       subtotal, the r439 `cases` trap. recalc() iterates to convergence, so the interlocked
+       beginning/ending chain resolves whatever order the player builds it in. */
+    name:'13-Week Cash', label:'Run the 13-week', par:45, parKeys:42, saveClose:true,   /* r447: par re-swept from scratch on the reworked board — dev/e2e-par-sweep.js wk13, 5-seed median 42 keys INCLUDING the engine-appended Ctrl+S, and the count is seed-INVARIANT by construction (every row number the demo types is 1 or 2 digits on every seed, so the block-depth jitter never moves a keystroke). parKeys 45 → 42, par held at 45 ≈ 1.07 s/key, the house band — the board grew by two whole flow blocks while the key count FELL, because the total column now lands from one AutoSum and one fill instead of a typed SUM. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 68s · pro 52s · legendary 45s. */
+    aha:'the 13-week is a roll-forward with a cushion — you built the front eight; the back five are the same five keys',
+    /* §1.5: the aha's MOMENT is beat 2 — one reference filled right and every remaining week
+       opens on the week before it, which is the whole horizon in one motion. */
+    prompt:'The lender group gets the refreshed 13-week on Friday. Treasury has collections and disbursements in for weeks one through eight — the spine is yours: net cash flow each week, the cash roll-forward where every week opens on the last one’s close, and the cushion against the minimum liquidity the credit agreement holds the company to. Total the flow lines only; a balance does not add across weeks. The ending-cash row ships bolded and ruled, and the week the cushion goes negative is the number the lenders will open on.',
+    req(){ const o=this._o; return '<em>B'+o.rNET+'</em> <em>=B'+o.rTR+'-B'+o.rTD+'</em> fill → · <em>C'+o.rBEG+'</em> <em>=B'+o.rEND+'</em> fill → · <em>B'+o.rEND+'</em> <em>=B'+o.rBEG+'+B'+o.rNET+'</em> fill → · dress <em>'+o.endRng+'</em>: <em>ctrl+b</em> + <em>alt h b p</em> · <em>'+o.asRng+'</em> <em>alt+=</em> then <em>'+o.totRng+'</em> <em>ctrl+d</em> · <em>B'+o.rCUSH+'</em> <em>=B'+o.rEND+'-$B$'+o.rMIN+'</em> fill → · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and every line names both routes where the engine offers two, because both are
+       graded (§1.0-R3(p)). guide[i] hints checks[i] (§1.9); the ☆ line is last. */
+    guide(){ const o=this._o; return [
+      'net cash flow starts at B'+o.rNET+' · <kbd>=</kbd> the <b>Total receipts</b> cell <kbd>-</kbd> the <b>Total disbursements</b> cell · <kbd>↵</kbd> · select '+o.netRng+' · <kbd>ctrl</kbd>+<kbd>r</kbd> carries it to week 8 (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> is the ribbon route)',
+      'week 1 already opens on the <b>Opening cash</b> assumption · C'+o.rBEG+' · <kbd>=B'+o.rEND+'</kbd> — point it at week 1’s <b>Ending cash</b> · fill '+o.begRng+' right and every later week picks up the week before it',
+      'ending cash at B'+o.rEND+' · <kbd>=B'+o.rBEG+'+B'+o.rNET+'</kbd> — beginning plus the week’s net · fill '+o.endRng+' right',
+      'select '+o.endRng+' · <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> — <kbd>p</kbd> puts the rule ABOVE the row',
+      'the 8-wk total column: J5 · <kbd>=SUM(B5:I5)</kbd> · select '+o.totRng+' · <kbd>ctrl</kbd>+<kbd>d</kbd> — every receipt line, every disbursement line, both subtotals and net cash flow. <b>Beginning cash</b>, <b>Ending cash</b> and <b>Cushion</b> stay empty out there',
+      'cushion at B'+o.rCUSH+' · <kbd>=B'+o.rEND+'-$B$'+o.rMIN+'</kbd> — <b>Minimum liquidity</b> is ANCHORED (<kbd>F4</kbd> locks it) so it holds when you fill '+o.cushRng+' right · the negative weeks are what the lenders read first',
+      '☆ the discovery: select a flow line THROUGH its empty total cell ('+o.asRng+') and one <kbd>alt</kbd>+<kbd>=</kbd> writes and commits the cross-foot — one <kbd>ctrl</kbd>+<kbd>d</kbd> down '+o.totRng+' then totals every flow line. Typing the SUM clears the beat too; it just costs the keys',
     ]; },
+    /* rings: ① net flow · ② the beginning row (weeks 2-8) · ③④ the ending row · ⑤ the total
+       column · ⑥ the cushion row · ☆ never ringed (r423 §2 mystery slot) */
+    targets(){ const o=this._o; return [o.netRng, o.begRng, o.endRng, o.endRng, o.totRng, o.cushRng, null]; },
+    demo(){ const o=this._o; return [
+      {sel:'B'+o.rNET,  keys:[...T('=B'+o.rTR+'-B'+o.rTD), Kb.enter]},
+      {sel:o.netRng,    keys:[Kb.fillR]},
+      {sel:'C'+o.rBEG,  keys:[...T('=B'+o.rEND), Kb.enter]},
+      {sel:o.begRng,    keys:[Kb.fillR]},
+      {sel:'B'+o.rEND,  keys:[...T('=B'+o.rBEG+'+B'+o.rNET), Kb.enter]},
+      {sel:o.endRng,    keys:[Kb.fillR]},
+      {sel:o.endRng,    keys:[Kb.bold]},                                  /* §1.0(a): the dress rides directly behind the row it dresses */
+      {sel:o.endRng,    keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
+      {sel:o.asRng,     keys:[Kb.eq]},                                    /* the ☆ move — AutoSum's ROW form, one press for the cross-foot */
+      {sel:o.totRng,    keys:[Kb.fillD]},
+      {sel:'B'+o.rCUSH, keys:[...T('=B'+o.rEND+'-$B$'+o.rMIN), Kb.enter]},
+      {sel:o.cushRng,   keys:[Kb.fillR]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 13-week cash flow, wks 1-8 ($000s)',txt:true,bold:true};
-      for(let i=0;i<8;i++) cells[colLetter(i+2)+2]={...blankCell(),value:'W-'+(i+1),txt:true,bold:true,align:'r'};
-      cells['J2']={...blankCell(),value:'8-wk',txt:true,bold:true,align:'r'};
-      [[4,'Operating receipts'],[5,'Operating disbursements'],[6,'Net cash flow'],[7,'Beginning cash'],
-       [8,'Ending cash'],[10,'Cushion vs. minimum'],[12,'Minimum liquidity']]
-        .forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===8)});
-      const open=rnd(15,60)*10, minL=rnd(8,25)*10;
-      cells['B7']={...blankCell(),value:open,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['B12']={...blankCell(),value:minL,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      this._exp=[]; let beg=open, totR=0, totD=0, totN=0;
-      for(let i=0;i<8;i++){ const col=colLetter(i+2);
-        const rec=rnd(30,90)*10, dis=rnd(30,95)*10;
-        cells[col+4]={...blankCell(),value:rec,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+5]={...blankCell(),value:dis,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        [6,7,8,10].forEach(r=>{ const k=col+r; if(!cells[k]) cells[k]={...blankCell(),fmtStyle:'comma',decimals:0}; });
-        const ncf=rec-dis, end=beg+ncf;
-        this._exp.push({ncf, beg, end, cush:end-minL});
-        totR+=rec; totD+=dis; totN+=ncf; beg=end;
+      /* §1.2 RANDOMIZATION — three independent axes. This is a full-grid artifact, so §1.2's
+         corner-jitter substitution for the site pool applies and the §4 page's "verify" is met
+         by making the jitter real: (a) the BLOCK DEPTHS move — 2 or 3 receipt lines and 3 or 4
+         disbursement lines, so every graded row shifts up to two rows between seeds and nothing
+         can be replayed from muscle memory; (b) the line labels come from Fisher-Yates shuffled
+         pools and the deal takes a codename; (c) every figure runs through rnd(), plus the
+         week-1 date, the opening cash and the covenant floor. */
+      const pick=(pool,k)=>{ const b=pool.slice(); for(let i=b.length-1;i>0;i--){ const j=rnd(0,i); [b[i],b[j]]=[b[j],b[i]]; } return b.slice(0,k); };
+      const nR=rnd(2,3), nD=rnd(3,4), n=nR+nD;
+      const rD0=6+nR, rTR=5+nR, rTD=6+n, rNET=7+n, rBEG=8+n, rEND=9+n, rCUSH=10+n, rMIN=12+n, rOPEN=13+n;
+      const CL=['B','C','D','E','F','G','H','I'];
+      /* every label is <=19 characters so it renders inside the 164px label column without
+         clipping into the figures (indent adds 13px on the detail lines) */
+      const RX=[['Other receipts',3,22],['Deposit releases',2,16],['Asset sales',4,28],['Rebates & credits',2,14],['Royalty receipts',2,12]];
+      const DX=[['Rent & occupancy'],['Debt service'],['Insurance & taxes'],['Professional fees'],['Freight & duty']];
+      const recvLines=[['Customer receipts',52,84]].concat(pick(RX,nR-1));
+      const disbLines=['Payroll & benefits','Vendor payments'].concat(pick(DX,nD-2).map(x=>x[0]));
+      /* the disbursement block is split off the week's total by weight, payroll heaviest, so the
+         detail is internally consistent with the subtotal a player can see. Every figure is a
+         multiple of 10, so a player who types the numbers instead of referencing them lands on
+         the same value the formula does (§1.0(c) freedom). */
+      const wts=[42,34].concat(new Array(nD-2).fill(Math.round(24/(nD-2))));
+      let recv=[], disb=[], totR=[], totD=[], net=[], beg=[], end=[], cush=[], open=0, minL=0;
+      for(let att=0; att<400; att++){
+        recv=[]; disb=[]; totR=[]; totD=[]; net=[]; let ok=true;
+        for(let i=0;i<8;i++){
+          const r=recvLines.map(Lx=>rnd(Lx[1],Lx[2])*10);
+          const tr=r.reduce((a,b)=>a+b,0);
+          let nf=rnd(-40,45)*10;
+          if(tr-nf<420) nf=tr-420;                              // keep the disbursement block big enough to split
+          const td=tr-nf;
+          const jw=wts.map(w=>w*(100+rnd(-15,15))/100);
+          const sw=jw.reduce((a,b)=>a+b,0);
+          const d=jw.map(w=>Math.round(td*w/sw/10)*10);
+          d[0]=td-d.slice(1).reduce((a,b)=>a+b,0);
+          if(d.some(v=>v<20)){ ok=false; break; }
+          recv.push(r); disb.push(d); totR.push(tr); totD.push(td); net.push(tr-td);
+        }
+        if(!ok) continue;
+        open=rnd(160,300)*10;
+        beg=[]; end=[]; let b=open;
+        for(let i=0;i<8;i++){ beg.push(b); const e=b+net[i]; end.push(e); b=e; }
+        if(!end.every(v=>v>=200 && v<=9000)) continue;          // every figure stays <=5 glyphs, so nothing can render ##### (see colW)
+        minL=Math.min.apply(null,end)+rnd(5,28)*10;             // the covenant floor sits ABOVE the trough, so at least one week breaches — the drama the artifact exists for
+        if(minL<400 || minL>4500) continue;
+        cush=end.map(e=>e-minL);
+        break;
       }
-      [4,5,6].forEach(r=>cells['J'+r]={...blankCell(),fmtStyle:'comma',decimals:0});
-      this._tot={r:totR, d:totD, n:totN};
-      return {ROWS:12, cells, active:{r:6,c:2}, sel:null, colW:{1:158,2:76,3:76,4:76,5:76,6:76,7:76,8:76,9:76,10:76}};   // r190: paren negatives — "(1,800)" must fit on every seed
+      // ---- the page
+      cells['A1']={...blankCell(),value:codename()+' — 13-week cash flow forecast ($000s)',txt:true,bold:true};
+      cells['A2']={...blankCell(),value:'Weeks 1-8 of 13 · prepared for the lender group · flows gross and positive; net = receipts less disbursements',txt:true,it:true,fontColor:'gray'};
+      const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const base=new Date(Date.UTC(2026, rnd(0,11), rnd(1,20)));
+      base.setUTCDate(base.getUTCDate()+((5-base.getUTCDay()+7)%7));      // week-ending Fridays, the desk convention
+      const wkLab=i=>{ const d=new Date(base.getTime()+i*7*86400000);
+        return String(d.getUTCDate()).padStart(2,'0')+'-'+MON[d.getUTCMonth()]; };
+      cells['A4']={...blankCell(),value:'Week ending',txt:true,bold:true,bb:true};
+      for(let i=0;i<8;i++) cells[CL[i]+'4']={...blankCell(),value:wkLab(i),txt:true,bold:true,align:'r',bb:true};
+      cells['J4']={...blankCell(),value:'8-wk total',txt:true,bold:true,align:'r',bb:true,bl:true};
+      const rowVals={};                                                   // row -> the eight weekly figures, for the 8-wk total expectations
+      recvLines.forEach((Lx,j)=>{ const r=5+j;
+        cells['A'+r]={...blankCell(),value:Lx[0],txt:true,indent:1};
+        rowVals[r]=recv.map(w=>w[j]);
+        for(let i=0;i<8;i++) cells[CL[i]+r]={...blankCell(),value:recv[i][j],fmtStyle:'comma',decimals:0,fontColor:'blue'}; });
+      cells['A'+rTR]={...blankCell(),value:'Total receipts',txt:true,bold:true};
+      rowVals[rTR]=totR.slice();
+      for(let i=0;i<8;i++) cells[CL[i]+rTR]={...blankCell(),formula:'=SUM('+CL[i]+'5:'+CL[i]+(4+nR)+')',value:totR[i],fmtStyle:'comma',decimals:0,bt:true};
+      disbLines.forEach((nm,j)=>{ const r=rD0+j;
+        cells['A'+r]={...blankCell(),value:nm,txt:true,indent:1};
+        rowVals[r]=disb.map(w=>w[j]);
+        for(let i=0;i<8;i++) cells[CL[i]+r]={...blankCell(),value:disb[i][j],fmtStyle:'comma',decimals:0,fontColor:'blue'}; });
+      cells['A'+rTD]={...blankCell(),value:'Total disbursements',txt:true,bold:true};
+      rowVals[rTD]=totD.slice();
+      for(let i=0;i<8;i++) cells[CL[i]+rTD]={...blankCell(),formula:'=SUM('+CL[i]+rD0+':'+CL[i]+(5+n)+')',value:totD[i],fmtStyle:'comma',decimals:0,bt:true};
+      /* the three player rows below ship EMPTY but pre-formatted — the lesson here is the model,
+         not the dress, so doctrine §2.1b says the board arrives dressed. Net cash flow keeps its
+         subtotal rule and weight; the ENDING row arrives undressed on purpose, because dressing
+         it is beat 4. */
+      cells['A'+rNET]={...blankCell(),value:'Net cash flow',txt:true,bold:true};
+      rowVals[rNET]=net.slice();
+      for(let i=0;i<8;i++) cells[CL[i]+rNET]={...blankCell(),fmtStyle:'comma',decimals:0,bt:true,bold:true};
+      cells['A'+rBEG]={...blankCell(),value:'Beginning cash',txt:true};
+      cells['B'+rBEG]={...blankCell(),formula:'=B'+rOPEN,value:open,fmtStyle:'comma',decimals:0};
+      for(let i=1;i<8;i++) cells[CL[i]+rBEG]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['A'+rEND]={...blankCell(),value:'Ending cash',txt:true,bold:true};
+      for(let i=0;i<8;i++) cells[CL[i]+rEND]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells['A'+rCUSH]={...blankCell(),value:'Cushion vs. minimum',txt:true};
+      for(let i=0;i<8;i++) cells[CL[i]+rCUSH]={...blankCell(),fmtStyle:'comma',decimals:0};
+      /* THE TOTAL COLUMN ships uniformly dressed — its own left rule, comma, no bold, no top
+         border — so the fill down it propagates exactly what is already there. A subtotal's top
+         border stops at column I by design: filling J from a bordered source would carry the
+         rule onto every detail line, and filling it from an unbordered one would STRIP the rule
+         off J's subtotal cells, which is the r439 `cases` degradation (a ☆ route that leaves the
+         board worse than the route it beats). One uniform column removes the trap entirely. */
+      for(let r=5;r<=rCUSH;r++) cells['J'+r]={...blankCell(),fmtStyle:'comma',decimals:0,bl:true};
+      // ---- §1.0(f)+§1.0-R2(l) assumptions: stacked, individually named after the assumption
+      //      itself (r430 — "Helper" names the drill's plumbing and tells a player nothing),
+      //      light yellow + all borders, blue figure, POPULATED. Never graded targets.
+      cells['A'+rMIN]={...blankCell(),value:'Minimum liquidity',txt:true};
+      cells['B'+rMIN]={...blankCell(),value:minL,fontColor:'blue',fill:'yellow',ball:true,fmtStyle:'comma',decimals:0,align:'c'};
+      cells['A'+rOPEN]={...blankCell(),value:'Opening cash (wk 1)',txt:true};
+      cells['B'+rOPEN]={...blankCell(),value:open,fontColor:'blue',fill:'yellow',ball:true,fmtStyle:'comma',decimals:0,align:'c'};
+      if(rOPEN<=18) cells['A20']={...blankCell(),value:'Source: treasury weekly bank sweep · no revolver draw assumed',txt:true,it:true,fontColor:'gray'};
+      // ---- expectations
+      const jrows=[]; const jexp={};
+      for(let r=5;r<=rNET;r++){ jrows.push(r); jexp[r]=rowVals[r].reduce((a,b)=>a+b,0); }
+      this._o={ nR:nR, nD:nD, rTR:rTR, rTD:rTD, rNET:rNET, rBEG:rBEG, rEND:rEND, rCUSH:rCUSH,
+        rMIN:rMIN, rOPEN:rOPEN, jrows:jrows, jexp:jexp,
+        exp:{net:net.slice(), beg:beg.slice(), end:end.slice(), cush:cush.slice()},
+        netRng:'B'+rNET+':I'+rNET, begRng:'C'+rBEG+':I'+rBEG, endRng:'B'+rEND+':I'+rEND,
+        cushRng:'B'+rCUSH+':I'+rCUSH, totRng:'J5:J'+rNET, asRng:'B5:J5' };
+      /* colW: the label column holds the longest 19-character line at 164px; the week columns
+         hold the widest figure any seed can print — ending cash is capped at 9,000 and every
+         negative prints in parens, so 5 glyphs × CHARPX + PAD_NUM = 55px against 70; the total
+         column takes an 8-week net that can run to (30,000), 7 glyphs = 72px against 92. Total
+         sheet 816px, inside the frame at 1440 and elastic below it (no width verdict is graded
+         here, so the drill stays out of __noShrink). */
+      const colW={1:164}; for(let c=2;c<=9;c++) colW[c]=70; colW[10]=92;
+      return {ROWS:20, cells, active:{r:rNET,c:2}, sel:null, colW:colW};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<0.5; };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase(); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D','E','F','G','H','I'];
-      const IDX=[0,1,2,3,4,5,6,7];
-      const anchOk=(function(){ const c=S.cells['C10']; if(!c||!c.formula) return false;
-        return String(c.formula).toUpperCase().indexOf('$B$12')>=0; })();
-      const dressOk=IDX.every(i=>{ const c=S.cells[COL[i]+'8']; return !!(c&&c.bold&&c.bt); });
+      const o=this._o;
+      const cel=k=>S.cells[k]||{};
+      const num=k=>{ const c=cel(k); return typeof c.value==='number' ? c.value : null; };
+      const near=(k,exp)=>{ const v=num(k); return v!==null && Math.abs(v-exp)<0.5; };
+      const CL=['B','C','D','E','F','G','H','I'];
+      /* §1.0(c) FREEDOM + §1.0-R3(p) END-STATE GRADING: beats 1, 3, 5 and 6 read only what the
+         page SHOWS, so a typed figure clears exactly like a referenced-and-filled one and the
+         clock prices the difference. Every seeded figure is a multiple of 10, so the slow route
+         can land the value exactly. */
+      const rowOk=(r,exp)=>CL.every((Lx,i)=>near(Lx+r,exp[i]));
+      const netOk=rowOk(o.rNET,o.exp.net);
+      /* BEAT 2 IS THE ONE CONVENTION GRADE ON THIS BOARD, and MODELING_STANDARDS §7 names it
+         explicitly: "a beginning balance that REFERENCES rather than repeats" is legitimately
+         gradeable as end state, and §3 makes it the lesson ("The Beginning cell must REFERENCE
+         the prior Ending — never re-type it"). It reads c.formula, NEVER formula TEXT, so
+         =B14, =+B14, =SUM(B14) and a pointed reference all clear (the untriggerable-beat class,
+         DEPTH_PASS_CAMPAIGN §1, is grading text). The label opens with "Reference" — the §1.7
+         closed-list verb for exactly this — so a player can act on it from the label alone
+         (doctrine §2.5) and can never be left staring at a right-looking number on a dark line. */
+      const begOk=CL.slice(1).every((Lx,i)=>{ const c=cel(Lx+o.rBEG); return !!c.formula && near(Lx+o.rBEG,o.exp.end[i]); });
+      const endOk=rowOk(o.rEND,o.exp.end);
+      /* §1.0(f): a total earns its rule ABOVE. bt OR ball clears — Alt H B P, Alt H B S (which
+         boxes the row and so sets its top edge), Alt H B A and the Format Cells border tab all
+         reach this state (§1.0-R3(p): enumerate the routes, grade the end state). A bottom
+         border is not REJECTED, because H B S legitimately draws one on the way to the top edge;
+         what the house rule forbids is a bottom border INSTEAD of a top, and that never clears. */
+      const dressOk=CL.every(Lx=>{ const c=cel(Lx+o.rEND); return !!(c.bold && (c.bt||c.ball)); });
+      /* the flows-only discipline is folded into the ok of the action check it protects (§1.1 —
+         no do-nothing lines): the eight-week column totals every flow line, and the three balance
+         rows carry no number out there, because a balance does not add across weeks. A dash or a
+         memo in those cells is tolerated; a figure is not. */
+      const totOk=o.jrows.every(r=>near('J'+r,o.jexp[r]))
+        && [o.rBEG,o.rEND,o.rCUSH].every(r=>typeof cel('J'+r).value!=='number');
+      const cushOk=rowOk(o.rCUSH,o.exp.cush);
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, SKIPPABLE decision): the total column
+         from ONE cross-foot and ONE carry. Read off the r436 S.autoSumN latch (the MECHANIC — a
+         typed =SUM and an autosummed one leave identical cells behind) plus the r424 S.fillOps
+         rect. The fill conjunct is not the discovery; it is the filter that refuses the
+         nine-separate-Alt+= route, which costs 18 keys against the typed route's 13 and must not
+         be rewarded for pressing the right chord badly. Skippable by construction: typing the
+         SUM and filling clears beat 5 identically and leaves the star dark — ALT 2 in
+         dev/e2e-alt-paths.js is that measured negative control. */
+      const oneCarry=(S.fillOps||[]).some(f=>(f.dir==='down'||f.dir==='up') && f.c1<=10 && f.c2>=10 && f.r1<=5 && f.r2>=o.rNET);
+      const starOk=totOk && (S.autoSumN||0)>=1 && oneCarry;
+      /* DEPTH_PASS §4.75 beats, in board order, with the §1.0(a) dress folded in directly behind
+         the row it dresses. Labels are INSTRUCTIONS (§1.0-R3(n)): the clause after the dash says
+         WHAT or WHERE, never why. */
       return [
-        {label:'run net cash flow, all eight weeks \u2014 receipts less disbursements', ok: IDX.every(i=>near(COL[i]+'6',this._exp[i].ncf))},
-        {label:'build the roll-forward \u2014 each week opens where the last closed', ok: IDX.slice(1).every(i=>near(COL[i]+'7',this._exp[i].beg)) && [1,2,3].every(i=>refs(COL[i]+'7',[COL[i-1]+'8']))},
-        {label:'run ending cash across the sheet', ok: IDX.every(i=>near(COL[i]+'8',this._exp[i].end)) && refs('B8',['B7','B6'])},
-        {label:'run the cushion vs. minimum \u2014 the anchor holds ($B$12 does not walk)', ok: IDX.every(i=>near(COL[i]+'10',this._exp[i].cush)) && anchOk},
-        {label:'total the FLOWS \u2014 SUM across receipts, disbursements, net', ok: near('J4',this._tot.r)&&near('J5',this._tot.d)&&near('J6',this._tot.n)&&refs('J4',['SUM('])},
-        {label:'bold the ending-cash row and add a top border above it', ok: dressOk},
+        {label:'Build the net cash flow row — total receipts less total disbursements', ok: netOk},
+        {label:'Reference the beginning-cash row to the prior week’s ending cash', ok: begOk},
+        {label:'Build the ending-cash row — beginning cash plus net cash flow', ok: endOk},
+        {label:'Bold the ending-cash row and add a top border above it', ok: dressOk},
+        {label:'Total every flow line — the balance rows get no total', ok: totOk},
+        {label:'Build the cushion row — ending cash less the minimum liquidity floor', ok: cushOk},
+        {label:'Total every flow line from one AutoSum and one fill', ok: starOk, bonus:true},
       ];
     }
   },
