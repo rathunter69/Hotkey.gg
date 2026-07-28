@@ -9,7 +9,13 @@ const BASE = process.env.BASE || 'http://127.0.0.1:8791';
 const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'billing.html', 'leaderboard.html', 'desks.html'];
 
 (async () => {
-  const exe = process.env.CHROME || chromium.executablePath();
+  /* r429: smoke was the ONE suite resolving the browser via chromium.executablePath(), which
+     points at whatever build playwright-core ships with (chromium-1234) — not the build actually
+     installed in this image (chromium-1194). Every other dev/e2e-*.js pins the 1194 path, so
+     smoke alone failed to launch unless CHROME was exported by hand. Same precedence as the rest
+     of the fleet now, with the library path kept as the last resort. */
+  const PINNED = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+  const exe = process.env.CHROME || (require('fs').existsSync(PINNED) ? PINNED : chromium.executablePath());
   const browser = await chromium.launch({ executablePath: exe, args: ['--no-sandbox'] });
   const fails = [];
   for (const p of PAGES) {

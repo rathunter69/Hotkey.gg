@@ -1,4 +1,4 @@
-# WORKFLOW.md — how we build hotkey.gg (process standards, v1.1 · 2026-07-24)
+# WORKFLOW.md — how we build hotkey.gg (process standards, v1.2 · 2026-07-26)
 
 _This is the operating system for every session. PROJECT_CONTEXT.md = what the product is +
 the live handoff. PIPELINE.md = WHAT to build next. AUDIT.md = what each round did.
@@ -163,3 +163,78 @@ in DEPTH_PASS.md (which carries the spec and the binding rules). They live in
 sign convention, the roll-forward shape, the standard formula forms, circularity handling and
 the error checks a real model carries. A correct keystroke on a wrong model is worse than no
 drill, and a banker judges the model first.
+## 9 · THE WAVE PLAYBOOK — drill builds at scale on Opus-5 sessions (r428, 2026-07-26)
+
+_WHY THIS SECTION EXISTS (the r427 incident): 12 parallel worktree agents each appended their own
+registrations to the SAME shared files. The union-merge assembly corrupted every one of them —
+check-invariants.js, e2e-depth-mechanics.js, and e2e-alt-paths.js all had to be rebuilt by hand
+(one ALTS entry shipped a literal SyntaxError; depth-mechanics parked merged sections after
+`process.exit()` as dead code), and two whole hunks (housestyle's index.html rework + its
+`S.gotoSpecials` telemetry) were silently LOST until the orchestrator noticed. The session then
+hit its limit before writing docs. Every rule below is a direct consequence._
+
+### 9.1 Ownership law — who may edit what
+A drill build agent OWNS exactly: **its drill's CHALLENGES block in index.html** (between its
+`key:{` and the next drill's key) + **a dedicated probe script** (`dev/verify-<key>.js`) if it
+needs one. EVERYTHING ELSE IS SHARED and off-limits to build agents:
+`drills.js` (meta/groups/PARS/CLOCKS/capstone fields) · `dev/check-invariants.js` (C9 list +
+custom guards) · `dev/e2e-alt-paths.js` (ALTS) · `dev/e2e-depth-mechanics.js` ·
+`refmap.js`/`drills/*.html`/`sitemap.xml` (GENERATED — regenerate once per batch, never hand-edit)
+· engine code outside the drill's block (new telemetry like `S.fmtOps`/`S.pasteLog` is an
+ORCHESTRATOR-applied payload item, flagged loudly in the report).
+Shared-file changes ship as a **PAYLOAD** in the agent's report; the orchestrator applies payloads
+SERIALLY, one drill at a time, verifying after each. No exceptions — a wave where agents edit
+shared files directly re-creates r427.
+
+### 9.2 The payload contract (the agent's final report, verbatim sections)
+1. Worktree path + list of files touched (must match §9.1 ownership).
+2. The drill's **AUDIT.md round entry**, fully written, ready to paste (the r425 entries are the
+   exemplars — beats/☆/board/random/par/alts/tests, file:line anchors). The agent writes it while
+   the context is hot; the orchestrator must never reconstruct it (that's how r426/r427 lost theirs).
+3. **ALTS entries** as paste-ready code (≥2 per DEPTH_PASS §1.8), each already run green ×3 seeds
+   in the worktree.
+4. **Invariant registration**: the C9 line delta + any custom guard, as a paste-ready diff.
+5. **drills.js deltas**: meta/desc (de-hint clean), PARS value (from the sweep), CLOCKS override
+   if the §4 page grants one, capstone fields if applicable.
+6. **Engine telemetry** needed by the ☆ (if any): the exact hunk + why existing telemetry
+   (fillOps/pasteOpLog/fmtOps/cutMoves/gotoSpecials) could not carry it.
+7. Par-sweep result (median, drift %, s/key vs the house band) + test matrix (replay ×3 · guided ·
+   fit · own probe) + screenshot paths (fresh/mid/win).
+8. **Spec deviations**, each with the §-anchor it deviates from + rationale — or the sentence
+   "built to page verbatim". A needed-but-missing spec detail is a SPEC BUG: the agent STOPS and
+   reports it instead of improvising (DEPTH_PASS §0).
+
+### 9.3 The orchestrator's assembly loop (serial, per drill, in catalog order)
+apply CHALLENGES block → apply engine-telemetry hunk (if any) → apply drills.js deltas → apply
+invariant registration → append ALTS → `node --check` extracted scripts + drills.js →
+`check-invariants.js` → replay THAT drill ×3. Only then the next drill. Batch close (once):
+full-catalog replay · alt-paths · depth-mechanics · par-sweep · fit-sweep · smoke · cache `?v=`
+bump · regenerate drill pages/sitemap/refmap (byte-stable ×2) · paste the agents' AUDIT entries ·
+PIPELINE ⚡ refresh · PR · post-batch brief to Wolf (§8). Before any browser run: verify the 8791
+server's cwd is the main checkout (§7 hygiene); agents test on their OWN ports and kill them.
+
+### 9.4 Model routing for the Opus-5 era (extends §7)
+- **Opus 5 is the default tier** for the orchestrator AND drill build agents — the specs are
+  model-proof by construction (§8, DEPTH_PASS §0), so builds are execution, not design. Do not
+  hold waves waiting for a bigger model.
+- **Escalate to the highest tier available** only for: playtest-feedback INTEGRATION rounds (the
+  r420c/r420d law-writing class — new binding rules must be authored, not followed), engine
+  SEMANTICS changes (Excel-parity judgment on the 15.9k-line single-scope engine), and
+  security/money-adjacent work.
+- **Route down (sonnet/haiku)** the mechanical tail: drill-page regeneration checks, rename
+  sweeps against a locked table, screenshot harness runs, par-sweep executions.
+- Opus-specific guardrails, learned r425–r427: keep waves at **≤5 drills + hard-serial assembly**
+  (the failure was integration, not build quality); agents must QUOTE the §-line they implement
+  in code comments for every judgment call (the r425 undo/dress entries show the pattern); an
+  agent that cannot make a §4 page's numbers work reports a spec bug — improvisation is the
+  Opus-era failure mode the whole §8/§9 apparatus exists to prevent.
+
+### 9.5 Session shape for a wave (the one-session recipe)
+Open: read PROJECT_CONTEXT ⚡ → PIPELINE ⚡ → DEPTH_PASS §0/§1 → this section. Confirm main is
+fetched, branch restarted. Launch the wave's build agents in parallel (worktrees, own ports) —
+`.claude/workflows/drill-wave.js` encodes the launch + payload prompt; assembly stays with the
+orchestrator per §9.3. While agents run: knock out one [auto·S] queue item (never a shared-file
+one). Assemble serially, close the batch, ship, write the brief, reconcile docs (§3.5), leave
+zero uncommitted work. If the session is dying mid-assembly: commit what is VERIFIED, list the
+unapplied payloads verbatim in PROJECT_CONTEXT's handoff, and say which drills are NOT in the
+C9 ledger yet — never leave "restart insurance" WIP as the only record.

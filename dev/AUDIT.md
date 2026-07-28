@@ -1350,6 +1350,622 @@ grow a filled column of answers._
   (72 drills) · e2e-depth-mechanics 155/0 · e2e-smoke ALL 7 PAGES CLEAN (count 76).
 - **NOT DONE, deliberately:** drills/*.html, refmap.js and the drills.js?v= bump are left to the
   integrator per the dispatch; the width-engine findings in campaign §6 were not touched.
+## r429 H6b-5 — qclose★ (DEPTH_PASS §4.32 + §2.4 + D1) — **CHAPTER 3 COMPLETE (12 of 12)**
+- **A NEW DRILL, NOT A REWORK** — the first one this pass. `qclose` is the **Formulas I capstone**:
+  a quarterly close built cold from a feed, carrying the chapter's five formula shapes in ONE
+  artifact — point (gross profit off the revenue and cost lines), fill (the FY column down every
+  P&L line), lock (the `B$4` margin divisor), grow (quarter on quarter), roll up (the segment
+  SUMIF). That is the §4.32 concept and it is the aha: *a P&L is five shapes run in one breath*.
+- **FULL PLUMBING ROW, all in this one commit** (a new drill costs more than a rework):
+  `drills.js` Formulas I group +`qclose` **last** · `meta.qclose` with `capstone:true` ·
+  `HOTKEY_CAMPAIGN.chapters[2].capstone:'qclose'` · `HOTKEY_CLOCKS.qclose={pass:188}` ·
+  `HOTKEY_PARS.qclose=94` · **`dev/migrate-certificates.sql`'s hardcoded `formulas` array in the
+  SAME PR** (the r359 drift rule — `HK_TRACKS` derives from the group, the SQL does not) ·
+  C9 ledger · a generated SEO page + sitemap entry. The achievement/`HOTKEY_CAPSTONES` rows already
+  named `qclose`, so those needed nothing.
+- **☆ — INDEPENDENT PROVE-OUT, and a DEVIATION recorded out loud.** FY gross profit exists twice
+  over: summed ACROSS the four quarters, and buildable DOWN the FY column as revenue plus cost. The
+  check cell puts one against the other. This is the family's **third** use in c3 (anchor, sumif),
+  past the r429 twice-per-chapter cap. Kept deliberately: **a capstone's job is to close a page, and
+  "does it tie?" is the closing discipline** — for the drill that gates Data & Lookups no other ☆ is
+  honest. Not adjacent to its last use (four drills back) and it teaches a third failure mode
+  (anchor: an anchor can be silently wrong · sumif: a rollup can silently MISS rows · here: two
+  routes to the same number can silently disagree). **Flagged for the playtest** — if c3's ☆s read
+  samey end to end, the knob is the family rule in §1.0-R3(o), not this drill.
+- **§2.2 PROVED, NOT ASSERTED:** this drill gates a chapter, so "a bonus can never gate anything"
+  had to be demonstrated. **ALT 2 leaves the check cell untouched** and clears all six cores —
+  the capstone opens Data & Lookups with the ☆ forfeited. ALT 1 proves the other direction: the tie
+  run the OTHER way round (`=SUM(B:E gp) - F rev - F cogs`) still latches, because §1.0(c) means the
+  ☆ reads the RESULT of the prove-out, not one spelling of it.
+- **§1.0(c) THROUGHOUT:** every core beat grades VALUES. ALT 2 types all twenty-odd figures as raw
+  numbers with no fill anywhere and clears — the clock is what prices the difference.
+- **§1.2 AXES (four):** which FOUR of six operating lines appear · a segment-name pool + codename +
+  fiscal year · every figure through `rnd()` and a 6–9 row ledger · **the margin and growth rows
+  SWAP places**, so the two percent rows are never in a fixed spot and the labels have to be read.
+  30/30 distinct builds.
+- **HARNESS:** `e2e-alt-paths.js` now prints a **`[☆ n/reps]` counter** on every alt that carries a
+  bonus. The ☆-forfeit contract already failed alts that claimed forfeit and earned it; the counter
+  makes the opposite case visible too — an alt meant to EARN the ☆ silently latching 0/3 used to
+  read as a clean PASS. ALT 1 here reads `[☆ 3/3]`, ALT 2 reads `[☆ 0/3]`.
+- **MARKETING COPY CAUGHT BY THE SMOKE GATE:** `index.html` + `About.html` said "81 banker-grade
+  drills" in five meta tags. `drill-count` compares that copy to `menuOrder.length` — now 82.
+- **PAR:** swept fresh at **94/86** (median 86, 0% drift, 1.09 s/key — the same ratio gauntlet★
+  sits at). Capstone clock `pass` in lockstep at par×2 = 188; the restored capstone invariant
+  asserts it.
+- **STALE COMMENT FIXED:** `HOTKEY_CLOCKS.gauntlet` said "par 52 × 2" next to `pass: 94` — the
+  number was right (par 47), the comment was the pre-retune one.
+- **TESTS:** replay 3/3 · **full-catalog replay ALL GREEN** · depth-contract PASS (density 17/20,
+  30/30 distinct) · guided PASS (full sweep 85 PASS) · **alt-paths 2/2 (full sweep 107 PASS)** ·
+  par-sweep FLAGGED 0 · fit-sweep clean (78) · smoke ALL 7 PAGES CLEAN · invariants clean
+  (capstone wiring: 3 designated) · drills.js?v=300→301 · 82 drill pages regenerated.
+  `e2e-depth-mechanics` sits at 150/5 — the 5 failures reproduce identically on HEAD (verified
+  against a clean `git archive` tree), so they are pre-existing and untouched by this drill.
+- **CHAPTER 3 IS DONE.** c1 9/9 (modeltour★) · c2 10/10 (gauntlet★) · c3 12/12 (qclose★) —
+  **31 of 82 drills at the depth-pass standard, and three complete chapters to playtest.**
+
+## r429 H6b-5 — cases (DEPTH_PASS §4.31) — wave 5 at 11 of 12
+- **🔴 THE CATALOG'S WORST MISALIGNMENT IS CLOSED.** `targets` was **NINE** entries against **SIX**
+  checks and `guide` was **FOUR** — so the guided ring landed on the wrong cell from step 2 onward,
+  and the hint ladder was off by two for most of the drill. This is the single worst instance of the
+  AUDIT_R417 §C class. All three arrays are now 6+1 and index-aligned.
+- **DOCUMENTED DEVIATION FROM §4.31's PROPOSED BEAT LIST:** the page suggests swapping the
+  model-build and %-growth beats for "enter 2 in the switch" and "bold the output header". That
+  would REDUCE the drill — it is the richest thing in c3 (par 89 after retune, still the chapter's
+  longest by design) and the model-runs-off-the-driver beat is the reason the switch means anything
+  at all. **The six beats are KEPT**; the page's real asks (alignment, a ☆, the language pass) are
+  applied on top. If Wolf wants the shorter shape at playtest it is a small edit from here.
+- **☆ — FORMULA CLONING** (cagr's family, five drills back so non-adjacent, and it teaches something
+  different there): the two CHOOSE formulas differ by **exactly one row**, so the growth pull is the
+  case pull copied down — the references walk themselves. Graded off `S.pasteLog` + a translate
+  census. ALT 2 clones by **paste-special-FORMULAS** instead of plain Ctrl+V, proving the latch is
+  not tied to one paste kind; ALT 1 types both and forfeits.
+- **§1.0(b) LANGUAGE:** every check label rewritten to the outcome form — the formulas moved into
+  guide/req where the route belongs (the labels were literally reciting `=CHOOSE($B$3,B5,C5,D5)`).
+- **PAR:** 94/100 → **89/81** (median 81, 0% drift, 1.10 s/key). The clone route replaces a typed
+  second CHOOSE.
+- **TESTS:** replay 3/3 · depth-contract PASS (density 15/21) · guided PASS · alt-paths 2/2 ·
+  par-sweep FLAGGED 0 · invariants clean · drills.js?v=299→300.
+
+## r429 H6b-5 — fxconvert (DEPTH_PASS §4.30 + D13) — wave 5 at 10 of 12
+- **BOTH AUDIT FINDINGS THE PAGE NAMES ARE CLOSED:** guide was **3 entries against 5 checks**, so
+  from step 2 on every hint pointed at the wrong beat (the AUDIT_R417 §C misalignment class) — now
+  5+1 index-aligned. And the drill had **ZERO registered ALTS** — now two, including the ☆-forfeit
+  control.
+- **§1.0(c) VIOLATION FIXED (the third of this wave):** core required every USD cell's formula TEXT
+  to contain `$B$3`. Typing the rate inline, or pasting values, produces identical numbers — a
+  ROUTE requirement. Core grades VALUES now; ALT 2 types all fifteen conversions with the rate
+  inline and clears every core.
+- **☆ — the drill's actual lesson, not a dress chore** (§4.30's "bold the rate cell" is a formatting
+  ☆, dead under §1.0(d)): **the whole block from ONE anchored formula**, graded by census + the
+  anchor holding + fills covering the row and the block. The point lands in the label: *move the
+  rate and the page re-prices itself* — the typed route cannot do that, which is exactly why it
+  forfeits.
+- **☆-FAMILY RULE AMENDED A SECOND TIME, out loud rather than quietly bent.** The twice-per-chapter
+  cap is right for incidental families and WRONG for a chapter's core craft: c3 is the FORMULAS
+  chapter and its thesis is *one formula serves many cells*. Barring that from being the discovery
+  after its second outing forces invented bonuses — precisely what the first amendment existed to
+  prevent. **The cap no longer applies to the family that IS the chapter's declared craft;
+  adjacency and teach-something-new still bind.** Flagged for the playtest: if c3's ☆s read samey
+  in a row, this is the knob to turn, not the individual drills.
+- **PAR:** 35/34 → **39/35**. D13 de-hint applied to the desc.
+- **TOOLING GOTCHA WORTH KNOWING:** C9's parser scans the drill's SOURCE TEXT, so writing an example
+  of the pattern it greps for *inside a comment* makes it match the comment instead of the code.
+  Cost a debug cycle; the fix is noted in-source at fxconvert's `targets()`.
+- **TESTS:** replay 3/3 · depth-contract PASS · guided PASS · **alt-paths 2/2 (first ever for this
+  drill)** · par-sweep FLAGGED 0 · invariants clean · drills.js?v=298→299.
+
+## r429 H6b-5 — sumif + rollup (DEPTH_PASS §4.28/§4.29) — wave 5 at 9 of 12
+_Both drills carried the SAME two defects, which is worth naming as a pattern: a §1.0(c) route
+requirement baked into core, and §1.2 axes that existed on paper but not in the build._
+
+### sumif — "Roll up the segments"
+- **§1.0(c) VIOLATION FIXED:** core required the SUMIF to carry `$`-locked ranges. Three separately
+  written SUMIFs produce the same numbers, so that was a ROUTE requirement. Core now grades the
+  rollup VALUES; the anchors are taught in guide/req and paid for by the clock. **ALT 2 walks a
+  separate un-anchored SUMIF per segment and clears every core** — that is the proof.
+- **§1.2 AXES — the page said "verify axes"; there was effectively ONE** (the ledger amounts).
+  Segment names, both block sites, the ledger depth and the segment count were all fixed. Now:
+  site jitter · a 6-deep segment pool · 3–4 segments · an 8–12 row ledger. Every segment is
+  guaranteed a ledger row, so no share cell ever divides into a zero rollup.
+- **☆ RE-CUT to INDEPENDENT PROVE-OUT** (§4.28's "outside border around the summary" is a formatting
+  ☆, and unlike cagr's it is NOT real work worth promoting — dress is not this drill's lesson):
+  **the summary ties back to the ledger.** That is the actual desk discipline for a rollup — a pivot
+  nobody tied out is a rumour — and it is what makes the failure visible: a rollup that misses rows
+  still looks like a table full of numbers, and only the check moves off zero. Second use of the
+  family in c3 (anchor was first, five drills back) and legal under the r429 spacing rule: it
+  teaches a different failure (there an anchor is silently wrong; here rows silently go missing).
+- **PAR:** 57/59 → **76/69**.
+
+### rollup — "Cross-tab with SUMIFS"
+- **SAME §1.0(c) FIX:** core demanded the exact mixed anchors (`$F3` / `G$2`). Four separately
+  written SUMIFS give the same four numbers. Core now grades VALUES; the mixed-anchor discipline
+  moved to the ☆, where a route MAY be graded.
+- **PROMOTE, DON'T DELETE:** §4.29's "☆ Bold the grid's row and column headers" is a formatting ☆,
+  but the axes genuinely have to read — so it becomes **core beat 4**. 4 beats → 5.
+- **NEW ☆ — ONE-PASS FILL, 2-D** (family's second use in c3; bridge was first, two drills back, and
+  taught one fill per ROW — here the point is that MIXED anchors let a single formula spread in
+  BOTH directions). Needs the census AND fills covering the row and the block.
+- **§1.2 AXES:** segment and region names were HARDCODED and the grid nailed at F2:H5. Now both
+  axes draw from pools, the page jitters, and the deal list varies 9–11 rows.
+- **PAR:** 65/68 → **68/62**.
+- **TESTS (both):** replay 3/3 · depth-contract PASS · guided PASS · alt-paths 2/2 each (all four
+  rebuilt) · par-sweep FLAGGED 0 · invariants clean · full catalog green · drills.js?v=296→298.
+
+## r429 H6b-5 — cagr + bridge (DEPTH_PASS §4.26/§4.27 + D10) — wave 5 at 7 of 12
+### cagr — "Compound it, three times"
+- **PROMOTE, DON'T DELETE (§1.0-R3(o)):** the page's "percent-format all three in one pass" ☆ is a
+  formatting bonus and dead — but it is real work, so it becomes **CORE beat 4** and the three rate
+  beats stop demanding the format themselves. 4 beats → 5.
+- **NEW ☆ — FORMULA CLONING** (the copy-translate cousin of gauntlet's format cloning): the three
+  blocks are geometrically IDENTICAL — begin/end/years/answer at fixed offsets every time — so one
+  rate copied onto the other two answer cells lands its own references. That symmetry is now
+  **load-bearing and documented as such in build()**, not incidental. Latches off `S.pasteLog`
+  (≥2 pastes whose destination is an answer cell). Typing all three clears core and wins.
+- **PAR:** 55/57 → **38/34**. The drop is honest — the clone route is far shorter than three typed
+  compoundings.
+
+### bridge — "Point-mode formulas" (D10 complete)
+- **THE DEAD MEMO ROW BECOMES THE SECOND VERSE** (the page's own fix): a "Memo: growth" row sat on
+  the board unused — dead furniture, exactly what §1.0-R3(n) rule 1 bans. The revenue row now ships
+  with ONLY year one typed and the player grows years 2–5 off those rates. **2 beats → 6.**
+- **☆ PROMOTED AND REPLACED:** §4.27's "total the five EBITDA years" ☆ is not a formatting task, so
+  §1.0-R3(o) does not kill it — but it is an extra CALCULATION, not a hidden efficiency, which is
+  what §1.0(d) actually asks for. Promoted to core beat 5; the ☆ becomes **ONE-PASS FILL DISCIPLINE**
+  (family unused elsewhere in c3): both build rows carried across in a SINGLE fill each. Filling in
+  chunks clears every core and never latches — ALT 2 walks exactly that.
+- **🔴 A BOARD DEFECT THE DEPTH CONTRACT CAUGHT THAT EYES DID NOT:** the site pool's `[2,1]` entry
+  put the year headers on row 1 **alongside the title**, costing the board a whole row and dropping
+  it under the §1.3 density floor. It had been there since r187 and survived every prior gate,
+  because nothing measured density until r429. Site pool now keeps hr≥2. **This is the generic
+  contract earning its keep on its first wave.**
+- **PAR:** 10/6 → **29/26**. D10 finished: tab → 'Point', desc de-hinted.
+- **TESTS (both):** replay 3/3 · depth-contract PASS · guided PASS · alt-paths 2/2 each (all four
+  rebuilt) · par-sweep FLAGGED 0 · invariants clean · drills.js?v=294→296.
+- **RECURRING TRAP, worth a standing note:** cagr hit the **C9 static-parser** hole again —
+  guide/targets built with `.map()/.push()` read as `null`, so the tri-length guard silently stops
+  covering the drill. Third occurrence (margin, cagr). **Build these arrays as LITERALS.**
+
+## r429 H6b-5 — percent + growth (DEPTH_PASS §4.24/§4.25) — wave 5 at 5 of 12
+### percent — "Common-size both statements"
+- **ARTIFACT:** "Statement A / Statement B" → **two NAMED business units**. "Statement A" is exactly
+  the "Table 1" class §1.0-R3(n) rule 1 bans — a real file names its blocks. Common-sizing two units
+  against their own revenue is FP&A's daily job and comp prep in the same shape.
+- **☆ RE-CUT (§4.24's "italicize both % headers" was a formatting ☆):** ANCHORING MASTERY /
+  fill-census — each column ONE formula carried down, the lock being what makes the fill safe.
+  **Second use of the family in c3**, which is legal under the r429 amended spacing rule (below):
+  non-adjacent to margin, and it teaches a different thing (margin: a ratio column is one formula;
+  here: an unlocked divisor walks and the column goes quietly wrong).
+- **BLOCK A UN-NAILED** — it sat at a fixed C2 (the audit ask the page records); both statements now
+  site-shuffle, with independent 5–7 line depths.
+- **PAR:** 17/14 → **26/23** (median 23, 0% drift, 1.13 s/key).
+
+### growth — "Run the growth rates"
+- **§1.0(c) VIOLATION FIXED, and it was hiding the ☆.** The pre-rework CORE checks required the
+  formulas to REFERENCE particular cells (`refs('B7',['F4','B4'])`). Freedom says no core check may
+  demand a route — a player who types the endpoints has done the arithmetic and must clear. Core now
+  grades the VALUE; **the reference became the ☆** (REFERENCE-OVER-RETYPE: a CAGR pointed at the
+  consolidated row survives a restatement, a typed one goes quietly wrong). ALT 2 walks the fully
+  typed route and clears all five cores with the ☆ dark, which is the proof the fix is real.
+- **§4.25's "add site jitter if fixed" applied** — the board was nailed to rows 1–7 with two fixed
+  segment names; now row jitter + a 6-deep segment pool + which segment leads.
+- **PAR:** 36/35 → **50/46** (median 46, 0% drift, 1.09 s/key).
+
+### Spec amendment made in this batch
+- **§1.0-R3(o) ☆-FAMILY SPACING — the original rule was unachievable and is now honest.** It said a
+  ☆ must not repeat another ☆ in the SAME chapter; with 12-drill chapters and seven families that is
+  impossible by the pigeonhole, and it was pushing page authors toward strained bonuses. Amended to:
+  **no two ADJACENT drills share a family, and no family appears more than TWICE per chapter** —
+  and where one repeats, the second use must differ in what it TEACHES even if the shape rhymes,
+  stated on the page. Same intent, reachable.
+- **TESTS (both drills):** replay 3/3 · depth-contract PASS · guided PASS · alt-paths 2/2 each (all
+  four rebuilt — the old pairs hardcoded pre-rework geometry) · par-sweep FLAGGED 0 · invariants
+  clean · full-catalog replay green · drills.js?v=292→294.
+- **ROUTE-CANON NOTE:** the Ctrl+1 dialog has **no percent accelerator** (percent is Alt H P or
+  Ctrl+Shift+%). A first-cut alt assumed Ctrl+1 → P and failed; recorded here so the next author
+  does not re-derive it. Ctrl+1 does carry C (currency), N (comma) and X (the 8.2x multiple).
+
+## r429 H6b-5 — anchor depth-pass rework (DEPTH_PASS §4.23 + §1.0/§1.0-R2/§1.0-R3 + D12)
+- **ARTIFACT KEPT:** the price × volume grid is already audience-neutral — a pricing grid is a sales
+  manager's file and a banker's sensitivity table in the same shape, which is exactly what
+  §1.0-R3(n) rule 5 asks for. c3's A-lean balance is carried by margin/foot/percent/growth.
+- **☆ KEPT FROM THE PAGE — the one pre-playtest ☆ in the wave §1.0-R3(o) does NOT kill**, because
+  it is not a formatting task: the far corner read a **second, independent way** off the two blue
+  inputs, and agreeing with the grid. Skippable (all five cores clear untouched — ALT 2 proves it).
+  §1.0-R3(o)'s family list gains **INDEPENDENT PROVE-OUT**, written as a deliberately NARROW
+  exception: admissible only where a page already specced it and the lesson is something that can
+  be silently wrong (an anchor, a lock, a link); at most once per chapter; efficiency stays the rule.
+  **Flagged for the playtest:** foot's beat 5 is also a prove-out, so c3 now carries the idea twice
+  (once core, once ☆). If that reads repetitive, anchor's is the one to re-cut.
+- **CHECK2 GAINS ITS FILL LATCH — the systemic audit finding the page names.** The grid check
+  previously accepted nine hand-typed formulas, so "one formula fills the grid" was claimed but
+  never graded. It now also requires the CENSUS: every grid cell a `translateFormula` of the
+  corner. Anchors stay graded via formula TEXT ($B, $row) per the §4.23 note — the doctrine §2.2
+  exception, since anchoring IS the lesson.
+- **BEATS (5 core + ☆ + save, was 2):** corner with both locks → carry down the volume column →
+  carry across the grid → dollar-format → outside border (the §1.6 finish-state beat; ok accepts
+  perimeter flags OR per-cell all-borders, §1.0-R2(m) S=outside / A=all).
+- **RANDOM (§1.2 — four axes, was two):** **NEW 4-spot site pool** (the audit's "move the grid per
+  seed" ask — it was nailed to C4) · product-name pool · price/volume magnitudes · **grid DEPTH
+  3–4 rows**, which moves the check cell and the far corner every seed.
+- **PAR:** 16/13 → **34/31** (5-seed sweep median 31 keys, 0% drift on the first measure; 1.10 s/key).
+- **D12 APPLIED:** drills.js tab **'F4' → 'Anchors'** and the desc de-hinted (the picker was leaking
+  the answer chord — AUDIT_R417 §D Class-A).
+- **TESTS:** replay 3/3 · **depth-contract PASS** · guided PASS · alt-paths 2/2 (both rebuilt; the
+  old pair stopped at the fill) · par-sweep FLAGGED 0 · invariants clean incl. C9 anchor ·
+  cache-bump clean (drills.js?v=291→292) · full-catalog replay green.
+
+## r429 H6b-5 — foot depth-pass rework (DEPTH_PASS §4.22) + THE THROUGHPUT TOOLING
+- **TOOLING FIRST (the reason the rest of the pass can move):** a bespoke `verify-<key>.js` per
+  drill does not scale to 61 remaining drills, so two generic guards now cover everything the
+  standard already promises:
+  · **`dev/e2e-depth-contract.js`** — the UNIVERSAL contract for every drill on the C9 ledger (read
+    straight out of check-invariants, so it cannot drift): demo clears core AND earns the ☆ · one
+    bonus, dark at load, "☆ ?" rendered, label not leaking · saveClose declared, no hand-written
+    save beat · 4–6 authored core beats · axes actually vary over 30 builds · density floor at the
+    win state · zero page errors.
+  · **`dev/e2e-alt-paths.js` gains the ☆-FORFEIT CONTRACT** — an alt whose NAME says "☆ forfeited"
+    is now ENFORCED as that drill's §1.0-R2(i) skippability control: if it actually earns the ☆,
+    the build fails. Every reworked drill already ships such an alt, so each one now gets its
+    negative-control proof from the alt it already has. No new file per drill.
+  · **First run found two real §1.1 violations:** `blocksel` and `pastes` carry SEVEN authored core
+    beats against the 4–6 cap. **Recorded as documented exceptions, not churned** — Wolf playtested
+    both at that shape in round 2 and signed them off, so his live approval outranks the doc cap.
+    Any OTHER drill over it is a real finding.
+- **ARTIFACT (§3.1 audience A):** "segment × quarter ($mm)" → **revenue by region and quarter
+  ($000s)**. Cross-footing a grid is the most audience-neutral skill in the catalog; only the units
+  and row labels moved.
+- **☆ RE-CUT (§1.0-R3(o); §4.22's "comma-format the entire block, one pass" was a formatting ☆):**
+  **REFERENCE-OVER-RETYPE** — the corner built off an **edge** (the Total column or the Total row)
+  instead of re-summing the raw block. That IS the cross-foot insight: the corner is not a third
+  independent opinion, it is the edge summed once more. Latches on **either** edge (ALT 1 walks the
+  row edge); `=SUM(raw block)` clears beat 3 and wins with the ☆ dark (ALT 2, now contract-enforced).
+- **BEATS (5 core + ☆ + save, was 3):** row totals → column totals → the corner → bold both edges
+  with a TOP rule on the Total row (§1.0(f)) → **the cross-foot check reading exactly zero** (the
+  §1.6 finish-state beat: it PROVES the foot rather than dressing it, which is why the aha lands at
+  beat 3 and is banked at beat 5). The check cell ships labelled and in the §1.0(f) input dress.
+- **LANGUAGE (§4.22's own note):** the prompt's "never type a SUM" claim is GONE — AutoSum is the
+  guide's route and a typed SUM grades the same (§1.0(c), and the AUDIT_R417 §D finding that the
+  copy contradicted what `sumishF` actually accepted).
+- **RANDOM (§1.2 — four axes, was one):** 3-spot site pool · region-name pool · all values ·
+  **block SIZE 3–5 regions × 3–4 quarters**, which moves the Total row, Total column, corner and
+  check cell every seed (the pre-rework board was a fixed 4×4 at B2).
+- **PAR:** 11/8 → **32/29** (5-seed sweep median 29 keys, 0% drift; 1.10 s/key).
+- **TESTS:** replay 3/3 · **depth-contract PASS** · guided PASS · alt-paths 2/2 (both rebuilt; the
+  old pair hardcoded the fixed 4×4) · par-sweep FLAGGED 0 · invariants clean incl. C9 foot ·
+  cache-bump clean (drills.js?v=290→291) · full-catalog replay green.
+
+## r429 H6b-5 — margin depth-pass rework (DEPTH_PASS §4.21 + §1.0/§1.0-R2/§1.0-R3) — WAVE 5 OPENS (Formulas I)
+- **ARTIFACT CONVERTED (§1.0-R3(n) + §3.1): three comp sets → the DIVISIONAL PERFORMANCE PACK.**
+  c3 is where audience A lives (§3.1 A-lean 2:1) and margin opens the chapter. The three asks are
+  exactly the ones §4.21 specs — a percent margin, a percent growth, a one-decimal × — but on
+  metrics an operator owns: gross margin, year-on-year growth, and **asset turnover** (revenue ÷
+  assets — the real corporate "×", deliberately not the inventory turns §4.12 already uses). Same
+  three formula families, same `mult` register: the DATA changed, the difficulty did not.
+- **§1.0-R2(g) ADAPTIVE LABELS ARE LOAD-BEARING HERE:** the ask PERMUTES across the three tables per
+  seed, so each label names THIS seed's division and its ratio ("Build the Turnover column in the
+  North division — revenue against assets, as a one-decimal multiple"). A static "run the ratio
+  column" would force the player to reverse-engineer which of three formulas each table wants —
+  (g) calls that a spec bug outright. Probe asserts it over 30 builds (18 division/ask pairs seen).
+- **☆ RE-CUT (§1.0-R3(o); §4.21's "right-align the three ratio headers" was a formatting ☆):**
+  **FILL-CENSUS** — every ratio column written ONCE and filled, never retyped. Needs BOTH halves per
+  column: a fill-down op covering the body (`S.fillOps`, chord-agnostic — ALT 1 earns it off the
+  RIBBON fill) **and** a formula census proving each cell is a `translateFormula` of the first, so a
+  fill later clobbered by hand cannot sneak through (asserted, probe C1). Typing every formula
+  clears all four cores and wins (ALT 2 walks it); it just never latches.
+- **DEPTH:** rows go 3–4 per table (was a fixed 3) — more real fill work, per Wolf's standing "no
+  four-keystroke wins" note, and it makes the ☆ worth more than the typing.
+- **STATIC-INVARIANT LESSON (worth propagating):** the first cut built guide/targets/checks with
+  `.map().concat()`. **C9 is a STATIC proxy** — it counts top-level elements of the returned array
+  LITERAL, so computed arrays read as `null` and **the tri-length guard silently stopped covering
+  the drill** (it reported `checks=3 guide=null targets=null`). Refactored to literals (the site
+  count is fixed at three). Wave agents: return literal arrays, or C9 quietly stops protecting you.
+- **PAR:** 23/21 → **45/41** (5-seed sweep median 41 keys, 0% drift after retune; 1.10 s/key). The
+  jump is honest scope: three DIFFERENT ratio families with their own registers, 3–4 rows each,
+  where the drill previously repeated one family three times (the audit's "shallow #13").
+- **⚠️ PLACEMENT FINDING (D16 assumption INVALIDATED — Wolf-facing, NOT acted on):** §3 D16 says the
+  placement series keeps its band roles after the rework; **margin's did not.** At par 45 it moved
+  mid → LONG, where `dress` (41) already sits, and the set now spans short/long/epic with **no mid
+  representative** (catalog quartiles 28 / 36 / 55). It still spans the arc, so §5.3 passes, but the
+  coverage is lumpier than designed. **Not changed unilaterally — HK_PLACEMENT decides ranked
+  placement for every player.** Recommendation: re-check after `sort` is reworked in c4 (par 10s
+  today, certain to rise); if margin and dress both sit long, swap one for a mid-band drill.
+- **ALTS (§1.8 — both rebuilt; the old entry used the retired single-ask shape and a fixed 3 rows):**
+  (1) op-ORDER reversed + RIBBON fill + the Ctrl+1 dialog for both registers (proves the ☆ latches
+  off a non-Ctrl+D fill); (2) FREEDOM proof — every formula typed row by row, no fill anywhere.
+  2/2 PASS.
+- **TESTS:** demo-replay margin 3/3 ×3 seeds · **`dev/verify-margin.js` 16/16** · guided PASS
+  (railed, contained, solvable) · alt-paths 2/2 · par-sweep FLAGGED 0 · invariants clean incl. C9
+  margin · cache-bump guard clean (drills.js?v=289→290) · full-catalog replay green · smoke 7/7.
+- **FIT: TARGETED, NOT THE FULL SWEEP — recorded so nobody has to wonder.** The catalog-wide
+  `e2e-fit-sweep` was killed mid-run at session end (it had already run ALL CLEAN earlier in r429,
+  and margin's board is the only one that changed since). In its place margin was checked directly
+  and harder than the sweep does it: **25 seeds at LOAD and the WIN state, zero `#####` in either**
+  (the sweep samples one build per drill at load only). If a future round wants belt-and-braces,
+  re-run `node dev/e2e-fit-sweep.js` — it takes ~5 min and needs no setup beyond the 8791 server.
+
+## r429 H6b-4 — gauntlet: the FORMATTING CAPSTONE (DEPTH_PASS §4.20 + §2.4 + §1.0/§1.0-R2/§1.0-R3) — WAVE 4 COMPLETE, CHAPTER 2 CLOSED
+_The second capstone, and the first built off the modeltour template rather than inventing it._
+- **ARTIFACT KEPT (§3.1):** sources & uses — a capstone should be the chapter's aspirational
+  artifact, and S&U is the audience-B summative page. Prompt reframed (committee book tonight).
+- **CAPSTONE WIRING — the modeltour template applied, not re-derived:** `meta.gauntlet.capstone:true`
+  · `HOTKEY_CAMPAIGN.chapters[1].capstone:'gauntlet'` · `HOTKEY_CLOCKS.gauntlet={pass:94}` (par×2)
+  · the SHARED `hkCapstoneOk` predicate untouched (one definition, every surface — the r359 drift
+  lesson) · picker ★ CAPTAG · both grandfather rules · drill ACCESS never blocked. **A clean run
+  now opens Formulas I.**
+- **🔴 MISSING INVARIANT FOUND AND RESTORED — a silent r427 union-merge casualty.** The r425 entry
+  records a capstone-wiring guard added to check-invariants C1, and the r427 assembly commit claims
+  it was carried forward — **it was not in the tree**. No capstone assertion existed when the second
+  capstone was wired. Restored and widened: a designated capstone must be a real drill, carry
+  `meta.capstone:true`, sit LAST in its group, be claimed by exactly one chapter, have
+  `hkCapstoneOk` present, and keep `HOTKEY_CLOCKS[key].pass === par × 2` in lockstep. **It caught a
+  live defect on its first run** — HOTKEY_PARS.gauntlet was still the pre-rework 63 against a
+  clocks value computed from the new par. WORKFLOW §3.3: no invariant, and the bug returns.
+- **BEATS (6 core + ☆ + save closer):** Color the typed inputs blue, both sides → Total both columns
+  → Bold both totals and add a top border above each → Comma-format both money columns → Autofit
+  every column that reads #### → **Finish at A1** (§1.6 finish-state beat; probe asserts it is open
+  until the cursor actually goes home) → Save. Tri-length 7, C9-registered.
+- **☆ RE-CUT (§1.0-R3(o); §4.20's "center the two side headings" was a formatting ☆ that also rode
+  along with the dress pass, failing §1.0-R2(i)):** **FORMAT CLONING** — one side dressed, then the
+  finished money column copied and **paste-special-FORMATS** onto its twin: blue, separators, bold
+  and the top rule all cross in one motion, and only the numbers stay each side's own. Chains the
+  `pastes` lesson into the chapter capstone, which is what a capstone is for.
+  **DIRECTION-AGNOSTIC** — cloning Uses→Sources earns it exactly as Sources→Uses does; a one-way
+  latch would be the route trap §1.0(c) bans. ALT 2 walks the reverse direction to keep it honest.
+- **NO ENGINE HUNK (§1.0-R3(o) "prefer existing telemetry"):** the r425 `S.pasteLog` already records
+  `kind:'formats'` + destination rect. The wave's other three ☆s each needed new telemetry; adding a
+  fourth array here would have been gold-plating (§7). **This is the only wave-4 drill with zero
+  engine change.**
+- **THE CAPSTONE RULE, ASSERTED (§2.2 — a bonus can NEVER gate anything):** dressing both sides BY
+  HAND clears all six cores, **WINS the capstone** (`done===true`) and leaves the ☆ dark. Since this
+  drill gates Formulas I, the point is proven explicitly rather than assumed (verify-gauntlet B1–B3,
+  and ALT 1 walks the same route).
+- **JUDGMENT CALL — the accounting-format beat is CUT** (it was core pre-rework): §4.20's beat list
+  is six lines and §1.1 caps core at six; the ☆ now carries the "both sides end up dressed
+  identically" lesson it half-served, and "Finish at A1" comes in as the finish-state beat the page
+  requires. Alt H A N is still taught in dress.
+- **RANDOM (§1.2 — four axes, was two):** (a) site jitter r0∈{3,4}; (b) BOTH label stacks
+  Fisher-Yates from 6-deep pools (were 4 fixed each); (c) values + line COUNT 4–5, moving the total
+  row and every graded range; (d) which side ships the squeezed column.
+- **PAR:** 63/66 → **47/43** (5-seed sweep median 43 keys, 0% drift after retune; 1.09 s/key). The
+  drop is honest: the clone route is shorter than dressing both sides, and the accounting beat left.
+  HOTKEY_PARS mirrored, clocks kept in lockstep at 94 (invariant-enforced); drills.js?v=288→289.
+- **ALTS (§1.8 — both rebuilt; the old entry hardcoded a 4-line block, graded the retired accounting
+  beat, and predated the home + save beats):** (1) op-ORDER + FREEDOM + the §2.2 capstone proof;
+  (2) REVERSE clone direction. 2/2 PASS.
+- **TESTS:** demo-replay gauntlet 3/3 ×3 seeds · **`dev/verify-gauntlet.js` 22/22** · guided PASS
+  (free/cursor-graded, solvable) · alt-paths 2/2 · par-sweep FLAGGED 0 · invariants clean incl. the
+  RESTORED capstone guard + C9 gauntlet · cache-bump guard clean · full-catalog replay green.
+
+## r429 H6b-4 — combo depth-pass rework (DEPTH_PASS §4.17 + §1.0/§1.0-R2/§1.0-R3)
+- **ARTIFACT KEPT (§3.1): the raw pasted comp sheet is chapter 2's audience-B drill** — with
+  decimals/center/autofit converted to audience A, c2 lands at the 5A/5B the map requires. Prompt
+  reframed to §1.0-R3(n) rule 2 (off the data provider ten minutes ago, MD wants it in the book).
+- **☆ RE-CUT (§1.0-R3(o)) — and the killed ☆ was PROMOTED, not deleted:** §4.17's "Color the pasted
+  inputs blue" is a formatting ☆ (dead under §1.0(d)), but the blue IS real work on a raw paste —
+  it is the house input convention. So it becomes **CORE beat 4**, sequenced directly behind the
+  comma beat that touches the same figures (§1.0(a) format-as-you-go). 6 core + ☆; tri-length 7.
+- **SHIPPED ☆ — CURRENT-REGION family:** the pasted block grabbed with **Ctrl+A** (current region,
+  the r407 engine behaviour) and that block then driving a format pass. **This is the one ☆ in the
+  wave that grades HOW the selection was made** — Wolf's §1.0-R2(i) framing exactly ("reward good
+  habits of using the previously taught hotkeys").
+- **ENGINE HUNK:** new `S.selOps` on the Ctrl+A handler, recording `kind:'region'|'used'` + the
+  resulting rect. A region grab and a hand-drag of the same block are rect-identical, so the CHORD
+  has to record itself. Telemetry only, no core check reads it (§1.0(c)).
+- **☆ DEFECT CAUGHT BY THE PROBE BEFORE IT SHIPPED (the reason drill probes exist):** the first
+  latch was `grabbed && anyBlockFormatPass` — two independently-true conditions, which wrongly
+  rewarded a **bare exploratory Ctrl+A followed by entirely hand-selected formatting**
+  (verify-combo C2). Fixed by making them CAUSALLY linked: the format pass must cover the
+  **grabbed region itself**, which spans the whole contiguous table (company and notes columns
+  included) and therefore can never be satisfied by a drag of just the number block.
+- **NEGATIVE CONTROLS (all verified):** hand-dragging the IDENTICAL rect clears all six cores and
+  leaves the ☆ dark (B2 — the load-bearing case for a chord-graded ☆); a bare Ctrl+A earns nothing
+  (C1); a bare Ctrl+A plus hand-formatting still earns nothing (C2).
+- **RANDOM (§1.2):** (a) header-row site {2,3}; (b) company/metric/note pools all Fisher-Yates;
+  (c) values + metric COUNT 2–3 + row count 4–6; (d) **NEW per §4.17 "add wrap-note position
+  variance"** — which row carries the over-long note varies, so the visible spill moves per seed
+  (6 distinct positions observed over 40 builds).
+- **PAR:** 24/22 → **36/33** (5-seed sweep median 33 keys, 0% drift after retune; 1.09 s/key).
+  HOTKEY_PARS mirrored; drills.js?v=287→288; drill pages + sitemap + refmap regenerated.
+- **FIT-SWEEP:** combo stays EXEMPT (dev/e2e-fit-sweep.js:11) — the #### is the opening state.
+- **ALTS (§1.8 — both rebuilt):** (1) op-ORDER reversed + FREEDOM proof — every range hand-selected
+  (six cores clear, chord-graded ☆ forfeited); (2) chord-ROUTE — the region grab drives a
+  **Ctrl+Shift+!** comma pass instead of Alt H K, proving the ☆ latch is agnostic about WHICH
+  format chord consumes the region. 2/2 PASS.
+- **TESTS:** demo-replay combo 3/3 ×3 seeds (green first run) · **`dev/verify-combo.js` 19/19** ·
+  guided PASS · alt-paths 2/2 · par-sweep FLAGGED 0 · invariants clean incl. C9 combo ·
+  cache-bump guard clean · full-catalog replay green.
+
+## r429 — index-UI: drill-tab names expanded (ROUND2_FEEDBACK §4c, the first of the two items the r426–r427 reconciliation found genuinely unshipped)
+- Wolf: _"there's room for longer names — 'paste sp.' → 'paste special'; feel it out and expand the
+  shortened drill names as space allows."_ All four genuinely-abbreviated tabs expanded:
+  **Paste Sp. → Paste Special** (his explicit example) · **Liq. Bridge → Liquidity** ·
+  **Sens. → Sensitivity** · **Acc/Dil → Accretion**. Every remaining `tab:` was already a real word.
+- **MEASURED, not eyeballed** (the "feel it out" was done with a ruler): a headless render walks
+  every chapter's bottom tab strip at 1280px and 1100px viewports and checks two failure modes —
+  strip overflow (`scrollWidth > clientWidth`) and per-label ellipsis
+  (`node.scrollWidth > node.clientWidth`). **No overflow and NO clipped label at either width**;
+  the widest strip sits at 1120px inside a 1132px bar. "Paste Special" (13 chars) is the new
+  longest tab, two characters past the prior max ("House Style"/"Ruling Pass", 11).
+- Drill pages + sitemap + refmap regenerated (byte-stable ×2). **STILL OPEN from §4c:** the selector
+  row-width tighten (`.pk-byline .vdr-fname{flex:1}` pushing pb/par hard right) — see
+  dev/R429_INDEXUI_VERIFICATION.md.
+
+## r429 H6b-4 — autofit depth-pass rework (DEPTH_PASS §4.14 + §1.0/§1.0-R2/§1.0-R3)
+- **ARTIFACT (§1.0-R3(n) + §3.1 audience A): two abstract blocks → ONE real file, a DEPARTMENT
+  HEADCOUNT ROSTER.** Department · Cost centre · Q1–Q4 · Total, with a company Total row. WHY: long
+  ragged department names ARE why autofit exists, and "one width for print" lands harder on a roster
+  that prints for a staffing review than on a nameless block. The pre-rework board's two
+  disconnected islands could not chain (§1.1); one roster can — see the consequence chain below.
+- **BEATS NOW CHAIN, and the chain IS the aha (§1.1 + §1.5):** Autofit the Department and Cost
+  centre columns → Set the four quarter columns to one width of 12 → **Total each department's four
+  quarters in the Total column** → **Autofit the Total column — your own figures earn their width**
+  → Bold the Total row and add a top border above it → Save. The Total column ships NARROW but
+  **EMPTY**, so beat 3 CREATES the ##### that beat 4 fixes: the figure that breaks the layout is the
+  player's own. Probe asserts all three states (empty at load → too narrow after the build → beat 4
+  still open until the autofit lands). 5 core + ☆; tri-length 6, C9-registered.
+- **☆ RE-CUT (§1.0-R3(o); §4.14's "set the title bold and autofit the label column" was a FORMATTING
+  ☆, dead under §1.0(d)):** **ONE-PASS AUTOFIT** — both squeezed label columns fitted in a SINGLE
+  selection instead of one at a time. Span-based, so a wider sweep counts (ALT 2 proves a full A:G
+  autofit latches); two separate one-column autofits never do. Negative control verified.
+- **ENGINE HUNK (§9.2 payload item 6 — justified):** new `hkWidthLatch(kind)` + `S.widthOps`,
+  recording the COLUMN SPAN of every autofit (`autofitCols`) and explicit set-width
+  (`applyColWidth`). No width telemetry existed at all — `S.fmtOps` covers number formats only — so
+  the one-pass ☆ had no latch. Same family and contract as fmtOps/fillOps/pasteOpLog: telemetry
+  only, no core check may read it (§1.0(c)).
+- **§1.0(c) FREEDOM:** beat 3 grades END-STATE VALUES (the ruleoff precedent) — typed totals clear
+  core, a SUM clears core, the clock prices the difference. ALT 1 walks the fully-typed route.
+- **RANDOM (§1.2 — four axes, was two):** (a) site jitter d∈{0,1}; (b) department names
+  Fisher-Yates from an 8-pool + cost-centre codes + fiscal year; (c) values AND **roster DEPTH
+  (4–6 departments, which moves the total row and every graded range)**; (d) ragged quarter widths
+  rotate. All verified varying over 40 builds.
+- **PAR:** 15/12 → **36/33** (5-seed sweep median 33 keys, 0% drift after retune; 1.09 s/key, house
+  band). The jump is real scope: the drill went from 2 beats to 5 + a build beat. HOTKEY_PARS
+  mirrored; drills.js?v=286→287; drill pages + sitemap + refmap regenerated.
+- **FIT-SWEEP:** autofit stays on the EXEMPT list (dev/e2e-fit-sweep.js:11) — the squeeze IS the
+  lesson and the board is meant to load with #### in the label columns.
+- **ALTS (§1.8 — both rebuilt; the pre-rework entry solved the two-island board):** (1) op-ORDER
+  reversed + FREEDOM proof — TYPED totals, label columns fitted one at a time (☆ forfeited, five
+  cores clear); (2) chord-ROUTE + SUPERSET ☆ proof — one autofit across A:G (must latch), quarter
+  widths re-set afterwards so beat 2 survives the over-wide autofit, fill-down via the ribbon
+  (Alt H F I D). 2/2 PASS.
+- **TESTS:** demo-replay autofit 3/3 ×3 seeds (green first run) · **`dev/verify-autofit.js` 23/23** ·
+  guided PASS (railed, contained, solvable) · alt-paths 2/2 · par-sweep FLAGGED 0 · static
+  invariants clean incl. C9 autofit · cache-bump guard clean · full-catalog replay green.
+
+## r429 H6b-4 — center depth-pass rework (DEPTH_PASS §4.13 + §1.0/§1.0-R2/§1.0-R3)
+- **ARTIFACT KEPT (§3.1):** the pipeline summary was already chapter 2's audience-A artifact — only
+  the scenario frame was sharpened (§1.0-R3(n) rule 2: the weekly review pulls from this tab).
+- **☆ SPEC BUG — FOUND AT BUILD, RECORDED, RE-CUT (the §0 escalation path working as designed):**
+  §4.13's first re-cut made the ☆ "centre-across-selection INSTEAD of merging". **The engine has no
+  merge operation at all** — the house anti-merge rule is enforced by OMISSION, not by a competing
+  route — so that ☆ is not a choice a player can decline: it would fall straight out of core beat 6
+  and fail §1.0-R2(i). WITHDRAWN, and the spec page now carries the finding. Title centring stays
+  CORE (beat 6, graded on `ca`).
+- **SHIPPED ☆ — CLASS-SWEEP DISCIPLINE (new family, added to the §1.0-R3(o) list):** the right-align
+  pass carries the figure block AND the total row in ONE selection — the insight being that a total
+  row is numbers and belongs to the same alignment class. Rect-based (superset-tolerant: a sweep
+  wider than the block still latches, proven by ALT 1), so no chord is privileged (§1.0(c)).
+  **Negative control verified: body-then-total in two passes clears every core beat and wins, ☆
+  stays "☆ ?".** Honest deviation flagged in §4.13: c2 now carries three one-selection-shaped ☆s
+  (dress=comma, autofit=width, center=alignment) — different operations, same shape; if the
+  playtest finds them samey, center is the one to re-cut.
+- **BEATS (6 core + ☆ + engine save closer; §1.0(b) outcome-vague):** Center the quarter headers →
+  Left-align the deal names and the Total label → Right-align the quarterly figures and the total
+  row → Bold the total row → **Add a bottom border under the header row (NEW, §4.13)** → Center the
+  title across the table, never merged. Tri-length 7, C9-registered.
+- **BOARD SHIPS MISALIGNED (Wolf's blocksel round-2 law made general):** the figures and the total
+  row arrive LEFT-aligned the way a bad paste really lands — "doesn't help to right align the data
+  if it's already coming right aligned". Probe asserts ZERO pre-right-aligned figures per seed.
+  Also fixed for realism: the **"Total" label joins the LEFT class** with the deal names (it was
+  graded RIGHT pre-rework, which no real pipeline sheet does — §1.0-R3(n) rule 1).
+- **ENGINE HUNK:** `hkFmtLatch('align')` on the Alt H A L/C/R RUN path — the only alignment route
+  the engine has, so the latch is chord-complete by construction. Telemetry only (§1.0(c)).
+- **RANDOM (§1.2 — four axes):** (a) header-row site {2,3}; (b) deal names Fisher-Yates from an
+  8-pool (was 6) + codename(); (c) table SHAPE — 3–5 quarters × 3–5 deals — and all values;
+  (d) which-one-is-broken — the labels arrive centered OR right, varying per seed. All verified
+  varying across 40 builds.
+- **PAR:** 18/15 → **23/20** (5-seed sweep median 20 keys, 0% drift after retune; 1.15 s/key — the
+  alignment-class read plus the stranded-title decision). HOTKEY_PARS mirrored; drills.js?v=285→286
+  across 28 files; drill pages + sitemap + refmap regenerated.
+- **ALTS (§1.8 — both rebuilt; the pre-rework pair solved a board with no border beat and an
+  `o.tot` range that no longer exists):** (1) chord-ROUTE + SUPERSET ☆ proof — legacy **Alt O E A**
+  Format-Cells dialog for the title, ribbon bold Alt H 1, and a class sweep WIDER than the figure
+  block with the headers re-centred over the top (the ☆ must still latch); (2) op-ORDER reversed +
+  FREEDOM proof — title/border/bold first, figures and total in TWO passes (☆ forfeited, six cores
+  clear). 2/2 PASS.
+- **TESTS:** demo-replay center 3/3 ×3 seeds · **`dev/verify-center.js` 14/14** · guided PASS
+  (railed, contained, solvable) · alt-paths 2/2 · par-sweep FLAGGED 0 · static invariants clean
+  incl. C9 center · cache-bump guard clean · full-catalog replay green.
+
+## r429 H6b-4 — decimals depth-pass rework (DEPTH_PASS §4.12 + §1.0/§1.0-R2/§1.0-R3) — THE FIRST §1.0-R3 DRILL
+_The reference build for the dual-audience real-task law: the first drill whose ARTIFACT was
+converted for audience A, and the first ☆ re-cut under the §1.0-R3(o) sweep._
+- **ARTIFACT CONVERTED (§1.0-R3(n) + the §3.1 audience map): comps page → OPERATIONS SCORECARD.**
+  One row per region, columns Revenue · Cost · Turns (x) · Gross margin, with a labelled **Median**
+  read line. WHY: the lesson ("a decimal standard is a column property") is audience-neutral, and
+  **inventory turns** preserves §4.12's exact "8.2x, not 8.20x" beat with a metric a corporate
+  operator reads weekly — chapter 2 needed its A-side balance (§3.1 locks c2 at 5A/5B). Data
+  converted, difficulty NOT: same beat count, MORE axes, same par band. Scenario prompt per
+  §1.0-R3(n) rule 2 (the scorecard goes to the leadership team this afternoon).
+- **BEATS (5 core + mystery ☆ + engine-appended Ctrl+S closer; §1.0(b) outcome-vague):** Set the
+  Revenue and Cost columns to whole dollars → Set the Turns column to one decimal → Set the Gross
+  margin column to one decimal → Fix the one cell in the [seed's column] that reads four decimals
+  → Bold the Median row and add a top border above it (§1.0(f): a total earns the line ABOVE it)
+  → Save your work. Tri-length 6, C9-registered.
+- **☆ RE-CUT (§1.0-R3(o); §4.12's "right-align the header row" was a FORMATTING ☆ — dead under
+  §1.0(d) and it also failed §1.0-R2(i), falling out of any dress pass):** **COLUMN-SELECTION
+  DISCIPLINE** — every standard applied in a pass that SPANS THE WHOLE COLUMN BODY (first data row
+  through the median line). Rect-based like the r425 dress ☆, so supersets count (Ctrl+Space's
+  whole column, or one sweep across both money columns) and no chord is privileged (§1.0(c));
+  cell-by-cell decimals leave single-cell rects and never latch. This is Wolf's own §1.0-R2(i)
+  framing — "reward good habits of using the previously taught hotkeys" (the column-select chord
+  taught in rowops/blocksel).
+- **ENGINE HUNK (§9.2 payload item 6 — justified):** `hkFmtLatch('dec')` added to the Alt H 0 /
+  Alt H 9 ribbon RUN path. No existing telemetry recorded DECIMAL ops — `S.fmtOps` only carried
+  `kind:'comma'` from r425 — so the column-select ☆ had no latch. Same family and same contract as
+  the comma latch: telemetry only, no core check may read it (§1.0(c)). One line, one route family.
+- **THE AHA MADE MECHANICAL:** relative decimal ops SHIFT places, they do not normalise — so a
+  whole-column pass moves the planted 4-place outlier along with everything else (turns 4→5 after
+  the +1 pass; margin 4→2 after the −2 pass) and it still has to be walked home by hand. That is
+  precisely why beat 4 exists, and it is asserted in the probe (§D).
+- **JUDGMENT CALLS (in-code, per WORKFLOW §8):** (1) the pre-playtest page's COLUMN-SHUFFLE axis is
+  dropped — a real scorecard reads Revenue · Cost · Turns · Margin, and §1.0-R3(n) rule 1 outranks
+  a shuffle that makes the board read like an exercise; replaced by four other axes. (2) §1.0-R2(h)
+  action-location cues DELIBERATELY NOT applied to beat 4 — the ragged cell is a HUNT ("find it by
+  eye"), so a board cue would delete the lesson; same carve-out class as §1.7 R2(a). §1.0-R2(g) is
+  still honoured: the label names the seed's COLUMN without spoiling the row.
+- **RANDOM (§1.2 — four axes, was effectively two):** (a) site jitter d∈{0,1}; (b) content pools —
+  regions Fisher-Yates from a 7-pool + codename() + month label; (c) every figure through rnd();
+  (d) which-one-is-broken ×2 — the outlier's COLUMN (turns or margin) and its ROW both vary.
+  Verified live: 7 distinct region draws, 6 distinct defect rows, both defect columns, over 40 builds.
+- **PAR:** 18/15 → **27/24** (5-seed sweep: median 24 keys, **0% drift** after retune; 1.13 s/key —
+  the audit-read premium the hunt beat carries, same band as ruleaudit's 1.14). HOTKEY_PARS
+  mirrored; drills.js?v=284→285 across all 28 files; 82 drill pages + sitemap + refmap regenerated,
+  **byte-stable across two further regenerations**.
+- **META (DoD #6):** drills.js desc rewritten for the scorecard scope, de-hint clean (no chord tokens).
+- **ALTS (§1.8 — both NEW; the r199-era entry RETIRED, it still solved the pre-rework comps board):**
+  (1) op-ORDER + FREEDOM proof — read line dressed FIRST, margins/turns by body pass, money columns
+  walked CELL BY CELL (every core clears, ☆ forfeited); (2) chord-ROUTE — Ctrl+Space whole-column
+  selections + ribbon bold Alt H 1 (proves the rect-based ☆ latches on a different route). 2/2 PASS.
+- **TESTS:** demo-replay decimals 3/3 ×3 seeds · **dedicated probe `dev/verify-decimals.js` 22/22**
+  (☆ earn + negative control, mystery "☆ ?" render + no label leak, the relative-decimal aha,
+  all four axes, board labelling, saveClose, zero page errors) · guided PASS (railed, contained,
+  solvable) · alt-paths 2/2 · par-sweep FLAGGED 0 · fit-sweep ALL CLEAN (77) · static invariants
+  clean incl. C9 decimals · cache-bump guard clean.
+
+## r426–r427 — RECONCILIATION ENTRY (written r428, 2026-07-26, from the PR #242 record — the source session hit its limit mid-assembly and never wrote these; treat the PR diff as the primary record)
+- **r426 — BORDER P0 (Wolf round-2 playtest, reported twice, R2-B1):** applied cell borders were
+  INVISIBLE site-wide — the r413 gridline-softener `#grid td{border-color:…}` (specificity 1,0,1)
+  outranked the applied-border classes `td.bt/.bb/.bdbl/.ball` (0,1,1) on border-COLOR, so every
+  seeded or player-applied border repainted in the faint gridline colour while grading still
+  passed (checks read state, not pixels). Fixed by scoping each applied-border rule under `#grid`
+  (bare `td.*` copies kept for preview harnesses). Probe: applied rgb(56,53,45) vs gridline
+  0.52-alpha — distinct. Same round: dev/ROUND2_FEEDBACK.md transcribed + dispositioned;
+  DEPTH_PASS → **r420d** (§1.0-R2 laws g–m).
+- **r427 — ENGINE ROUND (per assembly commit):** cursor anchor-collapse post-copy/paste (R2-B2),
+  ribbon sizing + fixed-height overlay submenu slot (R2-B5 — submenus no longer push the grid),
+  outside-border canon S=outside/A=all aligned across 3 teaching surfaces (R2-B4 / §1.0-R2(m)).
+- **r427 — INDEX-UI ROUND (per assembly; UNVERIFIED against the feedback doc):** landed in the
+  assembly but has no per-item record — next session should verify R2-B6 (onboarding arrow keys),
+  R2-B7 (drill-selector hard stop), and ROUND2_FEEDBACK §4c (tab names, selector default-expand,
+  section check marks, selector width, arrow-help legibility) against the live tree.
+- **r427 — ASSEMBLY:** 12 agent commits merged — 9 wave-2/3 drills (ruleoff · dress · copyover ·
+  editfix · ruleaudit · housestyle · typeset · undo · modeltour★, per-drill entries below) +
+  cosmetics (ROUND2_FEEDBACK §4a achievement renames incl. the golf par set) + 2 wave-1 ROUND-3
+  batches (navigation/filldr/pastes + blocksel/rowops to their §1.0-R2 items: adaptive labels,
+  "<<< Insert row above" cues, re-cut ☆s — NO per-drill entries were written; verify against
+  ROUND2_FEEDBACK §2 as the checklist). **Three union-merge casualties rebuilt by hand:**
+  check-invariants.js (base + ruleaudit C10 + modeltour capstone guard + full 14-drill REWORKED
+  list), e2e-depth-mechanics.js (155 checks, was corrupted with dead code parked after
+  process.exit()), e2e-alt-paths.js (89/89, one entry carried a literal SyntaxError). Two lost
+  hunks restored: housestyle's index.html rework + its `S.gotoSpecials` engine telemetry.
+  HOTKEY_PARS resynced from each drill's authoritative CHALLENGES.par; 81 drill pages + sitemap
+  regenerated; versions themes v310 · nav v301 · nav.css v210 · lb v40 · lb.css v22 · drills v284.
+- **Backend riders:** `20260725000000_retire_colops.sql` (D17) + `20260725100000_desk_create_pro.sql`
+  (ROUND2_FEEDBACK §4e — desk CREATION server-gated to PRO; deployed via supabase-deploy on merge).
+- **PROCESS LESSON (now law — WORKFLOW.md §9):** parallel build agents must never append to shared
+  registry files; the union-merge corrupted every shared file the fleet touched. Payload contract
+  + serial orchestrator assembly per §9 from wave 4 on.
 
 ## r425 H6b-2 — modeltour: the FOUNDATIONS CAPSTONE (DEPTH_PASS.md §4.10 + §2.4 + §1.0 overlay)
 _The first capstone build — the wiring template the other seven chapters inherit._

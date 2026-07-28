@@ -110,6 +110,29 @@ jobs:
       - name: Grid-height regression
         if: steps.scope.outputs.engine == 'true'
         run: node dev/e2e-grid-height.js
+      # r429 H6b-5: the DEPTH-PASS suites join the gate. They were session-only, which is exactly
+      # how e2e-depth-mechanics sat silently RED through all of wave 5 — its `foot` fixture rotted
+      # the moment `foot` was reworked, and nothing on CI was watching. Depth-contract asserts the
+      # universal §1 contract for every drill on the C9 REWORKED ledger; depth-mechanics asserts
+      # the platform mechanics those drills depend on (mystery ☆ display, the Ctrl+S closer,
+      # capstone gating, medal clocks).
+      - name: Depth contract (§1 anatomy, every reworked drill)
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/e2e-depth-contract.js
+      - name: Depth mechanics (☆ display · Ctrl+S closer · capstone gate · clocks)
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/e2e-depth-mechanics.js
+      # r442 (Wolf, playtest 4: "border visibility hasn't been fixed"). These two guards were
+      # WRITTEN in r429 and never wired in, so neither had run on a single PR — which is half of
+      # why the border bug survived four playtests. The other half was check-borders.js asserting
+      # only that two screenshots DIFFERED; it now measures the painted line and asserts its
+      # width. Both drive the real app, so they belong in the engine lane.
+      - name: Border render (painted width, every edge + thick + double)
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/check-borders.js
+      - name: Blur pause (clock freezes, resume swallows the key)
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/check-pause.js
       - name: Drill pages in sync
         if: steps.scope.outputs.engine == 'true'
         run: |
