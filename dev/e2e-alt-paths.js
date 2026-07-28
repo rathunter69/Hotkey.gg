@@ -1017,15 +1017,31 @@ const ALTS = [
       {sel:o.CY+o.P0, keys:[...T('='+o.CV+o.P0+'/'+o.CI+o.P0),{key:'Enter'}]},
       {sel:o.CY+o.P0+':'+o.CY+o.PN, keys:[{key:'d',ctrl:true}]},
     ]; }` },
-  { key: 'covtable', name: 'read bottom-up — MIN first, flags before headroom, net leverage last, ribbon fills', moves: `C => [
-      {sel:'B12', keys:[...T('=MIN(B9:F9)'),{key:'Enter'}]},
-      {sel:'B10', keys:[...T('=IF(B9>=0,1,0)'),{key:'Enter'}]},
-      {sel:'B10:F10', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B9',  keys:[...T('=B8-B7'),{key:'Enter'}]},
-      {sel:'B9:F9', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B7',  keys:[...T('=(B5-B6)/B4'),{key:'Enter'}]},
-      {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-    ]` },
+  /* r447 (covtable ROUND 3, DEPTH_PASS §4.73): the pre-pass entry above is DELETED — it drove a
+     board that no longer exists (12 rows, one leverage test, hard-coded B7/B9/B10/B12).
+     ALT 1 = chord-ROUTE alt: ribbon fills everywhere, the LEGACY Alt E S paste-special dialog
+     carrying the clone as FORMULAS, bold via Alt H 1, and the single-cell OUTSIDE box (Alt H B S,
+     which stores `ball` not `bt`) — the ☆ is still earned, because the latch reads the paste, not
+     the chord that opened it. ALT 2 = op-ORDER alt AND the §1.0(c)/§1.0-R2(i) freedom proof:
+     dress FIRST on an empty cell, then the flag line, then headroom, then the leverage line, every
+     cell hand-typed with no fill and no paste anywhere, and the MIN written over five named cells
+     instead of a range. All five cores clear; the ☆ must stay DARK. */
+  { key: 'covtable', name: 'ribbon fills, the legacy Alt E S dialog carries the clone as FORMULAS (☆ still earned), bold via Alt H 1, outside box via Alt H B S', moves: `C => { const o=C._o, q0=o.qc[0], qN=o.qc[o.NQ-1], dB=o.bTot?o.rTot:o.rSen; return [
+      {sel:q0+o.RB, keys:[...T('=('+q0+dB+'-'+q0+o.rCash+')/'+q0+o.rEb),{key:'Enter'}]},
+      {sel:q0+o.RB+':'+qN+o.RB, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.srcRng, keys:[{key:'c',ctrl:true}]},
+      {sel:q0+(o.RB+2), keys:[{key:'Alt'},L('e'),L('s'),L('f'),{key:'Enter'}]},
+      {sel:q0+o.rMin, keys:[...T('=MIN('+o.hdRng+')'),{key:'Enter'}]},
+      {sel:q0+o.rMin, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:q0+o.rMin, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
+    ]; }` },
+  { key: 'covtable', name: 'dress FIRST on an empty cell, then flags, then headroom, then the leverage line — every cell hand-typed, no fill and no paste, MIN over five named cells (the ☆ NEGATIVE CONTROL: all five cores clear, star dark)', moves: `C => { const o=C._o, dB=o.bTot?o.rTot:o.rSen, mv=[];
+      mv.push({sel:o.qc[0]+o.rMin, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      for(let j=0;j<o.NQ;j++){ const Q=o.qc[j]; mv.push({sel:Q+(o.RB+3), keys:[...T('=IF('+Q+(o.RB+2)+'>=0,1,0)'),{key:'Enter'}]}); }
+      for(let j=0;j<o.NQ;j++){ const Q=o.qc[j]; mv.push({sel:Q+(o.RB+2), keys:[...T('='+Q+(o.RB+1)+'-'+Q+o.RB),{key:'Enter'}]}); }
+      for(let j=0;j<o.NQ;j++){ const Q=o.qc[j]; mv.push({sel:Q+o.RB, keys:[...T('=('+Q+dB+'-'+Q+o.rCash+')/'+Q+o.rEb),{key:'Enter'}]}); }
+      mv.push({sel:o.qc[0]+o.rMin, keys:[...T('=MIN('+o.qc.map(q=>q+(o.RB+2)).join(',')+')'),{key:'Enter'}]});
+      return mv; }` },
   /* r444 (dcf DEPTH PASS, DEPTH_PASS §4.59 + §1.8). The drill had ONE entry, and it drove the
      board the old formula-TEXT checks were overfit to. Both entries below are rebuilt for the
      reworked board and both walk routes the old predicates locked out (CAMPAIGN §1).

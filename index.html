@@ -15985,88 +15985,285 @@ const CHALLENGES = {
   },
 
   covtable:{
-    name:'Cov. Table', label:'Run the covenant table', par:45, parKeys:45,
-    aha:'Covenants are ratios with teeth — the table shows headroom before the breach.',
-    prompt:'Leverage is tested every quarter and the covenant (the lender’s leverage ceiling) steps down — the question is never "compliant today?" but "which quarter pinches?". Covenants test net leverage: debt less cash, over LTM (last-twelve-months) EBITDA. Compute it, the headroom against the stepping maximum, and a 1/0 compliance flag with a real IF.',
-    req(){ return '<em>B7:F7</em> net leverage \u2192 =(B5-B6)/B4 \u00b7 <em>B9:F9</em> headroom \u2192 =B8\u2212B7 \u00b7 <em>B10:F10</em> compliant \u2192 =IF(B9>=0,1,0) \u00b7 <em>B12</em> tightest \u2192 =MIN(B9:F9)'; },
-    guide:[
-      'NET leverage = (debt \u2212 cash) over LTM EBITDA \u2014 covenants credit the cash \u00b7 B7: <kbd>=</kbd>(B5-B6)/B4 <kbd>\u21b5</kbd> \u00b7 select B7:F7, <kbd>ctrl</kbd>+<kbd>r</kbd>',
-      'headroom = covenant max \u2212 net leverage \u00b7 B9: <kbd>=</kbd>B8-B7 <kbd>\u21b5</kbd> \u00b7 fill across',
-      'the flag is a real IF \u00b7 B10: <kbd>=</kbd>IF(B9>=0,1,0) <kbd>\u21b5</kbd> \u00b7 fill across',
-      'the number the room asks for \u00b7 B12: <kbd>=</kbd>MIN(B9:F9) <kbd>\u21b5</kbd> \u2014 the tightest quarter',
-    ],
-    targets:['B7:F7','B9:F9','B10:F10','B12'],
-    demo(){ return [
-      {sel:'B7', keys:[...T('=(B5-B6)/B4'), Kb.enter]},      {sel:'B7:F7', keys:[Kb.fillR]},
-      {sel:'B9', keys:[...T('=B8-B7'), Kb.enter]},           {sel:'B9:F9', keys:[Kb.fillR]},
-      {sel:'B10', keys:[...T('=IF(B9>=0,1,0)'), Kb.enter]},  {sel:'B10:F10', keys:[Kb.fillR]},
-      {sel:'B12', keys:[...T('=MIN(B9:F9)'), Kb.enter]},
+    /* r447 H6b (DEPTH_PASS §4.73, "Run the covenant table") — the depth-pass rework, built to
+       §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 (the later law wins on conflict) and, because this is
+       a Models II board, to dev/MODELING_STANDARDS.md, which names this drill by name:
+       "Credit stats: Debt/EBITDA (leverage), EBITDA/Interest (coverage) — `covtable` owns these."
+
+       WAS: a 12-row board, four checks (net leverage · headroom · IF flag · MIN), no ☆, no save
+       closer, par 45 / parKeys 45.
+
+       ── THE ☆-HEADROOM DIAGNOSTIC, RUN BEFORE THE BOARD (CAMPAIGN §2) ────────────────────
+       Measured on the rebuilt board through the live engine, every selection and navigation
+       KEYED (dev/verify-covtable.js PART B, 12 seeds):
+         PART 1 — fastest legal route 55 keys against 240 for the slow-but-sane route (every
+           derived cell typed out, no fill and no paste anywhere). Spread 4.4×, inside the
+           shipped band and well clear of the ~1.3× warning line.
+         PART 2 — IS ANY OF IT ☆-LEGAL? Strip chord-vs-ribbon (Ctrl+R vs Alt H F I R, Ctrl+B vs
+           Alt H 1, Alt H B P vs Alt H B S — all forced to CLEAR under §1.0(c)) and formatting
+           (forbidden under §1.0(d)), and what survives is structural: the finished test block
+           above is a TEMPLATE, and its headroom + flag lines carry onto the new block in one
+           paste because relative references translate (r154). Legal, and it is the drill's own
+           lesson rather than a bolt-on.
+         PART 3 — THE HALF MEASURED IN ISOLATION (the r438 `series` rule — a combined number
+           hides a negative half): the two lines built by hand (type + fill each) cost 38 keys;
+           the same two lines cloned cost 15. **2.5× on the ☆'s own half**, and the star is
+           proved SKIPPABLE two ways — dev/verify-covtable.js PART D (12 seeds, all five cores
+           green with the star dark) and dev/e2e-alt-paths.js entry 2.
+
+       ── ☆ FAMILY: DELIBERATELY NOT A FILL (r447 wave addendum) ───────────────────────────
+       c7's first half already carries four fill-latch stars, and §1.0-R4(u) forbids ADJACENT
+       drills sharing a family. The fill family was measured here anyway and is real (one fill
+       covers a five-quarter line), but the paste/reference-over-retype family measured
+       comparably (2.5× isolated) and is non-fill, so it is the one taken — as the addendum
+       directs. Read off the r425 S.pasteLog latch (the MECHANIC and the rects it moved, never
+       geometry inferred from the end state): existing telemetry, so NO engine hunk is needed.
+
+       ── STRUCTURAL DEVIATIONS from the §4.73 page, declared here per §0 ──────────────────
+       (1) ☆ RE-CUT (binding, §1.0-R4(u)). The page's bonus is "Bold the pinch quarter's column
+           header" — a FORMATTING task, dead on arrival under §1.0(d), and it also fails the
+           §1.0-R2(i) skippability test because dressing the page is what you were doing anyway.
+           Replaced by the measured clone above.
+       (2) THE BOARD CARRIES TWO LEVERAGE TESTS, not one. A real credit agreement tests senior
+           secured net leverage AND total net leverage, each against its own stepping maximum;
+           that is the artifact (§1.0-R4(t) reality test) and it is what gives the ☆ a template
+           to clone. One test ships FINISHED (last quarter's certificate); the player builds the
+           other. Which one is the seed's (d)-axis.
+       (3) A FINISH-STATE BEAT JOINS (§1.6 — the page predates the rule): the tightest-quarter
+           line is bolded and takes a TOP border (§1.0(f): a total earns the line above), then
+           the engine appends the Ctrl+S closer (§1.0(e), saveClose:true).
+       (4) INTEREST COVERAGE (EBITDA/Interest) IS NOT ON THIS BOARD, though MODELING_STANDARDS §4
+           assigns both credit stats here. §1.3/§7 bind harder: a Models board is a COMPONENT and
+           must fit 20 rows, and the fragment that fits is the leverage covenant table. Coverage
+           is carried by `intsched` (§4.69, "coverage read"). Recorded as a deliberate narrowing,
+           not an omission — narrow the fragment, never raise the cap.
+
+       ── §1.0-R3(p) GRADE THE END STATE — ROUTES WALKED, NOT REASONED ABOUT ───────────────
+       · every ratio/headroom beat grades "the formula mentions the ONE cell every legal route
+         must mention" + VALUE parity against the seeded truth. No anchor text, no formula shape,
+         no range literal is ever read — the r439 class (`=MIN(B9:F9)` demanded as TEXT) is gone,
+         so =MIN(range), =MIN(cell,cell,…) and a reversed range all clear.
+       · the flag reads 'IF(' + value. The page asks for a real IF and the engine offers no other
+         conditional; =IF(headroom>=0,1,0), =IF(covenant>=leverage,1,0) and =IF(h<0,0,1) all clear
+         because only the VALUE is compared.
+       · the dress reads bold + (bt OR ball), so Alt H B P (top), Alt H B S (a 1×1 outside box
+         stores `ball`, campaign route fact) and Alt H B A all clear.
+       · the leave-untouched guard on the blue covenant row folds into beat 2's `ok` (doctrine
+         §2.5, no do-nothing lines): headroom grades against the SEEDED covenant level, so a
+         player who overwrites the input cannot make the line green.
+       · NO cueCell (§1.0-R2(h)/§1.0-R3(q)): there is no insert slot and no unlabelled paste
+         target — every graded cell sits on a labelled row, so the guided ring resolves. A cue at
+         the clone's destination would also spoil the mystery ☆ (§2.2). */
+    name:'Cov. Table', label:'Run the covenant table', par:36, parKeys:33, saveClose:true,   /* r447 §4.73 depth pass: par re-swept from scratch on the rebuilt 20-row board (was par 45 / parKeys 45 on the old 12-row board). dev/e2e-par-sweep.js covtable, 5-seed median 33 keys including the engine-appended Ctrl+S, and FLAT at 33 over a 36-seed probe (min 33, max 33): the board's geometry never varies, only its names, its figures and which of the two tests is missing. par 36 ≈ 1.09 s/key, the top of the house band, and deliberately there — two of the six beats are a READ before a hand moves (which test the amendment added, and which quarter pinches). Measured against it, every selection and navigation KEYED: the fast route runs 55 keys and the fully hand-typed route 240 (dev/verify-covtable.js PART B). Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 54 · pro 41 · legendary 36. */
+    aha:'covenants are ratios with teeth — the table shows the headroom quarter by quarter, and the tightest one is the only number the room wants.',
+    /* §1.5: the aha's MOMENT is beat 4 — the MIN lands and the whole five-quarter line collapses
+       to the one number the credit committee actually asks for. */
+    prompt:'The credit agreement runs two leverage tests every quarter, and last week’s amendment added the second one — that block of the compliance table is still empty while the other sits finished right above it. Net leverage is debt less cash over LTM (last-twelve-months) EBITDA, and the covenant maximum steps down as the deal seasons, so the question is never "compliant this quarter?" but "which quarter pinches?". Build the missing test, flag every quarter, and hand the credit committee the tightest number on the page before the lender call.',
+    req(){ const o=this._o, q0=o.qc[0], qN=o.qc[o.NQ-1], dB=o.bTot?o.rTot:o.rSen;
+      return 'seed <em>'+q0+o.RB+'</em> <em>=('+q0+dB+'-'+q0+o.rCash+')/'+q0+o.rEb+'</em> · <em>ctrl+r</em> across '+q0+o.RB+':'+qN+o.RB
+        +' · copy <em>'+o.srcRng+'</em> · <em>ctrl+v</em> at <em>'+q0+(o.RB+2)+'</em> · <em>'+q0+o.rMin+'</em> <em>=MIN('+o.hdRng+')</em> · <em>ctrl+b</em> · <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o, q0=o.qc[0], qN=o.qc[o.NQ-1], dB=o.bTot?o.rTot:o.rSen;
+      return [
+      'net leverage credits the cash — debt less cash, over LTM EBITDA · '+q0+o.RB+': <kbd>=</kbd>('+q0+dB+'-'+q0+o.rCash+')/'+q0+o.rEb+' <kbd>↵</kbd> · select '+q0+o.RB+':'+qN+o.RB+' and <kbd>ctrl</kbd>+<kbd>r</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> is the same fill). Typing all five quarters by hand lands the same line',
+      'headroom is the covenant maximum less the ratio · '+q0+(o.RB+2)+': <kbd>=</kbd>'+q0+(o.RB+1)+'-'+q0+o.RB+' <kbd>↵</kbd> · fill across. Leave the blue covenant row alone — it is what the agreement says',
+      'the flag is a real IF · '+q0+(o.RB+3)+': <kbd>=</kbd>IF('+q0+(o.RB+2)+'>=0,1,0) <kbd>↵</kbd> · fill across — <kbd>=</kbd>IF('+q0+(o.RB+1)+'>='+q0+o.RB+',1,0) grades the same',
+      'the number the room asks for · '+q0+o.rMin+': <kbd>=</kbd>MIN('+o.hdRng+') <kbd>↵</kbd> — naming the quarters one by one inside the MIN grades the same',
+      'select '+q0+o.rMin+' · <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> lays the top border (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> boxes the single cell and grades the same)',
+      '☆ the discovery: the test above is already finished, and its headroom and flag lines are a template — copy '+o.srcRng+', land it on '+q0+(o.RB+2)+', and the references travel with it. Building both lines by hand finishes the drill identically and forfeits the star',
     ]; },
+    /* rings: ① the new leverage line · ② its headroom line · ③ its flag line · ④/⑤ the
+       tightest-quarter cell · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o, q0=o.qc[0], qN=o.qc[o.NQ-1];
+      return [q0+o.RB+':'+qN+o.RB, o.hdRng, q0+(o.RB+3)+':'+qN+(o.RB+3), q0+o.rMin, q0+o.rMin, null]; },
+    demo(){ const o=this._o, q0=o.qc[0], qN=o.qc[o.NQ-1], dB=o.bTot?o.rTot:o.rSen;
+      return [
+        {sel:q0+o.RB, keys:[...T('=('+q0+dB+'-'+q0+o.rCash+')/'+q0+o.rEb), Kb.enter]},
+        {sel:q0+o.RB+':'+qN+o.RB, keys:[Kb.fillR]},
+        /* ☆ — the finished test is a template: two lines, one paste, references translate */
+        {sel:o.srcRng, keys:[Kb.copy]},
+        {sel:q0+(o.RB+2), keys:[Kb.paste]},
+        {sel:q0+o.rMin, keys:[...T('=MIN('+o.hdRng+')'), Kb.enter]},
+        {sel:q0+o.rMin, keys:[Kb.bold, Kb.alt,L('h'),L('b'),L('p')]},
+      ];
+    },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 Covenant compliance (the max steps down \u2014 where does it pinch?)',txt:true,bold:true};
-      cells['A3']={...blankCell(),value:'Item',txt:true,bold:true};
-      for(let c=2;c<=6;c++) cells[colLetter(c)+'3']={...blankCell(),value:'Q'+(c-1),txt:true,bold:true};
-      cells['A4']={...blankCell(),value:'LTM EBITDA ($mm)',txt:true};
-      cells['A5']={...blankCell(),value:'Total debt ($mm)',txt:true};
-      cells['A6']={...blankCell(),value:'Cash ($mm)',txt:true};
-      cells['A7']={...blankCell(),value:'Net leverage (x)',txt:true};
-      cells['A8']={...blankCell(),value:'Covenant max (x)',txt:true};
-      cells['A9']={...blankCell(),value:'Headroom (x)',txt:true,bold:true};
-      cells['A10']={...blankCell(),value:'Compliant? (1/0)',txt:true};
-      cells['A12']={...blankCell(),value:'Tightest quarter (x)',txt:true,bold:true};
-      // EBITDA sags mid-path (the RX story), debt amortizes a touch, cash breathes,
-      // the max steps down \u2014 the pinch lands mid-table more often than at the ends
-      let ebitda=rnd(80,200)*5;
-      const debt0=Math.round(ebitda*(3.5+rnd(0,15)/10)/5)*5;
-      let maxCov=(45+rnd(5,20))/10;                 // 5.0x\u20136.5x, stepping down
-      let debt=debt0, cash=rnd(4,16)*5;
-      for(let c=2;c<=6;c++){
-        const Lc=colLetter(c);
-        cells[Lc+'4']={...blankCell(),value:ebitda,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[Lc+'5']={...blankCell(),value:debt,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[Lc+'6']={...blankCell(),value:cash,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[Lc+'8']={...blankCell(),value:Math.round(maxCov*10)/10,fontColor:'blue',decimals:1};
-        cells[Lc+'7']={...blankCell(),decimals:2}; cells[Lc+'9']={...blankCell(),decimals:2};   // r190: ratios land at 2dp
-        const drift=(c<=4? -rnd(2,10) : rnd(0,8));  // sag then stabilize/recover
-        ebitda=Math.max(40, Math.round((ebitda*(1+drift/100))/5)*5);
-        debt=Math.max(40, debt-rnd(0,6)*5);
-        cash=Math.max(10, cash+(rnd(0,1)?1:-1)*rnd(0,4)*5);
-        if(c===3||c===5) maxCov-= (2+rnd(0,3))/10;  // the step-downs
+      /* §1.2 randomization — four independent axes on a near-full-grid board, so (a) site
+         shuffle becomes COLUMN jitter (§1.2's full-grid clause; twenty rows leaves no room to
+         move vertically): (a) the whole table sits on column A or B, which moves every
+         reference letter; (b) CONTENT — codename() plus a four-way tranche/label set; (c)
+         VALUES — every figure and every covenant level through rnd(), with the EBITDA sag and
+         the step-downs calibrated so the pinch quarter MOVES between seeds; (d) WHICH TEST IS
+         MISSING — senior secured or total net leverage, which changes the input row the ratio
+         must read and makes beat 1's label §1.0-R2(g) adaptive rather than memorisable.
+         Geometry is constant across seeds (five quarters, two four-row blocks) so the demo's
+         keystroke count never moves. */
+      const NQ=5;
+      const c0=1+rnd(0,1);
+      const cL=colLetter(c0);
+      const qc=[]; for(let j=0;j<NQ;j++) qc.push(colLetter(c0+1+j));
+      const rHdr=3, rEb=4, rSen=5, rTot=6, rCash=7, RA=9, RB=14, rMin=19, rMemo=20;
+      const bTot=rnd(0,1)===1;                       // §1.2(d): the MISSING test
+      const q1=rnd(1,4);                             // the quarter the table opens on
+      /* the input paths — EBITDA sags then steadies (the story a covenant table exists to
+         tell), debt amortises, cash breathes. MODELING_STANDARDS §2: this is a magnitude
+         table, not a P&L, so every figure carries a positive sign; the basis line says so. */
+      const eb=[], tD=[], sD=[], ca=[];
+      let e=rnd(30,90)*5, td=Math.round(e*(40+rnd(0,15))/10/5)*5, sd=Math.round(td*(55+rnd(0,20))/100/5)*5, cs=rnd(3,14)*5;
+      const sagEnd=2+rnd(0,1);
+      for(let j=0;j<NQ;j++){
+        eb.push(e); tD.push(td); sD.push(sd); ca.push(cs);
+        const drift=(j<sagEnd? -rnd(3,10) : rnd(3,10));
+        e=Math.max(60, Math.round(e*(1+drift/100)/5)*5);
+        td=Math.max(100, td-rnd(0,5)*5);
+        sd=Math.max(70, sd-rnd(0,5)*5);
+        cs=Math.max(10, cs+(rnd(0,1)?1:-1)*rnd(0,3)*5);
       }
-      cells['B12']={...blankCell(),decimals:2};
-      return {ROWS:12, cells, active:{r:7,c:2}, sel:null, colW:{1:150}};
+      const levOf=(d)=>eb.map((E,j)=>(d[j]-ca[j])/E);
+      const levSen=levOf(sD), levTot=levOf(tD);
+      /* THE COVENANT SCHEDULE. A stepping maximum is three levels across five quarters, so the
+         whole schedule is one base level minus the steps. WHERE the two step-downs land is a
+         randomization axis in its own right and it is load-bearing: with the steps pinned to
+         the last two quarters the covenant floor always beat the EBITDA recovery and the pinch
+         sat on the final column in 4 of 5 seeds (measured, dev/verify-covtable.js PART A) — a
+         drill whose answer is "the last one" every time. Drawing the first step from Q2/Q3 and
+         the second from Q4/Q5 puts the floor before the recovery often enough that the pinch
+         moves. The base is SOLVED so the tightest quarter lands on a chosen target headroom,
+         and the solver rejects any base that parks a quarter within 0.06x of zero — a line
+         reading "0.0x" beside a flag reading 0 is a board that argues with itself. */
+      const st1=1+rnd(0,1), st2=3+rnd(0,1);
+      const STEP=0.5, stepAt=(j)=>(j>=st1?1:0)+(j>=st2?1:0);
+      const solve=(lev,target)=>{
+        const raw=lev.map((L,j)=>-STEP*stepAt(j)-L);
+        const m=Math.min.apply(null,raw);
+        let best=null, bestD=1e9;
+        for(let k=-12;k<=12;k++){
+          const base=Math.round((target-m)*10+k)/10;
+          const h=raw.map(x=>base+x);
+          const mn=Math.min.apply(null,h);
+          if(!h.every(x=>Math.abs(x)>=0.06)) continue;
+          if((target<0)!==(mn<0)) continue;
+          const d=Math.abs(mn-target);
+          if(d<bestD){ bestD=d; best=base; }
+        }
+        return best===null? Math.round((target-m)*10)/10 : best;
+      };
+      const tgt=()=> (rnd(0,1)? -(20+rnd(0,25))/100 : (10+rnd(0,25))/100);
+      const schedule=(lev,target)=>{ const base=solve(lev,target);
+        return lev.map((L,j)=>Math.round((base-STEP*stepAt(j))*10)/10); };
+      const covSen=schedule(levSen, tgt()), covTot=schedule(levTot, tgt());
+      /* which block is which: the FINISHED test sits above (block A), the missing one below
+         (block B), exactly five rows apart — which is what lets one paste carry the headroom
+         and flag lines across with their references intact. */
+      const levA=bTot?levSen:levTot, covA=bTot?covSen:covTot, dRowA=bTot?rSen:rTot;
+      const levB=bTot?levTot:levSen, covB=bTot?covTot:covSen, dRowB=bTot?rTot:rSen;
+      const hdA=covA.map((c,j)=>c-levA[j]), hdB=covB.map((c,j)=>c-levB[j]);
+      const labA=bTot?'Senior net leverage (x)':'Total net leverage (x)';
+      const labB=bTot?'Total net leverage (x)':'Senior net leverage (x)';
+      const nameB=bTot?'total net leverage':'senior net leverage';
+      cells[cL+'1']={...blankCell(),value:codename()+' — Covenant compliance table (LTM, $mm; ratios in x)',txt:true,bold:true};
+      cells[cL+rHdr]={...blankCell(),value:'Item',txt:true,bold:true,bb:true};
+      for(let j=0;j<NQ;j++) cells[qc[j]+rHdr]={...blankCell(),value:'Q'+(((q1-1+j)%4)+1)+' FY'+(26+Math.floor((q1-1+j)/4)),txt:true,bold:true,align:'r',bb:true};
+      const inp=[[rEb,'LTM EBITDA ($mm)',eb],[rSen,'Senior secured debt ($mm)',sD],[rTot,'Total debt ($mm)',tD],[rCash,'Cash and equivalents ($mm)',ca]];
+      inp.forEach(([r,lab,arr])=>{ cells[cL+r]={...blankCell(),value:lab,txt:true};
+        for(let j=0;j<NQ;j++) cells[qc[j]+r]={...blankCell(),value:arr[j],fontColor:'blue',fmtStyle:'comma',decimals:0}; });
+      /* BLOCK A — the test that was already in the agreement, run and signed off. It ships
+         COMPLETE and live, which is what makes it a template rather than an example. */
+      cells[cL+RA]={...blankCell(),value:labA,txt:true};
+      cells[cL+(RA+1)]={...blankCell(),value:'Covenant max (x)',txt:true};
+      cells[cL+(RA+2)]={...blankCell(),value:'Headroom (x)',txt:true};
+      cells[cL+(RA+3)]={...blankCell(),value:'Compliant? (1/0)',txt:true};
+      for(let j=0;j<NQ;j++){ const Q=qc[j];
+        cells[Q+RA]={...blankCell(),formula:'=('+Q+dRowA+'-'+Q+rCash+')/'+Q+rEb,value:levA[j],fmtStyle:'mult',decimals:1};
+        cells[Q+(RA+1)]={...blankCell(),value:covA[j],fontColor:'blue',fmtStyle:'mult',decimals:1};
+        cells[Q+(RA+2)]={...blankCell(),formula:'='+Q+(RA+1)+'-'+Q+RA,value:hdA[j],fmtStyle:'mult',decimals:1};
+        cells[Q+(RA+3)]={...blankCell(),formula:'=IF('+Q+(RA+2)+'>=0,1,0)',value:(hdA[j]>=0?1:0),decimals:0};
+      }
+      /* BLOCK B — the amendment's test. The labels, the units and the blue covenant level are
+         all here (§1.3 labelled targets); the three derived lines are what the player builds.
+         The empty cells ship with the FORMAT they will need, so the hand route and the clone
+         route land the same page (§1.0(c): no route is penalised). */
+      cells[cL+RB]={...blankCell(),value:labB,txt:true};
+      cells[cL+(RB+1)]={...blankCell(),value:'Covenant max (x)',txt:true};
+      cells[cL+(RB+2)]={...blankCell(),value:'Headroom (x)',txt:true};
+      cells[cL+(RB+3)]={...blankCell(),value:'Compliant? (1/0)',txt:true};
+      for(let j=0;j<NQ;j++){ const Q=qc[j];
+        cells[Q+RB]={...blankCell(),fmtStyle:'mult',decimals:1};
+        cells[Q+(RB+1)]={...blankCell(),value:covB[j],fontColor:'blue',fmtStyle:'mult',decimals:1};
+        cells[Q+(RB+2)]={...blankCell(),fmtStyle:'mult',decimals:1};
+        cells[Q+(RB+3)]={...blankCell(),decimals:0};
+      }
+      cells[cL+rMin]={...blankCell(),value:'Tightest quarter (x)',txt:true};
+      cells[qc[0]+rMin]={...blankCell(),fmtStyle:'mult',decimals:1};
+      /* MODELING_STANDARDS §7: where a convention is simplified for teaching, the board says so
+         in its own memo line — here the covenant EBITDA is taken as reported, with no add-backs
+         and no pro-forma adjustment, and the cash netting is uncapped. */
+      cells[cL+rMemo]={...blankCell(),value:'Basis: LTM as reported — no add-backs; cash netted in full per the definition; levels per the credit agreement.',txt:true,it:true,fontColor:'gray'};
+      this._o={ c0, cL, qc, NQ, rHdr, rEb, rSen, rTot, rCash, RA, RB, rMin, rMemo,
+        bTot, nameB, labA, labB, dRowA, dRowB, eb, sD, tD, ca,
+        levA, levB, covA, covB, hdA, hdB,
+        minB: Math.min.apply(null, hdB),
+        pinch: hdB.indexOf(Math.min.apply(null, hdB)),
+        hdRng : qc[0]+(RB+2)+':'+qc[NQ-1]+(RB+2),
+        srcRng: qc[0]+(RA+2)+':'+qc[NQ-1]+(RA+3) };
+      const colW={}; if(c0>1) colW[c0-1]=22;
+      colW[c0]=206; for(let j=0;j<NQ;j++) colW[c0+1+j]=80;
+      return {ROWS:20, cells, active:{r:RB,c:c0+1}, sel:null, colW};
     },
     checks(S){
-      const V=(a)=>{ const x=S.cells[a]; return (x&&typeof x.value==='number')?x.value:0; };
-      let levOk=true, hdOk=true, flagOk=true;
-      for(let c=2;c<=6;c++){ const Lc=colLetter(c);
-        const lev=S.cells[Lc+'7'];
-        const fl=(lev&&lev.formula)?lev.formula.toUpperCase().replace(/[\s$]/g,''):'';
-        if(!fl || fl.indexOf(Lc+'5')<0 || fl.indexOf(Lc+'6')<0 || fl.indexOf(Lc+'4')<0
-           || Math.abs(((lev&&lev.value)||0)-(V(Lc+'5')-V(Lc+'6'))/V(Lc+'4'))>1e-6) levOk=false;
-        const hd=S.cells[Lc+'9'];
-        const fh=(hd&&hd.formula)?hd.formula.toUpperCase().replace(/[\s$]/g,''):'';
-        if(!fh || fh.indexOf(Lc+'8')<0 || fh.indexOf(Lc+'7')<0
-           || Math.abs(((hd&&hd.value)||0)-(V(Lc+'8')-V(Lc+'7')))>1e-6) hdOk=false;
-        const fg=S.cells[Lc+'10'];
-        const ff=(fg&&fg.formula)?fg.formula.toUpperCase().replace(/[\s$]/g,''):'';
-        const wantF=(V(Lc+'9')>=0)?1:0;
-        if(!ff || ff.indexOf('IF(')<0 || ff.indexOf(Lc+'9')<0 || !(fg && typeof fg.value==='number' && fg.value===wantF)) flagOk=false;
-      }
-      const tq=S.cells['B12'];
-      const ft=(tq&&tq.formula)?tq.formula.toUpperCase().replace(/[\s$]/g,''):'';
-      let wantT=Infinity; for(let c=2;c<=6;c++) wantT=Math.min(wantT, V(colLetter(c)+'9'));
-      const tqOk=!!(ft && ft.indexOf('MIN(')>=0 && ft.indexOf('B9:F9')>=0 && hdOk && Math.abs(((tq&&tq.value)||0)-wantT)<1e-6);
+      const o=this._o, cel=k=>S.cells[k]||{};
+      const F=k=>{ const c=cel(k); return c.formula?String(c.formula).toUpperCase().replace(/[\s$]/g,''):''; };
+      const hasRef=(f,key)=>new RegExp('(^|[^A-Z0-9])'+key+'([^0-9]|$)').test(f);
+      const near=(a,b,e)=>typeof a==='number' && Math.abs(a-b)<=(e||1e-6);
+      /* BEAT 1 — the missing test's ratio line. Formula MENTIONS the quarter's LTM EBITDA cell
+         (every live route divides by it; a typed number does not) + VALUE parity against the
+         seeded truth. Shape, anchoring and route are never read (§1.0-R3(p)). */
+      let levOk=true;
+      for(let j=0;j<o.NQ;j++){ const k=o.qc[j]+o.RB, f=F(k);
+        if(!f || !hasRef(f,(o.qc[j]+o.rEb).toUpperCase()) || !near(cel(k).value,o.levB[j])) levOk=false; }
+      /* BEAT 2 — headroom. Graded against the SEEDED covenant level, which folds the
+         leave-untouched guard on the blue input row into this check's ok (doctrine §2.5). */
+      let hdOk=true;
+      for(let j=0;j<o.NQ;j++){ const k=o.qc[j]+(o.RB+2), f=F(k);
+        if(!f || !hasRef(f,(o.qc[j]+(o.RB+1)).toUpperCase()) || !near(cel(k).value,o.hdB[j])) hdOk=false; }
+      /* BEAT 3 — the compliance flag, a real IF (the §4.73 page's explicit ask, and the engine
+         offers no other conditional). Only 'IF(' and the 1/0 VALUE are read, so every argument
+         order clears. */
+      let flagOk=true;
+      for(let j=0;j<o.NQ;j++){ const k=o.qc[j]+(o.RB+3), f=F(k), want=(o.hdB[j]>=0?1:0);
+        if(f.indexOf('IF(')<0 || !near(cel(k).value,want)) flagOk=false; }
+      /* BEAT 4 — the tightest quarter. Formula mentions at least one cell of the headroom line
+         it reads + VALUE parity; the r439 bug class (a range literal demanded as TEXT) is gone,
+         so =MIN(range), =MIN(cell,cell,…) and a reversed range all clear. */
+      const mk=o.qc[0]+o.rMin, mf=F(mk);
+      const readsRow=o.qc.some(Q=>hasRef(mf,(Q+(o.RB+2)).toUpperCase()));
+      const minOk=!!(mf && readsRow && near(cel(mk).value,o.minB,1e-6));
+      /* BEAT 5 — the §1.6 finish. bt OR ball, so every border route clears (a 1×1 outside
+         border stores `ball`, campaign route fact). */
+      const dressOk=!!(cel(mk).bold && (cel(mk).bt||cel(mk).ball));
+      /* ☆ (§1.0(d) hidden efficiency + §1.0-R2(i) a distinct, skippable decision) — the finished
+         test's headroom and flag lines carried onto the new block in ONE paste, references
+         translating with them. Read off the r425 S.pasteLog latch: the MECHANIC and the rects it
+         moved, never inferred from the end state, so beats 2 and 3 stay route-blind. Hand-typing
+         both lines clears every core with the star dark (dev/e2e-alt-paths.js, entry 2). */
+      const clone=(S.pasteLog||[]).some(p=>(p.kind==='all'||p.kind==='formulas')
+        && p.sr===o.RA+2 && p.r0===o.RB+2
+        && p.c0<=o.c0+1 && (p.c0+p.w-1)>=(o.c0+o.NQ) && (p.r0+p.h-1)>=(o.RB+3));
+      const starOk=hdOk && flagOk && clone;
+      /* §1.0-R2(g) ADAPTIVE LABEL: which test the amendment added is a seed fact, so beat 1
+         names THIS seed's line instead of making the player reverse-engineer the board. */
       return [
-        {label:'run NET leverage live \u2014 (debt \u2212 cash) \u00f7 LTM EBITDA, every quarter (row 7)', ok:levOk},
-        {label:'run headroom against the STEPPING max \u2014 covenant \u2212 net leverage (row 9)', ok:hdOk},
-        {label:'build the compliance flag as a real IF \u2014 1 in the clear, 0 in breach (row 10)', ok:flagOk},
-        {label:'pull the tightest quarter with MIN over the headroom row (B12; needs row 9 live)', ok:tqOk},
+        {label:'Build the '+o.nameB+' line — every quarter', ok: levOk},
+        {label:'Build the headroom line under the new test — every quarter', ok: hdOk},
+        {label:'Build the compliance flag — 1 compliant, 0 in breach', ok: flagOk},
+        {label:'Build the tightest-quarter cell — the lowest headroom on the new test', ok: minOk},
+        {label:'Bold the tightest-quarter line and add a top border above it', ok: dressOk},
+        {label:'Copy the finished test’s headroom and flag lines in one paste', ok: starOk, bonus:true},
       ];
     }
   },
-
   versionup:{
     /* r439 H6b (DEPTH_PASS §4.54, "Replace hardcodes so it rolls forward") — the depth-pass
        rework, built to §1.0 + §1.0-R2 + §1.0-R3 (§1.0-R3 wins on conflict) and, above all, to
