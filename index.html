@@ -10911,55 +10911,382 @@ const CHALLENGES = {
     }
   },
   dcfsens:{
-    name:'Sensitivity', label:'Run the sensitivity table', par:19, parKeys:17,
+    /* r444 H6b-P15 (DEPTH_PASS §4.63, "Run the sensitivity table") — the depth-pass rework,
+       built to §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (the law wins on conflict),
+       and to dev/MODELING_STANDARDS.md, which binds because this board IS a fragment of a DCF.
+
+       WAS: three checks on a ROWS:8 board — 40% density, the §1.3 defect in its purest form —
+       no ☆, no saveClose, a grid pinned at a FIXED site (C4:G6 every seed, the AUDIT_R417 §D #14
+       ask: "randomize grid site, base-case beat, de-nest checks"), and three NESTED checks where
+       CHECK3 re-graded CHECK1's and CHECK2's cells. CHECK3's label also claimed "one formula"
+       with NO fill latch behind it (AUDIT_R417 §D, "systemic") — a claim the drill could not
+       see and therefore could not grade. All four findings close here: the site draws from a
+       4-spot pool, the base-case READ is a beat, each check's ok stands alone given S, and the
+       "one formula" claim moves out of a core label into the ☆, where S.fillOps can prove it.
+
+       ── THE ☆-HEADROOM DIAGNOSTIC (CAMPAIGN §2, both parts, run BEFORE the board was designed
+       and re-measured on the shipped board through the live engine — `node dev/verify-dcfsens.js`
+       re-runs every number, every selection and navigation keyed):
+         PART 1 — IS THERE SPREAD? fastest legal **32 keys** (one anchored formula, the grid
+           grabbed once, Ctrl+D then Ctrl+R, Ctrl+1 N, Alt H B S, and the engine's save) against
+           **407** for the slowest legal route that clears every core (fifteen anchored formulas
+           typed out, the comma walked on each cell with Alt H K + Alt H 9 ×2, the box walked
+           edge by edge). **12.7×** — the widest spread this campaign has measured, and the shape
+           of the board is why: every one of the fifteen cells is a formula, so the type-it-out
+           floor is fifteen formulas rather than fifteen values.
+         PART 2 — IS ANY OF THAT SPREAD ☆-LEGAL? Strip chord-vs-ribbon (Ctrl+D/R vs Alt H F I
+           D/R, Ctrl+1 N vs Alt H K + Alt H 9 ×2, Alt H B S vs the four-edge walk — §1.0(c)
+           forces every one of them to clear, and all are probed): the ribbon route runs 41 keys
+           against the chord route's 32, so ~9 keys. Strip formatting (§1.0(d) forbids a
+           formatting ☆): the comma pass, 2 keys fast and 135 slow. What survives is **226 keys
+           of fill-against-typing**, which is neither excluded class — a legal ☆ exists and it is
+           the drill's own lesson.
+         EACH HALF MEASURED APART (the r438 `series` rule — a combined number hides a negative
+         half): the ACROSS half runs 22 keys (the corner formula, then one fill) against 85 (the
+         corner plus four more formulas typed); the DOWN half adds 7 keys (grab, Ctrl+D) against
+         170 for the ten typed. Both halves positive by an order of magnitude, so neither can be
+         hiding the other. Every number here re-runs from `node dev/verify-dcfsens.js`.
+
+       ── UNTRIGGERABLE-BEAT SWEEP (CAMPAIGN §1 — enumerate every route to the visible end state
+       and PROBE it; reading predicates has never once found this class). Routes walked live:
+         · typed dollar signs vs F4 cycling — identical strings, both clear (ALT 2 drives F4);
+         · ONE selection Ctrl+D then Ctrl+R over the whole rect, vs the two-selection
+           across-then-down, vs down-then-across (ALT 1) — all three clear and all three earn ☆;
+         · the ribbon fills Alt H F I D / Alt H F I R (ALT 2);
+         · Ctrl+Enter multi-commit over the grid (the `anchor` §4.23 move) — it lands the same
+           fifteen cells with NO fill op at all, so the ☆ reads S.multiEnter as an equal route
+           (a star that punished a better route would be a defect, not a bonus);
+         · **the FCF reference pointed at the forecast strip's last year instead of the labelled
+           Terminal-year FCF cell** — same number, same board, and the FIRST predicate written
+           here would have failed it. That is the untriggerable class exactly, caught by walking
+           the route: both cells ARE the terminal-year FCF and both now grade (see fcfRef below);
+         · fully absolute refs typed per cell (=$B$7/($E$12-$B$14)) — a legitimate slow-route end
+           state, so the locks are graded as "the lock that has to survive the fill is present",
+           never as "and nothing more" (the `anchor` r433 rule). Fifteen IDENTICAL absolute
+           formulas still fail, on VALUE, which is what stops that from being a loophole;
+         · comma at zero places: Ctrl+1 N in one move, Alt H K / Ctrl+Shift+! at two places then
+           Alt H 9 ×2 — all clear (CAMPAIGN §1 route facts, re-probed on this board);
+         · the box: Alt H B S on the 1×1 base case stores `ball` (CAMPAIGN §1), and so do Alt H
+           B A and the Format Cells border tab; Alt H B T adds `thick`; the four-edge walk stores
+           bt+bb+bl+br. Every one of them clears.
+       ONE route is deliberately NOT accepted and it is the doctrine §2.2 ANCHOR-TEXT EXCEPTION,
+       which names THIS DRILL by key: a grid of fifteen formulas carrying no locks reads right
+       and IS wrong — it cannot travel, and travelling is the whole lesson. §1.0(c) preserves the
+       exception in as many words ("doctrine's explicit anchor-text exception where anchoring IS
+       the lesson"), so the check LABEL states the locks and the guide names both routes to them.
+
+       ── WHAT THIS DRILL OWNS, against the rest of the anchoring family (the boundary `anchor`
+       and `fxconvert` record in their own headers — stated here so a later agent cannot blur it):
+         · anchor §4.23 (c3) — two MIXED references in one formula over a 3×3 quote grid. Its
+           star is the Ctrl+Enter multi-commit. A wrong anchor there produces an OBVIOUS wrong
+           number (a quote at the wrong volume) or an empty cell.
+         · fxconvert §4.30 (c3) — ONE fully absolute driver broadcast over a block.
+         · percent §4.22 (c3) — one absolute divisor per block, 1-D fill, two blocks.
+         · dcfsens (here, c6) — **all three lock forms in ONE formula**: absolute driver, a
+           row-locked header, a column-locked ladder, over a two-way grid. It is the only board
+           in the catalog where the three appear together, and — the part that makes it a Models
+           drill rather than a bigger `anchor` — a mis-anchored cell here yields a PLAUSIBLE
+           terminal value, not a visible error, which is precisely the failure a reviewer opens
+           a sensitivity table to find. CANON_DIFF records the ladder ("anchor → dcfsens").
+         Distinctness (CAMPAIGN §3 test — does fluency in one produce a correct first attempt at
+         the other?): partly, and deliberately — this is the declared second rung. What does NOT
+         carry over is the third reference: `anchor`'s fluent form has no absolute term at all,
+         and typing it here (=C$12-$B13 with a relative FCF) walks the driver off the page on the
+         first fill. KEEP, as the ladder's top rung.
+
+       THE BOARD (MODELING_STANDARDS §1/§4/§7 · §1.0-R4(t) reality test). One page of a live DCF:
+       the forecast's unlevered FCF strip across five fiscal years, the terminal-year figure
+       LINKED off the last year rather than retyped (§3's never-retype rule, in miniature), the
+       two base-case assumptions as labelled yellow inputs, and the WACC × terminal-growth grid
+       under them with a low/high range read-out at the foot. Terminal value is the perpetuity
+       form of MODELING_STANDARDS §4 — the numerator is the TERMINAL-YEAR FCF, i.e. already
+       grown, so TV = FCF_terminal ÷ (WACC − g) is the correct and internally consistent shape
+       (dev/REALISM_NOTES.md records this drill's PASS on exactly that point). g < WACC holds on
+       every one of the fifteen cells by construction — the §4 sanity check a reviewer applies —
+       because the growth ladder tops out at 3.5% and the WACC ladder starts at 7.0%.
+       REALITY TEST (§1.0-R4(t)): audience B produces this page the week a DCF goes in a book,
+       and the §3.1 map assigns Models I the B-heavy valuation family, so the artifact stays a
+       DCF. The craft is identical for audience A — a two-way price × volume table is the same
+       three locks — and the prompt carries the real frame (who wants it, why, by when).
+
+       DECLARED SIMPLIFICATIONS (MODELING_STANDARDS §7 — said in a code comment AND in the
+       board's own basis memo, so a player never learns a simplification without knowing it is
+       one): (1) only the TERMINAL value is sensitized; the forecast-period PV sits on the DCF
+       tab and does not move with the grid, which is why the exhibit is titled terminal value
+       and not enterprise value. (2) No mid-year convention. (3) The board is single-sheet, so
+       MODELING_STANDARDS §1's GREEN-for-another-tab ink has no honest home here — the strip is
+       blue because it is typed onto this exhibit and the memo names its source in words; the
+       terminal-year link and the range read-out are black formulas. Blue-input / black-formula
+       provenance is enforced across every seeded cell. (4) Every figure is positive, so the §2
+       sign convention is stated on the board but not exercised by any beat.
+
+       STRUCTURAL DEVIATIONS from the §4.63 page, declared here per §0:
+       (1) ☆ RE-CUT (binding, §1.0-R4(u)). The page's bonus — "Bold the header row and column —
+           the axes read" — is a FORMATTING task, which §1.0(d) killed as a class, and it falls
+           out of nobody's way, which §1.0-R2(i) also forbids. The re-cut ☆ is the mastery move
+           this board exists to reward and the one the AUDIT_R417 finding asked for: all fifteen
+           cells off ONE formula, proved by the S.fillOps rects (or S.multiEnter — see above),
+           never by geometry inferred from the end state. Measured skippable: the negative
+           control types all fifteen and clears every core with the ☆ dark (ALT 3; 292 keys with
+           the grid commaed in one pass, 407 with every cell dressed by hand).
+       (2) BEATS 4 AND 5 SWAP under §1.0(a) FORMAT-AS-YOU-GO. The page orders the base-case read
+           before the comma pass; the comma pass dresses the cells beats 1–3 just built, so it
+           follows them directly, and the read closes the drill as the §1.6 finish-state beat —
+           the last thing a reviewer does to a sensitivity page is mark the case being shown.
+       (3) THE PAGE'S BEATS 2 AND 3 ARE DE-NESTED (the audit's own ask). Beat 2 grades the four
+           cells beat 1 does not own; beat 3 grades the ten neither of them owns. Each ok stands
+           alone given S, so a dark line always names work that is actually missing.
+       (4) THE PAGE'S ROUTE WORDING IS CUT from the labels under §1.0(b): "Fill the top row
+           right" and "Fill the grid down" name the mechanism, and the mechanism lives in
+           guide/req. The lines state the outcome; the ☆ is what rewards the fill.
+       (5) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): there is no insert slot and no empty paste
+           target here, and a cue at the base case would hand over the READ that beat 5 IS.
+       (6) HELPER STANDARD (§1.0(f)/§1.0-R2(l)): the two base-case assumptions ARE the input
+           stack — vertically stacked, individually labelled, light yellow + all borders, blue
+           ink, shipped populated. The ladders stay plain blue hardcodes: they are the axis of
+           the exhibit rather than assumptions the model reads, and yellowing eight more cells
+           would bury the two the player has to find. No total sits on this board, so (f)'s
+           top-border law has nothing to dress.
+       (7) §1.3 DENSITY: 17 of 20 rows carry content at the win state (85%). The three blanks
+           are moats — one above the forecast block, one above the grid, one below it — and
+           they are load-bearing: they stop a Ctrl+arrow flight or a current-region grab riding
+           from the grid into the forecast strip or the read-out. ROWS=20, floor and cap.
+       (8) FRAME BUDGET (CAMPAIGN §6.6, the `autofit` precedent): the sheet is budgeted to
+           878px of natural width against the ~880px grid box at 1440, so it renders 1:1 —
+           the five grid columns are sized for the WIDEST thing any legal route can put in them
+           (an unformatted quotient renders at 10 significant digits, ~107px), which is also
+           what keeps ##### off the board mid-solve, not only at load. */
+    name:'Sensitivity', label:'Run the sensitivity table', par:35, parKeys:32, saveClose:true,   /* r444 §4.63 depth pass: par re-swept from scratch (was par 19 / parKeys 17 on the 3-check, 8-row board). dev/e2e-par-sweep.js dcfsens, 5-seed median 32 keys including the engine-appended Ctrl+S, and flat across seeds — the board's geometry never varies (five WACCs, three growth rates, five forecast years), only its site and its draw, so the median IS the figure. par 35 ≈ 1.09 s/key: the top of the house band, deliberately, because beat 5 charges for a READ before a hand moves — the base case moves every seed and has to be found in the grid. Measured against it: the same board worked the slow way — fifteen anchored formulas typed out, every cell commaed by hand, the box walked edge by edge — runs 407 keys (dev/verify-dcfsens.js, the negative control), which is the cost the clock exists to show. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 53 · pro 40 · legendary 35. */
     aha:'Mixed anchors run the grid — row-lock the header, column-lock the driver; one formula fills every cell.',
-    prompt:'A two-way sensitivity table: five WACCs (the blended discount rate) across, three growth rates down, fifteen cells from one formula. Only correct mixed anchors survive it — FCF locked absolute ($B$2), the WACC header row-locked (C$3), the growth column column-locked ($B4). Build the formula once, fill right, fill down.',
-    req:'<em>C4</em> \u00b7 <em>=$B$2/(C$3-$B4)</em> \u2014 F4 cycles each ref to its mixed form \u00b7 fill C4:G4 <em>ctrl+r</em> \u00b7 then C4:G6 <em>ctrl+d</em>',
-    guide:[
-      'at C4 \u00b7 <kbd>=$B$2/(C$3-$B4)</kbd> <kbd>\u21b5</kbd> \u2014 <kbd>F4</kbd> cycles $B$2 \u2192 B$2 \u2192 $B2 \u2192 B2; stop on the form each ref needs',
-      'C$3: the column walks with the fill, row 3 stays pinned \u00b7 $B4: column B pinned, the row walks',
-      'select C4:G4 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 the WACC ref walks across',
-      'select C4:G6 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 the growth ref walks down \u00b7 fifteen values, one formula',
-    ],
-    targets:['C4','C4:G4','C4:G6'],
-    demo(){ return [
-      {sel:'C4', keys:[...T('=$B$2/(C$3-$B4)'), Kb.enter]},
-      {sel:'C4:G4', keys:[Kb.fillR]},
-      {sel:'C4:G6', keys:[Kb.fillD]},
+    /* §1.5: the aha's MOMENT is beat 3 — one formula crosses five discount rates and drops
+       three growth rates, and fifteen different terminal values land because each reference
+       held exactly the half of itself that had to hold. */
+    prompt:'The valuation committee sits at four and the VP wants the terminal value stress-tested before the book goes out. The forecast is done — FY-final unlevered free cash flow is on the page, already grown a year — so the terminal value is that cash flow over WACC less the terminal growth rate. Build the grid: five discount rates across, three growth rates down, fifteen cells, and one formula does all of them if its three references are pinned the right way round. Bring the figures to house standard, then mark the case the committee is actually being shown. The page lands somewhere new every run.',
+    req(){ const o=this._o; return '<em>'+o.corner+'</em> <em>='+o.f0+'</em> — <em>F4</em> cycles each reference to the lock it needs · select <em>'+o.grid+'</em> <em>ctrl+d</em> then <em>ctrl+r</em> · <em>ctrl+1</em> <em>n</em> · <em>'+o.baseCell+'</em> <em>alt h b s</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and every line names ALL the routes that grade, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'at <b>'+o.corner+'</b> — the first growth row at the first WACC. Type <kbd>=</kbd>, point at the terminal-year FCF <kbd>'+o.fcfCell+'</kbd> and press <kbd>F4</kbd> once for <b>'+o.fcfAbs+'</b> — both halves locked, it is the one number all fifteen cells share · <kbd>/</kbd> <kbd>(</kbd> · the WACC header <kbd>'+o.yc[0]+o.hr+'</kbd> and <kbd>F4</kbd> ×2 for <b>'+o.yc[0]+'$'+o.hr+'</b> (row pinned, column free) · <kbd>-</kbd> · the growth rate <kbd>'+o.CB+o.gr0+'</kbd> and <kbd>F4</kbd> ×3 for <b>$'+o.CB+o.gr0+'</b> (column pinned, row free) · <kbd>)</kbd> <kbd>↵</kbd>. Typing the dollar signs yourself lands the identical formula, and the FY-final cell <kbd>'+o.stripCell+'</kbd> is the same number if you would rather point there',
+      'the top row prices the same growth rate at every discount rate: select '+o.topRow+' and <kbd>ctrl</kbd>+<kbd>r</kbd> — the WACC reference walks a column per cell because only its row is pinned (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> is the ribbon’s same fill; four more formulas typed out land it too)',
+      'the rest drops down: select '+o.grid+' and <kbd>ctrl</kbd>+<kbd>d</kbd> — the growth reference walks a row per cell because only its column is pinned (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>d</kbd> fills down too). Down first and then right lands the same fifteen cells',
+      'select '+o.grid+' · <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>n</kbd> lands commas at zero places in one move (<kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> and <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>!</kbd> come in at two places — walk them off with <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> ×2)',
+      'the base case is the cell where the yellow WACC input <b>'+o.wStr+'</b> meets the yellow growth input <b>'+o.gStr+'</b> — read the header row across and the growth column down, land on it, and <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> boxes it (<kbd>s</kbd> is out<b>S</b>ide borders; on a single cell <kbd>b</kbd> <kbd>a</kbd> draws the same box, <kbd>b</kbd> <kbd>t</kbd> draws it thick, and the four edges walked one at a time get there as well)',
+      '☆ the discovery: the whole grid is ONE formula. Grab '+o.grid+' before you fill and a single <kbd>ctrl</kbd>+<kbd>d</kbd> then <kbd>ctrl</kbd>+<kbd>r</kbd> lands all fifteen cells off the corner — or select the block first and commit the formula into every cell with <kbd>ctrl</kbd>+<kbd>↵</kbd>. Typing the other fourteen out finishes the drill exactly the same way; only the clock tells you what it cost',
     ]; },
+    /* rings: ① the corner · ② the top row · ③④ the whole grid · ⑤ the base-case cell ·
+       ☆ never ringed (§2.2 mystery slot — a ring would spoil the hidden move) */
+    targets(){ const o=this._o; return [o.corner, o.topRow, o.grid, o.grid, o.baseCell, null]; },
+    /* the demo BUILDS its own selections with Shift+arrow rather than being handed them by
+       setDemoSel, so parKeys measures what a player really pays for the range grab (the r438
+       `series` rule). setDemoSel only parks the cursor on the next beat's anchor. */
+    demo(){ const o=this._o;
+      const R=n=>{ const a=[]; for(let i=0;i<n;i++) a.push({key:'ArrowRight',shift:true}); return a; };
+      const D2=n=>{ const a=[]; for(let i=0;i<n;i++) a.push({key:'ArrowDown',shift:true}); return a; };
+      return [
+      {sel:o.corner, keys:[...T('='+o.f0), Kb.enter]},
+      /* §2.2: the demo performs the bonus — the grid grabbed ONCE, Ctrl+D then Ctrl+R off the
+         corner. Ctrl+D copies the corner down its own column (the other four top-row cells are
+         still empty, so it carries nothing sideways) and Ctrl+R then takes all three rows
+         across. Its state latches at the win. */
+      {sel:o.corner, keys:[...R(4), ...D2(2), Kb.fillD, Kb.fillR]},
+      {sel:o.grid, keys:[{key:'1',ctrl:true}, L('N')]},   /* §1.0(a) format-as-you-go: the comma rides directly behind the block it dresses */
+      {sel:o.baseCell, keys:[Kb.alt,L('h'),L('b'),L('s')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 TV sensitivity ($mm)',txt:true,bold:true};
-      const fcf=rnd(40,120)*10;
-      cells['A2']={...blankCell(),value:'Terminal FCF',txt:true};
-      cells['B2']={...blankCell(),value:fcf,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['B3']={...blankCell(),value:'g \u2193 \u00b7 WACC \u2192',txt:true,align:'r',bold:true};
-      const w0=rnd(75,90)/1000, g0=rnd(15,25)/1000;
-      this._exp=[];
+      /* §1.2 randomization — four independent axes, and the §4.63 page's own ask ("grid site
+         from a 3-spot pool, rate ladders, base-case position") is the first and the last of them:
+         (a) SITE — a 4-spot pool: the page anchors at column A or B (corner jitter) and the
+             source memo rides the head or the foot, which slides every block below it one row.
+             The grid rect therefore draws from {13,14} × {C..G, D..H} and no fill rect, no
+             formula and no ring can be replayed from memory. Every reference in the beats, the
+             guide, the req and the demo is DERIVED from the anchor, never written down.
+         (b) CONTENT — the codename and the fiscal-year window.
+         (c) VALUES — the FCF strip and both rate ladders through rnd(); the ladders keep a
+             fixed 50bp step (what a real sensitivity uses) while their starting rungs move.
+         (d) WHICH-ONE — which of the fifteen cells is the base case, drawn independently in
+             both axes, so beat 5's graded target and its adaptive label move every seed.
+         Geometry is constant across seeds (five WACCs, three growth rates, five forecast
+         years), so the keystroke count never moves with the draw — the par median is the exact
+         figure rather than a smoothed one. */
+      const co=codename();
+      const c0=rnd(0,1)?1:2;                       // (a) corner jitter
+      const d=rnd(0,1);                            // (a) the memo rides the head (d=1) or the foot (d=0)
+      const CA=colLetter(c0), CB=colLetter(c0+1);
+      const yc=[0,1,2,3,4].map(j=>colLetter(c0+2+j));
+      /* row map — a true 20 (§1.3). Three blank moats: 3+d, 10+d, 16+d. */
+      const rSec1=4+d, rYr=5+d, rFcf=6+d, rTfcf=7+d, rW=8+d, rG=9+d;
+      const rSec2=11+d, hr=12+d, gr0=13+d;
+      const rSec3=17+d, rLow=18+d, rHigh=19+d;
+      cells[CA+'1']={...blankCell(),value:co+' — DCF terminal value sensitivity ($mm)',txt:true,bold:true};
+      /* the BASIS MEMO (MODELING_STANDARDS §7): states the method, the units, the sign school
+         and the simplification, on the board, in the player's sight. */
+      cells[CA+'2']={...blankCell(),value:'Basis: perpetuity growth · terminal value = terminal-year FCF ÷ (WACC − growth) · $mm, inflows positive',txt:true,it:true,fontColor:'gray'};
+      /* both memo lines are sized to SPILL, not to clip: their right neighbours are empty on
+         those rows, so the room a label has is the whole sheet width (818px here) and each line
+         is written to fit inside it. dev/verify-dcfsens.js asserts clipsCol() on every column,
+         every seed — e2e-fit-sweep only scans #####, and a label is CLIPPED, never ####'d
+         (r441), so nothing in the gate would have caught the first draft of this line. */
+      cells[CA+(d?3:20)]={...blankCell(),value:'Source: forecast tab · simplified — only the terminal value is sensitized; the forecast PV sits on the DCF tab',txt:true,it:true,fontColor:'gray'};
+      /* ---- the forecast strip: blue typed inputs, black linked terminal-year figure ---- */
+      cells[CA+rSec1]={...blankCell(),value:'forecast — unlevered free cash flow',txt:true,it:true,fontColor:'gray'};
+      const y0=2026+rnd(0,3);
+      /* doctrine §2.1b banker's-workbook finish: the board ships PRE-DRESSED everywhere the
+         lesson is not the dress — bold, right-aligned period headers with a bottom rule under
+         them separating header from body. (§1.0(f)'s top-border law governs TOTALS; a header
+         rule is the other half of the same convention and there is no total on this board.) */
+      cells[CA+rYr]={...blankCell(),value:'Fiscal year',txt:true,bold:true,bb:true};
+      cells[CB+rYr]={...blankCell(),bb:true};
+      for(let j=0;j<5;j++) cells[yc[j]+rYr]={...blankCell(),value:'FY'+(y0+j),txt:true,bold:true,align:'r',bb:true};
+      cells[CA+rFcf]={...blankCell(),value:'Unlevered FCF',txt:true};
+      const strip=[]; let v=rnd(24,40)*10;
+      for(let j=0;j<5;j++){ strip.push(v);
+        cells[yc[j]+rFcf]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        v=Math.round(v*(1+rnd(4,9)/100)/5)*5; }
+      const fcf=strip[4];
+      /* MODELING_STANDARDS §3, in miniature: the terminal-year figure REFERENCES the forecast's
+         last year — a retyped one is the classic junior error, and it is also what would let
+         the grid drift away from the model that feeds it. Black ink: a formula on this sheet. */
+      cells[CA+rTfcf]={...blankCell(),value:'Terminal-year FCF',txt:true,bold:true};
+      cells[CB+rTfcf]={...blankCell(),formula:'='+yc[4]+rFcf,value:fcf,fmtStyle:'comma',decimals:0,bold:true};
+      /* ---- the two base-case assumptions: §1.0(f) + §1.0-R2(l) input stack — stacked,
+         individually labelled, light yellow + all borders, blue ink, shipped POPULATED. They
+         are what beat 5 reads, and they are never graded targets. ---- */
+      const w0=rnd(70,90)/1000, g0=rnd(15,25)/1000;
+      const W=[0,1,2,3,4].map(j=>w0+j*0.005);      // 50bp rungs — g < WACC on every cell by construction
+      const G=[0,1,2].map(i=>g0+i*0.005);
+      const jb=rnd(0,4), ib=rnd(0,2);              // (d) which cell is the base case
+      cells[CA+rW]={...blankCell(),value:'Base-case WACC',txt:true};
+      cells[CB+rW]={...blankCell(),value:W[jb],fontColor:'blue',fmtStyle:'percent',decimals:1,fill:'yellow',ball:true,align:'c'};
+      cells[CA+rG]={...blankCell(),value:'Base case — growth',txt:true};
+      cells[CB+rG]={...blankCell(),value:G[ib],fontColor:'blue',fmtStyle:'percent',decimals:1,fill:'yellow',ball:true,align:'c'};
+      /* ---- the sensitivity grid ---- */
+      cells[CA+rSec2]={...blankCell(),value:'terminal value sensitivity — WACC across, terminal growth down',txt:true,it:true,fontColor:'gray'};
+      cells[CB+hr]={...blankCell(),value:'g ↓',txt:true,bold:true,align:'r',bb:true};
+      const exp=[];
+      for(let j=0;j<5;j++) cells[yc[j]+hr]={...blankCell(),value:W[j],fontColor:'blue',fmtStyle:'percent',decimals:1,bold:true,align:'r',bb:true};
       for(let i=0;i<3;i++){
-        const g=g0+i*0.005;
-        cells['B'+(4+i)]={...blankCell(),value:g,fontColor:'blue',fmtStyle:'percent',decimals:1,bold:true,align:'r'};
+        cells[CB+(gr0+i)]={...blankCell(),value:G[i],fontColor:'blue',fmtStyle:'percent',decimals:1,bold:true,align:'r'};
         const row=[];
-        for(let j=0;j<5;j++){
-          const w=w0+j*0.005;
-          if(i===0) cells[colLetter(3+j)+'3']={...blankCell(),value:w,fontColor:'blue',fmtStyle:'percent',decimals:1,bold:true,align:'r'};
-          cells[colLetter(3+j)+(4+i)]={...blankCell(),fmtStyle:'comma',decimals:0};
-          row.push(fcf/(w-g));
-        }
-        this._exp.push(row);
+        for(let j=0;j<5;j++){ cells[yc[j]+(gr0+i)]={...blankCell()}; row.push(fcf/(W[j]-G[i])); }
+        exp.push(row);
       }
-      return {ROWS:8, cells, active:{r:4,c:3}, sel:null, colW:{1:112,2:96}};
+      const grid=yc[0]+gr0+':'+yc[4]+(gr0+2);
+      /* ---- the range read-out (MODELING_STANDARDS §6: the page's own read lives in ONE
+         visible place). Seeded LIVE off the grid, so it fills in as the grid lands and the win
+         state reads as a finished exhibit. Board furniture — checks() reads the grid cells
+         directly, so deleting either line cannot move any ok. ---- */
+      cells[CA+rSec3]={...blankCell(),value:'terminal value range — the widest spread to the tightest',txt:true,it:true,fontColor:'gray'};
+      cells[CA+rLow]={...blankCell(),value:'Low',txt:true};
+      cells[CB+rLow]={...blankCell(),formula:'=MIN('+grid+')',value:0,fmtStyle:'comma',decimals:0};
+      cells[CA+rHigh]={...blankCell(),value:'High',txt:true};
+      cells[CB+rHigh]={...blankCell(),formula:'=MAX('+grid+')',value:0,fmtStyle:'comma',decimals:0};
+      /* WIDTHS (deviation 8) — MEASURED against the engine, not estimated, and the measurement
+         is the point: render's elastic fit budgets `gridwrap.clientWidth-28-30` = **822px** of
+         columns at 1440, and when a board exceeds it the shrink has a **40px floor per column**,
+         so spare columns set narrower than 40 are INFLATED and a board that overruns cannot be
+         rescued by shrinking the gutters (probed: 852px of columns rendered at 914px). This lays
+         out 148 + 70 + 5×108 + three spare columns at 20 = **818 ≤ 822**, so no shrink runs at
+         all and every column renders at exactly the width designed for it.
+         The five grid columns are sized for the widest thing any legal route can put in them: an
+         UNFORMATTED quotient renders at ten significant digits ("6893.939394", 106.6px), which is
+         exactly what the board shows between the fill and the comma pass — sizing to the comma'd
+         figure alone would put ##### on screen for the whole middle of the run, and
+         e2e-fit-sweep only scans the LOAD state, so nothing but this would have caught it.
+         The label column is sized for its longest label ("Base case — growth", 18 glyphs) because
+         its right neighbour is occupied on those rows, and an occupied neighbour means no spill
+         (r441 clipsCol); the section titles and memos, whose neighbours are empty, spill as far
+         as they need. */
+      const colW={}; for(let c=1;c<=10;c++) colW[c]=20;
+      colW[c0]=148; colW[c0+1]=70; for(let j=0;j<5;j++) colW[c0+2+j]=108;
+      const wStr=(W[jb]*100).toFixed(1)+'%', gStr=(G[ib]*100).toFixed(1)+'%';
+      this._exp=exp;
+      this._o={ c0:c0, d:d, CA:CA, CB:CB, yc:yc, hr:hr, gr0:gr0, rYr:rYr, rFcf:rFcf, rTfcf:rTfcf,
+        rW:rW, rG:rG, rLow:rLow, rHigh:rHigh, W:W, G:G, jb:jb, ib:ib, fcf:fcf, strip:strip,
+        fcfCell:CB+rTfcf, fcfAbs:'$'+CB+'$'+rTfcf, stripCell:yc[4]+rFcf,
+        corner:yc[0]+gr0, topRow:yc[0]+gr0+':'+yc[4]+gr0, grid:grid,
+        baseCell:yc[jb]+(gr0+ib), wStr:wStr, gStr:gStr,
+        f0:'$'+CB+'$'+rTfcf+'/('+yc[0]+'$'+hr+'-$'+CB+gr0+')' };
+      return {ROWS:20, cells, active:{r:gr0,c:c0+2}, sel:null, colW:colW};
     },
     checks(S){
-      const cellOk=(i,j)=>{ const col=colLetter(3+j); const c=S.cells[col+(4+i)];
-        if(!c||!c.formula||typeof c.value!=='number') return false;
-        const f=String(c.formula).toUpperCase(); const exp=this._exp[i][j];
-        if(!(f.includes('$B$2')&&f.includes(col+'$3')&&f.includes('$B'+(4+i)))) return false;
-        return Math.abs(c.value-exp)<Math.abs(exp)*2e-3; };
+      const o=this._o, e=this._exp, cel=k=>S.cells[k]||{};
+      const norm=f=>String(f||'').toUpperCase().replace(/\s/g,'');
+      /* THE DOCTRINE §2.2 ANCHOR-TEXT EXCEPTION, scoped — and §2.2 names this drill by key, so
+         the exception is not being stretched: a grid cell holds a LIVE formula whose value is
+         that intersection's terminal value AND whose three references carry the lock each one
+         needs to survive the fill it will be carried by. Deliberately generous inside that:
+           · the DRIVER may be read off either cell that holds the terminal-year FCF — the
+             labelled summary or the forecast strip's own last year. Both are on the board, both
+             are the same number, and rejecting the second was the untriggerable beat this
+             rework found by walking the route (§1.0-R3(p));
+           · either lock may ALSO carry the other half ($E$12 in column E, $B$14 in row 14) —
+             fifteen hand-typed absolute formulas are a legitimate slow-route end state, and the
+             per-cell VALUE check is what stops an all-absolute BLOCK: fifteen identical
+             formulas carry the locks and fourteen wrong numbers, so they fail;
+           · operand order and any wrapper that evaluates to the same figure are free
+             (=ROUND($B$7/(C$12-$B13),0) reads);
+           · the ROUTE to the locks is never read — F4 cycling and typed dollar signs land the
+             same string, and no fill is required by any core beat (§1.0(c)); the ☆ is the only
+             line that reads a mechanic. */
+      const cellOk=(i,j)=>{
+        const c=cel(o.yc[j]+(o.gr0+i));
+        if(!c.formula || typeof c.value!=='number') return false;
+        if(Math.abs(c.value-e[i][j])>0.5) return false;
+        const f=norm(c.formula);
+        const fcfRef = new RegExp('\\$'+o.CB+'\\$'+o.rTfcf+'(?![0-9])').test(f) ||
+                       new RegExp('\\$'+o.yc[4]+'\\$'+o.rFcf+'(?![0-9])').test(f);
+        const wRef   = new RegExp('(^|[^A-Z0-9])\\$?'+o.yc[j]+'\\$'+o.hr+'(?![0-9])').test(f);
+        const gRef   = new RegExp('\\$'+o.CB+'\\$?'+(o.gr0+i)+'(?![0-9])').test(f);
+        return fcfRef && wRef && gRef;
+      };
+      /* DE-NESTED (AUDIT_R417 §D #14): the corner belongs to beat 1, the four cells beside it to
+         beat 2, the ten under them to beat 3 — every ok stands alone given S, so a dark line
+         always names work that is genuinely missing. */
+      const cornerOk=cellOk(0,0);
+      let rowOk=true;  for(let j=1;j<5;j++) if(!cellOk(0,j)) rowOk=false;
+      let restOk=true; for(let i=1;i<3;i++) for(let j=0;j<5;j++) if(!cellOk(i,j)) restOk=false;
+      const gridAll=cornerOk&&rowOk&&restOk;
+      /* §1.0-R3(p) ENUMERATE THE ROUTES BEFORE WRITING THE PREDICATE. Three routes land commas
+         at zero places on this grid and all three clear: Ctrl+1 → N in one move, and Alt H K /
+         Ctrl+Shift+! at two places walked down with Alt H 9 ×2. A dollar format is NOT one of
+         them — this is a comma beat and the units are stated in the title, which is how a
+         sensitivity exhibit is actually dressed. */
+      let commaOk=true;
+      for(let i=0;i<3;i++) for(let j=0;j<5;j++){ const c=cel(o.yc[j]+(o.gr0+i));
+        if(c.fmtStyle!=='comma' || (c.decimals|0)!==0) commaOk=false; }
+      /* the box, every route that draws four edges around the 1×1 base case: Alt H B S and
+         Alt H B A both store `ball` on a single cell (CAMPAIGN §1 route fact), Alt H B T adds
+         `thick` to the same, the Format Cells border tab sets `ball`, and the per-edge walk
+         (B P / B O / B L / B R) stores the four edges separately. */
+      const b=cel(o.baseCell);
+      const boxOk=!!(b.ball || (b.bt&&b.bb&&b.bl&&b.br));
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a distinct, skippable decision · §1.0-R4(u)
+         the re-cut of the page's dead formatting bonus) — ALL FIFTEEN CELLS OFF ONE FORMULA.
+         Read off the r424 S.fillOps latch and the r433 S.multiEnter latch — the MECHANIC, never
+         geometry inferred from the end state — so Ctrl+D/Ctrl+R, the ribbon's Alt H F I D/R and
+         the Ctrl+Enter multi-commit all earn it, in either order, from one selection or two,
+         and fifteen typed formulas earn nothing. This is also the AUDIT_R417 §D fix: the old
+         board CLAIMED "one formula" in a core label with no latch behind it; the claim now
+         lives where it can be proved. Measured skippable: ALT 3 types all fifteen and clears
+         every core with this line dark, 292 keys against the demo's 32. */
+      const cG0=o.c0+2, cG4=o.c0+6, r0=o.gr0, r2=o.gr0+2;
+      const ops=S.fillOps||[];
+      const acrossOk=ops.some(f=>f.dir==='right' && f.c1<=cG0 && f.c2>=cG4 && f.r1>=r0 && f.r2<=r2);
+      const downOk  =ops.some(f=>f.dir==='down'  && f.r1<=r0  && f.r2>=r2  && f.c1>=cG0 && f.c2<=cG4);
+      const oneEntry=(S.multiEnter||[]).some(m=>m.r1<=r0 && m.r2>=r2 && m.c1<=cG0 && m.c2>=cG4);
+      const starOk=gridAll && ((acrossOk&&downOk) || oneEntry);
+      /* Labels are INSTRUCTIONS (§1.0-R3(n)): the clause after the dash says WHAT or WHERE,
+         never why, and no label carries a formula or a chord — that is §1.7 R3. Beat 5 carries
+         this seed's facts per §1.0-R2(g): the base case moves every run, so the line names the
+         two rates the player is looking for rather than making them reverse-engineer the seed. */
       return [
-        {label:'build the base formula \u2014 $B$2 absolute, C$3 row-locked, $B4 column-locked (C4)', ok: cellOk(0,0)},
-        {label:'fill it RIGHT \u2014 the WACC ref walked, the anchors held (C4:G4)', ok: [0,1,2,3,4].every(j=>cellOk(0,j))},
-        {label:'fill it DOWN \u2014 the growth ref walks; all fifteen cells land live (C4:G6)', ok: [0,1,2].every(i=>[0,1,2,3,4].every(j=>cellOk(i,j)))},
+        {label:'Build the grid’s first terminal value — the WACC row locked, the growth column locked', ok: cornerOk},
+        {label:'Build the rest of the top row — a terminal value at every WACC', ok: rowOk},
+        {label:'Build the rest of the grid — every growth rate at every WACC', ok: restOk},
+        {label:'Comma-format the grid — zero decimals', ok: commaOk},
+        {label:'Add an outside border around the base case — '+o.wStr+' WACC, '+o.gStr+' growth', ok: boxOk},
+        {label:'Build all fifteen cells from one formula — one pass across, one down', ok: starOk, bonus:true},
       ];
     }
   },

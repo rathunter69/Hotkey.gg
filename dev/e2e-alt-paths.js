@@ -1767,15 +1767,37 @@ const ALTS = [
       {sel:o.spreadK, keys:[...T('='+o.ceilK+'-'+o.floorK),{key:'Enter'}]},
       {sel:o.boxRng,  keys:[{key:'Alt'},L('h'),L('b'),L('a')]},
     ]; }` },
-  { key: 'dcfsens', name: 'fill DOWN first, then right', moves: `C => [
-      {sel:'C4', keys:[...T('=$B$2/(C$3-$B4)'),{key:'Enter'}]},
-      {sel:'C4:C6', keys:[{key:'d',ctrl:true}]},
-      {sel:'C4:G6', keys:[{key:'r',ctrl:true}]},
-    ]` },
-  /* r439 (DEPTH_PASS §4.31 + §4.47 depth pass) — both drills' boards were rebuilt, so their
-     pre-r439 entries are DELETED, not edited: the old `cases` entry drove B8/B9/C12/C13/C18 on a
-     21-row board that no longer exists, and the old `wrapfix` entry drove C._o.q1/q2, fields the
-     rework does not carry. Integrators: do not resurrect either (CAMPAIGN §4 union rule). */
+  /* r444 (DEPTH_PASS §4.63 depth pass): the board was rebuilt from a fixed C4:G6 grid on an
+     8-row sheet to a 20-row DCF page whose grid draws from a 4-spot pool, so the pre-r444 entry
+     ("fill DOWN first, then right", hard-coded C4/C4:C6/C4:G6) is DELETED, not edited — those
+     cells no longer exist. Integrators: do not resurrect it (CAMPAIGN §4 union rule). */
+  { key: 'dcfsens', name: 'op ORDER alt — the corner COMMAED FIRST so the format travels with the formula on the fill, the grid built down-the-column then right, and the base case boxed last (the box has to come after the fills or the fill overwrites it — the one ordering the board really does constrain)', moves: `C => { const o=C._o;
+      const f=(i,j)=>'=$'+o.CB+'$'+o.rTfcf+'/('+o.yc[j]+'$'+o.hr+'-$'+o.CB+(o.gr0+i)+')';
+      return [
+        {sel:o.corner, keys:[...T(f(0,0)), {key:'Enter'}]},
+        {sel:o.corner, keys:[{key:'1',ctrl:true}, L('N')]},                 // comma the SOURCE cell — the fill carries the format
+        {sel:o.corner+':'+o.yc[0]+(o.gr0+2), keys:[{key:'d',ctrl:true}]},   // down the first WACC column
+        {sel:o.grid, keys:[{key:'r',ctrl:true}]},                           // then right across the block
+        {sel:o.baseCell, keys:[Kb.alt,L('h'),L('b'),L('a')]},               // all-borders on a 1x1 IS the box
+      ]; }` },
+  { key: 'dcfsens', name: 'chord ROUTE alt — F4 cycling instead of typed dollar signs (B7 -> $B$7 -> B$7 -> $B7), both fills off the RIBBON (Alt H F I R / Alt H F I D), comma via Alt H K + Alt H 9 x2 instead of Ctrl+1 N, and the box walked edge by edge (B P/O/L/R): every core clears and the star still lands', moves: `C => { const o=C._o; const F4={key:'F4'};
+      return [
+        {sel:o.corner, keys:[...T('='+o.fcfCell), F4, ...T('/('+o.yc[0]+o.hr), F4, F4,
+                             ...T('-'+o.CB+o.gr0), F4, F4, F4, ...T(')'), {key:'Enter'}]},
+        {sel:o.topRow, keys:[Kb.alt,L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.grid,   keys:[Kb.alt,L('h'),L('f'),L('i'),L('d')]},
+        {sel:o.grid,   keys:[Kb.alt,L('h'),L('k')]},
+        {sel:o.grid,   keys:[Kb.alt,L('h'),D(9),Kb.alt,L('h'),D(9)]},
+        {sel:o.baseCell, keys:[Kb.alt,L('h'),L('b'),L('p'),Kb.alt,L('h'),L('b'),L('o'),
+                               Kb.alt,L('h'),L('b'),L('l'),Kb.alt,L('h'),L('b'),L('r')]},
+      ]; }` },
+  { key: 'dcfsens', name: 'THE NEGATIVE CONTROL, ☆ forfeited — fifteen anchored formulas typed out with no fill anywhere: all five cores clear and the re-cut fill-☆ stays DARK, which is what proves it skippable by measurement rather than by assertion (292 keys against the demo\'s 32; dev/verify-dcfsens.js §E runs the fully hand-dressed variant at 407)', moves: `C => { const o=C._o; const out=[];
+      for(let i=0;i<3;i++) for(let j=0;j<5;j++){
+        const f='=$'+o.CB+'$'+o.rTfcf+'/('+o.yc[j]+'$'+o.hr+'-$'+o.CB+(o.gr0+i)+')';
+        out.push({sel:o.yc[j]+(o.gr0+i), keys:[...T(f), {key:'Enter'}]}); }
+      out.push({sel:o.grid, keys:[{key:'1',ctrl:true}, L('N')]});
+      out.push({sel:o.baseCell, keys:[Kb.alt,L('h'),L('b'),L('s')]});
+      return out; }` },
   { key: 'wrapfix', name: 'chord ROUTE alt — every read RETYPED in full (VLOOKUP, not INDEX/MATCH), ribbon bold and ribbon top border, typed SUM: all six cores clear with the re-cut fill-☆ DARK (the measured negative control, 145 keys against the demo\'s 24)', moves: `C => { const o=C._o;
       const key=cell=>o.CA+cell.replace(/[A-J]/g,'');
       const vl=cell=>'=VLOOKUP('+key(cell)+','+o.CA+o.T0+':'+o.CC+o.TN+',3,0)';
