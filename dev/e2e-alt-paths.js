@@ -1058,19 +1058,41 @@ const ALTS = [
       }
       for(let i=0;i<4;i++) out.push({sel:Y[i]+R.tot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('a')]});
       return out; }` },
-  { key: 'cfslink', name: 'rule the close FIRST, memo before the corkscrew, alt h p percent, bold last', moves: `C => [
-      {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:'B6',  keys:[...T('=SUM(B2:B5)'),{key:'Enter'}]},
-      {sel:'B6:F6', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B10', keys:[...T('=B6/B2'),{key:'Enter'}]},
-      {sel:'B10:F10', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B10:F10', keys:[{key:'Alt'},L('h'),L('p')]},
-      {sel:'B8',  keys:[...T('=B7+B6'),{key:'Enter'}]},
-      {sel:'C7',  keys:[...T('=B8'),{key:'Enter'}]},
-      {sel:'C7:F7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B8:F8', keys:[{key:'Alt'},L('h'),D(1)]},
-    ]` },
+  /* r448 (cfslink depth pass, DEPTH_PASS §4.80): the old single entry drove the retired ROWS:10
+     board (hard-coded B6/B8/C7/B10 addresses that no longer exist) and is DELETED — integrators,
+     do not resurrect it (CAMPAIGN §4: for the drill an agent reworked, its side is authoritative
+     for deletions too).
+     ALT 1 = chord-ROUTE alt. ALT 2 = op-ORDER alt AND the measured ☆ skippability control. */
+  { key: 'cfslink', name: 'chord ROUTE alt — both subtotals taken with AutoSum over the range (select through the empty total cell, Alt+= commits it) instead of typed SUMs, every fill off the RIBBON (Alt H F I R), the memo percent walked Alt H P + Alt H 0 instead of Ctrl+1 P, and the closing row dressed Alt H 1 + Alt H B S (outside border round the row): all six cores clear and the ☆ still lands, because the star grades the DECISION to cover the block in one pass, never the chord that does it', moves: `C => { const o=C._o; return [
+      {sel:o.wc0,  keys:[...T('='+o.nwcSrc0),{key:'Enter'}]},
+      {sel:o.cx0,  keys:[...T('='+o.capxSrc0),{key:'Enter'}]},
+      {sel:o.ni0+':'+o.cfo0,  keys:[{key:'=',alt:true,code:'Equal'}]},
+      {sel:o.cfo0+':'+o.net0, keys:[{key:'=',alt:true,code:'Equal'}]},
+      {sel:o.blk,     keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.memo0,   keys:[...T('='+o.net0+'/'+o.ebit0),{key:'Enter'}]},
+      {sel:o.memoRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r'),{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
+      {sel:o.end0,    keys:[...T('='+o.begC0+'+'+o.net0),{key:'Enter'}]},
+      {sel:o.begL1,   keys:[...T('='+o.end0),{key:'Enter'}]},
+      {sel:o.begRest, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.endRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r'),{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('s')]},
+    ]; }` },
+  { key: 'cfslink', name: 'op ORDER alt AND the measured ☆ NEGATIVE CONTROL — the closing row dressed BEFORE it holds anything, the memo built off an empty net-change row (recalc closes it), the statement written bottom-up from the investing line, the roll link written before the close exists, and the four lines carried as FOUR SEPARATE ROW FILLS so all six cores clear with the star DARK — the ☆ state itself is asserted in dev/verify-cfslink.js §I (this harness grades the win and never the star), and §D prices the skip fully keyed: the same four lines cost 59 keys as four row fills against 44 as one pass', moves: `C => { const o=C._o; return [
+      {sel:o.endRng,  keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:o.memo0,   keys:[...T('='+o.net0+'/'+o.ebit0),{key:'Enter'}]},
+      {sel:o.memoRng, keys:[{key:'r',ctrl:true},{key:'1',ctrl:true},L('p')]},
+      {sel:o.cx0,     keys:[...T('='+o.capxSrc0),{key:'Enter'}]},
+      {sel:o.cxRng,   keys:[{key:'r',ctrl:true}]},
+      {sel:o.wc0,     keys:[...T('='+o.nwcSrc0),{key:'Enter'}]},
+      {sel:o.wcRng,   keys:[{key:'r',ctrl:true}]},
+      {sel:o.cfo0,    keys:[...T('='+o.ni0+'+'+o.da0+'+'+o.wc0),{key:'Enter'}]},
+      {sel:o.cfoRng,  keys:[{key:'r',ctrl:true}]},
+      {sel:o.net0,    keys:[...T('='+o.cfo0+'+'+o.cx0),{key:'Enter'}]},
+      {sel:o.netRng,  keys:[{key:'r',ctrl:true}]},
+      {sel:o.begL1,   keys:[...T('='+o.end0),{key:'Enter'}]},
+      {sel:o.begRest, keys:[{key:'r',ctrl:true}]},
+      {sel:o.end0,    keys:[...T('='+o.begC0+'+'+o.net0),{key:'Enter'}]},
+      {sel:o.endRng,  keys:[{key:'r',ctrl:true}]},
+    ]; }` },
   /* r444 (comps depth pass, DEPTH_PASS §4.60): the old single entry drove the retired 3-column
      comps page (D3/D8/G4) and is DELETED — integrators, do not resurrect it (CAMPAIGN §4: for
      the drill an agent reworked, its side is authoritative for deletions too).

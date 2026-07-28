@@ -11957,74 +11957,362 @@ const CHALLENGES = {
     }
   },
   cfslink:{
-    name:'CFS Link', label:'Link the cash flow statement', par:36, parKeys:36,
-    aha:'Link every CFS line to the other statements (=) — type none of them.',
-    prompt:'Five years of cash flow, closed end to end: one SUM for the net change, the cash roll-forward linking every year to the last, a cash-conversion memo as a percent, and the ending row bolded and ruled. Sum, link, ratio, format.',
-    req:'<em>B6</em> =SUM(B2:B5) fill \u2192 \u00b7 <em>B8</em> =B7+B6 \u00b7 <em>C7</em> =B8 \u00b7 fill C7:F7 \u2192 \u00b7 fill B8:F8 \u2192 \u00b7 memo <em>B10</em> =B6/B2 fill \u2192 + <em>ctrl+shift+%</em> \u00b7 dress B8:F8: <em>ctrl+b</em> + <em>alt h b p</em>',
-    guide:[
-      'net change at B6 \u00b7 <kbd>=SUM(B2:B5)</kbd> \u2014 NI + D&A + \u0394NWC + capex (signs carried) \u00b7 fill right',
-      'ending cash at B8 \u00b7 <kbd>=B7+B6</kbd>',
-      'THE LINK at C7 \u00b7 <kbd>=B8</kbd> \u2014 beginning cash = prior ending \u00b7 fill C7:F7 \u2192, then B8:F8 \u2192',
-      'the memo the MD reads: B10 \u00b7 <kbd>=B6/B2</kbd> \u2014 cash conversion \u00b7 fill right \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd>',
-      'format the close: select B8:F8 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
-    ],
-    targets:['B6','B10','B11','B16','B20','B21'],
-    demo(){ return [
-      {sel:'B6', keys:[...T('=SUM(B2:B5)'), Kb.enter]},
-      {sel:'B6:F6', keys:[Kb.fillR]},
-      {sel:'B8', keys:[...T('=B7+B6'), Kb.enter]},
-      {sel:'C7', keys:[...T('=B8'), Kb.enter]},
-      {sel:'C7:F7', keys:[Kb.fillR]},
-      {sel:'B8:F8', keys:[Kb.fillR]},
-      {sel:'B10', keys:[...T('=B6/B2'), Kb.enter]},
-      {sel:'B10:F10', keys:[Kb.fillR]},
-      {sel:'B10:F10', keys:[Kb.pct]},
-      {sel:'B8:F8', keys:[Kb.bold]},
-      {sel:'B8:F8', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
+    /* r448 H6b-FB — the depth-pass rework of "Link the cash flow statement" (DEPTH_PASS §4.80),
+       built to §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 (later law wins on conflict) with
+       dev/MODELING_STANDARDS.md BINDING: this is a Full Builds board and a banker judges the
+       MODEL first — a correct keystroke on a wrong model is worse than no drill.
+
+       WAS: `ROWS:10` — 9 rows carrying content out of the real 20-row sheet (45%, well under the
+       §1.3 target and the exact `ROWS=14`-class defect DEPTH_PASS_CAMPAIGN §5 names), no
+       `saveClose`, five checklist lines opening with a bare lowercase verb and SHOUTING at the
+       player ("build THE LINK", "tie out ending cash"), a `refs('B6',['SUM('])` FORMULA-TEXT
+       grade on the net-change beat, ΔNWC and capex arriving as bare blue constants with no
+       schedule to link them to (so the drill named "Link the cash flow statement" linked
+       nothing), a conversion memo defined as net change ÷ NET INCOME (dev/REALISM_NOTES.md
+       flags exactly this: "sharpen to FCF/EBITDA … the classic definition"), a BOTTOM border
+       under the closing row — outlawed by §1.0(f) — and no ☆ at all.
+
+       NOW: one page of a model — the supporting schedules the CFS reads from, the statement
+       itself, the cash corkscrew and the conversion memo the committee reads. 6 core beats +
+       the hidden ☆ + the engine-appended Ctrl+S. ROWS=20; 17 rows carry content at the win
+       state on every seed — 85% against the §1.3 ≥60% target.
+
+       ── MODELING_STANDARDS CONVENTIONS THIS BOARD FOLLOWS ────────────────────────────────────
+       · §1 COLOUR-AS-PROVENANCE. Every seeded feed is blue (EBITDA, capex, the working-capital
+         build, net income, D&A, the opening cash balance) and every cell the player creates is
+         black — because every one of them is a formula on this sheet. No green: the board is a
+         single logical sheet-area, so there is no cross-sheet link to colour. The player never
+         types a number, which is the point of a LINKAGE drill.
+       · §1 NO HARDCODES INSIDE FORMULAS. There is no rate, multiple or driver on this board to
+         bury in a formula; the two schedule lines are cells the statement points at, and the ☆
+         is what proves those pointers were left RELATIVE (see THE ☆).
+       · §1 STRUCTURE. Subtotals wear a TOP border and never a rule underneath (§1.0(f)) — the
+         two computed subtotals ship with theirs, and the closing line earns its own in beat 6.
+         Units are stated in the title ($mm). Negatives render in parentheses via the comma
+         format. The period header wears a bottom border (doctrine §2.1b).
+       · §2 SIGN CONVENTION, stated on the board's basis memo and held across every seeded row:
+         USES OF CASH ARE NEGATIVE. Capex is (capex) and an increase in net working capital is a
+         use, so both subtotals are a clean SUM down the column rather than a subtraction chain.
+         MODELING_STANDARDS §2 names this convention for cash-flow statements specifically.
+       · §3 THE CORKSCREW. Beginning cash → net change → Ending cash, and each year's BEGINNING
+         cell REFERENCES the prior year's ENDING cell rather than repeating it. §3 calls the
+         typed beginning balance "the classic junior error", which is why beat 5 grades the
+         reference (see GRADING).
+       · §4 THREE-STATEMENT LINKAGE. Net income and D&A sit at the top of the operating section,
+         the working-capital change is INSIDE the operating section (not below it — see
+         DEVIATIONS (2)), and capex is the investing line beneath the operating subtotal. That
+         is the order a reviewer looks for.
+       · §5 CIRCULARITY: none. There is no interest and no debt on this fragment, so the
+         beginning-balance ruling has nothing to bite on here; the basis memo instead declares
+         the one simplification the board DOES make — no financing flows this period, which is
+         what makes the net change in cash equal to this page's free cash flow.
+       · §6 ERROR CHECKS: none on this board, deliberately. The check a cash flow statement
+         carries is "ending cash on the CFS equals cash on the balance sheet", and there is no
+         balance sheet here — a self-referential check row would be furniture. `threestmt`
+         (§4.82) owns that wire for this chapter.
+       · §7 THE COMPONENT RULE. This is a fragment — the cash link between two statements, five
+         years — not a model. It fits 20×10 with three blank rows to spare.
+
+       ── STRUCTURAL DEVIATIONS from the §4.80 page, declared per §0 ───────────────────────────
+       (1) ☆ RE-CUT (§1.0-R4(u), binding). The page's "One-decimal the conversion memo — 82.3%,
+           not 82.34%" is a FORMATTING bonus, killed outright by §1.0(d), and it also fails
+           §1.0-R2(i): it falls out of finishing the memo. It was real work, so per (u) it is
+           PROMOTED into the memo's own core beat as a scope clause ("percent, one decimal")
+           rather than deleted. The new ☆ is the one-pass block — see THE ☆ for the measurement
+           against every other family.
+       (2) THE WORKING-CAPITAL CHANGE MOVED INSIDE THE OPERATING SECTION. The page's beat order
+           puts the ΔNWC reference (beat 2) BELOW the "cash from operations" subtotal (beat 1).
+           MODELING_STANDARDS §4 makes the working-capital change an OPERATING item, so a
+           subtotal labelled "Cash flow from operations" that excludes it is mislabelled — the
+           form that legitimately excludes it is "funds from operations", which is a credit-desk
+           term this chapter has no reason to introduce. The row therefore sits above the
+           subtotal and the subtotal totals all three operating lines.
+       (3) BEAT ORDER, two swaps, both forced by law. (a) The reference beat leads, because (2)
+           makes the operating subtotal depend on it. (b) The memo sits at beat 4 and the roll at
+           beat 5, so the DRESS beat (6) directly follows the roll whose closing row it dresses —
+           §1.0(a) format-as-you-go requires a formatting beat to follow its parent work beat,
+           and with the page's order the dress would have been separated from the roll by the
+           memo. The memo depends only on the net-change row (beat 3), so nothing is stranded.
+       (4) TOP BORDER, not bottom. The page says "Bold the ending-cash row and add a bottom
+           border under it". §1.0(f) is later law and explicit: totals take TOP borders, never a
+           rule underneath, and "any existing page line that says bottom border under the Total
+           row is superseded". MODELING_STANDARDS §1 says the same.
+       (5) THE CONVERSION MEMO IS FCF ÷ EBITDA, not net change ÷ net income. The page's own beat
+           5 asks for "free cash flow divided by EBITDA" and dev/REALISM_NOTES.md records the
+           shipped net-change-÷-NI definition as the nit to sharpen. With no financing flows on
+           the page the net change in cash IS the free cash flow, which the basis memo states
+           out loud so the player never learns the identity without knowing why it holds.
+       (6) THE BOARD GREW A SUPPORTING-SCHEDULE BLOCK. The shipped board seeded ΔNWC and capex as
+           bare blue rows inside the statement, which left a drill called "Link the cash flow
+           statement" with nothing to link: the two lines a real CFS pulls from elsewhere were
+           already sitting in it. Three feed lines above the statement give the reference beat a
+           source, put §1.3 density on target, and let the ☆ measure whether the pointers were
+           left relative.
+       (7) NO cueCell() (§1.0-R2(h)/§1.0-R3(q)). There is no insert point and no empty paste
+           destination on this board. Every graded target is an empty cell on a LABELLED row of a
+           labelled section, which is exactly what the green ring expresses. No graded target
+           spills either — the title, the basis memo and the two section heads are the only
+           spilling cells and none of them is graded.
+       (8) NO HELPER STACK (§1.0(f)/§1.0-R2(l)). There is no assumption on this board: every
+           input is a fed line item in a labelled schedule row, not a driver, so a light-yellow
+           all-bordered helper cell would be furniture pretending to be an input convention.
+
+       ── GRADING (§1.0(c) FREEDOM + §1.0-R3(p) END STATE), routes ENUMERATED then WALKED ──────
+       The shipped drill graded `refs('B6',['SUM('])` on the net-change beat — the campaign's #1
+       bug class (DEPTH_PASS_CAMPAIGN §1: eighteen untriggerable beats found, every one a text
+       grade), locking out `=B2+B3+B4+B5` on a board whose own basis memo makes the addition
+       chain legal. It is gone. The four BUILD beats now grade a LIVE formula (doctrine §2.2
+       exception 1 — "don't hardcode the answer" is the lesson on a model board) plus VALUE
+       PARITY at a tolerance wider than one display step, and nothing else. `=SUM(...)`,
+       `=B10+B11+B12`, `=SUM(B10:B11)+B12`, a ROUND wrapper and an AutoSum all clear identically.
+       THE TWO TEXT GRADES that stay, both the same exception, both cited on their line:
+         · beat 1 — the two statement lines must POINT AT the schedule rows above. This is the
+           drill's entire lesson (its name, its aha and dev/REALISM_NOTES.md's linkage note all
+           say so), and MODELING_STANDARDS §7 lists it in the conventions that are "legitimately
+           gradeable as end state". $-anchors are stripped and the match is boundary-safe, so
+           `=B7`, `=+B7`, `=$B$7`, `=SUM(B7)`, `=B7+0` and a pointed reference all clear; typing
+           the number does not, which is the whole point of a linkage drill.
+         · beat 5 — the beginning cell must reference the PRIOR ENDING cell (MODELING_STANDARDS
+           §3, "that link is the lesson"). Re-deriving it from the prior year's components is the
+           junior error the beat trains out, and it fails.
+       BORDER DOCTRINE (r446b, campaign §5 — declared): this board grades the LENIENT reading,
+       `bt || ball`. Alt H B P (Top), Alt H B D (Top & bottom) and Alt H B S / B A around the row
+       all leave the closing line ruled the way a desk rules it, and MODELING_STANDARDS §1
+       explicitly allows a grand total to wear a double bottom rule ON TOP of its top rule — a
+       strict `bt && !bb && !bdbl` would strand that. A bottom rule ALONE still fails, which is
+       what §1.0(f) is protecting.
+
+       ── THE ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision) ────────────
+       ONE PASS TAKES THE STATEMENT ACROSS: the four built lines of the cash flow statement — the
+       working-capital reference, the operating subtotal, the capex reference and the net change
+       — written once in the first year and carried to every remaining year in a SINGLE op. Read
+       off the r424 S.fillOps latch OR the r425 S.pasteLog latch (the MECHANIC, never geometry
+       inferred), so Ctrl+R, Alt H F I R and a tiled paste of the first-year column all earn it
+       identically (§1.0(c)).
+       WHAT IT TEACHES THAT `debtsched`'s FILL ☆ DID NOT — and the reason it is not a repeat:
+       debtsched's one-pass proves the ANCHORS were SET (a $-less rate walks off the block).
+       This one proves the opposite discipline — that the two links were left RELATIVE. A player
+       who reflexively anchors the schedule references (`=$B$7`) clears the first year, watches
+       one Ctrl+R stamp FY24's working capital across all five years, and the board visibly
+       reads the same number five times. Same family, inverted lesson.
+       FAMILY NOTE for the orchestrator (wave-5 addendum, r448): every candidate family was
+       MEASURED on the IDENTICAL job (the four statement lines, all five years, fully keyed from
+       the board's own opening cursor) before settling here — fill 44 keys · structured selection
+       41 · tiled paste 48 · Ctrl+Enter multi-enter 55 · AutoSum-provenance 74 and it does not
+       even COMPLETE the job (Alt+= reaches the two subtotal rows and cannot carry a year, so the
+       other two rows still have to be written five times). The addendum asks for a non-fill
+       family at comparable headroom and there is none that is admissible: structured selection
+       is 3 keys cheaper only because Ctrl+Shift+→ replaces one four-arrow run — it is the SAME
+       one-pass decision, it would need NEW telemetry for a move S.fillOps already records, and
+       the ☆ as written already fires on it. dev/verify-cfslink.js §D reproduces the table.
+       SKIPPABILITY, measured not asserted (§1.0-R2(i)): the checklist actively pushes AWAY from
+       the block — beat 1 is two rows, beats 2 and 3 are one row each — so the natural route is
+       four separate row fills, which clears every core beat with the ☆ dark (66 keys against the
+       taught route's 63, verify-cfslink.js §E, all five seeds). That is dev/e2e-alt-paths.js
+       entry 2, the named negative control. */
+    name:'CFS Link', label:'Link the cash flow statement', par:66, parKeys:63, saveClose:true,   /* r448 §4.80 depth pass: par re-swept from scratch (was par 36 / parKeys 36 on the ROWS:10 board with no schedule block, no save closer and no ☆). dev/e2e-par-sweep.js cfslink, 5-seed median 63 keys INCLUDING the engine-appended Ctrl+S, and FLAT at 63 across a 9-seed probe (dev/verify-cfslink.js §H prints the raw counts) — the corner jitter moves the column letter and the row numbers together but never the character count of a formula, and every seeded figure is three digits. par 66 ≈ 1.05 s/key, the house band. The count grew with the scope: the schedule block gave the reference beat a source, the memo gained its percent-at-one-decimal, and the save closer came in. That lands cfslink between bsbuild and nwcsched in the Full Builds band. Measured against it: the same board worked the SLOW way, fully keyed — every year of every line typed by hand, no fill and no clipboard anywhere, the memo formatted cell by cell off Alt H P + Alt H 0 and the closing row dressed one cell at a time — runs 378 keys with all six cores clearing and the ☆ dark (verify-cfslink.js §C), which is the cost the clock exists to show. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 1:39 · pro 1:16 · legendary 1:06. */
+    aha:'a cash flow statement is a roll-forward wearing an income statement’s clothes — every line above the roll is borrowed from somewhere else.',
+    prompt:'The board pack prints tomorrow and the cash page is the only one still empty. The operating model and the working-capital schedule are already done and sitting above it — a cash flow statement READS from them, it never retypes them. Carry the two schedule lines down into the statement, total the operating section, close the cash roll year by year, and leave the cash-conversion memo the credit committee will look for.',
+    req(){ const o=this._o; return 'point <em>'+o.wc0+'</em> at <em>'+o.nwcSrc0+'</em> and <em>'+o.cx0+'</em> at <em>'+o.capxSrc0+'</em> · <em>'+o.cfo0+'</em> =SUM('+o.ni0+':'+o.wc0+') · <em>'+o.net0+'</em> =SUM('+o.cfo0+':'+o.cx0+') · select <em>'+o.blk+'</em> <em>ctrl+r</em> · <em>'+o.memo0+'</em> ='+o.net0+'/'+o.ebit0+' fill → + <em>ctrl+1 p</em> · <em>'+o.end0+'</em> ='+o.begC0+'+'+o.net0+' · <em>'+o.begL1+'</em> ='+o.end0+' · fill <em>'+o.begRest+'</em> → and <em>'+o.endRng+'</em> → · <em>'+o.endRng+'</em> <em>ctrl+b</em> + <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the checklist names OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and every line names each route the engine offers, since all of them grade. */
+    guide(){ const o=this._o; return [
+      'the statement reads its feeds: at '+o.wc0+' type <kbd>='+o.nwcSrc0+'</kbd> and at '+o.cx0+' type <kbd>='+o.capxSrc0+'</kbd> — point at the schedule rows above, and leave them RELATIVE so one pass can carry them across',
+      'the operating subtotal at '+o.cfo0+' · <kbd>=SUM('+o.ni0+':'+o.wc0+')</kbd> — net income, the D&A add-back and the working-capital change · <kbd>alt</kbd> <kbd>=</kbd> proposes the same range',
+      'the bottom line at '+o.net0+' · <kbd>=SUM('+o.cfo0+':'+o.cx0+')</kbd> — the operating subtotal plus the investing line, which already carries its minus sign',
+      'the memo at '+o.memo0+' · <kbd>='+o.net0+'/'+o.ebit0+'</kbd> · fill right · then <kbd>ctrl</kbd>+<kbd>1</kbd> <kbd>p</kbd> lands percent at one decimal outright (<kbd>alt</kbd> <kbd>h</kbd> <kbd>p</kbd> or <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> land zero — one <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> finishes them)',
+      'close the first year at '+o.end0+' · <kbd>='+o.begC0+'+'+o.net0+'</kbd> · then the link at '+o.begL1+' · <kbd>='+o.end0+'</kbd> · select '+o.begRest+' · <kbd>ctrl</kbd>+<kbd>r</kbd>, then '+o.endRng+' · <kbd>ctrl</kbd>+<kbd>r</kbd> — every year opens on the last one’s close',
+      'select '+o.endRng+' · <kbd>ctrl</kbd>+<kbd>b</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd>) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> for the top border (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>d</kbd> or <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> around the row do it too)',
+      '☆ the discovery: write all four statement lines in the first year FIRST, then select the whole block '+o.blk+' and one <kbd>ctrl</kbd>+<kbd>r</kbd> carries every one of them across — four separate row fills clear the drill too, they just cost time, and an anchored reference stamps year one five times',
     ]; },
+    /* rings: ① the two schedule references (the rect that spans them) · ② the operating subtotal
+       · ③ the net-change row · ④ the memo · ⑤ the cash roll rectangle · ⑥ the closing row
+       · ☆ never ringed (r423 §2 mystery slot) */
+    targets(){ const o=this._o; return [o.refRect, o.cfoRng, o.netRng, o.memoRng, o.rollRect, o.endRng, null]; },
+    demo(){ const o=this._o; return [
+      /* the four first-year lines, typed top-down — Enter walks the cursor onto the next one */
+      {sel:o.wc0, keys:[...T('='+o.nwcSrc0), Kb.enter,
+                        ...T('=SUM('+o.ni0+':'+o.wc0+')'), Kb.enter,
+                        ...T('='+o.capxSrc0), Kb.enter,
+                        ...T('=SUM('+o.cfo0+':'+o.cx0+')'), Kb.enter]},
+      /* the ☆ rides here in the middle of the run like any other action — its state latches at
+         the win (r421 §2.2): ONE fill carries the whole four-row statement across */
+      {sel:o.blk, keys:[Kb.fillR]},
+      {sel:o.memo0,   keys:[...T('='+o.net0+'/'+o.ebit0), Kb.enter]},
+      {sel:o.memoRng, keys:[Kb.fillR]},
+      {sel:o.memoRng, keys:[{key:'1',ctrl:true}, L('p')]},
+      {sel:o.end0,    keys:[...T('='+o.begC0+'+'+o.net0), Kb.enter]},
+      {sel:o.begL1,   keys:[...T('='+o.end0), Kb.enter]},
+      {sel:o.begRest, keys:[Kb.fillR]},
+      {sel:o.endRng,  keys:[Kb.fillR]},
+      {sel:o.endRng,  keys:[Kb.bold]},
+      {sel:o.endRng,  keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 cash flow linkage ($mm)',txt:true,bold:true};
-      const y0=rnd(24,26);
-      for(let i=0;i<5;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
-      const rows=[[2,'Net income'],[3,'D&A'],[4,'\u0394 NWC'],[5,'Capex'],[6,'Net change in cash'],[7,'Beginning cash'],[8,'Ending cash']];
-      rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===8)});
-      cells['A10']={...blankCell(),value:'Memo: cash conversion',txt:true};
-      const beg0=rnd(10,40)*10;
-      cells['B7']={...blankCell(),value:beg0,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      this._rows=[];
-      for(let i=0;i<5;i++){ const col=colLetter(i+2);
-        const ni=rnd(15,45)*10, da=rnd(5,15)*10, nwc=-rnd(2,10)*10, cx=-rnd(8,20)*10;
-        this._rows.push({ni:ni,da:da,nwc:nwc,cx:cx});
-        cells[col+2]={...blankCell(),value:ni,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+3]={...blankCell(),value:da,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+4]={...blankCell(),value:nwc,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+5]={...blankCell(),value:cx,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+6]={...blankCell(),fmtStyle:'comma',decimals:0};
-        if(i>0) cells[col+7]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+8]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+10]={...blankCell(),fmtStyle:'comma',decimals:0};
+      /* §1.2 randomization — FOUR independent axes on a full-grid artifact, which §1.2 lets
+         substitute corner jitter for a site pool: (a) CORNER JITTER in both axes — the page
+         anchors at column A or B and the whole stack drops a row or not, so no two seeds put a
+         graded cell at the same address; (b) the deal codename and the fiscal-year base are
+         drawn from pools; (c) every figure goes through rnd(); (d) WHICH year the business
+         out-spends its cash flow varies, so the roll dips — and the memo reads negative — on a
+         different column every seed. */
+      const c0=rnd(1,2), L0=colLetter(c0), pad=rnd(0,1);
+      const cY0=c0+1, cYn=c0+5, YL=i=>colLetter(cY0+i);
+      const rHdr=3+pad, rSrc=rHdr+1, rEbit=rSrc+1, rCapx=rSrc+2, rNwc=rSrc+3;
+      const rCfs=rSrc+5, rNi=rCfs+1, rDa=rCfs+2, rWc=rCfs+3, rCfo=rCfs+4,
+            rCx=rCfs+5, rNet=rCfs+6, rBeg=rCfs+7, rEnd=rCfs+8, rMemo=rCfs+10;
+      const y0=rnd(24,27);
+      const pinch=rnd(1,3);                       // §1.2(d): the heavy-capex year, FY2..FY4
+      const beg0=rnd(18,30)*10;
+
+      /* THE NUMBERS, simulated forward so the seeded feed and the expected statement can never
+         disagree. Net income is derived the way a P&L derives it — EBITDA less D&A less
+         interest, taxed — so a reader who checks the arithmetic against the schedule block finds
+         it holds (MODELING_STANDARDS §4). Everything lands on a multiple of 10 so the comma
+         format at zero decimals prints the exact number the check compares against. */
+      this._exp=[]; let beg=beg0;
+      for(let i=0;i<5;i++){
+        const ebitda=rnd(38,55)*10;
+        const da=rnd(6,11)*10;
+        const intx=rnd(2,5)*10;
+        const ni=Math.round((ebitda-da-intx)*0.75/10)*10;
+        const nwc=-rnd(1,5)*10;                   // an INCREASE in working capital is a use of cash
+        const cfo=ni+da+nwc;
+        /* the pinch year spends its whole operating cash flow and then some, so the roll visibly
+           dips and the memo turns negative — a real heavy-investment year, and the (d) axis */
+        const capx=(i===pinch) ? -(cfo+rnd(4,12)*10) : -rnd(6,12)*10;
+        const net=cfo+capx;
+        const end=beg+net;
+        this._exp.push({ebitda:ebitda, da:da, ni:ni, nwc:nwc, cfo:cfo, capx:capx,
+                        net:net, beg:beg, end:end, cv:net/ebitda});
+        beg=end;
       }
-      let beg=beg0; this._exp=[];
-      this._rows.forEach(r=>{ const ch=r.ni+r.da+r.nwc+r.cx; const end=beg+ch;
-        this._exp.push({ch:ch,beg:beg,end:end,cv:ch/r.ni}); beg=end; });
-      return {ROWS:10, cells, active:{r:6,c:2}, sel:null, colW:{1:170,2:70,3:70,4:70,5:70,6:70}};
+
+      cells[L0+'1']={...blankCell(),value:codename()+' — cash flow statement ($mm)',txt:true,bold:true};
+      /* the basis memo MODELING_STANDARDS §2/§7 require: the sign convention stated on the board,
+         plus the one simplification this fragment makes, named so a player never learns the
+         free-cash-flow identity without knowing why it holds here */
+      cells[L0+'2']={...blankCell(),value:'Basis: uses of cash shown negative · no financing flows, so the net change in cash is free cash flow',txt:true,it:true,fontColor:'gray'};
+      cells[L0+rHdr]={...blankCell(),bb:true};
+      for(let i=0;i<5;i++) cells[YL(i)+rHdr]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r',bb:true};
+
+      /* THE SUPPORTING SCHEDULES — pre-built and pre-dressed (§2.1b: the lesson is the linkage,
+         so the pages this one reads from arrive finished). One blank row separates them from the
+         statement, which is also the geometry moat (doctrine §3: no Ctrl+arrow ride-through). */
+      cells[L0+rSrc] ={...blankCell(),value:'Supporting schedules',txt:true,bold:true};
+      cells[L0+rEbit]={...blankCell(),value:'EBITDA',txt:true};
+      cells[L0+rCapx]={...blankCell(),value:'Capital expenditures',txt:true};
+      cells[L0+rNwc] ={...blankCell(),value:'Increase in net working capital',txt:true};
+
+      cells[L0+rCfs]={...blankCell(),value:'Cash flow statement',txt:true,bold:true};
+      [[rNi,'Net income'],[rDa,'Depreciation & amortization'],[rWc,'Increase in net working capital'],
+       [rCfo,'Cash flow from operations'],[rCx,'Capital expenditures'],[rNet,'Net change in cash'],
+       [rBeg,'Beginning cash'],[rEnd,'Ending cash']].forEach(([r,n])=>{
+        cells[L0+r]={...blankCell(),value:n,txt:true}; });   /* the closing row ships UNDRESSED — bolding and ruling it is beat 6 */
+      cells[L0+rMemo]={...blankCell(),value:'Memo: cash conversion',txt:true};
+
+      for(let i=0;i<5;i++){ const C=YL(i), e=this._exp[i];
+        cells[C+rEbit]={...blankCell(),value:e.ebitda,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[C+rCapx]={...blankCell(),value:e.capx, fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[C+rNwc] ={...blankCell(),value:e.nwc,  fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[C+rNi]  ={...blankCell(),value:e.ni,   fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[C+rDa]  ={...blankCell(),value:e.da,   fontColor:'blue',fmtStyle:'comma',decimals:0};
+        /* the four built statement lines ship EMPTY but pre-formatted, and the two SUBTOTALS
+           among them ship with their TOP border already on (§1.0(f) — the dress the player owns
+           is the closing line, beat 6) */
+        cells[C+rWc] ={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[C+rCfo]={...blankCell(),fmtStyle:'comma',decimals:0,bt:true};
+        cells[C+rCx] ={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[C+rNet]={...blankCell(),fmtStyle:'comma',decimals:0,bt:true};
+        cells[C+rBeg]= (i===0)
+          ? {...blankCell(),value:beg0,fontColor:'blue',fmtStyle:'comma',decimals:0}
+          : {...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[C+rEnd]={...blankCell(),fmtStyle:'comma',decimals:0};
+        /* the memo ships GENERAL on purpose: the §4.80 page's one-decimal ☆ was a formatting
+           bonus (dead under §1.0(d)) and §1.0-R4(u) says promote real work rather than delete
+           it, so percent-at-one-decimal is part of beat 4's own scope */
+        cells[C+rMemo]={...blankCell()};
+      }
+
+      const B=colLetter(cY0), Bn=colLetter(cYn);
+      this._o={ c0:c0, cY0:cY0, cYn:cYn, pad:pad, y0:y0, pinch:pinch,
+        rHdr:rHdr, rSrc:rSrc, rEbit:rEbit, rCapx:rCapx, rNwc:rNwc, rCfs:rCfs, rNi:rNi, rDa:rDa,
+        rWc:rWc, rCfo:rCfo, rCx:rCx, rNet:rNet, rBeg:rBeg, rEnd:rEnd, rMemo:rMemo,
+        nwcSrc0:B+rNwc, capxSrc0:B+rCapx, ebit0:B+rEbit, ni0:B+rNi, da0:B+rDa,
+        wc0:B+rWc, cfo0:B+rCfo, cx0:B+rCx, net0:B+rNet, begC0:B+rBeg, end0:B+rEnd, memo0:B+rMemo,
+        blk:B+rWc+':'+Bn+rNet, refRect:B+rWc+':'+Bn+rCx,
+        wcRng:B+rWc+':'+Bn+rWc, cxRng:B+rCx+':'+Bn+rCx,
+        cfoRng:B+rCfo+':'+Bn+rCfo, netRng:B+rNet+':'+Bn+rNet, memoRng:B+rMemo+':'+Bn+rMemo,
+        endRng:B+rEnd+':'+Bn+rEnd, rollRect:B+rBeg+':'+Bn+rEnd,
+        begL1:colLetter(cY0+1)+rBeg, begRest:colLetter(cY0+1)+rBeg+':'+Bn+rBeg };
+
+      /* WIDTH (§1.0-R3(r) — call neededWidth() or reason in the named constants, never a hand
+         metric). The two 31-character labels ('Increase in net working capital') sit in rows
+         whose year columns are OCCUPIED, so render() grants them no spill: 31 × TXTPX 6.9 +
+         PAD_TXT 20 = 234, and clipsCol() amputates anything narrower. 244 clears it with a
+         margin. The year columns hold '(1,234)' at 7 chars × CHARPX 8.6 + PAD_NUM 12 = 73, and
+         the memo's '(12.3%)' the same, so 92 is comfortable. Solved sheet: 244 + 5×92 = 704px
+         inside the r333 frame. This drill grades NO width verdict, so it is not __noShrink and
+         the elastic scaler owns the rest of the sheet. */
+      const colW={}; colW[c0]=244;
+      for(let c=cY0;c<=cYn;c++) colW[c]=92;
+      return {ROWS:20, cells, active:{r:rWc,c:cY0}, sel:null, colW:colW};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(0.5,Math.abs(exp)*1e-3); };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D','E','F'];
-      const linkOk=[1,2,3,4].every(i=> refs(COL[i]+'7',[COL[i-1]+'8']) && near(COL[i]+'7',this._exp[i].beg));
-      const cvOk=[0,1,2,3,4].every(i=>{ const c=S.cells[COL[i]+'10'];
-        return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-this._exp[i].cv)<1e-3&&c.fmtStyle==='percent'); });
-      const dressOk=[0,1,2,3,4].every(i=>{ const c=S.cells[COL[i]+'8']; return !!(c&&c.bold&&c.bt); });
+      const o=this._o, E=this._exp;
+      const cel=k=>S.cells[k]||{};
+      const YL=i=>colLetter(o.cY0+i);
+      /* §1.0-R3(p): a build beat reads a LIVE formula plus the number on screen, never the
+         formula's TEXT. The tolerance is wider than one display step at zero decimals, so a
+         player who works the slow way clears exactly like one who filled (§1.0(c)); the clock is
+         what prices the difference. */
+      const live=(k,want)=>{ const c=cel(k);
+        return !!c.formula && typeof c.value==='number' && Math.abs(c.value-want)<=Math.max(0.6, Math.abs(want)*5e-3); };
+      const row=(r,pick)=>[0,1,2,3,4].every(i=>live(YL(i)+r, pick(E[i])));
+      /* the reference grade — boundary-safe and $-stripped, so =B7 / =+B7 / =$B$7 / =SUM(B7) /
+         =B7+0 all clear and only a typed constant fails (doctrine §2.2 anchor-text exception read
+         onto a LINK; MODELING_STANDARDS §7 lists the pointed cell among the gradeable end-state
+         conventions). The boundary matters: a bare indexOf would let '=B17' satisfy 'B1'. */
+      const points=(k,src)=>{ const c=cel(k); if(!c.formula) return false;
+        const f=String(c.formula).toUpperCase().replace(/\$/g,'');
+        return new RegExp('(^|[^A-Z0-9])'+src+'([^0-9]|$)').test(f); };
+      const refOk=[0,1,2,3,4].every(i=>
+        live(YL(i)+o.rWc, E[i].nwc)  && points(YL(i)+o.rWc, YL(i)+o.rNwc) &&
+        live(YL(i)+o.rCx, E[i].capx) && points(YL(i)+o.rCx, YL(i)+o.rCapx));
+      const cfoOk=row(o.rCfo, e=>e.cfo);
+      const netOk=row(o.rNet, e=>e.net);
+      /* the memo carries its own format (§1.0(a) format-as-you-go, and §1.0-R4(u)'s promotion of
+         the dead one-decimal ☆). Ctrl+1 P lands one decimal outright; Alt H P and Ctrl+Shift+%
+         land zero and need one Alt H 0 — all three routes reach the same end state and clear. */
+      const memoOk=[0,1,2,3,4].every(i=>{ const c=cel(YL(i)+o.rMemo);
+        return !!c.formula && typeof c.value==='number' && Math.abs(c.value-E[i].cv)<5e-4
+          && c.fmtStyle==='percent' && (c.decimals|0)===1; });
+      const endOk=row(o.rEnd, e=>e.end);
+      /* MODELING_STANDARDS §3: the beginning cell REFERENCES the prior ending, never repeats it
+         and never re-derives it from the prior year's components — that is the corkscrew. */
+      const linkOk=[1,2,3,4].every(i=> live(YL(i)+o.rBeg, E[i].beg) && points(YL(i)+o.rBeg, YL(i-1)+o.rEnd));
+      /* beat 6: bold + a TOP rule on the closing line (§1.0(f)). LENIENT border reading (r446b,
+         campaign §5): Alt H B P, Alt H B D and Alt H B S / B A around the row all clear, and a
+         double bottom rule laid over the top rule stays legal per MODELING_STANDARDS §1. A
+         bottom rule ALONE does not clear — that is the rule §1.0(f) exists to kill. */
+      const dressOk=[0,1,2,3,4].every(i=>{ const c=cel(YL(i)+o.rEnd); return !!(c.bold && (c.bt||c.ball)); });
+      /* ☆ — one op carries the whole four-row statement across every year. Read off the r424
+         S.fillOps latch OR the r425 S.pasteLog latch (the MECHANIC, never geometry inferred), so
+         Ctrl+R, Alt H F I R and a tiled paste of the first-year column all earn it. Four separate
+         row fills clear every core beat and leave it dark — measured, and walked as alt-paths
+         entry 2. The value conjuncts are what make it anchoring mastery rather than a gesture: an
+         anchored schedule reference stamps year one across the page and the board reads wrong. */
+      const onePass=(S.fillOps||[]).some(f=>f.dir==='right' && f.r1<=o.rWc && f.r2>=o.rNet && f.c1<=o.cY0 && f.c2>=o.cYn)
+        || (S.pasteLog||[]).some(p=>p.r0<=o.rWc && p.r0+p.h-1>=o.rNet && p.c0<=o.cY0+1 && p.c0+p.w-1>=o.cYn);
       return [
-        {label:'run net change in cash \u2014 one SUM over the four lines, all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'6',this._exp[i].ch))&&refs('B6',['SUM('])},
-        {label:'build THE LINK \u2014 beginning cash = prior year\u2019s ending cash', ok: linkOk},
-        {label:'tie out ending cash through year 5', ok: [0,1,2,3,4].every(i=>near(COL[i]+'8',this._exp[i].end))},
-        {label:'run the cash conversion memo \u2014 net change \u00f7 net income, formatted as a percent', ok: cvOk},
-        {label:'bold the ending row and add a top border above it', ok: dressOk},
+        {label:'Reference the working-capital and capital-expenditure lines from the schedules above', ok: refOk},
+        {label:'Build cash flow from operations — all five years', ok: cfoOk},
+        {label:'Total net change in cash — cash flow from operations plus capital expenditures', ok: netOk},
+        {label:'Build the cash-conversion memo — net change over EBITDA, percent, one decimal', ok: memoOk},
+        {label:'Build the cash roll — each year opens on the prior year’s ending cash', ok: endOk && linkOk},
+        {label:'Bold the ending cash row and add a top border above it', ok: dressOk},
+        {label:'Fill the four statement lines across the years in one pass', ok: refOk && cfoOk && netOk && onePass, bonus:true},
       ];
     }
   },
