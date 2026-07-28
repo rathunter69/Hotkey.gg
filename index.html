@@ -12899,85 +12899,320 @@ const CHALLENGES = {
     }
   },
   threestmt:{
-    name:'3-Statement', label:'Tie the three statements', par:59, parKeys:61,
-    aha:'NI → cash → balance sheet — three statements, one loop, all links (=).',
-    prompt:'Three statements, three years wide: cash walks from the CFS into the balance sheet, retained earnings absorbs net income year after year, and the check row proves the whole build ties — three links, each built once and filled across. When all three check cells read zero, format the totals.',
-    req:'<em>B5</em> =SUM(B2:B4) fill \u2192 \u00b7 <em>B7</em> =B6+B5 \u00b7 <em>C6</em> =B7 fill \u2192 \u00b7 fill B7:D7 \u2192 \u00b7 <em>B9</em> =B7 fill \u2192 \u00b7 <em>B11</em> =B9+B10 fill \u2192 \u00b7 <em>C13</em> =B13+C2 fill \u2192 \u00b7 <em>B14</em> =B11-B12-B13 fill \u2192 \u00b7 dress: <em>ctrl+b</em> B11:D11 \u00b7 <em>alt h b p</em> B14:D14',
-    guide:[
-      'net change at B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u2014 capex already carries its sign; one clean SUM \u00b7 fill right \u00b7 ending cash at B7 \u00b7 <kbd>=B6+B5</kbd>',
-      'LINK 1, the roll-forward: C6 \u00b7 <kbd>=B7</kbd> \u00b7 fill C6:D6 \u2192 and B7:D7 \u2192',
-      'LINK 2, CFS\u2192BS: cash on the balance sheet at B9 \u00b7 <kbd>=B7</kbd> \u00b7 fill right \u00b7 total assets at B11 \u00b7 <kbd>=B9+B10</kbd> \u00b7 fill \u2192',
-      'LINK 3, the RE roll: C13 \u00b7 <kbd>=B13+C2</kbd> \u00b7 fill C13:D13 \u2192 \u2014 RE absorbs NI every year',
-      'the check at B14 \u00b7 <kbd>=B11-B12-B13</kbd> \u00b7 fill \u2192 \u2014 all three years must read ZERO',
-      'then format it: <kbd>ctrl</kbd>+<kbd>b</kbd> total assets \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> the check row',
-    ],
-    targets:['B3:F3','B4:F4','B7:F7','B8:F8','B7:F7'],
-    demo(){ return [
-      {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
-      {sel:'B5:D5', keys:[Kb.fillR]},
-      {sel:'B7', keys:[...T('=B6+B5'), Kb.enter]},
-      {sel:'C6', keys:[...T('=B7'), Kb.enter]},
-      {sel:'C6:D6', keys:[Kb.fillR]},
-      {sel:'B7:D7', keys:[Kb.fillR]},
-      {sel:'B9', keys:[...T('=B7'), Kb.enter]},
-      {sel:'B9:D9', keys:[Kb.fillR]},
-      {sel:'B11', keys:[...T('=B9+B10'), Kb.enter]},
-      {sel:'B11:D11', keys:[Kb.fillR]},
-      {sel:'C13', keys:[...T('=B13+C2'), Kb.enter]},
-      {sel:'C13:D13', keys:[Kb.fillR]},
-      {sel:'B14', keys:[...T('=B11-B12-B13'), Kb.enter]},
-      {sel:'B14:D14', keys:[Kb.fillR]},
-      {sel:'B11:D11', keys:[Kb.bold]},
-      {sel:'B14:D14', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
+    /* r448 H6b-FB (DEPTH_PASS §4.82, "Tie the three statements") — the depth-pass rework,
+       built to §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (the later law wins on
+       conflict), and to dev/MODELING_STANDARDS.md, which is BINDING on Full Builds.
+
+       WAS: 6 checks / 6 guide lines / 5 targets on a ROWS:14 board — the tri-length invariant
+       (§1.9) broken outright, no ☆ at all (§1.1/§2.2), no saveClose (§1.0(e)), and a trailing
+       beat that drove three check cells to zero AND dressed two rows in one line (§1.0(a)
+       format-as-you-go, §1.1 one-verb-one-beat, doctrine §2.5 one-action-per-line — all three).
+       Its board also engineered the tie by forcing capex to EQUAL D&A in years 2 and 3
+       ("cx[1]=da[1]; cx[2]=da[2];", the shipped comment says so), which is a model a reviewer
+       would stop on: a company whose capex lands exactly on its depreciation, to the dollar,
+       three years running. That went out with the board — this one ties because PP&E ROLLS
+       (MODELING_STANDARDS §3), which is what makes capex and D&A agree in aggregate without
+       making them identical in any year.
+
+       ── ☆-HEADROOM DIAGNOSTIC (CAMPAIGN §2, both parts) — run BEFORE the board was designed,
+       on the SHIPPED board, through the live engine, every selection and navigation keyed,
+       5 seeds (dev/verify-threestmt.js reruns the same measurement on the new board):
+         PART 1 — IS THERE SPREAD? taught route (each line built once, filled across) 77 keys
+           against 158 for the obvious slow route that does the SAME work (every year typed,
+           every row dressed cell by cell). 2.05×.
+         PART 2 — IS ANY OF IT ☆-LEGAL? Of the 81 keys of spread, 12 are the row dresses, which
+           §1.0(d) forbids grading. ZERO are chord-vs-ribbon in the §1.0(c) forced-to-clear
+           sense: the engine has no ribbon route into formula entry, and Ctrl+R and Alt H F I R
+           hit the same latch, so a fill is a fill however it is reached (the `wrapfix` r439
+           reading — on a formula board the forced-to-clear class is empty by construction).
+           The surviving 69 keys are FILL-versus-RETYPE across the year columns. Legal headroom,
+           in the drill's own subject. The drill is a lesson, not a motif.
+
+       ── ☆ FAMILY BAKE-OFF (wave-5 addendum, the r447 debtsched pattern — candidates measured
+       on the IDENTICAL job on the NEW board before the family was chosen, 5 seeds, through the
+       live engine, every selection keyed. dev/verify-threestmt.js §3/§4 re-runs all of it):
+         · one-pass, Ctrl+R fill ................. 41 keys   (the taught route)
+         · one-pass, Ctrl+Enter multi-commit ..... 41 keys   (grab the strip, type once, ctrl+↵)
+         · one-pass, clipboard clone ............. 41 keys   (copy the built cell onto the rest)
+         · one-pass, ribbon fill (Alt H F I R) ... 57 keys   (§1.0(c) forced-to-clear)
+         · structured selection (Ctrl+Shift+→) ... NOT AVAILABLE. Probed: on this board it
+           OVERSHOOTS to column J, because the year cells beside a freshly built one are still
+           EMPTY and Ctrl+Shift+→ walks to the next non-empty cell. A ☆ family the board cannot
+           express is not a candidate, it is a trap. (verify-threestmt.js §5 asserts it.)
+         · point mode (S.pointLog) ............... 39 keys — NOT A COMPETING FAMILY. Pointing is
+           a way to enter a REFERENCE; it composes with the fill rather than replacing it (that
+           39 still contains four fills). As a ☆ in its own right it would be worth 2 keys
+           against typing the refs, which is the `growth` failure with a different label.
+         · retype control (no one-pass anywhere) .. 74 keys — every core clears, ☆ DARK.
+       CHOSEN: **one-pass discipline**, satisfied by ANY of the three mechanics that write a
+       whole line in one motion — the fill (S.fillOps), the Ctrl+Enter multi-commit
+       (S.multiEnter), or the clipboard clone (S.pasteLog, the `balcheck` precedent). The
+       addendum asks for a non-fill family at comparable headroom; the measured answer is that
+       the three one-pass mechanics cost the IDENTICAL 41 keys on this job, so picking one of
+       them and darkening the other two would strand two equally good routes for no lesson —
+       §1.0(c) read as narrowly as the ☆'s own sanctioned exception allows. The star is the
+       DECISION (one motion per line vs. nine retyped cells), never the chord: 41 against 74 is
+       a 33-key discovery, the largest single decision on the board, and the spread it sits in
+       is 1.80× (74 ÷ 41), comfortably clear of the ~1.3× warning line.
+
+       ── UNTRIGGERABLE-BEAT SWEEP (CAMPAIGN §1 — routes WALKED, never predicates read). Every
+       core grades the END STATE (§1.0-R3(p)): the number standing in each year column, plus, on
+       the three lines whose stated outcome is a LINK, that the cell is a live formula rather
+       than a typed constant (doctrine §2.2's sanctioned "don't hardcode the answer" case, and
+       MODELING_STANDARDS §7's "a beginning balance that REFERENCES rather than repeats" read as
+       end state). NO check reads a range, a function name, an anchor or an operand order out of
+       formula text. Walked and green: RE roll off the IS net income OR off the CFS net income
+       (both are the same number and both are how it is really built); the check written
+       =assets-L&E, =-(L&E-assets), or with every ref $-anchored; the cash link written =Y12,
+       =+Y12 or =SUM(Y12); any op order at all; ribbon fills; Ctrl+Enter commits.
+
+       THE BOARD (§1.0-R4(t) reality test · MODELING_STANDARDS §7). One page, three statement
+       FRAGMENTS, three years — a component of a build, not a whole model. It is the artifact an
+       associate actually has open the night the pack goes out: the statements typed, the wires
+       not yet in. Every line is a real line item with a real magnitude in $mm.
+         · INCOME STATEMENT — pretax income, taxes, net income (a live =pretax+taxes).
+         · CASH FLOW STATEMENT — net income (WIRE 1, the player's), D&A add-back, capex,
+           beginning cash (a corkscrew: each year opens on the prior close), ending cash.
+         · BALANCE SHEET — cash (WIRE 2), PP&E net (rolls: prior − D&A − capex), total assets,
+           payables, retained earnings (WIRE 3), total liabs & equity, and the check row.
+       MODELING_STANDARDS conventions this board follows: §1 colour-as-provenance (blue = typed
+       input, black = formula on this sheet; nothing is green because the board is one sheet);
+       §1 totals wear a TOP border, never a rule underneath; §1 units stated in the title ($mm);
+       §2 costs and uses of cash carry their sign (taxes and capex negative, so every subtotal is
+       an addition); §3 the roll-forward corkscrew, twice (cash and PP&E) with the beginning cell
+       REFERENCING the prior ending; §4 three-statement linkage — net income → CFS and → retained
+       earnings, D&A and capex → PP&E, ending cash on the CFS = cash on the BS; §6 the balance
+       check lives in one visible place and reads zero.
+       DELIBERATE SIMPLIFICATIONS, stated on the board's own memo line as §7 requires: taxes,
+       D&A and capex are GIVEN for this fragment (their schedules sit off-page), and the
+       fragment carries no debt, so there is no interest and no circularity to resolve — the
+       beginning-balance ruling (§5) never comes up here.
+
+       STRUCTURAL DEVIATIONS from the §4.82 page, declared per §0 (payload item 8 carries them
+       with their §-anchors):
+       (1) ☆ RE-CUT (binding, §1.0-R4(u)). The page's bonus is "Finish at A1 — the model is one
+           page again". Dead on arrival twice over: it is not an efficiency discovery at all
+           (§1.0(d)), and it falls out of the run without a decision (§1.0-R2(i)) — and since
+           §1.0(e) the run ends on Ctrl+S anyway. Re-cut to the one-pass discovery measured in
+           the bake-off above.
+       (2) BEAT 5 TAKES A TOP BORDER, NOT A BOTTOM ONE. The page says "add a bottom border under
+           it"; §1.0(f) reverses exactly that line catalog-wide ("Any existing page line that
+           says 'bottom border under the Total row' is superseded"), and MODELING_STANDARDS §1
+           says the same. The check row is the page's read line and earns the rule ABOVE it.
+       (3) THE BOARD IS NARROWED, and this is the one the orchestrator should read. The page's
+           beat 4 grades "Total assets minus Total L&E", which needs both sides of a balance
+           sheet on a board that also carries an income statement and a cash flow statement. At
+           20 rows (§1.3, floor AND cap, Models included) the honest fit is: 4 IS rows, 6 CFS
+           rows, 8 BS rows, 2 header rows. The narrowing is the IS — it runs pretax → taxes →
+           net income rather than EBITDA → D&A → EBIT → taxes → net income, because the wire
+           this drill grades leaves the IS from its BOTTOM line and nothing above that line is
+           load-bearing here (`isbuild` owns building the statement itself). §1.3 and
+           MODELING_STANDARDS §7 both say to narrow the fragment rather than raise the cap.
+       (4) THE PERIOD HEADERS SIT ON THE FIRST SECTION'S HEAD ROW (row 3 reads
+           "Income statement | FY25 | FY26 | FY27"). A dedicated header row costs a 21st row.
+       (5) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an EXISTING labelled
+           cell in a labelled row — no insert slot, no empty paste target — so the guided ring
+           expresses all five core beats.
+       (6) NO HELPER STACK (§1.0(f)/§1.0-R2(l)): nothing here is converted, scaled or assumed;
+           the board's inputs are the statements' own typed lines and they ship blue.
+       (7) §1.3 DENSITY: 20 of 20 rows carry content at the win state (100%), against 12 of 20
+           (60%) on the shipped ROWS:14 board. */
+    name:'3-Statement', label:'Tie the three statements', par:45, parKeys:42, saveClose:true,
+    /* r448 §4.82 depth pass: par re-swept from scratch (was par 59 / parKeys 61 on the ROWS:14
+       board with no ☆ and no save closer). dev/e2e-par-sweep.js threestmt, 5-seed median 42
+       keys including the engine-appended Ctrl+S — FLAT across seeds, because the randomization
+       moves the figures, the anchor column and the stress year but never the beat count. par 45
+       ≈ 1.07 s/key, the house band. The count came DOWN with the rework and that is deliberate:
+       the shipped board also had the player build net change in cash, ending cash, the cash
+       corkscrew and total assets, which are `cfslink`'s and `bsbuild`'s lessons, not this
+       drill's (CAMPAIGN §3 — a redundancy is usually in the shared tail). What is left is the
+       three WIRES, the check they prove, and its dress. That lands threestmt at the light end
+       of the chapter band (cfslink 36 · isbuild 51 · opmodel 55 · debtblock 57 · bsbuild 60 ·
+       nwcsched 74 · lbobuild 82 · dcfbuild 91) — flagged for Wolf in the payload, since §5.4
+       reserves the H6b-FB difficulty target to him and this is the page he sets it off.
+       Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 1:07 · pro 0:51 · legendary 0:45. */
+    aha:'three statements, three wires — everything else is arithmetic.',
+    /* §1.5: the aha's MOMENT is the third wire going in — the check row, dark and non-zero
+       through the whole run, drops to three zeros the instant retained earnings absorbs the
+       year. Nothing was plugged to get it there. */
+    prompt:'The associate who built this pack left the three statements sitting side by side and never wired them together — net income never reaches the cash flow statement, cash never reaches the balance sheet, and retained earnings never absorbs the year. The VP reads it at eight. Build the three links, then build the check row under the balance sheet and bold it. Three zeros mean every wire is in.',
+    req(){ const o=this._o; return 'link <em>'+o.Y0+o.rCni+'</em> → <em>='+o.Y0+o.rNi+'</em> · <em>'+o.Y0+o.rCash+'</em> → <em>='+o.Y0+o.rEcash+'</em> · <em>'+o.Y1+o.rRe+'</em> → <em>='+o.Y0+o.rRe+'+'+o.Y1+o.rNi+'</em> · each line <em>shift+→</em> then <em>ctrl+r</em> (or <em>ctrl+↵</em>) · <em>'+o.Y0+o.rChk+'</em> → <em>='+o.Y0+o.rTa+'-'+o.Y0+o.rTle+'</em> <em>ctrl+r</em> · <em>ctrl+b</em> + <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'the income statement hands off from its net income line, row '+o.rNi+' · on '+o.Y0+o.rCni+': <kbd>=</kbd>'+o.Y0+o.rNi+' <kbd>↵</kbd> · then take it across the three years — <kbd>shift</kbd>+<kbd>→</kbd> twice and <kbd>ctrl</kbd>+<kbd>r</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> is the same fill; grab the strip first and <kbd>ctrl</kbd>+<kbd>↵</kbd> writes all three at once). Typing each year lands it too, it only costs the keys — <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>→</kbd> is the one that will not help, the years beside it are still empty',
+      'the cash flow statement closes on its ending cash line, row '+o.rEcash+', and the balance sheet opens with it · on '+o.Y0+o.rCash+': <kbd>=</kbd>'+o.Y0+o.rEcash+' <kbd>↵</kbd> · filled across. Anchored or not, <kbd>=SUM(</kbd> around it or not — it grades the number and that the cell is live, never the text',
+      'retained earnings absorbs the year: on '+o.Y1+o.rRe+' · <kbd>=</kbd>'+o.Y0+o.rRe+'<kbd>+</kbd>'+o.Y1+o.rNi+' <kbd>↵</kbd> · one fill covers the last two years. Point it at either net income — the statement line or the cash flow line — they are the same number and both grade',
+      'the check on '+o.Y0+o.rChk+': <kbd>=</kbd>'+o.Y0+o.rTa+'<kbd>-</kbd>'+o.Y0+o.rTle+' <kbd>↵</kbd> · filled across. Either way round so long as the sign is right, anchored or not',
+      'close it: select the check row and <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> rules above it (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> boxes the row and <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> borders every edge — both draw that top line, both clear it)',
+      '☆ the discovery: every one of those four lines written ONCE and taken across the years in a single motion — a fill, a <kbd>ctrl</kbd>+<kbd>↵</kbd> commit or a copy of the built cell onto the rest, four passes, no year retyped. Typing the nine repeat cells clears every core beat and forfeits it',
     ]; },
+    /* rings: ① the CFS net-income strip · ② the balance-sheet cash strip · ③ the retained-
+       earnings roll · ④ the check row · ⑤ the check row with its label · ☆ never ringed (§2.2) */
+    targets(){ const o=this._o; return [
+      o.Y0+o.rCni+':'+o.Y2+o.rCni,
+      o.Y0+o.rCash+':'+o.Y2+o.rCash,
+      o.Y1+o.rRe+':'+o.Y2+o.rRe,
+      o.Y0+o.rChk+':'+o.Y2+o.rChk,
+      o.CA+o.rChk+':'+o.Y2+o.rChk,
+      null,
+    ]; },
+    /* the demo BUILDS its own selections with Shift+→ rather than being handed them by
+       setDemoSel, so parKeys measures what a player really pays for the range grabs instead of
+       eliding them (the r438 `series` rule). setDemoSel only parks the cursor on the anchor
+       cell of the next beat. */
+    demo(){ const o=this._o; const R={key:'ArrowRight',shift:true}; return [
+      {sel:o.Y0+o.rCni, keys:[...T('='+o.Y0+o.rNi), Kb.enter]},
+      /* the ☆, one of four — a single pass right across the years */
+      {sel:o.Y0+o.rCni, keys:[R, R, Kb.fillR]},
+      {sel:o.Y0+o.rCash, keys:[...T('='+o.Y0+o.rEcash), Kb.enter]},
+      /* two of four */
+      {sel:o.Y0+o.rCash, keys:[R, R, Kb.fillR]},
+      {sel:o.Y1+o.rRe, keys:[...T('='+o.Y0+o.rRe+'+'+o.Y1+o.rNi), Kb.enter]},
+      /* three of four — the roll only has two years to cover */
+      {sel:o.Y1+o.rRe, keys:[R, Kb.fillR]},
+      {sel:o.Y0+o.rChk, keys:[...T('='+o.Y0+o.rTa+'-'+o.Y0+o.rTle), Kb.enter]},
+      /* four of four */
+      {sel:o.Y0+o.rChk, keys:[R, R, Kb.fillR]},
+      /* §1.0(a): the dress follows the beat that made the cells, not the end of the run */
+      {sel:o.CA+o.rChk, keys:[R, R, R, Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 three statements ($mm)',txt:true,bold:true};
-      const y0=rnd(24,26);
-      for(let i=0;i<3;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
-      const rows=[[2,'Net income'],[3,'D&A'],[4,'Capex'],[5,'Net change in cash'],[6,'Beginning cash'],[7,'Ending cash'],[9,'Cash (BS)'],[10,'Other assets'],[11,'Total assets'],[12,'Debt'],[13,'Retained earnings'],[14,'Check']];
-      rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===7||r===11||r===14)});
-      const ni=[],da=[],cx=[];
-      for(let i=0;i<3;i++){ ni.push(rnd(10,30)*10); da.push(rnd(4,12)*10); cx.push(rnd(6,16)*10); }
-      const beg0=rnd(15,40)*10, other=rnd(40,90)*10, debt=rnd(20,60)*10;
-      // engineer the tie: for years 2-3, \u0394TA must equal \u0394RE (=NI) \u2192 force DA=CX past year 1
-      cx[1]=da[1]; cx[2]=da[2];
-      const ch=[ni[0]+da[0]-cx[0], ni[1], ni[2]];
-      const end=[beg0+ch[0], 0, 0]; end[1]=end[0]+ch[1]; end[2]=end[1]+ch[2];
-      const re1=end[0]+other-debt;
-      const re=[re1, re1+ni[1], re1+ni[1]+ni[2]];
-      this._exp={ ch:ch, beg:[beg0,end[0],end[1]], end:end, ta:end.map(e=>e+other), re:re };
-      for(let i=0;i<3;i++){ const col=colLetter(i+2);
-        cells[col+2]={...blankCell(),value:ni[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+3]={...blankCell(),value:da[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+4]={...blankCell(),value:-cx[i],fontColor:'blue',fmtStyle:'comma',decimals:0};   // r174: capex lives negative (matches the CFS-link drill)
-        cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+7]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-        cells[col+9]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+10]={...blankCell(),value:other,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+11]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+12]={...blankCell(),value:debt,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+14]={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
-        if(i>0){ cells[col+6]={...blankCell(),fmtStyle:'comma',decimals:0}; cells[col+13]={...blankCell(),fmtStyle:'comma',decimals:0}; }
+      /* §1.2 randomization — four independent axes. (a) SITE: the board is a full-grid artifact
+         (20 of 20 rows), so per §1.2 the site axis is CORNER JITTER — the whole page anchors at
+         column A or column B. (b) CONTENT: the codename and the fiscal-year base. (c) VALUES:
+         every figure through rnd(). (d) WHICH-ONE: the STRESS YEAR — one of the three years
+         carries an outsized capex programme (the page's own "which year carries the stress"),
+         which moves every downstream number without moving a single beat. Geometry (three
+         statements, three years, four built lines) is constant across seeds so the keystroke
+         count never moves with the draw — the r439 `wrapfix` rule. */
+      const c0=rnd(0,1)?1:2;                          // (a) corner jitter: anchor column A or B
+      const CA=colLetter(c0), Y0=colLetter(c0+1), Y1=colLetter(c0+2), Y2=colLetter(c0+3);
+      const YS=[Y0,Y1,Y2];
+      const y0=rnd(2024,2028);                        // (b)
+      /* row map — one page, three fragments, 20 rows exactly (§1.3 floor AND cap) */
+      const rIs=3, rPre=4, rTax=5, rNi=6,
+            rCfs=7, rCni=8, rDa=9, rCap=10, rBcash=11, rEcash=12,
+            rBs=13, rCash=14, rPpe=15, rTa=16, rPay=17, rRe=18, rTle=19, rChk=20;
+      const stress=rnd(0,2);                          // (d) which year carries the build programme
+      const pretax=[], tax=[], ni=[], da=[], cap=[];
+      for(let i=0;i<3;i++){
+        const p=rnd(60,120)*10; pretax.push(p);
+        const t=-Math.round(p*0.25/10)*10; tax.push(t); ni.push(p+t);
+        da.push(rnd(15,35)*10);
+        cap.push(-(i===stress ? rnd(50,80) : rnd(20,45))*10);   // uses of cash carry their sign (MODELING_STANDARDS §2)
       }
-      cells['B6']={...blankCell(),value:beg0,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['B13']={...blankCell(),value:re1,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      return {ROWS:14, cells, active:{r:5,c:2}, sel:null, colW:{1:150,2:80,3:80,4:80}};
+      const begCash=rnd(30,80)*10, ppe0=rnd(120,240)*10, pay=rnd(30,90)*10;
+      const ecash=[], ppe=[], ta=[], re=[], tle=[];
+      /* TWO series, and the distinction matters: the SOLVED series is what checks() grades, the
+         LOAD series is what the seeded formulas actually read while the three wires are still
+         empty — an unfinished model on screen, which is the story the prompt tells. */
+      const ecL=[], bcL=[];
+      for(let i=0;i<3;i++){
+        const beg=i?ecL[i-1]:begCash; bcL.push(beg); ecL.push(beg+da[i]+cap[i]);   // wires out
+        ecash.push((i?ecash[i-1]:begCash)+ni[i]+da[i]+cap[i]);                     // wires in
+        ppe.push(i? ppe[i-1]-da[i]-cap[i] : ppe0);              // the PP&E roll: prior − D&A + spend
+        ta.push(ecash[i]+ppe[i]);
+      }
+      /* the opening balance sheet BALANCES as drawn — retained earnings carries the historical
+         accumulation, which is what it is on a real opening sheet; every later year then ties
+         because ΔAssets = ΔCash + ΔPP&E = net income and ΔL&E = ΔRE = net income. Nothing on
+         this page is a plug and nothing is forced (contrast the shipped board's cx=da hack). */
+      re.push(ta[0]-pay); re.push(re[0]+ni[1]); re.push(re[1]+ni[2]);
+      for(let i=0;i<3;i++) tle.push(pay+re[i]);
+      const num=(v,extra)=>({...blankCell(), value:v, fmtStyle:'comma', decimals:0, ...(extra||{})});
+      const inp=v=>num(v,{fontColor:'blue'});                    // §1.0(f)/MODELING_STANDARDS §1: blue = typed input
+      const fx=(f,v,extra)=>({...blankCell(), formula:f, value:v, fmtStyle:'comma', decimals:0, ...(extra||{})});
+      const lab=(r,s,b)=>cells[CA+r]={...blankCell(), value:s, txt:true, bold:!!b};
+      cells[CA+'1']={...blankCell(), value:codename()+' — three-statement links ($mm)', txt:true, bold:true};
+      cells[CA+'2']={...blankCell(), value:'Source: FY close pack · $mm · taxes, D&A and capex given here · uses of cash carry their sign', txt:true, it:true, fontColor:'gray'};
+      /* (4): the period headers ride the first section's head row — a dedicated header row
+         costs a 21st, and §1.3's cap is a cap. Bottom border under the headers (doctrine §2.1b). */
+      lab(rIs,'Income statement',true); cells[CA+rIs].bb=true;
+      YS.forEach((c,i)=>cells[c+rIs]={...blankCell(), value:'FY'+(y0+i), txt:true, bold:true, align:'r', bb:true});
+      lab(rPre,'Pretax income'); lab(rTax,'Taxes'); lab(rNi,'Net income',true);
+      lab(rCfs,'Cash flow statement',true);
+      lab(rCni,'Net income'); lab(rDa,'D&A'); lab(rCap,'Capex');
+      lab(rBcash,'Beginning cash'); lab(rEcash,'Ending cash',true);
+      lab(rBs,'Balance sheet',true);
+      lab(rCash,'Cash'); lab(rPpe,'PP&E, net'); lab(rTa,'Total assets',true);
+      lab(rPay,'Payables'); lab(rRe,'Retained earnings'); lab(rTle,'Total liabs & equity',true);
+      lab(rChk,'Check (assets − L&E)',true);
+      for(let i=0;i<3;i++){
+        const c=YS[i], p=i?YS[i-1]:null;
+        cells[c+rPre]=inp(pretax[i]);
+        cells[c+rTax]=inp(tax[i]);
+        /* §1.0(f) totals wear a TOP border, never a rule underneath (MODELING_STANDARDS §1) */
+        cells[c+rNi]=fx('='+c+rPre+'+'+c+rTax, ni[i], {bold:true, bt:true});
+        cells[c+rCni]=num(null);                                  // WIRE 1 — the player's
+        cells[c+rDa]=inp(da[i]);
+        cells[c+rCap]=inp(cap[i]);
+        /* the cash corkscrew (MODELING_STANDARDS §3): year one's opening is the typed input,
+           every later year REFERENCES the prior close rather than repeating it */
+        cells[c+rBcash]= i ? fx('='+p+rEcash, bcL[i]) : inp(begCash);
+        cells[c+rEcash]=fx('=SUM('+c+rCni+':'+c+rBcash+')', ecL[i], {bold:true, bt:true});
+        cells[c+rCash]=num(null);                                 // WIRE 2 — the player's
+        /* the PP&E roll: prior − D&A − capex (capex is negative, so that adds the spend) */
+        cells[c+rPpe]= i ? fx('='+p+rPpe+'-'+c+rDa+'-'+c+rCap, ppe[i]) : inp(ppe0);
+        cells[c+rTa]=fx('='+c+rCash+'+'+c+rPpe, ppe[i], {bold:true, bt:true});
+        cells[c+rPay]=inp(pay);
+        cells[c+rRe]= i ? num(null) : inp(re[0]);                 // WIRE 3 — the player's, years 2-3
+        cells[c+rTle]=fx('='+c+rPay+'+'+c+rRe, i?pay:tle[0], {bold:true, bt:true});
+        cells[c+rChk]=num(null);                                  // the check row — the player's
+      }
+      this._o={CA:CA, Y0:Y0, Y1:Y1, Y2:Y2, cols:YS, c0:c0, y0:y0, stress:stress,
+               rIs:rIs, rPre:rPre, rTax:rTax, rNi:rNi, rCfs:rCfs, rCni:rCni, rDa:rDa, rCap:rCap,
+               rBcash:rBcash, rEcash:rEcash, rBs:rBs, rCash:rCash, rPpe:rPpe, rTa:rTa,
+               rPay:rPay, rRe:rRe, rTle:rTle, rChk:rChk,
+               ni:ni, ecash:ecash, ta:ta, re:re, tle:tle};
+      const colW={}; colW[c0]=176; colW[c0+1]=92; colW[c0+2]=92; colW[c0+3]=92;
+      return {ROWS:20, cells, active:{r:rCni,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(0.5,Math.abs(exp)*1e-3); };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D'];
-      const e=this._exp;
-      const dressOk=[0,1,2].every(i=>{ const a=S.cells[COL[i]+'11'], b=S.cells[COL[i]+'14']; return !!(a&&a.bold&&b&&b.bt); });
+      const o=this._o;
+      /* every predicate reads the END STATE — the number standing in each year column, plus
+         liveness on the three lines whose stated outcome is a LINK. Nothing reads formula text
+         (§1.0-R3(p) / CAMPAIGN §1). */
+      const live=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'); };
+      const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&typeof c.value==='number'&&Math.abs(c.value-exp)<0.5); };
+      const rowLive=(r,f)=>o.cols.every((c,i)=>live(c+r)&&f(c+r,i));
+      const w1Ok = rowLive(o.rCni,(k,i)=>near(k,o.ni[i]));
+      const w2Ok = rowLive(o.rCash,(k,i)=>near(k,o.ecash[i]));
+      const w3Ok = [1,2].every(i=>live(o.cols[i]+o.rRe)&&near(o.cols[i]+o.rRe,o.re[i]));
+      const ckOk = rowLive(o.rChk,k=>near(k,0));
+      /* border-dress doctrine, wave-5 addendum: the LENIENT reading, `bt || ball`. Chosen and
+         declared because the campaign's own route facts say Alt H B S on a single row stores
+         `ball`, not `bt` — a strict `bt && !bb && !bdbl` here would go dark for a player who
+         boxed the row and can SEE the rule above it, which is §1.0-R3(p) exactly. The label
+         therefore carries no "no rule underneath" clause. */
+      const dressed = o.cols.every(c=>{ const x=S.cells[c+o.rChk]; return !!(x&&x.bold&&(x.bt||x.ball)); });
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real decision): each of the four
+         built lines written ONCE and taken across the years in a single motion. Read off the
+         MECHANIC latches, never geometry inferred — S.fillOps (r424: Ctrl+R and Alt H F I R both
+         log), S.multiEnter (r433: the Ctrl+Enter commit) and S.pasteLog (r425: the clipboard
+         clone, the `balcheck` precedent) — so the star is chord-agnostic per §1.0(c). All three
+         measured at the IDENTICAL 41 keys on this job against 74 to retype the nine repeat
+         cells: a 33-key discovery. Typing every year clears all five core beats and forfeits
+         only the star. onePass(row, built, last): the built column is where the line was
+         written; a fill or a multi-commit spans it, and a clipboard clone is recognised by its
+         SOURCE column plus a landed rect that starts one column later — so a partial fill that
+         only patches the last year after two were typed can never light it. */
+      const ops=S.fillOps||[], mult=S.multiEnter||[], plog=S.pasteLog||[];
+      const onePass=(r,cb,ce)=> ops.some(f=>f.dir==='right'&&f.r1<=r&&f.r2>=r&&f.c1<=cb&&f.c2>=ce)
+                             || mult.some(m=>m.r1<=r&&m.r2>=r&&m.c1<=cb&&m.c2>=ce)
+                             || plog.some(p=>p.sc===cb&&p.r0<=r&&p.r0+p.h-1>=r&&p.c0<=cb+1&&p.c0+p.w-1>=ce);
+      const A=o.c0+1, B=o.c0+3;
+      const starOk = w1Ok && w2Ok && w3Ok && ckOk &&
+                     onePass(o.rCni,A,B) && onePass(o.rCash,A,B) &&
+                     onePass(o.rRe,o.c0+2,B) && onePass(o.rChk,A,B);
       return [
-        {label:'run net change and ending cash, all three years', ok: [0,1,2].every(i=>near(COL[i]+'5',e.ch[i])&&near(COL[i]+'7',e.end[i]))},
-        {label:'run LINK 1 \u2014 the cash roll-forward, built once and filled', ok: [1,2].every(i=> refs(COL[i]+'6',[COL[i-1]+'7']) && near(COL[i]+'6',e.beg[i]))},
-        {label:'build LINK 2 \u2014 BS cash pulls from the CFS, all three years', ok: [0,1,2].every(i=> refs(COL[i]+'9',[COL[i]+'7']) && near(COL[i]+'9',e.end[i]))},
-        {label:'total assets, all three years', ok: [0,1,2].every(i=>near(COL[i]+'11',e.ta[i]))},
-        {label:'build LINK 3 \u2014 the RE roll absorbs net income, both later years', ok: [1,2].every(i=> refs(COL[i]+'13',[COL[i-1]+'13',COL[i]+'2']) && near(COL[i]+'13',e.re[i]))},
-        {label:'drive all three check cells to ZERO \u2014 then bold the totals and add a top border above the check row', ok: [0,1,2].every(i=>near(COL[i]+'14',0))&&dressOk},
+        {label:'Reference net income into the cash flow statement — all three years', ok: w1Ok},
+        {label:'Build the cash link — ending cash onto the balance sheet, all three years', ok: w2Ok},
+        {label:'Build the retained earnings roll — prior year plus net income, both later years', ok: w3Ok},
+        {label:'Build the check row — assets minus liabilities and equity, all three years', ok: ckOk},
+        {label:'Bold the check row and add a top border above it', ok: dressed},
+        {label:'Fill all four built lines across the years — one pass each, no year retyped', ok: starOk, bonus:true},
       ];
     }
   },

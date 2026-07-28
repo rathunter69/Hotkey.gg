@@ -1647,24 +1647,40 @@ const ALTS = [
       {sel:o.LR+(o.r1+1),keys:[...T('=SUMIF('+o.critR+','+o.LM+(o.r1+1)+','+o.sumR+')'),{key:'Enter'}]},
       {sel:o.LR+(o.r1+1)+':'+o.LR+o.rn, keys:[{key:'d',ctrl:true}]},                                 // starts one row low — no single op covers the column
     ]; }` },
-  { key: 'threestmt', name: 'balance sheet BEFORE the CFS — RE roll and check first, cash spine last', moves: `C => [
-      {sel:'C13', keys:[...T('=B13+C2'),{key:'Enter'}]},
-      {sel:'C13:D13', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B14', keys:[...T('=B11-B12-B13'),{key:'Enter'}]},
-      {sel:'B14:D14', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B11', keys:[...T('=B9+B10'),{key:'Enter'}]},
-      {sel:'B11:D11', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B9',  keys:[...T('=B7'),{key:'Enter'}]},
-      {sel:'B9:D9', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B5',  keys:[...T('=SUM(B2:B4)'),{key:'Enter'}]},
-      {sel:'B5:D5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B7',  keys:[...T('=B6+B5'),{key:'Enter'}]},
-      {sel:'C6',  keys:[...T('=B7'),{key:'Enter'}]},
-      {sel:'C6:D6', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B7:D7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B11:D11', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B14:D14', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
-    ]` },
+  /* r448 (DEPTH_PASS §4.82 depth pass) — BOTH threestmt entries are NEW; the single pre-r448
+     entry ("balance sheet BEFORE the CFS — RE roll and check first, cash spine last") is
+     DELETED, because every cell it names (B5/B7/C6/B9/B11/C13/B14) belongs to the retired
+     ROWS:14 geometry and to beats this pass no longer has. ALT 1 = chord ROUTE (ribbon fills
+     Alt H F I R · Alt H 1 bold · Alt H B S outside border, the RE roll read off the CASH FLOW
+     net income rather than the statement line, and the check written the other way round and
+     negated with every ref $-anchored) — the ☆ still latches, because a ribbon fill is a fill.
+     ALT 2 = op ORDER (the check row dressed and built FIRST, while it still reads a non-zero
+     number, then the balance sheet, then the cash flow wire last — recalc closes it) AND the
+     ☆'s second mechanic: a Ctrl+Enter commit into the whole year strip instead of a fill. */
+  { key: 'threestmt', name: 'RIBBON routes throughout (Alt H F I R fills · Alt H 1 bold · Alt H B S outside border), the RE roll off the cash flow net income, the check negated and $-anchored — the ☆ still latches', moves: `C => { const o=C._o;
+      const R={key:'ArrowRight',shift:true};
+      const FR=[{key:'Alt'},L('h'),L('f'),L('i'),L('r')];
+      return [
+        {sel:o.Y0+o.rCni,  keys:[...T('='+o.Y0+o.rNi),{key:'Enter'}]},
+        {sel:o.Y0+o.rCni,  keys:[R,R,...FR]},
+        {sel:o.Y0+o.rCash, keys:[...T('=SUM('+o.Y0+o.rEcash+')'),{key:'Enter'}]},
+        {sel:o.Y0+o.rCash, keys:[R,R,...FR]},
+        {sel:o.Y1+o.rRe,   keys:[...T('='+o.Y1+o.rCni+'+'+o.Y0+o.rRe),{key:'Enter'}]},
+        {sel:o.Y1+o.rRe,   keys:[R,...FR]},
+        {sel:o.Y0+o.rChk,  keys:[...T('=-($'+o.Y0+'$'+o.rTle+'-$'+o.Y0+'$'+o.rTa+')'),{key:'Enter'}]},
+        {sel:o.Y1+o.rChk,  keys:[...T('=-($'+o.Y1+'$'+o.rTle+'-$'+o.Y1+'$'+o.rTa+')'),{key:'Enter'}]},
+        {sel:o.Y2+o.rChk,  keys:[...T('=-($'+o.Y2+'$'+o.rTle+'-$'+o.Y2+'$'+o.rTa+')'),{key:'Enter'}]},
+        {sel:o.CA+o.rChk,  keys:[R,R,R,{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('s')]},
+      ]; }` },
+  { key: 'threestmt', name: 'op ORDER — check row dressed and built FIRST (non-zero on screen), then the balance sheet, the cash flow wire LAST; every line committed with ctrl+enter instead of a fill', moves: `C => { const o=C._o;
+      const R={key:'ArrowRight',shift:true}, CE={key:'Enter',ctrl:true};
+      return [
+        {sel:o.CA+o.rChk,  keys:[R,R,R,{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]},
+        {sel:o.Y0+o.rChk,  keys:[R,R,...T('='+o.Y0+o.rTa+'-'+o.Y0+o.rTle),CE]},
+        {sel:o.Y1+o.rRe,   keys:[R,...T('='+o.Y0+o.rRe+'+'+o.Y1+o.rNi),CE]},
+        {sel:o.Y0+o.rCash, keys:[R,R,...T('=+'+o.Y0+o.rEcash),CE]},
+        {sel:o.Y0+o.rCni,  keys:[R,R,...T('='+o.Y0+o.rNi),CE]},
+      ]; }` },
   { key: 'versionup', name: 'stamp FIRST, cost lines before revenue, ribbon fills, alt h f c Blue swatch, alt h b d — ☆ still earned', moves: `C => { const o=C._o, y=o.yc[0], mv=[];
       mv.push({sel:o.cL+'1', keys:[{key:'h',ctrl:true,code:'KeyH'},{key:'v'},{key:'1'},{key:'Tab'},{key:'v'},{key:'2'},{key:'Enter'}]});
       for(let i=1;i>=0;i--){ const r=o.ratioRows[i], ref='$'+o.cV+'$'+(o.pr+2+i);
