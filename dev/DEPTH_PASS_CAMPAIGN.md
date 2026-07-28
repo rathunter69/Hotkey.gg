@@ -275,6 +275,15 @@ far: they are not Excel-mechanic drills with a finance skin, they are **financia
 a banker will judge them on whether the model is built the way a real one is. A drill that
 teaches a correct keystroke on a wrong model is worse than no drill.
 
+**Border-dress doctrine on total rows (r446b — read before writing any dress beat).** Two
+readings ship today and the unification is a WOLF DECISION, not yours: (a) STRICT — §1.0(f)
+"never a rule underneath" graded as `bt && !bb && !bdbl`, with the label carrying the scope
+clause "— no rule underneath" (scrub · unhide · autofit · rowops · triage); (b) LENIENT —
+`bt || ball`, tolerating the boxed total (balance · ruleoff · the wave-3 Models II boards).
+Neither strands a correct artifact; do NOT "fix" one into the other, do NOT cite the widened
+form of boxed-REGION artifacts as precedent for total rows, and if you grade strict, the label
+MUST state the constraint. Declare which reading your board uses and why in payload §8.
+
 **Read `dev/MODELING_STANDARDS.md` before writing any Models board.** It carries the
 conventions that must hold — formatting colour law, sign conventions, roll-forward structure,
 the standard formula forms, circularity handling, and the error checks every real model

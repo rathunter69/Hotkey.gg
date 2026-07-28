@@ -11159,3 +11159,34 @@ have (Alt H V offers only Values and Paste-special; formulas-only is Alt H V S t
 - `dev/check-invariants.js`: `REWORKED` grows to 45.
 - `dev/verify-waterfall.js`: new, and the source of every number above.
 - No engine change. The ☆ reads the existing r425 `S.pasteLog` latch.
+
+## r446b — the border-predicate sweep CLOSED THE OTHER WAY: design, not drift
+
+_The r446 orchestrator note above queued a four-drill sweep (`balance` `scrub` `autofit`
+`triage`) on the schedule agent's finding that their dress predicates "read `.bt` without
+accepting `.ball`" and negate `.bb` — "drift, not design." The walk overturned that. The strict
+predicates are DOCUMENTED DESIGN: five drills (`scrub` `unhide` `autofit` `rowops` `triage`)
+carry explicit §1.0(f) comments — "a bottom rule under a total is the house error and never
+clears, so Alt H B S (which perimeters a one-row selection, hanging a bb under it) and
+Alt H B D stay correctly dark" (unhide, verbatim). The "seven drills already widened" evidence
+was misread: those are boxed-REGION artifacts (top rule on the first row, bottom rule on the
+last), where `ball` is the correct form — not total-row rules._
+
+_No untriggerable beat exists in this class: every route the strict predicates refuse (HBA,
+HBS, HBD on a total row) leaves a visible house error on the board — a rule under the total —
+so the dark line has something real to point at. §1.0-R3(p) is about a CORRECT end state
+staying dark; these end states are wrong. The REAL defect was discoverability: none of the
+five labels stated the constraint, so a player who boxed a total saw an unexplained dark line.
+Fixed with a §1.0-R3(n) scope clause on all five labels ("— no rule underneath"). Shipped
+grading behavior unchanged; replay + guided + smoke green._
+
+_What remains is a DOCTRINE FORK, recorded for Wolf: the five strict drills enforce §1.0(f)'s
+"never a rule underneath"; `balance` and `ruleoff` accept `bt` regardless of `bb` (over-accept
+HBD/HBS, strand nothing); and the four wave-3 Models II boards (`schedule` `intsched` `lbo`
+`revolver`) adopted the lenient `bt||ball` reading — their chord-route ALTS deliberately dress
+totals with Alt H B S / Alt H B A and clear. Both readings ship today with zero player-stranded
+routes; the difference is only whether the house error is REFUSED or TOLERATED on a dress beat.
+Unifying either way is a product-convention call that would change shipped play behavior in
+~10 drills, so it is queued as a Wolf decision, not fixed unilaterally. Until decided: wave-4
+payloads are normalized at assembly to whichever reading their board's own §1.0(f) comment
+declares, and any strict predicate must carry the label scope clause._

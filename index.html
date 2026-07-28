@@ -4895,7 +4895,7 @@ const CHALLENGES = {
         {label:'Sort the seven deals largest-first — rows move whole', ok: sorted},
         {label:'Delete the second '+o.dupName+' row — the export listed it twice', ok: dupOk},
         {label:'Total the size column on the Total line — a live SUM over the seven deals', ok: totalOk},
-        {label:'Bold the Total line and add a top border above it', ok: dressOk},
+        {label:'Bold the Total line and add a top border above it — no rule underneath', ok: dressOk},
         {label:'Total the size column without typing the formula', ok: starOk, bonus:true},
       ];
     }
@@ -5767,7 +5767,7 @@ const CHALLENGES = {
         {label:'Group each region’s three detail rows — the region totals stay out', ok: groupedOk},
         {label:'Fold the detail away — only the region totals stay on the page', ok: foldedOk},
         {label:'Unfold the '+ob.name+' detail — the other two stay folded', ok: openOk},
-        {label:'Bold the Consolidated line and add a top border above it', ok: dressOk},
+        {label:'Bold the Consolidated line and add a top border above it — no rule underneath', ok: dressOk},
         {label:'Fold every region in one pass', ok: starOk, bonus:true},
       ];
     }
@@ -6801,7 +6801,7 @@ const CHALLENGES = {
         {label:'Set the four quarter columns to one width of 12', ok: uniOk},
         {label:'Total the four quarters in the Total column — every business line and the Total row', ok: totalsIn},
         {label:'Autofit the Total column — the totals are landing as ####', ok: totFitOk},
-        {label:'Bold the Total revenue row and add a top border above it', ok: dressOk},
+        {label:'Bold the Total revenue row and add a top border above it — no rule underneath', ok: dressOk},
         {label:'Fill the Total column from one formula — a single pass down the column', ok: starOk, bonus:true},
       ];
     }
@@ -7067,7 +7067,7 @@ const CHALLENGES = {
           ok: lineIn && (S.insRowN||0)>=1 && (S.pasteN||0)>=1},
         {label:'Format the pasted figures to match the schedule — the Total recalculates over all six lines', ok: lineIn && dressOk && recalcPresent},
         {label:'Delete the PLACEHOLDER row', ok: contracted},
-        {label:'Add a top border above the Total row', ok: topOk},
+        {label:'Add a top border above the Total row — no rule underneath', ok: topOk},
         {label:'Delete the DRAFT column', ok: draftOut},
         {label:'Insert a column where the missing '+o.mq+' belongs and paste the staged quarter in — Q1–Q4 read in order', ok: quarterIn},
         {label:'Take the whole line and drive every insert and delete from the keyboard — no ribbon menus', ok: starOk, bonus:true},
@@ -14645,7 +14645,7 @@ const CHALLENGES = {
       return [
         {label:'Find and rebuild all 3 errors ('+k+'/3)', ok:k===3},
         {label:'Fix the #REF! Total costs row — a live SUM over the three cost lines ('+costGot+'/'+o.NQ+')', ok:costOk},
-        {label:'Bold the Total costs line and add a top border above it', ok:dressOk},
+        {label:'Bold the Total costs line and add a top border above it — no rule underneath', ok:dressOk},
         {label:'Repoint the #DIV/0! '+o.shareQ+' share — its denominator must be Total revenue', ok:shareOk},
         {label:'Fix the #VALUE! opex plan — the case read must carry all three cases', ok:selOk},
         {label:'Build the Total costs row in one pass — four quarters, one move', ok:starOk, bonus:true},
