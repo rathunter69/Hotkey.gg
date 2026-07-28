@@ -16,11 +16,11 @@ way. DEPTH_PASS.md §1.0-R3 carries the binding RULES; this file carries the PRA
 | Formulas I | 9 | 9 | ✅ complete as of r438 (`growth` retired; `cagr` absorbed its board; `bridge` → "Point-mode formulas"; `rollup` last in) |
 | Data & Lookups | 9 | 9 | ✅ complete as of r438 (`grpfold` retired into `unhide`, so the chapter is 9; `drill` and `series` last in — both tested for retirement and both kept) |
 | Formulas II | 10 | 10 | ✅ complete as of r440 (`wirewalk` retired into `tieout`, `hunt` into `audit`, so the chapter is 10; `balcheck`, `tieout` and `balance` last in — all three tested for retirement and all three kept). `redflags` §4.56, the chapter's designated capstone, is an unbuilt ADD (delta D4) and is NOT part of the pass |
-| Models I | 0 | 10 | ⚠️ read §5 below before dispatching |
+| Models I | 5 | 10 | wave 1 (r444): `wacc` `fcfbuild` `dcf` `comps` `txncomps` — wave 2 (`football` `dcfsens` `retbridge` `accdil` `sourcesuses`) next; `pitchpage` is a NEW capstone ADD, not part of the pass |
 | Models II | 0 | 10 | ⚠️ read §5 below before dispatching |
 | Full Builds | 0 | 10 | ⚠️ read §5 below before dispatching |
 
-**44 of 74 passed.** Catalog **74** (was 82; `hunt` closed it out at r439) — counted from `menuOrder`
+**49 of 74 passed.** Catalog **74** (was 82; `hunt` closed it out at r439) — counted from `menuOrder`
 at r440, chapter by chapter. `menuOrder.length` is the only source of truth; the
 "N banker-grade drills" marketing copy in index/About/enterprise is asserted against it by
 `e2e-smoke`, so it moves with every retirement.

@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Run the comps — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Build the multiples, read the summary — median, high/low and the LARGE/SMALL trimmed range — land per share and premium Par 94s, optimal 99 keys. Free interac">
+<meta name="description" content="Build both enterprise-value multiples across the peer set, read the median, high and low, and carry it down to an implied share price Par 89s, optimal 85 keys">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Run the comps — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Build the multiples, read the summary — median, high/low and the LARGE/SMALL trimmed range — land per share and premium Par 94s, optimal 99 keys. Free interac">
+<meta property="og:description" content="Build both enterprise-value multiples across the peer set, read the median, high and low, and carry it down to an implied share price Par 89s, optimal 85 keys">
 <meta property="og:url" content="https://www.hotkey.gg/drills/comps.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Run the comps — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Build the multiples, read the summary — median, high/low and the LARGE/SMALL trimmed range — land per share and premium Par 94s, optimal 99 keys. Free interac">
+<meta name="twitter:description" content="Build both enterprise-value multiples across the peer set, read the median, high and low, and carry it down to an implied share price Par 89s, optimal 85 keys">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/comps.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -85,7 +85,7 @@
   .trackhead small{color:var(--faint); font-weight:400; font-size:12px}
   .trackhead .tb{font-size:12.5px; color:var(--muted); font-weight:400; margin-top:4px; line-height:1.55}</style>
 <link rel="stylesheet" href="nav.css?v=210">
-<script src="drills.js?v=294"></script>
+<script src="drills.js?v=295"></script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -93,7 +93,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=310"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Run the comps","description":"Build the multiples, read the summary — median, high/low and the LARGE/SMALL trimmed range — land per share and premium","url":"https://www.hotkey.gg/drills/comps.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Models I","teaches":"Build one row of logic, then Ctrl+D stamps it down the page — and LARGE/SMALL read the range with the outliers trimmed off.","isPartOf":{"@type":"Course","name":"Financial Modeling Keyboard Mastery","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT94S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Run the comps","item":"https://www.hotkey.gg/drills/comps.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Run the comps","description":"Build both enterprise-value multiples across the peer set, read the median, high and low, and carry it down to an implied share price","url":"https://www.hotkey.gg/drills/comps.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Models I","teaches":"lock the enterprise-value column and one formula prices the whole tape — the anchor is what lets it travel sideways.","isPartOf":{"@type":"Course","name":"Financial Modeling Keyboard Mastery","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT89S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Run the comps","item":"https://www.hotkey.gg/drills/comps.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -102,28 +102,35 @@
   <div class="crumbs"><a href="index.html">hotkey.gg</a> / <a href="drills/index.html">drill library</a> / models i</div>
   <div class="eyebrow">◆ Models I · drill · Financial Modeling Keyboard Mastery track</div>
   <h1>Run the comps</h1>
-  <div class="aha">Build one row of logic, then Ctrl+D stamps it down the page — and LARGE/SMALL read the range with the outliers trimmed off.</div>
-  <div class="sub">A full comps page (trading comparables — what the market pays for businesses like this), both panels: compute EV/EBITDA for five peers and fill it down; read the data — median, high, low, then the trimmed read (2nd-high and 2nd-low, so one outlier peer doesn’t set the range); then walk the target through the implied chain: EV, equity, per share, premium to market.</div>
+  <div class="aha">lock the enterprise-value column and one formula prices the whole tape — the anchor is what lets it travel sideways.</div>
+  <div class="sub">Your MD wants a value on the target before Monday’s pitch, and the comp set is already pulled — trading comparables, the peers the market already prices. Build the multiples off each peer’s enterprise value, take the median of the set, and carry it down to a share price: implied enterprise value, less net debt, over the diluted count. That bottom line is the number that goes on the page.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=comps">train this drill →</a>
-    <span class="par">par 94s · optimal 99 keys · keyboard only · free</span>
+    <span class="par">par 89s · optimal 85 keys · keyboard only · free</span>
   </div>
 
   <div class="section-title">The shortcuts in this drill</div>
   <div class="panel">
+    <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
+    <div class="scb"><div class="sch"><kbd>Shift+→</kbd><span class="m">⇧→ on mac</span><span class="what">Extend selection one cell</span></div><div class="use">Nudge a selection one cell at a time when the block you need doesn’t end at a data edge.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+R</kbd><span class="m">⌘R on mac</span><span class="what">Fill right from the cell to the left</span></div><div class="use">Same as fill down, but across — one quarter’s formula becomes the whole year in two keystrokes.</div></div>
+    <div class="scb"><div class="sch"><kbd>Shift+↓</kbd><span class="m">⇧↓ on mac</span><span class="what">Extend selection one cell</span></div></div>
     <div class="scb"><div class="sch"><kbd>Ctrl+D</kbd><span class="m">⌘D on mac</span><span class="what">Fill down from the cell above</span></div><div class="use">Build the logic once in the top cell, select down, and stamp it — the standard way to fill a schedule.</div></div>
-    <div class="fnline">functions you'll type: <b style="color:var(--text)">MEDIAN()</b> · <b style="color:var(--text)">MAX()</b> · <b style="color:var(--text)">MIN()</b> · <b style="color:var(--text)">LARGE()</b> · <b style="color:var(--text)">SMALL()</b></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+B</kbd><span class="m">⌘B on mac</span><span class="what">Bold</span></div><div class="use">Bold marks structure: titles, total rows, anything the reviewer’s eye should land on first.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h b p</kbd><span class="m">⌥ h b p on mac</span><span class="what">Top border</span></div><div class="use">Top border above a total row — the accounting ruling that says “this line sums the ones above.”</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+S</kbd><span class="m">⌘S on mac</span><span class="what">Save</span></div></div>
+    <div class="fnline">functions you'll type: <b style="color:var(--text)">MEDIAN()</b> · <b style="color:var(--text)">MAX()</b> · <b style="color:var(--text)">MIN()</b></div>
   </div>
 
   <div class="section-title">The optimal line</div>
-  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>D3</em> · <em>=B3/C3</em> · fill D3:D7 ↓ · <em>D8</em> <em>=MEDIAN(D3:D7)</em> · <em>D9</em> <em>=MAX</em> · <em>D10</em> <em>=MIN</em> · <em>D11</em> <em>=LARGE(D3:D7,2)</em> · <em>D12</em> <em>=SMALL(D3:D7,2)</em> · <em>G4</em> EV <em>=G3*D8</em> · <em>G6</em> equity <em>=G4-G5</em> · <em>G8</em> per share <em>=G6/G7</em> · <em>G10</em> premium <em>=G8/G9-1</em></div></div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>F5</em> <em>=$C5/D5</em> · <em>ctrl+r</em> then <em>ctrl+d</em> over the block · <em>F10</em> <em>=MEDIAN(F5:F9)</em> · <em>F11</em> <em>=MAX</em> · <em>F12</em> <em>=MIN</em> · <em>ctrl+r</em> across · <em>C16</em> <em>=C15*F10</em> · <em>C18</em> <em>=C16-C17</em> · <em>C20</em> <em>=C18/C19</em> · <em>ctrl+b</em> <em>alt h b p</em> · <em>ctrl+s</em></div></div>
 
   <div class="section-title">More Models I drills</div>
   <div class="rel">
-    <a href="drills/wacc.html"><div class="rn">Build the discount rate</div><div class="rd">Unlever, relever, CAPM, weight — the full discount-rate build</div></a>
+    <a href="drills/wacc.html"><div class="rn">Build the discount rate</div><div class="rd">Unlever a five-comp beta set, relever at your own structure, weight both sides</div></a>
     <a href="drills/fcfbuild.html"><div class="rn">Build the unlevered FCF</div><div class="rd">EBIT → less taxes → NOPAT → plus D&amp;A, less capex and the NWC build: the row every DCF disc</div></a>
-    <a href="drills/dcf.html"><div class="rn">Discount the cash flows</div><div class="rd">Discount factors × cash flows build the PV row; the TV reuses the year-5 factor</div></a>
-    <a href="drills/txncomps.html"><div class="rn">Run precedent transactions</div><div class="rd">Multiples paid, the median, and the implied equity</div></a>
+    <a href="drills/dcf.html"><div class="rn">Discount the cash flows</div><div class="rd">Discount factors × free cash flows build the present-value row; a Gordon terminal value an</div></a>
+    <a href="drills/txncomps.html"><div class="rn">Run precedent transactions</div><div class="rd">A six-deal precedent tape, the median multiple paid, and the implied equity value</div></a>
   </div>
   <div class="cta-row" style="margin-top:26px">
     <a class="cta" href="drills/dcf.html">← DCF</a>

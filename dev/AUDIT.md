@@ -1520,7 +1520,7 @@ requirement baked into core, and §1.2 axes that existed on paper but not in the
   contract earning its keep on its first wave.**
 - **PAR:** 10/6 → **29/26**. D10 finished: tab → 'Point', desc de-hinted.
 - **TESTS (both):** replay 3/3 · depth-contract PASS · guided PASS · alt-paths 2/2 each (all four
-  rebuilt) · par-sweep FLAGGED 0 · invariants clean · drills.js?v=294→296.
+  rebuilt) · par-sweep FLAGGED 0 · invariants clean · drills.js?v=295→296.
 - **RECURRING TRAP, worth a standing note:** cagr hit the **C9 static-parser** hole again —
   guide/targets built with `.map()/.push()` read as `null`, so the tri-length guard silently stops
   covering the drill. Third occurrence (margin, cagr). **Build these arrays as LITERALS.**
@@ -9824,3 +9824,397 @@ branches disagree about the CATALOG itself — `main` still ships `hunt`, `dress
 `wirewalk`, `undo`, `copyover` and `grpfold`, all of which this branch retired on measurements.
 That is a product decision, not a mechanical resolution, and it is Wolf's call. Nothing has been
 merged and nothing is live; `main` remains the only thing users see.
+
+# ROUND r444 — MODELS I OPENS: wave 1 (wacc · fcfbuild · dcf · comps · txncomps)
+
+
+_Orchestrator note on the untriggerable-beat count. The five build agents ran CONCURRENTLY and
+each numbered its finds off the stale pre-wave base, so the per-entry claims of "campaign total
+N" below disagree with each other. Authoritative arithmetic: the count stood at 21 when the wave
+dispatched (r443); wacc found 3, fcfbuild 1, dcf 4, comps 3, txncomps 0 — the campaign total is
+now **32**, every one of them grading formula TEXT, every one found by walking a route. The
+agents' own entries are preserved verbatim below as the record; their internal totals are
+superseded by this note._
+
+_Wave ops notes: the Workflow tool's permission bridge is broken in this session (strips every
+subagent tool parameter — 5/5 agents dead on arrival before re-dispatch through the Agent tool).
+The ☆-family adjacency calls at assembly: dcf|comps distinct (reuse-half vs pure anchored
+propagation) and comps|txncomps distinct (anchor-is-the-lesson vs plain fill census; txncomps has
+no legal alternative). Coverage flag carried: LARGE/SMALL now have no teaching site. txncomps'
+agent re-confirmed "four cores is the ceiling" — the full fit sweep crashed twice at load
+average 25 with five build agents live and passed the moment the box freed._
+
+
+### `wacc` — "Build the discount rate" (DEPTH_PASS §4.57, Models I opens)
+
+_The first Models I board. §4.57 is a PRE-PLAYTEST page: it proposes a formatting ☆ ("Percent-format
+the WACC cell to one decimal and bold it"), dead on the letter of §1.0(d), and its board was written
+before §1.0-R4(t) existed. Both re-cut under §1.0-R4(u), no escalation. Every number below is
+`keyLog` through the live engine on the real board, medians over 3–5 seeds, every selection and
+navigation KEYED (setDemoSel only parks the cursor on an anchor cell)._
+
+**THREE UNTRIGGERABLE BEATS, FOUND BY WALKING ROUTES ON THE SHIPPED BOARD** (campaign #19–#21;
+`index.html:8187` header comment carries the detail, `dev/verify-wacc.js` §A walks all three).
+All three graded formula TEXT via `String(c.formula).includes(ref)`, so a board that was
+NUMERICALLY CORRECT sat under a dark line with nothing on the sheet to fix:
+
+| # | the check demanded | the route it locked out | probe |
+|---|---|---|---|
+| 19 | `B11` contains the literal `B10` | the relever written INLINE — `=B4/(1+(1-B6)*B5)*(1+(1-B6)*B8/B7)` | board right, check false, 5/5 seeds |
+| 20 | `B14` contains BOTH `B12` and `B13` | the one-expression WACC — `=(B7*(B2+B11*B3)+B8*(B9*(1-B6)))/(B7+B8)` | board right, check false, 5/5 |
+| 21 | `B12` contains the literal `B11` | CAPM off the unlevered beta relevered inline | board right, check false, 5/5 |
+
+Campaign total: **21**. The cause has still not moved once — it is grading formula text.
+
+**THE ☆-HEADROOM DIAGNOSTIC, RUN BEFORE THE BOARD WAS DESIGNED (CAMPAIGN §2, both parts).**
+
+| board | fastest legal | slowest legal | spread | part 2 — what survives stripping |
+|---|---|---|---|---|
+| `wacc` AS SHIPPED | 82 | 130 (every reference in POINT MODE — it clears all five cores today) | 1.59× | **nothing.** 36 of the 48 keys are $-anchoring (the anchored-typed route measures 118) and anchors buy nothing on a board with no fill; the rest is point-mode overhead, and pointing is the SLOWER side, so a star for it is the `growth` shape. Typing is the default, so a star for THAT auto-earns (§1.0-R2(i)). Chord-vs-ribbon is EMPTY by construction (no ribbon route into formula entry — the r439 `wrapfix` finding); formatting is forbidden (§1.0(d)), which is exactly what the page proposed |
+| `wacc` REBUILT | 102 | 251 | 2.46× | fill-vs-retype across the comp column — the "one copy fills a block" move §1.0(d) names |
+
+**No legal ☆ existed on the shipped board.** The drill KEEPS — the lesson is canonical, has no twin
+(CAMPAIGN §3: fluency in `comps` produces a correct first attempt at the median row and at nothing
+else; the unlevering identity, the relever at a DIFFERENT structure, CAPM and the two-sided
+weighting are absent there) and the §1.0-R4(t) reality test passes on the artifact. **The fix went
+to the BOARD, never the predicate** (the r438 `series` rule): five comps instead of one, so an
+anchored formula finally has a block to cover. ☆ ISOLATED: **24 keys against 85** typed — worth
+**61 keys, 3.54× on the move itself**, the largest single decision on the page.
+
+**THE BOARD.** A beta/discount-rate page: title, source-and-basis line, a five-comp table (levered
+beta, D/E, unlevered beta) under ruled headers, the median unlevered beta on a top-bordered summary
+line, a labelled yellow assumption stack (risk-free, ERP, marginal tax, pre-tax Kd, equity value,
+debt value), then the cost-of-capital strip — relevered beta, cost of equity, after-tax cost of
+debt, WACC. MODELING_STANDARDS §4 forms exactly (Hamada unlever/relever, CAPM, after-tax Kd, one
+denominator), median not mean (§4 comps), colour-as-provenance (§1), totals wearing TOP borders
+(§1.0(f)), and the three simplifications stated in the board's own memo line (§7).
+
+**BEATS (6 core + the engine-appended save closer + one ☆; tri-length 7, C9-registered)** —
+`index.html:8449`. They CHAIN end to end: the comp column feeds the median, the median feeds the
+relever, the relever feeds CAPM, CAPM and the after-tax line feed the weighted close.
+1. Build the unlevered beta for every comp — all five
+2. Build the median unlevered beta
+3. Build the relevered beta — at the target's own debt and equity
+4. Build the cost of equity
+5. Build the after-tax cost of debt
+6. Build the WACC — both sides weighted off one denominator
+☆ Fill the unlevered beta column — one anchored formula, no comp retyped
+
+**GRADING** (`index.html:8413`). Every predicate reads the END-STATE NUMBER at 0.75% relative
+tolerance. The only thing read out of formula text is a **liveness proxy** — "this cell points at
+some other cell" — which names no range, no function, no anchor and no particular cell, so it
+cannot lock out a route: the only route it excludes is a hand-computed constant, which the §1.7
+verb `Build` excludes by definition (doctrine §2.2, same as `balance`/`foot`/`versionup`). The
+0.75% band is chosen so a player who chains off a DISPLAYED 2-decimal beta (0.55% out at worst)
+clears, while every modelling error that matters — a missing (1−t), the mean for the median, the
+comps' D/E for the target's — is an order of magnitude larger and fails.
+
+**RANDOM (§1.2, three axes; the page asked for the axes to be verified and the shipped board had
+one).** (a) corner jitter — the whole page anchors at column A or B (full-grid substitution);
+(b) content — codename + five peer names Fisher-Yates from a ten-name pool; (c) values — every
+figure through `rnd()`, with D/E held to 0.25–0.65 so the target structure stays real. Geometry is
+CONSTANT across seeds so the key count never moves with the draw (the r439 `wrapfix` rule).
+Verified 30/30 distinct builds + same-seed determinism by `e2e-depth-contract`.
+
+**§1.3 DENSITY: ROWS 14 → 20, 15 of 20 rows carrying content at BOTH load and win = 75%** (was 13
+of 20 = 65% with the `ROWS=14` copied default). The five empty rows are the two block moats, the
+gap above the memo and the sheet's bottom margin.
+
+**PAR RE-SWEPT FROM SCRATCH: par 78 / parKeys 82 → par 112 / parKeys 107** (5-seed median, 0%
+drift, 1.05 s/key — the house band). The count grew with the board: a five-comp set and its median
+where there was one peer, plus the save closer. Top of the Models I band (fcfbuild 32 · txncomps 36
+· dcf 62 · comps 94) — it is the chapter's longest build and the one the rest of the chapter
+consumes. Clocks derive (§1.4): pass 2:48 · pro 2:09 · legendary 1:52.
+
+**ALTS ×2, both green ×3 seeds** — the stale single entry (hard-coded `B10..B14`) DELETED. ALT 1 is
+op ORDER + chord ROUTE and doubles as the §1.0-R3(p) end-state proof: the WACC line is written
+SECOND, off two cells that do not exist yet, reads a wrong rate for most of the run and recalcs into
+the right one when the equity side lands; the comp column travels by the ribbon fill, and the ☆
+still fires — the star grades the DECISION, never the chord. ALT 2 is the MEASURED negative control:
+no fill anywhere, five comps typed bottom-up with $-anchors, `SMALL(range,3)` for the median, the
+after-tax line as Kd − Kd×t, the weight-times-cost WACC — all six cores clear, ☆ dark.
+
+**TESTS.** demo-replay ×3 seeds · alt-paths ×2 ×3 seeds · guided (railed, contained, solvable) ·
+depth-contract (density 15/20, 30/30 distinct builds) · par sweep (0% drift) · fit sweep ALL CLEAN
+(70 drills) · check-invariants clean with the C9 line · `dev/verify-wacc.js` ALL GREEN (13 routes ×
+3 seeds, the ☆ isolated, the board facts). Zero page errors throughout.
+
+
+### `fcfbuild` — "Build the unlevered FCF" (DEPTH_PASS §4.58, Models I)
+
+The chapter's second board and the first Models drill built under `dev/MODELING_STANDARDS.md`. It arrived carrying four defects at once: a **broken tri-length** (guide 4 v checks 3 v targets 3), **no ☆ and no `saveClose`**, **`ROWS:12`** (10 rows used — 50%, under the §1.3 floor), **zero ALTS entries** (one of the nine §1.8 names) — and, the one that mattered, a first beat that graded formula TEXT.
+
+**THE UNTRIGGERABLE BEAT, #14.** `refs('B4',['B3','B11'])` demanded that the tax cell's own formula name both EBIT and the rate. Walked on the shipped board: a player who builds NOPAT first as `=B6*(1-$B$15)` and back-solves the tax line as `=B8-B6` has a **numerically perfect board and a dark line with nothing on it to fix** — the campaign's #1 defect, in the same grading-formula-TEXT shape as the thirteen before it. Found by walking the route, not by reading the predicate. Killed: every beat now reads the live sheet (value parity + "this cell is a live build"), and the one convention that survives as a text-adjacent test is a **transitive REFERENCE walk** to the rate assumption — which `MODELING_STANDARDS` §1 names as the corollary that "must be gradeable" and §7 sanctions as end state. It expands ranges and follows formulas up to four levels, so every build ORDER clears and only `=-B6*0.24`, the rate buried inside the formula, stays dark.
+
+**A SECOND STRANDING, FOUND IN THE SCREENSHOT AND NOT THE SOURCE — and it generalises.** The first build shipped the "Unlevered FCF" label pre-bolded (matching NOPAT). **Bold is a TOGGLE**, so the §1.0(c) slow route — a player dressing the closing line cell by cell — turns the pre-bolded label back OFF and watches a correct-looking board keep the dress beat dark. Fixed at the BOARD (the closing line ships plain; NOPAT keeps its template rule, which also makes the missing rule on the FCF line read as the obvious thing to close). **Standing note: never pre-set a property whose graded end state a TOGGLE reaches — the partial-selection route will invert it.**
+
+**§1.0-R4(u), THE ☆ RE-CUT — and the first ☆ this campaign PROMOTED rather than replaced.** The page's ☆ ("Total the five uFCF years in the FY cell") is real WORK, not a hidden efficiency, so it became **core beat 5** exactly as (u) directs, and the star was re-cut to the MECHANIC that lands it: the plan total from **autosum**, read off the r436 `S.autoSumN` latch (`scrub`'s precedent, two chapters away). Two candidates were rejected on the numbers first:
+
+| candidate | measured | verdict |
+|---|---|---|
+| the plan total from autosum | 2 keys vs 13 typed (11 saved) | **shipped** |
+| one fill pass over the two adjacent formula lines | 22 vs 26 hand-keyed (4 saved) | rejected — the `growth` band; it is the DEMO's route, never the star |
+| anchoring the rate so one formula fills | 0 saved | rejected — the fill beat already forces it, so it falls out by the nature of doing the exercise (§1.0-R2(i)) |
+
+**SKIPPABLE, MEASURED NOT ASSERTED:** ALT 2 is the whole hand-typed run — nothing filled, nothing autosummed, the line dressed cell by cell — **206 keys against the demo's 38, all six cores green and the ☆ dark**. §2 spread **5.4×**, the `fxconvert` band.
+
+**A trap left in deliberately, and taught.** `Alt+=` at the uFCF cell proposes `=SUM(B5:B11)` — the adaptive walk runs up through NOPAT into EBIT and the taxes and counts them twice. That is what Excel does to a real analyst on a real FCF build, so the board keeps it and `guide[2]` names it. At the PLAN TOTAL cell there is no trap: nothing numeric sits above `G12`, so the walk goes LEFT and proposes `=SUM(B12:F12)` correctly — which is why the ☆ lives there and not on the uFCF row.
+
+**THE BOARD (MODELING_STANDARDS, stated because a banker judges the model first).** A DCF's FCF strip, five plan years across, `uFCF = EBIT × (1 − t) + D&A − Capex − ΔNWC` (§4, verbatim). Costs and uses carry their sign (§2), declared on the board's own basis line, so the cascade is a column of additions. Colour is provenance (§1): every seeded driver and the rate blue, everything the player builds black. NOPAT and unlevered FCF are subtotals and take TOP borders (§1.0(f)); the header row takes the bottom rule (doctrine §2.1b). The rate cell is the §1.0(f)/(l) input convention — light yellow, all borders, populated, named by the assumption rather than by the word "Helper" (the r430 ruling). **Capex is drawn ABOVE D&A**, never below: on a plan whose revenue grows every year, spending less than you depreciate is a shrinking asset base and the first thing a reviewer would query. **Deliberately simplified:** no mid-year convention, no calendarisation — this board is the FCF COMPONENT and the discounting strip is `dcf`'s board (§1.3).
+
+**§1.3 DENSITY:** `ROWS:12` (10 used — **50%**) → **20 rows, 14 used — 70%**. Sized from a 20-row start, not inherited.
+
+**BEATS** (6 core + the engine's save + ☆): build the cash-tax line for year one · drop to NOPAT · build unlevered FCF · fill the three lines across the remaining plan years · total the plan years in the plan-total column · bold the closing line and rule it above · ☆ *total the plan years without typing the formula*. They CHAIN in the §8.1.4 sense, and the **aha lands on beat 3**, where NOPAT and the three lines under it collapse into the one row a DCF discounts.
+
+**RANDOM (§1.2, three axes):** (a) the assumptions block draws from a 3-spot pool, so the address the tax formula must anchor moves with the seed; (b) `codename()` plus the first plan year (FY25E/FY26E/FY27E), which re-labels every header and the total column; (c) revenue base, margin, growth, D&A %, capex spread and the NWC draw all through `rnd()`. `e2e-depth-contract` reports **30/30 distinct builds** and same-seed determinism holds.
+
+**PAR:** re-swept from scratch — par 32 / parKeys 31 → **par 40 / parKeys 38**, 5-seed median 38 including the engine's Ctrl+S, drift **0%**, **1.05 s/key**. Flat across seeds. Clocks derive (§1.4) at pass 60 · pro 46 · legendary 40; §4.58 says std, so no `HOTKEY_CLOCKS` override.
+
+**TESTS:** `e2e-demo-replay` ×3 seeds WIN · `e2e-guided` PASS (railed, contained, solvable) · `e2e-depth-contract` PASS (45/45 with fcfbuild on the ledger) · two new ALTS green ×3 seeds · `e2e-par-sweep` 0% drift · `e2e-fit-sweep` ALL CLEAN (70 drills), plus a targeted 12-seed load-AND-win scan and no horizontal scroll at 1024/1180/1440/2560 (870px sheet in an 880px box) · `check-invariants` clean, C9 green at tri-length 7.
+
+**NEW: `dev/verify-fcfbuild.js`** — the route probe, kept rather than thrown away. Nine walked routes with their expected core/☆ state (five positive, four negative controls), six key-count measurements including both rejected ☆ candidates, and the board assertions (20-row cap, win density, the blank moat between the two islands, `overflowsCol` at load and at the win). It mirrors the real harness init, and every number above comes out of it.
+
+---
+
+
+### `dcf` §4.59 — "Discount the cash flows" · MODELS I OPENS
+
+_Every number here is `keyLog` through the live engine on the real board, medians over seeds,
+every selection and navigation KEYED. Re-runnable: `node dev/verify-dcf.js` (48 assertions)._
+
+**WAS:** five checks on a `ROWS:12` board — the §1.3 defect in its purest form, and the load and
+win densities identical — no ☆ at all, no `saveClose`, and **every one of the five checks graded
+formula TEXT** through a `refs()` helper.
+
+**FOUR UNTRIGGERABLE BEATS, MEASURED ON THE PRE-REWORK BOARD.** Found the way this class is always
+found — by walking routes, never by reading predicates. The pre-rework tree was served on its own
+port and driven live; in all four the board's number came out EXACTLY equal to the expected one
+(relative error `0.0e+0`, 3 seeds each) with the line dark:
+
+| # | the check demanded | the route it locked out | probed |
+|---|---|---|---|
+| 19 | `refs('B4',['B7','B2'])` | the discount PERIOD typed as a literal exponent (`^1`, `^2`, `^3`…) — the periods are 1–5 and never move | 0.900901 / 0.811622 / 0.731191 / 0.658731 / 0.593451 vs the same five, FALSE |
+| 20 | `refs('B5',['B3','B4'])` | present-valuing the cash flows directly, `=B3/(1+$B$7)^B2` | 163.6364 / 160.3306 / 154.7708 / 151.6290 / 147.7793 vs the same five, FALSE |
+| 21 | `refs('B11',['B10','F4'])` | re-deriving `=B10/(1+B7)^5` — and this one graded a ROUTE, not an end state at all | 1169.4610 vs 1169.4610, FALSE |
+| 22 | the literal string `SUM(` | the addition chain `=B5+C5+D5+E5+F5+B11` | 3086.0273 vs 3086.0273, FALSE |
+
+Campaign total: **22**. The dominant cause still has not moved: grading formula text.
+The fifth old check (the TV beat's `refs('B10',['F3','B8'])`) survived every route walked at it —
+on that board exactly one cell holds the growth rate and one the year-5 cash flow, so no correct
+Gordon formula can avoid naming both. **Recorded rather than claimed:** a beat that happens to be
+safe is not a beat that grades an end state, and it grades the end state now like the rest.
+
+**#21 IS THE INSTRUCTIVE ONE, AND IT IS A NEW SHAPE.** The other three were accidents of
+over-specification. #21 was the drill's own lesson — "never retype a discount factor" — written as
+a core check. §1.0(c) is explicit that the ONLY sanctioned fast-route grading is the ☆, so a
+mastery move stated as a core beat is untriggerable by construction. **Generalisable: when a
+drill's headline lesson is a ROUTE, the beat grades the number and the ☆ grades the route.**
+
+**THE ☆-HEADROOM DIAGNOSTIC, BOTH PARTS, SLICE BY SLICE.** Part 2 is measured here, not estimated:
+
+| | keys |
+|---|---|
+| fastest legal clearing all six cores | **79** (+1 engine save) |
+| slowest legal doing the SAME work | **217** |
+| spread | **2.75×** |
+| composition of the 138 | **135 ☆-legal** + **3** chord-vs-ribbon (forced to clear, §1.0(c)) + **0** formatting |
+
+The board grades exactly one dress and every route to it costs the same or less, which is why the
+formatting slice is genuinely zero rather than small. The 135 that survive the strip: factor row
+filled 20 vs typed 75 · PV row filled 11 vs discounted one at a time 80 · terminal value pointed 7
+vs re-derived 14 · enterprise value SUM 15 vs addition chain 19. Legal headroom in the drill's own
+subject. **BUILD.**
+
+**THE ☆ RE-CUT (§1.0-R4(u) — the page is pre-playtest, so its ☆ was dead on arrival).** The §4.59
+line is *"Comma-format the PV row and bold the summed PV cell"*: formatting, which §1.0(d) forbids
+outright, and it falls out of doing the exercise, which §1.0-R2(i) forbids again. Where the killed
+☆ was real work it is PROMOTED (the r425 precedent) — the bold half is now core beat 6, the comma
+format ships on the board. **That is six re-cut formatting ☆s in the campaign.**
+
+The replacement is one sentence: **no discount factor computed twice.** Two halves, and per the
+r438 `series` rule each was measured APART before either was built —
+
+| half | star | slow | delta |
+|---|---|---|---|
+| A · the anchored factor row taken across in one pass | 20 | 75 (five formulas typed) | **+55** |
+| B · the terminal value discounted off the year-5 factor CELL | 7 | 14 (`/(1+rate)^5` re-derived) | **+7** |
+
+Both positive, so neither is the retirement failure §2 records. Half A reads the r424 `S.fillOps`
+latch (the MECHANIC — Ctrl+R and Alt H F I R both earn it); half B is the one place §1.0(c)
+sanctions grading a route. **No engine telemetry was needed.**
+NOT claimed, deliberately: the PV row's fill is worth 69 keys and is ☆-legal, but the star's idea
+is the factor and the PV fill is a different idea. The clock pays for it; the star stays readable.
+
+**SKIPPABILITY MEASURED, NOT ASSERTED**, with three controls, all green ×3 seeds: the named slow
+route clears all six cores with the ☆ dark (alt-paths entry 2, 217 keys) · filling the row but
+re-deriving the last factor leaves it dark (**half the star is not the star**) · covering the row
+in TWO fills instead of one clears beat 1 and forfeits the star.
+
+**THE BOARD (MODELING_STANDARDS, binding on Models I).** A five-year discounting strip: fiscal-year
+header underlined off the body, discount periods, unlevered FCF, the factor row and the PV row to
+build, a stacked assumption block, the Gordon terminal value, its discounted value, the enterprise
+value, and a live terminal-value-share line with the reviewer's 60–80% band beside it. §4 forms
+exactly as written; TV discounted at the FINAL period's factor; `g < WACC` on all 40 seeds probed,
+min spread **5.4 points**; TV share across those seeds **65.2–78.6%**, never outside the band.
+Provenance asserted both ways — every typed input blue, every built cell black. Assumptions ride
+the §1.0(f)/§1.0-R2(l) convention (yellow + all borders, populated, stacked, labelled with the
+assumption not the word "Helper"). The total wears a TOP border and no rule underneath.
+**Simplifications said out loud on the board's own memo line per §7:** end-of-year discounting, no
+mid-year convention; no enterprise-to-equity bridge — that is `dcfbuild`'s subject, and the 20-row
+cap makes this board the discounting STRIP, a component, not the page.
+
+**§1.3 DENSITY:** `ROWS:12`, 12 used (60%, exactly on the line) → **20 rows, 15 used (75%)**. Three
+of the five empty rows are moats and load-bearing: without them Ctrl+Shift+↓ rides out of the
+forecast grid into the assumption cells. The other two are the sheet's bottom margin.
+
+**PAR RE-SWEPT FROM SCRATCH:** par 62 / parKeys 64 → **par 85 / parKeys 81**, 5-seed median 81
+including the engine-appended Ctrl+S, drift **0%**, **1.05 s/key** — the house band. Flat across
+seeds: the corner jitter moves the column letters and the year base moves the header text, and
+neither moves a keystroke. The old parKeys 64 was measured with `setDemoSel` doing the selecting;
+the demo now builds its own range grabs with Shift+arrow (the r438 `series` rule). Lands between
+`wacc` (78) and `comps` (94) in the Models I band.
+
+**ROUTES WALKED: 33**, all in `dev/verify-dcf.js` part 1 — 29 that must clear and **4 that must
+not** (a hardcoded factor row and a hardcoded PV row, both under a "Build" verb; and Alt H B O /
+Alt H B B, which put the rule underneath — the convention §1.0(f) reverses). Route facts worth
+adding to the campaign's list: **Alt H B D is Excel's TOP AND BOTTOM pair, so it clears a
+line-above beat** (the probe asserted the opposite first and the probe was wrong, not the drill);
+and the engine parses a negative exponent on a cell reference, `=(1+$B$11)^-B5`, so the reciprocal
+form of the discount factor is a real route and must grade.
+
+
+### `comps` — "Run the comps" (§4.60) — Models I
+
+**WAS:** 7 checks on a `ROWS:12` board — 12 of the real 20-row sheet (60%, exactly on the §1.3 line), no ☆, no `saveClose`, check labels carrying bare ranges and route text ("=LARGE(D3:D7,2) at D11", "G4 must reference D8"), and the Class-D triple-bundle the page itself flags ("run per share and the premium to market (G8, G10)"). par 94 / parKeys 99.
+
+**NOW:** a trading-comps page in the form a desk prints it — five peers, enterprise value and the two PRE-INTEREST metrics an EV multiple takes (LTM EBITDA and LTM EBIT), a two-column multiple block the player builds, the median/high/low read under it, and the enterprise→equity bridge down to an implied share price. 6 core beats + the hidden ☆ + the engine-appended Ctrl+S. **ROWS=20, 18 rows carrying content at the win state — 90% density against 60%.**
+
+| | |
+|---|---|
+| beats | 1 build the ten multiples · 2 build median/high/low across both columns · 3 implied EV at the median · 4 implied equity, net debt out · 5 implied share price, diluted count · 6 bold + top-border the landing (§1.6 finish state) · ☆ |
+| ☆ | **anchoring mastery** — all ten multiples descended from ONE entry: `=$B5/C5`, the EV column pinned, filled right into EV/EBIT and down through every peer. Read off `S.fillOps` + `S.pasteLog` (the MECHANIC, never geometry inferred), so Ctrl+D/Ctrl+R, Alt H F I D/R and a tiled paste of the corner all earn it |
+| board | `codename()` — trading comps ($mm); basis memo (LTM as reported, not calendarised; shares fully diluted); header rule; the summary rule ABOVE the median (§1.0(f)); blue inputs, black formulas |
+| random | 3 axes — corner jitter (anchor column A or B) · codename + a 5-of-10 peer draw, Fisher-Yates · every figure through `rnd()`, with the multiple ladder shuffled so WHICH peer carries the median moves with the seed |
+| par | **89 / parKeys 85** (was 94 / 99). 5-seed median 85 incl. the Ctrl+S closer, FLAT (min 85, max 85). 1.05 s/key, the house band. Clocks derive: pass 2:14 · pro 1:42 · legendary 1:29 |
+| alts | 2 (was 1, and the old one drove the retired 3-column page — **DELETED, do not resurrect**) |
+| tests | replay ×3 · alt-paths ×2 ×3 seeds · guided (railed, contained, solvable) · par-sweep 0% drift · fit-sweep ALL CLEAN · depth-contract PASS · `dev/verify-comps.js` 29 assertions ALL GREEN |
+
+**THREE UNTRIGGERABLE BEATS FOUND ON THE SHIPPED BOARD** (campaign §1 class — found by WALKING routes through the live engine, never by reading predicates). All three graded formula TEXT:
+
+| # | the check demanded | the route it locked out |
+|---|---|---|
+| 14 | `MEDIAN(` in the text at D8 | `=LARGE(D3:D7,3)` / `=SMALL(D3:D7,3)` — on a five-peer set the identical double, and the engine has shipped both since r296. Probed: the board reads right, the line stays dark |
+| 15 | `MAX(`/`MIN(` in the text at D9/D10 | `=LARGE(rng,1)` / `=SMALL(rng,1)`, and pointing at the peer that IS the high once the column is on screen |
+| 16 | the literal `D8` inside G4 | `=B10*MEDIAN(D3:D7)` — one cell instead of two, an ordinary thing to write. Same class as campaign bug #9 |
+
+That takes the campaign's running total to **sixteen**, all sixteen found the same way. Every core here grades the END STATE — the number in the cell, plus liveness where the label's verb is Build (DRILL_DOCTRINE §2.2 names this drill by key for the live-formula exception). No check reads a range, a function name or an anchor out of formula text.
+
+**THE ☆-HEADROOM DIAGNOSTIC, BOTH PARTS** (`dev/verify-comps.js` §B, 5 seeds, every selection and navigation keyed):
+
+- PART 1 — fastest legal **85** keys against **162** for the slowest legal route that does the same work (all ten multiples typed, both summary columns typed, nothing filled). **1.91×.**
+- PART 2 — of the 77 keys of spread, **zero** are formatting (the one dress beat costs the same on every route) and **zero** are chord-vs-ribbon in the §1.0(c) forced-to-clear sense: the engine has no ribbon route into formula entry, and Ctrl+D / Ctrl+R / Alt H F I D / Alt H F I R hit the same latch. The whole spread is one-formula-versus-retype. **LEGAL.**
+- THE ☆ ISOLATED: **14** keys against **22** for the honest non-star route (two unanchored column formulas, two fill-downs) and **60** for typing all ten — worth 8 keys against the route a competent player actually reaches for, a wider margin than `filterpass` shipped with (24 vs 30).
+- SKIPPABLE, MEASURED: the two-column route clears all six cores and fires the WIN in **93** keys with the ☆ dark, on all five seeds. Registered as ALT #2 so it can never silently break.
+
+**THE ANCHOR IS THE STAR, AND IT IS THE PART THAT IS ACTUALLY TAUGHT.** The unanchored fill-right (`=B5/C5` → `=C5/D5`) is registered as a negative control: it leaves the block WRONG, so beat 1 stays dark and the ☆ can never light on a propagated mistake. Repairing it by typing the second column leaves two seeds and forfeits the star. That is the lesson of `anchor`/`fxconvert` landed on a comps tape.
+
+**A DEFECT FOUND BY LOOKING AT THE WIN SCREENSHOT, NOT BY A PREDICATE** (doctrine §8.1.5, the way `cases`'s fill-format bug was caught in r439): the summary rule was drawn only on the cells carrying a number, so the line above the median ran under the label, stopped, and resumed under the two multiple columns — a broken rule across the middle of an otherwise sendable page. Fixed at the board: the three dollar columns take the border and no value, and `nonEmpty()` keys off value/formula (`index.html:14897`) so a bordered blank stays invisible to Ctrl-arrow and to `usedRange()`.
+
+**MODELING_STANDARDS CONVENTIONS** — colour-as-provenance (§1): every seeded input blue, every built cell black; no green, the board has one sheet-area. Units and basis stated on the page (§7). EV multiples take PRE-INTEREST metrics, EBITDA and EBIT (§4 — pairing equity value with EBITDA is the error the standard calls out). MEDIAN is the headline, never the mean (§4). Bridge is `EV − net debt = equity value`, `per share = equity / DILUTED shares` (§4). Totals take TOP borders (§1). Simplifications, stated on the board and in code: LTM as reported with no calendarisation; net debt as a positive magnitude subtracted (the bridge's printed form, doctrine §2.4's labelled-magnitude case, not a summable cost column); no minorities/preferred/associates.
+
+**ADJACENCY FLAG (§1.0-R4(u) family spacing):** this ☆ is the ANCHORING-MASTERY family and `txncomps` is adjacent. If that drill's re-cut also lands on anchoring, one of the two must move.
+
+
+### `txncomps` — "Run precedent transactions" (DEPTH_PASS §4.61, Models I)
+
+_Every number below is `keyLog` through the live engine on the real board, medians over 5 seeds, every selection and navigation KEYED (`setDemoSel` only parks the cursor on an anchor cell). `dev/verify-txncomps.js` is the probe and re-runs the whole thing._
+
+**WAS:** 4 checks on a `ROWS:13` board — 11 of the real 20-row sheet carrying content (**55%**, under the §1.3 floor), **no ☆ at all**, no `saveClose`, and every check label opening with a lowercase gerund while naming its own cell address and its own route ("run the multiple paid on every deal — EV over EBITDA, fill down D3:D7"). §1.0(b) strips the route out of a label; §1.0-R3(n) makes the clause after the em-dash say WHAT, never why.
+
+**NOW:** a real precedent-transactions page on 20 rows — title, basis memo, a **six-deal tape** (announced date · acquirer · target · TEV · LTM EBITDA · TEV/LTM EBITDA), the median read under it wearing a top border, and the implied-valuation bridge below that (target LTM EBITDA → implied enterprise value → less net debt → implied equity value). **16 of 20 rows at the win state = 80%.** 5 authored core beats + the engine's save closer + one ☆.
+
+#### THE ☆ WAS A DRESS AND IS NOW THE FILL — and the dress was PROMOTED, not deleted
+
+The §4.61 page predates the playtest rounds, so §1.0-R4(u) makes its ☆ dead on arrival:
+
+| the page's ☆ | why it is dead | what happened to it |
+|---|---|---|
+| "Bold the implied-equity landing and add a top border above it" | a FORMATTING task (§1.0(d) forbids the whole class); and it falls out of finishing the page, so it fails §1.0-R2(i)'s skippability test | **PROMOTED VERBATIM to core beat 5** (the r425 editfix/dress/ruleoff precedent), sequenced immediately after the beat that builds the cell it dresses (§1.0(a) format-as-you-go) |
+
+The re-cut ☆ is the **fill census**: the multiple written ONCE and taken down all six deals in a single pass. That is now **six** re-cut formatting ☆s across the campaign (`stalelink`, `series`, `balance`, `tieout`, `balcheck`, and this one) — the standing instruction from r440 held again: _check a §4 page's ☆ against §1.0(d) before building anything._
+
+#### THE ☆-HEADROOM DIAGNOSTIC, BOTH PARTS
+
+Run **before** the board was designed, on the shipped (pre-rework) board, then re-run on the rebuilt one.
+
+| | fastest legal | slowest legal (same work) | spread |
+|---|---|---|---|
+| old board (5 deals, `ROWS:13`) | 40 | 59 | 1.48× |
+| **rebuilt board (6 deals, `ROWS:20`)** | **48** | **110** | **2.29×** |
+
+**Part 2 — what the spread is MADE of, which is the half that decides.** Strip chord-vs-ribbon (§1.0(c) forces those to clear) and formatting (§1.0(d) forbids grading it): the engine has **no ribbon route into formula entry**, and `Ctrl+D` / `Alt H F I D` hit the same `fillFrom` latch, so the chord-vs-ribbon component of this board is **EMPTY BY CONSTRUCTION** — the `wrapfix` (r439) composition exactly, where a low ratio means something different from a low ratio on a formatting board. The only graded formatting is one dress beat the player must do anyway. So essentially **all** of the spread is FILL-versus-RETYPE, which is the "one copy-down fills a block" mastery move §1.0(d) names outright. Legal headroom, in the drill's own subject. **BUILD.**
+
+**Isolated measurement** (the §2 rule — measure each half separately so a combined number cannot hide a negative half): the one-pass route costs **12 keys** against **38** to type the six multiples. **26 keys of value, 3.17×**, flat across all five seeds. **Skippable by MEASUREMENT, not assertion:** the negative control types all six, clears every core beat and leaves the star dark (74 keys against the demo's 48 on the whole run). It ships as ALT 1, so the forfeit is walked on every gate run.
+
+#### DISTINCTNESS vs `comps` — asked before anything was built (CAMPAIGN §3)
+
+`comps` (§4.60) is one slot up the chapter and also carries a multiple column, so the discriminator was put properly: **does fluency in `comps` produce a CORRECT first attempt here?** For the multiple column and the median, **yes** — deliberate spaced practice, the `scrub`/`rowops` shape. What it does not carry is this board's own work: `comps` reads a PEER set five ways (median, high, low, and the LARGE/SMALL trimmed read) and walks the target all the way to a premium over a live share price; this board reads a DEAL set exactly one way — the median of what buyers actually paid — and stops at implied equity value, because a precedent set has no market price to be a premium to. Different columns (announced date, acquirer, target), different argument. **KEEP both**, and this board deliberately does NOT grow the per-share landing `comps` already owns.
+
+#### EVERY ROUTE WALKED — no untriggerable beat shipped
+
+Thirteen untriggerable beats have been found in this campaign and every one was found by WALKING a route, never by reading a predicate. Every core here grades the END STATE — the number standing in the cell, plus liveness where the label says the line is BUILT. **No check reads a range, a function name or an anchor out of formula text**, which is the cause of every one of the thirteen. `dev/verify-txncomps.js` §A drives all of these and asserts the beat flips, 5 seeds each:
+
+| route | keys | result |
+|---|---|---|
+| untouched board | 0 | all five beats DARK, ☆ dark (the negative control the suite needs) |
+| taught (Ctrl+D · MEDIAN · bridge · Alt H B P) | 48 | all clear, ☆ earned |
+| six multiples TYPED, no fill | 74 | all clear, **☆ dark** |
+| divisor column-ANCHORED then filled | 49 | all clear, ☆ earned |
+| RIBBON fill `Alt H F I D` | 52 | all clear, ☆ earned |
+| head cell COPIED, pasted over the block | 44 | all clear, ☆ earned (`S.pasteLog`) |
+| median by the long-hand `SMALL` form | 69 | all clear — beat 2 does **not** grade the word MEDIAN |
+| bridge fully anchored, operands reversed, SUM-wrapped | 61 | all clear |
+| op ORDER reversed — bridge written before the tape it reads | 48 | all clear; recalc catches up |
+| whole ROW grabbed with Shift+Space, then dressed | 49 | all clear |
+
+**The dress beat's border routes, all five walked.** On a ONE-CELL selection `Alt H B S` / `B A` / `B T` store `ball` (the box) while `Alt H B P` / `B D` store `bt` — the CAMPAIGN §1 route fact. All five paint a line above the landing, so the predicate accepts `bt || ball` and all five clear. **Grading only `bt` would have stranded three of them:** a perfect board with a dark line, which is §1.0-R3(p) exactly.
+
+#### PAR RE-SWEPT FROM SCRATCH
+
+| drill | was | now | why it moved |
+|---|---|---|---|
+| `txncomps` | par 36 / parKeys 36 | **par 52 / parKeys 49** | a sixth deal, the dress beat promoted off the dead ☆, the save closer |
+
+`dev/e2e-par-sweep.js txncomps` — 5-seed median **49** keys including the engine-appended Ctrl+S, **drift 0%**, flat across seeds (the randomization moves the figures, the names and the anchor column but never the beat count). par 52 ≈ **1.06 s/key**, the house band. Mirrored in `HOTKEY_PARS`. Clocks derive (§1.4): **pass 1:18 · pro 1:00 · legendary 0:52**. That lands txncomps between `fcfbuild` (32) and `dcf` (62) in the chapter band (`wacc` 78 · `comps` 94).
+
+#### MODELING_STANDARDS (binding on Models I) — what this board follows, and what it simplifies
+
+- **§1 colour-as-provenance** — every figure pulled from filings (transaction values, LTM EBITDA, target EBITDA, net debt) ships BLUE; every computed cell is black.
+- **§1 structure** — units in the title (`$mm`), a source/basis memo line, the median read wearing a **TOP** border (§1.0(f): never a rule underneath), figures right-aligned, a rule under the column headers (doctrine §2.1b).
+- **§4 Comps** — EV multiples take **pre-interest** metrics, so the tape pairs transaction enterprise value with EBITDA and never equity value with EBITDA (the classic error); the headline is the **MEDIAN**, not the mean, because six deals is exactly where one aggressive buyer distorts an average.
+- **§4 the enterprise → equity bridge** — EV less net debt = equity value.
+- **§7 the board is a COMPONENT** of a valuation build (one page's precedent panel), not a model, and it fits 20×10 at natural width (**870px grid into an 880px box** at 1440×900 — no horizontal scroll, unlike the `combo`/`gauntlet` overruns campaign §6.6 tracks).
+- **DELIBERATE SIMPLIFICATIONS, stated per §7:** net debt is shown POSITIVE on a "Less:" line and deducted rather than carried negative and added. Both forms are standard on a real bridge, the "Less:" prefix carries the sign explicitly, and this board has no other signed line, so §2's "pick one and hold it" is not at risk. No calendarisation and no LTM adjustment — the memo line says "LTM as reported", which is what makes it a stated simplification rather than a silent error.
+
+#### §1.3 DENSITY
+
+| | rows | used | density |
+|---|---|---|---|
+| before | 13 (of a real 20-row sheet) | 11 | **55%** |
+| after | 20 | 16 | **80%** |
+
+The four blank rows are load-bearing: two are the moats between the three blocks — they are what stops `Ctrl+Shift+↓` riding out of the deal tape into the median read (asserted in the probe, §C4) — and one is the margin above the footnote.
+
+#### A PROBE DEFECT READ AS A BOARD DEFECT (fourth sighting this campaign)
+
+The geometry assertion first reported `Ctrl+↓` landing on row **20** instead of row 10, which would have meant the moat was not holding. It was the probe: it captured `C._o` **before** a `loadChallenge` and then used the stale column letters, so on half the seeds it was walking the empty multiple column instead of the EBITDA column the corner jitter had moved. Fixed in the probe with the reason written in place. After r440's `hotkey_onboarded` omission, r441's hidden rows and r442's three wrong border readings, **treat a surprising probe reading as suspect by default** — this one cost minutes only because the rule was already written down.
+
+#### PLUMBING
+
+- `drills.js`: `HOTKEY_PARS.txncomps` **36 → 52**. Meta needs no de-hint work (name/label/tab/desc were already chord-free); the desc is refreshed to name the artifact the board actually is. No `HOTKEY_CLOCKS` override (§4.61: "Clocks: std"). Key is immutable, so PBs, the leaderboard board and runs history are untouched.
+- `dev/e2e-alt-paths.js`: the single pre-rework entry is **DELETED** (it drove hard-coded `D3:D7`/`D8`/`B11`/`B13` on a board that no longer exists) and replaced by two entries built off `C._o`. Per CAMPAIGN §4 the reworking agent's side is authoritative for deletions too — **never union this file**.
+- `dev/check-invariants.js`: `REWORKED` grows to 45.
+- `dev/verify-txncomps.js`: new, self-contained, names no other drill (C13-safe).
+- Coupling sweep run per CAMPAIGN §4 — `CHALLENGES.txncomps._o` → **none**; `loadChallenge('txncomps')` → **none**; `'txncomps'` in `dev/` → only `e2e-alt-paths.js` (rebuilt), `migrate-certificates.sql` (modeling-track array, key unchanged, no edit) and `seed-field.sql` (historical leaderboard rows). **No parity / mac-input / depth-mechanics section reaches into this board.**
+
+---
