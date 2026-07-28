@@ -1741,13 +1741,32 @@ const ALTS = [
       {sel:o.CD+o.rEq, keys:[...T('=$'+o.CD+'$'+o.rEV+'-$'+o.CD+'$'+o.rNd),{key:'Enter'}]},
       {sel:o.CD+o.rEq, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('s')]},
     ]; }` },
-  { key: 'football', name: 'ceiling before floor, mids last', moves: `C => [
-      {sel:'B8', keys:[...T('=MAX(C3:C5)'),{key:'Enter'}]},
-      {sel:'B7', keys:[...T('=MIN(B3:B5)'),{key:'Enter'}]},
-      {sel:'B9', keys:[...T('=B8-B7'),{key:'Enter'}]},
-      {sel:'D3', keys:[...T('=(B3+C3)/2'),{key:'Enter'}]},
-      {sel:'D3:D5', keys:[{key:'d',ctrl:true}]},
-    ]` },
+  /* r444 (football depth pass, DEPTH_PASS §4.62): the board was REBUILT, so the pre-r444 entry
+     is DELETED, not edited — it drove B7/B8/B9 and D3:D5 on a nine-row board that no longer
+     exists. Integrators: do not resurrect it (CAMPAIGN §4 union rule).
+     ALT 1 = op-ORDER alt AND the measured ☆ NEGATIVE CONTROL — the page is worked backwards
+     (box first, spread before its own inputs, mids last) with NOTHING filled, so all six cores
+     clear with the star DARK. ALT 2 = chord-ROUTE alt — F4 instead of typed dollars, both
+     ribbon fills, SMALL/LARGE instead of MIN/MAX, and Alt H B A for the box; the ☆ still
+     earns, because a fill is a fill however it is reached. */
+  { key: 'football', name: 'op ORDER backwards (box first, spread before its own inputs, mids LAST) and every formula TYPED — all six cores clear with the ☆ DARK, the measured negative control', moves: `C => { const o=C._o; const mv=[];
+      for(const e of ['p','o','l','r']) mv.push({sel:o.boxRng, keys:[{key:'Alt'},L('h'),L('b'),L(e)]});
+      mv.push({sel:o.spreadK, keys:[...T('=MAX('+o.hiRng+')-MIN('+o.loRng+')'),{key:'Enter'}]});
+      mv.push({sel:o.ceilK,   keys:[...T('=MAX('+o.hiRng+')'),{key:'Enter'}]});
+      mv.push({sel:o.floorK,  keys:[...T('=MIN('+o.loRng+')'),{key:'Enter'}]});
+      for(const x of o.m) mv.push({sel:x.premK, keys:[...T('='+o.LM+x.row+'/$'+o.LL+'$'+o.pxR+'-1'),{key:'Enter'}]});
+      for(const x of o.m) mv.push({sel:x.midK,  keys:[...T('=('+o.LL+x.row+'+'+o.LH+x.row+')/2'),{key:'Enter'}]});
+      return mv; }` },
+  { key: 'football', name: 'chord ROUTE: the price cell locked with F4 instead of typed dollars, both columns filled from the RIBBON (alt h f i d), SMALL/LARGE instead of MIN/MAX, the box drawn with alt h b a — the ☆ still fires', moves: `C => { const o=C._o; return [
+      {sel:o.midTop,  keys:[...T('=AVERAGE('+o.LL+o.r1+':'+o.LH+o.r1+')'),{key:'Enter'}]},
+      {sel:o.midRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:o.premTop, keys:[...T('='+o.LM+o.r1+'/'+o.LL+o.pxR),{key:'F4'},...T('-1'),{key:'Enter'}]},
+      {sel:o.premRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:o.floorK,  keys:[...T('=SMALL('+o.loRng+',1)'),{key:'Enter'}]},
+      {sel:o.ceilK,   keys:[...T('=LARGE('+o.hiRng+',1)'),{key:'Enter'}]},
+      {sel:o.spreadK, keys:[...T('='+o.ceilK+'-'+o.floorK),{key:'Enter'}]},
+      {sel:o.boxRng,  keys:[{key:'Alt'},L('h'),L('b'),L('a')]},
+    ]; }` },
   { key: 'dcfsens', name: 'fill DOWN first, then right', moves: `C => [
       {sel:'C4', keys:[...T('=$B$2/(C$3-$B4)'),{key:'Enter'}]},
       {sel:'C4:C6', keys:[{key:'d',ctrl:true}]},

@@ -11012,55 +11012,334 @@ const CHALLENGES = {
     }
   },
   football:{
-    name:'Football', label:'Build the football field', par:39, parKeys:39,
-    aha:'Every method gives a low and a high — the football field is valuation on one axis.',
-    prompt:'Three methodologies, three ranges, one summary: a midpoint per method, then the widest view — the lowest low and the highest high across all three, with MIN and MAX. The summary page of every valuation section.',
-    req:'<em>D3</em> mid <em>=(B3+C3)/2</em> \u00b7 fill D3:D5 \u2193 \u00b7 <em>B7</em> floor <em>=MIN(B3:B5)</em> \u00b7 <em>B8</em> ceiling <em>=MAX(C3:C5)</em> \u00b7 <em>B9</em> width <em>=B8-B7</em>',
-    guide:[
-      'midpoint, comps: D3 \u00b7 <kbd>=(B3+C3)/2</kbd> <kbd>\u21b5</kbd> \u00b7 select D3:D5 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd>',
-      'the floor at B7 \u00b7 <kbd>=MIN(B3:B5)</kbd> \u2014 lowest low across methods',
-      'the ceiling at B8 \u00b7 <kbd>=MAX(C3:C5)</kbd> \u00b7 the width at B9 \u00b7 <kbd>=B8-B7</kbd>',
-    ],
-    targets:['D3:D5','B7','B8','B9'],
-    demo(){ return [
-      {sel:'D3', keys:[...T('=(B3+C3)/2'), Kb.enter]},
-      {sel:'D3:D5', keys:[Kb.fillD]},
-      {sel:'B7', keys:[...T('=MIN(B3:B5)'), Kb.enter]},
-      {sel:'B8', keys:[...T('=MAX(C3:C5)'), Kb.enter]},
-      {sel:'B9', keys:[...T('=B8-B7'), Kb.enter]},
+    /* r444 H6b-13 (DEPTH_PASS §4.62, "Build the football field") — the depth-pass rework,
+       built to §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (§1.0-R3 wins on
+       conflict), and to dev/MODELING_STANDARDS.md, which is BINDING on Models I.
+
+       WAS: 4 checks on a ROWS:9 board — 9 of the real 20-row sheet carrying content (45%,
+       well under the §1.3 floor and the ROWS=14-class defect Wolf named at r440), no ☆, no
+       saveClose, three methodology rows on an otherwise empty page, and check labels that
+       named their own cell address AND their own route ("run live midpoints for all three
+       methods — fill D3:D5"; "tie the width at B9"). §1.0(b) strips the route out of a label,
+       §1.0-R2(j) BANS "tie" for a recalculation, and §1.0-R3(n) makes the clause after the
+       em-dash say WHAT, never why.
+
+       ── §1.0-R4(t) THE REALITY TEST, applied to the board first ──────────────────────────
+       "Trading comps / Precedent txns / DCF" with a low and a high is the SHAPE of a football
+       field, but three rows floating on an empty sheet is not the page anyone opens. A real
+       one carries six or seven methodologies, states its per-share basis, names the price the
+       premiums are measured against, and ends boxed because it is going into a pack. §3.1
+       assigns Models I the B family and names "football field" in it, so the artifact stands —
+       what changed is that it is now a FILE FRAGMENT rather than a stub grid.
+
+       ── ☆-HEADROOM DIAGNOSTIC, BOTH PARTS, RUN BEFORE THE BOARD WAS DESIGNED (CAMPAIGN §2) ──
+       Measured live through the engine on the SHIPPED board, 5 seeds, every selection keyed
+       (dev/verify-football.js §B):
+         PART 1 — SPREAD. Fastest legal route clearing every core: 39 keys. Slowest legal route
+           doing the SAME work (each of the three midpoints its own typed formula, no fill
+           anywhere): 58. **1.49×** — inside the warning band §2 sets at ~1.3×.
+         PART 2 — IS ANY OF IT ☆-LEGAL? All 19 keys of spread are fill-versus-retype. Zero are
+           chord-vs-ribbon (the engine has no ribbon route into formula entry — the r439
+           `wrapfix` finding), zero are formatting (the shipped board graded none). So the
+           spread survives the strip and the drill is NOT the `growth` failure — but 19 keys
+           across a three-row column is a thin star, and fill-census is the family the ADJACENT
+           drill (`txncomps`, §4.61) re-cuts onto. §1.0-R4(u) forbids two adjacent drills
+           sharing a family.
+         VERDICT: KEEP the drill, FIX THE BOARD (the r438 `series` rule — never fix a thin star
+           at the predicate). The board gains the column a real football field carries and this
+           one did not: the premium each methodology's midpoint implies against the unaffected
+           price. That column hangs off ONE cell, so its fill is worthless unless the reference
+           to that cell is ABSOLUTE — which moves the star out of fill-census and into
+           ANCHORING MASTERY, a different §1.0-R4(u) family, and multiplies the headroom.
+           Re-measured on this board (verify-football.js §B, every selection and navigation
+           keyed): fastest legal 77, slowest legal doing the same work 178, **2.31×** — the
+           `cases` band. ☆ ISOLATED: 17 keys against 68 typed, **51 keys, 4.00×** on the move
+           itself, and PROVED SKIPPABLE by measurement rather than assertion — §C3 types all
+           six premiums, clears every core beat and leaves the star dark (116 keys against the
+           demo's 60), and it ships as dev/e2e-alt-paths.js ALT 1 so the forfeit is walked on
+           every gate run.
+
+       ── §1.0-R4(u) THE ☆ RE-CUT (the page is pre-playtest, so its ☆ was dead on arrival) ──
+       §4.62's bonus is "Add an outside border around the field summary — the page the MD flips
+       to". §1.0(d) outlaws formatting bonuses outright and §1.0-R2(i) outlaws it twice over,
+       since a player who finishes the exhibit draws that box anyway. Because it is real WORK it
+       is PROMOTED VERBATIM to core beat 6 (the r425 editfix/dress/ruleoff precedent, which
+       (u) names), sequenced immediately behind the beats that build the block it encloses
+       (§1.0(a) format-as-you-go). The replacement ☆ is the anchored fill above.
+       ADJACENCY, stated rather than assumed (§1.0-R4(u) family spacing): `txncomps` is the
+       drill before and its re-cut is fill-census; this one is anchoring mastery, so the binding
+       adjacency rule holds. `comps` is two away and also anchoring — at the twice-per-chapter
+       cap, and the recurrence teaches a different thing (comps locks a COLUMN, $B5, and fills
+       right; this locks ONE CELL, $B$16, the single assumption a whole column hangs off). The
+       drill after, `dcfsens`, cannot take anchoring: §4.63's CORE beats are mixed anchors, so
+       an anchoring ☆ there would fall out of the exercise (§1.0-R2(i)). Orchestrator's call at
+       assembly if the chapter's count needs re-balancing.
+
+       ── dev/MODELING_STANDARDS.md — what this board follows and where it simplifies ──────
+       §1 COLOUR AS PROVENANCE: every methodology low/high and the unaffected price are typed
+         inputs and ship BLUE; every cell the player builds is a formula and stays black. §7's
+         "no hardcodes inside formulas" is the premium column's whole lesson — the price lives
+         in one labelled cell and the formula points at it, never at 41.28.
+       §1 STRUCTURE: units in the title ($ per diluted share), a basis memo, headers ruled
+         underneath (doctrine §2.1b), the reference range boxed as the hand-off.
+       §7 SIMPLIFICATIONS, stated here AND in the board's own memo line as §7 requires:
+         (a) on a live model these six ranges would be GREEN links into the comps / precedents
+             / DCF / LBO tabs; this engine is single-sheet, so they are blue hardcodes and the
+             memo says they came from the analysis pack;
+         (b) no calendarisation and no LTM/NTM statement — the methodologies arrive already
+             expressed per share, which is what a summary exhibit receives.
+       §2 sign convention: not engaged — every figure on this page is a positive per-share
+         value. §3 roll-forward: not engaged. Recorded so the omissions read as deliberate.
+
+       ── ENGINE (probed live on THIS board — §1.0-R3(p): enumerate the routes BEFORE writing
+          the predicate; dev/verify-football.js §A) ─────────────────────────────────────────
+        · MIN/MAX are not the only routes to the envelope. `=MIN(B5:B10)`, `=SMALL(B5:B10,1)`,
+          `=MIN(B5:C10)` over the whole range block (a low can never exceed its own high, so the
+          block minimum IS the column minimum) and a typed reference chain all land the same
+          number. NOTHING here reads formula TEXT — that is bug class #3/#8/#12 in CAMPAIGN §1,
+          and the SHIPPED drill had it: `fRef('B7','MIN')` locked out every one of those.
+        · The premium column has four routes that all clear: `=D5/$B$16-1`, `=(D5-$B$16)/$B$16`,
+          the same with F4 cycling the anchor instead of typed $, and six unanchored formulas
+          typed cell by cell. All four are asserted.
+        · OUTSIDE BORDER: Alt H B S is the canon (§1.0-R2(m) — H B A is ALL borders), and
+          `ball` carries the perimeter, so H B A clears too, as do the thick box H B T and a
+          per-edge walk H B P / B O / B L / B R. Graded through the shared `boxed()` reading
+          (index.html:5545 pattern), which asks for four painted edges however they were drawn.
+        · FILL is Ctrl+D or Alt H F I D; both stamp S.fillOps. A tiled paste of the seed cell
+          stamps S.pasteLog. The ☆ census reads BOTH, so no legal route to "one entry, one
+          pass" is locked out.
+        · A fill copies the SOURCE cell's number format (r439 `cases`). Both computed columns
+          ship pre-formatted on their BLANK cells — currency 2dp on Mid, percent 1dp on
+          Premium — so a fill down either column carries the right format, and a single fill
+          over BOTH columns still carries each column's own (fillFrom stamps per column,
+          index.html:17914). Checked on the win screenshot, not reasoned about.
+        · loadChallenge does NOT recalculate, so nothing on this board ships live. */
+    name:'Football', label:'Build the football field', par:65, parKeys:60, saveClose:true,   /* r444: par re-swept from scratch on the reworked board (was par 39 / parKeys 39 for a three-row stub) — dev/e2e-par-sweep.js football, 5-seed median 60 keys incl. the engine-appended Ctrl+S, and FLAT at 60 over a 21-seed probe (min 60, max 60): the site jitter moves the board but never the keystroke count, because the header-row jitter is chosen so every typed reference is the same character length on both settings (the first methodology row stays one digit, the last one and the whole summary block stay two). par 65 ≈ 1.08 s/key, the house band. Measured against it: the same board worked the slow way — every midpoint and every premium typed cell by cell, nothing filled, the box walked edge by edge — runs 178 keys with every selection and navigation keyed (dev/verify-football.js §B2; dev/e2e-alt-paths.js ALT 1 is the same route as the ☆'s negative control), which is the cost the clock exists to show. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 1:38 · pro 1:15 · legendary 1:05. */
+    aha:'each method answers with a range, not a number — the reference range is the envelope of all of them, never an average of them.',
+    /* §1.5: the aha's MOMENT is beats 3 and 4. The board guarantees the floor and the ceiling
+       come from TWO DIFFERENT methodologies, so the envelope is visibly nobody's own range. */
+    prompt:'The board meets Thursday and the valuation summary is the page the chairman turns to first. Six methodologies are back from the team and every one of them answered with a range rather than a number. Put them on one per-share axis: the midpoint of each range, the premium each midpoint implies against the unaffected price — the last close before the approach leaked — and then the reference range itself, the lowest low and the highest high across all six, with the distance between them. Put an outside border around the reference range before the page goes into the pack. The page anchors somewhere new every run.',
+    req(){ const o=this._o; return '<em>'+o.midTop+'</em> <em>=('+o.loTop+'+'+o.hiTop+')/2</em> · fill <em>'+o.midRng+'</em> <em>ctrl+d</em> · <em>'+o.premTop+'</em> <em>='+o.midTop+'/$'+o.LV+'$'+o.pxR+'-1</em> · fill <em>'+o.premRng+'</em> · <em>'+o.floorK+'</em> <em>=MIN('+o.loRng+')</em> · <em>'+o.ceilK+'</em> <em>=MAX('+o.hiRng+')</em> · <em>'+o.spreadK+'</em> <em>='+o.ceilK+'-'+o.floorK+'</em> · outside border <em>'+o.boxRng+'</em> <em>alt h b s</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and every line names ALL the routes that grade, since they all do (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'the <b>Mid</b> column starts at '+o.midTop+' · <kbd>=</kbd><kbd>(</kbd> the <b>Low</b> beside it <kbd>+</kbd> the <b>High</b> beside it <kbd>)</kbd><kbd>/</kbd><kbd>2</kbd> <kbd>↵</kbd> · select '+o.midRng+' · <kbd>ctrl</kbd>+<kbd>d</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>d</kbd> is the ribbon’s same fill)',
+      'the <b>Premium</b> column starts at '+o.premTop+' · <kbd>=</kbd> the <b>Mid</b> cell <kbd>/</kbd> the <b>'+o.pxLbl+'</b> cell <kbd>-</kbd><kbd>1</kbd> — lock that price cell with typed <kbd>$</kbd> signs or <kbd>F4</kbd> before you fill, or the reference walks down the page with the fill',
+      'the floor at '+o.floorK+' · <kbd>=MIN(</kbd> the <b>Low</b> column <kbd>)</kbd> <kbd>↵</kbd> — <kbd>=SMALL(</kbd>range<kbd>,1)</kbd> lands the same number',
+      'the ceiling at '+o.ceilK+' · <kbd>=MAX(</kbd> the <b>High</b> column <kbd>)</kbd> <kbd>↵</kbd> — <kbd>=LARGE(</kbd>range<kbd>,1)</kbd> lands the same number',
+      'the spread at '+o.spreadK+' · <kbd>=</kbd> the ceiling cell <kbd>-</kbd> the floor cell <kbd>↵</kbd>',
+      'select '+o.boxRng+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> — outside borders (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> is ALL borders and paints the perimeter too, and a per-edge walk <kbd>b</kbd> <kbd>p</kbd>/<kbd>o</kbd>/<kbd>l</kbd>/<kbd>r</kbd> gets there as well)',
+      '☆ the discovery: write the premium ONCE with the price cell locked (<kbd>$</kbd> or <kbd>F4</kbd>), then select '+o.premRng+' and one <kbd>ctrl</kbd>+<kbd>d</kbd> drops all six — and the cheapest grab is off the finished <b>Mid</b> column, <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>↓</kbd> then <kbd>shift</kbd>+<kbd>→</kbd>, which stops on the last methodology instead of running to the bottom of the sheet. Typing the six out clears the beat too, it just costs about sixty extra keys — and an UNLOCKED reference filled down is the trap the lock exists for',
     ]; },
+    /* rings: ① the Mid column · ② the Premium column · ③④⑤ the three summary cells ·
+       ⑥ the reference-range block · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.midRng, o.premRng, o.floorK, o.ceilK, o.spreadK, o.boxRng, null]; },
+    demo(){ const o=this._o; return [
+      {sel:o.midTop,  keys:[...T('=('+o.loTop+'+'+o.hiTop+')/2'), Kb.enter]},
+      {sel:o.midRng,  keys:[Kb.fillD]},
+      /* §2.2: the demo performs the bonus — one anchored entry and ONE fill carry the whole
+         premium column, which is exactly the ☆ move; its state latches at the win. */
+      {sel:o.premTop, keys:[...T('='+o.midTop+'/$'+o.LV+'$'+o.pxR+'-1'), Kb.enter]},
+      {sel:o.premRng, keys:[Kb.fillD]},
+      {sel:o.floorK,  keys:[...T('=MIN('+o.loRng+')'), Kb.enter]},
+      {sel:o.ceilK,   keys:[...T('=MAX('+o.hiRng+')'), Kb.enter]},
+      {sel:o.spreadK, keys:[...T('='+o.ceilK+'-'+o.floorK), Kb.enter]},
+      /* §1.0(a) format-as-you-go: the box rides directly behind the three cells it encloses */
+      {sel:o.boxRng,  keys:[Kb.alt, L('h'), L('b'), L('s')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 valuation summary ($/sh)',txt:true,bold:true};
-      cells['A2']={...blankCell(),value:'Method',txt:true,bold:true};
-      cells['B2']={...blankCell(),value:'Low',txt:true,bold:true,align:'r'};
-      cells['C2']={...blankCell(),value:'High',txt:true,bold:true,align:'r'};
-      cells['D2']={...blankCell(),value:'Mid',txt:true,bold:true,align:'r'};
-      const methods=['Trading comps','Precedent txns','DCF'];
-      this._mids=[]; const lows=[], highs=[];
-      methods.forEach((m,i)=>{
-        const lo=rnd(20,45), hi=lo+rnd(6,25);
-        cells['A'+(3+i)]={...blankCell(),value:m,txt:true};
-        cells['B'+(3+i)]={...blankCell(),value:lo,fontColor:'blue',decimals:0};
-        cells['C'+(3+i)]={...blankCell(),value:hi,fontColor:'blue',decimals:0};
-        cells['D'+(3+i)]={...blankCell(),decimals:1};
-        this._mids.push((lo+hi)/2); lows.push(lo); highs.push(hi);
+      /* §1.2 randomization — FOUR independent axes: (a) SITE, the page anchors at column A or B
+         with its header row at 4 or 5 (corner jitter, the sanctioned substitute for a spot pool
+         on a board that fills five of ten columns and all twenty rows, §1.2); (b) the
+         methodology pool — the three a valuation section always carries are fixed and three
+         more are drawn Fisher-Yates from a pool of five, then the whole list is shuffled, so
+         neither the set nor the order repeats; (c) every figure through rnd() — the unaffected
+         price, the six premium targets and the six range half-widths; and (d) WHICH
+         METHODOLOGY OWNS THE FLOOR AND WHICH OWNS THE CEILING, which is the §4.62 page's
+         "which method is widest" read onto the beats that matter: the premium ladder and the
+         half-width ladder are shuffled INDEPENDENTLY, so the widest range, the floor-setter and
+         the ceiling-setter are three different rows on most seeds and never the same row twice
+         running. The answer can never be replayed from position. */
+      const ALWAYS=['Trading comps','Precedent transactions','DCF — perpetuity growth'];
+      const POOL=['52-week trading range','Analyst price targets','DCF — exit multiple','LBO — ability to pay','Sum of the parts'];
+      const shuf=a=>{ const b=a.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b; };
+      const names=shuf(ALWAYS.concat(shuf(POOL).slice(0,3)));
+      const c0=rnd(1,2), hr=rnd(4,5);
+      const L0=colLetter(c0), LL=colLetter(c0+1), LH=colLetter(c0+2), LM=colLetter(c0+3), LP=colLetter(c0+4);
+      const r1=hr+1, rN=hr+6, fR=hr+8, cR=hr+9, sR=hr+10, pxR=hr+12, mR=hr+14;
+      /* ---- THE FIGURES, and the two things this board must guarantee ----
+         Everything is drawn in CENTS so the arithmetic the player checks against is exact:
+         a range's half-width is subtracted and added to its own midpoint, so (low+high)/2 is
+         that midpoint on the nose and no beat can be defeated by a rounding step. The premium
+         ladder is six disjoint bands, so the Premium column always reads six distinct figures
+         at one decimal. The two guarantees, asserted rather than hoped for:
+           · the floor-setting methodology is NOT the ceiling-setting one (the §1.5 aha depends
+             on the envelope belonging to nobody's own range), and
+           · both are unique by at least three cents, so the read is never ambiguous on screen. */
+      /* the first band is deliberately shallow (−4.5% to −2.5%): it is the one a 52-week range
+         is handed, and (1+pm)(1+h) > 1 has to hold for every legal half-width so the bracket
+         below is satisfied BY CONSTRUCTION rather than by rejection sampling. */
+      const BANDS=[[-45,-25],[35,95],[135,190],[225,285],[315,375],[400,470]];   // premium targets, per mille of the unaffected price
+      const wk52=names.indexOf('52-week trading range');
+      const draw=(strict)=>{
+        const P=rnd(2900,4700);
+        /* the premium ladder is shuffled onto the rows — EXCEPT that a 52-week trading range,
+           when the pool drew one, takes the band BELOW the unaffected price and is then
+           asserted to bracket it. A board whose 52-week low sits above the price the stock
+           last closed at is not a file anyone has ever opened (§1.0-R4(t) rule 1), and it is
+           the first thing a reviewer would catch. */
+        const ladder=BANDS.map(b=>rnd(b[0],b[1]));
+        let prem;
+        if(wk52<0) prem=shuf(ladder);
+        else { const rest=shuf(ladder.slice(1)); prem=[]; let j=0;
+          for(let i=0;i<6;i++) prem.push(i===wk52 ? ladder[0] : rest[j++]); }
+        const half=shuf([rnd(50,68),rnd(70,88),rnd(90,105),rnd(107,120),rnd(122,131),rnd(133,140)]);   // half-widths, per mille of the midpoint
+        const rows=prem.map((pm,i)=>{ const mid=Math.round(P*(1000+pm)/1000), hw=Math.round(mid*half[i]/1000);
+          return {lo:mid-hw, hi:mid+hw, mid:mid}; });
+        if(wk52>=0 && !(rows[wk52].lo<P && rows[wk52].hi>P)) return null;   // the stock traded inside its own 52-week range
+        const los=rows.map(r=>r.lo), his=rows.map(r=>r.hi);
+        const fi=los.indexOf(Math.min.apply(null,los)), ci=his.indexOf(Math.max.apply(null,his));
+        if(fi===ci) return null;                                             // the envelope must belong to two different methodologies
+        const sl=los.slice().sort((a,b)=>a-b), sh=his.slice().sort((a,b)=>b-a);
+        if(sl[0]<1500 || sh[0]>9800) return null;                            // two-digit dollars, so nothing overflows its column
+        if(!strict) return {P:P, rows:rows, fi:fi, ci:ci};
+        if(sl[1]-sl[0]<3 || sh[0]-sh[1]<3) return null;                      // unique by at least three cents — readable on screen
+        if(new Set(los.concat(his)).size!==12) return null;                  // twelve distinct figures in the range block
+        return {P:P, rows:rows, fi:fi, ci:ci};
+      };
+      /* two passes with the COSMETIC assertions dropped on the second (the structural ones —
+         the 52-week bracket, two different envelope owners, the display range — hold in both).
+         The first pass clears the overwhelming majority of draws, so exhausting 300 of them is
+         already vanishing and the second cannot fail on anything the first was picky about;
+         build() can neither spin nor return null. */
+      let d=null;
+      for(let a=0;a<300 && !d;a++) d=draw(true);
+      for(let a=0;a<300 && !d;a++) d=draw(false);
+      if(!d){   // a deterministic construction of the same shape, so there is no path out of build() without a board
+        const P=3600, pm=[-35,65,160,255,345,435], hw=[60,80,98,113,126,136];
+        const k=wk52<0?0:wk52; const prem=[]; let j=1;
+        for(let i=0;i<6;i++) prem.push(i===k?pm[0]:pm[j++]);
+        const rows=prem.map((p,i)=>{ const mid=Math.round(P*(1000+p)/1000), h=Math.round(mid*hw[i]/1000); return {lo:mid-h,hi:mid+h,mid:mid}; });
+        const los=rows.map(r=>r.lo), his=rows.map(r=>r.hi);
+        d={P:P, rows:rows, fi:los.indexOf(Math.min.apply(null,los)), ci:his.indexOf(Math.max.apply(null,his))};
+      }
+      const P=d.P/100;
+      cells[L0+'1']={...blankCell(),value:codename()+' — valuation summary ($ per diluted share)',txt:true,bold:true};
+      cells[L0+'2']={...blankCell(),value:'Basis: methodology ranges as handed over by the analysis pack — comps, precedents, DCF, LBO',txt:true,it:true,fontColor:'gray'};
+      /* §1.3 LABELED TARGETS: every graded cell sits on a named methodology row under a named
+         column header, or on a named summary row. Headers are ruled underneath — doctrine
+         §2.1b's banker's-workbook finish, shipped rather than built, because the LESSON on this
+         board is the model and not the dress (the one dress beat is the hand-off box). */
+      cells[L0+hr]={...blankCell(),value:'Methodology',txt:true,bold:true,bb:true};
+      [[LL,'Low'],[LH,'High'],[LM,'Mid'],[LP,'Premium']].forEach(([L2,t])=>{
+        cells[L2+hr]={...blankCell(),value:t,txt:true,bold:true,align:'r',bb:true}; });
+      const m=[];
+      d.rows.forEach((rw,i)=>{ const r=r1+i;
+        cells[L0+r]={...blankCell(),value:names[i],txt:true};
+        /* blue = a figure a human typed in from somewhere else (MODELING_STANDARDS §1). On a
+           live model these would be GREEN links into the analysis tabs; this engine is
+           single-sheet, and the board says so on its memo line (§7). */
+        cells[LL+r]={...blankCell(),value:rw.lo/100,fmtStyle:'currency',decimals:2,fontColor:'blue'};
+        cells[LH+r]={...blankCell(),value:rw.hi/100,fmtStyle:'currency',decimals:2,fontColor:'blue'};
+        /* both computed columns ship EMPTY but pre-formatted, so a fill down either one carries
+           the right number format off its own head cell (the r439 `cases` finding) */
+        cells[LM+r]={...blankCell(),fmtStyle:'currency',decimals:2};
+        cells[LP+r]={...blankCell(),fmtStyle:'percent',decimals:1};
+        m.push({name:names[i], row:r, lo:rw.lo/100, hi:rw.hi/100, mid:rw.mid/100,
+          prem:(rw.mid/100)/P-1, midK:LM+r, premK:LP+r});
       });
-      cells['A7']={...blankCell(),value:'Range floor',txt:true,bold:true};  cells['B7']={...blankCell(),decimals:0,bold:true};
-      cells['A8']={...blankCell(),value:'Range ceiling',txt:true,bold:true}; cells['B8']={...blankCell(),decimals:0,bold:true};
-      cells['A9']={...blankCell(),value:'Range width',txt:true};             cells['B9']={...blankCell(),decimals:0};
-      this._exp={ lo:Math.min(...lows), hi:Math.max(...highs) };
-      this._exp.w=this._exp.hi-this._exp.lo;
-      return {ROWS:9, cells, active:{r:3,c:4}, sel:null, colW:{1:132,2:64,3:64,4:64}};
+      /* the reference range — three labelled rows the player builds and then boxes. No top
+         border ships here: §1.0(f) puts a rule ABOVE a total, and beat 6 draws the four edges
+         that carry this block instead, so the box is the player's work and not half-done at
+         load. */
+      cells[L0+fR]={...blankCell(),value:'Range floor',txt:true,bold:true};
+      cells[LL+fR]={...blankCell(),fmtStyle:'currency',decimals:2,bold:true};
+      cells[L0+cR]={...blankCell(),value:'Range ceiling',txt:true,bold:true};
+      cells[LL+cR]={...blankCell(),fmtStyle:'currency',decimals:2,bold:true};
+      cells[L0+sR]={...blankCell(),value:'Spread',txt:true};
+      cells[LL+sR]={...blankCell(),fmtStyle:'currency',decimals:2};
+      /* §1.0(f) + §1.0-R2(l): the assumption the premium column hangs off — light yellow, all
+         borders, blue figure, POPULATED, and labelled with the assumption itself rather than
+         the word "Helper" (the r430 correction). One cell, one label, directly under the block
+         that uses it. */
+      cells[L0+pxR]={...blankCell(),value:'Unaffected price ($/sh)',txt:true};
+      cells[LL+pxR]={...blankCell(),value:P,fmtStyle:'currency',decimals:2,fontColor:'blue',fill:'yellow',ball:true};
+      /* §1.3 density + the §7 simplification stated on the board. Story, never graded — both
+         lines sit below every checked rect and spill only into empty neighbours (r107). */
+      cells[L0+mR]={...blankCell(),value:'Memo: premium is measured against the unaffected price above',txt:true,it:true,fontColor:'gray'};
+      cells[L0+(mR+1)]={...blankCell(),value:'Memo: ranges are carried over as values — on the live model they link to the analysis tabs',txt:true,it:true,fontColor:'gray'};
+      this._o={ c0:c0, hr:hr, r1:r1, rN:rN, fR:fR, cR:cR, sR:sR, pxR:pxR, mR:mR,
+        L0:L0, LL:LL, LH:LH, LM:LM, LP:LP, LV:LL,
+        loC:c0+1, hiC:c0+2, midC:c0+3, premC:c0+4,
+        px:P, pxLbl:'Unaffected price ($/sh)', m:m,
+        floor:Math.min.apply(null,m.map(x=>x.lo)), ceil:Math.max.apply(null,m.map(x=>x.hi)),
+        floorK:LL+fR, ceilK:LL+cR, spreadK:LL+sR,
+        midTop:LM+r1, premTop:LP+r1, loTop:LL+r1, hiTop:LH+r1,
+        midRng:LM+r1+':'+LM+rN, premRng:LP+r1+':'+LP+rN,
+        loRng:LL+r1+':'+LL+rN, hiRng:LH+r1+':'+LH+rN,
+        boxRng:L0+fR+':'+LL+sR };
+      this._o.spread=this._o.ceil-this._o.floor;
+      /* widths sized for the WIDEST thing each column ever holds (an explicitly sized column
+         does not auto-grow, r432): 'DCF — perpetuity growth' and 'Unaffected price ($/sh)' are
+         the longest labels at 23 characters, a '$100.00' figure is the widest number, and
+         'Premium' is the widest header over its own column. No graded cell's text spills
+         (§1.0-R3(q)); the two memo lines and the title do, into empty neighbours. */
+      const colW={}; colW[c0]=190; colW[c0+1]=82; colW[c0+2]=82; colW[c0+3]=82; colW[c0+4]=88;
+      return {ROWS:20, cells, active:{r:r1,c:c0+3}, sel:null, colW:colW};
     },
     checks(S){
-      const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<0.05); };
-      const fRef=(k,fn)=>{ const c=S.cells[k]; return !!(c&&c.formula&&String(c.formula).toUpperCase().includes(fn)); };
+      const o=this._o;
+      const cel=k=>S.cells[k]||{};
+      /* §1.0-R3(p) END-STATE GRADING: nothing here reads formula TEXT. The shipped drill asked
+         for the literal string 'MIN' and the literal string 'MAX', which locked out SMALL/LARGE,
+         a block-wide MIN over both range columns, and a reference chain — CAMPAIGN §1 bug class
+         #3/#8/#12, the most expensive defect this campaign ships. What is required instead is a
+         LIVE cell: doctrine §2.2's sanctioned exception, and MODELING_STANDARDS §7's "a cell
+         that REFERENCES rather than repeats is legitimately gradeable as end state". A summary
+         exhibit whose numbers are typed goes stale the first time an analysis moves, which is
+         the failure this whole page exists to prevent. Tolerances are half a display step, so
+         the number the player can SEE is always inside them: dollars print at two decimals
+         (0.005) and the premium at one decimal of a percent (5e-4). */
+      const live=(k,exp,tol)=>{ const c=cel(k); return !!(c.formula && typeof c.value==='number' && Math.abs(c.value-exp)<=(tol||0.005)); };
+      const midOk=o.m.every(x=>live(x.midK,x.mid));
+      const premOk=o.m.every(x=>live(x.premK,x.prem,5e-4));
+      const floorOk=live(o.floorK,o.floor);
+      const ceilOk=live(o.ceilK,o.ceil);
+      const spreadOk=live(o.spreadK,o.spread);
+      /* every route that draws the four edges clears — Alt H B S (the §1.0-R2(m) canon), the
+         thick box Alt H B T, a per-edge walk B P / B O / B L / B R, and Alt H B A, whose `ball`
+         carries the perimeter as well. §1.0-R3(p) widening: "the reference range" is read
+         honestly either with its row labels or as the value column alone, and either down
+         through the spread line or around the floor/ceiling pair the phrase names. */
+      const boxed=(r1,c1,r2,c2)=>{
+        for(let c=c1;c<=c2;c++){ const t=cel(colLetter(c)+r1), b=cel(colLetter(c)+r2);
+          if(!(t.bt||t.ball)||!(b.bb||b.ball)) return false; }
+        for(let r=r1;r<=r2;r++){ const l=cel(colLetter(c1)+r), rr=cel(colLetter(c2)+r);
+          if(!(l.bl||l.ball)||!(rr.br||rr.ball)) return false; }
+        return true; };
+      const boxOk=boxed(o.fR,o.c0,o.sR,o.loC) || boxed(o.fR,o.loC,o.sR,o.loC)
+               || boxed(o.fR,o.c0,o.cR,o.loC) || boxed(o.fR,o.loC,o.cR,o.loC);
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision) — the whole
+         Premium column descended from ONE entry. Read off the r424 S.fillOps latch UNIONED with
+         the r425 S.pasteLog latch (the MECHANIC is recorded, never geometry inferred), so
+         Ctrl+D, the ribbon's Alt H F I D and a tiled paste of the head cell all earn it, and
+         six hand-typed formulas earn nothing. The values ride in the predicate because a fill
+         over an unanchored reference walks the price cell down the page and lands six wrong
+         numbers — the anchor is what makes the one-pass route legal, and that IS the star. */
+      const covered=(row,col)=>(S.fillOps||[]).some(f=>row>=f.r1&&row<=f.r2&&col>=f.c1&&col<=f.c2)
+                            || (S.pasteLog||[]).some(p=>row>=p.r0&&row<=p.r0+p.h-1&&col>=p.c0&&col<=p.c0+p.w-1);
+      const byHand=o.m.filter(x=>!covered(x.row,o.premC)).length;
+      /* §1.0-R3(n): labels are INSTRUCTIONS — the clause after the em-dash says WHAT or WHERE,
+         never why. §1.0(b): no cell address, no direction, no formula shape. */
       return [
-        {label:'run live midpoints for all three methods \u2014 fill D3:D5', ok: [0,1,2].every(i=>near('D'+(3+i),this._mids[i]))},
-        {label:'floor the range at B7 \u2014 a live MIN across the lows', ok: near('B7',this._exp.lo)&&fRef('B7','MIN')},
-        {label:'cap the range at B8 \u2014 a live MAX across the highs', ok: near('B8',this._exp.hi)&&fRef('B8','MAX')},
-        {label:'tie the width at B9 \u2014 ceiling less floor', ok: near('B9',this._exp.w)},
+        {label:'Build the Mid column — the midpoint of every methodology’s range', ok: midOk},
+        {label:'Build the Premium column — every midpoint against the unaffected price', ok: premOk},
+        {label:'Build the range floor — the lowest low across the six methodologies', ok: floorOk},
+        {label:'Build the range ceiling — the highest high across the six', ok: ceilOk},
+        {label:'Build the spread — the range ceiling less the range floor', ok: spreadOk},
+        {label:'Add an outside border around the reference range', ok: boxOk},
+        {label:'Fill the Premium column — one anchored formula, no midpoint retyped', ok: premOk && byHand<=1, bonus:true},
       ];
     }
   },
