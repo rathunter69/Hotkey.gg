@@ -10190,64 +10190,296 @@ const CHALLENGES = {
     }
   },
   lbo:{
-    name:'LBO', label:'Run the LBO math', par:54, parKeys:56,
-    aha:'Entry, leverage, exit — four lines of math and the IRR falls out.',
-    prompt:'Entry to exit, the whole chain: build enterprise value at entry, lever it, check the equity, mark the exit at the same multiple, compute MOIC (multiple of invested capital — cash out over cash in) — then annualize it over the hold for the IRR. Seven formulas; the multiple stays anchored so entry and exit agree.',
-    req:'<em>B6</em> entry EV <em>=B2*$B$4</em> \u00b7 <em>B7</em> debt <em>=B6*B5</em> \u00b7 <em>B8</em> entry equity <em>=B6-B7</em> \u00b7 <em>B9</em> exit EV <em>=B3*$B$4</em> \u00b7 <em>B11</em> exit equity <em>=B9-B10</em> \u00b7 <em>B12</em> MOIC <em>=B11/B8</em> \u00b7 <em>B14</em> IRR <em>=B12^(1/B13)-1</em>',
-    guide:[
-      'entry EV at B6 \u00b7 <kbd>=B2*$B$4</kbd> \u2014 EBITDA \u00d7 the anchored multiple',
-      'debt at B7 \u00b7 <kbd>=B6*B5</kbd> \u00b7 entry equity at B8 \u00b7 <kbd>=B6-B7</kbd> \u2014 the check you write',
-      'exit EV at B9 \u00b7 <kbd>=B3*$B$4</kbd> \u2014 same multiple, F4 keeps it honest',
-      'exit equity at B11 \u00b7 <kbd>=B9-B10</kbd> \u00b7 MOIC at B12 \u00b7 <kbd>=B11/B8</kbd>',
-      'IRR at B14 \u00b7 <kbd>=B12^(1/B13)-1</kbd> \u2014 MOIC compounded over the hold; the ^ key earns its place',
-    ],
-    targets:['B6','B8','B9','B11','B12','B14'],
-    demo(){ return [
-      {sel:'B6', keys:[...T('=B2*$B$4'), Kb.enter]},
-      {sel:'B7', keys:[...T('=B6*B5'), Kb.enter]},
-      {sel:'B8', keys:[...T('=B6-B7'), Kb.enter]},
-      {sel:'B9', keys:[...T('=B3*$B$4'), Kb.enter]},
-      {sel:'B11', keys:[...T('=B9-B10'), Kb.enter]},
-      {sel:'B12', keys:[...T('=B11/B8'), Kb.enter]},
-      {sel:'B14', keys:[...T('=B12^(1/B13)-1'), Kb.enter]},
+    /* r444 H6b (DEPTH_PASS §4.70, "Run the LBO math") — the depth-pass rework, built to
+       §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page, and to dev/MODELING_STANDARDS.md,
+       which is BINDING on Models II (WORKFLOW §9, campaign §5). Where they conflict the newer
+       law wins; §4.70 is a PRE-PLAYTEST page, so its ☆ line is dead on arrival under §1.0-R4(u)
+       and is re-cut here without escalation.
+
+       WAS: 6 checks on a ROWS:14 board (the copied-default tell — the §1.3 defect the campaign
+       named, 13 of the real 20-row sheet), a single column B of nine stacked cells, no ☆, no
+       saveClose, and a checklist whose verbs ("run", "back into", "mark", "compound") are not on
+       the §1.7 closed list at all. The prompt named the mechanism twice ("Seven formulas; the
+       multiple stays anchored") — §1.0(b) puts the route in guide/req, never in the copy.
+
+       ── ☆-HEADROOM DIAGNOSTIC (CAMPAIGN §2, BOTH PARTS), run BEFORE the board was designed,
+          measured through the live engine, every selection and navigation KEYED.
+         ON THE SHIPPED (old) BOARD — PART 1: fastest legal 63 keys (seven typed formulas, no
+           repetition anywhere) against 74 for the slowest legal one (every ref pointed with
+           arrows instead of typed). 1.17× — BELOW the 1.3× warning line that retired `grpfold`.
+           PART 2, the half that decides: strip chord-vs-ribbon (§1.0(c) forces those to clear —
+           and on a pure formula-entry board that class is EMPTY, the r439 `wrapfix` finding) and
+           strip formatting (§1.0(d) forbids it). What survives is pointing-vs-typing, which is
+           `bridge`'s lesson, not this one. **The old board could not carry a legal ☆ at all** —
+           one column of nine cells has no block to fill, no anchor that pays, no second pass to
+           compress. That is why the page proposes a formatting bonus, and why the fix had to be
+           at the BOARD (campaign §2's `series` rule: fix the board, never the predicate).
+         ON THE REBUILT BOARD — PART 1: fastest legal 68 keys against 165 for the obvious slow
+           route (every case typed on its own, nothing swept). **2.43×** — above `cases` (2.68×)
+           and `balance` (2.46×), far above the 1.3× line that retired `grpfold`. PART 2: of the
+           97 keys of spread, ZERO are chord-vs-ribbon (Ctrl+R and Alt H F I R hit the same latch,
+           so a fill is a fill however it is reached) and ZERO are formatting (the two dress beats
+           are core and cost the same either way — measured at 83 keys through the full ribbon
+           against 68 through the chords, and both clear). All 97 are SWEEP-versus-RETYPE across
+           the case columns — the "anchors set so ONE formula fills a whole block" family
+           §1.0-R4(u) names. Legal headroom, in the drill's own subject. Each half measured
+           SEPARATELY per the r438 `series` rule: the enterprise-value line 4 keys swept vs 27
+           typed · the equity line 4 vs 36 · the two returns lines together 4 vs 52. No half is
+           negative, and the cheapest half still pays 6.75× its own cost.
+         DISTINCTNESS (CAMPAIGN §3 discriminator, asked before anything was built): the nearest
+         neighbours are `retbridge` (Models I — attributing the RETURN to its drivers, which
+         presupposes the MOIC this board produces), `sourcesuses` (Models I — sizing the equity
+         cheque from a funding table, not from an equity bridge) and `lbobuild` (Full Builds —
+         the whole paper LBO, and the owner of the =IRR()-over-the-flows prove-out, deliberately
+         NOT built here). Fluency in any of them produces a first attempt at "what does an extra
+         two years of hold do to the IRR" that is not even the right shape: none of them lays the
+         same bridge out ACROSS exit years, which is the only place the MOIC-up/IRR-down fact is
+         visible. KEEP.
+
+       ── UNTRIGGERABLE BEATS FOUND ON THE SHIPPED BOARD (the CAMPAIGN §1 class — found by
+       WALKING routes, not by reading predicates). Both walked as ALTS so they cannot come back:
+         (1) THE IRR BEAT READ FORMULA TEXT — `f.includes('B12')&&f.includes('B13')`. A player
+             who wrote the IRR straight off the equity values, `=(B11/B8)^(1/B13)-1`, put the
+             right percentage on the board and watched the line stay dark with nothing to fix.
+             Same class as campaign bugs #3/#4/#8/#9 (grading a range or a name out of text).
+             PROVED, not argued: the shipped predicate lifted verbatim and run on the three
+             formula strings at the SAME value (0.268734) returns true · FALSE · FALSE.
+         (2) SAME BEAT, SECOND ROUTE — a typed hold in the exponent, `=B12^(1/5)-1`, on a seed
+             whose hold IS 5. A hardcode inside a formula is a model sin (MODELING_STANDARDS §1)
+             but it is not a WRONG ANSWER, and §1.0-R3(p) grades the end state: the board reads
+             the same number. It stayed dark too — the third of the three above.
+         Both routes are now permanent entries in dev/verify-lbo.js §B (routes 5 and 6) and route
+         6 is ALT 2's shape in dev/e2e-alt-paths.js, so the regression cannot come back silently.
+       Both die here: no check on this board reads a range, a function name, an anchor or a cell
+       reference out of formula text. Every core grades the VALUE standing in every case column,
+       plus — where the label's verb is "Build" (§1.7 glosses it "enter a live formula") — that
+       the cell is a live formula rather than a typed answer. That liveness requirement is the
+       doctrine §2.2 sanctioned exception ("don't hardcode the answer" IS the lesson on a model
+       page) and is the `balance`/`foot`/`versionup` precedent, not a new demand.
+
+       THE BOARD (§1.0-R4(t) reality test · §3.1 audience map: chapter 7 is B, "LBO returns"
+       named on the map itself). One page from a sponsor's returns file: the enterprise-to-equity
+       bridge laid out ACROSS the entry and three exit years, with the returns block under it.
+       A real associate builds exactly this the week before an IC — "what do we make if we sell
+       in three, four or five years" — and the layout is the reason the answer is legible: MOIC
+       climbs left to right while the IRR falls, on the same page, in the same eye movement.
+       MODELING_STANDARDS conventions carried (stated in full in the payload §8):
+         · colour = provenance (§1): blue = typed assumption (the entry multiple, the holds),
+           GREEN = fed from another tab (EBITDA from the operating model, net debt and preferred
+           from the debt schedule — the colour the standard says the catalog under-uses),
+           black = computed here. Every player-built cell lands black by construction.
+         · sign convention (§2), stated on the board's own basis memo: deductions carry their
+           sign, so the bridge is a SUM down the column and never a subtraction chain.
+         · the enterprise → equity bridge (§4): EV − net debt − preferred = equity value.
+         · returns (§4): MOIC = exit equity / entry equity · IRR = MOIC^(1/years) − 1, the
+           single-cash-flow compound form, which is the same shape `cagr` teaches.
+         · NO interest, no sweep and no circularity on this page — the fragment is the RETURNS
+           bridge (§7: a Models board is a COMPONENT), so §5's beginning-balance ruling has
+           nothing to bind here; net debt at exit arrives already swept, said on the memo line.
+
+       STRUCTURAL DEVIATIONS from the §4.70 page, declared here per §0 (and in the payload §8):
+       (1) ☆ RE-CUT (binding, §1.0-R4(u)). The page's bonus is "Percent-format the IRR to one
+           decimal and bold it". Dead three times over: it is a FORMATTING task, which §1.0(d)
+           forbids outright; the board already ships the IRR row percent/1-decimal, so it would
+           fire on an empty selection; and it would fall out of any dress beat, failing
+           §1.0-R2(i)'s skippable-decision test. The re-cut ☆ is the fill — measured above,
+           isolated in the ☆ note in checks(), and proved skippable by the negative-control alt.
+       (2) THE BOARD IS REBUILT, NOT RE-LABELLED. The page says "language pass + bonus", which
+           assumes the artifact stands. It does not: one column of nine cells fails §1.3 (ROWS 14,
+           the campaign's named defect), carries no legal ☆ (diagnostic above), and under
+           §1.0-R4(t)'s reality test is a worked example rather than a file — no case columns, so
+           the one thing a returns page exists to show cannot appear on it. §1.0-R4(t) names this
+           the ONE class of board change a build agent makes without escalating.
+       (3) TWO DRESS BEATS, EACH FOLLOWING ITS PARENT (§1.0(a) format-as-you-go). The equity line
+           is dressed by the beat after the beat that builds it; the returns lines by the beat
+           after theirs. Both ops are top of Wolf's §1.0-R3(o) frequency list (top border, bold).
+       (4) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an existing labelled
+           cell in a labelled row — no insert slot, no empty paste target — so the guided ring
+           expresses all six core beats on its own.
+       (5) NO HELPER STACK (§1.0(f)/§1.0-R2(l)): nothing on this page is converted, scaled or
+           sign-flipped, so there is no helper to label. Inputs carry the colour convention
+           instead, which is the Models-board form of the same rule.
+       (6) §1.3 DENSITY: 15 of 20 rows carry content at the win state (75%), against 13 of 20
+           (65%) before on a board that DECLARED 14. Three of the five empty rows are moats and
+           load-bearing — between the header and the bridge, between the bridge and the returns
+           block, and before the memo — and a bridge whose blocks run together is unreadable.
+
+       GRADING (§1.0(c) FREEDOM + §1.0-R3(p) END STATE), routes WALKED not reasoned about — the
+       walked list is in dev/AUDIT.md r444. The enterprise value accepts the multiple anchored or
+       typed per case; the equity value accepts =SUM over the three lines, an addition chain, or
+       autosum by either of its routes; MOIC accepts either denominator route; the IRR accepts the
+       MOIC referenced, the bridge re-derived inside it, or the hold typed into the exponent. The
+       top border accepts Alt H B P, B D, B S, B T and B A (the last stores `ball`, which draws
+       the same top line and so must clear — §1.0-R3(p)); bold accepts Ctrl+B and Alt H 1. */
+    name:'LBO', label:'Run the LBO math', par:71, parKeys:68, saveClose:true,   /* r444 §4.70 depth pass: par re-swept from scratch (was par 54 / parKeys 56 on the one-column board with no save closer). dev/e2e-par-sweep.js lbo, 5-seed median 68 keys including the engine-appended Ctrl+S — FLAT across seeds (range 68–68), because the randomization moves the figures, the fiscal year and the anchor column but never the beat count or the geometry (the r439 `wrapfix` rule, deliberate). par 71 ≈ 1.04 s/key, the house band. The count grew with the board: three case columns instead of none, a five-line bridge instead of a stack, two dress motions and the save closer. That lands lbo between `waterfall` (64) and `debtsched` (73) in the chapter band (intsched 29 · schedule 35 · liqbridge 40 · revolver 41 · covtable 45 · wk13 45 · cascade 94). Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 1:47 · pro 1:22 · legendary 1:11. */
+    aha:'hold it longer and the MOIC grows while the IRR falls — an IRR is a MOIC spread over the years.',
+    /* §1.5: the aha's MOMENT is the IRR line landing across the three case columns — MOIC rising
+       left to right and the IRR falling on the row beneath it, in one eye movement. That fact is
+       invisible on a single-exit board, which is the strongest argument for the rebuild. */
+    prompt:'The IC reads Thursday and the partner wants the returns bridge in front of it — the same entry multiple at exit, three exit years, no multiple expansion in the story. EBITDA, net debt and the preferred are already fed in from the operating model and the debt schedule. Build the enterprise value and the equity value across the page, then the MOIC (multiple of invested capital — cash out over cash in) and the IRR for every exit case. Deductions on this page carry their sign.',
+    req(){ const o=this._o; return 'build <em>'+o.CB+o.rEV+'</em> → <em>='+o.CB+o.rEB+'*$'+o.CB+'$'+o.rMU+'</em> · <em>'+o.CB+o.rEQ+'</em> → <em>=SUM('+o.CB+o.rEV+':'+o.CB+o.rPF+')</em> · each line <em>ctrl+r</em> across · <em>ctrl+b</em> + <em>alt h b p</em> on the equity line · <em>'+o.CC+o.rMO+'</em> → <em>='+o.CC+o.rEQ+'/$'+o.CB+'$'+o.rEQ+'</em> · <em>'+o.CC+o.rIR+'</em> → <em>='+o.CC+o.rMO+'^(1/'+o.CC+o.rHD+')-1</em> · <em>ctrl+r</em> · <em>ctrl+b</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'on '+o.CB+o.rEV+': <kbd>=</kbd>'+o.CB+o.rEB+'<kbd>*</kbd>'+o.CB+o.rMU+' then <kbd>F4</kbd> to lock the multiple (typing the <kbd>$</kbd> signs is the same thing) <kbd>↵</kbd> — the exit cases are marked at the ENTRY multiple, so that one cell has to hold still while the row moves. Then take it across: select '+o.CB+o.rEV+':'+o.CE+o.rEV+' and <kbd>ctrl</kbd>+<kbd>r</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> is the same fill). Typing each case lands it too, it only costs the keys',
+      'the bridge is three lines and the two deductions are already negative, so it adds: <kbd>=SUM(</kbd>'+o.CB+o.rEV+':'+o.CB+o.rPF+'<kbd>)</kbd> on '+o.CB+o.rEQ+', or select '+o.CB+o.rEV+':'+o.CB+o.rEQ+' through the empty cell and press <kbd>alt</kbd>+<kbd>=</kbd>. An addition chain totals the same. Filled across, one pass',
+      'dress it now rather than at the end: select '+o.CA+o.rEQ+':'+o.CE+o.rEQ+' and <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> rules above it (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> boxes the row, <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>d</kbd> tops and bottoms it, <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> borders every edge — all of them draw that top line, all of them clear it)',
+      'on '+o.CC+o.rMO+': <kbd>=</kbd>'+o.CC+o.rEQ+'<kbd>/</kbd>'+o.CB+o.rEQ+' <kbd>F4</kbd> <kbd>↵</kbd> — every case divides by the SAME entry cheque, so that one is anchored and the numerator is not',
+      'on '+o.CC+o.rIR+': <kbd>=</kbd>'+o.CC+o.rMO+'<kbd>^(1/</kbd>'+o.CC+o.rHD+'<kbd>)-1</kbd> <kbd>↵</kbd> — the compound form, the same shape <em>cagr</em> builds. Rebuilding the MOIC inside it grades the same, and so does typing the hold into the exponent — it grades the number on the board',
+      'select '+o.CC+o.rMO+':'+o.CE+o.rIR+' and <kbd>ctrl</kbd>+<kbd>b</kbd> — the returns are the two lines anyone opening this page reads first',
+      '☆ the discovery: each of those four lines written ONCE and taken across the cases in a single pass — the returns block is one selection covering BOTH rows. <kbd>ctrl</kbd>+<kbd>r</kbd>, the ribbon fill, or a copy and one paste over the destination cells all count. Typing the ten repeat cells clears every core beat and forfeits it',
     ]; },
+    /* rings: ① the enterprise-value line · ② the equity line · ③ the equity line + its label ·
+       ④ the MOIC line · ⑤ the IRR line · ⑥ the returns block · ☆ never ringed (§2.2) */
+    targets(){ const o=this._o; return [
+      o.CB+o.rEV+':'+o.CE+o.rEV, o.CB+o.rEQ+':'+o.CE+o.rEQ, o.CA+o.rEQ+':'+o.CE+o.rEQ,
+      o.CC+o.rMO+':'+o.CE+o.rMO, o.CC+o.rIR+':'+o.CE+o.rIR, o.CC+o.rMO+':'+o.CE+o.rIR, null,
+    ]; },
+    /* the demo BUILDS its own selections with Shift+arrow rather than being handed them by
+       setDemoSel, so parKeys measures what a player really pays for the range grabs instead of
+       eliding them (the r438 `series` rule). setDemoSel only ever parks the cursor on the anchor
+       cell of the next beat. Ctrl+Shift+→ is NOT the grab here and the guide does not teach it:
+       the cells to the right are empty until the fill lands, so the ride would run to column J. */
+    demo(){ const o=this._o; const R={key:'ArrowRight',shift:true}, D2={key:'ArrowDown',shift:true}; return [
+      {sel:o.CB+o.rEV, keys:[...T('='+o.CB+o.rEB+'*$'+o.CB+'$'+o.rMU), Kb.enter]},
+      /* the ☆, one of four — a single pass right across the cases */
+      {sel:o.CB+o.rEV, keys:[R, R, R, Kb.fillR]},
+      {sel:o.CB+o.rEQ, keys:[...T('=SUM('+o.CB+o.rEV+':'+o.CB+o.rPF+')'), Kb.enter]},
+      /* two of four */
+      {sel:o.CB+o.rEQ, keys:[R, R, R, Kb.fillR]},
+      /* §1.0(a): the equity line is dressed the moment it exists, not at the end of the run */
+      {sel:o.CB+o.rEQ, keys:[R, R, R, Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+      {sel:o.CC+o.rMO, keys:[...T('='+o.CC+o.rEQ+'/$'+o.CB+'$'+o.rEQ), Kb.enter]},
+      {sel:o.CC+o.rIR, keys:[...T('='+o.CC+o.rMO+'^(1/'+o.CC+o.rHD+')-1'), Kb.enter]},
+      /* three and four of four — ONE fill covers both returns lines */
+      {sel:o.CC+o.rMO, keys:[R, R, D2, Kb.fillR]},
+      {sel:o.CC+o.rMO, keys:[R, R, D2, Kb.bold]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 LBO returns ($mm)',txt:true,bold:true};
-      const e0=rnd(15,40)*10, e1=Math.round(e0*(1+rnd(15,45)/100)), mult=rnd(70,110)/10, lev=rnd(45,65)/100;
-      const rows=[[2,'Entry EBITDA',e0,'comma',0],[3,'Exit EBITDA',e1,'comma',0],[4,'EV / EBITDA',mult,null,1],[5,'Debt % of EV',lev,'percent',0]];
-      rows.forEach(([r,n,v,f,d])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
-        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:f,decimals:d}; });
-      const entryEV=e0*mult, debt=entryEV*lev, entryEq=entryEV-debt, exitEV=e1*mult;
-      const exitDebt=Math.round(debt*rnd(40,75)/100);
-      const hold=rnd(4,6);
-      cells['A6']={...blankCell(),value:'Entry EV',txt:true};        cells['B6']={...blankCell(),fmtStyle:'comma',decimals:0};
-      cells['A7']={...blankCell(),value:'Debt at entry',txt:true};   cells['B7']={...blankCell(),fmtStyle:'comma',decimals:0};
-      cells['A8']={...blankCell(),value:'Entry equity',txt:true,bold:true}; cells['B8']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      cells['A9']={...blankCell(),value:'Exit EV',txt:true};         cells['B9']={...blankCell(),fmtStyle:'comma',decimals:0};
-      cells['A10']={...blankCell(),value:'Debt at exit',txt:true};   cells['B10']={...blankCell(),value:exitDebt,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['A11']={...blankCell(),value:'Exit equity',txt:true,bold:true}; cells['B11']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      cells['A12']={...blankCell(),value:'MOIC',txt:true,bold:true}; cells['B12']={...blankCell(),decimals:2,bold:true};
-      cells['A13']={...blankCell(),value:'Hold period (yrs)',txt:true}; cells['B13']={...blankCell(),value:hold,fontColor:'blue',decimals:0};
-      cells['A14']={...blankCell(),value:'IRR',txt:true,bold:true};  cells['B14']={...blankCell(),fmtStyle:'percent',decimals:1,bold:true};
-      const moic=(exitEV-exitDebt)/entryEq;
-      this._exp={entryEV:entryEV, debt:debt, entryEq:entryEq, exitEV:exitEV, exitEq:exitEV-exitDebt, moic:moic, irr:Math.pow(moic,1/hold)-1};
-      return {ROWS:14, cells, active:{r:6,c:2}, sel:null, colW:{1:140,2:92}};
+      /* §1.2 randomization — three independent axes. (a) SITE: the board is a full-grid artifact
+         (15 of 20 rows), so per §1.2 the site axis is CORNER JITTER — the whole page anchors at
+         column A or column B. (b) CONTENT: the codename and the entry fiscal year, which drives
+         all four column headers. (c) VALUES: EBITDA, the entry multiple, the growth the exit
+         cases are marked off, leverage, the preferred and the sweep pace, every one through
+         rnd(). Geometry (five bridge lines, three exit cases, holds 3/4/5) is CONSTANT across
+         seeds so the keystroke count never moves with the draw — the r439 `wrapfix` rule. */
+      const c0=rnd(0,1)?1:2;                            // (a) corner jitter: anchor column A or B
+      const CA=colLetter(c0), CB=colLetter(c0+1), CC=colLetter(c0+2), CD=colLetter(c0+3), CE=colLetter(c0+4);
+      const cols=[CC,CD,CE], allCols=[CB,CC,CD,CE];
+      const y0=rnd(2024,2028);                          // (b) content
+      const HR=4, rEB=5, rMU=6, rEV=7, rND=8, rPF=9, rEQ=10, rRT=12, rHD=13, rMO=14, rIR=15, rLV=17, rMM=18;
+      const holds=[3,4,5];
+      const e0=rnd(30,60)*10;                           // (c) LTM EBITDA at entry, $mm
+      const mult=rnd(80,120)/10;                        // entry multiple, x — e0 is a multiple of 10 so e0*mult is exact
+      const g=rnd(6,12)/100;                            // EBITDA growth over the hold
+      const lev=rnd(45,60)/100;                         // net debt as a share of entry EV
+      const sweep=rnd(6,12)/100;                        // net debt paid down per year of hold
+      const accr=rnd(8,12)/100;                         // the preferred accretes rather than paying cash
+      cells[CA+'1']={...blankCell(),value:codename()+' — LBO returns bridge ($mm)',txt:true,bold:true};
+      /* MODELING_STANDARDS §2 is explicit that the sign convention must be STATED on the board,
+         and §1 that colour is provenance — so the basis memo says both out loud. */
+      cells[CA+'2']={...blankCell(),value:'Source: deal model v4 · $ in millions · deductions carry their sign · green = fed from another tab',txt:true,it:true,fontColor:'gray'};
+      cells[CA+HR]={...blankCell(),value:'Item',txt:true,bold:true,bb:true};
+      cells[CB+HR]={...blankCell(),value:'Entry FY'+String(y0).slice(2),txt:true,bold:true,align:'r',bb:true};
+      cols.forEach((c,i)=>cells[c+HR]={...blankCell(),value:'Exit FY'+String(y0+holds[i]).slice(2),txt:true,bold:true,align:'r',bb:true});
+      /* the bridge, MODELING_STANDARDS §4: EV − net debt − preferred = equity value. Every
+         deduction is seeded NEGATIVE (§2), which is what makes the equity line a clean SUM. */
+      cells[CA+rEB]={...blankCell(),value:'EBITDA',txt:true};
+      cells[CA+rMU]={...blankCell(),value:'Entry multiple (x)',txt:true};
+      cells[CA+rEV]={...blankCell(),value:'Enterprise value',txt:true};
+      cells[CA+rND]={...blankCell(),value:'Less: net debt',txt:true};
+      cells[CA+rPF]={...blankCell(),value:'Less: preferred equity',txt:true};
+      cells[CA+rEQ]={...blankCell(),value:'Equity value',txt:true};
+      cells[CA+rRT]={...blankCell(),value:'Returns to the sponsor',txt:true,bold:true};
+      cells[CA+rHD]={...blankCell(),value:'Hold period (yrs)',txt:true};
+      cells[CA+rMO]={...blankCell(),value:'MOIC (x)',txt:true};
+      cells[CA+rIR]={...blankCell(),value:'IRR',txt:true};
+      cells[CA+rLV]={...blankCell(),value:'Entry leverage (x)',txt:true};
+      cells[CA+rMM]={...blankCell(),value:'Memo — exit marked at the entry multiple, no expansion assumed; net debt at exit is after the cash sweep',txt:true,it:true,fontColor:'gray'};
+      /* blue = a typed assumption · green = fed from another tab · black = computed here (§1) */
+      cells[CB+rMU]={...blankCell(),value:mult,fontColor:'blue',fmtStyle:'mult',decimals:1};
+      const ebitda={}, netDebt={}, pref={}, ev={}, eq={}, moic={}, irr={};
+      const evEntry=e0*mult, nd0=-Math.round(evEntry*lev/10)*10, pf0=-rnd(6,16)*10;
+      ebitda[CB]=e0; netDebt[CB]=nd0; pref[CB]=pf0;
+      cols.forEach((c,i)=>{
+        const t=holds[i];
+        ebitda[c]=Math.round(e0*Math.pow(1+g,t)/10)*10;
+        /* the sweep pays debt down over the hold; floored so a long hold can never turn net debt
+           into net CASH, which would make the "Less:" label a lie */
+        netDebt[c]=-Math.max(Math.round(Math.abs(nd0)*0.15/10)*10, Math.abs(nd0)-Math.round(Math.abs(nd0)*sweep*t/10)*10);
+        pref[c]=-Math.round(Math.abs(pf0)*Math.pow(1+accr,t));
+      });
+      allCols.forEach(c=>{
+        cells[c+rEB]={...blankCell(),value:ebitda[c],fontColor:'green',fmtStyle:'comma',decimals:0};
+        cells[c+rND]={...blankCell(),value:netDebt[c],fontColor:'green',fmtStyle:'comma',decimals:0};
+        cells[c+rPF]={...blankCell(),value:pref[c],fontColor:'green',fmtStyle:'comma',decimals:0};
+        cells[c+rEV]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[c+rEQ]={...blankCell(),fmtStyle:'comma',decimals:0};
+        ev[c]=ebitda[c]*mult; eq[c]=ev[c]+netDebt[c]+pref[c];
+      });
+      cols.forEach((c,i)=>{
+        cells[c+rHD]={...blankCell(),value:holds[i],fontColor:'blue',decimals:0,align:'r'};
+        cells[c+rMO]={...blankCell(),fmtStyle:'mult',decimals:1};
+        cells[c+rIR]={...blankCell(),fmtStyle:'percent',decimals:1};
+        moic[c]=eq[c]/eq[CB]; irr[c]=Math.pow(moic[c],1/holds[i])-1;
+      });
+      /* the leverage memo ships BUILT (a live formula off two seeded cells) — a returns page
+         carries its entry credit stat, and it is the board's own worked example of black-for-
+         computed. It reads correctly at load because both its inputs are seeded. */
+      cells[CB+rLV]={...blankCell(),formula:'=-'+CB+rND+'/'+CB+rEB,value:-nd0/e0,fmtStyle:'mult',decimals:1};
+      this._o={CA:CA,CB:CB,CC:CC,CD:CD,CE:CE,c0:c0,cols:cols,allCols:allCols,y0:y0,holds:holds,
+               rEB:rEB,rMU:rMU,rEV:rEV,rND:rND,rPF:rPF,rEQ:rEQ,rHD:rHD,rMO:rMO,rIR:rIR,
+               exp:{ev:ev,eq:eq,moic:moic,irr:irr}};
+      const colW={}; colW[c0]=190; colW[c0+1]=96; colW[c0+2]=96; colW[c0+3]=96; colW[c0+4]=96;
+      return {ROWS:20, cells, active:{r:rEV,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(0.5,Math.abs(exp)*1e-3); };
-      const e=this._exp;
+      const o=this._o, E=o.exp;
+      /* every predicate reads the END STATE — the number standing in each case column, plus
+         liveness where the label's verb is Build. Nothing reads formula text (§1.0-R3(p)). */
+      const live=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'); };
+      const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&typeof c.value==='number'&&Math.abs(c.value-exp)<Math.max(1e-4,Math.abs(exp)*2e-3)); };
+      const built=(r,list,exp)=>list.every(c=>live(c+r)&&near(c+r,exp[c]));
+      const evOk=built(o.rEV,o.allCols,E.ev);
+      const eqOk=built(o.rEQ,o.allCols,E.eq);
+      const moOk=built(o.rMO,o.cols,E.moic);
+      const irOk=built(o.rIR,o.cols,E.irr);
+      /* §1.0-R3(p): Alt H B A stores `ball`, not `bt` — it draws the same top line on the row,
+         so it has to clear. Alt H B P / B D / B S / B T all store `bt`. */
+      const eqDress=o.allCols.every(c=>{ const x=S.cells[c+o.rEQ]; return !!(x&&x.bold&&(x.bt||x.ball)); });
+      const rtBold=o.cols.every(c=>{ const a=S.cells[c+o.rMO], b=S.cells[c+o.rIR]; return !!(a&&a.bold&&b&&b.bold); });
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real decision · §1.0-R4(u) anchoring
+         mastery): each of the four built lines written ONCE and taken across the case columns in
+         a single pass. Read off the r424 S.fillOps and r425 S.pasteLog latches (the MECHANIC,
+         never geometry inferred from the end state). THREE mechanics count and all three were
+         WALKED (dev/verify-lbo.js §B): Ctrl+R, the ribbon fill Alt H F I R, and copy + paste
+         across the destination range — the last one added after the route walk measured it at 62
+         keys, CHEAPER than the fill route it would have been denied against, which is the
+         §1.0-R3(p) "every valid route clears" failure wearing a bonus badge. A right-to-left
+         build filled the other way logs too (the Macabacus profile has Ctrl+Shift+L), so the
+         star is chord-, route- and direction-agnostic.
+         MEASURED, 5 seeds through the live engine, each half ISOLATED per the r438 `series` rule:
+         the enterprise-value line 4 keys swept vs 27 typed (+23) · the equity line 4 vs 36 (+32) ·
+         the returns block, both rows in ONE selection, 4 vs 52 (+48). No half is negative. Whole
+         board: 68 keys on the star route against 165 typing every case = 2.43x.
+         Typing every case clears all six core beats and forfeits only the star (walked as ALT 2,
+         5/5 seeds cores green with the ☆ dark). */
+      const fills=S.fillOps||[], pastes=S.pasteLog||[];
+      const swept=(r,src,d1,d2)=>
+        fills.some(f=>(f.dir==='right'||f.dir==='left')&&f.r1<=r&&f.r2>=r&&f.c1<=Math.min(src,d1)&&f.c2>=Math.max(src,d2)) ||
+        pastes.some(p=>p.r0<=r&&p.r0+p.h-1>=r&&p.c0<=d1&&p.c0+p.w-1>=d2);
+      const starOk = evOk && eqOk && moOk && irOk &&
+        swept(o.rEV,o.c0+1,o.c0+2,o.c0+4) && swept(o.rEQ,o.c0+1,o.c0+2,o.c0+4) &&
+        swept(o.rMO,o.c0+2,o.c0+3,o.c0+4) && swept(o.rIR,o.c0+2,o.c0+3,o.c0+4);
       return [
-        {label:'run entry EV and debt \u2014 EBITDA \u00d7 anchored multiple, levered', ok: near('B6',e.entryEV)&&near('B7',e.debt)},
-        {label:'back into entry equity \u2014 EV less debt (B8)', ok: near('B8',e.entryEq)},
-        {label:'mark exit EV at the SAME multiple', ok: near('B9',e.exitEV)},
-        {label:'back into exit equity after remaining debt', ok: near('B11',e.exitEq)},
-        {label:'run MOIC \u2014 exit equity over entry equity', ok: near('B12',e.moic)},
-        {label:'compound the IRR \u2014 MOIC over the hold, live off B12 and B13 (B14)',
-          ok: (()=>{ const c=S.cells['B14']; if(!c||!c.formula||typeof c.value!=='number') return false;
-            const f=String(c.formula).replace(/\$/g,'').toUpperCase();
-            return f.includes('B12')&&f.includes('B13')&&Math.abs(c.value-e.irr)<Math.max(1e-4,Math.abs(e.irr)*2e-3); })()},
+        {label:'Build the enterprise value line — entry and all three exit cases', ok: evOk},
+        {label:'Build the equity value line — entry and all three exit cases', ok: eqOk},
+        {label:'Bold the equity value line and add a top border above it', ok: eqDress},
+        {label:'Build the MOIC line — every exit case', ok: moOk},
+        {label:'Build the IRR line — every exit case', ok: irOk},
+        {label:'Bold the MOIC and IRR lines', ok: rtBold},
+        {label:'Fill every built line across the cases — one pass each, no case retyped', ok: starOk, bonus:true},   /* §1.7 R1: "Fill" is the closed-list verb; the acceptance clause is route-neutral because a copy-and-paste across the same cells earns it too (see the ☆ note above) */
       ];
     }
   },

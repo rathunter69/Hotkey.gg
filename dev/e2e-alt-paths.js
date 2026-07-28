@@ -1018,15 +1018,43 @@ const ALTS = [
       {sel:'B3', keys:[...T('=-B2*$B$10'),{key:'Enter'}]},
       {sel:'B3:F3', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
     ]` },
-  { key: 'lbo', name: 'the whole chain typed in REVERSE — IRR first, entry EV last (recalc closes it)', moves: `C => [
-      {sel:'B14', keys:[...T('=B12^(1/B13)-1'),{key:'Enter'}]},
-      {sel:'B12', keys:[...T('=B11/B8'),{key:'Enter'}]},
-      {sel:'B11', keys:[...T('=B9-B10'),{key:'Enter'}]},
-      {sel:'B9',  keys:[...T('=B3*$B$4'),{key:'Enter'}]},
-      {sel:'B8',  keys:[...T('=B6-B7'),{key:'Enter'}]},
-      {sel:'B7',  keys:[...T('=B6*B5'),{key:'Enter'}]},
-      {sel:'B6',  keys:[...T('=B2*$B$4'),{key:'Enter'}]},
-    ]` },
+  /* r444 §4.70 depth pass — both entries rebuilt for the case-column board (the single old entry
+     hard-coded B6/B8/B9/B11/B12/B14 off the retired one-column one and is DELETED, not kept).
+     ALT 1 = chord ROUTE: F4 cycling instead of typed $ anchors, autosum's range form for the
+     equity line, every fill through the ribbon (Alt H F I R), bold via Alt H 1 and the rule via
+     Alt H B S — which stores `bt` on a one-row range, the §1.0-R3(p) route the predicate has to
+     accept. The ☆ still latches: a ribbon fill is the same S.fillOps latch as Ctrl+R, which is
+     the point — the star grades the DECISION to fill, never the chord that does it. */
+  { key: 'lbo', name: 'chord ROUTE — F4 anchoring, autosum range form, ribbon fills, Alt H 1 bold, Alt H B S rule (☆ still latches)', moves: `C => { const o=C._o;
+      const R={key:'ArrowRight',shift:true}, DN={key:'ArrowDown',shift:true};
+      const fill=[{key:'Alt'},L('h'),L('f'),L('i'),L('r')];
+      return [
+        {sel:o.CB+o.rEV, keys:[...T('='+o.CB+o.rEB+'*'+o.CB+o.rMU),{key:'F4'},{key:'Enter'}]},
+        {sel:o.CB+o.rEV, keys:[R,R,R,...fill]},
+        {sel:o.CB+o.rEV+':'+o.CB+o.rEQ, keys:[{key:'=',alt:true,code:'Equal'}]},
+        {sel:o.CB+o.rEQ, keys:[R,R,R,...fill]},
+        {sel:o.CA+o.rEQ, keys:[R,R,R,R,{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('s')]},
+        {sel:o.CC+o.rMO, keys:[...T('='+o.CC+o.rEQ+'/'+o.CB+o.rEQ),{key:'F4'},{key:'Enter'}]},
+        {sel:o.CC+o.rIR, keys:[...T('='+o.CC+o.rMO+'^(1/'+o.CC+o.rHD+')-1'),{key:'Enter'}]},
+        {sel:o.CC+o.rMO, keys:[R,R,DN,...fill]},
+        {sel:o.CC+o.rMO, keys:[R,R,DN,{key:'Alt'},L('h'),D(1)]},
+      ]; }` },
+  /* ALT 2 = op ORDER + the MEASURED NEGATIVE CONTROL for the ☆: the returns block is built
+     BEFORE the bridge that feeds it (the values arrive when the bridge lands — §1.0-R3(p) grades
+     the end state, so the order is free), nothing is filled anywhere, both totals are written as
+     addition chains rather than SUMs, and the IRR carries the hold TYPED into its exponent with
+     no reference to the hold row. All six cores clear, the ☆ goes DARK (§1.0(c): the slow route
+     is never penalised, it just costs the keys) — and this is the route that proves the two
+     untriggerable beats recorded in the drill's header comment are dead, since the shipped board
+     graded the IRR by looking for 'B12' and 'B13' inside the formula text. */
+  { key: 'lbo', name: 'NEGATIVE CONTROL — returns built first, no fill anywhere, addition chains, hold typed into the exponent (cores clear, ☆ dark)', moves: `C => { const o=C._o; const st=[];
+      o.cols.forEach((c,j)=>st.push({sel:c+o.rMO, keys:[...T('='+c+o.rEQ+'/$'+o.CB+'$'+o.rEQ),{key:'Enter'}]}));
+      o.cols.forEach((c,j)=>st.push({sel:c+o.rIR, keys:[...T('='+c+o.rMO+'^(1/'+o.holds[j]+')-1'),{key:'Enter'}]}));
+      st.push({sel:o.CC+o.rMO, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowDown',shift:true},{key:'b',ctrl:true}]});
+      o.allCols.forEach(c=>st.push({sel:c+o.rEQ, keys:[...T('='+c+o.rEV+'+'+c+o.rND+'+'+c+o.rPF),{key:'Enter'}]}));
+      st.push({sel:o.CB+o.rEQ, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      o.allCols.forEach(c=>st.push({sel:c+o.rEV, keys:[...T('='+c+o.rEB+'*$'+o.CB+'$'+o.rMU),{key:'Enter'}]}));
+      return st; }` },
   { key: 'liqbridge', name: 'bold FIRST, bridge built bottom-up (cushion to availability), ribbon fills', moves: `C => [
       {sel:'B12:D12', keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:'B14', keys:[...T('=B12-B13'),{key:'Enter'}]},
