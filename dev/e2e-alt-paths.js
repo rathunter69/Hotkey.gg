@@ -673,16 +673,42 @@ const ALTS = [
       {sel:o.lab,      keys:[{key:'Alt'},L('h'),L('a'),L('l')]},
       {sel:o.hdr,      keys:[{key:'Alt'},L('h'),L('a'),L('c')]},
     ]; }` },
-  { key: 'revolver', name: 'MAX-outside nest, prove-outs bottom-up, border before bold via ribbon', moves: `C => [
-      {sel:'B5', keys:[...T('=MAX(0,MIN(B3,B2-B4))'),{key:'Enter'}]},
-      {sel:'B5:E5', keys:[{key:'r',ctrl:true}]},
-      {sel:'B7', keys:[...T('=B2-B5'),{key:'Enter'}]},
-      {sel:'B7:E7', keys:[{key:'r',ctrl:true}]},
-      {sel:'B6', keys:[...T('=B3-B5'),{key:'Enter'}]},
-      {sel:'B6:E6', keys:[{key:'r',ctrl:true}]},
-      {sel:'B6:E6', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:'B6:E6', keys:[{key:'Alt'},L('h'),D(1)]},
-    ]` },
+  /* r446 (DEPTH_PASS §4.71 depth pass): BOTH entries rebuilt for the corkscrew board. The single
+     pre-r446 entry ('MAX-outside nest, prove-outs bottom-up, border before bold via ribbon') is
+     DELETED — it drove the retired 7-row board by hard-coded B2:E7 geometry, and its own dress
+     leg (alt h b p after alt h 1) is now covered by ALT 1. Do not resurrect it on merge.
+     ALT 1 = op-ORDER alt (☆ forfeited, all six cores clear — §1.0(c));
+     ALT 2 = chord-ROUTE alt, and it deliberately walks the two routes that were UNTRIGGERABLE
+     on the shipped board: an IF-shaped sweep (the old check read 'MIN(' out of formula text) and
+     ALL borders (the old check demanded `bt`, which alt h b a never sets). Registered so neither
+     can come back. */
+  { key: 'revolver', name: 'op-ORDER reversed: sweep before draw, the cash line before the ending balance, an addition chain instead of SUM, the roll linked before the block exists, each row filled on its own (☆ forfeited), the dress LAST', moves: `C => { const o=C._o, R=o.R, SR={key:'ArrowRight',shift:true};
+      return [
+        {sel:o.CB+R.sw, keys:[...T('=-MIN('+o.CB+R.bb+',MAX(0,'+o.CB+R.cb+'-$'+o.CB+'$'+R.mc+'))'),{key:'Enter'}]},
+        {sel:o.CB+R.dr, keys:[...T('=MAX(0,$'+o.CB+'$'+R.mc+'-'+o.CB+R.cb+')'),{key:'Enter'}]},
+        {sel:o.CB+R.cp, keys:[...T('='+o.CB+R.cb+'+'+o.CB+R.dr+'+'+o.CB+R.sw),{key:'Enter'}]},
+        {sel:o.CB+R.eb, keys:[...T('='+o.CB+R.bb+'+'+o.CB+R.dr+'+'+o.CB+R.sw),{key:'Enter'}]},
+        {sel:o.CC+R.bb, keys:[...T('='+o.CB+R.eb),{key:'Enter'}]},
+        {sel:o.CC+R.bb, keys:[SR,SR,{key:'r',ctrl:true}]},
+        {sel:o.CB+R.dr, keys:[SR,SR,SR,{key:'r',ctrl:true}]},
+        {sel:o.CB+R.sw, keys:[SR,SR,SR,{key:'r',ctrl:true}]},
+        {sel:o.CB+R.eb, keys:[SR,SR,SR,{key:'r',ctrl:true}]},
+        {sel:o.CB+R.cp, keys:[SR,SR,SR,{key:'r',ctrl:true}]},
+        {sel:o.CB+R.eb, keys:[SR,SR,SR,{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]},
+      ]; }` },
+  { key: 'revolver', name: 'chord ROUTE: IF instead of MIN/MAX on both lines, ribbon bold (alt h 1) + ALL borders (alt h b a stores ball, never bt), every fill through the ribbon (alt h f i r) — the block grab still earns the ☆', moves: `C => { const o=C._o, R=o.R, SR={key:'ArrowRight',shift:true}, SD={key:'ArrowDown',shift:true};
+      const FR=[{key:'Alt'},L('h'),L('f'),L('i'),L('r')];
+      return [
+        {sel:o.CB+R.dr, keys:[...T('=IF($'+o.CB+'$'+R.mc+'>'+o.CB+R.cb+',$'+o.CB+'$'+R.mc+'-'+o.CB+R.cb+',0)'),{key:'Enter'}]},
+        {sel:o.CB+R.sw, keys:[...T('=-IF('+o.CB+R.cb+'-$'+o.CB+'$'+R.mc+'>'+o.CB+R.bb+','+o.CB+R.bb+',MAX(0,'+o.CB+R.cb+'-$'+o.CB+'$'+R.mc+'))'),{key:'Enter'}]},
+        {sel:o.CB+R.eb, keys:[...T('=SUM('+o.CB+R.bb+':'+o.CB+R.sw+')'),{key:'Enter'}]},
+        {sel:o.CB+R.eb, keys:[SR,SR,SR,{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('a')]},
+        {sel:o.CC+R.bb, keys:[...T('='+o.CB+R.eb),{key:'Enter'}]},
+        {sel:o.CC+R.bb, keys:[SR,SR,...FR]},
+        {sel:o.CB+R.dr, keys:[SR,SR,SR,SD,SD,...FR]},
+        {sel:o.CB+R.cp, keys:[...T('='+o.CB+R.cb+'+'+o.CB+R.dr+'+'+o.CB+R.sw),{key:'Enter'}]},
+        {sel:o.CB+R.cp, keys:[SR,SR,SR,...FR]},
+      ]; }` },
   { key: 'waterfall', name: 'corkscrews linked before block fills, narrower fill geometry than the demo', moves: `C => [
       {sel:'B5', keys:[...T('=SUM(B2:B4)'),{key:'Enter'}]},
       {sel:'B5:D5', keys:[{key:'r',ctrl:true}]},

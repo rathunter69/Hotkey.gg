@@ -10484,57 +10484,257 @@ const CHALLENGES = {
     }
   },
   revolver:{
-    name:'Revolver', label:'Sweep the revolver', par:41, parKeys:41,
-    aha:'MIN and MAX sweep the revolver — it plugs the shortfall, not your eyes.',
-    prompt:'Four year-end sweeps, each with its own cash picture. The sweep is the lesser of the outstanding balance and the cash above minimum — never negative. Prove each year out: revolver after the sweep, cash after the sweep, and the balance row formatted. MIN and MAX nested once, arithmetic twice.',
-    req:'<em>B5</em> <em>=MIN(B3,MAX(0,B2-B4))</em> \u00b7 fill B5:E5 \u2192 \u00b7 <em>B6</em> <em>=B3-B5</em> fill \u2192 \u00b7 <em>B7</em> <em>=B2-B5</em> fill \u2192 \u00b7 dress B6:E6: <em>ctrl+b</em> + <em>alt h b p</em>',
-    guide:[
-      'the sweep at B5 \u00b7 <kbd>=MIN(B3,MAX(0,B2-B4))</kbd> <kbd>\u21b5</kbd> \u2014 can\u2019t sweep more than the balance, can\u2019t dip below minimum cash',
-      'select B5:E5 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 one formula sweeps all four years',
-      'revolver after the sweep: B6 \u00b7 <kbd>=B3-B5</kbd> \u00b7 fill \u2192 \u00b7 cash after: B7 \u00b7 <kbd>=B2-B5</kbd> \u00b7 fill \u2192',
-      'format the balance row: select B6:E6 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
-    ],
-    targets:['B5:E5','B6:E6','B7:E7','B6:E6'],
-    demo(){ return [
-      {sel:'B5', keys:[...T('=MIN(B3,MAX(0,B2-B4))'), Kb.enter]},
-      {sel:'B5:E5', keys:[Kb.fillR]},
-      {sel:'B6', keys:[...T('=B3-B5'), Kb.enter]},
-      {sel:'B6:E6', keys:[Kb.fillR]},
-      {sel:'B7', keys:[...T('=B2-B5'), Kb.enter]},
-      {sel:'B7:E7', keys:[Kb.fillR]},
-      {sel:'B6:E6', keys:[Kb.bold]},
-      {sel:'B6:E6', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
+    /* r446 H6b (DEPTH_PASS §4.71, "Sweep the revolver") — the depth-pass rework, built to
+       §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (the law wins on conflict), and to
+       dev/MODELING_STANDARDS.md, which is binding on Models II.
+
+       WAS: 4 checks on a ROWS:7 board — 6 rows carrying content out of the real 20-row sheet
+       (30%, half the §1.3 target), no ☆, no saveClose, checklist labels opening with a bare
+       lowercase noun and carrying raw cell refs ("sweep at B5 …", "prove the revolver
+       post-sweep at B6"), and — the part that matters for a Models chapter — NO REVOLVER.
+       Four year columns each carried a typed blue "Revolver balance", so nothing rolled: the
+       board was four disconnected MIN/MAX arithmetic problems wearing a credit label. A
+       revolver that does not roll forward is the exact defect MODELING_STANDARDS §3 calls the
+       classic junior error, and there was no DRAW anywhere on the page, so the MAX had no
+       reason to exist beyond flooring a subtraction.
+
+       ── ☆-HEADROOM DIAGNOSTIC (CAMPAIGN §2, BOTH PARTS), run BEFORE the board was designed.
+       Measured through the live engine on the SHIPPED board, every selection and navigation
+       KEYED, 5 seeds (dev/verify-revolver.js reproduces the same shape on the new board):
+         PART 1 — IS THERE SPREAD? fastest legal 53 keys (three formulas, three fills, one dress
+           pass) against 160 for the obvious slow route that clears every core (all twelve year
+           cells typed, each column dressed on its own through the ribbon). 3.02×.
+         PART 2 — IS ANY OF IT ☆-LEGAL? Of the 107 keys of spread, ~20 are FORMATTING (the one
+           dress pass against four column dresses, and ctrl+b against alt h 1) — §1.0(d) forbids
+           grading those and §1.0(c) forces the ribbon route to clear. ZERO are chord-vs-ribbon
+           in the formula half: this engine has no ribbon route into formula entry, and Ctrl+R
+           and Alt H F I R hit the same fillFrom latch, so a fill is a fill however it is
+           reached. The surviving ~87 keys are FILL-versus-RETYPE across the year columns —
+           "one formula fills a block", which is the mastery move §1.0(d) names by hand. Legal
+           headroom, in the drill's own subject. KEEP.
+         DISTINCTNESS (CAMPAIGN §3 discriminator, asked before anything was built): three other
+           Models II boards run a MIN sweep — `waterfall`, `cascade` and `debtsched`. Fluency in
+           any of them produces a correct first attempt at a PAYDOWN and a wrong one here,
+           because none of them has the other regime: a revolver DRAWS when the business is
+           short, and the draw is a MAX, not a MIN. Those three answer "who gets paid first";
+           this one answers "what happens in a year where there is nothing to pay with". That
+           contrast is why the rebuilt board seeds one shortfall year, two partial-sweep years
+           and one year that repays the facility in full.
+
+       ── TWO UNTRIGGERABLE BEATS FOUND ON THE SHIPPED BOARD (the CAMPAIGN §1 class, found by
+       WALKING routes through the live engine, never by reading predicates):
+         (1) THE DRESS BEAT DEMANDED `c.bt`. Alt H B A (ALL borders) stores `ball` and paints a
+             box that includes the top edge, so a player who bordered every edge had a ruled,
+             bolded balance row on screen and a dark line with nothing to fix. Probed on the
+             shipped block: cores 0/3, the failing label exactly that one. Campaign bug #7,
+             shipped in the same form `gauntlet` had it.
+         (2) THE SWEEP BEAT READ FORMULA TEXT — refs('B5',['MIN(','MAX(']). The most common
+             alternative shape for a sweep, =IF(cash-min>balance,balance,MAX(0,cash-min)),
+             lands the identical number in every year and carries no MIN(. Probed: cores 0/3,
+             the failing label exactly that one. Same root cause as campaign bugs #3/#4/#8/#12.
+       Both die here: every core grades the END STATE (§1.0-R3(p)) — the number in every year
+       column, plus, where the label says a line is BUILT, that the cell is a live formula
+       rather than a typed constant (the doctrine §2.2 sanctioned exception, and the one
+       MODELING_STANDARDS §7 explicitly names as gradeable). No check reads a function name, a
+       range or an anchor out of formula text, and no check reads one column and assumes the
+       rest. The border predicate takes bt || ball.
+
+       ── THE BOARD (MODELING_STANDARDS §3 + §7). One facility, four years, in the shape a
+       reviewer looks for: Beginning balance → + draw → − sweep → = Ending balance, with each
+       year opening on the prior year's close. Above it the cash line the facility reacts to;
+       beside it the two assumptions a credit agreement actually sets (minimum cash, commitment)
+       as a labelled, stacked, light-yellow, all-bordered, POPULATED helper block (§1.0(f) +
+       §1.0-R2(l)); below it the two memo reads a credit analyst takes off this page — headroom
+       over the minimum and undrawn availability — shipped LIVE so they answer as the schedule
+       is built. Blue for typed inputs, black for formulas (§1 provenance law); reductions
+       negative so the ending balance is a straight SUM of the three lines above it (§2 sign
+       convention, stated on the board's own basis memo); the total wears a TOP border and never
+       a rule underneath (§1.0(f)).
+       DELIBERATE SIMPLIFICATIONS, stated here and on the board's memo line per MODELING_STANDARDS
+       §7: the sweep runs at 100% of cash above the minimum (no cash-flow-sweep step-down grid),
+       there is no mandatory amortisation line (that is `debtsched`'s), and revolver INTEREST is
+       not on this page — it belongs to `intsched`, and putting it here would either duplicate
+       that drill or leave an interest expense that does not feed the cash line above it. The
+       beginning-balance interest ruling (§5, no iterative calc) is therefore not exercised here
+       and nothing on this board asks for an average balance. Fourth: the DRAW is not capped at
+       the remaining commitment — a rigorous schedule writes MIN(commitment−beginning, shortfall),
+       which would put a third nesting in a formula whose lesson is already MAX-inside-MIN. The
+       commitment earns its row honestly instead, as the divisor of the undrawn-availability read,
+       and the generator holds the balance well inside it on every seed (probed: the maximum
+       reachable balance is opening+draw ≈ 247 against a commitment floor of 300), so the cap
+       could never bind and its absence is never visible on the board.
+
+       STRUCTURAL DEVIATIONS from the §4.71 page, declared here per §0 — see the payload item 8:
+       (1) ☆ RE-CUT (binding, §1.0-R4(u)). The page's bonus is "Add a top border above the
+           balance row — the sweep closes ruled". Dead three times over: it is a FORMATTING task,
+           which §1.0(d) forbids outright; it is already a core beat here (§1.0(f) makes a top
+           border on a total the house convention, so it cannot also be the discovery); and it
+           would fall out of the dress beat anyway, failing §1.0-R2(i)'s skippable test. The
+           re-cut ☆ is the one-pass block fill — isolated and measured in the ☆ note in checks().
+       (2) THE BOARD IS REBUILT, not language-passed (§1.0-R4(t) wave-agent duty). The page says
+           "At bar", which was true of the arithmetic and false of the model: no roll-forward and
+           no draw. §1.3/§4.71 also predate ROWS=20 (the board was 7) and §1.0(e) (no saveClose).
+       (3) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an existing labelled
+           cell in a labelled row — no insert slot, no empty paste target — so the guided ring
+           expresses all six core beats on its own.
+       (4) §1.3 DENSITY: 15 of 20 rows carry content at the win state (75%), against 30% before.
+           Four of the five empty rows are moats between the four blocks (page head · the cash
+           line · the assumption stack · the schedule · the memo reads); the fifth is the sheet's
+           bottom margin. */
+    name:'Revolver', label:'Sweep the revolver', par:95, parKeys:90, saveClose:true,   /* r446 §4.71 depth pass: par re-swept from scratch (was par 41 / parKeys 41 on the 7-row board with no roll, no draw and no save closer). dev/e2e-par-sweep.js revolver, 5-seed median 90 keys including the engine-appended Ctrl+S — FLAT at 90 across every seed measured (0% drift on the sweep), because the randomization moves the anchor column, the figures and which year is short, never the GEOMETRY: the rows are fixed, so every formula the demo types is the same length on every seed (the r439 `wrapfix` rule; a row jitter would have pushed the minimum-cash row 9→10 and charged two keys for nothing). par 95 ≈ 1.06 s/key, the house band. The count grew with the model: a draw line, a roll-forward, a prove-out and the save closer where the old board had three arithmetic rows. That lands revolver beside `cascade` (94) at the top of the Models II band (debtsched 73 · waterfall 64 · covtable 45 · wk13 45 · liqbridge 40 · schedule 35 · intsched 29). Measured against it: the same board worked the slow way — no fill anywhere, all twelve schedule cells and three roll links typed, each column dressed on its own — runs 297 keys with every core green and the ☆ dark (alt-paths-adjacent negative control, dev/verify-revolver.js §C). Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 2:23 · pro 1:49 · legendary 1:35. */
+    aha:'A revolver has two regimes and one formula each — MAX draws the shortfall, MIN sweeps only what is owed.',
+    /* §1.5: the aha's MOMENT is the block fill — one pass carries the same two formulas across
+       a year that draws and a year that repays in full, and both land right. */
+    prompt:'Credit committee is Thursday and the revolver page is still blank under the opening balance. One facility, four years: it funds any shortfall to the minimum cash balance, and in a good year it sweeps the cash above that minimum — never more than is outstanding. Build the draw and the sweep, close each year, open the next one on that close, and show where cash lands once the facility has moved.',
+    req(){ const o=this._o, R=o.R; return '<em>'+o.CB+R.dr+'</em> <em>=MAX(0,$'+o.CB+'$'+R.mc+'-'+o.CB+R.cb+')</em> · <em>'+o.CB+R.sw+'</em> <em>=-MIN('+o.CB+R.bb+',MAX(0,'+o.CB+R.cb+'-$'+o.CB+'$'+R.mc+'))</em> · <em>'+o.CB+R.eb+'</em> <em>=SUM('+o.CB+R.bb+':'+o.CB+R.sw+')</em> · <em>ctrl+b</em> + <em>alt h b p</em> · <em>'+o.CC+R.bb+'</em> <em>='+o.CB+R.eb+'</em> fill → · <em>ctrl+r</em> the '+R.dr+'–'+R.eb+' block · <em>'+o.CB+R.cp+'</em> <em>='+o.CB+R.cb+'+'+o.CB+R.dr+'+'+o.CB+R.sw+'</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o, R=o.R; return [
+      'the draw is whatever it takes to get back to the minimum, and nothing in a year that is already above it · on '+o.CB+R.dr+': <kbd>=MAX(0,$'+o.CB+'$'+R.mc+'-'+o.CB+R.cb+')</kbd> <kbd>↵</kbd> — the minimum-cash cell is anchored so the one formula survives the trip across the years; typing each year lands the same numbers, it only costs the keys',
+      'the sweep is the mirror of it · on '+o.CB+R.sw+': <kbd>=-MIN('+o.CB+R.bb+',MAX(0,'+o.CB+R.cb+'-$'+o.CB+'$'+R.mc+'))</kbd> <kbd>↵</kbd> — the inner MAX is the cash above the minimum, the MIN caps it at what is still outstanding, and the leading minus is the sign this page states. An IF that lands the same numbers grades the same',
+      'on '+o.CB+R.eb+': <kbd>=SUM('+o.CB+R.bb+':'+o.CB+R.sw+')</kbd> <kbd>↵</kbd> — beginning plus the draw plus the sweep, and the sweep is already negative. An addition chain down the three lines totals the same and grades the same',
+      'dress it now rather than at the end: select the ending row and <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> rules above it (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> boxes the row, <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>d</kbd> takes top and bottom, <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> borders every edge — all four draw that top line and all four clear it)',
+      'on '+o.CC+R.bb+': <kbd>=</kbd>'+o.CB+R.eb+' <kbd>↵</kbd>, then select '+o.CC+R.bb+':'+o.CE+R.bb+' and <kbd>ctrl</kbd>+<kbd>r</kbd> — every year after the first opens on the one before it. Anchored or not; it grades the number and that the cell is live, never the text',
+      'on '+o.CB+R.cp+': <kbd>=</kbd>'+o.CB+R.cb+'<kbd>+</kbd>'+o.CB+R.dr+'<kbd>+</kbd>'+o.CB+R.sw+' <kbd>↵</kbd> · filled across — the sweep carries its own minus, so adding it is what takes the cash back down to the minimum',
+      '☆ the discovery: one selection over the draw, the sweep and the ending line from '+o.CB+' through '+o.CE+', then a single <kbd>ctrl</kbd>+<kbd>r</kbd> — three lines, four years, one pass. Filling the three rows one at a time clears every core beat and forfeits it',
     ]; },
+    /* rings: ① the draw row · ② the sweep row · ③ the ending row · ④ the ending row with its
+       label · ⑤ the three opening balances that roll · ⑥ the cash row · ☆ never ringed (§2.2) */
+    targets(){ const o=this._o, R=o.R; return [
+      o.CB+R.dr+':'+o.CE+R.dr, o.CB+R.sw+':'+o.CE+R.sw, o.CB+R.eb+':'+o.CE+R.eb,
+      o.CA+R.eb+':'+o.CE+R.eb, o.CC+R.bb+':'+o.CE+R.bb, o.CB+R.cp+':'+o.CE+R.cp, null,
+    ]; },
+    /* the demo BUILDS its own selections with Shift+arrow rather than being handed them by
+       setDemoSel, so parKeys measures what a player really pays for the range grabs instead of
+       eliding them (the r438 `series` rule). setDemoSel only parks the cursor on the anchor
+       cell of the next beat. */
+    demo(){ const o=this._o, R=o.R; const SR={key:'ArrowRight',shift:true}, SD={key:'ArrowDown',shift:true}; return [
+      {sel:o.CB+R.dr, keys:[...T('=MAX(0,$'+o.CB+'$'+R.mc+'-'+o.CB+R.cb+')'), Kb.enter]},
+      {sel:o.CB+R.sw, keys:[...T('=-MIN('+o.CB+R.bb+',MAX(0,'+o.CB+R.cb+'-$'+o.CB+'$'+R.mc+'))'), Kb.enter]},
+      {sel:o.CB+R.eb, keys:[...T('=SUM('+o.CB+R.bb+':'+o.CB+R.sw+')'), Kb.enter]},
+      /* §1.0(a): the total is dressed the moment it exists, not at the end of the run */
+      {sel:o.CB+R.eb, keys:[SR,SR,SR, Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+      {sel:o.CC+R.bb, keys:[...T('='+o.CB+R.eb), Kb.enter]},
+      {sel:o.CC+R.bb, keys:[SR,SR, Kb.fillR]},
+      /* the ☆ — the whole moving block carried across in ONE pass */
+      {sel:o.CB+R.dr, keys:[SR,SR,SR, SD,SD, Kb.fillR]},
+      {sel:o.CB+R.cp, keys:[...T('='+o.CB+R.cb+'+'+o.CB+R.dr+'+'+o.CB+R.sw), Kb.enter]},
+      {sel:o.CB+R.cp, keys:[SR,SR,SR, Kb.fillR]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 revolver sweep ($mm)',txt:true,bold:true};
-      const y0=rnd(24,26);
-      for(let i=0;i<4;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
-      const rows=[[2,'Cash available'],[3,'Revolver balance'],[4,'Minimum cash'],[5,'Cash sweep'],[6,'Revolver, post-sweep'],[7,'Cash, post-sweep']];
-      rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===6)});
-      this._exp=[];
-      for(let i=0;i<4;i++){ const col=colLetter(i+2);
-        const cashA=rnd(6,30)*10, bal=rnd(5,25)*10, minC=rnd(2,12)*10;
-        cells[col+2]={...blankCell(),value:cashA,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+3]={...blankCell(),value:bal,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+4]={...blankCell(),value:minC,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        [5,6,7].forEach(r=>cells[col+r]={...blankCell(),fmtStyle:'comma',decimals:0});
-        const sw=Math.min(bal,Math.max(0,cashA-minC));
-        this._exp.push({sw:sw, rvE:bal-sw, cashE:cashA-sw});
+      /* §1.2 randomization — FOUR independent axes, and the geometry is deliberately NOT one of
+         them: the board is a full-grid artifact (15 of 20 rows), so per §1.2 the site axis is
+         CORNER JITTER, and it jitters the COLUMN only. Holding the rows fixed keeps every
+         formula the demo types the same length on every seed, so the par sweep reads flat (the
+         r439 `wrapfix` rule) — a row jitter would push the minimum-cash row from 9 to 10 and
+         charge two keys for nothing.
+           (a) SITE: the page anchors at column A or column B.
+           (b) CONTENT: the codename and the fiscal-year base.
+           (c) VALUES: every figure through rnd().
+           (d) WHICH-YEAR-IS-WHICH: the shortfall year is drawn between FY2 and FY3, so the year
+               the facility DRAWS moves with the seed while the pedagogy is guaranteed — one year
+               where the MAX bites, two partial sweeps where it does not, and a final year where
+               the MIN bites and the facility is repaid in full. */
+      const c0 = rnd(0,1) ? 1 : 2;
+      const CA=colLetter(c0), CB=colLetter(c0+1), CC=colLetter(c0+2), CD=colLetter(c0+3), CE=colLetter(c0+4);
+      const cols=[CB,CC,CD,CE];
+      const y0=rnd(2024,2028);
+      const R={t:1,m1:2,m2:3,h:5,cb:6,as:8,mc:9,cm:10,bb:12,dr:13,sw:14,eb:15,cp:17,cu:18,ua:19};
+      const minC=rnd(30,55), open0=rnd(150,225);
+      const commit=Math.max(rnd(300,400), open0+120);   // the facility is never seeded over-drawn
+      const drawYr=rnd(1,2);
+      /* the four years are simulated forward exactly as the player will build them, so this._o
+         carries the same numbers the board must end on. Ranges are sized so the partial-sweep
+         years can never accidentally clear the balance (which would make them full sweeps and
+         cost the board its contrast): a partial sweep is at most 44 against a balance that
+         never falls below 62. */
+      const exp=[]; let bal=open0;
+      for(let i=0;i<4;i++){
+        let cashB;
+        if(i===3) cashB = minC + bal + rnd(15,60);        // the MIN bites — the sweep is capped at what is outstanding
+        else if(i===drawYr) cashB = minC - rnd(8,22);     // the MAX bites — the facility funds the shortfall
+        else cashB = minC + rnd(12,44);                   // a partial sweep, comfortably inside the balance
+        const draw = Math.max(0, minC - cashB);
+        const sweep = -Math.min(bal, Math.max(0, cashB - minC));
+        const end = bal + draw + sweep;
+        exp.push({cashB:cashB, begin:bal, draw:draw, sweep:sweep, end:end, cash:cashB+draw+sweep});
+        bal = end;
       }
-      return {ROWS:7, cells, active:{r:5,c:2}, sel:null, colW:{1:170,2:74,3:74,4:74,5:74}};
+      cells[CA+R.t]={...blankCell(),value:codename()+' — revolver schedule ($mm)',txt:true,bold:true};
+      cells[CA+R.m1]={...blankCell(),value:'Source: credit model · $ in millions · reductions carry a minus sign',txt:true,it:true,fontColor:'gray'};
+      cells[CA+R.m2]={...blankCell(),value:'Basis: the sweep runs at 100% of cash above the minimum · revolver interest sits on the interest schedule',txt:true,it:true,fontColor:'gray'};
+      /* doctrine §2.1b: a rule under the column headers, shipped — the lesson here is not dress */
+      cells[CA+R.h]={...blankCell(),value:'Item',txt:true,bold:true,bb:true};
+      cols.forEach((c,i)=>cells[c+R.h]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r',bb:true});
+      const lab=(r,n,b)=>cells[CA+r]={...blankCell(),value:n,txt:true,bold:!!b};
+      lab(R.cb,'Cash before revolver'); lab(R.as,'Assumptions',true);
+      lab(R.mc,'Minimum cash balance'); lab(R.cm,'Revolver commitment');
+      lab(R.bb,'Beginning balance'); lab(R.dr,'Revolver draw'); lab(R.sw,'Cash sweep');
+      lab(R.eb,'Ending balance',true); lab(R.cp,'Cash, post-revolver');
+      lab(R.cu,'Headroom vs minimum cash'); lab(R.ua,'Undrawn availability');
+      /* §1.0(f) + §1.0-R2(l): the assumptions are VERTICALLY STACKED, INDIVIDUALLY LABELLED by
+         the row label beside them, light yellow + all borders, blue (typed input), and POPULATED
+         so the player can see they are there to be used. */
+      cells[CB+R.mc]={...blankCell(),value:minC,fontColor:'blue',fill:'yellow',ball:true,fmtStyle:'comma',decimals:0};
+      cells[CB+R.cm]={...blankCell(),value:commit,fontColor:'blue',fill:'yellow',ball:true,fmtStyle:'comma',decimals:0};
+      cols.forEach((c,i)=>{
+        cells[c+R.cb]={...blankCell(),value:exp[i].cashB,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        /* only FY1 opens on a typed balance — every later year is the player's roll-forward */
+        if(i===0) cells[c+R.bb]={...blankCell(),value:open0,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        else cells[c+R.bb]={...blankCell(),fmtStyle:'comma',decimals:0};
+        [R.dr,R.sw,R.eb,R.cp].forEach(r=>cells[c+r]={...blankCell(),fmtStyle:'comma',decimals:0});
+        /* the two memo reads a credit analyst takes off this page ship LIVE (MODELING_STANDARDS
+           §6 — the checks live in one visible place), so they answer as the schedule is built.
+           At load they read against an unbuilt schedule, which is what an unbuilt schedule
+           should look like; at the win state they read 0/0/0/positive headroom and the full
+           commitment undrawn, because the last year repays the facility. */
+        cells[c+R.cu]={...blankCell(),formula:'='+c+R.cp+'-$'+CB+'$'+R.mc, value:-minC, fmtStyle:'comma',decimals:0};
+        cells[c+R.ua]={...blankCell(),formula:'=$'+CB+'$'+R.cm+'-'+c+R.eb, value:commit, fmtStyle:'comma',decimals:0};
+      });
+      this._o={CA:CA,CB:CB,CC:CC,CD:CD,CE:CE,c0:c0,cols:cols,R:R,exp:exp,
+               minC:minC,commit:commit,open0:open0,drawYr:drawYr,y0:y0};
+      const colW={}; colW[c0]=196; colW[c0+1]=86; colW[c0+2]=86; colW[c0+3]=86; colW[c0+4]=86;
+      return {ROWS:20, cells, active:{r:R.dr,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<0.5; };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase(); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D','E'];
-      const dressOk=[0,1,2,3].every(i=>{ const c=S.cells[COL[i]+'6']; return !!(c&&c.bold&&c.bt); });
+      const o=this._o, R=o.R;
+      /* every predicate reads the END STATE — the number standing in each year column, plus
+         liveness where the label says the line is BUILT. Nothing reads formula text, a function
+         name, a range or an anchor (§1.0-R3(p) + CAMPAIGN §1). */
+      const live=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'); };
+      const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&typeof c.value==='number'&&Math.abs(c.value-exp)<0.5); };
+      const rowOk=(r,pick)=>o.cols.every((c,i)=>live(c+r)&&near(c+r,pick(i)));
+      const drOk = rowOk(R.dr, i=>o.exp[i].draw);
+      const swOk = rowOk(R.sw, i=>o.exp[i].sweep);
+      const ebOk = rowOk(R.eb, i=>o.exp[i].end);
+      const cpOk = rowOk(R.cp, i=>o.exp[i].cash);
+      /* the roll is years two through four — FY1 opens on the typed blue balance it ships with */
+      const rollOk = [1,2,3].every(i=>live(o.cols[i]+R.bb)&&near(o.cols[i]+R.bb,o.exp[i-1].end));
+      /* Alt H B A stores `ball` and paints a box whose top edge IS the rule; Alt H B P / B S /
+         B D / B T all store `bt`. Taking bt||ball is what kept campaign bug #7 out of this
+         board (it was live on the shipped one — see the header comment). */
+      const dressOk = o.cols.every(c=>{ const x=S.cells[c+R.eb]; return !!(x&&x.bold&&(x.bt||x.ball)); });
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): the three
+         MOVING lines — draw, sweep, ending — grabbed as ONE block and carried across the four
+         years in a SINGLE fill, instead of three row fills or twelve typed cells. Read off the
+         r424 S.fillOps latch (the MECHANIC, never geometry inferred), so Ctrl+R and the ribbon
+         fill Alt H F I R both earn it and the star is chord-agnostic per §1.0(c). Isolated
+         measurement through the live engine, 5 seeds: the one block grab costs 6 keys against
+         15 for three separate row fills and 199 to type the nine repeat cells — positive on
+         both comparisons, which is the r438 `series` rule applied to a single-move star.
+         SKIPPABLE, measured not asserted: the negative control (three row fills, everything
+         else identical) clears 6/6 cores on 5/5 seeds with the ☆ dark. */
+      const starOk = drOk && swOk && ebOk && (S.fillOps||[]).some(f=>
+        f.dir==='right' && f.r1<=R.dr && f.r2>=R.eb && f.c1<=o.c0+1 && f.c2>=o.c0+4);
       return [
-        {label:'sweep at B5 \u2014 MIN of balance and spare cash, floored at zero, fill all four years', ok: [0,1,2,3].every(i=>near(COL[i]+'5',this._exp[i].sw))&&refs('B5',['MIN(','MAX('])},
-        {label:'prove the revolver post-sweep at B6 \u2014 fill all four years', ok: [0,1,2,3].every(i=>near(COL[i]+'6',this._exp[i].rvE))},
-        {label:'prove cash post-sweep at B7 \u2014 fill across, never below the minimum', ok: [0,1,2,3].every(i=>near(COL[i]+'7',this._exp[i].cashE))},
-        {label:'bold the balance row (B6:E6) and add a top border above it', ok: dressOk},
+        {label:'Build the draw line — any shortfall to the minimum cash balance, all four years', ok: drOk},
+        {label:'Build the sweep line — the cash above the minimum, capped at the balance, signed negative', ok: swOk},
+        {label:'Total the ending balance — all four years', ok: ebOk},
+        {label:'Bold the ending-balance row and add a top border above it', ok: dressOk},
+        {label:'Reference each beginning balance to the prior year’s ending balance', ok: rollOk},
+        {label:'Build the post-revolver cash line — all four years', ok: cpOk},
+        {label:'Take the schedule across in one pass — draw, sweep and ending together', ok: starOk, bonus:true},
       ];
     }
   },
