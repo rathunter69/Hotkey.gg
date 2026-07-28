@@ -40,12 +40,23 @@ const { chromium } = require('playwright-core');
 
 const BASE = process.env.BASE || 'http://127.0.0.1:8791';
 const DSF = 4;                 // device pixels per CSS px — sub-pixel rounding is the whole story here
-const DARK = 170;              // luminance below this counts as ink; the gridline is far lighter
+const INK = 45;                // how far a pixel must sit from the cell's own background to count as
+                               // ink. r443: this was an ABSOLUTE luminance threshold (<170), which
+                               // silently assumed a light page — on CI the page renders dark, every
+                               // pixel in the band scored as ink, and all 20 assertions reported the
+                               // full 20px band width. Contrast against the local background is what
+                               // "ink" actually means, and it holds in either theme.
 const BAND = 10;               // CSS px each side of the edge
 
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROME });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: DSF });
+  /* r443: PIN the colour scheme. CI's Chromium resolved to dark where the dev box resolved to
+     light, which is how an absolute luminance threshold passed here and failed there. The
+     contrast measurement below no longer cares — but pinning makes the run deterministic, and
+     SCHEME=dark exercises the other side on demand. Borders in dark are additionally covered by
+     dev/e2e-depth-mechanics.js, which asserts both themes. */
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: DSF,
+    colorScheme: process.env.SCHEME === 'dark' ? 'dark' : 'light' });
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 160)));
   // a fresh profile walks the onboarding funnel and swallows every key
@@ -94,7 +105,7 @@ const BAND = 10;               // CSS px each side of the edge
      CI installs playwright-core and nothing else. Returns the longest dark run in CSS px. */
   async function paintedPx(buf, edge) {
     const b64 = buf.toString('base64');
-    return page.evaluate(async ({ b64, edge, DSF, DARK }) => {
+    return page.evaluate(async ({ b64, edge, DSF, INK }) => {
       const img = new Image();
       img.src = 'data:image/png;base64,' + b64;
       await img.decode();
@@ -105,15 +116,20 @@ const BAND = 10;               // CSS px each side of the edge
       const d = ctx.getImageData(0, 0, img.width, img.height).data;
       const horizontal = (edge === 'left' || edge === 'right');
       const n = horizontal ? img.width : img.height;
-      let best = 0, run = 0, total = 0;
+      const lums = [];
       for (let i = 0; i < n; i++) {
         const x = horizontal ? i : 0, y = horizontal ? 0 : i;
         const p = (img.width * y + x) << 2;
-        const lum = d[p] * 0.299 + d[p + 1] * 0.587 + d[p + 2] * 0.114;
-        if (lum < DARK) { run++; total++; if (run > best) best = run; } else run = 0;
+        lums.push(d[p] * 0.299 + d[p + 1] * 0.587 + d[p + 2] * 0.114);
+      }
+      // the band is mostly cell background with a rule crossing it, so the MEDIAN is the background
+      const bg = [...lums].sort((a, b) => a - b)[lums.length >> 1];
+      let best = 0, run = 0, total = 0;
+      for (const lum of lums) {
+        if (Math.abs(lum - bg) > INK) { run++; total++; if (run > best) best = run; } else run = 0;
       }
       return { run: best / DSF, ink: total / DSF };
-    }, { b64, edge, DSF, DARK });
+    }, { b64, edge, DSF, INK });
   }
 
   async function measure(flags, edge) {
