@@ -8527,70 +8527,229 @@ const CHALLENGES = {
     }
   },
   fcfbuild:{
-    name:'uFCF', label:'Build the unlevered FCF', par:32, parKeys:31,
+    /* r444 H6b (DEPTH_PASS §4.58, "Build the unlevered FCF", Models I) — the depth-pass rework.
+       WAS: 3 checks, guide 4 v checks 3 v targets 3 (tri-length broken), no ☆, no saveClose,
+       ROWS:12 (10 content rows, 50% — under the §1.3 target), zero ALTS entries (one of the
+       nine named in §1.8), and a tax beat that graded formula TEXT via refs('B4',['B3','B11']).
+
+       §1.0-R3(p) GRADE THE END STATE — the routes were WALKED (dev/verify-fcfbuild.js), not
+       reasoned about. The old refs() predicate is exactly the untriggerable-beat class the
+       campaign exists to kill (DEPTH_PASS_CAMPAIGN §1, thirteen found, every one by probing):
+       it locked out the NOPAT-first order, where NOPAT lands as =B6*(1-$B$15) and the tax line
+       back-solves =B8-B6 — a correct board with a dark line. Every predicate below reads the
+       LIVE sheet: a value assertion, a "this cell is a live build" test, and — for the tax
+       line only — a transitive REFERENCE walk to the rate assumption, which is the one
+       convention MODELING_STANDARDS §1 says must stay gradeable ("NO HARDCODES INSIDE
+       FORMULAS") and §7 sanctions as end state ("a beginning balance that REFERENCES rather
+       than repeats"). Walked and clearing: =-B6*$B$15 · =-$B$15*B6 · =B6*-$B$15 · the
+       NOPAT-first order · =SUM(B6:B7) for NOPAT · =B6*(1-$B$15) for NOPAT · =SUM(B8:B11) and
+       the addition chain =B8+B9+B10+B11 for uFCF · =SUM(B12:F12) and the five-term chain for
+       the plan total · Ctrl+R, Alt H F I R and copy/paste for the fill. Walked and correctly
+       DARK: =-B6*0.24 (the rate hardcoded inside the formula), the unanchored =-B6*B15 once
+       it is filled right (C15 is empty, so the year columns read zero), and Alt H B S on the
+       closing line — an outside box hangs a rule UNDER the total, the one thing §1.0(f)
+       forbids.
+
+       §1.0-R4(u) THE ☆ RE-CUT. The page's ☆ ("Total the five uFCF years in the FY cell") is
+       real WORK, not a hidden efficiency, so it is PROMOTED to core beat 5 exactly as the law
+       directs, and the ☆ is re-cut to the mechanic that lands it: the plan total from AUTOSUM.
+       Measured headroom (dev/verify-fcfbuild.js, 3 seeds): the star route costs 2 keys by
+       BOTH of its routes — the range form (select the filled row through the empty total cell,
+       one Alt+= commits) and the single-cell proposal at G12 (Alt+= then ↵, where nothing
+       numeric sits above so the adaptive walk goes LEFT and proposes =SUM(B12:F12) correctly)
+       — against 13 keys for the typed =SUM(B12:F12)↵. SKIPPABLE by construction (§1.0-R2(i)):
+       typing clears beat 5 identically, and ALT 2 in dev/e2e-alt-paths.js is the whole
+       hand-typed run, measured at 206 keys against the demo's 38, with all six cores green and
+       the ☆ dark — a 5.4× spread, the `fxconvert` band. Two other candidates were measured and
+       REJECTED on the numbers (DEPTH_PASS_CAMPAIGN §2, "measure each half separately"): the
+       one-pass fill of the two adjacent formula lines saves 4 keys hand-keyed (22 against 26)
+       — the growth failure band, so it is the demo's route but never the star; and anchoring
+       saves nothing at all, because the fill beat already forces it, so it would fall out by
+       the nature of doing the exercise.
+
+       §1.0-R4(t) THE REALITY TEST: this is the FCF strip an associate builds the week the DCF
+       is due — real operating-case rows, real magnitudes, stated units, a basis memo. §3.1
+       puts Models I at B-heavy, so the artifact stays a valuation page; the labels are plain
+       enough (revenue, EBIT, taxes, capex) that an FP&A reader is never sent to a glossary,
+       and the prompt glosses NOPAT on first use (§1.7 R7).
+
+       MODELING_STANDARDS: uFCF = EBIT × (1 − t) + D&A − Capex − ΔNWC (§4, verbatim). Costs
+       and uses carry their sign (§2), stated on the board's own basis line, so the cascade is
+       a column of additions. Font colour is provenance (§1) — every seeded driver and the tax
+       rate ship blue, every cell the player builds computes black. NOPAT and unlevered FCF are
+       subtotals and wear TOP borders (§1.0(f)); the header row wears the bottom rule (doctrine
+       §2.1b). The rate cell is the §1.0(f)/(l) input convention: light yellow, all borders,
+       populated, and labelled with the assumption's own name rather than the word "Helper"
+       (the r430 ruling). SIMPLIFIED DELIBERATELY: no mid-year convention and no calendarisation
+       — this board is the FCF component, and the discounting strip is `dcf`'s board (§1.3, a
+       Models board is a COMPONENT of a build).
+
+       §1.3 DENSITY: ROWS=20, floor and cap. 14 of 20 rows carry content at the win state (70%),
+       against the ≥60% target — the ROWS=14 inheritance is not repeated here.
+
+       No cueCell() (§1.0-R3(q)): every graded target is a labelled place — each build row
+       carries its own label in column A, and the plan total sits at the intersection of the
+       "Unlevered FCF" row and the "FY26–30E" header — so the green ring always has something
+       to sit on and a red note would be furniture with nothing to mark. */
+    name:'uFCF', label:'Build the unlevered FCF', par:40, parKeys:38, saveClose:true,   /* r444: par re-swept from scratch post-rework (was par 32 / parKeys 31 on the old 3-check ROWS:12 board). dev/e2e-par-sweep.js fcfbuild, 5-seed median 38 keys INCLUDING the engine-appended Ctrl+S, and flat across seeds — the demo types the same characters on every build (the rate address is always five, $B$15/$B$16/$B$17, and no seeded figure is ever typed). par 40 ≈ 1.05 s/key, the house band. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 60 · pro 46 · legendary 40 — §4.58 says std, so no HOTKEY_CLOCKS override. */
     aha:'Unlevered FCF is a cascade — NOPAT, add back D&A, take out capex and the NWC build; the row the DCF discounts.',
-    prompt:'From a five-year operating case, build the one row a DCF needs: unlevered free cash flow. Tax the EBIT (rate anchored), arrive at NOPAT (net operating profit after tax), add back the non-cash D&A, then subtract capex and the increase in working capital. Three formula rows, each filled across.',
-    req:'<em>B4</em> taxes <em>=-B3*$B$11</em> · fill B4:F4 → · <em>B5</em> NOPAT <em>=B3+B4</em> · fill B5:F5 → · <em>B9</em> uFCF <em>=B5+B6+B7+B8</em> · fill B9:F9 →',
-    guide:[
-      'cash taxes at B4 · <kbd>=-B3*$B$11</kbd> — EBIT × the anchored tax rate, negative',
-      'select B4:F4 · <kbd>ctrl</kbd>+<kbd>r</kbd> — one formula, all five years',
-      'NOPAT at B5 · <kbd>=B3+B4</kbd> · fill B5:F5 → — EBIT after tax',
-      'unlevered FCF at B9 · <kbd>=B5+B6+B7+B8</kbd> — NOPAT + D&A + capex + ΔNWC (the last two already negative) · fill B9:F9 →',
-    ],
-    targets:['B4:F4','B5:F5','B9:F9'],
-    demo(){ return [
-      {sel:'B4', keys:[...T('=-B3*$B$11'), Kb.enter]},
-      {sel:'B4:F4', keys:[Kb.fillR]},
-      {sel:'B5', keys:[...T('=B3+B4'), Kb.enter]},
-      {sel:'B5:F5', keys:[Kb.fillR]},
-      {sel:'B9', keys:[...T('=B5+B6+B7+B8'), Kb.enter]},
-      {sel:'B9:F9', keys:[Kb.fillR]},
+    prompt:'Your VP wants the DCF in the model before the four o\'clock, and the operating case stops at EBIT — nobody has built the cash row yet. Tax the EBIT at the rate on the assumptions line to reach NOPAT, net operating profit after tax, then add back D&A, take out capex and the increase in working capital, and carry the build across all five plan years. Total the plan and the row is ready to discount.',
+    req(){ const o=this._o; return '<em>B7</em> <em>=-B6*'+o.rateAbs+'</em> · <em>B8</em> <em>=B6+B7</em> · <em>B12</em> <em>=SUM(B8:B11)</em> · <em>B7:F8</em> and <em>B12:F12</em> → <em>ctrl+r</em> · <em>B12:G12</em> → <em>alt+=</em> · <em>A12:G12</em> → <em>ctrl+b</em> <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    guide(){ const o=this._o; const R=o.rateAbs; return [
+      'cash taxes at <b>B7</b> · <kbd>=-B6*'+R+'</kbd> — EBIT × the rate on the <b>'+o.rateLabel+'</b> line, negative because tax is a use of cash. The <kbd>$</kbd> signs (<kbd>f4</kbd> cycles them) are what let this one formula serve all five years',
+      'NOPAT at <b>B8</b> · <kbd>=B6+B7</kbd> — the tax line already carries its minus, so the cascade adds down the column',
+      'unlevered FCF at <b>B12</b> · <kbd>=SUM(B8:B11)</kbd> — NOPAT and the three lines under it. Careful with <kbd>alt</kbd>+<kbd>=</kbd> here: it proposes <kbd>=SUM(B5:B11)</kbd>, which reaches back over EBIT and the taxes and counts them twice — type this one, or re-point the proposal with the arrows before <kbd>↵</kbd>',
+      'select <b>B7:F8</b> · <kbd>ctrl</kbd>+<kbd>r</kbd> carries both lines out in one pass (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> is the ribbon route), then <b>B12:F12</b> the same way',
+      'the plan total at <b>G12</b> · a live SUM across <b>'+o.yr[0]+'</b> to <b>'+o.yr[4]+'</b>',
+      'close the line the model reads: select <b>A12:G12</b> · <kbd>ctrl</kbd>+<kbd>b</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> puts the rule ABOVE it',
+      '☆ the plan total never needed typing: select <b>B12:G12</b> — the filled row THROUGH the empty total cell — and press <kbd>alt</kbd>+<kbd>=</kbd>; one press writes the SUM and commits it. Typing <kbd>=SUM(B12:F12)</kbd> clears the beat just the same, and costs you eleven more keys',
+    ]; },
+    /* order: ① the tax cell · ② NOPAT · ③ unlevered FCF · ④ the two adjacent lines the fill
+       takes across · ⑤ the empty plan-total cell · ⑥ the closing line · ☆ never ringed (bonus
+       rows skip the rails).
+       ④ rings B7:F8 and NOT the whole C7:F12 rectangle: the rows between NOPAT and the closing
+       line hold the seeded drivers, and a ring drawn over them would read as "fill this block",
+       which is the one move that destroys the board (§1.0-R3(q) — a cue must point at the place
+       the work happens, never at a place that only looks like it). Seen in the mid-solve
+       screenshot, not in the source. The uFCF row's own fill is named in the beat and in
+       guide[3]; the rail parks the cursor, it does not bound the beat. */
+    targets(){ return ['B7','B8','B12','B7:F8','G12','A12:G12',null]; },
+    demo(){ const o=this._o; return [
+      {sel:'B7',      keys:[...T('=-B6*'+o.rateAbs), Kb.enter]},
+      {sel:'B8',      keys:[...T('=B6+B7'), Kb.enter]},
+      {sel:'B12',     keys:[...T('=SUM(B8:B11)'), Kb.enter]},
+      {sel:'B7:F8',   keys:[Kb.fillR]},
+      {sel:'B12:F12', keys:[Kb.fillR]},
+      /* ☆ + beat 5 in one press: the filled row THROUGH the empty total cell, so autosum's
+         r192 RANGE form commits =SUM(B12:F12) without ever opening the editor. */
+      {sel:'B12:G12', keys:[Kb.eq]},
+      /* §1.0(a) format-as-you-go: the dress lands on the line the three beats above just
+         finished, not batched at the end of the drill. */
+      {sel:'A12:G12', keys:[Kb.bold]},
+      {sel:'A12:G12', keys:[Kb.alt,L('H'),L('B'),L('P')]},
     ]; },
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — unlevered FCF ($mm)',txt:true,bold:true};
-      cells['A2']={...blankCell(),value:'Year',txt:true,bold:true};
-      cells['A3']={...blankCell(),value:'EBIT',txt:true};
-      cells['A4']={...blankCell(),value:'Less: cash taxes',txt:true};
-      cells['A5']={...blankCell(),value:'NOPAT',txt:true,bold:true};
-      cells['A6']={...blankCell(),value:'Plus: D&A',txt:true};
-      cells['A7']={...blankCell(),value:'Less: capex',txt:true};
-      cells['A8']={...blankCell(),value:'Less: increase in NWC',txt:true};
-      cells['A9']={...blankCell(),value:'Unlevered FCF',txt:true,bold:true};
-      cells['A11']={...blankCell(),value:'Tax rate',txt:true};
+      /* ---- §1.2(b) content pool: the deal name and where the plan starts ---- */
+      const y0=2026+rnd(-1,1);
+      const yr=[0,1,2,3,4].map(i=>'FY'+String(y0+i).slice(2)+'E');
+      const span='FY'+String(y0).slice(2)+'–'+String(y0+4).slice(2)+'E';
+      cells['A1']={...blankCell(),value:codename()+' — unlevered free cash flow build ($mm)',txt:true,bold:true};
+      /* MODELING_STANDARDS §2: state the sign convention on the board and never let the seeded
+         content violate it — every cost and every use below ships negative. */
+      cells['A2']={...blankCell(),value:'Operating case · costs and uses of cash carry their sign',txt:true,it:true,fontColor:'gray'};
+      const HDR=['Year',...yr,span];
+      for(let c=1;c<=7;c++){ cells[colLetter(c)+'4']={...blankCell(),value:HDR[c-1],txt:true,bold:true,align:c===1?null:'r',bb:true}; }
+      const LBL=['Revenue','EBIT','Less: cash taxes','NOPAT','Plus: D&A','Less: capex','Less: increase in NWC','Unlevered FCF'];
+      /* NOPAT's label ships bold with its rule; the closing line ships PLAIN, and not only
+         because beat 6 dresses it — bold is a TOGGLE, so a player who bolds the line cell by
+         cell (the §1.0(c) slow route, walked in dev/verify-fcfbuild.js) would turn a
+         pre-bolded label OFF and watch a correct-looking board keep the beat dark. Found by
+         walking the route, fixed at the BOARD rather than at the predicate. */
+      for(let i=0;i<8;i++) cells['A'+(5+i)]={...blankCell(),value:LBL[i],txt:true,bold:(i===3)};
+      /* ---- §1.2(c) value ranges: every figure through rnd(), magnitudes held so the widest
+         cell a column can ever carry — "(1,234)" — still fits its width ---- */
       const tax=rnd(21,28)/100;
-      let ebit=rnd(20,60)*10;
-      this._tax=tax; this._ebit=[]; this._da=[]; this._capex=[]; this._dnwc=[];
-      this._taxes=[]; this._nopat=[]; this._ufcf=[];
-      for(let y=1;y<=5;y++){ const col=colLetter(y+1);
-        cells[col+2]={...blankCell(),value:y,fontColor:'blue'};
-        const da=Math.round(ebit*rnd(15,30)/100);
-        const capex=-Math.round(ebit*rnd(20,40)/100);
-        const dnwc=-Math.round(ebit*rnd(3,12)/100);
-        cells[col+3]={...blankCell(),value:ebit,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+4]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-        cells[col+6]={...blankCell(),value:da,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+7]={...blankCell(),value:capex,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+8]={...blankCell(),value:dnwc,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+9]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
-        const taxes=-ebit*tax, nopat=ebit+taxes, ufcf=nopat+da+capex+dnwc;
-        this._ebit.push(ebit); this._da.push(da); this._capex.push(capex); this._dnwc.push(dnwc);
-        this._taxes.push(taxes); this._nopat.push(nopat); this._ufcf.push(ufcf);
-        ebit=Math.round(ebit*(1+rnd(4,10)/100));
+      /* capex is drawn ABOVE D&A, never below it: on a plan whose revenue grows every year, a
+         business spending less than it depreciates is shrinking its asset base, and that is the
+         first thing a reviewer would query on this page (MODELING_STANDARDS §7, the board must
+         be a plausible artifact). Independent draws let it read backwards on ~a third of seeds. */
+      const marg=rnd(18,26)/100, daP=rnd(4,6)/100, cxP=daP+rnd(1,3)/100, nwP=rnd(15,25)/100;
+      let rev=rnd(120,260)*10, prev=Math.round(rev/(1+rnd(5,9)/100));
+      const revs=[],ebits=[],taxes=[],nopat=[],das=[],capex=[],dnwc=[],ufcf=[];
+      for(let i=0;i<5;i++){
+        const eb=Math.round(rev*marg), tx=-eb*tax, np=eb+tx;
+        const da=Math.round(rev*daP), cx=-Math.round(rev*cxP), dn=-Math.round((rev-prev)*nwP);
+        const fc=np+da+cx+dn;
+        revs.push(rev); ebits.push(eb); taxes.push(tx); nopat.push(np);
+        das.push(da); capex.push(cx); dnwc.push(dn); ufcf.push(fc);
+        const C=colLetter(2+i);
+        /* MODELING_STANDARDS §1: blue = a hardcoded input a human typed; the three rows the
+           player BUILDS ship empty and compute black. */
+        cells[C+'5'] ={...blankCell(),value:rev,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[C+'6'] ={...blankCell(),value:eb, fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[C+'7'] ={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[C+'8'] ={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};   /* §1.0(f): NOPAT is a subtotal and the template already carries its rule ABOVE — doctrine §2.1b, the board ships pre-dressed where the lesson is elsewhere. The closing line below is the one the player rules (beat 6, the §1.6 finish-state beat). */
+        cells[C+'9'] ={...blankCell(),value:da, fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[C+'10']={...blankCell(),value:cx, fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[C+'11']={...blankCell(),value:dn, fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[C+'12']={...blankCell(),fmtStyle:'comma',decimals:0};
+        prev=rev; rev=Math.round(rev*(1+rnd(5,9)/100));
       }
-      cells['B11']={...blankCell(),value:tax,fontColor:'blue',fmtStyle:'percent',decimals:0};
-      return {ROWS:12, cells, active:{r:4,c:2}, sel:null, colW:{1:150,2:80,3:80,4:80,5:80,6:80}};
+      cells['G12']={...blankCell(),fmtStyle:'comma',decimals:0};
+      /* ---- §1.2(a) site shuffle: the assumptions block draws from a 3-spot pool, so the
+         address the tax formula has to anchor moves with the seed. Row 13 is a blank moat in
+         every column, so Ctrl+arrow can never ride through between the two islands. ---- */
+      const AS=14+rnd(0,2);
+      const rateLabel='Tax rate';
+      cells['A'+AS]={...blankCell(),value:'Assumptions',txt:true,bold:true};
+      cells['A'+(AS+1)]={...blankCell(),value:rateLabel,txt:true};
+      /* §1.0(f)+(l): the input convention — light yellow, all borders, POPULATED, and named by
+         the assumption itself rather than the word "Helper" (r430). */
+      cells['B'+(AS+1)]={...blankCell(),value:tax,fontColor:'blue',fmtStyle:'percent',decimals:0,fill:'yellow',ball:true,align:'c'};
+      cells['A'+(AS+2)]={...blankCell(),value:'Source: '+span+' operating case, board-approved',txt:true,it:true,fontColor:'gray'};
+      this._o={ yr, span, rateRow:AS+1, rateCell:'B'+(AS+1), rateAbs:'$B$'+(AS+1), rateLabel, tax,
+        revs, ebits, taxes, nopat, das, capex, dnwc, ufcf,
+        total: ufcf.reduce((a,b)=>a+b,0) };
+      return {ROWS:20, cells, active:{r:7,c:2}, sel:null, colW:{1:172,2:78,3:78,4:78,5:78,6:78,7:92}};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(Math.abs(exp)*1e-3,0.5); };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D','E','F'];
+      const o=this._o, YC=['B','C','D','E','F'];
+      const cel=k=>S.cells[k]||{};
+      /* A LIVE build: a formula that actually points at the sheet. A typed number never clears
+         (the row the DCF discounts has to recompute), and neither does a formula that is just a
+         constant dressed as one — doctrine §2.2's sanctioned "don't hardcode the answer" case. */
+      const live=k=>{ const c=cel(k); return !!(c.formula && typeof c.value==='number' && /[A-J]\$?\d/.test(String(c.formula))); };
+      const near=(k,exp)=>{ const v=cel(k).value; return typeof v==='number' && Math.abs(v-exp)<Math.max(Math.abs(exp)*2e-3,0.75); };
+      const built=(k,exp)=>live(k)&&near(k,exp);
+      /* Every cell a formula names, ranges expanded — so =SUM(B6:B7) reads the same as =B6+B7.
+         Function names cannot collide: the pattern needs a digit straight after the letter. */
+      const refsIn=f=>{ const out=[], s=String(f||'').toUpperCase().replace(/\$/g,'');
+        const rx=/([A-J])(\d+):([A-J])(\d+)|([A-J])(\d+)/g; let m;
+        while((m=rx.exec(s))){
+          if(m[1]){ const c1=m[1].charCodeAt(0)-64, r1=+m[2], c2=m[3].charCodeAt(0)-64, r2=+m[4];
+            for(let r=Math.min(r1,r2);r<=Math.max(r1,r2);r++) for(let c=Math.min(c1,c2);c<=Math.max(c1,c2);c++) out.push(colLetter(c)+r);
+          } else out.push(m[5]+m[6]);
+        } return out; };
+      /* MODELING_STANDARDS §1 ("NO HARDCODES INSIDE FORMULAS — gradeable") read as END STATE
+         (§1.0-R3(p)): the tax has to TRACE to a rate held in a CELL, by any route and any op
+         order. The walk is transitive, so the NOPAT-first build (=B6*(1-$B$15) up top, the tax
+         line back-solving =B8-B6) clears exactly like the direct one, and so does a player who
+         parks the rate in a spare cell of their own. Only =-B6*0.24 — the rate buried inside
+         the formula, the junior error this chapter exists to prevent — stays dark. */
+      const rateish=k=>{ const v=cel(k).value; return typeof v==='number' && Math.abs(v-o.tax)<1e-9; };
+      const fromRate=(k,d)=>{ if(d<0) return false; const c=cel(k); if(!c.formula) return false;
+        const rs=refsIn(c.formula);
+        return rs.some(x=>rateish(x)) || rs.some(x=>x!==k && fromRate(x,d-1)); };
+      const taxOk=i=>built(YC[i]+'7',o.taxes[i]) && fromRate(YC[i]+'7',4);
+      const filled=[1,2,3,4].every(i=>taxOk(i) && built(YC[i]+'8',o.nopat[i]) && built(YC[i]+'12',o.ufcf[i]));
+      /* §1.0(c) FREEDOM: any LIVE route totals the plan — =SUM over the row, the five-term
+         addition chain, or autosum by either of its two routes. sumishF() reads both shapes. */
+      const g=cel('G12');
+      const totalOk=!!(g.formula && sumishF(g.formula) && near('G12',o.total));
+      /* §1.0(f): a total earns its rule ABOVE, and a bottom rule under it is the house error
+         that never clears. The DOUBLE bottom rule is allowed to ride along — MODELING_STANDARDS
+         §1 sanctions it on a grand total, and forbidding it would strand a canonically-correct
+         board. Graded on the label and the five year figures, so any selection shape that
+         reaches the visible line clears (§1.0-R3(p), the r430 label+figures widening). */
+      const dressOk=['A12','B12','C12','D12','E12','F12'].every(k=>{ const c=cel(k); return !!(c.bold && c.bt && !c.bb); });
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision · §1.0-R4(u):
+         the page's own ☆ was real WORK, so it is core beat 5 now and the MECHANIC is the star).
+         Read off the r436 S.autoSumN latch — recorded when an Alt+= / Alt H U S / Alt M U S
+         proposal actually commits, never geometry-inferred, because a typed =SUM and an autosum
+         leave the same cell behind. Both autosum routes were walked and both light it: the
+         range form (select B12:G12, one press commits) and the single-cell proposal at G12
+         (Alt+= then ↵ — nothing numeric sits above it, so the adaptive walk goes LEFT and
+         proposes =SUM(B12:F12) correctly). */
+      const starOk=totalOk && (S.autoSumN||0)>=1;
       return [
-        {label:'tax the EBIT — one anchored formula (=-B3*$B$11), filled across all five years', ok:[0,1,2,3,4].every(i=>near(COL[i]+'4',this._taxes[i])) && refs('B4',['B3','B11'])},
-        {label:'drop to NOPAT — EBIT after tax, filled across', ok:[0,1,2,3,4].every(i=>near(COL[i]+'5',this._nopat[i])) && refs('B5',['B3','B4'])},
-        {label:'build unlevered FCF — NOPAT + D&A + capex + ΔNWC, filled across', ok:[0,1,2,3,4].every(i=>near(COL[i]+'9',this._ufcf[i])) && refs('B9',['B5','B6','B7','B8'])},
+        {label:'Build the cash-tax line for '+o.yr[0]+' — EBIT at the assumed tax rate', ok: taxOk(0)},
+        {label:'Build NOPAT for '+o.yr[0]+' — EBIT after tax', ok: built('B8',o.nopat[0])},
+        {label:'Build unlevered FCF for '+o.yr[0]+' — NOPAT, D&A, capex and the NWC increase', ok: built('B12',o.ufcf[0])},
+        {label:'Fill the tax, NOPAT and unlevered FCF lines across '+o.yr[1]+' through '+o.yr[4], ok: filled},
+        {label:'Total the plan years in the '+o.span+' column', ok: totalOk},
+        {label:'Bold the unlevered FCF line and add a top border above it', ok: dressOk},
+        {label:'Total the plan years without typing the formula', ok: starOk, bonus:true},
       ];
     }
   },

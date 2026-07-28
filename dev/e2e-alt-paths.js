@@ -1635,6 +1635,37 @@ const ALTS = [
       st.push({sel:o.CD+o.rKd,  keys:[...T('='+o.CG+o.aKd+'-'+o.CG+o.aKd+'*'+o.CG+o.aTax),{key:'Enter'}]});
       st.push({sel:o.CD+o.rW,   keys:[...T('='+o.CG+o.aEq+'/'+W+'*'+o.CD+o.rKe+'+'+o.CG+o.aDb+'/'+W+'*'+o.CD+o.rKd),{key:'Enter'}]});
       return st; }` },
+  /* r444 (fcfbuild depth pass, DEPTH_PASS §4.58) — one of the nine zero-ALT drills named in
+     §1.8, clearing the minimum here. ALT 1 = chord-ROUTE alt: ribbon fills, the ribbon bold,
+     the tax formula with the minus on the right, and the SINGLE-CELL autosum proposal at the
+     total cell (the ☆'s other route — it must still light). ALT 2 = op-ORDER alt AND the
+     §1.0(c) freedom control: nothing filled, nothing autosummed, every one of the fifteen
+     cells hand-typed and the dress walked cell by cell, the line closed BEFORE the total is
+     landed — all six cores clear and the ☆ must stay DARK (measured 206 keys against the
+     demo's 38). */
+  { key: 'fcfbuild', name: 'RIBBON fills (Alt H F I R), ribbon bold (Alt H 1), minus on the right of the tax formula, single-cell autosum proposal at the total cell (the ☆ still lights)', moves: `C => { const o=C._o; return [
+      {sel:'B7',      keys:[...T('=B6*-'+o.rateAbs), {key:'Enter'}]},
+      {sel:'B8',      keys:[...T('=SUM(B6:B7)'), {key:'Enter'}]},
+      {sel:'B12',     keys:[...T('=B8+B9+B10+B11'), {key:'Enter'}]},
+      {sel:'B7:F7',   keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:'B8:F8',   keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:'B12:F12', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:'G12',     keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},
+      {sel:'A12:G12', keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:'A12:G12', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+    ]; }` },
+  { key: 'fcfbuild', name: 'SLOW RUN, ☆ forfeited: nothing filled and nothing autosummed — all fifteen cells hand-typed year by year, the closing line dressed cell by cell BEFORE the total lands (206 keys against the demo\'s 38, every core green)', moves: `C => { const o=C._o; const YC=['B','C','D','E','F']; const mv=[];
+      for(let i=0;i<5;i++){ const c=YC[i];
+        mv.push({sel:c+'7',  keys:[...T('=-'+c+'6*'+o.rateAbs), {key:'Enter'}]});
+        mv.push({sel:c+'8',  keys:[...T('='+c+'6+'+c+'7'), {key:'Enter'}]});
+        mv.push({sel:c+'12', keys:[...T('='+c+'8+'+c+'9+'+c+'10+'+c+'11'), {key:'Enter'}]});
+      }
+      for(const c of ['A','B','C','D','E','F','G']){
+        mv.push({sel:c+'12', keys:[{key:'b',ctrl:true}]});
+        mv.push({sel:c+'12', keys:[{key:'Alt'},L('h'),L('b'),L('p')]});
+      }
+      mv.push({sel:'G12', keys:[...T('=B12+C12+D12+E12+F12'), {key:'Enter'}]});
+      return mv; }` },
   { key: 'txncomps', name: 'tape filled via ctrl+d, MEDIAN typed last-first', moves: `C => [
       {sel:'D3', keys:[...T('=B3/C3'),{key:'Enter'}]},
       {sel:'D3:D7', keys:[{key:'d',ctrl:true}]},
