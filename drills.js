@@ -136,7 +136,7 @@ window.HOTKEY_DRILLS = {
     percent:    { name:'% of Revenue', label:'Common-size both statements', tab:'Common-size', desc:'Both blocks ÷ their OWN revenue, $-locked so the fill can’t drift' },
     intsched:   { name:'Interest', label:'Run the interest schedule', tab:'Interest', desc:'Roll the debt, then rate × the opening balance is cash interest — and EBITDA ÷ interest is the coverage the covenant reads' },
     schedule:   { name:'Schedule', label:'Roll it forward',     tab:'Schedule',    desc:'5-yr roll: linked openings + the accumulated-dep memo' },
-    comps:      { name:'Comps',    label:'Run the comps',       tab:'Comps',       desc:'Build the multiples, read the summary \u2014 median, high/low and the LARGE/SMALL trimmed range \u2014 land per share and premium' },
+    comps:      { name:'Comps',    label:'Run the comps',       tab:'Comps',       desc:'Build both enterprise-value multiples across the peer set, read the median, high and low, and carry it down to an implied share price' },
 
     // Full Builds — plus lookup/lookup2, which live in Data & Lookups
     isbuild:    { name:'IS Build',  label:'Build the income statement', tab:'IS Build',  desc:'5-yr IS: anchored drivers, margin row as %, bottom line ruled' },
@@ -330,7 +330,7 @@ window.HOTKEY_CLOCKS = {
   gauntlet:  { pass: 94 },   /* r433: the Formatting capstone — par 47 × 2 (§4.20 "Clocks: capstone pass=par×2.0") */
 };
 
-window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":47,"margin":40,"foot":29,"percent":21,"cagr":36,"anchor":22,"bridge":33,"sumif":64,"rollup":80,"fxconvert":35,"cases":97,"sort":31,"scrub":21,"recon":92,"filterpass":26,"unhide":25,"lookup":59,"lookup2":80,"drill":22,"series":44,"audit":28,"triage":40,"wrapfix":26,"balcheck":37,"stalelink":64,"tieout":36,"signerr":35,"versionup":48,"balance":66,"wacc":112,"fcfbuild":40,"dcf":85,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
+window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":47,"margin":40,"foot":29,"percent":21,"cagr":36,"anchor":22,"bridge":33,"sumif":64,"rollup":80,"fxconvert":35,"cases":97,"sort":31,"scrub":21,"recon":92,"filterpass":26,"unhide":25,"lookup":59,"lookup2":80,"drill":22,"series":44,"audit":28,"triage":40,"wrapfix":26,"balcheck":37,"stalelink":64,"tieout":36,"signerr":35,"versionup":48,"balance":66,"wacc":112,"fcfbuild":40,"dcf":85,"comps":89,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}
