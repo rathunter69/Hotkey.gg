@@ -1141,19 +1141,49 @@ const ALTS = [
       mv.push({sel:o.CB+o.rPvtv, keys:[...T('='+o.CB+o.rTv+'/(1+'+o.CB+o.rW+')^5'),{key:'Enter'}]});
       mv.push({sel:o.CB+o.rEv, keys:[...T('=SUM('+o.CB+o.rPv+':'+o.CF+o.rPv+')+'+o.CB+o.rPvtv),{key:'Enter'}]});
       return mv; }` },
-  { key: 'debtsched', name: 'machine built FIRST, the VP rate dropped in LAST, ribbon fills + alt h 1', moves: `C => [
-      {sel:'B4', keys:[...T('=-B2*$B$9'),{key:'Enter'}]},
-      {sel:'B5', keys:[...T('=-MIN(B2+B4,MAX(0,B3))'),{key:'Enter'}]},
-      {sel:'B6', keys:[...T('=B2+B4+B5'),{key:'Enter'}]},
-      {sel:'B7', keys:[...T('=$B$10*(B2+B6)/2'),{key:'Enter'}]},
-      {sel:'C2', keys:[...T('=B6'),{key:'Enter'}]},
-      {sel:'C2:F2', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B4:F7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B6:F6', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B6:F6', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:'B9', keys:[...T(C._ratePct+'%'),{key:'Enter'}]},
-      {sel:'B9', keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-    ]` },
+  /* r447 (DEPTH_PASS §4.76 depth pass) — BOTH debtsched entries are NEW; the single pre-r447
+     entry ("machine built FIRST, the VP rate dropped in LAST, ribbon fills + alt h 1") is
+     DELETED, because it drives the retired B2/B4/B9/C2 geometry and the average-balance
+     interest formula that MODELING_STANDARDS §5 replaced. ALT 1 = chord-ROUTE alt (ribbon
+     everywhere, four separate row fills — the ☆ is forfeited and all six cores clear, the
+     §1.0(c) freedom proof). ALT 2 = op-ORDER alt (dress first, schedule built bottom-up, the
+     roll linked before the block travels, the VP's rate dropped in LAST so recalc closes it)
+     AND the ☆'s second mechanic — a TILED paste of the first-year column instead of a fill. */
+  { key: 'debtsched', name: 'RIBBON routes throughout (Alt H F I R fills · Alt H 1 bold · Alt H B S outside border) and the block taken across as FOUR separate row fills — the ☆ is forfeited, all six cores clear', moves: `C => { const o=C._o;
+      const Y=i=>colLetter(o.cY0+i), Y0=Y(0);
+      const RIB=[{key:'Alt'},L('h'),L('f'),L('i'),L('r')];
+      return [
+        {sel:o.rate,  keys:[...T(C._ratePct+'%'),{key:'Enter'}]},
+        {sel:o.rate,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+        {sel:o.am0,   keys:[...T('=-'+Y0+o.rBeg+'*$'+Y0+'$'+o.rRate),{key:'Enter'}]},
+        {sel:o.sw0,   keys:[...T('=-MIN('+Y0+o.rBeg+'+'+Y0+o.rAm+',MAX(0,'+Y0+o.rCash+'))'),{key:'Enter'}]},
+        {sel:o.end0,  keys:[...T('='+Y0+o.rBeg+'+'+Y0+o.rAm+'+'+Y0+o.rSw),{key:'Enter'}]},
+        {sel:o.int0,  keys:[...T('=-$'+Y0+'$'+o.rIr+'*'+Y0+o.rBeg),{key:'Enter'}]},
+        {sel:o.amRng,  keys:RIB},
+        {sel:o.swRng,  keys:RIB},
+        {sel:o.endRng, keys:RIB},
+        {sel:o.intRng, keys:RIB},
+        {sel:o.begL1,   keys:[...T('='+Y0+o.rEnd),{key:'Enter'}]},
+        {sel:o.begRest, keys:RIB},
+        {sel:o.endRng, keys:[{key:'Alt'},L('h'),D(1)]},
+        {sel:o.endRng, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
+      ]; }` },
+  { key: 'debtsched', name: 'dress FIRST, schedule built bottom-up (interest → ending → sweep → amortization), the roll linked before the block travels by TILED PASTE, and the VP rate dropped in LAST — recalc closes it', moves: `C => { const o=C._o;
+      const Y=i=>colLetter(o.cY0+i), Y0=Y(0), YN=Y(4);
+      return [
+        {sel:o.endRng, keys:[{key:'b',ctrl:true}]},
+        {sel:o.endRng, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+        {sel:o.int0,  keys:[...T('=-$'+Y0+'$'+o.rIr+'*'+Y0+o.rBeg),{key:'Enter'}]},
+        {sel:o.end0,  keys:[...T('='+Y0+o.rBeg+'+'+Y0+o.rAm+'+'+Y0+o.rSw),{key:'Enter'}]},
+        {sel:o.sw0,   keys:[...T('=-MIN('+Y0+o.rBeg+'+'+Y0+o.rAm+',MAX(0,'+Y0+o.rCash+'))'),{key:'Enter'}]},
+        {sel:o.am0,   keys:[...T('=-'+Y0+o.rBeg+'*$'+Y0+'$'+o.rRate),{key:'Enter'}]},
+        {sel:o.begL1,   keys:[...T('='+Y0+o.rEnd),{key:'Enter'}]},
+        {sel:o.begRest, keys:[{key:'r',ctrl:true}]},
+        {sel:Y0+o.rAm+':'+Y0+o.rInt,   keys:[{key:'c',ctrl:true}]},
+        {sel:Y(1)+o.rAm+':'+YN+o.rInt, keys:[{key:'v',ctrl:true}]},
+        {sel:o.rate,  keys:[...T(C._ratePct+'%'),{key:'Enter'}]},
+        {sel:o.rate,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+      ]; }` },
   { key: 'isbuild', name: 'dress FIRST, statement built bottom-up (margin to COGS), alt h p + ribbon fills', moves: `C => [
       {sel:'B7:F7', keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
