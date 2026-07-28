@@ -12029,87 +12029,310 @@ const CHALLENGES = {
     }
   },
   bsbuild:{
-    name:'BS Build', label:'Balance the balance sheet', par:60, parKeys:62,
-    aha:'The check row is part of the build — a sheet ties or it ships nothing.',
-    prompt:'Three years of balance sheet. Total both sides with live SUMs, build the retained-earnings roll ONCE and fill it across \u2014 prior RE + net income \u2212 dividends, walking year to year \u2014 prove it balances with a check row that must read zero three times, then format it: totals bolded, the check row ruled off. If a check cell isn\u2019t 0.0, something upstream is broken.',
-    req:'<em>B5</em> =SUM(B2:B4) fill \u2192 \u00b7 <em>B8</em> =SUM(B6:B7) fill \u2192 \u00b7 <em>C10</em> RE roll =B10+C12-C13 \u00b7 fill C10:D10 \u2192 \u00b7 <em>B11</em> =B8+B9+B10 fill \u2192 \u00b7 <em>B14</em> =B5-B11 fill \u2192 \u00b7 dress: <em>ctrl+b</em> B5:D5 and B11:D11 \u00b7 <em>alt h b p</em> B14:D14',
-    guide:[
-      'total assets at B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u00b7 fill right',
-      'total liabilities at B8 \u00b7 <kbd>=SUM(B6:B7)</kbd> \u00b7 fill right',
-      'THE RE ROLL at C10 \u00b7 <kbd>=B10+C12-C13</kbd> \u2014 prior RE + NI \u2212 dividends \u00b7 fill C10:D10 \u2192 and it walks',
-      'total L&E at B11 \u00b7 <kbd>=B8+B9+B10</kbd> \u00b7 fill \u2192 \u00b7 check at B14 \u00b7 <kbd>=B5-B11</kbd> \u00b7 fill \u2192 \u2014 all three years must read 0',
-      'format it: <kbd>ctrl</kbd>+<kbd>b</kbd> the two total rows \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> the check row',
-    ],
-    targets:['C3:F3','B4:F5','B6:F7','B8:F8'],
-    demo(){ return [
-      {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
-      {sel:'B5:D5', keys:[Kb.fillR]},
-      {sel:'B8', keys:[...T('=SUM(B6:B7)'), Kb.enter]},
-      {sel:'B8:D8', keys:[Kb.fillR]},
-      {sel:'C10', keys:[...T('=B10+C12-C13'), Kb.enter]},
-      {sel:'C10:D10', keys:[Kb.fillR]},
-      {sel:'B11', keys:[...T('=B8+B9+B10'), Kb.enter]},
-      {sel:'B11:D11', keys:[Kb.fillR]},
-      {sel:'B14', keys:[...T('=B5-B11'), Kb.enter]},
-      {sel:'B14:D14', keys:[Kb.fillR]},
-      {sel:'B5:D5', keys:[Kb.bold]},
-      {sel:'B11:D11', keys:[Kb.bold]},
-      {sel:'B14:D14', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
+    /* r448 H6b-FB (DEPTH_PASS §4.79, "Balance the balance sheet") — the depth-pass rework, built
+       to §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (the law wins on conflict), and to
+       dev/MODELING_STANDARDS.md, which is binding on every Full Builds board.
+
+       WAS: 6 checks on a ROWS:14 board (the copied-default tell — §1.3/CAMPAIGN §5 name ROWS=14
+       as the catalog's most-copied defect), guide 5 v checks 6 v targets 4 (tri-length broken,
+       C9), no ☆, no saveClose, and a single trailing beat that dressed BOTH total rows AND the
+       check row at the end of the run — a §1.0(a) format-as-you-go violation. Two of its six
+       checks read formula TEXT (refs('B5',['SUM(']) and the RE roll's refs(...)), which is the
+       CAMPAIGN §1 untriggerable-beat class in its purest form; both are dead here.
+
+       ── DISTINCTNESS: WHY THIS IS NOT `balance` (CAMPAIGN §3 discriminator, asked before
+          anything was built — "does fluency in one produce a CORRECT first attempt at the other?")
+       `balance` §4.55 (Formulas II) is the nearest board in the catalog: a three-year balance
+       sheet, both sides footed, a check row under them. Walked, not argued: `balance`'s method run
+       VERBATIM as a first attempt on this board — total the asset lines, total the L&E lines,
+       write the check — lands the check row at a NON-ZERO number on every seed, because the
+       equity side is short until the retained-earnings roll exists. The first attempt is not
+       merely slower, it is WRONG, which is the discriminator this section asks for.
+       The two drills teach opposite halves of the same page and both are real:
+         · `balance` is the HISTORICAL close — retained earnings comes off the trial balance, it
+           is a given, and the check PROVES the statement ("retained earnings is a given, not a
+           plug"). Its board ships RE typed in every year.
+         · `bsbuild` is the FORWARD roll — retained earnings is COMPUTED from the P&L
+           (MODELING_STANDARDS §3, the corkscrew: begin + net income − dividends = end), and the
+           check proves the ROLL. Only the opening year is given.
+       Neither carries the other's lesson, and MODELING_STANDARDS §7 is explicit that Full Builds
+       is where the pieces taught elsewhere get ASSEMBLED. KEEP, and the boards are deliberately
+       different shapes (four lines a side here, six/five there; a visible net-income and dividend
+       memo block here, none there).
+
+       ── ☆-HEADROOM DIAGNOSTIC (CAMPAIGN §2, BOTH parts, run BEFORE the board was built and
+          re-measured on the shipped board through the live engine — every selection and every
+          navigation KEYED, medians over 5 seeds; numbers reproduced by dev/verify-bsbuild.js).
+         PART 1 — IS THERE SPREAD? fastest legal 60 keys against 261 for the slowest legal route
+           that does the SAME work (every year of every built line typed on its own, both totals
+           written as anchored addition chains, the roll and the check typed per year, every dress
+           walked cell by cell, no fill and no paste anywhere). 4.35×.
+         PART 2 — IS ANY OF THAT SPREAD ☆-LEGAL? This is the half that decides, and it is measured
+           rather than estimated (verify-bsbuild §D isolates the dress and runs it both ways). Of
+           the 201 keys of spread, 31 are FORMATTING and chord-vs-ribbon — the dress costs 20 keys
+           row-wide against 51 cell by cell — and §1.0(c) forces those to clear while §1.0(d)
+           forbids grading them. The other 170 keys are all BUILD spread: retype versus carry.
+           Legal headroom, in the drill's own subject rather than a borrowed one.
+         PART 3 — WHICH FAMILY (the r447 debtsched pattern: measure the candidates, do not pick
+           one by taste). Four families were measured on this exact board, each against its own
+           slow control and each ISOLATED from the work the player does either way (CAMPAIGN §2's
+           "measure each half separately" rule — the gross number flatters whichever family
+           carries the bigger shared prefix, so the marginal keys are what the choice was made on):
+             family                 star  control  spread  verdict
+             paste-CLONE the total    4      16      4.0×   CHOSEN — the best LEGAL spread measured
+             fill-across             14      33      2.4×   legal, but it is `balance`'s star, and
+                                                           isbuild sits ADJACENT in catalog order
+                                                           with a five-year fill-across board
+             multi-enter (Ctrl+↵)    14      14      1.0×   no gain — the roll is two cells, so the
+                                                           multi-commit and the fill cost the same
+             autosum provenance       2      11      5.5×   ILLEGAL: Alt+= vs a typed SUM is
+                                                           chord-vs-typed on the same job, and
+                                                           §1.0(c) forces both to clear
+             independent prove-out    —       —       —     not specced on the §4.79 page, and the
+                                                           §1.0-R4(u) exception is once-a-chapter
+           The chosen star is the FORMAT/FORMULA-CLONING family (§1.0-R4(u) sanctioned list): the
+           two sides of this sheet are four lines deep each with the same offset, so the assets
+           total row ALREADY IS the liabilities total row — one copy, one paste, references
+           shifted (translateFormula, probed: '=SUM(B4:B7)' at +6 rows → '=SUM(B10:B13)', and an
+           addition chain travels the same). Non-fill AND the higher legal spread, so the wave-5
+           addendum's preference and the measurement agree. Measured skippable: building the
+           second total by hand clears every core with the star DARK, at +12 keys on the move and
+           +201 across the board (dev/e2e-alt-paths.js ALT 2, the negative control).
+         A ☆ MUST NOT DEGRADE THE BOARD (CAMPAIGN, r439 `cases`): the paste is over a row that
+         ships comma/0dp exactly like its source, so the clone lands identical furniture. Looked
+         at on the win screenshot, not reasoned about.
+
+       ── EVERY ROUTE TO THE VISIBLE END STATE, ENUMERATED AND PROBED (CAMPAIGN §1 — reading
+          predicates has never once found this class). No check on this board reads a range, a
+          function name, an anchor or an operator out of formula text.
+         · the roll: '=B13+C18+C19' · '=SUM(B13,C18,C19)' · '=B13+C18-ABS(C19)' · the cumulative
+           form on FY3 ('=B13+C18+C19+D18+D19') · anchored · typed year by year · filled ·
+           committed to both cells at once with Ctrl+Enter. All land the same number, all clear.
+         · both totals: '=SUM(block)' · an addition chain · Alt+= in either its range form or its
+           proposal form · anchored or not · filled right, filled LEFT from the last year, pasted,
+           or typed year by year. All clear.
+         · the check: '=TA-TLE' · '=-(TLE-TA)' · '=SUM(assets)-SUM(L&E)' · anchored · either way
+           round, since both land on zero.
+         · the top border: bt OR ball, so Alt H B P, Alt H B D, Alt H B S and Alt H B A all clear
+           (wave-5 addendum: the LENIENT reading, declared in the payload — a 1×1 Alt H B S stores
+           `ball` and not `bt`, CAMPAIGN §1 route fact #7, and grading `bt && !bb` would strand the
+           whole box family).
+         · bold: Ctrl+B and Alt H 1 are the same toggle.
+       What does NOT clear, deliberately and in line with the label's own verb (§1.7: Total = land
+       a live SUM, Build = enter a live formula): a hand-typed CONSTANT standing in a cell whose
+       beat says the line is built. MODELING_STANDARDS §1's no-hardcodes corollary is the reason,
+       and the guide says it in words so nobody watches a dark line with nothing to fix.
+
+       ── STRUCTURAL DEVIATIONS from the §4.79 page, declared here per §0 (the page carries the
+          [SEPARATE PASS — spec provisional] mark and predates the playtest rounds):
+       (1) ☆ RE-CUT (binding, §1.0-R4(u)). The page's bonus is "Bold the check row — three zeros,
+           in ink". Dead on arrival: it is a FORMATTING task, which §1.0(d) forbids outright, and
+           it falls out of ordinary dressing, which fails §1.0-R2(i)'s skippable-decision test.
+           Per §1.0-R4(u) the killed ☆ was real work, so it is PROMOTED to core beat 6 rather than
+           deleted (the r425 editfix/dress/ruleoff precedent), and the ☆ becomes the paste-clone
+           measured above.
+       (2) THE SINGLE DRESS BEAT IS SPLIT FROM ITS TRAILING SLOT AND RESEQUENCED (§1.0(a)). The
+           page's beat 5 dressed both total rows at the end of the run; it now follows the beat
+           that builds the second total, and the check row's bold follows the check.
+       (3) BEAT ORDER: the ROLL COMES FIRST, not third (§1.0(a) chaining + doctrine §8.1.4). The
+           L&E total foots OVER the retained-earnings line, so building the roll first is the only
+           order in which each action changes what the next operates on. Grading is order-free
+           (§1.0-R3(p)), so nothing is forced — this is the checklist's reading order, not a rail.
+       (4) THE PAGE'S OWN WOLF-PLAYTEST QUESTION, answered by law rather than escalated: "does the
+           RE roll want a visible net-income feed line or a scripted memo" → a VISIBLE feed. §1.3's
+           labeled-target rule and §1.0-R4(t) rule 1 both require it: a roll whose inputs are not
+           on the board cannot be built by a player who does not already know the answer. Net
+           income and dividends ship as labelled memo lines under the check.
+       (5) DIVIDENDS ARE IN THE ROLL and ship NEGATIVE (MODELING_STANDARDS §2 + §3 — the corkscrew
+           is begin + net income − dividends, and this catalog's convention is that a reduction
+           carries its own minus so the roll stays a clean addition). The page's beat 3 says "prior
+           RE plus net income"; that is a two-term simplification of the standard shape and the
+           standards file names the three-term form explicitly.
+       (6) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an existing labelled
+           cell in a labelled row — no insert slot, no empty paste target the outline cannot
+           express — so the guided ring carries all six core beats on its own.
+       (7) NO HELPER STACK (§1.0(f)/§1.0-R2(l)): nothing on this board is assumed, converted or
+           scaled; the blue cells ARE the inputs and they ship populated.
+       (8) §1.3 DENSITY: 16 of 20 rows carry content at the win state (80%), against 13 of 20 on
+           the old ROWS:14 board. Three of the four empty rows are the moats between the asset
+           block, the equity block, the check and the memo block — load-bearing, since a balance
+           sheet whose sides run together is not a balance sheet, and they are what stops
+           Ctrl+Shift+↓ riding from one island into the next (doctrine §3 geometry). The fourth is
+           the sheet's bottom margin.
+
+       ── MODELING_STANDARDS CONVENTIONS THIS BOARD FOLLOWS (§7 requires the statement):
+       §1 colour-as-provenance — every typed input ships BLUE, every built line lands black.
+       §1 no hardcodes inside formulas — nothing seeded on this board embeds a rate or a factor.
+       §1 structure — totals wear a TOP border and never a rule underneath; units stated in the
+         title ($mm); negatives render in parentheses (fmtNum comma, r190).
+       §2 sign convention — a reduction carries its own minus (dividends paid ship negative), so
+         the roll is an addition and never a subtraction against a positive.
+       §3 the corkscrew — begin (the prior year's close, REFERENCED, never re-typed) + net income
+         − dividends = end, and next year opens on it.
+       §4 three-statement linkage / §6 error checks — the balance check (A − L − E = 0) lives in
+         one visible place and is expected to read zero.
+       DELIBERATE SIMPLIFICATIONS, said out loud per §7: only the equity side rolls — PP&E, debt
+       and working capital ship flat as given closes, because this board is a COMPONENT (§1.3, §7)
+       and the other corkscrews are `nwcsched`'s and `debtsched`'s. There is no cash flow statement
+       here, so cash is the figure that closes the sheet; it ships positive on every seed, since a
+       negative cash line reads as a bug rather than a balancing figure (the r264 finding). */
+    name:'BS Build', label:'Balance the balance sheet', par:64, parKeys:61, saveClose:true,   /* r448 §4.79 depth pass: par re-swept from scratch (was par 60 / parKeys 62 on the ROWS:14 board with no save closer). dev/e2e-par-sweep.js bsbuild, 5-seed median 61 keys including the engine-appended Ctrl+S, and FLAT at 61 (min 61, max 61) — the demo types only formulas, never a figure, and the corner jitter moves single-letter column names, so the character count cannot move with the draw (the r439 `wrapfix` rule). par 64 ≈ 1.05 s/key, the house band. That lands bsbuild mid-band in Full Builds (cfslink 36 · dashcover 48 · isbuild 51 · opmodel 55 · debtblock 57 · threestmt 59 · nwcsched 74 · lbobuild 82 · dcfbuild 91). Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 1:36 · pro 1:14 · legendary 1:04. */
+    aha:'retained earnings is the wire from the P&L into equity — roll it and the sheet closes itself.',
+    /* §1.5: the aha's MOMENT is the check row landing on zero the moment the roll goes in — the
+       player watches the equity side stop being short. Nothing was plugged to get it there. */
+    prompt:'Your controller wants the closing balance sheet in the board pack by eight tomorrow, and the equity line is the only thing still empty. Retained earnings carries forward — last year closing balance plus this year net income and dividends — and until it does, the sheet does not balance. Roll it, total both sides, and prove the work with a check row that reads zero in all three years. A balance sheet that does not balance goes nowhere.',
+    req(){ const o=this._o; return '<em>'+o.CC+o.rRE+'</em> = '+o.CB+o.rRE+'+'+o.CC+o.rNI+'+'+o.CC+o.rDV+' · <em>ctrl+r</em> across · <em>'+o.CB+o.rTA+'</em> =SUM('+o.CB+o.a0+':'+o.CB+o.aN+') · <em>ctrl+r</em> · copy that row → <em>ctrl+v</em> on <em>'+o.CB+o.rLE+'</em> · <em>ctrl+b</em> + <em>alt h b p</em> both totals · <em>'+o.CB+o.rCK+'</em> ='+o.CB+o.rTA+'-'+o.CB+o.rLE+' <em>ctrl+r</em> · <em>ctrl+b</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o;
+      /* §1.7 R7: no craft verbs in player copy — the ban list includes "foot" and "dress", so the
+         third line says the total RUNS OVER the empty cell rather than foots over it, and the dress
+         line says BOLD and RULE. (Comments must live OUTSIDE the array literal itself — C9 counts
+         top-level elements and does not strip comments.) */
+      return [
+      'the opening year is the audited close and is given, so the roll starts in the second year · on '+o.CC+o.rRE+': <kbd>=</kbd>'+o.CB+o.rRE+'<kbd>+</kbd>'+o.CC+o.rNI+'<kbd>+</kbd>'+o.CC+o.rDV+' <kbd>↵</kbd> — the dividend memo already carries its minus, so the roll ADDS all three · then '+o.CC+o.rRE+':'+o.CD+o.rRE+' and <kbd>ctrl</kbd>+<kbd>r</kbd>, or select both cells, type it once and commit with <kbd>ctrl</kbd>+<kbd>↵</kbd>, or type the last year on its own — it grades the number, not the text',
+      'the four asset lines run row '+o.a0+' to row '+o.aN+' · on '+o.CB+o.rTA+': <kbd>=SUM(</kbd>'+o.CB+o.a0+':'+o.CB+o.aN+'<kbd>)</kbd> <kbd>↵</kbd>, or select the block through the empty total cell and press <kbd>alt</kbd>+<kbd>=</kbd> · take it across with <kbd>ctrl</kbd>+<kbd>r</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> is the same fill). An addition chain totals the same, and typing each year lands it too — it only costs the keys. A typed FIGURE does not: the beat wants a line that computes',
+      'the same job on the other side: four lines, row '+o.l0+' to row '+o.lN+', total on '+o.CB+o.rLE+' · retained earnings is one of those four, so the roll goes in first, or the total runs over an empty cell and comes up short',
+      'bold and rule both total lines now rather than at the end of the run: select each row and <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> rules above it (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> boxes the row, <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> borders every edge, <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>d</kbd> draws top and bottom — all four draw that top line and all four clear)',
+      'the check on '+o.CB+o.rCK+': <kbd>=</kbd>'+o.CB+o.rTA+'<kbd>-</kbd>'+o.CB+o.rLE+' <kbd>↵</kbd> · filled across. Anchored or not, and either way round so long as it lands on zero',
+      'close it: select the check row and <kbd>ctrl</kbd>+<kbd>b</kbd>',
+      '☆ the discovery: both sides are four lines deep and sit the same distance above their total, so the assets total ALREADY IS the liabilities total — select '+o.CB+o.rTA+':'+o.CD+o.rTA+', <kbd>ctrl</kbd>+<kbd>c</kbd>, land on '+o.CB+o.rLE+' and <kbd>ctrl</kbd>+<kbd>v</kbd>: the whole row arrives with its references shifted down. Copying the single cell onto the three-cell row does it too, and so does the paste-special Formulas route. Building the second total by hand clears the beat and forfeits the star; an anchored SUM will not travel, and pasting VALUES lands dead numbers the beat will not take',
     ]; },
+    /* rings: ① the two roll cells · ② the assets total row · ③ the L&E total row · ④ both total
+       rows · ⑤ the check row · ⑥ the check row again (the dress) · ☆ never ringed (§2.2) */
+    targets(){ const o=this._o; return [
+      o.CC+o.rRE+':'+o.CD+o.rRE,
+      o.CB+o.rTA+':'+o.CD+o.rTA,
+      o.CB+o.rLE+':'+o.CD+o.rLE,
+      o.CA+o.rTA+':'+o.CD+o.rLE,
+      o.CB+o.rCK+':'+o.CD+o.rCK,
+      o.CA+o.rCK+':'+o.CD+o.rCK,
+      null,
+    ]; },
+    /* the demo BUILDS its own selections with Shift+arrow rather than being handed them by
+       setDemoSel, so parKeys measures what a player really pays for the range grabs instead of
+       eliding them (the r438 `series` rule). setDemoSel only ever parks the cursor on the anchor
+       cell of the next beat. */
+    demo(){ const o=this._o; return [
+      /* the roll first — the L&E total foots over it (§1.0(a) chaining) */
+      {sel:o.CC+o.rRE, keys:[...T('='+o.CB+o.rRE+'+'+o.CC+o.rNI+'+'+o.CC+o.rDV), Kb.enter]},
+      {sel:o.CC+o.rRE, keys:[{key:'ArrowRight',shift:true}, Kb.fillR]},
+      {sel:o.CB+o.rTA, keys:[...T('=SUM('+o.CB+o.a0+':'+o.CB+o.aN+')'), Kb.enter]},
+      /* fill the assets total across, then copy the SAME selection — fillFrom leaves the range
+         selected, so the star costs one key on top of the fill the player was making anyway */
+      {sel:o.CB+o.rTA, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.fillR, Kb.copy]},
+      /* ☆ — the clone: the whole L&E total row lands from one paste, references shifted */
+      {sel:o.CB+o.rLE, keys:[Kb.paste]},
+      /* §1.0(a): both totals dressed the moment they exist, not at the end of the run */
+      {sel:o.CA+o.rTA, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+      {sel:o.CA+o.rLE, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+      {sel:o.CB+o.rCK, keys:[...T('='+o.CB+o.rTA+'-'+o.CB+o.rLE), Kb.enter]},
+      {sel:o.CB+o.rCK, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.fillR]},
+      {sel:o.CA+o.rCK, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.bold]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 balance sheet ($mm)',txt:true,bold:true};
-      const y0=rnd(24,26);
-      for(let i=0;i<3;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
-      const rows=[[2,'Cash'],[3,'Receivables'],[4,'PP&E'],[5,'Total assets'],[6,'Payables'],[7,'Debt'],[8,'Total liabilities'],[9,'Common stock'],[10,'Retained earnings'],[11,'Total liabs & equity'],[12,'Net income'],[13,'Dividends'],[14,'Check']];
-      rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===5||r===8||r===11||r===14)});
-      // engineer all three years to TIE: pick the L&E side, derive cash as the balancer
-      const ar=[],ppe=[],ap=[],debt=[],ni=[],div=[];
-      for(let i=0;i<3;i++){ ar.push(rnd(10,30)*10); ppe.push(rnd(30,70)*10);
-        ap.push(rnd(8,20)*10); debt.push(rnd(20,50)*10); ni.push(rnd(8,25)*10); div.push(rnd(1,6)*10); }
-      const cs=rnd(10,30)*10, re0=rnd(15,45)*10;
-      const re=[re0, re0+ni[1]-div[1], re0+ni[1]-div[1]+ni[2]-div[2]];
-      this._exp={};
-      for(let i=0;i<3;i++){ const col=colLetter(i+2);
-        // r264: cash is the balancer — keep it positive (negative cash on a BS reads as a bug, not a plug)
-        let short=(ap[i]+debt[i]+cs+re[i])-ar[i]-ppe[i];
-        if(short<20){ debt[i]+=Math.ceil((20-short)/10)*10; }
-        const totLE=ap[i]+debt[i]+cs+re[i];
-        const cash=totLE-ar[i]-ppe[i];
-        cells[col+2]={...blankCell(),value:cash,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+3]={...blankCell(),value:ar[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+4]={...blankCell(),value:ppe[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+6]={...blankCell(),value:ap[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+7]={...blankCell(),value:debt[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+8]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+9]={...blankCell(),value:cs,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+11]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+12]={...blankCell(),value:ni[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+13]={...blankCell(),value:div[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+14]={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
-        this._exp[col]={ta:cash+ar[i]+ppe[i], tl:ap[i]+debt[i], re:re[i], tle:totLE};
+      /* §1.2 randomization — three independent axes. (a) SITE: the board is a full-grid artifact
+         (16 of 20 rows), so per §1.2 the site axis is CORNER JITTER — the whole statement anchors
+         at column A or column B. (b) CONTENT: the codename and the fiscal-year base. (c) VALUES:
+         every figure through rnd(). Geometry (four lines a side, three years) is CONSTANT across
+         seeds, so the keystroke count never moves with the draw — the r439 `wrapfix` rule. */
+      const c0=rnd(0,1)?1:2;                        // (a) corner jitter: anchor column A or B
+      const CA=colLetter(c0), CB=colLetter(c0+1), CC=colLetter(c0+2), CD=colLetter(c0+3);
+      const y0=rnd(2023,2027);
+      const HR=3, A0=4, AN=7, RTA=8, L0=10, LN=13, RRE=13, RLE=14, RCK=16, RNI=18, RDV=19;
+      cells[CA+'1']={...blankCell(),value:codename()+' — balance sheet ($mm)',txt:true,bold:true};
+      cells[CA+'2']={...blankCell(),value:'Source: FY close pack · basis: $ in millions · net income and dividends carry down from the income statement',txt:true,it:true,fontColor:'gray'};
+      /* doctrine §2.1b (banker's-workbook finish): the header row ships BOLD with a BOTTOM border
+         under it, separating the headers from the body. That is the one sanctioned bottom rule —
+         §1.0(f)'s "never a rule underneath" governs TOTALS, not the header band — and it is board
+         furniture rather than a beat, because this drill's lesson is the roll, not the dress. */
+      cells[CA+HR]={...blankCell(),value:'Item',txt:true,bold:true,bb:true};
+      for(let i=0;i<3;i++) cells[colLetter(c0+1+i)+HR]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r',bb:true};
+      /* §1.3 labeled targets + §1.0-R4(t) rule 1: real line items, and the two sides are the same
+         DEPTH so the ☆'s clone has somewhere to land (four lines, total on the fifth row). */
+      ['Cash','Accounts receivable','Inventory','PP&E, net'].forEach((n,i)=>
+        cells[CA+(A0+i)]={...blankCell(),value:n,txt:true});
+      cells[CA+RTA]={...blankCell(),value:'Total assets',txt:true,bold:true};
+      ['Accounts payable','Debt','Common stock','Retained earnings'].forEach((n,i)=>
+        cells[CA+(L0+i)]={...blankCell(),value:n,txt:true});
+      cells[CA+RLE]={...blankCell(),value:'Total liabs & equity',txt:true,bold:true};
+      cells[CA+RCK]={...blankCell(),value:'Check (assets − L&E)',txt:true,bold:true};
+      cells[CA+RNI]={...blankCell(),value:'Net income (memo)',txt:true};
+      cells[CA+RDV]={...blankCell(),value:'Dividends paid (memo)',txt:true};
+      const exp={};
+      const cs=rnd(10,30)*10;                       // common stock is flat — no issuance in the window
+      let re=rnd(15,45)*10;                         // the opening year's audited close, the roll's given start
+      for(let i=0;i<3;i++){
+        const col=colLetter(c0+1+i);
+        /* MODELING_STANDARDS §2: a reduction CARRIES ITS OWN MINUS, so the corkscrew stays a
+           clean addition and the player never subtracts against a positive. */
+        const ni=rnd(8,25)*10, dv=-rnd(1,6)*10;
+        if(i>0) re=re+ni+dv;                        // §3 corkscrew: begin + net income − dividends
+        const ap=rnd(8,20)*10, ar=rnd(10,30)*10, inv=rnd(8,24)*10, ppe=rnd(30,70)*10;
+        let debt=rnd(20,50)*10;
+        /* the equity side is drawn first and CASH is then sized to close the sheet, so the
+           statement genuinely balances once the roll is in (r264: a negative cash figure reads as
+           a bug rather than a balancing line, so debt is nudged until cash clears the floor). */
+        let le=ap+debt+cs+re;
+        if(le-ar-inv-ppe<40){ debt+=Math.ceil((40-(le-ar-inv-ppe))/10)*10; le=ap+debt+cs+re; }
+        const cash=le-ar-inv-ppe;
+        [[A0,cash],[A0+1,ar],[A0+2,inv],[A0+3,ppe],[L0,ap],[L0+1,debt],[L0+2,cs],[RNI,ni],[RDV,dv]]
+          .forEach(([r,v])=>cells[col+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0});
+        /* §1 provenance: the opening retained earnings is a TYPED input and ships blue; the two
+           rolled years ship empty (and black once built, which is the whole point of the beat). */
+        cells[col+RRE]= i===0 ? {...blankCell(),value:re,fontColor:'blue',fmtStyle:'comma',decimals:0}
+                              : {...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[col+RTA]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[col+RLE]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[col+RCK]={...blankCell(),fmtStyle:'comma',decimals:0};
+        exp[col]={ta:le, le:le, re:re};
       }
-      cells['B10']={...blankCell(),value:re0,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['C10']={...blankCell(),fmtStyle:'comma',decimals:0};
-      cells['D10']={...blankCell(),fmtStyle:'comma',decimals:0};
-      return {ROWS:14, cells, active:{r:5,c:2}, sel:null, colW:{1:150,2:80,3:80,4:80}};
+      this._o={CA:CA,CB:CB,CC:CC,CD:CD,c0:c0,cols:[CB,CC,CD],exp:exp,
+               a0:A0,aN:AN,l0:L0,lN:LN,rTA:RTA,rLE:RLE,rRE:RRE,rCK:RCK,rNI:RNI,rDV:RDV};
+      const colW={}; colW[c0]=176; colW[c0+1]=92; colW[c0+2]=92; colW[c0+3]=92;
+      return {ROWS:20, cells, active:{r:RRE,c:c0+2}, sel:null, colW:colW};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(0.5,Math.abs(exp)*1e-3); };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D'];
-      const rollOk=[1,2].every(i=> refs(COL[i]+'10',[COL[i-1]+'10',COL[i]+'12',COL[i]+'13']) && near(COL[i]+'10',this._exp[COL[i]].re));
-      const boldOk=(r)=>[0,1,2].every(i=>{ const c=S.cells[COL[i]+r]; return !!(c&&c.bold); });
-      const ruleOk=[0,1,2].every(i=>{ const c=S.cells[COL[i]+'14']; return !!(c&&c.bt); });
+      const o=this._o;
+      /* every predicate reads the END STATE — the number standing in each year column, plus
+         liveness where the label's verb says the line is BUILT (§1.7: Total = land a live SUM,
+         Build = enter a live formula). Nothing reads formula text (§1.0-R3(p)). */
+      const live=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'); };
+      const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&typeof c.value==='number'&&Math.abs(c.value-exp)<0.5); };
+      const rollOk=[1,2].every(i=>live(o.cols[i]+o.rRE)&&near(o.cols[i]+o.rRE,o.exp[o.cols[i]].re));
+      const taOk=o.cols.every(c=>live(c+o.rTA)&&near(c+o.rTA,o.exp[c].ta));
+      const leOk=o.cols.every(c=>live(c+o.rLE)&&near(c+o.rLE,o.exp[c].le));
+      const ckOk=o.cols.every(c=>live(c+o.rCK)&&near(c+o.rCK,0));
+      /* §1.0(f) + MODELING_STANDARDS §1: a total wears a TOP border. LENIENT border reading
+         (wave-5 addendum, declared in the payload): `bt || ball`, so Alt H B P, Alt H B D,
+         Alt H B S and Alt H B A all clear — a 1×1 outside border stores `ball` and not `bt`
+         (CAMPAIGN §1 route fact #7, the r427 gauntlet bug), and the strict `bt && !bb` form
+         would strand every player who boxes the row instead of ruling it. */
+      const ruled=r=>o.cols.every(c=>{ const x=S.cells[c+r]; return !!(x&&x.bold&&(x.bt||x.ball)); });
+      const ckBold=o.cols.every(c=>{ const x=S.cells[c+o.rCK]; return !!(x&&x.bold); });
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision · the
+         FORMAT/FORMULA-CLONING family of §1.0-R4(u)): the liabilities total row ARRIVES from the
+         assets total row by paste. Read off the r425 S.pasteLog latch — the MECHANIC and its two
+         rects, never geometry inferred from the end state — so Ctrl+V and the paste-special
+         Formulas walk (Alt H V S → F → ↵, or the legacy Alt E S) both earn it, and the source may
+         be the single seed cell tiled across the row or the finished three-cell row. A VALUES
+         paste is excluded by `kind` AND fails beat 3's liveness on its own: it lands the right
+         numbers dead, which is the hardcode MODELING_STANDARDS §1 forbids.
+         MEASURED SKIPPABLE (dev/verify-bsbuild.js §C/§D + dev/e2e-alt-paths.js ALT 2, 5-seed
+         medians): the clone costs 4 keys against 16 to write the second total by hand, and the
+         hand-built route clears all six cores with this line DARK — 5/5 seeds. */
+      const cloned=(S.pasteLog||[]).some(p=>(p.kind==='all'||p.kind==='formulas')
+        && p.sr===o.rTA && p.sc>=o.c0+1 && (p.sc+p.sw-1)<=o.c0+3
+        && p.r0===o.rLE && p.c0<=o.c0+1 && (p.c0+p.w-1)>=o.c0+3);
       return [
-        {label:'total assets \u2014 live SUM, all three years', ok: [0,1,2].every(i=>near(COL[i]+'5',this._exp[COL[i]].ta))&&refs('B5',['SUM('])},
-        {label:'total liabilities \u2014 live SUM, all three years', ok: [0,1,2].every(i=>near(COL[i]+'8',this._exp[COL[i]].tl))&&refs('B8',['SUM('])},
-        {label:'run THE RE ROLL \u2014 prior RE + NI \u2212 dividends, built once, walking across', ok: rollOk},
-        {label:'total liabs & equity, all three years', ok: [0,1,2].every(i=>near(COL[i]+'11',this._exp[COL[i]].tle))},
-        {label:'run the check row \u2014 assets minus L&E, landing at 0 in all three years', ok: [0,1,2].every(i=>near(COL[i]+'14',0))},
-        {label:'bold the totals and add a top border above the check row', ok: boldOk(5)&&boldOk(11)&&ruleOk},
+        {label:'Build the retained earnings roll — prior year plus net income and dividends', ok: rollOk},
+        {label:'Total the asset side — live in all three years', ok: taOk},
+        {label:'Total liabilities and equity — live in all three years', ok: leOk},
+        {label:'Bold both total rows and add a top border above each', ok: ruled(o.rTA)&&ruled(o.rLE)},
+        {label:'Build the check row — total assets minus liabilities and equity, all three years', ok: ckOk},
+        {label:'Bold the check row — all three years', ok: ckBold},
+        {label:'Copy the assets total row onto the liabilities and equity total row', ok: leOk&&cloned, bonus:true},
       ];
     }
   },

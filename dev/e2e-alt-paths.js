@@ -929,21 +929,46 @@ const ALTS = [
         {sel:o.CB+o.rTie, keys:[...T('=-('+o.CB+o.rDeck+'-'+o.CB+o.rTot+')'),{key:'Enter'}]},
         {sel:o.CA+o.rTie+':'+o.CB+o.rTie, keys:[{key:'b',ctrl:true}]},
       ]; }` },
-  { key: 'bsbuild', name: 'dress FIRST, RE roll before any footing, assets footed LAST, ribbon fills + alt h 1', moves: `C => [
-      {sel:'B5:D5',   keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B11:D11', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B14:D14', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:'C10', keys:[...T('=B10+C12-C13'),{key:'Enter'}]},
-      {sel:'C10:D10', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B8',  keys:[...T('=SUM(B6:B7)'),{key:'Enter'}]},
-      {sel:'B8:D8', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B11', keys:[...T('=B8+B9+B10'),{key:'Enter'}]},
-      {sel:'B11:D11', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B5',  keys:[...T('=SUM(B2:B4)'),{key:'Enter'}]},
-      {sel:'B5:D5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B14', keys:[...T('=B5-B11'),{key:'Enter'}]},
-      {sel:'B14:D14', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-    ]` },
+  /* r448 §4.79 depth pass — the single old entry is DELETED (it hard-coded B5/B8/C10/B11/B14 off
+     the retired ROWS:14 board) and replaced by the pair below. ALT 1 = chord ROUTE + op ORDER:
+     the roll committed to BOTH cells at once with Ctrl+Enter, the assets total landed with
+     autosum's RANGE form instead of a typed SUM, the fill walked through the ribbon, the ☆'s
+     clone made through the paste-special FORMULAS dialog rather than Ctrl+V, both totals dressed
+     with Alt H 1 + the Alt H B S box (which stores bt AND bb — the lenient border reading is what
+     lets it clear), and the check written straight off the two BLOCKS so it never reads either
+     total row. The ☆ still latches: a dialog paste writes the same S.pasteLog entry as Ctrl+V
+     (§1.0(c)), which is the point — the star grades the DECISION to clone, never the chord. */
+  { key: 'bsbuild', name: 'Ctrl+Enter roll, autosum range form, ribbon fill, paste-special FORMULAS clone, Alt H B S box, check written off the blocks', moves: `C => { const o=C._o; const st=[
+      {sel:o.CC+o.rRE, keys:[{key:'ArrowRight',shift:true},...T('='+o.CB+o.rRE+'+'+o.CC+o.rNI+'+'+o.CC+o.rDV),{key:'Enter',ctrl:true}]},
+      {sel:o.CB+o.a0+':'+o.CB+o.rTA, keys:[{key:'=',alt:true,code:'Equal'}]},
+      {sel:o.CB+o.rTA+':'+o.CD+o.rTA, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.CB+o.rTA+':'+o.CD+o.rTA, keys:[{key:'c',ctrl:true}]},
+      {sel:o.CB+o.rLE, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('f'),{key:'Enter'}]},
+      {sel:o.CB+o.rTA+':'+o.CD+o.rTA, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('s')]},
+      {sel:o.CB+o.rLE+':'+o.CD+o.rLE, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('s')]}];
+    o.cols.forEach(c=>st.push({sel:c+o.rCK, keys:[...T('=SUM('+c+o.a0+':'+c+o.aN+')-SUM('+c+o.l0+':'+c+o.lN+')'),{key:'Enter'}]}));
+    st.push({sel:o.CB+o.rCK+':'+o.CD+o.rCK, keys:[{key:'Alt'},L('h'),D(1)]});
+    return st; }` },
+  /* ALT 2 = the MEASURED NEGATIVE CONTROL for the ☆, and the freedom proof for the whole board:
+     no paste and no fill anywhere. The roll typed year by year with $-ANCHORED refs, both totals
+     written as anchored ADDITION CHAINS rather than SUMs, every year typed on its own, the check
+     written the other way round and negated, and every dress walked cell by cell through the
+     ribbon. All six cores clear and the ☆ goes DARK — §1.0(c): the slow route is never penalised,
+     it only costs the keys (261 against 60, 5-seed medians, dev/verify-bsbuild.js §D). This is
+     also the route that proves the two formula-TEXT beats the retired board shipped are dead:
+     nothing here writes a SUM( or an unanchored reference anywhere. */
+  { key: 'bsbuild', name: 'NEGATIVE CONTROL — no paste, no fill, anchored addition chains, roll and check typed per year, dress cell by cell (six cores clear, ☆ dark)', moves: `C => { const o=C._o; const st=[];
+      [[o.CC,o.CB],[o.CD,o.CC]].forEach(([c,prev])=>
+        st.push({sel:c+o.rRE, keys:[...T('=$'+prev+'$'+o.rRE+'+$'+c+'$'+o.rNI+'+$'+c+'$'+o.rDV),{key:'Enter'}]}));
+      o.cols.forEach(c=>{ let f='='; for(let r=o.a0;r<=o.aN;r++) f+=(r>o.a0?'+':'')+'$'+c+'$'+r;
+        st.push({sel:c+o.rTA, keys:[...T(f),{key:'Enter'}]}); });
+      o.cols.forEach(c=>{ let f='='; for(let r=o.l0;r<=o.lN;r++) f+=(r>o.l0?'+':'')+'$'+c+'$'+r;
+        st.push({sel:c+o.rLE, keys:[...T(f),{key:'Enter'}]}); });
+      o.cols.forEach(c=>{ st.push({sel:c+o.rTA, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]});
+                          st.push({sel:c+o.rLE, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]}); });
+      o.cols.forEach(c=>st.push({sel:c+o.rCK, keys:[...T('=-($'+c+'$'+o.rLE+'-$'+c+'$'+o.rTA+')'),{key:'Enter'}]}));
+      o.cols.forEach(c=>st.push({sel:c+o.rCK, keys:[{key:'Alt'},L('h'),D(1)]}));
+      return st; }` },
   /* r447 (cascade depth pass, DEPTH_PASS §4.77 — the Models II capstone): three entries,
      replacing the one pre-pass entry, which drove the retired ROWS:14 geometry cell by cell.
      ALT 1 = chord-ROUTE alt — every fill walked from the ribbon (Alt H F I R), bold via Alt H 1,
