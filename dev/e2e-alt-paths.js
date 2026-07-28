@@ -1096,13 +1096,30 @@ const ALTS = [
       {sel:'B4', keys:[...T('=B2/365*$B$9'),{key:'Enter'}]},
       {sel:'B4:F4', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
     ]` },
-  { key: 'retbridge', name: 'bridge tied in REVERSE — check first, levers last; typed addition for the total', moves: `C => [
-      {sel:'B14', keys:[...T('=B12-((B3*B5-B7)-(B2*B4-B6))'),{key:'Enter'}]},
-      {sel:'B12', keys:[...T('=B9+B10+B11'),{key:'Enter'}]},
-      {sel:'B11', keys:[...T('=B6-B7'),{key:'Enter'}]},
-      {sel:'B10', keys:[...T('=(B5-B4)*B3'),{key:'Enter'}]},
-      {sel:'B9',  keys:[...T('=(B3-B2)*B4'),{key:'Enter'}]},
-    ]` },
+  /* r444 §4.64 depth pass — REPLACES the single pre-depth-pass retbridge entry, which drove the
+     retired 14-row board by hard-coded geometry (B9/B10/B11/B12/B14, all gone with the rebuild:
+     the board now jitters its corner, so nothing may name a cell that is not read off C._o).
+     ALT 1 is the chord-ROUTE + op-ORDER alt and EARNS the ☆ by the other fill door; ALT 2 is the
+     MEASURED negative control — every core clears with the ☆ dark (dev/verify-retbridge.js §3). */
+  { key: 'retbridge', name: 'bridge built BOTTOM-UP (paydown, multiple, growth), operands reversed, autosum by the RANGE form, F4 anchors instead of typed dollars, share column filled from the RIBBON (alt h f i d), check recomputing the gain inline — ☆ still earned', moves: `C => { const o=C._o; return [
+      {sel:o.CB+o.rD,   keys:[...T('=-('+o.CC+o.rNd+'-'+o.CB+o.rNd+')'),{key:'Enter'}]},
+      {sel:o.CB+o.rM,   keys:[...T('='+o.CC+o.rEbt+'*('+o.CC+o.rMlt+'-'+o.CB+o.rMlt+')'),{key:'Enter'}]},
+      {sel:o.CB+o.rG,   keys:[...T('='+o.CB+o.rMlt+'*('+o.CC+o.rEbt+'-'+o.CB+o.rEbt+')'),{key:'Enter'}]},
+      {sel:o.CB+o.rG+':'+o.CB+o.rTot, keys:[{key:'=',alt:true,code:'Equal'}]},
+      {sel:o.CC+o.rG,   keys:[...T('='+o.CB+o.rG+'/'+o.CB+o.rTot),{key:'F4'},{key:'Enter'}]},
+      {sel:o.CC+o.rG,   keys:[{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true},{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:o.CB+o.rChk, keys:[...T('='+o.CB+o.rTot+'-('+o.CC+o.rEq+'-'+o.CB+o.rEq+')'),{key:'Enter'}]},
+    ]; }` },
+  { key: 'retbridge', name: 'NEGATIVE CONTROL — every lever written out as two products, the total as a typed addition chain, all three shares typed one at a time with no anchor and no fill anywhere, check written the long way: all six cores clear, ☆ DARK', moves: `C => { const o=C._o; return [
+      {sel:o.CB+o.rG,   keys:[...T('='+o.CC+o.rEbt+'*'+o.CB+o.rMlt+'-'+o.CB+o.rEbt+'*'+o.CB+o.rMlt),{key:'Enter'}]},
+      {sel:o.CB+o.rM,   keys:[...T('='+o.CC+o.rMlt+'*'+o.CC+o.rEbt+'-'+o.CB+o.rMlt+'*'+o.CC+o.rEbt),{key:'Enter'}]},
+      {sel:o.CB+o.rD,   keys:[...T('='+o.CB+o.rNd+'-'+o.CC+o.rNd),{key:'Enter'}]},
+      {sel:o.CB+o.rTot, keys:[...T('='+o.CB+o.rG+'+'+o.CB+o.rM+'+'+o.CB+o.rD),{key:'Enter'}]},
+      {sel:o.CC+o.rG,   keys:[...T('='+o.CB+o.rG+'/'+o.CB+o.rTot),{key:'Enter'}]},
+      {sel:o.CC+o.rM,   keys:[...T('='+o.CB+o.rM+'/'+o.CB+o.rTot),{key:'Enter'}]},
+      {sel:o.CC+o.rD,   keys:[...T('='+o.CB+o.rD+'/'+o.CB+o.rTot),{key:'Enter'}]},
+      {sel:o.CB+o.rChk, keys:[...T('=-('+o.CB+o.rAct+'-'+o.CB+o.rTot+')'),{key:'Enter'}]},
+    ]; }` },
   { key: 'schedule', name: 'THE LINK laid FIRST, year-1 roll after it, memo last, ribbon fills', moves: `C => [
       {sel:'C2', keys:[...T('=B5'),{key:'Enter'}]},
       {sel:'C2:F2', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},

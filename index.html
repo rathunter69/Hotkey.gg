@@ -11291,50 +11291,342 @@ const CHALLENGES = {
     }
   },
   retbridge:{
-    name:'Ret. Bridge', label:'Attribute the returns', par:65, parKeys:68,
-    aha:'Split the return into levers — EBITDA growth, multiple, deleveraging, one line each.',
-    prompt:'Decompose the equity gain into its three drivers: EBITDA growth at the entry multiple, multiple expansion on exit EBITDA, and deleveraging — then prove the bridge ties to the actual equity change with a zero check.',
-    req:'<em>B9</em> growth <em>=(B3-B2)*B4</em> \u00b7 <em>B10</em> multiple <em>=(B5-B4)*B3</em> \u00b7 <em>B11</em> delever <em>=B6-B7</em> \u00b7 <em>B12</em> total <em>=SUM(B9:B11)</em> \u00b7 <em>B14</em> check <em>=B12-((B3*B5-B7)-(B2*B4-B6))</em> \u2192 0',
-    guide:[
-      'EBITDA growth effect at B9 \u00b7 <kbd>=(B3-B2)*B4</kbd> \u2014 growth priced at the ENTRY multiple',
-      'multiple expansion at B10 \u00b7 <kbd>=(B5-B4)*B3</kbd> \u2014 rerating on EXIT EBITDA',
-      'deleveraging at B11 \u00b7 <kbd>=B6-B7</kbd> \u00b7 total at B12 \u00b7 <kbd>=SUM(B9:B11)</kbd>',
-      'the check at B14 \u00b7 <kbd>=B12-((B3*B5-B7)-(B2*B4-B6))</kbd> \u2014 the bridge must tie to the real equity change',
-    ],
-    targets:['B9','B10','B11','B12','B14'],
-    demo(){ return [
-      {sel:'B9', keys:[...T('=(B3-B2)*B4'), Kb.enter]},
-      {sel:'B10', keys:[...T('=(B5-B4)*B3'), Kb.enter]},
-      {sel:'B11', keys:[...T('=B6-B7'), Kb.enter]},
-      {sel:'B12', keys:[...T('=SUM(B9:B11)'), Kb.enter]},
-      {sel:'B14', keys:[...T('=B12-((B3*B5-B7)-(B2*B4-B6))'), Kb.enter]},
+    /* r444 H6b-13 (DEPTH_PASS §4.64, "Attribute the returns") — the depth-pass rework, built to
+       §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (§1.0-R3 wins on conflict), with
+       dev/MODELING_STANDARDS.md binding because this is a Models I board.
+
+       ── THE §4.64 PAGE IS PRE-PLAYTEST, so two of its lines are dead on arrival (§1.0-R4(u),
+       stated once catalog-wide so no agent has to escalate for it):
+       (1) ITS ☆ — "Bold the three driver rows' labels — the bridge reads as a story" — is a
+           FORMATTING bonus, which §1.0(d) forbids outright ("NEVER a formatting task"), and it
+           also falls straight out of dressing the board, which fails §1.0-R2(i)'s skippable-
+           decision test. Re-cut below to an ANCHORING-MASTERY discovery (§1.0(d)'s named family:
+           "anchors set so ONE formula fills a whole block"). That is now the sixth re-cut
+           formatting ☆ of the campaign after stalelink / series / balance / tieout / balcheck.
+       (2) ITS RANDOM LINE — "verify axes (audit: 6055 fixed sites — add jitter)" — was the whole
+           of the page's randomization spec, and the shipped board had exactly ONE axis (value
+           ranges), against §1.2's minimum of two. Four axes below.
+
+       ── WHAT WAS WRONG WITH THE SHIPPED DRILL. The finance was right (dev/REALISM_NOTES.md
+       records the decomposition as an exact algebraic identity, and it still is — see the
+       identity note in build()), but the anatomy was not:
+         · ROWS:14 with 12 rows used — §1.3's named defect, "the ROWS=14 inheritance", 60% of a
+           real 20-row sheet with the empty band on screen the whole run;
+         · guide 4 vs checks 5 vs targets 5 — the r417 43/82 index-misalignment class, so the
+           last beat shipped UNHINTED (C9 would fail it today);
+         · no ☆ at all (§1.1/§2.2 require exactly one), no saveClose closer (§1.0(e)), one
+           alt-path entry against C12's two;
+         · check labels in the old state-y register ("run the growth effect", "tie the bridge") —
+           "run" and "tie" are not on §1.7's closed verb list, and §1.0-R2(j) bans "tie" for a
+           formula recalculating (it survives only where it means "the numbers MATCH", which is
+           what the board's own Check row means, so the BOARD label keeps it and the CHECKLIST
+           does not);
+         · parKeys 68 against par 65 — the only drill in the chapter whose declared key count
+           exceeded its declared seconds.
+
+       ── ☆-HEADROOM DIAGNOSTIC (DEPTH_PASS_CAMPAIGN §2, BOTH parts, run BEFORE the board was
+       authored and re-measured on the built board through the live engine — dev/verify-retbridge.js,
+       every selection and navigation keyed, 5 seeds; numbers in dev/AUDIT.md r444):
+         PART 1 — SPREAD: the fastest legal route is 60 keys (FLAT across seeds) against a
+           5-seed median 96 (range 91–102) for the obvious slow route that does the SAME work —
+           every reference retyped as the number it shows (§1.0(c) protects that route by name),
+           no autosum, no fill anywhere. 1.60×.
+         PART 2 — WHAT THAT SPREAD IS MADE OF, which is the half that decides it (CAMPAIGN §2's
+           `wrapfix` rule: read the composition, not the ratio). 0 of the 36 keys are
+           chord-vs-ribbon — the engine has no ribbon door into formula entry, so on a board whose
+           only ops are formulas that forced-to-clear component is EMPTY BY CONSTRUCTION, exactly
+           the r439 `wrapfix` finding. 0 are formatting, because the player dresses nothing here
+           (§2.1b ships the frame). So the ENTIRE spread survives the strip: a legal ☆ exists, and
+           it is this drill's own subject — the denominator of a share column is the one cell on
+           the page that must never walk.
+         ISOLATED ☆ MEASUREMENT (§2's "measure each half separately" rule — this star is a SINGLE
+           move, deliberately, so there is one half to measure): the anchored fill costs 14 keys
+           against 24 to type the three shares one at a time. Worth 10 keys — a smaller star than
+           `tieout`'s 21 or `balcheck`'s 17 and larger than shipped `filterpass`'s 6, which is the
+           honest size of a three-row fill. A two-move star (fill + autosum-vs-typed-SUM, worth a
+           further 11) was measured and REJECTED: §1.0-R2(i) asks for one distinct decision, §2
+           warns that a combined number hides a bad half, and autosum is `foot`'s lesson to own.
+           PROVED SKIPPABLE by measurement, not assertion — the typed route clears all six cores
+           with the line dark (dev/verify-retbridge.js §3, alt-paths entry 2).
+
+       ── THE BOARD (§1.0-R4(t) reality test + §3.1: Models I is B-heavy, so the artifact stays a
+       deal page). A sponsor's VALUE CREATION BRIDGE at exit — the one page an exit committee or
+       an annual portfolio review actually asks for: how much of the equity gain came from growing
+       EBITDA, how much from selling at a higher multiple, and how much from paying the debt down.
+       Real column headers, real magnitudes, a stated basis, and an entry/exit capitalization block
+       that is already wired (it comes off the models; the bridge is what is missing). A banker
+       recognises it as their own file; an FP&A reader meets the identical craft — an anchored
+       share-of-total column — which is why §1.0-R4(t) rule 5 holds here without softening the
+       artifact.
+
+       ── MODELING_STANDARDS CONVENTIONS THIS BOARD FOLLOWS (§7 of that file asks for this
+       statement explicitly):
+         · §1 COLOUR-AS-PROVENANCE — every hardcoded input is BLUE (entry/exit EBITDA, the two
+           multiples, both net-debt balances); every computed cell is BLACK (enterprise value,
+           equity value, the actual gain, and everything the player builds). No green, because the
+           board is one logical sheet-area — there is no other tab to link to.
+         · §1 NO HARDCODES INSIDE FORMULAS — no seeded formula on this board carries a literal;
+           EV is =EBITDA×multiple off the two cells above it, never =EBITDA*8.5.
+         · §1 STRUCTURE — the Equity value line and the Total value created line wear TOP borders
+           (§1.0(f): a total earns the line ABOVE it, never a rule underneath); both header rows
+           wear a bottom border under them (doctrine §2.1b); units are stated in the title ($mm)
+           and again in the bridge's own column header, multiples in x, shares in %.
+         · §2 SIGN CONVENTION, stated on the board's basis line and held everywhere: net debt is
+           carried as a POSITIVE balance and subtracted explicitly. The bridge levers are signed
+           CONTRIBUTIONS to equity, so a multiple that came in below entry shows the expansion
+           lever negative — in parens, which is what fmtNum's comma style paints.
+         · §4 (LBO) — the returns decomposition itself, in the standard two-point sponsor form.
+         · §6 ERROR CHECKS — the check lives in one visible place on the page and reads zero.
+       DELIBERATE SIMPLIFICATIONS, said out loud per §7 both in this comment and in the board's own
+       reviewer line: (a) three levers only — a full bridge also carries free-cash-flow generation
+       split out from debt paydown, fees and "other"; here debt paydown carries all of it, which is
+       the standard teaching cut and the reason the identity is EXACT; (b) two-point attribution
+       (entry snapshot vs exit snapshot), no interim-year path; (c) no dividend recaps or bolt-on
+       equity — one entry cheque, one exit.
+
+       ── §1.3 DENSITY: ROWS=20 (the r440 floor AND cap), 16 rows carrying content at the win
+       state — 80%, against 60% before, and the load and win counts are DIFFERENT (five cells and
+       a column arrive with the player), which is the tell §1.3 asks for.
+
+       ── GRADING (§1.0(c) FREEDOM + §1.0-R3(p) GRADE THE END STATE). NOT ONE PREDICATE IN THIS
+       DRILL READS FORMULA TEXT. All eighteen untriggerable beats the campaign has found were
+       text-grading, so every beat here is `live cell + value parity` and nothing else: any
+       algebraic arrangement clears, either anchoring clears, filled or typed clears, autosum and
+       =SUM() and a typed addition chain all clear, and the check clears written either way round
+       so long as the sign is right. The routes were WALKED, not reasoned about — the walk list is
+       in dev/verify-retbridge.js and the two alt-paths entries pin the two ends of it permanently.
+       The one thing every core does require is that the cell be LIVE (doctrine §2.2's sanctioned
+       exception, and r350 for totals): a returns bridge that does not recalculate is not a bridge,
+       and the board is built so nothing but a live cell can be right when the inputs move.
+
+       ── STRUCTURAL DEVIATIONS from the §4.64 page, declared here per §0:
+       (1) ☆ RE-CUT (above) — the page's formatting bonus is replaced by the anchored one-pass
+           fill down the share column. Where a killed ☆ was real work §1.0-R4(u) says PROMOTE it;
+           here it was not work at all (the driver labels are seeded bold as board furniture), so
+           there was nothing to promote.
+       (2) THE SHARE-OF-GAIN COLUMN IS NEW, and it is what makes a legal ☆ exist at all. The page
+           specified no beats (it is a "Language pass + bonus" page), and the shipped five beats
+           carried no efficiency headroom whatsoever — five formulas of five different shapes,
+           nothing fillable, nothing selectable, which by CAMPAIGN §2 would have made this a motif
+           rather than a lesson. The column is not a device: it is the single most-quoted number
+           on a real bridge page ("seventy per cent of the return was EBITDA growth"), and its
+           denominator is fixed, so anchoring is exactly what the fill needs.
+       (3) THE CAPITALIZATION BLOCK SHIPS WIRED (enterprise value, equity value and the actual
+           equity gain are pre-built black formulas). §1.1 caps core beats at six and there were
+           seven candidates; these three are the ones that come OFF the entry and exit models on a
+           real page, so they are the honest thing to seed. It also makes beat 6 a genuine
+           prove-out against a figure the player did not compute (§1.6).
+       (4) NO PLAYER-GRADED DRESS BEAT — the exhibit frame ships pre-dressed (§2.1b: "where the
+           lesson is elsewhere — a formula build — the BOARD ships pre-dressed so the win state is
+           already clean"), which is also what §1.0-R3(o) asks for: do not manufacture a formatting
+           beat to fill a slot. Every §1.0(f) convention is still ON the board, just seeded.
+       (5) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an existing labelled
+           cell inside a labelled row, so a green ring says exactly what it needs to. Cues are for
+           insert points and empty paste targets; there are neither here.
+       (6) THE SHARE COLUMN STOPS AT THE THREE LEVERS — there is deliberately no share cell on the
+           Total row. That is the r439 `cases` lesson applied at the BOARD, never at the predicate:
+           a fill copies the SOURCE cell's format, so a share column running through the total row
+           would let the ☆ route strip the bold and the top border off a cell the frame had already
+           dressed — a star that makes the board WORSE than the route it beats. With the column
+           stopping at the levers there is nothing below the fill to damage. */
+    name:'Ret. Bridge', label:'Attribute the returns', par:56, parKeys:52, saveClose:true,   /* r444 §4.64 depth pass: par re-swept from scratch (was par 65 / parKeys 68 — the only drill in the chapter whose declared KEY count exceeded its declared SECONDS, and measured on a board with no ☆, no closer and no share column). dev/e2e-par-sweep.js retbridge, 5-seed median 52 keys including the engine-appended Ctrl+S, and FLAT at 52 across seeds: the corner jitter moves letters and row numbers but never their digit-length, so the demo types the same character count on every seed. par 56 ≈ 1.08 s/key, the house band — the premium being the READ this board charges before a hand moves, since growth is priced at the ENTRY multiple and the rerating on EXIT EBITDA, and pairing them the other way round looks just as plausible until the check refuses to reach zero. Measured against it: the same board with every reference retyped as the number it shows, no autosum and no fill anywhere runs a 5-seed median 96 keys with all six cores green and the ☆ dark (the negative control, alt-paths entry 2); the fastest legal route with every navigation keyed is 60. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 1:24 · pro 1:04 · legendary 0:56. */
+    aha:'growth is priced at the multiple you paid and the rerating at the EBITDA you exit with — swap the two and the bridge stops tying.',
+    /* §1.5: the aha's MOMENT is the check falling to zero. The two products are the same six
+       characters in a different pairing, both read plausibly, and only one of them satisfies the
+       identity — so the check is the beat where the insight lands, not a formality after it. */
+    prompt:'The exit committee sits Thursday and the partner wants one page: how much of the equity gain came from growing EBITDA, how much from selling at a higher multiple, and how much from paying the debt down. Entry and exit capitalization is already on the sheet. Build the three levers, total them, show each as a share of the gain, and prove it with the check — a value creation bridge nobody can tie is a bridge nobody believes.',
+    req(){ const o=this._o; return 'growth <em>=('+o.CC+o.rEbt+'-'+o.CB+o.rEbt+')*'+o.CB+o.rMlt+'</em> · multiple <em>=('+o.CC+o.rMlt+'-'+o.CB+o.rMlt+')*'+o.CC+o.rEbt+'</em> · paydown <em>='+o.CB+o.rNd+'-'+o.CC+o.rNd+'</em> · <em>alt</em>+<em>=</em> totals · share <em>='+o.CB+o.rG+'/$'+o.CB+'$'+o.rTot+'</em> then <em>ctrl</em>+<em>d</em> · check <em>='+o.CB+o.rTot+'-'+o.CB+o.rAct+'</em> → 0 · <em>ctrl</em>+<em>s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'the growth lever on '+o.CB+o.rG+' · <kbd>=(</kbd>'+o.CC+o.rEbt+'<kbd>-</kbd>'+o.CB+o.rEbt+'<kbd>)*</kbd>'+o.CB+o.rMlt+' <kbd>↵</kbd> — the EBITDA you added, priced at the multiple you PAID. Expanded out (<kbd>=</kbd>'+o.CC+o.rEbt+'<kbd>*</kbd>'+o.CB+o.rMlt+'<kbd>-</kbd>'+o.CB+o.rEbt+'<kbd>*</kbd>'+o.CB+o.rMlt+') grades the same — it reads the number, not the text',
+      'the multiple lever on '+o.CB+o.rM+' · <kbd>=(</kbd>'+o.CC+o.rMlt+'<kbd>-</kbd>'+o.CB+o.rMlt+'<kbd>)*</kbd>'+o.CC+o.rEbt+' <kbd>↵</kbd> — the rerating, on the EBITDA you EXIT with. Pair it the other way round and the two levers double-count the growth you already took',
+      'the paydown lever on '+o.CB+o.rD+' · <kbd>=</kbd>'+o.CB+o.rNd+'<kbd>-</kbd>'+o.CC+o.rNd+' <kbd>↵</kbd> — net debt at entry less net debt at exit, both carried as positive balances',
+      'the total on '+o.CB+o.rTot+' · <kbd>alt</kbd>+<kbd>=</kbd> autosums the three levers directly above it — <kbd>=SUM(</kbd>'+o.CB+o.rG+':'+o.CB+o.rD+'<kbd>)</kbd> and an addition chain land the same number',
+      'the share column · on '+o.CC+o.rG+' <kbd>=</kbd>'+o.CB+o.rG+'<kbd>/$</kbd>'+o.CB+'<kbd>$</kbd>'+o.rTot+' <kbd>↵</kbd> (<kbd>F4</kbd> sets those anchors for you), then select down to '+o.CC+o.rD+' and <kbd>ctrl</kbd>+<kbd>d</kbd>. Three formulas typed one at a time land the same three numbers',
+      'the check on '+o.CB+o.rChk+' · <kbd>=</kbd>'+o.CB+o.rTot+'<kbd>-</kbd>'+o.CB+o.rAct+' <kbd>↵</kbd> — anchored or not, either way round so long as the sign is right. It reads 0 the moment the three levers explain the whole gain',
+      '☆ the discovery: the denominator never moves — every share divides by the same total — so ONE anchored formula takes the column down in a single pass. Lock it with <kbd>$</kbd> or <kbd>F4</kbd>, select the three lever rows, <kbd>ctrl</kbd>+<kbd>d</kbd>. Typing the three separately clears the beat and forfeits the star; filling WITHOUT the anchor walks the divisor into the blanks below',
     ]; },
+    /* rings: ① growth lever · ② multiple lever · ③ paydown lever · ④ the total ·
+       ⑤ the share column · ⑥ the check · ☆ never ringed (§2.2) */
+    targets(){ const o=this._o; return [o.CB+o.rG, o.CB+o.rM, o.CB+o.rD, o.CB+o.rTot,
+      o.CC+o.rG+':'+o.CC+o.rD, o.CB+o.rChk, null]; },
+    /* the demo BUILDS its own selection for the fill rather than being handed it by setDemoSel,
+       so parKeys measures what a player really pays for the range grab (the r438 `series` rule).
+       Enter moves the cursor down, Excel-parity, so the three levers cost no navigation. */
+    demo(){ const o=this._o; return [
+      {sel:o.CB+o.rG,   keys:[...T('=('+o.CC+o.rEbt+'-'+o.CB+o.rEbt+')*'+o.CB+o.rMlt), Kb.enter]},
+      {sel:o.CB+o.rM,   keys:[...T('=('+o.CC+o.rMlt+'-'+o.CB+o.rMlt+')*'+o.CC+o.rEbt), Kb.enter]},
+      {sel:o.CB+o.rD,   keys:[...T('='+o.CB+o.rNd+'-'+o.CC+o.rNd), Kb.enter]},
+      /* the total: autosum off the three adjacent levers directly above. Alt+= PROPOSES on a
+         single cell (r192 — the range form commits, the cell form opens the editor), so the
+         Enter is the commit, not a navigation key. */
+      {sel:o.CB+o.rTot, keys:[Kb.eq, Kb.enter]},
+      /* the ☆ — one anchored formula, then the three lever rows grabbed and filled in one pass */
+      {sel:o.CC+o.rG,   keys:[...T('='+o.CB+o.rG+'/$'+o.CB+'$'+o.rTot), Kb.enter]},
+      {sel:o.CC+o.rG,   keys:[{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true}, Kb.fillD]},
+      {sel:o.CB+o.rChk, keys:[...T('='+o.CB+o.rTot+'-'+o.CB+o.rAct), Kb.enter]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 returns attribution ($mm)',txt:true,bold:true};
-      const e0=rnd(15,40)*10, e1=Math.round(e0*(1+rnd(15,50)/100));
-      const m0=rnd(70,100)/10, m1=m0+rnd(-8,15)/10;
-      const d0=rnd(30,80)*10, d1=Math.max(0, d0-rnd(5,30)*10);
-      const rows=[[2,'Entry EBITDA',e0,'comma',0],[3,'Exit EBITDA',e1,'comma',0],[4,'Entry multiple',m0,null,1],[5,'Exit multiple',m1,null,1],[6,'Debt at entry',d0,'comma',0],[7,'Debt at exit',d1,'comma',0]];
-      rows.forEach(([r,n,v,f,dd])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
-        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:f,decimals:dd}; });
-      [[9,'EBITDA growth'],[10,'Multiple expansion'],[11,'Deleveraging']].forEach(([r,n])=>{
-        cells['A'+r]={...blankCell(),value:n,txt:true}; cells['B'+r]={...blankCell(),fmtStyle:'comma',decimals:0}; });
-      cells['A12']={...blankCell(),value:'Total equity gain',txt:true,bold:true}; cells['B12']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      cells['A14']={...blankCell(),value:'Check vs actual',txt:true,bold:true}; cells['B14']={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
-      this._exp={ g:(e1-e0)*m0, m:(m1-m0)*e1, d:d0-d1 };
-      this._exp.tot=this._exp.g+this._exp.m+this._exp.d;
-      return {ROWS:14, cells, active:{r:9,c:2}, sel:null, colW:{1:158,2:88}};
+      /* §1.2 RANDOMIZATION — four independent axes, against the shipped board's one (the audit's
+         "6055 fixed sites" finding, §4.64's Random line).
+           (a) SITE: corner jitter (§1.2's sanctioned substitute for a spot pool on a page-sized
+               board) — the page anchors at column A or B and starts on row 1 or row 2.
+           (b) CONTENT: the deal codename plus a nine-sector pool for the title.
+           (c) VALUES: every figure through rnd() — entry EBITDA, entry multiple, the leverage the
+               deal was done at, the growth over the hold, the rerating, the paydown.
+           (d) WHICH-WAY-IT-WENT: the exit multiple is drawn ABOVE or BELOW entry, so on roughly
+               half the seeds the expansion lever is NEGATIVE and the page tells the other story.
+               This is §1.2(d) read the only way a build board can read it — there is nothing
+               broken here to vary, so what varies is which lever carries the sign.
+         Geometry is CONSTANT across seeds (three levers, one total, one check), so the keystroke
+         count never moves with the draw — the r439 `wrapfix` rule, and it is what lets parKeys be
+         a single number. */
+      const SECTORS=['specialty distribution','industrial services','healthcare services',
+        'test & measurement','facilities management','protective packaging','aerospace components',
+        'enterprise software','environmental services'];
+      const c0=rnd(0,1)?1:2;                    // (a) labels in column A or column B
+      const dr=rnd(0,1);                        // (a) the page starts on row 1 or row 2
+      const CA=colLetter(c0), CB=colLetter(c0+1), CC=colLetter(c0+2);
+      const R={ ttl:1+dr, memo:2+dr, capH:3+dr, ebt:4+dr, mlt:5+dr, ev:6+dr, nd:7+dr, eq:8+dr,
+                brH:10+dr, g:11+dr, m:12+dr, d:13+dr, tot:14+dr, act:16+dr, chk:17+dr, note:19+dr };
+      /* (c)+(d) the draw. Constrained so the page always reads like a real exit: the gain is a
+         healthy fraction of the entry cheque and no single lever's share runs past ~130%, which is
+         what keeps a contraction seed legible instead of grotesque. Redrawing inside the seeded
+         rnd() stream is deterministic — same seed, same sequence, same board — so replay holds. */
+      let e0,m0,d0,e1,m1,d1,up,g,mx,dn,tot,eq0,eq1;
+      for(let t=0;t<40;t++){
+        e0=rnd(15,40)*10;                       // entry LTM EBITDA, $mm
+        /* MULTIPLES ARE DRAWN IN HALVES (7.0x … 10.5x), and that is not cosmetic — it is what
+           makes the check a TRUE zero. A one-decimal multiple like 7.9 is not representable in
+           binary, so 410*7.9 carries ~1e-13 of float noise, the bridge lands at -4.5e-13, and
+           the comma format paints it "(0)" — a check cell reading in PARENS on a page that ties
+           perfectly. Found by LOOKING at the win screenshot, which is the r439 `cases` lesson
+           exactly. Halves are dyadic, so every product, every difference and the whole
+           decomposition are exact and the check reads 0. Entry multiples are quoted in halves on
+           real deal pages anyway. */
+        m0=rnd(14,21)/2;                        // entry EV/EBITDA, 7.0x-10.5x in half turns
+        d0=Math.round(e0*m0*(rnd(45,60)/100)/10)*10;      // net debt at entry, ~4.5x-6.5x levered
+        e1=Math.round(e0*(1+rnd(25,55)/100)/10)*10;       // exit LTM EBITDA
+        up=rnd(0,1);                            // (d) rerated up, or down
+        m1=m0+(up?rnd(1,4):-rnd(1,2))/2;        // the rerating, also in half turns
+        d1=Math.round(d0*(1-rnd(18,45)/100)/10)*10;       // net debt at exit
+        g=(e1-e0)*m0; mx=(m1-m0)*e1; dn=d0-d1; tot=g+mx+dn;
+        eq0=e0*m0-d0; eq1=e1*m1-d1;
+        if(m1>=5 && eq0>0 && tot>0.40*eq0 && Math.max(Math.abs(g),Math.abs(mx),Math.abs(dn))<=1.3*tot) break;
+      }
+      /* THE IDENTITY, and it is exact, not approximate — it is the whole reason this drill can
+         carry a zero check instead of a tolerance band:
+             (E1-E0)*m0  +  (m1-m0)*E1  +  (D0-D1)
+           =  E1*m0 - E0*m0 + m1*E1 - m0*E1 + D0 - D1
+           =  (E1*m1 - D1) - (E0*m0 - D0)
+           =  exit equity - entry equity.
+         Every seeded figure is a round number and every product lands on an integer, so the board
+         shows no rounding anywhere and the check is a true zero, not a small one. */
+      cells[CA+R.ttl]={...blankCell(),value:codename()+' — value creation bridge, '+SECTORS[rnd(0,SECTORS.length-1)]+' ($mm)',txt:true,bold:true};
+      cells[CA+R.memo]={...blankCell(),value:'Source: entry and exit models · $mm · multiples are EV / LTM EBITDA · net debt a positive balance',txt:true,it:true,fontColor:'gray'};
+      /* §2.1b: a bold header row with a bottom border under it, right-aligned over the figures. */
+      cells[CA+R.capH]={...blankCell(),value:'Capitalization',txt:true,bold:true,bb:true};
+      cells[CB+R.capH]={...blankCell(),value:'At entry',txt:true,bold:true,align:'r',bb:true};
+      cells[CC+R.capH]={...blankCell(),value:'At exit',txt:true,bold:true,align:'r',bb:true};
+      /* MODELING_STANDARDS §1: BLUE = hardcoded input, BLACK = formula computed on this sheet. */
+      const inp=(k,v,st,dc)=>{ cells[k]={...blankCell(),value:v,fontColor:'blue',fmtStyle:st,decimals:dc}; };
+      const fml=(k,f,v)=>{ cells[k]={...blankCell(),formula:f,value:v,fmtStyle:'comma',decimals:0}; };
+      cells[CA+R.ebt]={...blankCell(),value:'LTM EBITDA',txt:true};
+      inp(CB+R.ebt,e0,'comma',0); inp(CC+R.ebt,e1,'comma',0);
+      cells[CA+R.mlt]={...blankCell(),value:'EV / LTM EBITDA',txt:true};
+      inp(CB+R.mlt,m0,'mult',1); inp(CC+R.mlt,m1,'mult',1);
+      cells[CA+R.ev]={...blankCell(),value:'Enterprise value',txt:true};
+      fml(CB+R.ev,'='+CB+R.ebt+'*'+CB+R.mlt,e0*m0); fml(CC+R.ev,'='+CC+R.ebt+'*'+CC+R.mlt,e1*m1);
+      cells[CA+R.nd]={...blankCell(),value:'Net debt',txt:true};
+      inp(CB+R.nd,d0,'comma',0); inp(CC+R.nd,d1,'comma',0);
+      /* §1.0(f): the subtotal earns the line ABOVE it. */
+      cells[CA+R.eq]={...blankCell(),value:'Equity value',txt:true,bold:true,bt:true};
+      fml(CB+R.eq,'='+CB+R.ev+'-'+CB+R.nd,eq0); fml(CC+R.eq,'='+CC+R.ev+'-'+CC+R.nd,eq1);
+      cells[CB+R.eq].bold=true; cells[CB+R.eq].bt=true;
+      cells[CC+R.eq].bold=true; cells[CC+R.eq].bt=true;
+      /* the bridge — the empty half of the page, framed and waiting */
+      cells[CA+R.brH]={...blankCell(),value:'Value creation bridge',txt:true,bold:true,bb:true};
+      cells[CB+R.brH]={...blankCell(),value:'$mm',txt:true,bold:true,align:'r',bb:true};
+      cells[CC+R.brH]={...blankCell(),value:'% of gain',txt:true,bold:true,align:'r',bb:true};
+      [[R.g,'EBITDA growth'],[R.m,'Multiple expansion'],[R.d,'Debt paydown']].forEach(([r,n])=>{
+        cells[CA+r]={...blankCell(),value:n,txt:true};
+        cells[CB+r]={...blankCell(),fmtStyle:'comma',decimals:0};
+        /* the share cells ship percent-formatted and otherwise BARE, so the ☆'s fill copies a
+           format identical to the one already there (the r439 `cases` degradation check) */
+        cells[CC+r]={...blankCell(),fmtStyle:'percent',decimals:1};
+      });
+      cells[CA+R.tot]={...blankCell(),value:'Total value created',txt:true,bold:true,bt:true};
+      cells[CB+R.tot]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      /* the % column's total cell stays EMPTY (deviation 6 — nothing below the ☆'s fill to
+         damage) but still wears the rule, so the total's line runs the full width of the block
+         the way the Equity value line does. Caught by LOOKING at the win screenshot: with the
+         border stopping at the $mm column the total read half-ruled beside a fully-ruled
+         subtotal eight rows above it. */
+      cells[CC+R.tot]={...blankCell(),bt:true};
+      /* the prove-out pair: the gain the models already show, and the check against it */
+      cells[CA+R.act]={...blankCell(),value:'Actual equity gain',txt:true};
+      fml(CB+R.act,'='+CC+R.eq+'-'+CB+R.eq,eq1-eq0);
+      cells[CA+R.chk]={...blankCell(),value:'Check vs actual gain',txt:true,bold:true};
+      cells[CB+R.chk]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      /* MODELING_STANDARDS §7: a simplification the player learns must be NAMED on the board, and
+         §1.0-R2(g)'s spirit — the seed's own fact (which way the multiple went) is stated rather
+         than left to be reverse-engineered off the two cells. */
+      cells[CA+R.note]={...blankCell(),value:'Exit review: three levers, no fees line — the exit multiple came in '+(up?'above entry, so all three run positive':'below entry, so expansion runs negative'),txt:true,it:true,fontColor:'gray'};
+      this._o={CA:CA,CB:CB,CC:CC,c0:c0,dr:dr,
+               rTtl:R.ttl,rEbt:R.ebt,rMlt:R.mlt,rEv:R.ev,rNd:R.nd,rEq:R.eq,
+               rG:R.g,rM:R.m,rD:R.d,rTot:R.tot,rAct:R.act,rChk:R.chk,
+               e0:e0,e1:e1,m0:m0,m1:m1,d0:d0,d1:d1,up:up,
+               g:g,mx:mx,dn:dn,tot:tot,eq0:eq0,eq1:eq1,gain:eq1-eq0};
+      const colW={}; colW[c0]=170; colW[c0+1]=88; colW[c0+2]=86;
+      return {ROWS:20, cells, active:{r:R.g,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<Math.max(0.5,Math.abs(exp)*1e-3)); };
-      const e=this._exp;
+      const o=this._o;
+      /* Every core reads the END STATE — the number standing on the board plus liveness, nothing
+         else. No predicate here touches formula TEXT (§1.0-R3(p), and CAMPAIGN §1: all eighteen
+         untriggerable beats found by this campaign were text-grading). */
+      const cell=k=>S.cells[k]||{};
+      const live=k=>{ const c=cell(k); return !!(c.formula&&typeof c.value==='number'); };
+      const num=k=>{ const c=cell(k); return (typeof c.value==='number')?c.value:NaN; };
+      const near=(k,exp)=>live(k)&&Math.abs(num(k)-exp)<=Math.max(0.5,Math.abs(exp)*5e-4);
+      const gOk=near(o.CB+o.rG,o.g), mOk=near(o.CB+o.rM,o.mx), dOk=near(o.CB+o.rD,o.dn);
+      /* the total grades against the levers AS THEY STAND on the board (the tieout pattern), so
+         =SUM, an addition chain and alt+= all clear and a wrong lever fails its OWN beat, not this
+         one */
+      const board=(num(o.CB+o.rG)||0)+(num(o.CB+o.rM)||0)+(num(o.CB+o.rD)||0);
+      const tOk=live(o.CB+o.rTot)&&Math.abs(num(o.CB+o.rTot)-board)<=Math.max(0.5,Math.abs(board)*5e-4);
+      /* the share column, also read off the board: each lever over the total standing in the Total
+         cell. Dividing by the Actual equity gain instead lands the identical number once the bridge
+         ties, so BOTH references clear — the §1.0-R3(p) point exactly. */
+      const den=num(o.CB+o.rTot);
+      const share=r=>{ const v=num(o.CB+r); return live(o.CC+r)&&isFinite(den)&&Math.abs(den)>1e-9
+        &&isFinite(v)&&Math.abs(num(o.CC+r)-v/den)<=5e-4; };
+      const sOk=share(o.rG)&&share(o.rM)&&share(o.rD);
+      /* the check: the cell must BE the difference between the total and the actual gain, and that
+         difference must be zero — so a typed 0 on a bridge that does not tie cannot clear it. */
+      const diff=num(o.CB+o.rTot)-num(o.CB+o.rAct);
+      const cOk=live(o.CB+o.rChk)&&Math.abs(num(o.CB+o.rChk)-diff)<=0.5&&Math.abs(num(o.CB+o.rChk))<=0.5;
+      /* ☆ RECIPE (§1.0(d) hidden EFFICIENCY · §1.0-R2(i) a real, skippable decision · §1.0-R4(u)'s
+         ANCHORING-MASTERY family): the share column landed by ONE fill down the three lever rows
+         instead of three formulas typed one at a time. Read off the r424 S.fillOps latch — the
+         MECHANIC, never geometry inferred — so Ctrl+D and the ribbon's Alt H F I D both earn it.
+         The anchor is what makes it work: fill without locking the total and the divisor walks
+         into the blank rows below, so the core beat goes dark and the star with it. Measured on
+         the built board through the live engine: 14 keys against 24 to type the three shares one
+         at a time (worth 10), and the typed route clears every core with this line dark —
+         alt-paths entry 2 is that measured negative control. */
+      const starOk=sOk&&(S.fillOps||[]).some(f=>f.dir==='down'&&f.c1<=(o.c0+2)&&f.c2>=(o.c0+2)
+        &&f.r1<=o.rG&&f.r2>=o.rD);
       return [
-        {label:'run the growth effect \u2014 \u0394EBITDA at the ENTRY multiple', ok: near('B9',e.g)},
-        {label:'run multiple expansion \u2014 \u0394multiple on EXIT EBITDA', ok: near('B10',e.m)},
-        {label:'run deleveraging \u2014 debt paid down', ok: near('B11',e.d)},
-        {label:'total the three effects to the equity gain', ok: near('B12',e.tot)},
-        {label:'tie the bridge \u2014 check vs actual reads zero', ok: near('B14',0)},
+        {label:'Build the EBITDA growth lever — the EBITDA increase at the entry multiple', ok:gOk},
+        {label:'Build the multiple expansion lever — the multiple change on exit EBITDA', ok:mOk},
+        {label:'Build the debt paydown lever — net debt at entry less at exit', ok:dOk},
+        {label:'Total the three levers', ok:tOk},
+        {label:'Build the share column — each lever against the total value created', ok:sOk},
+        {label:'Build the check — the bridge total less the actual equity gain', ok:cOk},
+        {label:'Fill the share column from one anchored formula — a single pass down', ok:starOk, bonus:true},
       ];
     }
   },
