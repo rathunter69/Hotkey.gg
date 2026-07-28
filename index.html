@@ -10852,61 +10852,298 @@ const CHALLENGES = {
     }
   },
   accdil:{
-    name:'Acc/Dil', label:'Run accretion / dilution', par:50, parKeys:51,
-    aha:'Accretion = pro-forma EPS ÷ standalone − 1 — the verdict is four rows of math.',
-    prompt:'Does the deal add to EPS (earnings per share)? Include the part that’s easy to forget — the financing drag: cash spent on the deal stops earning interest, and that foregone interest comes out of pro forma income before you divide. Combine the income, net the drag, combine the shares, compute both EPS figures, and state the verdict.',
-    req:'<em>B7</em> foregone interest <em>=-B5*B6</em> \u00b7 <em>B8</em> pro forma NI <em>=SUM(B2:B4)+B7</em> \u00b7 <em>B11</em> shares <em>=B9+B10</em> \u00b7 <em>B12</em> standalone EPS <em>=B2/B9</em> \u00b7 <em>B13</em> pro forma EPS <em>=B8/B11</em> \u00b7 <em>B14</em> accretion <em>=B13/B12-1</em>',
-    guide:[
-      'the drag first: B7 \u00b7 <kbd>=-B5*B6</kbd> \u2014 cash consideration \u00d7 its after-tax cost, negative convention',
-      'pro forma NI at B8 \u00b7 <kbd>=SUM(B2:B4)+B7</kbd> \u2014 acquirer + target + synergies, LESS the drag',
-      'pro forma shares at B11 \u00b7 <kbd>=B9+B10</kbd> \u2014 old count plus what you issued',
-      'both EPS lines: B12 \u00b7 <kbd>=B2/B9</kbd> \u00b7 B13 \u00b7 <kbd>=B8/B11</kbd>',
-      'the verdict at B14 \u00b7 <kbd>=B13/B12-1</kbd> \u2014 positive = accretive; the drag can flip it',
-    ],
-    targets:['B7','B8','B11','B12:B13','B14'],
-    demo(){ return [
-      {sel:'B7', keys:[...T('=-B5*B6'), Kb.enter]},
-      {sel:'B8', keys:[...T('=SUM(B2:B4)+B7'), Kb.enter]},
-      {sel:'B11', keys:[...T('=B9+B10'), Kb.enter]},
-      {sel:'B12', keys:[...T('=B2/B9'), Kb.enter]},
-      {sel:'B13', keys:[...T('=B8/B11'), Kb.enter]},
-      {sel:'B14', keys:[...T('=B13/B12-1'), Kb.enter]},
+    /* r444 H6b (DEPTH_PASS §4.65, "Run accretion / dilution") — the depth-pass rework, built to
+       §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (the later law wins on conflict).
+       Models I ⇒ dev/MODELING_STANDARDS.md is binding as well; the conventions statement is at
+       the bottom of this comment.
+
+       WAS: 5 checks on a ROWS:14 board (14 rows used of a 14-row sheet — the §1.3 "ROWS=14
+       inheritance" defect exactly, and a board that never grows), no ☆, no saveClose, one
+       alt-path entry, lowercase route-flavoured labels carrying bare cell refs ("run the
+       financing drag — foregone interest, negative, live off cash × rate (B7)").
+
+       ── WHY THE BOARD HAD TO CHANGE, MEASURED (CAMPAIGN §2, the ☆-headroom diagnostic run
+       BEFORE anything was designed). The page's ☆ — "Percent-format the accretion cell to one
+       decimal" — is a FORMATTING bonus, which §1.0(d) killed outright and §1.0-R4(u) declares
+       dead on arrival for every pre-playtest page. So the drill needed a legal star, and the
+       shipped board could not carry one. Walked through the live engine, 5 seeds:
+         PART 1 — SPREAD: the taught route measured 51 keys; a deliberately verbose but fully
+           legal route (unary 0-minus for the drag, a four-term addition chain instead of SUM,
+           the ribbon percent walk) measured 50. The slow route is CHEAPER. That is the `growth`
+           signature verbatim (CAMPAIGN §2: "its canonical route measured worse than the slow
+           one") and a spread of 1.02×, far under the 1.3× warning line.
+         PART 2 — WHAT THE SPREAD IS MADE OF: nothing survives the strip. Six single formulas in
+           six non-adjacent cells offer no fill, no block grab, no paste-special and no anchor
+           that pays; formula entry has no ribbon route at all (the r439 `wrapfix` finding), so
+           the chord-vs-ribbon component is EMPTY by construction; and the only formatting op on
+           the board is the very percent format §1.0(d) forbids grading as a bonus.
+         VERDICT: the one-structure board is a motif, not a lesson — it cannot satisfy §1.1/§2.2.
+       Rebuilt rather than retired, because the lesson (a deal's EPS math, drag included) is
+       carried nowhere else in the catalog and the REAL desk artifact supplies the missing
+       headroom for free: an acc/dil is never run at one structure. The MD asks for all cash,
+       part cash part stock, and all stock, and the page prices them side by side off ONE column
+       of anchored formulas. That is the §1.0-R4(t) reality test answered and a legal ☆ in the
+       same move. Re-measured on the rebuilt board, 5 seeds (dev/verify-accdil.js):
+         PART 1 — SPREAD: 71 keys fastest legal against 197 for the slowest legal one (all
+           fifteen formulas typed cell by cell, nothing filled, percent by the ribbon walk plus a
+           decimal step). 2.77×.
+         PART 2 — of those 126 keys of spread, 3 are chord-vs-ribbon (the percent route, which
+           §1.0(c) forces to clear) and 3 are the decimal walk. The remaining ~120 are one
+           selection against fifteen typed formulas — a sanctioned ☆ family (one-pass discipline),
+           and the board's own thesis.
+
+       STRUCTURAL DEVIATIONS from the §4.65 page, declared here per §0 / §9.2 item 8:
+       (1) ☆ RE-CUT under §1.0-R4(u): the page's percent-format bonus is PROMOTED to core beat 6
+           (the r425 editfix/dress/ruleoff precedent — where the killed ☆ was real work it becomes
+           a beat, it is not deleted), and the ☆ becomes a hidden efficiency discovery: the whole
+           five-row analysis block carried across both alternative structures in ONE pass.
+       (2) BOARD REBUILT from one structure to three, for the headroom measurement above and for
+           §1.0-R4(t) rule 3 ("the task is one a desk actually does"). §3.1 puts Models I at
+           B-heavy and names accretion/dilution as one of its artifact families, so the drill
+           stays audience B; nothing about the craft changes for audience A (a three-scenario
+           block off one anchored column is the same motion on a headcount plan).
+       (3) ROWS 14 → 20 (§1.3, Wolf r440: 20 is floor AND cap, and ROWS=14 is the defect). The
+           fragment was NARROWED to fit, never the cap raised (MODELING_STANDARDS §7): the deal
+           team's structuring output (cash consideration, shares issued) ships as inputs, so the
+           board is the EARNINGS half of an acc/dil — which is exactly the page's stated scope,
+           "combined EPS vs standalone incl. financing drag".
+       (4) saveClose:true (§1.0(e)) — the drill had no closer.
+       (5) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an existing labelled
+           row crossed with a labelled structure column, which the guided ring expresses exactly.
+       (6) §1.3 DENSITY: 18 of 20 rows carry content at load AND at the win state (90%), against
+           14 of 14 on a sheet that was never 20 rows. Rows 3 and 12 are deliberate moats — 12
+           keeps Ctrl+Shift+↓ off the assumptions block when the player grabs the analysis block.
+
+       GRADING (§1.0(c) FREEDOM + §1.0-R3(p) END STATE). Nothing anywhere reads formula TEXT and
+       nothing reads a keypress counter. Every core grades the NUMBER standing in the cell plus
+       liveness, because every core's verb is "Build" and §1.7 defines Build as "enter a live
+       formula" — so SUM vs an addition chain, typed refs vs pointer mode vs F4, one fill vs five
+       fills vs fifteen typed formulas, Ctrl+R vs Alt H F I R vs copy/paste all clear. The one
+       end-state property graded beyond value is the SIGN of the drag, which MODELING_STANDARDS §2
+       makes a convention rather than a route ("costs negative, so the column is a clean SUM") —
+       and the check label says "negative" out loud so it is never a hidden condition. Routes were
+       WALKED, not reasoned about: the list is in dev/verify-accdil.js and dev/AUDIT.md r444.
+
+       PERCENT ROUTES (§1.0-R3(p), the exact class that shipped broken in round 3): Ctrl+1 → P
+       lands percent at ONE decimal outright; Alt H P and Ctrl+Shift+% land percent at ZERO and
+       need one Alt H 0 after. All three clear beat 6, because the beat reads fmtStyle + decimals
+       off the cell and never asks how they got there.
+
+       MODELING_STANDARDS CONVENTIONS THIS BOARD FOLLOWS: colour-as-provenance (§1) — every typed
+       assumption is blue on the yellow input fill, every computed cell is black, and the board
+       has one logical sheet-area so nothing is green; sign convention (§2) — the financing drag
+       carries its own minus so pro forma income is a clean addition, and the basis memo states
+       the units; no hardcodes inside formulas (§1 corollary) — the yield, the share count and the
+       standalone EPS are all labelled cells the analysis points at, so one anchored column prices
+       every structure; totals wear TOP borders and never a rule underneath (§1 + §1.0(f)); units
+       stated in the header (§1); standalone EPS is itself a live formula off the acquirer's own
+       two lines, so the comparison can never drift. DELIBERATE SIMPLIFICATIONS, stated on the
+       board's own reviewer memo per §7: foregone interest is taken on the BEGINNING cash balance
+       (MODELING_STANDARDS §5 route 2 — this engine has no iterative calculation, and the ruling
+       is already made), there is no revolver and no new acquisition debt, synergies arrive fully
+       phased and already tax-effected, and the stock component converts at a single undisturbed
+       share price stated in the basis line. */
+    name:'Acc/Dil', label:'Run accretion / dilution', par:70, parKeys:66, saveClose:true,   /* r444 §4.65 depth pass: par re-swept from scratch (was par 50 / parKeys 51 on the one-structure board). dev/e2e-par-sweep.js accdil, 5-seed median 66 keys including the engine-appended Ctrl+S, and FLAT at 66 over a 15-seed probe (min 66, max 66) — the player types formulas and never a figure, so no value draw can move the count, and the corner jitter swaps a column letter for another single character. par 70 ≈ 1.06 s/key, the house band. The count grew from 51 to 66 because the board now prices three structures instead of one, the save closer landed, and the demo pays for its own block grab instead of being handed the selection. Measured against it: the same board with all fifteen formulas typed cell by cell, nothing filled and nothing pasted, and the ribbon percent walk plus a decimal step, runs 192 keys — the negative control, alt-paths entry 2 — which is the cost the clock exists to show. The clipboard route sits at 61 and still earns the star. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 1:45 · pro 1:20 · legendary 1:10. */
+    aha:'the drag is what cash costs and the share count is what stock costs — one anchored column prices both.',
+    /* §1.5: the aha's MOMENT is the fill. Until the block runs across, the drag looks like a
+       rounding detail; the instant the same five formulas land under all-stock, the drag goes to
+       zero, the share count explodes and the accretion line changes sign across the page. */
+    prompt:'The MD wants the accretion read before the 8am call, and she wants it at all three ways the financing team has offered to pay — all cash, part cash part stock, all stock. Accretion is just whether the deal lifts earnings per share: pro forma EPS against the acquirer’s own. Do not lose the drag — cash spent on the deal stops earning interest, and that foregone interest comes out of pro forma income before you divide. Land the read under every structure.',
+    req(){ const o=this._o; return 'the drag on <em>'+o.CB+o.rD+'</em> → <em>=-'+o.CB+o.rC+'*$'+o.CB+'$'+o.rY+'</em> · income <em>=SUM($'+o.CB+'$'+o.rAN+':$'+o.CB+'$'+o.rSY+')+'+o.CB+o.rD+'</em> · shares <em>=$'+o.CB+'$'+o.rAS+'+'+o.CB+o.rNS+'</em> · EPS <em>='+o.CB+o.rN+'/'+o.CB+o.rS+'</em> · accretion <em>='+o.CB+o.rE+'/$'+o.CB+'$'+o.rSE+'-1</em> · <em>ctrl+shift+↓</em> then <em>shift+→</em> grabs the block · <em>ctrl+r</em> · <em>ctrl+1</em> <em>p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'on '+o.CB+o.rD+': <kbd>=-</kbd>'+o.CB+o.rC+'<kbd>*</kbd>$'+o.CB+'$'+o.rY+' <kbd>↵</kbd> — the cash the structure spends times the after-tax yield it stops earning, carrying its own minus. Point mode and <kbd>F4</kbd> reach the same reference as typing the <kbd>$</kbd> signs',
+      'on '+o.CB+o.rN+': <kbd>=SUM(</kbd>$'+o.CB+'$'+o.rAN+'<kbd>:</kbd>$'+o.CB+'$'+o.rSY+'<kbd>)+</kbd>'+o.CB+o.rD+' <kbd>↵</kbd> — the three income lines plus the drag. An addition chain of the same four cells grades identically; it only costs the keys',
+      'on '+o.CB+o.rS+': <kbd>=</kbd>$'+o.CB+'$'+o.rAS+'<kbd>+</kbd>'+o.CB+o.rNS+' <kbd>↵</kbd> — the acquirer’s own count plus the shares this structure prints',
+      'on '+o.CB+o.rE+': <kbd>=</kbd>'+o.CB+o.rN+'<kbd>/</kbd>'+o.CB+o.rS+' <kbd>↵</kbd> — pro forma income over pro forma shares. A typed number will not take: the line has to compute',
+      'on '+o.CB+o.rA+': <kbd>=</kbd>'+o.CB+o.rE+'<kbd>/</kbd>$'+o.CB+'$'+o.rSE+'<kbd>-1</kbd> <kbd>↵</kbd> — pro forma EPS over the standalone line, less one. The lock on the standalone reference is what lets the column travel',
+      '<kbd>ctrl</kbd>+<kbd>1</kbd> then <kbd>p</kbd> lands percent at one decimal in a single move · <kbd>alt</kbd> <kbd>h</kbd> <kbd>p</kbd> and <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> land it at zero and take one <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> after — all three grade',
+      '☆ the discovery: build the first structure top to bottom, then take the WHOLE block in one grab — <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>↓</kbd> down the column, then <kbd>shift</kbd>+<kbd>→</kbd> twice across, exactly the three structures and no further — and <kbd>ctrl</kbd>+<kbd>r</kbd> once. <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> and a copy of the column pasted onto the other two both count. Filling row by row clears every line and forfeits it; so does typing all fifteen formulas, and so does over-reaching with <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>→</kbd>, which runs to the edge of the sheet',
     ]; },
+    /* rings: ① the drag line · ② the income line · ③ the share line · ④ the EPS line ·
+       ⑤ the accretion line · ⑥ the accretion line again (the dress that follows it, §1.0(a)) ·
+       ☆ never ringed (§2.2) */
+    targets(){ const o=this._o; const rng=r=>o.CB+r+':'+o.CD+r; return [
+      rng(o.rD), rng(o.rN), rng(o.rS), rng(o.rE), rng(o.rA), rng(o.rA), null]; },
+    /* the demo BUILDS its own selections rather than being handed them by setDemoSel wherever a
+       real player would pay keys for them (the r438 `series` rule): the block grab is keyed in
+       full, so parKeys measures the range grab instead of eliding it.
+       The five formulas take ONE STEP EACH rather than chaining on Enter's landing, and that is
+       not cosmetic — found by dev/e2e-guided.js, not by reading this: with guided ON, the FIRST
+       committed action is what triggers the initial railToTarget() placement, which pulls the
+       cursor back onto beat 1's target and quietly eats that one Enter's advance. A chained run
+       then writes every remaining formula one row high, and the drill cannot be won on the rails.
+       One sel per formula costs nothing (the Enters are still keyed, so parKeys is unchanged at
+       66) and the guided path is solvable by construction. */
+    demo(){ const o=this._o; return [
+      {sel:o.CB+o.rD, keys:[...T(o.fD), Kb.enter]},
+      {sel:o.CB+o.rN, keys:[...T(o.fN), Kb.enter]},
+      {sel:o.CB+o.rS, keys:[...T(o.fS), Kb.enter]},
+      {sel:o.CB+o.rE, keys:[...T(o.fE), Kb.enter]},
+      {sel:o.CB+o.rA, keys:[...T(o.fA), Kb.enter]},
+      /* the ☆ — one grab, one fill: the whole block prices the other two structures at once */
+      {sel:o.CB+o.rD, keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',shift:true},
+                            {key:'ArrowRight',shift:true}, Kb.fillR]},
+      /* §1.0(a) format-as-you-go: the headline line is dressed the moment it exists */
+      {sel:o.CB+o.rA, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},
+                            {key:'1',ctrl:true}, L('p')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 accretion / dilution ($mm)',txt:true,bold:true};
-      const aNI=rnd(40,120)*10, tNI=rnd(8,40)*10, syn=rnd(1,8)*10;
-      const cash=rnd(10,60)*10, rate=rnd(35,55)/1000;
-      const aSh=rnd(30,90)*10, newSh=rnd(4,25)*10;
-      const rows=[[2,'Acquirer net income',aNI,'comma',0],[3,'Target net income',tNI,'comma',0],
-        [4,'After-tax synergies',syn,'comma',0],[5,'Cash consideration',cash,'comma',0],
-        [6,'After-tax cost of cash',rate,'percent',1]];
-      rows.forEach(([r,n,v,f,d])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
-        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:f,decimals:d}; });
-      cells['A7']={...blankCell(),value:'Foregone interest',txt:true}; cells['B7']={...blankCell(),fmtStyle:'comma',decimals:1};
-      cells['A8']={...blankCell(),value:'Pro forma net income',txt:true,bold:true}; cells['B8']={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
-      cells['A9']={...blankCell(),value:'Acquirer shares',txt:true}; cells['B9']={...blankCell(),value:aSh,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['A10']={...blankCell(),value:'New shares issued',txt:true}; cells['B10']={...blankCell(),value:newSh,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['A11']={...blankCell(),value:'Pro forma shares',txt:true,bold:true}; cells['B11']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      cells['A12']={...blankCell(),value:'Standalone EPS',txt:true}; cells['B12']={...blankCell(),decimals:2};
-      cells['A13']={...blankCell(),value:'Pro forma EPS',txt:true};  cells['B13']={...blankCell(),decimals:2};
-      cells['A14']={...blankCell(),value:'Accretion / (dilution)',txt:true,bold:true}; cells['B14']={...blankCell(),fmtStyle:'percent',decimals:1,bold:true};
-      const fi=-cash*rate, pfNI=aNI+tNI+syn+fi, pfSh=aSh+newSh;
-      this._exp={fi:fi, ni:pfNI, sh:pfSh, e0:aNI/aSh, e1:pfNI/pfSh, acc:(pfNI/pfSh)/(aNI/aSh)-1};
-      return {ROWS:14, cells, active:{r:7,c:2}, sel:null, colW:{1:168,2:88}};
+      /* §1.2 randomization — three independent axes on a full-grid artifact, which §1.2 lets
+         substitute corner jitter for the site pool. (a) SITE: corner jitter — the whole page
+         anchors at column A or column B. (b) CONTENT: the deal codename, plus the middle
+         structure's mix drawn from a four-way pool, so the header the player reads is this
+         seed's split. (c) VALUES: every figure through rnd(), with the deal parameters drawn so
+         the STORY holds on every seed — see the constraint note below. Geometry is constant
+         across seeds and a jittered column letter is still one character, so the keystroke
+         count never moves with the draw (the r439 `wrapfix` rule). */
+      const c0=rnd(0,1)?1:2;                          // (a) corner jitter: anchor column A or B
+      const CA=colLetter(c0), CB=colLetter(c0+1), CC=colLetter(c0+2), CD=colLetter(c0+3);
+      const RH=4, RC=5, RNS=6, RD=7, RN=8, RS=9, RE=10, RA=11;
+      const RASM=13, RAN=14, RTN=15, RSY=16, RAS=17, RSE=18, RY=19, RMEMO=20;
+      /* (c) the deal. The draws are CONSTRAINED so every seed tells the same true story — all
+         cash accretive, all stock dilutive — because that contrast is the drill's whole read:
+           · all-stock is dilutive whenever the multiple PAID on the target's contribution
+             exceeds the acquirer's own, so the price is struck off (target NI + synergies) at a
+             multiple set 3–6 turns above the acquirer's;
+           · all-cash is accretive whenever the target's contribution beats the interest given
+             up, i.e. whenever (multiple paid × yield) < 1 — capped here at 24 × 3.5% = 0.84. */
+      const aSh=rnd(36,84)*5;                         // acquirer shares, 180–420mm
+      const aNI=Math.round(aSh*(rnd(140,380)/100)/5)*5;   // acquirer net income, $mm
+      const tNI=rnd(12,36)*5, syn=rnd(4,14)*5;        // target income + after-tax synergies, $mm
+      const peA=rnd(13,18), pePd=peA+rnd(3,6);
+      const P=Math.round((tNI+syn)*pePd/25)*25;       // equity purchase price, $mm
+      const sp=Math.round((aNI/aSh)*peA*100)/100;     // acquirer share price, $ — the stock currency
+      const yld=rnd(20,35)/1000;                      // after-tax yield on cash, 2.0–3.5%
+      const mid=[0.4,0.5,0.6,0.7][rnd(0,3)];          // (b) this seed's middle structure
+      const mixes=[1,mid,0], CS=[CB,CC,CD];
+      const hdr=['100% cash', Math.round(mid*100)+' / '+Math.round((1-mid)*100), '100% stock'];
+      cells[CA+'1']={...blankCell(),value:codename()+' — accretion / (dilution) by consideration mix ($mm, except per share)',txt:true,bold:true};
+      /* both memo lines are held to ~100 characters. They spill across the empty right-hand
+         columns by design (Excel clips text and never ####s it), and at ~6.9px per glyph that is
+         the width the ten-column sheet has to give them — a longer basis line renders amputated
+         at column J, which is not a page anybody would send (doctrine §8.1.5). */
+      cells[CA+'2']={...blankCell(),value:'Basis: $mm except per share · shares in millions · structures read cash / stock · synergies after tax',txt:true,it:true,fontColor:'gray'};
+      cells[CA+RH]={...blankCell(),value:'Consideration mix',txt:true,bold:true,bb:true};
+      CS.forEach((C,i)=>{ cells[C+RH]={...blankCell(),value:hdr[i],txt:true,bold:true,align:'r',bb:true}; });
+      /* the structuring desk's output — blue, because a human typed them (MODELING_STANDARDS §1) */
+      cells[CA+RC]={...blankCell(),value:'Cash consideration',txt:true};
+      cells[CA+RNS]={...blankCell(),value:'New shares issued',txt:true};
+      const cash=[], nsh=[];
+      CS.forEach((C,i)=>{ const m=mixes[i];
+        const cs=Math.round(P*m), ns=Math.round(P*(1-m)/sp*10)/10;
+        cash.push(cs); nsh.push(ns);
+        cells[C+RC]={...blankCell(),value:cs,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[C+RNS]={...blankCell(),value:ns,fontColor:'blue',fmtStyle:'comma',decimals:1}; });
+      /* the five lines the player builds — seeded EMPTY but pre-dressed, because the lesson here
+         is the model and not the formatting (doctrine §2.1b), so the win state is clean without a
+         dress beat. §1.0(f): the two pro forma subtotals and the headline wear TOP borders, never
+         a rule underneath. The accretion line deliberately ships UNformatted — that is beat 6. */
+      cells[CA+RD]={...blankCell(),value:'Foregone interest',txt:true};
+      cells[CA+RN]={...blankCell(),value:'Pro forma net income',txt:true,bold:true};
+      cells[CA+RS]={...blankCell(),value:'Pro forma shares',txt:true,bold:true};
+      cells[CA+RE]={...blankCell(),value:'Pro forma EPS',txt:true};
+      cells[CA+RA]={...blankCell(),value:'Accretion / (dilution)',txt:true,bold:true};
+      CS.forEach(C=>{
+        cells[C+RD]={...blankCell(),fmtStyle:'comma',decimals:1};
+        cells[C+RN]={...blankCell(),fmtStyle:'comma',decimals:1,bold:true,bt:true};
+        cells[C+RS]={...blankCell(),fmtStyle:'comma',decimals:1,bold:true,bt:true};
+        cells[C+RE]={...blankCell(),decimals:2};
+        cells[C+RA]={...blankCell(),decimals:3,bold:true,bt:true}; });
+      /* §1.0(f)+§1.0-R2(l): the assumption stack — vertically stacked, INDIVIDUALLY LABELLED by
+         what they are rather than by the word "helper" (the r430 ruling on naming), light yellow
+         + all borders, blue ink, and shipped POPULATED. The three income lines sit contiguous so
+         one SUM reaches them; the standalone EPS between the shares and the yield is itself a
+         live formula, so the comparison the whole page turns on can never drift. */
+      cells[CA+RASM]={...blankCell(),value:'Deal assumptions',txt:true,bold:true};
+      const asm=[[RAN,'Acquirer net income',aNI,'comma',0],[RTN,'Target net income',tNI,'comma',0],
+                 [RSY,'After-tax synergies',syn,'comma',0],[RAS,'Acquirer shares',aSh,'comma',1],
+                 [RY,'After-tax yield on cash',yld,'percent',1]];
+      asm.forEach(([r,n,v,f,d])=>{ cells[CA+r]={...blankCell(),value:n,txt:true};
+        cells[CB+r]={...blankCell(),value:v,fontColor:'blue',fill:'yellow',ball:true,fmtStyle:f,decimals:d}; });
+      cells[CA+RSE]={...blankCell(),value:'Standalone EPS',txt:true};
+      cells[CB+RSE]={...blankCell(),formula:'='+CB+RAN+'/'+CB+RAS,value:aNI/aSh,decimals:2};
+      cells[CA+RMEMO]={...blankCell(),value:'Reviewer: stock converts at $'+sp.toFixed(2)+' · foregone interest runs on the beginning cash balance, no revolver',txt:true,it:true,fontColor:'gray'};
+      const drag=cash.map(c=>-c*yld);
+      const ni=drag.map(d=>aNI+tNI+syn+d);
+      const sh=nsh.map(n=>aSh+n);
+      const eps=ni.map((n,i)=>n/sh[i]);
+      const seps=aNI/aSh;
+      this._exp={drag:drag, ni:ni, sh:sh, eps:eps, acc:eps.map(e=>e/seps-1)};
+      this._o={CA:CA,CB:CB,CC:CC,CD:CD,CS:CS,c0:c0,
+               rC:RC,rNS:RNS,rD:RD,rN:RN,rS:RS,rE:RE,rA:RA,
+               rAN:RAN,rTN:RTN,rSY:RSY,rAS:RAS,rSE:RSE,rY:RY,
+               fD:'=-'+CB+RC+'*$'+CB+'$'+RY,
+               fN:'=SUM($'+CB+'$'+RAN+':$'+CB+'$'+RSY+')+'+CB+RD,
+               fS:'=$'+CB+'$'+RAS+'+'+CB+RNS,
+               fE:'='+CB+RN+'/'+CB+RS,
+               fA:'='+CB+RE+'/$'+CB+'$'+RSE+'-1'};
+      const colW={}; colW[c0]=190; colW[c0+1]=104; colW[c0+2]=104; colW[c0+3]=104;
+      return {ROWS:20, cells, active:{r:RD,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const live=(k,exp,tol,ref)=>{ const c=S.cells[k]; if(!c||!c.formula||typeof c.value!=='number') return false;
-        if(Math.abs(c.value-exp)>(tol||0.5)) return false;
-        return !ref || String(c.formula).replace(/\$/g,'').toUpperCase().includes(ref); };
-      const e=this._exp;
+      const o=this._o, e=this._exp;
+      const cel=k=>S.cells[k]||{};
+      /* every core reads the END STATE — the number standing in the cell, plus liveness, because
+         §1.7 defines the verb "Build" as entering a live formula and the labels all use it.
+         Nothing reads formula TEXT (§1.0-R3(p) and the thirteen untriggerable beats CAMPAIGN §1
+         records, every one of them a text predicate). */
+      const live=(k,exp)=>{ const c=cel(k);
+        return !!(c.formula && typeof c.value==='number' &&
+                  Math.abs(c.value-exp) < Math.max(5e-4, Math.abs(exp)*1e-4)); };
+      const row=(r,exps)=>o.CS.every((C,i)=>live(C+r,exps[i]));
+      const dragOk=row(o.rD, e.drag);   // the minus is the graded convention (MODELING_STANDARDS §2)
+      const niOk  =row(o.rN, e.ni);
+      const shOk  =row(o.rS, e.sh);
+      const epsOk =row(o.rE, e.eps);
+      const accOk =row(o.rA, e.acc);
+      /* beat 6 grades the two properties the board SHOWS — percent, one decimal — and never the
+         route that set them: Ctrl+1 P lands both at once, Alt H P and Ctrl+Shift+% land percent
+         at zero decimals and take one Alt H 0 after. All three clear (§1.0-R3(p)). */
+      const pctOk =o.CS.every(C=>{ const c=cel(C+o.rA); return c.fmtStyle==='percent' && (c.decimals|0)===1; });
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): the whole
+         five-row analysis block carried onto both alternative structures in ONE pass. Read off
+         the r424 S.fillOps latch and the r425 S.pasteLog latch — the MECHANIC, never geometry
+         inferred from the end state — so Ctrl+R, the ribbon's Alt H F I R and a copy of the built
+         column pasted onto the other two all earn it. Latched only when the block is actually
+         RIGHT, so a fill that propagates a mistake never lights it. Measured skippable, 5 seeds
+         (dev/verify-accdil.js): the block grab plus one fill costs 4 keys where the same work row
+         by row costs 15 and typing it out costs 130 — and both of those slow routes clear all six
+         cores with the star DARK, which is the §1.0-R2(i) proof, measured rather than asserted.
+         Anchoring is what makes the one-pass route legal at all, which is why the star is this
+         drill's own lesson rather than a keystroke trick. */
+      /* Two things this predicate had to learn by WALKING routes rather than by being reasoned
+         about, both of them found in dev/verify-accdil.js:
+         (1) the two mechanics land DIFFERENT rects for the same job. A fill right must include the
+             SOURCE column, so its rect spans all three structures; a paste lands only on the two
+             DESTINATION structures, because the built column is the clipboard rather than part of
+             the target. A predicate written for one silently locks out the other.
+         (2) the rect is matched EXACTLY, and that is deliberate. Ctrl+Shift+→ off a filled column
+             whose right-hand neighbours are empty runs to the sheet edge — Excel does this too —
+             and a Ctrl+R on that selection dumps twenty-five plausible-looking junk cells across
+             the empty columns. The cores still clear, so the player is left with a "finished"
+             page nobody could send (doctrine §8.1.5), and a ☆ must never make the board WORSE
+             than the route it beats (r439, `cases`). One-pass discipline means one selection
+             covering exactly the job, so an over-grab forfeits the star and the junk on screen
+             says why. Five row-shaped fills never match either. */
+      const block=(r1,r2)=>r1===o.rD && r2===o.rA;
+      const onePass=(S.fillOps||[]).some(f=>f.dir==='right'&&block(f.r1,f.r2)&&f.c1===o.c0+1&&f.c2===o.c0+3) ||
+                    (S.pasteLog||[]).some(p=>block(p.r0,p.r0+p.h-1)&&p.c0+p.w-1===o.c0+3&&
+                                             (p.c0===o.c0+1||p.c0===o.c0+2));
+      const starOk=dragOk&&niOk&&shOk&&epsOk&&accOk&&onePass;
+      /* Labels are INSTRUCTIONS (§1.0-R3(n)): the clause after the dash says WHAT or WHERE, never
+         why. They name the board's own labelled lines (§1.7 R2/R9), carry no cell references and
+         no chords, and every verb is on the §1.7 closed list. */
       return [
-        {label:'run the financing drag \u2014 foregone interest, negative, live off cash \u00d7 rate (B7)', ok: live('B7',e.fi,0.05,'B5')&&live('B7',e.fi,0.05,'B6')},
-        {label:'net the drag out of pro forma net income \u2014 the SUM alone is wrong (B8)', ok: live('B8',e.ni,0.5,'B7')},
-        {label:'run the pro forma share count (B11)', ok: live('B11',e.sh)},
-        {label:'run standalone and pro forma EPS, both live (B12, B13)', ok: live('B12',e.e0,0.005)&&live('B13',e.e1,0.005)},
-        {label:'call the verdict \u2014 accretion vs the standalone line, as a percent (B14)', ok: (()=>{ const c=S.cells['B14'];
-          return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-e.acc)<0.001&&c.fmtStyle==='percent'); })()},
+        {label:'Build the foregone interest line — negative, all three structures', ok: dragOk},
+        {label:'Build pro forma net income — the foregone interest netted out', ok: niOk},
+        {label:'Build the pro forma share count — all three structures', ok: shOk},
+        {label:'Build pro forma EPS — the income line over the share line', ok: epsOk},
+        {label:'Build the accretion line — pro forma EPS against standalone EPS', ok: accOk},
+        {label:'Percent-format the accretion line — one decimal', ok: pctOk},
+        {label:'Fill the whole analysis block onto the other two structures in one pass', ok: starOk, bonus:true},
       ];
     }
   },

@@ -700,21 +700,46 @@ const ALTS = [
       {sel:'B13:D14', keys:[{key:'r',ctrl:true}]},
     ]` },
   // --- T24 anti-railroad tranche: order permutations + chord-route swaps ---
-  { key: 'accdil', name: 'shares side FIRST, drag last-but-one, typed addition instead of SUM()', moves: `C => [
-      {sel:'B11', keys:[...T('=B9+B10'),{key:'Enter'}]},
-      {sel:'B12', keys:[...T('=B2/B9'),{key:'Enter'}]},
-      {sel:'B7',  keys:[...T('=-B5*B6'),{key:'Enter'}]},
-      {sel:'B8',  keys:[...T('=B2+B3+B4+B7'),{key:'Enter'}]},
-      {sel:'B13', keys:[...T('=B8/B11'),{key:'Enter'}]},
-      {sel:'B14', keys:[...T('=B13/B12-1'),{key:'Enter'}]},
-    ]` },
-  /* r439 (audit, DEPTH_PASS §4.45 + the hunt MERGE): the shipped entry ("crimes fixed in
-     REVERSE, full retype instead of F2 surgery") is DELETED, not patched — it drove _t1/_t2/_t3
-     and the hard-coded rows 10/12/13 of the retired three-break board, and no seed produces
-     them now. Replaced by the §1.8 pair. ALT 1 = chord ROUTE (addition-chain Total, ribbon
-     fill, anchored margin refs, a padded sign-off) and it LIGHTS the ☆; ALT 2 = op ORDER and
-     the MEASURED NEGATIVE CONTROL — every break repaired one cell at a time in reverse, all
-     five cores clear, ☆ DARK 5/5. */
+  /* r444 (accdil depth pass, DEPTH_PASS §4.65): the shipped entry — "shares side FIRST, drag
+     last-but-one, typed addition instead of SUM()" — is DELETED, not patched. It drove the
+     one-structure board's fixed cells B7/B8/B11/B12/B13/B14, and no seed produces that geometry
+     now (the board is three structures on a 20-row sheet with corner jitter). Replaced by the
+     §1.8 pair plus the measured negative control. ALT 1 = chord ROUTE (point mode + F4 instead of
+     typed anchors, the ribbon's fill-right, the ribbon percent walk) and it LIGHTS the ☆;
+     ALT 2 = op ORDER (shares first, an addition chain, the headline dressed before the block
+     travels, and the block carried by CLIPBOARD rather than a fill) and it lights the ☆ too;
+     ALT 3 = the NEGATIVE CONTROL for the ☆ — fifteen formulas typed cell by cell, nothing filled
+     and nothing pasted: all six cores clear and the star must stay DARK. */
+  { key: 'accdil', name: 'chord ROUTE: point-mode + F4 references instead of typed anchors, the ribbon fill-right (alt h f i r), percent by alt h p plus a decimal step — the ☆ still fires', moves: `C => { const o=C._o;
+      const up=n=>Array(n).fill({key:'ArrowUp'}), dn=n=>Array(n).fill({key:'ArrowDown'});
+      return [
+        {sel:o.CB+o.rD, keys:[...T('=-'), ...up(o.rD-o.rC), ...T('*'), ...dn(o.rY-o.rD), {key:'F4'}, Kb.enter]},
+        {sel:o.CB+o.rN, keys:[...T(o.fN), Kb.enter]},
+        {sel:o.CB+o.rS, keys:[...T('='), ...dn(o.rAS-o.rS), {key:'F4'}, ...T('+'), ...up(o.rS-o.rNS), Kb.enter]},
+        {sel:o.CB+o.rE, keys:[...T('='), ...up(o.rE-o.rN), ...T('/'), ...up(o.rE-o.rS), Kb.enter]},
+        {sel:o.CB+o.rA, keys:[...T('='), ...up(o.rA-o.rE), ...T('/'), ...dn(o.rSE-o.rA), {key:'F4'}, ...T('-1'), Kb.enter]},
+        {sel:o.CB+o.rD+':'+o.CD+o.rA, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.CB+o.rA+':'+o.CD+o.rA, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),L('0')]},
+      ]; }` },
+  { key: 'accdil', name: 'op ORDER: shares side FIRST, addition chain instead of SUM(), the accretion line dressed BEFORE the block travels (ctrl+shift+% then alt h 0), block carried by COPY/PASTE instead of a fill — the ☆ still fires', moves: `C => { const o=C._o; return [
+      {sel:o.CB+o.rS, keys:[...T(o.fS), Kb.enter]},
+      {sel:o.CB+o.rD, keys:[...T('=-'+o.CB+o.rC+'*$'+o.CB+'$'+o.rY), Kb.enter,
+                            ...T('=$'+o.CB+'$'+o.rAN+'+$'+o.CB+'$'+o.rTN+'+$'+o.CB+'$'+o.rSY+'+'+o.CB+o.rD), Kb.enter]},
+      {sel:o.CB+o.rE, keys:[...T(o.fE), Kb.enter, ...T(o.fA), Kb.enter]},
+      {sel:o.CB+o.rA, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),L('0')]},
+      {sel:o.CB+o.rD+':'+o.CB+o.rA, keys:[Kb.copy]},
+      {sel:o.CC+o.rD+':'+o.CD+o.rA, keys:[Kb.paste]},
+    ]; }` },
+  { key: 'accdil', name: 'NEGATIVE CONTROL for the ☆: all fifteen formulas typed cell by cell, nothing filled and nothing pasted, ribbon percent walk per column — all six cores clear and the ☆ must stay DARK (192 keys against the demo’s 66)', moves: `C => { const o=C._o; const mv=[];
+      const F=(C2,r)=>({ [o.rD]:'=-'+C2+o.rC+'*$'+o.CB+'$'+o.rY,
+                         [o.rN]:'=$'+o.CB+'$'+o.rAN+'+$'+o.CB+'$'+o.rTN+'+$'+o.CB+'$'+o.rSY+'+'+C2+o.rD,
+                         [o.rS]:'=$'+o.CB+'$'+o.rAS+'+'+C2+o.rNS,
+                         [o.rE]:'='+C2+o.rN+'/'+C2+o.rS,
+                         [o.rA]:'='+C2+o.rE+'/$'+o.CB+'$'+o.rSE+'-1' }[r]);
+      o.CS.forEach(C2=>{ [o.rD,o.rN,o.rS,o.rE,o.rA].forEach(r=>{
+        mv.push({sel:C2+r, keys:[...T(F(C2,r)), Kb.enter]}); }); });
+      o.CS.forEach(C2=>{ mv.push({sel:C2+o.rA, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),L('0')]}); });
+      return mv; }` },
   { key: 'audit', name: 'chord ROUTE — addition-chain Total, ribbon fill Alt H F I R over the block, anchored margin refs, padded " OK " sign-off (☆ LIT, 47 keys)', moves: `C => { const o=C._o, CL=c=>colLetter(c);
       const chain=[]; for(let c=o.c0;c<=o.cN;c++) chain.push(CL(c)+o.badRow);
       return [
