@@ -10,7 +10,8 @@
       the cursor outside the fence (S._railZone).
    C. ZONE SANITY — the fence contains every graded target and every seeded cell, so
       copy sources and helper cells are always reachable.
-   D. ALTERNATES — Wolf's chase-the-marks list on the hunt drill, under guided: per-cell
+   D. ALTERNATES — three legitimate ways to foot a column, under guided (r439; was the
+      chase-the-marks list on the retired `hunt` drill): per-cell
       AutoSum, a manual addition chain, and copy/paste cell-to-next all count (the demo's
       fill-right route is covered by A).
 
@@ -100,42 +101,51 @@ const only = process.argv.slice(2);
     else console.log('PASS ' + key.padEnd(12) + (r.railed ? ' · railed, contained, solvable' : ' · free (cursor-graded), solvable'));
   }
 
-  // D: the chase-the-marks alternates (hunt) — every legit total build counts under guided
-  if (!only.length || only.includes('hunt')) {
-    const ALTS = [
-      { name: 'per-cell AutoSum (Alt+= each column)', tail: `[
-          {sel:'B8', keys:[Kb.eq, Kb.enter]}, {sel:'C8', keys:[Kb.eq, Kb.enter]}, {sel:'D8', keys:[Kb.eq, Kb.enter]},
-          {sel:'B8:D8', keys:[Kb.bold]} ]` },
-      { name: 'manual addition chain per cell', tail: `[
-          {sel:'B8', keys:[...T('=B3+B4+B5+B6+B7'), Kb.enter]},
-          {sel:'C8', keys:[...T('=C3+C4+C5+C6+C7'), Kb.enter]},
-          {sel:'D8', keys:[...T('=D3+D4+D5+D6+D7'), Kb.enter]},
-          {sel:'B8:D8', keys:[Kb.bold]} ]` },
-      { name: 'copy/paste the SUM cell-to-next', tail: `[
-          {sel:'B8', keys:[...T('=SUM(B3:B7)'), Kb.enter]},
-          {sel:'B8', keys:[Kb.copy]}, {sel:'C8', keys:[Kb.paste]}, {sel:'D8', keys:[Kb.paste]},
-          {sel:'B8:D8', keys:[Kb.bold]} ]` },
-    ];
-    for (const alt of ALTS) {
+  // D (r439): guided mode must not REJECT a legitimate alternate route.
+  // This used to drive `hunt` with hard-coded B3:D8 geometry. `hunt` retired into `audit` in
+  // r439, and the geometry was a board fact anyway. Repointed at `foot`, whose subject IS
+  // building totals — the three routes below are the same three this always tested (per-cell
+  // AutoSum, a manual addition chain, and copy-the-SUM) and every one of them is a legitimate
+  // way to foot a column. Geometry is derived from foot._o at runtime, so a future board
+  // rework moves the rows without breaking the test.
+  if (!only.length || only.includes('foot')) {
+    const ALT_KINDS = ['autosum', 'chain', 'copy'];
+    for (const kind of ALT_KINDS) {
       ran++;
-      const r = await page.evaluate(({ tail }) => {
+      const r = await page.evaluate((kind) => {
         try {
           try { window.__hkCelQ = []; document.querySelectorAll('.hk-cel-wrap').forEach(n => { n.click(); n.remove(); }); window.__hkCelOpen = false; } catch (e) {}
           document.querySelectorAll('.wb-dlg').forEach(n => n.remove());
-          guided = true; loadChallenge('hunt');
-          const C = CHALLENGES.hunt, o = C._o;
-          const moves = [{ sel: 'B3', keys: [{ key: 'F5' }, L('s'), L('o')] }];
-          o.sites.forEach(s => moves.push({ sel: s.k, keys: [...T(s.f), Kb.enter] }));
-          moves.push(...eval('(' + tail + ')'));
+          guided = true; loadChallenge('foot');
+          const C = CHALLENGES.foot, o = C._o;
+          const col = k => k.replace(/[0-9]/g, ''), row = k => +k.replace(/[^0-9]/g, '');
+          const moves = [];
+          // row totals down the CT column, one per segment line, three different ways
+          for (let rr = o.r1; rr <= o.rn; rr++) {
+            const cell = o.CT + rr;
+            if (kind === 'autosum') moves.push({ sel: cell, keys: [Kb.eq, Kb.enter] });
+            else if (kind === 'chain') {
+              let f = '=';
+              for (let c = o.cq1; c <= o.cq1 + o.q - 1; c++) f += (c > o.cq1 ? '+' : '') + colLetter(c) + rr;
+              moves.push({ sel: cell, keys: [...T(f), Kb.enter] });
+            } else {
+              if (rr === o.r1) { moves.push({ sel: cell, keys: [...T('=SUM(' + colLetter(o.cq1) + rr + ':' + colLetter(o.cq1 + o.q - 1) + rr + ')'), Kb.enter] });
+                                 moves.push({ sel: cell, keys: [Kb.copy] }); }
+              else moves.push({ sel: cell, keys: [Kb.paste] });
+            }
+          }
+          // then the rest of the drill's own demo, so the win condition is reachable
+          const demo = (typeof C.demo === 'function') ? C.demo.call(C) : C.demo;
+          for (const mv of (demo || [])) moves.push(mv);
           for (const mv of moves) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
           const won = !!done;
           const failing = won ? [] : C.checks(S).filter(x => !x.ok).map(x => x.label).slice(0, 2);
           guided = false;
           return { won, failing };
         } catch (e) { try { guided = false; } catch (e2) {} return { won: false, failing: ['THREW: ' + String(e).slice(0, 100)] }; }
-      }, { tail: alt.tail });
-      if (!r.won) { fails++; console.log('FAIL hunt-alt · ' + alt.name + ' · stuck on: ' + r.failing.join(' | ')); }
-      else console.log('PASS hunt-alt · ' + alt.name);
+      }, kind);
+      if (!r.won) { fails++; console.log('FAIL foot-alt · ' + kind + ' · stuck on: ' + r.failing.join(' | ')); }
+      else console.log('PASS foot-alt · ' + kind);
     }
   }
 

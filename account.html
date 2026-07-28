@@ -168,9 +168,9 @@
   .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
 <link rel="stylesheet" href="nav.css?v=210">
-<script src="drills.js?v=301"></script>
+<script src="drills.js?v=294"></script>
 
-<script src="drills.js?v=301"></script>
+<script src="drills.js?v=294"></script>
 
 
 
@@ -188,7 +188,7 @@ window.NAV_ACTIVE = '';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=301"></script>
+<script src="nav.js?v=302"></script>
 
 <header class="head"><div class="wrap"><h1>Account</h1></div></header>
 
@@ -302,7 +302,11 @@ async function load(){
 
     <div class="acc-row">
       <div class="card acc-grow acc-bill"><h4>Billing</h4>
-        <div class="fieldrow"><span class="fk">plan</span><span class="fv"><b style="color:var(--warn);font-size:14px">PRO</b> <span class="badge warn">free during beta</span></span></div>
+        <div class="fieldrow"><span class="fk">plan</span><span class="fv"><b style="color:var(--warn);font-size:14px">PRO</b> <span class="badge warn">perks free during beta</span></span></div>
+        <!-- r428 (Wolf): desks are the one carve-out from the beta free-for-all. Stated
+             here because the row above otherwise reads as "you are PRO", and create_desk
+             will reject this same player server-side unless they hold a real entitlement. -->
+        <div class="fieldrow"><span class="fk">desks</span><span class="fv">founding one needs real PRO <span style="color:var(--faint)">&mdash; joining stays free</span></span></div>
         <div class="fieldrow"><span class="fk">at launch</span><span class="fv" style="color:var(--muted)">beta players lock in founder pricing</span></div>
         <div class="fieldrow"><span class="fk">payment</span><span class="fv">none on file <span style="color:var(--faint)">&mdash; added at launch</span></span></div>
         <div class="fieldrow"><span class="fk">next charge</span><span class="fv">&mdash;</span></div>

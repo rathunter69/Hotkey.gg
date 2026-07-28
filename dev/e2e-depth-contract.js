@@ -71,10 +71,16 @@ const KEYS = only.length ? LEDGER.filter(k => only.includes(k)) : LEDGER;
          better — on the right track"), so his live approval outranks the doc's 4–6 cap and the
          right move is to record the exception, not to cut a beat out of a drill he liked. Any
          OTHER drill over the cap is a real finding. */
-      const BEAT_CAP_EXEMPT = { blocksel: 7, pastes: 7 };
+      /* r443: `gauntlet` joins them at SEVEN, but on different grounds — record the difference
+         rather than blur it. blocksel/pastes are exempt because Wolf approved those shapes live.
+         gauntlet is exempt STRUCTURALLY: it is the Formatting CAPSTONE (§2.4), which by
+         definition chains its chapter's reworked boards and runs at the par×2.0 capstone clock,
+         so the 4-6 cap — written for a single-subject drill — does not describe it. This one has
+         NOT been signed off live; it is a reasoned exemption and should be confirmed. */
+      const BEAT_CAP_EXEMPT = { blocksel: 7, pastes: 7, gauntlet: 7 };
       const cap = BEAT_CAP_EXEMPT[k] || 6;
       if (authored < 4 || authored > cap) out.bad.push('D: ' + authored + ' authored core beats (§1.1 wants 4–' + cap + ')');
-      else if (BEAT_CAP_EXEMPT[k]) out.note.push('§1.1 exempt at ' + authored + ' beats (Wolf-approved r2)');
+      else if (BEAT_CAP_EXEMPT[k]) out.note.push('§1.1 exempt at ' + authored + ' beats (' + (k === 'gauntlet' ? 'capstone §2.4, reasoned — unconfirmed' : 'Wolf-approved r2') + ')');
       if (!C.saveClose) out.bad.push('C: saveClose not declared (§1.0(e))');
       const handWritten = rows.filter(c => !c.bonus && /save your work/i.test(c.label)).length;
       if (C.saveClose && handWritten > 1) out.bad.push('C: the save beat appears ' + handWritten + '× — the engine owns it, exactly once');
@@ -96,7 +102,21 @@ const KEYS = only.length ? LEDGER.filter(k => only.includes(k)) : LEDGER;
       if (b && !b.ok) out.bad.push('A: demo does NOT earn the ☆ (§2.2 — the demo must perform the bonus, or replay never covers it)');
 
       // ---- G: density at the win state ---------------------------------------------
+      /* r443: a maze board carries its content in S.maze, not in S.cells, so this counter read
+         `navigation` as 8/20 and the signature below read it as ONE build in thirty. Measured
+         directly, the maze is 30/30 distinct — the suite was blind, the drill was fine. Count the
+         maze's own cells toward density, and fold S.maze into the signature. */
       const rowsUsed = new Set();
+      /* A maze board's content is its corridor, pips and table — none of which live in S.cells,
+         and whose internal shape is the drill's business, not this suite's. So for a maze, ask
+         the DOM what actually rendered: any row carrying painted content counts. */
+      if (S.maze) {
+        [...document.querySelectorAll('#grid tbody tr')].forEach((tr, i) => {
+          const live = [...tr.querySelectorAll('td')].some(td =>
+            (td.textContent || '').trim() !== '' || /wall|pip|touchcell|corridor/.test(td.className));
+          if (live) rowsUsed.add(i + 1);
+        });
+      }
       for (const cellKey of Object.keys(S.cells)) {
         const c = S.cells[cellKey];
         if (c && (c.value !== '' && c.value != null || c.formula)) rowsUsed.add(+cellKey.replace(/^[A-J]+/, ''));
@@ -106,7 +126,8 @@ const KEYS = only.length ? LEDGER.filter(k => only.includes(k)) : LEDGER;
 
       // ---- E/F: axes vary, and same-seed determinism --------------------------------
       const sig = () => { const o = C._o || C._R || C._sites || {};
-        return JSON.stringify(o) + '|' + JSON.stringify(Object.keys(S.cells).sort().slice(0, 40).map(x => S.cells[x].value)); };
+        return JSON.stringify(o) + '|' + JSON.stringify(S.maze || null)
+             + '|' + JSON.stringify(Object.keys(S.cells).sort().slice(0, 40).map(x => S.cells[x].value)); };
       const seen = new Set();
       for (let i = 0; i < 30; i++) { loadChallenge(k); seen.add(sig()); }
       if (seen.size < 2) out.bad.push('E: board is identical across 30 builds (§1.2 wants ≥2 axes)');

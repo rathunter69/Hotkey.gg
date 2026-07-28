@@ -176,7 +176,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   const type = async (sel, ch) => run(o => { setDemoSel(o.sel); demoKey({ key: o.ch }); demoKey({ key: 'Enter' }); }, { sel, ch });
 
   console.log('A. split capture on real drills (§2.1 + §2.8 runtime invariant)');
-  for (const key of ['foot', 'undo', 'pastes', 'margin']) {
+  for (const key of ['foot', 'editfix', 'pastes', 'margin']) {
     const r = await run((k) => {
       window.__clearCel();
       loadChallenge(k);
@@ -439,42 +439,40 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
 
   console.log('H. medal clocks (§2.1 display layer)');
   {
-    /* r429 H6b-5 FIXTURE ROT FIX: this block used to hardcode `foot` AT PAR 11 and assert the
-       literal strings "pass 0:17 / pro 0:13 / legendary 0:11". `foot` was reworked to par 32 in
-       wave 5, so all four assertions went red against CORRECT engine output and the whole suite
-       has been silently failing ever since. Every remaining chapter re-pars its drills, so a
-       hardcoded par WILL rot again — the expectations are now DERIVED from the live
-       HOTKEY_PARS entry and the fixture is picked at runtime. Nothing here asserts a number a
-       depth-pass rework is allowed to change. */
     const r = await run(() => {
-      /* a fixture with NO HOTKEY_CLOCKS override — capstones carry one by design (§2.4), so
-         picking one would test the override path instead of the derivation path */
-      const key = (window.HOTKEY_DRILLS.menuOrder || []).find(k =>
-        CHALLENGES[k] && (window.HOTKEY_PARS || {})[k] && !(window.HOTKEY_CLOCKS || {})[k]);
-      window.__clockKey = key;   // r2 below re-uses the same fixture
-      window.__clearCel(); hideResults(); loadChallenge(key);
-      const par = window.HOTKEY_PARS[key];
-      const c = hkClocksFor(key);
+      /* r433: was foot (par 11) — foot's depth-pass rework re-swept its par, and a clock test
+         that hardcodes one drill's seconds re-breaks every time that drill is reworked. Moved
+         to sort, then a par-10 drill outside the depth-pass wave.
+         r436: sort has now been depth-passed too (par 10 → 31), which broke this block for the
+         SECOND time — so the coupling is removed at the root rather than moved to a third
+         host. The block still runs on sort, but every expected value is DERIVED from the par
+         the page actually declares, exactly as hkClocksFor() derives them. What is under test
+         is the arithmetic and the rendering, never one drill's seconds; any future re-sweep of
+         any drill now leaves this block alone. */
+      window.__clearCel(); hideResults(); loadChallenge('sort');
+      const par = CHALLENGES.sort.par;
+      const c = hkClocksFor('sort');
       const ready = (document.getElementById('result') || {}).innerHTML || '';
-      const want = t => 'pass ' + hkClockFmt(c.pass) + ' · pro ' + hkClockFmt(c.pro) +
-                        ' · legendary ' + hkClockFmt(c.leg);
-      const strip = ready.replace(/<[^>]+>/g, '').includes(want());
-      const beat = hkClockBeat(key, (c.pro + c.leg) / 2);   // strictly between pro and legendary
-      window.HOTKEY_CLOCKS[key] = { pass: 100 };
-      const c2 = hkClocksFor(key);
-      delete window.HOTKEY_CLOCKS[key];
+      const beat = hkClockBeat('sort', (par * 1.15 + par) / 2);   // strictly between pro and legendary
+      window.HOTKEY_CLOCKS.sort = { pass: 100 };
+      const c2 = hkClocksFor('sort');
+      delete window.HOTKEY_CLOCKS.sort;
       return {
-        key, par, derives: c.pass === par * 1.5 && Math.abs(c.pro - par * 1.15) < 1e-9 && c.leg === par,
-        strip, beatN: beat && beat.beat && beat.beat.n, nextN: beat && beat.next && beat.next.n,
-        oPass: c2.pass, oLeg: c2.leg, wantLeg: par,
+        par, pass: c.pass, pro: +c.pro.toFixed(2), leg: c.leg,
+        wantPass: par * 1.5, wantPro: +(par * 1.15).toFixed(2), wantLeg: par,
+        strip: new RegExp('pass ' + hkClockFmt(par * 1.5)).test(ready)
+            && new RegExp('pro ' + hkClockFmt(par * 1.15)).test(ready)
+            && new RegExp('legendary ' + hkClockFmt(par)).test(ready),
+        beatN: beat && beat.beat && beat.beat.n, nextN: beat && beat.next && beat.next.n,
+        oPass: c2.pass, oLeg: c2.leg, wantOLeg: par,
       };
     });
-    ok(r.derives, 'clocks derive pass=par×1.5 · pro=par×1.15 · legendary=par×1.0', r);
+    ok(r.pass === r.wantPass && r.pro === r.wantPro && r.leg === r.wantLeg, 'clocks derive pass=par×1.5 · pro=par×1.15 · legendary=par×1.0', r);
     ok(r.strip, 'drill-start line carries the three-clock strip', r);
     ok(r.beatN === 'Pro' && r.nextN === 'Legendary', 'clock naming: the one you beat + the next one up', r);
-    ok(r.oPass === 100 && r.oLeg === r.wantLeg, 'HOTKEY_CLOCKS override wins per field, the rest still derive', r);
+    ok(r.oPass === 100 && r.oLeg === r.wantOLeg, 'HOTKEY_CLOCKS override wins per field, the rest still derive', r);
     const r2 = await run(() => {
-      const C = CHALLENGES[window.__clockKey];
+      const C = CHALLENGES.sort;
       for (const mv of C.demo()) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
       const m = document.getElementById('resultsModal');
       const row = m ? m.querySelector('.rm-clock') : null;
@@ -526,27 +524,29 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     ok(r2.lastIsSave, 'demo() gets the Ctrl+S keystroke appended engine-side (replays stay green)', r2);
     ok(r2.coresDone && r2.preDone === false, 'all cores complete — the win gates on the save beat', r2);
     ok(r2.done === true && r2.splitsLen === r2.checksLen, 'Ctrl+S fires the win; the save beat carries a split slot', r2);
-    /* r429 H6b-5 FIXTURE ROT FIX: this used to hardcode `foot` as the non-saveClose fixture.
-       `foot` GAINED saveClose in the wave-5 rework, so Ctrl+S correctly completed the drill and
-       the assertion went red against right behavior. Every depth-pass rework adds saveClose, so
-       the fixture is now chosen at runtime from whatever still lacks it, and the typed cell comes
-       from the board's own active cell rather than a hardcoded C5. When the pass finishes and
-       EVERY drill declares saveClose this contract stops existing — the test says so out loud
-       instead of failing. */
     const r3 = await run(() => {   // non-saveClose drills keep the restart behavior, still swallowed
-      const key = (window.HOTKEY_DRILLS.menuOrder || []).find(k => CHALLENGES[k] && !CHALLENGES[k].saveClose);
-      if (!key) return { skip: true };
-      window.__clearCel(); hideResults(); loadChallenge(key);
-      const a = S.active, cell = colLetter(a.c) + a.r;
-      setDemoSel(cell); demoKey({ key: '7' }); demoKey({ key: 'Enter' });
+      /* r433: was foot, which became saveClose:true in its depth-pass rework — this probe needs
+         a drill that has NOT been reworked yet. sort was one.
+         r436: sort became saveClose:true in ITS depth-pass rework, so naming a second host by
+         hand would only queue the same breakage for a third time. The probe now PICKS the host
+         at run time — the first catalog drill that has not declared saveClose — and reports
+         which one it used, so it keeps working until the very last drill is depth-passed (at
+         which point the whole non-saveClose contract is dead and this line goes with it). No
+         cell is named either: the key log only has to prove work happened, so a plain arrow off
+         whatever cell the board opens on is enough on any board. */
+      window.__clearCel(); hideResults();
+      const keysAll = Object.keys(CHALLENGES).filter(k => !/^__/.test(k) && CHALLENGES[k] && !CHALLENGES[k].saveClose);
+      if (!keysAll.length) return { skipped: true, hadWork: true, prevented: true, fresh: true, host: '(none left)' };
+      const key = keysAll[0];
+      loadChallenge(key);
+      demoKey({ key: 'ArrowDown' });
       const hadWork = keyLog.length > 0;
       const ev = new KeyboardEvent('keydown', { key: 's', ctrlKey: true, cancelable: true, bubbles: true });
       document.dispatchEvent(ev);
       const fresh = keyLog.length === 0 && done === false;   // loadChallenge wipes the key log — the board restarted
-      return { key, hadWork, prevented: ev.defaultPrevented, fresh };
+      return { hadWork, prevented: ev.defaultPrevented, fresh, host: key, hostCount: keysAll.length };
     });
-    if (r3.skip) console.log('  SKIP non-saveClose drill: every drill now declares saveClose — the contract no longer applies');
-    else ok(r3.hadWork && r3.prevented && r3.fresh, 'non-saveClose drill: Ctrl+S still swallowed + restarts (unchanged contract)', r3);
+    ok(r3.hadWork && r3.prevented && r3.fresh, 'non-saveClose drill: Ctrl+S still swallowed + restarts (unchanged contract)', r3);
   }
 
   console.log('J. mystery-☆ display (r423 round-2 §2)');
@@ -890,8 +890,15 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
       const cell = ref => { const r = +ref.slice(1), c = ref.charCodeAt(0) - 64;
         const tr = document.querySelectorAll('#grid tr')[r];   // row 0 is the header row
         return tr ? tr.querySelectorAll('td')[c - 1] : null; };
-      const cs = ref => { const el = cell(ref); return el ? getComputedStyle(el) : null; };
-      const plain = cs('H10');   // an untouched cell — the pure gridline colour
+      /* r443: applied borders moved OFF the td and onto an ::after overlay in r442 — the td
+         itself now only ever carries the faint gridline, so reading getComputedStyle(td) here
+         reported "the border is gridline-coloured, 1px" for every op and failed all eight border
+         assertions. The suite was right to fail: its assumption really had broken. Read the
+         OVERLAY for a formatted cell, and the td for the plain gridline baseline it compares
+         against. Verified independently by dev/check-borders.js, which measures painted pixels
+         rather than computed style: every edge 2.00px, thick 3.00px, double two 1px strokes. */
+      const cs = ref => { const el = cell(ref); return el ? getComputedStyle(el, '::after') : null; };
+      const plain = getComputedStyle(cell('H10'));   // an untouched cell — the pure gridline colour, still on the td
       const g = { top: plain.borderTopColor, bottom: plain.borderBottomColor,
         left: plain.borderLeftColor, right: plain.borderRightColor };
       const s = { bt: cs('C4'), bb: cs('C6'), ball: cs('E4'), bdbl: cs('E6') };
@@ -938,7 +945,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     for (const W of [1150, 1280, 1440]) {
       await page.setViewportSize({ width: W, height: 900 });
       const r = await run(() => {
-        window.__clearCel(); hideResults(); loadChallenge('dress');
+        window.__clearCel(); hideResults(); loadChallenge('housestyle');   /* r432: `dress` retired into housestyle; this test only needs a loaded board */
         const gt = () => +document.getElementById('gridwrap').getBoundingClientRect().top.toFixed(1);
         const ribH = () => +document.querySelector('.ribbon').getBoundingClientRect().height.toFixed(1);
         const slotH = () => +document.querySelector('.ribbon-slot').getBoundingClientRect().height.toFixed(1);

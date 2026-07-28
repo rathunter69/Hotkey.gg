@@ -1,5 +1,23 @@
 # PIPELINE — the Fable task queue
 
+## ⚡ LIVE: THE DEPTH-PASS CAMPAIGN (r436) — this is the active workstream
+**27 of 76 drills depth-passed.** Foundations ✅ · Formatting ✅ · Formulas I ✅ ·
+Data & Lookups 2/10 (`sort` in flight) · Formulas II 0/11 · Models I 0/10 · Models II 0/10 ·
+Full Builds 0/10. Catalog 81 → 76 (five retirements, each with the lesson verified as carried
+elsewhere).
+
+Operating notes, findings and open items: **`dev/DEPTH_PASS_CAMPAIGN.md`**.
+Spec and binding rules: `dev/DEPTH_PASS.md` (§1.0-R3 is newest and wins).
+**Before any Models/Full Builds drill: `dev/MODELING_STANDARDS.md`.**
+
+Deliberately unfixed, needs an owner: the width-engine pass (three converging findings), the
+dead `echo` feature (~90 unreachable lines), and `editfix` (52s) outgrowing the `modeltour`
+capstone (35s).
+
+---
+
+
+## ⚡ STATE OF THE QUEUE (r417, 2026-07-24 — READ FIRST)
 ## ⚡ STATE OF THE QUEUE (r429, 2026-07-27 — READ FIRST; supersedes the r417/r420c block below)
 
 **WHERE THE DEPTH PASS STANDS:**

@@ -232,10 +232,7 @@ try {
    STATIC counts asserted here stay the hand-written tri-length; C9 asserts the declaration is
    present and that no drill hand-writes the save beat (the engine owns it, exactly once). ---- */
 try {
-  const REWORKED = ['navigation', 'blocksel', 'filldr', 'pastes', 'rowops', 'ruleoff', 'dress', 'copyover', 'editfix', 'ruleaudit', 'housestyle', 'typeset', 'undo', 'modeltour',   // r422 H6b-1 wave 1 + r425 waves 2-3
-    'decimals', 'center', 'autofit', 'combo', 'gauntlet',   // r429 H6b wave 4 (DEPTH_PASS §4.12, §4.13, §4.14, §4.17, §4.20 — c2 capstone)
-    'margin', 'foot', 'anchor', 'percent', 'growth', 'cagr', 'bridge', 'sumif', 'rollup', 'fxconvert', 'cases',   // r429 H6b wave 5 (DEPTH_PASS §4.21-§4.31)
-    'qclose'];   // r429 H6b wave 5 (DEPTH_PASS §4.32) — the Formulas I capstone, a NEW drill rather than a rework
+  const REWORKED = ['navigation', 'blocksel', 'filldr', 'pastes', 'rowops', 'ruleoff', 'editfix', 'ruleaudit', 'housestyle', 'typeset', 'modeltour', 'combo', 'decimals', 'center', 'autofit', 'margin', 'anchor', 'gauntlet', 'foot', 'percent', 'bridge', 'sumif', 'fxconvert', 'cagr', 'lookup', 'scrub', 'sort', 'recon', 'lookup2', 'unhide', 'rollup', 'filterpass', 'series', 'drill', 'stalelink', 'signerr', 'versionup', 'wrapfix', 'cases', 'audit', 'triage', 'balcheck', 'tieout', 'balance'];   // r422 H6b-1 wave 1 · r440: the last three of Formulas II
   const idx = fs.readFileSync('index.html', 'utf8');
   const start = idx.indexOf('const CHALLENGES = {');
   const end = idx.indexOf('STATE + ENGINE', start);
@@ -320,6 +317,157 @@ try {
   if (fail === 0 || n10) ok(`drills.js: ${n10} errorCount drill(s) — counter labels match their declared N (§2.3)`);
 } catch (e) {
   bad('C10 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C11: checklist copy is INSTRUCTIONS, never lessons (r430) ----
+   Wolf has rejected this three rounds running, most recently: "Holy fuck dude you still are
+   doing the terrible pithy little quotes on the checklist items. ITS JUST THE INSTRUCTIONS OF
+   WHAT YOU HAVE TO DO OR ACCOMPLISH!!! NOT A LESSON!!!" — and, on the same point, "it should
+   be in the excluded list!". So it is now in the excluded list.
+
+   The rule is about the clause AFTER the em-dash: it may say WHAT or WHERE, never WHY.
+     keep — "Format the margin row — one decimal"        (scope)
+     keep — "Fill the row — filled across all five years" (scope)
+     cut  — "Bold the header row — headers carry the page" (a moral)
+   Free-text detection of "is this a maxim" is not reliable enough to gate a build on, so this
+   is a literal denylist of the phrasings that have actually shipped and been rejected. When a
+   new one gets caught in playtest, add it here — that is what keeps it from coming back. */
+try {
+  // Scan PLAYER COPY only. Developer comments legitimately quote the rejected phrasing when
+  // recording why it was cut (and this very check's rationale would trip itself otherwise), so
+  // block comments and full-line // comments come out first. Full-line only: a bare /\/\// would
+  // also eat https:// inside real copy.
+  // Scan PLAYER COPY only. Developer comments legitimately quote the rejected phrasing when
+  // recording why it was cut (and this check's own rationale would trip itself otherwise).
+  // Stateful line walk rather than a whole-file regex: block comments here run for dozens of
+  // lines, and a lone /\/\*[\s\S]*?\*\// pass mis-spans them — it left continuation lines
+  // behind while swallowing real code, so genuine copy was hidden and comments still flagged.
+  const raw = fs.readFileSync('index.html', 'utf8');
+  const kept = [];
+  let inBlock = false;
+  for (const line of raw.split('\n')) {
+    let s = line;
+    if (inBlock) {
+      const e = s.indexOf('*/');
+      if (e < 0) continue;                 // still inside the comment
+      s = s.slice(e + 2); inBlock = false;
+    }
+    if (s.trim().startsWith('//')) continue;   // full-line only, so https:// in copy survives
+    const b = s.indexOf('/*');
+    if (b >= 0) {
+      const e = s.indexOf('*/', b + 2);
+      if (e < 0) { inBlock = true; s = s.slice(0, b); } else { s = s.slice(0, b) + s.slice(e + 2); }
+    }
+    kept.push(s);
+  }
+  const html = kept.join('\n');
+  const APHORISMS = [
+    'headers carry the page', 'it never earned the weight', 'annotations whisper',
+    'retired, not erased', 'a total earns the line above it', 'a computed line reads apart',
+    'the page carries a masthead', 'blue font marks typed data', 'hardcodes wear blue',
+    'the page signs its date', 'undo has a twin', 'housekeeping first',
+    'extraneous by design', 'totals rule on top', 'the schedule closes the gap',
+    'the memo names it', 'it ships tonight', 'a pointed cell can never drift again',
+    'nothing ships showing ####', 'no text running over the page', 'the model starts live',
+    'Constants lights even the buried one', 'it double-counts the moment anyone totals',
+    'a clean model greets the reader', 'a clean line through the corridor',
+    'the page ties', 'one selection, one chord', 'one helper copy, one selection, one operation',
+    'the feed arrived left-aligned', 'wearing the row above', 'the total contract',
+  ];
+  let n11 = 0;
+  for (const a of APHORISMS) {
+    if (html.toLowerCase().includes(a.toLowerCase())) {
+      n11++; bad(`C11 checklist copy: aphorism is back in index.html — "${a}". Checklist items are instructions, not lessons.`);
+    }
+  }
+  if (!n11) ok(`index.html: checklist copy carries none of the ${APHORISMS.length} rejected aphorisms (instructions, not lessons)`);
+} catch (e) {
+  bad('C11 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C12 (r432, DEPTH_PASS §0 DoD #4): every reworked drill carries ≥2 ALT-PATH entries ----
+   The definition of done requires each depth-passed drill to ship at least two entries in
+   dev/e2e-alt-paths.js — one with a different op ORDER, one with a different chord ROUTE —
+   because that is what proves §1.0(c) Freedom: the beats grade the END STATE, not the route
+   the demo happens to take. Nothing enforced it. e2e-alt-paths runs whatever entries exist and
+   passes happily with zero for a given drill, so a build that simply never added them looked
+   green. That is the quietest possible failure: the drill ships, the gate is clean, and the
+   route-freedom claim is untested — which is exactly how the currency-vs-acct dead beat (§1.0-R3(p))
+   survived into a playtest.
+   With the full-catalog depth pass now running one agent per drill, this is the DoD item most
+   likely to be skipped under time pressure, so it is checked rather than trusted.
+   NOTE: this counts entries, which is mechanical. It cannot judge whether the two routes are
+   genuinely different — that stays a review question. ---- */
+try {
+  const inv = fs.readFileSync('dev/check-invariants.js', 'utf8');
+  const m = /const REWORKED = \[([^\]]*)\]/.exec(inv);
+  const reworked = m ? m[1].split(',').map(s => s.trim().replace(/^'|'$/g, '')).filter(Boolean) : [];
+  const alts = fs.readFileSync('dev/e2e-alt-paths.js', 'utf8');
+  const counts = {};
+  // must match an ALTS ENTRY, not a keystroke object — `{key:'z',ctrl:true}` in a moves
+  // script has the same shape. Entries are the only ones followed by a `name:` field.
+  let mm; const re = /\{\s*key:\s*'([a-z0-9_]+)'\s*,\s*name\s*:/g;
+  while ((mm = re.exec(alts))) counts[mm[1]] = (counts[mm[1]] || 0) + 1;
+  let thin = 0;
+  for (const k of reworked) {
+    const n = counts[k] || 0;
+    if (n < 2) { thin++; bad(`C12: reworked drill '${k}' has ${n} alt-path entr${n === 1 ? 'y' : 'ies'} in dev/e2e-alt-paths.js — the depth-pass DoD requires >=2 (different op order AND different chord route)`); }
+  }
+  // an entry naming a drill that no longer exists is dead weight and hides real coverage gaps
+  const sbA = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
+  vm.createContext(sbA);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sbA);
+  const live = new Set((sbA.window.HOTKEY_DRILLS || {}).menuOrder || []);
+  for (const k of Object.keys(counts))
+    if (live.size && !live.has(k)) bad(`C12: dev/e2e-alt-paths.js has ${counts[k]} entr${counts[k] === 1 ? 'y' : 'ies'} for '${k}', which is not in menuOrder (retired drill?)`);
+  if (reworked.length && !thin) ok(`e2e-alt-paths: all ${reworked.length} reworked drills carry >=2 alternate routes (DoD #4)`);
+} catch (e) {
+  bad('C12 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C13 (r437): NO HARNESS MAY NAME A RETIRED DRILL ----
+   This campaign retired five drills (dress, wirewalk, undo, copyover, growth) and every single
+   retirement left a reference behind somewhere that is not the drill. They surfaced one at a
+   time, days apart, each as a red suite:
+     · dev/migrate-certificates.sql still granted certificates for undo/copyover/dress/wirewalk/growth
+     · dev/e2e-lb.js hard-coded the old HK_PLACEMENT list after 'dress' was repointed to 'combo'
+     · dev/e2e-mac-input.js still called loadChallenge('dress') to test the Mac display layer
+   C12 already catches this inside e2e-alt-paths.js. Nothing caught it anywhere else, and
+   e2e-lb IS in gate.yml, so CI sat red across several batches before anyone looked.
+
+   So: sweep every harness and SQL file under dev/ for a quoted drill-shaped token that is a
+   KNOWN-RETIRED key. A denylist rather than "any key not in menuOrder" on purpose — the latter
+   would fire on ordinary English words in quotes and on keys a test legitimately invents.
+   When a drill is retired, add it here; that is the point of the plumbing checklist. ---- */
+try {
+  const RETIRED = ['dress', 'wirewalk', 'undo', 'copyover', 'growth', 'colops', 'grpfold', 'hunt'];
+  // seed-field.sql is HISTORICAL leaderboard data — retired keys are real past runs and the lb
+  // suite is green with them present, so rows there are evidence, not drift.
+  const SKIP = new Set(['dev/seed-field.sql', 'dev/check-invariants.js']);
+  const files = fs.readdirSync('dev')
+    .filter(f => /\.(js|sql)$/.test(f)).map(f => 'dev/' + f).filter(f => !SKIP.has(f));
+  let n13 = 0;
+  // A COMMENT may name a retired drill — the retirements are documented in place, and a
+  // trailing `/* r432: dress retired, so this loads housestyle */` is exactly the note you
+  // want to keep. So blank comments out rather than skipping whole lines: block comments
+  // first (line numbers preserved), then line comments, guarding `://` so URLs survive.
+  const decomment = src => src
+    .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
+    .split('\n').map(l => l.replace(/(^|[^:])\/\/.*$/, '$1').replace(/(^|[^-])--.*$/, '$1'))
+    .join('\n');
+  for (const f of files) {
+    const src = decomment(fs.readFileSync(f, 'utf8'));
+    src.split('\n').forEach((line, i) => {
+      for (const k of RETIRED)
+        if (new RegExp(`['"\`]${k}['"\`]`).test(line)) {
+          n13++;
+          bad(`C13: ${f}:${i + 1} references retired drill '${k}' — ${line.trim().slice(0, 90)}`);
+        }
+    });
+  }
+  if (!n13) ok(`no dev/ harness or migration names a retired drill (${RETIRED.join(', ')})`);
+} catch (e) {
+  bad('C13 could not run: ' + String(e.message || e).slice(0, 120));
 }
 
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }

@@ -1336,10 +1336,15 @@ function __tipEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&
      · HOTKEY_PRO.beta=true (drills.js) is a CLIENT-ONLY flag, and only the trainer honors
        it — index.html isPro() is `BETA_MODE || _pro`. Nothing server-side reads it.
      · So this gate does NOT inherit the beta free-for-all. During beta a player with no
-       paid entitlement and no .edu trial is blocked from CREATING a desk — which is
-       exactly Wolf's stated requirement, but it IS a live behavior change for beta users
-       against HOTKEY_PRO.betaNote ("PRO perks are free for everyone"). The migration is
-       therefore written and committed but NOT applied to prod; it needs Wolf's go.
+       paid entitlement and no .edu trial is blocked from CREATING a desk.
+     · r428 — Wolf's call: "get rid of pro free in beta and keep making desks pro." The
+       carve-out is now POLICY, not a conflict: the beta still hands out every other PRO
+       perk, and founding a desk is the single exception. betaNote, the PRO sheet, the
+       account + billing plan rows and the checkout fallback all state it, so no surface
+       tells a player they're PRO while create_desk() rejects them. SCOPE: only the desk
+       gate flipped — BETA_MODE (index.html) and HOTKEY_PRO.beta stay true, so the weakness
+       queue, plugin layers, ghost replays, analytics and the full catalog remain free.
+       Flipping those needs live checkout first (create-checkout refuses non-test keys).
      · Corollary worth knowing: the desk-grant branch of my_pro() can never authorize a
        create — you must already be ON a desk to inherit a desk grant, and create_desk
        raises ALREADY_ON_DESK in that case. In practice the gate reduces to "own paid
@@ -1475,10 +1480,23 @@ window.hkConfetti = function(host, colors, count){
    Offer content lives in drills.js HOTKEY_PRO (single source). Beta keeps
    everything free; at launch the CTA runs Stripe TEST-mode checkout via the
    create-checkout Edge Function (which refuses live keys). ---- */
+/* r428 (Wolf: "get rid of pro free in beta and keep making desks pro") — the sheet used to
+   read O.beta as a blanket "you already have everything", so its CTA was a quiet
+   "Back to training — PRO is on, free" that just closed. That is now FALSE for one
+   feature: founding a desk is entitlement-gated server-side (create_desk raises
+   PRO_REQUIRED unless my_pro(), which has never known about the beta flag). A player who
+   hit the desk gate and tapped "what comes with PRO" would land on a sheet telling them
+   they already have PRO, then close — a dead end at exactly the conversion moment.
+   deskCtx marks the carve-out so the sheet shows the real upgrade CTA and says why. */
+window.HK_BETA_EXEMPT = /desk/i;      // the only beta carve-out; widen here if others follow
 window.hkProSheet = function(feature){
   const O = window.HOTKEY_PRO || {beta:true, plans:[{id:'monthly',price:'$7',cap:'per month'}], features:[], betaNote:''};
   const PL = O.plans || [{id:'monthly', price:O.monthly||'$7', cap:'per month'}];
   const old=document.getElementById('hkProWrap'); if(old) old.remove();
+  // deskCtx: this sheet was opened for the one feature the beta does NOT hand out.
+  // betaFree: the blanket "everything is on during beta" framing — true for every OTHER feature.
+  const deskCtx = !!(O.beta && feature && (window.HK_BETA_EXEMPT||/desk/i).test(feature));
+  const betaFree = !!O.beta && !deskCtx;
   let plan=PL[0];
   const w=document.createElement('div'); w.className='hk-cel-wrap'; w.id='hkProWrap';
   const rows=(O.features||[]).map(f=>
@@ -1492,8 +1510,11 @@ window.hkProSheet = function(feature){
       '<div class="hk-pro-grid"><div class="hk-pro-head"><span>\u25c6 pro</span><span>free</span></div>'+rows+'</div>'+
       '<div class="hk-pro-plans">'+PL.map(function(p,i){ return '<div class="hk-pro-plan'+(i===0?' on':'')+'" data-plan="'+p.id+'"><b>'+p.price+'</b><i>'+p.cap+'</i></div>'; }).join('')+'</div>'+
       (O.roadmap&&O.roadmap.length?'<div class="hk-pro-tag" style="margin:12px 0 0">landing during beta: '+O.roadmap.join(' \u00b7 ')+'</div>':'')+
-      (O.beta?'<div class="hk-pro-beta">'+O.betaNote+'</div>':'')+
-      (O.beta
+      (betaFree?'<div class="hk-pro-beta">'+O.betaNote+'</div>':'')+
+      (deskCtx
+        ? '<div class="hk-pro-beta">Founding a desk is the one perk the beta does not hand out \u2014 it needs a real PRO entitlement. <b>Joining</b> a desk is free for everyone: use an invite code, or apply to a public desk.</div>'
+        : '')+
+      (betaFree
         ? '<button class="hk-pro-cta quiet" id="hkProGo">Back to training \u2014 PRO is on, free</button>'
         : '<button class="hk-pro-cta" id="hkProGo">Upgrade \u2014 <span id="hkProPrice">'+PL[0].price+' '+PL[0].cap.split(' \u00b7 ')[0]+'</span></button>')+
       '<div class="hk-pro-msg" id="hkProMsg"></div>'+
@@ -1511,7 +1532,7 @@ window.hkProSheet = function(feature){
     if(pr) pr.textContent = plan.price+' '+plan.cap.split(' \u00b7 ')[0];
   });
   const go=document.getElementById('hkProGo');
-  if(go) go.onclick=()=>{ if(O.beta){ close(); return; } window.hkProCheckout(plan.id); };
+  if(go) go.onclick=()=>{ if(betaFree){ close(); return; } window.hkProCheckout(plan.id); };
 };
 window.hkProCheckout = async function(plan){
   // Stripe TEST-mode scaffold: tries the Edge Function, reports honestly when
@@ -1525,7 +1546,9 @@ window.hkProCheckout = async function(plan){
       { body:{ user_id: window._navUser.id, plan: plan||'yearly' } });
     if(!error && data && data.url){ location.href=data.url; return; }
   }catch(e){}
-  say('Checkout isn\u2019t live yet \u2014 the beta keeps everything free.');
+  /* r428: was "the beta keeps everything free" \u2014 no longer true for founding a desk, and
+     this is the exact string a desk-gated player sees. Say what is actually available. */
+  say('Checkout opens at launch \u2014 every PRO perk except founding a desk is already free during the beta. A verified .edu address gets 7 days of full PRO now.');
 };
 window.__hkCelQ=[]; window.__hkCelOpen=false;
 /* r411 (Wolf: "don't overlap or collide with other pop-out menus"): a celebration waits not just

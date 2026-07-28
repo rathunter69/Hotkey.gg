@@ -14,7 +14,17 @@ const URL = process.env.URL || 'http://127.0.0.1:8791/leaderboard.html';
 let pass = 0, fail = 0;
 const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { fail++; console.log('  FAIL ' + n + (x ? ' — ' + x : '')); } };
 
-const PKEYS = ['navigation', 'dress', 'margin', 'sort', 'opmodel'];
+/* r436: was a hard-coded copy of HK_PLACEMENT.KEYS, and it drifted the moment `dress` was
+   retired and the real list repointed at `combo` — four placement assertions went red because
+   the suite was seeding times for a drill no longer in the series. Derived from drills.js now,
+   the same root-cause fix r436 applied to e2e-depth-mechanics §H/§I: a test that hard-codes a
+   fact owned elsewhere WILL drift, and re-pointing it just moves the next break. */
+const PKEYS = (() => {
+  const src = fs.readFileSync(require('path').join(__dirname, '..', 'drills.js'), 'utf8');
+  const m = /HK_PLACEMENT\s*=\s*\{[^}]*KEYS:\s*\[([^\]]*)\]/.exec(src);
+  if (!m) throw new Error('e2e-lb: could not read HK_PLACEMENT.KEYS from drills.js');
+  return m[1].split(',').map(x => x.trim().replace(/^'|'$/g, '')).filter(Boolean);
+})();
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });

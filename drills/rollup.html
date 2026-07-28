@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
-<title>Cross-tab with SUMIFS — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Cross a deal list into a segment-by-region grid — lock the ranges the right way and one formula spreads both directions; if two crosses come back identical, t">
+<title>Sum on two criteria — Excel shortcut drill · hotkey.gg</title>
+<meta name="description" content="Roll a booking ledger into a segment × region cross-tab, then prove it back Par 80s, optimal 76 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
-<meta property="og:title" content="Cross-tab with SUMIFS — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Cross a deal list into a segment-by-region grid — lock the ranges the right way and one formula spreads both directions; if two crosses come back identical, t">
+<meta property="og:title" content="Sum on two criteria — Excel shortcut drill · hotkey.gg">
+<meta property="og:description" content="Roll a booking ledger into a segment × region cross-tab, then prove it back Par 80s, optimal 76 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/rollup.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Cross-tab with SUMIFS — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Cross a deal list into a segment-by-region grid — lock the ranges the right way and one formula spreads both directions; if two crosses come back identical, t">
+<meta name="twitter:title" content="Sum on two criteria — Excel shortcut drill · hotkey.gg">
+<meta name="twitter:description" content="Roll a booking ledger into a segment × region cross-tab, then prove it back Par 80s, optimal 76 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/rollup.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -85,7 +85,7 @@
   .trackhead small{color:var(--faint); font-weight:400; font-size:12px}
   .trackhead .tb{font-size:12.5px; color:var(--muted); font-weight:400; margin-top:4px; line-height:1.55}</style>
 <link rel="stylesheet" href="nav.css?v=210">
-<script src="drills.js?v=301"></script>
+<script src="drills.js?v=294"></script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -93,48 +93,47 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=310"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Cross-tab with SUMIFS","description":"Cross a deal list into a segment-by-region grid — lock the ranges the right way and one formula spreads both directions; if two crosses come back identical, the anchors are telling you something","url":"https://www.hotkey.gg/drills/rollup.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas I","teaches":"mixed anchors are what let one formula spread in two directions — if a cross repeats, an anchor is wrong.","isPartOf":{"@type":"Course","name":"Spreadsheet Formulas & Data Analysis","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT68S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Cross-tab with SUMIFS","item":"https://www.hotkey.gg/drills/rollup.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Sum on two criteria","description":"Roll a booking ledger into a segment × region cross-tab, then prove it back","url":"https://www.hotkey.gg/drills/rollup.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Formulas I","teaches":"SUMIFS takes the sum range FIRST — the reverse of SUMIF — and two mixed anchors fill the whole cross-tab from one formula.","isPartOf":{"@type":"Course","name":"Spreadsheet Formulas & Data Analysis","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT80S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Sum on two criteria","item":"https://www.hotkey.gg/drills/rollup.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=301"></script>
+<script src="nav.js?v=302"></script>
 <div class="wrap">
   <div class="crumbs"><a href="index.html">hotkey.gg</a> / <a href="drills/index.html">drill library</a> / formulas i</div>
   <div class="eyebrow">◆ Formulas I · drill · Spreadsheet Formulas &amp; Data track</div>
-  <h1>Cross-tab with SUMIFS</h1>
-  <div class="aha">mixed anchors are what let one formula spread in two directions — if a cross repeats, an anchor is wrong.</div>
-  <div class="sub">A raw deal list — segment, region, revenue — and an empty cross-tab beside it. Fill the grid so every cell reads the revenue for that segment in that region, total the regions across the bottom, and make the axes read. One formula can serve the whole grid if its references are locked the right way; if two crosses come back identical, that is the anchors telling you something.</div>
+  <h1>Sum on two criteria</h1>
+  <div class="aha">SUMIFS takes the sum range FIRST — the reverse of SUMIF — and two mixed anchors fill the whole cross-tab from one formula.</div>
+  <div class="sub">The desk books revenue one line at a time — segment, region, amount — and the committee wants it as a segment by region cross-tab. A block is already framed beside the ledger, its segments down the side and its regions across the top, both in their own order. Roll the ledger into it, box the finished block, then total the cross-tab and prove it back against the ledger it came from.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=rollup">train this drill →</a>
-    <span class="par">par 68s · optimal 62 keys · keyboard only · free</span>
+    <span class="par">par 80s · optimal 76 keys · keyboard only · free</span>
   </div>
 
   <div class="section-title">The shortcuts in this drill</div>
   <div class="panel">
     <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
-    <div class="scb"><div class="sch"><kbd>Ctrl+R</kbd><span class="m">⌘R on mac</span><span class="what">Fill right from the cell to the left</span></div><div class="use">Same as fill down, but across — one quarter’s formula becomes the whole year in two keystrokes.</div></div>
-    <div class="scb"><div class="sch"><kbd>Ctrl+D</kbd><span class="m">⌘D on mac</span><span class="what">Fill down from the cell above</span></div><div class="use">Build the logic once in the top cell, select down, and stamp it — the standard way to fill a schedule.</div></div>
     <div class="scb"><div class="sch"><kbd>Alt+=</kbd><span class="m">⌥ = on mac</span><span class="what">AutoSum the adjacent range</span></div><div class="use">AutoSum reads the block above or beside the cursor and proposes the SUM — foot rows and columns without typing a formula.</div></div>
-    <div class="scb"><div class="sch"><kbd>Ctrl+B</kbd><span class="m">⌘B on mac</span><span class="what">Bold</span></div><div class="use">Bold marks structure: titles, total rows, anything the reviewer’s eye should land on first.</div></div>
-    <div class="scb"><div class="sch"><kbd>Alt h b p</kbd><span class="m">⌥ h b p on mac</span><span class="what">Top border</span></div><div class="use">Top border above a total row — the accounting ruling that says “this line sums the ones above.”</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+D</kbd><span class="m">⌘D on mac</span><span class="what">Fill down from the cell above</span></div><div class="use">Build the logic once in the top cell, select down, and stamp it — the standard way to fill a schedule.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+R</kbd><span class="m">⌘R on mac</span><span class="what">Fill right from the cell to the left</span></div><div class="use">Same as fill down, but across — one quarter’s formula becomes the whole year in two keystrokes.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h b s</kbd><span class="m">⌥ h b s on mac</span><span class="what">Outside borders</span></div><div class="use">OUTSIDE border (S for outSide) — ONE frame around the selection’s perimeter, interior clean. The finished-table look; A is the grid of lines, S is the frame.</div></div>
     <div class="scb"><div class="sch"><kbd>Ctrl+S</kbd><span class="m">⌘S on mac</span><span class="what">Save</span></div></div>
-    <div class="fnline">functions you'll type: <b style="color:var(--text)">SUMIFS()</b></div>
+    <div class="fnline">functions you'll type: <b style="color:var(--text)">SUMIFS()</b> · <b style="color:var(--text)">SUM()</b></div>
   </div>
 
   <div class="section-title">The optimal line</div>
-  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>G3</em> =SUMIFS($C$3:$C$13,$A$3:$A$13,$F3,$B$3:$B$13,G$2) · fill → then ↓ · feet <em>alt+=</em> fill → · headers <em>ctrl+b</em> · total line <em>ctrl+b</em> + <em>alt h b p</em> · <em>ctrl+s</em></div></div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>C4:C14</em> <em>alt+=</em> · <em>F4</em> <em>=SUMIFS($C$4:$C$13,$A$4:$A$13,$E4,$B$4:$B$13,F$3)</em> · <em>F4:F6</em> <em>ctrl+d</em> · <em>F4:H6</em> <em>ctrl+r</em> · <em>E3:H6</em> <em>alt h b s</em> · <em>F8</em> <em>=SUM(F4:H6)</em> · <em>F9</em> <em>=F8-C14</em> · <em>ctrl+s</em></div></div>
 
   <div class="section-title">More Formulas I drills</div>
   <div class="rel">
-    <a href="drills/margin.html"><div class="rn">Margins across the page</div><div class="rd">Three divisions, three different ratio columns — a margin, a growth rate and an asset-turn</div></a>
-    <a href="drills/foot.html"><div class="rn">Foot the table both ways</div><div class="rd">Total a regional revenue grid in both directions, land the corner where the edges meet, an</div></a>
-    <a href="drills/anchor.html"><div class="rn">Pin the reference</div><div class="rd">One formula prices a whole grid — lock the right two references, carry it across, dress it</div></a>
-    <a href="drills/percent.html"><div class="rn">Common-size both statements</div><div class="rd">Two business units on one page, each common-sized against its own revenue — the lock is th</div></a>
+    <a href="drills/margin.html"><div class="rn">Margins across the page</div><div class="rd">Three ratio columns on one peer page — the margin, the growth rate and the EV/EBITDA multi</div></a>
+    <a href="drills/foot.html"><div class="rn">Total it both ways</div><div class="rd">SUM across and down, tie out the corner</div></a>
+    <a href="drills/anchor.html"><div class="rn">Pin the reference</div><div class="rd">Cycle the reference locks — one pinned formula prices the whole grid</div></a>
+    <a href="drills/percent.html"><div class="rn">Common-size both statements</div><div class="rd">Both blocks ÷ their OWN revenue, $-locked so the fill can’t drift</div></a>
   </div>
   <div class="cta-row" style="margin-top:26px">
     <a class="cta" href="drills/sumif.html">← SUMIF</a>
     <a class="cta" href="drills/fxconvert.html">FX Convert →</a>
-    <a class="cta" href="drills/index.html">all 82 drills</a>
+    <a class="cta" href="drills/index.html">all 74 drills</a>
   </div>
   <div class="fine">
     Excel is a registered trademark of Microsoft Corporation. hotkey.gg is independent and not affiliated with or endorsed by Microsoft.

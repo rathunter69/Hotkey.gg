@@ -1,6 +1,10 @@
 /* r154 ONBOARDING AUDIT — a truly fresh visitor: curtain → landing → enter →
    tour → play; second visit: welcome-back. Stubbed supabase so auth paths run. */
 'use strict';
+/* r438: URL override — parallel checkouts serve on their own ports (the r421 e2e-guided /
+   r422 e2e-par-sweep pattern). This harness was the last one still hard-coding 8791, so a
+   gate run from a worktree silently tested WHOEVER owned that port. */
+const HK_URL = process.env.URL || 'http://127.0.0.1:8791/index.html';   /* r438: URL override — parallel checkouts serve on their own ports (the r421/r422 pattern, already on the other eleven gate harnesses). Without it this suite silently tested whatever ANOTHER agent's worktree was serving on 8791. Named HK_URL rather than URL so it cannot shadow Node's global URL class. */
 const { chromium } = require('playwright-core');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 let pass = 0, fail = 0;
@@ -37,7 +41,7 @@ const STUB = () => {
   await page.addInitScript(STUB);
 
   console.log('T1 fresh visitor: curtain');
-  await page.goto('http://127.0.0.1:8791/index.html', { waitUntil: 'load' });
+  await page.goto(HK_URL, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
   await page.waitForTimeout(400);
   const t1 = await page.evaluate(() => {
@@ -117,7 +121,7 @@ const STUB = () => {
   console.log('T3 second visit: welcome back');
   // domcontentloaded, not load: supabase-js loads async now (r285) — 'load' waits on
   // the CDN, and if it's slow the card's 12s auto-hide can fire before 'load' returns.
-  await page.goto('http://127.0.0.1:8791/index.html', { waitUntil: 'domcontentloaded' });
+  await page.goto(HK_URL, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
   // wait for the card explicitly rather than a fixed offset — robust to boot timing
   const t3up = await page.waitForFunction(() => {

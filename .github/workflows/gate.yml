@@ -122,6 +122,17 @@ jobs:
       - name: Depth mechanics (☆ display · Ctrl+S closer · capstone gate · clocks)
         if: steps.scope.outputs.engine == 'true'
         run: node dev/e2e-depth-mechanics.js
+      # r442 (Wolf, playtest 4: "border visibility hasn't been fixed"). These two guards were
+      # WRITTEN in r429 and never wired in, so neither had run on a single PR — which is half of
+      # why the border bug survived four playtests. The other half was check-borders.js asserting
+      # only that two screenshots DIFFERED; it now measures the painted line and asserts its
+      # width. Both drive the real app, so they belong in the engine lane.
+      - name: Border render (painted width, every edge + thick + double)
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/check-borders.js
+      - name: Blur pause (clock freezes, resume swallows the key)
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/check-pause.js
       - name: Drill pages in sync
         if: steps.scope.outputs.engine == 'true'
         run: |

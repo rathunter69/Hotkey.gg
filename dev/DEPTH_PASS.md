@@ -6,7 +6,7 @@ Everything below §1.0-R3 that has NOT been rewritten is a pre-playtest page: it
 arrival and its artifact is unverified against the reality test — the build agent re-cuts both
 under (n)/(o) without escalating. Prior header: r420d — playtest round 2 integrated, 2026-07-25._
 
-_The master build document for the depth pass. Binding inputs: Wolf's locked parameters (PROJECT_CONTEXT "WOLF DECISIONS — DEPTH PASS", 2026-07-24), **Wolf review round 1 (2026-07-24: semantic references over cell ranges · vague-verb ban · Full Builds as a separate build pass · per-beat sub-clocks · all eight taste calls resolved)**, **Wolf PLAYTEST round 1 (2026-07-24, wave 1 — dev/ROUND1_FEEDBACK.md: the §1.0 binding rules, the mystery-☆, the Ctrl+S universal closer, the rowops⊕colops merge, and the five ROUND-2 wave-1 spec pages)**, **Wolf PLAYTEST round 2 (2026-07-25 — dev/ROUND2_FEEDBACK.md: the §1.0-R2 rules — adaptive checklist labels · action-location cues · ☆-as-a-choice · the "re-tie" ban · first-drill nudge · labeled helper stack · the outside-border canon check)**, AUDIT_R417 §A/§D/§G, DRILL_DOCTRINE.md, and the three depth-research reports (finance canon · competitive Excel · course design + language standard). Where a beat descends from a research pattern it is tagged inline, e.g. [Origami Ladder]. Former open taste calls are all RESOLVED and collected in the decision log at the end._
+_The master build document for the depth pass. Binding inputs: Wolf's locked parameters (PROJECT_CONTEXT "WOLF DECISIONS — DEPTH PASS", 2026-07-24), **Wolf review round 1 (2026-07-24: semantic references over cell ranges · vague-verb ban · Full Builds as a separate build pass · per-beat sub-clocks · all eight taste calls resolved)**, **Wolf PLAYTEST round 1 (2026-07-24, wave 1 — dev/ROUND1_FEEDBACK.md: the §1.0 binding rules, the mystery-☆, the Ctrl+S universal closer, the rowops⊕colops merge, and the five ROUND-2 wave-1 spec pages)**, **Wolf PLAYTEST round 2 (2026-07-25 — dev/ROUND2_FEEDBACK.md: the §1.0-R2 rules — adaptive checklist labels · action-location cues · ☆-as-a-choice · the "re-tie" ban · first-drill nudge · labeled helper stack · the outside-border canon check)**, **Wolf PLAYTEST round 3 (2026-07-25 — the §1.0-R3 rules: checklist lines are instructions not lessons (CI-enforced) · formatting beats must match real desk frequency · grade the end state so every valid route clears · location cues over selection outlines · the r429–r431 engine changes · merge/retire a drill whose lesson is already carried)**, AUDIT_R417 §A/§D/§G, DRILL_DOCTRINE.md, and the three depth-research reports (finance canon · competitive Excel · course design + language standard). Where a beat descends from a research pattern it is tagged inline, e.g. [Origami Ladder]. Former open taste calls are all RESOLVED and collected in the decision log at the end._
 
 ---
 
@@ -14,7 +14,7 @@ _The master build document for the depth pass. Binding inputs: Wolf's locked par
 
 One agent builds one drill, in catalog order, Foundations first. The agent reads §1 (the anatomy standard — non-negotiable), the §2 mechanics its drill consumes, and its own §4 page; it does NOT need the research reports — every pattern it needs is restated here. The §4 beat lines are the spec: the agent ships those lines as the literal check labels (typo-level deviations only; a structural deviation gets a code comment naming why + a note in the PR). Capstones (§2.4) build after their chapter's other drills so they can chain the reworked boards.
 
-**MODEL-PROOF PROTOCOL (WORKFLOW.md §8, r420c; LIVE PRACTICE as of r420d — Wolf notes sessions may run Opus-tier):** this doc is written to be executed by a LESS-CAPABLE agent than the one that wrote it — every rule carries its rationale inline (the WHY, dated, with owner), every §4 page states exact beats/predicates/randomization, and nothing load-bearing lives only in session memory. A build agent must never have to re-derive design intent: if a page under-specifies something the agent needs, that is a SPEC BUG — stop and escalate to the orchestrator, do not improvise. All future wave agents build to the r420c rules (§1.0 below) PLUS the r420d rules (§1.0-R2 below), which OVERRIDE any older line in this doc where they conflict.
+**MODEL-PROOF PROTOCOL (WORKFLOW.md §8, r420c; LIVE PRACTICE as of r420d — Wolf notes sessions may run Opus-tier):** this doc is written to be executed by a LESS-CAPABLE agent than the one that wrote it — every rule carries its rationale inline (the WHY, dated, with owner), every §4 page states exact beats/predicates/randomization, and nothing load-bearing lives only in session memory. A build agent must never have to re-derive design intent: if a page under-specifies something the agent needs, that is a SPEC BUG — stop and escalate to the orchestrator, do not improvise. All future wave agents build to the r420c rules (§1.0 below) PLUS the r420d rules (§1.0-R2 below) PLUS the r429–r431 rules (§1.0-R3 below), which OVERRIDE any older line in this doc where they conflict. §1.0-R3 is the newest and wins over both; several of its rules are enforced by CI rather than review, so ignoring one ships a red gate.
 
 **Per-drill definition of done** (all nine, in the PR):
 1. `build()` / `checks()` / `guide()` / `req` / `targets()` / `demo()` reworked to this page; beats = the page's lines.
@@ -65,14 +65,61 @@ Source: dev/ROUND2_FEEDBACK.md (Wolf's round-2 playtest of the wave-1 rebuilds).
 
 **(m) OUTSIDE-BORDER CANON (recorded check, 2026-07-25).** Wolf states: outside borders = **Alt H B S** — NOT H B A (H B A = ALL borders). The engine already asserts H B S draws the selection PERIMETER (dev/e2e-audit-parity.js:506, the r302 canon sweep); the engine-UI round is VERIFYING and ALIGNING every drill hint route, reference table, and SEO surface to S=outside / A=all. Any page, guide line, or req teaching H B A for an outside border is wrong — fix on sight and note it in the PR.
 
-### 1.0-R3 THE DUAL-AUDIENCE REAL-TASK LAW (r429, Wolf directive 2026-07-27 — BINDING, same force as §1.0/§1.0-R2; letters continue §1.0-R2's)
+### 1.0-R3 PLAYTEST ROUND-3 LAW (r429–r431, Wolf 2026-07-25 — BINDING, same force as §1.0 and §1.0-R2; §1.0-R3 wins over any older line)
+Source: Wolf's round-3 playtest. These are catalog-wide and several are enforced by CI, not by review — a build agent that ignores them ships a red gate.
+
+**(n) CHECKLIST LINES ARE INSTRUCTIONS, NEVER LESSONS.** This is Wolf's third round raising it, and the last: *"ITS JUST THE INSTRUCTIONS OF WHAT YOU HAVE TO DO OR ACCOMPLISH!!! NOT A LESSON!!!"* and, on the fix, *"it should be in the excluded list!"* The operative rule is about the clause AFTER an em-dash: it may say WHAT or WHERE, never WHY.
+  · keep — "Format the margin row — one decimal" (scope) · "Fill the row — filled across all five years" (scope)
+  · cut  — "Bold the header row — headers carry the page" · "Italicize the memos — annotations whisper" (morals)
+Wolf's own examples of the target register: *"Delete the placeholder row"*, *"Add a top border to the totals row"*, *"Delete the DRAFT column"*, *"insert a column before Q3"*.
+ENFORCEMENT: `dev/check-invariants.js` C11 fails the build on a denylist of 31 already-rejected phrasings, scanning player copy only (it strips comments via a stateful walk, so a code comment may quote a cut phrase when recording why it went). When a new one is caught in playtest, ADD IT TO THAT LIST — that is what stops it coming back. WHY the denylist rather than a general "is this a maxim" detector: free-text detection is not reliable enough to gate a build on, and a false positive would block unrelated work.
+
+**(o) FORMATTING BEATS MUST REFLECT REAL DESK FREQUENCY.** Wolf: *"why are we focusing on strikethrough? Feels like how you anchored on the whole comma format hotkey but in reality it's such a seldom used / rare hotkey and you don't seem to understand the priority of what things people actually are changing day to day in excel."*
+  · BANNED as a graded primary beat: **strikethrough**. Two independent reasons — the ribbon shows no strikethrough path (so the drill would grade a move the UI cannot walk), and it is rare on a real desk. Ctrl+5 still WORKS; it is simply never a core beat.
+  · Wolf's stated priority order, use these instead: top borders · bottom borders · bold · italics · font colour (blue = hardcode, green = linked cell, red = needs attention) · comments · thick top/bottom borders · superscript · cell background colour · single borders · indent.
+  · GENERAL RULE behind it: before making an op a beat, ask how often an analyst performs it in a working day. A rare op may appear as flavour or in the ☆, never as a core formatting beat.
+
+**(p) GRADE THE END STATE — EVERY VALID ROUTE CLEARS.** This restates §1.0(c) because round 3 found it violated in shipped code. The bug: a dollar-format beat demanded `fmtStyle==='currency'`, which only Ctrl+Shift+$ produces, while the ribbon's Accounting Number Format (Alt H A N) sets `'acct'`. A player could dollar-format the row, SEE dollars on the board, and watch the beat stay dark with nothing to fix. Wolf: *"checklist isn't being triggered. Again, show cover us no matter how we fix."*
+  · When two Excel routes produce the same visible result, BOTH must clear. Enumerate the routes before writing the predicate.
+  · The failure mode to fear is not a beat that is too easy — it is an UNTRIGGERABLE beat, which is indistinguishable from a broken drill.
+  · Same class, same round: an outside-border beat that accepted only the figures now also accepts label + figures, since dressing a hand-off row with its label is how it is actually done.
+
+**(q) LOCATION CUES OVER SELECTION OUTLINES.** Wolf: *"The red carrot things are great — think this should be a standard instead of using green outlines if we're having the user similarly modify rows and columns that are hard to indicate with the green highlight."* Use the shared `cueCell(text)` helper (index.html) wherever the target is a PLACE the green outline cannot express:
+  · an INSERT point — the slot is *between* two rows/columns, so there is nothing to outline;
+  · a PASTE target — the destination is empty, so an outline reads as "cell", not "land here".
+  Cues are BOARD CONTENT: they ride inserts/deletes like a sticky note, and they are NEVER graded targets, so deleting one can never move a check. Related: no beat may target a cell whose text SPILLS across other columns — Wolf saw a highlight covering A1 while the title spilled onward and read it as "change half the title".
+
+**(r) ENGINE FACTS THAT CHANGED UNDER YOU (r429–r431).** Pages written before r429 may assume the old behaviour:
+  · **All four border edges now render — as of r442, not r429.** This bullet claimed the fix twice before it was true, so here is the measured state: r429 gave every edge a CSS rule and made applied borders 2px, but `render()` still carried r292's INLINE emitter writing `border-*: 1px` for `bl`/`br`/`thick`, and inline beats the stylesheet. Left painted **0.00px**, right a **1.00px** hairline, and the thick box was identical to the thin one; only top and bottom ever worked. r442 deleted the emitter and moved applied borders onto an overlay pseudo-element. Verified: every edge 2.00px, thick 3.00px, double two 1px strokes. Outside borders are now genuinely safe to use and to grade.
+  · **`dev/check-borders.js` and `dev/check-pause.js` are gate steps** (they existed from r429 but ran on no PR until r442). If you grade a border, that guard is what protects you.
+  · **Number formats auto-widen their column.** Applying comma/percent/accounting/decimal-step grows a column that is too narrow (grow only, never shrink), as Excel does. So "apply a format, then autofit" is no longer a real beat; #### now arises only from a hand-narrowed or build-seeded narrow column.
+  · **The #### test reasons in UNSCALED px.** It used to compare against the elastic display width, so the fit-scaler manufactured #### on columns that were genuinely wide enough. `overflowsCol()` (which grades autofit beats) matches it.
+  · **WIDTH BEATS GRADE THE BOARD, NOT AUTOFIT'S TARGET (r441 — Wolf's ruling; supersedes anything a pre-r441 page says about width).** There are exactly two width verdicts and you grade one of them, never a width number:
+    · figures — **`!overflowsCol(S,c)`**: no `####` left in the column;
+    · labels — **`!clipsCol(S,c)`**: no label amputated (a label that spills into empty neighbours is NOT clipped — Excel clips text and never `####`s it, and so do we).
+    Do **not** grade `colW >= neededWidth(c)-1`. `neededWidth()` is what **autofit SETS**, not what the board needs: it carries `FIT_SLACK` past the overflow threshold, so a player who types a width (`Alt H O W`, ~7px per Excel unit) can clear every visible `####` and still land under it — a perfect board with a dark line, §1.0-R3 exactly. Both bands were live before r441 and measured: 4px on `combo`, **21px** on `housestyle`, where the old math sized LABELS with the mono NUMBER metric.
+    If you need a width number for a board (not for a beat), call `neededWidth()`; never re-derive a metric from `CHARPX`/`TXTPX`/the pads by hand. `housestyle` shipped a hand-inlined copy and it drifted.
+  · **A run pauses on window blur.** Leaving the window freezes the clock behind a scrim; the paused span is not billed and resuming costs no mouse flag. Nothing in a drill needs to handle this, but do not write a beat that assumes wall-clock continuity.
+
+**(s) DRILLS MAY BE MERGED OR RETIRED WHEN THE LESSON IS ALREADY CARRIED.** Wolf, on catalog size: *"don't worry about increasing or decreasing catalog size at this point."* Two precedents from r431 — `undo` merged into `editfix` because undo's mechanic was sound but its MOTIVE was missing (the thing it destroyed was a number the player had no stake in; now it destroys the repair they made two beats earlier), and `copyover` retired outright because its lesson was already carried by `filldr` and `pastes`. If a page's drill is redundant or motiveless, say so rather than polishing it. `menuOrder.length` is the single source of truth for the catalog count; the "N banker-grade drills" marketing copy is asserted against it by smoke.
+
+
+### 1.0-R4 THE DUAL-AUDIENCE REAL-TASK LAW (r429, Wolf directive 2026-07-27 — BINDING, same force as §1.0/§1.0-R2/§1.0-R3)
+
+> **RENUMBERED IN r443, CONTENT UNTOUCHED.** This law arrived on PR #244 as "§1.0-R3 (n)/(o)"
+> while PR #243 was independently writing a *different* §1.0-R3 (n)–(s) from the round-3
+> playtest. Both are binding directives from Wolf and neither supersedes the other, so the
+> playtest block keeps §1.0-R3 (n)–(s) — the engine, the drills and the CI lint all cite
+> R3(p)/(r)/(s) by letter — and this block becomes **§1.0-R4**, its two laws relettered
+> **(n)→(t)** and **(o)→(u)**. Any pre-r443 reference to "§1.0-R3(n) dual-audience" or
+> "§1.0-R3(o) ☆ re-cut" means §1.0-R4(t) and §1.0-R4(u). Nothing else about them changed.
 
 Source: Wolf, 2026-07-27 (direct product direction, NOT a playtest): _"Make sure all drills are
 oriented towards the overall platform goal of creating drills similar to real world tasks to
 improve in Excel for both average corporate mid-career professionals and aspiring bankers and
 consultants."_ This is the product's north star written as build law.
 
-**(n) EVERY DRILL IS A REAL TASK, FOR BOTH AUDIENCES.**
+**(t) EVERY DRILL IS A REAL TASK, FOR BOTH AUDIENCES.**
 
 **The two audiences, equal weight:**
 - **A · the corporate mid-career professional** — FP&A analyst, ops/finance manager, controller,
@@ -119,7 +166,7 @@ you rebuild the board to the §3.1 audience map's family for your drill and reco
 spec deviation (§9.2 payload item 8). This is the ONE class of change a build agent may make to its
 board without escalating — because the reality test is objective and this law is Wolf-direct.
 
-**(o) THE ☆ RE-CUT SWEEP (r429 — catalog-wide known defect, stated once so no agent has to ask).**
+**(u) THE ☆ RE-CUT SWEEP (r429 — catalog-wide known defect, stated once so no agent has to ask).**
 Every §4 page written BEFORE the playtest rounds (i.e. everything from §4.12 down that has not been
 rewritten) proposes a FORMATTING bonus — "right-align the header row", "color the inputs blue",
 "bold the title". **§1.0(d) killed that entire class, and §1.0-R2(i) added the skippability test.**
@@ -181,7 +228,11 @@ Minimum TWO independent axes per drill, from:
 Full-grid artifacts (Models II / Full Builds boards that occupy most of 20×10) may substitute (a) with **corner jitter** (±1–2 rows/cols) + (d); their §4 page says which. Same-seed determinism holds (replay ×3 seeds must win).
 
 ### 1.3 Grid usage
-The board is 20 rows × 10 cols (A–J; `__ROW_CAP` 20). Target ≥60% of rows carrying content or scripted purpose at the win state; a drill living in a 6×4 corner of an empty sheet fails the density doctrine. Title row + labeled rows/headers/units per doctrine §2.1; win state per §2.1b (banker's-workbook finish) — where the lesson isn't formatting, the board ships pre-dressed.
+The board is 20 rows × 10 cols (A–J; `__ROW_CAP` 20). Target ≥60% of rows carrying content or scripted purpose at the win state; a drill living in a 6×4 corner of an empty sheet fails the density doctrine.
+
+**20 is floor AND cap, for every chapter — no exemptions (Wolf, r440).** `ROWS=20` is the default a board starts from; anything smaller is a decision that must be justified on its own §4 page, not a `ROWS=14` inherited from the drill it was copied off. The tell that this rule is being broken is a load-state and win-state density that are IDENTICAL — the drill is filling cells inside rows that already exist rather than sizing the board to the lesson, so the empty band at the bottom is on screen the whole run.
+
+The cap binds the Models chapters too: **a Models board is a COMPONENT of a build — a schedule, a corkscrew, a driver block, one statement's linkage — not a whole model.** If a board cannot fit in 20 rows it is scoped too wide, and the fix is to narrow the fragment, never to raise the cap. A board over the cap is a design signal, not a trim job (see `cases`, 21 → 20, which came down by rebuilding and got denser and better for it). Title row + labeled rows/headers/units per doctrine §2.1; win state per §2.1b (banker's-workbook finish) — where the lesson isn't formatting, the board ships pre-dressed.
 
 **Labeled targets (Wolf, review round 1 — load-bearing):** every graded target carries a VISIBLE label on the board — a row label, column header, or block title — so the semantic references §1.7 mandates always resolve. `build()` specs must seed those labels. R4's "never grade against a term the sheet doesn't show" now binds in both directions: no beat term the board doesn't label, and no graded target the board leaves unlabeled. The only exception is the R2(a) class (maze/obstacle boards, where coordinates are the game).
 
@@ -211,7 +262,9 @@ The last WORK beat leaves the artifact sendable: a dress/close motion (bold + ru
 - **R10** Negative space explicit: "Delete the content of the memo cell (keep the cell and its formatting)."
 
 **THE CLOSED VERB LIST** (42 — a check label starts with one of these, nothing else):
-Add · Autofit · Bold · Build · Center · Clear · Collect · Color · Comma-format · Copy · Cut · Delete · Dollar-format · Enter · Fill · Filter · Find · Finish · Fix · Flip · Fold · Group · Indent · Insert · Italicize · Left-align · Move · Paste · Percent-format · Reference · Repoint · Select · Set · Sort · Strike · Total · Trace · Transpose · Unbold · Underline · Undo · Unhide · Unfold · Wrap
+Add · Autofit · Bold · Build · Center · Clear · Collect · Color · Comma-format · Copy · Cut · Delete · Dollar-format · Enter · Fill · Filter · Find · Finish · Fix · Flip · Fold · Group · Indent · Insert · Italicize · Left-align · Move · Paste · Percent-format · Reference · Repoint · Select · Set · Sort · ~~Strike~~ · Total · Trace · Transpose · Unbold · Underline · Undo · Unhide · Unfold · Wrap
+
+**§1.0-R3(o) NOTE on this list:** ~~Strike~~ is struck from the approved verbs — strikethrough is banned as a graded primary beat (no ribbon path; rare on a real desk). It stays readable here only so an older page quoting it can be traced. Prefer the verbs Wolf actually ranked: border/rule, bold, italicize, color (blue = hardcode, green = linked, red = needs attention), fill, indent.
 (Total = land a live SUM; Build = enter a live formula; Reference = point a formula at an existing output, never retype it; Fix/Repoint = repair in place; Wrap = IFERROR or text-wrap by context. Adding a verb requires a doc PR touching this list — Reference added r420b for the never-retype beats.)
 Voice stays doctrine §7 (associate voice, lowercase confidence, em dashes) — the standard governs structure, not warmth. Two registers per research 1: checklist-imperative in beats; scenario-imperative in prompts ("the VP needs the downside case before the 4pm call").
 
@@ -478,14 +531,21 @@ Page grammar: **Now** = current beats/checks + weakness · **Beats** = the new c
 #### 4.6 colops — **RETIRED (D17, playtest round 1 — merged into rowops §4.5)**
 Wolf (2026-07-24): "combine this and the column drill to have a more fulsome drill that teaches you row inserts and deletions and column inserts and deletions." Row and column structure ops + the formatting-inheritance lesson are ONE drill — rowops (§4.5 round 2) carries all of it, including this page's former beats (DRAFT-column delete, quarter insert+paste, header order) and its randomization axes. The colops key leaves menuOrder/groups; PARS/TRACKS/cert arrays update in the same PR; its leaderboard board keeps history but goes unreachable; catalog 82→81 live (87 post-pass); the freed slot stays OPEN for a future add. The old spec is superseded — do not build.
 
-#### 4.7 editfix — "Fix the typos in place" · S
+#### 4.7 editfix — "Repair the schedule" · M — **ROUND 3 (r431 — SHIPPED; ABSORBS undo §4.8)**
+**ROUND-3 REBUILD (Wolf playtest round 3) — supersedes the lines below.** Wolf on the old editfix: *"we're not really testing a lot here … honestly think we just fold this into another drill"*, and on undo: *"I also don't really understand what we're doing here — action log? What's the point of the Q4 total? Why am i deleting a table then deleting another table?"* Undo's mechanic was sound; its MOTIVE was missing, because the thing the bad note destroyed was a number the player had no stake in. MERGED so the block the note names feeds **the total the player repaired two beats earlier** — following the note destroys their own work in plain sight, which is what makes Ctrl+Z matter. Shipped beats: (1) one misspelled label repaired in place — ONE, per Wolf's *"1 in-line text edit to fix a typo but not more"*; (2) a mis-typed FY reference pointing at the wrong row; (3) a stale Total that never grew to cover the last line; (4) follow the sweep note, watch beat 3 collapse, undo it back; (5) clear the block that was actually junk; ☆ undo PAST the repairs then redo forward. DROPPED: the action log, the strikethrough beat (§1.0-R3(o)), the second decorative data block, and the bold-the-title beat (its green target covered A1 while the title spilled across the row — §1.0-R3(q)). Formatting is deliberately absent; it owns its own chapter. par 52 / parKeys 48.
+
+**Superseded round-2 page below (historical):**
+#### 4.7-r2 editfix — "Fix the typos in place" · S
 **Now:** 4 checks (2 typos in-place, drift audit, stretch the short SUM) — chained, randomized, dense pools. Meets bar except the missing bonus (guide/checks align 4v4 — fine).
 **Language pass (1 line) + bonus:**
 - drift check → "Fix the drifted Model cell back to the feed's number — the Model column must equal the Feed column"
 ☆ Strike through the memo line the review closed — retired, not erased (add one memo row to the board)
 **Random:** as-is (19-typo pool, slot shuffle, drift index). **Aha:** lands on the F2 range-stretch re-totaling WITH the audit fix. **Finish:** the stretch beat (the total re-ties = prove-out). **Clocks:** std. **Engine:** none.
 
-#### 4.8 undo — "Undo is a tool" · M
+#### 4.8 undo — **RETIRED (r431, Wolf playtest round 3 — merged into editfix §4.7)**
+Do NOT build this page. The drill key `undo` no longer exists in `menuOrder`; its lesson (undo as the safety net during a repair pass) ships inside §4.7. Wolf: *"maybe this is worth just folding into another drill, or we combine with the typos in place one."* Historical page kept below for provenance only.
+
+#### 4.8-retired undo — "Undo is a tool" · M (historical)
 **Now:** 3 checks, scripted mistake + undo + aimed delete, site pool. Good story; thin at 3 beats, par 10, and the aha (undo rewinds EXACTLY) can carry more.
 **Beats:**
 1. Bold the title and italicize the memo line under it — housekeeping first
@@ -496,7 +556,10 @@ Wolf (2026-07-24): "combine this and the column drill to have a more fulsome dri
 ☆ Undo past your bold, then redo everything back — Ctrl+Z has a twin
 **Random:** as-is (4 spot-pool, wrong-block coin flip) + log-cell site rides the blocks. **Aha:** beat 3 — values return EXACTLY. **Finish:** beat 5 (the log line = desk habit: a tick list you can resume). **Clocks:** re-sweep (scope +2 beats). **Engine:** ☆ needs the redo latch — add `S.redoN` beside undoN if absent (3 lines).
 
-#### 4.9 copyover — "Chain the hand-offs" · M
+#### 4.9 copyover — **RETIRED (r431, Wolf playtest round 3 — lesson already carried elsewhere)**
+Do NOT build this page. The drill key `copyover` no longer exists in `menuOrder`. Wolf: *"what are we accomplishing here? … I'm not even sure what you're testing."* Its lesson (relative refs re-point when a formula block travels) is already carried by `filldr` and `pastes`, and its values-only hand-off by `pastes`; nothing was lost by retiring it. Historical page kept below for provenance only.
+
+#### 4.9-retired copyover — "Chain the hand-offs" · M (historical)
 **Now:** 3 destinations (block copy, peeled column, values-only) — the chain is right; checks 3, no dress, fixed sites.
 **Beats:**
 1. Copy the source block into the working area — formulas travel (the working area carries its own board title)
@@ -517,7 +580,8 @@ Wolf (2026-07-24): "combine this and the column drill to have a more fulsome dri
 
 ### CH 2 · FORMATTING (10)
 
-#### 4.11 typeset — "Typeset the memo" · S
+#### 4.11 typeset — "Typeset the memo" · S — **ROUND 3 (r430 — SHIPPED)**
+**ROUND-3 DELTA (§1.0-R3(o)):** the "strike the dead line" beat is REPLACED by "Color the discontinued line red" (Alt H F C). Wolf: strikethrough has no ribbon path and is rare on a desk; red font is on his stated priority list by name ("color red for a number that needs special attention") and is what actually happens to a dead line. Ctrl+5 still works but is no longer graded. Par re-swept 14 -> 24 / parKeys 13 -> 22 (the ribbon walk is ten keystrokes where Ctrl+5 was one). Lines below are otherwise current.
 **Now:** 5 checks (bold header, unbold imposter, italic memos, strike dead line, =TODAY stamp), imposter-row randomized. Order-free by design — acceptable for a pure-formatting showcase (§1.1).
 **Semantic pass (2 lines) + bonus:**
 - check 2 → "Unbold the imposter line — it never earned the weight"
@@ -745,9 +809,30 @@ wins").
 ☆ Italicize both % column headers — memo columns whisper
 **Random:** block A site NOW ALSO from a 3-spot pool (audit ask) + block B pool (exists) + depth 5–7 (exists). **Aha:** unchanged. **Finish:** beat 5. **Clocks:** re-sweep. **Engine:** r419 %-entry fix matters here (typing a raw number into a pre-%-formatted cell) — add its regression line to this drill's replay.
 
-#### 4.25 growth — "Run the growth rates" · S
+#### 4.25 growth — "Run the growth rates" · S — ⛔ **RETIREMENT RECOMMENDED (r434 depth-pass agent; AWAITING WOLF/ORCHESTRATOR DECISION — NOT EXECUTED)**
+
+> **The depth-pass build agent for this page declined to rework the drill and recommends retiring the `growth` key under §1.0-R3(s), folding its board into `cagr` (§4.26). Nothing below has been executed; the original page is preserved verbatim under this block so the recommendation can be overruled without losing the spec.**
+>
+> **(1) EVERY BEAT ON THIS PAGE IS ALREADY CARRIED, and three of them by drills in this same chapter.**
+> · beat 1 (total the segments, fill across) → `foot` §4.22 (total every row / every column, live SUMs), `balance` (foot both sides, fill right), `bridge` §4.27 beat 6 (total the five EBITDA years).
+> · beats 2–3 (YoY row, `=C4/B4-1`, filled across, percent) → **`versionup` beat 1 is this construct verbatim**, down to the staggered start: its guide reads *"growth row is typed · C5: `=C4/B4-1` · select C5:F5, ctrl+r"* on a five-year operating build. `cases` builds the same row (`C13 =C12/B12-1`, fill C13:F13). `margin` §4.21 beat 2 owns the growth RATIO itself ("Growth %", one of its three ratio columns) and its percent dress.
+> · beat 4 (CAGR) → `cagr` §4.26, which is the whole of that drill, three times per run.
+> · beat 5 (bold + top border a total row) → catalog-universal.
+> · ☆ (percent-format + bold the CAGR cell) → **illegal on arrival**: §1.0(d) outlaws formatting bonuses outright.
+> The doc collides with itself here: §4.21 assigns the growth column to `margin`, this page assigns the growth row to `growth`, and §2.4 lists "YoY growth" as one of the five skills the `qclose` capstone chains. YoY is a chapter-wide MOTIF with three homes, not a drill.
+>
+> **(2) NO LEGAL ☆ EXISTS ON THIS BOARD — measured, not reasoned (§1.0-R3(p) discipline).** Both sanctioned §1.0(d)/§1.0-R2(i) families were probed live against the shipped board:
+> · *one fill covering the block*: seed B4 and B5, select B4:F5, one Ctrl+R — **wins in 34 keys but leaves `#DIV/0!` parked in B5**, because year one has no prior year. The only one-pass move on this board ships a broken artifact (§1.6 sendable finish) to save ONE key against the taught route.
+> · *block-grab discipline* (Ctrl+Shift+→ before the fills, the §1.0-R2(i) exemplar): **37 keys — two MORE than the taught route**, because both derived rows are empty on load so the grab has nothing to ride.
+> · taught route 35 keys; fully hand-typed, no formulas, no fills, 85 keys and still a clean win. Efficiency headroom 2.4× — against 5.4× on `percent` (19 vs 103). There is nothing hidden here worth finding.
+> A drill that cannot carry a legal bonus cannot meet §1.1 / §2.2 / the per-drill DoD. Adding `growth` to `REWORKED` in dev/check-invariants.js today fails four gates (C9 tri-length, C9 one-bonus, C9 saveClose, C12 alt-count).
+>
+> **(3) RECOMMENDED DISPOSITION — MERGE, not a bare delete.** The one asset worth keeping is the BOARD: a real revenue build with two segments, a consolidated line and five fiscal years. `cagr`'s own §4.26 page leaves it as three abstract Begin/End/Years stubs — a calculator exercise whose MECHANIC is sound and whose MOTIVE is missing, which is exactly the `undo`→`editfix` case r431 already ruled on. Fold this board into `cagr`: build the YoY rates across the series, see four different annual rates, then compound the one rate that reproduces the endpoints — *the average of the annual rates is not the CAGR* — and keep `cagr`'s read-the-output winner beat. `cagr` keeps its key (its lesson is the one nothing else in Formulas I carries; `^(1/n)-1` otherwise only recurs as IRR in `lbo`/`dcf`). `growth`'s key leaves `menuOrder`.
+> **Plumbing a retirement touches** (r359 drift rule — all in one PR): drills.js `groups` Formulas I (10→9), `meta.growth`, `HOTKEY_PARS.growth` (36), `HOTKEY_CAMPAIGN.chapters` c3 `keys:['margin','growth','anchor','sumif']` — growth must be swapped out of the milestone list, dev/migrate-certificates.sql's `formulas` array, the one ALT entry at dev/e2e-alt-paths.js:461, drills/growth.html + refmap. `HK_PLACEMENT` does NOT reference growth. LB board orphans with history kept (the colops/copyover precedent).
+> **Baseline is healthy, so this is a pedagogy call and not a bug bailout:** par sweep reads par 36 / parKeys 35 / median 35 / 1.03 s/key, and the drill's alt entry passes.
+
 **Now:** consolidate + YoY% + CAGR, three formula families, prompt rich; near bar.
-**Language pass + bonus; split any bundled check:**
+**Language pass + bonus; split any bundled check (ORIGINAL PAGE — superseded by the block above unless overruled):**
 1. Total the two segments into the consolidated row — live SUMs filled across
 2. Build the YoY row — this year ÷ last year − 1, filled across
 3. Percent-format the YoY row — one decimal
@@ -780,11 +865,20 @@ wins").
 ☆ Add an outside border around the finished summary block
 **Random/Aha/Finish:** verify axes; existing aha; % beat closes. **Clocks:** std. **Engine:** none.
 
-#### 4.29 rollup — "Sum on two criteria" · S
+#### 4.29 rollup — "Sum on two criteria" · S — **ROUND 3 (r438 — SHIPPED; the ☆ and the "Finish" line below are both REPLACED, deviations declared in the drill's header comment and dev/AUDIT.md r438)**
 **Now:** one mixed-anchor SUMIFS fills the segment × region grid; par 65. Near bar.
 **Language pass + bonus:**
 ☆ Bold the grid's row and column headers — the axes read
 **Random:** verify grid site jitter + segment/region pools. **Aha:** existing. **Finish:** add if missing: "Add a top border above the grid's total row" — if no total row exists, ADD one (Total the grid's columns across the bottom — live SUMs) and make it beat 5. **Clocks:** std. **Engine:** none.
+
+**⚠️ WHAT SHIPPED INSTEAD (r438) — read this before touching the page above.**
+1. **The ☆ above is illegal.** "Bold the grid's row and column headers" is a FORMATTING task, which §1.0(d) forbids outright, and its tail is a moral, which §1.0-R3(n) forbids separately. r435 flagged it for re-cutting in advance. SHIPPED ☆: **one mixed-anchor SUMIFS covers every cross** (down fill + right fill, either order), graded off `S.fillOps`. Headroom MEASURED: 76 keys taught vs 245–480 hand-written (median 337) — 4.4×.
+2. **The "Finish" line is DECLINED, and this is the page's real defect.** It asks for a total row of live SUMs across the grid's columns. **§4.22 `foot` already ships exactly that**, beat for beat — row margins, column margins, the corner agreeing, bold + top border, and a tie check — and even its ☆ ("Fill both total lines through the corner") is the star a margined cross-tab would want. Adding margins here rebuilds `foot` inside Formulas I. The same objection kills r435's "two-way tie" suggestion. SHIPPED instead: r435's OTHER option, the mixed-anchor read, closed with a grand total over the whole 2-D block **reconciled back to the source ledger** — a COMPLETENESS check (did the cross-tab catch every booking?), which `foot`'s internal cross-foot is not.
+3. **"Near bar" was wrong.** The shipped beat 1 read `$C$3:$C$11`/`$F3`/`G$2` out of formula TEXT, so four separate correct SUMIFS left it dark — the campaign's untriggerable-beat class, its eighth instance. Every core now grades the END STATE.
+4. **"Verify grid site jitter + segment/region pools" — there were none.** The board was FIXED at A1/F2/G2 with hard-coded `'Retail'`/`'Instl'` and `'Americas'`/`'EMEA'`; only the amounts moved. Rebuilt to five axes, including a grid SHAPE that moves (3–4 segments × 2–3 regions).
+5. **Par was not "std":** 65/68 → 80/76, re-swept from scratch.
+**SHIPPED BEATS (5 core + ☆):** Total the ledger's revenue column · Build the cross-tab — every segment at every region · Add an outside border around the cross-tab · Total the whole cross-tab in the total cell · Enter the reconciliation check — the cross-tab total less the ledger total reads zero. ☆ Fill the whole cross-tab from one formula.
+**MERGE VERDICT vs §4.28 `sumif`: KEEP BOTH, now MEASURED** — the SUMIF-fluent generalisation `=SUMIFS(critR,crit,critR2,crit2,sumR)` throws `sumifs-args` and the SUMIFS-fluent `=SUMIF(sumR,critR,crit)` throws `sumif-args`; neither commits, so fluency in either produces a first attempt in the other that does not compute.
 
 #### 4.30 fxconvert — "Convert the page — one anchored rate" · S
 **Now:** anchored EUR→USD driver + 2D fill + commas + outline; 5 checks; guide 3v5 misalignment; ZERO ALTS (both audit findings).
@@ -865,13 +959,43 @@ wins").
 ☆ Set the figures column to one width of 12 — the folded page prints even
 **Random:** which quarter reopens + month-block start row jitter + value pools (exists). **Aha:** upgraded — "group beats hide because folds REOPEN on request — the ⊞ is a promise". **Finish:** beat 5. **Clocks:** re-sweep. **Engine:** unfold latch = group.collapsed===false (state, no new plumbing).
 
-#### 4.36 filterpass — "Work the filtered view" · S
-**Now:** AutoFilter on, picker, read the visible answer, type it; audit: cursor-rider promise ungraded (label↔check).
-**Language pass + fix + bonus:**
-- drop the ungraded cursor-rider promise from the prompt (decided — don't grade it)
-- final beat: "Enter the answer in the answer cell — the largest visible Open deal"
-☆ Filter the Status picker back to All — leave the view the way you found it
-**Random:** verify status/value pools + answer varies. **Aha:** existing. **Finish:** the answer entry. **Clocks:** std. **Engine:** Alt+↓ picker (exists).
+#### 4.36 filterpass — "Work the filtered view" · S — **SHIPPED (r438, depth pass)**
+**RETIREMENT TESTED FIRST (§1.0-R3(s)) AND REJECTED.** Par 13 / parKeys 10 / three checks was the
+thinnest profile left, so the §2 ☆-headroom diagnostic ran before anything was written, on the
+SHIPPED board: taught route **10 keys**, hand-hidden route (Ctrl+9 per non-matching row) **16 keys**,
+both clearing all three cores. Positive headroom — the opposite sign to `growth`, which died at 37
+against 35. Kept also because the chapter's four row-suppression tools are genuinely four tools
+(`sort` MOVES · `scrub` DELETES · `grpfold` FOLDS by position · this one hides BY VALUE), and because
+`sort`'s own r436 survival argument leans on exactly that distinction.
+**The board, not the beats, was what made it thin:** on 175 of 400 sampled seeds (43.8%) the largest
+OPEN deal was ALSO the largest deal on the page, so the filter did no work. build() now always hands
+the largest size on the board to a deal outside the screened sector.
+**Shipped beats** (5 core + save closer + ☆, tri-length 6): arm the AutoFilter across the header row →
+the largest screened-sector deal into the screen block → filter the list to the screened status →
+how many carry it → their combined size (the prove-out, §1.6, standing against the live
+`Total — all deals` SUM that never moved — the aha, §1.5). Labels adaptive per §1.0-R2(g).
+**☆ DEVIATION FROM THIS PAGE, DECLARED PER §0.** The page's "☆ Filter the Status picker back to All"
+is dead twice: §1.0(d) outlaws a ☆ that is hygiene rather than hidden EFFICIENCY, and it is
+STRUCTURALLY IMPOSSIBLE — §2.2 latches the bonus at the win moment, where every core is also graded,
+so restoring the whole view falsifies any filtered-state core in the same instant (the
+untriggerable-beat class). Kept in spirit as the efficiency INSIDE that move: two screens off one
+list, screen one must go before screen two exists, and the toggle retires it in **2 keys** against the
+picker walk-back's **6**. Graded off the new `S.filterClears` provenance latch (toggleFilter, the
+S.autoSumN family). Skippability MEASURED, not asserted: the walk-back run clears 5/5 cores at 30 keys
+with the ☆ dark, registered as ALT 2.
+**No dress beat — deliberate:** the chapter's bold-plus-top-border tail is the redundancy
+DEPTH_PASS_CAMPAIGN §3 says to cut, and formatting a filtered range hits the hidden rows in this
+engine anyway (probed). Board ships pre-dressed.
+**Random:** four axes — header row 3/4 AND table in column A or B · deal/sector/status pools shuffled ·
+sizes distinct through rnd() · which sector, which status, and 3-or-4 deals carrying it.
+**Par:** 13→26 (parKeys 10→25, 5-seed median incl. the appended Ctrl+S; 1.04 s/key).
+**Engine:** Alt+↓ picker (existed) + `S.filterClears` (new, additive, read only by this ☆).
+**Engine facts probed, three of which ruled out obvious beats:** no SUBTOTAL/AGGREGATE (a plain SUM
+counts hidden rows — Excel-true, and the point of the Total line) · Ctrl+B over a filtered range
+formats the hidden rows too, where Excel formats visible cells only · Delete clears them and Copy
+carries them · there is NO Alt A C, so the toggle is the only one-move clear · the picker WRAPS where
+Excel's does not (demo walks rightward only) · the picker scans hidden rows, so a second column's chip
+list is not narrowed by the first column's filter as Excel would narrow it.
 
 #### 4.37 unhide — "Flush the hidden rows" · S/M (audit shallow #12; r419 width fix landed)
 **Now:** 3 checks (unhide across the gap, group+fold the house way, width 12) — solid contrast lesson; fixed hidden span rows 4–7.
@@ -907,7 +1031,32 @@ wins").
 ☆ Enter the memo — type "index/match — columns can move" in the note cell (verbatim text check; the lesson, written by the player's own hands)
 **Random:** query pools + which column inserts (Region/Owner) + table site jitter. **Aha:** "VLOOKUP counts columns; INDEX/MATCH reads headers — one of them survives Tuesday". **Finish:** beat 5. **Clocks:** fresh measure (~40s expected). **Engine:** VLOOKUP + r419 sentinels (the broken state shows a wrong VALUE, not an error — deliberate; no sentinel needed). **Plumbing:** D2.
 
-#### 4.40 lookup2 — "Two-way lookup" · M (audit shallow #3)
+#### ⚠️ BINDING CONSTRAINT ON THIS PAGE (r436, from the `lookup` depth pass — READ BEFORE BUILDING)
+As SHIPPED, `lookup` and `lookup2` were **the same board**: identical metric pool, identical
+shuffle, identical query panel at F1:G4, identical `colW`, identical `ROWS:6`, identical
+two-check shape. Seven table rows against five, and one more MATCH. That is one lesson at two
+arities, not two lessons.
+
+The sumif/rollup defence does NOT transfer here. That pair survived because the argument
+signature INVERTS between SUMIF and SUMIFS. INDEX has no inversion — `INDEX(array, row_num,
+[col_num])`: the two-way form is the one-way form with one more optional argument supplied.
+Nothing moves, nothing swaps, and fluency in one produces a correct first attempt at the other.
+
+Worse, `lookup`'s old aha ("INDEX/MATCH targets headers, not cell positions") was FALSE of the
+formula it graded: a one-way INDEX/MATCH targets no header at all — the player picks the column
+by eye and hardcodes the offset. Header-reading IS the second MATCH, i.e. this drill's core.
+
+So distinctness must come from the BOARD SITUATION, not the arity:
+  · `lookup`  (r436, shipped) = ONE FIELD / MANY KEYS. One-way is the right formula; the skill
+    is anchoring so a single fill answers every name.
+  · `lookup2` (this page)     = ONE KEY / AN INTERSECTION. **It must NOT grow a filled column of
+    answers** — the moment it does, the two boards re-converge and the pair is redundant again.
+If only two lookup drills are wanted, the merge runs `lookup2` ABSORBS `lookup` (two-way is
+strictly more general and its aha is true), because the one-way case already lives in `recon`.
+Note also that `vlookup` (§4.39/D2), the middle term this doc leans on to justify keeping both,
+DOES NOT EXIST YET.
+
+#### 4.40 lookup2 — "Two-way lookup" · M (audit shallow #3) — **ROUND 3 (r437 — SHIPPED, built to the ⚠️ BINDING CONSTRAINT above; the board is a SQUARE 5×5 tape read by three cards, the ☆ is an anchored COPY travelling in both axes, and the page's formatting-☆ / comma beat / outside border are replaced — deviations declared in the drill's header comment and dev/AUDIT.md r437)**
 **Now:** 2 checks (two MATCHes present, value right); one query, small block.
 **Beats (deal-screen story per audit):**
 1. Build the screen's first read — INDEX with two MATCHes, company × metric
@@ -918,13 +1067,14 @@ wins").
 ☆ Bold the queried company's row in the data block — mark your source
 **Random:** metric shuffle (exists) + 2 query draws + swap-decoy which-axes + company pool. **Aha:** existing. **Finish:** beat 5. **Clocks:** re-sweep. **Engine:** none.
 
-#### 4.41 recon — "Two systems, one truth" · S
+#### 4.41 recon — "Two systems, one truth" · S — **SHIPPED r437 (depth pass; the page below is the pre-r437 sketch, kept for trace)**
 **Now:** COUNTIF presence + INDEX/MATCH amounts + enter the missing deal + Δ to zero; par 77, chained, zero-check finish. At bar.
 **Language pass + bonus:**
-☆ Color the brought-across deal blue — it was typed, not fed
+☆ ~~Color the brought-across deal blue — it was typed, not fed~~ — **DEAD under §1.0(d)** (a ☆ is a hidden EFFICIENCY, never a formatting task; flagged in advance by the r436 `lookup` agent). It also cannot be promoted to a core beat: the blotter figures ship blue, so the star route lands the colour for free and §1.1 forbids a do-nothing line. RE-CUT AS SHIPPED: **the missing deal carried in ONE paste, name and amount together, sourced from the blotter row** — latched off `S.pasteLog`, so Ctrl+V / Alt H V / the legacy Alt E S dialog all earn it and typing earns nothing.
 **Random/Aha/Finish:** verify axes; existing; Δ=0 closes. **Clocks:** std. **Engine:** none.
+**AS SHIPPED (r437):** 5 core beats — presence column → add the missing deal → Δ vs system column → fix the fat-fingered amount → total the Δ column into a Recon check line that reads 0 (the §1.6 prove-out finish; MODELING_STANDARDS §6's "one visible place"). No formatting beat, deliberately: the bold + top-border total-line pair is `sumif`'s closing tail and §3 of the campaign doc says to cut a shared tail rather than repeat it, so the check line ships pre-dressed. Beat 5 is the ONE place a live formula is required, on the §1.7 "Total = land a live SUM" gloss — verified by probe that a typed `0`, an `=0`, and typed zeros down the whole Δ column all leave it DARK. par 77→92, parKeys 81→88 (flat over 20 seeds). Distinctness against `lookup` is protected structurally, not asserted — see the index.html header and the r437 dev/AUDIT.md entry.
 
-#### 4.42 drill — "Hardcode it" · M (audit shallow #7)
+#### 4.42 drill — "Hardcode it" · M (audit shallow #7) — **SHIPPED (r438, depth pass; the ☆ is the r418 TILED paste, the outside border is cut as a `pastes` tail, and the delete is the §1.6 prove-out close — deviations declared in the drill's header comment and dev/AUDIT.md r438)**
 **Now:** 2 checks (values-onto-self + memo guard, blue font); fixed B3:B8 site.
 **Beats [the delete PROVES the paste — chained]:**
 1. Copy the Final column and paste it onto itself as values only — the Draft column keeps its wires (second live column added to the board; over-broad column paste now HITS something)
@@ -934,7 +1084,7 @@ wins").
 ☆ Paste the flattened column into the deck strip as values — the second hand-off
 **Random:** output-column site from 3-spot pool (audit ask) + which column is Final vs Draft + feed values. **Aha:** relocates to beat 3 — "values survive the source's death; links don't". **Finish:** beat 4. **Clocks:** re-sweep. **Engine:** none. Guard: Draft-stays-live folds into beat 1's ok (doctrine no-do-nothing).
 
-#### 4.43 series — "Serve the year table" · L (audit shallow #1)
+#### 4.43 series — "Serve the year table" · L (audit shallow #1) — **SHIPPED (r438, depth pass; the board grows a second Series run on a step that is not 1, the Total-row tail is cut as a `sort`/`unhide` repeat, and the close is the catalog's first graded INDENT — deviations declared in the drill's header comment and dev/AUDIT.md r438)**
 **Now:** 2 checks (fill series, bold+right-align) — the thinnest drill in the catalog.
 **Beats (table-to-serve per audit):**
 1. Fill the year header — Series extends the two seeds across the header row
@@ -960,7 +1110,7 @@ wins").
 
 ### CH 5 · FORMULAS II (12)
 
-#### 4.45 audit — "Review pass — find what's broken" · M
+#### 4.45 audit — "Review pass — find what's broken" · M — **SHIPPED (r439, depth pass; ABSORBS `hunt` §4.52 — the merge was decided by measurement, see dev/AUDIT.md r439. N goes 3→4 (the hardcode class is now PLURAL, which is what the merge buys), the page’s formatting-☆ is replaced by a one-pass calc-block re-drive, and the F5 ritual is taught and paid for but never graded — grading a keypress is the untriggerable class. Deviations declared in the drill’s header comment.)**
 **Now:** three planted breaks in a divisional P&L (short Total, stale hardcode, wrong-year read); already the audit format minus the disclosure.
 **Rework = adopt §2.3. N=3; beats:**
 1. Find and fix all 3 planted breaks (0/3 repaired) — the meter line
@@ -971,7 +1121,7 @@ wins").
 ☆ Color the two ex-hardcode cells black — formulas don't wear blue
 **Random:** which division carries each break + break sites + values (verify existing). **Aha:** existing. **Finish:** beat 5. **Clocks:** std. **Engine:** §2.3 meter (errorCount=3).
 
-#### 4.46 triage — "Error triage — #REF! #DIV/0! #VALUE!" · M
+#### 4.46 triage — "Error triage — #REF! #DIV/0! #VALUE!" · M — **SHIPPED (r439, depth pass; replanted on REAL r419 sentinels. BINDING ENGINE FACT for anyone re-reading this page: a formula that grabs a text LABEL cannot raise #VALUE! here — text coerces to 0 — so beat 4’s stated cause is UNBUILDABLE and is re-cut to a CHOOSE index past its argument list, the only natural route to that sentinel on this engine. The page’s comma-format ☆ is replaced. Deviations declared in the drill’s header comment and dev/AUDIT.md r439.)**
 **Now:** three classic breaks, read-and-rebuild; pre-r419 the engine FAKED error display with txt cells (seeds 6391–6397, left-aligned amber).
 **Rework = replant on REAL r419 sentinels + §2.3 (N=3):**
 1. Find and rebuild all 3 errors (0/3) — the meter
@@ -993,7 +1143,7 @@ wins").
 ☆ Trace the fixed read to its source and back — prove the wire
 **Random:** WHICH query is the true miss vs the broken one (audit ask — positions swap per seed) + healthy leave-alone read added (guard in ok) + segment pools (exist). **Aha:** existing (seatbelt, not blindfold). **Finish:** beat 5. **Clocks:** re-sweep (par 70 recalibrates). **Engine:** r419 #N/A sentinels — the broken states should now be REAL propagating #N/A (replaces any staged text).
 
-#### 4.48 balcheck — "Make it tie — hunt the break" · M
+#### 4.48 balcheck — "Make it tie — hunt the break" · M — **SHIPPED (r440, depth pass; §2.3 adopted with N=3 and the meter wired via `drills.js` errorCount. The page's formatting-☆ is replaced by `ruleaudit`'s surgeon's pass carried into formula work, and the dress beat deliberately stays LAST against §1.0(a) — a check row cannot be signed off in ink until it reads zero. Three untriggerable beats found and killed, all three walked as an alt-path so they cannot come back. Deviations declared in the drill's header comment and dev/AUDIT.md r440.)**
 **Now:** pasted-over check row resurrected + two causes fixed; strong story; adopt disclosure.
 **Rework = §2.3 (N=3: dead check row + 2 causes) [Cascading Bug Hunt — the rebuilt check row REVEALS which years break]:**
 1. Find and repair all 3 problems (0/3) — the meter
@@ -1008,7 +1158,7 @@ wins").
 **Now:** three cells reading the dead v1 block; find by pattern-break, repoint, confirm continuity. At bar.
 **Language pass + §2.3 dressing (N=3) + bonus:**
 - meter line: "Find and repoint all 3 stale reads (0/3)"
-☆ Strike through the v1 block's header — mark the corpse
+☆ **SUPERSEDED by §1.0-R3(o) — do not build a strikethrough beat.** Replace with a hidden EFFICIENCY move for this drill (strikethrough has no ribbon path and is rare on a desk; and per §1.0(d) a ☆ is never a formatting task at all). Original line, for provenance: "Strike through the v1 block's header".
 **Random/Aha/Finish:** verify axes; existing; continuity confirm closes. **Clocks:** std. **Engine:** meter.
 
 #### 4.50 wirewalk — "Trace the precedents" · M (par 10 — watchlist-adjacent)
@@ -1021,14 +1171,14 @@ wins").
 ☆ Color the fixed source blue — it is typed, and it should say so
 **Random:** wire path re-sites per seed + which input is rotten. **Aha:** existing ("don't hunt by eye"). **Finish:** beat 4. **Clocks:** re-sweep (scope up from par 10). **Engine:** §2.6 touch-list; ctrl+[ / ctrl+] latches exist (r173). Fixes the label↔check gap by GRADING the hops.
 
-#### 4.51 tieout — "Collapse the suspect leg" · S
+#### 4.51 tieout — "Collapse the suspect leg" · S — **SHIPPED (r440, depth pass. BINDING NOTE for anyone re-reading this page: the two shipped beats graded KEYPRESSES — `S.traceN>=2` and `S.f9N>=1` — the same predicate class that retired `hunt` in r439 and that `unhide` dropped in r437, and a player who diagnosed by eye had a perfect board with two dark lines. The page's own "CHECK2 tighten" is therefore MOVED TO THE ☆ rather than tightened in place, its acceptance condition intact; the Ctrl+[ trace is taught in req/guide/demo and never graded. The board gains four core beats of real work to clear §1.1's minimum without them. First ALTS entries ever (§1.8). Deviations declared in the drill's header comment and dev/AUDIT.md r440.)**
 **Now:** trace + F9-collapse a leg + repoint the stale link; CHECK2 f9N>=1 only (weak); desc re-hints F9 (D13).
 **Language pass + check tighten + bonus:**
 - CHECK2 ok: f9N>=1 AND the formula restored unchanged after backing out (R10: "collapse the leg, then leave the formula as you found it")
 ☆ Bold the repaired total — the tie-out closes
 **Random/Aha/Finish:** verify; existing; repoint closes. **Clocks:** std. **Engine:** F9-collapse latch exists.
 
-#### 4.52 hunt — "Hunt the hardcodes" · S
+#### 4.52 hunt — "Hunt the hardcodes" · S — ⛔ **RETIREMENT RECOMMENDED (r439 depth-pass agent — MEASURED; plumbing HANDED OVER, NOT EXECUTED). Merged into `audit` §4.45.** Containment probed: hunt’s canonical method run verbatim on audit’s board clears audit’s hardcode beat 5/5 on the FIRST attempt in 11 keys. Its own F5 instrument measures NEGATIVE (46 keys with the ritual against 43 without) and marks 13 cells of which 10 are legitimate blue inputs, so it narrows nothing. Its beat 1 (`markN>=1`) grades a KEYPRESS — the class `unhide` dropped in r437 — and breaches §1.0(c). The lesson is already carried by `housestyle`’s ☆ (the same F5 ritual, r425), by `versionup`, and by audit’s own beat 3. Delta D11 is mooted. Full plumbing checklist in dev/AUDIT.md r439.
 **Now:** Go To Special → constants; three typed-overs relinked; par 45. At bar (clean exemplar family).
 **Language pass + §2.3 dressing (N=3) + bonus (D11 tab rename):**
 - meter: "Find and relink all 3 typed-over cells (0/3)"
@@ -1049,7 +1199,7 @@ wins").
 ☆ Color the four rebuilt rows black — live formulas, no blue
 **Random/Aha/Finish:** verify; existing; the survives-new-numbers proof closes. **Clocks:** std. **Engine:** none.
 
-#### 4.55 balance — "Make it balance" · S
+#### 4.55 balance — "Make it balance" · S — **SHIPPED (r440, depth pass. The page's ☆ — a bottom border under the check row — is dead three times over (a formatting task under §1.0(d); the exact convention §1.0(f) reverses; and it falls out of the dress beat anyway) and is replaced by the fill. The board goes to three years so the fill has a block to cover, and the single trailing dress beat is split and resequenced under §1.0(a). Two untriggerable beats found and killed, both walked as an alt-path. Deviations declared in the drill's header comment and dev/AUDIT.md r440.)**
 **Now:** foot both sides, check row at zero, totals formatted; 2-year BS. At bar; audit flags state-report labels.
 **Language pass (labels → verb-first) + bonus:**
 ☆ Add a bottom border under the check row — the statement closes on zero
@@ -1195,7 +1345,7 @@ wins").
 #### 4.74 liqbridge — "Bridge the liquidity — three cases" · S
 **Now:** cash+undrawn → ending liquidity across Base/Downside/Severe, breach read; audit flags "Dress" label (6954).
 **Language pass (the flagged "Dress" label → "Bold the ending row and add a top border above it") + bonus:**
-☆ Strike through the breached case's label — flag it for the call
+☆ **SUPERSEDED by §1.0-R3(o) — do not build a strikethrough beat.** Flag the breached case in RED font instead (Wolf's stated use for red: "a number that needs special attention"), or better, per §1.0(d), replace with a hidden EFFICIENCY move. Original line, for provenance: "Strike through the breached case's label".
 **Random/Aha/Finish:** verify; existing; breach read closes. **Clocks:** std. **Engine:** strike exists.
 
 #### 4.75 wk13 — "Run the 13-week" · S

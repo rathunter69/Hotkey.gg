@@ -103,55 +103,6 @@ const ALTS = [
       {sel:'A3:A7',       keys:[{key:'Alt'},L('h'),L('b'),L('l')]},                                   // left edge
       {sel:'E3:E7',       keys:[{key:'Alt'},L('h'),L('b'),L('r')]},                                   // right edge — outside border assembled by hand
     ]; }` },
-  { key: 'undo', name: 'junk FIRST, values RETYPED back (no undo at all — Freedom), ribbon bold/italic LAST — cores clear, no ☆', moves: `C => { const o=C._o;
-      const steps=[
-        {sel:o.rightRng, keys:[{key:'Delete'}]},
-        {sel:o.wrongRng, keys:[{key:'Delete'}]},
-      ];
-      o.wrongCells.forEach((k,i)=>steps.push({sel:k, keys:[...T(String(o.wrongVals[i])),{key:'Enter'}]}));
-      steps.push({sel:'A1', keys:[{key:'Alt'},L('h'),D(1)]});
-      steps.push({sel:o.memo, keys:[{key:'Alt'},L('h'),D(2)]});
-      steps.push({sel:o.logCell, keys:[...T('cleared per note'),{key:'Enter'}]});
-      return steps; }` },
-  /* r425 (undo ROUND 2): chord-ROUTE alt — clears via the ribbon clear menu (alt h e c,
-     contents only), the ☆ walked on the OTHER redo chord (ctrl+shift+z, not ctrl+y), the
-     log signed through an F2 edit. Same beat order as the demo, different keys throughout. */
-  { key: 'undo', name: 'ribbon clears (alt h e c), deep undo + ctrl+shift+z redo (the ☆ on the other chord), F2 log entry', moves: `C => { const o=C._o; return [
-      {sel:'A1', keys:[{key:'b',ctrl:true}]},
-      {sel:o.memo, keys:[{key:'i',ctrl:true}]},
-      {sel:o.wrongRng, keys:[{key:'Alt'},L('h'),L('e'),L('c')]},
-      {sel:o.wrongRng, keys:[{key:'z',ctrl:true},{key:'z',ctrl:true},{key:'z',ctrl:true}]},
-      {sel:'A1', keys:[{key:'z',ctrl:true,shift:true},{key:'z',ctrl:true,shift:true}]},
-      {sel:o.rightRng, keys:[{key:'Alt'},L('h'),L('e'),L('c')]},
-      {sel:o.logCell, keys:[{key:'F2'},...T('cleared per note'),{key:'Enter'}]},
-    ]; }` },
-  { key: 'copyover', name: 'deck hand-off FIRST (ctrl+alt+v values), dress rides, block after, peel off the ORIGINAL column', moves: `C => { const o=C._o;
-      const srcCol=(o.peel?'C':'B')+'4:'+(o.peel?'C':'B')+'7';
-      return [
-        {sel:o.srcTot, keys:[{key:'c',ctrl:true}]},
-        {sel:o.d3, keys:[{key:'v',ctrl:true,alt:true},L('v'),{key:'Enter'}]},
-        {sel:o.deckRng, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-        {sel:o.deckRect, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
-        {sel:o.src, keys:[{key:'c',ctrl:true}]},
-        {sel:o.d1, keys:[{key:'v',ctrl:true}]},
-        {sel:srcCol, keys:[{key:'c',ctrl:true}]},
-        {sel:o.d2, keys:[{key:'v',ctrl:true}]},
-      ]; }` },
-  /* r425: chord-ROUTE alt — values land via the Alt H V S dialog instead of Alt E S V /
-     ctrl+alt+v, and the ☆ source delete fires MID-RUN, before the dress beats: the
-     destructive bonus may NEVER un-flip a core beat (the live re-grade safety this
-     drill's rework documents in its ☆ deviation comment). */
-  { key: 'copyover', name: 'H V S dialog values, ☆ source delete MID-RUN (destructive-bonus safety), box via preselected range', moves: `C => { const o=C._o; return [
-      {sel:o.src, keys:[{key:'c',ctrl:true}]},
-      {sel:o.d1, keys:[{key:'v',ctrl:true}]},
-      {sel:o.landedCol, keys:[{key:'c',ctrl:true}]},
-      {sel:o.d2, keys:[{key:'v',ctrl:true}]},
-      {sel:o.srcTot, keys:[{key:'c',ctrl:true}]},
-      {sel:o.d3, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
-      {sel:o.srcAll, keys:[{key:'Delete'}]},
-      {sel:o.deckRng, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-      {sel:o.deckRect, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
-    ]; }` },
   { key: 'pastes', name: 'ctrl+alt+v transpose, right-align + THICK box on the deck row, scale row-by-row via alt h v s, costs TYPED negative (Freedom), ribbon unbold (chord-ROUTE alt)', moves: `C => { const o=C._o; const k=o.mode==='div'?'i':'m'; return [
       {sel:o.side, keys:[{key:'c',ctrl:true}]},
       {sel:o.feesRow.split(':')[0], keys:[{key:'v',ctrl:true,alt:true},L('e'),{key:'Enter'}]},
@@ -231,408 +182,497 @@ const ALTS = [
       {sel:o.mixCol, keys:[{key:'d',ctrl:true}]},
       {sel:o.ratioBlk, keys:[{key:'r',ctrl:true}]},
     ]; }` },
-  /* r429 (DEPTH_PASS §4.22 wave 5): both foot entries rebuilt — the pre-rework pair hardcoded a
-     fixed 4x4 block at B2 (the grid is now 3-5 regions x 3-4 quarters and it moves), and predated
-     the dress beat, the cross-foot prove-out and the ☆. */
-  { key: 'foot', name: 'op-ORDER — columns before rows, typed SUMs (no alt+=), corner off the Total ROW edge (the ☆ must latch on EITHER edge)', moves: `C => { const o=C._o, mv=[];
-      mv.push({sel:'B'+o.tr, keys:[...T('=SUM(B'+o.r0+':B'+(o.tr-1)+')'),{key:'Enter'}]});
-      mv.push({sel:'B'+o.tr+':'+o.lastQ+o.tr, keys:[{key:'r',ctrl:true}]});
-      mv.push({sel:o.tCol+o.r0, keys:[...T('=SUM(B'+o.r0+':'+o.lastQ+o.r0+')'),{key:'Enter'}]});
-      mv.push({sel:o.tCol+o.r0+':'+o.tCol+(o.tr-1), keys:[{key:'d',ctrl:true}]});
-      mv.push({sel:o.tCol+o.tr, keys:[...T('=SUM(B'+o.tr+':'+o.lastQ+o.tr+')'),{key:'Enter'}]});
-      mv.push({sel:'A'+o.tr+':'+o.tCol+o.tr, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
-      mv.push({sel:o.tCol+o.r0+':'+o.tCol+o.tr, keys:[{key:'b',ctrl:true}]});
-      mv.push({sel:o.chk, keys:[...T('='+o.tCol+o.tr+'-SUM('+o.tCol+o.r0+':'+o.tCol+(o.tr-1)+')'),{key:'Enter'}]});
-      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
-      return mv; }` },
-  { key: 'foot', name: 'FREEDOM proof — corner re-summed off the RAW BLOCK and ribbon bold (☆ forfeited, all five cores clear)', moves: `C => { const o=C._o, mv=[];
-      mv.push({sel:o.tCol+o.r0, keys:[{key:'=',alt:true},{key:'Enter'}]});
-      mv.push({sel:o.tCol+o.r0+':'+o.tCol+(o.tr-1), keys:[{key:'d',ctrl:true}]});
-      mv.push({sel:'B'+o.tr, keys:[{key:'=',alt:true},{key:'Enter'}]});
-      mv.push({sel:'B'+o.tr+':'+o.lastQ+o.tr, keys:[{key:'r',ctrl:true}]});
-      mv.push({sel:o.tCol+o.tr, keys:[...T('=SUM(B'+o.r0+':'+o.lastQ+(o.tr-1)+')'),{key:'Enter'}]});
-      mv.push({sel:'A'+o.tr+':'+o.tCol+o.tr, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]});
-      mv.push({sel:o.tCol+o.r0+':'+o.tCol+o.tr, keys:[{key:'Alt'},L('h'),D(1)]});
-      mv.push({sel:o.chk, keys:[...T('='+o.tCol+o.tr+'-SUM('+o.tCol+o.r0+':'+o.tCol+(o.tr-1)+')'),{key:'Enter'}]});
-      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
-      return mv; }` },
-  /* r429: the r199-era decimals alt is RETIRED — it solved the pre-rework comps board
-     (o.evR/o.mR/o.pR are gone with §4.12). Its "columns in a different order" coverage lives on
-     inside the two r429 entries below, which also carry the ☆ earn/forfeit controls. */
+  /* r433 (foot DEPTH_PASS §4.22): the old single entry drove the retired fixed 4×4 board at B2.
+     Two entries now, per §1.8 / DoD #4 — ALT 1 is a different chord ROUTE (ribbon fills, ribbon
+     bold, ALL-borders instead of a top border, dialog percent-free) that still runs BOTH fills
+     through the corner, so the re-cut ☆ must FIRE on a chord set the demo never presses; ALT 2 is
+     a different op ORDER and the §1.0(c) FREEDOM proof — dress first, columns before rows, every
+     total TYPED (the row totals as bare numbers, no formula anywhere in the block), the corner
+     AutoSummed on its own and the tie check written against the ROW edge instead of the column.
+     Every core clears; the ☆ must NOT fire, because neither fill reaches the corner. */
+  { key: 'foot', name: 'RIBBON route with both fills carried through the corner (☆ still fires off Alt H F I D/R), ribbon bold, ALL borders on the total row, check written corner-minus-row', moves: `C => { const o=C._o; return [
+      {sel:o.rowSeed, keys:[{key:'Alt'},L('m'),L('u'),L('s'),{key:'Enter'}]},        // Alt M U S — the other AutoSum ribbon route
+      {sel:o.colRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},               // ribbon fill DOWN, through the corner
+      {sel:o.colSeed, keys:[{key:'Alt'},L('h'),L('u'),L('s'),{key:'Enter'}]},
+      {sel:o.rowRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},               // ribbon fill RIGHT, through the corner
+      {sel:o.rowRng,  keys:[{key:'Alt'},L('h'),D(1)]},                               // ribbon bold (Alt H 1) — the same toggle by another route
+      {sel:o.colRng,  keys:[{key:'Alt'},L('h'),D(1)]},                               // mixed selection (the corner is already bold) → Excel bolds ALL
+      {sel:o.rowRng,  keys:[{key:'Alt'},L('h'),L('b'),L('a')]},                      // ALL borders draws the top edge too (§1.0-R3(p))
+      {sel:o.chk,     keys:[...T('='+o.corner+'-SUM('+o.rowBody+')'),{key:'Enter'}]},// the corner against the ROW edge — the other legitimate cross-check
+    ]; }` },
+  { key: 'foot', name: 'SLOW + REVERSED: dress first, columns before rows, every total TYPED as a bare number (no formula in the block), corner AutoSummed alone — cores clear, ☆ forfeited', moves: `C => { const o=C._o; const cl=colLetter; return [
+      {sel:o.rowRng, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},                       // the rule lands before a single total exists — end-state grading must hold
+      {sel:o.rowRng, keys:[{key:'b',ctrl:true}]},
+      {sel:o.colRng, keys:[{key:'b',ctrl:true}]},
+      ...o.colSum.map((w,j)=>({sel:cl(o.cq1+j)+o.rt, keys:[...T(String(w)),{key:'Enter'}]})),
+      ...o.rowSum.map((w,i)=>({sel:o.CT+(o.r1+i),   keys:[...T(String(w)),{key:'Enter'}]})),
+      {sel:o.corner, keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},          // the corner totalled as a third act — the move the ☆ is hidden behind
+      {sel:o.chk,    keys:[...T('='+o.corner+'-'+o.CT+o.r1+(o.rowSum.slice(1).map((_,i)=>'-'+o.CT+(o.r1+1+i)).join(''))),{key:'Enter'}]},
+    ]; }` },
+  /* r432: rebuilt onto the round-3 board (the old entry drove the retired 3-column comps page).
+     Still the "reverse order" route, now with every dollar column taken SEPARATELY (☆ forfeited)
+     and the read line ruled with ALL borders — which draws a top edge, so the dress beat grades
+     the same as the Alt H B P route. */
+  { key: 'decimals', name: 'columns walked in reverse order, dollar columns one at a time (☆ forfeited), ragged cell reset via Ctrl+1, read line ruled with ALL borders', moves: `C => { const o=C._o; return [
+      {sel:'F'+o.r0+':F'+o.rN, keys:[{key:'Alt'},L('h'),D(9), {key:'Alt'},L('h'),D(9)]},
+      {sel:'E'+o.r0+':E'+o.rN, keys:[{key:'Alt'},L('h'),D(0)]},
+      {sel:'D'+o.r0+':D'+o.rN, keys:[{key:'Alt'},L('h'),D(9), {key:'Alt'},L('h'),D(9)]},
+      {sel:'C'+o.r0+':C'+o.rN, keys:[{key:'Alt'},L('h'),D(9), {key:'Alt'},L('h'),D(9)]},
+      {sel:'B'+o.r0+':B'+o.rN, keys:[{key:'Alt'},L('h'),D(9), {key:'Alt'},L('h'),D(9)]},
+      {sel:o.defCell, keys:[{key:'1',ctrl:true}, L(o.defKind==='mult'?'x':'n')]},
+      {sel:'A'+o.medR+':F'+o.medR, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('a')]},
+    ]; }` },
   /* r424 (D17): the colops entry is gone with the drill — its column-op alternates live on
      inside the two rowops entries above (ribbon vs chord routes, insert-vs-delete order). */
-  /* r429 (DEPTH_PASS §4.23 wave 5): both anchor entries rebuilt — the pre-rework pair stopped at
-     the fill (the drill now carries dollar-format, an outside border and the independent-check ☆),
-     and the grid moved off its nailed C4 site onto a 4-spot pool with 3-4 rows. ALT 1 = chord-ROUTE
-     (typed $ instead of F4, ctrl+1 for the money register, Alt H B A all-borders instead of B S —
-     the boxed check accepts either end state per §1.0-R2(m)). ALT 2 = the skippability control. */
-  /* r429 (DEPTH_PASS §4.30 wave 5): fxconvert had ZERO registered ALTS — one of the two audit
-     findings the page names (the other was guide 3-vs-5, also fixed). Two now, incl. the
-     ☆-forfeit control. */
-  { key: 'fxconvert', name: 'chord-ROUTE — typed $ anchors (no F4), ctrl+1 comma register, ribbon fills; the ☆ must still latch', moves: `C => [
-      {sel:'B3', keys:[...T(C._rateStr),{key:'Enter'}]},
-      {sel:'B3', keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-      {sel:'B3', keys:[{key:'Alt'},L('h'),L('b'),L('a')]},
-      {sel:'B10', keys:[...T('=B6*$B$3'),{key:'Enter'}]},
-      {sel:'B10:F10', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B10:F12', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:'B10:F12', keys:[{key:'1',ctrl:true},L('n')]},
-      {sel:'A10:F12', keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
-      {sel:'A1', keys:[{key:'s',ctrl:true}]},
-    ]` },
-  { key: 'fxconvert', name: 'FREEDOM proof — every conversion TYPED with the rate inline, no anchored formula and no fill (☆ forfeited, all five cores clear)', moves: `C => { const mv=[], r=C._rate;
-      mv.push({sel:'B3', keys:[...T(C._rateStr),{key:'Enter'}]});
-      mv.push({sel:'B3', keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]});
-      mv.push({sel:'B3', keys:[{key:'Alt'},L('h'),L('b'),L('a')]});
-      for(let i=0;i<3;i++) for(let j=0;j<5;j++){
-        mv.push({sel:colLetter(2+j)+(10+i), keys:[...T('='+colLetter(2+j)+(6+i)+'*'+C._rateStr),{key:'Enter'}]}); }
-      mv.push({sel:'B10:F12', keys:[{key:'Alt'},L('h'),L('k')]});
-      mv.push({sel:'A10:F12', keys:[{key:'Alt'},L('h'),L('b'),L('s')]});
-      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
-      return mv; }` },
-  { key: 'anchor', name: 'chord-ROUTE — dollars typed by hand (no F4), ctrl+1 money register, Alt H B A all-borders instead of the outside chord', moves: `C => { const o=C._o; return [
-      {sel:o.tl, keys:[...T('=$B'+o.r0+'*C$'+o.hr),{key:'Enter'}]},
-      {sel:o.col, keys:[{key:'d',ctrl:true}]},
-      {sel:o.grid, keys:[{key:'r',ctrl:true}]},
-      {sel:o.grid, keys:[{key:'1',ctrl:true},L('C')]},
-      {sel:o.grid, keys:[{key:'Alt'},L('h'),L('b'),L('a')]},
-      {sel:o.chk, keys:[...T('=B'+(o.r0+o.n-1)+'*'+o.lastC+o.hr),{key:'Enter'}]},
-      {sel:'A1', keys:[{key:'s',ctrl:true}]},
+  /* r433: both legacy anchor entries rebuilt onto the §4.23 board (the old ones drove _o.tl /
+     _o.col, which the depth pass replaced, and stopped before the format/border/save beats). */
+  { key: 'anchor', name: 'fill RIGHT first then DOWN (reversed fill order), dollars via ctrl+1 → C, ALL borders as the box', moves: `C => { const o=C._o; return [
+      {sel:o.corner, keys:[...T('=$'+o.VC+o.r0+'*'+o.PC[0]+'$'+o.hr),{key:'Enter'}]},
+      {sel:o.PC[0]+o.r0+':'+o.PC[2]+o.r0, keys:[{key:'r',ctrl:true}]},   // the seed ROW first…
+      {sel:o.grid, keys:[{key:'d',ctrl:true}]},                          // …then the whole grid down
+      {sel:o.grid, keys:[{key:'1',ctrl:true},L('c')]},                   // Format Cells → Currency, zero places
+      {sel:o.grid, keys:[{key:'Alt'},L('h'),L('b'),L('a')]},             // ALL borders — carries the perimeter the beat asks for
     ]; }` },
-  { key: 'anchor', name: 'pointer mode + F4, check cell left EMPTY (☆ forfeited, all five cores clear)', moves: `C => { const o=C._o; return [
-      {sel:o.tl, keys:[{key:'='},{key:'ArrowLeft'},{key:'F4'},{key:'F4'},{key:'F4'},{key:'*'},{key:'ArrowUp'},{key:'F4'},{key:'F4'},{key:'Enter'}]},
-      {sel:o.col, keys:[{key:'d',ctrl:true}]},
+  { key: 'anchor', name: 'POINT MODE + F4 — arrows grab both refs, F4 cycles the locks, ribbon dollars, outside box', moves: `C => { const o=C._o; return [
+      {sel:o.corner, keys:[{key:'='},{key:'ArrowLeft'},{key:'F4'},{key:'F4'},{key:'F4'},{key:'*'},{key:'ArrowUp'},{key:'F4'},{key:'F4'},{key:'Enter'}]},
+      {sel:o.col0, keys:[{key:'d',ctrl:true}]},
       {sel:o.grid, keys:[{key:'r',ctrl:true}]},
-      {sel:o.grid, keys:[{key:'$',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+      {sel:o.grid, keys:[{key:'Alt'},L('h'),L('a'),L('n')]},
       {sel:o.grid, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
-      {sel:'A1', keys:[{key:'s',ctrl:true}]},
     ]; }` },
-  { key: 'sort', name: 'foot and dress BEFORE sorting, single-column sort resolved via the WARNING (e expand)', moves: `C => { const o=C._o;
-      const m=o.range.match(/([A-J])(\\d+):([A-J])(\\d+)/);
+  /* r436 (sort depth pass, DEPTH_PASS §4.33). The pre-r436 entry ("foot and dress BEFORE
+     sorting, single-column sort resolved via the WARNING") drove the RETIRED 3-check board —
+     it read o.range / o.foot / o.sc off the old _o and there is no way to repair it into the
+     new one, so it was DELETED rather than edited. Both entries below replace it.
+     ALT 1 = different op ORDER + different chord ROUTE, and it KEEPS the ☆: the late deal is
+     entered FIRST so ONE ranking does the whole job, the grab is the WHOLE-BLOCK right-then-down
+     chord pair (the demo takes the single-column grab through the warning card instead — the
+     r436 provenance latch stamps both, because the flag is read at the press and not after the
+     expand rewrites the selection), the total is a hand-typed SUM, and the dress runs
+     ribbon-only (Alt H 1 / Alt H B P).
+     ALT 2 = the MEASURED NEGATIVE CONTROL for the ☆ (§1.0-R2(i) skippability): every grab
+     walked down with plain Shift+arrow, ascending sorts run twice to land descending, the
+     total typed as a chain of plus signs, bold via Alt H 1 and the border via Alt H B D. All
+     five cores must clear and the star must stay DARK. */
+  { key: 'sort', name: 'late deal FIRST so ONE ranking does it, WHOLE-BLOCK right-then-down chord grab instead of the warning card (the ☆ still fires), typed SUM, ribbon dress', moves: `C => { const o=C._o; return [
+      {sel:o.lateCell, keys:[...T(o.lateName),{key:'Enter'}]},
+      {sel:o.lateSizeCell, keys:[...T(String(o.lateSize)),{key:'Enter'}]},
+      {sel:o.top, keys:[{key:'ArrowRight',ctrl:true,shift:true},{key:'ArrowDown',ctrl:true,shift:true},{key:'Alt'},L('a'),L('s'),L('d')]},
+      {sel:o.foot, keys:[...T('=SUM('+o.SC+o.r1+':'+o.SC+(o.r1+6)+')'),{key:'Enter'}]},
+      {sel:o.totRow, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.totRow, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+    ]; }` },
+  { key: 'sort', name: 'NEGATIVE CONTROL for the ☆ — every block walked down with plain shift+arrow, two ASCENDING sorts, plus-chain total, Alt H 1 bold + Alt H B D border (five cores clear, star stays dark)', moves: `C => { const o=C._o;
+      const walk=(n)=>{ const k=[]; for(let i=0;i<n;i++) k.push({key:'ArrowDown',shift:true}); return k; };
       return [
-        {sel:o.foot, keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},
-        {sel:o.foot, keys:[{key:'b',ctrl:true}]},
-        {sel:o.sc+m[2]+':'+o.sc+m[4], keys:[{key:'Alt'},L('a'),L('s'),L('d'),L('e')]},
+        // grab six rows by hand: right one column, then step down five — the ☆ route refused
+        {sel:o.top, keys:[{key:'ArrowRight',shift:true}, ...walk(5), {key:'Alt'},L('a'),L('s'),L('a')]},
+        {sel:o.top, keys:[{key:'ArrowRight',shift:true}, ...walk(5), {key:'Alt'},L('a'),L('s'),L('d')]},
+        {sel:o.lateCell, keys:[...T(o.lateName),{key:'Enter'}]},
+        {sel:o.lateSizeCell, keys:[...T(String(o.lateSize)),{key:'Enter'}]},
+        {sel:o.top, keys:[{key:'ArrowRight',shift:true}, ...walk(6), {key:'Alt'},L('a'),L('s'),L('a')]},
+        {sel:o.top, keys:[{key:'ArrowRight',shift:true}, ...walk(6), {key:'Alt'},L('a'),L('s'),L('d')]},
+        {sel:o.foot, keys:[...T('='+o.SC+o.r1+'+'+o.SC+(o.r1+1)+'+'+o.SC+(o.r1+2)+'+'+o.SC+(o.r1+3)+'+'+o.SC+(o.r1+4)+'+'+o.SC+(o.r1+5)+'+'+o.SC+(o.r1+6)),{key:'Enter'}]},
+        {sel:o.totRow, keys:[{key:'Alt'},L('h'),D(1)]},
+        {sel:o.totRow, keys:[{key:'Alt'},L('h'),L('b'),L('d')]},
       ]; }` },
-  { key: 'series', name: 'dress first, series last', moves: `C => { const o=C._o; return [
-      {sel:o.range, keys:[{key:'b',ctrl:true}]},
-      {sel:o.range, keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
-      {sel:o.range, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('s'),{key:'Enter'}]},
+  /* r438 (series DEPTH PASS, DEPTH_PASS §4.43). The r169 entry that lived here — "dress first,
+     series last" — drove `o.range`, a five-cell header on a board with no Ref column, no
+     component lines and no indent beat. DELETED, not adapted: o.range no longer exists on any
+     seed. Do not resurrect it. ALT 1 = chord-ROUTE alt (ribbon bold instead of Ctrl+B, both
+     Series selections stretched one cell past the run, the indent taken in two passes, and the
+     dress applied BEFORE the run is filled — the ☆ still fires). ALT 2 = op-ORDER alt AND the
+     measured NEGATIVE CONTROL for the ☆: every value typed, nothing extended, all four cores
+     clear and the star must stay DARK (65 keys against the star route's 42). */
+  { key: 'series', name: 'chord-ROUTE: dress BEFORE the fill (ribbon bold Alt H 1), both Series runs selected one cell past the end, indent taken in two passes — the ☆ still fires', moves: `C => { const o=C._o; return [
+      {sel:o.hdrRun,  keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('a'),L('r')]},
+      {sel:o.hdrRun,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('s'),{key:'Enter'}]},
+      {sel:o.RL+o.r1+':'+o.RL+(o.r1+o.NC), keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('s'),{key:'Enter'}]},
+      {sel:o.LL+(o.r1+1)+':'+o.LL+(o.r1+3), keys:[{key:'Alt'},L('h'),D(6)]},
+      {sel:o.LL+(o.r1+4)+':'+o.LL+(o.r1+o.NC), keys:[{key:'Alt'},L('h'),D(6)]},
+    ]; }` },
+  { key: 'series', name: 'NEGATIVE CONTROL / op-ORDER: indent first, every year and every line number TYPED, nothing extended — all four cores clear and the \u2606 must stay DARK', moves: `C => { const o=C._o;
+      const yk=[]; for(let j=2;j<o.NY;j++){ yk.push(...T(String(o.y0+j))); yk.push(j===o.NY-1?{key:'Enter'}:{key:'Tab'}); }
+      const rk=[]; for(let i=2;i<=o.NC;i++){ rk.push(...T(String(o.ref0*(i+1)))); rk.push({key:'Enter'}); }
+      return [
+      {sel:o.compRng, keys:[{key:'Alt'},L('h'),D(6)]},
+      {sel:o.RL+(o.r1+2), keys:rk},
+      {sel:o.yc[2]+o.hr, keys:yk},
+      {sel:o.hdrRun, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('a'),L('r')]},
     ]; }` },
   // --- T-A tranche 2 additions (r170) ---
-  { key: 'lookup', name: 'the two-way INDEX form (block + double MATCH)', moves: `C => [
-      {sel:'G4', keys:[...T('=INDEX(B2:D8,MATCH(G2,A2:A8,0),MATCH(G3,B1:D1,0))'),{key:'Enter'}]},
-    ]` },
-  { key: 'lookup2', name: 'header-inclusive ranges (consistent off-by-one)', moves: `C => [
-      {sel:'G4', keys:[...T('=INDEX(B1:D6,MATCH(G2,A1:A6,0),MATCH(G3,B1:D1,0))'),{key:'Enter'}]},
-    ]` },
-  /* r429 (DEPTH_PASS §4.24 wave 5): both percent entries rebuilt — the pre-rework pair hardcoded
-     block A at C2:C6 (both blocks now site-shuffle), used C._R for what is now C._B, and predated
-     the one-decimal requirement, the bold-revenue beat and the ☆. */
-  { key: 'percent', name: 'chord-ROUTE — typed dollar anchors (no F4), unit B first, ribbon percent (Alt H P) and ribbon bold', moves: `C => { const A=C._A, B=C._B; return [
-      {sel:B.pc+B.r0, keys:[...T('='+B.vc+B.r0+'/$'+B.vc+'$'+B.r0),{key:'Enter'}]},
-      {sel:B.pc+B.r0+':'+B.pc+B.rN, keys:[{key:'d',ctrl:true},{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
-      {sel:A.pc+A.r0, keys:[...T('='+A.vc+A.r0+'/$'+A.vc+'$'+A.r0),{key:'Enter'}]},
-      {sel:A.pc+A.r0+':'+A.pc+A.rN, keys:[{key:'d',ctrl:true},{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
-      {sel:A.lc+A.r0+':'+A.pc+A.r0, keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:B.lc+B.r0+':'+B.pc+B.r0, keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'A1', keys:[{key:'s',ctrl:true}]},
-    ]; }` },
-  { key: 'percent', name: 'FREEDOM proof — every row written by hand with its own anchored formula, no fill at all (☆ forfeited, all five cores clear)', moves: `C => { const mv=[];
-      for(const blk of [C._A, C._B]){
-        for(let i=0;i<blk.n;i++){ const r=blk.r0+i;
-          mv.push({sel:blk.pc+r, keys:[...T('='+blk.vc+r+'/$'+blk.vc+'$'+blk.r0),{key:'Enter'}]}); }
-        mv.push({sel:blk.pc+blk.r0+':'+blk.pc+blk.rN, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
-        mv.push({sel:blk.lc+blk.r0+':'+blk.pc+blk.r0, keys:[{key:'b',ctrl:true}]});
-      }
-      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
-      return mv; }` },
-  /* r429 (DEPTH_PASS §4.27 wave 5): both bridge entries rebuilt — the pre-rework entry used o.f /
-     o.rng (gone) and stopped at the EBITDA fill; the drill now grows the revenue line off the memo
-     rates, totals the FY column and dresses the line. ALT 1 = chord-ROUTE, typed refs (no pointing)
-     with the RIBBON fill — the ☆ latch is chord-agnostic so it must still earn. ALT 2 = the
-     skippability control: both rows filled in CHUNKS instead of one pass. */
-  { key: 'bridge', name: 'chord-ROUTE — typed refs (no pointing at all) and ribbon fill right (Alt H F I R); the one-pass ☆ must still latch', moves: `C => { const o=C._o;
-      const CL=j=>colLetter(o.c0+j);
+  /* r436 (lookup DEPTH PASS, DEPTH_PASS §4.38). The r170 entry that lived here — a single
+     two-way INDEX typed into G4 against a 7-row table — drove the RETIRED board and was
+     DELETED, not adapted: G4/A2:A8/B1:D1 no longer exist on any seed. Do not resurrect it.
+     ALT 1 = chord-ROUTE alt: a locked VLOOKUP instead of INDEX/MATCH (the cores read VALUES,
+     never formula text — §1.0-R3(p)), the ribbon's Alt H F I D instead of Ctrl+D, the font
+     swatch walk instead of Cell Styles, the deck strip retyped instead of pasted, the THICK
+     box instead of Alt H B S, and the deck repair before the dress. The ☆ still fires.
+     ALT 2 = op-ORDER alt AND the measured NEGATIVE CONTROL for the ☆. */
+  { key: 'lookup', name: 'chord-ROUTE: locked VLOOKUP instead of INDEX/MATCH, ribbon fill alt h f i d, deck strip retyped BEFORE the dress, font-swatch walk instead of Cell Styles, thick box instead of outside borders — the ☆ still fires', moves: `C => { const o=C._o;
+      const vi=o.mL.charCodeAt(0)-o.LN.charCodeAt(0)+1;
+      const tbl='$'+o.LN+'$'+o.r1+':$'+o.mL+'$'+o.rL;
       return [
-        {sel:o.rev2, keys:[...T('='+CL(0)+(o.hr+1)+'*(1+'+CL(1)+(o.hr+5)+')'),{key:'Enter'}]},
-        {sel:o.revRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-        {sel:o.eb1, keys:[...T('='+CL(0)+(o.hr+1)+'*'+CL(0)+(o.hr+2)),{key:'Enter'}]},
-        {sel:o.ebRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-        {sel:o.fy, keys:[...T('=SUM('+CL(0)+(o.hr+3)+':'+CL(4)+(o.hr+3)+')'),{key:'Enter'}]},
-        {sel:o.ebRow, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
-        {sel:'A1', keys:[{key:'s',ctrl:true}]},
+        {sel:o.LPV+o.p0,  keys:[...T('=VLOOKUP('+o.LPL+o.p0+','+tbl+','+vi+',0)'),{key:'Enter'}]},
+        {sel:o.ansRng,    keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+        {sel:o.deck,      keys:[...T('=VLOOKUP('+o.LPL+o.dRow+','+tbl+','+vi+',0)'),{key:'Enter'}]},
+        {sel:o.ansRng,    keys:[{key:'Alt'},L('h'),L('f'),L('c'),
+                                {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},
+                                {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+        {sel:o.panel,     keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
       ]; }` },
-  { key: 'bridge', name: 'FREEDOM proof — both rows filled in CHUNKS, one column at a time (☆ forfeited, all six cores clear)', moves: `C => { const o=C._o, mv=[];
-      const CL=j=>colLetter(o.c0+j);
-      mv.push({sel:o.rev2, keys:[...T('='+CL(0)+(o.hr+1)+'*(1+'+CL(1)+(o.hr+5)+')'),{key:'Enter'}]});
-      for(let j=2;j<=4;j++) mv.push({sel:CL(j-1)+(o.hr+1)+':'+CL(j)+(o.hr+1), keys:[{key:'r',ctrl:true}]});
-      mv.push({sel:o.eb1, keys:[...T('='+CL(0)+(o.hr+1)+'*'+CL(0)+(o.hr+2)),{key:'Enter'}]});
-      for(let j=1;j<=4;j++) mv.push({sel:CL(j-1)+(o.hr+3)+':'+CL(j)+(o.hr+3), keys:[{key:'r',ctrl:true}]});
-      mv.push({sel:o.fy, keys:[{key:'=',alt:true},{key:'Enter'}]});
-      mv.push({sel:o.ebRow, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
-      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
-      return mv; }` },
-  /* r429 (DEPTH_PASS §4.14 wave 4): both autofit entries rebuilt — the pre-rework entry solved a
-     two-island board (o.uRng / o.a1 / o.a2 are gone with the headcount-roster rework). ALT 1 =
-     op-ORDER + the §1.0(c) FREEDOM proof (widths last, totals TYPED, label columns fitted one at a
-     time — every core clears, the one-pass ☆ is forfeited). ALT 2 = chord-ROUTE + SUPERSET ☆ proof
-     (a sweep wider than the two label columns still latches, and the quarter widths are re-set
-     afterwards so beat 2 survives the over-wide autofit). */
-  { key: 'autofit', name: 'op-ORDER reversed + FREEDOM proof — TYPED totals, label columns fitted one at a time (☆ forfeited, all five cores clear)', moves: `C => { const o=C._o; const mv=[];
-      for(let i=0;i<=o.nd;i++) mv.push({sel:o.tCol+(o.hr+1+i), keys:[...T(String(o.expect[i])),{key:'Enter'}]});
-      mv.push({sel:'A'+o.rt+':'+o.tCol+o.rt, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
-      mv.push({sel:'A'+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('i')]});
-      mv.push({sel:'B'+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('i')]});
-      mv.push({sel:o.tCol+(o.hr+1), keys:[{key:'Alt'},L('h'),L('o'),L('i')]});
-      mv.push({sel:o.qRng, keys:[{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(2),{key:'Enter'}]});
-      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
-      return mv; }` },
-  { key: 'autofit', name: 'chord-ROUTE + SUPERSET ☆ proof — one autofit across A:G (must latch), quarter widths re-set after, fill-down via the ribbon', moves: `C => { const o=C._o; return [
-      {sel:o.tCol+(o.hr+1), keys:[...T('=SUM('+o.q1+(o.hr+1)+':'+o.q4+(o.hr+1)+')'),{key:'Enter'}]},
-      {sel:o.tCol+(o.hr+1)+':'+o.tCol+o.rt, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:'A'+o.hr+':'+o.tCol+o.rt, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
-      {sel:o.qRng, keys:[{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(2),{key:'Enter'}]},
-      {sel:'A'+o.rt+':'+o.tCol+o.rt, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:'A1', keys:[{key:'s',ctrl:true}]},
-    ]; }` },
-  { key: 'editfix', name: 'range stretched FIRST, drift typed as a number (no ☆), memo mid-run, typos last in reverse', moves: `C => { const o=C._o;
-      const steps=[
-        {sel:o.totCell, keys:[{key:'F2'},{key:'Backspace'},{key:'Backspace'},...T(o.tailFix),{key:'Enter'}]},
-        {sel:o.driftCell, keys:[...T(String(o.feedVal)),{key:'Enter'}]},
-        {sel:o.memoCell, keys:[{key:'5',ctrl:true}]},
-      ];
-      [o.s2,o.s1].forEach(s2=>{
-        let p=0; while(p<s2.bad.length && p<s2.good.length && s2.bad[p]===s2.good[p]) p++;
-        const keys=[{key:'F2'}];
-        for(let i=0;i<s2.bad.length-p;i++) keys.push({key:'Backspace'});
-        keys.push(...T(s2.good.slice(p)),{key:'Enter'});
-        steps.push({sel:s2.cell, keys});
-      });
-      return steps; }` },
-  /* r425 (editfix rework): chord-ROUTE alt — a ZERO-F2 run. Typos and the total fixed by full
-     retype (slow but legal — §1.0(c) freedom re-affirmed), the strike via the ctrl+1 K Font-tab
-     route, the drift repaired by reference (the ☆ route inside an otherwise slow run). */
-  { key: 'editfix', name: 'zero-F2 run — full retypes + ctrl+1 K strike + drift by reference (☆ route)', moves: `C => { const o=C._o; return [
-      {sel:o.s1.cell, keys:[...T(o.s1.good),{key:'Enter'}]},
-      {sel:o.s2.cell, keys:[...T(o.s2.good),{key:'Enter'}]},
-      {sel:o.driftCell, keys:[...T('='+o.feedCell),{key:'Enter'}]},
-      {sel:o.memoCell, keys:[{key:'1',ctrl:true},L('k')]},
-      {sel:o.totCell, keys:[...T('=SUM(C11:C12)'),{key:'Enter'}]},
-    ]; }` },
-  { key: 'drill', name: 'values paste via the H V S dialog route', moves: `C => [
-      {sel:'B3:B8', keys:[{key:'c',ctrl:true}]},
-      {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
-      {sel:'B3:B8', keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-    ]` },
-  { key: 'dress', name: 'op-ORDER bottom-up: outline FIRST, ☆ one-pass comma via ctrl+shift+!, masthead LAST with a double-bottom rule (tightened CHECK1 accepts bdbl)', moves: `C => { const R=C._R; return [
-      {sel:'A'+R.mRow+':E'+R.mRow, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
-      {sel:R.mRowRange, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]},
-      {sel:'A'+R.tRow+':E'+R.tRow, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:R.fRange, keys:[{key:'!',ctrl:true,shift:true}]},
-      {sel:R.costRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-      {sel:R.segRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-      {sel:'A1', keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('b')]},
-    ]; }` },
-  { key: 'dress', name: 'chord-ROUTE: ribbon bold (alt h 1), ctrl+1 dialog comma/percent, all-borders outline (alt h b a) — commas row-by-row, ☆ forfeited, core clears', moves: `C => { const R=C._R;
-      const steps=[
-        {sel:'A1', keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('o')]},
-        {sel:R.segRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-        {sel:R.costRange, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-      ];
-      for(let r=R.segR0;r<=R.tRow;r++) steps.push({sel:'B'+r+':E'+r, keys:[{key:'1',ctrl:true},L('n')]});   // the slow way — every row its own pass; no fmtOps rect covers the body
-      steps.push({sel:'A'+R.tRow+':E'+R.tRow, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]});
-      steps.push({sel:R.mRowRange, keys:[{key:'1',ctrl:true},L('p')]});
-      steps.push({sel:'A'+R.mRow+':E'+R.mRow, keys:[{key:'Alt'},L('h'),L('b'),L('a')]});
-      return steps; }` },
-  { key: 'scrub', name: 'junk deleted TOP-DOWN (shift math) + typed SUM', moves: `C => { const o=C._o;
-      const rows=o.junkRows.slice().sort((a,b)=>a-b);
-      const steps=rows.map((r,i)=>({sel:'A'+(r-i), keys:[{key:'Alt'},L('h'),L('d'),L('r')]}));
-      steps.push({sel:o.range, keys:[{key:'Alt'},L('a'),L('s'),L('d')]});
-      steps.push({sel:o.foot, keys:[...T('=SUM(B'+(o.hr+1)+':B'+(o.hr+7)+')'),{key:'Enter'}]});
-      steps.push({sel:o.foot, keys:[{key:'b',ctrl:true}]});
-      return steps; }` },
-  { key: 'recon', name: 'typo fixed FIRST, diff before flags', moves: `C => { const o=C._o; return [
-      {sel:'E'+o.badRow, keys:[...T(String(o.badTrue)),{key:'Enter'}]},
-      {sel:'D10', keys:[...T(o.missName),{key:'Enter'}]},
-      {sel:'E10', keys:[...T(String(o.missAmt)),{key:'Enter'}]},
-      {sel:'F4', keys:[...T('=E4-INDEX($B$4:$B$10,MATCH(D4,$A$4:$A$10,0))'),{key:'Enter'}]},
-      {sel:'F4:F10', keys:[{key:'d',ctrl:true}]},
-      {sel:'C4', keys:[...T('=COUNTIF($D$4:$D$10,A4)'),{key:'Enter'}]},
-      {sel:'C4:C10', keys:[{key:'d',ctrl:true}]},
-    ]; }` },
-  { key: 'grpfold', name: 'quarters in REVERSE + one reopened and refolded (alt a j proof)', moves: `C => { const o=C._o;
+  { key: 'lookup', name: 'NEGATIVE CONTROL / op-ORDER: deck strip repaired FIRST, then the three screen amounts typed bottom-up as separate formulas with no fill anywhere, font-swatch walk, four per-edge border walks — all five cores clear, ☆ dark (163 keys against the demo’s 55)', moves: `C => { const o=C._o;
+      const F=row=>'=INDEX('+o.mL+o.r1+':'+o.mL+o.rL+',MATCH('+o.LPL+row+','+o.LN+o.r1+':'+o.LN+o.rL+',0))';
+      return [
+        {sel:o.deck,     keys:[...T(F(o.dRow)),{key:'Enter'}]},
+        {sel:o.LPV+o.p2, keys:[...T(F(o.p2)),{key:'Enter'}]},
+        {sel:o.LPV+o.p1, keys:[...T(F(o.p1)),{key:'Enter'}]},
+        {sel:o.LPV+o.p0, keys:[...T(F(o.p0)),{key:'Enter'}]},
+        {sel:o.ansRng,   keys:[{key:'Alt'},L('h'),L('f'),L('c'),
+                               {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},
+                               {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+        {sel:o.LPL+o.hr+':'+o.LPV+o.hr,         keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+        {sel:o.LPL+(o.hr+4)+':'+o.LPV+(o.hr+4), keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
+        {sel:o.LPL+o.hr+':'+o.LPL+(o.hr+4),     keys:[{key:'Alt'},L('h'),L('b'),L('l')]},
+        {sel:o.LPV+o.hr+':'+o.LPV+(o.hr+4),     keys:[{key:'Alt'},L('h'),L('b'),L('r')]},
+      ]; }` },
+  /* r437 (lookup2 ROUND 3, DEPTH_PASS §4.40 + the ⚠️ BINDING CONSTRAINT block): the r169 entry
+     that used to live here ("header-inclusive ranges") was DELETED — it was hard-wired to the
+     old G4 / B1:D6 board, which no longer exists. ALT 1 = chord-ROUTE alt: the three ranges are
+     typed BARE and locked with F4 instead of typed with dollars, the block is bordered FIRST and
+     with ALL borders rather than a top rule, and the pack cards are served p.9-before-p.4 — the
+     ☆ still fires, because it grades the paste MECHANIC, not the order. ALT 2 = the NEGATIVE
+     CONTROL and op-ORDER alt: three separately hand-typed UNLOCKED reads, no copy anywhere, the
+     missing header entered LAST (so every read is #N/A until the final keystroke re-prices it),
+     and each card bordered on its own with outside borders. All five cores clear; the ☆ must
+     stay dark. Measured: 71-73 keys for ALT 1, 167 for ALT 2, against the demo's 76. */
+  { key: 'lookup2', name: 'chord-ROUTE: bare ranges locked with F4 instead of typed dollars, ALL borders drawn FIRST and one card at a time, pack cards served p.9 before p.4 — the ☆ still fires', moves: `C => { const o=C._o;
+      const g=o.gridR.replace(/[$]/g,''), sg=o.segR.replace(/[$]/g,''), qt=o.qtrR.replace(/[$]/g,'');
+      return [
+        {sel:o.AL+o.pr+':'+o.AV+o.pr, keys:[{key:'Alt'},L('h'),L('b'),L('a')]},           // the rule goes down before any read exists…
+        {sel:o.BL+o.pr+':'+o.BV+o.pr, keys:[{key:'Alt'},L('h'),L('b'),L('a')]},           // …and ALL borders carries the top edge
+        {sel:o.mCell, keys:[...T(o.mQ),{key:'Enter'}]},
+        {sel:o.fRead, keys:[...T('=INDEX('+g),{key:'F4'},...T(',MATCH('+o.FV+o.hr+','+sg),{key:'F4'},
+                             ...T(',0),MATCH('+o.FV+(o.hr+1)+','+qt),{key:'F4'},...T(',0))'),{key:'Enter'}]},
+        {sel:o.fRead, keys:[{key:'c',ctrl:true}]},
+        {sel:o.bRead, keys:[{key:'v',ctrl:true}]},                                        // p.9 lands first this time
+        {sel:o.aRead, keys:[{key:'v',ctrl:true}]},
+      ]; }` },
+  { key: 'lookup2', name: 'NEGATIVE CONTROL / op-ORDER: three UNLOCKED reads hand-typed one at a time with no copy anywhere, the missing header entered LAST, each card bordered on its own — all five cores clear, ☆ dark (167 keys against the demo’s 76)', moves: `C => { const o=C._o;
+      const g=o.gridR.replace(/[$]/g,''), sg=o.segR.replace(/[$]/g,''), qt=o.qtrR.replace(/[$]/g,'');
+      const F=(sc,qc)=>'=INDEX('+g+',MATCH('+sc+','+sg+',0),MATCH('+qc+','+qt+',0))';
+      return [
+        {sel:o.aRead, keys:[...T(F(o.AV+o.pr, o.AV+(o.pr+1))),{key:'Enter'}]},            // p.4 repaired by retyping, before anything else
+        {sel:o.bRead, keys:[...T(F(o.BV+o.pr, o.BV+(o.pr+1))),{key:'Enter'}]},
+        {sel:o.fRead, keys:[...T(F(o.FV+o.hr, o.FV+(o.hr+1))),{key:'Enter'}]},            // still #N/A — its header is not on the board yet
+        {sel:o.AL+o.pr+':'+o.AV+o.pr, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
+        {sel:o.BL+o.pr+':'+o.BV+o.pr, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
+        {sel:o.mCell, keys:[...T(o.mQ),{key:'Enter'}]},                                   // the header LAST: one commit re-prices the flash read
+      ]; }` },
+  { key: 'autofit', name: 'run BACKWARDS — totals first as typed addition chains, dress next, then widths right-to-left with the labels last (no fill, so no star)', moves: `C => { const o=C._o;
       const steps=[];
-      o.blocks.slice().reverse().forEach(b=>{
-        steps.push({sel:'A'+b.r1+':A'+b.r2, keys:[{key:'ArrowRight',alt:true,shift:true}]});
-        steps.push({sel:'A'+b.r1, keys:[{key:'Alt'},L('a'),L('h')]});
-      });
-      const b0=o.blocks[0];
-      steps.push({sel:'A'+b0.sub, keys:[{key:'Alt'},L('a'),L('j')]});   // reopen from the summary row
-      steps.push({sel:'A'+b0.r1, keys:[{key:'Alt'},L('a'),L('h')]});    // fold it back
+      for(let r=o.r0;r<=o.tr;r++)
+        steps.push({sel:o.tcL+r, keys:[...T('='+o.qL[0]+r+'+'+o.qL[1]+r+'+'+o.qL[2]+r+'+'+o.qL[3]+r),{key:'Enter'}]});
+      steps.push({sel:o.lc1L+o.tr+':'+o.tcL+o.tr, keys:[{key:'Alt'},L('h'),D(1)]});                    // ribbon bold, before any column is sized
+      steps.push({sel:o.lc1L+o.tr+':'+o.tcL+o.tr, keys:[{key:'Alt'},L('h'),L('b'),L('p')]});
+      steps.push({sel:o.tcL+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('i')]});
+      steps.push({sel:o.qL[0]+o.hr+':'+o.qL[3]+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(2),{key:'Enter'}]});
+      steps.push({sel:o.lc1L+o.hr+':'+o.lc2L+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('i')]});          // the labels come last this time
       return steps; }` },
-  { key: 'filterpass', name: 'answer typed FIRST, armed via ribbon (alt a t) from A3, chips swept right-to-left', moves: `C => { const o=C._o;
-      const pk=[{key:'ArrowDown',alt:true}];
-      for(let i=0;i<o.chips.length-1;i++) pk.push({key:'ArrowRight'});
-      for(let i=o.chips.length-1;i>=0;i--){ if(o.chips[i]!=='Open') pk.push({key:' '}); if(i>0) pk.push({key:'ArrowLeft'}); }
-      pk.push({key:'Enter'});
+  { key: 'autofit', name: 'autosum totals (alt+= per line), whole-column ctrl+space selections, Total column sized by a TYPED width not a fit, ribbon bold', moves: `C => { const o=C._o;
+      const steps=[];
+      for(let r=o.r0;r<=o.tr;r++)   // Excel's RANGE autosum: select the line THROUGH its empty total cell, alt+= commits it
+        steps.push({sel:o.qL[0]+r+':'+o.tcL+r, keys:[{key:'=',alt:true,code:'Equal'}]});
+      steps.push({sel:o.lc1L+o.hr+':'+o.lc2L+o.hr, keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('o'),L('i')]});
+      steps.push({sel:o.qL[0]+o.hr+':'+o.qL[3]+o.hr, keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(2),{key:'Enter'}]});
+      steps.push({sel:o.tcL+o.hr, keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(6),{key:'Enter'}]});   // width 16 = 117px — wider than the grand total needs, and it reads the same
+      steps.push({sel:o.lc1L+o.tr+':'+o.tcL+o.tr, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]});
+      return steps; }` },
+  /* r431 (merged drill): FREEDOM route — the junk cleared FIRST, SCRATCH A restored by RETYPING
+     every value instead of undoing, and both formula repairs written as explicit additions
+     rather than SUM ranges. Every core beat still clears (§1.0(c) grades the end state), and
+     the ☆ must NOT light: no undo ever ran, so the deepUndo latch cannot fire. */
+  { key: 'editfix', name: 'junk FIRST, SCRATCH A retyped back (no undo at all — Freedom), additions not SUMs — cores clear, no star', moves: `C => { const o=C._o;
+      const steps=[
+        {sel:o.rightRng, keys:[{key:'Delete'}]},
+        {sel:o.wrongRng, keys:[{key:'Delete'}]},
+      ];
+      o.aCells.forEach((k,i)=>steps.push({sel:k, keys:[...T(String(o.aVals[i])),{key:'Enter'}]}));
+      steps.push({sel:o.typoCell,  keys:[...T(o.good),{key:'Enter'}]});
+      steps.push({sel:o.badFyCell, keys:[...T('=B'+o.badRow+'+C'+o.badRow+'+D'+o.badRow),{key:'Enter'}]});
+      steps.push({sel:o.totCell,   keys:[...T('=E5+E6+E7'),{key:'Enter'}]});
+      return steps; }` },
+  /* r431: chord-ROUTE alt — the clear walked through the ribbon clear menu (alt h e c,
+     contents only) instead of Delete, and the ☆ taken on the OTHER redo chord
+     (ctrl+shift+z, not ctrl+y). Same beats, different keys throughout. */
+  { key: 'editfix', name: 'ribbon clear (alt h e c), deep undo + ctrl+shift+z redo (the star on the other chord)', moves: `C => { const o=C._o; return [
+      {sel:o.typoCell,  keys:[...T(o.good),{key:'Enter'}]},
+      {sel:o.badFyCell, keys:[...T('=SUM(B'+o.badRow+':D'+o.badRow+')'),{key:'Enter'}]},
+      {sel:o.totCell,   keys:[...T('=SUM(E5:E7)'),{key:'Enter'}]},
+      {sel:o.wrongRng,  keys:[{key:'Alt'},L('h'),L('e'),L('c')]},
+      {sel:o.wrongRng,  keys:[{key:'z',ctrl:true}]},
+      {sel:o.totCell,   keys:[{key:'z',ctrl:true},{key:'z',ctrl:true},{key:'z',ctrl:true}]},
+      {sel:o.totCell,   keys:[{key:'z',ctrl:true,shift:true},{key:'z',ctrl:true,shift:true},{key:'z',ctrl:true,shift:true}]},
+      {sel:o.rightRng,  keys:[{key:'Delete'}]},
+    ]; }` },
+  /* r438 (drill DEPTH PASS, DEPTH_PASS §4.42). The r169 entry that lived here — "values paste
+     via the H V S dialog route" — drove the hard-coded B3:B8 site of the RETIRED board, which
+     no seed produces now (the block anchors at A or B, the header row is 3 or 4, and the Draft
+     working column can sit on either side of the send-out pair). DELETED, not adapted. Do not
+     resurrect it. ALT 1 = chord-ROUTE alt: the tiled paste through the Ctrl+Alt+V dialog rather
+     than Alt E S V, the feed cleared with Alt H E C rather than Del, and the blue pass moved
+     ahead of the archive — the ☆ still fires. ALT 2 = op-ORDER alt AND the measured NEGATIVE
+     CONTROL for the ☆: the archive served by its OWN second paste through the legacy Alt H V S
+     dialog, so nothing is ever broadcast; all four cores clear and the star must stay DARK
+     (31 keys against the star route's 21). */
+  { key: 'drill', name: 'chord-ROUTE: the tiled values-paste through the Ctrl+Alt+V dialog, blue BEFORE the feed dies, feed cleared with Alt H E C instead of Del \u2014 the \u2606 still fires', moves: `C => { const o=C._o; return [
+      {sel:o.finTop,  keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'c',ctrl:true},{key:'ArrowRight',shift:true},{key:'v',ctrl:true,alt:true},L('v'),{key:'Enter'}]},
+      {sel:o.finRng,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+      {sel:o.feedRng, keys:[{key:'Alt'},L('h'),L('e'),L('c')]},
+    ]; }` },
+  { key: 'drill', name: 'NEGATIVE CONTROL / op-ORDER: the archive served by its own SECOND paste (legacy Alt H V S dialog), archive before the flatten, blue last \u2014 all four cores clear and the \u2606 must stay DARK', moves: `C => { const o=C._o; return [
+      {sel:o.finTop,  keys:[{key:'ArrowDown',ctrl:true,shift:true},{key:'c',ctrl:true}]},
+      {sel:o.sentRng, keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
+      {sel:o.finRng,  keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('v'),{key:'Enter'}]},
+      {sel:o.feedRng, keys:[{key:'Delete'}]},
+      {sel:o.finRng,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+    ]; }` },
+  /* r436 (scrub ROUND 3, DEPTH_PASS §4.34): both entries rebuilt for the reworked drill — the
+     old single entry drove the RETIRED board (o.range / o.foot no longer exist, the duplicate
+     record and the dress beat did not exist, and it never touched the ☆) and was DELETED, not
+     patched. ALT 1 is the chord-ROUTE alt and the drill's NEGATIVE CONTROL: every structure op
+     on the Home ribbon, the sort through Excel's expand-the-selection warning card, the total
+     TYPED — all five cores clear and the ☆ must stay dark (41 keys against the demo's 20).
+     ALT 2 is the op-ORDER alt and the third delete route: the junk rows and the repeat are
+     CLEARED, not deleted, then one sort re-forms the block, and the total comes off the Home
+     ribbon's autosum (Alt H U S) instead of Alt+= — which must earn the same ☆. */
+  { key: 'scrub', name: 'NEGATIVE CONTROL — ribbon deletes (Alt H D R) from single cells, sort via the expand-selection warning card, SUM typed by hand, bold via Alt H 1 (every core clears, the ☆ must stay dark)', moves: `C => { const o=C._o;
+      const steps=[]; const top=o.hr+1;
+      o.junkRows.slice().sort((a,b)=>b-a).forEach(r=>{ steps.push({sel:'A'+r, keys:[{key:'Alt'},L('h'),L('d'),L('r')]}); });
+      steps.push({sel:'C'+top+':C'+(top+7), keys:[{key:'Alt'},L('a'),L('s'),L('d'),L('e')]});   // single-column sort → Excel's warning card → E expands to the block
+      steps.push({sel:'A'+(top+o.dupRank+1), keys:[{key:'Alt'},L('h'),L('d'),L('r')]});
+      steps.push({sel:'C'+(top+7), keys:[...T('=SUM(C'+top+':C'+(top+6)+')'),{key:'Enter'}]});  // typed, never autosum — this is what the ☆ is measured against
+      steps.push({sel:'A'+(top+7)+':C'+(top+7), keys:[{key:'Alt'},L('h'),D(1)]});
+      steps.push({sel:'A'+(top+7)+':C'+(top+7), keys:[{key:'Alt'},L('h'),L('b'),L('p')]});
+      return steps; }` },
+  { key: 'scrub', name: 'junk and the repeat CLEARED not deleted, ONE sort re-forms the block, total off the ribbon autosum (alt h u s)', moves: `C => { const o=C._o;
+      const steps=[]; const top=o.hr+1, last=o.hr+11, foot=o.footRow;
+      o.junkRows.forEach(r=>{ steps.push({sel:'A'+r+':C'+r, keys:[{key:'Delete'}]}); });
+      steps.push({sel:'A'+o.dupRows[1]+':C'+o.dupRows[1], keys:[{key:'Delete'}]});
+      steps.push({sel:'A'+top+':C'+last, keys:[{key:'Alt'},L('a'),L('s'),L('d')]});             // one sort: the four emptied rows part company with the deals
+      steps.push({sel:'C'+top+':C'+foot, keys:[{key:'Alt'},L('h'),L('u'),L('s')]});             // the ribbon's autosum — same ☆ as alt+=
+      steps.push({sel:'A'+foot+':C'+foot, keys:[{key:'b',ctrl:true}]});
+      steps.push({sel:'A'+foot+':C'+foot, keys:[{key:'Alt'},L('h'),L('b'),L('p')]});
+      return steps; }` },
+  /* r437 (DEPTH_PASS §4.41): both entries rebuilt for the reworked recon board. The single
+     pre-r437 entry ("typo fixed FIRST, diff before flags") was DELETED — it drove hard-coded
+     C4/D10/E10/F4:F10 against a board that now anchors at column A or B with its header row at
+     3 or 4, so it could not survive the randomization rebuild, and it predated the check cell
+     entirely. ALT 1 = chord-ROUTE alt (VLOOKUP instead of INDEX/MATCH, ribbon fills, the legacy
+     Alt E S paste dialog, a typed addition chain for the check — the ☆ still fires on the other
+     paste chord). ALT 2 = op-ORDER alt AND the MEASURED negative control for the ☆. */
+  { key: 'recon', name: 'chord-ROUTE: VLOOKUP instead of INDEX/MATCH, ribbon fills (alt h f i d), the deal carried by the legacy Alt E S dialog paste, check line as a typed addition chain instead of SUM — every core clears and the ☆ still fires', moves: `C => { const o=C._o;
+      const chain='='+o.LD+o.r1; let s=chain;
+      for(let r=o.r1+1;r<=o.rL;r++) s+='+'+o.LD+r;
       return [
-        {sel:'B'+o.ansR, keys:[...T(String(o.maxOpen)),{key:'Enter'}]},
-        {sel:'A3', keys:[{key:'Alt'},L('a'),L('t')]},
-        {sel:'C3', keys:pk},
+        {sel:o.LFL+o.r1, keys:[...T('=COUNTIF('+o.cntR+','+o.LTN+o.r1+')'),{key:'Enter'}]},
+        {sel:o.flagRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+        {sel:o.srcRng,   keys:[{key:'c',ctrl:true}]},
+        {sel:o.LFN+o.rL, keys:[{key:'Alt'},L('e'),L('s'),{key:'Enter'}]},
+        {sel:o.LD+o.r1,  keys:[...T('='+o.LFA+o.r1+'-VLOOKUP('+o.LFN+o.r1+',$'+o.LTN+'$'+o.r1+':$'+o.LTA+'$'+o.rL+',2,0)'),{key:'Enter'}]},
+        {sel:o.dRng,     keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+        {sel:o.LFA+o.badRow, keys:[...T(String(o.badTrue)),{key:'Enter'}]},
+        {sel:o.chk,      keys:[...T(s),{key:'Enter'}]},
       ]; }` },
-  { key: 'typeset', name: 'RIBBON routes — bold/unbold via Alt H 1, italics line-by-line via Alt H 2 (☆ forfeited, core clears), strike via ctrl+1 K', moves: `C => { const o=C._o; return [
+  { key: 'recon', name: 'NEGATIVE CONTROL / op-ORDER: check line written FIRST over an empty column, repair before the carry, the missing deal TYPED, then every difference and every presence count hand-written bottom-up with no fill and no paste anywhere — all five cores clear, ☆ dark (20-seed median 474 keys against the demo’s flat 88)', moves: `C => { const o=C._o;
+      const st=[];
+      st.push({sel:o.chk, keys:[...T('=SUM('+o.LD+o.r1+':'+o.LD+o.rL+')'),{key:'Enter'}]});
+      st.push({sel:o.LFA+o.badRow, keys:[...T(String(o.badTrue)),{key:'Enter'}]});
+      st.push({sel:o.LFN+o.rL, keys:[...T(o.missName),{key:'Enter'}]});
+      st.push({sel:o.LFA+o.rL, keys:[...T(String(o.missAmt)),{key:'Enter'}]});
+      for(let r=o.rL;r>=o.r1;r--)
+        st.push({sel:o.LD+r, keys:[...T('='+o.LFA+r+'-INDEX('+o.LTA+o.r1+':'+o.LTA+o.rL+',MATCH('+o.LFN+r+','+o.LTN+o.r1+':'+o.LTN+o.rL+',0))'),{key:'Enter'}]});
+      for(let r=o.rL;r>=o.r1;r--)
+        st.push({sel:o.LFL+r, keys:[...T('=COUNTIF('+o.LFN+o.r1+':'+o.LFN+o.rL+','+o.LTN+r+')'),{key:'Enter'}]});
+      return st; }` },
+  { key: 'filterpass', name: 'op ORDER: the graded status screen FIRST, its two figures typed, then the sector screen and back again (☆ lit — the toggle retires both screens)', moves: `C => { const o=C._o;
+      const pick=(chips,keep)=>{ const pk=[{key:'ArrowDown',alt:true}];
+        chips.forEach((v,i)=>{ if(v!==keep) pk.push({key:' '}); if(i<chips.length-1) pk.push({key:'ArrowRight'}); });
+        pk.push({key:'Enter'}); return pk; };
+      return [
+        {sel:o.CT+o.hr, keys:[{key:'l',ctrl:true,shift:true}]},
+        {sel:o.CT+o.hr, keys:pick(o.statChips,o.statusX)},
+        {sel:o.CS+o.ansR2, keys:[...T(String(o.ans2)),{key:'Enter'}]},
+        {sel:o.CS+o.ansR3, keys:[...T(String(o.ans3)),{key:'Enter'}]},
+        {sel:o.CE+o.hr, keys:[{key:'l',ctrl:true,shift:true},{key:'l',ctrl:true,shift:true}]},
+        {sel:o.CE+o.hr, keys:pick(o.sectChips,o.sectorA)},
+        {sel:o.CS+o.ansR1, keys:[...T(String(o.ans1)),{key:'Enter'}]},
+        {sel:o.CT+o.hr, keys:[{key:'l',ctrl:true,shift:true},{key:'l',ctrl:true,shift:true}]},
+        {sel:o.CT+o.hr, keys:pick(o.statChips,o.statusX)},
+      ]; }` },
+  /* THE ☆ SKIPPABILITY PROOF, MEASURED (§1.0-R2(i), and the §2 headroom law). Identical work to
+     the demo, except the first screen is walked BACK through its own picker chip by chip instead
+     of being discarded with the toggle. Walked on the live engine: 30 keys against the demo's
+     24, five of five cores GREEN, and S.filterClears never stamps — so the ☆ must stay DARK.
+     If this entry ever earns the star, the latch has started reading something it should not. */
+  { key: 'filterpass', name: 'NEGATIVE CONTROL — the sector picker walked back to All instead of the toggle (30 keys vs 24; every core clears, ☆ MUST stay dark)', moves: `C => { const o=C._o;
+      const pick=(chips,keep)=>{ const pk=[{key:'ArrowDown',alt:true}];
+        chips.forEach((v,i)=>{ if(v!==keep) pk.push({key:' '}); if(i<chips.length-1) pk.push({key:'ArrowRight'}); });
+        pk.push({key:'Enter'}); return pk; };
+      return [
+        {sel:o.CE+o.hr, keys:[{key:'l',ctrl:true,shift:true}]},
+        {sel:o.CE+o.hr, keys:pick(o.sectChips,o.sectorA)},
+        {sel:o.CS+o.ansR1, keys:[...T(String(o.ans1)),{key:'Enter'}]},
+        {sel:o.CE+o.hr, keys:pick(o.sectChips,o.sectorA)},   // every dropped chip switched back on
+        {sel:o.CT+o.hr, keys:pick(o.statChips,o.statusX)},
+        {sel:o.CS+o.ansR2, keys:[...T(String(o.ans2)),{key:'Enter'}]},
+        {sel:o.CS+o.ansR3, keys:[...T(String(o.ans3)),{key:'Enter'}]},
+      ]; }` },
+  /* Different CHORD ROUTE (§1.8): the value picker is never opened. The filter is armed from the
+     ribbon (Alt A T), both screens are built by hand-hiding every non-matching row with
+     Shift+Space / Ctrl+9, and the first screen is put back with Ctrl+Shift+9. 39 keys against
+     the demo's 24 — this is the "obvious slow route" the §2 headroom diagnostic measures against,
+     and it clears all five cores, which is §1.0(c) freedom proved rather than asserted. */
+  { key: 'filterpass', name: 'chord ROUTE — ribbon arm (alt a t) and both screens hand-hidden with shift+space / ctrl+9, no picker ever opened (39 keys, all cores clear, ☆ dark)', moves: `C => { const o=C._o;
+      const steps=[{sel:o.CE+o.hr, keys:[{key:'Alt'},L('a'),L('t')]}];
+      o.rows.filter(x=>x.sect!==o.sectorA).forEach(x=>{
+        steps.push({sel:o.CD+x.r, keys:[{key:' ',shift:true},{key:'9',ctrl:true}]}); });
+      steps.push({sel:o.CS+o.ansR1, keys:[...T(String(o.ans1)),{key:'Enter'}]});
+      steps.push({sel:o.CD+(o.hr+1)+':'+o.CD+(o.hr+o.nD), keys:[{key:'(',ctrl:true,shift:true}]});
+      o.rows.filter(x=>x.stat!==o.statusX).forEach(x=>{
+        steps.push({sel:o.CD+x.r, keys:[{key:' ',shift:true},{key:'9',ctrl:true}]}); });
+      steps.push({sel:o.CS+o.ansR2, keys:[...T(String(o.ans2)),{key:'Enter'}]});
+      steps.push({sel:o.CS+o.ansR3, keys:[...T(String(o.ans3)),{key:'Enter'}]});
+      return steps; }` },
+  /* r431: the strike route is gone with r430's strike->red-font beat. Red is applied CELL BY
+     CELL here (the demo does the whole range in one pass), so the per-cell path still grades. */
+  { key: 'typeset', name: 'RIBBON routes — bold/unbold via Alt H 1, italics line-by-line via Alt H 2 (☆ forfeited, core clears), red applied cell by cell', moves: `C => { const o=C._o;
+      const RED=[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}];
+      return [
       {sel:'A2:D2', keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:o.wbRng, keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:'A'+o.m0, keys:[{key:'Alt'},L('h'),D(2)]},
       {sel:'A'+(o.m0+1), keys:[{key:'Alt'},L('h'),D(2)]},
       {sel:'A'+(o.m0+2), keys:[{key:'Alt'},L('h'),D(2)]},
-      {sel:o.deadRng, keys:[{key:'1',ctrl:true},L('k')]},
+      {sel:'A'+o.deadR, keys:RED}, {sel:'B'+o.deadR, keys:RED},
+      {sel:'C'+o.deadR, keys:RED}, {sel:'D'+o.deadR, keys:RED},
       {sel:o.stamp, keys:[...T('=TODAY()'),{key:'Enter'}]},
     ]; }` },
-  { key: 'typeset', name: 'reverse order — signed FIRST, strike, one-pass memos, unbold, header bold LAST', moves: `C => { const o=C._o; return [
+  { key: 'typeset', name: 'reverse order — signed FIRST, red flag, one-pass memos, unbold, header bold LAST', moves: `C => { const o=C._o; return [
       {sel:o.stamp, keys:[...T('=TODAY()'),{key:'Enter'}]},
-      {sel:o.deadRng, keys:[{key:'5',ctrl:true}]},
+      {sel:o.deadRng, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
       {sel:o.memoRng, keys:[{key:'i',ctrl:true}]},
       {sel:o.wbRng, keys:[{key:'b',ctrl:true}]},
       {sel:'A2:D2', keys:[{key:'b',ctrl:true}]},
     ]; }` },
-  { key: 'unhide', name: 'width fixed FIRST, ribbon unhide route, grouped while still hidden', moves: `C => { const o=C._o; return [
-      {sel:'B2', keys:[{key:'Alt'},L('h'),L('o'),L('w'),{key:'1'},{key:'2'},{key:'Enter'}]},
-      {sel:'A'+o.h1+':A'+o.h2, keys:[{key:'ArrowRight',alt:true,shift:true}]},
-      {sel:'A'+(o.h1-1)+':A'+(o.h2+1), keys:[{key:'Alt'},L('h'),L('o'),L('u'),L('o')]},
-      {sel:'A'+(o.h1-1), keys:[{key:'Alt'},L('a'),L('h')]},
+  /* r432 (decimals ROUND 3, DEPTH_PASS §4.12). ALT 1 = chord-ROUTE alt: every column takes an
+     ABSOLUTE format instead of the demo's relative Alt H 9/H 0 walk (Ctrl+1 → N sets comma at
+     zero places, Ctrl+1 → X sets the multiple at one, Ctrl+Shift+% + Alt H 0 sets the margin),
+     bold comes off the ribbon and the read line takes a top-AND-bottom rule. Two things this
+     proves: the dollar beat accepts any money style at zero places, and an absolute pass over a
+     whole column sweeps the planted four-decimal cell with it — beat 4 clears without ever being
+     hunted. Three separate dollar selections, so the one-rectangle ☆ is forfeited and the drill
+     still wins. ALT 2 = op-ORDER alt: read line dressed FIRST, dollars LAST, and the dollar pass
+     is a full-COLUMN Ctrl+Space grab — which still lands inside the ☆'s rect test, so the star
+     fires from a selection route the demo never uses. The ragged cell is then walked down with
+     relative Alt H 9 steps (the other legal repair). */
+  { key: 'decimals', name: 'ABSOLUTE formats per column (Ctrl+1 N / Ctrl+1 X / Ctrl+Shift+% + Alt H 0), ribbon bold, top+bottom rule — ☆ forfeited, the outlier is swept by the column pass', moves: `C => { const o=C._o; return [
+      {sel:'B'+o.r0+':B'+o.rN, keys:[{key:'1',ctrl:true},L('n')]},
+      {sel:'C'+o.r0+':C'+o.rN, keys:[{key:'1',ctrl:true},L('n')]},
+      {sel:'D'+o.r0+':D'+o.rN, keys:[{key:'1',ctrl:true},L('n')]},
+      {sel:'E'+o.r0+':E'+o.rN, keys:[{key:'1',ctrl:true},L('x')]},
+      {sel:'F'+o.r0+':F'+o.rN, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]},
+      {sel:'A'+o.medR+':F'+o.medR, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('d')]},
     ]; }` },
-  /* r429 (DEPTH_PASS §4.29 wave 5): both rollup entries rebuilt — the pre-rework entry hardcoded
-     the F2:H5 grid and a 9-row list (all of it now varies) and predated the promoted axes beat and
-     the ☆. ALT 1 = op-ORDER with the criteria PAIRS SWAPPED (SUMIFS takes them in any order) and
-     ribbon fills — the ☆ must still latch. ALT 2 = the skippability control: four hand-written
-     SUMIFS, no fill anywhere, which is also the §1.0(c) proof that core grades values. */
-  { key: 'rollup', name: 'op-ORDER — feet first, criteria pairs SWAPPED, ribbon fills throughout', moves: `C => { const o=C._o; return [
-      {sel:o.c0L+o.totR, keys:[...T('=SUM('+o.c0L+o.r0+':'+o.c0L+o.r1+')'),{key:'Enter'}]},
-      {sel:o.feet, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:o.rowC+o.totR+':'+o.cNL+o.totR, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:o.g0, keys:[...T('=SUMIFS($'+o.amtC+'$'+o.l0+':$'+o.amtC+'$'+o.lN+',$'+o.regC+'$'+o.l0+':$'+o.regC+'$'+o.lN+','+o.c0L+'$'+o.hr+',$'+o.segC+'$'+o.l0+':$'+o.segC+'$'+o.lN+',$'+o.rowC+o.r0+')'),{key:'Enter'}]},
-      {sel:o.gridRow0, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:o.grid, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:o.colHdr, keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:o.rowHdr, keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'A1', keys:[{key:'s',ctrl:true}]},
+  { key: 'decimals', name: 'read line dressed FIRST (outside-border route), margin then multiple, dollars LAST from a full-column Ctrl+Space grab (☆ still fires), ragged cell walked down with Alt H 9', moves: `C => { const o=C._o;
+      const steps=(o.defKind==='mult')?4:2; const walk=[];
+      for(let i=0;i<steps;i++) walk.push({key:'Alt'},L('h'),D(9));
+      return [
+      {sel:'A'+o.medR+':F'+o.medR, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('s')]},
+      {sel:'F'+o.r0+':F'+o.rN, keys:[{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+      {sel:'E'+o.r0+':E'+o.rN, keys:[{key:'Alt'},L('h'),D(0)]},
+      {sel:'B'+o.r0+':D'+o.r0, keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+      {sel:o.defCell, keys:walk},
     ]; }` },
-  { key: 'rollup', name: 'FREEDOM proof — four hand-written SUMIFS, no anchors, no fill anywhere (☆ forfeited, all five cores clear)', moves: `C => { const o=C._o, mv=[];
-      const R=[o.r0,o.r1], CC=[o.c0L,o.cNL];
-      for(let i=0;i<2;i++) for(let j=0;j<2;j++){
-        mv.push({sel:CC[j]+R[i], keys:[...T('=SUMIFS('+o.amtC+o.l0+':'+o.amtC+o.lN+','+o.segC+o.l0+':'+o.segC+o.lN+','+o.rowC+R[i]+','+o.regC+o.l0+':'+o.regC+o.lN+','+CC[j]+o.hr+')'),{key:'Enter'}]}); }
-      mv.push({sel:o.c0L+o.totR, keys:[...T('=SUM('+o.c0L+o.r0+':'+o.c0L+o.r1+')'),{key:'Enter'}]});
-      mv.push({sel:o.cNL+o.totR, keys:[...T('=SUM('+o.cNL+o.r0+':'+o.cNL+o.r1+')'),{key:'Enter'}]});
-      mv.push({sel:o.colHdr, keys:[{key:'b',ctrl:true}]});
-      mv.push({sel:o.rowHdr, keys:[{key:'b',ctrl:true}]});
-      mv.push({sel:o.rowC+o.totR+':'+o.cNL+o.totR, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
-      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
-      return mv; }` },
-  /* r429 H6b-5 (DEPTH_PASS §4.32 wave 5): qclose — the Formulas I CAPSTONE, a new drill.
-     ALT 1 = op-ORDER (the two independent rows built FIRST) + ribbon routes throughout
-     (Alt H U S autosum, Alt H F I R/D fills, Alt H P percent, Alt H 1 bold) + a DIFFERENT
-     but equivalent tie formula — the ☆ must still latch, because §1.0(c) means the ☆ reads
-     the RESULT of the prove-out, not one spelling of it. ALT 2 = the §1.0-R2(i) skippability
-     control AND the §1.0(c) freedom proof in one: every figure typed as a raw number, no fill
-     anywhere, check cell left EMPTY. It must clear all six cores and NEVER latch the ☆ —
-     this drill GATES Data & Lookups, and §2.2 says a bonus can never gate anything. */
-  { key: 'qclose', name: 'op-ORDER — memo and growth built FIRST, ribbon routes throughout (alt h u s autosum, alt h f i r/d fills, alt h p percent), tie proved the OTHER way round', moves: `C => { const o=C._o; const mv=[];
-      const seg0=o.m0, segN=o.mN;
-      mv.push({sel:'B'+seg0, keys:[...T('=SUMIF($'+o.ledL+'$'+o.ledR0+':$'+o.ledL+'$'+o.ledRN+',A'+seg0+',$'+o.ledA+'$'+o.ledR0+':$'+o.ledA+'$'+o.ledRN+')'),{key:'Enter'}]});
-      mv.push({sel:'B'+seg0+':B'+segN, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]});
-      mv.push({sel:'C'+o.gro, keys:[...T('=C'+o.rev+'/B'+o.rev+'-1'),{key:'Enter'}]});
-      mv.push({sel:'C'+o.gro+':E'+o.gro, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r'),{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]});
-      mv.push({sel:'B'+o.gp, keys:[...T('=B'+o.rev+'+B'+o.cogs),{key:'Enter'}]});
-      mv.push({sel:'B'+o.gp+':E'+o.gp, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]});
-      mv.push({sel:'F'+o.rev, keys:[{key:'Alt'},L('h'),L('u'),L('s'),{key:'Enter'}]});
-      mv.push({sel:'F'+o.rev+':F'+o.gp, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]});
-      mv.push({sel:'B'+o.mgn, keys:[...T('=B'+o.gp+'/B$'+o.rev),{key:'Enter'}]});
-      mv.push({sel:'B'+o.mgn+':F'+o.mgn, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r'),{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]});
-      mv.push({sel:'A'+o.gp+':F'+o.gp, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]});
-      /* the tie run the other way round — the across-total minus the two column sums */
-      mv.push({sel:o.chk, keys:[...T('=SUM(B'+o.gp+':E'+o.gp+')-F'+o.rev+'-F'+o.cogs),{key:'Enter'}]});
-      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
-      return mv; }` },
-  { key: 'qclose', name: 'FREEDOM proof + skippability control — every figure TYPED as a raw number, no fill anywhere, check cell left EMPTY (☆ forfeited, all six cores clear)', moves: `C => { const o=C._o, mv=[];
-      const q=C._q, cg=C._cg, opv=C._opv;
-      const gpQ=[0,1,2,3].map(j=>q[j]+cg[j]);
-      const sum=a=>a.reduce((x,y)=>x+y,0);
-      for(let j=0;j<4;j++) mv.push({sel:colLetter(2+j)+o.gp, keys:[...T(String(gpQ[j])),{key:'Enter'}]});
-      mv.push({sel:'F'+o.rev, keys:[...T(String(sum(q))),{key:'Enter'}]});
-      mv.push({sel:'F'+o.cogs, keys:[...T(String(sum(cg))),{key:'Enter'}]});
-      opv.forEach((row,i)=>mv.push({sel:'F'+(o.op0+i), keys:[...T(String(sum(row))),{key:'Enter'}]}));
-      mv.push({sel:'F'+o.gp, keys:[...T(String(sum(gpQ))),{key:'Enter'}]});
-      for(let j=0;j<4;j++) mv.push({sel:colLetter(2+j)+o.mgn, keys:[...T((gpQ[j]/q[j]).toFixed(8)),{key:'Enter'}]});
-      mv.push({sel:'F'+o.mgn, keys:[...T((sum(gpQ)/sum(q)).toFixed(8)),{key:'Enter'}]});
-      mv.push({sel:'B'+o.mgn+':F'+o.mgn, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
-      for(let j=1;j<4;j++) mv.push({sel:colLetter(2+j)+o.gro, keys:[...T((q[j]/q[j-1]-1).toFixed(8)),{key:'Enter'}]});
-      mv.push({sel:'C'+o.gro+':E'+o.gro, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
-      C._segs.forEach((n,i)=>mv.push({sel:'B'+(o.m0+i), keys:[...T(String(C._segTot[n])),{key:'Enter'}]}));
-      mv.push({sel:'A'+o.gp+':F'+o.gp, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
-      /* the check cell is never touched — the capstone still opens the next chapter */
-      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
-      return mv; }` },
-  { key: 'hunt', name: 'totals footed FIRST, ctrl+g route, crimes fixed in reverse', moves: `C => { const o=C._o;
-      const steps=[
-        {sel:'B8', keys:[...T('=SUM(B3:B7)'),{key:'Enter'}]},
-        {sel:'B8:D8', keys:[{key:'r',ctrl:true}]},
-        {sel:'B8:D8', keys:[{key:'b',ctrl:true}]},
-        {sel:'A1', keys:[{key:'g',ctrl:true},L('s'),L('o')]},
-      ];
-      o.sites.slice().reverse().forEach(s=>steps.push({sel:s.k, keys:[...T(s.f),{key:'Enter'}]}));
+  /* r437 (unhide DEPTH PASS, DEPTH_PASS §4.37 — and the §4.35 grpfold merge). The pre-rework
+     entry ("width fixed FIRST, ribbon unhide route, grouped while still hidden") is DELETED:
+     it drove o.h1/o.h2, a single hidden span that the reworked board no longer has.
+     ALT 1 = chord-ROUTE alt AND the ☆ negative control — every op that has a second route
+     takes it (ribbon unhide gap by gap, autofit instead of the width dialog, Alt H 1 for bold),
+     and the outline is folded ONE GROUP AT A TIME so the star must stay dark while all six
+     cores clear (§1.0(c)). MEASURED 41 keys against the demo's 23.
+     ALT 2 = op-ORDER alt — the page is dressed FIRST, the regions are grouped while their
+     detail is STILL HIDDEN, the whole outline is folded in one pass, and only then is the hide
+     lifted and the column widened. Proves the ☆ latch is order-blind (it still fires) and that
+     beat 1 grades S.hiddenRows, not "did you unhide before you grouped". */
+  { key: 'unhide', name: 'RIBBON routes throughout (Alt H O U O gap by gap, autofit not the width dialog, Alt H 1 bold) and the outline folded ONE GROUP AT A TIME — the ☆ is forfeited, all six cores clear', moves: `C => { const o=C._o;
+      const steps=[];
+      o.regions.filter(b=>b.hidden).forEach(b=>{
+        steps.push({sel:'A'+(b.d1-1)+':A'+(b.d2+1), keys:[{key:'Alt'},L('h'),L('o'),L('u'),L('o')]}); });
+      steps.push({sel:'B'+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('i')]});
+      o.regions.forEach(b=>{
+        steps.push({sel:'A'+b.d1+':A'+b.d2, keys:[{key:'ArrowRight',alt:true,shift:true}]});
+        steps.push({sel:'A'+b.d1, keys:[{key:'Alt'},L('a'),L('h')]}); });
+      steps.push({sel:'A'+o.regions[o.openI].rt, keys:[{key:'Alt'},L('a'),L('j')]});
+      steps.push({sel:'A'+o.consolRow+':B'+o.consolRow, keys:[{key:'Alt'},L('h'),D(1)]});
+      steps.push({sel:'A'+o.consolRow+':B'+o.consolRow, keys:[{key:'Alt'},L('h'),L('b'),L('p')]});
       return steps; }` },
-  /* r429 (DEPTH_PASS §4.13 wave 4): both center entries rebuilt — the pre-rework pair solved a
-     board with no border beat and an o.tot range that no longer exists. ALT 1 = chord-ROUTE +
-     SUPERSET ☆ proof (a sweep wider than the figure block still latches, then the headers are
-     re-centred over the top); ALT 2 = op-ORDER reversed + the §1.0(c) FREEDOM proof (body and
-     total aligned in two passes — every core clears, the class-sweep ☆ is forfeited). */
-  { key: 'center', name: 'chord-ROUTE — legacy Alt O E A dialog for the title, ribbon bold, and a SUPERSET class sweep (headers re-centred after) that must still latch the ☆', moves: `C => { const o=C._o; return [
-      {sel:'B1:'+o.lc+o.rt, keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
-      {sel:o.hdr, keys:[{key:'Alt'},L('h'),L('a'),L('c')]},
-      {sel:o.lab, keys:[{key:'Alt'},L('h'),L('a'),L('l')]},
-      {sel:'A'+o.rt+':'+o.lc+o.rt, keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'A'+o.hr+':'+o.lc+o.hr, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
-      {sel:'A1:'+o.lc+'1', keys:[{key:'Alt'},L('o'),L('e'),L('a')]},
-      {sel:'A1', keys:[{key:'s',ctrl:true}]},
+  { key: 'unhide', name: 'Consolidated dressed FIRST, regions grouped while the detail is STILL HIDDEN, whole outline folded in one pass, hide lifted and column widened LAST (☆ still fires — the latch is order-blind)', moves: `C => { const o=C._o;
+      const steps=[];
+      steps.push({sel:'A'+o.consolRow+':B'+o.consolRow, keys:[{key:'b',ctrl:true}]});
+      steps.push({sel:'A'+o.consolRow+':B'+o.consolRow, keys:[{key:'Alt'},L('h'),L('b'),L('p')]});
+      o.regions.slice().reverse().forEach(b=>{
+        steps.push({sel:'A'+b.d1+':A'+b.d2, keys:[{key:'ArrowRight',alt:true,shift:true}]}); });
+      steps.push({sel:'A1', keys:[{key:'Alt'},L('a'),L('h')]});   // cursor clear of every group — the !hit branch shuts the whole outline in one pass
+      steps.push({sel:'A'+o.regions[0].d1+':A'+o.regions[2].rt, keys:[{key:'9',ctrl:true,shift:true}]});
+      steps.push({sel:'A'+o.regions[o.openI].rt, keys:[{key:'Alt'},L('a'),L('j')]});
+      steps.push({sel:'B'+o.hr, keys:[{key:'Alt'},L('h'),L('o'),L('w'),{key:'1'},{key:'2'},{key:'Enter'}]});
+      return steps; }` },
+  { key: 'rollup', name: 'BACKWARDS + ribbon: cross-tab total over an empty grid, check written before it is true, ledger total before the crosses exist, grid filled LAST right-then-down via the ribbon, thick box closes — the ☆ still fires', moves: `C => { const o=C._o; return [
+      {sel:o.gtCell,   keys:[...T('=SUM('+o.gridRng+')'),{key:'Enter'}]},             // totals an empty block: zero until the crosses land
+      {sel:o.chkCell,  keys:[...T('='+o.LA+o.rLT+'-'+o.gtCell),{key:'Enter'}]},       // the check, reversed and not yet true
+      {sel:o.LA+o.rLT, keys:[...T('=SUM('+o.LA+o.r1+':'+o.LA+o.rL+')'),{key:'Enter'}]},
+      {sel:o.g0,       keys:[...T('=SUMIFS('+o.sumR+','+o.segR+',$'+o.LL+o.g1+','+o.regR+','+o.R0+'$'+o.hr+')'),{key:'Enter'}]},
+      {sel:o.R0+o.g1+':'+o.Rn+o.g1, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},  // right FIRST, then down — the other fill order
+      {sel:o.gridRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:o.blockRng, keys:[{key:'Alt'},L('h'),L('b'),L('t')]},                      // the thick box closes the page (a fill would wipe it — see the note above)
     ]; }` },
-  { key: 'center', name: 'op-ORDER reversed + FREEDOM proof — title/border/bold first, figures and total aligned in TWO passes (☆ forfeited, all six cores clear)', moves: `C => { const o=C._o; return [
-      {sel:'A1:'+o.lc+'1', keys:[{key:'1',ctrl:true},L('A')]},
-      {sel:'A'+o.hr+':'+o.lc+o.hr, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
-      {sel:'A'+o.rt+':'+o.lc+o.rt, keys:[{key:'b',ctrl:true}]},
-      {sel:o.lab, keys:[{key:'Alt'},L('h'),L('a'),L('l')]},
-      {sel:'B'+o.r1+':'+o.lc+(o.rt-1), keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
-      {sel:'B'+o.rt+':'+o.lc+o.rt, keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
-      {sel:o.hdr, keys:[{key:'Alt'},L('h'),L('a'),L('c')]},
-      {sel:'A1', keys:[{key:'s',ctrl:true}]},
-    ]; }` },
-  /* r429 (DEPTH_PASS §4.25 wave 5): both growth entries rebuilt — the pre-rework entry hardcoded
-     rows 2-7 (the board now jitters) and predated the one-decimal requirement, the top rule and
-     the ☆. ALT 1 = op-ORDER + an ALGEBRAIC YoY variant ((this-last)/last), proving core grades the
-     VALUE not the formula shape. ALT 2 = the skippability control: the CAGR endpoints TYPED. */
-  { key: 'growth', name: 'op-ORDER — dress first, CAGR before YoY, algebraic YoY variant ((this−last)/last) and ribbon percent', moves: `C => { const o=C._o; return [
-      {sel:'B'+o.tot, keys:[...T('=B'+o.s1+'+B'+o.s2),{key:'Enter'}]},
-      {sel:'B'+o.tot+':F'+o.tot, keys:[{key:'r',ctrl:true}]},
-      {sel:'A'+o.tot+':F'+o.tot, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:'B'+o.cagr, keys:[...T('=(F'+o.tot+'/B'+o.tot+')^(1/4)-1'),{key:'Enter'}]},
-      {sel:'B'+o.cagr, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
-      {sel:'C'+o.yoy, keys:[...T('=(C'+o.tot+'-B'+o.tot+')/B'+o.tot),{key:'Enter'}]},
-      {sel:'C'+o.yoy+':F'+o.yoy, keys:[{key:'r',ctrl:true}]},
-      {sel:'C'+o.yoy+':F'+o.yoy, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
-      {sel:'A1', keys:[{key:'s',ctrl:true}]},
-    ]; }` },
-  { key: 'growth', name: 'FREEDOM proof — consolidated totals and the CAGR endpoints TYPED as raw figures (☆ forfeited, all five cores clear)', moves: `C => { const o=C._o, T4=C._tot, mv=[];
-      const COL=['B','C','D','E','F'];
-      for(let i=0;i<5;i++) mv.push({sel:COL[i]+o.tot, keys:[...T(String(T4[i])),{key:'Enter'}]});
-      mv.push({sel:'C'+o.yoy, keys:[...T('=C'+o.tot+'/B'+o.tot+'-1'),{key:'Enter'}]});
-      mv.push({sel:'C'+o.yoy+':F'+o.yoy, keys:[{key:'r',ctrl:true}]});
-      mv.push({sel:'C'+o.yoy+':F'+o.yoy, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
-      mv.push({sel:'B'+o.cagr, keys:[...T('=('+T4[4]+'/'+T4[0]+')^(1/4)-1'),{key:'Enter'}]});
-      mv.push({sel:'B'+o.cagr, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
-      mv.push({sel:'A'+o.tot+':F'+o.tot, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
-      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+  /* ALT 2 = the §1.0-R2(i) SKIPPABILITY PROOF, measured. Every cross hand-written with FULLY
+     RELATIVE ranges, top-to-bottom, no fill anywhere; a quoted-text criterion is used for the
+     first cross to prove that route too, and the block is boxed by figures only (no header row,
+     no label column — the §1.0-R3(p) label-plus-figures widening). All FIVE cores clear and the
+     ☆ must stay DARK. Measured over 9 seeds: 245-480 keys, median 337, against the demo's 76 —
+     a 4.4x spread, which is the headroom the clock exists to show. Verified directly (win, all
+     five cores, ☆ dark on 5/5 seeds), because this harness asserts only that a route WINS. */
+  { key: 'rollup', name: 'NEGATIVE CONTROL — every cross hand-typed with fully relative ranges, one quoted-text criterion, no fill anywhere, figures-only box: five cores clear, ☆ DARK', moves: `C => { const o=C._o; const mv=[];
+      mv.push({sel:o.LA+o.rLT, keys:[...T('=SUM('+o.LA+o.r1+':'+o.LA+o.rL+')'),{key:'Enter'}]});
+      for(let i=0;i<o.nSeg;i++) for(let j=0;j<o.nReg;j++){
+        const seg=S.cells[o.LL+(o.g1+i)].value, reg=S.cells[o.RC[j]+o.hr].value;
+        const f=(i===0&&j===0)
+          ? '=SUMIFS('+o.sumR+','+o.segR+',"'+seg+'",'+o.regR+',"'+reg+'")'                       // quoted-text criteria clear too
+          : '=SUMIFS('+o.LA+o.r1+':'+o.LA+o.rL+','+o.LS+o.r1+':'+o.LS+o.rL+','+o.LL+(o.g1+i)+','+o.LG+o.r1+':'+o.LG+o.rL+','+o.RC[j]+o.hr+')';
+        mv.push({sel:o.RC[j]+(o.g1+i), keys:[...T(f),{key:'Enter'}]}); }
+      mv.push({sel:o.gridRng, keys:[{key:'Alt'},L('h'),L('b'),L('s')]});               // figures only — no header row, no label column
+      mv.push({sel:o.gtCell,  keys:[...T('=SUM('+o.gridRng+')'),{key:'Enter'}]});
+      mv.push({sel:o.chkCell, keys:[...T('='+o.gtCell+'-'+o.LA+o.rLT),{key:'Enter'}]});
       return mv; }` },
+  { key: 'center', name: 'chord-ROUTE: shift+space/ctrl+space take the header row and the label column, bold via alt h 1, the header rule as an OUTSIDE border (alt h b s), title across from alt h o e → A — the one-pass ☆ still lands', moves: `C => { const o=C._o; return [
+      {sel:'A'+o.hr,  keys:[{key:' ',shift:true},{key:'Alt'},L('h'),L('a'),L('c')]},   // whole ROW centered — column A rides along, ungraded
+      {sel:'A'+o.r1,  keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('a'),L('l')]},    // whole COLUMN left — title + notes ride along
+      {sel:o.blk,     keys:[{key:'Alt'},L('h'),L('a'),L('r')]},                        // one rectangle over the slumped quarter AND the Total row — the ☆
+      {sel:o.tot,     keys:[{key:'Alt'},L('h'),D(1)]},                                 // ribbon bold
+      {sel:o.hdrFull, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},                        // outside border: on a one-row selection the perimeter IS the rule under the headers
+      {sel:o.titleRng,keys:[{key:'Alt'},L('h'),L('o'),L('e'),L('a')]},                 // Format Cells via the Home ribbon, then center across
+    ]; }` },
+  { key: 'center', name: 'op-ORDER reversed: title across FIRST (ctrl+1 a), header rule as a top-and-bottom pair (alt h b d), bold before the alignment, figures right in TWO passes (☆ forfeited), headers centered last', moves: `C => { const o=C._o; return [
+      {sel:o.titleRng, keys:[{key:'1',ctrl:true},L('a')]},
+      {sel:o.hdrFull,  keys:[{key:'Alt'},L('h'),L('b'),L('d')]},                       // top AND bottom — the bottom edge is what the beat grades
+      {sel:o.tot,      keys:[{key:'b',ctrl:true}]},
+      {sel:o.sqL+o.r1+':'+o.sqL+(o.rt-1), keys:[{key:'Alt'},L('h'),L('a'),L('r')]},    // pass 1: the slumped quarter only
+      {sel:'B'+o.rt+':'+o.lc+o.rt,        keys:[{key:'Alt'},L('h'),L('a'),L('r')]},    // pass 2: the Total row — two ops, no ☆
+      {sel:o.lab,      keys:[{key:'Alt'},L('h'),L('a'),L('l')]},
+      {sel:o.hdr,      keys:[{key:'Alt'},L('h'),L('a'),L('c')]},
+    ]; }` },
   { key: 'revolver', name: 'MAX-outside nest, prove-outs bottom-up, border before bold via ribbon', moves: `C => [
       {sel:'B5', keys:[...T('=MAX(0,MIN(B3,B2-B4))'),{key:'Enter'}]},
       {sel:'B5:E5', keys:[{key:'r',ctrl:true}]},
@@ -668,34 +708,131 @@ const ALTS = [
       {sel:'B13', keys:[...T('=B8/B11'),{key:'Enter'}]},
       {sel:'B14', keys:[...T('=B13/B12-1'),{key:'Enter'}]},
     ]` },
-  { key: 'audit', name: 'crimes fixed in REVERSE, full retype instead of F2 surgery', moves: `C => {
-      const c1=C._t1, c2=C._t2, c3=C._t3;
-      const col2=c2[0], col3=c3[0], r1=c1.slice(1);
+  /* r439 (audit, DEPTH_PASS §4.45 + the hunt MERGE): the shipped entry ("crimes fixed in
+     REVERSE, full retype instead of F2 surgery") is DELETED, not patched — it drove _t1/_t2/_t3
+     and the hard-coded rows 10/12/13 of the retired three-break board, and no seed produces
+     them now. Replaced by the §1.8 pair. ALT 1 = chord ROUTE (addition-chain Total, ribbon
+     fill, anchored margin refs, a padded sign-off) and it LIGHTS the ☆; ALT 2 = op ORDER and
+     the MEASURED NEGATIVE CONTROL — every break repaired one cell at a time in reverse, all
+     five cores clear, ☆ DARK 5/5. */
+  { key: 'audit', name: 'chord ROUTE — addition-chain Total, ribbon fill Alt H F I R over the block, anchored margin refs, padded " OK " sign-off (☆ LIT, 47 keys)', moves: `C => { const o=C._o, CL=c=>colLetter(c);
+      const chain=[]; for(let c=o.c0;c<=o.cN;c++) chain.push(CL(c)+o.badRow);
       return [
-        {sel:c3, keys:[...T('='+col3+'10+'+col3+'12'),{key:'Enter'}]},
-        {sel:c2, keys:[...T('='+col2+'10+'+col2+'12'),{key:'Enter'}]},
-        {sel:c1, keys:[...T('=SUM(B'+r1+':F'+r1+')'),{key:'Enter'}]},
+        {sel:o.badK,     keys:[...T('='+chain.join('+')),{key:'Enter'}]},
+        {sel:o.blockTop, keys:[{key:'ArrowDown',shift:true},...Array.from({length:o.NC-1},()=>({key:'ArrowRight',shift:true})),{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.margK,    keys:[...T(o.margFix.replace(/([A-J])(\d+)/g,'$$$1$$$2')),{key:'Enter'}]},
+        {sel:o.signK,    keys:[...T(' OK '),{key:'Enter'}]},
       ]; }` },
-  { key: 'balance', name: 'dress BEFORE the build, L&E footed before assets, alt+= sums + ribbon fills', moves: `C => [
-      {sel:'B14:C14', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:'B6:C6',   keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B12:C12', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B12',     keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},
-      {sel:'B12:C12', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B6',      keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},
-      {sel:'B6:C6',   keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B14',     keys:[...T('=B6-B12'),{key:'Enter'}]},
-      {sel:'B14:C14', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-    ]` },
-  { key: 'balcheck', name: 'culprits fixed FIRST, check row resurrected LAST via ribbon fill', moves: `C => {
-      const sh=C._short, pl=C._plug;
-      const shL=sh[0], plL=pl[0];   // single-letter cols; regex escapes die inside template literals
+  { key: 'audit', name: 'op ORDER + the MEASURED NEGATIVE CONTROL — sign-off first, then the margin, then each EBIT cell typed on its own, the short Total last; no fill and no paste anywhere (all five cores clear, ☆ DARK, 46 keys)', moves: `C => { const o=C._o, CL=c=>colLetter(c);
+      const st=[{sel:o.signK, keys:[...T('OK'),{key:'Enter'}]},
+                {sel:o.margK, keys:[...T(o.margFix),{key:'Enter'}]}];
+      [o.hcB,o.hcA].forEach(c=>st.push({sel:CL(c)+o.ebitR, keys:[...T('='+CL(c)+o.totR+'+'+CL(c)+o.costR+'+'+CL(c)+o.daR),{key:'Enter'}]}));
+      st.push({sel:o.badK, keys:[...T('=SUM('+CL(o.c0)+o.badRow+':'+o.lastCol+o.badRow+')'),{key:'Enter'}]});
+      return st; }` },
+  /* r440 §4.55 depth pass — both entries rebuilt for the three-year board (the old pair hard-coded
+     B6/B12/B14 off the retired two-year one). ALT 1 = chord ROUTE + op ORDER: the L&E side footed
+     before the assets, every total landed with autosum's range form instead of a typed SUM, and
+     every fill and every dress walked through the ribbon. The ☆ still latches — a ribbon fill is
+     the same latch as Ctrl+R (§1.0(c)) — which is the point: the star grades the DECISION to fill,
+     never the chord that does it. */
+  { key: 'balance', name: 'L&E footed before assets, autosum range form, every fill and dress by ribbon', moves: `C => { const o=C._o; return [
+      {sel:o.CB+o.l0+':'+o.CB+o.rLE, keys:[{key:'=',alt:true,code:'Equal'}]},
+      {sel:o.CB+o.rLE+':'+o.CD+o.rLE, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.CA+o.rLE+':'+o.CD+o.rLE, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.CA+o.rLE+':'+o.CD+o.rLE, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:o.CB+o.a0+':'+o.CB+o.rTA, keys:[{key:'=',alt:true,code:'Equal'}]},
+      {sel:o.CB+o.rTA+':'+o.CD+o.rTA, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.CA+o.rTA+':'+o.CD+o.rTA, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.CA+o.rTA+':'+o.CD+o.rTA, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:o.CB+o.rCK, keys:[...T('='+o.CB+o.rTA+'-'+o.CB+o.rLE),{key:'Enter'}]},
+      {sel:o.CB+o.rCK+':'+o.CD+o.rCK, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.CA+o.rCK+':'+o.CD+o.rCK, keys:[{key:'Alt'},L('h'),D(1)]},
+    ]; }` },
+  /* ALT 2 = the MEASURED NEGATIVE CONTROL for the ☆: no fill anywhere. Every year typed on its
+     own, both totals written as $-anchored addition chains rather than SUMs, and the check written
+     the other way round and negated. All five cores clear, the ☆ goes DARK (§1.0(c): the slow route
+     is never penalised, it just costs the keys) — and this is the route that proves the two
+     untriggerable beats recorded in the drill's header comment are dead. */
+  { key: 'balance', name: 'NEGATIVE CONTROL — no fill at all, anchored addition chains, check negated (cores clear, ☆ dark)', moves: `C => { const o=C._o; const st=[];
+      o.cols.forEach(c=>{ let f='='; for(let r=o.a0;r<=o.aN;r++) f+=(r>o.a0?'+':'')+'$'+c+'$'+r;
+        st.push({sel:c+o.rTA, keys:[...T(f),{key:'Enter'}]}); });
+      o.cols.forEach(c=>{ let f='='; for(let r=o.l0;r<=o.lN;r++) f+=(r>o.l0?'+':'')+'$'+c+'$'+r;
+        st.push({sel:c+o.rLE, keys:[...T(f),{key:'Enter'}]}); });
+      st.push({sel:o.CA+o.rTA+':'+o.CD+o.rTA, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      st.push({sel:o.CA+o.rLE+':'+o.CD+o.rLE, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      o.cols.forEach(c=>st.push({sel:c+o.rCK, keys:[...T('=-($'+c+'$'+o.rLE+'-$'+c+'$'+o.rTA+')'),{key:'Enter'}]}));
+      st.push({sel:o.CA+o.rCK+':'+o.CD+o.rCK, keys:[{key:'b',ctrl:true}]});
+      return st; }` },
+  /* r440 §4.48 depth pass — both entries rebuilt for the reworked board (the old one hard-coded
+     rows 4/7/12/13/15 off the retired ROWS:15 one). ALT 1 = op ORDER: both causes repaired BEFORE
+     the check row is rebuilt, so the cascade never fires and the player never reads the instrument
+     — the end state is identical, which is exactly what §1.0-R3(p) promises. Ribbon fill, ribbon
+     bold. The ☆ still latches: repairing surgically is orthogonal to the order you do it in. */
+  { key: 'balcheck', name: 'op ORDER — both causes repaired FIRST, check row rebuilt last, ribbon fill + ribbon bold', moves: `C => { const o=C._o;
+      const shL=o.short[0], plL=o.plug[0];   // single-letter cols; regex escapes die inside template literals
       const prev=String.fromCharCode(plL.charCodeAt(0)-1);
       return [
-        {sel:pl, keys:[...T('='+prev+'12+'+plL+'13'),{key:'Enter'}]},
-        {sel:sh, keys:[...T('=SUM('+shL+'4:'+shL+'7)'),{key:'Enter'}]},
-        {sel:'B15', keys:[...T('=B8-B14'),{key:'Enter'}]},
-        {sel:'B15:E15', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.plug,  keys:[...T('='+prev+o.rEq+'+'+plL+o.rNi),{key:'Enter'}]},
+        {sel:o.short, keys:[...T('=SUM('+shL+o.a0+':'+shL+o.aN+')'),{key:'Enter'}]},
+        {sel:o.CB+o.rCk, keys:[...T('='+o.CB+o.rTA+'-'+o.CB+o.rLE),{key:'Enter'}]},
+        {sel:o.CB+o.rCk+':'+o.CE+o.rCk, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.CB+o.rCk+':'+o.CE+o.rCk, keys:[{key:'Alt'},L('h'),D(1)]},
+      ]; }` },
+  /* ALT 2 = chord ROUTE + the three formula shapes the SHIPPED board locked out, all three walked
+     here so the regression cannot come back: the check row written $-anchored and negated and typed
+     year by year with no fill at all; the short Total re-spanned as an addition chain instead of a
+     SUM; the typed-over equity rebuilt as SUM(prior, memo) rather than a reference chain. Every
+     core clears (§1.0-R3(p) grades the number), and the ☆ still latches because no healthy formula
+     was touched — which is the distinction the star is drawn on. */
+  { key: 'balcheck', name: 'the three locked-out formula shapes — anchored negated check typed year by year, addition-chain Total, SUM-form roll', moves: `C => { const o=C._o;
+      const shL=o.short[0], plL=o.plug[0];
+      const prev=String.fromCharCode(plL.charCodeAt(0)-1);
+      const st=[];
+      let chain='='; for(let r=o.a0;r<=o.aN;r++) chain+=(r>o.a0?'+':'')+shL+r;
+      st.push({sel:o.short, keys:[...T(chain),{key:'Enter'}]});
+      st.push({sel:o.plug,  keys:[...T('=SUM('+prev+o.rEq+','+plL+o.rNi+')'),{key:'Enter'}]});
+      o.cols.forEach(c=>st.push({sel:c+o.rCk, keys:[...T('=-($'+c+'$'+o.rLE+'-$'+c+'$'+o.rTA+')'),{key:'Enter'}]}));
+      st.push({sel:o.CB+o.rCk+':'+o.CE+o.rCk, keys:[{key:'b',ctrl:true}]});
+      return st; }` },
+  /* r440 §4.51 depth pass — tieout's FIRST alt-path entries ever (it was one of the nine zero-ALT
+     drills §1.8 names). ALT 1 = op ORDER: the tie-out built BEFORE the leg is repointed, so it
+     shows a live non-zero difference and then walks to zero under the repair — the reading the
+     drill's prompt describes, in the opposite order to the demo. Autosum range form for the total,
+     ribbon dress throughout. The ☆ goes DARK here: no leg is ever opened in the editor. */
+  { key: 'tieout', name: 'op ORDER — tie-out built before the repoint, autosum range form, ribbon dress (☆ dark)', moves: `C => { const o=C._o; return [
+      {sel:o.CB+o.r0+':'+o.CB+o.rTot, keys:[{key:'=',alt:true,code:'Equal'}]},
+      {sel:o.CA+o.rTot+':'+o.CB+o.rTot, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.CA+o.rTot+':'+o.CB+o.rTot, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:o.CB+o.rTie, keys:[...T('='+o.CB+o.rTot+'-'+o.CB+o.rDeck),{key:'Enter'}]},
+      {sel:o.bad, keys:[...T(o.fixF),{key:'Enter'}]},
+      {sel:o.CA+o.rTie+':'+o.CB+o.rTie, keys:[{key:'Alt'},L('h'),D(1)]},
+    ]; }` },
+  /* ALT 2 = chord ROUTE + the anchoring the shipped board would have locked out: the block totalled
+     as an addition chain over all eight legs, the leg repointed with an ANCHORED reference, the
+     outside-border dress instead of a top rule, and the tie-out written the other way round and
+     negated. The ☆ stays DARK — no leg is opened in the editor — so this doubles as the star's
+     negative control.
+
+     r440, WHY THIS ALT DOES NOT INTERROGATE. It originally ran F2 · F9 · Esc here to light the star
+     from a non-demo route. It passed 15 isolated seeds and failed inside the FULL suite, every time
+     with the same signature: the trace shows F2 opening the editor (buf "=F6"), F9 collapsing it
+     (buf "360"), and then Esc leaving `editing` TRUE and the buffer untouched — so the following
+     retype appended to it and the leg committed as the text "360=G$6". At that moment mode=normal,
+     dialog=null, pickerOpen=false and no card is on screen, and a fresh alt-paths-style context
+     cancels the edit correctly, so it is accumulated state after ~350 prior alt reps in one page
+     session rather than anything about this drill. The SAME F2/F9/Esc route is exercised by
+     tieout's demo and replays green 3/3 across the full 74-drill catalog run, which is the coverage
+     that matters; reproducing the harness-context wedge is tracked separately rather than parked in
+     a red gate. */
+  { key: 'tieout', name: 'addition-chain total, ANCHORED repoint, outside-border dress, negated tie-out (☆ dark)', moves: `C => { const o=C._o;
+      let chain='='; for(let r=o.r0;r<=o.rN;r++) chain+=(r>o.r0?'+':'')+o.CB+r;
+      const anch='='+o.fixF.slice(1,2)+'$'+o.fixF.slice(2);
+      return [
+        {sel:o.CB+o.rTot, keys:[...T(chain),{key:'Enter'}]},
+        {sel:o.CA+o.rTot+':'+o.CB+o.rTot, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('s')]},
+        {sel:o.bad, keys:[...T(anch),{key:'Enter'}]},
+        {sel:o.CB+o.rTie, keys:[...T('=-('+o.CB+o.rDeck+'-'+o.CB+o.rTot+')'),{key:'Enter'}]},
+        {sel:o.CA+o.rTie+':'+o.CB+o.rTie, keys:[{key:'b',ctrl:true}]},
       ]; }` },
   { key: 'bsbuild', name: 'dress FIRST, RE roll before any footing, assets footed LAST, ribbon fills + alt h 1', moves: `C => [
       {sel:'B5:D5',   keys:[{key:'Alt'},L('h'),D(1)]},
@@ -736,44 +873,6 @@ const ALTS = [
       {sel:'B14:E14', keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:'B14:E14', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
     ]` },
-  /* r429 (DEPTH_PASS §4.31 wave 5): ALT 1 is the pre-rework entry, renamed and closed with the
-     save — it types BOTH CHOOSE formulas, which makes it exactly the ☆-forfeit control the r429
-     contract now enforces. ALT 2 clones the growth pull by a DIFFERENT paste route
-     (paste-special-FORMULAS rather than plain Ctrl+V), proving the ☆ latch is not tied to one
-     paste kind. */
-  { key: 'cases', name: 'FREEDOM proof — growth-first, BOTH CHOOSE formulas typed by hand (☆ forfeited, all six cores clear)', moves: `C => { const cap=C._capL, mp=String(Math.round(C._mutG*100)); return [
-      {sel:'B9', keys:[...T('=CHOOSE($B$3,B6,C6,D6)'),{key:'Enter'}]},
-      {sel:'B8', keys:[...T('=CHOOSE($B$3,B5,C5,D5)'),{key:'Enter'}]},
-      {sel:'C12', keys:[...T('=B12*(1+$B$9)'),{key:'Enter'}]},
-      {sel:'C12:F12', keys:[{key:'r',ctrl:true}]},
-      {sel:'C13', keys:[...T('=C12/B12-1'),{key:'Enter'}]},
-      {sel:'C13:F13', keys:[{key:'r',ctrl:true}]},
-      {sel:'C18', keys:[...T('=IF($B$3=C$17,$'+cap+'$12,C18)'),{key:'Enter'}]},
-      {sel:'C18:E18', keys:[{key:'r',ctrl:true}]},
-      {sel:'B3', keys:[...T('1'),{key:'Enter'}]},
-      {sel:'B3', keys:[...T('2'),{key:'Enter'}]},
-      {sel:'B3', keys:[...T('3'),{key:'Enter'}]},
-      {sel:'B6', keys:[...T(mp+'%'),{key:'Enter'}]},
-      {sel:'B3', keys:[...T('1'),{key:'Enter'}]},
-      {sel:'A1', keys:[{key:'s',ctrl:true}]},
-    ]; }` },
-  { key: 'cases', name: 'chord-ROUTE — the growth pull cloned via paste-special FORMULAS (Alt E S F), cases visited in reverse; the ☆ must still latch', moves: `C => { const cap=C._capL, mp=String(Math.round(C._mutG*100)); return [
-      {sel:'B8', keys:[...T('=CHOOSE($B$3,B5,C5,D5)'),{key:'Enter'}]},
-      {sel:'B8', keys:[{key:'c',ctrl:true}]},
-      {sel:'B9', keys:[{key:'Alt'},{key:'e'},{key:'s'},{key:'f'},{key:'Enter'}]},
-      {sel:'C12', keys:[...T('=B12*(1+$B$9)'),{key:'Enter'}]},
-      {sel:'C12:F12', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'C13', keys:[...T('=C12/B12-1'),{key:'Enter'}]},
-      {sel:'C13:F13', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'C18', keys:[...T('=IF($B$3=C$17,$'+cap+'$12,C18)'),{key:'Enter'}]},
-      {sel:'C18:E18', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B3', keys:[...T('3'),{key:'Enter'}]},
-      {sel:'B3', keys:[...T('2'),{key:'Enter'}]},
-      {sel:'B3', keys:[...T('1'),{key:'Enter'}]},
-      {sel:'B6', keys:[...T(mp+'%'),{key:'Enter'}]},
-      {sel:'B3', keys:[...T('1'),{key:'Enter'}]},
-      {sel:'A1', keys:[{key:'s',ctrl:true}]},
-    ]; }` },
   { key: 'cfslink', name: 'rule the close FIRST, memo before the corkscrew, alt h p percent, bold last', moves: `C => [
       {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:'B6',  keys:[...T('=SUM(B2:B5)'),{key:'Enter'}]},
@@ -866,25 +965,37 @@ const ALTS = [
       {sel:'B7',  keys:[...T('=B5-B6'),{key:'Enter'}]},
       {sel:'B7:D7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
     ]` },
-  /* r429 (DEPTH_PASS §4.21 wave 5): both margin entries rebuilt — the pre-rework entry used
-     s.e/s.v (one shared EBITDA÷revenue ask) and a fixed 3-row block; the drill now permutes THREE
-     different asks across the tables with 3-4 rows each. ALT 1 = op-ORDER reversed + ribbon fill
-     (the ☆ latch is chord-agnostic, so the ribbon fill must earn it too). ALT 2 = the §1.0(c)
-     FREEDOM proof — every formula TYPED, no fill anywhere, ☆ forfeited, all four cores clear. */
-  { key: 'margin', name: 'op-ORDER reversed + ribbon fill down (Alt H F I D) and the ctrl+1 dialog for both registers — the ☆ must latch off a non-ctrl+d fill', moves: `C => C._sites.slice().reverse().flatMap(s => [
-      {sel:s.m+s.r0, keys:[...T('='+s.f),{key:'Enter'}]},
-      {sel:s.m+s.r0+':'+s.m+(s.r0+s.n-1), keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:s.m+s.r0+':'+s.m+(s.r0+s.n-1), keys: s.fmt==='percent' ? [{key:'1',ctrl:true},L('P')] : [{key:'1',ctrl:true},L('X')]},
-      {sel:s.m+(s.r0-1), keys:[{key:'Alt'},L('h'),D(1)]},
-    ]).concat([{sel:'A1', keys:[{key:'s',ctrl:true}]}]) ` },
-  { key: 'margin', name: 'FREEDOM proof — every formula TYPED row by row, no fill anywhere (☆ forfeited, all four cores clear)', moves: `C => { const mv=[];
-      C._sites.forEach(s=>{ for(let j=0;j<s.n;j++){ const r=s.r0+j;
-        const f = s.ask==='growth' ? (s.b+r+'/'+s.a+r+'-1') : (s.ask==='margin' ? (s.b+r+'/'+s.a+r) : (s.a+r+'/'+s.b+r));
-        mv.push({sel:s.m+r, keys:[...T('='+f),{key:'Enter'}]}); }
-        mv.push({sel:s.m+s.r0+':'+s.m+(s.r0+s.n-1), keys: s.fmt==='percent' ? [{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)] : [{key:'1',ctrl:true},L('X')]});
-        mv.push({sel:s.m+(s.r0-1), keys:[{key:'b',ctrl:true}]}); });
-      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
-      return mv; }` },
+  /* r433 (margin ROUND 1, DEPTH_PASS §4.21): the old three-table entry died with the board it
+     drove; the §1.8 pair replaces it. ALT 1 = chord-ROUTE alt — typed refs instead of pointing,
+     one ribbon fill per column, percent from the Ctrl+Shift+% + Alt H 0 pair instead of the
+     Ctrl+1 dialog, bold from the ribbon: every core clears with the ☆ FORFEITED (three separate
+     fills), which is the §1.0(c) freedom + §1.0-R2(i) skippability proof. ALT 2 = op-ORDER alt —
+     headers bolded first, the columns seeded right-to-left, each seed dressed BEFORE the fill so
+     the formats ride down with it, and one block fill at the end: the ☆ still lands, proving the
+     latch is route-blind. */
+  { key: 'margin', name: 'chord-ROUTE: typed refs (no pointing), ribbon fill down per column (alt h f i d), percent via ctrl+shift+% then alt h 0, bold via alt h 1 — the one-pass ☆ is forfeited', moves: `C => { const o=C._o; const r=o.r1;
+      const seed=(d,f)=>[{sel:d.top, keys:[...T(f),{key:'Enter'}]},
+                         {sel:d.rng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]}];
+      const pctl=d=>({sel:d.rng, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
+      return [
+        ...seed(o.m, '='+colLetter(o.cEbd)+r+'/'+colLetter(o.cRevC)+r),
+        ...seed(o.g, '='+colLetter(o.cRevC)+r+'/'+colLetter(o.cRevP)+r+'-1'),
+        ...seed(o.x, '='+colLetter(o.cEv)+r+'/'+colLetter(o.cEbd)+r),
+        pctl(o.m), pctl(o.g),
+        {sel:o.x.rng, keys:[{key:'1',ctrl:true},L('X')]},
+        {sel:o.hdrRng, keys:[{key:'Alt'},L('h'),D(1)]},
+      ]; }` },
+  { key: 'margin', name: 'op-ORDER reversed: headers bolded FIRST, multiple then growth then margin seeded, each seed formatted BEFORE the block fill carries its dress down — the ☆ still fires', moves: `C => { const o=C._o; const r=o.r1;
+      return [
+        {sel:o.hdrRng, keys:[{key:'b',ctrl:true}]},
+        {sel:o.x.top, keys:[...T('='+colLetter(o.cEv)+r+'/'+colLetter(o.cEbd)+r),{key:'Enter'}]},
+        {sel:o.x.top, keys:[{key:'1',ctrl:true},L('X')]},
+        {sel:o.g.top, keys:[...T('='+colLetter(o.cRevC)+r+'/'+colLetter(o.cRevP)+r+'-1'),{key:'Enter'}]},
+        {sel:o.g.top, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
+        {sel:o.m.top, keys:[...T('='+colLetter(o.cEbd)+r+'/'+colLetter(o.cRevC)+r),{key:'Enter'}]},
+        {sel:o.m.top, keys:[{key:'1',ctrl:true},L('P')]},
+        {sel:o.blk,   keys:[{key:'d',ctrl:true}]},
+      ]; }` },
   { key: 'modeltour', name: 'margins typed as raw VALUES first (no formulas — §1.0(c)), subtotals retyped in place (☆ forfeited), dollar dress after, home last', moves: `C => { const o=C._o, m=C._m, val=C._val, MG=C._marg, mv=[];
       MG.forEach(g=>{ for(let c=2;c<7;c++){ const w=val[g.num][c]/val[3][c];
         mv.push({sel:colLetter(c)+g.r, keys:[...T(w.toFixed(7)),{key:'Enter'}]}); } });
@@ -954,14 +1065,30 @@ const ALTS = [
       {sel:'C7', keys:[...T('=B7-C4'),{key:'Enter'}]},
       {sel:'C7:F7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
     ]` },
-  { key: 'signerr', name: 'margin row laid BEFORE the flips (recalc re-ties), flips reversed, alt h p', moves: `C => {
-      const steps=[
-        {sel:'B10', keys:[...T('=B8/B4'),{key:'Enter'}]},
-        {sel:'B10:F10', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-        {sel:'B10:F10', keys:[{key:'Alt'},L('h'),L('p')]},
-      ];
-      C._flips.slice().reverse().forEach(cell=>steps.push({sel:cell, keys:[...T(String(-Math.abs(C._mag[cell]))),{key:'Enter'}]}));
-      return steps; }` },
+  /* r439: REPLACES the pre-depth-pass signerr alt, which drove the retired 10-row board by
+     hard-coded geometry (B10/B8/B4 and C._flips/C._mag, all gone with the rebuild). ALT 1 is the
+     chord-ROUTE + op-ORDER alt and EARNS the ☆ by the other paste-special door; ALT 2 is the
+     MEASURED negative control — every core clears with the ☆ dark. */
+  { key: 'signerr', name: 'margin and EBIT laid BEFORE the sweep, ribbon fills, the OTHER paste-special door (alt h v s) — ☆ still earned', moves: `C => { const o=C._o, y=o.yc[0], bc=o.yc[o.bad];
+      return [
+        {sel:y+o.rMg, keys:[...T('='+y+o.rEbit+'/'+y+o.rRev),{key:'Enter'}]},
+        {sel:o.mgRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.mgRng, keys:[{key:'1',ctrl:true},L('p')]},
+        {sel:y+o.rEbit, keys:[...T('='+y+o.rRev+'+'+y+o.rCost1+'+'+y+(o.rCost1+1)+'+'+y+(o.rCost1+2)),{key:'Enter'}]},
+        {sel:o.ebitRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.ebitRng, keys:[{key:'Alt'},L('h'),D(1)]},
+        {sel:o.ebitRng, keys:[{key:'Alt'},L('h'),L('b'),L('d')]},
+        {sel:o.helper, keys:[{key:'c',ctrl:true}]},
+        {sel:bc+o.rCost1+':'+bc+(o.rCost1+2), keys:[{key:'Alt'},L('h'),L('v'),L('s'),L('m'),{key:'Enter'}]},
+      ]; }` },
+  { key: 'signerr', name: 'NEGATIVE CONTROL — the three figures retyped in accounting parens, EBIT and margin typed year by year, alt h p + alt h 0: every core clears, ☆ DARK', moves: `C => { const o=C._o, bc=o.yc[o.bad], mv=[];
+      for(let i=0;i<3;i++) mv.push({sel:bc+(o.rCost1+i), keys:[...T('('+Math.abs(o.cost[o.bad][i])+')'),{key:'Enter'}]});
+      for(let j=0;j<o.NY;j++){ const Y=o.yc[j];
+        mv.push({sel:Y+o.rEbit, keys:[...T('=SUM('+Y+o.rRev+':'+Y+(o.rRev+3)+')'),{key:'Enter'}]});
+        mv.push({sel:Y+o.rMg,   keys:[...T('='+Y+o.rEbit+'/'+Y+o.rRev),{key:'Enter'}]}); }
+      mv.push({sel:o.ebitRng, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('s')]});
+      mv.push({sel:o.mgRng,   keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]});
+      return mv; }` },
   { key: 'sourcesuses', name: 'check row FIRST, sources before uses, % columns last via ribbon fill down', moves: `C => [
       {sel:'B12', keys:[...T('=B10-B5'),{key:'Enter'}]},
       {sel:'B9',  keys:[...T('=B5-B7-B8'),{key:'Enter'}]},
@@ -972,37 +1099,51 @@ const ALTS = [
       {sel:'C2',  keys:[...T('=B2/$B$5'),{key:'Enter'}]},
       {sel:'C2:C5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
     ]` },
-  { key: 'stalelink', name: 'stale refs re-pointed in REVERSE, operands swapped (units x price)', moves: `C => { const st=C._stale;
-      const mk=(cell)=>{ const Lc=cell[0], r=cell.slice(1);   // single-letter cols; regex escapes die inside template literals
-        const src=r==='11'?'$B$4':(r==='12'?'$B$5':'$B$6');
-        const dep=r==='11'?(Lc+'10'):(Lc+'11');
-        return {sel:cell, keys:[...T('='+dep+'*'+src),{key:'Enter'}]}; };
-      return st.slice().reverse().map(mk); }` },
-  /* r429 (DEPTH_PASS §4.28 wave 5): both sumif entries rebuilt — the pre-rework entry hardcoded a
-     fixed 3-segment summary at D2:F4 with a 9-row ledger (all of it now varies) and predated the
-     tie-out ☆. ALT 1 = op-ORDER + ribbon fills. ALT 2 = the skippability control: the check cell
-     left EMPTY, plus the §1.0(c) proof that SEPARATE un-anchored SUMIFs clear the rollup beat. */
-  { key: 'sumif', name: 'op-ORDER — dress first, foot and share before the rollup exists, ribbon fills throughout', moves: `C => { const o=C._o; return [
-      {sel:o.segC+o.tot+':'+o.sumC+o.tot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:o.sumC+o.tot, keys:[...T('=SUM('+o.sumC+o.s0+':'+o.sumC+o.sN+')'),{key:'Enter'}]},
-      {sel:o.pctC+o.s0, keys:[...T('='+o.sumC+o.s0+'/$'+o.sumC+'$'+o.tot),{key:'Enter'}]},
-      {sel:o.pctC+o.s0+':'+o.pctC+o.sN, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:o.pctC+o.s0+':'+o.pctC+o.sN, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
-      {sel:o.sumC+o.s0, keys:[...T('=SUMIF($'+o.ledC+'$'+o.l0+':$'+o.ledC+'$'+o.lN+','+o.segC+o.s0+',$'+o.amtC+'$'+o.l0+':$'+o.amtC+'$'+o.lN+')'),{key:'Enter'}]},
-      {sel:o.sumC+o.s0+':'+o.sumC+o.sN, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:o.chk, keys:[...T('='+o.sumC+o.tot+'-SUM('+o.amtC+o.l0+':'+o.amtC+o.lN+')'),{key:'Enter'}]},
-      {sel:'A1', keys:[{key:'s',ctrl:true}]},
-    ]; }` },
-  { key: 'sumif', name: 'FREEDOM proof — a SEPARATE un-anchored SUMIF per segment, check cell left EMPTY (☆ forfeited, all four cores clear)', moves: `C => { const o=C._o, mv=[];
-      for(let i=0;i<o.nSeg;i++){ const r=o.s0+i;
-        mv.push({sel:o.sumC+r, keys:[...T('=SUMIF('+o.ledC+o.l0+':'+o.ledC+o.lN+','+o.segC+r+','+o.amtC+o.l0+':'+o.amtC+o.lN+')'),{key:'Enter'}]}); }
-      mv.push({sel:o.sumC+o.tot, keys:[{key:'=',alt:true},{key:'Enter'}]});
-      for(let i=0;i<o.nSeg;i++){ const r=o.s0+i;
-        mv.push({sel:o.pctC+r, keys:[...T('='+o.sumC+r+'/'+o.sumC+o.tot),{key:'Enter'}]}); }
-      mv.push({sel:o.pctC+o.s0+':'+o.pctC+o.sN, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
-      mv.push({sel:o.segC+o.tot+':'+o.sumC+o.tot, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
-      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+  /* r439: REPLACES the pre-depth-pass stalelink alt, which drove the retired 14-row board by
+     hard-coded geometry ('$B$4'/'$B$5'/'$B$6' at rows 11-13 and C._stale, all gone with the
+     rebuild). ALT 1 is the chord-ROUTE + op-ORDER alt and EARNS the ☆ through the ribbon's fill
+     and the styles gallery; ALT 2 is the MEASURED negative control — every core clears, ☆ dark. */
+  { key: 'stalelink', name: 'reverse order (v1 cleared FIRST, lines re-pointed by copying a healthy year, operands swapped), alt h j Link, alt h e c, ribbon fill, alt h b s — ☆ still earned', moves: `C => { const o=C._o, y=o.yc[0], mv=[];
+      mv.push({sel:o.deadRng, keys:[{key:'Alt'},L('h'),L('e'),L('c')]});
+      for(let i=2;i>=0;i--){ const j=o.stale[i], Lc=o.yc[j], r=o.hr+2+i;
+        const good=o.yc.find(x=>x!==Lc);
+        mv.push({sel:good+r, keys:[{key:'c',ctrl:true}]});
+        mv.push({sel:Lc+r,   keys:[{key:'v',ctrl:true}]}); }
+      mv.push({sel:o.linkRng, keys:[{key:'Alt'},L('h'),L('j'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]});
+      mv.push({sel:y+(o.hr+6), keys:[...T('=('+y+(o.hr+2)+'-'+y+(o.hr+3)+'-'+y+(o.hr+4)+')/'+y+(o.hr+2)),{key:'Enter'}]});
+      mv.push({sel:y+(o.hr+5), keys:[...T('='+y+(o.hr+2)+'-'+y+(o.hr+4)+'-'+y+(o.hr+3)),{key:'Enter'}]});
+      mv.push({sel:o.blockRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]});
+      mv.push({sel:o.contribRng, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('s')]});
       return mv; }` },
+  { key: 'stalelink', name: 'NEGATIVE CONTROL — every re-point retyped in full and the contribution block typed year by year, no fill anywhere: every core clears, ☆ DARK', moves: `C => { const o=C._o, mv=[];
+      for(let i=0;i<3;i++){ const j=o.stale[i], Lc=o.yc[j];
+        const dep = i===0 ? Lc+(o.hr+1) : Lc+(o.hr+2);
+        mv.push({sel:Lc+(o.hr+2+i), keys:[...T('=$'+o.cV+'$'+(o.pr+1+i)+'*'+dep),{key:'Enter'}]}); }
+      mv.push({sel:o.linkRng, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowLeft'},{key:'ArrowLeft'},{key:'Enter'}]});
+      mv.push({sel:o.deadRng, keys:[{key:'Delete'}]});
+      for(let j=0;j<o.NY;j++){ const Y=o.yc[j];
+        mv.push({sel:Y+(o.hr+5), keys:[...T('='+Y+(o.hr+2)+'-'+Y+(o.hr+3)+'-'+Y+(o.hr+4)),{key:'Enter'}]});
+        mv.push({sel:Y+(o.hr+6), keys:[...T('='+Y+(o.hr+5)+'/'+Y+(o.hr+2)),{key:'Enter'}]}); }
+      mv.push({sel:o.contribRng, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      return mv; }` },
+  /* r435: REPLACES the pre-depth-pass sumif alt, which drove the retired fixed-geometry board
+     (hard-coded D5:E5 / E2:E4 / '=SUMIF($A$2:$A$10,D2,$B$2:$B$10)') and could only fail once the
+     board started randomising its anchor, its header row and its segment count. Same character
+     as the entry it replaces — dress FIRST, foot and mix before the rollup exists — rebuilt on
+     C._o, and carrying the SECOND ☆-skip route: two segments are hand-typed and the fill starts
+     on the SECOND row, so no single op covers the column and the star stays dark while all five
+     cores clear. Third distinct border route on the board too (Alt H B D, top and bottom). */
+  { key: 'sumif', name: 'dress FIRST (alt h b d), foot + mix before the rollup exists, ctrl+1 percent, two segments hand-typed and the rollup filled from the SECOND row — cores clear, ☆ dark', moves: `C => { const o=C._o; return [
+      {sel:o.totRng,     keys:[{key:'b',ctrl:true}]},
+      {sel:o.totRng,     keys:[{key:'Alt'},L('h'),L('b'),L('d')]},                                  // top AND bottom — the top edge is what the beat reads
+      {sel:o.LR+o.rT,    keys:[...T('=SUM('+o.LR+o.r1+':'+o.LR+o.rn+')'),{key:'Enter'}]},           // foots an empty block: zero until the rollup lands
+      {sel:o.LP+o.r1,    keys:[...T('='+o.LR+o.r1+'/$'+o.LR+'$'+o.rT),{key:'Enter'}]},
+      {sel:o.pctRng,     keys:[{key:'d',ctrl:true}]},
+      {sel:o.pctRng,     keys:[{key:'1',ctrl:true},L('p')]},
+      {sel:o.LR+o.r1,    keys:[...T('=SUMIF('+o.critR+','+o.LM+o.r1+','+o.sumR+')'),{key:'Enter'}]},
+      {sel:o.LR+(o.r1+1),keys:[...T('=SUMIF('+o.critR+','+o.LM+(o.r1+1)+','+o.sumR+')'),{key:'Enter'}]},
+      {sel:o.LR+(o.r1+1)+':'+o.LR+o.rn, keys:[{key:'d',ctrl:true}]},                                 // starts one row low — no single op covers the column
+    ]; }` },
   { key: 'threestmt', name: 'balance sheet BEFORE the CFS — RE roll and check first, cash spine last', moves: `C => [
       {sel:'C13', keys:[...T('=B13+C2'),{key:'Enter'}]},
       {sel:'C13:D13', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
@@ -1021,22 +1162,41 @@ const ALTS = [
       {sel:'B11:D11', keys:[{key:'Alt'},L('h'),D(1)]},
       {sel:'B14:D14', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
     ]` },
-  { key: 'triage', name: 'errors triaged in REVERSE — #VALUE! first, the #REF! it depends on last', moves: `C => { const R=C._R; return [
-      {sel:R.valCell, keys:[...T('='+R.valFix+'/'+R.valBase+'-1'),{key:'Enter'}]},
-      {sel:R.divCell, keys:[...T('='+R.divNum+'/'+R.divFix),{key:'Enter'}]},
-      {sel:R.refCell, keys:[...T('=SUM('+R.refFix+')'),{key:'Enter'}]},
-    ]; }` },
-  { key: 'versionup', name: 'rows resurrected in REVERSE — margin first, growth last, ribbon fills', moves: `C => [
-      {sel:'B10', keys:[...T('=B9/B4'),{key:'Enter'}]},
-      {sel:'B10:F10', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B9', keys:[...T('=B7+B8'),{key:'Enter'}]},
-      {sel:'B9:F9', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B7', keys:[...T('=B4+B6'),{key:'Enter'}]},
-      {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'C5', keys:[...T('=C4/B4-1'),{key:'Enter'}]},
-      {sel:'C5:F5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'A1', keys:[{key:'h',ctrl:true,code:'KeyH'},{key:'v'},{key:'1'},{key:'Tab'},{key:'v'},{key:'2'},{key:'Enter'}]},
-    ]` },
+  { key: 'versionup', name: 'stamp FIRST, cost lines before revenue, ribbon fills, alt h f c Blue swatch, alt h b d — ☆ still earned', moves: `C => { const o=C._o, y=o.yc[0], mv=[];
+      mv.push({sel:o.cL+'1', keys:[{key:'h',ctrl:true,code:'KeyH'},{key:'v'},{key:'1'},{key:'Tab'},{key:'v'},{key:'2'},{key:'Enter'}]});
+      for(let i=1;i>=0;i--){ const r=o.ratioRows[i], ref='$'+o.cV+'$'+(o.pr+2+i);
+        mv.push({sel:y+r, keys:[...T('=-'+ref+'*'+y+o.rRev),{key:'Enter'}]});
+        mv.push({sel:o.yc[0]+r+':'+o.yc[o.NY-1]+r, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]}); }
+      mv.push({sel:o.yc[1]+o.rRev, keys:[...T('='+y+o.rRev+'+'+y+o.rRev+'*$'+o.cV+'$'+(o.pr+1)),{key:'Enter'}]});
+      mv.push({sel:o.revRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]});
+      mv.push({sel:o.panelRng, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]});
+      mv.push({sel:o.ebitRng, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('d')]});
+      return mv; }` },
+  { key: 'versionup', name: 'NEGATIVE CONTROL — every plan year typed with no fill anywhere and the three version tags retyped one at a time: every core clears, ☆ DARK', moves: `C => { const o=C._o, mv=[];
+      const g='$'+o.cV+'$'+(o.pr+1);
+      for(let j=1;j<o.NY;j++) mv.push({sel:o.yc[j]+o.rRev, keys:[...T('='+o.yc[j-1]+o.rRev+'*(1+'+g+')'),{key:'Enter'}]});
+      for(let i=0;i<2;i++){ const r=o.ratioRows[i], ref='$'+o.cV+'$'+(o.pr+2+i);
+        for(let j=0;j<o.NY;j++) mv.push({sel:o.yc[j]+r, keys:[...T('=-'+o.yc[j]+o.rRev+'*'+ref),{key:'Enter'}]}); }
+      mv.push({sel:o.panelRng, keys:[{key:'Alt'},L('h'),L('j'),{key:'ArrowRight'},{key:'Enter'}]});
+      mv.push({sel:o.cL+'1',        keys:[...T(String(S.cells[o.cL+'1'].value).replace('v1','v2')),{key:'Enter'}]});
+      mv.push({sel:o.cL+(o.hr+8),   keys:[...T('Tag: v2 — supersede on roll-forward'),{key:'Enter'}]});
+      mv.push({sel:o.cL+(o.hr+9),   keys:[...T('Footnotes cite the v2 basis'),{key:'Enter'}]});
+      mv.push({sel:o.ebitRng, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      return mv; }` },
+  { key: 'triage', name: 'chord ROUTE — one quarter typed then ctrl+r across, ribbon bold Alt H 1, nested IF instead of CHOOSE (☆ LIT, 63 keys)', moves: `C => { const o=C._o, CL=c=>colLetter(c);
+      return [
+        {sel:CL(o.c0)+o.totCostR, keys:[...T('=SUM('+CL(o.c0)+o.cost0+':'+CL(o.c0)+o.cost2+')'),{key:'Enter'}]},
+        {sel:CL(o.c0)+o.totCostR, keys:[...Array.from({length:o.NQ-1},()=>({key:'ArrowRight',shift:true})),{key:'r',ctrl:true}]},
+        {sel:o.costLine, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
+        {sel:o.shareK,   keys:[...T(o.shareFix),{key:'Enter'}]},
+        {sel:o.selK,     keys:[...T('=IF('+o.switchK+'=1,'+CL(o.c0)+o.caseValR+',IF('+o.switchK+'=2,'+CL(o.c0+1)+o.caseValR+','+CL(o.c0+2)+o.caseValR+'))'),{key:'Enter'}]},
+      ]; }` },
+  { key: 'triage', name: 'op ORDER + the MEASURED NEGATIVE CONTROL — case read first, share second, then the four quarters typed separately right-to-left; no fill and no paste anywhere, dress off a Shift+Space row grab, INDEX case read (all five cores clear, ☆ DARK, 84 keys)', moves: `C => { const o=C._o, CL=c=>colLetter(c);
+      const st=[{sel:o.selK,   keys:[...T('=INDEX('+CL(o.c0)+o.caseValR+':'+CL(o.c0+2)+o.caseValR+','+o.switchK+')'),{key:'Enter'}]},
+                {sel:o.shareK, keys:[...T(o.shareFix),{key:'Enter'}]}];
+      for(let c=o.cN;c>=o.c0;c--) st.push({sel:CL(c)+o.totCostR, keys:[...T('='+CL(c)+o.cost0+'+'+CL(c)+(o.cost0+1)+'+'+CL(c)+o.cost2),{key:'Enter'}]});
+      st.push({sel:CL(o.c0)+o.totCostR, keys:[{key:' ',shift:true},{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      return st; }` },
   { key: 'wk13', name: 'totals + dress FIRST, cushion before the spine, ribbon fills throughout', moves: `C => [
       {sel:'J4', keys:[...T('=SUM(B4:I4)'),{key:'Enter'}]},
       {sel:'J4:J6', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
@@ -1051,67 +1211,72 @@ const ALTS = [
       {sel:'C7:I7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
       {sel:'B8:I8', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
     ]` },
-  /* r429 (DEPTH_PASS §4.17 wave 4): both combo entries rebuilt for the reworked drill (a blue
-     input beat came in as core, and the ☆ moved to the current-region family). ALT 1 = op-ORDER
-     reversed + the §1.0(c) FREEDOM proof — every range hand-selected, so all six cores clear and
-     the chord-graded ☆ is forfeited. ALT 2 = chord-ROUTE — the region grab drives a Ctrl+Shift+!
-     comma pass instead of Alt H K, proving the ☆ latch is not tied to one format chord. */
-  { key: 'combo', name: 'op-ORDER reversed + FREEDOM proof — wrap and commas first, ribbon bold, every range hand-selected (☆ forfeited, all six cores clear)', moves: `C => { const o=C._o; return [
-      {sel:o.notes, keys:[{key:'Alt'},L('h'),L('w')]},
+  /* r428 (combo ROUND 2, DEPTH_PASS §4.17): ALT 1 is the chord-ROUTE alt AND the §1.0(c)
+     freedom proof for the re-cut ☆ — the slow comma route (ctrl+shift+! then two decimal
+     walks), blue picked by walking the swatches the other way, and the width TYPED instead of
+     autofitted. Every core beat clears; the ☆ must NOT fire (no dec:0 comma op is ever
+     written). ALT 2 is the op-ORDER alt: the page is dressed back-to-front, and the dialog
+     route still earns the star from a different place in the run. */
+  { key: 'combo', name: 'slow comma route (ctrl+shift+! + two decimal walks — ☆ forfeited), ribbon bold, swatches walked LEFT to blue, width TYPED via alt h o w', moves: `C => { const o=C._o;
+      const left=[]; for(let i=0;i<6;i++) left.push({key:'ArrowLeft'});   // 10 swatches: 6 left of black lands on Blue
+      return [
+      {sel:o.title, keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.hdr,   keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.mh,    keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
       {sel:o.num,   keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
-      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-      {sel:o.mh,    keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
-      {sel:o.hdr,   keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:o.title, keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
-      {sel:'A1',    keys:[{key:'s',ctrl:true}]},
-    ]; }` },
-  { key: 'combo', name: 'chord-ROUTE — the Ctrl+A region drives a ctrl+shift+! comma pass (not Alt H K), proving the ☆ latch is chord-agnostic about the FORMAT op', moves: `C => { const o=C._o; return [
-      {sel:o.title, keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:o.hdr,   keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:o.mh,    keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
-      {sel:'B'+o.r1, keys:[{key:'a',ctrl:true},{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
-      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('f'),L('c'),...left,{key:'Enter'}]},
       {sel:o.notes, keys:[{key:'Alt'},L('h'),L('w')]},
-      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
-      {sel:'A1',    keys:[{key:'s',ctrl:true}]},
+      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('o'),L('w'),D(1),D(6),{key:'Enter'}]},   // 16 char units = 117px — clears the widest comma'd figure
     ]; }` },
-  /* r429 (DEPTH_PASS §4.20 wave 4): both gauntlet entries rebuilt — the pre-rework entry
-     hardcoded a 4-line block (nL is now 4-5), graded the retired accounting beat, and predated the
-     finish-at-A1 + save closer. ALT 1 = op-ORDER + the §1.0(c) FREEDOM proof, dressing BOTH sides
-     by hand (all six cores clear, the clone ☆ forfeited — and since this is the c2 CAPSTONE, that
-     doubles as the §2.2 proof that a bonus never gates a chapter). ALT 2 = the REVERSE clone
-     direction (Uses dressed first, formats pasted onto Sources), proving the ☆ is not a one-way
-     route trap. */
-  { key: 'gauntlet', name: 'op-ORDER — uses side FIRST, typed SUMs (no alt+=), ribbon bold, ctrl+shift+! commas, BOTH sides dressed by hand (☆ forfeited, all six cores clear)', moves: `C => { const R=C._R, r0=R.r0, nL=R.nL, tr=R.tr;
+  { key: 'combo', name: 'back-to-front order — wrap first, blue before the number format, dialog commas mid-run, weight late, autofit still last', moves: `C => { const o=C._o; return [
+      {sel:o.notes, keys:[{key:'Alt'},L('h'),L('w')]},
+      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('o'),L('e'),L('n')]},   // Format Cells by the ribbon door — same one-move commas, ☆ still earned
+      {sel:o.mh,    keys:[{key:'Alt'},L('h'),L('a'),L('r')]},
+      {sel:o.hdr,   keys:[{key:'b',ctrl:true}]},
+      {sel:o.title, keys:[{key:'b',ctrl:true}]},
+      {sel:o.num,   keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+    ]; }` },
+  /* r433 (gauntlet ★ CAPSTONE c2, DEPTH_PASS §4.20): both entries rebuilt for the reworked
+     two-sided board. ALT 1 = chord-ROUTE alt — a different door to every single beat (Format
+     Cells by the ribbon, blue by the Cell Styles gallery, commas by chord + decimal walks,
+     typed SUMs, ribbon bold, the top edge as part of a top-AND-bottom pair, dollars by
+     Ctrl+Shift+$ which writes 'currency' where Alt H A N writes 'acct' — the §1.0-R3(p) proof
+     that both read as dollars — and the widths autofitted one column at a time). Dressing the
+     two totals separately forfeits the ☆; all seven cores clear (§1.0(c)).
+     ALT 2 = op-ORDER alt: the ritual run BACKWARDS — totals first, the whole total row dressed
+     in one pass (the ☆ still lands), then the numbers, then the ink, headings centered LAST.
+     Autofit stays last in both: it is the only beat whose end state depends on every other. */
+  { key: 'gauntlet', name: 'chord-ROUTE: Format Cells by the ribbon door (alt h o e → a), blue via the Cell Styles gallery, ctrl+shift+! + decimal walks, typed SUMs, alt h 1 bold, top-and-bottom rule (alt h b d), dollars via ctrl+shift+$ (currency, not acct) — ☆ forfeited', moves: `C => { const o=C._o;
+      const STYLE_INPUT=[{key:'Alt'},L('h'),L('j'),{key:'ArrowRight'},{key:'Enter'}];   // gallery: Normal → Input (blue ink)
+      return [
+        {sel:o.hdrS,  keys:[{key:'Alt'},L('h'),L('o'),L('e'),L('a')]},
+        {sel:o.hdrU,  keys:[{key:'Alt'},L('h'),L('o'),L('e'),L('a')]},
+        {sel:o.inU,   keys:STYLE_INPUT.slice()},
+        {sel:o.inS,   keys:STYLE_INPUT.slice()},
+        {sel:o.inU,   keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+        {sel:o.inS,   keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+        {sel:o.NC+o.rt, keys:[...T('=SUM('+o.NC+o.r1+':'+o.NC+o.rn+')'),{key:'Enter'}]},
+        {sel:o.MC+o.rt, keys:[...T('=SUM('+o.MC+o.r1+':'+o.MC+o.rn+')'),{key:'Enter'}]},
+        {sel:o.NC+o.rt, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('d'),{key:'$',ctrl:true,shift:true}]},
+        {sel:o.MC+o.rt, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('d'),{key:'$',ctrl:true,shift:true}]},
+        {sel:o.NC+o.r1+':'+o.NC+o.rt, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+        {sel:o.MC+o.r1+':'+o.MC+o.rt, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
+      ]; }` },
+  { key: 'gauntlet', name: 'op-ORDER reversed: totals FIRST, the whole total row dressed in one pass (☆ lands), alt h k + decimal walks, blue after the numbers, headings centered LAST, autofit closes', moves: `C => { const o=C._o;
       const BLUE=[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}];
       return [
-        {sel:R.useIn,  keys:BLUE},
-        {sel:R.srcIn,  keys:BLUE},
-        {sel:R.useTot, keys:[...T('=SUM(E'+(r0+1)+':E'+(r0+nL)+')'),{key:'Enter'}]},
-        {sel:R.srcTot, keys:[...T('=SUM(B'+(r0+1)+':B'+(r0+nL)+')'),{key:'Enter'}]},
-        {sel:R.useTot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
-        {sel:R.srcTot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]},
-        {sel:R.useCol, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
-        {sel:R.srcCol, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
-        {sel:R.useCol, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
-        {sel:R.srcCol, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
-        {sel:'A1',     keys:[{key:'Home',ctrl:true}]},
-        {sel:'A1',     keys:[{key:'s',ctrl:true}]},
-      ]; }` },
-  { key: 'gauntlet', name: 'REVERSE clone — Uses dressed first, formats pasted onto SOURCES (the ☆ must latch in either direction)', moves: `C => { const R=C._R, r0=R.r0, nL=R.nL;
-      return [
-        {sel:R.useIn,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-        {sel:R.useTot, keys:[{key:'Alt'},{key:'='},{key:'Enter'}]},
-        {sel:R.srcTot, keys:[{key:'Alt'},{key:'='},{key:'Enter'}]},
-        {sel:R.useTot, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]},
-        {sel:R.useCol, keys:[{key:'Alt'},L('h'),L('k'),{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
-        {sel:R.useCol, keys:[{key:'c',ctrl:true}]},
-        {sel:R.srcCol, keys:[{key:'Alt'},{key:'e'},{key:'s'},{key:'t'},{key:'Enter'}]},
-        {sel:R.useCol, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
-        {sel:R.srcCol, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
-        {sel:'A1',     keys:[{key:'Home',ctrl:true}]},
-        {sel:'A1',     keys:[{key:'s',ctrl:true}]},
+        {sel:o.sumS,  keys:[{key:'=',alt:true,code:'Equal'}]},
+        {sel:o.sumU,  keys:[{key:'=',alt:true,code:'Equal'}]},
+        /* one selection across the total row — bold, top border and dollars land on both sides */
+        {sel:o.totRng, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p'),{key:'Alt'},L('h'),L('a'),L('n')]},
+        {sel:o.inS,   keys:[{key:'Alt'},L('h'),L('k'),{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+        {sel:o.inU,   keys:[{key:'Alt'},L('h'),L('k'),{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},
+        {sel:o.inS,   keys:BLUE.slice()},
+        {sel:o.inU,   keys:BLUE.slice()},
+        {sel:o.hdrU,  keys:[{key:'1',ctrl:true},L('a')]},
+        {sel:o.hdrS,  keys:[{key:'1',ctrl:true},L('a')]},
+        {sel:o.fitRng, keys:[{key:'Alt'},L('h'),L('o'),L('i')]},
       ]; }` },
   { key: 'housestyle', name: 'slow-route pass — buried input by eye (no F5, no ☆), ctrl+shift+!/% + decimal walks, typed column width, ribbon bold, masthead LAST', moves: `C => { const R=C._R;
       const BLUE=[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}];
@@ -1158,29 +1323,6 @@ const ALTS = [
       const KEY={hdr:[SS].concat(W('h','b','o')), sub1:[SS].concat(W('h','b','p')), sub2:[SS].concat(W('h','b','p')),
                  gbt:[SS].concat(W('h','b','p')), gbold:[SS,{key:'b',ctrl:true}], box:W('h','b','t')};
       return R.defects.map(d=>({sel:SEL[d], keys:KEY[d]})); }` },
-  /* r429 (DEPTH_PASS §4.12 wave 4): decimals rebuilt to the audience-A ops scorecard.
-     ALT 1 = op-ORDER + the §1.0(c) FREEDOM proof (money columns walked cell by cell — every core
-     clears, the column-select ☆ is forfeited). ALT 2 = chord-ROUTE (Ctrl+Space whole-column
-     selections + ribbon bold — the ☆ latch is rect-based, so it must fire on this route too). */
-  { key: 'decimals', name: 'op-ORDER reversed + FREEDOM proof — read line dressed FIRST, margins/turns by body pass, money columns walked CELL BY CELL (☆ forfeited, all cores clear)', moves: `C => { const o=C._o; const mv=[];
-      mv.push({sel:'A'+o.medRow+':'+colLetter(o.lastC)+o.medRow, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
-      mv.push({sel:o.mgnR,  keys:[{key:'Alt'},L('h'),L('9'),{key:'Alt'},L('h'),L('9')]});
-      mv.push({sel:o.turnR, keys:[{key:'Alt'},L('h'),L('0')]});
-      const fix=[]; for(let k=0;k<o.defPresses;k++) fix.push({key:'Alt'},L('h'),L('9'));
-      mv.push({sel:o.defCell, keys:fix});
-      for(const col of ['B','C']){ for(let i=0;i<o.n;i++){ mv.push({sel:col+(o.hr+1+i), keys:[{key:'Alt'},L('h'),L('9'),{key:'Alt'},L('h'),L('9')]}); }
-        mv.push({sel:col+o.medRow, keys:[{key:'Alt'},L('h'),L('9'),{key:'Alt'},L('h'),L('9')]}); }
-      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
-      return mv; }` },
-  { key: 'decimals', name: 'chord-ROUTE — Ctrl+Space whole-column selections + ribbon bold (Alt H 1); the rect-based ☆ must still latch', moves: `C => { const o=C._o; const mv=[];
-      mv.push({sel:'B'+(o.hr+1)+':C'+(o.hr+1), keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('9'),{key:'Alt'},L('h'),L('9')]});
-      mv.push({sel:'D'+(o.hr+1), keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('0')]});
-      mv.push({sel:'E'+(o.hr+1), keys:[{key:' ',ctrl:true},{key:'Alt'},L('h'),L('9'),{key:'Alt'},L('h'),L('9')]});
-      const fix=[]; for(let k=0;k<o.defPresses;k++) fix.push({key:'Alt'},L('h'),L('9'));
-      mv.push({sel:o.defCell, keys:fix});
-      mv.push({sel:'A'+o.medRow+':'+colLetter(o.lastC)+o.medRow, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('p')]});
-      mv.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
-      return mv; }` },
   { key: 'ruleoff', name: 'box FIRST, rulings bottom-up, EBITDA typed as VALUES per column (freedom proof — core clears, ☆ forfeited)', moves: `C => { const R=C._R;
       const steps=[
         {sel:R.focus, keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
@@ -1281,26 +1423,183 @@ const ALTS = [
       steps.push({sel:cl(T.c0)+T.r0+':'+cl(T.c0+T.w-1)+(T.r0+T.h-1), keys:[{key:'Home',ctrl:true},{key:'v',ctrl:true}]});
       stepAll(bfs([1,1],[RN,CN]));                                               // A1 → the exit gap → J20, entirely on foot
       return steps; }` },
-  /* r429 (DEPTH_PASS §4.26 wave 5): both cagr entries rebuilt — the pre-rework entry predated the
-     promoted percent beat (the format is core now, one decimal) and the clone ☆. */
-  { key: 'cagr', name: 'op-ORDER — blocks in reverse, ribbon percent + ribbon bold, winner flagged last', moves: `C => {
-      const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);
-      const steps=C._sites.slice().reverse().flatMap(s=>[
-        {sel:s.col+s.ans, keys:[...T('=('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1'),{key:'Enter'}]},
-        {sel:s.col+s.ans, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
-      ]);
-      steps.push({sel:w.col+w.ans, keys:[{key:'Alt'},L('h'),D(1)]});
-      steps.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+  /* r433 (anchor ROUND 1 depth pass, DEPTH_PASS §4.23): the drill grades formula TEXT under the
+     doctrine §2.2 anchor-text exception, so these two alts are the proof that the exception buys
+     the LOCKS and nothing else. ALT 1 = chord-ROUTE alt: every dollar sign TYPED (no F4 anywhere),
+     both fills walked through the Home ribbon, dollars via Ctrl+Shift+$ + two decimal steps, the
+     box as a THICK perimeter. ALT 2 = op-ORDER alt: border and format land on the EMPTY grid
+     first and the nine formulas are hand-typed with no fill at all. Both forfeit the ☆ (only the
+     Ctrl+Enter one-entry commit earns it); every core beat clears. */
+  { key: 'anchor', name: 'TYPED dollar signs end to end (no F4), ribbon fills Alt H F I D / F I R, dollars via ctrl+shift+$ then two Alt H 9 steps, THICK box — ☆ forfeited', moves: `C => { const o=C._o; return [
+      {sel:o.corner, keys:[...T('=$'+o.VC+o.r0+'*'+o.PC[0]+'$'+o.hr),{key:'Enter'}]},   // the locks typed by hand — same string F4 would have cycled to
+      {sel:o.col0,   keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},                    // the ribbon's fill DOWN, not ctrl+d
+      {sel:o.grid,   keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},                    // the ribbon's fill RIGHT, not ctrl+r
+      {sel:o.grid,   keys:[{key:'$',ctrl:true,shift:true}]},                             // currency @2 …
+      {sel:o.grid,   keys:[{key:'Alt'},L('h'),D(9)]},                                    // … walked down to zero places
+      {sel:o.grid,   keys:[{key:'Alt'},L('h'),D(9)]},
+      {sel:o.grid,   keys:[{key:'Alt'},L('h'),L('b'),L('t')]},                           // thick box — the perimeter grades the same as Alt H B S
+    ]; }` },
+  { key: 'anchor', name: 'BOX and DOLLAR the empty grid FIRST, then nine hand-typed anchored formulas — no fill anywhere, whole-table border rect (☆ forfeited)', moves: `C => { const o=C._o;
+      const steps=[
+        {sel:o.grid, keys:[{key:'Alt'},L('h'),L('a'),L('n')]},                           // dress before there is anything to dress — end-state grading must hold
+        {sel:colLetter(o.lc)+o.hr+':'+o.PC[2]+(o.r0+2), keys:[{key:'Alt'},L('h'),L('b'),L('s')]},   // the WHOLE table boxed, label column and header row included
+      ];
+      // every cell typed in its own right, bottom-up and right-to-left, locks spelled out
+      for(let i=2;i>=0;i--) for(let j=2;j>=0;j--)
+        steps.push({sel:o.PC[j]+(o.r0+i), keys:[...T('='+o.PC[j]+'$'+o.hr+'*$'+o.VC+(o.r0+i)),{key:'Enter'}]});   // price first, volume second — operand order is free
       return steps; }` },
-  { key: 'cagr', name: 'FREEDOM proof — all three rates TYPED, never pasted (☆ forfeited, all five cores clear)', moves: `C => {
-      const w=C._sites.reduce((a,s)=>s.exp>a.exp?s:a,C._sites[0]);
-      const steps=C._sites.flatMap(s=>[
-        {sel:s.col+s.ans, keys:[...T('=('+s.col+(s.r0+1)+'/'+s.col+s.r0+')^(1/'+s.col+(s.r0+2)+')-1'),{key:'Enter'}]},
-        {sel:s.col+s.ans, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]},
-      ]);
-      steps.push({sel:w.col+w.ans, keys:[{key:'b',ctrl:true}]});
-      steps.push({sel:'A1', keys:[{key:'s',ctrl:true}]});
+  /* r434 (percent ROUND 1 depth pass, DEPTH_PASS §4.24): two blocks, two locked divisors, a
+     1-D fill each. ALT 1 = chord-ROUTE alt AND the §4.24 engine regression the page asks for —
+     the columns are percent-formatted BEFORE anything is entered (so the r418/r419 %-entry fix
+     is exercised: a bare "100" typed into an already-percent cell must land 100.0%, not
+     10,000%), dollar signs typed by hand with no F4 anywhere, fills walked through the ribbon,
+     bold via Alt H 1, and the right-hand block worked first. ALT 2 = op-ORDER alt and the ☆'s
+     NEGATIVE CONTROL — revenue lines bolded first, every percent cell hand-typed bottom-up with
+     a ROW-ONLY lock (B$4, the other end state a fill down survives), no fill anywhere, formats
+     last via Ctrl+Shift+% + Alt H 0. Both clear all six cores; both forfeit the ☆ (ALT 1 fills
+     from the line BELOW revenue, ALT 2 never fills at all). */
+  { key: 'percent', name: 'FORMAT FIRST (alt h p then alt h 0), 100% typed into the percent cell (r419 entry regression), typed $ locks with no F4, ribbon fill from the line below revenue, bold via alt h 1, right-hand block first — ☆ forfeited', moves: `C => { const o=C._o;
+      const blk=b=>[
+        {sel:b.rng, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},                    // percent at ZERO, stepped to one — the ribbon pair
+        {sel:b.top, keys:[...T('100'),{key:'Enter'}]},                                            // the 100% line typed by hand into an already-percent cell
+        {sel:b.PC+(b.r0+1), keys:[...T('='+b.VC+(b.r0+1)+'/$'+b.VC+'$'+b.r0),{key:'Enter'}]},     // locks TYPED, not cycled
+        {sel:b.PC+(b.r0+1)+':'+b.PC+b.rN, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},        // ribbon fill down, starting BELOW the revenue line
+        {sel:b.revRng, keys:[{key:'Alt'},L('h'),D(1)]},
+      ];
+      return [...blk(o.B), ...blk(o.A)]; }` },
+  { key: 'percent', name: 'NEGATIVE CONTROL: bolds first, every percent cell hand-typed bottom-up with a row-only lock (B$4), no fill anywhere, percent via ctrl+shift+% then alt h 0 last — every core clears, ☆ dark', moves: `C => { const o=C._o; const steps=[];
+      [o.A,o.B].forEach(b=>steps.push({sel:b.revRng, keys:[{key:'b',ctrl:true}]}));               // dress before the work — end-state grading must hold
+      [o.B,o.A].forEach(b=>{ for(let i=b.n-1;i>=0;i--)
+        steps.push({sel:b.PC+(b.r0+i), keys:[...T('='+b.VC+(b.r0+i)+'/'+b.VC+'$'+b.r0),{key:'Enter'}]}); });   // bottom-up, row lock only
+      [o.A,o.B].forEach(b=>steps.push({sel:b.rng, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]}));
       return steps; }` },
+  /* r434 (bridge ROUND 1 depth pass, DEPTH_PASS §4.27). ALT 1 is the chord-ROUTE alt AND the
+     §1.0-R2(i) SKIPPABILITY PROOF for the re-cut ☆: every reference is TYPED OUT, so not one
+     arrow ever points, blue comes from the cell-styles gallery instead of the font-colour
+     drop-down, both fills walk the Home ribbon, bold is Alt H 1 and the rule is Alt H B S
+     (outside borders on a one-row selection — its top edge IS the top border). All six cores
+     clear; S.pointLog stays empty and the star stays dark. ALT 2 is the op-ORDER alt: the
+     EBITDA line is BOLDED AND RULED WHILE EMPTY, then built and filled across a revenue line
+     that does not exist yet (every year reads 0), and only then does the revenue verse land and
+     recalc light it — the §1.0-R3(p) end-state proof — with the hardcode marked blue last. Both
+     formulas are pointed there, so the ☆ still fires from a completely different order. */
+  { key: 'bridge', name: 'chord-ROUTE: every reference TYPED (no pointing — ☆ forfeited), blue via the alt h j cell-styles gallery, both fills via alt h f i r, bold alt h 1, rule via alt h b s', moves: `C => { const o=C._o; const CL=j=>colLetter(o.c0+1+j); return [
+      {sel:o.rev1,   keys:[{key:'Alt'},L('h'),L('j'),{key:'ArrowRight'},{key:'Enter'}]},          // cell styles → Input, the other route to blue
+      {sel:o.rev2,   keys:[...T('='+CL(0)+o.revRow+'*(1+'+CL(1)+o.gRow+')'),{key:'Enter'}]},      // typed refs — the arrows never grab anything
+      {sel:o.revRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.eb1,    keys:[...T('='+CL(0)+o.mRow+'*'+CL(0)+o.revRow),{key:'Enter'}]},             // margin × revenue — operand order is free
+      {sel:o.ebRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.ebRng,  keys:[{key:'Alt'},L('h'),D(1)]},
+      {sel:o.ebRng,  keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
+    ]; }` },
+  { key: 'bridge', name: 'op-ORDER: EBITDA line ruled while EMPTY, built and filled before revenue exists (reads 0 until the revenue verse recalcs it), hardcode marked blue LAST — ☆ still fires', moves: `C => { const o=C._o; return [
+      {sel:o.ebRng, keys:[{key:'b',ctrl:true}]},
+      {sel:o.ebRng, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:o.eb1,   keys:[{key:'='},{key:'ArrowUp'},{key:'*'},{key:'ArrowUp'},{key:'ArrowUp'},{key:'Enter'}]},
+      {sel:o.ebRng, keys:[{key:'r',ctrl:true}]},                                                  // five EBITDA years, every one of them zero
+      {sel:o.rev2,  keys:[{key:'='},{key:'ArrowLeft'},{key:'*'},{key:'('},{key:'1'},{key:'+'},{key:'ArrowUp'},{key:'ArrowUp'},{key:')'},{key:'Enter'}]},
+      {sel:o.revRng,keys:[{key:'r',ctrl:true}]},                                                  // the revenue line lands and the EBITDA line comes alive behind it
+      {sel:o.rev1,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+    ]; }` },
+  /* r435 (sumif depth pass, DEPTH_PASS §4.28). ALT 1 is the chord-ROUTE alt AND an op-ORDER
+     inversion: the whole page is built BACKWARDS — the % column is percent-formatted while it
+     is still empty, then built and ribbon-filled against a Total row that does not exist yet
+     (every share reads a divide-by-nothing until the foot lands), the Total row is dressed
+     before it holds a number, and the rollup itself is written LAST. Every chord differs from
+     the demo's: Alt H P + Alt H 0 for the percent, Alt H F I D for both fills, Alt H 1 for the
+     bold, Alt H B S for the rule (the perimeter of a one-row selection sets its top edge) and
+     Alt+= AutoSum for the foot. The ☆ still fires — it reads the fill MECHANIC off S.fillOps,
+     so the ribbon route earns it exactly like Ctrl+D. This is the §1.0-R3(p) end-state proof:
+     three of the five beats go through a state where they grade FALSE with the work correctly
+     done, and all five light once the last piece lands.
+     ALT 2 is the §1.0-R2(i) SKIPPABILITY PROOF and the drill's MEASURED negative control: every
+     segment's SUMIF hand-typed with FULLY RELATIVE ranges, bottom-up, no fill anywhere, the
+     share column hand-typed per row with an unlocked denominator, percent via Ctrl+Shift+%
+     then Alt H 0. All five cores clear and the star stays dark — measured at 111 keys on a
+     three-segment seed and 141 on a four-segment one, against the demo's flat 61. */
+  { key: 'sumif', name: 'BACKWARDS + ribbon: % column formatted empty, built and filled before the foot exists, total row dressed before it holds a number, rollup written LAST, autosum foot — the ☆ still fires off the ribbon fill', moves: `C => { const o=C._o; return [
+      {sel:o.pctRng,  keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},                  // percent-format an empty column
+      {sel:o.LP+o.r1, keys:[...T('='+o.LR+o.r1+'/$'+o.LR+'$'+o.rT),{key:'Enter'}]},               // denominator points at a Total row that is still blank
+      {sel:o.pctRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},                            // ribbon fill down
+      {sel:o.totRng,  keys:[{key:'Alt'},L('h'),D(1)]},                                            // bold via the ribbon
+      {sel:o.totRng,  keys:[{key:'Alt'},L('h'),L('b'),L('s')]},                                   // outside border — its top edge IS the top border
+      {sel:o.LR+o.r1, keys:[...T('=SUMIF('+o.critR+','+o.LM+o.r1+','+o.sumR+')'),{key:'Enter'}]},
+      {sel:o.rollRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},                            // the ☆ fill, ribbon route
+      {sel:o.LR+o.rT, keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},                      // AutoSum proposes the block from directly under it
+    ]; }` },
+  { key: 'sumif', name: 'NEGATIVE CONTROL: every segment SUMIF hand-typed bottom-up with FULLY RELATIVE ranges, no fill anywhere, shares typed per row off an unlocked denominator, percent via ctrl+shift+% then alt h 0 — all five cores clear, ☆ dark', moves: `C => { const o=C._o; const st=[];
+      const cr=o.LS+o.r1+':'+o.LS+o.rL, sr=o.LA+o.r1+':'+o.LA+o.rL;
+      for(let i=o.nSeg-1;i>=0;i--) st.push({sel:o.LR+(o.r1+i), keys:[...T('=SUMIF('+cr+','+o.LM+(o.r1+i)+','+sr+')'),{key:'Enter'}]});
+      st.push({sel:o.LR+o.rT, keys:[...T('=SUM('+o.LR+o.r1+':'+o.LR+o.rn+')'),{key:'Enter'}]});
+      st.push({sel:o.totRng, keys:[{key:'b',ctrl:true}]});
+      st.push({sel:o.totRng, keys:[{key:'Alt'},L('h'),L('b'),L('p')]});
+      for(let i=o.nSeg-1;i>=0;i--) st.push({sel:o.LP+(o.r1+i), keys:[...T('='+o.LR+(o.r1+i)+'/'+o.LR+o.rT),{key:'Enter'}]});
+      st.push({sel:o.pctRng, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});
+      return st; }` },
+  /* r435 (fxconvert ROUND 1 depth pass, DEPTH_PASS §4.30): ONE fully absolute scalar driver
+     broadcast over a 2-D block. ALT 1 is the op-ORDER alt AND the chord-ROUTE alt at once — the
+     empty dollar table is comma-formatted BEFORE anything is entered, the driver box is walked
+     edge by edge instead of chorded, blue comes from the cell-styles gallery, both dollar signs
+     are TYPED with no F4 anywhere, the two fills go DOWN-then-RIGHT through the Home ribbon
+     (the demo goes right-then-down with Ctrl chords), the perimeter is a THICK box, and the
+     RATE IS TYPED LAST, so every converted figure reads 0 until it lands and recalc lights the
+     page — the §1.0-R3(p) end-state proof. The ☆ still fires there, which is the point: it is
+     graded on SCOPE (the FY column and the Total line read the rate too), never on a chord.
+     ALT 2 is the ☆'s NEGATIVE CONTROL and the §1.0(c) freedom proof: the rate and its box
+     first, then every body cell hand-typed bottom-up and right-to-left with the dollar signs
+     spelled out and the operands the other way round, no fill anywhere, and the FY column and
+     the Total line summed with nine Alt+= passes — the route the guide actually teaches. All
+     five cores clear; the star stays dark because those nine cells hold SUMs, not the rate.
+     MEASURED: 153 keys at three segments, 187 at four, against the demo's 33 — and the tighter
+     skip route the guide actually teaches (fill the BODY, Alt+= the two edges) runs 49-51 with
+     the same result, which is the star's real headroom. */
+  { key: 'fxconvert', name: 'op-ORDER + chord-ROUTE: empty table comma-formatted FIRST (alt h k then two alt h 9), driver box walked edge by edge, blue via the alt h j cell-styles gallery, typed $ locks with no F4, ribbon fills DOWN then RIGHT, thick perimeter, and the rate typed LAST (every figure reads 0 until recalc) — ☆ still fires', moves: `C => { const o=C._o; return [
+      {sel:o.block,    keys:[{key:'Alt'},L('h'),L('k'),{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]},   // commas on an empty block — end-state grading must hold
+      {sel:o.rateCell, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},                                            // the box, one edge at a time …
+      {sel:o.rateCell, keys:[{key:'Alt'},L('h'),L('b'),L('o')]},
+      {sel:o.rateCell, keys:[{key:'Alt'},L('h'),L('b'),L('l')]},
+      {sel:o.rateCell, keys:[{key:'Alt'},L('h'),L('b'),L('r')]},                                            // … four edges, no ball flag anywhere
+      {sel:o.rateCell, keys:[{key:'Alt'},L('h'),L('j'),{key:'ArrowRight'},{key:'Enter'}]},                   // cell styles → Input, the other route to blue
+      {sel:o.seed,     keys:[...T('='+o.C[0]+o.eurR0+'*$'+o.VC+'$'+o.rr),{key:'Enter'}]},                    // locks typed, not cycled — and the rate cell is still empty
+      {sel:o.C[0]+o.usdR0+':'+o.C[0]+o.usdTot, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},              // down the first column …
+      {sel:o.block,    keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},                                      // … then right across everything, edges included
+      {sel:o.tableRect,keys:[{key:'Alt'},L('h'),L('b'),L('t')]},                                             // thick box — the perimeter grades the same
+      {sel:o.rateCell, keys:[...T(o.rateStr),{key:'Enter'}]},                                                // the rate lands last and the whole page comes alive
+    ]; }` },
+  { key: 'fxconvert', name: 'NEGATIVE CONTROL: rate and box first, every body cell hand-typed bottom-up with typed $ signs and reversed operands, no fill anywhere, FY column and Total line summed with nine alt+= passes, comma via ctrl+shift+! then two alt h 9, per-edge border walk — all five cores clear, ☆ dark', moves: `C => { const o=C._o; const steps=[];
+      steps.push({sel:o.rateCell, keys:[...T(o.rateStr),{key:'Enter'}]});
+      steps.push({sel:o.rateCell, keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]});
+      steps.push({sel:o.rateCell, keys:[{key:'Alt'},L('h'),L('b'),L('a')]});
+      for(let i=o.n-1;i>=0;i--) for(let j=3;j>=0;j--)                                                        // bottom-up, right-to-left, rate first in the product
+        steps.push({sel:o.C[j]+(o.usdR0+i), keys:[...T('=$'+o.VC+'$'+o.rr+'*'+o.C[j]+(o.eurR0+i)),{key:'Enter'}]});
+      for(let i=0;i<o.n;i++)                                                                                 // the FY column, one AutoSum per segment …
+        steps.push({sel:o.C[0]+(o.usdR0+i)+':'+o.C[4]+(o.usdR0+i), keys:[{key:'=',alt:true,code:'Equal'}]});
+      for(let j=0;j<5;j++)                                                                                   // … and the Total line, one per column
+        steps.push({sel:o.C[j]+o.usdR0+':'+o.C[j]+o.usdTot, keys:[{key:'=',alt:true,code:'Equal'}]});
+      steps.push({sel:o.block, keys:[{key:'!',ctrl:true,shift:true},{key:'Alt'},L('h'),D(9),{key:'Alt'},L('h'),D(9)]});
+      steps.push({sel:o.C[0]+o.usdR0+':'+o.C[4]+o.usdR0, keys:[{key:'Alt'},L('h'),L('b'),L('p')]});           // the perimeter walked one edge at a time,
+      steps.push({sel:o.C[0]+o.usdTot+':'+o.C[4]+o.usdTot, keys:[{key:'Alt'},L('h'),L('b'),L('o')]});         // and around the FIGURES only — the label
+      steps.push({sel:o.C[0]+o.usdR0+':'+o.C[0]+o.usdTot, keys:[{key:'Alt'},L('h'),L('b'),L('l')]});          // column and header row left outside it
+      steps.push({sel:o.C[4]+o.usdR0+':'+o.C[4]+o.usdTot, keys:[{key:'Alt'},L('h'),L('b'),L('r')]});
+      return steps; }` },
+  { key: 'cagr', name: 'chord-ROUTE: estimate column seeded BEFORE the CAGR it reads (recalcs behind it), root written ^0.25, forward compound as three (1+r) factors, ribbon block fill alt h f i d, percent alt h p + alt h 0, italic alt h 2, bold alt h 1 — the ☆ still fires', moves: `C => { const o=C._o; const CL=j=>colLetter(o.c0+1+j); const w=o.seg[o.win];
+      const f=o.cagrL+o.r1;
+      return [
+        {sel:o.fyTop,   keys:[...T('='+CL(4)+o.r1+'*(1+'+f+')*(1+'+f+')*(1+'+f+')'),{key:'Enter'}]},   // commits reading an EMPTY CAGR cell — the estimate reads flat until the root lands
+        {sel:o.cagrTop, keys:[...T('=('+CL(4)+o.r1+'/'+CL(0)+o.r1+')^0.25-1'),{key:'Enter'}]},
+        {sel:o.blk,     keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},                                // the ribbon's fill down — same latch, same star
+        {sel:o.fyRngH,  keys:[{key:'Alt'},L('h'),D(2)]},
+        {sel:o.cagrRng, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},                      // percent at ZERO, stepped to one
+        {sel:w.cagrK,   keys:[{key:'Alt'},L('h'),D(1)]},
+      ]; }` },
+  { key: 'cagr', name: 'NEGATIVE CONTROL: both columns dressed while empty, winner bolded before its number exists, all six formulas typed bottom-up with no fill anywhere, percent via ctrl+shift+% then alt h 0 — all five cores clear, ☆ dark', moves: `C => { const o=C._o; const CL=j=>colLetter(o.c0+1+j); const w=o.seg[o.win]; const st=[];
+      st.push({sel:o.cagrRng, keys:[{key:'%',ctrl:true,shift:true},{key:'Alt'},L('h'),D(0)]});          // dress before the work — end-state grading must hold
+      st.push({sel:o.fyRngH,  keys:[{key:'i',ctrl:true}]});
+      st.push({sel:w.cagrK,   keys:[{key:'b',ctrl:true}]});
+      for(let i=2;i>=0;i--){ const rr=o.r1+i;
+        st.push({sel:o.fyL+rr,   keys:[...T('='+CL(4)+rr+'*(1+'+o.cagrL+rr+')^3'),{key:'Enter'}]});
+        st.push({sel:o.cagrL+rr, keys:[...T('=('+CL(4)+rr+'/'+CL(0)+rr+')^(1/4)-1'),{key:'Enter'}]}); }
+      return st; }` },
   { key: 'wacc', name: 'debt side first — at-Kd before the beta chain', moves: `C => [
       {sel:'B13', keys:[...T('=B9*(1-B6)'),{key:'Enter'}]},
       {sel:'B10', keys:[...T('=B4/(1+(1-B6)*B5)'),{key:'Enter'}]},
@@ -1327,22 +1626,64 @@ const ALTS = [
       {sel:'C4:C6', keys:[{key:'d',ctrl:true}]},
       {sel:'C4:G6', keys:[{key:'r',ctrl:true}]},
     ]` },
-  // --- T-D audit pack (r173) ---
-  { key: 'wirewalk', name: 'hop up, fix, then ride the dependents back down', moves: `C => { const o=C._o;
-      const keys=[{key:'[',ctrl:true},{key:'[',ctrl:true}];
-      for(let i=0;i<o.bi;i++) keys.push({key:'ArrowDown'});
-      keys.push(...T(String(o.good)),{key:'Enter'});
-      return [{sel:o.deck, keys:keys}, {sel:o.bad, keys:[{key:']',ctrl:true},{key:']',ctrl:true},{key:'Home',ctrl:true}]}]; }` },
-  { key: 'wrapfix', name: 'fix the range FIRST, wrap second — F2 edit for the fix', moves: `C => { const o=C._o;
-      // F2 into the broken MATCH range: caret at end; walk back over ',0))' then fix B->A twice
+  /* r439 (DEPTH_PASS §4.31 + §4.47 depth pass) — both drills' boards were rebuilt, so their
+     pre-r439 entries are DELETED, not edited: the old `cases` entry drove B8/B9/C12/C13/C18 on a
+     21-row board that no longer exists, and the old `wrapfix` entry drove C._o.q1/q2, fields the
+     rework does not carry. Integrators: do not resurrect either (CAMPAIGN §4 union rule). */
+  { key: 'wrapfix', name: 'chord ROUTE alt — every read RETYPED in full (VLOOKUP, not INDEX/MATCH), ribbon bold and ribbon top border, typed SUM: all six cores clear with the re-cut fill-☆ DARK (the measured negative control, 145 keys against the demo\'s 24)', moves: `C => { const o=C._o;
+      const key=cell=>o.CA+cell.replace(/[A-J]/g,'');
+      const vl=cell=>'=VLOOKUP('+key(cell)+','+o.CA+o.T0+':'+o.CC+o.TN+',3,0)';
       return [
-        {sel:o.q2, keys:[{key:'F2'},
-          ...Array.from({length:8},()=>({key:'ArrowLeft'})),
-          {key:'Backspace'},...T('A'),
-          ...Array.from({length:3},()=>({key:'ArrowRight'})),
-          {key:'Backspace'},...T('A'),
-          {key:'Enter'}]},
-        {sel:o.q1, keys:[...T('=IFERROR(INDEX(B3:B7,MATCH(E2,A3:A7,0)),0)'),{key:'Enter'}]},
+        {sel:o.wrapCell, keys:[...T('=IFERROR('+vl(o.wrapCell).slice(1)+',0)'),{key:'Enter'}]},
+        {sel:o.bad[0].cell, keys:[...T(vl(o.bad[0].cell)),{key:'Enter'}]},
+        {sel:o.bad[1].cell, keys:[...T(vl(o.bad[1].cell)),{key:'Enter'}]},
+        {sel:o.totCell, keys:[...T('=SUM('+o.readRng+')'),{key:'Enter'}]},
+        {sel:o.totRow, keys:[{key:'Alt'},L('h'),D(1)]},
+        {sel:o.totRow, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+      ]; }` },
+  { key: 'wrapfix', name: 'op ORDER alt — foot and dress the panel LAST is the only order that works, so this one repairs bottom-up, wraps before it fixes, boxes the total with Alt H B S instead of B P, and takes the ☆ with the ribbon fill Alt H F I D', moves: `C => { const o=C._o;
+      return [
+        {sel:o.wrapCell, keys:[{key:'F2'},...T(',0)'),{key:'Home'},...T('IFERROR('),{key:'Enter'}]},
+        {sel:o.good.cell, keys:[{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true},{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+        {sel:o.totRow, keys:[{key:'Alt'},L('h'),L('b'),L('s')]},
+        {sel:o.totCell, keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},
+        {sel:o.totRow, keys:[{key:'b',ctrl:true}]},
+      ]; }` },
+  { key: 'cases', name: 'chord ROUTE alt — the driver built with INDEX instead of CHOOSE (the r439 untriggerable-beat probe: identical board, identical behaviour under every switch position) and every fill taken off the ribbon, Alt H F I D / Alt H F I R', moves: `C => { const o=C._o;
+      const R=n=>{ const a=[]; for(let i=0;i<n;i++) a.push({key:'ArrowRight',shift:true}); return a; };
+      return [
+        {sel:o.drv0, keys:[...T('=INDEX('+o.CB+o.rCase+':'+o.CD+o.rCase+',$'+o.CB+'$'+o.rSw+')'),{key:'Enter'}]},
+        {sel:o.drv0, keys:[{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true},{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+        {sel:o.rev1, keys:[...T('='+o.CB+o.rRev+'*(1+$'+o.CB+'$'+o.rDrvG+')'),{key:'Enter'}]},
+        {sel:o.rev1, keys:[...R(o.NY-2),{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.eb0,  keys:[...T('='+o.CB+o.rRev+'*$'+o.CB+'$'+o.rDrvM),{key:'Enter'}]},
+        {sel:o.eb0,  keys:[...R(o.NY-1),{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.cap0, keys:[...T('=IF($'+o.CB+'$'+o.rSw+'='+o.CC+'$'+o.rNum+',$'+o.capL+'$'+o.rEb+','+o.CC+o.rSnap+')'),{key:'Enter'}]},
+        {sel:o.cap0, keys:[...R(2),{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.swCell, keys:[...T('1'),{key:'Enter'}]},
+        {sel:o.swCell, keys:[...T('2'),{key:'Enter'}]},
+        {sel:o.swCell, keys:[...T('3'),{key:'Enter'}]},
+        {sel:o.mutCell, keys:[...T(o.mutPct+'%'),{key:'Enter'}]},
+        {sel:o.swCell, keys:[...T(String(o.mutIdx)),{key:'Enter'}]},
+      ]; }` },
+  { key: 'cases', name: 'op ORDER alt AND the measured negative control — capture built first, then EBITDA, then revenue, then the driver, and the driver TYPED OUT three times so all five cores clear with the ☆ DARK (133 keys against the demo\'s 92)', moves: `C => { const o=C._o;
+      const R=n=>{ const a=[]; for(let i=0;i<n;i++) a.push({key:'ArrowRight',shift:true}); return a; };
+      const ch=(r)=>'=CHOOSE($'+o.CB+'$'+o.rSw+','+o.CB+r+','+o.CC+r+','+o.CD+r+')';
+      return [
+        {sel:o.cap0, keys:[...T('=IF($'+o.CB+'$'+o.rSw+'='+o.CC+'$'+o.rNum+',$'+o.capL+'$'+o.rEb+','+o.CC+o.rSnap+')'),{key:'Enter'}]},
+        {sel:o.cap0, keys:[...R(2),{key:'r',ctrl:true}]},
+        {sel:o.eb0,  keys:[...T('='+o.CB+o.rRev+'*$'+o.CB+'$'+o.rDrvM),{key:'Enter'}]},
+        {sel:o.eb0,  keys:[...R(o.NY-1),{key:'r',ctrl:true}]},
+        {sel:o.rev1, keys:[...T('='+o.CB+o.rRev+'*(1+$'+o.CB+'$'+o.rDrvG+')'),{key:'Enter'}]},
+        {sel:o.rev1, keys:[...R(o.NY-2),{key:'r',ctrl:true}]},
+        {sel:o.drv0, keys:[...T(ch(o.rCase)),{key:'Enter'}]},
+        {sel:o.CB+o.rDrvG, keys:[...T(ch(o.rG)),{key:'Enter'}]},
+        {sel:o.CB+o.rDrvM, keys:[...T(ch(o.rM)),{key:'Enter'}]},
+        {sel:o.swCell, keys:[...T('1'),{key:'Enter'}]},
+        {sel:o.swCell, keys:[...T('2'),{key:'Enter'}]},
+        {sel:o.swCell, keys:[...T('3'),{key:'Enter'}]},
+        {sel:o.mutCell, keys:[...T(o.mutPct+'%'),{key:'Enter'}]},
+        {sel:o.swCell, keys:[...T(String(o.mutIdx)),{key:'Enter'}]},
       ]; }` },
 ];
 
@@ -1364,7 +1705,7 @@ const ALTS = [
   for (const alt of ALTS) {
     if (only.length && !only.includes(alt.key)) continue;
     ran++;
-    let wins = 0, starRuns = 0, bonusRuns = 0; const notes = [];
+    let wins = 0; const notes = [];
     for (let rep = 0; rep < REPS; rep++) {
       const r = await page.evaluate(({ key, movesSrc }) => {
         try {
@@ -1377,36 +1718,17 @@ const ALTS = [
              ends with the same save keystroke a player would press (the routes themselves
              stay chord-diverse; the closer is engine-owned and route-independent) */
           if (!done && C.saveClose) demoKey({ key: 's', ctrl: true });
-          /* r429: report the ☆ state too. An alt whose NAME says "☆ forfeited" is a drill's
-             NEGATIVE CONTROL for §1.0-R2(i) skippability — it must clear every core beat with the
-             bonus still dark. Enforcing it here means each reworked drill gets its skippability
-             proof from the alt it already ships, instead of a bespoke probe file per drill. */
-          const rows = C.checks(S);
-          const bonus = rows.find(x => x.bonus);
-          const star = !!(bonus && bonus.ok);
-          if (done) return { won: true, keys: keyLog.length, star, hasBonus: !!bonus };
-          const failing = rows.filter(x => !x.ok).map(x => x.label);
-          return { won: false, failing, star, hasBonus: !!bonus };
+          if (done) return { won: true, keys: keyLog.length };
+          const failing = C.checks(S).filter(x => !x.ok).map(x => x.label);
+          return { won: false, failing };
         } catch (e) { return { won: false, failing: ['THREW: ' + String(e).slice(0, 100)] }; }
       }, { key: alt.key, movesSrc: alt.moves });
       if (r.won) wins++;
       else notes.push((r.failing || []).join(' | ').slice(0, 160));
-      if (r.star) starRuns++;
-      if (r.hasBonus) bonusRuns++;
     }
-    let ok = wins === REPS;
-    /* the ☆-forfeit contract (see above): name says forfeited => the ☆ must be dark in EVERY rep */
-    const claimsForfeit = /☆\s*forfeit|forfeit(ed)?\s*(the\s*)?☆|no ☆/i.test(alt.name);
-    let starNote = '';
-    if (claimsForfeit && bonusRuns && starRuns > 0) {
-      ok = false;
-      starNote = '\n       ☆ CONTRACT BROKEN: this alt claims the ☆ is forfeited but EARNED it in '
-        + starRuns + '/' + REPS + ' reps — either the alt is not actually the slow route, or the ☆ latch is too loose';
-    }
+    const ok = wins === REPS;
     if (!ok) fails++;
-    console.log((ok ? 'PASS ' : 'FAIL ') + alt.key.padEnd(10) + ' · ' + alt.name
-      + (bonusRuns ? '  [\u2606 ' + starRuns + '/' + bonusRuns + ']' : '')
-      + (wins === REPS ? '' : '\n       stuck on: ' + notes[0]) + starNote);
+    console.log((ok ? 'PASS ' : 'FAIL ') + alt.key.padEnd(10) + ' · ' + alt.name + (ok ? '' : '\n       stuck on: ' + notes[0]));
   }
   console.log('\nALT PATHS: ' + (fails ? fails + ' FAILURE(S) of ' + ran : 'ALL ' + ran + ' PASS'));
   if (errs.length) { console.log('PAGE ERRORS: ' + errs.slice(0, 3).join(' · ')); fails++; }

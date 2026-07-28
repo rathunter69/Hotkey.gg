@@ -1306,7 +1306,7 @@ async function renderManage(root){
   // ---- quests + program templates (ported from account.html r130/r149) ----
   const MG_PROGRAMS={
     intern0:{name:'Intern week 0', pitch:'zero to desk-ready — movement, formatting, first formulas, find-and-fix', weeks:[
-      {note:'get moving, no mouse',        keys:['navigation','copyover','undo']},
+      {note:'get moving, no mouse',        keys:['navigation','pastes','editfix']}   /* r431: copyover retired, undo merged into editfix */,
       {note:'desk-standard formatting',    keys:['housestyle','dress','decimals']},
       {note:'first formulas',              keys:['margin','growth','foot']},
       {note:'find it and fix it',          keys:['modeltour','audit','triage']}]},

@@ -292,26 +292,57 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
 
   console.log('S. AutoFilter (r180)');
   await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('filterpass'); });
+  /* r438 — DE-COUPLED FROM THE DRILL'S PRIVATE GEOMETRY (DEPTH_PASS_CAMPAIGN, "Parity is coupled
+     to drill internals"). This section tests the ENGINE's AutoFilter (r180); filterpass is only
+     the board it happens to run on. It used to read CHALLENGES.filterpass._o.rows[].st and
+     hard-code the header at row 3, columns A–C, three ▾ markers, three chips and the data at
+     B4:B12 — so the filterpass depth pass (which jitters the header row, moves the table into
+     column A or B, and carries a fourth column) broke an engine suite that has nothing to do
+     with the drill. Same class as the sortGeo() fix in r437 and the section-U fix in unhide.
+     Everything below now DERIVES from the live sheet: the header row and span come from the
+     armed S.filter itself, the status column is the last column of that span, and the data rows
+     are read off the sheet. Re-boarding any filter drill can no longer reach this file. */
   const s1 = await run(() => {
-    const o = CHALLENGES.filterpass._o;
-    setDemoSel('B3'); demoKey({key:'L', ctrl:true, shift:true});
-    const armed = !!S.filter && S.filter.hr === 3 && S.filter.c1 === 1 && S.filter.c2 === 3;   // header block found from a MIDDLE cell
-    const markers = document.querySelectorAll('.fltbtn').length === 3;
-    setDemoSel('C3'); demoKey({key:'ArrowDown', alt:true});
-    const open = mode === 'ribbon' && dialog === 'filter' && filterVals.length === 3;
-    filterVals.forEach((x, i) => { if (x.v !== 'Open') { filterIdx = i; demoKey({key:' '}); } });
+    // find the header row from the sheet: the first row whose cells match the seeded headers
+    let hr = 0, cD = 0;
+    for (let r = 1; r <= S.ROWS && !hr; r++)
+      for (let c = 1; c <= 10; c++) {
+        const v = S.cells[String.fromCharCode(64 + c) + r];
+        if (v && v.value === 'Deal') { hr = r; cD = c; break; }
+      }
+    const CL = c => String.fromCharCode(64 + c);
+    // arm from a MIDDLE cell of the header block — the span must be found by walking outward
+    setDemoSel(CL(cD + 1) + hr); demoKey({key:'L', ctrl:true, shift:true});
+    const span = S.filter ? (S.filter.c2 - S.filter.c1 + 1) : 0;
+    const armed = !!S.filter && S.filter.hr === hr && S.filter.c1 === cD && span >= 3;
+    const markers = document.querySelectorAll('.fltbtn').length === span;
+    const cSt = S.filter ? S.filter.c2 : 0;                                    // Status: the last armed column
+    // the data rows and the distinct values in the status column, read off the sheet
+    const rows = [];
+    for (let r = hr + 1; r <= S.filter.r2; r++) {
+      const v = S.cells[CL(cSt) + r];
+      if (v && v.value !== null && v.value !== '') rows.push({ r, v: String(v.value) });
+    }
+    const vals = []; rows.forEach(x => { if (vals.indexOf(x.v) < 0) vals.push(x.v); });
+    const keep = vals[0];                                                      // keep the first value, drop the rest
+    setDemoSel(CL(cSt) + hr); demoKey({key:'ArrowDown', alt:true});
+    const open = mode === 'ribbon' && dialog === 'filter' && filterVals.length === vals.length;
+    filterVals.forEach((x, i) => { if (x.v !== keep) { filterIdx = i; demoKey({key:' '}); } });
     demoKey({key:'Enter'});
-    const nonOpen = o.rows.filter(x => x.st !== 'Open').map(x => x.r);
-    const hidOk = nonOpen.every(r => S.hidden.has(r)) && S.hidden.size === nonOpen.length;
-    S.cells['E1'] = { ...blankCell(), formula: '=SUM(B4:B12)' }; recalc();
-    let t = 0; for (let r = 4; r <= 12; r++) t += S.cells['B' + r].value;
-    const sumOk = Math.abs(S.cells['E1'].value - t) < 0.5;                     // SUM sees hidden rows (no SUBTOTAL yet)
+    const shouldHide = rows.filter(x => x.v !== keep).map(x => x.r);
+    const hidOk = shouldHide.every(r => S.hidden.has(r)) && S.hidden.size === shouldHide.length;
+    // SUM over the figures column still counts the hidden rows (no SUBTOTAL in this engine)
+    const cSi = cSt - 1;
+    const r1 = hr + 1, r2 = S.filter.r2;
+    S.cells['J1'] = { ...blankCell(), formula: '=SUM(' + CL(cSi) + r1 + ':' + CL(cSi) + r2 + ')' }; recalc();
+    let t = 0; for (let r = r1; r <= r2; r++) { const c = S.cells[CL(cSi) + r]; if (c && typeof c.value === 'number') t += c.value; }
+    const sumOk = Math.abs(S.cells['J1'].value - t) < 0.5;
     demoKey({key:'L', ctrl:true, shift:true});
     const cleared = !S.filter && S.hidden.size === 0 && document.querySelectorAll('.fltbtn').length === 0;
-    setDemoSel('A3'); demoKey({key:'Alt'}); demoKey({key:'a'}); demoKey({key:'t'});
+    setDemoSel(CL(cD) + hr); demoKey({key:'Alt'}); demoKey({key:'a'}); demoKey({key:'t'});
     const viaRibbon = !!S.filter && mode === 'normal';
     demoKey({key:'L', ctrl:true, shift:true});
-    return { armed, markers, open, hidOk, sumOk, cleared, viaRibbon };
+    return { armed, markers, open, hidOk, sumOk, cleared, viaRibbon, span, nVals: vals.length };
   });
   ok(s1.armed, 'Ctrl+Shift+L arms across the contiguous header block');
   ok(s1.markers, 'every armed header wears a \u25be');
@@ -322,48 +353,83 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(s1.viaRibbon, 'Alt A T is the ribbon route to the same toggle');
 
   console.log('T. Go To Special (r182)');
-  await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('hunt'); });
+  /* r439: this section tests the GO TO SPECIAL ENGINE, not a drill — but it drove
+     `loadChallenge('hunt')` and asserted magic counts (13 marks, 8 formulas, first mark at B3)
+     read off that board. `hunt` retired into `audit` in r439, and even before that the counts
+     were a board fact masquerading as an engine fact. It now builds its OWN fixture and derives
+     every expected number from it, so no drill rework can break an engine assertion again. */
+  await run(() => {
+    document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove());
+    loadChallenge('audit');                       // any board; we replace its cells wholesale
+    S.cells = {};
+    S.ROWS = 12;
+    // labels are TEXT constants — the engine's Constants criterion excludes them on purpose
+    ['Alpha','Beta','Gamma','Delta','Epsilon','Zeta'].forEach((n, i) => {
+      S.cells['A' + (3 + i)] = { ...blankCell(), value: n, txt: true };
+    });
+    // 6 numeric constants — the Constants criterion should mark exactly these
+    [110, 120, 130, 140, 150, 160].forEach((v, i) => {
+      S.cells['B' + (3 + i)] = { ...blankCell(), value: v };
+    });
+    // 4 formulas — the Formulas criterion should mark exactly these
+    for (let i = 0; i < 4; i++) {
+      S.cells['C' + (3 + i)] = { ...blankCell(), formula: '=B' + (3 + i) + '*2' };
+    }
+    recalc(); render();
+  });
   const t1 = await run(() => {
-    const o = CHALLENGES.hunt._o;
+    const CONSTS = ['B3','B4','B5','B6','B7','B8'], FORMS = ['C3','C4','C5','C6'];
     demoKey({key:'F5'}); const gotoOpen = mode === 'ribbon' && dialog === 'goto';
     demoKey({key:'s', code:'KeyS'}); demoKey({key:'o', code:'KeyO'});
-    const marked = S.marks.length === 13 && S.markN === 1 && mode === 'normal';   // 5 inputs + 5 growths + 3 crimes
+    const marked = S.marks.length === CONSTS.length && S.markN === 1 && mode === 'normal'
+                   && CONSTS.every(k => S.marks.indexOf(k) >= 0);
     setDemoSel('A1'); demoKey({key:'Enter'});
-    const walksTo = colLetter(S.active.c) + S.active.r;                            // first mark in scan order
+    const walksTo = colLetter(S.active.c) + S.active.r;            // first mark in scan order
     demoKey({key:'Enter', shift:true});
     const wrapsBack = colLetter(S.active.c) + S.active.r === walksTo || S.marks.indexOf(colLetter(S.active.c)+S.active.r) >= 0;
-    const s0 = o.sites[0];
-    setDemoSel(s0.k); for (const ch of s0.f) demoKey({key:ch}); demoKey({key:'Enter'});
-    const unmarked = S.marks.length === 12 && S.marks.indexOf(s0.k) < 0;           // fixing kills the mark
-    const walkedOn = S.marks.indexOf(colLetter(S.active.c) + S.active.r) >= 0;     // commit rode to a survivor
+    const victim = CONSTS[0];
+    setDemoSel(victim); for (const ch of '=1+1') demoKey({key:ch}); demoKey({key:'Enter'});
+    const unmarked = S.marks.length === CONSTS.length - 1 && S.marks.indexOf(victim) < 0;
+    const walkedOn = S.marks.indexOf(colLetter(S.active.c) + S.active.r) >= 0;
     demoKey({key:'Escape'});
     const cleared = !S.marks.length && !S.markCrit;
     demoKey({key:'g', ctrl:true}); const ctrlG = mode === 'ribbon' && dialog === 'goto';
     demoKey({key:'s', code:'KeyS'}); demoKey({key:'f', code:'KeyF'});
-    const formulas = S.marks.length === 8;                                         // 7 surviving calc formulas + 1 fix
+    const formulas = S.marks.length === FORMS.length + 1;          // the 4 seeded + the cell just repaired
     demoKey({key:'Escape'});
-    return { gotoOpen, marked, walksTo, wrapsBack, unmarked, walkedOn, cleared, ctrlG, formulas };
+    return { gotoOpen, marked, walksTo, wrapsBack, unmarked, walkedOn, cleared, ctrlG, formulas, nMarks: S.marks.length };
   });
   ok(t1.gotoOpen, 'F5 opens Go To');
-  ok(t1.marked, 'S\u2192O marks every raw number (and only those)');
+  ok(t1.marked, 'S\u2192O marks every raw number (and only those \u2014 text constants excluded)');
   ok(t1.walksTo === 'B3', 'Enter rides the marked set in scan order', t1.walksTo);
   ok(t1.wrapsBack, 'Shift+Enter walks backward');
   ok(t1.unmarked && t1.walkedOn, 'fixing a marked cell unmarks it and walks on', JSON.stringify(t1));
-  ok(t1.cleared, 'Esc clears the hunt');
-  ok(t1.ctrlG && t1.formulas, 'Ctrl+G route + Formulas criterion');
+  ok(t1.cleared, 'Esc clears the marks');
+  ok(t1.ctrlG && t1.formulas, 'Ctrl+G route + Formulas criterion', JSON.stringify(t1));
 
   console.log('U. manual hide + column width (r185)');
   await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('unhide'); });
+  /* r437: this section drove the PRE-REWORK unhide board by hard-coded coordinates (rows 4-7
+     hidden, the total at B3, the header at B2) and by `_o.sum`, none of which survived the
+     depth pass (DEPTH_PASS §4.37 + the §4.35 grpfold merge). It is an ENGINE-parity section,
+     not a drill section, so it is repointed at the live board's own `_o` instead of being
+     re-hard-coded — the r185 hide/unhide mechanics and the Alt H O W prompt are what it is
+     actually asserting, and those are unchanged. */
   const u1 = await run(() => {
-    const preHidden = [4,5,6,7].every(r => S.hidden.has(r)) && S.hiddenRows.length === 4;   // board loads with the sins in place
-    const subLive = Math.abs(S.cells['B3'].value - CHALLENGES.unhide._o.sum) < 0.5;        // SUM sees hidden rows
-    setDemoSel('A3:A8'); demoKey({key:'9', ctrl:true, shift:true});
-    const unhid = S.hidden.size === 0 && S.unhideN === 1;
-    setDemoSel('A5:A6'); demoKey({key:'9', ctrl:true});
-    const rehid = S.hidden.has(5) && S.hidden.has(6) && !S.hidden.has(4) && !rowHidden(S.active.r);
-    setDemoSel('A4:A7'); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'o'}); demoKey({key:'u'}); demoKey({key:'o'});
+    const o = CHALLENGES.unhide._o;
+    const gaps = o.regions.filter(b => b.hidden);
+    const buried = []; gaps.forEach(b => { for (let r = b.d1; r <= b.d2; r++) buried.push(r); });
+    const preHidden = buried.every(r => S.hidden.has(r)) && S.hiddenRows.length === buried.length;   // board loads with the sins in place
+    const subLive = gaps.every(b => Math.abs(S.cells['B' + b.rt].value - b.sum) < 0.5);              // SUM sees hidden rows
+    const g0 = gaps[0];
+    setDemoSel('A' + (g0.d1 - 1) + ':A' + (g0.d2 + 1)); demoKey({key:'9', ctrl:true, shift:true});
+    const unhid = ![g0.d1, g0.d2].some(r => S.hidden.has(r)) && S.unhideN === 1;
+    setDemoSel('A' + g0.d1 + ':A' + (g0.d1 + 1)); demoKey({key:'9', ctrl:true});
+    const rehid = S.hidden.has(g0.d1) && S.hidden.has(g0.d1 + 1) && !S.hidden.has(g0.d2) && !rowHidden(S.active.r);
+    setDemoSel('A' + o.regions[0].d1 + ':A' + o.regions[2].rt);
+    demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'o'}); demoKey({key:'u'}); demoKey({key:'o'});
     const ribbonUnhide = S.hidden.size === 0;
-    setDemoSel('B2'); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'o'}); demoKey({key:'w'});
+    setDemoSel('B' + o.hr); demoKey({key:'Alt'}); demoKey({key:'h'}); demoKey({key:'o'}); demoKey({key:'w'});
     const dlg = mode === 'ribbon' && dialog === 'colw';
     demoKey({key:'1'}); demoKey({key:'2'}); demoKey({key:'Enter'});
     const applied = colW[2] === Math.round(12*7)+5 && mode === 'normal';
@@ -377,18 +443,18 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(u1.dlg && u1.applied, 'Alt H O W numeric width prompt applies Excel units');
 
   console.log('V. SUMIFS + SUMPRODUCT (r188)');
-  await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('rollup'); });
-  /* r429 H6b-5 FIXTURE ROT FIX: this block used to READ whatever `rollup` happened to have in
-     A3:C11 and assert SUMPRODUCT against it. `rollup` was reworked in wave 5 and its board is now
-     randomized (site jitter, 8-12 row ledger, shuffled segment pool), so on roughly half of all
-     seeds C3:C6 held a label or a blank instead of a number and the dot product came out NaN —
-     a genuinely flaky gate that passed locally and failed on CI. Section V tests the EVALUATOR,
-     not a board, so it now PLANTS its own operands and asserts against a value computed from the
-     same planted numbers. No drill rework can move it again. */
+  /* r438: this section drove `rollup`'s BOARD \u2014 it hard-coded A3:A11/B3:B11/C3:C11 and the
+     literal labels "Retail"/"EMEA" that the pre-depth-pass board happened to seed. That is an
+     ENGINE suite depending on a drill's private geometry (dev/DEPTH_PASS_CAMPAIGN.md, "Parity is
+     coupled to drill internals"), so rollup's depth pass \u2014 which randomizes both axes and the
+     grid shape \u2014 would have broken it for reasons unrelated to the engine. De-coupled rather
+     than re-pinned: the section now seeds its OWN fixture and asserts against its own data, so
+     no drill rework can reach it again. */
+  await fresh();
   const v1 = await run(() => {
-    const SEG=['Retail','Retail','Wholesale','Retail','Wholesale','Retail','Retail','Wholesale','Retail'];
-    const REG=['EMEA','APAC','EMEA','EMEA','APAC','APAC','EMEA','EMEA','EMEA'];
-    const AMT=[120,340,55,880,210,64,730,410,95];
+    const SEG=['Retail','Retail','Instl','Retail','Instl','Instl','Retail','Instl','Retail'];
+    const REG=['EMEA','APAC','EMEA','EMEA','APAC','EMEA','APAC','APAC','EMEA'];
+    const AMT=[120,340,260,80,150,410,90,230,170];
     for(let i=0;i<9;i++){ const r=3+i;
       S.cells['A'+r]={...blankCell(), value:SEG[i], txt:true};
       S.cells['B'+r]={...blankCell(), value:REG[i], txt:true};
@@ -398,13 +464,11 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     S.cells['J3']={...blankCell(), formula:'=SUMIFS(C3:C11,A3:A11,"Nobody",B3:B11,"EMEA")'};
     S.cells['J4']={...blankCell(), formula:'=IFERROR(SUMIFS(C3:C11,A3:A11),-1)'};   // odd args \u2192 error \u2192 fallback
     recalc();
-    let want=0; for(let i=0;i<9;i++) if(SEG[i]==='Retail'&&REG[i]==='EMEA') want+=AMT[i];
-    let dot=0; for(let i=0;i<4;i++) dot+=AMT[i]*AMT[i];
-    return { two: Math.abs(S.cells['J1'].value-want)<0.5, dot: Math.abs(S.cells['J2'].value-dot)<0.5,
-      zero: S.cells['J3'].value===0, err: S.cells['J4'].value===-1,
-      wantNonZero: want>0, dotNonZero: dot>0 };
+    let want=0; for(let r=3;r<=11;r++) if(S.cells['A'+r].value==='Retail'&&S.cells['B'+r].value==='EMEA') want+=S.cells['C'+r].value;
+    let dot=0; for(let r=3;r<=6;r++) dot+=S.cells['C'+r].value*S.cells['C'+r].value;
+    return { two: want>0 && Math.abs(S.cells['J1'].value-want)<0.5, dot: Math.abs(S.cells['J2'].value-dot)<0.5,
+      zero: S.cells['J3'].value===0, err: S.cells['J4'].value===-1 };
   });
-  ok(v1.wantNonZero && v1.dotNonZero, 'V fixture plants real operands (the assertions cannot pass on zeros)');
   ok(v1.two, 'SUMIFS crosses two criteria correctly');
   ok(v1.dot, 'SUMPRODUCT is a pairwise dot product');
   ok(v1.zero, 'SUMIFS with no match sums to zero');
@@ -443,8 +507,24 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
 
   console.log('X. sort warning (r192)');
   await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('sort'); });
+  // r437: these two blocks test the SORT ENGINE (the r192 warning card, Alt+= range detection),
+  // not the sort drill — but they read the drill's private _o field names directly, so the
+  // depth-pass rework renamed `range`/`sc` out from under them and the suite crashed on
+  // undefined.match. Same coupling class as the depth-mechanics fix: go through sortGeo(),
+  // which accepts either shape, so a board rework can change geometry without breaking CI.
+  await run(() => {
+    window.sortGeo = () => {
+      const o = CHALLENGES.sort._o;
+      return {
+        range6: o.range || o.rng6,           // the table as it arrives (late-deal row empty)
+        range7: o.range || o.rng7 || o.rng6, // …one row taller, incl. the late-deal slot
+        sc    : o.sc    || o.SC,             // the size (sort-key) column letter
+        foot  : o.foot,
+      };
+    };
+  });
   const x1 = await run(() => {
-    const o = CHALLENGES.sort._o, m = o.range.match(/([A-J])(\d+):([A-J])(\d+)/);
+    const o = sortGeo(), m = o.range6.match(/([A-J])(\d+):([A-J])(\d+)/);
     const r1 = +m[2], r2 = +m[4], scN = o.sc.charCodeAt(0) - 64;
     const pairs = []; for (let rr = r1; rr <= r2; rr++) pairs.push([S.cells[m[1]+rr].value, S.cells[o.sc+rr].value]);
     S.sel = { r: r1, c: scN }; S.active = { r: r2, c: scN }; render();
@@ -466,15 +546,18 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   console.log('Y. Alt+= flow (r192)');
   await run(() => { document.querySelectorAll('.wb-dlg,.hk-cel-wrap').forEach(n => n.remove()); loadChallenge('sort'); });
   const y1 = await run(() => {
-    const o = CHALLENGES.sort._o, m = o.range.match(/([A-J])(\d+):([A-J])(\d+)/);
+    // range7, not range6: the foot sits directly under the LATE-DEAL row, so the Alt+= probe
+    // must select through it for `r2 + 1` to land on the total. That slot is legitimately
+    // empty at load, hence the guarded sum.
+    const o = sortGeo(), m = o.range7.match(/([A-J])(\d+):([A-J])(\d+)/);
     const r1 = +m[2], r2 = +m[4], scN = o.sc.charCodeAt(0) - 64;
-    let want = 0; for (let rr = r1; rr <= r2; rr++) want += S.cells[o.sc+rr].value;
+    let want = 0; for (let rr = r1; rr <= r2; rr++) want += (S.cells[o.sc+rr] || {}).value || 0;
     S.sel = { r: r1, c: scN }; S.active = { r: r2 + 1, c: scN }; render();
     demoKey({key:'=', alt:true});
     const f = S.cells[o.foot];
     const rangeForm = !!(f && f.formula && Math.abs(f.value - want) < 0.5) && !editing && !!S.sel;
     loadChallenge('sort');
-    const o2 = CHALLENGES.sort._o, fr = +o2.foot.match(/\d+/)[0], fc = o2.foot[0].charCodeAt(0) - 64;
+    const o2 = sortGeo(), fr = +o2.foot.match(/\d+/)[0], fc = o2.foot[0].charCodeAt(0) - 64;
     S.active = { r: fr, c: fc }; S.sel = null; render();
     demoKey({key:'=', alt:true}); demoKey({key:'Enter'});
     const stays = S.active.r === fr && S.active.c === fc;

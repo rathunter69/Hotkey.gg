@@ -112,7 +112,19 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   console.log('F. display layer speaks Mac (Stage 2)');
   await run(() => { try { localStorage.setItem('hk_mac_seen', '1'); } catch (e) {} });
   const f = await run(new Function('arg', K + `
-    loadChallenge('dress');
+    /* r437: this used to load 'dress', which the depth-pass campaign folded away — a retired
+       key left behind in a harness, the same miss as the certificate SQL and the leaderboard
+       PKEYS list. It is the DISPLAY layer under test, not a particular board, so pick the host
+       at runtime: any live drill whose task line actually names an Alt or Ctrl chord, since
+       that is the only precondition for the ⌥/⌘ caps to have something to render. */
+    const host = Object.keys(CHALLENGES).find(k => {
+      let r = CHALLENGES[k] && CHALLENGES[k].req;
+      if (typeof r === 'function') { try { r = r(); } catch (e) { return false; } }
+      const t = Array.isArray(r) ? r.join(' ') : String(r || '');
+      return /alt|ctrl/i.test(t);   // req is lower-case HTML copy, not display caps
+    });
+    if (!host) throw new Error('no drill names an Alt/Ctrl chord in req — mac caps untestable');
+    loadChallenge(host);
     const btnShown = (document.getElementById('macBtn')||{style:{}}).style.display !== 'none';
     const tl = (document.getElementById('taskLine')||{innerHTML:''}).innerHTML;
     const reqMac = tl.indexOf('\u2325') >= 0 || tl.indexOf('\u2318') >= 0;
