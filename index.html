@@ -8457,72 +8457,327 @@ const CHALLENGES = {
     }
   },
   dcf:{
-    name:'DCF', label:'Discount the cash flows', par:62, parKeys:64,
+    /* r444 H6b (DEPTH_PASS §4.59, "Discount the cash flows") — the depth-pass rework, built to
+       §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (the newer law wins on conflict) and
+       to dev/MODELING_STANDARDS.md, which is BINDING on Models I: a banker judges the MODEL first.
+
+       WAS: five checks on a ROWS:12 board — the §1.3 defect in its purest form (12 of the real
+       20-row sheet, and the load and win densities identical) — no ☆ at all, no saveClose, and
+       EVERY ONE OF THE FIVE CHECKS graded formula TEXT through a refs() helper.
+
+       ── THE ☆-HEADROOM DIAGNOSTIC (DEPTH_PASS_CAMPAIGN §2, both parts). Every number here is
+       `keyLog` through the live engine on the real board, medians over seeds, every selection and
+       navigation KEYED — re-run any time by `node dev/verify-dcf.js` part 2:
+         PART 1 — IS THERE SPREAD? The fastest legal route that clears all six cores is 79 keys
+           (two seeded formulas + two fills, three summary formulas, one dress motion; +1 for the
+           engine's save); the slowest legal one doing the SAME work is 217 — every factor and
+           every present value typed as its own formula with no fill anywhere, the present values
+           discounted straight off the cash flows, the terminal value re-derived instead of
+           pointed at, the enterprise value written as an addition chain, the dress walked off the
+           ribbon. **2.75×.**
+         PART 2 — IS ANY OF IT ☆-LEGAL? This is the half that decides, and it is MEASURED slice by
+           slice rather than estimated. Of the 138 keys of spread: **3** are chord-vs-ribbon
+           (Ctrl+B + Alt H B P at 5 keys against Alt H 1 + Alt H B A at 8), which §1.0(c) forces
+           to CLEAR; **0** are formatting, because this board grades exactly one dress and every
+           route to it costs the same or less. The other **135 survive the strip** — factor row
+           filled 20 vs typed 75, present-value row filled 11 vs discounted one at a time 80,
+           terminal value pointed 7 vs re-derived 14, enterprise value SUM 15 vs addition chain
+           19. Those are the §1.0-R4(u) families "anchoring mastery — anchors set so ONE formula
+           fills a whole block" and "reference over retype". Legal headroom, in the drill's own
+           subject rather than a borrowed one. BUILD.
+         EACH HALF OF THE STAR MEASURED SEPARATELY (the r438 `series` rule — a combined number
+         hides a negative half): half A, the anchored factor row taken across in one pass, is
+         **20 keys against 75** to type the five factors — +55. Half B, the terminal value
+         discounted off the year-5 factor CELL, is **7 against 14** to re-derive `/(1+rate)^5` —
+         +7. Both halves positive, so neither is the retirement failure CAMPAIGN §2 records (a
+         star route measuring WORSE than the route it exists to beat).
+         NOT CLAIMED BY THE STAR, DELIBERATELY: the present-value row's fill is worth 69 keys and
+         is ☆-legal, but the star's idea is "no discount factor computed twice" and the PV fill is
+         a different idea. The clock still pays for it; the star stays one sentence.
+
+       ── FOUR UNTRIGGERABLE BEATS FOUND ON THE SHIPPED BOARD (the CAMPAIGN §1 class, found by
+       WALKING routes through the pre-rework tree served on its own port, never by reading a
+       predicate). All five old checks read formula TEXT through a refs() helper; four of them
+       are demonstrably reachable-but-dark, and in every case the board's number came out EXACTLY
+       equal to the expected one — relative error 0.0e+0, three seeds each:
+         (1) THE FACTOR BEAT demanded refs('B4',['B7','B2']). Type the discount PERIOD as a
+             literal exponent — `=1/(1+$B$7)^1`, `^2`, `^3`… which is what half the desks do,
+             since the periods are 1 to 5 and never move — and there is no 'B2' anywhere in the
+             text. Probed: board 0.900901 / 0.811622 / 0.731191 / 0.658731 / 0.593451 against
+             expected 0.900901 / 0.811622 / 0.731191 / 0.658731 / 0.593451, check FALSE.
+         (2) THE PV BEAT demanded refs('B5',['B3','B4']). Present-value the cash flows directly
+             (`=B3/(1+$B$7)^B2`) and the PV row is identical to the last digit with no 'B4' in
+             it. Probed: 163.6364 / 160.3306 / 154.7708 / 151.6290 / 147.7793 against the same
+             five numbers, check FALSE.
+         (3) THE PV-OF-TV BEAT demanded refs('B11',['B10','F4']) — which is a ROUTE, not an end
+             state. `=B10/(1+B7)^5` lands 1169.4610 against an expected 1169.4610 and the line
+             stays dark. §1.0(c) says a route may only ever be graded as the ☆, and that is
+             exactly where it has gone.
+         (4) THE ENTERPRISE-VALUE BEAT demanded the literal string 'SUM('. The addition chain
+             `=B5+C5+D5+E5+F5+B11` foots to 3086.0273 against an expected 3086.0273, dark — the
+             same class as the r440 `balance` bug and #8 of the campaign table.
+       (The fifth, the TV beat's refs('B10',['F3','B8']), survived every route walked at it: on
+       this board there is exactly one cell holding the growth rate and one holding the year-5
+       cash flow, so no correct Gordon formula can avoid naming both. Recorded rather than
+       claimed — a beat that happens to be safe is not the same as a beat that grades an end
+       state, and it grades the end state now like the rest.)
+       Every core here grades the END STATE (§1.0-R3(p)): the NUMBER standing in the cell, plus —
+       where the label's verb is Build or Total — that the cell is live rather than a typed
+       constant. That liveness conjunct is doctrine §2.2's sanctioned exception ("don't hardcode
+       the answer" IS the lesson: foot, comps, versionup) and the r440 `balance` precedent; no
+       check reads a range, a function name or an anchor out of formula text.
+
+       ── MODELING_STANDARDS COMPLIANCE (stated because §7 requires it):
+         · §4 forms exactly as written — discount factor `1/(1+WACC)^t`; Gordon terminal value
+           `FCF_final × (1+g)/(WACC − g)`; the TV discounted at the FINAL period's factor; and
+           `g < WACC` holds on every seed by construction (WACC 8–12%, g 2–3%, spread ≥5pts).
+         · §1 provenance — every typed input is blue (the rate, the growth rate, the periods, the
+           cash flows); every built cell is black. The two assumptions ride the §1.0(f)/§1.0-R2(l)
+           input convention: light yellow, all borders, populated, vertically stacked, and each
+           labelled with the ASSUMPTION rather than the word "Helper" (the r430 correction).
+         · §1 structure — the enterprise value takes a TOP border, never a rule underneath; units
+           are stated in the title ($mm); the header row is underlined off the body.
+         · §6 — the check lives in one visible place: the terminal-value share of enterprise value
+           is on the page as a live line, with the reviewer's 60–80% band beside it. Ungraded
+           board furniture, so it can never move a beat.
+         · DELIBERATE SIMPLIFICATIONS, said out loud on the board's own memo line per §7:
+           end-of-year discounting (no mid-year convention, which would use t−0.5), and no
+           enterprise-to-equity bridge — the bridge is `dcfbuild`'s subject (§4.84), and §1.3's
+           20-row cap means this board is the DISCOUNTING STRIP, a component, not the page.
+         · The share line is the one IFERROR on the board: its denominator is empty until the
+           player builds the enterprise value, and a page that greets the player with #DIV/0!
+           would be teaching a different drill (`triage`). It is furniture, never graded.
+
+       ── STRUCTURAL DEVIATIONS from the §4.59 page, declared here per §0:
+       (1) ☆ RE-CUT (binding, §1.0-R4(u) — the page predates the playtest rounds so its ☆ line is
+           dead on arrival). The page proposes "Comma-format the PV row and bold the summed PV
+           cell": a FORMATTING task, which §1.0(d) forbids outright, and one that falls out of
+           doing the exercise, which §1.0-R2(i) forbids again. Where the killed ☆ was real work it
+           is PROMOTED (the r425 precedent): the bold half becomes core beat 6, and the comma
+           format ships on the board. The re-cut ☆ is the efficiency the drill is named for.
+       (2) BEATS. The page is a "language pass + desc fix + bonus" over a 5-check drill, which
+           leaves it two rules short of today's standard: §1.0(e) wants the save closer and §1.6
+           wants a finish-state beat. Beat 6 (dress the headline) is that finish state, sequenced
+           immediately after the beat that CREATES the enterprise value per §1.0(a) format-as-you-
+           go, and the engine appends the Ctrl+S closer after it.
+       (3) RANDOMIZATION — the page says "verify"; the shipped board had ONE axis (values), under
+           §1.2's minimum of two. Three now: corner jitter, content, values. The site axis is
+           CORNER JITTER rather than a ≥3-spot pool because the board is a full-grid artifact
+           (15 of 20 rows) — §1.2 names Models II / Full Builds as the examples of that class, and
+           this is the `balance` (r440) reading of the operative clause, "boards that occupy most
+           of 20×10". A 3-spot pool cannot exist on an 18-row-tall artifact.
+       (4) §1.0-R4(t) REALITY TEST — passed without a rebuild. §3.1 puts Models I at B-heavy, and
+           a five-year discounting strip under an agreed WACC is the artifact itself; the board
+           carries real column headers (fiscal years), real row labels, real magnitudes ($mm) and
+           a source/basis memo. The prompt carries WHO, WHY and what happens next.
+       (5) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an existing labelled
+           cell in a labelled row — no insert slot, no empty paste target — so the guided ring
+           expresses all six core beats on its own.
+       (6) §1.3 DENSITY: 15 of 20 rows carry content at the win state (75%), against 12 of 20
+           (60%, exactly on the line) before. Three of the five empty rows are moats — between the
+           memo and the grid, between the grid and the assumptions, and between the assumptions
+           and the summary block — and they are load-bearing: without them Ctrl+Shift+↓ rides
+           straight out of the forecast grid into the assumption cells. The other two are the
+           sheet's bottom margin.
+       (7) NO WIDTH VERDICT IS GRADED, so the drill stays out of `__noShrink` and the elastic fit
+           owns the frame. Column widths are seeded so nothing clips at natural width anyway: the
+           longest label is 'Unlevered free cash flow' at 23 characters, and the label column is
+           190px against the r441 text metric (6.9px/glyph + 20 pad = 179px).
+
+       GRADING (§1.0(c) FREEDOM + §1.0-R3(p) END STATE), routes WALKED not reasoned about — the
+       full walked-route list is in dev/AUDIT.md r444 and dev/verify-dcf.js. The factor row clears
+       from `=1/(1+$rate)^period`, from `=(1+$rate)^-period`, from a division shape, filled or
+       typed column by column, anchored or (where typed) not; the present-value row clears from
+       cash × factor or from cash discounted directly; the terminal value clears anchored or bare;
+       the discounted terminal value clears whether it POINTS at the year-5 factor or re-derives
+       the power (the pointing is the ☆, never the beat); the enterprise value clears from a SUM,
+       a two-argument SUM, an addition chain or either operand order; the top border clears from
+       Alt H B P, Alt H B A, Alt H B D and Alt H B S/B T — `bt` OR `ball`, because a one-cell
+       outside border stores `ball` (campaign route fact #7) and the line above the cell is on
+       screen either way. Four routes must NOT clear and are asserted dark: a hardcoded factor
+       row, a hardcoded PV row (both have "Build" as their verb), and Alt H B O / Alt H B B, which
+       put the rule underneath — the convention §1.0(f) reverses. 33 routes walked in all. */
+    name:'DCF', label:'Discount the cash flows', par:85, parKeys:81, saveClose:true,   /* r444 §4.59 depth pass: par re-swept from scratch (was par 62 / parKeys 64 on the ROWS:12 board with no ☆ and no save closer). dev/e2e-par-sweep.js dcf, 5-seed median 81 keys INCLUDING the engine-appended Ctrl+S — flat across seeds, because the corner jitter moves the column letters and the year base moves the header text, but neither moves a keystroke: every reference is one letter plus one or two digits on every draw. par 85 ≈ 1.05 s/key, the house band. The count grew with the board: the enterprise-value line, the dress motion and the save closer are all new, and the demo now BUILDS its own range grabs with Shift+arrow instead of being handed them (the r438 `series` rule — the old parKeys 64 was measured with setDemoSel doing the selecting). That lands dcf between `wacc` (78) and `comps` (94) in the Models I band (txncomps 36 · football 39 · accdil 50 · sourcesuses 55 · retbridge 65). Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 2:08 · pro 1:38 · legendary 1:25. */
     aha:'Each year ÷ (1+r)^n — discounting is a fill; then add the terminal value.',
-    prompt:'Five years of FCF and the full discounting stack: a discount-factor row built once off the anchored rate, a PV row that multiplies against it, a Gordon terminal value (the perpetuity standing in for every year past five) — and the TV discounts with the year-5 factor you already built. Never retype a discount factor.',
-    req:'<em>B4</em> DF <em>=1/(1+$B$7)^B2</em> \u00b7 fill B4:F4 \u2192 \u00b7 <em>B5</em> PV <em>=B3*B4</em> \u00b7 fill B5:F5 \u2192 \u00b7 <em>B10</em> TV <em>=F3*(1+B8)/($B$7-B8)</em> \u00b7 <em>B11</em> <em>=B10*F4</em> \u00b7 <em>B12</em> EV <em>=SUM(B5:F5)+B11</em>',
-    guide:[
-      'discount factor at B4 \u00b7 <kbd>=1/(1+$B$7)^B2</kbd> \u2014 rate anchored, year walking',
-      'select B4:F4 \u00b7 <kbd>ctrl</kbd>+<kbd>r</kbd> \u2014 five factors from one formula',
-      'PV row: B5 \u00b7 <kbd>=B3*B4</kbd> \u00b7 fill B5:F5 \u2192 \u2014 cash \u00d7 factor, nothing else',
-      'terminal value at B10 \u00b7 <kbd>=F3*(1+B8)/($B$7-B8)</kbd> \u2014 Gordon growth off year 5',
-      'PV of TV at B11 \u00b7 <kbd>=B10*F4</kbd> \u2014 REUSE the year-5 factor; never retype it',
-      'Enterprise Value at B12 \u00b7 <kbd>=SUM(B5:F5)+B11</kbd>',
-    ],
-    targets:['B4:F4','B5:F5','B10','B11','B12'],
-    demo(){ return [
-      {sel:'B4', keys:[...T('=1/(1+$B$7)^B2'), Kb.enter]},
-      {sel:'B4:F4', keys:[Kb.fillR]},
-      {sel:'B5', keys:[...T('=B3*B4'), Kb.enter]},
-      {sel:'B5:F5', keys:[Kb.fillR]},
-      {sel:'B10', keys:[...T('=F3*(1+B8)/($B$7-B8)'), Kb.enter]},
-      {sel:'B11', keys:[...T('=B10*F4'), Kb.enter]},
-      {sel:'B12', keys:[...T('=SUM(B5:F5)+B11'), Kb.enter]},
+    /* §1.5: the aha's MOMENT is beat 1's fill — one anchored formula walks the period reference
+       across five columns and holds the rate still, and the whole factor row lands at once. */
+    prompt:'The operating model closed this morning and the committee sits at four. Five years of unlevered free cash flow are on the page, WACC and long-term growth are agreed — the discounting is what is missing. Present-value the forecast years, put a Gordon terminal value on the back of year five, and land the enterprise value. Discounting is end of year here, no mid-year convention, and the year-5 factor you build is the one the terminal value discounts at — never retype a discount factor.',
+    req(){ const o=this._o; return '<em>'+o.CB+o.rDf+'</em> factor <em>=1/(1+$'+o.CB+'$'+o.rW+')^'+o.CB+o.rPer+'</em> · fill '+o.CB+o.rDf+':'+o.CF+o.rDf+' → · <em>'+o.CB+o.rPv+'</em> <em>='+o.CB+o.rFcf+'*'+o.CB+o.rDf+'</em> · fill → · <em>'+o.CB+o.rTv+'</em> <em>='+o.CF+o.rFcf+'*(1+'+o.CB+o.rG+')/('+o.CB+o.rW+'-'+o.CB+o.rG+')</em> · <em>'+o.CB+o.rPvtv+'</em> <em>='+o.CB+o.rTv+'*'+o.CF+o.rDf+'</em> · <em>'+o.CB+o.rEv+'</em> <em>=SUM('+o.CB+o.rPv+':'+o.CF+o.rPv+')+'+o.CB+o.rPvtv+'</em> · <em>ctrl+b</em> <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that GRADES, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'the factor row is '+o.CB+o.rDf+':'+o.CF+o.rDf+' · on '+o.CB+o.rDf+': <kbd>=1/(1+$'+o.CB+'$'+o.rW+')^'+o.CB+o.rPer+'</kbd> <kbd>↵</kbd> — the rate held with <kbd>F4</kbd> or typed dollars, the period reference left to walk · then select '+o.CB+o.rDf+':'+o.CF+o.rDf+' and <kbd>ctrl</kbd>+<kbd>r</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> is the same fill). <kbd>=(1+$'+o.CB+'$'+o.rW+')^-'+o.CB+o.rPer+'</kbd> is the same number, and typing all five costs only keys',
+      'present values on '+o.CB+o.rPv+':'+o.CF+o.rPv+' · <kbd>='+o.CB+o.rFcf+'*'+o.CB+o.rDf+'</kbd> <kbd>↵</kbd>, filled across — cash times factor. Discounting the cash flow directly, <kbd>='+o.CB+o.rFcf+'/(1+$'+o.CB+'$'+o.rW+')^'+o.CB+o.rPer+'</kbd>, lands the same row and grades the same',
+      'terminal value on '+o.CB+o.rTv+' · <kbd>='+o.CF+o.rFcf+'*(1+'+o.CB+o.rG+')/('+o.CB+o.rW+'-'+o.CB+o.rG+')</kbd> — Gordon growth: the last forecast cash flow grown one year, over the rate less that growth',
+      'the discounted terminal value on '+o.CB+o.rPvtv+' · <kbd>='+o.CB+o.rTv+'*'+o.CF+o.rDf+'</kbd> — the year-5 factor is already on the row above; re-deriving it as <kbd>/(1+'+o.CB+o.rW+')^5</kbd> lands the same number and clears this beat too',
+      'enterprise value on '+o.CB+o.rEv+' · <kbd>=SUM(</kbd>'+o.CB+o.rPv+':'+o.CF+o.rPv+'<kbd>)+</kbd>'+o.CB+o.rPvtv+' <kbd>↵</kbd> · select the present-value row through the empty cell and <kbd>alt</kbd>+<kbd>=</kbd> gets the first half; an addition chain foots to the same number',
+      'dress it now rather than at the end: select the enterprise-value line and <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> rules above it — and <kbd>b</kbd> <kbd>s</kbd> (outside), <kbd>b</kbd> <kbd>t</kbd> (thick box), <kbd>b</kbd> <kbd>a</kbd> (all borders) and <kbd>b</kbd> <kbd>d</kbd> (top and bottom) — every one of those draws the line above, so every one clears. <kbd>b</kbd> <kbd>o</kbd> and <kbd>b</kbd> <kbd>b</kbd> put the rule underneath instead, which is the other convention',
+      '☆ the discovery: no discount factor computed twice — the factor row written ONCE and taken across the five years in a single pass, and the terminal value discounted by pointing at the year-5 factor cell instead of writing the power again. Typing the five factors out and re-deriving the last one clears every core beat and forfeits it',
     ]; },
+    /* rings: ① the factor row ② the present-value row ③ the terminal-value cell
+       ④ the discounted terminal value ⑤ the enterprise-value cell ⑥ the enterprise-value
+       line · ☆ never ringed (§2.2) */
+    targets(){ const o=this._o; return [
+      o.CB+o.rDf+':'+o.CF+o.rDf, o.CB+o.rPv+':'+o.CF+o.rPv, o.CB+o.rTv, o.CB+o.rPvtv,
+      o.CB+o.rEv, o.CA+o.rEv+':'+o.CB+o.rEv, null,
+    ]; },
+    /* the demo BUILDS its own selections with Shift+arrow rather than being handed them by
+       setDemoSel, so parKeys measures what a player really pays for the range grabs instead of
+       eliding them (the r438 `series` rule). setDemoSel only parks the cursor on the next
+       beat's anchor cell. */
+    demo(){ const o=this._o; const R=n=>{ const a=[]; for(let i=0;i<n;i++) a.push({key:'ArrowRight',shift:true}); return a; };
+      return [
+      {sel:o.CB+o.rDf, keys:[...T('=1/(1+$'+o.CB+'$'+o.rW+')^'+o.CB+o.rPer), Kb.enter]},
+      /* the ☆, half one — one anchored formula right across the five years in a single pass */
+      {sel:o.CB+o.rDf, keys:[...R(4), Kb.fillR]},
+      {sel:o.CB+o.rPv, keys:[...T('='+o.CB+o.rFcf+'*'+o.CB+o.rDf), Kb.enter]},
+      {sel:o.CB+o.rPv, keys:[...R(4), Kb.fillR]},
+      {sel:o.CB+o.rTv, keys:[...T('='+o.CF+o.rFcf+'*(1+'+o.CB+o.rG+')/('+o.CB+o.rW+'-'+o.CB+o.rG+')'), Kb.enter]},
+      /* the ☆, half two — the terminal value discounts off the factor cell, not off a
+         second copy of the power */
+      {sel:o.CB+o.rPvtv, keys:[...T('='+o.CB+o.rTv+'*'+o.CF+o.rDf), Kb.enter]},
+      {sel:o.CB+o.rEv, keys:[...T('=SUM('+o.CB+o.rPv+':'+o.CF+o.rPv+')+'+o.CB+o.rPvtv), Kb.enter]},
+      /* §1.0(a): the headline is dressed the moment it exists, not at the end of the run */
+      {sel:o.CA+o.rEv, keys:[{key:'ArrowRight',shift:true}, Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 DCF ($mm)',txt:true,bold:true};
-      cells['A2']={...blankCell(),value:'Year',txt:true,bold:true};
-      cells['A3']={...blankCell(),value:'FCF',txt:true};
-      cells['A4']={...blankCell(),value:'Discount factor',txt:true};
-      cells['A5']={...blankCell(),value:'PV of FCF',txt:true,bold:true};
-      cells['A7']={...blankCell(),value:'Discount rate',txt:true};
-      cells['A8']={...blankCell(),value:'LT growth',txt:true};
-      cells['A10']={...blankCell(),value:'Terminal value',txt:true};
-      cells['A11']={...blankCell(),value:'PV of TV',txt:true};
-      cells['A12']={...blankCell(),value:'Enterprise Value',txt:true,bold:true};
-      const r=rnd(8,12)/100, g=rnd(2,3)/100;
-      let f=rnd(8,30)*10; const fcfs=[];
-      for(let y=1;y<=5;y++){ const col=colLetter(y+1);
-        cells[col+2]={...blankCell(),value:y,fontColor:'blue'};
-        fcfs.push(f);
-        cells[col+3]={...blankCell(),value:f,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+4]={...blankCell(),fmtStyle:'comma',decimals:2};
-        cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:1};
-        f=Math.round(f*(1+rnd(3,9)/100)); }
-      cells['B7']={...blankCell(),value:r,fontColor:'blue',fmtStyle:'percent',decimals:1};
-      cells['B8']={...blankCell(),value:g,fontColor:'blue',fmtStyle:'percent',decimals:1};
-      cells['B10']={...blankCell(),fmtStyle:'comma',decimals:1};
-      cells['B11']={...blankCell(),fmtStyle:'comma',decimals:1};
-      cells['B12']={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
-      this._df=[1,2,3,4,5].map(y=>1/Math.pow(1+r,y));
-      this._pv=fcfs.map((x,i)=>x*this._df[i]);
-      this._tv=fcfs[4]*(1+g)/(r-g);
-      this._pvtv=this._tv*this._df[4];
-      this._ev=this._pv.reduce((a,b)=>a+b,0)+this._pvtv;
-      return {ROWS:12, cells, active:{r:4,c:2}, sel:null, colW:{1:126,2:84,3:84,4:84,5:84,6:84}};
+      /* §1.2 randomization — three independent axes. (a) SITE: the board is a full-grid artifact
+         (15 of 20 rows), so per §1.2 the site axis is CORNER JITTER — the whole strip anchors at
+         column A or column B (deviation 3 in the header comment). (b) CONTENT: the codename and
+         the fiscal-year base, so the header row reads a different five years each run. (c)
+         VALUES: the rate, the growth rate, the opening cash flow and every year's step, all
+         through rnd(). Geometry (five forecast years, fixed row assignments) is constant across
+         seeds so the keystroke count never moves with the draw — the r439 `wrapfix` rule. */
+      const c0=rnd(0,1)?1:2;                                   // (a) corner jitter
+      const CA=colLetter(c0);
+      const CL=[1,2,3,4,5].map(i=>colLetter(c0+i));            // the five forecast-year columns
+      const y0=rnd(2026,2030);                                 // (b) content
+      const rHdr=4, rPer=5, rFcf=6, rDf=7, rPv=8, rAsm=10, rW=11, rG=12,
+            rTv=14, rPvtv=15, rEv=16, rShr=17, rNote=18;
+      cells[CA+'1']={...blankCell(),value:codename()+' — DCF ($mm)',txt:true,bold:true};
+      /* MODELING_STANDARDS §7: a simplification a player would otherwise learn as the rule gets
+         said on the board, not only in this comment. */
+      cells[CA+'2']={...blankCell(),value:'Source: operating model · basis: $ in millions · discounted at year end, no mid-year convention',txt:true,it:true,fontColor:'gray'};
+      /* header row, underlined off the body (doctrine §2.1b banker's-workbook finish — this
+         drill's lesson is the discounting, so the board ships pre-dressed everywhere the player
+         is not asked to dress it) */
+      cells[CA+rHdr]={...blankCell(),value:'Fiscal year',txt:true,bold:true,bb:true};
+      CL.forEach((c,i)=>cells[c+rHdr]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r',bb:true});
+      cells[CA+rPer]={...blankCell(),value:'Discount period',txt:true};
+      cells[CA+rFcf]={...blankCell(),value:'Unlevered free cash flow',txt:true};
+      cells[CA+rDf]={...blankCell(),value:'Discount factor',txt:true};
+      cells[CA+rPv]={...blankCell(),value:'PV of free cash flow',txt:true};
+      /* (c) values. WACC 8–12%, long-term growth 2–3%: g < WACC on every seed with at least five
+         points of spread, which is the sanity check MODELING_STANDARDS §4 says a reviewer applies
+         first (and it keeps the Gordon denominator away from zero). */
+      const r=rnd(80,120)/1000, g=rnd(20,30)/1000;
+      let f=rnd(14,30)*10; const fcf=[];
+      CL.forEach((c,i)=>{
+        cells[c+rPer]={...blankCell(),value:i+1,fontColor:'blue',align:'r'};
+        fcf.push(f);
+        cells[c+rFcf]={...blankCell(),value:f,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[c+rDf]={...blankCell(),decimals:3};              // graded target — 0.913, three decimals
+        cells[c+rPv]={...blankCell(),fmtStyle:'comma',decimals:0};   // graded target
+        f=Math.round(f*(1+rnd(4,9)/100));
+      });
+      /* §1.0(f) + §1.0-R2(l): the two assumptions are the input convention — light yellow, all
+         borders, populated, vertically stacked, each labelled with the assumption itself rather
+         than the word "Helper" (r430). Blue, because a human typed them (MODELING_STANDARDS §1). */
+      cells[CA+rAsm]={...blankCell(),value:'Assumptions',txt:true,bold:true};
+      cells[CA+rW]={...blankCell(),value:'WACC',txt:true};
+      cells[CL[0]+rW]={...blankCell(),value:r,fontColor:'blue',fill:'yellow',ball:true,fmtStyle:'percent',decimals:1,align:'r'};
+      cells[CA+rG]={...blankCell(),value:'Long-term growth rate',txt:true};
+      cells[CL[0]+rG]={...blankCell(),value:g,fontColor:'blue',fill:'yellow',ball:true,fmtStyle:'percent',decimals:1,align:'r'};
+      cells[CA+rTv]={...blankCell(),value:'Terminal value (Gordon)',txt:true};
+      cells[CL[0]+rTv]={...blankCell(),fmtStyle:'comma',decimals:0};       // graded target
+      cells[CA+rPvtv]={...blankCell(),value:'PV of terminal value',txt:true};
+      cells[CL[0]+rPvtv]={...blankCell(),fmtStyle:'comma',decimals:0};     // graded target
+      /* the headline ships UNDRESSED — beat 6 is the bold + top border (§1.0(f): a total earns
+         the line ABOVE it, never a rule underneath). The label is bold at load the way a total's
+         stub always is; the FIGURE is what the player dresses. */
+      cells[CA+rEv]={...blankCell(),value:'Enterprise value',txt:true,bold:true};
+      cells[CL[0]+rEv]={...blankCell(),fmtStyle:'comma',decimals:0};       // graded target
+      /* MODELING_STANDARDS §6: the check lives in one visible place and reads a number the
+         reviewer can judge. Ungraded board furniture — it can never move a beat. IFERROR because
+         its denominator is empty until the enterprise value lands, and a board that greets the
+         player with #DIV/0! is teaching `triage`, not this drill. */
+      cells[CA+rShr]={...blankCell(),value:'Terminal value % of EV',txt:true,it:true};
+      cells[CL[0]+rShr]={...blankCell(),formula:'=IFERROR('+CL[0]+rPvtv+'/'+CL[0]+rEv+',0)',fmtStyle:'percent',decimals:1,it:true,align:'r'};
+      cells[CA+rNote]={...blankCell(),value:'Reviewer check: a Gordon terminal value normally carries 60–80% of enterprise value',txt:true,it:true,fontColor:'gray'};
+      /* the expected end state, computed the way MODELING_STANDARDS §4 writes the forms */
+      const df=[1,2,3,4,5].map(t=>1/Math.pow(1+r,t));
+      const pv=fcf.map((x,i)=>x*df[i]);
+      const tv=fcf[4]*(1+g)/(r-g);
+      const pvtv=tv*df[4];
+      const ev=pv.reduce((a,b)=>a+b,0)+pvtv;
+      this._o={c0:c0, CA:CA, CB:CL[0], CF:CL[4], cols:CL, y0:y0, yN:'FY'+(y0+4),
+               rHdr:rHdr, rPer:rPer, rFcf:rFcf, rDf:rDf, rPv:rPv, rAsm:rAsm, rW:rW, rG:rG,
+               rTv:rTv, rPvtv:rPvtv, rEv:rEv, rShr:rShr, rNote:rNote,
+               df:df, pv:pv, tv:tv, pvtv:pvtv, ev:ev};
+      /* label column 190px against the r441 text metric (6.9px/glyph + 20 pad): the longest label
+         is 'Unlevered free cash flow' at 23 characters = 179px, so nothing clips at natural
+         width. Never re-derive this by hand elsewhere — call neededWidth() (§1.0-R3(r)). */
+      const colW={}; colW[c0]=190; for(let i=1;i<=5;i++) colW[c0+i]=86;
+      return {ROWS:20, cells, active:{r:rDf,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(Math.abs(exp)*1e-3,1e-3); };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D','E','F'];
+      const o=this._o;
+      /* every predicate reads the END STATE — the NUMBER standing in the cell, plus liveness
+         where the label's verb is Build or Total (doctrine §2.2's sanctioned "don't hardcode the
+         answer" exception; the r440 `balance` precedent). Nothing reads formula text (§1.0-R3(p)),
+         so every route in the guide grades. */
+      const live=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'); };
+      const near=(k,exp)=>{ const c=S.cells[k]; return !!(c&&typeof c.value==='number'
+        && Math.abs(c.value-exp)<=Math.max(Math.abs(exp)*2e-3,1e-6)); };
+      const built=(k,exp)=>live(k)&&near(k,exp);
+      const dfOk   = o.cols.every((c,i)=>built(c+o.rDf, o.df[i]));
+      const pvOk   = o.cols.every((c,i)=>built(c+o.rPv, o.pv[i]));
+      const tvOk   = built(o.CB+o.rTv,   o.tv);
+      const pvtvOk = built(o.CB+o.rPvtv, o.pvtv);
+      const evOk   = built(o.CB+o.rEv,   o.ev);
+      /* every border route that draws the line above the headline clears: Alt H B P sets bt,
+         Alt H B A sets ball, Alt H B D (Excel's TOP AND BOTTOM pair) sets bt, and an outside
+         border (Alt H B S / B T) stores `ball` on a ONE-CELL selection and `bt` on the
+         label+figure pair — campaign route fact #7, exactly the class §1.0-R3(p) exists to stop.
+         All six walked in dev/verify-dcf.js part 1, along with the two that must NOT clear:
+         Alt H B O and Alt H B B put the rule UNDERNEATH, which is the convention §1.0(f)
+         reverses, and bold alone is not a rule at all. */
+      const evCell = S.cells[o.CB+o.rEv];
+      const dressOk = !!(evCell && evCell.bold && (evCell.bt || evCell.ball));
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision ·
+         §1.0-R4(u) families "anchoring mastery" + "reference over retype"): NO DISCOUNT FACTOR
+         COMPUTED TWICE. Half one is read off the r424 S.fillOps latch — the MECHANIC, never
+         geometry inferred, so Ctrl+R and the ribbon fill Alt H F I R both earn it (§1.0(c)); the
+         fill must span the seed column through the last forecast year in ONE rect, and the row
+         must be RIGHT, which is what makes the anchor load-bearing (an unanchored fill walks the
+         rate off the assumption cell and the numbers go wrong). Half two is the one place a route
+         may legally be graded (§1.0(c): "the only sanctioned fast-route grading is the ☆") — the
+         discounted terminal value must POINT at the year-5 factor cell (uppercased and $-stripped
+         before the match, so anchored and unanchored both earn it). Measured, each half isolated:
+         half one 20 keys against 75 to type the five factors, half two 7 against 14 to re-derive
+         the power. Typing the factors out and re-deriving the last one clears all six core beats
+         and forfeits only the star, which is what keeps it a choice — walked as alt-paths entry 2
+         and asserted in dev/verify-dcf.js part 3, along with two near-misses that must ALSO leave
+         it dark: filling the row but re-deriving the last factor (half the star is not the star),
+         and covering the row in TWO fills instead of one. */
+      const onePass = (S.fillOps||[]).some(f=>f.dir==='right'
+        && f.r1<=o.rDf && f.r2>=o.rDf && f.c1<=o.c0+1 && f.c2>=o.c0+5);
+      const pvtvCell = S.cells[o.CB+o.rPvtv];
+      const reuse = !!(pvtvCell && pvtvCell.formula
+        && new RegExp('(^|[^A-Z0-9])'+o.CF+o.rDf+'(?![0-9])')
+             .test(String(pvtvCell.formula).toUpperCase().replace(/\$/g,'')));
+      const starOk = dfOk && pvtvOk && onePass && reuse;
+      /* §4.59 beats. Labels are INSTRUCTIONS (§1.0-R3(n)): the clause after the dash says WHAT or
+         WHERE, never why. Beat 3 names THIS seed's final fiscal year (§1.0-R2(g)). */
       return [
-        {label:'run the discount-factor row \u2014 one anchored formula, filled across all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'4',this._df[i])) && refs('B4',['B7','B2'])},
-        {label:'run the PV row \u2014 cash \u00d7 factor, live references both ways', ok: [0,1,2,3,4].every(i=>near(COL[i]+'5',this._pv[i])) && refs('B5',['B3','B4'])},
-        {label:'run terminal value \u2014 Gordon growth off year-5 FCF', ok: near('B10',this._tv) && refs('B10',['F3','B8'])},
-        {label:'discount the TV \u2014 REUSE the year-5 factor, not a retyped number', ok: near('B11',this._pvtv) && refs('B11',['B10','F4'])},
-        {label:'sum to Enterprise Value \u2014 the PV row plus the discounted TV', ok: near('B12',this._ev) && refs('B12',['SUM(','B11'])},
+        {label:'Build the discount-factor row — all five forecast years', ok: dfOk},
+        {label:'Build the PV of free cash flow — all five forecast years', ok: pvOk},
+        {label:'Build the terminal value — Gordon growth off the '+o.yN+' free cash flow', ok: tvOk},
+        {label:'Build the PV of the terminal value', ok: pvtvOk},
+        {label:'Total the enterprise value — the present values plus the discounted terminal value', ok: evOk},
+        {label:'Bold the enterprise value and add a top border above it', ok: dressOk},
+        {label:'Build every discount factor once — one anchored fill, and the year-5 factor reused', ok: starOk, bonus:true},
       ];
     }
   },

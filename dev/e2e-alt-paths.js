@@ -908,15 +908,40 @@ const ALTS = [
       {sel:'B7',  keys:[...T('=(B5-B6)/B4'),{key:'Enter'}]},
       {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
     ]` },
-  { key: 'dcf', name: 'TV block FIRST, PV row before the factors it reads, ribbon fills', moves: `C => [
-      {sel:'B10', keys:[...T('=F3*(1+B8)/($B$7-B8)'),{key:'Enter'}]},
-      {sel:'B11', keys:[...T('=B10*F4'),{key:'Enter'}]},
-      {sel:'B12', keys:[...T('=SUM(B5:F5)+B11'),{key:'Enter'}]},
-      {sel:'B5',  keys:[...T('=B3*B4'),{key:'Enter'}]},
-      {sel:'B5:F5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B4',  keys:[...T('=1/(1+$B$7)^B2'),{key:'Enter'}]},
-      {sel:'B4:F4', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-    ]` },
+  /* r444 (dcf DEPTH PASS, DEPTH_PASS §4.59 + §1.8). The drill had ONE entry, and it drove the
+     board the old formula-TEXT checks were overfit to. Both entries below are rebuilt for the
+     reworked board and both walk routes the old predicates locked out (CAMPAIGN §1).
+     ALT 1 = chord-ROUTE alt (ribbon fills, ribbon bold, all-borders instead of a top border, the
+     reciprocal-power factor shape, an addition chain for the enterprise value) with the op order
+     inverted — the terminal-value block is built BEFORE the factors it reads. The ☆ is EARNED.
+     ALT 2 = op-ORDER alt AND the ☆'s measured NEGATIVE CONTROL: the dress goes on first, the
+     factor row and the present-value row are typed cell by cell in REVERSE with no fill anywhere,
+     the present values are discounted straight off the cash flows (never cash × factor), and the
+     terminal value is re-derived rather than pointed at the year-5 factor. All six cores clear;
+     the ☆ must stay DARK (asserted in dev/verify-dcf.js part 3). 217 keys against the demo's 81. */
+  { key: 'dcf', name: 'chord-ROUTE + inverted order: terminal-value block FIRST (before the factors it reads), reciprocal-power factor shape, ribbon fills alt h f i r, addition chain for the enterprise value, ribbon bold alt h 1 and ALL borders alt h b a — the ☆ is earned', moves: `C => { const o=C._o;
+      const R=n=>{ const a=[]; for(let i=0;i<n;i++) a.push({key:'ArrowRight',shift:true}); return a; };
+      const chain=o.cols.map(c=>c+o.rPv).join('+');
+      return [
+        {sel:o.CB+o.rTv,   keys:[...T('='+o.CF+o.rFcf+'*(1+'+o.CB+o.rG+')/('+o.CB+o.rW+'-'+o.CB+o.rG+')'),{key:'Enter'}]},
+        {sel:o.CB+o.rPvtv, keys:[...T('=$'+o.CB+'$'+o.rTv+'*$'+o.CF+'$'+o.rDf),{key:'Enter'}]},
+        {sel:o.CB+o.rEv,   keys:[...T('='+chain+'+'+o.CB+o.rPvtv),{key:'Enter'}]},
+        {sel:o.CB+o.rPv,   keys:[...T('='+o.CB+o.rFcf+'*'+o.CB+o.rDf),{key:'Enter'}]},
+        {sel:o.CB+o.rPv,   keys:[...R(4),{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.CB+o.rDf,   keys:[...T('=(1+$'+o.CB+'$'+o.rW+')^-'+o.CB+o.rPer),{key:'Enter'}]},
+        {sel:o.CB+o.rDf,   keys:[...R(4),{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.CA+o.rEv,   keys:[...R(1),{key:'Alt'},L('h'),D(1)]},
+        {sel:o.CA+o.rEv,   keys:[...R(1),{key:'Alt'},L('h'),L('b'),L('a')]},
+      ]; }` },
+  { key: 'dcf', name: 'op-ORDER alt AND the ☆ negative control — dress FIRST on the empty headline (one-cell alt h b p), factor row and present-value row typed in REVERSE with no fill anywhere, present values discounted straight off the cash flows, terminal value re-derived instead of pointed at the year-5 factor: all six cores clear with the ☆ DARK (217 keys against the demo\'s 81)', moves: `C => { const o=C._o;
+      const mv=[];
+      mv.push({sel:o.CB+o.rEv, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
+      mv.push({sel:o.CB+o.rTv, keys:[...T('='+o.CF+o.rFcf+'*(1+'+o.CB+o.rG+')/('+o.CB+o.rW+'-'+o.CB+o.rG+')'),{key:'Enter'}]});
+      for(let i=4;i>=0;i--) mv.push({sel:o.cols[i]+o.rDf, keys:[...T('=1/(1+$'+o.CB+'$'+o.rW+')^'+o.cols[i]+o.rPer),{key:'Enter'}]});
+      for(let i=4;i>=0;i--) mv.push({sel:o.cols[i]+o.rPv, keys:[...T('='+o.cols[i]+o.rFcf+'/(1+$'+o.CB+'$'+o.rW+')^'+o.cols[i]+o.rPer),{key:'Enter'}]});
+      mv.push({sel:o.CB+o.rPvtv, keys:[...T('='+o.CB+o.rTv+'/(1+'+o.CB+o.rW+')^5'),{key:'Enter'}]});
+      mv.push({sel:o.CB+o.rEv, keys:[...T('=SUM('+o.CB+o.rPv+':'+o.CF+o.rPv+')+'+o.CB+o.rPvtv),{key:'Enter'}]});
+      return mv; }` },
   { key: 'debtsched', name: 'machine built FIRST, the VP rate dropped in LAST, ribbon fills + alt h 1', moves: `C => [
       {sel:'B4', keys:[...T('=-B2*$B$9'),{key:'Enter'}]},
       {sel:'B5', keys:[...T('=-MIN(B2+B4,MAX(0,B3))'),{key:'Enter'}]},
