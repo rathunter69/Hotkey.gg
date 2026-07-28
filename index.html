@@ -15900,90 +15900,309 @@ const CHALLENGES = {
     }
   },
   liqbridge:{
-    name:'Liq. Bridge', label:'Bridge the liquidity \u2014 three cases', par:40, parKeys:40,
-    aha:'Liquidity = cash + revolver − needs — three cases, one bridge.',
-    prompt:'The first page of every restructuring deck: where does liquidity land, and in which case does it break? Cash plus undrawn revolver is the start; the bridge walks burn (the cash the business eats each period), asset sales and fees to an ending number; the cushion against minimum liquidity is the answer. Build it once, fill it across Base / Downside / Severe.',
-    req(){ return '<em>B7:D7</em> availability \u2192 =B5\u2212B6 \u00b7 <em>B8:D8</em> beginning \u2192 =B4+B7 \u00b7 <em>B12:D12</em> ending \u2192 =B8+SUM(B9:B11) \u00b7 <em>B14:D14</em> cushion \u2192 =B12\u2212B13 \u00b7 ending row bold'; },
-    guide:[
-      'availability = commitment \u2212 drawn \u00b7 B7: <kbd>=</kbd>B5-B6 <kbd>\u21b5</kbd> \u00b7 select B7:D7, <kbd>ctrl</kbd>+<kbd>r</kbd>',
-      'beginning liquidity = cash + availability \u00b7 B8: <kbd>=</kbd>B4+B7 <kbd>\u21b5</kbd> \u00b7 fill across',
-      'ending = beginning + the whole bridge \u00b7 B12: <kbd>=</kbd>B8+SUM(B9:B11) <kbd>\u21b5</kbd> \u00b7 fill across',
-      'cushion = ending \u2212 minimum \u00b7 B14: <kbd>=</kbd>B12-B13 <kbd>\u21b5</kbd> \u00b7 fill \u2014 read which cases breach',
-      'format the answer: select B12:D12, <kbd>ctrl</kbd>+<kbd>b</kbd>',
-    ],
-    targets:['B7:D7','B8:D8','B12:D12','B14:D14','B12:D12'],
-    demo(){ return [
-      {sel:'B7',  keys:[...T('=B5-B6'), Kb.enter]},          {sel:'B7:D7',  keys:[Kb.fillR]},
-      {sel:'B8',  keys:[...T('=B4+B7'), Kb.enter]},          {sel:'B8:D8',  keys:[Kb.fillR]},
-      {sel:'B12', keys:[...T('=B8+SUM(B9:B11)'), Kb.enter]}, {sel:'B12:D12',keys:[Kb.fillR]},
-      {sel:'B14', keys:[...T('=B12-B13'), Kb.enter]},        {sel:'B14:D14',keys:[Kb.fillR]},
-      {sel:'B12:D12', keys:[Kb.bold]},
+    /* r447 H6b (DEPTH_PASS §4.74, "Bridge the liquidity — three cases") — the depth-pass
+       rework, built to §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page. The newer law
+       wins on conflict; §1.0-R4 is the dual-audience law, relettered from R3(n)/(o) in r443.
+       MODELS chapter, so dev/MODELING_STANDARDS.md binds as well — the conventions this board
+       follows are named at the bottom of this header.
+
+       WAS: 5 checks on a ROWS:14 board (the copied-default tell — 12 of 14 rows used, and only
+       12 of the real 20-row sheet, 60%), no ☆, no saveClose, no red-flag beat, and check labels
+       in the pre-§1.7 register ("run availability live — commitment − drawn, every case (row 7)")
+       that opened with a banned non-list verb, carried the mechanism, and named bare cells where
+       the board had perfectly good labels. AUDIT_R417 §C also flags this drill's "Dress" label
+       (old index.html:6954) as banned-verb copy; the §4.74 page prescribes the replacement line
+       verbatim and it ships here as beat 4.
+
+       ── THE ☆-HEADROOM DIAGNOSTIC (CAMPAIGN §2, BOTH PARTS) — run on the SHIPPED board BEFORE
+       this one was designed, keyLog through the live engine, 5 seeds, every within-beat
+       selection KEYED (dev/verify-liqbridge.js §A re-runs it on the new board):
+         · PART 1 — IS THERE SPREAD? fastest legal 50 keys (four formulas, four fills, one dress)
+           against 114 for the obvious slow route (all twelve case cells retyped, the dress walked
+           cell by cell through the ribbon). 2.28×, comfortably above the ~1.3× warning line that
+           retired `grpfold`.
+         · PART 2 — IS ANY OF IT ☆-LEGAL? Of the 64 keys of spread, 6 are chord-vs-ribbon on the
+           bold (§1.0(c) forces those to clear) and the rest of the dress delta is formatting,
+           which §1.0(d) forbids grading. The surviving ~58 keys are all one thing: WRITE-ONCE-
+           AND-CARRY-ACROSS versus retype-per-case. Legal, and it is the drill's own subject.
+         · PART 3 — WHICH MECHANIC, because the wave-4 brief asks for a non-fill family if one
+           has comparable headroom. Measured on the shipped board: fill 50 · Ctrl+Enter
+           multi-commit 50 · copy-and-paste-across 48. They are the SAME family reached three
+           ways and they are within two keys of each other; no non-fill family has independent
+           headroom here, because nothing on this board is cut, found by Go To Special, or
+           converted by an operator paste. So the ☆ is the one-pass family — and, rather than
+           latch it to fills alone, it reads fillOps ∪ multiEnter ∪ pasteLog, so all three
+           equally-fast routes earn it (the r446 `lbo` finding, widened: a star that only one of
+           three equal routes can earn is §1.0-R3(p)'s untriggerable class wearing a bonus badge).
+
+       ── THE ☆ RE-CUT (§1.0-R4(u)) — AND THE DEAD ☆ PROMOTED, NOT DELETED.
+       The §4.74 page's bonus was "Strike through the breached case's label", already struck on
+       the page itself by §1.0-R3(o) (no ribbon path to strikethrough; rare on a real desk). The
+       page offers red font as the replacement — Wolf's stated use for red is "a number that
+       needs special attention" — but a colour pass is a FORMATTING task, which §1.0(d) bars from
+       the ☆ outright. It is real work and a real desk motion, so per §1.0-R4(u) it is PROMOTED
+       to core beat 6 (the r425 editfix/dress/ruleoff precedent, and the r446 `schedule` one).
+       The ☆ becomes the hidden efficiency the diagnostic found.
+
+       ── §1.0-R4(t) THE REALITY TEST, applied to board and prompt. Chapter 7 is audience B by
+       the §3.1 map (schedules, revolvers, covenants — desk craft with no corporate-generic
+       twin), and a three-case liquidity bridge is the first page of a restructuring deck, so
+       the artifact family is right. What FAILED the test on the shipped board was the model,
+       not the frame: availability was `commitment − drawn`, which is a cash-flow revolver, and
+       almost every borrower who needs this page is on an ABL whose availability is capped by a
+       BORROWING BASE that shrinks with the collateral. That is exactly why the downside cases
+       break. So availability is now `MIN(commitment, borrowing base) − drawn`, the borrowing
+       base is projected per case, and the board is seeded so the commitment binds in Base and
+       the borrowing base binds in Severe — a player who writes `=commitment−drawn` gets Base
+       right and Severe wrong, and the check says so. Recorded as spec deviation 3.
+
+       ── UNTRIGGERABLE BEATS ON THE SHIPPED BOARD (CAMPAIGN §1 class, found by WALKING routes).
+       The old rowChk() demanded formula TEXT: every case cell had to CONTAIN the literal refs
+       `Lc5`,`Lc6` (availability), `Lc8`,`Lc9:Lc11` (ending) and so on. Four routes that leave
+       the identical board were locked out and are now legal:
+         (1) `=SUM(B8:B11)` for ending liquidity — beginning plus the three bridge lines is the
+             same arithmetic and the same number, but it has no `B8+` and no `B9:B11` in it;
+         (2) an anchored `=B12-$B$13` on the cushion — the habit `anchor`/`fxconvert` teach —
+             failed because the `$` strip left `$B$13` matching but `B12` order-dependent (the
+             r439 `wrapfix` class);
+         (3) building the Severe case first and filling LEFT — every predicate read column B's
+             own text, so a right-to-left build showed the right board and a dark line;
+         (4) an addition chain `=B8+B9+B10+B11` for ending liquidity.
+       Every core here grades the END STATE: the NUMBER standing in each case column, plus, where
+       the label says the line is BUILT, that the cell holds a formula rather than a typed
+       constant (the doctrine §2.2 live-formula exception — "don't hardcode the model" is the
+       lesson of a Models board). No check reads a range, a function name or an anchor out of
+       formula text, and no check reads one case and assumes the other two.
+
+       ── ORDER-INDEPENDENCE (the r439 `bridge` bug #5 class). Every expectation is derived from
+       the board's own INPUT cells, never from another beat's output cell, so no beat can grade
+       FALSE because of the order the player worked in, and no beat gates on another beat's ok.
+
+       ── STRUCTURAL DEVIATIONS from the §4.74 page are listed in the payload; the two that live
+       in the code are the borrowing-base cap (above) and the covenant minimum moving from three
+       repeated table cells into ONE labelled assumption cell — §1.0(f)/§1.0-R2(l) helper
+       standard (light yellow, all borders, populated, individually labelled) and
+       MODELING_STANDARDS §1's no-duplicated-input corollary. It is one covenant level in one
+       credit agreement; repeating it per case was duplication. It also makes the cushion line
+       the board's anchoring moment: pinned, one entry carries all three cases.
+
+       ── MODELING_STANDARDS conventions this board follows: §1 colour-as-provenance (blue
+       typed inputs, black formulas, red = needs attention on the breach); §1 units stated in
+       the title and the assumption label; §1 negatives in parentheses via comma format; §1
+       totals wear a TOP border (beat 4) and never a rule underneath; §1 no hardcodes inside
+       formulas — the covenant is a labelled cell the cushion points at; §2 costs carry their
+       sign (burn and fees seeded negative, so the bridge is a clean SUM) and the convention is
+       stated on the board's own basis line; §6 the answer line is a single visible read (the
+       cushion), not something to be hunted for. §5 circularity does not arise — there is no
+       interest on this page. Deliberate simplification, stated on the board's second footnote:
+       one test date rather than a monthly path (the 13-week path is `wk13`'s board). */
+    name:'Liq. Bridge', label:'Bridge the liquidity — three cases', par:77, parKeys:73, saveClose:true,   /* r447 §4.74 depth pass: par re-swept from scratch (was par 40 / parKeys 40 on the ROWS:14 board with no save closer, no dress beat and no borrowing base). dev/e2e-par-sweep.js liqbridge, 5-seed median 73 keys including the engine-appended Ctrl+S; the only seed-dependent keystroke is the extra Shift+→ when the downside case breaches too, so the run is 73–74 and the drift reads 0%. par 77 ≈ 1.05 s/key, the house band. The count grew with the board: the borrowing-base cap, a fourth built line, the dress motion, the red flag and the closer. That lands liqbridge between debtsched (73) and cascade (94) in the chapter band. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 1:56 · pro 1:29 · legendary 1:17. */
+    aha:'Liquidity is cash plus what you can actually draw — the borrowing base caps the revolver long before the commitment does.',
+    /* §1.5: the aha's MOMENT is beat 1. The MIN is not decoration — in Base the commitment is
+       the binding cap and in Severe the borrowing base is, so the same formula returns two
+       different constraints down one row, and the player watches Severe's availability come off
+       the collateral. */
+    prompt:'The lenders’ advisor wants the liquidity page before tomorrow’s steering committee. Cash plus whatever is still available under the revolver is where the period opens; operating burn (the cash the business eats), asset sales and the restructuring fees walk it down to an ending number; the cushion against the minimum-liquidity covenant is the answer the room is waiting for. Availability is capped by the borrowing base — the collateral the lenders will actually lend against — not by the commitment, once the collateral shrinks. Build the page across Base, Downside and Severe, and flag every case that breaks the covenant.',
+    req(){ const o=this._o; return '<em>'+o.CB+o.rAv+'</em> → <em>=MIN('+o.CB+o.rCom+','+o.CB+o.rBB+')-'+o.CB+o.rDr+'</em> · <em>'+o.CB+o.rBeg+'</em> → <em>='+o.CB+o.rCash+'+'+o.CB+o.rAv+'</em> · <em>'+o.CB+o.rEnd+'</em> → <em>='+o.CB+o.rBeg+'+SUM('+o.CB+o.rBurn+':'+o.CB+o.rFee+')</em> · <em>ctrl+b</em> + <em>alt h b p</em> · <em>'+o.CB+o.rCush+'</em> → <em>='+o.CB+o.rEnd+'-$'+o.CB+'$'+o.rMin+'</em> · fill across · <em>alt h f c</em> red on the breach · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'availability is the LOWER of the commitment and the borrowing base, less what is already drawn · on '+o.CB+o.rAv+': <kbd>=MIN(</kbd>'+o.CB+o.rCom+'<kbd>,</kbd>'+o.CB+o.rBB+'<kbd>)-</kbd>'+o.CB+o.rDr+' <kbd>↵</kbd> · reading the smaller of the two off the screen and typing it lands the same number and clears the same beat — the commitment caps Base, the borrowing base caps Severe',
+      'beginning liquidity is cash plus that availability · on '+o.CB+o.rBeg+': <kbd>=</kbd>'+o.CB+o.rCash+'<kbd>+</kbd>'+o.CB+o.rAv+' <kbd>↵</kbd>',
+      'ending liquidity is where the bridge lands · on '+o.CB+o.rEnd+': <kbd>=</kbd>'+o.CB+o.rBeg+'<kbd>+SUM(</kbd>'+o.CB+o.rBurn+':'+o.CB+o.rFee+'<kbd>)</kbd> <kbd>↵</kbd> · <kbd>=SUM(</kbd>'+o.CB+o.rBeg+':'+o.CB+o.rFee+'<kbd>)</kbd> and a plain addition chain land the same number and clear the same beat — burn and fees already carry their minus signs',
+      'dress it now rather than at the end: select the ending row and <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> rules above it (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> boxes the row, <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> borders every edge, <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>d</kbd> does top and bottom — they all draw that top line and they all clear)',
+      'the covenant level sits in one yellow assumption cell at '+o.CB+o.rMin+' · on '+o.CB+o.rCush+': <kbd>=</kbd>'+o.CB+o.rEnd+'<kbd>-$</kbd>'+o.CB+'<kbd>$</kbd>'+o.rMin+' <kbd>↵</kbd> · <kbd>F4</kbd> puts the locks on for you · unpinned works too if you write each case by hand — it only has to hold if you mean to carry the line across',
+      '<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> opens the font-colour swatches — five <kbd>→</kbd> lands Red, <kbd>↵</kbd> commits (<kbd>alt</kbd> <kbd>h</kbd> <kbd>j</kbd> → Warning is the same red from the cell-styles gallery) · only the cases whose cushion came out negative, and leave the ones that clear alone',
+      '☆ the discovery: write each built line ONCE and take it across the other two cases in a single pass — select the block and <kbd>ctrl</kbd>+<kbd>r</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> is the same fill), or select the three cases and commit with <kbd>ctrl</kbd>+<kbd>↵</kbd>, or copy the Base column onto the other two. Typing every case out clears all six beats and forfeits it',
     ]; },
+    /* rings: ① the availability line · ② the beginning line · ③ the ending line · ④ the ending row
+       incl. its label · ⑤⑥ the cushion line · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [
+      o.CB+o.rAv+':'+o.CD+o.rAv, o.CB+o.rBeg+':'+o.CD+o.rBeg, o.CB+o.rEnd+':'+o.CD+o.rEnd,
+      o.CA+o.rEnd+':'+o.CD+o.rEnd, o.CB+o.rCush+':'+o.CD+o.rCush, o.CB+o.rCush+':'+o.CD+o.rCush, null,
+    ]; },
+    /* the demo BUILDS its own selections with Shift+arrow rather than being handed them by
+       setDemoSel, so parKeys measures what a player really pays for the range grabs instead of
+       eliding them (the r438 `series` rule). setDemoSel only ever parks the cursor on the anchor
+       cell of the next beat. */
+    demo(){ const o=this._o; const SR={key:'ArrowRight',shift:true}, SD={key:'ArrowDown',shift:true};
+      const first=o.breach.indexOf(true), n=o.breach.filter(Boolean).length;
+      const flag=[]; for(let i=1;i<n;i++) flag.push(SR);
+      return [
+      {sel:o.CB+o.rAv,   keys:[...T('=MIN('+o.CB+o.rCom+','+o.CB+o.rBB+')-'+o.CB+o.rDr), Kb.enter]},
+      {sel:o.CB+o.rBeg,  keys:[...T('='+o.CB+o.rCash+'+'+o.CB+o.rAv), Kb.enter]},
+      /* the ☆, one of two — availability and beginning liquidity carried across in a single pass */
+      {sel:o.CB+o.rAv,   keys:[SR, SR, SD, Kb.fillR]},
+      {sel:o.CB+o.rEnd,  keys:[...T('='+o.CB+o.rBeg+'+SUM('+o.CB+o.rBurn+':'+o.CB+o.rFee+')'), Kb.enter]},
+      /* §1.0(a) format-as-you-go: the ending line is dressed the moment it exists — LABEL
+         included, so the rule runs the full width of the page the way a ruled total really does
+         (§1.0-R3(p): the check reads the three figure cells, so figures-only clears too) */
+      {sel:o.CA+o.rEnd,  keys:[SR, SR, SR, Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+      {sel:o.CB+o.rCush, keys:[...T('='+o.CB+o.rEnd+'-$'+o.CB+'$'+o.rMin), Kb.enter]},
+      /* two of two — and the anchored covenant reference is what lets this one travel */
+      {sel:o.CB+o.rEnd,  keys:[SR, SR, SD, Kb.fillR]},
+      /* the flag goes on LAST: a fill copies the source cell's format, so colouring before the
+         carry would have the pass paint the red straight back out (the r439 `cases` finding). */
+      {sel:o.cols[first]+o.rCush, keys:[...flag, Kb.alt, L('h'), L('f'), L('c'),
+        {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 Liquidity bridge (three cases \u2014 which ones breach?)',txt:true,bold:true};
-      cells['A3']={...blankCell(),value:'Item ($mm)',txt:true,bold:true};
-      ['Base','Downside','Severe'].forEach((h,i)=>cells[colLetter(2+i)+'3']={...blankCell(),value:h,txt:true,bold:true});
-      const lbl={4:'Cash',5:'Revolver commitment',6:'Revolver drawn',7:'Availability',8:'Beginning liquidity',
-                 9:'Operating burn',10:'Asset sale proceeds',11:'RX professional fees',
-                 12:'Ending liquidity',13:'Minimum liquidity',14:'Cushion / (shortfall)'};
-      Object.entries(lbl).forEach(([r,v])=>cells['A'+r]={...blankCell(),value:v,txt:true,
-        bold:(r==='8'||r==='12'||r==='14')});
-      /* Base inputs first; Downside/Severe take STRICTLY worse deltas so the three
-         endings are ordered. Cash is raised if the base ending lands thin, so the
-         minimum-liquidity line can always sit between Severe and Base: Base always
-         clears, Severe always breaches \u2014 the page tells its story every seed. */
-      let cash=rnd(20,120)*5;
-      const commit=rnd(60,200)*5;
-      const drawn=Math.min(commit-25, rnd(10, Math.max(11, Math.floor(commit/5)-5))*5);
-      const burn0=-rnd(30,90)*5, sale0=rnd(20,100)*5, fees0=-rnd(8,30)*5;
-      let baseEnd=cash+(commit-drawn)+burn0+sale0+fees0;
-      if(baseEnd<100){ cash+=Math.ceil((100-baseEnd)/5)*5; baseEnd=cash+(commit-drawn)+burn0+sale0+fees0; }
-      const worse=[0, -rnd(10,30)*5, -rnd(25,60)*5];
-      const saleCut=[1, .6, .25];
-      const ends=[];
+      /* §1.2 randomization — four independent axes. (a) SITE: this is a full-grid artifact (18 of
+         20 rows), so per §1.2 the site axis is CORNER JITTER — the page anchors at column A or B.
+         (b) CONTENT: the codename. (c) VALUES: every figure through rnd(). (d) WHICH-ONE-IS-
+         BROKEN: whether the DOWNSIDE case breaches as well as Severe, plus whether the borrowing
+         base binds in Downside. Row geometry is constant across seeds so the keystroke count
+         never moves with the draw (the r439 `wrapfix` rule) — the one exception is the single
+         extra Shift+→ when two cases have to be flagged, and the par sweep reports 73–74. */
+      const c0=rnd(0,1)?1:2;                          // (a) corner jitter: anchor column A or B
+      const CA=colLetter(c0), CB=colLetter(c0+1), CC=colLetter(c0+2), CD=colLetter(c0+3);
+      const HR=3, rCash=4, rCom=5, rBB=6, rDr=7, rAv=8, rBeg=9,
+            rBurn=10, rSale=11, rFee=12, rEnd=13, rCush=14, rAsm=16, rMin=17;
+      /* the ABL picture. Cash, the commitment and the drawings are TODAY's facts, so they are
+         the same in every case; the BORROWING BASE is projected under each case, which is the
+         whole reason a downside breaks (MODELING_STANDARDS §7 — a plausible artifact). Seeded so
+         the commitment binds in Base and the collateral binds in Severe. */
+      let cash=rnd(9,26)*10;
+      const commit=rnd(22,42)*10, drawn=rnd(3,7)*10;
+      const bb=[commit+rnd(2,9)*10, 0, commit-rnd(6,12)*10];
+      bb[1]= rnd(0,1) ? commit+rnd(1,5)*10 : commit-rnd(2,5)*10;      // (d) does the collateral bind in Downside?
+      if(bb[2]>=bb[1]-10) bb[2]=bb[1]-rnd(2,6)*10;
+      if(bb[2]<drawn+40) bb[2]=drawn+40;
+      const avail=[0,1,2].map(i=>Math.min(commit,bb[i])-drawn);
+      /* §2 SIGN CONVENTION (MODELING_STANDARDS): costs and burn carry their sign, so the bridge
+         is a clean SUM down the column and never a subtraction against a positive cost. */
+      const burn=[-rnd(7,16)*10,0,0], sale0=rnd(5,16)*10, fees0=-rnd(2,6)*10;
+      burn[1]=burn[0]-rnd(3,8)*10; burn[2]=burn[1]-rnd(6,14)*10;
+      /* MONOTONE BY CONSTRUCTION, and it is a MODEL point, not a cosmetic one: a worse case sells
+         fewer assets and pays MORE professional fees, never fewer. The first cut drew the two
+         fee deltas independently and a seed printed Severe fees BELOW Downside's — the kind of
+         thing a reviewer catches in the first ten seconds (MODELING_STANDARDS §7). */
+      const sale=[sale0, Math.round(sale0*0.6/10)*10, Math.round(sale0*0.25/10)*10];
+      const fees=[fees0, fees0-rnd(1,3)*10, 0]; fees[2]=fees[1]-rnd(1,4)*10;
+      const endOf=i=>cash+avail[i]+burn[i]+sale[i]+fees[i];
+      /* deterministic REPAIR rather than rejection sampling: force the three endings strictly
+         apart so the covenant line always has somewhere to sit, then floor the Severe ending so
+         the page reads as a thin case rather than a hole. */
+      let g1=endOf(0)-endOf(1); if(g1<40){ const d=Math.ceil((40-g1)/10)*10; burn[1]-=d; burn[2]-=d; }
+      let g2=endOf(1)-endOf(2); if(g2<40){ const d=Math.ceil((40-g2)/10)*10; burn[2]-=d; }
+      if(endOf(2)<20){ cash+=Math.ceil((20-endOf(2))/10)*10; }
+      const end=[0,1,2].map(endOf);
+      /* the covenant sits STRICTLY between two endings, so Base always clears and Severe always
+         breaches — the page tells its story every seed — while Downside is the seed's coin. */
+      const downBreach=!!rnd(0,1);
+      const minLiq=downBreach ? end[1]+Math.round((end[0]-end[1])/2/10)*10
+                              : end[2]+Math.round((end[1]-end[2])/2/10)*10;
+      const breach=[0,1,2].map(i=>end[i]-minLiq<0);
+
+      cells[CA+'1']={...blankCell(),value:codename()+' — Liquidity bridge ($mm)',txt:true,bold:true};
+      cells[CA+'2']={...blankCell(),value:'Source: lender case pack · basis: $ in millions · operating burn and fees carry their sign',txt:true,it:true,fontColor:'gray'};
+      cells[CA+HR]={...blankCell(),value:'Item',txt:true,bold:true,bb:true};
+      ['Base','Downside','Severe'].forEach((h,i)=>cells[colLetter(c0+1+i)+HR]={...blankCell(),value:h,txt:true,bold:true,align:'r',bb:true});
+      const lbl={};
+      lbl[rCash]='Cash'; lbl[rCom]='Revolver commitment'; lbl[rBB]='Borrowing base'; lbl[rDr]='Revolver drawn';
+      lbl[rAv]='Availability'; lbl[rBeg]='Beginning liquidity';
+      lbl[rBurn]='Operating burn'; lbl[rSale]='Asset sale proceeds'; lbl[rFee]='Restructuring fees';
+      lbl[rEnd]='Ending liquidity'; lbl[rCush]='Cushion / (shortfall)';
+      Object.keys(lbl).forEach(r=>cells[CA+r]={...blankCell(),value:lbl[r],txt:true,
+        bold:(+r===rBeg||+r===rEnd||+r===rCush)});
       for(let i=0;i<3;i++){
-        const Lc=colLetter(2+i);
-        cells[Lc+'4']={...blankCell(),value:cash,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[Lc+'5']={...blankCell(),value:commit,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[Lc+'6']={...blankCell(),value:drawn,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        const burn=burn0+worse[i], sale=Math.round(sale0*saleCut[i]/5)*5,
-              fees=fees0+(i? -rnd(2,8)*5 : 0);
-        cells[Lc+'9']={...blankCell(),value:burn,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[Lc+'10']={...blankCell(),value:sale,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[Lc+'11']={...blankCell(),value:fees,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        ends.push(cash+(commit-drawn)+burn+sale+fees);
+        const Lc=colLetter(c0+1+i);
+        const put=(r,v)=>cells[Lc+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        put(rCash,cash); put(rCom,commit); put(rBB,bb[i]); put(rDr,drawn);
+        put(rBurn,burn[i]); put(rSale,sale[i]); put(rFee,fees[i]);
+        /* the four built lines ship EMPTY but pre-formatted, so a typed answer and a carried one
+           read identically (doctrine §2.1b: no orphan cells at the win state). */
+        [rAv,rBeg,rEnd,rCush].forEach(r=>cells[Lc+r]={...blankCell(),fmtStyle:'comma',decimals:0});
       }
-      // the minimum sits strictly between Severe and Base, floored at a real number
-      let minLiq=Math.max(25, Math.min(baseEnd-25, ends[2]+rnd(2,8)*5));
-      minLiq=Math.round(minLiq/5)*5;
-      for(let i=0;i<3;i++) cells[colLetter(2+i)+'13']={...blankCell(),value:minLiq,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      this._ends=ends; this._min=minLiq;
-      return {ROWS:14, cells, active:{r:7,c:2}, sel:null, colW:{1:158}};
+      /* §1.0(f) + §1.0-R2(l) HELPER/ASSUMPTION STANDARD: the covenant level is an assumption, not
+         a computed line — light yellow, all borders, populated, individually labelled, and BLUE
+         because it is a typed input (MODELING_STANDARDS §1 colour-as-provenance). One credit
+         agreement means ONE level, so it is one cell the cushion points at rather than the same
+         number typed into three table cells (§1's no-duplicated-input corollary). */
+      cells[CA+rAsm]={...blankCell(),value:'Covenant assumption',txt:true,bold:true};
+      cells[CA+rMin]={...blankCell(),value:'Minimum liquidity ($mm)',txt:true};
+      cells[CB+rMin]={...blankCell(),value:minLiq,fontColor:'blue',fmtStyle:'comma',decimals:0,
+        fill:'yellow',ball:true};
+      /* §1.3 density: the page names its terms the way a real deck page does. Story, never
+         graded — both lines sit outside every checked rect, and the second one states the
+         simplification (MODELING_STANDARDS: say so when you simplify). */
+      cells[CA+'19']={...blankCell(),value:'Covenant tested at each month-end; a shortfall trips the minimum-liquidity test',txt:true,it:true,fontColor:'gray'};
+      cells[CA+'20']={...blankCell(),value:'One test date shown per case; the weekly path runs on the 13-week forecast',txt:true,it:true,fontColor:'gray'};
+      this._o={CA:CA,CB:CB,CC:CC,CD:CD,c0:c0,cols:[CB,CC,CD],
+               rCash:rCash,rCom:rCom,rBB:rBB,rDr:rDr,rAv:rAv,rBeg:rBeg,
+               rBurn:rBurn,rSale:rSale,rFee:rFee,rEnd:rEnd,rCush:rCush,rAsm:rAsm,rMin:rMin,
+               breach:breach,minLiq:minLiq};
+      const colW={}; colW[c0]=200; colW[c0+1]=98; colW[c0+2]=98; colW[c0+3]=98;
+      return {ROWS:20, cells, active:{r:rAv,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const V=(a)=>{ const x=S.cells[a]; return (x&&typeof x.value==='number')?x.value:0; };
-      const rowChk=(r, mk)=>{ for(let c=2;c<=4;c++){ const Lc=colLetter(c);
-          const x=S.cells[Lc+r];
-          const f=(x&&x.formula)?x.formula.toUpperCase().replace(/[\s$]/g,''):'';
-          const w=mk(Lc);
-          if(!f || !w.refs.every(t=>f.indexOf(t)>=0) || Math.abs(((x&&x.value)||0)-w.v)>1e-6) return false;
-        } return true; };
-      const availOk=rowChk('7', Lc=>({refs:[Lc+'5',Lc+'6'], v:V(Lc+'5')-V(Lc+'6')}));
-      const begOk  =rowChk('8', Lc=>({refs:[Lc+'4',Lc+'7'], v:V(Lc+'4')+V(Lc+'7')}));
-      const endOk  =rowChk('12',Lc=>({refs:[Lc+'8',Lc+'9:'+Lc+'11'], v:V(Lc+'8')+V(Lc+'9')+V(Lc+'10')+V(Lc+'11')}));
-      const cushOk =rowChk('14',Lc=>({refs:[Lc+'12',Lc+'13'], v:V(Lc+'12')-V(Lc+'13')}));
-      let boldOk=true; for(let c=2;c<=4;c++){ const x=S.cells[colLetter(c)+'12']; if(!x||!x.bold) boldOk=false; }
+      const o=this._o;
+      const V=k=>{ const x=S.cells[k]; return (x&&typeof x.value==='number')?x.value:0; };
+      const live=k=>{ const x=S.cells[k]; return !!(x&&x.formula&&typeof x.value==='number'); };
+      const near=(k,e)=>{ const x=S.cells[k]; return !!(x&&typeof x.value==='number'&&Math.abs(x.value-e)<0.5); };
+      /* every expectation is derived from the board's own INPUT cells, so each line grades its
+         own relationship and no beat depends on another beat having landed first (§1.0-R3(p),
+         and the r439 `bridge` order-dependency class). */
+      const wAv =c=>Math.min(V(c+o.rCom),V(c+o.rBB))-V(c+o.rDr);
+      const wBeg=c=>V(c+o.rCash)+wAv(c);
+      const wEnd=c=>wBeg(c)+V(c+o.rBurn)+V(c+o.rSale)+V(c+o.rFee);
+      const wCu =c=>wEnd(c)-V(o.CB+o.rMin);
+      const rowLive=(r,f)=>o.cols.every(c=>live(c+r)&&f(c));
+      const avOk  = rowLive(o.rAv,  c=>near(c+o.rAv,  wAv(c)));
+      const begOk = rowLive(o.rBeg, c=>near(c+o.rBeg, wBeg(c)));
+      const endOk = rowLive(o.rEnd, c=>near(c+o.rEnd, wEnd(c)));
+      const cuOk  = rowLive(o.rCush,c=>near(c+o.rCush,wCu(c)));
+      /* §1.0-R3(p): bold from ctrl+b / alt h 1 / the Total gallery style, and the top rule from
+         alt h b p (Top) / b s (Outside) / b d (Top & bottom) / that same gallery style — all of
+         those write `bt` — OR from alt h b a (All borders), which writes `ball` instead and paints
+         the identical line. WALKED, not reasoned about: the first cut of this predicate read `bt`
+         alone and the all-borders route left the beat dark on a correctly ruled board, which is
+         the untriggerable class exactly (dev/verify-liqbridge.js §B catches it). Dressing the
+         label cell alongside the figures is fine — only the figures are read. */
+      const dressOk = o.cols.every(c=>{ const x=S.cells[c+o.rEnd]; return !!(x&&x.bold&&(x.bt||x.ball)); });
+      /* the flag grades the SET: every negative cushion carries red font, and every case that
+         clears does not. fontColor==='red' is written by the Alt H F C swatch AND by the Alt H J
+         'Warning' cell style (probed, dev/verify-liqbridge.js §B), so both routes clear. */
+      const flagOk = o.cols.every(c=>{ const x=S.cells[c+o.rCush];
+        return ((wCu(c)<0) === !!(x&&x.fontColor==='red')); });
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): each built
+         line written ONCE and taken across the other two cases in a single pass. Read off the
+         MECHANIC, never geometry inferred from the end state — a carried cell and a typed one are
+         byte-identical once committed. Three equally fast mechanics reach it and all three latch:
+         the r424 S.fillOps rect (ctrl+r and alt h f i r both stamp it, and a left fill counts for
+         a right-to-left build), the r433 S.multiEnter rect (select the cases, type once, ctrl+↵)
+         and the r425 S.pasteLog rect (copy the Base column onto the pair). Measured on the
+         shipped board they cost 50 / 50 / 48 keys against 114 typed, so latching only one of them
+         would leave an equally correct — and in one case CHEAPER — route dark, which is
+         §1.0-R3(p)'s untriggerable class wearing a bonus badge (the r446 `lbo` finding). */
+      const cb=o.c0+1, cd=o.c0+3;
+      const fo=S.fillOps||[], me=S.multiEnter||[], pl=S.pasteLog||[];
+      /* the pass has to leave every one of the three cases written by that single op — a fill or
+         a multi-commit spans all three; a paste spans the two it lands on plus the one it was
+         copied FROM, whichever end the player built from (a right-to-left build pastes the base
+         pair off the Severe column, and it must earn the star exactly as a left-to-right one does). */
+      const carried=r=>
+        fo.some(f=>(f.dir==='right'||f.dir==='left') && f.r1<=r && f.r2>=r && f.c1<=cb && f.c2>=cd) ||
+        me.some(m=>m.r1<=r && m.r2>=r && m.c1<=cb && m.c2>=cd) ||
+        pl.some(p=>(p.kind==='all'||p.kind==='formulas') && p.w>=2 &&
+          p.r0<=r && p.r0+p.h-1>=r && p.sr<=r && p.sr+p.sh-1>=r &&
+          Math.min(p.c0,p.sc)<=cb && Math.max(p.c0+p.w-1,p.sc)>=cd);
+      const starOk = avOk && begOk && endOk && cuOk &&
+        [o.rAv,o.rBeg,o.rEnd,o.rCush].every(carried);
+      /* DEPTH_PASS §4.74 beats — the page's line for the dress ships verbatim (it is the page's
+         own replacement for the AUDIT_R417 §C "Dress" label), the rest are the outcome form. */
       return [
-        {label:'run availability live \u2014 commitment \u2212 drawn, every case (row 7)', ok:availOk},
-        {label:'run beginning liquidity \u2014 cash + availability, every case (row 8)', ok:begOk},
-        {label:'run ending liquidity \u2014 beginning + SUM of the whole bridge (row 12)', ok:endOk},
-        {label:'run cushion / (shortfall) \u2014 ending \u2212 minimum, every case (row 14)', ok:cushOk},
-        {label:'bold the ending liquidity row \u2014 the answer line (B12:D12)', ok:boldOk},
+        {label:'Build the availability line — lower of commitment and borrowing base, less drawn', ok: avOk},
+        {label:'Build the beginning liquidity line — cash plus availability, every case', ok: begOk},
+        {label:'Build the ending liquidity line — beginning plus the bridge, every case', ok: endOk},
+        {label:'Bold the ending liquidity row and add a top border above it', ok: dressOk},
+        {label:'Build the cushion line — ending less the minimum liquidity covenant', ok: cuOk},
+        {label:'Color the breached cases red — every case whose cushion is negative', ok: flagOk},
+        {label:'Enter each built line once — both other cases carried in one pass', ok: starOk, bonus:true},
       ];
     }
   },
-
   covtable:{
     /* r447 H6b (DEPTH_PASS §4.73, "Run the covenant table") — the depth-pass rework, built to
        §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 (the later law wins on conflict) and, because this is

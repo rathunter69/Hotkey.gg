@@ -1141,17 +1141,46 @@ const ALTS = [
       st.push({sel:o.CB+o.rEQ, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});
       o.allCols.forEach(c=>st.push({sel:c+o.rEV, keys:[...T('='+c+o.rEB+'*$'+o.CB+'$'+o.rMU),{key:'Enter'}]}));
       return st; }` },
-  { key: 'liqbridge', name: 'bold FIRST, bridge built bottom-up (cushion to availability), ribbon fills', moves: `C => [
-      {sel:'B12:D12', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B14', keys:[...T('=B12-B13'),{key:'Enter'}]},
-      {sel:'B14:D14', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B12', keys:[...T('=B8+SUM(B9:B11)'),{key:'Enter'}]},
-      {sel:'B12:D12', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B8',  keys:[...T('=B4+B7'),{key:'Enter'}]},
-      {sel:'B8:D8', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B7',  keys:[...T('=B5-B6'),{key:'Enter'}]},
-      {sel:'B7:D7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-    ]` },
+  /* r447 (liqbridge ROUND 1, DEPTH_PASS §4.74): the old single entry died with the ROWS:14
+     board it drove (no borrowing base, no covenant assumption cell, no dress beat, no flag) —
+     DELETE it and take this §1.8 pair. ALT 1 = chord-ROUTE alt: ribbon fills instead of Ctrl+R,
+     Alt H 1 for bold, Alt H B S for the rule, F4 for the covenant lock, the Warning cell style
+     for the flag — every core clears AND the ☆ still lands, which is what proves the star's
+     latch is route-blind (§1.0(c)). ALT 2 = op-ORDER alt AND the ☆ negative control: the page
+     is built BOTTOM-UP (cushion before ending before beginning before availability), the dress
+     goes on first, every case is typed by hand with unanchored covenant refs, and the flag comes
+     off the font-colour swatch — all six cores clear with the ☆ FORFEITED, which is the
+     §1.0-R2(i) skippability proof (the star state is asserted in dev/verify-liqbridge.js §C;
+     this harness asserts the win). */
+  { key: 'liqbridge', name: 'ribbon fills (Alt H F I R), bold via Alt H 1, the rule via Alt H B S, the covenant pinned with F4, the flag from the Warning cell style — the ☆ still lands', moves: `C => { const o=C._o;
+      const SR={key:'ArrowRight',shift:true}, SD={key:'ArrowDown',shift:true};
+      const f=o.breach.indexOf(true), n=o.breach.filter(Boolean).length, x=[];
+      for(let i=1;i<n;i++) x.push(SR);
+      return [
+        {sel:o.CB+o.rAv,   keys:[...T('=MIN('+o.CB+o.rCom+','+o.CB+o.rBB+')-'+o.CB+o.rDr), {key:'Enter'}]},
+        {sel:o.CB+o.rBeg,  keys:[...T('='+o.CB+o.rCash+'+'+o.CB+o.rAv), {key:'Enter'}]},
+        {sel:o.CB+o.rAv,   keys:[SR,SR,SD,{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.CB+o.rEnd,  keys:[...T('=SUM('+o.CB+o.rBeg+':'+o.CB+o.rFee+')'), {key:'Enter'}]},
+        {sel:o.CB+o.rEnd,  keys:[SR,SR,{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('s')]},
+        {sel:o.CB+o.rCush, keys:[...T('='+o.CB+o.rEnd+'-'+o.CB+o.rMin), {key:'F4'}, {key:'Enter'}]},
+        {sel:o.CB+o.rEnd,  keys:[SR,SR,SD,{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.cols[f]+o.rCush, keys:[...x,{key:'Alt'},L('h'),L('j'),
+          {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+      ]; }` },
+  { key: 'liqbridge', name: 'dress FIRST, page built BOTTOM-UP (cushion → ending → beginning → availability), every case typed by hand with unanchored covenant refs, flag from the font-colour swatch — all six cores clear, the ☆ forfeited', moves: `C => { const o=C._o;
+      const SR={key:'ArrowRight',shift:true};
+      const sub=(s,c)=>s.split(o.CB).join(c);
+      const A='=MIN('+o.CB+o.rCom+','+o.CB+o.rBB+')-'+o.CB+o.rDr;
+      const B='='+o.CB+o.rCash+'+'+o.CB+o.rAv;
+      const E='='+o.CB+o.rBeg+'+'+o.CB+o.rBurn+'+'+o.CB+o.rSale+'+'+o.CB+o.rFee;
+      const mv=[{sel:o.CB+o.rEnd, keys:[SR,SR,{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]}];
+      o.cols.forEach(c=>mv.push({sel:c+o.rCush, keys:[...T('='+c+o.rEnd+'-'+o.CB+o.rMin), {key:'Enter'}]}));
+      o.cols.forEach(c=>mv.push({sel:c+o.rEnd,  keys:[...T(sub(E,c)), {key:'Enter'}]}));
+      o.cols.forEach(c=>mv.push({sel:c+o.rBeg,  keys:[...T(sub(B,c)), {key:'Enter'}]}));
+      o.cols.forEach(c=>mv.push({sel:c+o.rAv,   keys:[...T(sub(A,c)), {key:'Enter'}]}));
+      o.cols.forEach((c,i)=>{ if(o.breach[i]) mv.push({sel:c+o.rCush, keys:[{key:'Alt'},L('h'),L('f'),L('c'),
+        {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]}); });
+      return mv; }` },
   /* r433 (margin ROUND 1, DEPTH_PASS §4.21): the old three-table entry died with the board it
      drove; the §1.8 pair replaces it. ALT 1 = chord-ROUTE alt — typed refs instead of pointing,
      one ribbon fill per column, percent from the Ctrl+Shift+% + Alt H 0 pair instead of the
