@@ -9178,3 +9178,33 @@ right one — including one that reported `0.00px` for an inline `6px solid red`
 impossible and was the tell. The reading that finally held was a plain zoomed screenshot looked
 at directly. **When a probe and your eyes disagree, believe your eyes and go fix the probe** —
 third sighting this campaign, after r440's `hotkey_onboarded` omission and r441's hidden rows.
+
+### r442 addendum — why CI stopped, and a wrong call recorded as wrong
+
+The gate stopped running on this branch entirely: Cloudflare and Supabase fired on every push,
+the `gate` workflow produced no run at all.
+
+**First diagnosis, WRONG:** the first commit to stop running was also the first to touch
+`.github/workflows/`, so I called it a push identity without the `workflows` permission and
+backed the CI wiring out (41ce86b) to unblock. **The next push produced no gate run either**,
+which disproved it.
+
+**Actual cause:** `mergeable_state: "dirty"`. `main` advanced while this PR was open — PR #244
+squash-merged an independent session's r428–r429 — and GitHub does not run `pull_request`
+workflows for a PR it cannot compute a merge commit for. Every push after #244 landed was
+therefore CI-silent, and the last green gate on this branch (`ef865c9`) predates that merge.
+
+Two things follow:
+
+1. **The revert in 41ce86b was unnecessary.** It is harmless and the wiring has to be re-applied
+   during conflict resolution anyway — `main`'s `gate.yml` has since gained `depth-contract` and
+   `depth-mechanics` steps, so that file needs BOTH sides, not a take-ours.
+2. **A silent CI is a symptom, not a coincidence.** Before theorising about permissions, read
+   `mergeable_state`. Same failure shape as the probe hazards this campaign keeps hitting: the
+   plausible explanation that arrives first is not evidence, and I acted on it before testing it.
+
+**Standing state:** PR #243 conflicts with `main` in 103 places in `index.html` alone. The two
+branches disagree about the CATALOG itself — `main` still ships `hunt`, `dress`, `growth`,
+`wirewalk`, `undo`, `copyover` and `grpfold`, all of which this branch retired on measurements.
+That is a product decision, not a mechanical resolution, and it is Wolf's call. Nothing has been
+merged and nothing is live; `main` remains the only thing users see.
