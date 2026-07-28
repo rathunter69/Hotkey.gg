@@ -31,10 +31,11 @@ filldr+pastes) · `growth`→cagr absorbed its board · `grpfold`→unhide (r437
 (r439, the strongest of the campaign — measured three ways). `cases` moved chapters rather than
 retiring.
 
-### Where the next session picks up (written r441, PR #243 open)
+### Where the next session picks up (r443 — PR #243 MERGED to main as 09f1aa2, live)
 
-The six passed chapters are shipped and green. **The engine work that had to precede Models is
-done** — the 20-row standard (r440) and the width-engine pass (r441) were both explicitly gated
+**Shipped and live** — PR #243 merged to main as `09f1aa2` on 2026-07-28, gate green on all 24
+steps. The six passed chapters, the width engine and the r442 border fix are all on the trunk,
+alongside #244's r428–r429. **The engine work that had to precede Models is done** — the 20-row standard (r440) and the width-engine pass (r441) were both explicitly gated
 in front of the Models dispatch, and both are in. Nothing engine-side is now blocking.
 
 Two decisions are Wolf's and neither is made:
@@ -844,5 +845,7 @@ Secondary divergence, mechanical by comparison:
 **CI is silent until this is resolved** — GitHub does not run `pull_request` workflows for a PR
 with `mergeable_state: "dirty"`, so no push on this branch can be gated until the merge lands.
 
-**Escalated to Wolf; nothing merged, nothing live.** Do not resolve this by picking a side
-mechanically — the letter collision and the 44-drill audit are product calls.
+**RESOLVED in r443 — merged to main as 09f1aa2 and live.** Both (n) laws kept: the round-3
+playtest block keeps §1.0-R3 (n)–(s), #244's dual-audience law is now §1.0-R4 (t)/(u). Code came
+from #243, test infrastructure from #244. Still outstanding from it: the dual-audience audit over
+all 44 passed drills (that law post-dates them) and #244's `qclose` capstone.
