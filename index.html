@@ -12625,76 +12625,276 @@ const CHALLENGES = {
     }
   },
   nwcsched:{
-    name:'NWC Sched.', label:'Roll working capital', par:74, parKeys:78,
-    aha:'DSO, DIO, DPO drive the balances — working capital rolls on days, not guesses.',
-    prompt:'Working capital from the drivers: three assumptions from the data room — type them in, color them blue, then build. AR off DSO (days customers take to pay), inventory off DIO (days stock sits), payables off DPO (days you take to pay), each driver anchored and filled across five years; net working capital bolded and ruled.',
-    req(){ return 'type the drivers at B9:B11 \u2014 DSO <em>'+this._dso+'</em> \u00b7 DIO <em>'+this._dio+'</em> \u00b7 DPO <em>'+this._dpo+'</em> \u2014 then <em>alt h f c</em> blue \u00b7 <em>B4</em> =B2/365*$B$9 fill \u2192 \u00b7 <em>B5</em> =B3/365*$B$10 fill \u2192 \u00b7 <em>B6</em> =B3/365*$B$11 fill \u2192 \u00b7 <em>B7</em> =B4+B5-B6 fill \u2192 + <em>ctrl+b</em> + <em>alt h b p</em> \u00b7 <em>C8</em> \u0394 =C7-B7 fill \u2192'; },
-    guide(){ return [
-      'the data room says DSO <kbd>'+this._dso+'</kbd> \u00b7 DIO <kbd>'+this._dio+'</kbd> \u00b7 DPO <kbd>'+this._dpo+'</kbd> \u2014 type them down B9:B11, <kbd>\u21b5</kbd> walks you down',
-      'select B9:B11 \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> \u00b7 <kbd>\u2192</kbd>\u00d74 <kbd>\u21b5</kbd>',
-      'AR at B4 \u00b7 <kbd>=B2/365*$B$9</kbd> \u2014 a day of revenue \u00d7 YOUR anchored DSO \u00b7 fill right',
-      'inventory at B5 \u00b7 <kbd>=B3/365*$B$10</kbd> \u00b7 payables at B6 \u00b7 <kbd>=B3/365*$B$11</kbd> \u2014 both off COGS \u00b7 fill each right',
-      'NWC at B7 \u00b7 <kbd>=B4+B5-B6</kbd> \u00b7 fill right \u00b7 then <kbd>ctrl</kbd>+<kbd>b</kbd> and <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> \u2014 the line that matters gets dressed',
-      '\u0394NWC at C8 \u00b7 <kbd>=C7-B7</kbd> \u00b7 fill C8:F8 \u2192 \u2014 the swing that hits cash flow',
+    /* r448 H6b-FB (DEPTH_PASS §4.81, "Roll working capital") — the depth-pass rework, built to
+       §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (the law wins on conflict) and to
+       dev/MODELING_STANDARDS.md §1/§2/§3/§7.
+
+       WAS: 5 checks on a ROWS:11 board (11 rows used of the real 20-row sheet — 55%, under the
+       §1.3 target), no ☆, no saveClose, no historical column, driver days typed into a bare
+       un-styled block, and the AR beat grading FORMULA TEXT (refs('B4',['B2','B9'])) — the
+       CAMPAIGN §1 untriggerable class in its usual form.
+
+       ── ☆-HEADROOM DIAGNOSTIC, BOTH PARTS (CAMPAIGN §2), run BEFORE the board was designed.
+       Measured through the live engine on the SHIPPED board, every selection and navigation
+       KEYED (setDemoSel only parks the cursor on an anchor cell), 5 seeds:
+         PART 1 — SPREAD: taught route 86 keys · slowest legal 287 (every cell of every line
+           typed year by year, no anchors, no fills, the blue pass one cell at a time). 3.34×.
+         PART 2 — WHAT SURVIVES THE STRIP: ~14 keys are chord-vs-ribbon (Ctrl+R vs Alt H F I R,
+           Ctrl+B vs Alt H 1, Alt H B P vs the Cell Styles Total) — §1.0(c) forces those to
+           clear — and ZERO are formatting (the shipped board graded only the one NWC dress that
+           is a core beat). The remaining ~187 keys are fill-versus-retype and anchor-versus-
+           retype over a five-line, five-year block. Legal headroom, and it is the biggest in
+           the chapter. KEEP. Re-measured on the REBUILT board: 99 keys against 333, 3.36×.
+         ☆ FAMILY BAKE-OFF (the wave-5 addendum — the candidate families MEASURED on the
+         identical job before one was chosen, not argued). Full solves on the REBUILT board,
+         every selection and navigation keyed, 3 seeds each, dev/verify-nwcsched.js §B. Every
+         one of them clears all six cores, so each is a legal route a player may take:
+           · one-pass FILL — the whole first plan column typed, then ONE Ctrl+R      99 keys
+           · per-line fills — the TAUGHT route, and the ☆'s control                 117 keys
+           · paste-across — copy the plan column, paste it over the other four      103 keys
+           · Ctrl+Enter multi-commit per line (S.multiEnter, `anchor`'s family)     112 keys
+           · per-line fills with Alt+= on the total (S.autoSumN, `scrub`'s family)  105 keys
+           · the slowest legal route — no anchors, no fills, every cell typed       333 keys
+           · independent prove-out — NOT ADMISSIBLE: §1.0-R4(u) allows it only where a
+             pre-playtest page already specced it, and §4.81 does not.
+         So the ☆ is worth 18 keys against the taught control, and the best NON-fill family
+         (paste-across) is 4 keys behind the fill while being worth only 14. The addendum asks
+         for a non-fill family at comparable headroom and prefers it where one exists; here the
+         fill is both cheaper AND worth more, and it is the family MODELING_STANDARDS §7 names
+         as the richest star a Models board can carry ("one anchored formula filling a whole
+         schedule"). Fill ships, with the numbers, per the addendum's own fallback. If the
+         chapter ends up fill-heavy at assembly, paste-across is the measured drop-in.
+       ── SKIPPABILITY PROOF (§1.0-R2(i)), measured not asserted: the taught per-line route
+       (guide lines 2-5) clears all six cores with the ☆ dark, at +18 keys. Registered as ALT 2.
+
+       ── UNTRIGGERABLE BEATS KILLED (CAMPAIGN §1, all found by WALKING routes):
+         (1) THE SHIPPED AR BEAT DEMANDED 'B2' AND 'B9' IN THE FORMULA TEXT. A player who pointed
+             the ratio through the header year (=B2*$B$9/365 is fine, but =B2/365 in one cell and
+             the driver multiply in another, or a ROUND() wrapper naming the same cells in a
+             different order) could stand on a correct board with the line dark. Nothing here
+             reads formula text: every core grades the number standing in the column, plus
+             liveness where the label says "Build" or "Total" (MODELING_STANDARDS §7).
+         (2) ANCHORING IS GRADED BY THE VALUES, NEVER BY THE '$'. An un-anchored driver reference
+             walks off the block on the fill and lands zeros, so the end state itself fails —
+             which means BOTH $B$5 and $B5 clear (a right-fill only needs the column locked), and
+             a player who never fills at all and types five correct formulas clears too (§1.0(c)).
+         (3) THE TOP-BORDER BEAT IS GRADED LENIENTLY (`bt || ball`) — the WAVE-5 addendum's
+             lenient reading, chosen because the engine's Cell Styles "Total" (Alt H J → Total)
+             sets bt AND bb together (index.html CELL_STYLES) and Alt H B S on a one-row range
+             sets bt and bb on the same cells (index.html HBS): a strict `bt && !bb` would lock
+             out two correct desk routes, which is §1.0-R3(p) exactly. Declared in the payload.
+
+       ── §1.0-R4(t) THE REALITY TEST. Chapter 8 is audience B (§3.1 audience map), and this is
+       the fragment a first-year builds in week one: diligence hands over three day-count
+       assumptions and the working-capital schedule has to be rolled before the cash flow
+       statement can close. The board is a real file fragment — a historical column, a linked
+       feed block, a driver block, five lines, a change row that another schedule reads.
+
+       ── MODELING_STANDARDS conventions carried (stated in full in the payload §8):
+       §1 colour-as-provenance (blue = the days the player types and the historical balances;
+       green = the revenue/COGS feed linked from the operating model; black = everything
+       computed here) · §1 totals wear a TOP border, never a rule underneath · §1 negatives in
+       parentheses (comma format does this) · §1 no hardcodes inside formulas — 365 is the one
+       exception every desk writes inline · §2 one sign convention, stated on the board's basis
+       memo: payables are carried NEGATIVE as a source of working capital, so net working
+       capital is one clean SUM down the column · §7 the board is a COMPONENT (the WC corkscrew
+       feeding the CFS), 20 rows, 16 carrying content at the win state (80%). */
+    name:'NWC Sched.', label:'Roll working capital', par:102, parKeys:97, saveClose:true,   /* r448 §4.81 depth pass: par re-swept from scratch (was par 74 / parKeys 78 on the ROWS:11 board with no historical column, no ☆ and no save closer). dev/e2e-par-sweep.js nwcsched, and dev/verify-nwcsched.js §A over 15 seeds: median 97 keys including the engine-appended Ctrl+S, FLAT at 97 (min 97, max 97) — the board's geometry is fixed across seeds, so only the digit-length of the three day-counts could move it and all three are two digits by construction. par 102 ≈ 1.05 s/key, the house band. That puts nwcsched at the top of the chapter band beside dcfbuild (91) and lbobuild (82), which is right for a five-line, six-column schedule. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 2:33 · pro 1:57 · legendary 1:42. */
+    aha:'working capital is three ratios pointed at two lines — the balances are an output, never a guess.',
+    /* §1.5: the aha's MOMENT is beat 5. The change row is the first line on the page that moves
+       because a DRIVER moved rather than because a number was typed — the whole plan swings off
+       three day-counts, and it is visible in one cell. */
+    prompt:'The operating model closed last night and the cash flow statement is waiting on working capital. Diligence reset the day-count assumptions this morning — put them in the driver block and roll receivables, inventory and payables out across the plan. The change line at the bottom is the number the cash flow statement reads on Monday.',
+    req(){ const o=this._o, F1=o.Y1;
+      return 'type <em>'+o.dso+'</em> / <em>'+o.dio+'</em> / <em>'+o.dpo+'</em> down '+o.CD+o.rDSO+':'+o.CD+o.rDPO+' · <em>alt h f c</em> →×4 blue · '+F1+o.rAR+' <em>='+F1+o.rRev+'/365*$'+o.CD+'$'+o.rDSO+'</em> · '+F1+o.rINV+' <em>='+F1+o.rCog+'/365*$'+o.CD+'$'+o.rDIO+'</em> · '+F1+o.rAP+' <em>=-'+F1+o.rCog+'/365*$'+o.CD+'$'+o.rDPO+'</em> · '+F1+o.rNWC+' <em>=SUM('+F1+o.rAR+':'+F1+o.rAP+')</em> · '+F1+o.rCHG+' <em>='+F1+o.rNWC+'-'+o.Y0+o.rNWC+'</em> · <em>ctrl+r</em> · <em>ctrl+b</em> + <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o, F1=o.Y1, FL=o.YL;
+      return [
+      'the diligence memo above the schedule sets DSO <kbd>'+o.dso+'</kbd> · DIO <kbd>'+o.dio+'</kbd> · DPO <kbd>'+o.dpo+'</kbd> — type them down the three yellow cells, <kbd>↵</kbd> walks you down · then select all three and <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> → the blue swatch (<kbd>alt</kbd> <kbd>h</kbd> <kbd>j</kbd> → <b>Input</b> lands the same colour)',
+      'receivables at '+F1+o.rAR+' · <kbd>='+F1+o.rRev+'/365*$'+o.CD+'$'+o.rDSO+'</kbd> — a day of revenue times your DSO, the driver locked so it survives the trip across · <kbd>ctrl</kbd>+<kbd>r</kbd> to '+FL+o.rAR+' (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> is the ribbon door)',
+      'inventory at '+F1+o.rINV+' · <kbd>='+F1+o.rCog+'/365*$'+o.CD+'$'+o.rDIO+'</kbd> · payables at '+F1+o.rAP+' · <kbd>=-'+F1+o.rCog+'/365*$'+o.CD+'$'+o.rDPO+'</kbd> — both run off COGS, and the minus is what makes payables a source · fill each across',
+      'net working capital at '+F1+o.rNWC+' · <kbd>=SUM('+F1+o.rAR+':'+F1+o.rAP+')</kbd> — payables already carry their sign, so it is one clean SUM · <kbd>alt</kbd>+<kbd>=</kbd> proposes the same range',
+      'the change row at '+F1+o.rCHG+' · <kbd>='+F1+o.rNWC+'-'+o.Y0+o.rNWC+'</kbd> — the plan year against the year before it, which is why the historical column is on the page · fill across',
+      'select the change row and <kbd>ctrl</kbd>+<kbd>b</kbd>, then <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> for the rule above it (<kbd>alt</kbd> <kbd>h</kbd> <kbd>j</kbd> → <b>Total</b> does both in one pass)',
+      '☆ the discovery: type the whole first plan column — all five lines — before you fill anything, then take the block across in ONE <kbd>ctrl</kbd>+<kbd>r</kbd>. Filling line by line clears every core beat and forfeits it',
     ]; },
-    targets:['B5:F5','B6:F6','B10:F10','B11:F11','B13:F14'],
-    demo(){ return [
-      {sel:'B9', keys:[...T(String(this._dso)), Kb.enter]},
-      {sel:'B10', keys:[...T(String(this._dio)), Kb.enter]},
-      {sel:'B11', keys:[...T(String(this._dpo)), Kb.enter]},
-      {sel:'B9:B11', keys:[{key:'Alt'}, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
-      {sel:'B4', keys:[...T('=B2/365*$B$9'), Kb.enter]},
-      {sel:'B4:F4', keys:[Kb.fillR]},
-      {sel:'B5', keys:[...T('=B3/365*$B$10'), Kb.enter]},
-      {sel:'B5:F5', keys:[Kb.fillR]},
-      {sel:'B6', keys:[...T('=B3/365*$B$11'), Kb.enter]},
-      {sel:'B6:F6', keys:[Kb.fillR]},
-      {sel:'B7', keys:[...T('=B4+B5-B6'), Kb.enter]},
-      {sel:'B7:F7', keys:[Kb.fillR]},
-      {sel:'B7:F7', keys:[Kb.bold]},
-      {sel:'B7:F7', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
-      {sel:'C8', keys:[...T('=C7-B7'), Kb.enter]},
-      {sel:'C8:F8', keys:[Kb.fillR]},
-    ]; },
+    /* rings: ① the driver block · ② receivables · ③ inventory + payables · ④ the NWC line ·
+       ⑤ the change row · ⑥ the change row · ☆ never ringed (§2.2) */
+    targets(){ const o=this._o, F1=o.Y1, FL=o.YL;
+      return [o.CD+o.rDSO+':'+o.CD+o.rDPO,
+              F1+o.rAR+':'+FL+o.rAR,
+              F1+o.rINV+':'+FL+o.rAP,
+              F1+o.rNWC+':'+FL+o.rNWC,
+              F1+o.rCHG+':'+FL+o.rCHG,
+              F1+o.rCHG+':'+FL+o.rCHG,
+              null]; },
+    /* the demo BUILDS every RANGE selection with keys rather than being handed it by setDemoSel
+       (the r438 `series` rule — a demo handed its selections measures almost nothing);
+       setDemoSel only parks the ACTIVE CELL on an anchor, and it parks once per line rather than
+       once for the whole column FOR A REASON: guided mode's rail (railToTarget) repositions the
+       cursor the moment the first-unmet target changes, so a column typed straight down with
+       Enter walking gets yanked back onto the receivables row and the next formula overwrites
+       the last. Found by dev/e2e-guided.js, not by reading — the per-line park is what makes
+       the drill solvable on the rails, and it costs the same keys either way. */
+    demo(){ const o=this._o, F1=o.Y1;
+      return [
+        {sel:o.CD+o.rDSO, keys:[...T(String(o.dso)), Kb.enter, ...T(String(o.dio)), Kb.enter, ...T(String(o.dpo)), Kb.enter]},
+        {sel:o.CD+o.rDPO, keys:[{key:'ArrowUp',shift:true},{key:'ArrowUp',shift:true},{key:'Alt'}, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
+        {sel:F1+o.rAR,  keys:[...T('='+F1+o.rRev+'/365*$'+o.CD+'$'+o.rDSO), Kb.enter]},
+        {sel:F1+o.rINV, keys:[...T('='+F1+o.rCog+'/365*$'+o.CD+'$'+o.rDIO), Kb.enter]},
+        {sel:F1+o.rAP,  keys:[...T('=-'+F1+o.rCog+'/365*$'+o.CD+'$'+o.rDPO), Kb.enter]},
+        {sel:F1+o.rNWC, keys:[...T('=SUM('+F1+o.rAR+':'+F1+o.rAP+')'), Kb.enter]},
+        {sel:F1+o.rCHG, keys:[...T('='+F1+o.rNWC+'-'+o.Y0+o.rNWC), Kb.enter]},
+        {sel:F1+o.rAR, keys:[{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true},
+                             {key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true}, Kb.fillR]},
+        {sel:F1+o.rCHG, keys:[{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},
+                              Kb.bold, {key:'Alt'}, L('h'), L('b'), L('p')]},
+      ];
+    },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 working capital ($mm)',txt:true,bold:true};
-      const y0=rnd(24,26);
-      for(let i=0;i<5;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
-      const rows=[[2,'Revenue'],[3,'COGS'],[4,'Receivables'],[5,'Inventory'],[6,'Payables'],[7,'Net working capital'],[8,'\u0394 NWC']];
-      rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===7)});
-      cells['A9']={...blankCell(),value:'DSO (days)',txt:true};
-      cells['A10']={...blankCell(),value:'DIO (days)',txt:true};
-      cells['A11']={...blankCell(),value:'DPO (days)',txt:true};
-      this._dso=rnd(30,60); this._dio=rnd(40,80); this._dpo=rnd(25,55);
-      this._exp=[];
-      let prevN=null;
-      for(let i=0;i<5;i++){ const col=colLetter(i+2);
-        const rev=Math.round(rnd(80,140)*10*(1+i*0.07)), cogs=Math.round(rev*rnd(45,60)/100);
-        cells[col+2]={...blankCell(),value:rev,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+3]={...blankCell(),value:cogs,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        [4,5,6].forEach(r=>cells[col+r]={...blankCell(),fmtStyle:'comma',decimals:1});
-        cells[col+7]={...blankCell(),fmtStyle:'comma',decimals:1};
-        if(i>0) cells[col+8]={...blankCell(),fmtStyle:'comma',decimals:1};
-        const ar=rev/365*this._dso, inv=cogs/365*this._dio, ap=cogs/365*this._dpo, nwc=ar+inv-ap;
-        this._exp.push({ar:ar,inv:inv,ap:ap,nwc:nwc,d:prevN===null?null:nwc-prevN});
-        prevN=nwc;
+      /* §1.2 randomization — FOUR independent axes on a full-grid artifact, which §1.2 lets
+         substitute CORNER JITTER for the site-shuffle pool:
+         (a) corner jitter, both axes — the schedule anchors at column A, or at column B behind
+             the narrow gutter column a real model keeps; and the whole statement block slides
+             one row down. (b) CONTENT pools — the codename, the fiscal-year base, and the four
+             line labels a desk actually disagrees about (receivables/payables/inventory/COGS
+             wording). (c) VALUES — every figure through rnd(): the three plan day-counts, the
+             historical day-counts they replace, opening revenue, the growth rate and the COGS
+             margin. (d) the HISTORICAL day-counts are drawn INDEPENDENTLY of the plan's, so the
+             first plan year's change row is a real number on every seed and can never be zero.
+         Geometry (five lines, one historical column, five plan years) is constant across seeds,
+         so the keystroke count never moves with the draw. */
+      const c0=rnd(0,1)?1:2;                       // (a) corner jitter, column axis
+      const j=rnd(0,1);                            // (a) corner jitter, row axis
+      const CA=colLetter(c0), CD=colLetter(c0+1);
+      const Y=[]; for(let i=0;i<6;i++) Y.push(colLetter(c0+2+i));
+      const rDrvH=4, rDSO=5, rDIO=6, rDPO=7, rMemo=8;
+      const HR=10+j, rRev=HR+1, rCog=HR+2, rAR=HR+4, rINV=HR+5, rAP=HR+6, rNWC=HR+7, rCHG=HR+8, rNote=20;
+      const P=a=>a[rnd(0,a.length-1)];             // (b) content pools
+      const arLbl=P(['Accounts receivable','Trade receivables']),
+            invLbl=P(['Inventory','Inventories']),
+            apLbl=P(['Accounts payable','Trade payables']),
+            cogLbl=P(['Cost of goods sold','Cost of sales']);
+      const dso=rnd(38,58), dio=rnd(46,74), dpo=rnd(28,46);          // (c) the plan's drivers
+      const hDso=dso-rnd(2,6), hDio=dio-rnd(3,8), hDpo=dpo+rnd(2,6); // (d) the year the file closed on
+      const y0=2024+rnd(0,3);
+      const rev0=rnd(90,140)*10, gr=rnd(4,9)/100, cgP=rnd(54,64)/100;
+      const rev=[], cog=[];
+      for(let i=0;i<6;i++){ rev.push(Math.round(rev0*Math.pow(1+gr,i))); cog.push(Math.round(rev[i]*cgP)); }
+      /* §2.1b banker's-workbook finish + §1.3 "where the lesson isn't formatting, the board ships
+         pre-dressed": every empty forecast cell already carries its number format, and the NWC
+         row already carries bold + its TOP border (§1.0(f)), so the win state is uniform however
+         the player gets there and the ☆'s block fill can never leave a half-dressed total row
+         (the r439 `cases` hazard — a fill copies the SOURCE cell's format). */
+      cells[CA+'1']={...blankCell(),value:codename()+' — working capital schedule ($mm)',txt:true,bold:true};
+      cells[CA+'2']={...blankCell(),value:'Basis: year-end balances, $ in millions · green = linked from the operating model',txt:true,it:true,fontColor:'gray'};
+      cells[CA+rDrvH]={...blankCell(),value:'Working capital drivers (days)',txt:true,bold:true};
+      /* §1.0(f) + §1.0-R2(l): assumption cells are LIGHT YELLOW + ALL BORDERS and individually
+         labelled. They ship EMPTY here — filling them IS beat 1 — so the empty yellow box is
+         itself the cue that something belongs in it; the values live in the diligence memo one
+         row below, the way a real assumption arrives. Declared as a deviation in the payload. */
+      [[rDSO,'DSO (days)'],[rDIO,'DIO (days)'],[rDPO,'DPO (days)']].forEach(([r,n])=>{
+        cells[CA+r]={...blankCell(),value:n,txt:true};
+        cells[CD+r]={...blankCell(),fill:'yellow',ball:true,align:'c'};
+      });
+      cells[CA+rMemo]={...blankCell(),value:'Diligence memo, this morning: DSO '+dso+' days · DIO '+dio+' days · DPO '+dpo+' days',txt:true,it:true,fontColor:'gray'};
+      cells[CA+HR]={...blankCell(),value:'Item',txt:true,bold:true,bb:true};
+      for(let i=0;i<6;i++) cells[Y[i]+HR]={...blankCell(),value:'FY'+String(y0+i).slice(2)+(i?'E':'A'),txt:true,bold:true,align:'r',bb:true};
+      cells[CA+rRev]={...blankCell(),value:'Revenue',txt:true};
+      cells[CA+rCog]={...blankCell(),value:cogLbl,txt:true};
+      /* MODELING_STANDARDS §1: the feed block is GREEN — it is linked in from the operating
+         model, not typed here. Revenue and COGS are carried as MAGNITUDES (the ratio bases),
+         which DRILL_DOCTRINE §2.4's sign rule exempts by name; the one signed line on this page
+         is payables, and the basis memo at the bottom says so. */
+      for(let i=0;i<6;i++){
+        cells[Y[i]+rRev]={...blankCell(),value:rev[i],fmtStyle:'comma',decimals:0,fontColor:'green'};
+        cells[Y[i]+rCog]={...blankCell(),value:cog[i],fmtStyle:'comma',decimals:0,fontColor:'green'};
       }
-      return {ROWS:11, cells, active:{r:9,c:2}, sel:null, colW:{1:170,2:84,3:84,4:84,5:84,6:84}};
+      cells[CA+rAR]={...blankCell(),value:arLbl,txt:true};
+      cells[CA+rINV]={...blankCell(),value:invLbl,txt:true};
+      cells[CA+rAP]={...blankCell(),value:apLbl,txt:true};
+      cells[CA+rNWC]={...blankCell(),value:'Net working capital',txt:true,bold:true};
+      cells[CA+rCHG]={...blankCell(),value:'Increase in NWC',txt:true};
+      /* the historical column ships COMPLETE — blue hardcoded balances off the closed year's own
+         day-counts, and a live SUM on the total (MODELING_STANDARDS §1: typed is blue, computed
+         is black). It is what makes the change row's first plan year a real subtraction rather
+         than a blank, and it is the column a reviewer checks the shape against. */
+      const ar0=Math.round(rev[0]/365*hDso), inv0=Math.round(cog[0]/365*hDio), ap0=-Math.round(cog[0]/365*hDpo);
+      cells[Y[0]+rAR]={...blankCell(),value:ar0,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      cells[Y[0]+rINV]={...blankCell(),value:inv0,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      cells[Y[0]+rAP]={...blankCell(),value:ap0,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+      cells[Y[0]+rNWC]={...blankCell(),formula:'=SUM('+Y[0]+rAR+':'+Y[0]+rAP+')',value:ar0+inv0+ap0,fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      for(let i=1;i<6;i++){
+        [rAR,rINV,rAP].forEach(r=>cells[Y[i]+r]={...blankCell(),fmtStyle:'comma',decimals:0});
+        cells[Y[i]+rNWC]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+        cells[Y[i]+rCHG]={...blankCell(),fmtStyle:'comma',decimals:0};
+      }
+      cells[CA+rNote]={...blankCell(),value:'Reviewer: revenue and COGS are magnitudes off the operating model; payables are carried negative as a source of working capital',txt:true,it:true,fontColor:'gray'};
+      this._o={c0:c0,CA:CA,CD:CD,Y:Y,rDSO:rDSO,rDIO:rDIO,rDPO:rDPO,rMemo:rMemo,
+               HR:HR,rRev:rRev,rCog:rCog,rAR:rAR,rINV:rINV,rAP:rAP,rNWC:rNWC,rCHG:rCHG,
+               dso:dso,dio:dio,dpo:dpo,rev:rev,cog:cog,
+               Y0:Y[0],Y1:Y[1],YL:Y[5],cF1:c0+3,cLast:c0+7};
+      /* width budget (CAMPAIGN §6.6 — a board is authored to fit its frame at natural width):
+         labels 190 + drivers 66 + six year columns at 84 = 760px, plus the 26px gutter when the
+         corner jitter pushes the statement to column B — 786px against ~822px of grid. No width
+         verdict is graded here, so the drill is NOT __noShrink and the elastic fit still applies. */
+      const colW={}; if(c0===2) colW[1]=26;
+      colW[c0]=190; colW[c0+1]=66; for(let i=0;i<6;i++) colW[c0+2+i]=84;
+      return {ROWS:20, cells, active:{r:rDSO,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(0.5,Math.abs(exp)*5e-3); };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D','E','F'];
-      const drv=(k,exp)=>{ const c=S.cells[k]; return !!(c&&!c.formula&&typeof c.value==='number'&&c.value===exp&&c.fontColor==='blue'); };
-      const dressOk=[0,1,2,3,4].every(i=>{ const c=S.cells[COL[i]+'7']; return !!(c&&c.bold&&c.bt); });
+      const o=this._o;
+      const cell=k=>S.cells[k]||{};
+      const num=k=>{ const c=cell(k); return (typeof c.value==='number')?c.value:NaN; };
+      const live=k=>{ const c=cell(k); return !!(c.formula&&typeof c.value==='number'); };
+      const F=o.Y.slice(1);                       // the five PLAN columns
+      /* ── every core grades the END STATE (§1.0-R3(p) + MODELING_STANDARDS §7): the number
+         standing in the column, plus liveness where the label says Build or Total. NOTHING reads
+         formula text, so a pointed reference, a typed one, F4 anchoring, a ROUND() wrapper, an
+         addition chain instead of SUM and Alt+= all clear. The 0.7 tolerance is the ROUND(...,0)
+         band a desk legitimately writes; the driver deltas are ≥2 days, which move a line by
+         ~5-9, so it can never accept a wrong driver. */
+      const drv=(k,exp)=>{ const c=cell(k);
+        return !!(c && !c.formula && typeof c.value==='number' && Math.round(c.value)===exp && c.fontColor==='blue'); };
+      const near=(k,exp,tol)=>{ const v=num(k); return !isNaN(v) && Math.abs(v-exp)<=tol; };
+      const drvOk = drv(o.CD+o.rDSO,o.dso) && drv(o.CD+o.rDIO,o.dio) && drv(o.CD+o.rDPO,o.dpo);
+      const arOk  = F.every((c,i)=>live(c+o.rAR)  && near(c+o.rAR,  o.rev[i+1]/365*o.dso, 0.7));
+      const invOk = F.every((c,i)=>live(c+o.rINV) && near(c+o.rINV, o.cog[i+1]/365*o.dio, 0.7));
+      const apOk  = F.every((c,i)=>live(c+o.rAP)  && near(c+o.rAP, -o.cog[i+1]/365*o.dpo, 0.7));
+      /* the total and the change row grade the RELATIONSHIP against the board's own lines, not
+         against a stored answer — so a player whose lines are right gets the total for free by
+         any route, and a player whose lines are wrong sees the line they actually broke. */
+      const nwcOk = F.every(c=>{ const w=num(c+o.rAR)+num(c+o.rINV)+num(c+o.rAP);
+        return live(c+o.rNWC) && !isNaN(w) && Math.abs(num(c+o.rNWC)-w)<=0.6; });
+      const chgOk = F.every((c,i)=>{ const w=num(c+o.rNWC)-num(o.Y[i]+o.rNWC);
+        return live(c+o.rCHG) && !isNaN(w) && Math.abs(num(c+o.rCHG)-w)<=0.6; });
+      /* WAVE-5 addendum, border-dress doctrine: the LENIENT reading (`bt || ball`). Alt H B P,
+         Alt H B D, Alt H B S over the row and Alt H J → Total all leave a rule above the line;
+         the strict `bt && !bb` would fail the last three (HBS sets bt AND bb on a one-row range,
+         CELL_STYLES.total sets bold+bt+bb), which is the §1.0-R3(p) failure. */
+      const dressOk = F.every(c=>{ const x=cell(c+o.rCHG); return !!(x.bold && (x.bt||x.ball)); });
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision · §1.0-R4(u)
+         one-pass discipline): type the whole first plan column, then take all five lines across
+         in ONE fill. Read off the r424 S.fillOps latch — the MECHANIC, never geometry inferred —
+         so Ctrl+R and the ribbon's Alt H F I R both earn it and nothing else can. Measured over
+         full keyed solves, 3 seeds: 99 keys against 117 for the taught per-line route — worth
+         18, and the per-line route clears every core with the star dark (ALT 2, the negative
+         control). Four other families were measured and lost; see the bake-off table above. */
+      const blockFill=(S.fillOps||[]).some(f=>f.dir==='right' &&
+        f.r1<=o.rAR && f.r2>=o.rCHG && f.c1<=o.cF1 && f.c2>=o.cLast);
+      const starOk = blockFill && arOk && invOk && apOk && nwcOk && chgOk;
       return [
-        {label:'type DSO / DIO / DPO into B9:B11 and blue-font them', ok: drv('B9',this._dso)&&drv('B10',this._dio)&&drv('B11',this._dpo)},
-        {label:'run AR off YOUR anchored DSO, all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'4',this._exp[i].ar))&&refs('B4',['B2','B9'])},
-        {label:'run inventory and payables off anchored DIO / DPO, all five years', ok: [0,1,2,3,4].every(i=>near(COL[i]+'5',this._exp[i].inv)&&near(COL[i]+'6',this._exp[i].ap))},
-        {label:'run net working capital, then bold the row and add a top border above it', ok: [0,1,2,3,4].every(i=>near(COL[i]+'7',this._exp[i].nwc))&&dressOk},
-        {label:'point \u0394NWC at the prior year, years 2-5', ok: [1,2,3,4].every(i=> refs(COL[i]+'8',[COL[i-1]+'7',COL[i]+'7']) && near(COL[i]+'8',this._exp[i].d))},
+        /* §1.0-R2(g) ADAPTIVE LABEL: the day-counts move every seed, so the line names THIS
+           seed's three numbers rather than making the player reverse-engineer them. */
+        {label:'Enter the driver days — DSO '+o.dso+', DIO '+o.dio+', DPO '+o.dpo+', in blue', ok: drvOk},
+        {label:'Build the receivables line off the DSO driver — all five plan years', ok: arOk},
+        {label:'Build inventory and payables off their own drivers — payables negative', ok: invOk&&apOk},
+        {label:'Total net working capital — all five plan years', ok: nwcOk},
+        {label:'Build the increase-in-NWC line — each year against the year before', ok: chgOk},
+        {label:'Bold the increase-in-NWC line and add a top border above it', ok: dressOk},
+        {label:'Fill the whole schedule in one pass — five lines, one selection', ok: starOk, bonus:true},
       ];
     }
   },

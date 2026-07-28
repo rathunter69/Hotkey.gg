@@ -1419,24 +1419,47 @@ const ALTS = [
       steps.push({sel:o.mr1, keys:[{key:'1',ctrl:true},L('p')]});
       steps.push({sel:'A1', keys:[{key:'Home',ctrl:true}]});
       return steps; }` },
-  { key: 'nwcsched', name: 'drivers typed bottom-up, NWC + dress before the driver rows, ribbon fills', moves: `C => [
-      {sel:'B11', keys:[...T(String(C._dpo)),{key:'Enter'}]},
-      {sel:'B10', keys:[...T(String(C._dio)),{key:'Enter'}]},
-      {sel:'B9',  keys:[...T(String(C._dso)),{key:'Enter'}]},
-      {sel:'B9:B11', keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
-      {sel:'B7', keys:[...T('=B4+B5-B6'),{key:'Enter'}]},
-      {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B7:F7', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:'C8', keys:[...T('=C7-B7'),{key:'Enter'}]},
-      {sel:'C8:F8', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B6', keys:[...T('=B3/365*$B$11'),{key:'Enter'}]},
-      {sel:'B6:F6', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B5', keys:[...T('=B3/365*$B$10'),{key:'Enter'}]},
-      {sel:'B5:F5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B4', keys:[...T('=B2/365*$B$9'),{key:'Enter'}]},
-      {sel:'B4:F4', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-    ]` },
+  /* r448 (DEPTH_PASS §4.81 depth pass): REPLACES the pre-depth-pass nwcsched alt, which drove the
+     retired ROWS:11 board by hard-coded geometry (B4/B5/B6/B7/C8 and C._dso/_dio/_dpo, all gone
+     with the rebuild). ALT 1 is the chord-ROUTE alt and EARNS the ☆ by the ribbon door; ALT 2 is
+     the op-ORDER alt and the ☆'s SKIPPABILITY PROOF (§1.0-R2(i)) — the taught per-line route,
+     every core clearing with the star dark. */
+  { key: 'nwcsched', name: 'Cell Styles gallery for the blue pass AND for the total rule, an addition chain instead of SUM, the ribbon fill takes the block across — the ☆ earned by the other door', moves: `C => { const o=C._o, F1=o.Y1;
+      const ent={key:'Enter'}, alt={key:'Alt'}, rt={key:'ArrowRight'};
+      const sU={key:'ArrowUp',shift:true}, sD={key:'ArrowDown',shift:true}, sR={key:'ArrowRight',shift:true};
+      return [
+        {sel:o.CD+o.rDSO, keys:[...T(String(o.dso)),ent,...T(String(o.dio)),ent,...T(String(o.dpo)),ent]},
+        {sel:o.CD+o.rDPO, keys:[sU,sU,alt,L('h'),L('j'),rt,ent]},                       // Alt H J → Input = the blue swatch's twin
+        {sel:F1+o.rAR, keys:[...T('='+F1+o.rRev+'/365*$'+o.CD+'$'+o.rDSO),ent,
+                             ...T('='+F1+o.rCog+'/365*$'+o.CD+'$'+o.rDIO),ent,
+                             ...T('=-'+F1+o.rCog+'/365*$'+o.CD+'$'+o.rDPO),ent,
+                             ...T('='+F1+o.rAR+'+'+F1+o.rINV+'+'+F1+o.rAP),ent,        // addition chain, not SUM
+                             ...T('='+F1+o.rNWC+'-'+o.Y0+o.rNWC),ent]},
+        {sel:F1+o.rAR, keys:[sD,sD,sD,sD,sR,sR,sR,sR,alt,L('h'),L('f'),L('i'),L('r')]}, // the ribbon fill still stamps S.fillOps → ☆
+        {sel:F1+o.rCHG, keys:[sR,sR,sR,sR,alt,L('h'),L('j'),rt,rt,rt,rt,ent]},          // Alt H J → Total = bold + the rule above
+      ]; }` },
+  { key: 'nwcsched', name: 'drivers typed bottom-up and coloured one cell at a time, inventory+payables built before receivables, per-line fills, the change row dressed in its first cell so the dress rides the fill — the ☆ forfeited, every core clears', moves: `C => { const o=C._o, F1=o.Y1;
+      const ent={key:'Enter'}, alt={key:'Alt'}, rt={key:'ArrowRight'};
+      const sD={key:'ArrowDown',shift:true}, sR={key:'ArrowRight',shift:true};
+      const blue=[alt,L('h'),L('f'),L('c'),rt,rt,rt,rt,ent];
+      return [
+        {sel:o.CD+o.rDPO, keys:[...T(String(o.dpo)),ent]},
+        {sel:o.CD+o.rDIO, keys:[...T(String(o.dio)),ent]},
+        {sel:o.CD+o.rDSO, keys:[...T(String(o.dso)),ent]},
+        {sel:o.CD+o.rDPO, keys:blue},
+        {sel:o.CD+o.rDIO, keys:blue},
+        {sel:o.CD+o.rDSO, keys:blue},
+        {sel:F1+o.rINV, keys:[...T('='+F1+o.rCog+'/365*$'+o.CD+'$'+o.rDIO),ent,
+                              ...T('=-'+F1+o.rCog+'/365*$'+o.CD+'$'+o.rDPO),ent]},
+        {sel:F1+o.rINV, keys:[sD,sR,sR,sR,sR,{key:'r',ctrl:true}]},                     // two lines, one fill — still not the block
+        {sel:F1+o.rAR, keys:[...T('='+F1+o.rRev+'/365*$'+o.CD+'$'+o.rDSO),ent]},
+        {sel:F1+o.rAR, keys:[sR,sR,sR,sR,{key:'r',ctrl:true}]},
+        {sel:F1+o.rNWC, keys:[...T('=SUM('+F1+o.rAR+':'+F1+o.rAP+')'),ent]},
+        {sel:F1+o.rNWC, keys:[sR,sR,sR,sR,{key:'r',ctrl:true}]},
+        {sel:F1+o.rCHG, keys:[...T('='+F1+o.rNWC+'-'+o.Y0+o.rNWC),ent]},
+        {sel:F1+o.rCHG, keys:[{key:'b',ctrl:true},alt,L('h'),L('b'),L('p')]},           // dress ONE cell first
+        {sel:F1+o.rCHG, keys:[sR,sR,sR,sR,{key:'r',ctrl:true}]},                        // the fill carries bold + the rule across
+      ]; }` },
   /* r444 §4.64 depth pass — REPLACES the single pre-depth-pass retbridge entry, which drove the
      retired 14-row board by hard-coded geometry (B9/B10/B11/B12/B14, all gone with the rebuild:
      the board now jitters its corner, so nothing may name a cell that is not read off C._o).
