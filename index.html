@@ -11318,75 +11318,329 @@ const CHALLENGES = {
     }
   },
   isbuild:{
-    name:'IS Build', label:'Build the income statement', par:51, parKeys:52,
-    aha:'An income statement is subtotals down the page — SUM the blocks, rule each line (Alt H B O).',
-    prompt:'Five years of income statement, start to finish: COGS off an anchored margin, gross profit, EBIT, net income after the anchored tax rate \u2014 then the net-margin row as a clean percent, and the bottom line bolded and ruled the way it goes in the book. Formulas, fills, a format chord, and the border walk: the whole toolkit on one tab.',
-    req:'<em>B3</em> =-B2*$B$10 fill \u2192 \u00b7 <em>B4</em> =B2+B3 fill \u2192 \u00b7 <em>B6</em> =B4+B5 fill \u2192 \u00b7 <em>B7</em> =B6*(1-$B$11) fill \u2192 \u00b7 <em>B8</em> =B7/B2 fill \u2192 + <em>ctrl+shift+%</em> \u00b7 dress B7:F7: <em>ctrl+b</em> + <em>alt h b p</em>',
-    guide:[
-      'COGS at B3 \u00b7 <kbd>=-B2*$B$10</kbd> \u2014 margin anchored, revenue walking \u00b7 fill right',
-      'gross profit at B4 \u00b7 <kbd>=B2+B3</kbd> (COGS is negative) \u00b7 fill right \u00b7 EBIT at B6 \u00b7 <kbd>=B4+B5</kbd> \u2014 SG&A carries its own sign \u00b7 fill right',
-      'net income at B7 \u00b7 <kbd>=B6*(1-$B$11)</kbd> \u2014 tax rate anchored \u00b7 fill right',
-      'net margin at B8 \u00b7 <kbd>=B7/B2</kbd> \u00b7 fill right \u00b7 <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> \u2014 margins read as percents',
-      'format the bottom line: select B7:F7 \u00b7 <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> \u2014 bold, ruled off',
-    ],
-    targets:['B4:F4','B5:F5','B10:B11','B12','B14','B16'],
-    demo(){ return [
-      {sel:'B3', keys:[...T('=-B2*$B$10'), Kb.enter]},
-      {sel:'B3:F3', keys:[Kb.fillR]},
-      {sel:'B4', keys:[...T('=B2+B3'), Kb.enter]},
-      {sel:'B4:F4', keys:[Kb.fillR]},
-      {sel:'B6', keys:[...T('=B4+B5'), Kb.enter]},
-      {sel:'B6:F6', keys:[Kb.fillR]},
-      {sel:'B7', keys:[...T('=B6*(1-$B$11)'), Kb.enter]},
-      {sel:'B7:F7', keys:[Kb.fillR]},
-      {sel:'B8', keys:[...T('=B7/B2'), Kb.enter]},
-      {sel:'B8:F8', keys:[Kb.fillR]},
-      {sel:'B8:F8', keys:[Kb.pct]},
-      {sel:'B7:F7', keys:[Kb.bold]},
-      {sel:'B7:F7', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
+    /* r448 H6b — the depth-pass rework of "Build the income statement" (DEPTH_PASS §4.78), built
+       to §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 (later law wins on conflict) with
+       dev/MODELING_STANDARDS.md binding: this is a Full Builds board and a banker judges the
+       MODEL before the keystroke.
+
+       WAS: `ROWS:11` — 11 rows carrying content out of the real 20-row sheet (55%, under the
+       §1.3 target), no `saveClose`, no ☆ at all, five checklist lines opening with the
+       non-list verb "run", an `aha` that named a CHORD (§1.7 R7 bans chords in player copy
+       outside req/guide), a prompt that narrated the route instead of the situation
+       (§1.0-R4(t) rule 2), and three checks reading ranges out of FORMULA TEXT
+       (`refs('B3',['B2','B10'])`, `refs('B7',['B6','B11'])`) — the campaign's #1 bug class.
+
+       NOW: the projection page of a deal model — the FY actual column in, a labelled driver
+       panel underneath, and five forecast years to build off it. 6 core beats + the hidden ☆ +
+       the engine-appended Ctrl+S. ROWS=20; 15 of 20 rows carry content at the win state (75%,
+       against the §1.3 ≥60% target).
+
+       ── MODELING_STANDARDS CONVENTIONS THIS BOARD FOLLOWS ────────────────────────────────────
+       · §1 COLOUR-AS-PROVENANCE, all four inks used honestly. BLUE = every typed hardcode (the
+         actual-year revenue, COGS and operating expenses, and the three driver cells). BLACK =
+         every cell computed on this sheet, which is everything the player builds. GREEN = the
+         depreciation line, because it LINKS IN from the depreciation schedule tab — §1 calls
+         green-for-link "the one the catalog under-uses", and an IS page whose D&A comes off the
+         fixed-asset schedule is exactly where it belongs. No red: nothing here is a flag.
+       · §1 NO HARDCODES INSIDE FORMULAS. All three rates live in labelled cells and every built
+         line points at them; the guide teaches the anchored form and the ☆ is what proves the
+         anchors were set (an unanchored rate walks off the panel on the one-pass carry and the
+         cost lines collapse to zero on screen).
+       · §1 STRUCTURE. The EBITDA subtotal wears a TOP border and never a rule underneath
+         (§1.0(f)); units are stated in the title ($mm) and the period basis in the sub-header;
+         negatives render in parentheses through the comma format.
+       · §2 SIGN CONVENTION, stated on the board's own basis line and held across every seeded
+         row: costs and D&A are NEGATIVE, so EBITDA is one clean SUM down the column and EBIT is
+         an addition, never `EBITDA - D&A`. The seeded actual column obeys it too.
+       · §4 STANDARD FORMS. Revenue is the prior year grown once by the growth driver — the
+         recursive line a projection is actually built from; the cost lines are percent-of-revenue
+         drivers; EBITDA = revenue + the two signed cost lines; EBIT = EBITDA + the signed D&A
+         line; the memo is EBITDA / revenue.
+       · §7 THE COMPONENT RULE. One statement's driver build across five years is a COMPONENT of
+         a model, not a model — no balance sheet, no cash flow, no tax line. It fits 20×10 with
+         four blank moat rows to spare.
+       · §7 DELIBERATE SIMPLIFICATIONS, said out loud on the board's basis line so a player never
+         learns one without knowing it is one: (a) the cost drivers are FLAT across the forecast,
+         so the EBITDA margin memo is constant by construction — that is what makes it a CHECK on
+         the two drivers rather than a forecast in its own right, and the memo line says so;
+         (b) no tax, no interest and no share count — EBIT is where this fragment stops, and
+         `threestmt`/`dcfbuild` own what happens below it.
+
+       ── STRUCTURAL DEVIATIONS from the §4.78 page, declared per §0 ───────────────────────────
+       (1) ☆ RE-CUT (§1.0-R4(u), binding — the page predates the playtest rounds). The page's
+           "Finish at A1 — the statement greets its reader" is not a hidden EFFICIENCY discovery
+           and it fails §1.0-R2(i) outright: Ctrl+Home is one keystroke nobody goes out of their
+           way for, and §1.6 already assigns the finish-state job to a beat, not to a bonus. The
+           replacement is the ONE-PASS BLOCK CARRY — see THE ☆ below for the family measurement.
+       (2) BEAT ORDER, one move (§1.0(a) over the page's "Finish: beat 6"). The page lists the
+           dress of the EBITDA line LAST, three beats after the beat that creates it. §1.0(a) is
+           explicit that "a formatting beat directly FOLLOWS the beat that created or touched the
+           cells it formats — never batched at the end", so the dress sits at beat 4, straight
+           after EBITDA lands. Beat content is the page's, verbatim; only the sequence moved. The
+           §1.6 finish-state job passes to the margin memo, which is a close motion in its own
+           right (build + percent it in one beat) and is the last thing that makes the page
+           readable. Every other beat is the page's line.
+       (3) THE BOARD GREW AN ACTUAL COLUMN AND A SUB-HEADER. The page's beat 1 grows revenue "off
+           the blue growth rate", which needs a prior year to grow FROM; the shipped board had
+           none and seeded five years of revenue as blue hardcodes instead, which is not a build.
+           The actual column also carries the seeded costs and D&A and its own live subtotals, so
+           the page reads as a real projection page rather than an empty frame (§1.0-R4(t) rule 1)
+           and the player has the finished column beside them as a worked example.
+       (4) NO cueCell() (§1.0-R2(h)/§1.0-R3(q)). There is no insert point and no empty paste
+           destination on this board; every graded target is a labelled statement row inside the
+           period columns, which the green ring expresses exactly. Nothing graded spills either —
+           the title, the sub-header, the Drivers head and the basis line are the only spilling
+           cells and none of them is a target.
+       (5) §1.0(f)/§1.0-R2(l) HELPER STACK. The three drivers are vertically stacked under their
+           own section head, individually labelled, light yellow, all-bordered and POPULATED, as
+           (f) requires — this board's lesson is USING the panel, never filling it in.
+
+       ── GRADING (§1.0(c) FREEDOM + §1.0-R3(p) END STATE), routes ENUMERATED then WALKED ──────
+       The shipped drill graded formula TEXT in two of its five checks and both were stranding
+       routes (DEPTH_PASS_CAMPAIGN §1, the campaign's #1 class — every instance found by walking
+       a route, never by reading a predicate):
+         · `refs('B3',['B2','B10'])` on the cost line refused `=-B2*45%`, `=-(B2*$B$10)` typed
+           per year, and the point-mode route that lands `=-B2*$B$10` with the anchor cycled by
+           F4 into `B$10` — a correct board, a dark line;
+         · `refs('B7',['B6','B11'])` on the tax line refused every algebraically identical form.
+       So all five BUILD beats here grade a LIVE formula (doctrine §2.2 exception 1 — "don't
+       hardcode the answer" is the lesson on a model board, and MODELING_STANDARDS §1 makes it a
+       convention) plus VALUE PARITY at a tolerance wider than one display step. No check reads a
+       range, a function name, an anchor or an operator out of formula text, so:
+         · revenue clears from `=B5*(1+$B$15)`, `=B5+B5*$B$15`, `=B5*$B$15+B5`, the unanchored
+           `=B5*(1+B15)` typed year by year, and the pointer/F4 routes;
+         · the cost lines clear from `=-C5*$B$16`, `=-($B$16*C5)`, `=C5*-$B$16` and the typed-rate
+           forms;
+         · EBITDA clears from `=SUM(C5:C7)`, `=C5+C6+C7`, autosum's range form (Alt+= over the
+           block through the empty subtotal cell) and `=SUM(C5:C6)+C7`;
+         · EBIT clears from `=C8+C9`, `=SUM(C8:C9)` and `=C8-ABS(C9)`;
+         · the margin memo clears from `=C8/C5` and from `=1-$B$16-$B$17`, which is the same
+           number by construction.
+       THE BORDER PREDICATE IS THE ONE THAT NEEDED THE WALK, and it was walked (dev/verify-isbuild.js
+       §B): Alt H B P writes `bt`; Alt H B D and Alt H B T write `bt`+`bb`; Alt H B S on a
+       multi-cell one-row selection writes `bt`+`bb` (the perimeter collapses) but on a 1×1
+       selection writes `ball` alone; and **Alt H B A writes `ball` and never `bt`**. A predicate
+       asking for `bt` alone strands both the All-Borders player and the cell-at-a-time boxer on a
+       board that visibly carries the line — §1.0-R3(p) exactly. So the check reads
+       `bold && (bt || ball)` and never rejects `bb`: the LENIENT reading of the r446b doctrine
+       fork, the same one `schedule`/`intsched`/`lbo`/`revolver` adopted in wave 3, which is why
+       no label scope clause is needed here (the strict reading is the one that must state
+       "— no rule underneath"). Alt H B O (bottom only) and Alt H B B (double bottom) correctly
+       stay dark: both leave the house error §1.0(f) names, a rule under a total.
+
+       ── THE ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision) ────────────
+       ONE PASS TAKES THE STATEMENT BLOCK ACROSS: revenue, both cost lines and EBITDA, written
+       once in the first forecast year and carried to the remaining four years in a SINGLE op.
+       Read off the r424 S.fillOps latch OR the r425 S.pasteLog latch — the MECHANIC, never
+       geometry inferred — so Ctrl+R, Alt H F I R and a tiled paste of the first forecast column
+       all earn it identically (§1.0(c)). The values must also be right, which is what makes it
+       anchoring mastery rather than a gesture.
+       FAMILY NOTE for the orchestrator (wave-5 addendum, r448): the candidate families were
+       MEASURED on the identical job before this was chosen, not assumed — full-run medians over
+       5 seeds, fully keyed: block fill 67 keys · tiled paste 68 · four separate row fills 70 ·
+       ribbon fill 71 · four Ctrl+Enter multi-commits 114 · autosum provenance no headroom at all
+       (Alt+= over the column costs the same keys as typing `=SUM(` and covers ONE row of the
+       four). Isolated to the carry alone (the r438 `series` rule): one block fill 12 keys against
+       27 for four row fills. Fill wins on this board and the numbers are in the payload — this is
+       the recurrence §1.0-R4(u) asks to be declared rather than assumed.
+       What it teaches that the other fill-shaped stars
+       in the catalog did not: the block is FOUR rows of THREE different shapes, one of them
+       RECURSIVE (revenue reads the year to its left), so the single pass proves both that the
+       driver anchors were set AND that the recursive reference was left relative — get either
+       wrong and the page visibly collapses. */
+    name:'IS Build', label:'Build the income statement', par:71, parKeys:67, saveClose:true,   /* r448: par re-swept from scratch on the rebuilt board — dev/e2e-par-sweep.js isbuild, two 5-seed sweeps both read 67 keys including the engine-appended Ctrl+S; the only movement across seeds is the digit-length of the year labels and the driver rates, so 67 is the count, not an average. WAS par 51 / parKeys 52 on an 11-row board with no save beat, no actual column and no ☆. par 71 ≈ 1.06 s/key, the house band. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 107 · pro 82 · legendary 71. */
+    aha:'an income statement is one driver panel and four shapes — build the first year top-down, then take the block across.',   /* §1.5: the page’s own aha, kept verbatim except for the route clause, which §1.0(b) moved out of player copy. The four shapes are the growth line, the percent-of-revenue line, the subtotal and the margin ratio; the moment it lands is the ONE pass in beat 3’s wake, where four rows travel together and the anchors either hold or the page collapses. */
+    prompt:'The MD wants this case in the deck tonight and the projection page is still a shell: the actual year is in, the driver panel is set, and the depreciation line already links across from the schedule. Build the five forecast years off that panel — revenue grown once a year, the two cost lines carried negative, EBITDA and EBIT — mark the EBITDA line the way the deck reads it, and leave the margin memo underneath so the sponsor can see the story in one number.',
+    req(){ const o=this._o; return '<em>'+o.rev1+'</em> ='+o.rev0+'*(1+'+o.gA+') · <em>'+o.cog1+'</em> =-'+o.rev1+'*'+o.cA_+' · <em>'+o.opx1+'</em> =-'+o.rev1+'*'+o.oA+' · <em>'+o.ebd1+'</em> =SUM('+o.rev1+':'+o.opx1+') · select <em>'+o.blk+'</em> <em>ctrl+r</em> · <em>'+o.ebdRow+'</em> <em>ctrl+b</em> + <em>alt h b p</em> · <em>'+o.ebt1+'</em> ='+o.ebd1+'+'+o.da1+' fill → · <em>'+o.mgn1+'</em> ='+o.ebd1+'/'+o.rev1+' fill → + <em>ctrl+1 p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the checklist names OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route the engine offers, because all of them grade. */
+    guide(){ const o=this._o; return [
+      'revenue at '+o.rev1+' · <kbd>='+o.rev0+'*(1+'+o.gA+')</kbd> — the growth cell anchored, the prior year left relative so it walks',
+      'costs at '+o.cog1+' · <kbd>=-'+o.rev1+'*'+o.cA_+'</kbd> and at '+o.opx1+' · <kbd>=-'+o.rev1+'*'+o.oA+'</kbd> — the minus is what keeps the subtotal a sum (<kbd>F4</kbd> cycles the anchor if you point instead of type)',
+      'EBITDA at '+o.ebd1+' · <kbd>=SUM('+o.rev1+':'+o.opx1+')</kbd>, or select '+o.ebd1col+' and <kbd>alt</kbd>+<kbd>=</kbd> for the same sum',
+      'select '+o.ebdRow+' · <kbd>ctrl</kbd>+<kbd>b</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd>) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> for the top border (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> around the row lands it too)',
+      'EBIT at '+o.ebt1+' · <kbd>='+o.ebd1+'+'+o.da1+'</kbd> — depreciation already carries its sign · select '+o.ebtRng+' · <kbd>ctrl</kbd>+<kbd>r</kbd>',
+      'the memo at '+o.mgn1+' · <kbd>='+o.ebd1+'/'+o.rev1+'</kbd> · select '+o.mgnRng+' · <kbd>ctrl</kbd>+<kbd>r</kbd> · <kbd>ctrl</kbd>+<kbd>1</kbd> then <kbd>p</kbd> lands percent at one decimal in one move (<kbd>alt</kbd> <kbd>h</kbd> <kbd>p</kbd> lands zero, then <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd>)',
+      '☆ the discovery: write revenue, both cost lines and EBITDA in the first forecast year FIRST, then select the whole block '+o.blk+' and one <kbd>ctrl</kbd>+<kbd>r</kbd> carries all four across — four separate row fills clear the drill too, they just cost time',
     ]; },
+    /* rings: ① revenue · ② the two cost lines · ③ EBITDA · ④ the EBITDA row · ⑤ EBIT
+       · ⑥ the margin memo · ☆ never ringed (r423 §2 mystery slot) */
+    targets(){ const o=this._o; return [o.revRng, o.costRect, o.ebdRng, o.ebdRow, o.ebtRng, o.mgnRng, null]; },
+    demo(){ const o=this._o; return [
+      {sel:o.rev1, keys:[...T('='+o.rev0+'*(1+'+o.gA+')'), Kb.enter]},
+      {sel:o.cog1, keys:[...T('=-'+o.rev1+'*'+o.cA_), Kb.enter]},
+      {sel:o.opx1, keys:[...T('=-'+o.rev1+'*'+o.oA), Kb.enter]},
+      {sel:o.ebd1, keys:[...T('=SUM('+o.rev1+':'+o.opx1+')'), Kb.enter]},
+      /* the ☆ rides here in the middle of the run like any other action — its state latches at
+         the win (r421 §2.2): ONE fill carries the whole four-row block across */
+      {sel:o.blk,    keys:[Kb.fillR]},
+      {sel:o.ebdRow, keys:[Kb.bold]},
+      {sel:o.ebdRow, keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
+      {sel:o.ebt1,   keys:[...T('='+o.ebd1+'+'+o.da1), Kb.enter]},
+      {sel:o.ebtRng, keys:[Kb.fillR]},
+      {sel:o.mgn1,   keys:[...T('='+o.ebd1+'/'+o.rev1), Kb.enter]},
+      {sel:o.mgnRng, keys:[Kb.fillR]},
+      {sel:o.mgnRng, keys:[{key:'1',ctrl:true}, L('p')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 income statement ($mm)',txt:true,bold:true};
-      const y0=rnd(24,26);
-      for(let i=0;i<5;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
-      const rows=[[2,'Revenue'],[3,'COGS'],[4,'Gross profit'],[5,'SG&A'],[6,'EBIT'],[7,'Net income'],[8,'Net margin']];
-      rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===4||r===7)});
-      cells['A10']={...blankCell(),value:'COGS % of rev',txt:true};
-      cells['A11']={...blankCell(),value:'Tax rate',txt:true};
-      const cog=rnd(35,55)/100, tax=rnd(21,28)/100;
-      cells['B10']={...blankCell(),value:cog,fontColor:'blue',fmtStyle:'percent',decimals:0};
-      cells['B11']={...blankCell(),value:tax,fontColor:'blue',fmtStyle:'percent',decimals:0};
-      this._rev=[]; this._sga=[];
-      for(let i=0;i<5;i++){ const col=colLetter(i+2);
-        const rv=Math.floor(rnd(80,140)*10*(1+i*0.08)); this._rev.push(rv);
-        cells[col+2]={...blankCell(),value:rv,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        const sg=-rnd(10,20)*10; this._sga.push(sg);   // r174: costs live negative
-        cells[col+5]={...blankCell(),value:sg,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        [3,4,6].forEach(r=>cells[col+r]={...blankCell(),fmtStyle:'comma',decimals:0,bold:(r===4)});
-        cells[col+7]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+8]={...blankCell(),fmtStyle:'comma',decimals:0};
+      /* §1.2 randomization — FOUR independent axes on a full-grid artifact, which §1.2 lets
+         substitute corner jitter for a site pool: (a) CORNER JITTER in both axes — the page
+         anchors at column A or B and the header row sits at 3 or 4, so every graded cell moves;
+         (b) the deal codename, the case name and the fiscal-year base are drawn from pools;
+         (c) every figure and every driver goes through rnd(); (d) WHICH forecast year the capex
+         program lands in, so the depreciation line steps up on a different column each seed and
+         the EBITDA-to-EBIT gap widens somewhere different. */
+      const c0=rnd(1,2), L0=colLetter(c0);
+      const cA=c0+1, cF0=c0+2, cFn=c0+6;             // cA = the actual year, cF0..cFn = five forecast years
+      const YC=i=>colLetter(cA+i);                   // i=0 actual, 1..5 forecast
+      const rHdr=rnd(3,4);
+      const rRev=rHdr+1, rCog=rHdr+2, rOpx=rHdr+3, rEbd=rHdr+4, rDA=rHdr+5, rEbt=rHdr+6;
+      const rMgn=rHdr+8, rDrv=rHdr+10, rG=rHdr+11, rC=rHdr+12, rO=rHdr+13, rBas=rHdr+15;
+      const CASES=['management case','operating plan','base case plan','sponsor case'];
+      const cse=CASES[rnd(0,CASES.length-1)];
+      const y0=rnd(24,27);
+
+      /* THE DRIVERS. One growth rate, two percent-of-revenue cost rates — the panel the whole
+         page runs off. Held FLAT across the forecast (declared on the basis line, §7). */
+      const gPct=rnd(4,12), cPct=rnd(38,52), oPct=rnd(22,32);
+      const g=gPct/100, cog=cPct/100, opx=oPct/100;
+
+      cells[L0+'1']={...blankCell(),value:codename()+' — '+cse+' ($mm)',txt:true,bold:true};
+      cells[L0+(rHdr-1)]={...blankCell(),value:'Fiscal years ending December · FY'+y0+'A actual, FY'+(y0+1)+'E–FY'+(y0+5)+'E forecast',txt:true,it:true,fontColor:'gray'};
+      cells[L0+rHdr]={...blankCell(),bb:true};
+      cells[YC(0)+rHdr]={...blankCell(),value:'FY'+y0+'A',txt:true,bold:true,align:'r',bb:true};
+      for(let i=1;i<=5;i++) cells[YC(i)+rHdr]={...blankCell(),value:'FY'+(y0+i)+'E',txt:true,bold:true,align:'r',bb:true};
+
+      [[rRev,'Revenue'],[rCog,'Cost of goods sold'],[rOpx,'Operating expenses'],[rEbd,'EBITDA'],
+       [rDA,'Depreciation & amortization'],[rEbt,'EBIT']].forEach(([r,n])=>{
+        cells[L0+r]={...blankCell(),value:n,txt:true}; });   /* the EBITDA row ships UNDRESSED — bolding and ruling it is beat 4 */
+      cells[L0+rMgn]={...blankCell(),value:'Memo: EBITDA margin %',txt:true};
+
+      cells[L0+rDrv]={...blankCell(),value:'Drivers',txt:true,bold:true};
+      cells[L0+rG]={...blankCell(),value:'Revenue growth',txt:true};
+      cells[L0+rC]={...blankCell(),value:'COGS % of revenue',txt:true};
+      cells[L0+rO]={...blankCell(),value:'Operating expense %',txt:true};
+      /* §1.0(f) input convention + §1.0-R2(l) labelled, vertically stacked helper stack — light
+         yellow, all borders, POPULATED, because using the panel is the lesson, not filling it. */
+      [[rG,g],[rC,cog],[rO,opx]].forEach(([r,v])=>{
+        cells[YC(0)+r]={...blankCell(),value:v,fontColor:'blue',fill:'yellow',ball:true,fmtStyle:'percent',decimals:1,align:'c'}; });
+
+      /* THE NUMBERS. Simulated forward once so the seeded actual column, the seeded depreciation
+         line and the expected statement can never disagree. */
+      const rev0=rnd(90,140)*10;
+      const daJump=rnd(2,4);                       // §1.2(d): the year the capex program lands
+      const daR0=rnd(35,45)/1000, daR1=daR0+rnd(10,18)/1000;
+      this._exp=[];
+      let rev=rev0;
+      for(let i=0;i<=5;i++){
+        if(i>0) rev=rev*(1+g);
+        /* the actual year is HISTORY: seeded in whole $mm at its own realised rates, within a
+           point of the plan's, so the memo line opens on a real number and then goes flat across
+           the forecast the way a percent-of-revenue plan does */
+        const c=(i===0)? -Math.round(rev*(cog+rnd(-1,1)/100)) : -rev*cog;
+        const o2=(i===0)? -Math.round(rev*(opx+rnd(-1,1)/100)) : -rev*opx;
+        const ebd=rev+c+o2;
+        const da=-Math.round(rev*(i>=daJump?daR1:daR0));
+        this._exp.push({rev:rev,cog:c,opx:o2,ebd:ebd,da:da,ebt:ebd+da,mgn:ebd/rev});
       }
-      this._cog=cog; this._tax=tax;
-      this._exp = this._rev.map((rv,i)=>{ const c=-rv*cog, gp=rv+c, eb=gp+this._sga[i], ni=eb*(1-tax);
-        return {c:c,gp:gp,eb:eb,ni:ni,m:ni/rv}; });
-      return {ROWS:11, cells, active:{r:3,c:2}, sel:null, colW:{1:170,2:70,3:70,4:70,5:70,6:70}};
+
+      const E=this._exp;
+      /* the ACTUAL column arrives finished — blue hardcodes, a live subtotal, a live memo and the
+         green link — so the page is a real projection page and the player has a worked column
+         beside them (§1.0-R4(t) rule 1, doctrine §2.1b). */
+      cells[YC(0)+rRev]={...blankCell(),value:E[0].rev,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells[YC(0)+rCog]={...blankCell(),value:E[0].cog,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells[YC(0)+rOpx]={...blankCell(),value:E[0].opx,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells[YC(0)+rEbd]={...blankCell(),formula:'=SUM('+YC(0)+rRev+':'+YC(0)+rOpx+')',value:E[0].ebd,fmtStyle:'comma',decimals:0};
+      cells[YC(0)+rDA]={...blankCell(),value:E[0].da,fontColor:'green',fmtStyle:'comma',decimals:0};   /* §1 green = a link from another sheet — this comes off the depreciation schedule */
+      cells[YC(0)+rEbt]={...blankCell(),formula:'='+YC(0)+rEbd+'+'+YC(0)+rDA,value:E[0].ebt,fmtStyle:'comma',decimals:0};
+      cells[YC(0)+rMgn]={...blankCell(),formula:'='+YC(0)+rEbd+'/'+YC(0)+rRev,value:E[0].mgn,fmtStyle:'percent',decimals:1};
+
+      for(let i=1;i<=5;i++){
+        const C=YC(i);
+        /* the forecast ships EMPTY but pre-formatted, so a built figure lands in the column's own
+           format and nothing prints #### mid-solve (r430: number formats auto-widen, but a raw
+           general float would render ~12 significant digits first) */
+        [rRev,rCog,rOpx,rEbd,rEbt].forEach(r=>{ cells[C+r]={...blankCell(),fmtStyle:'comma',decimals:0}; });
+        cells[C+rDA]={...blankCell(),value:E[i].da,fontColor:'green',fmtStyle:'comma',decimals:0};
+        /* the memo ships as a NUMBER format, never a percent — landing percent at one decimal is
+           beat 6, and a pre-percented cell would grade a format the board already carries */
+        cells[C+rMgn]={...blankCell(),fmtStyle:'comma',decimals:1};
+      }
+
+      /* the basis memo MODELING_STANDARDS §2 and §7 require: the sign convention stated on the
+         board, and every teaching simplification named out loud */
+      cells[L0+rBas]={...blankCell(),value:'Basis: cost drivers held flat across the forecast · costs shown negative · D&A links from the schedule',txt:true,it:true,fontColor:'gray'};
+
+      const B0=YC(0), B1=YC(1), Bn=YC(5);
+      this._o={ c0:c0, cA:cA, cF0:cF0, cFn:cFn, rHdr:rHdr, rRev:rRev, rCog:rCog, rOpx:rOpx,
+        rEbd:rEbd, rDA:rDA, rEbt:rEbt, rMgn:rMgn, rDrv:rDrv, rG:rG, rC:rC, rO:rO, rBas:rBas,
+        gA:'$'+B0+'$'+rG, cA_:'$'+B0+'$'+rC, oA:'$'+B0+'$'+rO,
+        rev0:B0+rRev, rev1:B1+rRev, cog1:B1+rCog, opx1:B1+rOpx, ebd1:B1+rEbd, da1:B1+rDA,
+        ebt1:B1+rEbt, mgn1:B1+rMgn,
+        revRng:B1+rRev+':'+Bn+rRev, costRect:B1+rCog+':'+Bn+rOpx, ebdRng:B1+rEbd+':'+Bn+rEbd,
+        ebtRng:B1+rEbt+':'+Bn+rEbt, mgnRng:B1+rMgn+':'+Bn+rMgn,
+        ebd1col:B1+rRev+':'+B1+rEbd, ebdRow:L0+rEbd+':'+Bn+rEbd,
+        blk:B1+rRev+':'+Bn+rEbd };
+
+      /* WIDTH (r441 helpers — never a hand-derived metric). The label column's longest occupant
+         is 'Depreciation & amortization', 27 glyphs, in a row whose period columns are OCCUPIED,
+         so render() grants it no spill: 27 × TXTPX 6.9 + PAD_TXT 20 = 206.3, and clipsCol()
+         amputates anything narrower. 216 clears it with a margin. The period columns carry
+         '(1,283)' at worst — 7 glyphs × CHARPX 8.6 + PAD_NUM 12 = 72.2 — so 84 holds every seed
+         with room, and the solved sheet is 216 + 6×84 = 720px inside the r333 frame. This drill
+         grades no width verdict, so it is NOT in the __noShrink set and the elastic fit is free
+         to scale it (r441). */
+      const colW={}; colW[c0]=216;
+      for(let c=cA;c<=cFn;c++) colW[c]=84;
+      return {ROWS:20, cells, active:{r:rRev,c:cF0}, sel:null, colW:colW};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D','E','F'];
-      const rowOk=(r,pick)=>[0,1,2,3,4].every(i=>{ const val=v(COL[i]+r); const exp=pick(this._exp[i]);
-        return val!==null&&Math.abs(val-exp)<Math.max(0.5,Math.abs(exp)*1e-3); });
-      const mOk=[0,1,2,3,4].every(i=>{ const c=S.cells[COL[i]+'8'];
-        return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-this._exp[i].m)<1e-3&&c.fmtStyle==='percent'); });
-      const dressOk=[0,1,2,3,4].every(i=>{ const c=S.cells[COL[i]+'7']; return !!(c&&c.bold&&c.bt); });
+      const o=this._o, E=this._exp;
+      const cel=k=>S.cells[k]||{};
+      const YC=i=>colLetter(o.cA+i);
+      /* §1.0-R3(p): a build beat reads a LIVE formula plus the number on screen, never the
+         formula's text. The live-formula requirement is doctrine §2.2 exception 1 and
+         MODELING_STANDARDS §1 — a model page whose figures are typed is the thing this chapter
+         exists to train out. Tolerance is wider than one display step at zero decimals, so a
+         player who points, types, anchors with F4 or writes the algebraically equal form clears
+         identically (§1.0(c)); the clock is what prices the slow route. */
+      const live=(k,want)=>{ const c=cel(k);
+        return !!c.formula && typeof c.value==='number' && Math.abs(c.value-want)<=Math.max(0.6, Math.abs(want)*5e-3); };
+      const row=(r,pick)=>[1,2,3,4,5].every(i=>live(YC(i)+r, pick(E[i])));
+      const revOk=row(o.rRev,e=>e.rev);
+      const cogOk=row(o.rCog,e=>e.cog);
+      const opxOk=row(o.rOpx,e=>e.opx);
+      const ebdOk=row(o.rEbd,e=>e.ebd);
+      const ebtOk=row(o.rEbt,e=>e.ebt);
+      /* beat 6: the ratio live, and PERCENT AT ONE DECIMAL on the board. Ctrl+1 P lands one
+         decimal outright; Alt H P and Ctrl+Shift+% land zero and want one more move — all three
+         reach the same end state, which is what is graded (DEPTH_PASS_CAMPAIGN §1 route facts). */
+      const mgnOk=[1,2,3,4,5].every(i=>{ const c=cel(YC(i)+o.rMgn);
+        return !!c.formula && typeof c.value==='number' && Math.abs(c.value-E[i].mgn)<=5e-4
+          && c.fmtStyle==='percent' && (c.decimals|0)===1; });
+      /* beat 4: bold + a TOP border on the EBITDA line, across every period column including the
+         actual. `bt || ball` is the LENIENT r446b reading (see the header comment): Alt H B P,
+         Alt H B D, Alt H B T and Alt H B S around the row all land bt; Alt H B A and a
+         cell-at-a-time Alt H B S land ball. Alt H B O / Alt H B B stay dark and should — they
+         leave a rule UNDER the total, the house error §1.0(f) names. */
+      const dressOk=[0,1,2,3,4,5].every(i=>{ const c=cel(YC(i)+o.rEbd); return !!(c.bold && (c.bt||c.ball)); });
+      /* ☆ — one op carries revenue, both cost lines and EBITDA across every forecast year. Read
+         off the r424 S.fillOps latch OR the r425 S.pasteLog latch (the MECHANIC, never geometry
+         inferred), so Ctrl+R, Alt H F I R and a tiled paste of the first forecast column all earn
+         it. Four separate row fills clear every core beat and leave it dark — measured, and
+         walked as alt-paths entry 1. */
+      const onePass=(S.fillOps||[]).some(f=>f.dir==='right' && f.r1<=o.rRev && f.r2>=o.rEbd && f.c1<=o.cF0 && f.c2>=o.cFn)
+        || (S.pasteLog||[]).some(p=>p.r0<=o.rRev && p.r0+p.h-1>=o.rEbd && p.c0<=o.cF0+1 && p.c0+p.w-1>=o.cFn);
       return [
-        {label:'run COGS \u2014 anchored margin \u00d7 revenue, all five years live', ok: rowOk(3,e=>e.c)&&refs('B3',['B2','B10'])},
-        {label:'run gross profit and EBIT, all five years', ok: rowOk(4,e=>e.gp)&&rowOk(6,e=>e.eb)},
-        {label:'run net income after the anchored tax rate, all five years', ok: rowOk(7,e=>e.ni)&&refs('B7',['B6','B11'])},
-        {label:'run the net margin \u2014 live ratio, formatted as a percent', ok: mOk},
-        {label:'bold the bottom line and add a top border above it', ok: dressOk},
+        {label:'Build the Revenue line — all five forecast years off the growth driver', ok: revOk},
+        {label:'Build the COGS and operating expense lines — each off its own driver, negative', ok: cogOk&&opxOk},
+        {label:'Total EBITDA — revenue plus the two signed cost lines, all five years', ok: ebdOk},
+        {label:'Bold the EBITDA line and add a top border above it', ok: dressOk},
+        {label:'Build EBIT — EBITDA plus the depreciation line, all five years', ok: ebtOk},
+        {label:'Build the EBITDA margin memo — percent, one decimal', ok: mgnOk},
+        {label:'Fill the statement block across the forecast in one pass', ok: revOk&&cogOk&&opxOk&&ebdOk&&onePass, bonus:true},
       ];
     }
   },

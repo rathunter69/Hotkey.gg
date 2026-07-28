@@ -1184,21 +1184,52 @@ const ALTS = [
         {sel:o.rate,  keys:[...T(C._ratePct+'%'),{key:'Enter'}]},
         {sel:o.rate,  keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
       ]; }` },
-  { key: 'isbuild', name: 'dress FIRST, statement built bottom-up (margin to COGS), alt h p + ribbon fills', moves: `C => [
-      {sel:'B7:F7', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
-      {sel:'B8', keys:[...T('=B7/B2'),{key:'Enter'}]},
-      {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('p')]},
-      {sel:'B7', keys:[...T('=B6*(1-$B$11)'),{key:'Enter'}]},
-      {sel:'B7:F7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B6', keys:[...T('=B4+B5'),{key:'Enter'}]},
-      {sel:'B6:F6', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B4', keys:[...T('=B2+B3'),{key:'Enter'}]},
-      {sel:'B4:F4', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B3', keys:[...T('=-B2*$B$10'),{key:'Enter'}]},
-      {sel:'B3:F3', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-    ]` },
+  /* r448 (DEPTH_PASS §4.78 depth pass) — BOTH isbuild entries are NEW; the single pre-r448
+     entry ("dress FIRST, statement built bottom-up (margin to COGS), alt h p + ribbon fills")
+     is DELETED, because it drives the retired B3/B4/B6/B7/B8/B10/B11 geometry, a tax line and
+     a net-margin row that no longer exist on the board. ALT 1 = chord-ROUTE alt (typed $ traded
+     for F4 anchoring, autosum's range form for EBITDA, every fill through the ribbon, Alt H 1
+     bold, Alt H B S for the rule, Alt H P + Alt H 0 for the percent — and FOUR SEPARATE ROW
+     FILLS, so the ☆ is forfeited and all six cores clear: the §1.0(c) freedom proof and the
+     ☆'s named negative control in one route). ALT 2 = op-ORDER alt (the row dressed before it
+     holds anything, the first forecast column built BOTTOM-UP so every figure arrives only when
+     revenue lands last and recalc closes it, the block carried by TILED PASTE instead of a fill
+     — the ☆'s second mechanic — and the memo written as `=1-cogs%-opex%`, which is the same
+     number by construction and is exactly the route a formula-text grade would have stranded). */
+  { key: 'isbuild', name: 'chord ROUTE — F4 anchoring, autosum range form for EBITDA, ribbon fills throughout, Alt H 1 bold, Alt H B S rule, Alt H P + Alt H 0 percent, and four separate row fills (☆ forfeited, all six cores clear)', moves: `C => { const o=C._o;
+      const Y=i=>colLetter(o.cA+i), Y0=Y(0), Y1=Y(1), YN=Y(5);
+      const RIB=[{key:'Alt'},L('h'),L('f'),L('i'),L('r')];
+      return [
+        {sel:o.rev1, keys:[...T('='+Y0+o.rRev+'*(1+'+Y0+o.rG),{key:'F4'},...T(')'),{key:'Enter'}]},   // F4 cycles the growth ref to $abs mid-edit instead of typing the dollars
+        {sel:o.revRng, keys:RIB},
+        {sel:o.cog1, keys:[...T('=-'+Y1+o.rRev+'*'+Y0+o.rC),{key:'F4'},{key:'Enter'}]},
+        {sel:Y1+o.rCog+':'+YN+o.rCog, keys:RIB},
+        {sel:o.opx1, keys:[...T('=-'+Y1+o.rRev+'*'+Y0+o.rO),{key:'F4'},{key:'Enter'}]},
+        {sel:Y1+o.rOpx+':'+YN+o.rOpx, keys:RIB},
+        {sel:o.ebd1col, keys:[{key:'=',alt:true,code:'Equal'}]},                                 // autosum's RANGE form lands =SUM() committed
+        {sel:o.ebdRng, keys:RIB},
+        {sel:o.ebdRow, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('s')]},
+        {sel:o.ebt1, keys:[...T('=SUM('+Y1+o.rEbd+':'+Y1+o.rDA+')'),{key:'Enter'}]},
+        {sel:o.ebtRng, keys:RIB},
+        {sel:o.mgn1, keys:[...T('='+Y1+o.rEbd+'/'+Y1+o.rRev),{key:'Enter'}]},
+        {sel:o.mgnRng, keys:RIB},
+        {sel:o.mgnRng, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
+      ]; }` },
+  { key: 'isbuild', name: 'op ORDER — the EBITDA row dressed while still empty, the first forecast column built BOTTOM-UP so revenue lands last and recalc closes it, the block carried by TILED PASTE, and the memo written as 1 − cogs% − opex%', moves: `C => { const o=C._o;
+      const Y=i=>colLetter(o.cA+i), Y0=Y(0), Y1=Y(1), Y2=Y(2), YN=Y(5);
+      return [
+        {sel:o.ebdRow, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]},             // the rule goes on before the row holds anything
+        {sel:o.opx1, keys:[...T('=-'+Y1+o.rRev+'*$'+Y0+'$'+o.rO),{key:'Enter'}]},
+        {sel:o.cog1, keys:[...T('=-'+Y1+o.rRev+'*$'+Y0+'$'+o.rC),{key:'Enter'}]},
+        {sel:o.ebd1, keys:[...T('='+Y1+o.rRev+'+'+Y1+o.rCog+'+'+Y1+o.rOpx),{key:'Enter'}]},      // the addition chain, not SUM
+        {sel:o.rev1, keys:[...T('='+Y0+o.rRev+'*(1+$'+Y0+'$'+o.rG+')'),{key:'Enter'}]},          // revenue LAST — recalc closes the column
+        {sel:Y1+o.rRev+':'+Y1+o.rEbd, keys:[{key:'c',ctrl:true}]},
+        {sel:Y2+o.rRev+':'+YN+o.rEbd, keys:[{key:'v',ctrl:true}]},                               // the ☆'s second mechanic: a TILED paste, not a fill
+        {sel:o.ebt1, keys:[...T('='+Y1+o.rEbd+'+'+Y1+o.rDA),{key:'Enter'}]},
+        {sel:o.ebtRng, keys:[{key:'r',ctrl:true}]},
+        {sel:o.mgn1, keys:[...T('=1-$'+Y0+'$'+o.rC+'-$'+Y0+'$'+o.rO),{key:'Enter'}]},
+        {sel:o.mgnRng, keys:[{key:'r',ctrl:true},{key:'1',ctrl:true},L('p')]},
+      ]; }` },
   /* r446 §4.70 depth pass — both entries rebuilt for the case-column board (the single old entry
      hard-coded B6/B8/B9/B11/B12/B14 off the retired one-column one and is DELETED, not kept).
      ALT 1 = chord ROUTE: F4 cycling instead of typed $ anchors, autosum's range form for the
