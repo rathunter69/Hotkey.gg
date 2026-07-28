@@ -18,9 +18,9 @@ way. DEPTH_PASS.md §1.0-R3 carries the binding RULES; this file carries the PRA
 | Formulas II | 10 | 10 | ✅ complete as of r440 (`wirewalk` retired into `tieout`, `hunt` into `audit`, so the chapter is 10; `balcheck`, `tieout` and `balance` last in — all three tested for retirement and all three kept). `redflags` §4.56, the chapter's designated capstone, is an unbuilt ADD (delta D4) and is NOT part of the pass |
 | Models I | 10 | 10 | ✅ complete as of r445 (waves 1–2). `pitchpage` §3.1, the designated capstone, is an unbuilt ADD and NOT part of the pass. ☆-family soft-rule breach recorded in the r445 AUDIT note |
 | Models II | 10 | 10 | ✅ complete as of r447 (waves 3–4). `cascade` designated capstone (D9: moved last, pass=par×2). ☆-family + border-doctrine notes in the r446/r446b/r447 AUDIT sections |
-| Full Builds | 0 | 10 | ⚠️ read §5 below before dispatching — wave 5 (`isbuild` `bsbuild` `cfslink` `nwcsched` `threestmt`) next, then wave 6 (`opmodel` `dcfbuild` `lbobuild` `debtblock` `dashcover`); `lbobuild` carries the 25-row trim (task #16) |
+| Full Builds | 5 | 10 | wave 5 shipped r448 (`isbuild` `bsbuild` `cfslink` `nwcsched` `threestmt`). Wave 6 next: `opmodel` `dcfbuild` `lbobuild` `debtblock` `dashcover` — `lbobuild` carries the 25-row trim (task #16); run the §3 discriminator on opmodel-vs-isbuild in the brief (r448 AUDIT note); `shipit`/chapter capstone is an unbuilt ADD, not part of the pass |
 
-**64 of 74 passed.** Catalog **74** (was 82; `hunt` closed it out at r439) — counted from `menuOrder`
+**69 of 74 passed.** Catalog **74** (was 82; `hunt` closed it out at r439) — counted from `menuOrder`
 at r440, chapter by chapter. `menuOrder.length` is the only source of truth; the
 "N banker-grade drills" marketing copy in index/About/enterprise is asserted against it by
 `e2e-smoke`, so it moves with every retirement.

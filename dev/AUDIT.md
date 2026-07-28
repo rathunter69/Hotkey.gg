@@ -1452,7 +1452,7 @@ grow a filled column of answers._
   of the pattern it greps for *inside a comment* makes it match the comment instead of the code.
   Cost a debug cycle; the fix is noted in-source at fxconvert's `targets()`.
 - **TESTS:** replay 3/3 · depth-contract PASS · guided PASS · **alt-paths 2/2 (first ever for this
-  drill)** · par-sweep FLAGGED 0 · invariants clean · drills.js?v=298→299.
+  drill)** · par-sweep FLAGGED 0 · invariants clean · drills.js?v=299→299.
 
 ## r429 H6b-5 — sumif + rollup (DEPTH_PASS §4.28/§4.29) — wave 5 at 9 of 12
 _Both drills carried the SAME two defects, which is worth naming as a pattern: a §1.0(c) route
@@ -1489,7 +1489,7 @@ requirement baked into core, and §1.2 axes that existed on paper but not in the
   axes draw from pools, the page jitters, and the deal list varies 9–11 rows.
 - **PAR:** 65/68 → **68/62**.
 - **TESTS (both):** replay 3/3 · depth-contract PASS · guided PASS · alt-paths 2/2 each (all four
-  rebuilt) · par-sweep FLAGGED 0 · invariants clean · full catalog green · drills.js?v=298→298.
+  rebuilt) · par-sweep FLAGGED 0 · invariants clean · full catalog green · drills.js?v=299→298.
 
 ## r429 H6b-5 — cagr + bridge (DEPTH_PASS §4.26/§4.27 + D10) — wave 5 at 7 of 12
 ### cagr — "Compound it, three times"
@@ -1520,7 +1520,7 @@ requirement baked into core, and §1.2 axes that existed on paper but not in the
   contract earning its keep on its first wave.**
 - **PAR:** 10/6 → **29/26**. D10 finished: tab → 'Point', desc de-hinted.
 - **TESTS (both):** replay 3/3 · depth-contract PASS · guided PASS · alt-paths 2/2 each (all four
-  rebuilt) · par-sweep FLAGGED 0 · invariants clean · drills.js?v=298→296.
+  rebuilt) · par-sweep FLAGGED 0 · invariants clean · drills.js?v=299→296.
 - **RECURRING TRAP, worth a standing note:** cagr hit the **C9 static-parser** hole again —
   guide/targets built with `.map()/.push()` read as `null`, so the tri-length guard silently stops
   covering the drill. Third occurrence (margin, cagr). **Build these arrays as LITERALS.**
@@ -11605,3 +11605,663 @@ Part 2 — chord-vs-ribbon accounts for ~9 keys (ribbon fill vs Ctrl+R, Alt H 1 
 Structured selection has no copy or cut to hang off (`S.grabLog` only stamps at grab time), cut-move has nothing to move, Go To Special has no ritual on a board with one input block. **Fill is the only family with legal headroom here** — the fifth fill-shaped ☆ in c7 and a knowing recurrence of §1.0-R4(u)'s soft cap. What it teaches that the earlier four did not: the block is FOUR rows of four DIFFERENT formulas, two carrying an anchored rate, so the one pass is the *proof the anchors were set* rather than one formula repeated. Skippability is measured: four row fills clear all six cores with the ☆ dark on 5/5 seeds, and so does the 388-key slow route.
 
 **MODELING_STANDARDS COMPLIANCE** (§1 colour-as-provenance · §1 no hardcodes inside formulas · §1 totals wear TOP borders · §2 costs and paydowns negative, stated on the board · §3 the corkscrew with a REFERENCED beginning balance · §5 interest on the BEGINNING balance, named in a memo line · §7 a component, not a model). Two deliberate simplifications, both stated on the board: beginning-balance interest rather than average, and no error-check row (a schedule's check is "ending balance = the balance sheet's line" and there is no balance sheet on this fragment; `cascade` owns the chapter's prove-out). One deviation from the §4.76 page itself: the page says *"interest on the average balance"* and MODELING_STANDARDS §5 rules the other way for this engine.
+
+
+# ROUND r448 — FULL BUILDS OPENS 5/10: wave 5 (isbuild · bsbuild · cfslink · nwcsched · threestmt)
+
+
+_Orchestrator note. Untriggerable-beat arithmetic, reconciled: the count stood at 58 after r447.
+Wave 5's shipped-board finds are isbuild 2 (formula-TEXT) · bsbuild 2 (SUM(-text on both totals,
+literal-ref roll) · cfslink 1 (SUM(-text on net change) · nwcsched 1 (refs on receivables) ·
+threestmt 0 (ten routes walked, none stranded — the board's defect was the MODEL: capex forced
+equal to D&A to fake the tie) — **the campaign total is 64**. Per-entry counts below are
+superseded by this note._
+
+_Ops notes earned by this wave: (1) Two agents (isbuild, cfslink) found their worktrees stale at
+09f1aa2 and reset to the branch tip per CAMPAIGN §4 STEP 0 before building — first wave where the
+reset discipline fired; the other three built on 09f1aa2 harmlessly (block-scoped diffs + 3-way
+apply). (2) bsbuild shipped block comments INSIDE its guide() array literal — C9 counts top-level
+elements and does not strip comments, so tri-length read 9; comments relocated above the array at
+assembly. Corollary found while fixing it: the r447-widened arrLen preamble regex anchors on the
+first literal "return", so the WORD "returned" in a preamble comment breaks the parse. Standing
+rule for agents: no block comments inside guide/targets array literals, and no "return" substring
+before the array. (3) threestmt and isbuild shipped their AUDIT entries as scratchpad sidecars —
+acceptable, but the §9.2 payload text is the durable record; sidecars must be banked at assembly
+or they die with the container. (4) The nwcsched guided-rail finding is standing: a demo that
+builds a column via Enter-walk fights railToTarget() and only e2e-guided sees it — park per line._
+
+_☆-family adjudication for the Full Builds first half (menu order: isbuild | bsbuild | cfslink |
+nwcsched | threestmt). Families: isbuild(anchored block carry, fill ∪ paste) | bsbuild(paste ·
+row-CLONE of the totals row, refs translating) | cfslink(one-pass carry proving links stay
+RELATIVE — anchor them and the board reads one number five times) | nwcsched(one-pass block fill
+proving anchors are SET — the unanchored driver walks to zeros) | threestmt(family-blind one-pass
+wire — four different formulas across two statements, fill/multi-enter/paste all 41 keys). The
+HARD adjacency rule holds under sub-family taxonomy; the deliberate pairing worth naming is
+cfslink/nwcsched, adjacent and complementary OPPOSITES (relative-links vs anchors-set) — that
+contrast is pedagogy, not repetition, and both agents shipped the measured negative. Re-cut
+candidates if playtest reads the chapter samey: nwcsched → paste-across (measured drop-in, 4 keys
+behind) and bsbuild already sits in the paste family. Every wave-5 agent ran the family bake-off
+with numbers — the r447 debtsched pattern is now uniform practice._
+
+_Flagged to Wolf (task list): threestmt par landed at 45s/42keys, light end of the chapter band —
+DEPTH_PASS §5.4 reserves the H6b-FB difficulty target to Wolf and names that page as where he
+sets it. The two ways up are a fourth year or handing the player the cash corkscrew (which
+re-opens the cfslink overlap). Reported, not tuned around._
+
+_Wave-6 pre-brief obligation recorded (isbuild agent's flag): run the CAMPAIGN §3 distinctness
+discriminator on opmodel §4.83 vs the rebuilt isbuild BEFORE the wave-6 agent builds — the two
+pages spec nearly the same beat list; what should survive as distinct is opmodel's volume×price
+revenue driver and isbuild's EBIT line._
+
+
+### `isbuild` — "Build the income statement" (DEPTH_PASS §4.78 · Full Builds · index.html:11320)
+
+**WAS:** a `ROWS:11` board — 11 of the real 20-row sheet (55%, under the §1.3 target) — with no
+`saveClose`, **no ☆ at all**, five checklist lines opening with the non-list verb "run", an `aha`
+that named a CHORD in player copy (`Alt H B O`, §1.7 R7), a prompt that narrated the route rather
+than the situation (§1.0-R4(t) rule 2), and five years of revenue seeded as blue hardcodes — a
+build drill in which nothing was actually built off a driver. The §4.78 page's own ☆, *"Finish at
+A1 — the statement greets its reader"*, is dead on arrival under §1.0-R4(u): it is not a hidden
+efficiency, and one Ctrl+Home nobody goes out of their way for fails §1.0-R2(i) outright.
+
+**THE BOARD (§1.3: a true 20 rows, 75% dense; §1.0-R4(t) audience B per the §3.1 map).** The
+projection page of a deal model. One actual year, fully finished — blue hardcodes, live subtotals,
+a live margin memo — then five forecast years to build; the depreciation line already **linked in
+GREEN from the depreciation schedule** (MODELING_STANDARDS §1 calls green-for-link the convention
+the catalog under-uses, and an IS page whose D&A comes off the fixed-asset schedule is exactly
+where it belongs); a labelled, vertically stacked, light-yellow, all-bordered driver panel with the
+growth rate and the two percent-of-revenue cost rates (§1.0(f)/§1.0-R2(l)); and the board's own
+basis line stating the sign convention and the flat-driver simplification (§2/§7). 15 of 20 rows
+carry content at the win state on every seed — **75%**, against the §1.3 ≥60% target and the 55%
+the shipped board managed.
+
+**BEATS (6 core + ☆ + the engine-appended Ctrl+S).** (1) build the revenue line — the prior year
+grown once by the driver, the recursive shape a projection is actually made of; (2) build COGS and
+operating expenses, each off its own driver, carried negative; (3) total EBITDA; (4) §1.0(a) dress —
+bold the EBITDA line and rule it on top, *immediately* after the beat that created it; (5) build
+EBIT off the green depreciation line; (6) §1.6 finish — the EBITDA margin memo, built and
+percent-formatted at one decimal in one beat. The chain is real: every beat reads what the one
+before it wrote, and beat 6's memo is the CHECK that the two cost drivers landed (with flat drivers
+the forecast margin is constant by construction — a mis-anchor makes the row go ragged on screen).
+
+**ONE BEAT-ORDER DEVIATION, declared (§9.2 item 8).** The page lists the dress LAST, three beats
+after EBITDA is created. §1.0(a) is explicit — "a formatting beat directly FOLLOWS the beat that
+created or touched the cells it formats — never batched at the end" — so the dress moved to beat 4
+and the §1.6 finish-state job passed to the margin memo, which is a close motion in its own right.
+Beat CONTENT is the page's, verbatim; only the sequence moved.
+
+**TWO UNTRIGGERABLE BEATS KILLED (campaign class — both graded formula TEXT).**
+
+| # | the shipped check demanded | the route it locked out |
+|---|---|---|
+| 1 | `refs('B3',['B2','B10'])` on the cost line | `=-B2*45%`, `=-(B2*$B$10)` typed per year, and the point-mode route whose F4 cycle lands `B$10` — a correct board, a dark line |
+| 2 | `refs('B7',['B6','B11'])` on the tax line | every algebraically identical form of the same after-tax number |
+
+Nothing on the rebuilt board reads a range, a function name, an anchor or an operator out of
+formula text. All five build beats grade **a live formula + value parity** (doctrine §2.2
+exception 1; MODELING_STANDARDS §1 makes "no typed answers" a convention on a model page), and
+**every route was WALKED, not reasoned about** (`dev/verify-isbuild.js` §B, all green):
+revenue from `=prior*(1+$g)` · `=prior+prior*$g` · `=prior*$g+prior` · unanchored refs typed year
+by year with no fill anywhere; costs from `=-rev*$c` · `=-($c*rev)` · `=rev*-$c`; EBITDA from
+`=SUM()` · the addition chain · **autosum's range form (Alt+=)** · `=SUM(two)+one`; EBIT from
+`=EBITDA+D&A` · `=SUM(EBITDA:D&A)` · `=EBITDA-ABS(D&A)`; the memo from `=EBITDA/revenue` **and**
+`=1-$cogs%-$opex%` (the same number by construction — precisely the route a text grade strands),
+each × three percent routes (Ctrl+1 P lands one decimal outright; Alt H P and Ctrl+Shift+% land
+zero and take one more move).
+
+**THE BORDER PREDICATE IS THE ONE THAT NEEDED THE WALK.** Measured on this board: Alt H B P writes
+`bt`; Alt H B D and Alt H B T write `bt`+`bb`; Alt H B S on a multi-cell one-row selection writes
+`bt`+`bb`; on a **1×1** selection it writes `ball` alone; and **Alt H B A writes `ball` and never
+`bt`**. `bold && bt` would strand both the All-Borders player and the cell-at-a-time boxer on a
+board that visibly carries the line. The check reads **`bold && (bt || ball)`** — the LENIENT
+r446b reading, the same one `schedule`/`intsched`/`lbo`/`revolver` adopted in wave 3, so no label
+scope clause is needed. Alt H B O (bottom only) and Alt H B B (double bottom) correctly stay dark:
+both leave the house error §1.0(f) names, a rule under a total. All nine border routes walked.
+
+**THE ☆ — the one-pass block carry, and the family was MEASURED before it was chosen.** Revenue,
+both cost lines and EBITDA written once in the first forecast year and carried to the remaining
+four in a SINGLE op, read off the r424 `S.fillOps` latch **or** the r425 `S.pasteLog` latch (the
+mechanic, never geometry inferred), so Ctrl+R, Alt H F I R and a tiled paste of the first forecast
+column all earn it identically. Per the wave-5 addendum the candidates were run on the identical
+job, 5 seeds, fully keyed:
+
+| family | keys | note |
+|---|---|---|
+| block fill (Ctrl+R) | **67** | chosen |
+| tiled paste | 68 | same latch, earns the ☆ too |
+| four separate row fills | 70 | the ☆'s named negative control |
+| ribbon fill (Alt H F I R) | 71 | same family, same latch |
+| four Ctrl+Enter multi-commits | 114 | dominated |
+| autosum provenance | — | Alt+= costs the same 5 keys as typing `=SUM(` and covers ONE of the four rows: no headroom to be a star |
+
+Isolated against its own control (the r438 `series` rule — measure the move, not the run): the one
+block fill is **12 keys** against **27** for four row fills. Headroom (§2 diagnostic, fully keyed):
+star **105** vs slow **382** — **3.64×**, and the whole spread is formula entry and fill, with
+**zero** chord-vs-ribbon and **zero** formatting in it, so none of it is forced to clear by §1.0(c)
+or forbidden by §1.0(d) (the r439 `wrapfix` composition reading). Skippability is measured, not
+asserted: four row fills, four multi-commits and every-cell-hand-typed each clear all six cores
+with the star DARK.
+**What this fill teaches that the catalog's earlier fill-shaped stars did not:** the block is four
+rows of three different shapes, one of them RECURSIVE (revenue reads the year to its left), so the
+single pass proves both that the driver anchors were set AND that the recursive reference was left
+relative. The probe walks the counter-example: the same formula unanchored and filled leaves the
+revenue line visibly flat and the beat dark — the anchoring lesson, not a stranding.
+
+**RANDOM (§1.2, four axes).** (a) corner jitter in BOTH axes — the page anchors at column A or B
+and the header row at 3 or 4, so every graded cell moves; (b) codename × case-name pool ×
+fiscal-year base; (c) every figure and all three drivers through `rnd()` (forecast EBITDA margins
+range 19–38% across a 24-seed census); (d) WHICH forecast year the capex program lands in, so the
+depreciation line steps up on a different column each seed and the EBITDA-to-EBIT gap widens
+somewhere different. All four verified varying over 24 seeds.
+
+**PAR.** Re-swept from scratch on the rebuilt board: two 5-seed sweeps both read **67 keys**
+including the engine-appended Ctrl+S. parKeys 52→67, par 51→**71** (**1.06 s/key**, the house
+band). Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 107 · pro 82 · legendary 71.
+
+**ALTS.** The stale pre-pass entry (hard-coded B3/B4/B6/B7/B8/B10/B11 on a board with a tax line
+and a net-margin row that no longer exist) is DELETED; two new entries — a chord-ROUTE alt (F4
+anchoring instead of typed `$`, autosum's range form for EBITDA, every fill through the ribbon,
+Alt H 1 bold, Alt H B S rule, Alt H P + Alt H 0 percent, and FOUR SEPARATE ROW FILLS so the ☆ is
+forfeited: the freedom proof and the star's negative control in one route) and an op-ORDER alt (the
+row dressed before it holds anything, the first forecast column built BOTTOM-UP so revenue lands
+last and recalc closes it, the block carried by TILED PASTE, and the memo written
+`=1-cogs%-opex%`). Both green ×3 seeds; ☆ 0/3 on the first, 3/3 on the second.
+
+**MODELING_STANDARDS.** §1 colour-as-provenance with all three inks used honestly (blue hardcodes,
+black computed, **green for the cross-sheet depreciation link**); §1 no hardcodes inside formulas —
+all three rates live in labelled cells; §1 the subtotal wears a TOP border and never a rule
+underneath; units in the title (`$mm`) and the period basis in the sub-header; §2 sign convention
+held across every seeded row and stated on the board, so EBITDA is one clean SUM and EBIT is an
+addition rather than `EBITDA − D&A`; §4 the standard percent-of-revenue projection forms; §7 the
+component rule. **Deliberately simplified, and said out loud on the board's basis line:** the cost
+drivers are held flat across the forecast (so the margin memo is constant by construction — which
+is what makes it a check on the drivers rather than a forecast), and there is no tax, interest or
+share count; EBIT is where this fragment stops and `threestmt`/`dcfbuild` own what is below it.
+
+Tests: demo-replay `isbuild` ×3 seeds AND the full catalog (74 drills, E2E ALL GREEN) · guided
+(railed, contained, solvable) · alt-paths ×2 ×3 seeds (☆ 0/3 on the chord-route alt, 3/3 on the
+op-order alt) · par-sweep ×2 (0% drift, 1.06 s/key) · fit-sweep ALL CLEAN (70 drills) ·
+check-invariants clean · e2e-smoke clean once the `HOTKEY_PARS` delta lands (its C2 parity guard
+is the only thing the block breaks on its own) · `dev/verify-isbuild.js` **ALL GREEN at 5 seeds**,
+55 assertions across 7 sections.
+
+## r448 H6b-FB — `bsbuild`: the equity roll is the drill (DEPTH_PASS §4.79 + MODELING_STANDARDS §1/§2/§3/§6)
+
+_The §4.79 page ships marked [SEPARATE PASS — spec provisional] and predates every playtest round,
+so both of §1.0-R4(u)'s known defects were live on it: a FORMATTING ☆ and an artifact never checked
+against the reality test. Both re-cut here without escalation. Every number below is `keyLog`
+through the live engine on the real board, 5-seed medians, every selection and navigation KEYED —
+reproducible with `node dev/verify-bsbuild.js`._
+
+### WHAT WAS THERE
+
+6 checks on a `ROWS:14` board — the copied-default tell §1.3 and CAMPAIGN §5 name as the catalog's
+most common density defect — with `guide` 5 v `checks` 6 v `targets` 4 (tri-length broken, C9), no
+☆, no `saveClose`, and one trailing beat that dressed BOTH total rows AND the check row at the end
+of the run (§1.0(a) format-as-you-go violation). Par 60 / parKeys 62.
+
+**Two untriggerable beats on the shipped board (the CAMPAIGN §1 class), both grading formula TEXT:**
+
+| # | the check demanded | the route it locked out |
+|---|---|---|
+| 1 | `refs('B5',['SUM('])` and `refs('B8',['SUM('])` — column B's text only | an addition chain down a four-line side, autosum's range form, or a board built on the last year and filled LEFT: right totals on screen, beat dark |
+| 2 | the RE roll's `refs(C10,[B10,C12,C13])` — three literal refs out of the formula | `=SUM(B10,C12,C13)`, the ABS spelling of the same sign, the cumulative form on the last year, and any $-anchored version — the anchoring habit `anchor`/`fxconvert` teach |
+
+Both are dead. Every core now grades the END STATE — the number standing in each year column, plus
+liveness where the label's verb says the line is BUILT. No check reads a range, a function name, an
+anchor or an operator out of formula text.
+
+### DISTINCTNESS — WHY THIS IS NOT `balance`, ANSWERED BY WALKING IT
+
+`balance` §4.55 is the nearest board in the catalog: three-year balance sheet, both sides footed, a
+check row underneath. The CAMPAIGN §3 discriminator was run rather than argued: **`balance`'s method
+run VERBATIM as a first attempt on this board lands the check at a NON-ZERO number on every seed**,
+because the equity side is short until the retained-earnings roll exists. Not a slower first
+attempt — a WRONG one, which is exactly what the discriminator asks for.
+
+- `balance` = the HISTORICAL close. Retained earnings comes off the trial balance, it is a given,
+  and the check PROVES the statement. Its aha is "retained earnings is a given, not a plug".
+- `bsbuild` = the FORWARD roll. Retained earnings is COMPUTED from the P&L (MODELING_STANDARDS §3
+  corkscrew: begin + net income − dividends), and the check proves the ROLL. Only the opening year
+  is given.
+
+MODELING_STANDARDS §7 is explicit that Full Builds is where the pieces taught elsewhere get
+ASSEMBLED, and the boards are deliberately different shapes (four lines a side here against six and
+five; a visible net-income and dividend memo block here, none there). KEEP.
+
+### THE ☆ — A FORMATTING BONUS DIED, AND THE REPLACEMENT WAS CHOSEN BY BAKE-OFF
+
+The page's ☆ is "Bold the check row — three zeros, in ink": a formatting task (§1.0(d) forbids the
+whole class) that also falls out of ordinary dressing (§1.0-R2(i)). Per §1.0-R4(u) the killed ☆ was
+real work, so it is **PROMOTED to core beat 6** rather than deleted. That is now **six** re-cut
+formatting ☆s across the campaign.
+
+The replacement was not picked by taste. Four families were measured on this exact board, each
+against its own slow control and each ISOLATED from the shared prefix (CAMPAIGN §2's
+measure-each-half rule; the marginal columns are what the choice was made on):
+
+| family | star | control | spread | verdict |
+|---|---|---|---|---|
+| **paste-CLONE the total row** | **4** | **16** | **4.0×** | **CHOSEN** — best legal spread measured |
+| fill-across (`balance`'s star) | 14 | 33 | 2.4× | legal, but it is `balance`'s star and `isbuild` sits ADJACENT with a five-year fill-across board |
+| multi-enter (Ctrl+↵) on the roll | 14 | 14 | 1.0× | no gain — the roll is two cells |
+| autosum provenance | 2 | 11 | 5.5× | ILLEGAL — Alt+= vs a typed SUM is chord-vs-typed, §1.0(c) forces both to clear |
+| independent prove-out | — | — | — | not specced on the page, and §1.0-R4(u) caps it at once a chapter |
+
+**The star: both sides are four lines deep at the same offset, so the assets total row ALREADY IS
+the liabilities total row.** One copy, one paste, references shifted — `translateFormula` probed:
+`=SUM(B4:B7)` at +6 rows becomes `=SUM(B10:B13)`, and an addition chain travels the same. Non-fill
+AND the higher legal spread, so the wave-5 preference and the measurement agree. Graded off the
+r425 `S.pasteLog` latch — the MECHANIC and its two rects, never geometry inferred — so Ctrl+V and
+the paste-special Formulas walk both earn it, and the source may be the single seed cell tiled
+across the row or the finished three-cell row.
+
+**A VALUES paste is excluded twice over** and both were walked: `kind` rules it out of the star, and
+it fails beat 3's liveness on its own, because it lands the right numbers DEAD — the hardcode
+MODELING_STANDARDS §1 forbids.
+
+### ☆-HEADROOM DIAGNOSTIC (CAMPAIGN §2, both parts)
+
+- **PART 1** — fastest legal **60** keys · slowest legal doing the same work **261** · **4.35×**.
+- **PART 2** — of the 201 keys of spread, **31 are formatting/chord-vs-ribbon** (the dress costs 20
+  keys row-wide against 51 cell by cell — isolated and run both ways, not estimated), inadmissible
+  under §1.0(c)/(d). **170 keys of BUILD spread survive the strip**, so a legal ☆ exists.
+- **SKIPPABILITY, measured not asserted** — the no-paste route clears all six cores with the ☆ dark
+  on 5/5 seeds.
+
+### THE BOARD
+
+A three-year balance sheet at book standard on the full 20 rows: four asset lines, four liability
+and equity lines, both sides unfooted, the check row under them, and — answering the page's own
+Wolf-playtest question by law rather than escalation — a **visible net-income and dividends memo
+block** feeding the roll (§1.3's labeled-target rule and §1.0-R4(t) rule 1 both require it; a roll
+whose inputs are not on the board cannot be built by anyone who does not already know the answer).
+Every typed input ships blue; the opening retained earnings is blue and the two rolled years land
+black. Dividends ship NEGATIVE so the corkscrew stays a clean addition (MODELING_STANDARDS §2). The
+cash line is sized to close the sheet once the roll is in, and stays positive on every seed (r264).
+
+**§1.3 density: 16 of 20 rows carry content at the win state (80%)**, against 13 of 20 on the old
+`ROWS:14` board. Three of the four empty rows are the moats between the asset block, the equity
+block, the check and the memo block — load-bearing, and what stops Ctrl+Shift+↓ riding between the
+islands (doctrine §3). The fourth is the sheet's bottom margin. Header row ships bold with a bottom
+rule (doctrine §2.1b); totals wear TOP borders and never a rule underneath (§1.0(f)).
+
+**Randomization, three axes (§1.2):** corner jitter (the statement anchors at column A or B) ·
+content (codename + fiscal-year base) · values (every figure through `rnd()`). Geometry is constant
+across seeds, so parKeys cannot move with the draw — measured FLAT at 61 (min 61, max 61).
+
+### BEATS (6 core + ☆, save closer engine-appended)
+
+1. Build the retained earnings roll — prior year plus net income and dividends
+2. Total the asset side — live in all three years
+3. Total liabilities and equity — live in all three years
+4. Bold both total rows and add a top border above each  ← §1.0(a): dressed the moment they exist
+5. Build the check row — total assets minus liabilities and equity, all three years
+6. Bold the check row — all three years  ← the promoted ☆, and the §1.6 finish-state beat
+☆ Copy the assets total row onto the liabilities and equity total row
+
+The roll comes FIRST rather than third (the page's order): the L&E total sums OVER the retained
+earnings line, so it is the only order in which each action changes what the next operates on
+(doctrine §8.1.4). Grading stays order-free (§1.0-R3(p)) — this is the checklist's reading order,
+not a rail.
+
+**Border reading: LENIENT `bt || ball`** (wave-5 addendum, declared). A 1×1 Alt H B S stores `ball`
+and not `bt` (CAMPAIGN §1 route fact #7, the r427 `gauntlet` bug), so the strict `bt && !bb` form
+would strand every player who boxes the row instead of ruling it. Walked: Alt H B P, Alt H B D,
+Alt H B S and Alt H B A all clear.
+
+### PAR
+
+par **64** / parKeys **61** (was 60 / 62 on the pre-save-closer board). 5-seed median 61 including
+the engine-appended Ctrl+S and FLAT at 61 — the demo types only formulas, never a figure, and the
+corner jitter moves single-letter column names. 1.05 s/key, the house band. Mid-band in Full Builds
+(cfslink 36 · dashcover 48 · isbuild 51 · opmodel 55 · debtblock 57 · threestmt 59 · **bsbuild 64**
+· nwcsched 74 · lbobuild 82 · dcfbuild 91). Clocks derive (§1.4): pass 1:36 · pro 1:14 · legendary 1:04.
+
+### ALT PATHS (2, both green ×3 seeds; the single stale entry DELETED)
+
+The old entry hard-coded B5/B8/C10/B11/B14 off the retired `ROWS:14` board. ALT 1 = chord ROUTE +
+op ORDER (Ctrl+Enter roll, autosum range form, ribbon fill, the clone through the paste-special
+FORMULAS dialog, Alt H B S box, check written off the two BLOCKS so it never reads a total row) —
+the ☆ still latches, because a dialog paste writes the same `S.pasteLog` entry as Ctrl+V. ALT 2 =
+the negative control: no paste and no fill anywhere, anchored addition chains, roll and check typed
+per year, dress cell by cell — six cores clear, ☆ dark.
+
+### TESTS
+
+`e2e-demo-replay bsbuild` 3/3 · `e2e-par-sweep bsbuild` median 61, drift 0%, 1.05 s/key ·
+`e2e-alt-paths bsbuild` 2/2 ×3 seeds · `e2e-guided bsbuild` PASS (railed, contained, solvable) ·
+`e2e-fit-sweep` ALL CLEAN (70 drills) · `check-invariants` clean (C9 tri-length 7, one ☆, saveClose
+declared) · `dev/verify-bsbuild.js` ALL GREEN — 18 routes walked ×5 seeds, 2 negative controls, the
+family bake-off, the headroom decomposition and the par distribution.
+
+**Engine fact recorded for the next probe author:** `Ctrl+Shift+V` is paste-VALUES only under
+`keyProfile === 'macabacus'`; in the default profile it falls through to the plain Ctrl+V branch and
+lands a `kind:'all'` paste. The default-profile values route is Alt H V V (r302). A first cut of the
+probe used the chord and reported a phantom failure — CAMPAIGN's "suspect the probe first" rule,
+fourth sighting. Second probe defect the same day: `loadChallenge` bounces a locked chapter back to
+the board already on screen via `drillLocked`/`openGateInfo`, so a probe that omits `_pro = true`
+silently measures whatever drill booted. Both are written into `dev/verify-bsbuild.js` in comments.
+
+## r448 H6b-FB — cfslink: the cash flow statement, actually LINKED (DEPTH_PASS §4.80 + MODELING_STANDARDS)
+_Full Builds opens. Every number below is `keyLog` through the live engine on the real board,
+medians over 5 seeds; where a route is quoted as "keyed", every selection and navigation is a real
+keystroke and `setDemoSel` only parks the opening cursor. The instrument is `dev/verify-cfslink.js`,
+which ships with the drill._
+
+### THE DRILL WAS NAMED FOR A LESSON ITS BOARD COULD NOT TEACH
+
+`cfslink` is "Link the cash flow statement" and the shipped board had **nothing to link**: the two
+lines a real CFS pulls from elsewhere — the working-capital change and capex — were seeded inside
+the statement as bare blue constants. The player's only link was the cash roll. The board now
+carries the supporting schedules the statement reads from (EBITDA, capex, the working-capital
+build), and beat 1 is the statement pointing at them.
+
+### FINDINGS IN THE SHIPPED DRILL
+
+| # | what | class |
+|---|---|---|
+| 1 | `refs('B6',['SUM('])` on the net-change beat | **untriggerable beat, campaign class #1 (formula TEXT)** — `=B2+B3+B4+B5` lands the identical value on a page whose own sign convention makes the addition chain the natural form, and the beat stays dark. Read straight off the predicate: the conjunct is a literal text match on `SUM(`. Gone. |
+| 2 | `targets:['B6','B10','B11','B16','B20','B21']` on a `ROWS:10` board | **BUG_SCAN #6** (cfslink is named in it): four of six rings pointed at rows the sheet does not have. Also `checks`=5 / `guide`=5 / `targets`=6 — C9's tri-length would have failed the moment the drill joined the ledger. Rebuilt to 7/7/7. |
+| 3 | conversion memo = net change ÷ **net income** | `dev/REALISM_NOTES.md` records this as the nit to sharpen ("sharpen to FCF/EBITDA … the classic definition") and §4.80 beat 5 asks for FCF ÷ EBITDA. Now FCF ÷ EBITDA, with the identity stated on the board. |
+| 4 | a **bottom** border under the closing row (page and code both) | §1.0(f) + MODELING_STANDARDS §1: totals take TOP borders, never a rule underneath. Superseded. |
+| 5 | `ROWS:10` — 9 rows of a 20-row sheet, **45%** | the `ROWS=14`-class density defect CAMPAIGN §5 names. Now 20 rows, **17 used, 85%**, identical on every seed. |
+| 6 | no `saveClose`, no ☆, five lowercase shouting check lines ("build THE LINK", "tie out ending cash") | §1.0(e) closer + §1.0(d) ☆ + §1.7/§1.0-R3(n) copy. All rebuilt. |
+
+Campaign untriggerable-beat total: **26**.
+
+### THE ☆: THE ONE PASS THAT PROVES THE LINKS WERE LEFT RELATIVE
+
+The §4.80 page proposes *"One-decimal the conversion memo — 82.3%, not 82.34%"* — a FORMATTING
+bonus, dead on arrival under §1.0(d) and skippability-dead under §1.0-R2(i) (it falls out of
+finishing the memo). Per §1.0-R4(u) the work was **promoted into the memo's own core beat**
+("percent, one decimal" — the memo ships GENERAL so it is real work) rather than deleted, and the
+☆ was re-cut to a hidden efficiency: **the four built lines of the statement — the working-capital
+reference, the operating subtotal, the capex reference and the net change — written once in the
+first year and carried across in a SINGLE op.** Read off `S.fillOps` OR `S.pasteLog` (the mechanic,
+never geometry inferred), so Ctrl+R, Alt H F I R and a tiled paste all earn it (verify §F).
+
+**Why it is not a repeat of `debtsched`'s fill star, said as a lesson rather than a shape.**
+debtsched's one-pass proves the ANCHORS were SET — a `$`-less rate walks off the block. This one
+proves the opposite discipline: that the two schedule links were left RELATIVE. Anchor them
+(`=$B$7`) and one Ctrl+R stamps FY24's working capital across all five years — a board that reads
+the same number five times, which is exactly what the ☆'s value conjuncts refuse.
+
+### THE FAMILY BAKE-OFF (wave-5 addendum: measure before you choose) — verify §D
+
+Keys on the IDENTICAL job (four statement lines × five years, fully keyed from the board's own
+opening cursor):
+
+| family | keys | job | ☆ |
+|---|---|---|---|
+| **fill (one pass)** | **44** | complete | earned |
+| structured selection (Ctrl+Shift+→ then one fill) | 41 | complete | earned |
+| tiled paste | 48 | complete | earned |
+| Ctrl+Enter multi-enter, row by row | 55 | complete | dark |
+| AutoSum provenance | 74 | **INCOMPLETE** | dark |
+| four separate row fills (the ☆'s negative control) | 59 | complete | dark |
+
+Structured selection is 3 keys cheaper only because `Ctrl+Shift+→` replaces one four-arrow run — it
+is the SAME one-pass decision, the shipped ☆ already fires on it, and making it the star would need
+NEW telemetry for a move `S.fillOps` already records. AutoSum cannot carry the job at all: `Alt+=`
+reaches the two subtotal rows and cannot carry a year. **The ☆ is worth 15 keys on the identical
+job** (44 vs 59), proved skippable by measurement, not assertion.
+
+### THE ☆-HEADROOM DIAGNOSTIC, BOTH PARTS — verify §C
+
+| board | fastest legal (all cores, ☆ earned) | slowest legal (all cores, ☆ dark) | spread |
+|---|---|---|---|
+| `cfslink` (rebuilt) | 100 | 373 | **3.73×** |
+
+Part 2, the half that does the work: **none** of the 273-key spread is chord-vs-ribbon (every ribbon
+twin here — Alt H F I R, Alt H 1, Alt H B P — costs the same or more than its chord and is forced to
+clear by §1.0(c)), and only 6 keys of it are formatting (the memo's one-decimal step). The remaining
+~267 keys are fill-vs-type and reference-vs-retype — both families a ☆ may reward.
+
+### THE ROUTE MATRIX (§1.0-R3(p)) — verify §B, 13 routes walked, 4 negative controls
+
+Cleared: the link as `=SUM(cell)` and as `=+cell` · the operating subtotal as an addition chain and
+via **AutoSum over the range** · the net change without a SUM and ROUND-wrapped · percent via
+**Ctrl+1 P** (one decimal outright), **Alt H P + Alt H 0** and **Ctrl+Shift+% + Alt H 0** · the roll
+link with `$`-anchors and the close as `=SUM(beginning:net change)` · the dress via Alt H 1 + Alt H
+B D, Ctrl+B + Alt H B S, and Ctrl+B + Alt H B P **then Alt H B B** (the grand-total double rule laid
+over the top rule).
+Correctly refused: the working-capital number TYPED instead of linked · the beginning cell
+RE-DERIVED from the prior year's components (MODELING_STANDARDS §3's "classic junior error") · a
+bottom rule alone · percent at zero decimals.
+
+**BORDER DOCTRINE (r446b, campaign §5) — declared: this board grades the LENIENT reading,
+`bt || ball`.** MODELING_STANDARDS §1 explicitly allows a grand total to wear a double bottom rule
+ON TOP of its top rule, and a strict `bt && !bb && !bdbl` would strand exactly that (walked, third
+dress route above). A bottom rule alone still fails, which is the thing §1.0(f) protects.
+
+### PARS RE-SWEPT FROM SCRATCH
+
+| drill | was | now | why it moved |
+|---|---|---|---|
+| `cfslink` | par 36 / parKeys 36 | **par 66 / parKeys 63** | the schedule block gave the reference beat a source, the memo gained its percent-at-one-decimal, the dress became its own beat, the save closer landed |
+
+1.05 s/key, the house band; drift **0%**, flat at 63 over a 9-seed probe (verify §H prints both
+conventions — 63 parked, 100 fully keyed, min = max on each). Clocks derive (§1.4):
+**pass 1:39 · pro 1:16 · legendary 1:06**.
+
+### §1.3 DENSITY AND THE 20-ROW STANDARD
+
+| drill | before | after |
+|---|---|---|
+| `cfslink` | ROWS:10, 9 rows used — **45%** | 20 rows, 17 used — **85%** |
+
+The three blank rows are load-bearing: one is the geometry moat between the supporting schedules and
+the statement, and verify §G drives Ctrl+↓ from the schedule block on every seed and requires it to
+stop at that block's last row — no ride-through.
+
+### THE BOARD IS A MODEL PAGE NOW — MODELING_STANDARDS CONVENTIONS
+
+Colour-as-provenance (§1): every seeded feed blue, every player cell black, no green because the
+board is one logical sheet-area. Structure (§1): subtotals ship with TOP borders, the period header
+wears a bottom rule, units in the title (`$mm`), negatives in parentheses. Sign convention (§2): uses
+of cash are negative, stated on the board's basis memo, so both subtotals are clean SUMs rather than
+subtraction chains. The corkscrew (§3): beginning → net change → ending, and the beginning cell
+REFERENCES the prior ending — the one text grade that stays, cited on its line. Linkage (§4): the
+working-capital change sits INSIDE the operating section and capex below the subtotal, the order a
+reviewer looks for. Circularity (§5): none — no interest, no debt on this fragment; the basis memo
+instead declares the one simplification the board does make (no financing flows this period, so the
+net change in cash IS this page's free cash flow). Error checks (§6): none, deliberately — a CFS's
+check is "ending cash equals the balance sheet's cash line" and there is no balance sheet here;
+`threestmt` owns that wire. Component rule (§7): the cash link between two statements, five years.
+
+**§1.0-R4(t) reality test, audience B (§3.1 row 8 — Full Builds is the interview-test endgame).**
+The prompt is a board pack printing tomorrow with the cash page still empty and the schedules above
+already done. Audience A is not a guest: every controller and FP&A lead builds this page, and the
+craft — point at the source, never retype; roll the balance; format the memo — is identical.
+
+### FILES
+
+`index.html` — the `cfslink` CHALLENGES block, rebuilt · `dev/verify-cfslink.js` — NEW, nine
+sections · `drills.js` — meta desc + HOTKEY_PARS · `dev/check-invariants.js` — C9 REWORKED ·
+`dev/e2e-alt-paths.js` — the stale entry DELETED (it drove the retired ROWS:10 addresses), two new.
+
+### `nwcsched` — "Roll working capital" (DEPTH_PASS §4.81 · MODELING_STANDARDS §1/§2/§3/§7)
+
+**WAS:** 5 checks on a `ROWS:11` board — 11 rows used of the real 20-row sheet (55%, under the §1.3 target) — no ☆, no `saveClose`, no historical column, driver days typed into an unstyled block, and the receivables beat grading FORMULA TEXT (`refs('B4',['B2','B9'])`). par 74 / parKeys 78.
+
+**NOW:** a 20-row working-capital schedule — a real component of a build, not a model: a basis memo, a three-cell driver block (yellow + boxed, individually labelled, shipping EMPTY because filling them is beat 1), a diligence memo carrying this seed's day-counts, a green feed block (revenue and COGS linked in from the operating model), a COMPLETE FY historical column, and five plan years the player builds. 16 of 20 rows carry content at the win state (**80%**, up from 55%).
+
+**BEATS** (6 core + the §1.0(e) save closer + 1 ☆; the page's six, re-cut to §1.0(b) outcome form):
+1. `Enter the driver days — DSO 47, DIO 62, DPO 38, in blue` — §1.0-R2(g) adaptive: the label names THIS seed's three numbers rather than making the player reverse-engineer the memo.
+2. `Build the receivables line off the DSO driver — all five plan years`
+3. `Build inventory and payables off their own drivers — payables negative` (the page's pairing kept as one beat — its own Wolf-playtest note asks whether it splits; it reads as one motion)
+4. `Total net working capital — all five plan years`
+5. `Build the increase-in-NWC line — each year against the year before` — the §1.5 aha moment
+6. `Bold the increase-in-NWC line and add a top border above it` — §1.0(a) format-as-you-go, immediately after the line it dresses; §1.6 finish-state beat, save closer after it
+☆ `Fill the whole schedule in one pass — five lines, one selection`
+
+**☆ — THE PAGE'S BONUS WAS DEAD ON ARRIVAL, AND THE REPLACEMENT WAS CHOSEN BY MEASUREMENT.** §4.81 proposes "Comma-format the schedule body — zero decimals, one pass": a FORMATTING task, which §1.0(d) forbids outright, and one that falls out of the board's own dress, so it also fails §1.0-R2(i). Re-cut under §1.0-R4(u) to one-pass discipline: type the whole first plan column, then take all five lines across in ONE `Ctrl+R`. Read off the r424 `S.fillOps` latch (the MECHANIC, never geometry inferred), so the ribbon's `Alt H F I R` earns it too.
+
+**THE FAMILY BAKE-OFF** (the wave-5 addendum: measure the candidate families before choosing). Full keyed solves on the rebuilt board, 3 seeds each, `dev/verify-nwcsched.js` §B — every one clears all six cores, so each is a legal route:
+
+| route | keys | ☆ |
+|---|---|---|
+| one-pass FILL — the plan column typed, then ONE Ctrl+R | **99** | earned |
+| per-line fills — the TAUGHT route, and the ☆'s control | 117 | dark |
+| paste-across — copy the plan column, paste it over the other four | 103 | dark |
+| Ctrl+Enter multi-commit per line (`S.multiEnter`, `anchor`'s family) | 112 | dark |
+| per-line fills with Alt+= on the total (`S.autoSumN`, `scrub`'s family) | 105 | dark |
+| the slowest legal route — no anchors, no fills, every cell typed | 333 | dark |
+
+☆ worth **18 keys**; the best NON-fill family (paste-across) is 4 keys behind the fill and worth only 14. The addendum prefers a non-fill family at comparable headroom — measured, the fill is both cheaper AND worth more, and it is the family MODELING_STANDARDS §7 names as the richest star a Models board can carry. Shipped with the numbers, per the addendum's own fallback; if chapter 8 lands fill-heavy, paste-across is the measured drop-in. Independent prove-out was considered and ruled INADMISSIBLE — §1.0-R4(u) allows it only where a pre-playtest page specced it, and §4.81 does not.
+
+**☆-HEADROOM DIAGNOSTIC, BOTH PARTS (CAMPAIGN §2), run BEFORE the board was designed.** On the SHIPPED board, 5 seeds, every selection and navigation keyed: taught route **86** keys against **287** for the slowest legal one — **3.34×**. Part 2: ~14 keys are chord-vs-ribbon (forced to clear by §1.0(c)) and ZERO are formatting (the old board graded only the one NWC dress, which was a core beat); the remaining ~187 are fill-versus-retype and anchor-versus-retype over a five-line block. Legal headroom, the widest in the chapter. KEEP. Re-measured on the rebuilt board: **99 against 333, 3.36×**.
+
+**UNTRIGGERABLE BEATS KILLED (CAMPAIGN §1 — found by WALKING routes, all now permanent probes):**
+1. The shipped receivables beat demanded `B2` and `B9` in the formula TEXT. Nothing here reads formula text: every core grades the number standing in the column, plus liveness where the label says Build or Total (MODELING_STANDARDS §7). Walked and green: a `ROUND(…,0)` wrapper on every line, an addition chain instead of `SUM`, `Alt+=` autosum, and column-only anchoring.
+2. **Anchoring is graded by the VALUES, never by the `$`.** An un-anchored driver reference walks off the block on the fill and lands zeros, so the end state itself fails — which means BOTH `$B$5` and `$B5` clear (a right-fill only needs the column locked), and a player who never fills and types five correct formulas clears too (§1.0(c)).
+3. **The top-border beat grades LENIENTLY (`bt || ball`)** — the wave-5 addendum's lenient reading, and the walk is why: Cell Styles → **Total** (`Alt H J`) sets `bt` AND `bb` together, and `Alt H B S` over a one-row range sets `bt` and `bb` on the same cells. A strict `bt && !bb` would have locked out two correct desk routes — §1.0-R3(p) exactly.
+
+**MODEL (MODELING_STANDARDS).** §1 colour-as-provenance: blue = the day-counts the player types and the historical balances; **green = the revenue/COGS feed linked in from the operating model** (the convention the catalog under-uses); black = everything computed on the page. §1 totals wear a TOP border. §1 negatives in parentheses (comma format). §2 ONE sign convention, stated on the board's own basis memo: **payables are carried NEGATIVE as a source of working capital**, so net working capital is one clean SUM down the column instead of `A + B − C`. §3 the change row reads the year before it, which is why the historical column is on the page at all. §7 the board is a COMPONENT — the WC corkscrew that feeds the CFS — inside 20 rows.
+
+**RANDOM (§1.2, four axes; full-grid artifact, so corner jitter substitutes for the site pool):** (a) corner jitter both axes — the statement anchors at column A or at column B behind a narrow 26px gutter, and the whole statement block slides one row down; (b) content pools — codename, fiscal-year base, and the four line labels a desk disagrees about (receivables/inventory/payables/COGS wording); (c) values — the three plan day-counts, the historical day-counts they replace, opening revenue, the growth rate and the COGS margin, all through `rnd()`; (d) the historical day-counts are drawn INDEPENDENTLY of the plan's, so the first plan year's change row is a real number on every seed and can never be zero. Geometry is constant across seeds, so the keystroke count never moves with the draw.
+
+**PAR RE-SWEPT FROM SCRATCH: par 74 / parKeys 78 → par 102 / parKeys 97.** `e2e-par-sweep` and `verify-nwcsched` §A over 15 seeds: median **97** keys including the engine-appended `Ctrl+S`, **FLAT at 97** (min 97, max 97) — the geometry is fixed across seeds and all three day-counts are two digits by construction. 1.05 s/key, the house band. Mirrored in `HOTKEY_PARS`. Clocks derive (§1.4): pass 2:33 · pro 1:57 · legendary 1:42.
+
+**A GUIDED-RAIL FINDING WORTH CARRYING (found by `e2e-guided.js`, not by reading).** The first demo typed the whole plan column straight down with `Enter` walking. Under guided rails `railToTarget()` repositions the cursor the moment the first-unmet target changes — so after the receivables formula committed, the cursor was yanked back onto the receivables row and the next formula overwrote it. Every core stayed dark and the drill was UNSOLVABLE on the rails. The fix is a per-line `setDemoSel` park, which costs the same keys. **Standing note for any Models/Full Builds board whose beats are one-row-each and whose demo builds a column: the guided rail will fight an Enter-walk, and only `e2e-guided` sees it.**
+
+**ALTS ×2, both green ×3 seeds.** (1) the chord-ROUTE alt — Cell Styles gallery for the blue pass AND for the total rule, an addition chain instead of `SUM`, the ribbon fill taking the block across, so the ☆ is EARNED by the other door; (2) the op-ORDER alt and the ☆'s skippability proof — drivers typed bottom-up and coloured one cell at a time, inventory+payables built before receivables, per-line fills, the change row dressed in its first cell so the dress rides the fill, every core clearing with the star DARK.
+
+**TESTS:** `e2e-demo-replay nwcsched` WIN 3/3 · `e2e-alt-paths nwcsched` 2/2 PASS ×3 seeds · `e2e-guided nwcsched` railed/contained/solvable · `e2e-par-sweep nwcsched` 0% drift · `dev/verify-nwcsched.js` ALL GREEN · `check-invariants` clean · targeted fit check clean at load and at win ×6 seeds. No harness reaches into this drill's internals: `CHALLENGES.nwcsched._o` — none; `loadChallenge('nwcsched')` — only its own probe; `'nwcsched'` in `dev/` — only alt-paths, the certificates migration (still a live key) and the exempt `seed-field.sql`.
+
+## r448 — H6b-FB: threestmt depth pass — "Tie the three statements" (DEPTH_PASS §4.82 + §1.0/-R2/-R3/-R4 + MODELING_STANDARDS)
+_Full Builds' flagship, and the page §5.4 reserves the chapter's difficulty target to. Built after
+the CAMPAIGN §2 ☆-headroom diagnostic was run on the SHIPPED board and passed, and after the
+wave-5 ☆ family bake-off was run on the NEW board before the star was chosen._
+
+- **WHAT WAS THERE.** `ROWS:14` — 12 of the real 20-row sheet carrying content (**60%**, sitting
+  exactly on the §1.3 line), **checks 6 / guide 6 / targets 5**, so the §1.9 tri-length invariant
+  was broken outright and `guide[i]` had not hinted `checks[i]` since the fifth beat. No `☆` at
+  all (§1.1/§2.2), no `saveClose` (§1.0(e)), and a final beat that drove three check cells to zero
+  **and** dressed two different rows in one line — §1.0(a) format-as-you-go, §1.1 one-verb-one-beat
+  and doctrine §2.5 one-action-per-line, all three in a single label. par 59 / parKeys 61, one ALT
+  entry. It was never depth-passed; the chapter is being passed now.
+- **AND THE MODEL WAS WRONG, which matters more (MODELING_STANDARDS, binding on Full Builds).**
+  The shipped board made its balance sheet tie by **forcing capex to equal D&A** in years 2 and 3 —
+  `cx[1]=da[1]; cx[2]=da[2];`, with the build comment saying so out loud ("engineer the tie"). A
+  company whose capex lands on its depreciation to the dollar, three years running, is the first
+  thing a reviewer stops on, and it is exactly the class of thing MODELING_STANDARDS exists to
+  catch: *a correct keystroke on a wrong model is worse than no drill.* The rebuilt board ties
+  because **PP&E ROLLS** (§3, the corkscrew: prior − D&A + capex), which is what makes capex and
+  D&A agree in aggregate without making them identical in any year. Nothing on the page is a plug.
+- **THE BOARD.** One page, three statement FRAGMENTS, three years, 20 rows exactly — a COMPONENT
+  of a build, not a whole model (§1.3 · MODELING_STANDARDS §7). Income statement (pretax income ·
+  taxes · net income, live). Cash flow statement (net income — WIRE 1 · D&A · capex · beginning
+  cash, a corkscrew · ending cash). Balance sheet (cash — WIRE 2 · PP&E net, rolling · total assets ·
+  payables · retained earnings — WIRE 3 · total liabs & equity · the check row). It is the artifact
+  an associate actually has open the night a pack goes out: the statements typed, the wires not in.
+  **Win-state density 20/20 rows (100%)**, against 60%.
+- **BEATS (5 core + the engine save closer + one ☆), and they CHAIN hard (§1.1/§8.1.4).** Every
+  seeded line downstream of a wire is live, so the board moves while the player works: WIRE 1 lands
+  and net change, ending cash and the whole cash corkscrew reprice; WIRE 2 lands and total assets
+  moves; WIRE 3 lands and total liabs & equity moves; the check row — dark and non-zero through the
+  whole run — drops to three zeros on the third wire. That is the §1.5 aha's MOMENT, on screen.
+- **☆ RE-CUT (§1.0-R4(u)), AND THE FAMILY WAS MEASURED BEFORE IT WAS CHOSEN (wave-5 addendum).**
+  §4.82's bonus is *"Finish at A1 — the model is one page again"*: not an efficiency discovery at
+  all (§1.0(d)), no decision to skip (§1.0-R2(i)), and moot since §1.0(e) ends every run on Ctrl+S.
+  Candidates measured on the identical four-line job, 5 seeds through the live engine, every
+  selection keyed:
+
+  | family | keys | verdict |
+  |---|---|---|
+  | one-pass · Ctrl+R fill | **41** | chosen |
+  | one-pass · Ctrl+Enter multi-commit | **41** | chosen |
+  | one-pass · clipboard clone | **41** | chosen |
+  | one-pass · ribbon fill (Alt H F I R) | 57 | §1.0(c) forced-to-clear, also earns it |
+  | structured selection (Ctrl+Shift+→) | — | **NOT AVAILABLE** |
+  | point mode (`S.pointLog`) | 39 | not a competing family |
+  | retype control — no one-pass anywhere | **74** | every core clears, ☆ **DARK** |
+
+  **Structured selection is not a candidate on this board, and the probe says why rather than the
+  reviewer:** the year cells beside a freshly built one are still EMPTY, so `Ctrl+Shift+→` walks
+  past the strip to column J. A ☆ family the board cannot express is a trap, not an option — this
+  is the `growth` lesson arriving in a new shape, and `dev/verify-threestmt.js` §5 asserts it so it
+  cannot be re-proposed by inspection. Point mode measured 39, but that 39 still contains four
+  fills: pointing is a way to enter a *reference* and it composes with the one-pass rather than
+  competing with it; as a star in its own right it would be worth 2 keys.
+  **CHOSEN: one-pass discipline, mechanic-agnostic** — `S.fillOps` OR `S.multiEnter` OR
+  `S.pasteLog` (the `balcheck` precedent). The addendum asks for a non-fill family at comparable
+  headroom; the measured answer is that all three one-pass mechanics cost the IDENTICAL 41 keys
+  here, so picking one and darkening the other two would strand two equally good routes for no
+  lesson. **41 against 74 — a 33-key discovery**, and the predicate reads the built column plus,
+  for the clipboard route, the paste's SOURCE column, so a partial fill that patches only the last
+  year after two were typed can never light it.
+- **THE ☆-HEADROOM DIAGNOSTIC, BOTH PARTS** (CAMPAIGN §2). Part 1, on the SHIPPED board before any
+  design: taught route **77** keys against **158** for the obvious slow route doing the same work —
+  **2.05×**. Part 2: of the 81 keys of spread, 12 are row dresses (§1.0(d) forbids grading them) and
+  **zero** are chord-vs-ribbon in the §1.0(c) forced-to-clear sense — the engine has no ribbon route
+  into formula entry, and Ctrl+R and Alt H F I R hit the same latch, so a fill is a fill however it
+  is reached (the `wrapfix` r439 reading: on a formula board that class is empty by construction).
+  69 keys survive the strip. Legal headroom, in the drill's own subject. On the rebuilt board the
+  spread is **1.80×** (74 ÷ 41) — narrower because the surrounding statements no longer have to be
+  built by hand, and every key of it is ☆-legal.
+- **TEN ROUTES WALKED, NO UNTRIGGERABLE BEAT FOUND — and one text grade kept deliberately.** Every
+  core grades the END STATE (§1.0-R3(p)): the number standing in each year column, plus, on the
+  three LINK beats, that the cell is a live formula rather than a typed constant. No check reads a
+  range, a function name, an anchor or an operand order out of formula text. Walked green: the RE
+  roll off the IS net income **or** off the CFS net income; the check written `=assets−L&E`, written
+  `=−(L&E−assets)`, written DECOMPOSED as `=assets−payables−RE`, and every ref `$`-anchored to its
+  own year; the cash link as `=Y`, `=+Y`, `=SUM(Y)`; every dress route (Ctrl+B / Alt H 1, Alt H B P /
+  B S / B A); every op order; ribbon fills; Ctrl+Enter commits. The liveness requirement is the one
+  deliberate route grade — doctrine §2.2's sanctioned "don't hardcode the answer" case, read onto
+  MODELING_STANDARDS §7's *"a beginning balance that REFERENCES rather than repeats"*. The negative
+  control is walked too: typed constants leave the three link beats dark while the check and the
+  dress still clear, which is what tells a player the board is not the problem.
+- **BORDER DRESS — THE LENIENT READING, AND IT WAS MEASURED, NOT PICKED (wave-5 addendum, §5).**
+  Probed: `Alt H B S` on the three-cell check row stores `bt:true, bb:true` on every cell. A strict
+  `bt && !bb && !bdbl` beat would therefore go DARK for a player who boxed the row and can SEE the
+  rule above it — §1.0-R3(p) exactly. The beat grades `bold && (bt || ball)`, and the label carries
+  no "no rule underneath" clause, as the addendum requires of the lenient side.
+- **DEVIATIONS FROM §4.82, declared per §0.** (1) the ☆ re-cut above. (2) The page says *"add a
+  bottom border under it"*; §1.0(f) reverses that line catalog-wide and MODELING_STANDARDS §1 says
+  the same, so the check row takes the rule ABOVE it. (3) **The fragment is narrowed** — the page's
+  beat 4 needs both sides of a balance sheet on a board that also carries an income statement and a
+  cash flow statement, so the income statement runs pretax → taxes → net income rather than EBITDA →
+  D&A → EBIT → taxes → net income. The wire this drill grades leaves the IS from its BOTTOM line and
+  nothing above that line is load-bearing here; `isbuild` owns building the statement. §1.3 and
+  MODELING_STANDARDS §7 both say narrow the fragment rather than raise the cap. (4) The period
+  headers ride the first section's head row, because a dedicated header row costs a 21st.
+- **PAR CAME DOWN, DELIBERATELY, AND IT IS FLAGGED.** parKeys **42** (5-seed median, flat across
+  seeds), par **45** ≈ 1.07 s/key, 0% drift on the re-sweep. The shipped board also had the player
+  build net change in cash, ending cash, the cash corkscrew and total assets — `cfslink`'s and
+  `bsbuild`'s lessons, both in this same chapter, and CAMPAIGN §3's "the redundancy is usually in
+  the shared tail". What is left is the three WIRES, the check they prove, and its dress. That puts
+  threestmt at the light end of the chapter band (cfslink 36 · isbuild 51 · opmodel 55 · debtblock 57 ·
+  bsbuild 60 · nwcsched 74 · lbobuild 82 · dcfbuild 91). **DEPTH_PASS §5.4 reserves the H6b-FB
+  difficulty target to Wolf and names this page as the one he sets it off — so the number is
+  reported, not tuned around.** The two ways up, if he wants them, are a fourth year or handing the
+  player the cash corkscrew as well (which would re-open the `cfslink` overlap).
+- **MODELING_STANDARDS COMPLIANCE.** §1 colour-as-provenance (18 blue typed inputs, 27 black
+  formulas, no blue cell carrying a formula — asserted by the probe) · §1 no hardcodes inside
+  formulas · §1 every total wears a TOP border and no rule underneath (asserted) · §1 units in the
+  title (`$mm`) · §2 uses of cash carry their sign, stated on the board's memo line · §3 the
+  roll-forward corkscrew twice, cash and PP&E, each beginning cell REFERENCING the prior ending
+  (asserted) · §4 three-statement linkage: net income → CFS and → retained earnings, D&A and capex →
+  PP&E, ending cash on the CFS = cash on the BS · §6 the balance check in one visible place, reading
+  zero (asserted) · §7 a component, not a model. **Deliberate simplifications, both on the board's
+  own memo line as §7 requires:** taxes, D&A and capex are GIVEN for this fragment (their schedules
+  sit off-page), and the fragment carries no debt — so there is no interest, no circularity, and the
+  §5 beginning-balance ruling never comes up here.
+- **RANDOMIZATION (§1.2), four axes:** (a) corner jitter — the page anchors at column A or B (the
+  §1.2 substitution for a full-grid artifact); (b) codename + fiscal-year base; (c) every figure
+  through `rnd()`; (d) **the stress year** — one of the three carries an outsized capex programme,
+  the page's own "which year carries the stress", which moves every downstream number without moving
+  a beat. Geometry is constant across seeds, so the keystroke count never moves with the draw (the
+  r439 `wrapfix` rule) — which is why parKeys measures flat.
+- **NO cueCell and NO helper stack, both declared:** every graded destination is an existing
+  labelled cell in a labelled row, so the guided ring expresses all five cores (§1.0-R2(h)/§1.0-R3(q)),
+  and nothing on this page is converted, scaled or assumed (§1.0(f)/§1.0-R2(l)).
+- **Labels are static and that is correct under §1.0-R2(g):** the required ACTION does not vary per
+  seed — the same four lines, the same shapes, every seed. The stress year changes the figures, never
+  what the player must do, so there is nothing for an adaptive label to disclose.
+- **Tests:** demo-replay ×3 seeds (twice, before and after the par retune) · e2e-alt-paths ×3 seeds,
+  both new entries · e2e-guided (full catalog) · e2e-fit-sweep (full catalog) · e2e-par-sweep ×2
+  (0% drift on the second) · check-invariants with threestmt registered in C9 ·
+  `dev/verify-threestmt.js` (6 sections, 5 seeds per family) · screenshots fresh/mid/win, win looked
+  at (doctrine §8.1.5).
