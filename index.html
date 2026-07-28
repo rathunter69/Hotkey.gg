@@ -8185,55 +8185,274 @@ const CHALLENGES = {
     }
   },
   wacc:{
-    name:'WACC', label:'Build the discount rate', par:78, parKeys:82,
-    aha:'WACC = weights × costs — build the pieces, one line ties them.',
-    prompt:'Build the discount rate — WACC, the blended cost of debt and equity capital — with no shortcuts: unlever the peer beta at the peer’s structure, relever it at the target’s own debt-to-equity, compute cost of equity with CAPM, tax-effect the debt side, then weight both sides off one denominator. Five formulas, each feeding the next — the grader follows the chain, so a retyped number breaks it.',
-    req:'<em>B10</em> unlev \u03b2 <em>=B4/(1+(1-B6)*B5)</em> \u00b7 <em>B11</em> relev \u03b2 <em>=B10*(1+(1-B6)*B8/B7)</em> \u00b7 <em>B12</em> Ke <em>=B2+B11*B3</em> \u00b7 <em>B13</em> at-Kd <em>=B9*(1-B6)</em> \u00b7 <em>B14</em> WACC <em>=(B7*B12+B8*B13)/(B7+B8)</em>',
-    guide:[
-      'unlevered \u03b2 at B10 \u00b7 <kbd>=B4/(1+(1-B6)*B5)</kbd> <kbd>\u21b5</kbd> \u2014 strip the peer\u2019s leverage out',
-      'relevered \u03b2 at B11 \u00b7 <kbd>=B10*(1+(1-B6)*B8/B7)</kbd> \u2014 same algebra, the target\u2019s OWN D/E (B8/B7)',
-      'cost of equity at B12 \u00b7 <kbd>=B2+B11*B3</kbd> \u2014 CAPM: risk-free plus beta times the premium',
-      'after-tax Kd at B13 \u00b7 <kbd>=B9*(1-B6)</kbd> \u2014 interest is deductible; equity isn\u2019t',
-      'WACC at B14 \u00b7 <kbd>=(B7*B12+B8*B13)/(B7+B8)</kbd> \u2014 both sides weighted off ONE denominator',
-    ],
-    targets:['B10','B11','B12','B13','B14'],
-    demo(){ return [
-      {sel:'B10', keys:[...T('=B4/(1+(1-B6)*B5)'), Kb.enter]},
-      {sel:'B11', keys:[...T('=B10*(1+(1-B6)*B8/B7)'), Kb.enter]},
-      {sel:'B12', keys:[...T('=B2+B11*B3'), Kb.enter]},
-      {sel:'B13', keys:[...T('=B9*(1-B6)'), Kb.enter]},
-      {sel:'B14', keys:[...T('=(B7*B12+B8*B13)/(B7+B8)'), Kb.enter]},
+    /* r444 H6b (DEPTH_PASS §4.57, "Build the discount rate") — the depth-pass rework, built to
+       §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (the law wins on conflict) and to
+       dev/MODELING_STANDARDS.md, which is BINDING on Models I. §4.57 is a PRE-PLAYTEST page:
+       its ☆ line is dead on arrival (§1.0-R4(u)) and its board was never checked against the
+       dual-audience reality test, so both are re-cut here, per the wave brief and (u) itself.
+
+       WAS: five checks on a ROWS:14 board (the copied-default tell — 14 of the real 20-row
+       sheet, 13 rows carrying content = 65%), no ☆, no saveClose, a single peer whose beta was
+       unlevered once, and every check grading FORMULA TEXT.
+
+       ── THREE UNTRIGGERABLE BEATS ON THE SHIPPED BOARD (DEPTH_PASS_CAMPAIGN §1 — the class is
+       found by WALKING routes, never by reading predicates; probed 5 seeds, dev/verify-wacc.js
+       §A holds the replacements' proof). All three graded formula TEXT via
+       `String(c.formula).includes(ref)`, so a board that was NUMERICALLY CORRECT sat under a
+       dark line with nothing to fix:
+         (1) B11 demanded the literal 'B10'. A player who relevers INLINE
+             (=B4/(1+(1-B6)*B5)*(1+(1-B6)*B8/B7)) lands the identical relevered beta — dark.
+         (2) B14 demanded BOTH 'B12' and 'B13'. The one-expression WACC
+             (=(B7*(B2+B11*B3)+B8*(B9*(1-B6)))/(B7+B8)) lands the identical rate — dark.
+         (3) B12 demanded 'B11'. CAPM written off the unlevered beta relevered inline — dark.
+       Same root cause as campaign bugs #3/#8/#9 and the r440 `balance` pair. Every core here
+       grades the END-STATE NUMBER (§1.0-R3(p)); nothing reads a range, a function name or an
+       anchor out of formula text.
+
+       ── ☆-HEADROOM DIAGNOSTIC, RUN BEFORE THE BOARD WAS DESIGNED (CAMPAIGN §2, both parts;
+       every number keyLog through the live engine, 5-seed medians).
+         ON THE SHIPPED BOARD — PART 1: fastest legal 82 keys (the taught typed-ref route)
+           against 130 for the slowest legal one (every reference entered in POINT MODE, which
+           clears all five cores today). 1.59×.
+         PART 2, WHICH IS THE HALF THAT DECIDES: of those 48 keys of spread, 36 are $-anchoring
+           (measured separately: the anchored-typed route is 118 keys) and ~12 are point-mode
+           overhead. NONE of it is ☆-legal. Anchors buy nothing on a board with no fill, so a
+           star for them would reward a keystroke with no consequence in the end state. Pointing
+           is the SLOWER side, so a star for it is the `growth` shape — negative value. Typing is
+           the default, so a star for THAT auto-earns and fails §1.0-R2(i). Chord-vs-ribbon is
+           EMPTY by construction (the engine has no ribbon route into formula entry — the r439
+           `wrapfix` finding), and formatting is forbidden outright by §1.0(d), which is exactly
+           what the §4.57 page proposed ("Percent-format the WACC cell … and bold it").
+         VERDICT: the drill KEEPS (the lesson is canonical, has no twin in the catalog, and the
+           §1.0-R4(t) reality test passes on the artifact) and the BOARD gains the repeated
+           formula it never had — five comps instead of one. Fixed at the BOARD, never at the
+           predicate (the r438 `series` rule).
+         ON THE REBUILT BOARD — the star ISOLATED (r438: measure each move against its own slow
+           alternative, never a combined number): one anchored formula + one fill covers the
+           comp column in 24 keys against 85 to type the five separately — the star is worth 61
+           keys (3.54× on the move itself), the largest single decision on the page. Board spread
+           102 → 251 keys = 2.46× across thirteen walked routes,
+           and the surviving spread is FILL-versus-RETYPE, which is precisely the mastery move
+           §1.0(d) names. SKIPPABLE, measured not asserted: ALT 2 is the negative control — five
+           typed formulas, no fill anywhere, all six cores green and the ☆ DARK.
+         FORMAT DEGRADATION CHECK (r439 `cases`): the star is a fill over a block, so the whole
+           comp column ships with ONE format (comma, 2dp) — the head cell cannot carry a format
+           into the block that differs from what a typed route would leave. Confirmed on the win
+           screenshot, not only in the predicate.
+
+       ── DISTINCTNESS (CAMPAIGN §3 discriminator, asked before anything was built): the nearest
+       neighbours are `comps`/`txncomps` (both take a MEDIAN down a peer column) and `dcf` (which
+       CONSUMES this number). Fluency in `comps` produces a correct first attempt at the median
+       row here and at nothing else on the page — the unlevering identity, the relever at a
+       DIFFERENT capital structure, CAPM and the two-sided weighting are all absent there, and
+       the median is one of six beats. Fluency here produces no attempt at all at a trading
+       multiple. Distinct, and the shared median is spaced practice, not redundancy.
+
+       ── THE BOARD (§1.0-R4(t) reality test: would a real person, at a real job, with a real
+       reason, produce this file this week — and recognise it as their own?). §3.1 puts Models I
+       at B-heavy and names valuation craft as the family; a beta page feeding a DCF is exactly
+       what an associate builds the night before the model goes up. Audience A meets the same
+       page as the hurdle rate behind a capital request, and the craft — one anchored formula
+       down a column, a median, a weighted average — is identical either way, so neither audience
+       is a guest (rule 5). The board is a COMPONENT of a valuation build, not the valuation:
+       the beta/discount-rate strip only (DEPTH_PASS §1.3, MODELING_STANDARDS §7).
+
+       MODELING_STANDARDS conventions this board follows: §1 colour-as-provenance (every typed
+       input blue, every built cell black); §1 the input convention (§1.0(f)/§1.0-R2(l): the six
+       assumptions ship POPULATED, light yellow + all borders, vertically stacked, individually
+       labelled, under an "Assumptions" block title); §1 structure (units in the header, the two
+       summary lines wear a TOP border and never a rule underneath); §4 the standard forms,
+       exactly — βu = βl/(1+(1−t)×D/E), relevered at the TARGET's own D/E, Re = Rf + β×ERP,
+       WACC = E/(D+E)×Re + D/(D+E)×Rd×(1−t); §4 comps lead with the MEDIAN, never the mean; §1's
+       no-hardcodes-inside-formulas rule holds in the seeded content (the tax rate, the two
+       market values and every peer figure are labelled blue cells the formulas point at).
+       DELIBERATE SIMPLIFICATIONS, stated in a code comment AND in the board's own memo line
+       (MODELING_STANDARDS §7): one marginal tax rate unlevers every peer rather than each peer's
+       own effective rate; no size or country premium in CAPM; the target is levered at its
+       CURRENT market capital structure rather than a target/optimal one. Circularity (§5) never
+       arises — nothing here reads an interest expense.
+
+       DEVIATIONS from the §4.57 page, declared here per §0 (and in the payload):
+       (1) ☆ RE-CUT (binding, §1.0(d) + §1.0-R4(u)). The page's bonus is a formatting task and
+           dies on the letter of §1.0(d). NOT promoted to a core beat under (u)'s "where the
+           killed ☆ was real work" clause, because on this board it is not work: the WACC cell
+           ships percent-formatted and bold (§2.1b — where the lesson is not formatting, the
+           board ships pre-dressed), so the beat would have graded a state the build hands the
+           player for free. Replaced by the fill, measured above.
+       (2) THE BOARD GAINS A FIVE-COMP BETA SET. Forced by the diagnostic — one peer cannot carry
+           a legal ☆ — and it is the more standard page besides (a beta is sourced from a comp
+           set, and the median is the headline: MODELING_STANDARDS §4). Beat count 5 → 6 core,
+           inside §1.1's 4–6.
+       (3) ROWS 14 → 20 (§1.3, floor and cap; the r440 ruling). 15 of 20 rows carry content at
+           both load and win = 75%, against the ≥60% target.
+       (4) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an existing labelled
+           cell in a labelled row or column — no insert slot, no empty paste target — so the
+           guided ring expresses all six core beats. No beat targets a spilling cell either (the
+           title and the two memo lines are board furniture, never graded).
+       (5) NO ADAPTIVE LABEL (§1.0-R2(g)): no beat's required ACTION varies by seed — only the
+           figures move — so a per-seed label would state a fact the player never has to
+           reverse-engineer. Declared rather than silently skipped.
+       (6) Language pass per §1.7/§1.0(b)/§1.0-R3(n): the five shipped labels named cells
+           ("unlever beta at B10"), taught ("interest is deductible; equity isn't") and leaked the
+           route. The six here are outcome-first, verb-first from the closed list, board-labelled,
+           with an em-dash clause that says WHAT or WHERE and never WHY. */
+    name:'WACC', label:'Build the discount rate', par:112, parKeys:107, saveClose:true,   /* r444 §4.57 depth pass: par re-swept from scratch (was par 78 / parKeys 82 on the single-peer ROWS:14 board with no save closer). dev/e2e-par-sweep.js wacc, 5-seed median 107 keys including the engine-appended Ctrl+S — flat across seeds, because the randomization moves figures, names and the anchor column but never the beat count or a formula's length. par 112 ≈ 1.05 s/key, the house band. The count grew with the board: a five-comp beta set and its median where there was one peer, plus the closer. That puts wacc at the top of the Models I band (fcfbuild 32 · txncomps 36 · dcf 62 · comps 94) — it is the chapter's longest build, and it is the one the rest of the chapter consumes. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 2:48 · pro 2:09 · legendary 1:52. */
+    aha:'a discount rate is built, not quoted — five comps, one median, and the last line just weights the two sides.',
+    /* §1.5: the aha's MOMENT is beat 6 — the weighted line lands and the number the whole DCF
+       hangs on turns out to be nothing but the five assumptions above it, in proportion. */
+    prompt:'The DCF goes up to the MD tomorrow morning and the discount rate is still an empty cell. Five comps sit on the page with their broker betas, each one levered at its own balance sheet — strip that leverage out of all five, take the median, and relever it at this target’s own debt and equity. Then price the equity side with CAPM — the risk-free rate plus beta times the equity risk premium — tax-effect the debt side, and weight the two off one denominator.',
+    req(){ const o=this._o; return '<em>'+o.CD+o.p0+'</em> unlevered β <em>='+o.CB+o.p0+'/(1+(1-$'+o.CG+'$'+o.aTax+')*'+o.CC+o.p0+')</em> · fill '+o.CD+o.p0+':'+o.CD+o.pN+' ↓ · <em>'+o.CD+o.rMed+'</em> <em>=MEDIAN('+o.CD+o.p0+':'+o.CD+o.pN+')</em> · <em>'+o.CD+o.rRel+'</em> relevered β <em>='+o.CD+o.rMed+'*(1+(1-'+o.CG+o.aTax+')*'+o.CG+o.aDb+'/'+o.CG+o.aEq+')</em> · <em>'+o.CD+o.rKe+'</em> Ke <em>='+o.CG+o.aRf+'+'+o.CD+o.rRel+'*'+o.CG+o.aErp+'</em> · <em>'+o.CD+o.rKd+'</em> <em>='+o.CG+o.aKd+'*(1-'+o.CG+o.aTax+')</em> · <em>'+o.CD+o.rW+'</em> <em>=('+o.CG+o.aEq+'*'+o.CD+o.rKe+'+'+o.CG+o.aDb+'*'+o.CD+o.rKd+')/('+o.CG+o.aEq+'+'+o.CG+o.aDb+')</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that GRADES, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'each comp is levered at its OWN balance sheet, so the leverage comes out at its own D/E · on '+o.CD+o.p0+': <kbd>='+o.CB+o.p0+'/(1+(1-$'+o.CG+'$'+o.aTax+')*'+o.CC+o.p0+')</kbd> <kbd>↵</kbd> — the tax cell anchored so the formula can travel · then take it down: select '+o.CD+o.p0+':'+o.CD+o.pN+' and <kbd>ctrl</kbd>+<kbd>d</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>d</kbd> is the same fill, and a copy of the first cell pasted over the other four lands it too). Five separate formulas grade the same, they only cost the keys',
+      'the comp set’s headline read: <kbd>=MEDIAN('+o.CD+o.p0+':'+o.CD+o.pN+')</kbd> on '+o.CD+o.rMed+' — the median, not the mean, so one comp with a strange structure cannot set the discount rate. Pointing at the middle value grades the same number',
+      'relever the median at the TARGET’s structure, not the comps’: <kbd>='+o.CD+o.rMed+'*(1+(1-'+o.CG+o.aTax+')*'+o.CG+o.aDb+'/'+o.CG+o.aEq+')</kbd> on '+o.CD+o.rRel+' — debt over equity comes off the two market values, so there is no second D/E input to keep in step. Anchored or not, either grades',
+      'CAPM on '+o.CD+o.rKe+': <kbd>='+o.CG+o.aRf+'+'+o.CD+o.rRel+'*'+o.CG+o.aErp+'</kbd> — the risk-free rate plus the relevered beta times the equity risk premium',
+      'the debt side carries a tax shield: <kbd>='+o.CG+o.aKd+'*(1-'+o.CG+o.aTax+')</kbd> on '+o.CD+o.rKd+' · <kbd>='+o.CG+o.aKd+'-'+o.CG+o.aKd+'*'+o.CG+o.aTax+'</kbd> is the same number and grades the same',
+      'both sides over ONE denominator on '+o.CD+o.rW+': <kbd>=('+o.CG+o.aEq+'*'+o.CD+o.rKe+'+'+o.CG+o.aDb+'*'+o.CD+o.rKd+')/('+o.CG+o.aEq+'+'+o.CG+o.aDb+')</kbd> — the two market values are the weights · the weight-times-cost form <kbd>='+o.CG+o.aEq+'/('+o.CG+o.aEq+'+'+o.CG+o.aDb+')*'+o.CD+o.rKe+'+'+o.CG+o.aDb+'/('+o.CG+o.aEq+'+'+o.CG+o.aDb+')*'+o.CD+o.rKd+'</kbd> lands the same rate',
+      '☆ the discovery: the whole comp column written ONCE and taken down in a single pass — anchor the tax cell and one fill covers all five. Typing five formulas clears the beat and forfeits it',
     ]; },
+    /* rings: ① the comp column · ② the median · ③ relevered beta · ④ cost of equity ·
+       ⑤ after-tax cost of debt · ⑥ the WACC cell · ☆ never ringed (§2.2) */
+    targets(){ const o=this._o; return [o.CD+o.p0+':'+o.CD+o.pN, o.CD+o.rMed, o.CD+o.rRel, o.CD+o.rKe, o.CD+o.rKd, o.CD+o.rW, null]; },
+    /* the demo BUILDS its own fill selection with Shift+arrow rather than being handed it by
+       setDemoSel, so parKeys measures what a player really pays for the range grab instead of
+       eliding it (the r438 `series` rule). setDemoSel only parks the cursor on the next anchor. */
+    demo(){ const o=this._o; return [
+      {sel:o.CD+o.p0, keys:[...T('='+o.CB+o.p0+'/(1+(1-$'+o.CG+'$'+o.aTax+')*'+o.CC+o.p0+')'), Kb.enter]},
+      /* the ☆ — one anchored formula taken down the whole comp column in a single pass */
+      {sel:o.CD+o.p0, keys:[{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true},{key:'ArrowDown',shift:true}, Kb.fillD]},
+      {sel:o.CD+o.rMed, keys:[...T('=MEDIAN('+o.CD+o.p0+':'+o.CD+o.pN+')'), Kb.enter]},
+      {sel:o.CD+o.rRel, keys:[...T('='+o.CD+o.rMed+'*(1+(1-'+o.CG+o.aTax+')*'+o.CG+o.aDb+'/'+o.CG+o.aEq+')'), Kb.enter]},
+      {sel:o.CD+o.rKe,  keys:[...T('='+o.CG+o.aRf+'+'+o.CD+o.rRel+'*'+o.CG+o.aErp), Kb.enter]},
+      {sel:o.CD+o.rKd,  keys:[...T('='+o.CG+o.aKd+'*(1-'+o.CG+o.aTax+')'), Kb.enter]},
+      {sel:o.CD+o.rW,   keys:[...T('=('+o.CG+o.aEq+'*'+o.CD+o.rKe+'+'+o.CG+o.aDb+'*'+o.CD+o.rKd+')/('+o.CG+o.aEq+'+'+o.CG+o.aDb+')'), Kb.enter]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 WACC build',txt:true,bold:true};
-      const rf=rnd(35,45)/1000, erp=rnd(45,60)/1000, pb=rnd(90,140)/100, pde=rnd(30,80)/100, tx=rnd(21,28)/100;
-      const E=rnd(40,90)*10, D=rnd(20,60)*10, kd=rnd(5,8)/100;
-      const rows=[[2,'Risk-free rate',rf,'percent',2],[3,'Equity risk premium',erp,'percent',2],
-        [4,'Peer levered beta',pb,null,2],[5,'Peer D/E',pde,null,2],[6,'Tax rate',tx,'percent',0],
-        [7,'Equity value',E,'comma',0],[8,'Debt value',D,'comma',0],[9,'Cost of debt, pre-tax',kd,'percent',1]];
-      rows.forEach(([r,n,v,f,d])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
-        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:f,decimals:d}; });
-      cells['A10']={...blankCell(),value:'Unlevered beta',txt:true};   cells['B10']={...blankCell(),decimals:2};
-      cells['A11']={...blankCell(),value:'Relevered beta',txt:true};   cells['B11']={...blankCell(),decimals:2};
-      cells['A12']={...blankCell(),value:'Cost of equity',txt:true};   cells['B12']={...blankCell(),fmtStyle:'percent',decimals:2};
-      cells['A13']={...blankCell(),value:'After-tax cost of debt',txt:true}; cells['B13']={...blankCell(),fmtStyle:'percent',decimals:2};
-      cells['A14']={...blankCell(),value:'WACC',txt:true,bold:true};   cells['B14']={...blankCell(),fmtStyle:'percent',decimals:2,bold:true};
-      const bu=pb/(1+(1-tx)*pde), bl=bu*(1+(1-tx)*D/E), ke=rf+bl*erp, akd=kd*(1-tx);
-      this._exp={bu:bu, bl:bl, ke:ke, akd:akd, wacc:(E*ke+D*akd)/(E+D)};
-      return {ROWS:14, cells, active:{r:10,c:2}, sel:null, colW:{1:168,2:92}};
+      const pickN=(pool,n)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b.slice(0,n); };
+      /* §1.2 randomization — THREE independent axes (the page asks for the axes to be verified;
+         the shipped board had only one, values). (a) SITE: this is a full-grid artifact (15 of
+         20 rows), so per §1.2 the site axis is CORNER JITTER — the whole page anchors at column
+         A or column B. (b) CONTENT: the codename plus five peer names Fisher-Yates drawn from a
+         ten-name pool. (c) VALUES: every figure through rnd(). Geometry (five comps, six
+         assumptions, four build lines) is CONSTANT across seeds, so the key count never moves
+         with the draw — the r439 `wrapfix` rule. */
+      const c0=rnd(0,1)?1:2;                                   // (a) corner jitter
+      const CA=colLetter(c0), CB=colLetter(c0+1), CC=colLetter(c0+2), CD=colLetter(c0+3),
+            CF=colLetter(c0+5), CG=colLetter(c0+6);            // column c0+4 is the moat (§3 geometry)
+      const HR=4, P0=5, PN=9, RMED=10, RTIT=12, RREL=13, RKE=14, RKD=15, RW=16, RMEMO=18;
+      const ARF=5, AERP=6, ATAX=7, AKD=8, AEQ=9, ADB=10;       // the assumption stack, rows 5–10
+      const NAMES=pickN(['Falcon Industrial','Atlas Group','Copper Peak','Summit Holdings','Ironline plc',
+        'Redrock Ltd.','Northgate Corp.','Bluewater Co.','Castlebar','Meridian Works'],5);
+      cells[CA+'1']={...blankCell(),value:codename()+' — WACC build',txt:true,bold:true};
+      cells[CA+'2']={...blankCell(),value:'Source: broker betas, five-year weekly · basis: $ in millions',txt:true,it:true,fontColor:'gray'};
+      /* the peer table: headers bold with a bottom rule under them (doctrine §2.1b) */
+      cells[CA+HR]={...blankCell(),value:'Peer',txt:true,bold:true,bb:true};
+      cells[CB+HR]={...blankCell(),value:'Levered beta',txt:true,bold:true,align:'r',bb:true};
+      cells[CC+HR]={...blankCell(),value:'Debt / equity',txt:true,bold:true,align:'r',bb:true};
+      cells[CD+HR]={...blankCell(),value:'Unlevered beta',txt:true,bold:true,align:'r',bb:true};
+      const tax=rnd(21,27)/100;
+      const bu=[];
+      for(let i=0;i<5;i++){
+        const bl=rnd(85,155)/100, de=rnd(20,85)/100;
+        cells[CA+(P0+i)]={...blankCell(),value:NAMES[i],txt:true};
+        cells[CB+(P0+i)]={...blankCell(),value:bl,fontColor:'blue',fmtStyle:'comma',decimals:2};
+        cells[CC+(P0+i)]={...blankCell(),value:de,fontColor:'blue',fmtStyle:'comma',decimals:2};
+        /* the ☆ is a fill over this column, so EVERY cell in it ships the SAME format — the
+           r439 `cases` hazard (a fill carries the head cell's format into the block) cannot
+           make the star route leave a worse board than the typed route. */
+        cells[CD+(P0+i)]={...blankCell(),fmtStyle:'comma',decimals:2};
+        bu.push(bl/(1+(1-tax)*de));
+      }
+      /* §1.0(f): a summary line earns the rule ABOVE it, never underneath — carried across the
+         table's four columns so the rule reads as one line. */
+      [CA,CB,CC,CD].forEach(c=>{ cells[c+RMED]={...blankCell(),bt:true}; });
+      cells[CA+RMED]={...blankCell(),value:'Median unlevered beta',txt:true,bold:true,bt:true};
+      cells[CD+RMED]={...blankCell(),fmtStyle:'comma',decimals:2,bold:true,bt:true};
+      /* §1.0(f) + §1.0-R2(l): the assumption stack — populated, light yellow, all borders,
+         vertically stacked, INDIVIDUALLY labelled, blue for provenance (MODELING_STANDARDS §1).
+         Never graded targets; they are the inputs the built lines point at. */
+      const rf=rnd(38,46)/1000, erp=rnd(50,65)/1000, kd=rnd(50,75)/1000;
+      const E=rnd(40,120)*10, D=Math.round(E*rnd(25,65)/1000)*10;   // D/E held to 0.25–0.65, a real target structure
+      cells[CF+HR]={...blankCell(),value:'Assumptions',txt:true,bold:true,bb:true};
+      cells[CG+HR]={...blankCell(),bb:true};
+      [[ARF,'Risk-free rate',rf,'percent',1],[AERP,'Equity risk premium',erp,'percent',1],
+       [ATAX,'Marginal tax rate',tax,'percent',0],[AKD,'Cost of debt, pre-tax',kd,'percent',1],
+       [AEQ,'Equity value ($mm)',E,'comma',0],[ADB,'Debt value ($mm)',D,'comma',0]].forEach(([r,n,v,f,d])=>{
+        cells[CF+r]={...blankCell(),value:n,txt:true};
+        cells[CG+r]={...blankCell(),value:v,fontColor:'blue',fill:'yellow',ball:true,fmtStyle:f,decimals:d}; });
+      /* the discount-rate strip */
+      [CA,CB,CC,CD].forEach(c=>{ cells[c+RTIT]={...blankCell(),bb:true}; });
+      cells[CA+RTIT]={...blankCell(),value:'Cost of capital',txt:true,bold:true,bb:true};
+      cells[CA+RREL]={...blankCell(),value:'Relevered beta',txt:true};
+      cells[CD+RREL]={...blankCell(),fmtStyle:'comma',decimals:2};
+      cells[CA+RKE]={...blankCell(),value:'Cost of equity',txt:true};
+      cells[CD+RKE]={...blankCell(),fmtStyle:'percent',decimals:1};
+      cells[CA+RKD]={...blankCell(),value:'After-tax cost of debt',txt:true};
+      cells[CD+RKD]={...blankCell(),fmtStyle:'percent',decimals:1};
+      /* §2.1b: the lesson here is the build, not the dress, so the headline line ships already
+         dressed — bold, percent to one decimal, and the top border a total earns (§1.0(f)). */
+      [CA,CB,CC].forEach(c=>{ cells[c+RW]={...blankCell(),bt:true}; });
+      cells[CA+RW]={...blankCell(),value:'WACC',txt:true,bold:true,bt:true};
+      cells[CD+RW]={...blankCell(),fmtStyle:'percent',decimals:1,bold:true,bt:true};
+      /* MODELING_STANDARDS §7: a simplification the player is not told about is a habit they
+         will be corrected for on a desk, so the board says it out loud. */
+      cells[CA+RMEMO]={...blankCell(),value:'Memo: one marginal tax rate unlevers every comp; no size premium; target levered at market values',txt:true,it:true,fontColor:'gray'};
+      const med=bu.slice().sort((a,b)=>a-b)[2];
+      const rel=med*(1+(1-tax)*D/E), ke=rf+rel*erp, akd=kd*(1-tax), wacc=(E*ke+D*akd)/(E+D);
+      this._o={CA:CA,CB:CB,CC:CC,CD:CD,CF:CF,CG:CG,c0:c0,co:c0+3,
+               hr:HR,p0:P0,pN:PN,rMed:RMED,rRel:RREL,rKe:RKE,rKd:RKD,rW:RW,
+               aRf:ARF,aErp:AERP,aTax:ATAX,aKd:AKD,aEq:AEQ,aDb:ADB,
+               bu:bu,med:med,rel:rel,ke:ke,akd:akd,wacc:wacc};
+      const colW={}; colW[c0]=176; colW[c0+1]=104; colW[c0+2]=110; colW[c0+3]=118;
+      colW[c0+4]=24; colW[c0+5]=172; colW[c0+6]=88;
+      return {ROWS:20, cells, active:{r:P0,c:c0+3}, sel:null, colW:colW};
     },
     checks(S){
-      const live=(k,exp,ref)=>{ const c=S.cells[k]; if(!c||!c.formula||typeof c.value!=='number') return false;
-        if(Math.abs(c.value-exp)>Math.max(1e-4,Math.abs(exp)*2e-3)) return false;
-        return !ref || String(c.formula).replace(/\$/g,'').toUpperCase().includes(ref); };
-      const e=this._exp;
+      const o=this._o;
+      /* §1.0-R3(p) GRADE THE END STATE. Every predicate reads the NUMBER standing in the cell.
+         The only thing read out of formula text is a LIVENESS PROXY — "this cell points at some
+         other cell" — which is what the §1.7 verb `Build` means and what the three untriggerable
+         beats recorded above were reaching for the wrong way. It names no range, no function, no
+         anchor and no particular cell, so it cannot lock out a route: every route that computes
+         the number on the sheet references something, and the only route it excludes is a
+         hand-computed constant, which "Build" excludes by definition (the doctrine §2.2
+         live-formula exception, same as `balance`/`foot`/`versionup`).
+         Tolerance is 0.75% relative: a player who chains off a DISPLAYED 2-decimal beta instead
+         of the cell is at most 0.55% out, so the honest route clears, while every modelling error
+         that matters (a missing (1−t), the mean for the median, the peers' D/E for the target's)
+         is an order of magnitude larger and fails. */
+      const live=(k,exp)=>{ const c=S.cells[k];
+        if(!c||!c.formula||typeof c.value!=='number') return false;
+        if(!/[A-J]\$?\d{1,2}/i.test(String(c.formula))) return false;
+        return Math.abs(c.value-exp)<=Math.abs(exp)*0.0075; };
+      const peerOk=o.bu.every((x,i)=>live(o.CD+(o.p0+i),x));
+      const medOk=live(o.CD+o.rMed,o.med);
+      const relOk=live(o.CD+o.rRel,o.rel);
+      const keOk=live(o.CD+o.rKe,o.ke);
+      const kdOk=live(o.CD+o.rKd,o.akd);
+      const wOk=live(o.CD+o.rW,o.wacc);
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): the comp
+         column written ONCE and taken down in a SINGLE pass. Read off the r424 S.fillOps and
+         r425 S.pasteLog latches — the MECHANIC, never geometry inferred from the end state — so
+         Ctrl+D, the ribbon's Alt H F I D and a copy of the head cell pasted over the rest all
+         earn it (§1.0(c): the star grades the DECISION to cover the block in one pass, never the
+         chord that does it). One op must cover every cell below the head: two half-fills are not
+         one pass. Measured 24 keys against 85 typed; the typed route clears all six cores with
+         the star dark (dev/e2e-alt-paths.js ALT 2, the negative control). */
+      const ops=S.fillOps||[], pl=S.pasteLog||[];
+      const onePass=(ops.some(f=>f.dir==='down'&&f.c1<=o.co&&f.c2>=o.co&&f.r1<=o.p0+1&&f.r2>=o.pN))
+                 || (pl.some(p=>p.c0<=o.co&&p.c0+(p.w||1)-1>=o.co&&p.r0<=o.p0+1&&p.r0+(p.h||1)-1>=o.pN));
       return [
-        {label:'strip the peer\u2019s leverage out \u2014 unlever beta at B10', ok: live('B10',e.bu,'B4')},
-        {label:'relever at the target\u2019s OWN D/E \u2014 chain B11 off B10, don\u2019t retype', ok: live('B11',e.bl,'B10')},
-        {label:'CAPM the cost of equity at B12 \u2014 risk-free + \u03b2 \u00d7 equity risk premium, off the relevered beta', ok: live('B12',e.ke,'B11')},
-        {label:'tax-effect the debt side at B13 \u2014 Kd \u00d7 (1 \u2212 tax)', ok: live('B13',e.akd,'B9')},
-        {label:'weight both sides off ONE denominator at B14 \u2014 live all the way down', ok: live('B14',e.wacc,'B12')&&live('B14',e.wacc,'B13')},
+        {label:'Build the unlevered beta for every comp — all five', ok: peerOk},
+        {label:'Build the median unlevered beta', ok: medOk},
+        {label:'Build the relevered beta — at the target’s own debt and equity', ok: relOk},
+        {label:'Build the cost of equity', ok: keOk},
+        {label:'Build the after-tax cost of debt', ok: kdOk},
+        {label:'Build the WACC — both sides weighted off one denominator', ok: wOk},
+        {label:'Fill the unlevered beta column — one anchored formula, no comp retyped', ok: peerOk&&onePass, bonus:true},
       ];
     }
   },

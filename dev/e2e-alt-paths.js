@@ -1600,13 +1600,41 @@ const ALTS = [
         st.push({sel:o.fyL+rr,   keys:[...T('='+CL(4)+rr+'*(1+'+o.cagrL+rr+')^3'),{key:'Enter'}]});
         st.push({sel:o.cagrL+rr, keys:[...T('=('+CL(4)+rr+'/'+CL(0)+rr+')^(1/4)-1'),{key:'Enter'}]}); }
       return st; }` },
-  { key: 'wacc', name: 'debt side first — at-Kd before the beta chain', moves: `C => [
-      {sel:'B13', keys:[...T('=B9*(1-B6)'),{key:'Enter'}]},
-      {sel:'B10', keys:[...T('=B4/(1+(1-B6)*B5)'),{key:'Enter'}]},
-      {sel:'B11', keys:[...T('=B10*(1+(1-B6)*B8/B7)'),{key:'Enter'}]},
-      {sel:'B12', keys:[...T('=B2+B11*B3'),{key:'Enter'}]},
-      {sel:'B14', keys:[...T('=(B7*B12+B8*B13)/(B7+B8)'),{key:'Enter'}]},
-    ]` },
+  /* r444 §4.57 depth pass — the single shipped entry ("debt side first", hard-coded B10..B14 off
+     the retired single-peer ROWS:14 board) is DELETED and replaced by this pair; nothing else in
+     the file is touched (CAMPAIGN §4: for the reworked drill, the agent's side is authoritative
+     for deletions as well as additions — never union).
+     ALT 1 = op ORDER + chord ROUTE, and it is also the §1.0-R3(p) END-STATE proof: the WACC line
+     is written SECOND, off two cells that do not exist yet, so it reads a wrong rate for most of
+     the run and recalcs into the right one when the equity side finally lands. The comp column
+     travels by the ribbon fill (Alt H F I D), which is the same latch as Ctrl+D — so the ☆ still
+     fires, which is the point: the star grades the DECISION to cover the block in one pass, never
+     the chord that does it (§1.0(c)). */
+  { key: 'wacc', name: 'op ORDER — debt side and the WACC line written FIRST (both read empty cells and recalc), comp column by ribbon fill, median last-in — ☆ still earned', moves: `C => { const o=C._o; return [
+      {sel:o.CD+o.rKd,  keys:[...T('='+o.CG+o.aKd+'*(1-'+o.CG+o.aTax+')'),{key:'Enter'}]},
+      {sel:o.CD+o.rW,   keys:[...T('=('+o.CG+o.aEq+'*'+o.CD+o.rKe+'+'+o.CG+o.aDb+'*'+o.CD+o.rKd+')/('+o.CG+o.aEq+'+'+o.CG+o.aDb+')'),{key:'Enter'}]},
+      {sel:o.CD+o.p0,   keys:[...T('='+o.CB+o.p0+'/(1+(1-$'+o.CG+'$'+o.aTax+')*'+o.CC+o.p0+')'),{key:'Enter'}]},
+      {sel:o.CD+o.p0+':'+o.CD+o.pN, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:o.CD+o.rMed, keys:[...T('=MEDIAN('+o.CD+o.p0+':'+o.CD+o.pN+')'),{key:'Enter'}]},
+      {sel:o.CD+o.rRel, keys:[...T('='+o.CD+o.rMed+'*(1+(1-'+o.CG+o.aTax+')*'+o.CG+o.aDb+'/'+o.CG+o.aEq+')'),{key:'Enter'}]},
+      {sel:o.CD+o.rKe,  keys:[...T('='+o.CG+o.aRf+'+'+o.CD+o.rRel+'*'+o.CG+o.aErp),{key:'Enter'}]},
+    ]; }` },
+  /* ALT 2 = the MEASURED NEGATIVE CONTROL for the ☆ (§1.0-R2(i) skippability, proved rather than
+     asserted) and, at the same time, the walk that kills the three untriggerable beats the
+     shipped board carried. No fill anywhere — five comps typed one at a time, bottom-up, every
+     reference $-anchored; the median taken with SMALL(range,3) instead of MEDIAN; the relever
+     written as βu + βu×(1−t)×D/E; the after-tax line as Kd − Kd×t; and the WACC in the
+     weight-times-cost form, which names neither denominator the shipped predicate demanded.
+     All six cores clear, the ☆ goes DARK (§1.0(c): the slow route is never penalised, it just
+     costs the keys — 85 against 24, measured in dev/verify-wacc.js §B). */
+  { key: 'wacc', name: 'NEGATIVE CONTROL — no fill at all, five comps typed bottom-up with $-anchors, SMALL(,3) for the median, weight×cost WACC (cores clear, ☆ forfeited)', moves: `C => { const o=C._o; const A=(c,r)=>'$'+c+'$'+r; const W='('+o.CG+o.aEq+'+'+o.CG+o.aDb+')'; const st=[];
+      for(let i=4;i>=0;i--) st.push({sel:o.CD+(o.p0+i), keys:[...T('='+A(o.CB,o.p0+i)+'/(1+(1-'+A(o.CG,o.aTax)+')*'+A(o.CC,o.p0+i)+')'),{key:'Enter'}]});
+      st.push({sel:o.CD+o.rMed, keys:[...T('=SMALL('+A(o.CD,o.p0)+':'+A(o.CD,o.pN)+',3)'),{key:'Enter'}]});
+      st.push({sel:o.CD+o.rRel, keys:[...T('='+o.CD+o.rMed+'+'+o.CD+o.rMed+'*(1-'+o.CG+o.aTax+')*'+o.CG+o.aDb+'/'+o.CG+o.aEq),{key:'Enter'}]});
+      st.push({sel:o.CD+o.rKe,  keys:[...T('='+o.CD+o.rRel+'*'+o.CG+o.aErp+'+'+o.CG+o.aRf),{key:'Enter'}]});
+      st.push({sel:o.CD+o.rKd,  keys:[...T('='+o.CG+o.aKd+'-'+o.CG+o.aKd+'*'+o.CG+o.aTax),{key:'Enter'}]});
+      st.push({sel:o.CD+o.rW,   keys:[...T('='+o.CG+o.aEq+'/'+W+'*'+o.CD+o.rKe+'+'+o.CG+o.aDb+'/'+W+'*'+o.CD+o.rKd),{key:'Enter'}]});
+      return st; }` },
   { key: 'txncomps', name: 'tape filled via ctrl+d, MEDIAN typed last-first', moves: `C => [
       {sel:'D3', keys:[...T('=B3/C3'),{key:'Enter'}]},
       {sel:'D3:D7', keys:[{key:'d',ctrl:true}]},
