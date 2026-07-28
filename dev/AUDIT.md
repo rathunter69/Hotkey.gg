@@ -1489,7 +1489,7 @@ requirement baked into core, and §1.2 axes that existed on paper but not in the
   axes draw from pools, the page jitters, and the deal list varies 9–11 rows.
 - **PAR:** 65/68 → **68/62**.
 - **TESTS (both):** replay 3/3 · depth-contract PASS · guided PASS · alt-paths 2/2 each (all four
-  rebuilt) · par-sweep FLAGGED 0 · invariants clean · full catalog green · drills.js?v=296→298.
+  rebuilt) · par-sweep FLAGGED 0 · invariants clean · full catalog green · drills.js?v=297→298.
 
 ## r429 H6b-5 — cagr + bridge (DEPTH_PASS §4.26/§4.27 + D10) — wave 5 at 7 of 12
 ### cagr — "Compound it, three times"
@@ -1520,7 +1520,7 @@ requirement baked into core, and §1.2 axes that existed on paper but not in the
   contract earning its keep on its first wave.**
 - **PAR:** 10/6 → **29/26**. D10 finished: tab → 'Point', desc de-hinted.
 - **TESTS (both):** replay 3/3 · depth-contract PASS · guided PASS · alt-paths 2/2 each (all four
-  rebuilt) · par-sweep FLAGGED 0 · invariants clean · drills.js?v=296→296.
+  rebuilt) · par-sweep FLAGGED 0 · invariants clean · drills.js?v=297→296.
 - **RECURRING TRAP, worth a standing note:** cagr hit the **C9 static-parser** hole again —
   guide/targets built with `.map()/.push()` read as `null`, so the tri-length guard silently stops
   covering the drill. Third occurrence (margin, cagr). **Build these arrays as LITERALS.**
@@ -10659,3 +10659,503 @@ A third latent one was killed before it shipped: `Alt H B A` stores `ball`, **no
 **DISTINCTNESS** (§1.0-R3(s), asked before anything was built): nearest neighbours are `foot` (cross-footing) and `balance` (the two-sided check row). Fluency in either gets you the two SUMs and the check and tells you nothing about a **PLUG** — one line on the page defined as whatever makes the two sides agree, so the check reads zero by construction rather than by luck. No other board in the catalog carries that inversion. **KEEP.**
 
 ---
+
+
+# ROUND r446 — MODELS II OPENS 5/10: wave 3 (schedule · intsched · lbo · revolver · waterfall)
+
+
+_Orchestrator note. Agents ran concurrently and tagged their entries r444 or r446; this batch is
+r446. Untriggerable-beat arithmetic, reconciled: the count stood at 35 after wave 2; wave 3's
+shipped-board finds are schedule 1 (Alt H B A stores `ball`, never `bt`) · intsched 4 (all four
+checks read formula TEXT) · lbo 2 (IRR text scan for `B12`/`B13`) · revolver 2 (`bt`-only border +
+`MIN(` text scan) · waterfall 2 — **the campaign total is 46**. Per-entry "campaign bug #N" and
+"running total" claims below are superseded by this note (agents cannot see each other's counts)._
+
+_Ops notes earned by this wave: (1) verify-revolver.js shipped with its default URL pinned to the
+agent's own port 8879 — normalized to 8791 at assembly; probes must default to the house port and
+honor URL=. (2) The intsched and lbo ALTS comments carried the r444 tag from their concurrent
+drafts — retagged r446 at batch close; round tags are the assembler's, not the agent's. (3) All
+five agents kept §9.1 file ownership clean this wave (wave 2's football deviation did not recur)._
+
+_☆-family adjudication for chapter c7 (wave-3 half), recorded: menu order is
+schedule | intsched | lbo | revolver | waterfall. The HARD rule (§1.0-R4(u) adjacency) holds on
+every pair under the sub-family taxonomy the Models I close established —
+schedule(fill-census: every built line once, incl. the expanding-anchor memo) |
+intsched(structured-selection: two neighbouring rows in ONE rectangle) |
+lbo(mixed-anchor sweep: two different anchors held, earnable by paste too) |
+revolver(structured-selection: three-row block grab) |
+waterfall(paste: chord-vs-ribbon paste-formulas). intsched and revolver share the
+structured-selection sub-family but are NOT adjacent (lbo sits between). The SOFT rule (≤2 per
+family per chapter) is breached again: four fill-latch stars in c7's first half. Accepted on the
+Models I precedent, with the re-cut candidate recorded: if playtest finds them samey, intsched
+moves to its own ground (the coverage ratio — the schedule agent's line: "the coverage ratio is
+intsched's own ground"), since revolver's block grab has the strongest board-specific
+justification (the corkscrew is the only shape where a three-row grab is the natural move).
+Wave-4 agents (covtable · liqbridge · wk13 · cascade · debtsched) will be briefed to prefer
+non-fill families where their boards allow._
+
+_Queued from this wave: the four-drill border-predicate sweep (`balance` `scrub` `autofit`
+`triage`) — schedule's agent measured the flag table (Alt H B A → `ball`, never `bt`; Alt H B S /
+D also set `bb`) and quoted the four predicates that read `.bt` without accepting `.ball` or that
+negate `.bb`. Seven drills already use the widened form, so this is drift, not design. Each needs
+a walk before the fix, per CAMPAIGN §1._
+
+
+## r446 H6b-c7 — `schedule`: the PP&E roll-forward to standard (DEPTH_PASS §4.68, MODELING_STANDARDS binding)
+_Models II opens. Every number below is `keyLog` through the live engine on the real board,
+medians over 5 seeds, every selection and navigation KEYED (setDemoSel only parks the cursor on
+an anchor cell). The probe is `dev/verify-schedule.js`, which ships with the drill._
+
+### WHAT WAS WRONG WITH THE SHIPPED BOARD
+`ROWS:9` — the smallest declared frame in the catalog, so **eleven of the twenty rendered rows sat
+empty for the whole run** (§1.3: 9/20 = 45%, load and win density identical, which is the tell the
+doc names). Four checks, no ☆, no `saveClose`, no dress beat — so the closing line of a *schedule*
+shipped unruled, against §1.0(f) and MODELING_STANDARDS §1. Labels opened with `run` and
+`build THE LINK`; neither is in the §1.7 closed verb list. And accumulated depreciation began at an
+implied **zero** on an asset base already carrying ~$500mm of net PP&E — not a fixed-asset ledger
+any desk would recognise (§1.0-R4(t) rule 1).
+
+### THE ☆-HEADROOM DIAGNOSTIC, BOTH PARTS, RUN BEFORE THE BOARD WAS DESIGNED
+· **Part 1 — spread.** On the SHIPPED board: taught route **45** keys (flat 45–45), slowest legal
+  route **130** (every year's formula typed, no fill anywhere). **2.89×**, both clearing all four
+  shipped cores.
+· **Part 2 — is any of it ☆-legal?** Of the 85 keys of spread, **zero** are chord-vs-ribbon (the
+  engine has no ribbon route into formula entry, and Ctrl+R and Alt H F I R hit the same latch, so
+  the §1.0(c) forced-to-clear class is EMPTY on a formula-build board — the r439 `wrapfix`
+  composition) and **zero** are formatting (the shipped board graded none). All 85 survive the
+  strip. Legal headroom in the drill's own subject. **KEEP.**
+· **Distinctness** (CAMPAIGN §3, asked before anything was built): the nearest neighbour is
+  `intsched`, next in the chapter. Fluency there produces a correct first attempt at the ROLL and a
+  wrong one at everything else — this schedule has adds AND subs, its closing line is a SUM over a
+  four-row block rather than a two-term subtraction, and its second corkscrew rolls off the FIRST
+  one's output, which no debt schedule does. They are the ASSET schedule and the DEBT schedule, the
+  two components every model carries side by side. **KEEP BOTH.**
+
+### THE ☆ RE-CUT (§1.0-R4(u)) — AND THE DEAD ☆ PROMOTED, NOT DELETED
+The page's bonus was *"Bold the closing row and add a top border above it"* — a FORMATTING task,
+dead on arrival under §1.0(d), and it would fall out of any competent finish (§1.0-R2(i)). It was
+REAL WORK, so per §1.0-R4(u) it is **promoted to core beat 3** (the r425 editfix/dress/ruleoff
+precedent). That is now the **sixth** re-cut formatting ☆ of the campaign.
+
+The replacement is the **fill census** — every built line written once and taken across the years in
+a single pass — the family MODELING_STANDARDS §7 names as the richest a Models board can carry.
+Each half MEASURED SEPARATELY (the r438 `series` rule — a combined number hides a negative half):
+
+| half | filled | typed | saves |
+|---|---|---|---|
+| the opening link | 4 | 9 | 5 |
+| the roll body (dep + closing, ONE rectangle) | 6 | 84 | 78 |
+| the memo | 4 | 21 | 17 |
+
+No half is negative. The link half is the small one and stays in deliberately: it is the half that
+only WORKS because the beginning cell was built as a reference, so dropping it would let the star be
+earned on a board whose corkscrew was retyped. **Skippability MEASURED, not asserted**: the negative
+control (alt-paths entry 2) types every later year, clears all five cores 5/5 seeds, ☆ dark 5/5.
+
+### THE UNTRIGGERABLE BEAT THIS BOARD WOULD HAVE SHIPPED — FOUND BY WALKING, AND IT IS CATALOG-WIDE
+Five border routes were driven end to end and the resulting cell flags read off the live engine
+(`dev/verify-schedule.js` section A2):
+
+| route | `bt` | `ball` | `bb` | a `bt`-only top-border check |
+|---|---|---|---|---|
+| Alt H B P (top) | true | false | false | GREEN |
+| Alt H B D (top+bottom) | true | false | **true** | GREEN |
+| Alt H B S (outside, one row) | true | false | **true** | GREEN |
+| Alt H B T (thick box) | true | false | **true** | GREEN |
+| **Alt H B A (all edges)** | **false** | **true** | false | **DARK** |
+
+`'HBA':c=>c.ball=true` — All Borders never writes `bt`. A predicate asking for `bt` alone leaves the
+All-Borders player looking at a ruled line under a dark checklist item: §1.0-R3(p) exactly. This
+drill's check reads `bt || ball`, and it never rejects `bb` (rejecting a bottom edge kills the
+outside-border route on a single row, since the perimeter collapses).
+
+**The same table condemns four already-shipped drills** (static census over `index.html`; the flag
+behaviour above is measured, the predicates are quoted):
+`balance:10659` `!!(x&&x.bold&&x.bt)` · `scrub:4619` `…tl.bt && tc.bt && !tl.bb && !tc.bb…` ·
+`autofit:6529` `!!c.bold && !!c.bt && !c.bb && !c.bdbl` · `triage:11181` same shape.
+`balance` strands Alt H B A; the other three strand Alt H B A **and** Alt H B S **and** Alt H B D.
+Seven other drills (`decimals` `sort` `bridge` `stalelink` `signerr` `versionup` `sumif`) already use
+the widened `(bt||ball)` form, so this is drift, not design. **Queued as a four-drill sweep.**
+
+### THE BOARD (§1.0-R4(t), audience B per §3.1)
+A five-year fixed-asset page: opening net book value, maintenance and growth capex split the way a
+capex plan actually arrives, depreciation, the closing line the balance sheet reads, and the
+accumulated-depreciation memo underneath, with a two-cell labelled assumption stack.
+**§1.3 density 14/20 = 70% at the win state**, against 45%. The four empty rows inside the board are
+moats between the three blocks (§3 geometry — they stop Ctrl+Shift+↓ riding out of the roll into the
+memo); rows 19–20 are the sheet's bottom margin. Frame: natural 962px, rendering 870px into an 880px
+box at 1440×900 — no `__noShrink`, no width verdict graded.
+
+### PAR RE-SWEPT FROM SCRATCH
+par 35 / parKeys 34 → **par 69 / parKeys 65** (1.06 s/key, the house band). The old 34 was never what
+a player paid: that same demo was HANDED its selections by `setDemoSel`, and measured **45** once the
+selections were keyed (the r438 `series` rule). The new demo builds its own ranges with Shift+arrow.
+**Flat at 65 over 9 seeds (min 65, max 65)** — the geometry is constant and only the column letter
+moves with the corner jitter, so every typed formula is the same length on every draw. Measured
+against it: the slow route runs **184** keys (spread 2.88×). Clocks derive: pass 1:44 · pro 1:19 ·
+legendary 1:09.
+
+### MODELING_STANDARDS COMPLIANCE
+§1 colour-as-provenance (typed inputs blue, built cells black — the year-1 opening ships blue and the
+linked openings render black); §1 totals wear a TOP border, never a rule underneath; §1 units in the
+title (`$mm`), negatives in parentheses; §2 sign convention held (capex ADDS to the asset base,
+depreciation carries its own minus, so the closing line is a clean SUM down the column); §3 the
+corkscrew, twice, with the beginning cell REFERENCING the prior ending; §7 plausible artifact and the
+20-row component rule. Simplifications stated on the board's own note row per §7: straight line on the
+OPENING balance (no mid-year convention, no half-year on new capex) and no disposals.
+
+### PLUMBING
+`HOTKEY_PARS.schedule` 35→69 · drills.js `desc` rewritten · C9 REWORKED +`schedule` ·
+2 alt-path entries replace the 1 stale one · `dev/verify-schedule.js` added. No engine change,
+no telemetry change, no retirement.
+
+Also banked at `/tmp/claude-0/-home-user-Hotkey-gg/09c9181b-f935-589a-927f-3edcd5f88263/scratchpad/intsched/intsched-audit-entry.md`.
+
+```markdown
+### `intsched` §4.69 — "Run the interest schedule" (Models II, drill 2 of 10)
+
+_The chapter's second board and the first Models II drill to meet the standard. Its §4 page is
+PRE-PLAYTEST — five terse lines whose whole content is "language pass + ALTS + bonus" — so both
+halves of §1.0-R4(u) applied: the ☆ was dead on arrival and the artifact had never been checked
+against the reality test. Every number below is `keyLog` through the live engine on the real
+board, medians over 5 seeds, every selection and navigation KEYED (`setDemoSel` only parks the
+cursor on an anchor cell). The measuring instrument ships as `dev/verify-intsched.js`._
+
+**WAS → NOW.** 4 checks on a `ROWS:11` board (9 rows used — **45%**), no ☆, no `saveClose`, no
+dress beat anywhere, one bare unstyled rate cell, and **every one of the four checks reading
+formula TEXT**. Now: 6 core beats + the re-cut ☆ + the engine's save closer, on a 20-row board at
+**75%** density, with no predicate anywhere reading a range, a function name, an operand order or
+an anchor.
+
+**FOUR UNTRIGGERABLE BEATS FOUND AND KILLED** (campaign §1 class — all four found by WALKING
+routes, none by reading predicates; campaign running total **22**):
+
+| # | the check demanded | the route it locked out |
+|---|---|---|
+| 19 | `refs('B4',['B2','B3'])` — two tokens out of column B's text, column B only | `=SUM(B2:B3)`, the range form for a stacked block · AutoSum from a selection through the empty ending cell · building the LAST year first and filling LEFT |
+| 20 | `refs(C2,[B4])` — the literal prior-ending token on the link | `=B2+B3`, re-deriving the opening instead of pointing at it: same number, same liveness, a formula that rolls identically |
+| 21 | `refs('B6',['B2','B10'])` on cash interest | `=B2*7.75%` · `=$B$10*B2` with the operands reversed · every per-year typed form, since the scan only ever read column B |
+| 22 | `refs('B8',['B7','B6'])` on coverage | identical shape, identical bug |
+
+Every core now grades the END STATE (§1.0-R3(p)): the value standing in each year column, plus —
+where the label says a line is BUILT — that the cell is a live formula rather than a typed
+constant (doctrine §2.2's sanctioned exception, the r440 `balance` precedent). **Twelve routes
+walked** in `dev/verify-intsched.js §C`, six that must clear and two negative controls that must
+not: AutoSum · addition chain · the re-derived link · the distributed reversed-operand interest ·
+figures-only dress with Alt H 1 + Alt H B S · Alt H B A (which stores `ball`, not `bt`) · every
+fill off Alt H F I R · Ctrl+1 → X for the multiple format. Negative controls: a typed-constant
+ending line leaves beat 1 dark, and Alt H B O — a rule UNDER the total — leaves beat 3 dark
+(§1.0(f): a total earns the line above it).
+
+**THE ☆ RE-CUT (§1.0-R4(u)), AND THE KILLED ONE PROMOTED RATHER THAN DELETED.** The page's bonus
+was *"One-decimal the coverage cell — the covenant reads 4.2x, not 4.20x"*: formatting, which
+§1.0(d) outlaws, and it falls out of any honest finish, which §1.0-R2(i) outlaws separately. But
+it was REAL WORK — a covenant is quoted at one place — so it became **core beat 6**, the r425
+editfix/dress/ruleoff precedent. The replacement ☆ is the one efficiency this board is built for:
+**the cash-interest and interest-coverage lines are NEIGHBOURING rows, so one rectangle covers
+both and a single fill carries them across all five years.** Read off the r424 `S.fillOps` latch,
+so Ctrl+R and the ribbon's Alt H F I R both earn it. That is the sixth re-cut formatting ☆ of the
+campaign.
+
+**☆-HEADROOM DIAGNOSTIC, both parts, plus the isolated third (`dev/verify-intsched.js §A/§B`):**
+
+| measurement | keys | note |
+|---|---|---|
+| taught route | **68** | flat across all 5 seeds |
+| slow route (every year typed, no fill, ribbon dress, per-cell decimals) | **220** | flat; clears all six cores |
+| spread | **3.24×** | |
+| part 2 — what survives stripping | **138 of 152** | 12 formatting (forbidden §1.0(d)), 2 chord-vs-ribbon (forced to clear §1.0(c)); the rest is fill-vs-retype, the move §1.0(d) names |
+| ☆ isolated — natural filler (two SEPARATE fills) | **72** | all six cores green, ☆ **dark** |
+| ☆ isolated — the same work typed out | **166** | all six cores green, ☆ **dark** |
+
+So the star is worth 4 keys against the filler who never noticed the rows were neighbours and 98
+against the typist, and **skippability is measured on two named routes rather than asserted**.
+
+**DISTINCTNESS (campaign §3), asked before anything was built.** vs `schedule` — a PP&E corkscrew
+whose anchored rate CONSUMES the opening balance; fluency there produces a correct roll here but
+says nothing about the schedule's real output being a line the P&L takes and a ratio a lender
+tests. vs `covtable` — net LEVERAGE, quarterly, against a stepping maximum; coverage inverts the
+fraction (debt over EBITDA vs EBITDA over interest), so fluency in one produces the wrong operand
+order in the other. **KEEP**, both lines recorded so a later agent does not re-litigate them.
+
+**MODELING_STANDARDS COMPLIANCE** (the file binds Models II): colour-as-provenance on every seeded
+input (§1) · units in the title and on the ratio label, a bottom border under the header row, a
+TOP border on the ending-debt total (§1, §1.0(f)) · costs negative, so the corkscrew closes as an
+addition, with the one departure — cash interest shown as a positive expense so coverage reads as
+a positive multiple — stated on the board's own memo line (§2, doctrine §2.4's all-cost exception)
+· the beginning / less reductions / ending corkscrew with the beginning cell REFERENCING the prior
+ending (§3) · coverage as EBITDA ÷ cash interest at one decimal (§4) · **interest on the BEGINNING
+balance, said on the board in the player's own words** (§5/§7). Declared simplifications: the
+optional prepayment is a seeded input rather than a computed sweep (the sweep needs a cash-flow
+statement the 20-row cap will not hold), no rate floor or commitment fee, no calendarisation.
+
+**BOARD.** `Project <codename> — <tranche> interest schedule ($mm)`, five years: beginning debt /
+less mandatory amort. / less optional prepay. / ending debt · EBITDA / cash interest / interest
+coverage (x) · a two-cell assumption block (base rate + credit spread, quoted on a quarter-point
+grid, light yellow + all borders + blue, individually labelled per §1.0(f)/§1.0-R2(l)) · two memo
+lines. **15 of 20 rows at the win state (75%)**; three of the five blanks are moats that also stop
+a Ctrl+arrow ride-through between the three islands.
+
+**RANDOM.** Three axes, geometry constant so the key count never moves with the draw: corner
+jitter (the page anchors at column A or B) · content pools (codename, a 3-name tranche pool, the
+fiscal-year base) · every figure through `rnd()`. 30/30 distinct builds and same-seed determinism,
+both asserted by `e2e-depth-contract`.
+
+**PAR RE-SWEPT FROM SCRATCH.** par 29 / parKeys 28 → **par 72 / parKeys 68** (5-seed median 68
+including the engine-appended Ctrl+S, drift 0%, **1.06 s/key** — the house band). The count grew
+with the board: a third debt line, the dress motion, the decimal pass, the two-cell rate and the
+save closer. Lands mid-chapter (schedule 35 · revolver 41 · covtable 45 · waterfall 64 ·
+**intsched 72** · debtsched 73 · cascade 94). Clocks derive (§1.4): pass 1:48 · pro 1:23 ·
+legendary 1:12.
+
+**ALTS — one of the nine ZERO-ALT drills §1.8 names, now at two.** ALT 1 chord ROUTE (AutoSum,
+both fills off the ribbon, figures-only dress via Alt H 1 + Alt H B S, Ctrl+1 → X for the
+multiple; the ☆ still fires, because the ribbon fill hits the same latch). ALT 2 op ORDER **and
+the ☆'s negative control** (feeds before the roll, decimals set on a still-empty row, dress last,
+every remaining feed year typed — 164 keys, all six cores green, star forfeited). Both green ×3
+seeds.
+
+**TWO BOARD DEFECTS CAUGHT BY LOOKING AT THE WIN SCREENSHOT, NOT BY A PREDICATE** (doctrine
+§8.1.5, and the r439 `cases` lesson repeating): the basis line was one long string that ran past
+column J and was **clipped** — not a page anybody hands over — so it was split across the header
+and two foot memos (which also took density 70% → 75%); and the rates were drawn as free basis
+points, so the board said *"Credit spread 3.41%"*, which no pricing grid has ever said. Both are
+board fixes, neither touched a predicate.
+
+**A PROBE DEFECT, THIRD CLASS OF ITS KIND THIS CAMPAIGN.** `verify-intsched.js §D` reported the ☆
+fill degrading a number format — and printed, as the evidence, the two formats the board is
+supposed to have. The filter compared a prefixed token against a bare string. Campaign rule held:
+suspect the probe before the product.
+
+**TESTS.** replay ×3 seeds WIN 3/3 · alt-paths 2/2 ×3 seeds · guided PASS (railed, contained,
+solvable) · depth-contract PASS (density 15/20, 30/30 distinct builds) · `verify-intsched.js` ALL
+GREEN (12 routes × 5 seeds) · par-sweep drift 0% · fit-sweep ALL CLEAN (70 drills) ·
+check-invariants clean (C9 tri-length 7, one ☆, saveClose declared) · `node --check` on all
+extracted inline scripts and drills.js.
+
+**FILE ANCHORS.** index.html:3845 (block) · :3980 (par/parKeys/saveClose) · :3981 (aha) · :3986
+(prompt) · :3987 (req) · :3991 (guide) · :4004 (targets) · :4016 (demo) · :4032 (build) · :4124
+(checks) · :4164–4170 (the seven beats). Probe: dev/verify-intsched.js.
+```
+
+### `lbo` — "Run the LBO math" (DEPTH_PASS §4.70, Models II · MODELING_STANDARDS binding)
+
+_Every number below is `keyLog` through the live engine on the real board, medians over 5 seeds, every range grab KEYED (setDemoSel only parks the cursor on an anchor cell). The instrument is `dev/verify-lbo.js`, which ships with the drill and runs the whole diagnostic in one command._
+
+**WAS:** 6 checks on a `ROWS:14` board — the copied-default tell the campaign named — carrying a single column B of nine stacked cells, no ☆, no `saveClose`, and a checklist whose verbs ("run", "back into", "mark", "compound") are not on the §1.7 closed list at all. The prompt named the mechanism twice ("Seven formulas; the multiple stays anchored"), which §1.0(b) puts in guide/req and never in player copy. par 54 / parKeys 56.
+
+**THE PAGE'S ☆ IS DEAD, AND SO WAS THE BOARD UNDER IT.** §4.70 proposes "Percent-format the IRR to one decimal and bold it" — a formatting bonus, which §1.0(d) forbids outright, and one that would fire on a row the board already ships percent/1-decimal. That is the §1.0-R4(u) class and was expected. What was NOT expected is that the shipped board could not carry ANY legal ☆:
+
+| | fastest legal | slowest legal | spread | ☆-legal after the strip |
+|---|---|---|---|---|
+| shipped one-column board | 63 | 74 | **1.17×** | **nothing** |
+| rebuilt case-column board | 68 | 165 | **2.43×** | 97 keys of sweep-vs-retype |
+
+Part 2 is what decides (campaign §2). On the old board the whole 11-key spread is pointing-vs-typing — `bridge`'s lesson, not this one — and a single column of nine cells has no block to fill, no anchor that pays and no second pass to compress. **A drill with no legal star is a motif, not a lesson**, so this reads exactly like `grpfold`; the difference is that here the board was fixable, and campaign §2's `series` rule says fix the BOARD, never the predicate.
+
+**THE REBUILT BOARD.** One page from a sponsor's returns file: the enterprise-to-equity bridge laid out ACROSS the entry column and three exit years (holds 3/4/5), with the returns block under it. The layout is the lesson — MOIC climbs left to right while the IRR falls, in one eye movement, which is invisible on a single-exit board and is now the drill's `aha`. Verified on every seed by the probe (§A): MOIC min 1.58–2.41×, IRR min 14.8–28.4%, monotone in both directions, and no seed produces a losing deal.
+
+**MODELING_STANDARDS COMPLIANCE** (probe §A asserts all of it, every seed):
+
+- **§1 colour = provenance** — blue typed assumptions (the entry multiple, the three holds), **green cross-tab feeds** (EBITDA from the operating model; net debt and preferred from the debt schedule), black computed. Green is the colour the standard says the catalog under-uses; this is the first Models II board to carry it, and it is declared on the board's own basis memo.
+- **§2 sign convention** — every deduction seeded NEGATIVE and stated out loud on the basis memo, which is what makes the equity line a clean `=SUM` down the column rather than a subtraction chain.
+- **§4 the enterprise → equity bridge** — `EV − net debt − preferred = equity value`; and the returns in their standard single-cash-flow forms, `MOIC = exit equity / entry equity`, `IRR = MOIC^(1/years) − 1` (the same compound shape `cagr` teaches).
+- **§5 circularity** — nothing to bind: the fragment is the RETURNS bridge, so there is no interest and no sweep on this page. Net debt at exit arrives already swept, declared on the memo line.
+- **§7 the board is a COMPONENT** — the bridge, not the LBO. `sourcesuses` sizes the cheque, `debtsched`/`revolver` run the debt, `lbobuild` assembles the whole paper LBO (and keeps the `=IRR()`-over-the-flows prove-out, deliberately not duplicated here).
+
+**TWO UNTRIGGERABLE BEATS FOUND AND KILLED.** Both in the shipped IRR check, which read formula TEXT (`f.includes('B12') && f.includes('B13')`) — campaign bug class #3/#4/#8/#9.
+
+| # | the check demanded | the route it locked out |
+|---|---|---|
+| 1 | `B12` inside the IRR formula | `=(B11/B8)^(1/B13)-1` — the IRR read straight off the equity values, correct percentage on the board |
+| 2 | `B13` inside the IRR formula | `=B12^(1/5)-1` — the hold typed into the exponent on a seed whose hold IS 5 |
+
+Proved rather than argued: the shipped predicate lifted verbatim and run on the three formula strings at the same value (0.268734) returns **true · FALSE · FALSE**. Both routes are now permanent entries in `dev/verify-lbo.js` §B (routes 5 and 6) and route 6 is ALT 2's shape, so the regression cannot come back silently. No check on the new board reads a range, a function name, an anchor or a cell reference out of formula text.
+
+**THE ☆, AND THE THIRD MECHANIC THE ROUTE WALK FOUND.** The star is anchoring mastery: each of the four built lines written ONCE and taken across the cases in a single pass — the returns block is one selection covering BOTH rows. Isolated per the r438 `series` rule, no half negative:
+
+| half | swept | typed | worth |
+|---|---|---|---|
+| enterprise value line | 4 | 27 | +23 |
+| equity value line | 4 | 36 | +32 |
+| returns block (both rows, one selection) | 4 | 52 | +48 |
+
+**It reads `S.pasteLog` as well as `S.fillOps`, and that is a finding worth carrying.** Route 8 of the walk — copy the source cell, paste over the destination range — measured **62 keys against the fill route's 68**, i.e. CHEAPER, while doing the identical write-once work. Denying it the star would have been §1.0-R3(p)'s "a valid route stays dark" defect wearing a bonus badge. Three mechanics now latch (Ctrl+R · Alt H F I R · copy+paste), and a left-fill latches too for the Macabacus profile. Skippability measured, not asserted: the fully typed route clears all six cores on 5/5 seeds with the ☆ dark (ALT 2, 147 keys).
+
+**BEATS** (6 core + ☆ + the engine-appended Ctrl+S). Both dress beats follow their parent work beat, never batched at the end (§1.0(a)); both ops are top of Wolf's §1.0-R3(o) frequency list.
+
+1. Build the enterprise value line — entry and all three exit cases
+2. Build the equity value line — entry and all three exit cases
+3. Bold the equity value line and add a top border above it
+4. Build the MOIC line — every exit case
+5. Build the IRR line — every exit case
+6. Bold the MOIC and IRR lines  ← §1.6 finish state, the read lines in ink
+☆ Fill every built line across the cases — one pass each, no case retyped
+
+**§1.3 DENSITY:** `ROWS:14`, 13 of 20 (65%) → **`ROWS:20`, 15 of 20 (75%)**. Three of the five empty rows are moats and load-bearing — header/bridge, bridge/returns, returns/memo — and a bridge whose blocks run together is unreadable.
+
+**RANDOMIZATION** (§1.2, three axes): corner jitter (the page anchors at column A or B — the full-grid substitute §1.2 grants Models boards) · content (codename, entry fiscal year, which drives all four column headers) · values (EBITDA, entry multiple, growth, leverage, preferred, sweep pace, all through `rnd()`). Geometry is CONSTANT across seeds by design, so the keystroke count never moves with the draw — the r439 `wrapfix` rule, and the par sweep reads 68/68/68/68/68.
+
+**PAR:** re-swept from scratch. par 54 / parKeys 56 → **par 71 / parKeys 68**, median 68, drift 0%, 1.04 s/key — the house band. The count grew with the board (three case columns, a five-line bridge, two dress motions, the save closer), landing `lbo` between `waterfall` (64) and `debtsched` (73) in the chapter. Clocks derive (§1.4): pass 1:47 · pro 1:22 · legendary 1:11.
+
+**TESTS:** `e2e-demo-replay` lbo ×3 WIN 3/3 and the full catalog ALL GREEN · `e2e-alt-paths` lbo 2/2 PASS ×3 seeds · `e2e-guided` PASS (railed, contained, solvable) · `e2e-par-sweep` 0 flagged · `e2e-fit-sweep` ALL CLEAN (70 drills) · `check-invariants` clean (incl. C11 aphorism scan and C13) · `dev/verify-lbo.js` ALL GREEN (8 routes walked, 5 seeds each).
+
+### `revolver` — "Sweep the revolver" (§4.71) — Models II
+
+**WAS:** 4 checks on a `ROWS:7` board — 6 rows carrying content out of the real 20-row sheet (**30%**, half the §1.3 target), no ☆, no `saveClose`, checklist lines opening with a bare lowercase noun and carrying raw cell refs ("sweep at B5 — MIN of balance and spare cash…", "prove the revolver post-sweep at B6"), par 41 / parKeys 41, one ALT. And — the part that matters for a Models chapter — **no revolver**: each year carried its own typed blue "Revolver balance", so nothing rolled, and there was no DRAW anywhere on the page, so the MAX existed only to floor a subtraction. Four disconnected MIN/MAX arithmetic problems wearing a credit label.
+
+**NOW:** a revolver schedule in the shape a reviewer looks for — Beginning balance → + draw → − sweep → = Ending balance, each year opening on the prior year's close; the cash line the facility reacts to above it; the two assumptions a credit agreement actually sets (minimum cash, commitment) as a labelled, stacked, light-yellow, all-bordered, populated helper block; and the two memo reads a credit analyst takes off the page (headroom over the minimum, undrawn availability) shipped LIVE below it. 6 core beats + the hidden ☆ + the engine-appended Ctrl+S. **ROWS=20, 15 rows carrying content at the win state — 75% density** (was 30%).
+
+| | |
+|---|---|
+| beats | 1 Build the draw line · 2 Build the sweep line (signed negative) · 3 Total the ending balance · 4 Bold it + top border (§1.0(a), immediately after its parent) · 5 Reference each beginning balance to the prior year's close · 6 Build the post-revolver cash line (§1.6 prove-out finish) · ☆ |
+| ☆ | **one-pass discipline / structured selection** — the three MOVING lines (draw, sweep, ending) grabbed as ONE block and carried across the four years in a SINGLE fill. Read off `S.fillOps` (the MECHANIC, never geometry inferred), so Ctrl+R and Alt H F I R both earn it |
+| board | `codename()` — revolver schedule ($mm); two basis memo lines (sign convention + the 100% sweep, and where interest lives); header rule under the column headers; the total wears a TOP border and no rule underneath; blue typed inputs, black formulas |
+| random | 4 axes — corner jitter (anchor column A or B) · codename + fiscal-year base · every figure through `rnd()` · **which year is short** (the draw year is drawn between FY2 and FY3). Row geometry deliberately FIXED so par reads flat (a row jitter would push the minimum-cash row 9→10 and charge two keys for nothing — the r439 `wrapfix` rule) |
+| par | **95 / parKeys 90** (was 41 / 41). 5-seed median 90 incl. the Ctrl+S closer, **FLAT at 90, 0% drift, 1.06 s/key** — the house band. Clocks derive (§1.4): pass 2:23 · pro 1:49 · legendary 1:35 |
+| alts | 2 (was 1, and the old one drove the retired 7-row board by hard-coded `B2:E7` geometry — **DELETED, do not resurrect**) |
+| tests | replay ×3 seeds · full-catalog replay ALL GREEN · alt-paths ×2 ×3 seeds (full run 119/119) · guided (railed, contained, solvable) · par-sweep 0% drift · fit-sweep ALL CLEAN (70 drills) · depth-contract PASS (density 15/20, **30/30 distinct builds**) · depth-mechanics 155/0 · audit-parity 177/177 · formulas 102/102 · grid-height · smoke ALL 7 PAGES CLEAN (with the PARS + desc deltas) · check-borders · check-pause · `dev/verify-revolver.js` **33 assertions ALL GREEN** |
+
+**TWO UNTRIGGERABLE BEATS FOUND ON THE SHIPPED BOARD** (campaign §1 class — found by WALKING routes through the live engine, never by reading predicates):
+
+| # | the check demanded | the route it locked out |
+|---|---|---|
+| + | `c.bt` on the balance row | **Alt H B A (ALL borders) stores `ball`, never `bt`** — and `ball` paints a box whose top edge IS the rule. A player who bordered every edge had a ruled, bolded balance row on screen and a dark line with nothing to fix. Probed on the shipped block: **cores 0/3**, and the failing label was exactly that one. Campaign bug #7, shipped again |
+| + | `refs('B5',['MIN(','MAX('])` — formula TEXT | `=IF(cash−min>balance, balance, MAX(0,cash−min))`, the most common alternative shape for a sweep, lands the identical number in every year and carries no `MIN(`. Probed: **cores 0/3**, the failing label exactly that one. Same root cause as campaign bugs #3/#4/#8/#12 |
+
+Both die here: every core grades the END STATE — the number in every year column, plus, where the label says a line is BUILT, that the cell is a live formula rather than a typed constant (the doctrine §2.2 exception, and the one MODELING_STANDARDS §7 names as legitimately gradeable). No check reads a function name, a range or an anchor out of formula text, and no check reads one column and assumes the rest. The border predicate takes `bt || ball`. **Both dead routes are now registered as ALT 2, so neither can come back.**
+
+**THE ☆-HEADROOM DIAGNOSTIC, BOTH PARTS** (run BEFORE the board was designed, on the shipped board; re-run on the rebuild):
+
+| board | fastest legal | slowest legal | spread | part 2 — what survives stripping |
+|---|---|---|---|---|
+| shipped (old) | 53 | 160 | 3.02× | of 107 keys, ~20 are formatting (§1.0(d) forbids grading, §1.0(c) forces the ribbon route to clear); **0** chord-vs-ribbon in the formula half (no ribbon route into formula entry; Ctrl+R and Alt H F I R hit the same `fillFrom` latch). **~87 keys survive** — fill-vs-retype, the family §1.0(d) names |
+| rebuilt | 90 | 297 | **3.30×** | same composition, same verdict. KEEP |
+
+Isolated per the r438 `series` rule: **one block grab 6 keys · three separate row fills 12 · the nine repeat cells typed 159** — positive on both comparisons. Proved skippable by two measured negative controls: three row fills → cores 3/3, ☆ dark 3/3; the full slow route (no fill anywhere, 297 keys) → cores 3/3, ☆ dark 3/3.
+
+**DISTINCTNESS (CAMPAIGN §3), asked before anything was built.** Three other Models II boards run a MIN sweep (`waterfall`, `cascade`, `debtsched`). Fluency in any of them produces a correct first attempt at a PAYDOWN and a wrong one here, because none of them has the other regime: a revolver DRAWS when the business is short, and the draw is a MAX, not a MIN. Those three answer "who gets paid first"; this one answers "what happens in a year where there is nothing to pay with". That is why the rebuilt seed guarantees one shortfall year, two partial sweeps and one year that repays the facility in full.
+
+## r444 H6b-13 — waterfall: Models II opens (DEPTH_PASS §4.72 + MODELING_STANDARDS)
+_The first Models board of the campaign, and the first drill built with dev/MODELING_STANDARDS.md
+binding. Every number below is `keyLog` through the live engine on the real board, medians over
+5 seeds, every selection and navigation KEYED (setDemoSel only parks the cursor on an anchor cell).
+The instrument is `dev/verify-waterfall.js`, which ships with the drill._
+
+### THE BOARD: A CREDIT PAYDOWN SCHEDULE, NOT AN ABSTRACT CASCADE
+
+The §4.72 page is pre-playtest, so both of the things §1.0-R4(u) warns about were true of it: its
+☆ was a dress, and its artifact had never been read against the R4(t) reality test. The board is
+rebuilt as the page a credit committee actually reads — a five-line cash-available build (EBITDA,
+capex, cash interest, cash taxes, working capital, every cost carrying its sign) footed by the
+player, then a strict two-tranche seniority cascade over three years, with the corkscrew on both
+tranches. Models II is audience **B** in the §3.1 map ("no corporate-generic twin"), so the
+artifact stays a deal page; what changed is that it is now a REAL one, with stated units, a basis
+memo carrying the sign convention, and a second memo declaring the simplification (§5).
+
+**What waterfall owns that `cascade` does not** (asked before anything was built, CAMPAIGN §3):
+the cash available for paydown is BUILT here, not handed over. `cascade` (the c7 capstone) and
+`revolver` both give the player the cash. Fluency in `revolver` produces a correct first attempt
+at ONE floor-and-cap sweep and says nothing about seniority — a revolver sweep never has to ask
+what the tranche above it left behind. KEEP.
+
+### THE ☆ WAS A DRESS. THE RE-CUT IS STRUCTURAL, AND THE BOARD IS SHAPED AROUND IT
+
+| | |
+|---|---|
+| the page's ☆ | "Bold the total-paydown row — the cash proves out" |
+| why it is dead | a FORMATTING bonus (§1.0(d)); falls out of the run rather than being a skippable decision (§1.0-R2(i)); and §1.0-R4(u) declares every pre-playtest page's ☆ dead on arrival |
+| the re-cut | **the junior tranche is the senior tranche five rows down** — copy the senior pair (paydown + closing balance) onto it and every relative reference walks down with it, landing the whole junior schedule in one paste |
+| the promotion | §1.0-R4(u)'s "do not simply delete it": what the dead ☆ reached for is now CORE beat 5, the "Cash after &lt;senior&gt;" row — and it is load-bearing, because the junior tranche rations against it |
+
+The +5 offset is the board's design, not a coincidence: cash source 9→14, opening 11→16,
+paydown 12→17, ending 13→18. That is §1.0-R4(u)'s structural family ("the richest ones here are
+structural") and it is the first of the campaign's ☆s that is a MODEL insight rather than an
+Excel one — a waterfall repeats because each tranche is the same corkscrew fed by what is left.
+
+### TWO UNTRIGGERABLE BEATS FOUND AND KILLED
+
+Both graded formula TEXT, the cause that has not moved once in the whole campaign. Both found by
+WALKING routes, neither by reading the predicate.
+
+| # | the check demanded | the route it locked out |
+|---|---|---|
+| 19 | `refs('B8',['MIN(','B5','B7'])` — function name and cell refs out of column B's text | `=IF(B5<B7,B5,B7)`, which rations identically and leaves an identical page; and any build that does year 2 first |
+| 20 | `refs('B13',['MIN(','B10','B12'])` — same class, and it read column B only while asserting all three years | the same, on the junior tranche |
+
+Campaign total: **20**. Both are now permanent alt-path entries (ALT 2 drives the IF form), so the
+regression cannot come back silently. Every core now grades the END STATE (§1.0-R3(p)): the number
+standing in each year column, plus liveness where the label's verb is Build or Total (§1.7's
+"land a live formula"; doctrine §2.2's sanctioned exception, and required outright by
+MODELING_STANDARDS §3 — a beginning balance that REFERENCES rather than repeats).
+
+### THE ☆-HEADROOM DIAGNOSTIC, BOTH PARTS
+
+| board | fastest legal | slowest legal | spread | part 2 — what survives stripping |
+|---|---|---|---|---|
+| `waterfall` | 73 | 209 | **2.86×** | 8 formatting (forbidden), **0 chord-vs-ribbon** — walked, not assumed: the whole board through the ribbon wins 5/5 and earns the ☆; **128 keys survive** as COPY/FILL-vs-RETYPE |
+
+Isolated ☆ measurement (CAMPAIGN §2 — never a combined number): the star move is **5 keys** and
+lands six cells; the same six cells typed-then-filled cost **25**, typed one at a time **63**.
+**5.0× against its own nearest honest alternative.** Proved SKIPPABLE by measurement, not
+assertion: the 209-key route clears all six cores with the ☆ dark (ALT 3), and three other winning
+routes leave it dark too.
+
+**A ☆ must not degrade the board (r439 `cases`):** a paste carries the source cells' format, so
+the two tranche blocks are format-identical by construction — paydown rows plain comma/0dp, ending
+rows bold + top border on both. Measured per seed: neither the star route nor the typed route
+changes the dress the board shipped with.
+
+### SIX ROUTES WALKED, ALL GREEN
+
+`demo` 73 (☆ 5/5) · addition chain instead of SUM 104 · anchored refs + AutoSum + Alt H B S 172 ·
+IF instead of MIN + Alt H B A 106 · every fill and the ☆ paste from the ribbon 100 (☆ 5/5) ·
+the slowest legal route 209. A **values** paste correctly does NOT earn the ☆ (values do not
+translate, so it would land the senior's figures on the junior rows).
+
+### PAR RE-SWEPT FROM SCRATCH
+
+| drill | was | now | why it moved |
+|---|---|---|---|
+| `waterfall` | par 64 / parKeys 67 | **par 77 / parKeys 73** | two more operating lines under the cash build, the cash-after row, the dress beat, the ☆'s copy-paste, the save closer |
+
+1.05 s/key, the house band; drift 0%, and FLAT across seeds by construction — every row index is
+fixed, so every typed formula is the same length on every draw and the corner-jitter axis changes
+the column LETTER, never the character count. Lands between `debtsched` (73) and `cascade` (94).
+Clocks derive (§1.4): pass 1:56 · pro 1:29 · legendary 1:17.
+
+### §1.3 DENSITY
+
+| drill | before | after |
+|---|---|---|
+| `waterfall` | ROWS:14, 12 rows used — **60% of the real 20-row sheet**, exactly on the line | 20 rows, 17 used — **85%** |
+
+The three empty rows are geometry moats between the operating block and the two tranches, and they
+are load-bearing (a Ctrl+Shift+↓ inside one block must not ride into the next). Content grows
+37 → 59 cells load-to-win. **Note for the retrofit list:** the ROW count is 17 at load AND at win,
+which looks like §1.3's "identical density" tell but is not it — every computed row ships with its
+column-A label because §1.3's own labelled-target rule demands it, and row 20 carries the basis
+memo, so there is no empty band at the bottom. The honest measure on a fully-labelled board is
+CELLS, not rows; recorded here so the next agent does not chase it.
+
+### A PROBE DEFECT READ AS A PRODUCT DEFECT — FOURTH SIGHTING
+
+The ☆-degradation check first ran the star route on one `loadChallenge` and the typed route on
+another, then compared by absolute cell key. Those are different SEEDS, and the corner-jitter axis
+moves the whole page between column A and column B, so the keys did not name the same cells; it
+reported a difference that was an artefact of the comparison. Confirmed by zooming into the win
+screenshot, which showed a clean board. After r440's `hotkey_onboarded` omission, r441's hidden
+rows and r442's three wrong border probes, **a probe that disagrees with the picture is wrong until
+proved otherwise.** Two other probe defects in the same run: an assertion that a fully-labelled
+board must grow its ROW count, and an alt route that used `Alt H V F` — a path the ribbon does not
+have (Alt H V offers only Values and Paste-special; formulas-only is Alt H V S then F).
+
+### PLUMBING
+
+- `drills.js`: par 64 → 77; desc rewritten (it described the retired board). Key immutable, so PBs,
+  boards and runs history are untouched. No CLOCKS override (§4.72: "Clocks: std"). Not a capstone.
+- `dev/e2e-alt-paths.js`: the one pre-pass entry is DELETED — it was written against the retired
+  ROWS:14 geometry — and replaced by three. THEIRS wins for `waterfall`, including the deletion.
+- `dev/check-invariants.js`: `REWORKED` grows to 45.
+- `dev/verify-waterfall.js`: new, and the source of every number above.
+- No engine change. The ☆ reads the existing r425 `S.pasteLog` latch.

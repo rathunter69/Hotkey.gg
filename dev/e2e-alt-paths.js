@@ -1088,7 +1088,7 @@ const ALTS = [
       {sel:'B3', keys:[...T('=-B2*$B$10'),{key:'Enter'}]},
       {sel:'B3:F3', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
     ]` },
-  /* r444 §4.70 depth pass — both entries rebuilt for the case-column board (the single old entry
+  /* r446 §4.70 depth pass — both entries rebuilt for the case-column board (the single old entry
      hard-coded B6/B8/B9/B11/B12/B14 off the retired one-column one and is DELETED, not kept).
      ALT 1 = chord ROUTE: F4 cycling instead of typed $ anchors, autosum's range form for the
      equity line, every fill through the ribbon (Alt H F I R), bold via Alt H 1 and the rule via
@@ -1271,7 +1271,7 @@ const ALTS = [
       for(let i=1;i<5;i++) mv.push({sel:Y[i]+R.acc, keys:[...T('='+Y[i-1]+R.acc+'+'+Y[i]+R.dep),{key:'Enter'}]});
       for(let i=0;i<5;i++) mv.push({sel:Y[i]+R.end, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('a')]});   // Alt H B A writes ball, never bt — the route the predicate was widened for
       return mv; }` },
-  /* r444 (DEPTH_PASS §4.69, `intsched` depth pass) — intsched was one of the nine ZERO-ALTS
+  /* r446 (DEPTH_PASS §4.69, `intsched` depth pass) — intsched was one of the nine ZERO-ALTS
      drills §1.8 names, and its board was rebuilt from 11 rows to 20, so there is nothing to
      carry forward: these are its first two entries and neither replaces anything.
      ALT 1 = chord ROUTE — AutoSum instead of a typed SUM, both fills off the ribbon
