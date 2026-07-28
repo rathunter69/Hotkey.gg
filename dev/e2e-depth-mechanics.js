@@ -890,8 +890,15 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
       const cell = ref => { const r = +ref.slice(1), c = ref.charCodeAt(0) - 64;
         const tr = document.querySelectorAll('#grid tr')[r];   // row 0 is the header row
         return tr ? tr.querySelectorAll('td')[c - 1] : null; };
-      const cs = ref => { const el = cell(ref); return el ? getComputedStyle(el) : null; };
-      const plain = cs('H10');   // an untouched cell — the pure gridline colour
+      /* r443: applied borders moved OFF the td and onto an ::after overlay in r442 — the td
+         itself now only ever carries the faint gridline, so reading getComputedStyle(td) here
+         reported "the border is gridline-coloured, 1px" for every op and failed all eight border
+         assertions. The suite was right to fail: its assumption really had broken. Read the
+         OVERLAY for a formatted cell, and the td for the plain gridline baseline it compares
+         against. Verified independently by dev/check-borders.js, which measures painted pixels
+         rather than computed style: every edge 2.00px, thick 3.00px, double two 1px strokes. */
+      const cs = ref => { const el = cell(ref); return el ? getComputedStyle(el, '::after') : null; };
+      const plain = getComputedStyle(cell('H10'));   // an untouched cell — the pure gridline colour, still on the td
       const g = { top: plain.borderTopColor, bottom: plain.borderBottomColor,
         left: plain.borderLeftColor, right: plain.borderRightColor };
       const s = { bt: cs('C4'), bb: cs('C6'), ball: cs('E4'), bdbl: cs('E6') };
