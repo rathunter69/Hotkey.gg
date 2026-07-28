@@ -4063,70 +4063,331 @@ const CHALLENGES = {
     }
   },
   intsched:{
-    name:'Interest', label:'Run the interest schedule', par:29, parKeys:28,
-    aha:'Interest ties the debt block to the P&L — rate × the opening balance, then EBITDA ÷ interest is the coverage the covenant reads.',
-    prompt:'A term loan and the schedule that feeds the P&L: each year opens at the prior close, mandatory amortization (the required annual paydown) takes its cut, and cash interest is the anchored rate on the opening balance. Build year 1, link the opening, fill the roll across — then compute coverage: EBITDA over interest.',
-    req:'<em>B4</em> ending <em>=B2+B3</em> · <em>C2</em> <em>=B4</em> · fill C2:F2 → · fill B4:F4 → · <em>B6</em> interest <em>=B2*$B$10</em> · fill B6:F6 → · <em>B8</em> coverage <em>=B7/B6</em> · fill B8:F8 →',
-    guide:[
-      'ending debt at B4 · <kbd>=B2+B3</kbd> — opening less the mandatory amort (already negative)',
-      'THE LINK: C2 · <kbd>=B4</kbd> · fill C2:F2 → — each year opens where the last one closed',
-      'select B4:F4 · <kbd>ctrl</kbd>+<kbd>r</kbd> — the debt roll walks itself across',
-      'cash interest at B6 · <kbd>=B2*$B$10</kbd> — the anchored rate on the OPENING balance · fill B6:F6 →',
-      'interest coverage at B8 · <kbd>=B7/B6</kbd> — EBITDA over interest, the covenant ratio · fill B8:F8 →',
-    ],
-    targets:['B4:F4','C2:F2','B6:F6','B8:F8'],
-    demo(){ return [
-      {sel:'B4', keys:[...T('=B2+B3'), Kb.enter]},
-      {sel:'C2', keys:[...T('=B4'), Kb.enter]},
-      {sel:'C2:F2', keys:[Kb.fillR]},
-      {sel:'B4:F4', keys:[Kb.fillR]},
-      {sel:'B6', keys:[...T('=B2*$B$10'), Kb.enter]},
-      {sel:'B6:F6', keys:[Kb.fillR]},
-      {sel:'B8', keys:[...T('=B7/B6'), Kb.enter]},
-      {sel:'B8:F8', keys:[Kb.fillR]},
+    /* r444 H6b (DEPTH_PASS §4.69, "Run the interest schedule") — the depth-pass rework, built to
+       §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (§1.0-R3 wins on conflict), and to
+       dev/MODELING_STANDARDS.md, which binds every Models chapter: a banker judges the MODEL
+       before the keystroke, so a correct chord on a wrong schedule is worse than no drill.
+
+       WAS: 4 checks on a ROWS:11 board (nine rows used — the §1.3 defect the campaign census
+       named, and the load and win densities were identical), no ☆, no saveClose, no dress beat
+       anywhere, one bare assumption cell with no §1.0(f) styling, and — the reason this rework
+       matters most — every one of the four checks read FORMULA TEXT.
+
+       ── THE ☆-HEADROOM DIAGNOSTIC (CAMPAIGN §2, BOTH parts), run BEFORE the board was drawn,
+       measured through the live engine on this board, 5 seeds, every selection and navigation
+       keyed (dev/verify-intsched.js §A/§B — the numbers below are that file's output, not an
+       estimate):
+         PART 1 — IS THERE SPREAD? fastest legal **68** keys (four formulas, three fills, one
+           dress, one decimal pass, the engine's Ctrl+S) against **220** for the obvious slow
+           route that clears the same six cores — every year of every built line typed out, no
+           fill anywhere, the dress walked off the ribbon, the decimals stepped cell by cell.
+           **3.24×**, and both counts are FLAT across all five seeds.
+         PART 2 — IS ANY OF THAT SPREAD ☆-LEGAL? This is the half that decides (CAMPAIGN: read
+           the COMPOSITION, never the ratio). Of the 152 keys of spread, **12** are FORMATTING —
+           five per-cell decimal walks against one row pass — which §1.0(d) forbids grading, and
+           **2** are chord-vs-ribbon (Alt H 1 against Ctrl+B), which §1.0(c) forces to clear
+           either way. The surviving **138** keys are FILL-versus-RETYPE across the year columns:
+           the "one copy-right fills a block" mastery move §1.0(d) names, in this drill's own
+           subject rather than a borrowed one. Legal headroom, and plenty of it.
+         PART 3 — THE ☆'S OWN MOVE, ISOLATED (the r438 `series` rule: never measure a star as
+           part of a bundle). The star is ONE move, so it is measured against its own two
+           alternatives, everything else held on the taught route: taught route **68** keys ·
+           the natural filler, which fills the two feed rows SEPARATELY, **72** · the same work
+           typed out cell by cell, **166**. So the discovery is worth 4 keys against the filler
+           who never noticed the rows were neighbours and 98 against the typist — and both of
+           those routes clear all six cores with the star dark (§B), which is the skippability
+           §1.0-R2(i) demands, measured rather than asserted. It also never makes the board
+           worse: fill-right sources each row from its OWN left-hand cell, so the interest line
+           stays comma@0 and the coverage line stays mult@1 (the r439 `cases` format-degradation
+           check, walked in dev/verify-intsched.js §D).
+
+       ── DISTINCTNESS (CAMPAIGN §3 discriminator — does fluency in one produce a correct first
+       attempt at the other?), asked before anything was built, against the two neighbours that
+       look closest:
+         · `schedule` (the chapter's other roll-forward) — a PP&E corkscrew where the moving
+           parts are capex and depreciation and the anchored rate is applied to the opening
+           balance to CONSUME it. Fluency there produces a correct roll here. It does NOT produce
+           the second half: that the schedule's real output is a line the P&L takes (cash
+           interest) and a ratio a lender tests (coverage), which is why this board carries a
+           P&L feed and that one carries a memo roll-forward.
+         · `covtable` (the chapter's covenant drill) — NET LEVERAGE, quarterly, against a
+           stepping maximum, with an IF flag and a MIN pinch read. Coverage is the other credit
+           stat and it inverts the fraction: leverage puts debt over EBITDA, coverage puts EBITDA
+           over interest. Fluency in one gives the wrong operand order in the other, which is the
+           discriminator §3 asks for. MODELING_STANDARDS §4 lists both under credit stats;
+           covtable owns the covenant TABLE, this drill owns where the interest number comes from.
+         KEEP, both lines recorded so a later agent does not re-litigate them.
+
+       ── FOUR UNTRIGGERABLE BEATS ON THE SHIPPED BOARD (the CAMPAIGN §1 class — found by WALKING
+       routes, not by reading predicates; every one of them graded FORMULA TEXT):
+         (1) THE ENDING-DEBT BEAT read refs('B4',['B2','B3']) — the tokens 'B2' and 'B3' out of
+             COLUMN B's formula text, and column B's only. Any route that leaves a correct board
+             without those two literals in that one cell was locked out: `=SUM(B2:B3)` (the range
+             form a modeller actually writes for a stacked block), AutoSum from a selection that
+             runs through the empty ending cell, and building the LAST year first and filling
+             LEFT — the board read correctly in every year and the line stayed dark.
+         (2) THE LINK BEAT demanded refs(C2,[B4]) — the literal prior-ending token. A player who
+             re-derived the opening as `=B2+B3` (same number, same live behaviour, a formula that
+             rolls exactly like the link does) watched the line stay dark with a correct board.
+             Same class as campaign bug #4 and #9.
+         (3) THE INTEREST BEAT demanded refs('B6',['B2','B10']) — so `=B2*7.75%`, `=$B$10*B2` with
+             the operands swapped and read out of order, and the per-year typed form all had to
+             pass a text scan that only ever looked at column B.
+         (4) THE COVERAGE BEAT demanded refs('B8',['B7','B6']) — identical shape, identical bug.
+       All four die here. Every core grades the END STATE (§1.0-R3(p)): the VALUE standing in each
+       year column, plus — where the label says a line is BUILT — that the cell is a live formula
+       rather than a typed constant (doctrine §2.2's sanctioned exception, the `balance` r440
+       precedent: a hand-typed constant never clears a beat whose stated outcome is a built line,
+       and that is the only "how" any core reads). No check reads a range, a function name, an
+       operand order or an anchor out of formula text.
+
+       ── MODELING_STANDARDS CONVENTIONS THIS BOARD FOLLOWS (stated per §7 of that file):
+         · §1 COLOUR IS PROVENANCE — every typed input ships BLUE (the beginning balance, both
+           paydown rows, EBITDA, the base rate, the spread); every cell the player builds is left
+           black. No green: the board is one sheet area, so there is no cross-tab link to mark.
+         · §1 STRUCTURE — units stated in the title ($mm) and on the ratio label ((x)); the
+           header row wears a bottom border; the ENDING DEBT total takes a TOP border and never a
+           rule underneath (§1.0(f), and the beat says so literally).
+         · §2 SIGN — costs negative: both paydown rows ship negative, so the corkscrew closes as
+           a clean addition down the column rather than a subtraction against positive numbers.
+           The ONE place this board departs from "costs negative" is CASH INTEREST, which is
+           shown as a positive expense so the coverage ratio reads as a positive multiple the way
+           a credit agreement states it — doctrine §2.4's sanctioned all-cost-magnitude exception.
+           It is stated on the board's own foot memo rather than left for the player to infer.
+         · §3 THE CORKSCREW — beginning / less reductions / ending, in that order, with the
+           beginning cell REFERENCING the prior ending. The link is beat 2 and it is the aha.
+         · §4 CREDIT STATS — coverage is EBITDA ÷ cash interest (pre-interest metric over the
+           interest itself); the covenant reads it as a multiple at one decimal, which is beat 6.
+         · §5 CIRCULARITY — interest accrues on the BEGINNING balance. That is the deliberate
+           simplification this engine's ruling already made (no iterative calculation), and §5/§7
+           require it to be SAID: the board's basis line says it in the player's own words.
+       DELIBERATE SIMPLIFICATIONS, declared: (a) the optional prepayment is a seeded input rather
+       than a computed cash sweep — the sweep needs a cash-flow statement the 20-row cap will not
+       hold (§1.3: a Models board is a COMPONENT, and the fragment gets narrowed, never the cap
+       raised); (b) the rate is a fixed base plus spread with no floor and no undrawn commitment
+       fee; (c) no calendarisation — full-year interest on a full-year beginning balance.
+
+       STRUCTURAL DEVIATIONS from the §4.69 page, declared here per §0:
+       (1) ☆ RE-CUT (binding, §1.0-R4(u)). The page is PRE-PLAYTEST and its bonus reads
+           "One-decimal the coverage cell". That is a FORMATTING task, which §1.0(d) outlaws
+           catalog-wide, and it would fall out of any honest finish of the drill, which
+           §1.0-R2(i) outlaws separately. It was REAL WORK, though — the covenant is quoted at
+           one decimal — so per §1.0-R4(u) it is PROMOTED to core beat 6 rather than deleted
+           (the r425 editfix/dress/ruleoff precedent). The re-cut ☆ is the hidden efficiency this
+           board is built for and is measured in PART 3 above.
+       (2) THE BOARD IS REBUILT TO 20 ROWS (§1.3, Wolf r440) and to the reality test
+           (§1.0-R4(t)): the old 11-row page had no dress anywhere, no stated basis, and an
+           unstyled rate cell. Chapter 7 is audience **B** on the §3.1 map — schedules and
+           credit craft with no corporate-generic twin — so the artifact stays a term-loan
+           schedule; what changed is that it is now a page a credit analyst would recognise as
+           their own file (a stated basis, an amortising facility with a prepayment line, a
+           priced rate, a P&L feed and the ratio the committee reads).
+       (3) THE RATE BECOMES TWO ASSUMPTION CELLS — a base rate and a credit spread — because a
+           term loan is priced that way, and because §1.0(f)/§1.0-R2(l) want a labelled, styled,
+           populated, vertically stacked assumption block rather than one bare number. They are
+           labelled by what they ARE ('Base rate (SOFR)', 'Credit spread') and not with the
+           'Helper — …' prefix: r430 already made that call on the filldr board, on the ground
+           that "Helper" names the cell's role in the DRILL and tells you nothing about the model.
+       (4) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an EXISTING labelled
+           cell inside a labelled row — no insert slot, no empty paste target — so the guided
+           ring expresses all six cores on its own, and nothing on this board is a place an
+           outline cannot say.
+       (5) §1.3 DENSITY: 15 of 20 rows carry content at the win state (75%), against 45% before.
+           Three of the five empty rows are the moats between the debt block, the coverage block
+           and the assumption block — load-bearing on a schedule tab, and they also stop a
+           Ctrl+arrow ride-through between the islands (doctrine §3 geometry). The other two are
+           the page's bottom margin. */
+    name:'Interest', label:'Run the interest schedule', par:72, parKeys:68, saveClose:true,   /* r444 §4.69 depth pass: par re-swept from scratch (was par 29 / parKeys 28 on the 11-row board with no dress beat, no decimal beat, no ☆ and no save closer). dev/e2e-par-sweep.js intsched, 5-seed median 68 keys INCLUDING the engine-appended Ctrl+S, and FLAT at 68 across all five (dev/verify-intsched.js §A prints the raw counts) — the corner jitter moves the column letters but never their count, the row numbers are fixed, and every typed formula is the same length on every draw. par 72 ≈ 1.06 s/key, the house band. The count grew with the board: a third debt line, the dress motion, the decimal pass, the two-cell rate and the save closer. That lands intsched mid-chapter (schedule 35 · revolver 41 · covtable 45 · waterfall 64 · debtsched 73 · cascade 94). Measured against it: the same board worked the slow way — every year of every built line typed out, no fill anywhere, the dress walked off the ribbon and the decimals stepped cell by cell — runs 220 keys, also flat across seeds, which is the cost the clock exists to show. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 1:48 · pro 1:23 · legendary 1:12. */
+    aha:'interest is charged on the beginning balance — point it at the prior year\'s ending debt and the rest of the schedule rolls itself.',
+    /* §1.5: the aha's MOMENT is beat 2. Until the link lands, years two through five of the
+       ending line, the interest line and the coverage line are all sitting on an empty opening;
+       the moment it lands, four years of three lines resolve at once. That is the insight, and
+       it is why MODELING_STANDARDS §3 calls a typed beginning balance the classic junior error. */
+    prompt:'The credit committee meets Thursday and the interest schedule that feeds the P&L is still empty. The facility opens each year where it closed, mandatory amortization takes the paydown the credit agreement requires, the optional prepayment takes what the borrower elected on top, and cash interest accrues on the beginning balance at the base rate plus the credit spread. Roll the debt across the five years, run the interest, and land the coverage line the covenant is tested against.',
+    req(){ const o=this._o; return '<em>'+o.CB+o.rEnd+'</em> <em>=SUM('+o.CB+o.rBeg+':'+o.CB+o.rPre+')</em> · <em>'+o.CC+o.rBeg+'</em> <em>='+o.CB+o.rEnd+'</em> · fill <em>ctrl+r</em> · <em>ctrl+b</em> + <em>alt h b p</em> · <em>'+o.CB+o.rInt+'</em> <em>='+o.CB+o.rBeg+'*($'+o.CB+'$'+o.rRate+'+$'+o.CB+'$'+o.rSprd+')</em> · <em>'+o.CB+o.rCov+'</em> <em>='+o.CB+o.rEbit+'/'+o.CB+o.rInt+'</em> · <em>alt h 9</em> · <em>ctrl+r</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name the OUTCOME; the ROUTE lives HERE, one line per check,
+       chords allowed — and each line names every route that grades, not only the fastest
+       (§1.0-R3(p): a guide that names one route teaches the player to distrust the others). */
+    guide(){ const o=this._o; return [
+      'the three debt lines run row '+o.rBeg+' to row '+o.rPre+' · on '+o.CB+o.rEnd+': <kbd>=SUM(</kbd>'+o.CB+o.rBeg+':'+o.CB+o.rPre+'<kbd>)</kbd> <kbd>↵</kbd>, or select the block down through the empty ending cell and press <kbd>alt</kbd>+<kbd>=</kbd> · then take it across the years — select '+o.CB+o.rEnd+':'+o.CF+o.rEnd+' and <kbd>ctrl</kbd>+<kbd>r</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> is the same fill). An addition chain <kbd>=</kbd>'+o.CB+o.rBeg+'<kbd>+</kbd>'+o.CB+o.rAmrt+'<kbd>+</kbd>'+o.CB+o.rPre+' lands the same number — both paydowns already carry their minus sign',
+      'the link: '+o.CC+o.rBeg+' · <kbd>=</kbd>'+o.CB+o.rEnd+' <kbd>↵</kbd> — point the beginning balance at the prior year\'s ending debt instead of retyping it · then select '+o.CC+o.rBeg+':'+o.CF+o.rBeg+' and <kbd>ctrl</kbd>+<kbd>r</kbd> to carry it to the last year',
+      'dress the line the moment it exists rather than at the end of the run: select '+o.CA+o.rEnd+':'+o.CF+o.rEnd+' · <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> rules above it (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> boxes the row and <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> borders every edge — both draw that top line, both clear it)',
+      'cash interest at '+o.CB+o.rInt+': <kbd>=</kbd>'+o.CB+o.rBeg+'<kbd>*($</kbd>'+o.CB+'<kbd>$</kbd>'+o.rRate+'<kbd>+$</kbd>'+o.CB+'<kbd>$</kbd>'+o.rSprd+'<kbd>)</kbd> <kbd>↵</kbd> — the base rate plus the spread, both locked so one formula fills across (<kbd>f4</kbd> cycles the lock, typed dollar signs land the same string) · fill '+o.CB+o.rInt+':'+o.CF+o.rInt+' right. Pointing each year at the two rate cells by hand lands the same numbers for more keys',
+      'coverage at '+o.CB+o.rCov+': <kbd>=</kbd>'+o.CB+o.rEbit+'<kbd>/</kbd>'+o.CB+o.rInt+' <kbd>↵</kbd> — EBITDA over cash interest, filled across. Anchored or not; it grades the number, not the text',
+      'the covenant is quoted at one place: select '+o.CB+o.rCov+':'+o.CF+o.rCov+' · <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd> steps the multiple from two places to one (<kbd>ctrl</kbd>+<kbd>1</kbd> then <kbd>x</kbd> sets the multiple format at one place outright)',
+      '☆ the discovery: interest and coverage sit on neighbouring rows — grab '+o.CB+o.rInt+':'+o.CF+o.rCov+' as ONE rectangle and a single fill carries both lines across all five years. Filling the two rows separately clears every beat and forfeits it',
     ]; },
+    /* rings: ① the ending debt line · ② the openings that have to be linked · ③ the whole ending
+       row, label included, because that is the honest selection for a dress · ④ the interest
+       line · ⑤ the coverage line · ⑥ the coverage line again (the decimal pass) · ☆ never
+       ringed (§2.2 — the mystery slot is not a rail). */
+    targets(){ const o=this._o; return [
+      o.CB+o.rEnd+':'+o.CF+o.rEnd,
+      o.CC+o.rBeg+':'+o.CF+o.rBeg,
+      o.CA+o.rEnd+':'+o.CF+o.rEnd,
+      o.CB+o.rInt+':'+o.CF+o.rInt,
+      o.CB+o.rCov+':'+o.CF+o.rCov,
+      o.CB+o.rCov+':'+o.CF+o.rCov,
+      null,
+    ]; },
+    /* the demo BUILDS its own selections with Shift+arrow instead of being handed them by
+       setDemoSel, so parKeys measures what a player really pays for the range grabs (the r438
+       `series` rule); setDemoSel only ever parks the cursor on the anchor cell of the next beat. */
+    demo(){ const o=this._o; const R={key:'ArrowRight',shift:true}, DN={key:'ArrowDown',shift:true}; return [
+      {sel:o.CB+o.rEnd, keys:[...T('=SUM('+o.CB+o.rBeg+':'+o.CB+o.rPre+')'), Kb.enter]},
+      {sel:o.CC+o.rBeg, keys:[...T('='+o.CB+o.rEnd), Kb.enter]},
+      {sel:o.CC+o.rBeg, keys:[R,R,R, Kb.fillR]},
+      {sel:o.CB+o.rEnd, keys:[R,R,R,R, Kb.fillR]},
+      /* §1.0(a): the roll is dressed the moment it exists, not in a trailing catch-all */
+      {sel:o.CA+o.rEnd, keys:[R,R,R,R,R, Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+      {sel:o.CB+o.rInt, keys:[...T('='+o.CB+o.rBeg+'*($'+o.CB+'$'+o.rRate+'+$'+o.CB+'$'+o.rSprd+')'), Kb.enter]},
+      {sel:o.CB+o.rCov, keys:[...T('='+o.CB+o.rEbit+'/'+o.CB+o.rInt), Kb.enter]},
+      /* the decimal pass runs on the seed cell BEFORE the fill, so the star carries the finished
+         format across instead of leaving four cells to walk back over (r439 `cases`: a ☆ must
+         never leave the board worse than the route it beats) */
+      {sel:o.CB+o.rCov, keys:[Kb.alt, L('h'), D(9)]},
+      /* ☆ — both P&L-feed lines carried across in ONE pass */
+      {sel:o.CB+o.rInt, keys:[R,R,R,R, DN, Kb.fillR]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — interest schedule ($mm)',txt:true,bold:true};
+      /* §1.2 randomization — three independent axes, and the geometry is CONSTANT across seeds
+         so the keystroke count never moves with the draw (the r439 `wrapfix` rule):
+         (a) SITE: the board is a full-grid artifact (15 of 20 rows), so per §1.2 the site axis is
+             CORNER JITTER — the whole schedule anchors at column A or column B;
+         (b) CONTENT: codename(), the tranche name from a 3-name pool, and the fiscal-year base;
+         (c) VALUES: the beginning balance, both paydown rows, EBITDA and both rate components all
+             through rnd(). */
+      const c0=rnd(0,1)?1:2;                                   // (a) corner jitter
+      const CA=colLetter(c0), CB=colLetter(c0+1), CC=colLetter(c0+2), CF=colLetter(c0+5);
+      const COLS_=[CB,CC,colLetter(c0+3),colLetter(c0+4),CF];
+      const TRANCHES=['Term Loan A','Senior secured term loan','First lien term loan'];
+      const tranche=TRANCHES[rnd(0,TRANCHES.length-1)];        // (b) content pool
       const y0=rnd(24,27);
-      for(let i=0;i<5;i++) cells[colLetter(i+2)+1]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
-      cells['A2']={...blankCell(),value:'Beginning debt',txt:true};
-      cells['A3']={...blankCell(),value:'Less: mandatory amort.',txt:true};
-      cells['A4']={...blankCell(),value:'Ending debt',txt:true,bold:true};
-      cells['A6']={...blankCell(),value:'Cash interest',txt:true};
-      cells['A7']={...blankCell(),value:'EBITDA',txt:true};
-      cells['A8']={...blankCell(),value:'Interest coverage (x)',txt:true,bold:true};
-      cells['A10']={...blankCell(),value:'Interest rate',txt:true};
-      const rate=rnd(6,9)/100;
-      cells['B10']={...blankCell(),value:rate,fontColor:'blue',fmtStyle:'percent',decimals:0};
+      const HR=4, RBEG=5, RAMRT=6, RPRE=7, REND=8, REBIT=10, RINT=11, RCOV=12,
+            RASM=14, RRATE=15, RSPRD=16, RMEMO=18, RMEMO2=19;
+      cells[CA+'1']={...blankCell(),value:codename()+' — '+tranche+' interest schedule ($mm)',txt:true,bold:true};
+      /* MODELING_STANDARDS §5/§7: the basis line states the beginning-balance simplification in
+         the player's own words, because a player who learns a simplification without being told
+         it is one gets corrected on a desk. The SIGN convention (§2) is stated on the two memo
+         lines at the foot of the page rather than crammed in here — the r444 win screenshot
+         showed a single combined line running past column J and being clipped, which is not a
+         page anybody would hand over (doctrine §8.1.5). Each line now sits inside the sheet. */
+      cells[CA+'2']={...blankCell(),value:'Basis: $ in millions · interest accrues on the beginning balance — no iterative calculation',txt:true,it:true,fontColor:'gray'};
+      cells[CA+HR]={...blankCell(),value:'Item',txt:true,bold:true,bb:true};
+      COLS_.forEach((L2,i)=>cells[L2+HR]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r',bb:true});
+      cells[CA+RBEG]={...blankCell(),value:'Beginning debt',txt:true};
+      cells[CA+RAMRT]={...blankCell(),value:'Less: mandatory amort.',txt:true};
+      cells[CA+RPRE]={...blankCell(),value:'Less: optional prepay.',txt:true};
+      cells[CA+REND]={...blankCell(),value:'Ending debt',txt:true};
+      cells[CA+REBIT]={...blankCell(),value:'EBITDA',txt:true};
+      cells[CA+RINT]={...blankCell(),value:'Cash interest',txt:true};
+      cells[CA+RCOV]={...blankCell(),value:'Interest coverage (x)',txt:true};
+      cells[CA+RASM]={...blankCell(),value:'Assumptions',txt:true,bold:true};
+      cells[CA+RRATE]={...blankCell(),value:'Base rate (SOFR)',txt:true};
+      cells[CA+RSPRD]={...blankCell(),value:'Credit spread',txt:true};
+      cells[CA+RMEMO]={...blankCell(),value:'Memo: paydowns carry their minus sign; cash interest is shown as a positive expense.',txt:true,it:true,fontColor:'gray'};
+      cells[CA+RMEMO2]={...blankCell(),value:'Memo: cash interest feeds the P&L; ending debt carries to the balance sheet.',txt:true,it:true,fontColor:'gray'};
+      /* §1.0(f) + §1.0-R2(l): the two assumption cells are vertically stacked, individually
+         labelled by what they ARE, light yellow with all borders, blue (typed input), populated. */
+      /* both quoted on a QUARTER-POINT grid, the way a credit agreement prices a facility —
+         SOFR 4.00%–5.25%, spread 2.50%–4.50%. The first cut drew basis points freely and the
+         win screenshot read "Credit spread 3.41%", which no pricing grid has ever said. */
+      const sofr=rnd(16,21)*25/10000, sprd=rnd(10,18)*25/10000;
+      cells[CB+RRATE]={...blankCell(),value:sofr,fontColor:'blue',fill:'yellow',ball:true,fmtStyle:'percent',decimals:2,align:'c'};
+      cells[CB+RSPRD]={...blankCell(),value:sprd,fontColor:'blue',fill:'yellow',ball:true,fmtStyle:'percent',decimals:2,align:'c'};
+      const rate=sofr+sprd;
+      /* the schedule's own figures. A five-year amortising facility: the credit agreement's
+         mandatory step-down as a share of ORIGINAL principal, plus whatever the borrower elected
+         to prepay on top. Both ship NEGATIVE (MODELING_STANDARDS §2), so the ending balance is a
+         clean SUM down the column and never a subtraction against positive costs. */
       const beg0=rnd(60,90)*10;
-      cells['B2']={...blankCell(),value:beg0,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      const amort=[]; for(let i=0;i<5;i++) amort.push(-rnd(3,8)*10);
-      const ebitda=[]; for(let i=0;i<5;i++) ebitda.push(rnd(15,30)*10);
-      for(let i=0;i<5;i++){ const col=colLetter(i+2);
-        cells[col+3]={...blankCell(),value:amort[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+4]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-        cells[col+6]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+7]={...blankCell(),value:ebitda[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+8]={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
-        if(i>0) cells[col+2]={...blankCell(),fmtStyle:'comma',decimals:0};
+      const AMPCT=[5,5,5,5,10];
+      const amort=AMPCT.map(p=>-Math.round(beg0*p/100/5)*5);
+      const prepay=[]; for(let i=0;i<5;i++) prepay.push(-rnd(1,3)*5);
+      /* EBITDA is sized off year-one interest so coverage opens in the 2.5x–3.8x band a levered
+         credit actually trades at, then grows — the schedule tells a delevering story rather
+         than printing a ratio nobody would underwrite. */
+      const ebitda=[]; ebitda.push(Math.max(50, Math.round(beg0*rate*rnd(25,38)/10/10)*10));
+      for(let i=1;i<5;i++) ebitda.push(ebitda[i-1]+rnd(0,2)*10);
+      const exp=[]; let beg=beg0;
+      for(let i=0;i<5;i++){
+        const end=beg+amort[i]+prepay[i];
+        const interest=beg*rate;
+        exp.push({beg:beg, end:end, interest:interest, cov:ebitda[i]/interest});
+        beg=end;
       }
-      this._exp=[]; let beg=beg0;
-      for(let i=0;i<5;i++){ const end=beg+amort[i]; const interest=beg*rate; const cov=ebitda[i]/interest;
-        this._exp.push({beg:beg,end:end,interest:interest,cov:cov}); beg=end; }
-      return {ROWS:11, cells, active:{r:4,c:2}, sel:null, colW:{1:160,2:82,3:82,4:82,5:82,6:82}};
+      COLS_.forEach((L2,i)=>{
+        if(i===0) cells[L2+RBEG]={...blankCell(),value:beg0,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        else      cells[L2+RBEG]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[L2+RAMRT]={...blankCell(),value:amort[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[L2+RPRE]={...blankCell(),value:prepay[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[L2+REND]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[L2+REBIT]={...blankCell(),value:ebitda[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[L2+RINT]={...blankCell(),fmtStyle:'comma',decimals:0};
+        /* the coverage row ships as a MULTIPLE at two places — the covenant is quoted at one, and
+           closing that gap is beat 6. A text value renders raw regardless of number format, so
+           nothing on this row reads oddly before the player builds it (the r439 `cases` probe). */
+        cells[L2+RCOV]={...blankCell(),fmtStyle:'mult',decimals:2};
+      });
+      this._o={CA:CA, CB:CB, CC:CC, CF:CF, c0:c0, cols:COLS_, exp:exp,
+        rBeg:RBEG, rAmrt:RAMRT, rPre:RPRE, rEnd:REND, rEbit:REBIT, rInt:RINT, rCov:RCOV,
+        rRate:RRATE, rSprd:RSPRD, hr:HR, rate:rate};
+      /* the label column holds 'Less: mandatory amort.' and 'Interest coverage (x)' at natural
+         width; the year columns hold a 3-digit comma figure and a 4-character multiple with room
+         to spare, so nothing loads showing #### and no width verdict is graded here (§1.0-R3(r):
+         this drill never calls overflowsCol/clipsCol, so it is NOT in the __noShrink set and the
+         elastic fit keeps it inside the frame). */
+      const colW={}; colW[c0]=184; for(let i=1;i<=5;i++) colW[c0+i]=84;
+      return {ROWS:20, cells, active:{r:REND,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(0.5,Math.abs(exp)*5e-3); };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D','E','F'];
-      const linkOk=[1,2,3,4].every(i=> refs(COL[i]+'2',[COL[i-1]+'4']) && near(COL[i]+'2',this._exp[i].beg));
+      const o=this._o;
+      /* EVERY predicate reads the END STATE — the number standing in each year column, plus
+         liveness where the label says the line is BUILT. Nothing reads formula text, a function
+         name, an operand order or an anchor (§1.0-R3(p); the four text-grading beats this rework
+         deleted are catalogued in the header note). Tolerance is RELATIVE and tight: it absorbs
+         the float difference between =B5*($B$15+$B$16) and =B5*$B$15+B5*$B$16 — both correct,
+         both must clear — while rejecting a schedule built on the wrong balance. */
+      const live=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'); };
+      const near=(k,exp)=>{ const c=S.cells[k];
+        return !!(c&&typeof c.value==='number'&&Math.abs(c.value-exp)<=Math.max(1e-9,Math.abs(exp)*1e-4)); };
+      const rowBuilt=(r,f)=>o.cols.every((c,i)=>live(c+r)&&near(c+r,f(i)));
+      const endOk = rowBuilt(o.rEnd, i=>o.exp[i].end);
+      /* the link is graded on years two through five only — year one's opening is a seeded blue
+         input and stays one (a beat that demanded a formula there would be asking the player to
+         overwrite the credit agreement's own number). */
+      const begOk = o.cols.slice(1).every((c,j)=>live(c+o.rBeg)&&near(c+o.rBeg,o.exp[j+1].beg));
+      /* the dress grades the FIGURES so both honest selections clear — the label column riding
+         along (what the demo does) and figures only. A top border, or an outside/all-borders box
+         that necessarily draws one: Alt H B P, Alt H B S, Alt H B T and Alt H B A all land it
+         (§1.0-R3(p)); Alt H B O, a rule UNDERNEATH, correctly does not (§1.0(f)). */
+      const dressOk = o.cols.every(c=>{ const x=S.cells[c+o.rEnd]; return !!(x&&x.bold&&(x.bt||x.ball)); });
+      const intOk = rowBuilt(o.rInt, i=>o.exp[i].interest);
+      const covOk = rowBuilt(o.rCov, i=>o.exp[i].cov);
+      /* the covenant read: a multiple at one place. Alt H 9 steps the shipped two places down to
+         one and Ctrl+1 → X sets the multiple format at one place outright — both clear. */
+      const decOk = o.cols.every(c=>{ const x=S.cells[c+o.rCov]; return !!(x&&x.fmtStyle==='mult'&&x.decimals===1); });
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): the two
+         P&L-feed lines are NEIGHBOURS, so one rectangle covers both and a single fill carries
+         them across all five years. Read off the r424 S.fillOps latch — the MECHANIC is recorded,
+         never geometry inferred — so Ctrl+R and the ribbon fill Alt H F I R both earn it (§1.0(c):
+         no route is penalised, and only the ☆ reads this latch). MEASURED skippability, 5 seeds
+         through the live engine (dev/verify-intsched.js §B): filling the two rows SEPARATELY
+         clears all six cores with the star DARK, at 72 keys against the star route's 68; typing
+         the eight remaining feed cells out clears all six cores with the star DARK, at 166. The
+         star is a decision a player can decline twice over, not a by-product of the exercise. */
+      const ops=S.fillOps||[];
+      const onePass = intOk && covOk && ops.some(f=>f.dir==='right'
+        && f.r1<=o.rInt && f.r2>=o.rCov && f.c1<=o.c0+1 && f.c2>=o.c0+5);
       return [
-        {label:'run the ending debt — opening less the mandatory amort, all five years', ok:[0,1,2,3,4].every(i=>near(COL[i]+'4',this._exp[i].end)) && refs('B4',['B2','B3'])},
-        {label:'build THE LINK — each year opens at the prior close', ok:linkOk},
-        {label:'run cash interest — the anchored rate on each OPENING balance, all five years', ok:[0,1,2,3,4].every(i=>near(COL[i]+'6',this._exp[i].interest)) && refs('B6',['B2','B10'])},
-        {label:'run interest coverage — EBITDA over interest, all five years', ok:[0,1,2,3,4].every(i=>near(COL[i]+'8',this._exp[i].cov)) && refs('B8',['B7','B6'])},
+        {label:'Build the ending debt — beginning debt less both paydowns, every year', ok: endOk},
+        {label:'Build the beginning debt — each year opens at the prior year\'s ending debt', ok: begOk},
+        {label:'Bold the ending debt line and add a top border above it', ok: dressOk},
+        {label:'Build cash interest — the all-in rate on each beginning balance, every year', ok: intOk},
+        {label:'Build interest coverage — EBITDA over cash interest, every year', ok: covOk},
+        {label:'Set the interest coverage line to one decimal — 4.2x, not 4.20x', ok: decOk},
+        {label:'Fill the interest and coverage lines across in one pass', ok: onePass, bonus:true},
       ];
     }
   },

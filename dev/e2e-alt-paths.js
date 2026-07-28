@@ -1173,6 +1173,48 @@ const ALTS = [
       for(let i=1;i<5;i++) mv.push({sel:Y[i]+R.acc, keys:[...T('='+Y[i-1]+R.acc+'+'+Y[i]+R.dep),{key:'Enter'}]});
       for(let i=0;i<5;i++) mv.push({sel:Y[i]+R.end, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('a')]});   // Alt H B A writes ball, never bt — the route the predicate was widened for
       return mv; }` },
+  /* r444 (DEPTH_PASS §4.69, `intsched` depth pass) — intsched was one of the nine ZERO-ALTS
+     drills §1.8 names, and its board was rebuilt from 11 rows to 20, so there is nothing to
+     carry forward: these are its first two entries and neither replaces anything.
+     ALT 1 = chord ROUTE — AutoSum instead of a typed SUM, both fills off the ribbon
+     (Alt H F I R), the ending row dressed FIGURES-ONLY with Alt H 1 and the outside-border
+     walk Alt H B S, and the coverage multiple set outright by the absolute Ctrl+1 → X route.
+     The ☆ still fires, because Alt H F I R hits the same S.fillOps latch as Ctrl+R (§1.0(c):
+     no route is penalised).
+     ALT 2 = op ORDER **and the ☆'s measured negative control** — the P&L feeds are built for
+     year one BEFORE the debt rolls, the coverage row is set to one place while it is still
+     empty, the roll and the link land after them, the dress closes the run, and every
+     remaining feed year is TYPED. All six cores clear with the re-cut fill-☆ DARK — measured
+     164 keys against the demo's 68, flat over 3 seeds. */
+  { key: 'intsched', name: 'chord ROUTE — beat 1 by alt+= over the block, both rolls filled off the ribbon (Alt H F I R), the ending row dressed figures-only via Alt H 1 + the outside-border walk Alt H B S, the coverage multiple set outright by Ctrl+1 → X; the ☆ still fires on the ribbon fill', moves: `C => { const o=C._o;
+      const R={key:'ArrowRight',shift:true}, DN={key:'ArrowDown',shift:true};
+      return [
+        {sel:o.CB+o.rBeg, keys:[DN,DN,DN,{key:'=',alt:true,code:'Equal'}]},                       // AutoSum down through the empty ending cell
+        {sel:o.CC+o.rBeg, keys:[...T('='+o.CB+o.rEnd),{key:'Enter'}]},
+        {sel:o.CC+o.rBeg, keys:[R,R,R,{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},                  // ribbon fill, not ctrl+r
+        {sel:o.CB+o.rEnd, keys:[R,R,R,R,{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+        {sel:o.CB+o.rEnd, keys:[R,R,R,R,{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('s')]},  // figures only; Alt H 1 = bold, Alt H B S = the perimeter, which draws the top rule
+        {sel:o.CB+o.rInt, keys:[...T('='+o.CB+o.rBeg+'*($'+o.CB+'$'+o.rRate+'+$'+o.CB+'$'+o.rSprd+')'),{key:'Enter'}]},
+        {sel:o.CB+o.rCov, keys:[...T('='+o.CB+o.rEbit+'/'+o.CB+o.rInt),{key:'Enter'}]},
+        {sel:o.CB+o.rCov, keys:[{key:'1',ctrl:true},L('x')]},                                     // Ctrl+1 → X sets the multiple at one place outright
+        {sel:o.CB+o.rInt, keys:[R,R,R,R,DN,{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},             // the ☆, taken off the ribbon
+      ]; }` },
+  { key: 'intsched', name: 'op ORDER AND the ☆\'s negative control — the P&L feeds built for year one before the debt rolls, the coverage row set to one place while still empty, roll + link after them, dress last, and every remaining feed year TYPED: all six cores clear with the re-cut fill-☆ forfeited and DARK (164 keys against the demo\'s 68)', moves: `C => { const o=C._o;
+      const R={key:'ArrowRight',shift:true}, CL=o.cols, st=[];
+      st.push({sel:o.CB+o.rInt, keys:[...T('='+o.CB+o.rBeg+'*($'+o.CB+'$'+o.rRate+'+$'+o.CB+'$'+o.rSprd+')'),{key:'Enter'}]});
+      st.push({sel:o.CB+o.rCov, keys:[...T('='+o.CB+o.rEbit+'/'+o.CB+o.rInt),{key:'Enter'}]});
+      /* the decimal pass runs over the whole coverage row while four of its five cells are
+         still EMPTY — a typed formula keeps the cell's number format (commitEdit only writes
+         formula/value), so the beat is satisfied by the cells the player fills in afterwards */
+      st.push({sel:o.CB+o.rCov, keys:[R,R,R,R,{key:'Alt'},L('h'),D(9)]});
+      st.push({sel:o.CB+o.rEnd, keys:[...T('='+o.CB+o.rBeg+'+'+o.CB+o.rAmrt+'+'+o.CB+o.rPre),{key:'Enter'}]});   // addition chain, not SUM
+      st.push({sel:o.CB+o.rEnd, keys:[R,R,R,R,{key:'r',ctrl:true}]});
+      st.push({sel:o.CC+o.rBeg, keys:[...T('='+o.CB+o.rEnd),{key:'Enter'}]});
+      st.push({sel:o.CC+o.rBeg, keys:[R,R,R,{key:'r',ctrl:true}]});
+      for(let i=1;i<5;i++) st.push({sel:CL[i]+o.rInt, keys:[...T('='+CL[i]+o.rBeg+'*($'+o.CB+'$'+o.rRate+'+$'+o.CB+'$'+o.rSprd+')'),{key:'Enter'}]});
+      for(let i=1;i<5;i++) st.push({sel:CL[i]+o.rCov, keys:[...T('='+CL[i]+o.rEbit+'/'+CL[i]+o.rInt),{key:'Enter'}]});
+      st.push({sel:o.CA+o.rEnd, keys:[R,R,R,R,R,{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]});          // the dress closes the run
+      return st; }` },
   /* r439: REPLACES the pre-depth-pass signerr alt, which drove the retired 10-row board by
      hard-coded geometry (B10/B8/B4 and C._flips/C._mag, all gone with the rebuild). ALT 1 is the
      chord-ROUTE + op-ORDER alt and EARNS the ☆ by the other paste-special door; ALT 2 is the
