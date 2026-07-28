@@ -1714,13 +1714,33 @@ const ALTS = [
       }
       mv.push({sel:'G12', keys:[...T('=B12+C12+D12+E12+F12'), {key:'Enter'}]});
       return mv; }` },
-  { key: 'txncomps', name: 'tape filled via ctrl+d, MEDIAN typed last-first', moves: `C => [
-      {sel:'D3', keys:[...T('=B3/C3'),{key:'Enter'}]},
-      {sel:'D3:D7', keys:[{key:'d',ctrl:true}]},
-      {sel:'D8', keys:[...T('=MEDIAN(D3:D7)'),{key:'Enter'}]},
-      {sel:'B11', keys:[...T('=B10*D8'),{key:'Enter'}]},
-      {sel:'B13', keys:[...T('=B11-B12'),{key:'Enter'}]},
-    ]` },
+  /* r444 (txncomps depth pass, DEPTH_PASS §4.61). The pre-rework entry is DELETED, not kept:
+     it drove hard-coded D3:D7/D8/B11/B13 on a ROWS:13 board that no longer exists. Per the
+     CAMPAIGN §4 merge rule the reworking agent's side is authoritative for DELETIONS as well as
+     additions — never union this file.
+     ALT 1 = op-ORDER alt (the bridge written before the tape it depends on, recalc catching up)
+     AND the measured ☆ NEGATIVE CONTROL: all six multiples typed, so every core clears with the
+     star DARK (74 keys against the demo's 48). ALT 2 = chord-ROUTE alt: ribbon fill instead of
+     Ctrl+D, an anchored divisor, the median by its long-hand SMALL form (proving beat 2 does not
+     grade the word MEDIAN), and the landing boxed with Alt H B S — which on a ONE-CELL selection
+     stores `ball` rather than `bt`, the route fact that would have stranded the dress beat. */
+  { key: 'txncomps', name: 'op ORDER reversed — implied equity and implied EV written FIRST, then the median, then all six multiples TYPED (☆ forfeited, all five cores clear), landing dressed with ribbon bold', moves: `C => { const o=C._o; const mv=[
+      {sel:o.CD+o.rEq, keys:[...T('='+o.CD+o.rEV+'-'+o.CD+o.rNd),{key:'Enter'}]},
+      {sel:o.CD+o.rEV, keys:[...T('='+o.CD+o.rTgt+'*'+o.CF+o.rMed),{key:'Enter'}]},
+      {sel:o.CF+o.rMed, keys:[...T('=MEDIAN('+o.CF+o.d0+':'+o.CF+o.dN+')'),{key:'Enter'}]}];
+      for(let i=5;i>=0;i--){ const r=o.d0+i; mv.push({sel:o.CF+r, keys:[...T('='+o.CD+r+'/'+o.CE+r),{key:'Enter'}]}); }
+      mv.push({sel:o.CD+o.rEq, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('d')]});
+      return mv; }` },
+  { key: 'txncomps', name: 'chord ROUTE: divisor column-anchored and filled by the RIBBON (alt h f i d), median by the long-hand SMALL form, bridge fully anchored, landing boxed with alt h b s (1x1 stores ball, not bt) — the ☆ still earns', moves: `C => { const o=C._o;
+      const rng=o.CF+o.d0+':'+o.CF+o.dN, SD=[]; for(let i=0;i<5;i++) SD.push({key:'ArrowDown',shift:true});
+      return [
+      {sel:o.CF+o.d0, keys:[...T('='+o.CD+o.d0+'/$'+o.CE+o.d0),{key:'Enter'}]},
+      {sel:o.CF+o.d0, keys:[...SD,{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
+      {sel:o.CF+o.rMed, keys:[...T('=(SMALL('+rng+',3)+SMALL('+rng+',4))/2'),{key:'Enter'}]},
+      {sel:o.CD+o.rEV, keys:[...T('=$'+o.CF+'$'+o.rMed+'*$'+o.CD+'$'+o.rTgt),{key:'Enter'}]},
+      {sel:o.CD+o.rEq, keys:[...T('=$'+o.CD+'$'+o.rEV+'-$'+o.CD+'$'+o.rNd),{key:'Enter'}]},
+      {sel:o.CD+o.rEq, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('s')]},
+    ]; }` },
   { key: 'football', name: 'ceiling before floor, mids last', moves: `C => [
       {sel:'B8', keys:[...T('=MAX(C3:C5)'),{key:'Enter'}]},
       {sel:'B7', keys:[...T('=MIN(B3:B5)'),{key:'Enter'}]},

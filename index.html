@@ -10520,61 +10520,272 @@ const CHALLENGES = {
     }
   },
   txncomps:{
-    name:'Txn Comps', label:'Run precedent transactions', par:36, parKeys:36,
-    aha:'Precedents are comps with dates — same multiples, read in deal order.',
-    prompt:'Five precedent deals, one target. Compute EV/EBITDA paid in each deal, take the MEDIAN of the multiples with one live formula — outliers can’t drag it — then mark the target: implied EV at the median multiple, less net debt, equals implied equity.',
-    req:'<em>D3</em> \u00b7 <em>=B3/C3</em> \u00b7 fill D3:D7 \u2193 \u00b7 <em>D8</em> median <em>=MEDIAN(D3:D7)</em> \u00b7 <em>B11</em> implied EV <em>=B10*D8</em> \u00b7 <em>B13</em> implied equity <em>=B11-B12</em>',
-    guide:[
-      'multiple paid, deal one: D3 \u00b7 <kbd>=B3/C3</kbd> <kbd>\u21b5</kbd> \u00b7 select D3:D7 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd>',
-      'median at D8 \u00b7 <kbd>=MEDIAN(D3:D7)</kbd> \u2014 outlier-resistant, live off the column',
-      'implied EV at B11 \u00b7 <kbd>=B10*D8</kbd> \u2014 target EBITDA \u00d7 the median multiple',
-      'implied equity at B13 \u00b7 <kbd>=B11-B12</kbd> \u2014 net debt comes off last',
-    ],
-    targets:['D3:D7','D8','B11','B13'],
-    demo(){ return [
-      {sel:'D3', keys:[...T('=B3/C3'), Kb.enter]},
-      {sel:'D3:D7', keys:[Kb.fillD]},
-      {sel:'D8', keys:[...T('=MEDIAN(D3:D7)'), Kb.enter]},
-      {sel:'B11', keys:[...T('=B10*D8'), Kb.enter]},
-      {sel:'B13', keys:[...T('=B11-B12'), Kb.enter]},
+    /* r444 H6b-14 (DEPTH_PASS §4.61, "Run precedent transactions") — the depth-pass rework,
+       built to §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page, with
+       dev/MODELING_STANDARDS.md binding as a Models-chapter board (§9 WORKFLOW).
+
+       WAS: 4 checks on a ROWS:13 board (11 of the real 20-row sheet carrying content — 55%,
+       under the §1.3 floor), no ☆ at all, no saveClose, every check label opening with a
+       lowercase gerund and naming its own cell address ("run the multiple paid on every deal
+       — EV over EBITDA, fill down D3:D7" told the player the ROUTE, which §1.0(b) strips).
+
+       ── ☆-HEADROOM DIAGNOSTIC (CAMPAIGN §2, BOTH PARTS) — run BEFORE the board was designed,
+          measured through the live engine on the SHIPPED board, keyLog, 5 seeds, every
+          selection and navigation keyed:
+          PART 1 — IS THERE SPREAD? fastest legal 40 keys (one multiple typed, the column
+            filled, MEDIAN, the two bridge cells) against 59 for the same work with all five
+            multiples hand-typed. 1.48× on the whole run; 13 keys against 40 on the fill
+            ISOLATED (CAMPAIGN §2's isolate-each-move rule), i.e. 3.1× and 27 keys of value.
+          PART 2 — IS ANY OF IT ☆-LEGAL? This half decides. Strip chord-vs-ribbon (§1.0(c)
+            forces those to clear) and formatting (§1.0(d) forbids grading it): the engine has
+            NO ribbon route into formula entry, and Ctrl+D and Alt H F I D hit the same
+            fillFrom latch, so the chord-vs-ribbon component of this board is EMPTY by
+            construction — the `wrapfix` (r439) composition exactly. The board grades no
+            formatting except one dress beat the player must do anyway. So 100% of the spread
+            is FILL-versus-RETYPE, which is the "one copy-down fills a block" mastery move
+            §1.0(d) names outright. Legal headroom, in the drill's own subject. BUILD.
+          RE-MEASURED on the SHIPPED board below (six deals instead of five, same instrument):
+            fastest legal 48 keys · slowest legal doing the SAME work 110 (all six multiples
+            typed, the median by its long-hand SMALL form, the bridge anchored and SUM-wrapped,
+            the landing dressed by ribbon walks) = 2.29×. Composition unchanged, so the verdict
+            is unchanged. Isolated ☆ numbers in the ☆ note in checks(); full table in
+            dev/AUDIT.md r444; dev/verify-txncomps.js re-runs the whole thing.
+
+       ── DISTINCTNESS (CAMPAIGN §3 discriminator, asked before anything was built). The
+          neighbour is `comps` (§4.60), one slot up the chapter, and the two boards do share a
+          multiple column. Does fluency in `comps` produce a CORRECT first attempt here? For
+          the multiple column and the median, yes — and that is deliberate spaced practice,
+          the `scrub`/`rowops` shape. What it does NOT produce is this board's own work:
+          `comps` reads a peer set five ways (median, high, low, and the LARGE/SMALL trimmed
+          read) and walks the target all the way to a premium-to-market on a LIVE share price;
+          this board reads a DEAL set exactly one way — the median of what buyers actually
+          paid — and stops at implied equity value, because a precedent set has no market
+          price to be a premium to. The pages are different artifacts with different columns
+          (announced date, acquirer, target) and different arguments. KEEP both, and this one
+          deliberately does not grow the per-share landing `comps` already owns.
+
+       ── ROUTES ENUMERATED AND WALKED (§1.0-R3(p) — the untriggerable-beat class dies by
+          probing, never by reading a predicate). Every core grades the END STATE: the number
+          standing in the cell, plus liveness where the label says a line is BUILT. No check
+          reads a range, a function name or an anchor out of formula text — which is what
+          killed the shipped `comps`-family checks (campaign bugs #3/#8/#9/#12).
+            · beat 1 clears from =D5/E5 typed six times, from one formula filled with Ctrl+D,
+              from Alt H F I D, from a copy of the head cell pasted over the block, and with
+              the divisor anchored ($E5, E$5, $E$5) — every one of those lands the same six
+              numbers, and the anchored form is the habit `anchor`/`fxconvert` teach.
+            · beat 2 clears from =MEDIAN(range), from =MEDIAN over a hand-listed argument
+              list, and from the long hand form (=(SMALL(..,3)+SMALL(..,4))/2) — the value is
+              what is graded, not the word MEDIAN.
+            · beats 3/4 clear anchored or not, and beat 4 clears as =EV-netdebt or as
+              =SUM(EV,-netdebt) or with the net-debt figure typed into the formula (slow, and
+              §1.0(c) says the slow way must never be punished by the grader).
+            · beat 5 clears from Alt H B P (stores `bt`), from Ctrl+1 → Border → top, and from
+              Alt H B A / Alt H B S / Alt H B T, which on a ONE-CELL selection store `ball`
+              rather than `bt` (CAMPAIGN §1 route fact) — all five paint a line above the
+              landing, so all five clear. Bold clears from Ctrl+B or Alt H 1.
+          Probe: dev/verify-txncomps.js walks all of these and asserts the beat flips.
+
+       ── STRUCTURAL DEVIATIONS from the §4.61 page, declared here per §0:
+       (1) ☆ RE-CUT (binding, §1.0-R4(u) — the page predates the playtest rounds, so its ☆ is
+           dead on arrival). The page proposes "Bold the implied-equity landing and add a top
+           border above it": a FORMATTING task, which §1.0(d) outlaws catalog-wide, and one
+           that falls out of finishing the page anyway, which §1.0-R2(i) forbids separately.
+           It was REAL WORK, so per §1.0-R4(u) it is PROMOTED to core beat 5 verbatim (the
+           r425 editfix/dress/ruleoff precedent) rather than deleted, and it lands where
+           §1.0(a) wants it — immediately after the beat that builds the cell it dresses.
+           The new ☆ is the fill census: the multiple written ONCE and taken down all six
+           deals in a single pass. Measured skippable, measured positive, isolated — see the
+           ☆ note in checks().
+       (2) BOARD REBUILT TO 20 ROWS (§1.3, Wolf r440 — floor AND cap). ROWS:13 was the
+           copied-default defect. The board is now a real precedent-transactions page: title,
+           basis memo, a six-deal tape with announced date / acquirer / target, the median
+           read under it, and the implied-valuation bridge below that. 16 of 20 rows carry
+           content at the win state (80%). The four blanks are the two moats between the three
+           blocks (load-bearing — they are what stops Ctrl+Shift+↓ riding out of the tape into
+           the median row, doctrine §3 geometry) plus one before the footnote.
+       (3) SIX DEALS, NOT FIVE. The fill is this drill's ☆ and five cells is a thin block; six
+           is also what a precedent tape actually carries. The count is FIXED across seeds so
+           the keystroke count never moves with the draw (the r439 `wrapfix` rule).
+       (4) AHA RE-CUT. The page says "aha: existing", and the existing line ("precedents are
+           comps with dates — same multiples, read in deal order") has no MOMENT inside the
+           run — §1.5 requires one, and no beat ever reads the tape in date order. The re-cut
+           aha's moment is beat 2: six multiples spread across the tape and the median
+           ignoring the two extremes.
+       (5) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an EXISTING labelled
+           cell in a labelled row — no insert slot, no empty paste target — so the guided ring
+           expresses all five core beats. NO HELPER STACK (§1.0(f)/§1.0-R2(l)): nothing on this
+           board is assumed, converted or scaled. NO adaptive label (§1.0-R2(g)): the required
+           action is identical every seed; only the figures move.
+
+       ── MODELING_STANDARDS CONVENTIONS THIS BOARD FOLLOWS:
+          · §1 colour-as-provenance — every figure pulled from filings (transaction values,
+            LTM EBITDA, target EBITDA, net debt) ships BLUE; every computed cell is black.
+          · §1 structure — units stated in the title ($mm), a source/basis memo line, the
+            median read wearing a TOP border (§1.0(f): never a rule underneath), figures
+            right-aligned, a rule under the column headers (doctrine §2.1b).
+          · §4 Comps — EV multiples take PRE-INTEREST metrics, so the tape pairs transaction
+            enterprise value with EBITDA and never equity value with EBITDA (the classic
+            error); the headline read is the MEDIAN, not the mean, because a six-deal set is
+            exactly where one aggressive buyer distorts an average.
+          · §4 the enterprise → equity bridge — EV less net debt = equity value.
+          · §7 the board is a COMPONENT of a build (one valuation page's precedent panel),
+            not a model, and it fits 20×10 at natural width.
+          DELIBERATE SIMPLIFICATIONS, stated per §7: net debt is shown POSITIVE on a
+          "Less:" line and deducted, rather than carried negative and added. Both forms are
+          standard on a real bridge; the "Less:" prefix carries the sign explicitly, and this
+          board has no other signed line, so §2's "pick one and hold it" is not at risk. There
+          is no calendarisation and no LTM adjustment — the memo line says "LTM as reported",
+          which is what makes it a simplification rather than a silent error. */
+    name:'Txn Comps', label:'Run precedent transactions', par:52, parKeys:49, saveClose:true,   /* r444 §4.61 depth pass: par re-swept from scratch (was par 36 / parKeys 36 on the five-deal ROWS:13 board with no ☆ and no save closer). dev/e2e-par-sweep.js txncomps, 5-seed median 49 keys including the engine-appended Ctrl+S — flat across seeds, since the randomization moves the figures, the names and the anchor column but never the beat count. par 52 ≈ 1.06 s/key, the house band. The count grew with the board: a sixth deal, the dress beat promoted off the dead ☆, and the save. That lands txncomps between `fcfbuild` (32) and `dcf` (62) in the chapter band (wacc 78 · comps 94). Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 1:18 · pro 1:00 · legendary 0:52. */
+    aha:'the median of six deals is the mark — one buyer who reached does not move it.',
+    /* §1.5: the aha's MOMENT is beat 2. The tape is deliberately seeded to spread 6.5x–12.5x,
+       so the highest deal on the page sits visibly above the number the median lands on. */
+    prompt:'Your MD wants a precedent read on the target before Monday’s committee. Six deals in the space are already on the page with what was paid and the LTM EBITDA behind it. Compute the multiple paid on each deal, take the median across the set, then mark the target at that multiple and bridge it down to implied equity value. TEV is transaction enterprise value — the equity paid plus the debt assumed.',
+    req(){ const o=this._o; return 'multiple <em>'+o.CF+o.d0+'</em> → <em>='+o.CD+o.d0+'/'+o.CE+o.d0+'</em> · select '+o.CF+o.d0+':'+o.CF+o.dN+' · <em>ctrl+d</em> · <em>'+o.CF+o.rMed+'</em> → <em>=MEDIAN('+o.CF+o.d0+':'+o.CF+o.dN+')</em> · <em>'+o.CD+o.rEV+'</em> → <em>='+o.CD+o.rTgt+'*'+o.CF+o.rMed+'</em> · <em>'+o.CD+o.rEq+'</em> → <em>='+o.CD+o.rEV+'-'+o.CD+o.rNd+'</em> · <em>ctrl+b</em> · <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check,
+       chords allowed — and each line names every route that GRADES, not only the fastest
+       (§1.0-R3(p)), so nobody watches a correct board sit against a dark line. */
+    guide(){ const o=this._o; return [
+      'the tape runs row '+o.d0+' to row '+o.dN+' · on '+o.CF+o.d0+': <kbd>=</kbd>'+o.CD+o.d0+'<kbd>/</kbd>'+o.CE+o.d0+' <kbd>↵</kbd>, then take it down the column — select '+o.CF+o.d0+':'+o.CF+o.dN+' and <kbd>ctrl</kbd>+<kbd>d</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>d</kbd> is the same fill, and a copy of the head cell pasted over the block lands it too). Typing all six clears the line as well — it only costs the keys, and anchoring the divisor changes nothing here',
+      'the median read at '+o.CF+o.rMed+': <kbd>=MEDIAN(</kbd>'+o.CF+o.d0+':'+o.CF+o.dN+'<kbd>)</kbd> <kbd>↵</kbd> — six deals, so it lands between the third and fourth. The long hand form grades the same, the number is what is read',
+      'mark the target at '+o.CD+o.rEV+': <kbd>=</kbd>'+o.CD+o.rTgt+'<kbd>*</kbd>'+o.CF+o.rMed+' <kbd>↵</kbd> — point at the median cell rather than retyping the number, so it moves when the tape does. Anchored or not, either order',
+      'the bridge at '+o.CD+o.rEq+': <kbd>=</kbd>'+o.CD+o.rEV+'<kbd>-</kbd>'+o.CD+o.rNd+' <kbd>↵</kbd> — net debt is shown positive on the Less line and comes off',
+      'close the page: on '+o.CD+o.rEq+' press <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) and <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> rules above it — <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd>, <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> and the Ctrl+1 border tab all draw that line too, and all of them clear it',
+      '☆ the discovery: the multiple written ONCE and taken down all six deals in a single pass — one selection, one fill. Typing the six clears every core beat and forfeits it',
     ]; },
+    /* rings: ① the multiple column · ② the median cell · ③ the implied-EV cell ·
+       ④ the implied-equity cell · ⑤ the implied-equity line · ☆ never ringed (§2.2) */
+    targets(){ const o=this._o; return [
+      o.CF+o.d0+':'+o.CF+o.dN, o.CF+o.rMed, o.CD+o.rEV, o.CD+o.rEq, o.CA+o.rEq+':'+o.CD+o.rEq, null,
+    ]; },
+    /* the demo BUILDS its own selection with Shift+ArrowDown rather than being handed it by
+       setDemoSel, so parKeys measures what a player really pays for the range grab instead of
+       eliding it (the r438 `series` rule). setDemoSel only parks the cursor on the anchor cell
+       of the next beat. */
+    demo(){ const o=this._o; const SD=n=>{ const a=[]; for(let i=0;i<n;i++) a.push({key:'ArrowDown',shift:true}); return a; };
+      return [
+        {sel:o.CF+o.d0, keys:[...T('='+o.CD+o.d0+'/'+o.CE+o.d0), Kb.enter]},
+        /* the ☆ — one selection, one fill, all six deals */
+        {sel:o.CF+o.d0, keys:[...SD(o.dN-o.d0), Kb.fillD]},
+        {sel:o.CF+o.rMed, keys:[...T('=MEDIAN('+o.CF+o.d0+':'+o.CF+o.dN+')'), Kb.enter]},
+        {sel:o.CD+o.rEV, keys:[...T('='+o.CD+o.rTgt+'*'+o.CF+o.rMed), Kb.enter]},
+        {sel:o.CD+o.rEq, keys:[...T('='+o.CD+o.rEV+'-'+o.CD+o.rNd), Kb.enter]},
+        /* §1.0(a) format-as-you-go: the landing is dressed the moment it exists */
+        {sel:o.CD+o.rEq, keys:[Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+      ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 precedent transactions ($mm)',txt:true,bold:true};
-      cells['A2']={...blankCell(),value:'Deal',txt:true,bold:true};
-      cells['B2']={...blankCell(),value:'EV',txt:true,bold:true,align:'r'};
-      cells['C2']={...blankCell(),value:'EBITDA',txt:true,bold:true,align:'r'};
-      cells['D2']={...blankCell(),value:'EV/EBITDA',txt:true,bold:true,align:'r'};
-      const buyers=['Falcon / Ridge','Atlas / Delta','Copper / Peak','Summit / Crest','Ironline / Bay'];
-      for(let k2=buyers.length-1;k2>0;k2--){ const j=rnd(0,k2); [buyers[k2],buyers[j]]=[buyers[j],buyers[k2]]; }
-      cells['E2']={...blankCell(),value:'Announced',txt:true,bold:true,align:'r'};
-      this._m=[];
-      for(let i=0;i<5;i++){
-        const ebd=rnd(8,40)*10; const mult=rnd(60,120)/10; const ev=Math.round(ebd*mult);
-        cells['A'+(3+i)]={...blankCell(),value:buyers[i],txt:true};
-        cells['B'+(3+i)]={...blankCell(),value:ev,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells['C'+(3+i)]={...blankCell(),value:ebd,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells['D'+(3+i)]={...blankCell(),fmtStyle:'mult',decimals:1};
-        cells['E'+(3+i)]={...blankCell(),value:45300+rnd(0,1100),fmtStyle:'date',decimals:0,align:'r'};   // announced \u2014 context only, precedents READ in deal order
-        this._m.push(ev/ebd);
+      /* §1.2 randomization — four independent axes. (a) SITE: the board is a full-grid
+         artifact (16 of 20 rows), so per §1.2 the site axis is CORNER JITTER — the whole page
+         anchors at column A or column B. (b) CONTENT: the codename, plus acquirer and target
+         name pools Fisher-Yates shuffled. (c) VALUES: every figure through rnd(), and the
+         announced dates walk backwards from a jittered base. (d) WHICH-ONE: which two of the
+         six deals straddle the median moves with the draw, so the number the page turns on is
+         never the same deal twice. Geometry (six deals, one median, four bridge rows) is
+         CONSTANT across seeds so the keystroke count never moves with the draw — the r439
+         `wrapfix` rule. */
+      const c0=rnd(0,1)?1:2;                                   // (a) corner jitter
+      const CA=colLetter(c0), CB=colLetter(c0+1), CC=colLetter(c0+2),
+            CD=colLetter(c0+3), CE=colLetter(c0+4), CF=colLetter(c0+5);
+      const HR=4, D0=5, DN=10, RMED=12, RSUB=14, RTGT=15, REV=16, RND_=17, REQ=18, RNOTE=20;
+      const pick=(pool,n)=>{ const b=pool.slice(); for(let k=b.length-1;k>0;k--){ const j=rnd(0,k); [b[k],b[j]]=[b[j],b[k]]; } return b.slice(0,n); };
+      const deal=codename();
+      cells[CA+'1']={...blankCell(),value:deal+' — precedent transactions ($mm)',txt:true,bold:true};
+      cells[CA+'2']={...blankCell(),value:'Source: company filings · TEV = enterprise value paid, debt assumed · LTM as reported',txt:true,it:true,fontColor:'gray'};
+      /* doctrine §2.1b: bold header row, figures right, a rule UNDER the headers */
+      const hdr=[[CA,'Announced',null],[CB,'Acquirer',null],[CC,'Target',null],
+                 [CD,'TEV','r'],[CE,'LTM EBITDA','r'],[CF,'TEV / LTM EBITDA','r']];
+      hdr.forEach(([col,txt,al])=>cells[col+HR]={...blankCell(),value:txt,txt:true,bold:true,bb:true,align:al});
+      const ACQ=['Falcon Ind.','Atlas Group','Copper Peak','Summit Hldgs','Ironline','Meridian Cap','Cardinal','Granite Ptrs','Beacon Ind.'];
+      const TGT=['Redwood Sys.','Harbor Ctrls','Juniper Labs','Basalt Mtls','Lantern Tech','Willow Foods','Cirrus Aero','Aspen Med.','Onyx Pkg.'];
+      const acq=pick(ACQ,6), tgt=pick(TGT,6);
+      const mults=[];
+      let ser=45658+rnd(0,320);                                // most recent deal first, the way a tape is sorted
+      for(let i=0;i<6;i++){
+        const r=D0+i;
+        const ebd=rnd(9,42)*10;                                // LTM EBITDA, $mm
+        const m0=rnd(65,125)/10;                               // the multiple the buyer paid, 6.5x-12.5x
+        const tev=Math.round(ebd*m0/5)*5;                      // announced TEV, rounded the way a filing reads
+        cells[CA+r]={...blankCell(),value:ser,fmtStyle:'date',decimals:0,align:'r'};
+        cells[CB+r]={...blankCell(),value:acq[i],txt:true};
+        cells[CC+r]={...blankCell(),value:tgt[i],txt:true};
+        cells[CD+r]={...blankCell(),value:tev,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[CE+r]={...blankCell(),value:ebd,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[CF+r]={...blankCell(),fmtStyle:'mult',decimals:1};   // ships formatted: the lesson here is not the format (doctrine §2.1b)
+        mults.push(tev/ebd);
+        ser-=rnd(60,180);
       }
-      cells['A8']={...blankCell(),value:'Median',txt:true,bold:true}; cells['D8']={...blankCell(),fmtStyle:'mult',decimals:1,bold:true};
-      cells['A10']={...blankCell(),value:'Target EBITDA',txt:true};   cells['B10']={...blankCell(),value:rnd(10,35)*10,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['A11']={...blankCell(),value:'Implied EV',txt:true,bold:true}; cells['B11']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      cells['A12']={...blankCell(),value:'Net debt',txt:true};        cells['B12']={...blankCell(),value:rnd(5,20)*10,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['A13']={...blankCell(),value:'Implied equity',txt:true,bold:true}; cells['B13']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      const avg=this._m.slice().sort((a,b)=>a-b)[2];   // r264: median of five \u2014 precedents lead with the median
-      this._exp={avg:avg, ev:cells['B10'].value*avg, eq:cells['B10'].value*avg-cells['B12'].value};
-      return {ROWS:13, cells, active:{r:3,c:4}, sel:null, colW:{1:132,2:80,3:80,4:88,5:86}};
+      /* the median read — §1.0(f): a summary line takes a TOP border, never a rule underneath */
+      cells[CA+RMED]={...blankCell(),value:'Median multiple paid',txt:true,bold:true,bt:true};
+      cells[CB+RMED]={...blankCell(),bt:true}; cells[CC+RMED]={...blankCell(),bt:true};
+      cells[CD+RMED]={...blankCell(),bt:true}; cells[CE+RMED]={...blankCell(),bt:true};
+      cells[CF+RMED]={...blankCell(),fmtStyle:'mult',decimals:1,bold:true,bt:true};
+      cells[CA+RSUB]={...blankCell(),value:'Implied valuation — '+deal,txt:true,bold:true};
+      const tEbd=rnd(18,52)*10, nd=rnd(6,26)*10;
+      cells[CA+RTGT]={...blankCell(),value:'Target LTM EBITDA',txt:true};
+      cells[CD+RTGT]={...blankCell(),value:tEbd,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells[CA+REV]={...blankCell(),value:'Implied enterprise value',txt:true};
+      cells[CD+REV]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells[CA+RND_]={...blankCell(),value:'Less: net debt',txt:true};
+      cells[CD+RND_]={...blankCell(),value:nd,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells[CA+REQ]={...blankCell(),value:'Implied equity value',txt:true};
+      cells[CD+REQ]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells[CA+RNOTE]={...blankCell(),value:'Note: multiples paid include the control premium · net debt is shown positive and deducted',txt:true,it:true,fontColor:'gray'};
+      const srt=mults.slice().sort((a,b)=>a-b);
+      const med=(srt[2]+srt[3])/2;                             // MODELING_STANDARDS §4: the median leads a comp set, and six deals straddle
+      this._o={CA:CA,CB:CB,CC:CC,CD:CD,CE:CE,CF:CF,c0:c0,
+               hr:HR,d0:D0,dN:DN,rMed:RMED,rTgt:RTGT,rEV:REV,rNd:RND_,rEq:REQ,
+               cM:c0+5,cV:c0+3,mults:mults,
+               med:med, ev:tEbd*med, eq:tEbd*med-nd};
+      const colW={}; colW[c0]=84; colW[c0+1]=112; colW[c0+2]=112; colW[c0+3]=88; colW[c0+4]=96; colW[c0+5]=126;
+      return {ROWS:20, cells, active:{r:D0,c:c0+5}, sel:null, colW:colW};
     },
     checks(S){
-      const near=(k,exp,tol)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<(tol||0.05)); };
+      const o=this._o;
+      /* every predicate reads the END STATE — the number standing in the cell, plus liveness
+         where the label says the line is BUILT. Nothing reads formula text, a function name,
+         a range or an anchor (§1.0-R3(p) + CAMPAIGN §1: thirteen untriggerable beats found in
+         this campaign and every one of them graded TEXT). */
+      const live=(k,exp,tol)=>{ const c=S.cells[k];
+        return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<(tol||0.005)); };
+      const multOk=[0,1,2,3,4,5].every(i=>live(o.CF+(o.d0+i),o.mults[i]));
+      const medOk=live(o.CF+o.rMed,o.med);
+      const evOk=live(o.CD+o.rEV,o.ev,0.5);
+      const eqOk=live(o.CD+o.rEq,o.eq,0.5);
+      /* §1.0-R3(p) + CAMPAIGN §1 route fact: on a ONE-CELL selection Alt H B S / B A / B T
+         store `ball` (the box), while Alt H B P stores `bt` — every one of them paints a line
+         above the landing, so every one of them clears. Bold: Ctrl+B and Alt H 1 both. */
+      const dressed=(()=>{ const c=S.cells[o.CD+o.rEq]; return !!(c&&c.bold&&(c.bt||c.ball)); })();
+      /* ☆ (§1.0(d) hidden efficiency · §1.0-R2(i) a real, SKIPPABLE decision): the multiple
+         written ONCE and taken down all six deals in a single pass. Read off the r424
+         S.fillOps latch and the r425 S.pasteLog latch (the MECHANIC, never geometry inferred
+         from the end state), so Ctrl+D, the ribbon fill Alt H F I D and a copy of the head
+         cell pasted over the block all earn it — chord-agnostic per §1.0(c). Latched only when
+         the column is actually RIGHT, so a fill that propagates a mistake never lights it
+         (the r440 balcheck rule).
+         MEASURED, isolated, 5 seeds through the live engine on THIS board (dev/verify-txncomps.js
+         §B — isolated so a combined number cannot hide a negative half, the r438 `series` rule):
+         the one-pass route costs 12 keys against 38 to type the six multiples — 26 keys of
+         value, 3.17x, flat across all five seeds. SKIPPABLE by measurement, not assertion: the
+         negative control types all six, clears every core beat and leaves the star dark (74 keys
+         against the demo's 48 on the whole run); it is registered as the first ALTS entry for
+         this drill.
+         FAMILY (§1.0-R4(u) spacing): fill-census. It is this board's own craft and its whole
+         key spread; flagged in the payload for the orchestrator because `comps` builds in the
+         same wave and is the adjacent drill. */
+      const ops=S.fillOps||[];
+      const onePass=ops.some(f=>f.dir==='down' && f.r1<=o.d0 && f.r2>=o.dN && f.c1<=o.cM && f.c2>=o.cM)
+        || (S.pasteLog||[]).some(p=>p.c0<=o.cM && p.c0+p.w-1>=o.cM && p.r0<=o.d0+1 && p.r0+p.h-1>=o.dN);
+      /* Labels are INSTRUCTIONS (§1.0-R3(n)) — the clause after the em-dash says WHAT or
+         WHERE, never why — and they name the board's own labelled items (§1.7 R2/R9), never
+         a bare cell address. */
       return [
-        {label:'run the multiple paid on every deal \u2014 EV over EBITDA, fill down D3:D7',
-          ok: [0,1,2,3,4].every(i=>near('D'+(3+i),this._m[i]))},
-        {label:'take the MEDIAN of the multiples at D8 \u2014 live off the column, never hand-typed', ok: near('D8',this._exp.avg)},
-        {label:'mark implied EV at B11 \u2014 target EBITDA \u00d7 the median multiple', ok: near('B11',this._exp.ev,0.5)},
-        {label:'back into implied equity at B13 \u2014 take net debt off the implied EV', ok: near('B13',this._exp.eq,0.5)},
+        {label:'Build the multiple paid on every deal — TEV over LTM EBITDA', ok: multOk},
+        {label:'Build the median multiple — across all six deals', ok: medOk},
+        {label:'Build implied enterprise value — target LTM EBITDA at the median multiple', ok: evOk},
+        {label:'Build implied equity value — implied enterprise value less net debt', ok: eqOk},
+        {label:'Bold the implied-equity landing and add a top border above it', ok: dressed},
+        {label:'Fill the multiple column in one pass — one formula down all six deals', ok: multOk&&onePass, bonus:true},
       ];
     }
   },
