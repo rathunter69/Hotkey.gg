@@ -741,3 +741,42 @@ before, and `unhide`'s beat 1 is to unhide anyway) — the fix was in the probe.
 campaign a probe defect read as an engine defect (see the r440 `hotkey_onboarded` note): when a
 probe's numbers move with something that cannot affect the thing being measured, suspect the
 probe first.
+
+## A visual guard must assert the MEASUREMENT, never the difference (r442)
+
+The border bug survived **four** playtests with a green guard sitting on top of it, and the guard
+is the more useful half of the story.
+
+`dev/check-borders.js` screenshotted a band across a cell edge with and without the border class
+and asserted the two buffers were **not byte-identical**. That is a difference test wearing a
+correctness test's clothes. `.bl` changed the border *colour* from the faint gridline to text
+colour even when its width collapsed away to nothing, so the buffers differed and the guard
+reported `ok` — while the edge painted **0.00px**. It proved "something changed"; it never once
+proved "a thicker line is on screen".
+
+**The rule: assert the number.** The rewritten guard measures the painted run of dark pixels and
+asserts 2px thin / 3px thick, and — this part matters — asserts that an *unformatted* cell paints
+**nothing**, so the ink threshold itself cannot rot. If the assertion cannot distinguish the bug
+from the fix, it is not a guard.
+
+Three corollaries, each earned here:
+
+1. **Test the combination the app actually emits.** The old guard hand-built a synthetic 3×3
+   table from the extracted CSS. The real cause — inline styles written by `render()` — lived
+   entirely outside what it tested, and the class combo the app really uses for an outside box
+   (`ball`) was never exercised. Drive the real render path.
+2. **A guard that is not in the gate does not exist.** `check-borders.js` and `check-pause.js`
+   were both written in r429 and neither had run on a single PR until r442. Writing the guard is
+   half the job; wiring it is the other half.
+3. **Two mechanisms for one job means the older, wronger one wins eventually.** r429 added
+   correct CSS beside r292's inline emitter and left both in place. `getComputedStyle` looked
+   innocent the whole time because the inline value *was* the computed value. When you fix a
+   render path, delete the path you replaced.
+
+**Probe discipline, third sighting.** Three probes written during this investigation gave
+confidently wrong readings before one held — including one reporting `0.00px` for an inline
+`6px solid red` border, which is impossible and was the tell that the probe, not the app, was
+broken. What finally settled it was a zoomed screenshot looked at directly. **When a probe and
+your eyes disagree, believe your eyes and go fix the probe.** (After r440's `hotkey_onboarded`
+omission and r441's hidden rows — this keeps costing rounds, so treat a surprising probe reading
+as suspect by default and confirm it visually before reasoning from it.)

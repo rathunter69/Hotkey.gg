@@ -527,25 +527,62 @@
      Net effect: Outside Borders — the most common real border op and the one the paste-special
      drill asks for — finally draws all four sides instead of just the bottom.
      Guarded by dev/check-borders.js, which pixel-tests every edge. */
-  td.bt,#grid td.bt{border-top:2px solid var(--rule,var(--text))}
-  td.bb,#grid td.bb{border-bottom:2px solid var(--rule,var(--text))}
-  td.bl,#grid td.bl{border-left:2px solid var(--rule,var(--text))}
-  td.br,#grid td.br{border-right:2px solid var(--rule,var(--text))}
-  td.bdbl,#grid td.bdbl{border-bottom:3px double var(--rule,var(--text))}   /* r298: Alt H B B — the double rule under a grand total */
+  /* r442 (Wolf, playtest 4: "border visibility hasn't been fixed — outside and thick look
+     identical, left border not rendering"). He was right, and r429's fix above is only half
+     true. MEASURED on the real grid by decoding pixels, not by diffing screenshot bytes:
+
+         bt  2.00px ✓     bl  0.00px ✗     ball        2.00px ✓
+         bb  2.00px ✓     br  1.00px ✗     ball+thick  2.00px ✗  (identical to plain ball)
+
+     So LEFT painted nothing at all, RIGHT painted a gridline-thin hairline, and the thick box
+     was indistinguishable from the thin one.
+
+     WHY, and it is not a CSS subtlety: render() still carried r292's INLINE border emitter,
+     which wrote `border-*: 1px solid` (2px for thick) onto any cell with bl, br or thick. An
+     inline style beats every stylesheet rule, so it overrode r429's 2px fix on precisely the
+     edges r429 existed to repair — and left them at 1px, the exact width of the gridline, which
+     is the tie that sends border-collapse to its positional tie-break. LEFT loses that
+     tie-break, RIGHT wins it as a hairline, and thick collapsed to ball's own 2px. bt and bb
+     were untouched only because the emitter's condition never fired for them. See the removal
+     note in render(). getComputedStyle looked innocent throughout: the inline value really was
+     what the cell computed to.
+
+     FIX: one mechanism, in the stylesheet, and nothing inline. Applied borders paint on an
+     OVERLAY pseudo-element that composes per edge — border-top-width and border-left-width are
+     different properties, so bt+bl on one cell simply both apply, with no combinatorial rules —
+     and never touches the collapse algorithm, so no edge can lose a tie-break to its neighbour.
+     The 1px gridline underneath is untouched, so an unformatted sheet looks exactly as before.
+
+     Guarded by dev/check-borders.js, which now MEASURES the painted run and asserts it is
+     thicker than the gridline. Its old byte-inequality test is what let this ship: `.bl` changed
+     the border COLOUR even when the width collapsed away, so the two screenshots differed and
+     the guard reported ok. A guard that cannot fail is worse than no guard. */
+  td.bt,td.bb,td.bl,td.br,td.ball,td.bdbl{position:relative}
+  td.bt::after,td.bb::after,td.bl::after,td.br::after,td.ball::after,td.bdbl::after{
+    content:''; position:absolute; left:0; top:0; right:0; bottom:0;
+    pointer-events:none; z-index:4; border:0 solid var(--rule,var(--text));
+  }
+  td.bt::after{border-top-width:2px}
+  td.bb::after{border-bottom-width:2px}
+  td.bl::after{border-left-width:2px}
+  td.br::after{border-right-width:2px}
+  td.bdbl::after{border-bottom:3px double var(--rule,var(--text))}   /* r298: Alt H B B — the double rule under a grand total */
   td.it{font-style:italic}
   td.strike{text-decoration:line-through; opacity:.75}
   td.uline{text-decoration:underline; text-underline-offset:2px}
   td.uline.strike{text-decoration:underline line-through}
-  td.ball,#grid td.ball{border:2px solid var(--rule,var(--text))}
+  td.ball::after{border-width:2px}
   /* r429: Alt H B T (thick box) set .thick on the perimeter but nothing rendered it — the
-     thick box was indistinguishable from the thin one. 2.5px keeps it clearly heavier than
-     both the 1px gridline and the 1.5px thin rule. Per-edge so a thick perimeter only
-     thickens the edges that op actually set. */
-  #grid td.thick.bt{border-top-width:3px}
-  #grid td.thick.bb{border-bottom-width:3px}
-  #grid td.thick.bl{border-left-width:3px}
-  #grid td.thick.br{border-right-width:3px}
-  #grid td.thick.ball{border-width:3px}
+     thick box was indistinguishable from the thin one. r442: it STILL was, because the extra
+     width lived on a collapsed border and the neighbour's background covered exactly the pixel
+     that made it thick. On the overlay it simply applies. 3px against the 2px thin rule and the
+     1px gridline; per-edge, so a thick perimeter only thickens the edges that op actually set.
+     Keep these integral — r429 measured 2.5px rounding down to 2px and rendering identically. */
+  td.thick.bt::after{border-top-width:3px}
+  td.thick.bb::after{border-bottom-width:3px}
+  td.thick.bl::after{border-left-width:3px}
+  td.thick.br::after{border-right-width:3px}
+  td.thick.ball::after{border-width:3px}
 
   /* r47: the ribbon is a PERMANENT slim strip (fixed height, zero layout shift) —
      faint at rest, lit in Alt-mode. Mirrors Excel instead of popping a banner. */
@@ -15773,16 +15810,22 @@ function render(){
         else if(S._tierFresh && r>=S._tierFresh.r1&&r<=S._tierFresh.r2&&c>=S._tierFresh.c1&&c<=S._tierFresh.c2) cls.push('revealed'); }
       const refColor = refColors[refKey];
       let extraStyle = '';
-      if(cell.bl || cell.br || cell.thick){   // r292: left/right/thick edges as real borders (collapse merges shared edges, no doubling)
-        const w = cell.thick ? 2 : 1;   // Thick Box Border renders every set edge at 2px
-        if(cell.ball){ extraStyle += ';border:'+w+'px solid var(--rule,var(--text))'; }
-        else{
-          if(cell.bt) extraStyle += ';border-top:'+w+'px solid var(--rule,var(--text))';
-          if(cell.bb) extraStyle += ';border-bottom:'+w+'px solid var(--rule,var(--text))';
-        }
-        if(cell.bl) extraStyle += ';border-left:'+w+'px solid var(--rule,var(--text))';
-        if(cell.br) extraStyle += ';border-right:'+w+'px solid var(--rule,var(--text))';
-      }
+      /* r442: r292's INLINE border emitter lived here, and it is the whole reason Wolf reported
+         missing borders in four straight playtests. Whenever a cell had bl, br or thick it wrote
+         `border-*: 1px solid` inline (2px for thick) — and an inline style beats every rule in
+         the stylesheet, so it silently overrode r429's 2px fix on exactly the edges r429 was
+         written to repair. Measured consequences, all four explained by this one line:
+             bl alone    1px inline == the 1px gridline, so border-collapse fell through to its
+                         positional tie-break (CSS 2.1 §17.6.2.1) and the cell to the LEFT won
+                         the shared edge  ->  painted 0.00px, nothing at all
+             br alone    same 1px, but the RIGHT edge wins that tie-break  ->  painted 1.00px,
+                         a hairline indistinguishable from a gridline
+             ball+thick  inline `border: 2px` == plain ball  ->  thick box identical to thin
+             bt/bb       the condition never fired for them, so r429's CSS applied  ->  2.00px
+         That is why top and bottom looked right while left, right and thick did not, and why
+         getComputedStyle looked innocent: the inline value WAS what the cell computed to.
+         Applied borders now live on the .bt/.bb/.bl/.br/.ball/.thick overlay in the stylesheet,
+         which composes per edge and never touches the collapse algorithm. Nothing inline. */
       if(refColor && !isActive && !(editing && editPointer && r===editPointer.r && c===editPointer.c)){
         extraStyle = `;outline:2px solid ${refColor};outline-offset:-2px;z-index:2`;
       }

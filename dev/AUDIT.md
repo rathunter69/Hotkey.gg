@@ -9098,3 +9098,83 @@ skin-unlock (drill-count 74) · lb 36/36 · parity ALL 177 PASS · onboard 35/35
 clean (5 drills × 3 viewports) · freeze census clean (36/36 in, 0/69 out). Alt-paths, mac-input,
 rapid-fire, guided, formulas, grid-height, fit-sweep and the full demo replay were still running
 locally at commit time and are enforced on CI for this push.
+
+## r442 — BORDERS, ACTUALLY (Wolf, playtest 4) — plus the guard that let it ship twice
+
+Wolf, on the r441 preview: *"looks like border visibility hasn't been fixed"*, then, reading a
+screenshot: *"outside and thick look identical — top and bottom look thick — left border not
+rendering."* All three correct. **r429's entry in this file, and the "fixed and pixel-guarded"
+line in PR #243, were wrong** — I wrote both.
+
+### Measured, on the real grid, by decoding pixels
+
+| classes | edge | painted | wanted |
+|---|---|---|---|
+| `bt` / `bb` | top / bottom | **2.00px** | 2px ✓ |
+| `bl` | left | **0.00px** | 2px ✗ |
+| `br` | right | **1.00px** | 2px ✗ |
+| `ball` | all four | 2.00px | 2px ✓ |
+| `ball`+`thick` | all four | **2.00px** | 3px ✗ |
+| `bt bb bl br` (Alt H B S) | left | **0.00px** | 2px ✗ |
+
+So the left edge painted *nothing*, the right edge painted a gridline-thin hairline, and the
+thick box was the thin box. Top and bottom "look thick" because they were the only sides
+rendering — a box came out as two horizontal rules.
+
+### The cause was one line, and it was not a CSS subtlety
+
+`render()` still carried **r292's INLINE border emitter**: any cell with `bl`, `br` or `thick`
+got `border-*: 1px solid` written inline (2px for thick). An inline style beats every rule in the
+stylesheet, so it silently overrode r429's 2px fix **on exactly the edges r429 existed to
+repair**, and left them at 1px — the exact width of the gridline, which is the tie that sends
+`border-collapse` to its positional tie-break (CSS 2.1 §17.6.2.1). From there everything follows
+and every measurement above is explained:
+
+- **LEFT loses** that tie-break to the cell on its left → 0.00px, nothing at all.
+- **RIGHT wins** it → 1.00px, indistinguishable from a gridline.
+- **`ball`+`thick`** → inline `border: 2px` is identical to plain `ball` → same weight.
+- **`bt`/`bb`** → the emitter's condition never fired for them, so r429's CSS applied → 2.00px.
+
+r429's own reasoning was sound and its declarations really did compute to 2px. `getComputedStyle`
+looked innocent throughout, because the inline value *was* what the cell computed to. Two
+mechanisms for one job, and the older, wronger one won.
+
+**Fix:** delete the emitter; applied borders paint on an OVERLAY pseudo-element
+(`td.bt::after` …). It composes per edge — `border-top-width` and `border-left-width` are
+different properties, so `bt`+`bl` both apply with no combinatorial rules — and it never touches
+the collapse algorithm, so no edge can lose a tie-break to a neighbour. The 1px gridline
+underneath is untouched, so an unformatted sheet is unchanged. Verified after: every edge 2.00px,
+thick 3.00px on all four, double = two 1px strokes.
+
+### The guard is the real lesson
+
+`dev/check-borders.js` reported **clean** through all of this, and its own header claims "this
+guard works on PIXELS". It does screenshot pixels — it just asked the wrong question of them:
+it asserted the band **differed** from the unformatted band. `.bl` changes the border *colour*
+from faint gridline to text colour even when its width collapses away, so the buffers differed
+and it passed. **It proved "something changed", never "a thicker line is on screen."**
+
+Two further holes, both found while fixing this:
+
+1. It hand-built a synthetic 3×3 table from the extracted CSS, so it never exercised the class
+   combination the app actually emits (`ball`), nor the inline styles `render()` was adding — the
+   entire cause sat outside what it tested.
+2. **It was never wired into CI.** Neither was `check-pause.js`. Both were written in r429 and
+   have never run on a single PR.
+
+Rewritten to MEASURE: it drives the real app, screenshots a band across each edge, decodes it
+through a canvas **in the browser** (no image library — CI installs only `playwright-core`), and
+asserts the painted run is 2px thin / 3px thick, with the unformatted cell asserted to paint
+nothing so the threshold itself stays honest. 27 assertions. Both guards are now gate steps.
+
+**The rule this earns:** *a visual guard must assert the MEASUREMENT, never the difference.*
+"Changed" and "correct" are not the same claim, and a guard that cannot fail is worse than no
+guard — it converts an open bug into a closed one.
+
+### Process note
+
+Three probes written during this investigation gave confidently wrong readings before one gave a
+right one — including one that reported `0.00px` for an inline `6px solid red` border, which is
+impossible and was the tell. The reading that finally held was a plain zoomed screenshot looked
+at directly. **When a probe and your eyes disagree, believe your eyes and go fix the probe** —
+third sighting this campaign, after r440's `hotkey_onboarded` omission and r441's hidden rows.
