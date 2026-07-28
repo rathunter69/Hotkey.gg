@@ -10790,64 +10790,282 @@ const CHALLENGES = {
     }
   },
   sourcesuses:{
-    name:'S&U', label:'Balance sources and uses', par:55, parKeys:57,
-    aha:'Sources must equal uses — the plug is a formula (=uses−sources), never a typed number.',
-    prompt:'The first page of every deal book: total the uses, let sponsor equity (the buyer’s own check) be the plug, total the sources, and prove the check reads zero — then common-size both sides with an anchored % column that runs through 100%. Two anchors, two fills, one funded deal.',
-    req:'<em>B5</em> total uses <em>=SUM(B2:B4)</em> \u00b7 <em>C2</em> % <em>=B2/$B$5</em> fill C2:C5 \u00b7 <em>B9</em> sponsor equity <em>=B5-B7-B8</em> (the plug) \u00b7 <em>B10</em> total sources <em>=SUM(B7:B9)</em> \u00b7 <em>C7</em> % <em>=B7/$B$10</em> fill C7:C10 \u00b7 <em>B12</em> check <em>=B10-B5</em> \u2192 0',
-    guide:[
-      'total uses at B5 \u00b7 <kbd>=SUM(B2:B4)</kbd> \u2014 equity purchase, refi, fees',
-      '% of uses at C2 \u00b7 <kbd>=B2/$B$5</kbd> \u2014 <kbd>F4</kbd> locks the total \u00b7 select C2:C5 \u00b7 <kbd>ctrl</kbd>+<kbd>d</kbd> \u2014 the total row must read 100%',
-      'THE PLUG: sponsor equity at B9 \u00b7 <kbd>=B5-B7-B8</kbd> \u2014 uses less what debt covers',
-      'total sources at B10 \u00b7 <kbd>=SUM(B7:B9)</kbd> \u00b7 % of sources at C7 \u00b7 <kbd>=B7/$B$10</kbd> \u00b7 fill C7:C10',
-      'the check at B12 \u00b7 <kbd>=B10-B5</kbd> \u2014 zero or the deal doesn\u2019t close',
-    ],
-    targets:['B5','C2:C5','B9','B10','C7:C10','B12'],
-    demo(){ return [
-      {sel:'B5', keys:[...T('=SUM(B2:B4)'), Kb.enter]},
-      {sel:'C2', keys:[...T('=B2/$B$5'), Kb.enter]},
-      {sel:'C2:C5', keys:[Kb.fillD]},
-      {sel:'B9', keys:[...T('=B5-B7-B8'), Kb.enter]},
-      {sel:'B10', keys:[...T('=SUM(B7:B9)'), Kb.enter]},
-      {sel:'C7', keys:[...T('=B7/$B$10'), Kb.enter]},
-      {sel:'C7:C10', keys:[Kb.fillD]},
-      {sel:'B12', keys:[...T('=B10-B5'), Kb.enter]},
+    /* r445 H6b (DEPTH_PASS §4.66, "Balance sources and uses") — the depth-pass rework, built to
+       §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (newer law wins on conflict) and to
+       dev/MODELING_STANDARDS.md, which WORKFLOW.md §9 makes binding on every Models chapter.
+
+       WAS: 6 checks on a ROWS:12 board (12 of the real 20-row sheet, and only 10 of those 12 rows
+       carried anything — 50% against the §1.3 target of 60%), no ☆ at all, no saveClose, three
+       use lines and two committed sources, and — the reason this page needed probing rather than
+       reading — TWO UNTRIGGERABLE BEATS.
+
+       ── UNTRIGGERABLE BEATS FOUND BY WALKING ROUTES (the CAMPAIGN §1 class; measured, not
+       reasoned about — dev/verify-sourcesuses.js part A reproduces both against the old block):
+         (1)+(2) BOTH % BEATS READ FORMULA TEXT — `anch('C2','$B$5')` / `anch('C7','$B$10')`.
+             A player who writes the five percents one at a time, unanchored (`=B2/B5`, `=B3/B5`,
+             …), lands the IDENTICAL board — every percent right, both total lines reading 100% —
+             and watches both lines stay dark with nothing on the sheet to fix. Measured on the
+             shipped block, 5 seeds: cores 0/5, and the two failing labels were exactly those two.
+             Same root cause as campaign bugs #9 (`wrapfix` demanding literal `A3:A7` over
+             `$A$3:$A$7`) and #3 (`sumif`): the anchoring HABIT the catalog teaches was the thing
+             that broke the beat. §1.0-R3(p) forbids it outright, and §1.0(c) says the slow route
+             may never be penalised — so anchoring moves OUT of the cores and INTO the ☆, which is
+             the one place §1.0(c) sanctions grading the fast route.
+         Every core here now grades the END STATE: the number standing in the cell, plus liveness
+         where the label says a line is BUILT. No check reads a range, a function name or an anchor
+         out of formula text.
+
+       ── ☆-HEADROOM DIAGNOSTIC (CAMPAIGN §2, BOTH parts), run BEFORE this board was designed,
+       through the live engine, every selection and navigation keyed, 5 seeds:
+         PART 1 — IS THERE SPREAD? On the OLD board: star route (2 anchored formulas + 2 fills)
+           63 keys against 87 for the obvious slow route that does the same work (8 percents typed
+           one at a time, addition chains for the totals). 1.38× — thin, and on the ratio alone it
+           reads like `grpfold` (1.21×, retired).
+         PART 2 — IS ANY OF THAT SPREAD ☆-LEGAL? This half decides, and here it is the whole
+           answer. Strip the two forbidden components: chord-vs-ribbon is EMPTY by construction
+           (the engine has no ribbon route into formula entry, and Ctrl+D and Alt H F I D hit the
+           same fillFrom latch, so a fill is a fill however it is reached), and FORMATTING is empty
+           (the old board graded none). 100% of the spread survives the strip — the `wrapfix`
+           (r439) shape exactly, where a low ratio was made entirely of legal material and the
+           drill was kept. LEGAL HEADROOM, in the drill's own subject.
+         ISOLATED, EACH HALF SEPARATELY (the r438 `series` rule — a combined number hides a
+           negative half), measured on the REBUILT board: the uses percent column costs 13 keys
+           anchored-and-filled against 30 typed cell by cell, the sources column 15 against 40.
+           Both halves positive on their own, 42 keys of value together, and the rebuilt board's
+           whole-drill spread reads 89 star / 131 slow = 1.47×.
+         DISTINCTNESS (CAMPAIGN §3 discriminator — does fluency in one produce a correct first
+           attempt at the other?): the nearest neighbours are `foot` (cross-footing, c3) and
+           `balance` (c5, the two-sided check row). Fluency in either gets you the two SUMs and
+           the check and tells you nothing about a PLUG — that one line on the page is defined as
+           whatever makes the two sides agree, so the check reads zero by construction rather than
+           by luck. That inversion is this drill's whole reason to exist and no other board in the
+           catalog carries it. KEEP.
+
+       THE BOARD (§1.0-R4(t) reality test + §3.1 audience map). Chapter 6 is B-heavy and the map
+       names "S&U" in its own artifact list, so the artifact needed no conversion — a sources &
+       uses page is page one of every deal book, and an associate produces one the week a deal
+       signs. Rebuilt to a real one rather than a stub: four uses (purchase price, refinancing,
+       advisory fees, financing fees), three committed sources plus the sponsor's equity as the
+       balancing figure, a stated basis memo, a percent-of-total column down each side, and the
+       check under both. 16 of 20 rows carry content at the win state (80%, §1.3).
+
+       MODELING_STANDARDS CONVENTIONS THIS BOARD FOLLOWS:
+         §1 colour-as-provenance — every committed figure ships BLUE (a hardcoded input); every
+             cell the player builds resolves BLACK (a formula on this sheet). Nothing is green:
+             this fragment is one sheet-area.
+         §1 units in the header — the title and both block headers carry $mm.
+         §1 structure — totals wear a TOP border and never a rule underneath (§1.0(f) says the
+             same thing); the check line is bold and unruled, because it is a memo, not a total.
+         §1 no hardcodes inside formulas — the plug reads the total and the three committed lines;
+             nothing on this page multiplies by a number typed into a formula.
+         §2 sign convention — an S&U is a MAGNITUDE table: both sides are positive by convention
+             (this is the sanctioned "all-cost magnitude schedule" case in doctrine §2.4), and the
+             basis memo says so on the board so the convention is never guessed at.
+         §6 error checks — sources = uses is one of the six named checks, it lives in ONE visible
+             place on the page, and it reads zero.
+       DELIBERATE SIMPLIFICATIONS (§7 says name them): no OID/original-issue-discount split inside
+       the financing fee, no funded/unfunded revolver line, and no leverage or equity-percentage
+       memo — each is a real line on a real S&U and each would cost a row the 20-row cap does not
+       have (§1.3: narrow the fragment, never raise the cap). Nothing simplified here changes the
+       shape of the page: the plug, the two totals and the check are the whole lesson.
+
+       STRUCTURAL DEVIATIONS from the §4.66 page, declared here per §0:
+       (1) ☆ RE-CUT (binding, §1.0-R4(u) — the page predates the playtest rounds so its ☆ line is
+           dead on arrival). The page proposes "Add a top border above both totals — two sides,
+           one rule". Dead twice: it is a FORMATTING task, which §1.0(d) forbids outright, and it
+           would fall out of any competent dress pass, failing §1.0-R2(i)'s skippable-decision
+           test. It was REAL WORK though, so per (u) it is PROMOTED to core beat 6 rather than
+           deleted (the r425 editfix/dress/ruleoff precedent). The re-cut ☆ is ANCHORING MASTERY —
+           one anchored formula per side taking the whole percent column down in a single pass —
+           measured in the diagnostic above and isolated in the ☆ note in checks().
+       (2) THE FINISH BEAT MOVED. The page says "% run closes"; here the DRESS closes and the
+           percent run is second-to-last. Two reasons, both law: §1.0(a) requires a formatting beat
+           to directly FOLLOW the beat that touched the cells it formats, and the percent run lands
+           a value in each total row's own percent cell — so the dress cannot precede it. And the
+           r439 `cases` finding (a fill carries the SOURCE cell's format) makes the order load-
+           bearing rather than cosmetic: a fill down the percent column stamps C5's format onto
+           the total row's percent cell, so dressing first would visibly strip the rule the player
+           just drew. §1.6 explicitly names a dress/close motion as the finish-state beat.
+       (3) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): every graded destination is an EXISTING labelled
+           cell in a labelled row — no insert slot, no empty paste target — so the guided ring
+           expresses all six cores on its own.
+       (4) NO HELPER STACK (§1.0(f)/§1.0-R2(l)): nothing here is assumed, converted or scaled.
+
+       GRADING (§1.0(c) FREEDOM + §1.0-R3(p) END STATE), routes WALKED not reasoned about — the
+       full matrix is dev/verify-sourcesuses.js part B. Both totals accept =SUM over the block, an
+       addition chain, Alt+= from the block or from the empty total cell, anchored or not; the plug
+       accepts a subtraction chain or =total-SUM(committed); the check accepts either operand order
+       so long as the sign is right; the percent column accepts anchored, half-anchored, unanchored,
+       F4-cycled or typed-$ references, filled or typed cell by cell; the rule accepts Alt H B P,
+       Alt H B S, Alt H B A (which stores `ball`, NOT `bt` — that one is a live §1.0-R3(p) trap and
+       the predicate takes both), Alt H B D and Alt H B T, from a two-cell, three-cell or whole-row
+       selection. (Ctrl+1 opens a Number/Font/Alignment card with NO border tab in this engine —
+       probed, so neither the guide nor the req offers a route that does not exist, §1.0-R3(r).)
+       A hand-typed constant never clears a beat whose stated
+       outcome is a built line (doctrine §2.2's first sanctioned exception — on a Models board a
+       hardcoded percent is the error MODELING_STANDARDS §1 exists to prevent). */
+    name:'S&U', label:'Balance sources and uses', par:92, parKeys:89, saveClose:true,   /* r445 §4.66 depth pass: par re-swept from scratch (was par 55 / parKeys 57 on the 12-row board with three uses, two committed sources and no save closer). dev/e2e-par-sweep.js sourcesuses, 5-seed median 89 keys including the engine-appended Ctrl+S — FLAT across seeds (89/89/89/89/89), because the randomization moves the figures, the labels and the anchor column but never the beat count and never a reference's digit length: every row index is fixed by build() and only the column letter shifts. par 92 ≈ 1.03 s/key, the house band, and 89×1.03 is the "clean-expert median +10%" rule after the sweep's own overhead. The count grew with the board: a fourth use line, a third committed source, a second percent run through its own total, the promoted dress beat and the save closer. That lands sourcesuses beside `recon` (92) and `comps` (94) rather than at the chapter floor. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 2:18 · pro 1:46 · legendary 1:32. */
+    aha:'sources must equal uses — sponsor equity is the plug, so the check reads zero by construction and never by typing.',
+    /* §1.5: the aha's MOMENT is beat 2. The plug lands, and two beats later the check falls to
+       zero without anyone aiming it there — that is the insight made physical. */
+    prompt:'The sponsor’s investment committee sits at eight tomorrow and the deal book opens on this page. The debt and the rollover are committed at the numbers shown, and sponsor equity funds whatever is left over. Total the uses, size the sponsor’s equity against them, total the sources, and prove the check row reads zero — then common-size both sides, each line as a percent of its own total, so the committee can see where every dollar comes from and where it goes.',
+    req(){ const o=this._o, R=o.R; return 'total <em>'+o.CB+R.tu+'</em> → <em>=SUM('+o.CB+R.u0+':'+o.CB+R.uN+')</em> · plug <em>'+o.CB+R.pl+'</em> → <em>='+o.CB+R.tu+'-'+o.CB+R.s0+'-'+o.CB+(R.s0+1)+'-'+o.CB+(R.s0+2)+'</em> · total <em>'+o.CB+R.ts+'</em> · check <em>'+o.CB+R.ck+'</em> → <em>='+o.CB+R.ts+'-'+o.CB+R.tu+'</em> · <em>'+o.CC+R.u0+'</em> → <em>='+o.CB+R.u0+'/$'+o.CB+'$'+R.tu+'</em> <em>f4</em> · <em>ctrl+d</em> both columns · <em>ctrl+b</em> + <em>alt h b p</em> both totals · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o, R=o.R; return [
+      'the four use lines run row '+R.u0+' to row '+R.uN+' · on '+o.CB+R.tu+': <kbd>=SUM(</kbd>'+o.CB+R.u0+':'+o.CB+R.uN+'<kbd>)</kbd> <kbd>↵</kbd>, or select the four lines through the empty total cell and press <kbd>alt</kbd>+<kbd>=</kbd>. An addition chain foots to the same number and grades the same; a typed figure does not — the line has to be live',
+      'the plug, on '+o.CB+R.pl+': <kbd>=</kbd>'+o.CB+R.tu+'<kbd>-</kbd>'+o.CB+R.s0+'<kbd>-</kbd>'+o.CB+(R.s0+1)+'<kbd>-</kbd>'+o.CB+(R.s0+2)+' <kbd>↵</kbd> — total uses less the three committed lines. <kbd>=</kbd>'+o.CB+R.tu+'<kbd>-SUM(</kbd>'+o.CB+R.s0+':'+o.CB+(R.s0+2)+'<kbd>)</kbd> is the same number and grades the same',
+      'the same shape on the funding side: on '+o.CB+R.ts+', <kbd>=SUM(</kbd>'+o.CB+R.s0+':'+o.CB+R.pl+'<kbd>)</kbd> — the four source lines including the equity you just sized, so the total moves with the plug instead of freezing behind it',
+      'the check on '+o.CB+R.ck+': <kbd>=</kbd>'+o.CB+R.ts+'<kbd>-</kbd>'+o.CB+R.tu+' <kbd>↵</kbd> — anchored or not, and either way round so long as the sign is right; it grades the number, not the text',
+      'on '+o.CC+R.u0+': <kbd>=</kbd>'+o.CB+R.u0+'<kbd>/$</kbd>'+o.CB+'<kbd>$</kbd>'+R.tu+' <kbd>↵</kbd> (<kbd>f4</kbd> on the reference sets the dollars for you), then the same on '+o.CC+R.s0+' against '+o.CB+R.ts+'. Take each column down through its own total line — select '+o.CC+R.u0+':'+o.CC+R.tu+' and <kbd>ctrl</kbd>+<kbd>d</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>d</kbd> is the same fill). Typing all ten cells lands it too, it only costs the keys',
+      'dress the totals AFTER the percents, not before — a fill carries the source cell’s format down with it, so a rule drawn early gets stamped over. Select each total row and <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> rules above it (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> boxes the row and <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> borders every edge — all three draw that top line, all three clear it)',
+      '☆ the discovery: each percent column written ONCE with the total locked, then taken down in a single pass — two formulas and two fills instead of ten cells. Typing the ten clears the percent beat and forfeits this',
     ]; },
+    /* rings: ① the total-uses cell · ② the sponsor-equity cell · ③ the total-sources cell ·
+       ④ the check cell · ⑤ the whole percent column · ⑥ the block holding both total rows ·
+       ☆ never ringed (§2.2) */
+    targets(){ const o=this._o, R=o.R; return [
+      o.CB+R.tu, o.CB+R.pl, o.CB+R.ts, o.CB+R.ck,
+      o.CC+R.u0+':'+o.CC+R.ts, o.CA+R.tu+':'+o.CC+R.ts, null,
+    ]; },
+    /* the demo BUILDS its own selections with Shift+arrow rather than being handed them by
+       setDemoSel, so parKeys measures what a player really pays for the range grabs instead of
+       eliding them (the r438 `series` rule). setDemoSel only ever parks the cursor on the anchor
+       cell of the next beat. */
+    demo(){ const o=this._o, R=o.R, dn={key:'ArrowDown',shift:true}, rt={key:'ArrowRight',shift:true}; return [
+      {sel:o.CB+R.tu, keys:[...T('=SUM('+o.CB+R.u0+':'+o.CB+R.uN+')'), Kb.enter]},
+      {sel:o.CB+R.pl, keys:[...T('='+o.CB+R.tu+'-'+o.CB+R.s0+'-'+o.CB+(R.s0+1)+'-'+o.CB+(R.s0+2)), Kb.enter]},
+      {sel:o.CB+R.ts, keys:[...T('=SUM('+o.CB+R.s0+':'+o.CB+R.pl+')'), Kb.enter]},
+      {sel:o.CB+R.ck, keys:[...T('='+o.CB+R.ts+'-'+o.CB+R.tu), Kb.enter]},
+      /* the ☆, one of two — the uses column written once with the total locked… */
+      {sel:o.CC+R.u0, keys:[...T('='+o.CB+R.u0+'/$'+o.CB+'$'+R.tu), Kb.enter]},
+      {sel:o.CC+R.u0, keys:[dn, dn, dn, dn, Kb.fillD]},
+      /* …two of two */
+      {sel:o.CC+R.s0, keys:[...T('='+o.CB+R.s0+'/$'+o.CB+'$'+R.ts), Kb.enter]},
+      {sel:o.CC+R.s0, keys:[dn, dn, dn, dn, Kb.fillD]},
+      /* §1.0(a) + the r439 `cases` fill-format finding: the dress FOLLOWS the percent run, which
+         is the last beat to touch either total row's cells */
+      {sel:o.CA+R.tu, keys:[rt, rt, Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+      {sel:o.CA+R.ts, keys:[rt, rt, Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 sources & uses ($mm)',txt:true,bold:true};
-      const eq=rnd(30,90)*10, refi=rnd(10,40)*10, fees=rnd(2,8)*10;
-      const uses=eq+refi+fees;
-      const tl=Math.round(uses*rnd(35,55)/100/10)*10, roll=Math.round(uses*rnd(5,15)/100/10)*10;
-      const rows=[[2,'Purchase of equity',eq],[3,'Refinance existing debt',refi],[4,'Fees & expenses',fees]];
-      rows.forEach(([r,n,v])=>{ cells['A'+r]={...blankCell(),value:n,txt:true};
-        cells['B'+r]={...blankCell(),value:v,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells['C'+r]={...blankCell(),fmtStyle:'percent',decimals:0}; });
-      cells['A5']={...blankCell(),value:'Total uses',txt:true,bold:true}; cells['B5']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      cells['C5']={...blankCell(),fmtStyle:'percent',decimals:0,bold:true};
-      cells['A7']={...blankCell(),value:'New term loan',txt:true};   cells['B7']={...blankCell(),value:tl,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['A8']={...blankCell(),value:'Rollover equity',txt:true}; cells['B8']={...blankCell(),value:roll,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['A9']={...blankCell(),value:'Sponsor equity',txt:true,bold:true}; cells['B9']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      cells['A10']={...blankCell(),value:'Total sources',txt:true,bold:true}; cells['B10']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      ['7','8','9'].forEach(r=>cells['C'+r]={...blankCell(),fmtStyle:'percent',decimals:0});
-      cells['C10']={...blankCell(),fmtStyle:'percent',decimals:0,bold:true};
-      cells['A12']={...blankCell(),value:'Check',txt:true,bold:true}; cells['B12']={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
-      const plug=uses-tl-roll;
-      this._exp={uses:uses, plug:plug, pu:[eq/uses,refi/uses,fees/uses,1], ps:[tl/uses,roll/uses,plug/uses,1]};
-      return {ROWS:12, cells, active:{r:5,c:2}, sel:null, colW:{1:172,2:88,3:64}};
+      const pick=(pool)=>pool[rnd(0,pool.length-1)];
+      /* §1.2 randomization — three independent axes. (a) SITE: the board is a full-grid artifact
+         (16 of 20 rows), so per §1.2 the site axis is CORNER JITTER — the whole page anchors at
+         column A or column B. (b) CONTENT: the codename plus a drawn label for each of the seven
+         seeded lines. (c) VALUES: every figure through rnd(), and the funding mix redrawn each
+         seed so the plug is a different share of the page. Geometry (four uses, three committed
+         sources, one plug, two totals, one check) is CONSTANT across seeds so the keystroke count
+         never moves with the draw — the r439 `wrapfix` rule, and the reason the par sweep reads
+         flat. Label pools are length-matched so column A never needs a different width. */
+      const c0=rnd(0,1)?1:2;                         // (a) corner jitter: anchor column A or B
+      const CA=colLetter(c0), CB=colLetter(c0+1), CC=colLetter(c0+2);
+      const R={hu:4, u0:5, uN:8, tu:9, hs:11, s0:12, sN:14, pl:15, ts:16, ck:18, nt:19};
+      const uNames=[pick(['Purchase of equity','Equity purchase price']),
+                    pick(['Refinance existing debt','Repay existing term loan']),
+                    pick(['Advisory & legal fees','Transaction fees']),
+                    pick(['Financing fees','Debt issuance costs'])];
+      const sNames=[pick(['New term loan B','Senior secured loan']),
+                    pick(['Senior notes','Second lien notes']),
+                    pick(['Rollover equity','Management rollover'])];
+      /* (c) values, $mm, mid-market LBO magnitudes. The three committed sources are drawn as a
+         share of uses and rounded to the nearest 10, so sponsor equity lands at 27–51% of the
+         page — the realistic band — and always comfortably positive: a negative plug would make
+         the board a puzzle about arithmetic instead of about structure. */
+      const eq=rnd(38,86)*10, refi=rnd(12,40)*10, advf=rnd(3,9)*10, finf=rnd(1,5)*10;
+      const uses=eq+refi+advf+finf;
+      const tl=Math.round(uses*rnd(36,46)/1000)*10;
+      const nts=Math.round(uses*rnd(9,17)/1000)*10;
+      const roll=Math.round(uses*rnd(4,10)/1000)*10;
+      const plug=uses-tl-nts-roll;
+      const uVals=[eq,refi,advf,finf], sVals=[tl,nts,roll];
+      cells[CA+'1']={...blankCell(),value:codename()+' — sources & uses ($mm)',txt:true,bold:true};
+      cells[CA+'2']={...blankCell(),value:'Source: signed commitment papers · basis: $ in millions, both sides shown as positive magnitudes',txt:true,it:true,fontColor:'gray'};
+      /* headers wear a bottom rule and the figure columns are right-aligned — the board ships
+         pre-dressed everywhere the LESSON is not formatting (doctrine §2.1b) */
+      [[R.hu,'Uses'],[R.hs,'Sources']].forEach(([r,n])=>{
+        cells[CA+r]={...blankCell(),value:n,txt:true,bold:true,bb:true};
+        cells[CB+r]={...blankCell(),value:'$mm',txt:true,bold:true,bb:true,align:'r'};
+        cells[CC+r]={...blankCell(),value:'% of total',txt:true,bold:true,bb:true,align:'r'};
+      });
+      /* MODELING_STANDARDS §1: every committed figure is a hardcoded input and ships BLUE; every
+         cell the player builds is left empty and resolves black */
+      uNames.forEach((n,i)=>{ cells[CA+(R.u0+i)]={...blankCell(),value:n,txt:true};
+        cells[CB+(R.u0+i)]={...blankCell(),value:uVals[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[CC+(R.u0+i)]={...blankCell(),fmtStyle:'percent',decimals:1}; });
+      sNames.forEach((n,i)=>{ cells[CA+(R.s0+i)]={...blankCell(),value:n,txt:true};
+        cells[CB+(R.s0+i)]={...blankCell(),value:sVals[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[CC+(R.s0+i)]={...blankCell(),fmtStyle:'percent',decimals:1}; });
+      cells[CA+R.pl]={...blankCell(),value:'Sponsor equity',txt:true};
+      cells[CB+R.pl]={...blankCell(),fmtStyle:'comma',decimals:0};
+      cells[CC+R.pl]={...blankCell(),fmtStyle:'percent',decimals:1};
+      [[R.tu,'Total uses'],[R.ts,'Total sources']].forEach(([r,n])=>{
+        cells[CA+r]={...blankCell(),value:n,txt:true};
+        cells[CB+r]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[CC+r]={...blankCell(),fmtStyle:'percent',decimals:1};
+      });
+      /* the check ships BOLD and empty: it is a memo line, not a total, so it takes no rule
+         (MODELING_STANDARDS §1) and its dress is board furniture rather than a beat */
+      cells[CA+R.ck]={...blankCell(),value:'Check — sources less uses',txt:true,bold:true};
+      cells[CB+R.ck]={...blankCell(),fmtStyle:'comma',decimals:1,bold:true};
+      cells[CA+R.nt]={...blankCell(),value:'Sponsor equity is the balancing figure; the other three sources are committed.',txt:true,it:true,fontColor:'gray'};
+      this._o={CA:CA,CB:CB,CC:CC,c0:c0,R:R,uses:uses,plug:plug,
+               pu:[eq/uses,refi/uses,advf/uses,finf/uses,1],
+               ps:[tl/uses,nts/uses,roll/uses,plug/uses,1]};
+      const colW={}; colW[c0]=206; colW[c0+1]=94; colW[c0+2]=94;
+      return {ROWS:20, cells, active:{r:R.tu,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const near=(k,exp,tol)=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'&&Math.abs(c.value-exp)<(tol||0.5)); };
-      const anch=(k,a)=>{ const c=S.cells[k]; return !!(c&&c.formula&&String(c.formula).toUpperCase().includes(a)); };
-      const e=this._exp;
+      const o=this._o, R=o.R;
+      /* every predicate reads the END STATE — the number standing in the cell, plus liveness
+         where the label says the line is BUILT. Nothing reads formula text (§1.0-R3(p)); the two
+         beats this drill shipped with that DID read formula text are the bugs recorded above. */
+      const live=k=>{ const c=S.cells[k]; return !!(c&&c.formula&&typeof c.value==='number'); };
+      const near=(k,exp,tol)=>{ const c=S.cells[k]; return !!(c&&typeof c.value==='number'&&Math.abs(c.value-exp)<(tol||0.5)); };
+      const built=(k,exp,tol)=>live(k)&&near(k,exp,tol);
+      const tuOk=built(o.CB+R.tu,o.uses);
+      const plOk=built(o.CB+R.pl,o.plug);
+      const tsOk=built(o.CB+R.ts,o.uses);
+      const ckOk=built(o.CB+R.ck,0);
+      const runOk=(r0,exp)=>exp.every((v,i)=>built(o.CC+(r0+i),v,0.0005));
+      const pctOk=runOk(R.u0,o.pu)&&runOk(R.s0,o.ps);
+      /* the rule: Alt H B P / B D / B T all set `bt`, but Alt H B S on a
+         one-row selection sets `bt` on every cell AND Alt H B A sets `ball` instead — a full box
+         that PAINTS the same top edge (td.ball::after is a 2px box, index.html CSS). Grading `bt`
+         alone would leave a player who bordered every edge staring at a ruled total row and a dark
+         line: §1.0-R3(p) exactly, and the same shape as campaign bug #7. Both clear. The figure
+         columns are what must carry it; whether the LABEL cell came along is the player's call
+         (§1.0-R3(p)'s "label + figures" ruling, both accepted). */
+      const ruled=r=>[o.CB,o.CC].every(c=>{ const x=S.cells[c+r]; return !!(x&&x.bold&&(x.bt||x.ball)); });
+      const dressOk=ruled(R.tu)&&ruled(R.ts);
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): each percent
+         column written ONCE with the total locked and taken down through its own total line in a
+         single pass. Read off the r424 S.fillOps latch and the r425 S.pasteLog latch — the
+         MECHANIC, never geometry inferred from the end state — so Ctrl+D, Alt H F I D and
+         copy-once-paste-over-the-block all earn it and no chord is privileged (§1.0(c)).
+         MEASURED, isolated per half, 5 seeds through the live engine: uses column 13 keys against
+         30 typed, sources column 15 against 40 — 42 keys of value, the largest decision on the
+         board. Typing all ten percent cells clears every core beat and forfeits only this; that
+         negative control is dev/e2e-alt-paths.js entry 2 and part C of dev/verify-sourcesuses.js.
+         The anchor lives here rather than in the core because a fill is the only route where the
+         anchor is load-bearing — typed cell by cell, anchored and unanchored land the same board,
+         which is exactly what made the old core beats untriggerable. */
+      const onePass=(c,r0,r1)=>{
+        const f=(S.fillOps||[]).some(x=>x.dir==='down'&&x.c1<=c&&x.c2>=c&&x.r1<=r0&&x.r2>=r1);
+        const p=(S.pasteLog||[]).some(x=>(x.kind==='all'||x.kind==='formulas')&&x.sh===1&&x.sw===1&&
+                  x.c0<=c&&x.c0+x.w-1>=c&&x.r0<=r0+1&&x.r0+x.h-1>=r1);
+        return f||p; };
+      const cc=o.c0+2;
+      const starOk=pctOk&&onePass(cc,R.u0,R.tu)&&onePass(cc,R.s0,R.ts);
       return [
-        {label:'total the uses \u2014 one live SUM over the three lines (B5)', ok: near('B5',e.uses)},
-        {label:'run % of uses \u2014 anchored on the total, filled through 100% (C2:C5)',
-          ok: [0,1,2,3].every(i=>near('C'+(2+i),e.pu[i],0.005)&&anch('C'+(2+i),'$B$5'))},
-        {label:'make sponsor equity THE PLUG \u2014 uses less debt less rollover (B9)', ok: near('B9',e.plug)},
-        {label:'total the sources \u2014 sum the stack (B10)', ok: near('B10',e.uses)},
-        {label:'run % of sources \u2014 same discipline on the funding side (C7:C10)',
-          ok: [0,1,2,3].every(i=>near('C'+(7+i),e.ps[i],0.005)&&anch('C'+(7+i),'$B$10'))},
-        {label:'prove the check \u2014 ZERO, the deal is funded (B12)', ok: near('B12',0)},
+        {label:'Total the uses — all four use lines', ok: tuOk},
+        {label:'Build sponsor equity — total uses less the other three source lines', ok: plOk},
+        {label:'Total the sources — all four source lines', ok: tsOk},
+        {label:'Build the check — total sources less total uses', ok: ckOk},
+        {label:'Build the % of total down both sides — each total reads 100%', ok: pctOk},
+        {label:'Bold both total rows and add a top border above each', ok: dressOk},
+        {label:'Fill each % column in one pass — no cell retyped', ok: starOk, bonus:true},
       ];
     }
   },

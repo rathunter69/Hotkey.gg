@@ -1179,20 +1179,34 @@ const ALTS = [
       mv.push({sel:o.ebitRng, keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('s')]});
       mv.push({sel:o.mgRng,   keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]});
       return mv; }` },
-  { key: 'sourcesuses', name: 'check row FIRST, sources before uses, % columns last via ribbon fill down', moves: `C => [
-      {sel:'B12', keys:[...T('=B10-B5'),{key:'Enter'}]},
-      {sel:'B9',  keys:[...T('=B5-B7-B8'),{key:'Enter'}]},
-      {sel:'B10', keys:[...T('=SUM(B7:B9)'),{key:'Enter'}]},
-      {sel:'B5',  keys:[...T('=SUM(B2:B4)'),{key:'Enter'}]},
-      {sel:'C7',  keys:[...T('=B7/$B$10'),{key:'Enter'}]},
-      {sel:'C7:C10', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-      {sel:'C2',  keys:[...T('=B2/$B$5'),{key:'Enter'}]},
-      {sel:'C2:C5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('d')]},
-    ]` },
-  /* r439: REPLACES the pre-depth-pass stalelink alt, which drove the retired 14-row board by
-     hard-coded geometry ('$B$4'/'$B$5'/'$B$6' at rows 11-13 and C._stale, all gone with the
-     rebuild). ALT 1 is the chord-ROUTE + op-ORDER alt and EARNS the ☆ through the ribbon's fill
-     and the styles gallery; ALT 2 is the MEASURED negative control — every core clears, ☆ dark. */
+  /* r445 (DEPTH_PASS §4.66): REPLACES the pre-depth-pass sourcesuses alt, which drove the retired
+     12-row board by hard-coded geometry ('B5'/'C2:C5'/'B9'/'B10'/'C7:C10'/'B12', all gone with the
+     rebuild — the board is corner-jittered now and every row moved). ALT 1 is the chord-ROUTE +
+     op-ORDER alt and EARNS the ☆ through the ribbon's fill; ALT 2 is the MEASURED negative control
+     — every core clears, ☆ dark. */
+  { key: 'sourcesuses', name: 'check row FIRST, both totals by alt+= autosum, the plug off a SUM of the committed lines, both percent columns filled from the ribbon (alt h f i d), whole-row shift+space dress with the outside-border box (alt h b s) and alt h 1 bold — the ☆ still lands', moves: `C => { const o=C._o, R=o.R, CB=o.CB, CC=o.CC,
+      dn={key:'ArrowDown',shift:true}, SS={key:' ',shift:true}, RIB=[{key:'Alt'},L('h'),L('f'),L('i'),L('d')];
+      return [
+        {sel:CB+R.ck, keys:[...T('='+CB+R.ts+'-'+CB+R.tu),{key:'Enter'}]},
+        {sel:CB+R.tu, keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},
+        {sel:CB+R.pl, keys:[...T('='+CB+R.tu+'-SUM('+CB+R.s0+':'+CB+R.sN+')'),{key:'Enter'}]},
+        {sel:CB+R.ts, keys:[{key:'=',alt:true,code:'Equal'},{key:'Enter'}]},
+        {sel:CC+R.s0, keys:[...T('='+CB+R.s0+'/'+CB+R.ts),{key:'F4'},{key:'Enter'}]},
+        {sel:CC+R.s0, keys:[dn,dn,dn,dn,...RIB]},
+        {sel:CC+R.u0, keys:[...T('='+CB+R.u0+'/'+CB+R.tu),{key:'F4'},{key:'Enter'}]},
+        {sel:CC+R.u0, keys:[dn,dn,dn,dn,...RIB]},
+        {sel:o.CA+R.ts, keys:[SS,{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('s')]},
+        {sel:o.CA+R.tu, keys:[SS,{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('s')]},
+      ]; }` },
+  { key: 'sourcesuses', name: 'NEGATIVE CONTROL — both totals as addition chains, the plug spelled out line by line, the check written the other way round, all ten percents typed cell by cell with no anchor, figures-only dress via alt h b a (which stores ball, not bt): every core clears, ☆ DARK', moves: `C => { const o=C._o, R=o.R, CB=o.CB, CC=o.CC, mv=[];
+      mv.push({sel:CB+R.tu, keys:[...T('='+CB+R.u0+'+'+CB+(R.u0+1)+'+'+CB+(R.u0+2)+'+'+CB+R.uN),{key:'Enter'}]});
+      mv.push({sel:CB+R.pl, keys:[...T('='+CB+R.tu+'-'+CB+R.s0+'-'+CB+(R.s0+1)+'-'+CB+R.sN),{key:'Enter'}]});
+      mv.push({sel:CB+R.ts, keys:[...T('='+CB+R.s0+'+'+CB+(R.s0+1)+'+'+CB+R.sN+'+'+CB+R.pl),{key:'Enter'}]});
+      mv.push({sel:CB+R.ck, keys:[...T('=-('+CB+R.tu+'-'+CB+R.ts+')'),{key:'Enter'}]});
+      for(let i=0;i<=4;i++) mv.push({sel:CC+(R.u0+i), keys:[...T('='+CB+(R.u0+i)+'/'+CB+R.tu),{key:'Enter'}]});
+      for(let i=0;i<=4;i++) mv.push({sel:CC+(R.s0+i), keys:[...T('='+CB+(R.s0+i)+'/'+CB+R.ts),{key:'Enter'}]});
+      [R.tu,R.ts].forEach(r=>mv.push({sel:CB+r, keys:[{key:'ArrowRight',shift:true},{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('a')]}));
+      return mv; }` },
   { key: 'stalelink', name: 'reverse order (v1 cleared FIRST, lines re-pointed by copying a healthy year, operands swapped), alt h j Link, alt h e c, ribbon fill, alt h b s — ☆ still earned', moves: `C => { const o=C._o, y=o.yc[0], mv=[];
       mv.push({sel:o.deadRng, keys:[{key:'Alt'},L('h'),L('e'),L('c')]});
       for(let i=2;i>=0;i--){ const j=o.stale[i], Lc=o.yc[j], r=o.hr+2+i;
