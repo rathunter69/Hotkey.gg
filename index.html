@@ -10739,86 +10739,267 @@ const CHALLENGES = {
     }
   },
   cascade:{
-    name:'Full Waterfall', label:'Run the full cascade', par:94, parKeys:100,
+    /* r447 H6b-14 (DEPTH_PASS §4.77, "Run the full cascade" — ★ CAPSTONE c7, delta D9) — the
+       depth-pass rework, built to §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (the
+       R-blocks win on conflict), with dev/MODELING_STANDARDS.md binding (Models II is a
+       financial-model chapter, not Excel mechanics with a finance skin).
+
+       WAS: 7 checks on a ROWS:14 board (11 rows used — 55%, under the §1.3 floor), guide 5 v
+       checks 7 (the tri-length break the page flags), no ☆, no saveClose, ONE alt-path entry
+       against C12's two, and — the real defect — five of the seven checks read FORMULA TEXT
+       (`refs('B6',['MIN('])`, `refs('B9',['MIN(','B6'])`, and the three roll checks demanding
+       the literal prior-year cell out of the text). That is the campaign's #1 bug class, and on
+       this board it locked out four separate correct routes (walked, see below).
+
+       ── ☆-HEADROOM DIAGNOSTIC (CAMPAIGN §2, BOTH PARTS), run on the SHIPPED board BEFORE this
+       one was designed, every selection and navigation KEYED, 5 seeds, medians:
+         PART 1 — SPREAD: fastest legal 118 keys against 357 for the slowest legal one (every
+           year-cell typed, no fill anywhere, the dress walked column by column). 3.03×.
+         PART 2 — WHAT THE SPREAD IS MADE OF: of the 239 keys, ~22 are chord-vs-ribbon (§1.0(c)
+           forces every one of those to clear) and ~18 are formatting (§1.0(d) forbids grading
+           them). The ~199 that survive the strip are ALL fill-vs-retype across the year columns.
+         So there IS legal headroom — this board is a lesson, not a motif — but every key of it
+         belongs to ONE family, and that family is the one chapter 7 is already saturated with
+         (four fill-latch stars in its first half, r446 AUDIT note). See the ☆ note below for the
+         measurement that settled which family this drill takes instead.
+
+       ── WHY THE PASTE FAMILY IS NOT AVAILABLE HERE, MEASURED NOT ASSUMED. `waterfall` §4.72
+       earns its ☆ by copying the senior tranche's pair onto the junior one and letting the
+       relative references walk. That move CANNOT work on this board and the reason is the
+       drill's own subject: each tranche nets one MORE senior than the tranche above it
+       (=MIN(bal, cash) · =MIN(bal, cash−rev) · =MIN(bal, cash−rev−TL)), so a translated copy of
+       the revolver pair lands =MIN(bal, cash) on the term loan — a different, wrong model. The
+       paste family has ZERO legal headroom here; structured navigation, cut-move and the
+       operator clipboard have no purchase on a board with no navigation puzzle, no move and no
+       unit conversion. That is what makes the page's own ☆ the right one.
+
+       ── THE ☆ IS THE §4.77 PAGE'S, BUILT VERBATIM, AND IT IS THE INDEPENDENT-PROVE-OUT FAMILY
+       (§1.0-R4(u), the narrow exception). The page specs: "Enter the sanity check in the check
+       cell — total paydown across years equals cash generated; it reads zero". Both conditions
+       the exception requires are met: (1) a PRE-PLAYTEST page already specced it, and (2) this
+       drill's whole lesson is a thing that can be SILENTLY WRONG — a MIN that forgets to net a
+       senior returns a plausible number on a plausible-looking page, which is exactly the class
+       (u) names. It is also the only ☆ in chapter 7 of this shape (checked against the other
+       nine drills' re-cuts), and MODELING_STANDARDS §6 asks every model to carry exactly this
+       check in one visible place. Skippability is MEASURED, not asserted — ALT 3 clears all six
+       cores with the star dark.
+
+       ── FIVE UNTRIGGERABLE BEATS FOUND AND KILLED (all five graded formula TEXT; every one
+       found by WALKING the route, never by reading the predicate):
+         #21 `refs('B6',['MIN('])` — locked out =IF(B5<B3,B5,B3), which rations identically and
+             leaves an identical page (the r444 `waterfall` finding, same drill family).
+         #22 `refs('B9',['MIN(','B6'])` — locked out the same IF form AND any build that reaches
+             the term loan through a different but equal expression.
+         #23 `refs('B12',['MIN(','B6','B9'])` — same class on the mezzanine.
+         #24/#25 the three roll checks demanded the literal prior-year cell out of the text, so
+             an ANCHORED opening (=$B$7, the habit `anchor`/`fxconvert` teach) read as wrong on
+             a board that is numerically perfect.
+       Campaign total: 25. Every core here now grades the number standing on the board plus
+       liveness where the label's verb is Build or Total (§1.7's "land a live formula"; doctrine
+       §2.2's sanctioned exception; and required outright by MODELING_STANDARDS §3 — an opening
+       balance must REFERENCE the prior close, never repeat it).
+
+       ── BORDER ROUTES, PROBED ON THIS ENGINE (§1.0-R3(p), dev/verify-cascade.js §B):
+       Alt H B P → bt · Alt H B S → bt+bb(+bl/br) · Alt H B T → bt+bb+thick · Alt H B D → bt+bb ·
+       Alt H B A → **ball, not bt** · Alt H B O → bb only. So the dress beat accepts `bt || ball`
+       (every route that puts a line ABOVE the row clears; the bottom-only route correctly does
+       not), and bold accepts Ctrl+B and Alt H 1 alike.
+
+       ── STRUCTURAL DEVIATIONS from the §4.77 page, declared here per §0:
+       (1) 7 CORE CHECKS → 6, by the page's own instruction ("trim to 6 core (fold the two
+           per-tranche roll checks that share a motion)"). The fold taken is the WHOLE corkscrew:
+           the three per-tranche roll checks become ONE beat, and the freed slot goes to the
+           dress, which §1.0(a)+doctrine §2.5 want as its own line rather than bolted onto the
+           total. 6 authored cores + the ☆ + the engine-appended save.
+       (2) ROWS 14 → 20 (§1.3, Wolf r440 — floor AND cap). 16 of 20 rows carry content at the win
+           state (80%), against 55%. The four blanks are geometry moats between the three tranche
+           blocks and above the total, and they are load-bearing: a Ctrl+Shift+↓ inside one
+           tranche must not ride into the next.
+       (3) BOARD REBUILT TO THE REALITY TEST (§1.0-R4(t) + §3.1 row 7, audience B). The old board
+           had no units memo, no sign/basis statement and no simplification note, so it read as a
+           grid of MINs rather than a credit page. It now carries both memo lines, a Facility
+           column header, a bottom-ruled header row and the check line a real waterfall carries.
+       (4) NO cueCell (§1.0-R2(h)/§1.0-R3(q)): there is no insert point and no empty paste
+           target on this board — every graded destination is an existing labelled cell in a
+           labelled row, the ☆'s check cell included (which is why it is labelled on the board:
+           §1.3's labelled-target rule binds the bonus too).
+       (5) NO helper/assumption stack (§1.0(f)/(l)): nothing on this page is converted, scaled or
+           assumed — the inputs ARE the schedule's opening balances and the cash line.
+       (6) NO width verdict is graded, so the drill takes no part in `__noShrink` and never
+           re-derives a width metric by hand (§1.0-R3(r)). */
+    name:'Full Waterfall', label:'Run the full cascade', par:161, parKeys:153, saveClose:true,   /* r447 §4.77 depth pass: par re-swept from scratch (was par 94 / parKeys 100 on the old ROWS:14 board). See the sweep note in dev/AUDIT.md r447. Mirrored in HOTKEY_PARS; CAPSTONE clocks pass = par×2.0 in HOTKEY_CLOCKS (§2.1/§2.4). */
     aha:'Each tranche pays from the cash left — MIN against the balance, cascade down.',
-    prompt:'Three tranches (debt layers ranked by who’s paid first), four years, cash flowing strictly by seniority: the revolver is paid first, the term loan takes what’s left, and mezzanine — the most junior layer — gets the remainder — some years nothing, and the MIN has to say so. Every tranche rolls its balance across the years, and total debt re-ties each year.',
-    req:'<em>B6</em> <em>=MIN(B5,B3)</em> fill \u2192 \u00b7 <em>B7</em> <em>=B5-B6</em> fill \u2192 \u00b7 <em>C5</em> <em>=B7</em> fill \u2192 \u00b7 term loan: <em>B9</em> <em>=MIN(B8,B3-B6)</em> \u00b7 <em>B10</em> <em>=B8-B9</em> \u00b7 <em>C8</em> <em>=B10</em> \u00b7 mezz: <em>B12</em> <em>=MIN(B11,B3-B6-B9)</em> \u00b7 <em>B13</em> <em>=B11-B12</em> \u00b7 <em>C11</em> <em>=B13</em> \u00b7 <em>B14</em> <em>=B7+B10+B13</em> fill \u2192 + dress',
-    guide:[
-      'the revolver drinks first: B6 \u00b7 <kbd>=MIN(B5,B3)</kbd> \u2014 can\u2019t pay down more than the balance \u00b7 fill \u2192',
-      'revolver ending: B7 \u00b7 <kbd>=B5-B6</kbd> \u00b7 fill \u2192 \u00b7 then the roll-forward: C5 \u00b7 <kbd>=B7</kbd> \u2014 next year opens where this year closed \u00b7 fill C5:E5 \u2192',
-      'term loan sweeps the REMAINDER: B9 \u00b7 <kbd>=MIN(B8,B3-B6)</kbd> \u00b7 ending B10 \u00b7 <kbd>=B8-B9</kbd> \u00b7 roll-forward C8 \u00b7 <kbd>=B10</kbd> \u00b7 fill all three \u2192',
-      'mezz gets the dregs: B12 \u00b7 <kbd>=MIN(B11,B3-B6-B9)</kbd> \u2014 two seniors already ate \u00b7 ending B13 \u00b7 <kbd>=B11-B12</kbd> \u00b7 roll-forward C11 \u00b7 <kbd>=B13</kbd> \u00b7 fill \u2192',
-      'total debt: B14 \u00b7 <kbd>=B7+B10+B13</kbd> \u00b7 fill \u2192 \u00b7 format it: <kbd>ctrl</kbd>+<kbd>b</kbd> \u00b7 <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd>',
-    ],
-    targets:['B6:E6','C5:E5','B9:E9','C8:E8','B12:E12','C11:E11','B14:E14'],
-    demo(){ return [
-      {sel:'B6',  keys:[...T('=MIN(B5,B3)'), Kb.enter]},
-      {sel:'B6:E6', keys:[Kb.fillR]},
-      {sel:'B7',  keys:[...T('=B5-B6'), Kb.enter]},
-      {sel:'B7:E7', keys:[Kb.fillR]},
-      {sel:'C5',  keys:[...T('=B7'), Kb.enter]},
-      {sel:'C5:E5', keys:[Kb.fillR]},
-      {sel:'B9',  keys:[...T('=MIN(B8,B3-B6)'), Kb.enter]},
-      {sel:'B9:E9', keys:[Kb.fillR]},
-      {sel:'B10', keys:[...T('=B8-B9'), Kb.enter]},
-      {sel:'B10:E10', keys:[Kb.fillR]},
-      {sel:'C8',  keys:[...T('=B10'), Kb.enter]},
-      {sel:'C8:E8', keys:[Kb.fillR]},
-      {sel:'B12', keys:[...T('=MIN(B11,B3-B6-B9)'), Kb.enter]},
-      {sel:'B12:E12', keys:[Kb.fillR]},
-      {sel:'B13', keys:[...T('=B11-B12'), Kb.enter]},
-      {sel:'B13:E13', keys:[Kb.fillR]},
-      {sel:'C11', keys:[...T('=B13'), Kb.enter]},
-      {sel:'C11:E11', keys:[Kb.fillR]},
-      {sel:'B14', keys:[...T('=B7+B10+B13'), Kb.enter]},
-      {sel:'B14:E14', keys:[Kb.fillR]},
-      {sel:'B14:E14', keys:[Kb.bold]},
-      {sel:'B14:E14', keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
+    /* §1.5: the aha's MOMENT is beat 3, where the junior tranche's MIN returns 0 because the two
+       seniors already took the whole cash line — the cascade visibly bites on the board. */
+    prompt:'The credit committee sits Thursday and wants the paydown page on this deal. Three facilities — debt layers ranked by who gets paid first — four years, and cash flowing strictly by seniority: the revolver is repaid first, the term loan takes only what the revolver leaves, and the junior layer gets whatever is still on the table, which in the early years is nothing at all. Every facility rolls its balance forward — each year opening where the last one closed — and the page closes on total debt.',
+    req(){ const o=this._o, R=o.R, Y=o.Y; return '<em>'+Y[0]+R.rp+'</em> <em>=MIN('+Y[0]+R.rb+','+Y[0]+R.cash+')</em> · <em>'+Y[0]+R.re+'</em> <em>='+Y[0]+R.rb+'-'+Y[0]+R.rp+'</em> · the same pair down each junior, its MIN netting every senior above it · grab a paydown/ending pair and <em>ctrl+r</em> · openings <em>'+Y[1]+R.rb+'</em> <em>='+Y[0]+R.re+'</em> · total <em>'+Y[0]+R.tot+'</em> <em>='+Y[0]+R.re+'+'+Y[0]+R.te+'+'+Y[0]+R.me+'</em> · <em>ctrl+b</em> + <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o, R=o.R, Y=o.Y; return [
+      'the '+o.rvN+' is senior, so it drinks first: on '+Y[0]+R.rp+' <kbd>=MIN(</kbd>'+Y[0]+R.rb+'<kbd>,</kbd>'+Y[0]+R.cash+'<kbd>)</kbd> <kbd>↵</kbd> — it can never take more than the balance it is repaying. <kbd>=IF(</kbd>'+Y[0]+R.cash+'<kbd>&lt;</kbd>'+Y[0]+R.rb+'<kbd>,…)</kbd> rations to the same number and grades the same',
+      'the '+o.tlN+' sweeps the REMAINDER: '+Y[0]+R.tp+' <kbd>=MIN(</kbd>'+Y[0]+R.tb+'<kbd>,</kbd>'+Y[0]+R.cash+'<kbd>-</kbd>'+Y[0]+R.rp+'<kbd>)</kbd> — the cash line less the paydown sitting above it',
+      'the '+o.mzN+' is last in the queue: '+Y[0]+R.mp+' <kbd>=MIN(</kbd>'+Y[0]+R.mb+'<kbd>,</kbd>'+Y[0]+R.cash+'<kbd>-</kbd>'+Y[0]+R.rp+'<kbd>-</kbd>'+Y[0]+R.tp+'<kbd>)</kbd> — two seniors have already eaten, so the early years read 0',
+      'each ending is its opening less that year’s paydown ('+Y[0]+R.re+' <kbd>=</kbd>'+Y[0]+R.rb+'<kbd>-</kbd>'+Y[0]+R.rp+'), and each next opening points straight at it ('+Y[1]+R.rb+' <kbd>=</kbd>'+Y[0]+R.re+'). Grab a paydown/ending pair and <kbd>ctrl</kbd>+<kbd>r</kbd> carries both across (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd> is the ribbon door); typing every year clears it too, it only costs the keys',
+      'total debt on '+Y[0]+R.tot+': <kbd>=</kbd>'+Y[0]+R.re+'<kbd>+</kbd>'+Y[0]+R.te+'<kbd>+</kbd>'+Y[0]+R.me+' — the three closing balances. <kbd>=SUM(</kbd>'+Y[0]+R.re+'<kbd>,</kbd>'+Y[0]+R.te+'<kbd>,</kbd>'+Y[0]+R.me+'<kbd>)</kbd> totals the same, then fill right',
+      'dress it the moment it exists: <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) and <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> rules above it — <kbd>b</kbd> <kbd>s</kbd>, <kbd>b</kbd> <kbd>a</kbd>, <kbd>b</kbd> <kbd>d</kbd> and <kbd>b</kbd> <kbd>t</kbd> all draw that top line as well',
+      '☆ the discovery: the page carries a check line nothing on the list asks you for. On '+Y[0]+R.chk+' — <kbd>=</kbd>'+Y[0]+R.rb+'<kbd>+</kbd>'+Y[0]+R.tb+'<kbd>+</kbd>'+Y[0]+R.mb+'<kbd>-</kbd>'+Y[3]+R.tot+'<kbd>-SUM(</kbd>'+Y[0]+R.cash+'<kbd>:</kbd>'+Y[3]+R.cash+'<kbd>)</kbd> <kbd>↵</kbd> — debt retired against cash applied, and it reads 0 only when every dollar of cash landed on a tranche. Skipping it clears the drill',
     ]; },
+    /* rings: ① the senior paydown row · ② the mid paydown row · ③ the junior paydown row ·
+       ④ the whole corkscrew zone · ⑤ the total row · ⑥ the total line incl. its label ·
+       ☆ never ringed (§2.2) */
+    targets(){ const o=this._o, R=o.R, Y=o.Y; return [
+      Y[0]+R.rp+':'+Y[3]+R.rp, Y[0]+R.tp+':'+Y[3]+R.tp, Y[0]+R.mp+':'+Y[3]+R.mp,
+      Y[0]+R.rb+':'+Y[3]+R.me, Y[0]+R.tot+':'+Y[3]+R.tot, o.CA+R.tot+':'+Y[3]+R.tot, null,
+    ]; },
+    /* the demo BUILDS its own selections rather than being handed them by setDemoSel, so parKeys
+       measures what a player really pays for the range grabs instead of eliding them (the r438
+       `series` rule). §1.0(a): the dress rides in the same motion as the total it dresses. */
+    demo(){ const o=this._o, R=o.R, Y=o.Y;
+      const RT=n=>{ const a=[]; for(let i=0;i<n;i++) a.push({key:'ArrowRight',shift:true}); return a; };
+      return [
+      {sel:Y[0]+R.rp, keys:[...T('=MIN('+Y[0]+R.rb+','+Y[0]+R.cash+')'), Kb.enter]},
+      {sel:Y[0]+R.re, keys:[...T('='+Y[0]+R.rb+'-'+Y[0]+R.rp), Kb.enter]},
+      {sel:Y[0]+R.tp, keys:[...T('=MIN('+Y[0]+R.tb+','+Y[0]+R.cash+'-'+Y[0]+R.rp+')'), Kb.enter]},
+      {sel:Y[0]+R.te, keys:[...T('='+Y[0]+R.tb+'-'+Y[0]+R.tp), Kb.enter]},
+      {sel:Y[0]+R.mp, keys:[...T('=MIN('+Y[0]+R.mb+','+Y[0]+R.cash+'-'+Y[0]+R.rp+'-'+Y[0]+R.tp+')'), Kb.enter]},
+      {sel:Y[0]+R.me, keys:[...T('='+Y[0]+R.mb+'-'+Y[0]+R.mp), Kb.enter]},
+      /* the corkscrew: year two opens on year one's close, on all three facilities */
+      {sel:Y[1]+R.rb, keys:[...T('='+Y[0]+R.re), Kb.enter]},
+      {sel:Y[1]+R.tb, keys:[...T('='+Y[0]+R.te), Kb.enter]},
+      {sel:Y[1]+R.mb, keys:[...T('='+Y[0]+R.me), Kb.enter]},
+      /* one grab per facility takes the paydown/ending PAIR across all four years */
+      {sel:Y[0]+R.rp, keys:[...RT(3), {key:'ArrowDown',shift:true}, Kb.fillR]},
+      {sel:Y[0]+R.tp, keys:[...RT(3), {key:'ArrowDown',shift:true}, Kb.fillR]},
+      {sel:Y[0]+R.mp, keys:[...RT(3), {key:'ArrowDown',shift:true}, Kb.fillR]},
+      {sel:Y[1]+R.rb, keys:[...RT(2), Kb.fillR]},
+      {sel:Y[1]+R.tb, keys:[...RT(2), Kb.fillR]},
+      {sel:Y[1]+R.mb, keys:[...RT(2), Kb.fillR]},
+      {sel:Y[0]+R.tot, keys:[...T('='+Y[0]+R.re+'+'+Y[0]+R.te+'+'+Y[0]+R.me), Kb.enter]},
+      {sel:Y[0]+R.tot, keys:[...RT(3), Kb.fillR]},
+      /* §1.0(a): the total is dressed in the same breath it is built — label included, so the
+         rule runs the width of the line the reader's eye follows */
+      {sel:o.CA+R.tot, keys:[...RT(4), Kb.bold, Kb.alt, L('h'), L('b'), L('p')]},
+      /* the ☆ — debt retired against cash applied, on the check line the board carries */
+      {sel:Y[0]+R.chk, keys:[...T('='+Y[0]+R.rb+'+'+Y[0]+R.tb+'+'+Y[0]+R.mb+'-'+Y[3]+R.tot+'-SUM('+Y[0]+R.cash+':'+Y[3]+R.cash+')'), Kb.enter]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' \u2014 debt paydown waterfall ($mm)',txt:true,bold:true};
-      const y0=rnd(24,26);
-      for(let i=0;i<4;i++) cells[colLetter(i+2)+2]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
-      const rows=[[3,'Cash avail. for paydown'],[5,'Revolver \u2014 beginning'],[6,'Revolver \u2014 paydown'],[7,'Revolver \u2014 ending'],
-        [8,'Term loan \u2014 beginning'],[9,'Term loan \u2014 sweep'],[10,'Term loan \u2014 ending'],
-        [11,'Mezzanine \u2014 beginning'],[12,'Mezzanine \u2014 paydown'],[13,'Mezzanine \u2014 ending'],[14,'Total debt']];
-      rows.forEach(([r,n])=>cells['A'+r]={...blankCell(),value:n,txt:true,bold:(r===14)});
-      // openings + yearly cash: random CONTENT, fixed real-tab layout (density doctrine).
-      // cash is sized so the cascade BITES: revolver dies mid-model, mezz often starves.
-      let rv=rnd(10,22)*10, tl=rnd(28,46)*10, mz=rnd(10,20)*10;
-      cells['B5']={...blankCell(),value:rv,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['B8']={...blankCell(),value:tl,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['B11']={...blankCell(),value:mz,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      this._exp=[];
-      for(let i=0;i<4;i++){ const col=colLetter(i+2);
-        const cash=rnd(8,32)*10;
-        cells[col+3]={...blankCell(),value:cash,fontColor:'blue',fmtStyle:'comma',decimals:0};
-        [5,6,7,8,9,10,11,12,13,14].forEach(r=>{ const k=col+r;
-          if(!cells[k]) cells[k]={...blankCell(),fmtStyle:'comma',decimals:0}; });
-        const rvPd=Math.min(rv,cash), rvE=rv-rvPd;
-        const tlPd=Math.min(tl,cash-rvPd), tlE=tl-tlPd;
-        const mzPd=Math.min(mz,cash-rvPd-tlPd), mzE=mz-mzPd;
-        this._exp.push({rvPd,rvE,tlPd,tlE,mzPd,mzE,tot:rvE+tlE+mzE});
-        rv=rvE; tl=tlE; mz=mzE;
-      }
-      return {ROWS:14, cells, active:{r:6,c:2}, sel:null, colW:{1:184,2:70,3:70,4:70,5:70}};
+      /* §1.2 randomization — four independent axes. (a) SITE: corner jitter, the §1.2 substitute
+         for a spot pool on a board that fills the grid — the whole page anchors at column A or
+         column B. (b) CONTENT: codename, fiscal-year base, and the three facility names drawn
+         from their own seniority-correct pools (interpolated into the check labels per
+         §1.0-R2(g), so the line always names THIS seed's facility). (c) VALUES: every figure
+         through rnd(). (d) WHICH-ONE-BITES: `reach` decides whether four years of cash ever get
+         past the two senior facilities — on half the seeds the junior layer is paid down in the
+         back years, on the other half it is untouched for the whole horizon and its paydown row
+         reads four zeros, which is the drill's own point.
+         Row geometry is CONSTANT across seeds, so the demo types the same character count on
+         every draw and the par sweep does not move with the seed (the r439 `wrapfix` rule). */
+      const one=a=>a[rnd(0,a.length-1)];
+      const c0=rnd(0,1)?1:2;                                   // (a) corner jitter
+      const CA=colLetter(c0);
+      const Y=[colLetter(c0+1),colLetter(c0+2),colLetter(c0+3),colLetter(c0+4)];
+      const rvN=one(['Revolver','RCF']);                       // (b) seniority-correct name pools
+      const tlN=one(['Term Loan A','Term Loan B','Term Loan']);
+      const mzN=one(['Mezzanine','Second Lien','PIK Notes']);
+      const y0=rnd(26,30);
+      const R={cash:5, rb:7, rp:8, re:9, tb:11, tp:12, te:13, mb:15, mp:16, me:17, tot:19, chk:20};
+      cells[CA+'1']={...blankCell(),value:codename()+' — debt paydown waterfall ($mm)',txt:true,bold:true};
+      /* MODELING_STANDARDS §2 (state the convention on the board) + §5/§7 (say the simplification
+         out loud): this engine has no iterative calculation, so interest is not computed off the
+         balances here — the beginning-balance convention is named on the page itself. */
+      cells[CA+'2']={...blankCell(),value:'Basis: $ in millions · cash shown is after cash interest and mandatory amortisation · paydowns apply strictly by seniority',txt:true,it:true,fontColor:'gray'};
+      cells[CA+'3']={...blankCell(),value:'Memo: interest accrues on each facility’s BEGINNING balance, so this page carries no circular reference',txt:true,it:true,fontColor:'gray'};
+      /* header row, bottom-ruled (doctrine §2.1b) */
+      cells[CA+'4']={...blankCell(),value:'Facility',txt:true,bold:true,bb:true};
+      for(let i=0;i<4;i++) cells[Y[i]+'4']={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r',bb:true};
+      /* (c) values. The sizing is what makes the ☆'s identity TRUE: total cash applied over the
+         four years is held strictly below total opening debt, so every dollar of cash lands on a
+         facility and "debt retired less cash applied" reads zero exactly. */
+      const rv=rnd(12,22)*10, tl=rnd(30,46)*10;
+      const reach=rnd(0,1);                                    // (d)
+      const gap=rnd(10,15)*10;
+      const mz=reach?gap+rnd(6,14)*10:rnd(16,26)*10;
+      const budget=reach?(rv+tl+(mz-gap)):(rv+rnd(15,28)*10);
+      const w=[rnd(22,30),rnd(22,30),rnd(22,30),rnd(22,30)], W=w[0]+w[1]+w[2]+w[3];
+      const cash=w.map(x=>Math.round(budget*x/W/10)*10);
+      cash[3]+=budget-(cash[0]+cash[1]+cash[2]+cash[3]);
+      const rows=[[R.cash,'Cash available for paydown',false],
+        [R.rb,rvN+' — beginning',false],[R.rp,rvN+' — paydown',false],[R.re,rvN+' — ending',false],
+        [R.tb,tlN+' — beginning',false],[R.tp,tlN+' — paydown',false],[R.te,tlN+' — ending',false],
+        [R.mb,mzN+' — beginning',false],[R.mp,mzN+' — paydown',false],[R.me,mzN+' — ending',false],
+        [R.tot,'Total debt — ending',true],[R.chk,'Check — debt repaid less cash',false]];
+      rows.forEach(([r,n,b])=>cells[CA+r]={...blankCell(),value:n,txt:true,bold:b});
+      /* MODELING_STANDARDS §1: blue is a hardcoded input typed by a human, black is a formula
+         computed on this sheet. The cash line and the three opening balances are the only inputs
+         on the page; everything else the player builds ships black by default. */
+      for(let i=0;i<4;i++) cells[Y[i]+R.cash]={...blankCell(),value:cash[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells[Y[0]+R.rb]={...blankCell(),value:rv,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells[Y[0]+R.tb]={...blankCell(),value:tl,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      cells[Y[0]+R.mb]={...blankCell(),value:mz,fontColor:'blue',fmtStyle:'comma',decimals:0};
+      [R.rb,R.rp,R.re,R.tb,R.tp,R.te,R.mb,R.mp,R.me,R.tot].forEach(r=>{
+        for(let i=0;i<4;i++){ const k=Y[i]+r; if(!cells[k]) cells[k]={...blankCell(),fmtStyle:'comma',decimals:0}; } });
+      cells[Y[0]+R.chk]={...blankCell(),fmtStyle:'comma',decimals:0};
+      /* the arithmetic truth of the cascade, year by year — what checks() grades against */
+      this._exp=[]; let a=rv,b=tl,c=mz;
+      for(let i=0;i<4;i++){ const ca=cash[i];
+        const rp=Math.min(a,ca), re=a-rp;
+        const tp=Math.min(b,ca-rp), te=b-tp;
+        const mp=Math.min(c,ca-rp-tp), me=c-mp;
+        this._exp.push({rb:a,rp:rp,re:re,tb:b,tp:tp,te:te,mb:c,mp:mp,me:me,tot:re+te+me});
+        a=re; b=te; c=me; }
+      this._o={CA:CA,Y:Y,R:R,c0:c0,rvN:rvN,tlN:tlN,mzN:mzN,y0:y0,cash:cash,open:[rv,tl,mz],reach:reach};
+      /* label column sized to the longest label on the page (29 chars); the four year columns
+         hold the widest figure any seed can print; every unused column is a narrow gutter so the
+         sheet keeps r333's constant frame without the elastic scaler having to work. */
+      const colW={}; for(let c=1;c<=10;c++) colW[c]=44;
+      colW[c0]=226; for(let i=0;i<4;i++) colW[c0+1+i]=82;
+      return {ROWS:20, cells, active:{r:R.rp,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<0.5; };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D','E'];
-      const all=(row,key)=>[0,1,2,3].every(i=>near(COL[i]+row,this._exp[i][key]));
-      const dressOk=[0,1,2,3].every(i=>{ const c=S.cells[COL[i]+'14']; return !!(c&&c.bold&&c.bt); });
+      const o=this._o, R=o.R, Y=o.Y, E=this._exp;
+      /* every core reads the END STATE — the number standing in each year column, plus liveness
+         where the label's verb is Build or Total (§1.7; doctrine §2.2's sanctioned exception;
+         MODELING_STANDARDS §3 requires an opening balance to REFERENCE the prior close). Nothing
+         reads formula text and nothing reads a keypress counter (§1.0-R3(p)), so MIN and IF, an
+         anchored reference and a bare one, a fill and a typed year all clear alike. */
+      const cell=k=>S.cells[k]||{};
+      const live=k=>{ const c=cell(k); return !!(c.formula&&typeof c.value==='number'); };
+      const num=k=>{ const c=cell(k); return (typeof c.value==='number')?c.value:NaN; };
+      const at=(k,x)=>live(k)&&Math.abs(num(k)-x)<0.5;
+      const row=(r,f)=>[0,1,2,3].every(i=>at(Y[i]+r,E[i][f]));
+      /* the folded corkscrew (§4.77: "fold the ... roll checks that share a motion"): all three
+         facilities' closing balances, and every later year's opening standing on the close above
+         it — one motion, three tranches, graded as one beat. */
+      const rollOk=[0,1,2,3].every(i=>at(Y[i]+R.re,E[i].re)&&at(Y[i]+R.te,E[i].te)&&at(Y[i]+R.me,E[i].me))
+                 &&[1,2,3].every(i=>at(Y[i]+R.rb,E[i].rb)&&at(Y[i]+R.tb,E[i].tb)&&at(Y[i]+R.mb,E[i].mb));
+      /* the dress: bold plus a line ABOVE the row. Probed routes that all clear — Alt H B P
+         (bt) · B S (bt+bb) · B T (bt+bb+thick) · B D (bt+bb) · B A (stores `ball`, which is why
+         it is accepted explicitly). Alt H B O paints only underneath and correctly does not. */
+      const dressOk=[0,1,2,3].every(i=>{ const c=cell(Y[i]+R.tot); return !!(c.bold&&(c.bt||c.ball)); });
+      /* ☆ recipe (§1.0-R4(u) independent prove-out · §1.0-R2(i) a real, skippable decision): the
+         check line reads the board's own cross-foot — the debt actually retired over the horizon
+         against the cash actually applied to it — and lands on zero. Read entirely off the end
+         state: total paydown standing on the board less the cash line standing on the board. The
+         one shape assertion is that the cell REFERENCES the sheet at all, which is what separates
+         a check from a typed 0; no function, no particular reference and no order is demanded, so
+         opening-less-closing, a paydown roll-up and an addition chain all clear (walked, ALT 1
+         and ALT 2). Nothing on the checklist asks for this line, so a player who never builds it
+         clears every core beat and forfeits only the star (measured: ALT 3). */
+      let paid=0, applied=0;
+      for(let i=0;i<4;i++){ [R.rp,R.tp,R.mp].forEach(r=>{ const v=num(Y[i]+r); if(!isNaN(v)) paid+=v; });
+        const cv=num(Y[i]+R.cash); if(!isNaN(cv)) applied+=cv; }
+      const ck=cell(Y[0]+R.chk);
+      const starOk=live(Y[0]+R.chk) && /[A-J]\s*\d/i.test(String(ck.formula||''))
+                && Math.abs(num(Y[0]+R.chk)-(paid-applied))<0.5;
       return [
-        {label:'pay the revolver first (most senior) \u2014 MIN of balance and cash, all four years', ok: all(6,'rvPd')&&refs('B6',['MIN('])},
-        {label:'roll forward the revolver \u2014 each year opens where the last closed', ok: all(7,'rvE')&&[1,2,3].every(i=>refs(COL[i]+'5',[COL[i-1]+'7']))},
-        {label:'sweep the term loan with only the REMAINDER after the revolver', ok: all(9,'tlPd')&&refs('B9',['MIN(','B6'])},
-        {label:'roll forward the term loan across', ok: all(10,'tlE')&&[1,2,3].every(i=>refs(COL[i]+'8',[COL[i-1]+'10']))},
-        {label:'pay the mezzanine from the cash left after BOTH seniors', ok: all(12,'mzPd')&&refs('B12',['MIN(','B6','B9'])},
-        {label:'roll forward the mezz across', ok: all(13,'mzE')&&[1,2,3].every(i=>refs(COL[i]+'11',[COL[i-1]+'13']))},
-        {label:'total the debt \u2014 three endings, bold with a top border above', ok: all(14,'tot')&&dressOk},
+        {label:'Build the '+o.rvN+' paydown — never more than its opening balance', ok: row(R.rp,'rp')},
+        {label:'Build the '+o.tlN+' sweep — only the cash the '+o.rvN+' left', ok: row(R.tp,'tp')},
+        {label:'Build the '+o.mzN+' paydown — only the cash both seniors left', ok: row(R.mp,'mp')},
+        {label:'Build each facility’s ending balance — every year opening where the last one closed', ok: rollOk},
+        {label:'Total the ending debt — the three facilities together', ok: row(R.tot,'tot')},
+        {label:'Bold the total debt line and add a top border above it', ok: dressOk},
+        {label:'Enter the sanity check — debt repaid against cash applied, reading zero', ok: starOk, bonus:true},
       ];
     }
   },

@@ -41,7 +41,7 @@ window.HOTKEY_DRILLS = {
     { name: 'Data & Lookups', keys: ['sort', 'scrub', 'filterpass', 'unhide', 'lookup', 'lookup2', 'recon', 'drill', 'series'] },
     { name: 'Formulas II',    keys: ['audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'cases', 'tieout', 'signerr', 'versionup', 'balance'] },
     { name: 'Models I',       keys: ['wacc', 'fcfbuild', 'dcf', 'comps', 'txncomps', 'football', 'dcfsens', 'retbridge', 'accdil', 'sourcesuses'] },
-    { name: 'Models II',      keys: ['schedule', 'intsched', 'lbo', 'revolver', 'waterfall', 'covtable', 'liqbridge', 'wk13', 'cascade', 'debtsched'] },
+    { name: 'Models II',      keys: ['schedule', 'intsched', 'lbo', 'revolver', 'waterfall', 'covtable', 'liqbridge', 'wk13', 'debtsched', 'cascade'] },   /* r447 (DEPTH_PASS §2.4/§3 D9): cascade MOVED to the end — capstone-last is uniform across chapters; the 1–9 picker hotkey re-map inside Models II is cosmetic (RESOLVED, Wolf 2026-07-24) */
     { name: 'Full Builds',    keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'threestmt', 'opmodel', 'dcfbuild', 'lbobuild', 'debtblock', 'dashcover'] },
   ],
 
@@ -64,7 +64,11 @@ window.HOTKEY_DRILLS = {
     editfix:    { name:'Repair',   label:'Repair the schedule',    tab:'Repair',   desc:'A review came back on the schedule — a misspelled team, an FY formula pointing at the wrong row, a Total that never grew. Repair all three, then do what the sweep note says and watch it cost you' },   /* r431: absorbed undo — the repair pass and its safety net are one drill */
     pastes:     { name:'Paste Special',label:'Paste Special everything',tab:'Paste Sp.',desc:'The full paste-special toolkit — transpose, divide, multiply, formats, values' },
     waterfall:  { name:'Waterfall', label:'Run the paydown waterfall',  tab:'Waterfall', desc:'Foot the cash a credit page has for debt, then cascade it down two tranches by seniority' },   /* r446 §4.72 depth pass: desc rewritten to the reworked board (the old one named the answer function) */
-    cascade:    { name:'Full Waterfall', label:'Run the full cascade',   tab:'Cascade',   desc:'3 tranches \u00d7 4 yrs: seniority MINs, per-tranche roll-forwards, total debt bold with a top border' },
+    /* r447 H6b-14 (DEPTH_PASS \u00a72.4/\u00a73 D9): cascade DESIGNATED the Models II capstone —
+       capstone:true drives the picker's ★ CAPSTONE tag + full-color group ring; the gate itself
+       reads HOTKEY_CAMPAIGN.chapters[6].capstone below. desc de-hinted: the old one named the
+       answer function ("seniority MINs") outright — the r417 Class-A leak. */
+    cascade:    { name:'Full Waterfall', label:'Run the full cascade',   tab:'Cascade',   capstone:true, desc:'The Models II capstone \u2014 three facilities, four years, cash applied strictly by seniority: each layer rations against what the one above it left, every balance rolls forward, and the page closes on total debt. One clean run opens the next track leg' },
     wk13:       { name:'13-Week Cash', label:'Run the 13-week', tab:'13-Week', desc:'The restructuring staple: a weekly cash roll-forward, an anchored liquidity cushion, and totals on the flow lines only' },   /* r447 §4.75: desc rewritten to the flow-block board (receipts and disbursements broken out) */
     liqbridge:  { name:'Liquidity Bridge', label:'Bridge the liquidity \u2014 three cases', tab:'Liq. Bridge', desc:'Cash plus revolver availability walked to ending liquidity across three cases, and the cushion against the covenant' },   /* r447 §4.74: availability now capped by the borrowing base — the old desc described the uncapped board */
     covtable:   { name:'Covenant Table',  label:'Run the covenant table', tab:'Covenants', desc:'Two leverage tests against a stepping maximum \u2014 headroom every quarter, a compliance flag, and the quarter that pinches' },   /* r447 §4.73: the board now runs senior secured AND total net leverage */
@@ -242,7 +246,7 @@ window.HOTKEY_CAMPAIGN = {
     { id:'c4', name:'Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','recon','lookup','lookup2'] },
     { id:'c5', name:'Formulas II',            badge:'\ud83e\uddee', xp:450, keys:['audit','balance','triage','versionup'] },
     { id:'c6', name:'Models I \u00b7 Valuation',    badge:'\ud83c\udfe6', xp:600, keys:['wacc','fcfbuild','dcf','comps'] },
-    { id:'c7', name:'Models II \u00b7 Credit',      badge:'\ud83d\udcc9', xp:750, keys:['lbo','revolver','intsched','debtsched'] },
+    { id:'c7', name:'Models II \u00b7 Credit',      badge:'\ud83d\udcc9', xp:750, keys:['lbo','revolver','intsched','debtsched'], capstone:'cascade' },   /* r447 (D9): the Models II capstone designates with its depth-pass build */
     { id:'c8', name:'Full Builds',            badge:'\ud83c\udfd7', xp:1000, keys:['threestmt','dcfbuild','lbobuild','opmodel'] },
   ],
   finisher: { badge:'\u2b50', name:'Catalog complete', xp:600 },
@@ -328,9 +332,10 @@ window.HOTKEY_CLOCKS = {
      lockstep with HOTKEY_PARS.modeltour: pass = par × 2. */
   modeltour: { pass: 70 },
   gauntlet:  { pass: 94 },   /* r433: the Formatting capstone — par 47 × 2 (§4.20 "Clocks: capstone pass=par×2.0") */
+  cascade:   { pass: 322 },   /* r447: the Models II capstone — par 161 × 2 (§4.77 "Clocks: pass=par×2.0 override") */
 };
 
-window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":47,"margin":40,"foot":29,"percent":21,"cagr":36,"anchor":22,"bridge":33,"sumif":64,"rollup":80,"fxconvert":35,"cases":97,"sort":31,"scrub":21,"recon":92,"filterpass":26,"unhide":25,"lookup":59,"lookup2":80,"drill":22,"series":44,"audit":28,"triage":40,"wrapfix":26,"balcheck":37,"stalelink":64,"tieout":36,"signerr":35,"versionup":48,"balance":66,"wacc":112,"fcfbuild":40,"dcf":85,"comps":89,"txncomps":52,"football":65,"dcfsens":35,"retbridge":56,"accdil":70,"sourcesuses":92,"lbo":71,"revolver":95,"schedule":69,"intsched":72,"waterfall":77,"cascade":94,"wk13":45,"liqbridge":77,"covtable":36,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
+window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":47,"margin":40,"foot":29,"percent":21,"cagr":36,"anchor":22,"bridge":33,"sumif":64,"rollup":80,"fxconvert":35,"cases":97,"sort":31,"scrub":21,"recon":92,"filterpass":26,"unhide":25,"lookup":59,"lookup2":80,"drill":22,"series":44,"audit":28,"triage":40,"wrapfix":26,"balcheck":37,"stalelink":64,"tieout":36,"signerr":35,"versionup":48,"balance":66,"wacc":112,"fcfbuild":40,"dcf":85,"comps":89,"txncomps":52,"football":65,"dcfsens":35,"retbridge":56,"accdil":70,"sourcesuses":92,"lbo":71,"revolver":95,"schedule":69,"intsched":72,"waterfall":77,"cascade":161,"wk13":45,"liqbridge":77,"covtable":36,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

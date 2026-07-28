@@ -944,30 +944,95 @@ const ALTS = [
       {sel:'B14', keys:[...T('=B5-B11'),{key:'Enter'}]},
       {sel:'B14:D14', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
     ]` },
-  { key: 'cascade', name: 'tranches bottom-up — mezz first, revolver last, ribbon fills, ribbon dress', moves: `C => [
-      {sel:'B12', keys:[...T('=MIN(B11,B3-B6-B9)'),{key:'Enter'}]},
-      {sel:'B12:E12', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B13', keys:[...T('=B11-B12'),{key:'Enter'}]},
-      {sel:'B13:E13', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'C11', keys:[...T('=B13'),{key:'Enter'}]},
-      {sel:'C11:E11', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B9',  keys:[...T('=MIN(B8,B3-B6)'),{key:'Enter'}]},
-      {sel:'B9:E9', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B10', keys:[...T('=B8-B9'),{key:'Enter'}]},
-      {sel:'B10:E10', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'C8',  keys:[...T('=B10'),{key:'Enter'}]},
-      {sel:'C8:E8', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B6',  keys:[...T('=MIN(B5,B3)'),{key:'Enter'}]},
-      {sel:'B6:E6', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B7',  keys:[...T('=B5-B6'),{key:'Enter'}]},
-      {sel:'B7:E7', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'C5',  keys:[...T('=B7'),{key:'Enter'}]},
-      {sel:'C5:E5', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B14', keys:[...T('=B7+B10+B13'),{key:'Enter'}]},
-      {sel:'B14:E14', keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
-      {sel:'B14:E14', keys:[{key:'Alt'},L('h'),D(1)]},
-      {sel:'B14:E14', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
-    ]` },
+  /* r447 (cascade depth pass, DEPTH_PASS §4.77 — the Models II capstone): three entries,
+     replacing the one pre-pass entry, which drove the retired ROWS:14 geometry cell by cell.
+     ALT 1 = chord-ROUTE alt — every fill walked from the ribbon (Alt H F I R), bold via Alt H 1,
+     the rule via Alt H B S, EVERY MIN written as an IF (the untriggerable-beat regression: the
+     pre-pass predicate demanded the literal 'MIN(' out of formula text, finding #21–#23), the
+     total as =SUM(a,b,c), and the ☆ built the OTHER way round — the three paydown rows rolled
+     up against the cash line instead of opening-less-closing. The star still fires, because it
+     grades the identity off the board and not a formula shape.
+     ALT 2 = op-ORDER alt — the junior facility built first and the senior last, the dress and
+     the total laid down BEFORE the numbers that feed them (everything recalculates when they
+     land), the corkscrew links last, every year-one reference ANCHORED (finding #24: the roll
+     checks used to demand the bare prior-year cell out of the text), and the ☆ as a bare
+     addition chain with no SUM anywhere.
+     ALT 3 = the §1.0-R2(i) SKIPPABILITY CONTROL and the ☆-headroom denominator: every year-cell
+     typed on its own, no fill anywhere on the board, the dress walked column by column with ALL
+     borders (Alt H B A, which stores `ball` and not `bt` — probed, and the reason the dress
+     predicate accepts either). All six cores clear and the ☆ must stay DARK.
+     MEASURED, 3 seeds each, in the r447 worktree: ALT 1 median 237 keys (☆ 3/3) · ALT 2 median
+     243 (☆ 3/3) · ALT 3 median 374 (☆ 0/3). The demo is 153. */
+  { key: 'cascade', name: 'RIBBON routes throughout (Alt H F I R fills, Alt H 1 bold, Alt H B S perimeter rule), every MIN written as an IF, and the ☆ built the other way round — the paydown rows rolled up against the cash line', moves: `C => { const o=C._o, R=o.R, Y=o.Y;
+      const RT=n=>{ const a=[]; for(let i=0;i<n;i++) a.push({key:'ArrowRight',shift:true}); return a; };
+      const IF=(bal,cash)=>'=IF('+cash+'<'+bal+','+cash+','+bal+')';
+      const FIR=[{key:'Alt'},L('h'),L('f'),L('i'),L('r')];
+      return [
+        {sel:Y[0]+R.rp, keys:[...T(IF(Y[0]+R.rb, Y[0]+R.cash)), {key:'Enter'}]},
+        {sel:Y[0]+R.re, keys:[...T('='+Y[0]+R.rb+'-'+Y[0]+R.rp), {key:'Enter'}]},
+        {sel:Y[0]+R.tp, keys:[...T(IF(Y[0]+R.tb, Y[0]+R.cash+'-'+Y[0]+R.rp)), {key:'Enter'}]},
+        {sel:Y[0]+R.te, keys:[...T('='+Y[0]+R.tb+'-'+Y[0]+R.tp), {key:'Enter'}]},
+        {sel:Y[0]+R.mp, keys:[...T(IF(Y[0]+R.mb, Y[0]+R.cash+'-'+Y[0]+R.rp+'-'+Y[0]+R.tp)), {key:'Enter'}]},
+        {sel:Y[0]+R.me, keys:[...T('='+Y[0]+R.mb+'-'+Y[0]+R.mp), {key:'Enter'}]},
+        {sel:Y[1]+R.rb, keys:[...T('='+Y[0]+R.re), {key:'Enter'}]},
+        {sel:Y[1]+R.tb, keys:[...T('='+Y[0]+R.te), {key:'Enter'}]},
+        {sel:Y[1]+R.mb, keys:[...T('='+Y[0]+R.me), {key:'Enter'}]},
+        {sel:Y[0]+R.rp, keys:[...RT(3), {key:'ArrowDown',shift:true}, ...FIR]},
+        {sel:Y[0]+R.tp, keys:[...RT(3), {key:'ArrowDown',shift:true}, ...FIR]},
+        {sel:Y[0]+R.mp, keys:[...RT(3), {key:'ArrowDown',shift:true}, ...FIR]},
+        {sel:Y[1]+R.rb, keys:[...RT(2), ...FIR]},
+        {sel:Y[1]+R.tb, keys:[...RT(2), ...FIR]},
+        {sel:Y[1]+R.mb, keys:[...RT(2), ...FIR]},
+        {sel:Y[0]+R.tot, keys:[...T('=SUM('+Y[0]+R.re+','+Y[0]+R.te+','+Y[0]+R.me+')'), {key:'Enter'}]},
+        {sel:Y[0]+R.tot, keys:[...RT(3), ...FIR]},
+        {sel:o.CA+R.tot, keys:[...RT(4), {key:'Alt'},L('h'),D(1), {key:'Alt'},L('h'),L('b'),L('s')]},
+        {sel:Y[0]+R.chk, keys:[...T('=SUM('+Y[0]+R.rp+':'+Y[3]+R.rp+')+SUM('+Y[0]+R.tp+':'+Y[3]+R.tp+')+SUM('+Y[0]+R.mp+':'+Y[3]+R.mp+')-SUM('+Y[0]+R.cash+':'+Y[3]+R.cash+')'), {key:'Enter'}]},
+      ]; }` },
+  { key: 'cascade', name: 'BOTTOM-UP op order — the junior facility built first and the senior last, the dress and the total laid down before the numbers that feed them, corkscrews last, every reference ANCHORED, and the ☆ written as an addition chain', moves: `C => { const o=C._o, R=o.R, Y=o.Y;
+      const RT=n=>{ const a=[]; for(let i=0;i<n;i++) a.push({key:'ArrowRight',shift:true}); return a; };
+      const A=c=>'$'+c[0]+'$'+c.slice(1);
+      return [
+        {sel:o.CA+R.tot, keys:[...RT(4), {key:'b',ctrl:true}, {key:'Alt'},L('h'),L('b'),L('t')]},
+        {sel:Y[0]+R.tot, keys:[...T('='+Y[0]+R.re+'+'+Y[0]+R.te+'+'+Y[0]+R.me), {key:'Enter'}]},
+        {sel:Y[0]+R.tot, keys:[...RT(3), {key:'r',ctrl:true}]},
+        {sel:Y[0]+R.mp, keys:[...T('=MIN('+A(Y[0]+R.mb)+','+A(Y[0]+R.cash)+'-'+A(Y[0]+R.rp)+'-'+A(Y[0]+R.tp)+')'), {key:'Enter'}]},
+        {sel:Y[0]+R.me, keys:[...T('='+Y[0]+R.mb+'-'+Y[0]+R.mp), {key:'Enter'}]},
+        {sel:Y[0]+R.tp, keys:[...T('=MIN('+A(Y[0]+R.tb)+','+A(Y[0]+R.cash)+'-'+A(Y[0]+R.rp)+')'), {key:'Enter'}]},
+        {sel:Y[0]+R.te, keys:[...T('='+Y[0]+R.tb+'-'+Y[0]+R.tp), {key:'Enter'}]},
+        {sel:Y[0]+R.rp, keys:[...T('=MIN('+A(Y[0]+R.rb)+','+A(Y[0]+R.cash)+')'), {key:'Enter'}]},
+        {sel:Y[0]+R.re, keys:[...T('='+Y[0]+R.rb+'-'+Y[0]+R.rp), {key:'Enter'}]},
+        {sel:Y[1]+R.mp, keys:[...T('=MIN('+Y[1]+R.mb+','+Y[1]+R.cash+'-'+Y[1]+R.rp+'-'+Y[1]+R.tp+')'), {key:'Enter'}]},
+        {sel:Y[1]+R.me, keys:[...T('='+Y[1]+R.mb+'-'+Y[1]+R.mp), {key:'Enter'}]},
+        {sel:Y[1]+R.tp, keys:[...T('=MIN('+Y[1]+R.tb+','+Y[1]+R.cash+'-'+Y[1]+R.rp+')'), {key:'Enter'}]},
+        {sel:Y[1]+R.te, keys:[...T('='+Y[1]+R.tb+'-'+Y[1]+R.tp), {key:'Enter'}]},
+        {sel:Y[1]+R.rp, keys:[...T('=MIN('+Y[1]+R.rb+','+Y[1]+R.cash+')'), {key:'Enter'}]},
+        {sel:Y[1]+R.re, keys:[...T('='+Y[1]+R.rb+'-'+Y[1]+R.rp), {key:'Enter'}]},
+        {sel:Y[1]+R.rp, keys:[...RT(2), {key:'ArrowDown',shift:true}, {key:'r',ctrl:true}]},
+        {sel:Y[1]+R.tp, keys:[...RT(2), {key:'ArrowDown',shift:true}, {key:'r',ctrl:true}]},
+        {sel:Y[1]+R.mp, keys:[...RT(2), {key:'ArrowDown',shift:true}, {key:'r',ctrl:true}]},
+        {sel:Y[1]+R.rb, keys:[...T('='+Y[0]+R.re), {key:'Enter'}]},
+        {sel:Y[1]+R.tb, keys:[...T('='+Y[0]+R.te), {key:'Enter'}]},
+        {sel:Y[1]+R.mb, keys:[...T('='+Y[0]+R.me), {key:'Enter'}]},
+        {sel:Y[1]+R.rb, keys:[...RT(2), {key:'r',ctrl:true}]},
+        {sel:Y[1]+R.tb, keys:[...RT(2), {key:'r',ctrl:true}]},
+        {sel:Y[1]+R.mb, keys:[...RT(2), {key:'r',ctrl:true}]},
+        {sel:Y[0]+R.chk, keys:[...T('='+Y[0]+R.rb+'+'+Y[0]+R.tb+'+'+Y[0]+R.mb+'-'+Y[3]+R.re+'-'+Y[3]+R.te+'-'+Y[3]+R.me+'-'+Y[0]+R.cash+'-'+Y[1]+R.cash+'-'+Y[2]+R.cash+'-'+Y[3]+R.cash), {key:'Enter'}]},
+      ]; }` },
+  { key: 'cascade', name: 'SLOWEST LEGAL ROUTE and the §1.0-R2(i) skippability control: every year-cell typed on its own, no fill anywhere on the board, the dress walked column by column with ALL borders (Alt H B A, which stores `ball` not `bt`) — all six cores clear, ☆ forfeited', moves: `C => { const o=C._o, R=o.R, Y=o.Y, out=[];
+      for(let i=0;i<4;i++){ const y=Y[i], p=i?Y[i-1]:null;
+        if(p){ out.push({sel:y+R.rb, keys:[...T('='+p+R.re), {key:'Enter'}]});
+               out.push({sel:y+R.tb, keys:[...T('='+p+R.te), {key:'Enter'}]});
+               out.push({sel:y+R.mb, keys:[...T('='+p+R.me), {key:'Enter'}]}); }
+        out.push({sel:y+R.rp, keys:[...T('=MIN('+y+R.rb+','+y+R.cash+')'), {key:'Enter'}]});
+        out.push({sel:y+R.re, keys:[...T('='+y+R.rb+'-'+y+R.rp), {key:'Enter'}]});
+        out.push({sel:y+R.tp, keys:[...T('=MIN('+y+R.tb+','+y+R.cash+'-'+y+R.rp+')'), {key:'Enter'}]});
+        out.push({sel:y+R.te, keys:[...T('='+y+R.tb+'-'+y+R.tp), {key:'Enter'}]});
+        out.push({sel:y+R.mp, keys:[...T('=MIN('+y+R.mb+','+y+R.cash+'-'+y+R.rp+'-'+y+R.tp+')'), {key:'Enter'}]});
+        out.push({sel:y+R.me, keys:[...T('='+y+R.mb+'-'+y+R.mp), {key:'Enter'}]});
+        out.push({sel:y+R.tot, keys:[...T('='+y+R.re+'+'+y+R.te+'+'+y+R.me), {key:'Enter'}]});
+      }
+      for(let i=0;i<4;i++) out.push({sel:Y[i]+R.tot, keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('a')]});
+      return out; }` },
   { key: 'cfslink', name: 'rule the close FIRST, memo before the corkscrew, alt h p percent, bold last', moves: `C => [
       {sel:'B8:F8', keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:'B6',  keys:[...T('=SUM(B2:B5)'),{key:'Enter'}]},
