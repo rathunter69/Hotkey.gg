@@ -781,6 +781,33 @@ your eyes disagree, believe your eyes and go fix the probe.** (After r440's `hot
 omission and r441's hidden rows — this keeps costing rounds, so treat a surprising probe reading
 as suspect by default and confirm it visually before reasoning from it.)
 
+## STANDING RULE — check `main` before you build, not at merge time (r443)
+
+The §1.0-R3 collision below cost two sessions a duplicated day on the SAME 26 drills. It was
+entirely preventable and the failure was mine as orchestrator: I branched off `main` and ran for
+days without once re-fetching it or looking at open PRs. The PR description even asserted *"main
+has not moved since r425–r427"* — true when written, stale within a day, never re-checked.
+
+**Five rules, and they are cheap:**
+
+1. **Fetch `main` and list open PRs at the START of every session, and before every batch.**
+   Divergence caught in hours is a rebase; caught in days it is a spec collision.
+2. **Never assert "main hasn't moved" without checking it that minute.** If the claim goes in a PR
+   body it must be re-checked on every update, because a PR body is read as current.
+3. **Merge `main` into the working branch continuously**, even when there is nothing to resolve,
+   so the branch can never drift far enough to collide.
+4. **One campaign, one branch.** A second session on the same catalog gets the same branch or an
+   explicitly non-overlapping slice, decided UP FRONT. Two sessions depth-passing "chapters 2 and
+   3" independently is not a merge problem, it is a dispatch problem.
+5. **A silent CI is a symptom — read `mergeable_state` first.** The gate went quiet for hours here
+   and the first theory was a workflows-permission problem; it was `"dirty"`, i.e. this very
+   collision. GitHub does not run `pull_request` workflows for a PR it cannot merge.
+
+**Nothing was lost to this** — git kept both lineages, the merge commit carries both parents, and
+#244's drill versions are readable at `git show 17efff7:index.html`. The cost was duplicated
+effort, not destroyed work. But the duplication was pure waste, and rule 1 alone would have
+caught it on day one.
+
 ## ⚠️ SPEC COLLISION with main — two different §1.0-R3 (n) laws (found r442)
 
 `main` advanced under PR #243 while it was open: **PR #244 squash-merged an independent
