@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Run the sensitivity table — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="True mixed anchors — one formula fills the 5×3 WACC × growth grid Par 19s, optimal 17 keys. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="A two-way DCF sensitivity — five discount rates across, three growth rates down Par 35s, optimal 32 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Run the sensitivity table — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="True mixed anchors — one formula fills the 5×3 WACC × growth grid Par 19s, optimal 17 keys. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="A two-way DCF sensitivity — five discount rates across, three growth rates down Par 35s, optimal 32 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/dcfsens.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Run the sensitivity table — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="True mixed anchors — one formula fills the 5×3 WACC × growth grid Par 19s, optimal 17 keys. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="A two-way DCF sensitivity — five discount rates across, three growth rates down Par 35s, optimal 32 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/dcfsens.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -85,7 +85,7 @@
   .trackhead small{color:var(--faint); font-weight:400; font-size:12px}
   .trackhead .tb{font-size:12.5px; color:var(--muted); font-weight:400; margin-top:4px; line-height:1.55}</style>
 <link rel="stylesheet" href="nav.css?v=210">
-<script src="drills.js?v=295"></script>
+<script src="drills.js?v=296"></script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -93,7 +93,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=310"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Run the sensitivity table","description":"True mixed anchors — one formula fills the 5×3 WACC × growth grid","url":"https://www.hotkey.gg/drills/dcfsens.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Models I","teaches":"Mixed anchors run the grid — row-lock the header, column-lock the driver; one formula fills every cell.","isPartOf":{"@type":"Course","name":"Financial Modeling Keyboard Mastery","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT19S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Run the sensitivity table","item":"https://www.hotkey.gg/drills/dcfsens.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Run the sensitivity table","description":"A two-way DCF sensitivity — five discount rates across, three growth rates down","url":"https://www.hotkey.gg/drills/dcfsens.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Models I","teaches":"Mixed anchors run the grid — row-lock the header, column-lock the driver; one formula fills every cell.","isPartOf":{"@type":"Course","name":"Financial Modeling Keyboard Mastery","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT35S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Run the sensitivity table","item":"https://www.hotkey.gg/drills/dcfsens.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -103,20 +103,26 @@
   <div class="eyebrow">◆ Models I · drill · Financial Modeling Keyboard Mastery track</div>
   <h1>Run the sensitivity table</h1>
   <div class="aha">Mixed anchors run the grid — row-lock the header, column-lock the driver; one formula fills every cell.</div>
-  <div class="sub">A two-way sensitivity table: five WACCs (the blended discount rate) across, three growth rates down, fifteen cells from one formula. Only correct mixed anchors survive it — FCF locked absolute ($B$2), the WACC header row-locked (C$3), the growth column column-locked ($B4). Build the formula once, fill right, fill down.</div>
+  <div class="sub">The valuation committee sits at four and the VP wants the terminal value stress-tested before the book goes out. The forecast is done — FY-final unlevered free cash flow is on the page, already grown a year — so the terminal value is that cash flow over WACC less the terminal growth rate. Build the grid: five discount rates across, three growth rates down, fifteen cells, and one formula does all of them if its three references are pinned the right way round. Bring the figures to house standard, then mark the case the committee is actually being shown. The page lands somewhere new every run.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=dcfsens">train this drill →</a>
-    <span class="par">par 19s · optimal 17 keys · keyboard only · free</span>
+    <span class="par">par 35s · optimal 32 keys · keyboard only · free</span>
   </div>
 
   <div class="section-title">The shortcuts in this drill</div>
   <div class="panel">
-    <div class="scb"><div class="sch"><kbd>Ctrl+R</kbd><span class="m">⌘R on mac</span><span class="what">Fill right from the cell to the left</span></div><div class="use">Same as fill down, but across — one quarter’s formula becomes the whole year in two keystrokes.</div></div>
+    <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
+    <div class="scb"><div class="sch"><kbd>Shift+→</kbd><span class="m">⇧→ on mac</span><span class="what">Extend selection one cell</span></div><div class="use">Nudge a selection one cell at a time when the block you need doesn’t end at a data edge.</div></div>
+    <div class="scb"><div class="sch"><kbd>Shift+↓</kbd><span class="m">⇧↓ on mac</span><span class="what">Extend selection one cell</span></div></div>
     <div class="scb"><div class="sch"><kbd>Ctrl+D</kbd><span class="m">⌘D on mac</span><span class="what">Fill down from the cell above</span></div><div class="use">Build the logic once in the top cell, select down, and stamp it — the standard way to fill a schedule.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+R</kbd><span class="m">⌘R on mac</span><span class="what">Fill right from the cell to the left</span></div><div class="use">Same as fill down, but across — one quarter’s formula becomes the whole year in two keystrokes.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+1</kbd><span class="m">⌘1 on mac</span><span class="what">Open the Format Cells dialog</span></div><div class="use">The master formatting dialog — number formats, alignment, borders in one place when a ribbon walk would take longer.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h b s</kbd><span class="m">⌥ h b s on mac</span><span class="what">Outside borders</span></div><div class="use">OUTSIDE border (S for outSide) — ONE frame around the selection’s perimeter, interior clean. The finished-table look; A is the grid of lines, S is the frame.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+S</kbd><span class="m">⌘S on mac</span><span class="what">Save</span></div></div>
   </div>
 
   <div class="section-title">The optimal line</div>
-  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>C4</em> · <em>=$B$2/(C$3-$B4)</em> — F4 cycles each ref to its mixed form · fill C4:G4 <em>ctrl+r</em> · then C4:G6 <em>ctrl+d</em></div></div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>D13</em> <em>=$C$7/(D$12-$C13)</em> — <em>F4</em> cycles each reference to the lock it needs · select <em>D13:H15</em> <em>ctrl+d</em> then <em>ctrl+r</em> · <em>ctrl+1</em> <em>n</em> · <em>D15</em> <em>alt h b s</em> · <em>ctrl+s</em></div></div>
 
   <div class="section-title">More Models I drills</div>
   <div class="rel">

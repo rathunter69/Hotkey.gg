@@ -1520,7 +1520,7 @@ requirement baked into core, and §1.2 axes that existed on paper but not in the
   contract earning its keep on its first wave.**
 - **PAR:** 10/6 → **29/26**. D10 finished: tab → 'Point', desc de-hinted.
 - **TESTS (both):** replay 3/3 · depth-contract PASS · guided PASS · alt-paths 2/2 each (all four
-  rebuilt) · par-sweep FLAGGED 0 · invariants clean · drills.js?v=295→296.
+  rebuilt) · par-sweep FLAGGED 0 · invariants clean · drills.js?v=296→296.
 - **RECURRING TRAP, worth a standing note:** cagr hit the **C9 static-parser** hole again —
   guide/targets built with `.map()/.push()` read as `null`, so the tri-length guard silently stops
   covering the drill. Third occurrence (margin, cagr). **Build these arrays as LITERALS.**
@@ -10216,5 +10216,446 @@ The geometry assertion first reported `Ctrl+↓` landing on row **20** instead o
 - `dev/check-invariants.js`: `REWORKED` grows to 45.
 - `dev/verify-txncomps.js`: new, self-contained, names no other drill (C13-safe).
 - Coupling sweep run per CAMPAIGN §4 — `CHALLENGES.txncomps._o` → **none**; `loadChallenge('txncomps')` → **none**; `'txncomps'` in `dev/` → only `e2e-alt-paths.js` (rebuilt), `migrate-certificates.sql` (modeling-track array, key unchanged, no edit) and `seed-field.sql` (historical leaderboard rows). **No parity / mac-input / depth-mechanics section reaches into this board.**
+
+---
+
+# ROUND r445 — MODELS I CLOSES 10/10: wave 2 (football · dcfsens · retbridge · accdil · sourcesuses)
+
+
+_Orchestrator note. Agents ran concurrently and tagged their entries r444 or r445; this batch is
+r445. Untriggerable-beat arithmetic, reconciled: the count stood at 32 after wave 1; football
+found 1 on its shipped board and sourcesuses 2 — **the campaign total is 35**. (dcfsens caught one
+in its OWN first predicate draft and killed it pre-ship; accdil caught the same class in a ☆
+predicate; neither counts against shipped boards, both prove the walking discipline works on new
+code too.) Per-entry "campaign total N" claims below are superseded by this note._
+
+_Ops notes earned by this wave, all now standing practice: (1) the shared scratchpad — NAMESPACE
+every probe/script file with the drill key; a near-clobber was observed (retbridge). (2) The
+guided-mode Enter-advance trap — a demo step that relies on Enter's landing to chain formulas
+writes everything one row high on the rails; one step per formula, and only `e2e-guided` catches
+it (accdil). (3) A verify-*.js probe must avoid every RETIRED drill key as an ordinary identifier
+or console string — C13 fired correctly on `dress` and `growth` used as variable names; third and
+fourth sightings (comps, sourcesuses, accdil). (4) One agent committed shared files in its
+worktree against §9.1 (football); assembly took only the owned files and applied shared deltas
+from the payload text — harmless, but the payload contract is what made it harmless._
+
+_☆-family adjudication for chapter c6, recorded: the HARD rule (§1.0-R4(u) adjacency) holds on
+every pair — txncomps(census) | football(anchor·1-cell) | dcfsens(one-formula census)
+| retbridge(anchor·1-D) | accdil(one-pass block) | sourcesuses(anchor·1-D). The SOFT rule (≤2 per
+family per chapter) is breached: five anchoring-family stars across Models I. Accepted with the
+sub-family taxonomy (column-lock 2-way / one-cell lock / 1-D denominator / percent-pair are the
+granularity the wave-4 taxonomy itself used), because every agent measured its alternatives at
+zero headroom or illegal. If playtest finds the stars samey, the re-cut candidates with measured
+alternatives are retbridge (autosum, +11) and comps (the §4.60 summary-stat demotion)._
+
+
+## r444 — H6b-13: football depth pass — "Build the football field" (DEPTH_PASS §4.62 + §1.0/-R2/-R3/-R4 + MODELING_STANDARDS)
+
+**WAS:** 4 checks on a `ROWS:9` board — 9 of the real 20-row sheet carrying content (**45%**, well
+under the §1.3 floor), **no ☆**, **no `saveClose`**, three methodology rows floating on an otherwise
+empty page, and check labels that named their own cell address AND their own route ("run live
+midpoints for all three methods — fill D3:D5"). Two of them also used the word §1.0-R2(j) banned
+outright: "tie the width at B9" for a subtraction. par 39 / parKeys 39.
+
+**NOW:** a valuation summary exhibit in the form a deal team prints it — title with its per-share
+basis, a source memo, six methodologies drawn from a pool under ruled headers, the **Mid** and
+**Premium** columns the player builds, the reference range (floor · ceiling · spread) boxed as the
+hand-off, and the unaffected share price as a labelled yellow assumption. **ROWS=20, 15 rows
+carrying content at the win state — 75% against 45%.** 6 core beats + the engine's Ctrl+S closer
++ one hidden ☆ (tri-length 7, C9-registered).
+
+### The untriggerable beat this drill was shipping (CAMPAIGN §1, bug #14)
+`checks()` demanded the literal strings `'MIN'` and `'MAX'` out of formula TEXT
+(`fRef('B7','MIN')`). Probed live (`dev/verify-football.js` §A2/§A3), **three** correct routes were
+locked out with nothing on the board to fix: `=SMALL(range,1)` / `=LARGE(range,1)`, a block-wide
+`=MIN(B5:C10)` (a low can never exceed its own high, so the block minimum IS the column minimum),
+and a reference chain. **Campaign total: 14. The cause has still never moved — it is grading
+formula text.** Every predicate now reads the END-STATE NUMBER; the only route requirement left is
+that the cell be LIVE, which doctrine §2.2 sanctions ("don't hardcode the answer" IS the lesson)
+and MODELING_STANDARDS §7 restates as gradeable end state ("a cell that REFERENCES rather than
+repeats"). A summary exhibit whose numbers are typed goes stale the first time an analysis moves —
+that is the failure this page exists to prevent.
+
+### §1.0-R4(t) the reality test, applied to the board first
+Three rows of Low/High on an empty sheet is the SHAPE of a football field, not the file anyone
+opens. §3.1 assigns Models I the B family and names "football field" in it, so the artifact stood;
+what changed is that it became a file FRAGMENT — six methodologies, a stated per-share basis, the
+price the premiums are measured against, and a boxed hand-off. Realism constraint enforced in
+`build()` and asserted 40×: when the pool draws a **52-week trading range**, its low and high must
+BRACKET the unaffected price. A 52-week low above the last close is the first thing a reviewer
+would catch, and rejection sampling could not guarantee it, so the shallow premium band was
+narrowed until `(1+pm)(1+h) > 1` holds for every legal half-width — satisfied by construction.
+
+### The ☆-headroom diagnostic, both parts, run BEFORE the board was designed (CAMPAIGN §2)
+| board | fastest legal | slowest legal, same work | spread | part 2 — what survives the strip |
+|---|---|---|---|---|
+| `football` AS SHIPPED | 39 | 58 | **1.49×** | all 19 keys are fill-vs-retype, so it IS ☆-legal — but 19 keys across a THREE-row column is a thin star, and fill-census is the family the **adjacent** drill (`txncomps`) re-cuts onto. §1.0-R4(u) forbids two adjacent drills sharing a family |
+| `football` REBUILT | 77 | 178 | **2.31×** | fill-vs-retype on an ANCHORED reference — a different family, and four times the headroom |
+
+**KEEP the drill, FIX THE BOARD** (the r438 `series` rule — never fix a thin star at the
+predicate). The board gained the column a real football field carries and this one did not: the
+premium each methodology's midpoint implies against the unaffected price. That column hangs off ONE
+cell, so its fill is worthless unless the reference is ABSOLUTE — which moves the star from
+fill-census into **anchoring mastery**.
+
+### §1.0-R4(u) the ☆ re-cut (the page is pre-playtest, so its ☆ was dead on arrival)
+§4.62's bonus is *"Add an outside border around the field summary — the page the MD flips to"*:
+formatting, which §1.0(d) outlaws outright, and it falls out of finishing the exhibit, which
+§1.0-R2(i) outlaws again. Because it is real WORK it is **PROMOTED VERBATIM to core beat 6** (the
+r425 editfix/dress/ruleoff precedent (u) names), sequenced directly behind the beats that build the
+block it encloses (§1.0(a)). **That is the seventh re-cut formatting ☆ of the campaign.**
+
+**The replacement, measured (`dev/verify-football.js` §B, every selection and navigation keyed,
+5 seeds):** ☆ ISOLATED **17 keys against 68** typed — **51 keys, 4.00× on the move itself.**
+**SKIPPABLE BY MEASUREMENT, not assertion:** §C3 types all six premiums, clears every core beat and
+leaves the star DARK (116 keys against the demo's 60); it ships as `dev/e2e-alt-paths.js` ALT 1 so
+the forfeit is walked on every gate run.
+
+**The trap is the lesson, and it FAILS VISIBLY.** An UNANCHORED premium filled down walks the price
+reference off the bottom of the page: the board prints five `#DIV/0!` cells, the Premium beat stays
+dark, and the ☆ stays dark (§C4, measured). That is the opposite of the untriggerable class — the
+player can see exactly what is wrong.
+
+### Beats (`index.html:10228`) — they CHAIN: ranges → mid → premium; ranges → floor/ceiling → spread → the box
+1. Build the Mid column — the midpoint of every methodology's range
+2. Build the Premium column — every midpoint against the unaffected price
+3. Build the range floor — the lowest low across the six methodologies
+4. Build the range ceiling — the highest high across the six
+5. Build the spread — the range ceiling less the range floor
+6. Add an outside border around the reference range   *(promoted from the dead ☆; §1.6 finish state)*
+☆ Fill the Premium column — one anchored formula, no midpoint retyped
+
+### Randomization — four independent axes (§1.2), asserted over 40 builds
+(a) site: column A or B × header row 4 or 5 — **4 distinct sites**; (b) content: three methodologies
+a valuation section always carries plus three drawn Fisher-Yates from a pool of five, whole list
+shuffled — **40/40 distinct sets**; (c) every figure through `rnd()`; (d) **which methodology owns
+the floor and which owns the ceiling** — the §4.62 page's "which method is widest" read onto the
+beats that matter. The premium ladder and the half-width ladder shuffle INDEPENDENTLY, so over 40
+builds the floor was set by **6 different rows**, the ceiling by **6**, and the widest range sat on
+**6**. The envelope is guaranteed to belong to two DIFFERENT methodologies, which is what makes the
+aha true on screen.
+
+**Aha (§1.5):** *"each method answers with a range, not a number — the reference range is the
+envelope of all of them, never an average of them."* Its MOMENT is beats 3 and 4.
+
+### Par
+par 39 / parKeys 39 → **par 65 / parKeys 60**. 5-seed median 60 including the engine-appended
+Ctrl+S, and **FLAT at 60 over a 21-seed probe (min 60, max 60)** — not a suspicious uniform number
+but a derived one: the header-row jitter is chosen so every typed reference is the same character
+length on both settings (`=(B5+C5)/2` / `=(B6+C6)/2`; `=MIN(B5:B10)` / `=MIN(B6:B11)`;
+`=B13-B12` / `=B14-B13`), and the column jitter changes letters, not lengths. par 65 ≈ **1.08 s/key**,
+the house band. Clocks derive (§1.4): pass 1:38 · pro 1:15 · legendary 1:05.
+
+### MODELING_STANDARDS conformance
+Colour-as-provenance (blue typed inputs, black formulas), units in the title, headers ruled
+underneath, no hardcodes inside formulas (that is beat 2's whole lesson), MIN/MAX envelope, premium
+= value / unaffected − 1. Two simplifications, stated in the board's own memo lines as §7 requires:
+the six ranges would be GREEN links to the analysis tabs on a live model (single-sheet engine), and
+there is no calendarisation/LTM statement (a summary exhibit receives per-share ranges already).
+Sign convention and roll-forward are not engaged and are recorded as deliberate omissions.
+
+### Tests
+`e2e-demo-replay` football ×3 seeds + full catalog · `e2e-alt-paths` 2/2 ×3 seeds ·
+`e2e-par-sweep` 0% drift · `e2e-fit-sweep` ALL CLEAN (70) · `e2e-guided` ALL 77 PASS ·
+`e2e-depth-contract` PASS football · density 15/20 · 30/30 distinct builds ·
+`e2e-depth-mechanics` 155/0 · `e2e-smoke` clean · `check-borders` clean ·
+`check-invariants` clean (C9 tri-length 7, one ☆, saveClose) · `dev/verify-football.js` ALL GREEN.
+
+
+### `dcfsens` §4.63 — "Run the sensitivity table" · MODELS I
+
+_Every number here is `keyLog` through the live engine on the real board, every selection and
+navigation KEYED (setDemoSel only parks the cursor on an anchor). Re-runnable in one command:
+`node dev/verify-dcfsens.js` — 35 assertions, all green._
+
+**WAS:** three checks on a `ROWS:8` board — **40% density**, the §1.3 defect in its purest form —
+no ☆, no `saveClose`, a grid pinned at a FIXED `C4:G6` on every seed, and three NESTED checks
+where CHECK3 re-graded CHECK1's and CHECK2's cells. AUDIT_R417 §D #14 asked for exactly four
+things (randomize the grid site · a base-case beat · de-nest the checks · CHECK3 claims "one
+formula" with **no fill latch behind it** — "systemic"). All four close here.
+
+**THE FOUR FINDINGS, CLOSED**
+| finding | close |
+|---|---|
+| fixed grid site | a **4-spot pool**: column anchor A or B × the source memo riding head or foot, which slides the grid a row. Probed: 4 distinct rects over 12 seeds (`C13:G15 · D13:H15 · C14:G16 · D14:H16`), every reference in beats/guide/req/demo DERIVED from the anchor |
+| no base-case beat | beat 5 is the READ: find the cell where the yellow WACC input meets the yellow growth input and box it. §1.0-R2(g) adaptive label names this seed's two rates; the base case draws independently in both axes |
+| nested checks | beat 1 owns the corner, beat 2 the four cells beside it, beat 3 the ten under them. Probed: clearing one lower cell darkens **beat 3 alone**; clearing the corner darkens **beat 1 alone** |
+| "one formula" with no latch | the claim moved OUT of a core label and INTO the ☆, where `S.fillOps`/`S.multiEnter` can prove it |
+
+**THE UNTRIGGERABLE-BEAT SWEEP (CAMPAIGN §1) — one found, in the FIRST draft of the predicate.**
+The board carries the terminal-year FCF twice by design: as a labelled summary cell that LINKS to
+the forecast strip (MODELING_STANDARDS §3, never retype), and as the strip's own final year. A
+player who points the driver at the strip cell gets the identical number, the identical board and
+the identical fifteen values — and the first predicate written here demanded the summary cell.
+Caught by WALKING the route, never by reading; both cells now grade (`fcfRef`, index.html:10130).
+Nine further routes walked, all clearing: typed `$` vs F4 cycling · one selection Ctrl+D→Ctrl+R ·
+two selections across-then-down · down-then-across · the ribbon fills Alt H F I D/R · Ctrl+Enter
+multi-commit (lands the grid with ZERO fill ops — the ☆ reads `S.multiEnter` as an equal route,
+because a star that punishes a better route is a defect) · fifteen fully-absolute formulas typed
+per cell · comma at zero places by all three chords · the box by all four border routes.
+Two refusals are deliberate and probed as refusals: a DOLLAR format does not clear a comma beat,
+and boxing the whole grid does not mark the base case.
+
+**THE ONE ROUTE REFUSED ON PURPOSE — doctrine §2.2, which names this drill by key.** Fifteen
+formulas carrying no locks read right and ARE wrong: they cannot travel, and travelling is the
+lesson. Probed (verify §B10): all fifteen values land, the three build beats stay dark, the dress
+beats clear. §1.0(c) preserves the exception in as many words; the check LABELS state the locks
+and the guide names both routes to them (F4 and typed `$`).
+
+**☆-HEADROOM DIAGNOSTIC (CAMPAIGN §2, both parts, each half apart per the r438 `series` rule).**
+Fastest legal **32** keys · slowest legal that clears every core **407** (fifteen anchored
+formulas typed, every cell commaed by hand, the box walked edge by edge) = **12.7×**, the widest
+spread the campaign has measured — because every one of the fifteen cells is a FORMULA, so the
+type-it-out floor is fifteen formulas, not fifteen values. Part 2: strip chord-vs-ribbon (the
+full ribbon route is 41 vs 32 → ~9 keys) and strip formatting (the comma pass, 2 fast / 135
+slow); **226 keys of fill-against-typing survive**, neither excluded class. Halves: ACROSS 22 vs
+85 · DOWN +7 vs +170. Both positive by an order of magnitude.
+
+**☆ RE-CUT (§1.0-R4(u)).** The page's bonus — "Bold the header row and column" — is formatting,
+dead as a class under §1.0(d), and unskippable under §1.0-R2(i). Replaced by the move this board
+exists to teach: **all fifteen cells off ONE formula**, read off the r424 `S.fillOps` rects or
+the r433 `S.multiEnter` rect (mechanic, never geometry inferred). Skippability MEASURED, not
+asserted: the negative control types all fifteen and clears every core with the line dark (ALT 3,
+292 keys; 407 fully hand-dressed).
+
+**THE BOARD (MODELING_STANDARDS + §1.0-R4(t)).** One page of a live DCF at **ROWS=20, 17 rows
+carrying content (85%)**: the forecast's unlevered FCF strip across five fiscal years → the
+terminal-year figure LINKED off the last year (never retyped) → two labelled yellow assumption
+inputs → the WACC × terminal-growth grid → a live low/high range read-out → source and
+simplification memo. TV = terminal-year FCF ÷ (WACC − g), the §4 perpetuity form with an
+already-grown numerator (REALISM_NOTES records this drill's PASS on exactly that point);
+`g < WACC` on all fifteen cells by construction and asserted per seed. Three blank rows are
+MOATS, asserted blank across all ten columns, so no Ctrl-arrow flight rides between the three
+blocks.
+
+**A CLIPPED LABEL THE GATE COULD NOT SEE.** The first draft's source memo was 979px of text in
+818px of sheet. `e2e-fit-sweep` scans `#####` only, and a LABEL is clipped, never `####`'d
+(r441) — so nothing in CI would have caught it. The probe asserts `clipsCol()` on every column,
+every seed; the memo was rewritten to fit. Same section records the measured frame budget:
+render's elastic budget is `clientWidth-28-30` = **822px**, and the shrink has a **40px floor per
+column**, so narrow gutters INFLATE and a board that overruns cannot be rescued by shrinking them
+(852px of columns rendered at 914px). The board now lays out 818px and renders 1:1 at 1440.
+
+**PAR:** re-swept from scratch — par 19/parKeys 17 → **par 35 / parKeys 32** (5-seed median 32
+including the engine-appended Ctrl+S, flat across seeds: the geometry never varies, only the site
+and the draw). **1.09 s/key**, the top of the house band, deliberately: beat 5 charges for a READ
+before a hand moves. Clocks derive (§1.4): pass 53 · pro 40 · legendary 35.
+**ALTS ×3** (op order · chord route · the ☆-forfeited negative control), all green ×3 seeds.
+**Tests:** replay ×3 · guided · depth-contract · alt-paths ×3 · fit-sweep (full catalog, ALL
+CLEAN 70) · par-sweep (0% drift) · `dev/verify-dcfsens.js` 35/35 · zero page errors.
+
+
+### `retbridge` — "Attribute the returns" (DEPTH_PASS §4.64) · Models I opens
+
+The chapter's first depth-passed board, and the first one built with `dev/MODELING_STANDARDS.md` binding. §4.64 is a pre-playtest "Language pass + bonus" page, so both of its lines were dead on arrival and both were re-cut under §1.0-R4(u) without escalation.
+
+**THE ☆ WAS A FORMATTING BONUS — THE SIXTH KILLED THIS CAMPAIGN.** The page proposed *"Bold the three driver rows' labels — the bridge reads as a story"*: forbidden outright by §1.0(d) ("NEVER a formatting task"), and since the driver labels ship bold as board furniture it failed §1.0-R2(i)'s skippable-decision test as well. Re-cut to the **anchoring-mastery** family — one anchored formula takes the share-of-gain column down the three levers in a single fill. Six now (`stalelink` · `series` · `balance` · `tieout` · `balcheck` · `retbridge`), and the standing instruction holds: **check a §4 page's ☆ against §1.0(d) BEFORE building anything.**
+
+**WHAT ELSE WAS WRONG.** The finance was already right — REALISM_NOTES records the decomposition as an exact algebraic identity and it still is — but nothing else was:
+
+| defect | was | now |
+|---|---|---|
+| §1.3 board | `ROWS:14`, 12 rows used — **60%** of a real sheet; the named `ROWS=14` inheritance | 20 rows, 16 used — **80%**, and load ≠ win (five cells and a whole column arrive with the player) |
+| §1.9 tri-length | guide **4** vs checks 5 vs targets 5 — the r417 misalignment class, last beat shipped unhinted | 7 / 7 / 7 (+ the engine's save beat) |
+| §2.2 ☆ | none at all | one, measured and proved skippable |
+| §1.0(e) closer | none | `saveClose:true` |
+| §1.8 / C12 alts | one, and it drove the old fixed geometry by hard-coded cells | two, both green ×3 seeds |
+| §1.2 randomization | **one** axis (values) — the audit's "6055 fixed sites" finding | four (corner jitter · sector pool · value ranges · which way the multiple went) |
+| par | par 65 / parKeys **68** — the only drill in the chapter whose declared key count exceeded its declared seconds | par 56 / parKeys 52, **0% drift**, 1.08 s/key |
+| §1.7 labels | "run the growth effect", "tie the bridge" — neither verb is on the closed list, and §1.0-R2(j) bans "tie" for a recalculation | all six open on closed-list verbs |
+
+**THE BOARD (§1.0-R4(t) + §3.1).** Models I is B-heavy, so the artifact stays a deal page: a sponsor's **value creation bridge at exit** — the page an exit committee actually asks for. Entry and exit capitalization (LTM EBITDA, EV/EBITDA, enterprise value, net debt, equity value) is already wired down the top half; the bridge, its share column and the check are the empty half. Reality test passes in both directions: a banker recognises their own file, and audience A meets the identical craft — an anchored share-of-total column — with no domain trivia gating it.
+
+**ZERO UNTRIGGERABLE BEATS, AND ZERO PREDICATES THAT READ FORMULA TEXT.** All eighteen of the campaign's untriggerable beats were text-grading, so this drill grades `live cell + value parity` and nothing else. Nineteen routes were **WALKED**, not reasoned about (`dev/verify-retbridge.js` §2, 5 seeds each): every algebraic rearrangement of all three levers, both anchorings, the figures typed instead of referenced, four ways to total (typed SUM, addition chain, the autosum CELL form, the autosum RANGE form, a two-range SUM), the share column typed / `Ctrl+D`-filled / ribbon-filled / F4-anchored / divided by the **Actual equity gain** cell instead of the Total, the check negated / anchored / recomputed inline, and the whole bridge built bottom-up. All nineteen clear all six cores.
+
+**THE ☆-HEADROOM DIAGNOSTIC, BOTH PARTS.**
+
+| | keys | note |
+|---|---|---|
+| fastest legal route | **60** | flat across all 5 seeds; every selection and navigation keyed |
+| slowest legal route doing the same work | **96** median (91–104) | every reference retyped as the number it shows (§1.0(c) protects that route by name), no autosum, no fill |
+| spread | **1.60×** | |
+| part 2 — what survives the strip | **36 of 36 keys** | 0 chord-vs-ribbon — the engine has no ribbon door into formula entry, so on a formula board that forced-to-clear component is EMPTY BY CONSTRUCTION (the r439 finding on a formula-repair board); 0 formatting — the player dresses nothing (§2.1b ships the frame) |
+| isolated ☆ | **14 vs 24** | worth 10 keys; smaller than `tieout` 21 and `balcheck` 17, larger than shipped `filterpass` 6 — the honest size of a three-row fill |
+
+A two-move star (the fill **plus** autosum-vs-typed-SUM, worth a further 11) was measured and **rejected**: §1.0-R2(i) asks for one distinct decision, CAMPAIGN §2 warns that a combined number hides a bad half, and autosum is `foot`'s lesson to own.
+
+**TWO BOARD BUGS FOUND BY LOOKING AT THE WIN SCREENSHOT** — neither reachable by any predicate, the r439 lesson repeating:
+
+1. **The check painted `(0)`.** One-decimal multiples (7.9x) are not representable in binary, so `410*7.9` carried ~1e-13 of noise, the bridge landed at −4.5e-13, and the comma format wrapped it in parens — a check cell reading in PARENS on a page that ties perfectly. Fixed at the BOARD, never at the predicate: multiples are now drawn in **half turns** (7.0x–10.5x), which are dyadic, so every product and difference is exact and the check is a true `0`. Entry multiples are quoted in halves on real deal pages anyway. The probe now asserts the identity is **exactly** zero, not near-zero.
+2. **The total's rule stopped short.** The top border ran across the label and the $mm column but not the % column, so the total read half-ruled beside a fully-ruled subtotal eight rows above. The % column's total cell now wears the rule while staying **empty** — which is simultaneously the r439 degradation guard: with nothing below the fill there is nothing for the ☆ route to strip.
+
+**Files:** `index.html` (the `retbridge` block, rebuilt, 9859–10198) · `dev/verify-retbridge.js` (new — route walk, ☆ diagnostic, board census: 41 assertions ×5 seeds, all green).
+
+
+## r444 H6b — accdil: the one-structure board had no legal ☆, so the board changed (DEPTH_PASS §4.65)
+
+_Every number below is `keyLog` through the live engine on the real board, medians over 5 seeds
+(15 for the flatness claim), every selection and navigation KEYED — `setDemoSel` only parks the
+cursor on an anchor cell. The probe is `dev/verify-accdil.js`._
+
+### THE HEADLINE: THE DIAGNOSTIC RAN FIRST AND IT FAILED
+
+CAMPAIGN §2 says run the ☆-headroom diagnostic BEFORE designing the board. Run on the SHIPPED
+accdil, it came back negative — the sixth time in the campaign and the first outside Foundations
+and Formulas:
+
+| | keys | note |
+|---|---|---|
+| taught route (the shipped demo) | **51** | six formulas in six non-adjacent cells |
+| a deliberately verbose but fully legal route | **50** | `=0-B5*B6` for the drag, a four-term addition chain instead of `SUM`, the ribbon percent walk |
+
+**Spread 1.02×, and inverted** — the `growth` signature verbatim. Part 2 of the diagnostic
+(CAMPAIGN §2, the half that does the work) left nothing at all: six single formulas offer no
+fill, no block grab, no paste-special and no anchor that pays; formula entry has NO ribbon route
+(the r439 `wrapfix` finding), so the chord-vs-ribbon component is empty by construction; and the
+only formatting op on the board is the very percent format §1.0(d) forbids grading as a bonus.
+The §4.65 page's ☆ — "Percent-format the accretion cell to one decimal" — was therefore dead on
+arrival under §1.0-R4(u) AND unreplaceable in place. **The one-structure board is a motif, not a
+lesson: it cannot satisfy §1.1/§2.2.**
+
+Rebuilt rather than retired. The lesson (a deal's EPS math, financing drag included) is carried
+nowhere else in the catalog, and the REAL desk artifact supplies the missing headroom for free —
+an acc/dil is never run at one structure. The MD asks for all cash, part cash part stock and all
+stock, and the page prices them side by side off ONE column of anchored formulas. §1.0-R4(t)'s
+reality test and a legal ☆ in the same move.
+
+### THE BOARD
+
+`<codename> — accretion / (dilution) by consideration mix ($mm, except per share)`. Three
+structure columns (100% cash · a seeded middle split · 100% stock) over five built lines; the
+deal team's structuring output (cash consideration, new shares issued) ships as blue inputs; a
+labelled yellow assumption stack sits below the analysis with the standalone EPS as a live
+formula inside it. The draws are CONSTRAINED so every seed tells the same true story — all-cash
+accretive, all-stock dilutive — because that contrast is the read: the price is struck off
+(target NI + synergies) at a multiple 3–6 turns above the acquirer's own, and the yield is capped
+so `multiple paid × yield < 1`.
+
+**ROWS 14 → 20. Density 18/20 = 90%** at load AND at the win state (rows 3 and 12 are deliberate
+moats; 12 is what keeps `Ctrl+Shift+↓` off the assumption stack when the block is grabbed).
+The old board was `ROWS:14` — the §1.3 "ROWS=14 inheritance" defect, a sheet that never grows.
+
+### BEATS (6 core + ☆ + the engine-appended Ctrl+S closer)
+
+1. Build the foregone interest line — negative, all three structures
+2. Build pro forma net income — the foregone interest netted out
+3. Build the pro forma share count — all three structures
+4. Build pro forma EPS — the income line over the share line
+5. Build the accretion line — pro forma EPS against standalone EPS
+6. Percent-format the accretion line — one decimal
+☆ Fill the whole analysis block onto the other two structures in one pass
+
+Beat 6 is the page's killed ☆ **PROMOTED to a core beat**, not deleted — the r425
+editfix/dress/ruleoff precedent, per §1.0-R4(u), and it lands directly after the beat that
+creates the cells it formats (§1.0(a) format-as-you-go). Everything else on the board ships
+pre-dressed (doctrine §2.1b) because the lesson is the model, not the formatting.
+
+### THE ☆, RE-CUT AND MEASURED
+
+One-pass discipline: the whole five-row block carried onto both alternative structures in a
+single fill or paste, read off the r424 `S.fillOps` / r425 `S.pasteLog` latches (the MECHANIC,
+never geometry inferred), latched only when the block is actually RIGHT.
+
+| route | keys | ☆ |
+|---|---|---|
+| block grab + one fill | **4** | earned |
+| the same work row by row (5 fills) | **15** | DARK |
+| the same work typed out (10 formulas) | **130** | DARK |
+
+Re-measured spread on the rebuilt board: **66 fastest legal against 192 slowest, 2.91×**, and of
+the 126 keys of spread only 3 are chord-vs-ribbon (§1.0(c) forces those to clear) and 3 are the
+decimal walk. **Skippability is measured, not asserted:** two named routes clear every core beat
+with the star dark, printed with their key counts by the probe.
+
+### TWO DEFECTS FOUND BY WALKING ROUTES, NEITHER VISIBLE IN THE PREDICATE
+
+1. **The ☆ read one rect shape.** A fill-right must include the SOURCE column, so its rect spans
+   all three structures; a paste lands only on the two DESTINATION structures, because the built
+   column is the clipboard rather than part of the target. The first predicate was written for
+   the fill and silently locked out the legal copy/paste route — the untriggerable-beat class
+   applied to a bonus. Both shapes now match.
+2. **`Ctrl+Shift+→` off the built column runs to the sheet edge** (Excel does this too) and a
+   `Ctrl+R` on that selection spills **25 junk cells** across the empty columns: all six cores
+   still clear, so the player is left with a "finished" page nobody could send. A ☆ must never
+   make the board WORSE than the route it beats (r439, `cases`). The ☆ now matches the block rect
+   EXACTLY, so an over-grab forfeits the star and the junk on screen says why. §1.0(c) untouched —
+   the cores never read the latch.
+
+**And one found by `dev/e2e-guided.js`:** with guided ON, the FIRST committed action is what
+triggers the initial `railToTarget()` placement, which pulls the cursor back onto beat 1's target
+and quietly eats that one Enter's advance. A demo that chains five formulas on Enter's landing
+then writes every remaining formula one row high and the drill **cannot be won on the rails**.
+Fixed by taking one demo step per formula — the Enters are still keyed, so parKeys is unchanged
+at 66. **Standing note for the rest of the pass: a demo step that relies on Enter-advance
+chaining is a guided-mode trap, and only `e2e-guided` catches it.**
+
+### GRADING
+
+Nothing anywhere reads formula TEXT and nothing reads a keypress counter. Every core grades the
+NUMBER standing in the cell plus liveness, because every core's verb is "Build" and §1.7 defines
+Build as "enter a live formula". The one end-state property graded beyond value is the SIGN of
+the drag, which MODELING_STANDARDS §2 makes a convention rather than a route — and the check
+label says "negative" out loud so it is never a hidden condition. Percent routes: `Ctrl+1 P`
+lands one decimal outright, `Alt H P` and `Ctrl+Shift+%` land zero and take one `Alt H 0` after;
+all three clear, because the beat reads `fmtStyle` + `decimals` off the cell (§1.0-R3(p) — the
+exact class that shipped broken in round 3).
+
+### RANDOM · PAR · TESTS
+
+**Random (§1.2, three axes on a full-grid artifact):** (a) corner jitter, column A or B; (b) the
+deal codename plus this seed's middle split from a four-way pool, so the header the player reads
+is the seed's own; (c) every figure through `rnd()`. Geometry is constant and a jittered column
+letter is still one character, so the key count never moves with the draw (the r439 `wrapfix`
+rule). 30/30 distinct builds (`e2e-depth-contract`).
+
+**Par: 50/51 → 70/66.** 5-seed median 66 including the appended Ctrl+S, **flat at 66 over 15
+seeds** (min 66, max 66) — the player types formulas and never a figure. par 70 ≈ **1.06 s/key**,
+the house band; drift 0%. Clocks derive (§1.4): **pass 1:45 · pro 1:20 · legendary 1:10.**
+
+**Tests:** replay ×3 WIN · guided PASS (railed, contained, solvable) · alt-paths 3/3 · par-sweep
+0 flagged · fit-sweep ALL CLEAN (70) · depth-contract PASS 18/20 · check-invariants clean ·
+e2e-smoke ALL 7 PAGES CLEAN (with the drills.js delta applied) · `dev/verify-accdil.js` ALL GREEN.
+
+**Anchors:** `index.html:9747–10042` · `dev/verify-accdil.js` · `dev/e2e-alt-paths.js` (1 entry
+deleted, 3 added) · `dev/check-invariants.js` C9 REWORKED · `drills.js` meta + HOTKEY_PARS.
+
+
+### `sourcesuses` — "Balance sources and uses" (§4.66) — Models I
+
+**WAS:** 6 checks on a `ROWS:12` board — 10 rows carrying content out of the real 20-row sheet (**50%**, well under the §1.3 target), no ☆, no `saveClose`, three use lines and two committed sources, checklist labels carrying bare ranges and route text ("total the uses — one live SUM over the three lines (B5)", "run % of uses — anchored on the total, filled through 100% (C2:C5)"), and **two untriggerable beats**. par 55 / parKeys 57, one ALT.
+
+**NOW:** a sources & uses page in the form a deal book prints it — four uses (purchase price, refinancing, advisory fees, financing fees), three committed sources plus sponsor equity as the balancing figure, a stated basis memo, a % of total column down each side, and the sources-equals-uses check under both. 6 core beats + the hidden ☆ + the engine-appended Ctrl+S. **ROWS=20, 16 rows carrying content at the win state — 80% density.**
+
+| | |
+|---|---|
+| beats | 1 Total the uses · 2 Build sponsor equity (the plug) · 3 Total the sources · 4 Build the check (reads zero) · 5 Build the % of total down both sides · 6 Bold both total rows + a top border above each (§1.6 finish state) · ☆ |
+| ☆ | **anchoring mastery** — each percent column written ONCE with the total locked and taken down through its own total line in a single pass. Read off `S.fillOps` + `S.pasteLog` (the MECHANIC, never geometry inferred), so Ctrl+D, Alt H F I D and copy-once-paste-over-the-block all earn it |
+| board | `codename()` — sources & uses ($mm); basis memo (signed commitment papers · both sides positive magnitudes); header rule under each block; totals wear TOP borders only; blue inputs, black formulas; the balancing-figure note on its own line |
+| random | 3 axes — corner jitter (anchor column A or B) · codename + a drawn label for each of the seven seeded lines · every figure through `rnd()` with the funding mix redrawn so the plug is 27–51% of the page. Geometry constant across seeds (the r439 `wrapfix` rule) — which is why the par sweep reads dead flat |
+| par | **92 / parKeys 89** (was 55 / 57). 5-seed median 89 incl. the Ctrl+S closer, FLAT (89/89/89/89/89). **0% drift, 1.03 s/key**, the house band. Clocks derive (§1.4): pass 2:18 · pro 1:46 · legendary 1:32 |
+| alts | 2 (was 1, and the old one drove the retired 12-row board by hard-coded `B5`/`C2:C5`/`B12` geometry — **DELETED, do not resurrect**) |
+| tests | replay ×3 · alt-paths ×2 ×3 seeds (plain AND guided) · guided gate (railed, contained, solvable) · par-sweep 0% drift · fit-sweep ALL CLEAN (70 drills) · depth-contract PASS · depth-mechanics 155/0 · smoke ALL 7 PAGES CLEAN (with the PARS delta) · `dev/verify-sourcesuses.js` **47 assertions ALL GREEN** |
+
+**TWO UNTRIGGERABLE BEATS FOUND ON THE SHIPPED BOARD** (campaign §1 class — found by WALKING routes through the live engine, never by reading predicates). Both graded formula TEXT:
+
+| # | the check demanded | the route it locked out |
+|---|---|---|
+| + | `$B$5` in `C2:C5`'s formula TEXT | the five percents typed one at a time, unanchored (`=B2/B5`, `=B3/B5`, …) — **identical board**, every percent right, the total line reading 100% |
+| + | `$B$10` in `C7:C10`'s formula TEXT | the same, on the funding side |
+
+Measured on the shipped block, 5 seeds: **cores 0/5**, and the two failing labels were exactly those two. This is the same root cause as campaign bugs #9 (`wrapfix` demanding literal `A3:A7` over `$A$3:$A$7`) and #3 (`sumif`) — **the anchoring habit the catalog itself teaches was the thing that broke the beat.** Both die here: every core grades the end state (the number, plus liveness where the label says the line is BUILT), and the anchor moves into the ☆, which is the one place §1.0(c) sanctions grading the fast route.
+
+A third latent one was killed before it shipped: `Alt H B A` stores `ball`, **not** `bt`, while `td.ball::after` paints a 2px box including the top edge — so a `bt`-only rule beat would leave a player who bordered every edge staring at a ruled total row and a dark line. The predicate takes `bt || ball` (same shape as campaign bug #7, and as `combo`'s shipped `ruled()`).
+
+**THE ☆-HEADROOM DIAGNOSTIC, BOTH PARTS**
+
+| board | fastest legal | slowest legal | spread | part 2 — what survives stripping |
+|---|---|---|---|---|
+| shipped (old) | 63 | 87 | 1.38× | 0 chord-vs-ribbon (no ribbon route into formula entry; Ctrl+D and Alt H F I D hit the same `fillFrom` latch), 0 formatting (the old board graded none) — **100% survives** |
+| rebuilt | 89 | 131 | **1.47×** | same composition, same verdict |
+
+1.38× reads like `grpfold` (1.21×, retired) on the ratio alone — this is the `wrapfix` (r439) case where the number alone is not the verdict and part 2 does the work. Isolated per half (the r438 `series` rule): **uses column 13 keys filled vs 30 typed (17 saved) · sources column 15 vs 40 (25 saved) — 42 keys, both halves positive on their own.** Proved skippable by a measured negative control: ten percents typed → cores 5/5, ☆ dark 5/5.
+
+**DISTINCTNESS** (§1.0-R3(s), asked before anything was built): nearest neighbours are `foot` (cross-footing) and `balance` (the two-sided check row). Fluency in either gets you the two SUMs and the check and tells you nothing about a **PLUG** — one line on the page defined as whatever makes the two sides agree, so the check reads zero by construction rather than by luck. No other board in the catalog carries that inversion. **KEEP.**
 
 ---
