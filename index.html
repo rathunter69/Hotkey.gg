@@ -11327,81 +11327,388 @@ const CHALLENGES = {
     }
   },
   dashcover:{
-    name:'Model cover', label:'Build the model cover', par:48, parKeys:48,
-    aha:'The cover page is all references — pull the model outputs into the headline metrics an investment committee actually reads, then stamp the title clean off the raw feed.',
-    prompt:'Page one of the summary: the cover box. The model produces enterprise value, net debt, shares, EBITDA and interest — build the summary that gets read first. Reference the outputs (never retype them) into equity value, value per share, the EV/EBITDA the deal prices at, net leverage and interest coverage.',
-    req:'<em>B10</em> equity <em>=B3-B4</em> · <em>B11</em> per share <em>=B10/B5</em> · <em>B12</em> EV/EBITDA <em>=B3/B6</em> · <em>B13</em> leverage <em>=B4/B6</em> · <em>B14</em> coverage <em>=B6/B7</em> · <em>B16</em> stamp <em>=UPPER(TRIM(B15))</em> — collapse the junk spaces, then shout it',
-    guide:[
-      'equity value at B10 · <kbd>=B3-B4</kbd> — enterprise value less net debt (reference, don’t retype)',
-      'value per share at B11 · <kbd>=B10/B5</kbd> — equity over shares',
-      'the multiple the deal is priced at: EV/EBITDA at B12 · <kbd>=B3/B6</kbd>',
-      'the credit read: net leverage at B13 · <kbd>=B4/B6</kbd> — net debt / EBITDA · coverage at B14 · <kbd>=B6/B7</kbd> — EBITDA / interest',
-      'the stamp at B16 · <kbd>=UPPER(TRIM(B15))</kbd> — TRIM eats the stray spaces (even the doubles inside), UPPER makes it a title; nested, inside-out',
-    ],
-    targets:['B10','B11','B12','B13','B14','B16'],
-    demo(){ return [
-      {sel:'B10', keys:[...T('=B3-B4'), Kb.enter]},
-      {sel:'B11', keys:[...T('=B10/B5'), Kb.enter]},
-      {sel:'B12', keys:[...T('=B3/B6'), Kb.enter]},
-      {sel:'B13', keys:[...T('=B4/B6'), Kb.enter]},
-      {sel:'B14', keys:[...T('=B6/B7'), Kb.enter]},
-      {sel:'B16', keys:[...T('=UPPER(TRIM(B15))'), Kb.enter]},
+    /* r449 H6b-FB (DEPTH_PASS §4.87, "Build the model cover") — the depth-pass rework, built to
+       §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (the later law wins on conflict),
+       and to dev/MODELING_STANDARDS.md, which is BINDING on Full Builds: a banker judges the
+       MODEL before the keystroke. §4.87 is a PRE-PLAYTEST page, so under §1.0-R4(u) its ☆ line
+       is dead on arrival and its artifact is unverified against the reality test; both are
+       re-cut here without escalation, and every judgment call names its §-line.
+
+       WAS: 6 checks / 5 guide lines / 6 targets on a ROWS:16 board — the §1.9 tri-length
+       invariant broken outright, no ☆ at all (§1.1/§2.2), no saveClose (§1.0(e)), one column of
+       stacked scalars, and check labels that opened on verbs the §1.7 closed list does not carry
+       ("run", "price", "stamp") while quoting the answer formula inside the label ("(=B3-B4)") —
+       §1.0(b) puts the route in guide/req, never in the copy. Worse, five of the six checks
+       graded formula TEXT through a refs() helper: the campaign's #1 defect class (CAMPAIGN §1,
+       eighteen found), e.g. equity value demanded the literal B3 and B4, so =$B$3-$B$4 cleared
+       only because the helper stripped $, and =-(B4-B3) cleared nothing at all.
+
+       ── ☆-HEADROOM DIAGNOSTIC (CAMPAIGN §2, BOTH PARTS), run BEFORE the board was designed and
+       re-measured on the shipped board through the live engine, every selection and navigation
+       KEYED (dev/verify-dashcover.js §3/§4 re-runs all of it, 5 seeds):
+         ON THE OLD BOARD — measured against HEAD's index.html served on its own port, 5 seeds,
+           the cursor walked rather than handed over. PART 1: 49 keys typed (six formulas down
+           one column, one extra step over the raw-feed row) against 92 for the slowest legal
+           route that does the same work — every reference POINTED with arrows instead of typed.
+           1.88×. PART 2, the half that decides: strip formatting (the old board graded NONE) and
+           strip chord-vs-ribbon (§1.0(c) forces those to clear, and on a pure formula-entry
+           board that class is EMPTY — the r439 `wrapfix` reading). What is left is all 43 keys
+           of pointing-versus-typing, and a ☆ may not be cut out of it in either direction:
+           rewarding the POINTED route hands `bridge` its own star to a Full Builds drill, and
+           rewarding the TYPED route pays a player for abandoning a habit the catalog teaches.
+           **The old board carried no legal ☆ at all** — six scalars in one column have no block
+           to fill, no second pass to compress and no anchor that pays. That is exactly why the
+           §4.87 page proposes a border, and the fix belongs at the BOARD, never at the predicate
+           (CAMPAIGN §2, the `series` rule).
+         ON THE REBUILT BOARD — PART 1: fastest legal 43 keys against 93 for the obvious slow
+           route that does the SAME work (all twelve links typed one at a time with the cursor
+           walked between them, both format passes walked one column at a time). **2.16×**, in
+           the band `balance` (2.46×) and `cases` (2.68×) shipped on and far clear of the ~1.3×
+           line that retired a drill in r437. PART 2: of the 50 keys of spread, 6 are the two
+           number-format passes done per column instead of over one rectangle (formatting —
+           §1.0(d) forbids grading it) and ZERO are chord-vs-ribbon; that half is WALKED, not
+           asserted — verify-dashcover.js §2 drives the ribbon fill, Alt H P, Alt H A N,
+           Ctrl+Shift+%, Ctrl+Shift+$, Alt H 1, Alt H O E A and Alt O E A and every one of them
+           clears. The surviving 44 keys are ONE-PASS-versus-RETYPE across the cover block — the
+           mastery class §1.0-R4(u) names. Legal headroom, in the drill's own subject.
+         ISOLATED MEASUREMENT OF THE ☆ ITSELF (CAMPAIGN §2: never a combined number): the star
+           move is 11 keys — five Shift+↓, one Shift+→, four characters of formula, one
+           Ctrl+Enter — and it lands twelve live links. The identical twelve typed one at a time,
+           with the cursor walked between them, cost 55 keys. **5.0×, worth 44 keys.**
+
+       ── ☆ FAMILY BAKE-OFF (wave-6 addendum — candidates measured on the IDENTICAL job, wiring
+       the whole cover block, 5 seeds, through the live engine, every selection keyed;
+       dev/verify-dashcover.js §3 re-runs it):
+         · Ctrl+Enter multi-commit over the block .. 11 keys  (NON-FILL — the taught route)
+         · fill down then fill right .............. 12 keys  (S.fillOps ×2)
+         · clipboard clone onto the block ......... 12 keys  (S.pasteLog, tiled from one cell)
+         · ribbon fill (Alt H F I D / I R) ........ 20 keys  (§1.0(c) forced-to-clear)
+         · autosum provenance ..................... NOT APPLICABLE. A cover page owns no
+           arithmetic — there is nothing on it to total, which is the drill's own thesis.
+         · structured selection (Ctrl+Shift+↓) .... NOT AVAILABLE. Probed: from the top cover
+           cell it OVERSHOOTS past the blank separator row to the outputs strip, because the
+           cover block loads EMPTY and Ctrl+Shift+↓ walks to the next non-empty cell (the
+           `threestmt` r448 finding, re-measured here). A family the board cannot express is a
+           trap, not a candidate — verify-dashcover.js §5 asserts the overshoot.
+         · independent prove-out .................. INADMISSIBLE. §1.0-R4(u) admits it only where
+           a pre-playtest page already specced it; §4.87 specced a border, so this is not that
+           narrow exception, and reaching for it here would be inventing a bonus.
+       CHOSEN: **one-pass block wiring**, satisfied by ANY of the three mechanics that author a
+       rectangle in a single motion — the Ctrl+Enter multi-commit (S.multiEnter), the fill
+       (S.fillOps) or the clipboard clone (S.pasteLog). The addendum asks for a NON-FILL family
+       at comparable headroom and that is what shipped: the multi-commit is the cheapest route on
+       this board (11 keys against the fill's 13) and it is what the demo plays. The other two are
+       accepted rather than darkened because they cost within two keys of it, and stranding two
+       equally good routes teaches nothing (§1.0(c) read as narrowly as the ☆'s own exception
+       allows). What separates this star from `threestmt`'s one-pass star, three drills earlier in
+       the chapter (§1.0-R4(u) family spacing: non-adjacent, second use must teach something the
+       first did not): there the discovery is that ONE LINE can be written once and taken across
+       the years; here it is that the WHOLE PAGE is one motion — and only because the cover was
+       laid out in the outputs strip's own line order. The lesson is the LAYOUT decision that
+       makes the single pass possible, which is why the guide says out loud that a $-anchored
+       reference is the one thing that breaks it.
+
+       ── ☆ SKIPPABILITY, MEASURED not asserted (§1.0-R2(i)): dev/e2e-alt-paths.js entry 3 is a
+       named slow route — all twelve links typed, both format passes walked one column at a time —
+       that clears every core beat with the star DARK, at 93 keys against the demo's 43. And the
+       predicate cannot fire by accident: it counts how many of the twelve cover cells were
+       AUTHORED by a bulk motion, where a fill authors only the cells its direction wrote into
+       (a fill-right authors the columns right of its source column, never the source itself), so
+       a player who types the six base-case cells and then fills right earns nothing.
+
+       ── A ☆ MUST NOT DEGRADE THE BOARD (r439 `cases`, and it bit here): a fill and a paste both
+       carry the SOURCE cell's number format, so a one-pass wire down a block of MIXED formats
+       smears the head cell's format over everything under it — measured live, a percent head
+       turned a $mm line into a percentage. Fixed at the BOARD, never at the predicate: every one
+       of the twelve cover cells ships GENERAL, and every one of them is set by a core format
+       beat afterwards (rows 1-3 of the box percent, rows 4-6 dollar). So the smear has nothing to
+       destroy on any route, and the win state is format-identical whether the box was wired in
+       one pass or typed twelve times. Verified per seed in verify-dashcover.js §1.
+
+       ── UNTRIGGERABLE-BEAT SWEEP (CAMPAIGN §1 — routes WALKED, never predicates read). NOTHING
+       here reads formula text, a range, a function name or an operand order. Walked and green:
+       the links written =B13, =+B13, =SUM(B13), $-anchored, or pointed with arrows; the twelve
+       landed by multi-commit, by fill, by ribbon fill, by clipboard clone or typed; percent via
+       Ctrl+1 P (lands 1dp outright) or Alt H P / Ctrl+Shift+% plus one Alt H 0 (both land 0dp and
+       need the second move) — all three clear "one decimal"; dollars via Ctrl+1 C (currency 0dp),
+       Alt H A N (ACCT 0dp — the r425 `modeltour` stranding, accepted here) or Ctrl+Shift+$ plus
+       two Alt H 9 (currency 2dp walked down); the stamp as =UPPER(TRIM(x)) or =TRIM(UPPER(x)),
+       which produce the identical string; the title span centered by Ctrl+1 A, Alt H O E A or
+       Alt O E A, which all write the same `ca` span, and bolded by Ctrl+B or Alt H 1.
+       Two beats deliberately require a LIVE cell and say so in the label's verb (§1.7's glossary:
+       Reference = point at an existing output and never retype it; Build = enter a live formula):
+       the twelve links and the title stamp. That is doctrine §2.2's sanctioned "don't hardcode
+       the answer" case and MODELING_STANDARDS §7's "a beginning balance that REFERENCES rather
+       than repeats" read as end state — copying the outputs strip and pasting it lands dead
+       numbers, which is the one thing a cover page must never carry.
+
+       THE BOARD (§1.0-R4(t) reality test · §3.1 audience map · MODELING_STANDARDS §7). Chapter 8
+       is audience **B**, and this is the deal artifact at its most literal: page one of an IC
+       pack, base case beside the downside, over the model's own outputs strip. It is a COMPONENT
+       of a build — the summary page, not the model — and it fits the 20-row frame with a row to
+       spare. The wave-6 addendum binds the sendable-page test hardest here, and it is what the
+       last two beats exist for: the win state is a titled, spanned, correctly formatted cover
+       page a VP could send without touching it.
+       MODELING_STANDARDS conventions this board follows: **§1 colour-as-provenance, all three
+       inks** — the outputs strip is GREEN because it links to the model's other tabs (the doc's
+       own "green-for-link is the one the catalog under-uses"), the raw deal-name feed is BLUE
+       because it is a hardcode a human pasted in, and every cell the player builds is BLACK
+       because it is a formula on this sheet; §1 units stated in the header ($mm unless noted, and
+       each cover line carries its own unit); §1 no hardcodes inside formulas — a cover page is
+       nothing but references; §4 the metric forms are the standard ones (revenue CAGR over the
+       plan, exit-year EBITDA margin, exit leverage as net debt ÷ EBITDA, sponsor IRR as the
+       compound return on the equity cheque); §7 the board is a plausible artifact with labelled
+       rows, stated units and a basis memo.
+       DELIBERATE SIMPLIFICATIONS, stated on the board's own memo line as §7 requires: the model
+       itself is off-page, so the outputs strip is GIVEN rather than built here (its schedules are
+       `opmodel`/`lbobuild`/`debtblock`'s boards); the memo states the engine-wide
+       beginning-balance interest ruling (MODELING_STANDARDS §5) because the leverage and IRR
+       lines are read off a model that uses it; and §6's check row lives on the model, not on the
+       cover — a cover page carries no arithmetic to check, which is the drill's whole aha.
+
+       STRUCTURAL DEVIATIONS from the §4.87 page, declared per §0 (payload item 8 carries them
+       with their §-anchors):
+       (1) ☆ RE-CUT (binding, §1.0-R4(u)). The page's bonus is "Add an outside border around the
+           cover box". Dead on arrival twice over: §1.0(d) outlaws a formatting ☆ outright, and
+           §1.0-R2(i) requires a skippable decision, which a dress a player performs anyway is
+           not. Re-cut to the one-pass discovery measured in the bake-off above. The killed dress
+           was NOT promoted to a core beat (contrast the r425 editfix/dress/ruleoff precedent):
+           the finish-state beat here is the title spanning the page, and a box drawn round a
+           cover's own metrics is not a dress a real cover page wears.
+       (2) THE OUTPUT ROSTER, and the page's own Wolf-playtest flag says he picks it ("which four
+           outputs make the real-world cover"). Built to the page's named roster — revenue CAGR,
+           EBITDA, leverage, IRR — plus two lines the roster implies and the format beats need
+           (equity value at exit and net debt at exit, so the $mm group is a group). Leverage
+           sits on the OUTPUTS strip only, not on the cover: with six cover lines the two format
+           beats cover every one of them, which is what keeps a General-formatted figure off a
+           sendable page, and a multiple line would need a third format beat. Flagged for Wolf.
+       (3) BEAT ORDER: the stamp moves from the page's beat 2 to beat 4. §1.0(a) requires a
+           formatting beat to directly FOLLOW the beat that made the cells it formats; with the
+           stamp at 2 the two number-format beats are separated from the wiring they dress. The
+           page's beats 3 and 4 also swap, so the format passes run in board order (the percent
+           group sits above the dollar group).
+       (4) THE CASE COLUMNS. The page's cover box is one column of scalars. That board carried no
+           legal ☆ at all (the diagnostic above), and a one-case cover is not what an IC pack
+           shows — base beside the downside is. The second column is the §1.0-R4(t) fix and it is
+           what creates the block the star lives in.
+       (5) NO cueCell (§1.0-R2(h)/§1.0-R3(q)). Every graded destination is either a labelled row
+           of a labelled block or the cover's own title row, and beat 4/5's ring is the title SPAN
+           rather than the single cell — which is the direct answer to (q)'s spill warning, since
+           a stamped deal name runs past its own column until the span is centered.
+       (6) NO HELPER STACK (§1.0(f)/§1.0-R2(l)): nothing on a cover page is converted, scaled or
+           assumed, so there is no assumption cell to label and stack.
+       (7) BORDER-DRESS DOCTRINE (wave-6 addendum, CAMPAIGN §5 / AUDIT r446b): NOT ENGAGED. This
+           board grades no border verdict at all. Its two section-head rows wear a BOTTOM border,
+           which is doctrine §2.1b's header rule and not a total row — §1.0(f)'s "a total earns
+           the line ABOVE it" is untouched, and the board carries no total to rule.
+       (8) §1.3 DENSITY: 18 of 20 rows carry content at the win state (**90%**), against 15 rows
+           on a ROWS:16 board — 75% of the real twenty-row sheet, which was over the §1.3 floor
+           but left a four-row dead band on screen for the whole run. The two blank rows here are
+           the separators between the cover, the outputs strip and the feed. */
+    name:'Model cover', label:'Build the model cover', par:47, parKeys:44, saveClose:true,
+    /* r449 §4.87 depth pass: par re-swept from scratch (was par 48 / parKeys 48 on the ROWS:16
+       board with no ☆ and no save closer). dev/e2e-par-sweep.js dashcover, 5-seed median 44 keys
+       including the engine-appended Ctrl+S — FLAT across seeds (drift 0%), because the
+       randomization moves the figures, the anchor column, the fiscal base and the deal name but
+       never the beat count or the length of anything typed (the r439 `wrapfix` rule: the stamp's
+       formula names a CELL, not the name, and the link is two characters wide on both jitters).
+       par 47 ≈ 1.07 s/key, the house band. The count came DOWN two keys against a board that had
+       the player type six separate formulas, and that is the point: what replaced them is one
+       formula over twelve cells plus two dresses and a spanned title. It lands dashcover at the
+       light end of Full Builds (threestmt 45 · opmodel 55 · debtblock 57 · bsbuild 64 · cfslink
+       66 · isbuild 71 · lbobuild 82 · dcfbuild 91 · nwcsched 102) — appropriate for a page that
+       owns no arithmetic, and flagged for Wolf since §5.4 reserves the H6b-FB difficulty target
+       to him. Mirrored in HOTKEY_PARS. Clocks derive (§1.4) and were read off the live start
+       card rather than computed: pass 1:12 · pro 0:55 · legendary 0:48. */
+    aha:'a cover page owns no math — every figure on it is a wire back to the model, and so is the title.',
+    /* §1.5: the aha's MOMENT is beat 1 landing — one selection, one formula, and the whole box
+       fills with the model's own numbers, in both cases, with nothing typed twice. */
+    prompt:'The IC pack goes out at six and page one is still blank. The model outputs strip at the bottom of the sheet is finished — base case and downside — and the deal name came off the data-room export in lower case with the spaces mangled. Build the cover: pull the six headline metrics onto it for both cases, set them to house format, and stamp the title off that raw feed. Nothing on a cover page is ever typed twice.',
+    req(){ const o=this._o; return 'cover box <em>'+o.cbRng+'</em> → one selection, <em>='+o.CB+o.rO+'</em>, <em>ctrl+↵</em> · <em>'+o.pctRng+'</em> <em>ctrl+1</em> <em>p</em> · <em>'+o.dolRng+'</em> <em>ctrl+1</em> <em>c</em> · <em>'+o.CA+'1</em> <em>=UPPER(TRIM('+o.CB+o.rFeed+'))</em> · <em>'+o.titleRng+'</em> <em>ctrl+b</em> + <em>ctrl+1</em> <em>a</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the check labels name OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every route that grades, not only the fastest (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'the cover box mirrors the outputs strip line for line, so one relative formula covers it: park on '+o.CB+o.rM+', grow the selection over the block with <kbd>shift</kbd>+<kbd>↓</kbd> and <kbd>shift</kbd>+<kbd>→</kbd>, type <kbd>='+o.CB+o.rO+'</kbd> and commit with <kbd>ctrl</kbd>+<kbd>↵</kbd> — every cell translates. A fill (<kbd>ctrl</kbd>+<kbd>d</kbd> then <kbd>ctrl</kbd>+<kbd>r</kbd>, or <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>d</kbd>/<kbd>r</kbd>) and a copy of the first cell onto the rest both land it too. <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>↓</kbd> is the one that will not help — the box is empty, so it rides past it. Anchor the reference with <kbd>$</kbd> and it stops translating: that is the one way to break the pass',
+      'the growth and returns lines are the top three of the box ('+o.pctRng+') — <kbd>ctrl</kbd>+<kbd>1</kbd> then <kbd>p</kbd> lands percent at one decimal in a single move; <kbd>alt</kbd> <kbd>h</kbd> <kbd>p</kbd> and <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> land it at zero and want one <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd> after',
+      'the three $mm lines are the bottom three ('+o.dolRng+') — <kbd>ctrl</kbd>+<kbd>1</kbd> then <kbd>c</kbd> lands dollars at zero decimals; <kbd>alt</kbd> <kbd>h</kbd> <kbd>a</kbd> <kbd>n</kbd> is the accounting format and grades the same; <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>$</kbd> lands two decimals and wants two <kbd>alt</kbd> <kbd>h</kbd> <kbd>9</kbd>',
+      'the raw feed sits at '+o.CB+o.rFeed+' with stray and doubled spaces around a lower-case name · on '+o.CA+'1: <kbd>=UPPER(TRIM('+o.CB+o.rFeed+'))</kbd> <kbd>↵</kbd> — TRIM closes the gaps, UPPER makes it a title, nested inside-out. <kbd>=TRIM(UPPER(…))</kbd> gives the identical string and grades the same; typing the clean name is the one thing that does not, because a cover title that does not point at the feed drifts the moment the feed changes',
+      'select the title across the box ('+o.titleRng+') · <kbd>ctrl</kbd>+<kbd>b</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd> is the same toggle) · <kbd>ctrl</kbd>+<kbd>1</kbd> then <kbd>a</kbd> centers it ACROSS the columns without merging one cell (<kbd>alt</kbd> <kbd>h</kbd> <kbd>o</kbd> <kbd>e</kbd> and <kbd>alt</kbd> <kbd>o</kbd> <kbd>e</kbd> open the same dialog)',
+      '☆ the discovery: the twelve links are one motion, not twelve. Grab the whole box first and write the formula once — <kbd>ctrl</kbd>+<kbd>↵</kbd> commits it into every cell, a <kbd>ctrl</kbd>+<kbd>d</kbd> then <kbd>ctrl</kbd>+<kbd>r</kbd> pair fills it, and a copy of the first link pasted over the box tiles it. Typing the twelve one at a time clears every core beat and forfeits it',
     ]; },
+    /* rings: ① the whole cover block · ② the percent group · ③ the dollar group · ④ the title
+       SPAN, not the cell — a stamped deal name spills past its own column until the span is
+       centered, and §1.0-R3(q) forbids ringing a cell whose text runs across its neighbours ·
+       ⑤ the same span · ☆ never ringed (§2.2 mystery slot) */
+    targets(){ const o=this._o; return [o.cbRng, o.pctRng, o.dolRng, o.titleRng, o.titleRng, null]; },
+    /* the demo BUILDS its own selections with Shift+arrow rather than being handed them by
+       setDemoSel, so parKeys measures what a player really pays for the range grabs instead of
+       eliding them (the r438 `series` rule). setDemoSel only parks the cursor on an anchor. */
+    demo(){ const o=this._o; const R={key:'ArrowRight',shift:true}, D2={key:'ArrowDown',shift:true}; return [
+      /* the ☆ and beat 1 in one motion — the block grabbed, the formula written once, committed
+         into all twelve with ctrl+enter (§1.0(a): the two dresses then follow immediately) */
+      {sel:o.CB+o.rM, keys:[D2, D2, D2, D2, D2, R, ...T('='+o.CB+o.rO), {key:'Enter',ctrl:true}]},
+      {sel:o.CB+o.rM, keys:[D2, D2, R, {key:'1',ctrl:true}, L('p')]},
+      {sel:o.CB+(o.rM+3), keys:[D2, D2, R, {key:'1',ctrl:true}, L('c')]},
+      {sel:o.CA+'1', keys:[...T('=UPPER(TRIM('+o.CB+o.rFeed+'))'), Kb.enter]},
+      {sel:o.CA+'1', keys:[R, R, Kb.bold, {key:'1',ctrl:true}, L('a')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — model cover ($mm, except per share)',txt:true,bold:true};
-      cells['A2']={...blankCell(),value:'Model outputs',txt:true,bold:true};
-      cells['A3']={...blankCell(),value:'Enterprise value',txt:true};
-      cells['A4']={...blankCell(),value:'Net debt',txt:true};
-      cells['A5']={...blankCell(),value:'Shares outstanding',txt:true};
-      cells['A6']={...blankCell(),value:'EBITDA',txt:true};
-      cells['A7']={...blankCell(),value:'Cash interest',txt:true};
-      cells['A9']={...blankCell(),value:'Cover — headline metrics',txt:true,bold:true};
-      cells['A10']={...blankCell(),value:'Equity value',txt:true,bold:true};
-      cells['A11']={...blankCell(),value:'Value per share',txt:true,bold:true};
-      cells['A12']={...blankCell(),value:'EV / EBITDA (x)',txt:true};
-      cells['A13']={...blankCell(),value:'Net leverage (x)',txt:true};
-      cells['A14']={...blankCell(),value:'Interest coverage (x)',txt:true};
-      const ebitda=rnd(40,120)*10, mult=rnd(80,140)/10;
-      const ev=Math.round(ebitda*mult);
-      const nd=Math.round(ev*rnd(15,45)/100);
-      const shares=rnd(20,90);
-      const interest=Math.round(ebitda*rnd(10,20)/100);
-      cells['B3']={...blankCell(),value:ev,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['B4']={...blankCell(),value:nd,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['B5']={...blankCell(),value:shares,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['B6']={...blankCell(),value:ebitda,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['B7']={...blankCell(),value:interest,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['B10']={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-      cells['B11']={...blankCell(),fmtStyle:'comma',decimals:2,bold:true};
-      cells['B12']={...blankCell(),fmtStyle:'comma',decimals:1};
-      cells['B13']={...blankCell(),fmtStyle:'comma',decimals:1};
-      cells['B14']={...blankCell(),fmtStyle:'comma',decimals:1};
-      /* r296: the raw deal-name feed — data-room mess (stray + double spaces, all lowercase) */
-      const dealNames=['project aurora','project keystone','project ridgeline','project bluebird','project granite','project meridian','project copperfield','project northstar'];
-      const rawName=dealNames[rnd(0,dealNames.length-1)];
-      const dirty='  '+rawName.replace(' ','   ')+' ';
-      cells['A15']={...blankCell(),value:'Deal name — raw feed',txt:true};
-      cells['B15']={...blankCell(),value:dirty,txt:true,fontColor:'blue'};
-      cells['A16']={...blankCell(),value:'Cover stamp',txt:true,bold:true};
-      cells['B16']={...blankCell(),txt:true,bold:true};
-      this._exp={equity:ev-nd, ps:(ev-nd)/shares, evEbitda:ev/ebitda, lev:nd/ebitda, cov:ebitda/interest,
-        stamp:rawName.toUpperCase()};
-      return {ROWS:16, cells, active:{r:10,c:2}, sel:null, colW:{1:170,2:158}};   /* r296: B wide enough for the stamped deal name */
+      /* §1.2 randomization — three independent axes, and the geometry is CONSTANT across seeds
+         so the keystroke count cannot move with the draw (the r439 `wrapfix` rule).
+         (a) SITE: the board is a full-grid artifact (18 of 20 rows), so §1.2 substitutes CORNER
+             JITTER for the site pool — the whole page anchors at column A or column B.
+         (b) CONTENT: the deal-name pool, the shape of the dirt on the raw feed (which padding,
+             which internal run, lower case or title case), the fiscal base year, and which
+             downside label the second case carries.
+         (c) VALUES: every figure through rnd(), and the whole model derived forward from the
+             entry year so the twelve numbers are internally coherent — a reviewer reading the
+             page can check that the downside grows slower, earns a lower margin, exits on a
+             lower multiple, deleverages less and therefore returns less. */
+      const c0=rnd(0,1)?1:2;                                   // (a) corner jitter
+      const CA=colLetter(c0), CB=colLetter(c0+1), CC=colLetter(c0+2);
+      const y0=rnd(2024,2027);                                 // (b)
+      const yA='FY'+String(y0).slice(2)+'A', yE='FY'+String(y0+4).slice(2)+'E';
+      const CASE2=['Downside','Bear case'][rnd(0,1)];          // (b)
+      /* row map — cover, outputs strip, feed; 20 rows exactly (§1.3 floor AND cap) */
+      const rM=5, rO=13, rFeed=20, rLev=19;                    // rM..rM+5 mirror rO..rO+5, offset 8
+      const r3=x=>Math.round(x*1000)/1000;
+      /* (c) the model, derived forward. MODELING_STANDARDS §4: revenue CAGR over the plan,
+         exit-year EBITDA off an expanding (base) or compressing (downside) margin, exit leverage
+         as net debt ÷ exit EBITDA, sponsor IRR as the compound return on the entry equity cheque
+         over the four plan years. Nothing here is a plug and nothing is forced. */
+      const rev0=rnd(90,180)*10, mar0=rnd(160,240)/1000, eb0=Math.round(rev0*mar0);
+      const gB=rnd(60,130)/1000, gD=Math.max(0.005, r3(gB-rnd(35,70)/1000));
+      const marB=r3(mar0+rnd(15,40)/1000), marD=r3(Math.max(0.09, mar0-rnd(5,25)/1000));
+      const ebB=Math.round(rev0*Math.pow(1+gB,4)*marB), ebD=Math.round(rev0*Math.pow(1+gD,4)*marD);
+      const entM=rnd(85,110)/10, exM=r3(entM+rnd(-5,5)/10), exMD=Math.max(6, r3(exM-rnd(5,15)/10));
+      const ndE=Math.round(eb0*rnd(45,60)/10), eqE=Math.round(eb0*entM)-ndE;
+      const levB=rnd(20,32)/10;
+      const ndXB=Math.round(ebB*levB);
+      /* the downside deleverages LESS, so its net debt is higher in absolute terms AND on the
+         multiple — a downside that ends with less debt than the base case is a model a reviewer
+         would stop on (MODELING_STANDARDS §7: the board must be a plausible artifact) */
+      let ndXD=Math.round(ebD*(levB+rnd(10,25)/10));
+      ndXD=Math.min(Math.max(ndXD, ndXB+Math.round(ebD*0.06)), Math.round(ndE*1.05));
+      ndXD=Math.max(ndXD, ndXB+5);
+      const eqXB=Math.round(ebB*exM)-ndXB;
+      const eqXD=Math.max(Math.round(eqE*1.05), Math.round(ebD*exMD)-ndXD);
+      const irrB=r3(Math.pow(eqXB/eqE,0.25)-1), irrD=r3(Math.pow(eqXD/eqE,0.25)-1);
+      /* the six mirrored lines, in board order: three percents then three $mm figures. The order
+         is what lets ONE format pass cover each group, and what keeps a General-formatted number
+         off the finished page (the r439 `cases` degradation rule, see the header comment). */
+      const MET=[
+        {cov:'Revenue CAGR, '+yA+'–'+yE, out:'Rev CAGR '+yA+'-'+yE,     b:gB,   d:gD,   f:'percent', dec:1},
+        {cov:'EBITDA margin, '+yE,            out:'EBITDA margin '+yE,       b:marB, d:marD, f:'percent', dec:1},
+        {cov:'Sponsor IRR (gross)',           out:'IRR to sponsor',          b:irrB, d:irrD, f:'percent', dec:1},
+        {cov:'Exit-year EBITDA ($mm)',        out:'EBITDA '+yE,              b:ebB,  d:ebD,  f:'comma',   dec:0},
+        {cov:'Equity value at exit ($mm)',    out:'Equity at exit',          b:eqXB, d:eqXD, f:'comma',   dec:0},
+        {cov:'Net debt at exit ($mm)',        out:'Net debt at exit',        b:ndXB, d:ndXD, f:'comma',   dec:0},
+      ];
+      const lab=(k,s,b,extra)=>cells[k]={...blankCell(), value:s, txt:true, bold:!!b, ...(extra||{})};
+      /* MODELING_STANDARDS §1, all three inks. green = a link to another tab (the outputs strip),
+         blue = a hardcode a human pasted in (the raw feed), black = a formula on this sheet
+         (everything the player builds). */
+      const link=(v,f,d)=>({...blankCell(), value:v, fmtStyle:f, decimals:d, fontColor:'green'});
+      /* row 1 — the cover title, EMPTY at load: page one is blank, which is the prompt's story */
+      cells[CA+'1']={...blankCell(), txt:true};
+      lab(CA+'2','Investment committee cover · $mm unless noted · outputs linked from the model tabs · beginning-balance interest', false, {it:true, fontColor:'gray'});
+      /* the cover box — a labelled block with a case header, doctrine §2.1b bottom rule under the
+         header row (a HEADER rule, not a total's: §1.0(f) is not engaged, nothing here is a total) */
+      lab(CA+'4','Cover — headline metrics', true, {bb:true});
+      cells[CB+'4']={...blankCell(), value:'Base', txt:true, bold:true, align:'r', bb:true};
+      cells[CC+'4']={...blankCell(), value:CASE2, txt:true, bold:true, align:'r', bb:true};
+      /* the section head is 30 characters, not 35: a header row has content in the case columns,
+         so its label CANNOT spill — and at colW 252 the longer wording was clipped on the board
+         (caught by LOOKING at the mid-solve screenshot, doctrine §8.1.5; verify-dashcover.js §1
+         asserts !clipsCol on the label column now, per §1.0-R3(r)'s label verdict) */
+      lab(CA+'12','Model outputs — from the model', true, {bb:true});
+      cells[CB+'12']={...blankCell(), value:'Base', txt:true, bold:true, align:'r', bb:true};
+      cells[CC+'12']={...blankCell(), value:CASE2, txt:true, bold:true, align:'r', bb:true};
+      for(let i=0;i<6;i++){
+        lab(CA+(rM+i), MET[i].cov);
+        /* the twelve graded cells ship GENERAL — see the degradation note in the header */
+        cells[CB+(rM+i)]={...blankCell()};
+        cells[CC+(rM+i)]={...blankCell()};
+        lab(CA+(rO+i), MET[i].out);
+        cells[CB+(rO+i)]=link(MET[i].b, MET[i].f, MET[i].dec);
+        cells[CC+(rO+i)]=link(MET[i].d, MET[i].f, MET[i].dec);
+      }
+      /* the seventh output line: the outputs strip is RICHER than the cover, which is what a
+         curated cover page means — and it sits BELOW the mirrored six so the block still fills */
+      lab(CA+rLev,'Net debt / EBITDA, exit');
+      cells[CB+rLev]=link(r3(ndXB/ebB),'mult',1);
+      cells[CC+rLev]=link(r3(ndXD/ebD),'mult',1);
+      /* (b) the raw feed — a data-room export, blue because a human pasted it in */
+      const NAMES=['project aurora','project keystone','project ridgeline','project bluebird',
+                   'project granite','project meridian','project copperfield','project northstar',
+                   'project sable','project tundra'];
+      const nm=NAMES[rnd(0,NAMES.length-1)];
+      const cased=rnd(0,1) ? nm : nm.replace(/\b\w/g, ch=>ch.toUpperCase());
+      const dirty=' '.repeat(rnd(1,3)) + cased.replace(' ', ' '.repeat(rnd(2,4))) + ' '.repeat(rnd(1,3));
+      lab(CA+rFeed,'Deal name — raw feed (data room)');
+      cells[CB+rFeed]={...blankCell(), value:dirty, txt:true, fontColor:'blue'};
+      const cbRng=CB+rM+':'+CC+(rM+5), pctRng=CB+rM+':'+CC+(rM+2), dolRng=CB+(rM+3)+':'+CC+(rM+5);
+      this._o={CA:CA, CB:CB, CC:CC, c0:c0, cB:c0+1, cC:c0+2, rM:rM, rO:rO, rFeed:rFeed, rLev:rLev,
+               y0:y0, yA:yA, yE:yE, case2:CASE2, cbRng:cbRng, pctRng:pctRng, dolRng:dolRng,
+               titleRng:CA+'1:'+CC+'1', stamp:nm.toUpperCase(),
+               base:MET.map(m=>m.b), down:MET.map(m=>m.d), fmt:MET.map(m=>m.f), dec:MET.map(m=>m.dec)};
+      const colW={}; colW[c0]=252; colW[c0+1]=104; colW[c0+2]=104;
+      return {ROWS:20, cells, active:{r:rM,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const E=this._exp;
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(Math.abs(exp)*2e-3,1e-2); };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
+      const o=this._o;
+      /* every predicate reads the END STATE (§1.0-R3(p) / CAMPAIGN §1). Nothing reads formula
+         text, a range, a function name or an operand order — the defect class that cost this
+         drill five of its six old checks. */
+      const cel=k=>S.cells[k];
+      const near=(k,exp)=>{ const c=cel(k); return !!(c && typeof c.value==='number'
+        && Math.abs(c.value-exp) <= Math.max(Math.abs(exp)*5e-4, 1e-7)); };
+      const liveNum=k=>{ const c=cel(k); return !!(c && c.formula && typeof c.value==='number'); };
+      const cols=[o.CB,o.CC], vals=[o.base,o.down];
+      let linksOk=true;
+      for(let i=0;i<6;i++) for(let j=0;j<2;j++){
+        const k=cols[j]+(o.rM+i);
+        if(!(liveNum(k) && near(k, vals[j][i]))) linksOk=false;
+      }
+      /* CAMPAIGN route facts, walked not assumed: Ctrl+1 P lands percent at ONE decimal, Alt H P
+         and Ctrl+Shift+% land it at zero — all three must be able to clear "one decimal", so the
+         verdict is the end state (percent + 1dp) and never the route. */
+      const grp=(r0,n,f)=>{ let ok=true; for(let i=0;i<n;i++) for(const c of cols){ const x=cel(c+(r0+i)); if(!(x&&f(x))) ok=false; } return ok; };
+      const pctOk=grp(o.rM,3,x=>x.fmtStyle==='percent' && x.decimals===1);
+      /* money: `currency` (Ctrl+Shift+$ walked down, Ctrl+1 C) and `acct` (Alt H A N) are both
+         dollar formats and both clear — the r425 modeltour stranding, not repeated here */
+      const dolOk=grp(o.rM+3,3,x=>(x.fmtStyle==='currency'||x.fmtStyle==='acct') && x.decimals===0);
+      const t=cel(o.CA+'1');
+      const stampOk=!!(t && t.formula && typeof t.value==='string' && t.value===o.stamp);
+      /* §1.0-R3(p): Ctrl+1 A, Alt H O E A and Alt O E A all write the same `ca` span on the
+         top-left cell; a plain centre (Alt H A C) is a different visible result and correctly
+         does not clear a beat whose outcome is a title spanning the box. */
+      const titleOk=!!(t && t.bold && (t.ca|0) >= 3);
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision): the whole
+         cover box authored by BULK motions rather than cell by cell. Read off the mechanic
+         latches, never geometry inferred — S.multiEnter (r433, the Ctrl+Enter commit), S.fillOps
+         (r424: Ctrl+D/R and Alt H F I D/R both log) and S.pasteLog (r425, the clipboard clone) —
+         so the star is chord-agnostic per §1.0(c). A fill authors only what its DIRECTION wrote
+         into (a fill-right authors the columns right of its source column, never the source), so
+         typing the base column and filling right earns nothing; ten of the twelve is the bar,
+         which leaves room for the two head cells a clipboard route has to seed by hand. */
+      const ops=S.fillOps||[], me=S.multiEnter||[], pl=S.pasteLog||[];
+      const authored=(r,c)=>
+        ops.some(f=>f.r1<=r&&f.r2>=r&&f.c1<=c&&f.c2>=c && (
+          (f.dir==='down'&&r>f.r1) || (f.dir==='up'&&r<f.r2) ||
+          (f.dir==='right'&&c>f.c1) || (f.dir==='left'&&c<f.c2)))
+        || me.some(m=>m.r1<=r&&m.r2>=r&&m.c1<=c&&m.c2>=c)
+        || pl.some(p=>p.r0<=r&&p.r0+p.h-1>=r&&p.c0<=c&&p.c0+p.w-1>=c);
+      let bulk=0;
+      for(let i=0;i<6;i++) for(const c of [o.cB,o.cC]) if(authored(o.rM+i,c)) bulk++;
       return [
-        {label:'run equity value — enterprise value less net debt, referenced not retyped (=B3-B4)', ok:near('B10',E.equity) && refs('B10',['B3','B4'])},
-        {label:'run value per share — equity over shares (=B10/B5)', ok:near('B11',E.ps) && refs('B11',['B10','B5'])},
-        {label:'price the multiple — EV / EBITDA (=B3/B6)', ok:near('B12',E.evEbitda) && refs('B12',['B3','B6'])},
-        {label:'run net leverage — net debt / EBITDA (=B4/B6)', ok:near('B13',E.lev) && refs('B13',['B4','B6'])},
-        {label:'run interest coverage — EBITDA / interest (=B6/B7)', ok:near('B14',E.cov) && refs('B14',['B6','B7'])},
-        {label:'stamp the cover clean — =UPPER(TRIM(B15)) fixes the raw feed by FORMULA, not by retyping',
-          ok:(()=>{ const c=S.cells['B16']; return !!(c && c.formula && c.value===E.stamp && refs('B16',['UPPER(','TRIM(','B15'])); })()},
+        {label:'Reference the six model outputs into the cover box — base and '+o.case2.toLowerCase(), ok: linksOk},
+        {label:'Percent-format the growth and returns lines — one decimal', ok: pctOk},
+        {label:'Dollar-format the three $mm lines — zero decimals', ok: dolOk},
+        {label:'Build the cover title from the raw deal name — capitals, single spaces', ok: stampOk},
+        {label:'Bold the cover title and center it across the box', ok: titleOk},
+        {label:'Build the whole cover box in one pass — one selection carries every link', ok: linksOk && bulk>=10, bonus:true},
       ];
     }
   },

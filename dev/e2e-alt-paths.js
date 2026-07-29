@@ -1830,6 +1830,51 @@ const ALTS = [
       {sel:Y[0]+o.rTD,  keys:[...T(o.fTotD),{key:'Enter'},...T(o.fTotI),{key:'Enter'}]},
       {sel:o.totRect,   keys:[{key:'r',ctrl:true}]},
     ]; }` },
+  /* r449 (DEPTH_PASS §4.87 depth pass) — ALL THREE dashcover entries are NEW; the drill had
+     ZERO before (§1.8 names it in the nine-drill zero-ALT list), so nothing is deleted here.
+     ALT 1 = chord ROUTE (the links cloned off the clipboard instead of multi-committed, the
+     percent group via Alt H P plus one Alt H 0, the dollars via ACCOUNTING Alt H A N, bold via
+     Alt H 1, the span via the legacy Alt O E A dialog, the stamp written =TRIM(UPPER(…))) — the
+     ☆ still latches, because a clipboard clone is a one-pass motion however it is reached.
+     ALT 2 = op ORDER (the title stamped and dressed FIRST, then both number formats onto the
+     still-empty box, then the twelve links LAST) AND the ☆'s second mechanic: a Ctrl+Enter
+     commit into the whole block. Note WHY this order needs the multi-commit and not a fill: a
+     fill carries the source cell's number format, so dressing first and filling second would
+     smear the percent group's format over the $mm group — the multi-commit writes values and
+     formulas only and leaves each cell's format alone (measured, dev/verify-dashcover.js §5).
+     ALT 3 = the §1.0-R2(i) SKIPPABILITY control: twelve refs typed one at a time with the
+     cursor walked between them, $-anchored so nothing can translate, and both format passes
+     walked one column at a time. Every core clears; the ☆ must stay DARK. */
+  { key: 'dashcover', name: 'clipboard clone for the links, Alt H P + Alt H 0 percents, ACCOUNTING dollars (Alt H A N), Alt H 1 bold, legacy Alt O E A span, the stamp as =TRIM(UPPER(…)) — the ☆ still latches', moves: `C => { const o=C._o;
+      const DN={key:'ArrowDown',shift:true}, R={key:'ArrowRight',shift:true};
+      return [
+        {sel:o.CB+o.rM,     keys:[...T('='+o.CB+o.rO),{key:'Enter'}]},
+        {sel:o.CB+o.rM,     keys:[{key:'c',ctrl:true},DN,DN,DN,DN,DN,R,{key:'v',ctrl:true}]},
+        {sel:o.CB+o.rM,     keys:[DN,DN,R,{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
+        {sel:o.CB+(o.rM+3), keys:[DN,DN,R,{key:'Alt'},L('h'),L('a'),L('n')]},
+        {sel:o.CA+'1',      keys:[...T('=TRIM(UPPER('+o.CB+o.rFeed+'))'),{key:'Enter'}]},
+        {sel:o.CA+'1',      keys:[R,R,{key:'Alt'},L('h'),D(1),{key:'Alt'},L('o'),L('e'),L('a')]},
+      ]; }` },
+  { key: 'dashcover', name: 'op ORDER — title stamped and dressed FIRST, both number formats onto the still-empty box, the twelve links LAST and committed with ctrl+enter (which leaves each cell format alone where a fill would smear it)', moves: `C => { const o=C._o;
+      const DN={key:'ArrowDown',shift:true}, R={key:'ArrowRight',shift:true};
+      return [
+        {sel:o.CA+'1',      keys:[...T('=UPPER(TRIM('+o.CB+o.rFeed+'))'),{key:'Enter'}]},
+        {sel:o.CA+'1',      keys:[R,R,{key:'b',ctrl:true},{key:'1',ctrl:true},L('a')]},
+        {sel:o.CB+(o.rM+3), keys:[DN,DN,R,{key:'1',ctrl:true},L('c')]},
+        {sel:o.CB+o.rM,     keys:[DN,DN,R,{key:'1',ctrl:true},L('p')]},
+        {sel:o.CB+o.rM,     keys:[DN,DN,DN,DN,DN,R,...T('='+o.CB+o.rO),{key:'Enter',ctrl:true}]},
+      ]; }` },
+  { key: 'dashcover', name: 'NEGATIVE CONTROL — twelve $-anchored refs typed one at a time with the cursor walked between them, both format passes walked one column at a time: every core clears, ☆ DARK', moves: `C => { const o=C._o;
+      const DN={key:'ArrowDown',shift:true}, mv=[];
+      for(let i=0;i<6;i++) for(const cl of [o.CB,o.CC])
+        mv.push({sel:cl+(o.rM+i), keys:[...T('=$'+cl+'$'+(o.rO+i)),{key:'Enter'}]});
+      mv.push({sel:o.CB+o.rM,     keys:[DN,DN,{key:'1',ctrl:true},L('p')]});
+      mv.push({sel:o.CC+o.rM,     keys:[DN,DN,{key:'1',ctrl:true},L('p')]});
+      mv.push({sel:o.CB+(o.rM+3), keys:[DN,DN,{key:'1',ctrl:true},L('c')]});
+      mv.push({sel:o.CC+(o.rM+3), keys:[DN,DN,{key:'1',ctrl:true},L('c')]});
+      mv.push({sel:o.CA+'1',      keys:[...T('=UPPER(TRIM('+o.CB+o.rFeed+'))'),{key:'Enter'}]});
+      mv.push({sel:o.CA+'1',      keys:[{key:'b',ctrl:true},{key:'ArrowRight',shift:true},{key:'ArrowRight',shift:true},{key:'1',ctrl:true},L('a')]});
+      return mv; }` },
   { key: 'versionup', name: 'stamp FIRST, cost lines before revenue, ribbon fills, alt h f c Blue swatch, alt h b d — ☆ still earned', moves: `C => { const o=C._o, y=o.yc[0], mv=[];
       mv.push({sel:o.cL+'1', keys:[{key:'h',ctrl:true,code:'KeyH'},{key:'v'},{key:'1'},{key:'Tab'},{key:'v'},{key:'2'},{key:'Enter'}]});
       for(let i=1;i>=0;i--){ const r=o.ratioRows[i], ref='$'+o.cV+'$'+(o.pr+2+i);
