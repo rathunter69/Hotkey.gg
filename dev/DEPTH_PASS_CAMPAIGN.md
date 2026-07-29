@@ -18,9 +18,13 @@ way. DEPTH_PASS.md §1.0-R3 carries the binding RULES; this file carries the PRA
 | Formulas II | 10 | 10 | ✅ complete as of r440 (`wirewalk` retired into `tieout`, `hunt` into `audit`, so the chapter is 10; `balcheck`, `tieout` and `balance` last in — all three tested for retirement and all three kept). `redflags` §4.56, the chapter's designated capstone, is an unbuilt ADD (delta D4) and is NOT part of the pass |
 | Models I | 10 | 10 | ✅ complete as of r445 (waves 1–2). `pitchpage` §3.1, the designated capstone, is an unbuilt ADD and NOT part of the pass. ☆-family soft-rule breach recorded in the r445 AUDIT note |
 | Models II | 10 | 10 | ✅ complete as of r447 (waves 3–4). `cascade` designated capstone (D9: moved last, pass=par×2). ☆-family + border-doctrine notes in the r446/r446b/r447 AUDIT sections |
-| Full Builds | 5 | 10 | wave 5 shipped r448 (`isbuild` `bsbuild` `cfslink` `nwcsched` `threestmt`). Wave 6 next: `opmodel` `dcfbuild` `lbobuild` `debtblock` `dashcover` — `lbobuild` carries the 25-row trim (task #16); run the §3 discriminator on opmodel-vs-isbuild in the brief (r448 AUDIT note); `shipit`/chapter capstone is an unbuilt ADD, not part of the pass |
+| Full Builds | 10 | 10 | ✅ complete as of r449 (waves 5–6). `lbobuild` down to 20 rows (task #16 closed); `shipit`, the chapter capstone, is an unbuilt ADD and NOT part of the pass |
 
-**69 of 74 passed.** Catalog **74** (was 82; `hunt` closed it out at r439) — counted from `menuOrder`
+**74 of 74 passed — THE DEPTH PASS IS COMPLETE (r449).** What remains is not drill rework: the
+Wolf decisions (border doctrine r446b · threestmt difficulty §5.4 · opmodel placement band D16 ·
+dashcover roster · redflags §4.56), the unbuilt capstone ADDs (`redflags` `pitchpage` `shipit`),
+the qclose port, the dual-audience audit over pre-R4 drills, and the standing engine backlog
+(fit-sweep flake · density retrofit · alt-paths Escape wedge · __noShrink frame overrun). Catalog **74** (was 82; `hunt` closed it out at r439) — counted from `menuOrder`
 at r440, chapter by chapter. `menuOrder.length` is the only source of truth; the
 "N banker-grade drills" marketing copy in index/About/enterprise is asserted against it by
 `e2e-smoke`, so it moves with every retirement.

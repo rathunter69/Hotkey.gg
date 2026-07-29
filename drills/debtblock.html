@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Build the debt &amp; interest block — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Two tranches, each rolling on its own anchored rate — senior and sub roll-forwards, both interest lines, then total debt and total interest Par 57s, optimal 5">
+<meta name="description" content="A term loan and a revolver, each priced on its own rate — both roll-forwards, interest on the opening balances, then total debt and total interest Par 70s, op">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Build the debt &amp; interest block — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Two tranches, each rolling on its own anchored rate — senior and sub roll-forwards, both interest lines, then total debt and total interest Par 57s, optimal 5">
+<meta property="og:description" content="A term loan and a revolver, each priced on its own rate — both roll-forwards, interest on the opening balances, then total debt and total interest Par 70s, op">
 <meta property="og:url" content="https://www.hotkey.gg/drills/debtblock.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Build the debt &amp; interest block — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Two tranches, each rolling on its own anchored rate — senior and sub roll-forwards, both interest lines, then total debt and total interest Par 57s, optimal 5">
+<meta name="twitter:description" content="A term loan and a revolver, each priced on its own rate — both roll-forwards, interest on the opening balances, then total debt and total interest Par 70s, op">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/debtblock.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -85,7 +85,7 @@
   .trackhead small{color:var(--faint); font-weight:400; font-size:12px}
   .trackhead .tb{font-size:12.5px; color:var(--muted); font-weight:400; margin-top:4px; line-height:1.55}</style>
 <link rel="stylesheet" href="nav.css?v=210">
-<script src="drills.js?v=299"></script>
+<script src="drills.js?v=300"></script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -93,7 +93,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=310"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Build the debt & interest block","description":"Two tranches, each rolling on its own anchored rate — senior and sub roll-forwards, both interest lines, then total debt and total interest","url":"https://www.hotkey.gg/drills/debtblock.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Full Builds","teaches":"A debt block is two roll-forwards and their interest — each tranche rolls on its own rate, then total debt and total interest feed the model.","isPartOf":{"@type":"Course","name":"Financial Modeling Keyboard Mastery","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT57S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Build the debt & interest block","item":"https://www.hotkey.gg/drills/debtblock.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Build the debt & interest block","description":"A term loan and a revolver, each priced on its own rate — both roll-forwards, interest on the opening balances, then total debt and total interest","url":"https://www.hotkey.gg/drills/debtblock.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Full Builds","teaches":"every tranche is the same sentence — open, move, close — so the second facility is the first one copied, not typed again.","isPartOf":{"@type":"Course","name":"Financial Modeling Keyboard Mastery","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT70S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Build the debt & interest block","item":"https://www.hotkey.gg/drills/debtblock.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -102,20 +102,27 @@
   <div class="crumbs"><a href="index.html">hotkey.gg</a> / <a href="drills/index.html">drill library</a> / full builds</div>
   <div class="eyebrow">◆ Full Builds · drill · Financial Modeling Keyboard Mastery track</div>
   <h1>Build the debt &amp; interest block</h1>
-  <div class="aha">A debt block is two roll-forwards and their interest — each tranche rolls on its own rate, then total debt and total interest feed the model.</div>
-  <div class="sub">Two tranches (debt layers), one block: a senior term loan and subordinated notes — junior debt, paid after the senior. Each opens at the prior close, its mandatory amort pays it down, and interest accrues at its OWN anchored rate. Build both roll-forwards, run both interest lines, then total debt and total interest — the two rows the balance sheet and P&L actually pull.</div>
+  <div class="aha">every tranche is the same sentence — open, move, close — so the second facility is the first one copied, not typed again.</div>
+  <div class="sub">The credit agreement signed this morning and the debt block is the one page the model does not have. Treasury has already fed the term loan amortization and the revolver draws off the cash flow forecast, and the pricing came in on the commitment letter. Roll both facilities out across the plan, run the interest each one accrues, and land the two rows the balance sheet and the income statement pull — total debt and total interest.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=debtblock">train this drill →</a>
-    <span class="par">par 57s · optimal 59 keys · keyboard only · free</span>
+    <span class="par">par 70s · optimal 67 keys · keyboard only · free</span>
   </div>
 
   <div class="section-title">The shortcuts in this drill</div>
   <div class="panel">
+    <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
+    <div class="scb"><div class="sch"><kbd>Shift+↑</kbd><span class="m">⇧↑ on mac</span><span class="what">Extend selection one cell</span></div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h f c</kbd><span class="m">⌥ h f c on mac</span><span class="what">Font color</span></div><div class="use">Font color: blue inputs, black formulas — the oldest convention in banking models, still enforced.</div></div>
     <div class="scb"><div class="sch"><kbd>Ctrl+R</kbd><span class="m">⌘R on mac</span><span class="what">Fill right from the cell to the left</span></div><div class="use">Same as fill down, but across — one quarter’s formula becomes the whole year in two keystrokes.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+C</kbd><span class="m">⌘C on mac</span><span class="what">Copy</span></div><div class="use">Copy starts almost every hand-off — grab a finished block once, then place it in the summary, the deck, or next quarter’s column.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+V</kbd><span class="m">⌘V on mac</span><span class="what">Paste</span></div><div class="use">Plain paste brings everything: values, formulas, formats. Reach for Paste Special when you only want part of it.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h b p</kbd><span class="m">⌥ h b p on mac</span><span class="what">Top border</span></div><div class="use">Top border above a total row — the accounting ruling that says “this line sums the ones above.”</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+S</kbd><span class="m">⌘S on mac</span><span class="what">Save</span></div></div>
   </div>
 
   <div class="section-title">The optimal line</div>
-  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys">Senior: <em>B5</em> <em>=B3+B4</em> · <em>C3</em> <em>=B5</em> · fill roll → · <em>B6</em> <em>=B3*$B$16</em> · Sub: <em>B10</em> <em>=B8+B9</em> · <em>C8</em> <em>=B10</em> · fill roll → · <em>B11</em> <em>=B8*$B$17</em> · Totals: <em>B13</em> <em>=B5+B10</em> · <em>B14</em> <em>=B6+B11</em> · fill →</div></div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys">type <em>6.5%</em> at C9 and <em>4.9%</em> at C14 · <em>alt h f c</em> →×4 blue · D8 <em>=D6+D7</em> · D9 <em>=D6*$C9</em> · E6 <em>=D8</em> · fill <em>E6:H6</em> → and <em>D8:H9</em> → · copy <em>D8:H9</em> → paste at D13 · E11 <em>=D13</em> · fill <em>E11:H11</em> → · D16 <em>=D8+D13</em> · D17 <em>=D9+D14</em> · fill <em>D16:H17</em> → · <em>alt h b p</em> · <em>ctrl+s</em></div></div>
 
   <div class="section-title">More Full Builds drills</div>
   <div class="rel">

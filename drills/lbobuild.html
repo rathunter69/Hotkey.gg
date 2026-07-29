@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Build the paper LBO — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Sources &amp; uses sizes the equity plug, entry to exit lands MOIC — then prove the IRR twice: compounded, and =IRR() over the raw equity flows Par 82s, optimal 8">
+<meta name="description" content="Size the deal at close, mark the same page at exit, and read the sponsor return — the equity cheque is the plug that balances the funding Par 84s, optimal 80 ">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Build the paper LBO — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Sources &amp; uses sizes the equity plug, entry to exit lands MOIC — then prove the IRR twice: compounded, and =IRR() over the raw equity flows Par 82s, optimal 8">
+<meta property="og:description" content="Size the deal at close, mark the same page at exit, and read the sponsor return — the equity cheque is the plug that balances the funding Par 84s, optimal 80 ">
 <meta property="og:url" content="https://www.hotkey.gg/drills/lbobuild.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Build the paper LBO — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Sources &amp; uses sizes the equity plug, entry to exit lands MOIC — then prove the IRR twice: compounded, and =IRR() over the raw equity flows Par 82s, optimal 8">
+<meta name="twitter:description" content="Size the deal at close, mark the same page at exit, and read the sponsor return — the equity cheque is the plug that balances the funding Par 84s, optimal 80 ">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/lbobuild.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -85,7 +85,7 @@
   .trackhead small{color:var(--faint); font-weight:400; font-size:12px}
   .trackhead .tb{font-size:12.5px; color:var(--muted); font-weight:400; margin-top:4px; line-height:1.55}</style>
 <link rel="stylesheet" href="nav.css?v=210">
-<script src="drills.js?v=299"></script>
+<script src="drills.js?v=300"></script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -93,7 +93,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=310"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Build the paper LBO","description":"Sources & uses sizes the equity plug, entry to exit lands MOIC — then prove the IRR twice: compounded, and =IRR() over the raw equity flows","url":"https://www.hotkey.gg/drills/lbobuild.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Full Builds","teaches":"A paper LBO is two blocks — sources & uses sizes the equity check, entry-to-exit turns it into MOIC — and IRR has two roads that MUST agree: compound the MOIC, or hand the raw equity flows to =IRR().","isPartOf":{"@type":"Course","name":"Financial Modeling Keyboard Mastery","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT82S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Build the paper LBO","item":"https://www.hotkey.gg/drills/lbobuild.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Build the paper LBO","description":"Size the deal at close, mark the same page at exit, and read the sponsor return — the equity cheque is the plug that balances the funding","url":"https://www.hotkey.gg/drills/lbobuild.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Full Builds","teaches":"two roads to the same IRR — compound the MOIC, or lay the equity out as flows and read them; if they disagree, the model is lying somewhere upstream.","isPartOf":{"@type":"Course","name":"Financial Modeling Keyboard Mastery","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT84S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Build the paper LBO","item":"https://www.hotkey.gg/drills/lbobuild.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -102,16 +102,25 @@
   <div class="crumbs"><a href="index.html">hotkey.gg</a> / <a href="drills/index.html">drill library</a> / full builds</div>
   <div class="eyebrow">◆ Full Builds · drill · Financial Modeling Keyboard Mastery track</div>
   <h1>Build the paper LBO</h1>
-  <div class="aha">A paper LBO is two blocks — sources & uses sizes the equity check, entry-to-exit turns it into MOIC — and IRR has two roads that MUST agree: compound the MOIC, or hand the raw equity flows to =IRR().</div>
-  <div class="sub">The whole paper LBO — a leveraged buyout: buy with debt, sell at exit, keep the spread — on one tab. Size the deal: purchase EV off the entry multiple, add fees for total uses, lever it, and the sponsor equity is the PLUG that makes sources tie to uses. Then run it to exit: exit EV at the exit multiple, net debt out for exit equity, MOIC (multiple on invested capital — cash out over cash in) against the check you wrote, and IRR compounded over the hold. Then prove it the way the fund model does — lay the equity out as CASH FLOWS (your check out at year 0, exit proceeds in at the end) and let =IRR() read the line. No interim flows means the two answers match to the decimal; when they don’t, someone fat-fingered the hold.</div>
+  <div class="aha">two roads to the same IRR — compound the MOIC, or lay the equity out as flows and read them; if they disagree, the model is lying somewhere upstream.</div>
+  <div class="sub">The partner wants the paper LBO in front of Monday's screening committee, on one page. LTM and exit EBITDA are already fed in from the operating model and the swept net debt at exit from the debt schedule; every assumption you can change is in blue. Size the deal at close — enterprise value, the debt the leverage driver supports, and the sponsor cheque that balances the funding (the plug: whatever is left once the debt is in) — then mark the same page at exit and read the return. Deductions carry their sign, and there are no interim distributions: the equity goes out once and comes back once.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=lbobuild">train this drill →</a>
-    <span class="par">par 82s · optimal 85 keys · keyboard only · free</span>
+    <span class="par">par 84s · optimal 80 keys · keyboard only · free</span>
   </div>
 
+  <div class="section-title">The shortcuts in this drill</div>
+  <div class="panel">
+    <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
+    <div class="scb"><div class="sch"><kbd>Shift+→</kbd><span class="m">⇧→ on mac</span><span class="what">Extend selection one cell</span></div><div class="use">Nudge a selection one cell at a time when the block you need doesn’t end at a data edge.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+B</kbd><span class="m">⌘B on mac</span><span class="what">Bold</span></div><div class="use">Bold marks structure: titles, total rows, anything the reviewer’s eye should land on first.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h b p</kbd><span class="m">⌥ h b p on mac</span><span class="what">Top border</span></div><div class="use">Top border above a total row — the accounting ruling that says “this line sums the ones above.”</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+S</kbd><span class="m">⌘S on mac</span><span class="what">Save</span></div></div>
+    <div class="fnline">functions you'll type: <b style="color:var(--text)">SUM()</b> · <b style="color:var(--text)">IRR()</b></div>
+  </div>
 
   <div class="section-title">The optimal line</div>
-  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>B6</em> EV <em>=B4*B5</em> · <em>B8</em> uses <em>=B6+B7</em> · <em>B10</em> debt <em>=B4*B9</em> · <em>B11</em> equity <em>=B8-B10</em> · <em>B16</em> exit EV <em>=B14*B15</em> · <em>B18</em> exit eq <em>=B16-B17</em> · <em>B20</em> MOIC <em>=B18/B11</em> · <em>B21</em> IRR <em>=B20^(1/B19)-1</em> · flows: <em>B24</em> <em>=-B11</em> · exit-year cell <em>=B18</em> · <em>B25</em> <em>=IRR(</em>flow row<em>)</em> — ties to B21</div></div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys">build <em>C8</em> → <em>=C5*C6</em>, then D8 the same · <em>C10</em> → <em>=-C5*C7</em> · <em>C11</em> and <em>D11</em> → <em>=SUM(C8:C10)</em> · <em>ctrl+b</em> + <em>alt h b p</em> on the equity line ·<em>C15</em> → <em>=D11/C11</em> · <em>C16</em> → <em>=C15^(1/C14)-1</em> · <em>C19</em> → <em>=-C11</em> · <em>H19</em> → <em>=D11</em> · <em>C20</em> → <em>=IRR(C19:H19)</em> · <em>ctrl+s</em></div></div>
 
   <div class="section-title">More Full Builds drills</div>
   <div class="rel">
