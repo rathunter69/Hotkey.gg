@@ -9949,75 +9949,420 @@ const CHALLENGES = {
     }
   },
   opmodel:{
-    name:'Op model', label:'Build the operating model', par:55, parKeys:57,
-    aha:'An operating model is drivers → margins — grow revenue off one rate, cost it as % of sales, and the EBITDA line builds itself.',
-    prompt:'Five years of operating model from the drivers up. Revenue compounds off a single growth rate; COGS and opex are each a percent of that revenue; gross profit and EBITDA fall out, and the margin line reads the story. Every rate is anchored so the fill can’t drag it — build column one, fill the whole model right.',
-    req:'<em>C3</em> revenue <em>=B3*(1+$B$10)</em> · fill C3:F3 → · <em>B4</em> COGS <em>=-B3*$B$11</em> · <em>B5</em> GP <em>=B3+B4</em> · <em>B6</em> opex <em>=-B3*$B$12</em> · <em>B7</em> EBITDA <em>=B5+B6</em> · <em>B8</em> margin <em>=B7/B3</em> · fill each row B:F →',
-    guide:[
-      'grow the top line: C3 · <kbd>=B3*(1+$B$10)</kbd> — prior year × the anchored growth · fill C3:F3 →',
-      'cost of sales at B4 · <kbd>=-B3*$B$11</kbd> · gross profit at B5 · <kbd>=B3+B4</kbd> · fill both right',
-      'opex at B6 · <kbd>=-B3*$B$12</kbd> · EBITDA at B7 · <kbd>=B5+B6</kbd> · fill both right',
-      'the margin line at B8 · <kbd>=B7/B3</kbd> · fill B8:F8 → · <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>%</kbd> if it needs it',
-    ],
-    targets:['B6:F6','C7:F7','B8:F8','B10:F10','B8:F8'],
-    demo(){ return [
-      {sel:'C3', keys:[...T('=B3*(1+$B$10)'), Kb.enter]},
-      {sel:'C3:F3', keys:[Kb.fillR]},
-      {sel:'B4', keys:[...T('=-B3*$B$11'), Kb.enter]},
-      {sel:'B4:F4', keys:[Kb.fillR]},
-      {sel:'B5', keys:[...T('=B3+B4'), Kb.enter]},
-      {sel:'B5:F5', keys:[Kb.fillR]},
-      {sel:'B6', keys:[...T('=-B3*$B$12'), Kb.enter]},
-      {sel:'B6:F6', keys:[Kb.fillR]},
-      {sel:'B7', keys:[...T('=B5+B6'), Kb.enter]},
-      {sel:'B7:F7', keys:[Kb.fillR]},
-      {sel:'B8', keys:[...T('=B7/B3'), Kb.enter]},
-      {sel:'B8:F8', keys:[Kb.fillR]},
+    /* r449 H6b-FB (DEPTH_PASS §4.83, "Build the operating model") — the depth-pass rework, built
+       to §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (the later law wins on conflict)
+       and to dev/MODELING_STANDARDS.md §1/§2/§4/§7.
+
+       WAS: `ROWS:13` — 13 rows of the real 20-row sheet — with FOUR checks against a `guide` of
+       four and a `targets` of FIVE (the §1.9 index-pair contract broken outright: targets[4] rang
+       a range no check graded), no ☆ at all, no `saveClose`, three checklist lines opening with
+       the non-list verb "run", a prompt that narrated the route ("build column one, fill the whole
+       model right" — §1.0-R4(t) rule 2), an `aha` written in sentence case with an arrow glyph,
+       and every one of the four checks reading ranges out of FORMULA TEXT (`refs('C3',['B3','B10'])`,
+       `refs('B4',['B3','B11'])`, `refs('B7',['B5','B6'])`, `refs('B8',['B7','B3'])`) — the
+       CAMPAIGN §1 untriggerable class, four instances in one drill.
+
+       ── §3 DISTINCTNESS DISCRIMINATOR vs the rebuilt `isbuild` §4.78 (r448 AUDIT obligation,
+          run FIRST, before the board was designed) ──────────────────────────────────────────────
+       The two §4 pages spec nearly the same beat list, and `isbuild` shipped last wave with
+       beats 2/3/4/6 word-for-word what §4.83 asks for here. CAMPAIGN §3's discriminator is not
+       "do these look alike" but "does fluency in one produce a correct FIRST ATTEMPT at the
+       other?" — so the answer had to be built, not argued:
+         · `isbuild` grows the top line: revenue_t = revenue_(t-1) × (1 + growth). ONE recursive
+           line, one driver, and an actual year to grow from.
+         · here the top line is not grown at all. Revenue is a PRODUCT of two lines the player
+           must build first — units × price — each recursive off its OWN driver, and the cost of
+           goods is priced PER UNIT (unit cost × units), not as a percent of revenue.
+       An `isbuild`-fluent player's first attempt on this board is `=prior*(1+growth)` on the
+       Revenue row, and there is no revenue-growth driver on the panel to point it at. They must
+       read the panel and discover that revenue is assembled, not grown. (The compound form
+       `=prior_revenue*(1+unit growth)*(1+price growth)` is algebraically identical here and DOES
+       clear the revenue beat — §1.0(c) freedom, walked in dev/verify-opmodel.js §C — but it does
+       not build the units or the price line, which are beat 1.) Distinct, and distinct in the
+       place the r448 AUDIT note named: the volume×price revenue driver. `isbuild`'s EBIT line is
+       absent here, as the note also requires — this fragment stops at EBITDA.
+       Two consequences of the unit-cost COGS worth stating, because they are what make the board
+       an OPERATING model rather than a second income statement: (a) the unit growth driver moves
+       revenue AND cost of goods, while the price growth driver moves revenue and operating
+       expenses but NOT cost of goods, so the two drivers are not interchangeable; (b) the EBITDA
+       margin therefore MOVES across the plan instead of being constant by construction the way
+       `isbuild`'s memo is — the memo line is a forecast in its own right here, not a check on two
+       drivers. SHARED TAIL, declared: beats 4/5/6 (the EBITDA subtotal, its dress, the margin
+       memo) are the same work `isbuild` closes with. CAMPAIGN §3 says a redundancy usually lives
+       in the shared tail; this one is the standard P&L close and cutting it would leave the page
+       without a subtotal, so it stays and is declared rather than disguised.
+
+       ── ☆-HEADROOM DIAGNOSTIC, BOTH PARTS (CAMPAIGN §2), run BEFORE the board was designed and
+          re-measured on the shipped board. Every selection and navigation KEYED; setDemoSel only
+          parks the cursor entering a region, the same number of times in every route.
+         PART 1 — SPREAD: the ☆ route 92 keys · the slowest legal route 340 (no anchors, no
+           fills, no clipboard — every cell of every line typed year by year, the memo percented
+           one cell at a time). 3.70×, and the slow route is if anything UNDER-charged: it takes
+           26 parks to the others' 12.
+         PART 2 — WHAT SURVIVES THE STRIP: only a handful of keys of that spread are
+           chord-vs-ribbon (Ctrl+C/V vs Alt H V, Ctrl+B vs Alt H 1, Alt H B P vs the Cell Styles
+           Total) — §1.0(c) forces those to clear — and ZERO are formatting (the only graded dress
+           is a core beat). Everything else is carry-versus-retype over a nine-row, five-column
+           block. Legal headroom. KEEP.
+
+       ── ☆ FAMILY BAKE-OFF (wave-6 addendum: measure the families on the identical job and ship
+          the numbers; prefer non-fill at comparable headroom). Full solves on the SHIPPED board,
+          3 seeds each, dev/verify-opmodel.js §B, every route asserted to clear all six cores and
+          every route handed the SAME TWELVE setDemoSel parks so the deltas are pure mechanics:
+            · one clipboard carry — the plan column copied once, the selection widened
+              across the plan, one paste                                                  92 keys
+            · one block FILL — the same column, one Ctrl+R over the whole rect             91
+            · per-line fills — the taught control and the ☆'s negative control            112
+            · autosum provenance (Alt+= on EBITDA) + per-line fills (S.autoSumN)          103
+            · Ctrl+Enter multi-commit per line (S.multiEnter, `anchor`'s family)          179
+            · the slowest legal route — every cell typed, no anchors, no carry            340
+          (medians over 3 seeds; the seed-to-seed spread is ±1 key — the year labels and the
+          driver rates are the only digits whose length moves.)
+            · independent prove-out — NOT ADMISSIBLE: §1.0-R4(u) allows it only where a
+              pre-playtest page already specced it, and §4.83 does not.
+       PARK PARITY IS THE PART THAT HAD TO BE FIXED, and it is worth recording because the first
+       run of the probe got it wrong in the way CAMPAIGN §4 warns about: setDemoSel costs no keys,
+       so the clipboard route — handed two free parks the block fill did not get — measured 11
+       keys AHEAD, which was an artifact, not a finding. Equalised at twelve parks each, the two
+       land within ONE KEY of each other: the clipboard costs exactly one extra keystroke (copy,
+       then widen the selection right and paste over the whole plan including its own source
+       column, which the engine tiles) and the seed-to-seed digit spread is the same size.
+       THE CLIPBOARD CARRY SHIPS, and the reason is family spacing, not the raw number.
+       §1.0-R4(u): "no two ADJACENT drills share a family". `threestmt` sits immediately before
+       this drill in the Full Builds order and its ☆ is the one-pass CARRY read off
+       fillOps ∪ multiEnter ∪ pasteLog; `isbuild`, `cfslink` and `nwcsched` are the same family
+       again, so the fill/one-pass family is already four deep in this chapter AND adjacent.
+       The clipboard clone is `bsbuild`'s family — once in this chapter, four drills away, and
+       there it clones ONE total row rather than a whole column of live formulas. The block fill
+       stays completely legal and clears every core with the star dark (walked, ALT 1). The
+       addendum asks for a non-fill family at COMPARABLE headroom and the measured cost of the
+       preference here is ONE key — the recurrence §1.0-R4(u) asks to be DECLARED rather than
+       assumed, and this one costs the player a single keystroke.
+       What it teaches that a fill does not: a column of live formulas travels through the
+       clipboard with its relative references translated and its anchors held — the copy IS the
+       model — and the source rect is nine rows spanning TWO blank spacer rows and a memo line
+       that sits outside the P&L block, so the discovery is that the whole plan year is one
+       object, not four separate line carries.
+       ── SKIPPABILITY PROOF (§1.0-R2(i)), measured not asserted: the taught per-line fill route
+       clears all six cores with the ☆ dark at 112 keys (20 more than the star), and the block
+       fill does the same at 91. Registered as ALT 1 (the ribbon fill carrying the block — a
+       different chord route AND the star's negative control) and ALT 2 (seven separate row fills
+       on a reversed build order); the slow typed route is the §1.0(c) freedom floor and is walked
+       in the probe.
+
+       ── UNTRIGGERABLE BEATS KILLED (CAMPAIGN §1 — all five found by WALKING routes, none by
+          reading the predicate; #5 is this pass's OWN, caught before it shipped):
+         (1) `refs('C3',['B3','B10'])` on the revenue line refused the compound form and every
+             route that reaches the same number without naming both cells.
+         (2) `refs('B4',['B3','B11'])` on the cost line refused `=-(B3*$B$11)`, the typed-rate
+             form, and the point-mode route that lands `B$11` after an F4 cycle.
+         (3) `refs('B7',['B5','B6'])` on EBITDA refused `=SUM(...)` outright — the single most
+             likely way anybody writes a subtotal — because SUM's text names a RANGE, not the two
+             cells. A player who autosummed the column had a correct board and a dark line.
+         (4) `refs('B8',['B7','B3'])` on the margin refused `=1-...` and every equivalent.
+         (5) THIS PASS'S OWN, and it only existed for one probe run: the margin memo graded
+             against the EXACT model margin at one display step. A player who wraps the money
+             lines in ROUND(...,0) — the standard desk habit on a plan page — moves EBITDA by up
+             to half a million on each of three lines, so the ratio computed from their own board
+             sits up to ~0.7pp off the model's and the line went dark on a page that was
+             internally perfect. Fixed by grading the ratio against the two cells STANDING IN THE
+             SAME COLUMN (see the predicate). Reading the predicate would never have found it;
+             walking the route did, on the first run.
+       NOTHING in this rework reads formula text. Every build beat grades a LIVE formula (doctrine
+       §2.2 exception 1; MODELING_STANDARDS §1 makes "no typed answers" a convention on a model
+       page) plus the VALUE on screen at a tolerance wider than one display step, so:
+         · units and price clear from `=B5*(1+$B$16)`, `=B5+B5*$B$16`, the unanchored `=B5*(1+B16)`
+           typed year by year, the column-only `$B16`, and the pointer/F4 routes;
+         · revenue clears from `=C5*C6`, `=C6*C5`, and from the compound
+           `=B8*(1+$B$16)*(1+$B$17)`, which is the same number by construction;
+         · cost of goods clears from `=-C5*$B$18`, `=-($B$18*C5)`, `=C5*-$B$18`;
+         · operating expenses clear from `=-C8*$B$19` and its algebraic twins;
+         · EBITDA clears from `=SUM(C8:C10)`, `=C8+C9+C10`, Alt+= over the block, and
+           `=SUM(C8:C9)+C10`;
+         · the margin memo clears from `=C11/C8` and from the driver-side identity.
+       THE BORDER PREDICATE IS THE ONE THAT NEEDED THE WALK and it was walked (§C of the probe):
+       Alt H B P writes `bt`; Alt H B T and Alt H B D write `bt`+`bb`; Alt H B S across a one-row
+       multi-cell selection writes `bt`+`bb`; Alt H B S on a 1×1 selection and Alt H B A both
+       write `ball` and never `bt`. So the check reads `bold && (bt || ball)` and never rejects
+       `bb` — the LENIENT reading of the r446b border-dress fork, the same one `isbuild`,
+       `nwcsched` and `threestmt` adopted, which is why the label carries no "no rule underneath"
+       scope clause (that clause is mandatory only on the STRICT reading). Alt H B O and Alt H B B
+       correctly stay dark: both leave a rule UNDER the total, the house error §1.0(f) names.
+
+       ── §1.0-R4(t) THE REALITY TEST. Chapter 8 is audience B on the §3.1 map, and this is the
+       page a first-year rebuilds every time the commercial team re-cuts the volume plan: an
+       operating case driven off units and price, with the actual year linked in from the
+       reporting pack. It is also the most audience-A-legible board in the chapter — an FP&A
+       analyst builds exactly this for a product line — which is §1.0-R4(t) rule 5 satisfied
+       without converting the artifact. Real column headers, real row labels, real magnitudes,
+       stated units, a basis memo, a labelled driver panel: a file, not a grid.
+
+       ── MODELING_STANDARDS conventions carried ───────────────────────────────────────────────
+       · §1 COLOUR-AS-PROVENANCE, and this board uses the ink the catalog under-uses. GREEN = the
+         whole FY actual column (units, price, revenue, cost of goods, operating expenses) —
+         those LINK from the reporting-pack tab, which is what green means; BLUE = the four
+         driver cells, and nothing else on the page, which is exactly right for an operating
+         model (the driver panel is the only place a human types); BLACK = everything computed on
+         this sheet, including the actual year's EBITDA subtotal and margin memo, because those
+         are re-footed here rather than linked. No red: nothing on this fragment is flagged.
+       · §1 NO HARDCODES INSIDE FORMULAS. All four rates live in labelled cells; every built line
+         points at them.
+       · §1 STRUCTURE: the EBITDA subtotal wears a TOP border and never a rule underneath
+         (§1.0(f)); units are stated in the title and in every row label that needs one ($mm,
+         mm units, $/unit); negatives render in parentheses through the comma format.
+       · §2 SIGN CONVENTION, stated on the board's basis line and held by every seeded row: costs
+         are NEGATIVE, so EBITDA is one clean SUM down the column.
+       · §4 STANDARD FORMS: revenue = units × price; variable cost = unit cost × units; operating
+         expenses = a percent of revenue; EBITDA = revenue plus the two signed cost lines; the
+         memo is EBITDA / revenue.
+       · §7 THE COMPONENT RULE: a driver block feeding one statement across five plan years is a
+         COMPONENT, not a model. No balance sheet, no cash flow, no D&A, no tax, no EBIT — this
+         fragment stops at EBITDA and `isbuild`/`threestmt`/`dcfbuild` own what happens below it.
+       · §7 DELIBERATE SIMPLIFICATIONS, said out loud on the basis line so nobody learns one
+         without knowing it is one: (a) unit cost is held FLAT across the plan — that is what
+         makes the margin memo expand when price growth outruns it, and it is the simplification
+         a real model would replace with an input-cost curve; (b) one product line, no mix.
+
+       ── §1.0-R2(h)/§1.0-R3(q) NO cueCell(). There is no insert point and no empty paste
+       destination this board must name: every graded target is a labelled statement row inside
+       the period columns, which the green ring expresses exactly. Nothing graded spills — the
+       title, the sub-header, the Drivers head and the basis line are the only spilling cells and
+       none of them is a target.
+       ── §1.0(f)/§1.0-R2(l) HELPER STACK: the four drivers are vertically stacked under their own
+       section head, individually labelled, light yellow, all-bordered and POPULATED. Using the
+       panel is the lesson; filling it in is not. */
+    name:'Op model', label:'Build the operating model', par:85, parKeys:81, saveClose:true,   /* r449: par re-swept from scratch on the rebuilt board — dev/e2e-par-sweep.js opmodel, 15-seed median 81 keys including the engine-appended Ctrl+S (range 80–81; the only movement across seeds is the digit-length of the year labels and the driver rates, so 81 is the count and not an average). WAS par 55 / parKeys 57 on a 13-row board with four beats, no ☆ and no save closer. par 85 ≈ 1.05 s/key, the house band. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 128 · pro 98 · legendary 85. ⚠ PLACEMENT SERIES (delta D16): opmodel is one of the five HK_PLACEMENT boards, so this par move shifts the placement bands — flagged to the orchestrator for Wolf's band call, not tuned around here. */
+    aha:'an operating model runs off its driver panel — units and price make the top line, and every cost under it traces back to the same four blue cells.',   /* §1.5: the page's own aha, rewritten to the lowercase em-dash voice and stripped of the arrow glyph. The moment it lands is the clipboard carry — one object leaves the first plan year and the whole page prices itself off four cells. */
+    prompt:'The commercial team just re-cut the volume and pricing plan and the deal team needs the five-year operating case before tomorrow morning. The actual year links in from the reporting pack and the driver panel is set — build the plan years off it: units, selling price, the top line, the two cost lines and EBITDA, mark the EBITDA line the way the deck reads it, and leave the margin memo underneath so the sponsor can see where the story goes.',
+    req(){ const o=this._o; return '<em>'+o.vol1+'</em> ='+o.vol0+'*(1+'+o.gUA+') · <em>'+o.prc1+'</em> ='+o.prc0+'*(1+'+o.gPA+') · <em>'+o.rev1+'</em> ='+o.vol1+'*'+o.prc1+' · <em>'+o.cog1+'</em> =-'+o.vol1+'*'+o.ucA+' · <em>'+o.opx1+'</em> =-'+o.rev1+'*'+o.oPA+' · <em>'+o.ebd1+'</em> =SUM('+o.rev1+':'+o.opx1+') · <em>'+o.mgn1+'</em> ='+o.ebd1+'/'+o.rev1+' + <em>ctrl+1 p</em> · copy <em>'+o.planCol+'</em> → paste <em>'+o.planAll+'</em> · <em>'+o.ebdRow+'</em> <em>ctrl+b</em> + <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the checklist names OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every door the engine opens, because all of them grade. */
+    guide(){ const o=this._o; return [
+      'units at '+o.vol1+' · <kbd>='+o.vol0+'*(1+'+o.gUA+')</kbd> and price at '+o.prc1+' · <kbd>='+o.prc0+'*(1+'+o.gPA+')</kbd> — the driver cell anchored, the prior year left relative so it walks (<kbd>F4</kbd> cycles the anchor if you point instead of type)',
+      'the top line at '+o.rev1+' · <kbd>='+o.vol1+'*'+o.prc1+'</kbd> — millions of units times dollars per unit is dollars in millions',
+      'cost of goods at '+o.cog1+' · <kbd>=-'+o.vol1+'*'+o.ucA+'</kbd>, priced per unit rather than off the top line · operating expenses at '+o.opx1+' · <kbd>=-'+o.rev1+'*'+o.oPA+'</kbd> · the minus is what keeps the subtotal a sum',
+      'EBITDA at '+o.ebd1+' · <kbd>=SUM('+o.rev1+':'+o.opx1+')</kbd>, or select '+o.ebdCol+' and <kbd>alt</kbd>+<kbd>=</kbd> for the same sum',
+      'select '+o.ebdRow+' · <kbd>ctrl</kbd>+<kbd>b</kbd> (or <kbd>alt</kbd> <kbd>h</kbd> <kbd>1</kbd>) · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> for the top border (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>s</kbd> around the row lands it too)',
+      'the memo at '+o.mgn1+' · <kbd>='+o.ebd1+'/'+o.rev1+'</kbd> · <kbd>ctrl</kbd>+<kbd>1</kbd> then <kbd>p</kbd> lands percent at one decimal in one move (<kbd>alt</kbd> <kbd>h</kbd> <kbd>p</kbd> lands zero, then <kbd>alt</kbd> <kbd>h</kbd> <kbd>0</kbd>)',
+      '☆ the discovery: finish the FIRST plan year top to bottom, memo included, then select the whole column '+o.planCol+', <kbd>ctrl</kbd>+<kbd>c</kbd>, widen the selection to '+o.planAll+' and one <kbd>ctrl</kbd>+<kbd>v</kbd> prices every remaining year (landing it on '+o.planRest+' instead does the same) — filling line by line clears the drill too, it just costs time',
     ]; },
+    /* rings: (1) the units and price block · (2) the top line · (3) the two cost lines
+       · (4) EBITDA · (5) the EBITDA row · (6) the margin memo · the star is never ringed
+       (r423 §2 mystery slot) */
+    targets(){ const o=this._o; return [o.volRect, o.revRng, o.costRect, o.ebdRng, o.ebdRow, o.mgnRng, null]; },
+    demo(){ const o=this._o; return [
+      {sel:o.vol1, keys:[...T('='+o.vol0+'*(1+'+o.gUA+')'), Kb.enter, ...T('='+o.prc0+'*(1+'+o.gPA+')'), Kb.enter]},
+      {sel:o.rev1, keys:[...T('='+o.vol1+'*'+o.prc1), Kb.enter,
+                         ...T('=-'+o.vol1+'*'+o.ucA), Kb.enter,
+                         ...T('=-'+o.rev1+'*'+o.oPA), Kb.enter,
+                         ...T('=SUM('+o.rev1+':'+o.opx1+')'), Kb.enter]},
+      {sel:o.mgn1, keys:[...T('='+o.ebd1+'/'+o.rev1), Kb.enter]},
+      {sel:o.mgn1, keys:[{key:'1',ctrl:true}, L('p')]},
+      /* the star rides here in the middle of the run like any other action — its state latches at
+         the win (r421 §2.2): ONE copy of the finished plan year, ONE paste over the other four */
+      {sel:o.planCol, keys:[Kb.copy]},
+      {sel:o.planAll, keys:[Kb.paste]},
+      {sel:o.ebdRow,   keys:[Kb.bold]},
+      {sel:o.ebdRow,   keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — operating model ($mm)',txt:true,bold:true};
+      /* §1.2 randomization — FOUR independent axes on a full-grid artifact, which §1.2 lets
+         substitute corner jitter for a site pool: (a) CORNER JITTER in both axes — the page
+         anchors at column A or B and the header row sits at 3 or 4, so every graded cell moves;
+         (b) the deal codename and the product line are drawn from pools and the fiscal base year
+         through rnd(); (c) every figure and every driver goes through rnd(); (d) WHICH DRIVER
+         LEADS THE PLAN — a volume-led seed grows units 6.0–10.0% against 0.8–1.8% on price, a
+         price-led seed inverts it, so the same board tells a different commercial story and the
+         margin memo bends a different way. */
+      const c0=rnd(1,2), L0=colLetter(c0);
+      const cA=c0+1, cP0=c0+2, cPn=c0+6;
+      const YC=i=>colLetter(cA+i);
+      const rHdr=rnd(3,4);
+      const rVol=rHdr+1, rPrc=rHdr+2;
+      const rRev=rHdr+4, rCog=rHdr+5, rOpx=rHdr+6, rEbd=rHdr+7;
+      const rMgn=rHdr+9;
+      const rDrv=rHdr+11, rG=rHdr+12, rP=rHdr+13, rU=rHdr+14, rO=rHdr+15;
+      const rBas=rHdr+16;
+      const LINES=['handsets','industrial sensors','diagnostic kits','smart meters','packaged snacks','network cards'];
+      const line=LINES[rnd(0,LINES.length-1)];
       const y0=rnd(24,27);
-      for(let i=0;i<5;i++) cells[colLetter(i+2)+2]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
-      cells['A3']={...blankCell(),value:'Revenue',txt:true};
-      cells['A4']={...blankCell(),value:'Less: COGS',txt:true};
-      cells['A5']={...blankCell(),value:'Gross profit',txt:true,bold:true};
-      cells['A6']={...blankCell(),value:'Less: opex',txt:true};
-      cells['A7']={...blankCell(),value:'EBITDA',txt:true,bold:true};
-      cells['A8']={...blankCell(),value:'EBITDA margin',txt:true};
-      cells['A10']={...blankCell(),value:'Revenue growth',txt:true};
-      cells['A11']={...blankCell(),value:'COGS % of rev',txt:true};
-      cells['A12']={...blankCell(),value:'Opex % of rev',txt:true};
-      const rev0=rnd(80,200)*10, grow=rnd(5,15)/100, cogsP=rnd(45,62)/100, opexP=rnd(12,24)/100;
-      cells['B3']={...blankCell(),value:rev0,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['B10']={...blankCell(),value:grow,fontColor:'blue',fmtStyle:'percent',decimals:0};
-      cells['B11']={...blankCell(),value:cogsP,fontColor:'blue',fmtStyle:'percent',decimals:0};
-      cells['B12']={...blankCell(),value:opexP,fontColor:'blue',fmtStyle:'percent',decimals:0};
-      for(let i=0;i<5;i++){ const col=colLetter(i+2);
-        if(i>0) cells[col+3]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+4]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-        cells[col+6]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+7]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
-        cells[col+8]={...blankCell(),fmtStyle:'percent',decimals:1};
+
+      /* THE DRIVERS. Four cells, three shapes: two growth rates, a unit cost and a percent of
+         revenue — the only typed cells on the page (MODELING_STANDARDS §1). */
+      /* the growth pair is deliberately BOUNDED, not just randomised: unit cost is held flat
+         across the plan (the §7 simplification named on the basis line), so every point of price
+         growth drops straight through to the margin memo. At the ranges below the memo moves a
+         defensible ~4–10pp over five years — a management case, not a fantasy. A wider price
+         range was measured on screen first and read as one (7.7% for five years lifted the memo
+         27.9% → 42.3%), which fails §1.0-R4(t)'s reality test on the artifact rather than on the
+         mechanics, so the range came down instead of the memo being hidden. */
+      const led=rnd(0,1);
+      const gU=(led ? rnd(10,25) : rnd(60,100))/1000;
+      const gP=(led ? rnd(25,40) : rnd(8,18))/1000;
+      const vol0=rnd(80,150)/10;
+      const prc0=rnd(2800,4600)/100;
+      const uc=Math.round(prc0*rnd(48,58))/100;
+      const oPct=rnd(180,260)/1000;
+
+      cells[L0+'1']={...blankCell(),value:codename()+' — '+line+' operating model ($mm)',txt:true,bold:true};
+      cells[L0+(rHdr-1)]={...blankCell(),value:'Fiscal years ending December · FY'+y0+'A actual, FY'+(y0+1)+'E–FY'+(y0+5)+'E plan',txt:true,it:true,fontColor:'gray'};
+      cells[L0+rHdr]={...blankCell(),bb:true};
+      cells[YC(0)+rHdr]={...blankCell(),value:'FY'+y0+'A',txt:true,bold:true,align:'r',bb:true};
+      for(let i=1;i<=5;i++) cells[YC(i)+rHdr]={...blankCell(),value:'FY'+(y0+i)+'E',txt:true,bold:true,align:'r',bb:true};
+
+      [[rVol,'Units shipped (mm)'],[rPrc,'Average selling price ($)'],
+       [rRev,'Revenue'],[rCog,'Cost of goods sold'],[rOpx,'Operating expenses'],[rEbd,'EBITDA']]
+        .forEach(([r,n])=>{ cells[L0+r]={...blankCell(),value:n,txt:true}; });
+      cells[L0+rMgn]={...blankCell(),value:'Memo: EBITDA margin %',txt:true};
+
+      cells[L0+rDrv]={...blankCell(),value:'Drivers',txt:true,bold:true};
+      cells[L0+rG]={...blankCell(),value:'Unit growth',txt:true};
+      cells[L0+rP]={...blankCell(),value:'Price growth',txt:true};
+      cells[L0+rU]={...blankCell(),value:'Unit cost ($/unit)',txt:true};
+      cells[L0+rO]={...blankCell(),value:'Opex % of revenue',txt:true};
+      /* §1.0(f) input convention + §1.0-R2(l) labelled, vertically stacked helper stack — light
+         yellow, all borders, POPULATED, blue ink because these are the page's only hardcodes.
+         The panel is stacked in the SAME order as the lines it drives. */
+      [[rG,gU,'percent',1],[rP,gP,'percent',1],[rU,uc,'comma',2],[rO,oPct,'percent',1]].forEach(([r,v,st,dp])=>{
+        cells[YC(0)+r]={...blankCell(),value:v,fontColor:'blue',fill:'yellow',ball:true,fmtStyle:st,decimals:dp,align:'c'}; });
+
+      /* THE NUMBERS. Simulated forward once so the linked actual column and the expected plan can
+         never disagree. The actual year is HISTORY: it ran at its own realised unit cost and its
+         own realised opex ratio, within a point or two of the plan's, so the memo line opens on a
+         real number instead of the plan's first year repeated. */
+      const ucA0=uc*(1+rnd(-40,40)/1000), oA0=oPct+rnd(-15,15)/1000;
+      this._exp=[]; let vol=vol0, prc=prc0;
+      for(let i=0;i<=5;i++){
+        if(i>0){ vol=vol*(1+gU); prc=prc*(1+gP); }
+        const rev=vol*prc;
+        const cog=(i===0)? -Math.round(vol*ucA0) : -vol*uc;
+        const opx=(i===0)? -Math.round(rev*oA0)  : -rev*oPct;
+        const ebd=rev+cog+opx;
+        this._exp.push({vol:vol,prc:prc,rev:rev,cog:cog,opx:opx,ebd:ebd,mgn:ebd/rev});
       }
-      this._exp=[]; let rev=rev0;
-      for(let i=0;i<5;i++){ const cogs=-rev*cogsP, gp=rev+cogs, opex=-rev*opexP, ebitda=gp+opex;
-        this._exp.push({rev:rev,cogs:cogs,gp:gp,opex:opex,ebitda:ebitda,margin:ebitda/rev});
-        rev=rev*(1+grow); }
-      return {ROWS:13, cells, active:{r:3,c:3}, sel:null, colW:{1:150,2:84,3:84,4:84,5:84,6:84}};
+      const E=this._exp;
+
+      /* THE ACTUAL COLUMN arrives finished and GREEN — units, price, revenue and both cost lines
+         LINK from the reporting-pack tab (MODELING_STANDARDS §1: green = a link off this sheet,
+         "the one the catalog under-uses"). Its subtotal and its memo are BLACK, because they are
+         re-footed here rather than linked — which is also what gives the player a worked example
+         of the two shapes the plan column has to repeat. */
+      [[rVol,E[0].vol,1],[rPrc,E[0].prc,2],[rRev,E[0].rev,0],[rCog,E[0].cog,0],[rOpx,E[0].opx,0]]
+        .forEach(([r,v,dp])=>{ cells[YC(0)+r]={...blankCell(),value:v,fontColor:'green',fmtStyle:'comma',decimals:dp}; });
+      cells[YC(0)+rEbd]={...blankCell(),formula:'=SUM('+YC(0)+rRev+':'+YC(0)+rOpx+')',value:E[0].ebd,fmtStyle:'comma',decimals:0};
+      cells[YC(0)+rMgn]={...blankCell(),formula:'='+YC(0)+rEbd+'/'+YC(0)+rRev,value:E[0].mgn,fmtStyle:'percent',decimals:1};
+
+      for(let i=1;i<=5;i++){
+        const C=YC(i);
+        /* the plan years ship EMPTY but pre-formatted, so a built figure lands in its row's own
+           format and no raw general float ever prints (r430: number formats auto-widen, but a
+           twelve-significant-digit float would show first). */
+        cells[C+rVol]={...blankCell(),fmtStyle:'comma',decimals:1};
+        cells[C+rPrc]={...blankCell(),fmtStyle:'comma',decimals:2};
+        [rRev,rCog,rOpx,rEbd].forEach(r=>{ cells[C+r]={...blankCell(),fmtStyle:'comma',decimals:0}; });
+        /* the memo ships as a NUMBER format, never a percent — landing percent at one decimal is
+           beat 6, and a pre-percented cell would grade a format the board already carries */
+        cells[C+rMgn]={...blankCell(),fmtStyle:'comma',decimals:1};
+      }
+
+      /* the basis memo MODELING_STANDARDS §2 and §7 require: the sign convention on the board and
+         every teaching simplification named out loud */
+      cells[L0+rBas]={...blankCell(),value:'Basis: one product line, no mix · unit cost held flat across the plan · costs shown negative · FY'+y0+'A links from the reporting pack',txt:true,it:true,fontColor:'gray'};
+
+      const B0=YC(0), B1=YC(1), Bn=YC(5);
+      this._o={ c0:c0, cA:cA, cP0:cP0, cPn:cPn, rHdr:rHdr, rVol:rVol, rPrc:rPrc, rRev:rRev,
+        rCog:rCog, rOpx:rOpx, rEbd:rEbd, rMgn:rMgn, rDrv:rDrv, rG:rG, rP:rP, rU:rU, rO:rO,
+        rBas:rBas, led:led,
+        gUA:'$'+B0+'$'+rG, gPA:'$'+B0+'$'+rP, ucA:'$'+B0+'$'+rU, oPA:'$'+B0+'$'+rO,
+        vol0:B0+rVol, prc0:B0+rPrc,
+        vol1:B1+rVol, prc1:B1+rPrc, rev1:B1+rRev, cog1:B1+rCog, opx1:B1+rOpx, ebd1:B1+rEbd, mgn1:B1+rMgn,
+        volRect:B1+rVol+':'+Bn+rPrc, revRng:B1+rRev+':'+Bn+rRev,
+        costRect:B1+rCog+':'+Bn+rOpx, ebdRng:B1+rEbd+':'+Bn+rEbd, mgnRng:B1+rMgn+':'+Bn+rMgn,
+        ebdCol:B1+rRev+':'+B1+rEbd, ebdRow:L0+rEbd+':'+Bn+rEbd,
+        planCol:B1+rVol+':'+B1+rMgn, planAll:B1+rVol+':'+Bn+rMgn, planRest:YC(2)+rVol+':'+Bn+rMgn };
+
+      /* WIDTH (r441 helpers — never a hand-derived metric). The label column's longest occupant
+         in a row whose period columns are OCCUPIED is 'Average selling price ($)', 25 glyphs, so
+         render() grants it no spill: 25 × TXTPX 6.9 + PAD_TXT 20 = 192.5, and clipsCol() amputates
+         anything narrower. 204 clears it with a margin. The title, the sub-header, the Drivers
+         head and the basis line are longer but sit in rows whose neighbours are empty, so they
+         spill exactly as render() spills them. The period columns carry '(1,316)' at worst —
+         7 glyphs × CHARPX 8.6 + PAD_NUM 12 = 72.2 — so 84 holds every seed, and the solved sheet
+         is 204 + 6×84 = 708px inside the r333 frame. This drill grades NO width verdict, so it is
+         NOT in the __noShrink set and the elastic fit is free to scale it (r441). */
+      const colW={}; colW[c0]=204;
+      for(let c=cA;c<=cPn;c++) colW[c]=84;
+      return {ROWS:20, cells, active:{r:rVol,c:cP0}, sel:null, colW:colW};
     },
     checks(S){
-      const E=this._exp;
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(Math.abs(exp)*2e-3,0.5); };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D','E','F'];
+      const o=this._o, E=this._exp;
+      const cel=k=>S.cells[k]||{};
+      const YC=i=>colLetter(o.cA+i);
+      /* §1.0-R3(p): a build beat reads a LIVE formula plus the number on screen, never the
+         formula's TEXT. The live-formula requirement is doctrine §2.2 exception 1 and
+         MODELING_STANDARDS §1 — typed figures on a model page are the habit this chapter exists
+         to train out. Tolerances sit wider than one display step at each row's own decimals, so
+         a player who points, types, anchors with F4, wraps in ROUND() or writes the algebraically
+         equal form clears identically (§1.0(c)); the clock is what prices the slow route. */
+      const live=(k,want,tol)=>{ const c=cel(k);
+        return !!c.formula && typeof c.value==='number' && Math.abs(c.value-want)<=tol; };
+      const row=(r,pick,tol)=>[1,2,3,4,5].every(i=>live(YC(i)+r, pick(E[i]), tol(E[i])));
+      const money=e=>Math.max(1.6,Math.abs(e.rev)*2e-3);
+      const volOk=row(o.rVol,e=>e.vol,e=>Math.max(0.03,e.vol*3e-3));
+      const prcOk=row(o.rPrc,e=>e.prc,e=>Math.max(0.03,e.prc*3e-3));
+      const revOk=row(o.rRev,e=>e.rev,money);
+      const cogOk=row(o.rCog,e=>e.cog,money);
+      const opxOk=row(o.rOpx,e=>e.opx,money);
+      const ebdOk=row(o.rEbd,e=>e.ebd,money);
+      /* beat 6: the ratio live, and PERCENT AT ONE DECIMAL on the board. Ctrl+1 P lands one
+         decimal outright; Alt H P and Ctrl+Shift+% land zero and want one more move — all three
+         reach the same end state, which is what is graded (CAMPAIGN §1 route facts).
+         THE RATIO IS GRADED AGAINST THE BOARD'S OWN TWO CELLS, not only against the model —
+         found by WALKING, not by reading (dev/verify-opmodel.js §C, probe `rounded`). A player
+         who wraps the money lines in ROUND(...,0), which is what a desk actually does to a plan
+         page, shifts EBITDA by up to half a million on each of three lines; the ratio they then
+         compute is CORRECT FOR THE NUMBERS ON THEIR BOARD but sits up to ~0.7pp off the exact
+         model margin, so a band tight enough to be meaningful against the model stranded them —
+         a perfect, internally consistent page with a dark line, §1.0-R3(p) exactly. So the beat
+         accepts EITHER: within 0.1pp of the EBITDA and Revenue standing in the same column
+         (the ROUND route, and the honest reading of "EBITDA divided by revenue"), OR within
+         0.1pp of the exact model margin (the driver-side identity 1 − unit cost/price − opex%,
+         which is the same number by construction and never touches the two cells). Both bands
+         are one display step wide; the beats above already pin the two cells to the model. */
+      const num=k=>{ const c=cel(k); return typeof c.value==='number' ? c.value : null; };
+      const mgnOk=[1,2,3,4,5].every(i=>{ const c=cel(YC(i)+o.rMgn);
+        if(!c.formula || typeof c.value!=='number') return false;
+        if(c.fmtStyle!=='percent' || (c.decimals|0)!==1) return false;
+        const eb=num(YC(i)+o.rEbd), rv=num(YC(i)+o.rRev);
+        const onBoard = (eb!==null && rv) ? Math.abs(c.value-eb/rv)<=1e-3 : false;
+        return onBoard || Math.abs(c.value-E[i].mgn)<=1e-3; });
+      /* beat 5: bold + a TOP border on the EBITDA line, across every period column including the
+         actual year. `bt || ball` is the LENIENT r446b reading (see the header comment): Alt H B P,
+         Alt H B T, Alt H B D and Alt H B S across the row all land bt; Alt H B A and a
+         cell-at-a-time Alt H B S land ball. Alt H B O / Alt H B B stay dark and should — they
+         leave a rule UNDER the total, the house error §1.0(f) names. */
+      const dressOk=[0,1,2,3,4,5].every(i=>{ const c=cel(YC(i)+o.rEbd); return !!(c.bold && (c.bt||c.ball)); });
+      /* the star — ONE clipboard op carries the finished first plan year onto the other four. Read
+         off the r425 S.pasteLog latch (the MECHANIC, never geometry inferred from the end state),
+         so Ctrl+V, Alt H V V and the legacy Alt E S dialog all earn it identically (§1.0(c)); a
+         values-only paste lands dead numbers and fails the cores instead. The source rect must
+         START at the first plan column and SPAN the whole plan year from units to the memo — nine
+         rows across two blank spacers — and the landed rect must begin at the second plan year and
+         reach the last, so four separate column pastes, a partial carry, or a paste of one line
+         can never light it. The block fill and the per-line fills clear every core beat with it
+         dark, both measured and both walked as alt-paths entries. */
+      const starOk = volOk && prcOk && revOk && cogOk && opxOk && ebdOk && mgnOk &&
+        (S.pasteLog||[]).some(p=>p.sc===o.cP0 && p.sr<=o.rVol && p.sr+p.sh-1>=o.rMgn
+          && p.r0<=o.rVol && p.r0+p.h-1>=o.rMgn && p.c0<=o.cP0+1 && p.c0+p.w-1>=o.cPn);
       return [
-        {label:'grow the revenue line — prior year × the anchored growth, filled across', ok:[1,2,3,4].every(i=>near(COL[i]+'3',E[i].rev)) && refs('C3',['B3','B10'])},
-        {label:'run COGS and gross profit — % of revenue, then revenue less COGS', ok:[0,1,2,3,4].every(i=>near(COL[i]+'4',E[i].cogs)&&near(COL[i]+'5',E[i].gp)) && refs('B4',['B3','B11']) && refs('B5',['B3','B4'])},
-        {label:'run opex and EBITDA — % of revenue, then GP less opex', ok:[0,1,2,3,4].every(i=>near(COL[i]+'6',E[i].opex)&&near(COL[i]+'7',E[i].ebitda)) && refs('B6',['B3','B12']) && refs('B7',['B5','B6'])},
-        {label:'run the EBITDA margin — EBITDA over revenue, all five years', ok:[0,1,2,3,4].every(i=>near(COL[i]+'8',E[i].margin)) && refs('B8',['B7','B3'])},
+        {label:'Build the units and selling price lines — all five plan years', ok: volOk&&prcOk},
+        {label:'Build the Revenue line — units times price, all five years', ok: revOk},
+        {label:'Build the cost of goods and operating expense lines — both negative', ok: cogOk&&opxOk},
+        {label:'Total EBITDA — revenue plus the two signed cost lines, all five years', ok: ebdOk},
+        {label:'Bold the EBITDA line and add a top border above it', ok: dressOk},
+        {label:'Build the EBITDA margin memo — percent, one decimal', ok: mgnOk},
+        {label:'Copy the first plan year across the plan — one paste', ok: starOk, bonus:true},
       ];
     }
   },

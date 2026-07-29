@@ -1681,6 +1681,48 @@ const ALTS = [
         {sel:o.Y0+o.rCash, keys:[R,R,...T('=+'+o.Y0+o.rEcash),CE]},
         {sel:o.Y0+o.rCni,  keys:[R,R,...T('='+o.Y0+o.rNi),CE]},
       ]; }` },
+  /* r449 (DEPTH_PASS §4.83 depth pass) — BOTH opmodel entries are NEW; opmodel was one of the
+     nine zero-ALT drills §1.8 names, so nothing is DELETED here. ALT 1 = chord ROUTE (ribbon
+     fill Alt H F I R for the carry, Alt H 1 for bold, Alt H B S for the rule, Alt H P + Alt H 0
+     for the percent, and an addition chain instead of SUM) — it is ALSO the measured ☆ NEGATIVE
+     CONTROL, because a fill is not a paste and the star latches on S.pasteLog alone. ALT 2 =
+     op ORDER (the total row dressed while it is still empty, the cost lines and the subtotal
+     built BEFORE the revenue they read, price before units, the memo last) with column-only
+     anchors and SEVEN separate row fills — cores clear, ☆ dark again. The ☆ state itself is
+     asserted in dev/verify-opmodel.js §B; this harness grades the win and never the star. */
+  { key: 'opmodel', name: 'RIBBON routes throughout (Alt H F I R carries the block · Alt H 1 bold · Alt H B S rule · Alt H P then Alt H 0 for the percent), EBITDA as an addition chain instead of SUM — every core clears and the ☆ is DARK, because a fill is not a paste', moves: `C => { const o=C._o;
+      const YC=i=>colLetter(o.cA+i), P=[0,1,2,3,4,5].map(YC);
+      const FR=[{key:'Alt'},L('h'),L('f'),L('i'),L('r')];
+      return [
+        {sel:P[1]+o.rVol, keys:[...T('='+P[0]+o.rVol+'*(1+'+o.gUA+')'),{key:'Enter'},
+                                ...T('='+P[0]+o.rPrc+'*(1+'+o.gPA+')'),{key:'Enter'}]},
+        {sel:P[1]+o.rRev, keys:[...T('='+P[1]+o.rPrc+'*'+P[1]+o.rVol),{key:'Enter'},
+                                ...T('=-'+o.ucA+'*'+P[1]+o.rVol),{key:'Enter'},
+                                ...T('=-'+o.oPA+'*'+P[1]+o.rRev),{key:'Enter'},
+                                ...T('='+P[1]+o.rRev+'+'+P[1]+o.rCog+'+'+P[1]+o.rOpx),{key:'Enter'}]},
+        {sel:P[1]+o.rMgn, keys:[...T('='+P[1]+o.rEbd+'/'+P[1]+o.rRev),{key:'Enter'}]},
+        {sel:P[1]+o.rMgn, keys:[{key:'Alt'},L('h'),L('p'),{key:'Alt'},L('h'),D(0)]},
+        {sel:o.planAll,   keys:FR},
+        {sel:o.ebdRow,    keys:[{key:'Alt'},L('h'),D(1),{key:'Alt'},L('h'),L('b'),L('s')]},
+      ]; }` },
+  { key: 'opmodel', name: 'op ORDER — the total row dressed FIRST while it is empty, then the cost lines and the subtotal built BEFORE the revenue they read (recalc closes them), price before units, the memo last; column-only anchors and seven separate row fills — every core clears, ☆ DARK', moves: `C => { const o=C._o;
+      const YC=i=>colLetter(o.cA+i), P=[0,1,2,3,4,5].map(YC);
+      const A=colLetter(o.cA);
+      const gU='$'+A+o.rG, gP='$'+A+o.rP, uc='$'+A+o.rU, oP='$'+A+o.rO;
+      const R={key:'ArrowRight',shift:true}, FR={key:'r',ctrl:true};
+      const fill=r=>({sel:P[1]+r, keys:[R,R,R,R,FR]});
+      return [
+        {sel:o.ebdRow,    keys:[{key:'b',ctrl:true},{key:'Alt'},L('h'),L('b'),L('p')]},
+        {sel:P[1]+o.rOpx, keys:[...T('=-'+P[1]+o.rRev+'*'+oP),{key:'Enter'}]},
+        {sel:P[1]+o.rCog, keys:[...T('=-'+P[1]+o.rVol+'*'+uc),{key:'Enter'}]},
+        {sel:P[1]+o.rEbd, keys:[...T('=SUM('+P[1]+o.rRev+':'+P[1]+o.rOpx+')'),{key:'Enter'}]},
+        {sel:P[1]+o.rPrc, keys:[...T('='+P[0]+o.rPrc+'*(1+'+gP+')'),{key:'Enter'}]},
+        {sel:P[1]+o.rVol, keys:[...T('='+P[0]+o.rVol+'*(1+'+gU+')'),{key:'Enter'}]},
+        {sel:P[1]+o.rRev, keys:[...T('='+P[1]+o.rVol+'*'+P[1]+o.rPrc),{key:'Enter'}]},
+        {sel:P[1]+o.rMgn, keys:[...T('='+P[1]+o.rEbd+'/'+P[1]+o.rRev),{key:'Enter'}]},
+        {sel:P[1]+o.rMgn, keys:[{key:'1',ctrl:true},L('p')]},
+        fill(o.rMgn), fill(o.rEbd), fill(o.rOpx), fill(o.rCog), fill(o.rRev), fill(o.rPrc), fill(o.rVol),
+      ]; }` },
   { key: 'versionup', name: 'stamp FIRST, cost lines before revenue, ribbon fills, alt h f c Blue swatch, alt h b d — ☆ still earned', moves: `C => { const o=C._o, y=o.yc[0], mv=[];
       mv.push({sel:o.cL+'1', keys:[{key:'h',ctrl:true,code:'KeyH'},{key:'v'},{key:'1'},{key:'Tab'},{key:'v'},{key:'2'},{key:'Enter'}]});
       for(let i=1;i>=0;i--){ const r=o.ratioRows[i], ref='$'+o.cV+'$'+(o.pr+2+i);
