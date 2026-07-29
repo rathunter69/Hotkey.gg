@@ -35,26 +35,25 @@ filldr+pastes) · `growth`→cagr absorbed its board · `grpfold`→unhide (r437
 (r439, the strongest of the campaign — measured three ways). `cases` moved chapters rather than
 retiring.
 
-### Where the next session picks up (r443 — PR #243 MERGED to main as 09f1aa2, live)
+### Where the next session picks up (r449 — THE DEPTH PASS IS COMPLETE)
 
-**Shipped and live** — PR #243 merged to main as `09f1aa2` on 2026-07-28, gate green on all 24
-steps. The six passed chapters, the width engine and the r442 border fix are all on the trunk,
-alongside #244's r428–r429. **The engine work that had to precede Models is done** — the 20-row standard (r440) and the width-engine pass (r441) were both explicitly gated
-in front of the Models dispatch, and both are in. Nothing engine-side is now blocking.
+**74/74 shipped on the working branch** (`claude/platform-audit-framework-1hf2v7`, PR #245).
+Waves 1–6 (r444–r449) rebuilt all thirty Models I / Models II / Full Builds drills; the final
+full gate (gate10) ran green on all 19 suites — ALT PATHS ALL 160 PASS, par sweep 0 flagged.
+`cascade` is the designated Models II capstone (D9); `lbobuild` is inside the 20-row cap; the
+campaign's untriggerable-beat ledger closed at **82**, every one found by walking a route.
 
-Two decisions are Wolf's and neither is made:
+**Wolf's decision queue** (task list #28/#31/#32 + standing): border-dress doctrine unification
+(r446b) · threestmt difficulty target (§5.4) · opmodel placement band (D16) · dcfbuild's 4-key
+star and the terminal-value beat split · dashcover cover roster · `redflags` §4.56 (scope call).
 
-1. **`redflags` §4.56** — Formulas II's designated capstone, an unbuilt ADD. The chapter is
-   complete at ten boards without it; building it is a scope call, not an omission. §6 has no
-   entry for it because it is not a defect.
-2. **Models I dispatch scope** — ten drills, and §5 above is the mandatory briefing. Do not
-   dispatch without `dev/MODELING_STANDARDS.md` in the agent brief and `ROWS=20` as the stated
-   default.
+**Unbuilt capstone ADDs, not defects:** `redflags` (Formulas II) · `pitchpage` (Models I) ·
+`shipit` (Full Builds); plus the deferred qclose port and the dual-audience audit over pre-R4
+drills.
 
-Standing debt that does NOT block Models: §6.6 (the frame overrun), the §1.3 density retrofit
-(11 drills in passed chapters), `lbobuild`'s 25 rows, the fit-sweep flake, and the alt-paths
-long-run Escape wedge. All are recorded here or in §6 with their measurements; none needs
-re-deriving.
+**Standing engine backlog** (measured, none blocking): the fit-sweep #### flake · the §1.3
+density retrofit (11 drills in early chapters) · the alt-paths long-run Escape wedge · the
+§6.6 __noShrink frame overrun.
 
 ---
 
