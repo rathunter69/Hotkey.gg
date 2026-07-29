@@ -1723,6 +1723,39 @@ const ALTS = [
         {sel:P[1]+o.rMgn, keys:[{key:'1',ctrl:true},L('p')]},
         fill(o.rMgn), fill(o.rEbd), fill(o.rOpx), fill(o.rCog), fill(o.rRev), fill(o.rPrc), fill(o.rVol),
       ]; }` },
+  /* r449 (DEPTH_PASS §4.84 depth pass): BOTH dcfbuild entries are NEW — the drill was one of the
+     nine zero-ALT drills §1.8 names, and it clears that here. ALT 1 is the chord-ROUTE alt and
+     EARNS the ☆ through the ribbon fill door; ALT 2 is the op-ORDER alt and the ☆'s
+     SKIPPABILITY PROOF (§1.0-R2(i)) — the taught per-row route, every core clearing with the
+     star dark. Nothing on this board is registered by the old pre-depth-pass geometry, so there
+     is nothing to DELETE for this key. */
+  { key: 'dcfbuild', name: 'RIBBON fill (Alt H F I R) takes the strip across, a COLUMN-only anchor on the WACC, the PV product commuted, enterprise value as an addition chain and the check written as SUMPRODUCT over the flows and the factors — the ☆ still latches', moves: `C => { const o=C._o, B=o.CB, LC=o.YL, Y=o.Y;
+      const ent={key:'Enter'}, alt={key:'Alt'}, up={key:'ArrowUp'};
+      const sR={key:'ArrowRight',shift:true}, sD={key:'ArrowDown',shift:true};
+      return [
+        {sel:B+o.rDF, keys:[...T('=1/(1+$'+B+o.rWACC+')^'+B+o.HR),ent,                 // column-only lock — all a fill RIGHT needs
+                            ...T('='+B+o.rDF+'*'+B+o.rFCF),ent]},                      // factor x flow, the product commuted
+        {sel:B+(o.rPV+1), keys:[up,up,sR,sR,sR,sR,sD,alt,L('h'),L('f'),L('i'),L('r')]}, // the ribbon fill stamps S.fillOps -> the ☆
+        {sel:B+o.rTV, keys:[...T('='+LC+o.rFCF+'*(1+'+B+o.rG+')/('+B+o.rWACC+'-'+B+o.rG+')'),ent,
+                            ...T('='+LC+o.rDF+'*'+B+o.rTV),ent,                        // the terminal discount, commuted
+                            ...T('='+Y.map(c=>c+o.rPV).join('+')+'+'+B+o.rPVTV),ent]}, // addition chain, not SUM
+        {sel:B+o.rEQ, keys:[...T('='+B+o.rEV+'-'+B+o.rND),ent]},
+        {sel:B+o.rPS, keys:[...T('='+B+o.rEQ+'/'+B+o.rSH),ent]},
+        {sel:B+o.rCHK, keys:[...T('=SUMPRODUCT('+B+o.rFCF+':'+LC+o.rFCF+','+B+o.rDF+':'+LC+o.rDF+')'),ent]},
+      ]; }` },
+  { key: 'dcfbuild', name: 'op ORDER — the check line written FIRST off the raw flows, then the bridge before enterprise value exists, then the terminal value, and the strip built per row with the PV line before the factor line — every core recalculates and clears, the ☆ forfeited', moves: `C => { const o=C._o, B=o.CB, LC=o.YL, Y=o.Y;
+      const ent={key:'Enter'}, up={key:'ArrowUp'}, dn={key:'ArrowDown'};
+      const sR={key:'ArrowRight',shift:true}, ctrlR={key:'r',ctrl:true};
+      return [
+        {sel:B+o.rCHK, keys:[...T('=NPV($'+B+'$'+o.rWACC+','+B+o.rFCF+':'+LC+o.rFCF+')'),ent]},
+        {sel:B+o.rEQ, keys:[...T('='+B+o.rEV+'-'+B+o.rND),ent]},                        // written against an EMPTY enterprise value
+        {sel:B+o.rPS, keys:[...T('='+B+o.rEQ+'/'+B+o.rSH),ent]},
+        {sel:B+o.rTV, keys:[...T('='+LC+o.rFCF+'*(1+$'+B+'$'+o.rG+')/($'+B+'$'+o.rWACC+'-$'+B+'$'+o.rG+')'),ent]},
+        {sel:B+o.rPV, keys:[...T('='+B+o.rFCF+'*'+B+o.rDF),ent, up, sR,sR,sR,sR, ctrlR]},   // the PV row BEFORE the factor row
+        {sel:B+o.rDF, keys:[...T('=1/(1+$'+B+'$'+o.rWACC+')^'+B+o.HR),ent, up, sR,sR,sR,sR, ctrlR]},
+        {sel:B+o.rPVTV, keys:[...T('='+B+o.rTV+'*'+LC+o.rDF),ent]},
+        {sel:B+o.rEV, keys:[...T('=SUM('+B+o.rPV+':'+LC+o.rPV+')+'+B+o.rPVTV),ent]},
+      ]; }` },
   { key: 'versionup', name: 'stamp FIRST, cost lines before revenue, ribbon fills, alt h f c Blue swatch, alt h b d — ☆ still earned', moves: `C => { const o=C._o, y=o.yc[0], mv=[];
       mv.push({sel:o.cL+'1', keys:[{key:'h',ctrl:true,code:'KeyH'},{key:'v'},{key:'1'},{key:'Tab'},{key:'v'},{key:'2'},{key:'Enter'}]});
       for(let i=1;i>=0;i--){ const r=o.ratioRows[i], ref='$'+o.cV+'$'+(o.pr+2+i);
