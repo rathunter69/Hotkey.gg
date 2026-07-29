@@ -1756,6 +1756,45 @@ const ALTS = [
         {sel:B+o.rPVTV, keys:[...T('='+B+o.rTV+'*'+LC+o.rDF),ent]},
         {sel:B+o.rEV, keys:[...T('=SUM('+B+o.rPV+':'+LC+o.rPV+')+'+B+o.rPVTV),ent]},
       ]; }` },
+  /* r449 (DEPTH_PASS §4.85 depth pass): NEW — `lbobuild` was one of the nine zero-ALT drills §1.8
+     names, and it clears that here. ALT 1 is the chord-ROUTE alt and still EARNS the one-pass ☆
+     through its multi-commit door while reaching every other end state differently (gallery
+     dress, addition chain instead of SUM, *-1 negation, the MOIC rebuilt inside the exponent,
+     and the beat-6 cross-check hand-compounded instead of handed to =IRR() — which is what
+     proves no beat reads a function name out of formula text). ALT 2 is the op-ORDER alt and the
+     ☆'s SKIPPABILITY PROOF (§1.0-R2(i)) — nothing swept anywhere, every core clearing with the
+     star dark. */
+  { key: 'lbobuild', name: 'an addition chain instead of SUM (multi-committed across, so the ☆ is still earned), the debt line negated with a trailing *-1, the Cell Styles Total gallery for the equity rule, the MOIC rebuilt inside the IRR exponent, the flow ends pointed through =0- and =+, and the cross-check hand-compounded instead of handed to =IRR()', moves: `C => { const o=C._o, B=o.CB, X=o.CC, G=o.CG;
+      const ent={key:'Enter'}, cEnt={key:'Enter',ctrl:true}, alt={key:'Alt'}, rt={key:'ArrowRight'};
+      const sR={key:'ArrowRight',shift:true};
+      return [
+        {sel:B+o.rEV, keys:[sR, ...T('='+o.CB+o.rEb+'*'+o.CB+o.rMu), cEnt]},               // ☆ half one
+        {sel:B+o.rNd, keys:[...T('='+B+o.rEb+'*'+B+o.rLv+'*-1'), ent]},                    // negated by multiplication
+        {sel:B+o.rEq, keys:[sR, ...T('='+B+o.rEV+'+'+B+o.rFe+'+'+B+o.rNd), cEnt]},         // ☆ half two, addition chain not SUM
+        {sel:B+o.rEq, keys:[sR, alt,L('h'),L('j'),rt,rt,rt,rt,ent]},                       // Alt H J -> Total = bold + the rule above
+        {sel:B+o.rMo, keys:[...T('='+X+o.rEq+'/'+B+o.rEq), ent]},
+        {sel:B+o.rIr, keys:[...T('=('+X+o.rEq+'/'+B+o.rEq+')^(1/'+B+o.rHD+')-1'), ent]},   // the MOIC rebuilt inside the exponent
+        {sel:B+o.rFl, keys:[...T('=0-'+B+o.rEq), ent]},
+        {sel:G+o.rFl, keys:[...T('=+'+X+o.rEq), ent]},
+        {sel:B+o.rIf, keys:[...T('=('+G+o.rFl+'/-'+B+o.rFl+')^(1/'+B+o.rHD+')-1'), ent]},  // beat 6 WITHOUT =IRR()
+      ]; }` },
+  { key: 'lbobuild', name: 'op ORDER reversed AND the measured negative control — the debt line first, the exit column built before the close column, both equity cells landed by Alt+= instead of a typed SUM, the equity row dressed through Alt H B S, the returns and the cross-check last, and NOTHING swept anywhere (no fill, no paste, no multi-commit): all six cores clear with the re-cut ☆ DARK, 81 keys against the demo\'s 80', moves: `C => { const o=C._o, B=o.CB, X=o.CC, G=o.CG;
+      const ent={key:'Enter'}, alt={key:'Alt'};
+      const sR={key:'ArrowRight',shift:true}, sD={key:'ArrowDown',shift:true};
+      const asum={key:'=',alt:true,code:'Equal'};
+      return [
+        {sel:B+o.rNd, keys:[...T('=-('+B+o.rEb+'*'+B+o.rLv+')'), ent]},                    // the deduction lands first
+        {sel:X+o.rEV, keys:[...T('='+X+o.rEb+'*'+X+o.rMu), ent]},                          // exit before close, nothing swept
+        {sel:B+o.rEV, keys:[...T('='+B+o.rEb+'*'+B+o.rMu), ent]},
+        {sel:X+o.rEV, keys:[sD, sD, sD, asum]},
+        {sel:B+o.rEV, keys:[sD, sD, sD, asum]},
+        {sel:B+o.rEq, keys:[sR, {key:'b',ctrl:true}, alt,L('h'),L('b'),L('s')]},           // outside border over the row: stores bt+bb, must clear
+        {sel:B+o.rMo, keys:[...T('='+X+o.rEq+'/'+B+o.rEq), ent]},
+        {sel:B+o.rIr, keys:[...T('='+B+o.rMo+'^(1/'+B+o.rHD+')-1'), ent]},
+        {sel:B+o.rFl, keys:[...T('=-'+B+o.rEq), ent]},
+        {sel:G+o.rFl, keys:[...T('='+X+o.rEq), ent]},
+        {sel:B+o.rIf, keys:[...T('=IRR('+B+o.rFl+':'+G+o.rFl+')'), ent]},
+      ]; }` },
   { key: 'versionup', name: 'stamp FIRST, cost lines before revenue, ribbon fills, alt h f c Blue swatch, alt h b d — ☆ still earned', moves: `C => { const o=C._o, y=o.yc[0], mv=[];
       mv.push({sel:o.cL+'1', keys:[{key:'h',ctrl:true,code:'KeyH'},{key:'v'},{key:'1'},{key:'Tab'},{key:'v'},{key:'2'},{key:'Enter'}]});
       for(let i=1;i>=0;i--){ const r=o.ratioRows[i], ref='$'+o.cV+'$'+(o.pr+2+i);
