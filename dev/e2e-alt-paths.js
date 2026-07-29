@@ -1795,6 +1795,41 @@ const ALTS = [
         {sel:G+o.rFl, keys:[...T('='+X+o.rEq), ent]},
         {sel:B+o.rIf, keys:[...T('=IRR('+B+o.rFl+':'+G+o.rFl+')'), ent]},
       ]; }` },
+  /* r449 (debtblock depth pass, DEPTH_PASS §4.86): debtblock was one of §1.8's nine ZERO-ALT
+     drills — there is nothing to delete, these are its first two entries.
+     ALT 1 = chord-ROUTE alt. ALT 2 = op-ORDER alt AND the measured ☆ skippability control. */
+  { key: 'debtblock', name: 'chord ROUTE alt — the rates typed as BARE numbers into the percent-formatted cells (the r418 auto-scale branch) and inked from the Cell Styles Input gallery instead of the font-colour swatches, every fill off the RIBBON (Alt H F I R), the tranche clone carried by the LEGACY Alt E S paste-special FORMULAS dialog instead of Ctrl+V, both totals written as SUM() over the two facilities instead of a paired reference, and the rules laid with Alt H B D (top AND bottom): all six cores clear and the ☆ still lands, because the star grades the DECISION to carry the engine in one paste, never the chord that opens the clipboard', moves: `C => { const o=C._o, Y=o.Y; return [
+      {sel:o.tlRate,   keys:[...T(o.tlPct),{key:'Enter'}]},
+      {sel:o.rvRate,   keys:[...T(o.rvPct),{key:'Enter'}]},
+      {sel:o.rateRng,  keys:[{key:'Alt'},L('h'),L('j'),{key:'ArrowRight'},{key:'Enter'}]},
+      {sel:Y[0]+o.rTLe, keys:[...T(o.fTlEnd),{key:'Enter'},...T(o.fTlInt),{key:'Enter'}]},
+      {sel:Y[1]+o.rTLb, keys:[...T(o.fTlLink),{key:'Enter'}]},
+      {sel:o.tlLinkRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:o.tlEngRng,  keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r'),{key:'c',ctrl:true}]},
+      {sel:Y[0]+o.rRVe, keys:[{key:'Alt'},L('e'),L('s'),L('f'),{key:'Enter'}]},
+      {sel:Y[1]+o.rRVb, keys:[...T(o.fRvLink),{key:'Enter'}]},
+      {sel:o.rvLinkRng, keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r')]},
+      {sel:Y[0]+o.rTD,  keys:[...T('=SUM('+Y[0]+o.rTLe+','+Y[0]+o.rRVe+')'),{key:'Enter'},
+                              ...T('=SUM('+Y[0]+o.rTLi+','+Y[0]+o.rRVi+')'),{key:'Enter'}]},
+      {sel:o.totRect,   keys:[{key:'Alt'},L('h'),L('f'),L('i'),L('r'),{key:'Alt'},L('h'),L('b'),L('d')]},
+    ]; }` },
+  { key: 'debtblock', name: 'op ORDER alt AND the measured ☆ NEGATIVE CONTROL — the total rows ruled BEFORE they hold anything, the REVOLVER built before the term loan, each facility priced immediately before it is rolled, every line carried by its own fill and no clipboard anywhere on the board, and the two totals written last off rows that already recalculated: all six cores clear with the star DARK — the ☆ state itself is asserted in dev/verify-debtblock.js §B (this harness grades the win and never the star), where the same job costs 23 keys more built facility by facility than carried in one paste', moves: `C => { const o=C._o, Y=o.Y; return [
+      {sel:o.totRect,   keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
+      {sel:o.rvRate,    keys:[...T(o.rvPct+'%'),{key:'Enter'}]},
+      {sel:o.rvRate,    keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+      {sel:Y[0]+o.rRVe, keys:[...T(o.fRvEnd),{key:'Enter'},...T(o.fRvInt),{key:'Enter'}]},
+      {sel:Y[1]+o.rRVb, keys:[...T(o.fRvLink),{key:'Enter'}]},
+      {sel:o.rvLinkRng, keys:[{key:'r',ctrl:true}]},
+      {sel:o.rvEngRng,  keys:[{key:'r',ctrl:true}]},
+      {sel:o.tlRate,    keys:[...T(o.tlPct+'%'),{key:'Enter'}]},
+      {sel:o.tlRate,    keys:[{key:'Alt'},L('h'),L('f'),L('c'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'Enter'}]},
+      {sel:Y[0]+o.rTLe, keys:[...T(o.fTlEnd),{key:'Enter'},...T(o.fTlInt),{key:'Enter'}]},
+      {sel:Y[1]+o.rTLb, keys:[...T(o.fTlLink),{key:'Enter'}]},
+      {sel:o.tlLinkRng, keys:[{key:'r',ctrl:true}]},
+      {sel:o.tlEngRng,  keys:[{key:'r',ctrl:true}]},
+      {sel:Y[0]+o.rTD,  keys:[...T(o.fTotD),{key:'Enter'},...T(o.fTotI),{key:'Enter'}]},
+      {sel:o.totRect,   keys:[{key:'r',ctrl:true}]},
+    ]; }` },
   { key: 'versionup', name: 'stamp FIRST, cost lines before revenue, ribbon fills, alt h f c Blue swatch, alt h b d — ☆ still earned', moves: `C => { const o=C._o, y=o.yc[0], mv=[];
       mv.push({sel:o.cL+'1', keys:[{key:'h',ctrl:true,code:'KeyH'},{key:'v'},{key:'1'},{key:'Tab'},{key:'v'},{key:'2'},{key:'Enter'}]});
       for(let i=1;i>=0;i--){ const r=o.ratioRows[i], ref='$'+o.cV+'$'+(o.pr+2+i);

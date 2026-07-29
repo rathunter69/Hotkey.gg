@@ -10920,91 +10920,409 @@ const CHALLENGES = {
     }
   },
   debtblock:{
-    name:'Debt block', label:'Build the debt & interest block', par:57, parKeys:59,
-    aha:'A debt block is two roll-forwards and their interest — each tranche rolls on its own rate, then total debt and total interest feed the model.',
-    prompt:'Two tranches (debt layers), one block: a senior term loan and subordinated notes — junior debt, paid after the senior. Each opens at the prior close, its mandatory amort pays it down, and interest accrues at its OWN anchored rate. Build both roll-forwards, run both interest lines, then total debt and total interest — the two rows the balance sheet and P&L actually pull.',
-    req:'Senior: <em>B5</em> <em>=B3+B4</em> · <em>C3</em> <em>=B5</em> · fill roll → · <em>B6</em> <em>=B3*$B$16</em> · Sub: <em>B10</em> <em>=B8+B9</em> · <em>C8</em> <em>=B10</em> · fill roll → · <em>B11</em> <em>=B8*$B$17</em> · Totals: <em>B13</em> <em>=B5+B10</em> · <em>B14</em> <em>=B6+B11</em> · fill →',
-    guide:[
-      'senior roll: ending at B5 · <kbd>=B3+B4</kbd> · link C3 · <kbd>=B5</kbd> · fill C3:F3 → · then fill B5:F5 →',
-      'senior interest at B6 · <kbd>=B3*$B$16</kbd> — the anchored senior rate on the opening balance · fill B6:F6 →',
-      'sub roll: ending at B10 · <kbd>=B8+B9</kbd> · link C8 · <kbd>=B10</kbd> · fill C8:F8 → · fill B10:F10 → · interest B11 · <kbd>=B8*$B$17</kbd> · fill →',
-      'total the block: total debt at B13 · <kbd>=B5+B10</kbd> · total interest at B14 · <kbd>=B6+B11</kbd> · fill both right',
-    ],
-    targets:['B5:D5','C6:D6','B9:D9','B11:D11','C13:D13','B14:D14'],
-    demo(){ return [
-      {sel:'B5', keys:[...T('=B3+B4'), Kb.enter]},
-      {sel:'C3', keys:[...T('=B5'), Kb.enter]},
-      {sel:'C3:F3', keys:[Kb.fillR]},
-      {sel:'B5:F5', keys:[Kb.fillR]},
-      {sel:'B6', keys:[...T('=B3*$B$16'), Kb.enter]},
-      {sel:'B6:F6', keys:[Kb.fillR]},
-      {sel:'B10', keys:[...T('=B8+B9'), Kb.enter]},
-      {sel:'C8', keys:[...T('=B10'), Kb.enter]},
-      {sel:'C8:F8', keys:[Kb.fillR]},
-      {sel:'B10:F10', keys:[Kb.fillR]},
-      {sel:'B11', keys:[...T('=B8*$B$17'), Kb.enter]},
-      {sel:'B11:F11', keys:[Kb.fillR]},
-      {sel:'B13', keys:[...T('=B5+B10'), Kb.enter]},
-      {sel:'B13:F13', keys:[Kb.fillR]},
-      {sel:'B14', keys:[...T('=B6+B11'), Kb.enter]},
-      {sel:'B14:F14', keys:[Kb.fillR]},
+    /* r449 H6b-FB (DEPTH_PASS §4.86, "Build the debt & interest block") — the depth-pass rework,
+       built to §1.0 + §1.0-R2 + §1.0-R3 + §1.0-R4 on top of the page (the later law wins on
+       conflict) and to dev/MODELING_STANDARDS.md, which is BINDING on Full Builds: a banker
+       judges the MODEL first, and a correct keystroke on a wrong model is worse than no drill.
+
+       WAS: 5 checks / 4 guide lines / 6 targets on a `ROWS:18` board — the tri-length invariant
+       broken three ways (§1.9), no ☆ at all (§1.1/§2.2 want exactly one), no `saveClose` closer
+       (§1.0(e)), and ZERO alt-path entries (§1.8 names debtblock in the nine). Every check label
+       carried the ANSWER FORMULA in its own text ("roll the senior tranche — ending (=B3+B4) and
+       each year opening at the prior close"), which is §1.7 R3 and §1.0(b) in one line. Worse,
+       four of the five beats graded FORMULA TEXT through `refs()` — the CAMPAIGN §1 untriggerable
+       class, thirteen found and every one a text grade. And the model itself was off: two
+       tranches called "senior" and "sub" both amortising on a fixed schedule, no revolver, no
+       total-debt rule, no basis memo, and interest on the opening balance with nothing on the
+       board saying that was a deliberate simplification (MODELING_STANDARDS §5 requires it said
+       out loud on a debt board).
+
+       NOW: the debt block a first-year actually builds — a term loan that amortises, a revolver
+       that is drawn and repaid off the cash flow forecast, each priced on its own rate, and the
+       two rows the balance sheet and the income statement pull. 6 core beats + the hidden ☆ +
+       the engine-appended Ctrl+S. ROWS=20; 18 rows carry content at the win state on every seed
+       — 90% against the §1.3 ≥60% target.
+
+       ── ☆-HEADROOM DIAGNOSTIC, BOTH PARTS (CAMPAIGN §2), run BEFORE the board was designed and
+       re-measured on the shipped one. Every selection and navigation KEYED (setDemoSel only
+       parks the active cell entering a region, the same number of times in every route), 3 seeds,
+       dev/verify-debtblock.js §B:
+         PART 1 — SPREAD: the ☆ route 96 keys · the slowest legal route 380 (every cell of every
+           line typed year by year, no anchor, no fill, no clipboard, the blue pass one cell at a
+           time, the two rules walked cell by cell). 3.96×, the widest in the chapter and above
+           `nwcsched` 3.36× and `lookup` 3.0×.
+         PART 2 — WHAT SURVIVES THE STRIP (the half that does the work): 14 keys of the spread are
+           chord-vs-ribbon — measured, not estimated: the same solve driven entirely off the
+           ribbon (bare rates + Alt H J → Input, Alt H F I R for every fill, the legacy Alt E S
+           paste-special FORMULAS dialog for the clone, Alt H B D for the rules) runs 110 against
+           the chord route's 96, and §1.0(c) forces every one of those doors to CLEAR. ZERO of the
+           spread is formatting, because the only dressed cells on this board are the two total
+           rows and that is a CORE beat, not a bonus (§1.0(d) forbids a formatting ☆). What
+           survives the strip is the whole tranche-cloning and fill-versus-retype band — 270 keys
+           of it. Legal headroom, and a lot of it. KEEP.
+         ☆ FAMILY BAKE-OFF (wave-6 addendum — the candidates MEASURED on the IDENTICAL job, not
+         argued). Full solves, everything keyed, 3 seeds, verify-debtblock.js §B. All of them
+         clear all six cores, so each is a route a player may legally take:
+           · CLONE the tranche — the term loan's closing and interest rows copied
+             onto the revolver in one paste (S.pasteLog)                              96 keys
+           · per-facility fills — the TAUGHT route, and the ☆'s negative control      119 keys
+           · one-pass FILL of the whole engine — NOT A ROUTE on this board, and that
+             is a board fact worth recording: the amortization and draw rows are
+             SEEDED and sit BETWEEN the rows that get built, so any rectangle tall
+             enough to cover a facility's engine also stamps year one's amortization
+             across the plan. The fill family therefore tops out at the per-facility
+             two-rectangle form, which IS the 119-key control above.                     —
+           · Ctrl+Enter multi-commit per line (S.multiEnter, `anchor`'s family)      125 keys
+           · the slowest legal route — no anchor, no fill, no clipboard              380 keys
+           · AutoSum provenance (S.autoSumN, `scrub`'s family) — NOT ADMISSIBLE: the
+             total rows sit under a blank moat row, so Alt+= proposes nothing and the
+             two totals are cross-block additions, not a column sum                     n/a
+           · independent prove-out — the §4.86 page's own ☆ ("enter the roll check…
+             it reads zero"). §1.0-R4(u) admits the family only where a pre-playtest
+             page specced it AND the lesson can be silently wrong, and both hold here.
+             It is NOT what shipped: on this board the check is a TAUTOLOGY of the way
+             beats 2/3 build the rolls, so it earns by the nature of doing the exercise
+             (§1.0-R2(i)) — and §1.0(d) still says the ☆ is an EFFICIENCY discovery.
+             The prove-out was real work, so per §1.0-R4(u) it was PROMOTED onto the
+             board instead of deleted: the roll check ships PRE-BUILT and live at the
+             foot of the page, cross-footing closing debt against opening plus every
+             movement, and it snaps to zero as the rolls land (MODELING_STANDARDS §6:
+             "checks live in one visible place and read zero").                          —
+         The clone is 23 keys cheaper than the taught control and 29 cheaper than the best
+         non-paste family, it is NON-FILL (the wave-6 addendum's stated preference, and this
+         chapter's fill family is already at four uses against the §1.0-R4(u) cap of two), and it
+         is this drill's own aha made mechanical. dev/verify-debtblock.js §B reproduces the table.
+       ── SKIPPABILITY PROOF (§1.0-R2(i)), measured not asserted: the checklist actively pushes
+       AWAY from the clone — beat 2 is the term loan, beat 3 is the revolver, two separate lines —
+       so the natural route builds each facility on its own and clears all six cores with the ☆
+       DARK, at +23 keys. Registered as dev/e2e-alt-paths.js ALT 2, green ×3 seeds.
+       ── WHAT THE CLONE TEACHES THAT `bsbuild`'s CLONE DID NOT (the §1.0-R4(u) family-recurrence
+       test; second and last use of the paste family in this chapter). bsbuild carries one
+       finished TOTAL row onto its twin — a one-row, one-formula move. This carries a whole
+       tranche ENGINE, and it only lands because the rate reference was left COLUMN-anchored and
+       ROW-RELATIVE ($<rate col> with a bare row): a player who reflexively writes the fully
+       anchored form clears the term loan, pastes, and watches the revolver accrue at the term
+       loan's rate — the numbers are visibly wrong and beat 4 stays dark. Same family, and the
+       anchor is the lesson rather than the gesture. WALKED, not asserted: verify-debtblock.js §D
+       drives the fully anchored form through the clone and the interest beat stays DARK on every
+       seed, which is the assertion that makes this ☆ worth its slot.
+
+       ── UNTRIGGERABLE BEATS KILLED (CAMPAIGN §1 — found by WALKING routes, not reading):
+         (1) FOUR OF THE FIVE SHIPPED BEATS DEMANDED SUBSTRINGS OF THE FORMULA TEXT. `refs('B6',
+             ['B3','B16'])` locked out a ROUND() wrapper naming the cells in another order, a
+             pointer-mode build, and any player who reached the same number a different way.
+             Nothing here reads formula text except the two corkscrew LINKS, which are the
+             drill's declared lesson and the one grade MODELING_STANDARDS §7 names as legitimate.
+         (2) ANCHORING IS GRADED THROUGH VALUES, NEVER THROUGH THE '$'. An unanchored rate
+             reference walks off the rate column on the fill and lands zeros, so the END STATE
+             itself fails — which means $<col>$<row> and $<col><row> both clear (a right-fill only
+             needs the column locked), and a player who never fills and types five correct
+             formulas clears too (§1.0(c)).
+         (3) THE PRICING BEAT DOES NOT REQUIRE A CONSTANT. Typing `7.5%` into the percent-formatted
+             rate cell and typing a bare `7.5` both land 0.075 (index.html commitEdit, the r418
+             percent-cell auto-scale branch); the beat grades the NUMBER plus the blue ink and
+             never asks whether a formula produced it.
+         (4) THE BORDER BEAT IS GRADED LENIENTLY (`bt || ball`) — the r446b/wave-5 reading. Alt H
+             B P over the two-row block sets bt on BOTH rows (eachSel), Alt H B D sets bt+bb,
+             Alt H B A stores `ball` and no bt at all, and Alt H J → Total sets bold+bt+bb: a
+             strict `bt && !bb && !bdbl` would strand three correct desk routes, which is
+             §1.0-R3(p) exactly. Declared in the payload; the label carries no scope clause
+             because the lenient reading needs none.
+
+       ── §1.0-R4(t) THE REALITY TEST. Chapter 8 is audience B on the §3.1 map, and this is the
+       page a first-year builds the week the credit agreement is signed: two facilities, the
+       pricing off the commitment letter, amortization and revolver movements fed from the cash
+       flow forecast, and the two rows the rest of the model reads. Real labels, real magnitudes
+       ($mm), real units in the header, a stated basis, and a control that has to read zero. An
+       FP&A reader recognises it too — it is the same corkscrew their equipment-loan schedule is.
+
+       ── MODELING_STANDARDS conventions carried (stated in full in the payload §8):
+       §1 colour-as-provenance (blue = the two rates the player types and every fed figure;
+       black = everything computed here; no green — one logical sheet-area) · §1 no hardcodes
+       inside formulas: the rates live in labelled cells and the interest lines point at them ·
+       §1 totals wear a TOP border, never a rule underneath · §1 units stated in the title ($mm),
+       negatives in parentheses via the comma format · §2 ONE sign convention, on the basis memo:
+       amortization and repayments are carried NEGATIVE, so every roll is `beginning + movement`
+       and never a subtraction chain · §3 the corkscrew, twice: each year's BEGINNING cell
+       REFERENCES the prior year's CLOSING cell, which §3 calls the lesson and the typed opening
+       "the classic junior error" — graded in beats 2 and 3 · §5 CIRCULARITY: interest accrues on
+       the OPENING balance and the basis memo says so, the ruling MODELING_STANDARDS §5 already
+       made for an engine with no iterative calculation · §6 the roll check, one visible place,
+       reading zero · §7 the board is a COMPONENT — one debt block, 20 rows. */
+    name:'Debt block', label:'Build the debt & interest block', par:70, parKeys:67, saveClose:true,   /* r449 §4.86 depth pass: par re-swept from scratch (was par 57 / parKeys 59 on the ROWS:18 board with no revolver, no pricing beat, no dress beat, no ☆ and no save closer). dev/e2e-par-sweep.js debtblock reports medKeys 67 at 0% drift, and dev/verify-debtblock.js §A over 15 seeds reads median 67 INCLUDING the engine-appended Ctrl+S and FLAT at 67 (min 67, max 67) — the row geometry is fixed by construction (see the (a) note in build(): the row axis is deliberately unjittered because the referenced rows straddle the 9/10 digit boundary), the column jitter moves single-letter column names only, and both rates always render to one decimal so the pricing beat is always four characters twice. Nothing in the draw can move the character count (the r439 `wrapfix` rule). par 70 ≈ 1.04 s/key, the house band. That lands debtblock mid-band in Full Builds against the pars standing before this wave (threestmt 45 · dashcover 48 · opmodel 55 · bsbuild 64 · cfslink 66 · debtblock 70 · isbuild 71 · lbobuild 82 · dcfbuild 91 · nwcsched 102). Measured against it: the same board worked the SLOW way, fully keyed — every year of every line typed by hand, no anchor, no fill and no clipboard anywhere, the blue pass one cell at a time and the two rules walked cell by cell — runs 380 keys with all six cores clearing and the ☆ dark (verify-debtblock.js §B), which is the cost the clock exists to show. Mirrored in HOTKEY_PARS. Clocks derive (§1.4): pass 1:45 · pro 1:20 · legendary 1:10. */
+    aha:'every tranche is the same sentence — open, move, close — so the second facility is the first one copied, not typed again.',
+    /* §1.5: the aha's MOMENT is beat 3. The revolver's engine is the term loan's engine with two
+       different feed rows under it, and the ☆ is that sentence made literal — one paste. */
+    prompt:'The credit agreement signed this morning and the debt block is the one page the model does not have. Treasury has already fed the term loan amortization and the revolver draws off the cash flow forecast, and the pricing came in on the commitment letter. Roll both facilities out across the plan, run the interest each one accrues, and land the two rows the balance sheet and the income statement pull — total debt and total interest.',
+    req(){ const o=this._o;
+      return 'type <em>'+o.tlPct+'%</em> at '+o.tlRate+' and <em>'+o.rvPct+'%</em> at '+o.rvRate+' · <em>alt h f c</em> →×4 blue · '+o.Y0+o.rTLe+' <em>'+o.fTlEnd+'</em> · '+o.Y0+o.rTLi+' <em>'+o.fTlInt+'</em> · '+o.Y1+o.rTLb+' <em>'+o.fTlLink+'</em> · fill <em>'+o.tlLinkRng+'</em> → and <em>'+o.tlEngRng+'</em> → · copy <em>'+o.tlEngRng+'</em> → paste at '+o.Y0+o.rRVe+' · '+o.Y1+o.rRVb+' <em>'+o.fRvLink+'</em> · fill <em>'+o.rvLinkRng+'</em> → · '+o.Y0+o.rTD+' <em>'+o.fTotD+'</em> · '+o.Y0+o.rTI+' <em>'+o.fTotI+'</em> · fill <em>'+o.totRect+'</em> → · <em>alt h b p</em> · <em>ctrl+s</em>'; },
+    /* §1.0(b): the checklist names OUTCOMES; the route lives HERE, one line per check, chords
+       allowed — and each line names every door the engine opens, not only the fastest, because
+       every one of them grades (§1.0-R3(p)). */
+    guide(){ const o=this._o; return [
+      'the commitment letter above the schedule prices them: term loan <kbd>'+o.tlPct+'%</kbd> at '+o.tlRate+', revolver <kbd>'+o.rvPct+'%</kbd> at '+o.rvRate+' — type them into the two yellow rate cells, then select both and <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> → four <kbd>→</kbd> to the blue swatch <kbd>↵</kbd> (<kbd>alt</kbd> <kbd>h</kbd> <kbd>j</kbd> → <b>Input</b> lands the same blue)',
+      'the term loan closes at '+o.Y0+o.rTLe+' · <kbd>'+o.fTlEnd+'</kbd> — the amortization already carries its minus sign, so the roll adds · then the link at '+o.Y1+o.rTLb+' · <kbd>'+o.fTlLink+'</kbd> and fill '+o.tlLinkRng+' across (<kbd>ctrl</kbd>+<kbd>r</kbd>, or <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>r</kbd>)',
+      'the revolver rolls the same way at '+o.Y0+o.rRVe+' · <kbd>'+o.fRvEnd+'</kbd> — draws add, repayments already carry their minus · then '+o.Y1+o.rRVb+' · <kbd>'+o.fRvLink+'</kbd> and fill '+o.rvLinkRng+' across',
+      'interest at '+o.Y0+o.rTLi+' · <kbd>'+o.fTlInt+'</kbd> and at '+o.Y0+o.rRVi+' · <kbd>'+o.fRvInt+'</kbd> — each facility on the OPENING balance and on its own rate, the rate column locked so the formula survives the trip across · <kbd>f4</kbd> cycles the lock if you would rather not type the dollar sign',
+      'total debt at '+o.Y0+o.rTD+' · <kbd>'+o.fTotD+'</kbd> and total interest at '+o.Y0+o.rTI+' · <kbd>'+o.fTotI+'</kbd> — the two closings and the two interest lines · select '+o.totRect+' and fill across',
+      'select '+o.totRect+' and <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> — one pass rules both rows (<kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>d</kbd>, <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>a</kbd> and <kbd>alt</kbd> <kbd>h</kbd> <kbd>j</kbd> → <b>Total</b> all leave a rule above the line too)',
+      '☆ the discovery: finish the term loan first — closing AND interest, all five years — then copy '+o.tlEngRng+' and paste it onto '+o.Y0+o.rRVe+'. The references walk down with it and the whole revolver engine arrives in one move. Building the revolver by hand clears the drill too; it just costs the time, and an over-anchored rate makes the paste price the revolver like a term loan',
     ]; },
+    /* rings: ① the two rate cells (the band that spans them) · ② the term loan roll · ③ the
+       revolver roll · ④ the interest band · ⑤ the two total rows · ⑥ the same two rows
+       · ☆ never ringed (r423 §2 mystery slot) */
+    targets(){ const o=this._o; return [
+      o.rateRng, o.tlRollRect, o.rvRollRect, o.intBand, o.totRect, o.totRect, null]; },
+    demo(){ const o=this._o; return [
+      {sel:o.tlRate, keys:[...T(o.tlPct+'%'), Kb.enter]},
+      {sel:o.rvRate, keys:[...T(o.rvPct+'%'), Kb.enter]},
+      /* the blue pass takes both rates in one selection built with keys, not handed over */
+      {sel:o.rvRate, keys:[{key:'ArrowUp',shift:true},{key:'ArrowUp',shift:true},{key:'ArrowUp',shift:true},{key:'ArrowUp',shift:true},{key:'ArrowUp',shift:true},
+                           {key:'Alt'}, L('h'), L('f'), L('c'), {key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'}, Kb.enter]},
+      /* the term loan, finished end to end — closing, interest, the link, both fills. Each
+         formula gets its OWN park rather than riding an Enter-walk out of the last one: guided
+         mode's rail (railToTarget) repositions the cursor the moment the first-unmet target
+         changes, and the interest row sits OUTSIDE beat 2's ring, so a walked cursor is yanked
+         back onto the roll and the next formula overwrites the closing balance. Found by
+         dev/e2e-guided.js, not by reading; the park is free (demo selections are uncounted), so
+         the par is identical either way. */
+      {sel:o.Y0+o.rTLe, keys:[...T(o.fTlEnd), Kb.enter]},
+      {sel:o.Y0+o.rTLi, keys:[...T(o.fTlInt), Kb.enter]},
+      {sel:o.Y1+o.rTLb, keys:[...T(o.fTlLink), Kb.enter]},
+      {sel:o.tlLinkRng, keys:[Kb.fillR]},
+      {sel:o.tlEngRng,  keys:[Kb.fillR]},
+      /* the ☆ rides here like any other action — its state latches at the win (r421 §2.2): the
+         finished tranche engine carried onto the revolver in ONE paste */
+      {sel:o.tlEngRng,  keys:[Kb.copy]},
+      {sel:o.Y0+o.rRVe, keys:[Kb.paste]},
+      {sel:o.Y1+o.rRVb, keys:[...T(o.fRvLink), Kb.enter]},
+      {sel:o.rvLinkRng, keys:[Kb.fillR]},
+      {sel:o.Y0+o.rTD,  keys:[...T(o.fTotD), Kb.enter]},
+      {sel:o.Y0+o.rTI,  keys:[...T(o.fTotI), Kb.enter]},
+      {sel:o.totRect,   keys:[Kb.fillR]},
+      {sel:o.totRect,   keys:[{key:'Alt'}, L('h'), L('b'), L('p')]},
+    ]; },   /* the engine appends the Ctrl+S closer (hkSaveCloseWire) */
     build(){
       const cells={};
-      cells['A1']={...blankCell(),value:codename()+' — debt & interest block ($mm)',txt:true,bold:true};
-      const y0=rnd(24,27);
-      for(let i=0;i<5;i++) cells[colLetter(i+2)+2]={...blankCell(),value:'FY'+(y0+i),txt:true,bold:true,align:'r'};
-      cells['A3']={...blankCell(),value:'Senior — beginning',txt:true};
-      cells['A4']={...blankCell(),value:'Senior — amort.',txt:true};
-      cells['A5']={...blankCell(),value:'Senior — ending',txt:true,bold:true};
-      cells['A6']={...blankCell(),value:'Senior — interest',txt:true};
-      cells['A8']={...blankCell(),value:'Sub — beginning',txt:true};
-      cells['A9']={...blankCell(),value:'Sub — amort.',txt:true};
-      cells['A10']={...blankCell(),value:'Sub — ending',txt:true,bold:true};
-      cells['A11']={...blankCell(),value:'Sub — interest',txt:true};
-      cells['A13']={...blankCell(),value:'Total debt',txt:true,bold:true};
-      cells['A14']={...blankCell(),value:'Total interest',txt:true,bold:true};
-      cells['A16']={...blankCell(),value:'Senior rate',txt:true};
-      cells['A17']={...blankCell(),value:'Sub rate',txt:true};
-      const sRate=rnd(5,7)/100, subRate=rnd(9,12)/100;
-      cells['B16']={...blankCell(),value:sRate,fontColor:'blue',fmtStyle:'percent',decimals:0};
-      cells['B17']={...blankCell(),value:subRate,fontColor:'blue',fmtStyle:'percent',decimals:0};
-      const sBeg0=rnd(40,70)*10, subBeg0=rnd(20,35)*10;
-      cells['B3']={...blankCell(),value:sBeg0,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      cells['B8']={...blankCell(),value:subBeg0,fontColor:'blue',fmtStyle:'comma',decimals:0};
-      const sAmort=[], subAmort=[];
-      for(let i=0;i<5;i++){ sAmort.push(-rnd(2,6)*10); subAmort.push(-rnd(1,3)*10); }
-      for(let i=0;i<5;i++){ const col=colLetter(i+2);
-        cells[col+4]={...blankCell(),value:sAmort[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
-        cells[col+9]={...blankCell(),value:subAmort[i],fontColor:'blue',fmtStyle:'comma',decimals:0};
-        if(i>0){ cells[col+3]={...blankCell(),fmtStyle:'comma',decimals:0}; cells[col+8]={...blankCell(),fmtStyle:'comma',decimals:0}; }
-        cells[col+5]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-        cells[col+6]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+10]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
-        cells[col+11]={...blankCell(),fmtStyle:'comma',decimals:0};
-        cells[col+13]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
-        cells[col+14]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+      /* §1.2 randomization — FOUR independent axes on a full-grid artifact, which §1.2 lets
+         substitute corner jitter for the site-shuffle pool:
+         (a) CORNER JITTER, column axis — the schedule anchors at column A, or at column B behind
+             the narrow gutter a real model keeps, so no two seeds put a graded cell at the same
+             address. The ROW axis is deliberately NOT jittered: the referenced rows straddle the
+             9/10 boundary, so a one-row slide would change the digit count of a formula and put
+             drift into the par sweep for nothing (the r439 `wrapfix` rule; cfslink solved the
+             same problem by keeping every referenced row on one side of it).
+         (b) CONTENT POOLS — the deal codename, the fiscal-year base, and the facility names a
+             desk genuinely disagrees about (Term loan B / Term loan A / Senior term loan;
+             Revolving credit facility / Revolver / Revolving facility).
+         (c) VALUES — every figure through rnd(): both rates, both opening balances, the five
+             amortization instalments and the five revolver movements.
+         (d) WHICH-ONE — the year the revolver is DRAWN rather than repaid moves across the plan,
+             so the facility that is shrinking on one seed swells mid-plan on the next and the
+             interest line bends in a different place. */
+      const c0=rnd(0,1)?1:2;                                    // (a)
+      const CA=colLetter(c0), CR=colLetter(c0+1);
+      const Y=[]; for(let i=0;i<5;i++) Y.push(colLetter(c0+2+i));
+      const P=a=>a[rnd(0,a.length-1)];                          // (b)
+      const tlLbl=P(['Term loan B','Term loan A','Senior term loan']);
+      const rvLbl=P(['Revolving credit facility','Revolver','Revolving facility']);
+      const y0=2025+rnd(0,3);
+      /* rows are CONSTANT across seeds — see (a). Two facilities, four lines each, the two rows
+         the model reads, and the control. The facility HEAD rows carry no figures, which is the
+         doctrine §3 geometry moat in the year columns; row 15 and row 18 are the moats around
+         the totals block. */
+      const rHdr=4, rTL=5, rTLb=6, rTLa=7, rTLe=8, rTLi=9,
+            rRV=10, rRVb=11, rRVd=12, rRVe=13, rRVi=14,
+            rTD=16, rTI=17, rChk=19, rNote=20;
+      /* (c) PRICING. Both rates are drawn in tenths and rendered to one decimal, so the player
+         always types exactly three characters plus the percent sign and the par count cannot
+         move with the draw. A revolver prices at or just inside its term loan, which is why the
+         revolver rate is derived from the term loan's rather than drawn independently. */
+      const tlT=rnd(55,85), rvT=tlT-rnd(10,20);
+      const tlRate=tlT/1000, rvRate=rvT/1000;
+      const tlPct=(tlT/10).toFixed(1), rvPct=(rvT/10).toFixed(1);
+      const tlBeg0=rnd(40,70)*10, rvBeg0=rnd(10,16)*10;
+      const drawYr=rnd(0,4);                                    // (d)
+      const amort=[], rvMove=[];
+      for(let i=0;i<5;i++){
+        amort.push(-rnd(2,6)*10);
+        rvMove.push(i===drawYr ? rnd(2,5)*10 : -rnd(1,2)*10);
       }
-      this._exp=[]; let sBeg=sBeg0, subBeg=subBeg0;
-      for(let i=0;i<5;i++){ const sEnd=sBeg+sAmort[i], sInt=sBeg*sRate, subEnd=subBeg+subAmort[i], subInt=subBeg*subRate;
-        this._exp.push({sBeg:sBeg,sEnd:sEnd,sInt:sInt,subBeg:subBeg,subEnd:subEnd,subInt:subInt,totD:sEnd+subEnd,totI:sInt+subInt});
-        sBeg=sEnd; subBeg=subEnd; }
-      return {ROWS:18, cells, active:{r:5,c:2}, sel:null, colW:{1:160,2:82,3:82,4:82,5:82,6:82}};
+      /* the schedule simulated forward, so the seeded feed and the expected page can never
+         disagree. The revolver floor is structural: four repayments of at most 20 against an
+         opening of at least 100 leaves it at 20 or better in every year, so it is never drawn
+         below zero and the basis memo can say so honestly. */
+      this._exp=[]; let tlB=tlBeg0, rvB=rvBeg0;
+      for(let i=0;i<5;i++){
+        const tlE=tlB+amort[i], rvE=rvB+rvMove[i], tlI=tlB*tlRate, rvI=rvB*rvRate;
+        this._exp.push({tlBeg:tlB, tlAm:amort[i], tlEnd:tlE, tlInt:tlI,
+                        rvBeg:rvB, rvMv:rvMove[i], rvEnd:rvE, rvInt:rvI,
+                        totD:tlE+rvE, totI:tlI+rvI});
+        tlB=tlE; rvB=rvE;
+      }
+      cells[CA+'1']={...blankCell(),value:codename()+' — debt & interest schedule ($mm)',txt:true,bold:true};
+      /* MODELING_STANDARDS §2 + §5 require BOTH of these said on the board: the sign convention
+         the whole page holds, and the circularity simplification. This engine has no iterative
+         calculation, so interest accrues on the OPENING balance — the ruling §5 already made,
+         and the reason a player never learns the average-balance habit here without knowing it
+         was traded away. Two lines rather than one because a single memo runs past the sheet
+         and clipsCol() would amputate it (§1.0-R3(r) — see the width note at the foot). */
+      cells[CA+'2']={...blankCell(),value:'Basis: $ in millions · amortization and repayments are carried negative',txt:true,it:true,fontColor:'gray'};
+      cells[CA+'3']={...blankCell(),value:'Interest accrues on the opening balance — this model runs without iterative calculation',txt:true,it:true,fontColor:'gray'};
+      cells[CA+rHdr]={...blankCell(),value:'Facility',txt:true,bold:true,bb:true};
+      cells[CR+rHdr]={...blankCell(),value:'Rate',txt:true,bold:true,align:'r',bb:true};
+      for(let i=0;i<5;i++) cells[Y[i]+rHdr]={...blankCell(),value:'FY'+String(y0+i).slice(2)+'E',txt:true,bold:true,align:'r',bb:true};
+      cells[CA+rTL]={...blankCell(),value:tlLbl,txt:true,bold:true};
+      cells[CA+rRV]={...blankCell(),value:rvLbl,txt:true,bold:true};
+      [[rTLb,'Beginning balance'],[rTLa,'Mandatory amortization'],[rTLe,'Closing balance'],[rTLi,'Interest expense'],
+       [rRVb,'Beginning balance'],[rRVd,'Draws / (repayments)'],[rRVe,'Closing balance'],[rRVi,'Interest expense'],
+       [rTD,'Total debt'],[rTI,'Total interest']].forEach(([r,n])=>{
+        cells[CA+r]={...blankCell(),value:n,txt:true}; });
+      /* §1.0(f) + §1.0-R2(l): the two priced cells are ASSUMPTIONS — light yellow, all borders,
+         individually labelled by the facility they sit inside, and they ship EMPTY because
+         filling them IS beat 1 (the nwcsched precedent; declared as a deviation in the payload).
+         They are ROW-ALIGNED with their own interest lines on purpose: that is what lets one
+         relative-row reference clone from one facility to the other, and it is how a real debt
+         schedule keeps pricing beside the facility it prices. */
+      cells[CR+rTLi]={...blankCell(),fill:'yellow',ball:true,align:'c',fmtStyle:'percent',decimals:1};
+      cells[CR+rRVi]={...blankCell(),fill:'yellow',ball:true,align:'c',fmtStyle:'percent',decimals:1};
+      /* §2.1b banker's-workbook finish + §1.3 "where the lesson isn't formatting, the board ships
+         pre-dressed": every empty forecast cell already carries its number format, both closing
+         rows already wear bold and their TOP rule (§1.0(f)), and the two rows the player dresses
+         in beat 6 are the ones the beat names. Pre-dressing the closings is also what keeps the
+         ☆'s paste format-neutral — a fill or a paste copies the SOURCE cell's format (the r439
+         `cases` hazard), and here source and destination are already identical. */
+      for(let i=0;i<5;i++){ const C=Y[i], e=this._exp[i];
+        cells[C+rTLb]= (i===0) ? {...blankCell(),value:tlBeg0,fontColor:'blue',fmtStyle:'comma',decimals:0}
+                               : {...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[C+rTLa]={...blankCell(),value:e.tlAm,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[C+rTLe]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+        cells[C+rTLi]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[C+rRVb]= (i===0) ? {...blankCell(),value:rvBeg0,fontColor:'blue',fmtStyle:'comma',decimals:0}
+                               : {...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[C+rRVd]={...blankCell(),value:e.rvMv,fontColor:'blue',fmtStyle:'comma',decimals:0};
+        cells[C+rRVe]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true,bt:true};
+        cells[C+rRVi]={...blankCell(),fmtStyle:'comma',decimals:0};
+        cells[C+rTD]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+        cells[C+rTI]={...blankCell(),fmtStyle:'comma',decimals:0,bold:true};
+      }
+      /* MODELING_STANDARDS §6: the control every debt schedule carries, in one visible place,
+         reading zero. It ships PRE-BUILT and live — cross-footing the final closing debt against
+         the opening balances plus every movement — so it reads the whole block's negative at load
+         and snaps to zero as the rolls land. It is the §4.86 page's prove-out ☆, promoted onto
+         the board rather than deleted (§1.0-R4(u)); it is NOT graded, because it can only be
+         wrong when beats 2, 3 and 5 are already wrong. */
+      const chkF='='+Y[4]+rTD+'-('+Y[0]+rTLb+'+SUM('+Y[0]+rTLa+':'+Y[4]+rTLa+')+'+Y[0]+rRVb+'+SUM('+Y[0]+rRVd+':'+Y[4]+rRVd+'))';
+      cells[CA+rChk]={...blankCell(),value:'Roll check — closing debt less opening balances and movements',txt:true};
+      cells[Y[4]+rChk]={...blankCell(),formula:chkF,value:-(this._exp[4].totD),fmtStyle:'comma',decimals:0,bold:true,ball:true};
+      cells[CA+rNote]={...blankCell(),value:'Reviewer: amortization and revolver movements come from the cash flow forecast',txt:true,it:true,fontColor:'gray'};
+      this._o={ c0:c0, CA:CA, CR:CR, Y:Y, Y0:Y[0], Y1:Y[1], YL:Y[4],
+        cY0:c0+2, cYn:c0+6, y0:y0, drawYr:drawYr,
+        rHdr:rHdr, rTL:rTL, rTLb:rTLb, rTLa:rTLa, rTLe:rTLe, rTLi:rTLi,
+        rRV:rRV, rRVb:rRVb, rRVd:rRVd, rRVe:rRVe, rRVi:rRVi,
+        rTD:rTD, rTI:rTI, rChk:rChk,
+        tlPct:tlPct, rvPct:rvPct, tlRateV:tlRate, rvRateV:rvRate,
+        tlRate:CR+rTLi, rvRate:CR+rRVi, rateRng:CR+rTLi+':'+CR+rRVi,
+        fTlEnd:'='+Y[0]+rTLb+'+'+Y[0]+rTLa,
+        fTlInt:'='+Y[0]+rTLb+'*$'+CR+rTLi,
+        fTlLink:'='+Y[0]+rTLe,
+        fRvEnd:'='+Y[0]+rRVb+'+'+Y[0]+rRVd,
+        fRvInt:'='+Y[0]+rRVb+'*$'+CR+rRVi,
+        fRvLink:'='+Y[0]+rRVe,
+        fTotD:'='+Y[0]+rTLe+'+'+Y[0]+rRVe,
+        fTotI:'='+Y[0]+rTLi+'+'+Y[0]+rRVi,
+        tlLinkRng:Y[1]+rTLb+':'+Y[4]+rTLb, rvLinkRng:Y[1]+rRVb+':'+Y[4]+rRVb,
+        tlEngRng:Y[0]+rTLe+':'+Y[4]+rTLi, rvEngRng:Y[0]+rRVe+':'+Y[4]+rRVi,
+        tlRollRect:Y[0]+rTLb+':'+Y[4]+rTLe, rvRollRect:Y[0]+rRVb+':'+Y[4]+rRVe,
+        intBand:Y[0]+rTLi+':'+Y[4]+rRVi, totRect:Y[0]+rTD+':'+Y[4]+rTI };
+      /* WIDTH (§1.0-R3(r) — reason in the named constants, never a hand metric, never a width
+         number in a beat). The longest label sitting on a row whose year columns are OCCUPIED is
+         'Mandatory amortization', 22 glyphs: 22 × TXTPX 6.9 + PAD_TXT 20 = 172, and clipsCol()
+         amputates anything narrower. 196 clears it with a margin. The year columns hold '(1,234)'
+         at worst — 7 × CHARPX 8.6 + PAD_NUM 12 = 73 — so 86 is comfortable, and the rate column
+         holds '8.5%' at 4 × 8.6 + 12 = 47 inside 62. Solved sheet: 196 + 62 + 5×86 = 688px, plus
+         the 26px gutter when the jitter pushes the schedule to column B — 714px against ~822px of
+         grid. No width verdict is graded here, so the drill is NOT __noShrink and the elastic fit
+         still owns the sheet. The four long text lines (title, two basis memos, reviewer note)
+         and the roll-check label sit beside EMPTY cells and SPILL, which is what Excel does and
+         what clipsCol() correctly does not call clipping — but the spill run is finite, so each
+         one is written under 688px of room (the longest, the check label at 58 glyphs, needs
+         58 × 6.9 + 20 = 420 against the 602px that ends at the occupied check figure). */
+      const colW={}; if(c0===2) colW[1]=26;
+      colW[c0]=196; colW[c0+1]=62; for(let i=0;i<5;i++) colW[c0+2+i]=86;
+      return {ROWS:20, cells, active:{r:rTLi,c:c0+1}, sel:null, colW:colW};
     },
     checks(S){
-      const E=this._exp;
-      const v=k=>{ const c=S.cells[k]; return (c&&c.formula&&typeof c.value==='number')?c.value:null; };
-      const near=(k,exp)=>{ const val=v(k); return val!==null&&Math.abs(val-exp)<Math.max(Math.abs(exp)*5e-3,0.5); };
-      const refs=(k,rs)=>{ const c=S.cells[k]; if(!c||!c.formula) return false; const f=String(c.formula).toUpperCase().replace(/\$/g,''); return rs.every(x=>f.includes(x)); };
-      const COL=['B','C','D','E','F'];
-      const sLink=[1,2,3,4].every(i=>refs(COL[i]+'3',[COL[i-1]+'5']) && near(COL[i]+'3',E[i].sBeg));
-      const subLink=[1,2,3,4].every(i=>refs(COL[i]+'8',[COL[i-1]+'10']) && near(COL[i]+'8',E[i].subBeg));
+      const o=this._o, E=this._exp, Y=o.Y;
+      const cel=k=>S.cells[k]||{};
+      const num=k=>{ const c=cel(k); return (typeof c.value==='number')?c.value:NaN; };
+      /* §1.0-R3(p): every build beat reads a LIVE formula plus the number standing on the board,
+         never the formula's TEXT. The tolerance is wider than one display step at zero decimals,
+         so the ROUND(...,0) a desk legitimately writes clears exactly like the raw product, and a
+         player who types five separate correct formulas clears exactly like one who filled. */
+      const live=(k,want)=>{ const c=cel(k);
+        return !!c.formula && typeof c.value==='number'
+          && Math.abs(c.value-want)<=Math.max(0.6, Math.abs(want)*5e-3); };
+      /* the corkscrew grade (MODELING_STANDARDS §3, "the beginning cell must REFERENCE the prior
+         ending — never re-type it"; §7 lists it among the conventions that ARE end state).
+         Boundary-safe and $-stripped, so =<prior>, =+<prior>, =$<prior>, =SUM(<prior>), <prior>+0
+         and a pointed reference all clear — only a typed constant or a re-derivation from the
+         prior year's components fails, which is the junior error the beat trains out. The
+         boundary matters: a bare indexOf would let 'C13' satisfy 'C1'. */
+      const points=(k,src)=>{ const c=cel(k); if(!c.formula) return false;
+        const f=String(c.formula).toUpperCase().replace(/\$/g,'');
+        return new RegExp('(^|[^A-Z0-9])'+src+'([^0-9]|$)').test(f); };
+      /* beat 1 — the pricing. The END STATE is the rate standing in the cell in blue ink; nothing
+         asks HOW it got there, so a typed '7.5%', a bare '7.5' into the percent-formatted cell
+         (the r418 auto-scale branch) and either blue door all clear. */
+      const priced=(k,want)=>{ const c=cel(k);
+        return typeof c.value==='number' && Math.abs(c.value-want)<5e-5 && c.fontColor==='blue'; };
+      const rateOk = priced(o.tlRate,o.tlRateV) && priced(o.rvRate,o.rvRateV);
+      const tlEndOk=[0,1,2,3,4].every(i=>live(Y[i]+o.rTLe, E[i].tlEnd));
+      const tlLinkOk=[1,2,3,4].every(i=>live(Y[i]+o.rTLb, E[i].tlBeg) && points(Y[i]+o.rTLb, Y[i-1]+o.rTLe));
+      const rvEndOk=[0,1,2,3,4].every(i=>live(Y[i]+o.rRVe, E[i].rvEnd));
+      const rvLinkOk=[1,2,3,4].every(i=>live(Y[i]+o.rRVb, E[i].rvBeg) && points(Y[i]+o.rRVb, Y[i-1]+o.rRVe));
+      const intOk=[0,1,2,3,4].every(i=>live(Y[i]+o.rTLi, E[i].tlInt) && live(Y[i]+o.rRVi, E[i].rvInt));
+      /* the two totals grade the RELATIONSHIP against the board's own lines rather than a stored
+         answer, so a player who rounded both interest lines gets a total that agrees with what is
+         on screen, and a player whose facility is wrong sees the line they actually broke. */
+      const totOk=[0,1,2,3,4].every(i=>{
+        const d=num(Y[i]+o.rTLe)+num(Y[i]+o.rRVe), t=num(Y[i]+o.rTLi)+num(Y[i]+o.rRVi);
+        const cd=cel(Y[i]+o.rTD), ct=cel(Y[i]+o.rTI);
+        return !!cd.formula && !!ct.formula && !isNaN(d) && !isNaN(t)
+          && Math.abs(num(Y[i]+o.rTD)-d)<=0.6 && Math.abs(num(Y[i]+o.rTI)-t)<=0.6; });
+      /* beat 6 — §1.0(f)/MODELING_STANDARDS §1: a total wears a TOP rule. LENIENT reading
+         (r446b, CAMPAIGN §5 — declared in the payload): Alt H B P over the two-row block sets bt
+         on BOTH rows, Alt H B D adds bb, Alt H B A stores `ball` and no bt at all, Alt H B S per
+         row sets bt+bb, and Alt H J → Total sets bold+bt+bb. A strict `bt && !bb && !bdbl` would
+         strand three of those, which is §1.0-R3(p) exactly. A rule ONLY underneath still fails —
+         that is what §1.0(f) exists to kill. */
+      const ruled=r=>[0,1,2,3,4].every(i=>{ const c=cel(Y[i]+r); return !!(c.bt||c.ball); });
+      /* ☆ recipe (§1.0(d) hidden efficiency · §1.0-R2(i) a real, skippable decision · the
+         format/formula-CLONING family of §1.0-R4(u)): the revolver's engine ARRIVES from the term
+         loan's by paste. Read off the r425 S.pasteLog latch — the MECHANIC and its two rects,
+         never geometry inferred from the end state — so Ctrl+V, the Alt H V S paste-special
+         Formulas walk and the legacy Alt E S dialog all earn it, and the source may be the
+         finished 2×5 block or a 2×1 column tiled across the plan. A VALUES paste is excluded by
+         `kind` and would fail beat 3's liveness anyway: it lands the right numbers dead, which is
+         the hardcode MODELING_STANDARDS §1 forbids. The value conjuncts are what make this
+         ANCHORING MASTERY rather than a gesture — an over-anchored rate reference prices the
+         revolver at the term loan's rate and the board reads visibly wrong. */
+      const cloned=(S.pasteLog||[]).some(p=>(p.kind==='all'||p.kind==='formulas')
+        && p.sr===o.rTLe && (p.sr+p.sh-1)>=o.rTLi
+        && p.sc>=o.cY0 && (p.sc+p.sw-1)<=o.cYn
+        && p.r0===o.rRVe && (p.r0+p.h-1)>=o.rRVi
+        && p.c0<=o.cY0 && (p.c0+p.w-1)>=o.cYn);
       return [
-        {label:'roll the senior tranche — ending (=B3+B4) and each year opening at the prior close', ok:[0,1,2,3,4].every(i=>near(COL[i]+'5',E[i].sEnd)) && refs('B5',['B3','B4']) && sLink},
-        {label:'run senior interest — the anchored senior rate on each opening (=B3*$B$16)', ok:[0,1,2,3,4].every(i=>near(COL[i]+'6',E[i].sInt)) && refs('B6',['B3','B16'])},
-        {label:'roll the sub tranche — ending (=B8+B9) linked to the prior close', ok:[0,1,2,3,4].every(i=>near(COL[i]+'10',E[i].subEnd)) && refs('B10',['B8','B9']) && subLink},
-        {label:'run sub interest — the anchored sub rate on each opening (=B8*$B$17)', ok:[0,1,2,3,4].every(i=>near(COL[i]+'11',E[i].subInt)) && refs('B11',['B8','B17'])},
-        {label:'total the block — total debt (=B5+B10) and total interest (=B6+B11), filled across', ok:[0,1,2,3,4].every(i=>near(COL[i]+'13',E[i].totD)&&near(COL[i]+'14',E[i].totI)) && refs('B13',['B5','B10']) && refs('B14',['B6','B11'])},
+        /* §1.0-R2(g) ADAPTIVE LABEL: the pricing moves every seed, so the line names THIS seed's
+           two rates instead of making the player reverse-engineer the commitment letter. */
+        {label:'Enter the two rates in blue — term loan '+o.tlPct+'%, revolver '+o.rvPct+'%', ok: rateOk},
+        {label:'Build the term loan roll — each year opens on the prior close', ok: tlEndOk && tlLinkOk},
+        {label:'Build the revolver roll — draws and repayments against the opening balance', ok: rvEndOk && rvLinkOk},
+        {label:'Build both interest lines — each facility on its own rate', ok: intOk},
+        {label:'Total debt and total interest — both rows, all five years', ok: totOk},
+        {label:'Add a top border above the total debt and total interest rows', ok: ruled(o.rTD) && ruled(o.rTI)},
+        {label:'Copy the term loan’s closing and interest rows onto the revolver', ok: rvEndOk && intOk && cloned, bonus:true},
       ];
     }
   },
