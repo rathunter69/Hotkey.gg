@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Roll working capital — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Type the drivers, paint them blue, roll NWC five years Par 74s, optimal 78 keys. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="Roll receivables, inventory and payables off three day-count drivers Par 102s, optimal 97 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Roll working capital — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Type the drivers, paint them blue, roll NWC five years Par 74s, optimal 78 keys. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="Roll receivables, inventory and payables off three day-count drivers Par 102s, optimal 97 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/nwcsched.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Roll working capital — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Type the drivers, paint them blue, roll NWC five years Par 74s, optimal 78 keys. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="Roll receivables, inventory and payables off three day-count drivers Par 102s, optimal 97 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/nwcsched.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -85,7 +85,7 @@
   .trackhead small{color:var(--faint); font-weight:400; font-size:12px}
   .trackhead .tb{font-size:12.5px; color:var(--muted); font-weight:400; margin-top:4px; line-height:1.55}</style>
 <link rel="stylesheet" href="nav.css?v=210">
-<script src="drills.js?v=294"></script>
+<script src="drills.js?v=300"></script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -93,7 +93,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=310"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Roll working capital","description":"Type the drivers, paint them blue, roll NWC five years","url":"https://www.hotkey.gg/drills/nwcsched.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Full Builds","teaches":"DSO, DIO, DPO drive the balances — working capital rolls on days, not guesses.","isPartOf":{"@type":"Course","name":"Financial Modeling Keyboard Mastery","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT74S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Roll working capital","item":"https://www.hotkey.gg/drills/nwcsched.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Roll working capital","description":"Roll receivables, inventory and payables off three day-count drivers","url":"https://www.hotkey.gg/drills/nwcsched.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Full Builds","teaches":"working capital is three ratios pointed at two lines — the balances are an output, never a guess.","isPartOf":{"@type":"Course","name":"Financial Modeling Keyboard Mastery","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT102S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Roll working capital","item":"https://www.hotkey.gg/drills/nwcsched.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -102,31 +102,36 @@
   <div class="crumbs"><a href="index.html">hotkey.gg</a> / <a href="drills/index.html">drill library</a> / full builds</div>
   <div class="eyebrow">◆ Full Builds · drill · Financial Modeling Keyboard Mastery track</div>
   <h1>Roll working capital</h1>
-  <div class="aha">DSO, DIO, DPO drive the balances — working capital rolls on days, not guesses.</div>
-  <div class="sub">Working capital from the drivers: three assumptions from the data room — type them in, color them blue, then build. AR off DSO (days customers take to pay), inventory off DIO (days stock sits), payables off DPO (days you take to pay), each driver anchored and filled across five years; net working capital bolded and ruled.</div>
+  <div class="aha">working capital is three ratios pointed at two lines — the balances are an output, never a guess.</div>
+  <div class="sub">The operating model closed last night and the cash flow statement is waiting on working capital. Diligence reset the day-count assumptions this morning — put them in the driver block and roll receivables, inventory and payables out across the plan. The change line at the bottom is the number the cash flow statement reads on Monday.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=nwcsched">train this drill →</a>
-    <span class="par">par 74s · optimal 78 keys · keyboard only · free</span>
+    <span class="par">par 102s · optimal 97 keys · keyboard only · free</span>
   </div>
 
   <div class="section-title">The shortcuts in this drill</div>
   <div class="panel">
     <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
+    <div class="scb"><div class="sch"><kbd>Shift+↑</kbd><span class="m">⇧↑ on mac</span><span class="what">Extend selection one cell</span></div></div>
     <div class="scb"><div class="sch"><kbd>Alt h f c</kbd><span class="m">⌥ h f c on mac</span><span class="what">Font color</span></div><div class="use">Font color: blue inputs, black formulas — the oldest convention in banking models, still enforced.</div></div>
+    <div class="scb"><div class="sch"><kbd>Shift+↓</kbd><span class="m">⇧↓ on mac</span><span class="what">Extend selection one cell</span></div></div>
+    <div class="scb"><div class="sch"><kbd>Shift+→</kbd><span class="m">⇧→ on mac</span><span class="what">Extend selection one cell</span></div><div class="use">Nudge a selection one cell at a time when the block you need doesn’t end at a data edge.</div></div>
     <div class="scb"><div class="sch"><kbd>Ctrl+R</kbd><span class="m">⌘R on mac</span><span class="what">Fill right from the cell to the left</span></div><div class="use">Same as fill down, but across — one quarter’s formula becomes the whole year in two keystrokes.</div></div>
     <div class="scb"><div class="sch"><kbd>Ctrl+B</kbd><span class="m">⌘B on mac</span><span class="what">Bold</span></div><div class="use">Bold marks structure: titles, total rows, anything the reviewer’s eye should land on first.</div></div>
     <div class="scb"><div class="sch"><kbd>Alt h b p</kbd><span class="m">⌥ h b p on mac</span><span class="what">Top border</span></div><div class="use">Top border above a total row — the accounting ruling that says “this line sums the ones above.”</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+S</kbd><span class="m">⌘S on mac</span><span class="what">Save</span></div></div>
+    <div class="fnline">functions you'll type: <b style="color:var(--text)">SUM()</b></div>
   </div>
 
   <div class="section-title">The optimal line</div>
-  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys">type the drivers at B9:B11 — DSO <em>35</em> · DIO <em>66</em> · DPO <em>35</em> — then <em>alt h f c</em> blue · <em>B4</em> =B2/365*$B$9 fill → · <em>B5</em> =B3/365*$B$10 fill → · <em>B6</em> =B3/365*$B$11 fill → · <em>B7</em> =B4+B5-B6 fill → + <em>ctrl+b</em> + <em>alt h b p</em> · <em>C8</em> Δ =C7-B7 fill →</div></div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys">type <em>38</em> / <em>61</em> / <em>46</em> down C5:C7 · <em>alt h f c</em> →×4 blue · E14 <em>=E11/365*$C$5</em> · E15 <em>=E12/365*$C$6</em> · E16 <em>=-E12/365*$C$7</em> · E17 <em>=SUM(E14:E16)</em> · E18 <em>=E17-D17</em> · <em>ctrl+r</em> · <em>ctrl+b</em> + <em>alt h b p</em> · <em>ctrl+s</em></div></div>
 
   <div class="section-title">More Full Builds drills</div>
   <div class="rel">
-    <a href="drills/isbuild.html"><div class="rn">Build the income statement</div><div class="rd">5-yr IS: anchored drivers, margin row as %, bottom line ruled</div></a>
-    <a href="drills/bsbuild.html"><div class="rn">Balance the balance sheet</div><div class="rd">3 yrs: SUM both sides, RE roll filled across, the check landing at zero</div></a>
-    <a href="drills/cfslink.html"><div class="rn">Link the cash flow statement</div><div class="rd">5-yr cash roll-forward + conversion memo as %, the close bold with a top border</div></a>
-    <a href="drills/threestmt.html"><div class="rn">Tie the three statements</div><div class="rd">3 yrs × 3 links, checks at zero, totals formatted to ship</div></a>
+    <a href="drills/isbuild.html"><div class="rn">Build the income statement</div><div class="rd">Five forecast years off one driver panel — revenue grown year on year, the cost lines as a</div></a>
+    <a href="drills/bsbuild.html"><div class="rn">Balance the balance sheet</div><div class="rd">Three years: roll retained earnings, total both sides, land the check at zero</div></a>
+    <a href="drills/cfslink.html"><div class="rn">Link the cash flow statement</div><div class="rd">Point the statement at its schedules, close the cash roll year to year, read cash conversi</div></a>
+    <a href="drills/threestmt.html"><div class="rn">Tie the three statements</div><div class="rd">Three statements on one page — net income, cash and retained earnings wired, the check at </div></a>
   </div>
   <div class="cta-row" style="margin-top:26px">
     <a class="cta" href="drills/cfslink.html">← CFS Link</a>

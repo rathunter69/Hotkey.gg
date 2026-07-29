@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="../">
 <title>Run precedent transactions — Excel shortcut drill · hotkey.gg</title>
-<meta name="description" content="Multiples paid, the median, and the implied equity Par 36s, optimal 36 keys. Free interactive Excel drill — no mouse allowed.">
+<meta name="description" content="A six-deal precedent tape, the median multiple paid, and the implied equity value Par 52s, optimal 49 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="Run precedent transactions — Excel shortcut drill · hotkey.gg">
-<meta property="og:description" content="Multiples paid, the median, and the implied equity Par 36s, optimal 36 keys. Free interactive Excel drill — no mouse allowed.">
+<meta property="og:description" content="A six-deal precedent tape, the median multiple paid, and the implied equity value Par 52s, optimal 49 keys. Free interactive Excel drill — no mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/drills/txncomps.html">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Run precedent transactions — Excel shortcut drill · hotkey.gg">
-<meta name="twitter:description" content="Multiples paid, the median, and the implied equity Par 36s, optimal 36 keys. Free interactive Excel drill — no mouse allowed.">
+<meta name="twitter:description" content="A six-deal precedent tape, the median multiple paid, and the implied equity value Par 52s, optimal 49 keys. Free interactive Excel drill — no mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/drills/txncomps.html">
 <link rel="icon" href="favicon.ico?v=174" sizes="16x16 32x32 48x48">
@@ -85,7 +85,7 @@
   .trackhead small{color:var(--faint); font-weight:400; font-size:12px}
   .trackhead .tb{font-size:12.5px; color:var(--muted); font-weight:400; margin-top:4px; line-height:1.55}</style>
 <link rel="stylesheet" href="nav.css?v=210">
-<script src="drills.js?v=294"></script>
+<script src="drills.js?v=300"></script>
 <script>
   const SUPABASE_URL='https://vshtftzrlepedydmkcnm.supabase.co';
   const SUPABASE_ANON_KEY='sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
@@ -93,7 +93,7 @@
   window.NAV_ACTIVE='';
 </script>
 <script src="themes.js?v=310"></script>
-<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Run precedent transactions","description":"Multiples paid, the median, and the implied equity","url":"https://www.hotkey.gg/drills/txncomps.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Models I","teaches":"Precedents are comps with dates — same multiples, read in deal order.","isPartOf":{"@type":"Course","name":"Financial Modeling Keyboard Mastery","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT36S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Run precedent transactions","item":"https://www.hotkey.gg/drills/txncomps.html"}]}]</script>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"LearningResource","name":"Run precedent transactions","description":"A six-deal precedent tape, the median multiple paid, and the implied equity value","url":"https://www.hotkey.gg/drills/txncomps.html","learningResourceType":"Interactive keyboard drill","interactivityType":"active","educationalLevel":"Models I","teaches":"the median of six deals is the mark — one buyer who reached does not move it.","isPartOf":{"@type":"Course","name":"Financial Modeling Keyboard Mastery","url":"https://www.hotkey.gg/drills/","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"}},"about":{"@type":"Thing","name":"Microsoft Excel keyboard shortcuts"},"timeRequired":"PT52S","provider":{"@type":"Organization","name":"hotkey.gg","url":"https://www.hotkey.gg/"},"isAccessibleForFree":true},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"hotkey.gg","item":"https://www.hotkey.gg/"},{"@type":"ListItem","position":2,"name":"Drill library","item":"https://www.hotkey.gg/drills/"},{"@type":"ListItem","position":3,"name":"Run precedent transactions","item":"https://www.hotkey.gg/drills/txncomps.html"}]}]</script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -102,28 +102,33 @@
   <div class="crumbs"><a href="index.html">hotkey.gg</a> / <a href="drills/index.html">drill library</a> / models i</div>
   <div class="eyebrow">◆ Models I · drill · Financial Modeling Keyboard Mastery track</div>
   <h1>Run precedent transactions</h1>
-  <div class="aha">Precedents are comps with dates — same multiples, read in deal order.</div>
-  <div class="sub">Five precedent deals, one target. Compute EV/EBITDA paid in each deal, take the MEDIAN of the multiples with one live formula — outliers can’t drag it — then mark the target: implied EV at the median multiple, less net debt, equals implied equity.</div>
+  <div class="aha">the median of six deals is the mark — one buyer who reached does not move it.</div>
+  <div class="sub">Your MD wants a precedent read on the target before Monday’s committee. Six deals in the space are already on the page with what was paid and the LTM EBITDA behind it. Compute the multiple paid on each deal, take the median across the set, then mark the target at that multiple and bridge it down to implied equity value. TEV is transaction enterprise value — the equity paid plus the debt assumed.</div>
   <div class="cta-row">
     <a class="cta solid" href="index.html?drill=txncomps">train this drill →</a>
-    <span class="par">par 36s · optimal 36 keys · keyboard only · free</span>
+    <span class="par">par 52s · optimal 49 keys · keyboard only · free</span>
   </div>
 
   <div class="section-title">The shortcuts in this drill</div>
   <div class="panel">
+    <div class="walknote">Alt walks: tap <kbd>Alt</kbd>, release, then the letters in sequence — each key steps one ribbon menu. On a Mac, tap <kbd>⌥</kbd> and use the same letters (KeyTips, Excel 2024+).</div>
+    <div class="scb"><div class="sch"><kbd>Shift+↓</kbd><span class="m">⇧↓ on mac</span><span class="what">Extend selection one cell</span></div></div>
     <div class="scb"><div class="sch"><kbd>Ctrl+D</kbd><span class="m">⌘D on mac</span><span class="what">Fill down from the cell above</span></div><div class="use">Build the logic once in the top cell, select down, and stamp it — the standard way to fill a schedule.</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+B</kbd><span class="m">⌘B on mac</span><span class="what">Bold</span></div><div class="use">Bold marks structure: titles, total rows, anything the reviewer’s eye should land on first.</div></div>
+    <div class="scb"><div class="sch"><kbd>Alt h b p</kbd><span class="m">⌥ h b p on mac</span><span class="what">Top border</span></div><div class="use">Top border above a total row — the accounting ruling that says “this line sums the ones above.”</div></div>
+    <div class="scb"><div class="sch"><kbd>Ctrl+S</kbd><span class="m">⌘S on mac</span><span class="what">Save</span></div></div>
     <div class="fnline">functions you'll type: <b style="color:var(--text)">MEDIAN()</b></div>
   </div>
 
   <div class="section-title">The optimal line</div>
-  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys"><em>D3</em> · <em>=B3/C3</em> · fill D3:D7 ↓ · <em>D8</em> median <em>=MEDIAN(D3:D7)</em> · <em>B11</em> implied EV <em>=B10*D8</em> · <em>B13</em> implied equity <em>=B11-B12</em></div></div>
+  <div class="panel"><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-bottom:10px">the par-setting sequence, straight through:</div><div class="keys">multiple <em>G5</em> → <em>=E5/F5</em> · select G5:G10 · <em>ctrl+d</em> · <em>G12</em> → <em>=MEDIAN(G5:G10)</em> · <em>E16</em> → <em>=E15*G12</em> · <em>E18</em> → <em>=E16-E17</em> · <em>ctrl+b</em> · <em>alt h b p</em> · <em>ctrl+s</em></div></div>
 
   <div class="section-title">More Models I drills</div>
   <div class="rel">
-    <a href="drills/wacc.html"><div class="rn">Build the discount rate</div><div class="rd">Unlever, relever, CAPM, weight — the full discount-rate build</div></a>
+    <a href="drills/wacc.html"><div class="rn">Build the discount rate</div><div class="rd">Unlever a five-comp beta set, relever at your own structure, weight both sides</div></a>
     <a href="drills/fcfbuild.html"><div class="rn">Build the unlevered FCF</div><div class="rd">EBIT → less taxes → NOPAT → plus D&amp;A, less capex and the NWC build: the row every DCF disc</div></a>
-    <a href="drills/dcf.html"><div class="rn">Discount the cash flows</div><div class="rd">Discount factors × cash flows build the PV row; the TV reuses the year-5 factor</div></a>
-    <a href="drills/comps.html"><div class="rn">Run the comps</div><div class="rd">Build the multiples, read the summary — median, high/low and the LARGE/SMALL trimmed range</div></a>
+    <a href="drills/dcf.html"><div class="rn">Discount the cash flows</div><div class="rd">Discount factors × free cash flows build the present-value row; a Gordon terminal value an</div></a>
+    <a href="drills/comps.html"><div class="rn">Run the comps</div><div class="rd">Build both enterprise-value multiples across the peer set, read the median, high and low, </div></a>
   </div>
   <div class="cta-row" style="margin-top:26px">
     <a class="cta" href="drills/comps.html">← Comps</a>
