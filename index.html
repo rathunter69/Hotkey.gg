@@ -371,6 +371,10 @@
   .rm-clock span{color:var(--muted)}
   .rm-bonus{font-family:var(--mono); font-size:12px; color:var(--muted); margin:2px 0}
   .rm-bonus.ok{color:var(--warn)}
+  /* r450 (flow audit P0-1): sits where the medal row would have been on a guided/mouse run */
+  .rm-practice{font-family:var(--mono); font-size:12px; color:var(--muted); margin:8px 0 2px;
+    border:1px dashed var(--line); border-radius:8px; padding:6px 8px; line-height:1.5}
+  .rm-practice span{color:var(--faint)}
   .rm-splits{margin-top:8px; font-family:var(--mono); font-size:10.5px; text-align:left}
   .rm-splits .rm-split, .rm-splits .rs-h{display:flex; gap:6px; align-items:baseline; padding:1px 2px}
   .rm-splits .rs-h{color:var(--faint); text-transform:uppercase; letter-spacing:.08em; font-size:9.5px; border-bottom:1px solid var(--line); margin-bottom:2px}
@@ -930,7 +934,11 @@
     padding:22px 26px; width:340px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.55);
     max-height:calc(100vh - 48px); overflow-y:auto; display:flex; flex-direction:column}
   .rm-card>*{flex:0 0 auto}
-  .rm-more.open{max-height:44vh; overflow-y:auto; flex:0 1 auto}
+  /* r450 (flow audit P2-2): 44vh alone still let the fold crowd the card at <=800px tall —
+     "where the time went", the 💡 tip and the leaderboard line were pushed under the action
+     row. Clamp against the real furniture (title + time + hooks + buttons ~= 320px) so the
+     fold scrolls internally instead of squeezing the rest of the card off screen. */
+  .rm-more.open{max-height:min(44vh, calc(100vh - 320px)); overflow-y:auto; flex:0 1 auto}
   .rm-title{font-family:var(--mono); font-size:12px; color:var(--accent); text-transform:uppercase;
     letter-spacing:1px; margin-bottom:8px}
   .rm-time{font-family:var(--mono); font-size:48px; font-weight:700; color:var(--text);
@@ -1162,6 +1170,9 @@
   .gate-brand{font-family:var(--mono); font-weight:700; font-size:22px; letter-spacing:-.5px; margin-bottom:16px}
   .gate-brand b{color:var(--accent)}
   .gate .auth-card p b{color:var(--text)}
+  /* r450 (flow audit P0-3): the one line that says what the product is, above the code input */
+  .gate-tag{font-size:12.5px; color:var(--faint) !important; margin-bottom:14px !important;
+    border-bottom:1px solid var(--line); padding-bottom:14px}
   /* ---- top exercise row + bottom sheet tabs ---- */
   .exrow{margin-bottom:8px}
   /* r398 (Wolf #99): a LIGHT top-bar reclaim (keeps clear breathing room) paired with the
@@ -1726,6 +1737,8 @@
   .tour-foot{display:flex; gap:8px; padding:0 15px 14px; font-family:var(--mono); font-size:11px}
   .tour-next{color:var(--accent); cursor:pointer; border:1px solid var(--accent-dim); border-radius:6px; padding:4px 12px}
   .tour-skip{color:var(--faint); cursor:pointer; padding:4px 8px}
+  /* r450 (flow audit P0-2): the armed state of the two-press skip on the first three beats */
+  .tour-skip.armed{color:var(--warn); font-weight:600}
     /* r68: mobile gate — the game needs a physical keyboard */
   .mobile-gate{display:none}
   @media (max-width:740px), (pointer:coarse) and (max-width:1024px){
@@ -23814,8 +23827,25 @@ function maybeStartCoach(){
     '<b>2.</b> the glowing cell is your start \u2014 you\u2019re already on it, <b>just type</b><br>'+
     '<b>3.</b> clear every checklist line \u2014 the clock stops itself';
   gw.style.position='relative';
+  /* r450 (flow audit P1-8): at 1024x700 the "how a drill works" card and the post-tour toast
+     both land bottom-left and OVERLAP — the two surfaces a first-run player most needs to read,
+     stacked on top of each other on their one and only appearance.
+     The toast lane is FIXED to the viewport (#hkToast: bottom 26px, ~46px tall); the coach is
+     absolute inside .gridwrap, which on a short window runs past the fold. So a flat bottom
+     offset can't clear the lane — 56px still collided at 1024x700 (measured). Anchor the lift
+     to the viewport instead: raise the card until its bottom edge is above the lane, clamped so
+     it can never climb out of the gridwrap. */
   c.style.left='18px'; c.style.bottom='16px';
   gw.appendChild(c);
+  try{
+    const LANE=96;   // toast bottom (26) + toast height (~46) + breathing room
+    const gr=gw.getBoundingClientRect();
+    const need=Math.round(gr.bottom - (window.innerHeight - LANE));
+    if(need>16){
+      const ceil=Math.max(16, Math.round(gr.height - c.offsetHeight - 8));
+      c.style.bottom=Math.min(Math.max(need, 56), ceil)+'px';
+    }
+  }catch(e){}
   c.querySelector('.sc-x').onclick=()=>{ try{ c.remove(); localStorage.setItem('hk_start_coach','1'); }catch(e){} };
   /* first keystroke dismisses via startClock's cleanup; latch so it never returns */
   const latch=()=>{ try{ localStorage.setItem('hk_start_coach','1'); }catch(e){} document.removeEventListener('keydown', latch, true); };
@@ -24011,7 +24041,9 @@ function hkClocksFor(key){
 function hkClockFmt(sec){ sec=Math.round(sec); return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0'); }
 function hkClockStrip(key){
   const c=hkClocksFor(key); if(!c) return '';
-  return '<span class="hk-clocks">'+
+  /* r450 (flow audit P1-2): the strip advertised three tiers all session and nothing in the
+     first session ever said what they were or that a guided run can't earn them. */
+  return '<span class="hk-clocks" title="the three medal times for this drill — beat them on a clean, unguided, keyboard-only run (pass = par ×1.5 · pro = ×1.15 · legendary = par)">'+
     '<b style="color:#aeb6c0">pass '+hkClockFmt(c.pass)+'</b> · '+
     '<b style="color:#e0b341">pro '+hkClockFmt(c.pro)+'</b> · '+
     '<b style="color:#b98bff">legendary '+hkClockFmt(c.leg)+'</b></span>';
@@ -24621,7 +24653,7 @@ function showResults(o){
     if(ev.key==='Escape'){ ev.preventDefault(); hideResults(); openPicker(); return; }   // r88: the card promises esc=menu — honor it
     if((ev.key==='r'||ev.key==='R') && window.__microOffer){ ev.preventDefault();
       const mo=window.__microOffer; window.__microOffer=null; startMicroRun(mo.targets); return; }   // r421 §2.7: launch the mistakes replay
-    if(ev.key==='d'||ev.key==='D'){ ev.preventDefault(); const m=$('resultsModal'); if(m){ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); const t=m.querySelector('.rm-more-t'); if(t) t.textContent=(x&&x.classList.contains('open'))?'hide the detail':'details \u2014 keys \u00b7 band \u00b7 splits \u00b7 boards'; } return; }   // r293: progressive disclosure
+    if(ev.key==='d'||ev.key==='D'){ ev.preventDefault(); const m=$('resultsModal'); if(m){ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); const t=m.querySelector('.rm-more-t'); if(t) t.textContent=(x&&x.classList.contains('open'))?'hide the detail':(t.dataset.hint||'details \u2014 keys \u00b7 band \u00b7 splits \u00b7 boards'); } return; }   // r293: progressive disclosure \u00b7 r450: first-card hint copy (P1-1)
   };
   return _showResults(o);
 }
@@ -24752,6 +24784,14 @@ function _showResults(o){
      Keys/band/stalls/boards fold behind a d-toggle so the loop stays fast. */
   /* r421 §2.1/§2.2: the clock this run beats (+ the next one), and the ☆ verdict — never red */
   const clockRow=(!o.mouse && !o.guided) ? hkClockRow(cur, (o.tSec!=null?o.tSec:parseFloat(o.t))) : '';
+  /* r450 (first-session flow audit P0-1): when the medal row is suppressed, SAY SO where the
+     medal row would have been. The "not posted" line existed only inside the `d` fold, below
+     the fold on a 1280x800 window — so a novice's first three wins read as "I beat legendary
+     and nothing happened." This renders in the card BODY, above the fold, always. */
+  const practiceRow=(o.mouse||o.guided)
+    ? '<div class="rm-practice">practice run '+(o.mouse?'(mouse used)':'(guided)')+' — not posted, no medal'+
+      '<span>'+(o.mouse?' · keyboard-only runs count' : ' · turn guided off to make the clock count')+'</span></div>'
+    : '';
   /* r423 (Wolf round-2 §2): the mystery ☆ reveals its label HERE, found or missed */
   const bonusRow=o.bonus ? `<div class="rm-bonus${o.bonus.ok?' ok':''}">☆ hidden bonus: ${escHtml(o.bonus.label||'')} — ${o.bonus.ok?('found'+(o.bonus.xp?' · +'+o.bonus.xp+' xp':'')):'missed'}</div>` : '';
   /* r425 §2.4: a CAPSTONE card names the track leg it opens — or exactly what still stands.
@@ -24773,12 +24813,20 @@ function _showResults(o){
       }
     }
   }catch(e){}
+  /* r450 (flow audit P1-1): the FIRST results card dumps eight unintroduced systems at once, and
+     the fold that explains them was labelled in jargon the player had never met. On card one only,
+     the hint says what's actually behind `d`. Everywhere after, the terse label is right. */
+  let __firstCard=false;
+  try{ __firstCard=(parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0)<=1; }catch(e){}
+  const dHint=__firstCard
+    ? 'details — your keys vs par, where the time went, and the beats you can redo'
+    : 'details — keys · band · splits · boards';
   m.innerHTML=`<div class="rm-card">`+
     `<div class="rm-title">solved${o.pb?' · ★ new best':''}</div>`+
     `<div class="rm-time">${o.t}<span>s</span></div>`+
-    clockRow+bonusRow+capRow+
+    clockRow+practiceRow+bonusRow+capRow+
     hookRow+flowRow+
-    `<a class="rm-more-t" id="rmMoreT"><kbd>d</kbd> details \u2014 keys \u00b7 band \u00b7 splits \u00b7 boards</a>`+
+    `<a class="rm-more-t" id="rmMoreT" data-hint="${escHtml(dHint)}"><kbd>d</kbd> ${escHtml(dHint)}</a>`+
     `<div class="rm-more">`+
     `<div class="rm-stats"><div>keys<b>${o.keys}</b></div><div>optimal<b>~${o.par}</b></div><div>best<b>${best}</b></div></div>`+
     _bandRow(o)+
@@ -24802,7 +24850,7 @@ function _showResults(o){
     `</div>`;
   m.classList.add('show');
   // r88: the rm-key buttons rendered but had NO click wiring — keyboard-only card.
-  { const mt=m.querySelector('#rmMoreT'); if(mt) mt.onclick=()=>{ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); mt.innerHTML=(x&&x.classList.contains('open'))?'<kbd>d</kbd> hide the detail':'<kbd>d</kbd> details \u2014 keys \u00b7 band \u00b7 splits \u00b7 boards'; }; }
+  { const mt=m.querySelector('#rmMoreT'); if(mt) mt.onclick=()=>{ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); mt.innerHTML=(x&&x.classList.contains('open'))?'<kbd>d</kbd> hide the detail':('<kbd>d</kbd> '+escHtml(mt.dataset.hint||'details \u2014 keys \u00b7 band \u00b7 splits \u00b7 boards')); }; }
   m.querySelectorAll('.rm-key[data-act]').forEach(b=>{ b.onclick=()=>{
     const a=b.dataset.act;
     if(a==='again'){ hideResults(); restartDrill(); }
@@ -25132,10 +25180,18 @@ function syncTabs(){
     if(!localStorage.getItem('hk_learn_done') && localStorage.getItem('hotkey_onboarded')){
       /* r356 (sweep): the one-shot used to fire on the BOOT load underneath the beta gate —
          toast invisible, flag burned, and the post-tour handoff owned nothing. Onboarded only. */
+      /* r450 (first-session flow audit P0-1): the tour hands off with {guided:true}, so `guided`
+         was ALREADY true here \u2014 the `!guided` branch never ran, the explanation never fired, and
+         the flag was burned OUTSIDE the branch so it could never fire later either. A novice's
+         first three solves posted nothing, earned no medal, and nothing said why.
+         Now: the toast is unconditional on a fresh device, and the one-shot flag is only spent
+         when the toast actually goes out. */
       const fresh = !localStorage.getItem('hk_runs_lite') && Object.keys(PB||{}).length===0;
-      if(fresh && !guided){ toggleGuided();
-        setTimeout(()=>showToast('guided mode is on for your first run \u2014 follow the highlighted keys \u00b7 click \u201cguided\u201d to turn it off (F1 = hints only, no lock)'), 800); }
-      localStorage.setItem('hk_learn_done','1');
+      if(fresh){
+        if(!guided) toggleGuided();
+        setTimeout(()=>showToast('guided is on for your first runs \u2014 it shows you the keys, but guided runs don\u2019t post a time. click \u201cguided\u201d (or F1 for hints only) when you want the clock to count.'), 800);
+        localStorage.setItem('hk_learn_done','1');
+      }
     }
     // r159: FROM-ZERO RAMP — a self-declared novice (comfort fork) keeps the
     // training wheels for their first 3 clean solves, unless they F1 them off.
@@ -25782,7 +25838,11 @@ function updateChecklist(){
        text (truly hidden); earning it latches the real label + lit star. Inside a mistakes
        replay that targets it, the label shows (the results card already revealed it). */
     const lab=isBonus?((i.ok || (microRun && isTarget))?('☆ '+i.label):'☆ ?'):i.label;
-    html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}${isBonus?' cl-bonus':''}${!isTarget?' cl-pre':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${lab}</span>${split}${keys}</div>`;
+    /* r450 (flow audit P1-3): an unearned ☆ rendered as a bare "☆ ?" inside a checklist headed
+       "0/5" — a first-timer read it as a sixth blocking item they couldn't decipher. The mystery
+       stays (r423); the tooltip just says it's optional and never blocks the win. */
+    const btip=isBonus?' title="a hidden bonus — find the efficient route. Optional: it never blocks the win."':'';
+    html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}${isBonus?' cl-bonus':''}${!isTarget?' cl-pre':''}"${btip}><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${lab}</span>${split}${keys}</div>`;
   });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
   html+=__altFooter;   /* r356 (sweep): the alt-routes line was BUILT since r-old but never appended — the whole 'many chords, one sheet' promise was invisible */
@@ -27024,7 +27084,7 @@ document.addEventListener('keydown',hkRawE=>{
     if(__st && __st.entry){
       // r303 ENTRY beat: the user TYPES into the live sheet (a number, or =/+ a formula).
       // Let editing keys through and advance when the target cell actually COMMITS.
-      if(k==='Escape' && !editing){ e.preventDefault(); tourShow(__tourPlan.length); return; }
+      if(k==='Escape' && !editing){ e.preventDefault(); tourSkipReq(); return; }   // r450 (P0-2)
       if(k==='Enter' && !editing){ e.preventDefault(); tourShow(__tourI+1); return; }   // the exercise is optional — Enter (the documented "next") skips it when you're not mid-edit
       const __adv=__tourI, __at=__st.at, __ok=__st.commit;
       setTimeout(()=>{ if(__tourI!==__adv || editing) return;
@@ -27043,7 +27103,7 @@ document.addEventListener('keydown',hkRawE=>{
       // fall through — the game handler below executes the chord for real
     } else {
       e.preventDefault();
-      if(k==='Enter'){ tourShow(__tourI+1); } else if(k==='Escape'){ tourShow(__tourPlan.length); }
+      if(k==='Enter'){ tourShow(__tourI+1); } else if(k==='Escape'){ tourSkipReq(); }   // r450 (P0-2)
       return;
     }
   }
@@ -28657,9 +28717,12 @@ function openKbd(){
     '<div class="pc-head"><div class="pc-name">shortcuts</div></div>'+
     '<div class="pc-sub">App navigation only — for Excel shortcuts, see the <a href="reference.html" style="color:var(--accent)">reference</a> page.</div>'+
     '<div class="kb-grid">'+sections+'</div>'+
-    '<div class="pc-foot"><span></span><a id="kbClose">press <kbd>?</kbd> or <kbd>esc</kbd> to close</a></div>'+
+    /* r450 (flow audit P0-2): the ONLY replay affordance in the product. Escaping the tour used
+       to be permanent per device — nothing anywhere brought the fundamentals back. */
+    '<div class="pc-foot"><a id="kbReplayTour" style="color:var(--accent)">↻ replay the tour</a><a id="kbClose">press <kbd>?</kbd> or <kbd>esc</kbd> to close</a></div>'+
     '</div>';
   const c=$('kbClose'); if(c) c.onclick=closeKbd;
+  const rt=$('kbReplayTour'); if(rt) rt.onclick=()=>{ closeKbd(); setTimeout(()=>{ try{ tourReplay(); }catch(e){} }, 140); };
   m.addEventListener('click', e=>{ if(e.target===m) closeKbd(); }, {once:true});
 }
 function openThemes(){
@@ -31400,12 +31463,19 @@ function showPrelaunchLock(){
   gateOpen=true;
   g.innerHTML='<div class="auth-card">'+
     '<div class="gate-brand">hotkey<b>.gg</b></div>'+
+    /* r450 (first-session flow audit P0-3): this card was the ENTIRE first impression for 100%
+       of uninvited traffic \u2014 a beige page that never said what hotkey.gg is and offered no way
+       to ask for access. The landing that explains the product sits behind this wall. One
+       tagline (what it is) and one door (get on the list); the code input stays primary. */
     '<h3>Private beta</h3>'+
+    '<p class="gate-tag" id="lockTag">Keyboard-only Excel training \u2014 74 speedrun drills against the clock, no mouse. '+
+      '<a href="About.html" style="color:var(--accent)">what this is \u2192</a></p>'+
     '<p>We\u2019re letting people in gradually \u2014 got a code?</p>'+
     '<input id="lockCode" type="text" placeholder="access code" autocomplete="off" autocapitalize="characters" spellcheck="false">'+
     '<button class="auth-go" id="lockGo">Enter</button>'+
     '<div class="auth-msg" id="lockMsg" style="color:var(--bad); min-height:15px; margin-top:9px"></div>'+
-    '<div class="micro" style="margin-top:10px">Already have an account? <a id="lockSignin" style="color:var(--accent);cursor:pointer">Sign in</a></div>'+
+    '<div class="micro" style="margin-top:10px">No code? <a id="lockList" href="mailto:hello@hotkey.gg?subject=Beta%20access%20%E2%80%94%20hotkey.gg&body=I\u2019d%20like%20on%20the%20hotkey.gg%20beta%20list." style="color:var(--accent)">get on the list \u2192</a></div>'+
+    '<div class="micro" style="margin-top:6px">Already have an account? <a id="lockSignin" style="color:var(--accent);cursor:pointer">Sign in</a></div>'+
     '</div>';
   g.classList.add('show');
   /* r279: codes validate SERVER-SIDE (beta_codes table via curtain_check) so we can
@@ -31770,6 +31840,27 @@ const TOUR_STEPS=[
     body:'<b>LEVEL</b> grows with practice — every clean solve earns xp. <b>RANK</b> is the competition — keyboard-only runs post to per-drill boards. And the <b>tracks</b> button holds three long tracks, each ending in a shareable certificate.'},
 ];
 let __tourI=-1, __tourAfter=null, __tourPlan=[];
+/* r450 (first-session flow audit P0-2): `Esc` is the universal panic key and it was printed on
+   beat 1 of 13. One press ended the whole fundamentals sequence, set hk_tour_done, and there was
+   no replay affordance anywhere in the product — skipping was indistinguishable from finishing
+   and irreversible. On the first three beats the skip now ARMS: the first Esc (or click) says so
+   inline, the second one actually skips. Re-armed per beat so the label always matches state. */
+let __tourSkipArmed=false;
+function tourSkipReq(){
+  if(__tourI>=0 && __tourI<3 && !__tourSkipArmed){
+    __tourSkipArmed=true;
+    const sk=$('tourSkip');
+    if(sk){ sk.textContent='press esc again to skip the tour'; sk.classList.add('armed'); }
+    return;
+  }
+  tourShow(__tourPlan.length);
+}
+/* the ? sheet's replay entry — un-remembers the tour and runs it from beat 0 */
+function tourReplay(){
+  try{ localStorage.removeItem('hk_tour_done'); }catch(e){}
+  __tourSkipArmed=false; __tourAfter=null;
+  try{ tourShow(0); }catch(e){}
+}
 /* r303: precompute the steps that will ACTUALLY show for this user — one place for the
    novice / audience / element gates, and an honest "n / total" counter (the old inline-skip
    recursion counted skipped steps). */
@@ -31802,6 +31893,7 @@ function tourShow(i){
     }, 350);
     return; }
   __tourI=i;
+  __tourSkipArmed=false;   // r450 (P0-2): each beat re-arms, so the skip label never lies
   const st=__tourPlan[i];
   // r303: park the cursor where the step teaches (name-box demo, typing/formula targets)
   if(st.at && typeof S!=='undefined' && S && !editing){ const p=parseRef(st.at); if(p){ S.active={r:p.r,c:p.c}; S.sel=null; try{ render(); updateFormulaBar(); }catch(e){} } }
@@ -31833,7 +31925,7 @@ function tourShow(i){
     const below2=r2.bottom+14+card.offsetHeight<window.innerHeight;
     card.style.top=(below2? r2.bottom+14 : Math.max(12, r2.top-card.offsetHeight-14))+'px'; } }catch(e){}
   const nx=$('tourNext'); if(nx) nx.onclick=()=>tourShow(__tourI+1);
-  const sk=$('tourSkip'); if(sk) sk.onclick=()=>tourShow(__tourPlan.length);
+  const sk=$('tourSkip'); if(sk) sk.onclick=()=>tourSkipReq();   // r450 (P0-2): arms on beats 0-2
 }
 let __tourBase=null;
 /* r134: maybeStartTour retired — the tour fires from dismissLanding, sequenced
