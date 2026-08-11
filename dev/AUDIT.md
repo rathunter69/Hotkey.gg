@@ -12930,3 +12930,176 @@ Six scalars in one column have no block to fill, no second pass to compress and 
 **COUPLING SWEEP (the standing three greps) — CLEAN.** No `CHALLENGES.dashcover._o` and no `loadChallenge('dashcover')` anywhere in `dev/`. The only quoted-key hits are `dev/migrate-certificates.sql` (catalog membership, correct, unchanged) and `dev/seed-field.sql` (historical leaderboard rows, C13-exempt).
 
 **ALT-PATHS:** three NEW entries; `dashcover` was one of §1.8's nine zero-ALT drills, so nothing is deleted and nothing may be resurrected.
+
+
+## r450 — THE DRILL-START GATE: every board loads locked behind "press any key to start"
+
+_Engine-global, not a drill wave. Wolf: "clicking a drill drops you straight onto a live board —
+there is no standard start point, the clock's t=0 is ambiguous relative to an accidental first
+keystroke, and par/leaderboard times are therefore not measured from a uniform zero."_
+
+### THE FEATURE
+
+A drill now renders in full but **input is locked and the clock is at zero** until the player
+says go. A centered scrim over the grid reads **"Press any key to start"**; the first key
+dismisses it, is **swallowed** (never lands on the grid, never opens an edit, never enters
+`keyLog`) and starts the clock at that instant. Clicking the scrim also starts it — the copy
+stays keyboard-first, and like the r429 pause's Resume button the click lives on the scrim and
+never on the grid, so it costs no `mouseUsed` flag.
+
+It reuses the **r429/r442 blur-pause overlay's language deliberately** — same scrim, same card,
+same swallow-the-key rule — because that overlay already solved this exact pair of problems
+(freeze the clock; take a key without playing it) and a player who has seen one must read the
+other instantly. `.hk-gate` sits inside `.gridwrap`, which carries its own paper palette under
+`html[data-dark="1"]` (r213), so the gate is theme-correct in light and dark by construction,
+exactly as `.hk-pause` is. Screenshots: `startgate-1-gate-{dark,light}.png`,
+`startgate-7-pause-card-{dark,light}.png` (the two cards side by side).
+
+**One arm point.** `hkGateArm()` is called last in `loadChallenge`, after `render()`. Every route
+onto a board funnels through that function — fresh load, drill switch, picker pick, Esc·Esc,
+Shift+F11, Ctrl+S restart, win→next, weakness queue, campaign map, daily/weekly/challenge,
+`exitSandbox`, the tour hand-off — so one call covers all of them and no future entry point can
+forget it.
+
+### WHERE IT DOES NOT ARM — each one WALKED, not reasoned about
+
+| path | gate | why |
+|---|---|---|
+| warm-up sandbox · onboarding board | no | `startClock()` no-ops under `sandboxMode`; a gate there promises a clock that will not run |
+| the spotlight tour | no | the tour drives the board; a gate would sit between the spotlight and the cell it points at. (It runs on the cleared board today, so the `__tourI` guard is belt-and-braces — but the tour's hand-off to the first real drill IS gated, and `e2e-audit-onboard` now asserts both halves) |
+| watch-solution · learn mode · the ribbon peek | no | scripted playback reloads the board and then fires its own keys; a gate would eat beat one and desynchronize the replay |
+| marathon · rapid-fire | no | a session has exactly ONE start — its own first key, which is what arms `marathon.endAt`. Re-gating between cards would drop a modal into a running countdown, in the two modes whose entire point is flow. Rapid-fire never routes through `loadChallenge` at all, so it is un-gated by construction; `startSession()` clears any gate left on the classic board it launched from, and `exitSession()` returns to a gated one |
+| the 30-second mistakes rep (`microRun`) | no | handed to a player already mid-flow, straight off the results card they just earned; its clock is a cap, not a score, and nothing there is graded. It never routes through `loadChallenge`, so this is recorded so nobody "fixes" it |
+| `\` (drill list) and `?` (shortcuts) | pass-through | the two keys that open a panel OVER the board and cannot touch the grid. Treating them as "start" would re-create in a new place the exact ambiguity the feature exists to kill — a clock started by a keystroke nobody meant as a move. The gate branch sits BELOW their handlers for this reason |
+| bare `Shift`/`Control`/`Meta`/`CapsLock`/… | ignored | a chord arrives as two keydowns. If the gate ate `Control`, the `d` of Ctrl+D would land on a live board a frame later. `Alt` is deliberately NOT on that list — a bare Alt tap is a real action here (it opens the ribbon) |
+
+### ROUTES WALKED ONTO A GATED BOARD (all clean, all on the real page)
+
+`?race=<drill>&t=&by=` (the challenge link — gate up, its own "type to start the race" line
+intact, first key starts it) · `?drill=<key>` deep link · the picker's own arrows over a gated
+board (`toMenu()`) · guided mode (the rails, `gtarget`/`gt-*`/`goff`, all paint under the scrim,
+so the board is fully readable while the player decides to begin) · the returning-user
+welcome-back card (its first-keydown fade and the gate's start key are now the same press) ·
+the first-drill coach · the celebration card. **`Ctrl+S` restart was walked and found to be dead
+code in today's catalog** — every one of the 74 drills carries `saveClose`/`usesSave`, so Ctrl+S
+is always the save beat and never reaches `restartDrill()`. Recorded, not changed.
+
+### THE REAL COST: THE HARNESS SWEEP
+
+Measured, not guessed. With the gate armed, a driven route loses exactly one keystroke and
+therefore the win: **filldr 44→43, navigation 17→16, combo 25→24** logged keys, none reaching
+`done`. That is 55 dev/ harnesses.
+
+The contract is `localStorage['hk_gate_off']='1'`, added to the shared init block those files
+already copy from each other (`hotkey_onboarded` · `hk_tour_done` · `hk_learn_done` ·
+`hk_handle_cache`), in each file's own quoting and spacing. Two files deliberately do NOT set it
+and key through the real gate: `dev/check-startgate.js` and `dev/check-pause.js`.
+`dev/e2e-audit-onboard.js` also stays on the real path and gained the two assertions that matter
+most for the onboarding claim — the gate is absent for every tour step, and present the instant
+the tour hands over a real timed drill.
+
+**Par integrity is proved where the flag would otherwise hide it.** `check-startgate` §7 runs the
+same demo route on the same seed twice — once paying a real gate key, once with `hk_gate_off` —
+and asserts identical `keyLog`: filldr 45/45, navigation 17/17, combo 25/25, both winning. Without
+that section, opting the battery out would prove nothing about par.
+
+### THE GUARDS (§3.3 — a bug class fixed in the round gets an invariant in the same round)
+
+- **`dev/check-startgate.js`** (new, wired into `gate.yml` in this round — the r442 lesson was
+  that `check-borders`/`check-pause` sat written-but-unwired through four playtests). Eight
+  sections: overlay at load · input locked · first key swallowed and absent from `keyLog` · t=0 at
+  dismissal · re-arm on Esc·Esc / Shift+F11 / drill switch / win→next · no stacking with the
+  blur-pause in either direction · par integrity both ways · the deliberate non-gates.
+- **`check-invariants` C14**: every dev/ harness that boots index.html and loads a drill must
+  declare a start-gate stance — set `hk_gate_off`, or be on the short KEYS_THROUGH list. It fired
+  on its first run and caught `dev/e2e-onboard-sandbox.js`, which the mechanical sweep had missed
+  because its init block never carried `hk_learn_done` to hang the new setter off.
+
+### TWO BUGS THE WALK FOUND (neither reasoned about, both from driving the real page)
+
+1. **`hkGateArm()` left a stale scrim.** When it declined to arm (session, demo, `hk_gate_off`) it
+   returned before touching the DOM, so the *previous* board's overlay stayed painted over a board
+   the gate had disowned. It now clears first, always, and arms second.
+2. **The first-drill coach was unreadable behind the scrim** (z-24 under z-61) and then, once
+   raised, clipped the gate card's last line. The coach is now z-62 and the gate wears
+   `.with-coach` on that one board, lifting the card off dead-center so both read in full. The
+   coach's copy gained the gate as step 2 — and its step 1, "nothing is timed yet", is now
+   literally true instead of approximately true. Screenshot:
+   `startgate-6-coach-plus-gate-dark.png`.
+
+### GATE (all 20, this worktree, own port 8853)
+
+`check-invariants` clean (incl. the new C14) · `check-cache-versions` clean · `e2e-smoke` ALL 7
+PAGES CLEAN + skin-unlock · `e2e-lb` ALL 36 PASS · `e2e-demo-replay` ALL GREEN · `e2e-alt-paths`
+**ALL 160 PASS** · `e2e-audit-parity` ALL 177 PASS · `e2e-audit-onboard` **ALL 38 PASS** (35 at
+r449 + the three new gate assertions) · `e2e-mac-input` ALL 19 PASS · `e2e-rapidfire` ALL 14 PASS
+· `e2e-guided` ALL 77 PASS (72 railed) · `e2e-formulas` ALL 102 PASS · `e2e-grid-height` ALL
+INVARIANTS HOLD · `e2e-depth-contract` ALL 74 PASS · `e2e-depth-mechanics` · `e2e-fit-sweep` ·
+`e2e-depth-mechanics` 155 passed / 0 failed · `e2e-fit-sweep` ALL CLEAN (70 drills) ·
+`e2e-par-sweep` **FLAGGED: 0** · `check-borders` clean · `check-pause` clean (it keys through
+the real gate now) · `check-startgate` clean.
+
+**NEGATIVE CONTROLS — both guards were seen to fire before being trusted (r442).** Breaking the
+swallow (gate passes, key still plays) turns `check-startgate` red on 12 assertions, including
+`filldr: keyLog identical … 46 vs 45` and `won:false`. Never arming turns it red on 12 more,
+starting with `a booted board arms the gate`. Restoring returns `START GATE: clean`. Removing the
+`hk_gate_off` setter from `dev/e2e-numfmt.js` turns C14 red with the fix in the message;
+restoring turns it green.
+
+### PLACES DELIBERATELY LEFT ALONE
+
+- **The celebration card over a gated board.** `window.__hkCelOpen`'s capture handler returns on
+  every trusted key, so the gate cannot be passed until the card closes. This is pre-r450
+  behavior and unchanged: the same swallow used to leave a *live* board with no start point, and
+  now leaves a *gated* one — strictly better. Worth knowing when writing harnesses: a stray
+  celebration makes the next `keyboard.press` vanish and the gate look stuck (it cost one debug
+  cycle here, and `check-startgate` presses through a `noCel()` helper because of it).
+- **`e2e-par-sweep` numbers were not re-baselined.** With `hk_gate_off` the sweep drives the same
+  board it drove at r449, and §7 above is the assertion that this is honest. Spot-checked drift
+  on the full table: `drill` 0% · `combo` 0% · `gauntlet` 0% · `housestyle` 0% · `anchor` 0% ·
+  `schedule` 0% · `intsched` 0% · `navigation` 0% · `modeltour` 0% · `ruleoff` −3%. FLAGGED: 0.
+- **One `tieout: REP FAILED no win` line in the full sweep, chased and cleared.** Not r450:
+  `REPS=8 e2e-demo-replay tieout` is 8/8, and `e2e-par-sweep tieout` alone reads 34/34 at 0%
+  drift. It is the sweep's own cross-drill state carry (it drives all 74 through one page), and
+  because rep 0 is the only rep that pushes a row, one miss drops the drill out of the printed
+  table entirely. Left alone; worth a look if it recurs.
+
+_Files: `index.html` (CSS `.hk-gate` + `.with-coach`, `#startCoach` z-index and copy; `hkGate`
+state + `hkGateShow`/`Arm`/`Clear`/`Pass`; the keydown branch; `hkGateArm` in `loadChallenge`;
+`hkGateClear` in `playDemo`/`echoStart`/`introRibbonPeek`/`startSession`/`microEnter`/
+`startSandbox`/`startOnboardBoard`) · `dev/check-startgate.js` (new) · `dev/check-invariants.js`
+(C14) · `dev/check-pause.js` · `dev/e2e-audit-onboard.js` · `dev/e2e-demo-replay.js` (the
+reference init block + the contract note) · `dev/e2e-onboard-sandbox.js` · 52 further dev/ suites
+and verify-\* probes (one-line init addition) · `.github/workflows/gate.yml`._
+
+## r450 FIRST-SESSION FLOW — the invisible first win, the one-key tour delete, and the beige curtain
+
+_Implementing the r450 first-session flow audit's top-5 (full audit: scratchpad flowaudit-findings.md,
+80 screenshots; the audit itself made no code changes). The audit's verdict: the onboarding SEQUENCE
+is good and both ends of it were broken._
+
+- **P0-1** — the r92 guided-explanation one-shot could never fire: its guard read `!guided` AFTER the
+  tour handed off with guided already on, and the `hk_learn_done` write sat outside the branch so the
+  one-shot burned anyway. A novice's first three wins showed a bare SOLVED with no medal, no XP, and
+  no statement that guided runs don't post. Fixed: branch is now `if(fresh)` with the write inside,
+  and a `practiceRow` renders on the FACE of the results card (both suppression causes: guided, mouse)
+  exactly where the medal row would sit.
+- **P0-2** — Esc on tour beat 1 permanently deleted onboarding with no replay affordance anywhere in
+  the product. Now: Esc on beats 0–2 arms ("press esc again to skip the tour"), second Esc skips; the
+  ? sheet gains "↻ replay the tour" (clears hk_tour_done, tourShow(0)). The arm resets per beat so the
+  label can never disagree with the state.
+- **P0-3** — the beta curtain never said what the product is. It now carries one tagline + "what this
+  is →" (About) above the code input, and "No code? get on the list →" (mailto capture, no backend)
+  below. The code input stays primary.
+- **P1 labels** — title text on .hk-clocks (what pass/pro/legendary mean), on the ☆ ? row (hidden
+  bonus, optional), and first-card-only copy on the d hint; the hint string moved to data-hint so its
+  three restore paths cannot drift.
+- **P1-8** — the audit's flat 16→56px coach lift was implemented, MEASURED still colliding at
+  1024×700 (the toast is viewport-fixed, the coach is gridwrap-absolute), and replaced by a lane-
+  computed lift clamped inside the gridwrap (56px floor). No change at normal heights. **P2-2 could
+  not be reproduced** — the prescribed overflow fix has existed since r354; a belt-and-braces
+  max-height clamp added (no-op above ~571px viewport height).
+- **The suite that passed through all of it**: e2e-audit-onboard 35 → 64 assertions — skipping is now
+  a DISTINCT asserted outcome from finishing; a do-it beat must advance on the real chord; the replay
+  affordance is asserted (the tour is Enter-advanceable by design); mid-tour refresh must not strand;
+  the first guided win's card is read for the not-posted line and its geometry above the action row.

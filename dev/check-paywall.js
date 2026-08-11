@@ -77,6 +77,7 @@ function catalogFromSource() {
     page.on('pageerror', e => errs.push('PAGEERROR: ' + e.message));
     page.on('console', mm => { if (mm.type() === 'error' && !/ERR_|supabase|Failed to load resource|net::/i.test(mm.text())) errs.push('CONSOLE.ERR: ' + mm.text()); });
     await page.route('**/@supabase/**', r => r.abort());
+    await page.addInitScript(() => { try { localStorage.setItem('hk_gate_off', '1'); } catch (e) {} });   /* r450 harness contract: suites opt out of the drill-start gate (C14) */
     await page.goto(BASE + '/' + url, { waitUntil: 'load', timeout: 30000 });
     if (seed) await page.evaluate(seed);
     if (seed) { await page.reload({ waitUntil: 'load', timeout: 30000 }); }

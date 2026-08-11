@@ -112,11 +112,23 @@ const STUB = () => {
     onboarded: !!onboarded }));
   ok(t2e.handedOff, 'tour hands off to the first real drill (not the warm-up board)');
   ok(t2e.onboarded, 'finishing the tour marks the user onboarded');
+  /* r450 THE DRILL-START GATE, on the one path that matters most for it: the tour hand-off.
+     This suite deliberately does NOT set hk_gate_off (the other harnesses do) — the whole
+     point of an onboarding audit is to walk what a first-time player walks. Two properties
+     are asserted here and nowhere else in the battery: the gate is ABSENT for every step of
+     the tour (it would sit between the spotlight and the cell it points at), and it is
+     PRESENT the instant the tour hands the player a real, timed drill. */
+  const t2g = await page.evaluate(() => ({ gate: hkGate, ov: !!document.getElementById('hkGate'), running }));
+  ok(t2g.gate && t2g.ov, 'the first real drill arrives behind the start gate', JSON.stringify(t2g));
+  ok(!t2g.running, 'and its clock has not started', JSON.stringify(t2g));
   const t2f = await page.evaluate(() => {
+    demoKey({key:'x'});                       // the start key: swallowed, starts the clock
+    const started = running === true && keyLog.length === 0 && !document.getElementById('hkGate');
     setDemoSel('B4'); demoKey({key:'5'}); demoKey({key:'Enter'});
-    return S.cells['B4'].value === 5 || S.cells['B4'].value === '5';
+    return { started, landed: S.cells['B4'].value === 5 || S.cells['B4'].value === '5' };
   });
-  ok(t2f, 'after the tour the grid takes keys immediately');
+  ok(t2f.started, 'the start key is swallowed (nothing in keyLog) and starts the clock');
+  ok(t2f.landed, 'after the tour the grid takes keys immediately');
 
   console.log('T3 second visit: welcome back');
   // domcontentloaded, not load: supabase-js loads async now (r285) — 'load' waits on
@@ -135,6 +147,7 @@ const STUB = () => {
   ok(t3.gateGone && t3.landingGone, 'returning visitor skips curtain + landing');
   ok(t3.up, 'welcome-back card greets the return');
   const t3b = await page.evaluate(async () => {
+    demoKey({key:'x'});   /* r450: a returning visitor lands on a gated board too — pass it before typing */
     setDemoSel('C4'); demoKey({key:'7'});
     await new Promise(r => setTimeout(r, 450));
     const w = document.getElementById('wbDlg');

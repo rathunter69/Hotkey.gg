@@ -327,6 +327,23 @@
   .hk-pause-go{margin-top:14px; font-family:var(--mono); font-size:12.5px; font-weight:700;
     color:var(--on-accent,#0c0d0e); background:var(--accent); border:none; border-radius:9px;
     padding:10px 22px; cursor:pointer}
+  /* r450 (Wolf): THE DRILL-START GATE. Same scrim language as the pause above — deliberately,
+     because it is the same promise ("the clock is not running and your keys are not landing")
+     and a player should recognize it instantly. Only the copy and the accent differ. Every
+     color is a theme token (no literals but the shared card shadow), so it reads correctly in
+     both light and dark exactly as .hk-pause does. */
+  .hk-gate{position:absolute; inset:0; z-index:61; display:flex; align-items:center; justify-content:center;
+    background:color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter:blur(2.5px); cursor:pointer}
+  .hk-gate .hk-pause-card{animation:hkGateIn .18s ease-out}
+  /* r450: on the ONE board where the first-drill coach also shows, the coach (bottom-left,
+     z-62) clipped the gate card's last line. Lift the card off dead-center for that board
+     only — both read in full, and every other board keeps the pause overlay's exact
+     centering. */
+  .hk-gate.with-coach{align-items:flex-start; padding-top:6%}
+  .hk-gate-sub{display:block; margin-top:10px; font-size:10.5px; letter-spacing:.35px;
+    color:color-mix(in srgb, var(--muted) 78%, transparent)}
+  @keyframes hkGateIn{from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none}}
+  @media (prefers-reduced-motion: reduce){ .hk-gate .hk-pause-card{animation:none} }
   #grid td.mzt{border-top:3px solid #38445e !important}
   #grid td.mzb{border-bottom:3px solid #38445e !important}
   #grid td.mzl{border-left:3px solid #38445e !important}
@@ -963,7 +980,10 @@
   .result.ready kbd{font-family:var(--mono); font-size:10.5px; border:1px solid var(--line); border-radius:4px; padding:0 5px}
   td.active.startcell{animation:hkStartPulse 1.5s ease-in-out infinite}
   @keyframes hkStartPulse{0%,100%{box-shadow:none} 50%{box-shadow:0 0 0 4px var(--accent-glow)}}
-  #startCoach{position:absolute; z-index:24; background:var(--surface); border:1px solid var(--accent-dim);
+  /* r450: z-index above .hk-gate (61) — the coach and the start gate are both first-run
+     teaching surfaces and they share the one board a player ever sees them on. The gate card
+     is centered, the coach is bottom-left, so they read as one moment instead of a stack. */
+  #startCoach{position:absolute; z-index:62; background:var(--surface); border:1px solid var(--accent-dim);
     border-radius:12px; padding:14px 18px; width:min(340px,80%); box-shadow:0 14px 40px rgba(0,0,0,.25);
     font-family:var(--mono); font-size:12px; color:var(--muted); line-height:1.9}
   #startCoach b{color:var(--text)}
@@ -23864,8 +23884,9 @@ function maybeStartCoach(){
   c.innerHTML='<div class="sc-t">how a drill works</div>'+
     '<a class="sc-x">\u00d7</a>'+
     '<b>1.</b> read the task on the right \u2014 nothing is timed yet<br>'+
-    '<b>2.</b> the glowing cell is your start \u2014 you\u2019re already on it, <b>just type</b><br>'+
-    '<b>3.</b> clear every checklist line \u2014 the clock stops itself';
+    '<b>2.</b> press any key to start the clock \u2014 that one key never lands on the sheet<br>'+   /* r450: the drill-start gate is step one of every run now */
+    '<b>3.</b> the glowing cell is your start \u2014 you\u2019re already on it, <b>just type</b><br>'+
+    '<b>4.</b> clear every checklist line \u2014 the clock stops itself';
   gw.style.position='relative';
   /* r450 (flow audit P1-8): at 1024x700 the "how a drill works" card and the post-tour toast
      both land bottom-left and OVERLAP — the two surfaces a first-run player most needs to read,
@@ -23945,6 +23966,84 @@ function hkResume(){
   try{ window.focus(); }catch(e){}
 }
 function hkClearPause(){ paused=false; pausedAt=0; try{ hkPauseShow(false); }catch(e){} }
+/* ============================================================
+   r450 THE DRILL-START GATE (Wolf: "clicking a drill drops you straight onto a live board —
+   there is no standard start point, and t=0 is ambiguous relative to an accidental first
+   keystroke, so par and leaderboard times are not measured from a uniform zero.")
+
+   The board renders in full, but input is LOCKED and the clock is at zero until the player
+   says go. The first key dismisses the gate, is SWALLOWED (never lands on the grid, never
+   opens an edit, never enters keyLog) and starts the clock at that instant. Every run on the
+   platform therefore begins from the same t=0: the moment a player chose to begin.
+
+   WHY IT REUSES .hk-pause's SHAPE (r429/r442): the pause overlay already solved this exact
+   pair of problems — freeze the clock, and take the resume key without playing it — and a
+   player who has seen one must read the other instantly. Same scrim, same card, same
+   swallow-the-key rule, same "the button lives on the scrim, never the grid, so it costs no
+   mouse flag" property. Only the copy differs.
+
+   WHERE IT DOES *NOT* ARM (each one walked, r450 — see dev/AUDIT.md):
+     - sandboxMode          the warm-up + onboarding boards are never timed; startClock()
+                            no-ops there, so a gate would be a lie with no clock behind it.
+     - demoPlaying / echoOn scripted playback owns the keyboard. `watch solution` reloads the
+                            board and then fires its own keys; a gate would eat beat one and
+                            desynchronize the whole replay (and e2e-demo-replay with it).
+     - __tourI >= 0         the tour drives the board. It runs on the sandbox board today, so
+                            this is belt-and-braces — but if the tour is ever pointed at a live
+                            drill, the gate must not appear mid-tour.
+     - a live session        marathon / rapid-fire have exactly ONE start — the session's own
+                            first key, which is what arms marathon.endAt. Re-gating between
+                            every card would stack an overlay into a running countdown and put
+                            a modal between drills in a mode whose whole point is flow.
+     - microRun             the 30-second mistakes rep is HANDED to a player already mid-flow,
+                            from the results card they just earned; its clock is a cap, not a
+                            score. It never routes through loadChallenge, so it is un-gated by
+                            construction — recorded here so nobody "fixes" that.
+     - hk_gate_off          the dev-harness opt-out (see dev/check-startgate.js), mirroring the
+                            hotkey_onboarded / hk_tour_done / hk_learn_done init pattern the
+                            suites already share.
+   ============================================================ */
+let hkGate=false;
+function hkGateOff(){ try{ return localStorage.getItem('hk_gate_off')==='1'; }catch(e){ return false; } }
+function hkGateShow(on){
+  const gw=document.querySelector('.gridwrap'); if(!gw) return;
+  let el=document.getElementById('hkGate');
+  if(!on){ if(el) el.remove(); return; }
+  if(el) return;
+  gw.style.position=gw.style.position||'relative';
+  el=document.createElement('div'); el.id='hkGate';
+  /* maybeStartCoach() runs just before hkGateArm() in loadChallenge, so the coach is already
+     in the DOM here when it is going to show at all */
+  el.className='hk-gate'+(document.getElementById('startCoach')?' with-coach':'');
+  el.innerHTML='<div class="hk-pause-card"><b>Press any key to start</b>'+
+    '<span>The board is set and the clock is at <i>0.00</i>.<br>Nothing counts until you begin.</span>'+
+    '<button class="hk-pause-go" id="hkGateGo">Start</button>'+
+    '<span class="hk-gate-sub">your first key starts the run — it won’t land on the grid</span></div>';
+  gw.appendChild(el);
+  // both handlers sit on the scrim, never the grid, so starting by mouse costs no mouse flag
+  el.addEventListener('mousedown', ev=>{ ev.preventDefault(); ev.stopPropagation(); hkGatePass(); }, true);
+}
+function hkGateArm(){
+  /* clear FIRST, always. A declining arm must still take the previous board's scrim down —
+     the r450 walk caught exactly this: hk_gate_off left the prior load's overlay painted over
+     a board the gate had disowned. */
+  hkGate=false; try{ hkGateShow(false); }catch(e){}
+  try{
+    if(sandboxMode) return;
+    if(demoPlaying || echoOn) return;
+    if(typeof __tourI!=='undefined' && __tourI>=0) return;
+    if(marathon && marathon.active) return;
+    if(gameMode!=='classic') return;
+    if(microRun) return;
+    if(hkGateOff()) return;
+  }catch(e){ return; }
+  hkGate=true; hkGateShow(true);
+}
+/* dismiss WITHOUT starting the clock — for paths that take the board over themselves */
+function hkGateClear(){ hkGate=false; try{ hkGateShow(false); }catch(e){} }
+/* dismiss AND start the clock — the player said go */
+function hkGatePass(){ if(!hkGate) return; hkGate=false; try{ hkGateShow(false); }catch(e){}
+  startClock(); try{ window.focus(); }catch(e){} }
 window.addEventListener('blur', hkPause);
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden) hkPause(); });
 function updateTimer(){ const t=(performance.now()-started)/1000; $('timer').textContent=t.toFixed(2); ghostTick(t);
@@ -24343,6 +24442,7 @@ function startMicroRun(targets){
     }finally{ microPrefill=false; window.__hkMute=false; }
     // hand the board over — fresh clock, nothing scored
     try{ hkClearPause(); }catch(e){}   /* r429 */
+    try{ hkGateClear(); }catch(e){}   /* r450: the 30s rep is handed to a player already mid-flow, straight off the results card they just earned — no second start point, and nothing here is scored */
     running=false; clearInterval(tickH); started=0; finished=0; done=false;
     mouseUsed=false; guidedUsed=false; keyLog=[]; keyTimes=[]; keyCells=[]; undoStack=[]; redoStack=[];
     S.splits=null; S._dropped=null; S._sndOkN=undefined;
@@ -27199,6 +27299,35 @@ document.addEventListener('keydown',hkRawE=>{
   }
   // open the picker with backslash (ignored while typing a formula or mid-marathon)
   if(k==='\\' && !editing && gameMode==='classic' && !e.ctrlKey && !e.altKey && !e.metaKey){ e.preventDefault(); openPicker(); return; }
+  /* r450 THE DRILL-START GATE — the board is loaded but the run has not begun. This key IS
+     the start: swallowed here so it can never land on the grid, open an edit, or enter
+     keyLog, and the clock starts at exactly this instant.
+
+     WHY IT SITS *HERE* and not at the top beside the pause branch (which it otherwise
+     mirrors): everything above owns the keyboard in its own right while a gated board waits
+     underneath it — the landing curtain, the intro cards, the tour, auth, the session summary,
+     the modes/themes/shortcuts sheets, and above all the DRILL PICKER, which `toMenu()` opens
+     directly on top of a freshly (re)loaded board. A gate branch at the top would eat the
+     picker's own arrow keys.
+
+     The two keys immediately above are a DELIBERATE carve-out, not an oversight: `\` opens the
+     drill list and `?` opens the shortcuts sheet. Both open a panel OVER the board and neither
+     can touch the grid, so treating them as "start" would re-create in a new place the exact
+     ambiguity this feature exists to kill — a clock started by a keystroke the player never
+     meant as a move.
+
+     Bare modifiers are ignored so a CHORD is never half-eaten: Ctrl+D arrives as keydown
+     'Control' then keydown 'd', and if the gate consumed 'Control' the 'd' would land on a
+     live board a frame later. Alt is NOT in that list — a bare Alt tap is a real action in
+     this engine (it opens the ribbon), so it starts the run like any other key. F5 keeps the
+     browser's reload, mirroring the __introCardOpen branch above. */
+  if(hkGate){
+    if(k==='Shift'||k==='Control'||k==='Meta'||k==='CapsLock'||k==='AltGraph'||
+       k==='NumLock'||k==='ScrollLock'||k==='ContextMenu'||k==='Dead') return;
+    if(k!=='F5') e.preventDefault();
+    hkGatePass();
+    return;
+  }
   // TYPE-TO-REPLACE (r41): typing any printable char on a selected cell starts an
   // Enter-mode edit seeded with it — Excel's most basic entry behavior. Sits after
   // the app hotkeys above; '=' and '+' fall through to the formula starter below.
@@ -29119,6 +29248,7 @@ function skipMarathonDrill(){
 
 function startSession(mode, durSec){
   closeModes(); closePicker(); hideResults(); hideSessionSummary();
+  try{ hkGateClear(); }catch(e){}   /* r450: a session has ONE start — its own first key. Drop any gate left over from the classic board we launched off. */
   gameMode=mode;
   guided=false; guidedUsed=false; updateGuideBtn();
   const cfg=SESSION_CFG[mode];
@@ -29461,6 +29591,7 @@ function demoSpotOff(){ demoSpotCur=null;
 async function playDemo(){
   if(demoPlaying||echoOn||!S) return;
   loadChallenge(cur);
+  try{ hkGateClear(); }catch(e){}   /* r450: the demo takes the board over and fires its own keys — beat one must not be eaten by the start gate */
   const C=CHALLENGES[cur]; const moves = typeof C.demo==='function'?C.demo.call(C):C.demo;
   if(!moves) return;
   demoPlaying=true; updateDemoBtn();
@@ -29517,6 +29648,7 @@ function echoStep(){
 function echoStart(){
   if(echoOn||demoPlaying||!S) return;
   loadChallenge(cur);
+  try{ hkGateClear(); }catch(e){}   /* r450: learn mode asks for the demo's chords by name — the first one is the LESSON, not a start key */
   const C=CHALLENGES[cur]; const moves=typeof C.demo==='function'?C.demo.call(C):C.demo;
   if(!moves||!moves.length) return;
   echoOn=true; echoState={moves:moves, mi:0, ki:0, miss:0};
@@ -30467,6 +30599,12 @@ function loadChallenge(key, opts){
     $('result').innerHTML='\u23f1 <b>ready</b> \u2014 read the task, then just type \u00b7 the clock starts on your first key'+(__cs?' \u00b7 '+__cs:''); }
   drawRibbon(); render(); resetFlash(); syncTabs(); hideResults();
   try{ maybeStartCoach(); }catch(e){}
+  /* r450: THE STANDARD START POINT. Every route onto a board funnels through here — fresh
+     load, drill switch, picker pick, win→next, Shift+F11, Esc·Esc, the weakness queue, the
+     campaign map, the daily/weekly/challenge entries — so arming the gate once, LAST (after
+     render, so the board is fully painted behind the scrim), covers all of them. hkGateArm
+     decides for itself whether this particular load is gateable. */
+  try{ hkGateArm(); }catch(e){}
 }
 /* ---- drill picker: catalog comes from drills.js (single source of truth across the app) ----
    All the maps below are thin aliases. If you're adding a new drill, edit drills.js — not here.
@@ -30762,8 +30900,10 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
 })();
 
 /* ---- welcome-back strip: returning users get a one-glance "you're on the game page" cue.
-   Passive by design — fades on the first keydown WITHOUT swallowing it, so zero friction:
-   the key that dismisses it is already your first rep. Shows once per browser session. ---- */
+   Passive by design — fades on the first keydown WITHOUT swallowing it, so zero friction.
+   r450: that first keydown is now the DRILL-START GATE's key, not a rep — one press dismisses
+   this card and starts the clock, which is if anything cleaner (the arrival card can no longer
+   eat the top of a live run). Shows once per browser session. ---- */
 function showWelcomeBack(key){
   /* r101: promoted from a thin strip to the frame-language DIALOG (Wolf: returning users
      should get a real welcome-back pop-out \u2014 the landing is skipped once you're onboarded,
@@ -31493,6 +31633,7 @@ function startSandbox(){
   S._ROWS0=S.ROWS;
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
   try{ hkClearPause(); }catch(e){}   /* r429 */
+  try{ hkGateClear(); }catch(e){}   /* r450: the warm-up sandbox is never timed — a start gate over it would promise a clock that startClock() refuses to run */
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
   editing=false; editBuf=''; editCaret=0; editPointer=null; guidedUsed=false; keyLog=[]; undoStack=[]; redoStack=[];
   clearInterval(tickH);
@@ -31555,6 +31696,7 @@ async function startGuidedIntro(){
 async function introRibbonPeek(){
   if(!S || demoPlaying) return;
   loadChallenge(cur);
+  try{ hkGateClear(); }catch(e){}   /* r450: same as playDemo — the ribbon peek drives its own keys */
   demoPlaying=true; updateDemoBtn();
   const kf=$('keyflash'); if(kf) kf.classList.add('demo');
   const r=$('result'); if(r){ r.className='result'; r.innerHTML='▶ <kbd>alt</kbd> opens the ribbon — formatting, borders, paste special'; }
@@ -31971,6 +32113,7 @@ function startOnboardBoard(){
   S={ROWS:9, cells, active:{r:4,c:1}, sel:null, clipboard:null};
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
   try{ hkClearPause(); }catch(e){}   /* r429 */
+  try{ hkGateClear(); }catch(e){}   /* r450: the tour drives THIS board — a gate would sit between the spotlight and the cell it is pointing at */
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
   editing=false; editBuf=''; editCaret=0; editPointer=null; guided=false; guidedUsed=false; keyLog=[]; undoStack=[]; redoStack=[];
   clearInterval(tickH);

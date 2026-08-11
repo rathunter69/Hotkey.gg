@@ -64,7 +64,7 @@ const BAND = 10;               // CSS px each side of the edge
     try {
       localStorage.setItem('hotkey_onboarded', '1');
       localStorage.setItem('hk_tour_done', '1');
-      localStorage.setItem('hk_learn_done', '1');
+      localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');
       localStorage.setItem('hk_handle_cache', '');
     } catch (e) {}
   });

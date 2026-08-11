@@ -12,7 +12,17 @@
 
    Per drill × REPS random builds: replay demo via setDemoSel + demoKey (the demo
    player's own dispatcher, no sleeps), then assert (a) the engine `done` flag —
-   the real win — and (b) C.checks(S) all ok. Zero page errors tolerated. */
+   the real win — and (b) C.checks(S) all ok. Zero page errors tolerated.
+
+   r450 · hk_gate_off — THE HARNESS CONTRACT for the drill-start gate. Every board now
+   loads LOCKED behind a "press any key to start" scrim: the first key is swallowed (never
+   logged, never played) and starts the clock. A driven route therefore loses exactly one
+   keystroke — measured, not guessed: the r450 walk showed filldr 44→43, navigation 17→16,
+   combo 25→24 logged keys, and all three stopped winning. `hk_gate_off='1'` keeps the gate
+   from arming, so every suite drives the same board it always drove and every par number
+   stays comparable across r449/r450. This flag is set in EVERY dev/ harness (the init block
+   this file is the reference copy of) with exactly two exceptions, both deliberate:
+   dev/check-startgate.js and dev/check-pause.js key through the real gate. */
 'use strict';
 const { chromium } = require('playwright-core');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
@@ -29,6 +39,7 @@ const REPS = parseInt(process.env.REPS || '3', 10);
       localStorage.setItem('hotkey_onboarded', '1'); // skip the landing
       localStorage.setItem('hk_tour_done', '1');     // no spotlight tour
       localStorage.setItem('hk_learn_done', '1');    // no auto-guided first drill
+      localStorage.setItem('hk_gate_off', '1');      // r450: no drill-start gate — see below
       localStorage.setItem('hk_handle_cache', '');   // no welcome-back card
     } catch (e) {}
   });
