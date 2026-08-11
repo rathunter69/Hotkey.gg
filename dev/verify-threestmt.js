@@ -41,7 +41,7 @@ const bad = m => { fails++; console.log('  FAIL ' + m); };
     try {
       localStorage.setItem('hotkey_onboarded', '1');
       localStorage.setItem('hk_tour_done', '1');
-      localStorage.setItem('hk_learn_done', '1');
+      localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');
       localStorage.setItem('hk_handle_cache', '');
     } catch (e) {}
   });

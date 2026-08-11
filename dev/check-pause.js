@@ -46,6 +46,16 @@ const BASE = process.env.BASE || 'http://127.0.0.1:8791';
   await page.evaluate(() => { try { loadChallenge('filldr'); } catch (e) {} });
   await page.waitForTimeout(900);
 
+  // r450: this suite deliberately does NOT set hk_gate_off. Every other dev/ harness opts out
+  // of the drill-start gate; this one keys through it for real, because the gate and the pause
+  // are the same overlay language solving the same two problems (frozen clock + swallowed key),
+  // and a second independent witness that they compose is worth one keystroke. The gate is up
+  // right now, so THIS press is the start key: it is swallowed and it starts the clock.
+  await page.keyboard.press('Space');
+  await page.waitForTimeout(200);
+  const gateGone = await page.evaluate(() => !document.getElementById('hkGate') && running === true);
+  check(gateGone, 'r450 start gate: the first key starts the run and is swallowed');
+
   // Start the clock with a real keystroke, never a click (a click sets mouseUsed itself and
   // would mask the very thing this guard checks). Arrow keys are NOT enough — navigation is
   // deliberately untimed ("nothing is timed yet"); the run starts on the first real action.

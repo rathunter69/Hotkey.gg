@@ -133,6 +133,14 @@ jobs:
       - name: Blur pause (clock freezes, resume swallows the key)
         if: steps.scope.outputs.engine == 'true'
         run: node dev/check-pause.js
+      # r450 (Wolf): THE DRILL-START GATE. Every board loads locked behind "press any key to
+      # start"; the first key is swallowed and starts the clock, so par and leaderboard times
+      # are measured from one uniform zero. Wired in the SAME round as the feature — the r442
+      # lesson was that check-borders/check-pause sat written-but-unwired through four
+      # playtests, and a guard that has never been seen to fire is not a guard.
+      - name: Drill-start gate (locked at load · first key swallowed · par unchanged)
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/check-startgate.js
       - name: Drill pages in sync
         if: steps.scope.outputs.engine == 'true'
         run: |
