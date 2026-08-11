@@ -16,11 +16,15 @@ way. DEPTH_PASS.md §1.0-R3 carries the binding RULES; this file carries the PRA
 | Formulas I | 9 | 9 | ✅ complete as of r438 (`growth` retired; `cagr` absorbed its board; `bridge` → "Point-mode formulas"; `rollup` last in) |
 | Data & Lookups | 9 | 9 | ✅ complete as of r438 (`grpfold` retired into `unhide`, so the chapter is 9; `drill` and `series` last in — both tested for retirement and both kept) |
 | Formulas II | 10 | 10 | ✅ complete as of r440 (`wirewalk` retired into `tieout`, `hunt` into `audit`, so the chapter is 10; `balcheck`, `tieout` and `balance` last in — all three tested for retirement and all three kept). `redflags` §4.56, the chapter's designated capstone, is an unbuilt ADD (delta D4) and is NOT part of the pass |
-| Models I | 0 | 10 | ⚠️ read §5 below before dispatching |
-| Models II | 0 | 10 | ⚠️ read §5 below before dispatching |
-| Full Builds | 0 | 10 | ⚠️ read §5 below before dispatching |
+| Models I | 10 | 10 | ✅ complete as of r445 (waves 1–2). `pitchpage` §3.1, the designated capstone, is an unbuilt ADD and NOT part of the pass. ☆-family soft-rule breach recorded in the r445 AUDIT note |
+| Models II | 10 | 10 | ✅ complete as of r447 (waves 3–4). `cascade` designated capstone (D9: moved last, pass=par×2). ☆-family + border-doctrine notes in the r446/r446b/r447 AUDIT sections |
+| Full Builds | 10 | 10 | ✅ complete as of r449 (waves 5–6). `lbobuild` down to 20 rows (task #16 closed); `shipit`, the chapter capstone, is an unbuilt ADD and NOT part of the pass |
 
-**44 of 74 passed.** Catalog **74** (was 82; `hunt` closed it out at r439) — counted from `menuOrder`
+**74 of 74 passed — THE DEPTH PASS IS COMPLETE (r449).** What remains is not drill rework: the
+Wolf decisions (border doctrine r446b · threestmt difficulty §5.4 · opmodel placement band D16 ·
+dashcover roster · redflags §4.56), the unbuilt capstone ADDs (`redflags` `pitchpage` `shipit`),
+the qclose port, the dual-audience audit over pre-R4 drills, and the standing engine backlog
+(fit-sweep flake · density retrofit · alt-paths Escape wedge · __noShrink frame overrun). Catalog **74** (was 82; `hunt` closed it out at r439) — counted from `menuOrder`
 at r440, chapter by chapter. `menuOrder.length` is the only source of truth; the
 "N banker-grade drills" marketing copy in index/About/enterprise is asserted against it by
 `e2e-smoke`, so it moves with every retirement.
@@ -31,25 +35,25 @@ filldr+pastes) · `growth`→cagr absorbed its board · `grpfold`→unhide (r437
 (r439, the strongest of the campaign — measured three ways). `cases` moved chapters rather than
 retiring.
 
-### Where the next session picks up (written r441, PR #243 open)
+### Where the next session picks up (r449 — THE DEPTH PASS IS COMPLETE)
 
-The six passed chapters are shipped and green. **The engine work that had to precede Models is
-done** — the 20-row standard (r440) and the width-engine pass (r441) were both explicitly gated
-in front of the Models dispatch, and both are in. Nothing engine-side is now blocking.
+**74/74 shipped on the working branch** (`claude/platform-audit-framework-1hf2v7`, PR #245).
+Waves 1–6 (r444–r449) rebuilt all thirty Models I / Models II / Full Builds drills; the final
+full gate (gate10) ran green on all 19 suites — ALT PATHS ALL 160 PASS, par sweep 0 flagged.
+`cascade` is the designated Models II capstone (D9); `lbobuild` is inside the 20-row cap; the
+campaign's untriggerable-beat ledger closed at **82**, every one found by walking a route.
 
-Two decisions are Wolf's and neither is made:
+**Wolf's decision queue** (task list #28/#31/#32 + standing): border-dress doctrine unification
+(r446b) · threestmt difficulty target (§5.4) · opmodel placement band (D16) · dcfbuild's 4-key
+star and the terminal-value beat split · dashcover cover roster · `redflags` §4.56 (scope call).
 
-1. **`redflags` §4.56** — Formulas II's designated capstone, an unbuilt ADD. The chapter is
-   complete at ten boards without it; building it is a scope call, not an omission. §6 has no
-   entry for it because it is not a defect.
-2. **Models I dispatch scope** — ten drills, and §5 above is the mandatory briefing. Do not
-   dispatch without `dev/MODELING_STANDARDS.md` in the agent brief and `ROWS=20` as the stated
-   default.
+**Unbuilt capstone ADDs, not defects:** `redflags` (Formulas II) · `pitchpage` (Models I) ·
+`shipit` (Full Builds); plus the deferred qclose port and the dual-audience audit over pre-R4
+drills.
 
-Standing debt that does NOT block Models: §6.6 (the frame overrun), the §1.3 density retrofit
-(11 drills in passed chapters), `lbobuild`'s 25 rows, the fit-sweep flake, and the alt-paths
-long-run Escape wedge. All are recorded here or in §6 with their measurements; none needs
-re-deriving.
+**Standing engine backlog** (measured, none blocking): the fit-sweep #### flake · the §1.3
+density retrofit (11 drills in early chapters) · the alt-paths long-run Escape wedge · the
+§6.6 __noShrink frame overrun.
 
 ---
 
@@ -273,6 +277,15 @@ These three chapters (30 drills) are different in kind from everything the campa
 far: they are not Excel-mechanic drills with a finance skin, they are **financial models**, and
 a banker will judge them on whether the model is built the way a real one is. A drill that
 teaches a correct keystroke on a wrong model is worse than no drill.
+
+**Border-dress doctrine on total rows (r446b — read before writing any dress beat).** Two
+readings ship today and the unification is a WOLF DECISION, not yours: (a) STRICT — §1.0(f)
+"never a rule underneath" graded as `bt && !bb && !bdbl`, with the label carrying the scope
+clause "— no rule underneath" (scrub · unhide · autofit · rowops · triage); (b) LENIENT —
+`bt || ball`, tolerating the boxed total (balance · ruleoff · the wave-3 Models II boards).
+Neither strands a correct artifact; do NOT "fix" one into the other, do NOT cite the widened
+form of boxed-REGION artifacts as precedent for total rows, and if you grade strict, the label
+MUST state the constraint. Declare which reading your board uses and why in payload §8.
 
 **Read `dev/MODELING_STANDARDS.md` before writing any Models board.** It carries the
 conventions that must hold — formatting colour law, sign conventions, roll-forward structure,
@@ -844,5 +857,7 @@ Secondary divergence, mechanical by comparison:
 **CI is silent until this is resolved** — GitHub does not run `pull_request` workflows for a PR
 with `mergeable_state: "dirty"`, so no push on this branch can be gated until the merge lands.
 
-**Escalated to Wolf; nothing merged, nothing live.** Do not resolve this by picking a side
-mechanically — the letter collision and the 44-drill audit are product calls.
+**RESOLVED in r443 — merged to main as 09f1aa2 and live.** Both (n) laws kept: the round-3
+playtest block keeps §1.0-R3 (n)–(s), #244's dual-audience law is now §1.0-R4 (t)/(u). Code came
+from #243, test infrastructure from #244. Still outstanding from it: the dual-audience audit over
+all 44 passed drills (that law post-dates them) and #244's `qclose` capstone.

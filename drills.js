@@ -41,7 +41,7 @@ window.HOTKEY_DRILLS = {
     { name: 'Data & Lookups', keys: ['sort', 'scrub', 'filterpass', 'unhide', 'lookup', 'lookup2', 'recon', 'drill', 'series'] },
     { name: 'Formulas II',    keys: ['audit', 'triage', 'wrapfix', 'balcheck', 'stalelink', 'cases', 'tieout', 'signerr', 'versionup', 'balance'] },
     { name: 'Models I',       keys: ['wacc', 'fcfbuild', 'dcf', 'comps', 'txncomps', 'football', 'dcfsens', 'retbridge', 'accdil', 'sourcesuses'] },
-    { name: 'Models II',      keys: ['schedule', 'intsched', 'lbo', 'revolver', 'waterfall', 'covtable', 'liqbridge', 'wk13', 'cascade', 'debtsched'] },
+    { name: 'Models II',      keys: ['schedule', 'intsched', 'lbo', 'revolver', 'waterfall', 'covtable', 'liqbridge', 'wk13', 'debtsched', 'cascade'] },   /* r447 (DEPTH_PASS §2.4/§3 D9): cascade MOVED to the end — capstone-last is uniform across chapters; the 1–9 picker hotkey re-map inside Models II is cosmetic (RESOLVED, Wolf 2026-07-24) */
     { name: 'Full Builds',    keys: ['isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'threestmt', 'opmodel', 'dcfbuild', 'lbobuild', 'debtblock', 'dashcover'] },
   ],
 
@@ -63,17 +63,21 @@ window.HOTKEY_DRILLS = {
     blocksel:   { name:'Block Select',label:'Assemble and format the summary',tab:'Block', desc:'COPY what stays, CUT what moves — the feeds run in segment order; dress the table as you go and box it whole' },   /* r424 §4.4 round 2: margin note + money formats out; whole-table close in */
     editfix:    { name:'Repair',   label:'Repair the schedule',    tab:'Repair',   desc:'A review came back on the schedule — a misspelled team, an FY formula pointing at the wrong row, a Total that never grew. Repair all three, then do what the sweep note says and watch it cost you' },   /* r431: absorbed undo — the repair pass and its safety net are one drill */
     pastes:     { name:'Paste Special',label:'Paste Special everything',tab:'Paste Sp.',desc:'The full paste-special toolkit — transpose, divide, multiply, formats, values' },
-    waterfall:  { name:'Waterfall', label:'Run the paydown waterfall',  tab:'Waterfall', desc:'3-yr cascade: MIN rations the cash, both tranches roll forward across' },
-    cascade:    { name:'Full Waterfall', label:'Run the full cascade',   tab:'Cascade',   desc:'3 tranches \u00d7 4 yrs: seniority MINs, per-tranche roll-forwards, total debt bold with a top border' },
-    wk13:       { name:'13-Week Cash', label:'Run the 13-week', tab:'13-Week', desc:'The restructuring staple: a weekly roll-forward, an anchored liquidity cushion, totals on flows only' },
-    liqbridge:  { name:'Liquidity Bridge', label:'Bridge the liquidity \u2014 three cases', tab:'Liq. Bridge', desc:'Cash + undrawn to ending liquidity, Base / Downside / Severe \u2014 read which cases breach' },
-    covtable:   { name:'Covenant Table',  label:'Run the covenant table', tab:'Covenants', desc:'Net leverage vs a stepping max \u2014 headroom, a real IF flag, MIN pulls the pinch quarter' },
-    txncomps:   { name:'Transaction Comps', label:'Run precedent transactions', tab:'Txn Comps', desc:'Multiples paid, the median, and the implied equity' },
-    sourcesuses:{ name:'Sources & Uses',       label:'Balance sources and uses',   tab:'S&U',       desc:'Total, plug, check zero — then % of total down both sides' },
-    accdil:     { name:'Accretion/Dilution',   label:'Run accretion / dilution',   tab:'Acc/Dil',   desc:'Combined EPS vs standalone — synergies in, financing drag out' },
-    dcfsens:    { name:'Sensitivity',label:'Run the sensitivity table', tab:'Sens.',     desc:'True mixed anchors — one formula fills the 5×3 WACC × growth grid' },
-    retbridge:  { name:'Returns Bridge',label:'Attribute the returns',     tab:'Returns',   desc:'Growth, multiple, delever — prove the bridge ties with a zero check' },
-    football:   { name:'Football',  label:'Build the football field',   tab:'Football',  desc:'Midpoints per method, MIN floor, MAX ceiling — the summary page' },
+    waterfall:  { name:'Waterfall', label:'Run the paydown waterfall',  tab:'Waterfall', desc:'Foot the cash a credit page has for debt, then cascade it down two tranches by seniority' },   /* r446 §4.72 depth pass: desc rewritten to the reworked board (the old one named the answer function) */
+    /* r447 H6b-14 (DEPTH_PASS \u00a72.4/\u00a73 D9): cascade DESIGNATED the Models II capstone —
+       capstone:true drives the picker's ★ CAPSTONE tag + full-color group ring; the gate itself
+       reads HOTKEY_CAMPAIGN.chapters[6].capstone below. desc de-hinted: the old one named the
+       answer function ("seniority MINs") outright — the r417 Class-A leak. */
+    cascade:    { name:'Full Waterfall', label:'Run the full cascade',   tab:'Cascade',   capstone:true, desc:'The Models II capstone \u2014 three facilities, four years, cash applied strictly by seniority: each layer rations against what the one above it left, every balance rolls forward, and the page closes on total debt. One clean run opens the next track leg' },
+    wk13:       { name:'13-Week Cash', label:'Run the 13-week', tab:'13-Week', desc:'The restructuring staple: a weekly cash roll-forward, an anchored liquidity cushion, and totals on the flow lines only' },   /* r447 §4.75: desc rewritten to the flow-block board (receipts and disbursements broken out) */
+    liqbridge:  { name:'Liquidity Bridge', label:'Bridge the liquidity \u2014 three cases', tab:'Liq. Bridge', desc:'Cash plus revolver availability walked to ending liquidity across three cases, and the cushion against the covenant' },   /* r447 §4.74: availability now capped by the borrowing base — the old desc described the uncapped board */
+    covtable:   { name:'Covenant Table',  label:'Run the covenant table', tab:'Covenants', desc:'Two leverage tests against a stepping maximum \u2014 headroom every quarter, a compliance flag, and the quarter that pinches' },   /* r447 §4.73: the board now runs senior secured AND total net leverage */
+    txncomps:   { name:'Transaction Comps', label:'Run precedent transactions', tab:'Txn Comps', desc:'A six-deal precedent tape, the median multiple paid, and the implied equity value' },
+    sourcesuses:{ name:'Sources & Uses',       label:'Balance sources and uses',   tab:'S&U',       desc:'Foot both sides, size the sponsor equity to balance, prove the check at zero, then common-size each side' },
+    accdil:     { name:'Accretion/Dilution',   label:'Run accretion / dilution',   tab:'Acc/Dil',   desc:'Cash, stock or both — pro forma EPS against standalone, drag included' },
+    dcfsens:    { name:'Sensitivity',label:'Run the sensitivity table', tab:'Sens.',     desc:'A two-way DCF sensitivity — five discount rates across, three growth rates down' },
+    retbridge:  { name:'Returns Bridge',label:'Attribute the returns',     tab:'Returns',   desc:'Split the equity gain into growth, multiple and debt paydown — shares of the gain, checked to zero' },
+    football:   { name:'Football',  label:'Build the football field',   tab:'Football',  desc:'Six methodologies on one per-share axis — midpoints, implied premiums, and the reference range the board sees' },
 
     // Formatting group — plus triage/versionup, which live in Formulas II now (groups[] above is authoritative)
     housestyle: { name:'House Style', label:'Clean it to standard', tab:'House Style', desc:'A full cleanup pass: title, headers, blue inputs (one buried), commas, %, the totals ruled with a top border' },
@@ -105,20 +109,20 @@ window.HOTKEY_DRILLS = {
     // Formulas & auditing — spans Formulas I and Formulas II, plus the Models drills
     margin:     { name:'Margins',  label:'Margins across the page', tab:'Margin',  desc:'Three ratio columns on one peer page — the margin, the growth rate and the EV/EBITDA multiple, each in the format it is quoted in' },   /* r433 §4.21: the desc named the retired three-table board */
     anchor:     { name:'Anchors',  label:'Pin the reference',       tab:'Anchors', desc:'Cycle the reference locks — one pinned formula prices the whole grid' },
-    wacc:       { name:'WACC',     label:'Build the discount rate', tab:'WACC',    desc:'Unlever, relever, CAPM, weight — the full discount-rate build' },
-    fcfbuild:   { name:'uFCF',     label:'Build the unlevered FCF', tab:'uFCF',    desc:'EBIT \u2192 less taxes \u2192 NOPAT \u2192 plus D&A, less capex and the NWC build: the row every DCF discounts, filled across five years' },
-    dcf:        { name:'DCF',      label:'Discount the cash flows', tab:'DCF',     desc:'Discount factors \u00d7 cash flows build the PV row; the TV reuses the year-5 factor' },
-    dcfbuild:   { name:'DCF page', label:'Build the DCF page',      tab:'DCF page',desc:'The whole valuation page: DF, PV, terminal value, EV \u2014 bridge to value per share, then one =NPV() line audits your whole PV row' },
-    lbobuild:   { name:'Paper LBO',label:'Build the paper LBO',     tab:'Paper LBO',desc:'Sources & uses sizes the equity plug, entry to exit lands MOIC \u2014 then prove the IRR twice: compounded, and =IRR() over the raw equity flows' },
-    opmodel:    { name:'Op model', label:'Build the operating model',tab:'Op model',desc:'Drivers up: grow revenue off one anchored rate, cost it as % of sales, and gross profit, EBITDA and the margin line build themselves' },
-    debtblock:  { name:'Debt block',label:'Build the debt & interest block',tab:'Debt block',desc:'Two tranches, each rolling on its own anchored rate — senior and sub roll-forwards, both interest lines, then total debt and total interest' },
-    dashcover:  { name:'Model cover',label:'Build the model cover',  tab:'Model cover',desc:'The page-one output box: reference the model into the headline metrics, then stamp the cover title clean with UPPER(TRIM())' },
-    lbo:        { name:'LBO',      label:'Run the LBO math',        tab:'LBO',     desc:'Entry equity, exit equity, MOIC — then IRR over the hold' },
+    wacc:       { name:'WACC',     label:'Build the discount rate', tab:'WACC',    desc:'Unlever a five-comp beta set, relever at your own structure, weight both sides' },
+    fcfbuild:   { name:'uFCF',     label:'Build the unlevered FCF', tab:'uFCF',    desc:'EBIT → less taxes → NOPAT → plus D&A, less capex and the NWC build: the row every DCF discounts, filled across five plan years and totalled' },
+    dcf:        { name:'DCF',      label:'Discount the cash flows', tab:'DCF',     desc:'Discount factors \u00d7 free cash flows build the present-value row; a Gordon terminal value and the enterprise value close the page' },
+    dcfbuild:   { name:'DCF page', label:'Build the DCF page',      tab:'DCF page',desc:'The valuation page a deal book opens on \u2014 discount five years of free cash flow, add a terminal value, bridge enterprise value down to a price per share, then prove the whole present-value row with one check line' },   /* r449 §4.84 depth pass: desc rewritten — the old one led with three bare abbreviations and named the answer function */
+    lbobuild:   { name:'Paper LBO',label:'Build the paper LBO',     tab:'Paper LBO',desc:'Size the deal at close, mark the same page at exit, and read the sponsor return \u2014 the equity cheque is the plug that balances the funding' },   /* r449 §4.85 depth pass: desc rewritten — the old one named =IRR() outright and described the retired 25-row S&U board */
+    opmodel:    { name:'Op model', label:'Build the operating model',tab:'Op model',desc:'The commercial plan lands as units and a price — build five plan years off a four-cell driver panel, take the top line down to EBITDA on a per-unit cost, and leave the margin memo showing which driver is doing the work' },   /* r449 (§4.83): the old line described the retired board — a revenue-growth rate and a gross-profit line, neither of which exists now */
+    debtblock:  { name:'Debt block',label:'Build the debt & interest block',tab:'Debt block',desc:'A term loan and a revolver, each priced on its own rate — both roll-forwards, interest on the opening balances, then total debt and total interest' },   /* r449 §4.86 depth pass: the old desc named tranches the reworked board does not have. name/label/tab unchanged — the key and its picker identity are immutable (PBs, boards, drills/debtblock.html). */
+    dashcover:  { name:'Model cover',label:'Build the model cover',  tab:'Model cover',desc:'Page one of the pack: wire the headline metrics off the model outputs strip for both cases, then stamp the deal name onto the title' },   /* r449 §4.87 depth pass: the old desc named the answer functions outright — the r417 Class-A leak */
+    lbo:        { name:'LBO',      label:'Run the LBO math',        tab:'LBO',     desc:'One entry multiple, three exit years — the equity bridge across all four, then MOIC and IRR per case' },   /* r446 §4.70 depth pass: desc rewritten to the case-column board (the old one described the retired one-column worked example) */
     /* r425 H6b-2 (DEPTH_PASS \u00a72.4/\u00a73 D7): modeltour DESIGNATED the Foundations capstone \u2014
        capstone:true drives the picker's \u2605 CAPSTONE tag + full-color group ring; the gate
        itself reads HOTKEY_CAMPAIGN.chapters[0].capstone below. */
     modeltour:  { name:'Model Tour', label:'Run the model tour', tab:'Model Tour', capstone:true, desc:'The Foundations capstone \u2014 four subtotals blown to #REF! in a live P&L: rebuild the cascade, land both margin rows, dress the bottom line. One clean run opens the next track leg' },
-    revolver:   { name:'Revolver', label:'Sweep the revolver',  tab:'Revolver',    desc:'MIN/MAX sweep ×4 years, then prove out both balances' },
+    revolver:   { name:'Revolver', label:'Sweep the revolver',  tab:'Revolver',    desc:'Draw, sweep and roll one revolver across four years' },   /* r446 (DEPTH_PASS §4.71): the desc named the retired 7-row board, which had no roll and no draw. De-hint clean — no chord names, no cell refs. */
     cagr:       { name:'CAGR',     label:'Compound it, three times', tab:'CAGR',   desc:'Compound each segment’s own rate, then read which one actually grew fastest' },   /* r435 (DEPTH_PASS §4.26): the desc named the retired board ("three scattered blocks") and spelled the answer out as a formula; the reworked drill is a segment revenue build whose second half is a read. Key is immutable, so PBs, boards and runs history are untouched. */
     sumif:      { name:'SUMIF',    label:'Roll up the segments',tab:'SUMIF',       desc:'SUMIF rollup + live foot + % of total, summary formatted' },
     rollup:     { name:'SUMIFS',   label:'Sum on two criteria',      tab:'SUMIFS',      desc:'Roll a booking ledger into a segment \u00d7 region cross-tab, then prove it back' },
@@ -134,17 +138,17 @@ window.HOTKEY_DRILLS = {
     wrapfix:    { name:'IFERROR',  label:'Wrap it or fix it',   tab:'IFERROR', desc:'Three reads down for three different reasons \u2014 wrap the truly missing, repair the merely broken, then foot the panel' },
     signerr:    { name:'Sign Sweep', label:'Flip the signs back', tab:'Signs', desc:'One plan year came in on the other sign convention \u2014 find it, flip it, re-lay EBIT', errorCount:3 },   /* r439 \u00a74.53 depth pass: \u00a72.3 disclosed-error meter (0/3); desc rewritten for the rebuilt board */
     percent:    { name:'% of Revenue', label:'Common-size both statements', tab:'Common-size', desc:'Both blocks ÷ their OWN revenue, $-locked so the fill can’t drift' },
-    intsched:   { name:'Interest', label:'Run the interest schedule', tab:'Interest', desc:'Roll the debt, then rate × the opening balance is cash interest — and EBITDA ÷ interest is the coverage the covenant reads' },
-    schedule:   { name:'Schedule', label:'Roll it forward',     tab:'Schedule',    desc:'5-yr roll: linked openings + the accumulated-dep memo' },
-    comps:      { name:'Comps',    label:'Run the comps',       tab:'Comps',       desc:'Build the multiples, read the summary \u2014 median, high/low and the LARGE/SMALL trimmed range \u2014 land per share and premium' },
+    intsched:   { name:'Interest', label:'Run the interest schedule', tab:'Interest', desc:'A term loan that opens where it closed, cash interest on the beginning balance, and the coverage line the credit committee reads' },   /* r446 §4.69 depth pass: desc rewritten to the reworked board (the old one narrated the mechanism — §1.0(b) puts that in guide/req, never player copy) */
+    schedule:   { name:'Schedule', label:'Roll it forward',     tab:'Schedule',    desc:'Five years of fixed assets — capex adds, depreciation takes its cut, and every year opens where the last one closed, with the accumulated-depreciation memo underneath' },   /* r446 §4.68 depth pass: desc rewritten to the reworked board (the old one described a ROWS:9 page with no capex split and no assumption stack) */
+    comps:      { name:'Comps',    label:'Run the comps',       tab:'Comps',       desc:'Build both enterprise-value multiples across the peer set, read the median, high and low, and carry it down to an implied share price' },
 
     // Full Builds — plus lookup/lookup2, which live in Data & Lookups
-    isbuild:    { name:'IS Build',  label:'Build the income statement', tab:'IS Build',  desc:'5-yr IS: anchored drivers, margin row as %, bottom line ruled' },
-    bsbuild:    { name:'BS Build',  label:'Balance the balance sheet',  tab:'BS Build',  desc:'3 yrs: SUM both sides, RE roll filled across, the check landing at zero' },
-    nwcsched:   { name:'NWC Schedule',label:'Roll working capital',       tab:'NWC',       desc:'Type the drivers, paint them blue, roll NWC five years' },
-    threestmt:  { name:'3-Statement',label:'Tie the three statements',  tab:'3-Stmt',    desc:'3 yrs × 3 links, checks at zero, totals formatted to ship' },
-    cfslink:    { name:'CFS Link',  label:'Link the cash flow statement',tab:'CFS Link', desc:'5-yr cash roll-forward + conversion memo as %, the close bold with a top border' },
-    debtsched:  { name:'Debt Schedule',label:'Run the debt schedule',      tab:'Debt',     desc:'Type the rate, paint it blue, run the 5-yr sweep roll-forward' },
+    isbuild:    { name:'IS Build',  label:'Build the income statement', tab:'IS Build',  desc:'Five forecast years off one driver panel — revenue grown year on year, the cost lines as a percent of it, EBITDA ruled and the margin memo underneath' },   /* r448 §4.78 depth pass: desc rewritten to the reworked board (the old one described an 11-row page with a tax line and a net-margin row, and named the mechanism rather than the artifact) */
+    bsbuild:    { name:'BS Build',  label:'Balance the balance sheet',  tab:'BS Build',  desc:'Three years: roll retained earnings, total both sides, land the check at zero' },   /* r448 §4.79 depth pass: desc rewritten to the reworked board (the old one named the mechanism — SUM, fill — not the artifact) */
+    nwcsched:   { name:'NWC Schedule',label:'Roll working capital',       tab:'NWC',       desc:'Roll receivables, inventory and payables off three day-count drivers' },   /* r448 §4.81 depth pass: desc rewritten to the reworked board (the old one narrated the route — type/paint — not the artifact) */
+    threestmt:  { name:'3-Statement',label:'Tie the three statements',  tab:'3-Stmt',    desc:'Three statements on one page — net income, cash and retained earnings wired, the check at zero' },   /* r448 §4.82 depth pass: desc rewritten to the reworked board (the old one advertised checks plural and pre-shipped dress) */
+    cfslink:    { name:'CFS Link',  label:'Link the cash flow statement',tab:'CFS Link', desc:'Point the statement at its schedules, close the cash roll year to year, read cash conversion against EBITDA' },   /* r448 §4.80 depth pass: desc rewritten to the reworked board — the old one narrated the dress, and the board has a supporting-schedule block now */
+    debtsched:  { name:'Debt Schedule',label:'Run the debt schedule',      tab:'Debt',     desc:'Roll the term loan year to year — mandatory amortization, a capped cash sweep, interest on the beginning balance' },   /* r447 §4.76 depth pass: desc rewritten to the reworked board (the old one narrated the route — type/paint — not the artifact) */
     lookup:     { name:'Lookup',   label:'Look it up',          tab:'Lookup',      desc:'Read a peer table with INDEX/MATCH \u2014 three pulls onto one pitch screen' },
     lookup2:    { name:'Two-way Lookup',    label:'Two-way lookup',      tab:'2-way',       desc:'INDEX with two MATCHes — row and column at once' },
   },
@@ -242,7 +246,7 @@ window.HOTKEY_CAMPAIGN = {
     { id:'c4', name:'Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','recon','lookup','lookup2'] },
     { id:'c5', name:'Formulas II',            badge:'\ud83e\uddee', xp:450, keys:['audit','balance','triage','versionup'] },
     { id:'c6', name:'Models I \u00b7 Valuation',    badge:'\ud83c\udfe6', xp:600, keys:['wacc','fcfbuild','dcf','comps'] },
-    { id:'c7', name:'Models II \u00b7 Credit',      badge:'\ud83d\udcc9', xp:750, keys:['lbo','revolver','intsched','debtsched'] },
+    { id:'c7', name:'Models II \u00b7 Credit',      badge:'\ud83d\udcc9', xp:750, keys:['lbo','revolver','intsched','debtsched'], capstone:'cascade' },   /* r447 (D9): the Models II capstone designates with its depth-pass build */
     { id:'c8', name:'Full Builds',            badge:'\ud83c\udfd7', xp:1000, keys:['threestmt','dcfbuild','lbobuild','opmodel'] },
   ],
   finisher: { badge:'\u2b50', name:'Catalog complete', xp:600 },
@@ -328,9 +332,10 @@ window.HOTKEY_CLOCKS = {
      lockstep with HOTKEY_PARS.modeltour: pass = par × 2. */
   modeltour: { pass: 70 },
   gauntlet:  { pass: 94 },   /* r433: the Formatting capstone — par 47 × 2 (§4.20 "Clocks: capstone pass=par×2.0") */
+  cascade:   { pass: 322 },   /* r447: the Models II capstone — par 161 × 2 (§4.77 "Clocks: pass=par×2.0 override") */
 };
 
-window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":47,"margin":40,"foot":29,"percent":21,"cagr":36,"anchor":22,"bridge":33,"sumif":64,"rollup":80,"fxconvert":35,"cases":97,"sort":31,"scrub":21,"recon":92,"filterpass":26,"unhide":25,"lookup":59,"lookup2":80,"drill":22,"series":44,"audit":28,"triage":40,"wrapfix":26,"balcheck":37,"stalelink":64,"tieout":36,"signerr":35,"versionup":48,"balance":66,"wacc":78,"fcfbuild":32,"dcf":62,"comps":94,"txncomps":36,"football":39,"dcfsens":19,"retbridge":65,"accdil":50,"sourcesuses":55,"lbo":54,"revolver":41,"schedule":35,"intsched":29,"waterfall":64,"cascade":94,"wk13":45,"liqbridge":40,"covtable":45,"debtsched":73,"isbuild":51,"bsbuild":60,"cfslink":36,"nwcsched":74,"threestmt":59,"opmodel":55,"dcfbuild":91,"lbobuild":82,"debtblock":57,"dashcover":48};
+window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":47,"margin":40,"foot":29,"percent":21,"cagr":36,"anchor":22,"bridge":33,"sumif":64,"rollup":80,"fxconvert":35,"cases":97,"sort":31,"scrub":21,"recon":92,"filterpass":26,"unhide":25,"lookup":59,"lookup2":80,"drill":22,"series":44,"audit":28,"triage":40,"wrapfix":26,"balcheck":37,"stalelink":64,"tieout":36,"signerr":35,"versionup":48,"balance":66,"wacc":112,"fcfbuild":40,"dcf":85,"comps":89,"txncomps":52,"football":65,"dcfsens":35,"retbridge":56,"accdil":70,"sourcesuses":92,"lbo":71,"revolver":95,"schedule":69,"intsched":72,"waterfall":77,"cascade":161,"wk13":45,"liqbridge":77,"covtable":36,"debtsched":86,"isbuild":71,"bsbuild":64,"cfslink":66,"nwcsched":102,"threestmt":45,"opmodel":85,"dcfbuild":113,"lbobuild":84,"debtblock":70,"dashcover":47};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

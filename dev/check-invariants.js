@@ -232,13 +232,13 @@ try {
    STATIC counts asserted here stay the hand-written tri-length; C9 asserts the declaration is
    present and that no drill hand-writes the save beat (the engine owns it, exactly once). ---- */
 try {
-  const REWORKED = ['navigation', 'blocksel', 'filldr', 'pastes', 'rowops', 'ruleoff', 'editfix', 'ruleaudit', 'housestyle', 'typeset', 'modeltour', 'combo', 'decimals', 'center', 'autofit', 'margin', 'anchor', 'gauntlet', 'foot', 'percent', 'bridge', 'sumif', 'fxconvert', 'cagr', 'lookup', 'scrub', 'sort', 'recon', 'lookup2', 'unhide', 'rollup', 'filterpass', 'series', 'drill', 'stalelink', 'signerr', 'versionup', 'wrapfix', 'cases', 'audit', 'triage', 'balcheck', 'tieout', 'balance'];   // r422 H6b-1 wave 1 · r440: the last three of Formulas II
+  const REWORKED = ['navigation', 'blocksel', 'filldr', 'pastes', 'rowops', 'ruleoff', 'editfix', 'ruleaudit', 'housestyle', 'typeset', 'modeltour', 'combo', 'decimals', 'center', 'autofit', 'margin', 'anchor', 'gauntlet', 'foot', 'percent', 'bridge', 'sumif', 'fxconvert', 'cagr', 'lookup', 'scrub', 'sort', 'recon', 'lookup2', 'unhide', 'rollup', 'filterpass', 'series', 'drill', 'stalelink', 'signerr', 'versionup', 'wrapfix', 'cases', 'audit', 'triage', 'balcheck', 'tieout', 'balance', 'wacc', 'fcfbuild', 'dcf', 'comps', 'txncomps', 'football', 'dcfsens', 'retbridge', 'accdil', 'sourcesuses', 'schedule', 'intsched', 'lbo', 'revolver', 'waterfall', 'covtable', 'liqbridge', 'wk13', 'cascade', 'debtsched', 'isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'threestmt', 'opmodel', 'dcfbuild', 'lbobuild', 'debtblock', 'dashcover'];   // r422 H6b-1 wave 1 · r440: the last three of Formulas II · r444: Models I opens
   const idx = fs.readFileSync('index.html', 'utf8');
   const start = idx.indexOf('const CHALLENGES = {');
   const end = idx.indexOf('STATE + ENGINE', start);
   // count top-level elements of the FIRST array literal returned by fn `name(){ return [ ... ]; }`
   const arrLen = (chunk, name) => {
-    const m = new RegExp(name + '\\s*\\(\\)\\s*\\{[^\\[]*?return\\s*\\[').exec(chunk);
+    const m = new RegExp(name + '\\s*\\(\\)\\s*\\{(?:(?!return)[\\s\\S])*?return\\s*\\[').exec(chunk);   /* r447: preamble may index (q0=o.qc[0]) — anchor on the first `return [` instead of forbidding `[` (covtable) */
     if (!m) return null;
     let i = m.index + m[0].length, depth = 1, elems = 0, sawTok = false, q = null;
     for (; i < chunk.length && depth > 0; i++) {
