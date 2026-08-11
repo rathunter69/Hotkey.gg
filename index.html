@@ -808,6 +808,9 @@
     color:var(--muted); padding:6px 4px 6px 26px; cursor:pointer; border-radius:6px}
   .camp-drill:hover{color:var(--text); background:var(--surface2)}
   .camp-drill.ok{color:var(--accent)}
+  .camp-drill.pw{color:var(--faint)}   /* r450: locked milestone — dimmed, never removed; .ok still wins the ink on a clear you already own */
+  .camp-drill.pw.ok{color:var(--accent); opacity:.8}
+  .camp-drill.pw .camp-gate{color:var(--warn); letter-spacing:.1em}
   .camp-gate{font-size:10.5px; color:var(--faint)}
   /* r425 §2.4: capstone designation rows in the tracks modal */
   .camp-cap{border-top:1px dashed var(--line); margin-top:4px; padding-top:6px}
@@ -1085,6 +1088,32 @@
   .ob-kbd{font-family:var(--mono); font-size:11px; font-weight:600;
     background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.22); border-radius:4px; padding:1px 6px; line-height:1}
   .ob-key.primary.focused .ob-kbd{background:rgba(6,18,12,.2); border-color:rgba(6,18,12,.3); color:var(--on-accent)}
+
+  /* ---- r450 PAYWALL MODAL. Dead CSS until HOTKEY_PREMIUM.enabled flips — #paywallModal is
+     only ever built by openPaywall(), whose only caller is the entitlement branch in
+     loadChallenge(). It sits BELOW the .ob-* block on purpose: .ob-card is centre-aligned and
+     .ob-opts is a COLUMN, and this card is left-aligned with a two-up button row — every rule
+     here is an override of an equally-specific one above, so source order is load-bearing.
+     No palette of its own: every colour is a theme token, so the card is correct on all 27
+     themes for free (screenshotted on default + daylight). ---- */
+  .ob-card.pw-card{width:470px; text-align:left; position:relative; padding:24px 26px 22px}
+  .pw-cap{font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--warn); margin-bottom:6px}
+  .pw-cap b{font-weight:700}
+  .pw-card .ob-title{text-align:left; margin-bottom:10px}
+  .pw-card .ob-body{text-align:left; font-size:13px; margin-bottom:14px}
+  .pw-body b{color:var(--warn)}
+  .pw-list{display:flex; flex-direction:column; gap:1px; border:1px solid var(--line); border-radius:10px;
+    overflow:hidden; margin-bottom:14px}
+  .pw-ch{display:flex; align-items:center; gap:9px; padding:7px 12px; font-family:var(--mono);
+    font-size:12px; color:var(--text); background:var(--surface2)}
+  .pw-ch.here{background:color-mix(in srgb, var(--warn) 16%, var(--surface2))}
+  .pw-dot{display:inline-block; width:8px; height:8px; border-radius:2px; flex:none}
+  .pw-n{margin-left:auto; color:var(--muted); font-size:11px}
+  .pw-keep{font-family:var(--mono); font-size:11px; line-height:1.7; color:var(--muted); margin-bottom:16px}
+  .ob-opts.pw-opts{flex-direction:row; flex-wrap:wrap; align-items:stretch}
+  .ob-opts.pw-opts .ob-key{flex:1 1 auto; justify-content:center; text-decoration:none; padding:11px 16px}
+  .pw-hint{font-family:var(--mono); font-size:10.5px; color:var(--faint); text-align:center; margin-top:12px}
 
   .help-toggle{font-family:var(--mono); font-size:12px; color:var(--muted); background:none; border:none; cursor:pointer; padding:0}
   .help-toggle:hover{color:var(--accent)}
@@ -1433,6 +1462,17 @@
   .pk-folder.done .vdr-gname{color:var(--accent)}
   .pk-advtag{font-size:9px; letter-spacing:.12em; color:var(--accent); border:1px solid var(--accent-dim);
     border-radius:5px; padding:1px 6px; text-transform:uppercase; font-weight:400}
+  /* r450 PAYWALL — dead CSS until HOTKEY_PREMIUM.enabled flips (nothing carries these
+     classes with the flag off). The chapter badge borrows --warn, the same ink the r158
+     level gate uses, so "you can see it, you can't open it yet" reads the same either way.
+     The lock glyph sits INSIDE the row so the filename, the PB and the par all stay put —
+     a locked file is the same file, with a lock on it. */
+  .pk-protag{font-size:9px; letter-spacing:.12em; color:var(--warn); border:1px solid var(--warn);
+    border-radius:5px; padding:1px 6px; text-transform:uppercase; font-weight:700; white-space:nowrap}
+  .pk-lock{font-size:9.5px; line-height:1; opacity:.85; filter:grayscale(.35); flex:none}
+  .pk-byline.pw .vdr-fname{color:var(--faint)}
+  .pk-byline.pw:hover .vdr-fname{color:var(--muted)}
+  .pk-byline.pw.focus .vdr-fname{color:var(--text)}   /* keyboard focus still reads clearly — locked is not unreachable */
   /* r425 §2.4: capstone file rows wear the full-color group ring + CAPSTONE tag
      (border color is inlined per row from HOTKEY_GROUP_COLORS — full color, not the dim token) */
   .pk-captag{font-size:8.5px; letter-spacing:.14em; border:1px solid; border-radius:5px;
@@ -1848,9 +1888,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=300"></script>
+<script src="drills.js?v=301"></script>
 
-<script src="drills.js?v=300"></script>
+<script src="drills.js?v=301"></script>
 
 
 
@@ -1863,7 +1903,7 @@
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=302"></script>
+<script src="nav.js?v=303"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -27878,6 +27918,7 @@ function buildWeaknessQueue(){
   MENU_ORDER.forEach((k,idx)=>{
     const C=CHALLENGES[k]; if(!C||!C.par) return;
     if(drillLocked(k)) return;   // r158: the queue never assigns locked tiers
+    if(drillPaywalled(k)) return;   // r450: nor drills behind the paywall — the queue is a free-tier ritual
     let score=0, why='';
     if(PB[k]===undefined){
       score=2.2-(idx/MENU_ORDER.length)*0.8; why='never cleared';
@@ -27917,7 +27958,7 @@ function toggleWqPop(){
 }
 $('wqBtn').addEventListener('click',(e)=>{ e.stopPropagation(); toggleWqPop(); });
 { const __rb=$('randBtn'); if(__rb) __rb.addEventListener('click',()=>{   // r306: random retired from the bar (drill menu covers it); guarded for old markup
-  const pool=MENU_ORDER.filter(k=>k!==cur && !drillLocked(k));
+  const pool=MENU_ORDER.filter(k=>k!==cur && !drillLocked(k) && !drillPaywalled(k));   // r450: random never lands on a paid drill
   loadChallenge(pool[Math.floor(Math.random()*pool.length)]);
 }); }
 { const __wb=$('weeklyBtn'); if(__wb) __wb.addEventListener('click',startWeekly); }   // r81 hotfix: button retired; unguarded listener was a boot TypeError
@@ -29063,7 +29104,7 @@ $('mhStop').addEventListener('click', ()=>{ endSession(); });
 try{ if(localStorage.getItem('hk_gridlines')==='0') document.body.classList.add('hide-gridlines'); }catch(e){}
 
 function loadRandomDrill(){
-  const pool=MENU_ORDER.filter(k=>k!==lastKey && !drillLocked(k));   // r158: sessions honor the ladder
+  const pool=MENU_ORDER.filter(k=>k!==lastKey && !drillLocked(k) && !drillPaywalled(k));   // r158: sessions honor the ladder · r450: and the paywall — filtered HERE so a session never serves a board it would have to interrupt
   const key=pool.length ? pool[Math.floor(Math.random()*pool.length)] : MENU_ORDER[0];
   lastKey=key; loadChallenge(key);
 }
@@ -29769,14 +29810,20 @@ function openCampaign(){
         const C=CHALLENGES[k]; if(!C) return;
         const gate=(C.par*G).toFixed(0);
         const ok=campCleared(k);
-        r+='<div class="camp-drill'+(ok?' ok':'')+'" data-key="'+k+'">'+
-          '<span><span style="color:var(--faint)">–</span> '+(ok?'✓ ':'')+(window.HOTKEY_DRILLS.labelOf[k]||k)+'</span>'+
-          '<span class="camp-gate">'+(ok?PB[k].toFixed(2)+'s':'beat '+gate+'s')+'</span></div>';
+        /* r450 FREE-TIER INTEGRITY: a paid milestone shows LOCKED, never BROKEN. The row keeps
+           its ✓, its recorded PB and its pace gate — a clear a free player already earned is
+           still theirs and still counts toward the chapter, the track and the certificate; only
+           a NEW launch is intercepted. Null with the flag off. */
+        const pw=drillPaywalled(k);
+        r+='<div class="camp-drill'+(ok?' ok':'')+(pw?' pw':'')+'" data-key="'+k+'">'+
+          '<span><span style="color:var(--faint)">–</span> '+(ok?'✓ ':'')+(pw?'\uD83D\uDD12 ':'')+(window.HOTKEY_DRILLS.labelOf[k]||k)+'</span>'+
+          '<span class="camp-gate">'+(ok?PB[k].toFixed(2)+'s':(pw?'PRO':'beat '+gate+'s'))+'</span></div>';
       });
       /* r425 §2.4: the capstone line — one clean run, any speed, unlimited retakes */
       if(c.capstone && CHALLENGES[c.capstone]){
-        r+='<div class="camp-drill camp-cap'+(c.capOk?' ok':'')+'" data-key="'+c.capstone+'">'+
-          '<span><span class="camp-capstar">★</span> '+(c.capOk?'✓ ':'')+(window.HOTKEY_DRILLS.labelOf[c.capstone]||c.capstone)+' <span class="camp-captag">capstone</span></span>'+
+        const cpw=drillPaywalled(c.capstone);   /* r450: the capstone locks with its chapter */
+        r+='<div class="camp-drill camp-cap'+(c.capOk?' ok':'')+(cpw?' pw':'')+'" data-key="'+c.capstone+'">'+
+          '<span><span class="camp-capstar">★</span> '+(c.capOk?'✓ ':'')+(cpw?'\uD83D\uDD12 ':'')+(window.HOTKEY_DRILLS.labelOf[c.capstone]||c.capstone)+' <span class="camp-captag">capstone</span></span>'+
           '<span class="camp-gate">'+(c.capOk?'clean run ✓':'one clean run — any speed')+'</span></div>';
       }
     } else {
@@ -30193,10 +30240,28 @@ function groupUnlocked(gname){
   return false;
 }
 function drillLocked(k){ const gn=GROUP_OF[k]; return (gn && !groupUnlocked(gn)) ? gn : null; }
+/* r450 PAYWALL — the engine's ONLY question about premium, and it asks drills.js.
+   Returns the chapter name when this drill is behind the (live) paywall for THIS
+   player, else null — same null-or-name shape as drillLocked() above so the two
+   read alike at every call site. While HOTKEY_PREMIUM.enabled is false, hkEntitled()
+   is true for every key and this returns null for every key: no lock renders, no
+   pool shrinks, no launch is intercepted. Do not inline an entitlement test
+   anywhere else — this and hkEntitled() are the whole surface. */
+function drillPaywalled(k){
+  try{ return (window.hkEntitled && !window.hkEntitled(k)) ? (GROUP_OF[k]||'PRO') : null; }catch(e){ return null; }
+}
 function nextUnlockedFrom(i){
-  for(let s=1;s<=MENU_ORDER.length;s++){ const k=MENU_ORDER[(i+s)%MENU_ORDER.length]; if(!drillLocked(k)) return k; }
+  for(let s=1;s<=MENU_ORDER.length;s++){ const k=MENU_ORDER[(i+s)%MENU_ORDER.length]; if(!drillLocked(k) && !drillPaywalled(k)) return k; }
   return MENU_ORDER[0];
 }
+/* r450: entitlement is read SYNCHRONOUSLY at paint time but resolves ASYNCHRONOUSLY (today the
+   localStorage stub is instant; at launch it is an RPC). Whatever resolves it calls this once it
+   lands so an already-open picker repaints against the new answer instead of showing stale locks
+   until the next open. Cheap and idempotent — safe to call on every entitlement change. */
+window.hkEntitlementRefresh = function(){
+  try{ if(pickerOpen){ buildSheetTabs(); highlightPk(); } }catch(e){}
+  try{ if($('campaignModal') && $('campaignModal').classList.contains('show')) openCampaign(); }catch(e){}
+};
 function openGateInfo(gname){
   const g=(window.HOTKEY_GATES&&window.HOTKEY_GATES.groups||{})[gname]; if(!g) return;
   // r174: mid-tour a locked tier gets a toast, not a modal — the tour scrim sits
@@ -30228,6 +30293,70 @@ function openGateInfo(gname){
   m.addEventListener('click',e=>{ if(e.target===m) close(); },{once:true});
   try{ ev('gate_hit',{g:gname, lvl:lv, clears:cl}); }catch(e){}
 }
+/* ============================================================================
+   r450 — THE UPGRADE MODAL. Opens when a player launches a drill they are not
+   entitled to. It CANNOT open while HOTKEY_PREMIUM.enabled is false, because the
+   only caller is loadChallenge()'s drillPaywalled() branch and that is null for
+   every key with the flag off.
+
+   Deliberately NOT hkProSheet(): that sheet names $7 / $19 from HOTKEY_PRO, and
+   pre-Stripe we do not quote a price we cannot charge. This one sells the
+   CATALOG (four chapters, live drill counts) and hands off to billing.html for
+   plans. Confident, short, no countdown, no fake scarcity.
+
+   House conventions honored: .onboard-modal/.ob-card chrome (so it inherits
+   every theme's tokens with no palette of its own), Esc-to-dismiss registered in
+   CAPTURE and always de-registered by close(), backdrop click closes, and the
+   decline path RETURNS THE PLAYER TO THE PICKER they launched from rather than
+   dumping them on whatever board happened to be loaded. */
+function openPaywall(key){
+  const gname = GROUP_OF[key] || 'PRO';
+  const label = (window.HOTKEY_DRILLS && window.HOTKEY_DRILLS.labelOf[key]) || key;
+  const chapters = (window.hkPremiumChapters ? window.hkPremiumChapters() : []);
+  const nPrem = (window.hkPremiumCount ? window.hkPremiumCount() : 0);
+  const nAll  = (window.hkCatalogCount ? window.hkCatalogCount() : MENU_ORDER.length);
+  let m=$('paywallModal');
+  if(!m){ m=document.createElement('div'); m.id='paywallModal'; m.className='onboard-modal'; document.body.appendChild(m); }
+  const chRows = chapters.map(c=>{
+    const col=(window.HOTKEY_GROUP_COLORS||{})[c.name]||'var(--line)';
+    return '<div class="pw-ch'+(c.name===gname?' here':'')+'">'+
+      '<span class="pw-dot" style="background:'+col+'"></span>'+
+      '<b>'+escHtml(c.name)+'</b>'+
+      '<span class="pw-n">'+c.n+' drills</span></div>';
+  }).join('');
+  m.innerHTML='<div class="ob-card pw-card"><a class="modal-x" id="pwX">×</a>'+
+    '<div class="pw-cap">◆ hotkey.gg <b>PRO</b></div>'+
+    /* the chapter leads the title, not the drill: .ob-title uppercases, and a drill label is a
+       sentence fragment ("Run the LBO math") that reads as shouting nonsense in caps. */
+    '<div class="ob-title">'+escHtml(gname)+' comes with PRO</div>'+
+    '<div class="ob-body pw-body">'+
+      '\u201c'+escHtml(label)+'\u201d is one of <b>'+nPrem+' of the '+nAll+' drills</b> PRO opens \u2014 '+
+      'the four modeling chapters, every one a full working build.'+
+    '</div>'+
+    '<div class="pw-list">'+chRows+'</div>'+
+    '<div class="pw-keep">Everything you’ve already earned stays yours — your times, your level, your medals, and every free drill on the board.</div>'+
+    '<div class="ob-opts pw-opts">'+
+      '<a class="ob-key primary" id="pwPlans" href="billing.html">See plans →</a>'+
+      '<button class="ob-key" id="pwBack">Back to the drills</button>'+
+    '</div>'+
+    '<div class="pw-hint">esc — back to the drills</div>'+
+    '</div>';
+  m.classList.add('show');
+  const __esc=(e)=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); close(true); } };
+  /* the decline path: close, then hand the player back the picker they came from.
+     `toPicker` is false only when they chose "See plans" (we're navigating away). */
+  const close=(toPicker)=>{
+    m.classList.remove('show');
+    document.removeEventListener('keydown',__esc,true);
+    if(toPicker){ try{ openPicker(); }catch(e){} }
+  };
+  document.addEventListener('keydown',__esc,true);   // r174: a modal without keyboard dismissal is a trap
+  { const x=$('pwX'); if(x) x.onclick=()=>close(true); }
+  { const b=$('pwBack'); if(b) b.onclick=()=>close(true); }
+  { const p=$('pwPlans'); if(p) p.onclick=()=>{ try{ ev('paywall_plans',{k:key,g:gname}); }catch(e){} close(false); }; }
+  m.addEventListener('click',e=>{ if(e.target===m) close(true); },{once:true});
+  try{ ev('paywall_hit',{k:key, g:gname}); }catch(e){}
+}
 /* r363: getSheet/sheetTag/toggleSheetPop deleted — the morning sheet's button left the
    DOM long ago; this was dead code whose leaderboard key ('daily-') caused the empty
    daily-board bug (r362). The Daily Mix owns the ritual now. */
@@ -30244,6 +30373,23 @@ function loadChallenge(key, opts){
       const __gn=drillLocked(key);
       if(__gn){
         openGateInfo(__gn);
+        if(S){ return; }                       // a board is on screen — stay on it
+        key=nextUnlockedFrom(-1);              // BOOT: never strand an empty grid (r174)
+      }
+      /* r450 PAYWALL — the entitlement interception, one branch below the r158 ladder and
+         sharing its exemptions verbatim. The daily / weekly / extra-hard-challenge board and
+         an armed race ride THROUGH the paywall for the same reason they ride through the
+         gate: they are ONE seeded board that the whole site plays on the same day, and half
+         the HOTKEY_CHALLENGE_POOL sits in paid chapters — locking them would delete the free
+         tier's daily ritual and split the shared leaderboard in two. It is a sampling
+         channel by design (one board, one day, no picker access), not a leak.
+         Marathon is exempted here for a different reason: loadRandomDrill() already filters
+         its pool by entitlement, so a session can never SERVE a locked drill — this branch
+         only exists so an in-flight session is never interrupted by a modal.
+         Same state discipline as the gate: a board on screen is left untouched. */
+      const __pw=drillPaywalled(key);
+      if(__pw){
+        openPaywall(key);
         if(S){ return; }                       // a board is on screen — stay on it
         key=nextUnlockedFrom(-1);              // BOOT: never strand an empty grid (r174)
       }
@@ -30441,7 +30587,11 @@ function buildSheetTabs(){   // r147: THE DATA ROOM — VDR file tree (was r80 s
   groups.forEach((g,gi)=>{
     const folded=folds.includes(g.name);
     const gcol=(window.HOTKEY_GROUP_COLORS||{})[g.name]||'var(--muted)';
-    const __adv=(window.HOTKEY_PREMIUM&&window.HOTKEY_PREMIUM.groups||[]).includes(g.name);
+    const __adv=(window.hkPremiumGroups?window.hkPremiumGroups():[]).includes(g.name);
+    /* r450: the paid chapter wears a PRO badge ONLY once the paywall is live. With
+       HOTKEY_PREMIUM.enabled false, hkPremiumOn() is false and this folder renders exactly
+       the \u25c6 advanced tag it has rendered since r156 \u2014 byte for byte, nothing added. */
+    const __pro=__adv && !!(window.hkPremiumOn && window.hkPremiumOn());
     /* r425 (Wolf \u00a74c): the folder wears its own completion. Part-done reads as a live
        "n/N cleared" counter; a fully cleared chapter swaps it for a solid \u2713 COMPLETE seal
        so total section completion is legible from the folder row, folded or not. */
@@ -30456,6 +30606,7 @@ function buildSheetTabs(){   // r147: THE DATA ROOM — VDR file tree (was r80 s
       (__done?'<span class="pk-done" title="every file in this folder is cleared">\u2713 complete</span>'
              :'<span class="pk-prog'+(__clr?'':' none')+'" title="'+__clr+' of '+g.keys.length+' files cleared">'+__clr+'/'+g.keys.length+'</span>')+
       (__adv?'<span class="pk-advtag">\u25c6 advanced</span>':'')+
+      (__pro?'<span class="pk-protag" title="this chapter comes with PRO">\uD83D\uDD12 PRO</span>':'')+
       '<span class="vdr-n">'+g.keys.length+' file'+(g.keys.length===1?'':'s')+(folded?' \u00b7 folded':'')+'</span>';
     const __gated=!groupUnlocked(g.name);   // r158: locked tier reads as locked
     if(__gated){ const gg=(window.HOTKEY_GATES.groups||{})[g.name];
@@ -30472,17 +30623,28 @@ function buildSheetTabs(){   // r147: THE DATA ROOM — VDR file tree (was r80 s
       const C=CHALLENGES[key]; if(!C) return;
       const __a=(window.__deskAsg||{})[key];   // r130: staffer's pinned drill
       const __cap=!!((window.HOTKEY_DRILLS.meta[key]||{}).capstone);   /* r425 \u00a72.4: capstone designation on the picker card */
+      /* r450 PAYWALL: the locked catalog IS the sales page \u2014 a paid drill is never hidden,
+         never removed from the tree, and never skipped by the keyboard. It renders in place
+         with a lock glyph and a dimmed name; \u2191\u2193 still walk onto it, \u21b5 still selects it, and the
+         LAUNCH is what gets intercepted (loadChallenge \u2192 openPaywall). Null with the flag off. */
+      const __pw=drillPaywalled(key);
       const row=document.createElement('div');
-      row.className='pk-byline'+(key===cur?' cur':'')+(PB[key]!==undefined?' held':'')+(__a?' asg':'')+(folded?' hidden':'')+(__gated?' gated':'')+(__cap?' capstone':'');
+      row.className='pk-byline'+(key===cur?' cur':'')+(PB[key]!==undefined?' held':'')+(__a?' asg':'')+(folded?' hidden':'')+(__gated?' gated':'')+(__cap?' capstone':'')+(__pw?' pw':'');
       row.dataset.key=key; row.dataset.group=g.name; row.dataset.gi=gi;
       row.innerHTML='<span class="vdr-guide">'+(ki===g.keys.length-1?'\u2514':'\u251c')+'</span>'+
         '<span class="vdr-fidx">'+String(gi+1).padStart(2,'0')+'.'+(ki+1)+'</span>'+
         (__a?'<span class="pk-asgmark">\u25c6</span>':'')+
+        (__pw?'<span class="pk-lock" title="'+escHtml(__pw)+' comes with PRO">\uD83D\uDD12</span>':'')+
         '<span class="vdr-fname">'+escHtml(vdrFileName(key).slice(0,-5))+'<i class="vdr-ext">.xlsx</i></span>'+
         (__cap?'<span class="pk-captag" style="color:'+gcol+';border-color:'+gcol+'">\u2605 capstone</span>':'')+
         (PB[key]!==undefined?'<span class="vdr-pb">\u2713 '+PB[key].toFixed(2)+'s</span>':'<span class="vdr-pb dim">\u2014</span>')+
         '<span class="pk-par">par '+(C.par||'')+'s</span>';
-      row.title=(__a?('desk assignment'+(__a.t?' \u00b7 target '+(__a.t/1000)+'s':'')+(__a.note?' \u00b7 '+__a.note:'')+' \u00b7 '):'')+(C.label||'')+(PB[key]!==undefined?' \u00b7 best '+PB[key].toFixed(2)+'s':'')+(__cap?' \u00b7 '+g.name+' capstone \u2014 one clean run opens the next track leg':'');
+      row.title=(__a?('desk assignment'+(__a.t?' \u00b7 target '+(__a.t/1000)+'s':'')+(__a.note?' \u00b7 '+__a.note:'')+' \u00b7 '):'')+(C.label||'')+(PB[key]!==undefined?' \u00b7 best '+PB[key].toFixed(2)+'s':'')+(__cap?' \u00b7 '+g.name+' capstone \u2014 one clean run opens the next track leg':'')+(__pw?' \u00b7 '+g.name+' comes with PRO':'');
+      /* r450: the one board a free player may open out of a paid chapter \u2014 opmodel while the
+         placement series is still open (drills.js hkPlacementRide). Say so on the row so an
+         unlocked Full Builds file among locked siblings reads as intentional, not as a bug. */
+      if(!__pw && (window.hkPremiumKey&&window.hkPremiumKey(key)) && (window.hkPlacementRide&&window.hkPlacementRide(key)))
+        row.title += ' \u00b7 open now \u2014 placement board';
       row.onclick=()=>{ if(demoPlaying) return; closePicker(); loadChallenge(key); };
       tree.appendChild(row);
     });
@@ -30719,6 +30881,14 @@ async function loadEntitlement(){
       showToast('\ud83c\udf93 .edu verified \u2014 PRO unlocked free for 7 days. Every feature, on the house.');
     } }catch(e){} }
   updateProBadge();
+  /* r450 STRIPE WIRING POINT (2 of 2 in this file — the full inventory is in drills.js above
+     hkEntitled). `_pro` is ALREADY the resolved server-side entitlement: own paid sub, an
+     unexpired .edu trial, or a desk grant, and it is final by here (the .edu auto-trial above
+     can still flip it). Publishing it is what will make the paywall read the real thing instead
+     of the localStorage stub — at launch, this line plus swapping drills.js hkEntitlementRead()
+     to `return !!window.__hkPro;` is the whole product change. Inert today: with
+     HOTKEY_PREMIUM.enabled false, hkEntitled() never reaches the read. */
+  try{ window.__hkPro = _pro; if(window.hkEntitlementRefresh) window.hkEntitlementRefresh(); }catch(e){}
 }
 function isPro(){ return BETA_MODE || _pro; }
 function proDaysLeft(){ if(!_proExp) return null;

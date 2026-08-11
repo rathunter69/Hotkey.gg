@@ -65,6 +65,27 @@
   .state{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:38px 28px; text-align:center;
     font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:1.8; margin-top:6px}
   .state a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
+  /* ---- r450 PRE-PAYMENTS PLAN CARD. Everything about pricing on this page is explicitly
+     PROVISIONAL: the figures render as a TBD token, not a number, and checkout is a disabled
+     stub. Nothing here quotes a price we cannot charge. ---- */
+  .pw-plans{display:flex; gap:16px; align-items:stretch; margin-bottom:16px; flex-wrap:wrap}
+  .pw-plan{flex:1 1 300px; min-width:0; background:var(--surface); border:1px solid var(--warn);
+    border-radius:16px; padding:20px 24px; display:flex; flex-direction:column;
+    background-image:linear-gradient(180deg, rgba(217,164,65,.10), transparent 46%)}
+  .pw-plan h4{font-family:var(--mono); font-size:11px; color:var(--warn); text-transform:uppercase;
+    letter-spacing:1.4px; margin-bottom:14px}
+  .pw-price{display:flex; align-items:baseline; gap:10px; font-family:var(--mono); margin-bottom:2px}
+  .pw-price b{font-size:26px; color:var(--text); letter-spacing:-.5px}
+  .pw-price i{font-style:normal; font-size:12px; color:var(--muted)}
+  .pw-tbd{font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.6px;
+    padding:2px 8px; border-radius:999px; border:1px solid var(--warn); color:var(--warn)}
+  .pw-incl{list-style:none; margin:14px 0 0; font-family:var(--mono); font-size:12.5px}
+  .pw-incl li{display:flex; align-items:baseline; gap:10px; padding:8px 0; border-bottom:1px dashed var(--line)}
+  .pw-incl li:last-child{border-bottom:none}
+  .pw-incl .pwc{margin-left:auto; color:var(--muted); font-size:11.5px; white-space:nowrap}
+  .pw-incl .pwd{display:inline-block; width:8px; height:8px; border-radius:2px; background:var(--warn); flex:none}
+  .pw-free{font-family:var(--mono); font-size:11.5px; color:var(--muted); line-height:1.7; margin-top:14px}
+  .pw-free b{color:var(--accent)}
 </style>
 <link rel="stylesheet" href="nav.css?v=210">
 <script>
@@ -75,24 +96,88 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
 window.NAV_ACTIVE = '';
 </script>
 <script src="themes.js?v=310"></script>
+<!-- r450: the catalog is loaded HERE so the plan's what's-included list is DERIVED from
+     HOTKEY_PREMIUM.groups + the live drill counts (drills.js hkPremiumChapters). No number on
+     this page is typed by hand, so a chapter that gains or loses a drill can never leave a
+     stale marketing count behind — dev/check-paywall.js §4 asserts every rendered count
+     against menuOrder, the same guard shape as the "N banker-grade drills" check in
+     dev/e2e-smoke.js. -->
+<script src="drills.js?v=301"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=302"></script>
+<script src="nav.js?v=303"></script>
 
 <header class="head"><div class="wrap">
   <div class="crumb"><a href="account.html">&larr; account</a></div>
   <h1>Billing</h1>
 </div></header>
 
-<main><div class="wrap" id="root">
-  <div class="state">loading&hellip;</div>
+<main><div class="wrap">
+  <div id="plans"></div>
+  <div id="root"><div class="state">loading&hellip;</div></div>
 </div></main>
 
 <div id="siteFooter"></div>
 
 <script>
 function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ============================================================================
+   r450 — THE PLAN CARD, PRE-PAYMENTS.
+   Renders for EVERYONE (signed out included): the upgrade modal in the trainer
+   sends people here with "See plans", and most of them will not be signed in.
+   The account-specific cards below stay auth-gated exactly as they were.
+
+   Three rules this card is built to keep:
+     1. NO REAL PRICE. The figure is the literal token "TBD" with a "pricing not
+        set" badge. hkProSheet's $7 / $19 placeholders are deliberately NOT
+        mirrored here — this is the page a prospective buyer reads as a promise.
+     2. NO LIVE CHECKOUT. The CTA is disabled and says so. There is no Stripe
+        key, no Edge Function call, and no dead RPC (the H1 / AUDIT r417 §B
+        lesson: a scaffold that CALLS something which does not exist masks the
+        real failure at launch). See the STRIPE GOES HERE marker on the button.
+     3. NO HAND-TYPED COUNTS. Every number is derived from drills.js on render,
+        and dev/check-paywall.js §4 re-derives them from menuOrder and compares.
+   ============================================================================ */
+(function renderPlans(){
+  const host=document.getElementById('plans'); if(!host) return;
+  const chapters=(window.hkPremiumChapters?window.hkPremiumChapters():[]);
+  if(!chapters.length) return;   // catalog missing: render nothing rather than a wrong number
+  const nPrem=window.hkPremiumCount(), nAll=window.hkCatalogCount(), nFree=window.hkFreeCount();
+  const live=!!(window.HOTKEY_PREMIUM&&window.HOTKEY_PREMIUM.enabled);
+  host.innerHTML=
+    '<div class="pw-plans"><div class="pw-plan">'+
+      '<h4>hotkey.gg PRO</h4>'+
+      '<div class="pw-price"><b id="pwPrice">TBD</b><i>per month</i><span class="pw-tbd">pricing not set</span></div>'+
+      '<div class="note" style="margin-top:6px">Founder pricing is being set now. Beta players get it locked in &mdash; '+
+        'we&rsquo;ll email you before anything is ever charged.</div>'+
+      /* r450 STRIPE GOES HERE (billing.html). Swap this disabled stub for the real
+         checkout call — the existing scaffold is nav.js hkProCheckout(plan) ->
+         sb.functions.invoke('create-checkout'). Keep it DISABLED until a live key
+         exists: an enabled button that fails is worse than an honest one. */
+      '<button class="btn ghost" id="pwCheckout" disabled title="No payment processor is connected yet" '+
+        'style="margin-top:14px">Payments launching soon</button>'+
+      '<div class="pw-free" id="pwFree">'+(live
+        ? 'PRO opens the <b>'+nPrem+'</b> drills in the four modeling chapters. The other <b>'+nFree+'</b> stay free forever &mdash; and everything you have already earned on them is yours regardless of plan.'
+        : '<b>Every one of the '+nAll+' drills is free right now.</b> The '+nPrem+' listed here are the chapters PRO will cover once payments go live; nothing on the board is locked today.')+
+      '</div>'+
+    '</div>'+
+    '<div class="pw-plan" style="border-color:var(--line); background-image:none">'+
+      '<h4 style="color:var(--muted)">What PRO includes</h4>'+
+      '<ul class="pw-incl" id="pwIncl">'+
+        chapters.map(c=>'<li><span class="pwd" style="background:'+
+          ((window.HOTKEY_GROUP_COLORS||{})[c.name]||'var(--warn)')+'"></span><span>'+esc(c.name)+'</span>'+
+          '<span class="pwc" data-n="'+c.n+'">'+c.n+' drills</span></li>').join('')+
+        '<li style="border-top:1px solid var(--line);margin-top:4px;padding-top:10px">'+
+          '<span><b>'+chapters.length+' chapters</b></span>'+
+          '<span class="pwc" id="pwTotal" data-n="'+nPrem+'" data-all="'+nAll+'">'+nPrem+' of '+nAll+' drills</span></li>'+
+      '</ul>'+
+      '<div class="pw-free">Full working builds &mdash; DCF, LBO, debt schedules, three-statement models. '+
+        'Certificates, ranked boards, levels and medals stay open to everyone.</div>'+
+    '</div></div>';
+})();
+
 (async function(){
   const root=document.getElementById('root');
   let me=null;

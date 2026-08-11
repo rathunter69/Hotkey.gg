@@ -1,5 +1,140 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r450 — THE PAYWALL, BUILT DARK: one entitlement point, a locked catalog, and the Stripe wiring inventory
+
+_Scope: the COMPLETE premium user experience behind `HOTKEY_PREMIUM.enabled`, which stays **false**.
+The deliverable is not a paywall that works — it is a paywall that is provably invisible until one
+boolean moves. Everything below was driven through a new dev preview so the flag itself was never
+edited to test it, and `dev/check-paywall.js` asserts BOTH states on every run._
+
+### THE HEADLINE: `hkEntitled(key)` IS THE ONLY QUESTION ANYONE ASKS
+
+There is now exactly one function in the codebase that answers "is this drill paid?", and exactly one
+line inside it that reads an entitlement:
+
+```
+hkEntitled(key)                     drills.js
+  ├─ !hkPremiumOn()          -> true    flag off (today): the whole catalog is free
+  ├─ !hkPremiumKey(key)      -> true    free tier: free forever, entitlement never consulted
+  ├─  hkPlacementRide(key)   -> true    the documented placement carve-out (below)
+  └─  hkEntitlementRead()             ← THE ONE READ STRIPE REPLACES
+```
+
+The engine reaches it through a single adapter, `drillPaywalled(k)` in `index.html`, which returns a
+chapter name or null — the same null-or-name shape as the r158 `drillLocked(k)` it sits beside, so the
+two ladders read alike at every call site. **Six** call sites in total: the picker row, the tracks-modal
+row, `loadChallenge()`'s interception, and three drill-pool filters (marathon, weakness queue, random).
+Nothing else in the tree reads `HOTKEY_PREMIUM.groups` any more — the picker's r156 `◆ advanced` tag was
+repointed at `hkPremiumGroups()` in the same pass, so the SSOT is real and not aspirational.
+
+**Counts are DERIVED, never typed.** The brief said "39 of 74"; the live catalog says **40 of 74**
+(Formulas II 10 · Models I 10 · Models II 10 · Full Builds 10). That one-drill drift between a written
+number and the board is exactly the failure mode `e2e-smoke`'s "N banker-grade drills" guard was built
+for, so no number on `billing.html` or in the upgrade modal is written by hand — every one comes from
+`hkPremiumChapters()` at render, and `check-paywall.js §4` re-derives them from `menuOrder` in Node and
+compares. A chapter that gains or loses a drill cannot leave a stale marketing count anywhere.
+
+### PLACEMENT vs ENTITLEMENT — the collision, walked, and the decision
+
+`opmodel` is **both** a Full Builds drill (paid) and one of the five `HK_PLACEMENT` boards every player
+must post a time on before they are ranked. Walked with the flag on and no carve-out, a free player
+opens the leaderboard, sees `⚔ placement 4/5`, opens the fifth board, and hits the paywall — with **no
+other path to finishing placement**, because the series is a fixed list of five named boards. Their rank
+pill reads `4/5` forever. That is not a paywall; it is a free feature (ranked play) with a dead end in
+it, and it reads as a bug long before it reads as an offer.
+
+| option | verdict |
+|---|---|
+| (a) swap `opmodel` out of `HK_PLACEMENT` for a free board | **rejected** — the series is deliberately one board per band of the arc (move → format → formula → data → **model**, r336) and *every* model board is paid. There is nothing to swap TO without breaking the yardstick every existing rank was set on. |
+| (b) unconditional bypass for placement keys | **rejected** — hands every free player permanent unlimited access to a Full Builds drill. |
+| **(c) placement RIDES THROUGH, and the hole closes behind it** | **CHOSEN** |
+
+The ride-through is live only while the player still has placement boards left to post
+(`hkPlacementRide`: no `hk_placement_done` latch **and** at least one of the five without a PB). The
+moment placement completes it shuts and `opmodel` locks with the rest of Full Builds. A free player gets
+exactly what the series promises — one run on each of the five standard boards — and not one run more.
+It is also the best sales moment on the site: their first full build, at the instant they start caring
+about rank. Precedent is exact: r158 already lets daily / weekly / challenge / armed-race boards ride
+through the progression ladder as "community moments". **Asserted four ways** (`§5`): the collision is
+real, the ride is open mid-placement, the hole closes on both the fifth PB and the owner latch, and no
+other paid drill ever rides through.
+
+**The daily / weekly / extra-hard board rides through too**, on the same r158 line and for the same
+reason: 11 of the 14 keys in `HOTKEY_CHALLENGE_POOL` sit in paid chapters, and one seeded board that the
+whole site plays on the same day cannot be split in two without deleting the free tier's daily ritual and
+forking the leaderboard. That is a sampling channel by design — one board, one day, no picker access.
+**Marathon is filtered, not exempted**: `loadRandomDrill()` drops un-entitled keys from its pool, so a
+session can never *serve* a board it would then have to interrupt with a modal.
+
+### NO RUG-PULL: what a free player keeps when the flag flips
+
+The paywall gates **launch**, and nothing else. Every one of these was walked in the preview:
+
+- **PBs survive and stay visible.** A locked picker row still prints `✓ 61.20s` — the file is the same
+  file, with a lock on it. Asserted (`§2`).
+- **Clears already banked on a now-paid milestone keep their ✓** in the tracks modal, still counting
+  toward the chapter, the track and the certificate. Asserted (`§3`).
+- **Locked ≠ broken.** A paid milestone renders dimmed with a 🔒 and a `PRO` gate label; it never renders
+  empty, `undefined`, or `NaN`. Asserted (`§3`).
+- **XP, levels, medals, certificate progress: untouched.** No paywall branch touches a scoring path.
+- `hk_entitled` was added to `nav.js`'s sign-out wipe list, beside `hk_beta_unlock` — an account
+  entitlement mirrored on a device must die with the session (the r416/r417 shared-machine class).
+
+### THE LOCKED CATALOG IS THE SALES PAGE
+
+Nothing is hidden. All 74 files still render, no row is removed, and **the keyboard still reaches every
+locked card** — `pkRows()` includes them, `↑↓` walk onto them, `↵` selects them, and it is the *launch*
+that is intercepted. The lock sits inside the row so the filename, the PB and the par column never move.
+The chapter folder gains a `🔒 PRO` badge in `--warn`, the same ink the r158 level gate already uses, so
+"you can see it, you can't open it yet" reads identically on both ladders.
+
+The upgrade modal is deliberately **not** `hkProSheet()`: that sheet names `$7` / `$19` from
+`HOTKEY_PRO`, and pre-Stripe we do not quote a price we cannot charge. The new one sells the catalog —
+four chapters, live counts, one line promising nothing already earned is lost — with `See plans →`
+handing off to `billing.html` and a decline path that returns the player **to the picker they launched
+from**, not to whatever board happened to be loaded. Esc dismisses (capture listener, always
+de-registered), backdrop closes, `§3` asserts the modal contains no `$` figure at all.
+
+`billing.html` is now credible pre-payments: a plan card whose price is the literal token **TBD** beside
+a `pricing not set` badge, a **disabled** `Payments launching soon` button — no Stripe key, no Edge
+Function call, and pointedly **no dead RPC** (the H1 / AUDIT r417 §B lesson: a scaffold that calls
+something which does not exist masks the real failure at launch) — and a what's-included list generated
+from `HOTKEY_PREMIUM.groups` × live counts. It renders for signed-out visitors too, because that is who
+the modal's `See plans` sends there. With the flag off its copy is honest about it: *"Every one of the 74
+drills is free right now."*
+
+### THE DEV PREVIEW, AND WHY IT CANNOT BE A BYPASS
+
+`?premium=preview` or `localStorage hk_premium_preview='1'` makes the site behave as if the flag were on.
+It is honored **only while `enabled:false`** — once the flag ships true the function returns early and the
+preview is dead code. Structurally it can only ever ADD locks, never remove one, so it is not an
+entitlement bypass in either direction. Every screenshot in this round and every ON-state assertion in
+`check-paywall.js` runs through it; `drills.js` was never edited to test itself, and `§2` asserts the
+preview does not mutate `HOTKEY_PREMIUM.enabled`.
+
+### `dev/check-paywall.js` — 56 assertions, both states, one run
+
+| § | asserts |
+|---|---|
+| §0 | `HOTKEY_PREMIUM.enabled` is **false** in source. Fires if the paywall ever goes live by accident. |
+| §1 | **flag off = zero change**: `hkEntitled` true for all 74 · `drillPaywalled` null for all 74 · zero locks / zero `PRO` badges / zero `.pw` rows in the picker · the r156 `◆ advanced` tags still exactly 4 · `#paywallModal` **never constructed** · a paid drill launches with no modal and no bounce · zero locks in the tracks modal · zero page errors |
+| §2 | preview ON: 39 locked cards each with a glyph, 4 chapter badges, nothing hidden, keyboard reaches and focuses a locked card, an earned PB still shows, pools skip paid keys |
+| §3 | modal opens on a blocked launch, board state untouched, names all four chapters + live counts, `See plans → billing.html`, **no `$` figure**, Esc closes, decline returns the picker, tracks modal locked-not-broken |
+| §4 | billing counts `== menuOrder` in **both** states, price is TBD, checkout disabled, no `$` anywhere in the plans block |
+| §5 | the placement carve-out and its closing, four ways |
+| §6 | `hk_entitled='1'` unlocks the tier, the refresh hook repaints the picker clean, paid chapters keep their PRO badge for an entitled player (branding, not a gate) |
+
+### STRIPE WIRING INVENTORY
+
+Three files, five lines. `drills.js hkEntitlementRead()` (the one read) · `index.html loadEntitlement()`
+(publish `window.__hkPro`, already resolved server-side by `my_pro_status`) · `billing.html #pwCheckout`
+(the disabled stub) · `billing.html #pwPrice` / `.pw-tbd` (the TBD token) · `nav.js` sign-out wipe list.
+Each carries an inline `STRIPE GOES HERE` marker naming what to swap and the three requirements on the
+read: **synchronous** (called ~74× per picker paint — resolve async, cache, read sync), **defaults FALSE
+on error** (a failed read locks; the reverse is a free-catalog incident), and **not the authority** (RLS
+and the RPCs are; this is presentation, and a user who edits `localStorage` sees unlocked cards and gets
+nothing else).
+
 ## r440 H6b-12 — balcheck + tieout + balance: Formulas II CLOSES 10/10 (DEPTH_PASS §4.48 + §4.51 + §4.55 + §2.3)
 _The chapter's last three boards. All three carried a FORMATTING ☆ on their §4 page, all three
 had those ☆s re-cut under §1.0(d); one of them (`tieout`) came within a diagnostic of retirement

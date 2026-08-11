@@ -72,6 +72,14 @@ jobs:
         run: node dev/e2e-smoke.js
       - name: Leaderboard (tier filter, placement, seed field)
         run: node dev/e2e-lb.js
+      # r450: THE PAYWALL GUARD. Always-on, never scope-gated. Its first assertion is that
+      # drills.js HOTKEY_PREMIUM.enabled is still FALSE — i.e. that the paywall has not gone
+      # live by accident — and its §1 proves the whole r450 surface stays invisible while it
+      # is. It also owns the billing.html count guard, and billing.html is a COSMETIC-lane
+      # file, so gating this on the engine lane would leave the one page that quotes catalog
+      # numbers unwatched on exactly the pushes most likely to change them.
+      - name: Paywall (flag off = zero change · preview on = full UX · billing counts)
+        run: node dev/check-paywall.js
       # r414-review A6: a fast behavioral net for the COSMETIC lane — shared-script
       # (themes.js/nav.js) changes skip the engine matrix, so drive one drill per core
       # group through the real engine on every push to catch a silent behavioral break.
