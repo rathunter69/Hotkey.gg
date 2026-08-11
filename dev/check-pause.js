@@ -56,10 +56,11 @@ const BASE = process.env.BASE || 'http://127.0.0.1:8791';
   const gateGone = await page.evaluate(() => !document.getElementById('hkGate') && running === true);
   check(gateGone, 'r450 start gate: the first key starts the run and is swallowed');
 
-  // Start the clock with a real keystroke, never a click (a click sets mouseUsed itself and
-  // would mask the very thing this guard checks). Arrow keys are NOT enough — navigation is
-  // deliberately untimed ("nothing is timed yet"); the run starts on the first real action.
-  // F2 opens an edit (startClock), Escape backs out without touching the board.
+  // Everything from here is by KEYBOARD, never a click — a click sets mouseUsed itself and
+  // would mask the very thing this guard checks. F2/Escape open and back out of an edit
+  // without touching the board; pre-r450 they were also what STARTED the clock (navigation
+  // alone was deliberately untimed), and they are kept because the pause has to be tested
+  // against a run that has actually done something.
   await page.keyboard.press('F2');
   await page.waitForTimeout(200);
   await page.keyboard.press('Escape');
