@@ -335,6 +335,11 @@
   .hk-gate{position:absolute; inset:0; z-index:61; display:flex; align-items:center; justify-content:center;
     background:color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter:blur(2.5px); cursor:pointer}
   .hk-gate .hk-pause-card{animation:hkGateIn .18s ease-out}
+  /* r450: on the ONE board where the first-drill coach also shows, the coach (bottom-left,
+     z-62) clipped the gate card's last line. Lift the card off dead-center for that board
+     only — both read in full, and every other board keeps the pause overlay's exact
+     centering. */
+  .hk-gate.with-coach{align-items:flex-start; padding-top:6%}
   .hk-gate-sub{display:block; margin-top:10px; font-size:10.5px; letter-spacing:.35px;
     color:color-mix(in srgb, var(--muted) 78%, transparent)}
   @keyframes hkGateIn{from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none}}
@@ -23936,7 +23941,10 @@ function hkGateShow(on){
   if(!on){ if(el) el.remove(); return; }
   if(el) return;
   gw.style.position=gw.style.position||'relative';
-  el=document.createElement('div'); el.className='hk-gate'; el.id='hkGate';
+  el=document.createElement('div'); el.id='hkGate';
+  /* maybeStartCoach() runs just before hkGateArm() in loadChallenge, so the coach is already
+     in the DOM here when it is going to show at all */
+  el.className='hk-gate'+(document.getElementById('startCoach')?' with-coach':'');
   el.innerHTML='<div class="hk-pause-card"><b>Press any key to start</b>'+
     '<span>The board is set and the clock is at <i>0.00</i>.<br>Nothing counts until you begin.</span>'+
     '<button class="hk-pause-go" id="hkGateGo">Start</button>'+
@@ -30667,8 +30675,10 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
 })();
 
 /* ---- welcome-back strip: returning users get a one-glance "you're on the game page" cue.
-   Passive by design — fades on the first keydown WITHOUT swallowing it, so zero friction:
-   the key that dismisses it is already your first rep. Shows once per browser session. ---- */
+   Passive by design — fades on the first keydown WITHOUT swallowing it, so zero friction.
+   r450: that first keydown is now the DRILL-START GATE's key, not a rep — one press dismisses
+   this card and starts the clock, which is if anything cleaner (the arrival card can no longer
+   eat the top of a live run). Shows once per browser session. ---- */
 function showWelcomeBack(key){
   /* r101: promoted from a thin strip to the frame-language DIALOG (Wolf: returning users
      should get a real welcome-back pop-out \u2014 the landing is skipped once you're onboarded,
