@@ -489,20 +489,29 @@ try {
   /* keys through the real gate on purpose — the two witnesses that the feature works */
   const KEYS_THROUGH = new Set(['dev/check-startgate.js', 'dev/e2e-audit-onboard.js', 'dev/check-pause.js']);
   const files = fs.readdirSync('dev').filter(f => /\.js$/.test(f)).map(f => 'dev/' + f);
+  /* Prose must NOT satisfy this. Every file swept in r450 also EXPLAINS the flag, so a plain
+     `/hk_gate_off/` would pass a file that only mentions it in a copy-pasted header. Match the
+     two real shapes instead — the direct setter, and the array-of-keys forEach form — rather
+     than stripping comments first: C13's decommenter is fooled by the supabase route glob in
+     e2e-formulas.js, whose star-slash-star string opens a comment that swallows the init
+     block — which is exactly how this check first reported a false failure. */
+  const SETS_FLAG = src =>
+    /setItem\(\s*['"]hk_gate_off['"]/.test(src) ||
+    /['"]hk_gate_off['"][^\n]*\]\s*[\s\S]{0,120}?forEach[\s\S]{0,120}?setItem/.test(src);
   let n14 = 0, seen14 = 0;
   for (const f of files) {
-    const src = fs.readFileSync(f, 'utf8');
-    if (!/addInitScript/.test(src) || !/loadChallenge\s*\(/.test(src)) continue;
+    const raw = fs.readFileSync(f, 'utf8');
+    if (!/addInitScript/.test(raw) || !/loadChallenge\s*\(/.test(raw)) continue;
     seen14++;
     if (KEYS_THROUGH.has(f)) {
-      if (!/hkGate|hk_gate_off|start gate|startgate/i.test(src)) {
+      if (!/hkGate|hk_gate_off|start gate|startgate/i.test(raw)) {
         n14++;
         bad(`C14: ${f} is listed as keying through the r450 start gate but never mentions it — ` +
             'either handle the gate explicitly or set hk_gate_off in its init block');
       }
       continue;
     }
-    if (!/hk_gate_off/.test(src)) {
+    if (!SETS_FLAG(raw)) {
       n14++;
       bad(`C14: ${f} boots index.html and loads a drill but never sets hk_gate_off — the r450 ` +
           'start gate will swallow its first key (one keystroke short, no win). Add ' +
