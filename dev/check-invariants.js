@@ -483,7 +483,11 @@ try {
    pattern applied to a boot flag instead of a drill key: whoever adds the 54th probe by
    copy-paste inherits the flag; whoever writes one from scratch gets told.
 
-   Detection is deliberately narrow — `loadChallenge(` plus an `addInitScript` — so drill-page
+   Detection is `loadChallenge(` plus EITHER an `addInitScript` or a `goto(...index.html`: not
+   every harness seeds through addInitScript (dev/check-paywall.js, which landed on the working
+   branch alongside this round, seeds with a post-goto page.evaluate instead), and a detector
+   that only knew the one shape would let the next one through. Deliberately narrow otherwise —
+   so drill-page
    builders, SQL, and the leaderboard suite never trip it. ---- */
 try {
   /* keys through the real gate on purpose — the two witnesses that the feature works */
@@ -501,7 +505,8 @@ try {
   let n14 = 0, seen14 = 0;
   for (const f of files) {
     const raw = fs.readFileSync(f, 'utf8');
-    if (!/addInitScript/.test(raw) || !/loadChallenge\s*\(/.test(raw)) continue;
+    const boots = /addInitScript/.test(raw) || /goto\([^)]*index\.html/.test(raw) || /goto\(\s*BASE\s*\+\s*['"]\/?index\.html/.test(raw) || /goto\(BASE \+ '\/' \+ url/.test(raw);
+    if (!boots || !/loadChallenge\s*\(/.test(raw)) continue;
     seen14++;
     if (KEYS_THROUGH.has(f)) {
       if (!/hkGate|hk_gate_off|start gate|startgate/i.test(raw)) {
