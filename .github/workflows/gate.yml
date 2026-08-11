@@ -13,7 +13,7 @@ concurrency:
 jobs:
   gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45   # r450: the depth pass grew the engine matrix past 25 min on CI hardware — the last two head runs died at exactly 25:00 (timeout presents as 'cancelled')
     steps:
       - uses: actions/checkout@v4
         with:
