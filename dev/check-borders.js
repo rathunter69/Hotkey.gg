@@ -272,6 +272,27 @@ const BAND = 10;               // CSS px each side of the edge
            sees happens at creation, so the pause cannot re-arm before the screenshot. */
         try { hkClearPause(); } catch (e) {}
         try { const p = document.getElementById('hkPause'); if (p) p.remove(); } catch (e) {}
+        /* THE REAL CI CULPRIT — round three, and the lineup caught the shape of it. The failing
+           shot is the sheet at ~137 with the rule smeared to a ~104 halo: exactly a fixed-
+           position modal backer (rgba black + backdrop blur) over the whole app. Those backers
+           hang off <body>, not .gridwrap, so the gridwrap-scoped overlay lineup listed nothing
+           while the pixels showed everything. Something async pops one on the runner mid-probe
+           (offline profile flows are the suspects); whichever it is, no modal belongs in a
+           border measurement. Hide every large fixed overlay and RECORD what was hidden — if
+           this recurs the failure line will name the element instead of a silhouette. */
+        const cleared = [];
+        try {
+          for (const el of document.querySelectorAll('body *')) {
+            const cs = getComputedStyle(el);
+            if (cs.position === 'fixed' && cs.display !== 'none') {
+              const rr = el.getBoundingClientRect();
+              if (rr.width > 600 && rr.height > 300) {
+                cleared.push((el.id || '') + '.' + String(el.className).slice(0, 30));
+                el.style.display = 'none';
+              }
+            }
+          }
+        } catch (e) {}
         S.cells = {}; S.ROWS = 9;
         S.maze = null; S.touch = null; S.tiers = null; S._railZone = null;
         for (const ref of ['C5', 'D5', 'E5']) S.cells[ref] = { ...blankCell(), bt: true };
@@ -289,9 +310,11 @@ const BAND = 10;               // CSS px each side of the edge
           const r = td.getBoundingClientRect();
           cells.push({ c, cls: td.className, bt: /\bbt\b/.test(td.className), x: r.x, y: r.y, w: r.width });
         }
-        return { cells };
+        return { cells, cleared };
       }, dark);
       if (geo.err) return { err: geo.err };
+      if (geo.cleared && geo.cleared.length && !attempt)
+        console.log(`       note DPR${dpr} ${dark ? 'dark' : 'light'}: hid fixed overlay(s) ${geo.cleared.join(' ')}`);
 
       /* Clip on exact device-pixel boundaries — a fractional clip would round, and this whole
          block is measuring fractions of a pixel. */
