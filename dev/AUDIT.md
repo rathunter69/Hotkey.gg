@@ -13103,3 +13103,101 @@ is good and both ends of it were broken._
   a DISTINCT asserted outcome from finishing; a do-it beat must advance on the real chord; the replay
   affordance is asserted (the tour is Enter-advanceable by design); mid-tour refresh must not strand;
   the first guided win's card is read for the not-posted line and its geometry above the action row.
+
+
+## r450 — THE APPLIED BORDER SITS ON THE GRIDLINE, NOT A PIXEL UNDER IT (Wolf, playtest)
+
+> "we're having rendering issues with cell borders still - seeing some misalignment for top
+> borders in one of the first few foundation drills."
+
+Fifth border report. r426 fixed a specificity fight, r429 a collapse tie-break, r442 the inline
+emitter — and each time the assertion was "is a thick enough line on screen". It always was.
+This one is about WHERE.
+
+### THE REPRO — every Foundations board that seeds a border
+
+`pastes` B9:E9 · `editfix` B8:E8 · `modeltour` B5:F5, B9:F9, B12:F12, B15:F15 · `rowops` J19 ·
+`navigation` H16:I17 · `filldr` I4:I5. (`blocksel`, `housestyle`, `ruleoff` seed none.) Wolf's
+"first few" is `pastes` — menu #3, and a four-cell totals rule is the most visible instance.
+
+### ROOT CAUSE — the overlay hung off the wrong box
+
+An absolutely positioned pseudo-element's containing block is the cell's PADDING box, and under
+`border-collapse` that box is inset from the cell's own edge by the cell's half of the shared
+1px gridline. Probed on `editfix` B8 with an `inset:0` marker div:
+
+    td  border box   y 430.125   x 330.000   w 73.422
+        padding box  y 430.625   x 330.500   w 72.422      delta 0.5px on every side
+
+`getComputedStyle` reports `border-top-width: 1px` throughout and looks innocent — the used
+width in the collapsed model is half of it, and only the geometry shows that.
+
+Two symptoms, one cause. VERTICAL: the gridline still drew its full 1px above the 2px rule, so
+a bordered row was a 3px stack and the rule started a whole pixel below the line its unbordered
+neighbours drew. Rows sit at fractional y (23.703px, not 24 — the table is `height:100%`
+stretched) and Chrome snaps each painted line to whole CSS px, so the drop landed anywhere from
+0.03 to 0.99px depending on the row: `editfix` r8 0.875, `pastes` r9 0.172, `modeltour` r5
+0.984. Same board, different rows, different sliver — and THAT variation is what reads as
+misalignment rather than as a thick border. HORIZONTAL: the same 0.5px inset left and right
+stopped each cell's rule short of its own vertical gridlines — three ~1px holes across a
+four-cell rule, where Excel draws one continuous line.
+
+Measured, DSF 8, light, extent in CSS px from the cell's border-box top:
+
+    before   editfix r8   gridline [-0.125, 0.875]   rule [0.875, 2.875]   3 holes
+             pastes  r9   gridline [-0.828, 0.172]   rule [0.172, 2.172]   3 holes
+             rowops  r19  gridline [-0.859, 0.141]   rule [0.141, 2.141]
+    after    editfix r8   rule [-0.125, 1.875]   pastes r9 rule [-0.828, 1.172]   0 holes
+
+### THE FIX — CSS only, one line of geometry
+
+`inset:-1px` on the overlay: exactly (used border 0.5px + the 0.5px of gridline that belongs to
+the neighbour), so adjacent overlays meet with no seam and the rule replaces the gridline the
+way Excel's does. `th,td{overflow:hidden}` (r107, load-bearing — it clips long text) clipped
+that 1px straight back off, cutting the painted run from 2.00px to 1.00px, so bordered cells now
+clip with a 1px margin: `overflow:clip; overflow-clip-margin:1px`. Same clipping for content,
+room for the overlay. `.spill` and `.editing` already run `overflow:visible` on purpose and
+paint the overlay in full, so they are excluded rather than overridden. A browser without
+`overflow-clip-margin` drops the declaration and lands on r442's geometry — degraded, never
+broken. No flag semantics, no predicate, no `render()` change.
+
+### THE GUARD (§3.3)
+
+`check-borders.js` gains an ALIGNMENT block at DPR 1 and 2 × light and dark, driven through the
+real `applyTheme` (and printing sheet luminance, so a theme leg cannot silently be a no-op). A
+run of adjacent `bt` cells with plain neighbours either side must: paint at one y; paint at the
+y its plain neighbours draw their gridline; have its whole visible band BE the rule; and have
+zero hole pixels along it. The third assertion is the one that needed two thresholds — FAINT
+locates the visible band including the gridline, INK the applied rule alone, because before the
+fix the two merged into one band whose faint start still matched the neighbours'. Measuring the
+band alone cannot tell a replaced gridline from a stacked one. Tolerance is a strict `< 1`
+device px and every comparison is differential, so a global snap cancels and the right answer
+is 0.00.
+
+WHY THE OLD GUARD WAS BLIND, and it is the same shape as r442's lesson: every existing assertion
+measures a border in ISOLATION — one flagged cell, one edge, how many pixels wide. All 27 were
+green while the grid looked wrong, because a border can be exactly 2.00px and be in the wrong
+place. Width is not geometry.
+
+### NEGATIVE CONTROL
+
+On the pre-fix tree the new block fires 12 of its 16 assertions — `flush to the row's gridline`
+(rule starts 1.97, gridline -0.03), `rule replaces the gridline` (band [-0.03,5.97) vs rule
+[1.97,5.97)) and `run is one unbroken rule` (4 hole pixels) at DPR 2 in both themes, and the
+continuity leg at DPR 1 in both. Post-fix: `BORDER RENDER: clean`, also with `SCHEME=dark`.
+
+### GATE
+
+`check-borders` clean (light and dark) · `e2e-depth-mechanics` 155/0, borders leg §P all 8 PASS
+· `e2e-smoke` ALL 7 PAGES CLEAN · `e2e-demo-replay REPS=1` on all six touched drills ALL GREEN ·
+`e2e-borders` ALL PASS · `e2e-cellstyles` ALL PASS · `check-invariants` clean · 
+`check-cache-versions` clean.
+
+### FOUND, NOT FIXED
+
+`dev/e2e-audit-visual.js:91` probes applied borders through `getComputedStyle(td.ball).boxShadow`.
+r442 moved borders off `box-shadow` onto the `::after` overlay, so that probe has read `''` for
+every theme since — "APPLIED borders read as ink vs bg — contrast null" fires on all 19 themes
+and is rot, not a contrast failure (identical count on the pre-fix tree: 108 FAIL / 271 PASS).
+It is not wired into `gate.yml`. The fix is to read `getComputedStyle(td, '::after')`, the way
+`e2e-depth-mechanics` §P already does. Its own pass.

@@ -579,8 +579,49 @@
      the border COLOUR even when the width collapsed away, so the two screenshots differed and
      the guard reported ok. A guard that cannot fail is worse than no guard. */
   td.bt,td.bb,td.bl,td.br,td.ball,td.bdbl{position:relative}
+  /* r450 (Wolf: "misalignment for top borders in one of the first few foundation drills") —
+     r442's overlay was RIGHT about the mechanism and WRONG about the box. An absolutely
+     positioned pseudo-element's containing block is the cell's PADDING box, and under
+     border-collapse the padding box is inset from the cell's own edge by that cell's half of
+     the shared 1px gridline. Measured on editfix row 8: td rect top 430.125, padding box top
+     430.625 — 0.5px on every side. So the applied rule painted INSIDE the gridline instead of
+     ON it, and both axes showed it:
+
+        VERTICAL   the row's gridline still drew its full 1px above the 2px rule, so a bordered
+                   row read as a 3px stack — a faint hairline, then the heavy rule starting a
+                   whole pixel below the row boundary the neighbouring unbordered cells drew
+                   their line on. Rows sit at fractional y (the table is height:100%-stretched,
+                   so a row is 23.703px, not 24), Chrome snaps each painted line to whole CSS
+                   px, and the size of that sliver therefore changed from row to row and drill
+                   to drill — which is exactly what reads as MISALIGNMENT rather than as a
+                   uniformly thick rule. Measured pre-fix, light, DSF 8, gridline vs rule:
+                     editfix r8    gridline [-0.125, 0.875]   rule [0.875, 2.875]
+                     pastes  r9    gridline [-0.828, 0.172]   rule [0.172, 2.172]
+                     rowops  r19   gridline [-0.859, 0.141]   rule [0.141, 2.141]
+                   Post-fix the rule starts on the gridline, at the same y as its unbordered
+                   neighbour: editfix [-0.125, 1.875], pastes [-0.828, 1.172].
+        HORIZONTAL the same 0.5px inset on left and right stopped each cell's rule short of its
+                   own vertical gridlines, so a RUN of bt cells (B9:E9 in pastes, B8:E8 in
+                   editfix) was broken by a ~1px hole at every column boundary — three holes
+                   across a four-cell total rule, where Excel draws one continuous line.
+
+     FIX: pull the overlay out by 1px so it covers the cell's edge plus its half of the gridline
+     — inset -1px is exactly (used border 0.5px + the 0.5px of gridline that belongs to the
+     neighbour), so adjacent overlays meet with no seam and the rule replaces the gridline the
+     way Excel's does. The cell's overflow:hidden (r107, and load-bearing — it clips long text)
+     would clip that 1px straight back off, so bordered cells clip with a 1px margin instead:
+     same clipping for content, room for the overlay. .spill and .editing already run
+     overflow:visible on purpose and paint the overlay in full, so they stay excluded. If a
+     browser lacks overflow-clip-margin the declaration drops and the geometry is exactly r442's
+     — degraded, never broken.
+
+     Guarded by the ALIGNMENT block in dev/check-borders.js: a run of adjacent bt cells must
+     paint one continuous rule, at one y, on the same line the row's plain neighbours draw. */
+  td.bt:not(.spill):not(.editing),td.bb:not(.spill):not(.editing),td.bl:not(.spill):not(.editing),
+  td.br:not(.spill):not(.editing),td.ball:not(.spill):not(.editing),td.bdbl:not(.spill):not(.editing){
+    overflow:clip; overflow-clip-margin:1px}
   td.bt::after,td.bb::after,td.bl::after,td.br::after,td.ball::after,td.bdbl::after{
-    content:''; position:absolute; left:0; top:0; right:0; bottom:0;
+    content:''; position:absolute; left:-1px; top:-1px; right:-1px; bottom:-1px;
     pointer-events:none; z-index:4; border:0 solid var(--rule,var(--text));
   }
   td.bt::after{border-top-width:2px}

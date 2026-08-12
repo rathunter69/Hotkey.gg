@@ -208,6 +208,185 @@ const BAND = 10;               // CSS px each side of the edge
     console.log(`  ${has ? 'ok  ' : 'FAIL'} render() emits .${cls} onto the cell`);
   }
 
+  /* ================================ ALIGNMENT ================================
+     r450 (Wolf: "misalignment for top borders in one of the first few foundation drills").
+     Everything above measures a border in ISOLATION — one flagged cell, one edge, is the
+     painted line thick enough. Every one of those assertions was green while the shipped grid
+     looked wrong, because a border can be exactly 2px and still be in the wrong PLACE: r442's
+     overlay hung off the cell's padding box, which under border-collapse is inset by that
+     cell's half of the shared gridline, so the rule painted a pixel below the row's own line
+     and stopped half a pixel short of each vertical gridline. A four-cell total rule came out
+     as four dashes sitting under the gridline instead of one rule on it. Presence-and-width
+     cannot see that. Geometry can, so this block asserts geometry:
+
+       1. NO STEP        — every cell in a run of adjacent bt cells paints its rule at the same
+                           y, top and bottom, within a device pixel.
+       2. ON THE LINE    — that y is the y where the row's UNBORDERED neighbours paint their
+                           plain gridline. This is the assertion that fires on r442: the rule
+                           sat a full CSS px lower than the gridline it was supposed to replace.
+       3. CONTINUOUS     — scanning along the rule itself from the first cell's centre to the
+                           last's, every pixel is ink. No holes at the column boundaries.
+
+     At DPR 1 and 2 (sub-pixel rounding is half this bug's story) and in both themes. */
+  const FAINT = 8;   // the plain gridline is deliberately low-contrast (r405) — it must register
+  const TOL   = 1;   // device px, EXCLUSIVE. Every comparison below is differential — rule against
+                     // the plain gridline in the same screenshot, or one neighbour against another
+                     // — so a global snap moves both sides together and cancels. What is left is
+                     // the real offset, which is 0.00 when the geometry is right. Strict `< 1`
+                     // keeps r442's one-CSS-px drop failing at DPR 1, where it is exactly 1.
+
+  async function alignScan(pg, dpr, dark) {
+    const geo = await pg.evaluate((dark) => {
+      /* Drive a REAL theme, not just the data-dark attribute, so the run goes through the same
+         path a player does. r212 is deliberate: dark themes keep a LIGHT sheet (dark chrome,
+         light sheet, like Excel), so the dark leg is not a dark grid — it is the sheet's OTHER
+         palette, surface #f0efe8 on gridline #c9c7bf against Daylight's own pair. Different
+         contrast, same geometry, which is exactly the claim under test. */
+      try { applyTheme(dark ? 'default' : 'daylight'); } catch (e) {
+        if (dark) document.documentElement.setAttribute('data-dark', '1');
+        else document.documentElement.removeAttribute('data-dark');
+      }
+      loadChallenge('navigation');
+      S.cells = {}; S.ROWS = 9;
+      S.maze = null; S.touch = null; S.tiers = null; S._railZone = null;
+      for (const ref of ['C5', 'D5', 'E5']) S.cells[ref] = { ...blankCell(), bt: true };
+      S.active = { r: 9, c: 9 }; S.sel = null;      // park the cursor far from the sample
+      render();
+      const cells = [];
+      for (const c of [2, 3, 4, 5, 6]) {            // B5 . C5 D5 E5 . F5 — plain, run, plain
+        const td = document.querySelector(`#grid td[data-r="5"][data-c="${c}"]`);
+        if (!td) return { err: `row 5 col ${c} never rendered` };
+        const r = td.getBoundingClientRect();
+        cells.push({ c, cls: td.className, bt: /\bbt\b/.test(td.className), x: r.x, y: r.y, w: r.width });
+      }
+      return { cells };
+    }, dark);
+    if (geo.err) return { err: geo.err };
+
+    /* Clip on exact device-pixel boundaries — a fractional clip would round, and this whole
+       block is measuring fractions of a pixel. */
+    const first = geo.cells[0], last = geo.cells[geo.cells.length - 1];
+    const x0 = Math.floor(first.x * dpr) / dpr;
+    const clip = { x: x0, y: (Math.round(first.y * dpr) - 5 * dpr) / dpr,
+                   width: Math.ceil((last.x + last.w) * dpr) / dpr - x0, height: 10 };
+    const b64 = (await pg.screenshot({ clip })).toString('base64');
+    return pg.evaluate(async ({ b64, geo, clip, dpr, FAINT, INK }) => {
+      const img = new Image(); img.src = 'data:image/png;base64,' + b64; await img.decode();
+      const cv = document.createElement('canvas'); cv.width = img.width; cv.height = img.height;
+      const ctx = cv.getContext('2d'); ctx.drawImage(img, 0, 0);
+      const d = ctx.getImageData(0, 0, img.width, img.height).data;
+      const lum = (x, y) => { const p = (img.width * y + x) << 2; return d[p] * 0.299 + d[p + 1] * 0.587 + d[p + 2] * 0.114; };
+      const ox = Math.round(clip.x * dpr), oy = Math.round(clip.y * dpr);
+      const out = [];
+      /* Two passes over the same column of pixels, and the difference between them is the bug.
+         FAINT catches every painted line including the deliberately low-contrast gridline — that
+         is the LINE THE ROW SHOWS. INK catches only the applied rule. r442 painted the rule
+         BELOW the gridline rather than over it, so the two merged into one 3px band whose faint
+         start still matched the neighbours': measuring the visible band alone cannot tell a
+         replaced gridline from a stacked one. Locating the ink separately can. */
+      const seg = (col, bg, thr) => {
+        let best = null, cur = null;
+        for (let i = 0; i < col.length; i++) {
+          if (Math.abs(col[i] - bg) > thr) { if (!cur) cur = { s: i, e: i }; else cur.e = i; }
+          else { if (cur && (!best || (cur.e - cur.s) > (best.e - best.s))) best = cur; cur = null; }
+        }
+        if (cur && (!best || (cur.e - cur.s) > (best.e - best.s))) best = cur;
+        return best;
+      };
+      for (const g of geo.cells) {
+        const x = Math.round((g.x + g.w / 2) * dpr) - ox;
+        const col = []; for (let y = 0; y < img.height; y++) col.push(lum(x, y));
+        const bg = [...col].sort((a, b) => a - b)[col.length >> 1];    // the cell's own background
+        const line = seg(col, bg, FAINT);      // the whole visible band, gridline included
+        const rule = seg(col, bg, INK);        // the applied rule alone
+        const rel = s => s ? { start: +(oy + s.s - g.y * dpr).toFixed(2), end: +(oy + s.e + 1 - g.y * dpr).toFixed(2) } : { start: null, end: null };
+        const L = rel(line), R = rel(rule);
+        out.push({ c: g.c, bt: g.bt, bg,
+          lineStart: L.start, lineEnd: L.end,
+          start: R.start, end: R.end,
+          scanY: g.bt && rule ? Math.round((rule.s + rule.e) / 2) : null });
+      }
+      /* CONTINUITY — walk the rule's own scanline across the whole run. */
+      const run = geo.cells.filter(g => g.bt);
+      const runOut = out.filter(o => o.bt);
+      let holes = null;
+      if (run.length > 1 && runOut[0].scanY != null) {
+        const y = runOut[0].scanY;
+        const xA = Math.round((run[0].x + run[0].w / 2) * dpr) - ox;
+        const xB = Math.round((run[run.length - 1].x + run[run.length - 1].w / 2) * dpr) - ox;
+        /* Reference background: inside the first cell of the run, clear of the rule. */
+        const bgRef = out.find(o => o.bt).bg;
+        holes = 0;
+        for (let x = xA; x <= xB; x++) if (Math.abs(lum(x, y) - bgRef) <= INK) holes++;
+      }
+      return { cells: out, holes, span: run.length > 1 ? 1 : 0 };
+    }, { b64, geo, clip, dpr, FAINT, INK });
+  }
+
+  for (const dark of [false, true]) {
+    for (const dpr of [1, 2]) {
+      const pg = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: dpr,
+        colorScheme: dark ? 'dark' : 'light' });
+      pg.on('pageerror', e => errs.push(String(e.message || e).slice(0, 160)));
+      await pg.addInitScript(() => {
+        try {
+          localStorage.setItem('hotkey_onboarded', '1');
+          localStorage.setItem('hk_tour_done', '1');
+          localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');
+          localStorage.setItem('hk_handle_cache', '');
+        } catch (e) {}
+      });
+      await pg.goto(`${BASE}/index.html`, { waitUntil: 'load', timeout: 20000 });
+      await pg.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof loadChallenge === 'function',
+        null, { timeout: 20000 });
+      await pg.evaluate(() => { try { _pro = true; } catch (e) {} });
+
+      const tag = `DPR${dpr} ${dark ? 'dark ' : 'light'}`;
+      const r = await alignScan(pg, dpr, dark);
+      if (r.err) { fail++; console.log(`  FAIL ${`alignment ${tag}`.padEnd(46)} ${r.err}`); await pg.close(); continue; }
+      const run = r.cells.filter(c => c.bt), plain = r.cells.filter(c => !c.bt);
+      const shown = r.cells.map(c => `${c.bt ? 'bt' : '--'}c${c.c}[${c.bt ? c.start : c.lineStart},${c.bt ? c.end : c.lineEnd})`).join(' ');
+
+      if (run.some(c => c.start === null)) {
+        fail++; console.log(`  FAIL ${`alignment ${tag} — run paints at all`.padEnd(46)} ${shown}`);
+        await pg.close(); continue;
+      }
+      /* 1. NO STEP between neighbours. */
+      {
+        const s0 = run[0].start, e0 = run[0].end;
+        const ok = run.every(c => Math.abs(c.start - s0) < TOL && Math.abs(c.end - e0) < TOL);
+        if (!ok) fail++;
+        /* sheet luminance is printed as proof the theme leg really flipped — identical geometry
+           in both themes is the expected result, not evidence the dark run was a no-op. */
+        console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${`alignment ${tag} — neighbours share one y`.padEnd(46)} ${shown}  sheet lum ${Math.round(run[0].bg)}`);
+      }
+      /* 2. ON THE LINE the row's unbordered cells draw — the rule REPLACES the gridline the way
+            Excel's does, rather than sitting a pixel under it. */
+      {
+        const g = plain.filter(c => c.lineStart !== null);
+        const ok = g.length > 0 && run.every(c => g.every(p => Math.abs(c.start - p.lineStart) < TOL));
+        if (!ok) fail++;
+        console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${`alignment ${tag} — flush to the row's gridline`.padEnd(46)} ` +
+                    `rule starts ${run[0].start}, plain gridline starts ${g.length ? g.map(p => p.lineStart).join('/') : '(none found)'} (device px)`);
+      }
+      /* 3. NOTHING STACKED — the whole visible band on a bordered cell IS the rule. If the
+            gridline still paints above it the band is a pixel taller than the rule. */
+      {
+        const ok = run.every(c => Math.abs(c.lineStart - c.start) < TOL && Math.abs(c.lineEnd - c.end) < TOL);
+        if (!ok) fail++;
+        console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${`alignment ${tag} — rule replaces the gridline`.padEnd(46)} ` +
+                    `visible band [${run[0].lineStart},${run[0].lineEnd}) vs rule [${run[0].start},${run[0].end}) (device px)`);
+      }
+      /* 4. CONTINUOUS across the column boundaries. */
+      {
+        const ok = r.holes === 0;
+        if (!ok) fail++;
+        console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${`alignment ${tag} — run is one unbroken rule`.padEnd(46)} ${r.holes} hole pixel(s) along the rule`);
+      }
+      await pg.close();
+    }
+  }
+
   if (errs.length) { fail++; console.log('  FAIL page errors: ' + errs.slice(0, 3).join(' | ')); }
   await browser.close();
   console.log(fail ? `BORDER RENDER: ${fail} FAILURE(S)` : 'BORDER RENDER: clean');
