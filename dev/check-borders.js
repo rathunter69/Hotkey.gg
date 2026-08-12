@@ -292,6 +292,7 @@ const BAND = 10;               // CSS px each side of the edge
       await pg.evaluate(() => new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res))));
       const b64 = (await pg.screenshot({ clip })).toString('base64');
       scan = await measureClip(pg, { b64, geo, clip, dpr, FAINT, INK });
+      scan.b64 = b64; scan.clip = clip;
       if (scan.cells && scan.cells.some(c => !c.bt && c.lineStart !== null)) return scan;
     }
     /* Four fresh takes, all blank — report what the page actually looks like. */
@@ -364,7 +365,22 @@ const BAND = 10;               // CSS px each side of the edge
         holes = 0;
         for (let x = xA; x <= xB; x++) if (Math.abs(lum(x, y) - bgRef) <= INK) holes++;
       }
-      return { cells: out, holes, span: run.length > 1 ? 1 : 0 };
+      /* Image ground truth, carried on every result: if the clip is ever blank on a runner,
+         these numbers say whether the SCREENSHOT was blank (real page pixels, uniform), the
+         DECODE broke (alpha 0 / dims wrong), or the SAMPLER looked in the wrong place. */
+      let mn = 255, mx = 0;
+      for (let y = 0; y < img.height; y++) for (let x = 0; x < img.width; x++) {
+        const v = lum(x, y); if (v < mn) mn = v; if (v > mx) mx = v;
+      }
+      const px = [];
+      for (let i = 0; i < 6; i++) {
+        const x = Math.floor(img.width * (i + 0.5) / 6), y = img.height >> 1;
+        const p = (img.width * y + x) << 2;
+        px.push([d[p], d[p + 1], d[p + 2], d[p + 3]]);
+      }
+      return { cells: out, holes, span: run.length > 1 ? 1 : 0,
+               img: { w: img.width, h: img.height, want: [Math.round(clip.width * dpr), Math.round(clip.height * dpr)],
+                      lumMin: +mn.toFixed(1), lumMax: +mx.toFixed(1), px } };
     }, args);
   }
 
@@ -394,6 +410,8 @@ const BAND = 10;               // CSS px each side of the edge
 
       if (run.some(c => c.start === null)) {
         fail++; console.log(`  FAIL ${`alignment ${tag} — run paints at all`.padEnd(46)} ${shown}${r.diag ? '  diag ' + JSON.stringify(r.diag) : ''}`);
+        if (r.img) console.log(`       img ${JSON.stringify(r.img)}  clip ${JSON.stringify(r.clip)}`);
+        if (r.b64) console.log(`       png ${r.b64}`);   // ~2KB — paste into a file to SEE what the runner shot
         await pg.close(); continue;
       }
       /* 1. NO STEP between neighbours. */
