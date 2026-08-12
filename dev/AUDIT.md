@@ -13193,6 +13193,18 @@ continuity leg at DPR 1 in both. Post-fix: `BORDER RENDER: clean`, also with `SC
 `e2e-borders` ALL PASS · `e2e-cellstyles` ALL PASS · `check-invariants` clean · 
 `check-cache-versions` clean.
 
+### CI ADDENDUM — the probe itself raced headless first-paint
+
+The alignment block's first gate run failed all four legs with every band null — plain gridline
+included — on a commit that was clean locally under the same chromium build (1148), same server,
+same flags. A blank clip is not a border defect: render() mutates the DOM synchronously, but
+headless Chromium rasters on demand, and on a loaded runner the CDP screenshot can capture
+before the compositor produces a frame of the new board. The probe now settles on a double-rAF
+and, only when even the PLAIN cells' gridline is invisible (a state no border bug can cause —
+misalignment moves ink, it doesn't erase the sheet), waits 400ms and retakes, up to 4 tries. A
+misaligned rule paints something and still fails on the first take; the negative control still
+fires 12/16 on the r442 geometry.
+
 ### FOUND, NOT FIXED
 
 `dev/e2e-audit-visual.js:91` probes applied borders through `getComputedStyle(td.ball).boxShadow`.

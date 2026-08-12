@@ -269,7 +269,27 @@ const BAND = 10;               // CSS px each side of the edge
     const x0 = Math.floor(first.x * dpr) / dpr;
     const clip = { x: x0, y: (Math.round(first.y * dpr) - 5 * dpr) / dpr,
                    width: Math.ceil((last.x + last.w) * dpr) / dpr - x0, height: 10 };
-    const b64 = (await pg.screenshot({ clip })).toString('base64');
+    /* r450 CI fix: the first run of this block on the gate runner returned an ENTIRELY blank
+       clip — every cell null at both thresholds, plain gridline included — while the same
+       commit, browser build (chromium-1148) and server were clean locally. render() mutates the
+       DOM synchronously but headless Chromium rasters on demand, and on a loaded runner the
+       CDP screenshot can capture before the compositor has produced a frame with the new board.
+       So: settle on a double-rAF (guarantees layout + a paint of the mutated DOM has been
+       scheduled), and if even the PLAIN cells' gridline is invisible — which no border bug can
+       cause; misalignment moves ink, it doesn't erase the sheet — wait and retake, up to 4
+       tries. A genuinely misaligned rule paints SOMETHING and fails on the first take. */
+    let scan = null;
+    for (let attempt = 0; attempt < 4; attempt++) {
+      if (attempt) await pg.waitForTimeout(400);
+      await pg.evaluate(() => new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res))));
+      const b64 = (await pg.screenshot({ clip })).toString('base64');
+      scan = await measureClip(pg, { b64, geo, clip, dpr, FAINT, INK });
+      if (scan.cells && scan.cells.some(c => !c.bt && c.lineStart !== null)) break;
+    }
+    return scan;
+  }
+
+  function measureClip(pg, args) {
     return pg.evaluate(async ({ b64, geo, clip, dpr, FAINT, INK }) => {
       const img = new Image(); img.src = 'data:image/png;base64,' + b64; await img.decode();
       const cv = document.createElement('canvas'); cv.width = img.width; cv.height = img.height;
@@ -320,7 +340,7 @@ const BAND = 10;               // CSS px each side of the edge
         for (let x = xA; x <= xB; x++) if (Math.abs(lum(x, y) - bgRef) <= INK) holes++;
       }
       return { cells: out, holes, span: run.length > 1 ? 1 : 0 };
-    }, { b64, geo, clip, dpr, FAINT, INK });
+    }, args);
   }
 
   for (const dark of [false, true]) {
