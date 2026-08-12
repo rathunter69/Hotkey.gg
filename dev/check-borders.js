@@ -236,56 +236,81 @@ const BAND = 10;               // CSS px each side of the edge
                      // keeps r442's one-CSS-px drop failing at DPR 1, where it is exactly 1.
 
   async function alignScan(pg, dpr, dark) {
-    const geo = await pg.evaluate((dark) => {
-      /* Drive a REAL theme, not just the data-dark attribute, so the run goes through the same
-         path a player does. r212 is deliberate: dark themes keep a LIGHT sheet (dark chrome,
-         light sheet, like Excel), so the dark leg is not a dark grid — it is the sheet's OTHER
-         palette, surface #f0efe8 on gridline #c9c7bf against Daylight's own pair. Different
-         contrast, same geometry, which is exactly the claim under test. */
-      try { applyTheme(dark ? 'default' : 'daylight'); } catch (e) {
-        if (dark) document.documentElement.setAttribute('data-dark', '1');
-        else document.documentElement.removeAttribute('data-dark');
-      }
-      loadChallenge('navigation');
-      S.cells = {}; S.ROWS = 9;
-      S.maze = null; S.touch = null; S.tiers = null; S._railZone = null;
-      for (const ref of ['C5', 'D5', 'E5']) S.cells[ref] = { ...blankCell(), bt: true };
-      S.active = { r: 9, c: 9 }; S.sel = null;      // park the cursor far from the sample
-      render();
-      const cells = [];
-      for (const c of [2, 3, 4, 5, 6]) {            // B5 . C5 D5 E5 . F5 — plain, run, plain
-        const td = document.querySelector(`#grid td[data-r="5"][data-c="${c}"]`);
-        if (!td) return { err: `row 5 col ${c} never rendered` };
-        const r = td.getBoundingClientRect();
-        cells.push({ c, cls: td.className, bt: /\bbt\b/.test(td.className), x: r.x, y: r.y, w: r.width });
-      }
-      return { cells };
-    }, dark);
-    if (geo.err) return { err: geo.err };
-
-    /* Clip on exact device-pixel boundaries — a fractional clip would round, and this whole
-       block is measuring fractions of a pixel. */
-    const first = geo.cells[0], last = geo.cells[geo.cells.length - 1];
-    const x0 = Math.floor(first.x * dpr) / dpr;
-    const clip = { x: x0, y: (Math.round(first.y * dpr) - 5 * dpr) / dpr,
-                   width: Math.ceil((last.x + last.w) * dpr) / dpr - x0, height: 10 };
-    /* r450 CI fix: the first run of this block on the gate runner returned an ENTIRELY blank
-       clip — every cell null at both thresholds, plain gridline included — while the same
-       commit, browser build (chromium-1148) and server were clean locally. render() mutates the
-       DOM synchronously but headless Chromium rasters on demand, and on a loaded runner the
-       CDP screenshot can capture before the compositor has produced a frame with the new board.
-       So: settle on a double-rAF (guarantees layout + a paint of the mutated DOM has been
-       scheduled), and if even the PLAIN cells' gridline is invisible — which no border bug can
-       cause; misalignment moves ink, it doesn't erase the sheet — wait and retake, up to 4
-       tries. A genuinely misaligned rule paints SOMETHING and fails on the first take. */
-    let scan = null;
+    /* r450 CI fix, round two. The first gate run of this block returned an ENTIRELY blank clip —
+       every cell null at both thresholds, plain gridline included — and a double-rAF settle plus
+       blind retakes of the SAME clip did not cure it, while an exact local replica (driver
+       1.49.1 + chromium-1148 + same server and flags) is clean. A stale-clip race fits that
+       evidence: parking the cursor on r9c9 can scroll the sheet frame on a runner whose fonts
+       overflow the grid differently, and a clip computed from pre-scroll rects then samples
+       featureless cell interior forever — retaking the same wrong rectangle can never help. So
+       each attempt now recomputes EVERYTHING: scrolls pinned to zero (window and .gridwrap),
+       layout settled on a double-rAF, rects measured fresh, clip rebuilt, THEN screenshot. The
+       retry condition stays "even the plain gridline is invisible", a state no border bug can
+       cause — a genuinely misaligned rule paints something and still fails on take one. If all
+       four takes stay blank, the failure line carries diagnostics instead of another guess. */
+    let scan = null, geo = null;
     for (let attempt = 0; attempt < 4; attempt++) {
       if (attempt) await pg.waitForTimeout(400);
+      geo = await pg.evaluate((dark) => {
+        /* Drive a REAL theme, not just the data-dark attribute, so the run goes through the same
+           path a player does. r212 is deliberate: dark themes keep a LIGHT sheet (dark chrome,
+           light sheet, like Excel), so the dark leg is not a dark grid — it is the sheet's OTHER
+           palette, surface #f0efe8 on gridline #c9c7bf against Daylight's own pair. Different
+           contrast, same geometry, which is exactly the claim under test. */
+        try { applyTheme(dark ? 'default' : 'daylight'); } catch (e) {
+          if (dark) document.documentElement.setAttribute('data-dark', '1');
+          else document.documentElement.removeAttribute('data-dark');
+        }
+        loadChallenge('navigation');
+        S.cells = {}; S.ROWS = 9;
+        S.maze = null; S.touch = null; S.tiers = null; S._railZone = null;
+        for (const ref of ['C5', 'D5', 'E5']) S.cells[ref] = { ...blankCell(), bt: true };
+        S.active = { r: 9, c: 9 }; S.sel = null;      // park the cursor far from the sample
+        render();
+        /* Rects are viewport-relative and the screenshot clip is page-relative — any scroll
+           between the two lies. Pin every scroller to zero BEFORE measuring. */
+        window.scrollTo(0, 0);
+        const gw = document.querySelector('.gridwrap');
+        if (gw) { gw.scrollTop = 0; gw.scrollLeft = 0; }
+        const cells = [];
+        for (const c of [2, 3, 4, 5, 6]) {            // B5 . C5 D5 E5 . F5 — plain, run, plain
+          const td = document.querySelector(`#grid td[data-r="5"][data-c="${c}"]`);
+          if (!td) return { err: `row 5 col ${c} never rendered` };
+          const r = td.getBoundingClientRect();
+          cells.push({ c, cls: td.className, bt: /\bbt\b/.test(td.className), x: r.x, y: r.y, w: r.width });
+        }
+        return { cells };
+      }, dark);
+      if (geo.err) return { err: geo.err };
+
+      /* Clip on exact device-pixel boundaries — a fractional clip would round, and this whole
+         block is measuring fractions of a pixel. */
+      const first = geo.cells[0], last = geo.cells[geo.cells.length - 1];
+      const x0 = Math.floor(first.x * dpr) / dpr;
+      const clip = { x: x0, y: (Math.round(first.y * dpr) - 5 * dpr) / dpr,
+                     width: Math.ceil((last.x + last.w) * dpr) / dpr - x0, height: 10 };
       await pg.evaluate(() => new Promise(res => requestAnimationFrame(() => requestAnimationFrame(res))));
       const b64 = (await pg.screenshot({ clip })).toString('base64');
       scan = await measureClip(pg, { b64, geo, clip, dpr, FAINT, INK });
-      if (scan.cells && scan.cells.some(c => !c.bt && c.lineStart !== null)) break;
+      if (scan.cells && scan.cells.some(c => !c.bt && c.lineStart !== null)) return scan;
     }
+    /* Four fresh takes, all blank — report what the page actually looks like. */
+    try {
+      scan.diag = await pg.evaluate(() => {
+        const gw = document.querySelector('.gridwrap');
+        const gate = document.querySelector('.hk-gate');
+        const grid = document.querySelector('#grid');
+        const gr = grid ? grid.getBoundingClientRect() : null;
+        return {
+          fonts: document.fonts ? document.fonts.status : 'n/a',
+          scrollY: window.scrollY,
+          gwScroll: gw ? [gw.scrollTop, gw.scrollLeft] : null,
+          gateShown: gate ? getComputedStyle(gate).display !== 'none' : false,
+          gridRect: gr ? [Math.round(gr.x), Math.round(gr.y), Math.round(gr.width), Math.round(gr.height)] : null,
+          rows: typeof S !== 'undefined' ? S.ROWS : null,
+        };
+      });
+    } catch (e) { scan.diag = { err: String(e).slice(0, 120) }; }
     return scan;
   }
 
@@ -368,7 +393,7 @@ const BAND = 10;               // CSS px each side of the edge
       const shown = r.cells.map(c => `${c.bt ? 'bt' : '--'}c${c.c}[${c.bt ? c.start : c.lineStart},${c.bt ? c.end : c.lineEnd})`).join(' ');
 
       if (run.some(c => c.start === null)) {
-        fail++; console.log(`  FAIL ${`alignment ${tag} — run paints at all`.padEnd(46)} ${shown}`);
+        fail++; console.log(`  FAIL ${`alignment ${tag} — run paints at all`.padEnd(46)} ${shown}${r.diag ? '  diag ' + JSON.stringify(r.diag) : ''}`);
         await pg.close(); continue;
       }
       /* 1. NO STEP between neighbours. */
