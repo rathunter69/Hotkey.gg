@@ -262,6 +262,16 @@ const BAND = 10;               // CSS px each side of the edge
           else document.documentElement.removeAttribute('data-dark');
         }
         loadChallenge('navigation');
+        /* THE ACTUAL CI CULPRIT, found by dumping the failing clip PNG from the runner: the
+           r429 alt-tab pause. On the gate runner a freshly created page reports document.hidden,
+           visibilitychange fires, and hkPause() drops the scrim + "Paused" card over the grid —
+           the shot showed the sheet dimmed to lum ~137 (gridline delta crushed under FAINT) with
+           the card as a ~104 band across the middle cells. Locally pages report visible, which
+           is why three exact replicas (driver 1.49.1 + chromium-1148 + same server) never
+           reproduced it. Clearing here is race-free: the only visibility change this page ever
+           sees happens at creation, so the pause cannot re-arm before the screenshot. */
+        try { hkClearPause(); } catch (e) {}
+        try { const p = document.getElementById('hkPause'); if (p) p.remove(); } catch (e) {}
         S.cells = {}; S.ROWS = 9;
         S.maze = null; S.touch = null; S.tiers = null; S._railZone = null;
         for (const ref of ['C5', 'D5', 'E5']) S.cells[ref] = { ...blankCell(), bt: true };
@@ -309,6 +319,31 @@ const BAND = 10;               // CSS px each side of the edge
           gateShown: gate ? getComputedStyle(gate).display !== 'none' : false,
           gridRect: gr ? [Math.round(gr.x), Math.round(gr.y), Math.round(gr.width), Math.round(gr.height)] : null,
           rows: typeof S !== 'undefined' ? S.ROWS : null,
+          paused: typeof paused !== 'undefined' ? paused : 'n/a',
+          hidden: document.hidden,
+          running: typeof running !== 'undefined' ? running : 'n/a',
+          gateFlag: typeof hkGate !== 'undefined' ? hkGate : 'n/a',
+          demo: typeof demoPlaying !== 'undefined' ? demoPlaying : 'n/a',
+          /* the lineup: every absolutely-positioned thing sitting on the gridwrap, because the
+             failing shot is unmistakably the sheet seen THROUGH a dimming scrim with backdrop
+             blur — gridline delta crushed under FAINT, the rule smeared into a halo. */
+          overlays: (() => {
+            const out = [];
+            const gw2 = document.querySelector('.gridwrap');
+            if (!gw2) return out;
+            for (const el of gw2.querySelectorAll('*')) {
+              const cs = getComputedStyle(el);
+              if (cs.position === 'absolute' && cs.display !== 'none') {
+                const r2 = el.getBoundingClientRect();
+                if (r2.width > 200 && r2.height > 100)
+                  out.push({ id: el.id || null, cls: String(el.className).slice(0, 40),
+                             z: cs.zIndex, bg: cs.backgroundColor.slice(0, 30),
+                             bf: (cs.backdropFilter || 'none').slice(0, 20),
+                             rect: [Math.round(r2.x), Math.round(r2.y), Math.round(r2.width), Math.round(r2.height)] });
+              }
+            }
+            return out;
+          })(),
         };
       });
     } catch (e) { scan.diag = { err: String(e).slice(0, 120) }; }
