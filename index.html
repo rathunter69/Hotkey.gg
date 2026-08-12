@@ -28208,7 +28208,14 @@ function choosePk(){ const rows=pkRows(); const r=rows[pkSel]; if(!r) return;
   if(r.classList.contains('pk-folder')){ togglePkFold(r.dataset.group); return; }   // r147: \u21b5 on a folder folds it
   closePicker(); loadChallenge(r.dataset.key); }
 $('drillPick').addEventListener('click', ()=>{ pickerOpen?closePicker():openPicker(); });
-$('picker').addEventListener('click', e=>{ if(e.target===$('picker')) closePicker(); });
+/* r450 (Wolf): click-off closes. The old guard closed only when the click landed on #picker
+   itself — but .pk-card is a transparent 1180px box (r146), so most of what READS as backdrop
+   is actually the card's dead space and the click never reached the guard. Close on any click
+   that isn't a row, the fold strip, or the footer hints. */
+$('picker').addEventListener('click', e=>{
+  if(e.target.closest && e.target.closest('.pk-folder, .pk-byline, .pk-foot')) return;
+  closePicker();
+});
 
 /* ============================================================
    SESSION MODES — marathon (random full drills) and rapid-fire
