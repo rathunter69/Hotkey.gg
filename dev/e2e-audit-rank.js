@@ -2,6 +2,7 @@
 'use strict';
 const { chromium } = require('playwright-core');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const BASE = process.env.BASE || 'http://127.0.0.1:8791';   /* r452: was hard-coded — worktrees must serve on their own port (WORKFLOW §7) */
 let pass = 0, fail = 0;
 const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { fail++; console.log('  FAIL ' + n + (x ? ' — ' + x : '')); } };
 
@@ -62,7 +63,7 @@ const STUB = (opts) => {
 
   console.log('T1 rank consistency across surfaces (provisional cap)');
   const lb = await newPage();
-  await lb.goto('http://127.0.0.1:8791/leaderboard.html', { waitUntil: 'load' });
+  await lb.goto(BASE + '/leaderboard.html', { waitUntil: 'load' });
   await lb.waitForFunction(() => window.DATA || document.querySelector('.state'), null, { timeout: 12000 }).catch(() => {});
   await lb.waitForTimeout(1200);
   const t1lb = await lb.evaluate(() => {
@@ -92,7 +93,7 @@ const STUB = (opts) => {
 
   console.log('T2 account page: tier + handle flows');
   const ac = await newPage();
-  await ac.goto('http://127.0.0.1:8791/account.html', { waitUntil: 'load' });
+  await ac.goto(BASE + '/account.html', { waitUntil: 'load' });
   await ac.waitForSelector('#acHandle', { timeout: 12000 });
   const t2 = await ac.evaluate(() => ({
     tier: (document.querySelector('.pc-tier span:last-child') || {}).textContent || (document.querySelector('.pc-tier') || {}).textContent || '',
@@ -123,7 +124,7 @@ const STUB = (opts) => {
 
   console.log('T3 password recovery + sign out');
   const rc = await newPage();
-  await rc.goto('http://127.0.0.1:8791/index.html#type=recovery', { waitUntil: 'load' });
+  await rc.goto(BASE + '/index.html#type=recovery', { waitUntil: 'load' });
   await rc.waitForTimeout(1500);
   const t3 = await rc.evaluate(() => {
     const am = document.querySelector('.auth-modal');
@@ -139,11 +140,49 @@ const STUB = (opts) => {
   ok(t3b.called, 'sign-out reaches the auth layer');
   await rc.close();
 
+  /* T5 (r452, audit P0-2): THE PLACEMENT SERIES CAN BE FINISHED.
+     Ranked opens at LVL 10 but the 5th placement board (opmodel) sits in Full Builds
+     (LVL 11 + 32 pace clears), so a level-10 player who entered Ranked hit the lock modal
+     on the one board left to post and sat at "placement 4/5" forever. drills.js
+     hkPlacementRide opens the gate for the five standard boards while the series is
+     incomplete. Both directions are asserted: it opens for the ranked, unplaced player,
+     and it stays SHUT for a player who never entered ranked (it must not become a free
+     pass around the ladder). */
+  console.log('T5 placement ride-through (LVL 10, unplaced)');
+  const seedLvl10 = (ranked) => `try{
+    localStorage.setItem('hk_xp_est','4600'); localStorage.setItem('hk_xp_uid','u1');
+    localStorage.removeItem('hotkey_pb'); localStorage.removeItem('hk_placement_done');
+    ${ranked ? "localStorage.setItem('hk_ranked','1');" : "localStorage.removeItem('hk_ranked');"}
+  }catch(e){}`;
+  for (const ranked of [true, false]) {
+    const pl = await newPage(seedLvl10(ranked));
+    await pl.goto(BASE + '/index.html?drill=opmodel', { waitUntil: 'load' });
+    await pl.waitForFunction(() => typeof cur !== 'undefined' && typeof drillLocked === 'function', null, { timeout: 15000 }).catch(() => {});
+    await pl.waitForTimeout(1200);
+    const r5 = await pl.evaluate(() => {
+      const gm = document.getElementById('gateModal');
+      return { cur: (typeof cur !== 'undefined' ? cur : null),
+               lvl: (typeof lvlOf === 'function' ? lvlOf(myXpEst()) : null),
+               locked: (typeof drillLocked === 'function' ? drillLocked('opmodel') : null),
+               gate: !!(gm && gm.classList.contains('show')) };
+    });
+    if (ranked) {
+      ok(r5.lvl !== null && r5.lvl < 11 && r5.locked === 'Full Builds',
+        'seed is genuinely gate-locked (LVL ' + r5.lvl + ' < 11, group locked)', JSON.stringify(r5));
+      ok(r5.cur === 'opmodel' && !r5.gate,
+        'ranked + unplaced: ?drill=opmodel LOADS the 5th placement board (no lock modal)', JSON.stringify(r5));
+    } else {
+      ok(r5.cur !== 'opmodel' && r5.gate,
+        'not in ranked: the same board still bounces off the gate (the ride is narrow)', JSON.stringify(r5));
+    }
+    await pl.close();
+  }
+
   console.log('T4 visual overflow sweep (2 themes × 5 pages)');
   for (const theme of ['default', 'daylight']) {
     for (const url of ['index.html', 'leaderboard.html', 'stats.html', 'account.html', 'reference.html']) {
       const p = await newPage(`try{ localStorage.setItem('hotkey_theme','${theme}'); }catch(e){}`);
-      await p.goto('http://127.0.0.1:8791/' + url, { waitUntil: 'load' });
+      await p.goto(BASE + '/' + url, { waitUntil: 'load' });
       await p.waitForTimeout(900);
       const over = await p.evaluate(() => Math.max(0, document.documentElement.scrollWidth - window.innerWidth));
       ok(over <= 1, url + ' @ ' + theme + ': no horizontal overflow', 'over=' + over);

@@ -1939,9 +1939,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=303"></script>
+<script src="drills.js?v=304"></script>
 
-<script src="drills.js?v=303"></script>
+<script src="drills.js?v=304"></script>
 
 
 
@@ -1954,7 +1954,7 @@
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=304"></script>
+<script src="nav.js?v=305"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -25179,7 +25179,7 @@ function _showResults(o){
         const ctx2=buildAchCtx();
         let seen2=[]; try{ seen2=JSON.parse(localStorage.getItem('hk_ach_seen')||'[]'); }catch(e){}
         let bestA=null;
-        AC.forEach(a=>{ if(seen2.includes(a.id)) return;
+        AC.forEach(a=>{ if(a.hidden || seen2.includes(a.id)) return;   /* r452 (audit P1-1): a hidden medal (capstone whose drill isn't built) is never chased */
           let r2; try{ r2=a.test(ctx2); }catch(e){ return; }
           if(!r2 || r2.done || !(r2.goal>1) || !(r2.prog>0)) return;
           const ratio=r2.prog/r2.goal;
@@ -30536,6 +30536,8 @@ function openPaywall(key){
 document.addEventListener('click',(e)=>{ const p=$('wqPop');   // r157: same closer for the weakness queue
   if(p && p.classList.contains('show') && !e.target.closest('#wqPop') && !e.target.closest('#wqBtn')) p.classList.remove('show'); });
 function sheetMarkWin(){ /* r363: retired with the sheet — kept as a no-op for one release so any stale caller can't throw */ }
+/* r452: the Ranked opt-in flag lb.js/nav.js read — used by the ladder's placement ride-through */
+function hkRankedEntered(){ try{ return localStorage.getItem('hk_ranked')==='1'; }catch(e){ return false; } }
 function loadChallenge(key, opts){
   try{ echoAbort(); }catch(e){}
   try{ window.__stkT=Date.now(); window.__stkBase=null; window.__stkDone=false; }catch(e){}
@@ -30544,7 +30546,13 @@ function loadChallenge(key, opts){
   try{
     if(!(opts&&(opts.daily||opts.weekly||opts.challenge)) && !(typeof race!=='undefined'&&race&&race.drill===key) && !(marathon&&marathon.active)){
       const __gn=drillLocked(key);
-      if(__gn){
+      /* r452 (audit P0-2): the five PLACEMENT boards ride through the LEVEL gate the same way
+         a daily run or an armed race does. The fifth of them (opmodel) sits in Full Builds
+         (LVL 11 + 32 clears) while Ranked opens at LVL 10, so a level-10 player who entered
+         Ranked could never post board 5 and sat at "placement 4/5" forever. hkPlacementRide
+         (drills.js) is the ONE predicate — ranked-entered AND series incomplete, closing on
+         the 5th posted board or the owner latch. */
+      if(__gn && !(hkRankedEntered() && window.hkPlacementRide && window.hkPlacementRide(key, k=>PB[k]!==undefined))){   /* r452: the ladder rides only for RANKED entrants (else day-1 players get opmodel free) */
         openGateInfo(__gn);
         if(S){ return; }                       // a board is on screen — stay on it
         key=nextUnlockedFrom(-1);              // BOOT: never strand an empty grid (r174)
@@ -31059,6 +31067,11 @@ async function loadEntitlement(){
       try{ ev('edu_trial_start',{}); }catch(e){}
       showToast('\ud83c\udf93 .edu verified \u2014 PRO unlocked free for 7 days. Every feature, on the house.');
     } }catch(e){} }
+  /* r452 (audit P1-2): mirror the resolved entitlement into hk_ach_flags.pro — themes.js gates
+     the `pro` skin and the PRO title on it, profile.html's customizer reads it, and NOTHING
+     wrote it (a paying subscriber saw the PRO cosmetic locked). The writer (nav.js hkFlagPro)
+     applies the SAME rule isPro() does: beta ORs in, a real entitlement always counts. */
+  try{ window.hkFlagPro && window.hkFlagPro(_pro); }catch(e){}
   updateProBadge();
   /* r450 STRIPE WIRING POINT (2 of 2 in this file — the full inventory is in drills.js above
      hkEntitled). `_pro` is ALREADY the resolved server-side entitlement: own paid sub, an
@@ -31890,8 +31903,15 @@ function buildAchCtx(){
   let __ck=0, __kl=0; try{ const kc=JSON.parse(localStorage.getItem('hk_key_counts')||'{}');
     __ck=Object.keys(kc).filter(isChordUnit).length;   // r272: semantic units
     __kl=parseInt(localStorage.getItem('hk_keys_lifetime')||'0',10) || Object.values(kc).reduce((a,b)=>a+(b|0),0); }catch(e){}
+  /* r452 (audit P1-3 / P1-11): the trainer computes chapter clears (campState applies the
+     shared hkCapstoneOk predicate — the same one the milestone badges use), so persist them
+     for the skin-unlock sweep, which reads hk_ach_flags.chaptersCleared and never found it
+     written. And crowns came from a hard-coded 0 here, so no crown medal could ever fire in
+     game; the count comes from the board standings nav.js latches (hkFlagCrowns) — as fresh
+     as the last ranked page load, since the trainer holds no board data of its own. */
+  try{ window.hkFlagChapters && window.hkFlagChapters(campState().filter(c=>c.done).map(c=>c.id)); }catch(e){}
   return { pb:PB, pars:window.HOTKEY_PARS||{}, runs:lite, streak:streakN, solves:solvesN,
-    crowns:0, groups, att:Object.keys(PB).filter(k=>CHALLENGES[k]).length, menuOrder:MENU_ORDER,   /* r371: challenge-/wk- PB keys don't count as drills attempted */
+    crowns:fl.crowns|0, groups, att:Object.keys(PB).filter(k=>CHALLENGES[k]).length, menuOrder:MENU_ORDER,   /* r371: challenge-/wk- PB keys don't count as drills attempted */
     dailyTop10:fl.dailyTop10||0, dailyPod:fl.dailyPod||0, dailyWins:fl.dailyWins||0,
     certs:Object.keys(fl.certTracks||{}).length,
     mouseRuns:fl.mouseRuns||0, slowWins:fl.slowWins||0,
@@ -31913,7 +31933,8 @@ function achSweepInGame(){
     const ctx=buildAchCtx();
     const seen=JSON.parse(localStorage.getItem('hk_ach_seen')||'[]');
     const fresh=[];
-    AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false}; }
+    AC.forEach(a=>{ if(a.hidden) return;   /* r452 (audit P1-1): hidden medals never celebrate */
+      let r; try{ r=a.test(ctx); }catch(e){ r={done:false}; }
       if(r&&r.done&&!seen.includes(a.id)) fresh.push(a); });
     if(fresh.length){
       window.hkCelebrate({cap:'achievement unlocked', title:fresh[0].name,

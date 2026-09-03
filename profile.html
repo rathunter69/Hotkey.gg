@@ -58,9 +58,9 @@
   .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
 <link rel="stylesheet" href="nav.css?v=312">
-<script src="drills.js?v=303"></script>
+<script src="drills.js?v=304"></script>
 
-<script src="drills.js?v=303"></script>
+<script src="drills.js?v=304"></script>
 
 
 
@@ -263,7 +263,7 @@ window.NAV_ACTIVE = 'profile';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=304"></script>
+<script src="nav.js?v=305"></script>
 
 <header class="head"><div class="wrap"><h1>Profile</h1></div></header>
 
@@ -322,6 +322,10 @@ async function load(){
   const frameU = { lvl:L.lvl, tierBest:Math.max(__fl.tierBest|0, tier.i|0),
     dailyWins:__fl.dailyWins|0, certs:Object.keys(__fl.certTracks||{}).length,
     charter:!!(me.created_at && String(me.created_at) < '2026-10-01'),
+    /* r452 (audit P1-2): the customizer's "PRO · Cosmic" tile read LOCKED for a paying
+       subscriber because this ctx carried no `pro` key at all (themes.js hkFrameUnlocked
+       gates it on u.pro). The flag is written by nav.js hkFlagPro. */
+    pro:!!__fl.pro,
     perfectRun:__fl.perfectRun?1:0 };
   const __liveBk = tier.bucket==='Top Bucket' ? 2 : tier.bucket==='Middle Bucket' ? 1 : 0;
   const __gemBk = (__fl.tierBestBucket!=null || (tier.i|0)>0)
@@ -343,7 +347,11 @@ async function load(){
          (hkCapstoneOk, drills.js) — same definition as campState/nav badges, no drift.
          pbAll includes server runs, so a capstone run posted from any device counts. */
       let claimedX={}; try{ claimedX=JSON.parse(localStorage.getItem('hk_camp_xp')||'{}'); }catch(e){}
-      frameU.chaptersCleared = CAMP.chapters.filter(c=>c.keys.every(cl) && (!window.hkCapstoneOk || window.hkCapstoneOk(c, pbAll, claimedX))).map(c=>c.id); }
+      frameU.chaptersCleared = CAMP.chapters.filter(c=>c.keys.every(cl) && (!window.hkCapstoneOk || window.hkCapstoneOk(c, pbAll, claimedX))).map(c=>c.id);
+      /* r452 (audit P1-3): persist what this page just computed — nav.js's skin-unlock sweep
+         gates emerald/architect on hk_ach_flags.chaptersCleared, which nothing ever wrote, so
+         those two skins were pickable here but never CELEBRATED. */
+      try{ window.hkFlagChapters && window.hkFlagChapters(frameU.chaptersCleared); }catch(e){} }
     else frameU.chaptersCleared=[];
   }catch(e){ frameU.chaptersCleared=[]; }
 
@@ -421,7 +429,9 @@ async function load(){
       }catch(e){ return {}; }
     })();
     const __fN=globalPct.__n||0;
-    AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
+    /* r452 (audit P1-1): hidden medals (capstone drills that don't exist) never enter achMeta,
+       so they can't show on the wall, in the showcase, or as a title source. */
+    AC.filter(a=>!a.hidden).forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
       if(r.done) earned.add(a.id);
       const gp=window.hkEffRarity?window.hkEffRarity(a.tier, globalPct[a.id], __fN):globalPct[a.id];
       achMeta[a.id]={ done:!!r.done, prog:r.prog||0, goal:r.goal||1, rarity:gp };
