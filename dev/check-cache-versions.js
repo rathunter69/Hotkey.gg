@@ -4,7 +4,12 @@
    the discipline a gate:
      1. CONSISTENCY (always): every *.html must agree on ONE version per asset — a
         partial sed that leaves some pages behind is the silent-stale failure mode.
-     2. BUMP (when GATE_BASE is set to a git ref): if a shared asset's file content
+     2. UNIQUENESS (always, r452): each asset appears AT MOST ONCE per HTML file. The
+        consistency pass above COUNTS matches, so a duplicate <script> tag only inflated
+        the "N files agree" tally — which is exactly how `drills.js` shipped TWICE on 14
+        of 16 pages from r425 through r450, 78 KB of duplicate parser-blocking download
+        per cold load, surviving ~25 cache bumps in lockstep. Counting is not asserting.
+     3. BUMP (when GATE_BASE is set to a git ref): if a shared asset's file content
         changed vs BASE, its `?v=` must have moved too.
    Run: node dev/check-cache-versions.js            (consistency only)
         GATE_BASE=<sha> node dev/check-cache-versions.js   (+ bump check)     */
@@ -19,12 +24,22 @@ const cur = {}; // asset -> {version -> [files]}
 for (const asset of ASSETS) {
   const re = new RegExp(asset.replace('.', '\\.') + '\\?v=(\\d+)', 'g');
   const seen = {};
+  const perFile = {};   // r452: file -> how many times this asset is referenced in it
   for (const f of html) {
     const t = fs.readFileSync(f, 'utf8');
-    let m;
-    while ((m = re.exec(t))) (seen[m[1]] = seen[m[1]] || []).push(f);
+    let m; re.lastIndex = 0;
+    while ((m = re.exec(t))) { (seen[m[1]] = seen[m[1]] || []).push(f); perFile[f] = (perFile[f] || 0) + 1; }
   }
   cur[asset] = seen;
+  // r452 UNIQUENESS: one reference per asset per page. Two identical tags are two fetches
+  // and two executions on the critical path, and the consistency pass cannot see them.
+  const dupes = Object.keys(perFile).filter(f => perFile[f] > 1);
+  if (dupes.length) {
+    fail++;
+    console.error(`FAIL ${asset}: referenced more than once in ${dupes.length} file(s) — ` +
+      dupes.map(f => `${f} x${perFile[f]}`).join(', '));
+    console.error(`    delete the duplicate tag(s); each page must load ${asset} exactly once`);
+  }
   const versions = Object.keys(seen);
   if (versions.length > 1) {
     fail++;

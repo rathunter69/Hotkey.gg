@@ -13,8 +13,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 140)));
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1'); localStorage.setItem('hk_beta_ok', '1');
-  } catch (e) {} });
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');  } catch (e) {} });
   await page.goto(process.env.URL || 'http://127.0.0.1:8791/index.html', { waitUntil: 'load' });   /* r421: URL override — parallel checkouts serve on their own ports */
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof demoKey === 'function');
   // r159: the matrix probes gated-tier drills ('foot' = Formulas) — flip the real
@@ -1161,6 +1160,86 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   }));
   ok(j1.noRestart, 'single Esc never restarts');
   ok(j1.restarted, 'esc·esc restarts the drill');
+
+  /* r452 (parity audit P1-1/P1-2/P1-5/P1-8/P1-9): four chords Excel users reach for that the
+     engine either missed or did something else with. Each was proven live before the fix. */
+  console.log('AM. r452 parity: Tab-Enter home · Ctrl+Shift+V · Ctrl+Shift+8 · Shift+F2 · Ctrl+;');
+  await fresh();
+  const am1 = await run(() => {
+    // Excel: a Tab run remembers its home column — B4 → Tab → Tab → Enter lands B5, not D5
+    setDemoSel('B4'); demoKey({key:'1'}); demoKey({key:'Tab'});
+    demoKey({key:'2'}); demoKey({key:'Tab'});
+    demoKey({key:'3'}); demoKey({key:'Enter'});
+    const home = colLetter(S.active.c) + S.active.r;
+    // …and a plain Tab run with no typing behaves the same
+    setDemoSel('E4'); demoKey({key:'Tab'}); demoKey({key:'Tab'}); demoKey({key:'Enter'});
+    const home2 = colLetter(S.active.c) + S.active.r;
+    // an arrow between the Tabs ENDS the run: Enter then just steps down
+    setDemoSel('B10'); demoKey({key:'Tab'}); demoKey({key:'ArrowRight'}); demoKey({key:'Enter'});
+    const broken = colLetter(S.active.c) + S.active.r;
+    // a lone Enter with no Tab run behind it still just moves down
+    setDemoSel('G4'); demoKey({key:'Enter'});
+    const plain = colLetter(S.active.c) + S.active.r;
+    return { home, home2, broken, plain };
+  });
+  ok(am1.home === 'B5', 'Tab, Tab, Enter returns to the column the run started in', am1.home);
+  ok(am1.home2 === 'E5', 'the home-column return needs no typing', am1.home2);
+  ok(am1.broken === 'D11', 'an arrow between Tabs ends the run (Enter just steps down)', am1.broken);
+  ok(am1.plain === 'G5', 'Enter with no Tab run behind it is unchanged', am1.plain);
+
+  await fresh();
+  const am2 = await run(() => {
+    // Ctrl+Shift+V = paste VALUES on the native profile (Excel 365, 2023)
+    setDemoSel('C9'); for (const ch of '=B4+1') demoKey({key:ch}); demoKey({key:'Enter'});
+    const src = S.cells['C9'].value;
+    setDemoSel('C9'); demoKey({key:'c', ctrl:true});
+    setDemoSel('E11'); demoKey({key:'v', ctrl:true, shift:true});
+    const d = S.cells['E11'] || {};
+    // Alt E S V still walks (the ribbon route must not have moved)
+    setDemoSel('C9'); demoKey({key:'c', ctrl:true});
+    setDemoSel('E12');
+    demoKey({key:'Alt'}); demoKey({key:'e'}); demoKey({key:'s'}); demoKey({key:'v'}); demoKey({key:'Enter'});
+    const w = S.cells['E12'] || {};
+    return { f: d.formula || null, v: d.value, src, wf: w.formula || null, wv: w.value };
+  });
+  ok(!am2.f && am2.v === am2.src, 'Ctrl+Shift+V pastes VALUES, not the formula', JSON.stringify(am2));
+  ok(!am2.wf && am2.wv === am2.src, 'Alt E S V is untouched by the Ctrl+Shift+V route', JSON.stringify(am2));
+
+  await fresh();
+  const am3 = await run(() => {
+    setDemoSel('C5'); demoKey({key:' ', ctrl:true, shift:true});
+    const spaceR = selRange();
+    setDemoSel('C5'); S.sel = null;
+    demoKey({key:'*', ctrl:true, shift:true});
+    const starR = selRange();
+    setDemoSel('C5'); S.sel = null;
+    demoKey({key:'8', ctrl:true, shift:true});
+    const eightR = selRange();
+    const same = (a, b) => a.r1 === b.r1 && a.c1 === b.c1 && a.r2 === b.r2 && a.c2 === b.c2;
+    return { ok8: same(spaceR, eightR), okStar: same(spaceR, starR), spaceR, starR };
+  });
+  ok(am3.okStar, 'Ctrl+* selects the current region, same as Ctrl+Shift+Space', JSON.stringify(am3));
+  ok(am3.ok8, 'Ctrl+Shift+8 selects the current region too', JSON.stringify(am3));
+
+  await fresh();
+  const am4 = await run(() => {
+    // Shift+F2 is Excel's INSERT COMMENT — it must never open the editor
+    setDemoSel('B4'); const before = S.cells['B4'].value;
+    demoKey({key:'F2', shift:true});
+    const noEdit = editing === false;
+    demoKey({key:'F2'});                       // plain F2 still edits
+    const edits = editing === true;
+    demoKey({key:'Escape'});
+    // Ctrl+; stamps today as a VALUE (the engine's date format renders it)
+    setDemoSel('D6'); demoKey({key:';', ctrl:true});
+    const c = S.cells['D6'] || {};
+    const today = Math.floor((Date.now() - Date.UTC(1899, 11, 30)) / 86400000);
+    return { noEdit, edits, kept: S.cells['B4'].value === before, dv: c.value, df: c.fmtStyle, today, txt: dispText(c) };
+  });
+  ok(am4.noEdit && am4.kept, 'Shift+F2 does not open edit mode (Excel: insert comment)', JSON.stringify(am4));
+  ok(am4.edits, 'plain F2 still edits');
+  ok(am4.dv === am4.today && am4.df === 'date', 'Ctrl+; stamps today as a dated value', JSON.stringify(am4));
+  ok(!!am4.txt && am4.txt.length > 0, 'the stamped date renders through the date format', String(am4.txt));
 
   const realErrors = errs.filter(e => !/supabase|Failed to fetch|NetworkError|ERR_/i.test(e));
   ok(realErrors.length === 0, 'zero page errors during the matrix', realErrors.join(' | '));

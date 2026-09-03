@@ -723,7 +723,7 @@ window.HK_RANK = {
      +25 warm-up for the first solve of each active day. Lifetime decay (v2/v3)
      RETIRED: it paid loyal players worst. ONE implementation — every page delegates
      here (r116 killed four drifted copies). Runs need created_at for day buckets;
-     legacy rows without it share one bucket (history reprices in beta). */
+     legacy rows without it share one bucket (early history reprices). */
   computeXP(myRuns, pl, mySessions){
     const PARS=(typeof window!=='undefined'&&window.HOTKEY_PARS)||{};
     const LADDER=[15,10,7,5];
@@ -886,16 +886,19 @@ window.HK_FRAMES = [
 /* u = {lvl, tierBest, dailyWins, certs, charter, perfectRun}. tierBest is a
    HK_RANK.TIERS index (highest tier ever DISPLAYED — nav.js persists it into
    hk_ach_flags.tierBest on every rank fetch; hydration maxes it across devices). */
-/* r389 (Wolf): BETA UNLOCK — a password-gated flag that opens every cosmetic for
-   beta testers/friends. Set by the profile customizer's beta button. */
-window.hkBetaUnlocked = function(){ try{ return localStorage.getItem('hk_beta_unlock')==='1'; }catch(e){ return false; } };
+/* r389 (Wolf): DEV COSMETIC UNLOCK — a password-gated flag that opens every cosmetic for
+   the dev/friends circle. Set by the profile customizer's dev button.
+   r451: key renamed hk_beta_unlock -> hk_dev_unlock_cosmetics (it was never a beta artifact).
+   It IS in nav.js's sign-out wipe list (r416 bugfix) — that list moved with the key. */
+window.hkDevCosmeticsUnlocked = function(){ try{ return localStorage.getItem('hk_dev_unlock_cosmetics')==='1'; }catch(e){ return false; } };
+window.hkBetaUnlocked = window.hkDevCosmeticsUnlocked;   // r451: legacy alias, one round only
 window.hkFrameUnlocked = function(id, u){
-  if(window.hkBetaUnlocked && window.hkBetaUnlocked()) return true;   // beta: every frame unlocked
+  if(window.hkDevCosmeticsUnlocked && window.hkDevCosmeticsUnlocked()) return true;   // dev: every frame unlocked
   return window.hkFrameEarned(id, u);
 };
-/* r393 (Wolf #75): the GENUINE earn check, with NO beta short-circuit. hkFrameUnlocked
-   (picker gating) still says "yes" to everything in beta; the skin-unlock celebration
-   sweep needs the real thing so it fires on an actual earn, not on the blanket beta grant. */
+/* r393 (Wolf #75): the GENUINE earn check, with NO dev short-circuit. hkFrameUnlocked
+   (picker gating) still says "yes" to everything under the dev grant; the skin-unlock
+   celebration sweep needs the real thing so it fires on an actual earn, not the blanket grant. */
 window.hkFrameEarned = function(id, u){
   u = u || {};
   const tb = u.tierBest|0;
@@ -943,7 +946,7 @@ window.hkFrameEarned = function(id, u){
   return false;
 };
 /* ---- r410 (Wolf): TITLES — an equippable name-plate the card wears in a notch under the
-   identity, earned across four buckets: ACCOUNT STATUS (Founder / PRO / Beta Tester),
+   identity, earned across four buckets: ACCOUNT STATUS (Founder / PRO / Charter Member),
    CERTIFICATE PATHS (one per track + Chartered for all three), the HARDEST MEDALS (every
    mythic/legendary achievement doubles as a title — its name IS the title), and a couple
    of GENERAL milestones (Analyst / Crownholder / Centurion). Rank is deliberately NOT a
@@ -952,7 +955,9 @@ window.hkFrameEarned = function(id, u){
      hkTitleEarned(id,u)  gates the pick; u carries certTracks{}, achDone, flags
      hkTitleCatalog(u)    the ordered {id,name,cat,earned} list the customizer draws  ---- */
 window.HK_TITLE_LABELS = {
-  founder:'Founder', pro:'PRO', beta:'Beta Tester',
+  /* r451: label only — the id 'beta' is PERSISTED in saved loadouts (hk_flair), so changing
+     it would orphan every equipped title. Rename the text, freeze the key. */
+  founder:'Founder', pro:'PRO', beta:'Charter Member',
   cert_fluency:'Keyboard Fluent', cert_formulas:'Formula Analyst', cert_modeling:'Modeler', chartered:'Chartered',
   analyst:'Analyst', crownholder:'Crownholder', centurion:'Centurion'
 };
@@ -975,7 +980,7 @@ window.hkTitleEarned = function(id, u){
   switch(id){
     case 'founder':       return !!u.founder || !!u.charter;
     case 'pro':           return !!u.pro;
-    case 'beta':          return !!u.beta || !!u.charter; // beta-unlock flag OR a beta-era account
+    case 'beta':          return !!u.beta || !!u.charter; // r451: id frozen (persisted in hk_flair); label is "Charter Member". dev-unlock flag OR a pre-launch account
     case 'cert_fluency':  return !!ct.fluency;
     case 'cert_formulas': return !!ct.formulas;
     case 'cert_modeling': return !!ct.modeling;
@@ -1249,8 +1254,15 @@ window.hkFrameOrnaments = (function(){
   /* r382: opts.lg — the large-card variant (the 640px profile card wears
      .hk-frame-lg). Only heraldic draws EXTRA art for it (denser filigree);
      everything else scales through the nav.css ornament sizes. */
-  /* r385 skins: [title, tab-fg, tab-bg, tab-border, fx-kind|'' , extraFlags]
-     fx-kind drives hkInitCardFx (snow/fire/prism/stars/none). */
+  /* r385 skins: [title, tab-fg, tab-bg, tab-border, fx-kind|'' , fxConfig]
+     fx-kind drives hkInitCardFx (snow/fire/prism/stars/none).
+     r452 PIXEL PASS — fxConfig is the skin's fx configuration object, read by hkInitCardFx.
+     Today it carries one key, `px`: the pixel-grid size in CSS px at .hk-frame-lg. Omitted =
+     the suite default of 3 (FRAME_PIXEL_PASS.md D1; the engine steps it down to 2 on the
+     compact/leaderboard sizes and never scales it non-integer). PRO and FOUNDER declare
+     px:2 — D3's answer to "do the paid cards stay smooth?": they go pixel like everything
+     else, and buy the prestige back with a FINER grid and the denser field elabFor already
+     gives their tier, rather than by opting out of the art direction. */
   const SKINS={
     circuit:      ['NEURAL',      '#04222a', 'linear-gradient(90deg,#1c6a68,#2aa89c)', '#2aa89c', 'circuit'],
     neon:         ['OVERCLOCK',   '#0b0410', 'linear-gradient(120deg,#ff2d95,#2edcff)', '#ff2d95', 'neon'],   /* r404 (Wolf): cyberpunk neon-chaos rain + glitch bars */
@@ -1259,11 +1271,11 @@ window.hkFrameOrnaments = (function(){
     constellation:['✦ NAVIGATOR','#0b0d1e','linear-gradient(90deg,#6a74c0,#9aa4e0)','#9aa4e0','navchart'],   /* r404 (Wolf #95): a star-chart — constellation lines trace between stars under a slow compass reticle. Wholly distinct from PRO's Milky Way galaxy. */
     vaporwave:    ['SYNTHWAVE',   '#1a0722', 'linear-gradient(120deg,#ff5db1,#2ee6e6)', '#ff5db1', 'drive'],
     terminal:     ['● LIVE', '#1a1204', 'linear-gradient(90deg,#3a2a08,#7a5a12)', '#e0a02f', 'ticker'],   /* r403 (Wolf): the promised live ticker, now real */
-    pro:          ['◆ PRO',  '#241a06', 'linear-gradient(90deg,#e6c86e,#f3e6b0)', '#e6c86e', 'nebula'],   /* r404.2 (Wolf): soft zoomed-out nebula, not the hard spiral */
+    pro:          ['◆ PRO',  '#241a06', 'linear-gradient(90deg,#e6c86e,#f3e6b0)', '#e6c86e', 'nebula', {px:2}],   /* r404.2 (Wolf): soft zoomed-out nebula, not the hard spiral. r452: px:2 — the finest grid in the suite (D3). */
     noir:         ['NOIR',        '#050506', '#f4f6fa', '#f4f6fa', ''],
     frostbite:    ['❄ SUBZERO','#08202e','linear-gradient(120deg,#cdeeff,#66b4e0)','#66b4e0','snow'],
     molten:       ['▲ ERUPTION','#2a0e04','linear-gradient(120deg,#ff7a2a,#ffb52e)','#ffb52e','fire'],
-    founder:      ['★ FOUNDER','#0e0d18','linear-gradient(120deg,#7ef0c0,#8fe0ff,#c89bff)','#c9b8ff','platinum'],   /* r416 (Wolf): DARK oil-slick — near-black iridescent base so the rainbow sheen glows like oil on wet asphalt (was light platinum) */
+    founder:      ['★ FOUNDER','#0e0d18','linear-gradient(120deg,#7ef0c0,#8fe0ff,#c89bff)','#c9b8ff','platinum',{px:2}],   /* r452: px:2 — the pinnacle card matches PRO's finer grid (D3). r416 (Wolf): DARK oil-slick — near-black iridescent base so the rainbow sheen glows like oil on wet asphalt (was light platinum) */
     /* r390 (Wolf) new title skins */
     amethyst:     ['◆ AMETHYST','#180a2a','linear-gradient(120deg,#a06cff,#d0a8ff)','#c49bff','prism'],
     onyx:         ['❖ ONYX','#0a0a0c','linear-gradient(120deg,#d8b25a,#8a6d2f)','#c9a24a','onyxfx'],   /* r404.2 (Wolf): black marble + gold veins (was gold dust, looked like boutique) */
@@ -1300,7 +1312,12 @@ window.hkFrameOrnaments = (function(){
       let h='';
       /* r385.2 (Wolf): the fracture/crack lines obscured the card — the pure particle
          animation (snow / embers) carries fire+ice better. Cracks retired. */
-      if(s[4]) h+='<canvas class="hk-fx" data-kind="'+s[4]+'" aria-hidden="true"></canvas>';
+      /* r452 pixel pass: s[5] is the skin's fx CONFIG (see the SKINS header). Its `px` slot is
+         the pixel-grid size in css px at .hk-frame-lg — the one hard constraint pixel art puts
+         on the engine (FRAME_PIXEL_PASS.md D1). It rides to hkInitCardFx on the canvas next to
+         data-kind, so the engine reads the skin's config without reaching into this closure. */
+      if(s[4]) h+='<canvas class="hk-fx" data-kind="'+s[4]+'"'+
+        ((s[5]&&s[5].px) ? ' data-px="'+(s[5].px|0)+'"' : '')+' aria-hidden="true"></canvas>';
       if(id==='vaporwave') h+='<span class="hkf-sun" aria-hidden="true"></span><span class="hkf-vgrid" aria-hidden="true"></span>';
       let ttl=s[0];
       if(id==='founder'){
@@ -1328,8 +1345,8 @@ window.hkFrameOrnaments = (function(){
         '<path d="M17 11.2 L22.2 17 L17 22.8 L11.8 17 Z" fill="none" stroke="#9c2a1c" stroke-width="1.1"/>'+
         '</svg>'+corners(lg ? HER+HER_LG : HER);
     }
-    if(id==='charter')  // no glint, no ◆ — the beta class keeps a quiet uniform
-      return corners(CHA)+tab('BETA TESTER','#c8d4e6','linear-gradient(180deg,#2a3550,#1a2334)','#55688a');
+    if(id==='charter')  // no glint, no ◆ — the charter class keeps a quiet uniform
+      return corners(CHA)+tab('CHARTER','#c8d4e6','linear-gradient(180deg,#2a3550,#1a2334)','#55688a');
     if(id.indexOf('plaque-')===0){
       const m=PLQ[id.slice(7)]; if(!m) return '';
       const P=M[m[0]]; if(!P) return '';
@@ -1400,12 +1417,194 @@ window.hkInitCardFx = function(root){
         if('x' in c) c.x=R(0,S.w); if('y' in c) c.y=R(0,S.h); if('ph' in c) c.ph=R(0,6.28); parts.push(c); }
       return parts;
     }
+    /* ================= r452 PIXEL PASS — the pixel mode =================
+       ONE engine, not two. The pixel treatment is a property of the skin's fx config
+       (SKINS slot 6, arriving here as data-px) and it changes only two things:
+
+       1. THE BUFFER IS SIZED IN PIXEL CELLS, not device pixels — ceil(cssPx / PX) — and the
+          canvas is upscaled by image-rendering:pixelated (nav.css). Every coordinate the 25
+          draw branches already compute therefore lands on a low-resolution grid: nothing can
+          be sub-pixel because no sub-pixel exists (FRAME_PIXEL_PASS.md R6).
+       2. THE CONTEXT IS WRAPPED so the soft primitives those branches use come out hard:
+            arc()/ellipse() + fill()  -> an integer square sprite      (R7)
+            shadowBlur                -> forced to 0, always           (R4 / decision D2)
+            gradient colour stops     -> snapped to hard bands         (R3 / R8)
+            strokes                   -> 1 cell, coords on .5 centres  (R2)
+            rotate()                  -> quantized to 90 deg = a 4-frame sprite cycle (R7)
+            alpha                     -> quantized to an 8-step ladder (R7, see note)
+
+       No draw branch is rewritten, none moves, and the non-pixel path is byte-for-byte the
+       old one. elabFor's tier density scaling still applies on top, unchanged.
+
+       ALPHA NOTE: the spec asks for 3 alpha levels on PARTICLES. A generic wrapper cannot
+       tell a particle's alpha from an ambient wash's, and snapping a .06 wash to .33 is
+       exactly the "soft clouds swallowing the stats" failure the prototype warned about --
+       in reverse. So the ladder is 8 steps with a floor, which quantizes visibly without
+       blowing out the 25 ambient fields; at 1-2 cells a particle's alpha level is carried by
+       the sprite anyway. */
+    const PXFLOOR=0.05;
+    function qAlpha(a){ if(!(a>0)) return 0; return Math.max(PXFLOOR, Math.round(a*8)/8); }
+    /* [r,g,b,a] from #rgb / #rrggbb / rgb() / rgba(); null for anything else (hsl, named,
+       'transparent' is special-cased to a clear black so a ramp can interpolate through it). */
+    function parseCol(c){
+      if(typeof c!=='string') return null;
+      c=c.trim();
+      if(c==='transparent') return [0,0,0,0];
+      let m=/^#([0-9a-f]{3})$/i.exec(c);
+      if(m) return [parseInt(m[1][0]+m[1][0],16),parseInt(m[1][1]+m[1][1],16),parseInt(m[1][2]+m[1][2],16),1];
+      m=/^#([0-9a-f]{6})$/i.exec(c);
+      if(m) return [parseInt(m[1].slice(0,2),16),parseInt(m[1].slice(2,4),16),parseInt(m[1].slice(4,6),16),1];
+      m=/^rgba?\(([^)]*)\)$/i.exec(c);
+      if(m){ const p=m[1].split(',').map(v=>parseFloat(v));
+        if(p.length>=3 && p.every(v=>isFinite(v))) return [p[0],p[1],p[2], p.length>3?p[3]:1]; }
+      return null;
+    }
+    /* NOTE ON SCALE — why the branches still draw in device space.
+       The naive version of R6 (hand the seeders the cell dimensions) silently breaks three
+       things the pass is required to preserve: particle COUNTS collapse (they are computed
+       from w*h), absolute RADII become cell counts (bokeh's r=28 would grow 6x and swallow the
+       card — the prototype's exact failure mode), and VELOCITIES in px/frame triple the fall
+       speed, changing every period. So instead the seeders and the 25 branches keep their
+       device-space geometry untouched, and pixelCtx carries the scale: it multiplies each
+       incoming coordinate by `s` (cells per device px) and THEN rounds, so the rounding
+       happens in buffer space where it belongs. Counts, sizes, speeds and periods are
+       identical to today; only the rendering resolution changes. */
+    /* quantize the alpha of an rgba()/hsla() colour string; anything else passes through */
+    function qColor(c){
+      if(typeof c!=='string') return c;
+      const m=/^(rgba?|hsla?)\(([^)]*)\)$/i.exec(c); if(!m) return c;
+      const parts=m[2].split(','); if(parts.length<4) return c;
+      const a=parseFloat(parts[3]); if(!isFinite(a)) return c;
+      parts[3]=String(qAlpha(a));
+      return m[1].replace(/a?$/i,'a')+'('+parts.join(',')+')';
+    }
+    /* PX is the skin's grid size in CSS px. D1: 3 at .hk-frame-lg, stepped down to 2 on the
+       compact / leaderboard sizes. Driven off the MEASURED width so every surface (the 56-grid
+       tab, .hk-frame-lg, the leaderboard hero) gets an integer grid without knowing class names. */
+    function pxFor(cv, cssW){
+      const dec=parseInt(cv.dataset.px||'0',10)||3;      // the skin's declared grid (default 3)
+      return cssW>=380 ? dec : Math.max(2, dec-1);
+    }
+    /* The hard-edge context. Delegates everything to the real 2D context; overrides only the
+       primitives that would otherwise anti-alias. */
+    /* s = buffer cells per device pixel. Every coordinate is scaled by s and then snapped. */
+    function pixelCtx(raw, s){
+      let pend=null;                                     // a pending arc/ellipse awaiting fill/stroke
+      const X=v=>Math.round(v*s);                        // a corner / fill coordinate
+      const C=v=>Math.floor(v*s)+0.5;                    // a stroke coordinate -> cell centre
+      const L=v=>Math.max(1,Math.round(v*s));            // a length, never thinner than one cell
+      const P={
+        get canvas(){ return raw.canvas; },
+        /* --- overridden: the primitives that would otherwise anti-alias --- */
+        arc(x,y,r){ pend={x:x,y:y,rx:r,ry:r}; },
+        ellipse(x,y,rx,ry){ pend={x:x,y:y,rx:rx,ry:ry}; },
+        beginPath(){ pend=null; raw.beginPath(); },
+        fill(){
+          if(pend){ const w=L(pend.rx*2), h=L(pend.ry*2);
+            raw.fillRect(X(pend.x)-(w>>1), X(pend.y)-(h>>1), w, h); pend=null; return; }
+          raw.fill();
+        },
+        stroke(){
+          if(pend){ const w=L(pend.rx*2), h=L(pend.ry*2);
+            raw.strokeRect(X(pend.x)-(w>>1)+0.5, X(pend.y)-(h>>1)+0.5, w, h); pend=null; return; }
+          raw.stroke();
+        },
+        fillRect(x,y,w,h){ raw.fillRect(X(x),X(y),L(w),L(h)); },
+        strokeRect(x,y,w,h){ raw.strokeRect(C(x),C(y),L(w),L(h)); },
+        clearRect(x,y,w,h){ raw.clearRect(X(x),X(y),Math.ceil(w*s),Math.ceil(h*s)); },
+        moveTo(x,y){ raw.moveTo(C(x),C(y)); },
+        lineTo(x,y){ raw.lineTo(C(x),C(y)); },
+        /* continuous rotation becomes a 4-frame sprite cycle (R7) */
+        rotate(a){ raw.rotate(Math.round(a/(Math.PI/2))*(Math.PI/2)); },
+        translate(x,y){ raw.translate(X(x),X(y)); },
+        /* gradients: coordinates scale, and every stop snaps to a 3-band grid and holds its
+           colour across its band, so a smooth ramp comes out as hard bands (R3/R8) */
+        createLinearGradient(x0,y0,x1,y1){ return wrapGrad(raw.createLinearGradient(x0*s,y0*s,x1*s,y1*s)); },
+        createRadialGradient(x0,y0,r0,x1,y1,r1){ return wrapGrad(raw.createRadialGradient(x0*s,y0*s,r0*s,x1*s,y1*s,r1*s)); },
+        /* --- pass-through, with the coordinate scale applied --- */
+        fillText(t,x,y){ raw.fillText(t,X(x),X(y)); },
+        strokeText(t,x,y){ raw.strokeText(t,X(x),X(y)); },
+        measureText(t){ return raw.measureText(t); },
+        closePath(){ raw.closePath(); }, save(){ raw.save(); }, restore(){ pend=null; raw.restore(); }
+      };
+      /* A ramp becomes HARD BANDS (R3/R8) by RESAMPLING, not by holding each stop forward.
+         Holding forward destroys the ramp's shape: the plaque/engraved `sheen` is a 3-stop
+         transparent -> bright -> transparent bar, and holding the bright middle stop to the
+         end turned a narrow highlight into a hard wash over half the card (seen in the first
+         render). Sampling the ramp at PXBANDS band centres keeps the peak a peak and the
+         falloff a falloff — just quantized, which is the point. */
+      const PXBANDS=6;
+      function lerpCol(c1,c2,t){
+        const a=parseCol(c1), b=parseCol(c2);
+        if(!a||!b) return t<0.5?c1:c2;
+        return 'rgba('+Math.round(a[0]+(b[0]-a[0])*t)+','+Math.round(a[1]+(b[1]-a[1])*t)+','+
+               Math.round(a[2]+(b[2]-a[2])*t)+','+qAlpha(a[3]+(b[3]-a[3])*t)+')';
+      }
+      function wrapGrad(g){
+        const stops=[]; let built=false;
+        function sample(u){
+          if(!stops.length) return 'rgba(0,0,0,0)';
+          if(u<=stops[0][0]) return stops[0][1];
+          if(u>=stops[stops.length-1][0]) return stops[stops.length-1][1];
+          for(let i=1;i<stops.length;i++){
+            if(u<=stops[i][0]){
+              const a=stops[i-1], b=stops[i], sp=b[0]-a[0];
+              return sp<=0 ? b[1] : lerpCol(a[1], b[1], (u-a[0])/sp);
+            }
+          }
+          return stops[stops.length-1][1];
+        }
+        return { addColorStop(o,c){ stops.push([Math.max(0,Math.min(1,o)), c]); },
+          get _g(){
+            if(!built){ built=true;
+              stops.sort((a,b)=>a[0]-b[0]);
+              for(let i=0;i<PXBANDS;i++){
+                const lo=i/PXBANDS, hi=(i+1)/PXBANDS;
+                /* The END bands sample the ENDPOINT, not their centre. A canvas gradient clamps
+                   to its terminal colours outside the axis, so tinting band 0 spills that tint
+                   across everything before the axis — which is how the plaque/engraved `sheen`
+                   (a transparent -> bright -> transparent bar over a .28w axis) washed the whole
+                   card in the second render. Endpoints exact, interior quantized. */
+                const col=sample(i===0 ? 0 : (i===PXBANDS-1 ? 1 : (lo+hi)/2));
+                try{ g.addColorStop(lo, col); g.addColorStop(hi-0.0001, col); }catch(e){}
+              }
+            }
+            return g;
+          } };
+      }
+      const unwrap=v=>(v&&v._g)?v._g:(typeof v==='string'?qColor(v):v);
+      ['fillStyle','strokeStyle'].forEach(k=>Object.defineProperty(P,k,{
+        get(){ return raw[k]; }, set(v){ raw[k]=unwrap(v); }}));
+      /* the glow is what fights the pixel read (decision D2): particle blur goes, always.
+         The card's own ambient box-shadow is a nav.css concern and is kept. */
+      Object.defineProperty(P,'shadowBlur',{get(){return 0;}, set(){ raw.shadowBlur=0; }});
+      Object.defineProperty(P,'shadowColor',{get(){return raw.shadowColor;}, set(){}});
+      /* hairlines only — a 1.6-device-px line would straddle two cells and grey both */
+      Object.defineProperty(P,'lineWidth',{get(){return raw.lineWidth;}, set(){ raw.lineWidth=1; }});
+      /* the branches set font in device px ("14px VT323"); rescale into cell space */
+      Object.defineProperty(P,'font',{get(){return raw.font;}, set(v){
+        raw.font=String(v).replace(/([\d.]+)px/, (m,n)=>Math.max(4,Math.round(parseFloat(n)*s))+'px'); }});
+      ['globalAlpha','globalCompositeOperation','textAlign','textBaseline','lineCap','lineJoin']
+        .forEach(k=>Object.defineProperty(P,k,{get(){return raw[k];}, set(v){ raw[k]=v; }}));
+      raw.imageSmoothingEnabled=false; raw.lineWidth=1; raw.shadowBlur=0;
+      return P;
+    }
     function fit(cv){
       const box=cv.parentElement; if(!box) return null;
       const r=box.getBoundingClientRect(); const dpr=Math.min(2, window.devicePixelRatio||1);
-      cv.width=Math.max(1,Math.floor(r.width*dpr)); cv.height=Math.max(1,Math.floor(r.height*dpr));
+      /* r452 pixel mode: the BUFFER is cells (ceil(cssPx / PX)); the branches keep drawing in
+         device space and pixelCtx carries the scale. Upscaling is image-rendering:pixelated. */
+      const PX=pxFor(cv, r.width);
+      const wd=Math.max(1,Math.floor(r.width*dpr)), hd=Math.max(1,Math.floor(r.height*dpr));
+      const raw=cv.getContext('2d');
+      if(PX>0){
+        cv.width=Math.max(4,Math.ceil(r.width/PX)); cv.height=Math.max(4,Math.ceil(r.height/PX));
+        cv.style.width='100%'; cv.style.height='100%';
+        return {ctx:pixelCtx(raw, cv.width/wd), w:wd, h:hd, dpr:dpr, px:PX};
+      }
+      cv.width=wd; cv.height=hd;
       cv.style.width='100%'; cv.style.height='100%';   // keep the display box glued to the card, never the buffer size
-      return {ctx:cv.getContext('2d'), w:cv.width, h:cv.height, dpr};
+      return {ctx:raw, w:wd, h:hd, dpr:dpr, px:0};
     }
     function snow(w,h){const n=Math.round(w*h/9000)+16,p=[];for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,2.3),vy:R(.2,.8),ph:R(0,6.28),amp:R(.2,.8),o:R(.35,.95)});return p;}
     function ember(w,h){const ash=Math.random()<.30;return{x:R(0,w),y:h+R(0,20),r:ash?R(1,2.6):R(.8,2.3),vy:ash?R(.35,.8):R(.9,1.9),drift:R(-.3,.3),ph:R(0,6.28),ash,life:0,max:R(90,210)};}
@@ -1413,8 +1612,6 @@ window.hkInitCardFx = function(root){
     // with a partial-life spread so they don't all launch from the floor at once.
     function fire(w,h){const n=Math.round(w/4.2)+30,p=[];for(let i=0;i<n;i++){const e=ember(w,h);e.y=R(0,h);e.life=R(0,e.max*.6);p.push(e);}return p;}
     // r389 traveling-pulse (circuit) · matrix rain (crt) · nebula+comets (cosmic) · holo-foil sweep (founder)
-    function comet(w,h){return{x:R(w*.3,w),y:R(0,h*.5),vx:R(-1.1,-2.4),vy:R(.4,1.1),len:R(26,60),life:0,max:R(45,95)};}
-    function cosmic(w,h){return{st:stars(w,h),cm:[]};}
     function circ(w,h){const gx=Math.max(3,Math.round(w/64)),gy=Math.max(2,Math.round(h/64)),nodes=[],tr=[];
       for(let i=0;i<gx;i++)for(let j=0;j<=gy;j++){if(Math.random()<.5)tr.push({x1:i/gx*w,y1:j/gy*h,x2:(i+1)/gx*w,y2:j/gy*h});}
       for(let i=0;i<=gx;i++)for(let j=0;j<gy;j++){if(Math.random()<.5)tr.push({x1:i/gx*w,y1:j/gy*h,x2:i/gx*w,y2:(j+1)/gy*h});}
@@ -1425,7 +1622,6 @@ window.hkInitCardFx = function(root){
     function matrix(w,h){const fs=Math.max(9,Math.round(w/40)),nc=Math.min(40,Math.max(6,Math.floor(w/(fs*.85)))),cols=[];
       for(let i=0;i<nc;i++)cols.push({x:i*(w/nc)+w/nc/2,y:R(-h,0),sp:R(.9,2.3),len:Math.round(R(6,15))});
       return{fs,cols};}
-    function prism(w,h){const n=Math.round(w*h/17000)+6,cols=['#ff9ed4','#a8e6ff','#c9b8ff','#8ff0c8','#ffe0a0'],p=[];for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.8),ph:R(0,6.28),sp:R(.6,1.6),c:cols[i%cols.length]});return p;}
     function stars(w,h){const n=Math.round(w*h/6500)+10,cols=['#ffffff','#cfd6ff','#ffe9b8'],p=[];for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.5,1.6),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});return p;}
     /* r390 (Wolf) new skin systems: falling petals (sakura/bloom) · soft bokeh (golden
        hour/cotton candy) · pastel pearl sheen · spiral galaxy (pro) · aurora curtains
@@ -1439,20 +1635,6 @@ window.hkInitCardFx = function(root){
     function candy(w,h){const n=Math.round(w*h/16000)+7,cols=['#ffc2e8','#b5d8ff','#fff0c0','#ffd0ec','#c8e6ff'],p=[];   // r404: cotton candy — smaller, defined puffs
       for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(5,13),vy:R(-.5,-.2),ph:R(0,6.28),sp:R(.4,1),c:cols[i%cols.length]});return p;}
     function pearl(w,h){const n=Math.round(w*h/22000)+6,p=[];for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.6),ph:R(0,6.28),sp:R(.5,1.3)});return p;}
-    function galaxy(w,h){const n=Math.round(w*h/2400)+50,cx=w*.5,cy=h*.52,cols=['#ffffff','#cfd6ff','#ffd9a0','#c9b8ff','#a8e6ff'],p=[];
-      for(let i=0;i<n;i++){const arm=i%2,rad=R(.04,.62)*Math.min(w,h),ang=rad*0.028+arm*Math.PI+R(-.35,.35);
-        p.push({rad,ang,r:R(.4,1.5),c:cols[i%cols.length],ph:R(0,6.28),sp:R(.5,1.4)});}
-      return{cx,cy,p};}
-    /* r406 (Wolf: "founder still no good animation"): richer aurora — five drifting curtains
-       (brighter, wider hue spread) over a slow-twinkling star field. */
-    function aurora(w,h){return{b:[{hue:150,off:0,sp:1},{hue:285,off:2.1,sp:.72},{hue:190,off:4.2,sp:1.35},{hue:330,off:1.1,sp:.9},{hue:50,off:3.3,sp:1.15}],st:stars(w,h)};}
-    /* r411 (Wolf: founder aurora too bright — wants it "cracked" = COOL, not shattered): a
-       refined dark HOLO-FOIL. The card stays near-black so the stats read; two narrow rainbow
-       sheen bands drift across on different phases (confined bands, not a full-bleed wash) with
-       a fine dim sparkle. Premium holographic-card feel, spectrum without the glare. */
-    function holorain(w,h){ const n=Math.round(w*h/26000)+5, st=[];
-      for(let i=0;i<n;i++) st.push({x:R(0,w),y:R(0,h),r:R(.5,1.4),ph:R(0,6.28),sp:R(.5,1.3)});
-      return {st}; }
     /* r413 (Wolf: founder = shiny OIL-SLICK, must not visibly loop): saturated rainbow blobs that
        flow on INCOMMENSURATE lissajous paths (fx/fy are irrational-ish ratios, so the combined
        motion has no short period — never an obvious loop), their hue slowly drifting. Layered over
@@ -1467,8 +1649,6 @@ window.hkInitCardFx = function(root){
       for(let i=0;i<n;i++) st.push({x:R(0,w),y:R(0,h),r:R(.5,1.5),ph:R(0,6.28),sp:R(.5,1.3)});
       return {blobs, st}; }
     function drive(w,h){return{hz:Math.round(h*.40)};}
-    function gold(w,h){const n=Math.round(w*h/9000)+10,cols=['#f5d67a','#e8c25a','#fff0b8','#c9a24a'],p=[];
-      for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(.6,1.9),vy:R(-.4,-.1),drift:R(-.3,.3),ph:R(0,6.28),sp:R(.5,1.4),c:cols[i%cols.length]});return p;}
     function draft(w,h){return{gs:Math.max(22,Math.round(w/14))};}
     /* r404.2 (Wolf) — PRO: a soft, zoomed-out nebula (drifting translucent colour clouds
        over fine star dust) instead of the hard spiral galaxy. */
@@ -1497,21 +1677,12 @@ window.hkInitCardFx = function(root){
        (diamond) palette — a prismatic rainbow sheen with brilliant-cut sparkles hugging the
        edges. Deliberately NOT starfield (constellation + pro already own space). */
     function foilfx(w,h){return{};}   // stateless — perimeter glints + prismatic wash computed from time
-    /* r404.6 (Wolf) — DIAMOND: a cooler, crystalline animation — icy prismatic shimmer + sharp
-       4-point facet sparkles that flash like light off a brilliant cut. */
-    /* r407 (Wolf: "make it cooler — matrix-like, moving text"): the Second-Year ANALYST card
-       rains financial NUMBERS in icy diamond-blue — a Bloomberg/data cascade, thematically the
-       analyst's world, under a faint prismatic wash. Each column falls at its own speed. */
-    function diamondfx(w,h){const cw=Math.max(15,Math.round(w/18)),cols=Math.ceil(w/cw),streams=[];
-      for(let i=0;i<cols;i++)streams.push({x:i*cw+cw*.5, y:R(-h,h), sp:R(.5,1.25), len:Math.round(R(4,9))});
-      return{cw,streams};}
     /* r413 (Wolf) — BLACK DIAMOND (Second-Year final boss, replaces the matrix number-cascade):
        white brilliance glints twinkle across the near-black carbon, and a slow prismatic caustic
        rakes the facets. Elite, dark, rare. */
     function blackdiam(w,h){const st=[], n=Math.round(w*h/9000)+20;
       for(let i=0;i<n;i++) st.push({x:R(0,w),y:R(0,h),r:R(.5,2),ph:R(0,6.28),sp:R(.5,1.5)});
       return {st};}
-    function pin(w,h){return{sp:Math.max(10,Math.round(w/26))};}
     /* r404 (Wolf #95) — NAVIGATOR star-chart: stars joined by faint constellation lines
        with a light pulse tracing each edge, under a slow-rotating compass reticle. */
     function navchart(w,h){const n=Math.round(w*h/8000)+10,cols=['#ffffff','#cfd6ff','#9fb0ff'],st=[];
@@ -1522,10 +1693,6 @@ window.hkInitCardFx = function(root){
           if(d<bd){bd=d;bj=j;} }
         if(bj>=0 && bd<(w*.34)*(w*.34) && i<bj) links.push({a:i,b:bj,ph:R(0,1),sp:R(.004,.011)}); }
       return{st,links,cx:w*.5,cy:h*.5,rr:Math.min(w,h)*.34};}
-    /* r404 (Wolf) — ELITE BOUTIQUE: a champagne spotlight sweeps the card while gold
-       sequins drift up and glint brightest as the light crosses them. */
-    function lux(w,h){const n=Math.round(w*h/13000)+8,cols=['#f0d68a','#fff0c8','#e8c0a0','#d8b25a'],p=[];
-      for(let i=0;i<n;i++)p.push({x:R(0,w),y:R(0,h),r:R(1,2.6),vy:R(-.35,-.1),drift:R(-.25,.25),ph:R(0,6.28),sp:R(.5,1.3),c:cols[i%cols.length]});return p;}
     /* r404 (Wolf) — refracting gem (amethyst/emerald): slow light beams sweeping from
        the stone's heart + facet sparkles. Palette picked by kind in the draw branch. */
     function facet(w,h){const n=Math.round(w*h/9000)+10,p=[];
@@ -1556,13 +1723,13 @@ window.hkInitCardFx = function(root){
       EL = elabFor(cv);   // r414 (#121): class-scaled particle density
       let parts = kind==='snow'?snow(S.w,S.h) : kind==='fire'?fire(S.w,S.h) : kind==='prism'?facet(S.w,S.h)
         : kind==='emerald'?facet(S.w,S.h) : kind==='neon'?neonfx(S.w,S.h) : kind==='sheet'?sheetfx(S.w,S.h)
-        : kind==='cosmic'?cosmic(S.w,S.h) : kind==='navchart'?navchart(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h) : kind==='holo'?prism(S.w,S.h)
-        : kind==='heraldic'?heraldicfx(S.w,S.h) : kind==='foilfx'?foilfx(S.w,S.h) : kind==='diamondfx'?diamondfx(S.w,S.h) : kind==='blackdiam'?blackdiam(S.w,S.h)
+        : kind==='navchart'?navchart(S.w,S.h) : kind==='circuit'?circ(S.w,S.h) : kind==='matrix'?matrix(S.w,S.h)
+        : kind==='heraldic'?heraldicfx(S.w,S.h) : kind==='foilfx'?foilfx(S.w,S.h) : kind==='blackdiam'?blackdiam(S.w,S.h)
         : kind==='petals'?petals(S.w,S.h) : kind==='bloom'?bloomfx(S.w,S.h) : kind==='bokeh'?bokeh(S.w,S.h) : kind==='candy'?candy(S.w,S.h) : kind==='pearl'?pearl(S.w,S.h)
-        : kind==='galaxy'?galaxy(S.w,S.h) : kind==='nebula'?nebula(S.w,S.h) : kind==='aurora'?aurora(S.w,S.h) : kind==='holorain'?holorain(S.w,S.h) : kind==='platinum'?platinum(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
-        : kind==='gold'?gold(S.w,S.h) : kind==='onyxfx'?onyxfx(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='pinstripe'?pin(S.w,S.h) : kind==='lux'?lux(S.w,S.h) : kind==='quilt'?quilt(S.w,S.h) : kind==='sheen'?sheen(S.w,S.h)
+        : kind==='nebula'?nebula(S.w,S.h) : kind==='platinum'?platinum(S.w,S.h) : kind==='drive'?drive(S.w,S.h)
+        : kind==='onyxfx'?onyxfx(S.w,S.h) : kind==='draft'?draft(S.w,S.h) : kind==='quilt'?quilt(S.w,S.h) : kind==='sheen'?sheen(S.w,S.h)
         : kind==='ticker'?ticker(S.w,S.h)
-        : (kind==='stars'||kind==='sun')?stars(S.w,S.h) : [];
+        : [];
       parts = applyEL(parts, S);   // r414 (#121): scale particle-field density by class
       sys.push({cv,kind,S,parts});
     });
@@ -1581,15 +1748,6 @@ window.hkInitCardFx = function(root){
         if(e.ash){ctx.fillStyle='rgba(120,108,98,'+(a*.5)+')';ctx.shadowBlur=0;}
         else{const hot=Math.max(0,1-k*1.4);ctx.fillStyle='rgba(255,'+Math.round(150+hot*90)+','+Math.round(40+hot*60)+','+a+')';ctx.shadowBlur=7*dpr;ctx.shadowColor='rgba(255,140,50,.9)';}
         ctx.fill(); } ctx.shadowBlur=0; }
-      else if(o.kind==='cosmic'){ const P=o.parts;
-        for(const s of P.st){ const a=reduce?.7:(.3+.5*(.5+.5*Math.sin(t/700*s.sp+s.ph)));
-          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1;} ctx.shadowBlur=0;
-        if(!reduce){ if(P.cm.length<2 && Math.random()<.025) P.cm.push(comet(w,h));
-          for(let i=P.cm.length-1;i>=0;i--){ const c=P.cm[i]; c.x+=c.vx*dpr*1.6; c.y+=c.vy*dpr*1.6; c.life++;
-            const a=Math.max(0,1-c.life/c.max), tx=c.x-c.vx*c.len, ty=c.y-c.vy*c.len;
-            const g=ctx.createLinearGradient(c.x,c.y,tx,ty); g.addColorStop(0,'rgba(210,230,255,'+a+')'); g.addColorStop(1,'rgba(210,230,255,0)');
-            ctx.strokeStyle=g; ctx.lineWidth=1.5*dpr; ctx.beginPath(); ctx.moveTo(c.x,c.y); ctx.lineTo(tx,ty); ctx.stroke();
-            if(c.life>c.max||c.x<-50||c.y>h+50) P.cm.splice(i,1); } } }
       else if(o.kind==='navchart'){ const P=o.parts;
         // slow compass reticle: two faint rings + rotating tick spokes
         const rot=reduce?0:t/14000;
@@ -1626,13 +1784,6 @@ window.hkInitCardFx = function(root){
             ctx.fillText(ch,c.x,yy); }
           if(c.y-c.len*P.fs>h){ c.y=R(-h*.4,0); c.sp=R(.9,2.3); } }
         ctx.shadowBlur=0; ctx.textAlign='start'; }
-      else if(o.kind==='holo'){ const P=o.parts;
-        for(let b=0;b<3;b++){ const off=((t/2600 + b/3)%1), cx=(-.4+off*1.8)*w, hue=(t/40+b*90)%360;
-          const g=ctx.createLinearGradient(cx-.25*w,0,cx+.25*w,h);
-          g.addColorStop(0,'hsla('+hue+',90%,70%,0)'); g.addColorStop(.5,'hsla('+hue+',92%,72%,.15)'); g.addColorStop(1,'hsla('+((hue+60)%360)+',90%,70%,0)');
-          ctx.fillStyle=g; ctx.fillRect(0,0,w,h); }
-        for(const s of P){ const a=reduce?.7:(.3+.5*(.5+.5*Math.sin(t/600*s.sp+s.ph)));
-          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1;} ctx.shadowBlur=0; }
       else if(o.kind==='petals'||o.kind==='bloom'){ for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr; s.x+=(s.drift+Math.sin(t/800+s.ph)*.4)*dpr; s.rot+=s.vr; if(s.y>h+8){s.y=-8;s.x=R(0,w);}}
         ctx.save();ctx.translate(s.x,s.y);ctx.rotate(s.rot);ctx.beginPath();ctx.ellipse(0,0,s.r*dpr,s.r*.5*dpr,0,0,6.28);ctx.fillStyle=s.c+s.o+')';ctx.fill();ctx.restore(); } }
       else if(o.kind==='candy'){ for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr; s.x+=Math.sin(t/1200+s.ph)*.35*dpr; if(s.y<-s.r*dpr){s.y=h+s.r*dpr;s.x=R(0,w);}}
@@ -1690,23 +1841,6 @@ window.hkInitCardFx = function(root){
           ctx.fillStyle=g2; ctx.fillRect(0,0,w,h); ctx.globalCompositeOperation='source-over'; }
         for(const s of P.st){ const a=reduce?.35:(.14+.5*(.5+.5*Math.sin(t/560*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle='rgba(255,255,255,'+a+')';ctx.shadowBlur=4*dpr;ctx.shadowColor='rgba(150,180,255,.7)';ctx.fill();ctx.shadowBlur=0; } }
-      else if(o.kind==='holorain'){ const P=o.parts;
-        /* r411 (Wolf): HOLO-FOIL — "cool" rainbow, not a shattered card. Two narrow spectral sheen
-           bands drift across on different speeds (banded, so most of the dark body stays clear and
-           the stats read), plus a fine dim sparkle. Reads like a premium holographic card. */
-        ctx.globalCompositeOperation='lighter';
-        for(let k=0;k<2;k++){
-          const sp=((t/(k?7200:5200)+k*.5)%1), bx=(-.3+sp*1.6)*w, hue=(t/22+k*150)%360;
-          const g=ctx.createLinearGradient(bx-.15*w,0,bx+.15*w,h);
-          g.addColorStop(0,'hsla('+hue+',85%,62%,0)');
-          g.addColorStop(.5,'hsla('+((hue+45)%360)+',88%,64%,'+(reduce?.07:.15)+')');
-          g.addColorStop(1,'hsla('+((hue+95)%360)+',85%,62%,0)');
-          ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
-        }
-        ctx.globalCompositeOperation='source-over';
-        if(P.st) for(const s of P.st){ const a=reduce?.3:(.12+.42*(.5+.5*Math.sin(t/620*s.sp+s.ph)));
-          ctx.beginPath(); ctx.arc(s.x,s.y,s.r*dpr,0,6.28); ctx.fillStyle='rgba(230,235,255,'+a+')';
-          ctx.shadowBlur=4*dpr; ctx.shadowColor='rgba(200,190,255,.8)'; ctx.fill(); ctx.shadowBlur=0; } }
       else if(o.kind==='sheen'){
         // polished-metal highlight bar rakes diagonally every ~4.5s
         const gp=reduce?.5:((t/4500)%1);
@@ -1763,31 +1897,6 @@ window.hkInitCardFx = function(root){
           g.addColorStop(1,'hsla('+((hue+70)%360)+',92%,66%,0)');
           ctx.fillStyle=g; ctx.fillRect(0,0,w,h); }
         ctx.globalCompositeOperation='source-over'; }
-      else if(o.kind==='diamondfx'){ const P=o.parts;
-        /* r407 (Wolf: "cooler — matrix/circuit vibe, dynamic"): an icy NUMBER CASCADE — the
-           Second-Year analyst's data streaming down the card in diamond-blue, each column at
-           its own speed, leading digit brilliant-white, trailing digits fading. Under a faint
-           prismatic wash so the crystal still reads. */
-        ctx.globalCompositeOperation='lighter';
-        { const off=reduce?.5:((t/6000)%1), cx=(-.3+off*1.6)*w, hue=(200+30*Math.sin(t/4200))%360;
-          const g=ctx.createLinearGradient(cx-.3*w,0,cx+.3*w,h);
-          g.addColorStop(0,'hsla('+hue+',90%,80%,0)');g.addColorStop(.5,'hsla('+hue+',90%,82%,'+(reduce?.05:.09)+')');g.addColorStop(1,'hsla('+((hue+50)%360)+',90%,80%,0)');
-          ctx.fillStyle=g; ctx.fillRect(0,0,w,h); }
-        ctx.globalCompositeOperation='source-over';
-        const cw=P.cw*dpr, fs=Math.max(9,Math.round(cw*.82)), step=fs*1.18;
-        ctx.font='600 '+fs+'px ui-monospace,"SF Mono",Menlo,monospace'; ctx.textAlign='center'; ctx.textBaseline='middle';
-        for(const s of P.streams){
-          if(!reduce) s.y += s.sp*dpr*1.15;
-          const head=Math.floor(s.y/step), sx=s.x*dpr;
-          for(let kk=0; kk<s.len; kk++){ const cy=s.y - kk*step;
-            if(cy<-step || cy>h+step) continue;
-            const cell=head-kk, dg=((cell*37 + Math.round(s.x*3) + (kk===0?Math.floor(t/110):0))%10+10)%10;
-            if(kk===0){ ctx.fillStyle='rgba(240,250,255,'+(reduce?.9:1)+')'; ctx.shadowBlur=9*dpr; ctx.shadowColor='rgba(150,210,255,.95)'; }
-            else { const a=Math.max(0,(1-kk/s.len))*(reduce?.45:.72); ctx.fillStyle='rgba(150,205,240,'+a+')'; ctx.shadowBlur=0; }
-            ctx.fillText(String(dg), sx, cy); }
-          if(s.y - s.len*step > h){ s.y=R(-h*.45,0); s.sp=R(.5,1.25); s.len=Math.round(R(4,9)); }
-        }
-        ctx.shadowBlur=0; ctx.textAlign='left'; ctx.textBaseline='alphabetic'; ctx.globalAlpha=1; }
       else if(o.kind==='foilfx'){
         /* r407 (Wolf: "the foil animation loops too obviously"): DESYNC the three rainbow
            bands — each drifts on its own incommensurate period + independent hue drift, so the
@@ -1805,16 +1914,6 @@ window.hkInitCardFx = function(root){
           if(pp<w){x=pp;y=0;} else if(pp<w+h){x=w;y=pp-w;} else if(pp<2*w+h){x=w-(pp-w-h);y=h;} else {x=0;y=h-(pp-2*w-h);}
           const tw=.5+.5*Math.sin(t/(430+i*37)+i*1.7), a=reduce?.7:(.24+.6*tw), r=(1.1+tw*1.7)*dpr;
           ctx.beginPath();ctx.arc(x,y,r,0,6.28);ctx.fillStyle='rgba(240,250,255,'+a+')';ctx.shadowBlur=9*dpr;ctx.shadowColor='rgba(170,220,255,.95)';ctx.fill(); }
-        ctx.shadowBlur=0; }
-      else if(o.kind==='lux'){
-        const off=reduce?.5:((t/5000)%1), lx=off*w;   // champagne spotlight travels L→R
-        const rg=ctx.createRadialGradient(lx,h*.42,0,lx,h*.42,w*.42);
-        rg.addColorStop(0,'rgba(245,222,150,'+(reduce?.06:.15)+')'); rg.addColorStop(.6,'rgba(232,192,120,.05)'); rg.addColorStop(1,'rgba(232,192,120,0)');
-        ctx.fillStyle=rg; ctx.fillRect(0,0,w,h);
-        for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr; s.x+=(s.drift+Math.sin(t/1300+s.ph)*.3)*dpr; if(s.y<-4){s.y=h+4;s.x=R(0,w);}}
-          const near=1-Math.min(1,Math.abs(s.x-lx)/(w*.42));   // sequins near the light glint brightest
-          const a=reduce?.5:(.2+.35*(.5+.5*Math.sin(t/700*s.sp+s.ph))+near*.4);
-          ctx.beginPath();ctx.arc(s.x,s.y,(s.r+near*.8)*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=Math.min(1,a);ctx.shadowBlur=(4+near*6)*dpr;ctx.shadowColor='rgba(245,215,130,.9)';ctx.fill();ctx.globalAlpha=1; }
         ctx.shadowBlur=0; }
       else if(o.kind==='bokeh'){
         // r404 (Wolf): warm god-rays raking from the top corner so golden hour reads golden
@@ -1834,17 +1933,6 @@ window.hkInitCardFx = function(root){
           ctx.fillStyle=g;ctx.fillRect(0,0,w,h); }
         for(const s of o.parts){ const a=reduce?.5:(.25+.4*(.5+.5*Math.sin(t/700*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle='rgba(255,255,255,'+a+')';ctx.shadowBlur=5*dpr;ctx.shadowColor='rgba(220,210,255,.7)';ctx.fill();} ctx.shadowBlur=0; }
-      else if(o.kind==='galaxy'){ const P=o.parts,rot=reduce?0:t/9000;
-        // r404 (Wolf): a Milky Way band — a bright diagonal galactic river of light behind the spiral
-        ctx.save(); ctx.translate(P.cx,P.cy); ctx.rotate(-0.5);
-        const bg=ctx.createLinearGradient(0,-h*.5,0,h*.5);
-        bg.addColorStop(0,'rgba(200,190,255,0)'); bg.addColorStop(.5,'rgba(220,210,255,'+(reduce?.10:.16)+')'); bg.addColorStop(1,'rgba(200,190,255,0)');
-        ctx.fillStyle=bg; ctx.fillRect(-w,-h*.22,w*2,h*.44); ctx.restore();
-        const cg=ctx.createRadialGradient(P.cx,P.cy,0,P.cx,P.cy,Math.min(w,h)*.24);
-        cg.addColorStop(0,'rgba(255,248,230,.62)');cg.addColorStop(.35,'rgba(200,180,255,.2)');cg.addColorStop(1,'transparent');
-        ctx.fillStyle=cg;ctx.fillRect(0,0,w,h);
-        for(const s of P.p){ const a2=s.ang+rot,x=P.cx+Math.cos(a2)*s.rad,y=P.cy+Math.sin(a2)*s.rad*.62,tw=reduce?.7:(.4+.5*(.5+.5*Math.sin(t/600*s.sp+s.ph)));
-          ctx.beginPath();ctx.arc(x,y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=tw;ctx.shadowBlur=5*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1;} ctx.shadowBlur=0; }
       else if(o.kind==='nebula'){ const P=o.parts;
         /* r413 (Wolf: "PRO still not animated"): the drift was there but too faint to read next to
            the bold pinnacle borders. PRO is the paid tier — make the cosmos unmistakably ALIVE:
@@ -1864,37 +1952,6 @@ window.hkInitCardFx = function(root){
         ctx.globalCompositeOperation='source-over';
         for(const s of P.st){ const a=reduce?.6:(.34+.62*(.5+.5*Math.sin(t/520*s.sp+s.ph)));
           ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=5*dpr;ctx.shadowColor=s.c;ctx.fill();ctx.globalAlpha=1; } ctx.shadowBlur=0; }
-      else if(o.kind==='aurora'){ ctx.globalCompositeOperation='lighter';
-        /* r407 (Wolf: "founder STILL not animated — more dynamic"): bright UNDULATING rainbow
-           curtains (sway on x and y) + a holographic sweep bar raking across every ~3.4s +
-           drifting stars — unmistakably alive, the pinnacle card. */
-        for(const bd of o.parts.b){ const cx=w*(.5+.42*Math.sin(t/2600*bd.sp+bd.off)), hue=bd.hue+34*Math.sin(t/3800+bd.off), yb=Math.sin(t/2200*bd.sp+bd.off)*.12*h;
-          const g=ctx.createLinearGradient(cx-.22*w,-yb,cx+.22*w,h-yb);
-          g.addColorStop(0,'hsla('+hue+',92%,64%,0)');g.addColorStop(.5,'hsla('+hue+',92%,68%,'+(reduce?.14:.3)+')');g.addColorStop(1,'hsla('+((hue+50)%360)+',92%,64%,0)');
-          ctx.fillStyle=g; ctx.fillRect(0,0,w,h); }
-        if(!reduce){ const sp=(t/3400)%1, sx=(-.25+sp*1.5)*w, sa=(1-Math.abs(sp-.5)/.5), shue=(t/16)%360;
-          const g2=ctx.createLinearGradient(sx-.12*w,0,sx+.12*w,h);
-          g2.addColorStop(0,'hsla('+shue+',95%,72%,0)');g2.addColorStop(.5,'hsla('+shue+',95%,75%,'+(sa*.26)+')');g2.addColorStop(1,'hsla('+((shue+60)%360)+',95%,72%,0)');
-          ctx.fillStyle=g2; ctx.fillRect(0,0,w,h); }
-        if(o.parts.st) for(const s of o.parts.st){ const a=reduce?.5:(.22+.55*(.5+.5*Math.sin(t/560*s.sp+s.ph)));
-          ctx.beginPath(); ctx.arc(s.x,s.y,s.r*dpr,0,6.28); ctx.fillStyle='rgba(242,238,255,'+a+')'; ctx.shadowBlur=5*dpr; ctx.shadowColor='rgba(205,185,255,.9)'; ctx.fill(); }
-        ctx.globalCompositeOperation='source-over'; ctx.shadowBlur=0; }
-      else if(o.kind==='gold'){
-        // onyx: slow diagonal gold shimmer sweep + rising gold dust that twinkles
-        const off=(t/5200)%1, cx=(-.3+off*1.6)*w;
-        const g=ctx.createLinearGradient(cx-.28*w,0,cx+.28*w,h);
-        g.addColorStop(0,'rgba(245,214,122,0)');g.addColorStop(.5,'rgba(245,214,122,'+(reduce?.06:.13)+')');g.addColorStop(1,'rgba(200,150,60,0)');
-        ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
-        // r404 (Wolf: de-bland) a bright hard glint streak rakes across every ~4.5s
-        if(!reduce){ const gp=(t/4500)%1; if(gp<.34){ const gx=(-.2+gp*1.7)*w, ga=(1-Math.abs(gp-.17)/.17);
-          ctx.globalCompositeOperation='lighter';
-          const g2=ctx.createLinearGradient(gx-.09*w,0,gx+.09*w,h);
-          g2.addColorStop(0,'rgba(255,240,190,0)');g2.addColorStop(.5,'rgba(255,240,190,'+(ga*.34)+')');g2.addColorStop(1,'rgba(255,240,190,0)');
-          ctx.fillStyle=g2; ctx.fillRect(0,0,w,h); ctx.globalCompositeOperation='source-over'; } }
-        for(const s of o.parts){ if(!reduce){s.y+=s.vy*dpr;s.x+=(s.drift+Math.sin(t/1200+s.ph)*.3)*dpr;if(s.y<-4){s.y=h+4;s.x=R(0,w);}}
-          const a=reduce?.6:(.22+.58*(.5+.5*Math.sin(t/650*s.sp+s.ph)));
-          ctx.beginPath();ctx.arc(s.x,s.y,s.r*dpr,0,6.28);ctx.fillStyle=s.c;ctx.globalAlpha=a;ctx.shadowBlur=6*dpr;ctx.shadowColor='rgba(245,205,110,.9)';ctx.fill();ctx.globalAlpha=1; }
-        ctx.shadowBlur=0; }
       else if(o.kind==='draft'){
         // architect: faint gold blueprint grid + a drafting scan line sweeping down
         const gs=o.parts.gs; ctx.strokeStyle='rgba(214,180,110,.13)'; ctx.lineWidth=1*dpr; ctx.beginPath();
@@ -1911,24 +1968,6 @@ window.hkInitCardFx = function(root){
         const corners=[[pad,pad,1,1],[w-pad,pad,-1,1],[pad,h-pad,1,-1],[w-pad,h-pad,-1,-1]];
         ctx.beginPath(); for(const c of corners){ ctx.moveTo(c[0],c[1]); ctx.lineTo(c[0]+mk*c[2],c[1]); ctx.moveTo(c[0],c[1]); ctx.lineTo(c[0],c[1]+mk*c[3]); } ctx.stroke();
         const vx2=reduce?w*.5:((t/4200)%1)*w; ctx.strokeStyle='rgba(230,196,120,.12)'; ctx.beginPath(); ctx.moveTo(vx2,0); ctx.lineTo(vx2,h); ctx.stroke(); }
-      else if(o.kind==='pinstripe'){
-        // elite boutique: tailored gold pinstripes under a raking spotlight that
-        // ignites the threads it crosses, plus a slow diagonal shimmer + drifting sequins
-        const sp=o.parts.sp;
-        const off=reduce?.5:((t/5200)%1), lx=off*w;   // spotlight centre travels L→R
-        ctx.strokeStyle='rgba(210,175,95,.14)'; ctx.lineWidth=1*dpr;
-        ctx.beginPath(); for(let x=sp/2;x<w;x+=sp){ ctx.moveTo(x,0); ctx.lineTo(x,h); } ctx.stroke();
-        // brighter threads within the spotlight cone
-        ctx.globalCompositeOperation='lighter';
-        for(let x=sp/2;x<w;x+=sp){ const d=Math.abs(x-lx)/(w*.28); if(d<1){ const a=(1-d)*(reduce?.18:.5);
-          ctx.strokeStyle='rgba(250,222,140,'+a+')'; ctx.lineWidth=1.3*dpr; ctx.shadowBlur=5*dpr; ctx.shadowColor='rgba(245,205,110,.7)';
-          ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); } }
-        ctx.shadowBlur=0;
-        // the spotlight glow itself
-        const rg=ctx.createRadialGradient(lx,h*.5,0,lx,h*.5,w*.34);
-        rg.addColorStop(0,'rgba(245,214,130,'+(reduce?.05:.12)+')'); rg.addColorStop(1,'rgba(245,214,130,0)');
-        ctx.fillStyle=rg; ctx.fillRect(0,0,w,h);
-        ctx.globalCompositeOperation='source-over'; }
       else if(o.kind==='drive'){ const hz=o.parts.hz,vx=w/2; ctx.strokeStyle='rgba(255,93,177,.30)';ctx.lineWidth=1*dpr;
         ctx.beginPath(); for(let i=-7;i<=7;i++){ ctx.moveTo(vx,hz); ctx.lineTo(vx+i*(w/7),h); } ctx.stroke();
         const scroll=reduce?0:(t/650)%1;
@@ -2333,7 +2372,7 @@ window.hkRarityMeta = function(pct){
   return { word:'common', abbr:'', color:C.c, weight:4 };
 };
 /* r150: EFFECTIVE RARITY — rarity was pure data (% of players holding it), which at
-   beta scale reads all-common (1 of 3 players = 33%). Each achievement now
+   small-N scale reads all-common (1 of 3 players = 33%). Each achievement now
    carries a hand-set difficulty tier ('r'/'e'/'l'/'m') as the DISPLAY FLOOR;
    live data takes over once the field is big enough to mean something
    (>= 20 players). */
@@ -2350,7 +2389,7 @@ window.hkEffRarity = function(tier, dataPct, fieldN){
 /* r389 (Wolf): FOUNDING COHORT — the first-100 mythics. One cheap count query (accounts
    created at/before you), cached so every page's achievement ctx reads the same flag.
    window.hkFoundingFlags() → {rank, class:boolean, partner:boolean}. Founding Partner
-   (first-100 PRO) arms post-beta once PRO purchases are tracked + ordered server-side;
+   (first-100 PRO) arms post-launch once PRO purchases are tracked + ordered server-side;
    until then `partner` stays false (the medal shows as a locked mythic goal). */
 window.hkFoundingRank = function(sb, me){
   try{
@@ -2663,19 +2702,99 @@ window.hkBandChip = function(band, size){
 /* ============================================================
    r279 MAC DISPLAY LAYER (Stage 2+3, dev/MAC_DESIGN.md) — shared by the game,
    the reference page, and anywhere else keycaps render. KeyTips-forward per
-   Wolf: the ⌥ ribbon walks are the star (they now match real Mac Excel);
-   F-keys stay F-keys on screen — the popup teaches fn + the ⌘T/⌃U alternates.
+   Wolf: the ⌥ ribbon walks are the star (they now match real Mac Excel).
+   r452: the blind glyph swap is now the FALLBACK behind HK_MAC_CHORDS (below) — the
+   audited table of chords whose Mac form is not "Ctrl→⌘". Derive from it; never re-swap.
    ============================================================ */
 window.hkIsMac = function(){ try{
   var o=localStorage.getItem('hk_platform');              // r280: onboarding pick wins
   if(o==='mac') return true; if(o==='win') return false;
   return /Mac/i.test(navigator.platform||'') || /Macintosh/i.test(navigator.userAgent||'');
 }catch(e){ return false; } };
-window.hkMacChord = function(s){
+/* r452 (audit P0-3 / P0-5): THE MAC CHORD TRUTH TABLE — the ONE place Mac Excel's real
+   bindings live. Everything downstream (in-game keycaps, the task line, reference.html's
+   Mac column) derives from here; nothing re-implements the swap.
+   Before r452 the whole Mac layer was a blind three-token glyph swap (ctrl→⌘, alt→⌥,
+   shift→⇧), which taught ⌘Space (macOS Spotlight), ⌘⌥V, ⌥= and ⌘` (macOS window cycle).
+   The blind swap is still the FALLBACK — it is verified-correct for the ⌘-plays-Ctrl
+   family (⌘C/V/X/B/I/U/D/R/S/Z/Y/A/F/1/-, ⌘arrows, ⇧Space, ⌘↵) — and this table carries
+   only the chords whose Mac form is NOT "Ctrl→⌘".
+   Confidence discipline (dev audit r452, §1): only rows the audit tagged [H] or [M-H] get
+   a Mac chord. Rows tagged [M]/[L] carry {varies:true} and render the WINDOWS chord with a
+   "Mac: varies" note — an honest gap beats a confident guess.
+   Entry shape: {mac:[tokens]}  ·  optional flat:'display form'  ·  optional note  ·  {varies:true} */
+window.HK_MAC_CHORDS = {
+  /* selection / clipboard */
+  'CTRL+SPACE':       {mac:['⌃','Space'],       note:'⌘Space is macOS Spotlight'},          // [H]
+  'CTRL+ALT+V':       {mac:['⌃','⌘','V']},                                                  // [H] paste special
+  /* formulas */
+  'ALT+=':            {mac:['⌘','⇧','T'],  note:'Alt+= is not a Mac Excel chord'},          // [H] AutoSum
+  'CTRL+`':           {mac:['⌃','`'],           note:'⌘` cycles macOS windows'},            // [M-H] show formulas
+  /* editing / F-keys */
+  'F2':               {mac:['⌃','U'],           note:'or fn+F2'},                                // [H] edit cell
+  'F4':               {mac:['fn','F4'], flat:'fn+F4',note:'or ⌘T — Chrome takes ⌘T outside fullscreen'}, // [H] anchor cycle
+  /* dialogs */
+  'CTRL+H':           {mac:['⌃','H'],           note:'⌘H hides the app'},                   // [M-H] find & replace
+  /* number formats — Mac Excel keeps these on ⌃, not ⌘ */
+  'CTRL+SHIFT+$':     {mac:['⌃','⇧','$']},                                                  // [M-H]
+  'CTRL+SHIFT+%':     {mac:['⌃','⇧','%']},                                                  // [M-H]
+  'CTRL+SHIFT+!':     {mac:['⌃','⇧','!']},                                                  // [M-H]
+  'CTRL+SHIFT+~':     {mac:['⌃','⇧','~']},                                                  // [M-H]
+  'CTRL+SHIFT+#':     {mac:['⌃','⇧','#']},                                                  // [M-H]
+  'CTRL+SHIFT++':     {mac:['⌃','⇧','=']},                                                  // [M-H] insert rows/cols
+  'CTRL+;':           {mac:['⌃',';']},                                                           // [M-H] today's date
+  'CTRL+SHIFT+;':     {mac:['⌃','⇧',';']},                                                  // [M-H] time
+  /* [M]/[L] — the audit would not stand behind a Mac form; say so instead of guessing */
+  'CTRL+9':                 {varies:true},
+  'CTRL+SHIFT+L':           {varies:true},
+  'CTRL+PAGE UP':           {varies:true},
+  'CTRL+PAGE DOWN':         {varies:true},
+  'CTRL+PAGE UP/PAGE DOWN': {varies:true}
+};
+window.hkMacNorm = function(s){
+  return String(s==null?'':s).trim().toUpperCase().replace(/\s*\+\s*/g,'+').replace(/\s*>\s*/g,'>');
+};
+/* exact-chord lookup — null when the blind swap is the right answer */
+window.hkMacLookup = function(spec){
+  try{ return window.HK_MAC_CHORDS[window.hkMacNorm(spec)] || null; }catch(e){ return null; }
+};
+window.hkMacBlind = function(s){
   return String(s)
-    .replace(/ctrl\+/gi,'\u2318')
-    .replace(/\bshift\+/gi,'\u21e7')
-    .replace(/\balt\b(?=(\s|\+))/gi,'\u2325');
+    .replace(/ctrl\+/gi,'⌘')
+    .replace(/\bshift\+/gi,'⇧')
+    .replace(/\balt\b(?=(\s|\+))/gi,'⌥');
+};
+/* one chord → its Mac display form (glyph-joined: '⌃Space', '⌘⇧T', 'fn+F4').
+   Whitespace-separated captions ('ctrl+c alt+h b o') map token by token. */
+window.hkMacChord = function(s){
+  var str=String(s);
+  var hit=window.hkMacLookup(str);
+  /* a {varies} row still takes the ⌘ swap HERE: this surface is the keyflash/caption — what
+     the player just pressed (the engine accepts ⌘⇧L) — not the reference's "press this in
+     real Mac Excel" column, which is where the honest "Mac: varies" note belongs. */
+  if(hit && !hit.varies) return hit.flat || hit.mac.join('');
+  if(/\s/.test(str.trim())){
+    return str.split(/(\s+)/).map(function(t){ return /\S/.test(t) ? window.hkMacChord(t) : t; }).join('');
+  }
+  return window.hkMacBlind(str);
+};
+/* one chord → its Mac form as a '+'/'>'-separated SPEC (reference.html renders caps from it) */
+window.hkMacSpec = function(spec){
+  var str=String(spec);
+  var hit=window.hkMacLookup(str);
+  if(hit) return hit.varies ? str : hit.mac.join('+');
+  if(str.indexOf('>')>=0) return str.split('>').map(function(p){ return window.hkMacSpec(p); }).join('>');
+  /* bare modifier caps (an Alt walk's first segment, reference.html's per-cap swap) */
+  if(/^\s*ctrl\s*$/i.test(str)) return '⌘';
+  if(/^\s*alt\s*$/i.test(str)) return '⌥';
+  if(/^\s*shift\s*$/i.test(str)) return '⇧';
+  return window.hkMacBlind(str).replace(/([⌘⌃⇧⌥])(?=[^+\s])/g,'$1+');
+};
+/* the caveat a surface should print beside a chord ('' when there is none) */
+window.hkMacNote = function(spec){
+  var hit=window.hkMacLookup(spec);
+  if(!hit) return '';
+  return hit.varies ? 'Mac: varies' : (hit.note||'');
 };
 window.hkMacifyKbds = function(root){
   if(!window.hkIsMac() || !root) return;
@@ -2702,7 +2821,12 @@ window.hkMacPopup = function(){
       '<div style="min-height:34px;display:flex;align-items:center;justify-content:space-between;padding:6px 16px;background:var(--surface2,#1c1d20);border-bottom:1px solid var(--line,#333);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted,#888)">'+
         '<span>\u2318 mac keys \u2014 one motion, every excel</span><a id="hkMacX" style="cursor:pointer;font-size:15px">\u00d7</a></div>'+
       '<div style="padding:16px 20px;font-size:12.5px;line-height:1.8;color:var(--muted,#999)">'+
-        '<div style="color:var(--text,#eee)"><b>\u2318 = Ctrl</b> \u2014 \u2318C \u00b7 \u2318B \u00b7 \u2318\u2193. <b style="color:var(--accent,#2ea36f)">\u2325 walks the ribbon</b> \u2014 \u2325 e s v pastes values, same letters as Windows Alt and Mac Excel\u2019s new KeyTips. <b>\u2318T</b> = F4 anchors \u00b7 <b>\u2303U</b> = F2 edit.</div>'+
+        '<div style="color:var(--text,#eee)"><b>\u2318 = Ctrl</b> \u2014 \u2318C \u00b7 \u2318B \u00b7 \u2318\u2193. <b style="color:var(--accent,#2ea36f)">\u2325 walks the ribbon</b> \u2014 \u2325 e s v pastes values, same letters as Windows Alt and Mac Excel\u2019s new KeyTips. <b>fn+F4</b> = cycle anchors \u00b7 <b>\u2303U</b> = F2 edit.</div>'+
+        /* r452 (audit P0-4/P0-5): the chords Mac Excel does NOT put on \u2318, plus the ones the
+           browser and macOS take before the sheet ever sees them. */
+        '<div style="margin-top:12px;padding-top:11px;border-top:1px dashed var(--line,#333);color:var(--text,#eee)">'+
+        '<b>Not on \u2318 in Mac Excel:</b> <b>\u2303Space</b> select column (\u2318Space is Spotlight) \u00b7 <b>\u2303\u2318V</b> paste special \u00b7 <b>\u2318\u21e7T</b> AutoSum (there is no Alt+= on Mac) \u00b7 <b>\u2303`</b> show formulas \u00b7 <b>\u2303H</b> find &amp; replace (\u2318H hides the app).</div>'+
+        '<div style="margin-top:11px;color:var(--warn,#d9a441)">Chrome keeps <b>\u2318T</b> (new tab) and <b>\u2318\u21e7T</b> unless you are in fullscreen \u2014 so <b>fn+F4</b> is the anchor chord we teach here, with \u2318T as the fullscreen alternate.</div>'+
         '<div style="margin-top:12px;padding-top:11px;border-top:1px dashed var(--line,#333)">'+
         '<b style="color:var(--warn,#d9a441)">Real Excel for Mac:</b> update Office, then tap \u2325 \u2014 KeyTips light up the ribbon. F-keys need <b>fn</b>, or flip \u201cUse F1, F2\u2026 as standard function keys\u201d in System Settings \u2192 Keyboard.</div>'+
         '<div style="margin-top:11px;font-size:10.5px;color:var(--faint,#666)">same boards, same pars, every platform</div>'+

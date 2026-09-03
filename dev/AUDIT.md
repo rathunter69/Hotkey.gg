@@ -1,5 +1,412 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r452 — THE FULL LOCAL GATE ON THE MERGED BRANCH (close of the build day)
+
+_gate.yml runs only on PRs and pushes to main, so the branch never saw CI. The whole matrix ran
+locally on the merged tip (fourteen streams merged): cache-versions · secrets · invariants (C1–C25)
+· outbox · smoke (+19 pages at 390px) · lb 36 · paywall · landing 28 · deeplink 18 · visual 406 ·
+behavioral replay · parity 189 · onboard 73 · replay ALL 74 · alt-paths 160 · mac 30 · rapidfire ·
+guided 77 · formulas 102 · grid-height · startgate · resize 34 · pause · drill-page drift —
+**23 green, 1 red**: the drift step found `drills/colops.html` resurrected by a worktree merge
+(the perf pass had deleted it; the bug-sweep worktree predated that). Deleted again; the generator's
+orphan assertion is exactly the guard that caught it. Log: `.gate-r452.log` (untracked)._
+
+## r452 — LANDING V2: learn by doing, Daylight by default, the PRO door
+
+_Scope: the `.landing` block in `index.html` — markup, CSS and its small JS — plus one long-standing
+deep-link bug the rework was required to absorb, a new guard (`dev/check-landing.js`) and a `URL=`
+override on the last harness that lacked one. Spec: `dev/BETA_RETIRE_LANDING.md`
+Part II; mock: `art/landing-mock.html` (Wolf-approved 2026-09-03, with three changes, all made).
+The r134 pre-launch curtain is untouched here — a parallel r452 change owns its retirement._
+
+### WHAT REPLACED WHAT
+
+r314 stripped the landing from a marketing splash to a 16-line start prompt because the curtain did
+the explaining. With the curtain going, that prompt becomes the **entire** first impression and it
+explains nothing — the real explanation lives on `About.html`, a page most visitors never click.
+
+Landing v2 is still the **r65 dialog over the live trainer** — `position:fixed`, fades out on
+`.gone`, `Enter` hands off to the grid with no navigation — it is just full-bleed and scrollable
+now. One screen answers "what is this" (hero + CTA, above the fold at 1280×800 **and** 390×844);
+the page below it answers "why should I" (how it works · the catalog · pricing · the board ·
+desks · close). **The CTA calls `tryEnter()`** — the same function `#startBtn` called before, so
+Enter → guest session → tour → first drill is byte-for-byte the path it was. The close CTA
+(`#startBtn2`) is wired to the same door.
+
+Two dead things went out with it: the duplicate `.landing h1` rule (`:1882` 23px vs `:1913`
+clamp — leftover from the r65 dialog experiment), and the stale "floating themes button" comment
+over a second copy of `.landing .micro`.
+
+### THE THREE WOLF CHANGES
+
+**1 · Daylight first.** `themes.js` already applies `daylight` unconditionally for a fresh device
+(r293) and it runs at `index.html:1962`, *before* the landing markup is parsed — so there is no
+flash and no new default to set. What was needed was the design order: every token pairing on this
+page was chosen against Daylight's warm paper (`--bg #dbd8d1` / `--surface #ecebe6` /
+`--accent #16a862`) and then verified on Graphite. Two rules are theme-conditional, both keyed off
+the `data-dark` attribute `applyTheme()` already sets, so all 27 palettes are covered without a
+per-theme table: the CTA's `↵` keycap tint, and the sheet's input-blue. One fix came straight out
+of looking at the dark render — the rail's `free` badge was drawn in `--accent-dim`, which
+vanishes on `--surface` in dark; it is `--accent` on an `--accent-dim` border now.
+
+**2 · The PRO door is visible.** A `pricing` band sits between the catalog and the board:
+*"Free today. PRO when billing opens."* It states what is true now (the whole catalog is open),
+what changes (the back four chapters), by how much (the live premium count of the live catalog
+total), and links to `billing.html`. It is deliberately **not** the paywall UI — no lock glyphs,
+no `#paywallModal`, no `.pk-lock` / `.pk-protag` classes (`check-paywall §1` counts those inside
+`#pkGroups` and must keep reading zero), and **no dollar figure in either flag state**, because
+Stripe is not live and `check-paywall §3/§4` hold that line on every other upgrade surface. The
+side panel says so out loud rather than leaving a blank: *"No price yet. Payments are not live, so
+we are not quoting a number we cannot charge."*
+
+**3 · Learning by doing, argued.** "How it works" leads with **"You don't learn this by
+watching."** and a two-column contrast — *the usual route* (sit through a class or a video at
+1.5×; memorise a sheet of chords; open a real file on Monday and reach for the mouse anyway)
+against *hotkey.gg · three minutes, start to graded* (a real page opens; you build it with the
+keyboard, clock running; you're graded on the finished sheet and the time goes on a board). The
+three original beats follow it as the detail, not the pitch. House voice held: lowercase
+confidence, numbers instead of adjectives, no hype, and the guard asserts zero exclamation marks
+on the whole surface.
+
+### EVERY NUMBER IS DERIVED — `paintLanding()`
+
+Nothing countable is typed into the markup. `paintLanding()` (next to the existing landing wiring)
+writes the hero lede's total, the catalog `h2`, all eight rail cards with their per-chapter counts,
+the rail note, and the whole PRO band from:
+
+```
+HOTKEY_DRILLS.groups / .menuOrder / .meta     chapters, counts, the board panel's drill label
+HOTKEY_CAMPAIGN.chapters                      the subtitled display names (Models I · Valuation)
+hkPremiumGroups / hkPremiumCount / hkCatalogCount / hkPremiumOn      the paid tier, both states
+HOTKEY_PARS + HOTKEY_CLOCKS                   the medal clocks in the proof panel
+```
+
+The rail badge derives from `hkPremiumOn()`, so it reads **"free right now"** today — honest,
+because with the flag off all 74 are playable — and relabels itself to **PRO** the day the flag
+flips, with no copy edit. Both states are walked through `?premium=preview`; the flag itself is
+never edited to run a test. Live figures at this commit: 8 chapters, 74 drills, 40 of them in the
+four `HOTKEY_PREMIUM` chapters.
+
+The proof panel deliberately shows **medal clocks derived from the live par ladder**
+(legendary = par×1.0 · pro = par×1.15 · pass = par×1.5, with `HOTKEY_CLOCKS` overrides) rather
+than a leaderboard. The spec offered a live board read; a landing that invents handles to look
+populated is worse than one that shows real thresholds, and a Supabase read on the most-tested
+page in the tree buys a network dependency for a decoration. Live rows stay on the table for a
+round that wants them.
+
+### THE HERO STILL — why it is not `playDemo()`
+
+Static, hand-built, theme-tokened (spec §4a, and what the mock implements). The machinery for a
+real replay genuinely exists — `playDemo()` walks `CHALLENGES[cur].demo` through `demoKey()` and
+all 74 drills ship a demo script — but it drives the **real `#grid`, which sits under this
+dialog**, calls `loadChallenge(cur)` twice and `hkGateClear()`, and `ghostCurTick` bails while
+`demoPlaying`. Running it under the landing means either un-blurring the backdrop (the landing
+stops being a dialog) or mounting a second engine instance. Both are a round of their own. Static
+costs nothing at first paint, renders identically with `sb === null`, and is screenshot-stable for
+the gate.
+
+### THE DESK-INVITE PREVIEW: a bug that could never have fired
+
+`dev/BETA_RETIRE_LANDING.md` §1 flags that the `?desk=CODE` preview writes into a `.lede` r314
+deleted. It is worse than that — walking it showed **two** faults, and fixing only the first
+changes nothing:
+
+1. no `.lede` existed, so the write fell through to a toast;
+2. the only caller is `handleDeepLink()`, which `advanceAccess()` runs **immediately after
+   `dismissLanding()`** — the landing was already `.gone` before the RPC could resolve, so the
+   "landing not visible" fallback was the only branch reachable in production, ever.
+
+Landing v2 ships a `.lede` (the hero's two-sentence line) and the read is now also fired at boot
+off `__sbReady`, while the landing is still up, latching on the call that actually issues the RPC
+so the post-Enter call cannot toast twice. Guarded end to end with a stubbed `preview_desk`.
+
+### GUARD: `dev/check-landing.js` (new, 28 assertions)
+
+Landing v2's failure mode is drift in the derivation, not typos in the copy, so the derivation is
+what gets asserted — the `e2e-smoke` drill-count pattern, applied to a rendered page. It covers the
+landing half of spec §7: rail chapters and per-chapter counts against `HOTKEY_DRILLS.groups`, their
+sum against `menuOrder.length`, the derived `h2` and lede, the badge tracking `hkPremiumOn()` in
+**both** states, the PRO band's chapters/counts/`billing.html` link and the no-price line in both
+states, CTA above the fold with no horizontal scroll at 1280×800 and 390×844, Daylight on a fresh
+device, the CTA being a real enabled `<button>` that runs `tryEnter()`, headings in descending
+order, `html.hk-returning` still hiding the landing, the `?desk=` write, and zero page errors.
+`dev/e2e-audit-visual.js` also picked up the `URL=` override it was still missing (the r438
+`e2e-audit-onboard` pattern) — it was the last harness hard-coding 8791, so a gate run from a
+worktree was silently measuring whatever another checkout owned that port. Found the hard way.
+
+### RENDERS (served on :8799, curtain passed with the device flag it already honours)
+
+`landing-live-1280-daylight[-full].png` · `landing-live-1280-dark[-full].png` ·
+`landing-live-390-daylight[-full].png`. CTA bottom 420px at 1280×800 and 436px at 390×844; page
+scrollWidth == clientWidth at both. The 390 render suppresses the phone gate (`index.html`, a
+separate z:400 surface) so what is captured is the landing itself — which still has to read on a
+phone, because that is the share surface.
+
+### SUITES (worktree served on :8799)
+
+| suite | result |
+|---|---|
+| `check-invariants` | STATIC INVARIANTS: clean |
+| `e2e-smoke` | ALL 7 PAGES CLEAN + skin-unlock · drill-count matches menuOrder (74) |
+| `check-paywall` | clean — dark with the flag off, complete with the preview on |
+| `e2e-audit-onboard` | ALL 67 PASS (baseline 67 — no assertion edited; T2's landing probe is `/enter\|start\|train/i`, which "Press ↵ to start" still satisfies) |
+| `e2e-audit-visual` | 108 FAILURE(S), 271 PASS — **identical to baseline**, re-run against HEAD's `index.html` on a separate port. Pre-existing grid font-swatch and applied-border contrast on `phoebes` / `crimson` / `tangerine`; nothing on the landing, which this matrix does not measure |
+| `check-cache-versions` | clean (no versioned asset touched — the landing lives entirely in the unversioned `index.html`) |
+| `check-landing` | ALL 28 PASS (new) |
+## r452 — THE KEYBOARD TOUR: wave 0 platform + the six-stage tutorial board
+
+_Spec: `dev/TUTORIAL_CHAPTER_SPEC.md` v2 (2026-09-03), §6 WAVE 0 + §3.0.1–3.0.6. Decisions taken
+as accepted by the orchestrator: **T1** untimed with a one-time +25 xp bounty · **T2** the Tour
+replaces BOTH the modal tour's Excel beats AND the warm-up sandbox · **T3** stage 5 forces the
+ribbon overlay on. The four LESSON DRILLS (§3.1–3.4) are NOT in this build — the catalog stays at
+74 and `drills.js` is untouched._
+
+### THE HEADLINE: the first thing a novice meets is a board that teaches, not a modal that talks
+
+`keyboardtour` is **one board, six stages, twenty-four beats, no clock**. It is not a drill: it has
+no `par`, no `parKeys`, no `demo`, no `req`, no `guide`, no entry in `drills.js`, no leaderboard, no
+PB, and it is not in the marketing count (still **74 banker-grade drills**). It hangs off the drill
+engine and is the **first consumer of the r421 §2.5 origami tier ladder** — platform code that has
+existed since r421 with nothing using it.
+
+The surface that makes it different from a drill is the **TUTORIAL HUD** (§3.0.2): a persistent
+banner over the grid that names the NEXT KEYSTROKE, one beat at a time, the way a pixel-art game
+walks you through its controls. A drill states an outcome and lets you struggle; the Tour states the
+key and waits for it.
+
+### WHAT WAS BUILT, BY SPEC SECTION
+
+| spec | what shipped | where |
+|---|---|---|
+| §3.0.2(1) banner | `#tourHud` — fixed, bottom-center, one line + keycaps, pulses 400 ms when a beat clears, re-measured every render. **Never covers the active cell or the beat's target**: both ends are measured and the smaller overlap wins (`hkTourHudPlace`), and the flipped position is clamped below the ribbon bar | `index.html` CSS + `hkTourHudShow` / `hkTourHudPlace` |
+| §3.0.2(2) spotlight | free, by declaring `targets` — `currentTargetRange()` and the `.ttarget` render branch are untouched; the Tour adds a **pulse class** to `.ttarget`, not a new class | render branch |
+| §3.0.2(3) nudge | `hkTourKeyWatch` — a PASSIVE observer above every game branch. It latches the beat's keystroke gate, counts consecutive wrong keys, and adds the second HUD line on the third. It never `preventDefault`s and never returns: every key still reaches the live sheet. Resets on a correct key and on beat completion; never escalates to a third line | keydown handler |
+| §3.0.2(4) stage cards | six §1.5 lesson cards over the dimmed board, any key dismisses | `hkTourStageCard` |
+| §3.0.2(6) reduced motion | the HUD pulse and the `.ttarget` pulse are inside `@media (prefers-reduced-motion: no-preference)` with a static `reduce` branch — the precedents at the gate card, the maze nudge and the ghost cursor | CSS |
+| §3.0.3–3.0.4 staging | five `tiers`, one per stage 2–6. Each reveals ONE contiguous, EMPTY region, so no parked box ever swallows live data | `build().tiers` |
+| §3.0.4(4)(6) | `checkWin` bails on `tourMode` (one edit removes the clock stop, results card, PB, ghost, streak, campaign xp, band xp and `recordRun`); `startClock` refuses `tourMode`; `hkGateArm` declines it and `startKeyboardTour` calls `hkGateClear()` — the r450 rationale comment re-pointed from the sandbox | engine |
+| §3.0.4(7) | +25 xp paid ONCE via the `hk_xp_est` + `hkStatePush` ☆-bounty pattern, latched on `hk_tour_done_v2` | `hkTourFinish` |
+| §3.0.4(8) | `startKeyboardTour()` is `obStart`'s handler and the "basically none" destination; the ? sheet gains **▶ the keyboard tour** beside ↻ replay the tour | onboarding + `openKbd` |
+| §3.0.5 | all 24 beats with their exact label / HUD / nudge strings and gates | `HK_TOUR_BEATS` + `CHALLENGES.keyboardtour.checks` |
+| §3.0.6 | `.cl-inner` "your checklist" folds into stage 1 (a callout INSIDE the panel it names, fired when the panel first renders at beat 3); `#hintsToggle` "stuck?" into stage 4's card footer; `.drillbar` "moving around" into the stage-6 hand-off card | `HK_TOUR_STAGE_NOTE`, `hkTourChecklist` |
+| §1.5 | the lesson card built **generically** — the Tour's stage cards and the hand-off card use it today, and on a drill declaring `lesson:{title,body,keys}` the card IS the r450 start gate (one keypress dismisses it AND starts the clock, `hk_lessons_off` turns it off forever, the ? sheet reopens it). No lesson drill ships yet; the surface is ready for the wave that adds them | `hkLessonCard` / `hkLessonMaybeGate` / `hkLessonKey` |
+| §1.7 | the comfort answer now ROUTES the session: **0** → the Tour → drill 1 · **1** → offered the Tour in one line, skippable · **2** → straight to the drills, the Tour on the ? sheet | `showComfort` / `dismissLanding` / `hkTourOffer` |
+| T3 | stage 5 forces `hk_ribbon_bar` on for its duration and hands the player's own setting back at Tour end (undefined-vs-null sentinel: `getItem` returns `null` for an unset key, so `null` cannot double as "not parked") | `hkTourRibbonForce` |
+| hand-off | `loadChallenge('navigation')` with **guided OFF** (the Tour was the hand-holding) and **hints ON** (a hinted run still posts, which the r450 guided hand-off could not say). The r450 guided one-shot and the from-zero rails ramp both stand down once `hk_tour_done_v2` is set | `hkTourHandoff` |
+
+### WHAT WAS RETIRED (T2) — 165 lines of index.html, one whole suite
+
+| gone | lines |
+|---|---|
+| `startSandbox` · `sandboxReadyCard` · `sandboxCallout` · `exitSandbox` · `sbCell` (the r238 throwaway sandbox) | 60 |
+| `startOnboardBoard` (the r303 cleared practice board the modal tour ran on) | 39 |
+| `startGuidedIntro` + `introRibbonPeek` (the ribbon PEEK is now stage 5 — live and hands-on) | 25 |
+| `TOUR_STEPS[0..6]` — five r303 `novice:true` fundamentals + two r292 chord beats — and the three §3.0.6 beats that fold into the Tour | 19 |
+| `buildTourPlan`'s now-dead `novice`/`hk_xlv` gate | 2 |
+| `dev/e2e-onboard-sandbox.js` | 68 |
+
+`sandboxMode` **the variable stays** (§8 do-not-change #6): `checkWin`, `updateChecklist` and
+`loadChallenge` all read it, and the Tour runs on its own `tourMode`. What is left of `TOUR_STEPS`
+is the five-beat PRODUCT tour, which is what a player who skips the Keyboard Tour still gets.
+
+### THE ONE TRAP THE SPEC DID NOT SEE
+
+`MENU_ORDER` falls back through `CHALLENGES` for any key not in `drills.js` — so adding
+`CHALLENGES.keyboardtour` would have **silently adopted a four-minute untimed tutorial into the
+catalog**: the picker, the drill count, prev/next, the random pool, the weekly bag. The fallback now
+filters `tour:true`, `dev/e2e-smoke.js`'s HOTKEY_PARS parity scan skips the same flag, and C15 fails
+the build if either exclusion is ever dropped.
+
+### DEVIATIONS FROM THE SPEC (§0: named, never silent)
+
+Each is an engine fact the spec's line-anchored survey missed. All seven are also recorded inline in
+the `CHALLENGES.keyboardtour` header, where a later build agent will actually read them.
+
+- **(a) The cells stage 5 dresses ship UNDRESSED.** §3.0.1 lists `A3:E3` bold and `A4:E11` comma/0dp
+  at stage 1, and §3.0.5 stage 5 grades exactly those two properties. Shipped as §3.0.1 describes,
+  three of stage 5's five beats are pre-satisfied and cannot be performed. §3's own page grammar
+  says "pre-dressed unless the lesson IS the dress" — and stage 5 IS the dress.
+- **(b) Beat 18 drops "no decimals".** `Ctrl+Shift+1` writes comma at **2 dp** in this engine
+  (`index.html`, Excel's own behavior), so a one-press beat cannot land 0 dp. The beat grades the
+  comma style; the label and HUD say so.
+- **(c) Beat 22 teaches `alt h b p`, not the spec's `alt h b t`.** In this engine — and in Excel, per
+  the r298 CANON note on the border gallery — `alt h b t` is the THICK BOX and `alt h b p` is the top
+  border. The spec's chord would have taught a wrong key.
+- **(d) Beats 11, 13 and 16 name the selection the chord needs.** Row insert/delete fire only from a
+  full row/column selection, and `Alt+=`'s committed range form takes a single column or row through
+  its empty total. The spec's HUD lines ("press ctrl+− to delete the whole row", "select the row and
+  press alt+=") would have left a player pressing a key that does nothing.
+- **(e) The `Total` label reveals with the ROSTER (tier 1, top of stage 3), not with the FY header at
+  stage 4.** Stage 3's fifth beat inserts a line ABOVE the total line, so the total line has to be on
+  the board while that beat is open — and a tier's parked region is the bounding box of its reveal
+  cells, so pairing `A12` with `F3` would have dimmed the whole live table between them. Each tier
+  now reveals one contiguous empty region and every tier's checks are exactly its stage's beats.
+- **(f) The two memo blocks carry their title one row above the spec's range** (`G2` over the `G3:I6`
+  select memo, `G7` over the `G8:I11` house-style memo) — four lines plus a block title do not fit in
+  four rows.
+- **(g) Stage 4's and stage 5's card bodies are trimmed to the 60-word cap §1.5 sets and §7 asserts**
+  — §3.0.5 writes them at 61 and 70 words. Only chords came out, and every one is still on the card's
+  keycap strip.
+
+Two readings worth recording, neither a change to the spec's intent:
+
+- §1.7's **"'I live in it' → straight to the picker"** is implemented as *straight to the drills* —
+  the short product tour over the live first drill, no Keyboard Tour, with the Tour on the ? sheet.
+  Auto-opening the picker modal over a freshly gated board would put a dismissable modal between a
+  self-declared expert and the r450 start gate, which is the opposite of what that answer asks for.
+- §3.0.2(2)'s prose says a chord with no grid target (Ctrl+S, Ctrl+Home, Ctrl+Z) returns a `null`
+  target; §7's invariant says **exactly one** entry is null. §7 governs: Ctrl+Home rings `A1`,
+  Ctrl+End rings the used-range corner, Ctrl+Z rings the row it restores, and only stage 6's save —
+  which genuinely has no cell — is `null`.
+
+### INVARIANTS (`dev/check-invariants.js` C15, +184 lines)
+
+The Tour is not a drill and nothing structural stops a later edit from making it one, so the
+exclusions are asserted one by one: `menuOrder` · `HOTKEY_PARS` · `HOTKEY_CLOCKS` ·
+`HOTKEY_CHALLENGE_POOL` · `HK_PLACEMENT.KEYS` · every `HK_TRACKS[].keys` · every campaign chapter ·
+every `drills.js` group and `meta` entry · and the `tour:true` filter on MENU_ORDER's fallback.
+Then its shape: `tour:true`, no par/parKeys, no `saveClose`, 24 beats, 24 targets with **exactly
+one** null, 5 tiers whose every check index is inside the beat array, 6 stage cards each ≤60 words
+with a non-empty keycap strip, 24 HUD lines (≤14 words, none empty, no two consecutive alike) and
+24 nudge lines. Then the six **runtime seams** it hangs off — each of which was a live bug during
+this build, and each of which fails with a sentence saying what breaks. Then the retirement: every
+sandbox function must stay gone, `sandboxMode` must stay, `e2e-onboard-sandbox.js` must not return.
+
+The second half is the **lesson-drill contract** (§1.5/§1.6/§2) — `lesson`↔`meta.lesson` parity,
+≤60-word bodies, `reveal:true` on the ☆ and on NO non-lesson drill, 2–4 core beats, par ≤ 30,
+`pass = par×2.0`, out of the daily pool and the placement series. Zero cases today, deliberately:
+it is written with the platform so the wave that adds the four drills inherits it (WORKFLOW §3.3).
+
+### SUITE RESULTS — old → new
+
+| suite | before | after |
+|---|---|---|
+| `check-invariants` | clean (C1–C14) | **clean** (C1–C15, +C15's 40-odd assertions) |
+| `check-startgate` | clean, §8 keyed the sandbox | **clean** — §8 now keys the Tour (never gated, no clock to run, keys never start one) and §8b proves the lesson card IS the gate |
+| `e2e-smoke` | 7 pages + skin-unlock | **7 pages + skin-unlock, 74 drills** |
+| `e2e-audit-onboard` | 64 assertions over the modal tour + sandbox | **rewritten, ALL 71 PASS** — per-beat HUD text for all 24 beats, six stage cards and their reveals, the checklist's staging, the nudge, the ribbon force + restore, the +25 xp, the hand-off |
+| `e2e-guided` | ALL 77 PASS (72 railed) | **ALL 77 PASS (72 railed)** |
+| `e2e-demo-replay navigation combo foot` | ALL GREEN | **ALL GREEN** |
+| `e2e-audit-parity` | ALL 177 PASS | **ALL 177 PASS** — the Tour changes no engine input semantics |
+| `check-cache-versions` | clean | **clean** (no versioned asset touched — `drills.js`, `nav.js`, `themes.js`, `nav.css` are all untouched) |
+| `e2e-onboard-sandbox` | 68 lines | **retired** |
+
+### RENDERS (Daylight + Tokyo Night, 1440×900)
+
+`tour-stagecard-*` (stage 1's lesson card over the dimmed board) · `tour-s1b1-*` (the HUD at stage 1
+beat 1, checklist deliberately absent) · `tour-nudge-*` (stage 1 beat 3 with the three-miss second
+line, the checklist showing only that stage's five beats with its folded-in callout) ·
+`tour-stage5ribbon-*` (the lean ribbon bar forced on, KeyTip chips lit, the HUD below it) ·
+`tour-handoff-*` (the hand-off card with the +25 xp line).
+
+Two things the renders caught and the code now fixes: the roster's `DUPLICATE — delete` label
+clipped in column A (column A is widened at build), and the folded-in checklist callout landing on
+top of the HUD in the shared bottom-center lane (it is a line inside the checklist panel now, and
+any other toast is lifted clear of the banner while the Tour owns the board).
+
+---
+## r452 — BUG SWEEP: the grid re-fits on resize · locked deep links explain themselves · billing's catalog · mobile overflows · the toast above the tour
+
+_Fixes for the read-only sweep in the r452 audit brief. Every finding below carries its audit id.
+Out of scope by instruction: **P0-1** (legal placeholders — needs Wolf's entity facts), **P1-2**
+(Escape / auth modal — owned by the Mac-parity agent), **P2-8** (the beta curtain — already deleted
+on this branch)._
+
+**P1-1 · the sheet never re-fit on a window resize.** `index.html:23045` + `28047-28100`. Three
+faults in one r409 block: the ResizeObserver handle lived on `S._gridRO`, and **every**
+`loadChallenge()` rebuilds `S`, so after the first board change the observer's only reference was
+dropped; the callback compared `clientHeight` **only**, so a width-only shrink — dragging a window
+narrower, opening devtools, rotating a tablet — was ignored; and there was no `resize` listener at
+all. Measured: 1440×900 → 960 left the grid at scrollWidth **854 in a 650px wrap** (+204), while a
+FRESH load at 960 fits at 640. The observer is now `window.__gridRO` (installed once, per document),
+the guard compares **both axes** against a new `S._renderedGwW`, and a 120ms-debounced `resize`
+handler re-runs `render()` on the same two-tick pattern `__fsRefit` uses. Guard: **`dev/check-resize.js`**
+(new, 27s, engine lane) — 34 asserts, **14 of which fail on the pre-fix tree**. Its central invariant
+is *parity with a fresh load* rather than an absolute width, so the r333 `__noShrink` exemption and
+the 40px column floor cannot be blamed on, or hidden by, the resize path.
+
+**P1-7 · `?drill=<locked key>` landed on Navigation maze in silence.** `index.html:30519-30559`
+(new `hkExplainStartFallback`), `30185-30206` (the gate/paywall branch), `30997/30976` (boot).
+All 74 public SEO drill pages, the `drills/` library and every "next drills" rail point at
+`index.html?drill=<key>`; a visitor with no PBs has **49 of 74 locked**, so two thirds of organic
+landing traffic arrived on the wrong board with no toast, no modal and no copy. `loadChallenge()`
+did call `openGateInfo()` — but at boot there is no board yet and the marketing landing owns the
+whole viewport (`landingOpen` stays true until Start), so the card was painted **behind the
+landing**, explaining a board the visitor could not see. Fixed at both ends: the boot branch now
+raises the card only when a board is already on screen, and the deep link is remembered and
+explained once the visitor can actually see the trainer — a toast naming the lock ("WACC opens at
+level 7 · 18 pace clears — starting you on Navigate") followed by the gate card. Respects the r452
+`hkPlacementRide` predicate and the r450 paywall branch (a board that RODE the gate reaches the
+helper with `cur === want` and nothing is said). Guard: **`dev/check-deeplink.js`** (new, ~25s,
+always-on) — 18 asserts including the *control* cases (an unlocked deep link and a plain load must
+stay silent); **5 fail pre-fix**.
+
+**P1-3 · `billing.html` and `drills.js`.** Already fixed on this branch (`billing.html:105`, r450
+loads the catalog so the plan's included-list is derived). What was missing was the net: `dev/e2e-smoke.js`
+only ever read `console` messages of type `error`, so nav.js's "drills.js not loaded — profile modal
+will be empty" **warning** on every single load was invisible to CI for a full release.
+`dev/e2e-smoke.js:41-47` now fails on warnings too, same ERR_/supabase carve-out.
+
+**P1-5 / P1-6 · two pages scrolled sideways on a phone.** `About.html:78-84` — `.hero-glow` is 760px,
+absolutely centred, and escaped an unclipped `.hero` (measured left −192, right 568): `overflow:hidden`.
+`stats.html:73-78` — six rarity chips in a non-wrapping `inline-flex` reached right:691 against a
+390px viewport: `flex-wrap:wrap`, `max-width:100%`, and the 14px indent drops under 560px. Guard:
+`dev/e2e-smoke.js:9-19,50-84` — the hand crawl encoded, **all 17 top-level pages at 390×844,
+`scrollWidth == clientWidth`**, and on failure it names the widest escaping element rather than
+printing a bare pixel count.
+
+**P1-4 · `dev/e2e-audit-visual.js` was 108/379 RED on a clean tree** — 27 themes × 4 assertions,
+identical everywhere, which is the tell that the harness and not the product had drifted. Three
+probe faults, all repaired, none re-thresholded: (a) `parseColor` could not read
+`color(srgb r g b / a)`, which is how Chromium serialises `#grid td`'s `color-mix(in srgb, …)`
+gridline — 54 of the 108 failures were this one missing branch; (b) the sheet background moved off
+`.gridwrap` (now transparent, carrying only the light-sheet variable overrides) down to `table#grid`,
+so every swatch was scored against `rgba(0,0,0,0)` ≡ **black** — hence "black" at 1.38:1 and
+darkgray at exactly 2.03:1 on all 27 themes; the probe now walks up to the first ancestor that
+actually paints; (c) applied-border ink left `boxShadow` for the r442 `::after` overlay, so it read
+`none` — the probe reads the pseudo-element, **and its width**, so a collapsed overlay (the r442 bug
+class) cannot pass as ink. Re-baseline: **ALL 406 PASS in 18s. Zero real theme-contrast defects on
+any theme** — the whole 108 was harness rot. Tightest margins across all 27: gridline vs sheet
+**1.17** (floor 1.15), blue fill vs sheet 1.55, gray swatch 3.35, everything else ≥3.6. Wired into
+gate.yml **always-on**, not the engine lane: what it guards is themes.js and the sheet CSS, and
+themes.js is a cosmetic-lane file — the same argument the paywall step makes for billing.html.
+
+**P2-1 · a toast fired during the tour rendered under the scrim.** `index.html:900-912`. `#hkToast`
+was z-index 220, `.tour-wrap` is 340; `elementFromPoint` at the toast's centre returned `tourWrap`.
+Not cosmetic: the tour's ENTRY and DO-IT beats deliberately pass real grid keys through, and
+`openGateInfo` degrades to a **toast** mid-tour by design (r174) — so the one message the tour cannot
+show as a modal was the one it most reliably hid. Raised to 360. Asserted in `check-deeplink.js §2`
+(the hit test lifts the toast's `pointer-events:none` for the probe, because `elementFromPoint`
+skips such elements and would otherwise "fail" at any z-index).
+
+**P2-4 · the `?` sheet mis-described F1 and omitted three real shortcuts.** `index.html:28925-28948`.
+F1 was labelled "toggle guided hints (paint-by-numbers walkthrough)"; it calls `toggleHints()` —
+tips only, no cursor lock. The walkthrough is a separate control (the ⤲ guided button; `g` is its key
+only inside a rapid-fire/marathon session, and a literal `g` on a classic board — so listing bare `g`
+under "while training" would have been a second, opposite lie). Two accurate rows now, plus
+**Alt/Ctrl+PgUp/PgDn** (`stepSheetTab` — walk the current chapter) and **Esc · Esc** (restart; the
+engine already toasts "esc·esc restarts" while the sheet offered only Shift+F11).
+
+**P2-6 · two malformed chords in `refmap.js`.** `dev/build-drill-pages.js:79-121`. The extractor let
+an Alt ribbon walk survive past the end of a demo STEP, so plain letters typed in the *next* step
+were appended as if they were ribbon mnemonics: `sort` demos Alt A S D E and then types a deal name,
+publishing `ALT>A>S>D>E>R>I>D>G>E` and `ALT>A>S>D>E>D>E>L>T>A`. Inert today (reference.html only does
+exact lookups) but the same mis-segmentation *consumes* a real chord whenever typed text follows a
+walk — the honest form never gets emitted at all. A walk is always contained in one step (the next
+step re-selects a cell), so it is closed at the step boundary. Regenerated: `refmap.js` loses exactly
+those two keys and keeps `ALT>A>S>D>E`; `drills/sort.html` loses the two bogus chips; **no other page
+changed**. `refmap.js?v=1 → v=2` in `reference.html`.
+
+**P2-7 · `cert.html` told a valid holder their link was malformed.** `cert.html:99-104`. `!id || !window.sb`
+was one branch printing "No certificate id.", so opening a perfectly good `cert.html?id=<real id>`
+while the backend was unreachable sent the holder hunting for a better link that does not exist.
+Two causes, two messages.
+
+**Recorded, not fixed** (new, out of scope): `pastes` overruns its frame by ~31px on a **fresh** load
+at 960 (681 in a 650 wrap) — three columns hit the elastic fit's per-column 40px floor, so the
+proportional shrink cannot reach `__availW`. Unrelated to resize; `check-resize.js` prints it as a
+NOTE rather than widening a threshold to hide it.
+
 ## r450 — THE PAYWALL, BUILT DARK: one entitlement point, a locked catalog, and the Stripe wiring inventory
 
 _Scope: the COMPLETE premium user experience behind `HOTKEY_PREMIUM.enabled`, which stays **false**.
@@ -134,6 +541,531 @@ read: **synchronous** (called ~74× per picker paint — resolve async, cache, r
 on error** (a failed read locks; the reverse is a free-catalog incident), and **not the authority** (RLS
 and the RPCs are; this is presentation, and a user who edits `localStorage` sees unlocked cards and gets
 nothing else).
+## r452 — CARD FRAMES: THE PIXEL PASS ACROSS ALL 31 SKINS (dev/FRAME_PIXEL_PASS.md)
+
+_Wolf 2026-09-03: "I love the pixel art card mock ups — implement fully across the board."
+Decisions applied as taken: **D1** 3px grid at `.hk-frame-lg`, 2px compact · **D2** cut particle
+blur/glow, keep the card's ambient shadow · **D3** PRO and Founder go pixel too, buying prestige
+back with a finer grid and the denser field `elabFor` already gives their tier._
+
+Presentation only. **No skin id, earn gate, title, notch/tab layout, fx-kind name or render size
+moved** — ids are frozen because earned skins persist in `profiles.flair`, and a renamed id
+silently un-skins a paying founder.
+
+### What changed, by skin class
+
+| class | skins | treatment |
+|---|---|---|
+| Rank ladder — engraved + 4 plaques | `engraved` `plaque-bronze/silver/gold/plat` | metal border → `repeating-linear-gradient(45deg)` in 6px stepped bands; interior → 3 solid stops at 160°; `sheen` raked highlight now quantized, its diagonal edge a chunky pixel staircase |
+| Rank ladder — pinnacle | `heraldic` `plaque-diam` | 16 hard conic sectors; heraldic's Cylon arc re-cut as four hard 15° cells so its 6s `steps(24)` orbit advances exactly one cell per step — a scanner, not a smear; embers are square sprites; the lozenge is a hard 1-cell diamond |
+| Prestige / paid | `pro` `founder` `foil` | **px:2**, the finest grid in the suite (D3). Nebula clouds and the 7 lissajous oil blobs become hard-edged banded discs; the "never visibly loops" incommensurate ratios survive untouched |
+| Epic + rare cosmetics | `circuit` `neon` `blueprint` `crt` `constellation` `vaporwave` `terminal` `sakura` `goldenhour` `pearl` `emerald` `amethyst` `bloom` `cottoncandy` | grid-based fx (circuit traces, CRT columns, blueprint cells, drive horizon, draft grid) were already axis-aligned and snap for free; petals/bokeh/puffs/sparkles become square sprites on a 3-frame rotation cycle |
+| Legendary | `noir` `frostbite` `molten` `onyx` `architect` `boutique` | 16-sector borders; boutique's lattice and gold studs read crisply; onyx's border stays deliberately still |
+| Easter egg | `bone` | **NO CHANGE.** It is the still card and the joke depends on it — excluded by name from every rule in the shared block |
+
+### The engine — one flag, not a fork
+
+`px` is a property of the skin's fx config (`SKINS` slot 6), plumbed to `hkInitCardFx` on the
+canvas beside `data-kind`. The 25 draw branches are **not rewritten and do not move**: they keep
+their device-space geometry, and a context wrapper carries the scale and hardens the primitives
+(square sprites, `shadowBlur` 0, gradients resampled to 6 hard bands, 1-cell strokes on `.5`
+centres, 90°-snapped rotation). Seeding in cell space instead would have collapsed particle
+counts, grown bokeh's radius 6×, and tripled every fall speed — see FRAME_PIXEL_PASS.md §5.
+
+### Dead branches removed (−155 lines)
+
+`aurora` · `cosmic` · `diamondfx` · `galaxy` · `gold` · `holo` · `holorain` · `lux` · `pinstripe`
+· `stars` · `sun` — **11 fx kinds no skin can reach.** Re-verified before deletion, not taken on
+the doc's word: `data-kind` is emitted in exactly ONE place (themes.js, from `SKINS[id][4]`), so
+the only reachable kinds are the 25 the table names. Orphaned seed helpers went with them
+(`comet` `cosmic` `prism` `galaxy` `aurora` `holorain` `gold` `diamondfx` `pin` `lux`).
+**`stars()` was KEPT** — `nebula()` (PRO, live) calls it, which a blanket deletion would have
+broken.
+
+### C3 — the notch taxonomy
+
+**PASS.** `nav.css: all 30 SKINS wear a per-class notch`. The taxonomy lists at nav.css:735–756
+are untouched; only the shapes inside them went hard (square, `2px 2px 0` offset shadow instead
+of a blur). The 45° stair corner was **deliberately not shipped**: `clip-path` on the card eats
+the notch at `top:-15px`, and the prototype's fix moves the notch onto `.pc-card` / `.panel.me`
+— rendered by lb.js and nav.js, outside this lane. Silhouette is `border-radius:0`.
+
+### Animation periods — before = after
+
+Every period is unchanged; only the timing function is quantized (R5).
+
+| animation | period | before → after |
+|---|---|---|
+| `hkBorderSpin` — boutique, architect | 16s | `linear` → `steps(16)` |
+| `hkBorderSpin` — founder | 8s | `linear` → `steps(16)` |
+| `hkBorderSpin` — pro | 9s | `linear` → `steps(16)` |
+| `hkBorderSpin` — molten | 12s | `linear` → `steps(16)` |
+| `hkBorderSpin` — terminal | 15s | `linear` → `steps(16)` |
+| `hkBorderSpin` — heraldic | 17s | `linear` → `steps(16)` |
+| `hkBorderSpin` — plaque-diam | 19s | `linear` → `steps(16)` |
+| `hkBorderSpin` — frostbite | 21s | `linear` → `steps(16)` |
+| `hkBorderSpin` — foil | 23s | `linear` → `steps(16)` |
+| `hkBorderSpin` — noir | 29s | `linear` → `steps(16)` |
+| `hkCylonCircle` — heraldic orbit | 6s | `linear` → `steps(24)` |
+| `hkfSheen` — foil | 7s | `linear` → `steps(24)` |
+| `hkfGlint` — hover glint | 1.2s | `ease` → `steps(8)` |
+| `hkfGlint7` / `hkfGlintHer` | 7s | `ease-in-out` → `steps(24)` |
+| `hkfEmber` — heraldic | 3s | `ease-in-out` → `steps(4)` |
+| `hkfMedBeat` — heraldic medallion | 7s | `ease-in-out` → `steps(4)` |
+| `hkfCrackPulse` — molten | 2.4s | `ease-in-out` → `steps(4)` |
+| `hkGemRays` — plaque gems | 8s | `ease-in-out` → `steps(4)` |
+
+Canvas-side periods (sheen 4.5s · heraldic glint 5.5s · quilt sheen 4.2s · pearl 3.4s · nebula
+aurora 9s · draft scan 3.0s · sheet wave 3.4s · navchart reticle 14s) are preserved **by
+construction**: the branches keep their device-space time math and only the rendering changed.
+
+**Reduced motion:** contract unchanged — `prefers-reduced-motion: reduce` still draws exactly one
+frame and never enters the loop; verified with zero page errors.
+
+### Verification
+
+| suite | result |
+|---|---|
+| `dev/check-invariants.js` | **STATIC INVARIANTS: clean** (C3 passes) |
+| `dev/check-cache-versions.js` | **CACHE-BUMP GUARD: clean** — themes.js 310→311, nav.css 210→211 across 183 refs in 92 pages |
+| `dev/e2e-smoke.js` | **ALL 7 PAGES CLEAN + skin-unlock** — zero page errors, so the pixel branch throws nothing |
+| `dev/e2e-demo-replay.js` (navigation, combo, foot) | **E2E: ALL GREEN** |
+| `dev/e2e-audit-visual.js` | 108 fail / 271 pass — **identical to the pristine control** run at HEAD on the same commit, so this pass is neutral on it. These are pre-existing grid/theme contrast failures on this base, unrelated to card frames. |
+
+`dev/e2e-audit-visual.js` was the one suite in the fleet whose origin could not be overridden;
+it now reads `BASE` like `e2e-smoke.js` does.
+
+### Renders reviewed (and what they caught)
+
+8 skins × {`.hk-frame-lg`, compact} × {dark `carbon`, light `daylight`}, plus a 3× close-up and a
+reduced-motion frame. Looking at them caught both render-loop bugs above — the sheen wash and the
+gradient clamp spill — neither of which is visible in code review. Final state: every card's stats
+row is legible in both themes at both sizes, and the 1px rim seats the pixel silhouette on light.
+## r452 — CATALOG COPY DRIFT: the 18 forbidden name/label duplicates, the `filldr` desc that sold a 2-beat drill, chapter-name alignment
+_Source: the read-only curriculum audit (`audit-catalog.md` §5), items 5.1 · 5.2 · 5.3 · 5.4 · 5.5.
+Copy and metadata only — no key, par, check, target, guide, demo or group placement moved. Those
+are Wolf's calls, and §5.6/§5.7 (the `drill` regroup and the five undesignated capstones) are
+deliberately NOT touched here._
+
+### 1 · THE 18 DUPLICATES — and why they rotted for two years (§5.1)
+
+`drills.js`'s header (lines 8–10) has always said the trainer overrides `CHALLENGES[k].name` and
+`.label` from `meta` at runtime, "so don't keep stale duplicates in CHALLENGES." `syncDrillMeta()`
+(index.html) does exactly that on every load, so **every one of these strings was already dead —
+nothing a player ever saw came from them.** That is precisely why they rotted: a dev reading
+`index.html` saw one identity and the product shipped another, and no surface disagreed loudly
+enough to notice. All 74 blocks carried the pair; **18 had drifted from the shipped string.**
+
+Two were semantic, not abbreviations — `ruleaudit` read label `Audit the rulings` against the
+shipped `The ruling pass`, `balcheck` read `Hunt the balance break` against `Make it tie — hunt the
+break`. Thirteen more carried the drill's **tab** string in its **name** slot (`Paste Sp.` for
+`Paste Special`, `S&U` for `Sources & Uses`, `2-way` for `Two-way Lookup`, `Acc/Dil`, `Ret. Bridge`,
+`Liq. Bridge`, `Cov. Table`, `Debt Sched.`, `NWC Sched.`, `Txn Comps`, `Years` for `Series`,
+`Block Sel.`, `% of rev`). Three (`audit`, `triage`, `fxconvert`) differed only in `—` vs `—`
+escaping — harmless at runtime, still a second copy of a string with one owner.
+
+**Fix: all 74 pairs deleted** (not just the 18 — the rule is zero duplicates, and the invariant
+below asserts zero). Every runtime read of `.name`/`.label` — the tab strip, the results card,
+the marathon splits, the picker tooltips, `dev/build-drill-pages.js` — runs after `syncDrillMeta`
+and was already reading meta, so the SEO pages regenerate byte-identical on those fields.
+
+### 2 · THE INVARIANTS (WORKFLOW §3.3: no invariant, and the bug returns)
+
+- **C14** — source regex over the `CHALLENGES` block: no drill-level `name:` / `label:` key.
+  A *runtime* assertion cannot see this class at all, because post-sync the properties legitimately
+  exist and hold the right value; only the file's text distinguishes a duplicate from the synced
+  one. Proof of failure: re-adding `name:'Ruling Pass', label:'Audit the rulings',` to
+  `index.html:3047` →
+  `FAIL C14: index.html:3047 CHALLENGES.ruleaudit carries an inline \`name:\``. Restored, clean.
+- **C15** — every `HOTKEY_CAMPAIGN.chapters[i].name` is a `groups[].name`. Proof of failure:
+  restoring `name:'Models I · Valuation'` → `FAIL C15: … chapter c6 name 'Models I · Valuation' is
+  not a groups[] name`. Restored, clean.
+
+### 3 · THE STALE COUNT (§5.2)
+
+`drills.js:35` said "Catalog is 82 grouped drills (Formulas I & II carry 11 each)". It is 74, with
+**9** in Formulas I and **10** in Formulas II — the comment was wrong in three numbers at once while
+its own next line correctly named `menuOrder.length` as the source of truth. Rather than restate a
+count that will drift again, the comment now **points at the `groups[]` block directly below it**
+and records the wrong figures once, as the reason the sentence stopped carrying a number.
+
+### 4 · `filldr` — the desc that sold a two-beat drill (§5.3)
+
+`desc:'Fill down and fill right — one formula, whole block'` described the pre-r427 board. The
+shipped board is a quarterly operating build — **7 beats at par 44**, the third hardest of the
+first sixteen drills, and the drill a new player meets **second**. §2.2 of the audit measures the
+step from `navigation` (par 20) to `filldr` at **×2.20**, the catalog's sharpest, and this desc is
+the one line that let a player walk into it expecting a fill exercise. Now:
+
+> A quarterly operating build off the revenue feed — three cost lines across the year, EBITDA,
+> Fiscal Year totals, and a ratio block down to EBITDA margin. One anchored formula fills most of it
+
+Picker outcome voice, no chords (C5 clean), 191 chars. `dev/build-drill-pages.js:367` cuts the
+generated meta description at **158**, so the first sentence is deliberately 153 — it survives the
+cut whole, and the truncation lands in the trailing clause, which is the house pattern (`navigation`
+and `editfix` cut the same way). Drill pages regenerated and committed.
+
+### 5 · `dcfsens` never named its own subject (§5.4)
+
+The words *sensitivity*, *two-way* and *data table* appeared **nowhere** in the drill's prompt, req,
+guide or check labels — only in the picker desc a player has already clicked past. A player could
+solve it and not know they had built a sensitivity table. One sentence into the PROMPT, in the
+scenario-imperative register the rest of it uses:
+
+> Run it as a two-way sensitivity — one number will not survive that room.
+
+and `two-way` into the one beat label that can carry it without a chord:
+`Build the rest of the two-way grid — every growth rate at every WACC`. **No check predicate,
+target, guide line or demo step moved** — the tri-length contract (C9) is untouched at 6, and the
+label edit changes display text only, never `ok:`.
+
+### 6 · TWO NAMES FOR ONE CHAPTER (§5.5)
+
+`groups[]` said `Models I` / `Models II`; `HOTKEY_CAMPAIGN.chapters` said `Models I · Valuation` /
+`Models II · Credit`. The picker folder showed one, the campaign rail the other. The rail is the
+**only** surface that renders the full string (`index.html`, the `chRow` heading) — two other call
+sites already stripped the suffix with `.replace(/\s*·.*$/,'')`, which is the tell that it was
+never wanted structurally. So `name` becomes the group name and the suffix moves to a new `sub`
+field the rail appends: the rail still reads "Models I · Valuation", and the two strings can no
+longer disagree, because C15 fails the build if they do.
+
+### 7 · SUITES
+
+`check-invariants` clean (C14 + C15 new) · `check-cache-versions` clean, `drills.js` v300 → **v301**
+across all 28 HTML pages including the regenerated drill pages · `e2e-smoke` on **8808** — 7 pages
+clean, drill-count 74, de-hint clean · `e2e-demo-replay REPS=1 filldr dcfsens ruleaudit balcheck` —
+4/4 WIN · `e2e-depth-contract filldr dcfsens` — 2/2 PASS (density 14/17 and 17/20, 30/30 distinct
+builds each) · `build-drill-pages` re-run twice, byte-stable the second time (the gate's drift diff).
+## r452 — PROGRESSION TIES: placement ride-through · phantom capstone medals · unwritten flags · stale quest templates
+
+Five findings from the PROGRESSION/RANK/DESK/LEVEL audit (scratchpad `audit-progression.md`),
+fixed with the CI invariant each bug class earns (WORKFLOW §3.3). Every one of them was a
+SYSTEM TIE: two systems that each work alone and contradict each other where they meet.
+
+### P0-2 · the placement series could not be finished (dead end at 4/5)
+`HK_PLACEMENT.KEYS` ends in `opmodel`, which lives in **Full Builds** (LVL 11 + 32 pace clears),
+while Ranked opens at **LVL 10** (`RANKED_MIN_LVL`). A level-10 player who entered Ranked clicked
+lb.js's "run it →" on the fifth board and got the lock modal — forever, with the nav pill parked
+at "⚔ placement 4/5" and no tier, no card, no rank.
+**Fix:** the five standard boards now ride THROUGH the progression gate exactly like a daily run
+or an armed race — ONE shared predicate, `window.hkPlacementRide` (drills.js), consulted by
+`loadChallenge`'s gate branch (index.html). Deliberately narrow so it can never become a free pass
+around the ladder: only the placement keys, only after the ranked opt-in (`hk_ranked`), only while
+the series is incomplete, and the owner latch (`hk_placement_done`) closes it too. lb.js's link
+needed no change — nothing outside the trainer enforces the gate.
+**Invariant C15:** every `HK_PLACEMENT.KEYS` entry is in an ungated group OR the trainer's gate
+branch consults `hkPlacementRide`. **Suite:** `dev/e2e-audit-rank.js` T5 seeds a LVL-10, unplaced,
+ranked player and proves `?drill=opmodel` LOADS — plus the negative control (not in ranked → the
+same board still bounces).
+
+### P1-1 · five phantom capstone medals, and the completionist mythic was unearnable
+`cap_c3/c4/c5/c6/c8` test `hkCapstoneDone(c,'qclose'|'cleanroom'|'redflags'|'pitchpage'|'shipit')`
+— drills that were never built. They sat on the wall at a permanent 0/1, and because `x_allach`
+(mythic, "every OTHER medal") swept them in, that medal was **unearnable forever**.
+**Fix, ids frozen** (earned ids persist in `hk_ach_seen`): each capstone medal carries a `cap`
+field, and drills.js derives `hidden` from `hkCapstoneKeys()` — i.e. from
+`HOTKEY_CAMPAIGN.chapters[i].capstone`, the SSOT that already drives the ★ tag and the milestone
+gate. The day a chapter designates its capstone, its medal appears with no edit here. Every
+renderer honors `hidden` (index.html drip + sweep, nav.js card, stats.html wall, profile.html
+achMeta) — including the earned/possible denominators — and `x_allach` counts visible medals only.
+**Invariant C16:** every `hkCapstoneDone(ctx,'key')` literal in HOTKEY_ACHIEVEMENTS is a live drill
+or its medal is hidden, the `cap` field matches the key its `test()` names, and `x_allach` keeps
+its `!a.hidden` clause.
+
+### P1-2 / P1-3 / P1-11 · three flags nothing ever wrote
+themes.js gates the `pro` skin + the `PRO` title on `u.pro`, and emerald/architect on
+`u.chaptersCleared`; nav.js's unlock sweep reads both out of `hk_ach_flags`. **Nothing wrote
+either one** — a paying subscriber read LOCKED on the PRO cosmetic, and a chapter clear never
+celebrated. Same shape in the trainer: `buildAchCtx` hard-coded `crowns:0`, so no crown medal
+could fire in game.
+**Fix — writers only; themes.js untouched.** Three idempotent writers in nav.js next to the
+tierBest latch: `hkFlagPro` (semantics MATCH `isPro()`: the free-PRO beta ORs in, a real
+entitlement always counts; an omitted argument keeps the stored entitlement so no page can
+downgrade a subscriber), `hkFlagChapters` (union, never replace — the no-rug-pull law), and
+`hkFlagCrowns` (high-water: an earned crown medal must not un-earn when someone posts faster).
+Wired where each fact is already computed: `loadEntitlement` (index.html) writes the resolved
+entitlement; `buildAchCtx` writes the chapter clears `campState()` derives through the shared
+`hkCapstoneOk` and reads `crowns` back; profile.html persists the clears it computes and passes
+`pro` into `frameU`; nav.js latches crowns in `__loadProfileData` (the one place board standings
+exist) and the legacy frame gallery now carries both flags.
+**LIMITATION, commented in place:** the trainer holds no board data, so its crown count is as
+fresh as the last ranked page load.
+
+### P1-4 · desk quest templates pinned retired drills
+`MG_PROGRAMS.intern0` weeks 2/3 pinned `dress` and `growth` (both retired in the depth pass). The
+pin loop's `if(!lab[k]) continue;` drift guard swallowed them **silently**, so a captain who
+pinned "Intern week 0" got a 2-drill week and the preview line advertised the raw dead key.
+**Fix:** `combo` and `cagr` — the live drills those two retired into (DEPTH_PASS_CAMPAIGN §0;
+`housestyle` already held week 2's first slot, so the chapter's own substitute takes the seat,
+exactly as HOTKEY_CAMPAIGN c2 did).
+**Invariant C14:** every key in every quest template is in `menuOrder` — the drift guard is now
+LOUD in CI, where C13 already covers `dev/`.
+
+**Cache:** drills.js v301 · nav.js v303 · lb.js v42 (themes.js deliberately untouched — a
+concurrent restyle owns it).
+
+**Gate:** check-invariants clean (C14/C15/C16 new — each proved to FAIL with its bug
+re-introduced, then restored) · check-cache-versions clean · e2e-smoke ALL 7 PAGES CLEAN ·
+e2e-lb ALL 36 PASS · e2e-demo-replay navigation/combo/foot ALL GREEN · e2e-audit-rank 20 PASS
+with T5 green; its 3 reds (nav pill null, account tier Unranked, no desk form) reproduce
+byte-identically on the pre-change baseline — pre-existing, untouched by this round.
+
+## r452 — Mac Excel parity: ⌃⌘V paste special, ⌘⇧T AutoSum, a real Mac chord table, Tab-Enter home
+
+_Fixes the safe set from the r452 parity + Mac keybinding audit (`audit-parity-mac.md`, worktree
+`agent-a868525fd97e43d27`, all engine verdicts proven headlessly on :8802). Every fixed class
+lands a CI assertion in this same round (WORKFLOW §3.3): mac-input 19 → 30, parity 177 → 189,
+plus a new static invariant C14._
+
+### The root cause, and what changed under it
+
+`hkMacAdapt` (index.html:26947) was a **modifier collapse**: `ctrl = ev.ctrlKey || ev.metaKey`
+on line one, so ⌃ and ⌘ were indistinguishable downstream and every Mac chord whose meaning
+depends on *which* one is held was unrepresentable. The merge is still what the handlers get
+(that is the "⌘ plays Ctrl, Windows habits keep working" superset) — but the raw identity now
+survives long enough to express the three chords that need it.
+
+| # | audit id | fix | file:line |
+|---|---|---|---|
+| 1 | P0-1 | **⌃⌘V opens Paste Special** — it arrived as a plain Ctrl+V and did a silent, formatting-and-formula-carrying full paste over the model (probe 03). The adapter presents it as Ctrl+Alt+V, so it lands on the existing dialog branch; ⌘V and ⌃V still plain-paste. | index.html:26965–26981 → 27654 |
+| 2 | P0-2 | **⌘⇧T is AutoSum** — the ⌘T→F4 rewrite didn't exclude Shift, so Mac Excel's flagship formula chord became an inert bare F4 (probe 01). ⌘⇧T now presents as Alt+= and reaches `autoSum()`; ⌘T with no Shift still cycles anchors. | index.html:26977–26980 |
+| 3 | P2-3 | **ONE Mac adapter.** `echoMatch` carried a second, subtly different copy of the same logic (its ⌥ recovery only fired on non-alphanumerics); it now runs the real `hkMacAdapt`, so the echo layer and the live handler can no longer disagree about a chord. | index.html:29513–29529 |
+| 4 | P0-4 | **`hkMacPopup` stops teaching stolen keycaps**: fn+F4 is the primary anchor chord (Chrome reserves ⌘T/⌘⇧T outside fullscreen — `preventDefault` cannot help), ⌘T is the fullscreen alternate, and the popup now names ⌃Space, ⌃⌘V, ⌘⇧T, ⌃` and ⌃H. | themes.js:2786–2791 |
+| 5 | P0-3 / P0-5 | **The blind glyph swap is dead as a source of truth.** `window.HK_MAC_CHORDS` (themes.js) is the audited exception table — the chords whose Mac form is NOT "Ctrl→⌘" — with `hkMacSpec` / `hkMacNote` / `hkMacChord` derived from it; the swap is only the fallback for the verified ⌘-plays-Ctrl family. Confidence discipline: only [H]/[M-H] rows get a Mac chord; [M]/[L] rows (Ctrl+9, Ctrl+Shift+L, Ctrl+PgUp/PgDn) render the WINDOWS chord with a "Mac: varies" note rather than a guess. | themes.js:2674–2760 |
+| 6 | P0-3 | **reference.html derives** — `macCap`'s per-cap swap is gone; whole specs are translated through themes.js, because the Mac form of a chord is a property of the chord, not of its caps. Select column now reads ⌃Space (not ⌘Space = Spotlight), paste special ⌃⌘V (not ⌘⌥V), AutoSum ⌘⇧T (not ⌥=), show formulas ⌃` (not ⌘` = macOS window cycle), F2 → ⌃U (or fn+F2), F4 → fn+F4 (or ⌘T). P2-6 falls out for free: `Ctrl+A>Alt>H>O>U>O` no longer renders half-Windows. | reference.html:329–362 |
+| 7 | P1-10 | **Macabacus / FactSet sections keep Windows caps** + one "Windows only — this add-in has no Mac build" line per section. Both are Windows-COM only; there is no Mac build to press ⌘⌥A in. | reference.html:399–401 |
+| 8 | §5 | **reference truth pass** — Alt+Enter line break, F4 repeat-last-action and Ctrl+` show-formulas are Excel-true but the engine does not implement them (it commits, has no repeat, and show-formulas is rapid-fire-deck only). All three now carry "not in the trainer yet" instead of being advertised. | reference.html:216/223/225 |
+| 9 | P1-2 | **Tab-Enter home.** B4 → Tab → Tab → Enter landed D5; Excel gives B5. `S.tabHome` latches where the run started and where it currently sits; any non-Tab move drops it, and a latch whose landing cell no longer matches the cursor is treated as stale rather than yanking the cursor. | index.html:27002–27026, 27245–27251, 27574–27580 |
+| 10 | P1-1 | **Ctrl+Shift+V / ⌘⇧V pastes VALUES** on every profile (Excel 365 shipped the chord natively in 2023). It used to fall through to plain Ctrl+V on the native profile — a values paste that silently carried formulas and formatting. Alt E S V / Alt H V V routes untouched. | index.html:27684 |
+| 11 | P1-9 | **Ctrl+Shift+8 / Ctrl+\*** select the current region, through the same `regionAround` path as Ctrl+Shift+Space (extracted to one `selectRegion()`). | index.html:26751–26758, 27657 |
+| 12 | P1-8 | **Ctrl+;** stamps today as a VALUE (Excel's hardcode-the-date gesture) — the Excel serial with the engine's date format. NOTE: the engine's date format renders `Mmm-yy`, so the stamp shows the month, not the day. Ctrl+Shift+; (time) is SKIPPED: there is no time format to render it with. | index.html:27661 |
+| 13 | P1-5 | **Shift+F2 no longer opens the editor.** In Excel it inserts a comment; here it fell into the F2 branch and silently opened an edit over the cell. Now a no-op with one honest toast. | index.html:27328–27332 |
+| 14 | bug sweep P1-2 | **Esc closes the sign-in modal.** The keydown handler's INPUT/TEXTAREA bail sits ABOVE the `authOpen` Escape branch and the modal focuses its own email field on open — so every Esc landed in the input and died, leaving the modal with no keyboard exit while the `?` sheet promises "Esc — close menus & modals". The modal owns the keyboard while it is up, so its Esc is now claimed at the top of the handler, ahead of the text-field bail. (Taken here rather than by another agent: it is inside the key handler this round already owns.) | index.html:27032–27038 |
+
+### CI (WORKFLOW §3.3 — no invariant, no fix)
+
+- `dev/e2e-mac-input.js` **19 → 30**: ⌃⌘V opens the dialog *and* leaves the destination untouched · ⌘⇧T proposes a SUM · ⌘T no-shift still cycles · ⌃Space selects the column · ⌘⇧V pastes values · and five reference-page row assertions (⌃Space never ⌘Space, ⌃⌘V, ⌘⇧T, ⌃`, Windows-only add-in sections).
+- `dev/e2e-audit-parity.js` **177 → 189**: Tab-Enter home (typed and untyped, plus an arrow that ENDS the run and a lone Enter that must not jump) · Ctrl+Shift+V values with Alt E S V still walking · Ctrl+Shift+8 and Ctrl+\* equal to Ctrl+Shift+Space · Shift+F2 guard with plain F2 still editing · Ctrl+; stamping a dated value.
+- `dev/e2e-audit-onboard.js` **T6** (35 → 37): the sign-in modal opens, then a REAL Escape pressed with focus where the modal actually leaves it (INPUT#authEmail) closes it — `authOpen` false, modal hidden. Verified to fail with the fix reverted, so it guards the bug and not the fix.
+- `dev/check-invariants.js` **C14**: themes.js owns `HK_MAC_CHORDS` and exports the four accessors; reference.html derives from them and carries no local ctrl→⌘ swap. The two surfaces cannot drift again.
+
+### NOT fixed, deliberately
+
+- **P0-6 KeyTips-on-Mac is still open — WOLF ITEM, needs a real MacBook.** `MAC_DESIGN.md` asserts Alt/Option KeyTips shipped in Excel for Mac; the audit rates that **[L]** and cannot corroborate it. 18–20 drills carry an Alt-walk as their canonical chord and the Ctrl+1 dialog has no Border/Alignment tab to fall back to, so if KeyTips do NOT exist on Mac those drills teach a motion the student cannot reproduce. Settle it on a device before any further Mac copy ships; if absent, the honest fix is a caveat plus Border/Alignment tabs in Ctrl+1, not more ⌥ copy.
+- **P2-1 / P2-2 Backspace-on-a-range** (clears the whole selection; Windows Excel clears the active cell only and enters Edit — and the branch that implements the Windows semantics at 27528 is unreachable while `mode==='normal'`). Left alone this round: it is P2, it is accidentally Mac-correct, and changing it touches a semantic every drill's clear-and-retype beat rides on.
+- **P1-3 Alt+Enter line break, P1-6 F4 repeat, P1-7 Ctrl+\` on the grid, P1-4 `$1,000` as text, P1-11 ⌘⇧F** — engine features, not label bugs. The reference now says "not in the trainer yet" for the first three instead of advertising them.
+- **Ctrl+Shift+; (time)** — skipped, no renderable time format (see above).
+## r452 — the keystroke hot path: one grid write, no forced relayouts, no leaked gate listeners
+
+_Acts on the r450 read-only PERFORMANCE + STALE-CODE audit. Every number below is MEASURED on the
+same container, same chromium-1194, viewport 1440×900, `?v=`-matched trees served side by side
+(pre-fix = `git archive HEAD`) so before and after are paired, not remembered. Read the RATIOS as
+the durable result; absolute ms are an upper bound on this CPU._
+
+### THE HEADLINE: a keystroke got ~2× cheaper, and nothing on screen moved
+
+| drill | ms/key before | ms/key after | change |
+|---|---|---|---|
+| `navigation` | 18.81 / 18.96 | 8.59 / 8.76 | **−54%** |
+| `margin` | 22.07 / 23.23 | 10.83 / 11.42 | **−52%** |
+| `foot` | 25.72 / 25.86 | 9.55 / 10.49 | **−61%** |
+
+_(two independent paired runs each; best-of-3 windows of 200 synthetic arrow keys after an
+80-key warm-up.)_ Four fixes compound into that: one grid write instead of 21, and the removal of
+the two forced relayouts that were being issued against the freshly-dirtied table.
+
+### P0-1 · `render()` builds the grid into ONE string — `index.html:23067` / `:23097` / `:23119` / `:23305` → the single write at `:23307`
+
+`g.innerHTML += row` inside the per-row loop made the browser serialize the whole growing
+`<tbody>`, re-parse it and destroy/recreate every node built so far — O(rows²) parse work and a
+layout invalidation 21 times per render, on a function that runs once per keystroke. It now
+buffers into `__gh` and assigns once.
+
+**Byte-identity proof** (5 drills × 3 seeds × {after load, after 8 keys} = 30 captures of
+`#grid.innerHTML`, 489,016 B): **0 differences** — with one documented and expected exception.
+`#grid` is a `<table>`, so the old `+=` made the PARSER open a fresh `<tbody>` around each
+appended row: **630 `<tbody>` elements across the 30 captures before, 30 after**. Collapse that
+boundary and every `<tr>`, `<th>`, `<td>`, class, inline style and text node matches byte for
+byte. Nothing reads it: no rule in the repo names `tbody` or an `nth-child`/`first-child` on a
+grid row, and the two harnesses that select `#grid tbody tr` (`e2e-grid-height`,
+`e2e-depth-contract`) count the same `<tr>` set either way. `REPS=1 e2e-demo-replay` replayed
+**every** drill green after the change.
+
+### P0-2 · the flow-combo pulse restarts without a reflow — `index.html:25898` (`hkPeakRestart`), called from `hkComboTick` `:25921`
+
+`el.classList.remove('peak'); void el.offsetWidth; el.classList.add('peak')` — the CSS-animation
+restart trick — ran on every productive keystroke, immediately after `render()` had rewritten the
+grid, so the `offsetWidth` read forced a full relayout of the fresh ~200-cell table (4.57ms/key,
+13.2% of a 300-key profile; the three classList lines themselves cost 0.012ms). Now: re-play the
+live `comboThrob` `CSSAnimation` (`cancel()` + `play()`), and where it has already finished —
+`getAnimations()` drops a finished `fill:none` animation, **verified**, so the class alone cannot
+restart it — drop and re-add the class across two `requestAnimationFrame`s. Zero layout reads on
+either path. Headless proof: mid-animation `currentTime` **150.03ms → 0**; post-finish, a key
+re-arms a fresh animation (`getAnimations().length` 0 → 1) and `.peak` stays applied.
+
+### P0-3 · the checklist autoscroll only measures when the next beat MOVES — `index.html:25781`
+
+`scrollHeight` / `clientHeight` / `offsetTop` were read immediately after `el.innerHTML=` and
+immediately after `render()` — the second forced relayout per keystroke (0.05ms for the write vs
+1.026ms for write+read on a *clean* layout; ~13ms in the real profile). The `.cl-item.next` index
+is now cached (keyed by drill + microRun + hints/guided, since those change row heights), and the
+reads are skipped unless it actually changed — once per beat instead of once per key. Identical
+scroll position whenever it does change.
+
+### P0-4 · `openGateInfo` binds its dismissal handlers ONCE — `index.html:30091` / `:30097`
+
+`#gateModal` is a singleton but every call added a new `document` keydown Escape handler and a
+new backdrop click handler, and `close()` could only remove the newest. **Measured, 30
+`loadChallenge()` + 150 keys: +11 keydown and +11 click listeners, 0 removals.** 49 of 74 drills
+are gate-locked, so ordinary picker browsing piled dead handlers onto the hot keydown path. Now
+`gateInfoEsc`/`gateInfoClose` are module-scope singletons bound at element creation and gated on
+`.show` (which is what removing them used to achieve).
+
+| listeners over 30 loads + 150 keys | before | after |
+|---|---|---|
+| net growth | **+22** | **+2** (the one-time bind at creation) |
+| adds attributed to `loadChallenge` | 11 keydown + 11 click | **0** |
+| DOM nodes / heap | +17 / +0.72 MB | +17 / +0.53 MB |
+
+### P1-1 · `drills.js` shipped TWICE on 14 of 16 pages — and the guard that should have caught it counted instead of asserting
+
+Deleted the second `<script src="drills.js?v=…">` on index / account / admin / cert / contact /
+desks / enterprise / leaderboard / privacy / profile / reference / security / stats / terms.
+Paired measurement under the audit's harness (`http-server -c-1`), 7 sampled pages:
+
+| per page | before | after |
+|---|---|---|
+| `<script>` tags | 2 | **1** |
+| network requests | 2 | **1** |
+| transferred bytes | 156,720 | **78,360** |
+
+Both tags were parser-blocking in `<head>`, so this sat on the critical path, and the second
+execution re-defined the whole catalog. It survived ~25 cache bumps because
+`dev/check-cache-versions.js` only asserted one *version* per asset and **counted matches** — the
+duplicate silently inflated the tally (`drills.js?v=300 — 28 files agree` across 16 files; it now
+reads 14). **The guard is the deliverable**: a UNIQUENESS pass asserts each asset appears at most
+once per HTML file. Proof-of-failure — the new guard against the pre-fix tree:
+
+```
+FAIL drills.js: referenced more than once in 14 file(s) — account.html x2, admin.html x2, … terms.html x2
+CACHE-BUMP GUARD: 1 problem(s)          (exit 1)
+```
+
+### P1-2 · one grader pass fewer per key — `index.html:25708`
+
+The `dense` class line ran `CHALLENGES[cur].checks(S)` a second time purely to read `.length`.
+It now reads the `items` computed on the same tick. **Stack-attributed count on `navigation`:
+4 `checks()` calls per keystroke → 3** (`currentTargetRange`, `updateChecklist`, `gradePass`).
+Small today — catalog median 0.020ms, worst `recon` 0.590ms — but it scales with drill depth.
+
+### P1-3 · the stuck-nudge interval now runs only while it can fire — `index.html:29430`
+
+A bare `setInterval(…, 3000)` that was never cleared, ticking for the whole session (and on a
+backgrounded tab, where `setInterval` is only clamped) with a `getClientRects()` forced layout in
+it. Two changes, both behaviour-preserving: the landing test **latches** (the `gone` class is only
+ever added, never removed — verified), so the layout read happens at most until the landing goes
+and never again; and `window.__stkDone` is now an accessor that **clears the interval when it
+latches true and re-arms it when `loadChallenge` sets it false**, which it already does on every
+load. The nudge still gets exactly one shot per drill load, and `loadChallenge` was not touched.
+
+### P1-5 · `_headers` gets Cache-Control
+
+The file set five security headers and nothing else, so every navigation revalidated all shared
+assets plus the 2.5 MB `index.html`. Added `public, max-age=31536000, immutable` for `/*.js`,
+`/*.css`, `/art/*` and the four favicons, and `no-cache` for `/`, `/*.html` and `/drills/*`.
+Cloudflare Pages merges the headers of every matching rule and, on a conflict, the **last**
+matching rule wins — so the security block stays first, assets next, HTML last (which is what
+keeps `/art/rank-proto.html` on revalidate). This makes the `?v=` discipline load-bearing for
+real, which is why it ships in the same round as the P1-1 uniqueness assertion.
+
+### THE ECHO SUBSYSTEM IS RETIRED — 103 lines, and a toast that advertised a deleted button
+
+r401 pulled the `#echoBtn` out of the bar and left the wiring behind `if(eb)`, which made
+`echoStart()` unreachable and `echoOn` permanently false. PIPELINE.md has carried "dead echo
+feature ~90 unreachable lines" without an owner since r436. Deleted: `updateEchoBtn`, `echoAbort`,
+`echoStop`, `echoStep`, `echoStart`, `echoDone`, `echoNudge`, `echoMatch`, the capture-phase
+keydown gate, the mouseup re-assert, the `#echoBtn` wiring, and the one dead rule
+(`#demoSpotCap.echo-miss`; `@keyframes echoShake` stays — the rejected-formula shake still uses
+it). Two pieces of **user-visible copy** went with it: the post-demo card offered "or ⌨ learn mode
+to walk the steps yourself", and the stuck-nudge toast read "⌨ learn mode walks you through it"
+and then pulsed `'echoBtn'` — an element that has not existed for 51 revisions.
+
+`let echoOn=false` stays declared: ~20 engine guards read it as a cheap "not in a scripted
+replay" test and they sit in regions other rounds own. It is now a constant false.
+
+### The rest of the sweep (every symbol re-grepped to zero references before deletion)
+
+| deleted | where | proof |
+|---|---|---|
+| `startPlacement` + the unreachable `if(placementMode)` verdict/share branch (27 lines) + `placementVerdict` | `index.html` results card + onboarding | `startPlacement` had 1 repo-wide hit (its own definition) and was the ONLY setter of `placementMode=true`; `placementVerdict` was called only from inside that branch. **`HK_PLACEMENT` in lb.js is a different, live system — untouched.** |
+| `startGuidedIntro` → and `introRibbonPeek` with it | `index.html` | zero references; deleting the first stranded the second (its only caller) |
+| `sheetMarkWin` | `index.html` | an empty no-op kept "for one release" in r363, ~89 revisions ago |
+| `evalSum` | `index.html:22289` | regex-only `=SUM()` evaluator, superseded by `evalFormula` |
+| `DRILL_DESC`, `TAB_LABEL` | `index.html` | two SSOT aliases nobody read |
+| `__CELL_TARGET` | `index.html` (inside `render`) | never read — a comment promising "one knob for the whole grid" in the most fragile function in the file, while the math ran on `__availH/__VR` |
+| `__sbT` | `index.html` | zero references |
+| `ladderHtml` (19 lines), `marathonScore`, `bucketsPresent` | `lb.js` | zero references |
+| `.pc-badges/.pc-badge/.pc-legend*/.pc-ach-i/.pc-card.flair-*`, `.nav-lvl*` | `nav.css` | 0 non-CSS hits with `<style>` blocks stripped |
+| the `.pub-cap/.pub-hero/.pub-nm/.pub-you/.pub-desk/.pub-tiles/.pub-best/.pub-row` family, `.standing .st-*`, `.gb-or` | `lb.css` | same; **`.pub-card` and `.pub-card>.pub-x` are LIVE (lb.js:496/558) and stayed** |
+| `.guide-toggle/.toprow/.mode-ctrls/.keylog`, `.help-toggle` + descendants | `index.html` inline `<style>` | the retired top-row control strip |
+| `drills/colops.html` | orphan SEO page | `colops` retired in the depth pass (DEPTH_PASS D17); the page stayed live, canonical'd, schema.org'd, with a CTA deep-linking `index.html?drill=colops` |
+
+**Deliberately NOT deleted, recorded so nobody re-audits them:** `nav.js` `mySchoolChip` (built,
+never inserted — a built-but-unused chip usually means a MISSING feature; check it against the
+school/desk design first) · `cycleProfile` / `toggleSound` (`index.html`, MED confidence — confirm
+the plugin picker and the settings sound toggle reach `keyProfile`/`saveSound` by some other path
+first) · `nav.css` `.pc-customize` (its own comment claims nav.js renders it) · `themes.js`
+`MOTTO` (it sits inside the rank-emblem IIFE beside `TIERS`/`DRESS`, and that file is being
+worked in parallel) · `nav.css` `.hkf-serial` / `.hkf-crack` (inside the `.hk-frame-*` block, in
+flight elsewhere) · `wrongIsA` (`index.html:6530`, inside a CHALLENGES build) · `let
+placementMode=false` (two live resets still assign it from regions this round does not own; it is
+now a constant false).
+
+### THREE NEW GUARDS, each proven to fail on the tree it was written for
+
+1. **`dev/check-cache-versions.js` — uniqueness.** Shown above: exit 1 on the pre-fix tree, clean
+   after.
+2. **`dev/e2e-smoke.js` — the drill count, widened.** The existing check only matched
+   `N banker-grade drills`, which is exactly why **"82 drills"** survived in `index.html:21`'s
+   schema.org description (the number Google reads), `About.html:301` and `enterprise.html:106`
+   against a catalog of 74. It now also matches bare `N drills`, at `N >= 20` (the small ones —
+   "5 drills", "11 drills" — are genuine chapter and feature sizes) and outside comments (the
+   engine's own notes cite historical catalog sizes as evidence and must stay quotable).
+   Proof-of-failure on the pre-fix tree: three hits, `index.html` / `About.html` /
+   `enterprise.html`, `"82 drills" != 74 (menuOrder)`. All three corrected.
+3. **`dev/build-drill-pages.js` — the orphan assertion.** The gate's drift check is
+   `build-drill-pages.js && git diff --exit-code -- drills sitemap.xml`, and `git diff` only sees
+   files the generator MODIFIES — never one it has stopped writing, which is precisely how
+   `drills/colops.html` stayed green after its drill was retired. The generator now asserts that
+   `drills/*.html` equals `menuOrder + index`. Proof-of-failure, with colops restored:
+   `ORPHAN drill page(s) — retired but still on disk: drills/colops.html` (exit 1); clean after,
+   `drills/ holds exactly menuOrder + index (75 pages, 0 orphans)`.
+
+### Docs reconciled
+
+`PROJECT_CONTEXT.md:781` and `:804` said **GitHub Pages**; `:538` said Cloudflare. It is
+**Cloudflare Pages**, and the entry now carries the evidence: `_headers` exists and its own first
+line says so (a file GitHub Pages ignores entirely); `.github/workflows/` holds only `gate.yml`
+and `supabase-deploy.yml` — no Pages deploy job, no `actions/deploy-pages`; `dev/PROJECT_REVIEW.md:32`
+states "Cloudflare Pages deploys main". The root `CNAME` is an **inert** GitHub-Pages-era leftover
+that Cloudflare Pages does not read — left in place deliberately and labelled as such, since
+deleting it forecloses a fallback and the custom-domain binding lives in the Cloudflare dashboard,
+not the repo.
+
+### Suites (server on 127.0.0.1:8809)
+
+`check-invariants` clean · `check-cache-versions` clean (with the new uniqueness rule) ·
+`e2e-smoke` ALL 7 PAGES CLEAN + skin-unlock + drill-count(74) · `REPS=1 e2e-demo-replay` ALL GREEN
+(every drill — `render()` changed) · `e2e-alt-paths` green · `e2e-guided` green · `e2e-lb` ALL 36
+PASS · `e2e-grid-height` green · `check-pause` green. `e2e-audit-visual` reports **108 FAIL / 271
+PASS — byte-identical to the same suite run against the pre-fix tree in this session**: it is the
+theme-contrast backlog (sepia/frost/phoebes/crimson/tangerine swatches), pre-existing and owned
+elsewhere; this round did not move it by one assertion.
+
+Cache: `nav.css` v210→**v211**, `lb.js` v41→**v42**, `lb.css` v22→**v23** across all HTML +
+`drills/*.html` (drill pages derive their versions from index.html and were regenerated).
+`themes.js` and `drills.js` untouched, so unbumped.
+
 
 ## r440 H6b-12 — balcheck + tieout + balance: Formulas II CLOSES 10/10 (DEPTH_PASS §4.48 + §4.51 + §4.55 + §2.3)
 _The chapter's last three boards. All three carried a FORMATTING ☆ on their §4 page, all three

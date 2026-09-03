@@ -12,6 +12,9 @@
           checklist/desc but never scanned these fields, and its pattern skips bare
           F-keys (cell refs there are content); picker metadata has no cell refs, so
           bare F1-F12 are flagged here too.
+     C14 — certificate tracks: the arrays hard-coded in the NEWEST issue_certificate migration
+          (and its dev/migrate-certificates.sql mirror) are set-equal to HK_TRACKS from drills.js
+          — the r359 drift rule, added r452 after the retired keys sat live in the RPC.
    Run: node dev/check-invariants.js */
 'use strict';
 const fs = require('fs');
@@ -527,6 +530,443 @@ try {
   if (!n14) ok(`all ${seen14} drill-driving dev/ harnesses declare a r450 start-gate stance`);
 } catch (e) {
   bad('C14 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C16 (r452): NO `name:` / `label:` KEY INSIDE A CHALLENGES BLOCK ----
+   drills.js is the display-string SSOT and its header says so: syncDrillMeta (index.html)
+   WRITES CHALLENGES[k].name/.label from meta on every load, "so don't keep stale duplicates in
+   CHALLENGES". Eighteen of the 74 blocks kept them anyway and had drifted — `ruleaudit` read
+   "Audit the rulings" against the shipped "The ruling pass", `balcheck` "Hunt the balance break"
+   against "Make it tie — hunt the break", and thirteen more carried the drill's TAB string in
+   its NAME slot ("Paste Sp.", "S&U", "2-way"). None of it ever reached a player — the sync
+   overwrote all of it — which is exactly why it rotted for two years: a dev reading index.html
+   saw one identity, the product shipped another. r452 deleted all 74; this asserts the zero.
+   SOURCE regex, not a runtime read: post-sync the properties legitimately exist, so only the
+   text of the file can tell a duplicate from the synced value. ---- */
+try {
+  const idx = fs.readFileSync('index.html', 'utf8');
+  const start = idx.indexOf('const CHALLENGES = {');
+  const end = idx.indexOf('STATE + ENGINE', start);
+  if (start < 0 || end < 0) bad('C16: CHALLENGES block not found in index.html (shape changed?)');
+  else {
+    const body = idx.slice(start, end);
+    const lines = body.split('\n');
+    const base = idx.slice(0, start).split('\n').length;   // 1-based line of `const CHALLENGES = {`
+    let key = '(head)', n14 = 0;
+    let inBlock = false;
+    for (let i = 0; i < lines.length; i++) {
+      let s = lines[i];
+      if (inBlock) { const e = s.indexOf('*/'); if (e < 0) continue; s = s.slice(e + 2); inBlock = false; }
+      if (s.trim().startsWith('//')) continue;
+      const b = s.indexOf('/*');
+      if (b >= 0) { const e = s.indexOf('*/', b + 2); if (e < 0) { inBlock = true; s = s.slice(0, b); } else { s = s.slice(0, b) + s.slice(e + 2); } }
+      const km = s.match(/^  ([a-z][a-z0-9_]*)\s*:\s*\{/);
+      if (km) key = km[1];
+      // a drill-level property only — two-space indent inside the block, i.e. four columns in.
+      // check LABELS (`{label:'…'` inside checks()) are indented deeper and are not this class.
+      const hit = s.match(/^    (name|label)\s*:/);
+      /* r452: the Keyboard Tour (`keyboardtour`, tour:true) is NOT a catalog drill — drills.js meta
+         does not carry it, so its display strings legitimately live inline. The only exemption. */
+      if (hit && key !== 'keyboardtour') {
+        n14++;
+        bad(`C16: index.html:${base + i} CHALLENGES.${key} carries an inline \`${hit[1]}:\` — drills.js meta is the SSOT for display strings (drills.js header, lines 8-10); delete it, don't sync it`);
+      }
+    }
+    if (!n14) ok('index.html: no CHALLENGES block carries an inline name:/label: (drills.js meta is the display-string SSOT)');
+  }
+} catch (e) {
+  bad('C16 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C15 (r452): CERTIFICATE TRACK ARRAYS == HK_TRACKS (the r359 drift rule, in CI) ----
+   issue_certificate() hard-codes the three track key lists in SQL. drills.js is the truth, so the
+   two drift the moment a drill is retired or added — which is exactly what happened: the r424
+   retirements reached drills.js and dev/migrate-certificates.sql, but only 'colops' was carried
+   into supabase/migrations/, leaving the DEPLOYED function demanding seven drills that no longer
+   exist (undo/copyover/dress/growth/grpfold/wirewalk/hunt). The fluency and formulas certificates
+   were unissuable in production for weeks and nothing in the gate noticed (contract audit P0-1).
+   So: find the NEWEST migration that defines issue_certificate (highest timestamp prefix), parse
+   its three arrays, and assert set-equality with the HK_TRACKS keys derived from drills.js. The
+   dev/migrate-certificates.sql mirror is held to the same lists — it is a copy, not a channel. ---- */
+try {
+  const trackArrays = (src, where) => {
+    const out = {};
+    const re = /when\s+'(fluency|formulas|modeling)'\s*then\s*array\[([^\]]*)\]/g;
+    let m;
+    while ((m = re.exec(src))) out[m[1]] = m[2].split(',').map(s => s.trim().replace(/^'|'$/g, '')).filter(Boolean);
+    for (const t of ['fluency', 'formulas', 'modeling'])
+      if (!out[t]) bad('C15: ' + where + ' — could not parse the ' + t + ' array out of issue_certificate (shape changed?)');
+    return out;
+  };
+  const sbC = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
+  vm.createContext(sbC);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sbC);
+  const truth = {};
+  for (const t of (sbC.window.HK_TRACKS || [])) truth[t.id] = t.keys || [];
+
+  // NEWEST migration that (re)defines the RPC — migrations replay in filename order, so the last
+  // one to define it is the one that is live.
+  const migDir = 'supabase/migrations';
+  const defs = fs.readdirSync(migDir).filter(f => f.endsWith('.sql'))
+    .filter(f => /create\s+or\s+replace\s+function\s+public\.issue_certificate/.test(fs.readFileSync(migDir + '/' + f, 'utf8')))
+    .sort();
+  if (!defs.length) bad('C15: no migration defines public.issue_certificate');
+  const live = defs[defs.length - 1];
+  const sources = [[migDir + '/' + live, ' (live definition)'], ['dev/migrate-certificates.sql', ' (mirror)']];
+  let n14 = 0;
+  for (const [path, tag] of sources) {
+    if (!fs.existsSync(path)) continue;
+    const got = trackArrays(fs.readFileSync(path, 'utf8'), path);
+    for (const t of Object.keys(truth)) {
+      if (!got[t]) { n14++; continue; }
+      const want = new Set(truth[t]), have = new Set(got[t]);
+      const extra = [...have].filter(k => !want.has(k));
+      const missing = [...want].filter(k => !have.has(k));
+      if (got[t].length !== have.size) { n14++; bad('C15: ' + path + tag + ' ' + t + ' array has duplicate keys'); }
+      if (extra.length) { n14++; bad('C15: ' + path + tag + ' ' + t + ' requires ' + extra.join(', ') + ' — not in drills.js HK_TRACKS (retired drill? the certificate becomes unissuable)'); }
+      if (missing.length) { n14++; bad('C15: ' + path + tag + ' ' + t + ' is missing ' + missing.join(', ') + ' — in HK_TRACKS but not required by the RPC'); }
+    }
+  }
+  if (!n14) ok('certificate tracks: ' + live + ' + dev/migrate-certificates.sql match HK_TRACKS (' +
+    Object.keys(truth).map(t => t + ' ' + truth[t].length).join(' · ') + ')');
+} catch (e) {
+  bad('C15 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C17 (r452): CAMPAIGN CHAPTER NAMES ARE GROUP NAMES ----
+   The picker folder reads groups[].name; the campaign rail reads chapters[].name. They were two
+   strings for one chapter — groups said `Models I`, the campaign said `Models I · Valuation` —
+   so the same chapter had two names on two surfaces. The editorial suffix now lives in a
+   separate `sub`, which only the rail appends, and the NAME must match a group exactly. ---- */
+try {
+  const sb15 = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
+  vm.createContext(sb15);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sb15);
+  const groups15 = ((sb15.window.HOTKEY_DRILLS || {}).groups || []).map(g => g.name);
+  const camp15 = (sb15.window.HOTKEY_CAMPAIGN && sb15.window.HOTKEY_CAMPAIGN.chapters) || [];
+  if (!groups15.length || !camp15.length) bad('C17: groups[] or HOTKEY_CAMPAIGN.chapters did not parse (shape changed?)');
+  else {
+    let n15 = 0;
+    for (const c of camp15)
+      if (!groups15.includes(c.name)) {
+        n15++;
+        bad(`C17: HOTKEY_CAMPAIGN chapter ${c.id} name '${c.name}' is not a groups[] name — the picker folder and the campaign rail must show one string (put any suffix in \`sub\`). Groups: ${groups15.join(' | ')}`);
+      }
+    if (!n15) ok(`drills.js: all ${camp15.length} campaign chapter names match a groups[] name`);
+  }
+} catch (e) {
+  bad('C17 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C20 (r452, audit P1-4): DESK QUEST TEMPLATES NAME LIVE DRILLS ----
+   lb.js MG_PROGRAMS pins a week of drills through set_assignment, and the pin loop carries a
+   `if(!lab[k]) continue;  // catalog drift guard` that SILENTLY drops a key the catalog no
+   longer has. Two retired keys (dress, growth) sat there for the whole depth pass: a captain
+   who pinned "Intern week 0" week 2 got a 2-drill week, and the preview line advertised the
+   raw retired key. C19 catches retired names under dev/ only — nothing scanned lb.js. So the
+   drift guard is now LOUD where it belongs, in CI: every key in every template must be in
+   menuOrder. Same pattern as C18's "harness names a retired drill". ---- */
+try {
+  const sbQ = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
+  vm.createContext(sbQ);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sbQ);
+  const liveQ = new Set((sbQ.window.HOTKEY_DRILLS || {}).menuOrder || []);
+  const lbSrc = fs.readFileSync('lb.js', 'utf8');
+  const blk = /const\s+MG_PROGRAMS\s*=\s*\{([\s\S]*?)\n  \};/.exec(lbSrc);
+  if (!blk) bad('C20: MG_PROGRAMS block not found in lb.js (shape changed?)');
+  else {
+    const before = lbSrc.slice(0, blk.index).split('\n').length;
+    let n14 = 0, keys14 = 0;
+    blk[1].split('\n').forEach((line, i) => {
+      const km = /keys:\s*\[([^\]]*)\]/.exec(line);
+      if (!km) return;
+      km[1].split(',').map(x => x.trim().replace(/^['"`]|['"`]$/g, '')).filter(Boolean).forEach(k => {
+        keys14++;
+        if (!liveQ.has(k)) { n14++; bad(`C20: lb.js:${before + i} quest template pins '${k}', which is not in menuOrder — the pin loop's drift guard would ship a short week`); }
+      });
+    });
+    if (!n14) ok(`desk quest templates: all ${keys14} pinned keys are live drills (lb.js MG_PROGRAMS)`);
+  }
+} catch (e) {
+  bad('C20 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C21 (r452, audit P0-2): EVERY PLACEMENT BOARD IS REACHABLE ----
+   HK_PLACEMENT.KEYS is the standardized 5-board placement series. Its 5th key (opmodel) sits
+   in Full Builds — LVL 11 + 32 pace clears — while Ranked opens at LVL 10, so the gate made
+   the series impossible to finish and the nav pill sat at "placement 4/5" forever. A placement
+   key may therefore be EITHER in an ungated group, OR the trainer's gate must consult the
+   shared ride-through predicate (drills.js hkPlacementRide). Source-level assertion on
+   purpose: this is about the gate branch existing, not about any one player's state. ---- */
+try {
+  const sbP = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
+  vm.createContext(sbP);
+  const drillSrc = fs.readFileSync('drills.js', 'utf8');
+  vm.runInContext(drillSrc, sbP);
+  const WP = sbP.window;
+  const pk = (WP.HK_PLACEMENT || {}).KEYS || [];
+  const gatedGroups = new Set(Object.keys((WP.HOTKEY_GATES || {}).groups || {}));
+  const groupOf = (WP.HOTKEY_DRILLS || {}).groupOf || {};
+  const idx = fs.readFileSync('index.html', 'utf8');
+  const gateBranch = /const __gn\s*=\s*drillLocked\(key\);[\s\S]{0,900}?if\s*\(__gn([\s\S]{0,220}?)\)\s*\{/.exec(idx);
+  const rideDefined = /window\.hkPlacementRide\s*=\s*function/.test(drillSrc);
+  const gateRides = !!(gateBranch && /hkPlacementRide/.test(gateBranch[1]));
+  if (!pk.length) bad('C21: HK_PLACEMENT.KEYS is empty (shape changed?)');
+  if (!gateBranch) bad("C21: loadChallenge's progression-gate branch not found in index.html (shape changed?)");
+  let n15 = 0;
+  for (const k of pk) {
+    if (!(k in groupOf)) { n15++; bad(`C21: placement key '${k}' is not a real drill`); continue; }
+    if (!gatedGroups.has(groupOf[k])) continue;             // free/ungated tier — always reachable
+    if (rideDefined && gateRides) continue;                 // gated, but the gate rides through
+    n15++;
+    bad(`C21: placement key '${k}' is in the GATED group '${groupOf[k]}' and the trainer's gate does not consult hkPlacementRide — the placement series cannot be finished (audit P0-2)`);
+  }
+  if (!n15 && pk.length) ok(`placement series: ${pk.length} boards, every one reachable (gate rides through via hkPlacementRide)`);
+} catch (e) {
+  bad('C21 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C22 (r452, audit P1-1): NO PHANTOM CAPSTONE MEDALS ON THE WALL ----
+   Five capstone medals test drills that were never built, so they read a permanent 0/1 — and
+   they dragged the completionist mythic (x_allach, "every other medal") down with them, making
+   it unearnable forever. Ids are frozen, so the fix is `hidden` (derived in drills.js from
+   hkCapstoneKeys(), i.e. from HOTKEY_CAMPAIGN.chapters[i].capstone). The invariant: every
+   hkCapstoneDone(ctx,'key') literal inside HOTKEY_ACHIEVEMENTS is either a live drill or its
+   medal is hidden — and the medal's `cap` field must name the same key its test() does. ---- */
+try {
+  const sbA2 = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {},
+                 localStorage: { getItem: () => null, setItem() {} } };
+  vm.createContext(sbA2);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sbA2);
+  const WA = sbA2.window;
+  const liveA = new Set((WA.HOTKEY_DRILLS || {}).menuOrder || []);
+  const AC = WA.HOTKEY_ACHIEVEMENTS || [];
+  if (!AC.length) bad('C22: no achievements parsed from drills.js (shape changed?)');
+  let n16 = 0, hid = 0;
+  for (const a of AC) {
+    const src = String(a.test || '');
+    const lits = [...src.matchAll(/hkCapstoneDone\s*\([^,]+,\s*['"]([a-z0-9_]+)['"]\)/g)].map(m => m[1]);
+    if (!lits.length) continue;
+    for (const k of lits) {
+      if (a.cap !== k) { n16++; bad(`C22: medal '${a.id}' tests hkCapstoneDone(…,'${k}') but its cap field is '${a.cap}' — the pairing the hidden-derivation reads is broken`); }
+      if (liveA.has(k)) continue;
+      if (a.hidden) { hid++; continue; }
+      n16++;
+      bad(`C22: medal '${a.id}' tests capstone '${k}', which is not in menuOrder, and the medal is NOT hidden — a permanently 0/1 medal on the wall that also blocks x_allach (audit P1-1)`);
+    }
+  }
+  const allach = AC.find(a => a.id === 'x_allach');
+  if (allach && !/!a\.hidden/.test(String(allach.test))) bad('C22: x_allach must count VISIBLE medals only (its filter dropped the !a.hidden clause) — hidden medals make the mythic unearnable');
+  if (!n16) ok(`capstone medals: every hkCapstoneDone key is live or its medal is hidden (${hid} hidden), x_allach counts visible only`);
+} catch (e) {
+  bad('C22 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C24 (r452, dev/TUTORIAL_CHAPTER_SPEC.md §7): THE KEYBOARD TOUR IS NOT A DRILL ----
+   The Tour hangs off the drill engine — a CHALLENGES entry with build/checks/targets and the
+   r421 §2.5 tier ladder — but it must never be ONE. It carries no par, so a clock over it would
+   read `undefineds`; it is untimed, so a leaderboard row from it would be meaningless; and it is
+   not in the marketing count. Nothing structural stops a later edit from adding it to
+   drills.js's menuOrder or to HOTKEY_PARS, and MENU_ORDER's fallback (index.html: "Drills in
+   engine but not drills.js") would have ADOPTED it automatically if the `tour:true` filter were
+   ever dropped — silently putting a four-minute untimed tutorial into the picker, the drill
+   count, prev/next, the random pool and the weekly bag. So the exclusions are asserted, one by
+   one, and so is the shape the HUD and the staging depend on.
+
+   Second half: the LESSON-DRILL contract (§1.5, §1.6, §2). No lesson drill exists yet — the four
+   of §3.1–3.4 are a later wave — so these are ZERO-CASE guards today. They are written now, with
+   the platform, precisely so the wave that adds the drills inherits them (WORKFLOW §3.3). ---- */
+try {
+  const sb15 = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
+  vm.createContext(sb15);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sb15);
+  const W15 = sb15.window;
+  const D15 = W15.HOTKEY_DRILLS || {};
+  const idx15 = fs.readFileSync('index.html', 'utf8');
+  const KT = 'keyboardtour';
+
+  /* ---- the Tour is nowhere in the catalog plumbing ---- */
+  const menu = D15.menuOrder || [];
+  if (menu.includes(KT)) bad(`C24: '${KT}' is in drills.js menuOrder — the Tour is not a drill (§2(g))`);
+  for (const [name, map] of [['HOTKEY_PARS', W15.HOTKEY_PARS], ['HOTKEY_CLOCKS', W15.HOTKEY_CLOCKS]])
+    if (map && KT in map) bad(`C24: '${KT}' is in ${name} — it must be impossible to time the Tour (§7)`);
+  if ((W15.HOTKEY_CHALLENGE_POOL || []).includes(KT)) bad(`C24: '${KT}' is in HOTKEY_CHALLENGE_POOL`);
+  if (((W15.HK_PLACEMENT || {}).KEYS || []).includes(KT)) bad(`C24: '${KT}' is in HK_PLACEMENT.KEYS`);
+  for (const t of Object.keys(W15.HK_TRACKS || {}))
+    if ((W15.HK_TRACKS[t].keys || []).includes(KT)) bad(`C24: '${KT}' is in HK_TRACKS.${t}.keys`);
+  for (const c of ((W15.HOTKEY_CAMPAIGN || {}).chapters || []))
+    if ((c.keys || []).includes(KT)) bad(`C24: '${KT}' is in HOTKEY_CAMPAIGN chapter ${c.id}`);
+  for (const g of (D15.groups || []))
+    if ((g.keys || []).includes(KT)) bad(`C24: '${KT}' is in drills.js group '${g.name}'`);
+  if ((D15.meta || {})[KT]) bad(`C24: drills.js meta.${KT} exists — the Tour has no picker entry (§2(g))`);
+  /* the filter that keeps MENU_ORDER's fallback from re-adopting it */
+  if (!/filter\(k\s*=>\s*!g\.includes\(k\)\s*&&\s*!CHALLENGES\[k\]\.tour\)/.test(idx15))
+    bad('C24: MENU_ORDER\'s fallback no longer filters `tour:true` entries — keyboardtour would ' +
+        'silently join the catalog (index.html, the `Drills in engine but not drills.js` block)');
+
+  /* ---- the Tour's own shape, read out of its CHALLENGES chunk ---- */
+  const s15 = idx15.indexOf('const CHALLENGES = {');
+  const e15 = idx15.indexOf('STATE + ENGINE', s15);
+  const body15 = idx15.slice(s15, e15);
+  const parts15 = body15.split(/\n  ([a-z][a-z0-9_]*):\s*\{/);
+  const chunks15 = {};
+  for (let i = 1; i < parts15.length; i += 2) chunks15[parts15[i]] = parts15[i + 1] || '';
+  const tc = chunks15[KT];
+  if (!tc) bad(`C24: CHALLENGES.${KT} not found — the Keyboard Tour board is gone`);
+  else {
+    if (!/\btour\s*:\s*true/.test(tc)) bad(`C24: ${KT} must declare tour:true (that flag is what keeps it out of MENU_ORDER)`);
+    if (/\bpar\s*:/.test(tc) || /\bparKeys\s*:/.test(tc))
+      bad(`C24: ${KT} declares a par — it must be impossible to time the Tour (§7)`);
+    if (/saveClose\s*:\s*true/.test(tc))
+      bad(`C24: ${KT} declares saveClose — hkSaveCloseWire would append a 25th beat over stage 6's own save`);
+    const ci = tc.indexOf('checks(');
+    const nChecks = ci >= 0 ? (tc.slice(ci).match(/\{label:/g) || []).length : 0;
+    if (nChecks !== 24) bad(`C24: ${KT} has ${nChecks} beats, expected 24 (§3.0.5: 5·4·5·4·5·1)`);
+    /* targets are index-paired with checks and exactly ONE is null — stage 6 beat 1 (Ctrl+S has
+       no cell on the grid, §3.0.2(2)); the HUD alone carries that beat, by design, not by gap */
+    const tm = /targets\(\)\s*\{[\s\S]*?return\s*\[([\s\S]*?)\n      \]; \}/.exec(tc);
+    if (!tm) bad(`C24: ${KT} targets() is not a literal array (the C23 static parser reads it as one)`);
+    else {
+      const nulls = (tm[1].match(/(^|[,\s])null(?=[,\s]|$)/g) || []).length;
+      if (nulls !== 1) bad(`C24: ${KT} targets() has ${nulls} null entries, expected exactly 1 (stage 6 beat 1)`);
+    }
+    /* five staged tiers, one per stage 2-6, every checks index inside 0..23 */
+    const tiers = tc.match(/\{ label:'[^']*', checks:\[([0-9,\s]*)\]/g) || [];
+    if (tiers.length !== 5) bad(`C24: ${KT} declares ${tiers.length} tiers, expected 5 (stages 2-6, §7)`);
+    for (const t of tiers) {
+      const ix = /checks:\[([0-9,\s]*)\]/.exec(t)[1].split(',').map(x => parseInt(x, 10)).filter(x => !isNaN(x));
+      if (!ix.length) bad(`C24: ${KT} tier ${t.slice(0, 30)} lists no checks`);
+      for (const i of ix) if (i < 0 || i >= nChecks)
+        bad(`C24: ${KT} tier checks index ${i} is outside its ${nChecks}-beat checks() array`);
+    }
+    /* six stage cards, each with a title, a body of at most 60 words and a non-empty keycap strip */
+    const stagesM = /stages:\s*\[([\s\S]*?)\n    \],/.exec(tc);
+    if (!stagesM) bad(`C24: ${KT} declares no stages[] (the six §1.5 lesson cards)`);
+    else {
+      const titles = stagesM[1].match(/title:'((?:[^'\\]|\\.)*)'/g) || [];
+      const bodies = stagesM[1].match(/body:'((?:[^'\\]|\\.)*)'/g) || [];
+      const keys = stagesM[1].match(/keys:\[[^\]]+\]/g) || [];
+      if (titles.length !== 6 || bodies.length !== 6 || keys.length !== 6)
+        bad(`C24: ${KT} stages: ${titles.length} titles / ${bodies.length} bodies / ${keys.length} keycap strips, expected 6 of each`);
+      bodies.forEach((b, i) => {
+        const words = b.slice(6, -1).split(/\s+/).filter(Boolean).length;
+        if (words > 60) bad(`C24: ${KT} stage ${i + 1} card body is ${words} words — the §1.5 lesson card caps at 60`);
+      });
+    }
+  }
+
+  /* ---- the HUD's per-beat strings (HK_TOUR_BEATS, beside the engine) ---- */
+  const bm = /const HK_TOUR_BEATS=\[([\s\S]*?)\n\];/.exec(idx15);
+  if (!bm) bad('C24: HK_TOUR_BEATS not found — the TUTORIAL HUD has no per-beat copy (§3.0.2)');
+  else {
+    const huds = (bm[1].match(/hud:'((?:[^'\\]|\\.)*)'/g) || []).map(x => x.slice(5, -1));
+    const nudges = (bm[1].match(/nudge:'((?:[^'\\]|\\.)*)'/g) || []).map(x => x.slice(7, -1));
+    if (huds.length !== 24) bad(`C24: HK_TOUR_BEATS carries ${huds.length} hud lines, expected 24`);
+    if (nudges.length !== 24) bad(`C24: HK_TOUR_BEATS carries ${nudges.length} nudge lines, expected 24 (every beat gets the three-miss line)`);
+    huds.forEach((h, i) => {
+      if (!h.trim()) bad(`C24: HK_TOUR_BEATS[${i}].hud is empty — the HUD is the ONLY instruction surface on the Tour`);
+      const w = h.split(/\s+/).filter(Boolean).length;
+      if (w > 14) bad(`C24: HK_TOUR_BEATS[${i}].hud is ${w} words — §3.0.2(5) caps the banner at 14 ("${h.slice(0, 50)}")`);
+      if (i && h === huds[i - 1]) bad(`C24: HK_TOUR_BEATS[${i}].hud repeats beat ${i - 1}'s line — one beat, one line`);
+    });
+  }
+
+  /* ---- the Tour's runtime seams stay wired (each was a live bug during the r452 build) ---- */
+  const seams = [
+    [/if\(done\|\|demoPlaying\|\|sandboxMode\|\|tourMode\|\|echoOn\|\|microPrefill\) return;/,
+     'checkWin no longer bails on tourMode — the Tour would stop a clock it never started, post a PB and pay xp twice (§3.0.4(4))'],
+    [/function startClock\(\)\{ if\(running\|\|done\|\|sandboxMode\|\|tourMode\)return;/,
+     'startClock no longer refuses tourMode — the untimed Tour would start running a clock (§3.0.4(6))'],
+    [/if\(tourMode\) return;\s*\/\* r452 §3\.0\.4\(6\)/,
+     'hkGateArm no longer declines the Tour — a start gate would promise a clock nothing runs (check-startgate §8)'],
+    [/if\(tourMode\)\{ try\{ hkTourChecklist/,
+     'updateChecklist lost its Tour branch — the parked stages\' beats would render (§3.0.2(1))'],
+    [/if\(tourMode\)\{ try\{ hkTourKeyWatch\(e\); \}catch\(_\)\{\} \}/,
+     'the keydown handler lost hkTourKeyWatch — no keystroke gates and no three-miss nudge (§3.0.2(3))'],
+    [/if\(tourMode\) cls\.push\('tourping'\);/,
+     'the render lost the Tour\'s .ttarget pulse — the target spotlight stops pulsing (§3.0.2(2))'],
+  ];
+  for (const [re, why] of seams) if (!re.test(idx15)) bad('C24: ' + why);
+
+  /* ---- the sandbox stays retired (§1.7 / decision T2) ---- */
+  for (const dead of ['function startSandbox', 'function sandboxReadyCard', 'function sandboxCallout',
+                      'function exitSandbox', 'function startOnboardBoard', 'function sbCell'])
+    if (idx15.includes(dead))
+      bad(`C24: '${dead}' is back in index.html — the warm-up sandbox was retired into the Keyboard Tour (§1.7, T2)`);
+  if (!/let sandboxMode=false;/.test(idx15))
+    bad('C24: sandboxMode was deleted — §8 do-not-change #6 keeps the FLAG (checkWin, updateChecklist and loadChallenge all read it)');
+  if (fs.existsSync('dev/e2e-onboard-sandbox.js'))
+    bad('C24: dev/e2e-onboard-sandbox.js is back — it tests a surface that no longer exists (§1.7)');
+
+  /* ---- the LESSON-DRILL contract (§1.5/§1.6/§2). Zero cases today, by design. ---- */
+  const lessonKeys = Object.keys(chunks15).filter(k => /\blesson\s*:\s*\{/.test(chunks15[k]));
+  const metaLesson = Object.keys(D15.meta || {}).filter(k => (D15.meta[k] || {}).lesson);
+  for (const k of lessonKeys) if (!metaLesson.includes(k))
+    bad(`C24: CHALLENGES.${k} carries a lesson but drills.js meta.${k}.lesson is not true (§2(a): the two must never drift)`);
+  for (const k of metaLesson) if (!lessonKeys.includes(k))
+    bad(`C24: drills.js meta.${k}.lesson is true but CHALLENGES.${k} declares no lesson object (§2(a))`);
+  for (const k of lessonKeys) {
+    const ch = chunks15[k];
+    const lm = /lesson:\s*\{([\s\S]*?)\}/.exec(ch);
+    const title = lm && /title:'((?:[^'\\]|\\.)*)'/.exec(lm[1]);
+    const bodyL = lm && /body:'((?:[^'\\]|\\.)*)'/.exec(lm[1]);
+    const keysL = lm && /keys:\[([^\]]*)\]/.exec(lm[1]);
+    if (!title || !bodyL || !keysL || !keysL[1].trim())
+      bad(`C24: ${k}.lesson needs title, body and a non-empty keys strip (§1.5)`);
+    else {
+      const w = bodyL[1].split(/\s+/).filter(Boolean).length;
+      if (w > 60) bad(`C24: ${k}.lesson.body is ${w} words — the lesson card caps at 60 (§1.5)`);
+    }
+    if (!/reveal\s*:\s*true/.test(ch))
+      bad(`C24: lesson drill ${k} must render its ☆ visibly (reveal:true) — the efficiency IS the lesson (§1.6)`);
+    if (!menu.includes(k)) bad(`C24: lesson drill ${k} is not in menuOrder — lesson drills ARE drills (§2(h))`);
+    if ((W15.HOTKEY_CHALLENGE_POOL || []).includes(k)) bad(`C24: lesson drill ${k} is in HOTKEY_CHALLENGE_POOL — a ≤30 s board is not a Daily Challenge (§4 A5)`);
+    if (((W15.HK_PLACEMENT || {}).KEYS || []).includes(k)) bad(`C24: lesson drill ${k} is in HK_PLACEMENT.KEYS (§7)`);
+    const par = (W15.HOTKEY_PARS || {})[k];
+    if (!(par > 0 && par <= 30)) bad(`C24: lesson drill ${k} par is ${par} — lesson pars are ≤ 30 s (§7)`);
+    const cl = (W15.HOTKEY_CLOCKS || {})[k];
+    if (!cl || Math.abs(cl.pass - par * 2) > 0.01)
+      bad(`C24: lesson drill ${k} clocks: pass must be par×2.0 (§2(b)), got ${cl && cl.pass} against par ${par}`);
+  }
+  /* reveal:true is legal ONLY on a lesson drill — navigation's game ☆ stays hidden (§1.6) */
+  for (const k of Object.keys(chunks15))
+    if (/reveal\s*:\s*true/.test(chunks15[k]) && !lessonKeys.includes(k))
+      bad(`C24: ${k} declares reveal:true but is not a lesson drill — the ☆ is a hidden discovery everywhere else (§1.6)`);
+  if (!/function hkLessonKey\(k\)\{/.test(idx15))
+    bad('C24: hkLessonKey() is gone — §2(a) names it as the single lesson-drill helper');
+
+  if (!fail) ok(`Keyboard Tour: outside the catalog, 24 beats / 24 targets / 5 tiers / 6 stage cards, ` +
+                `HUD copy + runtime seams intact, sandbox retired; ${lessonKeys.length} lesson drill(s) contract-clean`);
+} catch (e) {
+  bad('C24 could not run: ' + String(e.message || e).slice(0, 160));
+}
+
+/* ---- C25 (r452): the Mac chord truth table is SSOT ----
+   themes.js's HK_MAC_CHORDS is the only place Mac Excel's real bindings live. Before r452
+   reference.html carried its OWN blind glyph swap (macCap: ctrl→⌘, alt→⌥, shift→⇧) and the
+   two surfaces drifted for six rounds — the public table published ⌘Space (macOS Spotlight)
+   and ⌥= (not a Mac chord) as Excel for Mac. reference.html must DERIVE (hkMacSpec/hkMacNote)
+   and must never re-implement the swap locally. */
+try {
+  const themes = fs.readFileSync('themes.js', 'utf8');
+  const ref = fs.readFileSync('reference.html', 'utf8');
+  const TABLE = /window\.HK_MAC_CHORDS\s*=\s*\{/;
+  const rows = (themes.match(/'(?:CTRL|ALT|F\d|SHIFT)[^']*'\s*:\s*\{/g) || []).length;
+  if (!TABLE.test(themes)) bad('C25: themes.js no longer defines window.HK_MAC_CHORDS (the Mac truth table)');
+  else if (rows < 12) bad(`C25: HK_MAC_CHORDS has only ${rows} rows — the Mac exception table looks gutted`);
+  else ok(`themes.js owns the Mac chord truth table (${rows} audited rows)`);
+  for (const fn of ['hkMacSpec', 'hkMacNote', 'hkMacChord', 'hkMacLookup'])
+    if (!new RegExp('window\\.' + fn + '\\s*=').test(themes)) bad(`C25: themes.js no longer exports ${fn}()`);
+  if (!/window\.hkMacSpec/.test(ref) || !/window\.hkMacNote/.test(ref))
+    bad('C25: reference.html no longer derives its Mac column from themes.js (hkMacSpec/hkMacNote)');
+  else ok('reference.html derives its Mac column from themes.js');
+  // the local re-implementation must stay gone: no ctrl→⌘ swap outside themes.js
+  const localSwap = /replace\(\s*\/(?:\\b)?ctrl/i;
+  if (localSwap.test(ref) || /function\s+macCap\s*\(/.test(ref))
+    bad('C25: reference.html has its own ctrl→⌘ swap again — that is the drift this guard exists for');
+  else ok('reference.html carries no local glyph swap');
+} catch (e) {
+  bad('C25 could not run: ' + String(e.message || e).slice(0, 120));
 }
 
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }

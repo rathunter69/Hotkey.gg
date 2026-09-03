@@ -7,6 +7,18 @@
 const { chromium } = require('playwright-core');
 const BASE = process.env.BASE || 'http://127.0.0.1:8791';
 const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'billing.html', 'leaderboard.html', 'desks.html'];
+/* r452 (audit P1-5/P1-6) — THE PHONE SWEEP. Two pages scrolled sideways on a 390px phone
+   (About's 760px .hero-glow escaping an unclipped .hero: +178px; stats' six non-wrapping rarity
+   chips: +301px) and nothing on CI was looking, because the smoke list is the SEVEN app pages
+   and the marketing pages had no automated viewport check at all. A page that scrolls sideways
+   on a phone is a bug you cannot un-see and the cheapest possible assertion, so encode the
+   crawl the audit did by hand: EVERY top-level page, at 390x844, scrollWidth == clientWidth. */
+const MOBILE_PAGES = ['index.html', 'About.html', 'profile.html', 'stats.html', 'account.html',
+  'admin.html', 'billing.html', 'leaderboard.html', 'desks.html', 'reference.html', 'contact.html',
+  'enterprise.html', 'cert.html', 'privacy.html', 'terms.html', 'security.html', '404.html',
+  /* the library, plus one generated drill page standing in for all 74 — they share one template
+     (dev/build-drill-pages.js), so a template regression shows up on any of them */
+  'drills/index.html', 'drills/wacc.html'];
 
 (async () => {
   /* r429: smoke was the ONE suite resolving the browser via chromium.executablePath(), which
@@ -23,6 +35,13 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
     const errs = [];
     page.on('pageerror', e => errs.push('PAGEERROR: ' + e.message));
     page.on('console', m => { if (m.type() === 'error' && !/ERR_|supabase|Failed to load resource|net::/i.test(m.text())) errs.push('CONSOLE.ERR: ' + m.text()); });
+    /* r452 (audit P1-3): WARNINGS COUNT TOO. billing.html shipped without drills.js for a full
+       release — nav.js warned "drills.js not loaded — profile modal will be empty" on every
+       single load and the player-card modal rendered empty, but the filter above only ever read
+       type()==='error', so CI saw a clean page. A shared script announcing that its data source
+       is missing is exactly the class this suite exists to catch. Same ERR_/supabase carve-out:
+       the sandbox has no egress, so network noise is not a page defect. */
+    page.on('console', m => { if (m.type() === 'warning' && !/ERR_|supabase|Failed to load resource|net::/i.test(m.text())) errs.push('CONSOLE.WARN: ' + m.text()); });
     await page.route('**/@supabase/**', r => r.abort());
     try {
       await page.goto(BASE + '/' + p, { waitUntil: 'networkidle', timeout: 30000 });
@@ -32,7 +51,41 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
     const bodyLen = await page.evaluate(() => (document.body && document.body.innerHTML || '').length).catch(() => 0);
     if (bodyLen < 200) errs.push('EMPTY BODY (' + bodyLen + ' chars) — page did not render');
     if (errs.length) fails.push({ p, errs });
-    else console.log('  PASS ' + p + ' — loaded, zero page errors');
+    else console.log('  PASS ' + p + ' — loaded, zero page errors/warnings');
+    await page.close();
+  }
+
+  /* r452 (audit P1-5/P1-6): the 390px no-sideways-scroll sweep — see MOBILE_PAGES above. */
+  {
+    const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    await page.route('**/@supabase/**', r => r.abort());
+    const wide = [];
+    for (const p of MOBILE_PAGES) {
+      try {
+        await page.goto(BASE + '/' + p, { waitUntil: 'load', timeout: 30000 });
+        await page.waitForTimeout(450);
+        const m = await page.evaluate(() => {
+          const d = document.documentElement;
+          const over = d.scrollWidth - d.clientWidth;
+          if (over <= 0) return { over: 0 };
+          /* name the culprit — a bare pixel count sends the next reader hunting */
+          let worst = null;
+          document.querySelectorAll('*').forEach(el => {
+            const r = el.getBoundingClientRect();
+            if (r.width === 0 && r.height === 0) return;
+            if (r.right <= d.clientWidth + 1 && r.left >= -1) return;
+            if (!worst || r.right > worst.right) worst = { right: Math.round(r.right), left: Math.round(r.left),
+              sel: el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + (typeof el.className === 'string' && el.className ? '.' + el.className.trim().split(/\s+/).join('.') : '') };
+          });
+          return { over, worst, sw: d.scrollWidth, cw: d.clientWidth };
+        });
+        if (m.over > 0) wide.push(p + ': +' + m.over + 'px (' + m.sw + ' vs ' + m.cw + ')' +
+          (m.worst ? ' — widest escapee ' + m.worst.sel + ' [' + m.worst.left + '..' + m.worst.right + ']' : ''));
+        else console.log('  PASS ' + p + ' @390 — no sideways scroll');
+      } catch (e) { wide.push(p + ': NAV FAIL ' + String(e).slice(0, 100)); }
+    }
+    if (wide.length) fails.push({ p: 'mobile-overflow @390x844', errs: wide });
+    else console.log('  PASS mobile-overflow — all ' + MOBILE_PAGES.length + ' pages fit 390px');
     await page.close();
   }
   // r393 (Wolf #75) / r411: skin-unlock celebration + equip-now. Drives the PAGE-LOAD sweep
@@ -53,9 +106,11 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
       await page.waitForTimeout(1000);
       const r = await page.evaluate(() => {
         const o = {};
-        try { localStorage.setItem('hk_beta_unlock', '1'); } catch (e) {}
-        o.earnIgnoresBeta = window.hkFrameEarned('onyx', { tierBest: 2 }) === false && window.hkFrameUnlocked('onyx', { tierBest: 2 }) === true;
-        try { localStorage.setItem('hk_beta_unlock', '0'); } catch (e) {}
+        /* r451: key renamed hk_beta_unlock -> hk_dev_unlock_cosmetics (themes.js). The invariant
+           itself is unchanged: the blanket dev grant opens the PICKER but must never fake an EARN. */
+        try { localStorage.setItem('hk_dev_unlock_cosmetics', '1'); } catch (e) {}
+        o.earnIgnoresDevUnlock = window.hkFrameEarned('onyx', { tierBest: 2 }) === false && window.hkFrameUnlocked('onyx', { tierBest: 2 }) === true;
+        try { localStorage.setItem('hk_dev_unlock_cosmetics', '0'); } catch (e) {}
         const l = window.hkFlair('{"f":"molten","st":["solves","crowns"],"ti":"pro"}'); l.frame = 'onyx';
         const back = window.hkFlair(window.hkFlairPack(l));
         o.loadoutPreserved = back.frame === 'onyx' && back.title === 'pro' && (back.stats || []).join(',') === 'solves,crowns';
@@ -80,7 +135,7 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
         o.drills = (window.HOTKEY_DRILLS && window.HOTKEY_DRILLS.menuOrder || []).length;
         return o;
       });
-      const checks = ['earnIgnoresBeta', 'loadoutPreserved', 'seedSilent', 'freshFires', 'inGameSilent', 'equipBtn'];
+      const checks = ['earnIgnoresDevUnlock', 'loadoutPreserved', 'seedSilent', 'freshFires', 'inGameSilent', 'equipBtn'];
       const bad = checks.filter(k => !r[k]);
       if (bad.length) errs.push('skin-unlock invariants failed: ' + bad.join(', '));
       if (errs.length) fails.push({ p: 'skin-unlock', errs });
@@ -89,15 +144,32 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
       // r398 (#76): the hand-written marketing copy must not drift from the live catalog.
       // "banker-grade drills" is the unambiguous full-catalog phrase (smaller "N drills"
       // counts are chapter/feature sizes), so any "N banker-grade drills" must == menuOrder.
+      // r452: WIDENED to bare "N drills" too — "82 drills" survived in index.html's schema.org
+      // description (the number Google reads), About.html and enterprise.html for ~8 catalog
+      // changes precisely because it never said "banker-grade". Bare counts are only checked
+      // at N >= 20, since the small ones ("5 drills", "11 drills") are genuinely chapter and
+      // feature sizes, and only outside comments, since the engine's own /* */ notes cite
+      // historical catalog sizes ("75 of 81 drills") as evidence and must stay quotable.
       const total = r.drills;
       const cerr = [];
+      const BARE_MIN = 20;
       if (!total) cerr.push('menuOrder.length came back 0 — could not verify');
       else {
         const fs = require('fs');
+        const decomment = s => s
+          .replace(/<!--[\s\S]*?-->/g, ' ')          // html comments
+          .replace(/\/\*[\s\S]*?\*\//g, ' ')         // block comments (js + css)
+          .replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');    // line comments (keep https:// intact)
         for (const f of ['index.html', 'About.html', 'enterprise.html']) {
           let txt = ''; try { txt = fs.readFileSync(f, 'utf8'); } catch (e) { continue; }
           let m; const re = /(\d+)\s+banker-grade\s+drills/g;
           while ((m = re.exec(txt))) if (+m[1] !== total) cerr.push(f + ': "' + m[0] + '" != ' + total + ' (menuOrder)');
+          const bare = decomment(txt);
+          let b; const bre = /(\d+)\s+(?:banker-grade\s+)?drills\b/g;
+          while ((b = bre.exec(bare))) {
+            const n = +b[1];
+            if (n >= BARE_MIN && n !== total) cerr.push(f + ': "' + b[0].replace(/\s+/g, ' ') + '" != ' + total + ' (menuOrder)');
+          }
         }
       }
       if (cerr.length) fails.push({ p: 'drill-count', errs: cerr });
@@ -111,7 +183,12 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
       const inv = await page.evaluate(() => {
         const out = { parsMissing: [], parsMismatch: [], dehint: [] };
         const D = window.HOTKEY_DRILLS || {}, pars = D.pars || window.HOTKEY_PARS || {}, meta = D.meta || {};
+        /* r452: a CHALLENGES entry flagged `tour:true` is NOT a drill — the Keyboard Tour is
+           untimed and deliberately absent from HOTKEY_PARS (spec §2(g), asserted by
+           dev/check-invariants.js C15). Skipping it here is the same exclusion, not a hole:
+           C15 fails the build if it ever DOES appear in PARS. */
         for (const k of Object.keys(CHALLENGES)) { const c = CHALLENGES[k];
+          if (c.tour) continue;
           if (!(k in pars)) { out.parsMissing.push(k); continue; }
           if (Number(pars[k]) !== Number(c.par)) out.parsMismatch.push(k + ':' + pars[k] + '!=' + c.par); }
         const CHORD = /\b(Ctrl|Alt|Cmd|Shift)\s*\+|⌘|\bAlt\s+[A-Z]\b/;
@@ -138,5 +215,7 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
     fails.forEach(f => console.error('  ' + f.p + '\n    ' + f.errs.join('\n    ')));
     process.exit(1);
   }
-  console.log('SMOKE: ALL ' + PAGES.length + ' PAGES CLEAN + skin-unlock');
+  /* r452: the summary names the phone sweep too — a suite whose last line does not mention a
+     section is a suite whose section can be deleted without anyone noticing. */
+  console.log('SMOKE: ALL ' + PAGES.length + ' PAGES CLEAN + ' + MOBILE_PAGES.length + ' @390 + skin-unlock');
 })().catch(e => { console.error('SMOKE HARNESS FAIL', e); process.exit(1); });

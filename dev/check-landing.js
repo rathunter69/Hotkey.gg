@@ -1,0 +1,171 @@
+/* r452 LANDING GUARD — dev/BETA_RETIRE_LANDING.md Part II §7, the landing half.
+   Landing v2 is a marketing surface whose every number is DERIVED from the catalog, so the
+   thing that can rot here is the derivation, not the copy. This asserts:
+     · the chapter rail renders every HOTKEY_DRILLS group, with its live per-chapter count,
+       and those counts sum to menuOrder.length (the e2e-smoke drill-count pattern)
+     · the catalog h2 and the hero lede carry the live totals, not typed ones
+     · the free / "free right now" / PRO badge tracks hkPremiumOn() in BOTH states, driven
+       through the dev preview (?premium=preview) so no flag is ever edited to run a test
+     · the PRO door names every HOTKEY_PREMIUM chapter, carries the live premium and catalog
+       counts, points at billing.html, and quotes NO dollar figure in either state
+       (the same no-price line dev/check-paywall.js §3/§4 holds on the other paywall surfaces)
+     · the hero fits 1280x800 and 390x844 with the CTA above the fold and no horizontal scroll
+     · a fresh device lands on Daylight (themes.js r293), the CTA is a real focusable <button>
+       that runs tryEnter(), headings descend in order, and there are no exclamation marks
+     · html.hk-returning still hides the landing (the r314 property e2e-audit-onboard T3 owns)
+     · the ?desk=CODE invite preview writes into .lede — the r314 regression fixed in r452
+
+   Run: node dev/check-landing.js                       (server on 127.0.0.1:8791)
+        BASE=http://127.0.0.1:8799 node dev/check-landing.js */
+const { chromium } = require('playwright-core');
+const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const BASE = process.env.BASE || 'http://127.0.0.1:8791';
+let pass = 0, fail = 0;
+const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { fail++; console.log('  FAIL ' + n + (x ? ' — ' + x : '')); } };
+
+(async () => {
+  const browser = await chromium.launch({ executablePath: EXE, args: ['--no-sandbox'] });
+  const mk = async (q, seed) => {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    page.__errs = []; page.on('pageerror', e => page.__errs.push(String(e.message).slice(0, 140)));
+    await page.route('**/@supabase/**', r => r.abort());
+    await page.addInitScript(() => { try { localStorage.setItem('hk_beta_ok', '1'); } catch (e) {} });
+    if (seed) await page.addInitScript(seed);
+    await page.goto(BASE + '/index.html' + (q || ''), { waitUntil: 'load' });
+    await page.waitForTimeout(1000);
+    return page;
+  };
+
+  // --- flag OFF (today)
+  let p = await mk('');
+  let r = await p.evaluate(() => {
+    const L = document.getElementById('landing');
+    const grp = window.HOTKEY_DRILLS.groups.filter(g => g.keys.length);
+    const nAll = window.hkCatalogCount();
+    const rail = [...document.querySelectorAll('#lRail .l-chap')];
+    const heads = [...L.querySelectorAll('h1,h2,h3')].map(h => +h.tagName[1]);
+    const cta = document.getElementById('startBtn');
+    return {
+      chapters: rail.length, wantChapters: grp.length,
+      counts: rail.map(e => +e.querySelector('.l-ccount').textContent),
+      wantCounts: grp.map(g => g.keys.length),
+      sum: rail.reduce((a, e) => a + (+e.querySelector('.l-ccount').textContent), 0),
+      menuOrder: nAll,
+      h2: document.getElementById('lCatalogH2').textContent,
+      lede: document.getElementById('landingLede').textContent,
+      badges: rail.map(e => e.querySelector('.l-tag').textContent),
+      proChips: [...document.querySelectorAll('#lProChaps .l-pro-chip')].map(e => e.textContent.trim()),
+      wantPro: window.hkPremiumGroups(), nPrem: window.hkPremiumCount(),
+      proLater: document.getElementById('lProLaterP').textContent,
+      plansHref: document.getElementById('lProPlans').getAttribute('href'),
+      noPrice: !/\$\s?\d/.test(L.textContent),
+      noBang: !/!/.test(L.textContent),
+      heads, ctaTag: cta.tagName, ctaDisabled: cta.disabled,
+      hasLede: !!L.querySelector('.lede'),
+      board: [...document.querySelectorAll('#lBoard .l-brow')].map(e => e.textContent),
+      theme: window.currentTheme
+    };
+  });
+  ok(r.chapters === r.wantChapters, 'the rail renders every catalog chapter (' + r.chapters + ')');
+  ok(JSON.stringify(r.counts) === JSON.stringify(r.wantCounts), 'per-chapter counts match HOTKEY_DRILLS.groups', JSON.stringify(r.counts));
+  ok(r.sum === r.menuOrder, 'rail counts sum to menuOrder.length (' + r.sum + ' == ' + r.menuOrder + ')');
+  ok(r.h2 === r.wantChapters + ' chapters. ' + r.menuOrder + ' drills.', 'the catalog h2 is derived: "' + r.h2 + '"');
+  ok(r.lede.indexOf(String(r.menuOrder) + ' timed drills') === 0, 'the hero lede carries the live total');
+  ok(r.badges.filter(b => /free right now/i.test(b)).length === r.wantPro.length,
+    'flag off: the paid chapters read "free right now" (' + r.badges.join(' | ') + ')');
+  ok(r.proChips.length === r.wantPro.length && r.wantPro.every(n => r.proChips.some(c => c.indexOf(n) === 0)),
+    'the PRO band names all ' + r.wantPro.length + ' paid chapters: ' + r.proChips.join(' · '));
+  ok(r.proLater.indexOf(r.nPrem + ' of the ' + r.menuOrder + ' drills') > 0,
+    'the PRO band carries the live premium/catalog counts');
+  ok(r.plansHref === 'billing.html', 'the PRO door points at billing.html');
+  ok(r.noPrice, 'the landing quotes NO dollar figure');
+  ok(r.noBang, 'no exclamation marks (house voice)');
+  ok(r.heads[0] === 1 && r.heads.every((h, i) => i === 0 || h - r.heads[i - 1] <= 1), 'headings descend in order: ' + r.heads.join(''));
+  ok(r.ctaTag === 'BUTTON' && !r.ctaDisabled, 'the Enter CTA is a real, enabled <button>');
+  ok(r.hasLede, 'the landing ships a .lede (the desk-invite write target)');
+  ok(r.board.length === 4, 'the clock panel renders its four rows');
+  ok(r.theme === 'daylight', 'a fresh device lands on Daylight (got ' + r.theme + ')');
+  ok(p.__errs.length === 0, 'zero page errors', p.__errs.join(' | '));
+  // the hero fits, at both widths, with no horizontal scroll
+  for (const [w, h] of [[1280, 800], [390, 844]]) {
+    await p.setViewportSize({ width: w, height: h });
+    /* the phone gate (index.html, <=740px) is a separate surface that sits OVER the landing at
+       z:400 — hide it so what is measured is the landing's own layout, which is the share
+       surface and has to read on a phone regardless. */
+    await p.evaluate(() => { const g = document.querySelector('.mobile-gate'); if (g) g.style.display = 'none'; });
+    await p.waitForTimeout(200);
+    const g = await p.evaluate(() => {
+      const r = document.getElementById('startBtn').getBoundingClientRect();
+      const l = document.getElementById('landing');
+      return { bottom: Math.round(r.bottom), scrollW: l.scrollWidth, clientW: l.clientWidth };
+    });
+    ok(g.bottom < h, 'CTA is above the fold at ' + w + 'x' + h + ' (bottom ' + g.bottom + ')');
+    ok(g.scrollW <= g.clientW, 'no horizontal scroll at ' + w + ' (' + g.scrollW + ' <= ' + g.clientW + ')');
+  }
+  await p.setViewportSize({ width: 1280, height: 800 });
+
+  // the CTA calls tryEnter -> dismisses the landing
+  const t = await p.evaluate(async () => {
+    document.getElementById('startBtn').click();
+    await new Promise(r => setTimeout(r, 400));
+    return document.getElementById('landing').classList.contains('gone');
+  });
+  ok(t, 'clicking the hero CTA runs tryEnter() and dismisses the landing');
+  await p.close();
+
+  // --- close-CTA is the same door
+  p = await mk('');
+  const t2 = await p.evaluate(async () => {
+    document.getElementById('startBtn2').click();
+    await new Promise(r => setTimeout(r, 400));
+    return document.getElementById('landing').classList.contains('gone');
+  });
+  ok(t2, 'the close CTA is the same door');
+  await p.close();
+
+  // --- flag ON via the dev preview
+  p = await mk('?premium=preview');
+  const r2 = await p.evaluate(() => ({
+    on: window.hkPremiumOn(),
+    badges: [...document.querySelectorAll('#lRail .l-tag')].map(e => e.textContent),
+    nPro: [...document.querySelectorAll('#lRail .l-tag.l-soon')].length,
+    want: window.hkPremiumGroups().length,
+    note: document.getElementById('lRailNote').textContent,
+    noPrice: !/\$\s?\d/.test(document.getElementById('landing').textContent)
+  }));
+  ok(r2.on && r2.badges.filter(b => /^pro$/i.test(b)).length === r2.want,
+    'preview ON: the same chapters relabel to PRO with no copy edit (' + r2.badges.join(' | ') + ')');
+  ok(r2.noPrice, 'still no dollar figure with the paywall ON');
+  ok(p.__errs.length === 0, 'zero page errors in the ON state', p.__errs.join(' | '));
+  await p.close();
+
+  // --- returning user never sees the marketing landing
+  p = await mk('', () => { try { localStorage.setItem('hotkey_onboarded', '1'); } catch (e) {} });
+  const r3 = await p.evaluate(() => ({
+    cls: document.documentElement.classList.contains('hk-returning'),
+    disp: getComputedStyle(document.getElementById('landing')).display
+  }));
+  ok(r3.cls && r3.disp === 'none', 'html.hk-returning still hides the landing');
+  await p.close();
+
+  // --- the desk-invite preview writes into .lede (BETA_RETIRE_LANDING §1 bug)
+  p = await mk('?desk=TESTDESK', () => {
+    window.supabase = { createClient: () => ({
+      auth: { getSession: () => Promise.resolve({ data: { session: null } }),
+              getUser: () => Promise.resolve({ data: { user: null } }),
+              onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),
+              signInAnonymously: () => new Promise(() => {}) },
+      from: () => ({ select: () => ({ eq: function () { return this; }, order: function () { return this; },
+        limit: function () { return this; }, then: (res) => Promise.resolve({ data: [], error: null }).then(res) }) }),
+      rpc: (n) => Promise.resolve({ data: n === 'preview_desk' ? [{ name: 'Wharton IB Club', members: 42 }] : null, error: null }),
+      functions: { invoke: () => Promise.resolve({ data: null, error: 'no' }) } }) };
+  });
+  await p.waitForTimeout(1200);
+  const r4 = await p.evaluate(() => (document.querySelector('#landing .lede') || {}).textContent || '');
+  ok(/invited to join Wharton IB Club/.test(r4), 'the ?desk= deep link writes into .lede', r4.slice(0, 80));
+  await p.close();
+
+  await browser.close();
+  console.log((fail ? 'LANDING GUARD: ' + fail + ' FAILURE(S), ' : 'LANDING GUARD: ALL ') + pass + ' PASS');
+  process.exit(fail ? 1 : 0);
+})();

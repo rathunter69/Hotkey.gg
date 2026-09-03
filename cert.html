@@ -61,10 +61,9 @@
     .cert{border-color:#bbb; box-shadow:none}
   }
 </style>
-<link rel="stylesheet" href="nav.css?v=210">
-<script src="drills.js?v=301"></script>
+<link rel="stylesheet" href="nav.css?v=313">
+<script src="drills.js?v=304"></script>
 
-<script src="drills.js?v=301"></script>
 
 
 
@@ -77,11 +76,11 @@
   window.sb=(SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
   window.NAV_ACTIVE='';
 </script>
-<script src="themes.js?v=310"></script>
+<script src="themes.js?v=313"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=303"></script>
+<script src="nav.js?v=305"></script>
 
 <main><div class="wrap" id="root">
   <div class="state">loading certificate…</div>
@@ -97,7 +96,12 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>'
 async function load(){
   const root = document.getElementById('root');
   const id = new URLSearchParams(location.search).get('id');
-  if(!id || !window.sb){ root.innerHTML = '<div class="state">No certificate id. Certificates are issued from the <a href="index.html">trainer</a> when a track is completed.</div>'; return; }
+  /* r452 (audit P2-7): these were ONE branch printing "No certificate id." — so a holder opening
+     a perfectly good cert.html?id=<real id> while the backend was unreachable was told their link
+     was malformed, and would go looking for a better link that does not exist. Two causes, two
+     messages: a missing id is the visitor's problem, an unreachable backend is ours. */
+  if(!id){ root.innerHTML = '<div class="state">No certificate id. Certificates are issued from the <a href="index.html">trainer</a> when a track is completed.</div>'; return; }
+  if(!window.sb){ root.innerHTML = '<div class="state">Can’t reach the certificate service right now — this link is fine, the lookup isn’t available. Try again in a moment.</div>'; return; }
   let cert = null;
   try{ const { data } = await sb.from('certificates').select('id,user_id,track,handle,issued_at').eq('id', id).maybeSingle(); cert = data; }catch(e){}
   if(!cert){ root.innerHTML = '<div class="state">Certificate not found — the id may be wrong, or it was revoked.</div>'; return; }

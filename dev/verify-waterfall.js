@@ -182,8 +182,7 @@ const STAR_HALF = {
      that lies (CAMPAIGN, the r440 `hotkey_onboarded` note and the r441 hidden-rows note). */
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1'); localStorage.setItem('hk_beta_ok', '1');
-    localStorage.setItem('hk_xlv', '2'); localStorage.setItem('hk_handle_cache', '');
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');    localStorage.setItem('hk_xlv', '2'); localStorage.setItem('hk_handle_cache', '');
   } catch (e) {} });
   const perr = [];
   page.on('pageerror', e => perr.push(String(e.message).slice(0, 140)));

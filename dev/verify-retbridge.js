@@ -12,7 +12,7 @@
    dev/*.js for quoted drill keys).
 
    HARNESS INIT — the probe mirrors the real gate harnesses exactly (hotkey_onboarded,
-   hk_tour_done, hk_learn_done, hk_beta_ok, hk_xlv). CAMPAIGN records two rounds lost to a probe
+   hk_tour_done, hk_learn_done, hk_xlv). CAMPAIGN records two rounds lost to a probe
    that skipped one of these and read the onboarding overlay's state as a product defect; a probe
    that does not mirror the harness init is lying.
 
@@ -33,8 +33,7 @@ const head = m => console.log('\n=== ' + m);
   const page = await browser.newPage();
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1'); localStorage.setItem('hk_beta_ok', '1');
-    localStorage.setItem('hk_xlv', '2');
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');    localStorage.setItem('hk_xlv', '2');
   } catch (e) {} });
   await page.goto(process.env.URL || 'http://127.0.0.1:8791/index.html', { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof demoKey === 'function');

@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.8" integrity="sha384-Tve8O+C6PBzsIMK/IRCwHbi8fyEzXIlIs6OfVBZHubplwYhaQF/4Mzxqgg+pp/oy" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="lb.css?v=22">
+<link rel="stylesheet" href="lb.css?v=24">
 <style>
   html{scrollbar-gutter:stable}   /* r68: content filters change page height — without this the centered wrap jumps horizontally */
   :root{
@@ -70,7 +70,13 @@
   /* r135: achievements live HERE now (rolled off the card); earned medals are pickable */
   .ach-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(64px,1fr)); gap:12px 8px; margin:10px 0 18px}
   /* r267: wall navigation — filter chips (58 medals was one undifferentiated wall) */
-  .ach-filters{display:inline-flex; gap:6px; margin-left:14px; vertical-align:2px}
+  /* r452 (audit P1-6): flex-wrap + a mobile margin reset. Six rarity chips in a non-wrapping
+     inline-flex row measured right:691 against a 390px viewport — 301px of sideways page scroll
+     on a phone, both themes. Wrapping is the whole fix; the 14px indent only makes sense while
+     the chips sit beside the section heading, so it drops on the wrapped layout.
+     Guarded by dev/e2e-smoke.js's 390px overflow sweep. */
+  .ach-filters{display:inline-flex; flex-wrap:wrap; gap:6px; margin-left:14px; vertical-align:2px; max-width:100%}
+  @media(max-width:560px){ .ach-filters{display:flex; margin-left:0; margin-top:8px} }
   .ach-f{font-family:var(--mono); font-size:10.5px; padding:3px 10px; border-radius:99px; cursor:pointer;
     background:var(--surface); color:var(--muted); border:1px solid var(--line)}
   .ach-f:hover{color:var(--text); border-color:var(--faint)}
@@ -189,10 +195,9 @@
     letter-spacing:.12em; margin:18px 0 0}
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
-<link rel="stylesheet" href="nav.css?v=210">
-<script src="drills.js?v=301"></script>
+<link rel="stylesheet" href="nav.css?v=313">
+<script src="drills.js?v=304"></script>
 
-<script src="drills.js?v=301"></script>
 
 
 
@@ -206,11 +211,11 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'stats';
 </script>
-<script src="themes.js?v=310"></script>
+<script src="themes.js?v=313"></script>
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=303"></script>
+<script src="nav.js?v=305"></script>
 
 <header class="head">
   <div class="wrap">
@@ -469,7 +474,7 @@ async function load(){
         raceWins:flags.raceWins||0, sheetClears:flags.sheetClears||0, frzBanked:flags.frzBanked||0,
         chordKinds:__ck, keysLifetime:__kl, dailyTop10:flags.dailyTop10||0,   // r150/r151 · r371
         dailyPod:flags.dailyPod||0, dailyWins:flags.dailyWins||0, certs:Object.keys(flags.certTracks||{}).length,
-        /* r376: mythic-class keys — beta-era account + the packed rank latch + the S+++ desk latch */
+        /* r376: mythic-class keys — pre-launch account + the packed rank latch + the S+++ desk latch */
         charter:!!(me && me.created_at && String(me.created_at) < '2026-10-01'),
         foundingClass:!!(window.hkFoundingFlags&&window.hkFoundingFlags().class),
         foundingPartner:!!(window.hkFoundingFlags&&window.hkFoundingFlags().partner),
@@ -507,8 +512,12 @@ async function load(){
           return out;
         }catch(e){ return {}; }
       })();
+      /* r452 (audit P1-1): the wall renders VISIBLE medals only — a capstone medal whose
+         drill was never built is hidden (drills.js), so it can neither sit on the wall at a
+         permanent 0/1 nor inflate the earned/possible denominator. */
+      const ACV=AC.filter(a=>!a.hidden);
       let earnedN=0; const cells=[]; const rarPresent={};   /* r393 (Wolf #91): which rarity tiers actually appear, for the picker-style chip row */
-      AC.forEach((a,ord)=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
+      ACV.forEach((a,ord)=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
         if(r.done) earnedN++;
         /* r150: EFFECTIVE rarity \u2014 static difficulty tier is the display floor until
            the field is big enough (>=20 players) for the live % to mean anything */
@@ -576,7 +585,7 @@ async function load(){
          wall; chips still open all/in-progress/locked. New users with nothing earned fall
          back to "all" so the wall never looks empty on first visit. */
       const __defF = earnedN>0 ? 'earned' : 'all';
-      achHtml += '<h3 class="section-title" id="achievements" style="margin-top:10px">Achievements <span style="color:var(--faint)">'+earnedN+' / '+AC.length+'</span>'+
+      achHtml += '<h3 class="section-title" id="achievements" style="margin-top:10px">Achievements <span style="color:var(--faint)">'+earnedN+' / '+ACV.length+'</span>'+
         '<span class="ach-filters">'+
           '<button class="ach-f'+(__defF==='all'?' on':'')+'" data-f="all">all</button>'+
           '<button class="ach-f'+(__defF==='earned'?' on':'')+'" data-f="earned">earned</button>'+
@@ -680,7 +689,7 @@ async function load(){
         `<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:6px">how it's computed: each point = one posted run's time \u00f7 that drill's par, oldest \u2192 newest. keys/min = keystrokes \u00f7 minutes across posted runs (median).</div></div>`;
     }
   }
-  // ---- Analytics (PRO \u00b7 free in beta): key frequency + speed by drill ----
+  // ---- Analytics (PRO \u00b7 free for now): key frequency + speed by drill ----
   if(me && mine.length>=3){
     let traces=[];
     try{ const tr=await sb.from('runs').select('trace').eq('user_id',me.id).eq('mouse_used',false)
@@ -722,7 +731,7 @@ async function load(){
     mine.forEach(r=>{ if(r.time_ms>0&&r.keystrokes>0){ const v=r.keystrokes/(r.time_ms/1000);
       if(!kps[r.challenge]||v>kps[r.challenge]) kps[r.challenge]=v; } });
     const kpsTop=Object.entries(kps).filter(([k])=>D.meta[k]).sort((a,b)=>b[1]-a[1]).slice(0,5);
-    html += `<h3 class="section-title">Analytics <span class="proTag" style="float:right;font-size:9px;color:var(--warn);letter-spacing:1px;cursor:pointer" title="what comes with PRO">PRO \u00b7 free in beta</span></h3>`;
+    html += `<h3 class="section-title">Analytics <span class="proTag" style="float:right;font-size:9px;color:var(--warn);letter-spacing:1px;cursor:pointer" title="what comes with PRO">PRO \u00b7 free for now</span></h3>`;
     // r91 MERGED PANEL: local tally (every clean run) is the primary source; posted-run
     // traces retired as a display source (kept for distinct-shortcut stat above).
     let tally={}, tallySrc='this device';

@@ -30,9 +30,26 @@ Companion doc: dev/STRATEGY.md (what we build before/after); dev/TRUST_SAFETY.md
    and delays the paywall until Stripe can go live (internship constraint).
 
 ## Phase 1 — LAUNCH DAY (the flip, ~30 minutes)
-1. index.html: `PRELAUNCH_LOCK = false`. That's the launch.
-2. Cache bump (?v=N+1 across all pages that reference the touched files;
-   the page count grew past nine — grep, don't count from memory).
+**DONE r451 (2026-09-03) — branch `claude/drill-redesign-art-style-jg9vhm`, goes live on merge.**
+Wolf's call went further than the flag: the curtain is **DELETED**, not set false
+(`PRELAUNCH_LOCK`, `showPrelaunchLock()`, `closeGate()`, `#gate`, `.gate*` CSS, the four
+`gateOpen` guards, every `hk_beta_ok` read/write). Rollback is `git revert` on the commit,
+not a flag flip. `BETA_MODE` → `PRO_PERKS_FREE` (same value, same behaviour). The Phase-0
+items below were NOT all done first — these are now DUE (dev/BETA_RETIRE_LANDING.md):
+
+- [ ] 0.3 pilot cohort running — **Wolf**, judgement call
+- [ ] 0.4 T&S minimums — report-queue habit + force-rename/suspend scripts (dev/TRUST_SAFETY.md)
+- [ ] 0.5 remove the smoke-u fixture — `delete from teams where slug='smoke-u'` (**migration, orchestrator**)
+- [ ] 0.5b decide the seed field — `dev/seed-clear.sql` clears it in one transaction (**Wolf**)
+- [ ] follow-up migration: drop `public.beta_codes` + revoke/drop `curtain_check(text)` (**orchestrator**)
+- [ ] Landing v2 — the curtain was the only thing explaining the product (Part II; separate agent)
+- [x] 0.6 beta-tools sweep — `hk_dev_unlock` card deleted, `hk_beta_unlock` → `hk_dev_unlock_cosmetics`,
+      `[beta]` brand chip removed, copy sweep done
+- [x] 0.7 PRO posture — decided: keep the unlock, rename the flag
+
+1. ~~index.html: `PRELAUNCH_LOCK = false`~~ — done as a deletion, see above.
+2. Cache bump — done r451: nav.js 303→304, nav.css 210→211, themes.js 310→311,
+   drills.js 301→302, lb.js 41→42 across all 92 pages (`node dev/check-cache-versions.js`).
 3. Commit → PR → merge (auto-merge agreement). Pages deploys in minutes.
 4. Verify live: incognito → landing (no curtain) → Enter → tour → placement;
    sign-up with a real email; run one drill; check the run posts. Then the
@@ -55,8 +72,11 @@ Companion doc: dev/STRATEGY.md (what we build before/after); dev/TRUST_SAFETY.md
   attention is highest — proof artifacts amplify a fresh audience.
 
 ## Rollback
-Flip PRELAUNCH_LOCK back to true + cache bump. Existing sessions keep playing
-(curtain only gates NEW devices); nothing else to unwind. DB changes: none.
+r451: there is no flag to flip back — `git revert` the retirement commit + cache bump.
+That was the deliberate trade (dev/BETA_RETIRE_LANDING.md §8A): the curtain only ever
+gated NEW devices, so re-raising it would have locked out exactly the people a rollback
+is meant to protect, and it would sit in front of the landing that replaced it. DB
+changes: none in this commit (the beta_codes/curtain_check drop is a later migration).
 
 ## Explicitly NOT launch-gated
 Payments (constraint), seasons, PWA, email digests, achievement art pass,

@@ -1,5 +1,28 @@
-/* r154 ONBOARDING AUDIT — a truly fresh visitor: curtain → landing → enter →
-   tour → play; second visit: welcome-back. Stubbed supabase so auth paths run. */
+/* r154 ONBOARDING AUDIT — a truly fresh visitor: curtain → landing → enter → THE KEYBOARD
+   TOUR → drill 1; second visit: welcome-back. Stubbed supabase so auth paths run.
+
+   r452 REWRITTEN AROUND THE KEYBOARD TOUR (dev/TUTORIAL_CHAPTER_SPEC.md §3.0, §5). What this
+   suite used to walk — a thirteen-card modal spotlight tour over a throwaway warm-up sandbox —
+   no longer exists: decision T2 retired both into one staged, untimed, hands-on board, and
+   dev/e2e-onboard-sandbox.js went with them. So T2–T8 are new, and they assert the contract
+   §3.0.2(7) writes down:
+     · the TUTORIAL HUD's text PER BEAT, for all twenty-four beats, driven by real keystrokes
+       (each beat is checked BEFORE it is performed and the next beat's line after it);
+     · each stage opening on its own lesson card, with its board region painted in by the
+       r421 §2.5 tier ladder (the Tour is that platform piece's first consumer);
+     · the checklist absent before stage 1 beat 3, then showing ONLY the open stage's beats;
+     · three wrong keys adding the second HUD line, a correct key clearing it, and the nudge
+       never escalating past two lines;
+     · the HUD never covering the active cell, on any row;
+     · stage 5 forcing the lean ribbon bar on and handing the player's setting back (T3);
+     · the one-time +25 xp bounty (T1), and the hand-off into drill 1 with guided OFF, hints
+       ON, and the r450 start gate armed;
+     · every retired sandbox function actually gone, with the sandboxMode FLAG kept.
+
+   THE START-GATE STANCE (dev/check-invariants.js C14): this suite deliberately does NOT set
+   hk_gate_off. It is the walk a first-time player walks, and two properties live only here —
+   the Tour is never gated (it is untimed), and drill 1 IS gated the instant the Tour hands
+   over. Every other harness opts out of the gate; this one keys through it. */
 'use strict';
 /* r438: URL override — parallel checkouts serve on their own ports (the r421 e2e-guided /
    r422 e2e-par-sweep pattern). This harness was the last one still hard-coding 8791, so a
@@ -40,394 +63,431 @@ const STUB = () => {
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 140)));
   await page.addInitScript(STUB);
 
-  console.log('T1 fresh visitor: curtain');
+  /* r451: T1/T9 are CONDITIONAL on index.html's PRELAUNCH_LOCK. The curtain code is still
+     shipped (kept one round as the documented rollback — dev/LAUNCH.md), so this suite reads
+     the live flag off the page and asserts whichever contract is actually in force. Three
+     asserts in T1 and four in T9 either way — the count does not move with the flag. */
   await page.goto(HK_URL, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
   await page.waitForTimeout(400);
-  const t1 = await page.evaluate(() => {
-    const g = document.getElementById('gate');
-    return { shown: !!(g && g.classList.contains('show')), hasInput: !!document.getElementById('lockCode') };
-  });
-  ok(t1.shown && t1.hasInput, 'prelaunch curtain shows for a fresh device');
-  // r279: codes validate server-side (curtain_check RPC) — both probes are async round-trips
-  await page.fill('#lockCode', 'WRONG');
-  await page.click('#lockGo');
-  const t1b = await page.waitForFunction(() => /didn/.test((document.getElementById('lockMsg') || {}).textContent || ''), null, { timeout: 15000 }).then(() => true).catch(() => false);
-  ok(t1b, 'wrong code gets a real error (server-checked)');
-  await page.fill('#lockCode', 'hags');   // case-insensitive per the uppercase()
-  await page.click('#lockGo');
-  const t1c = await page.waitForFunction(() => !document.getElementById('gate').classList.contains('show'), null, { timeout: 15000 }).then(() => true).catch(() => false);
-  ok(t1c, 'right code (case-insensitive) passes the curtain (server-checked)');
+  const LOCK = await page.evaluate(() => typeof PRELAUNCH_LOCK !== 'undefined' && PRELAUNCH_LOCK === true);
 
-  console.log('T2 landing → enter → tour');
+  if (LOCK) {
+    console.log('T1 fresh visitor: curtain (PRELAUNCH_LOCK=true)');
+    const t1 = await page.evaluate(() => {
+      const g = document.getElementById('gate');
+      return { shown: !!(g && g.classList.contains('show')), hasInput: !!document.getElementById('lockCode') };
+    });
+    ok(t1.shown && t1.hasInput, 'prelaunch curtain shows for a fresh device');
+    // r279: codes validate server-side (curtain_check RPC) — both probes are async round-trips
+    await page.fill('#lockCode', 'WRONG');
+    await page.click('#lockGo');
+    const t1b = await page.waitForFunction(() => /didn/.test((document.getElementById('lockMsg') || {}).textContent || ''), null, { timeout: 15000 }).then(() => true).catch(() => false);
+    ok(t1b, 'wrong code gets a real error (server-checked)');
+    await page.fill('#lockCode', 'hags');   // case-insensitive per the uppercase()
+    await page.click('#lockGo');
+    const t1c = await page.waitForFunction(() => !document.getElementById('gate').classList.contains('show'), null, { timeout: 15000 }).then(() => true).catch(() => false);
+    ok(t1c, 'right code (case-insensitive) passes the curtain (server-checked)');
+  } else {
+    console.log('T1 fresh visitor: NO curtain (PRELAUNCH_LOCK=false)');
+    const t1 = await page.evaluate(() => {
+      const g = document.getElementById('gate'), l = document.getElementById('landing');
+      let betaOk = null; try { betaOk = localStorage.getItem('hk_beta_ok'); } catch (e) {}
+      return {
+        shown: !!(g && g.classList.contains('show')),
+        hasInput: !!document.getElementById('lockCode'),
+        gateEmpty: !g || !g.innerHTML.trim(),          /* r452: the curtain markup itself is gone now, so #gate may not exist at all */
+        landingUp: !!(l && !l.classList.contains('gone') && getComputedStyle(l).display !== 'none'),
+        gateOpen: (typeof gateOpen !== 'undefined') ? gateOpen : null,
+        betaOk: betaOk,
+      };
+    });
+    ok(!t1.shown && !t1.hasInput && t1.gateEmpty, 'no curtain element on a fresh device');
+    ok(t1.landingUp, 'a fresh device lands straight on the landing');
+    ok(!t1.gateOpen && !t1.betaOk, 'the Enter path is unguarded \u2014 no curtain state, no hk_beta_ok needed', JSON.stringify(t1));
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════════════════════
+     T2–T8 (r452): rewritten around THE KEYBOARD TOUR — dev/TUTORIAL_CHAPTER_SPEC.md §3.0.
+     What used to live here was the modal spotlight tour over a throwaway sandbox: Enter-mash
+     thirteen cards, land on a drill. Both surfaces are retired (§1.7 / decision T2), so the
+     walk is now the real thing a first-timer does — six staged cards and twenty-four beats
+     performed by hand on a live board — and the assertions are the ones §3.0.2(7) names:
+     the HUD's text PER BEAT, the stage reveals, the checklist's staging, the three-miss nudge,
+     the forced ribbon bar, the +25 xp bounty and the hand-off into drill 1.
+
+     THIS SUITE DELIBERATELY DOES NOT SET hk_gate_off (dev/check-invariants.js C14 lists it in
+     KEYS_THROUGH). The Tour clears the r450 start gate because it is untimed; drill 1 arms it
+     the instant the Tour hands over. Both properties are asserted here and nowhere else.
+     ══════════════════════════════════════════════════════════════════════════════════════ */
+
+  console.log('T2 the comfort fork routes the first session (§1.7)');
   const t2 = await page.evaluate(() => {
     const l = document.getElementById('landing');
-    return { visible: !!(l && !l.classList.contains('gone')), hasStart: !!(l && l.textContent.match(/enter|start|train/i)) };
+    return { visible: !!(l && !l.classList.contains('gone')) };
   });
   ok(t2.visible, 'landing dialog is up after the curtain');
   await page.keyboard.press('Enter');   // Enter = start (friction-free entry)
   await page.waitForTimeout(900);
-  // r280: the keyboard pick asks FIRST — the right key overlay loads up front
   const t2kb = await page.evaluate(() => { const m = document.getElementById('kbCard'); return !!(m && m.classList.contains('show')); });
   ok(t2kb, 'keyboard pick asks first (r280)');
   await page.keyboard.press('1');       // Windows
   await page.waitForTimeout(500);
-  // r159: the comfort fork follows
   const t2fork = await page.evaluate(() => { const m = document.getElementById('comfortCard'); return !!(m && m.classList.contains('show')); });
   ok(t2fork, 'comfort fork asks how much Excel you know (r159)');
-  await page.keyboard.press('2');       // "I get around" → straight to the tour
-  await page.waitForTimeout(500);
-  const t2b = await page.evaluate(() => {
-    const l = document.getElementById('landing');
-    const w = document.getElementById('tourWrap');
-    return { landingGone: !!(l && l.classList.contains('gone')), tourUp: !!(w && w.classList.contains('on')) };
-  });
+  await page.keyboard.press('1');       // "basically none" → the Keyboard Tour
+  await page.waitForTimeout(1400);
+  const t2b = await page.evaluate(() => ({
+    landingGone: !!(document.getElementById('landing') || {}).classList?.contains('gone'),
+    cur, tourMode, card: !!document.getElementById('tourWrap').classList.contains('on'),
+    cap: (document.querySelector('#tourCard .tour-cap') || {}).textContent || '',
+  }));
   ok(t2b.landingGone, 'Enter dismisses the landing');
-  ok(t2b.tourUp, 'first-run spotlight tour appears');
-  // tour must OWN the keyboard: typing during the tour must not hit the grid
-  const t2c = await page.evaluate(() => {
-    const before = JSON.stringify(Object.keys(S.cells).map(k => [k, S.cells[k].value]));
-    demoKey({key:'9'}); demoKey({key:'9'});
-    const after = JSON.stringify(Object.keys(S.cells).map(k => [k, S.cells[k].value]));
-    return before === after;
+  ok(t2b.cur === 'keyboardtour' && t2b.tourMode, '"basically none" lands on the Keyboard Tour', JSON.stringify(t2b));
+  ok(t2b.card && /STAGE 1 OF 6/.test(t2b.cap), 'and opens on stage 1\'s lesson card', t2b.cap);
+
+  /* the Tour is a deliberate NON-gate: it is untimed, so a start gate over it would promise a
+     clock that startClock() refuses to run (dev/check-startgate.js §8, the sandbox's rationale
+     re-pointed at the Tour) */
+  const t2g = await page.evaluate(() => ({ gate: hkGate, ov: !!document.getElementById('hkGate'),
+    running, timer: document.getElementById('timer').textContent,
+    par: document.getElementById('par').textContent, pb: document.getElementById('pb').textContent }));
+  ok(!t2g.gate && !t2g.ov, 'the Tour is not gated — it is never timed', JSON.stringify(t2g));
+  ok(!t2g.running && t2g.timer === '—', 'and its clock reads "—", not 0.00', JSON.stringify(t2g));
+  ok(t2g.par === '—' && t2g.pb === '—', 'no par and no PB are advertised over it', JSON.stringify(t2g));
+
+  console.log('T3 the twenty-four beats: the HUD names each one, and performing it advances (§3.0.2(7))');
+  /* One row per beat: the EXACT §3.0.5 HUD line the banner must read before the beat, and the
+     keystrokes that perform it. `stage` marks the first beat of a stage — the card in front of
+     it is dismissed by any key first. Nothing here reaches past the public surface: every beat
+     is driven with real keystrokes on the real board, exactly as a player performs it. */
+  const hudLine = () => page.evaluate(() => {
+    const h = document.getElementById('tourHud');
+    return h ? (h.querySelector('.hud-line') || {}).textContent : null;
   });
-  ok(t2c, 'tour blocks grid input (keys can’t leak into cells)');
-  // walk the tour to the end with Enter
-  const t2d = await page.evaluate(async () => {
-    for (let i = 0; i < 12; i++) {
-      const w = document.getElementById('tourWrap');
-      if (!w || !w.classList.contains('on')) break;
-      demoKey({key:'Enter'});
-      await new Promise(r => setTimeout(r, 150));
+  const beatIdx = () => page.evaluate(() => CHALLENGES.keyboardtour.checks(S).findIndex(x => !x.ok));
+  const totRow = () => page.evaluate(() => CHALLENGES.keyboardtour._row(S, 'Total'));
+  const K = async (k, ms) => { await page.keyboard.press(k); await page.waitForTimeout(ms || 110); };
+  const selDown = async (n) => { for (let i = 0; i < n; i++) await K('Shift+ArrowDown', 40); };
+  const at = async (ref) => page.evaluate(r => { const p = parseRef(r); S.active = { r: p.r, c: p.c }; S.sel = null; render(); }, ref);
+
+  const BEATS = [
+    { stage: 1, hud: 'press → until you reach the Q4 figure',                     run: async () => { for (let i = 0; i < 4; i++) await K('ArrowRight'); } },
+    {           hud: 'hold ctrl and press → to fly to the end of the row',        run: async () => K('Control+ArrowRight') },
+    {           hud: 'hold ctrl and press ↓ to fly to the last region',           run: async () => K('Control+ArrowDown') },
+    {           hud: 'press ctrl+home — top-left of the sheet, from anywhere',    run: async () => K('Control+Home') },
+    {           hud: 'press ctrl+end — the last cell holding anything',           run: async () => K('Control+End', 300) },
+    { stage: 2, hud: 'hold shift and press → to stretch the selection',           run: async () => { for (let i = 0; i < 3; i++) await K('Shift+ArrowRight'); } },
+    {           hud: 'hold ctrl+shift and press ↓ to stretch to the edge',        run: async () => K('Control+Shift+ArrowDown') },
+    {           hud: 'press shift+space — the whole row, one press',              run: async () => K('Shift+Space') },
+    {           hud: 'press ctrl+a — the whole block you are standing in',        run: async () => K('Control+a', 300) },
+    { stage: 3, hud: 'type the number, then press tab to commit and move right',  run: async () => { await K('4'); await K('Tab'); await K('1'); await K('9'); await K('0'); await K('Enter', 260); } },
+    {           hud: 'press F2 to edit inside the cell — do not retype it',       run: async () => { await K('F2'); for (let i = 0; i < 3; i++) await K('Backspace'); for (const c of 'ting') await K(c); await K('Enter', 260); } },
+    {           hud: 'select the row, then press ctrl+− to delete it',            run: async () => { await K('Shift+Space'); await K('Control+Minus', 260); } },
+    {           hud: 'press ctrl+z — undo puts it straight back',                 run: async () => K('Control+z', 320) },
+    {           hud: 'select the total row and press ctrl+shift+= to insert above it', run: async () => { await K('Shift+Space'); await K('Control+Shift+Equal', 400); } },
+    { stage: 4, hud: 'type = then point with the arrows, ↵ to commit',            run: async () => { await at('F4'); for (const ch of '=SUM(B4:E4)') await page.keyboard.press(ch === '=' ? 'Equal' : ch === '(' ? 'Shift+Digit9' : ch === ')' ? 'Shift+Digit0' : ch === ':' ? 'Shift+Semicolon' : ch); await K('Enter', 260); } },
+    {           hud: 'press ctrl+d to fill the formula down the column',          run: async () => { await at('F4'); await selDown(7); await K('Control+d', 320); } },
+    {           hud: 'select a quarter through the empty total, then press alt+=', run: async () => { const t = await totRow(); for (let c = 2; c <= 5; c++) { await page.evaluate(cc => { S.active = { r: 4, c: cc }; S.sel = null; render(); }, c); await selDown(t - 4); await K('Alt+Equal', 190); } } },
+    {           hud: 'press alt+= once more for the grand total',                 run: async () => { const t = await totRow(); await page.evaluate(tt => { S.active = { r: tt, c: 2 }; S.sel = null; render(); }, t); for (let i = 0; i < 4; i++) await K('Shift+ArrowRight', 40); await K('Alt+Equal', 320); } },
+    { stage: 5, hud: 'press ctrl+shift+1 — commas on the whole figure block',     run: async () => { await page.evaluate(() => { S.active = { r: 4, c: 2 }; S.sel = { r: 11, c: 5 }; render(); }); await K('Control+Shift+Digit1', 260); } },
+    {           hud: 'press alt h f c, then pick blue — typed numbers are blue',  run: async () => { await page.evaluate(() => { S.active = { r: 4, c: 2 }; S.sel = { r: 11, c: 5 }; render(); }); await K('Alt'); await K('h'); await K('f'); await K('c', 200); for (let i = 0; i < 4; i++) await K('ArrowRight', 60); await K('Enter', 260); } },
+    {           hud: 'press ctrl+b to bold the header row',                       run: async () => { await page.evaluate(() => { S.active = { r: 3, c: 1 }; S.sel = { r: 3, c: 5 }; render(); }); await K('Control+b', 260); } },
+    {           hud: 'press alt h a c to center the headers',                     run: async () => { await page.evaluate(() => { S.active = { r: 3, c: 2 }; S.sel = { r: 3, c: 5 }; render(); }); await K('Alt'); await K('h'); await K('a'); await K('c', 260); } },
+    {           hud: 'press alt h b p — a line above every total',                run: async () => { const t = await totRow(); await page.evaluate(tt => { S.active = { r: tt, c: 1 }; S.sel = { r: tt, c: 6 }; render(); }, t); await K('Alt'); await K('h'); await K('b'); await K('p', 320); } },
+    { stage: 6, hud: 'press ctrl+s — every drill ends with a save',               run: async () => K('Control+s', 700) },
+  ];
+
+  /* the stage cards' reveals, checked as each stage opens (§2.5 tier ladder, §3.0.1 board) */
+  const REVEAL = { 2: ['G2', 'G6'], 3: ['A12', 'A16'], 4: ['F3'], 5: ['G7', 'G11'] };
+  await page.keyboard.press('Enter');           // stage 1's card is up from T2 — any key dismisses it
+  await page.waitForTimeout(560);
+  let hudMisses = 0, revealMisses = 0, stagesSeen = 0;
+  for (let i = 0; i < BEATS.length; i++) {
+    const B = BEATS[i];
+    if (B.stage) {
+      if (B.stage > 1) {
+        await page.waitForTimeout(950);                       // the reveal flash, then the card
+        const up = await page.evaluate(() => ({ on: __tourCardOn,
+          cap: (document.querySelector('#tourCard .tour-cap') || {}).textContent || '',
+          hud: !!document.getElementById('tourHud') }));
+        ok(up.on && up.cap.indexOf('STAGE ' + B.stage + ' OF 6') >= 0,
+          'stage ' + B.stage + ' opens on its own lesson card', JSON.stringify(up));
+        ok(!up.hud, 'and the banner steps aside while the card is up');
+        const rv = await page.evaluate(cells => cells.map(c => (S.cells[c] || {}).value != null), REVEAL[B.stage] || []);
+        if (!rv.every(Boolean)) { revealMisses++; ok(false, 'stage ' + B.stage + '\'s board region painted in', JSON.stringify(REVEAL[B.stage])); }
+        await page.keyboard.press('Enter');                   // any key dismisses
+        await page.waitForTimeout(560);
+      }
+      stagesSeen++;
     }
-    const w = document.getElementById('tourWrap');
-    return !(w && w.classList.contains('on'));
-  });
-  ok(t2d, 'tour completes on repeated Enter and releases the keyboard');
-  // r313 (Wolf): finishing the tour no longer re-prompts "quick warm-up?" — it hands off
-  // straight to the first REAL drill (guided on) and toasts, leaving the warm-up board behind.
-  await page.waitForTimeout(900);    // tour → +350ms → loadChallenge(first drill)
-  const t2e = await page.evaluate(() => ({
-    handedOff: (typeof cur !== 'undefined' && cur !== '__onboard__' && !sandboxMode),
-    onboarded: !!onboarded }));
-  ok(t2e.handedOff, 'tour hands off to the first real drill (not the warm-up board)');
-  ok(t2e.onboarded, 'finishing the tour marks the user onboarded');
-  /* r450 THE DRILL-START GATE, on the one path that matters most for it: the tour hand-off.
-     This suite deliberately does NOT set hk_gate_off (the other harnesses do) — the whole
-     point of an onboarding audit is to walk what a first-time player walks. Two properties
-     are asserted here and nowhere else in the battery: the gate is ABSENT for every step of
-     the tour (it would sit between the spotlight and the cell it points at), and it is
-     PRESENT the instant the tour hands the player a real, timed drill. */
-  const t2g = await page.evaluate(() => ({ gate: hkGate, ov: !!document.getElementById('hkGate'), running }));
-  ok(t2g.gate && t2g.ov, 'the first real drill arrives behind the start gate', JSON.stringify(t2g));
-  ok(!t2g.running, 'and its clock has not started', JSON.stringify(t2g));
-  const t2f = await page.evaluate(() => {
-    demoKey({key:'x'});                       // the start key: swallowed, starts the clock
-    const started = running === true && keyLog.length === 0 && !document.getElementById('hkGate');
-    setDemoSel('B4'); demoKey({key:'5'}); demoKey({key:'Enter'});
-    return { started, landed: S.cells['B4'].value === 5 || S.cells['B4'].value === '5' };
-  });
-  ok(t2f.started, 'the start key is swallowed (nothing in keyLog) and starts the clock');
-  ok(t2f.landed, 'after the tour the grid takes keys immediately');
-
-  console.log('T3 second visit: welcome back');
-  // domcontentloaded, not load: supabase-js loads async now (r285) — 'load' waits on
-  // the CDN, and if it's slow the card's 12s auto-hide can fire before 'load' returns.
-  await page.goto(HK_URL, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
-  // wait for the card explicitly rather than a fixed offset — robust to boot timing
-  const t3up = await page.waitForFunction(() => {
-    const w = document.getElementById('wbDlg');
-    return !!(w && getComputedStyle(w).display !== 'none');
-  }, null, { timeout: 8000 }).then(() => true).catch(() => false);
-  const t3 = await page.evaluate(() => ({
-    gateGone: !document.getElementById('gate').classList.contains('show'),
-    landingGone: document.getElementById('landing').classList.contains('gone') }));
-  t3.up = t3up;
-  ok(t3.gateGone && t3.landingGone, 'returning visitor skips curtain + landing');
-  ok(t3.up, 'welcome-back card greets the return');
-  const t3b = await page.evaluate(async () => {
-    demoKey({key:'x'});   /* r450: a returning visitor lands on a gated board too — pass it before typing */
-    setDemoSel('C4'); demoKey({key:'7'});
-    await new Promise(r => setTimeout(r, 450));
-    const w = document.getElementById('wbDlg');
-    const gone = !w || !document.body.contains(w) || getComputedStyle(w).opacity === '0' || w.classList.contains('bye');
-    demoKey({key:'Enter'});
-    return { gone, typed: S.cells['C4'].value === 7 || S.cells['C4'].value === '7' };
-  });
-  ok(t3b.gone, 'first keydown dismisses welcome-back');
-  ok(t3b.typed, '…without swallowing the key (it lands in the cell)');
-
-  console.log('T4 the novice branch: ONE folded spotlight sequence on a cleared board (r303)');
-  await page.evaluate(() => { ['hk_xlv','hk_tour_done','hotkey_onboarded','hk_primer_done','hk_learn_done'].forEach(k => localStorage.removeItem(k)); });
-  await page.reload({ waitUntil: 'load' });
-  await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
-  await page.waitForTimeout(700);
-  await page.keyboard.press('Enter');                 // through the landing again
-  await page.waitForTimeout(900);
-  await page.keyboard.press('1');                     // r280: keyboard pick first (windows)
-  await page.waitForTimeout(500);
-  const t4a = await page.evaluate(() => { const m = document.getElementById('comfortCard'); return !!(m && m.classList.contains('show')); });
-  ok(t4a, 'comfort fork re-asks once the flags are gone');
-  await page.keyboard.press('1');                     // "basically none"
-  await page.waitForTimeout(600);
-  // r303: no separate primer modal — the fundamentals are the FIRST tour steps, on a cleared board.
-  const t4b = await page.evaluate(() => ({
-    noPrimer: !(document.getElementById('primerCard') && document.getElementById('primerCard').classList.contains('show')),
-    tourUp: !!(document.getElementById('tourWrap') && document.getElementById('tourWrap').classList.contains('on')),
-    step0: (typeof __tourPlan !== 'undefined' && __tourPlan[0]) ? __tourPlan[0].cap : null,
-    onBoard: (typeof cur !== 'undefined') ? cur : null,
-    planLen: (typeof __tourPlan !== 'undefined') ? __tourPlan.length : -1,
-    grid: /grid/i.test(document.getElementById('tourCard').innerText),
-  }));
-  ok(t4b.noPrimer, 'no separate primer modal — folded into the tour');
-  ok(t4b.tourUp && t4b.grid, 'the spotlight sequence opens on the grid fundamentals');
-  ok(t4b.onBoard === '__onboard__', 'it runs on the cleared onboarding board', t4b.onBoard);
-  ok(t4b.planLen >= 12, 'the novice plan carries fundamentals + product steps', t4b.planLen);
-
-  // walk the fundamentals: two arrow do-it beats, an Enter read beat, then TWO typed-entry beats
-  await page.keyboard.press('ArrowRight'); await page.waitForTimeout(1050);   // grid orientation
-  await page.keyboard.press('ArrowRight'); await page.waitForTimeout(1050);   // name box
-  await page.keyboard.press('Enter');       await page.waitForTimeout(200);   // formula-bar read
-  const t4c0 = await page.evaluate(() => ({ i: __tourI, cap: __tourPlan[__tourI] && __tourPlan[__tourI].cap }));
-  ok(/type/i.test(t4c0.cap || ''), 'reaches the typing beat', JSON.stringify(t4c0));
-  // stray key is allowed through on an entry beat (it starts an edit) but does NOT advance
-  await page.keyboard.press('5'); await page.keyboard.press('0'); await page.keyboard.press('0');
-  await page.keyboard.press('Enter'); await page.waitForTimeout(1000);
-  const t4c1 = await page.evaluate(() => ({ i: __tourI, a5: (S.cells['A5']||{}).value, cap: __tourPlan[__tourI] && __tourPlan[__tourI].cap }));
-  ok(t4c1.a5 === 500, 'typing beat commits a real number to the sheet', t4c1.a5);
-  ok(/formula/i.test(t4c1.cap || ''), 'and advances to the formula beat', JSON.stringify(t4c1));
-  // formula beat: = or + both start it; type =A4-B4
-  for (const ch of '=A4-B4') { await page.keyboard.press(ch === '=' ? 'Equal' : ch === '-' ? 'Minus' : ch); }
-  await page.keyboard.press('Enter'); await page.waitForTimeout(1000);
-  const t4c2 = await page.evaluate(() => ({ i: __tourI, c4f: (S.cells['C4']||{}).formula, c4v: (S.cells['C4']||{}).value }));
-  ok(t4c2.c4f === '=A4-B4' && t4c2.c4v === 130, 'formula beat commits a live formula (=A4-B4 → 130)', JSON.stringify(t4c2));
-  // the chord beat still works and executes on the live sheet
-  const before = await page.evaluate(() => S.active.c);
-  await page.keyboard.press('Control+ArrowRight'); await page.waitForTimeout(1150);
-  const t4d = await page.evaluate(() => ({ moved: S.active.c !== undefined }));
-  ok(t4d.moved, 'the chord beat still runs on the live sheet');
-  // finish the tour; it must HAND OFF the cleared board to a real drill
-  for (let i = 0; i < 12; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(120); }
-  await page.waitForTimeout(600);
-  const t4e = await page.evaluate(() => ({ tourDone: localStorage.getItem('hk_tour_done') === '1', sandbox: (typeof sandboxMode !== 'undefined') ? sandboxMode : true, cur: cur }));
-  ok(t4e.tourDone, 'the tour completes and remembers it');
-  ok(!t4e.sandbox && t4e.cur !== '__onboard__', 'and hands the cleared board off to a real drill', JSON.stringify(t4e));
-
-  // T4b (r303): the EXPERT answer skips the fundamentals — plan starts at the product tour.
-  await page.evaluate(() => { ['hk_tour_done','hk_xlv'].forEach(k => localStorage.removeItem(k)); localStorage.setItem('hk_xlv','2'); });
-  await page.reload({ waitUntil: 'load' });
-  await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
-  await page.waitForTimeout(700);
-  await page.keyboard.press('Enter'); await page.waitForTimeout(1000);
-  const t4f = await page.evaluate(() => ({ up: !!(document.getElementById('tourWrap') && document.getElementById('tourWrap').classList.contains('on')),
-    step0: __tourPlan[0] && __tourPlan[0].cap, noNovice: !__tourPlan.some(s => s.novice) }));
-  ok(t4f.up, 'expert still gets the product tour');
-  ok(t4f.noNovice, 'but the fundamentals beats are gated OUT for "I live in it"', JSON.stringify(t4f));
-  for (let i = 0; i < 12; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(120); }
-
-  // T5 (r174, Wolf's stranding bug): a returning user whose synced last-drill is
-  // LOCKED on this device (fresh xp estimate) must NEVER boot into an empty grid.
-  await page.evaluate(() => { try {
-    localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_xlv', '2');
-    localStorage.setItem('hotkey_last_drill', 'dcf');   // a gated Models drill
-    localStorage.removeItem('hk_xp_est');
-  } catch (e) {} });
-  await page.reload({ waitUntil: 'load' });
-  await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
-  await page.waitForTimeout(1300);
-  const t5 = await page.evaluate(() => ({
-    cells: (typeof S !== 'undefined' && S && S.cells) ? Object.keys(S.cells).length : -1,
-    locked: (typeof drillLocked === 'function') ? !!drillLocked(typeof cur !== 'undefined' ? cur : '') : null,
-    gate: !!(document.getElementById('gateModal') && document.getElementById('gateModal').classList.contains('show')),
-  }));
-  ok(t5.cells > 0, 'locked-resume boot still loads a board (no empty grid)', JSON.stringify(t5));
-  ok(t5.locked === false, 'the fallback drill is an UNLOCKED one');
-  if (t5.gate) {
-    await page.keyboard.press('Escape');
-    await page.waitForTimeout(300);
-    const g2 = await page.evaluate(() => document.getElementById('gateModal').classList.contains('show'));
-    ok(!g2, 'Escape dismisses the gate modal');
-  } else {
-    ok(true, 'gate modal not shown at boot (also acceptable)');
+    const before = await hudLine();
+    if (before !== B.hud) { hudMisses++; ok(false, 'beat ' + i + ': the banner reads its §3.0.5 line', JSON.stringify({ want: B.hud, got: before })); }
+    await B.run();
+    await page.waitForTimeout(220);
+    const idx = await beatIdx();
+    if (idx !== i + 1 && !(i === BEATS.length - 1 && idx === -1)) {
+      ok(false, 'beat ' + i + ' (' + B.hud.slice(0, 34) + '…) grades on being performed', 'first ungraded = ' + idx);
+    }
   }
+  ok(hudMisses === 0, 'all 24 beats: #tourHud carries that beat\'s exact §3.0.5 line', hudMisses + ' wrong');
+  ok(revealMisses === 0, 'every stage paints its board region in as the stage before it clears (§2.5 tiers)');
+  ok(stagesSeen === 6, 'all six stages ran', String(stagesSeen));
+  const t3done = await page.evaluate(() => CHALLENGES.keyboardtour.checks(S).filter(x => x.ok).length);
+  ok(t3done === 24, 'all twenty-four beats graded', String(t3done));
 
-  /* ============================================================================
-     r450 FIRST-SESSION FLOW HARDENING (the flow audit's reconciliation).
-     The suite used to assert only the happy path: Enter-mash the tour, land on a
-     drill, done. Every gap below is a state a real first-timer reaches that no
-     assertion covered — skipping vs finishing, refreshing mid-tour, and what the
-     first (guided, unpostable) win actually SAYS.
-     ============================================================================ */
+  console.log('T4 completion: the one-time +25 xp, the hand-off card, and drill 1 (§3.0.4(7))');
+  await page.waitForTimeout(900);
+  const t4 = await page.evaluate(() => ({
+    card: __tourCardOn, txt: (document.getElementById('tourCard') || {}).innerText || '',
+    xp: localStorage.getItem('hk_xp_est'), latch: localStorage.getItem('hk_tour_done_v2'),
+    a18: (S.cells['A18'] || {}).value || null, hud: !!document.getElementById('tourHud'),
+  }));
+  ok(t4.card && /THE KEYBOARD TOUR — DONE/.test(t4.txt), 'the hand-off card renders', t4.txt.slice(0, 60));
+  ok(/start drill 1/i.test(t4.txt), '…and offers drill 1', t4.txt.slice(-80));
+  ok(t4.latch === '1' && t4.xp === '25', 'the tour pays +25 xp, once, and latches it', JSON.stringify({ xp: t4.xp, latch: t4.latch }));
+  ok(/Saved/.test(t4.a18 || ''), 'the save reveals the closing line on the board', String(t4.a18));
+  ok(!t4.hud, 'the banner is gone once the Tour is done');
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(1300);
+  const t4b = await page.evaluate(() => ({ cur, tourMode, guided, hints, gate: hkGate,
+    ov: !!document.getElementById('hkGate'), running, hud: !!document.getElementById('tourHud'),
+    bar: localStorage.getItem('hk_ribbon_bar') }));
+  ok(t4b.cur === 'navigation' && !t4b.tourMode, 'the hand-off loads drill 1 and leaves the Tour', JSON.stringify(t4b));
+  ok(!t4b.guided, '…with guided OFF — the Tour was the hand-holding (§1.4)');
+  ok(t4b.hints, '…and hints ON, which still posts a time (§1.5(e))');
+  ok(t4b.gate && t4b.ov && !t4b.running, 'drill 1 arrives behind the r450 start gate, clock unstarted', JSON.stringify(t4b));
+  ok(t4b.bar === null, 'and stage 5\'s forced ribbon bar is handed back to the player\'s own setting (T3)', String(t4b.bar));
+  const t4c = await page.evaluate(() => {
+    demoKey({ key: 'x' });                       // the gate key: swallowed, starts the clock
+    return { started: running === true && keyLog.length === 0 && !document.getElementById('hkGate') };
+  });
+  ok(t4c.started, 'and its first key is swallowed by the gate and starts the clock');
 
-  const freshNovice = async () => {
-    await page.evaluate(() => { ['hk_xlv','hk_tour_done','hotkey_onboarded','hk_primer_done',
-      'hk_learn_done','hk_runs_lite','hotkey_solves','hk_start_coach','hotkey_last_drill','hk_last_drill']
+  console.log('T5 the TUTORIAL HUD\'s contract (§3.0.2)');
+  const fresh = async (answer) => {
+    await page.evaluate(() => { ['hk_xlv','hk_tour_done','hk_tour_done_v2','hotkey_onboarded','hk_learn_done',
+      'hk_xp_est','hk_runs_lite','hotkey_solves','hotkey_last_drill','hk_last_drill','hk_ribbon_bar','hk_lessons_off']
       .forEach(k => localStorage.removeItem(k)); });
     await page.reload({ waitUntil: 'load' });
-    await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
+    await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof startKeyboardTour === 'function');
     await page.waitForTimeout(700);
-    await page.keyboard.press('Enter');  await page.waitForTimeout(900);   // landing
-    await page.keyboard.press('1');      await page.waitForTimeout(500);   // keyboard: windows
-    await page.keyboard.press('1');      await page.waitForTimeout(700);   // comfort: basically none
+    await page.keyboard.press('Enter'); await page.waitForTimeout(900);   // landing
+    await page.keyboard.press('1');    await page.waitForTimeout(500);    // keyboard: windows
+    await page.keyboard.press(answer); await page.waitForTimeout(1300);   // comfort
   };
+  await fresh('1');
+  await page.keyboard.press('Enter'); await page.waitForTimeout(600);     // dismiss stage 1's card
 
-  console.log('T6 skipping is NOT finishing: the skip arms, and the tour is replayable (P0-2)');
-  await freshNovice();
-  const t6up = await page.evaluate(() => !!(document.getElementById('tourWrap') &&
-    document.getElementById('tourWrap').classList.contains('on')));
-  ok(t6up, 'novice tour is up for the skip walk');
+  // (a) the checklist is ABSENT until stage 1's third beat, then shows only the open stage
+  const t5a = await page.evaluate(() => (document.getElementById('checklist') || {}).innerHTML || '');
+  ok(t5a.trim() === '', 'the checklist panel is absent at stage 1 beat 1 (§3.0.2(1))', JSON.stringify(t5a.slice(0, 40)));
+  for (let i = 0; i < 4; i++) { await page.keyboard.press('ArrowRight'); await page.waitForTimeout(90); }
+  await page.keyboard.press('Control+ArrowRight'); await page.waitForTimeout(400);   // beats 0-1 done; beat 2 is open
+  const t5b = await page.evaluate(() => {
+    const el = document.getElementById('checklist');
+    return { rows: el.querySelectorAll('.cl-item').length, head: (el.querySelector('.cl-head') || {}).textContent || '',
+      txt: el.innerText };
+  });
+  ok(t5b.rows === 5, 'it appears at stage 1 beat 3 showing ONLY that stage\'s five beats', JSON.stringify(t5b.rows));
+  ok(/stage 1 of 6/.test(t5b.head), '…headed by the stage it belongs to', t5b.head);
+  ok(!/Comma-format|Total the North line/.test(t5b.txt), '…and never renders a parked stage\'s beats');
 
-  // (b) a DO-IT beat advances on the real chord, not just on Enter — the fundamentals
-  // are genuinely performable, not decorative. (The tour is Enter-advanceable BY DESIGN,
-  // so the replay affordance below is asserted too — an Enter-masher can come back.)
-  const t6doit = await page.evaluate(() => ({ i: __tourI, doIt: !!(__tourPlan[__tourI] && __tourPlan[__tourI].doIt) }));
-  ok(t6doit.i === 0 && t6doit.doIt, 'beat 0 is a do-it beat (the chord IS the lesson)', JSON.stringify(t6doit));
-  await page.keyboard.press('ArrowRight');
-  await page.waitForTimeout(1050);
-  const t6adv = await page.evaluate(() => __tourI);
-  ok(t6adv === 1, 'performing the do-it chord (no Enter) advances the beat', 'tourI=' + t6adv);
+  // (b) three wrong keys add the nudge line; a correct key clears it; it never escalates
+  const t5c0 = await page.evaluate(() => !!document.querySelector('#tourHud .hud-nudge'));
+  ok(!t5c0, 'no nudge line before any wrong key');
+  for (let i = 0; i < 3; i++) { await page.keyboard.press('Control+Shift+ArrowRight'); await page.waitForTimeout(180); }
+  const t5c = await page.evaluate(() => {
+    const h = document.getElementById('tourHud');
+    return { miss: S._hudMiss, nudge: (h.querySelector('.hud-nudge') || {}).textContent || null,
+      lines: h.querySelectorAll('.hud-nudge').length };
+  });
+  ok(t5c.miss === 3 && !!t5c.nudge, 'three wrong keys add the second HUD line (§3.0.2(3))', JSON.stringify(t5c));
+  ok(t5c.nudge === 'try ctrl+↓ — hold ctrl down first, then tap the arrow', '…and it is the open beat\'s exact nudge string', String(t5c.nudge));
+  for (let i = 0; i < 3; i++) { await page.keyboard.press('Control+Shift+ArrowRight'); await page.waitForTimeout(150); }
+  ok((await page.evaluate(() => document.querySelectorAll('#tourHud .hud-nudge').length)) === 1,
+    'three more misses never escalate to a third line');
+  await page.keyboard.press('Control+ArrowDown'); await page.waitForTimeout(400);   // beat 2's own chord
+  const t5d = await page.evaluate(() => ({ miss: S._hudMiss, nudge: !!document.querySelector('#tourHud .hud-nudge') }));
+  ok(t5d.miss === 0 && !t5d.nudge, 'a correct key clears the counter and the nudge', JSON.stringify(t5d));
 
-  // (a) ONE Esc on an early beat must NOT end the tour — it arms and says so inline.
-  await page.keyboard.press('Escape');
-  await page.waitForTimeout(300);
-  const t6arm = await page.evaluate(() => ({
-    stillOn: !!(document.getElementById('tourWrap') && document.getElementById('tourWrap').classList.contains('on')),
-    i: __tourI,
-    skipTxt: (document.getElementById('tourSkip') || {}).textContent || '',
-    done: localStorage.getItem('hk_tour_done'),
-  }));
-  ok(t6arm.stillOn && t6arm.i === 1, 'one Esc on an early beat does not end the tour', JSON.stringify(t6arm));
-  ok(/again/i.test(t6arm.skipTxt), 'the skip arms and says so inline', t6arm.skipTxt);
-  ok(!t6arm.done, 'and a single Esc has not burned hk_tour_done', String(t6arm.done));
+  // (c) the HUD never covers the active cell, at any row of the board
+  const t5e = await page.evaluate(() => {
+    let hits = 0, seen = 0;
+    for (let r = 1; r <= S.ROWS; r++) {
+      S.active = { r, c: 3 }; S.sel = null; render();
+      const h = document.getElementById('tourHud'); if (!h) continue;
+      const td = document.querySelector('#grid td[data-r="' + r + '"][data-c="3"]'); if (!td) continue;
+      seen++;
+      const a = td.getBoundingClientRect(), b = h.getBoundingClientRect();
+      if (!(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom)) hits++;
+    }
+    return { hits, seen };
+  });
+  ok(t5e.seen > 0 && t5e.hits === 0, 'the HUD never covers the active cell, on any row (§3.0.2(1))', JSON.stringify(t5e));
 
-  // …the SECOND Esc really does skip. Skipping is a distinct outcome from finishing.
-  await page.keyboard.press('Escape');
+  // (d) the HUD exists only while the Tour is running (§7)
+  await page.evaluate(() => loadChallenge('filldr'));
+  await page.waitForTimeout(600);
+  const t5f = await page.evaluate(() => ({ tourMode, hud: !!document.getElementById('tourHud'),
+    card: document.getElementById('tourWrap').classList.contains('on') }));
+  ok(!t5f.tourMode && !t5f.hud && !t5f.card, 'leaving the Tour tears the HUD and the card down (§7)', JSON.stringify(t5f));
+
+  console.log('T6 stage 5 forces the ribbon bar on, and gives the player\'s setting back (T3)');
+  await fresh('1');
+  await page.keyboard.press('Enter'); await page.waitForTimeout(560);   // stage 1's card, out of the way
+  const t6 = await page.evaluate(() => {
+    const C = CHALLENGES.keyboardtour;
+    localStorage.removeItem('hk_ribbon_bar');
+    const before = localStorage.getItem('hk_ribbon_bar');
+    S._tourKey = {}; for (let i = 0; i < 24; i++) S._tourKey[i] = true;
+    S._tourOk = new Array(24).fill(false); for (let i = 0; i < 18; i++) S._tourOk[i] = true;
+    tourStage = -1; __tourCardOn = false; __tourPrevOk = 18;
+    hkTourStageCard(4);
+    return { before };
+  });
   await page.waitForTimeout(400);
-  const t6skip = await page.evaluate(() => ({
-    gone: !(document.getElementById('tourWrap') && document.getElementById('tourWrap').classList.contains('on')),
-    done: localStorage.getItem('hk_tour_done') === '1',
-  }));
-  ok(t6skip.gone, 'a second Esc actually skips the tour');
-  ok(t6skip.done, 'an escaped tour is remembered like a finished one', JSON.stringify(t6skip));
+  await page.keyboard.press('Enter'); await page.waitForTimeout(600);
+  const t6b = await page.evaluate(() => ({ bar: localStorage.getItem('hk_ribbon_bar'),
+    chips: (document.getElementById('ribbonSlot') || {}).innerHTML.length, stage: tourStage,
+    hudTop: (function(){ const h=document.getElementById('tourHud'); return h ? h.getBoundingClientRect().top : null; })(),
+    hudUp: !!document.getElementById('tourHud'),
+    flipped: !!(document.getElementById('tourHud') || {}).classList?.contains('top'),
+    ribBot: document.getElementById('ribbonSlot').getBoundingClientRect().bottom }));
+  ok(t6.before === null && t6b.bar === '1', 'stage 5 forces the lean ribbon bar on for a player who had it off', JSON.stringify({ ...t6, ...{ bar: t6b.bar } }));
+  ok(t6b.chips > 500, '…so the KeyTip letters the card names are on screen while they are pressed', String(t6b.chips));
+  ok(t6b.hudUp && t6b.hudTop > t6b.ribBot, 'and the banner sits BELOW the ribbon bar, never over it (§3.0.5)',
+    JSON.stringify({ hud: Math.round(t6b.hudTop), rib: Math.round(t6b.ribBot), flipped: t6b.flipped, up: t6b.hudUp }));
+  await page.evaluate(() => loadChallenge('filldr'));
+  await page.waitForTimeout(500);
+  ok((await page.evaluate(() => localStorage.getItem('hk_ribbon_bar'))) === null,
+    'leaving the Tour restores the player\'s own ribbon-bar setting (T3)');
 
-  // …and that is now RECOVERABLE: the ? sheet carries the only replay affordance.
-  await page.waitForTimeout(900);
-  const t6replay = await page.evaluate(() => {
-    openKbd();
-    const a = document.getElementById('kbReplayTour');
-    return { exists: !!a, label: a ? a.textContent : null };
-  });
-  ok(t6replay.exists, 'the ? sheet offers "replay the tour"', JSON.stringify(t6replay));
-  ok(/replay/i.test(t6replay.label || ''), 'and it is labelled as a replay', t6replay.label);
-  await page.evaluate(() => document.getElementById('kbReplayTour').click());
-  await page.waitForTimeout(700);
-  const t6back = await page.evaluate(() => ({
-    up: !!(document.getElementById('tourWrap') && document.getElementById('tourWrap').classList.contains('on')),
-    i: typeof __tourI !== 'undefined' ? __tourI : -99,
-    done: localStorage.getItem('hk_tour_done'),
-  }));
-  ok(t6back.up && t6back.i === 0, 'replaying brings the tour back at beat 0', JSON.stringify(t6back));
-  ok(!t6back.done, 'and un-remembers hk_tour_done so the replay is real', String(t6back.done));
-
-  console.log('T7 refresh mid-tour must not strand the player (P1-4)');
-  await freshNovice();
-  await page.keyboard.press('ArrowRight'); await page.waitForTimeout(1050);
-  await page.keyboard.press('ArrowRight'); await page.waitForTimeout(1050);
-  const t7mid = await page.evaluate(() => __tourI);
-  ok(t7mid >= 1, 'walked into the middle of the tour before refreshing', 'tourI=' + t7mid);
-  await page.reload({ waitUntil: 'load' });
-  await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
-  await page.waitForTimeout(1200);
+  console.log('T7 the warm-up sandbox is RETIRED (§1.7, decision T2)');
   const t7 = await page.evaluate(() => ({
-    tourUp: !!(document.getElementById('tourWrap') && document.getElementById('tourWrap').classList.contains('on')),
-    landingUp: !!(document.getElementById('landing') && !document.getElementById('landing').classList.contains('gone')),
-    done: localStorage.getItem('hk_tour_done'),
-    cells: (typeof S !== 'undefined' && S && S.cells) ? Object.keys(S.cells).length : -1,
+    startSandbox: typeof startSandbox, exitSandbox: typeof exitSandbox,
+    sandboxReadyCard: typeof sandboxReadyCard, sandboxCallout: typeof sandboxCallout,
+    startOnboardBoard: typeof startOnboardBoard, sbCell: typeof sbCell,
+    startGuidedIntro: typeof startGuidedIntro, introRibbonPeek: typeof introRibbonPeek,
+    flagKept: typeof sandboxMode,
+    tourSteps: TOUR_STEPS.length, novice: TOUR_STEPS.filter(s => s.novice).length,
+    doIt: TOUR_STEPS.filter(s => s.doIt || s.entry).length,
+    folded: TOUR_STEPS.filter(s => /\.cl-inner|\.drillbar|#hintsToggle/.test(s.sel || '')).length,
   }));
-  // Either outcome is acceptable — resume the tour, or offer the door back into it.
-  // What is NOT acceptable is an empty board with the tour marked done and no way back.
-  ok(t7.tourUp || t7.landingUp, 'a mid-tour refresh resumes the tour or offers the way back in', JSON.stringify(t7));
-  ok(t7.done !== '1', 'a mid-tour refresh does not silently mark the tour finished', String(t7.done));
-  if (!t7.tourUp) {
-    await page.keyboard.press('Enter'); await page.waitForTimeout(1400);
-    const t7b = await page.evaluate(() => !!(document.getElementById('tourWrap') &&
-      document.getElementById('tourWrap').classList.contains('on')) ||
-      !!(document.getElementById('kbCard') && document.getElementById('kbCard').classList.contains('show')));
-    ok(t7b, 'and re-entering from the landing reaches the tour again');
-  } else {
-    ok(true, 'the tour resumed directly after the refresh');
-  }
+  ok(['startSandbox','exitSandbox','sandboxReadyCard','sandboxCallout','startOnboardBoard','sbCell',
+      'startGuidedIntro','introRibbonPeek'].every(k => t7[k] === 'undefined'),
+    'every sandbox / onboard-board function is gone', JSON.stringify(t7));
+  ok(t7.flagKept === 'boolean', '…but the sandboxMode FLAG stays (§8 do-not-change #6)', t7.flagKept);
+  ok(t7.novice === 0 && t7.doIt === 0, 'TOUR_STEPS has no Excel-teaching beats left (A8)', JSON.stringify(t7));
+  ok(t7.folded === 0, '…and the three that fold into the Tour have left it (§3.0.6)', String(t7.folded));
+  ok(t7.tourSteps === 5, 'what remains is the five-beat PRODUCT tour for the skip path', String(t7.tourSteps));
 
-  console.log('T8 the first (guided) win says why nothing posted (P0-1)');
-  // the one-shot that explains guided must FIRE on the tour handoff, not be burned silently
-  await page.evaluate(() => { ['hk_tour_done','hotkey_onboarded','hk_learn_done','hk_runs_lite','hotkey_solves']
-    .forEach(k => localStorage.removeItem(k)); localStorage.setItem('hk_xlv','2'); });
-  await page.reload({ waitUntil: 'load' });
-  await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
+  console.log('T8 the other two comfort answers, and the ? sheet\'s two doors (§1.7, §3.0.4(8))');
+  await fresh('2');   // "I get around" → OFFERED the Tour, one line, skippable
+  const t8 = await page.evaluate(() => ({ card: document.getElementById('tourWrap').classList.contains('on'),
+    txt: (document.getElementById('tourCard') || {}).innerText || '', cur, tourMode }));
+  ok(t8.card && /NEW HERE\?/i.test(t8.txt), '"I get around" is OFFERED the Tour in one line', t8.txt.slice(0, 60));
+  ok(!t8.tourMode, '…and is not dropped into it unasked', JSON.stringify({ tourMode: t8.tourMode }));
+  await page.keyboard.press('Enter'); await page.waitForTimeout(1100);
+  ok((await page.evaluate(() => tourMode)) === true, '…Enter takes the offer');
+
+  await fresh('2');
+  await page.keyboard.press('Escape'); await page.waitForTimeout(1400);
+  const t8b = await page.evaluate(() => ({ tourMode, cur,
+    tour: document.getElementById('tourWrap').classList.contains('on') }));
+  ok(!t8b.tourMode && t8b.cur !== 'keyboardtour', '…Esc declines it and goes to the drills', JSON.stringify(t8b));
+
+  await fresh('3');   // "I live in it" → straight to the drills, the Tour on the ? sheet
+  const t8c = await page.evaluate(() => ({ tourMode, cur }));
+  ok(!t8c.tourMode && t8c.cur !== 'keyboardtour', '"I live in it" never sees the Tour', JSON.stringify(t8c));
+  await page.evaluate(() => { try { tourShow(999); } catch (e) {} openKbd(); });
+  await page.waitForTimeout(400);
+  const t8d = await page.evaluate(() => ({
+    tour: (document.getElementById('kbKeyTour') || {}).textContent || null,
+    replay: (document.getElementById('kbReplayTour') || {}).textContent || null }));
+  ok(/keyboard tour/i.test(t8d.tour || ''), 'the ? sheet carries "▶ the keyboard tour"', String(t8d.tour));
+  ok(/replay/i.test(t8d.replay || ''), '…beside the product tour\'s replay', String(t8d.replay));
+  await page.evaluate(() => document.getElementById('kbKeyTour').click());
+  await page.waitForTimeout(800);
+  const t8e = await page.evaluate(() => ({ cur, tourMode, card: __tourCardOn }));
+  ok(t8e.cur === 'keyboardtour' && t8e.tourMode && t8e.card, 'and it starts the Tour at stage 1', JSON.stringify(t8e));
+  const t8f = await page.evaluate(() => { localStorage.setItem('hk_tour_done_v2', '1');
+    const est = localStorage.getItem('hk_xp_est'); return est; });
+  await page.evaluate(() => { S._tourOk = new Array(24).fill(true); __tourCardOn = false; tourStage = 5; __tourPrevOk = 23; render(); });
   await page.waitForTimeout(700);
-  await page.keyboard.press('Enter'); await page.waitForTimeout(1000);
-  for (let i = 0; i < 12; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(120); }
-  await page.waitForTimeout(1800);   // handoff (+350ms) then the guided one-shot toast (+800ms)
-  const t8a = await page.evaluate(() => ({
-    guided: !!guided,
-    learnDone: localStorage.getItem('hk_learn_done'),
-    toast: (document.getElementById('hkToast') || {}).textContent || '',
-  }));
-  ok(t8a.guided, 'the tour still hands off with guided ON');
-  ok(/post/i.test(t8a.toast), 'and the handoff explains that guided runs do not post a time', t8a.toast);
-  ok(t8a.learnDone === '1', 'the one-shot flag is spent only once the explanation went out', String(t8a.learnDone));
+  ok((await page.evaluate(() => localStorage.getItem('hk_xp_est'))) === t8f,
+    'a replay of a finished Tour pays the +25 bounty a second time? no — it pays once (T1)', String(t8f));
+  await page.keyboard.press('Enter'); await page.waitForTimeout(900);
 
-  // the card itself must carry the line, in the BODY, above the action row — not only under `d`
-  await page.setViewportSize({ width: 1280, height: 800 });
-  const t8b = await page.evaluate(() => {
-    _showResults({ t: '0.90', tSec: 0.90, keys: 12, par: 10, guided: true, combo: 17 });
-    const m = document.getElementById('resultsModal');
-    const pr = m.querySelector('.rm-practice');
-    const fold = m.querySelector('.rm-more');
-    const opts = m.querySelector('.rm-opts');
-    if (!pr) return { has: false };
-    const r = pr.getBoundingClientRect();
-    return {
-      has: true,
-      text: pr.innerText.replace(/\s+/g, ' '),
-      inFold: !!(fold && fold.contains(pr)),
-      inView: r.top >= 0 && r.bottom <= window.innerHeight && r.height > 0,
-      aboveOpts: !!(opts && r.bottom <= opts.getBoundingClientRect().top),
-      optsInView: !!(opts && opts.getBoundingClientRect().bottom <= window.innerHeight),
-      hint: (m.querySelector('.rm-more-t') || {}).innerText || '',
-    };
-  });
-  ok(t8b.has, 'the guided results card carries a not-posted line');
-  ok(/not posted/i.test(t8b.text || ''), '…and it says "not posted" in plain words', t8b.text);
-  ok(t8b.inFold === false, '…in the card BODY, not hidden inside the `d` fold');
-  ok(t8b.inView && t8b.aboveOpts, '…above the fold at 1280x800, ahead of the action row', JSON.stringify(t8b));
-  ok(t8b.optsInView, 'and the action row is still fully on screen with the line added');
-  ok(/where the time went|redo/i.test(t8b.hint), 'the first card names what is behind `d` (P1-1)', t8b.hint);
-  await page.evaluate(() => { try { hideResults(); } catch (e) {} });
-
-  console.log('T9 the curtain gives an uninvited visitor a story and a door (P0-3)');
   await page.evaluate(() => { ['hk_beta_ok','hotkey_onboarded'].forEach(k => localStorage.removeItem(k)); });
   await page.reload({ waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
   await page.waitForTimeout(700);
-  const t9 = await page.evaluate(() => {
-    const g = document.getElementById('gate');
-    const list = document.getElementById('lockList');
-    return {
-      shown: !!(g && g.classList.contains('show')),
-      codeFirst: !!document.getElementById('lockCode'),
-      tagline: (document.getElementById('lockTag') || {}).innerText || '',
-      listHref: list ? list.getAttribute('href') : null,
-      listText: list ? list.innerText : null,
-    };
-  });
-  ok(t9.shown && t9.codeFirst, 'the curtain still gates, code input still primary');
-  ok(/excel/i.test(t9.tagline), 'the curtain now says what the product is', t9.tagline);
-  ok(!!t9.listHref && /mailto:|contact/i.test(t9.listHref), 'an uninvited visitor has a next action', String(t9.listHref));
-  ok(/list/i.test(t9.listText || ''), '…labelled as getting on the list', t9.listText);
-  await page.evaluate(() => { try { localStorage.setItem('hk_beta_ok', '1'); } catch (e) {} });
+  if (LOCK) {
+    console.log('T9 the curtain gives an uninvited visitor a story and a door (P0-3)');
+    const t9 = await page.evaluate(() => {
+      const g = document.getElementById('gate');
+      const list = document.getElementById('lockList');
+      return {
+        shown: !!(g && g.classList.contains('show')),
+        codeFirst: !!document.getElementById('lockCode'),
+        tagline: (document.getElementById('lockTag') || {}).innerText || '',
+        listHref: list ? list.getAttribute('href') : null,
+        listText: list ? list.innerText : null,
+      };
+    });
+    ok(t9.shown && t9.codeFirst, 'the curtain still gates, code input still primary');
+    ok(/excel/i.test(t9.tagline), 'the curtain now says what the product is', t9.tagline);
+    ok(!!t9.listHref && /mailto:|contact/i.test(t9.listHref), 'an uninvited visitor has a next action', String(t9.listHref));
+    ok(/list/i.test(t9.listText || ''), '\u2026labelled as getting on the list', t9.listText);
+    await page.evaluate(() => { try { localStorage.setItem('hk_beta_ok', '1'); } catch (e) {} });
+  } else {
+    /* r451: the mirror of the P0-3 asserts. The curtain WAS the whole first impression for
+       uninvited traffic; with it retired the landing has to carry that job itself. */
+    console.log('T9 an uninvited visitor gets the landing itself (curtain retired)');
+    const t9 = await page.evaluate(() => {
+      const g = document.getElementById('gate'), l = document.getElementById('landing');
+      let betaOk = null; try { betaOk = localStorage.getItem('hk_beta_ok'); } catch (e) {}
+      return {
+        shown: !!(g && g.classList.contains('show')),
+        codeFirst: !!document.getElementById('lockCode'),
+        landingUp: !!(l && !l.classList.contains('gone') && getComputedStyle(l).display !== 'none'),
+        text: l ? l.innerText : '',
+        hasStart: !!document.getElementById('startBtn'),
+        hasLogin: !!document.getElementById('loginBtn'),
+        betaOk: betaOk,
+      };
+    });
+    ok(!t9.shown && !t9.codeFirst && t9.landingUp, 'no gate for an uninvited visitor \u2014 the landing is the first impression');
+    ok(/excel/i.test(t9.text), 'the landing says what the product is', t9.text.slice(0, 90));
+    ok(t9.hasStart && t9.hasLogin, 'an uninvited visitor has a next action (start drilling / log in)', JSON.stringify({ s: t9.hasStart, l: t9.hasLogin }));
+    ok(!t9.betaOk, '\u2026and never needs an access code (no hk_beta_ok on the device)', String(t9.betaOk));
+  }
+
+  /* T10 (r452 bug sweep P1-2): ESC CLOSES THE SIGN-IN MODAL. The keydown handler's
+     INPUT/TEXTAREA bail sits above the authOpen branch and the modal focuses its own email
+     field on open, so every Esc landed in the input and died — the modal had NO keyboard exit
+     while the ? sheet promises "Esc — close menus & modals". Pressed as a real key with the
+     focus where the modal actually leaves it, which is the whole point of the bug. */
+  console.log('T10 esc closes the sign-in modal (the ? sheet\'s "close menus & modals" contract)');
+  await page.evaluate(() => { try { openAuth('signin'); } catch (e) {} });
+  await page.waitForTimeout(250);
+  const escA = await page.evaluate(() => ({
+    open: typeof authOpen !== 'undefined' && authOpen === true,
+    shown: !!(document.getElementById('authModal') || {}).classList &&
+      document.getElementById('authModal').classList.contains('show'),
+    focus: (document.activeElement || {}).tagName
+  }));
+  ok(escA.open && escA.shown, 'the sign-in modal opens', JSON.stringify(escA));
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(250);
+  const escB = await page.evaluate(() => ({
+    open: typeof authOpen !== 'undefined' ? authOpen : null,
+    shown: document.getElementById('authModal').classList.contains('show')
+  }));
+  ok(escB.open === false && escB.shown === false,
+    'Escape closes it from inside the focused field (authOpen false, modal hidden)',
+    JSON.stringify({ before: escA, after: escB }));
 
   const realErrors = errs.filter(e => !/supabase|Failed to fetch|NetworkError|ERR_/i.test(e));
   ok(realErrors.length === 0, 'zero page errors through onboarding', realErrors.join(' | '));

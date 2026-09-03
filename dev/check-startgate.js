@@ -22,7 +22,11 @@
          the gate armed (paying one gate key) and with hk_gate_off logs the SAME keyLog and
          wins the same way. This is the assertion that makes every other suite's hk_gate_off
          honest — without it, opting the battery out would prove nothing about par.
-     §8  the deliberate NON-gates: warm-up sandbox, live session, watch-solution demo.
+     §8  the deliberate NON-gates: THE KEYBOARD TOUR, live session, watch-solution demo —
+         and the one surface that REPLACES the gate rather than declining it, the r452
+         lesson card (§1.5: on a lesson drill the card IS the gate, so one keypress both
+         dismisses it and starts the clock, and honest t=0 survives with ONE surface
+         instead of two stacked over each other).
 
    Run: CHROME=<chromium> BASE=http://127.0.0.1:8791 node dev/check-startgate.js  */
 'use strict';
@@ -50,7 +54,6 @@ const check = (ok, label, extra) => { if (!ok) fail++; console.log('  ' + (ok ? 
     localStorage.setItem('hk_learn_done', '1');
     localStorage.setItem('hk_handle_cache', '');
     localStorage.setItem('hk_start_coach', '1');
-    localStorage.setItem('hk_beta_ok', '1');
   } catch (e) {} });
   await page.goto(BASE + '/index.html', { waitUntil: 'load' });
   await page.waitForFunction(() => typeof loadChallenge === 'function' && typeof CHALLENGES !== 'undefined'
@@ -247,11 +250,30 @@ const check = (ok, label, extra) => { if (!ok) fail++; console.log('  ' + (ok ? 
 
   console.log('\n§8 the deliberate NON-gates');
   {
-    await page.evaluate(() => { try { startSandbox(); } catch (e) {} });
+    /* r452: the warm-up sandbox is RETIRED (dev/TUTORIAL_CHAPTER_SPEC.md §1.7, decision T2) and
+       THE KEYBOARD TOUR took over its place in this list. Same rationale, re-pointed: the Tour is
+       untimed, so a start gate over it would promise a clock that startClock() refuses to run.
+       Two flags carry it — hkGateArm declines on tourMode, and startKeyboardTour calls
+       hkGateClear() on every entry (index.html, the r450 comment the sandbox used to own). */
+    await page.evaluate(() => { try { startKeyboardTour(); } catch (e) {} });
+    await page.waitForTimeout(700);
+    const kt = await page.evaluate(() => ({ tour: tourMode, cur, gate: hkGate,
+      ov: document.querySelectorAll('#hkGate').length, running,
+      timer: document.getElementById('timer').textContent }));
+    check(kt.tour === true && kt.cur === 'keyboardtour' && kt.gate === false && kt.ov === 0,
+      'the Keyboard Tour is never gated (it is never timed)', JSON.stringify(kt));
+    check(kt.running === false && kt.timer === '\u2014',
+      'and its clock is not merely stopped \u2014 there is no clock to run', JSON.stringify(kt));
+    /* and it STAYS unclocked once the player starts pressing keys: startClock bails on tourMode,
+       so the dozens of startClock() calls scattered through the op handlers cannot start one */
+    await page.evaluate(() => { try { hkLessonCardHide(); __tourCardOn = false; tourStage = 0; } catch (e) {} });
+    await key('ArrowRight', 120); await key('Control+ArrowRight', 200); await key('Control+b', 200);
+    const kt2 = await page.evaluate(() => ({ running, timer: document.getElementById('timer').textContent, done }));
+    check(kt2.running === false && kt2.timer === '\u2014' && kt2.done === false,
+      'keys on the Tour board never start a clock (startClock declines tourMode)', JSON.stringify(kt2));
+    await page.evaluate(() => { try { loadChallenge('filldr'); } catch (e) {} });
     await page.waitForTimeout(400);
-    const sb = await page.evaluate(() => ({ sandbox: sandboxMode, gate: hkGate, ov: document.querySelectorAll('#hkGate').length }));
-    check(sb.sandbox === true && sb.gate === false && sb.ov === 0,
-      'the warm-up sandbox is never gated (it is never timed)', JSON.stringify(sb));
+    check((await snap()).gate === true, 'and the board it hands back IS gated');
 
     await load();
     await page.evaluate(() => { try { _pro = true; } catch (e) {} startSession('marathon', 120); });
@@ -273,6 +295,51 @@ const check = (ok, label, extra) => { if (!ok) fail++; console.log('  ' + (ok ? 
     await page.evaluate(() => cancelDemo());
     await page.waitForTimeout(2400);
     check((await snap()).gate === true, 'and the board it hands back IS gated');
+  }
+
+  console.log('\n\u00a78b the LESSON CARD is the gate (r452, spec \u00a71.5)');
+  {
+    /* No lesson drill ships yet \u2014 the four of \u00a73.1\u20133.4 are a later wave \u2014 so the platform is
+       proved against a synthetic one: a `lesson` object stapled onto a real drill. That is
+       exactly what those drills will declare, and it is the whole contract this surface owes
+       them: the card REPLACES the r450 scrim (never stacks on it), one keypress dismisses the
+       card AND starts the clock, and the start key is still swallowed so t=0 stays honest. */
+    await page.evaluate(() => {
+      CHALLENGES.filldr.lesson = { title: 'Fill it down', keys: ['ctrl+d', 'ctrl+r'],
+        body: 'A formula filled down carries its row references with it. Ctrl+D fills from above, Ctrl+R from the left.' };
+      try { localStorage.removeItem('hk_lessons_off'); } catch (e) {}
+    });
+    await load('filldr');
+    await page.waitForTimeout(400);
+    const lc = await page.evaluate(() => ({
+      card: document.getElementById('tourWrap').classList.contains('on'),
+      txt: (document.getElementById('tourCard') || {}).innerText || '',
+      scrim: document.querySelectorAll('#hkGate').length,
+      gate: hkGate, running, timer: document.getElementById('timer').textContent, keys: keyLog.length,
+    }));
+    check(lc.card && /Fill it down/.test(lc.txt), 'a lesson drill opens on its lesson card', lc.txt.slice(0, 50));
+    check(lc.scrim === 0 && lc.gate === true,
+      'the card REPLACES the gate scrim \u2014 one surface, not two stacked', JSON.stringify(lc));
+    check(lc.running === false && lc.timer === '0.00', 'the clock has not started behind it', JSON.stringify(lc));
+    await key('ArrowDown', 320);
+    const lc2 = await page.evaluate(() => ({
+      card: document.getElementById('tourWrap').classList.contains('on'),
+      gate: hkGate, running, keys: keyLog.length,
+      act: S && S.active ? S.active.r + ',' + S.active.c : null,
+      t: parseFloat(document.getElementById('timer').textContent),
+    }));
+    check(!lc2.card, 'one keypress dismisses the card');
+    check(lc2.running === true && lc2.gate === false, '\u2026and the same keypress starts the clock', JSON.stringify(lc2));
+    check(lc2.keys === 0 && lc2.t < 0.4, '\u2026with the key swallowed and t=0 honest', JSON.stringify(lc2));
+    /* the one toggle turns it off forever, and then the plain r450 gate is back */
+    await page.evaluate(() => { try { localStorage.setItem('hk_lessons_off', '1'); } catch (e) {} });
+    await load('filldr');
+    const lc3 = await page.evaluate(() => ({
+      card: document.getElementById('tourWrap').classList.contains('on'),
+      scrim: document.querySelectorAll('#hkGate').length, gate: hkGate }));
+    check(!lc3.card && lc3.scrim === 1 && lc3.gate === true,
+      'hk_lessons_off puts the plain start gate back (\u00a71.5: dismissable forever)', JSON.stringify(lc3));
+    await page.evaluate(() => { try { delete CHALLENGES.filldr.lesson; localStorage.removeItem('hk_lessons_off'); } catch (e) {} });
   }
 
   const real = errs.filter(e => !/supabase|Failed to fetch|NetworkError|ERR_/i.test(e));

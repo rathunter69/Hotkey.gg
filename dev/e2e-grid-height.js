@@ -35,8 +35,7 @@ const measure = () => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1'); localStorage.setItem('hk_beta_ok', '1');
-  } catch (e) {} });
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');  } catch (e) {} });
   await page.route('**/@supabase/**', r => r.abort());
   await page.goto(URL, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof loadChallenge === 'function');

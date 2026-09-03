@@ -17,7 +17,7 @@ const ROOT = path.join(__dirname, '..');
 const OUT = path.join(ROOT, 'drills');
 const SITE = 'https://www.hotkey.gg';
 
-/* r416-review: DERIVE the shared-asset ?v= from index.html so the 82 drill pages can never
+/* r416-review: DERIVE the shared-asset ?v= from index.html so the drill pages can never
    serve a stale version again — they had been hard-pinned at nav.css v188 / drills.js v275 /
    themes.js v280 / nav.js v288 while the live site moved on. Because the drill-page drift guard
    regenerates + diffs on any index.html change, a future cache-bump now forces the pages back
@@ -35,8 +35,7 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
   const page = await browser.newPage();
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1'); localStorage.setItem('hk_beta_ok', '1');
-  } catch (e) {} });
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');  } catch (e) {} });
   await page.goto((process.env.URL || 'http://127.0.0.1:8791/index.html'), { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && window.HOTKEY_DRILLS);
 
@@ -80,7 +79,7 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
           (typing.match(/[A-Za-z]{2,}(?=\()/g) || []).forEach(f => fns.add(f.toUpperCase()));
           typing = '';
         };
-        (mv || []).forEach(step => (step.keys || []).forEach(kk => {
+        (mv || []).forEach(step => { (step.keys || []).forEach(kk => {
           const K = kk.key || '';
           const plain = K.length === 1 && !kk.ctrl && !kk.alt && !kk.shift;
           if (walk !== null && plain && /^[a-z0-9]$/i.test(K)) { walk += '>' + K.toUpperCase(); return; }
@@ -96,7 +95,19 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
           let disp = K === ' ' ? 'Space' : (AR[K] || (K.length === 1 ? K.toUpperCase() : K));
           if (kk.ctrl && kk.shift && K.length === 1 && !/[a-z0-9]/i.test(K)) disp = K;   // Ctrl+Shift+% keeps the symbol
           put(mods + disp);
-        }));
+        });
+        /* r452 (audit P2-6): CLOSE THE RIBBON WALK AT THE STEP BOUNDARY. A demo step is one
+           selection plus one key sequence, and an Alt ribbon walk is always contained inside a
+           single step — the next step starts by moving the cursor somewhere else. The walk used
+           to survive into the next step, so any plain letters typed there were appended to it as
+           if they were ribbon mnemonics. `sort` demos Alt A S D E (Sort dialog) and then TYPES a
+           deal name into the board, which is how refmap.js ended up publishing
+           "ALT>A>S>D>E>R>I>D>G>E" and "ALT>A>S>D>E>D>E>L>T>A" — chords nobody can press. They
+           were inert because reference.html only does exact lookups, but the same mis-segmentation
+           consumes a REAL chord whenever typed text follows a walk: the walk that should have been
+           published gets a tail welded onto it and the honest form is never emitted at all. */
+        if (walk !== null) { if (walk.includes('>')) put(walk); walk = null; }
+        });
         if (walk !== null && walk.includes('>')) put(walk);
         flushTyping();
       };
@@ -494,4 +505,22 @@ ${(() => {
     'window.HK_CHORD_DRILL = ' + JSON.stringify(chordDrill, null, 0) + ';\n');
 
   console.log(`wrote ${all.length} drill pages + library + sitemap (${urls.length} urls) + refmap (${Object.keys(chordDrill).length} chords)`);
+
+  /* r452 ORPHAN GUARD (perf/stale audit P2-d4 + P2-e2). The gate's drift check is
+     `node dev/build-drill-pages.js && git diff --exit-code -- drills sitemap.xml`, and
+     `git diff` only ever sees files this generator MODIFIES — never one it has stopped
+     writing. So when colops was retired in the depth pass, drills/colops.html stayed live and
+     green: an indexed, canonical'd, schema.org'd landing page whose CTA deep-linked
+     index.html?drill=colops into a drill that no longer exists. Assert the directory instead:
+     the set of drills/*.html must be exactly menuOrder + the library index. */
+  const onDisk = fs.readdirSync(OUT).filter(f => f.endsWith('.html')).map(f => f.slice(0, -5)).sort();
+  const expect = ['index', ...all].sort();
+  const orphaned = onDisk.filter(k => !expect.includes(k));
+  const missing = expect.filter(k => !onDisk.includes(k));
+  if (orphaned.length || missing.length) {
+    if (orphaned.length) console.error(`ORPHAN drill page(s) — retired but still on disk: ${orphaned.map(k => 'drills/' + k + '.html').join(', ')}\n  delete them: the catalog (drills.js menuOrder) no longer has these keys`);
+    if (missing.length) console.error(`MISSING drill page(s): ${missing.map(k => 'drills/' + k + '.html').join(', ')}`);
+    process.exit(1);
+  }
+  console.log(`  ok  drills/ holds exactly menuOrder + index (${expect.length} pages, 0 orphans)`);
 })();

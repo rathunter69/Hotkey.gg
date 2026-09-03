@@ -75,7 +75,13 @@
   .menu-btn{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:20px; cursor:pointer}
 
   /* ---------- HERO ---------- */
-  .hero{padding:88px 0 60px; position:relative}
+  /* r452 (audit P1-5): overflow:hidden. .hero-glow is 760px wide, absolutely centred with
+     translateX(-50%) — on a 390px phone it measured left:-192 right:568 and, with nothing
+     clipping it, pushed document.scrollWidth 178px past clientWidth. The whole page scrolled
+     sideways in both themes. The glow is decorative and pointer-events:none, so clipping it to
+     the hero costs nothing visible; the hero is already position:relative, so this is the
+     containing block that owns it. Guarded by dev/e2e-smoke.js's 390px overflow sweep. */
+  .hero{padding:88px 0 60px; position:relative; overflow:hidden}
   .hero-glow{
     position:absolute; top:-80px; left:50%; transform:translateX(-50%);
     width:760px; height:520px; background:radial-gradient(ellipse at center,var(--accent-glow),transparent 65%);
@@ -242,7 +248,7 @@
         <a href="index.html" class="btn btn-primary">Start your first run</a>
         <a href="#how" class="btn btn-ghost">See how it works</a>
       </div>
-      <div class="micro fade d5">No install. Runs in the browser. <b>Invite-only beta</b> — built for the summer before the internship.</div>
+      <div class="micro fade d5">No install. Runs in the browser. <b>Free to play</b> — built for the summer before the internship.</div>
     </div>
 
     <div class="demo fade d3" aria-hidden="true">
@@ -298,7 +304,7 @@
       <div class="board-row"><span class="board-rank">3</span><span class="board-name">classmate</span><span class="board-ex">model-ready</span><span class="board-time">—</span></div>
       <div class="board-row"><span class="board-rank">4</span><span class="board-name">classmate</span><span class="board-ex">hardcode it</span><span class="board-time">—</span></div>
       <div class="board-veil">
-        <p>The boards are live — 82 drills, each with a ladder.</p>
+        <p>The boards are live — 74 drills, each with a ladder.</p>
         <span class="sub">daily &amp; weekly gauntlets · ranked tiers · desks &amp; school standings</span>
         <a href="leaderboard.html" class="btn btn-primary">See the leaderboard</a>
       </div>

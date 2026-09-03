@@ -5,6 +5,38 @@ standards — READ FIRST; §9 is the wave playbook for Opus-5 sessions, new r428
 **dev/PIPELINE.md's ⚡ r428 header (the live queue)**, dev/AUDIT.md (newest round at the TOP),
 and the dev/ design docs._
 
+## ⚡ NEXT-SESSION HANDOFF (2026-09-03 late, r452 — THE AUDIT + THE BUILD DAY)
+Read `dev/CONTINUITY.md` §0a, then `dev/AUDIT_R452.md`. The beta is retired on the branch, landing v2
+and the Keyboard Tour are built, the frames are pixel, fourteen audit fixes landed with guards. The
+branch has not been through CI (gate.yml is PR/main only). Next: Wolf's menu answers (AUDIT_R452 §2),
+then the lesson-drill wave (TUTORIAL_CHAPTER_SPEC §3.1–3.4 + `signs` + `tracepass`).
+
+## ⚡ NEXT-SESSION HANDOFF (2026-09-03, r451 — THE FOUR VECTORS: tutorial chapter · rank art · business · security)
+
+**READ `dev/CONTINUITY.md` §0 FIRST.** Wolf's direction after the r450 playtest: the catalog must
+teach before it tests. Session r451 produced PLANS, no product code:
+- **`dev/TUTORIAL_CHAPTER_SPEC.md`** (**v2**, same day — v1's ten-drill chapter is superseded) —
+  **one robust Keyboard Tour + a four-drill on-ramp, inside the existing Foundations chapter.** The
+  Tour (`keyboardtour`) is a staged, untimed, replayable tutorial board that lives OUTSIDE the catalog
+  like the sandbox does today: six stages (move · select · enter & edit · formulas · the ribbon ·
+  save), a TUTORIAL HUD that names the next keystroke on screen, a one-time +25 xp bounty; it replaces
+  the 13-card modal tour's Excel beats AND the warm-up sandbox. The four lesson drills — select ·
+  firstsum · lockref · ribbonpass — slot into Foundations right after `navigation` (lesson card = start
+  gate, hints on by default, visible ☆, pass = par×2). **No chapter rename, no `c0`, no achievement
+  re-targeting**; Foundations becomes 11 drills, `modeltour★` stays its capstone, catalog 74 → 78.
+  Cascade map (§5), invariants (§7), three-wave rollout (§6), and **eleven Wolf decisions (§9,
+  including L1: build the four lesson drills or Tour only)** — nothing builds before they are answered.
+- **`dev/ART_DIRECTION.md` + `art/rank-pixel-proto.html` (+ PNG renders)** — recommendation: pixel
+  sprites replace the heraldic crests (16×16 chips + a 32×32 hero master, same `rankEmblem`
+  signature, integer scaling as an invariant). Four Wolf decisions (A1–A4).
+- **`dev/BUSINESS_PLAN.md`** (reserved) — OBA gate first, then home-state LLC → EIN → bank →
+  Stripe live → bookkeeping → mail/login/bill routing; four short sessions.
+- **`dev/SECURITY_PLAN.md`** (reserved) — eight-domain audit fleet, method, definition of done;
+  first fact to check: which host actually serves production (`_headers` only applies on
+  Cloudflare Pages).
+**Docs-only round** (no cache bump). Branch `claude/drill-redesign-art-style-jg9vhm` off `main`
+@ r450 (#246 merged).
+
 ## ⚡ NEXT-SESSION HANDOFF (2026-07-27, r429 — THE DUAL-AUDIENCE LAW + CHAPTERS 1-3 COMPLETE)
 
 **WOLF'S NEW PRODUCT DIRECTION (2026-07-27), now binding build law:** every drill must read as a
@@ -778,10 +810,18 @@ IB associate, restructuring) is founder; Claude is sole developer.
   Launch = flip PRELAUNCH_LOCK to false. BETA_MODE now ONLY unlocks PRO.
   Signup open to all emails (r133; .edu = incentive: school-desk auto-match +
   future student perks).
-- **Git workflow (NEW):** repo github.com/rathunter69/Hotkey.gg (public), GitHub Pages
-  via CNAME → www.hotkey.gg. Claude clones per session (no persistent access); Wolf
-  pastes a fine-grained token (Contents: R/W, this repo only) when Claude should push.
-  Push to main = deploy. Tokens never stored in repo or this file.
+- **Git workflow (NEW):** repo github.com/rathunter69/Hotkey.gg (public), deployed by
+  **Cloudflare Pages** from `main` → www.hotkey.gg. (r452 corrected "GitHub Pages" here and
+  at the cache-busting note below; ":538" already said Cloudflare. Evidence: `_headers` exists
+  and its first line reads "Cloudflare Pages response headers" — GitHub Pages ignores that file
+  entirely; `.github/workflows/` holds only gate.yml + supabase-deploy.yml, with no Pages deploy
+  job and no actions/deploy-pages; dev/PROJECT_REVIEW.md:32 states "Cloudflare Pages deploys
+  main". The root `CNAME` is an INERT GitHub-Pages-era leftover — Cloudflare Pages does not read
+  it; left in place deliberately, since deleting it forecloses a fallback to GH Pages and the
+  Cloudflare custom-domain binding lives in the dashboard, not the repo.)
+  Claude clones per session (no persistent access); Wolf pastes a fine-grained token
+  (Contents: R/W, this repo only) when Claude should push. Push to main = deploy. Tokens never
+  stored in repo or this file.
 - **Coupled deploy set:** index.html (4,835 lines), drills.js, themes.js, nav.js,
   nav.css, leaderboard.html, reference.html, About.html, privacy/terms/security.html,
   favicon.svg. supabase/ IS in the repo: migrations/ deploy
@@ -801,7 +841,7 @@ story) · S9 team spaces v2 (invite links, team pages) · S10 rank-math consolid
 ## Conventions (bugs earned these)
 - **CACHE-BUSTING (round 16):** every shared-asset reference uses ?v=N
   (nav.js, nav.css, themes.js, drills.js across all pages). BUMP N on any shared-file
-  change or GitHub Pages serves stale JS — this caused the "missing stats icon" and
+  change or Cloudflare Pages serves stale JS — this caused the "missing stats icon" and
   earlier "invisible rank pill" reports.
 - Emoji in python edits: \U escapes + io.open utf-8 (surrogate write once zeroed index.html).
 - Duplicated-code sync sets: tier/level math (index+nav.js+leaderboard TIERS) ·

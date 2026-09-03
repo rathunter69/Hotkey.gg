@@ -32,8 +32,11 @@ window.HOTKEY_DRILLS = {
   // Formulas II / Models I / Models II / Full Builds (PRO).
   // r249 — the 6 folded legacy drills (saves, ribbon, polish, format, blue, transpose) were
   // deleted outright, their value covered by survivors (housestyle, decimals,
-  // the Alt-H drills, pastes). Catalog is 82 grouped drills (Formulas I & II carry 11 each);
-  // menuOrder.length is the source of truth — do not hardcode the total elsewhere.
+  // the Alt-H drills, pastes). r452: the catalog total and every chapter's size are whatever the
+  // groups[] block below adds up to — read them off it, and off menuOrder.length, which is the
+  // source of truth. Do not restate a count in this comment (the one that stood here said 82
+  // grouped drills with 11 each in Formulas I & II; it was 74, with 9 and 10) or hardcode the
+  // total anywhere else.
   groups: [
     { name: 'Foundations',    keys: ['navigation', 'filldr', 'pastes', 'blocksel', 'rowops', 'editfix', 'modeltour'] },   /* r367: modeltour moved from #2 to capstone — it demands cascades + formatting no fresh player has yet · r424 (D17): colops RETIRED — rowops absorbed it (row AND column structure ops, one drill); the freed slot stays open for a future add */
     { name: 'Formatting',     keys: ['typeset', 'decimals', 'center', 'autofit', 'ruleoff', 'ruleaudit', 'combo', 'housestyle', 'gauntlet'] },
@@ -59,7 +62,7 @@ window.HOTKEY_DRILLS = {
     navigation: { name:'Navigate', label:'Navigation maze',     tab:'Nav',         desc:'One long switchback corridor through solid walls — every straightaway is a single shot, every corner one turn. Collect the pips, copy the model data, bring it home to A1, save, and finish at the far corner of the active area — the wall past the model breaks open if you would rather walk there than fly' },   /* r427 (§4.1 round 3): windier serpentine + the carved exit */
     autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'A print page nobody can read — fit the labels to their content, hold the quarter block to one width, and find out what your own totals do to a narrow column' },   /* r432 (§4.14): reworked to the single print-page board */
     rowops:     { name:'Structure', label:'Rebuild the schedule',   tab:'Structure',desc:'Full structural surgery \u2014 insert the missing line and the missing quarter, delete the squatters, and watch every new row and column arrive already dressed' },   /* r424 (D17): absorbed colops \u2014 rows AND columns in one drill */
-    filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'Fill down and fill right — one formula, whole block' },
+    filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'A quarterly operating build off the revenue feed — three cost lines across the year, EBITDA, Fiscal Year totals, and a ratio block down to EBITDA margin. One anchored formula fills most of it' },   /* r452 (audit §5.3): the old desc ("Fill down and fill right — one formula, whole block") sold a 2-beat exercise; the r427 board is 7 beats at par 44. First sentence stays inside the 158-char meta-description cut in dev/build-drill-pages.js */
     blocksel:   { name:'Block Select',label:'Assemble and format the summary',tab:'Block', desc:'COPY what stays, CUT what moves — the feeds run in segment order; dress the table as you go and box it whole' },   /* r424 §4.4 round 2: margin note + money formats out; whole-table close in */
     editfix:    { name:'Repair',   label:'Repair the schedule',    tab:'Repair',   desc:'A review came back on the schedule — a misspelled team, an FY formula pointing at the wrong row, a Total that never grew. Repair all three, then do what the sweep note says and watch it cost you' },   /* r431: absorbed undo — the repair pass and its safety net are one drill */
     pastes:     { name:'Paste Special',label:'Paste Special everything',tab:'Paste Sp.',desc:'The full paste-special toolkit — transpose, divide, multiply, formats, values' },
@@ -245,8 +248,11 @@ window.HOTKEY_CAMPAIGN = {
     { id:'c3', name:'Formulas I',             badge:'\u2797',        xp:250, keys:['margin','bridge','anchor','sumif'] },
     { id:'c4', name:'Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','recon','lookup','lookup2'] },
     { id:'c5', name:'Formulas II',            badge:'\ud83e\uddee', xp:450, keys:['audit','balance','triage','versionup'] },
-    { id:'c6', name:'Models I \u00b7 Valuation',    badge:'\ud83c\udfe6', xp:600, keys:['wacc','fcfbuild','dcf','comps'] },
-    { id:'c7', name:'Models II \u00b7 Credit',      badge:'\ud83d\udcc9', xp:750, keys:['lbo','revolver','intsched','debtsched'], capstone:'cascade' },   /* r447 (D9): the Models II capstone designates with its depth-pass build */
+    /* r452 (audit \u00a75.5): a chapter's `name` IS its groups[] name \u2014 one string for the picker folder
+       and the campaign rail, asserted by dev/check-invariants.js C15. The editorial suffix these two
+       carried ("Models I \u00b7 Valuation") moved to `sub`, which the rail appends; nothing else reads it. */
+    { id:'c6', name:'Models I',               sub:'Valuation', badge:'\ud83c\udfe6', xp:600, keys:['wacc','fcfbuild','dcf','comps'] },
+    { id:'c7', name:'Models II',              sub:'Credit',    badge:'\ud83d\udcc9', xp:750, keys:['lbo','revolver','intsched','debtsched'], capstone:'cascade' },   /* r447 (D9): the Models II capstone designates with its depth-pass build */
     { id:'c8', name:'Full Builds',            badge:'\ud83c\udfd7', xp:1000, keys:['threestmt','dcfbuild','lbobuild','opmodel'] },
   ],
   finisher: { badge:'\u2b50', name:'Catalog complete', xp:600 },
@@ -307,8 +313,8 @@ window.HK_BAND = {
 
 /* ---- par snapshot (auto-extracted from CHALLENGES; regen when pars change) ---- */
 // ---- ADVANCED TIER / PAYWALL SCAFFOLD ----
-// enabled:false during beta. Advanced groups carry the \u25c6 badge and section-leader
-// boards now; flipping enabled:true (post-beta, post-internship, Stripe LIVE keys)
+// enabled:false until billing is live. Advanced groups carry the \u25c6 badge and section-leader
+// boards now; flipping enabled:true (post-internship, Stripe LIVE keys)
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Formulas II','Models I','Models II','Full Builds'] };
 
@@ -437,13 +443,20 @@ window.hkPremiumKey = function(key){
    Precedent: this is the same shape as the r158 progression gate, which already
    lets daily / weekly / challenge / armed-race boards ride through the ladder
    ("community moments"). Asserted by dev/check-paywall.js §5. */
-window.hkPlacementRide = function(key){
+window.hkPlacementRide = function(key, hasPB){
+  /* r452 (audit P0-2): the SAME predicate now also serves the r158 level+clears ladder in
+     loadChallenge — opmodel (Full Builds, LVL 11) is the 5th placement board while Ranked opens at
+     LVL 10, so a ranked entrant sat at "placement 4/5" forever. One rule, two gates; the caller
+     may pass its own "board is posted" test (the trainer's PB map) instead of the stored PB read.
+     The ladder gate additionally requires hk_ranked at its call site — a caller condition, not a
+     second copy of this rule (the paywall rides for any player mid-placement, per r450). */
   const P = (window.HK_PLACEMENT && window.HK_PLACEMENT.KEYS) || [];
   if(P.indexOf(key) < 0) return false;                     // not a placement board
   try{ if(localStorage.getItem('hk_placement_done') === '1') return false; }catch(e){}   // placed: hole shut
-  let pb = {};
-  try{ pb = JSON.parse(localStorage.getItem('hotkey_pb') || '{}') || {}; }catch(e){}
-  return P.some(k => pb[k] === undefined);                 // still boards left to post
+  let has;
+  if(typeof hasPB === 'function') has = hasPB;
+  else { let pb = {}; try{ pb = JSON.parse(localStorage.getItem('hotkey_pb') || '{}') || {}; }catch(e){} has = k => pb[k] !== undefined; }
+  return P.some(k => !has(k));                             // still boards left to post
 };
 
 /* ---- THE ENTITLEMENT POINT ------------------------------------------------ */
@@ -586,17 +599,18 @@ window.HOTKEY_ACHIEVEMENTS = [
   { id:'kbd1', glyph:'combo',  tier:'r', name:'Multi-channel',    desc:'Use 25 distinct shortcuts in clean runs', test:c=>({done:(c.chordKinds||0)>=25, prog:Math.min(c.chordKinds||0,25), goal:25}) },
   { id:'bld1', glyph:'cert',    tier:'e', name:'Shipped It',       desc:'Beat par on the three-statement capstone', test:c=>{ const ok=c.pb['threestmt']!==undefined&&c.pars['threestmt']&&c.pb['threestmt']<=c.pars['threestmt']; return {done:ok, prog:ok?1:0, goal:1}; } },
   /* ---- r376 (Wolf): THE MYTHIC CLASS — the rarest things on the wall (red ring +
-     crest crown). ctx keys: charter (auth created_at before the beta cutoff, same
-     gate as the charter frame — unobtainable once beta ends), tierBest /
+     crest crown). ctx keys: charter (auth created_at before the launch cutoff, same
+     gate as the charter frame — unobtainable after it; the cutoff literal lives in
+     nav.js 712/928), tierBest /
      tierBestBucket (the packed high-water latch from nav.js persistTierBest),
      deskPeak (latched by lb.js when your own desk grades S+++). ---- */
-  { id:'x_charter', glyph:'founder', tier:'m', name:'Charter',        desc:'Account opened during the beta — you were on the desk before the desk was cool', test:c=>({done:!!c.charter, prog:c.charter?1:0, goal:1}) },
+  { id:'x_charter', glyph:'founder', tier:'m', name:'Charter',        desc:'Account opened before launch — you were on the desk before the desk was cool', test:c=>({done:!!c.charter, prog:c.charter?1:0, goal:1}) },
   { id:'x_summit',  glyph:'crown', tier:'m', name:'Up for promotion',         desc:'Hold the top rank tier in its Top Bucket', test:c=>{ const top=(((window.HK_RANK||{}).TIERS)||{length:8}).length-1; const ok=(c.tierBest|0)>=top && (c.tierBestBucket|0)>=top*3+2; return {done:ok, prog:ok?1:0, goal:1}; } },
   { id:'x_bulge',   glyph:'mastery', tier:'m', name:'Elite boutique',  desc:'Sit on a desk graded S+++ — the top of the guild scale', test:c=>({done:!!c.deskPeak, prog:c.deskPeak?1:0, goal:1}) },
   /* r389 (Wolf): the founding-cohort + completionist mythics. foundingClass/foundingPartner
      ride the ctx (themes.js hkFoundingFlags — one count query, cached). Founding Partner
-     arms post-beta when PRO purchases are tracked + ordered; until then it's a locked goal. */
-  { id:'x_allach',  glyph:'mastery', tier:'m', name:'Sweaty',         desc:'Earn every other medal on the wall — the complete collection',            test:c=>{ const AC=window.HOTKEY_ACHIEVEMENTS||[]; const others=AC.filter(a=>a.id!=='x_allach'&&a.tier!=='m'); let n=0; others.forEach(a=>{ try{ if(a.test(c).done) n++; }catch(e){} }); return {done:others.length>0&&n>=others.length, prog:n, goal:others.length||1}; } },
+     arms post-launch when PRO purchases are tracked + ordered; until then it's a locked goal. */
+  { id:'x_allach',  glyph:'mastery', tier:'m', name:'Sweaty',         desc:'Earn every other medal on the wall — the complete collection',            test:c=>{ const AC=window.HOTKEY_ACHIEVEMENTS||[]; const others=AC.filter(a=>a.id!=='x_allach'&&a.tier!=='m'&&!a.hidden);   /* r452 (audit P1-1): hidden medals (capstones whose drill isn't built) are not on the wall, so they cannot be required for "every other medal" — that made this mythic unearnable */ let n=0; others.forEach(a=>{ try{ if(a.test(c).done) n++; }catch(e){} }); return {done:others.length>0&&n>=others.length, prog:n, goal:others.length||1}; } },
   { id:'x_first100',glyph:'founder',  tier:'m', name:'First Analyst Class', desc:'One of the first 100 accounts on hotkey.gg — the founding class',         test:c=>({done:!!c.foundingClass, prog:c.foundingClass?1:0, goal:1}) },
   { id:'x_foundpro',glyph:'crown',    tier:'m', name:'Founding Partner',    desc:'One of the first 100 to go PRO — a permanent founding badge',             test:c=>({done:!!c.foundingPartner, prog:c.foundingPartner?1:0, goal:1}) },
   /* ---- r426 (Wolf, ROUND2_FEEDBACK §4a): THE CAPSTONE SET — one medal per chapter
@@ -610,14 +624,14 @@ window.HOTKEY_ACHIEVEMENTS = [
      their drills land — no NaN, no phantom credit, no edit needed here when they ship.
      The key list DERIVES from HOTKEY_CAMPAIGN once §2.4 wires `chapters[i].capstone`
      (SSOT); HOTKEY_CAPSTONES below is the fallback until then. ---- */
-  { id:'cap_c1', glyph:'perfect', tier:'r', name:'Toured the model',    desc:'Clear the Foundations capstone — Model Tour, cold',                       test:c=>{ const ok=window.hkCapstoneDone(c,'modeltour'); return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'cap_c2', glyph:'perfect', tier:'r', name:'Model-ready',         desc:'Clear the Formatting capstone — the sheet a VP would open',               test:c=>{ const ok=window.hkCapstoneDone(c,'gauntlet');  return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'cap_c3', glyph:'perfect', tier:'r', name:'Books are closed',    desc:'Clear the Formulas I capstone — the quarter, start to finish',            test:c=>{ const ok=window.hkCapstoneDone(c,'qclose');    return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'cap_c4', glyph:'perfect', tier:'r', name:'Data room ready',     desc:'Clear the Data & Lookups capstone — dirty export to sendable tape',       test:c=>{ const ok=window.hkCapstoneDone(c,'cleanroom'); return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'cap_c5', glyph:'perfect', tier:'r', name:'Diligence cleared',   desc:'Clear the Formulas II capstone — every red flag found and fixed',         test:c=>{ const ok=window.hkCapstoneDone(c,'redflags');  return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'cap_c6', glyph:'perfect', tier:'e', name:'Straight to the VP',  desc:'Clear the Models I capstone — the valuation page, referenced not retyped', test:c=>{ const ok=window.hkCapstoneDone(c,'pitchpage'); return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'cap_c7', glyph:'perfect', tier:'e', name:'Down the waterfall',  desc:'Clear the Models II capstone — three tranches, four years, one pass',      test:c=>{ const ok=window.hkCapstoneDone(c,'cascade');   return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'cap_c8', glyph:'perfect', tier:'e', name:'Signed off',          desc:'Clear the Full Builds capstone — the model ships and it balances',        test:c=>{ const ok=window.hkCapstoneDone(c,'shipit');    return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c1', cap:'modeltour', glyph:'perfect', tier:'r', name:'Toured the model',    desc:'Clear the Foundations capstone — Model Tour, cold',                       test:c=>{ const ok=window.hkCapstoneDone(c,'modeltour'); return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c2', cap:'gauntlet', glyph:'perfect', tier:'r', name:'Model-ready',         desc:'Clear the Formatting capstone — the sheet a VP would open',               test:c=>{ const ok=window.hkCapstoneDone(c,'gauntlet');  return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c3', cap:'qclose', glyph:'perfect', tier:'r', name:'Books are closed',    desc:'Clear the Formulas I capstone — the quarter, start to finish',            test:c=>{ const ok=window.hkCapstoneDone(c,'qclose');    return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c4', cap:'cleanroom', glyph:'perfect', tier:'r', name:'Data room ready',     desc:'Clear the Data & Lookups capstone — dirty export to sendable tape',       test:c=>{ const ok=window.hkCapstoneDone(c,'cleanroom'); return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c5', cap:'redflags', glyph:'perfect', tier:'r', name:'Diligence cleared',   desc:'Clear the Formulas II capstone — every red flag found and fixed',         test:c=>{ const ok=window.hkCapstoneDone(c,'redflags');  return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c6', cap:'pitchpage', glyph:'perfect', tier:'e', name:'Straight to the VP',  desc:'Clear the Models I capstone — the valuation page, referenced not retyped', test:c=>{ const ok=window.hkCapstoneDone(c,'pitchpage'); return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c7', cap:'cascade', glyph:'perfect', tier:'e', name:'Down the waterfall',  desc:'Clear the Models II capstone — three tranches, four years, one pass',      test:c=>{ const ok=window.hkCapstoneDone(c,'cascade');   return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c8', cap:'shipit', glyph:'perfect', tier:'e', name:'Signed off',          desc:'Clear the Full Builds capstone — the model ships and it balances',        test:c=>{ const ok=window.hkCapstoneDone(c,'shipit');    return {done:ok, prog:ok?1:0, goal:1}; } },
   { id:'cap_half',glyph:'mastery', tier:'e', name:'Mid-cap',            desc:'Clear half the chapter capstones',                                        test:c=>{ const KS=window.hkCapstoneKeys(); const n=KS.filter(k=>window.hkCapstoneDone(c,k)).length; const goal=Math.max(1,Math.ceil(KS.length/2)); return {done:n>=goal, prog:Math.min(n,goal), goal}; } },
   { id:'cap_all', glyph:'mastery', tier:'l', name:'Large cap',          desc:'Clear every chapter capstone — the whole catalog, answered',               test:c=>{ const KS=window.hkCapstoneKeys(); const n=KS.filter(k=>window.hkCapstoneDone(c,k)).length; const goal=KS.length||1; return {done:KS.length>0&&n>=goal, prog:n, goal}; } },
 ];
@@ -655,6 +669,25 @@ window.hkCapstoneDone = function(ctx, key){
     return ctx.pb[key]!==undefined;
   }catch(e){ return false; }
 };
+
+/* ---- r452 (audit P1-1): PHANTOM CAPSTONE MEDALS ARE HIDDEN UNTIL THEIR DRILL EXISTS ----
+   Five of the eight capstone medals (cap_c3/c4/c5/c6/c8) name drills that were never built
+   (qclose, cleanroom, redflags, pitchpage, shipit). They read a permanent 0/1 on the wall, and
+   because `x_allach` (mythic, "every OTHER medal") swept them in, the completionist medal was
+   unearnable forever. Ids are FROZEN (hk_ach_seen persists earned ids), so nothing is deleted
+   or renumbered: the medal is marked `hidden` and every renderer skips it.
+   SSOT: the live set is hkCapstoneKeys() — HOTKEY_CAMPAIGN.chapters[i].capstone — so the day a
+   chapter designates its capstone (the same line that wires the ★ tag and the milestone gate)
+   its medal appears on the wall with no edit here. `cap` on each medal is the pairing the CI
+   invariant checks against the key its test() names. ---- */
+(function(){
+  try{
+    var live=window.hkCapstoneKeys()||[];
+    (window.HOTKEY_ACHIEVEMENTS||[]).forEach(function(a){
+      if(a && a.cap) a.hidden = live.indexOf(a.cap)<0;
+    });
+  }catch(e){}
+})();
 
 /* ---- r426 (Wolf, §4b): ACHIEVEMENT CATEGORIES — the TYPE axis the stats wall groups by
    when the all-types / all-rarities chips are both selected ("organize by achievement TYPE
@@ -759,13 +792,13 @@ window.HOTKEY_PLUGIN_LAYERS = {
    DECIDED monetization: subscription; free = the level-gated progression path;
    PRO = the whole catalog from Level 1 + plugin layers + deep analytics +
    cosmetics. Prices are placeholders on Stripe TEST MODE — Wolf sets real
-   pricing at launch; beta:true keeps every PRO feature ON for everyone. ---- */
+   pricing at launch; freeNow:true keeps every PRO feature ON for everyone. ---- */
 /* ---- PROGRESSION GATES (r158) — the free spine. Advanced groups unlock by
    LEVEL (volume: you showed up) AND PACE CLEARS (skill: par x1.5 clean — slow
    grinding alone never opens the door), OR by shipping the campaign versions
    that cover everything before the group (pure skill path), OR grandfathered
    by an existing PB in the group. Real PRO entitlement skips; the gates run
-   DURING BETA — the ladder is the game, not the paywall. ---- */
+   EVEN WHILE PERKS ARE FREE — the ladder is the game, not the paywall. ---- */
 window.HOTKEY_GATES = {
   PACE: 1.5,   // = HOTKEY_CAMPAIGN.GATE — one definition of "cleared at pace"
   // r221 (Wolf): the level ladder now gates EVERY group past Foundations, escalating —
@@ -779,7 +812,7 @@ window.HOTKEY_GATES = {
   // r242 — v2.1 gates. Foundations / Formatting / Formulas I are FREE (no entry = open).
   // Data & Lookups is a level bridge (gated, NOT pro). Formulas II / Models I / Models II /
   // Full Builds are PRO (see HOTKEY_PREMIUM) — the level+clears path or the chapters below
-  // is the beta bypass; a real PRO entitlement skips all of it.
+  // is the free bypass; a real PRO entitlement skips all of it.
   groups: {
     'Data & Lookups': { lvl:3,  clears:8,  chapters:['c1','c2','c3'] },
     'Formulas II':    { lvl:5,  clears:12, chapters:['c1','c2','c3','c4'] },
@@ -790,7 +823,7 @@ window.HOTKEY_GATES = {
 };
 
 window.HOTKEY_PRO = {
-  beta: true,
+  freeNow: true,   // r451: was `beta` — client-only flag, read by nav.js's PRO sheet
   // Wolf-decided (r157): MONTHLY leads ("$7 — crazy ROI on the time you save");
   // SEASON = one recruiting cycle / pre-summer ramp, lightly discounted. No annual —
   // this audience trains in cycles, not years.
@@ -818,12 +851,12 @@ window.HOTKEY_PRO = {
     ['Pro cosmetics',
      'exclusive card flair + share-card themes + first access to new looks',
      'standard flair'],
-    // r428 (Wolf): the ONE perk the beta does not hand out — the server gate is live
+    // r428 (Wolf): the ONE perk that is not free — the server gate is live
     // (create_desk raises PRO_REQUIRED unless my_pro()). Joining is deliberately free.
     ['Found your own desk',
-     'start a desk and captain it — live now, the one PRO perk beta does not give away',
+     'start a desk and captain it — live now, the one PRO perk that isn’t free',
      'join any desk free'],
   ],
   roadmap: ['Interview mode \u2014 timed assessment + report card', 'Season rewards track'],
-  betaNote: 'Beta: PRO perks are free for everyone \u2014 with one exception. Founding a desk needs a real PRO entitlement (a paid plan or the .edu trial); JOINING someone else\u2019s desk is free for everyone, always. The progression ladder still applies \u2014 the climb is the game \u2014 but at launch PRO opens the full catalog from Level 1. Beta players lock in founder pricing.',
+  freeNote: 'Everything below is free until billing goes live \u2014 with one exception. Founding a desk needs a real PRO entitlement (a paid plan or the .edu trial); JOINING someone else\u2019s desk is free for everyone, always. The progression ladder still applies \u2014 the climb is the game \u2014 but PRO opens the full catalog from Level 1. Early players lock in founder pricing.',
 };

@@ -16,8 +16,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   await page.addInitScript(() => { try {
     Object.defineProperty(navigator, 'platform', { get: () => 'MacIntel' });
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1'); localStorage.setItem('hk_beta_ok', '1');
-  } catch (e) {} });
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');  } catch (e) {} });
   await page.goto((process.env.URL || 'http://127.0.0.1:8791/index.html'), { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof demoKey === 'function');
   await page.evaluate(() => { try { _pro = true; } catch (e) {} });
@@ -82,6 +81,53 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   `));
   ok(c.anchored, '⌘T cycles the anchor like F4', c.buf1);
   ok(c.editingNow, '⌃U enters edit mode like F2');
+
+  /* r452 (audit P0-1/P0-2/P0-5): the chords Mac Excel does NOT put on ⌘+the-Windows-letter.
+     Before r452 hkMacAdapt collapsed ⌃ and ⌘ into one bit, so ⌃⌘V arrived as a plain Ctrl+V
+     (a silent, formatting-carrying full paste over the model) and ⌘⇧T became an inert bare F4. */
+  console.log('C2. Mac-only chords: ⌃⌘V · ⌘⇧T · ⌃Space · ⌘⇧V');
+  await fresh();
+  const c2 = await run(new Function('arg', K + `
+    setDemoSel('B4'); K({key:'c', code:'KeyC', metaKey:true});
+    setDemoSel('E9'); K({key:'v', code:'KeyV', metaKey:true, ctrlKey:true});   // ⌃⌘V = Paste Special
+    const dlg = dialog, landed = !!(S.cells['E9'] && S.cells['E9'].value !== null && S.cells['E9'].value !== undefined);
+    K({key:'Escape', code:'Escape'}); K({key:'Escape', code:'Escape'});
+    return { dlg, landed };
+  `));
+  ok(c2.dlg === 'paste', '⌃⌘V opens the Paste Special dialog', String(c2.dlg));
+  ok(!c2.landed, '⌃⌘V no longer silently full-pastes onto the destination');
+
+  await fresh();
+  const c3 = await run(new Function('arg', K + `
+    setDemoSel('B8'); K({key:'t', code:'KeyT', metaKey:true, shiftKey:true});  // ⌘⇧T = AutoSum
+    const proposed = editing === true && /SUM/i.test(editBuf);
+    const buf = editBuf;
+    K({key:'Escape', code:'Escape'});
+    // ⌘T with no shift still cycles anchors (the two must not collide)
+    setDemoSel('C5'); K({key:'=', code:'Equal'});
+    'B4'.split('').forEach(ch => K({key:ch, code:''}));
+    K({key:'t', code:'KeyT', metaKey:true});
+    const anchored = /\\$B\\$4/.test(editBuf);
+    K({key:'Escape', code:'Escape'});
+    return { proposed, buf, anchored };
+  `));
+  ok(c3.proposed, '⌘⇧T proposes a SUM (Mac AutoSum — there is no Alt+= on a Mac)', c3.buf);
+  ok(c3.anchored, '⌘T with no shift still cycles the anchor (F4)');
+
+  await fresh();
+  const c4 = await run(new Function('arg', K + `
+    setDemoSel('C5'); K({key:' ', code:'Space', ctrlKey:true});                // ⌃Space (⌘Space is Spotlight)
+    const R = selRange();
+    const colSel = R.c1 === 3 && R.c2 === 3 && R.r1 === 1 && R.r2 === S.ROWS;
+    K({key:'Escape', code:'Escape'});
+    setDemoSel('C9'); for(const ch of '=B4+1') K({key:ch, code:''}); K({key:'Enter', code:'Enter'});
+    setDemoSel('C9'); K({key:'c', code:'KeyC', metaKey:true});
+    setDemoSel('E11'); K({key:'v', code:'KeyV', metaKey:true, shiftKey:true}); // ⌘⇧V = paste VALUES
+    const dest = S.cells['E11'] || {};
+    return { colSel, R, f: dest.formula || null, v: dest.value, src: S.cells['C9'].value };
+  `));
+  ok(c4.colSel, '⌃Space selects the whole column', JSON.stringify(c4.R));
+  ok(!c4.f && c4.v === c4.src, '⌘⇧V pastes VALUES, not the formula', JSON.stringify({ f: c4.f, v: c4.v }));
 
   console.log('D. Windows habits still work on the Mac (superset, not a swap)');
   await fresh();
@@ -164,6 +210,27 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     const popped = !!document.getElementById('hkMacPop');
     return { macNow, winBack, popped };
   });
+  /* r452 (audit P0-3): the Mac column is a TRUTH table now, not a glyph swap. Row-by-row —
+     ⌘Space is Spotlight, ⌘⌥V is not Paste Special, ⌥= does not exist on a Mac. */
+  const r2 = await ref.evaluate(() => {
+    const rowFor = (needle) => [...document.querySelectorAll('.row')]
+      .find(r => (r.querySelector('.desc') || {}).textContent && r.querySelector('.desc').textContent.includes(needle));
+    // the CAPS only — a row's Mac note ("⌘Space is macOS Spotlight") is prose, not a keycap
+    const keysOf = (needle) => { const r = rowFor(needle); return r ? [...r.querySelectorAll('.keys .cap')].map(c => c.textContent).join('') : ''; };
+    return {
+      col: keysOf('Select the entire column'),
+      psp: keysOf('Paste Special dialog'),
+      sum: keysOf('AutoSum'),
+      fx:  keysOf('Toggle show formulas'),
+      pro: [...document.querySelectorAll('.keys[data-winonly="1"]')].map(k => k.textContent).join(' '),
+      wonly: [...document.querySelectorAll('.wonly')].some(n => n.style.display !== 'none')
+    };
+  });
+  ok(r2.col.indexOf('⌃') === 0 && r2.col.indexOf('⌘') < 0, 'select column teaches ⌃Space, never ⌘Space (Spotlight)', r2.col);
+  ok(r2.psp.indexOf('⌃') >= 0 && r2.psp.indexOf('⌘') >= 0, 'paste special teaches ⌃⌘V', r2.psp);
+  ok(/⌘.*⇧.*T/.test(r2.sum), 'AutoSum teaches ⌘⇧T, not ⌥=', r2.sum);
+  ok(r2.fx.indexOf('⌃') === 0, 'show formulas teaches ⌃`, not ⌘` (macOS window cycle)', r2.fx);
+  ok(r2.pro.indexOf('⌘') < 0 && r2.wonly, 'the Windows-only add-in sections keep Windows caps + say so', r2.pro.slice(0, 40));
   ok(r1.macNow, 'reference defaults to ⌘/⌥ caps on a Mac');
   ok(r1.winBack, 'toggle flips back to windows caps');
   ok(r1.popped, 'mac setup link opens the popup');

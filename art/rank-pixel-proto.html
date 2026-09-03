@@ -1,0 +1,157 @@
+<!doctype html><html><head><meta charset="utf-8"><title>rank art proto — PIXEL direction (r451)</title>
+<style>
+  body{margin:0;font-family:'JetBrains Mono',ui-monospace,monospace;background:#141519;color:#cdd0d6;padding:26px}
+  body.light{background:#e9eaed;color:#2a2c31}
+  h1{font-size:14px;letter-spacing:2px;color:#8b8f98;margin:0 0 4px}
+  .sub{font-size:11px;color:#7c828e;margin-bottom:18px;max-width:1080px;line-height:1.5}
+  .band{margin-bottom:18px}
+  .bandcap{font-size:10px;color:#7c828e;letter-spacing:1.5px;margin:0 0 8px}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+  .tile{width:118px;background:#1d1f25;border:1px solid #2d3038;border-radius:10px;padding:12px 6px 8px;text-align:center}
+  body.light .tile{background:#f6f7f9;border-color:#d0d2d8}
+  .tile .nm{font-size:8.5px;letter-spacing:.6px;margin-top:6px;color:#9a9ea8;text-transform:uppercase;line-height:1.3;min-height:22px}
+  body.light .tile .nm{color:#6b6f78}
+  .pair{display:flex;gap:10px;justify-content:center;align-items:flex-end}
+  .pair .lbl{font-size:7.5px;color:#5d616a;margin-top:2px;letter-spacing:1px}
+  .mock{background:#1d1f25;border:1px solid #2d3038;border-radius:10px;padding:10px 14px;width:max-content;font-size:11px}
+  body.light .mock{background:#f6f7f9;border-color:#d0d2d8}
+  .lbrow{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid #26282e}
+  body.light .lbrow{border-color:#dcdee3}
+  .lbrow .pos{width:22px;color:#7c828e}.lbrow .who{width:150px}.lbrow .t{color:#7c828e;width:60px;text-align:right}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:#23262d;border:1px solid #33363d;border-radius:20px;padding:3px 10px 3px 6px;font-size:11px}
+  body.light .pill{background:#fff;border-color:#d0d2d8}
+  .hero{display:flex;gap:16px;align-items:center}
+  .hero .txt b{display:block;font-size:14px}.hero .txt span{font-size:10px;color:#7c828e}
+  svg.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+  .toggle{position:fixed;top:10px;right:14px;font-size:11px;color:#7c828e;cursor:pointer;border:1px solid #33363d;border-radius:6px;padding:4px 8px;background:#1d1f25}
+</style></head><body>
+<div class="toggle" onclick="document.body.classList.toggle('light')">toggle light/dark</div>
+<h1>HOTKEY.GG — RANKED EMBLEMS · PIXEL DIRECTION (prototype, r451)</h1>
+<div class="sub">A decision prototype, not final art. Left of each pair = today's generative heraldic crest (themes.js rankEmblem, top bucket).
+Right = a 16×16 pixel sprite per tier drawn from one grammar: an escalating plate silhouette (cell → keycap → hex badge → shield → banded shield → winged shield → crowned shield → gem),
+a two-tone metal with 1px highlight/shadow, a 5–7px charge in the tier's device (#REF! crack · blank key · #### · d-pad · ↵ · $ · horns · Σ), and the three bucket pips on the bottom row.
+Rendered as SVG rects with crisp edges at INTEGER scales only (16 · 32 · 48 · 64 · 96 · 160) — the one hard constraint pixel art puts on the engine.</div>
+
+<div class="band"><div class="bandcap">LADDER · CARD SIZE (crest 60px → sprite 64px = 4×)</div><div class="row" id="ladder"></div></div>
+<div class="band"><div class="bandcap">CHIP ROW · 16px (nav pill / leaderboard) — the silhouette test</div><div class="mock" id="chips"></div></div>
+<div class="band"><div class="bandcap">LEADERBOARD ROWS · 16px sprite vs 16px crest</div><div class="mock" id="lb"></div></div>
+<div class="band"><div class="bandcap">RANK PILL + PLAYER-CARD HERO (96px = 6×) + RANK-UP REVEAL (160px = 10×)</div><div class="row" id="hero"></div></div>
+<div class="band"><div class="bandcap">BUCKET ESCALATION INSIDE ONE TIER · First-Year Analyst · bottom / middle / top (32px)</div><div class="row" id="buckets"></div></div>
+
+<script src="../themes.js"></script>
+<script>
+/* ---------- palette: per-tier metal, mirrors themes.js PALS roles (hi/mid/lo/deep) ---------- */
+const PAL={
+  'MBA Associate':      {hi:'#a9aeb9',mid:'#7c828e',lo:'#525761',deep:'#26282e',g:'#e9e8e3'},
+  'Candidate':          {hi:'#f4c088',mid:'#cf8e4c',lo:'#95602c',deep:'#432a12',g:'#fff1dc'},
+  'Summer Analyst':     {hi:'#e4e8ee',mid:'#aeb6c0',lo:'#7c838f',deep:'#33373f',g:'#1c1e24'},
+  'First-Year Analyst': {hi:'#ffe08a',mid:'#e0b341',lo:'#a67c1e',deep:'#4a3610',g:'#2a1d05'},
+  'Associate':          {hi:'#d9b8ff',mid:'#b98bff',lo:'#7d4fd1',deep:'#3a2160',g:'#f6eeff'},
+  'VP':                 {hi:'#f4f7fa',mid:'#c9d3dc',lo:'#8a97a6',deep:'#3d4652',g:'#1a2230'},
+  'MD':                 {hi:'#ff8a80',mid:'#d94a3d',lo:'#992b22',deep:'#3d1210',g:'#ffe9e6'},
+  'Second-Year Analyst':{hi:'#f4fdff',mid:'#9be0f7',lo:'#4aa6cc',deep:'#153c50',g:'#0b2a3a'},
+};
+const ORDER=Object.keys(PAL);
+/* ---------- plate silhouettes (16×16, '#' = plate) ---------- */
+const SHAPES={
+  tile:[ /* MBA — a spreadsheet cell */
+    '................','..############..','..############..','..############..','..############..','..############..','..############..','..############..',
+    '..############..','..############..','..############..','..############..','..############..','..############..','................','................'],
+  keycap:[ /* Candidate — the blank key */
+    '................','...##########...','..############..','..############..','..############..','..############..','..############..','..############..',
+    '..############..','..############..','..############..','..############..','..############..','...##########...','................','................'],
+  hex:[ /* Summer — a badge */
+    '................','......####......','....########....','..############..','..############..','..############..','..############..','..############..',
+    '..############..','..############..','..############..','..############..','....########....','......####......','................','................'],
+  shield:[ /* First-Year — the shield */
+    '................','..############..','..############..','..############..','..############..','..############..','..############..','..############..',
+    '..############..','...##########...','...##########...','....########....','.....######.....','......####......','.......##.......','................'],
+  band:[ /* Associate — banded shield (top band drawn as highlight row) */
+    '.##############.','.##############.','..############..','..############..','..############..','..############..','..############..','..############..',
+    '..############..','...##########...','...##########...','....########....','.....######.....','......####......','.......##.......','................'],
+  wing:[ /* VP — winged */
+    '................','..############..','.##############.','################','################','.##############.','..############..','..############..',
+    '..############..','...##########...','...##########...','....########....','.....######.....','......####......','.......##.......','................'],
+  crown:[ /* MD — crowned + winged */
+    '..#..#.##.#..#..','..############..','.##############.','################','################','.##############.','..############..','..############..',
+    '..############..','...##########...','...##########...','....########....','.....######.....','......####......','.......##.......','................'],
+  gem:[ /* Second-Year — the gem, star finial */
+    '.......##.......','......####......','.....######.....','....########....','...##########...','..############..','.##############.','################',
+    '.##############.','..############..','...##########...','....########....','.....######.....','......####......','.......##.......','................'],
+};
+/* ---------- charges (7×7; g = glyph ink, w = white spark) ---------- */
+const GLYPH={
+  crack:   ['....gg.','...gg..','..gg...','.ggggg.','...gg..','..gg...','.gg....'],   // the #REF! fault line
+  key:     ['.......','.ggggg.','.g...g.','.g...g.','.ggggg.','.......','.......'],   // a blank keycap outline
+  hash:    ['.g...g.','ggggggg','.g...g.','.g...g.','ggggggg','.g...g.','.......'],   // #### overflow
+  dpad:    ['...g...','..ggg..','...g...','gggggg.','...g...','..ggg..','...g...'],   // crossed arrow keys
+  enter:   ['......g','......g','......g','..g...g','.gggggg','..g....','...g...'],   // ↵ ships the model
+  dollar:  ['...g...','.ggggg.','g..g...','.ggggg.','...g..g','.ggggg.','...g...'],   // $
+  horns:   ['g.....g','g.....g','.g...g.','.ggggg.','.g.g.g.','.ggggg.','..g.g..'],   // the bull
+  sigma:   ['ggggg..','.g.....','..g....','...g...','..g....','.g.....','ggggg..'],   // Σ
+};
+const TIER=[
+  {shape:'tile',   glyph:'crack'},
+  {shape:'keycap', glyph:'key'},
+  {shape:'hex',    glyph:'hash'},
+  {shape:'shield', glyph:'dpad'},
+  {shape:'band',   glyph:'enter'},
+  {shape:'wing',   glyph:'dollar'},
+  {shape:'crown',  glyph:'horns'},
+  {shape:'gem',    glyph:'sigma'},
+];
+/* ---------- rasterize: plate → outline/highlight/shadow, then charge, then pips ---------- */
+function sprite(tierName, bucket){
+  const i=ORDER.indexOf(tierName), P=PAL[tierName], T=TIER[i];
+  const S=SHAPES[T.shape], W=16, H=16, px=[];
+  const at=(r,c)=> r>=0&&r<H&&c>=0&&c<W && S[r][c]==='#';
+  for(let r=0;r<H;r++){ px[r]=[]; for(let c=0;c<W;c++){
+    if(!at(r,c)){ px[r][c]=null; continue; }
+    const edge=!at(r-1,c)||!at(r+1,c)||!at(r,c-1)||!at(r,c+1);
+    if(edge){ px[r][c]=P.deep; continue; }
+    const inner=!at(r-2,c)||!at(r,c-2);          // top/left inner rim = highlight
+    const innerBR=!at(r+2,c)||!at(r,c+2);        // bottom/right inner rim = shadow
+    px[r][c]= inner ? P.hi : innerBR ? P.lo : P.mid;
+  } }
+  // Associate: the band row 1 is solid highlight; gem: a facet line
+  if(T.shape==='band'){ for(let c=2;c<14;c++) px[1][c]=P.hi; }
+  if(T.shape==='gem'){ for(let c=1;c<15;c++) if(px[7][c]) px[7][c]=P.hi; }
+  // charge, optically centred on the plate's mass (shields sit high)
+  const G=GLYPH[T.glyph], gy = T.shape==='tile'||T.shape==='keycap'||T.shape==='hex' ? 4 : 3, gx=4;
+  for(let r=0;r<7;r++) for(let c=0;c<7;c++){ const ch=G[r][c]; if(ch==='g') px[gy+r][gx+c]=P.g; if(ch==='w') px[gy+r][gx+c]='#fff'; }
+  // top-bucket spark (the "hot rim" read) — one white pixel on the highlight
+  if(bucket===3){ px[2][3]='#ffffff'; if(T.shape==='gem') px[0][7]='#ffffff'; }
+  // pips: bottom row, three 2px pips, lit = tier hi, unlit = deep
+  let pipRow=15; const pips=[[5,6],[7,8],[9,10]];
+  pips.forEach((p,k)=>{ const on=bucket && k<bucket; p.forEach(c=>{ px[pipRow][c]= on ? P.hi : (bucket? P.deep : null); }); });
+  return px;
+}
+function svgOf(px, size, title){
+  let s='<svg class="px" viewBox="0 0 16 16" width="'+size+'" height="'+size+'" shape-rendering="crispEdges" aria-label="'+(title||'')+'">';
+  for(let r=0;r<16;r++) for(let c=0;c<16;c++){ const col=px[r][c]; if(col) s+='<rect x="'+c+'" y="'+r+'" width="1" height="1" fill="'+col+'"/>'; }
+  return s+'</svg>';
+}
+const pxEmblem=(name,size,bucket)=> svgOf(sprite(name,bucket==null?3:bucket), size, name);
+const crest=(name,size,bucket)=> window.rankEmblem ? window.rankEmblem(name,size,bucket==null?'Top Bucket':bucket) : '';
+/* ---------- bands ---------- */
+const L=document.getElementById('ladder');
+ORDER.forEach(n=>{ const d=document.createElement('div'); d.className='tile';
+  d.innerHTML='<div class="pair"><div>'+crest(n,60)+'<div class="lbl">crest 60</div></div><div>'+pxEmblem(n,64)+'<div class="lbl">pixel 64</div></div></div><div class="nm">'+n+'</div>'; L.appendChild(d); });
+const C=document.getElementById('chips');
+C.innerHTML='<div style="display:flex;gap:14px;align-items:center;margin-bottom:8px"><span style="width:52px;color:#7c828e;font-size:9px">crest</span>'+ORDER.map(n=>crest(n,16)).join('')+'</div>'+
+            '<div style="display:flex;gap:14px;align-items:center"><span style="width:52px;color:#7c828e;font-size:9px">pixel</span>'+ORDER.map(n=>pxEmblem(n,16)).join('')+'</div>';
+const LB=document.getElementById('lb');
+const who=[['1','wolfofwallst','Second-Year Analyst','31.4s'],['2','deskjockey','MD','33.0s'],['3','ctrl_shift_end','VP','35.8s'],['4','anon_analyst','First-Year Analyst','44.1s'],['5','excel_curious','Candidate','71.2s']];
+LB.innerHTML='<div style="display:flex;gap:40px"><div>'+who.map(w=>'<div class="lbrow"><span class="pos">#'+w[0]+'</span>'+pxEmblem(w[2],16)+'<span class="who">'+w[1]+'</span><span class="t">'+w[3]+'</span></div>').join('')+'</div>'+
+  '<div>'+who.map(w=>'<div class="lbrow"><span class="pos">#'+w[0]+'</span>'+crest(w[2],16)+'<span class="who">'+w[1]+'</span><span class="t">'+w[3]+'</span></div>').join('')+'</div></div>';
+const HR=document.getElementById('hero');
+HR.innerHTML='<div class="tile" style="width:auto;padding:14px 18px"><span class="pill">'+pxEmblem('VP',16)+' VP · Top Bucket</span><div class="nm">nav rank pill · pixel 16</div></div>'+
+  '<div class="tile" style="width:auto;padding:14px 18px"><span class="pill">'+crest('VP',15)+' VP · Top Bucket</span><div class="nm">nav rank pill · crest 15</div></div>'+
+  '<div class="tile" style="width:auto;padding:14px 18px"><div class="hero">'+pxEmblem('Associate',96)+'<div class="txt"><b>Associate</b><span>Top Bucket · top 22%</span></div></div><div class="nm">player card hero · pixel 96</div></div>'+
+  '<div class="tile" style="width:auto;padding:14px 18px"><div class="hero">'+crest('Associate',96)+'<div class="txt"><b>Associate</b><span>Top Bucket · top 22%</span></div></div><div class="nm">player card hero · crest 96</div></div>'+
+  '<div class="tile" style="width:auto;padding:14px 18px">'+pxEmblem('Second-Year Analyst',160)+'<div class="nm">rank-up reveal · pixel 160</div></div>'+
+  '<div class="tile" style="width:auto;padding:14px 18px">'+crest('Second-Year Analyst',160)+'<div class="nm">rank-up reveal · crest 160</div></div>';
+const B=document.getElementById('buckets');
+[1,2,3].forEach(b=>{ const d=document.createElement('div'); d.className='tile'; d.innerHTML='<div class="pair"><div>'+crest('First-Year Analyst',32,['','Bottom Bucket','Middle Bucket','Top Bucket'][b])+'</div><div>'+pxEmblem('First-Year Analyst',32,b)+'</div></div><div class="nm">'+['','bottom','middle','top'][b]+' bucket</div>'; B.appendChild(d); });
+</script>
+</body></html>

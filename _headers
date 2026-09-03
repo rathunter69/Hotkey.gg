@@ -4,9 +4,53 @@
 # endpoint with no staging to test against), while still locking the highest-
 # value vectors: script FILES load only from self + the pinned jsdelivr CDN,
 # no plugins (object-src none), no base-tag hijack, and the site can't be framed.
+#
+# r452 (perf audit P1-5): Cache-Control added. Cloudflare Pages MERGES the headers of every
+# matching rule and, when two rules set the SAME header, the LAST matching rule wins — so the
+# order below is load-bearing: the site-wide security block stays first, the immutable asset
+# rules come next, and the revalidate rules for HTML come last so an HTML file that also
+# matches an asset rule (e.g. /art/rank-proto.html) still ends up on no-cache.
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: wss:; frame-src https:; frame-ancestors 'none'; object-src 'none'; base-uri 'self'
+
+# ---- versioned static assets: immutable for a year ----------------------------------------
+# SAFE because every shipped reference is cache-busted by ?v= and dev/check-cache-versions.js
+# is a gate step: it asserts one version per asset across all HTML, and (r452) that each asset
+# appears AT MOST ONCE per file. A ?v= bump is therefore the deploy mechanism for these files —
+# do not ship an edit to a .js/.css without bumping it.
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/art/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/favicon.ico
+  Cache-Control: public, max-age=31536000, immutable
+
+/favicon-32.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/favicon.svg
+  Cache-Control: public, max-age=31536000, immutable
+
+/apple-touch-icon.png
+  Cache-Control: public, max-age=31536000, immutable
+
+# ---- HTML: always revalidate ---------------------------------------------------------------
+# The pages carry the ?v= pointers, so they must never be served stale — otherwise a deploy
+# ships new assets that nobody asks for. no-cache still allows a 304 on an unchanged ETag.
+/
+  Cache-Control: no-cache
+
+/*.html
+  Cache-Control: no-cache
+
+/drills/*
+  Cache-Control: no-cache

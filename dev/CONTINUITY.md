@@ -1,11 +1,52 @@
 # HOTKEY.GG — PROJECT CONTINUITY BRIEF
 
-_Written r449 (2026-07-29) at the close of the depth-pass campaign. Purpose: condition a fresh
+_Written r449 (2026-07-29) at the close of the depth-pass campaign; §0 added r451 (2026-09-03). Purpose: condition a fresh
 session — especially one working the BUSINESS PLAN — with everything load-bearing about the
 product, its current state, and where the decisions sit. The operational/engineering companion
 docs are listed in §8; this file is the top of the funnel._
 
 ---
+
+## 0 · r451 (2026-09-03) — THE FOUR VECTORS: where the project goes next
+
+_Wolf returned after a break with four workstreams. Session r451 wrote the plans; nothing is built._
+
+| # | vector | state | the doc |
+|---|---|---|---|
+| 1 | **Tutorial front end for Foundations** — ONE robust `keyboardtour` (staged, untimed, replayable, a TUTORIAL HUD that names the next keystroke; six stages; outside the catalog like the sandbox — it replaces the modal tour's Excel beats and the warm-up sandbox) + FOUR lesson drills (select · firstsum · lockref · ribbonpass) inside the existing **Foundations** chapter, right after `navigation`. No chapter rename, no `c0`, no achievement re-targeting; Foundations becomes 11 drills, `modeltour★` stays its capstone, catalog 74 → 78 | **spec v2 written, awaiting Wolf's decisions** (T1–T3 · L1 · D2–D7 · D9) | `dev/TUTORIAL_CHAPTER_SPEC.md` |
+| 2 | **Rank art** — 8-bit pixel sprites vs the shipped heraldic crests | **memo + rendered prototype, awaiting A1–A4** | `dev/ART_DIRECTION.md` · `art/rank-pixel-proto.html` · `art/rank-pixel-proto-{dark,light}.png` |
+| 3 | **Business plan** — OBA clearance, LLC (home state), EIN, bank, Stripe live, bookkeeping, mail/logins/bills routing | **reserved plan; four short sessions sequenced** | `dev/BUSINESS_PLAN.md` (+ `dev/EMAIL_SETUP.md`, `STRIPE_SETUP.md`) |
+| 4 | **Security hardening** — eight-domain audit fleet (RLS/RPC, auth, edge+secrets, browser/CSP, run integrity, repo/pipeline, data+policy, ops) with a definition of done | **reserved plan; one dedicated session** | `dev/SECURITY_PLAN.md` |
+
+**Order Wolf set:** vectors 1 and 2 first (this and the next sessions), 3 and 4 reserved. **Build
+order inside 1+2:** tutorial platform wave → tutorial drill waves → art (cosmetic lane, can run in
+parallel once A1 is answered). Also on the table from r450: PR #246 merged the first-session round
+(start gate, tour Esc arming, paywall built dark) — `main` is current through r450.
+
+**Facts a new session needs that changed since r449:** catalog is 74 with PR #245 merged; the
+premium flag is still OFF and CI asserts it; the r450 first-session audit is the newest playtest
+evidence (AUDIT.md top). The tutorial spec supersedes `FOUNDATIONS_SPEC.md` §6 for chapter 1 only.
+
+## 0a · r452 (2026-09-03, same day) — THE FULL-PROJECT AUDIT + THE BUILD DAY
+
+**Read `dev/AUDIT_R452.md` first** — six domain audits (perf/stale · Excel+Mac parity · pages+drills
+bugs · progression systems · catalog coherence · client↔backend contract) synthesized into fixes
+made and a menu for Wolf; the full reports live in `dev/audit-r452/`. Fourteen fix/build streams
+landed on the branch the same day, each with a CI guard (AUDIT_R452 §1): certificates issuable
+again (P0), the run outbox, placement's 5th board, phantom medals, Mac ⌃⌘V / ⌘⇧T and the chord
+truth table, Tab-Enter home, Esc closes sign-in, 74 inline name/label duplicates, the beta retired
+(curtain deleted, BETA_MODE → PRO_PERKS_FREE, beta_codes dropped), landing v2, the Keyboard Tour
+(wave 0 + the six-stage board + the HUD), the card-frame pixel pass, plus the keystroke hot path
+and the bug-sweep set. Wolf's answered decisions: delete the curtain · keep BETA_MODE behavior,
+rename it · landing defaults to Daylight with a PRO door and learn-by-doing · pixel frames go ·
+implement from the pushes and re-assess. **Open Wolf items:** AUDIT_R452 §2 (the menu) — first up
+C1 legal placeholders, C4 Mac KeyTips, then the lesson-drill wave B1–B3.
+
+**Branch state:** everything is on `claude/drill-redesign-art-style-jg9vhm`; `gate.yml` runs only on
+PRs and pushes to main, so CI has NOT run on the branch — but the FULL 24-step local gate (every
+suite gate.yml runs plus the r452 guards) ran green on the merged tip at the close of r452
+(`.gate-r452.log`; the one red step was a resurrected orphan page, deleted). Merge to main = launch (the curtain is gone). Cache versions on the branch:
+themes.js 313 · nav.css 312 · drills.js 304 · nav.js 305 · lb.js 43.
 
 ## 1 · What the product is
 
@@ -48,10 +89,10 @@ and measured. The same gate runs on CI for every push.
 
 ## 3 · Where the code sits
 
-- **`main`** — live through r443 (everything through Formulas II + the width/border engine work).
-- **Branch `claude/platform-audit-framework-1hf2v7` → PR #245** — carries waves 1–6 (r444–r449):
-  all 30 Models/Full-Builds rebuilds, the capstone designation, the complete AUDIT record.
-  **Gate green; merge is Wolf's call and has NOT been given yet.**
+- **`main`** — live through r450: PR #245 (the depth pass, waves 1–6) and PR #246 (the
+  first-session round: start gate, tour Esc arming, paywall built dark) are both MERGED
+  (2026-09-03). _r449 text kept for history: "#245 gate green; merge is Wolf's call" — given._
+- **Branch `claude/drill-redesign-art-style-jg9vhm`** — r451, docs only (the four vector plans, §0).
 - Cache-busting is versioned (`drills.js?v=300`) and guarded by CI, so a merge goes live cleanly.
 
 ## 4 · Product surface inventory (business-plan relevant)
@@ -88,7 +129,7 @@ and measured. The same gate runs on CI for every push.
 
 ## 6 · Wolf's open decision queue (nothing here blocks the product)
 
-1. **Merge PR #245** — the depth pass to live.
+1. ~~Merge PR #245~~ — DONE (merged with #246, live through r450).
 2. **Premium flip** — when/whether to enable `HOTKEY_PREMIUM` (§4).
 3. **Border-dress doctrine** (r446b): strict ("a rule under a total never clears") vs lenient
    (`bt || ball`) — both ship today in different drills, zero player-stranding either way;
