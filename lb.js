@@ -1268,7 +1268,7 @@ async function renderManage(root){
       return;
     }
     if(st==='pending'){
-      host.innerHTML='<div style="font-family:var(--mono);font-size:12.5px;color:var(--warn)">⏳ request received — we’ll review and get back to you. Beta desks are approved fast.</div>';
+      host.innerHTML='<div style="font-family:var(--mono);font-size:12.5px;color:var(--warn)">⏳ request received — we’ll review and get back to you. Desks are approved fast.</div>';
       return;
     }
     const denied = st==='denied' ? '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:8px">a previous request wasn’t approved — reach out at hello@hotkey.gg if that’s a surprise.</div>' : '';

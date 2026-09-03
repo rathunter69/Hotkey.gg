@@ -53,9 +53,11 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
       await page.waitForTimeout(1000);
       const r = await page.evaluate(() => {
         const o = {};
-        try { localStorage.setItem('hk_beta_unlock', '1'); } catch (e) {}
-        o.earnIgnoresBeta = window.hkFrameEarned('onyx', { tierBest: 2 }) === false && window.hkFrameUnlocked('onyx', { tierBest: 2 }) === true;
-        try { localStorage.setItem('hk_beta_unlock', '0'); } catch (e) {}
+        /* r451: key renamed hk_beta_unlock -> hk_dev_unlock_cosmetics (themes.js). The invariant
+           itself is unchanged: the blanket dev grant opens the PICKER but must never fake an EARN. */
+        try { localStorage.setItem('hk_dev_unlock_cosmetics', '1'); } catch (e) {}
+        o.earnIgnoresDevUnlock = window.hkFrameEarned('onyx', { tierBest: 2 }) === false && window.hkFrameUnlocked('onyx', { tierBest: 2 }) === true;
+        try { localStorage.setItem('hk_dev_unlock_cosmetics', '0'); } catch (e) {}
         const l = window.hkFlair('{"f":"molten","st":["solves","crowns"],"ti":"pro"}'); l.frame = 'onyx';
         const back = window.hkFlair(window.hkFlairPack(l));
         o.loadoutPreserved = back.frame === 'onyx' && back.title === 'pro' && (back.stats || []).join(',') === 'solves,crowns';
@@ -80,7 +82,7 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
         o.drills = (window.HOTKEY_DRILLS && window.HOTKEY_DRILLS.menuOrder || []).length;
         return o;
       });
-      const checks = ['earnIgnoresBeta', 'loadoutPreserved', 'seedSilent', 'freshFires', 'inGameSilent', 'equipBtn'];
+      const checks = ['earnIgnoresDevUnlock', 'loadoutPreserved', 'seedSilent', 'freshFires', 'inGameSilent', 'equipBtn'];
       const bad = checks.filter(k => !r[k]);
       if (bad.length) errs.push('skin-unlock invariants failed: ' + bad.join(', '));
       if (errs.length) fails.push({ p: 'skin-unlock', errs });

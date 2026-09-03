@@ -427,11 +427,6 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .hk-pro-cta.quiet{background:var(--surface2); color:var(--text); border:1px solid var(--line)}
 .hk-pro-msg{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-align:center; min-height:15px; margin-top:8px}
 
-/* r81: beta tag on the brand — inherits the adaptive palette */
-.brand-beta{font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;   /* r355: 8.5px was below the phone readability floor */
-  color:var(--accent); border:1px solid var(--accent-dim); border-radius:5px; padding:1.5px 5px;
-  margin-left:8px; vertical-align:3px}
-
 /* r113 (#32): level chip beside the user menu */
 .nav-lvl{display:inline-flex;align-items:center;gap:7px;margin-right:9px;cursor:pointer;vertical-align:middle}
 /* r133: the keycap number alone was illegible at nav size — the label carries the read */

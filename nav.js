@@ -70,7 +70,7 @@
   const NAV_HTML = `
     <nav class="topnav">
       <div class="topnav-in">
-        <a class="topnav-brand" href="index.html" title="hotkey.gg — excel trainer">hotkey<b>.gg</b><span class="brand-beta">beta</span></a>
+        <a class="topnav-brand" href="index.html" title="hotkey.gg — excel trainer">hotkey<b>.gg</b></a>
         <div class="topnav-pages" id="navPages">
           <a class="topnav-link" data-page="trainer"     href="index.html" title="trainer" aria-label="trainer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span class="tl-label">trainer</span></a>
           <a class="topnav-link" data-page="leaderboard" href="leaderboard.html" title="leaderboard" aria-label="leaderboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H5a2 2 0 0 0 0 4h2"/><path d="M17 6h2a2 2 0 0 1 0 4h-2"/><path d="M12 14v3"/><path d="M8 21h8"/><path d="M10 21a2 2 0 0 1 4 0"/></svg><span class="tl-label">leaderboard</span></a>
@@ -375,13 +375,13 @@
   async function navRank(){
     const el=$('navRankPill'); if(!el) return;
     /* r406/r407 (Wolf): the owner account sees the WHOLE site — ranked on + every gateway/
-       cosmetic unlocked (hk_beta_unlock is the master switch hkFrameUnlocked honors), so his
+       cosmetic unlocked (hk_dev_unlock_cosmetics is the master switch hkFrameUnlocked honors), so his
        card can wear any animated skin. Scoped to his email; never touches anyone else. */
     try{ const __em=((window._navUser&&window._navUser.email)||'').toLowerCase();
       if(__em==='wolfcdrake@gmail.com'){
         let __ch=false;
         if(localStorage.getItem('hk_ranked')!=='1'){ localStorage.setItem('hk_ranked','1'); __ch=true; }
-        if(localStorage.getItem('hk_beta_unlock')!=='1'){ localStorage.setItem('hk_beta_unlock','1'); __ch=true; }
+        if(localStorage.getItem('hk_dev_unlock_cosmetics')!=='1'){ localStorage.setItem('hk_dev_unlock_cosmetics','1'); __ch=true; }
         /* r408 (Wolf): mark placements DONE for his account so the real tier shows and he can
            verify the level/rank wiring end-to-end (his rank still computes from his real runs). */
         if(localStorage.getItem('hk_placement_done')!=='1'){ localStorage.setItem('hk_placement_done','1'); __ch=true; }
@@ -468,8 +468,8 @@
       ['hotkey_pb','hk_runs_lite','hotkey_solves','hotkey_streak','hk_camp_xp','hk_clears',
        'hk_clears_day','hk_key_counts','hk_keys_lifetime','hk_keystats_seeded','hk_ach_flags',
        'hk_ach_seen','hk_feat_ach','hk_band_best','hk_dc_done','hk_ranked','hk_seen_tier',
-       'hk_xlv','hk_last_drill','hk_placement_done','hk_beta_unlock',
-       'hk_dev_unlock','hk_dc_top10','hk_seen_frames','hk_run_outbox','hk_entitled'].forEach(k=>localStorage.removeItem(k));   /* r416 bugfix: hk_beta_unlock (the master cosmetic-unlock flag the owner shim sets) was NOT wiped on sign-out, so the next account on a shared machine inherited every skin unlocked. r417 audit: hk_dev_unlock (ranked-gate bypass leaked to the next account), hk_dc_top10 (blocked the next account's daily bounty), hk_seen_frames (stale reveal diff), hk_run_outbox (foreign-user rows retried forever under RLS). r450: hk_entitled — the PRE-STRIPE entitlement stub that drills.js hkEntitlementRead() reads. It is an ACCOUNT entitlement mirrored on the device, so it must die with the session exactly like hk_beta_unlock did; whoever wires Stripe keeps it in this list, or drops the key here in the same commit if the read moves to an in-memory server flag. */
+       'hk_xlv','hk_last_drill','hk_placement_done','hk_dev_unlock_cosmetics','hk_beta_unlock',
+       'hk_dev_unlock','hk_dc_top10','hk_seen_frames','hk_run_outbox','hk_entitled'].forEach(k=>localStorage.removeItem(k));   /* r451: hk_beta_unlock renamed hk_dev_unlock_cosmetics; the OLD key stays in this list one round so a device carrying it from a pre-r451 build still gets wiped on sign-out. r416 bugfix: this flag (the master cosmetic-unlock switch the owner shim sets) was NOT wiped on sign-out, so the next account on a shared machine inherited every skin unlocked. r417 audit: hk_dev_unlock (ranked-gate bypass leaked to the next account), hk_dc_top10 (blocked the next account's daily bounty), hk_seen_frames (stale reveal diff), hk_run_outbox (foreign-user rows retried forever under RLS). r450: hk_entitled — the PRE-STRIPE entitlement stub that drills.js hkEntitlementRead() reads. It is an ACCOUNT entitlement mirrored on the device, so it must die with the session exactly like hk_beta_unlock did; whoever wires Stripe keeps it in this list, or drops the key here in the same commit if the read moves to an in-memory server flag. */
       for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
         if(k && (k.indexOf('hk_ghost_')===0 || k.indexOf('hk_cert_')===0)) localStorage.removeItem(k); }   // per-drill ghost replays + cert-offer latches (r417 audit: a surviving hk_cert_<track> latch blocked the next account's cert offers)
     }catch(e){}
@@ -708,7 +708,10 @@
               raceWins:__xflags.raceWins||0, sheetClears:__xflags.sheetClears||0,
               frzBanked:__xflags.frzBanked||0, chordKinds:__ck, keysLifetime:__kl, dailyTop10:__xflags.dailyTop10||0,
               dailyPod:__xflags.dailyPod||0, dailyWins:__xflags.dailyWins||0, certs:Object.keys(__xflags.certTracks||{}).length,
-              /* r376: mythic-class keys — beta-era account + the packed rank latch + the S+++ desk latch */
+              /* r376: mythic-class keys — pre-launch account + the packed rank latch + the S+++ desk latch */
+              /* THE CHARTER CUTOFF. r451 left this literal at 2026-10-01 deliberately (Wolf's call
+                 to move it is still open — dev/BETA_RETIRE_LANDING.md §4c). It is duplicated at
+                 nav.js:~928 (the frame gallery); the two MUST agree. */
               charter:!!(window._navUser && window._navUser.created_at && String(window._navUser.created_at) < '2026-10-01'),
               foundingClass:!!(window.hkFoundingFlags&&window.hkFoundingFlags().class),
               foundingPartner:!!(window.hkFoundingFlags&&window.hkFoundingFlags().partner),
@@ -923,9 +926,10 @@
       const stale=document.getElementById('frameGallery'); if(stale) stale.remove();
       let fl={}; try{ fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}'); }catch(e){}
       /* unlock context \u2014 the account.html frameU recipe: live level, the tierBest
-         latch maxed with the tier on screen, flag-carried wins/certs, beta charter */
+         latch maxed with the tier on screen, flag-carried wins/certs, charter */
       const u={ lvl:__L.lvl, tierBest:Math.max(fl.tierBest|0, tier.i|0),
         dailyWins:fl.dailyWins|0, certs:Object.keys(fl.certTracks||{}).length,
+        /* THE CHARTER CUTOFF — second copy; must match nav.js:~712. See §4c. */
         charter:!!(window._navUser && window._navUser.created_at && String(window._navUser.created_at) < '2026-10-01'),
         perfectRun:fl.perfectRun?1:0 };
       const bk=window.hkFrameBucket?window.hkFrameBucket():1;
@@ -1327,22 +1331,22 @@ function __tipEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&
    raises PRO_REQUIRED unless my_pro(). This helper is the COURTESY layer so a free player
    meets the upsell instead of a red RPC error; it is never the security boundary.
 
-   HOW my_pro() INTERACTS WITH THE BETA WINDOW — the finding, written down because it is
+   HOW my_pro() INTERACTS WITH THE FREE-PERKS WINDOW — the finding, written down because it is
    NOT obvious and it decides whether this ships:
      · my_pro() is ENTITLEMENT-ONLY (migrations 20260717400000 + 20260717500000): an
        unexpired entitlements.pro row (paid or the 7-day .edu trial), OR membership in a
        desk holding an active desk_pro_grant within its seat cap. It has NO knowledge of
-       HOTKEY_PRO.beta.
-     · HOTKEY_PRO.beta=true (drills.js) is a CLIENT-ONLY flag, and only the trainer honors
-       it — index.html isPro() is `BETA_MODE || _pro`. Nothing server-side reads it.
-     · So this gate does NOT inherit the beta free-for-all. During beta a player with no
-       paid entitlement and no .edu trial is blocked from CREATING a desk.
+       HOTKEY_PRO.freeNow.
+     · HOTKEY_PRO.freeNow=true (drills.js) is a CLIENT-ONLY flag, and only the trainer honors
+       it — index.html isPro() is `PRO_PERKS_FREE || _pro`. Nothing server-side reads it.
+     · So this gate does NOT inherit the free-for-all. A player with no paid entitlement
+       and no .edu trial is blocked from CREATING a desk.
      · r428 — Wolf's call: "get rid of pro free in beta and keep making desks pro." The
-       carve-out is now POLICY, not a conflict: the beta still hands out every other PRO
-       perk, and founding a desk is the single exception. betaNote, the PRO sheet, the
+       carve-out is now POLICY, not a conflict: every other PRO perk is still handed out
+       free, and founding a desk is the single exception. freeNote, the PRO sheet, the
        account + billing plan rows and the checkout fallback all state it, so no surface
        tells a player they're PRO while create_desk() rejects them. SCOPE: only the desk
-       gate flipped — BETA_MODE (index.html) and HOTKEY_PRO.beta stay true, so the weakness
+       gate flipped — PRO_PERKS_FREE (index.html) and HOTKEY_PRO.freeNow stay true, so the weakness
        queue, plugin layers, ghost replays, analytics and the full catalog remain free.
        Flipping those needs live checkout first (create-checkout refuses non-test keys).
      · Corollary worth knowing: the desk-grant branch of my_pro() can never authorize a
@@ -1477,26 +1481,27 @@ window.hkConfetti = function(host, colors, count){
   setTimeout(()=>{ try{ box.remove(); }catch(e){} }, 2400);
 };
 /* ---- r156: PRO OFFER SHEET — THE upgrade surface, shared by every page.
-   Offer content lives in drills.js HOTKEY_PRO (single source). Beta keeps
-   everything free; at launch the CTA runs Stripe TEST-mode checkout via the
+   Offer content lives in drills.js HOTKEY_PRO (single source). Everything is
+   free until billing opens; then the CTA runs Stripe TEST-mode checkout via the
    create-checkout Edge Function (which refuses live keys). ---- */
 /* r428 (Wolf: "get rid of pro free in beta and keep making desks pro") — the sheet used to
-   read O.beta as a blanket "you already have everything", so its CTA was a quiet
+   read the blanket flag as "you already have everything", so its CTA was a quiet
    "Back to training — PRO is on, free" that just closed. That is now FALSE for one
    feature: founding a desk is entitlement-gated server-side (create_desk raises
-   PRO_REQUIRED unless my_pro(), which has never known about the beta flag). A player who
-   hit the desk gate and tapped "what comes with PRO" would land on a sheet telling them
+   PRO_REQUIRED unless my_pro(), which has never known about the free-perks flag). A player
+   who hit the desk gate and tapped "what comes with PRO" would land on a sheet telling them
    they already have PRO, then close — a dead end at exactly the conversion moment.
-   deskCtx marks the carve-out so the sheet shows the real upgrade CTA and says why. */
-window.HK_BETA_EXEMPT = /desk/i;      // the only beta carve-out; widen here if others follow
+   deskCtx marks the carve-out so the sheet shows the real upgrade CTA and says why.
+   r451: HOTKEY_PRO.beta/betaNote renamed to freeNow/freeNote — same flag, no "beta" wording. */
+window.HK_FREE_EXEMPT = /desk/i;      // the only carve-out; widen here if others follow
 window.hkProSheet = function(feature){
-  const O = window.HOTKEY_PRO || {beta:true, plans:[{id:'monthly',price:'$7',cap:'per month'}], features:[], betaNote:''};
+  const O = window.HOTKEY_PRO || {freeNow:true, plans:[{id:'monthly',price:'$7',cap:'per month'}], features:[], freeNote:''};
   const PL = O.plans || [{id:'monthly', price:O.monthly||'$7', cap:'per month'}];
   const old=document.getElementById('hkProWrap'); if(old) old.remove();
-  // deskCtx: this sheet was opened for the one feature the beta does NOT hand out.
-  // betaFree: the blanket "everything is on during beta" framing — true for every OTHER feature.
-  const deskCtx = !!(O.beta && feature && (window.HK_BETA_EXEMPT||/desk/i).test(feature));
-  const betaFree = !!O.beta && !deskCtx;
+  // deskCtx: this sheet was opened for the one feature that is NOT free.
+  // allFree: the blanket "everything is on right now" framing — true for every OTHER feature.
+  const deskCtx = !!(O.freeNow && feature && (window.HK_FREE_EXEMPT||/desk/i).test(feature));
+  const allFree = !!O.freeNow && !deskCtx;
   let plan=PL[0];
   const w=document.createElement('div'); w.className='hk-cel-wrap'; w.id='hkProWrap';
   const rows=(O.features||[]).map(f=>
@@ -1509,12 +1514,12 @@ window.hkProSheet = function(feature){
       (feature?'<div class="hk-pro-hook"><b>'+feature+'</b> comes with PRO.</div>':'')+
       '<div class="hk-pro-grid"><div class="hk-pro-head"><span>\u25c6 pro</span><span>free</span></div>'+rows+'</div>'+
       '<div class="hk-pro-plans">'+PL.map(function(p,i){ return '<div class="hk-pro-plan'+(i===0?' on':'')+'" data-plan="'+p.id+'"><b>'+p.price+'</b><i>'+p.cap+'</i></div>'; }).join('')+'</div>'+
-      (O.roadmap&&O.roadmap.length?'<div class="hk-pro-tag" style="margin:12px 0 0">landing during beta: '+O.roadmap.join(' \u00b7 ')+'</div>':'')+
-      (betaFree?'<div class="hk-pro-beta">'+O.betaNote+'</div>':'')+
+      (O.roadmap&&O.roadmap.length?'<div class="hk-pro-tag" style="margin:12px 0 0">coming next: '+O.roadmap.join(' \u00b7 ')+'</div>':'')+
+      (allFree?'<div class="hk-pro-beta">'+O.freeNote+'</div>':'')+
       (deskCtx
-        ? '<div class="hk-pro-beta">Founding a desk is the one perk the beta does not hand out \u2014 it needs a real PRO entitlement. <b>Joining</b> a desk is free for everyone: use an invite code, or apply to a public desk.</div>'
+        ? '<div class="hk-pro-beta">Founding a desk is the one perk that isn\u2019t free \u2014 it needs a real PRO entitlement. <b>Joining</b> a desk is free for everyone: use an invite code, or apply to a public desk.</div>'
         : '')+
-      (betaFree
+      (allFree
         ? '<button class="hk-pro-cta quiet" id="hkProGo">Back to training \u2014 PRO is on, free</button>'
         : '<button class="hk-pro-cta" id="hkProGo">Upgrade \u2014 <span id="hkProPrice">'+PL[0].price+' '+PL[0].cap.split(' \u00b7 ')[0]+'</span></button>')+
       '<div class="hk-pro-msg" id="hkProMsg"></div>'+
@@ -1532,7 +1537,7 @@ window.hkProSheet = function(feature){
     if(pr) pr.textContent = plan.price+' '+plan.cap.split(' \u00b7 ')[0];
   });
   const go=document.getElementById('hkProGo');
-  if(go) go.onclick=()=>{ if(betaFree){ close(); return; } window.hkProCheckout(plan.id); };
+  if(go) go.onclick=()=>{ if(allFree){ close(); return; } window.hkProCheckout(plan.id); };
 };
 window.hkProCheckout = async function(plan){
   // Stripe TEST-mode scaffold: tries the Edge Function, reports honestly when
@@ -1548,7 +1553,7 @@ window.hkProCheckout = async function(plan){
   }catch(e){}
   /* r428: was "the beta keeps everything free" \u2014 no longer true for founding a desk, and
      this is the exact string a desk-gated player sees. Say what is actually available. */
-  say('Checkout opens at launch \u2014 every PRO perk except founding a desk is already free during the beta. A verified .edu address gets 7 days of full PRO now.');
+  say('Checkout isn\u2019t live yet \u2014 every PRO perk except founding a desk is free right now. A verified .edu address gets 7 days of full PRO now.');
 };
 window.__hkCelQ=[]; window.__hkCelOpen=false;
 /* r411 (Wolf: "don't overlap or collide with other pop-out menus"): a celebration waits not just

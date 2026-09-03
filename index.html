@@ -2141,7 +2141,11 @@
    ============================================================ */
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
-const BETA_MODE         = true; // PRO stays unlocked during beta (isPro) — no longer gates entry (r134)
+/* r451 (was BETA_MODE, r134): every PRO perk is free for everyone. The word "beta" retired with
+   the curtain; the BEHAVIOUR is deliberately unchanged (dev/BETA_RETIRE_LANDING.md §2) — taking
+   perks away on launch day is the wrong trade. Read by isPro() only. Flips to false in the
+   Stripe PR, alongside HOTKEY_PREMIUM.enabled. */
+const PRO_PERKS_FREE    = true;
 /* r451 (Wolf, 2026-09-03): THE PRE-LAUNCH CURTAIN IS GONE. The r134 access-code wall
    (PRELAUNCH_LOCK / showPrelaunchLock / #gate / hk_beta_ok) is deleted, not flag-disabled —
    see dev/BETA_RETIRE_LANDING.md §8A. Rollback is `git revert` on this commit, not a flag.
@@ -30381,8 +30385,8 @@ function updateDailyBtn(){}   /* r363: retired with the morning sheet */
    computed locally — works signed-out. Clearing all three = the sheet crown. */
 /* ---- r158: PROGRESSION GATES — the free spine (config: drills.js HOTKEY_GATES).
    Unlock = (level AND pace clears) OR campaign coverage OR PB grandfather OR a
-   REAL pro entitlement (_pro — deliberately not BETA_MODE: the ladder runs in
-   beta because the climb IS the game). Daily and armed races are exempt. ---- */
+   REAL pro entitlement (_pro — deliberately not PRO_PERKS_FREE: the ladder runs
+   free because the climb IS the game). Daily and armed races are exempt. ---- */
 function myXpEst(){
   // r412: read the ONE canonical XP (hkLevelXp) so the gate can never disagree with the visible
   // LVL chip. Kept as max() with the raw stored estimate so a gate never drops BELOW what a
@@ -31030,7 +31034,7 @@ async function updateRankPill(){
   }catch(e){}
 }
 /* ============================================================
-   PRO — monetization scaffold. During BETA_MODE everything is unlocked;
+   PRO — monetization scaffold. While PRO_PERKS_FREE everything is unlocked;
    the gate, badge, and upgrade surface exist so flipping the switch later
    is a config change, not a rebuild. Entitlements written server-side only
    (future stripe-webhook in TEST mode). requirePro() is the single gate.
@@ -31061,7 +31065,7 @@ async function loadEntitlement(){
      HOTKEY_PREMIUM.enabled false, hkEntitled() never reaches the read. */
   try{ window.__hkPro = _pro; if(window.hkEntitlementRefresh) window.hkEntitlementRefresh(); }catch(e){}
 }
-function isPro(){ return BETA_MODE || _pro; }
+function isPro(){ return PRO_PERKS_FREE || _pro; }
 function proDaysLeft(){ if(!_proExp) return null;
   const d=Math.ceil((new Date(_proExp)-Date.now())/86400000); return d>0?d:0; }
 function updateProBadge(){ const el=$('proBadge'); if(!el) return;

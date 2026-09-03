@@ -254,7 +254,7 @@ window.NAV_ACTIVE = 'profile';
 
   .cz-foot{font-family:var(--mono); font-size:10.5px; color:var(--faint); line-height:1.6;
     margin-top:18px; border-top:1px dashed var(--line); padding-top:14px}
-  /* r389 (Wolf): beta unlock-all button */
+  /* r389 (Wolf): dev unlock-all button */
   .cz-beta{display:inline-block; margin-top:10px; font-family:var(--mono); font-size:11px; color:var(--warn);
     cursor:pointer; border:1px dashed color-mix(in srgb, var(--warn) 50%, transparent); border-radius:999px; padding:5px 13px}
   .cz-beta:hover{background:color-mix(in srgb, var(--warn) 12%, transparent)}
@@ -569,14 +569,14 @@ async function load(){
     }).join('');
   }
 
-  // r389 (Wolf): beta unlock — friends can open every cosmetic with the beta button below
-  const betaOpen = !!(window.hkBetaUnlocked && window.hkBetaUnlocked());
+  // r389 (Wolf): dev unlock — friends can open every cosmetic with the dev button below
+  const betaOpen = !!(window.hkDevCosmeticsUnlocked && window.hkDevCosmeticsUnlocked());
   /* TITLE chips — a few rank/earned titles + a CUSTOM (PRO) chip. NOTE: the card's
      title NOTCH rendering lands in a later round; persisting loadout.title here is
      enough for now (the pick round-trips through hkFlairPack). */
   /* r410 (Wolf): the full TITLE catalog — account status · certificate paths · the hardest
      (mythic/legendary) medals · general milestones. Rank is intentionally NOT a title (the
-     crest + motto carry it). Built from the shared hkTitleCatalog(); beta-unlock opens every
+     crest + motto carry it). Built from the shared hkTitleCatalog(); the dev unlock opens every
      title the way it opens every frame. The CUSTOM (PRO) chip is appended last with a sentinel
      id so it never collides with the earned 'pro' (PRO) status title. */
   const __ct = (__fl && __fl.certTracks) || {};
@@ -727,7 +727,7 @@ async function load(){
       '</div>'+
 
       '<div class="cz-foot">Locked frames &amp; medals stay greyed with how they’re earned on hover · nothing here touches your Account or Stats pages.'+
-        '<br><a id="czBeta" class="cz-beta'+(betaOpen?' on':'')+'">'+(betaOpen?window.hkIcon('unlock')+' Beta unlock active — every skin & title is open':window.hkIcon('unlock')+' Beta: unlock everything')+'</a></div>'+
+        '<br><a id="czBeta" class="cz-beta'+(betaOpen?' on':'')+'">'+(betaOpen?window.hkIcon('unlock')+' Dev unlock active — every skin & title is open':window.hkIcon('unlock')+' Dev: unlock everything')+'</a></div>'+
     '</div>';
 
   renderCard();
@@ -805,7 +805,7 @@ async function load(){
     b.onclick=()=>{
       if(b.dataset.locked==='1') return;
       if(b.dataset.pro==='1'){
-        // CUSTOM: unlocked (beta/PRO) → reveal the safe input; otherwise the PRO upsell
+        // CUSTOM: unlocked (dev/PRO) → reveal the safe input; otherwise the PRO upsell
         if(betaOpen){
           if(czCustomWrap) czCustomWrap.hidden=false;
           titlesEl.querySelectorAll('.cz-chip').forEach(x=>x.classList.toggle('on', x===b));
@@ -888,16 +888,16 @@ async function load(){
     };
   });
 
-  // BETA UNLOCK — password opens every skin + title for friends during beta
+  // DEV UNLOCK — password opens every skin + title for the dev/friends circle
   { const bt=document.getElementById('czBeta');
     if(bt) bt.onclick=()=>{
       if(betaOpen) return;
-      const pw=window.prompt('Beta access code:');
+      const pw=window.prompt('Dev unlock code:');
       if(pw==null) return;
       if(pw.trim().toLowerCase()==='chicagosux'){
-        try{ localStorage.setItem('hk_beta_unlock','1'); }catch(e){}
+        try{ localStorage.setItem('hk_dev_unlock_cosmetics','1'); }catch(e){}
         location.reload();
-      } else { bt.innerHTML=window.hkIcon('lock')+' wrong code'; setTimeout(()=>{ bt.innerHTML=window.hkIcon('unlock')+' Beta: unlock everything'; }, 1600); }
+      } else { bt.innerHTML=window.hkIcon('lock')+' wrong code'; setTimeout(()=>{ bt.innerHTML=window.hkIcon('unlock')+' Dev: unlock everything'; }, 1600); }
     };
   }
 

@@ -307,8 +307,8 @@ window.HK_BAND = {
 
 /* ---- par snapshot (auto-extracted from CHALLENGES; regen when pars change) ---- */
 // ---- ADVANCED TIER / PAYWALL SCAFFOLD ----
-// enabled:false during beta. Advanced groups carry the \u25c6 badge and section-leader
-// boards now; flipping enabled:true (post-beta, post-internship, Stripe LIVE keys)
+// enabled:false until billing is live. Advanced groups carry the \u25c6 badge and section-leader
+// boards now; flipping enabled:true (post-internship, Stripe LIVE keys)
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Formulas II','Models I','Models II','Full Builds'] };
 
@@ -586,16 +586,17 @@ window.HOTKEY_ACHIEVEMENTS = [
   { id:'kbd1', glyph:'combo',  tier:'r', name:'Multi-channel',    desc:'Use 25 distinct shortcuts in clean runs', test:c=>({done:(c.chordKinds||0)>=25, prog:Math.min(c.chordKinds||0,25), goal:25}) },
   { id:'bld1', glyph:'cert',    tier:'e', name:'Shipped It',       desc:'Beat par on the three-statement capstone', test:c=>{ const ok=c.pb['threestmt']!==undefined&&c.pars['threestmt']&&c.pb['threestmt']<=c.pars['threestmt']; return {done:ok, prog:ok?1:0, goal:1}; } },
   /* ---- r376 (Wolf): THE MYTHIC CLASS — the rarest things on the wall (red ring +
-     crest crown). ctx keys: charter (auth created_at before the beta cutoff, same
-     gate as the charter frame — unobtainable once beta ends), tierBest /
+     crest crown). ctx keys: charter (auth created_at before the launch cutoff, same
+     gate as the charter frame — unobtainable after it; the cutoff literal lives in
+     nav.js 712/928), tierBest /
      tierBestBucket (the packed high-water latch from nav.js persistTierBest),
      deskPeak (latched by lb.js when your own desk grades S+++). ---- */
-  { id:'x_charter', glyph:'founder', tier:'m', name:'Charter',        desc:'Account opened during the beta — you were on the desk before the desk was cool', test:c=>({done:!!c.charter, prog:c.charter?1:0, goal:1}) },
+  { id:'x_charter', glyph:'founder', tier:'m', name:'Charter',        desc:'Account opened before launch — you were on the desk before the desk was cool', test:c=>({done:!!c.charter, prog:c.charter?1:0, goal:1}) },
   { id:'x_summit',  glyph:'crown', tier:'m', name:'Up for promotion',         desc:'Hold the top rank tier in its Top Bucket', test:c=>{ const top=(((window.HK_RANK||{}).TIERS)||{length:8}).length-1; const ok=(c.tierBest|0)>=top && (c.tierBestBucket|0)>=top*3+2; return {done:ok, prog:ok?1:0, goal:1}; } },
   { id:'x_bulge',   glyph:'mastery', tier:'m', name:'Elite boutique',  desc:'Sit on a desk graded S+++ — the top of the guild scale', test:c=>({done:!!c.deskPeak, prog:c.deskPeak?1:0, goal:1}) },
   /* r389 (Wolf): the founding-cohort + completionist mythics. foundingClass/foundingPartner
      ride the ctx (themes.js hkFoundingFlags — one count query, cached). Founding Partner
-     arms post-beta when PRO purchases are tracked + ordered; until then it's a locked goal. */
+     arms post-launch when PRO purchases are tracked + ordered; until then it's a locked goal. */
   { id:'x_allach',  glyph:'mastery', tier:'m', name:'Sweaty',         desc:'Earn every other medal on the wall — the complete collection',            test:c=>{ const AC=window.HOTKEY_ACHIEVEMENTS||[]; const others=AC.filter(a=>a.id!=='x_allach'&&a.tier!=='m'); let n=0; others.forEach(a=>{ try{ if(a.test(c).done) n++; }catch(e){} }); return {done:others.length>0&&n>=others.length, prog:n, goal:others.length||1}; } },
   { id:'x_first100',glyph:'founder',  tier:'m', name:'First Analyst Class', desc:'One of the first 100 accounts on hotkey.gg — the founding class',         test:c=>({done:!!c.foundingClass, prog:c.foundingClass?1:0, goal:1}) },
   { id:'x_foundpro',glyph:'crown',    tier:'m', name:'Founding Partner',    desc:'One of the first 100 to go PRO — a permanent founding badge',             test:c=>({done:!!c.foundingPartner, prog:c.foundingPartner?1:0, goal:1}) },
@@ -759,13 +760,13 @@ window.HOTKEY_PLUGIN_LAYERS = {
    DECIDED monetization: subscription; free = the level-gated progression path;
    PRO = the whole catalog from Level 1 + plugin layers + deep analytics +
    cosmetics. Prices are placeholders on Stripe TEST MODE — Wolf sets real
-   pricing at launch; beta:true keeps every PRO feature ON for everyone. ---- */
+   pricing at launch; freeNow:true keeps every PRO feature ON for everyone. ---- */
 /* ---- PROGRESSION GATES (r158) — the free spine. Advanced groups unlock by
    LEVEL (volume: you showed up) AND PACE CLEARS (skill: par x1.5 clean — slow
    grinding alone never opens the door), OR by shipping the campaign versions
    that cover everything before the group (pure skill path), OR grandfathered
    by an existing PB in the group. Real PRO entitlement skips; the gates run
-   DURING BETA — the ladder is the game, not the paywall. ---- */
+   EVEN WHILE PERKS ARE FREE — the ladder is the game, not the paywall. ---- */
 window.HOTKEY_GATES = {
   PACE: 1.5,   // = HOTKEY_CAMPAIGN.GATE — one definition of "cleared at pace"
   // r221 (Wolf): the level ladder now gates EVERY group past Foundations, escalating —
@@ -779,7 +780,7 @@ window.HOTKEY_GATES = {
   // r242 — v2.1 gates. Foundations / Formatting / Formulas I are FREE (no entry = open).
   // Data & Lookups is a level bridge (gated, NOT pro). Formulas II / Models I / Models II /
   // Full Builds are PRO (see HOTKEY_PREMIUM) — the level+clears path or the chapters below
-  // is the beta bypass; a real PRO entitlement skips all of it.
+  // is the free bypass; a real PRO entitlement skips all of it.
   groups: {
     'Data & Lookups': { lvl:3,  clears:8,  chapters:['c1','c2','c3'] },
     'Formulas II':    { lvl:5,  clears:12, chapters:['c1','c2','c3','c4'] },
@@ -790,7 +791,7 @@ window.HOTKEY_GATES = {
 };
 
 window.HOTKEY_PRO = {
-  beta: true,
+  freeNow: true,   // r451: was `beta` — client-only flag, read by nav.js's PRO sheet
   // Wolf-decided (r157): MONTHLY leads ("$7 — crazy ROI on the time you save");
   // SEASON = one recruiting cycle / pre-summer ramp, lightly discounted. No annual —
   // this audience trains in cycles, not years.
@@ -818,12 +819,12 @@ window.HOTKEY_PRO = {
     ['Pro cosmetics',
      'exclusive card flair + share-card themes + first access to new looks',
      'standard flair'],
-    // r428 (Wolf): the ONE perk the beta does not hand out — the server gate is live
+    // r428 (Wolf): the ONE perk that is not free — the server gate is live
     // (create_desk raises PRO_REQUIRED unless my_pro()). Joining is deliberately free.
     ['Found your own desk',
-     'start a desk and captain it — live now, the one PRO perk beta does not give away',
+     'start a desk and captain it — live now, the one PRO perk that isn’t free',
      'join any desk free'],
   ],
   roadmap: ['Interview mode \u2014 timed assessment + report card', 'Season rewards track'],
-  betaNote: 'Beta: PRO perks are free for everyone \u2014 with one exception. Founding a desk needs a real PRO entitlement (a paid plan or the .edu trial); JOINING someone else\u2019s desk is free for everyone, always. The progression ladder still applies \u2014 the climb is the game \u2014 but at launch PRO opens the full catalog from Level 1. Beta players lock in founder pricing.',
+  freeNote: 'Everything below is free until billing goes live \u2014 with one exception. Founding a desk needs a real PRO entitlement (a paid plan or the .edu trial); JOINING someone else\u2019s desk is free for everyone, always. The progression ladder still applies \u2014 the climb is the game \u2014 but PRO opens the full catalog from Level 1. Early players lock in founder pricing.',
 };

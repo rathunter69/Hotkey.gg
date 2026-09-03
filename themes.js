@@ -723,7 +723,7 @@ window.HK_RANK = {
      +25 warm-up for the first solve of each active day. Lifetime decay (v2/v3)
      RETIRED: it paid loyal players worst. ONE implementation — every page delegates
      here (r116 killed four drifted copies). Runs need created_at for day buckets;
-     legacy rows without it share one bucket (history reprices in beta). */
+     legacy rows without it share one bucket (early history reprices). */
   computeXP(myRuns, pl, mySessions){
     const PARS=(typeof window!=='undefined'&&window.HOTKEY_PARS)||{};
     const LADDER=[15,10,7,5];
@@ -886,16 +886,19 @@ window.HK_FRAMES = [
 /* u = {lvl, tierBest, dailyWins, certs, charter, perfectRun}. tierBest is a
    HK_RANK.TIERS index (highest tier ever DISPLAYED — nav.js persists it into
    hk_ach_flags.tierBest on every rank fetch; hydration maxes it across devices). */
-/* r389 (Wolf): BETA UNLOCK — a password-gated flag that opens every cosmetic for
-   beta testers/friends. Set by the profile customizer's beta button. */
-window.hkBetaUnlocked = function(){ try{ return localStorage.getItem('hk_beta_unlock')==='1'; }catch(e){ return false; } };
+/* r389 (Wolf): DEV COSMETIC UNLOCK — a password-gated flag that opens every cosmetic for
+   the dev/friends circle. Set by the profile customizer's dev button.
+   r451: key renamed hk_beta_unlock -> hk_dev_unlock_cosmetics (it was never a beta artifact).
+   It IS in nav.js's sign-out wipe list (r416 bugfix) — that list moved with the key. */
+window.hkDevCosmeticsUnlocked = function(){ try{ return localStorage.getItem('hk_dev_unlock_cosmetics')==='1'; }catch(e){ return false; } };
+window.hkBetaUnlocked = window.hkDevCosmeticsUnlocked;   // r451: legacy alias, one round only
 window.hkFrameUnlocked = function(id, u){
-  if(window.hkBetaUnlocked && window.hkBetaUnlocked()) return true;   // beta: every frame unlocked
+  if(window.hkDevCosmeticsUnlocked && window.hkDevCosmeticsUnlocked()) return true;   // dev: every frame unlocked
   return window.hkFrameEarned(id, u);
 };
-/* r393 (Wolf #75): the GENUINE earn check, with NO beta short-circuit. hkFrameUnlocked
-   (picker gating) still says "yes" to everything in beta; the skin-unlock celebration
-   sweep needs the real thing so it fires on an actual earn, not on the blanket beta grant. */
+/* r393 (Wolf #75): the GENUINE earn check, with NO dev short-circuit. hkFrameUnlocked
+   (picker gating) still says "yes" to everything under the dev grant; the skin-unlock
+   celebration sweep needs the real thing so it fires on an actual earn, not the blanket grant. */
 window.hkFrameEarned = function(id, u){
   u = u || {};
   const tb = u.tierBest|0;
@@ -943,7 +946,7 @@ window.hkFrameEarned = function(id, u){
   return false;
 };
 /* ---- r410 (Wolf): TITLES — an equippable name-plate the card wears in a notch under the
-   identity, earned across four buckets: ACCOUNT STATUS (Founder / PRO / Beta Tester),
+   identity, earned across four buckets: ACCOUNT STATUS (Founder / PRO / Charter Member),
    CERTIFICATE PATHS (one per track + Chartered for all three), the HARDEST MEDALS (every
    mythic/legendary achievement doubles as a title — its name IS the title), and a couple
    of GENERAL milestones (Analyst / Crownholder / Centurion). Rank is deliberately NOT a
@@ -952,7 +955,9 @@ window.hkFrameEarned = function(id, u){
      hkTitleEarned(id,u)  gates the pick; u carries certTracks{}, achDone, flags
      hkTitleCatalog(u)    the ordered {id,name,cat,earned} list the customizer draws  ---- */
 window.HK_TITLE_LABELS = {
-  founder:'Founder', pro:'PRO', beta:'Beta Tester',
+  /* r451: label only — the id 'beta' is PERSISTED in saved loadouts (hk_flair), so changing
+     it would orphan every equipped title. Rename the text, freeze the key. */
+  founder:'Founder', pro:'PRO', beta:'Charter Member',
   cert_fluency:'Keyboard Fluent', cert_formulas:'Formula Analyst', cert_modeling:'Modeler', chartered:'Chartered',
   analyst:'Analyst', crownholder:'Crownholder', centurion:'Centurion'
 };
@@ -975,7 +980,7 @@ window.hkTitleEarned = function(id, u){
   switch(id){
     case 'founder':       return !!u.founder || !!u.charter;
     case 'pro':           return !!u.pro;
-    case 'beta':          return !!u.beta || !!u.charter; // beta-unlock flag OR a beta-era account
+    case 'beta':          return !!u.beta || !!u.charter; // r451: id frozen (persisted in hk_flair); label is "Charter Member". dev-unlock flag OR a pre-launch account
     case 'cert_fluency':  return !!ct.fluency;
     case 'cert_formulas': return !!ct.formulas;
     case 'cert_modeling': return !!ct.modeling;
@@ -1328,8 +1333,8 @@ window.hkFrameOrnaments = (function(){
         '<path d="M17 11.2 L22.2 17 L17 22.8 L11.8 17 Z" fill="none" stroke="#9c2a1c" stroke-width="1.1"/>'+
         '</svg>'+corners(lg ? HER+HER_LG : HER);
     }
-    if(id==='charter')  // no glint, no ◆ — the beta class keeps a quiet uniform
-      return corners(CHA)+tab('BETA TESTER','#c8d4e6','linear-gradient(180deg,#2a3550,#1a2334)','#55688a');
+    if(id==='charter')  // no glint, no ◆ — the charter class keeps a quiet uniform
+      return corners(CHA)+tab('CHARTER','#c8d4e6','linear-gradient(180deg,#2a3550,#1a2334)','#55688a');
     if(id.indexOf('plaque-')===0){
       const m=PLQ[id.slice(7)]; if(!m) return '';
       const P=M[m[0]]; if(!P) return '';
@@ -2333,7 +2338,7 @@ window.hkRarityMeta = function(pct){
   return { word:'common', abbr:'', color:C.c, weight:4 };
 };
 /* r150: EFFECTIVE RARITY — rarity was pure data (% of players holding it), which at
-   beta scale reads all-common (1 of 3 players = 33%). Each achievement now
+   small-N scale reads all-common (1 of 3 players = 33%). Each achievement now
    carries a hand-set difficulty tier ('r'/'e'/'l'/'m') as the DISPLAY FLOOR;
    live data takes over once the field is big enough to mean something
    (>= 20 players). */
@@ -2350,7 +2355,7 @@ window.hkEffRarity = function(tier, dataPct, fieldN){
 /* r389 (Wolf): FOUNDING COHORT — the first-100 mythics. One cheap count query (accounts
    created at/before you), cached so every page's achievement ctx reads the same flag.
    window.hkFoundingFlags() → {rank, class:boolean, partner:boolean}. Founding Partner
-   (first-100 PRO) arms post-beta once PRO purchases are tracked + ordered server-side;
+   (first-100 PRO) arms post-launch once PRO purchases are tracked + ordered server-side;
    until then `partner` stays false (the medal shows as a locked mythic goal). */
 window.hkFoundingRank = function(sb, me){
   try{

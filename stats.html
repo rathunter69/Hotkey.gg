@@ -469,7 +469,7 @@ async function load(){
         raceWins:flags.raceWins||0, sheetClears:flags.sheetClears||0, frzBanked:flags.frzBanked||0,
         chordKinds:__ck, keysLifetime:__kl, dailyTop10:flags.dailyTop10||0,   // r150/r151 · r371
         dailyPod:flags.dailyPod||0, dailyWins:flags.dailyWins||0, certs:Object.keys(flags.certTracks||{}).length,
-        /* r376: mythic-class keys — beta-era account + the packed rank latch + the S+++ desk latch */
+        /* r376: mythic-class keys — pre-launch account + the packed rank latch + the S+++ desk latch */
         charter:!!(me && me.created_at && String(me.created_at) < '2026-10-01'),
         foundingClass:!!(window.hkFoundingFlags&&window.hkFoundingFlags().class),
         foundingPartner:!!(window.hkFoundingFlags&&window.hkFoundingFlags().partner),
@@ -680,7 +680,7 @@ async function load(){
         `<div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:6px">how it's computed: each point = one posted run's time \u00f7 that drill's par, oldest \u2192 newest. keys/min = keystrokes \u00f7 minutes across posted runs (median).</div></div>`;
     }
   }
-  // ---- Analytics (PRO \u00b7 free in beta): key frequency + speed by drill ----
+  // ---- Analytics (PRO \u00b7 free for now): key frequency + speed by drill ----
   if(me && mine.length>=3){
     let traces=[];
     try{ const tr=await sb.from('runs').select('trace').eq('user_id',me.id).eq('mouse_used',false)
@@ -722,7 +722,7 @@ async function load(){
     mine.forEach(r=>{ if(r.time_ms>0&&r.keystrokes>0){ const v=r.keystrokes/(r.time_ms/1000);
       if(!kps[r.challenge]||v>kps[r.challenge]) kps[r.challenge]=v; } });
     const kpsTop=Object.entries(kps).filter(([k])=>D.meta[k]).sort((a,b)=>b[1]-a[1]).slice(0,5);
-    html += `<h3 class="section-title">Analytics <span class="proTag" style="float:right;font-size:9px;color:var(--warn);letter-spacing:1px;cursor:pointer" title="what comes with PRO">PRO \u00b7 free in beta</span></h3>`;
+    html += `<h3 class="section-title">Analytics <span class="proTag" style="float:right;font-size:9px;color:var(--warn);letter-spacing:1px;cursor:pointer" title="what comes with PRO">PRO \u00b7 free for now</span></h3>`;
     // r91 MERGED PANEL: local tally (every clean run) is the primary source; posted-run
     // traces retired as a display source (kept for distinct-shortcut stat above).
     let tally={}, tallySrc='this device';

@@ -379,7 +379,7 @@ DATA.forEach((sec,si)=>{
   const card = document.createElement('section');
   card.className='card'; card.dataset.cat=sec.cat;
   card.style.animationDelay=(si*45)+'ms';
-  const proTag = sec.pro ? '<span style="font-size:9px;color:var(--warn);letter-spacing:1px;vertical-align:2px;margin-left:8px">\u25c6 PRO \u00b7 free in beta</span>' : '';
+  const proTag = sec.pro ? '<span style="font-size:9px;color:var(--warn);letter-spacing:1px;vertical-align:2px;margin-left:8px">\u25c6 PRO \u00b7 free for now</span>' : '';
   const noteLine = sec.note ? `<div style="font-family:var(--mono);font-size:10.5px;color:var(--faint);margin:-4px 0 10px">${sec.note}</div>` : '';
   card.innerHTML = `<h2>${sec.color?`<span class="ic" style="color:${sec.color}">${sec.ic}</span>`:`<span class="ic">${sec.ic}</span>`}${sec.cat}${proTag}<span class="n">${sec.items.length}</span></h2>` + noteLine +
     sec.items.map(it=>{

@@ -150,7 +150,7 @@ function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
     '<div class="pw-plans"><div class="pw-plan">'+
       '<h4>hotkey.gg PRO</h4>'+
       '<div class="pw-price"><b id="pwPrice">TBD</b><i>per month</i><span class="pw-tbd">pricing not set</span></div>'+
-      '<div class="note" style="margin-top:6px">Founder pricing is being set now. Beta players get it locked in &mdash; '+
+      '<div class="note" style="margin-top:6px">Founder pricing is being set now. Early players get it locked in &mdash; '+
         'we&rsquo;ll email you before anything is ever charged.</div>'+
       /* r450 STRIPE GOES HERE (billing.html). Swap this disabled stub for the real
          checkout call — the existing scaffold is nav.js hkProCheckout(plan) ->
@@ -188,17 +188,17 @@ function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
       '<a href="index.html?openAuth=signup">Create an account</a> or <a href="index.html?openAuth=signin">log in</a> to see your plan and invoices.</div>';
     return;
   }
-  // plan tier — reads profiles.plan when it exists; everyone is PRO (free) during beta
+  // plan tier — reads profiles.plan when it exists; everyone is PRO (free) until billing opens
   let plan='pro';
   try{ const {data}=await sb.from('profiles').select('plan').eq('id',me.id).maybeSingle(); if(data&&data.plan) plan=String(data.plan).toLowerCase(); }catch(e){}
   const isPro = plan==='pro';
   root.innerHTML =
     '<div class="row">'+
       '<div class="card plan"><h4>Current plan</h4>'+
-        '<div class="fieldrow"><span class="fk">plan</span><span class="fv">'+(isPro?'<b style="color:var(--warn);font-size:15px">PRO</b> <span class="badge">perks free during beta</span>':'<b style="font-size:15px">Free</b>')+'</span></div>'+
-        '<div class="fieldrow"><span class="fk">status</span><span class="fv">'+(isPro?'active &mdash; not billed during beta':'the basics, free forever')+'</span></div>'+
-        /* r428 (Wolf): desks are the one carve-out from the beta free-for-all — this row
-           reads "PRO" for every beta player, but create_desk() checks my_pro() server-side
+        '<div class="fieldrow"><span class="fk">plan</span><span class="fv">'+(isPro?'<b style="color:var(--warn);font-size:15px">PRO</b> <span class="badge">perks free for now</span>':'<b style="font-size:15px">Free</b>')+'</span></div>'+
+        '<div class="fieldrow"><span class="fk">status</span><span class="fv">'+(isPro?'active &mdash; not billed yet':'the basics, free forever')+'</span></div>'+
+        /* r428 (Wolf): desks are the one carve-out from the free-for-all — this row
+           reads "PRO" for every player, but create_desk() checks my_pro() server-side
            and rejects anyone without a real entitlement. Say so rather than let them find
            out at the RPC. */
         '<div class="fieldrow"><span class="fk">desks</span><span class="fv">founding a desk needs real PRO <span style="color:var(--faint)">&mdash; joining stays free</span></span></div>'+
@@ -207,7 +207,7 @@ function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
         (isPro
           ? '<button class="btn ghost" id="proBtn" style="margin-top:14px">What comes with PRO</button>'
           : '<button class="btn" id="upgradeBtn" style="margin-top:14px">Upgrade to PRO</button>')+
-        '<div class="note" style="margin-top:auto">'+(isPro?'Founder pricing and payment collection go live when the beta ends &mdash; we’ll email you before anything is ever charged.':'PRO unlocks ranked cosmetics, certificates, and the full drill library.')+'</div>'+
+        '<div class="note" style="margin-top:auto">'+(isPro?'Founder pricing and payment collection go live when billing opens &mdash; we’ll email you before anything is ever charged.':'PRO unlocks ranked cosmetics, certificates, and the full drill library.')+'</div>'+
       '</div>'+
 
       '<div class="card"><h4>Payment method</h4>'+
@@ -221,7 +221,7 @@ function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 
     '<div class="row">'+
       '<div class="card"><h4>Invoices &amp; payment history</h4>'+
-        '<div id="invBody"><div class="empty">No payments yet &mdash; you’re on the free beta.<br>Invoices and receipts show up here once billing goes live.</div></div>'+
+        '<div id="invBody"><div class="empty">No payments yet &mdash; nothing is billed today.<br>Invoices and receipts show up here once billing goes live.</div></div>'+
       '</div>'+
 
       '<div class="card"><h4>Manage plan</h4>'+
@@ -230,11 +230,11 @@ function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
             '<div class="msg">Keep your account &amp; data, stop billing. Resume anytime.</div>'+
             '<div class="fieldrow"><span class="fk">cancel</span><span class="fv" style="color:var(--faint)">available at launch</span></div>'+
             '<div class="msg">Drops you to Free at the end of the period. Your account, runs, and boards stay.</div>'+
-            '<div class="msg" style="color:var(--warn)">Billing isn&rsquo;t live during beta &mdash; there&rsquo;s no subscription to pause or cancel yet.</div>'+
+            '<div class="msg" style="color:var(--warn)">Billing isn&rsquo;t live yet &mdash; there&rsquo;s no subscription to pause or cancel yet.</div>'+
             '<div class="note" style="margin-top:auto">Cancelling only ends PRO &mdash; to erase everything, use Delete account on the <a href="account.html" style="color:var(--accent)">account page</a>.</div>'
           : '<div class="fieldrow"><span class="fk">you’re on</span><span class="fv"><b>Free</b></span></div>'+
             '<button class="btn" id="upgradeBtn2" style="margin-top:12px">Upgrade to PRO</button>'+
-            '<div class="note" style="margin-top:auto">Go PRO for ranked cosmetics, certificates, and every drill. Founder pricing is locked in for beta players.</div>')+
+            '<div class="note" style="margin-top:auto">Go PRO for ranked cosmetics, certificates, and every drill. Founder pricing is locked in for early players.</div>')+
       '</div>'+
     '</div>'+
 
@@ -247,13 +247,13 @@ function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
     if(b) b.onclick=()=>{ if(window.hkProSheet) window.hkProSheet(); }; });
 
   // H1 (AUDIT r417 §B): pause/cancel used to call pause_subscription / cancel_subscription
-  // RPCs that DO NOT EXIST, and the catch branch printed beta copy that would have masked
-  // REAL failures at launch. While billing is scaffold (no Stripe live) the actions are
-  // rendered disabled above with a plain "billing isn't live during beta" note — no dead
+  // RPCs that DO NOT EXIST, and the catch branch printed free-period copy that would have
+  // masked REAL failures at launch. While billing is scaffold (no Stripe live) the actions are
+  // rendered disabled above with a plain "billing isn't live yet" note — no dead
   // RPC calls at all.
   // TODO(Segment E2 — dev/PROJECT_REVIEW.md): real billing backend. When Stripe goes live,
   // wire pause/cancel here to the real pause_subscription / cancel_subscription RPCs (or
-  // the Stripe billing portal), with honest error surfacing — no beta-copy fallbacks.
+  // the Stripe billing portal), with honest error surfacing — no free-period-copy fallbacks.
 
   // r396: when billing goes live, an `invoices` table (or the processor's API) fills #invBody.
   // Rendered as a table so the empty state and the live state share one layout:
@@ -271,7 +271,7 @@ function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
           '<td>'+(r.hosted_url?'<a href="'+esc(r.hosted_url)+'" target="_blank" rel="noopener" style="color:var(--accent)">receipt &rarr;</a>':'')+'</td></tr>').join('')+
         '</tbody></table>';
     }
-  }catch(e){ console.warn('billing: invoices read failed (expected during beta — no invoices table yet):', e); /* the empty state stands */ }
+  }catch(e){ console.warn('billing: invoices read failed (expected pre-Stripe — no invoices table yet):', e); /* the empty state stands */ }
 })();
 </script>
 </body>

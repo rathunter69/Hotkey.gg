@@ -302,12 +302,12 @@ async function load(){
 
     <div class="acc-row">
       <div class="card acc-grow acc-bill"><h4>Billing</h4>
-        <div class="fieldrow"><span class="fk">plan</span><span class="fv"><b style="color:var(--warn);font-size:14px">PRO</b> <span class="badge warn">perks free during beta</span></span></div>
-        <!-- r428 (Wolf): desks are the one carve-out from the beta free-for-all. Stated
+        <div class="fieldrow"><span class="fk">plan</span><span class="fv"><b style="color:var(--warn);font-size:14px">PRO</b> <span class="badge warn">perks free for now</span></span></div>
+        <!-- r428 (Wolf): desks are the one carve-out from the free-for-all. Stated
              here because the row above otherwise reads as "you are PRO", and create_desk
              will reject this same player server-side unless they hold a real entitlement. -->
         <div class="fieldrow"><span class="fk">desks</span><span class="fv">founding one needs real PRO <span style="color:var(--faint)">&mdash; joining stays free</span></span></div>
-        <div class="fieldrow"><span class="fk">at launch</span><span class="fv" style="color:var(--muted)">beta players lock in founder pricing</span></div>
+        <div class="fieldrow"><span class="fk">at launch</span><span class="fv" style="color:var(--muted)">early players lock in founder pricing</span></div>
         <div class="fieldrow"><span class="fk">payment</span><span class="fv">none on file <span style="color:var(--faint)">&mdash; added at launch</span></span></div>
         <div class="fieldrow"><span class="fk">next charge</span><span class="fv">&mdash;</span></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
@@ -385,12 +385,9 @@ async function load(){
         <div class="msg" id="acDataMsg"></div>
       </div>
 
-      <div class="card acc-grow" id="betaTools"><h4>Beta tools <span style="color:var(--faint);font-size:9px">testing only &mdash; removed at launch</span></h4>
-        <div style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:10px">Bypass the LVL-10 ranked gate so you can test ranked without grinding. Cosmetic only &mdash; your real rating and boards are untouched.</div>
-        <button class="btn ghost" id="devRanked">Unlock ranked gate (test)</button>
-        <button class="btn ghost" id="devRankedOff" style="margin-left:8px">Reset</button>
-        <div class="msg" id="devMsg"></div>
-      </div>
+      <!-- r451: the "Beta tools" card (hk_dev_unlock + hk_ranked ranked-gate bypass) is DELETED —
+           LAUNCH.md phase-0 item 6, flagged REMOVE AT LAUNCH since r-early. lb.js still READS
+           hk_dev_unlock so dev/e2e-lb.js can seed it as a fixture; nothing writes it in the UI. -->
     </div>
 
     <div class="card acc-delete" style="border-color:var(--bad)"><h4 style="color:var(--bad)">Delete account</h4>
@@ -823,11 +820,7 @@ async function load(){
   renderSetup();
   // r156: PRO touchpoints — plan card button + the flair PRO tag open the offer sheet
   { const pb=document.getElementById('proSheetBtn'); if(pb) pb.onclick=()=>{ if(window.hkProSheet) window.hkProSheet(); }; }
-  { const dv=document.getElementById('devRanked'), dro=document.getElementById('devRankedOff');
-    if(dv) dv.onclick=()=>{ try{ localStorage.setItem('hk_dev_unlock','1'); localStorage.setItem('hk_ranked','1'); }catch(e){}
-      say('devMsg','Ranked unlocked for testing ✓ — open the leaderboard.'); };
-    if(dro) dro.onclick=()=>{ try{ localStorage.removeItem('hk_dev_unlock'); localStorage.removeItem('hk_ranked'); }catch(e){}
-      say('devMsg','Reset ✓ — the real gate applies again.'); } }
+  // r451: the devRanked/devRankedOff handlers went with the Beta-tools card above.
 }
 load();
 </script>
