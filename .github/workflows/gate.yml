@@ -68,6 +68,10 @@ jobs:
           node dev/check-cache-versions.js
           bash dev/check-secrets.sh
           node dev/check-invariants.js
+      # r452: the run outbox is client-side delivery of every leaderboard score — it wedged in
+      # prod (P1-3) because a server-rejected row was retried forever. Node-level, no browser.
+      - name: Run outbox (terminal vs transient, no wedge)
+        run: node dev/check-outbox.js
       - name: Smoke (every page loads, zero page errors + drill invariants)
         run: node dev/e2e-smoke.js
       - name: Leaderboard (tier filter, placement, seed field)

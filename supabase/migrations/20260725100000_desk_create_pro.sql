@@ -2,10 +2,17 @@
 -- "Desk CREATION must be a PRO feature, locked to free users. Needs a server-side
 -- guard (RPC/RLS), not just UI hiding.")
 --
--- NOT APPLIED TO PRODUCTION. This file is committed for review only — see the BETA
--- INTERACTION note below; flipping it changes live behavior for every beta player, so
--- it lands behind Wolf's explicit go (WORKFLOW §2 standing gate: anything user-visible
--- that changes the product's promise).
+-- APPLIED TO PRODUCTION on merge (commit dc42b79, PR #242). Corrected r452 (contract
+-- audit P1-6) — comment only, the SQL below is untouched.
+--
+-- The header used to read "NOT APPLIED TO PRODUCTION … committed for review only". That
+-- was never possible in this pipeline: .github/workflows/supabase-deploy.yml triggers on
+-- any push to main touching supabase/** and runs `supabase db push --include-all`, so
+-- committing a migration IS deploying it. There is no review-only lane in
+-- supabase/migrations/ — a change that must not ship yet has to stay out of this
+-- directory (park it under dev/ and land it as a migration when the go arrives).
+-- Consequence: the BETA INTERACTION note below describes LIVE behavior, not a forecast,
+-- and the Wolf question it raises is now a rollback decision rather than a go/no-go.
 --
 -- ============================================================================
 -- DIFF-BEFORE-REPLACE (WORKFLOW §4, the r417 regression class)
@@ -51,11 +58,11 @@
 --    and is a CLIENT flag; only the trainer honors it (index.html isPro() is
 --    `BETA_MODE || _pro`). No SQL function reads it, and nothing writes entitlements
 --    rows for beta players.
--- 3. THEREFORE this gate does not inherit the beta free-for-all. The moment it is
---    applied, every beta account without a paid entitlement or a live .edu trial is
+-- 3. THEREFORE this gate does not inherit the beta free-for-all. Since it went live,
+--    every beta account without a paid entitlement or a live .edu trial has been
 --    blocked from creating a desk — which is precisely Wolf's requirement, but it
 --    contradicts HOTKEY_PRO.betaNote ("Beta: PRO perks are free for everyone").
---    Wolf decides which promise wins; that is why this file is not applied.
+--    Wolf decides which promise wins; until then the gate is the one in force.
 -- 4. Corollary: the desk-grant branch of my_pro() can NEVER authorize a create. You
 --    must already be a team_members row to inherit a desk grant, and the
 --    ALREADY_ON_DESK check rejects exactly that caller. In practice this gate reduces

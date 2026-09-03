@@ -31847,32 +31847,54 @@ const HK_OUTBOX_KEY='hk_run_outbox', HK_OUTBOX_MAX=25;
 function _outboxRead(){ try{ const a=JSON.parse(localStorage.getItem(HK_OUTBOX_KEY)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
 function _outboxWrite(a){ try{ localStorage.setItem(HK_OUTBOX_KEY, JSON.stringify(a.slice(-HK_OUTBOX_MAX))); }catch(e){} }
 function _outboxEnqueue(payload){ const a=_outboxRead(); a.push(payload); _outboxWrite(a); }
-// Best-effort, silent flush of queued runs. Removes each row that posts (or that errors as a
-// permanent/duplicate conflict); keeps rows that fail on transient/connection errors for next time.
+/* r452 (contract audit P1-3): TERMINAL vs TRANSIENT. supabase-js RETURNS a Postgres exception as
+   `error`, it does not throw, and the old drop test matched only /duplicate|conflict|unique/ — so a
+   row runs_guard rejects outright sat in the outbox forever AND burned a slot of the 15-row flush
+   budget on every attempt, meaning 15 poisoned rows stopped every future real score from posting.
+   runs_guard (supabase/migrations/20260717100000_run_integrity.sql) raises exactly two codes:
+     RUN_REJECTED — deterministic (time_ms out of 300..3600000, keystrokes out of 1..5000, optimal
+                    > 1000, malformed challenge key, >30 keys/sec). The same row can NEVER insert.
+     RATE_LIMITED — 20 runs/60s or 2000/24h. The same row inserts fine later.
+   So: RUN_REJECTED (plus duplicate/conflict/unique and an RLS refusal, both equally final) → drop;
+   RATE_LIMITED, network/fetch failures and everything unrecognized → keep. */
+const _outboxTerminal = e => { const m=(e&&(e.message||e.details||''))||'';
+  return !/RATE_LIMITED/i.test(m) && /RUN_REJECTED|duplicate|conflict|unique|row-level security|violates (check|not-null)/i.test(m); };
+const HK_OUTBOX_TRIES=10;   // a row nobody can classify still gets a finite life, never an infinite one
+// Best-effort, silent flush of queued runs. Removes each row that posts, that the server refuses
+// deterministically, or that has failed HK_OUTBOX_TRIES times; keeps rows that fail transiently.
 async function flushRunOutbox(){
   try{
     if(!sb || !me_user || isAnonUser()) return;
     let q=_outboxRead(); if(!q.length) return;
-    const posted=new Set();
+    const done=new Set(), retried=new Set();
     /* r418 hardening: (a) a row stamped with a DIFFERENT user_id can never insert under RLS
        (with check auth.uid() = user_id) — it 403s on every flush forever; drop it instead of
        retrying. (b) runs_guard rate-limits inserts at 20/60s — cap one flush at 15 rows so a
        full 25-row outbox can't trip RATE_LIMITED and fail the whole batch; the remainder
-       simply rides the next flush. */
+       simply rides the next flush.
+       r452: walk NEWEST-FIRST so a stalled tail can never starve a freshly stranded run of the
+       flush budget, and carry a per-row attempt count (_att, stripped before the insert — it is
+       not a runs column) so nothing can be retried forever. */
     const FLUSH_CAP=15; let sent=0;
-    for(const row of q){
-      if(row && row.user_id && row.user_id!==me_user.id){ posted.add(JSON.stringify(row)); continue; }   // foreign-user row → drop (RLS-uninsertable)
+    for(const row of q.slice().reverse()){
+      const sig=JSON.stringify(row);
+      if(row && row.user_id && row.user_id!==me_user.id){ done.add(sig); continue; }   // foreign-user row → drop (RLS-uninsertable)
+      if((row&&row._att||0)>=HK_OUTBOX_TRIES){ done.add(sig); try{ ev('outbox_drop',{reason:'stale'}); }catch(e){} continue; }
       if(sent>=FLUSH_CAP) break;
       sent++;
-      try{ const { error } = await sb.from('runs').insert(row);
-        if(!error || /duplicate|conflict|unique/i.test(error.message||'')) posted.add(JSON.stringify(row));   // posted or permanent → drop
-      }catch(e){ /* transient → leave it in the outbox for next time */ }
+      try{ const ins=Object.assign({}, row); delete ins._att;
+        const { error } = await sb.from('runs').insert(ins);
+        if(!error) done.add(sig);                                                       // posted → drop
+        else if(_outboxTerminal(error)){ done.add(sig); try{ ev('outbox_drop',{reason:/RUN_REJECTED/i.test(error.message||'')?'rejected':'permanent'}); }catch(e){} }
+        else retried.add(sig);                                                          // RATE_LIMITED / server blip → keep, count the try
+      }catch(e){ retried.add(sig); /* transient → leave it in the outbox for next time */ }
     }
     /* r416 bugfix: RE-READ at write time and remove only the rows we actually posted. The old code
        overwrote the outbox with a snapshot taken BEFORE the awaits, silently dropping any run
        enqueued while we were posting — the exact "network blip loses a real time" the outbox exists
        to prevent. Match by value (fresh objects from a re-parse won't share identity). */
-    _outboxWrite(_outboxRead().filter(r=>!posted.has(JSON.stringify(r))));
+    _outboxWrite(_outboxRead().filter(r=>!done.has(JSON.stringify(r)))
+      .map(r=>retried.has(JSON.stringify(r)) ? Object.assign({}, r, {_att:(r._att||0)+1}) : r));
   }catch(e){}
 }
 async function recordRun(t){

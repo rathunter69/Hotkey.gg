@@ -12,6 +12,9 @@
           checklist/desc but never scanned these fields, and its pattern skips bare
           F-keys (cell refs there are content); picker metadata has no cell refs, so
           bare F1-F12 are flagged here too.
+     C14 — certificate tracks: the arrays hard-coded in the NEWEST issue_certificate migration
+          (and its dev/migrate-certificates.sql mirror) are set-equal to HK_TRACKS from drills.js
+          — the r359 drift rule, added r452 after the retired keys sat live in the RPC.
    Run: node dev/check-invariants.js */
 'use strict';
 const fs = require('fs');
@@ -469,6 +472,62 @@ try {
 } catch (e) {
   bad('C13 could not run: ' + String(e.message || e).slice(0, 120));
 }
+
+/* ---- C14 (r452): CERTIFICATE TRACK ARRAYS == HK_TRACKS (the r359 drift rule, in CI) ----
+   issue_certificate() hard-codes the three track key lists in SQL. drills.js is the truth, so the
+   two drift the moment a drill is retired or added — which is exactly what happened: the r424
+   retirements reached drills.js and dev/migrate-certificates.sql, but only 'colops' was carried
+   into supabase/migrations/, leaving the DEPLOYED function demanding seven drills that no longer
+   exist (undo/copyover/dress/growth/grpfold/wirewalk/hunt). The fluency and formulas certificates
+   were unissuable in production for weeks and nothing in the gate noticed (contract audit P0-1).
+   So: find the NEWEST migration that defines issue_certificate (highest timestamp prefix), parse
+   its three arrays, and assert set-equality with the HK_TRACKS keys derived from drills.js. The
+   dev/migrate-certificates.sql mirror is held to the same lists — it is a copy, not a channel. ---- */
+try {
+  const trackArrays = (src, where) => {
+    const out = {};
+    const re = /when\s+'(fluency|formulas|modeling)'\s*then\s*array\[([^\]]*)\]/g;
+    let m;
+    while ((m = re.exec(src))) out[m[1]] = m[2].split(',').map(s => s.trim().replace(/^'|'$/g, '')).filter(Boolean);
+    for (const t of ['fluency', 'formulas', 'modeling'])
+      if (!out[t]) bad('C14: ' + where + ' — could not parse the ' + t + ' array out of issue_certificate (shape changed?)');
+    return out;
+  };
+  const sbC = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
+  vm.createContext(sbC);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sbC);
+  const truth = {};
+  for (const t of (sbC.window.HK_TRACKS || [])) truth[t.id] = t.keys || [];
+
+  // NEWEST migration that (re)defines the RPC — migrations replay in filename order, so the last
+  // one to define it is the one that is live.
+  const migDir = 'supabase/migrations';
+  const defs = fs.readdirSync(migDir).filter(f => f.endsWith('.sql'))
+    .filter(f => /create\s+or\s+replace\s+function\s+public\.issue_certificate/.test(fs.readFileSync(migDir + '/' + f, 'utf8')))
+    .sort();
+  if (!defs.length) bad('C14: no migration defines public.issue_certificate');
+  const live = defs[defs.length - 1];
+  const sources = [[migDir + '/' + live, ' (live definition)'], ['dev/migrate-certificates.sql', ' (mirror)']];
+  let n14 = 0;
+  for (const [path, tag] of sources) {
+    if (!fs.existsSync(path)) continue;
+    const got = trackArrays(fs.readFileSync(path, 'utf8'), path);
+    for (const t of Object.keys(truth)) {
+      if (!got[t]) { n14++; continue; }
+      const want = new Set(truth[t]), have = new Set(got[t]);
+      const extra = [...have].filter(k => !want.has(k));
+      const missing = [...want].filter(k => !have.has(k));
+      if (got[t].length !== have.size) { n14++; bad('C14: ' + path + tag + ' ' + t + ' array has duplicate keys'); }
+      if (extra.length) { n14++; bad('C14: ' + path + tag + ' ' + t + ' requires ' + extra.join(', ') + ' — not in drills.js HK_TRACKS (retired drill? the certificate becomes unissuable)'); }
+      if (missing.length) { n14++; bad('C14: ' + path + tag + ' ' + t + ' is missing ' + missing.join(', ') + ' — in HK_TRACKS but not required by the RPC'); }
+    }
+  }
+  if (!n14) ok('certificate tracks: ' + live + ' + dev/migrate-certificates.sql match HK_TRACKS (' +
+    Object.keys(truth).map(t => t + ' ' + truth[t].length).join(' · ') + ')');
+} catch (e) {
+  bad('C14 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
 
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }
 console.log('STATIC INVARIANTS: clean');
