@@ -42,6 +42,17 @@ rename it · landing defaults to Daylight with a PRO door and learn-by-doing · 
 implement from the pushes and re-assess. **Open Wolf items:** AUDIT_R452 §2 (the menu) — first up
 C1 legal placeholders, C4 Mac KeyTips, then the lesson-drill wave B1–B3.
 
+**r453 backend round APPLIED LIVE (2026-09-03 22:20 UTC, via the Supabase connector; PR #248 carries
+the files):** baseline (no-op on prod) · membership retired (runs INSERT policy replaced first;
+members/invite_codes/access_codes/redeem_code dropped) · prune_guest_shells daily 04:00 UTC and the
+one-time pass (2,558 abandoned anonymous shells removed of 2,622 users) · RPC grants (37 client RPCs
+off public+anon, 12 helpers off authenticated; anon keeps preview_desk + is_desk_captain) ·
+profiles 6→3 policies + 22 initplan rewrites · 6 FK indexes, 4 dropped, desk_creations PK, events
+retention 180 days daily 03:30 UTC · run_stats aggregate + trigger + backfill (no read path moved —
+dev/RUN_STATS_PLAN.md). Version rows stamped in supabase_migrations.schema_migrations so a future
+`db push` skips them. Leaked-password protection is Wolf's dashboard toggle (Authentication →
+Providers → Passwords).
+
 **Branch state:** everything is on `claude/drill-redesign-art-style-jg9vhm`; `gate.yml` runs only on
 PRs and pushes to main, so CI has NOT run on the branch — but the FULL 24-step local gate (every
 suite gate.yml runs plus the r452 guards) ran green on the merged tip at the close of r452
