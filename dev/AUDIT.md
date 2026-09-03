@@ -1,5 +1,106 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r452 — CARD FRAMES: THE PIXEL PASS ACROSS ALL 31 SKINS (dev/FRAME_PIXEL_PASS.md)
+
+_Wolf 2026-09-03: "I love the pixel art card mock ups — implement fully across the board."
+Decisions applied as taken: **D1** 3px grid at `.hk-frame-lg`, 2px compact · **D2** cut particle
+blur/glow, keep the card's ambient shadow · **D3** PRO and Founder go pixel too, buying prestige
+back with a finer grid and the denser field `elabFor` already gives their tier._
+
+Presentation only. **No skin id, earn gate, title, notch/tab layout, fx-kind name or render size
+moved** — ids are frozen because earned skins persist in `profiles.flair`, and a renamed id
+silently un-skins a paying founder.
+
+### What changed, by skin class
+
+| class | skins | treatment |
+|---|---|---|
+| Rank ladder — engraved + 4 plaques | `engraved` `plaque-bronze/silver/gold/plat` | metal border → `repeating-linear-gradient(45deg)` in 6px stepped bands; interior → 3 solid stops at 160°; `sheen` raked highlight now quantized, its diagonal edge a chunky pixel staircase |
+| Rank ladder — pinnacle | `heraldic` `plaque-diam` | 16 hard conic sectors; heraldic's Cylon arc re-cut as four hard 15° cells so its 6s `steps(24)` orbit advances exactly one cell per step — a scanner, not a smear; embers are square sprites; the lozenge is a hard 1-cell diamond |
+| Prestige / paid | `pro` `founder` `foil` | **px:2**, the finest grid in the suite (D3). Nebula clouds and the 7 lissajous oil blobs become hard-edged banded discs; the "never visibly loops" incommensurate ratios survive untouched |
+| Epic + rare cosmetics | `circuit` `neon` `blueprint` `crt` `constellation` `vaporwave` `terminal` `sakura` `goldenhour` `pearl` `emerald` `amethyst` `bloom` `cottoncandy` | grid-based fx (circuit traces, CRT columns, blueprint cells, drive horizon, draft grid) were already axis-aligned and snap for free; petals/bokeh/puffs/sparkles become square sprites on a 3-frame rotation cycle |
+| Legendary | `noir` `frostbite` `molten` `onyx` `architect` `boutique` | 16-sector borders; boutique's lattice and gold studs read crisply; onyx's border stays deliberately still |
+| Easter egg | `bone` | **NO CHANGE.** It is the still card and the joke depends on it — excluded by name from every rule in the shared block |
+
+### The engine — one flag, not a fork
+
+`px` is a property of the skin's fx config (`SKINS` slot 6), plumbed to `hkInitCardFx` on the
+canvas beside `data-kind`. The 25 draw branches are **not rewritten and do not move**: they keep
+their device-space geometry, and a context wrapper carries the scale and hardens the primitives
+(square sprites, `shadowBlur` 0, gradients resampled to 6 hard bands, 1-cell strokes on `.5`
+centres, 90°-snapped rotation). Seeding in cell space instead would have collapsed particle
+counts, grown bokeh's radius 6×, and tripled every fall speed — see FRAME_PIXEL_PASS.md §5.
+
+### Dead branches removed (−155 lines)
+
+`aurora` · `cosmic` · `diamondfx` · `galaxy` · `gold` · `holo` · `holorain` · `lux` · `pinstripe`
+· `stars` · `sun` — **11 fx kinds no skin can reach.** Re-verified before deletion, not taken on
+the doc's word: `data-kind` is emitted in exactly ONE place (themes.js, from `SKINS[id][4]`), so
+the only reachable kinds are the 25 the table names. Orphaned seed helpers went with them
+(`comet` `cosmic` `prism` `galaxy` `aurora` `holorain` `gold` `diamondfx` `pin` `lux`).
+**`stars()` was KEPT** — `nebula()` (PRO, live) calls it, which a blanket deletion would have
+broken.
+
+### C3 — the notch taxonomy
+
+**PASS.** `nav.css: all 30 SKINS wear a per-class notch`. The taxonomy lists at nav.css:735–756
+are untouched; only the shapes inside them went hard (square, `2px 2px 0` offset shadow instead
+of a blur). The 45° stair corner was **deliberately not shipped**: `clip-path` on the card eats
+the notch at `top:-15px`, and the prototype's fix moves the notch onto `.pc-card` / `.panel.me`
+— rendered by lb.js and nav.js, outside this lane. Silhouette is `border-radius:0`.
+
+### Animation periods — before = after
+
+Every period is unchanged; only the timing function is quantized (R5).
+
+| animation | period | before → after |
+|---|---|---|
+| `hkBorderSpin` — boutique, architect | 16s | `linear` → `steps(16)` |
+| `hkBorderSpin` — founder | 8s | `linear` → `steps(16)` |
+| `hkBorderSpin` — pro | 9s | `linear` → `steps(16)` |
+| `hkBorderSpin` — molten | 12s | `linear` → `steps(16)` |
+| `hkBorderSpin` — terminal | 15s | `linear` → `steps(16)` |
+| `hkBorderSpin` — heraldic | 17s | `linear` → `steps(16)` |
+| `hkBorderSpin` — plaque-diam | 19s | `linear` → `steps(16)` |
+| `hkBorderSpin` — frostbite | 21s | `linear` → `steps(16)` |
+| `hkBorderSpin` — foil | 23s | `linear` → `steps(16)` |
+| `hkBorderSpin` — noir | 29s | `linear` → `steps(16)` |
+| `hkCylonCircle` — heraldic orbit | 6s | `linear` → `steps(24)` |
+| `hkfSheen` — foil | 7s | `linear` → `steps(24)` |
+| `hkfGlint` — hover glint | 1.2s | `ease` → `steps(8)` |
+| `hkfGlint7` / `hkfGlintHer` | 7s | `ease-in-out` → `steps(24)` |
+| `hkfEmber` — heraldic | 3s | `ease-in-out` → `steps(4)` |
+| `hkfMedBeat` — heraldic medallion | 7s | `ease-in-out` → `steps(4)` |
+| `hkfCrackPulse` — molten | 2.4s | `ease-in-out` → `steps(4)` |
+| `hkGemRays` — plaque gems | 8s | `ease-in-out` → `steps(4)` |
+
+Canvas-side periods (sheen 4.5s · heraldic glint 5.5s · quilt sheen 4.2s · pearl 3.4s · nebula
+aurora 9s · draft scan 3.0s · sheet wave 3.4s · navchart reticle 14s) are preserved **by
+construction**: the branches keep their device-space time math and only the rendering changed.
+
+**Reduced motion:** contract unchanged — `prefers-reduced-motion: reduce` still draws exactly one
+frame and never enters the loop; verified with zero page errors.
+
+### Verification
+
+| suite | result |
+|---|---|
+| `dev/check-invariants.js` | **STATIC INVARIANTS: clean** (C3 passes) |
+| `dev/check-cache-versions.js` | **CACHE-BUMP GUARD: clean** — themes.js 310→311, nav.css 210→211 across 183 refs in 92 pages |
+| `dev/e2e-smoke.js` | **ALL 7 PAGES CLEAN + skin-unlock** — zero page errors, so the pixel branch throws nothing |
+| `dev/e2e-demo-replay.js` (navigation, combo, foot) | **E2E: ALL GREEN** |
+| `dev/e2e-audit-visual.js` | 108 fail / 271 pass — **identical to the pristine control** run at HEAD on the same commit, so this pass is neutral on it. These are pre-existing grid/theme contrast failures on this base, unrelated to card frames. |
+
+`dev/e2e-audit-visual.js` was the one suite in the fleet whose origin could not be overridden;
+it now reads `BASE` like `e2e-smoke.js` does.
+
+### Renders reviewed (and what they caught)
+
+8 skins × {`.hk-frame-lg`, compact} × {dark `carbon`, light `daylight`}, plus a 3× close-up and a
+reduced-motion frame. Looking at them caught both render-loop bugs above — the sheen wash and the
+gradient clamp spill — neither of which is visible in code review. Final state: every card's stats
+row is legible in both themes at both sizes, and the 1px rim seats the pixel silhouette on light.
+
 ## r440 H6b-12 — balcheck + tieout + balance: Formulas II CLOSES 10/10 (DEPTH_PASS §4.48 + §4.51 + §4.55 + §2.3)
 _The chapter's last three boards. All three carried a FORMATTING ☆ on their §4 page, all three
 had those ☆s re-cut under §1.0(d); one of them (`tieout`) came within a diagnostic of retirement

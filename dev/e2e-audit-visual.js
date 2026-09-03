@@ -8,9 +8,12 @@
        light themes — Excel parity: white-on-white is invisible there too)
      - blue-fill text vs the blue fill          (>= 3.0)
      - selection outline vs bg                  (>= 2.0)
-   Run: node dev/e2e-audit-visual.js   (server on 127.0.0.1:8791) */
+   Run: node dev/e2e-audit-visual.js   (server on 127.0.0.1:8791)
+   r452: BASE overrides the origin, matching e2e-smoke.js (BASE) and e2e-demo-replay.js (URL)
+   -- this was the one suite in the fleet that could not be pointed at another port. */
 'use strict';
 const { chromium } = require('playwright-core');
+const BASE = process.env.BASE || 'http://127.0.0.1:8791';
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 let pass = 0, fail = 0;
 const ok = (c, n, x) => { if (c) { pass++; } else { fail++; console.log('  FAIL ' + n + (x ? ' — ' + x : '')); } };
@@ -44,7 +47,7 @@ function contrast(fgS, bgS) {
     localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_beta_ok', '1');
     localStorage.setItem('hk_xlv', '2');
   } catch (e) {} });
-  await page.goto('http://127.0.0.1:8791/index.html', { waitUntil: 'load' });
+  await page.goto(BASE + '/index.html', { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof applyTheme === 'function');
   await page.evaluate(() => { try { _pro = true; } catch (e) {} });
 

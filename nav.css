@@ -479,9 +479,9 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   transform:translateX(0) rotate(8deg); opacity:0}
 
 /* 1 · ENGRAVED (common) — r404.4 (Wolf #96): brushed-steel certificate THEME card. */
-.hk-frame-engraved.hk-frame-engraved{--text:#e9ebf1;--muted:#969cab;--line:#3a3d45;--accent:#c8ccd4;--accent-dim:#6a6e78; color:#e9ebf1;
-  border:2px solid transparent; box-shadow:0 0 20px rgba(0,0,0,.25),0 20px 60px rgba(0,0,0,.55);
-  background:radial-gradient(ellipse at 30% 4%,rgba(200,204,212,.1),transparent 55%),linear-gradient(#14161c,#101218) padding-box, linear-gradient(150deg,#dfe3ea,#9aa0ac 40%,#4a4e58 72%,#c8ccd4) border-box}
+.hk-frame-engraved.hk-frame-engraved{--hkrim:#e7eaef; --text:#e9ebf1;--muted:#969cab;--line:#3a3d45;--accent:#c8ccd4;--accent-dim:#6a6e78; color:#e9ebf1;
+  border:2px solid transparent; box-shadow:inset 0 0 0 1px #e7eaef, 0 20px 60px rgba(0,0,0,.55);
+  background:radial-gradient(ellipse at 30% 4%, rgba(200,204,212,.1) 0 30.3%, rgba(200,204,212,0.045) 30.3% 55%, transparent 55%),linear-gradient(160deg, #14161c 0 34%, #12141a 34% 70%, #101218 70% 100%) padding-box, repeating-linear-gradient(45deg, #dfe3ea 0px 6px, #9aa0ac 6px 12px, #4a4e58 12px 18px, #c8ccd4 18px 24px) border-box}
 .hk-frame-engraved.hk-frame-engraved::before{content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:0;
   background:repeating-linear-gradient(115deg,transparent 0 5px,rgba(255,255,255,.03) 5px 6px)}
 
@@ -495,35 +495,35 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .hk-frame-plaque-gold.hk-frame-plaque-gold, .hk-frame-plaque-plat.hk-frame-plaque-plat,
 .hk-frame-plaque-diam.hk-frame-plaque-diam{border:2px solid transparent;
   box-shadow:0 0 20px rgba(0,0,0,.25),0 20px 60px rgba(0,0,0,.55)}
-.hk-frame-plaque-bronze.hk-frame-plaque-bronze{--text:#f4dcc0;--muted:#b08a64;--line:#5a3a1e;--accent:#e0a35a;--accent-dim:#a5701f; color:#f4dcc0;
-  background:radial-gradient(ellipse at 30% 4%,rgba(224,163,90,.16),transparent 55%),linear-gradient(#1a0f07,#160c05) padding-box, linear-gradient(150deg,#f4c088,#cf8e4c 32%,#95602c 60%,#e0a35a) border-box}
-.hk-frame-plaque-silver.hk-frame-plaque-silver{--text:#eef1f6;--muted:#9aa2ad;--line:#3a4048;--accent:#e4ebf2;--accent-dim:#9aa2ad; color:#eef1f6;
-  background:radial-gradient(ellipse at 30% 4%,rgba(228,235,242,.14),transparent 55%),linear-gradient(#12151a,#0e1116) padding-box, linear-gradient(150deg,#f4f7fc,#c9d0dc 32%,#8e96a5 60%,#e4ebf2) border-box}
-.hk-frame-plaque-gold.hk-frame-plaque-gold{--text:#f6e6b0;--muted:#c0a860;--line:#5a4410;--accent:#f5d878;--accent-dim:#bf8e20; color:#f6e6b0;
-  background:radial-gradient(ellipse at 30% 4%,rgba(245,216,120,.16),transparent 55%),linear-gradient(#1a1404,#140f02) padding-box, linear-gradient(150deg,#ffefb3,#f4c754 32%,#bf8e20 60%,#f5d878) border-box}
+.hk-frame-plaque-bronze.hk-frame-plaque-bronze{--hkrim:#f7d0a6; --text:#f4dcc0;--muted:#b08a64;--line:#5a3a1e;--accent:#e0a35a;--accent-dim:#a5701f; color:#f4dcc0;
+  background:radial-gradient(ellipse at 30% 4%, rgba(224,163,90,.16) 0 30.3%, rgba(224,163,90,0.072) 30.3% 55%, transparent 55%),linear-gradient(160deg, #1a0f07 0 34%, #180e06 34% 70%, #160c05 70% 100%) padding-box, repeating-linear-gradient(45deg, #f4c088 0px 6px, #cf8e4c 6px 12px, #95602c 12px 18px, #e0a35a 18px 24px) border-box}
+.hk-frame-plaque-silver.hk-frame-plaque-silver{--hkrim:#f7f9fd; --text:#eef1f6;--muted:#9aa2ad;--line:#3a4048;--accent:#e4ebf2;--accent-dim:#9aa2ad; color:#eef1f6;
+  background:radial-gradient(ellipse at 30% 4%, rgba(228,235,242,.14) 0 30.3%, rgba(228,235,242,0.063) 30.3% 55%, transparent 55%),linear-gradient(160deg, #12151a 0 34%, #101318 34% 70%, #0e1116 70% 100%) padding-box, repeating-linear-gradient(45deg, #f4f7fc 0px 6px, #c9d0dc 6px 12px, #8e96a5 12px 18px, #e4ebf2 18px 24px) border-box}
+.hk-frame-plaque-gold.hk-frame-plaque-gold{--hkrim:#fff3c6; --text:#f6e6b0;--muted:#c0a860;--line:#5a4410;--accent:#f5d878;--accent-dim:#bf8e20; color:#f6e6b0;
+  background:radial-gradient(ellipse at 30% 4%, rgba(245,216,120,.16) 0 30.3%, rgba(245,216,120,0.072) 30.3% 55%, transparent 55%),linear-gradient(160deg, #1a1404 0 34%, #171203 34% 70%, #140f02 70% 100%) padding-box, repeating-linear-gradient(45deg, #ffefb3 0px 6px, #f4c754 6px 12px, #bf8e20 12px 18px, #f5d878 18px 24px) border-box}
 /* r404.4 (Wolf): PLATINUM (VP) — cooler, an icy blue-white platinum with a frost cast. */
-.hk-frame-plaque-plat.hk-frame-plaque-plat{--text:#e6f2ff;--muted:#93b0cc;--line:#2e4256;--accent:#dbecff;--accent-dim:#7fa8d8; color:#e6f2ff;
-  background:radial-gradient(ellipse at 30% 4%,rgba(150,200,255,.18),transparent 55%),linear-gradient(#0a0f16,#070b12) padding-box, linear-gradient(150deg,#eaf4ff,#a8c8e8 32%,#5a82ad 60%,#c8e2ff) border-box}
+.hk-frame-plaque-plat.hk-frame-plaque-plat{--hkrim:#eff7ff; --text:#e6f2ff;--muted:#93b0cc;--line:#2e4256;--accent:#dbecff;--accent-dim:#7fa8d8; color:#e6f2ff;
+  background:radial-gradient(ellipse at 30% 4%, rgba(150,200,255,.18) 0 30.3%, rgba(150,200,255,0.081) 30.3% 55%, transparent 55%),linear-gradient(160deg, #0a0f16 0 34%, #080d14 34% 70%, #070b12 70% 100%) padding-box, repeating-linear-gradient(45deg, #eaf4ff 0px 6px, #a8c8e8 6px 12px, #5a82ad 12px 18px, #c8e2ff 18px 24px) border-box}
 /* r413 (Wolf): DIAMOND (Second-Year, the final boss) — BLACK DIAMOND. Near-black carbon body with a
    brilliant full-spectrum prism border; the blackdiam fx twinkles white brilliance + rakes a slow
    prismatic caustic across the facets. (Replaced the old matrix-style number cascade.) */
-.hk-frame-plaque-diam.hk-frame-plaque-diam{--text:#eef4fb;--muted:#9aa6b6;--line:#26303c;--accent:#eef4fb;--accent-dim:#8fb0d0; color:#eef4fb;
-  background:radial-gradient(ellipse at 30% 2%,rgba(200,225,255,.12),transparent 58%),linear-gradient(150deg,#0a0b10,#060709 55%,#08090e) padding-box, conic-gradient(from var(--hkang,135deg),#ffffff,#9be0f7,#7fa8ff,#c9a8ff,#ffc2e8,#ffffff) border-box}
+.hk-frame-plaque-diam.hk-frame-plaque-diam{--hkrim:#ffffff; --text:#eef4fb;--muted:#9aa6b6;--line:#26303c;--accent:#eef4fb;--accent-dim:#8fb0d0; color:#eef4fb;
+  background:radial-gradient(ellipse at 30% 2%, rgba(200,225,255,.12) 0 31.9%, rgba(200,225,255,0.054) 31.9% 58%, transparent 58%),linear-gradient(150deg, #0a0b10 0 34%, #060709 34% 70%, #08090e 70% 100%) padding-box, repeating-conic-gradient(from var(--hkang,135deg), #ffffff 0deg 22.5deg, #9be0f7 22.5deg 45deg, #7fa8ff 45deg 67.5deg, #ffc2e8 67.5deg 90deg) border-box}
 
 /* 3 · FOIL (epic) — conic sheen border + fan corners + scalloped inner edge */
 /* r404.5 (Wolf): FOIL → a "super diamond" holographic THEME card — the diamond/Second-Year
    palette (icy prismatic), a brilliant full-spectrum edge, and a holographic sheen. Not the
    old teal, not purple, not starfield (constellation + pro already own space). */
-.hk-frame-foil.hk-frame-foil{--text:#eaf6ff;--muted:#9fc4dc;--line:#274458;--accent:#eaf8ff;--accent-dim:#8fd0e8; color:#eaf6ff;
-  border:2px solid transparent; box-shadow:0 0 24px rgba(140,200,255,.22),0 20px 60px rgba(0,0,0,.6);
-  background:radial-gradient(ellipse at 28% 6%,rgba(150,210,255,.22),transparent 55%),linear-gradient(#0a1418,#08101a) padding-box, conic-gradient(from var(--hkang,135deg),#ffffff,#9be0f7,#7fa8ff,#c9a8ff,#ffc2e8,#ffffff) border-box}
+.hk-frame-foil.hk-frame-foil{--hkrim:#ffffff; --text:#eaf6ff;--muted:#9fc4dc;--line:#274458;--accent:#eaf8ff;--accent-dim:#8fd0e8; color:#eaf6ff;
+  border:2px solid transparent; box-shadow:inset 0 0 0 1px #ffffff, 0 20px 60px rgba(0,0,0,.6);
+  background:radial-gradient(ellipse at 28% 6%, rgba(150,210,255,.22) 0 30.3%, rgba(150,210,255,0.099) 30.3% 55%, transparent 55%),linear-gradient(160deg, #0a1418 0 34%, #091219 34% 70%, #08101a 70% 100%) padding-box, repeating-conic-gradient(from var(--hkang,135deg), #ffffff 0deg 22.5deg, #9be0f7 22.5deg 45deg, #7fa8ff 45deg 67.5deg, #ffc2e8 67.5deg 90deg) border-box}
 .hk-frame-foil .pc-name span,.hk-frame-foil .pub-nm{color:#eaf6ff; text-shadow:0 0 10px rgba(150,210,255,.5)}
 
 /* 4 · HERALDIC · MD (legendary) — r404.6 (Wolf): red/EVIL. Deep blood-red interior, a
    dark crimson border, an ominous red glow. Border animates (see .hk-anim-border below). */
-.hk-frame-heraldic.hk-frame-heraldic{--text:#f7d6ce;--muted:#c98a82;--line:#5a1414;--accent:#e8443a;--accent-dim:#8a1410; color:#f7d6ce;
-  border:2px solid transparent; box-shadow:0 0 26px rgba(200,24,24,.26),0 20px 60px rgba(0,0,0,.66);
-  background:radial-gradient(ellipse at 50% 8%,rgba(180,20,20,.24),transparent 58%),linear-gradient(#140608,#0c0305) padding-box, conic-gradient(from var(--hkang,120deg),#e8be62,#7a1410,#c02a1a,#3a0406,#d8a24a,#5a0a0c,#e8be62) border-box}   /* r407 (Wolf): Blood Angels — crimson with GILT trim in the border */
+.hk-frame-heraldic.hk-frame-heraldic{--hkrim:#eece89; --text:#f7d6ce;--muted:#c98a82;--line:#5a1414;--accent:#e8443a;--accent-dim:#8a1410; color:#f7d6ce;
+  border:2px solid transparent; box-shadow:inset 0 0 0 1px #eece89, 0 20px 60px rgba(0,0,0,.66);
+  background:radial-gradient(ellipse at 50% 8%, rgba(180,20,20,.24) 0 31.9%, rgba(180,20,20,0.108) 31.9% 58%, transparent 58%),linear-gradient(160deg, #140608 0 34%, #100406 34% 70%, #0c0305 70% 100%) padding-box, repeating-conic-gradient(from var(--hkang,120deg), #e8be62 0deg 22.5deg, #c02a1a 22.5deg 45deg, #3a0406 45deg 67.5deg, #d8a24a 67.5deg 90deg) border-box}   /* r407 (Wolf): Blood Angels — crimson with GILT trim in the border */
 /* r408 (Wolf): a CYLON red scanner sweeps the top edge — the menacing red eye of a Basestar. */
 .hk-frame-heraldic.hk-frame-heraldic{position:relative}
 /* r411 (Wolf): the Cylon red scanner now CIRCLES the whole card instead of a top bar that
@@ -532,11 +532,14 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    spin — reads as a scanning eye orbiting the card. */
 @property --hkcyl{ syntax:'<angle>'; inherits:false; initial-value:0deg }
 .hk-frame-heraldic::after{content:''; position:absolute; inset:0; z-index:1; pointer-events:none; border-radius:inherit; padding:5px;
-  background:conic-gradient(from var(--hkcyl,0deg), transparent 0deg 292deg, rgba(255,42,26,.5) 316deg, #ff7a4a 338deg, #ffd8bc 350deg, #ff7a4a 358deg, transparent 360deg);
-  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude;
-  filter:drop-shadow(0 0 5px rgba(255,54,26,.85))}
+  /* r452 pixel pass: the scanner is now four HARD 15deg cells instead of a smeared arc, so on
+     the 6s steps(24) orbit it advances exactly one cell per step — a scanner, not a blur.
+     The drop-shadow glow is gone with every other blur (decision D2). */
+  background:conic-gradient(from var(--hkcyl,0deg), transparent 0deg 300deg,
+    #7a1410 300deg 315deg, #ff2a1a 315deg 330deg, #ff7a4a 330deg 345deg, #ffd8bc 345deg 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude}
 @media (prefers-reduced-motion: no-preference){
-  .hk-frame-heraldic::after{animation:hkCylonCircle 6s linear infinite}   /* r413 (Wolf): slower, statelier sweep — 2.6s read too frantic */
+  .hk-frame-heraldic::after{animation:hkCylonCircle 6s steps(24) infinite}   /* r413 (Wolf): slower, statelier sweep — 2.6s read too frantic */
 }
 @keyframes hkCylonCircle{ to{ --hkcyl:360deg } }
 /* r404.6 (Wolf): charter retired. */
@@ -568,13 +571,13 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   .hk-frame-plaque-bronze:hover .hkf-glint::before, .hk-frame-plaque-silver:hover .hkf-glint::before,
   .hk-frame-plaque-gold:hover .hkf-glint::before, .hk-frame-plaque-plat:hover .hkf-glint::before,
   .hk-frame-plaque-diam:hover .hkf-glint::before,
-  .hk-frame-foil:hover .hkf-glint::before{animation:hkfGlint 1.2s ease}
-  .hk-frame-foil.hk-frame-foil::before{animation:hkfSheen 7s linear infinite}
-  .hk-frame-heraldic .hkf-cn, .hk-frame-heraldic .hkf-med{animation:hkfEmber 3s ease-in-out infinite alternate}
-  .hk-frame-heraldic .hkf-glint::before{animation:hkfGlint7 7s ease-in-out infinite}
+  .hk-frame-foil:hover .hkf-glint::before{animation:hkfGlint 1.2s steps(8)}
+  .hk-frame-foil.hk-frame-foil::before{animation:hkfSheen 7s steps(24) infinite}
+  .hk-frame-heraldic .hkf-cn, .hk-frame-heraldic .hkf-med{animation:hkfEmber 3s steps(4) infinite alternate}
+  .hk-frame-heraldic .hkf-glint::before{animation:hkfGlint7 7s steps(24) infinite}
   /* r376: top-bucket brilliants only — .gem-rays exists solely on that cut, so the
      selector self-gates. Slow 8s opacity pulse, nothing moves. */
-  .hkf-cn .gem-rays{animation:hkGemRays 8s ease-in-out infinite}
+  .hkf-cn .gem-rays{animation:hkGemRays 8s steps(4) infinite}
 }
 @keyframes hkfGlint{0%{transform:translateX(0) rotate(8deg); opacity:0}
   10%{opacity:1} 90%{opacity:1}
@@ -668,7 +671,7 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
    were silently overriding it — leaving a 1/2/3/5px scatter across the catalog. This one
    authoritative rule (higher specificity, placed last) forces every full skin card to the same
    5px width + 16px radius, so the footprint is identical card-to-card. */
-.uc.hk-frame-lg[class*="hk-frame-"]{border-width:5px; border-radius:16px}
+.uc.hk-frame-lg[class*="hk-frame-"]{border-width:5px; border-radius:0}   /* r452: squared (R1) */
 /* r413 (Wolf): the "no theme" card wears a plain 5px neutral border so its footprint matches the
    skinned cards (which all carry a 5px animated/gradient border) — no more size mismatch. */
 .uc.hk-frame-none{border:5px solid var(--line); border-radius:16px}
@@ -681,8 +684,8 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 @media (prefers-reduced-motion: no-preference){
   /* heraldic at LG: the glint sweeps in, CATCHES mid-card, then snaps through —
      two beats every 7s; the medallion pulses with the second beat. */
-  .hk-frame-lg.hk-frame-heraldic .hkf-glint::before{animation:hkfGlintHer 7s ease-in-out infinite}
-  .hk-frame-lg.hk-frame-heraldic .hkf-med{animation:hkfEmber 3s ease-in-out infinite alternate, hkfMedBeat 7s ease-in-out infinite}
+  .hk-frame-lg.hk-frame-heraldic .hkf-glint::before{animation:hkfGlintHer 7s steps(24) infinite}
+  .hk-frame-lg.hk-frame-heraldic .hkf-med{animation:hkfEmber 3s steps(4) infinite alternate, hkfMedBeat 7s steps(4) infinite}
 }
 @keyframes hkfGlintHer{0%, 76%{transform:translateX(0) rotate(8deg); opacity:0}
   79%{opacity:1}
@@ -783,46 +786,46 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   background-size:24px 18px; transform:perspective(120px) rotateX(52deg); transform-origin:bottom}
 
 /* ---- per-skin interior + border ---- */
-.hk-frame-circuit.hk-frame-circuit{--text:#dff7f2; --muted:#3a8f86; --line:#154a48; --accent:#5fe9d4; --accent-dim:#2aa89c;
+.hk-frame-circuit.hk-frame-circuit{--hkrim:#5fbeb5; --text:#dff7f2; --muted:#3a8f86; --line:#154a48; --accent:#5fe9d4; --accent-dim:#2aa89c;
   border:2px solid transparent; color:#dff7f2;
-  background:linear-gradient(#0a1518,#0d1a1e) padding-box, linear-gradient(120deg,#1c6a68,#2aa89c) border-box;
-  box-shadow:0 0 20px rgba(64,224,208,.12),0 20px 60px rgba(0,0,0,.55)}
+  background:linear-gradient(160deg, #0a1518 0 34%, #0c181b 34% 70%, #0d1a1e 70% 100%) padding-box, repeating-linear-gradient(45deg, #1c6a68 0px 6px, #2aa89c 6px 12px) border-box;
+  box-shadow:inset 0 0 0 1px #5fbeb5, 0 20px 60px rgba(0,0,0,.55)}
 .hk-frame-circuit.hk-frame-circuit::before{content:""; position:absolute; inset:0; border-radius:inherit; z-index:0; pointer-events:none;
   background-image:linear-gradient(rgba(64,224,208,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(64,224,208,.05) 1px,transparent 1px); background-size:22px 22px; opacity:.5}
 .hk-frame-circuit .pc-name span,.hk-frame-circuit .pub-nm{color:#7ff0e0; text-shadow:0 0 8px rgba(64,224,208,.5)}
 
-.hk-frame-neon.hk-frame-neon{--text:#ffd3ea; --muted:#7a5a86; --line:#3a0a4a; --accent:#ff6ab3; --accent-dim:#2edcff;
+.hk-frame-neon.hk-frame-neon{--hkrim:#62e5ff; --text:#ffd3ea; --muted:#7a5a86; --line:#3a0a4a; --accent:#ff6ab3; --accent-dim:#2edcff;
   border:2px solid transparent; color:#ffd3ea;
-  background:linear-gradient(135deg,#1a0620,#15121e) padding-box, linear-gradient(120deg,#ff2d95,#2edcff) border-box;
-  box-shadow:0 0 20px rgba(255,45,149,.28),0 0 34px rgba(46,220,255,.14),0 20px 60px rgba(0,0,0,.6)}
+  background:linear-gradient(135deg, #1a0620 0 34%, #180c1f 34% 70%, #15121e 70% 100%) padding-box, repeating-linear-gradient(45deg, #ff2d95 0px 6px, #2edcff 6px 12px) border-box;
+  box-shadow:inset 0 0 0 1px #62e5ff, 0 20px 60px rgba(0,0,0,.6)}
 .hk-frame-neon .pc-name span,.hk-frame-neon .pub-nm{color:#ff6ab3; text-shadow:0 0 8px rgba(255,45,149,.6)}
 
-.hk-frame-blueprint.hk-frame-blueprint{--text:#cfe2f8; --muted:#6c8fb5; --line:#2f5b86; --accent:#8fbfe8; --accent-dim:#4f7aa8;
+.hk-frame-blueprint.hk-frame-blueprint{--hkrim:#7b9bbe; --text:#cfe2f8; --muted:#6c8fb5; --line:#2f5b86; --accent:#8fbfe8; --accent-dim:#4f7aa8;
   border:2px solid transparent; color:#cfe2f8;
-  background:linear-gradient(#152230,#152230) padding-box, linear-gradient(120deg,#2f5b86,#4f7aa8) border-box;
-  box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  background:linear-gradient(160deg, #152230 0 34%, #152230 34% 70%, #152230 70% 100%) padding-box, repeating-linear-gradient(45deg, #2f5b86 0px 6px, #4f7aa8 6px 12px) border-box;
+  box-shadow:inset 0 0 0 1px #7b9bbe, 0 20px 60px rgba(0,0,0,.5)}
 .hk-frame-blueprint.hk-frame-blueprint::before{content:""; position:absolute; inset:0; border-radius:inherit; z-index:0; pointer-events:none;
   background-image:repeating-linear-gradient(0deg,transparent 0 21px,rgba(120,170,225,.08) 21px 22px),repeating-linear-gradient(90deg,transparent 0 21px,rgba(120,170,225,.08) 21px 22px)}
 .hk-frame-blueprint .pc-name span,.hk-frame-blueprint .pub-nm{letter-spacing:1px}
 
-.hk-frame-crt.hk-frame-crt{--text:#5bf08a; --muted:#3a9a5a; --line:#0c3a1c; --accent:#5bf08a; --accent-dim:#2fae5c;
+.hk-frame-crt.hk-frame-crt{--hkrim:#63c285; --text:#5bf08a; --muted:#3a9a5a; --line:#0c3a1c; --accent:#5bf08a; --accent-dim:#2fae5c;
   border:2px solid transparent; color:#5bf08a;
-  background:linear-gradient(#08110b,#08110b) padding-box, linear-gradient(120deg,#0c3a1c,#2fae5c) border-box;
-  box-shadow:0 0 20px rgba(60,240,120,.14),0 20px 60px rgba(0,0,0,.6)}
+  background:linear-gradient(160deg, #08110b 0 34%, #08110b 34% 70%, #08110b 70% 100%) padding-box, repeating-linear-gradient(45deg, #0c3a1c 0px 6px, #2fae5c 6px 12px) border-box;
+  box-shadow:inset 0 0 0 1px #63c285, 0 20px 60px rgba(0,0,0,.6)}
 .hk-frame-crt.hk-frame-crt::before{content:""; position:absolute; inset:0; border-radius:inherit; z-index:0; pointer-events:none;
   background:repeating-linear-gradient(0deg,rgba(80,255,140,.06) 0 2px,transparent 2px 4px)}
 .hk-frame-crt .pc-name span,.hk-frame-crt .pub-nm{color:#5bf08a; text-shadow:0 0 8px rgba(60,240,120,.5)}
 
-.hk-frame-constellation.hk-frame-constellation{--text:#eef1ff; --muted:#8d96c8; --line:#33385a; --accent:#aeb6f0; --accent-dim:#6a74c0;
+.hk-frame-constellation.hk-frame-constellation{--hkrim:#b3bbe8; --text:#eef1ff; --muted:#8d96c8; --line:#33385a; --accent:#aeb6f0; --accent-dim:#6a74c0;
   border:2px solid transparent; color:#eef1ff;
-  background:radial-gradient(ellipse at 28% 6%,rgba(110,80,190,.42),transparent 55%),linear-gradient(#080a18,#0e1128) padding-box, linear-gradient(120deg,#3a4270,#9aa4e0) border-box;
-  box-shadow:0 0 20px rgba(90,90,180,.2),0 20px 60px rgba(0,0,0,.6)}
+  background:radial-gradient(ellipse at 28% 6%, rgba(110,80,190,.42) 0 30.3%, rgba(110,80,190,0.189) 30.3% 55%, transparent 55%),linear-gradient(160deg, #080a18 0 34%, #0b0e20 34% 70%, #0e1128 70% 100%) padding-box, repeating-linear-gradient(45deg, #3a4270 0px 6px, #9aa4e0 6px 12px) border-box;
+  box-shadow:inset 0 0 0 1px #b3bbe8, 0 20px 60px rgba(0,0,0,.6)}
 .hk-frame-constellation .pc-name span,.hk-frame-constellation .pub-nm{color:#eef1ff; text-shadow:0 0 10px rgba(150,160,255,.4)}
 
-.hk-frame-vaporwave.hk-frame-vaporwave{--text:#f6e6ff; --muted:#c79ad8; --line:#5a1f66; --accent:#ff8fd0; --accent-dim:#2ee6e6;
+.hk-frame-vaporwave.hk-frame-vaporwave{--hkrim:#ff86c4; --text:#f6e6ff; --muted:#c79ad8; --line:#5a1f66; --accent:#ff8fd0; --accent-dim:#2ee6e6;
   border:2px solid transparent; color:#f6e6ff;
-  background:linear-gradient(180deg,#2a1140,#5a1f66 55%,#c0316f) padding-box, linear-gradient(120deg,#ff5db1,#7b5cff,#2ee6e6) border-box;
-  box-shadow:0 0 22px rgba(255,90,180,.24),0 20px 60px rgba(0,0,0,.6)}
+  background:linear-gradient(180deg, #2a1140 0 34%, #5a1f66 34% 70%, #c0316f 70% 100%) padding-box, repeating-linear-gradient(45deg, #ff5db1 0px 6px, #7b5cff 6px 12px, #2ee6e6 12px 18px) border-box;
+  box-shadow:inset 0 0 0 1px #ff86c4, 0 20px 60px rgba(0,0,0,.6)}
 .hk-frame-vaporwave .pc-name span,.hk-frame-vaporwave .pub-nm{color:#fff; text-shadow:0 2px 0 #ff5db1,0 0 12px rgba(120,90,255,.7)}
 /* r406 (Wolf: "can't see level text on synthwave"): the LVL / xp text ran pink-on-magenta —
    force high contrast so it reads over the neon gradient. */
@@ -832,35 +835,35 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 
 /* r408 (Wolf): make it read like a BLOOMBERG terminal — bright amber on near-black, not
    dim brown. Brighter text/muted + an animated amber conic edge. */
-.hk-frame-terminal.hk-frame-terminal{--text:#ffcf7a; --muted:#c99a3a; --line:#6a5218; --accent:#ffb52e; --accent-dim:#c9902a;
+.hk-frame-terminal.hk-frame-terminal{--hkrim:#ffe2a7; --text:#ffcf7a; --muted:#c99a3a; --line:#6a5218; --accent:#ffb52e; --accent-dim:#c9902a;
   border:2px solid transparent; color:#ffcf7a;
-  background:linear-gradient(#080604,#0a0906) padding-box, conic-gradient(from var(--hkang,120deg),#ffb52e,#7a5a12,#ffd98a,#8a6a1a,#ffb52e) border-box;
-  box-shadow:0 0 20px rgba(255,181,46,.2),0 20px 60px rgba(0,0,0,.65)}
+  background:linear-gradient(160deg, #080604 0 34%, #090805 34% 70%, #0a0906 70% 100%) padding-box, repeating-conic-gradient(from var(--hkang,120deg), #ffb52e 0deg 22.5deg, #7a5a12 22.5deg 45deg, #ffd98a 45deg 67.5deg, #8a6a1a 67.5deg 90deg) border-box;
+  box-shadow:inset 0 0 0 1px #ffe2a7, 0 20px 60px rgba(0,0,0,.65)}
 .hk-frame-terminal .pc-name span,.hk-frame-terminal .pub-nm{color:#ffc24a; text-shadow:0 0 10px rgba(255,181,46,.6)}
 
-.hk-frame-pro.hk-frame-pro{--text:#f6ecca; --muted:#b6a886; --line:#4a3f1e; --accent:#f0dfa8; --accent-dim:#a08a3a;
+.hk-frame-pro.hk-frame-pro{--hkrim:#f6ecc4; --text:#f6ecca; --muted:#b6a886; --line:#4a3f1e; --accent:#f0dfa8; --accent-dim:#a08a3a;
   border:2px solid transparent; color:#f6ecca;
-  background:radial-gradient(ellipse at 28% 6%,rgba(120,90,190,.38),transparent 55%),linear-gradient(#0a0a18,#111022) padding-box, conic-gradient(from var(--hkang,210deg),#f3e6b0,#8f7fff,#4fd0ff,#c98fff,#5fe0c0,#ffd98a,#6f8fff,#f3e6b0) border-box;   /* r408 var(--hkang) spins; r411 (Wolf): cooler COSMIC iridescence — gilt threaded through deep violet / cyan / aurora-green, not the old flat gold+mint */
-  box-shadow:0 0 22px rgba(217,194,122,.2),0 20px 60px rgba(0,0,0,.6)}
+  background:radial-gradient(ellipse at 28% 6%, rgba(120,90,190,.38) 0 30.3%, rgba(120,90,190,0.171) 30.3% 55%, transparent 55%),linear-gradient(160deg, #0a0a18 0 34%, #0e0d1d 34% 70%, #111022 70% 100%) padding-box, repeating-conic-gradient(from var(--hkang,210deg), #f3e6b0 0deg 22.5deg, #8f7fff 22.5deg 45deg, #4fd0ff 45deg 67.5deg, #c98fff 67.5deg 90deg, #5fe0c0 90deg 112.5deg, #5fe0c0 112.5deg 135deg, #ffd98a 135deg 157.5deg, #6f8fff 157.5deg 180deg) border-box;   /* r408 var(--hkang) spins; r411 (Wolf): cooler COSMIC iridescence — gilt threaded through deep violet / cyan / aurora-green, not the old flat gold+mint */
+  box-shadow:inset 0 0 0 1px #f6ecc4, 0 20px 60px rgba(0,0,0,.6)}
 .hk-frame-pro .pc-name span,.hk-frame-pro .pub-nm{color:#f6ecca; text-shadow:0 0 12px rgba(230,200,120,.45)}
 
-.hk-frame-noir.hk-frame-noir{--text:#f4f6fa; --muted:#5a5e66; --line:#2c2e33; --accent:#c8ccd2; --accent-dim:#6a6e78;
+.hk-frame-noir.hk-frame-noir{--hkrim:#caced6; --text:#f4f6fa; --muted:#5a5e66; --line:#2c2e33; --accent:#c8ccd2; --accent-dim:#6a6e78;
   border:2px solid transparent; color:#f4f6fa;
-  background:radial-gradient(ellipse at 60% 0%,rgba(255,255,255,.05),transparent 55%),linear-gradient(#050506,#050506) padding-box, conic-gradient(from var(--hkang,135deg),#b8bec8,#54585f,#2c2e33,#8a8f98,#b8bec8) border-box;
-  box-shadow:0 0 20px rgba(180,190,210,.08),0 20px 60px rgba(0,0,0,.7)}
+  background:radial-gradient(ellipse at 60% 0%, rgba(255,255,255,.05) 0 30.3%, rgba(255,255,255,0.023) 30.3% 55%, transparent 55%),linear-gradient(160deg, #050506 0 34%, #050506 34% 70%, #050506 70% 100%) padding-box, repeating-conic-gradient(from var(--hkang,135deg), #b8bec8 0deg 22.5deg, #54585f 22.5deg 45deg, #2c2e33 45deg 67.5deg, #8a8f98 67.5deg 90deg) border-box;
+  box-shadow:inset 0 0 0 1px #caced6, 0 20px 60px rgba(0,0,0,.7)}
 .hk-frame-noir .pc-name span,.hk-frame-noir .pub-nm{color:#f4f6fa; letter-spacing:3px; font-weight:700}
 
-.hk-frame-frostbite.hk-frame-frostbite{--text:#e6f6ff; --muted:#7fb0cf; --line:#2a5a7a; --accent:#bfe8ff; --accent-dim:#4a90c0;
+.hk-frame-frostbite.hk-frame-frostbite{--hkrim:#effaff; --text:#e6f6ff; --muted:#7fb0cf; --line:#2a5a7a; --accent:#bfe8ff; --accent-dim:#4a90c0;
   border:2px solid transparent; color:#e6f6ff;
-  background:radial-gradient(ellipse at 30% 0%,rgba(180,225,255,.22),transparent 55%),linear-gradient(160deg,#0f2c46,#0b1a2b 55%,#124055) padding-box, conic-gradient(from var(--hkang,120deg),#eaf8ff,#6fc0ec,#2a6a9a,#a8ecff,#eaf8ff) border-box;   /* r408 (Wolf): animated ICE conic border */
-  box-shadow:0 0 22px rgba(120,200,255,.18),0 20px 60px rgba(0,0,0,.6)}
+  background:radial-gradient(ellipse at 30% 0%, rgba(180,225,255,.22) 0 30.3%, rgba(180,225,255,0.099) 30.3% 55%, transparent 55%),linear-gradient(160deg, #0f2c46 0 34%, #0b1a2b 34% 70%, #124055 70% 100%) padding-box, repeating-conic-gradient(from var(--hkang,120deg), #eaf8ff 0deg 22.5deg, #6fc0ec 22.5deg 45deg, #2a6a9a 45deg 67.5deg, #a8ecff 67.5deg 90deg) border-box;   /* r408 (Wolf): animated ICE conic border */
+  box-shadow:inset 0 0 0 1px #effaff, 0 20px 60px rgba(0,0,0,.6)}
 .hk-frame-frostbite .hkf-crack{stroke:rgba(215,242,255,.55); stroke-width:1.1; filter:drop-shadow(0 0 3px rgba(160,220,255,.7))}
 .hk-frame-frostbite .pc-name span,.hk-frame-frostbite .pub-nm{color:#eefaff; text-shadow:0 0 14px rgba(150,215,255,.55)}
 
-.hk-frame-molten.hk-frame-molten{--text:#ffcfa8; --muted:#b47a54; --line:#5a2a18; --accent:#ffb56a; --accent-dim:#c0502f;
+.hk-frame-molten.hk-frame-molten{--hkrim:#ffdc83; --text:#ffcfa8; --muted:#b47a54; --line:#5a2a18; --accent:#ffb56a; --accent-dim:#c0502f;
   border:2px solid transparent; color:#ffcfa8;
-  background:radial-gradient(ellipse at 50% 122%,rgba(255,110,30,.5),transparent 55%),linear-gradient(160deg,#1c0a06,#250f08 55%,#0e0503) padding-box, conic-gradient(from var(--hkang,120deg),#ffd15a,#ff6a2a,#c0261a,#ffb52e,#ffd15a) border-box;
-  box-shadow:0 0 24px rgba(255,90,30,.22),0 20px 60px rgba(0,0,0,.62)}
+  background:radial-gradient(ellipse at 50% 122%, rgba(255,110,30,.5) 0 30.3%, rgba(255,110,30,0.225) 30.3% 55%, transparent 55%),linear-gradient(160deg, #1c0a06 0 34%, #250f08 34% 70%, #0e0503 70% 100%) padding-box, repeating-conic-gradient(from var(--hkang,120deg), #ffd15a 0deg 22.5deg, #ff6a2a 22.5deg 45deg, #c0261a 45deg 67.5deg, #ffb52e 67.5deg 90deg) border-box;
+  box-shadow:inset 0 0 0 1px #ffdc83, 0 20px 60px rgba(0,0,0,.62)}
 .hk-frame-molten .hkf-crack{stroke:#ff7a2a; stroke-width:1.5; filter:drop-shadow(0 0 4px rgba(255,120,40,.9))}
 .hk-frame-molten .pc-name span,.hk-frame-molten .pub-nm{color:#ffcea0; text-shadow:0 0 14px rgba(255,120,40,.6)}
 
@@ -870,62 +873,99 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 /* r413 (Wolf): PLATINUM ELITE founder — the rainbow now rides a LIGHT brushed-silver bg (was the
    dark space theme), more vibrant, with DARK text so the stats read on the bright metal. The 5px
    rainbow prism border stays. */
-.hk-frame-founder.hk-frame-founder{--text:#eef0fa; --muted:#a9b0cb; --line:rgba(255,255,255,.15); --accent:#c9b8ff; --accent-dim:#9a8fd6;
+.hk-frame-founder.hk-frame-founder{--hkrim:#69e8ff; --text:#eef0fa; --muted:#a9b0cb; --line:rgba(255,255,255,.15); --accent:#c9b8ff; --accent-dim:#9a8fd6;
   border:5px solid transparent; color:#eef0fa;
   /* r416 (Wolf): DARK oil-slick base — a near-black iridescent gradient so the moving rainbow sheen
      (platinum fx, additive glow) reads like oil on wet asphalt; light text stays legible on it. */
-  background:linear-gradient(122deg,#161226,#0d0c17 26%,#0a1016 52%,#12101f 74%,#0e0b18) padding-box, conic-gradient(from var(--hkang,0deg),#ff2f6e,#ff7a2f,#ffd23b,#5bff8f,#37e0ff,#5b7bff,#b45bff,#ff45c2,#ff2f6e) border-box;
-  box-shadow:0 0 34px rgba(150,120,230,.42),0 22px 60px rgba(0,0,0,.55)}
+  background:linear-gradient(122deg, #161226 0 34%, #0a1016 34% 70%, #0e0b18 70% 100%) padding-box, repeating-conic-gradient(from var(--hkang,0deg), #ff2f6e 0deg 22.5deg, #ff7a2f 22.5deg 45deg, #ffd23b 45deg 67.5deg, #5bff8f 67.5deg 90deg, #37e0ff 90deg 112.5deg, #5b7bff 112.5deg 135deg, #b45bff 135deg 157.5deg, #ff45c2 157.5deg 180deg) border-box;
+  box-shadow:inset 0 0 0 1px #69e8ff, 0 22px 60px rgba(0,0,0,.55)}
 .hk-frame-founder .hkf-glint-sheen{position:absolute; inset:0; z-index:1; overflow:hidden; pointer-events:none; border-radius:inherit}
 .hk-frame-founder .pc-name span,.hk-frame-founder .pub-nm{color:#f2f1fb; text-shadow:0 1px 3px rgba(0,0,0,.55)}
 
 /* r390 (Wolf) new title skins — dark tinted interiors + themed borders so light text
    reads on every one; the canvas (petals/bokeh/pearl/galaxy) carries the motion. */
-.hk-frame-amethyst.hk-frame-amethyst{--text:#efe0ff; --muted:#b79ad8; --line:#3a2358; --accent:#c49bff; --accent-dim:#7a4fd0;
+.hk-frame-amethyst.hk-frame-amethyst{--hkrim:#dcbeff; --text:#efe0ff; --muted:#b79ad8; --line:#3a2358; --accent:#c49bff; --accent-dim:#7a4fd0;
   border:2px solid transparent; color:#efe0ff;
-  background:radial-gradient(ellipse at 50% 0%,rgba(160,108,255,.28),transparent 60%),linear-gradient(160deg,#180a2a,#0f0620) padding-box, linear-gradient(120deg,#d0a8ff,#a06cff 55%,#6a3fb0) border-box;
-  box-shadow:0 0 24px rgba(150,90,255,.22),0 20px 60px rgba(0,0,0,.6)}
-.hk-frame-onyx.hk-frame-onyx{--text:#efe6d2; --muted:#9a8a5e; --line:#3a2f16; --accent:#d8b25a; --accent-dim:#8a6d2f;
+  background:radial-gradient(ellipse at 50% 0%, rgba(160,108,255,.28) 0 33%, rgba(160,108,255,0.126) 33% 60%, transparent 60%),linear-gradient(160deg, #180a2a 0 34%, #140825 34% 70%, #0f0620 70% 100%) padding-box, repeating-linear-gradient(45deg, #d0a8ff 0px 6px, #a06cff 6px 12px, #6a3fb0 12px 18px) border-box;
+  box-shadow:inset 0 0 0 1px #dcbeff, 0 20px 60px rgba(0,0,0,.6)}
+.hk-frame-onyx.hk-frame-onyx{--hkrim:#eed697; --text:#efe6d2; --muted:#9a8a5e; --line:#3a2f16; --accent:#d8b25a; --accent-dim:#8a6d2f;
   border:2px solid transparent; color:#efe6d2;
-  background:linear-gradient(160deg,#0c0c0e,#060607) padding-box, conic-gradient(from var(--hkang,120deg),#e8c874,#8a6d2f,#4a3a18,#d8b25a,#e8c874) border-box;
-  box-shadow:0 0 20px rgba(200,160,80,.14),0 20px 60px rgba(0,0,0,.66)}
-.hk-frame-sakura.hk-frame-sakura{--text:#ffe0ec; --muted:#d79ab0; --line:#5a2a3c; --accent:#ff8fb8; --accent-dim:#d05a86;
+  background:linear-gradient(160deg, #0c0c0e 0 34%, #09090a 34% 70%, #060607 70% 100%) padding-box, repeating-conic-gradient(from var(--hkang,120deg), #e8c874 0deg 22.5deg, #8a6d2f 22.5deg 45deg, #4a3a18 45deg 67.5deg, #d8b25a 67.5deg 90deg) border-box;
+  box-shadow:inset 0 0 0 1px #eed697, 0 20px 60px rgba(0,0,0,.66)}
+.hk-frame-sakura.hk-frame-sakura{--hkrim:#ffd1e5; --text:#ffe0ec; --muted:#d79ab0; --line:#5a2a3c; --accent:#ff8fb8; --accent-dim:#d05a86;
   border:2px solid transparent; color:#ffe0ec;
-  background:radial-gradient(ellipse at 30% 0%,rgba(255,150,196,.26),transparent 58%),linear-gradient(160deg,#2a0f1a,#1c0a12) padding-box, linear-gradient(120deg,#ffc2dc,#ff8fb8 55%,#c95a86) border-box;
-  box-shadow:0 0 22px rgba(255,140,190,.2),0 20px 60px rgba(0,0,0,.58)}
-.hk-frame-goldenhour.hk-frame-goldenhour{--text:#ffe8d0; --muted:#d3a883; --line:#5a3320; --accent:#ffb488; --accent-dim:#d07a4a;
+  background:radial-gradient(ellipse at 30% 0%, rgba(255,150,196,.26) 0 31.9%, rgba(255,150,196,0.117) 31.9% 58%, transparent 58%),linear-gradient(160deg, #2a0f1a 0 34%, #230c16 34% 70%, #1c0a12 70% 100%) padding-box, repeating-linear-gradient(45deg, #ffc2dc 0px 6px, #ff8fb8 6px 12px, #c95a86 12px 18px) border-box;
+  box-shadow:inset 0 0 0 1px #ffd1e5, 0 20px 60px rgba(0,0,0,.58)}
+.hk-frame-goldenhour.hk-frame-goldenhour{--hkrim:#ffe2b8; --text:#ffe8d0; --muted:#d3a883; --line:#5a3320; --accent:#ffb488; --accent-dim:#d07a4a;
   border:2px solid transparent; color:#ffe8d0;
-  background:radial-gradient(ellipse at 50% 118%,rgba(255,160,110,.34),transparent 55%),linear-gradient(160deg,#2a1408,#1c0d06) padding-box, linear-gradient(120deg,#ffd9a0,#ff9e7a 55%,#c85a3a) border-box;
-  box-shadow:0 0 22px rgba(255,150,90,.2),0 20px 60px rgba(0,0,0,.58)}
-.hk-frame-pearl.hk-frame-pearl{--text:#f0ecff; --muted:#aeb0cc; --line:#3c3a52; --accent:#e6d9ff; --accent-dim:#9a94c8;
+  background:radial-gradient(ellipse at 50% 118%, rgba(255,160,110,.34) 0 30.3%, rgba(255,160,110,0.153) 30.3% 55%, transparent 55%),linear-gradient(160deg, #2a1408 0 34%, #231007 34% 70%, #1c0d06 70% 100%) padding-box, repeating-linear-gradient(45deg, #ffd9a0 0px 6px, #ff9e7a 6px 12px, #c85a3a 12px 18px) border-box;
+  box-shadow:inset 0 0 0 1px #ffe2b8, 0 20px 60px rgba(0,0,0,.58)}
+.hk-frame-pearl.hk-frame-pearl{--hkrim:#fff4fa; --text:#f0ecff; --muted:#aeb0cc; --line:#3c3a52; --accent:#e6d9ff; --accent-dim:#9a94c8;
   border:2px solid transparent; color:#f0ecff;
-  background:radial-gradient(ellipse at 30% 0%,rgba(210,220,255,.2),transparent 60%),linear-gradient(160deg,#20202c,#161620) padding-box, linear-gradient(120deg,#f0e6ff,#cfe6ff 45%,#e6d0ff 75%,#fff0f8) border-box;
-  box-shadow:0 0 22px rgba(200,200,255,.18),0 20px 60px rgba(0,0,0,.56)}
-.hk-frame-bloom.hk-frame-bloom{--text:#eaf6e4; --muted:#a8c49a; --line:#2e4426; --accent:#dcb0e0; --accent-dim:#8aab6a;
+  background:radial-gradient(ellipse at 30% 0%, rgba(210,220,255,.2) 0 33%, rgba(210,220,255,0.09) 33% 60%, transparent 60%),linear-gradient(160deg, #20202c 0 34%, #1b1b26 34% 70%, #161620 70% 100%) padding-box, repeating-linear-gradient(45deg, #f0e6ff 0px 6px, #cfe6ff 6px 12px, #e6d0ff 12px 18px, #fff0f8 18px 24px) border-box;
+  box-shadow:inset 0 0 0 1px #fff4fa, 0 20px 60px rgba(0,0,0,.56)}
+.hk-frame-bloom.hk-frame-bloom{--hkrim:#f8d6e8; --text:#eaf6e4; --muted:#a8c49a; --line:#2e4426; --accent:#dcb0e0; --accent-dim:#8aab6a;
   border:2px solid transparent; color:#eaf6e4;
-  background:radial-gradient(ellipse at 70% 0%,rgba(246,200,224,.2),transparent 60%),linear-gradient(160deg,#162014,#0f180d) padding-box, linear-gradient(120deg,#c8f0b0,#f6c8e0 60%,#b088c0) border-box;
-  box-shadow:0 0 20px rgba(180,220,150,.16),0 20px 60px rgba(0,0,0,.56)}
-.hk-frame-cottoncandy.hk-frame-cottoncandy{--text:#ffe6f4; --muted:#c9a6d0; --line:#3a2a58; --accent:#ffc2e8; --accent-dim:#8fb8e0;
+  background:radial-gradient(ellipse at 70% 0%, rgba(246,200,224,.2) 0 33%, rgba(246,200,224,0.09) 33% 60%, transparent 60%),linear-gradient(160deg, #162014 0 34%, #121c10 34% 70%, #0f180d 70% 100%) padding-box, repeating-linear-gradient(45deg, #c8f0b0 0px 6px, #f6c8e0 6px 12px, #b088c0 12px 18px) border-box;
+  box-shadow:inset 0 0 0 1px #f8d6e8, 0 20px 60px rgba(0,0,0,.56)}
+.hk-frame-cottoncandy.hk-frame-cottoncandy{--hkrim:#ffd1ee; --text:#ffe6f4; --muted:#c9a6d0; --line:#3a2a58; --accent:#ffc2e8; --accent-dim:#8fb8e0;
   border:2px solid transparent; color:#ffe6f4;
-  background:radial-gradient(ellipse at 30% 0%,rgba(255,194,232,.22),transparent 60%),linear-gradient(160deg,#1e1430,#140d22) padding-box, linear-gradient(120deg,#ffc2e8,#b5d8ff 70%,#c8b0ff) border-box;
-  box-shadow:0 0 22px rgba(220,180,255,.18),0 20px 60px rgba(0,0,0,.56)}
+  background:radial-gradient(ellipse at 30% 0%, rgba(255,194,232,.22) 0 33%, rgba(255,194,232,0.099) 33% 60%, transparent 60%),linear-gradient(160deg, #1e1430 0 34%, #191029 34% 70%, #140d22 70% 100%) padding-box, repeating-linear-gradient(45deg, #ffc2e8 0px 6px, #b5d8ff 6px 12px, #c8b0ff 12px 18px) border-box;
+  box-shadow:inset 0 0 0 1px #ffd1ee, 0 20px 60px rgba(0,0,0,.56)}
 /* r391 chapter/cert capstone skins */
-.hk-frame-architect.hk-frame-architect{--text:#e8edf6; --muted:#8fa4c2; --line:#1c3050; --accent:#e0b45a; --accent-dim:#9a7a34;
+.hk-frame-architect.hk-frame-architect{--hkrim:#ecd692; --text:#e8edf6; --muted:#8fa4c2; --line:#1c3050; --accent:#e0b45a; --accent-dim:#9a7a34;
   border:2px solid transparent; color:#e8edf6;
-  background:radial-gradient(ellipse at 50% 0%,rgba(90,130,190,.2),transparent 60%),linear-gradient(160deg,#0c1728,#07101d) padding-box, conic-gradient(from var(--hkang,120deg),#e6c86e,#b8892f,#6a5220,#3a5a8a,#e6c86e) border-box;
-  box-shadow:0 0 22px rgba(200,160,80,.16),0 20px 60px rgba(0,0,0,.64)}
-.hk-frame-boutique.hk-frame-boutique{--text:#f2ecd8; --muted:#a89772; --line:#33301f; --accent:#d8b25a; --accent-dim:#8a6d2f;
+  background:radial-gradient(ellipse at 50% 0%, rgba(90,130,190,.2) 0 33%, rgba(90,130,190,0.09) 33% 60%, transparent 60%),linear-gradient(160deg, #0c1728 0 34%, #0a1422 34% 70%, #07101d 70% 100%) padding-box, repeating-conic-gradient(from var(--hkang,120deg), #e6c86e 0deg 22.5deg, #b8892f 22.5deg 45deg, #6a5220 45deg 67.5deg, #3a5a8a 67.5deg 90deg) border-box;
+  box-shadow:inset 0 0 0 1px #ecd692, 0 20px 60px rgba(0,0,0,.64)}
+.hk-frame-boutique.hk-frame-boutique{--hkrim:#f4e6b3; --text:#f2ecd8; --muted:#a89772; --line:#33301f; --accent:#d8b25a; --accent-dim:#8a6d2f;
   border:2px solid transparent; color:#f2ecd8;
-  background:linear-gradient(160deg,#0d0d12,#07070a) padding-box, conic-gradient(from var(--hkang,120deg),#f0dd9a,#8a6d2f,#4a3a18,#e8cf88,#f0dd9a) border-box;
-  box-shadow:0 0 20px rgba(210,170,90,.15),0 20px 60px rgba(0,0,0,.68)}
-.hk-frame-emerald.hk-frame-emerald{--text:#d8f7e6; --muted:#7fc0a0; --line:#124030; --accent:#4fd89a; --accent-dim:#2f8f66;
+  background:linear-gradient(160deg, #0d0d12 0 34%, #0a0a0e 34% 70%, #07070a 70% 100%) padding-box, repeating-conic-gradient(from var(--hkang,120deg), #f0dd9a 0deg 22.5deg, #8a6d2f 22.5deg 45deg, #4a3a18 45deg 67.5deg, #e8cf88 67.5deg 90deg) border-box;
+  box-shadow:inset 0 0 0 1px #f4e6b3, 0 20px 60px rgba(0,0,0,.68)}
+.hk-frame-emerald.hk-frame-emerald{--hkrim:#87e8bc; --text:#d8f7e6; --muted:#7fc0a0; --line:#124030; --accent:#4fd89a; --accent-dim:#2f8f66;
   border:2px solid transparent; color:#d8f7e6;
-  background:radial-gradient(ellipse at 40% 0%,rgba(80,220,150,.22),transparent 60%),linear-gradient(160deg,#08281d,#041710) padding-box, linear-gradient(120deg,#5fe0a6,#2f8f66 55%,#1a5a40) border-box;
-  box-shadow:0 0 22px rgba(70,210,150,.2),0 20px 60px rgba(0,0,0,.58)}
+  background:radial-gradient(ellipse at 40% 0%, rgba(80,220,150,.22) 0 33%, rgba(80,220,150,0.099) 33% 60%, transparent 60%),linear-gradient(160deg, #08281d 0 34%, #062016 34% 70%, #041710 70% 100%) padding-box, repeating-linear-gradient(45deg, #5fe0a6 0px 6px, #2f8f66 6px 12px, #1a5a40 12px 18px) border-box;
+  box-shadow:inset 0 0 0 1px #87e8bc, 0 20px 60px rgba(0,0,0,.58)}
+
+/* ============================================================
+   r452 · CARD-FRAME PIXEL PASS — the shared rule set
+   (dev/FRAME_PIXEL_PASS.md R1 · R4 · R6 · R10; Wolf 2026-09-03: "implement fully
+   across the board"). Each skin's own border/interior/glow was converted in place
+   above; this block carries the parts every skin shares.
+
+   BONE IS EXCLUDED BY NAME throughout — it is the still card and the joke depends
+   on it (the spec's one "no change" row). .hk-frame-none is not a skin.
+
+   ON THE 45-DEGREE STAIR CORNER: the prototype cut it with a clip-path on the card,
+   and found the migration constraint this pass inherits — the clip eats the notch,
+   which rides OUTSIDE the card box at top:-15px. The prototype's fix (a) is to move
+   the notch onto the host, but the host is .pc-card / .panel.me, rendered by lb.js
+   and nav.js, outside this change's lane. So the silhouette here is square corners
+   (border-radius:0) WITHOUT the stair: the notch taxonomy at :735-756 survives
+   untouched, and the stair stays available to a later pass that can move the notch.
+   ============================================================ */
+[class*="hk-frame-"]:not(.hk-frame-bone):not(.hk-frame-none){ border-radius:0 }
+/* R6 · the fx buffer is authored in pixel cells and upscaled hard — never smoothed */
+[class*="hk-frame-"]:not(.hk-frame-bone) .hk-fx{
+  border-radius:0; image-rendering:pixelated; image-rendering:crisp-edges }
+/* R1 · every inner chip squares off with the card */
+[class*="hk-frame-"]:not(.hk-frame-bone) .uc-crest,
+[class*="hk-frame-"]:not(.hk-frame-bone) .uc-lvl,
+[class*="hk-frame-"]:not(.hk-frame-bone) .uc-titlechip span,
+[class*="hk-frame-"]:not(.hk-frame-bone) .uc-meds i,
+[class*="hk-frame-"]:not(.hk-frame-bone) .uc-bar{ border-radius:0 }
+/* R10 · the notch keeps its TAXONOMY (angular vs rounded, :735-756 — untouched); only the
+   shapes inside it go hard. The rounded family loses its 99px pill; both families trade the
+   blurred drop shadow for a hard 2px offset. */
+[class*="hk-frame-"]:not(.hk-frame-bone) .hkf-tab{
+  border-radius:0; box-shadow:2px 2px 0 rgba(0,0,0,.55) }
+/* R10 · card names move to the mono stack, except the skins that own a display face
+   (Cinzel on the plaques/heraldic/pro, VT323 on crt/terminal, Orbitron on the neon three) */
+[class*="hk-frame-"]:not(.hk-frame-bone) .uc-nm{
+  font-family:var(--mono,ui-monospace,monospace); letter-spacing:1px }
 
 /* keyframes — canvas carries the heavy motion; CSS handles the founder sheen only */
 @media (prefers-reduced-motion: no-preference){
-  .hk-frame-molten .hkf-crack path{animation:hkfCrackPulse 2.4s ease-in-out infinite}
+  .hk-frame-molten .hkf-crack path{animation:hkfCrackPulse 2.4s steps(4) infinite}
 }
 @keyframes hkfCrackPulse{0%,100%{opacity:.55}50%{opacity:1}}
 
@@ -947,7 +987,7 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   .hk-frame-molten.hk-frame-molten,
   .hk-frame-boutique.hk-frame-boutique, .hk-frame-architect.hk-frame-architect,
   .hk-frame-frostbite.hk-frame-frostbite, .hk-frame-terminal.hk-frame-terminal,
-  .hk-frame-pro.hk-frame-pro, .hk-frame-noir.hk-frame-noir{ animation:hkBorderSpin 16s linear infinite }
+  .hk-frame-pro.hk-frame-pro, .hk-frame-noir.hk-frame-noir{ animation:hkBorderSpin 16s steps(16) infinite }
   /* r408 (Wolf): ONYX stays STILL — a spinning border fights the "black + stable" onyx vibe.
      Its border holds; only the faint marble veins drift. */
   .hk-frame-founder.hk-frame-founder{ animation-duration:8s }    /* pinnacle — prominent */
