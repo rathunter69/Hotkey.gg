@@ -43,6 +43,35 @@ A1, B1–B6 and C3, which it absorbs._
 | **P7** | **Certificates = tracks of chapters, unchanged in shape**; `HK_TRACKS` re-derives from the new groups and `migrate-certificates`/the RPC arrays move in the same PR (C15 guards it). | keeps the cert product; the invariant already exists |
 | **P8** | **Frozen:** drill keys, achievement ids, HK_RANK.TIERS order, HK_PLACEMENT keys, localStorage keys. Renamed/moved: group names, chapter ids may be re-cut (a claim-flag migration maps old `hk_camp_xp` ids to new — one-time, client-side). | earned things persist |
 
+## 1a · AMENDMENT (Wolf, 2026-09-03 evening — after the first Phase A map) — supersedes P3/P4 where they conflict
+
+Wolf on the nine-chapter map: "I don't love that layout — the idea is less about lessons and
+execution drills and more about MERGING the two into a gamified format. The original chapter layout
+was actually pretty good; expand Foundations to cover the ribbon and other stuff (an extended long
+set of tutorials) and then sections based on Excel functionalities. The first chapter is very
+gamified — like the pac-man-style course for movement — with similar mechanics that make each drill
+in the first set a GAME as you learn each foundational concept: a game tutorial before the speed
+drills that are more like actual spreadsheets and business tasks."
+
+Binding changes:
+- **P3 (re-cut) is withdrawn.** The eight chapters stay (Foundations · Formatting · Formulas I ·
+  Data & Lookups · Formulas II · Models I · Models II · Full Builds), with their ids c1–c8 and their
+  capstone designations. No claim-flag migration.
+- **P4 becomes: Foundations = THE GAME TUTORIAL.** ~12 mini-game drills, one foundational concept
+  each (move · select · enter/edit · copy/cut/paste · fill · first formulas · anchors · number
+  formats · fonts & colours · alignment & borders · the ribbon · structure ops), each built on a
+  game mechanic the way the movement corridor is (pips, captures, lives, a visible bonus), before
+  the speed drills that look like real spreadsheets. No lesson drills at the head of later chapters;
+  later chapters are re-ordered within themselves only.
+- **P1 (one spine) and P2 (two real tiers) stand.** PRO = the four chapters HOTKEY_PREMIUM names
+  today; earn-in levels per PRO chapter.
+- **Art (new, P9): every native asset goes pixel** — rank emblems, achievement medals, level chip,
+  medal clocks, ☆, streak/crown/placement glyphs, badges, favicon/OG — in a detailed pixel style
+  (Shattered Pixel Dungeon / Undertale register, "voxel-ish with some detail"), replacing the
+  heraldic League-style theme entirely. Plan: dev/ASSET_INVENTORY.md + ART_DIRECTION §7.
+
+Phase A v2 (the revised map) replaces the first map on PR #249.
+
 ## 2 · The phases (each = one PR, gate green, Wolf playtest between)
 
 ### Phase A — the curriculum map (spec, one session, Wolf review)
