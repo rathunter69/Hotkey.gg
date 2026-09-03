@@ -8,9 +8,14 @@
        light themes — Excel parity: white-on-white is invisible there too)
      - blue-fill text vs the blue fill          (>= 3.0)
      - selection outline vs bg                  (>= 2.0)
-   Run: node dev/e2e-audit-visual.js   (server on 127.0.0.1:8791) */
+   Run: node dev/e2e-audit-visual.js   (server on 127.0.0.1:8791)
+        URL=http://127.0.0.1:8830/index.html node dev/e2e-audit-visual.js */
 'use strict';
 const { chromium } = require('playwright-core');
+/* r452: URL override — the r438 e2e-audit-onboard pattern. This harness was still hard-coding
+   8791, so a gate run from a worktree measured whatever ANOTHER checkout was serving there.
+   Named HK_URL rather than URL so it cannot shadow Node's global URL class. */
+const HK_URL = process.env.URL || 'http://127.0.0.1:8791/index.html';
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 let pass = 0, fail = 0;
 const ok = (c, n, x) => { if (c) { pass++; } else { fail++; console.log('  FAIL ' + n + (x ? ' — ' + x : '')); } };
@@ -44,7 +49,7 @@ function contrast(fgS, bgS) {
     localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1'); localStorage.setItem('hk_beta_ok', '1');
     localStorage.setItem('hk_xlv', '2');
   } catch (e) {} });
-  await page.goto('http://127.0.0.1:8791/index.html', { waitUntil: 'load' });
+  await page.goto(HK_URL, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof applyTheme === 'function');
   await page.evaluate(() => { try { _pro = true; } catch (e) {} });
 

@@ -1865,22 +1865,30 @@
     /* nav.css loads after this block — .show doubles specificity so 500 beats its 62 */
     .profile-modal.show{z-index:500}
   }
-  .landing{position:fixed; inset:0; z-index:120; display:flex; align-items:center; justify-content:center;
-    background:rgba(11,12,13,.66); backdrop-filter:blur(5px); padding:28px; overflow-y:auto;
+  /* ============================================================================
+     LANDING V2 (r452) — the shell.
+     r65 doctrine kept: this is still a DIALOG over the live trainer (fixed, fades
+     out via .gone, Enter hands off to the grid with no navigation). What changed
+     is its SIZE — it is now a full-bleed scrollable surface, so the page that
+     answers "why should I" sits under the screen that answers "what is this".
+     Every colour is a theme token; the page is designed against Daylight (the
+     unconditional default a fresh device lands on, themes.js r293) and verified
+     on the dark palettes. Landing-only rules are prefixed .l- so nothing in the
+     trainer's stylesheet can bleed in or out.
+     ============================================================================ */
+  .landing{position:fixed; inset:0; z-index:120; display:flex; align-items:flex-start; justify-content:center;
+    background:rgba(20,21,26,.55); backdrop-filter:blur(4px); padding:0; overflow-y:auto; overflow-x:hidden;
     transition:opacity .55s ease, visibility .55s}
   .landing.gone{opacity:0; visibility:hidden; pointer-events:none}
-  /* r65: the landing is a DIALOG over the game now — frame language, not a splash page */
-  .landing{background:rgba(20,21,26,.55); backdrop-filter:blur(4px)}
-  .landing .landing-inner{background:var(--surface); border:1px solid var(--line); border-radius:12px;
-    max-width:600px; width:100%; padding:0 0 26px; text-align:left; overflow:hidden}
-  .landing .lbrand{min-height:34px; display:flex; align-items:center; padding:6px 16px; margin:0 0 18px;
-    background:var(--surface2); border-bottom:1px solid var(--line);
-    font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
-  .landing .lbrand b{color:var(--accent)}
-  .landing .eyebrow, .landing h1, .landing .lede, .landing .landing-cta, .landing #landingMicro{
-    margin-left:26px; margin-right:26px}
-  .landing h1{font-size:23px}
-  .landing .lede{font-size:14px}
+  .landing .landing-inner{position:relative; background:var(--bg); border:0; border-radius:0;
+    max-width:none; width:100%; min-height:100%; padding:0; text-align:left; overflow:hidden}
+  /* faint spreadsheet atmosphere behind the hero — gridlines from the live theme */
+  .landing .landing-inner::before{content:""; position:absolute; inset:0 0 auto 0; height:760px; z-index:0;
+    pointer-events:none;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:42px 30px; opacity:.22;
+    mask-image:radial-gradient(ellipse 95% 62% at 50% 0%,#000 0%,transparent 76%);
+    -webkit-mask-image:radial-gradient(ellipse 95% 62% at 50% 0%,#000 0%,transparent 76%)}
   /* r101: returning-user welcome-back DIALOG — frame language (cap strip + card) over the blurred game */
   .wb-dlg{position:fixed; inset:0; z-index:130; display:flex; align-items:center; justify-content:center;
     background:rgba(20,21,26,.45); backdrop-filter:blur(3px); opacity:0; pointer-events:none; transition:opacity .25s}
@@ -1905,39 +1913,246 @@
     color:var(--muted)}   /* r101: returning-user strip — mg-cap language, accent-tinted */
   #wbStrip b{color:var(--accent); text-transform:none; letter-spacing:0}
   html.hk-returning .landing{display:none}    /* returning user (onboarded): skip the marketing landing */
-  .landing-inner{max-width:600px; width:100%}
-  .landing .lbrand{font-family:var(--mono); font-weight:700; font-size:17px; letter-spacing:-.5px; margin-bottom:34px}
+  /* ---------------------------------------------------------------- landing v2 · layout */
+  .landing .l-wrap{position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:0 26px}
+  .landing .l-top{position:relative; z-index:2; border-bottom:1px solid var(--line); background:var(--bg)}
+  .landing .l-top-in{display:flex; align-items:center; justify-content:space-between; gap:16px; height:56px}
+  .landing .l-top-left{display:flex; align-items:center; gap:10px; min-width:0}
+  .landing .lbrand{font-family:var(--mono); font-weight:700; font-size:17px; letter-spacing:-.5px;
+    color:var(--text); margin:0; padding:0; background:none; border:0; min-height:0;
+    text-transform:none; display:block}
   .landing .lbrand b{color:var(--accent)}
-  .landing .eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.8px; color:var(--accent); margin-bottom:16px}
-  .landing h1{font-family:var(--sans); font-size:clamp(42px,7.5vw,70px); font-weight:800; letter-spacing:-2.2px; line-height:.98; margin-bottom:20px}
-  .landing h1 .dim{color:var(--muted)}
-  .landing .lede{font-size:17px; color:var(--muted); line-height:1.55; max-width:52ch; margin-bottom:30px}
+  /* r101 welcome-back strip, re-fitted for the top rail it now lands in (greetReturning
+     inserts it directly after .lbrand — do not move .lbrand out of .l-top-left) */
+  .landing #wbStrip{margin:0; padding:4px 10px; font-size:10.5px; white-space:nowrap}
+  .landing .l-top-right{display:flex; align-items:center; gap:20px;
+    font-family:var(--mono); font-size:12.5px; color:var(--muted)}
+  .landing .l-linkbtn{font-family:var(--mono); font-size:12.5px; color:var(--muted); background:none;
+    border:0; padding:0; cursor:pointer; transition:.15s}
+  .landing .l-linkbtn:hover{color:var(--text)}
+  .landing .l-linkbtn:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:3px}
+
+  /* ---------------------------------------------------------------- landing v2 · hero */
+  .landing .l-hero{position:relative; z-index:1; padding:58px 0 56px}
+  .landing .l-glow{position:absolute; top:-150px; left:50%; transform:translateX(-50%);
+    width:min(900px,120vw); height:520px; pointer-events:none;
+    background:radial-gradient(ellipse at center,var(--accent-glow),transparent 66%)}
+  .landing .l-hero-grid{display:grid; grid-template-columns:1.14fr .86fr; gap:46px; align-items:center}
+  .landing .eyebrow{font-family:var(--mono); font-size:11.5px; letter-spacing:1.7px; text-transform:uppercase;
+    color:var(--accent); margin:0 0 20px}
+  .landing h1{font-family:var(--sans); font-size:clamp(32px,3.6vw,46px); line-height:1.05; font-weight:800;
+    letter-spacing:-1.5px; margin:0 0 18px; max-width:17ch}
+  .landing h1 .dim{color:var(--muted); font-weight:700}
+  .landing .lede{font-size:17px; color:var(--muted); line-height:1.56; max-width:50ch; margin:0 0 26px}
   .landing .lede b{color:var(--text); font-weight:600}
   .landing-cta{display:flex; gap:14px; align-items:center; flex-wrap:wrap}
   .start-btn{font-family:var(--mono); font-size:15px; font-weight:700; color:var(--on-accent); background:var(--accent);
-    border:none; border-radius:10px; padding:14px 26px; cursor:pointer; transition:.16s; display:inline-flex; align-items:center; gap:10px}
+    border:none; border-radius:10px; padding:14px 24px; cursor:pointer; transition:.16s;
+    display:inline-flex; align-items:center; gap:9px}
   .start-btn:hover{filter:brightness(1.08); box-shadow:0 10px 34px var(--accent-glow); transform:translateY(-1px)}
+  .start-btn:focus-visible{outline:2px solid var(--text); outline-offset:3px}
   .start-btn .kbd-cta{font-family:var(--mono); font-size:13px; font-weight:600; color:var(--on-accent);
-    background:rgba(6,18,12,.18); border:1px solid rgba(6,18,12,.3); border-radius:5px; padding:2px 7px; line-height:1}
-  .micro-hint{display:block; margin-top:6px; color:var(--faint); font-size:11.5px}
-  .micro-hint kbd{font-family:var(--mono); color:var(--muted); background:var(--surface2);
-    border:1px solid var(--line); border-radius:4px; padding:1px 6px; margin:0 1px}
-  .landing .modes{display:flex; gap:7px; align-items:center}
-  .mode-chip{font-family:var(--mono); font-size:12px; color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:8px 14px}
+    background:rgba(0,0,0,.17); border:1px solid rgba(0,0,0,.26); border-radius:5px; padding:2px 7px; line-height:1.3}
+  html[data-dark="0"] .start-btn .kbd-cta{background:rgba(255,255,255,.22); border-color:rgba(255,255,255,.36)}
+  .landing .l-quiet{font-family:var(--mono); font-size:13px; color:var(--muted); background:transparent;
+    border:1px solid var(--line); border-radius:10px; padding:13px 18px; cursor:pointer; transition:.16s}
+  .landing .l-quiet:hover{color:var(--text); border-color:var(--faint)}
+  .landing .l-quiet:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .landing .modes{display:flex; gap:7px; align-items:center; margin-top:18px}
+  .mode-chip{font-family:var(--mono); font-size:11.5px; color:var(--muted); border:1px solid var(--line);
+    border-radius:999px; padding:6px 13px}
   .mode-chip.soon{opacity:.45}
   .mode-chip.pick{cursor:pointer; color:var(--text); border-color:var(--accent-dim); transition:.15s}
   .mode-chip.pick:hover{color:var(--accent); border-color:var(--accent); background:var(--accent-glow)}
   .mode-chip.selected{color:var(--on-accent); background:var(--accent); border-color:var(--accent); font-weight:700}
   .mode-chip.selected:hover{color:var(--on-accent); background:var(--accent); border-color:var(--accent)}
+  .landing .micro{font-family:var(--mono); font-size:11.5px; color:var(--muted); line-height:1.8;
+    margin-top:20px; max-width:60ch}
+  .landing .micro b{color:var(--text); font-weight:500}
+  .micro-hint{display:block; margin-top:6px; color:var(--faint); font-size:11.5px}
+  .micro-hint kbd{font-family:var(--mono); color:var(--muted); background:var(--surface2);
+    border:1px solid var(--line); border-radius:4px; padding:1px 6px; margin:0 1px}
+
+  /* ------------------------------------------- landing v2 · the hero still (see AUDIT r452)
+     A hand-built, theme-tokened mini-sheet, NOT the engine. playDemo() drives the real #grid,
+     which lives UNDER this dialog — running it here would mean un-blurring the backdrop or
+     mounting a second engine instance (BETA_RETIRE_LANDING §4b). Static costs nothing at
+     first paint, renders identically with sb null, and is screenshot-stable for the gate. */
+  .landing .l-demo{background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden;
+    box-shadow:0 30px 68px -32px rgba(0,0,0,.42)}
+  .landing .l-demo-cap{display:flex; align-items:center; gap:8px; height:34px; padding:0 14px;
+    background:var(--surface2); border-bottom:1px solid var(--line); font-family:var(--mono);
+    font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+  .landing .l-demo-cap .l-dot{width:8px; height:8px; border-radius:50%; background:var(--line); flex:none}
+  .landing .l-demo-cap .l-clock{margin-left:auto; color:var(--accent); letter-spacing:.08em}
+  .landing .l-demo-task{font-family:var(--mono); font-size:11.5px; color:var(--muted); line-height:1.5;
+    padding:12px 14px 10px}
+  .landing .l-demo-task b{color:var(--text)}
+  .landing .l-sheet{margin:0 14px; border:1px solid var(--line); border-radius:6px; overflow-x:auto; background:var(--bg)}
+  .landing .l-sheet table{width:100%; border-collapse:collapse; font-family:var(--cellfont); font-size:11.5px}
+  .landing .l-sheet th{background:var(--surface2); color:var(--faint); font-family:var(--mono); font-size:9.5px;
+    font-weight:500; height:19px; border:1px solid var(--line); text-align:center; overflow:visible}
+  .landing .l-sheet td{height:21px; padding:1px 7px; border:1px solid var(--line); color:var(--text);
+    white-space:nowrap; text-align:left; overflow:visible; vertical-align:middle}
+  .landing .l-sheet td.l-rh{background:var(--surface2); color:var(--faint); font-family:var(--mono);
+    font-size:9.5px; text-align:center; width:24px; padding:0}
+  .landing .l-sheet td.l-num{text-align:right; font-variant-numeric:tabular-nums}
+  .landing .l-sheet td.l-lbl{color:var(--muted)}
+  .landing .l-sheet td.l-in{color:#1657c8}                       /* input-in-blue, the desk convention */
+  html[data-dark="1"] .landing .l-sheet td.l-in{color:#6ea8f7}
+  .landing .l-sheet td.l-tot{font-weight:700; border-top:2px solid var(--text)}
+  .landing .l-sheet td.l-cur{outline:2px solid var(--accent); outline-offset:-2px; background:var(--accent-glow)}
+  .landing .l-demo-keys{display:flex; align-items:center; gap:6px; padding:13px 14px; font-family:var(--mono); font-size:11px}
+  .landing .l-cap{border:1px solid var(--line); background:var(--surface2); color:var(--muted); border-radius:5px; padding:3px 9px}
+  .landing .l-cap.lit{border-color:var(--accent); color:var(--accent); background:var(--accent-glow)}
+  .landing .l-demo-keys .l-tail{margin-left:auto; color:var(--faint)}
+
+  /* ---------------------------------------------------------------- landing v2 · sections */
+  .landing .l-sec{position:relative; z-index:1; padding:52px 0; border-top:1px solid var(--line)}
+  .landing .l-label{font-family:var(--mono); font-size:11px; letter-spacing:1.7px; text-transform:uppercase;
+    color:var(--accent); margin-bottom:12px}
+  .landing h2{font-family:var(--sans); font-size:clamp(24px,2.5vw,32px); font-weight:700; letter-spacing:-.9px;
+    line-height:1.15; margin:0 0 12px}
+  .landing h3{font-family:var(--sans); font-size:16.5px; font-weight:700; letter-spacing:-.3px; margin:0 0 9px}
+  .landing .l-sub{font-size:15.5px; color:var(--muted); max-width:62ch; line-height:1.6; margin:0}
+  .landing .l-sub b{color:var(--text); font-weight:600}
+
+  /* the old way vs. doing it — Wolf 2026-09-03 */
+  .landing .l-vs{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:26px}
+  .landing .l-col{border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface)}
+  .landing .l-col.l-old{background:transparent}
+  .landing .l-col-cap{display:flex; align-items:center; gap:8px; min-height:34px; padding:6px 16px;
+    background:var(--surface2); border-bottom:1px solid var(--line); font-family:var(--mono);
+    font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
+  .landing .l-col.l-new .l-col-cap{color:var(--accent); background:var(--accent-glow); border-bottom-color:var(--accent-dim)}
+  .landing .l-col ul{list-style:none; margin:0; padding:14px 18px 17px}
+  .landing .l-col li{position:relative; padding:6px 0 6px 24px; font-size:14px; line-height:1.55; color:var(--muted)}
+  .landing .l-col li::before{position:absolute; left:0; top:6px; font-family:var(--mono); font-size:12px}
+  .landing .l-col.l-old li::before{content:"\00d7"; color:var(--faint)}
+  .landing .l-col.l-new li::before{content:"\2192"; color:var(--accent)}
+  .landing .l-col.l-new li{color:var(--text)}
+  .landing .l-col li b{color:var(--text); font-weight:600}
+
+  .landing .l-beats{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:22px}
+  .landing .l-beat{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:20px 21px 22px}
+  .landing .l-beat .l-n{font-family:var(--mono); font-size:11px; color:var(--accent); letter-spacing:.14em; margin-bottom:12px}
+  .landing .l-beat p{font-size:13.5px; color:var(--muted); line-height:1.62; margin:0}
+  .landing .l-beat kbd{font-family:var(--mono); font-size:11px; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:4px; padding:1px 5px}
+
+  /* ---------------------------------------------------------------- landing v2 · catalog rail */
+  .landing .l-rail{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:26px}
+  .landing .l-chap{background:var(--surface); border:1px solid var(--line); border-radius:11px;
+    padding:15px 16px 16px; display:flex; flex-direction:column; gap:7px}
+  .landing .l-chap .l-cn{font-family:var(--mono); font-size:10px; color:var(--faint); letter-spacing:.14em}
+  .landing .l-chap .l-cname{font-size:14.5px; font-weight:700; letter-spacing:-.2px; line-height:1.25}
+  .landing .l-chap .l-cmeta{display:flex; align-items:baseline; gap:8px; margin-top:auto; padding-top:8px}
+  .landing .l-chap .l-ccount{font-family:var(--mono); font-size:19px; font-weight:700; color:var(--text); line-height:1}
+  .landing .l-chap .l-cunit{font-family:var(--mono); font-size:10.5px; color:var(--faint)}
+  .landing .l-tag{font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase;
+    border:1px solid var(--line); color:var(--faint); border-radius:4px; padding:2px 6px; align-self:flex-start}
+  .landing .l-tag.l-free{color:var(--accent); border-color:var(--accent-dim)}
+  .landing .l-tag.l-soon{color:var(--warn); border-color:var(--warn)}
+  .landing .l-note{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-top:18px; line-height:1.7}
+  .landing .l-note b{color:var(--text); font-weight:500}
+
+  /* ------------------------------------------------- landing v2 · the PRO door (Wolf 2026-09-03)
+     Deliberately NOT the paywall UI: no lock glyphs, no #paywallModal, no dollar figure (Stripe
+     is not live and dev/check-paywall.js §3/§4 hold the no-price line). It states the shape of
+     the eventual deal in plain terms and points at billing.html. Chapter names and counts come
+     from HOTKEY_PREMIUM.groups × HOTKEY_DRILLS.groups at render — never typed in. */
+  .landing .l-pro{display:grid; grid-template-columns:1.35fr .9fr; gap:0; margin-top:24px;
+    border:1px solid var(--accent-dim); border-radius:14px; overflow:hidden; background:var(--surface)}
+  .landing .l-pro-main{padding:24px 26px 26px}
+  .landing .l-pro-side{padding:24px 26px 26px; background:var(--accent-glow); border-left:1px solid var(--accent-dim);
+    display:flex; flex-direction:column; justify-content:center; gap:12px}
+  .landing .l-pro-now{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--accent); margin-bottom:10px}
+  .landing .l-pro h3{font-size:20px; letter-spacing:-.5px; margin-bottom:10px}
+  .landing .l-pro p{font-size:14px; color:var(--muted); line-height:1.6; margin:0 0 12px; max-width:56ch}
+  .landing .l-pro p:last-child{margin-bottom:0}
+  .landing .l-pro p b{color:var(--text); font-weight:600}
+  .landing .l-pro-chaps{display:flex; flex-wrap:wrap; gap:7px; margin:0 0 14px}
+  .landing .l-pro-chip{font-family:var(--mono); font-size:11px; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:999px; padding:5px 11px}
+  .landing .l-pro-chip span{color:var(--faint)}
+  .landing .l-pro-price{font-family:var(--mono); font-size:12.5px; color:var(--muted); line-height:1.7}
+  .landing .l-pro-price b{color:var(--text); font-weight:600}
+  .landing .l-btn{display:inline-block; font-family:var(--mono); font-size:13px; color:var(--accent);
+    background:transparent; border:1px solid var(--accent-dim); border-radius:9px; padding:11px 20px;
+    white-space:nowrap; text-decoration:none; cursor:pointer; align-self:flex-start; transition:.15s}
+  .landing .l-btn:hover{background:var(--accent-glow); border-color:var(--accent)}
+  .landing .l-btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+  /* ---------------------------------------------------------------- landing v2 · proof */
+  .landing .l-proof{display:grid; grid-template-columns:1.22fr .89fr .89fr; gap:16px; margin-top:26px; align-items:stretch}
+  .landing .l-panel{background:var(--surface); border:1px solid var(--line); border-radius:12px; overflow:hidden;
+    display:flex; flex-direction:column}
+  .landing .l-panel-cap{min-height:32px; display:flex; align-items:center; gap:8px; padding:0 14px;
+    background:var(--surface2); border-bottom:1px solid var(--line); font-family:var(--mono); font-size:10px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+  .landing .l-panel-cap b{color:var(--accent); letter-spacing:.06em; text-transform:none}
+  .landing .l-panel-body{padding:14px 16px 16px; flex:1}
+  .landing .l-brow{display:grid; grid-template-columns:22px 1fr auto; align-items:center; gap:10px;
+    font-family:var(--mono); font-size:12px; padding:7px 0; border-bottom:1px solid var(--line)}
+  .landing .l-brow:last-child{border-bottom:none}
+  .landing .l-brow .l-r{color:var(--faint)}
+  .landing .l-brow .l-r.l-p1{color:var(--warn)}
+  .landing .l-brow .l-h{color:var(--text); overflow:hidden; text-overflow:ellipsis}
+  .landing .l-brow .l-t{color:var(--accent); font-variant-numeric:tabular-nums}
+  .landing .l-brow.l-you .l-h{color:var(--muted)}
+  .landing .l-brow.l-you .l-t{color:var(--faint)}
+  .landing .l-plist{display:flex; flex-direction:column; gap:9px; font-size:13px; color:var(--muted); line-height:1.5}
+  .landing .l-plist .l-k{font-family:var(--mono); font-size:11px; color:var(--faint); letter-spacing:.06em}
+  .landing .l-plist b{color:var(--text); font-weight:600}
+  .landing .l-certs{display:flex; gap:7px; flex-wrap:wrap; margin-top:4px}
+  .landing .l-cert{font-family:var(--mono); font-size:10.5px; color:var(--muted); border:1px solid var(--line);
+    border-radius:999px; padding:4px 10px}
+
+  /* ---------------------------------------------------------------- landing v2 · teams + close */
+  .landing .l-teams{display:grid; grid-template-columns:1fr auto; gap:30px; align-items:center;
+    background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:26px 28px; margin-top:24px}
+  .landing .l-close{text-align:center; padding:62px 0 58px}
+  .landing .l-close h2{margin-bottom:8px}
+  .landing .l-close .l-sub{margin:0 auto 24px; font-family:var(--mono); font-size:13px; letter-spacing:.06em}
+  .landing .l-foot{border-top:1px solid var(--line); padding:24px 0 40px; position:relative; z-index:1}
+  .landing .l-foot-in{display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap;
+    font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.7}
+  .landing .l-foot-in a{color:var(--muted); text-decoration:none}
+  .landing .l-foot-in a:hover{color:var(--text)}
+  .landing .l-foot-in b{color:var(--accent)}
+
+  /* ---------------------------------------------------------------- landing v2 · responsive */
+  @media (max-width:1000px){
+    .landing .l-hero-grid{grid-template-columns:1fr; gap:32px}
+    .landing .l-beats{grid-template-columns:1fr}
+    .landing .l-vs{grid-template-columns:1fr}
+    .landing .l-rail{grid-template-columns:repeat(2,1fr)}
+    .landing .l-pro{grid-template-columns:1fr}
+    .landing .l-pro-side{border-left:0; border-top:1px solid var(--accent-dim)}
+    .landing .l-proof{grid-template-columns:1fr}
+    .landing .l-teams{grid-template-columns:1fr; gap:18px; align-items:flex-start}
+  }
+  @media (max-width:560px){
+    .landing .l-wrap{padding:0 18px}
+    .landing .l-hero{padding:32px 0 38px}
+    .landing h1{font-size:31px; letter-spacing:-1.2px}
+    .landing .lede{font-size:15.5px}
+    .landing .l-sec{padding:38px 0}
+    .landing .l-rail{gap:10px}
+    .landing .l-chap{padding:13px 13px 14px}
+    .landing .l-chap .l-cname{font-size:13px}
+    .landing .l-top-right .l-hide-sm{display:none}
+    .landing-cta{gap:10px}
+    .start-btn, .landing .l-quiet{width:100%; justify-content:center; text-align:center}
+    .landing .l-pro-main, .landing .l-pro-side{padding:20px}
+  }
   #guestBanner{position:fixed; bottom:14px; left:50%; transform:translateX(-50%); z-index:25;   /* r356: below the dialogs (z30) and results card (z40) — it used to cover their footers on short screens */
     background:var(--surface); border:1px solid var(--warn); border-radius:8px; padding:8px 14px;
     font-family:var(--mono); font-size:11.5px; color:var(--warn); box-shadow:0 8px 24px rgba(0,0,0,.5)}
   #guestBanner b{color:var(--text); font-weight:700}
   #guestBanner a{color:var(--accent); margin-left:8px}
 
-  /* floating themes button — discoverable but out of the way */
-  .landing .micro{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:26px; line-height:1.6}
-  .landing .micro b{color:var(--muted)}
 
   /* ---- density pass (r36): grid reads like Excel at 100%, not 140% ---- */
   #grid td, #grid th{font-size:12px; height:21px; padding:2px 7px}
@@ -2124,20 +2339,224 @@
 </div>
 <div class="landing" id="landing">
   <div class="landing-inner">
-    <!-- r314 (Wolf): stripped from a marketing splash to a clean start prompt — begin drilling or
-         log in. Logged-in returning users skip this entirely (welcome-back path). -->
-    <div class="lbrand">hotkey<b>.gg</b></div>
-    <div class="eyebrow">Keyboard-only Excel training</div>
-    <h1>Ready to <span class="dim">drill?</span></h1>
-    <div class="landing-cta">
-      <button class="start-btn" id="startBtn">Start drilling <kbd class="kbd-cta">↵</kbd></button>
-      <button class="start-btn ghosted" id="loginBtn" style="background:transparent;border:1px solid var(--line);color:var(--muted)">Log in</button>
-      <span class="modes">
-        <span class="mode-chip pick selected" id="chipClassic" title="solve drills at your own pace">Classic</span>
-        <span class="mode-chip pick" id="chipRapid" title="one shortcut at a time, as fast as you can">⚡ Rapid-fire</span>
-      </span>
+    <!-- LANDING V2 (r452) — dev/BETA_RETIRE_LANDING.md Part II, mocked at art/landing-mock.html.
+         Still the r65 DIALOG over the live trainer: Enter → tryEnter() → guest session → tour →
+         first drill, unchanged. What is new is everything under the fold, and the three changes
+         Wolf signed off on 2026-09-03: it is designed against Daylight (the default theme) first,
+         it shows the PRO door instead of hiding it, and "how it works" now argues learning by
+         DOING against watching a class you forget by Thursday.
+         Every count on this page (chapters, drills per chapter, the paid chapters and their
+         totals) is written by paintLanding() from HOTKEY_DRILLS / HOTKEY_PREMIUM at render.
+         Nothing here is a typed number — e2e-smoke's drill-count guard and check-paywall both
+         assert against menuOrder, and hand-typed marketing copy is exactly what drifts. -->
+
+    <div class="l-top">
+      <div class="l-wrap l-top-in">
+        <div class="l-top-left"><div class="lbrand">hotkey<b>.gg</b></div></div>
+        <div class="l-top-right">
+          <button class="l-linkbtn l-hide-sm" data-lgo="lHow">how it works</button>
+          <button class="l-linkbtn l-hide-sm" data-lgo="lCatalog">drills</button>
+          <button class="l-linkbtn l-hide-sm" data-lgo="lPricing">pricing</button>
+          <button class="l-linkbtn l-hide-sm" data-lgo="lTeams">desks</button>
+          <button class="l-linkbtn" id="landingSignin">log in</button>
+        </div>
+      </div>
     </div>
-    <div class="micro" id="landingMicro"><span class="micro-hint"><kbd>↵</kbd> to begin · everything’s keyboard — no mouse needed</span></div>
+
+    <div class="l-hero">
+      <div class="l-glow"></div>
+      <div class="l-wrap l-hero-grid">
+        <div>
+          <div class="eyebrow">keyboard-only excel training</div>
+          <h1>Get fast at the pages<br><span class="dim">you actually build.</span></h1>
+          <p class="lede" id="landingLede">Timed drills on a real spreadsheet — debt schedules, three-statement ties, covenant tables. <b>You're graded on the finished page</b>, not on which key you pressed to get there.</p>
+          <div class="landing-cta">
+            <button class="start-btn" id="startBtn">Press <kbd class="kbd-cta">↵</kbd> to start</button>
+            <button class="l-quiet" id="loginBtn">log in</button>
+          </div>
+          <div class="modes">
+            <span class="mode-chip pick selected" id="chipClassic" title="solve drills at your own pace">Classic</span>
+            <span class="mode-chip pick" id="chipRapid" title="one shortcut at a time, as fast as you can">⚡ Rapid-fire</span>
+          </div>
+          <div class="micro" id="landingMicro">no account · no install · <b>free while we're building</b><span class="micro-hint">everything is keyboard — reach for the mouse and the run gets flagged</span></div>
+        </div>
+
+        <!-- the hero still. Hand-built, theme-tokened, engine-free — see the CSS note above and
+             the r452 AUDIT entry for why this is not a live playDemo(). -->
+        <div class="l-demo" aria-hidden="true">
+          <div class="l-demo-cap">
+            <span class="l-dot"></span><span class="l-dot"></span><span class="l-dot"></span>
+            <span>models ii · debt schedule</span>
+            <span class="l-clock">00:41.7 / par 1:52</span>
+          </div>
+          <div class="l-demo-task">Roll the term loan forward — <b>opening, mandatory amort, sweep, closing</b> — and foot the total.</div>
+          <div class="l-sheet">
+            <table>
+              <tbody>
+              <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr>
+              <tr><td class="l-rh">4</td><td class="l-lbl">Term Loan B</td><td class="l-num l-lbl">FY24</td><td class="l-num l-lbl">FY25</td><td class="l-num l-lbl">FY26</td><td class="l-num l-lbl">FY27</td></tr>
+              <tr><td class="l-rh">5</td><td class="l-lbl">Opening balance</td><td class="l-num">400.0</td><td class="l-num">380.0</td><td class="l-num">351.4</td><td class="l-num">312.9</td></tr>
+              <tr><td class="l-rh">6</td><td class="l-lbl">Mandatory amort.</td><td class="l-num l-in">(20.0)</td><td class="l-num l-in">(20.0)</td><td class="l-num l-in">(20.0)</td><td class="l-num l-in">(20.0)</td></tr>
+              <tr><td class="l-rh">7</td><td class="l-lbl">Cash sweep</td><td class="l-num">—</td><td class="l-num">(8.6)</td><td class="l-num">(18.5)</td><td class="l-num l-cur">(27.1)</td></tr>
+              <tr><td class="l-rh">8</td><td class="l-lbl">Closing balance</td><td class="l-num l-tot">380.0</td><td class="l-num l-tot">351.4</td><td class="l-num l-tot">312.9</td><td class="l-num l-tot">265.8</td></tr>
+              <tr><td class="l-rh">9</td><td class="l-lbl"></td><td class="l-num"></td><td class="l-num"></td><td class="l-num"></td><td class="l-num"></td></tr>
+              <tr><td class="l-rh">10</td><td class="l-lbl">Total debt</td><td class="l-num">520.0</td><td class="l-num">491.4</td><td class="l-num">452.9</td><td class="l-num">405.8</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="l-demo-keys">
+            <span class="l-cap">alt</span><span class="l-cap">h</span><span class="l-cap lit">o</span><span class="l-cap">i</span>
+            <span class="l-tail">☆ 2 of 3 · 118 keys</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wolf 2026-09-03, change 3: the pitch is learning by DOING, argued against the way this
+         is normally taught. Keep the contrast concrete — a class, a video, a shortcut sheet —
+         and keep the promise measurable (a real page, the keyboard, a grade in three minutes). -->
+    <div class="l-sec" id="lHow">
+      <div class="l-wrap">
+        <div class="l-label">how it works</div>
+        <h2>You don't learn this by watching.</h2>
+        <p class="l-sub">The usual route is a class, a YouTube video, or a shortcut sheet taped to the monitor. You watch someone else's hands, you nod, and by Thursday it is gone — because you never once did it yourself.</p>
+        <div class="l-vs">
+          <div class="l-col l-old">
+            <div class="l-col-cap">the usual route</div>
+            <ul>
+              <li>sit through a class, or a video at 1.5×</li>
+              <li>memorise a sheet of chords you will not use today</li>
+              <li>open a real file on Monday and reach for the mouse anyway</li>
+            </ul>
+          </div>
+          <div class="l-col l-new">
+            <div class="l-col-cap">hotkey.gg · three minutes, start to graded</div>
+            <ul>
+              <li>a real page opens — a debt schedule, a comps tape, a covenant table</li>
+              <li>you build it with the keyboard, clock running</li>
+              <li>you're graded on the <b>finished sheet</b>, and the time goes on a board</li>
+            </ul>
+          </div>
+        </div>
+        <div class="l-beats">
+          <div class="l-beat">
+            <div class="l-n">01</div>
+            <h3>A real task, not a lesson</h3>
+            <p>Every drill opens on a page a banker would recognise as their own file. Build the schedule, tie the statements, foot the covenant table. Nothing is a toy example.</p>
+          </div>
+          <div class="l-beat">
+            <div class="l-n">02</div>
+            <h3>Keyboard only</h3>
+            <p><kbd>alt</kbd> walks the ribbon, <kbd>ctrl</kbd> does the rest, and the mouse is a foul. That constraint is the whole product — it is how fast modelers actually work.</p>
+          </div>
+          <div class="l-beat">
+            <div class="l-n">03</div>
+            <h3>Graded on the finished page</h3>
+            <p>The clock stops when the page is right. Par times, medals at pass / pro / legendary, hidden ☆ for the efficient route, and every clean run posts to the board.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="l-sec" id="lCatalog">
+      <div class="l-wrap">
+        <div class="l-label">the catalog</div>
+        <h2 id="lCatalogH2">The catalog.</h2>
+        <p class="l-sub">A difficulty spine, not a menu. Foundations teaches the hands; Full Builds hands you a blank sheet and a deadline.</p>
+        <div class="l-rail" id="lRail"></div>
+        <div class="l-note" id="lRailNote"></div>
+      </div>
+    </div>
+
+    <!-- Wolf 2026-09-03, change 2: the PRO option is VISIBLE, and honest about where it stands.
+         No price — Stripe is not live, HOTKEY_PRO.plans carries placeholders, and
+         dev/check-paywall.js §3/§4 hold the no-dollar-figure line on every upgrade surface. -->
+    <div class="l-sec" id="lPricing">
+      <div class="l-wrap">
+        <div class="l-label">pricing</div>
+        <h2>Free today. PRO when billing opens.</h2>
+        <p class="l-sub">No trial clock, no card, nothing switched off behind your back. Here is exactly what changes the day payments go live.</p>
+        <div class="l-pro">
+          <div class="l-pro-main">
+            <div class="l-pro-now">right now</div>
+            <h3 id="lProNow">The whole catalog is open.</h3>
+            <p id="lProNowP">Every drill is playable, every board is live, every certificate track is earnable. Nothing on this site is locked today.</p>
+            <div class="l-pro-now" style="margin-top:18px">when billing opens</div>
+            <h3 id="lProLater">The back chapters become PRO.</h3>
+            <div class="l-pro-chaps" id="lProChaps"></div>
+            <p id="lProLaterP"></p>
+          </div>
+          <div class="l-pro-side">
+            <div class="l-pro-price"><b>No price yet.</b><br>Payments are not live, so we are not quoting a number we cannot charge.</div>
+            <a class="l-btn" href="billing.html" id="lProPlans">see what PRO will include →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="l-sec" id="lProof">
+      <div class="l-wrap">
+        <div class="l-label">the board</div>
+        <h2>Every run has a time on it.</h2>
+        <p class="l-sub">Live boards per drill, ranked tiers, daily and weekly gauntlets. Desks for your club or your analyst class, with school standings. Three certificate tracks when the times hold up.</p>
+        <div class="l-proof">
+          <div class="l-panel">
+            <div class="l-panel-cap" id="lBoardCap">the clock</div>
+            <div class="l-panel-body" id="lBoard"></div>
+          </div>
+          <div class="l-panel">
+            <div class="l-panel-cap">desks</div>
+            <div class="l-panel-body">
+              <div class="l-plist">
+                <div><span class="l-k">private boards</span><br>Your club or analyst class gets its own ladder, roster hall, and school colours.</div>
+                <div><span class="l-k">weekly quests</span><br>The staffer pins <b>up to 3 drills</b> with time targets. One click a week.</div>
+              </div>
+            </div>
+          </div>
+          <div class="l-panel">
+            <div class="l-panel-cap">certificates</div>
+            <div class="l-panel-body">
+              <div class="l-plist">
+                <div>Three tracks, earned on <b>held times</b> — not attendance.</div>
+                <div class="l-certs">
+                  <span class="l-cert">keyboard fluency</span>
+                  <span class="l-cert">formulas</span>
+                  <span class="l-cert">modeling</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="l-sec" id="lTeams">
+      <div class="l-wrap">
+        <div class="l-label">for desks</div>
+        <h2>Bring the whole analyst class.</h2>
+        <div class="l-teams">
+          <p class="l-sub" style="max-width:70ch">Private boards, weekly assignments the staffer pins in one click, and a cohort report worth forwarding — hours saved, cohort improvement, coverage, momentum. Free for clubs.</p>
+          <a class="l-btn" href="enterprise.html">see how desks work →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="l-sec l-close">
+      <div class="l-wrap">
+        <h2>Your first run takes thirty seconds.</h2>
+        <p class="l-sub">one drill · one clock · no mouse</p>
+        <button class="start-btn" id="startBtn2">Press <kbd class="kbd-cta">↵</kbd> to start</button>
+      </div>
+    </div>
+
+    <div class="l-foot">
+      <div class="l-wrap l-foot-in">
+        <div>hotkey<b>.gg</b> — an Excel speedrun trainer.<br>
+          <a href="About.html">about</a> · <a href="drills/">drills</a> · <a href="leaderboard.html">leaderboard</a> ·
+          <a href="desks.html">desks</a> · <a href="terms.html">terms</a> · <a href="privacy.html">privacy</a></div>
+        <div style="max-width:52ch">Excel is a registered trademark of Microsoft Corporation. hotkey.gg is independent and not affiliated with or endorsed by Microsoft.</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -28137,6 +28556,117 @@ $('campaignBtn').addEventListener('click',openCampaign);
 $('startBtn').addEventListener('click', tryEnter);
 { const ls=$('landingSignin'); if(ls) ls.onclick=()=>{ openAuth('signin'); };
   const lb=$('loginBtn'); if(lb) lb.onclick=()=>{ openAuth('signin'); }; }
+{ const s2=$('startBtn2'); if(s2) s2.addEventListener('click', tryEnter); }   /* r452: the close CTA is the same door as the hero's — one tryEnter(), one guest session, one tour */
+
+/* ============================================================================
+   LANDING V2 (r452) — paintLanding()
+   ----------------------------------------------------------------------------
+   The landing's numbers are DERIVED, never typed. drills.js:36 is the law
+   ("menuOrder.length is the source of truth"), e2e-smoke's drill-count guard
+   holds the marketing copy to it, and dev/check-paywall.js holds the premium
+   counts to HOTKEY_PREMIUM x menuOrder. A chapter that gains or loses a drill
+   relabels this page with no copy edit — which is the whole point, because
+   hand-typed catalog totals are exactly what drifts.
+
+   Reads, all of them public helpers from drills.js:
+     HOTKEY_DRILLS.groups / .menuOrder / .meta   — chapters, counts, labels
+     HOTKEY_CAMPAIGN.chapters                    — the subtitled display names
+     hkPremiumGroups() / hkPremiumCount() / hkCatalogCount() / hkPremiumOn()
+     HOTKEY_PARS + HOTKEY_CLOCKS                 — the medal clocks in "the board"
+
+   Renders identically with sb === null: nothing here touches the network.
+   Everything is wrapped so a catalog shape it does not expect degrades to the
+   markup already in the document rather than throwing on the most-tested page.
+   ============================================================================ */
+function paintLanding(){
+  const D = window.HOTKEY_DRILLS;
+  if(!D || !document.getElementById('lRail')) return;
+  const esc = s => String(s).replace(/[<>&]/g, ch=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[ch]));
+  const set = (id, html) => { const e=document.getElementById(id); if(e) e.innerHTML = html; };
+
+  const groups = (D.groups || []).filter(g => g && g.keys && g.keys.length);
+  const nAll   = window.hkCatalogCount ? window.hkCatalogCount() : (D.menuOrder || []).length;
+  const paid   = window.hkPremiumGroups ? window.hkPremiumGroups() : [];
+  const nPaid  = window.hkPremiumCount ? window.hkPremiumCount() : 0;
+  const nFree  = nAll - nPaid;
+  const proOn  = !!(window.hkPremiumOn && window.hkPremiumOn());
+  const camp   = ((window.HOTKEY_CAMPAIGN || {}).chapters) || [];
+  const isPaid = g => paid.indexOf(g.name) >= 0;
+  /* the campaign carries the subtitled form of the SAME eight chapters ("Models I ·
+     Valuation"); prefer it for display, fall back to the catalog's own name. */
+  const disp = g => { const c = camp.find(c => c.name === g.name || c.name.indexOf(g.name + ' ·') === 0);
+                      return c ? c.name : g.name; };
+  const paidGroups = groups.filter(isPaid);
+
+  /* ---- hero lede: the one number in the pitch ---- */
+  set('landingLede', nAll + ' timed drills on a real spreadsheet — debt schedules, three-statement ' +
+      'ties, covenant tables. <b>You’re graded on the finished page</b>, not on which key you pressed ' +
+      'to get there.');
+
+  /* ---- the catalog rail ---- */
+  set('lCatalogH2', groups.length + ' chapters. ' + nAll + ' drills.');
+  set('lRail', groups.map((g, i) => {
+    const n = g.keys.length;
+    const tag = !isPaid(g) ? '<span class="l-tag l-free">free</span>'
+              : (proOn ? '<span class="l-tag l-soon">pro</span>'
+                       : '<span class="l-tag l-soon">free right now</span>');
+    return '<div class="l-chap"><div class="l-cn">' + ('0' + (i + 1)).slice(-2) + '</div>' +
+           '<div class="l-cname">' + esc(disp(g)) + '</div>' + tag +
+           '<div class="l-cmeta"><span class="l-ccount">' + n + '</span>' +
+           '<span class="l-cunit">drill' + (n === 1 ? '' : 's') + '</span></div></div>';
+  }).join(''));
+  set('lRailNote', proOn
+    ? 'counts read straight off the live catalog · <b>' + nFree + ' drills are free</b> — the back ' +
+      paidGroups.length + ' chapters need PRO'
+    : 'counts read straight off the live catalog · <b>every chapter is playable today</b> — the back ' +
+      paidGroups.length + ' become PRO when billing opens');
+
+  /* ---- the PRO door (Wolf 2026-09-03). States the deal, never a price. ---- */
+  set('lProNow',   proOn ? nFree + ' drills stay free, for good.' : 'The whole catalog is open.');
+  set('lProNowP',  proOn
+    ? 'The first ' + (groups.length - paidGroups.length) + ' chapters — ' + nFree + ' of the ' + nAll +
+      ' drills — are free with no account. Boards, ranks, desks and streaks are free on all of them.'
+    : 'All ' + nAll + ' drills are playable, every board is live, and every certificate track is earnable. ' +
+      'Nothing on this site is locked today.');
+  set('lProLater', proOn ? 'These chapters need PRO.'
+                         : 'The back ' + paidGroups.length + ' chapters become PRO.');
+  set('lProChaps', paidGroups.map(g =>
+    '<span class="l-pro-chip">' + esc(disp(g)) + ' <span>' + g.keys.length + '</span></span>').join(''));
+  set('lProLaterP', (proOn ? '' : 'When payments open, ') + '<b>' + nPaid + ' of the ' + nAll +
+      ' drills</b> sit behind PRO. The ' + nFree + ' in front of them stay free for good, and any time you ' +
+      'have already posted keeps its place on the board — nothing you earned gets taken back.');
+
+  /* ---- "the board" panel: the medal clocks, derived from the live par ladder
+         (pass par×1.5 · pro par×1.15 · legendary par×1.0, drills.js:458), so the
+         proof panel shows real thresholds rather than invented handles. ---- */
+  const pars = D.pars || window.HOTKEY_PARS || {};
+  const key  = (pars.debtsched ? 'debtsched' : (D.menuOrder || [])[0]);
+  const par  = pars[key];
+  if(par){
+    const ov   = (window.HOTKEY_CLOCKS || {})[key] || {};
+    const clk  = { leg: ov.leg || par, pro: ov.pro || par * 1.15, pass: ov.pass || par * 1.5 };
+    const fmt  = s => Math.floor(s / 60) + ':' + ('0' + Math.round(s % 60)).slice(-2);
+    const meta = (D.meta || {})[key] || {};
+    set('lBoardCap', 'the clock · <b>' + esc((meta.name || meta.label || key)).toLowerCase() + '</b>');
+    set('lBoard',
+      '<div class="l-brow"><span class="l-r l-p1">★</span><span class="l-h">legendary</span>' +
+        '<span class="l-t">' + fmt(clk.leg) + '</span></div>' +
+      '<div class="l-brow"><span class="l-r">◆</span><span class="l-h">pro</span>' +
+        '<span class="l-t">' + fmt(clk.pro) + '</span></div>' +
+      '<div class="l-brow"><span class="l-r">●</span><span class="l-h">pass</span>' +
+        '<span class="l-t">' + fmt(clk.pass) + '</span></div>' +
+      '<div class="l-brow l-you"><span class="l-r">—</span><span class="l-h">your first run</span>' +
+        '<span class="l-t">—</span></div>');
+  }
+}
+try{ paintLanding(); }catch(e){}
+/* the landing's own section jumps — scrollIntoView inside the dialog's scroller, so
+   the trainer's URL never picks up a hash it would have to clean up later. */
+{ const lnav = document.querySelectorAll('#landing [data-lgo]');
+  lnav.forEach(b => b.addEventListener('click', () => {
+    const t = document.getElementById(b.getAttribute('data-lgo'));
+    if(t && t.scrollIntoView) t.scrollIntoView({ behavior:'smooth', block:'start' });
+  })); }
 
 /* r101: RETURNING-USER GREETING — if this browser has seen a handle before, the landing
    opens AS the welcome-back card immediately (no waiting on the session roundtrip).
@@ -31782,6 +32312,29 @@ async function ensureGuestSession(){
 // Deep-link helper — leaderboard/reference pages link here with ?openProfile=1 or ?openAuth=signup
 // to trigger the right modal once the user has cleared the gate. Reads the param, opens the modal,
 // then strips the param from the URL so a refresh doesn't re-trigger.
+/* r452 (dev/BETA_RETIRE_LANDING.md §1, bug 1) — THE DESK-INVITE PREVIEW, actually reaching
+   the landing. It had two faults and needed both fixed to ever fire:
+     (a) r314 deleted the `.lede` this writes into, so the branch fell silently through to a
+         toast. Landing v2 ships a .lede again (#landingLede, the hero's two-sentence line).
+     (b) the ONLY caller was handleDeepLink(), which advanceAccess() runs immediately AFTER
+         dismissLanding() — the landing was already .gone before the RPC could resolve, so the
+         "landing not visible" fallback was the only branch reachable in practice.
+   The read now also fires at boot, while the landing is still up, and latches on the call that
+   actually issues the RPC so the post-Enter call cannot toast a second time. */
+let __deskPreviewed = false;
+function deskInvitePreview(code){
+  if(__deskPreviewed || !code || !window.sb) return;
+  __deskPreviewed = true;
+  try{ sb.rpc('preview_desk',{p_code:code}).then(({data})=>{
+    const d=(data&&data[0]); if(!d) return;
+    const l=$('landing'), le=l&&l.querySelector('.lede');
+    if(le && !l.classList.contains('gone')) le.textContent='You\u2019ve been invited to join '+d.name+' \u2014 '+d.members+' on the desk. Sign in and you\u2019re on it.';
+    else showToast('signing you onto '+d.name+' once you\u2019re in');
+  }).catch(()=>{}); }catch(e){}
+}
+try{ const __dk = new URLSearchParams(location.search).get('desk');
+     if(__dk) __sbReady.then(()=>{ try{ deskInvitePreview(__dk); }catch(e){} }); }catch(e){}
+
 function handleDeepLink(){
   try{
     const p = new URLSearchParams(location.search);
@@ -31793,12 +32346,7 @@ function handleDeepLink(){
     if(deskCode){
       try{ localStorage.setItem('hk_pending_desk', deskCode); }catch(e){}
       consumed = true; p.delete('desk');
-      try{ if(window.sb) sb.rpc('preview_desk',{p_code:deskCode}).then(({data})=>{
-        const d=(data&&data[0]); if(!d) return;
-        const l=$('landing'), le=l&&l.querySelector('.lede');
-        if(le && !l.classList.contains('gone')) le.textContent='You\u2019ve been invited to join '+d.name+' \u2014 '+d.members+' on the desk. Sign in and you\u2019re on it.';
-        else showToast('signing you onto '+d.name+' once you\u2019re in');
-      }); }catch(e){}
+      deskInvitePreview(deskCode);
     }
     const authMode = p.get('openAuth');
     if(authMode === 'signin' || authMode === 'signup'){ openAuth(authMode); consumed = true; }

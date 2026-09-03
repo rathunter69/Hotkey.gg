@@ -1,5 +1,150 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r452 — LANDING V2: learn by doing, Daylight by default, the PRO door
+
+_Scope: the `.landing` block in `index.html` — markup, CSS and its small JS — plus one long-standing
+deep-link bug the rework was required to absorb, a new guard (`dev/check-landing.js`) and a `URL=`
+override on the last harness that lacked one. Spec: `dev/BETA_RETIRE_LANDING.md`
+Part II; mock: `art/landing-mock.html` (Wolf-approved 2026-09-03, with three changes, all made).
+The r134 pre-launch curtain is untouched here — a parallel r452 change owns its retirement._
+
+### WHAT REPLACED WHAT
+
+r314 stripped the landing from a marketing splash to a 16-line start prompt because the curtain did
+the explaining. With the curtain going, that prompt becomes the **entire** first impression and it
+explains nothing — the real explanation lives on `About.html`, a page most visitors never click.
+
+Landing v2 is still the **r65 dialog over the live trainer** — `position:fixed`, fades out on
+`.gone`, `Enter` hands off to the grid with no navigation — it is just full-bleed and scrollable
+now. One screen answers "what is this" (hero + CTA, above the fold at 1280×800 **and** 390×844);
+the page below it answers "why should I" (how it works · the catalog · pricing · the board ·
+desks · close). **The CTA calls `tryEnter()`** — the same function `#startBtn` called before, so
+Enter → guest session → tour → first drill is byte-for-byte the path it was. The close CTA
+(`#startBtn2`) is wired to the same door.
+
+Two dead things went out with it: the duplicate `.landing h1` rule (`:1882` 23px vs `:1913`
+clamp — leftover from the r65 dialog experiment), and the stale "floating themes button" comment
+over a second copy of `.landing .micro`.
+
+### THE THREE WOLF CHANGES
+
+**1 · Daylight first.** `themes.js` already applies `daylight` unconditionally for a fresh device
+(r293) and it runs at `index.html:1962`, *before* the landing markup is parsed — so there is no
+flash and no new default to set. What was needed was the design order: every token pairing on this
+page was chosen against Daylight's warm paper (`--bg #dbd8d1` / `--surface #ecebe6` /
+`--accent #16a862`) and then verified on Graphite. Two rules are theme-conditional, both keyed off
+the `data-dark` attribute `applyTheme()` already sets, so all 27 palettes are covered without a
+per-theme table: the CTA's `↵` keycap tint, and the sheet's input-blue. One fix came straight out
+of looking at the dark render — the rail's `free` badge was drawn in `--accent-dim`, which
+vanishes on `--surface` in dark; it is `--accent` on an `--accent-dim` border now.
+
+**2 · The PRO door is visible.** A `pricing` band sits between the catalog and the board:
+*"Free today. PRO when billing opens."* It states what is true now (the whole catalog is open),
+what changes (the back four chapters), by how much (the live premium count of the live catalog
+total), and links to `billing.html`. It is deliberately **not** the paywall UI — no lock glyphs,
+no `#paywallModal`, no `.pk-lock` / `.pk-protag` classes (`check-paywall §1` counts those inside
+`#pkGroups` and must keep reading zero), and **no dollar figure in either flag state**, because
+Stripe is not live and `check-paywall §3/§4` hold that line on every other upgrade surface. The
+side panel says so out loud rather than leaving a blank: *"No price yet. Payments are not live, so
+we are not quoting a number we cannot charge."*
+
+**3 · Learning by doing, argued.** "How it works" leads with **"You don't learn this by
+watching."** and a two-column contrast — *the usual route* (sit through a class or a video at
+1.5×; memorise a sheet of chords; open a real file on Monday and reach for the mouse anyway)
+against *hotkey.gg · three minutes, start to graded* (a real page opens; you build it with the
+keyboard, clock running; you're graded on the finished sheet and the time goes on a board). The
+three original beats follow it as the detail, not the pitch. House voice held: lowercase
+confidence, numbers instead of adjectives, no hype, and the guard asserts zero exclamation marks
+on the whole surface.
+
+### EVERY NUMBER IS DERIVED — `paintLanding()`
+
+Nothing countable is typed into the markup. `paintLanding()` (next to the existing landing wiring)
+writes the hero lede's total, the catalog `h2`, all eight rail cards with their per-chapter counts,
+the rail note, and the whole PRO band from:
+
+```
+HOTKEY_DRILLS.groups / .menuOrder / .meta     chapters, counts, the board panel's drill label
+HOTKEY_CAMPAIGN.chapters                      the subtitled display names (Models I · Valuation)
+hkPremiumGroups / hkPremiumCount / hkCatalogCount / hkPremiumOn      the paid tier, both states
+HOTKEY_PARS + HOTKEY_CLOCKS                   the medal clocks in the proof panel
+```
+
+The rail badge derives from `hkPremiumOn()`, so it reads **"free right now"** today — honest,
+because with the flag off all 74 are playable — and relabels itself to **PRO** the day the flag
+flips, with no copy edit. Both states are walked through `?premium=preview`; the flag itself is
+never edited to run a test. Live figures at this commit: 8 chapters, 74 drills, 40 of them in the
+four `HOTKEY_PREMIUM` chapters.
+
+The proof panel deliberately shows **medal clocks derived from the live par ladder**
+(legendary = par×1.0 · pro = par×1.15 · pass = par×1.5, with `HOTKEY_CLOCKS` overrides) rather
+than a leaderboard. The spec offered a live board read; a landing that invents handles to look
+populated is worse than one that shows real thresholds, and a Supabase read on the most-tested
+page in the tree buys a network dependency for a decoration. Live rows stay on the table for a
+round that wants them.
+
+### THE HERO STILL — why it is not `playDemo()`
+
+Static, hand-built, theme-tokened (spec §4a, and what the mock implements). The machinery for a
+real replay genuinely exists — `playDemo()` walks `CHALLENGES[cur].demo` through `demoKey()` and
+all 74 drills ship a demo script — but it drives the **real `#grid`, which sits under this
+dialog**, calls `loadChallenge(cur)` twice and `hkGateClear()`, and `ghostCurTick` bails while
+`demoPlaying`. Running it under the landing means either un-blurring the backdrop (the landing
+stops being a dialog) or mounting a second engine instance. Both are a round of their own. Static
+costs nothing at first paint, renders identically with `sb === null`, and is screenshot-stable for
+the gate.
+
+### THE DESK-INVITE PREVIEW: a bug that could never have fired
+
+`dev/BETA_RETIRE_LANDING.md` §1 flags that the `?desk=CODE` preview writes into a `.lede` r314
+deleted. It is worse than that — walking it showed **two** faults, and fixing only the first
+changes nothing:
+
+1. no `.lede` existed, so the write fell through to a toast;
+2. the only caller is `handleDeepLink()`, which `advanceAccess()` runs **immediately after
+   `dismissLanding()`** — the landing was already `.gone` before the RPC could resolve, so the
+   "landing not visible" fallback was the only branch reachable in production, ever.
+
+Landing v2 ships a `.lede` (the hero's two-sentence line) and the read is now also fired at boot
+off `__sbReady`, while the landing is still up, latching on the call that actually issues the RPC
+so the post-Enter call cannot toast twice. Guarded end to end with a stubbed `preview_desk`.
+
+### GUARD: `dev/check-landing.js` (new, 28 assertions)
+
+Landing v2's failure mode is drift in the derivation, not typos in the copy, so the derivation is
+what gets asserted — the `e2e-smoke` drill-count pattern, applied to a rendered page. It covers the
+landing half of spec §7: rail chapters and per-chapter counts against `HOTKEY_DRILLS.groups`, their
+sum against `menuOrder.length`, the derived `h2` and lede, the badge tracking `hkPremiumOn()` in
+**both** states, the PRO band's chapters/counts/`billing.html` link and the no-price line in both
+states, CTA above the fold with no horizontal scroll at 1280×800 and 390×844, Daylight on a fresh
+device, the CTA being a real enabled `<button>` that runs `tryEnter()`, headings in descending
+order, `html.hk-returning` still hiding the landing, the `?desk=` write, and zero page errors.
+`dev/e2e-audit-visual.js` also picked up the `URL=` override it was still missing (the r438
+`e2e-audit-onboard` pattern) — it was the last harness hard-coding 8791, so a gate run from a
+worktree was silently measuring whatever another checkout owned that port. Found the hard way.
+
+### RENDERS (served on :8799, curtain passed with the device flag it already honours)
+
+`landing-live-1280-daylight[-full].png` · `landing-live-1280-dark[-full].png` ·
+`landing-live-390-daylight[-full].png`. CTA bottom 420px at 1280×800 and 436px at 390×844; page
+scrollWidth == clientWidth at both. The 390 render suppresses the phone gate (`index.html`, a
+separate z:400 surface) so what is captured is the landing itself — which still has to read on a
+phone, because that is the share surface.
+
+### SUITES (worktree served on :8799)
+
+| suite | result |
+|---|---|
+| `check-invariants` | STATIC INVARIANTS: clean |
+| `e2e-smoke` | ALL 7 PAGES CLEAN + skin-unlock · drill-count matches menuOrder (74) |
+| `check-paywall` | clean — dark with the flag off, complete with the preview on |
+| `e2e-audit-onboard` | ALL 67 PASS (baseline 67 — no assertion edited; T2's landing probe is `/enter\|start\|train/i`, which "Press ↵ to start" still satisfies) |
+| `e2e-audit-visual` | 108 FAILURE(S), 271 PASS — **identical to baseline**, re-run against HEAD's `index.html` on a separate port. Pre-existing grid font-swatch and applied-border contrast on `phoebes` / `crimson` / `tangerine`; nothing on the landing, which this matrix does not measure |
+| `check-cache-versions` | clean (no versioned asset touched — the landing lives entirely in the unversioned `index.html`) |
+| `check-landing` | ALL 28 PASS (new) |
+
+---
+
 ## r450 — THE PAYWALL, BUILT DARK: one entitlement point, a locked catalog, and the Stripe wiring inventory
 
 _Scope: the COMPLETE premium user experience behind `HOTKEY_PREMIUM.enabled`, which stays **false**.
