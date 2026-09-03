@@ -1,7 +1,8 @@
 /* r160 VISUAL-CLARITY MATRIX — Wolf's standing brief: grid, colors, text, and
    borders must READ on every theme (the formatting drills depend on it).
-   For all 20 themes this computes real WCAG contrast from getComputedStyle:
+   For all 27 themes this computes real WCAG contrast from getComputedStyle:
      - gridlines vs the sheet background        (subtle but present: >= 1.15)
+     - the applied-border overlay actually paints (r452: >= 2px, the r442 bug class)
      - APPLIED borders (bt/bb/ball) vs bg       (must read as ink: >= 3.0)
      - applied borders vs gridlines             (distinct layers: >= 1.6)
      - every font swatch vs the cell bg         (>= 2.5; white is exempt on
@@ -24,8 +25,16 @@ function lum(rgb) {
 }
 function parseColor(s) {
   const m = String(s).match(/rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\)/);
-  if (!m) return null;
-  return { rgb: [+m[1], +m[2], +m[3]], a: m[4] === undefined ? 1 : +m[4] };
+  if (m) return { rgb: [+m[1], +m[2], +m[3]], a: m[4] === undefined ? 1 : +m[4] };
+  /* r452 (audit P1-4): CSS Color 4. index.html:286 paints the gridline with
+     `color-mix(in srgb, var(--line) 52%, transparent)`, and Chromium serialises that as
+     `color(srgb 0.776471 0.760784 0.721569 / 0.52)` — which this regex could not read, so
+     contrast() returned null and BOTH the gridline and the applied-border assertions failed on
+     every one of the 27 themes with "contrast null". 54 of the 108 baseline failures were this
+     one missing branch. Channels are 0-1 floats here, and the alpha is `/ a`, not `, a`. */
+  const c = String(s).match(/^color\(srgb\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s+([\d.eE+-]+)(?:\s*\/\s*([\d.eE+-]+))?\s*\)$/);
+  if (c) return { rgb: [+c[1] * 255, +c[2] * 255, +c[3] * 255], a: c[4] === undefined ? 1 : +c[4] };
+  return null;
 }
 // composite a possibly-translucent color over a base before measuring
 function over(fg, bg) { return fg.rgb.map((v, i) => Math.round(v * fg.a + bg.rgb[i] * (1 - fg.a))); }
@@ -71,8 +80,25 @@ function contrast(fgS, bgS) {
       // r212: the visible sheet bg is the .gridwrap DIV (background:var(--surface)), NOT the
       // body — cells are transparent and sit over the gridwrap. On dark themes the sheet is now
       // light (dark chrome, light sheet), so measuring against body would be wrong.
-      const sheetBg = getComputedStyle(document.querySelector('.gridwrap') || document.body).backgroundColor;
+      /* r452 (audit P1-4): .gridwrap is TRANSPARENT now — the sheet paint moved down to
+         `table#grid`, and .gridwrap only carries the --surface/--text overrides that make the
+         sheet light under a dark theme (index.html:200-207). Reading .gridwrap therefore
+         returned `rgba(0, 0, 0, 0)`, which contrast() measures as pure BLACK, and every font
+         swatch was scored against black instead of the sheet: "black" (the r204 graphite
+         #38352d) came out at 1.38:1 and darkgray #404040 at exactly 2.03:1 on all 27 themes —
+         the same number everywhere, which is the tell that the bg, not the theme, was wrong.
+         Walk UP from the cell to the first ancestor that actually paints, so this survives the
+         next move too. */
+      const opaque = (el) => {
+        for (let e = el; e; e = e.parentElement) {
+          const bg = getComputedStyle(e).backgroundColor;
+          const pc = String(bg).match(/rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\)/);
+          if (pc && (pc[4] === undefined || +pc[4] > 0)) return bg;
+        }
+        return getComputedStyle(document.body).backgroundColor;
+      };
       const anyTd = document.querySelector('td:not(.rowhdr)');
+      const sheetBg = opaque(anyTd || document.querySelector('.gridwrap') || document.body);
       const grid = getComputedStyle(anyTd).borderTopColor;
       const tdBg0 = getComputedStyle(anyTd).backgroundColor;
       const bg = (parseFloat((tdBg0.match(/[\d.]+\)$/) || ['1'])[0]) === 0 || tdBg0 === 'rgba(0, 0, 0, 0)') ? sheetBg : tdBg0;
@@ -82,15 +108,25 @@ function contrast(fgS, bgS) {
       });
       const fillTd = [...document.querySelectorAll('td.fill-blue')][0];
       const fill = fillTd ? { bg: getComputedStyle(fillTd).backgroundColor, fg: getComputedStyle(fillTd).color } : null;
+      /* r452 (audit P1-4): applied border INK moved to the ::after OVERLAY. r442 deleted the
+         inline border emitter and r429's box-shadow with it — applied borders now paint on
+         `td.ball::after` (index.html:622-626, `border:0 solid var(--rule,var(--text))` with a
+         per-edge width). getComputedStyle(td).boxShadow has read "none" ever since, so the
+         border-ink assertion scored `contrast null` on all 27 themes and the layer-separation
+         assertion never ran at all. Read the pseudo-element, and read its WIDTH too so a
+         collapsed overlay (the r442 bug class) can't pass as ink. */
       const bTd = document.querySelector('td.ball');
-      const bShadow = bTd ? getComputedStyle(bTd).boxShadow : '';
+      const bAfter = bTd ? getComputedStyle(bTd, '::after') : null;
+      const bInk = bAfter ? bAfter.borderTopColor : '';
+      const bW = bAfter ? parseFloat(bAfter.borderTopWidth) || 0 : 0;
       const acc = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-      return { bg, grid, sw, fill, bShadow, acc, dark: document.documentElement.getAttribute('data-dark') === '1' };
+      return { bg, grid, sw, fill, bInk, bW, acc, dark: document.documentElement.getAttribute('data-dark') === '1' };
     }, th);
 
     const gc = contrast(m.grid, m.bg);
     ok(gc !== null && gc >= 1.15, th + ': gridlines visible vs sheet bg', 'contrast ' + (gc && gc.toFixed(2)));
-    const bcol = (m.bShadow.match(/rgba?\([^)]+\)/) || [null])[0];
+    const bcol = m.bInk || null;
+    ok(m.bW >= 2, th + ': applied border overlay actually paints', 'border-top-width ' + m.bW + 'px');
     const bc = bcol ? contrast(bcol, m.bg) : null;
     ok(bc !== null && bc >= 3.0, th + ': APPLIED borders read as ink vs bg', 'contrast ' + (bc && bc.toFixed(2)));
     if (bcol && gc) {

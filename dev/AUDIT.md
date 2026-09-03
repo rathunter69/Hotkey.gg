@@ -1,5 +1,107 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r452 — BUG SWEEP: the grid re-fits on resize · locked deep links explain themselves · billing's catalog · mobile overflows · the toast above the tour
+
+_Fixes for the read-only sweep in the r452 audit brief. Every finding below carries its audit id.
+Out of scope by instruction: **P0-1** (legal placeholders — needs Wolf's entity facts), **P1-2**
+(Escape / auth modal — owned by the Mac-parity agent), **P2-8** (the beta curtain — already deleted
+on this branch)._
+
+**P1-1 · the sheet never re-fit on a window resize.** `index.html:23045` + `28047-28100`. Three
+faults in one r409 block: the ResizeObserver handle lived on `S._gridRO`, and **every**
+`loadChallenge()` rebuilds `S`, so after the first board change the observer's only reference was
+dropped; the callback compared `clientHeight` **only**, so a width-only shrink — dragging a window
+narrower, opening devtools, rotating a tablet — was ignored; and there was no `resize` listener at
+all. Measured: 1440×900 → 960 left the grid at scrollWidth **854 in a 650px wrap** (+204), while a
+FRESH load at 960 fits at 640. The observer is now `window.__gridRO` (installed once, per document),
+the guard compares **both axes** against a new `S._renderedGwW`, and a 120ms-debounced `resize`
+handler re-runs `render()` on the same two-tick pattern `__fsRefit` uses. Guard: **`dev/check-resize.js`**
+(new, 27s, engine lane) — 34 asserts, **14 of which fail on the pre-fix tree**. Its central invariant
+is *parity with a fresh load* rather than an absolute width, so the r333 `__noShrink` exemption and
+the 40px column floor cannot be blamed on, or hidden by, the resize path.
+
+**P1-7 · `?drill=<locked key>` landed on Navigation maze in silence.** `index.html:30519-30559`
+(new `hkExplainStartFallback`), `30185-30206` (the gate/paywall branch), `30997/30976` (boot).
+All 74 public SEO drill pages, the `drills/` library and every "next drills" rail point at
+`index.html?drill=<key>`; a visitor with no PBs has **49 of 74 locked**, so two thirds of organic
+landing traffic arrived on the wrong board with no toast, no modal and no copy. `loadChallenge()`
+did call `openGateInfo()` — but at boot there is no board yet and the marketing landing owns the
+whole viewport (`landingOpen` stays true until Start), so the card was painted **behind the
+landing**, explaining a board the visitor could not see. Fixed at both ends: the boot branch now
+raises the card only when a board is already on screen, and the deep link is remembered and
+explained once the visitor can actually see the trainer — a toast naming the lock ("WACC opens at
+level 7 · 18 pace clears — starting you on Navigate") followed by the gate card. Respects the r452
+`hkPlacementRide` predicate and the r450 paywall branch (a board that RODE the gate reaches the
+helper with `cur === want` and nothing is said). Guard: **`dev/check-deeplink.js`** (new, ~25s,
+always-on) — 18 asserts including the *control* cases (an unlocked deep link and a plain load must
+stay silent); **5 fail pre-fix**.
+
+**P1-3 · `billing.html` and `drills.js`.** Already fixed on this branch (`billing.html:105`, r450
+loads the catalog so the plan's included-list is derived). What was missing was the net: `dev/e2e-smoke.js`
+only ever read `console` messages of type `error`, so nav.js's "drills.js not loaded — profile modal
+will be empty" **warning** on every single load was invisible to CI for a full release.
+`dev/e2e-smoke.js:41-47` now fails on warnings too, same ERR_/supabase carve-out.
+
+**P1-5 / P1-6 · two pages scrolled sideways on a phone.** `About.html:78-84` — `.hero-glow` is 760px,
+absolutely centred, and escaped an unclipped `.hero` (measured left −192, right 568): `overflow:hidden`.
+`stats.html:73-78` — six rarity chips in a non-wrapping `inline-flex` reached right:691 against a
+390px viewport: `flex-wrap:wrap`, `max-width:100%`, and the 14px indent drops under 560px. Guard:
+`dev/e2e-smoke.js:9-19,50-84` — the hand crawl encoded, **all 17 top-level pages at 390×844,
+`scrollWidth == clientWidth`**, and on failure it names the widest escaping element rather than
+printing a bare pixel count.
+
+**P1-4 · `dev/e2e-audit-visual.js` was 108/379 RED on a clean tree** — 27 themes × 4 assertions,
+identical everywhere, which is the tell that the harness and not the product had drifted. Three
+probe faults, all repaired, none re-thresholded: (a) `parseColor` could not read
+`color(srgb r g b / a)`, which is how Chromium serialises `#grid td`'s `color-mix(in srgb, …)`
+gridline — 54 of the 108 failures were this one missing branch; (b) the sheet background moved off
+`.gridwrap` (now transparent, carrying only the light-sheet variable overrides) down to `table#grid`,
+so every swatch was scored against `rgba(0,0,0,0)` ≡ **black** — hence "black" at 1.38:1 and
+darkgray at exactly 2.03:1 on all 27 themes; the probe now walks up to the first ancestor that
+actually paints; (c) applied-border ink left `boxShadow` for the r442 `::after` overlay, so it read
+`none` — the probe reads the pseudo-element, **and its width**, so a collapsed overlay (the r442 bug
+class) cannot pass as ink. Re-baseline: **ALL 406 PASS in 18s. Zero real theme-contrast defects on
+any theme** — the whole 108 was harness rot. Tightest margins across all 27: gridline vs sheet
+**1.17** (floor 1.15), blue fill vs sheet 1.55, gray swatch 3.35, everything else ≥3.6. Wired into
+gate.yml **always-on**, not the engine lane: what it guards is themes.js and the sheet CSS, and
+themes.js is a cosmetic-lane file — the same argument the paywall step makes for billing.html.
+
+**P2-1 · a toast fired during the tour rendered under the scrim.** `index.html:900-912`. `#hkToast`
+was z-index 220, `.tour-wrap` is 340; `elementFromPoint` at the toast's centre returned `tourWrap`.
+Not cosmetic: the tour's ENTRY and DO-IT beats deliberately pass real grid keys through, and
+`openGateInfo` degrades to a **toast** mid-tour by design (r174) — so the one message the tour cannot
+show as a modal was the one it most reliably hid. Raised to 360. Asserted in `check-deeplink.js §2`
+(the hit test lifts the toast's `pointer-events:none` for the probe, because `elementFromPoint`
+skips such elements and would otherwise "fail" at any z-index).
+
+**P2-4 · the `?` sheet mis-described F1 and omitted three real shortcuts.** `index.html:28925-28948`.
+F1 was labelled "toggle guided hints (paint-by-numbers walkthrough)"; it calls `toggleHints()` —
+tips only, no cursor lock. The walkthrough is a separate control (the ⤲ guided button; `g` is its key
+only inside a rapid-fire/marathon session, and a literal `g` on a classic board — so listing bare `g`
+under "while training" would have been a second, opposite lie). Two accurate rows now, plus
+**Alt/Ctrl+PgUp/PgDn** (`stepSheetTab` — walk the current chapter) and **Esc · Esc** (restart; the
+engine already toasts "esc·esc restarts" while the sheet offered only Shift+F11).
+
+**P2-6 · two malformed chords in `refmap.js`.** `dev/build-drill-pages.js:79-121`. The extractor let
+an Alt ribbon walk survive past the end of a demo STEP, so plain letters typed in the *next* step
+were appended as if they were ribbon mnemonics: `sort` demos Alt A S D E and then types a deal name,
+publishing `ALT>A>S>D>E>R>I>D>G>E` and `ALT>A>S>D>E>D>E>L>T>A`. Inert today (reference.html only does
+exact lookups) but the same mis-segmentation *consumes* a real chord whenever typed text follows a
+walk — the honest form never gets emitted at all. A walk is always contained in one step (the next
+step re-selects a cell), so it is closed at the step boundary. Regenerated: `refmap.js` loses exactly
+those two keys and keeps `ALT>A>S>D>E`; `drills/sort.html` loses the two bogus chips; **no other page
+changed**. `refmap.js?v=1 → v=2` in `reference.html`.
+
+**P2-7 · `cert.html` told a valid holder their link was malformed.** `cert.html:99-104`. `!id || !window.sb`
+was one branch printing "No certificate id.", so opening a perfectly good `cert.html?id=<real id>`
+while the backend was unreachable sent the holder hunting for a better link that does not exist.
+Two causes, two messages.
+
+**Recorded, not fixed** (new, out of scope): `pastes` overruns its frame by ~31px on a **fresh** load
+at 960 (681 in a 650 wrap) — three columns hit the elastic fit's per-column 40px floor, so the
+proportional shrink cannot reach `__availW`. Unrelated to resize; `check-resize.js` prints it as a
+NOTE rather than widening a threshold to hide it.
+
 ## r450 — THE PAYWALL, BUILT DARK: one entitlement point, a locked catalog, and the Stripe wiring inventory
 
 _Scope: the COMPLETE premium user experience behind `HOTKEY_PREMIUM.enabled`, which stays **false**.
