@@ -1,0 +1,433 @@
+<!doctype html><html><head><meta charset="utf-8"><title>frame art proto — PIXEL direction (r452)</title>
+<!-- no-op stub: themes.js hkEnsureSkinFonts() short-circuits on this id, so the proto
+     never reaches the network (Cinzel/VT323 fall back to the local serif/mono stack). -->
+<style id="hk-skin-fonts"></style>
+<style>
+/* ============ page chrome ============ */
+body{margin:0;font-family:'JetBrains Mono',ui-monospace,monospace;background:#141519;color:#cdd0d6;padding:26px 26px 60px}
+body.light{background:#e9eaed;color:#2a2c31}
+h1{font-size:14px;letter-spacing:2px;color:#8b8f98;margin:0 0 4px}
+.sub{font-size:11px;color:#7c828e;margin-bottom:22px;max-width:1120px;line-height:1.55}
+.sub b{color:#a9aeb9}
+body.light .sub b{color:#3a3d44}
+.band{margin-bottom:26px}
+.bandcap{font-size:10px;color:#7c828e;letter-spacing:1.5px;margin:0 0 4px;text-transform:uppercase}
+.bandnote{font-size:10.5px;color:#6c717b;margin:0 0 12px;max-width:1120px;line-height:1.5}
+.pair{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+.slot{display:flex;flex-direction:column;gap:7px}
+.slotlbl{font-size:9px;letter-spacing:2px;color:#6c717b}
+.slotlbl.px{color:#8fbf7a}
+.toggle{position:fixed;top:10px;right:14px;font-size:11px;color:#7c828e;cursor:pointer;border:1px solid #33363d;border-radius:6px;padding:5px 9px;background:#1d1f25;z-index:99}
+body.light .toggle{background:#f6f7f9;border-color:#d0d2d8}
+
+/* ============================================================
+   COPIED FROM nav.css — the real card layout + the four ORIGINAL
+   skins, verbatim enough to be a fair before/after.
+   ============================================================ */
+@property --hkang{ syntax:'<angle>'; inherits:false; initial-value:0deg; }
+@keyframes hkBorderSpin{ to{ --hkang:360deg; } }
+@property --hkcyl{ syntax:'<angle>'; inherits:false; initial-value:0deg }
+@keyframes hkCylonCircle{ to{ --hkcyl:360deg } }
+
+.uc{position:relative;border-radius:16px;padding:22px 24px 20px;width:430px;box-sizing:border-box;
+  font-family:ui-sans-serif,system-ui,sans-serif}
+.uc[class*="hk-frame-"]{border-width:5px}
+.uc .hk-fx,.uc .px-fx{position:absolute;inset:0;z-index:0;pointer-events:none;border-radius:inherit}
+.uc-head,.uc-div,.uc-stats,.uc-meds{position:relative;z-index:2}
+.uc-head{display:flex;align-items:center;gap:16px}
+.uc-crest{line-height:0;flex:none;width:60px;height:60px;display:grid;place-items:center;
+  border:2px solid var(--accent-dim,#666);border-radius:10px;font-size:26px;color:var(--accent,#ccc);
+  background:var(--surface,rgba(0,0,0,.4))}
+.uc-id{min-width:0;flex:1}
+.uc-nm{font-size:24px;font-weight:700;letter-spacing:.3px;line-height:1.05;color:var(--text)}
+.uc-tier{font-size:11px;color:var(--muted);margin-top:3px}
+.uc-titlechip{display:flex;margin-top:6px}
+.uc-titlechip span{font-family:ui-monospace,monospace;font-size:10.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;padding:3px 10px;border-radius:6px;color:var(--text);
+  background:var(--surface2,rgba(0,0,0,.32));border:1px solid var(--line)}
+.uc-lvlwrap{flex:none;text-align:right}
+.uc-lvl{display:inline-flex;align-items:center;font-size:19px;font-weight:800;color:var(--accent);
+  background:var(--surface2,rgba(0,0,0,.32));border:1px solid var(--line);border-radius:9px;padding:5px 11px}
+.uc-div{height:1px;background:var(--line);border:0;margin:16px 0}
+.uc-stats{display:flex;gap:14px;flex-wrap:wrap}
+.uc-stats .s{display:flex;flex-direction:column;gap:1px}
+.uc-stats b{font-size:19px;font-weight:700;color:var(--text)}
+.uc-stats .s>span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
+.uc-meds{display:flex;gap:6px;margin-top:16px}
+.uc-meds i{flex:1;height:34px;border-radius:8px;border:1px dashed var(--line);display:grid;place-items:center;
+  font-style:normal;font-size:15px;color:var(--muted);background:var(--surface2,rgba(0,0,0,.28))}
+
+/* the notch nameplate (nav.css:471 / :741 ANGULAR taxonomy) */
+.hkf-tab{position:absolute; top:-15px; left:50%; transform:translateX(-50%); z-index:3; pointer-events:none;
+  font-style:normal; font-family:ui-monospace,monospace; font-size:10.5px; font-weight:700;
+  letter-spacing:.26em; white-space:nowrap; padding:5px 18px;
+  border:0; border-radius:0; box-shadow:0 2px 6px rgba(0,0,0,.45);
+  clip-path:polygon(9px 0,calc(100% - 9px) 0,100% 100%,0 100%)}
+
+/* dark inner panels on every skinned card (nav.css:726) */
+[class*="hk-frame-"],[class*="px-frame-"]{--surface2:rgba(0,0,0,.32); --surface:rgba(0,0,0,.4); --faint:rgba(255,255,255,.34)}
+
+/* --- ORIGINAL · HERALDIC · MD (nav.css:524–541) --- */
+.hk-frame-heraldic{--text:#f7d6ce;--muted:#c98a82;--line:#5a1414;--accent:#e8443a;--accent-dim:#8a1410; color:#f7d6ce;
+  border:5px solid transparent; box-shadow:0 0 26px rgba(200,24,24,.26),0 20px 60px rgba(0,0,0,.66);
+  background:radial-gradient(ellipse at 50% 8%,rgba(180,20,20,.24),transparent 58%),linear-gradient(#140608,#0c0305) padding-box,
+    conic-gradient(from var(--hkang,120deg),#e8be62,#7a1410,#c02a1a,#3a0406,#d8a24a,#5a0a0c,#e8be62) border-box}
+.hk-frame-heraldic::after{content:''; position:absolute; inset:0; z-index:1; pointer-events:none; border-radius:inherit; padding:5px;
+  background:conic-gradient(from var(--hkcyl,0deg), transparent 0deg 292deg, rgba(255,42,26,.5) 316deg, #ff7a4a 338deg, #ffd8bc 350deg, #ff7a4a 358deg, transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite:exclude;
+  filter:drop-shadow(0 0 5px rgba(255,54,26,.85))}
+.hk-frame-heraldic .uc-nm{font-family:Cinzel,Georgia,serif;letter-spacing:1px}
+
+/* --- ORIGINAL · SAKURA (nav.css:892) --- */
+.hk-frame-sakura{--text:#ffe0ec; --muted:#d79ab0; --line:#5a2a3c; --accent:#ff8fb8; --accent-dim:#d05a86;
+  border:5px solid transparent; color:#ffe0ec;
+  background:radial-gradient(ellipse at 30% 0%,rgba(255,150,196,.26),transparent 58%),linear-gradient(160deg,#2a0f1a,#1c0a12) padding-box,
+    linear-gradient(120deg,#ffc2dc,#ff8fb8 55%,#c95a86) border-box;
+  box-shadow:0 0 22px rgba(255,140,190,.2),0 20px 60px rgba(0,0,0,.58)}
+
+/* --- ORIGINAL · PRO · Cosmic (nav.css:841) --- */
+.hk-frame-pro{--text:#f6ecca; --muted:#b6a886; --line:#4a3f1e; --accent:#f0dfa8; --accent-dim:#a08a3a;
+  border:5px solid transparent; color:#f6ecca;
+  background:radial-gradient(ellipse at 28% 6%,rgba(120,90,190,.38),transparent 55%),linear-gradient(#0a0a18,#111022) padding-box,
+    conic-gradient(from var(--hkang,210deg),#f3e6b0,#8f7fff,#4fd0ff,#c98fff,#5fe0c0,#ffd98a,#6f8fff,#f3e6b0) border-box;
+  box-shadow:0 0 22px rgba(217,194,122,.2),0 20px 60px rgba(0,0,0,.6)}
+
+/* --- ORIGINAL · ELITE BOUTIQUE (nav.css:917) --- */
+.hk-frame-boutique{--text:#f2ecd8; --muted:#a89772; --line:#33301f; --accent:#d8b25a; --accent-dim:#8a6d2f;
+  border:5px solid transparent; color:#f2ecd8;
+  background:linear-gradient(160deg,#0d0d12,#07070a) padding-box,
+    conic-gradient(from var(--hkang,120deg),#f0dd9a,#8a6d2f,#4a3a18,#e8cf88,#f0dd9a) border-box;
+  box-shadow:0 0 20px rgba(210,170,90,.15),0 20px 60px rgba(0,0,0,.68)}
+
+@media (prefers-reduced-motion: no-preference){
+  .hk-frame-heraldic{animation:hkBorderSpin 17s linear infinite}
+  .hk-frame-heraldic::after{animation:hkCylonCircle 6s linear infinite}
+  .hk-frame-pro{animation:hkBorderSpin 9s linear infinite}
+  .hk-frame-boutique{animation:hkBorderSpin 16s linear infinite}
+}
+
+/* ============================================================
+   PIXEL PASS — the proposed treatment. One shared rule set,
+   then a per-skin palette. PX = 3px at card scale.
+   ============================================================ */
+.pxhalo{--px:3px; padding:6px; width:442px; box-sizing:border-box; position:relative}
+.pxhalo::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  /* dithered 2-band halo: a 2px checker outside, a solid inner band. No blur anywhere. */
+  background-image:repeating-conic-gradient(var(--halo2) 0% 25%, transparent 0% 50%);
+  background-size:4px 4px;
+  box-shadow:inset 0 0 0 3px var(--halo1);
+  clip-path:polygon(9px 0,calc(100% - 9px) 0,calc(100% - 9px) 3px,calc(100% - 3px) 3px,calc(100% - 3px) 9px,100% 9px,
+    100% calc(100% - 9px),calc(100% - 3px) calc(100% - 9px),calc(100% - 3px) calc(100% - 3px),calc(100% - 9px) calc(100% - 3px),calc(100% - 9px) 100%,
+    9px 100%,9px calc(100% - 3px),3px calc(100% - 3px),3px calc(100% - 9px),0 calc(100% - 9px),
+    0 9px,3px 9px,3px 3px,9px 3px)}
+.uc[class*="px-frame-"]{
+  border-radius:0; border:6px solid transparent; box-shadow:none;
+  /* squared corners with a 3px 45-degree stair — the pixel silhouette */
+  clip-path:polygon(6px 0,calc(100% - 6px) 0,calc(100% - 6px) 3px,calc(100% - 3px) 3px,calc(100% - 3px) 6px,100% 6px,
+    100% calc(100% - 6px),calc(100% - 3px) calc(100% - 6px),calc(100% - 3px) calc(100% - 3px),calc(100% - 6px) calc(100% - 3px),calc(100% - 6px) 100%,
+    6px 100%,6px calc(100% - 3px),3px calc(100% - 3px),3px calc(100% - 6px),0 calc(100% - 6px),
+    0 6px,3px 6px,3px 3px,6px 3px)}
+/* 1px lighter inner rim replaces every box-shadow glow */
+.uc[class*="px-frame-"]::before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  box-shadow:inset 0 0 0 1px var(--rim)}
+.uc[class*="px-frame-"] .px-fx{image-rendering:pixelated;image-rendering:crisp-edges;border-radius:0}
+/* every panel inside goes square + hard-edged too */
+.uc[class*="px-frame-"] .uc-crest,.uc[class*="px-frame-"] .uc-lvl,
+.uc[class*="px-frame-"] .uc-titlechip span,.uc[class*="px-frame-"] .uc-meds i{border-radius:0}
+.pxhalo>.hkf-tab{top:-9px;z-index:5}
+.pxhalo .hkf-tab{border-radius:0;box-shadow:2px 2px 0 rgba(0,0,0,.55);
+  clip-path:polygon(6px 0,calc(100% - 6px) 0,calc(100% - 6px) 3px,100% 3px,100% 100%,0 100%,0 3px,6px 3px)}
+.uc[class*="px-frame-"] .uc-nm{font-family:ui-monospace,monospace;letter-spacing:1px;font-size:21px}
+
+/* PIXEL · HERALDIC — gilt/crimson stepped bands, Cylon eye in 24 steps */
+.px-frame-heraldic{--text:#f7d6ce;--muted:#c98a82;--line:#5a1414;--accent:#e8443a;--accent-dim:#8a1410;
+  --rim:#e8be62; --halo1:rgba(200,24,24,.30); --halo2:rgba(200,24,24,.30); color:#f7d6ce;
+  /* interior gradient quantized to 3 solid bands */
+  background:linear-gradient(#1c080b 0 34%,#140608 34% 70%,#0c0305 70% 100%) padding-box,
+    repeating-conic-gradient(from var(--hkang,120deg),
+      #e8be62 0deg 22.5deg,#7a1410 22.5deg 45deg,#c02a1a 45deg 67.5deg,#3a0406 67.5deg 90deg) border-box}
+.px-frame-heraldic::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;padding:6px;
+  background:conic-gradient(from var(--hkcyl,0deg), transparent 0deg 300deg,
+    #7a1410 300deg 315deg, #ff2a1a 315deg 330deg, #ff7a4a 330deg 345deg, #ffd8bc 345deg 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite:exclude}
+
+/* PIXEL · SAKURA — static two-band border, no spin (matches the original) */
+.px-frame-sakura{--text:#ffe0ec;--muted:#d79ab0;--line:#5a2a3c;--accent:#ff8fb8;--accent-dim:#d05a86;
+  --rim:#ffc2dc; --halo1:rgba(255,140,190,.26); --halo2:rgba(255,140,190,.26); color:#ffe0ec;
+  background:linear-gradient(#3a1524 0 30%,#2a0f1a 30% 66%,#1c0a12 66% 100%) padding-box,
+    repeating-linear-gradient(45deg,#ffc2dc 0 6px,#ff8fb8 6px 12px,#c95a86 12px 18px) border-box}
+.px-frame-sakura::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
+  box-shadow:inset 0 0 0 3px transparent}
+
+/* PIXEL · PRO · Cosmic — 8-sector prism border, jumps a sector per step */
+.px-frame-pro{--text:#f6ecca;--muted:#b6a886;--line:#4a3f1e;--accent:#f0dfa8;--accent-dim:#a08a3a;
+  --rim:#f3e6b0; --halo1:rgba(217,194,122,.24); --halo2:rgba(140,110,220,.28); color:#f6ecca;
+  background:linear-gradient(#181432 0 28%,#111022 28% 62%,#0a0a18 62% 100%) padding-box,
+    repeating-conic-gradient(from var(--hkang,210deg),
+      #f3e6b0 0deg 22.5deg,#8f7fff 22.5deg 45deg,#4fd0ff 45deg 67.5deg,#c98fff 67.5deg 90deg,
+      #5fe0c0 90deg 112.5deg,#ffd98a 112.5deg 135deg,#6f8fff 135deg 157.5deg,#c98fff 157.5deg 180deg) border-box}
+
+/* PIXEL · ELITE BOUTIQUE — 6-sector gold border, slow step spin */
+.px-frame-boutique{--text:#f2ecd8;--muted:#a89772;--line:#33301f;--accent:#d8b25a;--accent-dim:#8a6d2f;
+  --rim:#f0dd9a; --halo1:rgba(210,170,90,.20); --halo2:rgba(210,170,90,.20); color:#f2ecd8;
+  background:linear-gradient(#141419 0 30%,#0d0d12 30% 66%,#07070a 66% 100%) padding-box,
+    repeating-conic-gradient(from var(--hkang,120deg),
+      #f0dd9a 0deg 22.5deg,#8a6d2f 22.5deg 45deg,#4a3a18 45deg 67.5deg,#e8cf88 67.5deg 90deg) border-box}
+
+/* Motion is KEPT, only quantized: steps() on every sweep + rotation. */
+@media (prefers-reduced-motion: no-preference){
+  .px-frame-heraldic{animation:hkBorderSpin 17s steps(16) infinite}
+  .px-frame-heraldic::after{animation:hkCylonCircle 6s steps(24) infinite}
+  .px-frame-pro{animation:hkBorderSpin 9s steps(16) infinite}
+  .px-frame-boutique{animation:hkBorderSpin 16s steps(16) infinite}
+}
+</style></head><body>
+<div class="toggle" onclick="document.body.classList.toggle('light')">toggle light/dark</div>
+<h1>HOTKEY.GG — CARD FRAMES · PIXEL DIRECTION (prototype, r452)</h1>
+<div class="sub">A decision prototype, not final art. <b>Left of each pair = today's frame</b> (nav.css rules copied verbatim; the canvas is driven by the real
+<b>themes.js hkInitCardFx</b> engine, so the motion is the shipped motion). <b>Right = the pixel pass.</b> Same motion semantics, quantized:
+borders become 2×3px stepped bands with a 45° stair corner and a 1px lighter rim (no blur, no anti-aliased gradient — every gradient cut to 3–4 hard stops);
+sweeps and rotations keep their period but run on <b>steps(n)</b>; particles run on a 3px grid at 8fps as square sprites with 3-level alpha instead of continuous fades;
+outer glows become a 1px rim plus a dithered 2-band checker halo. Ids, earn gates and the notch taxonomy are untouched.</div>
+<div id="rows"></div>
+
+<script src="../themes.js"></script>
+<script>
+/* ============================================================
+   MOCK CARD — approximately the real .uc at full (430px) scale.
+   ============================================================ */
+const CARDS = [
+  {id:'heraldic', px:'heraldic', kind:'heraldic', pxkind:'pxheraldic',
+   tab:['⬧ HERALDIC','#12060a','linear-gradient(120deg,#c02a1a,#5a0a0c)'],
+   pxtab:['⬧ HERALDIC','#12060a','linear-gradient(90deg,#c02a1a 0 50%,#7a1410 50% 100%)'],
+   name:'WOLF', tier:'MD · TOP BUCKET', title:'Chartered', lvl:42, crest:'◆',
+   cap:'HERALDIC · MD — the Cylon border sweep',
+   note:'Original: a conic red arc orbits the 5px ring on a 6s linear loop, over a 17s crimson+gilt border spin; canvas = radial "menace" breathe, rising red/gold embers, a raking gold glint, a breathing lozenge watermark. Pixel: the same 6s orbit on steps(24) — the eye jumps one 15° cell at a time, a scanner not a smear; the menace becomes 3 dithered radial bands; embers are 3px squares on a 3px grid at 8fps; the glint is a 4-cell hard column; the lozenge is a 1px Bresenham diamond that toggles between two brightnesses.'},
+  {id:'sakura', px:'sakura', kind:'petals', pxkind:'pxpetals',
+   tab:['❀ SAKURA','#3a1a26','linear-gradient(120deg,#ffd6e6,#ffaccb)'],
+   pxtab:['❀ SAKURA','#3a1a26','linear-gradient(90deg,#ffd6e6 0 50%,#ffaccb 50% 100%)'],
+   name:'ANALYST', tier:'FIRST-YEAR · 14-DAY STREAK', title:'Crownholder', lvl:17, crest:'❀',
+   cap:'SAKURA — drifting petals (the particle class)',
+   note:'Original: rotated translucent ellipses fall and sway on a sine, continuous rotation and per-petal alpha. Pixel: three 2-frame petal sprites (flat · edge · turned) cycle in place of continuous rotation, positions snap to the 3px grid, three fixed pink tones replace the alpha ramp, and the sway is a stepped ±1-cell drift. Same fall speed, same density.'},
+  {id:'pro', px:'pro', kind:'nebula', pxkind:'pxnebula',
+   tab:['◆ PRO','#241a06','linear-gradient(90deg,#e6c86e,#f3e6b0)'],
+   pxtab:['◆ PRO','#241a06','linear-gradient(90deg,#e6c86e 0 50%,#f3e6b0 50% 100%)'],
+   name:'PRO MEMBER', tier:'ASSOCIATE · PRO', title:'PRO', lvl:28, crest:'✦',
+   cap:'PRO · COSMIC — the nebula (the premium-smooth question)',
+   note:'Original: four additive radial clouds drift and breathe, a hue-cycling aurora band rakes across every 9s, a star field twinkles on a sine; the border conic spins in 9s. Pixel: the clouds are quantized to 3 alpha bands with a 2×2 Bayer dither at the boundary, the aurora band is a hard 6-cell column stepping across on the same 9s, stars are 1px squares on a 3-frame twinkle, the border is 8 hard sectors on steps(8). This is the deliberate test of whether the PAID tier should go pixel at all.'},
+  {id:'boutique', px:'boutique', kind:'quilt', pxkind:'pxquilt',
+   tab:['◈ ELITE BOUTIQUE','#0b0b10','linear-gradient(120deg,#e8cf88,#8a6d2f)'],
+   pxtab:['◈ ELITE BOUTIQUE','#0b0b10','linear-gradient(90deg,#e8cf88 0 50%,#8a6d2f 50% 100%)'],
+   name:'CHARTERED','tier':'SECOND-YEAR · 3 CERTIFICATES', title:'Modeler', lvl:36, crest:'◈',
+   cap:'ELITE BOUTIQUE — the quilted lattice + gold studs',
+   note:'Original: a diagonal lattice of hairlines, gold studs at every intersection, and a 4.2s diagonal sheen front that ignites the studs it crosses (radius-and-shadow ramp). Pixel: the lattice is drawn with integer 45° stepping so it is crisp by construction, studs are 1px/2px/3px squares — three sizes standing in for the continuous glow ramp — and the sheen front advances one lattice cell per step on the same 4.2s period.'}
+];
+
+function tabHtml(t, pixel){
+  return '<i class="hkf-tab" style="color:'+t[1]+';background:'+t[2]+'">'+t[0]+'</i>';
+}
+function cardHtml(c, pixel){
+  const cls = pixel ? ('uc px-frame-'+c.px) : ('uc hk-frame-'+c.id+' hk-frame-lg');
+  const kind = pixel ? c.pxkind : c.kind;
+  return '<div class="'+cls+'">'+
+    '<canvas class="'+(pixel?'px-fx':'hk-fx')+'" data-kind="'+kind+'" aria-hidden="true"></canvas>'+
+    (pixel ? '' : tabHtml(c.tab, pixel))+
+    '<div class="uc-head"><span class="uc-crest">'+c.crest+'</span>'+
+      '<div class="uc-id"><div class="uc-nm">'+c.name+'</div><div class="uc-tier">'+c.tier+'</div>'+
+      '<div class="uc-titlechip"><span>'+c.title+'</span></div></div>'+
+      '<div class="uc-lvlwrap"><div class="uc-lvl">LVL '+c.lvl+'</div></div></div>'+
+    '<hr class="uc-div">'+
+    '<div class="uc-stats">'+
+      '<span class="s"><b>1,284</b><span>solves</span></span>'+
+      '<span class="s"><b>17</b><span>crowns</span></span>'+
+      '<span class="s"><b>94%</b><span>efficiency</span></span>'+
+      '<span class="s"><b>31</b><span>day streak</span></span></div>'+
+    '<div class="uc-meds"><i>★</i><i>◆</i><i>❖</i><i>·</i><i>·</i></div>'+
+  '</div>';
+}
+document.getElementById('rows').innerHTML = CARDS.map(c =>
+  '<div class="band"><div class="bandcap">'+c.cap+'</div><div class="bandnote">'+c.note+'</div>'+
+  '<div class="pair">'+
+    '<div class="slot"><div class="slotlbl">ORIGINAL — shipped (nav.css + themes.js fx)</div>'+cardHtml(c,false)+'</div>'+
+    '<div class="slot"><div class="slotlbl px">PIXEL PASS — proposed</div><div class="pxhalo px-frame-'+c.px+'">'+tabHtml(c.pxtab,true)+cardHtml(c,true)+'</div></div>'+
+  '</div></div>').join('');
+
+/* ---- ORIGINAL side: the real engine, unmodified ---- */
+requestAnimationFrame(()=>{ try{ window.hkInitCardFx(document); }catch(e){ console.warn(e); } });
+
+/* ============================================================
+   PIXEL FX — a minimal re-implementation of the same four motions
+   on a low-resolution buffer. Every buffer pixel = PX css px, so
+   nothing is ever anti-aliased; the canvas is upscaled with
+   image-rendering:pixelated. 8fps step cadence; reduced-motion
+   draws exactly one frame.
+   ============================================================ */
+(function(){
+  const PX = 3, FPS = 8, STEP = 1000/FPS;
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const R = (a,b)=>a+Math.random()*(b-a);
+  const BAYER = [[0,2],[3,1]];   // 2x2 ordered dither
+  const sys = [];
+
+  document.querySelectorAll('canvas.px-fx').forEach(cv=>{
+    const box = cv.parentElement, r = box.getBoundingClientRect();
+    const w = Math.max(4, Math.round(r.width/PX)), h = Math.max(4, Math.round(r.height/PX));
+    cv.width = w; cv.height = h; cv.style.width='100%'; cv.style.height='100%';
+    const ctx = cv.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    sys.push({ctx, w, h, kind:cv.dataset.kind, st:seed(cv.dataset.kind, w, h)});
+  });
+
+  function seed(kind, w, h){
+    if(kind==='pxheraldic'){
+      const n = Math.round(w*h/70)+8, p=[];
+      for(let i=0;i<n;i++) p.push({x:(R(0,w))|0, y:(R(0,h))|0, sp:1+((Math.random()*2)|0), gold:(i%4===0), ph:(Math.random()*3)|0});
+      return {p, cx:(w*.5)|0, cy:(h*.46)|0, rad:Math.max(4,(Math.min(w,h)*.20)|0)};
+    }
+    if(kind==='pxpetals'){
+      const n = Math.round(w*h/150)+7, p=[];
+      for(let i=0;i<n;i++) p.push({x:(R(0,w))|0, y:(R(0,h))|0, sp:1+((Math.random()*2)|0), f:(Math.random()*3)|0,
+        c:i%3, sway:(Math.random()*4)|0});
+      return {p};
+    }
+    if(kind==='pxnebula'){
+      const cols=[[150,120,255],[90,140,255],[255,200,120],[200,110,230]], b=[];
+      for(let i=0;i<4;i++) b.push({x:(R(.2,.8)*w)|0, y:(R(.2,.8)*h)|0, r:(R(.30,.48)*Math.max(w,h))|0,
+        c:cols[i], dx:(Math.random()<.5?1:-1), dy:(Math.random()<.5?1:-1), ph:(Math.random()*8)|0});
+      const n=Math.round(w*h/26)+14, st=[];
+      for(let i=0;i<n;i++) st.push({x:(R(0,w))|0, y:(R(0,h))|0, ph:(Math.random()*6)|0, sp:1+((Math.random()*2)|0)});
+      return {b, st};
+    }
+    if(kind==='pxquilt'){
+      return {sp: Math.max(6, Math.round(w/9))};
+    }
+    return {};
+  }
+
+  function px(ctx,x,y,c,s){ ctx.fillStyle=c; ctx.fillRect(x|0,y|0,s||1,s||1); }
+
+  function draw(o, f){   // f = integer frame counter (8fps)
+    const {ctx,w,h,st,kind} = o;
+    ctx.clearRect(0,0,w,h);
+
+    if(kind==='pxheraldic'){
+      /* 3-band radial "menace", dithered at each band boundary — the pixel stand-in
+         for the original's continuous radial gradient. Breathes on a 4-step cycle. */
+      const beat = [0,1,2,1][f%4];
+      const r1 = (Math.min(w,h)*.30)+beat, r2 = (Math.min(w,h)*.55)+beat*1.5, r3 = Math.max(w,h)*.80;
+      const BANDS = ['rgba(175,24,24,.30)','rgba(120,12,16,.24)','rgba(60,4,10,.16)'];
+      for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+        const dx=x-st.cx, dy=(y-st.cy)*1.35, d=Math.sqrt(dx*dx+dy*dy);
+        let band = d<r1?0 : d<r2?1 : d<r3?2 : -1;
+        if(band<0) continue;
+        // ordered dither on the outer edge of each band
+        const edge = band===0?(d-r1*.72)/(r1*.28) : band===1?(d-r2*.78)/(r2*.22) : (d-r3*.7)/(r3*.3);
+        if(edge>0 && BAYER[y&1][x&1] < edge*4) band = Math.min(2, band+1);
+        px(ctx,x,y,BANDS[band]);
+      }
+      /* gold glint: a hard 4-cell column raking across, on the original 5.5s period */
+      const gp = (f/(5.5*FPS))%1;
+      if(gp<.34){ const gx = ((-4 + gp*(w+12))|0);
+        for(let i=0;i<4;i++) for(let y=0;y<h;y++) px(ctx,gx+i+((y/6)|0),y, i===1||i===2?'rgba(240,200,110,.26)':'rgba(240,200,110,.13)');
+      }
+      /* embers: 3px squares (1 buffer cell), red with a gilt quarter, 3-level alpha */
+      const RED=['rgba(212,40,38,.42)','rgba(212,40,38,.72)','rgba(255,120,90,1)'];
+      const GLD=['rgba(232,184,84,.42)','rgba(232,184,84,.72)','rgba(255,224,150,1)'];
+      for(const s of st.p){
+        if(!reduce){ s.y -= (f%2===0 ? s.sp : 0); if(s.y< -1){ s.y=h+1; s.x=(R(0,w))|0; }
+          if(f%3===0) s.x += (((f+s.ph)%2)?1:-1); if(s.x<0)s.x=w-1; if(s.x>=w)s.x=0; }
+        const lvl = [0,1,2,1][(f+s.ph)%4];
+        px(ctx, s.x, s.y, (s.gold?GLD:RED)[lvl]);
+      }
+      /* lozenge watermark: 1px Bresenham diamond, 2-frame brightness toggle */
+      const bright = (f%8)<4;
+      const lz = bright ? 'rgba(224,176,84,.34)' : 'rgba(224,176,84,.20)';
+      const li = bright ? 'rgba(210,50,44,.42)' : 'rgba(210,50,44,.26)';
+      diamond(ctx, st.cx, st.cy, st.rad, lz);
+      diamond(ctx, st.cx, st.cy, (st.rad*.62)|0, li);
+    }
+
+    else if(kind==='pxpetals'){
+      /* three sprite frames stand in for continuous rotation */
+      const SPR = [ [[0,0],[1,0]],                     // flat
+                    [[0,0],[1,0],[0,1],[1,1]],         // turned (2x2)
+                    [[0,0],[0,1]] ];                   // edge-on
+      const COLS = ['rgba(255,208,228,.92)','rgba(255,182,212,.92)','rgba(255,226,238,.75)'];
+      for(const s of st.p){
+        if(!reduce){ s.y += (f%2===0 ? s.sp : 1);
+          if(f%3===0) s.x += ((f+s.sway)%2 ? 1 : -1);
+          if(f%5===0) s.f = (s.f+1)%3;
+          if(s.y>h+2){ s.y=-2; s.x=(R(0,w))|0; }
+          if(s.x<0)s.x=w-1; if(s.x>=w)s.x=0; }
+        for(const [ox,oy] of SPR[s.f]) px(ctx, s.x+ox, s.y+oy, COLS[s.c]);
+      }
+    }
+
+    else if(kind==='pxnebula'){
+      /* clouds: 3 quantized alpha bands with a 2x2 Bayer dither at each boundary */
+      for(const b of st.b){
+        if(!reduce && f%4===0){ b.x += b.dx; b.y += b.dy;
+          if(b.x<w*.12||b.x>w*.88) b.dx*=-1; if(b.y<h*.12||b.y>h*.88) b.dy*=-1; }
+        const pulse = [0,1,2,1][((f>>2)+b.ph)%4], rr = b.r + pulse;
+        const A=['.30','.18','.09'];
+        for(let y=Math.max(0,b.y-rr); y<Math.min(h,b.y+rr); y++)
+          for(let x=Math.max(0,b.x-rr); x<Math.min(w,b.x+rr); x++){
+            const dx=x-b.x, dy=y-b.y, d=Math.sqrt(dx*dx+dy*dy)/rr;
+            if(d>1) continue;
+            let band = d<.42?0 : d<.72?1 : 2;
+            const edge = band===0?(d-.30)/.12 : band===1?(d-.62)/.10 : (d-.88)/.12;
+            if(edge>0 && BAYER[y&1][x&1] < edge*4) band = Math.min(2, band+1);
+            px(ctx,x,y,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+','+A[band]+')');
+          }
+      }
+      /* aurora band: a hard 6-cell column stepping across on the original 9s period,
+         hue quantized to 6 stops instead of a continuous cycle */
+      if(!reduce){ const sp=(f/(9*FPS))%1, bx=((-6+sp*(w+14))|0), hue=[300,340,20,140,200,260][(f>>3)%6];
+        for(let i=0;i<6;i++){ const a = (i===0||i===5)?'.07':(i===1||i===4)?'.13':'.20';
+          for(let y=0;y<h;y++) px(ctx,bx+i,y,'hsla('+hue+',80%,64%,'+a+')'); } }
+      /* stars: 1 cell, 3-frame twinkle (off / dim / bright) */
+      const SC=['rgba(255,255,255,0)','rgba(207,214,255,.55)','rgba(255,255,255,1)'];
+      for(const s of st.st) px(ctx, s.x, s.y, SC[[0,1,2,1][((f*s.sp)+s.ph)%4]]);
+    }
+
+    else if(kind==='pxquilt'){
+      /* integer 45-degree lattice — crisp by construction, no anti-aliasing possible */
+      const sp = st.sp;
+      for(let o=-h; o<w+h; o+=sp){
+        for(let y=0;y<h;y++){ px(ctx, o+y, y, 'rgba(210,178,90,.16)'); px(ctx, o+h-y, y, 'rgba(210,178,90,.16)'); }
+      }
+      /* studs: three discrete sizes (1/2/3 cells) replace the continuous glow ramp;
+         the sheen front advances one lattice cell per step, same 4.2s period */
+      const front = reduce ? (w*.5) : ((f/(4.2*FPS))%1)*(w+h) - h;
+      let ry=0;
+      for(let gy=(sp>>1); gy<h; gy+=sp, ry++){
+        for(let gx=(ry%2?sp:sp>>1); gx<w; gx+=sp){
+          const d = Math.abs(gx-(front+gy)), near = d/(sp*1.6);
+          const lvl = near<.34?2 : near<.75?1 : 0;
+          const c = ['rgba(210,178,90,.42)','rgba(235,205,125,.80)','rgba(255,238,190,1)'][lvl];
+          const s = lvl+1;
+          px(ctx, gx-(s>>1), gy-(s>>1), c, s);
+        }
+      }
+    }
+  }
+
+  function diamond(ctx,cx,cy,r,col){
+    for(let i=0;i<=r;i++){
+      const j=r-i;
+      px(ctx,cx+i,cy+j,col); px(ctx,cx+i,cy-j,col); px(ctx,cx-i,cy+j,col); px(ctx,cx-i,cy-j,col);
+    }
+  }
+
+  if(!sys.length) return;
+  if(reduce){ sys.forEach(o=>draw(o,0)); return; }
+  let last=-1;
+  (function loop(t){
+    const f = Math.floor(t/STEP);
+    if(f!==last){ last=f; sys.forEach(o=>draw(o,f)); }
+    requestAnimationFrame(loop);
+  })(0);
+})();
+</script></body></html>
