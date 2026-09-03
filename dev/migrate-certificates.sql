@@ -1,3 +1,6 @@
+-- MIRROR ONLY (r452): supabase/migrations/ is the deploy channel (WORKFLOW §4) — this file is a
+-- read-only copy of the live definition; the applied version is supabase/migrations/20260903000000_certificate_tracks_r452.sql.
+-- The arrays below are asserted set-equal to drills.js HK_TRACKS + that migration by dev/check-invariants.js C14.
 -- r359 CERTIFICATES MIGRATION — run once in the Supabase SQL editor (after migrate-client-state).
 -- Three long tracks, one verifiable certificate each. Issuance goes ONLY through the
 -- issue_certificate() RPC below, which re-checks the caller's recorded runs server-side —
@@ -29,9 +32,9 @@ begin
   if v_uid is null then raise exception 'NOT_SIGNED_IN'; end if;
   if coalesce((auth.jwt()->>'is_anonymous')::boolean, false) then raise exception 'GUEST_ACCOUNT'; end if;
   v_keys := case p_track
-    when 'fluency'  then array['navigation','modeltour','filldr','pastes','blocksel','rowops','editfix','typeset','decimals','center','autofit','ruleoff','ruleaudit','combo','housestyle','gauntlet']   -- r424 (D17): colops retired — rowops absorbed it; the array moves in the same PR as HK_TRACKS (r359 drift rule)
-    when 'formulas' then array['margin','foot','anchor','percent','cagr','bridge','sumif','rollup','fxconvert','cases','sort','scrub','filterpass','unhide','lookup','lookup2','recon','drill','series','audit','triage','wrapfix','balcheck','stalelink','tieout','signerr','versionup','balance']
-    when 'modeling' then array['wacc','fcfbuild','dcf','comps','txncomps','football','dcfsens','retbridge','accdil','sourcesuses','schedule','intsched','lbo','revolver','waterfall','covtable','liqbridge','wk13','cascade','debtsched','isbuild','bsbuild','cfslink','nwcsched','threestmt','opmodel','dcfbuild','lbobuild','debtblock','dashcover']
+    when 'fluency'  then array['navigation','filldr','pastes','blocksel','rowops','editfix','modeltour','typeset','decimals','center','autofit','ruleoff','ruleaudit','combo','housestyle','gauntlet']
+    when 'formulas' then array['margin','foot','anchor','percent','cagr','bridge','sumif','rollup','fxconvert','sort','scrub','filterpass','unhide','lookup','lookup2','recon','drill','series','audit','triage','wrapfix','balcheck','stalelink','cases','tieout','signerr','versionup','balance']
+    when 'modeling' then array['wacc','fcfbuild','dcf','comps','txncomps','football','dcfsens','retbridge','accdil','sourcesuses','schedule','intsched','lbo','revolver','waterfall','covtable','liqbridge','wk13','debtsched','cascade','isbuild','bsbuild','cfslink','nwcsched','threestmt','opmodel','dcfbuild','lbobuild','debtblock','dashcover']
     else null end;
   if v_keys is null then raise exception 'BAD_TRACK'; end if;
   select count(*) into v_missing from unnest(v_keys) k
