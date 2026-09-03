@@ -1,0 +1,275 @@
+<!doctype html><html><head><meta charset="utf-8"><title>rank art proto v2 — PIXEL REPLICAS of the crests (r451)</title>
+<style>
+  body{margin:0;font-family:'JetBrains Mono',ui-monospace,monospace;background:#141519;color:#cdd0d6;padding:26px 26px 60px}
+  body.light{background:#e9eaed;color:#2a2c31}
+  h1{font-size:14px;letter-spacing:2px;color:#8b8f98;margin:0 0 6px}
+  .sub{font-size:11px;color:#7c828e;margin-bottom:22px;max-width:1120px;line-height:1.6}
+  .band{margin-bottom:26px}
+  .bandcap{font-size:10px;color:#7c828e;letter-spacing:1.6px;margin:0 0 10px;border-top:1px solid #26282e;padding-top:10px}
+  body.light .bandcap{border-color:#d4d6dc}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start}
+  .tile{background:#1d1f25;border:1px solid #2d3038;border-radius:10px;padding:12px 10px 8px;text-align:center}
+  body.light .tile{background:#f6f7f9;border-color:#d0d2d8}
+  .tile .nm{font-size:8.5px;letter-spacing:.6px;margin-top:8px;color:#9a9ea8;text-transform:uppercase;line-height:1.3}
+  body.light .tile .nm{color:#6b6f78}
+  .trio{display:flex;gap:12px;justify-content:center;align-items:flex-end;min-height:82px}
+  .trio>div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+  .lbl{font-size:7.5px;color:#5d616a;margin-top:4px;letter-spacing:.8px}
+  body.light .lbl{color:#868b95}
+  .mock{background:#1d1f25;border:1px solid #2d3038;border-radius:10px;padding:12px 16px;width:max-content;font-size:11px}
+  body.light .mock{background:#f6f7f9;border-color:#d0d2d8}
+  .lbrow{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid #26282e;height:24px}
+  body.light .lbrow{border-color:#dcdee3}
+  .lbrow .pos{width:22px;color:#7c828e}.lbrow .who{width:140px}.lbrow .t{color:#7c828e;width:56px;text-align:right}
+  .hero{display:flex;gap:18px;align-items:center}
+  .hero .txt b{display:block;font-size:15px}.hero .txt span{font-size:10px;color:#7c828e}
+  svg.px{display:block;shape-rendering:crispEdges}
+  .toggle{position:fixed;top:10px;right:14px;font-size:11px;color:#7c828e;cursor:pointer;border:1px solid #33363d;border-radius:6px;padding:5px 9px;background:#1d1f25;z-index:9}
+  body.light .toggle{background:#fff;border-color:#d0d2d8}
+</style></head><body>
+<div class="toggle" onclick="document.body.classList.toggle('light')">toggle light/dark</div>
+<h1>HOTKEY.GG — RANK ART v2 · PIXEL REPLICAS vs THE CREST</h1>
+<div class="sub">v1 asked whether a <i>new</i> 16&times;16 grammar could carry the ladder. v2 tests the other question: can the crests we already have be <b>replicated</b> in pixel art rather than replaced?
+Every tier below shows three things — <b>(A)</b> today's generative heraldic crest from themes.js (top bucket), <b>(B)</b> a hand-drawn <b>32&times;32 pixel replica</b> of that exact crest (same heater silhouette, the tier metal in hi/mid/lo bands over a dark plate with a 1px deep outline, the same charge redrawn pixel-by-pixel, and the same escalating furniture: rivets &rarr; bordure &rarr; mantling curls &rarr; wings small/mid/full/grand &rarr; bead/diamond/star finials), and <b>(C)</b> a <b>16&times;16 chip</b> derived from the same drawing for nav pills and leaderboard rows — wings cut to nubs, furniture dropped, charge simplified.
+Metals are the literal PALS hex values from themes.js, so nothing drifts. Everything is inline &lt;rect&gt;-per-pixel SVG at <b>integer scales only</b> (32-grid at 64/96/192; 16-grid at 16/32/48) — the single hard constraint pixel art puts on the engine. Three bucket pips sit under every plate. Toggle light/dark: the 1px deep outline is what lets a sprite sit on a pale page.</div>
+
+<div class="band"><div class="bandcap">1 · THE LADDER AT CARD SIZE — crest 60 &middot; replica 64 (2&times;) &middot; chip 32 (2&times;)</div><div class="row" id="ladder"></div></div>
+<div class="band"><div class="bandcap">2 · 16px — the silhouette test, and a leaderboard row three ways</div><div class="row" id="small"></div></div>
+<div class="band"><div class="bandcap">3 · PLAYER-CARD HERO — replica 96 (3&times;) vs crest 96</div><div class="row" id="hero"></div></div>
+<div class="band"><div class="bandcap">4 · RANK-UP REVEAL — replica 192 (6&times;) vs crest 192 &middot; Second-Year Analyst, Top Bucket</div><div class="row" id="reveal"></div></div>
+<div class="band"><div class="bandcap">5 · BUCKET ESCALATION INSIDE ONE TIER — First-Year Analyst, bottom / middle / top &middot; replica 64</div><div class="row" id="buckets"></div></div>
+
+<script src="../themes.js"></script>
+<script>
+const SPR32={
+  "MBA Associate":{
+    1:['................................','................................','................................','................................','................................','......oooooooooooooooooooo......','......ohhhhhhhhhhhhhhhhhho......','......ohddddddddddddddddho......','......ohddddddddddddddddho......','......ohddddddddddddddddho......','......ohdddggggggggggdddho......','......omdddgddddddddgdddmo......','......omdddgddggddddgdddmo......','......omdddgdggdddddgdddmo......','......omdddgddgggdddgdddmo......','......omdddgddddggddgdddmo......','......omdddgdddggdddgdddmo......','.......omddgddggddddgddmo.......','.......olddgddddddddgddlo.......','........oldggggggggggdlo........','.........olddddddddddlo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..ooo..ooo..........','.........mmm..ooo..ooo..........','................................','................................'],
+    2:['................................','................................','................................','................................','................................','......oooooooooooooooooooo......','......ohhhhhhhhhhhhhhhhhho......','......ohddddddddddddddddho......','......ohddddddddddddddddho......','......ohdhmdddddddddddhmho......','......ohdmoggggggggggdmoho......','......omdddgddddddddgdddmo......','......omdddgddggddddgdddmo......','......omdddgdggdddddgdddmo......','......omdddgddgggdddgdddmo......','......omdddgddddggddgdddmo......','......omdddgdddggdddgdddmo......','.......omddgddggddddgddmo.......','.......olhmgddddddddgdhmo.......','........omoggggggggggdmo........','.........olddddddddddlo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..ooo..........','.........mmm..mmm..ooo..........','................................','................................'],
+    3:['................................','................................','................................','................................','................................','......oooooooooooooooooooo......','......ohwhhhhhhhhhhhhhhhho......','......owddddddddddddddddho......','......ohddddddddddddddddho......','......ohdhmdddddddddddhmho......','......ohdmoggggggggggdmoho......','......omdddgddddddddgdddmo......','......omdddgddggddddgdddmo......','......omdddgdggdddddgdddmo......','......omdddgddgggdddgdddmo......','......omdddgddddggddgdddmo......','......omdddgdddggdddgdddmo......','.......omddgddggddddgddmo.......','.......olhmgddddddddgdhmo.......','........omoggggggggggdmo........','.........olddddddddddlo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..hhh..........','.........mmm..mmm..mmm..........','................................','................................'],
+  },
+  "Candidate":{
+    1:['................................','................................','................................','................................','................................','......oooooooooooooooooooo......','......ohhhhhhhhhhhhhhhhhho......','......ohddddddddddddddddho......','......ohddddddddddddddddho......','......ohdhmdddddddddddhmho......','......ohdmodddddddddddmoho......','......omddddggggggggddddmo......','......omdddgmmmmmmmmgdddmo......','......omdddghhhhhhhhgdddmo......','......omdddgmmmmmmmmgdddmo......','......omdddgmmmmmmmmgdddmo......','......omdddgmmmmmmmmgdddmo......','.......omddgllllllllgddmo.......','.......olhmdggggggggddhmo.......','........omodddddddddddmo........','.........olddddddddddlo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..ooo..ooo..........','.........mmm..ooo..ooo..........','................................','................................'],
+    2:['................................','................................','................................','................................','................................','......oooooooooooooooooooo......','......ohhhhhhhhhhhhhhhhhho......','......ohddddddddddddddddho......','......ohdmmmmmmmmmmmmmmdho......','......ohdmddddddddddddmdho......','......ohdmddddddddddddmdho......','......omdmddggggggggddmdmo......','......omdmdgmmmmmmmmgdmdmo......','......omdmdghhhhhhhhgdmdmo......','......omdmdgmmmmmmmmgdmdmo......','......omdmdgmmmmmmmmgdmdmo......','......omdmdgmmmmmmmmgdmdmo......','.......omdmgllllllllgmdmo.......','.......oldmdggggggggdmdlo.......','........oldmddddddddmdlo........','.........oldmddddddmdlo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..ooo..........','.........mmm..mmm..ooo..........','................................','................................'],
+    3:['................................','................................','................................','................................','................................','......oooooooooooooooooooo......','......ohwhhhhhhhhhhhhhhhho......','......owddddddddddddddddho......','......ohdmmmmmmmmmmmmmmdho......','......ohdmddddddddddddmdho......','......ohdmddddddddddddmdho......','......omdmddggggggggddmdmo......','......omdmdgmmmmmmmmgdmdmo......','......omdmdghhhhhhhhgdmdmo......','......omdmdgmmmmmmmmgdmdmo......','......omdmdgmmmmmmmmgdmdmo......','......omdmdgmmmmmmmmgdmdmo......','.......omdmgllllllllgmdmo.......','.......oldmdggggggggdmdlo.......','........oldmddddddddmdlo........','.........oldmddddddmdlo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..hhh..........','.........mmm..mmm..mmm..........','................................','................................'],
+  },
+  "Summer Analyst":{
+    1:['................................','................................','................................','................................','................................','......oooooooooooooooooooo......','......ohhhhhhhhhhhhhhhhhho......','......ohddddddddddddddddho......','......ohdmmmmmmmmmmmmmmdho......','......ohdmddddddddddddmdho......','......ohdmddddddddddddmdho......','......omdmdddddggdddddmdmo......','......omdmddddggggddddmdmo......','......omdmdddggggggdddmdmo......','......omdmddgogddgogddmdmo......','......omdmdogoddddogodmdmo......','......omdmgogddddddgogmdmo......','.......omdggddddddddggdmo.......','.......oldmddddddddddmdlo.......','........oldmddddddddmdlo........','.........oldmddddddmdlo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..ooo..ooo..........','.........mmm..ooo..ooo..........','................................','................................'],
+    2:['................................','................................','................................','................................','................................','......oooooooooooooooooooo......','......ohhhhhhhhhhhhhhhhhho......','......ohddddddddddddddddho......','....ooohdmmmmmmmmmmmmmmdhooo....','...oomohdmddddddddddddmdhomoo...','..oommohdmddddddddddddmdhommoo..','..ommoomdmdddddggdddddmdmoommo..','..ommoomdmddddggggddddmdmoommo..','..oommomdmdddggggggdddmdmommoo..','...oomomdmddgogddgogddmdmomoo...','....ooomdmdogoddddogodmdmooo....','......omdmgogddddddgogmdmo......','.......omdggddddddddggdmo.......','.......oldmddddddddddmdlo.......','........oldmddddddddmdlo........','.........oldmddddddmdlo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..ooo..........','.........mmm..mmm..ooo..........','................................','................................'],
+    3:['................................','................................','................................','................................','................................','......oooooooooooooooooooo......','......ohwhhhhhhhhhhhhhhhho......','......owddddddddddddddddho......','....ooohdmmmmmmmmmmmmmmdhooo....','...oomohdmddddddddddddmdhomoo...','..oommohdmddddddddddddmdhommoo..','..ommoomdmdddddggdddddmdmoommo..','..ommoomdmddddggggddddmdmoommo..','..oommomdmdddggggggdddmdmommoo..','...oomomdmddgogddgogddmdmomoo...','....ooomdmdogoddddogodmdmooo....','...oomomdmgogddddddgogmdmomoo...','..oommoomdggddddddddggdmoommoo..','..ommoooldmddddddddddmdlooommo..','..oomo..oldmddddddddmdlo..omoo..','...ooo...oldmddddddmdlo...ooo...','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..hhh..........','.........mmm..mmm..mmm..........','................................','................................'],
+  },
+  "First-Year Analyst":{
+    1:['................................','................................','................................','................................','................................','......oooooooooooooooooooo......','......ohhhhhhhhhhhhhhhhhho......','......ohddddddddddddddddho......','....ooohdmmmmmmmmmmmmmmdhooo....','...oomohdmggggddddggggmdhomoo...','..oommohdmgghgddddghggmdhommoo..','..ommoomdmdgggddddgggdmdmoommo..','..ommoomdmddggddddggddmdmoommo..','..oommomdmdddggddggdddmdmommoo..','...oomomdmddddggggddddmdmomoo...','....ooomdmddddggggddddmdmooo....','......omdmdddggddggdddmdmo......','.......omdmdggddddggdmdmo.......','.......oldmgggddddgggmdlo.......','........olgghgddddghgglo........','.........oggggddddggggo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..ooo..ooo..........','.........mmm..ooo..ooo..........','................................','................................'],
+    2:['................................','................................','................................','................................','................................','......oooooooooooooooooooo......','......ohhhhhhhhhhhhhhhhhho......','......ohddddddddddddddddho......','....ooohdmmmmmmmmmmmmmmdhooo....','...oomohdmggggddddggggmdhomoo...','..oommohdmgghgddddghggmdhommoo..','..ommoomdmdgggddddgggdmdmoommo..','..ommoomdmddggddddggddmdmoommo..','..oommomdmdddggddggdddmdmommoo..','...oomomdmddddggggddddmdmomoo...','....ooomdmddddggggddddmdmooo....','...oomomdmdddggddggdddmdmomoo...','..oommoomdmdggddddggdmdmoommoo..','..ommoooldmgggddddgggmdlooommo..','..oomo..olgghgddddghgglo..omoo..','...ooo...oggggddddggggo...ooo...','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..ooo..........','.........mmm..mmm..ooo..........','................................','................................'],
+    3:['................................','................................','................................','................................','................................','......oooooooooooooooooooo......','......ohwhhhhhhhhhhhhhhhho......','......owddddddddddddddddho......','....ooohdmmmmmmmmmmmmmmdhooo....','...oomohdhggggddddgggghmhomoo...','..oommohdmgghgddddghggmohommoo..','..ommoomdmdgggddddgggdmdmoommo..','..ommoomdmddggddddggddmdmoommo..','..oommomdmdddggddggdddmdmommoo..','...oomomdmddddggggddddmdmomoo...','....ooomdmddddggggddddmdmooo....','...oomomdmdddggddggdddmdmomoo...','..oommoomdmdggddddggdmdmoommoo..','..ommooolhmgggddddgggmhmooommo..','..oomo..omgghgddddghggmo..omoo..','...ooo...oggggddddggggo...ooo...','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..hhh..........','.........mmm..mmm..mmm..........','................................','................................'],
+  },
+  "Associate":{
+    1:['................................','................................','................................','................................','................................','......oooooooooooooooooooo......','......ohhhhhhhhhhhhhhhhhho......','......ohddddddddddddddddho......','....ooohdmmmmmmmmmmmmmmdhooo....','...oomohdmdddddddddggdmdhomoo...','..oommohdmdddddddddggdmdhommoo..','..ommoomdmdddddddddggdmdmoommo..','..ommoomdmdddddddddggdmdmoommo..','..oommomdmdddgdddddggdmdmommoo..','...oomomdmddggdddddggdmdmomoo...','....ooomdmdggggggggggdmdmooo....','...oomomdmdggggggggggdmdmomoo...','..oommoomdmdggdddddddmdmoommoo..','..ommoooldmddgdddddddmdlooommo..','..oomo..oldmddddddddmdlo..omoo..','...ooo...oldmddddddmdlo...ooo...','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..ooo..ooo..........','.........mmm..ooo..ooo..........','................................','................................'],
+    2:['................................','................................','................................','................................','................................','......oooooooooooooooooooo......','......ohhhhhhhhhhhhhhhhhho......','....ooohddddddddddddddddhooo....','..ooomohdmmmmmmmmmmmmmmdhomooo..','..ommmohdmdddddddddggdmdhommmo..','..oommohdmdddddddddggdmdhommoo..','..ommmomdmdddddddddggdmdmommmo..','..oommomdmdddddddddggdmdmommoo..','...oomomdmdddgdddddggdmdmomoo...','....ooomdmddggdddddggdmdmooo....','......omdmdggggggggggdmdmo......','......omdmdggggggggggdmdmo......','.......omdmdggdddddddmdmo.......','.......oldmddgdddddddmdlo.......','........oldmddddddddmdlo........','.........oldmddddddmdlo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..ooo..........','.........mmm..mmm..ooo..........','................................','................................'],
+    3:['..............oooo..............','.............oohhoo.............','.............ohhhho.............','.............oommoo.............','..............ommo..............','......oooooooooooooooooooo......','......ohwhhhhhhhhhhhhhhhho......','....ooowddddddddddddddddhooo....','..ooomohdmmmmmmmmmmmmmmdhomooo..','..ommmohdmdddddddddggdmdhommmo..','..oommohdmdddddddddggdmdhommoo..','..ommmomdmdddddddddggdmdmommmo..','..oommomdmdddddddddggdmdmommoo..','...oomomdmdddgdddddggdmdmomoo...','....ooomdmddggdddddggdmdmooo....','......omdmdggggggggggdmdmo......','......omdmdggggggggggdmdmo......','.......omdmdggdddddddmdmo.......','.......oldmddgdddddddmdlo.......','........oldmddddddddmdlo........','.........oldmddddddmdlo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..hhh..........','.........mmm..mmm..mmm..........','................................','................................'],
+  },
+  "VP":{
+    1:['................................','................................','................................','................................','................................','......oooooooooooooooooooo......','......ohhhhhhhoogoohhhhhho......','....ooohdddddoogggodddddhooo....','..ooomohdmmmmogogoommmmdhomooo..','..ommmohdmdddoogggooddmdhommmo..','..oommohdmddddoogogoddmdhommoo..','..ommmomdmddddogggooddmdmommmo..','..oommomdmddddoogoodddmdmommoo..','...oomomdmdddddoooddddmdmomoo...','....ooomdmddddddddddddmdmooo....','......omdmdggdddddggddmdmo......','......omdmddggdddggdddmdmo......','.......omdmddggdggdddmdmo.......','.......oldmdddgggddddmdlo.......','........oldmdggdggddmdlo........','.........oldhhhhhhhmdlo.........','..........oggdddddgglo..........','...........ogglllgglo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..ooo..ooo..........','.........mmm..ooo..ooo..........','................................','................................'],
+    2:['................................','................................','................................','................................','................................','....oooooooooooooooooooooooo....','..ooomohhhhhhhoogoohhhhhhomooo..','..ommmohdddddoogggodddddhommmo..','.ooommohdmmmmogogoommmmdhommooo.','.ommmmohdmdddoogggooddmdhommmmo.','ooommmohdmddddoogogoddmdhommmooo','ommmmmomdmddddogggooddmdmommmmmo','oommmmomdmddddoogoodddmdmommmmoo','.oommmomdmdddddoooddddmdmommmoo.','..oommomdmddddddddddddmdmommoo..','...oomomdmdggdddddggddmdmomoo...','....ooomdmddggdddggdddmdmooo....','.......omdmddggdggdddmdmo.......','.......oldmdddgggddddmdlo.......','........oldmdggdggddmdlo........','.........oldhhhhhhhmdlo.........','..........oggdddddgglo..........','...........ogglllgglo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..ooo..........','.........mmm..mmm..ooo..........','................................','................................'],
+    3:['..............oooo..............','.............oohhoo.............','.............ohhhho.............','.............oommoo.............','..............ommo..............','....oooooooooooooooooooooooo....','..ooomohwhhhhhoogoohhhhhhomooo..','..ommmowdddddoogggodddddhommmo..','.ooommohdmmmmogogoommmmdhommooo.','.ommmmohdmdddoogggooddmdhommmmo.','ooommmohdmddddoogogoddmdhommmooo','ommmmmomdmddddogggooddmdmommmmmo','oommmmomdmddddoogoodddmdmommmmoo','.oommmomdmdddddoooddddmdmommmoo.','..oommomdmddddddddddddmdmommoo..','...oomomdmdggdddddggddmdmomoo...','....ooomdmddggdddggdddmdmooo....','.......omdmddggdggdddmdmo.......','.......oldmdddgggddddmdlo.......','........oldmdggdggddmdlo........','.........oldhhhhhhhmdlo.........','..........oggdddddgglo..........','...........ogglllgglo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..hhh..........','.........mmm..mmm..mmm..........','................................','................................'],
+  },
+  "MD":{
+    1:['................................','................................','................................','................................','................................','....oooooooooooooooooooooooo....','..ooomohhhhhhhhhhhhhhhhhhomooo..','..ommmohddddddddddddddddhommmo..','.ooommohdmmmmmmmmmmmmmmdhommooo.','.ommmmohdggddddddddddggdhommmmo.','ooommmohdmggddddddddggmdhommmooo','ommmmmomdmdggddddddggdmdmommmmmo','oommmmomdmddggggggggddmdmommmmoo','.oommmomdmdggggggggggdmdmommmoo.','..oommomdmdgooggggoogdmdmommoo..','...oomomdmdggggggggggdmdmomoo...','....ooomdmddggggggggddmdmooo....','.......omdmddggggggddmdmo.......','.......oldmddgoggogddmdlo.......','........oldmddggggddmdlo........','.........oldmddggddmdlo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..ooo..ooo..........','.........mmm..ooo..ooo..........','................................','................................'],
+    2:['................................','................................','................................','....ooo..................ooo....','..oooho..................ohooo..','..ohhmoooooooooooooooooooomhho..','.ooohmohhhhhhhhhhhhhhhhhhomhooo.','.ohmmmohddddddddddddddddhommmho.','ooohmmohdmmmmmmmmmmmmmmdhommhooo','ohmmmmohdggddddddddddggdhommmmho','oohmmmohdmggddddddddggmdhommmhoo','hmmmmmomdmdggddddddggdmdmommmmmh','ohmmmmomdmddggggggggddmdmommmmho','oommmmomdmdggggggggggdmdmommmmoo','.oommmomdmdgooggggoogdmdmommmoo.','..oommomdmdggggggggggdmdmommoo..','...oolomdmddggggggggddmdmoloo...','....oooomdmddggggggddmdmoooo....','.......oldmddgoggogddmdlo.......','........oldmddggggddmdlo........','.........oldmddggddmdlo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..ooo..........','.........mmm..mmm..ooo..........','................................','................................'],
+    3:['.............oohhoo.............','............oohhhhoo............','............ohhhhhho............','....ooo.....oohhhhoo.....ooo....','..oooho......oommoo......ohooo..','..ohhmoooooooooooooooooooomhho..','.ooohmohwhhhhhhhhhhhhhhhhomhooo.','.ohmmmowddddddddddddddddhommmho.','ooohmmohdmmmmmmmmmmmmmmdhommhooo','ohmmmmohdggddddddddddggdhommmmho','oohmmmohdmggddddddddggmdhommmhoo','hmmmmmomdmdggddddddggdmdmommmmmh','ohmmmmomdmddggggggggddmdmommmmho','oommmmomdmdggggggggggdmdmommmmoo','.oommmomdmdgooggggoogdmdmommmoo.','..oommomdmdggggggggggdmdmommoo..','...oolomdmddggggggggddmdmoloo...','....oooomdmddggggggddmdmoooo....','.......oldmddgoggogddmdlo.......','........oldmddggggddmdlo........','.........oldmddggddmdlo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..hhh..........','.........mmm..mmm..mmm..........','................................','................................'],
+  },
+  "Second-Year Analyst":{
+    1:['..............oooo..............','.............oohhoo.............','.............ohhhho.............','.............oommoo.............','..............ommo..............','......oooooooooooooooooooo......','......ohhhhhhhhhhhhhhhhhho......','....ooohddddddddddddddddhooo....','..ooomohdmmmmmmggmmmmmmdhomooo..','..ommmohdmddddghhgddddmdhommmo..','..oommohdmdddghmmhgdddmdhommoo..','..ommmomdmddgoooooogddmdmommmo..','..oommomdmdghoommmmlgdmdmommoo..','...oomomdmghmmoommmmlgmdmomoo...','....ooomdmghmmoommmmlgmdmooo....','......omdmdgmoommmmllgmdmo......','......omdmddgoooooolgdmdmo......','.......omdmddgmmmllgdmdmo.......','.......oldmdddgmllgddmdlo.......','........oldmdddggdddmdlo........','.........oldmddddddmdlo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..ooo..ooo..........','.........mmm..ooo..ooo..........','................................','................................'],
+    2:['.............oohhoo.............','............oohhhhoo............','............ohhhhhho............','............oohhhhoo............','.............oommoo.............','....oooooooooooooooooooooooo....','..ooomohhhhhhhhhhhhhhhhhhomooo..','..ommmohddddddddddddddddhommmo..','.ooommohdmmmmmmggmmmmmmdhommooo.','.ommmmohdmddddghhgddddmdhommmmo.','ooommmohdmdddghmmhgdddmdhommmooo','ommmmmomdmddgoooooogddmdmommmmmo','oommmmomdmdghoommmmlgdmdmommmmoo','.oommmomdmghmmoommmmlgmdmommmoo.','..oommomdmghmmoommmmlgmdmommoo..','...oomomdmdgmoommmmllgmdmomoo...','....ooomdmddgoooooolgdmdmooo....','.......omdmddgmmmllgdmdmo.......','.......oldmdddgmllgddmdlo.......','........oldmdddggdddmdlo........','.........oldmddddddmdlo.........','..........olddddddddlo..........','...........ollllllllo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..ooo..........','.........mmm..mmm..ooo..........','................................','................................'],
+    3:['.............oowoo..............','....ooo....ooohhhooo.....ooo....','..oooho....ohhhhhhho.....ohooo..','..ohhho....ooohhhooo.....ohhho..','.ooohho......oomoo.......ohhooo.','.ohhmmoooooooooooooooooooommhho.','ooohmmohwhhhhhhhhhhhhhhhhommhooo','ohmmmmowddddddddddddddddhommmmho','oohmmmohdmmmmmmggmmmmmmdhommmhoo','hmmmmmohdmddddghhgddddmdhommmmmh','ohmmmmohdmdddghmmhgdddmdhommmmho','hmmmmmomdmddgoooooogddmdmommmmmh','ohmmmmomdmdghoommmmlgdmdmommmmho','oommmmomdmghmmoommmmlgmdmommmmoo','.oommmomdmghmmoommmmlgmdmommmoo.','..olmmomdmdgmoommmmllgmdmommlo..','..oolmomdmddgoooooolgdmdmomloo..','...ooloomdmddgmmmllgdmdmooloo...','....ooooldmdddgmllgddmdloooo....','........oldmdddggdddmdlo........','.........oldoddddddodlo.........','..........oldoddddodlo..........','...........olollllolo...........','............ollllllo............','.............ollllo.............','..............ollo..............','...............oo...............','................................','.........hhh..hhh..hhh..........','.........mmm..mmm..mmm..........','................................','................................'],
+  },
+};
+const SPR16={
+  "MBA Associate":{
+    3:['................','................','...oooooooooo...','...ohhwwhhhho...','...ohggggggho...','...ohgdddggho...','...omgddggdmo...','...omgdggdgmo...','...omggdddgmo...','....oggggggo....','.....olddlo.....','......ollo......','.......oo.......','................','...hh..hh..hh...','................'],
+  },
+  "Candidate":{
+    3:['................','................','...oooooooooo...','...ohhwwhhhho...','...ohdggggdho...','...ohghhhhgho...','...omgmmmmgmo...','...omgmmmmgmo...','...omgllllgmo...','....olgggglo....','.....olddlo.....','......ollo......','.......oo.......','................','...hh..hh..hh...','................'],
+  },
+  "Summer Analyst":{
+    3:['................','................','...oooooooooo...','...ohhwwhhhho...','...ohddggddho...','...ohdggggdho...','...omggggggmo...','...omggddggmo...','...omgddddgmo...','....olddddlo....','.....olddlo.....','......ollo......','.......oo.......','................','...hh..hh..hh...','................'],
+  },
+  "First-Year Analyst":{
+    3:['................','................','...oooooooooo...','...ohhwwhhhho...','...ohggddggho...','...ohdgddgdho...','...omddggddmo...','...omddggddmo...','...omdgddgdmo...','....oggddggo....','.....olddlo.....','......ollo......','.......oo.......','................','...hh..hh..hh...','................'],
+  },
+  "Associate":{
+    3:['................','................','...oooooooooo...','...ohhwwhhhho...','...ohddddggho...','.omohddddgghomo.','.omomdgddggmomo.','...omggggggmo...','...omdgddddmo...','....olddddlo....','.....olddlo.....','......ollo......','.......oo.......','................','...hh..hh..hh...','................'],
+  },
+  "VP":{
+    3:['................','................','...oooooooooo...','...ohhwwhhhho...','.omohgddddghomo.','.omohdgddgdhomo.','.omomddggddmomo.','.omomhhhhhhmomo.','...omdgddgdmo...','....oggddggo....','.....olddlo.....','......ollo......','.......oo.......','................','...hh..hh..hh...','................'],
+  },
+  "MD":{
+    3:['................','................','...oooooooooo...','.omohhwwhhhhomo.','oomohgddddghomoo','oomohggddgghomoo','oomomdggggdmomoo','oomomggggggmomoo','.omomdgddgdmomo.','....oldggdlo....','.....olddlo.....','......ollo......','.......oo.......','................','...hh..hh..hh...','................'],
+  },
+  "Second-Year Analyst":{
+    3:['................','................','.omoooooooooomo.','oomohhwwhhhhomoo','oomohddggddhomoo','oomohdghhgdhomoo','oomomghmmhgmomoo','oomomghmmhgmomoo','.omomdgllgdmomo.','....oldggdlo....','.....olddlo.....','......ollo......','.......oo.......','................','...hh..hh..hh...','................'],
+  },
+};
+const V1PAL={
+  'MBA Associate':      {hi:'#a9aeb9',mid:'#7c828e',lo:'#525761',deep:'#26282e',g:'#e9e8e3'},
+  'Candidate':          {hi:'#f4c088',mid:'#cf8e4c',lo:'#95602c',deep:'#432a12',g:'#fff1dc'},
+  'Summer Analyst':     {hi:'#e4e8ee',mid:'#aeb6c0',lo:'#7c838f',deep:'#33373f',g:'#1c1e24'},
+  'First-Year Analyst': {hi:'#ffe08a',mid:'#e0b341',lo:'#a67c1e',deep:'#4a3610',g:'#2a1d05'},
+  'Associate':          {hi:'#d9b8ff',mid:'#b98bff',lo:'#7d4fd1',deep:'#3a2160',g:'#f6eeff'},
+  'VP':                 {hi:'#f4f7fa',mid:'#c9d3dc',lo:'#8a97a6',deep:'#3d4652',g:'#1a2230'},
+  'MD':                 {hi:'#ff8a80',mid:'#d94a3d',lo:'#992b22',deep:'#3d1210',g:'#ffe9e6'},
+  'Second-Year Analyst':{hi:'#f4fdff',mid:'#9be0f7',lo:'#4aa6cc',deep:'#153c50',g:'#0b2a3a'},
+};
+const V1ORDER=Object.keys(V1PAL);
+/* ---------- plate silhouettes (16×16, '#' = plate) ---------- */
+const V1SHAPES={
+  tile:[ /* MBA — a spreadsheet cell */
+    '................','..############..','..############..','..############..','..############..','..############..','..############..','..############..',
+    '..############..','..############..','..############..','..############..','..############..','..############..','................','................'],
+  keycap:[ /* Candidate — the blank key */
+    '................','...##########...','..############..','..############..','..############..','..############..','..############..','..############..',
+    '..############..','..############..','..############..','..############..','..############..','...##########...','................','................'],
+  hex:[ /* Summer — a badge */
+    '................','......####......','....########....','..############..','..############..','..############..','..############..','..############..',
+    '..############..','..############..','..############..','..############..','....########....','......####......','................','................'],
+  shield:[ /* First-Year — the shield */
+    '................','..############..','..############..','..############..','..############..','..############..','..############..','..############..',
+    '..############..','...##########...','...##########...','....########....','.....######.....','......####......','.......##.......','................'],
+  band:[ /* Associate — banded shield (top band drawn as highlight row) */
+    '.##############.','.##############.','..############..','..############..','..############..','..############..','..############..','..############..',
+    '..############..','...##########...','...##########...','....########....','.....######.....','......####......','.......##.......','................'],
+  wing:[ /* VP — winged */
+    '................','..############..','.##############.','################','################','.##############.','..############..','..############..',
+    '..############..','...##########...','...##########...','....########....','.....######.....','......####......','.......##.......','................'],
+  crown:[ /* MD — crowned + winged */
+    '..#..#.##.#..#..','..############..','.##############.','################','################','.##############.','..############..','..############..',
+    '..############..','...##########...','...##########...','....########....','.....######.....','......####......','.......##.......','................'],
+  gem:[ /* Second-Year — the gem, star finial */
+    '.......##.......','......####......','.....######.....','....########....','...##########...','..############..','.##############.','################',
+    '.##############.','..############..','...##########...','....########....','.....######.....','......####......','.......##.......','................'],
+};
+/* ---------- charges (7×7; g = glyph ink, w = white spark) ---------- */
+const V1GLYPH={
+  crack:   ['....gg.','...gg..','..gg...','.ggggg.','...gg..','..gg...','.gg....'],   // the #REF! fault line
+  key:     ['.......','.ggggg.','.g...g.','.g...g.','.ggggg.','.......','.......'],   // a blank keycap outline
+  hash:    ['.g...g.','ggggggg','.g...g.','.g...g.','ggggggg','.g...g.','.......'],   // #### overflow
+  dpad:    ['...g...','..ggg..','...g...','gggggg.','...g...','..ggg..','...g...'],   // crossed arrow keys
+  enter:   ['......g','......g','......g','..g...g','.gggggg','..g....','...g...'],   // ↵ ships the model
+  dollar:  ['...g...','.ggggg.','g..g...','.ggggg.','...g..g','.ggggg.','...g...'],   // $
+  horns:   ['g.....g','g.....g','.g...g.','.ggggg.','.g.g.g.','.ggggg.','..g.g..'],   // the bull
+  sigma:   ['ggggg..','.g.....','..g....','...g...','..g....','.g.....','ggggg..'],   // Σ
+};
+const V1TIER=[
+  {shape:'tile',   glyph:'crack'},
+  {shape:'keycap', glyph:'key'},
+  {shape:'hex',    glyph:'hash'},
+  {shape:'shield', glyph:'dpad'},
+  {shape:'band',   glyph:'enter'},
+  {shape:'wing',   glyph:'dollar'},
+  {shape:'crown',  glyph:'horns'},
+  {shape:'gem',    glyph:'sigma'},
+];
+/* ---------- rasterize: plate → outline/highlight/shadow, then charge, then pips ---------- */
+function v1sprite(tierName, bucket){
+  const i=V1ORDER.indexOf(tierName), P=V1PAL[tierName], T=V1TIER[i];
+  const S=V1SHAPES[T.shape], W=16, H=16, px=[];
+  const at=(r,c)=> r>=0&&r<H&&c>=0&&c<W && S[r][c]==='#';
+  for(let r=0;r<H;r++){ px[r]=[]; for(let c=0;c<W;c++){
+    if(!at(r,c)){ px[r][c]=null; continue; }
+    const edge=!at(r-1,c)||!at(r+1,c)||!at(r,c-1)||!at(r,c+1);
+    if(edge){ px[r][c]=P.deep; continue; }
+    const inner=!at(r-2,c)||!at(r,c-2);          // top/left inner rim = highlight
+    const innerBR=!at(r+2,c)||!at(r,c+2);        // bottom/right inner rim = shadow
+    px[r][c]= inner ? P.hi : innerBR ? P.lo : P.mid;
+  } }
+  // Associate: the band row 1 is solid highlight; gem: a facet line
+  if(T.shape==='band'){ for(let c=2;c<14;c++) px[1][c]=P.hi; }
+  if(T.shape==='gem'){ for(let c=1;c<15;c++) if(px[7][c]) px[7][c]=P.hi; }
+  // charge, optically centred on the plate's mass (shields sit high)
+  const G=V1GLYPH[T.glyph], gy = T.shape==='tile'||T.shape==='keycap'||T.shape==='hex' ? 4 : 3, gx=4;
+  for(let r=0;r<7;r++) for(let c=0;c<7;c++){ const ch=G[r][c]; if(ch==='g') px[gy+r][gx+c]=P.g; if(ch==='w') px[gy+r][gx+c]='#fff'; }
+  // top-bucket spark (the "hot rim" read) — one white pixel on the highlight
+  if(bucket===3){ px[2][3]='#ffffff'; if(T.shape==='gem') px[0][7]='#ffffff'; }
+  // pips: bottom row, three 2px pips, lit = tier hi, unlit = deep
+  let pipRow=15; const pips=[[5,6],[7,8],[9,10]];
+  pips.forEach((p,k)=>{ const on=bucket && k<bucket; p.forEach(c=>{ px[pipRow][c]= on ? P.hi : (bucket? P.deep : null); }); });
+  return px;
+}
+function v1svgOf(px, size, title){
+  let s='<svg class="px" viewBox="0 0 16 16" width="'+size+'" height="'+size+'" shape-rendering="crispEdges" aria-label="'+(title||'')+'">';
+  for(let r=0;r<16;r++) for(let c=0;c<16;c++){ const col=px[r][c]; if(col) s+='<rect x="'+c+'" y="'+r+'" width="1" height="1" fill="'+col+'"/>'; }
+  return s+'</svg>';
+}
+const v1px=(name,size)=>v1svgOf(v1sprite(name,3),size,name);
+/* ---- palette roles, verbatim from themes.js PALS ---- */
+const PALS={
+ 'MBA Associate':      {hi:'#a9aeb9',mid:'#7c828e',lo:'#525761',deep:'#26282e',plateHi:'#33363d',core:'#8b919d'},
+ 'Candidate':          {hi:'#f4c088',mid:'#cf8e4c',lo:'#95602c',deep:'#432a12',plateHi:'#453425',core:'#e8a45f'},
+ 'Summer Analyst':     {hi:'#f4f7fc',mid:'#c9d0dc',lo:'#8e96a5',deep:'#454c59',plateHi:'#454b57',core:'#dde2ea'},
+ 'First-Year Analyst': {hi:'#ffefb3',mid:'#f4c754',lo:'#bf8e20',deep:'#523a05',plateHi:'#4a3f20',core:'#ffd968'},
+ 'Associate':          {hi:'#efe0ff',mid:'#b78ae8',lo:'#7a4fb8',deep:'#2f1b50',plateHi:'#382b52',core:'#c9a2ff'},
+ 'VP':                 {hi:'#e0fdf7',mid:'#86dcca',lo:'#3d9c8e',deep:'#173f3a',plateHi:'#25453f',core:'#8ef2df'},
+ 'MD':                 {hi:'#ffb3a1',mid:'#e65843',lo:'#9c2a1c',deep:'#3a0f0b',plateHi:'#3b1d19',core:'#ff6248'},
+ 'Second-Year Analyst':{hi:'#f4fdff',mid:'#9be0f7',lo:'#4aa6cc',deep:'#153c50',plateHi:'#21404f',core:'#a8ecff'}
+};
+const ORDER=Object.keys(PALS);
+function colOf(ch,P){ return ch==='o'?P.deep:ch==='h'?P.hi:ch==='m'?P.mid:ch==='l'?P.lo:
+  ch==='d'?P.plateHi:ch==='g'?P.core:ch==='w'?'#ffffff':null; }
+/* render a char-grid as one <rect> per pixel; run-length merged horizontally */
+function draw(rows,tier,size){
+  const P=PALS[tier], n=rows.length; let s='<svg class="px" viewBox="0 0 '+n+' '+n+'" width="'+size+
+    '" height="'+size+'" shape-rendering="crispEdges" aria-label="'+tier+'">';
+  for(let r=0;r<n;r++){ let c=0;
+    while(c<n){ const col=colOf(rows[r][c],P);
+      if(!col){c++;continue;} let e=c+1; while(e<n && rows[r][e]===rows[r][c]) e++;
+      s+='<rect x="'+c+'" y="'+r+'" width="'+(e-c)+'" height="1" fill="'+col+'"/>'; c=e; } }
+  return s+'</svg>';
+}
+const replica=(t,size,bk)=>draw(SPR32[t][bk||3],t,size);
+const chip=(t,size)=>draw(SPR16[t][3],t,size);
+const crest=(t,size,bk)=>window.rankEmblem(t,size,bk||'Top Bucket');
+
+/* ---- band 1: the ladder ---- */
+document.getElementById('ladder').innerHTML=ORDER.map(function(n){
+  return '<div class="tile" style="width:190px"><div class="trio">'+
+    '<div>'+crest(n,60)+'<div class="lbl">A crest 60</div></div>'+
+    '<div>'+replica(n,64)+'<div class="lbl">B replica 2&times;</div></div>'+
+    '<div>'+chip(n,32)+'<div class="lbl">C chip 2&times;</div></div>'+
+    '</div><div class="nm">'+n+'</div></div>';
+}).join('');
+
+/* ---- band 2: 16px chips + leaderboard ---- */
+const who=[['1','wolfofwallst','Second-Year Analyst','31.4s'],['2','deskjockey','MD','33.0s'],
+  ['3','ctrl_shift_end','VP','35.8s'],['4','anon_analyst','First-Year Analyst','44.1s'],
+  ['5','excel_curious','Candidate','71.2s']];
+function lb(fn,cap){ return '<div class="mock"><div class="lbl" style="margin:0 0 6px">'+cap+'</div>'+
+  who.map(w=>'<div class="lbrow"><span class="pos">#'+w[0]+'</span>'+fn(w[2])+
+  '<span class="who">'+w[1]+'</span><span class="t">'+w[3]+'</span></div>').join('')+'</div>'; }
+document.getElementById('small').innerHTML=
+  '<div class="mock"><div class="lbl" style="margin:0 0 8px">chip 16 &middot; crest 16 &middot; v1 sprite 16 — all eight tiers</div>'+
+  ['chip','crest','v1'].map(function(k){
+    return '<div style="display:flex;gap:16px;align-items:center;height:22px"><span style="width:46px;color:#7c828e;font-size:9px">'+k+'</span>'+
+      ORDER.map(n=>k==='chip'?chip(n,16):k==='crest'?crest(n,16):v1px(n,16)).join('')+'</div>';
+  }).join('')+'</div>'+
+  lb(n=>chip(n,16),'B/C · pixel chip 16')+lb(n=>crest(n,16),'A · crest 16')+lb(n=>v1px(n,16),'v1 · redesign 16');
+
+/* ---- band 3: hero ---- */
+document.getElementById('hero').innerHTML=['Associate','MD'].map(function(n){
+  return '<div class="tile"><div class="hero">'+replica(n,96)+'<div class="txt" style="text-align:left"><b>'+n+
+    '</b><span>Top Bucket</span></div></div><div class="nm">replica 96 (3&times;)</div></div>'+
+  '<div class="tile"><div class="hero">'+crest(n,96)+'<div class="txt" style="text-align:left"><b>'+n+
+    '</b><span>Top Bucket</span></div></div><div class="nm">crest 96</div></div>';
+}).join('');
+
+/* ---- band 4: reveal ---- */
+document.getElementById('reveal').innerHTML=
+  '<div class="tile">'+replica('Second-Year Analyst',192)+'<div class="nm">replica 192 (6&times;)</div></div>'+
+  '<div class="tile">'+crest('Second-Year Analyst',192)+'<div class="nm">crest 192</div></div>';
+
+/* ---- band 5: buckets ---- */
+document.getElementById('buckets').innerHTML=[1,2,3].map(function(b){
+  return '<div class="tile"><div class="trio">'+
+   '<div>'+crest('First-Year Analyst',60,b)+'<div class="lbl">crest</div></div>'+
+   '<div>'+replica('First-Year Analyst',64,b)+'<div class="lbl">replica</div></div></div>'+
+   '<div class="nm">'+['bottom','middle','top'][b-1]+' bucket</div></div>';
+}).join('');
+</script></body></html>
