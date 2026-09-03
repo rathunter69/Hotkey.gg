@@ -190,9 +190,9 @@
   .loading{font-family:var(--mono); font-size:13px; color:var(--muted); text-align:center; padding:40px}
 </style>
 <link rel="stylesheet" href="nav.css?v=210">
-<script src="drills.js?v=300"></script>
+<script src="drills.js?v=301"></script>
 
-<script src="drills.js?v=300"></script>
+<script src="drills.js?v=301"></script>
 
 
 
@@ -210,7 +210,7 @@ window.NAV_ACTIVE = 'stats';
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=302"></script>
+<script src="nav.js?v=303"></script>
 
 <header class="head">
   <div class="wrap">
@@ -507,8 +507,12 @@ async function load(){
           return out;
         }catch(e){ return {}; }
       })();
+      /* r452 (audit P1-1): the wall renders VISIBLE medals only — a capstone medal whose
+         drill was never built is hidden (drills.js), so it can neither sit on the wall at a
+         permanent 0/1 nor inflate the earned/possible denominator. */
+      const ACV=AC.filter(a=>!a.hidden);
       let earnedN=0; const cells=[]; const rarPresent={};   /* r393 (Wolf #91): which rarity tiers actually appear, for the picker-style chip row */
-      AC.forEach((a,ord)=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
+      ACV.forEach((a,ord)=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false,prog:0,goal:1}; }
         if(r.done) earnedN++;
         /* r150: EFFECTIVE rarity \u2014 static difficulty tier is the display floor until
            the field is big enough (>=20 players) for the live % to mean anything */
@@ -576,7 +580,7 @@ async function load(){
          wall; chips still open all/in-progress/locked. New users with nothing earned fall
          back to "all" so the wall never looks empty on first visit. */
       const __defF = earnedN>0 ? 'earned' : 'all';
-      achHtml += '<h3 class="section-title" id="achievements" style="margin-top:10px">Achievements <span style="color:var(--faint)">'+earnedN+' / '+AC.length+'</span>'+
+      achHtml += '<h3 class="section-title" id="achievements" style="margin-top:10px">Achievements <span style="color:var(--faint)">'+earnedN+' / '+ACV.length+'</span>'+
         '<span class="ach-filters">'+
           '<button class="ach-f'+(__defF==='all'?' on':'')+'" data-f="all">all</button>'+
           '<button class="ach-f'+(__defF==='earned'?' on':'')+'" data-f="earned">earned</button>'+

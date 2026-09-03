@@ -528,6 +528,12 @@
       };
     });
     const attempted = drills.filter(d => d.rank !== null);
+    /* r452 (audit P1-11): latch the crown count here — this is the one place the board
+       standings exist. The trainer's achievement sweep has no board data at all (it ran on a
+       hard-coded crowns:0, so crn1/crn2/crn3 and x_summit could never celebrate in-game) and
+       reads this cache instead. LIMITATION, on purpose: it is only as fresh as the last rank
+       fetch, so a crown won mid-session celebrates on the next load of a ranked surface. */
+    try{ window.hkFlagCrowns && window.hkFlagCrowns(drills.filter(d => d.rank === 1).length); }catch(e){}
     /* r302 (Wolf, THIRD recurrence of "my rank differs by surface"): this file used to
        hand-roll the standing with pct = idx/total while HK_RANK.standing (stats, boards,
        desks) uses idx/(n-1) — on small fields that's a different tier. ONE calc now:
@@ -750,7 +756,9 @@
             // r70: header shows earned/possible; top-3 rarest EARNED featured large
             // r150: gp = EFFECTIVE rarity (static tier floor until the field is >= 20 players)
             const __fieldN=globalPct.__n||0;
-            let earnedList=[]; AC.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false}; }
+            /* r452 (audit P1-1): VISIBLE medals only — hidden capstone medals (drill not built) are off the card and out of the denominator */
+            const ACV=AC.filter(a=>!a.hidden);
+            let earnedList=[]; ACV.forEach(a=>{ let r; try{ r=a.test(ctx); }catch(e){ r={done:false}; }
               if(r.done) earnedList.push({a, gp:(window.hkEffRarity?window.hkEffRarity(a.tier, globalPct[a.id], __fieldN):(globalPct[a.id]!==undefined?globalPct[a.id]:100))}); });
             earnedList.sort((x,y)=>x.gp-y.gp);
             // r77: NEW unlocks since last look → celebrate (queued if several)
@@ -775,7 +783,7 @@
             const earnedById={}; earnedList.forEach(e=>earnedById[e.a.id]=e);
             const showcase = picks.map(id=>earnedById[id]).filter(Boolean).slice(0,3);
             const shown = showcase.length ? showcase : earnedList.slice(0,3);
-            let out='<div class="pc-ach-h">achievements <span style="color:var(--faint)">'+earnedList.length+' / '+AC.length+'</span>'+
+            let out='<div class="pc-ach-h">achievements <span style="color:var(--faint)">'+earnedList.length+' / '+ACV.length+'</span>'+
               '<a href="profile.html#showcase" style="float:right;font-size:9.5px;color:var(--accent);text-decoration:none">'+(showcase.length?'edit showcase':'pick your showcase')+' \u2197</a></div>';
             if(shown.length){
               out+='<div style="display:flex;gap:14px;margin:2px 0 10px">'+shown.map(e=>
@@ -927,6 +935,9 @@
       const u={ lvl:__L.lvl, tierBest:Math.max(fl.tierBest|0, tier.i|0),
         dailyWins:fl.dailyWins|0, certs:Object.keys(fl.certTracks||{}).length,
         charter:!!(window._navUser && window._navUser.created_at && String(window._navUser.created_at) < '2026-10-01'),
+        /* r452 (audit P1-2 / P1-3): this legacy gallery omitted the flags themes.js gates on,
+           so pro / emerald / architect read LOCKED here even when earned. */
+        pro:!!fl.pro, chaptersCleared:fl.chaptersCleared||[],
         perfectRun:fl.perfectRun?1:0 };
       const bk=window.hkFrameBucket?window.hkFrameBucket():1;
       const cards=[{id:'none', name:'None', tier:'', desc:'plain card', earn:'', unlocked:true}]
@@ -1714,6 +1725,77 @@ window.hkSkinUnlockSweep = function(){
         cardData:{ name:nm, lvl, tierLabel:'' } }); });
   }catch(e){}
 };
+
+/* ---- r452 (audit P1-2 / P1-3 / P1-11): THE hk_ach_flags WRITERS ----
+   themes.js gates the `pro` skin and the PRO title on `u.pro`, and the chapter skins
+   (emerald/architect) on `u.chaptersCleared`; nav.js's unlock sweep reads BOTH out of
+   hk_ach_flags — and nothing in the repo ever wrote either one, so a paying subscriber read
+   LOCKED on the PRO cosmetic and a chapter clear never celebrated. Same shape for `crowns`:
+   the trainer's achievement ctx hard-coded 0. These are the three writers, next to the
+   tierBest latch that already works this way. Every one of them is idempotent, pushes the
+   account-state sync only on a real change, and is safe to call from any page. ---- */
+
+/* PRO — semantics MATCH index.html isPro(): during the free-PRO beta (HOTKEY_PRO.beta, the
+   cross-page mirror of BETA_MODE) every player counts as PRO for perks, and "Pro cosmetics"
+   is one of the perks the beta explicitly hands out; after the beta only a real entitlement
+   (my_pro_status) counts. `entitled` omitted means "this surface can't see the entitlement" —
+   the stored one stands, so a non-trainer page can never downgrade a subscriber. */
+window.hkFlagPro = function(entitled){
+  try{
+    const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');
+    const ent=(entitled===undefined) ? !!fl.proEnt : !!entitled;
+    const pro=!!(window.HOTKEY_PRO && window.HOTKEY_PRO.beta) || ent;
+    if(fl.pro===pro && fl.proEnt===ent) return pro;
+    fl.pro=pro; fl.proEnt=ent;
+    localStorage.setItem('hk_ach_flags', JSON.stringify(fl));
+    try{ window.hkStatePush && window.hkStatePush(); }catch(e){}
+    return pro;
+  }catch(e){ return false; }
+};
+
+/* CHAPTERS CLEARED — the ids come from the caller's own milestone computer (index.html
+   campState / profile.html's PB-vs-par pass), both of which apply the shared hkCapstoneOk
+   predicate, so this only STORES what a surface already decided. Unioned, never replaced:
+   a chapter cleared on one device stays cleared (the r158 no-rug-pull law, and the same
+   grandfather hkCapstoneOk gives claimed milestones). */
+window.hkFlagChapters = function(ids){
+  try{
+    if(!Array.isArray(ids)) return;
+    const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');
+    const have=Array.isArray(fl.chaptersCleared)?fl.chaptersCleared:[];
+    const merged=[...new Set([...have, ...ids.filter(Boolean)])];
+    if(merged.length===have.length) return;
+    fl.chaptersCleared=merged;
+    localStorage.setItem('hk_ach_flags', JSON.stringify(fl));
+    try{ window.hkStatePush && window.hkStatePush(); }catch(e){}
+  }catch(e){}
+};
+
+/* CROWNS — the high-water crown count off the board standings. HIGH-WATER on purpose: a
+   crown medal is EARNED, and losing the #1 slot to a faster analyst must not un-earn it
+   (it is also what the client-state merge does with numbers). Written wherever the board
+   data actually exists (__loadProfileData); the trainer has no board data of its own and
+   reads this cache. */
+window.hkFlagCrowns = function(n){
+  try{
+    const v=n|0; if(v<=0) return;
+    const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');
+    if((fl.crowns|0)>=v) return;
+    fl.crowns=v;
+    localStorage.setItem('hk_ach_flags', JSON.stringify(fl));
+    try{ window.hkStatePush && window.hkStatePush(); }catch(e){}
+  }catch(e){}
+};
+
+/* r452: the beta grant lands on every page load — hkFlagPro() with no argument keeps any
+   stored entitlement and ORs in the beta window, so the `pro` skin + PRO title stop reading
+   locked while PRO perks are free. index.html re-writes it with the real entitlement the
+   moment my_pro_status resolves. */
+(function(){
+  const kickPro=()=>{ try{ window.hkFlagPro(); }catch(e){} };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', kickPro);
+  else kickPro();
+})();
 
 /* r411: kick the sweep once per page load, after boot settles so onboarding / welcome-back
    cards claim the foreground first — hkCelebrate's queue + __hkCelBlocked guard serialize any

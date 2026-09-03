@@ -470,5 +470,109 @@ try {
   bad('C13 could not run: ' + String(e.message || e).slice(0, 120));
 }
 
+/* ---- C14 (r452, audit P1-4): DESK QUEST TEMPLATES NAME LIVE DRILLS ----
+   lb.js MG_PROGRAMS pins a week of drills through set_assignment, and the pin loop carries a
+   `if(!lab[k]) continue;  // catalog drift guard` that SILENTLY drops a key the catalog no
+   longer has. Two retired keys (dress, growth) sat there for the whole depth pass: a captain
+   who pinned "Intern week 0" week 2 got a 2-drill week, and the preview line advertised the
+   raw retired key. C13 catches retired names under dev/ only — nothing scanned lb.js. So the
+   drift guard is now LOUD where it belongs, in CI: every key in every template must be in
+   menuOrder. Same pattern as C12's "harness names a retired drill". ---- */
+try {
+  const sbQ = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
+  vm.createContext(sbQ);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sbQ);
+  const liveQ = new Set((sbQ.window.HOTKEY_DRILLS || {}).menuOrder || []);
+  const lbSrc = fs.readFileSync('lb.js', 'utf8');
+  const blk = /const\s+MG_PROGRAMS\s*=\s*\{([\s\S]*?)\n  \};/.exec(lbSrc);
+  if (!blk) bad('C14: MG_PROGRAMS block not found in lb.js (shape changed?)');
+  else {
+    const before = lbSrc.slice(0, blk.index).split('\n').length;
+    let n14 = 0, keys14 = 0;
+    blk[1].split('\n').forEach((line, i) => {
+      const km = /keys:\s*\[([^\]]*)\]/.exec(line);
+      if (!km) return;
+      km[1].split(',').map(x => x.trim().replace(/^['"`]|['"`]$/g, '')).filter(Boolean).forEach(k => {
+        keys14++;
+        if (!liveQ.has(k)) { n14++; bad(`C14: lb.js:${before + i} quest template pins '${k}', which is not in menuOrder — the pin loop's drift guard would ship a short week`); }
+      });
+    });
+    if (!n14) ok(`desk quest templates: all ${keys14} pinned keys are live drills (lb.js MG_PROGRAMS)`);
+  }
+} catch (e) {
+  bad('C14 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C15 (r452, audit P0-2): EVERY PLACEMENT BOARD IS REACHABLE ----
+   HK_PLACEMENT.KEYS is the standardized 5-board placement series. Its 5th key (opmodel) sits
+   in Full Builds — LVL 11 + 32 pace clears — while Ranked opens at LVL 10, so the gate made
+   the series impossible to finish and the nav pill sat at "placement 4/5" forever. A placement
+   key may therefore be EITHER in an ungated group, OR the trainer's gate must consult the
+   shared ride-through predicate (drills.js hkPlacementRide). Source-level assertion on
+   purpose: this is about the gate branch existing, not about any one player's state. ---- */
+try {
+  const sbP = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
+  vm.createContext(sbP);
+  const drillSrc = fs.readFileSync('drills.js', 'utf8');
+  vm.runInContext(drillSrc, sbP);
+  const WP = sbP.window;
+  const pk = (WP.HK_PLACEMENT || {}).KEYS || [];
+  const gatedGroups = new Set(Object.keys((WP.HOTKEY_GATES || {}).groups || {}));
+  const groupOf = (WP.HOTKEY_DRILLS || {}).groupOf || {};
+  const idx = fs.readFileSync('index.html', 'utf8');
+  const gateBranch = /const __gn\s*=\s*drillLocked\(key\);[\s\S]{0,900}?if\s*\(__gn([\s\S]{0,220}?)\)\s*\{/.exec(idx);
+  const rideDefined = /window\.hkPlacementRide\s*=\s*function/.test(drillSrc);
+  const gateRides = !!(gateBranch && /hkPlacementRide/.test(gateBranch[1]));
+  if (!pk.length) bad('C15: HK_PLACEMENT.KEYS is empty (shape changed?)');
+  if (!gateBranch) bad("C15: loadChallenge's progression-gate branch not found in index.html (shape changed?)");
+  let n15 = 0;
+  for (const k of pk) {
+    if (!(k in groupOf)) { n15++; bad(`C15: placement key '${k}' is not a real drill`); continue; }
+    if (!gatedGroups.has(groupOf[k])) continue;             // free/ungated tier — always reachable
+    if (rideDefined && gateRides) continue;                 // gated, but the gate rides through
+    n15++;
+    bad(`C15: placement key '${k}' is in the GATED group '${groupOf[k]}' and the trainer's gate does not consult hkPlacementRide — the placement series cannot be finished (audit P0-2)`);
+  }
+  if (!n15 && pk.length) ok(`placement series: ${pk.length} boards, every one reachable (gate rides through via hkPlacementRide)`);
+} catch (e) {
+  bad('C15 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C16 (r452, audit P1-1): NO PHANTOM CAPSTONE MEDALS ON THE WALL ----
+   Five capstone medals test drills that were never built, so they read a permanent 0/1 — and
+   they dragged the completionist mythic (x_allach, "every other medal") down with them, making
+   it unearnable forever. Ids are frozen, so the fix is `hidden` (derived in drills.js from
+   hkCapstoneKeys(), i.e. from HOTKEY_CAMPAIGN.chapters[i].capstone). The invariant: every
+   hkCapstoneDone(ctx,'key') literal inside HOTKEY_ACHIEVEMENTS is either a live drill or its
+   medal is hidden — and the medal's `cap` field must name the same key its test() does. ---- */
+try {
+  const sbA2 = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {},
+                 localStorage: { getItem: () => null, setItem() {} } };
+  vm.createContext(sbA2);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sbA2);
+  const WA = sbA2.window;
+  const liveA = new Set((WA.HOTKEY_DRILLS || {}).menuOrder || []);
+  const AC = WA.HOTKEY_ACHIEVEMENTS || [];
+  if (!AC.length) bad('C16: no achievements parsed from drills.js (shape changed?)');
+  let n16 = 0, hid = 0;
+  for (const a of AC) {
+    const src = String(a.test || '');
+    const lits = [...src.matchAll(/hkCapstoneDone\s*\([^,]+,\s*['"]([a-z0-9_]+)['"]\)/g)].map(m => m[1]);
+    if (!lits.length) continue;
+    for (const k of lits) {
+      if (a.cap !== k) { n16++; bad(`C16: medal '${a.id}' tests hkCapstoneDone(…,'${k}') but its cap field is '${a.cap}' — the pairing the hidden-derivation reads is broken`); }
+      if (liveA.has(k)) continue;
+      if (a.hidden) { hid++; continue; }
+      n16++;
+      bad(`C16: medal '${a.id}' tests capstone '${k}', which is not in menuOrder, and the medal is NOT hidden — a permanently 0/1 medal on the wall that also blocks x_allach (audit P1-1)`);
+    }
+  }
+  const allach = AC.find(a => a.id === 'x_allach');
+  if (allach && !/!a\.hidden/.test(String(allach.test))) bad('C16: x_allach must count VISIBLE medals only (its filter dropped the !a.hidden clause) — hidden medals make the mythic unearnable');
+  if (!n16) ok(`capstone medals: every hkCapstoneDone key is live or its medal is hidden (${hid} hidden), x_allach counts visible only`);
+} catch (e) {
+  bad('C16 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }
 console.log('STATIC INVARIANTS: clean');

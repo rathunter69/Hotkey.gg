@@ -1,5 +1,80 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r452 — PROGRESSION TIES: placement ride-through · phantom capstone medals · unwritten flags · stale quest templates
+
+Five findings from the PROGRESSION/RANK/DESK/LEVEL audit (scratchpad `audit-progression.md`),
+fixed with the CI invariant each bug class earns (WORKFLOW §3.3). Every one of them was a
+SYSTEM TIE: two systems that each work alone and contradict each other where they meet.
+
+### P0-2 · the placement series could not be finished (dead end at 4/5)
+`HK_PLACEMENT.KEYS` ends in `opmodel`, which lives in **Full Builds** (LVL 11 + 32 pace clears),
+while Ranked opens at **LVL 10** (`RANKED_MIN_LVL`). A level-10 player who entered Ranked clicked
+lb.js's "run it →" on the fifth board and got the lock modal — forever, with the nav pill parked
+at "⚔ placement 4/5" and no tier, no card, no rank.
+**Fix:** the five standard boards now ride THROUGH the progression gate exactly like a daily run
+or an armed race — ONE shared predicate, `window.hkPlacementRide` (drills.js), consulted by
+`loadChallenge`'s gate branch (index.html). Deliberately narrow so it can never become a free pass
+around the ladder: only the placement keys, only after the ranked opt-in (`hk_ranked`), only while
+the series is incomplete, and the owner latch (`hk_placement_done`) closes it too. lb.js's link
+needed no change — nothing outside the trainer enforces the gate.
+**Invariant C15:** every `HK_PLACEMENT.KEYS` entry is in an ungated group OR the trainer's gate
+branch consults `hkPlacementRide`. **Suite:** `dev/e2e-audit-rank.js` T5 seeds a LVL-10, unplaced,
+ranked player and proves `?drill=opmodel` LOADS — plus the negative control (not in ranked → the
+same board still bounces).
+
+### P1-1 · five phantom capstone medals, and the completionist mythic was unearnable
+`cap_c3/c4/c5/c6/c8` test `hkCapstoneDone(c,'qclose'|'cleanroom'|'redflags'|'pitchpage'|'shipit')`
+— drills that were never built. They sat on the wall at a permanent 0/1, and because `x_allach`
+(mythic, "every OTHER medal") swept them in, that medal was **unearnable forever**.
+**Fix, ids frozen** (earned ids persist in `hk_ach_seen`): each capstone medal carries a `cap`
+field, and drills.js derives `hidden` from `hkCapstoneKeys()` — i.e. from
+`HOTKEY_CAMPAIGN.chapters[i].capstone`, the SSOT that already drives the ★ tag and the milestone
+gate. The day a chapter designates its capstone, its medal appears with no edit here. Every
+renderer honors `hidden` (index.html drip + sweep, nav.js card, stats.html wall, profile.html
+achMeta) — including the earned/possible denominators — and `x_allach` counts visible medals only.
+**Invariant C16:** every `hkCapstoneDone(ctx,'key')` literal in HOTKEY_ACHIEVEMENTS is a live drill
+or its medal is hidden, the `cap` field matches the key its `test()` names, and `x_allach` keeps
+its `!a.hidden` clause.
+
+### P1-2 / P1-3 / P1-11 · three flags nothing ever wrote
+themes.js gates the `pro` skin + the `PRO` title on `u.pro`, and emerald/architect on
+`u.chaptersCleared`; nav.js's unlock sweep reads both out of `hk_ach_flags`. **Nothing wrote
+either one** — a paying subscriber read LOCKED on the PRO cosmetic, and a chapter clear never
+celebrated. Same shape in the trainer: `buildAchCtx` hard-coded `crowns:0`, so no crown medal
+could fire in game.
+**Fix — writers only; themes.js untouched.** Three idempotent writers in nav.js next to the
+tierBest latch: `hkFlagPro` (semantics MATCH `isPro()`: the free-PRO beta ORs in, a real
+entitlement always counts; an omitted argument keeps the stored entitlement so no page can
+downgrade a subscriber), `hkFlagChapters` (union, never replace — the no-rug-pull law), and
+`hkFlagCrowns` (high-water: an earned crown medal must not un-earn when someone posts faster).
+Wired where each fact is already computed: `loadEntitlement` (index.html) writes the resolved
+entitlement; `buildAchCtx` writes the chapter clears `campState()` derives through the shared
+`hkCapstoneOk` and reads `crowns` back; profile.html persists the clears it computes and passes
+`pro` into `frameU`; nav.js latches crowns in `__loadProfileData` (the one place board standings
+exist) and the legacy frame gallery now carries both flags.
+**LIMITATION, commented in place:** the trainer holds no board data, so its crown count is as
+fresh as the last ranked page load.
+
+### P1-4 · desk quest templates pinned retired drills
+`MG_PROGRAMS.intern0` weeks 2/3 pinned `dress` and `growth` (both retired in the depth pass). The
+pin loop's `if(!lab[k]) continue;` drift guard swallowed them **silently**, so a captain who
+pinned "Intern week 0" got a 2-drill week and the preview line advertised the raw dead key.
+**Fix:** `combo` and `cagr` — the live drills those two retired into (DEPTH_PASS_CAMPAIGN §0;
+`housestyle` already held week 2's first slot, so the chapter's own substitute takes the seat,
+exactly as HOTKEY_CAMPAIGN c2 did).
+**Invariant C14:** every key in every quest template is in `menuOrder` — the drift guard is now
+LOUD in CI, where C13 already covers `dev/`.
+
+**Cache:** drills.js v301 · nav.js v303 · lb.js v42 (themes.js deliberately untouched — a
+concurrent restyle owns it).
+
+**Gate:** check-invariants clean (C14/C15/C16 new — each proved to FAIL with its bug
+re-introduced, then restored) · check-cache-versions clean · e2e-smoke ALL 7 PAGES CLEAN ·
+e2e-lb ALL 36 PASS · e2e-demo-replay navigation/combo/foot ALL GREEN · e2e-audit-rank 20 PASS
+with T5 green; its 3 reds (nav pill null, account tier Unranked, no desk form) reproduce
+byte-identically on the pre-change baseline — pre-existing, untouched by this round.
+
+
 ## r440 H6b-12 — balcheck + tieout + balance: Formulas II CLOSES 10/10 (DEPTH_PASS §4.48 + §4.51 + §4.55 + §2.3)
 _The chapter's last three boards. All three carried a FORMATTING ☆ on their §4 page, all three
 had those ☆s re-cut under §1.0(d); one of them (`tieout`) came within a diagnostic of retirement

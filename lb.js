@@ -1307,8 +1307,15 @@ async function renderManage(root){
   const MG_PROGRAMS={
     intern0:{name:'Intern week 0', pitch:'zero to desk-ready — movement, formatting, first formulas, find-and-fix', weeks:[
       {note:'get moving, no mouse',        keys:['navigation','pastes','editfix']}   /* r431: copyover retired, undo merged into editfix */,
-      {note:'desk-standard formatting',    keys:['housestyle','dress','decimals']},
-      {note:'first formulas',              keys:['margin','growth','foot']},
+      /* r452 (audit P1-4): `dress` and `growth` are RETIRED keys — the drift guard below
+         silently dropped them, so "pin week 2" shipped a 2-drill week and the preview line
+         advertised the raw key to the captain. Replaced with the live drills that carry the
+         same lesson (DEPTH_PASS_CAMPAIGN §0): dress retired INTO housestyle, which already
+         holds this week's first slot, so the chapter's own substitute takes the seat
+         (HOTKEY_CAMPAIGN c2 swapped dress -> combo the same way); growth retired into cagr,
+         which absorbed its board. check-invariants C14 now fails the build on a dead key. */
+      {note:'desk-standard formatting',    keys:['housestyle','combo','decimals']},
+      {note:'first formulas',              keys:['margin','cagr','foot']},
       {note:'find it and fix it',          keys:['modeltour','audit','triage']}]},
     bootcamp:{name:'First-year bootcamp', pitch:'the modeling core — clean-up, functions, schedules, statements', weeks:[
       {note:'clean-up week',               keys:['housestyle','editfix','pastes']},

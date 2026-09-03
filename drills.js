@@ -20,6 +20,31 @@
    rank is placed off one yardstick whether you're early in the catalog or deep into it. */
 window.HK_PLACEMENT = { KEYS: ['navigation','combo','margin','sort','opmodel'] };
 
+/* r452 (audit P0-2 — PLACEMENT RIDE-THROUGH, the ONE predicate). The fifth placement board
+   (`opmodel`) lives in Full Builds, gated at LVL 11 + 32 pace clears, while Ranked opens at
+   LVL 10 (themes.js RANKED_MIN_LVL) — so a level-10 player who entered Ranked could never
+   post the 5th board and sat at "⚔ placement 4/5" forever. The five standard boards ride
+   THROUGH the progression gate, exactly like a daily run or an armed race does (index.html
+   loadChallenge). Deliberately narrow, so this can never become a free pass around the ladder:
+     · only the HK_PLACEMENT keys,
+     · only once you have ENTERED ranked (hk_ranked — the same opt-in lb.js/nav.js read),
+     · only while the series is INCOMPLETE — it closes on the 5th posted board,
+     · and the owner latch (hk_placement_done, r408) closes it too.
+   hasPB(key) is the caller's "this board is posted" test (the trainer passes its PB map).
+   Every gate that would otherwise bounce a placement board must consult THIS function — a
+   second copy of the rule is the drift bug this file exists to prevent. */
+window.hkPlacementRide = function(key, hasPB){
+  try{
+    var P=(window.HK_PLACEMENT&&window.HK_PLACEMENT.KEYS)||[];
+    if(P.indexOf(key)<0) return false;
+    if(localStorage.getItem('hk_ranked')!=='1') return false;
+    if(localStorage.getItem('hk_placement_done')==='1') return false;
+    var has=(typeof hasPB==='function') ? hasPB : function(){ return false; };
+    for(var i=0;i<P.length;i++){ if(!has(P[i])) return true; }   // incomplete -> open
+    return false;
+  }catch(e){ return false; }
+};
+
 window.HOTKEY_DRILLS = {
 
   // ---------------------------------------------------------------
@@ -454,7 +479,7 @@ window.HOTKEY_ACHIEVEMENTS = [
   /* r389 (Wolf): the founding-cohort + completionist mythics. foundingClass/foundingPartner
      ride the ctx (themes.js hkFoundingFlags — one count query, cached). Founding Partner
      arms post-beta when PRO purchases are tracked + ordered; until then it's a locked goal. */
-  { id:'x_allach',  glyph:'mastery', tier:'m', name:'Sweaty',         desc:'Earn every other medal on the wall — the complete collection',            test:c=>{ const AC=window.HOTKEY_ACHIEVEMENTS||[]; const others=AC.filter(a=>a.id!=='x_allach'&&a.tier!=='m'); let n=0; others.forEach(a=>{ try{ if(a.test(c).done) n++; }catch(e){} }); return {done:others.length>0&&n>=others.length, prog:n, goal:others.length||1}; } },
+  { id:'x_allach',  glyph:'mastery', tier:'m', name:'Sweaty',         desc:'Earn every other medal on the wall — the complete collection',            test:c=>{ const AC=window.HOTKEY_ACHIEVEMENTS||[]; const others=AC.filter(a=>a.id!=='x_allach'&&a.tier!=='m'&&!a.hidden);   /* r452 (audit P1-1): hidden medals (capstones whose drill isn't built) are not on the wall, so they cannot be required for "every other medal" — that made this mythic unearnable */ let n=0; others.forEach(a=>{ try{ if(a.test(c).done) n++; }catch(e){} }); return {done:others.length>0&&n>=others.length, prog:n, goal:others.length||1}; } },
   { id:'x_first100',glyph:'founder',  tier:'m', name:'First Analyst Class', desc:'One of the first 100 accounts on hotkey.gg — the founding class',         test:c=>({done:!!c.foundingClass, prog:c.foundingClass?1:0, goal:1}) },
   { id:'x_foundpro',glyph:'crown',    tier:'m', name:'Founding Partner',    desc:'One of the first 100 to go PRO — a permanent founding badge',             test:c=>({done:!!c.foundingPartner, prog:c.foundingPartner?1:0, goal:1}) },
   /* ---- r426 (Wolf, ROUND2_FEEDBACK §4a): THE CAPSTONE SET — one medal per chapter
@@ -468,14 +493,14 @@ window.HOTKEY_ACHIEVEMENTS = [
      their drills land — no NaN, no phantom credit, no edit needed here when they ship.
      The key list DERIVES from HOTKEY_CAMPAIGN once §2.4 wires `chapters[i].capstone`
      (SSOT); HOTKEY_CAPSTONES below is the fallback until then. ---- */
-  { id:'cap_c1', glyph:'perfect', tier:'r', name:'Toured the model',    desc:'Clear the Foundations capstone — Model Tour, cold',                       test:c=>{ const ok=window.hkCapstoneDone(c,'modeltour'); return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'cap_c2', glyph:'perfect', tier:'r', name:'Model-ready',         desc:'Clear the Formatting capstone — the sheet a VP would open',               test:c=>{ const ok=window.hkCapstoneDone(c,'gauntlet');  return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'cap_c3', glyph:'perfect', tier:'r', name:'Books are closed',    desc:'Clear the Formulas I capstone — the quarter, start to finish',            test:c=>{ const ok=window.hkCapstoneDone(c,'qclose');    return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'cap_c4', glyph:'perfect', tier:'r', name:'Data room ready',     desc:'Clear the Data & Lookups capstone — dirty export to sendable tape',       test:c=>{ const ok=window.hkCapstoneDone(c,'cleanroom'); return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'cap_c5', glyph:'perfect', tier:'r', name:'Diligence cleared',   desc:'Clear the Formulas II capstone — every red flag found and fixed',         test:c=>{ const ok=window.hkCapstoneDone(c,'redflags');  return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'cap_c6', glyph:'perfect', tier:'e', name:'Straight to the VP',  desc:'Clear the Models I capstone — the valuation page, referenced not retyped', test:c=>{ const ok=window.hkCapstoneDone(c,'pitchpage'); return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'cap_c7', glyph:'perfect', tier:'e', name:'Down the waterfall',  desc:'Clear the Models II capstone — three tranches, four years, one pass',      test:c=>{ const ok=window.hkCapstoneDone(c,'cascade');   return {done:ok, prog:ok?1:0, goal:1}; } },
-  { id:'cap_c8', glyph:'perfect', tier:'e', name:'Signed off',          desc:'Clear the Full Builds capstone — the model ships and it balances',        test:c=>{ const ok=window.hkCapstoneDone(c,'shipit');    return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c1', cap:'modeltour', glyph:'perfect', tier:'r', name:'Toured the model',    desc:'Clear the Foundations capstone — Model Tour, cold',                       test:c=>{ const ok=window.hkCapstoneDone(c,'modeltour'); return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c2', cap:'gauntlet', glyph:'perfect', tier:'r', name:'Model-ready',         desc:'Clear the Formatting capstone — the sheet a VP would open',               test:c=>{ const ok=window.hkCapstoneDone(c,'gauntlet');  return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c3', cap:'qclose', glyph:'perfect', tier:'r', name:'Books are closed',    desc:'Clear the Formulas I capstone — the quarter, start to finish',            test:c=>{ const ok=window.hkCapstoneDone(c,'qclose');    return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c4', cap:'cleanroom', glyph:'perfect', tier:'r', name:'Data room ready',     desc:'Clear the Data & Lookups capstone — dirty export to sendable tape',       test:c=>{ const ok=window.hkCapstoneDone(c,'cleanroom'); return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c5', cap:'redflags', glyph:'perfect', tier:'r', name:'Diligence cleared',   desc:'Clear the Formulas II capstone — every red flag found and fixed',         test:c=>{ const ok=window.hkCapstoneDone(c,'redflags');  return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c6', cap:'pitchpage', glyph:'perfect', tier:'e', name:'Straight to the VP',  desc:'Clear the Models I capstone — the valuation page, referenced not retyped', test:c=>{ const ok=window.hkCapstoneDone(c,'pitchpage'); return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c7', cap:'cascade', glyph:'perfect', tier:'e', name:'Down the waterfall',  desc:'Clear the Models II capstone — three tranches, four years, one pass',      test:c=>{ const ok=window.hkCapstoneDone(c,'cascade');   return {done:ok, prog:ok?1:0, goal:1}; } },
+  { id:'cap_c8', cap:'shipit', glyph:'perfect', tier:'e', name:'Signed off',          desc:'Clear the Full Builds capstone — the model ships and it balances',        test:c=>{ const ok=window.hkCapstoneDone(c,'shipit');    return {done:ok, prog:ok?1:0, goal:1}; } },
   { id:'cap_half',glyph:'mastery', tier:'e', name:'Mid-cap',            desc:'Clear half the chapter capstones',                                        test:c=>{ const KS=window.hkCapstoneKeys(); const n=KS.filter(k=>window.hkCapstoneDone(c,k)).length; const goal=Math.max(1,Math.ceil(KS.length/2)); return {done:n>=goal, prog:Math.min(n,goal), goal}; } },
   { id:'cap_all', glyph:'mastery', tier:'l', name:'Large cap',          desc:'Clear every chapter capstone — the whole catalog, answered',               test:c=>{ const KS=window.hkCapstoneKeys(); const n=KS.filter(k=>window.hkCapstoneDone(c,k)).length; const goal=KS.length||1; return {done:KS.length>0&&n>=goal, prog:n, goal}; } },
 ];
@@ -513,6 +538,25 @@ window.hkCapstoneDone = function(ctx, key){
     return ctx.pb[key]!==undefined;
   }catch(e){ return false; }
 };
+
+/* ---- r452 (audit P1-1): PHANTOM CAPSTONE MEDALS ARE HIDDEN UNTIL THEIR DRILL EXISTS ----
+   Five of the eight capstone medals (cap_c3/c4/c5/c6/c8) name drills that were never built
+   (qclose, cleanroom, redflags, pitchpage, shipit). They read a permanent 0/1 on the wall, and
+   because `x_allach` (mythic, "every OTHER medal") swept them in, the completionist medal was
+   unearnable forever. Ids are FROZEN (hk_ach_seen persists earned ids), so nothing is deleted
+   or renumbered: the medal is marked `hidden` and every renderer skips it.
+   SSOT: the live set is hkCapstoneKeys() — HOTKEY_CAMPAIGN.chapters[i].capstone — so the day a
+   chapter designates its capstone (the same line that wires the ★ tag and the milestone gate)
+   its medal appears on the wall with no edit here. `cap` on each medal is the pairing the CI
+   invariant checks against the key its test() names. ---- */
+(function(){
+  try{
+    var live=window.hkCapstoneKeys()||[];
+    (window.HOTKEY_ACHIEVEMENTS||[]).forEach(function(a){
+      if(a && a.cap) a.hidden = live.indexOf(a.cap)<0;
+    });
+  }catch(e){}
+})();
 
 /* ---- r426 (Wolf, §4b): ACHIEVEMENT CATEGORIES — the TYPE axis the stats wall groups by
    when the all-types / all-rarities chips are both selected ("organize by achievement TYPE
