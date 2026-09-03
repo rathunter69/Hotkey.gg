@@ -5,6 +5,12 @@ standards — READ FIRST; §9 is the wave playbook for Opus-5 sessions, new r428
 **dev/PIPELINE.md's ⚡ r428 header (the live queue)**, dev/AUDIT.md (newest round at the TOP),
 and the dev/ design docs._
 
+## ⚡ NEXT-SESSION HANDOFF (2026-09-03 late, r452 — THE AUDIT + THE BUILD DAY)
+Read `dev/CONTINUITY.md` §0a, then `dev/AUDIT_R452.md`. The beta is retired on the branch, landing v2
+and the Keyboard Tour are built, the frames are pixel, fourteen audit fixes landed with guards. The
+branch has not been through CI (gate.yml is PR/main only). Next: Wolf's menu answers (AUDIT_R452 §2),
+then the lesson-drill wave (TUTORIAL_CHAPTER_SPEC §3.1–3.4 + `signs` + `tracepass`).
+
 ## ⚡ NEXT-SESSION HANDOFF (2026-09-03, r451 — THE FOUR VECTORS: tutorial chapter · rank art · business · security)
 
 **READ `dev/CONTINUITY.md` §0 FIRST.** Wolf's direction after the r450 playtest: the catalog must

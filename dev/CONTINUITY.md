@@ -27,6 +27,26 @@ parallel once A1 is answered). Also on the table from r450: PR #246 merged the f
 premium flag is still OFF and CI asserts it; the r450 first-session audit is the newest playtest
 evidence (AUDIT.md top). The tutorial spec supersedes `FOUNDATIONS_SPEC.md` §6 for chapter 1 only.
 
+## 0a · r452 (2026-09-03, same day) — THE FULL-PROJECT AUDIT + THE BUILD DAY
+
+**Read `dev/AUDIT_R452.md` first** — six domain audits (perf/stale · Excel+Mac parity · pages+drills
+bugs · progression systems · catalog coherence · client↔backend contract) synthesized into fixes
+made and a menu for Wolf; the full reports live in `dev/audit-r452/`. Fourteen fix/build streams
+landed on the branch the same day, each with a CI guard (AUDIT_R452 §1): certificates issuable
+again (P0), the run outbox, placement's 5th board, phantom medals, Mac ⌃⌘V / ⌘⇧T and the chord
+truth table, Tab-Enter home, Esc closes sign-in, 74 inline name/label duplicates, the beta retired
+(curtain deleted, BETA_MODE → PRO_PERKS_FREE, beta_codes dropped), landing v2, the Keyboard Tour
+(wave 0 + the six-stage board + the HUD), the card-frame pixel pass, plus the keystroke hot path
+and the bug-sweep set. Wolf's answered decisions: delete the curtain · keep BETA_MODE behavior,
+rename it · landing defaults to Daylight with a PRO door and learn-by-doing · pixel frames go ·
+implement from the pushes and re-assess. **Open Wolf items:** AUDIT_R452 §2 (the menu) — first up
+C1 legal placeholders, C4 Mac KeyTips, then the lesson-drill wave B1–B3.
+
+**Branch state:** everything is on `claude/drill-redesign-art-style-jg9vhm`; `gate.yml` runs only on
+PRs and pushes to main, so CI has NOT run on the branch — the local gate ran per merge (see each
+commit message). Merge to main = launch (the curtain is gone). Cache versions on the branch:
+themes.js 313 · nav.css 312 · drills.js 304 · nav.js 305 · lb.js 43.
+
 ## 1 · What the product is
 
 **Hotkey.gg is keyboard-only Excel training for finance professionals.** The tagline on the live
