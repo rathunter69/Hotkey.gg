@@ -1,5 +1,16 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r452 — THE FULL LOCAL GATE ON THE MERGED BRANCH (close of the build day)
+
+_gate.yml runs only on PRs and pushes to main, so the branch never saw CI. The whole matrix ran
+locally on the merged tip (fourteen streams merged): cache-versions · secrets · invariants (C1–C25)
+· outbox · smoke (+19 pages at 390px) · lb 36 · paywall · landing 28 · deeplink 18 · visual 406 ·
+behavioral replay · parity 189 · onboard 73 · replay ALL 74 · alt-paths 160 · mac 30 · rapidfire ·
+guided 77 · formulas 102 · grid-height · startgate · resize 34 · pause · drill-page drift —
+**23 green, 1 red**: the drift step found `drills/colops.html` resurrected by a worktree merge
+(the perf pass had deleted it; the bug-sweep worktree predated that). Deleted again; the generator's
+orphan assertion is exactly the guard that caught it. Log: `.gate-r452.log` (untracked)._
+
 ## r452 — LANDING V2: learn by doing, Daylight by default, the PRO door
 
 _Scope: the `.landing` block in `index.html` — markup, CSS and its small JS — plus one long-standing

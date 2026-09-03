@@ -43,8 +43,9 @@ implement from the pushes and re-assess. **Open Wolf items:** AUDIT_R452 §2 (th
 C1 legal placeholders, C4 Mac KeyTips, then the lesson-drill wave B1–B3.
 
 **Branch state:** everything is on `claude/drill-redesign-art-style-jg9vhm`; `gate.yml` runs only on
-PRs and pushes to main, so CI has NOT run on the branch — the local gate ran per merge (see each
-commit message). Merge to main = launch (the curtain is gone). Cache versions on the branch:
+PRs and pushes to main, so CI has NOT run on the branch — but the FULL 24-step local gate (every
+suite gate.yml runs plus the r452 guards) ran green on the merged tip at the close of r452
+(`.gate-r452.log`; the one red step was a resurrected orphan page, deleted). Merge to main = launch (the curtain is gone). Cache versions on the branch:
 themes.js 313 · nav.css 312 · drills.js 304 · nav.js 305 · lb.js 43.
 
 ## 1 · What the product is
