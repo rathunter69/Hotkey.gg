@@ -111,7 +111,12 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
       const inv = await page.evaluate(() => {
         const out = { parsMissing: [], parsMismatch: [], dehint: [] };
         const D = window.HOTKEY_DRILLS || {}, pars = D.pars || window.HOTKEY_PARS || {}, meta = D.meta || {};
+        /* r452: a CHALLENGES entry flagged `tour:true` is NOT a drill — the Keyboard Tour is
+           untimed and deliberately absent from HOTKEY_PARS (spec §2(g), asserted by
+           dev/check-invariants.js C15). Skipping it here is the same exclusion, not a hole:
+           C15 fails the build if it ever DOES appear in PARS. */
         for (const k of Object.keys(CHALLENGES)) { const c = CHALLENGES[k];
+          if (c.tour) continue;
           if (!(k in pars)) { out.parsMissing.push(k); continue; }
           if (Number(pars[k]) !== Number(c.par)) out.parsMismatch.push(k + ':' + pars[k] + '!=' + c.par); }
         const CHORD = /\b(Ctrl|Alt|Cmd|Shift)\s*\+|⌘|\bAlt\s+[A-Z]\b/;

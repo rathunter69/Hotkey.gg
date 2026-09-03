@@ -1,5 +1,158 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r452 — THE KEYBOARD TOUR: wave 0 platform + the six-stage tutorial board
+
+_Spec: `dev/TUTORIAL_CHAPTER_SPEC.md` v2 (2026-09-03), §6 WAVE 0 + §3.0.1–3.0.6. Decisions taken
+as accepted by the orchestrator: **T1** untimed with a one-time +25 xp bounty · **T2** the Tour
+replaces BOTH the modal tour's Excel beats AND the warm-up sandbox · **T3** stage 5 forces the
+ribbon overlay on. The four LESSON DRILLS (§3.1–3.4) are NOT in this build — the catalog stays at
+74 and `drills.js` is untouched._
+
+### THE HEADLINE: the first thing a novice meets is a board that teaches, not a modal that talks
+
+`keyboardtour` is **one board, six stages, twenty-four beats, no clock**. It is not a drill: it has
+no `par`, no `parKeys`, no `demo`, no `req`, no `guide`, no entry in `drills.js`, no leaderboard, no
+PB, and it is not in the marketing count (still **74 banker-grade drills**). It hangs off the drill
+engine and is the **first consumer of the r421 §2.5 origami tier ladder** — platform code that has
+existed since r421 with nothing using it.
+
+The surface that makes it different from a drill is the **TUTORIAL HUD** (§3.0.2): a persistent
+banner over the grid that names the NEXT KEYSTROKE, one beat at a time, the way a pixel-art game
+walks you through its controls. A drill states an outcome and lets you struggle; the Tour states the
+key and waits for it.
+
+### WHAT WAS BUILT, BY SPEC SECTION
+
+| spec | what shipped | where |
+|---|---|---|
+| §3.0.2(1) banner | `#tourHud` — fixed, bottom-center, one line + keycaps, pulses 400 ms when a beat clears, re-measured every render. **Never covers the active cell or the beat's target**: both ends are measured and the smaller overlap wins (`hkTourHudPlace`), and the flipped position is clamped below the ribbon bar | `index.html` CSS + `hkTourHudShow` / `hkTourHudPlace` |
+| §3.0.2(2) spotlight | free, by declaring `targets` — `currentTargetRange()` and the `.ttarget` render branch are untouched; the Tour adds a **pulse class** to `.ttarget`, not a new class | render branch |
+| §3.0.2(3) nudge | `hkTourKeyWatch` — a PASSIVE observer above every game branch. It latches the beat's keystroke gate, counts consecutive wrong keys, and adds the second HUD line on the third. It never `preventDefault`s and never returns: every key still reaches the live sheet. Resets on a correct key and on beat completion; never escalates to a third line | keydown handler |
+| §3.0.2(4) stage cards | six §1.5 lesson cards over the dimmed board, any key dismisses | `hkTourStageCard` |
+| §3.0.2(6) reduced motion | the HUD pulse and the `.ttarget` pulse are inside `@media (prefers-reduced-motion: no-preference)` with a static `reduce` branch — the precedents at the gate card, the maze nudge and the ghost cursor | CSS |
+| §3.0.3–3.0.4 staging | five `tiers`, one per stage 2–6. Each reveals ONE contiguous, EMPTY region, so no parked box ever swallows live data | `build().tiers` |
+| §3.0.4(4)(6) | `checkWin` bails on `tourMode` (one edit removes the clock stop, results card, PB, ghost, streak, campaign xp, band xp and `recordRun`); `startClock` refuses `tourMode`; `hkGateArm` declines it and `startKeyboardTour` calls `hkGateClear()` — the r450 rationale comment re-pointed from the sandbox | engine |
+| §3.0.4(7) | +25 xp paid ONCE via the `hk_xp_est` + `hkStatePush` ☆-bounty pattern, latched on `hk_tour_done_v2` | `hkTourFinish` |
+| §3.0.4(8) | `startKeyboardTour()` is `obStart`'s handler and the "basically none" destination; the ? sheet gains **▶ the keyboard tour** beside ↻ replay the tour | onboarding + `openKbd` |
+| §3.0.5 | all 24 beats with their exact label / HUD / nudge strings and gates | `HK_TOUR_BEATS` + `CHALLENGES.keyboardtour.checks` |
+| §3.0.6 | `.cl-inner` "your checklist" folds into stage 1 (a callout INSIDE the panel it names, fired when the panel first renders at beat 3); `#hintsToggle` "stuck?" into stage 4's card footer; `.drillbar` "moving around" into the stage-6 hand-off card | `HK_TOUR_STAGE_NOTE`, `hkTourChecklist` |
+| §1.5 | the lesson card built **generically** — the Tour's stage cards and the hand-off card use it today, and on a drill declaring `lesson:{title,body,keys}` the card IS the r450 start gate (one keypress dismisses it AND starts the clock, `hk_lessons_off` turns it off forever, the ? sheet reopens it). No lesson drill ships yet; the surface is ready for the wave that adds them | `hkLessonCard` / `hkLessonMaybeGate` / `hkLessonKey` |
+| §1.7 | the comfort answer now ROUTES the session: **0** → the Tour → drill 1 · **1** → offered the Tour in one line, skippable · **2** → straight to the drills, the Tour on the ? sheet | `showComfort` / `dismissLanding` / `hkTourOffer` |
+| T3 | stage 5 forces `hk_ribbon_bar` on for its duration and hands the player's own setting back at Tour end (undefined-vs-null sentinel: `getItem` returns `null` for an unset key, so `null` cannot double as "not parked") | `hkTourRibbonForce` |
+| hand-off | `loadChallenge('navigation')` with **guided OFF** (the Tour was the hand-holding) and **hints ON** (a hinted run still posts, which the r450 guided hand-off could not say). The r450 guided one-shot and the from-zero rails ramp both stand down once `hk_tour_done_v2` is set | `hkTourHandoff` |
+
+### WHAT WAS RETIRED (T2) — 165 lines of index.html, one whole suite
+
+| gone | lines |
+|---|---|
+| `startSandbox` · `sandboxReadyCard` · `sandboxCallout` · `exitSandbox` · `sbCell` (the r238 throwaway sandbox) | 60 |
+| `startOnboardBoard` (the r303 cleared practice board the modal tour ran on) | 39 |
+| `startGuidedIntro` + `introRibbonPeek` (the ribbon PEEK is now stage 5 — live and hands-on) | 25 |
+| `TOUR_STEPS[0..6]` — five r303 `novice:true` fundamentals + two r292 chord beats — and the three §3.0.6 beats that fold into the Tour | 19 |
+| `buildTourPlan`'s now-dead `novice`/`hk_xlv` gate | 2 |
+| `dev/e2e-onboard-sandbox.js` | 68 |
+
+`sandboxMode` **the variable stays** (§8 do-not-change #6): `checkWin`, `updateChecklist` and
+`loadChallenge` all read it, and the Tour runs on its own `tourMode`. What is left of `TOUR_STEPS`
+is the five-beat PRODUCT tour, which is what a player who skips the Keyboard Tour still gets.
+
+### THE ONE TRAP THE SPEC DID NOT SEE
+
+`MENU_ORDER` falls back through `CHALLENGES` for any key not in `drills.js` — so adding
+`CHALLENGES.keyboardtour` would have **silently adopted a four-minute untimed tutorial into the
+catalog**: the picker, the drill count, prev/next, the random pool, the weekly bag. The fallback now
+filters `tour:true`, `dev/e2e-smoke.js`'s HOTKEY_PARS parity scan skips the same flag, and C15 fails
+the build if either exclusion is ever dropped.
+
+### DEVIATIONS FROM THE SPEC (§0: named, never silent)
+
+Each is an engine fact the spec's line-anchored survey missed. All seven are also recorded inline in
+the `CHALLENGES.keyboardtour` header, where a later build agent will actually read them.
+
+- **(a) The cells stage 5 dresses ship UNDRESSED.** §3.0.1 lists `A3:E3` bold and `A4:E11` comma/0dp
+  at stage 1, and §3.0.5 stage 5 grades exactly those two properties. Shipped as §3.0.1 describes,
+  three of stage 5's five beats are pre-satisfied and cannot be performed. §3's own page grammar
+  says "pre-dressed unless the lesson IS the dress" — and stage 5 IS the dress.
+- **(b) Beat 18 drops "no decimals".** `Ctrl+Shift+1` writes comma at **2 dp** in this engine
+  (`index.html`, Excel's own behavior), so a one-press beat cannot land 0 dp. The beat grades the
+  comma style; the label and HUD say so.
+- **(c) Beat 22 teaches `alt h b p`, not the spec's `alt h b t`.** In this engine — and in Excel, per
+  the r298 CANON note on the border gallery — `alt h b t` is the THICK BOX and `alt h b p` is the top
+  border. The spec's chord would have taught a wrong key.
+- **(d) Beats 11, 13 and 16 name the selection the chord needs.** Row insert/delete fire only from a
+  full row/column selection, and `Alt+=`'s committed range form takes a single column or row through
+  its empty total. The spec's HUD lines ("press ctrl+− to delete the whole row", "select the row and
+  press alt+=") would have left a player pressing a key that does nothing.
+- **(e) The `Total` label reveals with the ROSTER (tier 1, top of stage 3), not with the FY header at
+  stage 4.** Stage 3's fifth beat inserts a line ABOVE the total line, so the total line has to be on
+  the board while that beat is open — and a tier's parked region is the bounding box of its reveal
+  cells, so pairing `A12` with `F3` would have dimmed the whole live table between them. Each tier
+  now reveals one contiguous empty region and every tier's checks are exactly its stage's beats.
+- **(f) The two memo blocks carry their title one row above the spec's range** (`G2` over the `G3:I6`
+  select memo, `G7` over the `G8:I11` house-style memo) — four lines plus a block title do not fit in
+  four rows.
+- **(g) Stage 4's and stage 5's card bodies are trimmed to the 60-word cap §1.5 sets and §7 asserts**
+  — §3.0.5 writes them at 61 and 70 words. Only chords came out, and every one is still on the card's
+  keycap strip.
+
+Two readings worth recording, neither a change to the spec's intent:
+
+- §1.7's **"'I live in it' → straight to the picker"** is implemented as *straight to the drills* —
+  the short product tour over the live first drill, no Keyboard Tour, with the Tour on the ? sheet.
+  Auto-opening the picker modal over a freshly gated board would put a dismissable modal between a
+  self-declared expert and the r450 start gate, which is the opposite of what that answer asks for.
+- §3.0.2(2)'s prose says a chord with no grid target (Ctrl+S, Ctrl+Home, Ctrl+Z) returns a `null`
+  target; §7's invariant says **exactly one** entry is null. §7 governs: Ctrl+Home rings `A1`,
+  Ctrl+End rings the used-range corner, Ctrl+Z rings the row it restores, and only stage 6's save —
+  which genuinely has no cell — is `null`.
+
+### INVARIANTS (`dev/check-invariants.js` C15, +184 lines)
+
+The Tour is not a drill and nothing structural stops a later edit from making it one, so the
+exclusions are asserted one by one: `menuOrder` · `HOTKEY_PARS` · `HOTKEY_CLOCKS` ·
+`HOTKEY_CHALLENGE_POOL` · `HK_PLACEMENT.KEYS` · every `HK_TRACKS[].keys` · every campaign chapter ·
+every `drills.js` group and `meta` entry · and the `tour:true` filter on MENU_ORDER's fallback.
+Then its shape: `tour:true`, no par/parKeys, no `saveClose`, 24 beats, 24 targets with **exactly
+one** null, 5 tiers whose every check index is inside the beat array, 6 stage cards each ≤60 words
+with a non-empty keycap strip, 24 HUD lines (≤14 words, none empty, no two consecutive alike) and
+24 nudge lines. Then the six **runtime seams** it hangs off — each of which was a live bug during
+this build, and each of which fails with a sentence saying what breaks. Then the retirement: every
+sandbox function must stay gone, `sandboxMode` must stay, `e2e-onboard-sandbox.js` must not return.
+
+The second half is the **lesson-drill contract** (§1.5/§1.6/§2) — `lesson`↔`meta.lesson` parity,
+≤60-word bodies, `reveal:true` on the ☆ and on NO non-lesson drill, 2–4 core beats, par ≤ 30,
+`pass = par×2.0`, out of the daily pool and the placement series. Zero cases today, deliberately:
+it is written with the platform so the wave that adds the four drills inherits it (WORKFLOW §3.3).
+
+### SUITE RESULTS — old → new
+
+| suite | before | after |
+|---|---|---|
+| `check-invariants` | clean (C1–C14) | **clean** (C1–C15, +C15's 40-odd assertions) |
+| `check-startgate` | clean, §8 keyed the sandbox | **clean** — §8 now keys the Tour (never gated, no clock to run, keys never start one) and §8b proves the lesson card IS the gate |
+| `e2e-smoke` | 7 pages + skin-unlock | **7 pages + skin-unlock, 74 drills** |
+| `e2e-audit-onboard` | 64 assertions over the modal tour + sandbox | **rewritten, ALL 71 PASS** — per-beat HUD text for all 24 beats, six stage cards and their reveals, the checklist's staging, the nudge, the ribbon force + restore, the +25 xp, the hand-off |
+| `e2e-guided` | ALL 77 PASS (72 railed) | **ALL 77 PASS (72 railed)** |
+| `e2e-demo-replay navigation combo foot` | ALL GREEN | **ALL GREEN** |
+| `e2e-audit-parity` | ALL 177 PASS | **ALL 177 PASS** — the Tour changes no engine input semantics |
+| `check-cache-versions` | clean | **clean** (no versioned asset touched — `drills.js`, `nav.js`, `themes.js`, `nav.css` are all untouched) |
+| `e2e-onboard-sandbox` | 68 lines | **retired** |
+
+### RENDERS (Daylight + Tokyo Night, 1440×900)
+
+`tour-stagecard-*` (stage 1's lesson card over the dimmed board) · `tour-s1b1-*` (the HUD at stage 1
+beat 1, checklist deliberately absent) · `tour-nudge-*` (stage 1 beat 3 with the three-miss second
+line, the checklist showing only that stage's five beats with its folded-in callout) ·
+`tour-stage5ribbon-*` (the lean ribbon bar forced on, KeyTip chips lit, the HUD below it) ·
+`tour-handoff-*` (the hand-off card with the +25 xp line).
+
+Two things the renders caught and the code now fixes: the roster's `DUPLICATE — delete` label
+clipped in column A (column A is widened at build), and the folded-in checklist callout landing on
+top of the HUD in the shared bottom-center lane (it is a line inside the checklist panel now, and
+any other toast is lifted clear of the banner while the Tour owns the board).
+
+---
+
 ## r450 — THE PAYWALL, BUILT DARK: one entitlement point, a locked catalog, and the Stripe wiring inventory
 
 _Scope: the COMPLETE premium user experience behind `HOTKEY_PREMIUM.enabled`, which stays **false**.
