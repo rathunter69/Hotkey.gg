@@ -105,3 +105,34 @@ sizes, and tune the palettes (the diamond tier needs more contrast against the l
 | A2 | hero-size treatment: chunky 16×16 scaled · a 32×32 second master | **32×32 master** for ≥64px |
 | A3 | who draws: code-generated grammar (this proto, tuned) · hand-drawn by Wolf/an artist from the grammar | **Wolf hand-draws or commissions off the grammar** — the grammar guarantees consistency; a human hand gives the charges character the generator cannot |
 | A4 | order: after the tutorial chapter ships · in parallel (cosmetic lane, no engine overlap) | **parallel is safe** (themes.js only) but the tutorial is the product — art rides second unless Wolf wants the visual win first |
+
+## 6 · v2 addendum (2026-09-03, same day) — replicas, not a redesign
+
+Wolf's read on v1: "I don't hate it, but I was thinking more detailed pixel-art replicas of the old
+rank designs." `art/rank-pixel-proto-v2.html` (+ `-dark.png` / `-light.png`) tests exactly that: a
+hand-drawn 32×32 replica of each shipped crest (same heater silhouette, PALS metals verbatim, the
+tier's own charge, the DRESS furniture stepped per bucket) beside the crest and a derived 16×16 chip.
+
+**What the renders settle:**
+- **Replicas win on consistency, decisively.** One silhouette, one metal ladder, the tier's charge:
+  the family reads as *the same crests, pixelated*. v1's eight different plate shapes read as eight
+  different games. **Recommendation changes: replicate, don't redesign.**
+- **Size verdict:** the replica wins at 64px (card), ties at 96, and loses at 192 (the reveal) —
+  32×32 runs out of information there; the grand wings become triangles. So: a **32×32 master** for
+  everything up to 96px, and **one more drawing pass per tier at 64×64** for the rank-up reveal and
+  the shareable rank card. That is 16 sprites total, not 8.
+- **The chip inverts.** At 16px a dark plate cannot hold a bright charge; the chip is solid tier
+  metal with the device engraved in deep. It reads better than both the crest and v1 in the
+  leaderboard mock. Accept the inversion as the chip's rule.
+- **Charge casualties, resolved:** `#REF!` text → a cracked-cell mark; VP's `$` needs a dark halo at
+  7×9 and the swords become a subordinate X; Σ redrawn at 6×7 (the first cut read as an S).
+- **Escalation is quieter** in pixels — the furniture ladder (rivets → bordure → mantling → wings →
+  finials) carries less at 64px than in the crest. Bucket pips + the top-bucket spark do the work at
+  small sizes; the 64×64 reveal master is where the furniture gets to show.
+
+**Revised build (§4 amended):** 8 × 32×32 + 8 × 64×64 + 8 × 16×16 masters as pixel arrays in
+`themes.js`; `rankEmblem(name, size, bucket)` picks 16 (<32), 32 (<128) or 64 (≥128) and snaps size to
+an integer multiple; chips inverted by rule; same signature, same classes, same 23 call sites.
+Decision A1 is now: **pixel replicas replace the crests** (recommended) · keep the crests. A2 is
+resolved by the size verdict (three masters). A3 stands (hand-drawn off the grammar — the v2 arrays
+are the starting point). A4 stands.
