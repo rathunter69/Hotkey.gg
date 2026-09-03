@@ -70,7 +70,13 @@
   /* r135: achievements live HERE now (rolled off the card); earned medals are pickable */
   .ach-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(64px,1fr)); gap:12px 8px; margin:10px 0 18px}
   /* r267: wall navigation — filter chips (58 medals was one undifferentiated wall) */
-  .ach-filters{display:inline-flex; gap:6px; margin-left:14px; vertical-align:2px}
+  /* r452 (audit P1-6): flex-wrap + a mobile margin reset. Six rarity chips in a non-wrapping
+     inline-flex row measured right:691 against a 390px viewport — 301px of sideways page scroll
+     on a phone, both themes. Wrapping is the whole fix; the 14px indent only makes sense while
+     the chips sit beside the section heading, so it drops on the wrapped layout.
+     Guarded by dev/e2e-smoke.js's 390px overflow sweep. */
+  .ach-filters{display:inline-flex; flex-wrap:wrap; gap:6px; margin-left:14px; vertical-align:2px; max-width:100%}
+  @media(max-width:560px){ .ach-filters{display:flex; margin-left:0; margin-top:8px} }
   .ach-f{font-family:var(--mono); font-size:10.5px; padding:3px 10px; border-radius:99px; cursor:pointer;
     background:var(--surface); color:var(--muted); border:1px solid var(--line)}
   .ach-f:hover{color:var(--text); border-color:var(--faint)}

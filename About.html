@@ -75,7 +75,13 @@
   .menu-btn{display:none; background:none; border:none; color:var(--text); font-family:var(--mono); font-size:20px; cursor:pointer}
 
   /* ---------- HERO ---------- */
-  .hero{padding:88px 0 60px; position:relative}
+  /* r452 (audit P1-5): overflow:hidden. .hero-glow is 760px wide, absolutely centred with
+     translateX(-50%) — on a 390px phone it measured left:-192 right:568 and, with nothing
+     clipping it, pushed document.scrollWidth 178px past clientWidth. The whole page scrolled
+     sideways in both themes. The glow is decorative and pointer-events:none, so clipping it to
+     the hero costs nothing visible; the hero is already position:relative, so this is the
+     containing block that owns it. Guarded by dev/e2e-smoke.js's 390px overflow sweep. */
+  .hero{padding:88px 0 60px; position:relative; overflow:hidden}
   .hero-glow{
     position:absolute; top:-80px; left:50%; transform:translateX(-50%);
     width:760px; height:520px; background:radial-gradient(ellipse at center,var(--accent-glow),transparent 65%);

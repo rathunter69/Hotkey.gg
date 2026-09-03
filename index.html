@@ -901,7 +901,13 @@
   #hkToast{position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(8px);
     background:var(--surface2); color:var(--text); border:1px solid var(--accent-dim);
     font-family:var(--mono); font-size:12.5px; padding:9px 18px; border-radius:999px;
-    opacity:0; pointer-events:none; transition:all .18s; z-index:220}   /* r60 flat */
+    opacity:0; pointer-events:none; transition:all .18s; z-index:360}
+  /* r60 flat. r452 (audit P2-1): was z-index:220, UNDER .tour-wrap's 340 scrim — elementFromPoint
+     at the toast's centre returned tourWrap. The tour's ENTRY and DO-IT beats deliberately let real
+     grid keys through, so gameplay toasts fire while the scrim is up and every one of them was
+     swallowed; openGateInfo's mid-tour branch degrades to a toast for exactly that reason, so the
+     one message the tour cannot show as a modal was the one most reliably hidden. 360 clears the
+     tour and stays under nothing that needs to cover it — the toast is pointer-events:none. */
   #hkToast.show{opacity:1; transform:translateX(-50%) translateY(0)}
   .cl-esc{margin-top:10px; padding-top:8px; border-top:1px dashed var(--line);
     font-family:var(--mono); font-size:10.5px; color:var(--faint)}
@@ -23751,6 +23757,7 @@ function render(){
   // so overflow behavior stays consistent with what the eye sees.
   const __gw=$('gridwrap');
   const __availW=__gw ? (__gw.clientWidth-28-30) : 0;      // padding 14×2 + row header
+  if(__gw) S._renderedGwW = __gw.clientWidth;   /* r452 (audit P1-1): the WIDTH we fit to — the ResizeObserver guard compares both axes now, so a width-only shrink re-fits instead of overrunning the frame by ~200px */
   let __base=0; for(let c=1;c<=COLS;c++) __base+=(colW[c]||72);
   // r333 (Wolf): STANDARD grid width — the sheet fills the SAME frame on every drill. Elastic fit
   // used to only GROW narrow drills; wide ones (~half the catalog) overflowed the frame and scrolled, so the
@@ -28892,18 +28899,49 @@ function toggleFullscreen(){
      leaving the old ~14-row look with dead space below. Nav only self-corrected because it
      re-renders on navProgress. A ResizeObserver on the gridwrap re-fits EVERY drill whenever the
      stage settles to (or changes to) a different height — initial layout, window resize, fullscreen.
-     render() only sets --cellh/rows and never changes the gridwrap's own flex height, so this can't loop. */
+     render() only sets --cellh/rows and never changes the gridwrap's own flex height, so this can't loop.
+
+     r452 (audit P1-1) — THREE BUGS IN THAT ONE BLOCK, all of which meant the sheet never re-fit
+     when the window changed size. Measured at 1440x900 -> 960 wide: grid scrollWidth 852 in an
+     880 -> 650 wrap, a 202px overrun that one explicit render() clears (640/650). A FRESH load at
+     960 fits, so the elastic math was right; it was simply never re-run.
+       (1) OWNERSHIP. The handle lived on `S._gridRO`, and every loadChallenge() builds a new S —
+           so after the first board change the guard `!S._gridRO` read false-y again and, worse,
+           the only reference to the observer was dropped. It is per-DOCUMENT, not per-board:
+           it now lives on window.__gridRO and is installed exactly once.
+       (2) WIDTH. The callback compared clientHeight only. A width-only shrink (the common case —
+           dragging a window narrower, opening devtools, rotating a tablet) changes no height, so
+           the guard bailed and the elastic fit never re-ran. It now compares BOTH axes.
+       (3) NO RESIZE LISTENER. ResizeObserver covers the gridwrap's own box, but a viewport change
+           that the flex chain absorbs elsewhere (or a browser that fires the observer before the
+           new layout settles) left the fit stale. A debounced window `resize` handler now re-runs
+           render() directly, on the same two-tick pattern __fsRefit uses for fullscreen.
+     Guarded by dev/check-resize.js (shrink 1440->960, assert grid scrollWidth <= wrap clientWidth). */
   try{
-    if(window.ResizeObserver && !S._gridRO){
+    if(window.ResizeObserver && !window.__gridRO){
       const __gwEl=$('gridwrap');
       if(__gwEl){
-        S._gridRO=new ResizeObserver(()=>{
-          if(S._gridROpend) return; S._gridROpend=1;
-          requestAnimationFrame(()=>{ S._gridROpend=0;
-            try{ const w=$('gridwrap'); if(w && w.clientHeight>100 && Math.abs(w.clientHeight-(S._renderedGwH||0))>6) render(); }catch(e){} });
+        window.__gridRO=new ResizeObserver(()=>{
+          if(window.__gridROpend) return; window.__gridROpend=1;
+          requestAnimationFrame(()=>{ window.__gridROpend=0;
+            try{ const w=$('gridwrap'); if(!w || w.clientHeight<=100 || !S) return;   /* !S: the observer outlives any single board now, so it must not render() into an empty state */
+              if(Math.abs(w.clientHeight-(S._renderedGwH||0))>6 || Math.abs(w.clientWidth-(S._renderedGwW||0))>6) render();
+            }catch(e){} });
         });
-        S._gridRO.observe(__gwEl);
+        window.__gridRO.observe(__gwEl);
       }
+    }
+  }catch(e){}
+  try{
+    if(!window.__gridResizeBound){
+      window.__gridResizeBound=1;
+      let __rzT=null;
+      window.addEventListener('resize', ()=>{
+        clearTimeout(__rzT);
+        __rzT=setTimeout(()=>{ try{ if(!S) return; render();
+          requestAnimationFrame(()=>{ try{ render(); }catch(e){} });
+        }catch(e){} }, 120);
+      });
     }
   }catch(e){}
 }
@@ -29840,11 +29878,23 @@ const APP_SHORTCUTS = [
   { title:'navigating drills', rows: [
     ['\\',         'open the drill picker'],
     ['1 – 9',      'in the drill picker: jump to that folder'],
+    /* r452 (audit P2-4): three real shortcuts the sheet never listed. Alt/Ctrl+PgUp/PgDn walk
+       the CURRENT CHAPTER's drills (stepSheetTab), the way Excel walks worksheet tabs — the
+       fastest route through a tier, and undiscoverable until now. */
+    ['Alt + PgUp', 'previous drill in this chapter (Ctrl + PgUp too)'],
+    ['Alt + PgDn', 'next drill in this chapter (Ctrl + PgDn too)'],
     ['Shift + F11','restart the current drill'],
+    ['Esc · Esc',  'restart the current drill — tap Esc twice'],
   ]},
   { title:'while training', rows: [
     ['type',       'start the clock (first keystroke begins the run)'],
-    ['F1',         'toggle guided hints (paint-by-numbers walkthrough)'],
+    /* r452 (audit P2-4): this row said "toggle guided hints (paint-by-numbers walkthrough)".
+       F1 calls toggleHints() — tips only, no cursor lock. The paint-by-numbers walkthrough is
+       a SEPARATE control (the ⤲ guided button; `g` is its key inside a rapid-fire session, and
+       is a literal `g` on a classic board), so the one row players read to learn the two assist
+       levels described neither of them accurately. Two rows now, each true where it is written. */
+    ['F1',         'toggle the hint line for this step'],
+    ['⤲ guided',   'the paint-by-numbers walkthrough — the mode-bar button (g in a session)'],
     ['F2',         'edit the active cell'],
   ]},
   { title:'in a rapid-fire session', rows: [
@@ -31371,6 +31421,48 @@ function openGateInfo(gname){
   $('gatePro').onclick=()=>{ gateInfoClose(); if(window.hkProSheet) window.hkProSheet('The '+gname+' tier'); };
   try{ ev('gate_hit',{g:gname, lvl:lv, clears:cl}); }catch(e){}
 }
+/* r452 (audit P1-7) — THE HONEST DEEP LINK.
+   `index.html?drill=<key>` is the CTA on all 74 public SEO drill pages, on the drills/ library,
+   and on every drill page's "next drills" rail. For a signed-out visitor with no PBs, 49 of the
+   74 are locked — so two thirds of organic landing traffic arrived on Navigation maze with no
+   toast, no modal and no copy saying why.
+
+   WHY, precisely: loadChallenge() DID call openGateInfo() on that path — but at BOOT the whole
+   viewport belongs to the marketing landing (landingOpen=true until Start), so the card was
+   painted BEHIND it, explaining a board the visitor could not see. The gate branch below now
+   raises it only when a board is already on screen, and this function owns the boot case:
+
+   it DEFERS PAST THE LANDING. Poll for landingOpen to clear — cheap, bounded, and it means the
+   explanation lands the moment the visitor presses Enter rather than seconds before. Then a
+   toast names the lock and the board they got, and the gate card (or the r450 paywall sheet)
+   follows so the requirement is readable, not just asserted. Mid-tour, openGateInfo degrades to
+   a toast by design (r174), and the r452 z-fix on #hkToast finally puts that toast above the
+   tour scrim — so on the first-run path the message is visible either way.
+   Guarded by dev/check-deeplink.js (§1a-d, including the "stays silent" controls). */
+function hkExplainStartFallback(want, got){
+  try{
+    if(!want || !CHALLENGES[want] || want===got) return;
+    const gname = drillLocked(want);
+    const pwName = (typeof drillPaywalled==='function') ? drillPaywalled(want) : null;
+    if(!gname && !pwName) return;                       // it wasn't a lock — say nothing
+    const nm = k => { try{ return ((window.HOTKEY_DRILLS&&window.HOTKEY_DRILLS.nameOf||{})[k]) || k; }catch(e){ return k; } };   /* drills.js meta is the SSOT for display strings (C16) */
+    const g = gname ? ((window.HOTKEY_GATES&&window.HOTKEY_GATES.groups||{})[gname]) : null;
+    const msg = g
+      ? nm(want)+' opens at level '+g.lvl+' · '+g.clears+' pace clears — starting you on '+nm(got)
+      : (pwName ? nm(want)+' is in '+pwName+' — starting you on '+nm(got)
+                : nm(want)+' isn’t open yet — starting you on '+nm(got));
+    let tries=0;
+    const fire=()=>{
+      tries++;
+      if(typeof landingOpen!=='undefined' && landingOpen && tries<400){ setTimeout(fire,600); return; }
+      try{ showToast(msg); }catch(e){}
+      setTimeout(()=>{ try{ if(gname) openGateInfo(gname); else if(pwName && typeof openPaywall==='function') openPaywall(want); }catch(e){} }, 260);
+      try{ ev('deeplink_locked',{want:want, got:got, g:gname||pwName||''}); }catch(e){}
+    };
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', ()=>setTimeout(fire,500), {once:true});
+    else setTimeout(fire,500);
+  }catch(e){}
+}
 /* ============================================================================
    r450 — THE UPGRADE MODAL. Opens when a player launches a drill they are not
    entitled to. It CANNOT open while HOTKEY_PREMIUM.enabled is false, because the
@@ -31463,8 +31555,13 @@ function loadChallenge(key, opts){
          (drills.js) is the ONE predicate — ranked-entered AND series incomplete, closing on
          the 5th posted board or the owner latch. */
       if(__gn && !(hkRankedEntered() && window.hkPlacementRide && window.hkPlacementRide(key, k=>PB[k]!==undefined))){   /* r452: the ladder rides only for RANKED entrants (else day-1 players get opmodel free) */
-        openGateInfo(__gn);
-        if(S){ return; }                       // a board is on screen — stay on it
+        /* r452 (audit P1-7): the explainer moved INSIDE the "a board is on screen" branch. At
+           BOOT there is no board and the marketing landing may still be covering the whole
+           viewport, so raising the card here painted it behind the landing — which is a large
+           part of why `?drill=<locked key>` read as completely silent. hkExplainStartFallback
+           owns the boot message instead: it names the lock in a toast and raises this same card
+           once the visitor can actually see the trainer. One owner, one moment. */
+        if(S){ openGateInfo(__gn); return; }   // a board is on screen — stay on it
         key=nextUnlockedFrom(-1);              // BOOT: never strand an empty grid (r174)
       }
       /* r450 PAYWALL — the entitlement interception, one branch below the r158 ladder and
@@ -31480,9 +31577,8 @@ function loadChallenge(key, opts){
          Same state discipline as the gate: a board on screen is left untouched. */
       const __pw=drillPaywalled(key);
       if(__pw){
-        openPaywall(key);
-        if(S){ return; }                       // a board is on screen — stay on it
-        key=nextUnlockedFrom(-1);              // BOOT: never strand an empty grid (r174)
+        if(S){ openPaywall(key); return; }     // a board is on screen — stay on it
+        key=nextUnlockedFrom(-1);              // BOOT: never strand an empty grid (r174); r452 (audit P1-7): the sheet is raised by hkExplainStartFallback once the landing is clear, not behind it
       }
     }
   }catch(e){}
@@ -31823,8 +31919,9 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
     try{ const last = await KV.get('hotkey_last_drill');
       if(last && CHALLENGES[last]) startKey = last; }catch(e){}
   }
+  let __askedFor=null;   /* r452 (audit P1-7): the key the ?drill= deep link asked for — kept so a locked one can be explained instead of silently swapped */
   try{ const qd=new URLSearchParams(location.search).get('drill');
-    if(qd && CHALLENGES[qd]) startKey=qd; }catch(e){}
+    if(qd && CHALLENGES[qd]){ startKey=qd; __askedFor=qd; } }catch(e){}
   // r148: challenge link — the race target outranks last-drill resume.
   try{ const p=new URLSearchParams(location.search);
     const rd=p.get('race');
@@ -31838,6 +31935,12 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
     }
   }catch(e){}
   loadChallenge(startKey);
+  /* r452 (audit P1-7): loadChallenge() may have swapped a locked/paywalled deep link for the
+     r174 "never strand an empty grid" fallback. `cur` is the board that actually loaded, so if
+     it isn't what the link asked for, say so. Placement ride-through and the paywall branch are
+     re-read inside the helper, so a board that RODE the gate reaches here with cur===__askedFor
+     and nothing is said. */
+  try{ if(__askedFor) hkExplainStartFallback(__askedFor, cur); }catch(e){}
   // r299 (Wolf): arriving from sign-out (?fresh=1) — say so, so the clean slate reads as
   // intentional. The account wipe already cleared last-drill, so this lands on drill one.
   try{ if(/[?&]fresh=1/.test(location.search)){

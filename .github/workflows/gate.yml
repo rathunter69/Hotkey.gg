@@ -84,6 +84,24 @@ jobs:
       # numbers unwatched on exactly the pushes most likely to change them.
       - name: Paywall (flag off = zero change · preview on = full UX · billing counts)
         run: node dev/check-paywall.js
+      # r452 (bug sweep P1-4): the theme-contrast matrix joins the gate. It was written in r160
+      # and never wired in, and it had rotted to 108/379 RED on a clean tree — the ::after border
+      # overlay (r442) moved applied-border ink off boxShadow, .gridwrap stopped painting the sheet, and
+      # color-mix() gridlines serialise as color(srgb …) which its parser could not read. All
+      # three probes are repaired; nothing was re-thresholded, and the tightest margin across
+      # 27 themes is 1.17 against a 1.15 floor. ALWAYS-ON, not engine-lane: what it actually
+      # guards is themes.js and the sheet CSS, and themes.js is a COSMETIC-lane file — gating
+      # this on the engine matrix would leave 27 themes unwatched on exactly the pushes most
+      # likely to change them (the same argument the paywall step above makes for billing.html).
+      # 18s on this hardware.
+      - name: Visual matrix (gridlines · applied borders · font swatches, 27 themes)
+        run: node dev/e2e-audit-visual.js
+      # r452 (bug sweep P1-7 / P2-1): boot routing. `index.html?drill=<key>` is the CTA on all 74
+      # public SEO drill pages; for a visitor with no progress 49 of the 74 are LOCKED and the
+      # boot path silently swapped them for Navigation maze. Also asserts the toast stacks above
+      # the tour scrim, because mid-tour the gate explainer degrades to a toast by design. ~25s.
+      - name: Deep link (a locked ?drill= explains itself · toast above the tour)
+        run: node dev/check-deeplink.js
       # r414-review A6: a fast behavioral net for the COSMETIC lane — shared-script
       # (themes.js/nav.js) changes skip the engine matrix, so drive one drill per core
       # group through the real engine on every push to catch a silent behavioral break.
@@ -145,6 +163,16 @@ jobs:
       - name: Blur pause (clock freezes, resume swallows the key)
         if: steps.scope.outputs.engine == 'true'
         run: node dev/check-pause.js
+      # r452 (bug sweep P1-1): THE RE-FIT GUARD. The sheet never re-fit on a window resize —
+      # shrinking 1440->960 left it overrunning its frame by ~200px on every drill, because the
+      # ResizeObserver handle lived on S (rebuilt by every loadChallenge), compared height only,
+      # and had no resize listener beside it. dev/e2e-fit-sweep.js walks the whole catalog for
+      # fit invariants but takes over an hour, which is why the gate never carried it and why
+      # this class went unwatched for 43 rounds. 27s, four drills, and it fails 14 asserts on
+      # the pre-fix tree.
+      - name: Grid re-fits on resize (width and height, across a board change)
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/check-resize.js
       # r450 (Wolf): THE DRILL-START GATE. Every board loads locked behind "press any key to
       # start"; the first key is swallowed and starts the clock, so par and leaderboard times
       # are measured from one uniform zero. Wired in the SAME round as the feature — the r442

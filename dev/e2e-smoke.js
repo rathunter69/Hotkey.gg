@@ -7,6 +7,18 @@
 const { chromium } = require('playwright-core');
 const BASE = process.env.BASE || 'http://127.0.0.1:8791';
 const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'billing.html', 'leaderboard.html', 'desks.html'];
+/* r452 (audit P1-5/P1-6) — THE PHONE SWEEP. Two pages scrolled sideways on a 390px phone
+   (About's 760px .hero-glow escaping an unclipped .hero: +178px; stats' six non-wrapping rarity
+   chips: +301px) and nothing on CI was looking, because the smoke list is the SEVEN app pages
+   and the marketing pages had no automated viewport check at all. A page that scrolls sideways
+   on a phone is a bug you cannot un-see and the cheapest possible assertion, so encode the
+   crawl the audit did by hand: EVERY top-level page, at 390x844, scrollWidth == clientWidth. */
+const MOBILE_PAGES = ['index.html', 'About.html', 'profile.html', 'stats.html', 'account.html',
+  'admin.html', 'billing.html', 'leaderboard.html', 'desks.html', 'reference.html', 'contact.html',
+  'enterprise.html', 'cert.html', 'privacy.html', 'terms.html', 'security.html', '404.html',
+  /* the library, plus one generated drill page standing in for all 74 — they share one template
+     (dev/build-drill-pages.js), so a template regression shows up on any of them */
+  'drills/index.html', 'drills/wacc.html'];
 
 (async () => {
   /* r429: smoke was the ONE suite resolving the browser via chromium.executablePath(), which
@@ -23,6 +35,13 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
     const errs = [];
     page.on('pageerror', e => errs.push('PAGEERROR: ' + e.message));
     page.on('console', m => { if (m.type() === 'error' && !/ERR_|supabase|Failed to load resource|net::/i.test(m.text())) errs.push('CONSOLE.ERR: ' + m.text()); });
+    /* r452 (audit P1-3): WARNINGS COUNT TOO. billing.html shipped without drills.js for a full
+       release — nav.js warned "drills.js not loaded — profile modal will be empty" on every
+       single load and the player-card modal rendered empty, but the filter above only ever read
+       type()==='error', so CI saw a clean page. A shared script announcing that its data source
+       is missing is exactly the class this suite exists to catch. Same ERR_/supabase carve-out:
+       the sandbox has no egress, so network noise is not a page defect. */
+    page.on('console', m => { if (m.type() === 'warning' && !/ERR_|supabase|Failed to load resource|net::/i.test(m.text())) errs.push('CONSOLE.WARN: ' + m.text()); });
     await page.route('**/@supabase/**', r => r.abort());
     try {
       await page.goto(BASE + '/' + p, { waitUntil: 'networkidle', timeout: 30000 });
@@ -32,7 +51,41 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
     const bodyLen = await page.evaluate(() => (document.body && document.body.innerHTML || '').length).catch(() => 0);
     if (bodyLen < 200) errs.push('EMPTY BODY (' + bodyLen + ' chars) — page did not render');
     if (errs.length) fails.push({ p, errs });
-    else console.log('  PASS ' + p + ' — loaded, zero page errors');
+    else console.log('  PASS ' + p + ' — loaded, zero page errors/warnings');
+    await page.close();
+  }
+
+  /* r452 (audit P1-5/P1-6): the 390px no-sideways-scroll sweep — see MOBILE_PAGES above. */
+  {
+    const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    await page.route('**/@supabase/**', r => r.abort());
+    const wide = [];
+    for (const p of MOBILE_PAGES) {
+      try {
+        await page.goto(BASE + '/' + p, { waitUntil: 'load', timeout: 30000 });
+        await page.waitForTimeout(450);
+        const m = await page.evaluate(() => {
+          const d = document.documentElement;
+          const over = d.scrollWidth - d.clientWidth;
+          if (over <= 0) return { over: 0 };
+          /* name the culprit — a bare pixel count sends the next reader hunting */
+          let worst = null;
+          document.querySelectorAll('*').forEach(el => {
+            const r = el.getBoundingClientRect();
+            if (r.width === 0 && r.height === 0) return;
+            if (r.right <= d.clientWidth + 1 && r.left >= -1) return;
+            if (!worst || r.right > worst.right) worst = { right: Math.round(r.right), left: Math.round(r.left),
+              sel: el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + (typeof el.className === 'string' && el.className ? '.' + el.className.trim().split(/\s+/).join('.') : '') };
+          });
+          return { over, worst, sw: d.scrollWidth, cw: d.clientWidth };
+        });
+        if (m.over > 0) wide.push(p + ': +' + m.over + 'px (' + m.sw + ' vs ' + m.cw + ')' +
+          (m.worst ? ' — widest escapee ' + m.worst.sel + ' [' + m.worst.left + '..' + m.worst.right + ']' : ''));
+        else console.log('  PASS ' + p + ' @390 — no sideways scroll');
+      } catch (e) { wide.push(p + ': NAV FAIL ' + String(e).slice(0, 100)); }
+    }
+    if (wide.length) fails.push({ p: 'mobile-overflow @390x844', errs: wide });
+    else console.log('  PASS mobile-overflow — all ' + MOBILE_PAGES.length + ' pages fit 390px');
     await page.close();
   }
   // r393 (Wolf #75) / r411: skin-unlock celebration + equip-now. Drives the PAGE-LOAD sweep
@@ -162,5 +215,7 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
     fails.forEach(f => console.error('  ' + f.p + '\n    ' + f.errs.join('\n    ')));
     process.exit(1);
   }
-  console.log('SMOKE: ALL ' + PAGES.length + ' PAGES CLEAN + skin-unlock');
+  /* r452: the summary names the phone sweep too — a suite whose last line does not mention a
+     section is a suite whose section can be deleted without anyone noticing. */
+  console.log('SMOKE: ALL ' + PAGES.length + ' PAGES CLEAN + ' + MOBILE_PAGES.length + ' @390 + skin-unlock');
 })().catch(e => { console.error('SMOKE HARNESS FAIL', e); process.exit(1); });

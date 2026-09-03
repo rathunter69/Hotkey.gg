@@ -79,7 +79,7 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
           (typing.match(/[A-Za-z]{2,}(?=\()/g) || []).forEach(f => fns.add(f.toUpperCase()));
           typing = '';
         };
-        (mv || []).forEach(step => (step.keys || []).forEach(kk => {
+        (mv || []).forEach(step => { (step.keys || []).forEach(kk => {
           const K = kk.key || '';
           const plain = K.length === 1 && !kk.ctrl && !kk.alt && !kk.shift;
           if (walk !== null && plain && /^[a-z0-9]$/i.test(K)) { walk += '>' + K.toUpperCase(); return; }
@@ -95,7 +95,19 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
           let disp = K === ' ' ? 'Space' : (AR[K] || (K.length === 1 ? K.toUpperCase() : K));
           if (kk.ctrl && kk.shift && K.length === 1 && !/[a-z0-9]/i.test(K)) disp = K;   // Ctrl+Shift+% keeps the symbol
           put(mods + disp);
-        }));
+        });
+        /* r452 (audit P2-6): CLOSE THE RIBBON WALK AT THE STEP BOUNDARY. A demo step is one
+           selection plus one key sequence, and an Alt ribbon walk is always contained inside a
+           single step — the next step starts by moving the cursor somewhere else. The walk used
+           to survive into the next step, so any plain letters typed there were appended to it as
+           if they were ribbon mnemonics. `sort` demos Alt A S D E (Sort dialog) and then TYPES a
+           deal name into the board, which is how refmap.js ended up publishing
+           "ALT>A>S>D>E>R>I>D>G>E" and "ALT>A>S>D>E>D>E>L>T>A" — chords nobody can press. They
+           were inert because reference.html only does exact lookups, but the same mis-segmentation
+           consumes a REAL chord whenever typed text follows a walk: the walk that should have been
+           published gets a tail welded onto it and the honest form is never emitted at all. */
+        if (walk !== null) { if (walk.includes('>')) put(walk); walk = null; }
+        });
         if (walk !== null && walk.includes('>')) put(walk);
         flushTyping();
       };
