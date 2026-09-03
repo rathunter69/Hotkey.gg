@@ -30,6 +30,10 @@ Companion doc: dev/STRATEGY.md (what we build before/after); dev/TRUST_SAFETY.md
    and delays the paywall until Stripe can go live (internship constraint).
 
 ## Phase 1 — LAUNCH DAY (the flip, ~30 minutes)
+**DONE r451 (2026-09-03): PRELAUNCH_LOCK=false on branch
+claude/drill-redesign-art-style-jg9vhm; goes live on merge. The Phase-0 items
+below were NOT all done first — see dev/BETA_RETIRE_LANDING.md for what is now due.**
+
 1. index.html: `PRELAUNCH_LOCK = false`. That's the launch.
 2. Cache bump (?v=N+1 across all pages that reference the touched files;
    the page count grew past nine — grep, don't count from memory).

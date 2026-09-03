@@ -40,24 +40,49 @@ const STUB = () => {
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 140)));
   await page.addInitScript(STUB);
 
-  console.log('T1 fresh visitor: curtain');
+  /* r451: T1/T9 are CONDITIONAL on index.html's PRELAUNCH_LOCK. The curtain code is still
+     shipped (kept one round as the documented rollback — dev/LAUNCH.md), so this suite reads
+     the live flag off the page and asserts whichever contract is actually in force. Three
+     asserts in T1 and four in T9 either way — the count does not move with the flag. */
   await page.goto(HK_URL, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
   await page.waitForTimeout(400);
-  const t1 = await page.evaluate(() => {
-    const g = document.getElementById('gate');
-    return { shown: !!(g && g.classList.contains('show')), hasInput: !!document.getElementById('lockCode') };
-  });
-  ok(t1.shown && t1.hasInput, 'prelaunch curtain shows for a fresh device');
-  // r279: codes validate server-side (curtain_check RPC) — both probes are async round-trips
-  await page.fill('#lockCode', 'WRONG');
-  await page.click('#lockGo');
-  const t1b = await page.waitForFunction(() => /didn/.test((document.getElementById('lockMsg') || {}).textContent || ''), null, { timeout: 15000 }).then(() => true).catch(() => false);
-  ok(t1b, 'wrong code gets a real error (server-checked)');
-  await page.fill('#lockCode', 'hags');   // case-insensitive per the uppercase()
-  await page.click('#lockGo');
-  const t1c = await page.waitForFunction(() => !document.getElementById('gate').classList.contains('show'), null, { timeout: 15000 }).then(() => true).catch(() => false);
-  ok(t1c, 'right code (case-insensitive) passes the curtain (server-checked)');
+  const LOCK = await page.evaluate(() => typeof PRELAUNCH_LOCK !== 'undefined' && PRELAUNCH_LOCK === true);
+
+  if (LOCK) {
+    console.log('T1 fresh visitor: curtain (PRELAUNCH_LOCK=true)');
+    const t1 = await page.evaluate(() => {
+      const g = document.getElementById('gate');
+      return { shown: !!(g && g.classList.contains('show')), hasInput: !!document.getElementById('lockCode') };
+    });
+    ok(t1.shown && t1.hasInput, 'prelaunch curtain shows for a fresh device');
+    // r279: codes validate server-side (curtain_check RPC) — both probes are async round-trips
+    await page.fill('#lockCode', 'WRONG');
+    await page.click('#lockGo');
+    const t1b = await page.waitForFunction(() => /didn/.test((document.getElementById('lockMsg') || {}).textContent || ''), null, { timeout: 15000 }).then(() => true).catch(() => false);
+    ok(t1b, 'wrong code gets a real error (server-checked)');
+    await page.fill('#lockCode', 'hags');   // case-insensitive per the uppercase()
+    await page.click('#lockGo');
+    const t1c = await page.waitForFunction(() => !document.getElementById('gate').classList.contains('show'), null, { timeout: 15000 }).then(() => true).catch(() => false);
+    ok(t1c, 'right code (case-insensitive) passes the curtain (server-checked)');
+  } else {
+    console.log('T1 fresh visitor: NO curtain (PRELAUNCH_LOCK=false)');
+    const t1 = await page.evaluate(() => {
+      const g = document.getElementById('gate'), l = document.getElementById('landing');
+      let betaOk = null; try { betaOk = localStorage.getItem('hk_beta_ok'); } catch (e) {}
+      return {
+        shown: !!(g && g.classList.contains('show')),
+        hasInput: !!document.getElementById('lockCode'),
+        gateEmpty: !!g && !g.innerHTML.trim(),
+        landingUp: !!(l && !l.classList.contains('gone') && getComputedStyle(l).display !== 'none'),
+        gateOpen: (typeof gateOpen !== 'undefined') ? gateOpen : null,
+        betaOk: betaOk,
+      };
+    });
+    ok(!t1.shown && !t1.hasInput && t1.gateEmpty, 'no curtain element on a fresh device');
+    ok(t1.landingUp, 'a fresh device lands straight on the landing');
+    ok(t1.gateOpen === false && !t1.betaOk, 'the Enter path is unguarded \u2014 gateOpen false, no hk_beta_ok needed', JSON.stringify(t1));
+  }
 
   console.log('T2 landing → enter → tour');
   const t2 = await page.evaluate(() => {
@@ -407,27 +432,50 @@ const STUB = () => {
   ok(/where the time went|redo/i.test(t8b.hint), 'the first card names what is behind `d` (P1-1)', t8b.hint);
   await page.evaluate(() => { try { hideResults(); } catch (e) {} });
 
-  console.log('T9 the curtain gives an uninvited visitor a story and a door (P0-3)');
   await page.evaluate(() => { ['hk_beta_ok','hotkey_onboarded'].forEach(k => localStorage.removeItem(k)); });
   await page.reload({ waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
   await page.waitForTimeout(700);
-  const t9 = await page.evaluate(() => {
-    const g = document.getElementById('gate');
-    const list = document.getElementById('lockList');
-    return {
-      shown: !!(g && g.classList.contains('show')),
-      codeFirst: !!document.getElementById('lockCode'),
-      tagline: (document.getElementById('lockTag') || {}).innerText || '',
-      listHref: list ? list.getAttribute('href') : null,
-      listText: list ? list.innerText : null,
-    };
-  });
-  ok(t9.shown && t9.codeFirst, 'the curtain still gates, code input still primary');
-  ok(/excel/i.test(t9.tagline), 'the curtain now says what the product is', t9.tagline);
-  ok(!!t9.listHref && /mailto:|contact/i.test(t9.listHref), 'an uninvited visitor has a next action', String(t9.listHref));
-  ok(/list/i.test(t9.listText || ''), '…labelled as getting on the list', t9.listText);
-  await page.evaluate(() => { try { localStorage.setItem('hk_beta_ok', '1'); } catch (e) {} });
+  if (LOCK) {
+    console.log('T9 the curtain gives an uninvited visitor a story and a door (P0-3)');
+    const t9 = await page.evaluate(() => {
+      const g = document.getElementById('gate');
+      const list = document.getElementById('lockList');
+      return {
+        shown: !!(g && g.classList.contains('show')),
+        codeFirst: !!document.getElementById('lockCode'),
+        tagline: (document.getElementById('lockTag') || {}).innerText || '',
+        listHref: list ? list.getAttribute('href') : null,
+        listText: list ? list.innerText : null,
+      };
+    });
+    ok(t9.shown && t9.codeFirst, 'the curtain still gates, code input still primary');
+    ok(/excel/i.test(t9.tagline), 'the curtain now says what the product is', t9.tagline);
+    ok(!!t9.listHref && /mailto:|contact/i.test(t9.listHref), 'an uninvited visitor has a next action', String(t9.listHref));
+    ok(/list/i.test(t9.listText || ''), '\u2026labelled as getting on the list', t9.listText);
+    await page.evaluate(() => { try { localStorage.setItem('hk_beta_ok', '1'); } catch (e) {} });
+  } else {
+    /* r451: the mirror of the P0-3 asserts. The curtain WAS the whole first impression for
+       uninvited traffic; with it retired the landing has to carry that job itself. */
+    console.log('T9 an uninvited visitor gets the landing itself (curtain retired)');
+    const t9 = await page.evaluate(() => {
+      const g = document.getElementById('gate'), l = document.getElementById('landing');
+      let betaOk = null; try { betaOk = localStorage.getItem('hk_beta_ok'); } catch (e) {}
+      return {
+        shown: !!(g && g.classList.contains('show')),
+        codeFirst: !!document.getElementById('lockCode'),
+        landingUp: !!(l && !l.classList.contains('gone') && getComputedStyle(l).display !== 'none'),
+        text: l ? l.innerText : '',
+        hasStart: !!document.getElementById('startBtn'),
+        hasLogin: !!document.getElementById('loginBtn'),
+        betaOk: betaOk,
+      };
+    });
+    ok(!t9.shown && !t9.codeFirst && t9.landingUp, 'no gate for an uninvited visitor \u2014 the landing is the first impression');
+    ok(/excel/i.test(t9.text), 'the landing says what the product is', t9.text.slice(0, 90));
+    ok(t9.hasStart && t9.hasLogin, 'an uninvited visitor has a next action (start drilling / log in)', JSON.stringify({ s: t9.hasStart, l: t9.hasLogin }));
+    ok(!t9.betaOk, '\u2026and never needs an access code (no hk_beta_ok on the device)', String(t9.betaOk));
+  }
 
   const realErrors = errs.filter(e => !/supabase|Failed to fetch|NetworkError|ERR_/i.test(e));
   ok(realErrors.length === 0, 'zero page errors through onboarding', realErrors.join(' | '));

@@ -1253,16 +1253,6 @@
   .rm-post-cta{font-family:var(--mono); font-size:12px; color:var(--accent); cursor:pointer; margin-top:2px}
   .rm-post-cta:hover{text-decoration:underline}
 
-  .gate{position:fixed; inset:0; z-index:150; display:none; align-items:center; justify-content:center; background:var(--bg)}
-  .gate.show{display:flex}
-  .gate .auth-card{text-align:center}
-  .gate .auth-card input{text-align:center}
-  .gate-brand{font-family:var(--mono); font-weight:700; font-size:22px; letter-spacing:-.5px; margin-bottom:16px}
-  .gate-brand b{color:var(--accent)}
-  .gate .auth-card p b{color:var(--text)}
-  /* r450 (flow audit P0-3): the one line that says what the product is, above the code input */
-  .gate-tag{font-size:12.5px; color:var(--faint) !important; margin-bottom:14px !important;
-    border-bottom:1px solid var(--line); padding-bottom:14px}
   /* ---- top exercise row + bottom sheet tabs ---- */
   .exrow{margin-bottom:8px}
   /* r398 (Wolf #99): a LIGHT top-bar reclaim (keeps clear breathing room) paired with the
@@ -2141,7 +2131,6 @@
   </div>
 </div>
 
-<div class="gate" id="gate"></div>
 
 <script>
 /* ============================================================
@@ -2153,11 +2142,10 @@
 const SUPABASE_URL      = 'https://vshtftzrlepedydmkcnm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yKhIRqtk7w98jUCJYjFWAQ_CMnQ4-yT';
 const BETA_MODE         = true; // PRO stays unlocked during beta (isPro) — no longer gates entry (r134)
-/* r134: THE LAUNCH SWITCH. Onboarding is launch-final (play first, account whenever).
-   While true, a one-time access-code curtain stands in front of the landing
-   (localStorage hk_beta_ok remembers the device; signing in also passes).
-   Launch day = flip this ONE flag to false. Nothing else changes. */
-const PRELAUNCH_LOCK    = true;
+/* r451 (Wolf, 2026-09-03): THE PRE-LAUNCH CURTAIN IS GONE. The r134 access-code wall
+   (PRELAUNCH_LOCK / showPrelaunchLock / #gate / hk_beta_ok) is deleted, not flag-disabled —
+   see dev/BETA_RETIRE_LANDING.md §8A. Rollback is `git revert` on this commit, not a flag.
+   The beta_codes table + curtain_check RPC are dropped by a follow-up migration. */
 const ev=(n,m)=>{ try{ (window.hkEvent||function(){})(n,m); }catch(e){} };   // r139: funnel telemetry (nav.js hkEvent)
 const INVITE_AUTO_CODE  = 'HAGS'; // silently redeemed for every session — keeps the members table consistent
 window.NAV_ACTIVE='trainer';
@@ -2183,7 +2171,7 @@ const __sbReady = new Promise(resolve=>{
   if(window.supabase) mk();             // already present (test stub) → resolve now
   // else: __sbInit fires from the async loader; a blocked CDN just leaves sb null (guest mode)
 });
-let me_user = null, me_handle = null, me_member = false, authOpen = false, gateOpen = false;
+let me_user = null, me_handle = null, me_member = false, authOpen = false;
 let enterRequested = false, landingOpen = true, recoveryMode = false;
 let pendingMode = null;   // 'marathon' | 'rapidfire' chosen on the landing
 
@@ -27232,7 +27220,7 @@ document.addEventListener('keydown',hkRawE=>{
   // any browser default fires, on every path. preventDefault only; the real handlers still run.
   if(k==='F4') e.preventDefault();
   // landing overlay is up (and no modal over it): swallow grid keys; Enter starts training
-  if(landingOpen && !authOpen && !gateOpen){ if(k==='Enter'){ e.preventDefault(); tryEnter(); } return; }
+  if(landingOpen && !authOpen){ if(k==='Enter'){ e.preventDefault(); tryEnter(); } return; }
   // r159: comfort fork / primer cards own the keyboard while up — their own
   // listeners (registered later) still see the key; the grid never does.
   if(window.__introCardOpen){ if(k!=='F5') e.preventDefault(); return; }
@@ -27290,7 +27278,6 @@ document.addEventListener('keydown',hkRawE=>{
   }
   // while the sign-in modal is open, the trainer ignores keys (esc closes it)
   if(authOpen){ if(k==='Escape'){ e.preventDefault(); closeAuth(); } return; }
-  if(gateOpen){ return; }
 
   // session summary (marathon end): enter = run again, esc = back to drills
   if(sessionOpen){ e.preventDefault();
@@ -29748,7 +29735,7 @@ function echoMatch(e, x){
 document.addEventListener('keydown', function(e){
   if(!echoOn || !e.isTrusted) return;
   // a modal owns the keyboard — echo waits rather than eating its keys
-  if(pickerOpen||authOpen||modesOpen||themesOpen||kbdOpen||sessionOpen||gateOpen||window.__hkCelOpen||__tourI>=0) return;
+  if(pickerOpen||authOpen||modesOpen||themesOpen||kbdOpen||sessionOpen||window.__hkCelOpen||__tourI>=0) return;
   const st=echoState; if(!st) return;
   const mv=st.moves[st.mi]; const exp=mv&&mv.keys[st.ki];
   if(e.key==='Escape' && !(exp&&exp.key==='Escape')){ e.preventDefault(); e.stopPropagation(); echoStop(); return; }
@@ -29780,7 +29767,7 @@ function __stkOk(){ try{ const C=CHALLENGES[cur]; if(!C||!C.checks||!S) return n
   return C.checks.call(C,S).filter(c=>c&&c.ok).length; }catch(e){ return null; } }
 setInterval(()=>{ try{
   if(!S || done || demoPlaying || echoOn || gameMode!=='classic' || window.__stkDone) return;
-  if(gateOpen || authOpen || pickerOpen || modesOpen || themesOpen || kbdOpen || sessionOpen || window.__hkCelOpen) return;
+  if(authOpen || pickerOpen || modesOpen || themesOpen || kbdOpen || sessionOpen || window.__hkCelOpen) return;
   if(typeof __tourI!=='undefined' && __tourI>=0) return;
   // actually-rendered check — onboarded boots hide the landing without the 'gone' class
   const l=$('landing'); if(l && !l.classList.contains('gone') && l.getClientRects().length>0) return;
@@ -30889,10 +30876,6 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
   await loadTheme();
   // returning user (already onboarded once)? skip the marketing landing — head straight to the trainer
   if(onboarded){ enterRequested = true; landingOpen = false; }
-  // r134: pre-launch curtain — new devices only (onboarded/session users pass free)
-  if(PRELAUNCH_LOCK && !onboarded){
-    try{ if(!localStorage.getItem('hk_beta_ok')) showPrelaunchLock(); }catch(e){}
-  }
   buildSheetTabs();
   try{ renderMobileGate(); }catch(e){}   // r151: hub links paint even when sb never connects
   try{ updateDailyBtn(); }catch(e){}   // r140: sheet count paints on the \u26a1 button at boot
@@ -31129,8 +31112,6 @@ function renderMobileGate(){
 async function onSession(session){
   try{ setTimeout(renderMobileGate, 300); }catch(e){}   // r151: hub reflects the auth state
   if(arguments[0]){ window.__hkHasSession=true;
-    // r134: a session IS beta access — pass the curtain and close it if it's up
-    try{ localStorage.setItem('hk_beta_ok','1'); if(gateOpen) closeGate(); }catch(e){}
     try{ if(!isAnonUser() && !localStorage.getItem('hk_ev_signed')){
       localStorage.setItem('hk_ev_signed','1'); ev('account_session'); } }catch(e){}
     // r76: a real account with membership but NO handle gets the prompt wherever it is
@@ -31591,9 +31572,7 @@ async function saveHandle(){
   }catch(e){}
   refreshAuthUI(); closeAuth(); advanceAccess();
 }
-function closeAuth(){ authOpen=false; const m=$('authModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; }
-  // r134: cancelling sign-in at the curtain puts the curtain back (never mid-game)
-  try{ if(PRELAUNCH_LOCK && landingOpen && !me_user && !localStorage.getItem('hk_beta_ok')) showPrelaunchLock(); }catch(e){} }
+function closeAuth(){ authOpen=false; const m=$('authModal'); if(m){ m.classList.remove('show'); m.innerHTML=''; } }
 
 /* ---------- landing → app entry ---------- */
 let __landingDismissed=false;
@@ -31760,11 +31739,11 @@ async function introRibbonPeek(){
 /* ---------- entry (r134: friction-free — guests play instantly) ---------- */
 function advanceAccess(){
   // r134: entry is FRICTION-FREE — Enter drops you on the sheet as a guest; accounts
-  // happen whenever (sign in / save-your-progress). The pre-launch curtain (if any)
-  // already ran at boot. The old beta gate that held the landing open is deleted.
-  if(!sb){ closeGate(); dismissLanding(); return; }
+  // happen whenever (sign in / save-your-progress). r451: the pre-launch curtain that
+  // used to run ahead of this is deleted; nothing gates entry any more.
+  if(!sb){ dismissLanding(); return; }
   if(!enterRequested){ return; }                       // hold at the landing until Start
-  closeGate(); dismissLanding(); handleDeepLink();
+  dismissLanding(); handleDeepLink();
   ensureGuestSession();                                 // silent, async, failure-safe
 }
 /* r134: guest sessions happen silently — the game never asks for a form to start.
@@ -31813,48 +31792,6 @@ function handleDeepLink(){
     }
   }catch(e){}
 }
-/* ---------- r134: PRE-LAUNCH CURTAIN — the only beta remnant ----------
-   The old in-landing gate (invite code + handle form: showLandingGate/showGate/
-   redeemCode/submitBetaCode) is DELETED. Membership is auto-redeemed per session
-   (onSession); guests play instantly; accounts are optional. This curtain is a
-   device-once access wall that disappears entirely when PRELAUNCH_LOCK=false. */
-function showPrelaunchLock(){
-  const g=$('gate'); if(!g) return;
-  gateOpen=true;
-  g.innerHTML='<div class="auth-card">'+
-    '<div class="gate-brand">hotkey<b>.gg</b></div>'+
-    /* r450 (first-session flow audit P0-3): this card was the ENTIRE first impression for 100%
-       of uninvited traffic \u2014 a beige page that never said what hotkey.gg is and offered no way
-       to ask for access. The landing that explains the product sits behind this wall. One
-       tagline (what it is) and one door (get on the list); the code input stays primary. */
-    '<h3>Private beta</h3>'+
-    '<p class="gate-tag" id="lockTag">Keyboard-only Excel training \u2014 74 speedrun drills against the clock, no mouse. '+
-      '<a href="About.html" style="color:var(--accent)">what this is \u2192</a></p>'+
-    '<p>We\u2019re letting people in gradually \u2014 got a code?</p>'+
-    '<input id="lockCode" type="text" placeholder="access code" autocomplete="off" autocapitalize="characters" spellcheck="false">'+
-    '<button class="auth-go" id="lockGo">Enter</button>'+
-    '<div class="auth-msg" id="lockMsg" style="color:var(--bad); min-height:15px; margin-top:9px"></div>'+
-    '<div class="micro" style="margin-top:10px">No code? <a id="lockList" href="mailto:hello@hotkey.gg?subject=Beta%20access%20%E2%80%94%20hotkey.gg&body=I\u2019d%20like%20on%20the%20hotkey.gg%20beta%20list." style="color:var(--accent)">get on the list \u2192</a></div>'+
-    '<div class="micro" style="margin-top:6px">Already have an account? <a id="lockSignin" style="color:var(--accent);cursor:pointer">Sign in</a></div>'+
-    '</div>';
-  g.classList.add('show');
-  /* r279: codes validate SERVER-SIDE (beta_codes table via curtain_check) so we can
-     rotate/revoke without shipping code. The client-side compare survives only as the
-     offline fallback when Supabase never loaded. */
-  const go=async()=>{ const v=($('lockCode')?$('lockCode').value:'').trim().toUpperCase();
-    const m2=$('lockMsg'), b2=$('lockGo'); if(!v){ if(m2) m2.textContent='Enter your access code.'; return; }
-    if(b2){ b2.disabled=true; b2.textContent='checking\u2026'; }
-    let okCode=false;
-    if(window.sb){ try{ const {data,error}=await sb.rpc('curtain_check',{p_code:v}); okCode=!error&&data===true; }catch(e){} }
-    else okCode=(v===INVITE_AUTO_CODE.toUpperCase());
-    if(b2){ b2.disabled=false; b2.textContent='Enter'; }
-    if(okCode){ try{ localStorage.setItem('hk_beta_ok','1'); }catch(e){} ev('curtain_pass'); closeGate(); }
-    else if(m2) m2.textContent='That code didn\u2019t work. Check with whoever invited you.'; };
-  const b=$('lockGo'); if(b) b.onclick=go;
-  const ci=$('lockCode'); if(ci){ ci.focus(); ci.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); go(); } }; }
-  const si=$('lockSignin'); if(si) si.onclick=()=>{ closeGate(); openAuth('signin'); };
-}
-function closeGate(){ gateOpen=false; const g=$('gate'); if(g){ g.classList.remove('show'); g.innerHTML=''; } }
 
 /* r272 (Wolf): the analytics tally now stores SEMANTIC units, not raw keys — "your most
    used hotkey is alt" taught nothing. An alt-ribbon sequence tallies as one chord
