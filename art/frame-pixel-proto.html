@@ -16,7 +16,10 @@ body.light .sub b{color:#3a3d44}
 .pair{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
 .slot{display:flex;flex-direction:column;gap:7px}
 .slotlbl{font-size:9px;letter-spacing:2px;color:#6c717b}
-.slotlbl.px{color:#8fbf7a}
+.slotlbl.px{color:#6a9a55}
+body.light .slotlbl{color:#585c65}
+body.light .slotlbl.px{color:#3d6b2c}
+body.light .bandcap,body.light .bandnote,body.light .sub{color:#565a63}
 .toggle{position:fixed;top:10px;right:14px;font-size:11px;color:#7c828e;cursor:pointer;border:1px solid #33363d;border-radius:6px;padding:5px 9px;background:#1d1f25;z-index:99}
 body.light .toggle{background:#f6f7f9;border-color:#d0d2d8}
 
@@ -144,7 +147,7 @@ body.light .toggle{background:#f6f7f9;border-color:#d0d2d8}
 .px-frame-heraldic{--text:#f7d6ce;--muted:#c98a82;--line:#5a1414;--accent:#e8443a;--accent-dim:#8a1410;
   --rim:#e8be62; --halo1:rgba(200,24,24,.30); --halo2:rgba(200,24,24,.30); color:#f7d6ce;
   /* interior gradient quantized to 3 solid bands */
-  background:linear-gradient(#1c080b 0 34%,#140608 34% 70%,#0c0305 70% 100%) padding-box,
+  background:linear-gradient(160deg,#180709 0 34%,#120508 34% 70%,#0c0305 70% 100%) padding-box,
     repeating-conic-gradient(from var(--hkang,120deg),
       #e8be62 0deg 22.5deg,#7a1410 22.5deg 45deg,#c02a1a 45deg 67.5deg,#3a0406 67.5deg 90deg) border-box}
 .px-frame-heraldic::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;padding:6px;
@@ -156,7 +159,7 @@ body.light .toggle{background:#f6f7f9;border-color:#d0d2d8}
 /* PIXEL · SAKURA — static two-band border, no spin (matches the original) */
 .px-frame-sakura{--text:#ffe0ec;--muted:#d79ab0;--line:#5a2a3c;--accent:#ff8fb8;--accent-dim:#d05a86;
   --rim:#ffc2dc; --halo1:rgba(255,140,190,.26); --halo2:rgba(255,140,190,.26); color:#ffe0ec;
-  background:linear-gradient(#3a1524 0 30%,#2a0f1a 30% 66%,#1c0a12 66% 100%) padding-box,
+  background:linear-gradient(160deg,#32121f 0 30%,#260e17 30% 66%,#1c0a12 66% 100%) padding-box,
     repeating-linear-gradient(45deg,#ffc2dc 0 6px,#ff8fb8 6px 12px,#c95a86 12px 18px) border-box}
 .px-frame-sakura::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;
   box-shadow:inset 0 0 0 3px transparent}
@@ -164,7 +167,7 @@ body.light .toggle{background:#f6f7f9;border-color:#d0d2d8}
 /* PIXEL · PRO · Cosmic — 8-sector prism border, jumps a sector per step */
 .px-frame-pro{--text:#f6ecca;--muted:#b6a886;--line:#4a3f1e;--accent:#f0dfa8;--accent-dim:#a08a3a;
   --rim:#f3e6b0; --halo1:rgba(217,194,122,.24); --halo2:rgba(140,110,220,.28); color:#f6ecca;
-  background:linear-gradient(#181432 0 28%,#111022 28% 62%,#0a0a18 62% 100%) padding-box,
+  background:linear-gradient(160deg,#14112a 0 28%,#0e0d1e 28% 62%,#0a0a18 62% 100%) padding-box,
     repeating-conic-gradient(from var(--hkang,210deg),
       #f3e6b0 0deg 22.5deg,#8f7fff 22.5deg 45deg,#4fd0ff 45deg 67.5deg,#c98fff 67.5deg 90deg,
       #5fe0c0 90deg 112.5deg,#ffd98a 112.5deg 135deg,#6f8fff 135deg 157.5deg,#c98fff 157.5deg 180deg) border-box}
@@ -172,7 +175,7 @@ body.light .toggle{background:#f6f7f9;border-color:#d0d2d8}
 /* PIXEL · ELITE BOUTIQUE — 6-sector gold border, slow step spin */
 .px-frame-boutique{--text:#f2ecd8;--muted:#a89772;--line:#33301f;--accent:#d8b25a;--accent-dim:#8a6d2f;
   --rim:#f0dd9a; --halo1:rgba(210,170,90,.20); --halo2:rgba(210,170,90,.20); color:#f2ecd8;
-  background:linear-gradient(#141419 0 30%,#0d0d12 30% 66%,#07070a 66% 100%) padding-box,
+  background:linear-gradient(160deg,#101015 0 30%,#0b0b10 30% 66%,#07070a 66% 100%) padding-box,
     repeating-conic-gradient(from var(--hkang,120deg),
       #f0dd9a 0deg 22.5deg,#8a6d2f 22.5deg 45deg,#4a3a18 45deg 67.5deg,#e8cf88 67.5deg 90deg) border-box}
 
@@ -287,16 +290,16 @@ requestAnimationFrame(()=>{ try{ window.hkInitCardFx(document); }catch(e){ conso
       return {p, cx:(w*.5)|0, cy:(h*.46)|0, rad:Math.max(4,(Math.min(w,h)*.20)|0)};
     }
     if(kind==='pxpetals'){
-      const n = Math.round(w*h/150)+7, p=[];
+      const n = Math.round(w*h/260)+5, p=[];
       for(let i=0;i<n;i++) p.push({x:(R(0,w))|0, y:(R(0,h))|0, sp:1+((Math.random()*2)|0), f:(Math.random()*3)|0,
         c:i%3, sway:(Math.random()*4)|0});
       return {p};
     }
     if(kind==='pxnebula'){
       const cols=[[150,120,255],[90,140,255],[255,200,120],[200,110,230]], b=[];
-      for(let i=0;i<4;i++) b.push({x:(R(.2,.8)*w)|0, y:(R(.2,.8)*h)|0, r:(R(.30,.48)*Math.max(w,h))|0,
+      for(let i=0;i<4;i++) b.push({x:(R(.2,.8)*w)|0, y:(R(.2,.8)*h)|0, r:(R(.20,.32)*Math.max(w,h))|0,
         c:cols[i], dx:(Math.random()<.5?1:-1), dy:(Math.random()<.5?1:-1), ph:(Math.random()*8)|0});
-      const n=Math.round(w*h/26)+14, st=[];
+      const n=Math.round(w*h/44)+12, st=[];
       for(let i=0;i<n;i++) st.push({x:(R(0,w))|0, y:(R(0,h))|0, ph:(Math.random()*6)|0, sp:1+((Math.random()*2)|0)});
       return {b, st};
     }
@@ -317,7 +320,7 @@ requestAnimationFrame(()=>{ try{ window.hkInitCardFx(document); }catch(e){ conso
          for the original's continuous radial gradient. Breathes on a 4-step cycle. */
       const beat = [0,1,2,1][f%4];
       const r1 = (Math.min(w,h)*.30)+beat, r2 = (Math.min(w,h)*.55)+beat*1.5, r3 = Math.max(w,h)*.80;
-      const BANDS = ['rgba(175,24,24,.30)','rgba(120,12,16,.24)','rgba(60,4,10,.16)'];
+      const BANDS = ['rgba(175,24,24,.20)','rgba(120,12,16,.15)','rgba(60,4,10,.09)'];
       for(let y=0;y<h;y++) for(let x=0;x<w;x++){
         const dx=x-st.cx, dy=(y-st.cy)*1.35, d=Math.sqrt(dx*dx+dy*dy);
         let band = d<r1?0 : d<r2?1 : d<r3?2 : -1;
@@ -330,7 +333,7 @@ requestAnimationFrame(()=>{ try{ window.hkInitCardFx(document); }catch(e){ conso
       /* gold glint: a hard 4-cell column raking across, on the original 5.5s period */
       const gp = (f/(5.5*FPS))%1;
       if(gp<.34){ const gx = ((-4 + gp*(w+12))|0);
-        for(let i=0;i<4;i++) for(let y=0;y<h;y++) px(ctx,gx+i+((y/6)|0),y, i===1||i===2?'rgba(240,200,110,.26)':'rgba(240,200,110,.13)');
+        for(let i=0;i<3;i++) for(let y=0;y<h;y++) px(ctx,gx+i+((y/6)|0),y, i===1?'rgba(255,214,130,.20)':'rgba(255,214,130,.10)');
       }
       /* embers: 3px squares (1 buffer cell), red with a gilt quarter, 3-level alpha */
       const RED=['rgba(212,40,38,.42)','rgba(212,40,38,.72)','rgba(255,120,90,1)'];
@@ -352,9 +355,9 @@ requestAnimationFrame(()=>{ try{ window.hkInitCardFx(document); }catch(e){ conso
     else if(kind==='pxpetals'){
       /* three sprite frames stand in for continuous rotation */
       const SPR = [ [[0,0],[1,0]],                     // flat
-                    [[0,0],[1,0],[0,1],[1,1]],         // turned (2x2)
-                    [[0,0],[0,1]] ];                   // edge-on
-      const COLS = ['rgba(255,208,228,.92)','rgba(255,182,212,.92)','rgba(255,226,238,.75)'];
+                    [[0,0],[1,0],[1,1]],               // turned
+                    [[0,0]] ];                         // edge-on
+      const COLS = ['rgba(255,208,228,.62)','rgba(255,182,212,.58)','rgba(255,226,238,.44)'];
       for(const s of st.p){
         if(!reduce){ s.y += (f%2===0 ? s.sp : 1);
           if(f%3===0) s.x += ((f+s.sway)%2 ? 1 : -1);
@@ -371,7 +374,7 @@ requestAnimationFrame(()=>{ try{ window.hkInitCardFx(document); }catch(e){ conso
         if(!reduce && f%4===0){ b.x += b.dx; b.y += b.dy;
           if(b.x<w*.12||b.x>w*.88) b.dx*=-1; if(b.y<h*.12||b.y>h*.88) b.dy*=-1; }
         const pulse = [0,1,2,1][((f>>2)+b.ph)%4], rr = b.r + pulse;
-        const A=['.30','.18','.09'];
+        const A=['.15','.09','.045'];
         for(let y=Math.max(0,b.y-rr); y<Math.min(h,b.y+rr); y++)
           for(let x=Math.max(0,b.x-rr); x<Math.min(w,b.x+rr); x++){
             const dx=x-b.x, dy=y-b.y, d=Math.sqrt(dx*dx+dy*dy)/rr;
@@ -385,10 +388,10 @@ requestAnimationFrame(()=>{ try{ window.hkInitCardFx(document); }catch(e){ conso
       /* aurora band: a hard 6-cell column stepping across on the original 9s period,
          hue quantized to 6 stops instead of a continuous cycle */
       if(!reduce){ const sp=(f/(9*FPS))%1, bx=((-6+sp*(w+14))|0), hue=[300,340,20,140,200,260][(f>>3)%6];
-        for(let i=0;i<6;i++){ const a = (i===0||i===5)?'.07':(i===1||i===4)?'.13':'.20';
+        for(let i=0;i<6;i++){ const a = (i===0||i===5)?'.04':(i===1||i===4)?'.07':'.11';
           for(let y=0;y<h;y++) px(ctx,bx+i,y,'hsla('+hue+',80%,64%,'+a+')'); } }
       /* stars: 1 cell, 3-frame twinkle (off / dim / bright) */
-      const SC=['rgba(255,255,255,0)','rgba(207,214,255,.55)','rgba(255,255,255,1)'];
+      const SC=['rgba(255,255,255,0)','rgba(207,214,255,.42)','rgba(255,255,255,.85)'];
       for(const s of st.st) px(ctx, s.x, s.y, SC[[0,1,2,1][((f*s.sp)+s.ph)%4]]);
     }
 
