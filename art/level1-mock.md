@@ -1,5 +1,11 @@
 # Level 1 "The Corridor" — playable preview mock (r455)
 
+> **Direction rejected (r455, Wolf):** the pixel-game chrome on the drill surface — act cards, pixel HUD, dissolve
+> reveal, bitmap fonts — is NOT the direction. Pixel art is limited to identity assets (rank, level, achievements,
+> player card); the game surface keeps the site's original leetcode-like chrome, and Foundations become integrated
+> tutorial drills (guide + hints + editorial) rather than game acts. This mock is kept only as a record of the
+> keyboard mechanics it verified (end-state grading, nudge-after-three, ☆ chord tracking), which still apply.
+
 `art/level1-mock.html` — one standalone page, a toy of CURRICULUM_V3 §9.1 on a 16×20 fake Excel sheet, in the
 pixel language of `art/frame-pixel-proto.html`. Open it and play with the keyboard; the DEV strip at the bottom
 jumps between acts, resets, toggles theme (light default / dark) and Mac keycaps. Renders: `level1-mock-act1/2/3.png`,
