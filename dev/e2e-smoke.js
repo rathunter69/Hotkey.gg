@@ -89,15 +89,32 @@ const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'bill
       // r398 (#76): the hand-written marketing copy must not drift from the live catalog.
       // "banker-grade drills" is the unambiguous full-catalog phrase (smaller "N drills"
       // counts are chapter/feature sizes), so any "N banker-grade drills" must == menuOrder.
+      // r452: WIDENED to bare "N drills" too — "82 drills" survived in index.html's schema.org
+      // description (the number Google reads), About.html and enterprise.html for ~8 catalog
+      // changes precisely because it never said "banker-grade". Bare counts are only checked
+      // at N >= 20, since the small ones ("5 drills", "11 drills") are genuinely chapter and
+      // feature sizes, and only outside comments, since the engine's own /* */ notes cite
+      // historical catalog sizes ("75 of 81 drills") as evidence and must stay quotable.
       const total = r.drills;
       const cerr = [];
+      const BARE_MIN = 20;
       if (!total) cerr.push('menuOrder.length came back 0 — could not verify');
       else {
         const fs = require('fs');
+        const decomment = s => s
+          .replace(/<!--[\s\S]*?-->/g, ' ')          // html comments
+          .replace(/\/\*[\s\S]*?\*\//g, ' ')         // block comments (js + css)
+          .replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');    // line comments (keep https:// intact)
         for (const f of ['index.html', 'About.html', 'enterprise.html']) {
           let txt = ''; try { txt = fs.readFileSync(f, 'utf8'); } catch (e) { continue; }
           let m; const re = /(\d+)\s+banker-grade\s+drills/g;
           while ((m = re.exec(txt))) if (+m[1] !== total) cerr.push(f + ': "' + m[0] + '" != ' + total + ' (menuOrder)');
+          const bare = decomment(txt);
+          let b; const bre = /(\d+)\s+(?:banker-grade\s+)?drills\b/g;
+          while ((b = bre.exec(bare))) {
+            const n = +b[1];
+            if (n >= BARE_MIN && n !== total) cerr.push(f + ': "' + b[0].replace(/\s+/g, ' ') + '" != ' + total + ' (menuOrder)');
+          }
         }
       }
       if (cerr.length) fails.push({ p: 'drill-count', errs: cerr });

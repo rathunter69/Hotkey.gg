@@ -778,10 +778,18 @@ IB associate, restructuring) is founder; Claude is sole developer.
   Launch = flip PRELAUNCH_LOCK to false. BETA_MODE now ONLY unlocks PRO.
   Signup open to all emails (r133; .edu = incentive: school-desk auto-match +
   future student perks).
-- **Git workflow (NEW):** repo github.com/rathunter69/Hotkey.gg (public), GitHub Pages
-  via CNAME → www.hotkey.gg. Claude clones per session (no persistent access); Wolf
-  pastes a fine-grained token (Contents: R/W, this repo only) when Claude should push.
-  Push to main = deploy. Tokens never stored in repo or this file.
+- **Git workflow (NEW):** repo github.com/rathunter69/Hotkey.gg (public), deployed by
+  **Cloudflare Pages** from `main` → www.hotkey.gg. (r452 corrected "GitHub Pages" here and
+  at the cache-busting note below; ":538" already said Cloudflare. Evidence: `_headers` exists
+  and its first line reads "Cloudflare Pages response headers" — GitHub Pages ignores that file
+  entirely; `.github/workflows/` holds only gate.yml + supabase-deploy.yml, with no Pages deploy
+  job and no actions/deploy-pages; dev/PROJECT_REVIEW.md:32 states "Cloudflare Pages deploys
+  main". The root `CNAME` is an INERT GitHub-Pages-era leftover — Cloudflare Pages does not read
+  it; left in place deliberately, since deleting it forecloses a fallback to GH Pages and the
+  Cloudflare custom-domain binding lives in the dashboard, not the repo.)
+  Claude clones per session (no persistent access); Wolf pastes a fine-grained token
+  (Contents: R/W, this repo only) when Claude should push. Push to main = deploy. Tokens never
+  stored in repo or this file.
 - **Coupled deploy set:** index.html (4,835 lines), drills.js, themes.js, nav.js,
   nav.css, leaderboard.html, reference.html, About.html, privacy/terms/security.html,
   favicon.svg. supabase/ IS in the repo: migrations/ deploy
@@ -801,7 +809,7 @@ story) · S9 team spaces v2 (invite links, team pages) · S10 rank-math consolid
 ## Conventions (bugs earned these)
 - **CACHE-BUSTING (round 16):** every shared-asset reference uses ?v=N
   (nav.js, nav.css, themes.js, drills.js across all pages). BUMP N on any shared-file
-  change or GitHub Pages serves stale JS — this caused the "missing stats icon" and
+  change or Cloudflare Pages serves stale JS — this caused the "missing stats icon" and
   earlier "invisible rank pill" reports.
 - Emoji in python edits: \U escapes + io.open utf-8 (surrogate write once zeroed index.html).
 - Duplicated-code sync sets: tier/level math (index+nav.js+leaderboard TIERS) ·

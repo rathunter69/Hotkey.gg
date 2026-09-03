@@ -121,7 +121,7 @@ function bestPerUser(rows, mode, dur){
 }
 // r298: MARATHON_DURS deleted — marathon boards retired r293; nothing referenced it
 const RAPID_DURS    = [{sec:30,  label:'30-second rapid-fire'}, {sec:60, label:'60-second rapid-fire'}, {sec:90, label:'90-second rapid-fire'}];  // must match the trainer's duration configs
-const marathonScore = r => `${r.score} drill${r.score===1?'':'s'} · ${r.keystrokes} keys`;
+// r452: marathonScore deleted — marathon boards retired in r293; zero references since.
 const rapidScore    = r => { const t=r.score+(r.misses||0); const a=t?Math.round(100*r.score/t):100;
                              return `${r.score} hit${r.score===1?'':'s'} · ${a}%`; };
 
@@ -743,25 +743,9 @@ function rankedInfographic(){
   try{ localStorage.setItem('hk_ranked','1'); window.hkStatePush&&window.hkStatePush(); load(); }catch(e){}
 }
 
-function ladderHtml(){
-  const {userStat,meId}=DATA;
-  const me=(meId&&userStat[meId])||{att:0,sum:0};
-  const avg=me.att?me.avg:null;
-  const cur=tierOf(avg, me.att, me.wsum);
-  // r112: TIERS.slice(1) already starts at Candidate — the manual prepend listed it twice
-  const T=TIERS.map(t=>({name:t.name,cls:t.cls,req:t.req||((t.att?t.att+' drills':'')+(t.pct<=1?' \u00b7 top '+Math.round(t.pct*100)+'%':' \u00b7 any placement'))}));
-  let rows='';
-  T.forEach((t,i)=>{
-    const here=t.name===cur.name;
-    const locked=i>(cur.i??-1)+1 && !here;
-    const reqLines=String(t.req).split(/\s*[\u00b7\u2014,]\s*/).filter(Boolean).slice(0,3)
-      .map(p=>'<i>'+p+'</i>').join('');   // r268: stacked nowrap lines — the ragged mid-phrase wrap read as compression
-    rows+='<div class="ld-row'+(here?' here':'')+(locked&&!here?' locked':'')+'">'+
-      '<span class="'+t.cls+'" style="display:inline-flex;color:inherit">'+(window.rankEmblem?window.rankEmblem(t.name,22):'')+'</span>'+
-      '<span>'+t.name+(here?' \u2014 you':'')+'</span><span class="ld-req">'+reqLines+'</span></div>';
-  });
-  return '<div class="panel"><h4>the ladder</h4>'+rows+'</div>';
-}
+// r452: ladderHtml() deleted — 19 lines, zero callers; the ladder renders from the standings
+// panel now. Its .ld-row/.ld-req rules in lb.css are stranded by this and go in the next
+// CSS sweep (not deleted here: the r452 audit verified its dead-CSS list individually).
 function topPlayersHtml(){
   const {userStat,names,meId}=DATA;
   const ranked=Object.keys(userStat).map(u=>({u, ...userStat[u]}))
@@ -886,7 +870,7 @@ function rosterHtml(flush){
   const inBand=users.filter(x=>x.tier.name===rosterTier).sort((a,b)=>a.av-b.av);
   const bandCounts={}; ROSTER_BUCKETS.forEach(b=>bandCounts[b]=inBand.filter(x=>bkOf(x)===b).length);
   // a tier only splits into buckets once someone actually holds more than one — hide chips otherwise
-  const bucketsPresent=ROSTER_BUCKETS.filter(b=>bandCounts[b]>0);
+  // r452: `const bucketsPresent = ...` deleted — computed every render, never read.
   if(rosterBucket && !bandCounts[rosterBucket]) rosterBucket=null;   // stale pick after tier switch
   const inTier=(rosterBucket ? inBand.filter(x=>bkOf(x)===rosterBucket) : inBand);
   /* r383 (Wolf: same density grammar as the r382 board rows): the roster's dead

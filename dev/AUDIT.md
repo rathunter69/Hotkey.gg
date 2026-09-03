@@ -1,5 +1,217 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r452 — the keystroke hot path: one grid write, no forced relayouts, no leaked gate listeners
+
+_Acts on the r450 read-only PERFORMANCE + STALE-CODE audit. Every number below is MEASURED on the
+same container, same chromium-1194, viewport 1440×900, `?v=`-matched trees served side by side
+(pre-fix = `git archive HEAD`) so before and after are paired, not remembered. Read the RATIOS as
+the durable result; absolute ms are an upper bound on this CPU._
+
+### THE HEADLINE: a keystroke got ~2× cheaper, and nothing on screen moved
+
+| drill | ms/key before | ms/key after | change |
+|---|---|---|---|
+| `navigation` | 18.81 / 18.96 | 8.59 / 8.76 | **−54%** |
+| `margin` | 22.07 / 23.23 | 10.83 / 11.42 | **−52%** |
+| `foot` | 25.72 / 25.86 | 9.55 / 10.49 | **−61%** |
+
+_(two independent paired runs each; best-of-3 windows of 200 synthetic arrow keys after an
+80-key warm-up.)_ Four fixes compound into that: one grid write instead of 21, and the removal of
+the two forced relayouts that were being issued against the freshly-dirtied table.
+
+### P0-1 · `render()` builds the grid into ONE string — `index.html:23067` / `:23097` / `:23119` / `:23305` → the single write at `:23307`
+
+`g.innerHTML += row` inside the per-row loop made the browser serialize the whole growing
+`<tbody>`, re-parse it and destroy/recreate every node built so far — O(rows²) parse work and a
+layout invalidation 21 times per render, on a function that runs once per keystroke. It now
+buffers into `__gh` and assigns once.
+
+**Byte-identity proof** (5 drills × 3 seeds × {after load, after 8 keys} = 30 captures of
+`#grid.innerHTML`, 489,016 B): **0 differences** — with one documented and expected exception.
+`#grid` is a `<table>`, so the old `+=` made the PARSER open a fresh `<tbody>` around each
+appended row: **630 `<tbody>` elements across the 30 captures before, 30 after**. Collapse that
+boundary and every `<tr>`, `<th>`, `<td>`, class, inline style and text node matches byte for
+byte. Nothing reads it: no rule in the repo names `tbody` or an `nth-child`/`first-child` on a
+grid row, and the two harnesses that select `#grid tbody tr` (`e2e-grid-height`,
+`e2e-depth-contract`) count the same `<tr>` set either way. `REPS=1 e2e-demo-replay` replayed
+**every** drill green after the change.
+
+### P0-2 · the flow-combo pulse restarts without a reflow — `index.html:25898` (`hkPeakRestart`), called from `hkComboTick` `:25921`
+
+`el.classList.remove('peak'); void el.offsetWidth; el.classList.add('peak')` — the CSS-animation
+restart trick — ran on every productive keystroke, immediately after `render()` had rewritten the
+grid, so the `offsetWidth` read forced a full relayout of the fresh ~200-cell table (4.57ms/key,
+13.2% of a 300-key profile; the three classList lines themselves cost 0.012ms). Now: re-play the
+live `comboThrob` `CSSAnimation` (`cancel()` + `play()`), and where it has already finished —
+`getAnimations()` drops a finished `fill:none` animation, **verified**, so the class alone cannot
+restart it — drop and re-add the class across two `requestAnimationFrame`s. Zero layout reads on
+either path. Headless proof: mid-animation `currentTime` **150.03ms → 0**; post-finish, a key
+re-arms a fresh animation (`getAnimations().length` 0 → 1) and `.peak` stays applied.
+
+### P0-3 · the checklist autoscroll only measures when the next beat MOVES — `index.html:25781`
+
+`scrollHeight` / `clientHeight` / `offsetTop` were read immediately after `el.innerHTML=` and
+immediately after `render()` — the second forced relayout per keystroke (0.05ms for the write vs
+1.026ms for write+read on a *clean* layout; ~13ms in the real profile). The `.cl-item.next` index
+is now cached (keyed by drill + microRun + hints/guided, since those change row heights), and the
+reads are skipped unless it actually changed — once per beat instead of once per key. Identical
+scroll position whenever it does change.
+
+### P0-4 · `openGateInfo` binds its dismissal handlers ONCE — `index.html:30091` / `:30097`
+
+`#gateModal` is a singleton but every call added a new `document` keydown Escape handler and a
+new backdrop click handler, and `close()` could only remove the newest. **Measured, 30
+`loadChallenge()` + 150 keys: +11 keydown and +11 click listeners, 0 removals.** 49 of 74 drills
+are gate-locked, so ordinary picker browsing piled dead handlers onto the hot keydown path. Now
+`gateInfoEsc`/`gateInfoClose` are module-scope singletons bound at element creation and gated on
+`.show` (which is what removing them used to achieve).
+
+| listeners over 30 loads + 150 keys | before | after |
+|---|---|---|
+| net growth | **+22** | **+2** (the one-time bind at creation) |
+| adds attributed to `loadChallenge` | 11 keydown + 11 click | **0** |
+| DOM nodes / heap | +17 / +0.72 MB | +17 / +0.53 MB |
+
+### P1-1 · `drills.js` shipped TWICE on 14 of 16 pages — and the guard that should have caught it counted instead of asserting
+
+Deleted the second `<script src="drills.js?v=…">` on index / account / admin / cert / contact /
+desks / enterprise / leaderboard / privacy / profile / reference / security / stats / terms.
+Paired measurement under the audit's harness (`http-server -c-1`), 7 sampled pages:
+
+| per page | before | after |
+|---|---|---|
+| `<script>` tags | 2 | **1** |
+| network requests | 2 | **1** |
+| transferred bytes | 156,720 | **78,360** |
+
+Both tags were parser-blocking in `<head>`, so this sat on the critical path, and the second
+execution re-defined the whole catalog. It survived ~25 cache bumps because
+`dev/check-cache-versions.js` only asserted one *version* per asset and **counted matches** — the
+duplicate silently inflated the tally (`drills.js?v=300 — 28 files agree` across 16 files; it now
+reads 14). **The guard is the deliverable**: a UNIQUENESS pass asserts each asset appears at most
+once per HTML file. Proof-of-failure — the new guard against the pre-fix tree:
+
+```
+FAIL drills.js: referenced more than once in 14 file(s) — account.html x2, admin.html x2, … terms.html x2
+CACHE-BUMP GUARD: 1 problem(s)          (exit 1)
+```
+
+### P1-2 · one grader pass fewer per key — `index.html:25708`
+
+The `dense` class line ran `CHALLENGES[cur].checks(S)` a second time purely to read `.length`.
+It now reads the `items` computed on the same tick. **Stack-attributed count on `navigation`:
+4 `checks()` calls per keystroke → 3** (`currentTargetRange`, `updateChecklist`, `gradePass`).
+Small today — catalog median 0.020ms, worst `recon` 0.590ms — but it scales with drill depth.
+
+### P1-3 · the stuck-nudge interval now runs only while it can fire — `index.html:29430`
+
+A bare `setInterval(…, 3000)` that was never cleared, ticking for the whole session (and on a
+backgrounded tab, where `setInterval` is only clamped) with a `getClientRects()` forced layout in
+it. Two changes, both behaviour-preserving: the landing test **latches** (the `gone` class is only
+ever added, never removed — verified), so the layout read happens at most until the landing goes
+and never again; and `window.__stkDone` is now an accessor that **clears the interval when it
+latches true and re-arms it when `loadChallenge` sets it false**, which it already does on every
+load. The nudge still gets exactly one shot per drill load, and `loadChallenge` was not touched.
+
+### P1-5 · `_headers` gets Cache-Control
+
+The file set five security headers and nothing else, so every navigation revalidated all shared
+assets plus the 2.5 MB `index.html`. Added `public, max-age=31536000, immutable` for `/*.js`,
+`/*.css`, `/art/*` and the four favicons, and `no-cache` for `/`, `/*.html` and `/drills/*`.
+Cloudflare Pages merges the headers of every matching rule and, on a conflict, the **last**
+matching rule wins — so the security block stays first, assets next, HTML last (which is what
+keeps `/art/rank-proto.html` on revalidate). This makes the `?v=` discipline load-bearing for
+real, which is why it ships in the same round as the P1-1 uniqueness assertion.
+
+### THE ECHO SUBSYSTEM IS RETIRED — 103 lines, and a toast that advertised a deleted button
+
+r401 pulled the `#echoBtn` out of the bar and left the wiring behind `if(eb)`, which made
+`echoStart()` unreachable and `echoOn` permanently false. PIPELINE.md has carried "dead echo
+feature ~90 unreachable lines" without an owner since r436. Deleted: `updateEchoBtn`, `echoAbort`,
+`echoStop`, `echoStep`, `echoStart`, `echoDone`, `echoNudge`, `echoMatch`, the capture-phase
+keydown gate, the mouseup re-assert, the `#echoBtn` wiring, and the one dead rule
+(`#demoSpotCap.echo-miss`; `@keyframes echoShake` stays — the rejected-formula shake still uses
+it). Two pieces of **user-visible copy** went with it: the post-demo card offered "or ⌨ learn mode
+to walk the steps yourself", and the stuck-nudge toast read "⌨ learn mode walks you through it"
+and then pulsed `'echoBtn'` — an element that has not existed for 51 revisions.
+
+`let echoOn=false` stays declared: ~20 engine guards read it as a cheap "not in a scripted
+replay" test and they sit in regions other rounds own. It is now a constant false.
+
+### The rest of the sweep (every symbol re-grepped to zero references before deletion)
+
+| deleted | where | proof |
+|---|---|---|
+| `startPlacement` + the unreachable `if(placementMode)` verdict/share branch (27 lines) + `placementVerdict` | `index.html` results card + onboarding | `startPlacement` had 1 repo-wide hit (its own definition) and was the ONLY setter of `placementMode=true`; `placementVerdict` was called only from inside that branch. **`HK_PLACEMENT` in lb.js is a different, live system — untouched.** |
+| `startGuidedIntro` → and `introRibbonPeek` with it | `index.html` | zero references; deleting the first stranded the second (its only caller) |
+| `sheetMarkWin` | `index.html` | an empty no-op kept "for one release" in r363, ~89 revisions ago |
+| `evalSum` | `index.html:22289` | regex-only `=SUM()` evaluator, superseded by `evalFormula` |
+| `DRILL_DESC`, `TAB_LABEL` | `index.html` | two SSOT aliases nobody read |
+| `__CELL_TARGET` | `index.html` (inside `render`) | never read — a comment promising "one knob for the whole grid" in the most fragile function in the file, while the math ran on `__availH/__VR` |
+| `__sbT` | `index.html` | zero references |
+| `ladderHtml` (19 lines), `marathonScore`, `bucketsPresent` | `lb.js` | zero references |
+| `.pc-badges/.pc-badge/.pc-legend*/.pc-ach-i/.pc-card.flair-*`, `.nav-lvl*` | `nav.css` | 0 non-CSS hits with `<style>` blocks stripped |
+| the `.pub-cap/.pub-hero/.pub-nm/.pub-you/.pub-desk/.pub-tiles/.pub-best/.pub-row` family, `.standing .st-*`, `.gb-or` | `lb.css` | same; **`.pub-card` and `.pub-card>.pub-x` are LIVE (lb.js:496/558) and stayed** |
+| `.guide-toggle/.toprow/.mode-ctrls/.keylog`, `.help-toggle` + descendants | `index.html` inline `<style>` | the retired top-row control strip |
+| `drills/colops.html` | orphan SEO page | `colops` retired in the depth pass (DEPTH_PASS D17); the page stayed live, canonical'd, schema.org'd, with a CTA deep-linking `index.html?drill=colops` |
+
+**Deliberately NOT deleted, recorded so nobody re-audits them:** `nav.js` `mySchoolChip` (built,
+never inserted — a built-but-unused chip usually means a MISSING feature; check it against the
+school/desk design first) · `cycleProfile` / `toggleSound` (`index.html`, MED confidence — confirm
+the plugin picker and the settings sound toggle reach `keyProfile`/`saveSound` by some other path
+first) · `nav.css` `.pc-customize` (its own comment claims nav.js renders it) · `themes.js`
+`MOTTO` (it sits inside the rank-emblem IIFE beside `TIERS`/`DRESS`, and that file is being
+worked in parallel) · `nav.css` `.hkf-serial` / `.hkf-crack` (inside the `.hk-frame-*` block, in
+flight elsewhere) · `wrongIsA` (`index.html:6530`, inside a CHALLENGES build) · `let
+placementMode=false` (two live resets still assign it from regions this round does not own; it is
+now a constant false).
+
+### THREE NEW GUARDS, each proven to fail on the tree it was written for
+
+1. **`dev/check-cache-versions.js` — uniqueness.** Shown above: exit 1 on the pre-fix tree, clean
+   after.
+2. **`dev/e2e-smoke.js` — the drill count, widened.** The existing check only matched
+   `N banker-grade drills`, which is exactly why **"82 drills"** survived in `index.html:21`'s
+   schema.org description (the number Google reads), `About.html:301` and `enterprise.html:106`
+   against a catalog of 74. It now also matches bare `N drills`, at `N >= 20` (the small ones —
+   "5 drills", "11 drills" — are genuine chapter and feature sizes) and outside comments (the
+   engine's own notes cite historical catalog sizes as evidence and must stay quotable).
+   Proof-of-failure on the pre-fix tree: three hits, `index.html` / `About.html` /
+   `enterprise.html`, `"82 drills" != 74 (menuOrder)`. All three corrected.
+3. **`dev/build-drill-pages.js` — the orphan assertion.** The gate's drift check is
+   `build-drill-pages.js && git diff --exit-code -- drills sitemap.xml`, and `git diff` only sees
+   files the generator MODIFIES — never one it has stopped writing, which is precisely how
+   `drills/colops.html` stayed green after its drill was retired. The generator now asserts that
+   `drills/*.html` equals `menuOrder + index`. Proof-of-failure, with colops restored:
+   `ORPHAN drill page(s) — retired but still on disk: drills/colops.html` (exit 1); clean after,
+   `drills/ holds exactly menuOrder + index (75 pages, 0 orphans)`.
+
+### Docs reconciled
+
+`PROJECT_CONTEXT.md:781` and `:804` said **GitHub Pages**; `:538` said Cloudflare. It is
+**Cloudflare Pages**, and the entry now carries the evidence: `_headers` exists and its own first
+line says so (a file GitHub Pages ignores entirely); `.github/workflows/` holds only `gate.yml`
+and `supabase-deploy.yml` — no Pages deploy job, no `actions/deploy-pages`; `dev/PROJECT_REVIEW.md:32`
+states "Cloudflare Pages deploys main". The root `CNAME` is an **inert** GitHub-Pages-era leftover
+that Cloudflare Pages does not read — left in place deliberately and labelled as such, since
+deleting it forecloses a fallback and the custom-domain binding lives in the Cloudflare dashboard,
+not the repo.
+
+### Suites (server on 127.0.0.1:8809)
+
+`check-invariants` clean · `check-cache-versions` clean (with the new uniqueness rule) ·
+`e2e-smoke` ALL 7 PAGES CLEAN + skin-unlock + drill-count(74) · `REPS=1 e2e-demo-replay` ALL GREEN
+(every drill — `render()` changed) · `e2e-alt-paths` green · `e2e-guided` green · `e2e-lb` ALL 36
+PASS · `e2e-grid-height` green · `check-pause` green. `e2e-audit-visual` reports **108 FAIL / 271
+PASS — byte-identical to the same suite run against the pre-fix tree in this session**: it is the
+theme-contrast backlog (sepia/frost/phoebes/crimson/tangerine swatches), pre-existing and owned
+elsewhere; this round did not move it by one assertion.
+
+Cache: `nav.css` v210→**v211**, `lb.js` v41→**v42**, `lb.css` v22→**v23** across all HTML +
+`drills/*.html` (drill pages derive their versions from index.html and were regenerated).
+`themes.js` and `drills.js` untouched, so unbumped.
+
+
 ## r440 H6b-12 — balcheck + tieout + balance: Formulas II CLOSES 10/10 (DEPTH_PASS §4.48 + §4.51 + §4.55 + §2.3)
 _The chapter's last three boards. All three carried a FORMATTING ☆ on their §4 page, all three
 had those ☆s re-cut under §1.0(d); one of them (`tieout`) came within a diagnostic of retirement
