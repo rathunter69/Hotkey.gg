@@ -17,7 +17,7 @@ const ROOT = path.join(__dirname, '..');
 const OUT = path.join(ROOT, 'drills');
 const SITE = 'https://www.hotkey.gg';
 
-/* r416-review: DERIVE the shared-asset ?v= from index.html so the 82 drill pages can never
+/* r416-review: DERIVE the shared-asset ?v= from index.html so the drill pages can never
    serve a stale version again — they had been hard-pinned at nav.css v188 / drills.js v275 /
    themes.js v280 / nav.js v288 while the live site moved on. Because the drill-page drift guard
    regenerates + diffs on any index.html change, a future cache-bump now forces the pages back
@@ -493,4 +493,22 @@ ${(() => {
     'window.HK_CHORD_DRILL = ' + JSON.stringify(chordDrill, null, 0) + ';\n');
 
   console.log(`wrote ${all.length} drill pages + library + sitemap (${urls.length} urls) + refmap (${Object.keys(chordDrill).length} chords)`);
+
+  /* r452 ORPHAN GUARD (perf/stale audit P2-d4 + P2-e2). The gate's drift check is
+     `node dev/build-drill-pages.js && git diff --exit-code -- drills sitemap.xml`, and
+     `git diff` only ever sees files this generator MODIFIES — never one it has stopped
+     writing. So when colops was retired in the depth pass, drills/colops.html stayed live and
+     green: an indexed, canonical'd, schema.org'd landing page whose CTA deep-linked
+     index.html?drill=colops into a drill that no longer exists. Assert the directory instead:
+     the set of drills/*.html must be exactly menuOrder + the library index. */
+  const onDisk = fs.readdirSync(OUT).filter(f => f.endsWith('.html')).map(f => f.slice(0, -5)).sort();
+  const expect = ['index', ...all].sort();
+  const orphaned = onDisk.filter(k => !expect.includes(k));
+  const missing = expect.filter(k => !onDisk.includes(k));
+  if (orphaned.length || missing.length) {
+    if (orphaned.length) console.error(`ORPHAN drill page(s) — retired but still on disk: ${orphaned.map(k => 'drills/' + k + '.html').join(', ')}\n  delete them: the catalog (drills.js menuOrder) no longer has these keys`);
+    if (missing.length) console.error(`MISSING drill page(s): ${missing.map(k => 'drills/' + k + '.html').join(', ')}`);
+    process.exit(1);
+  }
+  console.log(`  ok  drills/ holds exactly menuOrder + index (${expect.length} pages, 0 orphans)`);
 })();

@@ -130,13 +130,9 @@
   .pub-card>.pub-x:hover{background:var(--surface2)}
   .pub-card>.pub-rep{position:absolute; bottom:11px; right:14px; z-index:6; cursor:pointer; font-family:var(--mono); font-size:10px; color:var(--faint)}
   .pub-card>.pub-rep:hover{color:var(--warn)}
-  .pub-cap{height:34px; background:var(--surface2); border-bottom:1px solid var(--line); display:flex; align-items:center;
-    justify-content:space-between; padding:0 13px; font-family:var(--mono); font-size:10px; letter-spacing:1.6px; color:var(--muted)}
-  .pub-cap .pub-x{cursor:pointer; font-size:15px; color:var(--muted)}
-  .pub-hero{display:flex; gap:14px; align-items:center; padding:16px 18px 10px}
-  .pub-nm{font-family:var(--mono); font-size:17px; font-weight:700}
-  .pub-you{font-size:11px; color:var(--muted); font-weight:400}
-  .pub-desk{font-family:var(--mono); font-size:11px; color:var(--accent); margin-top:5px}
+  /* r452: the retired .pub-cap / .pub-hero / .pub-nm / .pub-you / .pub-desk family deleted —
+     r386 handed the whole public card to themes.js hkPlayerCard and nothing has emitted these
+     class names since. (.pub-card and .pub-card>.pub-x above are still live in lb.js.) */
   /* ===== r136: THE DESK HALL — captain dashboard (guild frame, house language) ===== */
   .dk-hall{border:1px solid var(--accent-dim); border-radius:12px; background:var(--surface);
     margin:0 0 26px; overflow:hidden}
@@ -192,12 +188,7 @@
   .dk-foot{font-family:var(--mono); font-size:10px; color:var(--faint); padding:10px 20px 16px}
   @media (max-width:760px){ .dk-r{grid-template-columns:1fr 90px 50px 60px} .dk-r span:nth-child(3),.dk-r span:nth-child(6){display:none} }
 
-  .pub-tiles{display:flex; gap:14px; padding:8px 18px 4px; font-family:var(--mono); font-size:11.5px; color:var(--muted)}
-  .pub-tiles b{color:var(--text); font-size:14px; margin-right:3px}
-  .pub-best{padding:10px 12px 14px}
-  .pub-row{display:flex; align-items:center; gap:10px; padding:6px 8px; font-family:var(--mono); font-size:12.5px}
-  .pub-row .nm{flex:1}
-  .pub-row .tm{color:var(--muted); font-size:11.5px}
+  /* r452: .pub-tiles / .pub-best / .pub-row deleted with the rest of the retired public card. */
   .panel{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 14px}   /* r84: rhythm */
   .panel.me{border-color:var(--accent-dim); background:var(--surface)}   /* r62 flat — border carries it */
   .panel h4{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1.4px; margin:0 0 12px}
@@ -372,13 +363,10 @@
   .standing{grid-column:1/-1; background:var(--surface); border:1px solid var(--accent-dim);
     border-left:3px solid var(--accent); border-radius:14px; padding:16px 22px;
     display:flex; gap:26px; flex-wrap:wrap; align-items:baseline}
-  .standing .st-big{font-family:var(--mono); font-size:22px; font-weight:700; color:var(--text)}
-  .standing .st-lbl{font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-left:7px}
-  .standing .st-chase{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-left:auto}
-  .standing .st-chase b{color:var(--accent)}
+  /* r452: .standing .st-big / .st-lbl / .st-chase deleted — the strip renders .standing.cta
+     copy only; nothing has emitted an st-* child since. */
   .standing.cta{color:var(--muted); font-family:var(--mono); font-size:13px; line-height:1.6}
   .standing.cta a{color:var(--accent); border-bottom:1px solid var(--accent-dim)}
-  @media(max-width:640px){ .standing .st-chase{margin-left:0} }
   .state{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:40px 30px; text-align:center}
   .state h2{font-size:19px; font-weight:600; margin-bottom:10px}
   .state p{font-size:14px; color:var(--muted); max-width:440px; margin:0 auto 18px; line-height:1.6}
@@ -470,7 +458,6 @@
   .gb-found .tab{font-size:11px}
   /* r426 (§4e): the PRO upsell that replaces the found-a-desk input for free accounts */
   .gb-pro-note{color:var(--faint); font-size:11px; flex:1; min-width:180px}
-  .gb-or{color:var(--faint)}
   .gb-msg{font-family:var(--mono); font-size:11px}
   .mg-app{display:flex; gap:10px; align-items:center; font-family:var(--mono); font-size:12.5px;
     padding:8px 2px; border-bottom:1px solid var(--line)}
@@ -544,7 +531,6 @@
    since the card's overflow:hidden no longer does it. Frameless cards keep the
    exact r114 box — zero layout shift. */
 .pub-card[class*="hk-frame-"]{overflow:visible}
-.pub-card[class*="hk-frame-"] .pub-cap{border-radius:11px 11px 0 0}
 /* r386: skinned public card — the .uc now carries the skin, so the holder drops its
    own surface/border (no double box) and lets the ornaments overflow. Frameless cards
    keep the r114 surface box. */

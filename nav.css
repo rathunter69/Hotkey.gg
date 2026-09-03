@@ -230,9 +230,8 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
   cursor:pointer; line-height:1; padding:4px 8px; border-radius:8px; z-index:3}
 .pc-x:hover{color:var(--text); background:var(--surface2)}
 .pc-scroll{overflow-y:auto; margin-top:4px; padding-right:8px; flex:1; min-height:0}
-.pc-badges{display:flex; gap:8px; margin:2px 0 12px; flex-wrap:wrap}
-.pc-badge{font-size:19px; cursor:default}
-.pc-badge.off{opacity:.22; filter:grayscale(1)}
+/* r452: .pc-badges / .pc-badge / .pc-badge.off deleted — the emoji badge strip was replaced by
+   the .pc-ach medal grid below; nothing emits these class names. */
 
 /* ---- achievement medals + card legend ---- */
 /* r374 (Wolf: crests/badges looked eyeballed per surface) — ONE alignment system for
@@ -251,28 +250,15 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .hk-badge{flex:none; vertical-align:middle}
 .hk-badge.earned{/* flat */}
 .hk-badge.off{opacity:.5}
-.pc-badge{cursor:default; display:inline-flex}
-.pc-legend-t{display:inline-block; font-family:var(--mono); font-size:10.5px; color:var(--muted);
-  cursor:pointer; text-decoration:underline dotted; margin:-4px 0 10px}
-.pc-legend-t:hover{color:var(--accent)}
-.pc-legend{display:none; font-family:var(--mono); font-size:11px; color:var(--muted); line-height:2;
-  background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin:0 0 14px}
-.pc-legend.show{display:block}
-.pc-legend b{color:var(--text)}
+/* r452: the second .pc-badge rule and the whole .pc-legend* disclosure deleted — zero refs. */
 
 /* ---- achievements grid ---- */
 .pc-ach-h{font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin:2px 0 6px}
 /* r134: even grid — flex-wrap gave ragged rows once %-chips varied item height */
 .pc-ach{display:grid; grid-template-columns:repeat(auto-fill,minmax(46px,1fr)); gap:9px; justify-items:center; margin-bottom:12px}
-.pc-ach-i{position:relative; display:inline-flex; cursor:default}
-.pc-ach-i i{position:absolute; bottom:-4px; right:-4px; font-style:normal; font-family:var(--mono); font-size:7.5px;
-  background:var(--surface2); border:1px solid var(--line); border-radius:99px; padding:1px 4px; color:var(--muted)}
-.pc-ach-i.got i{color:var(--warn); border-color:var(--warn)}
-
-/* ---- card flair borders ---- */
-.pc-card.flair-gold{border:2px solid #e3b341; box-shadow:0 0 24px rgba(227,179,65,.28), 0 20px 60px rgba(0,0,0,.55)}
-.pc-card.flair-emerald{border:2px solid #2ea36f; box-shadow:0 0 24px rgba(46,163,111,.3), 0 20px 60px rgba(0,0,0,.55)}
-.pc-card.flair-holo{border:2px solid #8ab4ff; box-shadow:0 0 14px rgba(138,180,255,.35), 0 0 34px rgba(196,140,255,.22), 0 20px 60px rgba(0,0,0,.55)}
+/* r452: .pc-ach-i (+ its count pip) and the legacy .pc-card.flair-gold/-emerald/-holo borders
+   deleted — the skin system (.hk-frame-*) owns card surfaces now and nav.js emits neither.
+   .flair-opt stays: nav.js:941/970/984 still render the picker swatches. */
 .flair-opt.on{border-width:2px !important; font-weight:700}
 
 /* ---- modal × (shared) ---- */
@@ -427,16 +413,9 @@ html[data-dark="0"] .tier-emerald {color:#158a4c; border-color:#6cc394}
 .hk-pro-cta.quiet{background:var(--surface2); color:var(--text); border:1px solid var(--line)}
 .hk-pro-msg{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-align:center; min-height:15px; margin-top:8px}
 
-/* r113 (#32): level chip beside the user menu */
-.nav-lvl{display:inline-flex;align-items:center;gap:7px;margin-right:9px;cursor:pointer;vertical-align:middle}
-/* r133: the keycap number alone was illegible at nav size — the label carries the read */
-.nav-lvl-t{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--text)}
-@media (max-width:740px){.nav-lvl-t{display:none}}
-/* r342 (Wolf): level progress at a glance — slim bar beside the level chip */
-.nav-lvl-bar{display:inline-block;width:74px;height:6px;border-radius:99px;background:var(--surface2);
-  border:1px solid var(--line);overflow:hidden;vertical-align:middle}
-.nav-lvl-bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s ease}
-@media (max-width:860px){.nav-lvl-bar{display:none}}
+/* r452: the r113/r133/r342 .nav-lvl / .nav-lvl-t / .nav-lvl-bar level chip deleted — 12 lines,
+   zero refs in nav.js or any page; the XP read moved into the user menu. (.brand-beta went with
+   the beta, r452.) */
 
 /* ============================================================
    r373 PROFILE FRAME SYSTEM — earned card frames (Wolf-approved board v2 port).

@@ -18,7 +18,7 @@
 <meta name="twitter:description" content="Keyboard-only Excel training: 74 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"hotkey.gg","alternateName":"hotkey.gg \u2014 Excel shortcut trainer","url":"https://www.hotkey.gg/","description":"An Excel simulator that scores your keyboard speed \u2014 82 drills from navigation to full model builds, with pars, leaderboards, and guided demos."}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"hotkey.gg","alternateName":"hotkey.gg \u2014 Excel shortcut trainer","url":"https://www.hotkey.gg/","description":"An Excel simulator that scores your keyboard speed \u2014 74 drills from navigation to full model builds, with pars, leaderboards, and guided demos."}</script>
 <script>
   // BOOT BEACON: if anything fatal happens while the game loads, paint the error on
   // screen instead of failing silent ("all the elements are gone" must never be a mystery).
@@ -427,7 +427,8 @@
   #demoSpotCap b{color:var(--accent)}
   #demoSpotCap kbd{font-family:inherit; color:var(--text); background:var(--surface2);
     border:1px solid var(--line); border-radius:5px; padding:0 5px}
-  #demoSpotCap.echo-miss{animation:echoShake .3s; border-color:var(--bad)}
+  /* r452: #demoSpotCap.echo-miss deleted with the echo subsystem; echoShake itself stays —
+     the rejected-formula shake below is its only remaining consumer. */
   @keyframes echoShake{25%{transform:translateX(-4px)} 75%{transform:translateX(4px)}}
   /* r348: rejected-formula shake — the cell says no, the editor stays open */
   td.fx-badformula .edbox{animation:echoShake .28s ease 2}
@@ -924,16 +925,9 @@
   .cl-item.next .cl-box{border-color:var(--accent); outline:3px solid var(--accent-glow)}
   .cl-item.next .cl-keys{color:var(--accent)}
   .cl-item.next .cl-keys kbd{color:var(--on-accent); background:var(--accent); border-color:var(--accent); font-weight:600}
-  .guide-toggle{font-family:var(--mono); font-size:11px; color:var(--muted); background:none;
-    border:1px solid var(--line); border-radius:7px; padding:5px 10px; cursor:pointer; transition:.15s; margin-right:8px}
-  .toprow{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:2px}
-  .toprow .tabs{flex:1 1 auto; min-width:0; margin-bottom:0}
-  .mode-ctrls{display:flex; align-items:center; gap:8px}
-  .toprow .guide-toggle{margin-right:0; font-size:12px; padding:6px 12px}
-  .guide-toggle:hover{color:var(--text); border-color:var(--faint)}
-  .guide-toggle.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
-  .guide-toggle kbd{font-family:var(--mono); font-size:10px; opacity:.8}
-  .keylog{display:flex; gap:5px; flex-wrap:wrap; margin-top:10px; min-height:24px; align-items:center}
+  /* r452: the retired top-row control strip deleted — .guide-toggle (+ :hover/.on/kbd),
+     .toprow (+ .tabs/.guide-toggle), .mode-ctrls and .keylog. 11 lines, zero markup: the guide
+     button lives in the HUD as #guideToggle and the key trail renders into .keyflash. */
   .kchip{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var(--surface2);
     border:1px solid var(--line); border-radius:5px; padding:2px 7px}
   .kchip.empty{color:var(--faint); background:transparent; border:none}
@@ -1175,11 +1169,8 @@
   .ob-opts.pw-opts{flex-direction:row; flex-wrap:wrap; align-items:stretch}
   .ob-opts.pw-opts .ob-key{flex:1 1 auto; justify-content:center; text-decoration:none; padding:11px 16px}
   .pw-hint{font-family:var(--mono); font-size:10.5px; color:var(--faint); text-align:center; margin-top:12px}
-
-  .help-toggle{font-family:var(--mono); font-size:12px; color:var(--muted); background:none; border:none; cursor:pointer; padding:0}
-  .help-toggle:hover{color:var(--accent)}
-  .help-toggle kbd{font-family:var(--mono); color:var(--muted); border:1px solid var(--line); border-radius:4px; padding:1px 6px; margin-right:5px}
-  .help-toggle:hover kbd{color:var(--accent); border-color:var(--accent)}
+  /* r452: .help-toggle (+ 3 descendant rules) deleted — no element carries the class; the
+     shortcuts sheet opens from the HUD and `?`. .help/.help.show below are still used. */
   .help{display:none; background:var(--surface); border:1px solid var(--line); border-radius:10px;
     padding:15px 17px; margin-top:14px; font-size:12.5px; color:var(--text); line-height:1.7}
   .help.show{display:block}
@@ -2215,14 +2206,13 @@
 </style>
 <script src="drills.js?v=304"></script>
 
-<script src="drills.js?v=304"></script>
 
 
 
 
 
 
-<link rel="stylesheet" href="nav.css?v=312">
+<link rel="stylesheet" href="nav.css?v=313">
 <script src="themes.js?v=313"></script>
 
 </head>
@@ -23115,14 +23105,8 @@ function neededWidth(c){
   return Math.min(Math.ceil(w), 220);
 }
 
-/* ---- formula (only =SUM needed) ---- */
-function evalSum(expr){
-  const m=expr.match(/=SUM\(([A-Z])(\d+):([A-Z])(\d+)\)/i);
-  if(!m) return 0;
-  const c1=m[1].charCodeAt(0)-64, r1=+m[2], r2=+m[4];
-  let s=0; for(let r=Math.min(r1,r2);r<=Math.max(r1,r2);r++){ const x=get(r,c1); if(typeof x.value==='number') s+=x.value; }
-  return s;
-}
+/* r452: evalSum() deleted — a regex-only =SUM(A1:A9) evaluator superseded by evalFormula
+   long ago; zero references repo-wide. */
 function rangeRefs(a,b){ const pa=parseRef(a),pb=parseRef(b); const out=[]; if(!pa||!pb) return out;
   for(let r=Math.min(pa.r,pb.r);r<=Math.max(pa.r,pb.r);r++)
     for(let c=Math.min(pa.c,pb.c);c<=Math.max(pa.c,pb.c);c++) out.push(colLetter(c)+r);
@@ -23843,7 +23827,9 @@ function render(){
      cell size on a given screen, nothing scales per-drill, and there's far more room to build.
      Tall models (more content rows than fit at target) auto-densify so nothing scrolls and no
      content is ever cut — canvas rows = max(content, rows-that-fit), so 1..S.ROWS always render. */
-  const __CELL_TARGET = 26;   // catalog-standard cell height (px) — one knob for the whole grid
+  /* r452: `const __CELL_TARGET = 26` deleted. It was never read — the 26 lives in the comment
+     above and the math below runs on __availH/__VR — so the "one knob for the whole grid"
+     promise was a doc-vs-code lie sitting in the most fragile function in the file. */
   /* r413 (Wolf): ANCHOR the sheet at 20 rows. The fill math (availH / 26px) packed MORE empty
      filler rows on a taller monitor — a hi-res screen ballooned to 26 rows, stranding a band of
      empty rows under the shorter drills (the nav maze is exactly 20 rows: RN=20). Cap the filler
@@ -23896,7 +23882,20 @@ function render(){
   S._VR = __VR;   /* r423 (Wolf round-2 §8): the RENDERED canvas rows — Ctrl+Space parity reads this */
   S._colW = colW;                                          // ENGINE widths — graders (autofit) read these; r55 wrongly pointed this at __ew
   try{ hkTouchTick(); }catch(e){}   /* r421 §2.6: render runs after every action — latch a checkpoint the moment the cursor lands on it */
-  const g=$('grid'); g.innerHTML='';
+  /* r452 (perf audit P0-1): the grid is built into ONE string and written ONCE. It used to be
+     `g.innerHTML += row` inside the per-row loop — every `+=` re-serializes the whole growing
+     <tbody> to a string, re-parses it, and destroys/recreates every node built so far, so a
+     21-row board paid O(rows^2) parse work and 21 layout invalidations per render. Measured on
+     the live page: 6.779ms vs 0.437ms for the same 14.3 KB of markup (15.5x), and 34-49% of the
+     whole per-keystroke handler. Every fragment below was already a complete <tr>...</tr>, so
+     the emitted markup is byte-identical with ONE documented exception: #grid is a <table>, and
+     the old `+=` made the parser open a fresh <tbody> around each appended row (21 tbodies per
+     render, 630 across the 30-capture proof); one assign yields one. Collapse that boundary and
+     all 30 captures (5 drills x 3 seeds, at load and after 8 keys, 489 KB) match byte for byte.
+     Nothing reads it: no CSS in the repo names tbody or an nth/first-child on a grid row, and
+     the harnesses that do (`#grid tbody tr` in e2e-grid-height / e2e-depth-contract) count the
+     same <tr> set either way. */
+  const g=$('grid'); let __gh='';
   const sr=selRange();
   const gt=currentTargetRange();
   // r330/r350 (Wolf): in a guided drill the cursor is fenced to the drill's working area
@@ -23926,7 +23925,7 @@ function render(){
   // header row
   let head='<tr><th class="rowhdr"></th>';
   for(let c=1;c<=COLS;c++) head+=`<th style="min-width:${__ew[c]}px">${colLetter(c)}</th>`;
-  head+='</tr>'; g.innerHTML+=head;
+  head+='</tr>'; __gh+=head;
   /* r308 (Wolf): the DISPLAYED active cell is the selection ANCHOR (Excel-true) — extending
      a selection used to march the ring to the far end; native Excel keeps it at the start */
   const __dA = S.sel ? (S.selA && S.selA.r>=1 ? S.selA : {r:S.sel.r, c:S.sel.c}) : S.active;
@@ -23948,7 +23947,7 @@ function render(){
         }
         fr+='<td class="'+fcls+'"></td>';
       }
-      g.innerHTML+=fr+'</tr>'; continue;
+      __gh+=fr+'</tr>'; continue;
     }
     if(rowHidden(r)) continue;   // r179: collapsed group detail
     let grpCls='', grpGlyph='';
@@ -24135,8 +24134,9 @@ function render(){
         break; } } }
       row+=`<td data-r="${r}" data-c="${c}" class="${cls.join(' ')}" style="min-width:${__ew[c]}px;max-width:${__ew[c]}px${extraStyle}">${txt}</td>`;
     }
-    row+='</tr>'; g.innerHTML+=row;
+    row+='</tr>'; __gh+=row;
   }
+  g.innerHTML=__gh;   /* r452 P0-1: the one and only grid write */
   // r401 (Wolf): pop the pip that was just eaten — one-shot, added after the grid is built so it
   // isn't wiped by the innerHTML rebuild, and only on the render right after a fresh collect.
   if(__pipFresh>=0 && __navPath && __navPath[__pipFresh]){
@@ -25784,36 +25784,12 @@ function _showResults(o){
   const spi=$('rmSaveProgInline'); if(spi) spi.onclick=()=>openAuth('signup');
   const rmd=$('rmDaily'); if(rmd) rmd.onclick=()=>{ hideResults(); openDailyChallenge(); };   /* r362 */
   $('result').innerHTML='';
-  // placement verdict + share card (appended post-render; independent of the modal template)
+  /* r452: the `if(placementMode){...}` placement-verdict + share block (27 lines) deleted —
+     UNREACHABLE. placementMode could only ever be set true by startPlacement(), which had zero
+     callers repo-wide, so this branch has never run. (HK_PLACEMENT in lb.js is a different,
+     live system and is untouched.) The weekly / race / share rows below are all live. */
   try{
     const card = m.querySelector('.pc-card, .res-card, div');
-    if(placementMode){
-      placementMode=false;
-      const verdict=placementVerdict(parseFloat(o.t), CHALLENGES[cur].par);
-      const v=document.createElement('div');
-      v.style.cssText='font-family:var(--mono);font-size:14px;color:var(--warn);margin:10px 0 2px;font-weight:700;letter-spacing:.4px';
-      v.textContent='\ud83c\udfaf placement: '+verdict;
-      if(card) card.insertBefore(v, card.children[1]||null);
-      // r148: the verdict gets a NUMBER \u2014 percentile vs distinct-user bests on this
-      // board \u2014 plus a share card. Recruiting season wants something postable.
-      let sub='placement: '+verdict;
-      if(sb){ try{
-        sb.from('runs').select('user_id,time_ms').eq('challenge',cur).eq('mouse_used',false)
-          .then(r=>{ try{
-            const best={}; (r.data||[]).forEach(x2=>{ if(best[x2.user_id]===undefined||x2.time_ms<best[x2.user_id]) best[x2.user_id]=x2.time_ms; });
-            const times=Object.values(best); if(times.length<5) return;   // a 3-person field isn't a percentile
-            const tm=parseFloat(o.t)*1000;
-            const beat=times.filter(x2=>x2>tm).length;
-            const line=' \u2014 faster than '+Math.round(100*beat/times.length)+'% of '+times.length+' analysts';
-            v.textContent+=line; sub+=line;
-          }catch(e){} });
-      }catch(e){} }
-      const shp=document.createElement('button');
-      shp.className='ob-key'; shp.style.cssText='margin-top:8px;width:100%';
-      shp.textContent='\u2b07 share your verdict';
-      shp.onclick=()=>{ makeShareCard(Object.assign({}, o, {sub})); try{ ev('placement_share'); }catch(e){} };
-      if(card) card.insertBefore(shp, v.nextSibling);
-    }
     if(weeklyMode && weeklyIdx+1<weeklyList.length){
       const nx=document.createElement('button');
       nx.className='ob-key primary'; nx.style.cssText='margin-top:10px;width:100%';
@@ -26689,9 +26665,12 @@ function gradePass(){ return CHALLENGES[cur].checks(S).every(c=>c.ok||c.bonus); 
 function updateChecklist(){
   const el=$('checklist'); if(!el||!S) return;
   if(sandboxMode || !CHALLENGES[cur]){ el.innerHTML=''; return; }   // r238: the sandbox has no checklist
-  el.classList.toggle('dense', (CHALLENGES[cur].checks(S)||[]).length>=5 || guided);
   const C=CHALLENGES[cur];
   const items=C.checks(S);
+  /* r452 (perf audit P1-2): the `dense` toggle used to run the WHOLE grader a second time just
+     to read `.length`. Same tick, same state, same array — read the pass we already have. Drops
+     the per-keystroke grader passes from 4 to 3 (worst drill `recon` 0.590ms/pass). */
+  el.classList.toggle('dense', (items||[]).length>=5 || guided);
   try{ hkSplitTick(items); }catch(e){}   /* r421 §2.1: latch per-beat splits off this grading pass */
   try{ hkTierTick(items); }catch(e){}    /* r421 §2.5: a completed tier paints its next region in live */
   /* r452 §3.0.2(1): on the Keyboard Tour the checklist shows ONLY the open stage's beats — the
@@ -26710,7 +26689,7 @@ function updateChecklist(){
   if(running && !done && !demoPlaying && !echoOn && gameMode!=='rapidfire' &&
      S._sndOkN!==undefined && n>S._sndOkN && n<items.length && !coreDone){ try{ playObjectiveDing(); }catch(e){} }
   S._sndOkN=n;
-  let nextDone=false;
+  let nextDone=false, __clNextIdx=-1;
   /* r421: the header counts CORE beats (the win condition); a declared ☆ shows beside it,
      lit once cleared (§2.2). A live mistakes-replay (§2.7) counts only its targeted beats. */
   const __bonusItem=items.find(x=>x.bonus);
@@ -26738,7 +26717,7 @@ function updateChecklist(){
     /* r423 (Wolf round-2 §2): the ☆ is a MYSTERY slot — never the highlighted next beat,
        never guide-lit. (A mistakes-replay that targets the missed ☆ is the one exception:
        the results card already named it, so the rep shows it openly.) */
-    const isNext = !i.ok && !nextDone && isTarget && !isBonus; if(isNext) nextDone=true;
+    const isNext = !i.ok && !nextDone && isTarget && !isBonus; if(isNext){ nextDone=true; __clNextIdx=idx; }
     const __g = (typeof C.guide==='function') ? (C.__gCache || (C.__gCache=C.guide.call(C))) : C.guide;
     const keys = ((hints||guided) && __g && __g[idx] && !isBonus) ? `<div class="cl-keys">${__g[idx]}${guideAltNote(__g[idx])}</div>` : '';
     /* r421 §2.1: a completed row shows its split beside the ✓ — dim ink, PB-delta tinted
@@ -26766,6 +26745,16 @@ function updateChecklist(){
   try{ if(window.hkMacifyKbds) window.hkMacifyKbds(el); }catch(e){}   // r279: Mac keycap language
   // r134: AUTOSCROLL — long checklists scroll inside .cl-body; keep the next failing
   // task in view (scoped scrollTop math, never scrollIntoView — that can jiggle the page)
+  /* r452 (perf audit P0-3): the scrollHeight/clientHeight/offsetTop reads sit immediately after
+     `el.innerHTML=html` AND immediately after render() invalidated the whole document layout —
+     the second of three forced relayouts per keystroke (0.05ms write vs 1.026ms write+read on
+     an otherwise-clean layout, ~13ms/key in the real profile). The scroll only ever needs to
+     move when the highlighted `.cl-item.next` actually CHANGES, which happens once per beat,
+     not once per keystroke. Cache it (keyed by drill so a fresh board always scrolls once) and
+     skip the reads entirely on every other call. Same scroll position whenever it does change. */
+  const __clKey = cur+'|'+__clNextIdx+'|'+(microRun?'m':'')+(hints?'h':'')+(guided?'g':'');   // hints/guided change the row height, so they re-arm the scroll too
+  if(__clKey===window.__clLastNext) return;
+  window.__clLastNext=__clKey;
   try{
     const bodyEl=el.querySelector('.cl-body'), nx=el.querySelector('.cl-item.next');
     if(bodyEl && nx && bodyEl.scrollHeight>bodyEl.clientHeight+4){
@@ -26869,6 +26858,30 @@ function logKey(t){ keyLog.push(t); keyTimes.push(running ? Math.round(performan
    drive logKey too, but their keys shouldn't score flow. Purely cosmetic (never gates
    a win), so it stays out of the parity/replay assertions. */
 let hkCombo=0, hkComboMax=0, _hkComboLastT=0;
+/* r452 (perf audit P0-2): restart #hkCombo's `comboThrob` keyframes WITHOUT the classic
+   `classList.remove(); void el.offsetWidth; classList.add()` trick. That offsetWidth read
+   fires immediately after render() has rewritten the whole grid, so it forced a full relayout
+   of the freshly-built ~200-cell table on every productive keystroke — measured 4.57ms/key
+   self time, 13.2% of a 300-key CPU profile, essentially all of it the forced layout (the
+   three classList lines cost 0.012ms on a clean layout).
+   Two layout-free paths, in order:
+     1. the animation is still running (the common case — a flow streak means keys inside the
+        0.28s window): re-play the live CSSAnimation, which resets currentTime to 0 instantly.
+     2. it already finished (getAnimations() drops a finished, fill:none animation) — drop the
+        class and re-add it two frames later, so the intervening style recalc sees it absent
+        and the next one starts a fresh animation. One frame of delay, no forced layout. */
+function hkPeakRestart(el){
+  try{
+    el.classList.add('peak');
+    let an=[];
+    try{ an=(el.getAnimations?el.getAnimations():[]).filter(a=>a.animationName==='comboThrob'); }catch(e){}
+    if(an.length){ an.forEach(a=>{ try{ a.cancel(); a.play(); }catch(e){} }); return; }
+    if(el.__peakQ) return;                       // a re-add is already in flight — don't stack frames
+    el.__peakQ=1; el.classList.remove('peak');
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      try{ el.__peakQ=0; if(el.classList.contains('show')) el.classList.add('peak'); }catch(e){} }));
+  }catch(e){}
+}
 function hkComboTick(){
   try{
     if(!running || done || demoPlaying || echoOn || (typeof __tourI!=='undefined'&&__tourI>=0) || gameMode!=='classic'){ return; }
@@ -26880,7 +26893,7 @@ function hkComboTick(){
     if(hkCombo>=4){
       el.textContent='×'+hkCombo+' flow';
       el.classList.add('show'); el.classList.toggle('hot', hkCombo>=12);
-      el.classList.remove('peak'); void el.offsetWidth; el.classList.add('peak');
+      hkPeakRestart(el);   /* r452 P0-2: restart the throb without the `void el.offsetWidth` reflow */
     } else { el.classList.remove('show','hot'); }
   }catch(e){}
 }
@@ -30602,106 +30615,23 @@ async function playDemo(){
   if(kf) kf.classList.remove('demo');
   demoPlaying=false; updateDemoBtn();
   loadChallenge(cur);
-  const r2=$('result'); if(r2){ r2.className='result'; r2.innerHTML='your turn — or <b>⌨ learn mode</b> to walk the steps yourself'; }
+  const r2=$('result'); if(r2){ r2.className='result'; r2.innerHTML='your turn'; }   /* r452: the "⌨ learn mode" offer went with the retired echo feature */
 }
-$('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():(echoOn?echoStop():playDemo()); });
+$('demoBtn').addEventListener('click',()=>{ demoPlaying?cancelDemo():playDemo(); });
 
 /* ============================================================
-   r281 (#27) ECHO MODE — watch it, then DO it.
-   The same demo script drives both: watch replays the keys, echo hands
-   them to YOU. The spotlight frames each step and names the chord; only
-   the asked-for keys reach the engine — anything else is swallowed with
-   a caption shake. Esc bails; drill switches abort via loadChallenge.
-   Echoed runs never score (checkWin guard) — finish resets the board
-   for a real run. The gate listener runs CAPTURE-phase so it beats the
-   game handler; synthetic (untrusted) keys pass untouched, which keeps
-   the replay/parity suites and watch mode out of its way.
+   r452: ECHO / "learn mode" (r281 #27) DELETED — 103 lines (updateEchoBtn, echoAbort,
+   echoStop, echoStep, echoStart, echoDone, echoNudge, echoMatch, the capture-phase keydown
+   gate, the mouseup re-assert and the #echoBtn wiring). r401 pulled the button out of the bar
+   and left the wiring guarded by `if(eb)`, which made echoStart() unreachable — so `echoOn`
+   has been permanently false ever since and every line above was dead. Confirmed by the r452
+   perf/stale audit (PIPELINE.md's "~90 unreachable lines", measured at 91 for the block plus
+   the listeners) and by `grep -c 'id="echoBtn"' index.html` -> 0.
+   The `let echoOn=false` declaration STAYS: ~20 engine guards still read it as a cheap "not in a
+   scripted replay" test and they live in regions other rounds own; it is now a constant false.
+   Its one dead rule (#demoSpotCap.echo-miss) went too; @keyframes echoShake stays — the
+   rejected-formula shake (td.fx-badformula .edbox) still uses it.
    ============================================================ */
-function updateEchoBtn(){ const b=$('echoBtn'); if(b){ b.classList.toggle('on',echoOn);
-  b.innerHTML=echoOn?'<kbd>esc</kbd> stop':'⌨ learn mode'; } }
-function echoAbort(){ if(!echoOn) return; echoOn=false; echoState=null;
-  try{ demoSpotOff(); updateEchoBtn(); const kf=$('keyflash'); if(kf) kf.classList.remove('demo'); }catch(e){} }
-function echoStop(){ if(!echoOn) return;
-  try{ ev('echo_stop',{d:cur, step:(echoState?echoState.mi:0)}); }catch(e){}
-  echoAbort(); loadChallenge(cur);
-  const r=$('result'); if(r){ r.className='result'; r.innerHTML='your turn'; } }
-function echoStep(){
-  const st=echoState; if(!st||!echoOn) return;
-  const mv=st.moves[st.mi]; if(!mv) return;
-  setDemoSel(mv.sel);
-  demoSpotTo(mv.sel, st.mi+1, st.moves.length, demoSpotKeys(mv.keys), false, mv.watch||null);
-}
-function echoStart(){
-  if(echoOn||demoPlaying||!S) return;
-  loadChallenge(cur);
-  try{ hkGateClear(); }catch(e){}   /* r450: learn mode asks for the demo's chords by name — the first one is the LESSON, not a start key */
-  const C=CHALLENGES[cur]; const moves=typeof C.demo==='function'?C.demo.call(C):C.demo;
-  if(!moves||!moves.length) return;
-  echoOn=true; echoState={moves:moves, mi:0, ki:0, miss:0};
-  try{ ev('echo_start',{d:cur}); }catch(e){}
-  updateEchoBtn();
-  const kf=$('keyflash'); if(kf) kf.classList.add('demo');
-  const r=$('result'); if(r){ r.className='result'; r.innerHTML='⌨ learn mode — press each highlighted chord yourself · <kbd>esc</kbd> bails'; }
-  setTimeout(echoStep,150);
-}
-function echoDone(){
-  const missed=echoState?echoState.miss:0;
-  try{ ev('echo_done',{d:cur, miss:missed}); }catch(e){}
-  echoAbort(); loadChallenge(cur);
-  const r=$('result'); if(r){ r.className='result';
-    r.innerHTML='⚡ you walked the whole line'+(missed?' ('+missed+' stray key'+(missed>1?'s':'')+')':'')+' — board’s reset, now run it for time'; }
-}
-function echoNudge(){
-  if(echoState) echoState.miss++;
-  try{ const cap=$('demoSpotCap'); if(cap){
-    cap.classList.remove('echo-miss'); void cap.offsetWidth; cap.classList.add('echo-miss'); } }catch(e){}
-}
-/* does this real keydown perform the expected spec? Mac-fluent: ⌘ plays ctrl,
-   ⌥ dead characters recover via e.code, ⌘T≡F4, ⌃U≡F2, ⌃⌘V≡Ctrl+Alt+V, ⌘⇧T≡Alt+=.
-   r452 (audit P2-3): there is now exactly ONE Mac adapter. This used to carry a second,
-   subtly different copy of hkMacAdapt's logic (its ⌥ recovery only fired on non-alphanumeric
-   keys), so the echo layer and the live handler could — and did — disagree about a chord. */
-function echoMatch(e, x){
-  const xk=x.key||'';
-  const a=(HK_MAC && hkMacAdapt(e)) || e;
-  const key=a.key, ctrl=!!a.ctrlKey, alt=!!a.altKey, shift=!!a.shiftKey;
-  if(ctrl!==!!x.ctrl) return false;
-  if(x.alt && !alt) return false;
-  if(!x.alt && x.ctrl && alt) return false;          // ctrl+alt+X is a DIFFERENT chord than ctrl+X
-  if(xk.length===1){
-    if(xk===' '){ return key===' ' && shift===!!x.shift; }   // space vs shift+space differ
-    if(key.length!==1) return false;
-    return key===xk || key.toLowerCase()===xk.toLowerCase();        // symbols prove their own shift
-  }
-  if(key!==xk) return false;                          // named keys exact…
-  return shift===!!x.shift;                           // …and shift+arrow ≠ arrow
-}
-document.addEventListener('keydown', function(e){
-  if(!echoOn || !e.isTrusted) return;
-  // a modal owns the keyboard — echo waits rather than eating its keys
-  if(pickerOpen||authOpen||modesOpen||themesOpen||kbdOpen||sessionOpen||window.__hkCelOpen||__tourI>=0) return;
-  const st=echoState; if(!st) return;
-  const mv=st.moves[st.mi]; const exp=mv&&mv.keys[st.ki];
-  if(e.key==='Escape' && !(exp&&exp.key==='Escape')){ e.preventDefault(); e.stopPropagation(); echoStop(); return; }
-  if(!exp) return;
-  if(e.key==='Control'||e.key==='Meta'||e.key==='Shift') return;    // held-modifier preamble
-  if(e.key==='Alt'&&exp.key!=='Alt'){ if(exp.alt) return;           // alt going down ahead of alt+=
-    e.preventDefault(); e.stopPropagation(); echoNudge(); return; } // stray alt would open the ribbon
-  if(echoMatch(e, exp)){
-    st.ki++;
-    if(st.ki>=mv.keys.length){
-      st.mi++; st.ki=0;
-      if(st.mi>=st.moves.length) setTimeout(echoDone, 420);
-      else setTimeout(echoStep, 380);
-    } else setTimeout(function(){ try{ demoSpotSync(); }catch(_){} }, 30);
-    // fall through — the engine executes the key for real
-  } else { e.preventDefault(); e.stopPropagation(); echoNudge(); }
-}, true);
-// clicks move the selection out from under the script — re-assert the step
-document.addEventListener('mouseup', function(e){
-  if(echoOn && e.target && e.target.closest && e.target.closest('#grid')) setTimeout(echoStep, 60);
-}, true);
-{ const eb=$('echoBtn'); if(eb) eb.addEventListener('click',()=>{ echoOn?echoStop():echoStart(); }); }   /* r401: 'learn' button retired from the bar — guard the wiring so its absence never throws */
 
 /* r283 STUCK NUDGE (Wolf) — a fresh player staring at a drill with zero checklist
    progress for 40s doesn't know the trainers exist. One quiet pointer per drill
@@ -30709,22 +30639,45 @@ document.addEventListener('mouseup', function(e){
    disarms it for that load; window.* state avoids TDZ (loadChallenge runs at boot). */
 function __stkOk(){ try{ const C=CHALLENGES[cur]; if(!C||!C.checks||!S) return null;
   return C.checks.call(C,S).filter(c=>c&&c.ok).length; }catch(e){ return null; } }
-setInterval(()=>{ try{
+/* r452 (perf audit P1-3): this was a bare `setInterval(...,3000)` that was NEVER cleared — it
+   ticked for the whole session (and keeps ticking on a backgrounded tab, where setInterval is
+   only clamped, not suspended), and every tick ran `l.getClientRects()`, a forced layout, plus
+   a full grader pass. It is only ever useful between a drill load and the moment __stkDone
+   latches, so the timer now RUNS ONLY IN THAT WINDOW. `window.__stkDone` is an accessor:
+   latching it true clears the interval, and loadChallenge's existing `__stkDone=false` re-arms
+   it — no edit to loadChallenge, and the nudge still gets exactly one shot per drill load.
+   The landing test also latches now ('gone' is only ever ADDED, never removed), so the layout
+   read happens at most until the landing goes and never again. */
+let __stkIV=null, __stkDoneV=false, __stkLandGone=false;
+function __stkTick(){ try{
   if(!S || done || demoPlaying || echoOn || gameMode!=='classic' || window.__stkDone) return;
   if(authOpen || pickerOpen || modesOpen || themesOpen || kbdOpen || sessionOpen || window.__hkCelOpen) return;
   if(typeof __tourI!=='undefined' && __tourI>=0) return;
   // actually-rendered check — onboarded boots hide the landing without the 'gone' class
-  const l=$('landing'); if(l && !l.classList.contains('gone') && l.getClientRects().length>0) return;
+  if(!__stkLandGone){
+    const l=$('landing'); if(l && !l.classList.contains('gone') && l.getClientRects().length>0) return;
+    __stkLandGone=true;   // the landing never comes back once it is down
+  }
   if(window.__stkBase==null){ window.__stkBase=__stkOk(); return; }
   const nowOk=__stkOk(); if(nowOk==null) return;
   if(nowOk>window.__stkBase){ window.__stkDone=true; return; }   // they're moving — never interrupt
   if(Date.now()-(window.__stkT||0) < 40000) return;
   window.__stkDone=true;
-  showToast('stuck? \u25b6 watch solution plays the line \u00b7 \u2328 learn mode walks you through it \u00b7 F1 shows the keys \u00b7 guided fences the cursor');
-  ['demoBtn','echoBtn','guideToggle'].forEach(id=>{ const b=$(id); if(b){ b.classList.add('nudge');
+  /* r452: the toast used to advertise "⌨ learn mode walks you through it" and pulse #echoBtn —
+     a feature retired in r401 and deleted above, and a button that has not existed since. */
+  showToast('stuck? ▶ watch solution plays the line · F1 shows the keys · guided fences the cursor');
+  ['demoBtn','guideToggle'].forEach(id=>{ const b=$(id); if(b){ b.classList.add('nudge');
     setTimeout(()=>{ try{ b.classList.remove('nudge'); }catch(e){} }, 6000); } });
   try{ ev('stuck_nudge',{d:cur}); }catch(e){}
-}catch(e){} }, 3000);
+}catch(e){} }
+try{
+  Object.defineProperty(window,'__stkDone',{ configurable:true,
+    get(){ return __stkDoneV; },
+    set(v){ __stkDoneV=!!v;
+      if(__stkDoneV){ if(__stkIV){ clearInterval(__stkIV); __stkIV=null; } }
+      else if(!__stkIV){ __stkIV=setInterval(__stkTick,3000); } } });
+}catch(e){ __stkIV=setInterval(__stkTick,3000); }   // no accessor? fall back to the old always-on timer
+window.__stkDone=false;   // arms the first window
 
 /* ============================================================
    LOAD / RESET
@@ -31375,6 +31328,19 @@ window.hkEntitlementRefresh = function(){
   try{ if(pickerOpen){ buildSheetTabs(); highlightPk(); } }catch(e){}
   try{ if($('campaignModal') && $('campaignModal').classList.contains('show')) openCampaign(); }catch(e){}
 };
+/* r452 (perf audit P0-4): #gateModal is a SINGLETON, but openGateInfo used to attach a fresh
+   document-keydown Escape handler and a fresh backdrop click handler on every call, and its
+   `close()` closure could only ever remove the newest one. Measured: 30 loadChallenge() over
+   the catalog left +11 keydown and +11 click listeners with ZERO removals — and 49 of 74 drills
+   are gate-locked, so arrowing the picker piles dead handlers onto the hot keydown path. Both
+   handlers are now module-scope singletons bound ONCE at element creation; they no-op while the
+   modal is hidden, which is exactly what removing them used to achieve. */
+function gateInfoClose(){ const m=$('gateModal'); if(m) m.classList.remove('show'); }
+function gateInfoEsc(e){
+  if(e.key!=='Escape') return;
+  const m=$('gateModal'); if(!m || !m.classList.contains('show')) return;
+  e.preventDefault(); e.stopPropagation(); gateInfoClose();
+}
 function openGateInfo(gname){
   const g=(window.HOTKEY_GATES&&window.HOTKEY_GATES.groups||{})[gname]; if(!g) return;
   // r174: mid-tour a locked tier gets a toast, not a modal — the tour scrim sits
@@ -31383,7 +31349,10 @@ function openGateInfo(gname){
   const lv=lvlOf(myXpEst()), cl=paceClears();
   const lvOK=lv>=g.lvl, clOK=cl>=g.clears;
   let m=$('gateModal');
-  if(!m){ m=document.createElement('div'); m.id='gateModal'; m.className='onboard-modal'; document.body.appendChild(m); }
+  if(!m){ m=document.createElement('div'); m.id='gateModal'; m.className='onboard-modal'; document.body.appendChild(m);
+    document.addEventListener('keydown',gateInfoEsc,true);              // r174: a modal without keyboard dismissal is a trap
+    m.addEventListener('click',e=>{ if(e.target===m) gateInfoClose(); });   // backdrop — bound once, at creation
+  }
   m.innerHTML='<div class="ob-card" style="max-width:440px;position:relative;text-align:left">'+
     '<a class="modal-x" id="gateX">\u00d7</a>'+
     '<div class="ob-title">'+gname+' \u2014 locked, for now</div>'+
@@ -31398,12 +31367,8 @@ function openGateInfo(gname){
       '<button class="ob-key" id="gatePro" style="color:var(--warn)">\u25c6 PRO skips the wait</button>'+
     '</div></div>';
   m.classList.add('show');
-  const __esc=(e)=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); close(); } };
-  const close=()=>{ m.classList.remove('show'); document.removeEventListener('keydown',__esc,true); };
-  document.addEventListener('keydown',__esc,true);   // r174: a modal without keyboard dismissal is a trap
-  $('gateX').onclick=close; $('gateGo').onclick=close;
-  $('gatePro').onclick=()=>{ close(); if(window.hkProSheet) window.hkProSheet('The '+gname+' tier'); };
-  m.addEventListener('click',e=>{ if(e.target===m) close(); },{once:true});
+  $('gateX').onclick=gateInfoClose; $('gateGo').onclick=gateInfoClose;
+  $('gatePro').onclick=()=>{ gateInfoClose(); if(window.hkProSheet) window.hkProSheet('The '+gname+' tier'); };
   try{ ev('gate_hit',{g:gname, lvl:lv, clears:cl}); }catch(e){}
 }
 /* ============================================================================
@@ -31475,11 +31440,11 @@ function openPaywall(key){
    daily-board bug (r362). The Daily Mix owns the ritual now. */
 document.addEventListener('click',(e)=>{ const p=$('wqPop');   // r157: same closer for the weakness queue
   if(p && p.classList.contains('show') && !e.target.closest('#wqPop') && !e.target.closest('#wqBtn')) p.classList.remove('show'); });
-function sheetMarkWin(){ /* r363: retired with the sheet — kept as a no-op for one release so any stale caller can't throw */ }
+/* r452: sheetMarkWin() deleted — an empty no-op kept "for one release" in r363, ~89 revisions
+   and zero callers ago. */
 /* r452: the Ranked opt-in flag lb.js/nav.js read — used by the ladder's placement ride-through */
 function hkRankedEntered(){ try{ return localStorage.getItem('hk_ranked')==='1'; }catch(e){ return false; } }
 function loadChallenge(key, opts){
-  try{ echoAbort(); }catch(e){}
   /* r452: any load that is not the Tour's own board leaves the Tour — the picker, a drill
      switch, the ? sheet's replay. Tears down the HUD, any stage card, and the forced ribbon bar. */
   let __tourReload=false;
@@ -31613,9 +31578,7 @@ function loadChallenge(key, opts){
    All the maps below are thin aliases. If you're adding a new drill, edit drills.js — not here.
    We also inject name/label from drills.js into each CHALLENGES entry (further down) so the
    trainer never reads a stale value. */
-const DRILL_DESC   = window.HOTKEY_DRILLS.descOf;
-const DRILL_GROUPS = window.HOTKEY_DRILLS.groups;
-const TAB_LABEL    = window.HOTKEY_DRILLS.tabOf;
+const DRILL_GROUPS = window.HOTKEY_DRILLS.groups;   /* r452: DRILL_DESC / TAB_LABEL deleted — two SSOT aliases nobody read */
 const GROUP_OF     = window.HOTKEY_DRILLS.groupOf;
 // MENU_ORDER preserves the original behavior of falling back through CHALLENGES for any keys
 // that exist in the engine but aren't yet listed in drills.js (defensive — shouldn't happen
@@ -32632,6 +32595,10 @@ function showOnboard(){
 }
 function closeOnboard(){ onboardOpen=false; const o=$('onboard'); if(o) o.classList.remove('show'); }
 function skipOnboard(){ markOnboarded(); closeOnboard(); ev('tutorial_skip'); }
+/* r452: startPlacement() deleted — zero callers, and it was the ONLY thing that could set
+   placementMode true, so the whole placement path (its verdict function and the results-card
+   branch) was unreachable. The flag itself stays declared: two live resets still assign it
+   false from regions this round does not own, and it is now a constant false. */
 let placementMode=false;
 function startPlacement(){
   markOnboarded(); closeOnboard(); ev('tutorial_start');
@@ -33165,15 +33132,6 @@ function hkLessonReopen(){
   hkLessonCard({ caption:'LESSON · '+String(C.lesson.title||'').toUpperCase(),
     title:C.lesson.title||'', body:escHtml(String(C.lesson.body||'')), keys:C.lesson.keys||[],
     go:'press any key to close' }, ()=>{});
-}
-// time-vs-par → starting-rung verdict (display only; the real ladder is earned on the boards)
-function placementVerdict(t, par){
-  const r = t/Math.max(1,par);
-  if(r<=1.0) return 'Second-Year Analyst pace';
-  if(r<=1.5) return 'Associate pace';
-  if(r<=2.2) return 'First-Year Analyst pace';
-  if(r<=3.0) return 'Summer Analyst pace';
-  return 'Candidate — the ladder starts here';
 }
 /* r452 (spec §1.7): startGuidedIntro + introRibbonPeek are RETIRED (25 lines). The ribbon
    peek was a DEMO of the ribbon; it is now Keyboard Tour stage 5 — live, hands-on, with the
