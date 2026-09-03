@@ -565,7 +565,9 @@ try {
       // a drill-level property only — two-space indent inside the block, i.e. four columns in.
       // check LABELS (`{label:'…'` inside checks()) are indented deeper and are not this class.
       const hit = s.match(/^    (name|label)\s*:/);
-      if (hit) {
+      /* r452: the Keyboard Tour (`keyboardtour`, tour:true) is NOT a catalog drill — drills.js meta
+         does not carry it, so its display strings legitimately live inline. The only exemption. */
+      if (hit && key !== 'keyboardtour') {
         n14++;
         bad(`C16: index.html:${base + i} CHALLENGES.${key} carries an inline \`${hit[1]}:\` — drills.js meta is the SSOT for display strings (drills.js header, lines 8-10); delete it, don't sync it`);
       }
@@ -758,6 +760,185 @@ try {
   if (!n16) ok(`capstone medals: every hkCapstoneDone key is live or its medal is hidden (${hid} hidden), x_allach counts visible only`);
 } catch (e) {
   bad('C22 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C24 (r452, dev/TUTORIAL_CHAPTER_SPEC.md §7): THE KEYBOARD TOUR IS NOT A DRILL ----
+   The Tour hangs off the drill engine — a CHALLENGES entry with build/checks/targets and the
+   r421 §2.5 tier ladder — but it must never be ONE. It carries no par, so a clock over it would
+   read `undefineds`; it is untimed, so a leaderboard row from it would be meaningless; and it is
+   not in the marketing count. Nothing structural stops a later edit from adding it to
+   drills.js's menuOrder or to HOTKEY_PARS, and MENU_ORDER's fallback (index.html: "Drills in
+   engine but not drills.js") would have ADOPTED it automatically if the `tour:true` filter were
+   ever dropped — silently putting a four-minute untimed tutorial into the picker, the drill
+   count, prev/next, the random pool and the weekly bag. So the exclusions are asserted, one by
+   one, and so is the shape the HUD and the staging depend on.
+
+   Second half: the LESSON-DRILL contract (§1.5, §1.6, §2). No lesson drill exists yet — the four
+   of §3.1–3.4 are a later wave — so these are ZERO-CASE guards today. They are written now, with
+   the platform, precisely so the wave that adds the drills inherits them (WORKFLOW §3.3). ---- */
+try {
+  const sb15 = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
+  vm.createContext(sb15);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sb15);
+  const W15 = sb15.window;
+  const D15 = W15.HOTKEY_DRILLS || {};
+  const idx15 = fs.readFileSync('index.html', 'utf8');
+  const KT = 'keyboardtour';
+
+  /* ---- the Tour is nowhere in the catalog plumbing ---- */
+  const menu = D15.menuOrder || [];
+  if (menu.includes(KT)) bad(`C24: '${KT}' is in drills.js menuOrder — the Tour is not a drill (§2(g))`);
+  for (const [name, map] of [['HOTKEY_PARS', W15.HOTKEY_PARS], ['HOTKEY_CLOCKS', W15.HOTKEY_CLOCKS]])
+    if (map && KT in map) bad(`C24: '${KT}' is in ${name} — it must be impossible to time the Tour (§7)`);
+  if ((W15.HOTKEY_CHALLENGE_POOL || []).includes(KT)) bad(`C24: '${KT}' is in HOTKEY_CHALLENGE_POOL`);
+  if (((W15.HK_PLACEMENT || {}).KEYS || []).includes(KT)) bad(`C24: '${KT}' is in HK_PLACEMENT.KEYS`);
+  for (const t of Object.keys(W15.HK_TRACKS || {}))
+    if ((W15.HK_TRACKS[t].keys || []).includes(KT)) bad(`C24: '${KT}' is in HK_TRACKS.${t}.keys`);
+  for (const c of ((W15.HOTKEY_CAMPAIGN || {}).chapters || []))
+    if ((c.keys || []).includes(KT)) bad(`C24: '${KT}' is in HOTKEY_CAMPAIGN chapter ${c.id}`);
+  for (const g of (D15.groups || []))
+    if ((g.keys || []).includes(KT)) bad(`C24: '${KT}' is in drills.js group '${g.name}'`);
+  if ((D15.meta || {})[KT]) bad(`C24: drills.js meta.${KT} exists — the Tour has no picker entry (§2(g))`);
+  /* the filter that keeps MENU_ORDER's fallback from re-adopting it */
+  if (!/filter\(k\s*=>\s*!g\.includes\(k\)\s*&&\s*!CHALLENGES\[k\]\.tour\)/.test(idx15))
+    bad('C24: MENU_ORDER\'s fallback no longer filters `tour:true` entries — keyboardtour would ' +
+        'silently join the catalog (index.html, the `Drills in engine but not drills.js` block)');
+
+  /* ---- the Tour's own shape, read out of its CHALLENGES chunk ---- */
+  const s15 = idx15.indexOf('const CHALLENGES = {');
+  const e15 = idx15.indexOf('STATE + ENGINE', s15);
+  const body15 = idx15.slice(s15, e15);
+  const parts15 = body15.split(/\n  ([a-z][a-z0-9_]*):\s*\{/);
+  const chunks15 = {};
+  for (let i = 1; i < parts15.length; i += 2) chunks15[parts15[i]] = parts15[i + 1] || '';
+  const tc = chunks15[KT];
+  if (!tc) bad(`C24: CHALLENGES.${KT} not found — the Keyboard Tour board is gone`);
+  else {
+    if (!/\btour\s*:\s*true/.test(tc)) bad(`C24: ${KT} must declare tour:true (that flag is what keeps it out of MENU_ORDER)`);
+    if (/\bpar\s*:/.test(tc) || /\bparKeys\s*:/.test(tc))
+      bad(`C24: ${KT} declares a par — it must be impossible to time the Tour (§7)`);
+    if (/saveClose\s*:\s*true/.test(tc))
+      bad(`C24: ${KT} declares saveClose — hkSaveCloseWire would append a 25th beat over stage 6's own save`);
+    const ci = tc.indexOf('checks(');
+    const nChecks = ci >= 0 ? (tc.slice(ci).match(/\{label:/g) || []).length : 0;
+    if (nChecks !== 24) bad(`C24: ${KT} has ${nChecks} beats, expected 24 (§3.0.5: 5·4·5·4·5·1)`);
+    /* targets are index-paired with checks and exactly ONE is null — stage 6 beat 1 (Ctrl+S has
+       no cell on the grid, §3.0.2(2)); the HUD alone carries that beat, by design, not by gap */
+    const tm = /targets\(\)\s*\{[\s\S]*?return\s*\[([\s\S]*?)\n      \]; \}/.exec(tc);
+    if (!tm) bad(`C24: ${KT} targets() is not a literal array (the C23 static parser reads it as one)`);
+    else {
+      const nulls = (tm[1].match(/(^|[,\s])null(?=[,\s]|$)/g) || []).length;
+      if (nulls !== 1) bad(`C24: ${KT} targets() has ${nulls} null entries, expected exactly 1 (stage 6 beat 1)`);
+    }
+    /* five staged tiers, one per stage 2-6, every checks index inside 0..23 */
+    const tiers = tc.match(/\{ label:'[^']*', checks:\[([0-9,\s]*)\]/g) || [];
+    if (tiers.length !== 5) bad(`C24: ${KT} declares ${tiers.length} tiers, expected 5 (stages 2-6, §7)`);
+    for (const t of tiers) {
+      const ix = /checks:\[([0-9,\s]*)\]/.exec(t)[1].split(',').map(x => parseInt(x, 10)).filter(x => !isNaN(x));
+      if (!ix.length) bad(`C24: ${KT} tier ${t.slice(0, 30)} lists no checks`);
+      for (const i of ix) if (i < 0 || i >= nChecks)
+        bad(`C24: ${KT} tier checks index ${i} is outside its ${nChecks}-beat checks() array`);
+    }
+    /* six stage cards, each with a title, a body of at most 60 words and a non-empty keycap strip */
+    const stagesM = /stages:\s*\[([\s\S]*?)\n    \],/.exec(tc);
+    if (!stagesM) bad(`C24: ${KT} declares no stages[] (the six §1.5 lesson cards)`);
+    else {
+      const titles = stagesM[1].match(/title:'((?:[^'\\]|\\.)*)'/g) || [];
+      const bodies = stagesM[1].match(/body:'((?:[^'\\]|\\.)*)'/g) || [];
+      const keys = stagesM[1].match(/keys:\[[^\]]+\]/g) || [];
+      if (titles.length !== 6 || bodies.length !== 6 || keys.length !== 6)
+        bad(`C24: ${KT} stages: ${titles.length} titles / ${bodies.length} bodies / ${keys.length} keycap strips, expected 6 of each`);
+      bodies.forEach((b, i) => {
+        const words = b.slice(6, -1).split(/\s+/).filter(Boolean).length;
+        if (words > 60) bad(`C24: ${KT} stage ${i + 1} card body is ${words} words — the §1.5 lesson card caps at 60`);
+      });
+    }
+  }
+
+  /* ---- the HUD's per-beat strings (HK_TOUR_BEATS, beside the engine) ---- */
+  const bm = /const HK_TOUR_BEATS=\[([\s\S]*?)\n\];/.exec(idx15);
+  if (!bm) bad('C24: HK_TOUR_BEATS not found — the TUTORIAL HUD has no per-beat copy (§3.0.2)');
+  else {
+    const huds = (bm[1].match(/hud:'((?:[^'\\]|\\.)*)'/g) || []).map(x => x.slice(5, -1));
+    const nudges = (bm[1].match(/nudge:'((?:[^'\\]|\\.)*)'/g) || []).map(x => x.slice(7, -1));
+    if (huds.length !== 24) bad(`C24: HK_TOUR_BEATS carries ${huds.length} hud lines, expected 24`);
+    if (nudges.length !== 24) bad(`C24: HK_TOUR_BEATS carries ${nudges.length} nudge lines, expected 24 (every beat gets the three-miss line)`);
+    huds.forEach((h, i) => {
+      if (!h.trim()) bad(`C24: HK_TOUR_BEATS[${i}].hud is empty — the HUD is the ONLY instruction surface on the Tour`);
+      const w = h.split(/\s+/).filter(Boolean).length;
+      if (w > 14) bad(`C24: HK_TOUR_BEATS[${i}].hud is ${w} words — §3.0.2(5) caps the banner at 14 ("${h.slice(0, 50)}")`);
+      if (i && h === huds[i - 1]) bad(`C24: HK_TOUR_BEATS[${i}].hud repeats beat ${i - 1}'s line — one beat, one line`);
+    });
+  }
+
+  /* ---- the Tour's runtime seams stay wired (each was a live bug during the r452 build) ---- */
+  const seams = [
+    [/if\(done\|\|demoPlaying\|\|sandboxMode\|\|tourMode\|\|echoOn\|\|microPrefill\) return;/,
+     'checkWin no longer bails on tourMode — the Tour would stop a clock it never started, post a PB and pay xp twice (§3.0.4(4))'],
+    [/function startClock\(\)\{ if\(running\|\|done\|\|sandboxMode\|\|tourMode\)return;/,
+     'startClock no longer refuses tourMode — the untimed Tour would start running a clock (§3.0.4(6))'],
+    [/if\(tourMode\) return;\s*\/\* r452 §3\.0\.4\(6\)/,
+     'hkGateArm no longer declines the Tour — a start gate would promise a clock nothing runs (check-startgate §8)'],
+    [/if\(tourMode\)\{ try\{ hkTourChecklist/,
+     'updateChecklist lost its Tour branch — the parked stages\' beats would render (§3.0.2(1))'],
+    [/if\(tourMode\)\{ try\{ hkTourKeyWatch\(e\); \}catch\(_\)\{\} \}/,
+     'the keydown handler lost hkTourKeyWatch — no keystroke gates and no three-miss nudge (§3.0.2(3))'],
+    [/if\(tourMode\) cls\.push\('tourping'\);/,
+     'the render lost the Tour\'s .ttarget pulse — the target spotlight stops pulsing (§3.0.2(2))'],
+  ];
+  for (const [re, why] of seams) if (!re.test(idx15)) bad('C24: ' + why);
+
+  /* ---- the sandbox stays retired (§1.7 / decision T2) ---- */
+  for (const dead of ['function startSandbox', 'function sandboxReadyCard', 'function sandboxCallout',
+                      'function exitSandbox', 'function startOnboardBoard', 'function sbCell'])
+    if (idx15.includes(dead))
+      bad(`C24: '${dead}' is back in index.html — the warm-up sandbox was retired into the Keyboard Tour (§1.7, T2)`);
+  if (!/let sandboxMode=false;/.test(idx15))
+    bad('C24: sandboxMode was deleted — §8 do-not-change #6 keeps the FLAG (checkWin, updateChecklist and loadChallenge all read it)');
+  if (fs.existsSync('dev/e2e-onboard-sandbox.js'))
+    bad('C24: dev/e2e-onboard-sandbox.js is back — it tests a surface that no longer exists (§1.7)');
+
+  /* ---- the LESSON-DRILL contract (§1.5/§1.6/§2). Zero cases today, by design. ---- */
+  const lessonKeys = Object.keys(chunks15).filter(k => /\blesson\s*:\s*\{/.test(chunks15[k]));
+  const metaLesson = Object.keys(D15.meta || {}).filter(k => (D15.meta[k] || {}).lesson);
+  for (const k of lessonKeys) if (!metaLesson.includes(k))
+    bad(`C24: CHALLENGES.${k} carries a lesson but drills.js meta.${k}.lesson is not true (§2(a): the two must never drift)`);
+  for (const k of metaLesson) if (!lessonKeys.includes(k))
+    bad(`C24: drills.js meta.${k}.lesson is true but CHALLENGES.${k} declares no lesson object (§2(a))`);
+  for (const k of lessonKeys) {
+    const ch = chunks15[k];
+    const lm = /lesson:\s*\{([\s\S]*?)\}/.exec(ch);
+    const title = lm && /title:'((?:[^'\\]|\\.)*)'/.exec(lm[1]);
+    const bodyL = lm && /body:'((?:[^'\\]|\\.)*)'/.exec(lm[1]);
+    const keysL = lm && /keys:\[([^\]]*)\]/.exec(lm[1]);
+    if (!title || !bodyL || !keysL || !keysL[1].trim())
+      bad(`C24: ${k}.lesson needs title, body and a non-empty keys strip (§1.5)`);
+    else {
+      const w = bodyL[1].split(/\s+/).filter(Boolean).length;
+      if (w > 60) bad(`C24: ${k}.lesson.body is ${w} words — the lesson card caps at 60 (§1.5)`);
+    }
+    if (!/reveal\s*:\s*true/.test(ch))
+      bad(`C24: lesson drill ${k} must render its ☆ visibly (reveal:true) — the efficiency IS the lesson (§1.6)`);
+    if (!menu.includes(k)) bad(`C24: lesson drill ${k} is not in menuOrder — lesson drills ARE drills (§2(h))`);
+    if ((W15.HOTKEY_CHALLENGE_POOL || []).includes(k)) bad(`C24: lesson drill ${k} is in HOTKEY_CHALLENGE_POOL — a ≤30 s board is not a Daily Challenge (§4 A5)`);
+    if (((W15.HK_PLACEMENT || {}).KEYS || []).includes(k)) bad(`C24: lesson drill ${k} is in HK_PLACEMENT.KEYS (§7)`);
+    const par = (W15.HOTKEY_PARS || {})[k];
+    if (!(par > 0 && par <= 30)) bad(`C24: lesson drill ${k} par is ${par} — lesson pars are ≤ 30 s (§7)`);
+    const cl = (W15.HOTKEY_CLOCKS || {})[k];
+    if (!cl || Math.abs(cl.pass - par * 2) > 0.01)
+      bad(`C24: lesson drill ${k} clocks: pass must be par×2.0 (§2(b)), got ${cl && cl.pass} against par ${par}`);
+  }
+  /* reveal:true is legal ONLY on a lesson drill — navigation's game ☆ stays hidden (§1.6) */
+  for (const k of Object.keys(chunks15))
+    if (/reveal\s*:\s*true/.test(chunks15[k]) && !lessonKeys.includes(k))
+      bad(`C24: ${k} declares reveal:true but is not a lesson drill — the ☆ is a hidden discovery everywhere else (§1.6)`);
+  if (!/function hkLessonKey\(k\)\{/.test(idx15))
+    bad('C24: hkLessonKey() is gone — §2(a) names it as the single lesson-drill helper');
+
+  if (!fail) ok(`Keyboard Tour: outside the catalog, 24 beats / 24 targets / 5 tiers / 6 stage cards, ` +
+                `HUD copy + runtime seams intact, sandbox retired; ${lessonKeys.length} lesson drill(s) contract-clean`);
+} catch (e) {
+  bad('C24 could not run: ' + String(e.message || e).slice(0, 160));
 }
 
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }

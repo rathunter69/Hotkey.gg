@@ -1830,6 +1830,65 @@
   .tour-skip{color:var(--faint); cursor:pointer; padding:4px 8px}
   /* r450 (flow audit P0-2): the armed state of the two-press skip on the first three beats */
   .tour-skip.armed{color:var(--warn); font-weight:600}
+  /* ============================================================================
+     r452 (2026-09-03) THE TUTORIAL HUD — dev/TUTORIAL_CHAPTER_SPEC.md §3.0.2.
+     The Keyboard Tour's distinguishing surface: a persistent banner that names the
+     NEXT KEYSTROKE, the way a pixel-art game walks you through its controls. One
+     beat, one line, never a queue. It floats over the grid and NEVER swallows input
+     (§3.0.2(3)) — pointer-events:none, no scrim, no modal.
+     z-index 210 sits above the grid chrome (max 62) and below #tourWrap (340), so a
+     stage card always covers it. It sits BELOW the ribbon bar by construction (the
+     bar is at the top of the page; the .top flip clamps under it — §3.0.5 stage 5).
+     ============================================================================ */
+  #tourHud{position:fixed; left:50%; transform:translateX(-50%); bottom:22px; z-index:210;
+    width:min(640px, calc(100vw - 48px)); box-sizing:border-box; pointer-events:none;
+    background:var(--surface); border:1px solid var(--accent-dim); border-radius:11px;
+    box-shadow:0 6px 26px rgba(0,0,0,.34); padding:11px 18px; text-align:center;
+    font-family:var(--mono); font-size:13px; line-height:1.6; color:var(--text)}
+  #tourHud.top{bottom:auto}
+  /* the toast lane is the HUD's lane (#hkToast sits at bottom 26px). While the Tour owns the
+     board, lift every toast clear of the banner — the two on top of each other made both
+     unreadable (r452 render review). */
+  body.hk-tour #hkToast{bottom:118px}
+  .cl-callout{margin-top:10px; padding:7px 9px; border:1px solid var(--accent-dim); border-radius:7px;
+    background:color-mix(in srgb, var(--accent) 8%, transparent);
+    font-family:var(--mono); font-size:11px; line-height:1.5; color:var(--muted)}
+  #tourHud .hud-stage{display:block; margin-bottom:5px; font-size:10px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--faint)}
+  #tourHud .hud-line b{color:var(--text)}
+  #tourHud kbd{display:inline-block; font-family:inherit; font-size:12px; color:var(--text);
+    background:var(--surface2); border:1px solid var(--line); border-bottom-width:2px;
+    border-radius:5px; padding:1px 7px; margin:0 2px}
+  /* §3.0.2(3): the three-miss nudge is a SECOND line, one clause, and it never escalates */
+  #tourHud .hud-nudge{display:block; margin-top:7px; padding-top:7px; border-top:1px solid var(--line);
+    font-size:11.5px; color:var(--warn)}
+  /* §3.0.2(6) REDUCED MOTION — precedents: .hk-gate (index.html:346), .mznudge (:358),
+     #ghostCur (:449). The state change survives; only the animation goes. */
+  @media (prefers-reduced-motion: no-preference){
+    #tourHud.pulse{animation:hkHudPulse .4s ease-out}
+    @keyframes hkHudPulse{0%{border-color:var(--accent); box-shadow:0 0 0 5px var(--accent-glow), 0 6px 26px rgba(0,0,0,.34)}
+                          100%{border-color:var(--accent-dim); box-shadow:0 6px 26px rgba(0,0,0,.34)}}
+    #grid td.ttarget.tourping{animation:hkTourPing 1.5s ease-in-out infinite}
+    @keyframes hkTourPing{0%,100%{background:color-mix(in srgb, var(--accent) 9%, transparent)}
+                          50%{background:color-mix(in srgb, var(--accent) 26%, transparent)}}
+  }
+  @media (prefers-reduced-motion: reduce){
+    #tourHud.pulse{border-color:var(--accent)}
+    #grid td.ttarget.tourping{background:color-mix(in srgb, var(--accent) 20%, transparent) !important}
+  }
+  /* ---- r452 §1.5 THE LESSON CARD — one component, two consumers: the Tour's six stage
+     cards, and (dormant until the lesson drills land) a lesson drill's start gate. ---- */
+  .tour-card.lesson{width:460px}
+  .lc-body{padding:14px 16px 10px; font-family:var(--mono); font-size:12.5px;
+    color:var(--muted); line-height:1.66}
+  .lc-body b{color:var(--text)}
+  .lc-keys{display:flex; flex-wrap:wrap; gap:6px; padding:0 16px 13px}
+  .lc-keys kbd{font-family:var(--mono); font-size:11px; color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:2px 8px}
+  .lc-foot{display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:0 16px 15px; font-family:var(--mono); font-size:11px; color:var(--faint)}
+  .lc-foot .lc-go{color:var(--accent); border:1px solid var(--accent-dim); border-radius:6px; padding:4px 12px}
+  .lc-off{cursor:pointer; text-decoration:underline dotted}
     /* r68: mobile gate — the game needs a physical keyboard */
   .mobile-gate{display:none}
   @media (max-width:740px), (pointer:coarse) and (max-width:1024px){
@@ -2686,6 +2745,253 @@ function stepFsz(cur,dir){ let i=FSZ_LADDER.indexOf(cur==null?FSZ_BASE:cur); if(
   i=Math.max(0,Math.min(FSZ_LADDER.length-1,i+dir)); return FSZ_LADDER[i]===FSZ_BASE?null:FSZ_LADDER[i]; }
 
 const CHALLENGES = {
+  /* ============================================================================
+     r452 (2026-09-03) THE KEYBOARD TOUR — dev/TUTORIAL_CHAPTER_SPEC.md §3.0.
+     One board, six stages, UNTIMED, revealed a stage at a time by the r421 §2.5 tier
+     ladder (hkTiersInit / hkTierTick — the Tour is that platform piece's first consumer).
+
+     IT IS NOT A DRILL (§2(g), §3.0.4(2)): `keyboardtour` is absent from drills.js, from
+     menuOrder, HOTKEY_PARS, HOTKEY_CLOCKS, HOTKEY_CHALLENGE_POOL, HK_PLACEMENT, HK_TRACKS,
+     HOTKEY_CAMPAIGN, the leaderboards, PB and the marketing count. It carries no par, no
+     parKeys, no demo, no req, no guide and no saveClose (its stage-6 beat IS the save, hand
+     written, because hkSaveCloseWire's engine-appended closer would grade against cores that
+     the Tour never uses). checkWin() bails on tourMode, so nothing here can score.
+
+     Reached from exactly two places (§2(g)): the onboarding flow, and the ? sheet.
+
+     THE 24 BEATS carry three exact strings copied verbatim from §3.0.5 — `label` (the
+     checklist line: closed verb first, no chords, DEPTH_PASS §1.7), `hud` (the §3.0.2 banner
+     line, plain text so a test can read it off #tourHud), and `nudge` (the second HUD line
+     after three wrong keys) — plus a gate: `key` (a keystroke gate, the modal tour's `doIt`
+     step type), `entry` (type-and-commit, the modal tour's `entry`+`commit` type), an
+     end-state `ok(S)` predicate, or a pair of them.
+
+     EVERY BEAT LATCHES (S._tourOk). A tutorial's progress must not unwind: stage 3 beat 3
+     deletes a row and beat 4 puts it straight back, so beat 3's end state is false again the
+     instant beat 4 lands — and hkTierTick needs every listed check ok SIMULTANEOUSLY to open
+     the next stage's region. Sticky beats are what make both work.
+
+     DEVIATIONS FROM THE SPEC, named (§0: never silent) — each is an engine fact the spec's
+     line-anchored survey missed, and each is recorded in dev/AUDIT.md:
+       (a) The cells stage 5 dresses ship UNDRESSED. §3.0.1 lists A3:E3 bold and A4:E11 comma
+           /0dp at stage 1, but §3.0.5 stage 5 grades exactly those two properties — shipped
+           as §3.0.1 describes, three of stage 5's five beats are pre-satisfied and cannot be
+           performed. §3's page grammar already says "pre-dressed unless the lesson IS the
+           dress", and stage 5 IS the dress.
+       (b) Beat 18's label/HUD drop "no decimals". Ctrl+Shift+1 in this engine writes
+           fmtStyle 'comma' with decimals:2 (index.html:27896 — Excel's own behavior), so a
+           one-press beat cannot land 0 dp; the beat grades the comma style.
+       (c) Beat 22 says `alt h b p`, not the spec's `alt h b t`. In this engine (and in Excel
+           — see the r298 CANON note at index.html:23541) `alt h b t` is the THICK BOX border
+           and `alt h b p` is the top border. Teaching the spec's chord would teach a wrong key.
+       (d) Beats 11, 13 and 16 name the selection the chord needs. Row insert/delete fire only
+           from a full row/column selection (index.html:27446), and Alt+='s committed range
+           form takes a single column or row through its empty total (index.html:22778) — the
+           spec's HUD lines ("press ctrl+− to delete the whole row", "select the row and press
+           alt+=") would leave a player pressing a key that does nothing.
+       (e) The `Total` label (A12) reveals with the ROSTER at the top of stage 3, not with the
+           FY header at stage 4 as §3.0.1 lists it. Stage 3's fifth beat inserts a line ABOVE the
+           total line, so the total line has to be on the board while that beat is the open one —
+           and a tier's parked region is the bounding box of its reveal cells (hkTiersInit,
+           index.html:24382), so pairing A12 with F3 would have dimmed the whole live table
+           between them. Each tier now reveals one contiguous, EMPTY region, and every tier's
+           checks are exactly its stage's beats, which is what §3.0.4 asks for.
+       (f) The two memo blocks carry their title one row above the spec's range (G2 over the
+           G3:I6 select memo, G7 over the G8:I11 house-style memo) — four lines plus a block
+           title do not fit in four rows.
+       (g) Stage 4's and stage 5's card bodies are trimmed to the §1.5 60-word cap that §7
+           asserts: §3.0.5 writes them at 61 and 70 words. Only chords came out, and every one
+           of them is still on the card's keycap strip.
+     ============================================================================ */
+  keyboardtour:{
+    name:'Keyboard Tour', label:'The keyboard tour', tour:true, usesSave:true,
+    /* usesSave, NOT saveClose: Ctrl+S must SAVE here rather than restart the board
+       (index.html:27989), and hkSaveCloseWire must not append a 25th beat over the top of
+       stage 6's own hand-written save. */
+    /* §1.5 / §3.0.2(4): the six stage cards. One lesson card per stage, ≤60 words of body,
+       a keycap strip of the chords the stage teaches, dismissed by any key. */
+    stages:[
+      { title:'MOVE — the keyboard flies',
+        body:'Every cell has an address. The highlighted box is where you stand. Arrows walk one cell. Add Ctrl and you fly to the edge of the data in one press. Ctrl+Home goes to the top-left of the sheet; Ctrl+End goes to the last cell holding anything. Watch the name box as you move.',
+        keys:['←↑→↓','ctrl+←↑→↓','ctrl+home','ctrl+end'] },
+      { title:'SELECT — Shift stretches, Ctrl+Shift stretches to the edge',
+        body:'A selection is a rectangle you grow from where you stand. Hold Shift and the arrows stretch it. Add Ctrl and it stretches to the edge of the data in one press. Shift+Space takes the whole row, Ctrl+Space the whole column, Ctrl+A the whole block you are standing in.',
+        keys:['shift+←↑→↓','ctrl+shift+←↑→↓','shift+space','ctrl+space','ctrl+a'] },
+      { title:'ENTER & EDIT — type replaces, F2 edits inside',
+        body:'Typing replaces what is in a cell. Enter commits and moves down, Tab commits right, Esc backs out. F2 edits inside the cell instead of retyping it. Delete clears. Ctrl+Z undoes, Ctrl+Y redoes. Ctrl+plus inserts a row, Ctrl+minus deletes one.',
+        keys:['↵','tab','esc','F2','delete','ctrl+z','ctrl+shift+=','ctrl+−'] },
+      { title:'FORMULAS — a formula points at cells',
+        body:'A formula starts with = or +. While you type it, the arrow keys POINT at cells instead of moving — watch the reference appear in the bar. Alt+= writes a SUM for you. Ctrl+D fills the cell above down, Ctrl+R fills the cell on the left across. F4 puts $ on a reference so it stays put.',
+        keys:['=','+','←↑→↓ (point)','alt+=','ctrl+d','ctrl+r','F4'] },
+      { title:'THE RIBBON — Alt opens it, the letters walk it',
+        body:'Alt opens the ribbon and the letters walk it — Alt H is Home, then one more letter picks the command. Ctrl+Shift+1 comma, +4 dollar, +5 percent. Alt H F C picks a font color — blue means a number you typed. Alt H A L/C/R aligns. Alt H B P rules a total.',
+        keys:['alt','alt h 9 / 0','ctrl+shift+1/4/5','alt h f c','ctrl+b','alt h a l/c/r','alt h b p','alt h o i'] },
+      { title:'SAVE — and the hand-off',
+        body:'One last thing: Ctrl+S. Every drill on this site ends with a save, the way every real file does. That was the whole grammar — move, select, enter, calculate, dress, save. Drill one is the corridor: pure movement, against a clock.',
+        keys:['ctrl+s'] },
+    ],
+    /* §3.0.5: 5 · 4 · 5 · 4 · 5 · 1 = 24 beats. HK_TOUR_BEATS (below the CHALLENGES object)
+       carries the per-beat HUD/nudge/gate/park data; the labels live here in checks(), which
+       is the engine's contract and the one place the C8/C11 copy lints read. */
+    stageOf:[0,0,0,0,0, 1,1,1,1, 2,2,2,2,2, 3,3,3,3, 4,4,4,4,4, 5],
+    /* board geometry helpers — the roster and the total line MOVE (stage 3 inserts a row
+       above the total), so every grader resolves its row by the board's own label rather
+       than by a frozen coordinate (DEPTH_PASS §1.3: the label is the contract). */
+    _row(S,lab){ try{ for(let r=1;r<=(S.ROWS||20);r++){ const c=S.cells['A'+r]; if(c && String(c.value)===lab) return r; } }catch(e){} return 0; },
+    _n(S,ref){ const c=S.cells[ref]; return (c && typeof c.value==='number') ? c.value : null; },
+    checks(S){
+      const T=this;
+      const L = S._tourOk || (S._tourOk = new Array(24).fill(false));
+      const K = S._tourKey || {};                       // keystroke-gate latches (hkTourKeyWatch)
+      const at=(r,c)=>!!(S.active && S.active.r===r && S.active.c===c);
+      /* S.sel is the ANCHOR corner, S.active the moving one (selRange, index.html:22299) */
+      const sel=(r1,c1,r2,c2)=>{ if(!S.sel||!S.active) return false;
+        return Math.min(S.sel.r,S.active.r)===r1 && Math.max(S.sel.r,S.active.r)===r2 &&
+               Math.min(S.sel.c,S.active.c)===c1 && Math.max(S.sel.c,S.active.c)===c2; };
+      const cel=(ref)=>S.cells[ref]||blankCell();
+      const num=(ref)=>{ const c=S.cells[ref]; return (c && typeof c.value==='number') ? c.value : null; };
+      const REG=[4,5,6,7,8,9,10,11];                    // the eight region rows — never move
+      const rowSum=(r)=>['B','C','D','E'].reduce((a,L2)=>a+(num(L2+r)||0),0);
+      const tot=T._row(S,'Total'), res=T._row(S,'Research'), dup=T._row(S,'DUPLICATE — delete');
+      const mkt=T._row(S,'Marketing'), roster=T._row(S,'Team');
+      const colSum=(L2)=>REG.reduce((a,r)=>a+(num(L2+r)||0),0);
+      const bordered=(r)=>!!r && ['A','B','C','D','E','F'].every(L2=>cel(L2+r).bt===true);
+      const figs=[];                                     // B4:E11 — the figure block
+      for(const r of REG) for(const L2 of ['B','C','D','E']) figs.push(L2+r);
+      const allFigs=(f)=>figs.every(k=>f(cel(k)));
+      const fyOk=(r)=>{ const c=S.cells['F'+r]; return !!(c && c.formula && typeof c.value==='number' && Math.abs(c.value-rowSum(r))<0.51); };
+      /* every beat latches once true — see the header note */
+      const set=(i,v)=>{ if(v) L[i]=true; return L[i]; };
+      set(0,  at(4,5));
+      set(1,  !!K[1]);
+      set(2,  !!K[2]);
+      set(3,  !!K[3]);
+      set(4,  !!K[4]);
+      set(5,  sel(7,2,7,5));
+      set(6,  sel(4,4,11,4));
+      set(7,  !!K[7]);
+      set(8,  !!K[8]);
+      set(9,  !!res && typeof num('B'+res)==='number' && typeof num('C'+res)==='number');
+      set(10, !!K[10] && !!mkt);
+      set(11, !!roster && !dup);
+      set(12, !!K[12] && !!T._row(S,'DUPLICATE — delete'));
+      set(13, !!K[13] && !!tot && !['A','B','C','D','E'].some(L2=>{ const c=S.cells[L2+(tot-1)]; return !!(c && (c.value!=null && c.value!=='')); }));
+      set(14, fyOk(4));
+      set(15, REG.every(r=>fyOk(r)));
+      set(16, !!tot && ['B','C','D','E'].every(L2=>{ const c=S.cells[L2+tot]; return !!(c && typeof c.value==='number' && Math.abs(c.value-colSum(L2))<0.51); }));
+      set(17, !!tot && (()=>{ const c=S.cells['F'+tot]; return !!(c && typeof c.value==='number' && Math.abs(c.value-REG.reduce((a,r)=>a+(num('F'+r)||0),0))<0.51); })());
+      set(18, allFigs(c=>c.fmtStyle==='comma'));
+      set(19, allFigs(c=>c.fontColor==='blue'));
+      set(20, ['A','B','C','D','E'].every(L2=>cel(L2+'3').bold===true));
+      set(21, ['B','C','D','E'].every(L2=>cel(L2+'3').align==='c'));
+      set(22, bordered(tot));
+      set(23, !!K[23]);
+      return [
+        {label:'Move to the Q4 figure on the North line',            ok:L[0]},
+        {label:'Move to the end of the North line in one press',     ok:L[1]},
+        {label:'Move to the last region on the table in one press',  ok:L[2]},
+        {label:'Move to the top-left of the sheet',                  ok:L[3]},
+        {label:'Move to the last cell that holds anything',          ok:L[4]},
+        {label:'Select the four quarters on the West line',          ok:L[5]},
+        {label:'Select the Q3 column for every region',              ok:L[6]},
+        {label:'Select the whole West row',                          ok:L[7]},
+        {label:'Select the whole table in one press',                ok:L[8]},
+        {label:'Enter the new team’s headcount and rate on the marked line', ok:L[9]},
+        {label:'Fix the misspelled team name in place',              ok:L[10]},
+        {label:'Delete the row marked DUPLICATE',                    ok:L[11]},
+        {label:'Undo the deletion',                                  ok:L[12]},
+        {label:'Insert a blank line above the total line',           ok:L[13]},
+        {label:'Total the North line into the FY column',            ok:L[14]},
+        {label:'Fill the FY column down for every region',           ok:L[15]},
+        {label:'Total each quarter on the Total line',               ok:L[16]},
+        {label:'Build the FY total',                                 ok:L[17]},
+        {label:'Comma-format the figure block',                      ok:L[18]},
+        {label:'Color the typed figures blue',                       ok:L[19]},
+        {label:'Bold the region headers',                            ok:L[20]},
+        {label:'Center the period headers over their columns',       ok:L[21]},
+        {label:'Add a top border above the Total line',              ok:L[22]},
+        {label:'Finish the page — save it',                          ok:L[23]},
+      ];
+    },
+    /* §3.0.2(2): the spotlight rides currentTargetRange() — the Tour gets the ring for free by
+       declaring targets. Index-paired with checks (DEPTH_PASS §1.9). Exactly ONE entry is null
+       (stage 6 beat 1, Ctrl+S: no cell on the grid is its target — §3.0.2(2), §7). Rows that
+       MOVE resolve through a function, exactly as `navigation` does. */
+    targets(){ const self=this; const R=(lab)=>self._row((typeof S!=='undefined'&&S)?S:{cells:{}}, lab);
+      return [
+        'E4', 'E4', 'A11', 'A1', 'E11',
+        'B7:E7', 'D4:D11', 'A7:J7', 'A3:E11',
+        function(){ const r=R('Research')||14; return 'B'+r+':C'+r; },
+        function(){ const r=R('Marketng')||R('Marketing')||15; return 'A'+r; },
+        function(){ const r=R('DUPLICATE — delete')||16; return 'A'+r+':D'+r; },
+        function(){ const r=R('Marketng')||R('Marketing')||15; return 'A'+(r+1)+':D'+(r+1); },
+        function(){ const r=R('Total')||12; return 'A'+r+':J'+r; },
+        'F4', 'F4:F11',
+        function(){ const r=R('Total')||13; return 'B'+r+':E'+r; },
+        function(){ const r=R('Total')||13; return 'F'+r; },
+        'B4:E11', 'B4:E11', 'A3:E3', 'B3:E3',
+        function(){ const r=R('Total')||13; return 'A'+r+':F'+r; },
+        null,
+      ]; },
+    build(){
+      /* §3.0.1: FIXED CONTENT, no randomization — the Tour is a lesson, not a rep; a player
+         who replays it should recognize the board. 20 rows × A–J; 13 of 20 rows carry content
+         once stage 4 opens. Everything a later stage reveals is absent here and arrives
+         through `tiers` (§2.5), so the parked regions dim with a "▸ unlocks" tag. */
+      const cells={};
+      const C=(v,o)=>Object.assign(blankCell(), {value:v}, o||{});
+      cells['A1']=C('Keyboard Tour — Meridian Foods, FY sales',{txt:true, bold:true});
+      // header row ships UNBOLD and uncentered — stage 5 beats 3 and 4 are what dress it (deviation a)
+      ['Region','Q1','Q2','Q3','Q4'].forEach((h,i)=>{ cells[colLetter(1+i)+'3']=C(h,{txt:true, bb:true}); });
+      const REGIONS=['North','South','East','West','Midwest','Northeast','Southeast','Mountain'];
+      const FIG=[[412,455,398,470],[286,301,268,315],[344,362,330,388],[521,548,502,566],
+                 [198,214,205,231],[377,392,368,404],[263,275,258,289],[186,192,177,204]];
+      REGIONS.forEach((nm,i)=>{ const r=4+i;
+        cells['A'+r]=C(nm,{txt:true});
+        // figures ship GENERAL and BLACK — stage 5 beats 1 and 2 are what dress them (deviation a)
+        FIG[i].forEach((v,j)=>{ cells[colLetter(2+j)+r]=C(v); });
+      });
+      return {
+        ROWS:20, cells, active:{r:4,c:1},
+        /* column A carries 'DUPLICATE — delete' (18 glyphs) and its neighbours hold figures, so
+           it cannot spill — widen it or the row the player is told to delete reads 'DUPLICATE –' */
+        colW:{1:152},
+        /* §2.5 / §3.0.4: five staged tiers, one per stage 2–6. Each opens when its listed
+           check indices are ALL ok and writes its region in live. Tier 3's list stops at beat
+           12 on purpose (deviation e) — beat 13 inserts a line above the total line, so the
+           total line has to be on the board while beat 13 is the open beat. */
+        tiers:[
+          { label:'stage 2', checks:[0,1,2,3,4], reveal:{
+              'G2':{value:'WHAT TO SELECT', txt:true, bold:true, bb:true},
+              'G3':{value:'the four quarters on the West line', txt:true, fontColor:'gray'},
+              'G4':{value:'the Q3 column, every region', txt:true, fontColor:'gray'},
+              'G5':{value:'the whole West row', txt:true, fontColor:'gray'},
+              'G6':{value:'the whole table, in one press', txt:true, fontColor:'gray'} } },
+          { label:'stage 3', checks:[5,6,7,8], reveal:{
+              'A12':{value:'Total', txt:true, bold:true},
+              'A13':{value:'Team', txt:true, bold:true, bb:true},
+              'B13':{value:'Head', txt:true, bold:true, bb:true},
+              'C13':{value:'Rate', txt:true, bold:true, bb:true},
+              'D13':{value:'Cost', txt:true, bold:true, bb:true},
+              'A14':{value:'Research', txt:true},
+              'E14':{value:'◂ new team', txt:true, bold:true, fontColor:'red'},
+              'A15':{value:'Marketng', txt:true}, 'B15':{value:5}, 'C15':{value:168}, 'D15':{value:840},
+              'A16':{value:'DUPLICATE — delete', txt:true, fontColor:'red'},
+              'B16':{value:5}, 'C16':{value:168}, 'D16':{value:840} } },
+          { label:'FY', checks:[9,10,11,12,13], reveal:{
+              'F3':{value:'FY', txt:true, bb:true} } },
+          { label:'stage 5', checks:[14,15,16,17], reveal:{
+              'G7':{value:'HOUSE STYLE', txt:true, bold:true, bb:true},
+              'G8':{value:'figures carry commas', txt:true, fontColor:'gray'},
+              'G9':{value:'typed figures are blue', txt:true, fontColor:'gray'},
+              'G10':{value:'headers are bold and centered', txt:true, fontColor:'gray'},
+              'G11':{value:'a line sits above every total', txt:true, fontColor:'gray'} } },
+          { label:'stage 6', checks:[23], reveal:{
+              'A18':{value:'Saved. That was the whole grammar.', txt:true, it:true, fontColor:'gray'} } },
+        ],
+      };
+    },
+  },
   drill:{
     /* r438 H6b (DEPTH_PASS §4.42, "Hardcode it", tagged audit-shallow #7) — the depth-pass
        rework, built to §1.0 + §1.0-R2 + §1.0-R3 on top of the page (§1.0-R3 wins).
@@ -23681,6 +23987,7 @@ function render(){
         if(!running && !started && !done && !demoPlaying && !echoOn && !sandboxMode && gameMode==='classic') cls.push('startcell'); }   /* r365: the breathing start cell */
       else if(inSel&&S.sel)cls.push('sel');
       if(gt && r>=gt.r1&&r<=gt.r2&&c>=gt.c1&&c<=gt.c2){ cls.push(guided?'gtarget':'ttarget');
+        if(tourMode) cls.push('tourping');   /* r452 §3.0.2(2): the Tour adds a PULSE to .ttarget rather than a new class */
         // r329: the target draws as ONE outer frame around the whole zone (the paste footprint),
         // not a box per cell — tag the range's edge cells so the border rides the perimeter.
         if(r===gt.r1)cls.push('gt-t'); if(r===gt.r2)cls.push('gt-b'); if(c===gt.c1)cls.push('gt-l'); if(c===gt.c2)cls.push('gt-r'); }
@@ -24325,7 +24632,7 @@ function __drawRibbon(){
    their first real board after onboarding. Pure visual: any key both dismisses it AND counts
    (the overlay never swallows input). */
 function maybeStartCoach(){
-  if(demoPlaying || echoOn || sandboxMode || gameMode!=='classic') return;
+  if(demoPlaying || echoOn || sandboxMode || tourMode || gameMode!=='classic') return;   /* r452: the Tour's HUD is the coach */
   if(localStorage.getItem('hk_start_coach')) return;
   if(!localStorage.getItem('hotkey_onboarded')) return;   // the tour is still teaching
   const solves=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0;
@@ -24364,7 +24671,7 @@ function maybeStartCoach(){
   const latch=()=>{ try{ localStorage.setItem('hk_start_coach','1'); }catch(e){} document.removeEventListener('keydown', latch, true); };
   document.addEventListener('keydown', latch, true);
 }
-function startClock(){ if(running||done||sandboxMode)return; running=true; started=performance.now();   // r238: the onboarding sandbox never times
+function startClock(){ if(running||done||sandboxMode||tourMode)return;   /* r452 §3.0.4(6): the Keyboard Tour is untimed */ running=true; started=performance.now();   // r238: the onboarding sandbox never times
   try{ const r=$('result'); if(r && r.classList.contains('ready')){ r.className='result'; r.innerHTML=''; } }catch(e){}   /* r365 */
   try{ const c=document.getElementById('startCoach'); if(c) c.remove(); }catch(e){}
   if(marathon && marathon.active && !marathon.endAt){
@@ -24482,6 +24789,8 @@ function hkGateArm(){
   hkGate=false; try{ hkGateShow(false); }catch(e){}
   try{
     if(sandboxMode) return;
+    if(tourMode) return;        /* r452 §3.0.4(6): the Keyboard Tour is never timed — a start gate
+                                   over it would promise a clock that startClock() refuses to run */
     if(demoPlaying || echoOn) return;
     if(typeof __tourI!=='undefined' && __tourI>=0) return;
     if(marathon && marathon.active) return;
@@ -24948,7 +25257,10 @@ function microCheckWin(){   // the rep's own win: ONLY the targeted beats grade
 }
 
 function checkWin(){
-  if(done||demoPlaying||sandboxMode||echoOn||microPrefill) return;   // r238: the sandbox is a free-play scratch sheet — never wins, never scores
+  /* r452 §3.0.4(4): tourMode joins the bail. ONE edit removes the clock stop, the results
+     card, PB, ghost, streak, campaign xp, band xp and recordRun for the Keyboard Tour — the
+     Tour is untimed and unscored by construction (T1); its +25 xp is paid once by hkTourFinish. */
+  if(done||demoPlaying||sandboxMode||tourMode||echoOn||microPrefill) return;   // r238: the sandbox is a free-play scratch sheet — never wins, never scores
   if(microRun){ microCheckWin(); return; }                           // r421 §2.7: the rep grades only its targeted beats
   if(!gradePass()) return;
   const t=(performance.now()-started)/1000;
@@ -25769,6 +26081,10 @@ function syncTabs(){
   // r92: LEARN FROM ZERO — a genuinely new player (no runs, no PBs) gets guided ON
   // for their very first drill, with a gentle note. One time; F1 hands over control.
   try{
+    /* r452: neither one-shot runs on the Tour's own board, and the Tour's hand-off has already
+       spent hk_learn_done and turned HINTS on with rails OFF — re-arming guided here would take
+       the cursor back from a player who has just done the whole grammar by hand (§1.4, §3.0.5). */
+    if(tourMode) throw 0;
     if(!localStorage.getItem('hk_learn_done') && localStorage.getItem('hotkey_onboarded')){
       /* r356 (sweep): the one-shot used to fire on the BOOT load underneath the beta gate —
          toast invisible, flag burned, and the post-tour handoff owned nothing. Onboarded only. */
@@ -25787,7 +26103,8 @@ function syncTabs(){
     }
     // r159: FROM-ZERO RAMP — a self-declared novice (comfort fork) keeps the
     // training wheels for their first 3 clean solves, unless they F1 them off.
-    if(localStorage.getItem('hk_xlv')==='0' && !sessionStorage.getItem('hk_guided_off')){
+    if(localStorage.getItem('hk_xlv')==='0' && !sessionStorage.getItem('hk_guided_off') &&
+       localStorage.getItem('hk_tour_done_v2')!=='1'){   /* r452: the Keyboard Tour replaces the from-zero ramp */
       const __solves=parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0;
       if(__solves<3 && !guided && !demoPlaying) toggleGuided();
     }
@@ -26377,6 +26694,12 @@ function updateChecklist(){
   const items=C.checks(S);
   try{ hkSplitTick(items); }catch(e){}   /* r421 §2.1: latch per-beat splits off this grading pass */
   try{ hkTierTick(items); }catch(e){}    /* r421 §2.5: a completed tier paints its next region in live */
+  /* r452 §3.0.2(1): on the Keyboard Tour the checklist shows ONLY the open stage's beats — the
+     parked stages' beats never render — and the panel is ABSENT until stage 1's third beat,
+     where the folded-in "your checklist" callout fires (§3.0.6). Everything below this line is
+     drill chrome the Tour has no use for (splits, hint keys, the ☆ mystery slot, the esc line). */
+  if(tourMode){ try{ hkTourChecklist(el, items); }catch(e){ el.innerHTML=''; }
+    try{ hkTourTick(items); }catch(e){} return; }
   const coreItems=items.filter(x=>!x.bonus);
   const nCore=coreItems.filter(x=>x.ok).length;
   const coreDone=coreItems.length>0 && nCore===coreItems.length;
@@ -27657,7 +27980,7 @@ document.addEventListener('keydown',hkRawE=>{
     }
     if(k==='Enter'){
       e.preventDefault();
-      if(onboardChoice===0) startSandbox(); else skipOnboard();
+      if(onboardChoice===0) startKeyboardTour(); else skipOnboard();   // r452 (§3.0.4(8))
       return;
     }
     if(k==='Escape'){ e.preventDefault(); skipOnboard(); return; }
@@ -27699,6 +28022,11 @@ document.addEventListener('keydown',hkRawE=>{
       return;
     }
   }
+  /* r452 §3.0.2(3): the TUTORIAL HUD's PASSIVE observer. It latches the open beat's keystroke
+     gate and counts consecutive wrong keys for the three-miss nudge — and it never calls
+     preventDefault and never returns, so every key still reaches the live sheet. The player can
+     do anything they like on the Keyboard Tour; the HUD just gets more explicit. */
+  if(tourMode){ try{ hkTourKeyWatch(e); }catch(_){} }
   // while the sign-in modal is open, the trainer ignores keys (esc closes it)
   if(authOpen){ if(k==='Escape'){ e.preventDefault(); closeAuth(); } return; }
 
@@ -28149,7 +28477,7 @@ document.addEventListener('keydown',hkRawE=>{
 
   const dirs={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]};
   if(dirs[k]){ e.preventDefault(); startClock(); logKey(arrowLabel(k,e.shiftKey,e.ctrlKey||e.metaKey)); move(dirs[k][0],dirs[k][1],e.shiftKey,e.ctrlKey||e.metaKey);
-    if(sandboxMode) sandboxCallout(e.ctrlKey||e.metaKey, e.shiftKey); return; }
+    return; }   /* r452: sandboxCallout retired with the sandbox — the Tour's HUD is the callout now */
   // r89: ESC NEVER RESTARTS. Excel muscle memory hammers Esc to back out of cells/formulas;
   // a stray Esc nuking a run is exactly the wrong punishment. Esc = cancel marching ants,
   // otherwise nothing. Restart lives on Shift+F11 and the results card.
@@ -29458,10 +29786,17 @@ function openKbd(){
     '<div class="kb-grid">'+sections+'</div>'+
     /* r450 (flow audit P0-2): the ONLY replay affordance in the product. Escaping the tour used
        to be permanent per device — nothing anywhere brought the fundamentals back. */
-    '<div class="pc-foot"><a id="kbReplayTour" style="color:var(--accent)">↻ replay the tour</a><a id="kbClose">press <kbd>?</kbd> or <kbd>esc</kbd> to close</a></div>'+
+    /* r452 §3.0.4(8): the Keyboard Tour sits beside the product tour's replay — these two links
+       are the ONLY places outside the onboarding flow that reach the Tour (§2(g)). */
+    '<div class="pc-foot"><span><a id="kbKeyTour" style="color:var(--accent)">▶ the keyboard tour</a>'+
+      '<a id="kbReplayTour" style="color:var(--accent);margin-left:14px">↻ replay the tour</a>'+
+      (CHALLENGES[cur]&&CHALLENGES[cur].lesson?'<a id="kbLesson" style="color:var(--accent);margin-left:14px">▤ this drill’s lesson</a>':'')+
+      '</span><a id="kbClose">press <kbd>?</kbd> or <kbd>esc</kbd> to close</a></div>'+
     '</div>';
   const c=$('kbClose'); if(c) c.onclick=closeKbd;
   const rt=$('kbReplayTour'); if(rt) rt.onclick=()=>{ closeKbd(); setTimeout(()=>{ try{ tourReplay(); }catch(e){} }, 140); };
+  const kt=$('kbKeyTour'); if(kt) kt.onclick=()=>{ closeKbd(); setTimeout(()=>{ try{ startKeyboardTour(); }catch(e){} }, 140); };
+  const kl=$('kbLesson'); if(kl) kl.onclick=()=>{ closeKbd(); setTimeout(()=>{ try{ hkLessonReopen(); }catch(e){} }, 140); };
   m.addEventListener('click', e=>{ if(e.target===m) closeKbd(); }, {once:true});
 }
 function openThemes(){
@@ -31070,6 +31405,11 @@ function sheetMarkWin(){ /* r363: retired with the sheet — kept as a no-op for
 function hkRankedEntered(){ try{ return localStorage.getItem('hk_ranked')==='1'; }catch(e){ return false; } }
 function loadChallenge(key, opts){
   try{ echoAbort(); }catch(e){}
+  /* r452: any load that is not the Tour's own board leaves the Tour — the picker, a drill
+     switch, the ? sheet's replay. Tears down the HUD, any stage card, and the forced ribbon bar. */
+  let __tourReload=false;
+  try{ if(tourMode){ if(key!=='keyboardtour') hkTourAbort();
+                     else if(tourStage>=0 || __tourCardOn) __tourReload=true; } }catch(e){}
   try{ window.__stkT=Date.now(); window.__stkBase=null; window.__stkDone=false; }catch(e){}
   // r158: progression gate — daily runs and armed races ride through (community
   // moments); everything else locked-tier bounces to the explainer, state untouched.
@@ -31184,6 +31524,15 @@ function loadChallenge(key, opts){
      render, so the board is fully painted behind the scrim), covers all of them. hkGateArm
      decides for itself whether this particular load is gateable. */
   try{ hkGateArm(); }catch(e){}
+  /* r452 §1.5: on a LESSON DRILL the lesson card IS the start gate — it replaces the scrim and
+     one keypress dismisses it AND starts the clock, so r450's honest t=0 holds with one
+     surface instead of two. No-op on every drill that declares no `lesson`. */
+  try{ hkLessonMaybeGate(); }catch(e){}
+  /* r452: a restart of the Tour's own board (Esc\u00b7Esc, Shift+F11) throws the beat latches away
+     with S — so re-enter at stage 1 rather than leaving the HUD speaking for a stage whose
+     board no longer exists. */
+  if(__tourReload){ try{ tourStage=-1; __tourCardOn=false; __tourPrevOk=0; __tourClOpen=false;
+    hkTourHudHide(); setTimeout(()=>{ if(tourMode) hkTourStageCard(0); }, 140); }catch(e){} }
 }
 /* ---- drill picker: catalog comes from drills.js (single source of truth across the app) ----
    All the maps below are thin aliases. If you're adding a new drill, edit drills.js — not here.
@@ -31198,7 +31547,11 @@ const GROUP_OF     = window.HOTKEY_DRILLS.groupOf;
 // in normal use but prevents a missing drills.js entry from making a drill un-launchable).
 const MENU_ORDER = (()=>{
   const g = window.HOTKEY_DRILLS.menuOrder.filter(k => CHALLENGES[k]);
-  const extra = Object.keys(CHALLENGES).filter(k => !g.includes(k));
+  /* r452 §2(g): a CHALLENGES entry flagged `tour:true` is NOT a drill and never joins
+     menuOrder. Without this filter the fallback below would silently re-adopt keyboardtour
+     into the catalog — into the picker, the drill count, prev/next, the random pool and the
+     weekly bag — which is the one thing §2(g) and the §7 invariants forbid. */
+  const extra = Object.keys(CHALLENGES).filter(k => !g.includes(k) && !CHALLENGES[k].tour);
   if(extra.length) console.warn('Drills in engine but not drills.js:', extra);
   return [...g, ...extra];
 })();
@@ -32140,15 +32493,34 @@ function dismissLanding(){
   // tutorial prompt. They used to fire on independent timers and overlap.
   let tourDone=false; try{ tourDone=!!localStorage.getItem('hk_tour_done'); }catch(e){}
   if(!tourDone){
-    // r303: the tour ends on the cleared board — hand off to the real first drill, THEN the prompt.
-    __tourAfter=()=>{ try{ if(sandboxMode){ sandboxMode=false; loadChallenge(MENU_ORDER[0]); } }catch(e){} maybeOnboard(); };
-    // r159/r303: first entry asks the comfort question; the answer only gates how many
-    // fundamentals steps show — the whole intro is now ONE spotlight sequence on a cleared board.
-    const runTour=()=>{ try{ startOnboardBoard(); }catch(e){} tourShow(0); };
+    __tourAfter=()=>{ maybeOnboard(); };
+    /* r452 (spec §1.7) THE COMFORT ANSWER NOW ROUTES THE FIRST SESSION, not just how many
+       spotlight beats show. It used to gate five `novice:true` tour steps; those steps are the
+       Keyboard Tour's stages 1–4 now, so the fork is bigger and simpler:
+         0 "basically none" → the Keyboard Tour, then drill 1
+         1 "I get around"   → OFFERED the Tour in one line, skippable, then drill 1
+         2 "I live in it"   → straight to the drills; the Tour sits on the ? sheet
+       Levels 1 and 2 still get the short PRODUCT tour (the five TOUR_STEPS beats that did not
+       fold into the Tour, §3.0.6) over the live first drill. */
+    const runProductTour=()=>{ tourShow(0); };
+    const route=(v)=>{
+      if(v===0){ setTimeout(startKeyboardTour, 260); return; }
+      if(v===1){ setTimeout(()=>hkTourOffer(runProductTour), 260); return; }
+      setTimeout(runProductTour, 320);
+    };
     let asked=null; try{ asked=localStorage.getItem('hk_xlv'); }catch(e){}
-    if(asked===null) setTimeout(()=>showKeyboard(()=>showComfort(runTour)), 700);
-    else setTimeout(runTour, 700); }
+    if(asked===null) setTimeout(()=>showKeyboard(()=>showComfort(route)), 700);
+    else setTimeout(()=>route(parseInt(asked,10)||0), 700); }
   else maybeOnboard(); }
+/* r452 (§1.7): "I get around" is OFFERED the Tour — one line, skippable. Enter takes it, Esc or
+   any other key goes on to the drills with the short product tour. */
+function hkTourOffer(after){
+  hkLessonCard({ caption:'NEW HERE?', title:'the keyboard tour walks the whole grammar',
+    body:'six stages, no clock, about four minutes — move, select, enter, calculate, dress, save. '+
+         'you can start it any time from the <b>?</b> sheet instead.',
+    keys:[], go:'↵ take the tour', foot:'<span class="lc-off" id="lcSkipTour">esc — straight to the drills</span>' },
+    ()=>{}, {choice:true, onYes:()=>startKeyboardTour(), onNo:()=>{ try{ after&&after(); }catch(e){} }});
+}
 function tryEnter(){ enterRequested=true; ev('enter'); if(!sb){ dismissLanding(); return; } advanceAccess(); }
 
 /* ---------- first-run guided intro ---------- */
@@ -32171,7 +32543,7 @@ function paintOnboard(){
   a.classList.toggle('focused', onboardChoice===0);
   b.classList.toggle('focused', onboardChoice===1);
   // Show the ↵ kbd hint only on the currently-selected button
-  a.innerHTML = '▶ Quick warm-up — feel the moves' + (onboardChoice===0 ? ' <kbd class="ob-kbd">↵</kbd>' : '');
+  a.innerHTML = '▶ The keyboard tour — learn the whole grammar' + (onboardChoice===0 ? ' <kbd class="ob-kbd">↵</kbd>' : '');
   b.innerHTML = "Skip — straight to the drills" + (onboardChoice===1 ? ' <kbd class="ob-kbd">↵</kbd>' : '');
 }
 function showOnboard(){
@@ -32179,7 +32551,7 @@ function showOnboard(){
   if(window.__hkHasSession){ onboarded=true; try{localStorage.setItem('hotkey_onboarded','1');}catch(e){} return; }
   const o=$('onboard'); if(!o) return;
   onboardOpen=true; onboardChoice=0; o.classList.add('show');
-  const s=$('obStart'); if(s) s.onclick=startSandbox;   // r238: warm-up sandbox, not the graded placement
+  const s=$('obStart'); if(s) s.onclick=startKeyboardTour;   // r452 (§3.0.4(8)): the Keyboard Tour is the warm-up now
   const k=$('obSkip'); if(k) k.onclick=skipOnboard;
   paintOnboard();
 }
@@ -32191,66 +32563,533 @@ function startPlacement(){
   placementMode=true;
   loadChallenge('navigation');   // the 12-chord tour IS the placement — pure movement skill
 }
-/* r238 (Wolf): the onboarding rep is now a THROWAWAY SANDBOX — a scratch grid with no
-   timer and no grading, big callouts for what the movement/selection chords do, and a
-   "Ready" button that drops you onto a clean, untouched first drill. Fixes the bug where
-   practicing on the live first drill left it half-initialized. */
+/* r238's THROWAWAY SANDBOX is RETIRED (r452 — spec §1.7, decision T2). The Keyboard Tour is
+   the warm-up now, and it teaches on a real board instead of a scratch sheet: startSandbox,
+   sandboxReadyCard, sandboxCallout, exitSandbox and sbCell are gone. The FLAG stays (§8
+   do-not-change #6) — checkWin, updateChecklist and loadChallenge all read it, and the Tour
+   runs on its own tourMode. */
 let sandboxMode=false;
-function sbCell(v,o){ return Object.assign(blankCell(), {value:v}, o||{}); }
-function startSandbox(){
-  markOnboarded(); closeOnboard(); try{ ev('sandbox_start'); }catch(e){}
-  sandboxMode=true; placementMode=false; cur='__sandbox__';
-  const cells={};
-  cells['A1']=sbCell('Warm-up — no timer, no score. Feel out the moves, then hit Ready.',{txt:true, it:true, fontColor:'gray'});
-  const hdr=['Region','Q1','Q2','Q3','Q4'];
-  hdr.forEach((h,i)=>{ cells[colLetter(1+i)+3]=sbCell(h,{bold:true, bb:true}); });
-  const rows=[['North',120,140,160,150],['South',90,110,130,140],['West',75,95,120,135],['East',110,130,150,170]];
-  rows.forEach((r,ri)=>{ r.forEach((v,ci)=>{
-    cells[colLetter(1+ci)+(4+ri)]=sbCell(typeof v==='number'? v*1000 : v, typeof v==='number'?{fmtStyle:'comma',decimals:0}:{}); }); });
-  S={ROWS:ROWS_MAX, cells, active:{r:4,c:1}, sel:null, clipboard:null};
-  S._ROWS0=S.ROWS;
-  colW=new Array(COLS+1).fill(COLW_DEFAULT);
-  try{ hkClearPause(); }catch(e){}   /* r429 */
-  try{ hkGateClear(); }catch(e){}   /* r450: the warm-up sandbox is never timed — a start gate over it would promise a clock that startClock() refuses to run */
-  started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
-  editing=false; editBuf=''; editCaret=0; editPointer=null; guidedUsed=false; keyLog=[]; undoStack=[]; redoStack=[];
-  clearInterval(tickH);
-  window.__sbSeen={};
-  guided=false;   // r238: no paint-by-numbers in the sandbox — it's free play
-  try{ updateGuideBtn(); }catch(e){}
+/* ============================================================================
+   r452 (2026-09-03) THE KEYBOARD TOUR — the runtime.
+   Spec: dev/TUTORIAL_CHAPTER_SPEC.md §3.0.2 (the TUTORIAL HUD), §3.0.4 (the engine
+   wiring), §3.0.5 (the six stages), §3.0.6 (where the product-tour beats fold in).
+
+   WHAT THIS REPLACES (§1.7, decision T2): the warm-up sandbox — startSandbox,
+   sandboxReadyCard, sandboxCallout, exitSandbox, sbCell and startOnboardBoard — and
+   TOUR_STEPS' seven Excel-teaching beats, plus startGuidedIntro / introRibbonPeek
+   (the ribbon peek is now stage 5, live and hands-on instead of a demo). The variable
+   `sandboxMode` STAYS (§8 do-not-change #6): checkWin, updateChecklist and
+   loadChallenge all read it, and the Tour must use a distinct flag.
+
+   WHY A SEPARATE FLAG. `updateChecklist` early-returns on sandboxMode, which would kill
+   both the checklist and hkTierTick — and the tier ladder is how the Tour stages. So
+   `tourMode` is its own thing: checkWin bails on it (no clock stop, no results card, no
+   PB, no ghost, no streak, no xp, no recordRun), startClock refuses to run on it, and
+   updateChecklist takes a Tour branch instead of returning empty.
+   ============================================================================ */
+let tourMode=false;              // the Keyboard Tour owns the board
+let tourStage=-1;                // 0..5 while a stage is live, -1 between/before
+let __tourCardOn=false;          // a stage card (or the hand-off card) is up
+let __tourRibbonPrev;            // the player's hk_ribbon_bar, parked for stage 5 (T3).
+                                 // undefined = not parked; null = parked and the player had it UNSET
+                                 // (localStorage.getItem returns null for a key that was never written,
+                                 // so null can't double as the sentinel or the restore silently no-ops)
+let __tourClOpen=false;          // §3.0.6: the checklist panel has been revealed
+const HK_TOUR_N=24;
+
+/* §3.0.5: the per-beat HUD line, the three-miss nudge line, and the gate.
+     hud    — the banner line, PLAIN TEXT (a test reads it straight off #tourHud);
+              hkHudKbd() wraps the chord tokens in <kbd> without changing textContent.
+     nudge  — the SECOND line after three wrong keys. One clause. Never escalates (§3.0.2(3)).
+     keys   — a keystroke gate: the beat latches the moment one of these lands (the modal
+              tour's doIt step type). The key still reaches the live sheet — the Tour never
+              swallows input.
+     route  — extra keystrokes that count as ON-ROUTE for the miss counter (a chord the
+              beat needs but does not grade, e.g. the Shift+Space that arms a row delete).
+     free   — a beat the player TYPES through (entry beats, ribbon walks): no miss counting.
+     park   — where to stand when the beat opens. Only where the lesson needs the run-up:
+              beat 1 walked to the end of the row, so beat 2 ("in one press") starts back at
+              the left or there is nothing to fly across.
+     entry  — the modal tour's entry+commit type: the cell must COMMIT before the beat lands.
+   Every string here is copied from §3.0.5. The three that differ carry a WHY, and each is
+   named in the CHALLENGES.keyboardtour header and in dev/AUDIT.md (§0: deviations are never
+   silent). */
+const KX=(k,m)=>({k:k, ctrl:!!(m&&m.c), shift:!!(m&&m.s), alt:!!(m&&m.a)});
+const HK_TOUR_BEATS=[
+  /* STAGE 1 · MOVE */
+  {hud:'press → until you reach the Q4 figure',
+   nudge:'press → — nothing else is needed', park:'A4'},
+  {hud:'hold ctrl and press → to fly to the end of the row',
+   nudge:'try ctrl+→ — hold ctrl down first, then tap the arrow',
+   keys:[KX('ArrowRight',{c:1})], park:'A4'},
+  {hud:'hold ctrl and press ↓ to fly to the last region',
+   nudge:'try ctrl+↓ — hold ctrl down first, then tap the arrow',
+   keys:[KX('ArrowDown',{c:1})], park:'A4'},
+  {hud:'press ctrl+home — top-left of the sheet, from anywhere',
+   nudge:'try ctrl+home — hold ctrl, then home',
+   keys:[KX('Home',{c:1})]},
+  {hud:'press ctrl+end — the last cell holding anything',
+   nudge:'try ctrl+end — hold ctrl, then end',
+   keys:[KX('End',{c:1})]},
+  /* STAGE 2 · SELECT */
+  {hud:'hold shift and press → to stretch the selection',
+   nudge:'try shift+→ — hold shift down, then tap the arrow', park:'B7'},
+  {hud:'hold ctrl+shift and press ↓ to stretch to the edge',
+   nudge:'try ctrl+shift+↓ — hold both, then tap the arrow', park:'D4'},
+  {hud:'press shift+space — the whole row, one press',
+   nudge:'try shift+space — hold shift, then the spacebar',
+   keys:[KX(' ',{s:1})], park:'B7'},
+  {hud:'press ctrl+a — the whole block you are standing in',
+   nudge:'try ctrl+a — hold ctrl, then a',
+   keys:[KX('a',{c:1}), KX('8',{c:1,s:1}), KX('*',{c:1,s:1})], park:'C6'},
+  /* STAGE 3 · ENTER & EDIT */
+  {hud:'type the number, then press tab to commit and move right',
+   nudge:'press tab — nothing else is needed', free:true, park:'@Research.B'},
+  {hud:'press F2 to edit inside the cell — do not retype it',
+   nudge:'press F2 — nothing else is needed',
+   keys:[KX('F2')], free:true, park:'@Marketng.A'},
+  /* §3.0.5 HUD reads "press ctrl+− to delete the whole row". Row delete only fires from a
+     FULL-ROW selection in this engine (index.html:27446), so the line names it — deviation (d). */
+  {hud:'select the row, then press ctrl+− to delete it',
+   nudge:'try ctrl+− — hold ctrl, then the minus key',
+   route:[KX(' ',{s:1}), KX('-',{c:1}), KX('_',{c:1})], park:'@DUPLICATE — delete.A'},
+  {hud:'press ctrl+z — undo puts it straight back',
+   nudge:'try ctrl+z — hold ctrl, then z',
+   keys:[KX('z',{c:1})]},
+  /* §3.0.5 HUD reads "press ctrl+shift+= to insert a row" — same full-row rule, deviation (d). */
+  {hud:'select the total row and press ctrl+shift+= to insert above it',
+   nudge:'try ctrl+shift+= — hold both, then the equals key',
+   keys:[KX('=',{c:1,s:1}), KX('+',{c:1,s:1}), KX('=',{c:1}), KX('+',{c:1})],
+   route:[KX(' ',{s:1})], park:'@Total.A'},
+  /* STAGE 4 · FORMULAS */
+  {hud:'type = then point with the arrows, ↵ to commit',
+   nudge:'press = first — then the arrows point instead of moving', free:true, park:'F4'},
+  {hud:'press ctrl+d to fill the formula down the column',
+   nudge:'try ctrl+d — select down first, then hold ctrl and press d',
+   keys:[KX('d',{c:1})], park:'F4'},
+  /* §3.0.5 HUD reads "select the row and press alt+=". Alt+='s committed range form takes a
+     single COLUMN or row through its empty total (index.html:22778) — deviation (d). */
+  {hud:'select a quarter through the empty total, then press alt+=',
+   nudge:'try alt+= — hold alt, then the equals key',
+   route:[KX('=',{a:1}), KX('+',{a:1})], free:true},
+  {hud:'press alt+= once more for the grand total',
+   nudge:'try alt+= — hold alt, then the equals key',
+   route:[KX('=',{a:1}), KX('+',{a:1})], free:true},
+  /* STAGE 5 · THE RIBBON */
+  /* §3.0.5 says "no decimals"; Ctrl+Shift+1 writes comma at 2 dp here (index.html:27896,
+     Excel's own behavior), so the beat grades the comma style — deviation (b). */
+  {hud:'press ctrl+shift+1 — commas on the whole figure block',
+   nudge:'try ctrl+shift+1 — hold both, then the 1 above the letters',
+   keys:[KX('!',{c:1,s:1}), KX('1',{c:1,s:1})], route:[KX(' ',{s:1})], park:'B4'},
+  {hud:'press alt h f c, then pick blue — typed numbers are blue',
+   nudge:'press alt first — the ribbon opens and the letters light up',
+   route:[KX('Alt',{a:1})], free:true, park:'B4'},
+  {hud:'press ctrl+b to bold the header row',
+   nudge:'try ctrl+b — hold ctrl, then b',
+   keys:[KX('b',{c:1})], park:'A3'},
+  {hud:'press alt h a c to center the headers',
+   nudge:'press alt, then h, then a, then c — one letter at a time',
+   route:[KX('Alt',{a:1})], free:true, park:'B3'},
+  /* §3.0.5 says alt h b t; in this engine (and in Excel) alt h b t is the THICK BOX and the
+     top border is alt h b p (index.html:23541 r298 CANON) — deviation (c). */
+  {hud:'press alt h b p — a line above every total',
+   nudge:'press alt, then h, then b, then p — one letter at a time',
+   route:[KX('Alt',{a:1})], free:true, park:'@Total.A'},
+  /* STAGE 6 · SAVE */
+  {hud:'press ctrl+s — every drill ends with a save',
+   nudge:'try ctrl+s — hold ctrl, then s',
+   keys:[KX('s',{c:1})]},
+];
+
+/* §3.0.6: the product-tour beats that FOLD into the Tour. Each is a one-line footer note on
+   the named stage's card, never a separate modal beat. The rest stay in TOUR_STEPS for the
+   skip path (#navThemes, #profileToggle, #ghostToggle, #authSlot ×2). */
+const HK_TOUR_STAGE_NOTE={
+  3:'stuck on a drill later? <b>F1</b> lights up the keys — the cursor stays free.',
+  5:'<b>\\</b> opens the drill list · <b>alt+←/→</b> switches drills · <b>esc·esc</b> restarts a board.',
+};
+
+/* ---- §3.0.2(1): the banner ---- */
+function hkHudKbd(txt){
+  /* Wrap the chord tokens in <kbd> WITHOUT changing textContent — the per-beat HUD-text
+     assertions in dev/e2e-audit-onboard.js read #tourHud.textContent against the exact
+     §3.0.5 string, so the markup may never add or drop a character. Longest token first. */
+  const T=['ctrl+shift+↓','ctrl+shift+→','ctrl+shift+=','ctrl+shift+1',
+           'shift+space','shift+→','shift+↓','ctrl+→','ctrl+↓','ctrl+−',
+           'alt h f c','alt h a c','alt h b p',
+           'ctrl+home','ctrl+end','ctrl+a','ctrl+b','ctrl+d','ctrl+s','ctrl+z',
+           'alt+=','ctrl','shift','alt','tab','F2','↵','→','↓','←','↑','='];
+  const esc=escHtml(String(txt||''));
+  const re=new RegExp('('+T.map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','g');
+  return esc.replace(re, '<kbd>$1</kbd>');
+}
+function hkTourFirstOpen(){
+  /* the first ungraded beat — the one the HUD is speaking for */
+  try{ const items=CHALLENGES.keyboardtour.checks(S);
+    for(let i=0;i<items.length;i++) if(!items[i].ok) return i;
+  }catch(e){}
+  return HK_TOUR_N;
+}
+function hkTourStageRange(st){
+  const map=CHALLENGES.keyboardtour.stageOf;
+  let a=-1,b=-1;
+  for(let i=0;i<map.length;i++){ if(map[i]===st){ if(a<0) a=i; b=i; } }
+  return {from:a, to:b};
+}
+function hkTourHudHide(){ const el=$('tourHud'); if(el) el.remove(); }
+function hkTourHudShow(pulse){
+  /* One beat, one line, never a queue (§3.0.2(1)). Rebuilt on every render; the pulse fires
+     only on the render that follows a beat clearing. */
+  if(!tourMode || tourStage<0 || __tourCardOn){ hkTourHudHide(); return; }
+  const i=hkTourFirstOpen();
+  if(i>=HK_TOUR_N){ hkTourHudHide(); return; }
+  const B=HK_TOUR_BEATS[i]; if(!B) return;
+  let el=$('tourHud');
+  if(!el){ el=document.createElement('div'); el.id='tourHud'; document.body.appendChild(el); }
+  const miss=(S && S._hudMiss)|0;
+  el.innerHTML='<span class="hud-stage">stage '+(tourStage+1)+' of 6 · beat '+
+      (i-hkTourStageRange(tourStage).from+1)+' of '+
+      (hkTourStageRange(tourStage).to-hkTourStageRange(tourStage).from+1)+'</span>'+
+    '<span class="hud-line">'+hkHudKbd(B.hud)+'</span>'+
+    (miss>=3 ? '<span class="hud-nudge">'+hkHudKbd(B.nudge)+'</span>' : '');
+  if(pulse){ el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
+  try{ if(window.hkMacifyKbds) window.hkMacifyKbds(el); }catch(e){}
+  hkTourHudPlace();
+}
+function hkTourHudPlace(){
+  /* §3.0.2(1): IT MUST NEVER COVER THE ACTIVE CELL. Measure the active cell's client rect each
+     render; if it intersects the HUD's, flip the HUD to top-center for this beat (one boolean,
+     no animation). The same rule applies to the beat's target region when it has one.
+     Flipped, the HUD is clamped BELOW the ribbon bar — stage 5 teaches that bar and the banner
+     may never hide it (§3.0.5 stage 5: "The HUD sits BELOW the ribbon bar, never over it").
+     Both ends are MEASURED and the smaller overlap wins, so a beat whose target spans most of
+     the sheet still lands the HUD where it hides least; ties keep the bottom, which is home. */
+  const el=$('tourHud'); if(!el) return;
+  try{
+    const boxes=[];
+    if(S && S.active){ const a=dispActive();
+      const td=document.querySelector('#grid td[data-r="'+a.r+'"][data-c="'+a.c+'"]');
+      if(td) boxes.push(td.getBoundingClientRect()); }
+    const t=currentTargetRange();
+    if(t){ const td1=document.querySelector('#grid td[data-r="'+t.r1+'"][data-c="'+t.c1+'"]');
+      const td2=document.querySelector('#grid td[data-r="'+t.r2+'"][data-c="'+t.c2+'"]');
+      if(td1&&td2){ const a=td1.getBoundingClientRect(), b=td2.getBoundingClientRect();
+        boxes.push({top:Math.min(a.top,b.top), bottom:Math.max(a.bottom,b.bottom),
+                    left:Math.min(a.left,b.left), right:Math.max(a.right,b.right)}); } }
+    const over=(h)=>boxes.reduce((a,b)=>{
+      const w=Math.min(b.right,h.right)-Math.max(b.left,h.left);
+      const v=Math.min(b.bottom,h.bottom)-Math.max(b.top,h.top);
+      return a + ((w>0&&v>0)?w*v:0); }, 0);
+    let top=88;
+    try{ const rb=document.getElementById('ribbonSlot');
+      if(rb){ const r=rb.getBoundingClientRect(); if(r.height>0) top=Math.max(top, r.bottom+10); } }catch(e){}
+    el.classList.remove('top'); el.style.top='';
+    const atBottom=over(el.getBoundingClientRect());
+    if(atBottom<=0) return;                       // home is clear — nothing to flip
+    el.classList.add('top'); el.style.top=Math.round(top)+'px';
+    if(over(el.getBoundingClientRect())>=atBottom){ el.classList.remove('top'); el.style.top=''; }
+  }catch(e){}
+}
+
+/* ---- §3.0.2(3): the wrong-key nudge, and the keystroke gates ---- */
+const HK_NAVK=new Set(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home','End','PageUp','PageDown']);
+const HK_MODK=new Set(['Shift','Control','Alt','Meta','CapsLock','OS','AltGraph']);
+function hkKeyMatch(spec,e){
+  if(!spec) return false;
+  const k=e.key;
+  const same=(spec.k.length===1) ? (String(k).toLowerCase()===spec.k.toLowerCase()) : (k===spec.k);
+  return same && !!(e.ctrlKey||e.metaKey)===!!spec.ctrl && !!e.shiftKey===!!spec.shift && !!e.altKey===!!spec.alt;
+}
+function hkTourKeyWatch(e){
+  /* A PASSIVE OBSERVER. It latches the keystroke gates and counts consecutive wrong keys —
+     it never calls preventDefault and never returns early, so every key still reaches the
+     live sheet (§3.0.2(3): "the nudge never blocks input"). */
+  if(!tourMode || tourStage<0 || __tourCardOn || !S) return;
+  const k=e.key;
+  if(HK_MODK.has(k)) return;
+  const i=hkTourFirstOpen(); if(i>=HK_TOUR_N) return;
+  const B=HK_TOUR_BEATS[i]; if(!B) return;
+  const gate=(B.keys||[]).some(s=>hkKeyMatch(s,e));
+  if(gate){ (S._tourKey||(S._tourKey={}))[i]=true; }
+  /* "neither the beat's key nor a navigation key" (§3.0.2(3)). A BARE arrow / Home / End /
+     PgUp / PgDn is navigation and never a miss — with Shift too, which is just selecting. Add
+     Ctrl or Alt and it is a chord, so ctrl+shift+→ on a ctrl+→ beat DOES count: that is exactly
+     the confusion the nudge exists to name. A ribbon walk or an open dialog is never a miss
+     (the letters ARE the route on the Alt beats), and `free` beats — the ones the player types
+     through — never count at all. */
+  const nav = HK_NAVK.has(k) && !e.ctrlKey && !e.metaKey && !e.altKey;
+  const onRoute = gate || nav || (B.route||[]).some(s=>hkKeyMatch(s,e)) ||
+                  B.free || mode==='ribbon' || !!dialog;
+  S._hudMiss = onRoute ? 0 : ((S._hudMiss|0)+1);
+  /* the counter resets on a correct key and on beat completion (hkTourTick). Refresh after the
+     game handler has run, so a key that changes nothing on the board still repaints the nudge. */
+  setTimeout(()=>{ try{ hkTourHudShow(false); }catch(e){} }, 0);
+}
+
+/* ---- stage cards, staging and completion (§3.0.2(4), §3.0.3, §3.0.4(7)) ---- */
+function hkTourStageCard(st){
+  const C=CHALLENGES.keyboardtour, sp=C.stages[st]; if(!sp) return;
+  __tourCardOn=true; hkTourHudHide();
+  hkLessonCard({
+    caption:'STAGE '+(st+1)+' OF 6', title:sp.title, body:sp.body, keys:sp.keys,
+    note:HK_TOUR_STAGE_NOTE[st]||'', go:'press any key to start',
+    /* the hk_lessons_off toggle is the LESSON DRILL's (§1.5); turning the Tour's own stage cards
+       off would leave the player with nothing but the banner, so the Tour's footer is a counter */
+    foot:'stage '+(st+1)+' of 6 \u00b7 no clock'
+  }, ()=>{
+    __tourCardOn=false; tourStage=st;
+    if(st===4) hkTourRibbonForce(true);          /* T3: stage 5 teaches the bar — show it */
+    if(S){ S._hudMiss=0; }
+    hkTourPark(hkTourFirstOpen());
+    try{ render(); }catch(e){}
+    hkTourHudShow(false);
+  });
+}
+function hkTourPark(i){
+  /* the modal tour's `at:` mechanic (index.html:32195) — park the cursor where the beat
+     teaches, so "in one press" has something to fly across. */
+  try{
+    const B=HK_TOUR_BEATS[i]; if(!B || !B.park || !S || editing) return;
+    let ref=B.park;
+    if(ref.charAt(0)==='@'){
+      const bits=ref.slice(1).split('.');                       // '@Total.A' → the Total row, column A
+      const r=CHALLENGES.keyboardtour._row(S, bits[0]); if(!r) return;
+      ref=bits[1]+r;
+    }
+    const p=parseRef(ref); if(!p) return;
+    if(S.active.r===p.r && S.active.c===p.c && !S.sel) return;
+    S.active={r:p.r,c:p.c}; S.sel=null; S.selA=null;
+    /* repaint OUTSIDE this grading pass — hkTourTick runs inside updateChecklist, which runs
+       inside render() (the hkTierTick precedent, index.html:24406). */
+    if(!S._tourRepaint){ S._tourRepaint=1;
+      setTimeout(()=>{ try{ S._tourRepaint=0; render(); }catch(e){} }, 0); }
+  }catch(e){}
+}
+/* §3.0.2(1)+§3.0.6: the Tour's checklist. Only the OPEN stage's beats render; the panel itself
+   is absent until stage 1's third beat, where the "your checklist" product beat folds in. */
+function hkTourChecklist(el, items){
+  if(tourStage<0 || __tourCardOn){ el.innerHTML=''; return; }
+  const open=hkTourFirstOpen();
+  if(tourStage===0 && open<2 && !__tourClOpen){ el.innerHTML=''; return; }
+  const R=hkTourStageRange(tourStage);
+  const nOk=(()=>{ let k=0; for(let i=R.from;i<=R.to;i++) if(items[i].ok) k++; return k; })();
+  const tot=R.to-R.from+1;
+  let html='<div class="cl-inner"><div class="cl-colhdr">\u2713</div><div class="cl-body">'+
+    '<div class="cl-head">stage '+(tourStage+1)+' of 6 <span>'+nOk+'/'+tot+'</span></div>'+
+    '<div class="cl-bar"><div class="cl-bar-fill" style="width:'+Math.round(100*nOk/tot)+'%"></div></div>';
+  let nextDone=false;
+  for(let i=R.from;i<=R.to;i++){
+    const it=items[i];
+    const isNext=!it.ok && !nextDone; if(isNext) nextDone=true;
+    html+='<div class="cl-item'+(it.ok?' ok':'')+(isNext?' next':'')+'"><span class="cl-box">'+
+      (it.ok?'\u2713':'')+'</span><span class="cl-label">'+it.label+'</span></div>';
+  }
+  /* §3.0.6: the product tour's "your checklist" beat, folded in — it fires the moment the
+     panel first renders (stage 1 beat 3) and rides out the rest of stage 1. */
+  if(tourStage===0) html+='<div class="cl-callout">your checklist \u2014 every line is one action, and it turns green when it is done</div>';
+  html+='<div class="cl-esc">no clock here \u2014 the banner names the next key. <kbd>esc</kbd><kbd>esc</kbd> restarts the stage board.</div>';
+  el.innerHTML=html+'</div></div>';
+  __tourClOpen=true;
+  /* the HUD is re-measured on EVERY render, not only when a beat clears: the active cell moves
+     under the player's hands and §3.0.2(1)'s "never covers the active cell" is a per-render fact */
+  try{ hkTourHudShow(false); }catch(e){}
+}
+function hkTourRibbonForce(on){
+  /* T3 (§3.0.5 stage 5): the lean ribbon bar is FORCED ON while stage 5 teaches it — the
+     lesson is unlearnable without seeing the KeyTip letters light up — and the player's own
+     hk_ribbon_bar setting is restored at Tour end. */
+  try{
+    if(on){
+      if(__tourRibbonPrev===undefined) __tourRibbonPrev = localStorage.getItem('hk_ribbon_bar');
+      localStorage.setItem('hk_ribbon_bar','1');
+    } else {
+      if(__tourRibbonPrev===undefined) return;          // never forced it — nothing to give back
+      if(__tourRibbonPrev===null) localStorage.removeItem('hk_ribbon_bar');
+      else localStorage.setItem('hk_ribbon_bar', __tourRibbonPrev);
+      __tourRibbonPrev=undefined;
+    }
+    drawRibbon();
+  }catch(e){}
+}
+let __tourPrevOk=0;
+function hkTourTick(items){
+  /* Driven from updateChecklist, which render() calls on every keystroke — the same pass
+     that runs hkTierTick, so a stage's region paints in as its last beat grades. */
+  if(!tourMode || __tourCardOn || !items) return;
+  const n=items.filter(x=>x.ok).length;
+  if(n!==__tourPrevOk){
+    const advanced=n>__tourPrevOk;
+    __tourPrevOk=n;
+    if(advanced && S){ S._hudMiss=0; }
+    if(advanced){
+      try{ if(!window.__hkMute) playObjectiveDing(); }catch(e){}   /* the run is untimed, so the checklist ding never fires on its own */
+      hkTourPark(hkTourFirstOpen());
+    }
+    hkTourHudShow(advanced);
+  }
+  if(tourStage<0) return;
+  const R=hkTourStageRange(tourStage);
+  let all=true; for(let i=R.from;i<=R.to;i++) if(!items[i].ok){ all=false; break; }
+  if(!all) return;
+  if(tourStage>=5){ hkTourFinish(); return; }
+  const nx=tourStage+1; tourStage=-1;
+  setTimeout(()=>{ if(tourMode) hkTourStageCard(nx); }, 620);   // let the reveal flash land first
+}
+function hkTourFinish(){
+  /* §3.0.4(7) + §3.0.5 stage 6: the one-time +25 xp bounty (T1), the latch, the hand-off. */
+  tourStage=-1; hkTourHudHide(); hkTourRibbonForce(false);
+  let paid=0;
+  try{
+    if(localStorage.getItem('hk_tour_done_v2')!=='1'){
+      localStorage.setItem('hk_tour_done_v2','1');
+      const est=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
+      localStorage.setItem('hk_xp_est', String(est+25));   /* the ☆-bounty pattern, index.html checkWin */
+      paid=25;
+      try{ window.hkStatePush&&window.hkStatePush(); }catch(e){}
+    }
+    localStorage.setItem('hk_tour_done','1');              /* the modal product tour never re-fires over it */
+    markOnboarded();
+    ev('keyboardtour_done',{xp:paid});
+  }catch(e){}
+  __tourCardOn=true;
+  hkLessonCard({
+    caption:'THE KEYBOARD TOUR — DONE', title:'move · select · enter · calculate · dress · save',
+    body:'that is the whole grammar, and every drill from here is a page built out of it.<br>'+
+         'next: the corridor — pure movement, against a clock.'+(paid?'<br><b>+25 xp</b> — the tour pays once.':''),
+    keys:[], note:HK_TOUR_STAGE_NOTE[5], go:'↵ start drill 1', foot:'replay this tour from <b>?</b>'
+  }, ()=>{ __tourCardOn=false; hkTourHandoff(); });
+}
+function hkTourHandoff(){
+  /* §3.0.5: into drill 1 with GUIDED OFF (the Tour was the hand-holding; rails would take
+     the cursor back) and HINTS ON (F1's key lights, cursor free — a hinted run still posts,
+     which the r450 guided hand-off could not say). */
+  tourMode=false; hkTourHudHide();
+  try{ document.body.classList.remove('hk-tour'); }catch(e){}
+  try{ localStorage.setItem('hk_learn_done','1'); }catch(e){}   /* the r450 guided one-shot is spent — the Tour did that job */
+  try{ if(guided) toggleGuided(); }catch(e){}
+  try{ if(!hints) toggleHints(); }catch(e){}
+  loadChallenge('navigation');
+  try{ if(guided) toggleGuided(); }catch(e){}                   /* syncTabs' from-zero ramp may re-arm rails — the hand-off says no */
+  try{ showToast('hints are on — they light the keys and the run still posts. F1 turns them off.'); }catch(e){}
+}
+function startKeyboardTour(){
+  /* §3.0.4(8): replaces startSandbox as obStart's handler and as the "basically none"
+     destination from showComfort; also the ? sheet's "▶ the keyboard tour". */
+  try{ markOnboarded(); closeOnboard(); }catch(e){}
+  try{ ev('keyboardtour_start'); }catch(e){}
+  tourMode=true; tourStage=-1; __tourCardOn=false; __tourPrevOk=0; __tourClOpen=false;
+  try{ document.body.classList.add('hk-tour'); }catch(e){}
+  sandboxMode=false; placementMode=false;
+  guided=false; hints=false;                       /* §1.4: hints and rails are OFF throughout */
+  try{ updateGuideBtn(); updateHintsBtn(); }catch(e){}
+  loadChallenge('keyboardtour');
+  if(S){ S._tourOk=new Array(HK_TOUR_N).fill(false); S._tourKey={}; S._hudMiss=0; }
+  /* r450, re-pointed at the Tour: the Keyboard Tour is never timed — a start gate over it
+     would promise a clock that startClock() refuses to run. (The sandbox cleared it the same
+     way; hkGateArm also declines on tourMode, so this is belt and braces on every entry.) */
+  try{ hkGateClear(); }catch(e){}
   const tm=$('timer'); if(tm){ tm.textContent='—'; tm.classList.remove('run'); }
   try{ $('par').textContent='—'; $('keyPar').textContent='—'; $('pb').textContent='—'; }catch(e){}
-  const dn=$('dbName'); if(dn) dn.textContent='Warm-up';
-  const dc=$('dbCat'); if(dc) dc.innerHTML='practice';
-  const tl=$('taskLine'); if(tl) tl.innerHTML='<span class="tl-dot" style="background:var(--accent)"></span>Try the moves below — <b>Ctrl+→</b> to jump, <b>Shift+→</b> to select, <b>Ctrl+Shift+→</b> to grab the whole run.';
-  drawRibbon(); render();
-  sandboxReadyCard();
+  const dn=$('dbName'); if(dn) dn.textContent='Keyboard Tour';
+  const dc=$('dbCat'); if(dc) dc.innerHTML='tutorial';
+  const pel=$('dbPos'); if(pel) pel.textContent='—';
+  const xc=$('dbXp'); if(xc) xc.textContent='';
+  const tl=$('taskLine'); if(tl) tl.innerHTML='<span class="tl-dot" style="background:var(--accent)"></span>Six stages, no clock — the banner names the next key.';
+  const rs=$('result'); if(rs){ rs.className='result'; rs.innerHTML=''; }
+  try{ render(); }catch(e){}
+  hkTourStageCard(0);
 }
-function sandboxReadyCard(){
-  const r=$('result'); if(!r) return;
-  r.className='result';
-  r.innerHTML='<b>Warm-up</b> — no clock, no score. '+
-    '<kbd>Ctrl</kbd>+<kbd>→</kbd> leaps to the edge · <kbd>Shift</kbd>+<kbd>→</kbd> selects across · <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>→</kbd> grabs the run · <kbd>Ctrl</kbd>+<kbd>Home</kbd> home. '+
-    '<button id="sbReady" class="ob-key primary" style="margin-top:8px;width:100%">Ready — start your first drill →</button>';
-  const b=$('sbReady'); if(b) b.onclick=exitSandbox;
+function hkTourAbort(){
+  /* leaving the Tour for any other board — the picker, a drill switch, the replay link */
+  if(!tourMode) return;
+  tourMode=false; tourStage=-1; __tourCardOn=false;
+  try{ document.body.classList.remove('hk-tour'); }catch(e){}
+  hkTourHudHide(); hkLessonCardHide(); hkTourRibbonForce(false);
 }
-let __sbT=0;
-function sandboxCallout(ctrl, shift){
-  // one-time toast per distinct chord so the sheet teaches what just happened
-  const seen=window.__sbSeen||(window.__sbSeen={});
-  const key = ctrl&&shift ? 'cs' : ctrl ? 'c' : shift ? 's' : 'm';
-  if(seen[key]) return; seen[key]=1;
-  const msg = key==='cs' ? 'Ctrl+Shift+→ — grabbed the whole run in one leap'
-            : key==='c'  ? 'Ctrl+→ — jumped straight to the edge of the data'
-            : key==='s'  ? 'Shift+→ — extended the selection (watch the blue block grow)'
-            :              'arrows move one cell — add Ctrl to leap, Shift to select';
-  try{ showToast(msg); }catch(e){}
+
+/* ============================================================================
+   r452 §1.5 THE LESSON CARD — one component, two consumers.
+   (1) the Tour's six stage cards and its hand-off card, and
+   (2) a LESSON DRILL's start gate: on a drill whose CHALLENGES entry carries
+       `lesson:{title, body, keys}`, the card renders over the dimmed board and "press any
+       key" IS the r450 start gate — one keypress dismisses the card AND starts the clock,
+       so t=0 stays honest. No lesson drill exists yet (§3.1–3.4 are a later wave); the
+       surface is built generically here so those drills only have to declare the data.
+   Dismissable forever with one toggle (hk_lessons_off), re-openable from the ? sheet.
+   ============================================================================ */
+function hkLessonKey(k){ try{ return !!(CHALLENGES[k] && CHALLENGES[k].lesson); }catch(e){ return false; } }
+function hkLessonsOff(){ try{ return localStorage.getItem('hk_lessons_off')==='1'; }catch(e){ return false; } }
+function hkLessonCardHide(){
+  const w=$('tourWrap'); if(w){ w.classList.remove('on'); w.classList.remove('lite'); }
+  window.__introCardOpen=false;
+  if(window.__lcKey){ document.removeEventListener('keydown', window.__lcKey, true); window.__lcKey=null; }
 }
-function exitSandbox(){
-  sandboxMode=false; window.__sbSeen={};
-  try{ ev('sandbox_done'); }catch(e){}
-  loadChallenge(MENU_ORDER[0]);   // a clean, untouched level-1 starter
-  try{ showToast('same moves — now for real. take your time; the clock starts on your first keystroke'); }catch(e){}
+function hkLessonCard(spec, onDismiss, choice){
+  /* `choice` (optional): {onYes, onNo} — Enter takes the offer, Esc/any other key declines.
+     Used by the §1.7 "I get around" one-line Tour offer; the six stage cards and the lesson
+     drills' start gate use the plain any-key form. */
+  const w=$('tourWrap'), ring=$('tourRing'), card=$('tourCard');
+  if(!w||!ring||!card){ try{ onDismiss&&onDismiss(); }catch(e){} return; }
+  /* re-entrant: a card opened over a card must not leave the first one's capture listener
+     armed, or one keypress dismisses both and the second card's callback runs on a stale
+     stage (seen driving the Tour's stage cards back to back) */
+  if(window.__lcKey){ document.removeEventListener('keydown', window.__lcKey, true); window.__lcKey=null; }
+  ring.style.width='0px'; ring.style.height='0px'; ring.style.left='-40px'; ring.style.top='-40px';
+  card.classList.add('lesson');
+  const keys=(spec.keys||[]).map(k=>'<kbd>'+escHtml(k)+'</kbd>').join('');
+  card.innerHTML='<div class="tour-cap"><span>'+escHtml(spec.caption||'')+'</span></div>'+
+    '<div class="lc-body"><b>'+escHtml(spec.title||'')+'</b><br>'+(spec.body||'')+'</div>'+
+    (keys?'<div class="lc-keys">'+keys+'</div>':'')+
+    (spec.note?'<div class="lc-body" style="padding-top:0;font-size:11.5px">'+spec.note+'</div>':'')+
+    '<div class="lc-foot"><span class="lc-go">'+escHtml(spec.go||'press any key to start')+'</span>'+
+    '<span>'+(spec.foot||'<span class="lc-off" id="lcOff">don’t show lessons</span>')+'</span></div>';
+  card.style.left=Math.max(12,(window.innerWidth-card.offsetWidth)/2)+'px';
+  card.style.top=Math.max(28,(window.innerHeight-card.offsetHeight)/2)+'px';
+  w.classList.add('on'); w.classList.remove('lite');
+  /* re-place from the card's REAL height once it is in the DOM (the r356 fix) */
+  try{ card.style.left=Math.max(12,(window.innerWidth-card.offsetWidth)/2)+'px';
+       card.style.top=Math.max(28,(window.innerHeight-card.offsetHeight)/2)+'px'; }catch(e){}
+  window.__introCardOpen=true;   /* the card owns the keyboard — the grid never sees the key */
+  const off=$('lcOff'); if(off) off.onclick=(e)=>{ e.stopPropagation();
+    if(!choice){ try{ localStorage.setItem('hk_lessons_off','1'); }catch(_){} }
+    go(false); };
+  let spent=false;
+  const go=(yes)=>{ if(spent) return; spent=true;
+    document.removeEventListener('keydown', h, true); window.__lcKey=null;
+    hkLessonCardHide();
+    if(choice){ try{ (yes ? choice.onYes : choice.onNo)&&(yes ? choice.onYes() : choice.onNo()); }catch(e){} return; }
+    try{ onDismiss&&onDismiss(); }catch(e){}
+  };
+  const h=(e)=>{ if(e.key==='F5'||e.key==='F12') return; e.preventDefault(); e.stopPropagation();
+    go(choice ? (e.key==='Enter') : true); };
+  window.__lcKey=h;
+  document.addEventListener('keydown', h, true);
+  card.onclick=null;
+  const gob=card.querySelector('.lc-go'); if(gob) gob.onclick=()=>go(true);
+}
+function hkLessonMaybeGate(){
+  /* §1.5: on a lesson drill the card IS the start gate — one keypress dismisses it and
+     starts the clock (hkGatePass), so the r450 honest-t=0 law holds with one surface, not
+     two. Called from loadChallenge AFTER hkGateArm, so the gate is already armed. */
+  try{
+    if(tourMode || sandboxMode || demoPlaying || echoOn || microRun) return;
+    if(gameMode!=='classic') return;
+    const C=CHALLENGES[cur]; if(!C || !C.lesson) return;
+    if(hkLessonsOff()) return;
+    if(!hkGate) return;                       // the gate declined this load; don't stack a card on it
+    try{ hkGateShow(false); }catch(e){}       // one surface: the card replaces the scrim
+    hkLessonCard({
+      caption:'LESSON · '+String(C.lesson.title||'').toUpperCase(),
+      title:C.lesson.title||'', body:escHtml(String(C.lesson.body||'')), keys:C.lesson.keys||[],
+      go:'press any key to start'
+    }, ()=>{ try{ hkGatePass(); }catch(e){} });
+  }catch(e){}
+}
+function hkLessonReopen(){
+  const C=CHALLENGES[cur]; if(!C||!C.lesson) return;
+  hkLessonCard({ caption:'LESSON · '+String(C.lesson.title||'').toUpperCase(),
+    title:C.lesson.title||'', body:escHtml(String(C.lesson.body||'')), keys:C.lesson.keys||[],
+    go:'press any key to close' }, ()=>{});
 }
 // time-vs-par → starting-rung verdict (display only; the real ladder is earned on the boards)
 function placementVerdict(t, par){
@@ -32261,31 +33100,9 @@ function placementVerdict(t, par){
   if(r<=3.0) return 'Summer Analyst pace';
   return 'Candidate — the ladder starts here';
 }
-async function startGuidedIntro(){
-  markOnboarded(); closeOnboard();
-  loadChallenge(MENU_ORDER[0]);          // Foundations — "Copy it over"
-  guided=true; updateGuideBtn(); if(S) render();
-  await playDemo();                      // part 1: watch the copy/paste solution
-  await introRibbonPeek();               // part 2: a quick look at the ribbon
-  guidedUsed=true;                        // practice run — won't post a time
-  const r=$('result'); if(r){ r.className='result';
-    r.innerHTML="you're set — <kbd>\\</kbd> all drills · <kbd>shift+f11</kbd> restart · <kbd>F1</kbd> hints · <kbd>?</kbd> shortcuts · type to start"; }
-}
-async function introRibbonPeek(){
-  if(!S || demoPlaying) return;
-  loadChallenge(cur);
-  try{ hkGateClear(); }catch(e){}   /* r450: same as playDemo — the ribbon peek drives its own keys */
-  demoPlaying=true; updateDemoBtn();
-  const kf=$('keyflash'); if(kf) kf.classList.add('demo');
-  const r=$('result'); if(r){ r.className='result'; r.innerHTML='▶ <kbd>alt</kbd> opens the ribbon — formatting, borders, paste special'; }
-  await sleep(1000);
-  demoKey(Kb.alt);          await sleep(1200);   // open the ribbon
-  demoKey(L('h'));          await sleep(1300);   // Home tab reveals its keys
-  demoKey({key:'Escape'});  await sleep(650);    // back out
-  if(kf) kf.classList.remove('demo');
-  demoPlaying=false; updateDemoBtn();
-  loadChallenge(cur);                            // clean board for the user
-}
+/* r452 (spec §1.7): startGuidedIntro + introRibbonPeek are RETIRED (25 lines). The ribbon
+   peek was a DEMO of the ribbon; it is now Keyboard Tour stage 5 — live, hands-on, with the
+   lean bar forced on while it teaches (T3). startGuidedIntro had no caller left after r303. */
 
 /* ---------- entry (r134: friction-free — guests play instantly) ---------- */
 function advanceAccess(){
@@ -32651,61 +33468,20 @@ function showComfort(after){
     try{ localStorage.setItem('hk_xlv', String(v)); }catch(e){}
     try{ ev('comfort',{v:v}); }catch(e){}
     m.classList.remove('show'); window.__introCardOpen=false;
-    after();   // r303: the primer is folded INTO the tour now (buildTourPlan gates the fundamentals by xlv) — no separate modal
+    after(v);   // r452 (§1.7): the answer is the ROUTE now — the caller decides Tour / offer / straight to the drills
   });
 }
 /* r303: PRIMER + showPrimer DELETED — the five cards live on as the tour's novice beats. */
-/* r303 ONBOARDING V3 (Wolf) — the primer is FOLDED into the spotlight tour: one dim+highlight
-   sequence for everyone, run on a CLEARED practice board (not the live first drill). The five
-   `novice:true` beats teach the fundamentals — grid, name box, formula bar, typing, and starting
-   a formula with = OR + — and only show for the "basically none" comfort answer; "I get around"
-   and "I live in it" skip straight to the product tour. Spec: dev/ONBOARDING_V3.md. */
-function startOnboardBoard(){
-  sandboxMode=true; placementMode=false; cur='__onboard__';
-  const cells={};
-  cells['A1']=sbCell('Warm-up sheet — nothing here counts. Follow the callouts.',{txt:true, it:true, fontColor:'gray'});
-  cells['A3']=sbCell('Revenue',{bold:true});   cells['B3']=sbCell('Costs',{bold:true});   cells['C3']=sbCell('Profit',{bold:true, fontColor:'gray'});
-  cells['A4']=sbCell(340,{fmtStyle:'comma',decimals:0, fontColor:'blue'});
-  cells['B4']=sbCell(210,{fmtStyle:'comma',decimals:0, fontColor:'blue'});
-  // A5 = the typing target · C4 = the formula target (=A4-B4 or +A4-B4)
-  // r313 (Wolf): a FULL monthly run A6:H6 so the Ctrl+→ / Ctrl+Shift+← demos actually TRAVEL —
-  // the old board stopped at B4, so the jump moved one cell and the time-save never landed.
-  cells['A6']=sbCell('Monthly',{bold:true, fontColor:'gray'});
-  [120,180,150,240,300,260,410,520,470,610].forEach((v,i)=>{ cells[colLetter(1+i)+7]=sbCell(v,{fmtStyle:'comma',decimals:0, fontColor:'blue'}); });
-  S={ROWS:9, cells, active:{r:4,c:1}, sel:null, clipboard:null};
-  colW=new Array(COLS+1).fill(COLW_DEFAULT);
-  try{ hkClearPause(); }catch(e){}   /* r429 */
-  try{ hkGateClear(); }catch(e){}   /* r450: the tour drives THIS board — a gate would sit between the spotlight and the cell it is pointing at */
-  started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
-  editing=false; editBuf=''; editCaret=0; editPointer=null; guided=false; guidedUsed=false; keyLog=[]; undoStack=[]; redoStack=[];
-  clearInterval(tickH);
-  const tm=$('timer'); if(tm){ tm.textContent='—'; tm.classList.remove('run'); }
-  try{ $('par').textContent='—'; $('keyPar').textContent='—'; $('pb').textContent='—'; }catch(e){}
-  const dn=$('dbName'); if(dn) dn.textContent='Warm-up';
-  const dc=$('dbCat'); if(dc) dc.innerHTML='intro';
-  try{ updateGuideBtn(); }catch(e){}
-  drawRibbon(); render();
-}
+/* r452 (spec §1.7 / A8 / A9): startOnboardBoard is RETIRED with the sandbox (39 lines), and
+   TOUR_STEPS' seven Excel-teaching beats with it — the five r303 `novice:true` fundamentals
+   and the two r292 chord beats are now Keyboard Tour stages 1–4, performed on a real board.
+   THREE MORE beats FOLD into the Tour (§3.0.6) and leave this list: '.cl-inner your checklist'
+   (Tour stage 1, the moment the first beat renders), '.drillbar moving around' (the stage-6
+   hand-off card) and '#hintsToggle stuck?' (the stage-4 card footer). What is left is the
+   PRODUCT tour — the five beats that do not fold — and it is what a player who skips the
+   Keyboard Tour still gets. With no `novice:true` beat left, buildTourPlan's hk_xlv read is
+   dead and goes with them; showComfort now routes on xlv itself (§1.7). */
 const TOUR_STEPS=[
-  /* r303 — the folded-in fundamentals (shown only for the "basically none" answer) */
-  {sel:'.gridwrap', novice:true, cap:'this is the grid', at:'A4',
-    body:'Every cell has an address — <b style="font-family:var(--mono)">A4</b>. The highlighted box is your active cell. <b>Press <kbd>→</kbd></b> to move.', doIt:{key:'ArrowRight'}},
-  {sel:'#nameBox', novice:true, cap:'where am I?', at:'A4',
-    body:'The <b>name box</b> shows your cell’s address. <b>Press <kbd>→</kbd></b> — watch it change.', doIt:{key:'ArrowRight'}},
-  {sel:'.fbar', novice:true, cap:'shown vs. inside', at:'A4',
-    body:'The grid shows the <b>result</b>; the <b>formula bar</b> shows what’s inside. <kbd>↵</kbd> to go on.'},
-  {sel:'.gridwrap', novice:true, cap:'just type', at:'A5', entry:true, commit:(c)=>typeof c.value==='number',
-    body:'No clicking. On <b style="font-family:var(--mono)">A5</b>, <b>type a number, press <kbd>↵</kbd></b>.'},
-  {sel:'.gridwrap', novice:true, cap:'start a formula', at:'C4', entry:true, commit:(c)=>!!c.formula,
-    body:'Formulas start with <b style="font-family:var(--mono)">=</b> or <b style="font-family:var(--mono)">+</b>. On <b style="font-family:var(--mono)">C4</b> type <b style="font-family:var(--mono)">=A4-B4</b>, <kbd>↵</kbd>.'},
-  /* r292 INTERACTIVE INTRO — the chord beats, now for everyone after the fundamentals. */
-  {sel:'.gridwrap', cap:'why the keyboard wins', doIt:{key:'ArrowRight',ctrl:true}, at:'A7',
-    body:'A mouse drags cell by cell. <b>Hold <kbd>ctrl</kbd>, press <kbd>→</kbd></b> — jump to the end of the row in one press.'},
-  {sel:'.gridwrap', cap:'now select it', doIt:{key:'ArrowLeft',ctrl:true,shift:true}, at:'J7',
-    body:'Add <kbd>shift</kbd> and it <b>selects</b> as it jumps. <b><kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>←</kbd></b> — select the whole row, no dragging.'},
-  {sel:'.cl-inner',   cap:'your checklist', body:'Every line is one action — it turns green when done. Clear them all and the clock stops.'},
-  {sel:'.drillbar',   cap:'moving around', body:'<b>\\</b> opens the drill list (<b>↑↓</b> move, <b>↵</b> loads). <b>Alt+←/→</b> switches drills. A single <b>Esc</b> never ends a run — <b>Esc·Esc</b> restarts the board.'},
-  {sel:'#hintsToggle', cap:'stuck?', body:'Three levels of help: <b>hints</b> (<kbd>F1</kbd>) lights up the keys to press — cursor stays free. <b>Guided</b> adds a fence that keeps the cursor on the target. <b>Solution</b> plays the optimal keys; <b>learn</b> hands them to you one at a time.'},
   {sel:'#profileToggle', cap:'your keyboard', optional:true, body:'Your layout and shortcut profile (Excel · Macabacus · FactSet) live here — click to switch.'},
   {sel:'#ghostToggle', cap:'race yourself', optional:true, body:'<b>Ghost</b> replays your best run as a moving cursor — race your own time.'},
   {sel:'#navThemes',  cap:'make it yours', body:'<b>Themes</b> — light or dark — live here. Pick one anytime; it saves.'},
@@ -32741,9 +33517,10 @@ function tourReplay(){
    recursion counted skipped steps). */
 function buildTourPlan(){
   const signedIn = !!(me_user && !isAnonUser());
-  let xlv=0; try{ xlv=parseInt(localStorage.getItem('hk_xlv')||'0',10)||0; }catch(e){}
+  /* r452 (A8): the `novice` gate and its hk_xlv read are GONE with the Excel beats they gated —
+     nothing in TOUR_STEPS is novice any more. The comfort answer now decides something bigger
+     than which beats show: whether the player gets the Keyboard Tour at all (showComfort, §1.7). */
   return TOUR_STEPS.filter(st=>{
-    if(st.novice && xlv>=1) return false;                 // only "basically none" gets the from-zero beats; "I get around" / "I live in it" go straight to the product tour
     if(st.signedIn && !signedIn) return false;
     if(st.signedOut && signedIn) return false;
     if(st.sel){ const el=document.querySelector(st.sel); if(!el) return false;
@@ -32757,14 +33534,14 @@ function tourShow(i){
   if(i<=0) __tourPlan=buildTourPlan();
   if(i>=__tourPlan.length){ w.classList.remove('on'); try{ localStorage.setItem('hk_tour_done','1'); }catch(e){} __tourI=-1;
     ev('tour_done');
-    // r313 (Wolf): the tour ended ON the warm-up board with no next action. ALWAYS leave the
-    // sandbox for the real first drill (guided on) and cue it, whatever __tourAfter was.
+    /* r452: the tour no longer runs over a throwaway board — startOnboardBoard is retired and
+       what is left of TOUR_STEPS is the PRODUCT tour, five spotlights over the live first drill.
+       So there is no sandbox to leave: the board underneath is already the one the player keeps. */
     try{ markOnboarded(); }catch(e){}       // finishing the tour IS the onboarding — so the post-tour "quick warm-up?" prompt no-ops
     const f=__tourAfter; __tourAfter=null;
     setTimeout(()=>{
-      try{ if(sandboxMode){ sandboxMode=false; loadChallenge(MENU_ORDER[0], {guided:true}); } }catch(e){}
-      if(f){ try{ f(); }catch(e){} }        // f re-checks sandboxMode (won't double-load); its maybeOnboard() now no-ops via onboarded=true
-      try{ if(typeof showToast==='function') showToast(guided ? 'You’re set — first drill’s loaded, guided’s on. Clear the checklist · press \\ for the full list.' : 'You’re set — first drill’s loaded. Clear the checklist · press \\ for the full list.'); }catch(e){}
+      if(f){ try{ f(); }catch(e){} }
+      try{ if(typeof showToast==='function') showToast('You’re set — press \\ for the full drill list, F1 for hints.'); }catch(e){}
     }, 350);
     return; }
   __tourI=i;
