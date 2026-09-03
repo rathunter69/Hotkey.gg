@@ -5,6 +5,27 @@ standards — READ FIRST; §9 is the wave playbook for Opus-5 sessions, new r428
 **dev/PIPELINE.md's ⚡ r428 header (the live queue)**, dev/AUDIT.md (newest round at the TOP),
 and the dev/ design docs._
 
+## ⚡ NEXT-SESSION HANDOFF (2026-09-03, r451 — THE FOUR VECTORS: tutorial chapter · rank art · business · security)
+
+**READ `dev/CONTINUITY.md` §0 FIRST.** Wolf's direction after the r450 playtest: the catalog must
+teach before it tests. Session r451 produced PLANS, no product code:
+- **`dev/TUTORIAL_CHAPTER_SPEC.md`** — chapter 1 becomes a ten-drill Excel keyboard tutorial
+  (navigation kept as lesson 1 + nine new drills: select · entry · clipboard · firstsum · lockref ·
+  numfmt · fonts · alignrule · firstpage★). Lesson card = start gate; hints on by default; visible ☆;
+  pass = par×2. The six robust Foundations drills move intact to a renamed chapter ("Desk Ops",
+  D1). Catalog 74 → 83. Full cascade map (§5), invariants (§7), four-session rollout (§6), and
+  **ten Wolf decisions (§9)** — nothing builds before they are answered.
+- **`dev/ART_DIRECTION.md` + `art/rank-pixel-proto.html` (+ PNG renders)** — recommendation: pixel
+  sprites replace the heraldic crests (16×16 chips + a 32×32 hero master, same `rankEmblem`
+  signature, integer scaling as an invariant). Four Wolf decisions (A1–A4).
+- **`dev/BUSINESS_PLAN.md`** (reserved) — OBA gate first, then home-state LLC → EIN → bank →
+  Stripe live → bookkeeping → mail/login/bill routing; four short sessions.
+- **`dev/SECURITY_PLAN.md`** (reserved) — eight-domain audit fleet, method, definition of done;
+  first fact to check: which host actually serves production (`_headers` only applies on
+  Cloudflare Pages).
+**Docs-only round** (no cache bump). Branch `claude/drill-redesign-art-style-jg9vhm` off `main`
+@ r450 (#246 merged).
+
 ## ⚡ NEXT-SESSION HANDOFF (2026-07-27, r429 — THE DUAL-AUDIENCE LAW + CHAPTERS 1-3 COMPLETE)
 
 **WOLF'S NEW PRODUCT DIRECTION (2026-07-27), now binding build law:** every drill must read as a

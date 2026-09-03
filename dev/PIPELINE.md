@@ -1,5 +1,14 @@
 # PIPELINE — the Fable task queue
 
+## ⚡ LIVE (r451, 2026-09-03): THE FOUR VECTORS — plans written, Wolf decisions pending
+The depth pass is complete (74/74, r449) and the first-session round shipped (r450, #246). The
+active queue is now the four vectors in `dev/CONTINUITY.md` §0: **(1) the tutorial chapter**
+(`dev/TUTORIAL_CHAPTER_SPEC.md` — build order §6: platform wave → T2–T5 → T6–T10★ → assembly),
+**(2) rank art** (`dev/ART_DIRECTION.md`), **(3) business** (`dev/BUSINESS_PLAN.md`, reserved),
+**(4) security** (`dev/SECURITY_PLAN.md`, reserved). Nothing in (1)/(2) builds until the §9 / §5
+decision tables are answered in chat. The blocks below are the historical queue.
+
+
 ## ⚡ LIVE: THE DEPTH-PASS CAMPAIGN (r436) — this is the active workstream
 **27 of 76 drills depth-passed.** Foundations ✅ · Formatting ✅ · Formulas I ✅ ·
 Data & Lookups 2/10 (`sort` in flight) · Formulas II 0/11 · Models I 0/10 · Models II 0/10 ·

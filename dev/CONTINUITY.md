@@ -1,11 +1,31 @@
 # HOTKEY.GG — PROJECT CONTINUITY BRIEF
 
-_Written r449 (2026-07-29) at the close of the depth-pass campaign. Purpose: condition a fresh
+_Written r449 (2026-07-29) at the close of the depth-pass campaign; §0 added r451 (2026-09-03). Purpose: condition a fresh
 session — especially one working the BUSINESS PLAN — with everything load-bearing about the
 product, its current state, and where the decisions sit. The operational/engineering companion
 docs are listed in §8; this file is the top of the funnel._
 
 ---
+
+## 0 · r451 (2026-09-03) — THE FOUR VECTORS: where the project goes next
+
+_Wolf returned after a break with four workstreams. Session r451 wrote the plans; nothing is built._
+
+| # | vector | state | the doc |
+|---|---|---|---|
+| 1 | **Tutorial chapter** — the first 10 drills become an Excel keyboard tutorial (lesson cards, 2–4 beats, visible ☆, hints on); the six robust Foundations drills move intact to the chapter after it | **spec written, awaiting Wolf's D1–D10** | `dev/TUTORIAL_CHAPTER_SPEC.md` |
+| 2 | **Rank art** — 8-bit pixel sprites vs the shipped heraldic crests | **memo + rendered prototype, awaiting A1–A4** | `dev/ART_DIRECTION.md` · `art/rank-pixel-proto.html` · `art/rank-pixel-proto-{dark,light}.png` |
+| 3 | **Business plan** — OBA clearance, LLC (home state), EIN, bank, Stripe live, bookkeeping, mail/logins/bills routing | **reserved plan; four short sessions sequenced** | `dev/BUSINESS_PLAN.md` (+ `dev/EMAIL_SETUP.md`, `STRIPE_SETUP.md`) |
+| 4 | **Security hardening** — eight-domain audit fleet (RLS/RPC, auth, edge+secrets, browser/CSP, run integrity, repo/pipeline, data+policy, ops) with a definition of done | **reserved plan; one dedicated session** | `dev/SECURITY_PLAN.md` |
+
+**Order Wolf set:** vectors 1 and 2 first (this and the next sessions), 3 and 4 reserved. **Build
+order inside 1+2:** tutorial platform wave → tutorial drill waves → art (cosmetic lane, can run in
+parallel once A1 is answered). Also on the table from r450: PR #246 merged the first-session round
+(start gate, tour Esc arming, paywall built dark) — `main` is current through r450.
+
+**Facts a new session needs that changed since r449:** catalog is 74 with PR #245 merged; the
+premium flag is still OFF and CI asserts it; the r450 first-session audit is the newest playtest
+evidence (AUDIT.md top). The tutorial spec supersedes `FOUNDATIONS_SPEC.md` §6 for chapter 1 only.
 
 ## 1 · What the product is
 
@@ -48,10 +68,10 @@ and measured. The same gate runs on CI for every push.
 
 ## 3 · Where the code sits
 
-- **`main`** — live through r443 (everything through Formulas II + the width/border engine work).
-- **Branch `claude/platform-audit-framework-1hf2v7` → PR #245** — carries waves 1–6 (r444–r449):
-  all 30 Models/Full-Builds rebuilds, the capstone designation, the complete AUDIT record.
-  **Gate green; merge is Wolf's call and has NOT been given yet.**
+- **`main`** — live through r450: PR #245 (the depth pass, waves 1–6) and PR #246 (the
+  first-session round: start gate, tour Esc arming, paywall built dark) are both MERGED
+  (2026-09-03). _r449 text kept for history: "#245 gate green; merge is Wolf's call" — given._
+- **Branch `claude/drill-redesign-art-style-jg9vhm`** — r451, docs only (the four vector plans, §0).
 - Cache-busting is versioned (`drills.js?v=300`) and guarded by CI, so a merge goes live cleanly.
 
 ## 4 · Product surface inventory (business-plan relevant)
@@ -88,7 +108,7 @@ and measured. The same gate runs on CI for every push.
 
 ## 6 · Wolf's open decision queue (nothing here blocks the product)
 
-1. **Merge PR #245** — the depth pass to live.
+1. ~~Merge PR #245~~ — DONE (merged with #246, live through r450).
 2. **Premium flip** — when/whether to enable `HOTKEY_PREMIUM` (§4).
 3. **Border-dress doctrine** (r446b): strict ("a rule under a total never clears") vs lenient
    (`bt || ball`) — both ship today in different drills, zero player-stranding either way;
