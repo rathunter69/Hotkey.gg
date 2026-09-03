@@ -528,6 +528,46 @@ try {
     }
   }
   if (!n14) ok(`all ${seen14} drill-driving dev/ harnesses declare a r450 start-gate stance`);
+/* ---- C16 (r452): NO `name:` / `label:` KEY INSIDE A CHALLENGES BLOCK ----
+   drills.js is the display-string SSOT and its header says so: syncDrillMeta (index.html)
+   WRITES CHALLENGES[k].name/.label from meta on every load, "so don't keep stale duplicates in
+   CHALLENGES". Eighteen of the 74 blocks kept them anyway and had drifted — `ruleaudit` read
+   "Audit the rulings" against the shipped "The ruling pass", `balcheck` "Hunt the balance break"
+   against "Make it tie — hunt the break", and thirteen more carried the drill's TAB string in
+   its NAME slot ("Paste Sp.", "S&U", "2-way"). None of it ever reached a player — the sync
+   overwrote all of it — which is exactly why it rotted for two years: a dev reading index.html
+   saw one identity, the product shipped another. r452 deleted all 74; this asserts the zero.
+   SOURCE regex, not a runtime read: post-sync the properties legitimately exist, so only the
+   text of the file can tell a duplicate from the synced value. ---- */
+try {
+  const idx = fs.readFileSync('index.html', 'utf8');
+  const start = idx.indexOf('const CHALLENGES = {');
+  const end = idx.indexOf('STATE + ENGINE', start);
+  if (start < 0 || end < 0) bad('C16: CHALLENGES block not found in index.html (shape changed?)');
+  else {
+    const body = idx.slice(start, end);
+    const lines = body.split('\n');
+    const base = idx.slice(0, start).split('\n').length;   // 1-based line of `const CHALLENGES = {`
+    let key = '(head)', n14 = 0;
+    let inBlock = false;
+    for (let i = 0; i < lines.length; i++) {
+      let s = lines[i];
+      if (inBlock) { const e = s.indexOf('*/'); if (e < 0) continue; s = s.slice(e + 2); inBlock = false; }
+      if (s.trim().startsWith('//')) continue;
+      const b = s.indexOf('/*');
+      if (b >= 0) { const e = s.indexOf('*/', b + 2); if (e < 0) { inBlock = true; s = s.slice(0, b); } else { s = s.slice(0, b) + s.slice(e + 2); } }
+      const km = s.match(/^  ([a-z][a-z0-9_]*)\s*:\s*\{/);
+      if (km) key = km[1];
+      // a drill-level property only — two-space indent inside the block, i.e. four columns in.
+      // check LABELS (`{label:'…'` inside checks()) are indented deeper and are not this class.
+      const hit = s.match(/^    (name|label)\s*:/);
+      if (hit) {
+        n14++;
+        bad(`C16: index.html:${base + i} CHALLENGES.${key} carries an inline \`${hit[1]}:\` — drills.js meta is the SSOT for display strings (drills.js header, lines 8-10); delete it, don't sync it`);
+      }
+    }
+    if (!n14) ok('index.html: no CHALLENGES block carries an inline name:/label: (drills.js meta is the display-string SSOT)');
+  }
 } catch (e) {
   bad('C14 could not run: ' + String(e.message || e).slice(0, 120));
 }
@@ -583,6 +623,27 @@ try {
   }
   if (!n14) ok('certificate tracks: ' + live + ' + dev/migrate-certificates.sql match HK_TRACKS (' +
     Object.keys(truth).map(t => t + ' ' + truth[t].length).join(' · ') + ')');
+/* ---- C16 (r452): CAMPAIGN CHAPTER NAMES ARE GROUP NAMES ----
+   The picker folder reads groups[].name; the campaign rail reads chapters[].name. They were two
+   strings for one chapter — groups said `Models I`, the campaign said `Models I · Valuation` —
+   so the same chapter had two names on two surfaces. The editorial suffix now lives in a
+   separate `sub`, which only the rail appends, and the NAME must match a group exactly. ---- */
+try {
+  const sb15 = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
+  vm.createContext(sb15);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sb15);
+  const groups15 = ((sb15.window.HOTKEY_DRILLS || {}).groups || []).map(g => g.name);
+  const camp15 = (sb15.window.HOTKEY_CAMPAIGN && sb15.window.HOTKEY_CAMPAIGN.chapters) || [];
+  if (!groups15.length || !camp15.length) bad('C16: groups[] or HOTKEY_CAMPAIGN.chapters did not parse (shape changed?)');
+  else {
+    let n15 = 0;
+    for (const c of camp15)
+      if (!groups15.includes(c.name)) {
+        n15++;
+        bad(`C16: HOTKEY_CAMPAIGN chapter ${c.id} name '${c.name}' is not a groups[] name — the picker folder and the campaign rail must show one string (put any suffix in \`sub\`). Groups: ${groups15.join(' | ')}`);
+      }
+    if (!n15) ok(`drills.js: all ${camp15.length} campaign chapter names match a groups[] name`);
+  }
 } catch (e) {
   bad('C15 could not run: ' + String(e.message || e).slice(0, 120));
 }
