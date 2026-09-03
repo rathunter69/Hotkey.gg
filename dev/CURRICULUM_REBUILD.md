@@ -84,6 +84,29 @@ Phase A v2 (the revised map) replaces the first map on PR #249.
 - Entry path: landing → Enter → Level 1 act 1. The modal product tour and the guided auto-handoff are
   deleted; three contextual one-time tips replace the tour's chrome beats.
 
+### 1c · r455 redirect: integrated tutorials, not game levels (Wolf, 2026-09-03) — RESOLVED
+Wolf, on the r454 "level" plan (act cards, pixel HUD, dissolve reveals, story names): "I think we lose
+the similarity to leetcode as a platform… keep the pixel art limited to the rank, level, achievements,
+player card — basically all the customization options, but keep the original style for the actual
+game. This is trying too hard to be like an indie game without building the gameplay or story to
+support it — so we should lean into the idea of teaching and make these an integrated tutorial."
+
+| # | decision | effect |
+|---|---|---|
+| **1** | **Guide panel open by default on the five Foundations keys**, a collapsed toggle everywhere else (CURRICULUM_V3 §9.0.2) | the LeetCode shape: board left, explanation beside it, clock running |
+| **2** | **Route replay is the "editorial", built later** — after Foundations, once the ghost stores keys (§9.0.5) | nothing in the Foundations build designs against it |
+| **3** | **No Practice-vs-Ranked mode.** The clock always runs; every run posts, as every drill does today; hints are free and never change the score | §8 D-4 reads "guide open on play 1", not "clock hidden". (Making the ranked opt-in automatic at a level is a separate spec — not this file) |
+
+What it changes: **P9 (art) narrows** to identity surfaces — rank emblems, level chip, achievements,
+player card; the drill keeps the site's original style. **§1b's five boards stand** (every beat, tag,
+pool, alt, ☆ and par), renamed functionally (Navigate & Select · Edit & Repair · First Formulas ·
+Format the Page · Model Tour; keys unchanged). **Phase B:** the step controller is kept and is what
+is built now (CURRICULUM_V3 §9.0); the pixel chrome — act cards, HUD banner, reveals — is dropped, and
+the Tour's HUD/stage-card runtime goes with the Tour instead of being re-scoped. **Phase C:** Level 1
+becomes the `navigation` **guided drill** (guide panel + three-rung hints); the Keyboard Tour still
+retires into it; `e2e-depth-mechanics` asserts steps and hints, not cards. Superseded by this note:
+§1b "multi-act game boards", the r455 Level 1 pixel mock (rejected direction, kept as a record).
+
 ## 2 · The phases (each = one PR, gate green, Wolf playtest between)
 
 ### Phase A — the curriculum map (spec, one session, Wolf review)

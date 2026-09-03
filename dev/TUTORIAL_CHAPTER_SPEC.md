@@ -1,5 +1,12 @@
 # THE KEYBOARD TOUR + THE ON-RAMP — Foundations gains a tutorial front end (r451 spec **v2**, DRAFT for Wolf review)
 
+> **r455 (2026-09-03) — partly superseded.** §3.0.2 (the TUTORIAL HUD banner) and the stage cards
+> (§3.0.4's `#tourWrap`/`#tourCard` overlay, §3.0.3's between-stage cards) are **superseded by
+> `dev/CURRICULUM_V3.md` §9**: a guide panel beside the board plus a three-rung hint ladder, built
+> from the existing checklist/F1-hints chrome. The Keyboard Tour **retires into the `navigation`
+> guided drill** (CURRICULUM_V3 §6 D-3, §9.1); only its three-miss counter (`S._hudMiss`) survives,
+> as the hint trigger. §0 (the diagnosis) and §3.0.1's board stay useful; read the rest as history.
+
 _History: **v1** written 2026-09-03 (session r451) — "the first ten drills become a tutorial chapter,
 the six robust Foundations drills move to a new chapter". **v2, same day (2026-09-03), replaces it and
 is the design of record.** Wolf's question that forced the re-cut: "a chapter of foundation drills, or

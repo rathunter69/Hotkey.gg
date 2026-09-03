@@ -25,14 +25,15 @@ generated off that JSON.
 §1 (P1–P8, law **except** P3's re-cut and P4's lesson-opener rule, which Wolf's redirect supersedes) ·
 `dev/audit-r452/audit-catalog.md` (the skill graph: 74 drills, 59 require-before-teach violations, the
 difficulty spine, options A–D) · `dev/TUTORIAL_CHAPTER_SPEC.md` §3.0 (the Tour's six stages and its HUD
-— now the **level machinery**) · `dev/DEPTH_PASS.md` §1.7 (language standard), §2.4 (capstones), §2.5
+— retired; r455 §9 carries the guide panel that replaces them) · `dev/DEPTH_PASS.md` §1.7 (language standard), §2.4 (capstones), §2.5
 (the tier ladder), §3 (delta-table grammar), §4 (the five unbuilt capstone pages) ·
 `dev/DEPTH_PASS_CAMPAIGN.md` §0–§1 (retirements and route facts a build agent must not re-derive).
 
 **The headline.** The **eight original chapters keep their names, their order, their campaign ids
 `c1`–`c8` and their capstone designations.** Chapter 1, Foundations, is rebuilt from seven ordinary
-drills into **five major levels** — four multi-act game boards plus `modeltour` — that replace both
-the lesson-drill idea and the Keyboard Tour. 74 drills → **84** (74 − 1 retired + 4 levels + 2 opener
+drills into **five guided drills** — four three-step integrated tutorials plus `modeltour` (r455: guide
+panel + hints, not game levels) — that replace both
+the lesson-drill idea and the Keyboard Tour. 74 drills → **84** (74 − 1 retired + 4 guided + 2 opener
 drills + 5 capstones). **Require-before-teach violations: 59 → 0.**
 
 **What v2 kills that v1 cost.** Because the eight chapters and their ids survive, there is **no
@@ -49,7 +50,7 @@ Chapter ids are the live `HOTKEY_CAMPAIGN` ids `c1`–`c8`, and a chapter's `nam
 
 | # | chapter | tier | unlock | opens on | capstone | entries (drills) | what it teaches |
 |---|---|---|---|---|---|---|---|
-| c1 | **Foundations** | free | — | `navigation` | `modeltour` | 5 (5) | the game tutorial — four multi-act levels, one foundational family each, then the model tour |
+| c1 | **Foundations** | free | — | `navigation` | `modeltour` | 5 (5) | the integrated tutorial — four guided drills, one foundational family each, then the model tour |
 | c2 | **Formatting** | free | — | `ruleaudit` | `gauntlet` | 11 (11) | the banker’s finish — weight, alignment, decimals, rules, widths, paste-special and the house standard |
 | c3 | **Formulas I** | free | — | `percent` | `qclose` | 11 (11) | a formula points at cells — sums, anchors, ratios, growth and roll-ups on a live page |
 | c4 | **Data & Lookups** | free | — | `tapepull` | `cleanroom` | 12 (12) | rows, columns, sorts, filters and the two ways to read a value out of a tape |
@@ -59,16 +60,16 @@ Chapter ids are the live `HOTKEY_CAMPAIGN` ids `c1`–`c8`, and a chapter's `nam
 | c8 | **Full Builds** | pro | L22 | `threestmt` | `shipit` | 11 (11) | whole models, cold and under the clock — three statements, the DCF page, the paper LBO, the cover |
 
 **Counts.** free = **39** drills (c1–c4) · PRO = **45** (c5–c8). Catalog total **84**, up from 74:
-+4 levels, +2 opener drills (`tapepull`, `rollfwd`), +5 capstones, −1 retirement (`navigation`,
-absorbed into level 1). The Keyboard Tour leaves the product entirely (§6 D-3).
++4 guided drills, +2 opener drills (`tapepull`, `rollfwd`), +5 capstones, −1 retirement (`navigation`,
+absorbed into the `navigation` guided drill). The Keyboard Tour leaves the product entirely (§6 D-3).
 
-**Why five levels and not twelve games.** The twelve-mini-game draft split the foundational grammar
+**Why five drills and not twelve games.** The twelve-mini-game draft split the foundational grammar
 into twelve 16–26-second boards. Wolf's read was that it "feels shallow" — and he is right for a
 structural reason: at 20 seconds a board can carry one chord, so twelve of them teach twelve chords
-and no *habit*. A level runs 60–120 seconds across three or four acts, which is long enough for the
+and no *habit*. A guided drill runs 60–120 seconds across three or four steps, which is long enough for the
 thing that actually transfers: use a chord, then use it again inside a task that has moved on. Four
-levels also match the four families the graph actually has — **move & select · enter, edit & structure ·
-formulas & anchors · formats & the ribbon** — so each level owns a family instead of a keystroke.
+drills also match the four families the graph actually has — **move & select · enter, edit & structure ·
+formulas & anchors · formats & the ribbon** — so each drill owns a family instead of a keystroke.
 
 ---
 
@@ -82,10 +83,10 @@ which is correct and intended for the ~50 drills the audit §3.1 identified as r
 
 | ch | # | key | name | kind · status | par | teaches (new only) | requires |
 |---|---|---|---|---|---|---|---|
-| c1 | 1 | `navigation` | The Corridor | LEVEL · add | 90 | `move` · `save` · `jump(ctrl-arrow)` · `select` · `select-edge` · `row/col-select` · `goto-special` · `copy/paste` | — |
-| c1 | 2 | `repairshop` | The Repair Shop | LEVEL · add | 105 | `enter/edit(F2)` · `clear/delete` · `undo` · `redo` · `cut` · `fill(D/R)` · `insert/delete row-col` · `schedule` · `hide/unhide/group` | `move` · `select` · `select-edge` · `row/col-select` · `copy/paste` |
-| c1 | 3 | `powergrid` | The Power Grid | LEVEL · add | 110 | `point-mode` · `sum(Alt=)` · `margin/ratio` · `anchor($/F4)` · `mixed-anchor` · `sign-convention` · `costs-negative` | `enter/edit(F2)` · `select` · `select-edge` · `fill(D/R)` |
-| c1 | 4 | `printshop` | The Print Shop | LEVEL · add | 100 | `comma/currency-fmt` · `decimals` · `percent-fmt` · `parens-negative` · `bold/italic/color` · `blue-inputs` · `align` · `borders(top/outside/bottom)` · `autofit` | `select` · `row/col-select` · `goto-special` · `enter/edit(F2)` · `margin/ratio` · `sign-convention` |
+| c1 | 1 | `navigation` | Navigate & Select | GUIDED · add | 90 | `move` · `save` · `jump(ctrl-arrow)` · `select` · `select-edge` · `row/col-select` · `goto-special` · `copy/paste` | — |
+| c1 | 2 | `repairshop` | Edit & Repair | GUIDED · add | 105 | `enter/edit(F2)` · `clear/delete` · `undo` · `redo` · `cut` · `fill(D/R)` · `insert/delete row-col` · `schedule` · `hide/unhide/group` | `move` · `select` · `select-edge` · `row/col-select` · `copy/paste` |
+| c1 | 3 | `powergrid` | First Formulas | GUIDED · add | 110 | `point-mode` · `sum(Alt=)` · `margin/ratio` · `anchor($/F4)` · `mixed-anchor` · `sign-convention` · `costs-negative` | `enter/edit(F2)` · `select` · `select-edge` · `fill(D/R)` |
+| c1 | 4 | `printshop` | Format the Page | GUIDED · add | 100 | `comma/currency-fmt` · `decimals` · `percent-fmt` · `parens-negative` · `bold/italic/color` · `blue-inputs` · `align` · `borders(top/outside/bottom)` · `autofit` | `select` · `row/col-select` · `goto-special` · `enter/edit(F2)` · `margin/ratio` · `sign-convention` |
 | c1 | 5 | `modeltour` | Model Tour | capstone · built | 35 | — | `move` · `jump(ctrl-arrow)` · `copy/paste` · `fill(D/R)` · `percent-fmt` · `comma/currency-fmt` · `decimals` · `bold/italic/color` · `blue-inputs` · `align` · `schedule` |
 | c2 | 6 | `ruleaudit` | Ruling Pass | drill · built | 16 | — | `bold/italic/color` · `borders(top/outside/bottom)` · `schedule` |
 | c2 | 7 | `center` | Center | drill · built | 22 | — | `row/col-select` · `bold/italic/color` · `borders(top/outside/bottom)` |
@@ -184,7 +185,7 @@ Wolf**.*
   39 drills — no gate, ever                    |  45 drills — subscription OR level 13/16/19/22
 ```
 
-| side | chapters | drills | of which levels | of which capstones | gate |
+| side | chapters | drills | of which guided | of which capstones | gate |
 |---|---|---|---|---|---|
 | **free** | c1 · c2 · c3 · c4 | **39** | 4 (all in c1) | 4 (`modeltour` `gauntlet` `qclose` `cleanroom`) | none — open forever |
 | **PRO** | c5 · c6 · c7 · c8 | **45** | — | 4 (`redflags` `pitchpage` `cascade` `shipit`) | entitlement **OR** the curve below |
@@ -241,7 +242,7 @@ modeling:['c6','c7','c8'] }`.
 already done — and if you are mid-chapter, it is the first such drill in the chapter you are standing
 in.* A drill you "can actually do" is one whose every REQUIRES tag has been taught by something you
 have cleared. That is the whole rule: no level check, no entitlement check, no pace check. Locks are
-shown as reasons, never as walls — a locked row reads "wants `anchor($/F4)`: try **The Power Grid**",
+shown as reasons, never as walls — a locked row reads "wants `anchor($/F4)`: try **First Formulas**",
 and free play stays open (audit §4 UI note 2).
 
 Because the map has **zero** require-before-teach violations, catalog order alone already satisfies
@@ -275,7 +276,7 @@ Three consequences the picker UI hangs off:
    the checker's rule (d1) asserts. A brand-new player's "next up" is `navigation`, every time, with
    no `hk_tour_done` flag in the way.
 2. **A chapter's opener is always ready off Foundations alone** (checker rule d2), so a player who
-   finished the five levels and jumped to Data & Lookups is never told "nothing here yet".
+   finished the five Foundations drills and jumped to Data & Lookups is never told "nothing here yet".
 3. **A capstone is ready only when its chapter is.** Every capstone's REQUIRES is its own chapter's
    vocabulary, so "★ capstone — locked until you clear X" is computed, not hand-written.
 
@@ -294,11 +295,11 @@ achievements reading group names · **POOL** = `HOTKEY_CHALLENGE_POOL`.
 | # | delta | type | rationale | plumbing impact |
 |---|---|---|---|---|
 | **D-1** | **The eight groups, ids, names, order and capstone designations are UNCHANGED** — `Foundations · Formatting · Formulas I · Data & Lookups · Formulas II · Models I · Models II · Full Builds`, campaign `c1`–`c8`, capstones `modeltour · gauntlet · qclose · cleanroom · redflags · pitchpage · cascade · shipit` | NO CHANGE | Wolf 2026-09-03: "the original chapter layout was actually pretty good". Everything v1 spent on a re-cut — the claim-flag map, the track re-derivation, the `HOTKEY_PREMIUM` re-point, the achievement re-pointing — is **withdrawn** | none. `cap_c1`…`cap_c8` keep their targets; `hk_camp_xp` needs no migration; `x_found`/`grp1`–`grp4` keep their group strings |
-| **D-2** | **4 LEVEL ADDs** — `navigation` `repairshop` `powergrid` `printshop` (all c1) | ADD ×4 | Wolf: Foundations becomes a game tutorial of "a few major lessons", not twelve shallow boards. §9 carries the pages | GROUPS +4 (all at the head of `Foundations`) · `meta` ×4 with `level:true` · PARS +4 (60–120 s band) · CLOCKS +4 (**pass ×2.5**, not ×2.0 — §8 D-2) · LB auto (levels post, §8 RESOLVED-2) · SEO +4 · TRACKS +4 (`fluency`) · POOL excludes level keys · `e2e-alt-paths` +8 · a new act controller (§9.0) |
-| **D-3** | **`keyboardtour` RETIRED** — level 1 replaces it | RETIRE | Wolf 2026-09-03. L1 act 1 **is** the Tour's stage 1 board, act 2 **is** stage 2; stages 3–6 redistribute to L2 (enter/edit/structure), L3 (sums/fill) and L4 (dress/save). A separate untimed pre-game would teach the same grammar twice, and the honest-t=0 problem it was built to solve is now solved by the level's own act-1 HUD | **KEEP the runtime, re-point it:** the TUTORIAL HUD (`TUTORIAL_CHAPTER_SPEC` §3.0.2) becomes the per-ACT banner · the stage cards (§3.0.4) become ACT cards · the tier-ladder reveal (DEPTH_PASS §2.5) paints act N+1's region in · `TOUR_STEPS`/`startKeyboardTour`'s untimed bail, the `tourMode` flag, `hk_tour_done_v2` and the `checkWin` exemption all **go** (a level is a timed drill). `obStart` and `showComfort`'s "basically none" branch load `navigation`. `check-invariants`' Keyboard-Tour block re-points at the level contract |
-| **D-4** | **`navigation` RETIRED into `navigation` act 1** | RETIRE | the switchback corridor board is act 1 verbatim; a 20-second movement board cannot also be the level that teaches selection and the clipboard, and two keys over one board would split its PBs and its leaderboard | GROUPS −1 · `menuOrder` −1 · PARS/CLOCKS −1 · LB: the `navigation` board closes, `navigation`'s opens (no migration — boards derive from `menuOrder`) · SEO: `drills/navigation.html` → 301 to `drills/corridor.html` · **`HK_PLACEMENT[0]` re-points** `navigation` → `navigation` (§8 D-6) · PBs on `navigation` are kept in localStorage and shown as a retired-drill row on the profile (r158) |
-| **D-5** | **the five robust Foundations drills LEAVE c1** — `blocksel` → c2 · `pastes` → c2 · `filldr` → c3 · `rowops` → c4 · `editfix` → c5 | MOVE ×5 | Foundations is exactly five levels now (checker d1), so each of the five goes to the chapter whose functionality it exercises. **`blocksel`** ("assemble and format the summary; dress the table as you go and box it whole") — its clipboard half is L2's job now, what is left is a dressing board → **Formatting**. **`pastes`** — three of paste-special's four routes (formats, values, transpose) are presentation ops and every one of its REQUIRES is a format tag → **Formatting**; it must also precede `drill`/`lookup2`/`recon`, and parking it inside Data & Lookups puts par 42 ahead of `drill` 22, a ×0.52 spine break (this is the one place v2 deviates from the destination Wolf sketched, and the deviation is arithmetic, not taste). **`filldr`** ("a quarterly operating build off the revenue feed… one anchored formula fills most of it") → **Formulas I**. **`rowops`** ("insert the missing line and the missing quarter, delete the squatters") → **Data & Lookups**, beside `scrub` and `unhide`, the same hand. **`editfix`** ("a review came back on the schedule — repair all three") → **Formulas II**, which is the audit-and-repair chapter | GROUPS only; keys, boards, PBs, pars and SEO pages untouched. TRACKS: `filldr` `rowops` `editfix` change track (§4). Picker hotkeys inside a chapter shift (cosmetic — the r447 `cascade` move is the precedent) |
-| **D-6** | **2 opener drill ADDs** — `tapepull` (c4) · `rollfwd` (c7) | ADD ×2 | the only two ADDs the graph still forces. `tapepull` kills the last two orphan tags in one 22-second board: **`VLOOKUP`** (3 drills need it, nothing teaches it) and **`stat-fn(MEDIAN/AVERAGE)`** (demanded at `recon`, taught 13 positions later at `wacc`). `rollfwd` teaches **`circularity-avoidance`**, which appears in *zero* player-facing surfaces despite being the catalog's most-asked interview idea, and gives Models II an opener at par 26 instead of `covtable` 36. Pages: v1 §9.7 and §9.8, carried unchanged in substance — they are ordinary timed drills, not levels and not lessons | GROUPS +2 · PARS +2 · CLOCKS +2 · LB auto · SEO +2 · TRACKS +2 · POOL candidates |
+| **D-2** | **4 GUIDED-DRILL ADDs** — `navigation` `repairshop` `powergrid` `printshop` (all c1) | ADD ×4 | Wolf: Foundations becomes "a few major lessons", not twelve shallow boards; r455: as **integrated tutorials** (guide panel + hints), not game levels. §9 carries the pages | GROUPS +4 (all at the head of `Foundations`) · `meta` ×4 with `guided:true` · `steps` ×4 (§9.0.1) · PARS +4 (60–120 s band) · CLOCKS +4 (**pass ×2.5**, not ×2.0 — §8 D-2) · LB auto (they post, §8 RESOLVED-2) · SEO +4 · TRACKS +4 (`fluency`) · POOL excludes the guided keys · `e2e-alt-paths` +8 · a new step controller (§9.0) |
+| **D-3** | **`keyboardtour` RETIRED** — the `navigation` guided drill replaces it | RETIRE | Wolf 2026-09-03. `navigation` step 1 **is** the Tour's stage 1 board, step 2 **is** stage 2; stages 3–6 redistribute to `repairshop` (enter/edit/structure), `powergrid` (sums/fill) and `printshop` (dress/save). A separate untimed pre-game would teach the same grammar twice, and the honest-t=0 problem it was built to solve is now solved by the guide panel open on play 1 | **KEEP two pieces, drop the rest (r455):** the three-miss counter `S._hudMiss` becomes the hint trigger (§9.0.3) and the tier ladder (DEPTH_PASS §2.5) may grow a board step by step; the TUTORIAL HUD banner (`TUTORIAL_CHAPTER_SPEC` §3.0.2), the stage cards, `TOUR_STEPS`/`startKeyboardTour`'s untimed bail, the `tourMode` flag, `hk_tour_done_v2` and the `checkWin` exemption all **go** (a guided drill is a timed drill). `obStart` and `showComfort`'s "basically none" branch load `navigation`. `check-invariants`' Keyboard-Tour block re-points at the step contract |
+| **D-4** | **`navigation` RETIRED into `navigation` step 1** | RETIRE | the switchback corridor board is step 1 verbatim; a 20-second movement board cannot also be the drill that teaches selection and the clipboard, and two keys over one board would split its PBs and its leaderboard | GROUPS −1 · `menuOrder` −1 · PARS/CLOCKS −1 · LB: the `navigation` board closes, `navigation`'s opens (no migration — boards derive from `menuOrder`) · SEO: `drills/navigation.html` → 301 to `drills/corridor.html` · **`HK_PLACEMENT[0]` re-points** `navigation` → `navigation` (§8 D-6) · PBs on `navigation` are kept in localStorage and shown as a retired-drill row on the profile (r158) |
+| **D-5** | **the five robust Foundations drills LEAVE c1** — `blocksel` → c2 · `pastes` → c2 · `filldr` → c3 · `rowops` → c4 · `editfix` → c5 | MOVE ×5 | Foundations is exactly five guided drills now (checker d1), so each of the five goes to the chapter whose functionality it exercises. **`blocksel`** ("assemble and format the summary; dress the table as you go and box it whole") — its clipboard half is `repairshop`'s job now, what is left is a dressing board → **Formatting**. **`pastes`** — three of paste-special's four routes (formats, values, transpose) are presentation ops and every one of its REQUIRES is a format tag → **Formatting**; it must also precede `drill`/`lookup2`/`recon`, and parking it inside Data & Lookups puts par 42 ahead of `drill` 22, a ×0.52 spine break (this is the one place v2 deviates from the destination Wolf sketched, and the deviation is arithmetic, not taste). **`filldr`** ("a quarterly operating build off the revenue feed… one anchored formula fills most of it") → **Formulas I**. **`rowops`** ("insert the missing line and the missing quarter, delete the squatters") → **Data & Lookups**, beside `scrub` and `unhide`, the same hand. **`editfix`** ("a review came back on the schedule — repair all three") → **Formulas II**, which is the audit-and-repair chapter | GROUPS only; keys, boards, PBs, pars and SEO pages untouched. TRACKS: `filldr` `rowops` `editfix` change track (§4). Picker hotkeys inside a chapter shift (cosmetic — the r447 `cascade` move is the precedent) |
+| **D-6** | **2 opener drill ADDs** — `tapepull` (c4) · `rollfwd` (c7) | ADD ×2 | the only two ADDs the graph still forces. `tapepull` kills the last two orphan tags in one 22-second board: **`VLOOKUP`** (3 drills need it, nothing teaches it) and **`stat-fn(MEDIAN/AVERAGE)`** (demanded at `recon`, taught 13 positions later at `wacc`). `rollfwd` teaches **`circularity-avoidance`**, which appears in *zero* player-facing surfaces despite being the catalog's most-asked interview idea, and gives Models II an opener at par 26 instead of `covtable` 36. Pages: v1 §9.7 and §9.8, carried unchanged in substance — they are ordinary timed drills with no guide panel and no steps | GROUPS +2 · PARS +2 · CLOCKS +2 · LB auto · SEO +2 · TRACKS +2 · POOL candidates |
 | **D-7** | **5 capstone ADDs** — `qclose` (c3) · `cleanroom` (c4) · `redflags` (c5) · `pitchpage` (c6) · `shipit` (c8) | ADD ×5 | DEPTH_PASS §2.4 / §3 D1/D3/D4/D5/D6, still unbuilt (DEPTH_PASS_CAMPAIGN §0). Pages refreshed to the r452 law in §10. Three chapters already have theirs (`modeltour` `gauntlet` `cascade`) | GROUPS +5 · `meta` ×5 with `capstone:true` · PARS +5 · CLOCKS +5 (pass ×2.0) · SPINE `chapters[i].capstone` for c3–c6 and c8 · LB auto · SEO +5 · TRACKS +5 · POOL: `redflags` / `shipit` post-calibration |
 | **D-8** | **`audit` TEACHES += `audit(trace)` · `show-formulas`** | AMEND (graph) | `audit(trace)` had **no teacher** and is required by `tieout` (c5) and `opmodel` (c8); `Ctrl+\`` show-formulas is wired at `index.html:28400` and used by zero drills. `audit` is literally the **Review Pass** — "a divisional review page came back with four breaks in it" — and it sits at c5 position 2, before `tieout`. The trace lesson belongs on the review board, not on an eleventh new drill | map + one Phase C clause each in `audit`'s `guide`/`aha`; no board change |
 | **D-9** | **`lookup2` REQUIRES −= `corkscrew(roll-forward)`** | AMEND (graph) | the audit derived this row from board scenery. `lookup2`'s board is a **square 5×5 segment × metric tape with three row×column intersections** (`index.html:22149`); the player never rolls a balance. The audit's own alternative was to move `lookup2` past `balcheck`, which costs Data & Lookups a free drill to fix a requirement that is not real | map only |
@@ -309,7 +310,7 @@ achievements reading group names · **POOL** = `HOTKEY_CHALLENGE_POOL`.
 | **D-14** | **`HOTKEY_GATES` RETIRED** | RETIRE | P1 — one ladder | delete `window.HOTKEY_GATES`; `drillLocked()` / `openGateInfo()` re-point to the capstone + level answer; `check-invariants` C1's gate-bypass assertion retires with it |
 | **D-15** | **`HK_TRACKS` UNCHANGED in shape; 3 keys change track** | RE-DERIVE | P7, §4 | TRACKS — `dev/migrate-certificates.sql` + the newest `issue_certificate` migration regenerate in the **same PR** (r359). C14 guards it |
 | **D-16** | **achievements UNCHANGED** | NO CHANGE | every group name survives the redirect, so `x_found` `grp1` `grp2` `grp3` `grp4` keep their strings and `cap_c1`–`cap_c8` keep their targets. Goals re-derive from the new chapter sizes, which is arithmetic, not an id change (P8 holds) | goal numbers only |
-| **D-17** | **`HK_PLACEMENT` = `corridor · combo · margin · sort · opmodel`** | RE-POINT | `navigation` retires (D-4), so the movement probe re-points at the level that absorbed it. But `navigation` is a ~90 s board where `navigation` was 20 s, which makes the placement three times longer at its cheapest step — **§8 D-6** | `HK_PLACEMENT[0]`; re-sweep the band boundaries once the level pars are measured |
+| **D-17** | **`HK_PLACEMENT` = `corridor · combo · margin · sort · opmodel`** | RE-POINT | `navigation` retires (D-4), so the movement probe re-points at the guided drill that absorbed it. But `navigation` is a ~90 s board where `navigation` was 20 s, which makes the placement three times longer at its cheapest step — **§8 D-6** | `HK_PLACEMENT[0]`; re-sweep the band boundaries once the guided pars are measured |
 | **D-18** | **marketing count 74 → 84** | COUNT | `menuOrder.length` is the source of truth | `index.html:7, :11, :18` · `About.html:14, :21` · enterprise / billing copy · the `e2e-smoke` drill-count guard |
 | **D-19** | **SEO pages +11, −1** | GENERATE | one page per new key; `navigation`'s 301s to `navigation` | `dev/build-drill-pages.js` → `drills/*.html` ×11 + `sitemap.xml` |
 | **D-20** | **`dev/check-curriculum-map.js` wired into gate.yml's fast lane** | ADD (CI) | the violation check as a CI invariant, landed in Phase A so the map cannot rot between phases | one line in the "Static guards" step; it reads one JSON, runs in well under a second, and is never scope-gated |
@@ -323,8 +324,8 @@ returns false for any key absent from `menuOrder`, so nothing NaNs before the Ph
 
 ## 7 · The spine, as text
 
-par by position inside each chapter; `★` = the capstone. The four Foundations **levels** are exempt
-from the spine and print without a rung marker — a 60–120 s multi-act teaching board is not a speed
+par by position inside each chapter; `★` = the capstone. The four Foundations **guided drills** are exempt
+from the spine and print without a rung marker — a 60–120 s three-step teaching board is not a speed
 rung, and Foundations' first rung is its capstone. The floor the checker enforces on everything else
 is the audit §2.3 drop threshold: **par(i+1) ≥ 0.63 × par(i)**.
 
@@ -341,8 +342,8 @@ is the audit §2.3 drop threshold: **par(i+1) ≥ 0.63 × par(i)**.
 
 **Jumps > ×1.6 — one left, from sixteen.** (The audit counted 16 on the live catalog, headed by
 `navigation 20 → filldr 44` ×2.20 — "the product's whole retention problem in one number". Both ends
-of that jump have moved: `navigation` is act 1 of a level, `filldr` sits mid-Formulas I behind four
-levels and eleven Formatting drills.)
+of that jump have moved: `navigation` is step 1 of a guided drill, `filldr` sits mid-Formulas I behind four
+guided drills and eleven Formatting drills.)
 
 | jump | ratio | verdict |
 |---|---|---|
@@ -353,7 +354,7 @@ c1's only graded rung is now `modeltour` at 35, and c2 opens at 16. And Full Bui
 *easier* than Models II (mean 79); the re-orders leave c8 (mean 76) above c6 (mean 73) and beside c7.
 
 **Par estimates.** The 11 new pars are **estimates**, except `qclose` — DEPTH_PASS §4.32 records it
-measured at **94** (median 86 keys; capstone clock pass 188). The four level pars (90 / 105 / 110 /
+measured at **94** (median 86 keys; capstone clock pass 188). The four guided pars (90 / 105 / 110 /
 100) are the roughest numbers in this file: they are Wolf's "5–8 minutes on a first play, replayable
 for time" translated into a *replay* par, which is what a par is. Every new par is re-measured by
 `dev/e2e-par-sweep.js` when the drill builds, and the checker re-runs on the real numbers.
@@ -363,98 +364,196 @@ for time" translated into a *replay* par, which is what a par is. Every new par 
 ## 8 · DECISIONS — for Wolf, recommendation first
 
 **RESOLVED 2026-09-03, by Wolf, and encoded above — not re-litigated here:**
-**(R1)** Level 1 **replaces** the Keyboard Tour entirely; `keyboardtour` retires and its runtime (HUD,
-stage cards, tier reveals) survives as the level machinery (§6 D-3). **(R2)** Levels **post to
-leaderboards** like any drill — timed, generous pass clocks, ☆ visible. **(R3)** The level names *The
-Corridor · The Repair Shop · The Power Grid · The Print Shop* are **placeholders**, kept as such;
-renaming them costs nothing while the keys stay `navigation` `repairshop` `powergrid` `printshop`.
+**(R1)** The `navigation` guided drill **replaces** the Keyboard Tour entirely; `keyboardtour` retires
+(§6 D-3; r455: its HUD and stage cards go with it — the guide panel is the teaching surface). **(R2)**
+The five Foundations drills **post to leaderboards** like any drill — timed, generous pass clocks,
+☆ visible. **(R3)** The names are functional and free to change while the keys stay `navigation`
+`repairshop` `powergrid` `printshop`; r455 proposes *Navigate & Select · Edit & Repair · First
+Formulas · Format the Page* (§9.0 "Names"), replacing the r454 story placeholders.
+**(R4, r455)** Foundations drills are **integrated tutorials, not game levels**: pixel art stays on
+rank, level, achievements and the player card; the drill keeps the site's original style; no
+cards, no HUD, no story, no practice mode (§9.6). Guide panel open by default on the five; route
+replay is an editorial, built later.
 
 | # | question | recommendation | what turns on it |
 |---|---|---|---|
 | **D-1** | **`pastes` goes to Formatting, not Data & Lookups** — the one destination in §6 D-5 that differs from the sketch. | **Formatting.** Inside Data & Lookups it must precede `drill`, `lookup2` and `recon`, which puts par 42 ahead of `drill` 22 — a ×0.52 spine break the checker fails. In Formatting it lands at 42 between `autofit` 36 and `housestyle` 44 with the chapter still monotone. Three of its four routes are presentation ops anyway. | c2/c4 sizes; rule (f) |
-| **D-2** | **A level's pass clock.** Every other drill passes at par × 2.0. A level is a four-act teaching board a player meets cold. | **Pass = par × 2.5 for the four levels only**, par × 2.0 everywhere else. At ×2.0 a first play of a 110 s board fails on the clock while the player is still reading act 3's card, which is exactly the "punished for learning" feeling the tutorial exists to remove. | `HOTKEY_CLOCKS`; the level contract |
-| **D-3** | **How a level scores — one rule for all four.** Pips, time, or lives? | **Pips + the clock; no lives.** Each act's targets are a **touch-list of pips** (the corridor's own §2.6 machinery, generalized): a pip lights when its target reaches its end state, the act completes when its pips are all lit, and the drill's *score* is the clock, exactly like every other drill. **No lives, no fail state** — a wrong move simply does not light a pip. Lives would make the tutorial punish exploration, and the Freedom Doctrine says the slow route is always legal. | the act controller (§9.0); the HUD; `e2e-depth-mechanics` |
-| **D-4** | **First play vs replay.** A level teaches on play 1 and is a time-attack on play 5. | **The HUD's instruction line shows on the first play and hides on replays** (latch per level key, same shape as `hk_tour_done_v2` but per drill); the **clock always runs, and the first play posts** like any other run. Hiding the clock on play 1 would make the first PB a lie and break the leaderboard's honesty (R2). | the level contract; `recordRun` |
-| **D-5** | **Certificate scope moves under live players.** `filldr` `rowops` `editfix` leave `fluency` for `formulas`; four levels join `fluency`. | **Ship it with the r158 softener:** a player who has already *earned* a certificate keeps it (server-side issuance untouched); only in-progress scope moves, and the profile shows the new scope with the old one struck. This is three keys, where v1 moved fourteen. | `migrate-certificates.sql`, the RPC arrays, C14 |
-| **D-6** | **`HK_PLACEMENT`'s movement probe.** `navigation` (20 s) retires into `navigation` (~90 s), so the placement's cheapest step triples. | **Keep `navigation` as the probe for now and re-sweep the bands when its par is measured.** If the placement then reads too long, drop to four probes (`combo · margin · sort · opmodel`) rather than inventing a short movement board that duplicates act 1 — the placement's job is banding, not teaching. | `HK_PLACEMENT`, the band boundaries |
-| **D-7** | **Foundations is now the shortest chapter (5) and the free tier lost a drill (40 → 39).** | **Accept.** Chapter size is not the unit a player feels; time is, and five levels plus `modeltour` is 8–10 minutes of first play against the old seven drills' four. The free tier also *gains* the whole of `Data & Lookups`, which `HOTKEY_GATES` walls today. | landing copy; the "84 drills" count |
+| **D-2** | **A guided drill's pass clock.** Every other drill passes at par × 2.0. A guided drill is a three-step teaching board a player meets cold, reading the guide panel as they go. | **Pass = par × 2.5 for the five Foundations keys**, par × 2.0 everywhere else. At ×2.0 a first play of a 110 s board fails on the clock while the player is still reading step 3's guide, which is exactly the "punished for learning" feeling the tutorial exists to remove. | `HOTKEY_CLOCKS`; the step contract (§9.0) |
+| **D-3** | **How a guided drill scores — one rule for all five.** Beats, time, or lives? | **Checklist beats + the clock; no lives.** Each step owns a group of checklist beats (`updateChecklist`'s rows, grouped — §9.0.1): a beat clears when its target reaches its end state, the step completes when its beats are all clear, and the drill's *score* is the clock, exactly like every other drill. **No lives, no fail state** — a wrong move simply does not clear a beat. Lives would make the tutorial punish exploration, and the Freedom Doctrine says the slow route is always legal. Hints never change the score. | the step controller (§9.0); the guide panel; `e2e-depth-mechanics` |
+| **D-4** | **First play vs replay.** A guided drill teaches on play 1 and is a time-attack on play 5. | **The guide panel is open and hints are armed on the first play; on replays the panel starts collapsed and the toggle is there** (`hk_guide_<key>` latch, §9.0.2 — the shape of `hk_tour_done_v2`, per drill); the **clock always runs, and the first play posts** like any other run. Hiding the clock on play 1 would make the first PB a lie and break the leaderboard's honesty (R2). No practice mode (Wolf, r455). | the step contract (§9.0.4); `recordRun` |
+| **D-5** | **Certificate scope moves under live players.** `filldr` `rowops` `editfix` leave `fluency` for `formulas`; four guided drills join `fluency`. | **Ship it with the r158 softener:** a player who has already *earned* a certificate keeps it (server-side issuance untouched); only in-progress scope moves, and the profile shows the new scope with the old one struck. This is three keys, where v1 moved fourteen. | `migrate-certificates.sql`, the RPC arrays, C14 |
+| **D-6** | **`HK_PLACEMENT`'s movement probe.** `navigation` (20 s) retires into `navigation` (~90 s), so the placement's cheapest step triples. | **Keep `navigation` as the probe for now and re-sweep the bands when its par is measured.** If the placement then reads too long, drop to four probes (`combo · margin · sort · opmodel`) rather than inventing a short movement board that duplicates step 1 — the placement's job is banding, not teaching. | `HK_PLACEMENT`, the band boundaries |
+| **D-7** | **Foundations is now the shortest chapter (5) and the free tier lost a drill (40 → 39).** | **Accept.** Chapter size is not the unit a player feels; time is, and four guided drills plus `modeltour` is 8–10 minutes of first play against the old seven drills' four. The free tier also *gains* the whole of `Data & Lookups`, which `HOTKEY_GATES` walls today. | landing copy; the "84 drills" count |
 | **D-8** | **The four earn-in levels 13 / 16 / 19 / 22.** | **Accept as recommended.** Straight line, three levels per PRO chapter, last chapter at 22 rather than v1's 25 because there are four PRO chapters, not five. If it reads too steep at playtest, flatten the tail (13/16/18/20) rather than the head — the head is the conversion moment. | the landing's ladder band, `unlock_level` |
 
 ---
 
-## 9 · THE FIVE FOUNDATIONS LEVELS
+## 9 · THE FIVE FOUNDATIONS DRILLS — integrated tutorials
 
-### 9.0 What a level IS — the shared contract
+_r455 redirect (Wolf, 2026-09-03): "I think we lose the similarity to leetcode as a platform… keep
+the pixel art limited to the rank, level, achievements, player card — basically all the
+customization options, but keep the original style for the actual game. This is trying too hard to
+be like an indie game without building the gameplay or story to support it — so we should lean into
+the idea of teaching and make these an integrated tutorial." The five boards below are the same
+boards the r454 "levels" were — every beat, tag, pool, alt, ☆ and par survives — with the game
+chrome withdrawn and a **guide panel + progressive hints** put in its place, modelled on the LeetCode
+problem page: the problem on the left, the explanation beside it, the clock running. §9.6 lists what
+is NOT built and why._
 
-A **level** is a timed catalog drill with three or four **acts** on one board. It is not a lesson
-(there is no untimed card before the clock) and not the Tour (there is no exemption from `checkWin`,
-PB, ghost, xp or the leaderboard). What makes it a level rather than a long drill is three things,
-all of which already exist in the engine and only need re-scoping:
+### 9.0 What a Foundations drill IS — the shared contract
 
-| piece | today | as level machinery |
+A **Foundations drill** is an ordinary timed catalog drill whose checklist is grouped into **three
+or four steps** on one board. It is not a lesson (no untimed card before the clock), not a game
+level (no cards, scrim, HUD banner, reveal or story), and not the Tour (no exemption from `checkWin`,
+PB, ghost, xp or the leaderboard). What makes it a tutorial rather than a long drill is the **guide
+panel** (§9.0.2) and the **hint ladder** (§9.0.3), both built from chrome the drill page already has:
+
+| piece | today (verified 2026-09-03 on this branch) | as tutorial machinery |
 |---|---|---|
-| **the act card** | the Tour's stage card — scrim + ring, title, ≤ 60-word body, keycap strip, any key dismisses (`TUTORIAL_CHAPTER_SPEC` §3.0.4, markup reused from the modal tour) | renders between acts, ≤ 4 per level. **The clock does not stop for it** — that is the whole difference from a stage card, and it is why the ≤ 60-word cap is a hard cap |
-| **the HUD** | the TUTORIAL HUD banner + nudge-after-three-wrong-keys (§3.0.2) | the per-act banner. Shows on the **first play only** (§8 D-4); on replays the checklist alone carries the beats |
-| **the reveal** | the Tour's staged board + DEPTH_PASS §2.5's tier ladder | act N+1's region is drawn dim and paints in live when act N's pips are all lit |
-| **the pips** | the `navigation` corridor's pip/touch-list (`index.html` corridor machinery, DEPTH_PASS §2.6) | generalized: every act owns a touch-list, a pip lights on its target's END STATE (never on a keypress), and the act completes when its list is clean |
+| **the checklist** | `updateChecklist()` `index.html:26676` renders every beat, highlights the next open one (`:26731`), and shows `guide[idx]` as a keycap line under it when `hints‖guided` is on (`:26733`) | unchanged as the grader's surface; the step controller groups its rows under step headers |
+| **the guide/keys line** | `C.guide()` is INDEX-PAIRED with `C.checks()` (WORKFLOW §4; `:26732` reads `C.__gCache[idx]`); `hkMacifyKbds` (`themes.js:2799`) rewrites keycaps for Mac at render (`:26756`) | the guide panel's keycap column reads the SAME array — no second copy of any chord |
+| **F1 hints / guided** | `#hintsToggle` `:2269`, `toggleHints` `:28792`; `#guideToggle` `:2270`, `toggleGuided` `:28798` (keys + the cursor fence, `railClamp` `:27466`) | hint 2 of the ladder IS today's F1 line; hint 3 lights the target without the fence |
+| **the target range** | `currentTargetRange()` `:23726`, `C.targets()` index-paired with checks | hint 3's highlight |
+| **the wrong-key counter** | `S._hudMiss` (`:32967`, reset on advance `:33067`) — the Tour's three-miss nudge | generalized as the hint trigger (§9.0.3) |
+| **the results card** | `showResults` `:25560`; the `aha` line (`.rm-aha` `:1035`, e.g. `:3082`) | unchanged; the aha is the step-level "why" (§9.0.2) |
+| **the tier ladder** | `hkTierTick` `:25135` (DEPTH_PASS §2.5, built r421, undeclared by any drill) | optional: a step's region may be declared as a tier so the board grows step by step. No dim-then-paint art; a tier simply appears |
+| **the solution replay** | `#demoBtn` → `playDemo()` `:30644` (optimal keys through the real engine) | stays as-is; the route-replay editorial (§9.0.5) is built on top of it later |
 
-**The one genuinely new piece** is an **act controller**: `S.act`, an act-scoped slice of the
-checklist (`updateChecklist` already renders a slice for the Tour — the same code, without the
-`tourMode` bail), and an act-completion handler that fires the reveal and the next card. Everything
-else is a re-point. Build the act controller before any level.
+**The one genuinely new piece is the step controller:** `S.step`, a step-scoped grouping of the
+checklist (`updateChecklist` already renders a slice for the Tour behind the `tourMode` bail at
+`:26691` — the same code, without the bail), a step-completion handler that advances `S.step`,
+resets the miss counter and re-renders the guide panel. Everything else is a re-point. **Build the
+step controller before any drill.**
 
-**Scoring, per §8 D-3:** pips per act, no lives, the clock is the score. **☆ per level: exactly one,
-visible** (`bonus:true, reveal:true`), and it is always an *efficiency* discovery, never a formatting
-task and never a stamp (DEPTH_PASS §1.0(d)). **Alts ×2 per level**, one of which is the ☆-forfeit
-control. **Grading law, binding (DEPTH_PASS_CAMPAIGN §1):** never grade formula TEXT and never grade
-a KEYPRESS in a core beat.
+#### 9.0.1 The step data shape (declared beside `checks`/`guide`/`targets` in `CHALLENGES[key]`)
+
+```
+steps: [ { name:'Navigate',                       // step header, plain Excel language
+           why:'the keyboard flies — one press per range, not one per cell',   // ONE line; the aha of this step
+           beats:[ {id:0, why:'a plain arrow walks; ctrl+arrow jumps to the edge of the data'},
+                   {id:1}, {id:2} ] },
+         { name:'Select', why:'…', beats:[ {id:3,…}, … ] } ]
+```
+
+The controller BUILDS `steps[s].beats[b]` into `{id, hud, why, keys:{win,mac}}` at render; the source
+literal carries **only `id` and `why`**. Derivations, so nothing is duplicated:
+
+| field | derives from | rule |
+|---|---|---|
+| `id` | the index into `C.checks(S)` / `C.guide()` / `C.targets()` | the index-paired contract (WORKFLOW §4). The step controller asserts every core check index appears in exactly one step; `check-invariants` gets that assertion |
+| `hud` | `checks(S)[id].label` | the checklist line IS the instruction line (`#taskLine` `:2239` carries the drill prompt; a beat never restates it) |
+| `keys.win` | `guide()[id]` | the existing per-beat keycap html |
+| `keys.mac` | `hkMacifyKbds` at render | never stored |
+| `why` (beat) | **new**, ≤ 12 words, optional | the one field a build agent writes. Copy law holds — no chords in `why` (chords live in `keys`) |
+| `why` (step) | the step's line of the drill's `aha` | the results card prints the drill-level `aha`; the panel prints it per step |
+
+`id` never points at a `bonus:true` check — the ☆ belongs to no step, and the panel never lists it
+(the r423 mystery rule, `:26728`).
+
+#### 9.0.2 The guide panel
+
+A column beside the board (the existing `<aside class="checklist" id="checklist">` `:2318` slot,
+widened for the five keys; the same aside everywhere else). Contents, top to bottom: the step list
+(name + `n/m` beats), the current step expanded — each beat's `hud` line with its keycap chord in
+Mac/Win keycaps, the current beat highlighted (the existing `.next` class, `:26750`), the step's
+`why` under the header; a **hint** button (§9.0.3); and the existing footer lines (alt routes
+`:26719`, the esc line `:26754`). Nothing in it is a second surface: it is `updateChecklist`'s
+output with step grouping and the keycap column shown by default.
+
+| state | rule | latch |
+|---|---|---|
+| **Foundations, first play** | panel OPEN, hints armed (the ladder at §9.0.3 is live) | `hk_guide_<key>` unset |
+| **Foundations, replay** | panel starts COLLAPSED to the plain checklist; the toggle is there; hints re-arm on the toggle | `hk_guide_<key>='done'` set by `recordRun` (`:33779`) on the first posted run — the shape of `hk_tour_done_v2` (`:26094`, `:33087`), per key |
+| **a player collapses it mid-first-play** | it stays collapsed for that key | `hk_guide_<key>='off'` |
+| **every other drill** | a collapsed toggle on the drill bar (re-labels `#guideToggle`'s slot; `guided` rails stay a separate, opt-in thing) that remembers its state | `hk_guide` (global) |
+
+The clock never stops for the panel. The panel never covers the board.
+
+#### 9.0.3 Progressive hints — three rungs, in order, never past the ☆
+
+| rung | shows | source | trigger |
+|---|---|---|---|
+| **1 · concept** | the current step's `why` line, pulsed once in the panel | `steps[s].why` | 3 wrong keys on the current beat (`S._hudMiss` ≥ 3, generalized from `:32967`) OR the hint button |
+| **2 · keycap** | the current beat's chord, lit in the panel and on the checklist row | `guide()[id]` — today's F1 line `:26733` | 3 more wrong keys, or the button again |
+| **3 · target** | the beat's cell/range lit on the board (the `guided` highlight without `railClamp`) | `targets()[id]` / `currentTargetRange()` `:23726` | 3 more, or the button again |
+
+Rules: the ladder resets on beat advance (the miss counter already does, `:33067`). **Hints never
+cover the ☆** — it is a discovery, and `isBonus` rows are already excluded from the keys line
+(`:26733`). **Hints do not change scoring** — the clock is the score (Wolf, 2026-09-03: no
+practice mode; every run posts). A "wrong key" is a keypress that moves no beat toward its end state
+and is not a modifier — the Tour's `onRoute` test at `:32967`, without the Tour's per-beat `keys`
+list (a Foundations beat grades end state, so "on route" means "the board changed toward a check").
+
+#### 9.0.4 First play vs replay (replaces §8 D-4's HUD language)
+
+Play 1: guide open, hints armed, the clock runs, the run posts. Play N: guide collapsed, toggle
+present, hints armed only when the panel is opened. The par is a replay par; the ×2.5 pass clock
+(§8 D-2) is what keeps play 1 from failing while the player reads.
+
+#### 9.0.5 Route replay — the editorial (built later, after Foundations)
+
+A scrubbable replay of a run — the player's, the ghost's, or the optimal `playDemo` route — with the
+guide panel following the scrubber so each keystroke is captioned by the beat it served. It needs
+two things the engine does not store today: **the ghost's key stream** (`recordRun` `:33779` posts
+time and splits, not keys; the ghost races on splits) and a **scrubber UI** over `playDemo`'s
+step-through (`:30644`). Not part of the Foundations build; one line here so nothing in §9.0 is
+designed against it.
+
+**Scoring, per §8 D-3:** checklist beats grouped into steps; no lives; the clock is the score.
+**☆ per drill: exactly one, visible** (`bonus:true, reveal:true`), always an *efficiency* discovery,
+never a formatting task and never a stamp (DEPTH_PASS §1.0(d)). **Alts ×2 per drill**, one of which
+is the ☆-forfeit control. **Grading law, binding (DEPTH_PASS_CAMPAIGN §1):** never grade formula
+TEXT and never grade a KEYPRESS in a core beat.
+
+**Names.** Functional, not story — a picker row should say what the drill teaches. Proposed (R3 in
+§8 lets these change freely; keys never do): `navigation` **Navigate & Select** · `repairshop`
+**Edit & Repair** · `powergrid` **First Formulas** · `printshop` **Format the Page** · `modeltour`
+**Model Tour** (unchanged). `drills.js` `name`/`label`/`tab` carry them at build time (`drills.js:62`
+is the pattern); nothing in `dev/curriculum-v3.json` names a drill.
 
 ---
 
-### 9.1 `navigation` — **"The Corridor"** (key kept: PBs, boards and runs key off it) ★ LEVEL 1 · c1 · *name is a placeholder (R3)*
+### 9.1 `navigation` — **Navigate & Select** (key kept: PBs, boards and runs key off it) · c1 · #1
 
-**Game.** You are inside the model, and the model is a maze. Act 1 is the existing switchback
-corridor — solid walls, one straightaway per press, pips down every hall. Act 2 knocks the walls down
-and turns the room into a live sales table you must **capture** block by block: the CAPTURE memo names
-a target, you stretch a selection onto it exactly, the block lights and the next target names itself.
-Act 3 is the run home — teleport to the far corner, take the model block, carry it to the home bay and
-save. **Score:** pips — 1 per corridor hall, 1 per captured block, 1 per delivered thing. **Lives:**
-none; a wrong capture just fails to light. **Feel:** the first minute of the product, and it should
-feel like a game before it feels like Excel.
+**What it teaches.** Moving with the keyboard, jumping to the edge of data, growing a selection from
+where you stand, selecting a whole class of cells at once, and copy/paste/save. Three steps, one
+board that grows.
 
-**Board, per act.**
-- **Act 1 — THE CORRIDOR.** `navigation`'s board verbatim (D-4): one long switchback of solid walls,
-  a pip at the end of every straightaway, the model block parked at the far corner. The wall past the
-  model breaks open for a player who would rather walk than fly.
-- **Act 2 — CAPTURE.** The walls clear; the corner block becomes a regional sales table (Region ×
-  Q1–Q4 + FY, 8 regions), pre-dressed. A **CAPTURE** memo to the right names four targets one at a
-  time, in this seed's words: *the West row · the Q3 column · the whole table · every typed figure.*
-- **Act 3 — THE RUN HOME.** The whole page, a marked **home bay** at A1, and the model block still
-  parked at the far corner.
+**Board, per step.**
+- **Step 1 — Navigate.** `navigation`'s board verbatim (§6 D-4): one long switchback of solid
+  walls, a checkpoint cell at the end of every straightaway, the model block parked at the far
+  corner. The wall past the model breaks open for a player who would rather walk than jump.
+- **Step 2 — Select.** The walls clear; the corner block becomes a regional sales table (Region ×
+  Q1–Q4 + FY, 8 regions), pre-dressed. A memo to the right names four ranges one at a time, in this
+  seed's words: *the West row · the Q3 column · the whole table · every typed figure.*
+- **Step 3 — Copy home.** The whole page, a marked destination range at A1, and the model block
+  still parked at the far corner.
 
 **Concepts taught (tags).** `move` · `jump(ctrl-arrow)` · `select` · `select-edge` · `row/col-select` ·
 `goto-special` · `copy/paste` · `save`
 
 **Beats.**
-- Act 1: (1) Clear the first hall · (2) Clear the corridor to the far corner · (3) Reach the model block
-- Act 2: (4) Capture the {West} row of figures, Q1 through FY · (5) Capture the {Q3} column, every
-  region · (6) Capture the whole table, headers and figures · (7) Capture every typed figure on the
+- Step 1: (1) Reach the first checkpoint · (2) Reach the far corner through every checkpoint ·
+  (3) Reach the model block
+- Step 2: (4) Select the {West} row of figures, Q1 through FY · (5) Select the {Q3} column, every
+  region · (6) Select the whole table, headers and figures · (7) Select every typed figure on the
   table in one pass
-- Act 3: (8) Copy the model block · (9) Deliver it to the home bay · (10) Save the workbook
-- **☆ (visible): take every hall in one press** — no arrow-walking anywhere in act 1.
+- Step 3: (8) Copy the model block · (9) Paste it at the destination range · (10) Save the workbook
+- **☆ (visible): take every straightaway in one press** — no arrow-walking anywhere in step 1.
 
-**Random.** Corridor layout (the existing seed pool) · which row and column the CAPTURE memo names
-(pools) · the table's anchor (3 spots) · values.
+**Random.** Corridor layout (the existing seed pool) · which row and column the memo names (pools) ·
+the table's anchor (3 spots) · values.
 
-**Aha, per act.** A1: "the keyboard flies — one press per hall, not one per cell." A2: "a selection
-is a rectangle you grow from where you stand; ctrl+shift grows it to the edge." A3: "F5 → Special
-selects a whole class at once — every typed number, or every formula."
+**Aha, per step.** S1: "the keyboard flies — one press per range, not one per cell." S2: "a
+selection is a rectangle you grow from where you stand; ctrl+shift grows it to the edge." S3: "F5 →
+Special selects a whole class at once — every typed number, or every formula."
 
 **Par estimate.** ~90 s (replay par; a first play runs 3–4 minutes). Pass = par × 2.5.
 
-**Engine.** Reuse: the corridor pip/touch-list (§2.6) for act 1 · `S.sel` end-state grading for act 2
-(the r429 `selOps` telemetry already records chord-vs-arrow for the ☆) · `F5 → Special` (wired) · the
-save latch. **New:** the act controller (§9.0) — this is the level that builds it.
+**Engine.** Reuse: the checkpoint touch-list (`navigation`'s own, DEPTH_PASS §2.6) for step 1 ·
+`S.sel` end-state grading for step 2 (the r427 selection-provenance latch `S._chordRun` /
+`S._chordRect`, `index.html:27456–27468`, already records chord-vs-arrow for the ☆) · `F5 → Special`
+(wired) · the save latch. **New:** the step controller (§9.0) — this is the drill that builds it.
 
 **Alts.** (1) Walk the corridor cell by cell and select block by block with plain Shift+arrows —
 every core beat clears, **☆ forfeited** (the ☆-forfeit control). (2) `Ctrl+Space` / `Shift+Space` for
@@ -462,156 +561,141 @@ beats 4–5 instead of `Ctrl+Shift+arrows`, and `Ctrl+A` for beat 6 — the star
 
 ---
 
-### 9.2 `repairshop` — **"The Repair Shop"** ★ LEVEL 2 · c1 · *placeholder name*
+### 9.2 `repairshop` — **Edit & Repair** · c1 · #2
 
-**Game.** A page comes in broken and you fix it, then you move it, then you rebuild the floor it sits
-on. Act 1 is a **hunt**: three typos and two wrong entries are planted, F2 fixes what is nearly right,
-Delete-and-retype fixes what is not — and one of them is an **undo trap**, a cell that looks wrong,
-is right, and costs a pip when you clear it (Ctrl+Z gives the pip back; Ctrl+Y takes it away again if
-you overshoot). Act 2 is a **delivery**: cargo blocks with marked destination bays — cut what moves,
-copy what is needed in two places. Act 3 is **the missing floor**: a schedule with a row and a quarter
-missing, two squatter rows to delete, a detail band to fold away, and one formula that floods the
-rebuilt frame with Ctrl+D / Ctrl+R. **Score:** pips per repair, per delivery, per floor. **Feel:**
-competent, fast, slightly smug — the first time the player fixes something.
+**What it teaches.** Editing a cell in place, clearing and retyping, undo and redo, cut vs copy, and
+the structure ops — insert, delete, fill, group. Three steps on one page that arrives broken.
 
-**Board, per act.**
-- **Act 1 — REPAIRS.** A team roster and a small cost block: `Marketng` misspelled, a rate typed into
-  the wrong column, a headcount entered as text, one duplicate row marked `DUPLICATE — delete`, and
-  **one cell the review note flags that is actually correct** (the trap).
-- **Act 2 — THE DOCK.** Three cargo blocks on the left, three marked bays on the right; one block's
-  bay note says *"and leave a copy where it is"*.
-- **Act 3 — THE MISSING FLOOR.** A four-quarter schedule missing its `Q3` column and its `Other`
-  line, two squatter rows below it, a detail band of six rows under the total, and one built formula
-  in the top-left of the empty grid.
+**Board, per step.**
+- **Step 1 — Repairs.** A team roster and a small cost block: `Marketng` misspelled, a rate typed
+  into the wrong column, a headcount entered as text, one duplicate row marked `DUPLICATE — delete`,
+  and **one cell the review note flags that is actually correct** (the undo beat: clearing it
+  un-clears beat 4; Ctrl+Z restores it; Ctrl+Y takes it away again on an overshoot).
+- **Step 2 — Move and copy.** Three data blocks on the left, three marked destination ranges on the
+  right; one block's note says *"and leave a copy where it is"*.
+- **Step 3 — Rebuild the schedule.** A four-quarter schedule missing its `Q3` column and its
+  `Other` line, two stray rows below it, a detail band of six rows under the total, and one built
+  formula in the top-left of the empty grid.
 
 **Concepts taught (tags).** `enter/edit(F2)` · `clear/delete` · `undo` · `redo` · `cut` ·
 `fill(D/R)` · `insert/delete row-col` · `schedule` · `hide/unhide/group`
 
 **Beats.**
-- Act 1: (1) Fix the misspelled team name · (2) Re-enter the two figures that landed wrong ·
+- Step 1: (1) Fix the misspelled team name · (2) Re-enter the two figures that landed wrong ·
   (3) Delete the duplicate row · (4) Restore the cell the note was wrong about
-- Act 2: (5) Move each cargo block to its bay · (6) Leave the shared block in both places
-- Act 3: (7) Insert the missing line and the missing quarter · (8) Delete the two squatter rows ·
-  (9) Flood the schedule from the built formula · (10) Fold the detail band away
-- **☆ (visible): deliver every block with one cut** — no copy-then-delete anywhere in act 2.
+- Step 2: (5) Move each block to its destination range · (6) Leave the shared block in both places
+- Step 3: (7) Insert the missing line and the missing quarter · (8) Delete the two stray rows ·
+  (9) Fill the schedule from the built formula · (10) Group the detail band away
+- **☆ (visible): move every block with one cut** — no copy-then-delete anywhere in step 2.
 
-**Random.** Which name carries the typo (pool) · which two figures land wrong · which cell is the
-trap · bay positions · the missing quarter · values.
+**Random.** Which name carries the typo (pool) · which two figures land wrong · which cell the note
+is wrong about · destination positions · the missing quarter · values.
 
-**Aha, per act.** A1: "F2 edits in place — you do not retype a cell to change one letter, and
-Ctrl+Z is free." A2: "cut moves, copy duplicates — the clipboard is a verb, not a place." A3: "a
+**Aha, per step.** S1: "F2 edits in place — you do not retype a cell to change one letter, and
+Ctrl+Z is free." S2: "cut moves, copy duplicates — the clipboard is a verb, not a place." S3: "a
 schedule is a frame; add a row and everything in it arrives already dressed."
 
 **Par estimate.** ~105 s. Pass = par × 2.5.
 
-**Engine.** Reuse: the act controller · `insert/delete row-col` and the outline/group ops (all
-wired) · the fill ops. **New:** the **undo trap** needs a pip that can go dark again — the touch-list
-already re-evaluates end states on every commit, so this is a predicate, not a mechanism. Nothing
-else.
+**Engine.** Reuse: the step controller · `insert/delete row-col` and the outline/group ops (all
+wired) · the fill ops. **New:** nothing — beat 4 is a check that can go back to not-ok, and the
+checklist already re-evaluates every end state on every commit (`updateChecklist` `:26680`), so
+this is a predicate, not a mechanism.
 
-**Alts.** (1) Retype every broken cell in full instead of F2, and copy-then-delete every cargo block
-— all cores clear, **☆ forfeited** (the control). (2) `Ctrl+9` to hide the detail band instead of
+**Alts.** (1) Retype every broken cell in full instead of F2, and copy-then-delete every block —
+all cores clear, **☆ forfeited** (the control). (2) `Ctrl+9` to hide the detail band instead of
 grouping it — beat 10 clears on the end state (the band is not visible), and the group route is what
 `unhide` (c4) later reps.
 
 ---
 
-### 9.3 `powergrid` — **"The Power Grid"** ★ LEVEL 3 · c1 · *placeholder name*
+### 9.3 `powergrid` — **First Formulas** · c1 · #3
 
-**Game.** The page is a grid of dark cells and formulas are the current. Act 1 is **power-up**: you
-point a formula at its feeds and the cell lights — but the cost feeds arrive **positive**, and a cell
-fed by a wrong-signed input lights red instead of green until you flip it. Act 2 is **the corridor
-sum**: `Alt+=` runs a total down a whole hall of lit cells in one press. Act 3 is **the lock**: one
-formula, one `F4`, filled down and right, and the entire grid comes up at once — the level's payoff
-image. **Score:** pips = lit cells; a red cell is a pip you have not earned yet. **Feel:** the moment
-the whole board lights is the single best five seconds in the tutorial. Build for that.
+**What it teaches.** Pointing a formula at its inputs, the sign convention, Alt+= totals, a ratio,
+and the `$` anchor filled across a grid. Three steps on one P&L that grows.
 
-**Board, per act.**
-- **Act 1 — POWER-UP.** A five-line divisional P&L (Revenue · COGS · Gross profit · Opex · EBITDA) ×
-  Q1–Q4, with Gross profit and EBITDA empty, and **three of the four cost lines entered positive**.
-  A CONVENTION memo states the house rule in words: *costs are entered negative, so a total is
-  always a plain sum.*
-- **Act 2 — THE HALL.** A Total column opens to the right of the P&L, and a Margin line opens
-  beneath it.
-- **Act 3 — THE GRID.** A units-by-product × region grid appears below, with a single bordered
-  **price helper** cell and an empty Revenue grid of the same shape.
+**Board, per step.**
+- **Step 1 — Point and sign.** A five-line divisional P&L (Revenue · COGS · Gross profit · Opex ·
+  EBITDA) × Q1–Q4, with Gross profit and EBITDA empty, and **three of the four cost lines entered
+  positive**. A CONVENTION memo states the house rule in words: *costs are entered negative, so a
+  total is always a plain sum.*
+- **Step 2 — Totals and margin.** A Total column opens to the right of the P&L, and a Margin line
+  opens beneath it.
+- **Step 3 — Anchor and fill.** A units-by-product × region grid appears below, with a single
+  bordered **price** cell and an empty Revenue grid of the same shape.
 
 **Concepts taught (tags).** `point-mode` · `sum(Alt=)` · `margin/ratio` · `anchor($/F4)` ·
 `mixed-anchor` · `sign-convention` · `costs-negative`
 
 **Beats.**
-- Act 1: (1) Flip the cost lines that were entered positive · (2) Build Gross profit for Q1 —
-  revenue plus the signed cost line · (3) Light the rest of the Gross profit row · (4) Build EBITDA
+- Step 1: (1) Flip the cost lines that were entered positive · (2) Build Gross profit for Q1 —
+  revenue plus the signed cost line · (3) Fill the rest of the Gross profit row · (4) Build EBITDA
   for every quarter
-- Act 2: (5) Total every line across the year · (6) Build the gross margin — gross profit over
+- Step 2: (5) Total every line across the year · (6) Build the gross margin — gross profit over
   revenue, every quarter
-- Act 3: (7) Build the top-left Revenue cell — units against the price helper · (8) Light the whole
+- Step 3: (7) Build the top-left Revenue cell — units against the price cell · (8) Fill the whole
   Revenue grid
-- **☆ (visible): light the grid from one anchored formula** — the lock made with `F4`, not typed.
+- **☆ (visible): fill the grid from one anchored formula** — the lock made with `F4`, not typed.
 
 **Random.** Which three cost lines arrive positive (4 pools) · the division-name pool · grid size
-(3×3 or 4×3) · helper position (3 spots) · values.
+(3×3 or 4×3) · price-cell position (3 spots) · values.
 
-**Aha, per act.** A1: "costs go in negative, so a total is always just a sum — the sign does the
-arithmetic for you." A2: "a formula points at cells; point with the arrows and Alt+= writes the sum."
-A3: "one `$` pass, twelve cells — the lock is where the speed lives."
+**Aha, per step.** S1: "costs go in negative, so a total is always just a sum — the sign does the
+arithmetic for you." S2: "a formula points at cells; point with the arrows and Alt+= writes the
+sum." S3: "one `$` pass, twelve cells — the lock is where the speed lives."
 
-**Par estimate.** ~110 s (the longest level). Pass = par × 2.5.
+**Par estimate.** ~110 s (the longest of the five). Pass = par × 2.5.
 
-**Engine.** Reuse: the act controller · point-mode · `cycleAnchor()` (`index.html:25897`) already
-sets `S.f4Used`, which is the ☆ predicate · the fill ops. **New:** the **red/green cell state** for
-act 1 — a per-cell render class driven by the existing ok-predicate, not a new grading path.
+**Engine.** Reuse: the step controller · point-mode · `cycleAnchor()` (`index.html:26612`) already
+sets `S.f4Used`, which is the ☆ predicate · the fill ops. **New:** nothing. (r454 asked for a
+red/green per-cell state for wrong-signed inputs; withdrawn with the game chrome — a wrong-signed
+cell is simply an un-cleared beat 1, and hint rung 3 lights the cells that still need flipping.)
 
-**Alts.** (1) Type every reference and every `$` by hand, twelve formulas in act 3 — all cores clear,
-**☆ forfeited** (the control). (2) Retype each positive cost with a leading minus instead of pasting
-a −1 over the block — beat 1 grades the **value on the board**, so both clear (DEPTH_PASS_CAMPAIGN §1).
+**Alts.** (1) Type every reference and every `$` by hand, twelve formulas in step 3 — all cores
+clear, **☆ forfeited** (the control). (2) Retype each positive cost with a leading minus instead of
+pasting a −1 over the block — beat 1 grades the **value on the board**, so both clear
+(DEPTH_PASS_CAMPAIGN §1).
 
 ---
 
-### 9.4 `printshop` — **"The Print Shop"** ★ LEVEL 4 · c1 · *placeholder name*
+### 9.4 `printshop` — **Format the Page** · c1 · #4
 
-**Game.** The page is right and looks wrong, and you have two ways to fix every part of it: the chord
-and the ribbon walk. Act 1 is **the exchange** — every figure must wear the right format before it
-counts: comma, dollars, percent, decimals, and negatives in parentheses. Act 2 is **blue ink** —
-typed inputs blue, formulas black, headers bold, and `F5 → Special` finds the typed ones in one pass.
-Act 3 is **the frame** — headers centred, a rule above the total, a box around the block, columns
-autofitted. Threaded through all three is **the menu maze**: every command has an `Alt` walk
-(`Alt H 9`, `Alt H F C`, `Alt H A C`, `Alt H B T`, `Alt H O I`), and the ☆ is clearing one whole act
-by ribbon walk alone. **Score:** pips per formatted region. **Feel:** the page goes from a
-spreadsheet to a document in ninety seconds.
+**What it teaches.** Number formats, the blue-input convention, alignment, borders and autofit — and
+that every one of them has a chord AND an `Alt` ribbon walk (`Alt H 9`, `Alt H F C`, `Alt H A C`,
+`Alt H B T`, `Alt H O I`). Three steps on one summary page.
 
-**Board, per act.** One monthly summary page, built once and revealed by act: a title, a header row
+**Board, per step.** One monthly summary page, built once and opened by step: a title, a header row
 (not bold), four labelled lines (Revenue · Costs · Profit · Margin) × six months with figures raw
 (`1234567.891`, `0.0834`, one negative), a Total line with no rule above it, one typed assumption
-cell in black, and two columns too narrow to show their numbers. Act 1 opens the figure block, act 2
-opens the header row and the assumption cell, act 3 opens the frame and the narrow columns.
+cell in black, and two columns too narrow to show their numbers. Step 1 opens the figure block, step
+2 opens the header row and the assumption cell, step 3 opens the frame and the narrow columns.
 
 **Concepts taught (tags).** `comma/currency-fmt` · `decimals` · `percent-fmt` · `parens-negative` ·
 `bold/italic/color` · `blue-inputs` · `align` · `borders(top/outside/bottom)` · `autofit`
 
 **Beats.**
-- Act 1: (1) Dollar-format the figure block · (2) Step the decimals to the house standard ·
+- Step 1: (1) Dollar-format the figure block · (2) Step the decimals to the house standard ·
   (3) Percent-format the Margin line, one decimal · (4) Show the negative in parentheses
-- Act 2: (5) Colour the typed assumption blue · (6) Bold the header row
-- Act 3: (7) Centre the month headers over their columns · (8) Rule the Total line · (9) Box the
+- Step 2: (5) Color the typed assumption blue · (6) Bold the header row
+- Step 3: (7) Center the month headers over their columns · (8) Rule the Total line · (9) Box the
   figure block · (10) Fit the two narrow columns to their contents
-- **☆ (visible): clear a whole act from the ribbon** — one act, start to finish, on `Alt` walks only.
+- **☆ (visible): clear a whole step from the ribbon** — one step, start to finish, on `Alt` walks only.
 
 **Random.** Which line carries the raw percent (Margin or a seeded Growth line) · header pool (months
 vs quarters) · which two columns are narrow · anchor jitter · values.
 
-**Aha, per act.** A1: "a number and its format are two different things — the cell did not change,
-only what it wears." A2: "blue means somebody typed it; black means the sheet worked it out." A3:
+**Aha, per step.** S1: "a number and its format are two different things — the cell did not change,
+only what it wears." S2: "blue means somebody typed it; black means the sheet worked it out." S3:
 "Alt walks the ribbon — every command on it is three letters away."
 
 **Par estimate.** ~100 s. Pass = par × 2.5.
 
-**Engine.** Reuse: the act controller · `fmtOps`, `fmtOps.dec`, `fmtOps.align`, the border ops and
-autofit (all wired) · `introRibbonPeek`'s content (`index.html:31745`), which becomes act 3's card.
-**New:** a **route counter** for the ☆ — the engine must know an act's beats all landed by ribbon
-walk. `fmtOps` already records the op; it needs the route beside it (one field), and the ☆ reads it.
-This is a bonus predicate only — **never a core beat** (grading a keypress in core is the class that
-retired `hunt`).
+**Engine.** Reuse: the step controller · `fmtOps` (`index.html:26276`, `:26963`), `fmtOps.dec`,
+`fmtOps.align`, the border ops and autofit (all wired) · `introRibbonPeek`'s content becomes step
+3's `why` line. **New:** a **route field** for the ☆ — the engine must know a step's beats all landed
+by ribbon walk. `fmtOps` already records the op; it needs the route beside it (one field), and the ☆
+reads it. This is a bonus predicate only — **never a core beat** (grading a keypress in core is the
+class that retired `hunt`).
 
 **Alts.** (1) Do every beat with `Ctrl+1` and the dialogs — all cores clear, **☆ forfeited** (the
 control). (2) Chords throughout (`Ctrl+Shift+1/4/5`, `Ctrl+B`) — cores clear, ☆ forfeited; note the
@@ -620,24 +704,37 @@ route facts: `Ctrl+1 P` lands one decimal where `Alt H P` lands zero, `Ctrl+1 N`
 
 ---
 
-### 9.5 `modeltour` — **"Model Tour"** ★ LEVEL 5 / CAPSTONE · c1 — **built, refresh only**
+### 9.5 `modeltour` — **Model Tour** ★ CAPSTONE · c1 · #5 — **built, refresh only**
 
 Unchanged as a board. `modeltour` is already Foundations' capstone, already `cap_c1`'s target, and
 already "four subtotals blown to `#REF!` in a live P&L: rebuild the cascade, land both margin rows,
 dress the bottom line". The audit's complaint about it — *"a Formatting exam wearing a Foundations
-badge"* — is answered by construction in v2: L4 The Print Shop teaches the whole format vocabulary
-two boards earlier, so the capstone now **chains** what the chapter taught instead of introducing it.
+badge"* — is answered by construction in v2: Format the Page teaches the whole format vocabulary two
+boards earlier, so the capstone now **chains** what the chapter taught instead of introducing it.
 That is exactly what checker rule (b) asserts, and it is why `cap_c1` never re-points (r158).
 
-**Refresh, Phase C, one pass:** its `guide` and `aha` reference the levels by name rather than the
-retired Tour; its par (35) is re-swept once the levels land, because a player arriving off four levels
-is a different player from one arriving off `navigation`.
+**Refresh, Phase C, one pass:** it gets a `steps` block too (its checklist already reads as three
+groups: rebuild · margins · dress), so the guide panel opens on it like the other four; its `guide`
+and `aha` reference the four drills by name rather than the retired Tour; its par (35) is re-swept
+once the four land, because a player arriving off four guided drills is a different player from one
+arriving off `navigation`.
 
 ---
 
-### 9.6 `tapepull` — "Tape Read" · name `Tape Read` · label `Read the tape` · tab `Tape` — **ADD (c4 opener)**
+### 9.6 What is NOT built — and why (Wolf, 2026-09-03)
 
-*Not a level and not a lesson — an ordinary timed drill that happens to be Data & Lookups' first and
+| not built | why, in Wolf's words |
+|---|---|
+| **act / stage cards** (scrim, ring, ≤ 60-word body between acts) | "trying too hard to be like an indie game without building the gameplay or story to support it" — a card between steps is a story beat with no story; the guide panel says the same thing without stopping the eye |
+| **pixel chrome on the drill** (HUD banner, pixel keycaps, dissolve reveals, lit "pips") | "keep the pixel art limited to the rank, level, achievements, player card — basically all the customization options, but keep the original style for the actual game" |
+| **story names and framing** ("The Corridor", "capture", "halls", "the power grid lights up") | "we lose the similarity to leetcode as a platform" — a problem page names what it teaches |
+| **practice vs ranked mode** (an untimed or non-posting first play) | no mode: the clock always runs and every run posts, exactly as every drill does today; hints are free and never change the score. (A separate spec covers making the ranked opt-in automatic at a level — not this document.) |
+| **the route-replay editorial** (§9.0.5) | not withdrawn, deferred: "built later" — after Foundations, when the ghost stores keys |
+
+---
+### 9.7 `tapepull` — "Tape Read" · name `Tape Read` · label `Read the tape` · tab `Tape` — **ADD (c4 opener)**
+
+*Not a guided drill and not a lesson — an ordinary timed drill that happens to be Data & Lookups' first and
 cheapest board. It exists because the graph forces it: **`VLOOKUP`** has three users and no teacher
 (`lookup` teaches INDEX/MATCH *instead*), and **`stat-fn(MEDIAN/AVERAGE)`** is demanded at `recon`
 and taught thirteen positions later at `wacc`. One 22-second board closes both.*
@@ -664,7 +761,7 @@ beat 1 if the number on the board is right.
 
 ---
 
-### 9.7 `rollfwd` — "Roll Forward" · name `Roll Forward` · label `Open, add, less, close` · tab `Roll` — **ADD (c7 opener)**
+### 9.8 `rollfwd` — "Roll Forward" · name `Roll Forward` · label `Open, add, less, close` · tab `Roll` — **ADD (c7 opener)**
 
 *The Models II opener, and the drill that names the thing the catalog does everywhere and says
 nowhere: interest computed off a **beginning** balance is the circularity dodge. At par 26 it also
@@ -808,7 +905,7 @@ changes value.
 which cost family carries the sign error. **Aha:** "seven errors is a finite number — a review pass is a
 hunt with a count, not a vibe." **Finish:** beat 6. **Clocks:** par ~90 (estimate), pass = par × 2.0.
 **Engine:** r419 sentinels REQUIRED (live `#REF!` / `#DIV/0!` propagation); the §2.3 meter with
-`errorCount: 7`; `F5 → Special` (taught by level 1, §9.1) is the fast route to beat 5 and is **never
+`errorCount: 7`; `F5 → Special` (taught by `navigation`, §9.1) is the fast route to beat 5 and is **never
 graded** — grading the keypress is the class that retired `hunt` (DEPTH_PASS_CAMPAIGN §1).
 **Plumbing:** §6 D-7; POOL candidate after calibration.
 **Alts:** (1) fix the seven in board order, top to bottom, touching two correct cells on the way and
@@ -891,8 +988,8 @@ and whether beat 5's deck hand-off belongs in core at all get set live with Wolf
 
 | phase | reads |
 |---|---|
-| **B — the clean-slate entry** | §6 D-3 and §9.0–§9.1. B no longer "makes the Keyboard Tour the only first-run path" — it deletes the modal tour **and** retires the Tour, and points `obStart` / `showComfort`'s "basically none" branch at `navigation`. The Tour's runtime (HUD, act cards, tier reveals) is not deleted; it is re-scoped by the act controller. |
-| **C — the level wave + the moves** | everything. Wave 1 = §9.0's act controller, then §9.1–§9.4's four levels. Wave 2 = §9.6–§9.7's two openers. Wave 3 = §10's five capstones. Assembly = §6's delta table, in order, with `dev/check-curriculum-map.js` green at every step and `dev/migrate-certificates.sql` in the same PR (§4). |
+| **B — the clean-slate entry** | §6 D-3 and §9.0–§9.1. B no longer "makes the Keyboard Tour the only first-run path" — it deletes the modal tour **and** retires the Tour, and points `obStart` / `showComfort`'s "basically none" branch at `navigation`. The Tour's HUD and stage cards are deleted with it (r455); the three-miss counter and the tier ladder are re-scoped by the step controller (§9.0). |
+| **C — the guided wave + the moves** | everything. Wave 1 = §9.0's step controller + guide panel + hint ladder, then §9.1–§9.4's four guided drills (§9.5's `modeltour` refresh rides with them). Wave 2 = §9.7–§9.8's two openers. Wave 3 = §10's five capstones. Assembly = §6's delta table, in order, with `dev/check-curriculum-map.js` green at every step and `dev/migrate-certificates.sql` in the same PR (§4). |
 | **D — progression ties** | §3 (the capstone spine and `unlock_level` replace `HOTKEY_GATES`) and §5 (the "next up" selector). |
 | **E — the launch homepage** | §1's table and §3's curve — the ladder band reads free / PRO / "unlocks at level N" per chapter **from the live config**, never hand-typed (the landing has zero hand-typed numbers). |
 
