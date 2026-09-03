@@ -13,7 +13,7 @@
    "teaches_line": "the game tutorial — four multi-act levels, one foundational family each, then the model tour",
    "drills": [
     {
-     "key": "corridor",
+     "key": "navigation",
      "kind": "level",
      "status": "add",
      "requires": [],
@@ -1542,14 +1542,8 @@
  ],
  "retired": [
   {
-   "key": "navigation",
-   "into": "corridor",
-   "outside_catalog": false,
-   "why": "the switchback corridor becomes ACT 1 of level 1 verbatim; a 20-second movement board cannot also be the level that teaches selection and the clipboard, and two keys over one board would split its PBs and its leaderboard"
-  },
-  {
    "key": "keyboardtour",
-   "into": "corridor",
+   "into": "navigation",
    "outside_catalog": true,
    "why": "Wolf 2026-09-03: level 1 REPLACES the Tour. Its acts carry the Tour's first-contact beats (stages 1–2 verbatim, 3–6 redistributed to L2–L4), so a separate untimed pre-game would teach the same grammar twice. The Tour's RUNTIME survives as the level machinery: the TUTORIAL HUD (§3.0.2), the stage cards (§3.0.4) and the tier-ladder reveal (DEPTH_PASS §2.5) all become per-ACT surfaces"
   }
@@ -1610,7 +1604,7 @@
   "undo"
  ],
  "placement": [
-  "corridor",
+  "navigation",
   "combo",
   "margin",
   "sort",
