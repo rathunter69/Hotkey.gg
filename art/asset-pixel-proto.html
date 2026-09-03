@@ -1,0 +1,419 @@
+<!doctype html><html><head><meta charset="utf-8">
+<title>ALL-ASSETS pixel proto — every native glyph, sprited (r454)</title>
+<style>
+  :root{
+    --pg:#141519; --pfg:#cdd0d6; --ptile:#1d1f25; --pline:#2d3038; --pdim:#7c828e; --pcap:#8b8f98;
+    --px-ink:#2a2e35;                     /* outline ink on DARK themes — lifted, never pure black */
+  }
+  body.light{
+    --pg:#e9eaed; --pfg:#2a2c31; --ptile:#f6f7f9; --pline:#d0d2d8; --pdim:#6b6f78; --pcap:#5d616a;
+    --px-ink:#14161a;                     /* outline ink on LIGHT themes — the deepest house tone */
+  }
+  body{margin:0;font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--pg);color:var(--pfg);
+       padding:24px 24px 80px}
+  h1{font-size:14px;letter-spacing:2px;margin:0 0 6px}
+  .sub{font-size:11px;color:var(--pdim);margin:0 0 18px;max-width:1180px;line-height:1.65}
+  .sub b{color:var(--pfg)}
+  .band{margin-bottom:26px}
+  .bandcap{font-size:10px;color:var(--pcap);letter-spacing:1.6px;margin:0 0 10px;border-top:1px solid var(--pline);
+           padding-top:10px;text-transform:uppercase}
+  .bandcap i{font-style:normal;color:var(--pdim);letter-spacing:.3px;text-transform:none;margin-left:10px;font-size:10px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}
+  .tile{background:var(--ptile);border:1px solid var(--pline);border-radius:8px;padding:10px 8px 7px;text-align:center}
+  .nm{font-size:8.5px;letter-spacing:.6px;margin-top:7px;color:var(--pdim);text-transform:uppercase;line-height:1.3}
+  .nm em{font-style:normal;color:#d98a3a}
+  .lbl{font-size:7.5px;color:var(--pdim);margin-top:3px;letter-spacing:.6px;white-space:nowrap}
+  .strip{display:flex;gap:8px;align-items:flex-end;justify-content:center;min-height:74px}
+  .strip>div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+  svg.px{display:block;shape-rendering:crispEdges;image-rendering:pixelated}
+  .sw{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:7px;color:var(--pdim)}
+  .sw i{display:block;width:34px;height:22px;border-radius:3px;border:1px solid var(--pline)}
+  .mock{background:var(--ptile);border:1px solid var(--pline);border-radius:8px;padding:11px 14px;width:max-content;font-size:11px}
+  .lbrow{display:flex;align-items:center;gap:9px;padding:4px 0;border-bottom:1px solid var(--pline);height:24px}
+  .lbrow:last-child{border-bottom:none}
+  .lbrow .pos{width:20px;color:var(--pdim)}.lbrow .who{width:132px}.lbrow .t{color:var(--pdim);width:52px;text-align:right}
+  .wall{display:grid;grid-template-columns:repeat(9,auto);gap:9px;align-items:end;justify-items:center}
+  #tgl{position:fixed;top:12px;right:14px;z-index:9;font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:1px;
+       background:var(--ptile);color:var(--pfg);border:1px solid var(--pline);border-radius:6px;padding:8px 12px;cursor:pointer}
+  .anim{position:relative;width:64px;height:64px}
+  .anim svg{position:absolute;inset:0}
+  @media (prefers-reduced-motion: no-preference){
+    .anim .f0{animation:hkpxA 640ms steps(1,end) infinite}
+    .anim .f1{animation:hkpxB 640ms steps(1,end) infinite}
+    .spk .s0{animation:hkpxS0 900ms steps(1,end) infinite}
+    .spk .s1{animation:hkpxS1 900ms steps(1,end) infinite}
+    .spk .s2{animation:hkpxS2 900ms steps(1,end) infinite}
+  }
+  @keyframes hkpxA{0%,49%{opacity:1}50%,100%{opacity:0}}
+  @keyframes hkpxB{0%,49%{opacity:0}50%,100%{opacity:1}}
+  @keyframes hkpxS0{0%,32%{opacity:1}33%,100%{opacity:0}}
+  @keyframes hkpxS1{0%,32%{opacity:0}33%,65%{opacity:1}66%,100%{opacity:0}}
+  @keyframes hkpxS2{0%,65%{opacity:0}66%,100%{opacity:1}}
+  table.eff{border-collapse:collapse;font-size:10.5px}
+  table.eff td,table.eff th{border:1px solid var(--pline);padding:5px 9px;text-align:left}
+  table.eff th{color:var(--pcap);font-weight:600;letter-spacing:.8px}
+</style></head><body>
+<button id="tgl">◐ light / dark</button>
+
+<h1>ALL-ASSETS PIXEL PROTO — r454</h1>
+<p class="sub">Every native drawn glyph on hotkey.gg, re-cut in the pixel grammar of <b>Shattered Pixel Dungeon</b> (chunky
+16×16, one-pixel ink outline, 3–4 tone shading, saturated-but-limited palette) with <b>Undertale</b>'s crisp
+no-anti-aliasing UI chrome. Left of each pair is <b>today's generative SVG</b>, drawn live by <code>themes.js</code>
+(<code>hkBadge</code> / <code>hkGlyph</code> / <code>hkLevelChip</code> / <code>hkLevelRing</code>); right is the
+proposed sprite. Sprites are hand-authored <b>char-row arrays</b> (<code>o</code> ink · <code>d/m/l/h</code> the four
+body tones · <code>w</code> spark · uppercase = the accent hue), rendered as one <code>&lt;rect&gt;</code> run per
+horizontal span with <code>shape-rendering:crispEdges</code> — zero image requests, CSP-clean, theme-safe.
+Toggle light/dark top-right: only <code>--px-ink</code> moves.</p>
+
+<div class="band"><div class="bandcap">0 · THE HOUSE PALETTE — 24 colours<i>+ the 5 canon rarity mids (HK_RARITY, imported verbatim) + the 8 tier metals (HK_METALS, imported verbatim). Every sprite below uses only these.</i></div>
+  <div class="row" id="pal"></div>
+  <div class="row" id="palr" style="margin-top:10px"></div>
+</div>
+
+<div class="band"><div class="bandcap">1 · THE 18 ACHIEVEMENT CATEGORY GLYPHS<i>SVG today · 16 master at 1× and 2× · 32 master at 1× and 2×. Orange name = the 32 master is HAND-DRAWN; the rest are EPX-derived from the 16 (that gap is the argument for the hand pass).</i></div>
+  <div class="row" id="glyphs"></div>
+</div>
+
+<div class="band"><div class="bandcap">2 · THE COLOUR AXIS — one decision<i>r384 retired per-family colour ("the wall read as a rainbow") and made every medal engraved steel with rarity on the ring alone. Top row keeps that law in pixels. Bottom row spends one family hue per glyph. Pick one.</i></div>
+  <div class="mock" style="width:auto"><div class="lbl" style="text-align:left;margin-bottom:6px">A · MONO STEEL (r384 law held)</div><div class="row" id="mono"></div>
+  <div class="lbl" style="text-align:left;margin:14px 0 6px">B · FAMILY TINT (one hue per category)</div><div class="row" id="tint"></div></div>
+</div>
+
+<div class="band"><div class="bandcap">3 · THE RARITY RING — pixel grammar replacing the SVG hex ring<i>common → rare → epic → legendary → mythic. SVG today (26-grid hex + scaled outer hex) vs the pixel ring (corner ticks → thin frame → frame + beads → double frame + beads → + edge fins and a crown notch). At 16 the ring degrades by rule.</i></div>
+  <div class="row" id="rings"></div>
+</div>
+
+<div class="band"><div class="bandcap">4 · THE MEDAL WALL, BOTH WAYS<i>the stats-page analytics wall — 18 medals at the size it actually renders. Today's hkBadge hex medal (left) vs pixel sprite + pixel ring (right).</i></div>
+  <div class="row" style="gap:22px;align-items:flex-start">
+    <div class="mock"><div class="lbl" style="text-align:left;margin-bottom:8px">TODAY · hkBadge(id, true, 34, null, rarity)</div><div class="wall" id="wallA"></div></div>
+    <div class="mock"><div class="lbl" style="text-align:left;margin-bottom:8px">PIXEL · 16 master @2× + pixel ring</div><div class="wall" id="wallB"></div></div>
+  </div>
+</div>
+
+<div class="band"><div class="bandcap">5 · LEVEL — chip and ring<i>hkLevelChip (a flat tier tile + numeral) and hkLevelRing (an SMIL-swept progress ring). The pixel ring quantises the sweep to 24 cells and the numeral to a 3×5 pixel face.</i></div>
+  <div class="row" id="level"></div>
+</div>
+
+<div class="band"><div class="bandcap">6 · MEDAL CLOCKS + THE UI GLYPH SET<i>everything currently drawn as a unicode char or an OS emoji — the read changes per platform today. Sprites make it one look everywhere.</i></div>
+  <div class="row" id="uiset"></div>
+</div>
+
+<div class="band"><div class="bandcap">7 · MARKETING MARK — favicon candidate<i>the r209 grid mark, pixel-cut. 16 (tab) · 32 (retina tab / favicon-32.png) · 64 · 96. apple-touch-icon is the same master at 180 ≈ 16×11 — snap to 176 (11×) or re-cut a 20×20 master at 9×.</i></div>
+  <div class="row" id="fav"></div>
+</div>
+
+<div class="band"><div class="bandcap">8 · IN CONTEXT<i>a leaderboard row, a results-card medal strip, and a desk-grade chip — the three places these glyphs actually live.</i></div>
+  <div class="row" style="gap:16px;align-items:flex-start" id="ctx"></div>
+</div>
+
+<div class="band"><div class="bandcap">9 · MOTION — 2 and 3 frame cycles on steps()<i>the only three assets that earn animation. Everything sits inside @media (prefers-reduced-motion: no-preference); with reduce set, frame 0 alone renders.</i></div>
+  <div class="row" id="anim"></div>
+</div>
+
+<script src="../themes.js"></script>
+<script>
+const SPR = {"g16":{"explorer":["....oooooooo....","..ooohhhhhhooo..",".oohhllllllhhoo.",".ohlllddddmllho.","oohlmd....hlmdoo","ohllmd....hlmmho","ohlmmd....hlmmdo","ohlmmd....hlmmdo","oohlmd....hlmdoo",".ohlmmhhhhllmdo.",".oohlmlllllmdoo.","..oohlmmmmmdoo..","...oohlmmmdoo...","....oohlmdoo....",".....oohdoo.....","......oooo......"],"speed":[".......oooooo...","......oohhhho...",".....oohllldo...","....oohllmdoo...","...oohllmdoo....","..oohllmdooooo..","..ohllmmmhhhho..","..ohddddmllldo..","..oooooohlmdoo..",".....oohlldoo...","....oohlldoo....","...oohlldoo.....","...ohlldoo......","...ohddoo.......","...ooooo........","................"],"accuracy":[".....oooooo.....","...ooohhhhooo...","..oohhllllhhoo..",".oohlddddddlhoo.",".ohld......hlho.","oohd........hdoo","ohd...hhhh...hho","ohd..hllllh..hdo","ohd..hlmmmd..hdo","ohd...hddd...hdo","oohh........hdoo",".ohlh......hldo.",".oohlhhhhhhldoo.","..oohdllllddoo..","...ooohdddooo...",".....oooooo....."],"perfect":["................","...oooooooooo...","..oohhhhhhhhoo..",".oohllllllllhoo.","oohllmmmmmmmlhoo","ohllmmmmmmmmmlho","ohlmmddddddmmmdo","oohlmddddddmmdoo",".oohlmddddmmdoo.","..oohlmddmmdoo..","...oohlddmdoo...","....oohlmdoo....",".....oohdoo.....","......oooo......","................","................"],"rapid":["................",".....oooooo.....","....oohhhhoo....","..ooohllllhooo..",".oohhllddmlhhoo.","oohllld..hlllhoo","ohllmmd..hlmmlho","ohlmmmd..hlmmmdo","ohlmmmd..hdmmmdo","ohlmmmd....hlmdo","ohlmmmmhhhhllmdo","oohlmmmlllllmdoo",".oohdmmmmmmddoo.","..ooohdddddooo..","....oooooooo....","................"],"streak":["......oooo......",".....oohho......",".....ohldoo.....","....oohlmho.....","....ohllmdoo....","...oohlmmmho....","..oohllmmmdoo...",".oohllmmmmmhoo..",".ohllMMMMmmlho..","oohlMMMMMMmmdoo.","ohllMMMMMMmmmho.","ohlmMMMMMMmmmdo.","ohlmmMMMMmmmmdo.","oohdmmmmmmmddoo.",".ooohddddddooo..","...ooooooooo...."],"combo":["................","................","................",".ooooo.ooooo....",".ohhhooohhhoo...",".ohllhoohllhoo..",".oohllhoohllhoo.","..oohllhoohllho.",".oohlldoohlldoo.",".ohlldoohlldoo..",".ohddooohddoo...",".ooooo.ooooo....","................","................","................","................"],"comeback":["...........oooo.","..........oohho.",".........oohldo.","........oohlldo.",".......oohllmdo.","......oohlddmdo.",".....oohldoohdo.","....oohldoooooo.","...oohldoo......","..oohldoo.......",".oohldoo........","oohldoo.........","ohldoo..........","ohdoo...........","oooo............","................"],"cert":["....oooooooo....","..ooohhhhhhooo..",".oohhllllllhhoo.",".ohlllmmmmmllho.",".ohlmmmMMmmmmdo.",".ohlmmMMMMmmmdo.",".ohMMMMMMMMMMdo.",".ohlMMMMMMMMmdo.",".ohlmMMMMMMmmdo.",".ohlMMMMMMMMmdo.",".ohlMMmmmmMMmdo.",".oohlmddddmmdoo.","..ohldoooohldo..","..ohldoooohldo..","..ohddhoohdddo..","..oooooooooooo.."],"formula":[".oooooooooooooo.",".ohhhhhhhhhhhho.",".ohdllllddddddo.",".ooohlmdooooooo.","...oohlmhoo.....","....oohllhoo....",".....oohllho....","......oohldo....",".....oohlldo....","....oohlldoo....","...oohlldoo.....",".ooohlldooooooo.",".ohhllmmhhhhhho.",".ohdddddddddddo.",".oooooooooooooo.","................"],"volume":["..........ooooo.","..........ohhho.","..........ohldo.",".....oooooohldo.",".....ohhhoohldo.",".....ohldoohldo.","oooooohldoohldo.","ohhhoohldoohldo.","ohldoohldoohldo.","ohldoohldoohldo.","ohldoohldoohldo.","ohldoohldoohldo.","ohddoohddoohddo.","ooooooooooooooo.","................","................"],"daily":["......oooo......","......ohho......","..ooooohdooooo..","..ohhoooooohho..","..ohdoooooohdo..","..ooohhhhhhooo..","oooohllllllhoooo","ohhohlmmmmmdohho","ohdohlmmmmmdohdo","oooohlmmmmmdoooo","..ooohdddddooo..","..ohhoooooohho..","..ohdoooooohdo..","..ooooohhooooo..","......ohdo......","......oooo......"],"crown":["................","oooo........oooo","ohho........ohho","ohdo..oooo..ohdo","ohdoo.ohho.oohdo","ohlhooohdooohldo","ohldoohllhoohldo","ohlmhohlmdohlldo","ohlmlhllmmhllmdo","ohlmmllmmmllmmdo","ohlmmmmmmmmmmmdo","oohlmmmMMmmmmdoo",".ohlmmmmmmmmmdo.",".ohdddddddddddo.",".oooooooooooooo.","................"],"mastery":["................","......oooo......","...oooohhoooo...","oooohhhllhhhoooo","ohhhllllmlllhhho","oooohlmmmmmdoooo","...oohlmmmdoo...","...ohllmmmmho...","...ohlmmmmmdo...","...ohlmmmmmdo...","...ohlmmmmmdo...","...oohdddddoo...","....oooooooo....","................","................","................"],"mouse":["......oooo......","......ohho......","...oooohdoooo...","..oohhhddhhhoo..","..ohlldoohllho..","..ohlmdoohlmdo..","..ohlmdoohlmdo..",".oohlmmhhllmdoo.",".ohllmmlllmmmho.",".ohlmmmmmmmmmdo.",".ohlmmmmmmmmmdo.",".ohlmmmmmmmmmdo.",".oohlmmmmmmmdoo.","..oohlmmmmmdoo..","...oohdddddoo...","....oooooooo...."],"ice":["......oooo......",".....oohhoo.....",".....ohllho.....","..ooooohdooooo..","..ohhoohdoohho..","..oohhohdohdoo..","ooooohhllhdooooo","ohhhhlllmllhhhho","ohdddlmmmmmddddo","ooooohdmmddooooo","..oohdohdohhoo..","..ohdoohdoohho..","..ooooohdooooo..",".....ohllho.....",".....oohdoo.....","......oooo......"],"moon":["................","....oooo........","...oohho........","..oohldo........","..ohldoo........",".oohldo.........",".ohlldo.........",".ohlmdo.........",".ohlmdoo........",".ohlmmhoo.......",".oohlmlhoo......","..ohlmmlhooooo..","..oohlmmlhhhho..","...oohddddddoo..","....ooooooooo...","................"],"founder":["................","..oooooo.oooooo.",".ooRRRRoooOOOOoo",".oRRRRRRoOOOOOOo",".oRRRRRRoOOOOOOo",".oRRRRRRoOOOOOOo",".oRRRRRRoOOOOOOo",".ooRRRRoooOOOOoo","..oooooo.oooooo.",".ooGGGGoooBBBBoo",".oGGGGGGoBBBBBBo",".oGGGGGGoBBBBBBo",".oGGGGGGoBBBBBBo",".oGGGGGGoBBBBBBo",".ooGGGGoooBBBBoo","..oooooo.oooooo."]},"g32":{"speed":["................................","..................ooooooooo.....",".................oohhhhhhho.....","................oohlllllldo.....","...............oohllmmmmdoo.....","..............oohllmmmmdoo......",".............oohllmmmmdoo.......","............oohllmmmmdoo........","...........oohllmmmmdoo.........","..........oohllmmmmdoo..........",".........oohllmmmmdoo...........","........oohllmmmmdoo............",".......oohllmmmmdoooooooooooo...","......oohllmmmmmmhhhhhhhhhhho...","......ohllmmmmmmmlllllllllldo...","......ohlmmmmmmmmmmmmmmmmmmdo...","......ohdddddddddddddmmmmmdoo...","......ooooooooooooooohlmmmmho...","..................oohllmmmdoo...",".................oohllmmmdoo....","................oohllmmmdoo.....","...............oohllmmmdoo......","..............oohllmmmdoo.......",".............oohllmmmdoo........","............oohllmmmdoo.........","...........oohllmmmdoo..........","..........oohllmmmdoo...........",".........oohllmmddoo............",".........ohllmmdooo.............",".........ohddddoo...............",".........ooooooo................","................................"],"streak":["................................",".............oooooo.............","............oohhhho.............","............ohllldo.............","...........oohlmmdo.............","...........ohllmmdoo............","..........oohlmmmmho............","..........ohllmmmmdoo...........",".........oohlmmmmmmho...........",".........ohllmmmmmmdoo..........","........oohlmmmmmmmmho..........","........ohllmmmmmmmmdoo.........",".......oohlmmmmmmmmmmho.........",".......ohllmmmmmmmmmmdo.........","......oohlmmMMMMMmmmmdoo........",".....oohllmMMMMMMMmmmmhoo.......","....oohllmMMMMMMMMMmmmlhoo......","....ohllmMMMMMMMMMMMmmmlho......","...oohlmMMMMMMMMMMMMMmmmdoo.....","...ohllmMMMMMwwwMMMMMmmmmho.....","...ohlmMMMMMwwwwwMMMMMmmmdo.....","...ohlmMMMMMwwwwwMMMMMmmmdo.....","...ohlmMMMMMMwwwMMMMMMmmmdo.....","...ohlmmMMMMMMMMMMMMMmmmmdo.....","...oohlmmMMMMMMMMMMMmmmmdoo.....","....ohlmmmMMMMMMMMMmmmmdoo......","....oohlmmmMMMMMMMmmmmdoo.......",".....oohlmmmMMMMMmmmmdoo........","......oohlmmmmmmmmmmmmho........",".......oohdmmmmmmmmmddoo........","........ooohddddddddooo.........","..........ooooooooooo..........."],"crown":["................................",".oooooo..................oooooo.",".ohhhho..................ohhhho.",".ohlldo..................ohlldo.",".ohlmdo......oooooo......ohlmdo.",".ohlmdoo.....ohhhho.....oohlmdo.",".ohlmmho.....ohlldo.....ohllmdo.",".ohlmmdo....oohlmdoo....ohlmmdo.",".ohlmmdoo...ohllmmho...oohlmmdo.",".ohlmmmho..oohlmmmdoo..ohllmmdo.",".ohlmmmdoo.ohllmmmmho.oohlmmmdo.",".ohlmmmmhooohlmmmmmdooohllmmmdo.",".ohlmmmmdoohllmmmmmmhoohlmmmmdo.",".ohlmmmmmhohlmmmmmmmdohllmmmmdo.",".ohlmmmmmlhllmmmmmmmmhllmmmmmdo.",".ohlmmmmmmllmmmmmmmmmllmmmmmmdo.",".ohlmmmmmmmmmmmmmmmmmmmmmmmmmdo.",".ohlmmmmmmmmmmmmmmmmmmmmmmmmmdo.",".ohlmmmmmmmmmmmmmmmmmmmmmmmmmdo.",".ohlmmmmmmmmmmmmmmmmmmmmmmmmmdo.",".ohlmmMMMMmmmmMMMMmmmmMMMMmmmdo.",".ohlmmMMMMmmmmMMMMmmmmMMMMmmmdo.",".ohlmmmmmmmmmmmmmmmmmmmmmmmmmdo.",".ohlmmmmmmmmmmmmmmmmmmmmmmmmmdo.",".oohlmmmmmmmmmmmmmmmmmmmmmmmdoo.","..ohlmmmmmmmmmmmmmmmmmmmmmmmdo..","..ohdddddddddddddddddddddddddo..","..oooooooooooooooooooooooooooo..","................................","................................","................................","................................"],"cert":["................................","...........ooooooooo............",".........ooohhhhhhhooo..........","........oohhlllllllhhoo.........",".......oohlllmmmmmmllhoo........","......oohllmmmmmmmmmmlhoo.......",".....oohllmmmmmMMmmmmmlhoo......",".....ohllmmmmmmMMmmmmmmlho......","....oohlmmmmmmMMMMmmmmmmdoo.....","....ohllmmmmmmMMMMmmmmmmmho.....","....ohlmmMMMMMMMMMMMMMMmmdo.....","....ohlmmmMMMMMMMMMMMMmmmdo.....","....ohlmmmmMMMMMMMMMMmmmmdo.....","....ohlmmmmMMMMMMMMMMmmmmdo.....","....ohlmmmMMMMMMMMMMMMmmmdo.....","....ohlmmmMMMMmmmmMMMMmmmdo.....","....oohlmmMMMmmmmmmMMMmmdoo.....",".....ohlmmMMmmmmmmmmMMmmdo......",".....oohlmmmmmmmmmmmmmmdoo......","......oohlmmmmmmmmmmmmdoo.......",".......oohlmmmmmmmmmmdooo.......",".......ohllmmmmmmmmmmmhho.......",".......ohlmmmddddddmmmldo.......",".......ohlmmdoooooohlmmdo.......",".......ohlmmdo....ohlmmdo.......",".......ohlmmdo....ohlmmdo.......",".......ohlmmdo....ohlmmdo.......",".......ohlmdoo....oohlmdo.......",".......ohlmdo......ohlmdo.......",".......ohlmdo......ohlmdo.......",".......ohdddo......ohdddo.......",".......oooooo......oooooo......."],"formula":["................................","...oooooooooooooooooooooooooo...","...ohhhhhhhhhhhhhhhhhhhhhhhho...","...ohlllllllllllllllllllllldo...","...ohddmmmmmmmmdddddddddddddo...","...oooohlmmmmmdoooooooooooooo...","......oohlmmmmmhoo..............",".......oohlmmmmlhoo.............","........oohlmmmmlhoo............",".........oohlmmmmlhoo...........","..........oohlmmmmlhoo..........","...........oohlmmmmlhoo.........","............oohlmmmmlho.........",".............oohlmmmmdo.........",".............oohlmmmmdo.........","............oohllmmmmdo.........","...........oohllmmmmdoo.........","..........oohllmmmmdoo..........",".........oohllmmmmdoo...........","........oohllmmmmdoo............",".......oohllmmmmdoo.............","......oohllmmmmdoo..............","...oooohllmmmmdoooooooooooooo...","...ohhhllmmmmmmhhhhhhhhhhhhho...","...ohlllmmmmmmmlllllllllllldo...","...ohdddddddddddddddddddddddo...","...oooooooooooooooooooooooooo...","................................","................................","................................","................................","................................"],"moon":["................................","................................",".............oooo...............","...........ooohho...............",".........ooohhdoo...............","........oohhldoo................",".......oohllldo.................","......oohllmdoo.................",".....oohllmmdo..................",".....ohllmmdoo..................","....oohlmmmdo...................","....ohllmmmdo...................","....ohlmmmddo...................","...oohlmmmddo...................","...ohllmmmmdo...................","...ohlmmmmmdoo..................","...ohlmmmmmmho..................","...ohlmmmmmmdoo.................","...oohlmmmmmmho.................","....ohlmmdmmmdoo................","....ohlmdddmmddoo...............","....oohlmdmmmmmhoo..............",".....ohlmmmmmmmlhooo............",".....oohlmmmmmmmlhhooooooooo....","......oohlmmmmmmmllhhhhhhhho....",".......oohlmmmmmmmmlllllldoo....","........oohdmmmmmmmmmmmddoo.....",".........ooohdmmmmmmdddooo......","...........ooohdddddoooo........",".............oooooooo...........","................................","................................"],"mastery":["................................","................................","................................",".............oooooo.............",".........ooooohhhhooooo.........","......oooohhhhllllhhhhoooo......","...oooohhhlllllmmmllllhhhoooo...",".ooohhhllllmmmmmmmmmmmlllhhhooo.",".ohhllllmmmmmmmmmmmmmmmmmlllhho.",".ooohddmmmmmmmmmmmmmmmmmmdddooo.","...oooohddmmmmmmmmmmmmdddoooo...","......oooohlmmmmmmmmmdoooo......","........ohllmmmmmmmmmmho........","........ohlmmmmmmmmmmmdo........","........ohlmmmmmmmmmmmdo........","........ohlmmmmmmmmmmmdo........","........ohlmmmmmmmmmmmdo........","........oohlmmmmmmmmmdoo........",".........oohdddddddddoo.........","..........oooooooooooo..........","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................","................................"],"mouse":["................................",".............oooooo.............",".............ohhhho.............",".............ohlldo.............",".........ooooohlmdooooo.........","........oohhhhllmmhhhhoo........",".......oohlllllmmmllllhoo.......",".......ohllmmmmddmmmmmlho.......","......oohlmmmmdoohlmmmmdoo......","......ohllmmmmdoohlmmmmmho......","......ohlmmmmmdoohlmmmmmdo......","......ohlmmmmmdoohlmmmmmdo......","......ohlmmmmmdoohlmmmmmdo......","......ohlmmmmmdoohlmmmmmdo......",".....oohlmmmmmmhhllmmmmmdoo.....",".....ohllmmmmmmlllmmmmmmmho.....",".....ohlmmmmmmmmmmmmmmmmmdo.....",".....ohlmmmmmmmmmmmmmmmmmdo.....",".....ohlmmmmmmmmmmmmmmmmmdo.....",".....ohlmmmmmmmmmmmmmmmmmdo.....",".....ohlmmmmmmmmmmmmmmmmmdo.....",".....ohlmmmmmmmmmmmmmmmmmdo.....",".....oohlmmmmmmmmmmmmmmmdoo.....","......oohlmmmmmmmmmmmmmdoo......",".......oohlmmmmmmmmmmmdoo.......","........oohdddddddddddoo........",".........oooooooooooooo.........","................................","................................","................................","................................","................................"],"explorer":["................................","..........oooooooooooo..........","........ooohhhhhhhhhhooo........","......ooohhllllllllllhhooo......","....ooohhlllmmmmmmmmmllhhooo....","....ohhlllmmmmmmmmmmmmmllhho....","...oohllmmmmmmmmmmmmmmmmmldoo...","...ohllmmmmmmddddddmmmmmmmmho...","..oohlmmmmmmd......hlmmmmmmdoo..","..ohllmmmmmd........hlmmmmmmho..",".oohlmmmmmmd........hlmmmmmmdoo.",".ohllmmmmmmd........hlmmmmmmmho.",".ohlmmmmmmmd........hlmmmmmmmdo.",".ohlmmmmmmmd........hlmmmmmmmdo.",".ohlmmmmmmmd........hlmmmmmmmdo.",".oohlmmmmmmd........hlmmmmmmdoo.","..ohlmmmmmmd........hlmmmmmmdo..","..oohlmmmmmmh......hllmmmmmdoo..","...ohlmmmmmmlhhhhhhllmmmmmmdo...","...oohlmmmmmmlllllllmmmmmmdoo...","....ohdmmmmmmmmmmmmmmmmmmddo....","....ooohlmmmmmmmmmmmmmmmdooo....","......ohdmmmmmmmmmmmmmmddo......","......ooohlmmmmmmmmmmmdooo......","........ohdmmmmmmmmmmddo........","........ooohlmmmmmmmdooo........","..........ohdmmmmmmddo..........","..........ooohlmmmdooo..........","............ohdmmddo............","............ooohdooo............","..............oooo..............","................................"],"accuracy":["................................","............oooooooo............","..........ooohhhhhhooo..........","........ooohhllllllhhooo........","......ooohhlllmmmmmllhhooo......","......ohhlllmmmmmmmmmllhho......","....ooohllmmmmmmmmmmmmmldooo....","....ohhllmmddddddddddmmmmhho....","...oohllmdd..........hdmmldoo...","...ohllmd..............hlmmho...","..oohlmdd..............hdmmdoo..","..ohlld..................hlmho..",".oohlmd......hhhhhh......hlmdoo.",".ohlld.....hhllllllhh.....hlmho.",".ohlmd.....hllmmmmmld.....hlmdo.",".ohlmd....hllmmmmmmmmh....hlmdo.",".ohlmd....hlmmmmmmmmmd....hlmdo.",".ohlmd.....hlmmmmmmmd.....hlmdo.",".ohlmd.....hdmmmmmmdd.....hlmdo.",".oohlmh......hddddd......hlldoo.","..ohlmd..................hlmdo..","..oohlmhh..............hhlldoo..","...ohlmld..............hllmdo...","...oohlmmhh..........hhllmdoo...","....ohdmmllhhhhhhhhhhlllmddo....","....ooohlmmlllllllllllmmdooo....","......ohdmmmmmmmmmmmmmmddo......","......ooohdmmmmmmmmmmddooo......","........ooohdmmmmmmddooo........","..........ooohdddddooo..........","............oooooooo............","................................"],"perfect":["................................","................................","................................","........oooooooooooooooo........","......ooohhhhhhhhhhhhhhooo......","......ohhllllllllllllllhho......","....ooohllmmmmmmmmmmmmmldooo....","....ohhllmmmmmmmmmmmmmmmmhho....","..ooohllmmmmmmmmmmmmmmmmmldooo..","..ohhllmmmmmmmmmmmmmmmmmmmmhho..",".oohllmmmmmmmmmmmmmmmmmmmmmldoo.",".ohllmmmmmmmmmmmmmmmmmmmmmmmmho.",".ohlmmmmmmmddddddddddmmmmmmmmdo.",".oohlmmmmmddddddddddddmmmmmmdoo.","..ohdmmmmmddddddddddddmmmmmddo..","..ooohlmmmmddddddddddmmmmmdooo..","....ohdmmmmddddddddddmmmmddo....","....ooohlmmmmddddddmmmmmdooo....","......ohdmmmmddddddmmmmddo......","......ooohlmmmddddmmmmdooo......","........ohdmmmddddmmmddo........","........ooohlmmddmmmdooo........","..........ohdmmmmmmddo..........","..........ooohlmmmdooo..........","............ohdmmddo............","............ooohdooo............","..............oooo..............","................................","................................","................................","................................","................................"],"rapid":["................................","................................","................................","............oooooooo............","..........ooohhhhhhooo..........","..........ohhllllllhho..........","........ooohllmmmmmldooo........","......ooohhllmmmmmmmmhhooo......","....ooohhlllmmmmmmmmmllhhooo....","....ohhlllmmmmmddmmmmmmllhho....","..ooohllmmmmmmd..hlmmmmmmldooo..","..ohhllmmmmmmd....hlmmmmmmmhho..",".oohllmmmmmmmd....hlmmmmmmmldoo.",".ohllmmmmmmmmd....hlmmmmmmmmmho.",".ohlmmmmmmmmmd....hlmmmmmmmmmdo.",".ohlmmmmmmmmmd....hlmmmmmmmmmdo.",".ohlmmmmmmmmmd....hlmmmmmmmmmdo.",".ohlmmmmmmmmmd.....hddmmmmmmmdo.",".ohlmmmmmmmmmd........hlmmmmmdo.",".ohlmmmmmmmmmmh.......hlmmmmmdo.",".ohlmmmmmmmmmmlhhhhhhhllmmmmmdo.",".oohlmmmmmmmmmmllllllllmmmmmdoo.","..ohdmmmmmmmmmmmmmmmmmmmmmmddo..","..ooohlmmmmmmmmmmmmmmmmmmmdooo..","....ohdmmmmmmmmmmmmmmmmmmddo....","....ooohdmmmmmmmmmmmmmmddooo....","......ooohdmmmmmmmmmmddooo......","........ooohdddddddddooo........","..........oooooooooooo..........","................................","................................","................................"],"combo":["................................","................................","................................","................................","................................","................................","................................","....oooooo......oooooo..........","...oohhhhooo...oohhhhooo........","...ohllllhho...ohllllhho........","...ohlmmmldooo.ohlmmmldooo......","...oohlmmmmhho.oohlmmmmhho......","....ohdmmmmldoooohdmmmmldooo....","....ooohlmmmmhhoooohlmmmmhhoo...","......oohlmmmllho.oohlmmmllho...","......oohlmmmmmdo.oohlmmmmmdo...","....ooohllmmmddoooohllmmmddoo...","....ohhllmmmdoooohhllmmmdooo....","...oohllmmmddo.oohllmmmddo......","...ohllmmmdooo.ohllmmmdooo......","...ohlmmmddo...ohlmmmddo........","...oohdddooo...oohdddooo........","....oooooo......oooooo..........","................................","................................","................................","................................","................................","................................","................................","................................","................................"],"comeback":["................................","........................oooo....","......................ooohhoo...","......................ohhllho...","....................ooohllmdo...","....................ohhllmmdo...","..................ooohllmmmdo...","..................ohhllmmmmdo...","................ooohllmmmmmdo...","................ohhllmmmmmmdo...","..............ooohllmmmmmmmdo...","..............ohhllmmddmmmmdo...","............ooohllmddoohdmmdo...","............ohhllmdoooooohdoo...","..........ooohllmddo....oooo....","..........ohhllmdooo............","........ooohllmddo..............","........ohhllmdooo..............","......ooohllmddo................","......ohhllmdooo................","....ooohllmddo..................","....ohhllmdooo..................","..ooohllmddo....................","..ohhllmdooo....................",".oohllmddo......................",".ohllmdooo......................",".ohlmddo........................",".oohdooo........................","..oooo..........................","................................","................................","................................"],"volume":["................................","......................oooooo....",".....................oohhhhoo...",".....................ohllllho...",".....................ohlmmmdo...",".....................ohlmmmdo...",".....................ohlmmmdo...","............oooooo...ohlmmmdo...","...........oohhhhoo..ohlmmmdo...","...........ohllllho..ohlmmmdo...","...........ohlmmmdo..ohlmmmdo...","...........ohlmmmdo..ohlmmmdo...","...........ohlmmmdo..ohlmmmdo...","..oooooo...ohlmmmdo..ohlmmmdo...",".oohhhhoo..ohlmmmdo..ohlmmmdo...",".ohllllho..ohlmmmdo..ohlmmmdo...",".ohlmmmdo..ohlmmmdo..ohlmmmdo...",".ohlmmmdo..ohlmmmdo..ohlmmmdo...",".ohlmmmdo..ohlmmmdo..ohlmmmdo...",".ohlmmmdo..ohlmmmdo..ohlmmmdo...",".ohlmmmdo..ohlmmmdo..ohlmmmdo...",".ohlmmmdo..ohlmmmdo..ohlmmmdo...",".ohlmmmdo..ohlmmmdo..ohlmmmdo...",".ohlmmmdo..ohlmmmdo..ohlmmmdo...",".ohlmmmdo..ohlmmmdo..ohlmmmdo...",".oohdddoo..oohdddoo..oohdddoo...","..oooooo....oooooo....oooooo....","................................","................................","................................","................................","................................"],"daily":["................................","..............oooo..............",".............oohhoo.............",".............ohllho.............",".............ohlmdo.............","......oooo...oohdoo...oooo......",".....oohhoo...oooo...oohhoo.....",".....ohllho..........ohllho.....",".....ohlmdoo........oohlmdo.....",".....oohdohoooooooooohohdoo.....","......ooooohhhhhhhhhhooooo......","........oohllllllllllhoo........",".......oohllmmmmmmmmmlhoo.......","..oooo.ohllmmmmmmmmmmmlho.oooo..",".oohhooohlmmmmmmmmmmmmmdooohhoo.",".ohllhoohlmmmmmmmmmmmmmdoohllho.",".ohlmdoohlmmmmmmmmmmmmmdoohlmdo.",".oohdooohlmmmmmmmmmmmmmdooohdoo.","..oooo.ohlmmmmmmmmmmmmmdo.oooo..",".......oohlmmmmmmmmmmmdoo.......","........oohlmmmmmmmmmdoo........","......ooooohdddddddddooooo......",".....oohhohoooooooooohohhoo.....",".....ohllhoo........oohllho.....",".....ohlmdo..........ohlmdo.....",".....oohdoo...oooo...oohdoo.....","......oooo...oohhoo...oooo......",".............ohllho.............",".............ohlmdo.............",".............oohdoo.............","..............oooo..............","................................"],"ice":["................................","..............oooo..............","............ooohhooo............","...........oohhllhhoo...........","...........ohlllmllho...........","...........ohlmmmmmdo...........","...........oohlmmmdoo...........",".....ooooo..oohlmdoo..ooooo.....",".....ohhhooo.ohlmdo.ooohhho.....",".....ohllhho.ohlmdo.ohhlldo.....",".....oohdldooohlmdooohlddoo.....","......ooohlhoohlmdoohldooo......","........oohlhhllmmhhldoo........","..oooooooohllllmmmllldoooooooo..",".oohhhhhhhllmmmmmmmmmmhhhhhhhoo.",".ohllllllllmmmmmmmmmmmlllllllho.",".ohlmmmmmmmmmmmmmmmmmmmmmmmmmdo.",".oohddddddmmmmmmmmmmmmdddddddoo.","..oooooooohlmmmmmmmmmdoooooooo..","........oohlddmmmmddmdoo........","......ooohldoohlmdoohlhooo......",".....oohhldooohlmdooohlhhoo.....",".....ohllddo.ohlmdo.ohdllho.....",".....ohddooo.ohlmdo.ooohddo.....",".....ooooo..oohlmdoo..ooooo.....","...........oohllmmhoo...........","...........ohllmmmlho...........","...........ohlmmmmmdo...........","...........oohdmmddoo...........","............ooohdooo............","..............oooo..............","................................"],"founder":["................................","................................","................................","......oooooooo......oooooooo....","....oooRRRRRRooo..oooOOOOOOooo..","....oRRRRRRRRRRo..oOOOOOOOOOOo..","...ooRRRRRRRRRRooooOOOOOOOOOOoo.","...oRRRRRRRRRRRRooOOOOOOOOOOOOo.","...oRRRRRRRRRRRRooOOOOOOOOOOOOo.","...oRRRRRRRRRRRRooOOOOOOOOOOOOo.","...oRRRRRRRRRRRRooOOOOOOOOOOOOo.","...oRRRRRRRRRRRRooOOOOOOOOOOOOo.","...oRRRRRRRRRRRRooOOOOOOOOOOOOo.","...ooRRRRRRRRRRooooOOOOOOOOOOoo.","....oRRRRRRRRRRo..oOOOOOOOOOOo..","....oooRRRRRRooo..oooOOOOOOooo..","......oooooooo......oooooooo....","......oooooooo......oooooooo....","....oooGGGGGGooo..oooBBBBBBooo..","....oGGGGGGGGGGo..oBBBBBBBBBBo..","...ooGGGGGGGGGGooooBBBBBBBBBBoo.","...oGGGGGGGGGGGGooBBBBBBBBBBBBo.","...oGGGGGGGGGGGGooBBBBBBBBBBBBo.","...oGGGGGGGGGGGGooBBBBBBBBBBBBo.","...oGGGGGGGGGGGGooBBBBBBBBBBBBo.","...oGGGGGGGGGGGGooBBBBBBBBBBBBo.","...oGGGGGGGGGGGGooBBBBBBBBBBBBo.","...ooGGGGGGGGGGooooBBBBBBBBBBoo.","....oGGGGGGGGGGo..oBBBBBBBBBBo..","....oooGGGGGGooo..oooBBBBBBooo..","......oooooooo......oooooooo....","................................"]},"hand32":["cert","crown","formula","mastery","moon","mouse","speed","streak"],"ui":{"star":["......oooo......","......ohho......",".....oohdoo.....",".....ohllho.....","oooooohlmdoooooo","ohhhhhllmmhhhhho","oohllllmmmllldoo",".oohlmmmmmmmdoo.",".oohlmmmmmmmdoo.",".ohllmddddmmmho.",".ohlmdoooohlmdo.",".ohldoo..oohldo.",".ohdoo....oohdo.",".oooo......oooo.","................","................"],"diamond":["................","......oooo......",".....oohhoo.....","....oohllhoo....","...oohllmlhoo...","..oohllmmmlhoo..",".oohllmmmmmlhoo.",".ohllmmmmmmmlho.",".oohlmmmmmmmdoo.","..oohlmmmmmdoo..","...oohlmmmdoo...","....oohlmdoo....",".....oohdoo.....","......oooo......","................","................"],"dot":["................",".....oooooo.....","...ooohhhhooo...","..oohhllllhhoo..","..ohlllmmmllho..",".oohlmmmmmmmdoo.",".ohllmmmmmmmmho.",".ohlmmmmmmmmmdo.",".ohlmmmmmmmmmdo.",".ohlmmmmmmmmmdo.",".oohlmmmmmmmdoo.","..ohlmmmmmmmdo..","..oohdmmmmddoo..","...ooohdddooo...",".....oooooo.....","................"],"swords":["oooo........oooo","ohhoo......oohho","ohlhoo....oohldo","oohlhoo..oohldoo",".oohlhoooohldoo.","..oohlhoohldoo..","...oohlhhldoo...","....oohlldoo....","...oohdlmdhoo...","..oohdohdohhoo..",".oohdoohdoohhoo.","oohdooohdooohhoo","ohllhoohdoohllho","ohdddoooooohdddo","oooooo....oooooo","................"],"trophy":[".oooooooooooooo.",".ohhhhhhhhhhhho.","oohdllllllllddoo","ohdohlmmmmmdohho","ohdohlmmmmmdohdo","ohdohlmmmmmdohdo","ohlhohlmmmdohldo","oohdohdddddohdoo",".oohhdoooohhdoo.","..ooohhhhhdooo..","....oohlldoo....","..ooohllmmhooo..",".oohhllmmmlhhoo.",".ohddddddddddho.",".oooooooooooooo.","................"],"flame_a":["......oooo......",".....oohho......",".....ohldoo.....","....oohlmho.....","....ohllmdoo....","...oohlmmmho....","..oohllmmmdoo...",".oohllmmmmmhoo..",".ohllMMMMmmlho..","oohlMMMMMMmmdoo.","ohllMMMMMMmmmho.","ohlmMMMMMMmmmdo.","ohlmmMMMMmmmmdo.","oohdmmmmmmmddoo.",".ooohddddddooo..","...ooooooooo...."],"flame_b":[".....oooo.......","....oohho.......","....ohldoo......","...oohlmho......","...ohllmdoo.....","..oohlmmmho.....",".oohllmmmdoo....",".ohllmmmmmhooo..",".ohlmMMMMmlhho..","oohlMMMMMMmldoo.","ohllMMMMMMmmmho.","ohlmMMMMMMmmmdo.","ohlmmMMMMmmmmdo.","oohdmmmmmmmddoo.",".ooohddddddooo..","...ooooooooo...."],"lock":["....oooooooo....","...oohhhhhhoo...","...ohdoooohho...","...ohdo..ohdo...",".ooohdoooohdooo.",".ohhllhhhhllhho.",".ohllmlddllmldo.",".ohlmmdoohlmmdo.",".ohlmdoooohlmdo.",".ohlmmhoohllmdo.",".ohlmmlhhllmmdo.",".ohlmmmlllmmmdo.",".ohdddddddddddo.",".oooooooooooooo.","................","................"],"unlock":["....oooooooo....","...oohhhhhhoo...","...ohdoooohho...","...ohdo..oooo...",".ooohdooooooooo.",".ohhllhhhhhhhho.",".ohllmlddlllldo.",".ohlmmdoohlmmdo.",".ohlmdoooohlmdo.",".ohlmmhoohllmdo.",".ohlmmlhhllmmdo.",".ohlmmmlllmmmdo.",".ohdddddddddddo.",".oooooooooooooo.","................","................"],"cap":["................","......oooo......","...oooohhoooo...","oooohhhllhhhoooo","ohhhllllmlllhhho","oooohlmmmmmdoooo","...oohlmmmdoo...","...ohllmmmmho...","...ohlmmmmmdo...","...ohlmmmmmdo...","...ohlmmmmmdo...","...oohdddddoo...","....oooooooo....","................","................","................"],"target":[".....oooooo.....","...ooohhhhooo...","..oohhllllhhoo..",".oohlddddddlhoo.",".ohld......hlho.","oohd........hdoo","ohd...hhhh...hho","ohd..hllllh..hdo","ohd..hlmmmd..hdo","ohd...hddd...hdo","oohh........hdoo",".ohlh......hldo.",".oohlhhhhhhldoo.","..oohdllllddoo..","...ooohdddooo...",".....oooooo....."],"timer":["................",".....oooooo.....","....oohhhhoo....","..ooohllllhooo..",".oohhllddmlhhoo.","oohllld..hlllhoo","ohllmmd..hlmmlho","ohlmmmd..hlmmmdo","ohlmmmd..hdmmmdo","ohlmmmd....hlmdo","ohlmmmmhhhhllmdo","oohlmmmlllllmdoo",".oohdmmmmmmddoo.","..ooohdddddooo..","....oooooooo....","................"],"medaldisc":["................","....oooooooo....","..ooohhhhhhooo..",".oohhllllllhhoo.",".ohlllmmmmmllho.",".ohlmmmmmmmmmdo.",".ohlmmmmmmmmmdo.",".ohlmmmmmmmmmdo.",".ohlmmmmmmmmmdo.",".ohlmmmmmmmmmdo.",".oohlmmmmmmmdoo.","..oohlddddmdoo..","..ohldoooohlho..","..ohldoooohldo..","..ohddhoohdddo..","..oooooooooooo.."],"plate":["................","................",".oooooooooooooo.","oommmmmmmmmmmmoo","ommmmmmmmmmmmmmo","mmmmmmmmmmmmmmmm","mmmmmmmmmmmmmmmd","mmmmmmmmmmmmmmmd","mmmmmmmmmmmmmmmd","mmmmmmmmmmmmmmmd","mmmmmmmmmmmmmmmd","ommmmmmmmmmmmmdo","oomdddddddddddoo",".oooooooooooooo.","................","................"]},"favicon":["oohhhhhhhhhhhhoo","ohllllllllllllho","hllmmmmmmmmmmmlh","hlmwwwwwwwwwwmmd","hlmwwwwwwmmmwmmd","hlmwwwwwwmmmwmmd","hlmwwwwwwmmmwmmd","hlmwwwwwwmmmwmmd","hlmwwwwwwwwwwmmd","hlmwmmmmwmmmwmmd","hlmwmmmmwmmmwmmd","hlmwmmmmwmmmwmmd","hlmwwwwwwwwwwmmd","hlmmmmmmmmmmmmmd","ohlmmmmmmmmmmmdo","oohdddddddddddoo"],"font":{"0":["###","#.#","#.#","#.#","###"],"1":["..#","..#","..#","..#","..#"],"2":["###","..#","###","#..","###"],"3":["###","..#","###","..#","###"],"4":["#.#","#.#","###","..#","..#"],"5":["###","#..","###","..#","###"],"6":["###","#..","###","#.#","###"],"7":["###","..#","..#","..#","..#"],"8":["###","#.#","###","#.#","###"],"9":["###","#.#","###","..#","###"],"S":["###","#..","###","..#","###"],"+":["...",".#.","###",".#.","..."],"-":["...","...","###","...","..."],"A":["###","#.#","###","#.#","#.#"],"B":["##.","#.#","##.","#.#","##."],"C":["###","#..","#..","#..","###"]},"rings":{"c":{"16":["....................",".R................R.","....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","....................","....................",".R................R.","...................."],"32":["........................................","........................................","..RR................................RR..","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","........................................","..RR................................RR..","........................................","........................................"]},"r":{"16":["....................","..RRRRRRRRRRRRRRRR..",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.","..RRRRRRRRRRRRRRRR..","...................."],"32":["........................................","........................................","....RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR....","...R................................R...","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","...R................................R...","....RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR....","........................................","........................................"]},"e":{"16":["....................",".RRRRRRRRRRRRRRRRRR.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".RRRRRRRRRRRRRRRRRR.","...................."],"32":["........................................","........................................","..RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR..","..RR................................RR..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..R..................................R..","..RR................................RR..","..RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR..","........................................","........................................"]},"l":{"16":["....................",".RRRRRRRRRRRRRRRRRR.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".RRRRRRRRRRRRRRRRRR.","...................."],"32":["........................................","........................................","..RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR..","..RR.RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR.RR..","..R.R..............................R.R..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..R.R..............................R.R..","..RR.RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR.RR..","..RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR..","........................................","........................................"]},"m":{"16":[".........RR.........",".RRRRRRRRRRRRRRRRRR.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.","RR................RR","RR................RR",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".R................R.",".RRRRRRRRRRRRRRRRRR.",".........RR........."],"32":[".................RR.R.RR................","...................RR...................","..RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR..","..RR.RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR.RR..","..R.R..............................R.R..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..",".RRR................................RRR.",".RRR................................RRR.","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..RR................................RR..","..R.R..............................R.R..","..RR.RRRRRRRRRRRRRRRRRRRRRRRRRRRRRR.RR..","..RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR..","...................RR...................","........................................"]}},"ringpad":{"16":2,"32":4},"levelring":{"0":["................................","............TTTTTTTT............",".........TTTTTTTTTTTTTT.........","........TTTTTTTTTTTTTTTT........","......TTTTTTTTTTTTTTTTTTTT......",".....TTTTTTTT......TTTTTTTT.....","....TTTTTTT..........TTTTTTT....","....TTTTT..............TTTTT....","...TTTTT................TTTTT...","..TTTTT..................TTTTT..","..TTTTT..................TTTTT..","..TTTT....................TTTT..",".TTTTT....................TTTTT.",".TTTT......................TTTT.",".TTTT......................TTTT.",".TTTT......................TTTT.",".TTTT......................TTTT.",".TTTT......................TTTT.",".TTTT......................TTTT.",".TTTTT....................TTTTT.","..TTTT....................TTTT..","..TTTTT..................TTTTT..","..TTTTT..................TTTTT..","...TTTTT................TTTTT...","....TTTTT..............TTTTT....","....TTTTTTT..........TTTTTTT....",".....TTTTTTTT......TTTTTTTT.....","......TTTTTTTTTTTTTTTTTTTT......","........TTTTTTTTTTTTTTTT........",".........TTTTTTTTTTTTTT.........","............TTTTTTTT............","................................"],"35":["................................","............TTTTAAAA............",".........TTTTTTTAAAAAAA.........","........TTTTTTTTAAAAAAAA........","......TTTTTTTTTTAAAAAAAAAA......",".....TTTTTTTT......AAAAAAAA.....","....TTTTTTT..........AAAAAAA....","....TTTTT..............AAAAA....","...TTTTT................AAAAA...","..TTTTT..................AAAAA..","..TTTTT..................AAAAA..","..TTTT....................AAAA..",".TTTTT....................AAAAA.",".TTTT......................AAAA.",".TTTT......................AAAA.",".TTTT......................AAAA.",".TTTT......................AAAA.",".TTTT......................AAAA.",".TTTT......................AAAA.",".TTTTT....................AAAAA.","..TTTT....................AAAA..","..TTTTT..................AAAAA..","..TTTTT..................AAAAA..","...TTTTT................TTAAA...","....TTTTT..............TTTTT....","....TTTTTTT..........TTTTTTT....",".....TTTTTTTT......TTTTTTTT.....","......TTTTTTTTTTTTTTTTTTTT......","........TTTTTTTTTTTTTTTT........",".........TTTTTTTTTTTTTT.........","............TTTTTTTT............","................................"],"68":["................................","............TTTTAAAA............",".........TTTTTTTAAAAAAA.........","........TTTTTTTTAAAAAAAA........","......TTTTTTTTTTAAAAAAAAAA......",".....TTTTTTTT......AAAAAAAA.....","....TTTTTTT..........AAAAAAA....","....TTTTT..............AAAAA....","...TTTTT................AAAAA...","..TTTTT..................AAAAA..","..TTTTT..................AAAAA..","..TTTT....................AAAA..",".TTTTT....................AAAAA.",".TTTT......................AAAA.",".TTTT......................AAAA.",".TTTT......................AAAA.",".TTTT......................AAAA.",".TTTT......................AAAA.",".TTTT......................AAAA.",".TTTTT....................AAAAA.","..TTTT....................AAAA..","..TTAAA..................AAAAA..","..AAAAA..................AAAAA..","...AAAAA................AAAAA...","....AAAAA..............AAAAA....","....AAAAAAA..........AAAAAAA....",".....AAAAAAAA......AAAAAAAA.....","......AAAAAAAAAAAAAAAAAAAA......","........AAAAAAAAAAAAAAAA........",".........AAAAAAAAAAAAAA.........","............AAAAAAAA............","................................"],"100":["................................","............AAAAAAAA............",".........AAAAAAAAAAAAAA.........","........AAAAAAAAAAAAAAAA........","......AAAAAAAAAAAAAAAAAAAA......",".....AAAAAAAA......AAAAAAAA.....","....AAAAAAA..........AAAAAAA....","....AAAAA..............AAAAA....","...AAAAA................AAAAA...","..AAAAA..................AAAAA..","..AAAAA..................AAAAA..","..AAAA....................AAAA..",".AAAAA....................AAAAA.",".AAAA......................AAAA.",".AAAA......................AAAA.",".AAAA......................AAAA.",".AAAA......................AAAA.",".AAAA......................AAAA.",".AAAA......................AAAA.",".AAAAA....................AAAAA.","..AAAA....................AAAA..","..AAAAA..................AAAAA..","..AAAAA..................AAAAA..","...AAAAA................AAAAA...","....AAAAA..............AAAAA....","....AAAAAAA..........AAAAAAA....",".....AAAAAAAA......AAAAAAAA.....","......AAAAAAAAAAAAAAAAAAAA......","........AAAAAAAAAAAAAAAA........",".........AAAAAAAAAAAAAA.........","............AAAAAAAA............","................................"]}};
+
+/* ---------------- the 24-colour house palette ---------------- */
+const PAL = {
+  k0:'#14161a', k1:'#26282e', k2:'#525761', k3:'#7c828e', k4:'#a9aeb9', k5:'#d5d9e0', w:'#ffffff',
+  g0:'#0d5c3a', g1:'#2ea36f', g2:'#6ec9a0',
+  y0:'#8a6212', y1:'#e0b341', y2:'#ffe08a',
+  b0:'#5a3312', b1:'#a06a2e', b2:'#cf8e4c',
+  r0:'#7d2015', r1:'#e0503f', r2:'#ff9c86',
+  v0:'#5a3396', v1:'#a271e8', v2:'#d9c2ff',
+  c0:'#2b6f96', c1:'#63c2e0'
+};
+const PALNAME = {k0:'ink',k1:'shade',k2:'slate',k3:'steel',k4:'chrome',k5:'bone',w:'spark',
+  g0:'grn·d',g1:'grn·m',g2:'grn·l', y0:'gld·d',y1:'gld·m',y2:'gld·l',
+  b0:'brz·d',b1:'brz·m',b2:'brz·l', r0:'red·d',r1:'red·m',r2:'red·l',
+  v0:'vio·d',v1:'vio·m',v2:'vio·l', c0:'cyn·d',c1:'cyn·m'};
+
+/* rarity mids are NOT invented here — they are HK_RARITY, verbatim */
+const RAR = window.HK_RARITY || {c:'#5a9a64',r:'#5f83bd',e:'#8d6cb5',l:'#c58a3a',m:'#bd5a4e'};
+const RARNAME = {c:'common',r:'rare',e:'epic',l:'legendary',m:'mythic'};
+const RARPCT  = {c:40,r:20,e:8,l:2,m:0.3};
+
+/* four body tones + a four-tone accent, composed from the 24 */
+function R(d,m,l,h,ad,am,al,ah){ return {d:PAL[d],m:PAL[m],l:PAL[l],h:PAL[h],
+  D:PAL[ad],M:PAL[am],L:PAL[al],H:PAL[ah]}; }
+const RAMPS = {
+  steel : R('k2','k3','k4','k5', 'g0','g1','g2','g2'),
+  gold  : R('y0','y1','y2','w',  'r0','r1','r2','r2'),
+  bronze: R('b0','b1','b2','y2', 'y0','y1','y2','w'),
+  green : R('g0','g1','g2','k5', 'y0','y1','y2','w'),
+  red   : R('r0','r1','r2','y2', 'y0','y1','y2','w'),
+  violet: R('v0','v1','v2','w',  'c0','c1','k5','w'),
+  cyan  : R('c0','c1','k5','w',  'y0','y1','y2','w'),
+  /* the r384 law in pixels: one engraved steel, accent lifted rather than hued */
+  mono  : R('k2','k3','k4','k5', 'k3','k4','k5','w')
+};
+/* founder is the documented exception: four brand hues, outside the 24 */
+const BRAND = {R:'#e0503f', O:'#e0902f', G:'#3fae6a', B:'#3f8fe0'};
+
+const FAMILY = {
+  explorer:'green', speed:'gold', accuracy:'red', perfect:'cyan', rapid:'gold',
+  streak:'red', combo:'steel', comeback:'green', cert:'bronze', formula:'green',
+  volume:'green', daily:'gold', crown:'gold', mastery:'bronze', moon:'violet',
+  mouse:'steel', founder:'steel', ice:'cyan'
+};
+const ORDER = ['speed','rapid','perfect','accuracy','explorer','combo','comeback','streak',
+  'volume','daily','crown','cert','formula','mastery','moon','ice','mouse','founder'];
+
+/* ---------------- the renderer: one <rect> per horizontal run ---------------- */
+function colOf(ch, P, extra){
+  if(ch==='.') return null;
+  if(ch==='o') return 'var(--px-ink)';
+  if(ch==='w') return PAL.w;
+  if(P[ch]) return P[ch];
+  if(BRAND[ch]) return BRAND[ch];
+  if(extra && extra[ch]) return extra[ch];
+  return null;
+}
+function draw(rows, ramp, size, opts){
+  opts = opts || {};
+  const P = (typeof ramp==='string') ? RAMPS[ramp] : ramp;
+  const n = rows.length, cls = opts.cls ? (' '+opts.cls) : '';
+  let s = '<svg class="px'+cls+'" viewBox="0 0 '+n+' '+n+'" width="'+size+'" height="'+size+
+    '" shape-rendering="crispEdges" aria-hidden="true">';
+  for(let r=0;r<n;r++){
+    let c=0;
+    while(c<n){
+      const ch = rows[r][c], col = colOf(ch,P,opts.extra);
+      if(!col){ c++; continue; }
+      let e=c+1; while(e<n && rows[r][e]===ch) e++;
+      if(!(opts.hollow && (ch==='m'||ch==='l'||ch==='M'||ch==='L')))
+        s += '<rect x="'+c+'" y="'+r+'" width="'+(e-c)+'" height="1" fill="'+col+'"/>';
+      c=e;
+    }
+  }
+  return s+'</svg>';
+}
+/* a glyph seated inside a rarity ring: one svg, ring box = glyph + 2·pad */
+function ringed(rows, ramp, tier, unit){
+  const g = rows.length, pad = SPR.ringpad[String(g)], rr = SPR.rings[tier][String(g)], n = g+pad*2;
+  const P = (typeof ramp==='string') ? RAMPS[ramp] : ramp;
+  let s = '<svg class="px" viewBox="0 0 '+n+' '+n+'" width="'+(n*unit)+'" height="'+(n*unit)+
+    '" shape-rendering="crispEdges" aria-hidden="true">';
+  for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(rr[r][c]==='R')
+    s += '<rect x="'+c+'" y="'+r+'" width="1" height="1" fill="'+RAR[tier]+'"/>';
+  for(let r=0;r<g;r++){ let c=0;
+    while(c<g){ const ch=rows[r][c], col=colOf(ch,P);
+      if(!col){c++;continue;} let e=c+1; while(e<g && rows[r][e]===ch) e++;
+      s+='<rect x="'+(c+pad)+'" y="'+(r+pad)+'" width="'+(e-c)+'" height="1" fill="'+col+'"/>'; c=e; } }
+  return s+'</svg>';
+}
+/* a chamfered plate of any w×h — the shared chrome under chips, tabs and badges */
+function plateRows(w,h,cut){
+  cut = cut||2;
+  const g=[];
+  for(let y=0;y<h;y++){ let r='';
+    for(let x=0;x<w;x++){
+      const dx = Math.min(x, w-1-x), dy = Math.min(y, h-1-y);
+      r += (dx+dy < cut) ? '.' : '#';
+    } g.push(r); }
+  return g;
+}
+function shadePlate(rows){
+  const h=rows.length, w=rows[0].length, on=(y,x)=>(y>=0&&y<h&&x>=0&&x<w&&rows[y][x]==='#');
+  const out=[];
+  for(let y=0;y<h;y++){ let r='';
+    for(let x=0;x<w;x++){
+      if(rows[y][x]!=='#'){ r += (on(y-1,x)||on(y+1,x)||on(y,x-1)||on(y,x+1)||on(y-1,x-1)||on(y-1,x+1)||on(y+1,x-1)||on(y+1,x+1))?'o':'.'; continue; }
+      r += (!on(y-1,x)||!on(y,x-1)) ? 'l' : (!on(y+1,x)||!on(y,x+1)) ? 'd' : 'm';
+    } out.push(r); }
+  return out;
+}
+function drawGrid(rows, ramp, unit, extra){
+  const h=rows.length, w=rows[0].length, P=(typeof ramp==='string')?RAMPS[ramp]:ramp;
+  let s='<svg class="px" viewBox="0 0 '+w+' '+h+'" width="'+(w*unit)+'" height="'+(h*unit)+
+    '" shape-rendering="crispEdges" aria-hidden="true">';
+  for(let r=0;r<h;r++){ let c=0;
+    while(c<w){ const ch=rows[r][c], col=colOf(ch,P,extra);
+      if(!col){c++;continue;} let e=c+1; while(e<w && rows[r][e]===ch) e++;
+      s+='<rect x="'+c+'" y="'+r+'" width="'+(e-c)+'" height="1" fill="'+col+'"/>'; c=e; } }
+  return s+'</svg>';
+}
+/* stamp 3×5 pixel type into a grid (returns a new grid) */
+function stamp(rows, txt, x0, y0, ch){
+  const g = rows.map(r=>r.split(''));
+  let x = x0;
+  for(const k of txt){
+    const f = SPR.font[k]; if(!f){ x+=2; continue; }
+    for(let r=0;r<5;r++) for(let c=0;c<3;c++)
+      if(f[r][c]==='#' && g[y0+r] && g[y0+r][x+c]!==undefined) g[y0+r][x+c]=ch;
+    x += 4;
+  }
+  return g.map(r=>r.join(''));
+}
+const textW = t => t.length*4-1;
+
+/* ---------------- band 0 · palette ---------------- */
+document.getElementById('pal').innerHTML = Object.keys(PAL).map(k=>
+  '<div class="sw"><i style="background:'+PAL[k]+'"></i>'+PALNAME[k]+'<br>'+PAL[k]+'</div>').join('');
+document.getElementById('palr').innerHTML =
+  '<div class="lbl" style="align-self:center;margin:0 6px 0 0">RARITY (HK_RARITY, imported)</div>'+
+  'crelm'.split('').map(t=>'<div class="sw"><i style="background:'+RAR[t]+'"></i>'+RARNAME[t]+'<br>'+RAR[t]+'</div>').join('');
+
+/* ---------------- band 1 · the 18 glyphs ---------------- */
+const HAND = new Set(SPR.hand32);
+document.getElementById('glyphs').innerHTML = ORDER.map(function(id){
+  const f = FAMILY[id];
+  const badge = window.hkBadge ? window.hkBadge(id, true, 40, null, null) : '';
+  const gl = window.hkGlyph ? window.hkGlyph(id, 34, '#828896') : '';
+  return '<div class="tile" style="width:300px"><div class="strip">'+
+    '<div>'+badge+'<div class="lbl">hkBadge 40</div></div>'+
+    '<div>'+gl+'<div class="lbl">hkGlyph 34</div></div>'+
+    '<div>'+draw(SPR.g16[id], f, 16)+'<div class="lbl">16 · 1×</div></div>'+
+    '<div>'+draw(SPR.g16[id], f, 32)+'<div class="lbl">16 · 2×</div></div>'+
+    '<div>'+draw(SPR.g32[id], f, 32)+'<div class="lbl">32 · 1×</div></div>'+
+    '<div>'+draw(SPR.g32[id], f, 64)+'<div class="lbl">32 · 2×</div></div>'+
+    '</div><div class="nm">'+(HAND.has(id)?'<em>'+id+'</em> · hand':id+' · epx')+'</div></div>';
+}).join('');
+
+/* ---------------- band 2 · colour axis ---------------- */
+document.getElementById('mono').innerHTML = ORDER.map(id=>
+  '<div>'+draw(SPR.g32[id],'mono',32)+'</div>').join('');
+document.getElementById('tint').innerHTML = ORDER.map(id=>
+  '<div>'+draw(SPR.g32[id],FAMILY[id],32)+'</div>').join('');
+
+/* ---------------- band 3 · rarity rings ---------------- */
+document.getElementById('rings').innerHTML = 'crelm'.split('').map(function(t){
+  const pct = RARPCT[t];
+  return '<div class="tile" style="width:252px"><div class="strip">'+
+    '<div>'+window.hkBadge('crown', true, 30, null, pct)+'<div class="lbl">SVG 30</div></div>'+
+    '<div>'+window.hkBadge('crown', true, 46, null, pct)+'<div class="lbl">SVG 46</div></div>'+
+    '<div>'+ringed(SPR.g16.crown,'mono',t,2)+'<div class="lbl">px 16 · 2×</div></div>'+
+    '<div>'+ringed(SPR.g32.crown,'mono',t,1)+'<div class="lbl">px 32 · 1×</div></div>'+
+    '<div>'+ringed(SPR.g16.crown,'mono',t,1)+'<div class="lbl">chip 1×</div></div>'+
+    '</div><div class="nm">'+RARNAME[t]+' · '+pct+'%</div></div>';
+}).join('');
+
+/* ---------------- band 4 · the wall ---------------- */
+const WALLR = ['m','l','e','r','c','e','l','r','c','e','r','l','c','e','r','m','c','r'];
+document.getElementById('wallA').innerHTML = ORDER.map((id,i)=>
+  '<div>'+window.hkBadge(id, true, 34, null, RARPCT[WALLR[i]])+'</div>').join('');
+document.getElementById('wallB').innerHTML = ORDER.map((id,i)=>
+  '<div>'+ringed(SPR.g16[id],'mono',WALLR[i],2)+'</div>').join('');
+
+/* ---------------- band 5 · level ---------------- */
+(function(){
+  function pxChip(lvl, unit){
+    const T = lvl>=25?'violet' : lvl>=20?'cyan' : lvl>=15?'gold' : lvl>=10?'steel' : lvl>=5?'bronze':'steel';
+    const w = 16, h = 16;
+    let rows = shadePlate(plateRows(w,h,3));
+    rows = stamp(rows, String(lvl), Math.round((w-textW(String(lvl)))/2), 6, 'w');
+    return drawGrid(rows, T, unit);
+  }
+  function pxRing(lvl, pct, unit){
+    const rr = SPR.levelring[String(pct)];
+    let rows = rr.map(r=>r.replace(/T/g,'t').replace(/A/g,'a'));
+    rows = stamp(rows, String(lvl), Math.round((32-textW(String(lvl)))/2), 13, 'w');
+    return drawGrid(rows, 'steel', unit, {t:PAL.k2, a:PAL.g2});
+  }
+  const html = [[3,0],[7,35],[14,68],[27,100]].map(function(p){
+    return '<div class="tile" style="width:262px"><div class="strip">'+
+      '<div>'+window.hkLevelRing(p[0],p[1],56)+'<div class="lbl">SVG ring 56</div></div>'+
+      '<div>'+pxRing(p[0],p[1],2)+'<div class="lbl">px 32 · 2×</div></div>'+
+      '<div>'+window.hkLevelChip(p[0],22)+'<div class="lbl">SVG chip 22</div></div>'+
+      '<div>'+pxChip(p[0],2)+'<div class="lbl">px chip 2×</div></div>'+
+      '<div>'+pxChip(p[0],1)+'<div class="lbl">1×</div></div>'+
+      '</div><div class="nm">LVL '+p[0]+' · '+p[1]+'%</div></div>';
+  }).join('');
+  document.getElementById('level').innerHTML = html;
+})();
+
+/* ---------------- band 6 · clocks + UI set ---------------- */
+(function(){
+  const cell = (today, sprite, name) =>
+    '<div class="tile" style="width:120px"><div class="strip">'+
+      '<div><span style="font-size:26px;line-height:1;display:block;height:34px">'+today+'</span><div class="lbl">today</div></div>'+
+      '<div>'+sprite+'<div class="lbl">px</div></div></div><div class="nm">'+name+'</div></div>';
+  let h = '';
+  h += cell('<span style="color:#aeb6c0">●</span>', draw(SPR.ui.dot,'steel',32), 'clock · pass');
+  h += cell('<span style="color:#e0b341">◆</span>', draw(SPR.ui.diamond,'gold',32), 'clock · pro');
+  h += cell('<span style="color:#b98bff">★</span>', draw(SPR.ui.star,'violet',32), 'clock · legendary');
+  h += cell('<span style="color:#7c828e">☆</span>', draw(SPR.ui.star,'steel',32,{hollow:true}), 'bonus ☆ · unfound');
+  h += cell('<span style="color:#e0b341">☆</span>', draw(SPR.ui.star,'gold',32), 'bonus ☆ · found');
+  h += cell('🔥', draw(SPR.ui.flame_a,'red',32), 'streak flame');
+  h += cell('⚔', draw(SPR.ui.swords,'steel',32), 'placement ⚔');
+  h += cell('🏆', draw(SPR.ui.trophy,'gold',32), 'trophy');
+  h += cell('🎓', draw(SPR.ui.cap,'bronze',32), 'cert 🎓');
+  const podium = (n, ramp) => drawGrid(stamp(SPR.ui.medaldisc, String(n), 7, 5, 'w'), ramp, 2);
+  h += cell('🥇', podium(1,'gold'), 'podium 🥇');
+  h += cell('🥈', podium(2,'steel'), 'podium 🥈');
+  h += cell('🥉', podium(3,'bronze'), 'podium 🥉');
+  h += cell(window.hkIcon('lock',26), draw(SPR.ui.lock,'steel',32), 'hkIcon lock');
+  h += cell(window.hkIcon('unlock',26), draw(SPR.ui.unlock,'steel',32), 'hkIcon unlock');
+  h += cell(window.hkIcon('timer',26), draw(SPR.ui.timer,'steel',32), 'hkIcon timer');
+  h += cell(window.hkIcon('target',26), draw(SPR.ui.target,'steel',32), 'hkIcon target');
+  document.getElementById('uiset').innerHTML = h;
+})();
+
+/* ---------------- band 7 · favicon ---------------- */
+(function(){
+  const f = SPR.favicon;
+  document.getElementById('fav').innerHTML =
+    '<div class="tile" style="width:330px"><div class="strip">'+
+      [16,32,64,96].map(s=>'<div>'+draw(f,'green',s)+'<div class="lbl">'+s+'px ('+(s/16)+'×)</div></div>').join('')+
+    '</div><div class="nm">pixel grid mark · green ramp</div></div>'+
+    '<div class="tile" style="width:200px"><div class="strip">'+
+      '<div><img src="../favicon.svg" width="64" height="64" alt=""><div class="lbl">today 64</div></div>'+
+      '<div><img src="../favicon.svg" width="32" height="32" alt=""><div class="lbl">32</div></div>'+
+      '<div><img src="../favicon.svg" width="16" height="16" alt=""><div class="lbl">16</div></div>'+
+    '</div><div class="nm">today · favicon.svg</div></div>';
+})();
+
+/* ---------------- band 8 · in context ---------------- */
+(function(){
+  const who=[['1','wolfofwallst','MD','31.4s','m'],['2','deskjockey','VP','33.0s','l'],
+    ['3','ctrl_shift_end','Associate','35.8s','e'],['4','anon_analyst','First-Year Analyst','44.1s','r'],
+    ['5','excel_curious','Candidate','71.2s','c']];
+  const rowsA = who.map(w=>'<div class="lbrow"><span class="pos">#'+w[0]+'</span>'+
+    (window.rankEmblem?window.rankEmblem(w[2],16,'Top Bucket'):'')+
+    '<span class="who">'+w[1]+'</span><span style="color:#d9a441">🔥 12</span>'+
+    '<span class="t">'+w[3]+'</span></div>').join('');
+  const rowsB = who.map(w=>'<div class="lbrow"><span class="pos">#'+w[0]+'</span>'+
+    (window.rankEmblem?window.rankEmblem(w[2],16,'Top Bucket'):'')+
+    '<span class="who">'+w[1]+'</span>'+draw(SPR.ui.flame_a,'red',16)+'<span style="color:#d9a441">12</span>'+
+    '<span class="t">'+w[3]+'</span></div>').join('');
+
+  const stripA = ORDER.slice(0,5).map((id,i)=>window.hkBadge(id,true,30,null,RARPCT[WALLR[i]])).join(' ');
+  const stripB = ORDER.slice(0,5).map((id,i)=>ringed(SPR.g16[id],'mono',WALLR[i],2)).join(' ');
+
+  function gradeChip(txt, ramp){
+    const w = textW(txt)+8, h = 13;
+    let rows = shadePlate(plateRows(w,h,2));
+    rows = stamp(rows, txt, 4, 4, 'w');
+    return drawGrid(rows, ramp, 2);
+  }
+  document.getElementById('ctx').innerHTML =
+    '<div class="mock"><div class="lbl" style="text-align:left;margin-bottom:6px">TODAY — emoji streak</div>'+rowsA+'</div>'+
+    '<div class="mock"><div class="lbl" style="text-align:left;margin-bottom:6px">PIXEL — sprite streak</div>'+rowsB+'</div>'+
+    '<div class="mock"><div class="lbl" style="text-align:left;margin-bottom:8px">RESULTS-CARD MEDAL STRIP</div>'+
+      '<div style="display:flex;gap:8px;align-items:center;height:44px">'+stripA+'</div>'+
+      '<div style="display:flex;gap:8px;align-items:center;height:48px;margin-top:6px">'+stripB+'</div></div>'+
+    '<div class="mock"><div class="lbl" style="text-align:left;margin-bottom:8px">DESK GRADE — plate sprited, type stays type</div>'+
+      '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;max-width:250px">'+
+      gradeChip('S+++','gold')+gradeChip('S','violet')+gradeChip('A+','green')+
+      gradeChip('B','steel')+gradeChip('C-','bronze')+'</div></div>';
+})();
+
+/* ---------------- band 9 · motion ---------------- */
+(function(){
+  const flame = '<div class="anim">'+draw(SPR.ui.flame_a,'red',64,{cls:'f0'})+
+                draw(SPR.ui.flame_b,'red',64,{cls:'f1'})+'</div>';
+  const spark = '<div class="anim spk">'+draw(SPR.ui.star,'gold',64,{cls:'s0'})+
+                draw(SPR.ui.star,'gold',64,{cls:'s1',hollow:true})+
+                draw(SPR.ui.star,'gold',64,{cls:'s2'})+'</div>';
+  const clock = '<div class="anim">'+draw(SPR.ui.timer,'gold',64,{cls:'f0'})+
+                draw(SPR.g32.rapid,'gold',64,{cls:'f1'})+'</div>';
+  document.getElementById('anim').innerHTML =
+    '<div class="tile" style="width:150px">'+flame+'<div class="nm">streak flame<br>2 frames · 640ms</div></div>'+
+    '<div class="tile" style="width:150px">'+spark+'<div class="nm">bonus ☆ found<br>3 frames · 900ms</div></div>'+
+    '<div class="tile" style="width:150px">'+clock+'<div class="nm">clock tick<br>2 frames · 640ms</div></div>';
+})();
+
+/* ---------------- theme toggle ---------------- */
+document.getElementById('tgl').onclick = function(){ document.body.classList.toggle('light'); };
+</script></body></html>
