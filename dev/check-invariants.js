@@ -528,6 +528,10 @@ try {
     }
   }
   if (!n14) ok(`all ${seen14} drill-driving dev/ harnesses declare a r450 start-gate stance`);
+} catch (e) {
+  bad('C14 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
 /* ---- C16 (r452): NO `name:` / `label:` KEY INSIDE A CHALLENGES BLOCK ----
    drills.js is the display-string SSOT and its header says so: syncDrillMeta (index.html)
    WRITES CHALLENGES[k].name/.label from meta on every load, "so don't keep stale duplicates in
@@ -569,7 +573,7 @@ try {
     if (!n14) ok('index.html: no CHALLENGES block carries an inline name:/label: (drills.js meta is the display-string SSOT)');
   }
 } catch (e) {
-  bad('C14 could not run: ' + String(e.message || e).slice(0, 120));
+  bad('C16 could not run: ' + String(e.message || e).slice(0, 120));
 }
 
 /* ---- C15 (r452): CERTIFICATE TRACK ARRAYS == HK_TRACKS (the r359 drift rule, in CI) ----
@@ -623,7 +627,7 @@ try {
   }
   if (!n14) ok('certificate tracks: ' + live + ' + dev/migrate-certificates.sql match HK_TRACKS (' +
     Object.keys(truth).map(t => t + ' ' + truth[t].length).join(' · ') + ')');
-/* ---- C16 (r452): CAMPAIGN CHAPTER NAMES ARE GROUP NAMES ----
+/* ---- C17 (r452): CAMPAIGN CHAPTER NAMES ARE GROUP NAMES ----
    The picker folder reads groups[].name; the campaign rail reads chapters[].name. They were two
    strings for one chapter — groups said `Models I`, the campaign said `Models I · Valuation` —
    so the same chapter had two names on two surfaces. The editorial suffix now lives in a
@@ -634,18 +638,18 @@ try {
   vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sb15);
   const groups15 = ((sb15.window.HOTKEY_DRILLS || {}).groups || []).map(g => g.name);
   const camp15 = (sb15.window.HOTKEY_CAMPAIGN && sb15.window.HOTKEY_CAMPAIGN.chapters) || [];
-  if (!groups15.length || !camp15.length) bad('C16: groups[] or HOTKEY_CAMPAIGN.chapters did not parse (shape changed?)');
+  if (!groups15.length || !camp15.length) bad('C17: groups[] or HOTKEY_CAMPAIGN.chapters did not parse (shape changed?)');
   else {
     let n15 = 0;
     for (const c of camp15)
       if (!groups15.includes(c.name)) {
         n15++;
-        bad(`C16: HOTKEY_CAMPAIGN chapter ${c.id} name '${c.name}' is not a groups[] name — the picker folder and the campaign rail must show one string (put any suffix in \`sub\`). Groups: ${groups15.join(' | ')}`);
+        bad(`C17: HOTKEY_CAMPAIGN chapter ${c.id} name '${c.name}' is not a groups[] name — the picker folder and the campaign rail must show one string (put any suffix in \`sub\`). Groups: ${groups15.join(' | ')}`);
       }
     if (!n15) ok(`drills.js: all ${camp15.length} campaign chapter names match a groups[] name`);
   }
 } catch (e) {
-  bad('C15 could not run: ' + String(e.message || e).slice(0, 120));
+  bad('C17 could not run: ' + String(e.message || e).slice(0, 120));
 }
 
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }
