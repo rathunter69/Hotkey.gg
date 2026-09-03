@@ -50,7 +50,6 @@ const check = (ok, label, extra) => { if (!ok) fail++; console.log('  ' + (ok ? 
     localStorage.setItem('hk_learn_done', '1');
     localStorage.setItem('hk_handle_cache', '');
     localStorage.setItem('hk_start_coach', '1');
-    localStorage.setItem('hk_beta_ok', '1');
   } catch (e) {} });
   await page.goto(BASE + '/index.html', { waitUntil: 'load' });
   await page.waitForFunction(() => typeof loadChallenge === 'function' && typeof CHALLENGES !== 'undefined'

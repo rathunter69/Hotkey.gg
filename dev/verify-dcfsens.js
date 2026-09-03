@@ -13,7 +13,7 @@
          URL=http://127.0.0.1:8873/index.html node dev/verify-dcfsens.js     (worktree port)
 
    The init below MIRRORS the real gate harnesses (hotkey_onboarded / hk_tour_done /
-   hk_learn_done / hk_beta_ok / hk_xlv / hk_handle_cache). A probe that boots the page in a
+   hk_learn_done / hk_xlv / hk_handle_cache). A probe that boots the page in a
    different state than the gate does is measuring a different product — r440 lost a round to
    exactly that. */
 'use strict';
@@ -34,8 +34,7 @@ const is = (cond, m) => cond ? ok(m) : bad(m);
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 160)));
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1'); localStorage.setItem('hk_beta_ok', '1');
-    localStorage.setItem('hk_xlv', '2'); localStorage.setItem('hk_handle_cache', '');
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');    localStorage.setItem('hk_xlv', '2'); localStorage.setItem('hk_handle_cache', '');
   } catch (e) {} });
   await page.goto(URL, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof demoKey === 'function');

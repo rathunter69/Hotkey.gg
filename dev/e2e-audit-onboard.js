@@ -25,10 +25,9 @@ const STUB = () => {
     },
     from: t => ({ select: () => mk([]), insert: () => Promise.resolve({ data: null, error: null }),
       upsert: () => Promise.resolve({ data: null, error: null }) }),
-    // r279: curtain codes validate server-side — mirror the live beta_codes behavior
-    rpc: (name, args) => name === 'curtain_check'
-      ? Promise.resolve({ data: String((args && args.p_code) || '').trim().toUpperCase() === 'HAGS', error: null })
-      : Promise.resolve({ data: null, error: null }),
+    // r451: the curtain_check stub went with the curtain (beta_codes + the RPC are dropped
+    // by a follow-up migration). Every RPC now resolves empty, like the rest of the stub.
+    rpc: () => Promise.resolve({ data: null, error: null }),
     functions: { invoke: () => Promise.resolve({ data: null, error: 'no' }) }
   }) };
 };
@@ -40,48 +39,29 @@ const STUB = () => {
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 140)));
   await page.addInitScript(STUB);
 
-  /* r451: T1/T9 are CONDITIONAL on index.html's PRELAUNCH_LOCK. The curtain code is still
-     shipped (kept one round as the documented rollback — dev/LAUNCH.md), so this suite reads
-     the live flag off the page and asserts whichever contract is actually in force. Three
-     asserts in T1 and four in T9 either way — the count does not move with the flag. */
+  /* r451: T1 used to assert the r134 access-code curtain (it shows / a wrong code errors /
+     `hags` passes). The curtain is DELETED, not flag-disabled (dev/BETA_RETIRE_LANDING.md §8A),
+     so T1 asserts the opposite contract with the SAME three asserts: a fresh device meets no
+     gate, the landing is the first thing it sees, and nothing had to be unlocked first. */
+  console.log('T1 fresh visitor: no curtain — straight to the landing');
   await page.goto(HK_URL, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
   await page.waitForTimeout(400);
-  const LOCK = await page.evaluate(() => typeof PRELAUNCH_LOCK !== 'undefined' && PRELAUNCH_LOCK === true);
-
-  if (LOCK) {
-    console.log('T1 fresh visitor: curtain (PRELAUNCH_LOCK=true)');
+  {
     const t1 = await page.evaluate(() => {
-      const g = document.getElementById('gate');
-      return { shown: !!(g && g.classList.contains('show')), hasInput: !!document.getElementById('lockCode') };
-    });
-    ok(t1.shown && t1.hasInput, 'prelaunch curtain shows for a fresh device');
-    // r279: codes validate server-side (curtain_check RPC) — both probes are async round-trips
-    await page.fill('#lockCode', 'WRONG');
-    await page.click('#lockGo');
-    const t1b = await page.waitForFunction(() => /didn/.test((document.getElementById('lockMsg') || {}).textContent || ''), null, { timeout: 15000 }).then(() => true).catch(() => false);
-    ok(t1b, 'wrong code gets a real error (server-checked)');
-    await page.fill('#lockCode', 'hags');   // case-insensitive per the uppercase()
-    await page.click('#lockGo');
-    const t1c = await page.waitForFunction(() => !document.getElementById('gate').classList.contains('show'), null, { timeout: 15000 }).then(() => true).catch(() => false);
-    ok(t1c, 'right code (case-insensitive) passes the curtain (server-checked)');
-  } else {
-    console.log('T1 fresh visitor: NO curtain (PRELAUNCH_LOCK=false)');
-    const t1 = await page.evaluate(() => {
-      const g = document.getElementById('gate'), l = document.getElementById('landing');
+      const l = document.getElementById('landing');
       let betaOk = null; try { betaOk = localStorage.getItem('hk_beta_ok'); } catch (e) {}
       return {
-        shown: !!(g && g.classList.contains('show')),
-        hasInput: !!document.getElementById('lockCode'),
-        gateEmpty: !!g && !g.innerHTML.trim(),
+        noGateEl: !document.getElementById('gate'),
+        noCodeInput: !document.getElementById('lockCode'),
+        noFlag: typeof window.PRELAUNCH_LOCK === 'undefined' && typeof window.showPrelaunchLock === 'undefined',
         landingUp: !!(l && !l.classList.contains('gone') && getComputedStyle(l).display !== 'none'),
-        gateOpen: (typeof gateOpen !== 'undefined') ? gateOpen : null,
         betaOk: betaOk,
       };
     });
-    ok(!t1.shown && !t1.hasInput && t1.gateEmpty, 'no curtain element on a fresh device');
+    ok(t1.noGateEl && t1.noCodeInput, 'no curtain element on a fresh device (#gate / #lockCode are gone)', JSON.stringify(t1));
     ok(t1.landingUp, 'a fresh device lands straight on the landing');
-    ok(t1.gateOpen === false && !t1.betaOk, 'the Enter path is unguarded \u2014 gateOpen false, no hk_beta_ok needed', JSON.stringify(t1));
+    ok(t1.noFlag && !t1.betaOk, 'the curtain is DELETED, not disabled \u2014 no PRELAUNCH_LOCK, no hk_beta_ok', JSON.stringify(t1));
   }
 
   console.log('T2 landing → enter → tour');
@@ -89,7 +69,7 @@ const STUB = () => {
     const l = document.getElementById('landing');
     return { visible: !!(l && !l.classList.contains('gone')), hasStart: !!(l && l.textContent.match(/enter|start|train/i)) };
   });
-  ok(t2.visible, 'landing dialog is up after the curtain');
+  ok(t2.visible, 'landing dialog is up on first load');
   await page.keyboard.press('Enter');   // Enter = start (friction-free entry)
   await page.waitForTimeout(900);
   // r280: the keyboard pick asks FIRST — the right key overlay loads up front
@@ -166,10 +146,10 @@ const STUB = () => {
     return !!(w && getComputedStyle(w).display !== 'none');
   }, null, { timeout: 8000 }).then(() => true).catch(() => false);
   const t3 = await page.evaluate(() => ({
-    gateGone: !document.getElementById('gate').classList.contains('show'),
+    gateGone: !document.getElementById('gate'),   /* r451: the curtain element no longer exists at all */
     landingGone: document.getElementById('landing').classList.contains('gone') }));
   t3.up = t3up;
-  ok(t3.gateGone && t3.landingGone, 'returning visitor skips curtain + landing');
+  ok(t3.gateGone && t3.landingGone, 'returning visitor skips the landing (and there is no curtain to skip)');
   ok(t3.up, 'welcome-back card greets the return');
   const t3b = await page.evaluate(async () => {
     demoKey({key:'x'});   /* r450: a returning visitor lands on a gated board too — pass it before typing */
@@ -432,37 +412,21 @@ const STUB = () => {
   ok(/where the time went|redo/i.test(t8b.hint), 'the first card names what is behind `d` (P1-1)', t8b.hint);
   await page.evaluate(() => { try { hideResults(); } catch (e) {} });
 
-  await page.evaluate(() => { ['hk_beta_ok','hotkey_onboarded'].forEach(k => localStorage.removeItem(k)); });
+  /* r451: T9 was the r450 P0-3 pass — the curtain had to name the product and offer a door,
+     because it WAS the entire first impression for uninvited traffic. The curtain is gone,
+     so the same four asserts now hold the LANDING to that job. Landing v2 (Part II) will
+     deepen these; they must keep passing through that rework. */
+  await page.evaluate(() => { ['hotkey_onboarded'].forEach(k => localStorage.removeItem(k)); });
   await page.reload({ waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
   await page.waitForTimeout(700);
-  if (LOCK) {
-    console.log('T9 the curtain gives an uninvited visitor a story and a door (P0-3)');
-    const t9 = await page.evaluate(() => {
-      const g = document.getElementById('gate');
-      const list = document.getElementById('lockList');
-      return {
-        shown: !!(g && g.classList.contains('show')),
-        codeFirst: !!document.getElementById('lockCode'),
-        tagline: (document.getElementById('lockTag') || {}).innerText || '',
-        listHref: list ? list.getAttribute('href') : null,
-        listText: list ? list.innerText : null,
-      };
-    });
-    ok(t9.shown && t9.codeFirst, 'the curtain still gates, code input still primary');
-    ok(/excel/i.test(t9.tagline), 'the curtain now says what the product is', t9.tagline);
-    ok(!!t9.listHref && /mailto:|contact/i.test(t9.listHref), 'an uninvited visitor has a next action', String(t9.listHref));
-    ok(/list/i.test(t9.listText || ''), '\u2026labelled as getting on the list', t9.listText);
-    await page.evaluate(() => { try { localStorage.setItem('hk_beta_ok', '1'); } catch (e) {} });
-  } else {
-    /* r451: the mirror of the P0-3 asserts. The curtain WAS the whole first impression for
-       uninvited traffic; with it retired the landing has to carry that job itself. */
+  {
     console.log('T9 an uninvited visitor gets the landing itself (curtain retired)');
     const t9 = await page.evaluate(() => {
-      const g = document.getElementById('gate'), l = document.getElementById('landing');
+      const l = document.getElementById('landing');
       let betaOk = null; try { betaOk = localStorage.getItem('hk_beta_ok'); } catch (e) {}
       return {
-        shown: !!(g && g.classList.contains('show')),
+        noGateEl: !document.getElementById('gate'),
         codeFirst: !!document.getElementById('lockCode'),
         landingUp: !!(l && !l.classList.contains('gone') && getComputedStyle(l).display !== 'none'),
         text: l ? l.innerText : '',
@@ -471,10 +435,10 @@ const STUB = () => {
         betaOk: betaOk,
       };
     });
-    ok(!t9.shown && !t9.codeFirst && t9.landingUp, 'no gate for an uninvited visitor \u2014 the landing is the first impression');
+    ok(t9.noGateEl && !t9.codeFirst && t9.landingUp, 'no gate for an uninvited visitor — the landing is the first impression', JSON.stringify({ g: t9.noGateEl, c: t9.codeFirst, l: t9.landingUp }));
     ok(/excel/i.test(t9.text), 'the landing says what the product is', t9.text.slice(0, 90));
     ok(t9.hasStart && t9.hasLogin, 'an uninvited visitor has a next action (start drilling / log in)', JSON.stringify({ s: t9.hasStart, l: t9.hasLogin }));
-    ok(!t9.betaOk, '\u2026and never needs an access code (no hk_beta_ok on the device)', String(t9.betaOk));
+    ok(!t9.betaOk, '…and never needs an access code (no hk_beta_ok on the device)', String(t9.betaOk));
   }
 
   const realErrors = errs.filter(e => !/supabase|Failed to fetch|NetworkError|ERR_/i.test(e));

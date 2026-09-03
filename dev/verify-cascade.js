@@ -46,8 +46,7 @@ const ok = (cond, msg, extra) => {
      every number it reports is a lie (the r440 hotkey_onboarded lesson) */
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1'); localStorage.setItem('hk_beta_ok', '1');
-    localStorage.setItem('hk_handle_cache', ''); localStorage.setItem('hk_xlv', '2');
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');    localStorage.setItem('hk_handle_cache', ''); localStorage.setItem('hk_xlv', '2');
   } catch (e) {} });
   await page.goto(URL, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof demoKey === 'function'

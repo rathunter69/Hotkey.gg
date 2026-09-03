@@ -19,8 +19,7 @@ const URL = process.env.URL || 'http://127.0.0.1:8791/index.html';
   await page.route('**/@supabase/**', r => r.abort());
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1'); localStorage.setItem('hk_beta_ok', '1');
-  } catch (e) {} });
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');  } catch (e) {} });
   await page.goto(URL, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => typeof evalFormula === 'function' && typeof S !== 'undefined', null, { timeout: 15000 });
 
