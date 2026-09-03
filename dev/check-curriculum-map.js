@@ -1,5 +1,7 @@
-/* CURRICULUM MAP GUARD (r454, dev/CURRICULUM_REBUILD.md Phase A).
-   Reads dev/curriculum-v3.json — the nine-chapter map — and asserts the six properties
+/* CURRICULUM MAP GUARD (r454, dev/CURRICULUM_REBUILD.md Phase A; rules re-cut to Wolf's
+   2026-09-03 redirects — the ORIGINAL EIGHT chapters, and Foundations rebuilt as FIVE major
+   game levels that replace both the lesson drills and the Keyboard Tour).
+   Reads dev/curriculum-v3.json — the eight-chapter map — and asserts the six properties
    that make it a LADDER rather than a list. No browser, no network: it loads one JSON and
    drills.js (via vm, the dev/check-invariants.js pattern) and runs in well under a second,
    so it belongs in gate.yml's always-on fast lane.
@@ -11,17 +13,27 @@
      (b) CAPSTONE LAST, AND IT CHAINS. Each chapter's last entry is its declared capstone,
          and the capstone's TEACHES is a subset of the tags taught strictly earlier — a
          capstone chains what the chapter taught, it never introduces.
-     (c) MEMBERSHIP. Every key in drills.js menuOrder appears exactly once in the map; no
-         key is invented; the Tour is present and is NOT a catalog drill.
-     (d) EVERY CHAPTER OPENS ON TEACHING. The first entry of each chapter is the Tour or a
-         lesson — unless the chapter declares opener_exempt, which is legal only when the
-         chapter introduces no tag that is not already taught before it AND it opens on its
-         own lowest-par drill.
+     (c) MEMBERSHIP. Every key in drills.js menuOrder appears exactly once in the map, or is
+         declared in retired[] with the map key it retires INTO and a 'why'; no key is
+         invented; the map carries NO entry of kind 'tour' and declares `keyboardtour`
+         retired, because level 1 replaces it.
+     (d) FOUNDATIONS IS THE GAME TUTORIAL, AND NO OTHER CHAPTER OPENS ON A WALL.
+         (d1) Chapter 1 is EXACTLY FIVE level drills — four of kind 'level', 60–120 s par
+              each, then the capstone. No Tour, no lesson, no ordinary drill, no sixth
+              entry. Level 1 requires nothing (it is first contact). Each level is a
+              multi-act game board teaching one foundational FAMILY; the capstone chains
+              all four.
+         (d2) Every OTHER chapter opens either on its own lowest-par drill, or on a drill
+              whose REQUIRES are all satisfied by Foundations alone — i.e. a player who has
+              done nothing but the five levels can walk into it. No chapter opens on a
+              capstone. There is no opener_exempt flag and no "a lesson at the head of
+              every chapter" rule: Wolf's redirect replaces both.
      (e) TIER + LEVEL CURVE. tier is free|pro on every chapter, free chapters all precede
          pro ones, free chapters carry no unlock_level, and pro unlock_levels strictly rise.
      (f) THE DIFFICULTY SPINE. Inside a chapter, par(i+1) >= 0.63 x par(i) over the graded
-         drills (lessons and the Tour are exempt — a 14-second lesson is a start gate, not a
-         rung). 0.63 is the audit §2.3 "drop" threshold. The spine is printed either way.
+         drills. The four Foundations LEVELS are exempt: a level is a 60–120 s multi-act
+         teaching board, not a rung on the speed spine — Foundations' first rung is its
+         capstone. 0.63 is the audit §2.3 "drop" threshold. The spine is printed anyway.
 
    Run: node dev/check-curriculum-map.js     (exit 0 = clean) */
 'use strict';
@@ -115,45 +127,77 @@ const firstTaughtAt = new Map();   // tag -> ref of the first entry that teaches
 
   const catalogKeys = flat.filter(f => f.d.kind !== 'tour').map(f => f.d.key);
   const catalogSet = new Set(catalogKeys);
-  const missing = live.filter(k => !catalogSet.has(k));
+  /* a live key may leave the catalog ONLY by naming, in retired[], the map key that absorbs it */
+  const retired = M.retired || [];
+  const retiredOf = new Map(retired.map(r => [r.key, r.into]));
+  for (const r of retired) {
+    if (!liveSet.has(r.key) && !r.outside_catalog)
+      bad(`(c) retired[] names '${r.key}', which drills.js does not have — a surface outside menuOrder must say outside_catalog:true`);
+    if (!r.into || !catalogSet.has(r.into)) bad(`(c) retired '${r.key}' must retire INTO a key the map carries (has '${r.into}')`);
+    if (!r.why) bad(`(c) retired '${r.key}' carries no 'why'`);
+    if (catalogSet.has(r.key)) bad(`(c) '${r.key}' is both retired and in the catalog`);
+  }
+  const missing = live.filter(k => !catalogSet.has(k) && !retiredOf.has(k));
   const invented = flat.filter(f => f.d.status === 'built' && f.d.kind !== 'tour' && !liveSet.has(f.d.key)).map(f => f.d.key);
   if (missing.length) bad(`(c) live catalog key(s) absent from the map: ${missing.join(', ')}`);
   if (invented.length) bad(`(c) key(s) marked status 'built' that drills.js does not have: ${invented.join(', ')}`);
 
+  /* the Keyboard Tour is retired into level 1 — the map carries no separate tour entry, and the
+     retirement must be declared so nobody re-adds an untimed pre-game by accident */
   const tours = flat.filter(f => f.d.kind === 'tour');
-  if (tours.length !== 1) bad(`(c) expected exactly 1 entry of kind 'tour', found ${tours.length}`);
-  else if (tours[0].ch.id !== chapters[0].id || tours[0].ch.drills[0].key !== tours[0].d.key)
-    bad(`(c) the Tour must be the first entry of the first chapter`);
-  else if (liveSet.has(tours[0].d.key)) bad(`(c) the Tour '${tours[0].d.key}' must NOT be in menuOrder — it is not a catalog drill`);
+  if (tours.length) bad(`(c) entry of kind 'tour' found (${tours.map(t => t.d.key).join(', ')}) — level 1 replaces the Tour; declare it in retired[] instead`);
+  if (!retiredOf.has('keyboardtour')) bad(`(c) the Keyboard Tour must be declared in retired[] (into level 1)`);
 
   const adds = flat.filter(f => f.d.status === 'add');
-  const lessons = flat.filter(f => f.d.kind === 'lesson');
-  if (lessons.length > 8) bad(`(c) ${lessons.length} lesson drills — the program caps lessons at 8`);
+  const levels = flat.filter(f => f.d.kind === 'level');
+  const stale = flat.filter(f => f.d.kind === 'lesson' || f.d.kind === 'game');
+  if (stale.length) bad(`(c) ${stale.length} entries of kind 'lesson'/'game' — the five-level tutorial replaced both; use kind 'level'`);
+  const addCaps = adds.filter(f => f.d.kind === 'capstone').length;
   if (!missing.length && !invented.length && !dupes.length)
-    ok(`(c) membership: ${live.length} live keys each appear once · +${adds.length} ADDs (${lessons.length} lessons, ${adds.length - lessons.length} capstones) · catalog after = ${catalogKeys.length}`);
+    ok(`(c) membership: ${live.length} live keys · ${retired.length} retired (${retired.map(r => r.key + '→' + r.into).join(', ') || 'none'}) · +${adds.length} ADDs (${adds.length - addCaps} drills, ${addCaps} capstones) · ${levels.length} levels · catalog after = ${catalogKeys.length}`);
 }
 
-/* ---------- (d) every chapter opens on teaching ---------- */
+/* ---------- (d) Foundations is the game tutorial; no other chapter opens on a wall ---------- */
 {
   let bad_d = 0;
-  const exempt = [];
-  for (const c of chapters) {
-    const first = (c.drills || [])[0];
-    if (!first) { bad(`(d) ${c.id} is empty`); bad_d++; continue; }
-    if (first.kind === 'tour' || first.kind === 'lesson') continue;
-    if (!c.opener_exempt) { bad(`(d) ${c.id} opens on '${first.key}' (kind ${first.kind}) — a chapter opens on a lesson or the Tour`); bad_d++; continue; }
-    // an exemption is legal only if the chapter introduces nothing new...
-    const before = new Set();
-    for (const { ch, d } of flat) { if (ch.id === c.id) break; for (const t of (d.teaches || [])) before.add(t); }
-    const introduced = [];
-    for (const d of c.drills) for (const t of (d.teaches || [])) if (!before.has(t)) introduced.push(t);
-    if (introduced.length) { bad(`(d) ${c.id} claims opener_exempt but introduces ${[...new Set(introduced)].join(', ')}`); bad_d++; continue; }
-    // ...and only if it opens on its own lowest par
-    const pars = c.drills.filter(d => typeof d.par === 'number').map(d => d.par);
-    if (first.par !== Math.min(...pars)) { bad(`(d) ${c.id} claims opener_exempt but opens on par ${first.par}, not its lowest (${Math.min(...pars)})`); bad_d++; continue; }
-    exempt.push(`${c.id} ${c.name} (opens ${first.key}, par ${first.par})`);
+  const c1 = chapters[0];
+
+  /* (d1) the five-level tutorial: four levels, then the capstone — nothing else, and no Tour. */
+  {
+    const ds = c1.drills || [];
+    const body = ds.slice(0, -1);                       // everything but the capstone
+    if (ds.length !== 5) { bad(`(d1) ${c1.id} carries ${ds.length} entries — Foundations is EXACTLY five levels (four kind 'level' + the capstone)`); bad_d++; }
+    const strays = body.filter(d => d.kind !== 'level');
+    if (strays.length) { bad(`(d1) ${c1.id} ${c1.name} is the five-level tutorial — every entry before the capstone must be kind 'level'; found ${strays.map(d => d.key + ' (' + d.kind + ')').join(', ')}`); bad_d++; }
+    const nLevels = body.filter(d => d.kind === 'level').length;
+    if (nLevels !== 4) { bad(`(d1) ${c1.id} carries ${nLevels} entries of kind 'level' (want exactly 4)`); bad_d++; }
+    if (body[0] && (body[0].requires || []).length) { bad(`(d1) ${c1.id}/${body[0].key} is level 1 — first contact requires nothing, it has ${body[0].requires.join(', ')}`); bad_d++; }
+    for (const d of body)
+      if (typeof d.par === 'number' && (d.par < 60 || d.par > 120)) { bad(`(d1) ${c1.id}/${d.key} par ${d.par} — a level runs 60–120 s`); bad_d++; }
+    if (!bad_d) ok(`(d1) ${c1.id} ${c1.name} = ${nLevels} levels + ${c1.capstone}, five catalog entries and no Tour · L1 '${body[0] && body[0].key}' is first contact`);
   }
-  if (!bad_d) ok(`(d) every chapter opens on the Tour or a lesson · ${exempt.length} recorded exemption(s): ${exempt.join(' · ') || 'none'}`);
+
+  /* (d2) every other chapter opens on its lowest par, or on a drill the game tutorial
+     alone already qualifies the player for. Never on a capstone. */
+  const foundationTaught = new Set();
+  for (const d of (c1.drills || [])) for (const t of (d.teaches || [])) foundationTaught.add(t);
+  const how = [];
+  for (const c of chapters.slice(1)) {
+    const first = (c.drills || [])[0];
+    if (!first) { bad(`(d2) ${c.id} is empty`); bad_d++; continue; }
+    if (first.kind === 'capstone') { bad(`(d2) ${c.id} opens on the capstone '${first.key}'`); bad_d++; continue; }
+    const pars = c.drills.filter(d => typeof d.par === 'number').map(d => d.par);
+    const lowest = Math.min(...pars);
+    const isLowest = first.par === lowest;
+    const walkIn = (first.requires || []).every(t => foundationTaught.has(t));
+    if (!isLowest && !walkIn) {
+      const missing = (first.requires || []).filter(t => !foundationTaught.has(t));
+      bad(`(d2) ${c.id} opens on '${first.key}' (par ${first.par}, lowest is ${lowest}) and it wants ${missing.join(', ')} — which Foundations does not teach`);
+      bad_d++; continue;
+    }
+    how.push(`${c.id} ${first.key}${isLowest ? ' (lowest par ' + first.par + ')' : ' (walk-in off Foundations)'}`);
+  }
+  if (!bad_d) ok(`(d2) ${how.length} chapters open on a rung, not a wall: ${how.join(' · ')}`);
 }
 
 /* ---------- (e) tier + level curve ---------- */
@@ -178,11 +222,11 @@ const firstTaughtAt = new Map();   // tag -> ref of the first entry that teaches
 /* ---------- (f) the difficulty spine ---------- */
 {
   let bad_f = 0;
-  console.log('\n  THE SPINE (par by position; · = lesson/tour, exempt)');
+  console.log('\n  THE SPINE (par by position; ▮ = a Foundations level — exempt, it is a teaching board)');
   for (const c of chapters) {
-    const line = c.drills.map(d => (d.kind === 'lesson' || d.kind === 'tour') ? '·' : d.par).join(' → ');
+    const line = c.drills.map(d => (d.kind === 'tour' || d.kind === 'level') ? (d.kind === 'tour' ? '·' : d.par + '▮') : d.par).join(' → ');
     console.log(`    ${c.id} ${c.name.padEnd(18)} ${line}`);
-    const graded = c.drills.filter(d => d.kind !== 'lesson' && d.kind !== 'tour');
+    const graded = c.drills.filter(d => d.kind !== 'tour' && d.kind !== 'level');
     for (let i = 0; i + 1 < graded.length; i++) {
       const a = graded[i], b = graded[i + 1];
       const r = b.par / a.par;
@@ -192,7 +236,7 @@ const firstTaughtAt = new Map();   // tag -> ref of the first entry that teaches
   // report the jumps, too (not a failure — the doc flags them)
   const jumps = [];
   for (const c of chapters) {
-    const g = c.drills.filter(d => d.kind !== 'lesson' && d.kind !== 'tour');
+    const g = c.drills.filter(d => d.kind !== 'tour' && d.kind !== 'level');
     for (let i = 0; i + 1 < g.length; i++) { const r = g[i + 1].par / g[i].par; if (r > 1.6) jumps.push(`${c.id} ${g[i].key} ${g[i].par} → ${g[i + 1].key} ${g[i + 1].par} x${r.toFixed(2)}`); }
   }
   console.log('\n  jumps > x1.6 (reported, not failed): ' + (jumps.length ? jumps.length : 'none'));

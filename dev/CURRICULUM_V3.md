@@ -1,261 +1,265 @@
-# CURRICULUM V3 — the nine-chapter map (r454, Phase A of `dev/CURRICULUM_REBUILD.md`)
+# CURRICULUM V3 (v2) — the eight-chapter map (r454, Phase A of `dev/CURRICULUM_REBUILD.md`)
 
-_Status: **RECOMMENDED, PENDING WOLF.** Everything in §1–§8 that CURRICULUM_REBUILD §1 (P1–P8) already
-settled is law and is marked as such; everything CURRICULUM_REBUILD §4 only *recommended* — the PRO
-line, the level curve, the chapter ids — is carried here as the working answer and marked
-**"recommended, pending Wolf"**. §8 is the short list of things this map could not settle from the
-program spec. Once Wolf signs §8, this file is binding and Phase B/C build against it._
+_Status: **RECOMMENDED, PENDING WOLF.** This is **v2**, rewritten against Wolf's 2026-09-03
+redirects. v1's nine-chapter re-cut, its `k1`–`k9` ids, its eight lesson drills, its
+`opener_exempt` flag and its "a lesson at the head of every chapter" rule are **withdrawn**.
+What replaces them:_
+
+> _"The original chapter layout was actually pretty good… the first chapter is very gamified,
+> like how we have a pac-man-like course for movement, and we have similar mechanics to make each
+> drill in the first set a GAME as you learn each foundational concept — basically a game tutorial
+> before moving into the speed drills."_ — Wolf, 2026-09-03
+>
+> _"I'm not in love with 12 drills for intro — feels shallow, or like we should just have a few
+> major lessons essentially."_ — Wolf, same day, on the first draft of this file
+>
+> _"Level 1 replaces the Keyboard Tour entirely. Levels post to leaderboards like any drill."_
+> — Wolf, same day, resolving D-1/D-2 below
 
 **Machine-readable twin:** `dev/curriculum-v3.json`. **Guard:** `node dev/check-curriculum-map.js`
-prints `CURRICULUM MAP: 0 violations` and exits 0; it runs in gate.yml's always-on fast lane beside
-`check-invariants`. Nothing in this document is hand-counted — every table below is generated off
-that JSON.
+prints `CURRICULUM MAP: 0 violations` and exits 0; it belongs in gate.yml's always-on fast lane
+beside `check-invariants`. Nothing in this document is hand-counted — every table below is
+generated off that JSON.
 
-**Inputs, in the order they bind:** `dev/CURRICULUM_REBUILD.md` §1 (P1–P8, law) · `dev/audit-r452/audit-catalog.md`
-(the skill graph: 74 drills, 59 require-before-teach violations, the difficulty spine, options A–D and
-the B-then-D-then-C recommendation) · `dev/TUTORIAL_CHAPTER_SPEC.md` §3.0–§3.4 (the Tour's six stages,
-the four lesson pages) · `dev/DEPTH_PASS.md` §1.7 (the language standard), §2.4 (capstones), §3 (the
-delta-table grammar), §4 (the five unbuilt capstone pages) · `dev/DEPTH_PASS_CAMPAIGN.md` §0–§1
-(retirements, and the route facts a build agent must not re-derive).
+**Inputs, in the order they bind:** Wolf's 2026-09-03 redirects (above, law) · `dev/CURRICULUM_REBUILD.md`
+§1 (P1–P8, law **except** P3's re-cut and P4's lesson-opener rule, which Wolf's redirect supersedes) ·
+`dev/audit-r452/audit-catalog.md` (the skill graph: 74 drills, 59 require-before-teach violations, the
+difficulty spine, options A–D) · `dev/TUTORIAL_CHAPTER_SPEC.md` §3.0 (the Tour's six stages and its HUD
+— now the **level machinery**) · `dev/DEPTH_PASS.md` §1.7 (language standard), §2.4 (capstones), §2.5
+(the tier ladder), §3 (delta-table grammar), §4 (the five unbuilt capstone pages) ·
+`dev/DEPTH_PASS_CAMPAIGN.md` §0–§1 (retirements and route facts a build agent must not re-derive).
 
-**The headline.** 74 drills → **87** (74 + 8 lesson drills + 5 capstones), in **9 chapters**, plus the
-Keyboard Tour outside the catalog. Every chapter ends on a capstone. **Require-before-teach violations:
-59 → 0.**
+**The headline.** The **eight original chapters keep their names, their order, their campaign ids
+`c1`–`c8` and their capstone designations.** Chapter 1, Foundations, is rebuilt from seven ordinary
+drills into **five major levels** — four multi-act game boards plus `modeltour` — that replace both
+the lesson-drill idea and the Keyboard Tour. 74 drills → **84** (74 − 1 retired + 4 levels + 2 opener
+drills + 5 capstones). **Require-before-teach violations: 59 → 0.**
+
+**What v2 kills that v1 cost.** Because the eight chapters and their ids survive, there is **no
+campaign claim-flag migration**, **no certificate-track re-cut** (only three keys change track), and
+**no `HOTKEY_PREMIUM` re-point** — the PRO line stays exactly the four groups `drills.js` names today.
 
 ---
 
-## 1 · The nine chapters
+## 1 · The eight chapters
 
-Chapter ids are `k1`–`k9` (CURRICULUM_REBUILD §4.3 — *recommended, pending Wolf*), not an overload of
-`c1`–`c8`; §6 D-14 carries the one-time claim-flag map. "entries" counts the Tour; "(drills)" is the
-catalog count that `menuOrder.length` will report.
+Chapter ids are the live `HOTKEY_CAMPAIGN` ids `c1`–`c8`, and a chapter's `name` **is** its
+`groups[]` name (the r452 one-string law, asserted by `check-invariants` C15). "entries" and
+"(drills)" are now the same number: the Tour is retired, so every entry is a catalog drill.
 
-| # | chapter | tier | unlock | opening lesson | capstone | entries (drills) | what it teaches |
+| # | chapter | tier | unlock | opens on | capstone | entries (drills) | what it teaches |
 |---|---|---|---|---|---|---|---|
-| k1 | **Keyboard** | free | — | `keyboardtour` (the Tour) | `modeltour` | 9 (8) | the whole keyboard grammar — move, select, enter, edit, structure, clipboard, save |
-| k2 | **Build** | free | — | `lockref` | `qclose` | 12 (12) | a formula points at cells — sums, anchors, ratios, growth and roll-ups on a live page |
-| k3 | **Format** | free | — | `ribbonpass` | `gauntlet` | 12 (12) | the banker's finish — weight, alignment, decimals, rules, widths and the house standard |
-| k4 | **Structure & Data** | free | — | `tapepull` | `cleanroom` | 8 (8) | rows, columns, sorts, filters and the two ways to read a value out of a tape |
-| k5 | **Audit & Repair** | pro | L13 | `tracepass` | `redflags` | 13 (13) | find the break — trace, show formulas, triage the sentinels, flip the signs, make it tie |
-| k6 | **Components** | pro | L16 | `rollfwd` | `nwcsched` | 7 (7) | the parts a model is assembled from — corkscrews, schedules, bridges and scenario switches |
-| k7 | **Valuation** | pro | L19 | `dcfsens` † | `pitchpage` | 10 (10) | what a company is worth — discount rate, free cash flow, DCF, comps and the page a VP reads |
-| k8 | **Credit** | pro | L22 | `covtable` † | `cascade` | 8 (8) | the debt side — facilities, sweeps, waterfalls, covenants and liquidity under three cases |
-| k9 | **Full Builds** | pro | L25 | `threestmt` † | `shipit` | 9 (9) | whole models, cold and under the clock — three statements, the DCF page, the paper LBO, the cover |
+| c1 | **Foundations** | free | — | `corridor` | `modeltour` | 5 (5) | the game tutorial — four multi-act levels, one foundational family each, then the model tour |
+| c2 | **Formatting** | free | — | `ruleaudit` | `gauntlet` | 11 (11) | the banker’s finish — weight, alignment, decimals, rules, widths, paste-special and the house standard |
+| c3 | **Formulas I** | free | — | `percent` | `qclose` | 11 (11) | a formula points at cells — sums, anchors, ratios, growth and roll-ups on a live page |
+| c4 | **Data & Lookups** | free | — | `tapepull` | `cleanroom` | 12 (12) | rows, columns, sorts, filters and the two ways to read a value out of a tape |
+| c5 | **Formulas II** | pro | L13 | `wrapfix` | `redflags` | 12 (12) | find the break — trace, show formulas, triage the sentinels, flip the signs, make it tie |
+| c6 | **Models I** | pro | L16 | `dcfsens` | `pitchpage` | 11 (11) | what a company is worth — discount rate, free cash flow, DCF, comps and the page a VP reads |
+| c7 | **Models II** | pro | L19 | `rollfwd` | `cascade` | 11 (11) | the debt side and the schedules that feed it — corkscrews, sweeps, waterfalls, covenants, liquidity |
+| c8 | **Full Builds** | pro | L22 | `threestmt` | `shipit` | 11 (11) | whole models, cold and under the clock — three statements, the DCF page, the paper LBO, the cover |
 
-**† the three opener exemptions.** CURRICULUM_REBUILD P4 says every chapter opens with a lesson.
-Nine chapters need nine openers: the Tour plus eight lessons — and the eight lessons are all pinned
-early by the graph (selection, sums, anchors, signs and the ribbon are needed by k1–k3; the tape reads
-by k4; tracing by k5; the corkscrew by k6). A lesson at the head of Valuation, Credit or Full Builds
-would teach **nothing** — those three chapters introduce no tag the earlier eight have not already
-taught — and the audit's own §3.1 discriminator kills a drill that teaches nothing and is not a
-capstone. So those three chapters carry an explicit `opener_exempt` flag, and the checker allows it
-**only** on proof of both conditions: the chapter introduces no new tag, and it opens on its own
-lowest-par drill. That is decision **D-1** in §8.
+**Counts.** free = **39** drills (c1–c4) · PRO = **45** (c5–c8). Catalog total **84**, up from 74:
++4 levels, +2 opener drills (`tapepull`, `rollfwd`), +5 capstones, −1 retirement (`navigation`,
+absorbed into level 1). The Keyboard Tour leaves the product entirely (§6 D-3).
 
-**Counts.** free = **40** drills (32 existing + 6 lessons + 2 capstones) + the Tour · PRO = **47**
-drills (42 existing + 2 lessons + 3 capstones). Catalog total **87**.
+**Why five levels and not twelve games.** The twelve-mini-game draft split the foundational grammar
+into twelve 16–26-second boards. Wolf's read was that it "feels shallow" — and he is right for a
+structural reason: at 20 seconds a board can carry one chord, so twelve of them teach twelve chords
+and no *habit*. A level runs 60–120 seconds across three or four acts, which is long enough for the
+thing that actually transfers: use a chord, then use it again inside a task that has moved on. Four
+levels also match the four families the graph actually has — **move & select · enter, edit & structure ·
+formulas & anchors · formats & the ribbon** — so each level owns a family instead of a keystroke.
 
 ---
 
 ## 2 · The full ordered catalog
 
-Catalog order = chapter order, then drill order. `#` is the position in `menuOrder`; the Tour has none
-because it is not in `menuOrder` (TUTORIAL_CHAPTER_SPEC §4 A1). **teaches** shows only tags that are
-*new at that position* — a blank means the drill reps something already taught, which is correct and
-intended for the 40-odd drills the audit §3.1 identified as reps and syntheses. **requires** is carried
-**verbatim** from the audit's §6 table, extracted mechanically; the three amendments are §6 D-3.
-
-
+Catalog order = chapter order, then drill order; `#` is the position in `menuOrder`. **teaches** shows
+only tags that are *new at that position* — a blank means the drill reps something already taught,
+which is correct and intended for the ~50 drills the audit §3.1 identified as reps and syntheses.
+**requires** is carried **verbatim** from the audit's §6 table except for the three amendments in §6
+(D-8, D-9, D-10).
 
 | ch | # | key | name | kind · status | par | teaches (new only) | requires |
 |---|---|---|---|---|---|---|---|
-| k1 | — | `keyboardtour` | The Keyboard Tour | tour · built | — | `move` · `jump(ctrl-arrow)` · `select` · `enter/edit(F2)` · `clear/delete` · `undo` · `redo` · `insert/delete row-col` · `point-mode` · `sum(Alt=)` · `fill(D/R)` · `bold/italic/color` · `align` · `borders(top/outside/bottom)` · `comma/currency-fmt` · `blue-inputs` · `decimals` · `percent-fmt` · `save` | — |
-| k1 | 1 | `select` | Select | lesson · add | 16 | `select-edge` · `row/col-select` · `goto-special` | `select` |
-| k1 | 2 | `firstsum` | First Sums | lesson · add | 26 | `margin/ratio` | `enter/edit(F2)` · `select` · `point-mode` · `sum(Alt=)` · `fill(D/R)` |
-| k1 | 3 | `navigation` | Navigate | existing · built | 20 | `copy/paste` | `select` · `select-edge` |
-| k1 | 4 | `rowops` | Structure | existing · built | 30 | `schedule` | `select` · `row/col-select` · `copy/paste` · `comma/currency-fmt` · `blue-inputs` · `borders(top/outside/bottom)` |
-| k1 | 5 | `signs` | Signs | lesson · add | 18 | `sign-convention` · `costs-negative` · `parens-negative` | `enter/edit(F2)` |
-| k1 | 6 | `pastes` | Paste Special | existing · built | 42 | `paste-special` | `copy/paste` · `comma/currency-fmt` · `bold/italic/color` · `align` · `borders(top/outside/bottom)` · `sign-convention` |
-| k1 | 7 | `editfix` | Repair | existing · built | 52 | — | `redo` · `clear/delete` · `schedule` |
-| k1 | 8 | `modeltour` | Model Tour | capstone · built | 35 | — | `move` · `jump(ctrl-arrow)` · `copy/paste` · `fill(D/R)` · `percent-fmt` · `comma/currency-fmt` · `decimals` · `bold/italic/color` · `blue-inputs` · `align` · `schedule` |
-| k2 | 9 | `lockref` | Lock | lesson · add | 16 | `anchor($/F4)` · `mixed-anchor` | `fill(D/R)` · `point-mode` |
-| k2 | 10 | `blocksel` | Block Select | existing · built | 34 | `cut` | `select-edge` · `copy/paste` · `fill(D/R)` · `bold/italic/color` · `align` · `borders(top/outside/bottom)` · `margin/ratio` |
-| k2 | 11 | `filldr` | Fill | existing · built | 44 | — | `bold/italic/color` · `borders(top/outside/bottom)` · `margin/ratio` · `schedule` · `sign-convention` |
-| k2 | 12 | `foot` | Foot | existing · built | 29 | — | `fill(D/R)` · `bold/italic/color` · `borders(top/outside/bottom)` |
-| k2 | 13 | `anchor` | Anchors | existing · built | 22 | — | `fill(D/R)` · `anchor($/F4)` · `mixed-anchor` · `comma/currency-fmt` · `decimals` · `borders(top/outside/bottom)` |
-| k2 | 14 | `percent` | % of Revenue | existing · built | 21 | — | `row/col-select` · `fill(D/R)` · `anchor($/F4)` · `decimals` · `bold/italic/color` |
-| k2 | 15 | `margin` | Margins | existing · built | 40 | `growth/CAGR` | `fill(D/R)` · `percent-fmt` · `decimals` · `bold/italic/color` · `margin/ratio` |
-| k2 | 16 | `cagr` | CAGR | existing · built | 36 | — | `fill(D/R)` · `anchor($/F4)` · `percent-fmt` · `decimals` · `bold/italic/color` · `growth/CAGR` |
-| k2 | 17 | `bridge` | Point Mode | existing · built | 33 | — | `fill(D/R)` · `point-mode` · `anchor($/F4)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `growth/CAGR` · `margin/ratio` |
-| k2 | 18 | `sumif` | SUMIF | existing · built | 64 | `SUMIF(S)` · `tie-out/check-row` | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `percent-fmt` · `decimals` · `bold/italic/color` · `borders(top/outside/bottom)` · `margin/ratio` |
-| k2 | 19 | `rollup` | SUMIFS | existing · built | 80 | — | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `mixed-anchor` · `borders(top/outside/bottom)` · `SUMIF(S)` |
-| k2 | 20 | `qclose` | Close the Quarter | capstone · add | 94 | — | `point-mode` · `sum(Alt=)` · `fill(D/R)` · `anchor($/F4)` · `mixed-anchor` · `percent-fmt` · `decimals` · `growth/CAGR` · `SUMIF(S)` · `tie-out/check-row` · `bold/italic/color` · `borders(top/outside/bottom)` · `sign-convention` · `margin/ratio` |
-| k3 | 21 | `ribbonpass` | Ribbon | lesson · add | 24 | — | `select` · `bold/italic/color` · `align` · `borders(top/outside/bottom)` · `percent-fmt` · `decimals` · `blue-inputs` |
-| k3 | 22 | `ruleaudit` | Ruling Pass | existing · built | 16 | — | `bold/italic/color` · `borders(top/outside/bottom)` · `schedule` |
-| k3 | 23 | `center` | Center | existing · built | 22 | — | `row/col-select` · `bold/italic/color` · `borders(top/outside/bottom)` |
-| k3 | 24 | `typeset` | Typeset | existing · built | 24 | `date/TODAY` | `margin/ratio` |
-| k3 | 25 | `decimals` | Decimals | existing · built | 25 | — | `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `margin/ratio` |
-| k3 | 26 | `autofit` | Autofit | existing · built | 36 | `autofit` | `select` · `fill(D/R)` · `bold/italic/color` · `borders(top/outside/bottom)` |
-| k3 | 27 | `combo` | Combo | existing · built | 27 | — | `decimals` · `bold/italic/color` · `align` · `autofit` |
-| k3 | 28 | `unhide` | Unhide | existing · built | 25 | `hide/unhide/group` | `select` · `bold/italic/color` · `borders(top/outside/bottom)` · `autofit` |
-| k3 | 29 | `ruleoff` | Rule Off | existing · built | 31 | — | `fill(D/R)` · `bold/italic/color` · `sign-convention` |
-| k3 | 30 | `fxconvert` | FX Convert | existing · built | 35 | — | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `comma/currency-fmt` · `decimals` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` |
-| k3 | 31 | `housestyle` | House Style | existing · built | 44 | — | `percent-fmt` · `comma/currency-fmt` · `decimals` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `autofit` · `goto-special` · `margin/ratio` |
-| k3 | 32 | `gauntlet` | Gauntlet | capstone · built | 47 | — | `sum(Alt=)` · `comma/currency-fmt` · `decimals` · `bold/italic/color` · `blue-inputs` · `align` · `borders(top/outside/bottom)` · `autofit` · `hide/unhide/group` |
-| k4 | 33 | `tapepull` | Tape Read | lesson · add | 22 | `VLOOKUP` · `stat-fn(MEDIAN/AVERAGE)` | `enter/edit(F2)` · `fill(D/R)` · `anchor($/F4)` · `select-edge` |
-| k4 | 34 | `filterpass` | Filter | existing · built | 26 | `filter` | — |
-| k4 | 35 | `sort` | Sort | existing · built | 31 | `sort` | `select` · `select-edge` · `clear/delete` · `sum(Alt=)` · `bold/italic/color` · `borders(top/outside/bottom)` · `tie-out/check-row` |
-| k4 | 36 | `scrub` | Scrub | existing · built | 21 | — | `row/col-select` · `clear/delete` · `sum(Alt=)` · `bold/italic/color` · `borders(top/outside/bottom)` · `insert/delete row-col` · `sort` |
-| k4 | 37 | `series` | Series | existing · built | 44 | — | `select` · `select-edge` · `fill(D/R)` · `bold/italic/color` · `align` |
-| k4 | 38 | `lookup` | Lookup | existing · built | 59 | `INDEX/MATCH` | `enter/edit(F2)` · `fill(D/R)` · `anchor($/F4)` · `borders(top/outside/bottom)` · `VLOOKUP` |
-| k4 | 39 | `recon` | Recon | existing · built | 92 | — | `select` · `enter/edit(F2)` · `copy/paste` · `paste-special` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `stat-fn(MEDIAN/AVERAGE)` · `INDEX/MATCH` · `VLOOKUP` |
-| k4 | 40 | `cleanroom` | The Data-Room Tape | capstone · add | 90 | — | `clear/delete` · `insert/delete row-col` · `sort` · `filter` · `INDEX/MATCH` · `sum(Alt=)` · `hide/unhide/group` · `bold/italic/color` · `borders(top/outside/bottom)` · `row/col-select` |
-| k5 | 41 | `tracepass` | Trace | lesson · add | 20 | `audit(trace)` · `show-formulas` | `select` · `point-mode` · `goto-special` |
-| k5 | 42 | `drill` | Hardcode | existing · built | 22 | — | `select` · `select-edge` · `row/col-select` · `undo` · `clear/delete` · `copy/paste` · `paste-special` · `bold/italic/color` · `blue-inputs` |
-| k5 | 43 | `wrapfix` | IFERROR | existing · built | 26 | `IFERROR` | `select` · `enter/edit(F2)` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `VLOOKUP` · `tie-out/check-row` |
-| k5 | 44 | `audit` | Review Pass | existing · built | 28 | — | `select` · `enter/edit(F2)` · `fill(D/R)` · `comma/currency-fmt` · `blue-inputs` · `goto-special` · `margin/ratio` |
-| k5 | 45 | `signerr` | Sign Sweep | existing · built | 35 | — | `copy/paste` · `paste-special` · `fill(D/R)` · `sum(Alt=)` · `percent-fmt` · `decimals` · `bold/italic/color` · `borders(top/outside/bottom)` · `margin/ratio` |
-| k5 | 46 | `tieout` | Tie-out | existing · built | 36 | — | `select` · `enter/edit(F2)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `audit(trace)` · `tie-out/check-row` |
-| k5 | 47 | `balcheck` | Make It Tie | existing · built | 37 | `corkscrew(roll-forward)` · `linkage(cross-statement)` | `select` · `enter/edit(F2)` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `tie-out/check-row` |
-| k5 | 48 | `triage` | Error triage | existing · built | 40 | — | `enter/edit(F2)` · `copy/paste` · `fill(D/R)` · `bold/italic/color` · `borders(top/outside/bottom)` |
-| k5 | 49 | `versionup` | Roll-forward prep | existing · built | 48 | `find/replace` | `fill(D/R)` · `anchor($/F4)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `growth/CAGR` |
-| k5 | 50 | `stalelink` | Stale Links | existing · built | 64 | — | `enter/edit(F2)` · `clear/delete` · `fill(D/R)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `margin/ratio` |
-| k5 | 51 | `balance` | Balance | existing · built | 66 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `linkage(cross-statement)` · `tie-out/check-row` |
-| k5 | 52 | `lookup2` | Two-way Lookup | existing · built | 80 | — | `enter/edit(F2)` · `copy/paste` · `paste-special` · `anchor($/F4)` · `borders(top/outside/bottom)` · `sort` · `INDEX/MATCH` · `corkscrew(roll-forward)` |
-| k5 | 53 | `redflags` | The Red-Flag Pass | capstone · add | 90 | — | `enter/edit(F2)` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `goto-special` · `find/replace` · `sign-convention` · `tie-out/check-row` · `audit(trace)` · `bold/italic/color` · `borders(top/outside/bottom)` · `margin/ratio` · `blue-inputs` |
-| k6 | 54 | `rollfwd` | Roll Forward | lesson · add | 26 | `circularity-avoidance` | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `corkscrew(roll-forward)` · `schedule` · `sign-convention` |
-| k6 | 55 | `wk13` | 13-Week Cash | existing · built | 45 | — | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `corkscrew(roll-forward)` · `tie-out/check-row` |
-| k6 | 56 | `retbridge` | Returns Bridge | existing · built | 56 | `bridge` | `select` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `margin/ratio` |
-| k6 | 57 | `schedule` | Schedule | existing · built | 69 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `point-mode` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `corkscrew(roll-forward)` · `schedule` · `linkage(cross-statement)` |
-| k6 | 58 | `intsched` | Interest | existing · built | 72 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `decimals` · `bold/italic/color` · `borders(top/outside/bottom)` · `margin/ratio` · `corkscrew(roll-forward)` · `schedule` · `sign-convention` · `circularity-avoidance` |
-| k6 | 59 | `cases` | Sticky switch | existing · built | 97 | `IF/MIN/MAX` · `CHOOSE` | `select` · `fill(D/R)` · `anchor($/F4)` · `margin/ratio` |
-| k6 | 60 | `nwcsched` | NWC Schedule | capstone · built | 102 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `schedule` |
-| k7 | 61 | `dcfsens` | Sensitivity | existing · built | 35 | — | `select` · `fill(D/R)` · `point-mode` · `anchor($/F4)` · `mixed-anchor` · `comma/currency-fmt` · `decimals` · `borders(top/outside/bottom)` · `growth/CAGR` |
-| k7 | 62 | `fcfbuild` | uFCF | existing · built | 40 | — | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `sign-convention` |
-| k7 | 63 | `txncomps` | Transaction Comps | existing · built | 52 | — | `select` · `fill(D/R)` · `point-mode` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `stat-fn(MEDIAN/AVERAGE)` · `margin/ratio` · `bridge` |
-| k7 | 64 | `football` | Football | existing · built | 65 | — | `select` · `select-edge` · `fill(D/R)` · `anchor($/F4)` · `borders(top/outside/bottom)` · `IF/MIN/MAX` |
-| k7 | 65 | `accdil` | Accretion/Dilution | existing · built | 70 | — | `select` · `select-edge` · `fill(D/R)` · `point-mode` · `anchor($/F4)` · `percent-fmt` · `decimals` · `margin/ratio` |
-| k7 | 66 | `dcf` | DCF | existing · built | 85 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `tie-out/check-row` |
-| k7 | 67 | `comps` | Comps | existing · built | 89 | — | `select` · `fill(D/R)` · `point-mode` · `anchor($/F4)` · `decimals` · `bold/italic/color` · `borders(top/outside/bottom)` · `stat-fn(MEDIAN/AVERAGE)` · `margin/ratio` · `bridge` |
-| k7 | 68 | `sourcesuses` | Sources & Uses | existing · built | 92 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `percent-fmt` · `bold/italic/color` · `borders(top/outside/bottom)` · `margin/ratio` · `tie-out/check-row` |
-| k7 | 69 | `wacc` | WACC | existing · built | 112 | — | `select` · `fill(D/R)` · `point-mode` · `anchor($/F4)` · `linkage(cross-statement)` |
-| k7 | 70 | `pitchpage` | The Valuation Page | capstone · add | 88 | — | `select` · `point-mode` · `fill(D/R)` · `anchor($/F4)` · `IF/MIN/MAX` · `stat-fn(MEDIAN/AVERAGE)` · `comma/currency-fmt` · `bold/italic/color` · `borders(top/outside/bottom)` · `date/TODAY` · `margin/ratio` · `bridge` |
-| k8 | 71 | `covtable` | Covenant Table | existing · built | 36 | — | `copy/paste` · `fill(D/R)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `IF/MIN/MAX` · `margin/ratio` |
-| k8 | 72 | `debtblock` | Debt block | existing · built | 70 | — | `select` · `fill(D/R)` · `anchor($/F4)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `corkscrew(roll-forward)` · `schedule` · `linkage(cross-statement)` · `sign-convention` |
-| k8 | 73 | `lbo` | LBO | existing · built | 71 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `growth/CAGR` · `margin/ratio` · `bridge` · `schedule` |
-| k8 | 74 | `waterfall` | Waterfall | existing · built | 77 | — | `select` · `copy/paste` · `fill(D/R)` · `sum(Alt=)` · `point-mode` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `IF/MIN/MAX` · `corkscrew(roll-forward)` · `schedule` · `tie-out/check-row` |
-| k8 | 75 | `liqbridge` | Liquidity Bridge | existing · built | 77 | — | `select` · `fill(D/R)` · `anchor($/F4)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `IF/MIN/MAX` · `bridge` · `sign-convention` |
-| k8 | 76 | `debtsched` | Debt Schedule | existing · built | 86 | — | `fill(D/R)` · `anchor($/F4)` · `percent-fmt` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `IF/MIN/MAX` · `corkscrew(roll-forward)` · `schedule` · `circularity-avoidance` |
-| k8 | 77 | `revolver` | Revolver | existing · built | 95 | — | `select` · `fill(D/R)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `IF/MIN/MAX` · `corkscrew(roll-forward)` · `schedule` · `circularity-avoidance` |
-| k8 | 78 | `cascade` | Full Waterfall | capstone · built | 161 | — | `select` · `fill(D/R)` · `bold/italic/color` · `borders(top/outside/bottom)` · `IF/MIN/MAX` · `corkscrew(roll-forward)` |
-| k9 | 79 | `threestmt` | 3-Statement | existing · built | 45 | — | `select` · `select-edge` · `fill(D/R)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `linkage(cross-statement)` · `tie-out/check-row` |
-| k9 | 80 | `dashcover` | Model cover | existing · built | 47 | — | `select` · `select-edge` · `fill(D/R)` · `point-mode` · `anchor($/F4)` · `percent-fmt` · `comma/currency-fmt` · `decimals` · `bold/italic/color` |
-| k9 | 81 | `bsbuild` | BS Build | existing · built | 64 | — | `select` · `copy/paste` · `paste-special` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `corkscrew(roll-forward)` · `linkage(cross-statement)` · `sign-convention` · `tie-out/check-row` |
-| k9 | 82 | `cfslink` | CFS Link | existing · built | 66 | — | `fill(D/R)` · `point-mode` · `anchor($/F4)` · `percent-fmt` · `decimals` · `bold/italic/color` · `borders(top/outside/bottom)` · `corkscrew(roll-forward)` · `schedule` · `sign-convention` |
-| k9 | 83 | `isbuild` | IS Build | existing · built | 71 | — | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `percent-fmt` · `decimals` · `bold/italic/color` · `borders(top/outside/bottom)` · `margin/ratio` · `schedule` |
-| k9 | 84 | `lbobuild` | Paper LBO | existing · built | 84 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `growth/CAGR` · `margin/ratio` · `schedule` · `tie-out/check-row` |
-| k9 | 85 | `opmodel` | Op model | existing · built | 85 | — | `copy/paste` · `sum(Alt=)` · `anchor($/F4)` · `percent-fmt` · `decimals` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `margin/ratio` · `audit(trace)` |
-| k9 | 86 | `dcfbuild` | DCF page | existing · built | 113 | — | `select` · `fill(D/R)` · `anchor($/F4)` · `margin/ratio` · `bridge` |
-| k9 | 87 | `shipit` | Ship the Model | capstone · add | 110 | — | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `paste-special` · `corkscrew(roll-forward)` · `linkage(cross-statement)` · `tie-out/check-row` · `sign-convention` · `growth/CAGR` · `bold/italic/color` · `borders(top/outside/bottom)` · `date/TODAY` · `schedule` · `margin/ratio` |
+| c1 | 1 | `corridor` | The Corridor | LEVEL · add | 90 | `move` · `save` · `jump(ctrl-arrow)` · `select` · `select-edge` · `row/col-select` · `goto-special` · `copy/paste` | — |
+| c1 | 2 | `repairshop` | The Repair Shop | LEVEL · add | 105 | `enter/edit(F2)` · `clear/delete` · `undo` · `redo` · `cut` · `fill(D/R)` · `insert/delete row-col` · `schedule` · `hide/unhide/group` | `move` · `select` · `select-edge` · `row/col-select` · `copy/paste` |
+| c1 | 3 | `powergrid` | The Power Grid | LEVEL · add | 110 | `point-mode` · `sum(Alt=)` · `margin/ratio` · `anchor($/F4)` · `mixed-anchor` · `sign-convention` · `costs-negative` | `enter/edit(F2)` · `select` · `select-edge` · `fill(D/R)` |
+| c1 | 4 | `printshop` | The Print Shop | LEVEL · add | 100 | `comma/currency-fmt` · `decimals` · `percent-fmt` · `parens-negative` · `bold/italic/color` · `blue-inputs` · `align` · `borders(top/outside/bottom)` · `autofit` | `select` · `row/col-select` · `goto-special` · `enter/edit(F2)` · `margin/ratio` · `sign-convention` |
+| c1 | 5 | `modeltour` | Model Tour | capstone · built | 35 | — | `move` · `jump(ctrl-arrow)` · `copy/paste` · `fill(D/R)` · `percent-fmt` · `comma/currency-fmt` · `decimals` · `bold/italic/color` · `blue-inputs` · `align` · `schedule` |
+| c2 | 6 | `ruleaudit` | Ruling Pass | drill · built | 16 | — | `bold/italic/color` · `borders(top/outside/bottom)` · `schedule` |
+| c2 | 7 | `center` | Center | drill · built | 22 | — | `row/col-select` · `bold/italic/color` · `borders(top/outside/bottom)` |
+| c2 | 8 | `typeset` | Typeset | drill · built | 24 | `date/TODAY` | `margin/ratio` |
+| c2 | 9 | `decimals` | Decimals | drill · built | 25 | — | `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `margin/ratio` |
+| c2 | 10 | `combo` | Combo | drill · built | 27 | — | `decimals` · `bold/italic/color` · `align` · `autofit` |
+| c2 | 11 | `ruleoff` | Rule Off | drill · built | 31 | — | `fill(D/R)` · `bold/italic/color` · `sign-convention` |
+| c2 | 12 | `blocksel` | Block Select | drill · built | 34 | — | `select-edge` · `copy/paste` · `fill(D/R)` · `bold/italic/color` · `align` · `borders(top/outside/bottom)` · `margin/ratio` |
+| c2 | 13 | `autofit` | Autofit | drill · built | 36 | — | `select` · `fill(D/R)` · `bold/italic/color` · `borders(top/outside/bottom)` |
+| c2 | 14 | `pastes` | Paste Special | drill · built | 42 | `paste-special` | `copy/paste` · `comma/currency-fmt` · `bold/italic/color` · `align` · `borders(top/outside/bottom)` · `sign-convention` |
+| c2 | 15 | `housestyle` | House Style | drill · built | 44 | — | `percent-fmt` · `comma/currency-fmt` · `decimals` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `autofit` · `goto-special` · `margin/ratio` |
+| c2 | 16 | `gauntlet` | Gauntlet | capstone · built | 47 | — | `sum(Alt=)` · `comma/currency-fmt` · `decimals` · `bold/italic/color` · `blue-inputs` · `align` · `borders(top/outside/bottom)` · `autofit` · `hide/unhide/group` |
+| c3 | 17 | `percent` | % of Revenue | drill · built | 21 | — | `row/col-select` · `fill(D/R)` · `anchor($/F4)` · `decimals` · `bold/italic/color` |
+| c3 | 18 | `anchor` | Anchors | drill · built | 22 | — | `fill(D/R)` · `anchor($/F4)` · `mixed-anchor` · `comma/currency-fmt` · `decimals` · `borders(top/outside/bottom)` |
+| c3 | 19 | `foot` | Foot | drill · built | 29 | — | `fill(D/R)` · `bold/italic/color` · `borders(top/outside/bottom)` |
+| c3 | 20 | `margin` | Margins | drill · built | 40 | `growth/CAGR` | `fill(D/R)` · `percent-fmt` · `decimals` · `bold/italic/color` · `margin/ratio` |
+| c3 | 21 | `bridge` | Point Mode | drill · built | 33 | — | `fill(D/R)` · `point-mode` · `anchor($/F4)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `growth/CAGR` · `margin/ratio` |
+| c3 | 22 | `cagr` | CAGR | drill · built | 36 | — | `fill(D/R)` · `anchor($/F4)` · `percent-fmt` · `decimals` · `bold/italic/color` · `growth/CAGR` |
+| c3 | 23 | `fxconvert` | FX Convert | drill · built | 35 | — | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `comma/currency-fmt` · `decimals` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` |
+| c3 | 24 | `filldr` | Fill | drill · built | 44 | — | `bold/italic/color` · `borders(top/outside/bottom)` · `margin/ratio` · `schedule` · `sign-convention` |
+| c3 | 25 | `sumif` | SUMIF | drill · built | 64 | `SUMIF(S)` · `tie-out/check-row` | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `percent-fmt` · `decimals` · `bold/italic/color` · `borders(top/outside/bottom)` · `margin/ratio` |
+| c3 | 26 | `rollup` | SUMIFS | drill · built | 80 | — | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `mixed-anchor` · `borders(top/outside/bottom)` · `SUMIF(S)` |
+| c3 | 27 | `qclose` | Close the Quarter | capstone · add | 94 | — | `point-mode` · `sum(Alt=)` · `fill(D/R)` · `anchor($/F4)` · `mixed-anchor` · `percent-fmt` · `decimals` · `growth/CAGR` · `SUMIF(S)` · `tie-out/check-row` · `bold/italic/color` · `borders(top/outside/bottom)` · `sign-convention` · `margin/ratio` |
+| c4 | 28 | `tapepull` | Tape Read | drill · add | 22 | `VLOOKUP` · `stat-fn(MEDIAN/AVERAGE)` | `enter/edit(F2)` · `fill(D/R)` · `anchor($/F4)` · `select-edge` |
+| c4 | 29 | `drill` | Hardcode | drill · built | 22 | — | `select` · `select-edge` · `row/col-select` · `undo` · `clear/delete` · `copy/paste` · `paste-special` · `bold/italic/color` · `blue-inputs` |
+| c4 | 30 | `unhide` | Unhide | drill · built | 25 | — | `select` · `bold/italic/color` · `borders(top/outside/bottom)` · `autofit` |
+| c4 | 31 | `filterpass` | Filter | drill · built | 26 | `filter` | — |
+| c4 | 32 | `sort` | Sort | drill · built | 31 | `sort` | `select` · `select-edge` · `clear/delete` · `sum(Alt=)` · `bold/italic/color` · `borders(top/outside/bottom)` · `tie-out/check-row` |
+| c4 | 33 | `scrub` | Scrub | drill · built | 21 | — | `row/col-select` · `clear/delete` · `sum(Alt=)` · `bold/italic/color` · `borders(top/outside/bottom)` · `insert/delete row-col` · `sort` |
+| c4 | 34 | `rowops` | Structure | drill · built | 30 | — | `select` · `row/col-select` · `copy/paste` · `comma/currency-fmt` · `blue-inputs` · `borders(top/outside/bottom)` |
+| c4 | 35 | `series` | Series | drill · built | 44 | — | `select` · `select-edge` · `fill(D/R)` · `bold/italic/color` · `align` |
+| c4 | 36 | `lookup` | Lookup | drill · built | 59 | `INDEX/MATCH` | `enter/edit(F2)` · `fill(D/R)` · `anchor($/F4)` · `borders(top/outside/bottom)` · `VLOOKUP` |
+| c4 | 37 | `lookup2` | Two-way Lookup | drill · built | 80 | — | `enter/edit(F2)` · `copy/paste` · `paste-special` · `anchor($/F4)` · `borders(top/outside/bottom)` · `sort` · `INDEX/MATCH` |
+| c4 | 38 | `recon` | Recon | drill · built | 92 | — | `select` · `enter/edit(F2)` · `copy/paste` · `paste-special` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `stat-fn(MEDIAN/AVERAGE)` · `INDEX/MATCH` · `VLOOKUP` |
+| c4 | 39 | `cleanroom` | The Data-Room Tape | capstone · add | 90 | — | `clear/delete` · `insert/delete row-col` · `sort` · `filter` · `INDEX/MATCH` · `sum(Alt=)` · `hide/unhide/group` · `bold/italic/color` · `borders(top/outside/bottom)` · `row/col-select` |
+| c5 | 40 | `wrapfix` | IFERROR | drill · built | 26 | `IFERROR` | `select` · `enter/edit(F2)` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `VLOOKUP` · `tie-out/check-row` |
+| c5 | 41 | `audit` | Review Pass | drill · built | 28 | `audit(trace)` · `show-formulas` | `select` · `enter/edit(F2)` · `fill(D/R)` · `comma/currency-fmt` · `blue-inputs` · `goto-special` · `margin/ratio` |
+| c5 | 42 | `signerr` | Sign Sweep | drill · built | 35 | — | `copy/paste` · `paste-special` · `fill(D/R)` · `sum(Alt=)` · `percent-fmt` · `decimals` · `bold/italic/color` · `borders(top/outside/bottom)` · `margin/ratio` |
+| c5 | 43 | `tieout` | Tie-out | drill · built | 36 | — | `select` · `enter/edit(F2)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `audit(trace)` · `tie-out/check-row` |
+| c5 | 44 | `balcheck` | Make It Tie | drill · built | 37 | `corkscrew(roll-forward)` · `linkage(cross-statement)` | `select` · `enter/edit(F2)` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `tie-out/check-row` |
+| c5 | 45 | `triage` | Error triage | drill · built | 40 | — | `enter/edit(F2)` · `copy/paste` · `fill(D/R)` · `bold/italic/color` · `borders(top/outside/bottom)` |
+| c5 | 46 | `versionup` | Roll-forward prep | drill · built | 48 | `find/replace` | `fill(D/R)` · `anchor($/F4)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `growth/CAGR` |
+| c5 | 47 | `editfix` | Repair | drill · built | 52 | — | `redo` · `clear/delete` · `schedule` |
+| c5 | 48 | `stalelink` | Stale Links | drill · built | 64 | — | `enter/edit(F2)` · `clear/delete` · `fill(D/R)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `margin/ratio` |
+| c5 | 49 | `balance` | Balance | drill · built | 66 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `linkage(cross-statement)` · `tie-out/check-row` |
+| c5 | 50 | `cases` | Sticky switch | drill · built | 97 | `IF/MIN/MAX` · `CHOOSE` | `select` · `fill(D/R)` · `anchor($/F4)` · `margin/ratio` |
+| c5 | 51 | `redflags` | The Red-Flag Pass | capstone · add | 90 | — | `enter/edit(F2)` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `goto-special` · `find/replace` · `sign-convention` · `tie-out/check-row` · `audit(trace)` · `bold/italic/color` · `borders(top/outside/bottom)` · `margin/ratio` · `blue-inputs` |
+| c6 | 52 | `dcfsens` | Sensitivity | drill · built | 35 | — | `select` · `fill(D/R)` · `point-mode` · `anchor($/F4)` · `mixed-anchor` · `comma/currency-fmt` · `decimals` · `borders(top/outside/bottom)` · `growth/CAGR` |
+| c6 | 53 | `fcfbuild` | uFCF | drill · built | 40 | — | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `sign-convention` |
+| c6 | 54 | `retbridge` | Returns Bridge | drill · built | 56 | `bridge` | `select` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `margin/ratio` |
+| c6 | 55 | `txncomps` | Transaction Comps | drill · built | 52 | — | `select` · `fill(D/R)` · `point-mode` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `stat-fn(MEDIAN/AVERAGE)` · `margin/ratio` · `bridge` |
+| c6 | 56 | `football` | Football | drill · built | 65 | — | `select` · `select-edge` · `fill(D/R)` · `anchor($/F4)` · `borders(top/outside/bottom)` · `IF/MIN/MAX` |
+| c6 | 57 | `accdil` | Accretion/Dilution | drill · built | 70 | — | `select` · `select-edge` · `fill(D/R)` · `point-mode` · `anchor($/F4)` · `percent-fmt` · `decimals` · `margin/ratio` |
+| c6 | 58 | `dcf` | DCF | drill · built | 85 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `tie-out/check-row` |
+| c6 | 59 | `comps` | Comps | drill · built | 89 | — | `select` · `fill(D/R)` · `point-mode` · `anchor($/F4)` · `decimals` · `bold/italic/color` · `borders(top/outside/bottom)` · `stat-fn(MEDIAN/AVERAGE)` · `margin/ratio` · `bridge` |
+| c6 | 60 | `sourcesuses` | Sources & Uses | drill · built | 92 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `percent-fmt` · `bold/italic/color` · `borders(top/outside/bottom)` · `margin/ratio` · `tie-out/check-row` |
+| c6 | 61 | `wacc` | WACC | drill · built | 112 | — | `select` · `fill(D/R)` · `point-mode` · `anchor($/F4)` · `linkage(cross-statement)` |
+| c6 | 62 | `pitchpage` | The Valuation Page | capstone · add | 88 | — | `select` · `point-mode` · `fill(D/R)` · `anchor($/F4)` · `IF/MIN/MAX` · `stat-fn(MEDIAN/AVERAGE)` · `comma/currency-fmt` · `bold/italic/color` · `borders(top/outside/bottom)` · `date/TODAY` · `margin/ratio` · `bridge` |
+| c7 | 63 | `rollfwd` | Roll Forward | drill · add | 26 | `circularity-avoidance` | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `corkscrew(roll-forward)` · `schedule` · `sign-convention` |
+| c7 | 64 | `covtable` | Covenant Table | drill · built | 36 | — | `copy/paste` · `fill(D/R)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `IF/MIN/MAX` · `margin/ratio` |
+| c7 | 65 | `wk13` | 13-Week Cash | drill · built | 45 | — | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `corkscrew(roll-forward)` · `tie-out/check-row` |
+| c7 | 66 | `schedule` | Schedule | drill · built | 69 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `point-mode` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `corkscrew(roll-forward)` · `schedule` · `linkage(cross-statement)` |
+| c7 | 67 | `lbo` | LBO | drill · built | 71 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `growth/CAGR` · `margin/ratio` · `bridge` · `schedule` |
+| c7 | 68 | `intsched` | Interest | drill · built | 72 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `decimals` · `bold/italic/color` · `borders(top/outside/bottom)` · `margin/ratio` · `corkscrew(roll-forward)` · `schedule` · `sign-convention` · `circularity-avoidance` |
+| c7 | 69 | `waterfall` | Waterfall | drill · built | 77 | — | `select` · `copy/paste` · `fill(D/R)` · `sum(Alt=)` · `point-mode` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `IF/MIN/MAX` · `corkscrew(roll-forward)` · `schedule` · `tie-out/check-row` |
+| c7 | 70 | `liqbridge` | Liquidity Bridge | drill · built | 77 | — | `select` · `fill(D/R)` · `anchor($/F4)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `IF/MIN/MAX` · `bridge` · `sign-convention` |
+| c7 | 71 | `debtsched` | Debt Schedule | drill · built | 86 | — | `fill(D/R)` · `anchor($/F4)` · `percent-fmt` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `IF/MIN/MAX` · `corkscrew(roll-forward)` · `schedule` · `circularity-avoidance` |
+| c7 | 72 | `revolver` | Revolver | drill · built | 95 | — | `select` · `fill(D/R)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `IF/MIN/MAX` · `corkscrew(roll-forward)` · `schedule` · `circularity-avoidance` |
+| c7 | 73 | `cascade` | Full Waterfall | capstone · built | 161 | — | `select` · `fill(D/R)` · `bold/italic/color` · `borders(top/outside/bottom)` · `IF/MIN/MAX` · `corkscrew(roll-forward)` |
+| c8 | 74 | `threestmt` | 3-Statement | drill · built | 45 | — | `select` · `select-edge` · `fill(D/R)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `linkage(cross-statement)` · `tie-out/check-row` |
+| c8 | 75 | `dashcover` | Model cover | drill · built | 47 | — | `select` · `select-edge` · `fill(D/R)` · `point-mode` · `anchor($/F4)` · `percent-fmt` · `comma/currency-fmt` · `decimals` · `bold/italic/color` |
+| c8 | 76 | `bsbuild` | BS Build | drill · built | 64 | — | `select` · `copy/paste` · `paste-special` · `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `bold/italic/color` · `borders(top/outside/bottom)` · `corkscrew(roll-forward)` · `linkage(cross-statement)` · `sign-convention` · `tie-out/check-row` |
+| c8 | 77 | `cfslink` | CFS Link | drill · built | 66 | — | `fill(D/R)` · `point-mode` · `anchor($/F4)` · `percent-fmt` · `decimals` · `bold/italic/color` · `borders(top/outside/bottom)` · `corkscrew(roll-forward)` · `schedule` · `sign-convention` |
+| c8 | 78 | `debtblock` | Debt block | drill · built | 70 | — | `select` · `fill(D/R)` · `anchor($/F4)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `corkscrew(roll-forward)` · `schedule` · `linkage(cross-statement)` · `sign-convention` |
+| c8 | 79 | `isbuild` | IS Build | drill · built | 71 | — | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `percent-fmt` · `decimals` · `bold/italic/color` · `borders(top/outside/bottom)` · `margin/ratio` · `schedule` |
+| c8 | 80 | `lbobuild` | Paper LBO | drill · built | 84 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `growth/CAGR` · `margin/ratio` · `schedule` · `tie-out/check-row` |
+| c8 | 81 | `opmodel` | Op model | drill · built | 85 | — | `copy/paste` · `sum(Alt=)` · `anchor($/F4)` · `percent-fmt` · `decimals` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `margin/ratio` · `audit(trace)` |
+| c8 | 82 | `nwcsched` | NWC Schedule | drill · built | 102 | — | `select` · `fill(D/R)` · `sum(Alt=)` · `bold/italic/color` · `blue-inputs` · `borders(top/outside/bottom)` · `schedule` |
+| c8 | 83 | `dcfbuild` | DCF page | drill · built | 113 | — | `select` · `fill(D/R)` · `anchor($/F4)` · `margin/ratio` · `bridge` |
+| c8 | 84 | `shipit` | Ship the Model | capstone · add | 110 | — | `fill(D/R)` · `sum(Alt=)` · `anchor($/F4)` · `paste-special` · `corkscrew(roll-forward)` · `linkage(cross-statement)` · `tie-out/check-row` · `sign-convention` · `growth/CAGR` · `bold/italic/color` · `borders(top/outside/bottom)` · `date/TODAY` · `schedule` · `margin/ratio` |
 
 ---
 
-## 3 · THE PRO LINE and the level curve
+## 3 · THE PRO LINE and the earn-in curve
 
-*Exactly as CURRICULUM_REBUILD §4.1–4.2 recommends — carried here as the working answer,
-**recommended, pending Wolf**. CURRICULUM_REBUILD P2 (two tiers, both real at launch; a level
-threshold per PRO chapter so a committed free player can earn in) is law; the numbers below are the
-recommendation.*
+*The PRO line is **exactly what `drills.js` `HOTKEY_PREMIUM.groups` says today** — `Formulas II ·
+Models I · Models II · Full Builds`. v1 re-pointed it at five re-cut chapters; v2 does not touch it.
+What is new is one number per PRO chapter: an earn-in level, so a committed free player can reach
+paid content without paying (CURRICULUM_REBUILD P2, law). The numbers are **recommended, pending
+Wolf**.*
 
 ```
-  FREE  ──────────────────────────────────────────  |  ── PRO ────────────────────────────────────
-  k1 Keyboard   k2 Build   k3 Format   k4 Str&Data  |  k5 Audit  k6 Comps  k7 Val  k8 Credit  k9 Full
-  the Tour + 40 drills                              |  47 drills
-  no gate, ever                                     |  subscription  OR  level 13/16/19/22/25
+  FREE  ─────────────────────────────────────  |  ── PRO ──────────────────────────────────
+  c1 Foundations  c2 Formatting  c3 Formulas I |  c5 Formulas II  c6 Models I
+  c4 Data & Lookups                            |  c7 Models II    c8 Full Builds
+  39 drills — no gate, ever                    |  45 drills — subscription OR level 13/16/19/22
 ```
 
-| side | chapters | drills | of which lessons | of which capstones | gate |
+| side | chapters | drills | of which levels | of which capstones | gate |
 |---|---|---|---|---|---|
-| **free** | k1 · k2 · k3 · k4 | **40** (+ the Tour) | 6 | 2 (`qclose`, `cleanroom`) | none — open forever |
-| **PRO** | k5 · k6 · k7 · k8 · k9 | **47** | 2 | 3 (`redflags`, `pitchpage`, `shipit`) | entitlement **OR** the level curve below |
+| **free** | c1 · c2 · c3 · c4 | **39** | 4 (all in c1) | 4 (`modeltour` `gauntlet` `qclose` `cleanroom`) | none — open forever |
+| **PRO** | c5 · c6 · c7 · c8 | **45** | — | 4 (`redflags` `pitchpage` `cascade` `shipit`) | entitlement **OR** the curve below |
 
-**The curve.** PRO chapter *k* (k = 1…5) opens at **level 10 + 3k**:
+**The curve.** PRO chapter *k* (k = 1…4) opens at **level 10 + 3k**:
 
-| PRO chapter | k5 Audit & Repair | k6 Components | k7 Valuation | k8 Credit | k9 Full Builds |
-|---|---|---|---|---|---|
-| **unlocks at** | **L13** | **L16** | **L19** | **L22** | **L25** |
+| PRO chapter | c5 Formulas II | c6 Models I | c7 Models II | c8 Full Builds |
+|---|---|---|---|---|
+| **unlocks at** | **L13** | **L16** | **L19** | **L22** |
 
-A free grinder reaches Full Builds around level 25; a subscriber skips the curve on day one. Two
+A free grinder reaches Full Builds around level 22; a subscriber skips the curve on day one. Two
 standing laws hold on top of it: **free play is never blocked** (gate the progression artifact, never
-the access — Wolf decision log #4, restated in TUTORIAL_CHAPTER_SPEC §1.8), and until Stripe is live
-`HOTKEY_PREMIUM.enabled` stays false, so the PRO chapters show their gate and their price and open by
-the level path only (P2).
+the access — Wolf decision log #4), and until Stripe is live `HOTKEY_PREMIUM.enabled` stays false, so
+the PRO chapters show their gate and their price and open by the level path only (P2).
 
 **What retires with this.** `HOTKEY_GATES` — the level+pace-clears wall that today gates five groups
-(`Data & Lookups` L3 / 8 clears, `Formulas II` L5 / 12, `Models I` L7 / 18, `Models II` L9 / 26,
-`Full Builds` L11 / 32) — is **retired outright** (P1: level+clears gates are retired as a second
-gate). It is replaced by exactly two things: the **capstone spine** (clear chapter N's capstone to open
-chapter N+1's progression artifacts) and the **PRO `unlock_level`** above. One ladder, not four.
+(`Data & Lookups` L3/8 clears, `Formulas II` L5/12, `Models I` L7/18, `Models II` L9/26, `Full Builds`
+L11/32) — is **retired outright** (P1). It is replaced by exactly two things: the **capstone spine**
+(clear chapter N's capstone to open chapter N+1's progression artifacts) and the **PRO `unlock_level`**
+above. One ladder, not four. Note that today's gates also wall `Data & Lookups`, which is **free** in
+this map — retiring them is what makes the free tier actually free.
 
 ---
 
-## 4 · Certificate tracks, re-derived
+## 4 · Certificate tracks — unchanged in shape, three keys moved
 
-Three tracks, unchanged in shape (P7), each now exactly three chapters — the cleanest partition the new
-cut allows, and it makes every track's cert name true:
+The three tracks keep the composition `HK_TRACKS` has today (P7); because the eight groups survive,
+the tracks survive with them. This is the single biggest saving v2 makes over v1, which moved 14 keys
+and re-cut every track.
 
-| track | chapters | cert | why these three |
+| track | chapters | cert | drills |
 |---|---|---|---|
-| `fluency` | k1 Keyboard · k2 Build · k3 Format | Excel Keyboard Fluency | the free tier's first three: the grammar, the formulas that use it, the finish that ships it. "The full keyboard loop, at speed" reads true for the first time — today's blurb promises formatting and stops before a single formula |
-| `formulas` | k4 Structure & Data · k5 Audit & Repair · k6 Components | Spreadsheet Formulas & Data Analysis | lookups and data hygiene, then formula auditing, then the schedules those two produce. The blurb already says "data hygiene and formula auditing", which is what these three chapters actually are |
-| `modeling` | k7 Valuation · k8 Credit · k9 Full Builds | Financial Modeling Keyboard Mastery | DCF and comps, the debt side, and the whole-model builds — unchanged in spirit, tightened in scope |
+| `fluency` | c1 Foundations · c2 Formatting | Excel Keyboard Fluency | 16 |
+| `formulas` | c3 Formulas I · c4 Data & Lookups · c5 Formulas II | Spreadsheet Formulas & Data Analysis | 35 |
+| `modeling` | c6 Models I · c7 Models II · c8 Full Builds | Financial Modeling Keyboard Mastery | 33 |
 
-**Migration (r359 drift rule — the SQL moves in the same PR as the code).** `HK_TRACKS[].keys` derives
-from `groups`, so re-cutting groups silently re-cuts every certificate. Keys that change track:
+**Keys that change track (3, all `fluency` → `formulas`):** `filldr` (→ c3), `rowops` (→ c4),
+`editfix` (→ c5) — the three Foundations drills whose destination chapter sits in another track
+(§6 D-5). `blocksel` and `pastes` move to c2, which is in the same track, so they do not move
+certificate. `navigation` leaves `fluency` by retirement; the four new levels join it by construction.
 
-- **→ `fluency` from `formulas` (9):** `foot` `anchor` `percent` `margin` `cagr` `bridge` `sumif`
-  `rollup` — the old Formulas I body, now chapter k2 Build — plus `fxconvert`, now in k3 Format
-  (audit §3.3: its beats are comma/currency and border work, not formula construction).
-- **→ `formulas` from `modeling` (5):** `retbridge` `schedule` `intsched` `wk13` `nwcsched` — the
-  component schedules, now chapter k6.
-- **13 new keys** land in tracks by construction: `select` `firstsum` `signs` (fluency, k1),
-  `lockref` `qclose` (fluency, k2), `ribbonpass` (fluency, k3), `tapepull` `cleanroom` (formulas, k4),
-  `tracepass` `redflags` (formulas, k5), `rollfwd` (formulas, k6), `pitchpage` (modeling, k7),
-  `shipit` (modeling, k9).
-
-All three arrays in `dev/migrate-certificates.sql` and the newest `issue_certificate` migration are
-regenerated in the same PR; `dev/check-invariants.js` C14 already asserts set-equality between them and
-`HK_TRACKS`, so the guard is in place before the move. **A player mid-certificate sees their track
-composition change** — that is the one r158 tension in this map, and it is decision **D-4** in §8.
-
-**Milestones.** `MS` becomes `{ fluency:['k1','k2','k3'], formulas:['k4','k5','k6'], modeling:['k7','k8','k9'] }`.
+**Migration (r359 drift rule — SQL in the same PR as the code).** `HK_TRACKS[].keys` derives from
+`groups`, so all three arrays in `dev/migrate-certificates.sql` and the newest `issue_certificate`
+migration regenerate in the same PR; `dev/check-invariants.js` C14 already asserts set-equality
+between them and `HK_TRACKS`. A player mid-`fluency` sees three keys leave their scope and four
+levels arrive — smaller than v1's rug, but still a change, and it carries the r158 softener in
+§8 D-5. **Milestones.** `MS` is untouched: `{ fluency:['c1','c2'], formulas:['c3','c4','c5'],
+modeling:['c6','c7','c8'] }`.
 
 ---
 
 ## 5 · The picker's "next up" rule
 
-**In prose.** *Next up is the first drill in catalog order that you can actually do and have not already
-done — and if you are mid-chapter, it is the first such drill in the chapter you are standing in.* A
-drill you "can actually do" is one whose every REQUIRES tag has been taught by something you have
-cleared. That is the whole rule: no level check, no entitlement check, no pace check. Locks are shown as
-reasons, never as walls — a locked row reads "wants `anchor`: try **Lock** (16 s)", and free play stays
-open (audit §4 UI note 2; TUTORIAL_CHAPTER_SPEC §1.8).
+**In prose.** *Next up is the first drill in catalog order that you can actually do and have not
+already done — and if you are mid-chapter, it is the first such drill in the chapter you are standing
+in.* A drill you "can actually do" is one whose every REQUIRES tag has been taught by something you
+have cleared. That is the whole rule: no level check, no entitlement check, no pace check. Locks are
+shown as reasons, never as walls — a locked row reads "wants `anchor($/F4)`: try **The Power Grid**",
+and free play stays open (audit §4 UI note 2).
 
-Because the map has **zero** require-before-teach violations, catalog order alone already satisfies the
-rule for a player who goes straight through — "next up" and "the next row down" agree. The rule earns
-its keep for the player who jumped around, cleared three drills out of order and came back a week later.
+Because the map has **zero** require-before-teach violations, catalog order alone already satisfies
+the rule for a player who goes straight through — "next up" and "the next row down" agree. The rule
+earns its keep for the player who jumped around, cleared three drills out of order and came back a
+week later.
 
 ```js
-/* the cleared set is the PB map: a PB records only on a clean run (no mouse, no guided) */
+/* the cleared set is the PB map: a PB records only on a clean run (no mouse, no guided) —
+   and that now includes the four Foundations LEVELS, which are timed drills like any other */
 function hkNextUp(map, pb, currentChapter){
   const flat = map.chapters.flatMap(c => c.drills.map(d => ({ ch:c, d })));
 
-  // 1. what the player has been TAUGHT = union of TEACHES over everything cleared,
-  //    plus the Tour's stages if it was finished (the Tour has no PB — it has hk_tour_done).
+  // 1. what the player has been TAUGHT = union of TEACHES over everything cleared.
   const known = new Set();
   for (const { d } of flat)
-    if (d.kind === 'tour' ? hkTourDone() : pb[d.key] !== undefined)
-      d.teaches.forEach(t => known.add(t));
+    if (pb[d.key] !== undefined) d.teaches.forEach(t => known.add(t));
 
   // 2. ready = not yet cleared, and every REQUIRES already taught.
   const ready = d => pb[d.key] === undefined && d.requires.every(t => known.has(t));
@@ -266,391 +270,394 @@ function hkNextUp(map, pb, currentChapter){
 }
 ```
 
-Three consequences, because the picker UI hangs off them:
+Three consequences the picker UI hangs off:
 
-1. **A chapter's opening lesson is always ready.** Lessons require only what the Tour taught, so a
-   player opening a fresh chapter is never told "nothing here yet".
-2. **A capstone is ready only when its chapter is.** Every capstone's REQUIRES is its own chapter's
+1. **Level 1 is always ready** — it requires nothing, which is what "first contact" means and what
+   the checker's rule (d1) asserts. A brand-new player's "next up" is `corridor`, every time, with
+   no `hk_tour_done` flag in the way.
+2. **A chapter's opener is always ready off Foundations alone** (checker rule d2), so a player who
+   finished the five levels and jumped to Data & Lookups is never told "nothing here yet".
+3. **A capstone is ready only when its chapter is.** Every capstone's REQUIRES is its own chapter's
    vocabulary, so "★ capstone — locked until you clear X" is computed, not hand-written.
-3. **"Next up" is one pinned row at the top of the tree** (audit §4 UI note 3), and the same selector
-   feeds the locked-with-reason string on every other row.
 
 ---
 
 ## 6 · THE DELTA TABLE (DEPTH_PASS §3 grammar)
 
 Keys are immutable (PBs, `runs.challenge`, leaderboard boards, `drills/<key>.html` and
-`migrate-certificates.sql`'s arrays all key off them). Nothing below renames a key.
+`migrate-certificates.sql`'s arrays all key off them). Nothing below renames a key; two keys
+**retire**, which is a different and heavier act, and each carries its `why` in the JSON.
 Plumbing legend: **GROUPS** = `drills.js groups[]` · **SPINE** = `HOTKEY_CAMPAIGN.chapters` ·
 **TRACKS** = `HK_TRACKS` + `dev/migrate-certificates.sql` (same PR, r359) · **PARS** = `HOTKEY_PARS` ·
-**CLOCKS** = `HOTKEY_CLOCKS` · **LB** = leaderboard boards (auto from `menuOrder`; a new key is a new
-board, no migration) · **ACH** = achievements reading group names · **POOL** = `HOTKEY_CHALLENGE_POOL`.
+**CLOCKS** = `HOTKEY_CLOCKS` · **LB** = leaderboard boards (auto from `menuOrder`) · **ACH** =
+achievements reading group names · **POOL** = `HOTKEY_CHALLENGE_POOL`.
 
 | # | delta | type | rationale | plumbing impact |
 |---|---|---|---|---|
-| **D-1** | **9 chapters `k1`–`k9`** replace the 8 groups `Foundations · Formatting · Formulas I · Data & Lookups · Formulas II · Models I · Models II · Full Builds` | RE-CUT | CURRICULUM_REBUILD P3; the audit's Option C, taken once the bridges (Option B) exist | GROUPS rewritten · SPINE ids c1–c8 → k1–k9 (+1 chapter) with the claim-flag map D-16 · TRACKS D-12 · ACH D-13 · `HOTKEY_GROUP_COLORS` +1 · picker folders, `nav.js` profile headers and the campaign rail all re-render off `groups` (no edit) |
-| **D-2** | **8 lesson drills ADD** — `select` `firstsum` `signs` (k1) · `lockref` (k2) · `ribbonpass` (k3) · `tapepull` (k4) · `tracepass` (k5) · `rollfwd` (k6) | ADD ×8 | TUTORIAL_CHAPTER_SPEC §3.1–3.4 supplies four; the audit's Option B adds `signs` and `tracepass`; `tapepull` and `rollfwd` are this map's own (D-6, D-7) | GROUPS +8 · `meta` ×8 with `lesson:true` · PARS +8 · CLOCKS +8 (pass ×2.0) · POOL excludes lesson keys · LB auto · SEO +8 · TRACKS +8 · `e2e-alt-paths` +16 · depth-contract beat-floor exemption via `hkLessonKey` |
-| **D-3** | **`circularity-avoidance` added to the REQUIRES of `intsched` · `revolver` · `debtsched`** | AMEND (graph) | audit §3.2: all three compute interest off a **beginning balance** — which *is* the circularity dodge — and none of them ever says so | map only; the three drills already do it, and their `guide`/`aha` gain one clause each in Phase C |
-| **D-4** | **`select` TEACHES += `goto-special`** | AMEND (lesson scope) | `goto-special` (F5 → Special) had **no teacher anywhere** and is required at #15 `housestyle` and #35 `audit`. It is a *selection* instrument, so the selection lesson owns it. One added beat: "Select every typed input in one pass" | §9.1 carries the amendment note under the verbatim §3.1 page |
-| **D-5** | **`firstsum` TEACHES += `margin/ratio`; one added beat** | AMEND (lesson scope) | `margin/ratio` was taught at #7 and demanded at #2. `firstsum`'s board is already a five-line P&L, so a gross-margin beat is one division away — and it is what lets `modeltour` stay a capstone that **chains** rather than introduces | §9.2 carries the amendment note |
-| **D-6** | **`tapepull` — "Read the tape"** | ADD (lesson, k4 opener) | kills the last two orphans in one 22-second board: **`VLOOKUP`** (3 drills, no teacher, first demanded at `lookup`) and **`stat-fn(MEDIAN/AVERAGE)`** (lag 13 — demanded at `recon`, taught at `wacc`). Both are "read one number out of a column" | as D-2 |
-| **D-7** | **`rollfwd` — "Roll it forward"** | ADD (lesson, k6 opener) | gives Components its opener and teaches **`circularity-avoidance`**, which audit §3.2 found in *zero* player-facing surfaces despite it being the catalog's most-asked interview idea | as D-2 |
-| **D-8** | **5 capstone ADDs** — `qclose` (k2) · `cleanroom` (k4) · `redflags` (k5) · `pitchpage` (k7) · `shipit` (k9) | ADD ×5 | DEPTH_PASS §2.4 / §3 D1/D3/D4/D5/D6, still unbuilt (DEPTH_PASS_CAMPAIGN §0). Pages refreshed to the r452 law in §10 | GROUPS +5 · `meta` ×5 with `capstone:true` · PARS +5 · CLOCKS +5 (pass ×2.0) · SPINE `chapters[i].capstone` · LB auto · SEO +5 · TRACKS +5 · POOL: `redflags` / `shipit` candidates post-calibration |
-| **D-9** | **`nwcsched` DESIGNATED the k6 capstone** | DESIGNATE | nine chapters need nine capstones and only eight exist. `nwcsched` is Components' hardest board (par 102), teaches nothing new (so it chains, per §2.4), and "roll working capital" is the chapter's own subject | `meta.nwcsched.capstone:true` · SPINE k6 · **new achievement `cap_c9`** (adding an id is legal; P8 freezes the existing ones) · `HOTKEY_CAPSTONES` +1 row |
-| **D-10** | **capstone key targets UNCHANGED** — `cap_c1`…`cap_c8` keep pointing at `modeltour` `gauntlet` `qclose` `cleanroom` `redflags` `pitchpage` `cascade` `shipit` | NO CHANGE | this is *why* `modeltour` stays k1's capstone and `editfix` does not become one: re-pointing `cap_c1` from a drill a player has already cleared to one they have not is a rug-pull (r158) | achievement `desc` strings only ("the Foundations capstone" → "the Keyboard capstone", and so on); `test:` bodies untouched |
-| **D-11** | **cross-chapter moves (17 drills)** — `blocksel` `filldr` → k2 · `fxconvert` `unhide` → k3 · `series` → k4 · `drill` `lookup2` → k5 · `cases` `retbridge` `schedule` `intsched` `wk13` `nwcsched` → k6 · `debtblock` → k8 | MOVE ×17 | the audit's Option-B re-orders plus the re-cut's own. `unhide`→k3 (ahead of `gauntlet`) kills the grouping lag-13; `drill`→k5 is audit §5.6 verbatim; `series`→k4 and `fxconvert`→k3 are audit §3.3 verbatim; `lookup2`→k5 puts it after `balcheck`, the only drill that teaches the corkscrew its board rolls | GROUPS only; keys, boards, PBs, pars and SEO pages untouched. Picker hotkeys 1–9 inside a chapter shift (cosmetic — the r447 `cascade` move is the precedent) |
-| **D-12** | **`HK_TRACKS[].groups` re-derived** to `k1,k2,k3` / `k4,k5,k6` / `k7,k8,k9`; `MS` → `k1…k9` | RE-DERIVE | P7 | TRACKS — **`dev/migrate-certificates.sql` + the newest `issue_certificate` migration regenerate in the SAME PR** (r359). 14 keys change track (§4). C14 guards it |
-| **D-13** | **achievements that read a group NAME re-pointed** | RE-POINT | group names are load-bearing strings | `x_found` `'Foundations'`→`'Keyboard'` · `grp1` `'Foundations'`→`'Keyboard'` · `grp2` `'Models I','Models II'`→`'Valuation','Credit'` · `grp3` `'Formulas I','Formulas II'`→`'Build','Audit & Repair'` · `grp4` `'Full Builds'`→**unchanged** (the only group name that survives the cut). Ids frozen (P8); goals re-derive from the new chapter sizes |
+| **D-1** | **The eight groups, ids, names, order and capstone designations are UNCHANGED** — `Foundations · Formatting · Formulas I · Data & Lookups · Formulas II · Models I · Models II · Full Builds`, campaign `c1`–`c8`, capstones `modeltour · gauntlet · qclose · cleanroom · redflags · pitchpage · cascade · shipit` | NO CHANGE | Wolf 2026-09-03: "the original chapter layout was actually pretty good". Everything v1 spent on a re-cut — the claim-flag map, the track re-derivation, the `HOTKEY_PREMIUM` re-point, the achievement re-pointing — is **withdrawn** | none. `cap_c1`…`cap_c8` keep their targets; `hk_camp_xp` needs no migration; `x_found`/`grp1`–`grp4` keep their group strings |
+| **D-2** | **4 LEVEL ADDs** — `corridor` `repairshop` `powergrid` `printshop` (all c1) | ADD ×4 | Wolf: Foundations becomes a game tutorial of "a few major lessons", not twelve shallow boards. §9 carries the pages | GROUPS +4 (all at the head of `Foundations`) · `meta` ×4 with `level:true` · PARS +4 (60–120 s band) · CLOCKS +4 (**pass ×2.5**, not ×2.0 — §8 D-2) · LB auto (levels post, §8 RESOLVED-2) · SEO +4 · TRACKS +4 (`fluency`) · POOL excludes level keys · `e2e-alt-paths` +8 · a new act controller (§9.0) |
+| **D-3** | **`keyboardtour` RETIRED** — level 1 replaces it | RETIRE | Wolf 2026-09-03. L1 act 1 **is** the Tour's stage 1 board, act 2 **is** stage 2; stages 3–6 redistribute to L2 (enter/edit/structure), L3 (sums/fill) and L4 (dress/save). A separate untimed pre-game would teach the same grammar twice, and the honest-t=0 problem it was built to solve is now solved by the level's own act-1 HUD | **KEEP the runtime, re-point it:** the TUTORIAL HUD (`TUTORIAL_CHAPTER_SPEC` §3.0.2) becomes the per-ACT banner · the stage cards (§3.0.4) become ACT cards · the tier-ladder reveal (DEPTH_PASS §2.5) paints act N+1's region in · `TOUR_STEPS`/`startKeyboardTour`'s untimed bail, the `tourMode` flag, `hk_tour_done_v2` and the `checkWin` exemption all **go** (a level is a timed drill). `obStart` and `showComfort`'s "basically none" branch load `corridor`. `check-invariants`' Keyboard-Tour block re-points at the level contract |
+| **D-4** | **`navigation` RETIRED into `corridor` act 1** | RETIRE | the switchback corridor board is act 1 verbatim; a 20-second movement board cannot also be the level that teaches selection and the clipboard, and two keys over one board would split its PBs and its leaderboard | GROUPS −1 · `menuOrder` −1 · PARS/CLOCKS −1 · LB: the `navigation` board closes, `corridor`'s opens (no migration — boards derive from `menuOrder`) · SEO: `drills/navigation.html` → 301 to `drills/corridor.html` · **`HK_PLACEMENT[0]` re-points** `navigation` → `corridor` (§8 D-6) · PBs on `navigation` are kept in localStorage and shown as a retired-drill row on the profile (r158) |
+| **D-5** | **the five robust Foundations drills LEAVE c1** — `blocksel` → c2 · `pastes` → c2 · `filldr` → c3 · `rowops` → c4 · `editfix` → c5 | MOVE ×5 | Foundations is exactly five levels now (checker d1), so each of the five goes to the chapter whose functionality it exercises. **`blocksel`** ("assemble and format the summary; dress the table as you go and box it whole") — its clipboard half is L2's job now, what is left is a dressing board → **Formatting**. **`pastes`** — three of paste-special's four routes (formats, values, transpose) are presentation ops and every one of its REQUIRES is a format tag → **Formatting**; it must also precede `drill`/`lookup2`/`recon`, and parking it inside Data & Lookups puts par 42 ahead of `drill` 22, a ×0.52 spine break (this is the one place v2 deviates from the destination Wolf sketched, and the deviation is arithmetic, not taste). **`filldr`** ("a quarterly operating build off the revenue feed… one anchored formula fills most of it") → **Formulas I**. **`rowops`** ("insert the missing line and the missing quarter, delete the squatters") → **Data & Lookups**, beside `scrub` and `unhide`, the same hand. **`editfix`** ("a review came back on the schedule — repair all three") → **Formulas II**, which is the audit-and-repair chapter | GROUPS only; keys, boards, PBs, pars and SEO pages untouched. TRACKS: `filldr` `rowops` `editfix` change track (§4). Picker hotkeys inside a chapter shift (cosmetic — the r447 `cascade` move is the precedent) |
+| **D-6** | **2 opener drill ADDs** — `tapepull` (c4) · `rollfwd` (c7) | ADD ×2 | the only two ADDs the graph still forces. `tapepull` kills the last two orphan tags in one 22-second board: **`VLOOKUP`** (3 drills need it, nothing teaches it) and **`stat-fn(MEDIAN/AVERAGE)`** (demanded at `recon`, taught 13 positions later at `wacc`). `rollfwd` teaches **`circularity-avoidance`**, which appears in *zero* player-facing surfaces despite being the catalog's most-asked interview idea, and gives Models II an opener at par 26 instead of `covtable` 36. Pages: v1 §9.7 and §9.8, carried unchanged in substance — they are ordinary timed drills, not levels and not lessons | GROUPS +2 · PARS +2 · CLOCKS +2 · LB auto · SEO +2 · TRACKS +2 · POOL candidates |
+| **D-7** | **5 capstone ADDs** — `qclose` (c3) · `cleanroom` (c4) · `redflags` (c5) · `pitchpage` (c6) · `shipit` (c8) | ADD ×5 | DEPTH_PASS §2.4 / §3 D1/D3/D4/D5/D6, still unbuilt (DEPTH_PASS_CAMPAIGN §0). Pages refreshed to the r452 law in §10. Three chapters already have theirs (`modeltour` `gauntlet` `cascade`) | GROUPS +5 · `meta` ×5 with `capstone:true` · PARS +5 · CLOCKS +5 (pass ×2.0) · SPINE `chapters[i].capstone` for c3–c6 and c8 · LB auto · SEO +5 · TRACKS +5 · POOL: `redflags` / `shipit` post-calibration |
+| **D-8** | **`audit` TEACHES += `audit(trace)` · `show-formulas`** | AMEND (graph) | `audit(trace)` had **no teacher** and is required by `tieout` (c5) and `opmodel` (c8); `Ctrl+\`` show-formulas is wired at `index.html:28400` and used by zero drills. `audit` is literally the **Review Pass** — "a divisional review page came back with four breaks in it" — and it sits at c5 position 2, before `tieout`. The trace lesson belongs on the review board, not on an eleventh new drill | map + one Phase C clause each in `audit`'s `guide`/`aha`; no board change |
+| **D-9** | **`lookup2` REQUIRES −= `corkscrew(roll-forward)`** | AMEND (graph) | the audit derived this row from board scenery. `lookup2`'s board is a **square 5×5 segment × metric tape with three row×column intersections** (`index.html:22149`); the player never rolls a balance. The audit's own alternative was to move `lookup2` past `balcheck`, which costs Data & Lookups a free drill to fix a requirement that is not real | map only |
+| **D-10** | **`circularity-avoidance` added to the REQUIRES of `intsched` · `revolver` · `debtsched`** | AMEND (graph) | audit §3.2: all three compute interest off a **beginning balance** — which *is* the circularity dodge — and none of them ever says so | map only; the three drills already do it, and their `guide`/`aha` gain one clause each in Phase C |
+| **D-11** | **within-chapter re-orders in c2–c8 (audit Option A)** | RE-ORDER | no drill crosses a chapter except the five in D-5. Every other chapter is sorted to open on its lowest par and to put teachers ahead of users: c3 `margin` moves ahead of `bridge`/`cagr` (it teaches `growth/CAGR`); c4 `sort` ahead of `scrub`; c5 `wrapfix`/`audit` to the head; c6 `retbridge` ahead of `txncomps`/`comps` (it teaches `bridge`); c7 `covtable` and `wk13` to the head; c8 `threestmt`/`dashcover` to the head | GROUPS only. Fixes the audit's worst live jump (`scrub` 21 → `series` 44, ×2.10) by seating `rowops` between them |
+| **D-12** | **`nwcsched` is NOT a capstone** | NO CHANGE | v1 designated it the ninth capstone because nine chapters needed nine. Eight chapters need eight and all eight exist, so `nwcsched` stays an ordinary Full Builds drill and the achievement id `cap_c9` is never minted | none (this row exists only to withdraw a v1 delta) |
+| **D-13** | **`HOTKEY_PREMIUM.groups` UNCHANGED** = `['Formulas II','Models I','Models II','Full Builds']`; `enabled` still `false`; each PRO group gains `unlock_level` 13/16/19/22 | ADD (field) | §3 | one field per PRO group; `dev/check-paywall.js` §1 ("flag off = zero visible change") re-runs both states unchanged |
 | **D-14** | **`HOTKEY_GATES` RETIRED** | RETIRE | P1 — one ladder | delete `window.HOTKEY_GATES`; `drillLocked()` / `openGateInfo()` re-point to the capstone + level answer; `check-invariants` C1's gate-bypass assertion retires with it |
-| **D-15** | **`HOTKEY_PREMIUM.groups` = `['Audit & Repair','Components','Valuation','Credit','Full Builds']`** (was `['Formulas II','Models I','Models II','Full Builds']`); `enabled` still `false` | RE-POINT | §3, the PRO line | one array; `dev/check-paywall.js` §1 ("flag off = zero visible change") re-runs both states unchanged |
-| **D-16** | **campaign ids `c1`–`c8` → `k1`–`k9`, with a one-time client-side claim-flag map** | RENAME + MIGRATE | P8: earned things persist | `hk_camp_xp` map, matched **by capstone key** so it cannot drift: `c1→k1` (modeltour) · `c2→k3` (gauntlet) · `c3→k2` (qclose) · `c4→k4` (cleanroom) · `c5→k5` (redflags) · `c6→k7` (pitchpage) · `c7→k8` (cascade) · `c8→k9` (shipit); **`k6` is new** and has no legacy flag. One-time, idempotent, client-side |
-| **D-17** | **`HK_PLACEMENT` UNCHANGED** — `navigation · combo · margin · sort · opmodel` | NO CHANGE | CURRICULUM_REBUILD §4.4; the five still span the arc under the new cut (k1 move · k3 format · k2 formula · k4 data · k9 model) | none; re-verify the band boundaries after the lesson pars land |
-| **D-18** | **marketing count 74 → 87** | COUNT | `menuOrder.length` is the source of truth | `index.html:7, :11, :18` · `About.html:14, :21` · enterprise / billing copy · the `e2e-smoke` drill-count guard |
-| **D-19** | **SEO pages +13** | GENERATE | one page per new key | `dev/build-drill-pages.js` → `drills/*.html` ×13 + `sitemap.xml` |
-| **D-20** | **`dev/check-curriculum-map.js` wired into gate.yml's fast lane** | ADD (CI) | CURRICULUM_REBUILD Phase C wants the violation check as a CI invariant — landed early, in Phase A, so the map cannot rot between phases | one line in the "Static guards" step; it reads one JSON, runs in well under a second, and is never scope-gated |
+| **D-15** | **`HK_TRACKS` UNCHANGED in shape; 3 keys change track** | RE-DERIVE | P7, §4 | TRACKS — `dev/migrate-certificates.sql` + the newest `issue_certificate` migration regenerate in the **same PR** (r359). C14 guards it |
+| **D-16** | **achievements UNCHANGED** | NO CHANGE | every group name survives the redirect, so `x_found` `grp1` `grp2` `grp3` `grp4` keep their strings and `cap_c1`–`cap_c8` keep their targets. Goals re-derive from the new chapter sizes, which is arithmetic, not an id change (P8 holds) | goal numbers only |
+| **D-17** | **`HK_PLACEMENT` = `corridor · combo · margin · sort · opmodel`** | RE-POINT | `navigation` retires (D-4), so the movement probe re-points at the level that absorbed it. But `corridor` is a ~90 s board where `navigation` was 20 s, which makes the placement three times longer at its cheapest step — **§8 D-6** | `HK_PLACEMENT[0]`; re-sweep the band boundaries once the level pars are measured |
+| **D-18** | **marketing count 74 → 84** | COUNT | `menuOrder.length` is the source of truth | `index.html:7, :11, :18` · `About.html:14, :21` · enterprise / billing copy · the `e2e-smoke` drill-count guard |
+| **D-19** | **SEO pages +11, −1** | GENERATE | one page per new key; `navigation`'s 301s to `corridor` | `dev/build-drill-pages.js` → `drills/*.html` ×11 + `sitemap.xml` |
+| **D-20** | **`dev/check-curriculum-map.js` wired into gate.yml's fast lane** | ADD (CI) | the violation check as a CI invariant, landed in Phase A so the map cannot rot between phases | one line in the "Static guards" step; it reads one JSON, runs in well under a second, and is never scope-gated |
 
-**Not touched, deliberately:** drill keys · `HK_RANK.TIERS` · `HK_PLACEMENT` keys · localStorage keys ·
-`HK_BAND` · `HOTKEY_PRO.plans` · every drill's board, beats, par and checks (this phase is a map, not a
-rework) · `hkCapstoneOk()` (the predicate is already shared, and `hkCapstoneDone()` already returns false
-for any key absent from `menuOrder`, so nothing NaNs before the Phase C builds land).
+**Not touched, deliberately:** drill keys (bar the two retirements) · `HK_RANK.TIERS` · localStorage
+keys · `HK_BAND` · `HOTKEY_PRO.plans` · every existing drill's board, beats, par and checks (this
+phase is a map, not a rework) · `hkCapstoneOk()` (already shared, and `hkCapstoneDone()` already
+returns false for any key absent from `menuOrder`, so nothing NaNs before the Phase C builds land).
 
 ---
 
 ## 7 · The spine, as text
 
-par by position inside each chapter; `·` = a lesson or the Tour (exempt — a 14-second start gate is not
-a rung), `★` = the capstone. The floor the checker enforces is the audit §2.3 drop threshold:
-**par(i+1) ≥ 0.63 × par(i)**.
+par by position inside each chapter; `★` = the capstone. The four Foundations **levels** are exempt
+from the spine and print without a rung marker — a 60–120 s multi-act teaching board is not a speed
+rung, and Foundations' first rung is its capstone. The floor the checker enforces on everything else
+is the audit §2.3 drop threshold: **par(i+1) ≥ 0.63 × par(i)**.
 
 ```
-  k1 Keyboard           ·    ·    ·   20 → 30 →  ·  → 42 → 52 → 35★
-  k2 Build              ·   34 → 44 → 29 → 22 → 21 → 40 → 36 → 33 → 64 → 80 → 94★
-  k3 Format             ·   16 → 22 → 24 → 25 → 36 → 27 → 25 → 31 → 35 → 44 → 47★
-  k4 Structure & Data   ·   26 → 31 → 21 → 44 → 59 → 92 → 90★
-  k5 Audit & Repair     ·   22 → 26 → 28 → 35 → 36 → 37 → 40 → 48 → 64 → 66 → 80 → 90★
-  k6 Components         ·   45 → 56 → 69 → 72 → 97 → 102★
-  k7 Valuation          35 → 40 → 52 → 65 → 70 → 85 → 89 → 92 → 112 → 88★
-  k8 Credit             36 → 70 → 71 → 77 → 77 → 86 → 95 → 161★
-  k9 Full Builds        45 → 47 → 64 → 66 → 71 → 84 → 85 → 113 → 110★
+  c1 Foundations      90 → 105 → 110 → 100 → 35★
+  c2 Formatting       16 → 22 → 24 → 25 → 27 → 31 → 34 → 36 → 42 → 44 → 47★
+  c3 Formulas I       21 → 22 → 29 → 40 → 33 → 36 → 35 → 44 → 64 → 80 → 94★
+  c4 Data & Lookups   22 → 22 → 25 → 26 → 31 → 21 → 30 → 44 → 59 → 80 → 92 → 90★
+  c5 Formulas II      26 → 28 → 35 → 36 → 37 → 40 → 48 → 52 → 64 → 66 → 97 → 90★
+  c6 Models I         35 → 40 → 56 → 52 → 65 → 70 → 85 → 89 → 92 → 112 → 88★
+  c7 Models II        26 → 36 → 45 → 69 → 71 → 72 → 77 → 77 → 86 → 95 → 161★
+  c8 Full Builds      45 → 47 → 64 → 66 → 70 → 71 → 84 → 85 → 102 → 113 → 110★
 ```
 
-**Jumps > ×1.6 — five left, from sixteen.** (The audit counted 16 on the live catalog, headed by
-`navigation 20 → filldr 44` ×2.20 — "the product's whole retention problem in one number". That one is
-gone: `filldr` now sits in k2 behind a Tour, three lessons and one drill.)
+**Jumps > ×1.6 — one left, from sixteen.** (The audit counted 16 on the live catalog, headed by
+`navigation 20 → filldr 44` ×2.20 — "the product's whole retention problem in one number". Both ends
+of that jump have moved: `navigation` is act 1 of a level, `filldr` sits mid-Formulas I behind four
+levels and eleven Formatting drills.)
 
 | jump | ratio | verdict |
 |---|---|---|
-| k4 `scrub` 21 → `series` 44 | **×2.10** | **the worst left.** Both are k4 structure boards; `series` is a five-beat frame rebuild, `scrub` the chapter's shortest clean-up. Fixable only by re-parring one of them, which is a Phase C measurement, not a map decision. **Flagged, not fixed.** |
-| k2 `bridge` 33 → `sumif` 64 | ×1.94 | legitimate — `sumif` introduces two tags (`SUMIF(S)`, `tie-out/check-row`) and is the chapter's first long board |
-| k8 `covtable` 36 → `debtblock` 70 | ×1.94 | chapter opener → first real build; the opener-exemption rule puts the lowest par first by construction |
-| k2 `percent` 21 → `margin` 40 | ×1.90 | legitimate — `margin` introduces `growth/CAGR` |
-| k8 `revolver` 95 → `cascade` 161 | ×1.69 | the capstone; the audit already called this one legitimate |
+| c7 `revolver` 95 → `cascade` 161 | ×1.69 | the capstone, and the audit already called this one legitimate |
 
 **Both chapter-level inversions are gone.** Foundations (mean 37) was harder than Formatting (mean 30);
-k1 Keyboard now runs 20 / 30 / 42 / 52 / 35 into k2 Build's 34 … 94. And Full Builds (mean 75) was
-*easier* than Models II (mean 79); k9 (mean 76) now sits above k7 Valuation (mean 73) and beside k8.
+c1's only graded rung is now `modeltour` at 35, and c2 opens at 16. And Full Builds (mean 75) was
+*easier* than Models II (mean 79); the re-orders leave c8 (mean 76) above c6 (mean 73) and beside c7.
 
-**Par estimates.** The 13 new drills' pars are **estimates**, except `qclose` — DEPTH_PASS §4.32 records
-it measured at **94** (median 86 keys; capstone clock pass 188). Every other new par is re-measured by
+**Par estimates.** The 11 new pars are **estimates**, except `qclose` — DEPTH_PASS §4.32 records it
+measured at **94** (median 86 keys; capstone clock pass 188). The four level pars (90 / 105 / 110 /
+100) are the roughest numbers in this file: they are Wolf's "5–8 minutes on a first play, replayable
+for time" translated into a *replay* par, which is what a par is. Every new par is re-measured by
 `dev/e2e-par-sweep.js` when the drill builds, and the checker re-runs on the real numbers.
 
 ---
 
 ## 8 · DECISIONS — for Wolf, recommendation first
 
+**RESOLVED 2026-09-03, by Wolf, and encoded above — not re-litigated here:**
+**(R1)** Level 1 **replaces** the Keyboard Tour entirely; `keyboardtour` retires and its runtime (HUD,
+stage cards, tier reveals) survives as the level machinery (§6 D-3). **(R2)** Levels **post to
+leaderboards** like any drill — timed, generous pass clocks, ☆ visible. **(R3)** The level names *The
+Corridor · The Repair Shop · The Power Grid · The Print Shop* are **placeholders**, kept as such;
+renaming them costs nothing while the keys stay `corridor` `repairshop` `powergrid` `printshop`.
+
 | # | question | recommendation | what turns on it |
 |---|---|---|---|
-| **D-1** | **Nine chapters want nine lesson openers; the graph only supports six.** Valuation, Credit and Full Builds introduce no new tag, so a lesson at their head would teach nothing. | **Accept three `opener_exempt` chapters** (k7 / k8 / k9), each opening on its own lowest-par drill, machine-checked. The alternatives are three padding lessons (11 total — the audit §3.1 discriminator kills them) or an 8-chapter cut. | P4's wording; the checker's rule (d) |
-| **D-2** | **Eight lesson drills, not four.** The spec's four, plus `signs` and `tracepass` (the audit's Option B), plus `tapepull` and `rollfwd` (this map). | **Build all eight.** They are what takes 59 violations to 0; the four alone leave `VLOOKUP`, `stat-fn`, `goto-special` and `circularity-avoidance` with no teacher at all. About two build sessions. | Phase C wave 1 size; catalog 74 → 87 |
-| **D-3** | **The PRO line.** | **Free = k1–k4 (40 drills + the Tour); PRO = k5–k9 (47).** Exactly CURRICULUM_REBUILD §4.1 re-expressed in the new cut: free ends where a player can build, dress and clean their own page; paid starts where they audit somebody else's. | landing copy, `HOTKEY_PREMIUM.groups`, the whole conversion story |
-| **D-4** | **Certificate composition moves under live players.** 14 keys change track; anyone mid-certificate sees their scope change. | **Ship it with the r158 softener:** a player who has already *earned* a certificate keeps it (server-side issuance is untouched); only in-progress scope moves, and the profile shows the new scope with the old one struck. | `migrate-certificates.sql`, the RPC arrays, C14 |
-| **D-5** | **`modeltour` stays k1's capstone** rather than `editfix`, purely so `cap_c1` never re-points. | **Keep `modeltour`.** The audit's complaint about it — "a Formatting exam wearing a Foundations badge" — is answered by construction: the Tour now teaches the format vocabulary before k1's first drill. | achievement integrity (D-10) |
-| **D-6** | **`nwcsched` designated k6's capstone** — the ninth capstone, and the only one that is an existing drill newly promoted. | **Accept.** It is Components' hardest board, teaches nothing new (so it chains rather than introduces), and needs no build. Costs one new achievement id, `cap_c9`. | `HOTKEY_CAPSTONES`, achievements |
-| **D-7** | **`ribbonpass` introduces no tag** — the Tour's stage 5 names them all first, and k2's formula drills need decimals and percent before k3 opens. | **Keep it anyway.** It is k3's start gate and the only *timed* ribbon rep; the Tour is untimed by design. If it must own something, move `decimals` + `percent-fmt` off the Tour and re-order k2 — four moves. | k3's opener; the lesson count |
-| **D-8** | **The level curve 13 / 16 / 19 / 22 / 25** is a straight line, so the last PRO chapter sits twelve levels past the first. | **Accept as recommended (§4.2).** If it reads too steep at playtest, flatten the tail (13/16/19/21/23) rather than the head — the head is the conversion moment. | the landing's ladder band, `unlock_level` |
+| **D-1** | **`pastes` goes to Formatting, not Data & Lookups** — the one destination in §6 D-5 that differs from the sketch. | **Formatting.** Inside Data & Lookups it must precede `drill`, `lookup2` and `recon`, which puts par 42 ahead of `drill` 22 — a ×0.52 spine break the checker fails. In Formatting it lands at 42 between `autofit` 36 and `housestyle` 44 with the chapter still monotone. Three of its four routes are presentation ops anyway. | c2/c4 sizes; rule (f) |
+| **D-2** | **A level's pass clock.** Every other drill passes at par × 2.0. A level is a four-act teaching board a player meets cold. | **Pass = par × 2.5 for the four levels only**, par × 2.0 everywhere else. At ×2.0 a first play of a 110 s board fails on the clock while the player is still reading act 3's card, which is exactly the "punished for learning" feeling the tutorial exists to remove. | `HOTKEY_CLOCKS`; the level contract |
+| **D-3** | **How a level scores — one rule for all four.** Pips, time, or lives? | **Pips + the clock; no lives.** Each act's targets are a **touch-list of pips** (the corridor's own §2.6 machinery, generalized): a pip lights when its target reaches its end state, the act completes when its pips are all lit, and the drill's *score* is the clock, exactly like every other drill. **No lives, no fail state** — a wrong move simply does not light a pip. Lives would make the tutorial punish exploration, and the Freedom Doctrine says the slow route is always legal. | the act controller (§9.0); the HUD; `e2e-depth-mechanics` |
+| **D-4** | **First play vs replay.** A level teaches on play 1 and is a time-attack on play 5. | **The HUD's instruction line shows on the first play and hides on replays** (latch per level key, same shape as `hk_tour_done_v2` but per drill); the **clock always runs, and the first play posts** like any other run. Hiding the clock on play 1 would make the first PB a lie and break the leaderboard's honesty (R2). | the level contract; `recordRun` |
+| **D-5** | **Certificate scope moves under live players.** `filldr` `rowops` `editfix` leave `fluency` for `formulas`; four levels join `fluency`. | **Ship it with the r158 softener:** a player who has already *earned* a certificate keeps it (server-side issuance untouched); only in-progress scope moves, and the profile shows the new scope with the old one struck. This is three keys, where v1 moved fourteen. | `migrate-certificates.sql`, the RPC arrays, C14 |
+| **D-6** | **`HK_PLACEMENT`'s movement probe.** `navigation` (20 s) retires into `corridor` (~90 s), so the placement's cheapest step triples. | **Keep `corridor` as the probe for now and re-sweep the bands when its par is measured.** If the placement then reads too long, drop to four probes (`combo · margin · sort · opmodel`) rather than inventing a short movement board that duplicates act 1 — the placement's job is banding, not teaching. | `HK_PLACEMENT`, the band boundaries |
+| **D-7** | **Foundations is now the shortest chapter (5) and the free tier lost a drill (40 → 39).** | **Accept.** Chapter size is not the unit a player feels; time is, and five levels plus `modeltour` is 8–10 minutes of first play against the old seven drills' four. The free tier also *gains* the whole of `Data & Lookups`, which `HOTKEY_GATES` walls today. | landing copy; the "84 drills" count |
+| **D-8** | **The four earn-in levels 13 / 16 / 19 / 22.** | **Accept as recommended.** Straight line, three levels per PRO chapter, last chapter at 22 rather than v1's 25 because there are four PRO chapters, not five. If it reads too steep at playtest, flatten the tail (13/16/18/20) rather than the head — the head is the conversion moment. | the landing's ladder band, `unlock_level` |
 
 ---
 
-## 9 · THE EIGHT LESSON-DRILL PAGES
+## 9 · THE FIVE FOUNDATIONS LEVELS
 
-Page grammar per TUTORIAL_CHAPTER_SPEC §3.1: **Board · Lesson card** (title / body ≤ 60 words / keys) ·
-**Beats** (2–4 core + a **visible** ☆, `bonus:true, reveal:true` — §1.6) · **Random** (two axes) ·
-**Aha** · **Par estimate** · **Engine** · **Alts ×2, one of which is the ☆-forfeit control** (§1.8).
-Every lesson runs with hints ON for the first attempt, the lesson card IS the start gate (r450's
-honest-t=0), and it is excluded from `HOTKEY_CHALLENGE_POOL`.
+### 9.0 What a level IS — the shared contract
 
-**§9.1–§9.4 are reproduced verbatim from `dev/TUTORIAL_CHAPTER_SPEC.md` §3.1–§3.4** (the design of
-record for those four; do not re-derive them here). Where this map needs a page to own one more tag,
-the amendment is stated **below** the verbatim page, never inside it, and carries its delta-table row.
-**§9.5–§9.8 are new** and are written to the same grammar.
+A **level** is a timed catalog drill with three or four **acts** on one board. It is not a lesson
+(there is no untimed card before the clock) and not the Tour (there is no exemption from `checkWin`,
+PB, ghost, xp or the leaderboard). What makes it a level rather than a long drill is three things,
+all of which already exist in the engine and only need re-scoping:
 
----
+| piece | today | as level machinery |
+|---|---|---|
+| **the act card** | the Tour's stage card — scrim + ring, title, ≤ 60-word body, keycap strip, any key dismisses (`TUTORIAL_CHAPTER_SPEC` §3.0.4, markup reused from the modal tour) | renders between acts, ≤ 4 per level. **The clock does not stop for it** — that is the whole difference from a stage card, and it is why the ≤ 60-word cap is a hard cap |
+| **the HUD** | the TUTORIAL HUD banner + nudge-after-three-wrong-keys (§3.0.2) | the per-act banner. Shows on the **first play only** (§8 D-4); on replays the checklist alone carries the beats |
+| **the reveal** | the Tour's staged board + DEPTH_PASS §2.5's tier ladder | act N+1's region is drawn dim and paints in live when act N's pips are all lit |
+| **the pips** | the `navigation` corridor's pip/touch-list (`index.html` corridor machinery, DEPTH_PASS §2.6) | generalized: every act owns a touch-list, a pip lights on its target's END STATE (never on a keypress), and the act completes when its list is clean |
 
-### 9.1 `select` (k1) — verbatim from `dev/TUTORIAL_CHAPTER_SPEC.md` §3.1
+**The one genuinely new piece** is an **act controller**: `S.act`, an act-scoped slice of the
+checklist (`updateChecklist` already renders a slice for the Tour — the same code, without the
+`tourMode` bail), and an act-completion handler that fires the reveal and the next card. Everything
+else is a re-point. Build the act controller before any level.
 
-### 3.1 `select` — "Select" · name `Select` · label `Select the blocks` · tab `Select`
-
-**Board:** a regional sales table (Region × Q1–Q4 + FY, 8 regions), pre-dressed, at a randomized anchor
-(3-spot pool). A memo block to the right names four things to select, one per beat, in THIS seed's
-words ("the West row", "the Q3 column", "the whole table", "the FY figures").
-
-**Lesson card:** *Select* — "Hold Shift and the arrows stretch a selection from where you stand. Add
-Ctrl and it stretches to the edge of the data. Shift+Space takes the row, Ctrl+Space the column,
-Ctrl+A the whole block."
-keys: `shift+arrows` · `ctrl+shift+arrows` · `shift+space` · `ctrl+space` · `ctrl+a`
-
-**Beats** (graded on `S.sel` at commit — the player presses Enter or any non-selection key to lodge a
-selection; the engine's existing selection latches handle it):
-1. Select the {West} row of figures — Q1 through FY
-2. Select the {Q3} column of figures — every region
-3. Select the whole table — headers and figures
-4. Select the FY figures for every region
-
-☆ (visible): Select the whole table in one press
-
-**Random:** anchor (3 spots) · which row/column the memo names (pools) · values. **Aha:** "a selection
-is a rectangle you grow from where you stand — ctrl+shift grows it to the edge." **Par:** ~14 s / ~12
-keys. **Engine:** nothing new — `selOps` telemetry (r429) already records chord-vs-arrow selection for
-the ☆. **Alts:** (1) arrow-by-arrow Shift selection on every beat (☆ forfeited, core clears);
-(2) Ctrl+Space / Shift+Space route for beats 1–2.
-
-
-> **r454 AMENDMENT (delta D-4) — `select` TEACHES += `goto-special`.** The page above is unchanged;
-> it gains **one core beat, placed fourth**, and one keycap:
->
-> - beat: **Select every typed input on the table in one pass** — the memo names them ("the figures
->   somebody typed"); graded on `S.sel` covering exactly the constant cells, any route.
-> - keycap strip gains `F5 → special` (and `ctrl+g` as its twin).
-> - lesson-card body gains one sentence, inside the 60-word cap: *"F5 then Special selects a whole
->   class at once — every typed number, or every formula."*
->
-> **Why:** `goto-special` had **no teacher anywhere in 74 drills** and is required at `housestyle`
-> (k3) and `audit` (k5). It is a selection instrument, so the selection lesson owns it. Par estimate
-> moves 14 → **16 s**. Alts unchanged in shape; alt (1) (arrow-by-arrow Shift selection, ☆ forfeited)
-> now also walks the new beat by Ctrl+click-free arrow selection of the two input blocks.
+**Scoring, per §8 D-3:** pips per act, no lives, the clock is the score. **☆ per level: exactly one,
+visible** (`bonus:true, reveal:true`), and it is always an *efficiency* discovery, never a formatting
+task and never a stamp (DEPTH_PASS §1.0(d)). **Alts ×2 per level**, one of which is the ☆-forfeit
+control. **Grading law, binding (DEPTH_PASS_CAMPAIGN §1):** never grade formula TEXT and never grade
+a KEYPRESS in a core beat.
 
 ---
 
-### 9.2 `firstsum` (k1) — verbatim from `dev/TUTORIAL_CHAPTER_SPEC.md` §3.2
+### 9.1 `corridor` — **"The Corridor"** ★ LEVEL 1 · c1 · *name is a placeholder (R3)*
 
-### 3.2 `firstsum` — "Your first formulas" · name `First Sums` · label `Your first formulas` · tab `Sums`
+**Game.** You are inside the model, and the model is a maze. Act 1 is the existing switchback
+corridor — solid walls, one straightaway per press, pips down every hall. Act 2 knocks the walls down
+and turns the room into a live sales table you must **capture** block by block: the CAPTURE memo names
+a target, you stretch a selection onto it exactly, the block lights and the next target names itself.
+Act 3 is the run home — teleport to the far corner, take the model block, carry it to the home bay and
+save. **Score:** pips — 1 per corridor hall, 1 per captured block, 1 per delivered thing. **Lives:**
+none; a wrong capture just fails to light. **Feel:** the first minute of the product, and it should
+feel like a game before it feels like Excel.
 
-**Board:** a five-line divisional P&L (Revenue · COGS · Gross profit · Opex · EBITDA) × Q1–Q4; Gross
-profit and EBITDA rows EMPTY; a Total column empty. Costs negative per convention.
+**Board, per act.**
+- **Act 1 — THE CORRIDOR.** `navigation`'s board verbatim (D-4): one long switchback of solid walls,
+  a pip at the end of every straightaway, the model block parked at the far corner. The wall past the
+  model breaks open for a player who would rather walk than fly.
+- **Act 2 — CAPTURE.** The walls clear; the corner block becomes a regional sales table (Region ×
+  Q1–Q4 + FY, 8 regions), pre-dressed. A **CAPTURE** memo to the right names four targets one at a
+  time, in this seed's words: *the West row · the Q3 column · the whole table · every typed figure.*
+- **Act 3 — THE RUN HOME.** The whole page, a marked **home bay** at A1, and the model block still
+  parked at the far corner.
 
-**Lesson card:** *Your first formulas* — "A formula starts with = or +. While you type it the arrow keys
-point at cells instead of moving — watch the reference appear. Alt+= writes a SUM for you. Fill a
-formula down and its references move with the row."
-keys: `=` · `+` · `arrows (point)` · `alt+=` · `ctrl+r`
+**Concepts taught (tags).** `move` · `jump(ctrl-arrow)` · `select` · `select-edge` · `row/col-select` ·
+`goto-special` · `copy/paste` · `save`
 
-**Beats:**
-1. Build Gross profit for Q1 — Revenue plus the COGS line
-2. Fill Gross profit across the other three quarters
-3. Build EBITDA for every quarter — Gross profit plus Opex
-4. Total each line across the year into the Total column
+**Beats.**
+- Act 1: (1) Clear the first hall · (2) Clear the corridor to the far corner · (3) Reach the model block
+- Act 2: (4) Capture the {West} row of figures, Q1 through FY · (5) Capture the {Q3} column, every
+  region · (6) Capture the whole table, headers and figures · (7) Capture every typed figure on the
+  table in one pass
+- Act 3: (8) Copy the model block · (9) Deliver it to the home bay · (10) Save the workbook
+- **☆ (visible): take every hall in one press** — no arrow-walking anywhere in act 1.
 
-☆ (visible): Total all five lines in one pass
+**Random.** Corridor layout (the existing seed pool) · which row and column the CAPTURE memo names
+(pools) · the table's anchor (3 spots) · values.
 
-**Random:** anchor jitter · values (integers) · the label pool for the division name. Two axes minimum.
-**Aha:** "a formula points at cells — point with the arrows, and alt+= writes the sum for you."
-**Par:** ~24 s. **Engine:** none. **Alts:** (1) typed refs `=B4+B5` with no point mode — core clears;
-(2) SUM typed by hand in each total (☆ forfeited).
+**Aha, per act.** A1: "the keyboard flies — one press per hall, not one per cell." A2: "a selection
+is a rectangle you grow from where you stand; ctrl+shift grows it to the edge." A3: "F5 → Special
+selects a whole class at once — every typed number, or every formula."
 
-> **r454 AMENDMENT (delta D-5) — `firstsum` TEACHES += `margin/ratio`.** The page above is unchanged;
-> it gains **one core beat, placed last**:
->
-> - beat: **Build the gross margin — gross profit divided by revenue, every quarter** (the board
->   already carries a Margin line under EBITDA in the r454 cut; it is empty at load, percent-formatted
->   at build so no format beat is implied).
-> - lesson-card body gains one clause, inside the 60-word cap: *"A ratio is a formula too — one line
->   over another."*
->
-> **Why:** `margin/ratio` was demanded at catalog #2 and taught at #7 — and it is required by 20 later
-> drills, `modeltour` among them. Teaching it here is what lets `modeltour` remain k1's capstone and
-> still satisfy the capstone rule (a capstone chains, it does not introduce — §6 D-5, D-10). Par
-> estimate moves 24 → **26 s**. Alts unchanged; alt (2) (SUM typed by hand, ☆ forfeited) also covers
-> the margin beat with a typed `=B7/B4`.
+**Par estimate.** ~90 s (replay par; a first play runs 3–4 minutes). Pass = par × 2.5.
 
----
+**Engine.** Reuse: the corridor pip/touch-list (§2.6) for act 1 · `S.sel` end-state grading for act 2
+(the r429 `selOps` telemetry already records chord-vs-arrow for the ☆) · `F5 → Special` (wired) · the
+save latch. **New:** the act controller (§9.0) — this is the level that builds it.
 
-### 9.3 `lockref` (k2) — verbatim from `dev/TUTORIAL_CHAPTER_SPEC.md` §3.3
-
-### 3.3 `lockref` — "Lock a reference" · name `Lock` · label `Lock the reference` · tab `Lock`
-
-**Board:** a price grid — Units by product (rows) × region (columns), a single yellow bordered helper
-cell `Helper — price per unit`, and an empty Revenue grid of the same shape.
-
-**Lesson card:** *Lock a reference* — "Fill a formula and its references move with it. Put $ on a
-reference — F4 does it — and that one stays put. One anchored formula, filled down then right, covers
-the whole grid."
-keys: `F4` · `$` · `ctrl+d` · `ctrl+r`
-
-**Beats:**
-1. Build the top-left Revenue cell — units times the price helper
-2. Fill the Revenue grid — every product, every region
-
-☆ (visible): Lock the price with F4 rather than typing the dollar signs
-
-**Random:** helper position (3 spots) · grid size (3×3 or 4×3) · values. **Aha:** "one $ pass, twelve
-cells — the lock is where the speed lives." **Par:** ~16 s. **Engine:** F4 telemetry — `cycleAnchor()`
-(`index.html:25897`) sets `S.f4Used` for the ☆ predicate (one-line add; the function already owns every
-F4 path including the r88 caret fix). **Alts:** (1) typed `$` (☆ forfeited); (2) twelve typed formulas
-(core clears — the slow route is legal, Freedom Doctrine).
-
-> **r454:** carried unamended. It owns `anchor($/F4)` and `mixed-anchor` — the #2-demanded,
-> #19-drilled inversion the audit §3.1 named — and it is chapter k2 Build's opening lesson.
+**Alts.** (1) Walk the corridor cell by cell and select block by block with plain Shift+arrows —
+every core beat clears, **☆ forfeited** (the ☆-forfeit control). (2) `Ctrl+Space` / `Shift+Space` for
+beats 4–5 instead of `Ctrl+Shift+arrows`, and `Ctrl+A` for beat 6 — the star route.
 
 ---
 
-### 9.4 `ribbonpass` (k3) — verbatim from `dev/TUTORIAL_CHAPTER_SPEC.md` §3.4
+### 9.2 `repairshop` — **"The Repair Shop"** ★ LEVEL 2 · c1 · *placeholder name*
 
-### 3.4 `ribbonpass` — "The ribbon pass" · name `Ribbon` · label `The ribbon pass` · tab `Ribbon`
+**Game.** A page comes in broken and you fix it, then you move it, then you rebuild the floor it sits
+on. Act 1 is a **hunt**: three typos and two wrong entries are planted, F2 fixes what is nearly right,
+Delete-and-retype fixes what is not — and one of them is an **undo trap**, a cell that looks wrong,
+is right, and costs a pip when you clear it (Ctrl+Z gives the pip back; Ctrl+Y takes it away again if
+you overshoot). Act 2 is a **delivery**: cargo blocks with marked destination bays — cut what moves,
+copy what is needed in two places. Act 3 is **the missing floor**: a schedule with a row and a quarter
+missing, two squatter rows to delete, a detail band to fold away, and one formula that floods the
+rebuilt frame with Ctrl+D / Ctrl+R. **Score:** pips per repair, per delivery, per floor. **Feel:**
+competent, fast, slightly smug — the first time the player fixes something.
 
-*New in v2. Merges v1's `numfmt`, `fonts` and `alignrule` into ONE drill: the ribbon is one idea (Alt
-opens it, the letters walk it), and three 20-second boards teaching one idea is padding.*
+**Board, per act.**
+- **Act 1 — REPAIRS.** A team roster and a small cost block: `Marketng` misspelled, a rate typed into
+  the wrong column, a headcount entered as text, one duplicate row marked `DUPLICATE — delete`, and
+  **one cell the review note flags that is actually correct** (the trap).
+- **Act 2 — THE DOCK.** Three cargo blocks on the left, three marked bays on the right; one block's
+  bay note says *"and leave a copy where it is"*.
+- **Act 3 — THE MISSING FLOOR.** A four-quarter schedule missing its `Q3` column and its `Other`
+  line, two squatter rows below it, a detail band of six rows under the total, and one built formula
+  in the top-left of the empty grid.
 
-**Board:** a small monthly summary page — a title, a header row (not bold), four labeled lines
-(Revenue · Costs · Profit · Margin) × six months, figures raw (`1234567.891`, `0.0834`), a Total line
-with no rule above it, and one assumptions cell whose typed input is black. 20 rows, pre-dressed
-everywhere the beats do not touch.
+**Concepts taught (tags).** `enter/edit(F2)` · `clear/delete` · `undo` · `redo` · `cut` ·
+`fill(D/R)` · `insert/delete row-col` · `schedule` · `hide/unhide/group`
 
-**Lesson card:** *The ribbon pass* — "Alt opens the ribbon and the letters walk it: Alt H is Home, then
-one more letter is the command. Alt H 9 and Alt H 0 step decimals, Alt H F C picks a font color,
-Alt H A L/C/R aligns, Alt H B T rules a total. Ctrl+Shift+5 is percent. Blue means typed."
-keys: `alt h 9 / 0` · `ctrl+shift+1/4/5` · `alt h f c` · `ctrl+b` · `alt h a l/c/r` · `alt h b t`
+**Beats.**
+- Act 1: (1) Fix the misspelled team name · (2) Re-enter the two figures that landed wrong ·
+  (3) Delete the duplicate row · (4) Restore the cell the note was wrong about
+- Act 2: (5) Move each cargo block to its bay · (6) Leave the shared block in both places
+- Act 3: (7) Insert the missing line and the missing quarter · (8) Delete the two squatter rows ·
+  (9) Flood the schedule from the built formula · (10) Fold the detail band away
+- **☆ (visible): deliver every block with one cut** — no copy-then-delete anywhere in act 2.
 
-**Beats:**
-1. Percent-format the Margin line — one decimal
-2. Color the typed assumption blue
-3. Center the month headers over their columns
-4. Add a top border above the Total line
+**Random.** Which name carries the typo (pool) · which two figures land wrong · which cell is the
+trap · bay positions · the missing quarter · values.
 
-☆ (visible): Format the whole figure block from one selection
+**Aha, per act.** A1: "F2 edits in place — you do not retype a cell to change one letter, and
+Ctrl+Z is free." A2: "cut moves, copy duplicates — the clipboard is a verb, not a place." A3: "a
+schedule is a frame; add a row and everything in it arrives already dressed."
 
-**Random:** which line is the raw-percent line (Margin or a seeded Growth line) · header pool (months vs
-quarters) · anchor jitter · values. **Aha:** "alt walks the ribbon — every command on it is three
-letters away, and blue means somebody typed it." **Par:** ~24 s. **Engine:** none — `fmtOps`,
-`fmtOps.dec`, `fmtOps.align` and the border ops all exist. **Alts:** (1) Ctrl+1 dialog for the number
-format and the alignment; (2) beat-by-beat formatting with no block selection (☆ forfeited).
+**Par estimate.** ~105 s. Pass = par × 2.5.
 
-> **r454:** carried unamended, and it introduces **no tag** — the Tour's stage 5 names the whole
-> ribbon vocabulary first, and chapter k2's formula drills need decimals and percent before k3 opens.
-> It stays because it is k3 Format's start gate and the only *timed* ribbon rep; the Tour is untimed
-> by design. See decision **D-7** in §8.
+**Engine.** Reuse: the act controller · `insert/delete row-col` and the outline/group ops (all
+wired) · the fill ops. **New:** the **undo trap** needs a pip that can go dark again — the touch-list
+already re-evaluates end states on every commit, so this is a predicate, not a mechanism. Nothing
+else.
 
----
-
-### 9.5 `signs` — "Signs" · name `Signs` · label `Which way is down` · tab `Signs` — **NEW**
-
-*The audit's single worst lag: `sign-convention` is demanded at catalog #2 and taught at #42, forty
-positions later. This is the twenty-second lesson that closes it. It must stay a convention lesson, not
-a second `signerr` sweep — the §3.1 discriminator kills it otherwise (audit Option B, risk note).*
-
-**Board:** a six-line quarterly cost block off one revenue feed — Revenue (blue, positive), COGS,
-Payroll, Rent, Marketing (typed, and **three of the four arrive positive** — the seed picks which),
-an EBITDA line already built as a plain sum, and a small **CONVENTION** memo to the right that states
-the house rule in words: *costs are entered negative; totals are plain sums; a negative reads in
-parentheses.* 14 rows used.
-
-**Lesson card:** *Which way is down* — "On a banker's page costs are entered **negative**, so every
-total is a plain sum — never a subtraction. A negative shows in parentheses, not with a minus sign.
-Type a minus in front of a cost, or flip a whole block by pasting a −1 over it."
-keys: `-` · `ctrl+1` (number format) · `alt e s` / `alt h v s` (paste special · multiply)
-
-**Beats:**
-1. Flip the three cost lines that were entered positive — the EBITDA total drops to its real number
-2. Set the cost block to show negatives in parentheses
-3. Enter the missing Marketing figure for the last quarter — signed to the house rule
-4. Bold the EBITDA line and add a top border above it
-
-☆ (visible): **Flip all three cost lines in one pass** — one −1 travels over the block
-
-**Random:** which three of the four cost lines arrive positive (4 pools) · the quarter with the missing
-figure · values · the memo's wording pool (two axes minimum, four supplied).
-**Aha:** "costs go in negative, so a total is always just a sum — the sign does the arithmetic for you."
-**Par estimate:** ~18 s. **Engine:** none — paste-multiply is `pastes`' own r427 route, and the
-parentheses format is `numfmt`'s existing negative style. **Alts:** (1) retype each of the three costs
-with a leading minus, one at a time (**☆ forfeited**, cores clear — the ☆-forfeit control);
-(2) `Ctrl+1` custom-format route for beat 2 instead of the ribbon walk.
-
-**Route facts that bind the build** (DEPTH_PASS_CAMPAIGN §1, do not re-derive): grade the **value on the
-board**, never the formula text and never the keypress — a player who retypes `-4200` and a player who
-pastes `-1` over the block must both clear beat 1. Both `currency` and `acct` are dollar formats; this
-drill grades neither (no money beat).
+**Alts.** (1) Retype every broken cell in full instead of F2, and copy-then-delete every cargo block
+— all cores clear, **☆ forfeited** (the control). (2) `Ctrl+9` to hide the detail band instead of
+grouping it — beat 10 clears on the end state (the band is not visible), and the group route is what
+`unhide` (c4) later reps.
 
 ---
 
-### 9.6 `tracepass` — "Trace" · name `Trace` · label `Follow the wire` · tab `Trace` — **NEW**
+### 9.3 `powergrid` — **"The Power Grid"** ★ LEVEL 3 · c1 · *placeholder name*
 
-*Closes `audit(trace)` (two drills, no teacher) and puts the catalog's biggest chord gap on the board:
-`Ctrl+\`` show-formulas is wired at `index.html:28400` and used by **zero** drills (audit §3.2).*
+**Game.** The page is a grid of dark cells and formulas are the current. Act 1 is **power-up**: you
+point a formula at its feeds and the cell lights — but the cost feeds arrive **positive**, and a cell
+fed by a wrong-signed input lights red instead of green until you flip it. Act 2 is **the corridor
+sum**: `Alt+=` runs a total down a whole hall of lit cells in one press. Act 3 is **the lock**: one
+formula, one `F4`, filled down and right, and the entire grid comes up at once — the level's payoff
+image. **Score:** pips = lit cells; a red cell is a pip you have not earned yet. **Feel:** the moment
+the whole board lights is the single best five seconds in the tutorial. Build for that.
 
-**Board:** a small live operating page — a driver panel (blue), a revenue line, two cost lines, EBITDA,
-and a **margin memo two rows below that reads off the wrong row**. One of the six formulas points a row
-high. 12 rows used, everything already dressed. A **REVIEW** card to the right names the deliverable:
-*"which cell feeds the margin memo, and is it the right one?"*
+**Board, per act.**
+- **Act 1 — POWER-UP.** A five-line divisional P&L (Revenue · COGS · Gross profit · Opex · EBITDA) ×
+  Q1–Q4, with Gross profit and EBITDA empty, and **three of the four cost lines entered positive**.
+  A CONVENTION memo states the house rule in words: *costs are entered negative, so a total is
+  always a plain sum.*
+- **Act 2 — THE HALL.** A Total column opens to the right of the P&L, and a Margin line opens
+  beneath it.
+- **Act 3 — THE GRID.** A units-by-product × region grid appears below, with a single bordered
+  **price helper** cell and an empty Revenue grid of the same shape.
 
-**Lesson card:** *Follow the wire* — "Every formula points somewhere. Ctrl+[ jumps to the cell a formula
-reads; Ctrl+] jumps to the cells that read this one. Ctrl+\` flips the whole sheet to show formulas
-instead of numbers, so you can read a page the way it was built. F5 then Special selects a whole class
-at once."
-keys: `ctrl+[` · `ctrl+]` · `` ctrl+` `` · `F5 → special`
+**Concepts taught (tags).** `point-mode` · `sum(Alt=)` · `margin/ratio` · `anchor($/F4)` ·
+`mixed-anchor` · `sign-convention` · `costs-negative`
 
-**Beats:**
-1. Repoint the margin memo at the EBITDA line — it is reading the row above
-2. Enter the name of the driver the revenue line reads, in the REVIEW card's answer cell
-3. Fix the cost line that reads a driver it should not — point it at its own rate
+**Beats.**
+- Act 1: (1) Flip the cost lines that were entered positive · (2) Build Gross profit for Q1 —
+  revenue plus the signed cost line · (3) Light the rest of the Gross profit row · (4) Build EBITDA
+  for every quarter
+- Act 2: (5) Total every line across the year · (6) Build the gross margin — gross profit over
+  revenue, every quarter
+- Act 3: (7) Build the top-left Revenue cell — units against the price helper · (8) Light the whole
+  Revenue grid
+- **☆ (visible): light the grid from one anchored formula** — the lock made with `F4`, not typed.
 
-☆ (visible): **Read the page with formulas showing** — flip the sheet once and answer both cards from it
+**Random.** Which three cost lines arrive positive (4 pools) · the division-name pool · grid size
+(3×3 or 4×3) · helper position (3 spots) · values.
 
-**Random:** which row the memo mis-points at (3 pools) · which cost line carries the crossed wire ·
-driver names (pool) · values.
-**Aha:** "a page you did not build is readable in one keypress — show the formulas and every wire is
-on screen at once."
-**Par estimate:** ~20 s. **Engine:** none new — `Ctrl+[` / `Ctrl+]` are wired, `Ctrl+\`` is wired at
-`:28400`, `F5 → Special` is wired. The ☆ is the **only** place a keypress is read (`S.showFmlN >= 1`),
-and it is a **bonus**, never a core beat — DEPTH_PASS_CAMPAIGN §1 retired `hunt` and re-cut `tieout`
-precisely for grading keypresses in core.
-**Alts:** (1) diagnose by eye and repoint both formulas without ever flipping the sheet (**☆ forfeited**,
-cores clear — the ☆-forfeit control); (2) `Ctrl+]` from the driver panel outward instead of `Ctrl+[`
-inward.
+**Aha, per act.** A1: "costs go in negative, so a total is always just a sum — the sign does the
+arithmetic for you." A2: "a formula points at cells; point with the arrows and Alt+= writes the sum."
+A3: "one `$` pass, twelve cells — the lock is where the speed lives."
+
+**Par estimate.** ~110 s (the longest level). Pass = par × 2.5.
+
+**Engine.** Reuse: the act controller · point-mode · `cycleAnchor()` (`index.html:25897`) already
+sets `S.f4Used`, which is the ☆ predicate · the fill ops. **New:** the **red/green cell state** for
+act 1 — a per-cell render class driven by the existing ok-predicate, not a new grading path.
+
+**Alts.** (1) Type every reference and every `$` by hand, twelve formulas in act 3 — all cores clear,
+**☆ forfeited** (the control). (2) Retype each positive cost with a leading minus instead of pasting
+a −1 over the block — beat 1 grades the **value on the board**, so both clear (DEPTH_PASS_CAMPAIGN §1).
 
 ---
 
-### 9.7 `tapepull` — "Tape Read" · name `Tape Read` · label `Read the tape` · tab `Tape` — **NEW**
+### 9.4 `printshop` — **"The Print Shop"** ★ LEVEL 4 · c1 · *placeholder name*
 
-*The k4 opener, and the last two orphans in one board: `VLOOKUP` (three drills need it, nothing teaches
-it — `lookup` teaches INDEX/MATCH *instead*) and `stat-fn(MEDIAN/AVERAGE)` (lag 13: demanded at `recon`,
-taught at `wacc` thirteen positions later).*
+**Game.** The page is right and looks wrong, and you have two ways to fix every part of it: the chord
+and the ribbon walk. Act 1 is **the exchange** — every figure must wear the right format before it
+counts: comma, dollars, percent, decimals, and negatives in parentheses. Act 2 is **blue ink** —
+typed inputs blue, formulas black, headers bold, and `F5 → Special` finds the typed ones in one pass.
+Act 3 is **the frame** — headers centred, a rule above the total, a box around the block, columns
+autofitted. Threaded through all three is **the menu maze**: every command has an `Alt` walk
+(`Alt H 9`, `Alt H F C`, `Alt H A C`, `Alt H B T`, `Alt H O I`), and the ☆ is clearing one whole act
+by ribbon walk alone. **Score:** pips per formatted region. **Feel:** the page goes from a
+spreadsheet to a document in ninety seconds.
 
-**Board:** a ten-row deal tape — Company · Sector · EV/EBITDA · EBITDA — sorted by nothing in
-particular, with a two-cell **ASK** panel to the right: *"the multiple on <company>"* and *"the median
-multiple on the tape"*. The tape's first column is the label column, so a left-to-right read works.
-16 rows used, pre-dressed.
+**Board, per act.** One monthly summary page, built once and revealed by act: a title, a header row
+(not bold), four labelled lines (Revenue · Costs · Profit · Margin) × six months with figures raw
+(`1234567.891`, `0.0834`, one negative), a Total line with no rule above it, one typed assumption
+cell in black, and two columns too narrow to show their numbers. Act 1 opens the figure block, act 2
+opens the header row and the assumption cell, act 3 opens the frame and the narrow columns.
 
-**Lesson card:** *Read the tape* — "Two ways to get one number out of a list. A lookup finds the row by
-its label and returns a column from it. A median asks the whole column at once — the middle value, not
-the average, because one outlier moves an average and not a median."
-keys: `=vlookup(` · `=index(` / `=match(` · `=median(` · `=average(`
+**Concepts taught (tags).** `comma/currency-fmt` · `decimals` · `percent-fmt` · `parens-negative` ·
+`bold/italic/color` · `blue-inputs` · `align` · `borders(top/outside/bottom)` · `autofit`
 
-**Beats:**
-1. Build the multiple read — the ASK panel's company, off the tape
-2. Build the median multiple for the whole tape
-3. Add the sector median under it — the sector the ASK panel names
-4. Add a top border above the two median lines
+**Beats.**
+- Act 1: (1) Dollar-format the figure block · (2) Step the decimals to the house standard ·
+  (3) Percent-format the Margin line, one decimal · (4) Show the negative in parentheses
+- Act 2: (5) Colour the typed assumption blue · (6) Bold the header row
+- Act 3: (7) Centre the month headers over their columns · (8) Rule the Total line · (9) Box the
+  figure block · (10) Fit the two narrow columns to their contents
+- **☆ (visible): clear a whole act from the ribbon** — one act, start to finish, on `Alt` walks only.
 
-☆ (visible): **Answer both reads from one anchored formula filled down**
+**Random.** Which line carries the raw percent (Margin or a seeded Growth line) · header pool (months
+vs quarters) · which two columns are narrow · anchor jitter · values.
 
-**Random:** which company the panel asks for (10 pools) · which sector (3 pools) · multiples and EBITDA
-values · whether the ASK panel sits right or below.
-**Aha:** "a lookup answers one row; a median answers the column — and the median is what a comps page
-actually quotes."
-**Par estimate:** ~22 s. **Engine:** none — VLOOKUP has been in the engine since r416, MEDIAN and
-AVERAGE since the `wacc` build.
+**Aha, per act.** A1: "a number and its format are two different things — the cell did not change,
+only what it wears." A2: "blue means somebody typed it; black means the sheet worked it out." A3:
+"Alt walks the ribbon — every command on it is three letters away."
+
+**Par estimate.** ~100 s. Pass = par × 2.5.
+
+**Engine.** Reuse: the act controller · `fmtOps`, `fmtOps.dec`, `fmtOps.align`, the border ops and
+autofit (all wired) · `introRibbonPeek`'s content (`index.html:31745`), which becomes act 3's card.
+**New:** a **route counter** for the ☆ — the engine must know an act's beats all landed by ribbon
+walk. `fmtOps` already records the op; it needs the route beside it (one field), and the ☆ reads it.
+This is a bonus predicate only — **never a core beat** (grading a keypress in core is the class that
+retired `hunt`).
+
+**Alts.** (1) Do every beat with `Ctrl+1` and the dialogs — all cores clear, **☆ forfeited** (the
+control). (2) Chords throughout (`Ctrl+Shift+1/4/5`, `Ctrl+B`) — cores clear, ☆ forfeited; note the
+route facts: `Ctrl+1 P` lands one decimal where `Alt H P` lands zero, `Ctrl+1 N` lands zero where
+`Alt H K` lands two, and both `currency` and `acct` clear a dollar beat.
+
+---
+
+### 9.5 `modeltour` — **"Model Tour"** ★ LEVEL 5 / CAPSTONE · c1 — **built, refresh only**
+
+Unchanged as a board. `modeltour` is already Foundations' capstone, already `cap_c1`'s target, and
+already "four subtotals blown to `#REF!` in a live P&L: rebuild the cascade, land both margin rows,
+dress the bottom line". The audit's complaint about it — *"a Formatting exam wearing a Foundations
+badge"* — is answered by construction in v2: L4 The Print Shop teaches the whole format vocabulary
+two boards earlier, so the capstone now **chains** what the chapter taught instead of introducing it.
+That is exactly what checker rule (b) asserts, and it is why `cap_c1` never re-points (r158).
+
+**Refresh, Phase C, one pass:** its `guide` and `aha` reference the levels by name rather than the
+retired Tour; its par (35) is re-swept once the levels land, because a player arriving off four levels
+is a different player from one arriving off `navigation`.
+
+---
+
+### 9.6 `tapepull` — "Tape Read" · name `Tape Read` · label `Read the tape` · tab `Tape` — **ADD (c4 opener)**
+
+*Not a level and not a lesson — an ordinary timed drill that happens to be Data & Lookups' first and
+cheapest board. It exists because the graph forces it: **`VLOOKUP`** has three users and no teacher
+(`lookup` teaches INDEX/MATCH *instead*), and **`stat-fn(MEDIAN/AVERAGE)`** is demanded at `recon`
+and taught thirteen positions later at `wacc`. One 22-second board closes both.*
+
+**Board:** a ten-row deal tape — Company · Sector · EV/EBITDA · EBITDA — with a two-cell **ASK** panel
+to the right: *"the multiple on &lt;company&gt;"* and *"the median multiple on the tape"*. The tape's
+first column is the label column, so a left-to-right read works. 16 rows used, pre-dressed.
+
+**Beats:** (1) Build the multiple read — the ASK panel's company, off the tape · (2) Build the median
+multiple for the whole tape · (3) Add the sector median under it — the sector the ASK panel names ·
+(4) Add a top border above the two median lines.
+**☆ (visible): answer both reads from one anchored formula filled down.**
+
+**Random:** which company the panel asks for (10 pools) · which sector (3 pools) · multiples and
+EBITDA values · whether the ASK panel sits right or below. **Aha:** "a lookup answers one row; a
+median answers the column — and the median is what a comps page actually quotes." **Par estimate:**
+~22 s. **Engine:** none — VLOOKUP since r416, MEDIAN and AVERAGE since the `wacc` build.
 **Alts:** (1) `INDEX`/`MATCH` for beat 1 instead of `VLOOKUP` — **both must clear**, this is the r436
-untriggerable-beat lesson (`lookup` beat 4 demanded `INDEX(`/`MATCH(` out of formula text and locked out
-a correct VLOOKUP); (2) two separately typed medians with no fill (**☆ forfeited**, cores clear — the
-☆-forfeit control).
+untriggerable-beat lesson; (2) two separately typed medians with no fill (**☆ forfeited**, the control).
 
 **Binding constraint:** grade the **value returned**, never the function name. A `VLOOKUP`, an
 `INDEX`/`MATCH`, a typed reference to the right cell and an `XLOOKUP`-shaped `INDEX` must all clear
@@ -658,42 +665,30 @@ beat 1 if the number on the board is right.
 
 ---
 
-### 9.8 `rollfwd` — "Roll Forward" · name `Roll Forward` · label `Open, add, less, close` · tab `Roll` — **NEW**
+### 9.7 `rollfwd` — "Roll Forward" · name `Roll Forward` · label `Open, add, less, close` · tab `Roll` — **ADD (c7 opener)**
 
-*The k6 opener. It names the thing the catalog does everywhere and says nowhere: interest computed off a
-**beginning** balance is the circularity dodge (audit §3.2 — `circularity-avoidance` appears in zero
-player-facing surfaces across 74 drills).*
+*The Models II opener, and the drill that names the thing the catalog does everywhere and says
+nowhere: interest computed off a **beginning** balance is the circularity dodge. At par 26 it also
+gives Models II a rung below `covtable` 36, which is what lets the chapter open on its own lowest par.*
 
 **Board:** one facility, four years, laid out as a corkscrew — **Opening balance · Drawdown ·
 Repayment · Closing balance** — with year 1's opening balance seeded (blue) and everything else empty.
 Below it, an **Interest** line and a one-cell rate (blue). A memo names the house rule: *interest is
 charged on the opening balance.* 13 rows used.
 
-**Lesson card:** *Open, add, less, close* — "A schedule rolls: this year's close is next year's open.
-Build one column — open plus draws less repayments — then fill it across and the whole schedule
-follows. Charge interest on the **opening** balance: a balance that pays interest on itself is a
-circle, and a circle will not calculate."
-keys: `alt+=` · `ctrl+r` · `F4` · `←↑→↓ (point)`
-
-**Beats:**
-1. Build the year-one closing balance — opening plus the draw, less the repayment
-2. Reference year two's opening balance to year one's close
-3. Fill the schedule across the remaining years
-4. Build the interest line — the rate on each year's opening balance
-
-☆ (visible): **Fill the whole schedule from one column** — one pass, three years
+**Beats:** (1) Build the year-one closing balance — opening plus the draw, less the repayment ·
+(2) Reference year two's opening balance to year one's close · (3) Fill the schedule across the
+remaining years · (4) Build the interest line — the rate on each year's opening balance.
+**☆ (visible): fill the whole schedule from one column.**
 
 **Random:** the number of years (4 or 5) · draw and repayment pools · the rate · whether the rate cell
-sits above or beside the schedule.
-**Aha:** "the close is the next open — and interest goes on the open, which is how a model avoids
-calculating in a circle."
-**Par estimate:** ~26 s. **Engine:** none — the corkscrew is `schedule`'s own shape at a quarter of
-its size. **Alts:** (1) build all four closing balances by hand and reference each opening separately
-(**☆ forfeited**, cores clear — the ☆-forfeit control); (2) `Ctrl+R` fill from a selection instead of
-the fill handle route, and a typed `$` instead of `F4` on the rate.
+sits above or beside the schedule. **Aha:** "the close is the next open — and interest goes on the
+open, which is how a model avoids calculating in a circle." **Par estimate:** ~26 s. **Engine:** none
+— the corkscrew is `schedule`'s own shape at a quarter of its size. **Alts:** (1) build all four
+closing balances by hand and reference each opening separately (**☆ forfeited**, the control);
+(2) `Ctrl+R` fill from a selection, and a typed `$` instead of `F4` on the rate.
 
 ---
-
 ## 10 · THE FIVE CAPSTONE PAGES, refreshed to the r452 law
 
 These five are the unbuilt ADDs `dev/DEPTH_PASS.md` §4.32 / §4.44 / §4.56 / §4.67 / §4.88 carry
@@ -720,13 +715,13 @@ has moved on since they were written:
 
 ---
 
-### 10.1 `qclose` — "Close the Quarter" ★ CAPSTONE k2 · L
+### 10.1 `qclose` — "Close the Quarter" ★ CAPSTONE c3 · L
 
 **Status:** built in r429 (H6b-5) and never ported into the live catalog — DEPTH_PASS_CAMPAIGN §0 calls
 it "the deferred qclose port". Phase C ports the existing build and re-labels it to the lines below.
 **Par: 94** — measured, not estimated (median 86 keys, 0 % drift, 1.09 s/key); capstone clock pass 188.
 
-**Concept:** one quarterly P&L page built cold from a feed — chapter k2's five formula shapes in one
+**Concept:** one quarterly P&L page built cold from a feed — chapter c3’s five formula shapes in one
 artifact [Checkpoint-Staged Build + Rebuild the Output Page].
 **Board:** title row; Q1–Q4 + FY headers; a revenue feed row (blue); COGS and opex rows (blue, signed);
 empty subtotal, margin and growth rows; a small segment ledger island for the memo; 16+ rows used.
@@ -742,11 +737,11 @@ empty subtotal, margin and growth rows; a small segment ledger island for the me
 ☆ (hidden): **Enter the tie check** — the fiscal-year gross profit against the four quarters summed
 across. Two independent routes to one number; it reads zero when the page is right.
 
-**Gate:** one clean run opens k3 Format. **Random:** value pools · segment pools · which opex lines
+**Gate:** one clean run opens c4 Data & Lookups. **Random:** value pools · segment pools · which opex lines
 appear (4 of 6) · the margin/growth row order. **Aha:** "a P&L is five formula shapes — point, fill,
 lock, grow, roll up — run in one breath." **Finish:** beat 6. **Clocks:** par 94, pass = par × 2.0.
-**Engine:** none beyond existing fns. **Plumbing:** §6 D-8.
-**Alts:** (1) leave the check cell untouched — all six cores clear and the capstone still opens k3
+**Engine:** none beyond existing fns. **Plumbing:** §6 D-7.
+**Alts:** (1) leave the check cell untouched — all six cores clear and the capstone still opens c4
 (**☆ forfeited** — the control, and the §2.2 proof that a bonus gates nothing); (2) type each segment's
 SUMIF separately instead of one anchored formula filled down — cores clear.
 **Recorded deviation (r429, kept):** the ☆ is the independent-prove-out family's third use in the
@@ -755,9 +750,9 @@ that gates the next chapter, *does it tie?* is the only honest close.
 
 ---
 
-### 10.2 `cleanroom` — "The Data-Room Tape" ★ CAPSTONE k4 · L
+### 10.2 `cleanroom` — "The Data-Room Tape" ★ CAPSTONE c4 · L
 
-**Concept:** chapter k4 chained on one artifact — a dirty data-room export becomes the sendable summary
+**Concept:** chapter c4 chained on one artifact — a dirty data-room export becomes the sendable summary
 [Clean → Aggregate → Present Pipeline].
 **Board:** a 14-row deal tape with a duplicated header and a `--- PAGE 2 ---` break row planted; a
 Status column; a query panel; a summary strip; 18+ rows used.
@@ -773,12 +768,12 @@ Status column; a query panel; a summary strip; 18+ rows used.
 ☆ (hidden): **Fold the detail with the outline rather than hiding the rows one at a time** — one group,
 one fold, and the detail comes back for the next reader.
 
-**Gate:** one clean run opens k5 Audit & Repair. **Random:** junk-row positions · tape values and names ·
+**Gate:** one clean run opens c5 Formulas II. **Random:** junk-row positions · tape values and names ·
 which status the panel asks for. **Aha:** "clean, sort, filter, pull, present — every data room ends in
 the same five moves." **Finish:** beat 6. **Clocks:** par ~90 (estimate — measure at build), pass =
 par × 2.0. **Engine:** `COUNTA` (r419) is useful in ok-predicates; **`SUBTOTAL` is not in the engine**,
 so beat 5 grades a plain `SUM` per the `filterpass` convention — say so in a code comment.
-**Plumbing:** §6 D-8.
+**Plumbing:** §6 D-7.
 **Alts:** (1) hide the detail rows individually instead of grouping (**☆ forfeited**, cores clear — the
 control); (2) `INDEX`/`MATCH` for beat 4 instead of `VLOOKUP`, or the reverse — **both must clear**
 (r436).
@@ -788,7 +783,7 @@ efficiency above; the dress work stays where it belongs, inside beat 6's end sta
 
 ---
 
-### 10.3 `redflags` — "The Red-Flag Pass" ★ CAPSTONE k5 · L
+### 10.3 `redflags` — "The Red-Flag Pass" ★ CAPSTONE c5 · L
 
 **Concept:** the flagship disclosed-error-count drill (§2.3). An inherited one-tab operating model with
 **exactly 7** planted errors spanning the chapter's five families; fixing an upstream error recomputes
@@ -810,13 +805,13 @@ on the rail.
 ☆ (hidden): **Clear all seven without touching anything that was right** — nothing outside the seven
 changes value.
 
-**Gate:** one clean run opens k6 Components. **Random:** every error's row and column · magnitudes ·
+**Gate:** one clean run opens c6 Models I. **Random:** every error's row and column · magnitudes ·
 which cost family carries the sign error. **Aha:** "seven errors is a finite number — a review pass is a
 hunt with a count, not a vibe." **Finish:** beat 6. **Clocks:** par ~90 (estimate), pass = par × 2.0.
 **Engine:** r419 sentinels REQUIRED (live `#REF!` / `#DIV/0!` propagation); the §2.3 meter with
-`errorCount: 7`; `F5 → Special` (taught by `select`, §9.1) is the fast route to beat 5 and is **never
+`errorCount: 7`; `F5 → Special` (taught by level 1, §9.1) is the fast route to beat 5 and is **never
 graded** — grading the keypress is the class that retired `hunt` (DEPTH_PASS_CAMPAIGN §1).
-**Plumbing:** §6 D-8; POOL candidate after calibration.
+**Plumbing:** §6 D-7; POOL candidate after calibration.
 **Alts:** (1) fix the seven in board order, top to bottom, touching two correct cells on the way and
 undoing them (**☆ forfeited**, cores clear — the control); (2) repoint the two typed-over cells by two
 separate entries instead of one fill.
@@ -827,9 +822,9 @@ review cell") was a **stamp**, not an efficiency (§1.0(d)); replaced with the p
 
 ---
 
-### 10.4 `pitchpage` — "The Valuation Page" ★ CAPSTONE k7 · L
+### 10.4 `pitchpage` — "The Valuation Page" ★ CAPSTONE c6 · L
 
-**Concept:** chapter k7's outputs assembled into the one page a VP reads — reference, never retype
+**Concept:** chapter c6’s outputs assembled into the one page a VP reads — reference, never retype
 [Rebuild the Output Page + Narrative Deadline Skin].
 **Board:** left = mini outputs "from the team", all live formulas, pre-built: a WACC cell, a
 present-value total, a comps median multiple, a football floor/ceiling pair. Right = the empty pitch
@@ -846,10 +841,10 @@ page frame. 18 rows used.
 ☆ (hidden): **Build the range line from one selection across every method** — one low and one high over
 the whole block, not four references stitched together.
 
-**Gate:** one clean run opens k8 Credit. **Random:** output values and magnitudes · which side hosts the
+**Gate:** one clean run opens c7 Models II. **Random:** output values and magnitudes · which side hosts the
 outputs · share counts. **Aha:** "a pitch page owns no math — every number on it is a wire into the
 work." **Finish:** beat 6. **Clocks:** par ~88 (estimate), pass = par × 2.0. **Engine:** none new.
-**Plumbing:** §6 D-8.
+**Plumbing:** §6 D-7.
 **Alts:** (1) build the range from four separate references (**☆ forfeited**, cores clear — the
 control); (2) `Ctrl+1` for the dollar format instead of the ribbon walk — and remember **`currency` and
 `acct` both clear beat 5** (DEPTH_PASS_CAMPAIGN §1); the label does not say accounting.
@@ -860,7 +855,7 @@ the board's frame, and the ☆ is now the one-selection range.
 
 ---
 
-### 10.5 `shipit` — "Ship the Model" ★ CAPSTONE k9 · L
+### 10.5 `shipit` — "Ship the Model" ★ CAPSTONE c8 · L
 
 **Concept:** the catalog's endgame — a mini model built cold under the clock, and **it only counts if it
 balances** [Timed Micro-Build with a Floor + Print-Ready Last Mile + Interview-Test Simulation].
@@ -885,7 +880,7 @@ formula that produced them.
 **Random:** driver pools · line-item pools · magnitudes · corner jitter. **Aha:** "speed only counts
 when the check row reads zero — balance is the floor, not the bonus." **Finish:** beat 6.
 **Clocks:** par ~110 (estimate; expect the second-longest in the catalog behind `cascade`), pass =
-par × 2.0. **Engine:** none new. **Plumbing:** §6 D-8; POOL candidate.
+par × 2.0. **Engine:** none new. **Plumbing:** §6 D-7; POOL candidate.
 **Alts:** (1) build each plan year by hand with no fill (**☆ forfeited**, cores clear — the control);
 (2) `Alt E S V` for beat 5 instead of `Alt H V V` — both are paste-values and both must clear.
 **Wolf playtest, still open (DEPTH_PASS §4.88):** the par band, the balance-floor frustration curve,
@@ -897,8 +892,8 @@ and whether beat 5's deck hand-off belongs in core at all get set live with Wolf
 
 | phase | reads |
 |---|---|
-| **B — the clean-slate entry** | nothing structural: B deletes the modal tour and makes the Keyboard Tour the only first-run path. It only needs §1's fact that the Tour is k1's opening entry and hands off to k1's first lesson (`select`), not to `navigation`. |
-| **C — the lesson wave + re-cut** | everything. Wave 1 = §9's eight lesson pages. Wave 2 = §10's five capstones. Assembly = §6's delta table, in order, with `dev/check-curriculum-map.js` green at every step and `dev/migrate-certificates.sql` in the same PR (§4). |
+| **B — the clean-slate entry** | §6 D-3 and §9.0–§9.1. B no longer "makes the Keyboard Tour the only first-run path" — it deletes the modal tour **and** retires the Tour, and points `obStart` / `showComfort`'s "basically none" branch at `corridor`. The Tour's runtime (HUD, act cards, tier reveals) is not deleted; it is re-scoped by the act controller. |
+| **C — the level wave + the moves** | everything. Wave 1 = §9.0's act controller, then §9.1–§9.4's four levels. Wave 2 = §9.6–§9.7's two openers. Wave 3 = §10's five capstones. Assembly = §6's delta table, in order, with `dev/check-curriculum-map.js` green at every step and `dev/migrate-certificates.sql` in the same PR (§4). |
 | **D — progression ties** | §3 (the capstone spine and `unlock_level` replace `HOTKEY_GATES`) and §5 (the "next up" selector). |
 | **E — the launch homepage** | §1's table and §3's curve — the ladder band reads free / PRO / "unlocks at level N" per chapter **from the live config**, never hand-typed (the landing has zero hand-typed numbers). |
 
