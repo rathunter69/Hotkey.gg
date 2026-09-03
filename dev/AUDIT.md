@@ -1,5 +1,101 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r452 — CATALOG COPY DRIFT: the 18 forbidden name/label duplicates, the `filldr` desc that sold a 2-beat drill, chapter-name alignment
+_Source: the read-only curriculum audit (`audit-catalog.md` §5), items 5.1 · 5.2 · 5.3 · 5.4 · 5.5.
+Copy and metadata only — no key, par, check, target, guide, demo or group placement moved. Those
+are Wolf's calls, and §5.6/§5.7 (the `drill` regroup and the five undesignated capstones) are
+deliberately NOT touched here._
+
+### 1 · THE 18 DUPLICATES — and why they rotted for two years (§5.1)
+
+`drills.js`'s header (lines 8–10) has always said the trainer overrides `CHALLENGES[k].name` and
+`.label` from `meta` at runtime, "so don't keep stale duplicates in CHALLENGES." `syncDrillMeta()`
+(index.html) does exactly that on every load, so **every one of these strings was already dead —
+nothing a player ever saw came from them.** That is precisely why they rotted: a dev reading
+`index.html` saw one identity and the product shipped another, and no surface disagreed loudly
+enough to notice. All 74 blocks carried the pair; **18 had drifted from the shipped string.**
+
+Two were semantic, not abbreviations — `ruleaudit` read label `Audit the rulings` against the
+shipped `The ruling pass`, `balcheck` read `Hunt the balance break` against `Make it tie — hunt the
+break`. Thirteen more carried the drill's **tab** string in its **name** slot (`Paste Sp.` for
+`Paste Special`, `S&U` for `Sources & Uses`, `2-way` for `Two-way Lookup`, `Acc/Dil`, `Ret. Bridge`,
+`Liq. Bridge`, `Cov. Table`, `Debt Sched.`, `NWC Sched.`, `Txn Comps`, `Years` for `Series`,
+`Block Sel.`, `% of rev`). Three (`audit`, `triage`, `fxconvert`) differed only in `—` vs `—`
+escaping — harmless at runtime, still a second copy of a string with one owner.
+
+**Fix: all 74 pairs deleted** (not just the 18 — the rule is zero duplicates, and the invariant
+below asserts zero). Every runtime read of `.name`/`.label` — the tab strip, the results card,
+the marathon splits, the picker tooltips, `dev/build-drill-pages.js` — runs after `syncDrillMeta`
+and was already reading meta, so the SEO pages regenerate byte-identical on those fields.
+
+### 2 · THE INVARIANTS (WORKFLOW §3.3: no invariant, and the bug returns)
+
+- **C14** — source regex over the `CHALLENGES` block: no drill-level `name:` / `label:` key.
+  A *runtime* assertion cannot see this class at all, because post-sync the properties legitimately
+  exist and hold the right value; only the file's text distinguishes a duplicate from the synced
+  one. Proof of failure: re-adding `name:'Ruling Pass', label:'Audit the rulings',` to
+  `index.html:3047` →
+  `FAIL C14: index.html:3047 CHALLENGES.ruleaudit carries an inline \`name:\``. Restored, clean.
+- **C15** — every `HOTKEY_CAMPAIGN.chapters[i].name` is a `groups[].name`. Proof of failure:
+  restoring `name:'Models I · Valuation'` → `FAIL C15: … chapter c6 name 'Models I · Valuation' is
+  not a groups[] name`. Restored, clean.
+
+### 3 · THE STALE COUNT (§5.2)
+
+`drills.js:35` said "Catalog is 82 grouped drills (Formulas I & II carry 11 each)". It is 74, with
+**9** in Formulas I and **10** in Formulas II — the comment was wrong in three numbers at once while
+its own next line correctly named `menuOrder.length` as the source of truth. Rather than restate a
+count that will drift again, the comment now **points at the `groups[]` block directly below it**
+and records the wrong figures once, as the reason the sentence stopped carrying a number.
+
+### 4 · `filldr` — the desc that sold a two-beat drill (§5.3)
+
+`desc:'Fill down and fill right — one formula, whole block'` described the pre-r427 board. The
+shipped board is a quarterly operating build — **7 beats at par 44**, the third hardest of the
+first sixteen drills, and the drill a new player meets **second**. §2.2 of the audit measures the
+step from `navigation` (par 20) to `filldr` at **×2.20**, the catalog's sharpest, and this desc is
+the one line that let a player walk into it expecting a fill exercise. Now:
+
+> A quarterly operating build off the revenue feed — three cost lines across the year, EBITDA,
+> Fiscal Year totals, and a ratio block down to EBITDA margin. One anchored formula fills most of it
+
+Picker outcome voice, no chords (C5 clean), 191 chars. `dev/build-drill-pages.js:367` cuts the
+generated meta description at **158**, so the first sentence is deliberately 153 — it survives the
+cut whole, and the truncation lands in the trailing clause, which is the house pattern (`navigation`
+and `editfix` cut the same way). Drill pages regenerated and committed.
+
+### 5 · `dcfsens` never named its own subject (§5.4)
+
+The words *sensitivity*, *two-way* and *data table* appeared **nowhere** in the drill's prompt, req,
+guide or check labels — only in the picker desc a player has already clicked past. A player could
+solve it and not know they had built a sensitivity table. One sentence into the PROMPT, in the
+scenario-imperative register the rest of it uses:
+
+> Run it as a two-way sensitivity — one number will not survive that room.
+
+and `two-way` into the one beat label that can carry it without a chord:
+`Build the rest of the two-way grid — every growth rate at every WACC`. **No check predicate,
+target, guide line or demo step moved** — the tri-length contract (C9) is untouched at 6, and the
+label edit changes display text only, never `ok:`.
+
+### 6 · TWO NAMES FOR ONE CHAPTER (§5.5)
+
+`groups[]` said `Models I` / `Models II`; `HOTKEY_CAMPAIGN.chapters` said `Models I · Valuation` /
+`Models II · Credit`. The picker folder showed one, the campaign rail the other. The rail is the
+**only** surface that renders the full string (`index.html`, the `chRow` heading) — two other call
+sites already stripped the suffix with `.replace(/\s*·.*$/,'')`, which is the tell that it was
+never wanted structurally. So `name` becomes the group name and the suffix moves to a new `sub`
+field the rail appends: the rail still reads "Models I · Valuation", and the two strings can no
+longer disagree, because C15 fails the build if they do.
+
+### 7 · SUITES
+
+`check-invariants` clean (C14 + C15 new) · `check-cache-versions` clean, `drills.js` v300 → **v301**
+across all 28 HTML pages including the regenerated drill pages · `e2e-smoke` on **8808** — 7 pages
+clean, drill-count 74, de-hint clean · `e2e-demo-replay REPS=1 filldr dcfsens ruleaudit balcheck` —
+4/4 WIN · `e2e-depth-contract filldr dcfsens` — 2/2 PASS (density 14/17 and 17/20, 30/30 distinct
+builds each) · `build-drill-pages` re-run twice, byte-stable the second time (the gate's drift diff).
+
 ## r440 H6b-12 — balcheck + tieout + balance: Formulas II CLOSES 10/10 (DEPTH_PASS §4.48 + §4.51 + §4.55 + §2.3)
 _The chapter's last three boards. All three carried a FORMATTING ☆ on their §4 page, all three
 had those ☆s re-cut under §1.0(d); one of them (`tieout`) came within a diagnostic of retirement

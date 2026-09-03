@@ -32,8 +32,11 @@ window.HOTKEY_DRILLS = {
   // Formulas II / Models I / Models II / Full Builds (PRO).
   // r249 — the 6 folded legacy drills (saves, ribbon, polish, format, blue, transpose) were
   // deleted outright, their value covered by survivors (housestyle, decimals,
-  // the Alt-H drills, pastes). Catalog is 82 grouped drills (Formulas I & II carry 11 each);
-  // menuOrder.length is the source of truth — do not hardcode the total elsewhere.
+  // the Alt-H drills, pastes). r452: the catalog total and every chapter's size are whatever the
+  // groups[] block below adds up to — read them off it, and off menuOrder.length, which is the
+  // source of truth. Do not restate a count in this comment (the one that stood here said 82
+  // grouped drills with 11 each in Formulas I & II; it was 74, with 9 and 10) or hardcode the
+  // total anywhere else.
   groups: [
     { name: 'Foundations',    keys: ['navigation', 'filldr', 'pastes', 'blocksel', 'rowops', 'editfix', 'modeltour'] },   /* r367: modeltour moved from #2 to capstone — it demands cascades + formatting no fresh player has yet · r424 (D17): colops RETIRED — rowops absorbed it (row AND column structure ops, one drill); the freed slot stays open for a future add */
     { name: 'Formatting',     keys: ['typeset', 'decimals', 'center', 'autofit', 'ruleoff', 'ruleaudit', 'combo', 'housestyle', 'gauntlet'] },
@@ -59,7 +62,7 @@ window.HOTKEY_DRILLS = {
     navigation: { name:'Navigate', label:'Navigation maze',     tab:'Nav',         desc:'One long switchback corridor through solid walls — every straightaway is a single shot, every corner one turn. Collect the pips, copy the model data, bring it home to A1, save, and finish at the far corner of the active area — the wall past the model breaks open if you would rather walk there than fly' },   /* r427 (§4.1 round 3): windier serpentine + the carved exit */
     autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'A print page nobody can read — fit the labels to their content, hold the quarter block to one width, and find out what your own totals do to a narrow column' },   /* r432 (§4.14): reworked to the single print-page board */
     rowops:     { name:'Structure', label:'Rebuild the schedule',   tab:'Structure',desc:'Full structural surgery \u2014 insert the missing line and the missing quarter, delete the squatters, and watch every new row and column arrive already dressed' },   /* r424 (D17): absorbed colops \u2014 rows AND columns in one drill */
-    filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'Fill down and fill right — one formula, whole block' },
+    filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'A quarterly operating build off the revenue feed — three cost lines across the year, EBITDA, Fiscal Year totals, and a ratio block down to EBITDA margin. One anchored formula fills most of it' },   /* r452 (audit §5.3): the old desc ("Fill down and fill right — one formula, whole block") sold a 2-beat exercise; the r427 board is 7 beats at par 44. First sentence stays inside the 158-char meta-description cut in dev/build-drill-pages.js */
     blocksel:   { name:'Block Select',label:'Assemble and format the summary',tab:'Block', desc:'COPY what stays, CUT what moves — the feeds run in segment order; dress the table as you go and box it whole' },   /* r424 §4.4 round 2: margin note + money formats out; whole-table close in */
     editfix:    { name:'Repair',   label:'Repair the schedule',    tab:'Repair',   desc:'A review came back on the schedule — a misspelled team, an FY formula pointing at the wrong row, a Total that never grew. Repair all three, then do what the sweep note says and watch it cost you' },   /* r431: absorbed undo — the repair pass and its safety net are one drill */
     pastes:     { name:'Paste Special',label:'Paste Special everything',tab:'Paste Sp.',desc:'The full paste-special toolkit — transpose, divide, multiply, formats, values' },
@@ -245,8 +248,11 @@ window.HOTKEY_CAMPAIGN = {
     { id:'c3', name:'Formulas I',             badge:'\u2797',        xp:250, keys:['margin','bridge','anchor','sumif'] },
     { id:'c4', name:'Data & Lookups',         badge:'\ud83d\udd0e', xp:300, keys:['sort','recon','lookup','lookup2'] },
     { id:'c5', name:'Formulas II',            badge:'\ud83e\uddee', xp:450, keys:['audit','balance','triage','versionup'] },
-    { id:'c6', name:'Models I \u00b7 Valuation',    badge:'\ud83c\udfe6', xp:600, keys:['wacc','fcfbuild','dcf','comps'] },
-    { id:'c7', name:'Models II \u00b7 Credit',      badge:'\ud83d\udcc9', xp:750, keys:['lbo','revolver','intsched','debtsched'], capstone:'cascade' },   /* r447 (D9): the Models II capstone designates with its depth-pass build */
+    /* r452 (audit \u00a75.5): a chapter's `name` IS its groups[] name \u2014 one string for the picker folder
+       and the campaign rail, asserted by dev/check-invariants.js C15. The editorial suffix these two
+       carried ("Models I \u00b7 Valuation") moved to `sub`, which the rail appends; nothing else reads it. */
+    { id:'c6', name:'Models I',               sub:'Valuation', badge:'\ud83c\udfe6', xp:600, keys:['wacc','fcfbuild','dcf','comps'] },
+    { id:'c7', name:'Models II',              sub:'Credit',    badge:'\ud83d\udcc9', xp:750, keys:['lbo','revolver','intsched','debtsched'], capstone:'cascade' },   /* r447 (D9): the Models II capstone designates with its depth-pass build */
     { id:'c8', name:'Full Builds',            badge:'\ud83c\udfd7', xp:1000, keys:['threestmt','dcfbuild','lbobuild','opmodel'] },
   ],
   finisher: { badge:'\u2b50', name:'Catalog complete', xp:600 },
