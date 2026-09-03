@@ -45,7 +45,7 @@ C1 legal placeholders, C4 Mac KeyTips, then the lesson-drill wave B1–B3.
 **Branch state:** everything is on `claude/drill-redesign-art-style-jg9vhm`; `gate.yml` runs only on
 PRs and pushes to main, so CI has NOT run on the branch — but the FULL 24-step local gate (every
 suite gate.yml runs plus the r452 guards) ran green on the merged tip at the close of r452
-(`.gate-r452.log`; the one red step was a resurrected orphan page, deleted). Merge to main = launch (the curtain is gone). Cache versions on the branch:
+(`.gate-r452.log`; the one red step was a resurrected orphan page, deleted). **LAUNCHED 2026-09-03 21:44 UTC: PR #247 squash-merged (854cf00); www.hotkey.gg serves the new build via Cloudflare; the two r452 migrations were applied through the Supabase connector because the deploy workflow's SUPABASE_ACCESS_TOKEN secret is stale ("Unauthorized" at `supabase link`) — the MCP recorded them as 20260903214612/…615, so the next successful `db push` will re-run the repo's 20260903000000/…100 files, which are idempotent. Wolf: refresh the repo secret.** The live DB was also cleaned the same hour: 50 seed players + 2 seed desks, 21 smoke/test accounts, and Wolf's own playtest history (backup in the session scratchpad only). Cache versions on the branch:
 themes.js 313 · nav.css 312 · drills.js 304 · nav.js 305 · lb.js 43.
 
 ## 1 · What the product is
