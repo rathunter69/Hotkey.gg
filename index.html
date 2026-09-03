@@ -2223,7 +2223,7 @@
 
 
 <link rel="stylesheet" href="nav.css?v=312">
-<script src="themes.js?v=312"></script>
+<script src="themes.js?v=313"></script>
 
 </head>
 <body>
@@ -27367,6 +27367,7 @@ function copySel(isCut){
 function visStep(r,dr){ let nr=r+dr; while(nr>=1&&nr<=S.ROWS&&rowHidden(nr)) nr+=dr;
   return (nr<1||nr>S.ROWS)? r : nr; }
 function move(dr,dc,shift,ctrl){
+  if(S) S.tabHome=null;   /* r452: any move drops the Tab-run latch — the Tab handlers re-arm it after their own step */
   // r402 (Wolf): MAZE navigation — walls block, pips collect. Ctrl+arrow shoots along the corridor
   // to the next wall; a plain arrow steps one cell (or no-op into a wall).
   // r423 (Wolf round-2 §5): WALL INTEGRITY — shift chords used to fall through to the normal
@@ -27722,6 +27723,15 @@ function selectCol(){
   render();
   checkWin();   // r207: mirror selectRow — selection is a legitimate final action
 }
+/* r452 (audit P1-9): ONE current-region selection, shared by Excel's two chords for it —
+   Ctrl+Shift+Space and Ctrl+Shift+8 / Ctrl+* (the second pair was missing entirely). */
+function selectRegion(){
+  if(!S) return;
+  S.selA={r:S.active.r,c:S.active.c};
+  const rg=regionAround(S.active.r,S.active.c);
+  if(!rg) return;
+  S.sel={r:rg.r1,c:rg.c1}; S.active={r:rg.r2,c:rg.c2};
+}
 // ============================================================
 // ROW / COLUMN INSERT + DELETE
 // Shifts all cells whose row (or column) index falls at/after `at` by `delta` positions.
@@ -27921,7 +27931,15 @@ const MAC_CODE_PUNCT={Equal:'=',Minus:'-',Comma:',',Period:'.',Slash:'/',Backsla
   Semicolon:';',Quote:"'",BracketLeft:'[',BracketRight:']',Backquote:'`'};
 function hkMacAdapt(ev){
   if(!HK_MAC) return null;
-  let key=ev.key, ctrl=!!ev.ctrlKey||!!ev.metaKey, alt=!!ev.altKey;
+  /* r452 (audit P0-1/P0-2): ⌃ and ⌘ are no longer collapsed BEFORE the Mac-native chords are
+     read. The merge (one `ctrl` bit for both) is still what the downstream handlers get — that
+     is the "⌘ plays Ctrl, and Windows habits keep working" superset — but the RAW identity is
+     kept here long enough to express the chords whose meaning depends on WHICH one is held:
+       ⌃⌘V → Paste Special (presented downstream as Ctrl+Alt+V, the same dialog branch)
+       ⌘⇧T → AutoSum        (presented downstream as Alt+=, the same autoSum() branch)
+       ⌘T  → F4 anchor cycle · ⌃U → F2 edit   (shift-free, or ⌘⇧T/⌃⇧U would steal them) */
+  const rawCtrl=!!ev.ctrlKey, rawMeta=!!ev.metaKey, sh=!!ev.shiftKey;
+  let key=ev.key, ctrl=rawCtrl||rawMeta, alt=!!ev.altKey, shift=sh;
   // ⌥-generated dead characters: recover the intended key from the physical code
   if(ev.altKey && ev.code){
     let m=/^Key([A-Z])$/.exec(ev.code);
@@ -27929,16 +27947,20 @@ function hkMacAdapt(ev){
     else{ m=/^Digit([0-9])$/.exec(ev.code); if(m) key=m[1];
       else if(MAC_CODE_PUNCT[ev.code]) key=MAC_CODE_PUNCT[ev.code]; }
   }
-  // Mac-native muscle memory: ⌘T cycles anchors (F4) · ⌃U edits the cell (F2)
-  if(ev.metaKey && !ev.altKey && !ev.ctrlKey && String(key).toLowerCase()==='t'){ key='F4'; ctrl=false; }
-  else if(ev.ctrlKey && !ev.metaKey && !ev.altKey && String(key).toLowerCase()==='u'){ key='F2'; ctrl=false; }
+  const lk=String(key).toLowerCase();
+  if(rawCtrl && rawMeta && !ev.altKey && lk==='v'){ key='v'; alt=true; ctrl=true; }   // ⌃⌘V = Mac Excel's Paste Special
+  else if(rawMeta && !rawCtrl && !ev.altKey && lk==='t'){
+    if(sh){ key='='; alt=true; ctrl=false; shift=false; }                             // ⌘⇧T = Mac Excel's AutoSum (no Alt+= on Mac)
+    else { key='F4'; ctrl=false; }                                                    // ⌘T = anchor cycle (fn+F4 is the browser-safe cap)
+  }
+  else if(rawCtrl && !rawMeta && !ev.altKey && !sh && lk==='u'){ key='F2'; ctrl=false; }
   return {
-    key:key, code:ev.code, ctrlKey:ctrl, altKey:alt, shiftKey:!!ev.shiftKey, metaKey:false,
+    key:key, code:ev.code, ctrlKey:ctrl, altKey:alt, shiftKey:shift, metaKey:false,
     repeat:!!ev.repeat, isComposing:!!ev.isComposing, location:ev.location, type:ev.type,
     target:ev.target, isTrusted:ev.isTrusted, timeStamp:ev.timeStamp,
     getModifierState:function(mod){
       if(mod==='Control') return ctrl; if(mod==='Alt') return alt;
-      if(mod==='Shift') return !!ev.shiftKey; if(mod==='Meta') return false;
+      if(mod==='Shift') return shift; if(mod==='Meta') return false;
       try{ return ev.getModifierState(mod); }catch(e){ return false; } },
     preventDefault:function(){ ev.preventDefault(); },
     stopPropagation:function(){ ev.stopPropagation(); },
@@ -27953,9 +27975,39 @@ setTimeout(function(){ try{
        (or clicks the mac-keys button); first visits stay uninterrupted. */
   }
 }catch(e){} }, 0);
+/* r452 (audit P1-2): TAB-ENTER HOME. In Excel a Tab run remembers where it started: type
+   across B4 → C4 → D4 with Tab and the next Enter lands on B5, not D5 — the single most-felt
+   missing behaviour for anyone typing a row of assumptions. S.tabHome latches the cell the run
+   began on (first plain Tab only); ANY non-Tab move clears it (move() drops it unconditionally
+   and the Tab handlers re-arm it after the step), so a stale latch can never yank the cursor.
+   hkTabArm(prev, back, was): prev = the cell the Tab stepped OFF, was = the latch as it stood
+   before that step. The latch remembers where the run STARTED (r,c) and where it currently
+   SITS (ar,ac) — a latch whose ar/ac no longer match the cursor is stale (a jump, a click, a
+   demo seek) and is dropped rather than yanking the cursor somewhere nobody tabbed from. */
+function hkTabArm(prev, back, was){
+  if(!S || !prev) return;
+  const cont = was && was.ar===prev.r && was.ac===prev.c;
+  const home = cont ? {r:was.r, c:was.c} : (back ? null : {r:prev.r, c:prev.c});
+  S.tabHome = home ? {r:home.r, c:home.c, ar:S.active.r, ac:S.active.c} : null;
+}
+function hkTabEnterHome(){
+  if(!S || !S.tabHome) return false;
+  const t=S.tabHome; S.tabHome=null;
+  if(S.active.r!==t.ar || S.active.c!==t.ac) return false;   // stale latch — the cursor left by other means
+  let nr=Math.min(S.ROWS,Math.max(1,t.r+1)), nc=Math.min(COLS,Math.max(1,t.c));
+  const cl=railClamp(nr,nc); if(cl){ nr=cl.r; nc=cl.c; }   // r350: the guided rails hold here too
+  S.active={r:nr,c:nc}; S.sel=null; S.selA=null;
+  return true;
+}
 document.addEventListener('keydown',hkRawE=>{
   const e=hkMacAdapt(hkRawE)||hkRawE;
   const k=e.key;
+  /* r452 (bug sweep P1-2): ESC CLOSES THE SIGN-IN MODAL — and it must be claimed HERE, above
+     everything. The text-field bail one line down returns before the authOpen branch (~27100)
+     can ever run, and the modal focuses its own email/handle field on open, so Esc landed in
+     the input and died there — while the ? sheet promises "Esc — close menus & modals" and the
+     modal has no other keyboard exit. Escape is the one key a focused field does not need. */
+  if(authOpen && k==='Escape'){ e.preventDefault(); closeAuth(); return; }
   // let text fields (auth email/handle) receive their own keystrokes
   if(e.target && (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')) return;
   /* r429: paused (alt-tab) — the first key back is the RESUME, swallowed so it never lands
@@ -28027,7 +28079,7 @@ document.addEventListener('keydown',hkRawE=>{
      preventDefault and never returns, so every key still reaches the live sheet. The player can
      do anything they like on the Keyboard Tour; the HUD just gets more explicit. */
   if(tourMode){ try{ hkTourKeyWatch(e); }catch(_){} }
-  // while the sign-in modal is open, the trainer ignores keys (esc closes it)
+  // while the sign-in modal is open, the trainer ignores keys (its Esc is claimed at the top — r452)
   if(authOpen){ if(k==='Escape'){ e.preventDefault(); closeAuth(); } return; }
 
   // session summary (marathon end): enter = run again, esc = back to drills
@@ -28203,8 +28255,14 @@ document.addEventListener('keydown',hkRawE=>{
     }
     if(k==='Enter'){
       if((e.ctrlKey||e.metaKey) && S.sel){ logKey('Ctrl+\u21b5'); commitEditAll(); return; }   /* r308 (Wolf): Ctrl+Enter fills the whole selection with the edit — refs translate per cell */
+      /* r452: the Enter that closes a Tab run commits IN PLACE, then returns to the run's home column */
+      if(!e.shiftKey && S && S.tabHome && S.tabHome.ar===S.active.r && S.tabHome.ac===S.active.c){
+        const __th=S.tabHome; commitEdit(0,0);
+        if(!editing){ S.tabHome=__th; hkTabEnterHome(); render(); commitAction(); }
+        return; }
       commitEdit(e.shiftKey?-1:1,0); return; }   // Shift+Enter commits and moves UP (Excel parity)
-    if(k==='Tab'){ commitEdit(0,e.shiftKey?-1:1); return; }      // Shift+Tab commits and moves LEFT
+    if(k==='Tab'){ const __tp = S ? {r:S.active.r,c:S.active.c} : null, __tl = S ? S.tabHome : null;
+      commitEdit(0,e.shiftKey?-1:1); hkTabArm(__tp,e.shiftKey,__tl); return; }      // Shift+Tab commits and moves LEFT
     if(k==='Escape'){ cancelEdit(); return; }
     if(k==='Delete'){
       // Delete in edit mode = cancel the in-progress edit AND clear the underlying cell's contents.
@@ -28262,6 +28320,7 @@ document.addEventListener('keydown',hkRawE=>{
         return;
       }
       // (3) Otherwise — a plain value: the arrow commits the edit and moves (Excel).
+      if(S) S.tabHome=null;   // r452: an arrow commit is a non-Tab move — the Tab-run latch dies with it
       commitEdit(dr, dc);
       return;
     }
@@ -28280,7 +28339,12 @@ document.addEventListener('keydown',hkRawE=>{
     if((k==='=' || k==='+') && !e.ctrlKey && !e.altKey && !e.metaKey){
       e.preventDefault(); startEdit(k==='+' ? '=+' : '='); logKey(k==='+' ? '+' : '='); render(); return;
     }
-    if(k==='F2'){ e.preventDefault(); startClock(); logKey('F2');
+    /* r452 (audit P1-5): SHIFT+F2 IS NOT F2. In Excel it inserts a cell comment; here it used
+       to fall into this branch and open the editor — a Windows habit that silently typed over
+       the cell. Comments aren't in the trainer, so the honest answer is a no-op + one toast. */
+    if(k==='F2' && e.shiftKey && !e.ctrlKey && !e.altKey){ e.preventDefault();
+      showToast('Shift+F2 inserts a cell comment in Excel — not in the trainer yet'); return; }
+    if(k==='F2' && !e.shiftKey){ e.preventDefault(); startClock(); logKey('F2');
       editRetarget();   /* r308: F2 on a selection edits the anchor cell */
       const c=get(S.active.r,S.active.c);
       startEdit(c.formula||(c.value!=null&&c.value!==''?String(c.value):''), 'edit');   // Edit mode: arrows move the caret, not the cell
@@ -28439,9 +28503,7 @@ document.addEventListener('keydown',hkRawE=>{
   if(k===' '){
     if((e.ctrlKey||e.metaKey) && e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+Space');
       /* r308 (Wolf): select the CURRENT REGION (the table under the cursor) — Excel's Ctrl+Shift+Space */
-      S.selA={r:S.active.r,c:S.active.c};
-      const rg=regionAround(S.active.r,S.active.c);
-      S.sel={r:rg.r1,c:rg.c1}; S.active={r:rg.r2,c:rg.c2};
+      selectRegion();
       render(); commitAction(); return; }
     /* r427 (§1.0-R2(i), rowops ☆): SPACE-CHORD latch — the selection half of the structure
        family (Shift+Space whole row · Ctrl+Space whole column). Bonus telemetry only. */
@@ -28524,10 +28586,12 @@ document.addEventListener('keydown',hkRawE=>{
   // Enter/Tab move the cursor even when not editing — Excel parity. Shift reverses direction.
   if(k==='Enter' && !e.ctrlKey && !e.altKey && !e.metaKey){
     e.preventDefault(); startClock(); logKey(e.shiftKey?'Shift+↵':'↵');
+    if(!e.shiftKey && hkTabEnterHome()){ render(); commitAction(); return; }   // r452: home column, one row down
     move(e.shiftKey?-1:1, 0, false, false); return; }
   if(k==='Tab' && !e.ctrlKey && !e.altKey && !e.metaKey){
     e.preventDefault(); startClock(); logKey(e.shiftKey?'Shift+Tab':'Tab');
-    move(0, e.shiftKey?-1:1, false, false); return; }
+    const __tp = S ? {r:S.active.r,c:S.active.c} : null, __tl = S ? S.tabHome : null;
+    move(0, e.shiftKey?-1:1, false, false); hkTabArm(__tp,e.shiftKey,__tl); return; }
   // Delete clears the WHOLE selection's contents (Excel parity — not just the active cell)
   if(k==='Delete' && !e.ctrlKey && !e.altKey && !e.metaKey){
     e.preventDefault(); startClock(); logKey('Delete'); pushUndo();
@@ -28604,6 +28668,19 @@ document.addEventListener('keydown',hkRawE=>{
     if(e.altKey && lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+Alt+V');
       mode='ribbon'; path=['E','S']; dialog='paste'; pasteKind='all'; pasteOp='none'; ribbonNote=''; drawRibbon(); return; }
     if(e.altKey){ e.preventDefault(); return; }
+    /* r452 (audit P1-9): Ctrl+Shift+8 / Ctrl+* — Excel's OTHER current-region chord, the one
+       that lives on a laptop's number row. Same regionAround path as Ctrl+Shift+Space. */
+    if((k==='*' || (k==='8' && e.shiftKey)) && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+Shift+8');
+      selectRegion(); render(); commitAction(); return; }
+    /* r452 (audit P1-8): Ctrl+; stamps TODAY as a VALUE (Excel's hardcode-the-date gesture —
+       =TODAY() re-computes, Ctrl+; does not). Stored as the Excel serial with the engine's date
+       format, so it renders through fmtNum's date branch (Mmm-yy). Ctrl+Shift+; (time) stays
+       out: the engine has no time format to render it with. */
+    if(k===';' && !e.shiftKey && !e.altKey){ e.preventDefault(); startClock(); logKey('Ctrl+;'); pushUndo();
+      const __d=ensure(S.active.r,S.active.c);
+      __d.formula=null; __d.txt=false; __d.value=Math.floor((Date.now()-Date.UTC(1899,11,30))/86400000);
+      __d.fmtStyle='date'; __d.decimals=0;
+      commitAction(); return; }
     if(lk==='a'){ e.preventDefault(); startClock(); logKey('Ctrl+A');
       S.selA={r:S.active.r,c:S.active.c};   /* r308: Excel keeps the active cell where it was */
       /* r407 (Wolf audit F4): first Ctrl+A selects the CURRENT REGION (the contiguous block
@@ -28618,8 +28695,12 @@ document.addEventListener('keydown',hkRawE=>{
       render(); commitAction(); return; }
     if(lk==='c'){ e.preventDefault(); startClock(); logKey('Ctrl+C'); copySel(); render(); checkWin(); return; }   /* r213: a copy can be a drill's goal (navigation) — run the win check; no-op for every other drill */
     if(lk==='x'){ e.preventDefault(); startClock(); logKey('Ctrl+X'); copySel(true); if(S.clipboard) S.clipboard.cut=true; render(); return; }
-    if(keyProfile==='macabacus' && e.shiftKey && !e.altKey && lk==='v'){
-      e.preventDefault(); startClock(); logKey('Ctrl+Shift+V'); doPaste('values'); commitAction(); return; }  // Macabacus paste values (documented default)
+    /* r452 (audit P1-1): Ctrl+Shift+V = PASTE VALUES on EVERY profile. Excel 365 shipped the
+       chord natively in 2023 (⌘⇧V on Mac); before r452 only the Macabacus profile honoured it
+       and the native profile fell through to the plain Ctrl+V below — a values paste that
+       silently carried formulas and formatting onto the model. Alt E S V / Alt H V V unchanged. */
+    if(e.shiftKey && !e.altKey && lk==='v'){
+      e.preventDefault(); startClock(); logKey('Ctrl+Shift+V'); doPaste('values'); commitAction(); return; }
     if(lk==='v'){ e.preventDefault(); startClock(); logKey('Ctrl+V'); doPaste('all'); commitAction(); return; }
     if(lk==='b'){ e.preventDefault(); startClock(); logKey('Ctrl+B'); pushUndo(); toggleAllOrNone('bold'); commitAction(); return; }
     if(lk==='i' && !e.shiftKey){ e.preventDefault(); startClock(); logKey('Ctrl+I'); pushUndo(); toggleAllOrNone('it'); commitAction(); return; }   // r193: italic
@@ -28671,7 +28752,8 @@ document.addEventListener('keyup',e=>{ if(e.key==='Alt'||(HK_MAC&&e.key==='Meta'
 $('grid').addEventListener('mousedown',e=>{
   const td=e.target.closest('td'); if(!td)return;
   mouseUsed=true; $('mouseBadge').style.display='block';
-  startClock(); S.active={r:+td.dataset.r,c:+td.dataset.c}; S.sel=null; render();
+  startClock(); S.tabHome=null;   /* r452: clicking away ends the Tab run */
+  S.active={r:+td.dataset.r,c:+td.dataset.c}; S.sel=null; render();
 });
 // results-card buttons (mouse path mirrors the keyboard options)
 $('result').addEventListener('click',e=>{ const b=e.target.closest('.rc-key'); if(!b)return;
@@ -30575,31 +30657,24 @@ function echoNudge(){
     cap.classList.remove('echo-miss'); void cap.offsetWidth; cap.classList.add('echo-miss'); } }catch(e){}
 }
 /* does this real keydown perform the expected spec? Mac-fluent: ⌘ plays ctrl,
-   ⌥ dead characters recover via e.code, ⌘T≡F4 and ⌃U≡F2 — mirrors hkMacAdapt. */
+   ⌥ dead characters recover via e.code, ⌘T≡F4, ⌃U≡F2, ⌃⌘V≡Ctrl+Alt+V, ⌘⇧T≡Alt+=.
+   r452 (audit P2-3): there is now exactly ONE Mac adapter. This used to carry a second,
+   subtly different copy of hkMacAdapt's logic (its ⌥ recovery only fired on non-alphanumeric
+   keys), so the echo layer and the live handler could — and did — disagree about a chord. */
 function echoMatch(e, x){
   const xk=x.key||'';
-  let key=e.key, ctrl=e.ctrlKey, alt=e.altKey;
-  if(HK_MAC){
-    if(xk==='F4' && e.metaKey && /^t$/i.test(key)) return true;
-    if(xk==='F2' && e.ctrlKey && /^u$/i.test(key)) return true;
-    if(e.metaKey) ctrl=true;
-    if(alt && key.length===1 && !/^[a-zA-Z0-9]$/.test(key)){
-      const c=e.code||'';
-      if(c.slice(0,3)==='Key') key=c.slice(3).toLowerCase();
-      else if(c.slice(0,5)==='Digit') key=c.slice(5);
-      else if(MAC_CODE_PUNCT[c]) key=MAC_CODE_PUNCT[c];
-    }
-  }
+  const a=(HK_MAC && hkMacAdapt(e)) || e;
+  const key=a.key, ctrl=!!a.ctrlKey, alt=!!a.altKey, shift=!!a.shiftKey;
   if(ctrl!==!!x.ctrl) return false;
   if(x.alt && !alt) return false;
   if(!x.alt && x.ctrl && alt) return false;          // ctrl+alt+X is a DIFFERENT chord than ctrl+X
   if(xk.length===1){
-    if(xk===' '){ return key===' ' && !!e.shiftKey===!!x.shift; }   // space vs shift+space differ
+    if(xk===' '){ return key===' ' && shift===!!x.shift; }   // space vs shift+space differ
     if(key.length!==1) return false;
     return key===xk || key.toLowerCase()===xk.toLowerCase();        // symbols prove their own shift
   }
   if(key!==xk) return false;                          // named keys exact…
-  return !!e.shiftKey===!!x.shift;                    // …and shift+arrow ≠ arrow
+  return shift===!!x.shift;                           // …and shift+arrow ≠ arrow
 }
 document.addEventListener('keydown', function(e){
   if(!echoOn || !e.isTrusted) return;

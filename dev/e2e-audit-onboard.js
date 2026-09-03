@@ -464,6 +464,31 @@ const STUB = () => {
     ok(!t9.betaOk, '\u2026and never needs an access code (no hk_beta_ok on the device)', String(t9.betaOk));
   }
 
+  /* T10 (r452 bug sweep P1-2): ESC CLOSES THE SIGN-IN MODAL. The keydown handler's
+     INPUT/TEXTAREA bail sits above the authOpen branch and the modal focuses its own email
+     field on open, so every Esc landed in the input and died — the modal had NO keyboard exit
+     while the ? sheet promises "Esc — close menus & modals". Pressed as a real key with the
+     focus where the modal actually leaves it, which is the whole point of the bug. */
+  console.log('T10 esc closes the sign-in modal (the ? sheet\'s "close menus & modals" contract)');
+  await page.evaluate(() => { try { openAuth('signin'); } catch (e) {} });
+  await page.waitForTimeout(250);
+  const escA = await page.evaluate(() => ({
+    open: typeof authOpen !== 'undefined' && authOpen === true,
+    shown: !!(document.getElementById('authModal') || {}).classList &&
+      document.getElementById('authModal').classList.contains('show'),
+    focus: (document.activeElement || {}).tagName
+  }));
+  ok(escA.open && escA.shown, 'the sign-in modal opens', JSON.stringify(escA));
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(250);
+  const escB = await page.evaluate(() => ({
+    open: typeof authOpen !== 'undefined' ? authOpen : null,
+    shown: document.getElementById('authModal').classList.contains('show')
+  }));
+  ok(escB.open === false && escB.shown === false,
+    'Escape closes it from inside the focused field (authOpen false, modal hidden)',
+    JSON.stringify({ before: escA, after: escB }));
+
   const realErrors = errs.filter(e => !/supabase|Failed to fetch|NetworkError|ERR_/i.test(e));
   ok(realErrors.length === 0, 'zero page errors through onboarding', realErrors.join(' | '));
   await browser.close();

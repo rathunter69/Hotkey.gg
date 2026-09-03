@@ -941,5 +941,33 @@ try {
   bad('C24 could not run: ' + String(e.message || e).slice(0, 160));
 }
 
+/* ---- C25 (r452): the Mac chord truth table is SSOT ----
+   themes.js's HK_MAC_CHORDS is the only place Mac Excel's real bindings live. Before r452
+   reference.html carried its OWN blind glyph swap (macCap: ctrl→⌘, alt→⌥, shift→⇧) and the
+   two surfaces drifted for six rounds — the public table published ⌘Space (macOS Spotlight)
+   and ⌥= (not a Mac chord) as Excel for Mac. reference.html must DERIVE (hkMacSpec/hkMacNote)
+   and must never re-implement the swap locally. */
+try {
+  const themes = fs.readFileSync('themes.js', 'utf8');
+  const ref = fs.readFileSync('reference.html', 'utf8');
+  const TABLE = /window\.HK_MAC_CHORDS\s*=\s*\{/;
+  const rows = (themes.match(/'(?:CTRL|ALT|F\d|SHIFT)[^']*'\s*:\s*\{/g) || []).length;
+  if (!TABLE.test(themes)) bad('C25: themes.js no longer defines window.HK_MAC_CHORDS (the Mac truth table)');
+  else if (rows < 12) bad(`C25: HK_MAC_CHORDS has only ${rows} rows — the Mac exception table looks gutted`);
+  else ok(`themes.js owns the Mac chord truth table (${rows} audited rows)`);
+  for (const fn of ['hkMacSpec', 'hkMacNote', 'hkMacChord', 'hkMacLookup'])
+    if (!new RegExp('window\\.' + fn + '\\s*=').test(themes)) bad(`C25: themes.js no longer exports ${fn}()`);
+  if (!/window\.hkMacSpec/.test(ref) || !/window\.hkMacNote/.test(ref))
+    bad('C25: reference.html no longer derives its Mac column from themes.js (hkMacSpec/hkMacNote)');
+  else ok('reference.html derives its Mac column from themes.js');
+  // the local re-implementation must stay gone: no ctrl→⌘ swap outside themes.js
+  const localSwap = /replace\(\s*\/(?:\\b)?ctrl/i;
+  if (localSwap.test(ref) || /function\s+macCap\s*\(/.test(ref))
+    bad('C25: reference.html has its own ctrl→⌘ swap again — that is the drift this guard exists for');
+  else ok('reference.html carries no local glyph swap');
+} catch (e) {
+  bad('C25 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }
 console.log('STATIC INVARIANTS: clean');

@@ -2702,19 +2702,99 @@ window.hkBandChip = function(band, size){
 /* ============================================================
    r279 MAC DISPLAY LAYER (Stage 2+3, dev/MAC_DESIGN.md) — shared by the game,
    the reference page, and anywhere else keycaps render. KeyTips-forward per
-   Wolf: the ⌥ ribbon walks are the star (they now match real Mac Excel);
-   F-keys stay F-keys on screen — the popup teaches fn + the ⌘T/⌃U alternates.
+   Wolf: the ⌥ ribbon walks are the star (they now match real Mac Excel).
+   r452: the blind glyph swap is now the FALLBACK behind HK_MAC_CHORDS (below) — the
+   audited table of chords whose Mac form is not "Ctrl→⌘". Derive from it; never re-swap.
    ============================================================ */
 window.hkIsMac = function(){ try{
   var o=localStorage.getItem('hk_platform');              // r280: onboarding pick wins
   if(o==='mac') return true; if(o==='win') return false;
   return /Mac/i.test(navigator.platform||'') || /Macintosh/i.test(navigator.userAgent||'');
 }catch(e){ return false; } };
-window.hkMacChord = function(s){
+/* r452 (audit P0-3 / P0-5): THE MAC CHORD TRUTH TABLE — the ONE place Mac Excel's real
+   bindings live. Everything downstream (in-game keycaps, the task line, reference.html's
+   Mac column) derives from here; nothing re-implements the swap.
+   Before r452 the whole Mac layer was a blind three-token glyph swap (ctrl→⌘, alt→⌥,
+   shift→⇧), which taught ⌘Space (macOS Spotlight), ⌘⌥V, ⌥= and ⌘` (macOS window cycle).
+   The blind swap is still the FALLBACK — it is verified-correct for the ⌘-plays-Ctrl
+   family (⌘C/V/X/B/I/U/D/R/S/Z/Y/A/F/1/-, ⌘arrows, ⇧Space, ⌘↵) — and this table carries
+   only the chords whose Mac form is NOT "Ctrl→⌘".
+   Confidence discipline (dev audit r452, §1): only rows the audit tagged [H] or [M-H] get
+   a Mac chord. Rows tagged [M]/[L] carry {varies:true} and render the WINDOWS chord with a
+   "Mac: varies" note — an honest gap beats a confident guess.
+   Entry shape: {mac:[tokens]}  ·  optional flat:'display form'  ·  optional note  ·  {varies:true} */
+window.HK_MAC_CHORDS = {
+  /* selection / clipboard */
+  'CTRL+SPACE':       {mac:['⌃','Space'],       note:'⌘Space is macOS Spotlight'},          // [H]
+  'CTRL+ALT+V':       {mac:['⌃','⌘','V']},                                                  // [H] paste special
+  /* formulas */
+  'ALT+=':            {mac:['⌘','⇧','T'],  note:'Alt+= is not a Mac Excel chord'},          // [H] AutoSum
+  'CTRL+`':           {mac:['⌃','`'],           note:'⌘` cycles macOS windows'},            // [M-H] show formulas
+  /* editing / F-keys */
+  'F2':               {mac:['⌃','U'],           note:'or fn+F2'},                                // [H] edit cell
+  'F4':               {mac:['fn','F4'], flat:'fn+F4',note:'or ⌘T — Chrome takes ⌘T outside fullscreen'}, // [H] anchor cycle
+  /* dialogs */
+  'CTRL+H':           {mac:['⌃','H'],           note:'⌘H hides the app'},                   // [M-H] find & replace
+  /* number formats — Mac Excel keeps these on ⌃, not ⌘ */
+  'CTRL+SHIFT+$':     {mac:['⌃','⇧','$']},                                                  // [M-H]
+  'CTRL+SHIFT+%':     {mac:['⌃','⇧','%']},                                                  // [M-H]
+  'CTRL+SHIFT+!':     {mac:['⌃','⇧','!']},                                                  // [M-H]
+  'CTRL+SHIFT+~':     {mac:['⌃','⇧','~']},                                                  // [M-H]
+  'CTRL+SHIFT+#':     {mac:['⌃','⇧','#']},                                                  // [M-H]
+  'CTRL+SHIFT++':     {mac:['⌃','⇧','=']},                                                  // [M-H] insert rows/cols
+  'CTRL+;':           {mac:['⌃',';']},                                                           // [M-H] today's date
+  'CTRL+SHIFT+;':     {mac:['⌃','⇧',';']},                                                  // [M-H] time
+  /* [M]/[L] — the audit would not stand behind a Mac form; say so instead of guessing */
+  'CTRL+9':                 {varies:true},
+  'CTRL+SHIFT+L':           {varies:true},
+  'CTRL+PAGE UP':           {varies:true},
+  'CTRL+PAGE DOWN':         {varies:true},
+  'CTRL+PAGE UP/PAGE DOWN': {varies:true}
+};
+window.hkMacNorm = function(s){
+  return String(s==null?'':s).trim().toUpperCase().replace(/\s*\+\s*/g,'+').replace(/\s*>\s*/g,'>');
+};
+/* exact-chord lookup — null when the blind swap is the right answer */
+window.hkMacLookup = function(spec){
+  try{ return window.HK_MAC_CHORDS[window.hkMacNorm(spec)] || null; }catch(e){ return null; }
+};
+window.hkMacBlind = function(s){
   return String(s)
-    .replace(/ctrl\+/gi,'\u2318')
-    .replace(/\bshift\+/gi,'\u21e7')
-    .replace(/\balt\b(?=(\s|\+))/gi,'\u2325');
+    .replace(/ctrl\+/gi,'⌘')
+    .replace(/\bshift\+/gi,'⇧')
+    .replace(/\balt\b(?=(\s|\+))/gi,'⌥');
+};
+/* one chord → its Mac display form (glyph-joined: '⌃Space', '⌘⇧T', 'fn+F4').
+   Whitespace-separated captions ('ctrl+c alt+h b o') map token by token. */
+window.hkMacChord = function(s){
+  var str=String(s);
+  var hit=window.hkMacLookup(str);
+  /* a {varies} row still takes the ⌘ swap HERE: this surface is the keyflash/caption — what
+     the player just pressed (the engine accepts ⌘⇧L) — not the reference's "press this in
+     real Mac Excel" column, which is where the honest "Mac: varies" note belongs. */
+  if(hit && !hit.varies) return hit.flat || hit.mac.join('');
+  if(/\s/.test(str.trim())){
+    return str.split(/(\s+)/).map(function(t){ return /\S/.test(t) ? window.hkMacChord(t) : t; }).join('');
+  }
+  return window.hkMacBlind(str);
+};
+/* one chord → its Mac form as a '+'/'>'-separated SPEC (reference.html renders caps from it) */
+window.hkMacSpec = function(spec){
+  var str=String(spec);
+  var hit=window.hkMacLookup(str);
+  if(hit) return hit.varies ? str : hit.mac.join('+');
+  if(str.indexOf('>')>=0) return str.split('>').map(function(p){ return window.hkMacSpec(p); }).join('>');
+  /* bare modifier caps (an Alt walk's first segment, reference.html's per-cap swap) */
+  if(/^\s*ctrl\s*$/i.test(str)) return '⌘';
+  if(/^\s*alt\s*$/i.test(str)) return '⌥';
+  if(/^\s*shift\s*$/i.test(str)) return '⇧';
+  return window.hkMacBlind(str).replace(/([⌘⌃⇧⌥])(?=[^+\s])/g,'$1+');
+};
+/* the caveat a surface should print beside a chord ('' when there is none) */
+window.hkMacNote = function(spec){
+  var hit=window.hkMacLookup(spec);
+  if(!hit) return '';
+  return hit.varies ? 'Mac: varies' : (hit.note||'');
 };
 window.hkMacifyKbds = function(root){
   if(!window.hkIsMac() || !root) return;
@@ -2741,7 +2821,12 @@ window.hkMacPopup = function(){
       '<div style="min-height:34px;display:flex;align-items:center;justify-content:space-between;padding:6px 16px;background:var(--surface2,#1c1d20);border-bottom:1px solid var(--line,#333);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted,#888)">'+
         '<span>\u2318 mac keys \u2014 one motion, every excel</span><a id="hkMacX" style="cursor:pointer;font-size:15px">\u00d7</a></div>'+
       '<div style="padding:16px 20px;font-size:12.5px;line-height:1.8;color:var(--muted,#999)">'+
-        '<div style="color:var(--text,#eee)"><b>\u2318 = Ctrl</b> \u2014 \u2318C \u00b7 \u2318B \u00b7 \u2318\u2193. <b style="color:var(--accent,#2ea36f)">\u2325 walks the ribbon</b> \u2014 \u2325 e s v pastes values, same letters as Windows Alt and Mac Excel\u2019s new KeyTips. <b>\u2318T</b> = F4 anchors \u00b7 <b>\u2303U</b> = F2 edit.</div>'+
+        '<div style="color:var(--text,#eee)"><b>\u2318 = Ctrl</b> \u2014 \u2318C \u00b7 \u2318B \u00b7 \u2318\u2193. <b style="color:var(--accent,#2ea36f)">\u2325 walks the ribbon</b> \u2014 \u2325 e s v pastes values, same letters as Windows Alt and Mac Excel\u2019s new KeyTips. <b>fn+F4</b> = cycle anchors \u00b7 <b>\u2303U</b> = F2 edit.</div>'+
+        /* r452 (audit P0-4/P0-5): the chords Mac Excel does NOT put on \u2318, plus the ones the
+           browser and macOS take before the sheet ever sees them. */
+        '<div style="margin-top:12px;padding-top:11px;border-top:1px dashed var(--line,#333);color:var(--text,#eee)">'+
+        '<b>Not on \u2318 in Mac Excel:</b> <b>\u2303Space</b> select column (\u2318Space is Spotlight) \u00b7 <b>\u2303\u2318V</b> paste special \u00b7 <b>\u2318\u21e7T</b> AutoSum (there is no Alt+= on Mac) \u00b7 <b>\u2303`</b> show formulas \u00b7 <b>\u2303H</b> find &amp; replace (\u2318H hides the app).</div>'+
+        '<div style="margin-top:11px;color:var(--warn,#d9a441)">Chrome keeps <b>\u2318T</b> (new tab) and <b>\u2318\u21e7T</b> unless you are in fullscreen \u2014 so <b>fn+F4</b> is the anchor chord we teach here, with \u2318T as the fullscreen alternate.</div>'+
         '<div style="margin-top:12px;padding-top:11px;border-top:1px dashed var(--line,#333)">'+
         '<b style="color:var(--warn,#d9a441)">Real Excel for Mac:</b> update Office, then tap \u2325 \u2014 KeyTips light up the ribbon. F-keys need <b>fn</b>, or flip \u201cUse F1, F2\u2026 as standard function keys\u201d in System Settings \u2192 Keyboard.</div>'+
         '<div style="margin-top:11px;font-size:10.5px;color:var(--faint,#666)">same boards, same pars, every platform</div>'+
