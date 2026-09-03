@@ -149,7 +149,7 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = 'reference';
 </script>
-<script src="themes.js?v=310"></script>
+<script src="themes.js?v=311"></script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -213,16 +213,16 @@ const DATA = [
     {k:'Tab', d:'Commit and move right', dr:true},
     {k:'Esc', d:'Cancel the edit', dr:true},
     {k:'Delete', d:'Clear cell contents'},
-    {k:'Alt+Enter', d:'Line break inside a cell'},
+    {k:'Alt+Enter', d:'Line break inside a cell', nyt:true},
     {k:'F4', d:'Cycle absolute / relative refs ($) while editing', dr:true},
   ]},
   {cat:'Formulas & fill', ic:'∑', items:[
     {k:'Alt+=', d:'AutoSum the adjacent range', dr:true},
     {k:'Ctrl+D', d:'Fill down from the cell above', dr:true},
     {k:'Ctrl+R', d:'Fill right from the cell to the left', dr:true},
-    {k:'F4', d:'Repeat the last action (when not editing)'},
+    {k:'F4', d:'Repeat the last action (when not editing)', nyt:true, macv:true},
     {k:'F9', d:'Recalculate all workbooks'},
-    {k:'Ctrl+`', d:'Toggle show formulas / values'},
+    {k:'Ctrl+`', d:'Toggle show formulas / values', nyt:true},
   ]},
   {cat:'Number formats', ic:'#', items:[
     {k:'Ctrl+Shift+$', d:'Currency, 2 decimals', dr:true},
@@ -326,17 +326,33 @@ function renderCombo(spec){
 let refMac=(function(){ try{ const v=localStorage.getItem('hk_ref_mac');
   if(v!==null) return v==='1';
   return !!(window.hkIsMac && window.hkIsMac()); }catch(e){ return false; } })();
-function macCap(t){
-  if(/^ctrl$/i.test(t)) return '\u2318';
-  if(/^alt$/i.test(t)) return '\u2325';
-  if(/^shift$/i.test(t)) return '\u21e7';
-  return t;
+/* r452 (audit P0-3): the Mac column DERIVES from themes.js's HK_MAC_CHORDS truth table
+   (window.hkMacSpec / window.hkMacNote) \u2014 this page owns no chord facts of its own. The old
+   macCap() was a blind per-cap glyph swap (ctrl\u2192\u2318, alt\u2192\u2325, shift\u2192\u21e7) that published \u2318Space
+   (macOS Spotlight), \u2318\u2325V, \u2325= and \u2318` (macOS window cycle) as Excel for Mac. Whole SPECS are
+   translated now, not single caps, because the Mac form of a chord is a property of the chord.
+   Rows the table can't stand behind keep the Windows caps with a "Mac: varies" note, and the
+   Windows-only add-in sections (Macabacus / FactSet) never translate at all. */
+function macSpec(spec){
+  try{ return (window.hkMacSpec ? window.hkMacSpec(spec) : spec); }catch(e){ return spec; }
+}
+function macNote(spec){
+  try{ return (window.hkMacNote ? window.hkMacNote(spec) : ''); }catch(e){ return ''; }
 }
 function applyPlatform(){
-  document.querySelectorAll('.cap').forEach(c=>{
-    if(!c.dataset.win) c.dataset.win=c.textContent;
-    c.textContent = refMac ? macCap(c.dataset.win) : c.dataset.win;
+  document.querySelectorAll('.keys').forEach(el=>{
+    const spec=el.dataset.spec; if(!spec) return;
+    const winOnly = el.dataset.winonly==='1';
+    const varies  = el.dataset.macvaries==='1';
+    let html=renderCombo(spec), tag='';
+    if(refMac){
+      if(winOnly) tag='';   // the section header carries the one "Windows only" line
+      else if(varies) tag='Mac: varies';
+      else { html=renderCombo(macSpec(spec)); tag=macNote(spec); }
+    }
+    el.innerHTML = html + (tag?' <span class="alt">\u00b7 '+tag+'</span>':'');
   });
+  document.querySelectorAll('.wonly').forEach(n=>{ n.style.display = refMac ? '' : 'none'; });
   const b=document.getElementById('platToggle');
   if(b){ b.textContent = refMac ? '\u2318 mac keys \u00b7 show windows' : '\u229e windows keys \u00b7 show mac';
     b.style.color = refMac ? 'var(--accent)' : 'var(--muted)';
@@ -380,7 +396,10 @@ DATA.forEach((sec,si)=>{
   card.className='card'; card.dataset.cat=sec.cat;
   card.style.animationDelay=(si*45)+'ms';
   const proTag = sec.pro ? '<span style="font-size:9px;color:var(--warn);letter-spacing:1px;vertical-align:2px;margin-left:8px">\u25c6 PRO \u00b7 free in beta</span>' : '';
-  const noteLine = sec.note ? `<div style="font-family:var(--mono);font-size:10.5px;color:var(--faint);margin:-4px 0 10px">${sec.note}</div>` : '';
+  /* r452 (audit P1-10): both add-ins are Windows-COM only — there is no Mac build to press these
+     in, so their caps never take the ⌘ swap and the Mac view says why, once, per section. */
+  const wonly = sec.pro ? `<div class="wonly" style="display:none;font-family:var(--mono);font-size:10.5px;color:var(--warn);margin:-4px 0 8px">⊞ Windows only — this add-in has no Mac build, so these stay Windows chords</div>` : '';
+  const noteLine = wonly + (sec.note ? `<div style="font-family:var(--mono);font-size:10.5px;color:var(--faint);margin:-4px 0 10px">${sec.note}</div>` : '');
   card.innerHTML = `<h2>${sec.color?`<span class="ic" style="color:${sec.color}">${sec.ic}</span>`:`<span class="ic">${sec.ic}</span>`}${sec.cat}${proTag}<span class="n">${sec.items.length}</span></h2>` + noteLine +
     sec.items.map(it=>{
       const txt=(it.k+' '+it.d).toLowerCase();
@@ -388,9 +407,14 @@ DATA.forEach((sec,si)=>{
       // A combined key like 'Ctrl+↑/↓/←/→' tries each single-arrow variant.
       const dk = refDrillFor(it.k);
       const practice = dk ? `<a class="practice" href="index.html?drill=${dk}" title="practice this shortcut in a drill">practice →</a>` : '';
+      /* r452: nyt = Excel-true but NOT in the trainer yet (the engine commits on Alt+Enter, has
+         no repeat-last-action, and show-formulas lives only in the rapid-fire deck) — say so on
+         the row instead of advertising a motion no drill can grade. macv = the audit rates the
+         Mac form [M]/[L], so the Windows cap stands with a "Mac: varies" note. */
+      const nyt = it.nyt ? '<span class="alt"> · not in the trainer yet</span>' : '';
       return `<div class="row${it.dr?' drilled':''}" data-s="${txt.replace(/"/g,'')}">
-        <span class="keys">${renderCombo(it.k)}</span>
-        <span class="desc">${it.d}${it.dr?'<span class="dr" title="drilled in the trainer"></span>':''}</span>
+        <span class="keys" data-spec="${it.k}"${sec.pro?' data-winonly="1"':''}${it.macv?' data-macvaries="1"':''}>${renderCombo(it.k)}</span>
+        <span class="desc">${it.d}${nyt}${it.dr?'<span class="dr" title="drilled in the trainer"></span>':''}</span>
         ${practice}
       </div>`;
     }).join('');

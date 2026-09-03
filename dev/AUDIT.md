@@ -1,5 +1,51 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r452 — Mac Excel parity: ⌃⌘V paste special, ⌘⇧T AutoSum, a real Mac chord table, Tab-Enter home
+
+_Fixes the safe set from the r452 parity + Mac keybinding audit (`audit-parity-mac.md`, worktree
+`agent-a868525fd97e43d27`, all engine verdicts proven headlessly on :8802). Every fixed class
+lands a CI assertion in this same round (WORKFLOW §3.3): mac-input 19 → 30, parity 177 → 189,
+plus a new static invariant C14._
+
+### The root cause, and what changed under it
+
+`hkMacAdapt` (index.html:26947) was a **modifier collapse**: `ctrl = ev.ctrlKey || ev.metaKey`
+on line one, so ⌃ and ⌘ were indistinguishable downstream and every Mac chord whose meaning
+depends on *which* one is held was unrepresentable. The merge is still what the handlers get
+(that is the "⌘ plays Ctrl, Windows habits keep working" superset) — but the raw identity now
+survives long enough to express the three chords that need it.
+
+| # | audit id | fix | file:line |
+|---|---|---|---|
+| 1 | P0-1 | **⌃⌘V opens Paste Special** — it arrived as a plain Ctrl+V and did a silent, formatting-and-formula-carrying full paste over the model (probe 03). The adapter presents it as Ctrl+Alt+V, so it lands on the existing dialog branch; ⌘V and ⌃V still plain-paste. | index.html:26965–26981 → 27654 |
+| 2 | P0-2 | **⌘⇧T is AutoSum** — the ⌘T→F4 rewrite didn't exclude Shift, so Mac Excel's flagship formula chord became an inert bare F4 (probe 01). ⌘⇧T now presents as Alt+= and reaches `autoSum()`; ⌘T with no Shift still cycles anchors. | index.html:26977–26980 |
+| 3 | P2-3 | **ONE Mac adapter.** `echoMatch` carried a second, subtly different copy of the same logic (its ⌥ recovery only fired on non-alphanumerics); it now runs the real `hkMacAdapt`, so the echo layer and the live handler can no longer disagree about a chord. | index.html:29513–29529 |
+| 4 | P0-4 | **`hkMacPopup` stops teaching stolen keycaps**: fn+F4 is the primary anchor chord (Chrome reserves ⌘T/⌘⇧T outside fullscreen — `preventDefault` cannot help), ⌘T is the fullscreen alternate, and the popup now names ⌃Space, ⌃⌘V, ⌘⇧T, ⌃` and ⌃H. | themes.js:2786–2791 |
+| 5 | P0-3 / P0-5 | **The blind glyph swap is dead as a source of truth.** `window.HK_MAC_CHORDS` (themes.js) is the audited exception table — the chords whose Mac form is NOT "Ctrl→⌘" — with `hkMacSpec` / `hkMacNote` / `hkMacChord` derived from it; the swap is only the fallback for the verified ⌘-plays-Ctrl family. Confidence discipline: only [H]/[M-H] rows get a Mac chord; [M]/[L] rows (Ctrl+9, Ctrl+Shift+L, Ctrl+PgUp/PgDn) render the WINDOWS chord with a "Mac: varies" note rather than a guess. | themes.js:2674–2760 |
+| 6 | P0-3 | **reference.html derives** — `macCap`'s per-cap swap is gone; whole specs are translated through themes.js, because the Mac form of a chord is a property of the chord, not of its caps. Select column now reads ⌃Space (not ⌘Space = Spotlight), paste special ⌃⌘V (not ⌘⌥V), AutoSum ⌘⇧T (not ⌥=), show formulas ⌃` (not ⌘` = macOS window cycle), F2 → ⌃U (or fn+F2), F4 → fn+F4 (or ⌘T). P2-6 falls out for free: `Ctrl+A>Alt>H>O>U>O` no longer renders half-Windows. | reference.html:329–362 |
+| 7 | P1-10 | **Macabacus / FactSet sections keep Windows caps** + one "Windows only — this add-in has no Mac build" line per section. Both are Windows-COM only; there is no Mac build to press ⌘⌥A in. | reference.html:399–401 |
+| 8 | §5 | **reference truth pass** — Alt+Enter line break, F4 repeat-last-action and Ctrl+` show-formulas are Excel-true but the engine does not implement them (it commits, has no repeat, and show-formulas is rapid-fire-deck only). All three now carry "not in the trainer yet" instead of being advertised. | reference.html:216/223/225 |
+| 9 | P1-2 | **Tab-Enter home.** B4 → Tab → Tab → Enter landed D5; Excel gives B5. `S.tabHome` latches where the run started and where it currently sits; any non-Tab move drops it, and a latch whose landing cell no longer matches the cursor is treated as stale rather than yanking the cursor. | index.html:27002–27026, 27245–27251, 27574–27580 |
+| 10 | P1-1 | **Ctrl+Shift+V / ⌘⇧V pastes VALUES** on every profile (Excel 365 shipped the chord natively in 2023). It used to fall through to plain Ctrl+V on the native profile — a values paste that silently carried formulas and formatting. Alt E S V / Alt H V V routes untouched. | index.html:27684 |
+| 11 | P1-9 | **Ctrl+Shift+8 / Ctrl+\*** select the current region, through the same `regionAround` path as Ctrl+Shift+Space (extracted to one `selectRegion()`). | index.html:26751–26758, 27657 |
+| 12 | P1-8 | **Ctrl+;** stamps today as a VALUE (Excel's hardcode-the-date gesture) — the Excel serial with the engine's date format. NOTE: the engine's date format renders `Mmm-yy`, so the stamp shows the month, not the day. Ctrl+Shift+; (time) is SKIPPED: there is no time format to render it with. | index.html:27661 |
+| 13 | P1-5 | **Shift+F2 no longer opens the editor.** In Excel it inserts a comment; here it fell into the F2 branch and silently opened an edit over the cell. Now a no-op with one honest toast. | index.html:27328–27332 |
+| 14 | bug sweep P1-2 | **Esc closes the sign-in modal.** The keydown handler's INPUT/TEXTAREA bail sits ABOVE the `authOpen` Escape branch and the modal focuses its own email field on open — so every Esc landed in the input and died, leaving the modal with no keyboard exit while the `?` sheet promises "Esc — close menus & modals". The modal owns the keyboard while it is up, so its Esc is now claimed at the top of the handler, ahead of the text-field bail. (Taken here rather than by another agent: it is inside the key handler this round already owns.) | index.html:27032–27038 |
+
+### CI (WORKFLOW §3.3 — no invariant, no fix)
+
+- `dev/e2e-mac-input.js` **19 → 30**: ⌃⌘V opens the dialog *and* leaves the destination untouched · ⌘⇧T proposes a SUM · ⌘T no-shift still cycles · ⌃Space selects the column · ⌘⇧V pastes values · and five reference-page row assertions (⌃Space never ⌘Space, ⌃⌘V, ⌘⇧T, ⌃`, Windows-only add-in sections).
+- `dev/e2e-audit-parity.js` **177 → 189**: Tab-Enter home (typed and untyped, plus an arrow that ENDS the run and a lone Enter that must not jump) · Ctrl+Shift+V values with Alt E S V still walking · Ctrl+Shift+8 and Ctrl+\* equal to Ctrl+Shift+Space · Shift+F2 guard with plain F2 still editing · Ctrl+; stamping a dated value.
+- `dev/e2e-audit-onboard.js` **T6** (35 → 37): the sign-in modal opens, then a REAL Escape pressed with focus where the modal actually leaves it (INPUT#authEmail) closes it — `authOpen` false, modal hidden. Verified to fail with the fix reverted, so it guards the bug and not the fix.
+- `dev/check-invariants.js` **C14**: themes.js owns `HK_MAC_CHORDS` and exports the four accessors; reference.html derives from them and carries no local ctrl→⌘ swap. The two surfaces cannot drift again.
+
+### NOT fixed, deliberately
+
+- **P0-6 KeyTips-on-Mac is still open — WOLF ITEM, needs a real MacBook.** `MAC_DESIGN.md` asserts Alt/Option KeyTips shipped in Excel for Mac; the audit rates that **[L]** and cannot corroborate it. 18–20 drills carry an Alt-walk as their canonical chord and the Ctrl+1 dialog has no Border/Alignment tab to fall back to, so if KeyTips do NOT exist on Mac those drills teach a motion the student cannot reproduce. Settle it on a device before any further Mac copy ships; if absent, the honest fix is a caveat plus Border/Alignment tabs in Ctrl+1, not more ⌥ copy.
+- **P2-1 / P2-2 Backspace-on-a-range** (clears the whole selection; Windows Excel clears the active cell only and enters Edit — and the branch that implements the Windows semantics at 27528 is unreachable while `mode==='normal'`). Left alone this round: it is P2, it is accidentally Mac-correct, and changing it touches a semantic every drill's clear-and-retype beat rides on.
+- **P1-3 Alt+Enter line break, P1-6 F4 repeat, P1-7 Ctrl+\` on the grid, P1-4 `$1,000` as text, P1-11 ⌘⇧F** — engine features, not label bugs. The reference now says "not in the trainer yet" for the first three instead of advertising them.
+- **Ctrl+Shift+; (time)** — skipped, no renderable time format (see above).
+
 ## r440 H6b-12 — balcheck + tieout + balance: Formulas II CLOSES 10/10 (DEPTH_PASS §4.48 + §4.51 + §4.55 + §2.3)
 _The chapter's last three boards. All three carried a FORMATTING ☆ on their §4 page, all three
 had those ☆s re-cut under §1.0(d); one of them (`tieout`) came within a diagnostic of retirement
