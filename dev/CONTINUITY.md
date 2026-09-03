@@ -42,9 +42,21 @@ rename it · landing defaults to Daylight with a PRO door and learn-by-doing · 
 implement from the pushes and re-assess. **Open Wolf items:** AUDIT_R452 §2 (the menu) — first up
 C1 legal placeholders, C4 Mac KeyTips, then the lesson-drill wave B1–B3.
 
+**r453 backend round APPLIED LIVE (2026-09-03 22:20 UTC, via the Supabase connector; PR #248 carries
+the files):** baseline (no-op on prod) · membership retired (runs INSERT policy replaced first;
+members/invite_codes/access_codes/redeem_code dropped) · prune_guest_shells daily 04:00 UTC and the
+one-time pass (2,558 abandoned anonymous shells removed of 2,622 users) · RPC grants (37 client RPCs
+off public+anon, 12 helpers off authenticated; anon keeps preview_desk + is_desk_captain) ·
+profiles 6→3 policies + 22 initplan rewrites · 6 FK indexes, 4 dropped, desk_creations PK, events
+retention 180 days daily 03:30 UTC · run_stats aggregate + trigger + backfill (no read path moved —
+dev/RUN_STATS_PLAN.md). Version rows stamped in supabase_migrations.schema_migrations so a future
+`db push` skips them. Leaked-password protection is Wolf's dashboard toggle (Authentication →
+Providers → Passwords).
+
 **Branch state:** everything is on `claude/drill-redesign-art-style-jg9vhm`; `gate.yml` runs only on
 PRs and pushes to main, so CI has NOT run on the branch — but the FULL 24-step local gate (every
 suite gate.yml runs plus the r452 guards) ran green on the merged tip at the close of r452
+(`.gate-r452.log`; the one red step was a resurrected orphan page, deleted). **LAUNCHED 2026-09-03 21:44 UTC: PR #247 squash-merged (854cf00); www.hotkey.gg serves the new build via Cloudflare; the two r452 migrations were applied through the Supabase connector because the deploy workflow's SUPABASE_ACCESS_TOKEN secret is stale ("Unauthorized" at `supabase link`) — the MCP recorded them as 20260903214612/…615, so the next successful `db push` will re-run the repo's 20260903000000/…100 files, which are idempotent. Wolf: refresh the repo secret.** The live DB was also cleaned the same hour: 50 seed players + 2 seed desks, 21 smoke/test accounts, and Wolf's own playtest history (backup in the session scratchpad only). Cache versions on the branch:
 (`.gate-r452.log`; the one red step was a resurrected orphan page, deleted). Merge to main = launch (the curtain is gone). Cache versions on the branch:
 themes.js 313 · nav.css 312 · drills.js 304 · nav.js 305 · lb.js 43.
 

@@ -2625,7 +2625,11 @@ const PRO_PERKS_FREE    = true;
    see dev/BETA_RETIRE_LANDING.md §8A. Rollback is `git revert` on this commit, not a flag.
    The beta_codes table + curtain_check RPC are dropped by a follow-up migration. */
 const ev=(n,m)=>{ try{ (window.hkEvent||function(){})(n,m); }catch(e){} };   // r139: funnel telemetry (nav.js hkEvent)
-const INVITE_AUTO_CODE  = 'HAGS'; // silently redeemed for every session — keeps the members table consistent
+/* r453: INVITE_AUTO_CODE is gone with the members/access_codes/invite_codes tables and
+   redeem_code() — see supabase/migrations/20260903000300_retire_membership.sql. The beta
+   invite gate died at r134; only the silent per-session auto-redeem survived it, writing
+   2,371 bookkeeping rows nothing ever read. me_member now means what every caller already
+   assumed it meant: signed in with a real (non-anonymous) account. */
 window.NAV_ACTIVE='trainer';
 // r277: one-click digest unsubscribe from the email footer (?digest=off)
 try{ if(new URLSearchParams(location.search).get('digest')==='off'){
@@ -32260,16 +32264,11 @@ async function onSession(session){
       me_handle = (data && data.handle) ? data.handle : null;
       try{ if(me_handle) localStorage.setItem('hk_handle_cache', me_handle); }catch(e2){}   // r101: the landing greets by name on the NEXT visit, before any roundtrip
     }catch(e){ me_handle=null; }
-    try{
-      const { data:mem } = await sb.from('members').select('user_id').eq('user_id', me_user.id).maybeSingle();
-      me_member = !!mem;
-      if(!me_member){
-        // r134: the invite gate is retired — membership auto-redeems per session
-        // (server RPC keeps the members table consistent for RLS and boards)
-        try{ const {data:rd}=await sb.rpc('redeem_code',{p_code:INVITE_AUTO_CODE});
-          if(rd===true) me_member=true; }catch(e){}
-      }
-    }catch(e){ me_member=false; }
+    // r453: was a members lookup + redeem_code('HAGS') auto-redeem round-trip on every
+    // session. The table is dropped (20260903000300) and the runs INSERT policy no longer
+    // joins it, so membership is simply "signed in with a real account" — which is what
+    // every me_member reader already pairs with an !isAnonUser() check anyway.
+    me_member = true;
   } else { me_handle=null; me_member=false; }
   refreshAuthUI();
   if(recoveryMode && me_user){ openAuth('newpassword'); return; }
