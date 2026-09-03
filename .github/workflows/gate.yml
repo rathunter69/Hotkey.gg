@@ -61,13 +61,17 @@ jobs:
       # r414-review Segment A/C: static guards that need no browser — the cache-bump
       # discipline (the r390-392 "nothing reached live" class), a committed-secret scan,
       # and the SSOT invariants (drill membership + skin notch coverage).
-      - name: Static guards (cache-bump · secrets · SSOT invariants)
+      # r454 (CURRICULUM_REBUILD Phase A): the curriculum map's require-before-teach check is a
+      # CI invariant from the day the map exists, not from the day Phase C ships it — it reads one
+      # JSON plus drills.js, takes a second, and is what keeps the 59→0 violation count at 0.
+      - name: Static guards (cache-bump · secrets · SSOT invariants · curriculum map)
         env:
           GATE_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
           node dev/check-cache-versions.js
           bash dev/check-secrets.sh
           node dev/check-invariants.js
+          node dev/check-curriculum-map.js
       # r452: the run outbox is client-side delivery of every leaderboard score — it wedged in
       # prod (P1-3) because a server-rejected row was retried forever. Node-level, no browser.
       - name: Run outbox (terminal vs transient, no wedge)

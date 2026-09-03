@@ -1,0 +1,1717 @@
+{
+ "_": "CURRICULUM V3 — the machine-readable curriculum map (r454 Phase A). Checked by dev/check-curriculum-map.js.",
+ "version": "v3",
+ "generated_for": "dev/CURRICULUM_REBUILD.md Phase A",
+ "status": "RECOMMENDED, PENDING WOLF",
+ "chapters": [
+  {
+   "id": "k1",
+   "name": "Keyboard",
+   "tier": "free",
+   "unlock_level": null,
+   "capstone": "modeltour",
+   "teaches_line": "the whole keyboard grammar — move, select, enter, edit, structure, clipboard, save",
+   "opener_exempt": false,
+   "opener_exempt_reason": null,
+   "drills": [
+    {
+     "key": "keyboardtour",
+     "kind": "tour",
+     "status": "built",
+     "requires": [],
+     "teaches": [
+      "move",
+      "jump(ctrl-arrow)",
+      "select",
+      "enter/edit(F2)",
+      "clear/delete",
+      "undo",
+      "redo",
+      "insert/delete row-col",
+      "point-mode",
+      "sum(Alt=)",
+      "fill(D/R)",
+      "bold/italic/color",
+      "align",
+      "borders(top/outside/bottom)",
+      "comma/currency-fmt",
+      "blue-inputs",
+      "decimals",
+      "percent-fmt",
+      "save"
+     ],
+     "par": null
+    },
+    {
+     "key": "select",
+     "kind": "lesson",
+     "status": "add",
+     "requires": [
+      "select"
+     ],
+     "teaches": [
+      "select-edge",
+      "row/col-select",
+      "goto-special"
+     ],
+     "par": 16
+    },
+    {
+     "key": "firstsum",
+     "kind": "lesson",
+     "status": "add",
+     "requires": [
+      "enter/edit(F2)",
+      "select",
+      "point-mode",
+      "sum(Alt=)",
+      "fill(D/R)"
+     ],
+     "teaches": [
+      "margin/ratio"
+     ],
+     "par": 26
+    },
+    {
+     "key": "navigation",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "select-edge"
+     ],
+     "teaches": [
+      "move",
+      "jump(ctrl-arrow)",
+      "copy/paste",
+      "save"
+     ],
+     "par": 20
+    },
+    {
+     "key": "rowops",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "row/col-select",
+      "copy/paste",
+      "comma/currency-fmt",
+      "blue-inputs",
+      "borders(top/outside/bottom)"
+     ],
+     "teaches": [
+      "clear/delete",
+      "insert/delete row-col",
+      "schedule"
+     ],
+     "par": 30
+    },
+    {
+     "key": "signs",
+     "kind": "lesson",
+     "status": "add",
+     "requires": [
+      "enter/edit(F2)"
+     ],
+     "teaches": [
+      "sign-convention",
+      "costs-negative",
+      "parens-negative"
+     ],
+     "par": 18
+    },
+    {
+     "key": "pastes",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "copy/paste",
+      "comma/currency-fmt",
+      "bold/italic/color",
+      "align",
+      "borders(top/outside/bottom)",
+      "sign-convention"
+     ],
+     "teaches": [
+      "paste-special"
+     ],
+     "par": 42
+    },
+    {
+     "key": "editfix",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "redo",
+      "clear/delete",
+      "schedule"
+     ],
+     "teaches": [
+      "enter/edit(F2)",
+      "undo"
+     ],
+     "par": 52
+    },
+    {
+     "key": "modeltour",
+     "kind": "capstone",
+     "status": "built",
+     "requires": [
+      "move",
+      "jump(ctrl-arrow)",
+      "copy/paste",
+      "fill(D/R)",
+      "percent-fmt",
+      "comma/currency-fmt",
+      "decimals",
+      "bold/italic/color",
+      "blue-inputs",
+      "align",
+      "schedule"
+     ],
+     "teaches": [
+      "margin/ratio"
+     ],
+     "par": 35
+    }
+   ]
+  },
+  {
+   "id": "k2",
+   "name": "Build",
+   "tier": "free",
+   "unlock_level": null,
+   "capstone": "qclose",
+   "teaches_line": "a formula points at cells — sums, anchors, ratios, growth and roll-ups on a live page",
+   "opener_exempt": false,
+   "opener_exempt_reason": null,
+   "drills": [
+    {
+     "key": "lockref",
+     "kind": "lesson",
+     "status": "add",
+     "requires": [
+      "fill(D/R)",
+      "point-mode"
+     ],
+     "teaches": [
+      "anchor($/F4)",
+      "mixed-anchor"
+     ],
+     "par": 16
+    },
+    {
+     "key": "blocksel",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select-edge",
+      "copy/paste",
+      "fill(D/R)",
+      "bold/italic/color",
+      "align",
+      "borders(top/outside/bottom)",
+      "margin/ratio"
+     ],
+     "teaches": [
+      "select",
+      "cut"
+     ],
+     "par": 34
+    },
+    {
+     "key": "filldr",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "margin/ratio",
+      "schedule",
+      "sign-convention"
+     ],
+     "teaches": [
+      "fill(D/R)",
+      "anchor($/F4)",
+      "mixed-anchor"
+     ],
+     "par": 44
+    },
+    {
+     "key": "foot",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "fill(D/R)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)"
+     ],
+     "teaches": [
+      "sum(Alt=)"
+     ],
+     "par": 29
+    },
+    {
+     "key": "anchor",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "fill(D/R)",
+      "anchor($/F4)",
+      "mixed-anchor",
+      "comma/currency-fmt",
+      "decimals",
+      "borders(top/outside/bottom)"
+     ],
+     "teaches": [],
+     "par": 22
+    },
+    {
+     "key": "percent",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "row/col-select",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "decimals",
+      "bold/italic/color"
+     ],
+     "teaches": [
+      "percent-fmt"
+     ],
+     "par": 21
+    },
+    {
+     "key": "margin",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "fill(D/R)",
+      "percent-fmt",
+      "decimals",
+      "bold/italic/color",
+      "margin/ratio"
+     ],
+     "teaches": [
+      "point-mode",
+      "growth/CAGR"
+     ],
+     "par": 40
+    },
+    {
+     "key": "cagr",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "fill(D/R)",
+      "anchor($/F4)",
+      "percent-fmt",
+      "decimals",
+      "bold/italic/color",
+      "growth/CAGR"
+     ],
+     "teaches": [],
+     "par": 36
+    },
+    {
+     "key": "bridge",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "growth/CAGR",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 33
+    },
+    {
+     "key": "sumif",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "percent-fmt",
+      "decimals",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "margin/ratio"
+     ],
+     "teaches": [
+      "SUMIF(S)",
+      "tie-out/check-row"
+     ],
+     "par": 64
+    },
+    {
+     "key": "rollup",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "mixed-anchor",
+      "borders(top/outside/bottom)",
+      "SUMIF(S)"
+     ],
+     "teaches": [],
+     "par": 80
+    },
+    {
+     "key": "qclose",
+     "kind": "capstone",
+     "status": "add",
+     "requires": [
+      "point-mode",
+      "sum(Alt=)",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "mixed-anchor",
+      "percent-fmt",
+      "decimals",
+      "growth/CAGR",
+      "SUMIF(S)",
+      "tie-out/check-row",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "sign-convention",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 94
+    }
+   ]
+  },
+  {
+   "id": "k3",
+   "name": "Format",
+   "tier": "free",
+   "unlock_level": null,
+   "capstone": "gauntlet",
+   "teaches_line": "the banker's finish — weight, alignment, decimals, rules, widths and the house standard",
+   "opener_exempt": false,
+   "opener_exempt_reason": null,
+   "drills": [
+    {
+     "key": "ribbonpass",
+     "kind": "lesson",
+     "status": "add",
+     "requires": [
+      "select",
+      "bold/italic/color",
+      "align",
+      "borders(top/outside/bottom)",
+      "percent-fmt",
+      "decimals",
+      "blue-inputs"
+     ],
+     "teaches": [],
+     "par": 24
+    },
+    {
+     "key": "ruleaudit",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "schedule"
+     ],
+     "teaches": [],
+     "par": 16
+    },
+    {
+     "key": "center",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "row/col-select",
+      "bold/italic/color",
+      "borders(top/outside/bottom)"
+     ],
+     "teaches": [
+      "align"
+     ],
+     "par": 22
+    },
+    {
+     "key": "typeset",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "margin/ratio"
+     ],
+     "teaches": [
+      "bold/italic/color",
+      "date/TODAY"
+     ],
+     "par": 24
+    },
+    {
+     "key": "decimals",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "margin/ratio"
+     ],
+     "teaches": [
+      "decimals"
+     ],
+     "par": 25
+    },
+    {
+     "key": "autofit",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)"
+     ],
+     "teaches": [
+      "autofit"
+     ],
+     "par": 36
+    },
+    {
+     "key": "combo",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "decimals",
+      "bold/italic/color",
+      "align",
+      "autofit"
+     ],
+     "teaches": [
+      "comma/currency-fmt",
+      "blue-inputs"
+     ],
+     "par": 27
+    },
+    {
+     "key": "unhide",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "autofit"
+     ],
+     "teaches": [
+      "hide/unhide/group"
+     ],
+     "par": 25
+    },
+    {
+     "key": "ruleoff",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "fill(D/R)",
+      "bold/italic/color",
+      "sign-convention"
+     ],
+     "teaches": [
+      "borders(top/outside/bottom)"
+     ],
+     "par": 31
+    },
+    {
+     "key": "fxconvert",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "comma/currency-fmt",
+      "decimals",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)"
+     ],
+     "teaches": [],
+     "par": 35
+    },
+    {
+     "key": "housestyle",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "percent-fmt",
+      "comma/currency-fmt",
+      "decimals",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "autofit",
+      "goto-special",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 44
+    },
+    {
+     "key": "gauntlet",
+     "kind": "capstone",
+     "status": "built",
+     "requires": [
+      "sum(Alt=)",
+      "comma/currency-fmt",
+      "decimals",
+      "bold/italic/color",
+      "blue-inputs",
+      "align",
+      "borders(top/outside/bottom)",
+      "autofit",
+      "hide/unhide/group"
+     ],
+     "teaches": [],
+     "par": 47
+    }
+   ]
+  },
+  {
+   "id": "k4",
+   "name": "Structure & Data",
+   "tier": "free",
+   "unlock_level": null,
+   "capstone": "cleanroom",
+   "teaches_line": "rows, columns, sorts, filters and the two ways to read a value out of a tape",
+   "opener_exempt": false,
+   "opener_exempt_reason": null,
+   "drills": [
+    {
+     "key": "tapepull",
+     "kind": "lesson",
+     "status": "add",
+     "requires": [
+      "enter/edit(F2)",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "select-edge"
+     ],
+     "teaches": [
+      "VLOOKUP",
+      "stat-fn(MEDIAN/AVERAGE)"
+     ],
+     "par": 22
+    },
+    {
+     "key": "filterpass",
+     "kind": "existing",
+     "status": "built",
+     "requires": [],
+     "teaches": [
+      "filter"
+     ],
+     "par": 26
+    },
+    {
+     "key": "sort",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "select-edge",
+      "clear/delete",
+      "sum(Alt=)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "tie-out/check-row"
+     ],
+     "teaches": [
+      "sort"
+     ],
+     "par": 31
+    },
+    {
+     "key": "scrub",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "row/col-select",
+      "clear/delete",
+      "sum(Alt=)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "insert/delete row-col",
+      "sort"
+     ],
+     "teaches": [],
+     "par": 21
+    },
+    {
+     "key": "series",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "select-edge",
+      "fill(D/R)",
+      "bold/italic/color",
+      "align"
+     ],
+     "teaches": [],
+     "par": 44
+    },
+    {
+     "key": "lookup",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "enter/edit(F2)",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "borders(top/outside/bottom)",
+      "VLOOKUP"
+     ],
+     "teaches": [
+      "INDEX/MATCH"
+     ],
+     "par": 59
+    },
+    {
+     "key": "recon",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "enter/edit(F2)",
+      "copy/paste",
+      "paste-special",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "stat-fn(MEDIAN/AVERAGE)",
+      "INDEX/MATCH",
+      "VLOOKUP"
+     ],
+     "teaches": [],
+     "par": 92
+    },
+    {
+     "key": "cleanroom",
+     "kind": "capstone",
+     "status": "add",
+     "requires": [
+      "clear/delete",
+      "insert/delete row-col",
+      "sort",
+      "filter",
+      "INDEX/MATCH",
+      "sum(Alt=)",
+      "hide/unhide/group",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "row/col-select"
+     ],
+     "teaches": [],
+     "par": 90
+    }
+   ]
+  },
+  {
+   "id": "k5",
+   "name": "Audit & Repair",
+   "tier": "pro",
+   "unlock_level": 13,
+   "capstone": "redflags",
+   "teaches_line": "find the break — trace, show formulas, triage the sentinels, flip the signs, make it tie",
+   "opener_exempt": false,
+   "opener_exempt_reason": null,
+   "drills": [
+    {
+     "key": "tracepass",
+     "kind": "lesson",
+     "status": "add",
+     "requires": [
+      "select",
+      "point-mode",
+      "goto-special"
+     ],
+     "teaches": [
+      "audit(trace)",
+      "show-formulas"
+     ],
+     "par": 20
+    },
+    {
+     "key": "drill",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "select-edge",
+      "row/col-select",
+      "undo",
+      "clear/delete",
+      "copy/paste",
+      "paste-special",
+      "bold/italic/color",
+      "blue-inputs"
+     ],
+     "teaches": [],
+     "par": 22
+    },
+    {
+     "key": "wrapfix",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "enter/edit(F2)",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "VLOOKUP",
+      "tie-out/check-row"
+     ],
+     "teaches": [
+      "IFERROR"
+     ],
+     "par": 26
+    },
+    {
+     "key": "audit",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "enter/edit(F2)",
+      "fill(D/R)",
+      "comma/currency-fmt",
+      "blue-inputs",
+      "goto-special",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 28
+    },
+    {
+     "key": "signerr",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "copy/paste",
+      "paste-special",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "percent-fmt",
+      "decimals",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "margin/ratio"
+     ],
+     "teaches": [
+      "sign-convention"
+     ],
+     "par": 35
+    },
+    {
+     "key": "tieout",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "enter/edit(F2)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "audit(trace)",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 36
+    },
+    {
+     "key": "balcheck",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "enter/edit(F2)",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "tie-out/check-row"
+     ],
+     "teaches": [
+      "corkscrew(roll-forward)",
+      "linkage(cross-statement)"
+     ],
+     "par": 37
+    },
+    {
+     "key": "triage",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "enter/edit(F2)",
+      "copy/paste",
+      "fill(D/R)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)"
+     ],
+     "teaches": [],
+     "par": 40
+    },
+    {
+     "key": "versionup",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "fill(D/R)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "growth/CAGR"
+     ],
+     "teaches": [
+      "find/replace"
+     ],
+     "par": 48
+    },
+    {
+     "key": "stalelink",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "enter/edit(F2)",
+      "clear/delete",
+      "fill(D/R)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 64
+    },
+    {
+     "key": "balance",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "linkage(cross-statement)",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 66
+    },
+    {
+     "key": "lookup2",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "enter/edit(F2)",
+      "copy/paste",
+      "paste-special",
+      "anchor($/F4)",
+      "borders(top/outside/bottom)",
+      "sort",
+      "INDEX/MATCH",
+      "corkscrew(roll-forward)"
+     ],
+     "teaches": [],
+     "par": 80
+    },
+    {
+     "key": "redflags",
+     "kind": "capstone",
+     "status": "add",
+     "requires": [
+      "enter/edit(F2)",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "goto-special",
+      "find/replace",
+      "sign-convention",
+      "tie-out/check-row",
+      "audit(trace)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "margin/ratio",
+      "blue-inputs"
+     ],
+     "teaches": [],
+     "par": 90
+    }
+   ]
+  },
+  {
+   "id": "k6",
+   "name": "Components",
+   "tier": "pro",
+   "unlock_level": 16,
+   "capstone": "nwcsched",
+   "teaches_line": "the parts a model is assembled from — corkscrews, schedules, bridges and scenario switches",
+   "opener_exempt": false,
+   "opener_exempt_reason": null,
+   "drills": [
+    {
+     "key": "rollfwd",
+     "kind": "lesson",
+     "status": "add",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "sign-convention"
+     ],
+     "teaches": [
+      "circularity-avoidance"
+     ],
+     "par": 26
+    },
+    {
+     "key": "wk13",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "corkscrew(roll-forward)",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 45
+    },
+    {
+     "key": "retbridge",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "margin/ratio"
+     ],
+     "teaches": [
+      "bridge"
+     ],
+     "par": 56
+    },
+    {
+     "key": "schedule",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "point-mode",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "linkage(cross-statement)"
+     ],
+     "teaches": [],
+     "par": 69
+    },
+    {
+     "key": "intsched",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "decimals",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "margin/ratio",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "sign-convention",
+      "circularity-avoidance"
+     ],
+     "teaches": [],
+     "par": 72
+    },
+    {
+     "key": "cases",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "margin/ratio"
+     ],
+     "teaches": [
+      "IF/MIN/MAX",
+      "CHOOSE"
+     ],
+     "par": 97
+    },
+    {
+     "key": "nwcsched",
+     "kind": "capstone",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "schedule"
+     ],
+     "teaches": [],
+     "par": 102
+    }
+   ]
+  },
+  {
+   "id": "k7",
+   "name": "Valuation",
+   "tier": "pro",
+   "unlock_level": 19,
+   "capstone": "pitchpage",
+   "teaches_line": "what a company is worth — discount rate, free cash flow, DCF, comps and the page a VP reads",
+   "opener_exempt": true,
+   "opener_exempt_reason": "introduces no new tag (wacc re-teaches stat-fn, taught by tapepull @k4); opens on its lowest par",
+   "drills": [
+    {
+     "key": "dcfsens",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "mixed-anchor",
+      "comma/currency-fmt",
+      "decimals",
+      "borders(top/outside/bottom)",
+      "growth/CAGR"
+     ],
+     "teaches": [],
+     "par": 35
+    },
+    {
+     "key": "fcfbuild",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "sign-convention"
+     ],
+     "teaches": [],
+     "par": 40
+    },
+    {
+     "key": "txncomps",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "stat-fn(MEDIAN/AVERAGE)",
+      "margin/ratio",
+      "bridge"
+     ],
+     "teaches": [],
+     "par": 52
+    },
+    {
+     "key": "football",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "select-edge",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "borders(top/outside/bottom)",
+      "IF/MIN/MAX"
+     ],
+     "teaches": [],
+     "par": 65
+    },
+    {
+     "key": "accdil",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "select-edge",
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "percent-fmt",
+      "decimals",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 70
+    },
+    {
+     "key": "dcf",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 85
+    },
+    {
+     "key": "comps",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "decimals",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "stat-fn(MEDIAN/AVERAGE)",
+      "margin/ratio",
+      "bridge"
+     ],
+     "teaches": [],
+     "par": 89
+    },
+    {
+     "key": "sourcesuses",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "percent-fmt",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "margin/ratio",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 92
+    },
+    {
+     "key": "wacc",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "linkage(cross-statement)"
+     ],
+     "teaches": [
+      "stat-fn(MEDIAN/AVERAGE)"
+     ],
+     "par": 112
+    },
+    {
+     "key": "pitchpage",
+     "kind": "capstone",
+     "status": "add",
+     "requires": [
+      "select",
+      "point-mode",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "IF/MIN/MAX",
+      "stat-fn(MEDIAN/AVERAGE)",
+      "comma/currency-fmt",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "date/TODAY",
+      "margin/ratio",
+      "bridge"
+     ],
+     "teaches": [],
+     "par": 88
+    }
+   ]
+  },
+  {
+   "id": "k8",
+   "name": "Credit",
+   "tier": "pro",
+   "unlock_level": 22,
+   "capstone": "cascade",
+   "teaches_line": "the debt side — facilities, sweeps, waterfalls, covenants and liquidity under three cases",
+   "opener_exempt": true,
+   "opener_exempt_reason": "introduces no new tag at all; opens on its lowest par",
+   "drills": [
+    {
+     "key": "covtable",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "copy/paste",
+      "fill(D/R)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "IF/MIN/MAX",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 36
+    },
+    {
+     "key": "debtblock",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "linkage(cross-statement)",
+      "sign-convention"
+     ],
+     "teaches": [],
+     "par": 70
+    },
+    {
+     "key": "lbo",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "growth/CAGR",
+      "margin/ratio",
+      "bridge",
+      "schedule"
+     ],
+     "teaches": [],
+     "par": 71
+    },
+    {
+     "key": "waterfall",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "copy/paste",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "point-mode",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "IF/MIN/MAX",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 77
+    },
+    {
+     "key": "liqbridge",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "IF/MIN/MAX",
+      "bridge",
+      "sign-convention"
+     ],
+     "teaches": [],
+     "par": 77
+    },
+    {
+     "key": "debtsched",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "fill(D/R)",
+      "anchor($/F4)",
+      "percent-fmt",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "IF/MIN/MAX",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "circularity-avoidance"
+     ],
+     "teaches": [],
+     "par": 86
+    },
+    {
+     "key": "revolver",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "IF/MIN/MAX",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "circularity-avoidance"
+     ],
+     "teaches": [],
+     "par": 95
+    },
+    {
+     "key": "cascade",
+     "kind": "capstone",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "IF/MIN/MAX",
+      "corkscrew(roll-forward)"
+     ],
+     "teaches": [],
+     "par": 161
+    }
+   ]
+  },
+  {
+   "id": "k9",
+   "name": "Full Builds",
+   "tier": "pro",
+   "unlock_level": 25,
+   "capstone": "shipit",
+   "teaches_line": "whole models, cold and under the clock — three statements, the DCF page, the paper LBO, the cover",
+   "opener_exempt": true,
+   "opener_exempt_reason": "introduces no new tag at all; opens on its lowest par",
+   "drills": [
+    {
+     "key": "threestmt",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "select-edge",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "linkage(cross-statement)",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 45
+    },
+    {
+     "key": "dashcover",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "select-edge",
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "percent-fmt",
+      "comma/currency-fmt",
+      "decimals",
+      "bold/italic/color"
+     ],
+     "teaches": [],
+     "par": 47
+    },
+    {
+     "key": "bsbuild",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "copy/paste",
+      "paste-special",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "corkscrew(roll-forward)",
+      "linkage(cross-statement)",
+      "sign-convention",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 64
+    },
+    {
+     "key": "cfslink",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "percent-fmt",
+      "decimals",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "sign-convention"
+     ],
+     "teaches": [],
+     "par": 66
+    },
+    {
+     "key": "isbuild",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "percent-fmt",
+      "decimals",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "margin/ratio",
+      "schedule"
+     ],
+     "teaches": [],
+     "par": 71
+    },
+    {
+     "key": "lbobuild",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "growth/CAGR",
+      "margin/ratio",
+      "schedule",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 84
+    },
+    {
+     "key": "opmodel",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "copy/paste",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "percent-fmt",
+      "decimals",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "margin/ratio",
+      "audit(trace)"
+     ],
+     "teaches": [],
+     "par": 85
+    },
+    {
+     "key": "dcfbuild",
+     "kind": "existing",
+     "status": "built",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "margin/ratio",
+      "bridge"
+     ],
+     "teaches": [],
+     "par": 113
+    },
+    {
+     "key": "shipit",
+     "kind": "capstone",
+     "status": "add",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "paste-special",
+      "corkscrew(roll-forward)",
+      "linkage(cross-statement)",
+      "tie-out/check-row",
+      "sign-convention",
+      "growth/CAGR",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "date/TODAY",
+      "schedule",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 110
+    }
+   ]
+  }
+ ],
+ "tags": [
+  "CHOOSE",
+  "IF/MIN/MAX",
+  "IFERROR",
+  "INDEX/MATCH",
+  "SUMIF(S)",
+  "VLOOKUP",
+  "align",
+  "anchor($/F4)",
+  "audit(trace)",
+  "autofit",
+  "blue-inputs",
+  "bold/italic/color",
+  "borders(top/outside/bottom)",
+  "bridge",
+  "circularity-avoidance",
+  "clear/delete",
+  "comma/currency-fmt",
+  "copy/paste",
+  "corkscrew(roll-forward)",
+  "costs-negative",
+  "cut",
+  "date/TODAY",
+  "decimals",
+  "enter/edit(F2)",
+  "fill(D/R)",
+  "filter",
+  "find/replace",
+  "goto-special",
+  "growth/CAGR",
+  "hide/unhide/group",
+  "insert/delete row-col",
+  "jump(ctrl-arrow)",
+  "linkage(cross-statement)",
+  "margin/ratio",
+  "mixed-anchor",
+  "move",
+  "parens-negative",
+  "paste-special",
+  "percent-fmt",
+  "point-mode",
+  "redo",
+  "row/col-select",
+  "save",
+  "schedule",
+  "select",
+  "select-edge",
+  "show-formulas",
+  "sign-convention",
+  "sort",
+  "stat-fn(MEDIAN/AVERAGE)",
+  "sum(Alt=)",
+  "tie-out/check-row",
+  "undo"
+ ],
+ "placement": [
+  "navigation",
+  "combo",
+  "margin",
+  "sort",
+  "opmodel"
+ ],
+ "tracks": {
+  "fluency": {
+   "id": "fluency",
+   "name": "Excel Keyboard Fluency",
+   "chapters": [
+    "k1",
+    "k2",
+    "k3"
+   ]
+  },
+  "formulas": {
+   "id": "formulas",
+   "name": "Spreadsheet Formulas & Data",
+   "chapters": [
+    "k4",
+    "k5",
+    "k6"
+   ]
+  },
+  "modeling": {
+   "id": "modeling",
+   "name": "Financial Modeling Keyboard Mastery",
+   "chapters": [
+    "k7",
+    "k8",
+    "k9"
+   ]
+  }
+ }
+}
