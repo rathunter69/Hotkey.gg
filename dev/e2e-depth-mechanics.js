@@ -535,7 +535,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
          cell is named either: the key log only has to prove work happened, so a plain arrow off
          whatever cell the board opens on is enough on any board. */
       window.__clearCel(); hideResults();
-      const keysAll = Object.keys(CHALLENGES).filter(k => !/^__/.test(k) && CHALLENGES[k] && !CHALLENGES[k].saveClose);
+      const keysAll = Object.keys(CHALLENGES).filter(k => !/^__/.test(k) && CHALLENGES[k] && !CHALLENGES[k].saveClose && !CHALLENGES[k].tour);   /* r452: the Keyboard Tour lives in CHALLENGES but is not a catalog drill (tour:true, no clock, Ctrl+S is a taught beat) — never a host for this probe */
       if (!keysAll.length) return { skipped: true, hadWork: true, prevented: true, fresh: true, host: '(none left)' };
       const key = keysAll[0];
       loadChallenge(key);
