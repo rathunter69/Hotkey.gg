@@ -627,6 +627,10 @@ try {
   }
   if (!n14) ok('certificate tracks: ' + live + ' + dev/migrate-certificates.sql match HK_TRACKS (' +
     Object.keys(truth).map(t => t + ' ' + truth[t].length).join(' · ') + ')');
+} catch (e) {
+  bad('C15 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
 /* ---- C17 (r452): CAMPAIGN CHAPTER NAMES ARE GROUP NAMES ----
    The picker folder reads groups[].name; the campaign rail reads chapters[].name. They were two
    strings for one chapter — groups said `Models I`, the campaign said `Models I · Valuation` —
