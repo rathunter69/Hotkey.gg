@@ -13,7 +13,7 @@ _Wolf returned after a break with four workstreams. Session r451 wrote the plans
 
 | # | vector | state | the doc |
 |---|---|---|---|
-| 1 | **Tutorial chapter** — the first 10 drills become an Excel keyboard tutorial (lesson cards, 2–4 beats, visible ☆, hints on); the six robust Foundations drills move intact to the chapter after it | **spec written, awaiting Wolf's D1–D10** | `dev/TUTORIAL_CHAPTER_SPEC.md` |
+| 1 | **Tutorial front end for Foundations** — ONE robust `keyboardtour` (staged, untimed, replayable, a TUTORIAL HUD that names the next keystroke; six stages; outside the catalog like the sandbox — it replaces the modal tour's Excel beats and the warm-up sandbox) + FOUR lesson drills (select · firstsum · lockref · ribbonpass) inside the existing **Foundations** chapter, right after `navigation`. No chapter rename, no `c0`, no achievement re-targeting; Foundations becomes 11 drills, `modeltour★` stays its capstone, catalog 74 → 78 | **spec v2 written, awaiting Wolf's decisions** (T1–T3 · L1 · D2–D7 · D9) | `dev/TUTORIAL_CHAPTER_SPEC.md` |
 | 2 | **Rank art** — 8-bit pixel sprites vs the shipped heraldic crests | **memo + rendered prototype, awaiting A1–A4** | `dev/ART_DIRECTION.md` · `art/rank-pixel-proto.html` · `art/rank-pixel-proto-{dark,light}.png` |
 | 3 | **Business plan** — OBA clearance, LLC (home state), EIN, bank, Stripe live, bookkeeping, mail/logins/bills routing | **reserved plan; four short sessions sequenced** | `dev/BUSINESS_PLAN.md` (+ `dev/EMAIL_SETUP.md`, `STRIPE_SETUP.md`) |
 | 4 | **Security hardening** — eight-domain audit fleet (RLS/RPC, auth, edge+secrets, browser/CSP, run integrity, repo/pipeline, data+policy, ops) with a definition of done | **reserved plan; one dedicated session** | `dev/SECURITY_PLAN.md` |

@@ -9,12 +9,17 @@ and the dev/ design docs._
 
 **READ `dev/CONTINUITY.md` §0 FIRST.** Wolf's direction after the r450 playtest: the catalog must
 teach before it tests. Session r451 produced PLANS, no product code:
-- **`dev/TUTORIAL_CHAPTER_SPEC.md`** — chapter 1 becomes a ten-drill Excel keyboard tutorial
-  (navigation kept as lesson 1 + nine new drills: select · entry · clipboard · firstsum · lockref ·
-  numfmt · fonts · alignrule · firstpage★). Lesson card = start gate; hints on by default; visible ☆;
-  pass = par×2. The six robust Foundations drills move intact to a renamed chapter ("Desk Ops",
-  D1). Catalog 74 → 83. Full cascade map (§5), invariants (§7), four-session rollout (§6), and
-  **ten Wolf decisions (§9)** — nothing builds before they are answered.
+- **`dev/TUTORIAL_CHAPTER_SPEC.md`** (**v2**, same day — v1's ten-drill chapter is superseded) —
+  **one robust Keyboard Tour + a four-drill on-ramp, inside the existing Foundations chapter.** The
+  Tour (`keyboardtour`) is a staged, untimed, replayable tutorial board that lives OUTSIDE the catalog
+  like the sandbox does today: six stages (move · select · enter & edit · formulas · the ribbon ·
+  save), a TUTORIAL HUD that names the next keystroke on screen, a one-time +25 xp bounty; it replaces
+  the 13-card modal tour's Excel beats AND the warm-up sandbox. The four lesson drills — select ·
+  firstsum · lockref · ribbonpass — slot into Foundations right after `navigation` (lesson card = start
+  gate, hints on by default, visible ☆, pass = par×2). **No chapter rename, no `c0`, no achievement
+  re-targeting**; Foundations becomes 11 drills, `modeltour★` stays its capstone, catalog 74 → 78.
+  Cascade map (§5), invariants (§7), three-wave rollout (§6), and **eleven Wolf decisions (§9,
+  including L1: build the four lesson drills or Tour only)** — nothing builds before they are answered.
 - **`dev/ART_DIRECTION.md` + `art/rank-pixel-proto.html` (+ PNG renders)** — recommendation: pixel
   sprites replace the heraldic crests (16×16 chips + a 32×32 hero master, same `rankEmblem`
   signature, integer scaling as an invariant). Four Wolf decisions (A1–A4).
