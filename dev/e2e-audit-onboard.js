@@ -112,11 +112,23 @@ const STUB = () => {
     onboarded: !!onboarded }));
   ok(t2e.handedOff, 'tour hands off to the first real drill (not the warm-up board)');
   ok(t2e.onboarded, 'finishing the tour marks the user onboarded');
+  /* r450 THE DRILL-START GATE, on the one path that matters most for it: the tour hand-off.
+     This suite deliberately does NOT set hk_gate_off (the other harnesses do) — the whole
+     point of an onboarding audit is to walk what a first-time player walks. Two properties
+     are asserted here and nowhere else in the battery: the gate is ABSENT for every step of
+     the tour (it would sit between the spotlight and the cell it points at), and it is
+     PRESENT the instant the tour hands the player a real, timed drill. */
+  const t2g = await page.evaluate(() => ({ gate: hkGate, ov: !!document.getElementById('hkGate'), running }));
+  ok(t2g.gate && t2g.ov, 'the first real drill arrives behind the start gate', JSON.stringify(t2g));
+  ok(!t2g.running, 'and its clock has not started', JSON.stringify(t2g));
   const t2f = await page.evaluate(() => {
+    demoKey({key:'x'});                       // the start key: swallowed, starts the clock
+    const started = running === true && keyLog.length === 0 && !document.getElementById('hkGate');
     setDemoSel('B4'); demoKey({key:'5'}); demoKey({key:'Enter'});
-    return S.cells['B4'].value === 5 || S.cells['B4'].value === '5';
+    return { started, landed: S.cells['B4'].value === 5 || S.cells['B4'].value === '5' };
   });
-  ok(t2f, 'after the tour the grid takes keys immediately');
+  ok(t2f.started, 'the start key is swallowed (nothing in keyLog) and starts the clock');
+  ok(t2f.landed, 'after the tour the grid takes keys immediately');
 
   console.log('T3 second visit: welcome back');
   // domcontentloaded, not load: supabase-js loads async now (r285) — 'load' waits on
@@ -135,6 +147,7 @@ const STUB = () => {
   ok(t3.gateGone && t3.landingGone, 'returning visitor skips curtain + landing');
   ok(t3.up, 'welcome-back card greets the return');
   const t3b = await page.evaluate(async () => {
+    demoKey({key:'x'});   /* r450: a returning visitor lands on a gated board too — pass it before typing */
     setDemoSel('C4'); demoKey({key:'7'});
     await new Promise(r => setTimeout(r, 450));
     const w = document.getElementById('wbDlg');
@@ -239,6 +252,182 @@ const STUB = () => {
   } else {
     ok(true, 'gate modal not shown at boot (also acceptable)');
   }
+
+  /* ============================================================================
+     r450 FIRST-SESSION FLOW HARDENING (the flow audit's reconciliation).
+     The suite used to assert only the happy path: Enter-mash the tour, land on a
+     drill, done. Every gap below is a state a real first-timer reaches that no
+     assertion covered — skipping vs finishing, refreshing mid-tour, and what the
+     first (guided, unpostable) win actually SAYS.
+     ============================================================================ */
+
+  const freshNovice = async () => {
+    await page.evaluate(() => { ['hk_xlv','hk_tour_done','hotkey_onboarded','hk_primer_done',
+      'hk_learn_done','hk_runs_lite','hotkey_solves','hk_start_coach','hotkey_last_drill','hk_last_drill']
+      .forEach(k => localStorage.removeItem(k)); });
+    await page.reload({ waitUntil: 'load' });
+    await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
+    await page.waitForTimeout(700);
+    await page.keyboard.press('Enter');  await page.waitForTimeout(900);   // landing
+    await page.keyboard.press('1');      await page.waitForTimeout(500);   // keyboard: windows
+    await page.keyboard.press('1');      await page.waitForTimeout(700);   // comfort: basically none
+  };
+
+  console.log('T6 skipping is NOT finishing: the skip arms, and the tour is replayable (P0-2)');
+  await freshNovice();
+  const t6up = await page.evaluate(() => !!(document.getElementById('tourWrap') &&
+    document.getElementById('tourWrap').classList.contains('on')));
+  ok(t6up, 'novice tour is up for the skip walk');
+
+  // (b) a DO-IT beat advances on the real chord, not just on Enter — the fundamentals
+  // are genuinely performable, not decorative. (The tour is Enter-advanceable BY DESIGN,
+  // so the replay affordance below is asserted too — an Enter-masher can come back.)
+  const t6doit = await page.evaluate(() => ({ i: __tourI, doIt: !!(__tourPlan[__tourI] && __tourPlan[__tourI].doIt) }));
+  ok(t6doit.i === 0 && t6doit.doIt, 'beat 0 is a do-it beat (the chord IS the lesson)', JSON.stringify(t6doit));
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(1050);
+  const t6adv = await page.evaluate(() => __tourI);
+  ok(t6adv === 1, 'performing the do-it chord (no Enter) advances the beat', 'tourI=' + t6adv);
+
+  // (a) ONE Esc on an early beat must NOT end the tour — it arms and says so inline.
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+  const t6arm = await page.evaluate(() => ({
+    stillOn: !!(document.getElementById('tourWrap') && document.getElementById('tourWrap').classList.contains('on')),
+    i: __tourI,
+    skipTxt: (document.getElementById('tourSkip') || {}).textContent || '',
+    done: localStorage.getItem('hk_tour_done'),
+  }));
+  ok(t6arm.stillOn && t6arm.i === 1, 'one Esc on an early beat does not end the tour', JSON.stringify(t6arm));
+  ok(/again/i.test(t6arm.skipTxt), 'the skip arms and says so inline', t6arm.skipTxt);
+  ok(!t6arm.done, 'and a single Esc has not burned hk_tour_done', String(t6arm.done));
+
+  // …the SECOND Esc really does skip. Skipping is a distinct outcome from finishing.
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(400);
+  const t6skip = await page.evaluate(() => ({
+    gone: !(document.getElementById('tourWrap') && document.getElementById('tourWrap').classList.contains('on')),
+    done: localStorage.getItem('hk_tour_done') === '1',
+  }));
+  ok(t6skip.gone, 'a second Esc actually skips the tour');
+  ok(t6skip.done, 'an escaped tour is remembered like a finished one', JSON.stringify(t6skip));
+
+  // …and that is now RECOVERABLE: the ? sheet carries the only replay affordance.
+  await page.waitForTimeout(900);
+  const t6replay = await page.evaluate(() => {
+    openKbd();
+    const a = document.getElementById('kbReplayTour');
+    return { exists: !!a, label: a ? a.textContent : null };
+  });
+  ok(t6replay.exists, 'the ? sheet offers "replay the tour"', JSON.stringify(t6replay));
+  ok(/replay/i.test(t6replay.label || ''), 'and it is labelled as a replay', t6replay.label);
+  await page.evaluate(() => document.getElementById('kbReplayTour').click());
+  await page.waitForTimeout(700);
+  const t6back = await page.evaluate(() => ({
+    up: !!(document.getElementById('tourWrap') && document.getElementById('tourWrap').classList.contains('on')),
+    i: typeof __tourI !== 'undefined' ? __tourI : -99,
+    done: localStorage.getItem('hk_tour_done'),
+  }));
+  ok(t6back.up && t6back.i === 0, 'replaying brings the tour back at beat 0', JSON.stringify(t6back));
+  ok(!t6back.done, 'and un-remembers hk_tour_done so the replay is real', String(t6back.done));
+
+  console.log('T7 refresh mid-tour must not strand the player (P1-4)');
+  await freshNovice();
+  await page.keyboard.press('ArrowRight'); await page.waitForTimeout(1050);
+  await page.keyboard.press('ArrowRight'); await page.waitForTimeout(1050);
+  const t7mid = await page.evaluate(() => __tourI);
+  ok(t7mid >= 1, 'walked into the middle of the tour before refreshing', 'tourI=' + t7mid);
+  await page.reload({ waitUntil: 'load' });
+  await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
+  await page.waitForTimeout(1200);
+  const t7 = await page.evaluate(() => ({
+    tourUp: !!(document.getElementById('tourWrap') && document.getElementById('tourWrap').classList.contains('on')),
+    landingUp: !!(document.getElementById('landing') && !document.getElementById('landing').classList.contains('gone')),
+    done: localStorage.getItem('hk_tour_done'),
+    cells: (typeof S !== 'undefined' && S && S.cells) ? Object.keys(S.cells).length : -1,
+  }));
+  // Either outcome is acceptable — resume the tour, or offer the door back into it.
+  // What is NOT acceptable is an empty board with the tour marked done and no way back.
+  ok(t7.tourUp || t7.landingUp, 'a mid-tour refresh resumes the tour or offers the way back in', JSON.stringify(t7));
+  ok(t7.done !== '1', 'a mid-tour refresh does not silently mark the tour finished', String(t7.done));
+  if (!t7.tourUp) {
+    await page.keyboard.press('Enter'); await page.waitForTimeout(1400);
+    const t7b = await page.evaluate(() => !!(document.getElementById('tourWrap') &&
+      document.getElementById('tourWrap').classList.contains('on')) ||
+      !!(document.getElementById('kbCard') && document.getElementById('kbCard').classList.contains('show')));
+    ok(t7b, 'and re-entering from the landing reaches the tour again');
+  } else {
+    ok(true, 'the tour resumed directly after the refresh');
+  }
+
+  console.log('T8 the first (guided) win says why nothing posted (P0-1)');
+  // the one-shot that explains guided must FIRE on the tour handoff, not be burned silently
+  await page.evaluate(() => { ['hk_tour_done','hotkey_onboarded','hk_learn_done','hk_runs_lite','hotkey_solves']
+    .forEach(k => localStorage.removeItem(k)); localStorage.setItem('hk_xlv','2'); });
+  await page.reload({ waitUntil: 'load' });
+  await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
+  await page.waitForTimeout(700);
+  await page.keyboard.press('Enter'); await page.waitForTimeout(1000);
+  for (let i = 0; i < 12; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(120); }
+  await page.waitForTimeout(1800);   // handoff (+350ms) then the guided one-shot toast (+800ms)
+  const t8a = await page.evaluate(() => ({
+    guided: !!guided,
+    learnDone: localStorage.getItem('hk_learn_done'),
+    toast: (document.getElementById('hkToast') || {}).textContent || '',
+  }));
+  ok(t8a.guided, 'the tour still hands off with guided ON');
+  ok(/post/i.test(t8a.toast), 'and the handoff explains that guided runs do not post a time', t8a.toast);
+  ok(t8a.learnDone === '1', 'the one-shot flag is spent only once the explanation went out', String(t8a.learnDone));
+
+  // the card itself must carry the line, in the BODY, above the action row — not only under `d`
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const t8b = await page.evaluate(() => {
+    _showResults({ t: '0.90', tSec: 0.90, keys: 12, par: 10, guided: true, combo: 17 });
+    const m = document.getElementById('resultsModal');
+    const pr = m.querySelector('.rm-practice');
+    const fold = m.querySelector('.rm-more');
+    const opts = m.querySelector('.rm-opts');
+    if (!pr) return { has: false };
+    const r = pr.getBoundingClientRect();
+    return {
+      has: true,
+      text: pr.innerText.replace(/\s+/g, ' '),
+      inFold: !!(fold && fold.contains(pr)),
+      inView: r.top >= 0 && r.bottom <= window.innerHeight && r.height > 0,
+      aboveOpts: !!(opts && r.bottom <= opts.getBoundingClientRect().top),
+      optsInView: !!(opts && opts.getBoundingClientRect().bottom <= window.innerHeight),
+      hint: (m.querySelector('.rm-more-t') || {}).innerText || '',
+    };
+  });
+  ok(t8b.has, 'the guided results card carries a not-posted line');
+  ok(/not posted/i.test(t8b.text || ''), '…and it says "not posted" in plain words', t8b.text);
+  ok(t8b.inFold === false, '…in the card BODY, not hidden inside the `d` fold');
+  ok(t8b.inView && t8b.aboveOpts, '…above the fold at 1280x800, ahead of the action row', JSON.stringify(t8b));
+  ok(t8b.optsInView, 'and the action row is still fully on screen with the line added');
+  ok(/where the time went|redo/i.test(t8b.hint), 'the first card names what is behind `d` (P1-1)', t8b.hint);
+  await page.evaluate(() => { try { hideResults(); } catch (e) {} });
+
+  console.log('T9 the curtain gives an uninvited visitor a story and a door (P0-3)');
+  await page.evaluate(() => { ['hk_beta_ok','hotkey_onboarded'].forEach(k => localStorage.removeItem(k)); });
+  await page.reload({ waitUntil: 'load' });
+  await page.waitForFunction(() => typeof CHALLENGES !== 'undefined');
+  await page.waitForTimeout(700);
+  const t9 = await page.evaluate(() => {
+    const g = document.getElementById('gate');
+    const list = document.getElementById('lockList');
+    return {
+      shown: !!(g && g.classList.contains('show')),
+      codeFirst: !!document.getElementById('lockCode'),
+      tagline: (document.getElementById('lockTag') || {}).innerText || '',
+      listHref: list ? list.getAttribute('href') : null,
+      listText: list ? list.innerText : null,
+    };
+  });
+  ok(t9.shown && t9.codeFirst, 'the curtain still gates, code input still primary');
+  ok(/excel/i.test(t9.tagline), 'the curtain now says what the product is', t9.tagline);
+  ok(!!t9.listHref && /mailto:|contact/i.test(t9.listHref), 'an uninvited visitor has a next action', String(t9.listHref));
+  ok(/list/i.test(t9.listText || ''), '…labelled as getting on the list', t9.listText);
+  await page.evaluate(() => { try { localStorage.setItem('hk_beta_ok', '1'); } catch (e) {} });
 
   const realErrors = errs.filter(e => !/supabase|Failed to fetch|NetworkError|ERR_/i.test(e));
   ok(realErrors.length === 0, 'zero page errors through onboarding', realErrors.join(' | '));

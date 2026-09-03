@@ -327,6 +327,23 @@
   .hk-pause-go{margin-top:14px; font-family:var(--mono); font-size:12.5px; font-weight:700;
     color:var(--on-accent,#0c0d0e); background:var(--accent); border:none; border-radius:9px;
     padding:10px 22px; cursor:pointer}
+  /* r450 (Wolf): THE DRILL-START GATE. Same scrim language as the pause above — deliberately,
+     because it is the same promise ("the clock is not running and your keys are not landing")
+     and a player should recognize it instantly. Only the copy and the accent differ. Every
+     color is a theme token (no literals but the shared card shadow), so it reads correctly in
+     both light and dark exactly as .hk-pause does. */
+  .hk-gate{position:absolute; inset:0; z-index:61; display:flex; align-items:center; justify-content:center;
+    background:color-mix(in srgb, var(--bg) 72%, transparent); backdrop-filter:blur(2.5px); cursor:pointer}
+  .hk-gate .hk-pause-card{animation:hkGateIn .18s ease-out}
+  /* r450: on the ONE board where the first-drill coach also shows, the coach (bottom-left,
+     z-62) clipped the gate card's last line. Lift the card off dead-center for that board
+     only — both read in full, and every other board keeps the pause overlay's exact
+     centering. */
+  .hk-gate.with-coach{align-items:flex-start; padding-top:6%}
+  .hk-gate-sub{display:block; margin-top:10px; font-size:10.5px; letter-spacing:.35px;
+    color:color-mix(in srgb, var(--muted) 78%, transparent)}
+  @keyframes hkGateIn{from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none}}
+  @media (prefers-reduced-motion: reduce){ .hk-gate .hk-pause-card{animation:none} }
   #grid td.mzt{border-top:3px solid #38445e !important}
   #grid td.mzb{border-bottom:3px solid #38445e !important}
   #grid td.mzl{border-left:3px solid #38445e !important}
@@ -371,6 +388,10 @@
   .rm-clock span{color:var(--muted)}
   .rm-bonus{font-family:var(--mono); font-size:12px; color:var(--muted); margin:2px 0}
   .rm-bonus.ok{color:var(--warn)}
+  /* r450 (flow audit P0-1): sits where the medal row would have been on a guided/mouse run */
+  .rm-practice{font-family:var(--mono); font-size:12px; color:var(--muted); margin:8px 0 2px;
+    border:1px dashed var(--line); border-radius:8px; padding:6px 8px; line-height:1.5}
+  .rm-practice span{color:var(--faint)}
   .rm-splits{margin-top:8px; font-family:var(--mono); font-size:10.5px; text-align:left}
   .rm-splits .rm-split, .rm-splits .rs-h{display:flex; gap:6px; align-items:baseline; padding:1px 2px}
   .rm-splits .rs-h{color:var(--faint); text-transform:uppercase; letter-spacing:.08em; font-size:9.5px; border-bottom:1px solid var(--line); margin-bottom:2px}
@@ -558,8 +579,49 @@
      the border COLOUR even when the width collapsed away, so the two screenshots differed and
      the guard reported ok. A guard that cannot fail is worse than no guard. */
   td.bt,td.bb,td.bl,td.br,td.ball,td.bdbl{position:relative}
+  /* r450 (Wolf: "misalignment for top borders in one of the first few foundation drills") —
+     r442's overlay was RIGHT about the mechanism and WRONG about the box. An absolutely
+     positioned pseudo-element's containing block is the cell's PADDING box, and under
+     border-collapse the padding box is inset from the cell's own edge by that cell's half of
+     the shared 1px gridline. Measured on editfix row 8: td rect top 430.125, padding box top
+     430.625 — 0.5px on every side. So the applied rule painted INSIDE the gridline instead of
+     ON it, and both axes showed it:
+
+        VERTICAL   the row's gridline still drew its full 1px above the 2px rule, so a bordered
+                   row read as a 3px stack — a faint hairline, then the heavy rule starting a
+                   whole pixel below the row boundary the neighbouring unbordered cells drew
+                   their line on. Rows sit at fractional y (the table is height:100%-stretched,
+                   so a row is 23.703px, not 24), Chrome snaps each painted line to whole CSS
+                   px, and the size of that sliver therefore changed from row to row and drill
+                   to drill — which is exactly what reads as MISALIGNMENT rather than as a
+                   uniformly thick rule. Measured pre-fix, light, DSF 8, gridline vs rule:
+                     editfix r8    gridline [-0.125, 0.875]   rule [0.875, 2.875]
+                     pastes  r9    gridline [-0.828, 0.172]   rule [0.172, 2.172]
+                     rowops  r19   gridline [-0.859, 0.141]   rule [0.141, 2.141]
+                   Post-fix the rule starts on the gridline, at the same y as its unbordered
+                   neighbour: editfix [-0.125, 1.875], pastes [-0.828, 1.172].
+        HORIZONTAL the same 0.5px inset on left and right stopped each cell's rule short of its
+                   own vertical gridlines, so a RUN of bt cells (B9:E9 in pastes, B8:E8 in
+                   editfix) was broken by a ~1px hole at every column boundary — three holes
+                   across a four-cell total rule, where Excel draws one continuous line.
+
+     FIX: pull the overlay out by 1px so it covers the cell's edge plus its half of the gridline
+     — inset -1px is exactly (used border 0.5px + the 0.5px of gridline that belongs to the
+     neighbour), so adjacent overlays meet with no seam and the rule replaces the gridline the
+     way Excel's does. The cell's overflow:hidden (r107, and load-bearing — it clips long text)
+     would clip that 1px straight back off, so bordered cells clip with a 1px margin instead:
+     same clipping for content, room for the overlay. .spill and .editing already run
+     overflow:visible on purpose and paint the overlay in full, so they stay excluded. If a
+     browser lacks overflow-clip-margin the declaration drops and the geometry is exactly r442's
+     — degraded, never broken.
+
+     Guarded by the ALIGNMENT block in dev/check-borders.js: a run of adjacent bt cells must
+     paint one continuous rule, at one y, on the same line the row's plain neighbours draw. */
+  td.bt:not(.spill):not(.editing),td.bb:not(.spill):not(.editing),td.bl:not(.spill):not(.editing),
+  td.br:not(.spill):not(.editing),td.ball:not(.spill):not(.editing),td.bdbl:not(.spill):not(.editing){
+    overflow:clip; overflow-clip-margin:1px}
   td.bt::after,td.bb::after,td.bl::after,td.br::after,td.ball::after,td.bdbl::after{
-    content:''; position:absolute; left:0; top:0; right:0; bottom:0;
+    content:''; position:absolute; left:-1px; top:-1px; right:-1px; bottom:-1px;
     pointer-events:none; z-index:4; border:0 solid var(--rule,var(--text));
   }
   td.bt::after{border-top-width:2px}
@@ -804,6 +866,9 @@
     color:var(--muted); padding:6px 4px 6px 26px; cursor:pointer; border-radius:6px}
   .camp-drill:hover{color:var(--text); background:var(--surface2)}
   .camp-drill.ok{color:var(--accent)}
+  .camp-drill.pw{color:var(--faint)}   /* r450: locked milestone — dimmed, never removed; .ok still wins the ink on a clear you already own */
+  .camp-drill.pw.ok{color:var(--accent); opacity:.8}
+  .camp-drill.pw .camp-gate{color:var(--warn); letter-spacing:.1em}
   .camp-gate{font-size:10.5px; color:var(--faint)}
   /* r425 §2.4: capstone designation rows in the tracks modal */
   .camp-cap{border-top:1px dashed var(--line); margin-top:4px; padding-top:6px}
@@ -930,7 +995,11 @@
     padding:22px 26px; width:340px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.55);
     max-height:calc(100vh - 48px); overflow-y:auto; display:flex; flex-direction:column}
   .rm-card>*{flex:0 0 auto}
-  .rm-more.open{max-height:44vh; overflow-y:auto; flex:0 1 auto}
+  /* r450 (flow audit P2-2): 44vh alone still let the fold crowd the card at <=800px tall —
+     "where the time went", the 💡 tip and the leaderboard line were pushed under the action
+     row. Clamp against the real furniture (title + time + hooks + buttons ~= 320px) so the
+     fold scrolls internally instead of squeezing the rest of the card off screen. */
+  .rm-more.open{max-height:min(44vh, calc(100vh - 320px)); overflow-y:auto; flex:0 1 auto}
   .rm-title{font-family:var(--mono); font-size:12px; color:var(--accent); text-transform:uppercase;
     letter-spacing:1px; margin-bottom:8px}
   .rm-time{font-family:var(--mono); font-size:48px; font-weight:700; color:var(--text);
@@ -952,7 +1021,10 @@
   .result.ready kbd{font-family:var(--mono); font-size:10.5px; border:1px solid var(--line); border-radius:4px; padding:0 5px}
   td.active.startcell{animation:hkStartPulse 1.5s ease-in-out infinite}
   @keyframes hkStartPulse{0%,100%{box-shadow:none} 50%{box-shadow:0 0 0 4px var(--accent-glow)}}
-  #startCoach{position:absolute; z-index:24; background:var(--surface); border:1px solid var(--accent-dim);
+  /* r450: z-index above .hk-gate (61) — the coach and the start gate are both first-run
+     teaching surfaces and they share the one board a player ever sees them on. The gate card
+     is centered, the coach is bottom-left, so they read as one moment instead of a stack. */
+  #startCoach{position:absolute; z-index:62; background:var(--surface); border:1px solid var(--accent-dim);
     border-radius:12px; padding:14px 18px; width:min(340px,80%); box-shadow:0 14px 40px rgba(0,0,0,.25);
     font-family:var(--mono); font-size:12px; color:var(--muted); line-height:1.9}
   #startCoach b{color:var(--text)}
@@ -1078,6 +1150,32 @@
     background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.22); border-radius:4px; padding:1px 6px; line-height:1}
   .ob-key.primary.focused .ob-kbd{background:rgba(6,18,12,.2); border-color:rgba(6,18,12,.3); color:var(--on-accent)}
 
+  /* ---- r450 PAYWALL MODAL. Dead CSS until HOTKEY_PREMIUM.enabled flips — #paywallModal is
+     only ever built by openPaywall(), whose only caller is the entitlement branch in
+     loadChallenge(). It sits BELOW the .ob-* block on purpose: .ob-card is centre-aligned and
+     .ob-opts is a COLUMN, and this card is left-aligned with a two-up button row — every rule
+     here is an override of an equally-specific one above, so source order is load-bearing.
+     No palette of its own: every colour is a theme token, so the card is correct on all 27
+     themes for free (screenshotted on default + daylight). ---- */
+  .ob-card.pw-card{width:470px; text-align:left; position:relative; padding:24px 26px 22px}
+  .pw-cap{font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--warn); margin-bottom:6px}
+  .pw-cap b{font-weight:700}
+  .pw-card .ob-title{text-align:left; margin-bottom:10px}
+  .pw-card .ob-body{text-align:left; font-size:13px; margin-bottom:14px}
+  .pw-body b{color:var(--warn)}
+  .pw-list{display:flex; flex-direction:column; gap:1px; border:1px solid var(--line); border-radius:10px;
+    overflow:hidden; margin-bottom:14px}
+  .pw-ch{display:flex; align-items:center; gap:9px; padding:7px 12px; font-family:var(--mono);
+    font-size:12px; color:var(--text); background:var(--surface2)}
+  .pw-ch.here{background:color-mix(in srgb, var(--warn) 16%, var(--surface2))}
+  .pw-dot{display:inline-block; width:8px; height:8px; border-radius:2px; flex:none}
+  .pw-n{margin-left:auto; color:var(--muted); font-size:11px}
+  .pw-keep{font-family:var(--mono); font-size:11px; line-height:1.7; color:var(--muted); margin-bottom:16px}
+  .ob-opts.pw-opts{flex-direction:row; flex-wrap:wrap; align-items:stretch}
+  .ob-opts.pw-opts .ob-key{flex:1 1 auto; justify-content:center; text-decoration:none; padding:11px 16px}
+  .pw-hint{font-family:var(--mono); font-size:10.5px; color:var(--faint); text-align:center; margin-top:12px}
+
   .help-toggle{font-family:var(--mono); font-size:12px; color:var(--muted); background:none; border:none; cursor:pointer; padding:0}
   .help-toggle:hover{color:var(--accent)}
   .help-toggle kbd{font-family:var(--mono); color:var(--muted); border:1px solid var(--line); border-radius:4px; padding:1px 6px; margin-right:5px}
@@ -1162,6 +1260,9 @@
   .gate-brand{font-family:var(--mono); font-weight:700; font-size:22px; letter-spacing:-.5px; margin-bottom:16px}
   .gate-brand b{color:var(--accent)}
   .gate .auth-card p b{color:var(--text)}
+  /* r450 (flow audit P0-3): the one line that says what the product is, above the code input */
+  .gate-tag{font-size:12.5px; color:var(--faint) !important; margin-bottom:14px !important;
+    border-bottom:1px solid var(--line); padding-bottom:14px}
   /* ---- top exercise row + bottom sheet tabs ---- */
   .exrow{margin-bottom:8px}
   /* r398 (Wolf #99): a LIGHT top-bar reclaim (keeps clear breathing room) paired with the
@@ -1422,6 +1523,17 @@
   .pk-folder.done .vdr-gname{color:var(--accent)}
   .pk-advtag{font-size:9px; letter-spacing:.12em; color:var(--accent); border:1px solid var(--accent-dim);
     border-radius:5px; padding:1px 6px; text-transform:uppercase; font-weight:400}
+  /* r450 PAYWALL — dead CSS until HOTKEY_PREMIUM.enabled flips (nothing carries these
+     classes with the flag off). The chapter badge borrows --warn, the same ink the r158
+     level gate uses, so "you can see it, you can't open it yet" reads the same either way.
+     The lock glyph sits INSIDE the row so the filename, the PB and the par all stay put —
+     a locked file is the same file, with a lock on it. */
+  .pk-protag{font-size:9px; letter-spacing:.12em; color:var(--warn); border:1px solid var(--warn);
+    border-radius:5px; padding:1px 6px; text-transform:uppercase; font-weight:700; white-space:nowrap}
+  .pk-lock{font-size:9.5px; line-height:1; opacity:.85; filter:grayscale(.35); flex:none}
+  .pk-byline.pw .vdr-fname{color:var(--faint)}
+  .pk-byline.pw:hover .vdr-fname{color:var(--muted)}
+  .pk-byline.pw.focus .vdr-fname{color:var(--text)}   /* keyboard focus still reads clearly — locked is not unreachable */
   /* r425 §2.4: capstone file rows wear the full-color group ring + CAPSTONE tag
      (border color is inlined per row from HOTKEY_GROUP_COLORS — full color, not the dim token) */
   .pk-captag{font-size:8.5px; letter-spacing:.14em; border:1px solid; border-radius:5px;
@@ -1726,6 +1838,8 @@
   .tour-foot{display:flex; gap:8px; padding:0 15px 14px; font-family:var(--mono); font-size:11px}
   .tour-next{color:var(--accent); cursor:pointer; border:1px solid var(--accent-dim); border-radius:6px; padding:4px 12px}
   .tour-skip{color:var(--faint); cursor:pointer; padding:4px 8px}
+  /* r450 (flow audit P0-2): the armed state of the two-press skip on the first three beats */
+  .tour-skip.armed{color:var(--warn); font-weight:600}
     /* r68: mobile gate — the game needs a physical keyboard */
   .mobile-gate{display:none}
   @media (max-width:740px), (pointer:coarse) and (max-width:1024px){
@@ -1835,9 +1949,9 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=300"></script>
+<script src="drills.js?v=301"></script>
 
-<script src="drills.js?v=300"></script>
+<script src="drills.js?v=301"></script>
 
 
 
@@ -1850,7 +1964,7 @@
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=302"></script>
+<script src="nav.js?v=303"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -23811,11 +23925,29 @@ function maybeStartCoach(){
   c.innerHTML='<div class="sc-t">how a drill works</div>'+
     '<a class="sc-x">\u00d7</a>'+
     '<b>1.</b> read the task on the right \u2014 nothing is timed yet<br>'+
-    '<b>2.</b> the glowing cell is your start \u2014 you\u2019re already on it, <b>just type</b><br>'+
-    '<b>3.</b> clear every checklist line \u2014 the clock stops itself';
+    '<b>2.</b> press any key to start the clock \u2014 that one key never lands on the sheet<br>'+   /* r450: the drill-start gate is step one of every run now */
+    '<b>3.</b> the glowing cell is your start \u2014 you\u2019re already on it, <b>just type</b><br>'+
+    '<b>4.</b> clear every checklist line \u2014 the clock stops itself';
   gw.style.position='relative';
+  /* r450 (flow audit P1-8): at 1024x700 the "how a drill works" card and the post-tour toast
+     both land bottom-left and OVERLAP — the two surfaces a first-run player most needs to read,
+     stacked on top of each other on their one and only appearance.
+     The toast lane is FIXED to the viewport (#hkToast: bottom 26px, ~46px tall); the coach is
+     absolute inside .gridwrap, which on a short window runs past the fold. So a flat bottom
+     offset can't clear the lane — 56px still collided at 1024x700 (measured). Anchor the lift
+     to the viewport instead: raise the card until its bottom edge is above the lane, clamped so
+     it can never climb out of the gridwrap. */
   c.style.left='18px'; c.style.bottom='16px';
   gw.appendChild(c);
+  try{
+    const LANE=96;   // toast bottom (26) + toast height (~46) + breathing room
+    const gr=gw.getBoundingClientRect();
+    const need=Math.round(gr.bottom - (window.innerHeight - LANE));
+    if(need>16){
+      const ceil=Math.max(16, Math.round(gr.height - c.offsetHeight - 8));
+      c.style.bottom=Math.min(Math.max(need, 56), ceil)+'px';
+    }
+  }catch(e){}
   c.querySelector('.sc-x').onclick=()=>{ try{ c.remove(); localStorage.setItem('hk_start_coach','1'); }catch(e){} };
   /* first keystroke dismisses via startClock's cleanup; latch so it never returns */
   const latch=()=>{ try{ localStorage.setItem('hk_start_coach','1'); }catch(e){} document.removeEventListener('keydown', latch, true); };
@@ -23875,6 +24007,84 @@ function hkResume(){
   try{ window.focus(); }catch(e){}
 }
 function hkClearPause(){ paused=false; pausedAt=0; try{ hkPauseShow(false); }catch(e){} }
+/* ============================================================
+   r450 THE DRILL-START GATE (Wolf: "clicking a drill drops you straight onto a live board —
+   there is no standard start point, and t=0 is ambiguous relative to an accidental first
+   keystroke, so par and leaderboard times are not measured from a uniform zero.")
+
+   The board renders in full, but input is LOCKED and the clock is at zero until the player
+   says go. The first key dismisses the gate, is SWALLOWED (never lands on the grid, never
+   opens an edit, never enters keyLog) and starts the clock at that instant. Every run on the
+   platform therefore begins from the same t=0: the moment a player chose to begin.
+
+   WHY IT REUSES .hk-pause's SHAPE (r429/r442): the pause overlay already solved this exact
+   pair of problems — freeze the clock, and take the resume key without playing it — and a
+   player who has seen one must read the other instantly. Same scrim, same card, same
+   swallow-the-key rule, same "the button lives on the scrim, never the grid, so it costs no
+   mouse flag" property. Only the copy differs.
+
+   WHERE IT DOES *NOT* ARM (each one walked, r450 — see dev/AUDIT.md):
+     - sandboxMode          the warm-up + onboarding boards are never timed; startClock()
+                            no-ops there, so a gate would be a lie with no clock behind it.
+     - demoPlaying / echoOn scripted playback owns the keyboard. `watch solution` reloads the
+                            board and then fires its own keys; a gate would eat beat one and
+                            desynchronize the whole replay (and e2e-demo-replay with it).
+     - __tourI >= 0         the tour drives the board. It runs on the sandbox board today, so
+                            this is belt-and-braces — but if the tour is ever pointed at a live
+                            drill, the gate must not appear mid-tour.
+     - a live session        marathon / rapid-fire have exactly ONE start — the session's own
+                            first key, which is what arms marathon.endAt. Re-gating between
+                            every card would stack an overlay into a running countdown and put
+                            a modal between drills in a mode whose whole point is flow.
+     - microRun             the 30-second mistakes rep is HANDED to a player already mid-flow,
+                            from the results card they just earned; its clock is a cap, not a
+                            score. It never routes through loadChallenge, so it is un-gated by
+                            construction — recorded here so nobody "fixes" that.
+     - hk_gate_off          the dev-harness opt-out (see dev/check-startgate.js), mirroring the
+                            hotkey_onboarded / hk_tour_done / hk_learn_done init pattern the
+                            suites already share.
+   ============================================================ */
+let hkGate=false;
+function hkGateOff(){ try{ return localStorage.getItem('hk_gate_off')==='1'; }catch(e){ return false; } }
+function hkGateShow(on){
+  const gw=document.querySelector('.gridwrap'); if(!gw) return;
+  let el=document.getElementById('hkGate');
+  if(!on){ if(el) el.remove(); return; }
+  if(el) return;
+  gw.style.position=gw.style.position||'relative';
+  el=document.createElement('div'); el.id='hkGate';
+  /* maybeStartCoach() runs just before hkGateArm() in loadChallenge, so the coach is already
+     in the DOM here when it is going to show at all */
+  el.className='hk-gate'+(document.getElementById('startCoach')?' with-coach':'');
+  el.innerHTML='<div class="hk-pause-card"><b>Press any key to start</b>'+
+    '<span>The board is set and the clock is at <i>0.00</i>.<br>Nothing counts until you begin.</span>'+
+    '<button class="hk-pause-go" id="hkGateGo">Start</button>'+
+    '<span class="hk-gate-sub">your first key starts the run — it won’t land on the grid</span></div>';
+  gw.appendChild(el);
+  // both handlers sit on the scrim, never the grid, so starting by mouse costs no mouse flag
+  el.addEventListener('mousedown', ev=>{ ev.preventDefault(); ev.stopPropagation(); hkGatePass(); }, true);
+}
+function hkGateArm(){
+  /* clear FIRST, always. A declining arm must still take the previous board's scrim down —
+     the r450 walk caught exactly this: hk_gate_off left the prior load's overlay painted over
+     a board the gate had disowned. */
+  hkGate=false; try{ hkGateShow(false); }catch(e){}
+  try{
+    if(sandboxMode) return;
+    if(demoPlaying || echoOn) return;
+    if(typeof __tourI!=='undefined' && __tourI>=0) return;
+    if(marathon && marathon.active) return;
+    if(gameMode!=='classic') return;
+    if(microRun) return;
+    if(hkGateOff()) return;
+  }catch(e){ return; }
+  hkGate=true; hkGateShow(true);
+}
+/* dismiss WITHOUT starting the clock — for paths that take the board over themselves */
+function hkGateClear(){ hkGate=false; try{ hkGateShow(false); }catch(e){} }
+/* dismiss AND start the clock — the player said go */
+function hkGatePass(){ if(!hkGate) return; hkGate=false; try{ hkGateShow(false); }catch(e){}
+  startClock(); try{ window.focus(); }catch(e){} }
 window.addEventListener('blur', hkPause);
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden) hkPause(); });
 function updateTimer(){ const t=(performance.now()-started)/1000; $('timer').textContent=t.toFixed(2); ghostTick(t);
@@ -24011,7 +24221,9 @@ function hkClocksFor(key){
 function hkClockFmt(sec){ sec=Math.round(sec); return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0'); }
 function hkClockStrip(key){
   const c=hkClocksFor(key); if(!c) return '';
-  return '<span class="hk-clocks">'+
+  /* r450 (flow audit P1-2): the strip advertised three tiers all session and nothing in the
+     first session ever said what they were or that a guided run can't earn them. */
+  return '<span class="hk-clocks" title="the three medal times for this drill — beat them on a clean, unguided, keyboard-only run (pass = par ×1.5 · pro = ×1.15 · legendary = par)">'+
     '<b style="color:#aeb6c0">pass '+hkClockFmt(c.pass)+'</b> · '+
     '<b style="color:#e0b341">pro '+hkClockFmt(c.pro)+'</b> · '+
     '<b style="color:#b98bff">legendary '+hkClockFmt(c.leg)+'</b></span>';
@@ -24271,6 +24483,7 @@ function startMicroRun(targets){
     }finally{ microPrefill=false; window.__hkMute=false; }
     // hand the board over — fresh clock, nothing scored
     try{ hkClearPause(); }catch(e){}   /* r429 */
+    try{ hkGateClear(); }catch(e){}   /* r450: the 30s rep is handed to a player already mid-flow, straight off the results card they just earned — no second start point, and nothing here is scored */
     running=false; clearInterval(tickH); started=0; finished=0; done=false;
     mouseUsed=false; guidedUsed=false; keyLog=[]; keyTimes=[]; keyCells=[]; undoStack=[]; redoStack=[];
     S.splits=null; S._dropped=null; S._sndOkN=undefined;
@@ -24621,7 +24834,7 @@ function showResults(o){
     if(ev.key==='Escape'){ ev.preventDefault(); hideResults(); openPicker(); return; }   // r88: the card promises esc=menu — honor it
     if((ev.key==='r'||ev.key==='R') && window.__microOffer){ ev.preventDefault();
       const mo=window.__microOffer; window.__microOffer=null; startMicroRun(mo.targets); return; }   // r421 §2.7: launch the mistakes replay
-    if(ev.key==='d'||ev.key==='D'){ ev.preventDefault(); const m=$('resultsModal'); if(m){ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); const t=m.querySelector('.rm-more-t'); if(t) t.textContent=(x&&x.classList.contains('open'))?'hide the detail':'details \u2014 keys \u00b7 band \u00b7 splits \u00b7 boards'; } return; }   // r293: progressive disclosure
+    if(ev.key==='d'||ev.key==='D'){ ev.preventDefault(); const m=$('resultsModal'); if(m){ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); const t=m.querySelector('.rm-more-t'); if(t) t.textContent=(x&&x.classList.contains('open'))?'hide the detail':(t.dataset.hint||'details \u2014 keys \u00b7 band \u00b7 splits \u00b7 boards'); } return; }   // r293: progressive disclosure \u00b7 r450: first-card hint copy (P1-1)
   };
   return _showResults(o);
 }
@@ -24752,6 +24965,14 @@ function _showResults(o){
      Keys/band/stalls/boards fold behind a d-toggle so the loop stays fast. */
   /* r421 §2.1/§2.2: the clock this run beats (+ the next one), and the ☆ verdict — never red */
   const clockRow=(!o.mouse && !o.guided) ? hkClockRow(cur, (o.tSec!=null?o.tSec:parseFloat(o.t))) : '';
+  /* r450 (first-session flow audit P0-1): when the medal row is suppressed, SAY SO where the
+     medal row would have been. The "not posted" line existed only inside the `d` fold, below
+     the fold on a 1280x800 window — so a novice's first three wins read as "I beat legendary
+     and nothing happened." This renders in the card BODY, above the fold, always. */
+  const practiceRow=(o.mouse||o.guided)
+    ? '<div class="rm-practice">practice run '+(o.mouse?'(mouse used)':'(guided)')+' — not posted, no medal'+
+      '<span>'+(o.mouse?' · keyboard-only runs count' : ' · turn guided off to make the clock count')+'</span></div>'
+    : '';
   /* r423 (Wolf round-2 §2): the mystery ☆ reveals its label HERE, found or missed */
   const bonusRow=o.bonus ? `<div class="rm-bonus${o.bonus.ok?' ok':''}">☆ hidden bonus: ${escHtml(o.bonus.label||'')} — ${o.bonus.ok?('found'+(o.bonus.xp?' · +'+o.bonus.xp+' xp':'')):'missed'}</div>` : '';
   /* r425 §2.4: a CAPSTONE card names the track leg it opens — or exactly what still stands.
@@ -24773,12 +24994,20 @@ function _showResults(o){
       }
     }
   }catch(e){}
+  /* r450 (flow audit P1-1): the FIRST results card dumps eight unintroduced systems at once, and
+     the fold that explains them was labelled in jargon the player had never met. On card one only,
+     the hint says what's actually behind `d`. Everywhere after, the terse label is right. */
+  let __firstCard=false;
+  try{ __firstCard=(parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0)<=1; }catch(e){}
+  const dHint=__firstCard
+    ? 'details — your keys vs par, where the time went, and the beats you can redo'
+    : 'details — keys · band · splits · boards';
   m.innerHTML=`<div class="rm-card">`+
     `<div class="rm-title">solved${o.pb?' · ★ new best':''}</div>`+
     `<div class="rm-time">${o.t}<span>s</span></div>`+
-    clockRow+bonusRow+capRow+
+    clockRow+practiceRow+bonusRow+capRow+
     hookRow+flowRow+
-    `<a class="rm-more-t" id="rmMoreT"><kbd>d</kbd> details \u2014 keys \u00b7 band \u00b7 splits \u00b7 boards</a>`+
+    `<a class="rm-more-t" id="rmMoreT" data-hint="${escHtml(dHint)}"><kbd>d</kbd> ${escHtml(dHint)}</a>`+
     `<div class="rm-more">`+
     `<div class="rm-stats"><div>keys<b>${o.keys}</b></div><div>optimal<b>~${o.par}</b></div><div>best<b>${best}</b></div></div>`+
     _bandRow(o)+
@@ -24802,7 +25031,7 @@ function _showResults(o){
     `</div>`;
   m.classList.add('show');
   // r88: the rm-key buttons rendered but had NO click wiring — keyboard-only card.
-  { const mt=m.querySelector('#rmMoreT'); if(mt) mt.onclick=()=>{ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); mt.innerHTML=(x&&x.classList.contains('open'))?'<kbd>d</kbd> hide the detail':'<kbd>d</kbd> details \u2014 keys \u00b7 band \u00b7 splits \u00b7 boards'; }; }
+  { const mt=m.querySelector('#rmMoreT'); if(mt) mt.onclick=()=>{ const x=m.querySelector('.rm-more'); if(x) x.classList.toggle('open'); mt.innerHTML=(x&&x.classList.contains('open'))?'<kbd>d</kbd> hide the detail':('<kbd>d</kbd> '+escHtml(mt.dataset.hint||'details \u2014 keys \u00b7 band \u00b7 splits \u00b7 boards')); }; }
   m.querySelectorAll('.rm-key[data-act]').forEach(b=>{ b.onclick=()=>{
     const a=b.dataset.act;
     if(a==='again'){ hideResults(); restartDrill(); }
@@ -25132,10 +25361,18 @@ function syncTabs(){
     if(!localStorage.getItem('hk_learn_done') && localStorage.getItem('hotkey_onboarded')){
       /* r356 (sweep): the one-shot used to fire on the BOOT load underneath the beta gate —
          toast invisible, flag burned, and the post-tour handoff owned nothing. Onboarded only. */
+      /* r450 (first-session flow audit P0-1): the tour hands off with {guided:true}, so `guided`
+         was ALREADY true here \u2014 the `!guided` branch never ran, the explanation never fired, and
+         the flag was burned OUTSIDE the branch so it could never fire later either. A novice's
+         first three solves posted nothing, earned no medal, and nothing said why.
+         Now: the toast is unconditional on a fresh device, and the one-shot flag is only spent
+         when the toast actually goes out. */
       const fresh = !localStorage.getItem('hk_runs_lite') && Object.keys(PB||{}).length===0;
-      if(fresh && !guided){ toggleGuided();
-        setTimeout(()=>showToast('guided mode is on for your first run \u2014 follow the highlighted keys \u00b7 click \u201cguided\u201d to turn it off (F1 = hints only, no lock)'), 800); }
-      localStorage.setItem('hk_learn_done','1');
+      if(fresh){
+        if(!guided) toggleGuided();
+        setTimeout(()=>showToast('guided is on for your first runs \u2014 it shows you the keys, but guided runs don\u2019t post a time. click \u201cguided\u201d (or F1 for hints only) when you want the clock to count.'), 800);
+        localStorage.setItem('hk_learn_done','1');
+      }
     }
     // r159: FROM-ZERO RAMP — a self-declared novice (comfort fork) keeps the
     // training wheels for their first 3 clean solves, unless they F1 them off.
@@ -25782,7 +26019,11 @@ function updateChecklist(){
        text (truly hidden); earning it latches the real label + lit star. Inside a mistakes
        replay that targets it, the label shows (the results card already revealed it). */
     const lab=isBonus?((i.ok || (microRun && isTarget))?('☆ '+i.label):'☆ ?'):i.label;
-    html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}${isBonus?' cl-bonus':''}${!isTarget?' cl-pre':''}"><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${lab}</span>${split}${keys}</div>`;
+    /* r450 (flow audit P1-3): an unearned ☆ rendered as a bare "☆ ?" inside a checklist headed
+       "0/5" — a first-timer read it as a sixth blocking item they couldn't decipher. The mystery
+       stays (r423); the tooltip just says it's optional and never blocks the win. */
+    const btip=isBonus?' title="a hidden bonus — find the efficient route. Optional: it never blocks the win."':'';
+    html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}${isBonus?' cl-bonus':''}${!isTarget?' cl-pre':''}"${btip}><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${lab}</span>${split}${keys}</div>`;
   });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
   html+=__altFooter;   /* r356 (sweep): the alt-routes line was BUILT since r-old but never appended — the whole 'many chords, one sheet' promise was invisible */
@@ -27024,7 +27265,7 @@ document.addEventListener('keydown',hkRawE=>{
     if(__st && __st.entry){
       // r303 ENTRY beat: the user TYPES into the live sheet (a number, or =/+ a formula).
       // Let editing keys through and advance when the target cell actually COMMITS.
-      if(k==='Escape' && !editing){ e.preventDefault(); tourShow(__tourPlan.length); return; }
+      if(k==='Escape' && !editing){ e.preventDefault(); tourSkipReq(); return; }   // r450 (P0-2)
       if(k==='Enter' && !editing){ e.preventDefault(); tourShow(__tourI+1); return; }   // the exercise is optional — Enter (the documented "next") skips it when you're not mid-edit
       const __adv=__tourI, __at=__st.at, __ok=__st.commit;
       setTimeout(()=>{ if(__tourI!==__adv || editing) return;
@@ -27043,7 +27284,7 @@ document.addEventListener('keydown',hkRawE=>{
       // fall through — the game handler below executes the chord for real
     } else {
       e.preventDefault();
-      if(k==='Enter'){ tourShow(__tourI+1); } else if(k==='Escape'){ tourShow(__tourPlan.length); }
+      if(k==='Enter'){ tourShow(__tourI+1); } else if(k==='Escape'){ tourSkipReq(); }   // r450 (P0-2)
       return;
     }
   }
@@ -27099,6 +27340,35 @@ document.addEventListener('keydown',hkRawE=>{
   }
   // open the picker with backslash (ignored while typing a formula or mid-marathon)
   if(k==='\\' && !editing && gameMode==='classic' && !e.ctrlKey && !e.altKey && !e.metaKey){ e.preventDefault(); openPicker(); return; }
+  /* r450 THE DRILL-START GATE — the board is loaded but the run has not begun. This key IS
+     the start: swallowed here so it can never land on the grid, open an edit, or enter
+     keyLog, and the clock starts at exactly this instant.
+
+     WHY IT SITS *HERE* and not at the top beside the pause branch (which it otherwise
+     mirrors): everything above owns the keyboard in its own right while a gated board waits
+     underneath it — the landing curtain, the intro cards, the tour, auth, the session summary,
+     the modes/themes/shortcuts sheets, and above all the DRILL PICKER, which `toMenu()` opens
+     directly on top of a freshly (re)loaded board. A gate branch at the top would eat the
+     picker's own arrow keys.
+
+     The two keys immediately above are a DELIBERATE carve-out, not an oversight: `\` opens the
+     drill list and `?` opens the shortcuts sheet. Both open a panel OVER the board and neither
+     can touch the grid, so treating them as "start" would re-create in a new place the exact
+     ambiguity this feature exists to kill — a clock started by a keystroke the player never
+     meant as a move.
+
+     Bare modifiers are ignored so a CHORD is never half-eaten: Ctrl+D arrives as keydown
+     'Control' then keydown 'd', and if the gate consumed 'Control' the 'd' would land on a
+     live board a frame later. Alt is NOT in that list — a bare Alt tap is a real action in
+     this engine (it opens the ribbon), so it starts the run like any other key. F5 keeps the
+     browser's reload, mirroring the __introCardOpen branch above. */
+  if(hkGate){
+    if(k==='Shift'||k==='Control'||k==='Meta'||k==='CapsLock'||k==='AltGraph'||
+       k==='NumLock'||k==='ScrollLock'||k==='ContextMenu'||k==='Dead') return;
+    if(k!=='F5') e.preventDefault();
+    hkGatePass();
+    return;
+  }
   // TYPE-TO-REPLACE (r41): typing any printable char on a selected cell starts an
   // Enter-mode edit seeded with it — Excel's most basic entry behavior. Sits after
   // the app hotkeys above; '=' and '+' fall through to the formula starter below.
@@ -27818,6 +28088,7 @@ function buildWeaknessQueue(){
   MENU_ORDER.forEach((k,idx)=>{
     const C=CHALLENGES[k]; if(!C||!C.par) return;
     if(drillLocked(k)) return;   // r158: the queue never assigns locked tiers
+    if(drillPaywalled(k)) return;   // r450: nor drills behind the paywall — the queue is a free-tier ritual
     let score=0, why='';
     if(PB[k]===undefined){
       score=2.2-(idx/MENU_ORDER.length)*0.8; why='never cleared';
@@ -27857,7 +28128,7 @@ function toggleWqPop(){
 }
 $('wqBtn').addEventListener('click',(e)=>{ e.stopPropagation(); toggleWqPop(); });
 { const __rb=$('randBtn'); if(__rb) __rb.addEventListener('click',()=>{   // r306: random retired from the bar (drill menu covers it); guarded for old markup
-  const pool=MENU_ORDER.filter(k=>k!==cur && !drillLocked(k));
+  const pool=MENU_ORDER.filter(k=>k!==cur && !drillLocked(k) && !drillPaywalled(k));   // r450: random never lands on a paid drill
   loadChallenge(pool[Math.floor(Math.random()*pool.length)]);
 }); }
 { const __wb=$('weeklyBtn'); if(__wb) __wb.addEventListener('click',startWeekly); }   // r81 hotfix: button retired; unguarded listener was a boot TypeError
@@ -27978,7 +28249,14 @@ function choosePk(){ const rows=pkRows(); const r=rows[pkSel]; if(!r) return;
   if(r.classList.contains('pk-folder')){ togglePkFold(r.dataset.group); return; }   // r147: \u21b5 on a folder folds it
   closePicker(); loadChallenge(r.dataset.key); }
 $('drillPick').addEventListener('click', ()=>{ pickerOpen?closePicker():openPicker(); });
-$('picker').addEventListener('click', e=>{ if(e.target===$('picker')) closePicker(); });
+/* r450 (Wolf): click-off closes. The old guard closed only when the click landed on #picker
+   itself — but .pk-card is a transparent 1180px box (r146), so most of what READS as backdrop
+   is actually the card's dead space and the click never reached the guard. Close on any click
+   that isn't a row, the fold strip, or the footer hints. */
+$('picker').addEventListener('click', e=>{
+  if(e.target.closest && e.target.closest('.pk-folder, .pk-byline, .pk-foot')) return;
+  closePicker();
+});
 
 /* ============================================================
    SESSION MODES — marathon (random full drills) and rapid-fire
@@ -28657,9 +28935,12 @@ function openKbd(){
     '<div class="pc-head"><div class="pc-name">shortcuts</div></div>'+
     '<div class="pc-sub">App navigation only — for Excel shortcuts, see the <a href="reference.html" style="color:var(--accent)">reference</a> page.</div>'+
     '<div class="kb-grid">'+sections+'</div>'+
-    '<div class="pc-foot"><span></span><a id="kbClose">press <kbd>?</kbd> or <kbd>esc</kbd> to close</a></div>'+
+    /* r450 (flow audit P0-2): the ONLY replay affordance in the product. Escaping the tour used
+       to be permanent per device — nothing anywhere brought the fundamentals back. */
+    '<div class="pc-foot"><a id="kbReplayTour" style="color:var(--accent)">↻ replay the tour</a><a id="kbClose">press <kbd>?</kbd> or <kbd>esc</kbd> to close</a></div>'+
     '</div>';
   const c=$('kbClose'); if(c) c.onclick=closeKbd;
+  const rt=$('kbReplayTour'); if(rt) rt.onclick=()=>{ closeKbd(); setTimeout(()=>{ try{ tourReplay(); }catch(e){} }, 140); };
   m.addEventListener('click', e=>{ if(e.target===m) closeKbd(); }, {once:true});
 }
 function openThemes(){
@@ -29000,7 +29281,7 @@ $('mhStop').addEventListener('click', ()=>{ endSession(); });
 try{ if(localStorage.getItem('hk_gridlines')==='0') document.body.classList.add('hide-gridlines'); }catch(e){}
 
 function loadRandomDrill(){
-  const pool=MENU_ORDER.filter(k=>k!==lastKey && !drillLocked(k));   // r158: sessions honor the ladder
+  const pool=MENU_ORDER.filter(k=>k!==lastKey && !drillLocked(k) && !drillPaywalled(k));   // r158: sessions honor the ladder · r450: and the paywall — filtered HERE so a session never serves a board it would have to interrupt
   const key=pool.length ? pool[Math.floor(Math.random()*pool.length)] : MENU_ORDER[0];
   lastKey=key; loadChallenge(key);
 }
@@ -29015,6 +29296,7 @@ function skipMarathonDrill(){
 
 function startSession(mode, durSec){
   closeModes(); closePicker(); hideResults(); hideSessionSummary();
+  try{ hkGateClear(); }catch(e){}   /* r450: a session has ONE start — its own first key. Drop any gate left over from the classic board we launched off. */
   gameMode=mode;
   guided=false; guidedUsed=false; updateGuideBtn();
   const cfg=SESSION_CFG[mode];
@@ -29357,6 +29639,7 @@ function demoSpotOff(){ demoSpotCur=null;
 async function playDemo(){
   if(demoPlaying||echoOn||!S) return;
   loadChallenge(cur);
+  try{ hkGateClear(); }catch(e){}   /* r450: the demo takes the board over and fires its own keys — beat one must not be eaten by the start gate */
   const C=CHALLENGES[cur]; const moves = typeof C.demo==='function'?C.demo.call(C):C.demo;
   if(!moves) return;
   demoPlaying=true; updateDemoBtn();
@@ -29413,6 +29696,7 @@ function echoStep(){
 function echoStart(){
   if(echoOn||demoPlaying||!S) return;
   loadChallenge(cur);
+  try{ hkGateClear(); }catch(e){}   /* r450: learn mode asks for the demo's chords by name — the first one is the LESSON, not a start key */
   const C=CHALLENGES[cur]; const moves=typeof C.demo==='function'?C.demo.call(C):C.demo;
   if(!moves||!moves.length) return;
   echoOn=true; echoState={moves:moves, mi:0, ki:0, miss:0};
@@ -29706,14 +29990,20 @@ function openCampaign(){
         const C=CHALLENGES[k]; if(!C) return;
         const gate=(C.par*G).toFixed(0);
         const ok=campCleared(k);
-        r+='<div class="camp-drill'+(ok?' ok':'')+'" data-key="'+k+'">'+
-          '<span><span style="color:var(--faint)">–</span> '+(ok?'✓ ':'')+(window.HOTKEY_DRILLS.labelOf[k]||k)+'</span>'+
-          '<span class="camp-gate">'+(ok?PB[k].toFixed(2)+'s':'beat '+gate+'s')+'</span></div>';
+        /* r450 FREE-TIER INTEGRITY: a paid milestone shows LOCKED, never BROKEN. The row keeps
+           its ✓, its recorded PB and its pace gate — a clear a free player already earned is
+           still theirs and still counts toward the chapter, the track and the certificate; only
+           a NEW launch is intercepted. Null with the flag off. */
+        const pw=drillPaywalled(k);
+        r+='<div class="camp-drill'+(ok?' ok':'')+(pw?' pw':'')+'" data-key="'+k+'">'+
+          '<span><span style="color:var(--faint)">–</span> '+(ok?'✓ ':'')+(pw?'\uD83D\uDD12 ':'')+(window.HOTKEY_DRILLS.labelOf[k]||k)+'</span>'+
+          '<span class="camp-gate">'+(ok?PB[k].toFixed(2)+'s':(pw?'PRO':'beat '+gate+'s'))+'</span></div>';
       });
       /* r425 §2.4: the capstone line — one clean run, any speed, unlimited retakes */
       if(c.capstone && CHALLENGES[c.capstone]){
-        r+='<div class="camp-drill camp-cap'+(c.capOk?' ok':'')+'" data-key="'+c.capstone+'">'+
-          '<span><span class="camp-capstar">★</span> '+(c.capOk?'✓ ':'')+(window.HOTKEY_DRILLS.labelOf[c.capstone]||c.capstone)+' <span class="camp-captag">capstone</span></span>'+
+        const cpw=drillPaywalled(c.capstone);   /* r450: the capstone locks with its chapter */
+        r+='<div class="camp-drill camp-cap'+(c.capOk?' ok':'')+(cpw?' pw':'')+'" data-key="'+c.capstone+'">'+
+          '<span><span class="camp-capstar">★</span> '+(c.capOk?'✓ ':'')+(cpw?'\uD83D\uDD12 ':'')+(window.HOTKEY_DRILLS.labelOf[c.capstone]||c.capstone)+' <span class="camp-captag">capstone</span></span>'+
           '<span class="camp-gate">'+(c.capOk?'clean run ✓':'one clean run — any speed')+'</span></div>';
       }
     } else {
@@ -30130,10 +30420,28 @@ function groupUnlocked(gname){
   return false;
 }
 function drillLocked(k){ const gn=GROUP_OF[k]; return (gn && !groupUnlocked(gn)) ? gn : null; }
+/* r450 PAYWALL — the engine's ONLY question about premium, and it asks drills.js.
+   Returns the chapter name when this drill is behind the (live) paywall for THIS
+   player, else null — same null-or-name shape as drillLocked() above so the two
+   read alike at every call site. While HOTKEY_PREMIUM.enabled is false, hkEntitled()
+   is true for every key and this returns null for every key: no lock renders, no
+   pool shrinks, no launch is intercepted. Do not inline an entitlement test
+   anywhere else — this and hkEntitled() are the whole surface. */
+function drillPaywalled(k){
+  try{ return (window.hkEntitled && !window.hkEntitled(k)) ? (GROUP_OF[k]||'PRO') : null; }catch(e){ return null; }
+}
 function nextUnlockedFrom(i){
-  for(let s=1;s<=MENU_ORDER.length;s++){ const k=MENU_ORDER[(i+s)%MENU_ORDER.length]; if(!drillLocked(k)) return k; }
+  for(let s=1;s<=MENU_ORDER.length;s++){ const k=MENU_ORDER[(i+s)%MENU_ORDER.length]; if(!drillLocked(k) && !drillPaywalled(k)) return k; }
   return MENU_ORDER[0];
 }
+/* r450: entitlement is read SYNCHRONOUSLY at paint time but resolves ASYNCHRONOUSLY (today the
+   localStorage stub is instant; at launch it is an RPC). Whatever resolves it calls this once it
+   lands so an already-open picker repaints against the new answer instead of showing stale locks
+   until the next open. Cheap and idempotent — safe to call on every entitlement change. */
+window.hkEntitlementRefresh = function(){
+  try{ if(pickerOpen){ buildSheetTabs(); highlightPk(); } }catch(e){}
+  try{ if($('campaignModal') && $('campaignModal').classList.contains('show')) openCampaign(); }catch(e){}
+};
 function openGateInfo(gname){
   const g=(window.HOTKEY_GATES&&window.HOTKEY_GATES.groups||{})[gname]; if(!g) return;
   // r174: mid-tour a locked tier gets a toast, not a modal — the tour scrim sits
@@ -30165,6 +30473,70 @@ function openGateInfo(gname){
   m.addEventListener('click',e=>{ if(e.target===m) close(); },{once:true});
   try{ ev('gate_hit',{g:gname, lvl:lv, clears:cl}); }catch(e){}
 }
+/* ============================================================================
+   r450 — THE UPGRADE MODAL. Opens when a player launches a drill they are not
+   entitled to. It CANNOT open while HOTKEY_PREMIUM.enabled is false, because the
+   only caller is loadChallenge()'s drillPaywalled() branch and that is null for
+   every key with the flag off.
+
+   Deliberately NOT hkProSheet(): that sheet names $7 / $19 from HOTKEY_PRO, and
+   pre-Stripe we do not quote a price we cannot charge. This one sells the
+   CATALOG (four chapters, live drill counts) and hands off to billing.html for
+   plans. Confident, short, no countdown, no fake scarcity.
+
+   House conventions honored: .onboard-modal/.ob-card chrome (so it inherits
+   every theme's tokens with no palette of its own), Esc-to-dismiss registered in
+   CAPTURE and always de-registered by close(), backdrop click closes, and the
+   decline path RETURNS THE PLAYER TO THE PICKER they launched from rather than
+   dumping them on whatever board happened to be loaded. */
+function openPaywall(key){
+  const gname = GROUP_OF[key] || 'PRO';
+  const label = (window.HOTKEY_DRILLS && window.HOTKEY_DRILLS.labelOf[key]) || key;
+  const chapters = (window.hkPremiumChapters ? window.hkPremiumChapters() : []);
+  const nPrem = (window.hkPremiumCount ? window.hkPremiumCount() : 0);
+  const nAll  = (window.hkCatalogCount ? window.hkCatalogCount() : MENU_ORDER.length);
+  let m=$('paywallModal');
+  if(!m){ m=document.createElement('div'); m.id='paywallModal'; m.className='onboard-modal'; document.body.appendChild(m); }
+  const chRows = chapters.map(c=>{
+    const col=(window.HOTKEY_GROUP_COLORS||{})[c.name]||'var(--line)';
+    return '<div class="pw-ch'+(c.name===gname?' here':'')+'">'+
+      '<span class="pw-dot" style="background:'+col+'"></span>'+
+      '<b>'+escHtml(c.name)+'</b>'+
+      '<span class="pw-n">'+c.n+' drills</span></div>';
+  }).join('');
+  m.innerHTML='<div class="ob-card pw-card"><a class="modal-x" id="pwX">×</a>'+
+    '<div class="pw-cap">◆ hotkey.gg <b>PRO</b></div>'+
+    /* the chapter leads the title, not the drill: .ob-title uppercases, and a drill label is a
+       sentence fragment ("Run the LBO math") that reads as shouting nonsense in caps. */
+    '<div class="ob-title">'+escHtml(gname)+' comes with PRO</div>'+
+    '<div class="ob-body pw-body">'+
+      '\u201c'+escHtml(label)+'\u201d is one of <b>'+nPrem+' of the '+nAll+' drills</b> PRO opens \u2014 '+
+      'the four modeling chapters, every one a full working build.'+
+    '</div>'+
+    '<div class="pw-list">'+chRows+'</div>'+
+    '<div class="pw-keep">Everything you’ve already earned stays yours — your times, your level, your medals, and every free drill on the board.</div>'+
+    '<div class="ob-opts pw-opts">'+
+      '<a class="ob-key primary" id="pwPlans" href="billing.html">See plans →</a>'+
+      '<button class="ob-key" id="pwBack">Back to the drills</button>'+
+    '</div>'+
+    '<div class="pw-hint">esc — back to the drills</div>'+
+    '</div>';
+  m.classList.add('show');
+  const __esc=(e)=>{ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); close(true); } };
+  /* the decline path: close, then hand the player back the picker they came from.
+     `toPicker` is false only when they chose "See plans" (we're navigating away). */
+  const close=(toPicker)=>{
+    m.classList.remove('show');
+    document.removeEventListener('keydown',__esc,true);
+    if(toPicker){ try{ openPicker(); }catch(e){} }
+  };
+  document.addEventListener('keydown',__esc,true);   // r174: a modal without keyboard dismissal is a trap
+  { const x=$('pwX'); if(x) x.onclick=()=>close(true); }
+  { const b=$('pwBack'); if(b) b.onclick=()=>close(true); }
+  { const p=$('pwPlans'); if(p) p.onclick=()=>{ try{ ev('paywall_plans',{k:key,g:gname}); }catch(e){} close(false); }; }
+  m.addEventListener('click',e=>{ if(e.target===m) close(true); },{once:true});
+  try{ ev('paywall_hit',{k:key, g:gname}); }catch(e){}
+}
 /* r363: getSheet/sheetTag/toggleSheetPop deleted — the morning sheet's button left the
    DOM long ago; this was dead code whose leaderboard key ('daily-') caused the empty
    daily-board bug (r362). The Daily Mix owns the ritual now. */
@@ -30181,6 +30553,23 @@ function loadChallenge(key, opts){
       const __gn=drillLocked(key);
       if(__gn){
         openGateInfo(__gn);
+        if(S){ return; }                       // a board is on screen — stay on it
+        key=nextUnlockedFrom(-1);              // BOOT: never strand an empty grid (r174)
+      }
+      /* r450 PAYWALL — the entitlement interception, one branch below the r158 ladder and
+         sharing its exemptions verbatim. The daily / weekly / extra-hard-challenge board and
+         an armed race ride THROUGH the paywall for the same reason they ride through the
+         gate: they are ONE seeded board that the whole site plays on the same day, and half
+         the HOTKEY_CHALLENGE_POOL sits in paid chapters — locking them would delete the free
+         tier's daily ritual and split the shared leaderboard in two. It is a sampling
+         channel by design (one board, one day, no picker access), not a leak.
+         Marathon is exempted here for a different reason: loadRandomDrill() already filters
+         its pool by entitlement, so a session can never SERVE a locked drill — this branch
+         only exists so an in-flight session is never interrupted by a modal.
+         Same state discipline as the gate: a board on screen is left untouched. */
+      const __pw=drillPaywalled(key);
+      if(__pw){
+        openPaywall(key);
         if(S){ return; }                       // a board is on screen — stay on it
         key=nextUnlockedFrom(-1);              // BOOT: never strand an empty grid (r174)
       }
@@ -30258,6 +30647,12 @@ function loadChallenge(key, opts){
     $('result').innerHTML='\u23f1 <b>ready</b> \u2014 read the task, then just type \u00b7 the clock starts on your first key'+(__cs?' \u00b7 '+__cs:''); }
   drawRibbon(); render(); resetFlash(); syncTabs(); hideResults();
   try{ maybeStartCoach(); }catch(e){}
+  /* r450: THE STANDARD START POINT. Every route onto a board funnels through here — fresh
+     load, drill switch, picker pick, win→next, Shift+F11, Esc·Esc, the weakness queue, the
+     campaign map, the daily/weekly/challenge entries — so arming the gate once, LAST (after
+     render, so the board is fully painted behind the scrim), covers all of them. hkGateArm
+     decides for itself whether this particular load is gateable. */
+  try{ hkGateArm(); }catch(e){}
 }
 /* ---- drill picker: catalog comes from drills.js (single source of truth across the app) ----
    All the maps below are thin aliases. If you're adding a new drill, edit drills.js — not here.
@@ -30378,7 +30773,11 @@ function buildSheetTabs(){   // r147: THE DATA ROOM — VDR file tree (was r80 s
   groups.forEach((g,gi)=>{
     const folded=folds.includes(g.name);
     const gcol=(window.HOTKEY_GROUP_COLORS||{})[g.name]||'var(--muted)';
-    const __adv=(window.HOTKEY_PREMIUM&&window.HOTKEY_PREMIUM.groups||[]).includes(g.name);
+    const __adv=(window.hkPremiumGroups?window.hkPremiumGroups():[]).includes(g.name);
+    /* r450: the paid chapter wears a PRO badge ONLY once the paywall is live. With
+       HOTKEY_PREMIUM.enabled false, hkPremiumOn() is false and this folder renders exactly
+       the \u25c6 advanced tag it has rendered since r156 \u2014 byte for byte, nothing added. */
+    const __pro=__adv && !!(window.hkPremiumOn && window.hkPremiumOn());
     /* r425 (Wolf \u00a74c): the folder wears its own completion. Part-done reads as a live
        "n/N cleared" counter; a fully cleared chapter swaps it for a solid \u2713 COMPLETE seal
        so total section completion is legible from the folder row, folded or not. */
@@ -30393,6 +30792,7 @@ function buildSheetTabs(){   // r147: THE DATA ROOM — VDR file tree (was r80 s
       (__done?'<span class="pk-done" title="every file in this folder is cleared">\u2713 complete</span>'
              :'<span class="pk-prog'+(__clr?'':' none')+'" title="'+__clr+' of '+g.keys.length+' files cleared">'+__clr+'/'+g.keys.length+'</span>')+
       (__adv?'<span class="pk-advtag">\u25c6 advanced</span>':'')+
+      (__pro?'<span class="pk-protag" title="this chapter comes with PRO">\uD83D\uDD12 PRO</span>':'')+
       '<span class="vdr-n">'+g.keys.length+' file'+(g.keys.length===1?'':'s')+(folded?' \u00b7 folded':'')+'</span>';
     const __gated=!groupUnlocked(g.name);   // r158: locked tier reads as locked
     if(__gated){ const gg=(window.HOTKEY_GATES.groups||{})[g.name];
@@ -30409,17 +30809,28 @@ function buildSheetTabs(){   // r147: THE DATA ROOM — VDR file tree (was r80 s
       const C=CHALLENGES[key]; if(!C) return;
       const __a=(window.__deskAsg||{})[key];   // r130: staffer's pinned drill
       const __cap=!!((window.HOTKEY_DRILLS.meta[key]||{}).capstone);   /* r425 \u00a72.4: capstone designation on the picker card */
+      /* r450 PAYWALL: the locked catalog IS the sales page \u2014 a paid drill is never hidden,
+         never removed from the tree, and never skipped by the keyboard. It renders in place
+         with a lock glyph and a dimmed name; \u2191\u2193 still walk onto it, \u21b5 still selects it, and the
+         LAUNCH is what gets intercepted (loadChallenge \u2192 openPaywall). Null with the flag off. */
+      const __pw=drillPaywalled(key);
       const row=document.createElement('div');
-      row.className='pk-byline'+(key===cur?' cur':'')+(PB[key]!==undefined?' held':'')+(__a?' asg':'')+(folded?' hidden':'')+(__gated?' gated':'')+(__cap?' capstone':'');
+      row.className='pk-byline'+(key===cur?' cur':'')+(PB[key]!==undefined?' held':'')+(__a?' asg':'')+(folded?' hidden':'')+(__gated?' gated':'')+(__cap?' capstone':'')+(__pw?' pw':'');
       row.dataset.key=key; row.dataset.group=g.name; row.dataset.gi=gi;
       row.innerHTML='<span class="vdr-guide">'+(ki===g.keys.length-1?'\u2514':'\u251c')+'</span>'+
         '<span class="vdr-fidx">'+String(gi+1).padStart(2,'0')+'.'+(ki+1)+'</span>'+
         (__a?'<span class="pk-asgmark">\u25c6</span>':'')+
+        (__pw?'<span class="pk-lock" title="'+escHtml(__pw)+' comes with PRO">\uD83D\uDD12</span>':'')+
         '<span class="vdr-fname">'+escHtml(vdrFileName(key).slice(0,-5))+'<i class="vdr-ext">.xlsx</i></span>'+
         (__cap?'<span class="pk-captag" style="color:'+gcol+';border-color:'+gcol+'">\u2605 capstone</span>':'')+
         (PB[key]!==undefined?'<span class="vdr-pb">\u2713 '+PB[key].toFixed(2)+'s</span>':'<span class="vdr-pb dim">\u2014</span>')+
         '<span class="pk-par">par '+(C.par||'')+'s</span>';
-      row.title=(__a?('desk assignment'+(__a.t?' \u00b7 target '+(__a.t/1000)+'s':'')+(__a.note?' \u00b7 '+__a.note:'')+' \u00b7 '):'')+(C.label||'')+(PB[key]!==undefined?' \u00b7 best '+PB[key].toFixed(2)+'s':'')+(__cap?' \u00b7 '+g.name+' capstone \u2014 one clean run opens the next track leg':'');
+      row.title=(__a?('desk assignment'+(__a.t?' \u00b7 target '+(__a.t/1000)+'s':'')+(__a.note?' \u00b7 '+__a.note:'')+' \u00b7 '):'')+(C.label||'')+(PB[key]!==undefined?' \u00b7 best '+PB[key].toFixed(2)+'s':'')+(__cap?' \u00b7 '+g.name+' capstone \u2014 one clean run opens the next track leg':'')+(__pw?' \u00b7 '+g.name+' comes with PRO':'');
+      /* r450: the one board a free player may open out of a paid chapter \u2014 opmodel while the
+         placement series is still open (drills.js hkPlacementRide). Say so on the row so an
+         unlocked Full Builds file among locked siblings reads as intentional, not as a bug. */
+      if(!__pw && (window.hkPremiumKey&&window.hkPremiumKey(key)) && (window.hkPlacementRide&&window.hkPlacementRide(key)))
+        row.title += ' \u00b7 open now \u2014 placement board';
       row.onclick=()=>{ if(demoPlaying) return; closePicker(); loadChallenge(key); };
       tree.appendChild(row);
     });
@@ -30537,8 +30948,10 @@ async function savePB(){ await KV.set('hotkey_pb', JSON.stringify(PB)); }
 })();
 
 /* ---- welcome-back strip: returning users get a one-glance "you're on the game page" cue.
-   Passive by design — fades on the first keydown WITHOUT swallowing it, so zero friction:
-   the key that dismisses it is already your first rep. Shows once per browser session. ---- */
+   Passive by design — fades on the first keydown WITHOUT swallowing it, so zero friction.
+   r450: that first keydown is now the DRILL-START GATE's key, not a rep — one press dismisses
+   this card and starts the clock, which is if anything cleaner (the arrival card can no longer
+   eat the top of a live run). Shows once per browser session. ---- */
 function showWelcomeBack(key){
   /* r101: promoted from a thin strip to the frame-language DIALOG (Wolf: returning users
      should get a real welcome-back pop-out \u2014 the landing is skipped once you're onboarded,
@@ -30656,6 +31069,14 @@ async function loadEntitlement(){
       showToast('\ud83c\udf93 .edu verified \u2014 PRO unlocked free for 7 days. Every feature, on the house.');
     } }catch(e){} }
   updateProBadge();
+  /* r450 STRIPE WIRING POINT (2 of 2 in this file — the full inventory is in drills.js above
+     hkEntitled). `_pro` is ALREADY the resolved server-side entitlement: own paid sub, an
+     unexpired .edu trial, or a desk grant, and it is final by here (the .edu auto-trial above
+     can still flip it). Publishing it is what will make the paywall read the real thing instead
+     of the localStorage stub — at launch, this line plus swapping drills.js hkEntitlementRead()
+     to `return !!window.__hkPro;` is the whole product change. Inert today: with
+     HOTKEY_PREMIUM.enabled false, hkEntitled() never reaches the read. */
+  try{ window.__hkPro = _pro; if(window.hkEntitlementRefresh) window.hkEntitlementRefresh(); }catch(e){}
 }
 function isPro(){ return BETA_MODE || _pro; }
 function proDaysLeft(){ if(!_proExp) return null;
@@ -31260,6 +31681,7 @@ function startSandbox(){
   S._ROWS0=S.ROWS;
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
   try{ hkClearPause(); }catch(e){}   /* r429 */
+  try{ hkGateClear(); }catch(e){}   /* r450: the warm-up sandbox is never timed — a start gate over it would promise a clock that startClock() refuses to run */
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
   editing=false; editBuf=''; editCaret=0; editPointer=null; guidedUsed=false; keyLog=[]; undoStack=[]; redoStack=[];
   clearInterval(tickH);
@@ -31322,6 +31744,7 @@ async function startGuidedIntro(){
 async function introRibbonPeek(){
   if(!S || demoPlaying) return;
   loadChallenge(cur);
+  try{ hkGateClear(); }catch(e){}   /* r450: same as playDemo — the ribbon peek drives its own keys */
   demoPlaying=true; updateDemoBtn();
   const kf=$('keyflash'); if(kf) kf.classList.add('demo');
   const r=$('result'); if(r){ r.className='result'; r.innerHTML='▶ <kbd>alt</kbd> opens the ribbon — formatting, borders, paste special'; }
@@ -31400,12 +31823,19 @@ function showPrelaunchLock(){
   gateOpen=true;
   g.innerHTML='<div class="auth-card">'+
     '<div class="gate-brand">hotkey<b>.gg</b></div>'+
+    /* r450 (first-session flow audit P0-3): this card was the ENTIRE first impression for 100%
+       of uninvited traffic \u2014 a beige page that never said what hotkey.gg is and offered no way
+       to ask for access. The landing that explains the product sits behind this wall. One
+       tagline (what it is) and one door (get on the list); the code input stays primary. */
     '<h3>Private beta</h3>'+
+    '<p class="gate-tag" id="lockTag">Keyboard-only Excel training \u2014 74 speedrun drills against the clock, no mouse. '+
+      '<a href="About.html" style="color:var(--accent)">what this is \u2192</a></p>'+
     '<p>We\u2019re letting people in gradually \u2014 got a code?</p>'+
     '<input id="lockCode" type="text" placeholder="access code" autocomplete="off" autocapitalize="characters" spellcheck="false">'+
     '<button class="auth-go" id="lockGo">Enter</button>'+
     '<div class="auth-msg" id="lockMsg" style="color:var(--bad); min-height:15px; margin-top:9px"></div>'+
-    '<div class="micro" style="margin-top:10px">Already have an account? <a id="lockSignin" style="color:var(--accent);cursor:pointer">Sign in</a></div>'+
+    '<div class="micro" style="margin-top:10px">No code? <a id="lockList" href="mailto:hello@hotkey.gg?subject=Beta%20access%20%E2%80%94%20hotkey.gg&body=I\u2019d%20like%20on%20the%20hotkey.gg%20beta%20list." style="color:var(--accent)">get on the list \u2192</a></div>'+
+    '<div class="micro" style="margin-top:6px">Already have an account? <a id="lockSignin" style="color:var(--accent);cursor:pointer">Sign in</a></div>'+
     '</div>';
   g.classList.add('show');
   /* r279: codes validate SERVER-SIDE (beta_codes table via curtain_check) so we can
@@ -31731,6 +32161,7 @@ function startOnboardBoard(){
   S={ROWS:9, cells, active:{r:4,c:1}, sel:null, clipboard:null};
   colW=new Array(COLS+1).fill(COLW_DEFAULT);
   try{ hkClearPause(); }catch(e){}   /* r429 */
+  try{ hkGateClear(); }catch(e){}   /* r450: the tour drives THIS board — a gate would sit between the spotlight and the cell it is pointing at */
   started=0; finished=0; running=false; done=false; mode='normal'; path=[]; dialog=null;
   editing=false; editBuf=''; editCaret=0; editPointer=null; guided=false; guidedUsed=false; keyLog=[]; undoStack=[]; redoStack=[];
   clearInterval(tickH);
@@ -31770,6 +32201,27 @@ const TOUR_STEPS=[
     body:'<b>LEVEL</b> grows with practice — every clean solve earns xp. <b>RANK</b> is the competition — keyboard-only runs post to per-drill boards. And the <b>tracks</b> button holds three long tracks, each ending in a shareable certificate.'},
 ];
 let __tourI=-1, __tourAfter=null, __tourPlan=[];
+/* r450 (first-session flow audit P0-2): `Esc` is the universal panic key and it was printed on
+   beat 1 of 13. One press ended the whole fundamentals sequence, set hk_tour_done, and there was
+   no replay affordance anywhere in the product — skipping was indistinguishable from finishing
+   and irreversible. On the first three beats the skip now ARMS: the first Esc (or click) says so
+   inline, the second one actually skips. Re-armed per beat so the label always matches state. */
+let __tourSkipArmed=false;
+function tourSkipReq(){
+  if(__tourI>=0 && __tourI<3 && !__tourSkipArmed){
+    __tourSkipArmed=true;
+    const sk=$('tourSkip');
+    if(sk){ sk.textContent='press esc again to skip the tour'; sk.classList.add('armed'); }
+    return;
+  }
+  tourShow(__tourPlan.length);
+}
+/* the ? sheet's replay entry — un-remembers the tour and runs it from beat 0 */
+function tourReplay(){
+  try{ localStorage.removeItem('hk_tour_done'); }catch(e){}
+  __tourSkipArmed=false; __tourAfter=null;
+  try{ tourShow(0); }catch(e){}
+}
 /* r303: precompute the steps that will ACTUALLY show for this user — one place for the
    novice / audience / element gates, and an honest "n / total" counter (the old inline-skip
    recursion counted skipped steps). */
@@ -31802,6 +32254,7 @@ function tourShow(i){
     }, 350);
     return; }
   __tourI=i;
+  __tourSkipArmed=false;   // r450 (P0-2): each beat re-arms, so the skip label never lies
   const st=__tourPlan[i];
   // r303: park the cursor where the step teaches (name-box demo, typing/formula targets)
   if(st.at && typeof S!=='undefined' && S && !editing){ const p=parseRef(st.at); if(p){ S.active={r:p.r,c:p.c}; S.sel=null; try{ render(); updateFormulaBar(); }catch(e){} } }
@@ -31833,7 +32286,7 @@ function tourShow(i){
     const below2=r2.bottom+14+card.offsetHeight<window.innerHeight;
     card.style.top=(below2? r2.bottom+14 : Math.max(12, r2.top-card.offsetHeight-14))+'px'; } }catch(e){}
   const nx=$('tourNext'); if(nx) nx.onclick=()=>tourShow(__tourI+1);
-  const sk=$('tourSkip'); if(sk) sk.onclick=()=>tourShow(__tourPlan.length);
+  const sk=$('tourSkip'); if(sk) sk.onclick=()=>tourSkipReq();   // r450 (P0-2): arms on beats 0-2
 }
 let __tourBase=null;
 /* r134: maybeStartTour retired — the tour fires from dismissLanding, sequenced

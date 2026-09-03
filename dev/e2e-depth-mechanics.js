@@ -38,7 +38,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 160)));
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_handle_cache', '');
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1'); localStorage.setItem('hk_handle_cache', '');
   } catch (e) {} });
   await page.route('**/@supabase/**', r => r.abort());
   await page.goto(URL, { waitUntil: 'load' });

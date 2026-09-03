@@ -72,6 +72,14 @@ jobs:
         run: node dev/e2e-smoke.js
       - name: Leaderboard (tier filter, placement, seed field)
         run: node dev/e2e-lb.js
+      # r450: THE PAYWALL GUARD. Always-on, never scope-gated. Its first assertion is that
+      # drills.js HOTKEY_PREMIUM.enabled is still FALSE — i.e. that the paywall has not gone
+      # live by accident — and its §1 proves the whole r450 surface stays invisible while it
+      # is. It also owns the billing.html count guard, and billing.html is a COSMETIC-lane
+      # file, so gating this on the engine lane would leave the one page that quotes catalog
+      # numbers unwatched on exactly the pushes most likely to change them.
+      - name: Paywall (flag off = zero change · preview on = full UX · billing counts)
+        run: node dev/check-paywall.js
       # r414-review A6: a fast behavioral net for the COSMETIC lane — shared-script
       # (themes.js/nav.js) changes skip the engine matrix, so drive one drill per core
       # group through the real engine on every push to catch a silent behavioral break.
@@ -133,6 +141,14 @@ jobs:
       - name: Blur pause (clock freezes, resume swallows the key)
         if: steps.scope.outputs.engine == 'true'
         run: node dev/check-pause.js
+      # r450 (Wolf): THE DRILL-START GATE. Every board loads locked behind "press any key to
+      # start"; the first key is swallowed and starts the clock, so par and leaderboard times
+      # are measured from one uniform zero. Wired in the SAME round as the feature — the r442
+      # lesson was that check-borders/check-pause sat written-but-unwired through four
+      # playtests, and a guard that has never been seen to fire is not a guard.
+      - name: Drill-start gate (locked at load · first key swallowed · par unchanged)
+        if: steps.scope.outputs.engine == 'true'
+        run: node dev/check-startgate.js
       - name: Drill pages in sync
         if: steps.scope.outputs.engine == 'true'
         run: |

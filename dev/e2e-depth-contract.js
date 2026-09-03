@@ -37,7 +37,7 @@ const KEYS = only.length ? LEDGER.filter(k => only.includes(k)) : LEDGER;
   const page = await browser.newPage();
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 120)));
-  await page.addInitScript(() => { try { ['hotkey_onboarded', 'hk_tour_done', 'hk_learn_done']
+  await page.addInitScript(() => { try { ['hotkey_onboarded', 'hk_tour_done', 'hk_learn_done', 'hk_gate_off']
     .forEach(k => localStorage.setItem(k, '1')); localStorage.setItem('hk_handle_cache', ''); } catch (e) {} });
   await page.goto(URL, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof loadChallenge === 'function'

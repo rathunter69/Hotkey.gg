@@ -15,7 +15,7 @@ const EXEMPT = new Set(['autofit', 'combo', 'gauntlet', 'unhide']);   // unhide 
   const page = await browser.newPage();
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_beta_ok', '1');
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1'); localStorage.setItem('hk_beta_ok', '1');
     localStorage.setItem('hk_xlv', '2');
   } catch (e) {} });
   await page.goto(process.env.URL || 'http://127.0.0.1:8791/index.html', { waitUntil: 'load' });   /* r422: URL override — parallel checkouts serve on their own ports (the r421 e2e-guided pattern) */

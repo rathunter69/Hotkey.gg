@@ -312,6 +312,148 @@ window.HK_BAND = {
 // gates these groups behind entitlement. Everything else stays free.
 window.HOTKEY_PREMIUM = { enabled:false, groups:['Formulas II','Models I','Models II','Full Builds'] };
 
+/* ============================================================================
+   r450 — ENTITLEMENT. THE ONE POINT.
+   ----------------------------------------------------------------------------
+   Every premium decision on the site funnels through hkEntitled(drillKey).
+   Nothing else in the codebase may ask "is this drill paid?" — if you find
+   yourself reading HOTKEY_PREMIUM.groups anywhere but here, that's the bug.
+
+   TODAY (HOTKEY_PREMIUM.enabled === false, the live default):
+     hkEntitled() returns true for EVERY key. The whole catalog is free and
+     nothing below can render, gate, intercept, or log a single thing. That is
+     asserted by dev/check-paywall.js §1 ("flag off = zero visible change").
+
+   AT LAUNCH (enabled:true):
+     free-tier keys      -> true (unchanged, forever)
+     premium-tier keys   -> hkEntitlementRead()
+     placement boards    -> true while the placement series is still open (see
+                            hkPlacementRide below — the documented carve-out)
+
+   WHO CALLS THIS (the complete inventory — keep it complete):
+     index.html  drillPaywalled()   -> the picker lock glyph, campaign locks,
+                                       loadChallenge()'s interception, and every
+                                       drill-pool filter (marathon, weakness
+                                       queue, random, next/prev)
+     billing.html                   -> the what's-included list + counts
+     dev/check-paywall.js           -> the guard, both states
+   ============================================================================ */
+
+/* THE STRIPE WIRING POINT. This function is the ONLY read of a paid entitlement
+   in the entire front end, and it is deliberately one line long so that swapping
+   it is a swap, not a refactor.
+
+   >>>>>>>>>>>>>>>>>>>>>> STRIPE / SUPABASE GOES HERE <<<<<<<<<<<<<<<<<<<<<<<<<<
+   Replace the localStorage read below with the real entitlement. The shape that
+   already exists server-side is index.html's loadEntitlement() -> sb.rpc(
+   'my_pro_status') -> {pro, source, expires_at}, cached into `_pro`. At launch:
+
+       window.hkEntitlementRead = function(){ return !!window.__hkPro; };
+
+   ...with index.html's loadEntitlement() publishing `window.__hkPro = _pro`
+   after the RPC resolves, and calling window.hkEntitlementRefresh() so any open
+   picker re-renders. Requirements for whoever wires it:
+     · MUST be synchronous and cheap — it is called once per drill row per
+       picker paint (~74 calls). Resolve async, cache, read sync.
+     · MUST default to FALSE on error/offline. A failed read locks; it never
+       unlocks. (The reverse is a free-catalog incident.)
+     · MUST NOT be the authority. Server-side RLS + the RPCs are the authority;
+       this is presentation. A user who edits localStorage sees unlocked cards
+       and gets nothing else — no board data, no leaderboard write, no cert.
+   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> */
+window.hkEntitlementRead = function(){
+  try{ return localStorage.getItem('hk_entitled') === '1'; }catch(e){ return false; }
+};
+
+/* DEV PREVIEW — dev-only, and structurally incapable of unlocking anything.
+   `?premium=preview` on the URL, or localStorage hk_premium_preview='1', makes
+   the site behave as if the flag were ON, so the locked catalog / upgrade modal
+   / billing copy can be screenshotted and guarded without editing drills.js.
+   HONORED ONLY WHILE enabled:false. Once the flag ships true this returns early
+   and the preview is dead code — it can only ever ADD locks, never remove one,
+   so it is not an entitlement bypass in either direction. */
+window.hkPremiumPreview = function(){
+  if(window.HOTKEY_PREMIUM && window.HOTKEY_PREMIUM.enabled) return false;   // real flag on: preview is inert
+  try{ if(/[?&]premium=preview\b/.test(location.search)) return true; }catch(e){}
+  try{ return localStorage.getItem('hk_premium_preview') === '1'; }catch(e){}
+  return false;
+};
+
+/* Is the paywall live at all? The single truth every consumer asks. */
+window.hkPremiumOn = function(){
+  return !!((window.HOTKEY_PREMIUM && window.HOTKEY_PREMIUM.enabled) || window.hkPremiumPreview());
+};
+
+/* The premium chapters, and their live drill counts. Derived from the catalog on
+   every call — a chapter that gains or loses a drill can never leave a stale
+   number behind on billing.html or in the upgrade modal (dev/check-paywall.js §4
+   asserts these against menuOrder, the marketing-count pattern from e2e-smoke). */
+window.hkPremiumGroups = function(){
+  return ((window.HOTKEY_PREMIUM && window.HOTKEY_PREMIUM.groups) || []).slice();
+};
+window.hkPremiumChapters = function(){
+  const P = window.hkPremiumGroups();
+  return ((window.HOTKEY_DRILLS && window.HOTKEY_DRILLS.groups) || [])
+    .filter(g => P.indexOf(g.name) >= 0)
+    .map(g => ({ name:g.name, n:g.keys.length, keys:g.keys.slice() }));
+};
+window.hkPremiumCount = function(){ return window.hkPremiumChapters().reduce((a,c)=>a+c.n, 0); };
+window.hkCatalogCount = function(){ return ((window.HOTKEY_DRILLS && window.HOTKEY_DRILLS.menuOrder) || []).length; };
+window.hkFreeCount    = function(){ return window.hkCatalogCount() - window.hkPremiumCount(); };
+
+/* Catalog fact, independent of the flag and of the player: is this key in a paid
+   chapter? Used for the "would be locked" reasoning (badges, copy, the guard). */
+window.hkPremiumKey = function(key){
+  const g = ((window.HOTKEY_DRILLS && window.HOTKEY_DRILLS.groupOf) || {})[key];
+  return !!g && window.hkPremiumGroups().indexOf(g) >= 0;
+};
+
+/* ---- PLACEMENT vs ENTITLEMENT — the decided carve-out (r450) ----------------
+   `opmodel` is BOTH a Full Builds drill (premium) AND one of the five HK_PLACEMENT
+   boards every player must post a time on before they are ranked. Walked with the
+   flag on and no carve-out, a free player: opens the leaderboard, sees "placement
+   4/5", opens the fifth board, hits the paywall — and there is no other way to
+   finish placement, because the series is a fixed list of five named boards. Their
+   rank pill reads "⚔ placement 4/5" forever. That is not a paywall, it is a free
+   feature (ranked play) with a dead end in it, and it would read as a bug long
+   before it read as an offer.
+
+   Three options were on the table:
+     (a) swap opmodel out of HK_PLACEMENT for a free board — rejected: the series is
+         deliberately one board per band of the arc (move → format → formula → data
+         → MODEL, r336) and every model board is premium, so there is nothing to
+         swap TO without breaking the yardstick that every existing rank was set on.
+     (b) unconditional bypass for placement keys — rejected: that hands every free
+         player permanent unlimited access to a Full Builds drill.
+     (c) PLACEMENT RIDES THROUGH, AND THE HOLE CLOSES BEHIND IT. ← chosen.
+
+   The ride-through is live only while the player still has placement boards left
+   to post. The moment placement completes it shuts, and opmodel locks like the
+   rest of Full Builds. So a free player gets exactly what the series promises —
+   one run on each of the five standard boards — and not one run more. It is also
+   the single best sales moment on the site: their first Full Build, at the exact
+   instant they start caring about rank.
+
+   Precedent: this is the same shape as the r158 progression gate, which already
+   lets daily / weekly / challenge / armed-race boards ride through the ladder
+   ("community moments"). Asserted by dev/check-paywall.js §5. */
+window.hkPlacementRide = function(key){
+  const P = (window.HK_PLACEMENT && window.HK_PLACEMENT.KEYS) || [];
+  if(P.indexOf(key) < 0) return false;                     // not a placement board
+  try{ if(localStorage.getItem('hk_placement_done') === '1') return false; }catch(e){}   // placed: hole shut
+  let pb = {};
+  try{ pb = JSON.parse(localStorage.getItem('hotkey_pb') || '{}') || {}; }catch(e){}
+  return P.some(k => pb[k] === undefined);                 // still boards left to post
+};
+
+/* ---- THE ENTITLEMENT POINT ------------------------------------------------ */
+window.hkEntitled = function(key){
+  if(!window.hkPremiumOn())      return true;   // flag off (today): the whole catalog is free
+  if(!window.hkPremiumKey(key))  return true;   // free tier: free forever, entitlement never consulted
+  if(window.hkPlacementRide(key))return true;   // the documented placement carve-out
+  return window.hkEntitlementRead();            // ← the one read Stripe replaces
+};
+
 /* ---- r421 DEPTH-PASS §2.1 — MEDAL CLOCKS override map. The three named clocks
    (pass / pro / legendary) are a DISPLAY layer over HK_BAND — nothing new is stored:
    they derive at render from HOTKEY_PARS (pass = par×1.5 · pro = par×1.15 ·

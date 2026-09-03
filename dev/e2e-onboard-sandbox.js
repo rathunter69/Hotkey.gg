@@ -13,7 +13,11 @@ const URL = process.env.URL || 'http://127.0.0.1:8791/index.html';
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 200)));
   // NOTE: do NOT preset hotkey_theme — we want to prove the clean-login default.
   await page.addInitScript(() => {
-    try { localStorage.setItem('hotkey_onboarded','1'); localStorage.setItem('hk_tour_done','1'); } catch(e){}
+    /* r450: hk_gate_off — the drill-start gate would swallow this suite's first key on the
+       post-sandbox drill. Caught by check-invariants C14, not by the r450 sweep, because this
+       file's init block never carried hk_learn_done to hang the new setter off. */
+    try { localStorage.setItem('hotkey_onboarded','1'); localStorage.setItem('hk_tour_done','1');
+      localStorage.setItem('hk_gate_off','1'); } catch(e){}
   });
   await page.goto(URL, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES!=='undefined' && typeof startSandbox==='function' && typeof loadChallenge==='function', null, {timeout:15000});

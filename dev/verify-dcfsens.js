@@ -34,7 +34,7 @@ const is = (cond, m) => cond ? ok(m) : bad(m);
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 160)));
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_beta_ok', '1');
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1'); localStorage.setItem('hk_beta_ok', '1');
     localStorage.setItem('hk_xlv', '2'); localStorage.setItem('hk_handle_cache', '');
   } catch (e) {} });
   await page.goto(URL, { waitUntil: 'load' });

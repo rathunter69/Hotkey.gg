@@ -470,5 +470,64 @@ try {
   bad('C13 could not run: ' + String(e.message || e).slice(0, 120));
 }
 
+/* ---- C14 (r450): EVERY DRILL-DRIVING HARNESS DECLARES ITS DRILL-START-GATE STANCE ----
+   The r450 gate makes every board load LOCKED behind "press any key to start": the first key
+   is swallowed and starts the clock. A harness that drives a route without accounting for it
+   loses exactly one keystroke and therefore the win — measured on three drills at r450
+   (filldr 44→43, navigation 17→16, combo 25→24 logged keys, none winning). That failure is
+   silent-ish and generic: a route "stops working" with nothing in the diff to point at.
+
+   So the stance must be EXPLICIT in the file. A harness that boots index.html and loads a
+   drill either sets hk_gate_off='1' in its init block (the 53 suites/probes swept in r450) or
+   is on the short list below that keys through the real gate on purpose. This is the C13
+   pattern applied to a boot flag instead of a drill key: whoever adds the 54th probe by
+   copy-paste inherits the flag; whoever writes one from scratch gets told.
+
+   Detection is `loadChallenge(` plus EITHER an `addInitScript` or a `goto(...index.html`: not
+   every harness seeds through addInitScript (dev/check-paywall.js, which landed on the working
+   branch alongside this round, seeds with a post-goto page.evaluate instead), and a detector
+   that only knew the one shape would let the next one through. Deliberately narrow otherwise —
+   so drill-page
+   builders, SQL, and the leaderboard suite never trip it. ---- */
+try {
+  /* keys through the real gate on purpose — the two witnesses that the feature works */
+  const KEYS_THROUGH = new Set(['dev/check-startgate.js', 'dev/e2e-audit-onboard.js', 'dev/check-pause.js']);
+  const files = fs.readdirSync('dev').filter(f => /\.js$/.test(f)).map(f => 'dev/' + f);
+  /* Prose must NOT satisfy this. Every file swept in r450 also EXPLAINS the flag, so a plain
+     `/hk_gate_off/` would pass a file that only mentions it in a copy-pasted header. Match the
+     two real shapes instead — the direct setter, and the array-of-keys forEach form — rather
+     than stripping comments first: C13's decommenter is fooled by the supabase route glob in
+     e2e-formulas.js, whose star-slash-star string opens a comment that swallows the init
+     block — which is exactly how this check first reported a false failure. */
+  const SETS_FLAG = src =>
+    /setItem\(\s*['"]hk_gate_off['"]/.test(src) ||
+    /['"]hk_gate_off['"][^\n]*\]\s*[\s\S]{0,120}?forEach[\s\S]{0,120}?setItem/.test(src);
+  let n14 = 0, seen14 = 0;
+  for (const f of files) {
+    const raw = fs.readFileSync(f, 'utf8');
+    const boots = /addInitScript/.test(raw) || /goto\([^)]*index\.html/.test(raw) || /goto\(\s*BASE\s*\+\s*['"]\/?index\.html/.test(raw) || /goto\(BASE \+ '\/' \+ url/.test(raw);
+    if (!boots || !/loadChallenge\s*\(/.test(raw)) continue;
+    seen14++;
+    if (KEYS_THROUGH.has(f)) {
+      if (!/hkGate|hk_gate_off|start gate|startgate/i.test(raw)) {
+        n14++;
+        bad(`C14: ${f} is listed as keying through the r450 start gate but never mentions it — ` +
+            'either handle the gate explicitly or set hk_gate_off in its init block');
+      }
+      continue;
+    }
+    if (!SETS_FLAG(raw)) {
+      n14++;
+      bad(`C14: ${f} boots index.html and loads a drill but never sets hk_gate_off — the r450 ` +
+          'start gate will swallow its first key (one keystroke short, no win). Add ' +
+          "localStorage.setItem('hk_gate_off', '1') next to hk_learn_done, or add the file to " +
+          'KEYS_THROUGH in this check and handle the gate on purpose.');
+    }
+  }
+  if (!n14) ok(`all ${seen14} drill-driving dev/ harnesses declare a r450 start-gate stance`);
+} catch (e) {
+  bad('C14 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }
 console.log('STATIC INVARIANTS: clean');

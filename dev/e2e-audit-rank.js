@@ -55,7 +55,7 @@ const STUB = (opts) => {
     await p.addInitScript(STUB);
     await p.addInitScript(() => { try {
       localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-      localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_beta_ok', '1');
+      localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1'); localStorage.setItem('hk_beta_ok', '1');
     } catch (e) {} });
     if (extra) await p.addInitScript(extra);
     return p;

@@ -44,7 +44,7 @@ const bad = m => { fails++; console.log('  FAIL ' + m); };
     try {
       localStorage.setItem('hotkey_onboarded', '1');   // skip the landing
       localStorage.setItem('hk_tour_done', '1');       // no spotlight tour
-      localStorage.setItem('hk_learn_done', '1');      // no auto-guided first drill
+      localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');      // no auto-guided first drill
       localStorage.setItem('hk_handle_cache', '');     // no welcome-back card
     } catch (e) {}
   });

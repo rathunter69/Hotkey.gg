@@ -1,5 +1,140 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r450 — THE PAYWALL, BUILT DARK: one entitlement point, a locked catalog, and the Stripe wiring inventory
+
+_Scope: the COMPLETE premium user experience behind `HOTKEY_PREMIUM.enabled`, which stays **false**.
+The deliverable is not a paywall that works — it is a paywall that is provably invisible until one
+boolean moves. Everything below was driven through a new dev preview so the flag itself was never
+edited to test it, and `dev/check-paywall.js` asserts BOTH states on every run._
+
+### THE HEADLINE: `hkEntitled(key)` IS THE ONLY QUESTION ANYONE ASKS
+
+There is now exactly one function in the codebase that answers "is this drill paid?", and exactly one
+line inside it that reads an entitlement:
+
+```
+hkEntitled(key)                     drills.js
+  ├─ !hkPremiumOn()          -> true    flag off (today): the whole catalog is free
+  ├─ !hkPremiumKey(key)      -> true    free tier: free forever, entitlement never consulted
+  ├─  hkPlacementRide(key)   -> true    the documented placement carve-out (below)
+  └─  hkEntitlementRead()             ← THE ONE READ STRIPE REPLACES
+```
+
+The engine reaches it through a single adapter, `drillPaywalled(k)` in `index.html`, which returns a
+chapter name or null — the same null-or-name shape as the r158 `drillLocked(k)` it sits beside, so the
+two ladders read alike at every call site. **Six** call sites in total: the picker row, the tracks-modal
+row, `loadChallenge()`'s interception, and three drill-pool filters (marathon, weakness queue, random).
+Nothing else in the tree reads `HOTKEY_PREMIUM.groups` any more — the picker's r156 `◆ advanced` tag was
+repointed at `hkPremiumGroups()` in the same pass, so the SSOT is real and not aspirational.
+
+**Counts are DERIVED, never typed.** The brief said "39 of 74"; the live catalog says **40 of 74**
+(Formulas II 10 · Models I 10 · Models II 10 · Full Builds 10). That one-drill drift between a written
+number and the board is exactly the failure mode `e2e-smoke`'s "N banker-grade drills" guard was built
+for, so no number on `billing.html` or in the upgrade modal is written by hand — every one comes from
+`hkPremiumChapters()` at render, and `check-paywall.js §4` re-derives them from `menuOrder` in Node and
+compares. A chapter that gains or loses a drill cannot leave a stale marketing count anywhere.
+
+### PLACEMENT vs ENTITLEMENT — the collision, walked, and the decision
+
+`opmodel` is **both** a Full Builds drill (paid) and one of the five `HK_PLACEMENT` boards every player
+must post a time on before they are ranked. Walked with the flag on and no carve-out, a free player
+opens the leaderboard, sees `⚔ placement 4/5`, opens the fifth board, and hits the paywall — with **no
+other path to finishing placement**, because the series is a fixed list of five named boards. Their rank
+pill reads `4/5` forever. That is not a paywall; it is a free feature (ranked play) with a dead end in
+it, and it reads as a bug long before it reads as an offer.
+
+| option | verdict |
+|---|---|
+| (a) swap `opmodel` out of `HK_PLACEMENT` for a free board | **rejected** — the series is deliberately one board per band of the arc (move → format → formula → data → **model**, r336) and *every* model board is paid. There is nothing to swap TO without breaking the yardstick every existing rank was set on. |
+| (b) unconditional bypass for placement keys | **rejected** — hands every free player permanent unlimited access to a Full Builds drill. |
+| **(c) placement RIDES THROUGH, and the hole closes behind it** | **CHOSEN** |
+
+The ride-through is live only while the player still has placement boards left to post
+(`hkPlacementRide`: no `hk_placement_done` latch **and** at least one of the five without a PB). The
+moment placement completes it shuts and `opmodel` locks with the rest of Full Builds. A free player gets
+exactly what the series promises — one run on each of the five standard boards — and not one run more.
+It is also the best sales moment on the site: their first full build, at the instant they start caring
+about rank. Precedent is exact: r158 already lets daily / weekly / challenge / armed-race boards ride
+through the progression ladder as "community moments". **Asserted four ways** (`§5`): the collision is
+real, the ride is open mid-placement, the hole closes on both the fifth PB and the owner latch, and no
+other paid drill ever rides through.
+
+**The daily / weekly / extra-hard board rides through too**, on the same r158 line and for the same
+reason: 11 of the 14 keys in `HOTKEY_CHALLENGE_POOL` sit in paid chapters, and one seeded board that the
+whole site plays on the same day cannot be split in two without deleting the free tier's daily ritual and
+forking the leaderboard. That is a sampling channel by design — one board, one day, no picker access.
+**Marathon is filtered, not exempted**: `loadRandomDrill()` drops un-entitled keys from its pool, so a
+session can never *serve* a board it would then have to interrupt with a modal.
+
+### NO RUG-PULL: what a free player keeps when the flag flips
+
+The paywall gates **launch**, and nothing else. Every one of these was walked in the preview:
+
+- **PBs survive and stay visible.** A locked picker row still prints `✓ 61.20s` — the file is the same
+  file, with a lock on it. Asserted (`§2`).
+- **Clears already banked on a now-paid milestone keep their ✓** in the tracks modal, still counting
+  toward the chapter, the track and the certificate. Asserted (`§3`).
+- **Locked ≠ broken.** A paid milestone renders dimmed with a 🔒 and a `PRO` gate label; it never renders
+  empty, `undefined`, or `NaN`. Asserted (`§3`).
+- **XP, levels, medals, certificate progress: untouched.** No paywall branch touches a scoring path.
+- `hk_entitled` was added to `nav.js`'s sign-out wipe list, beside `hk_beta_unlock` — an account
+  entitlement mirrored on a device must die with the session (the r416/r417 shared-machine class).
+
+### THE LOCKED CATALOG IS THE SALES PAGE
+
+Nothing is hidden. All 74 files still render, no row is removed, and **the keyboard still reaches every
+locked card** — `pkRows()` includes them, `↑↓` walk onto them, `↵` selects them, and it is the *launch*
+that is intercepted. The lock sits inside the row so the filename, the PB and the par column never move.
+The chapter folder gains a `🔒 PRO` badge in `--warn`, the same ink the r158 level gate already uses, so
+"you can see it, you can't open it yet" reads identically on both ladders.
+
+The upgrade modal is deliberately **not** `hkProSheet()`: that sheet names `$7` / `$19` from
+`HOTKEY_PRO`, and pre-Stripe we do not quote a price we cannot charge. The new one sells the catalog —
+four chapters, live counts, one line promising nothing already earned is lost — with `See plans →`
+handing off to `billing.html` and a decline path that returns the player **to the picker they launched
+from**, not to whatever board happened to be loaded. Esc dismisses (capture listener, always
+de-registered), backdrop closes, `§3` asserts the modal contains no `$` figure at all.
+
+`billing.html` is now credible pre-payments: a plan card whose price is the literal token **TBD** beside
+a `pricing not set` badge, a **disabled** `Payments launching soon` button — no Stripe key, no Edge
+Function call, and pointedly **no dead RPC** (the H1 / AUDIT r417 §B lesson: a scaffold that calls
+something which does not exist masks the real failure at launch) — and a what's-included list generated
+from `HOTKEY_PREMIUM.groups` × live counts. It renders for signed-out visitors too, because that is who
+the modal's `See plans` sends there. With the flag off its copy is honest about it: *"Every one of the 74
+drills is free right now."*
+
+### THE DEV PREVIEW, AND WHY IT CANNOT BE A BYPASS
+
+`?premium=preview` or `localStorage hk_premium_preview='1'` makes the site behave as if the flag were on.
+It is honored **only while `enabled:false`** — once the flag ships true the function returns early and the
+preview is dead code. Structurally it can only ever ADD locks, never remove one, so it is not an
+entitlement bypass in either direction. Every screenshot in this round and every ON-state assertion in
+`check-paywall.js` runs through it; `drills.js` was never edited to test itself, and `§2` asserts the
+preview does not mutate `HOTKEY_PREMIUM.enabled`.
+
+### `dev/check-paywall.js` — 56 assertions, both states, one run
+
+| § | asserts |
+|---|---|
+| §0 | `HOTKEY_PREMIUM.enabled` is **false** in source. Fires if the paywall ever goes live by accident. |
+| §1 | **flag off = zero change**: `hkEntitled` true for all 74 · `drillPaywalled` null for all 74 · zero locks / zero `PRO` badges / zero `.pw` rows in the picker · the r156 `◆ advanced` tags still exactly 4 · `#paywallModal` **never constructed** · a paid drill launches with no modal and no bounce · zero locks in the tracks modal · zero page errors |
+| §2 | preview ON: 39 locked cards each with a glyph, 4 chapter badges, nothing hidden, keyboard reaches and focuses a locked card, an earned PB still shows, pools skip paid keys |
+| §3 | modal opens on a blocked launch, board state untouched, names all four chapters + live counts, `See plans → billing.html`, **no `$` figure**, Esc closes, decline returns the picker, tracks modal locked-not-broken |
+| §4 | billing counts `== menuOrder` in **both** states, price is TBD, checkout disabled, no `$` anywhere in the plans block |
+| §5 | the placement carve-out and its closing, four ways |
+| §6 | `hk_entitled='1'` unlocks the tier, the refresh hook repaints the picker clean, paid chapters keep their PRO badge for an entitled player (branding, not a gate) |
+
+### STRIPE WIRING INVENTORY
+
+Three files, five lines. `drills.js hkEntitlementRead()` (the one read) · `index.html loadEntitlement()`
+(publish `window.__hkPro`, already resolved server-side by `my_pro_status`) · `billing.html #pwCheckout`
+(the disabled stub) · `billing.html #pwPrice` / `.pw-tbd` (the TBD token) · `nav.js` sign-out wipe list.
+Each carries an inline `STRIPE GOES HERE` marker naming what to swap and the three requirements on the
+read: **synchronous** (called ~74× per picker paint — resolve async, cache, read sync), **defaults FALSE
+on error** (a failed read locks; the reverse is a free-catalog incident), and **not the authority** (RLS
+and the RPCs are; this is presentation, and a user who edits `localStorage` sees unlocked cards and gets
+nothing else).
+
 ## r440 H6b-12 — balcheck + tieout + balance: Formulas II CLOSES 10/10 (DEPTH_PASS §4.48 + §4.51 + §4.55 + §2.3)
 _The chapter's last three boards. All three carried a FORMATTING ☆ on their §4 page, all three
 had those ☆s re-cut under §1.0(d); one of them (`tieout`) came within a diagnostic of retirement
@@ -12795,3 +12930,286 @@ Six scalars in one column have no block to fill, no second pass to compress and 
 **COUPLING SWEEP (the standing three greps) — CLEAN.** No `CHALLENGES.dashcover._o` and no `loadChallenge('dashcover')` anywhere in `dev/`. The only quoted-key hits are `dev/migrate-certificates.sql` (catalog membership, correct, unchanged) and `dev/seed-field.sql` (historical leaderboard rows, C13-exempt).
 
 **ALT-PATHS:** three NEW entries; `dashcover` was one of §1.8's nine zero-ALT drills, so nothing is deleted and nothing may be resurrected.
+
+
+## r450 — THE DRILL-START GATE: every board loads locked behind "press any key to start"
+
+_Engine-global, not a drill wave. Wolf: "clicking a drill drops you straight onto a live board —
+there is no standard start point, the clock's t=0 is ambiguous relative to an accidental first
+keystroke, and par/leaderboard times are therefore not measured from a uniform zero."_
+
+### THE FEATURE
+
+A drill now renders in full but **input is locked and the clock is at zero** until the player
+says go. A centered scrim over the grid reads **"Press any key to start"**; the first key
+dismisses it, is **swallowed** (never lands on the grid, never opens an edit, never enters
+`keyLog`) and starts the clock at that instant. Clicking the scrim also starts it — the copy
+stays keyboard-first, and like the r429 pause's Resume button the click lives on the scrim and
+never on the grid, so it costs no `mouseUsed` flag.
+
+It reuses the **r429/r442 blur-pause overlay's language deliberately** — same scrim, same card,
+same swallow-the-key rule — because that overlay already solved this exact pair of problems
+(freeze the clock; take a key without playing it) and a player who has seen one must read the
+other instantly. `.hk-gate` sits inside `.gridwrap`, which carries its own paper palette under
+`html[data-dark="1"]` (r213), so the gate is theme-correct in light and dark by construction,
+exactly as `.hk-pause` is. Screenshots: `startgate-1-gate-{dark,light}.png`,
+`startgate-7-pause-card-{dark,light}.png` (the two cards side by side).
+
+**One arm point.** `hkGateArm()` is called last in `loadChallenge`, after `render()`. Every route
+onto a board funnels through that function — fresh load, drill switch, picker pick, Esc·Esc,
+Shift+F11, Ctrl+S restart, win→next, weakness queue, campaign map, daily/weekly/challenge,
+`exitSandbox`, the tour hand-off — so one call covers all of them and no future entry point can
+forget it.
+
+### WHERE IT DOES NOT ARM — each one WALKED, not reasoned about
+
+| path | gate | why |
+|---|---|---|
+| warm-up sandbox · onboarding board | no | `startClock()` no-ops under `sandboxMode`; a gate there promises a clock that will not run |
+| the spotlight tour | no | the tour drives the board; a gate would sit between the spotlight and the cell it points at. (It runs on the cleared board today, so the `__tourI` guard is belt-and-braces — but the tour's hand-off to the first real drill IS gated, and `e2e-audit-onboard` now asserts both halves) |
+| watch-solution · learn mode · the ribbon peek | no | scripted playback reloads the board and then fires its own keys; a gate would eat beat one and desynchronize the replay |
+| marathon · rapid-fire | no | a session has exactly ONE start — its own first key, which is what arms `marathon.endAt`. Re-gating between cards would drop a modal into a running countdown, in the two modes whose entire point is flow. Rapid-fire never routes through `loadChallenge` at all, so it is un-gated by construction; `startSession()` clears any gate left on the classic board it launched from, and `exitSession()` returns to a gated one |
+| the 30-second mistakes rep (`microRun`) | no | handed to a player already mid-flow, straight off the results card they just earned; its clock is a cap, not a score, and nothing there is graded. It never routes through `loadChallenge`, so this is recorded so nobody "fixes" it |
+| `\` (drill list) and `?` (shortcuts) | pass-through | the two keys that open a panel OVER the board and cannot touch the grid. Treating them as "start" would re-create in a new place the exact ambiguity the feature exists to kill — a clock started by a keystroke nobody meant as a move. The gate branch sits BELOW their handlers for this reason |
+| bare `Shift`/`Control`/`Meta`/`CapsLock`/… | ignored | a chord arrives as two keydowns. If the gate ate `Control`, the `d` of Ctrl+D would land on a live board a frame later. `Alt` is deliberately NOT on that list — a bare Alt tap is a real action here (it opens the ribbon) |
+
+### ROUTES WALKED ONTO A GATED BOARD (all clean, all on the real page)
+
+`?race=<drill>&t=&by=` (the challenge link — gate up, its own "type to start the race" line
+intact, first key starts it) · `?drill=<key>` deep link · the picker's own arrows over a gated
+board (`toMenu()`) · guided mode (the rails, `gtarget`/`gt-*`/`goff`, all paint under the scrim,
+so the board is fully readable while the player decides to begin) · the returning-user
+welcome-back card (its first-keydown fade and the gate's start key are now the same press) ·
+the first-drill coach · the celebration card. **`Ctrl+S` restart was walked and found to be dead
+code in today's catalog** — every one of the 74 drills carries `saveClose`/`usesSave`, so Ctrl+S
+is always the save beat and never reaches `restartDrill()`. Recorded, not changed.
+
+### THE REAL COST: THE HARNESS SWEEP
+
+Measured, not guessed. With the gate armed, a driven route loses exactly one keystroke and
+therefore the win: **filldr 44→43, navigation 17→16, combo 25→24** logged keys, none reaching
+`done`. That is 55 dev/ harnesses.
+
+The contract is `localStorage['hk_gate_off']='1'`, added to the shared init block those files
+already copy from each other (`hotkey_onboarded` · `hk_tour_done` · `hk_learn_done` ·
+`hk_handle_cache`), in each file's own quoting and spacing. Two files deliberately do NOT set it
+and key through the real gate: `dev/check-startgate.js` and `dev/check-pause.js`.
+`dev/e2e-audit-onboard.js` also stays on the real path and gained the two assertions that matter
+most for the onboarding claim — the gate is absent for every tour step, and present the instant
+the tour hands over a real timed drill.
+
+**Par integrity is proved where the flag would otherwise hide it.** `check-startgate` §7 runs the
+same demo route on the same seed twice — once paying a real gate key, once with `hk_gate_off` —
+and asserts identical `keyLog`: filldr 45/45, navigation 17/17, combo 25/25, both winning. Without
+that section, opting the battery out would prove nothing about par.
+
+### THE GUARDS (§3.3 — a bug class fixed in the round gets an invariant in the same round)
+
+- **`dev/check-startgate.js`** (new, wired into `gate.yml` in this round — the r442 lesson was
+  that `check-borders`/`check-pause` sat written-but-unwired through four playtests). Eight
+  sections: overlay at load · input locked · first key swallowed and absent from `keyLog` · t=0 at
+  dismissal · re-arm on Esc·Esc / Shift+F11 / drill switch / win→next · no stacking with the
+  blur-pause in either direction · par integrity both ways · the deliberate non-gates.
+- **`check-invariants` C14**: every dev/ harness that boots index.html and loads a drill must
+  declare a start-gate stance — set `hk_gate_off`, or be on the short KEYS_THROUGH list. It fired
+  on its first run and caught `dev/e2e-onboard-sandbox.js`, which the mechanical sweep had missed
+  because its init block never carried `hk_learn_done` to hang the new setter off.
+
+### TWO BUGS THE WALK FOUND (neither reasoned about, both from driving the real page)
+
+1. **`hkGateArm()` left a stale scrim.** When it declined to arm (session, demo, `hk_gate_off`) it
+   returned before touching the DOM, so the *previous* board's overlay stayed painted over a board
+   the gate had disowned. It now clears first, always, and arms second.
+2. **The first-drill coach was unreadable behind the scrim** (z-24 under z-61) and then, once
+   raised, clipped the gate card's last line. The coach is now z-62 and the gate wears
+   `.with-coach` on that one board, lifting the card off dead-center so both read in full. The
+   coach's copy gained the gate as step 2 — and its step 1, "nothing is timed yet", is now
+   literally true instead of approximately true. Screenshot:
+   `startgate-6-coach-plus-gate-dark.png`.
+
+### GATE (all 20, this worktree, own port 8853)
+
+`check-invariants` clean (incl. the new C14) · `check-cache-versions` clean · `e2e-smoke` ALL 7
+PAGES CLEAN + skin-unlock · `e2e-lb` ALL 36 PASS · `e2e-demo-replay` ALL GREEN · `e2e-alt-paths`
+**ALL 160 PASS** · `e2e-audit-parity` ALL 177 PASS · `e2e-audit-onboard` **ALL 38 PASS** (35 at
+r449 + the three new gate assertions) · `e2e-mac-input` ALL 19 PASS · `e2e-rapidfire` ALL 14 PASS
+· `e2e-guided` ALL 77 PASS (72 railed) · `e2e-formulas` ALL 102 PASS · `e2e-grid-height` ALL
+INVARIANTS HOLD · `e2e-depth-contract` ALL 74 PASS · `e2e-depth-mechanics` · `e2e-fit-sweep` ·
+`e2e-depth-mechanics` 155 passed / 0 failed · `e2e-fit-sweep` ALL CLEAN (70 drills) ·
+`e2e-par-sweep` **FLAGGED: 0** · `check-borders` clean · `check-pause` clean (it keys through
+the real gate now) · `check-startgate` clean.
+
+**NEGATIVE CONTROLS — both guards were seen to fire before being trusted (r442).** Breaking the
+swallow (gate passes, key still plays) turns `check-startgate` red on 12 assertions, including
+`filldr: keyLog identical … 46 vs 45` and `won:false`. Never arming turns it red on 12 more,
+starting with `a booted board arms the gate`. Restoring returns `START GATE: clean`. Removing the
+`hk_gate_off` setter from `dev/e2e-numfmt.js` turns C14 red with the fix in the message;
+restoring turns it green.
+
+### PLACES DELIBERATELY LEFT ALONE
+
+- **The celebration card over a gated board.** `window.__hkCelOpen`'s capture handler returns on
+  every trusted key, so the gate cannot be passed until the card closes. This is pre-r450
+  behavior and unchanged: the same swallow used to leave a *live* board with no start point, and
+  now leaves a *gated* one — strictly better. Worth knowing when writing harnesses: a stray
+  celebration makes the next `keyboard.press` vanish and the gate look stuck (it cost one debug
+  cycle here, and `check-startgate` presses through a `noCel()` helper because of it).
+- **`e2e-par-sweep` numbers were not re-baselined.** With `hk_gate_off` the sweep drives the same
+  board it drove at r449, and §7 above is the assertion that this is honest. Spot-checked drift
+  on the full table: `drill` 0% · `combo` 0% · `gauntlet` 0% · `housestyle` 0% · `anchor` 0% ·
+  `schedule` 0% · `intsched` 0% · `navigation` 0% · `modeltour` 0% · `ruleoff` −3%. FLAGGED: 0.
+- **One `tieout: REP FAILED no win` line in the full sweep, chased and cleared.** Not r450:
+  `REPS=8 e2e-demo-replay tieout` is 8/8, and `e2e-par-sweep tieout` alone reads 34/34 at 0%
+  drift. It is the sweep's own cross-drill state carry (it drives all 74 through one page), and
+  because rep 0 is the only rep that pushes a row, one miss drops the drill out of the printed
+  table entirely. Left alone; worth a look if it recurs.
+
+_Files: `index.html` (CSS `.hk-gate` + `.with-coach`, `#startCoach` z-index and copy; `hkGate`
+state + `hkGateShow`/`Arm`/`Clear`/`Pass`; the keydown branch; `hkGateArm` in `loadChallenge`;
+`hkGateClear` in `playDemo`/`echoStart`/`introRibbonPeek`/`startSession`/`microEnter`/
+`startSandbox`/`startOnboardBoard`) · `dev/check-startgate.js` (new) · `dev/check-invariants.js`
+(C14) · `dev/check-pause.js` · `dev/e2e-audit-onboard.js` · `dev/e2e-demo-replay.js` (the
+reference init block + the contract note) · `dev/e2e-onboard-sandbox.js` · 52 further dev/ suites
+and verify-\* probes (one-line init addition) · `.github/workflows/gate.yml`._
+
+## r450 FIRST-SESSION FLOW — the invisible first win, the one-key tour delete, and the beige curtain
+
+_Implementing the r450 first-session flow audit's top-5 (full audit: scratchpad flowaudit-findings.md,
+80 screenshots; the audit itself made no code changes). The audit's verdict: the onboarding SEQUENCE
+is good and both ends of it were broken._
+
+- **P0-1** — the r92 guided-explanation one-shot could never fire: its guard read `!guided` AFTER the
+  tour handed off with guided already on, and the `hk_learn_done` write sat outside the branch so the
+  one-shot burned anyway. A novice's first three wins showed a bare SOLVED with no medal, no XP, and
+  no statement that guided runs don't post. Fixed: branch is now `if(fresh)` with the write inside,
+  and a `practiceRow` renders on the FACE of the results card (both suppression causes: guided, mouse)
+  exactly where the medal row would sit.
+- **P0-2** — Esc on tour beat 1 permanently deleted onboarding with no replay affordance anywhere in
+  the product. Now: Esc on beats 0–2 arms ("press esc again to skip the tour"), second Esc skips; the
+  ? sheet gains "↻ replay the tour" (clears hk_tour_done, tourShow(0)). The arm resets per beat so the
+  label can never disagree with the state.
+- **P0-3** — the beta curtain never said what the product is. It now carries one tagline + "what this
+  is →" (About) above the code input, and "No code? get on the list →" (mailto capture, no backend)
+  below. The code input stays primary.
+- **P1 labels** — title text on .hk-clocks (what pass/pro/legendary mean), on the ☆ ? row (hidden
+  bonus, optional), and first-card-only copy on the d hint; the hint string moved to data-hint so its
+  three restore paths cannot drift.
+- **P1-8** — the audit's flat 16→56px coach lift was implemented, MEASURED still colliding at
+  1024×700 (the toast is viewport-fixed, the coach is gridwrap-absolute), and replaced by a lane-
+  computed lift clamped inside the gridwrap (56px floor). No change at normal heights. **P2-2 could
+  not be reproduced** — the prescribed overflow fix has existed since r354; a belt-and-braces
+  max-height clamp added (no-op above ~571px viewport height).
+- **The suite that passed through all of it**: e2e-audit-onboard 35 → 64 assertions — skipping is now
+  a DISTINCT asserted outcome from finishing; a do-it beat must advance on the real chord; the replay
+  affordance is asserted (the tour is Enter-advanceable by design); mid-tour refresh must not strand;
+  the first guided win's card is read for the not-posted line and its geometry above the action row.
+
+
+## r450 — THE APPLIED BORDER SITS ON THE GRIDLINE, NOT A PIXEL UNDER IT (Wolf, playtest)
+
+> "we're having rendering issues with cell borders still - seeing some misalignment for top
+> borders in one of the first few foundation drills."
+
+Fifth border report. r426 fixed a specificity fight, r429 a collapse tie-break, r442 the inline
+emitter — and each time the assertion was "is a thick enough line on screen". It always was.
+This one is about WHERE.
+
+### THE REPRO — every Foundations board that seeds a border
+
+`pastes` B9:E9 · `editfix` B8:E8 · `modeltour` B5:F5, B9:F9, B12:F12, B15:F15 · `rowops` J19 ·
+`navigation` H16:I17 · `filldr` I4:I5. (`blocksel`, `housestyle`, `ruleoff` seed none.) Wolf's
+"first few" is `pastes` — menu #3, and a four-cell totals rule is the most visible instance.
+
+### ROOT CAUSE — the overlay hung off the wrong box
+
+An absolutely positioned pseudo-element's containing block is the cell's PADDING box, and under
+`border-collapse` that box is inset from the cell's own edge by the cell's half of the shared
+1px gridline. Probed on `editfix` B8 with an `inset:0` marker div:
+
+    td  border box   y 430.125   x 330.000   w 73.422
+        padding box  y 430.625   x 330.500   w 72.422      delta 0.5px on every side
+
+`getComputedStyle` reports `border-top-width: 1px` throughout and looks innocent — the used
+width in the collapsed model is half of it, and only the geometry shows that.
+
+Two symptoms, one cause. VERTICAL: the gridline still drew its full 1px above the 2px rule, so
+a bordered row was a 3px stack and the rule started a whole pixel below the line its unbordered
+neighbours drew. Rows sit at fractional y (23.703px, not 24 — the table is `height:100%`
+stretched) and Chrome snaps each painted line to whole CSS px, so the drop landed anywhere from
+0.03 to 0.99px depending on the row: `editfix` r8 0.875, `pastes` r9 0.172, `modeltour` r5
+0.984. Same board, different rows, different sliver — and THAT variation is what reads as
+misalignment rather than as a thick border. HORIZONTAL: the same 0.5px inset left and right
+stopped each cell's rule short of its own vertical gridlines — three ~1px holes across a
+four-cell rule, where Excel draws one continuous line.
+
+Measured, DSF 8, light, extent in CSS px from the cell's border-box top:
+
+    before   editfix r8   gridline [-0.125, 0.875]   rule [0.875, 2.875]   3 holes
+             pastes  r9   gridline [-0.828, 0.172]   rule [0.172, 2.172]   3 holes
+             rowops  r19  gridline [-0.859, 0.141]   rule [0.141, 2.141]
+    after    editfix r8   rule [-0.125, 1.875]   pastes r9 rule [-0.828, 1.172]   0 holes
+
+### THE FIX — CSS only, one line of geometry
+
+`inset:-1px` on the overlay: exactly (used border 0.5px + the 0.5px of gridline that belongs to
+the neighbour), so adjacent overlays meet with no seam and the rule replaces the gridline the
+way Excel's does. `th,td{overflow:hidden}` (r107, load-bearing — it clips long text) clipped
+that 1px straight back off, cutting the painted run from 2.00px to 1.00px, so bordered cells now
+clip with a 1px margin: `overflow:clip; overflow-clip-margin:1px`. Same clipping for content,
+room for the overlay. `.spill` and `.editing` already run `overflow:visible` on purpose and
+paint the overlay in full, so they are excluded rather than overridden. A browser without
+`overflow-clip-margin` drops the declaration and lands on r442's geometry — degraded, never
+broken. No flag semantics, no predicate, no `render()` change.
+
+### THE GUARD (§3.3)
+
+`check-borders.js` gains an ALIGNMENT block at DPR 1 and 2 × light and dark, driven through the
+real `applyTheme` (and printing sheet luminance, so a theme leg cannot silently be a no-op). A
+run of adjacent `bt` cells with plain neighbours either side must: paint at one y; paint at the
+y its plain neighbours draw their gridline; have its whole visible band BE the rule; and have
+zero hole pixels along it. The third assertion is the one that needed two thresholds — FAINT
+locates the visible band including the gridline, INK the applied rule alone, because before the
+fix the two merged into one band whose faint start still matched the neighbours'. Measuring the
+band alone cannot tell a replaced gridline from a stacked one. Tolerance is a strict `< 1`
+device px and every comparison is differential, so a global snap cancels and the right answer
+is 0.00.
+
+WHY THE OLD GUARD WAS BLIND, and it is the same shape as r442's lesson: every existing assertion
+measures a border in ISOLATION — one flagged cell, one edge, how many pixels wide. All 27 were
+green while the grid looked wrong, because a border can be exactly 2.00px and be in the wrong
+place. Width is not geometry.
+
+### NEGATIVE CONTROL
+
+On the pre-fix tree the new block fires 12 of its 16 assertions — `flush to the row's gridline`
+(rule starts 1.97, gridline -0.03), `rule replaces the gridline` (band [-0.03,5.97) vs rule
+[1.97,5.97)) and `run is one unbroken rule` (4 hole pixels) at DPR 2 in both themes, and the
+continuity leg at DPR 1 in both. Post-fix: `BORDER RENDER: clean`, also with `SCHEME=dark`.
+
+### GATE
+
+`check-borders` clean (light and dark) · `e2e-depth-mechanics` 155/0, borders leg §P all 8 PASS
+· `e2e-smoke` ALL 7 PAGES CLEAN · `e2e-demo-replay REPS=1` on all six touched drills ALL GREEN ·
+`e2e-borders` ALL PASS · `e2e-cellstyles` ALL PASS · `check-invariants` clean · 
+`check-cache-versions` clean.
+
+### CI ADDENDUM — the probe itself raced headless first-paint
+
+The alignment block's first gate run failed all four legs with every band null — plain gridline
+included — on a commit that was clean locally under the same chromium build (1148), same server,
+same flags. A blank clip is not a border defect: render() mutates the DOM synchronously, but
+headless Chromium rasters on demand, and on a loaded runner the CDP screenshot can capture
+before the compositor produces a frame of the new board. The probe now settles on a double-rAF
+and, only when even the PLAIN cells' gridline is invisible (a state no border bug can cause —
+misalignment moves ink, it doesn't erase the sheet), waits 400ms and retakes, up to 4 tries. A
+misaligned rule paints something and still fails on the first take; the negative control still
+fires 12/16 on the r442 geometry.
+
+### FOUND, NOT FIXED
+
+`dev/e2e-audit-visual.js:91` probes applied borders through `getComputedStyle(td.ball).boxShadow`.
+r442 moved borders off `box-shadow` onto the `::after` overlay, so that probe has read `''` for
+every theme since — "APPLIED borders read as ink vs bg — contrast null" fires on all 19 themes
+and is rot, not a contrast failure (identical count on the pre-fix tree: 108 FAIL / 271 PASS).
+It is not wired into `gate.yml`. The fix is to read `getComputedStyle(td, '::after')`, the way
+`e2e-depth-mechanics` §P already does. Its own pass.

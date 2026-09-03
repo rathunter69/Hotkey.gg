@@ -37,7 +37,7 @@ const bad = m => { fails++; console.log('  FAIL ' + m); };
      overlay instead of the drill (the r440 hotkey_onboarded lesson) */
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
-    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_beta_ok', '1');
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1'); localStorage.setItem('hk_beta_ok', '1');
     localStorage.setItem('hk_xlv', '2');
   } catch (e) {} });
   const errs = [];
