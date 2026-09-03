@@ -72,6 +72,18 @@ Binding changes:
 
 Phase A v2 (the revised map) replaces the first map on PR #249.
 
+### 1b · Wolf's answers (2026-09-03, late) — RESOLVED
+- **Foundations = FIVE LEVELS, not twelve mini-games** ("feels shallow"): L1 The Corridor (move & select) ·
+  L2 The Repair Shop (enter, edit, structure, clipboard, fill) · L3 The Power Grid (formulas, anchors,
+  sign convention) · L4 The Print Shop (formats, fonts, alignment, borders, the ribbon both ways) ·
+  L5 Model Tour (the existing capstone). Multi-act game boards, 5–8 min first play, replayable for time.
+- **Level 1 replaces the Keyboard Tour** entirely (its runtime — HUD, cards, tier reveals — becomes
+  the level runtime; the separate pre-game is retired when L1 ships).
+- **Levels post to leaderboards** like any drill: timed, generous pass clocks, one visible ☆ each.
+- **The level names are placeholders**; keep them until playtest.
+- Entry path: landing → Enter → Level 1 act 1. The modal product tour and the guided auto-handoff are
+  deleted; three contextual one-time tips replace the tour's chrome beats.
+
 ## 2 · The phases (each = one PR, gate green, Wolf playtest between)
 
 ### Phase A — the curriculum map (spec, one session, Wolf review)
