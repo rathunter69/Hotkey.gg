@@ -18,7 +18,13 @@
      C14 — certificate tracks: the arrays hard-coded in the NEWEST issue_certificate migration
           (and its dev/migrate-certificates.sql mirror) are set-equal to HK_TRACKS from drills.js
           — the r359 drift rule, added r452 after the retired keys sat live in the RPC.
-   Run: node dev/check-invariants.js */
+     C28-C31 — the CATALOG_V4 §2 VARIETY guards (r457 wave 0), printed as WARNINGS with the
+          per-chapter numbers and flipped to failures by V4_STRICT=1: C28 archetype quota (P2,
+          no meta.board above 40% of a chapter) · C29 closer ration (P3, one bold+rule core
+          closer and one fill-in-one-pass ☆ per chapter) · C30 family coverage (P4, every
+          dev/curriculum-v4.json family is some drill's primary, none repeated in a chapter) ·
+          C31 prompt register (P6, the deadline register under half of every chapter).
+   Run: node dev/check-invariants.js   (V4_STRICT=1 to fail on C28-C31) */
 'use strict';
 const fs = require('fs');
 const vm = require('vm');
@@ -1283,6 +1289,175 @@ try {
   ok('the opt-in ceremony stays retired (no nudge, gate buttons, enter/later CTA or leave control)');
 } catch (e) {
   bad('C27 could not run: ' + String(e.message || e).slice(0, 160));
+}
+
+
+/* ================================================================================
+   C28–C31 (r457, dev/CATALOG_V4.md §2 principles P2/P3/P4/P6 · §7 wave 0)
+   THE FOUR VARIETY GUARDS. Wave 0 of the v4 re-cut is MEASUREMENT ONLY: no drill is
+   re-cut, so these four ship as WARNINGS and print the per-chapter numbers Wolf reads
+   as the baseline (CATALOG_V4 §9). `V4_STRICT=1 node dev/check-invariants.js` flips
+   every one of them to a FAILURE; wave 9 flips that default (§7).
+     C28 — ARCHETYPE QUOTA (P2). Per chapter (HOTKEY_DRILLS.groups), no meta.board value
+           may carry more than 40% of the chapter's drills.
+     C29 — CLOSER RATION (P3). Per chapter, at most ONE drill whose CORE (non-bonus) check
+           labels close on the bold+rule trio, and at most ONE whose ☆ (bonus:true) label is
+           a fill-in-one-pass variant.
+     C30 — FAMILY COVERAGE (P4). Every family id declared in dev/curriculum-v4.json
+           `families` is the PRIMARY family (meta.family) of at least one drill, and no two
+           drills in a chapter share a primary family.
+     C31 — PROMPT REGISTER (P6). Per chapter, at most 50% of the task-line prompts open on
+           the deadline register ("goes out tonight", "the committee sits at four").
+
+   HOW THE LABELS AND PROMPTS ARE READ: this file is STATIC-ONLY by construction (no
+   browser, gate.yml fast lane), so it cannot instantiate `C.checks(S)` the way
+   dev/e2e-depth-contract.js does inside a page. C29 and C31 therefore run a STATIC scan of
+   the index.html CHALLENGES source: each drill's block is sliced out, the string literals
+   inside every `{label: … , ok:` object of its `checks(` body are concatenated (so
+   `'Total the '+o.yE+' column'` reads as "Total the column"), and `prompt:'…'` is read as
+   the literal it is on all 74 drills. Interpolated fragments are therefore INVISIBLE to
+   these regexes — the counts are a floor, not a census. If a drill's checks() or prompt
+   stops being readable this way the guard FAILS hard rather than silently under-counting.
+   ================================================================================ */
+try {
+  const V4_STRICT = process.env.V4_STRICT === '1';
+  let warns = 0;
+  const warn = m => { if (V4_STRICT) bad(m); else { warns++; console.warn('WARN ' + m); } };
+
+  const sandbox = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console: { warn() {}, log() {} }, navigator: {} };
+  vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sandbox);
+  const D = sandbox.window.HOTKEY_DRILLS || {};
+  const groups = D.groups || [];
+  const meta = D.meta || {};
+  const BOARDS = new Set(['schedule', 'table', 'tape', 'form', 'grid', 'two-block', 'list', 'maze', 'cover']);
+
+  /* every drill declares both fields, and board is in the vocabulary — this half is a HARD
+     failure: a missing field would make all four measurements below lie. */
+  {
+    const noFam = [], noBoard = [], badBoard = [];
+    for (const k of (D.menuOrder || [])) {
+      const m = meta[k] || {};
+      if (!m.family) noFam.push(k);
+      if (!m.board) noBoard.push(k); else if (!BOARDS.has(m.board)) badBoard.push(k + "='" + m.board + "'");
+    }
+    if (noFam.length) bad(`C28-31: drills.js meta carries no family on: ${noFam.join(', ')}`);
+    if (noBoard.length) bad(`C28-31: drills.js meta carries no board on: ${noBoard.join(', ')}`);
+    if (badBoard.length) bad(`C28-31: board outside the CATALOG_V4 §2 vocabulary: ${badBoard.join(', ')}`);
+    if (!noFam.length && !noBoard.length && !badBoard.length) ok(`meta.family + meta.board on all ${(D.menuOrder || []).length} drills`);
+  }
+
+  /* ---- the static CHALLENGES slice (see the note above) ---- */
+  const idxSrc = fs.readFileSync('index.html', 'utf8').split('\n');
+  const cStart = idxSrc.findIndex(l => /^const CHALLENGES = \{/.test(l));
+  let cEnd = idxSrc.length;
+  for (let i = cStart + 1; i < idxSrc.length; i++) if (/^\};/.test(idxSrc[i])) { cEnd = i; break; }
+  const marks = [];
+  for (let i = cStart + 1; i < cEnd; i++) { const m = /^  ([a-z0-9]+):\{/.exec(idxSrc[i]); if (m) marks.push([m[1], i]); }
+  const block = {};
+  marks.forEach(([k, i], j) => { block[k] = idxSrc.slice(i, j + 1 < marks.length ? marks[j + 1][1] : cEnd).join('\n'); });
+
+  const checkLabels = k => {
+    const blk = block[k]; if (!blk) return null;
+    const at = blk.search(/\n\s*checks\s*\(/); if (at < 0) return null;
+    const body = blk.slice(at), out = [];
+    const re = /\{\s*label\s*:\s*([\s\S]*?),\s*ok\s*:/g;
+    let m;
+    while ((m = re.exec(body))) {
+      const lits = [...m[1].matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"|`((?:[^`\\]|\\.)*)`/g)].map(x => x[1] || x[2] || x[3] || '');
+      const text = lits.join(' ').replace(/\$\{[^}]*\}/g, ' ').replace(/\\u2014/g, '—').replace(/\s+/g, ' ').trim();
+      const tail = body.slice(m.index, re.lastIndex + 600), cut = tail.indexOf('},');
+      out.push({ text, bonus: /bonus\s*:\s*true/.test(tail.slice(0, cut < 0 ? tail.length : cut + 2)) });
+    }
+    return out.length ? out : null;
+  };
+  const promptOf = k => { const m = /^    prompt:'((?:[^'\\]|\\.)*)'/m.exec(block[k] || ''); return m ? m[1] : null; };
+
+  /* ---- C28: archetype quota (P2) — no board above 40% of a chapter ---- */
+  {
+    console.log('\n  C28 · ARCHETYPE QUOTA (P2 — ceiling 40% of a chapter)');
+    for (const g of groups) {
+      const n = g.keys.length, tally = {};
+      for (const k of g.keys) { const b = (meta[k] || {}).board; tally[b] = (tally[b] || 0) + 1; }
+      const rows = Object.entries(tally).sort((a, b) => b[1] - a[1]);
+      console.log(`    ${g.name.padEnd(15)} ${n} drills · ` + rows.map(([b, c]) => `${b} ${c} (${Math.round(c * 100 / n)}%)`).join(' · '));
+      for (const [b, c] of rows) if (c * 100 / n > 40) warn(`C28 ${g.name}: board '${b}' carries ${c}/${n} drills (${Math.round(c * 100 / n)}%) — the P2 ceiling is 40%`);
+    }
+  }
+
+  /* ---- C29: closer ration (P3) ---- */
+  {
+    const CLOSER = /^bold\b.*\b(top border|rule)/i;
+    const PAIR_A = /^bold the /i, PAIR_B = /^add a top border/i;
+    const ONEPASS = /one pass|one fill|from one (anchored )?formula|in one (press|move|selection)/i;
+    console.log('\n  C29 · CLOSER RATION (P3 — ceiling 1 bold+rule core beat and 1 "one pass" ☆ per chapter)');
+    const unread = [];
+    for (const g of groups) {
+      const closers = [], stars = [];
+      for (const k of g.keys) {
+        const ls = checkLabels(k);
+        if (!ls) { unread.push(k); continue; }
+        const core = ls.filter(l => !l.bonus).map(l => l.text);
+        let hit = core.some(t => CLOSER.test(t));
+        for (let i = 0; !hit && i + 1 < core.length; i++) if (PAIR_A.test(core[i]) && PAIR_B.test(core[i + 1])) hit = true;
+        if (hit) closers.push(k);
+        if (ls.some(l => l.bonus && ONEPASS.test(l.text))) stars.push(k);
+      }
+      console.log(`    ${g.name.padEnd(15)} closer ${closers.length}/${g.keys.length} [${closers.join(' ')}] · ☆one-pass ${stars.length}/${g.keys.length} [${stars.join(' ')}]`);
+      if (closers.length > 1) warn(`C29 ${g.name}: ${closers.length} drills close on bold + top border (${closers.join(', ')}) — P3 rations it to 1`);
+      if (stars.length > 1) warn(`C29 ${g.name}: ${stars.length} drills award a fill-in-one-pass ☆ (${stars.join(', ')}) — P3 rations it to 1`);
+    }
+    if (unread.length) bad(`C29: no checks() source could be read for: ${unread.join(', ')} (the static slice broke — fix the parser, do not lower the guard)`);
+  }
+
+  /* ---- C30: family coverage (P4) ---- */
+  {
+    const V4 = JSON.parse(fs.readFileSync('dev/curriculum-v4.json', 'utf8'));
+    const fams = V4.families || {};
+    const ids = Object.keys(fams);
+    if (!ids.length) bad('C30: dev/curriculum-v4.json declares no families');
+    const stray = (D.menuOrder || []).filter(k => meta[k] && meta[k].family && !fams[meta[k].family]);
+    if (stray.length) bad(`C30: meta.family names an id curriculum-v4.json does not declare: ${stray.map(k => k + '=' + meta[k].family).join(', ')}`);
+    const primaryOf = {};
+    for (const k of (D.menuOrder || [])) { const f = (meta[k] || {}).family; (primaryOf[f] = primaryOf[f] || []).push(k); }
+    const uncovered = ids.filter(id => !primaryOf[id]);
+    console.log('\n  C30 · FAMILY COVERAGE (P4 — every family taught, no repeat inside a chapter)');
+    console.log(`    ${ids.length} families declared · ${ids.length - uncovered.length} are some drill's PRIMARY · uncovered: ${uncovered.length ? uncovered.map(i => i + ' ' + fams[i].name).join(' · ') : 'none'}`);
+    if (uncovered.length) warn(`C30: ${uncovered.length} family/families are nobody's primary: ${uncovered.join(', ')} — P4 wants ≥1 drill each`);
+    for (const g of groups) {
+      const byFam = {};
+      for (const k of g.keys) { const f = (meta[k] || {}).family; (byFam[f] = byFam[f] || []).push(k); }
+      const dupes = Object.entries(byFam).filter(([, ks]) => ks.length > 1);
+      console.log(`    ${g.name.padEnd(15)} ${Object.keys(byFam).length} distinct primaries in ${g.keys.length} drills · repeats: ` + (dupes.length ? dupes.map(([f, ks]) => `${f}×${ks.length} (${ks.join(' ')})`).join(' · ') : 'none'));
+      for (const [f, ks] of dupes) warn(`C30 ${g.name}: ${ks.length} drills share primary family ${f} (${ks.join(', ')}) — P4 allows 1 per chapter`);
+    }
+  }
+
+  /* ---- C31: prompt register (P6) ---- */
+  {
+    const DEADLINE = /(tonight|tomorrow|by (four|eight|six|noon)|committee|before the .* call|goes out|prints)/i;
+    console.log('\n  C31 · PROMPT REGISTER (P6 — deadline register ≤ 50% of a chapter)');
+    const unread = [];
+    for (const g of groups) {
+      const hits = [];
+      let n = 0;
+      for (const k of g.keys) {
+        const p = promptOf(k);
+        if (p === null) { unread.push(k); continue; }
+        n++;
+        if (DEADLINE.test(p)) hits.push(k);
+      }
+      const pct = n ? Math.round(hits.length * 100 / n) : 0;
+      console.log(`    ${g.name.padEnd(15)} deadline ${hits.length}/${n} (${pct}%) [${hits.join(' ')}]`);
+      if (n && hits.length * 100 / n > 50) warn(`C31 ${g.name}: ${hits.length}/${n} prompts (${pct}%) open on the deadline register — P6 caps it at 50%`);
+    }
+    if (unread.length) bad(`C31: prompt is no longer a plain literal on: ${unread.join(', ')} — teach the static reader the new shape rather than skipping the drill`);
+  }
+
+  if (V4_STRICT) ok('C28–C31 ran in V4_STRICT mode — every variety breach above is a FAILURE');
+  else console.log(`\n  C28–C31: ${warns} variety WARNING(S) — the wave-0 baseline (CATALOG_V4 §9). V4_STRICT=1 makes them failures.`);
+} catch (e) {
+  bad('C28–C31 could not run: ' + String(e.message || e).slice(0, 200));
 }
 
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }

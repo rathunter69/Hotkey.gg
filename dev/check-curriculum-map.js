@@ -35,14 +35,26 @@
          teaching board, not a rung on the speed spine — Foundations' first rung is its
          capstone. 0.63 is the audit §2.3 "drop" threshold. The spine is printed anyway.
 
-   Run: node dev/check-curriculum-map.js     (exit 0 = clean) */
+   --v4 (r457, dev/CATALOG_V4.md §7 wave 0): the SAME proof, over dev/curriculum-v4.json —
+   the v4 map, which carries CATALOG_V4's `family`, `board` and §5 `verdict` on every entry
+   plus the 15 planned new keys. Only the vocabulary check and (a) require-before-teach run:
+   (b)-(f) are properties of the FINAL 64-drill ladder, and wave 0 deliberately leaves the
+   chapters and the 74 keys' order exactly where v3 put them (waves 1-8 cut the order). A
+   `planned` entry teaches only the tags it DECLARES — one with an empty teaches[] (every new
+   capstone) is skipped as a teacher, so a planned drill can never satisfy a requirement it
+   has not promised. The run then prints the FAMILY COVERAGE table (§2 P4): every §3 family,
+   who teaches it as a primary, and which chapters repeat one.
+
+   Run: node dev/check-curriculum-map.js         (v3 — the gated one, exit 0 = clean)
+        node dev/check-curriculum-map.js --v4    (v4 — the wave-0 map) */
 'use strict';
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..');
-const MAP_PATH = path.join(ROOT, 'dev', 'curriculum-v3.json');
+const V4 = process.argv.includes('--v4');
+const MAP_PATH = path.join(ROOT, 'dev', V4 ? 'curriculum-v4.json' : 'curriculum-v3.json');
 const DROP = 0.63;
 
 let fail = 0;
@@ -51,7 +63,8 @@ const ok = m => console.log('  ok  ' + m);
 
 const M = JSON.parse(fs.readFileSync(MAP_PATH, 'utf8'));
 const chapters = M.chapters || [];
-if (!chapters.length) { console.error('FAIL curriculum-v3.json: no chapters'); process.exit(1); }
+if (!chapters.length) { console.error(`FAIL ${path.basename(MAP_PATH)}: no chapters`); process.exit(1); }
+console.log(`MAP: ${path.basename(MAP_PATH)} (${M.version})`);
 
 /* flatten into catalog order: chapter order, then drill order */
 const flat = [];
@@ -79,6 +92,8 @@ const firstTaughtAt = new Map();   // tag -> ref of the first entry that teaches
         violations++;
         bad(`${ref} requires ${t}, first taught at ${later ? later.ref : 'never'}`);
       }
+    /* --v4: a `planned` drill is not built, so it teaches ONLY the tags it declares; one with
+       an empty teaches[] is skipped as a teacher entirely (it can satisfy nothing). */
     for (const t of (d.teaches || [])) if (!taught.has(t)) { taught.set(t, ref); firstTaughtAt.set(t, ref); }
   }
   console.log(`\nCURRICULUM MAP: ${violations} violations\n`);
@@ -89,6 +104,47 @@ const firstTaughtAt = new Map();   // tag -> ref of the first entry that teaches
   else ok(`(a) every tag in the vocabulary has a teacher`);
 }
 
+/* ---------- --v4 only: the FAMILY COVERAGE table (CATALOG_V4 §2 P4) ---------- */
+if (V4) {
+  const fams = M.families || {};
+  const ids = Object.keys(fams);
+  if (!ids.length) bad('(v4) the map declares no families{} — CATALOG_V4 §3 is the source');
+  const live = flat.filter(d => d.d.status !== 'planned');
+  const primaryOf = {};
+  for (const { d } of flat) {
+    if (!d.family) { bad(`(v4) ${d.key}: no family — every v4 entry declares one primary family (§3)`); continue; }
+    if (!fams[d.family]) bad(`(v4) ${d.key}: family '${d.family}' is not in families{}`);
+    if (!d.board) bad(`(v4) ${d.key}: no board — §2 P2 needs one of schedule/table/tape/form/grid/two-block/list/maze/cover`);
+    if (!d.verdict) bad(`(v4) ${d.key}: no §5 verdict (keep|recut|new|retire|capstone)`);
+    if (d.verdict === 'retire' && !d.absorbedBy) bad(`(v4) ${d.key} is retired and names no absorbedBy key`);
+    (primaryOf[d.family] = primaryOf[d.family] || []).push(d.key);
+  }
+  console.log('\n  FAMILY COVERAGE (§2 P4 — every family a primary somewhere, none twice in a chapter)');
+  for (const id of ids) {
+    const ks = primaryOf[id] || [];
+    console.log(`    ${id.padEnd(4)} ${fams[id].name.padEnd(26)} ${ks.length ? ks.join(' ') : '— NOBODY\'S PRIMARY'}`);
+  }
+  const uncovered = ids.filter(id => !(primaryOf[id] || []).length);
+  if (uncovered.length) console.warn(`WARN (v4) ${uncovered.length} family/families are nobody's primary: ${uncovered.join(', ')}`);
+  else ok(`(v4) all ${ids.length} families are some drill's primary`);
+  let rep = 0;
+  for (const c of chapters) {
+    const byFam = {};
+    for (const d of c.drills) (byFam[d.family] = byFam[d.family] || []).push(d.key);
+    const dupes = Object.entries(byFam).filter(([, ks]) => ks.length > 1);
+    console.log(`    ${c.id} ${c.name.padEnd(16)} ${c.drills.length} entries · ${Object.keys(byFam).length} distinct primaries · repeats: ` +
+      (dupes.length ? dupes.map(([f, ks]) => `${f}×${ks.length} (${ks.join(' ')})`).join(' · ') : 'none'));
+    rep += dupes.length;
+  }
+  if (rep) console.warn(`WARN (v4) ${rep} chapter/family repeats remain — wave 0 measures them; waves 1-8 cut them (§7)`);
+  const tally = {}, boards = {};
+  for (const { d } of flat) { tally[d.verdict] = (tally[d.verdict] || 0) + 1; boards[d.board] = (boards[d.board] || 0) + 1; }
+  console.log('\n  VERDICTS (§5): ' + Object.entries(tally).map(([k, v]) => k + ' ' + v).join(' · '));
+  console.log('  BOARDS   (§2 P2): ' + Object.entries(boards).sort((a, b) => b[1] - a[1]).map(([k, v]) => k + ' ' + v).join(' · '));
+  console.log(`  ${live.length} built · ${flat.length - live.length} planned · retired[]: ${(M.retired || []).map(r => r.key + '→' + r.into).join(', ')}`);
+}
+
+if (!V4) {
 /* ---------- (b) capstone last, and it chains ---------- */
 {
   let bad_b = 0;
@@ -242,6 +298,7 @@ const firstTaughtAt = new Map();   // tag -> ref of the first entry that teaches
   console.log('\n  jumps > x1.6 (reported, not failed): ' + (jumps.length ? jumps.length : 'none'));
   jumps.forEach(j => console.log('    ' + j));
   if (!bad_f) ok(`\n(f) spine monotone within tolerance in all ${chapters.length} chapters (floor x${DROP})`);
+}
 }
 
 console.log(fail ? `\nCURRICULUM MAP: ${fail} FAILURE(S)` : '\nCURRICULUM MAP: clean');
