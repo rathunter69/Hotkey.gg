@@ -8,6 +8,40 @@ docs are listed in §8; this file is the top of the funnel._
 
 ---
 
+## 0d · r458 (2026-09-04) — ONE SESSION, ONE GOAL: the roadmap, and where the rebuild stands
+
+**Wolf, verbatim:** "I feel like we've made things too complicated as we push things … I want to move to another
+session and want one session dedicated to one discrete goal. We're mixing too many updates and fixes."
+
+**START HERE in a new session:** open `dev/ROADMAP.md`, pick the top ☐ row (today: **S0 merge PR #250**, then
+**S1 Foundations wave 1**), read only what the row names, ship one PR, update the row. Off-goal findings go to
+ROADMAP §3, not into the PR.
+
+**Where things stand (2026-09-04 evening):**
+- **Live (main @ #249):** landing v3.1 ("Learn Excel properly. The hours come back."), rank automatic at LVL 10,
+  the step controller with the modal tour deleted, Foundations 1 `navigation` built to the integrated-tutorial
+  contract, identity pixel assets drawn (not wired). 74 drills.
+- **PR #250 (open, green, no player-facing change):** wave-0 `meta.family`/`meta.board` tags + four variety
+  guards as warnings (C28–C31), `ENGINE_GAP_MATRIX.md` (134 syllabus items: 63 grade, 60 absent → 4 engine
+  packs), `DRILLS_WOLF_LIKED.md` (the seven drill rules), **curriculum v5.1** (`CURRICULUM_V5.md` + the page
+  `curriculum-v5.html`, generated from `dev/gen/curriculum_v51_data.py`): eight chapters kept, 61 full-page drills,
+  **Phase A** (`CURRICULUM_V5_PHASE_A.md`: the map `curriculum-v5.json`, 74→61 delta with every retirement's home,
+  engine packs P1–P4, 13 waves) proven by `check-curriculum-map.js --v5`, and `check-borders` made deterministic
+  (the daily-challenge card was the "flake").
+- **Decided by Wolf today:** pixel art is identity-only; the drill surface keeps the leetcode-like chrome;
+  Foundations are integrated tutorials, not game levels; no practice-vs-ranked mode; rank automatic at 10; the
+  eight chapters stay; charts excluded; the whole breadth of desk Excel is in scope; drills must be full-page,
+  fulsome, desk-language (the seven rules).
+- **Waiting on Wolf:** merge #250; the five Phase A decisions (§6 of that doc — recommendations stand if silent).
+- **Wolf-side:** `SUPABASE_ACCESS_TOKEN` must be an `sbp_` token; rotate the secret key pasted in chat; one
+  `reports` row + one `team_applications` row to review; legal placeholders after the entity exists; Mac KeyTips.
+
+**How a build wave works (S1 onward):** the orchestrator writes the brief from the drill's block in
+`curriculum_v51_data.py` + the §9.0 contract; one Opus agent per drill in a worktree off main; the orchestrator
+cherry-picks, runs the gate locally (`NODE_PATH=/opt/node22/lib/node_modules/playwright/node_modules`, server on
+8791), regenerates drill pages after any `?v=` bump, pushes, and drives the PR to green. Sonnet for docs and
+mechanical follow-ups. Never model names in commits.
+
 ## 0 · r451 (2026-09-03) — THE FOUR VECTORS: where the project goes next
 
 _Wolf returned after a break with four workstreams. Session r451 wrote the plans; nothing is built._
