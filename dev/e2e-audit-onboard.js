@@ -150,7 +150,7 @@ const STUB = () => {
   ok(!t2.tourMode, 'the Keyboard Tour is not the entry any more');
   ok(t2.guided === false, 'rails are OFF — the guided auto-handoff is deleted (P5)', String(t2.guided));
   ok(t2.hints === false, 'and hints are OFF by default', String(t2.hints));
-  ok(/step 1 of 2/.test(t2.head), 'the ordinary checklist head names the open step', t2.head);
+  ok(new RegExp('step 1 of ' + LVL.length).test(t2.head), 'the ordinary checklist head names the open step', t2.head);
 
   /* ---------------------------------------------------------------- T3 */
   console.log('T3 the r450 gate is unchanged, and carries the one skip line');
@@ -240,7 +240,7 @@ const STUB = () => {
   ok(t5.running === true, 'THE CLOCK IS STILL RUNNING across the boundary (a tutorial is one timed run)');
   ok(!t5.wrap && !t5.hud && t5.scrims === 0 && t5.pause === 0,
     'no card, no banner, no scrim, no pause — nothing interrupts the run', JSON.stringify(t5));
-  ok(/step 2 of 2/.test(t5.head), 'the checklist head names step 2', t5.head);
+  ok(new RegExp('step 2 of ' + LVL.length).test(t5.head), 'the checklist head names step 2', t5.head);
   ok(t5.hint.indexOf(LVL[1].beats[0].why) >= 0, 'and the checklist\'s hint row is step 2\'s first beat', t5.hint.slice(0, 80));
 
   /* ---------------------------------------------------------------- T6 */

@@ -924,6 +924,32 @@
   .cl-esc kbd{background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:9.5px}
   .cl-hint{margin-top:9px; font-size:12.5px; color:var(--warn); line-height:1.5}
   .cl-hint em{font-style:normal; color:var(--accent)}
+  /* r456 (dev/CURRICULUM_V3.md §9.0.2) THE GUIDE PANEL — no new surface: the step list and the
+     two controls live inside the checklist aside, in the checklist's own type and rules. */
+  .cl-steps{margin:2px 0 10px; padding-bottom:8px; border-bottom:1px dashed var(--line)}
+  .cl-step{display:flex; align-items:baseline; gap:8px; padding:2px 0; font-size:11.5px; color:var(--faint)}
+  .cl-step .cs-n{font-family:var(--mono); font-size:9.5px; width:14px; height:14px; line-height:14px;
+    text-align:center; border:1px solid var(--line); border-radius:50%; flex:none}
+  .cl-step .cs-name{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .cl-step .cs-cnt{font-family:var(--mono); font-size:10px}
+  .cl-step.on{color:var(--text)}
+  .cl-step.on .cs-n{border-color:var(--accent); color:var(--accent)}
+  .cl-step.done .cs-n{background:var(--accent-glow); border-color:var(--accent-dim)}
+  .cl-why{margin:3px 0 4px 22px; font-size:11.5px; color:var(--muted); line-height:1.45; font-style:italic}
+  .cl-why.lit{color:var(--accent)}
+  .cl-caps.lit kbd{color:var(--on-accent); background:var(--accent); border-color:var(--accent); font-weight:600}
+  .cl-hint kbd{font-family:var(--mono); color:var(--text); background:var(--surface2);
+    border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:10.5px; margin:0 1px}
+  .cl-guide{margin-top:9px; display:flex; gap:10px; align-items:center}
+  .cl-gbtn{font-family:var(--mono); font-size:10px; letter-spacing:.06em; color:var(--accent);
+    border:1px solid var(--accent-dim); border-radius:5px; padding:2px 8px; cursor:pointer}
+  .cl-gbtn:hover{background:var(--accent-glow)}
+  .cl-gbtn[data-max]{color:var(--faint); border-color:var(--line)}
+  /* §9.0.3 rung 3 — the beat's range, lit on the board. The target frame is always drawn
+     (r317); the rung makes it breathe, and nothing is fenced (rails stay a separate opt-in). */
+  #grid td.hintring{box-shadow:inset 0 0 0 2px var(--accent); animation:hkHintRing 1.25s ease-in-out infinite}
+  @keyframes hkHintRing{50%{box-shadow:inset 0 0 0 3px var(--accent)}}
+  @media (prefers-reduced-motion: reduce){ #grid td.hintring{animation:none} }
   /* guided / paint-by-numbers */
   .cl-item{flex-wrap:wrap}
   .cl-label{flex:1; min-width:0}
@@ -2276,7 +2302,7 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=305"></script>
+<script src="drills.js?v=306"></script>
 
 
 
@@ -2847,7 +2873,14 @@ function stepFsz(cur,dir){ let i=FSZ_LADDER.indexOf(cur==null?FSZ_BASE:cur); if(
    does not disappear between two PRs. Flipping this to true removes that link, and
    CHALLENGES.keyboardtour + HK_TOUR_BEATS + the hkTour* runtime can be deleted in the same
    commit (the STEP controller below is the part that survives them). */
-const LEVEL1_LIVE=false;
+/* r456: FLIPPED. Foundations 1 "Navigate & Select" now ships its full three-step board, so it
+   IS the intro — the ? sheet's "▶ replay the intro" link is gone and the Keyboard Tour has no
+   caller left in the product. Its runtime (CHALLENGES.keyboardtour + HK_TOUR_BEATS + the
+   hkTour* / hkHud* block, ~1400 lines) is LEFT IN PLACE behind this flag rather than deleted:
+   e2e-audit-parity, e2e-visual, the drill-page generator and check-borders all still walk it,
+   and untangling that safely is a round of its own (r456 scoped it at well over an hour). The
+   deletion commit flips nothing — it just removes what this flag already made unreachable. */
+const LEVEL1_LIVE=true;
 
 const CHALLENGES = {
   /* ============================================================================
@@ -22692,70 +22725,117 @@ const CHALLENGES = {
   },
   navigation:{
     /* ============================================================================
-       r455 (Phase B) THE STEP DECLARATION — dev/CURRICULUM_V3.md §9.0.1, the step
-       controller's first real consumer.
-       Two STEPS that PARTITION navigation's four core checks, each beat carrying its own
-       `why` — the one line the guide surface speaks for that beat. NO CHORDS live here:
-       the keycaps are DERIVED from this drill's own guide() at render (§9.0.1's derivation
-       table — `keys.win` comes from `guide()[id]`, `keys.mac` from hkMacifyKbds), so the
-       line and the F1 ladder can never say different things. No cards and no banner: the
-       beat's line goes into the checklist's own .cl-hint row and the checklist scopes to
-       the open step's beats (Wolf round 2 — the drill surface keeps the site's original
-       chrome). The §9.1 wave replaces this with Navigate & Select's full three-step board;
-       the board changes, this shape does not.
-       DEVIATION, named (§0): the Phase B brief said "one step". It ships as TWO so the step
-       BOUNDARY — the handler that must advance the checklist and the line without stopping the
-       clock — is exercised end to end by a real drill today, not only by a later wave.
-       Beat ids are indices into checks(): 0-3 are the cores, 4 is the ☆ (hidden, never a
-       step's beat) and 5 is the engine-appended save closer, which is the win and belongs to
-       no step. `tutorial:` carries the three fields §9.0.1's step shape has no home for — the
-       Foundations number the picker's path reads, and the name + hand-off the results card
-       prints ("Foundations 1 clear — Navigate & Select · next: …").
+       r456 — FOUNDATIONS 1 · "Navigate & Select"  (dev/CURRICULUM_V3.md §9.0 + §9.1)
+       THE FIRST INTEGRATED TUTORIAL. Three STEPS on ONE board that grows, ten beats, one
+       visible ☆. It is an ordinary timed catalog drill in every other respect (§9.0):
+       checkWin fires, recordRun posts, PB / XP / ghost / leaderboard behave as on any board,
+       and the surface is the site's ORIGINAL chrome — no cards, no scrim, no pixel HUD, no
+       story text (Wolf round 2, 2026-09-03).
+
+       THE BOARD, PER STEP (§9.1 "Board, per step"):
+         · STEP 1 "ride the corridor" — the r427/r430 switchback corridor VERBATIM: the same
+           serpentine generator, the same seed pool, the same pips, the same model block parked
+           at the far corner, the same carved exit.
+         · STEP 2 "take the ranges" — step 1's beats close the r421 §2.5 TIER LADDER's first
+           rung: the walls come down (tier.wipe), the model block is replaced by a REGIONAL
+           SALES TABLE (8 regions × Q1-Q4 + FY, pre-dressed) and a MEMO naming the four capture
+           targets. A plain appear — no dissolve, no flourish (§9.1).
+         · STEP 3 "bring it home" — step 2's beats open the second rung: the marked HOME RANGE
+           at A1 (tier.set → S.pasteRoom, the r430/r432 positional marker, geometry not cells).
+
+       THE TEN BEATS grade an END STATE and never a keypress (DEPTH_PASS_CAMPAIGN §1, binding):
+         0 first checkpoint · 1 every checkpoint · 2 landed on the block          → step 1
+         3 the memo's row · 4 the memo's column · 5 the whole table ·
+         6 every typed figure in one pass                                          → step 2
+         7 the table on the clipboard · 8 the table delivered at A1                → step 3
+         9 (engine-appended, saveClose) save the workbook                          = beat 10
+       BEAT 6 has exactly ONE one-pass route by construction: one FY figure per seed is TYPED
+       BY HAND among seven SUM formulas, so the typed set is NOT a rectangle and only
+       F5 → Special → Constants can take it in a single pass (graded off S.marks — the engine's
+       own multi-selection end state, never the keystroke).
+       BEATS 3 and 4 accept the figures-only rectangle, the rectangle with its label/header, OR
+       the whole sheet row/column (Shift+Space / Ctrl+Space) — §9.1's alt route, same end state.
+
+       THE ☆ (the bonus row, declared `reveal` so it is named — §9.0's "exactly one, VISIBLE"):
+       TAKE EVERY
+       STRAIGHTAWAY IN ONE PRESS. Per-HALL forgiveness, decided r456: a hall counts as WALKED
+       only if the player was inside it and stepped through it cell by cell — two or more plain
+       single-cell steps whose start AND end both lie on that hall. One step is a reorientation
+       and is forgiven; two is walking. Read off S.mzWalkLog, the maze branch's plain-step latch
+       (the S.pointLog / S.grabLog / S.gotoSpecials provenance family — a MECHANIC is recorded,
+       never inferred from the end state, because a walked hall and a flown hall look identical
+       once you are standing at its end). Latched ONCE, when beat 2 grades.
+
+       RANDOM (§9.1): the corridor layout (the existing seed pool) · which region row and which
+       quarter column the memo names · the table's anchor (3 spots) · every figure · which FY
+       cell is the hard-coded one.
+
+       ALTS (§9.1, dev/e2e-alt-paths.js): (1) walk the corridor cell by cell and grow every
+       range with plain Shift+arrows — every core beat clears, ☆ FORFEITED (the ☆-forfeit
+       control); (2) Shift+Space / Ctrl+Space / Ctrl+A for beats 3-5 — the star route the demo
+       plays.
        ============================================================================ */
     tutorial:{ n:1, name:'Navigate & Select', nextKey:'autofit' },
     steps:[
       { name:'ride the corridor',
-        why:'a corridor is a handful of flights, not a hundred steps',
-        beats:[ {id:0, why:'Ride each straightaway in one press — Ctrl and an arrow fly to the wall, over every pip on the line.'},
-                {id:1, why:'Land in the block, span it to its far edges, and copy it.'} ] },
+        why:'the keyboard flies — one press per range, not one per cell',
+        beats:[ {id:0, why:'Shoot the first straightaway — Ctrl and an arrow ride the whole leg and eat the checkpoint on it.'},
+                {id:1, why:'Keep turning and shooting until every checkpoint on the corridor is collected.'},
+                {id:2, why:'The last flight rides through the doorway and lands you on the model block.'} ] },
+      { name:'take the ranges',
+        why:'a selection is a rectangle you grow from where you stand, and Go To Special takes a whole class at once',
+        beats:[ {id:3, why:'The memo wants one region across the quarters — take that row of figures.'},
+                {id:4, why:'Now one quarter down every region — take that column.'},
+                {id:5, why:'Take the whole table at once, headers and figures together.'},
+                {id:6, why:'One FY figure was keyed by hand — light every typed figure on the table in a single pass.'} ] },
       { name:'bring it home',
-        why:'the far corners of a sheet are one press away, wall or no wall',
-        beats:[ {id:2, why:'No wall holds a teleport — return to A1 and paste the block into the empty room.'},
-                {id:3, why:'Finish at the bottom-right corner of everything on the sheet — your pasted block counts now.'} ] }
+        why:'the clipboard carries the block; the marked room says where it lands',
+        beats:[ {id:7, why:'Copy the table you are standing on.'},
+                {id:8, why:'Return to A1 and drop the table into the marked home range.'} ] }
     ],
-    par:20, parKeys:17, saveClose:true,   /* r427 H6b-1r3 (§4.1 ROUND 3): par re-swept ×9 seeds after the serpentine rebuild (8–10 corridor legs, was 6–8) — parKeys = measured demo median · r424 H6b-1r2 (§4.1 ROUND 2): corridor rebuild; r423 §1: Ctrl+S closer (engine-appended final beat) */
-    aha:'a corridor is a handful of flights, not a hundred steps — Ctrl+arrow eats the straightaways.',
-    prompt:'Solid walls carve one long switchback corridor from your empty corner to the model data. Ride the straightaways, turn at the corners, and collect every pip on the way. Copy the whole block, bring it home to A1, save your work, and finish at the far corner of everything you built — the corridor breaks open past the model if you would rather walk there than fly.',
-    req:'shoot each straightaway with <em>ctrl+↑/↓/←/→</em> (walls stop you) → grab the block <em>ctrl+⇧+arrows</em> → <em>ctrl+c</em> → <em>ctrl+home</em> → <em>ctrl+v</em> → <em>ctrl+s</em> → <em>ctrl+end</em>',
-    /* r424 (§4.1 ROUND 2, Wolf playtest r1): guide/targets index-aligned with checks — 4 core
-       + the ☆ bonus (the engine appends the save closer to all three at runtime). Beat 1's ring
-       rides the NEXT uncollected pip (§1.9 — guided ring on the right cell).
-       STRUCTURAL NOTE (§0: deviation named): the §4.1 page lists 'Save your work' as beat 4 and
-       the bottom-right flight as beat 5. The engine-owned saveClose beat always renders LAST
-       (hkSaveCloseWire), so the checklist shows the flight above the save line — but BOTH play
-       orders grade: the finish beat is flagged post:true (the sanctioned §1.0(e) exception), so
-       Ctrl+S takes after the paste and the win fires on whichever of save/flight lands last —
-       on Wolf's sketch order (paste → save → flight) that is the flight, exactly per the page. */
+    par:90, parKeys:21, saveClose:true,   /* r456 (§9.1 "Par estimate ~90 s (replay par); pass = par x 2.5"): par is the SPEC's replay par for a Foundations tutorial, not the house s/key band — a tutorial replay is reading-dominated and dev/curriculum-v3.json holds every Foundations level to 60-120 s. parKeys is the swept demo median (dev/e2e-par-sweep.js navigation). HOTKEY_CLOCKS.navigation overrides pass to par x 2.5 so a FIRST play (3-4 min per §9.1) is not failed for reading the guide. Mirrored in HOTKEY_PARS. */
+    aha:'a corridor is a handful of flights, not a hundred steps — and a range is one press, not a hundred cells.',
+    prompt:'Solid walls carve one long switchback corridor from your empty corner to the model block. Ride the straightaways, turn at the corners and collect every checkpoint on the way. Land on the block and the walls come down: a regional sales table stands in the corner and a memo names four ranges to capture — one region across the quarters, one quarter down every region, the whole table, and every typed figure on it (one FY figure was keyed by hand and hides among the formulas). Then copy the table, bring it home to the marked room at A1 and save.',
+    req:'ride each straightaway with <em>ctrl+arrows</em> → the row <em>shift+space</em> · the column <em>ctrl+space</em> · the table <em>ctrl+a</em> · every typed figure <em>f5</em> <em>s</em> <em>o</em> → <em>ctrl+c</em> → <em>ctrl+home</em> → <em>ctrl+v</em> → <em>ctrl+s</em>',
+    /* guide/targets are INDEX-PAIRED with checks (WORKFLOW §4): 9 cores + the ☆ at index 9;
+       hkSaveCloseWire appends the save closer to all three at runtime. The step controller
+       DERIVES every keycap it shows from these lines (hkStepCaps, §9.0.1) — no step literal
+       carries a chord of its own. */
     guide(){ return [
-      'walls box the corridor — <kbd>ctrl</kbd>+<kbd>→/↓/←/↑</kbd> shoots a whole straightaway and stops at the wall; one press per leg rides over every pip on the line',
-      'land in the block, then span it — <kbd>ctrl</kbd>+<kbd>⇧</kbd>+arrows ride to the block’s far edges — and <kbd>ctrl</kbd>+<kbd>c</kbd>',
-      'walls can’t hold a teleport — <kbd>ctrl</kbd>+<kbd>home</kbd> returns to A1, then <kbd>ctrl</kbd>+<kbd>v</kbd>',
-      '<kbd>ctrl</kbd>+<kbd>end</kbd> flies to the bottom-right corner of the active area — your pasted block counts now; the wall past the model is broken open too, so two more flights walk you there',
-      'a keypress the wall swallows is a bump — read the leg before you shoot, and the line stays clean' ]; },
+      'walls box the corridor — <kbd>ctrl</kbd>+<kbd>→/↓/←/↑</kbd> shoots a whole straightaway and stops at the wall; one press per leg rides over every checkpoint on the line',
+      'keep chaining flights — turn at each corner and shoot again with <kbd>ctrl</kbd>+<kbd>→/↓/←/↑</kbd>; a flight collects every checkpoint it passes through',
+      'the last flight rides through the doorway onto the block — one more <kbd>ctrl</kbd>+<kbd>↓</kbd> lands you inside it',
+      'land on the row and take it — <kbd>⇧</kbd>+<kbd>space</kbd> grabs the whole row, or grow the figures with <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>→</kbd>',
+      'land in the column and take it — <kbd>ctrl</kbd>+<kbd>space</kbd> grabs the whole column, or grow it with <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>↓</kbd>',
+      'stand anywhere on the table and press <kbd>ctrl</kbd>+<kbd>a</kbd> — it takes the whole block you are standing in, headers and figures',
+      '<kbd>f5</kbd> · <kbd>s</kbd> · <kbd>o</kbd> — Go To Special → Constants lights every typed figure at once; the hand-keyed FY cannot hide, and <kbd>↵</kbd> walks the marks',
+      'take the whole table again and <kbd>ctrl</kbd>+<kbd>c</kbd> — the marching ants say what is on the clipboard',
+      '<kbd>ctrl</kbd>+<kbd>home</kbd> returns to A1 — <kbd>ctrl</kbd>+<kbd>v</kbd> drops the table into the marked room',
+      'a straightaway walked cell by cell is a straightaway spent — read the leg, then shoot it' ]; },
     targets(){ const self=this; return [
-      function(){ const M=self._maze; if(!M) return 'A1';
-        try{ const got=(typeof S!=='undefined' && S && S.touch) ? S.touch.got : ((S && S.maze && S.maze.got)||{});
-          for(let i=0;i<M.pips.length;i++){ if(!got[i]) return colLetter(M.pips[i][1])+M.pips[i][0]; } }catch(e){}
-        return colLetter(M.table.c0)+M.table.r0; },
+      function(){ return self._pipTarget(); },
+      function(){ return self._pipTarget(); },
       function(){ const T=self._maze.table; return colLetter(T.c0)+T.r0+':'+colLetter(T.c0+T.w-1)+(T.r0+T.h-1); },
-      'A1',
-      function(){ const E=self._maze.end; return colLetter(E.c)+E.r; },
+      function(){ const N=self._nav, B=N.table, rr=B.r0+1+N.memoRow;
+        return colLetter(B.c0+1)+rr+':'+colLetter(B.c0+5)+rr; },
+      function(){ const N=self._nav, B=N.table, cc=colLetter(B.c0+1+N.memoCol);
+        return cc+(B.r0+1)+':'+cc+(B.r0+8); },
+      function(){ return self._tableRef(); },
+      function(){ return self._tableRef(); },
+      function(){ return self._tableRef(); },
+      function(){ const H=self._nav.home; return 'A1:'+colLetter(H.w)+H.h; },
       null ]; },
+    _pipTarget(){ const M=this._maze; if(!M) return 'A1';
+      try{ const got=(typeof S!=='undefined' && S && S.touch) ? S.touch.got : ((S && S.maze && S.maze.got)||{});
+        for(let i=0;i<M.pips.length;i++){ if(!got[i]) return colLetter(M.pips[i][1])+M.pips[i][0]; } }catch(e){}
+      return colLetter(M.table.c0)+M.table.r0; },
+    _tableRef(){ const B=this._nav.table;
+      return colLetter(B.c0)+B.r0+':'+colLetter(B.c0+B.w-1)+(B.r0+B.h-1); },
     // ---- maze geometry helpers (shared by build + demo + the alt-path harness) ----
     _mz(r,c,nr,nc){ const a=r*100+c,b=nr*100+nc; return a<b?(r+':'+c+'|'+nr+':'+nc):(nr+':'+nc+'|'+r+':'+c); },
     demo(){
-      const M=this._maze; if(!M) return [];
-      const pass=M.pass, T=M.table, RN=20, CN=10, self=this;
+      const M=this._maze, N=this._nav; if(!M||!N) return [];
+      const pass=M.pass, RN=20, CN=10, self=this;
       const passable=(r,c,nr,nc)=> nr>=1&&nr<=RN&&nc>=1&&nc<=CN && pass.has(self._mz(r,c,nr,nc));
       const shoot=(r,c,dr,dc)=>{ let cr=r,cc=c; while(passable(cr,cc,cr+dr,cc+dc)){cr+=dr;cc+=dc;} return [cr,cc]; };
       const dK=(dr,dc)=> dr===1?Kb.ctrlDown:dr===-1?Kb.ctrlUp:dc===1?Kb.ctrlRight:Kb.ctrlLeft;
@@ -22769,19 +22849,22 @@ const CHALLENGES = {
           if(sh[0]===end[0]&&sh[1]===end[1]){ steps.push({sel:ref(r,c), keys:[dK(dr,dc)]}); }
           else { for(let k=i;k<j;k++){ const [rr,cc]=path[k]; steps.push({sel:ref(rr,cc), keys:[sK(dr,dc)]}); } }
           i=j; } };
-      // 1) ride the corridor — every leg one flight (build() verified it); the last flight
-      //    carries through the door and lands on the block's bottom-left corner
+      /* THE OPTIMAL ROUTE = THE ☆ ROUTE (§9.1, and dev/e2e-demo-replay.js proves it wins).
+         STEP 1 — every leg is exactly ONE Ctrl+arrow flight (build() re-proves that per seed),
+         so no hall is ever walked and the ☆ latches with the last flight. */
       walkKeys(M.p1);
-      // 2) grab the whole block from the landing corner + copy
-      const BL=ref(T.r0+T.h-1,T.c0), BR=ref(T.r0+T.h-1,T.c0+T.w-1);
-      const full=ref(T.r0,T.c0)+':'+BR;
-      steps.push({sel:BL, keys:[{key:'ArrowRight',ctrl:true,shift:true}]});
-      steps.push({sel:BL+':'+BR, keys:[{key:'ArrowUp',ctrl:true,shift:true}]});
-      steps.push({sel:full, keys:[Kb.copy]});
-      // 3) teleport home + paste, then the finish flight (the Ctrl+S closer appends engine-side;
-      //    the post:true finish beat means either save-then-flight or flight-then-save wins)
-      steps.push({sel:full, keys:[Kb.ctrlHome, Kb.paste]});
-      steps.push({sel:'A1', keys:[Kb.ctrlEnd]});
+      /* the last flight lands INSIDE the model block: beat 2 grades, the tier ladder's first
+         rung opens, the walls come down and the sales table is on the board from here on. */
+      const B=N.table, cL=i=>colLetter(B.c0+i);
+      const rowR=B.r0+1+N.memoRow, colC=cL(1+N.memoCol), first=cL(1)+(B.r0+1);
+      // STEP 2 — the star route: one chord per range, then one Go To Special pass
+      steps.push({sel:cL(1)+rowR,        keys:[{key:' ',shift:true}]});                 // beat 3 · Shift+Space
+      steps.push({sel:colC+(B.r0+1),     keys:[{key:' ',ctrl:true}]});                  // beat 4 · Ctrl+Space
+      steps.push({sel:first,             keys:[{key:'a',ctrl:true,code:'KeyA'}]});      // beat 5 · Ctrl+A = the current region
+      steps.push({sel:first,             keys:[{key:'F5'},L('s'),L('o')]});             // beat 6 · Go To Special -> Constants
+      // STEP 3 — take the table again, copy, teleport home, paste (the Ctrl+S closer appends engine-side)
+      steps.push({sel:first,             keys:[{key:'a',ctrl:true,code:'KeyA'}, Kb.copy]});
+      steps.push({sel:this._tableRef(),  keys:[Kb.ctrlHome, Kb.paste]});
       return steps;
     },
     build(){
@@ -22944,43 +23027,149 @@ const CHALLENGES = {
          visual marker must not mutate the board model, or every consumer that reasons about
          which cells EXIST (used range, Ctrl+End extent, autofit scans) inherits a phantom.
          So the room rides on _maze and render() paints it positionally. */
+      /* ---- STEP 2's REGION: the regional sales table + the memo (§9.1) --------------------
+         Built here, painted by the r421 §2.5 TIER LADDER when step 1's beats close. Nothing
+         below is in `cells`, so step 1's board — walls, pips, model block, used range, Ctrl+End
+         — is byte-identical to r430's corridor. The table is 8 regions × Q1-Q4 + FY (6 cols ×
+         9 rows) at one of THREE anchors; the HOME RANGE it is delivered to is the same
+         footprint at A1, and it is marked positionally (S.pasteRoom), never as cells (r432). */
+      const REGIONS=['North','South','East','West','Central','Northeast','Southwest','Midwest','Pacific','Mountain','Atlantic','Gulf'];
+      const regs=[]; { const pool=REGIONS.slice(); while(regs.length<8) regs.push(pool.splice(rnd(0,pool.length-1),1)[0]); }
+      const QS=['Q1','Q2','Q3','Q4'];
+      const TB={r0:11, c0:[1,3,5][rnd(0,2)], w:6, h:9};      // rows 11-19; the anchor is the §9.1 random axis
+      const HOME={r0:1, c0:1, w:6, h:9};                      // A1:F9 — the marked home range
+      const hardRow=rnd(0,7), memoRow=rnd(0,7), memoCol=rnd(0,3);
+      const cL=i=>colLetter(TB.c0+i);
+      const tCells={}, typedRefs=[];
+      tCells[cL(0)+TB.r0]={value:'Region',txt:true,bold:true,bb:true};
+      QS.concat(['FY']).forEach((h,i)=>{ tCells[cL(i+1)+TB.r0]={value:h,txt:true,bold:true,bb:true,align:'right'}; });
+      for(let i=0;i<8;i++){
+        const rr=TB.r0+1+i; let fy=0;
+        tCells[cL(0)+rr]={value:regs[i],txt:true};
+        for(let q=0;q<4;q++){ const v=rnd(40,320)*5; fy+=v;
+          tCells[cL(q+1)+rr]={value:v,fmtStyle:'comma',decimals:0,fontColor:'blue'};
+          typedRefs.push(cL(q+1)+rr); }
+        /* ONE FY figure per seed is TYPED BY HAND. That is what makes beat 6's typed set
+           non-rectangular, so F5 -> Special -> Constants is the ONLY one-pass route to it. */
+        tCells[cL(5)+rr] = (i===hardRow)
+          ? {value:fy,fmtStyle:'comma',decimals:0,bold:true,bl:true}
+          : {formula:'=SUM('+cL(1)+rr+':'+cL(4)+rr+')',value:fy,fmtStyle:'comma',decimals:0,bold:true,bl:true};
+        if(i===hardRow) typedRefs.push(cL(5)+rr);
+      }
+      const memo={
+        H2:{value:'MEMO — capture list',txt:true,bold:true},
+        H3:{value:'1 · the '+regs[memoRow]+' row, Q1 through FY',txt:true},
+        H4:{value:'2 · the '+QS[memoCol]+' column, every region',txt:true},
+        H5:{value:'3 · the whole table',txt:true},
+        H6:{value:'4 · every typed figure on it',txt:true}
+      };
+      const memo2={ H8:{value:'then: the table goes home to A1',txt:true} };
+      /* the wall + model-block cells the first rung DELETES (§9.1: "the walls clear") */
+      const wipe=[];
+      for(let r=1;r<=RN;r++)for(let c=1;c<=CN;c++){ if(!geo.open.has(K(r,c))) wipe.push(colLetter(c)+r); }
+      for(let r=t.r0;r<t.r0+t.h;r++)for(let c=t.c0;c<t.c0+t.w;c++) wipe.push(colLetter(c)+r);
+      /* the post-wall board: every edge open, so movement, Shift+arrow growth and the two
+         teleports behave exactly as on an ordinary sheet. S.maze stays TRUTHY on purpose —
+         it is what keeps render() from drawing the (finished) touch-list dots over the table. */
+      const openPass=new Set();
+      for(let r=1;r<=RN;r++)for(let c=1;c<=CN;c++){
+        if(c<CN) openPass.add(self._mz(r,c,r,c+1));
+        if(r<RN) openPass.add(self._mz(r,c,r+1,c)); }
+      /* THE HALLS the ☆ is measured over: one per straightaway of the corridor (D.W's legs). */
+      const legSet=[];
+      for(let i=0;i+1<W.length;i++){ const a=W[i], b=W[i+1];
+        const dr=Math.sign(b[0]-a[0]), dc=Math.sign(b[1]-a[1]);
+        const s=new Set(); let rr=a[0], cc=a[1]; s.add(rr+':'+cc);
+        while(rr!==b[0]||cc!==b[1]){ rr+=dr; cc+=dc; s.add(rr+':'+cc); }
+        if(s.size>2) legSet.push(s); }
       // paste-grading snapshot: the four corners the A1 landing must reproduce
-      const snap={tl:ln[0], tr:cells[yrs[1]+t.r0].value, bl:ln[3], br:cells[yrs[1]+(t.r0+3)].value};
+      const snap={ tl:'Region', tr:'FY', bl:regs[7], br:tCells[cL(5)+(TB.r0+8)].value,
+                   mid:tCells[cL(1)+(TB.r0+1)].value };
       this._maze={pass:geo.pass, channel:geo.open, pips, table:t, p1:geo.p, exit:D.X, end:{r:RN,c:CN}, snap, pasteRoom:{r0:room.r0,c0:room.c0,w:room.w,h:room.h}};   /* r432: paste-target footprint — geometry, never cells */
+      this._nav={ table:TB, home:HOME, block:t, regs, QS, memoRow, memoCol, hardRow,
+                  typedRefs, snap, legSet, pips };
       /* r422 (§2.6): the pips ARE the checkpoint touch-list — mazePip feeds hkTouchLatch on
          pass-through (a ctrl-shot collects mid-flight, which the render-time cursor tick can't
          see), so hkTouchTick stands down on maze boards; the maze draws its own pip glyphs. */
       return {ROWS:RN, cells, active:{r:e,c:1}, sel:null,
         colW:{1:80,2:80,3:80,4:80,5:80,6:80,7:80,8:80,9:80,10:80},
         maze:{pass:geo.pass, channel:geo.open, pips, table:t, got:{}, prog:{}, tele:true, end:{r:RN,c:CN}, snap, nudge, moved:false},
-        touch:{cells:pips.map(p=>colLetter(p[1])+p[0]), label:'pips'}};
+        touch:{cells:pips.map(p=>colLetter(p[1])+p[0]), label:'pips'},
+        /* §2.5 THE TIER LADDER — one rung per step boundary, `park:false` because the region
+           is hidden behind the corridor, not previewed dim behind it (§9.1: a plain appear). */
+        tiers:[
+          { checks:[0,1,2], park:false, wipe, label:'the sales table',
+            reveal:Object.assign({}, tCells, memo),
+            set:{ maze:{pass:openPass, channel:new Set(), pips:[], got:{}, prog:{}, tele:true, end:{r:RN,c:CN}, nudge:[], moved:true} } },
+          { checks:[3,4,5,6], park:false, label:'the home range', reveal:memo2,
+            set:{ pasteRoom:{r0:HOME.r0,c0:HOME.c0,w:HOME.w,h:HOME.h} } }
+        ]};
     },
     checks(S){
-      const mz=S.maze; if(!mz) return [];
-      if(!mz.got) mz.got={}; if(!mz.prog) mz.prog={};
+      const N=this._nav; if(!N) return [];
       // A=S.active — load-bearing: railSafe() scans this source for 'S.active' to keep the
       // guided rails OFF cursor-graded boards (rails would wall off the corridor itself).
-      const pr=mz.prog, A=S.active, cb=S.clipboard&&S.clipboard.rect, T=mz.table;
+      const A=S.active, T=N.block, B=N.table, H=N.home;
+      const pr = (S._navP = S._navP || {});
       /* r422 (§2.6): the pip count reads the generalized touch-list latch; the legacy
-         mz.got tally covers harnesses that build S without loadChallenge's hkTouchInit. */
-      const nGot=S.touch ? (S.touchGot|0) : mz.pips.filter((_,i)=>mz.got[i]).length;
-      if(mz.pips.length===0 || nGot===mz.pips.length) pr.pips=true;
-      if(pr.pips && !pr.copied && !!cb && cb.r1===T.r0 && cb.c1===T.c0 && cb.r2>=T.r0+T.h-1 && cb.c2>=T.c0+T.w-1) pr.copied=true;
-      const sn=mz.snap, gv=k=>{ const x=S.cells[k]; return x?x.value:null; };
-      if(pr.copied && !pr.pasted && sn && gv('A1')===sn.tl && gv(colLetter(T.w)+'1')===sn.tr
-        && gv('A'+T.h)===sn.bl && gv(colLetter(T.w)+T.h)===sn.br) pr.pasted=true;
-      if(pr.pasted && !pr.fin && mz.end && A.r===mz.end.r && A.c===mz.end.c) pr.fin=true;
+         maze.got tally covers harnesses that build S without loadChallenge's hkTouchInit. */
+      const nPip=N.pips.length;
+      const nGot = S.touch ? (S.touchGot|0)
+                 : ((S.maze&&S.maze.got) ? N.pips.filter((_,i)=>S.maze.got[i]).length : 0);
+      if(nGot>=1) pr.p1=true;
+      if(nPip===0 || nGot>=nPip) pr.pips=true;
+      if(pr.pips && !pr.atBlock && A.r>=T.r0 && A.r<T.r0+T.h && A.c>=T.c0 && A.c<T.c0+T.w) pr.atBlock=true;
+      /* THE ☆, latched ONCE at the end of step 1 (§9.1). Per-HALL forgiveness: a hall is
+         WALKED only if TWO or more plain single-cell steps ran inside it (start AND end both
+         on that hall) — one step is a reorientation, two is walking. S.mzWalkLog is the maze
+         branch's plain-step latch; a flight logs nothing, so the flown route keeps the star. */
+      if(pr.atBlock && pr.star===undefined){
+        const log=(S.mzWalkLog||[]), n=new Array(N.legSet.length).fill(0);
+        for(const s of log){ for(let i=0;i<N.legSet.length;i++){
+          if(N.legSet[i].has(s.a) && N.legSet[i].has(s.b)){ n[i]++; break; } } }
+        pr.star = n.every(x=>x<2);
+      }
+      /* ---- STEP 2: four SELECTION end states. Any route that lands the rectangle grades;
+         §9.1's alts (Shift+Space / Ctrl+Space whole sheet line, Ctrl+A, Ctrl+Shift+arrows,
+         plain Shift+arrows) all reduce to one of these three shapes. ---- */
+      const rg=selRange(), hasSel=!!S.sel;
+      const rowR=B.r0+1+N.memoRow;
+      if(pr.atBlock && !pr.rowSel && hasSel && rg.r1===rowR && rg.r2===rowR &&
+         ((rg.c1===B.c0+1 && rg.c2===B.c0+5) || (rg.c1===B.c0 && rg.c2===B.c0+5) || (rg.c1===1 && rg.c2===COLS)))
+        pr.rowSel=true;
+      const colC=B.c0+1+N.memoCol;
+      if(pr.atBlock && !pr.colSel && hasSel && rg.c1===colC && rg.c2===colC &&
+         ((rg.r1===B.r0+1 && rg.r2===B.r0+8) || (rg.r1===B.r0 && rg.r2===B.r0+8) || (rg.r1===1 && rg.r2===S.ROWS)))
+        pr.colSel=true;
+      if(pr.atBlock && !pr.allSel && hasSel &&
+         rg.r1===B.r0 && rg.c1===B.c0 && rg.r2===B.r0+B.h-1 && rg.c2===B.c0+B.w-1) pr.allSel=true;
+      /* beat 6 grades S.marks — Go To Special's own multi-selection END STATE (never the
+         keystroke). The typed set is not a rectangle, so no single Shift-chord can match it. */
+      if(pr.atBlock && !pr.typed && S.markCrit==='const'){
+        const got=(S.marks||[]);
+        if(got.length===N.typedRefs.length && N.typedRefs.every(k=>got.indexOf(k)>=0)) pr.typed=true;
+      }
+      /* ---- STEP 3 ---- */
+      const s2 = !!(pr.rowSel && pr.colSel && pr.allSel && pr.typed);
+      const cb=S.clipboard&&S.clipboard.rect;
+      if(s2 && !pr.copied && !!cb && cb.r1===B.r0 && cb.c1===B.c0 && cb.r2>=B.r0+B.h-1 && cb.c2>=B.c0+B.w-1) pr.copied=true;
+      const sn=N.snap, gv=k=>{ const x=S.cells[k]; return x?x.value:null; };
+      if(pr.copied && !pr.pasted && gv('A1')===sn.tl && gv(colLetter(H.w)+'1')===sn.tr
+        && gv('A'+H.h)===sn.bl && gv(colLetter(H.w)+H.h)===sn.br && gv('B2')===sn.mid) pr.pasted=true;
       return [
-        {label:'Navigate to the model data — collect every pip on the way ('+nGot+'/'+mz.pips.length+')', ok:!!pr.pips},
-        {label:'Select and copy the whole block of data', ok:!!pr.copied},
-        {label:'Return to A1 and paste the data', ok:!!pr.pasted},
-        /* post:true — the sanctioned §1.0(e)/§4.1 exception: this beat comes AFTER the save in
-           Wolf's sketch, so the Ctrl+S gate must not require it (the win still requires it) */
-        {label:'Finish at the bottom-right corner of the active area', ok:!!pr.fin, post:true},
-        /* §4.1 ☆ (mystery slot): zero wall bumps, latched at the finish — S.bumpN counts only a
-           keydown the wall SWALLOWED (move() maze branch); a flight that merely stops at a wall
-           is never a bump (Wolf's r423 fairness latch rides). */
-        {label:'Finish with zero wall bumps', ok:!!pr.fin && (S.bumpN|0)===0, bonus:true}
+        {label:'Reach the first checkpoint in the corridor', ok:!!pr.p1},
+        {label:'Collect every checkpoint on the way to the far corner ('+nGot+'/'+nPip+')', ok:!!pr.pips},
+        {label:'Land on the model block at the end of the corridor', ok:!!pr.atBlock},
+        {label:'Select the '+N.regs[N.memoRow]+' row of figures, Q1 through FY', ok:!!pr.rowSel},
+        {label:'Select the '+N.QS[N.memoCol]+' column, every region', ok:!!pr.colSel},
+        {label:'Select the whole table, headers and figures', ok:!!pr.allSel},
+        {label:'Select every typed figure on the table in one pass', ok:!!pr.typed},
+        {label:'Copy the whole sales table', ok:!!pr.copied},
+        {label:'Paste the table into the marked home range at A1', ok:!!pr.pasted},
+        /* §9.0 THE ☆ — exactly one, VISIBLE (reveal:true): the checklist names it from the
+           first paint instead of hiding it behind "☆ ?", because a Foundations discovery the
+           player cannot read is not a lesson. Never blocks the win (§2.2). */
+        {label:'Take every straightaway in one press', ok:!!pr.atBlock && pr.star===true, bonus:true, reveal:true}
       ];
     }
   }
@@ -24050,6 +24239,7 @@ function render(){
   // (S._railZone), so dim everything OUTSIDE the ZONE — the playable area reads at a glance.
   // Cells inside the zone but outside the current step's target stay live: that's where
   // alternate routes (copy a finished formula forward, revisit a source) happen.
+  const __hintR3 = (typeof hkHintRung==='function') ? (hkHintRung()>=3) : false;   /* r456 §9.0.3: hint rung 3 lights the beat's range (no rails, no fence) */
   const __rz = (guided && !editing && !demoPlaying && S._railZone &&
     CHALLENGES[cur] && typeof railSafe==='function' && railSafe(CHALLENGES[cur])) ? S._railZone : null;
   // r331 (Wolf): the nav maze's blue dots all looked alike — a new user couldn't tell which
@@ -24121,7 +24311,7 @@ function render(){
       /* r430/r432: paste-target marker (nav maze), painted from _maze geometry so the board
          model stays untouched. Only while the square is genuinely empty — the instant the
          block lands the tint clears, so it reads as a destination, not a style. */
-      const __pr = (S.maze && S.maze.pasteRoom);
+      const __pr = S.pasteRoom || (S.maze && S.maze.pasteRoom);   /* r456: a tier rung may mark the home range on a board that has no maze left */
       if(__pr && cell.value==null && !cell.formula &&
          r>=__pr.r0 && r<__pr.r0+__pr.h && c>=__pr.c0 && c<__pr.c0+__pr.w){
         cls.push('ptgt'); if(r===__pr.r0 && c===__pr.c0) cls.push('ptgt-l');
@@ -24135,6 +24325,7 @@ function render(){
       else if(inSel&&S.sel)cls.push('sel');
       if(gt && r>=gt.r1&&r<=gt.r2&&c>=gt.c1&&c<=gt.c2){ cls.push(guided?'gtarget':'ttarget');
         if(tourMode) cls.push('tourping');   /* r452 §3.0.2(2): the Tour adds a PULSE to .ttarget rather than a new class */
+        if(__hintR3) cls.push('hintring');   /* r456 §9.0.3 rung 3: the beat's range, lit on the board */
         // r329: the target draws as ONE outer frame around the whole zone (the paste footprint),
         // not a box per cell — tag the range's edge cells so the border rides the perimeter.
         if(r===gt.r1)cls.push('gt-t'); if(r===gt.r2)cls.push('gt-b'); if(c===gt.c1)cls.push('gt-l'); if(c===gt.c2)cls.push('gt-r'); }
@@ -25265,8 +25456,14 @@ function hkTiersInit(built){
     const refs=Object.keys(t.reveal||{});
     let r1=Infinity,c1=Infinity,r2=-1,c2=-1;
     refs.forEach(k=>{ const p=resolveRange(k); if(p){ r1=Math.min(r1,p.r1); c1=Math.min(c1,p.c1); r2=Math.max(r2,p.r2); c2=Math.max(c2,p.c2); } });
+    /* r456 (§9.1, Foundations 1): three optional fields, so a STEP BOUNDARY can be a board
+       change and not only an addition. `wipe` deletes cells when the rung opens (the corridor
+       walls coming down); `set` shallow-assigns onto S (dropping the maze, marking the home
+       range); `park:false` suppresses the dim "▸ unlocks" preview for a region that is hidden
+       behind the current board rather than parked beside it (§9.1: a plain appear). */
     return { checks:(t.checks||[]).slice(), reveal:t.reveal||{}, label:String(t.label||''),
-             open:!refs.length, rect:(r2>=0?{r1,c1,r2,c2}:null) };
+             wipe:(t.wipe||[]).slice(), set:(t.set||null),
+             open:!refs.length, rect:(t.park===false?null:(r2>=0?{r1,c1,r2,c2}:null)) };
   });
 }
 function hkTierTick(items){
@@ -25275,7 +25472,9 @@ function hkTierTick(items){
   for(const t of S.tiers){
     if(t.open) continue;
     if(!(t.checks||[]).every(i=>items[i]&&items[i].ok)) break;   // the ladder opens in order
+    for(const ref of (t.wipe||[])) delete S.cells[ref];          // r456: cells the rung REMOVES (the walls coming down)
     for(const ref in t.reveal){ S.cells[ref]=Object.assign({}, blankCell(), t.reveal[ref]); }
+    if(t.set) Object.assign(S, t.set);                           // r456: board state the rung flips (maze off, home range marked)
     if(t.rect && t.rect.r2>S.ROWS) S.ROWS=t.rect.r2;
     t.open=true; opened=true;
     S._tierFresh=t.rect;
@@ -25429,7 +25628,9 @@ function checkWin(){
     if(bi>=0){
       /* r423 (Wolf round-2 §2): the card names the hidden bonus whether found or missed —
          the reveal is the results card's job, never the in-run checklist's */
-      __bonus={ok:!!__winItems[bi].ok, label:String(__winItems[bi].label||'').replace(/<[^>]*>/g,'')};
+      /* r456: a Foundations ☆ declares `reveal` — it was NAMED in the checklist all run, so
+         the card must not call it hidden (§9.0: "exactly one, VISIBLE"). */
+      __bonus={ok:!!__winItems[bi].ok, shown:!!__winItems[bi].reveal, label:String(__winItems[bi].label||'').replace(/<[^>]*>/g,'')};
       if(__bonus.ok && !mouseUsed && !guidedUsed && !hkBonusStar(cur)){
         try{
           const bs=JSON.parse(localStorage.getItem('hk_bonus_star')||'{}');
@@ -25859,7 +26060,7 @@ function _showResults(o){
       '<span>'+(o.mouse?' · keyboard-only runs count' : ' · turn guided off to make the clock count')+'</span></div>'
     : '';
   /* r423 (Wolf round-2 §2): the mystery ☆ reveals its label HERE, found or missed */
-  const bonusRow=o.bonus ? `<div class="rm-bonus${o.bonus.ok?' ok':''}">☆ hidden bonus: ${escHtml(o.bonus.label||'')} — ${o.bonus.ok?('found'+(o.bonus.xp?' · +'+o.bonus.xp+' xp':'')):'missed'}</div>` : '';
+  const bonusRow=o.bonus ? `<div class="rm-bonus${o.bonus.ok?' ok':''}">☆ ${o.bonus.shown?'bonus':'hidden bonus'}: ${escHtml(o.bonus.label||'')} — ${o.bonus.ok?('found'+(o.bonus.xp?' · +'+o.bonus.xp+' xp':'')):'missed'}</div>` : '';
   /* r425 §2.4: a CAPSTONE card names the track leg it opens — or exactly what still stands.
      Three states: clean run + chapter done → the leg is open; clean run but the chapter's
      keys aren't at pace yet → the clean run is banked; mouse/guided run → say what a clean
@@ -26861,7 +27062,7 @@ function updateChecklist(){
     __barPct=microRun.targets.length?Math.round(100*gotT/microRun.targets.length):0;
   } else {
     /* r455: a coaching tutorial names the open step in the head the checklist already has */
-    const __stA=(stepMode && stepIdx>=0) ? hkStepsOf(cur) : null;
+    const __stA=hkGuideOpen() ? hkStepsOf(cur) : null;
     __headTxt=(__stA?`step ${stepIdx+1} of ${__stA.length}`:'checklist')+` <span>${nCore}/${coreItems.length}</span>`+
       (__bonusItem?` <b class="cl-star${__bonusItem.ok?' on':''}" title="bonus — never blocks the win">☆</b>`:'');
     __barPct=coreItems.length?Math.round(100*nCore/coreItems.length):0;
@@ -26871,6 +27072,11 @@ function updateChecklist(){
   const __altFooter = (hints||guided) ? '<div class="cl-alt">many chords, one sheet \u2014 the grader only checks the result. live alternates: fills <b>ctrl+r/d</b> \u21d4 <b>alt h f i r/d</b> \u00b7 autosum <b>alt+=</b> \u21d4 <b>alt h u s</b> \u00b7 paste special <b>ctrl+alt+v</b> \u21d4 <b>alt e s</b> \u00b7 format cells <b>ctrl+1</b> \u21d4 <b>alt o e</b> \u00b7 rows/cols <b>ctrl+\u00b1</b> \u21d4 <b>alt h i r / h d r</b> \u00b7 plugin profiles (\u2328) add Macabacus / FactSet chords</div>' : '';
   html+=`<div class="cl-bar"><div class="cl-bar-fill" style="width:${__barPct}%"></div></div>`;
   html+=hkErrMeterHtml(items);   /* r421 §2.3: the disclosed-error meter (drills.js meta.errorCount) */
+  /* r456 (§9.0.2): THE GUIDE PANEL. Not a second surface — the same aside, the same rows: the
+     step list above the beats, the open step's `why` under it, and the keycap column turned on
+     for the open step. Everything below is unchanged on every other board and on a replay. */
+  html+=hkStepListHtml(items);
+  const __gOpenBeat = hkGuideOpen() ? hkStepFirstOpen(items) : -1;
   items.forEach((i,idx)=>{
     /* r455 (Phase B): THE STEP-SCOPED SLICE. While the guide coaches, the panel shows the open
        step's beats plus everything already cleared (hkStepShows) — same rows, same classes, same
@@ -26886,7 +27092,11 @@ function updateChecklist(){
        the results card already named it, so the rep shows it openly.) */
     const isNext = !i.ok && !nextDone && isTarget && !isBonus; if(isNext){ nextDone=true; __clNextIdx=idx; }
     const __g = (typeof C.guide==='function') ? (C.__gCache || (C.__gCache=C.guide.call(C))) : C.guide;
-    const keys = ((hints||guided) && __g && __g[idx] && !isBonus) ? `<div class="cl-keys">${__g[idx]}${guideAltNote(__g[idx])}</div>` : '';
+    /* r456 (§9.0.2): while the guide is open its keycap COLUMN is shown for the open step's
+       beats — except the open beat itself, whose chord rides the `.cl-hint` explanation row
+       below (one chord, one place). §9.0.3's rung 2 LIGHTS that chord, it never reveals it. */
+    const __gShow = (__gOpenBeat>=0 && idx!==__gOpenBeat && hkStepShows(idx, items) && !i.ok);
+    const keys = ((hints||guided||__gShow) && __g && __g[idx] && !isBonus) ? `<div class="cl-keys">${__g[idx]}${guideAltNote(__g[idx])}</div>` : '';
     /* r421 §2.1: a completed row shows its split beside the ✓ — dim ink, PB-delta tinted
        (ahead = accent, behind = neutral; never red mid-run) */
     let split='';
@@ -26898,18 +27108,28 @@ function updateChecklist(){
        r423 (Wolf round-2 §2): MYSTERY until earned — an unearned ☆ shows "☆ ?" with NO label
        text (truly hidden); earning it latches the real label + lit star. Inside a mistakes
        replay that targets it, the label shows (the results card already revealed it). */
-    const lab=isBonus?((i.ok || (microRun && isTarget))?('☆ '+i.label):'☆ ?'):i.label;
+    /* r456 (dev/CURRICULUM_V3.md §9.0, "☆ per drill: exactly one, VISIBLE"): a check may
+       declare `reveal:true` and its ☆ is named from the first paint. The r423 mystery slot is
+       still the default for every other drill — a Foundations discovery is taught, not hidden. */
+    const lab=isBonus?((i.ok || i.reveal || (microRun && isTarget))?('☆ '+i.label):'☆ ?'):i.label;
     /* r450 (flow audit P1-3): an unearned ☆ rendered as a bare "☆ ?" inside a checklist headed
        "0/5" — a first-timer read it as a sixth blocking item they couldn't decipher. The mystery
        stays (r423); the tooltip just says it's optional and never blocks the win. */
-    const btip=isBonus?' title="a hidden bonus — find the efficient route. Optional: it never blocks the win."':'';
+    const btip=isBonus?(i.reveal?' title="the bonus — the efficient route. Optional: it never blocks the win."'
+                                :' title="a hidden bonus — find the efficient route. Optional: it never blocks the win."'):'';
     html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}${isBonus?' cl-bonus':''}${!isTarget?' cl-pre':''}"${btip}><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${lab}</span>${split}${keys}</div>`;
+    /* r456: the open beat's line sits UNDER ITS OWN ROW, not at the foot of an eleven-row
+       panel — a Foundations checklist is long enough that a trailing explanation reads as
+       belonging to the ☆ it follows (caught in the r456 render review). */
+    if(idx===__gOpenBeat) html+=hkStepHintHtml(items);
   });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
-  html+=hkStepHintHtml(items);   /* r455: the open beat's guide line, in the row a drill's own hint() uses */
+  if(__gOpenBeat<0) html+=hkStepHintHtml(items);   /* r455: the open beat's guide line, in the row a drill's own hint() uses (r456: inline, above — this is the folded/closed fallback) */
+  html+=hkGuideFootHtml();       /* r456 §9.0.2/§9.0.3: the hint button + the guide's own collapse toggle */
   html+=__altFooter;   /* r356 (sweep): the alt-routes line was BUILT since r-old but never appended — the whole 'many chords, one sheet' promise was invisible */
   html+=`<div class="cl-esc">stuck or off the rails? <kbd>esc</kbd><kbd>esc</kbd> or <kbd>shift+f11</kbd> restarts the drill</div>`;
   el.innerHTML=html;
+  try{ hkGuideWire(el, items); }catch(e){}   /* r456: the guide's two controls (hint · hide/show) */
   try{ if(window.hkMacifyKbds) window.hkMacifyKbds(el); }catch(e){}   // r279: Mac keycap language
   // r134: AUTOSCROLL — long checklists scroll inside .cl-body; keep the next failing
   // task in view (scoped scrollTop math, never scrollIntoView — that can jiggle the page)
@@ -27577,6 +27797,16 @@ function move(dr,dc,shift,ctrl){
     else { if(mazePassable(cr,cc,cr+dr,cc+dc)){ cr+=dr; cc+=dc; mazePip(cr,cc); } }
     if(cr===S.active.r && cc===S.active.c && !done) S.bumpN=(S.bumpN||0)+1;   // r422 (§4.1 ☆): a keydown the wall swallowed — the zero-bump bonus reads this latch (movement that merely STOPS at a wall is never a bump)
     else S.maze.moved=true;   // r427 (§1.0-R2(k)): the first-drill nudge is a FIRST-ACTION cue — the first move that lands anywhere new retires it
+    /* r456 (dev/CURRICULUM_V3.md §9.1, the Foundations 1 ☆): THE PLAIN-STEP LATCH. A hall
+       walked cell by cell and a hall taken in one flight look IDENTICAL once you are standing
+       at its end, so the mechanic is recorded rather than inferred — the S.pointLog / S.grabLog
+       / S.gotoSpecials provenance family (§1.0(d)). Only a bare arrow that actually moved one
+       cell is logged; a Ctrl flight, a Shift extension and a swallowed bump log nothing.
+       Telemetry only: nothing core may ever require it (§1.0(c)). */
+    if(!ctrl && !shift && !(cr===S.active.r && cc===S.active.c)){
+      (S.mzWalkLog=S.mzWalkLog||[]).push({a:S.active.r+':'+S.active.c, b:cr+':'+cc});
+      if(S.mzWalkLog.length>400) S.mzWalkLog.shift();
+    }
 
     if(shift){ if(!S.sel){ S.sel={r:S.active.r,c:S.active.c}; S.selA=null; } }   // r423: anchor the wall-respecting selection exactly like the normal engine (r308)
     else S.sel=null;
@@ -28219,6 +28449,9 @@ document.addEventListener('keydown',hkRawE=>{
      preventDefault and never returns, so every key still reaches the live sheet. The player can
      do anything they like on the Keyboard Tour; the HUD just gets more explicit. */
   if(tourMode){ try{ hkTourKeyWatch(e); }catch(_){} }
+  /* r456 §9.0.3: the GUIDE's passive observer — three keys that move nothing walk one hint
+     rung. Same contract as the Tour's: no preventDefault, no early return. */
+  if(stepMode){ try{ hkGuideKeyWatch(e); }catch(_){} }
   // while the sign-in modal is open, the trainer ignores keys (its Esc is claimed at the top — r452)
   if(authOpen){ if(k==='Escape'){ e.preventDefault(); closeAuth(); } return; }
 
@@ -33590,6 +33823,13 @@ function hkLessonReopen(){
 let stepMode=false;      // the step controller is coaching this board (line + step slice)
 let stepIdx=-1;          // the open step; mirrored onto S.step for the checklist and the tests
 let __stPrevOk=0;         // graded-beat count at the last tick
+/* r456 (§9.0.2's state table): the panel can be FOLDED — on a replay it starts folded, and a
+   player who folds it mid-first-play keeps it folded for that key (hk_guide_<key>='off').
+   Folded = the plain checklist every other drill has: no step list, no keycap column, no
+   beat line, no hint ladder. The controller keeps grading either way. */
+let __gCollapse=false;
+function hkGuideOpen(){ return !!(stepMode && stepIdx>=0 && !__gCollapse); }
+function hkHintRung(){ try{ return hkGuideOpen() ? (S._hintRung|0) : 0; }catch(e){ return 0; } }
 
 function hkStepsOf(k){ try{ const C=CHALLENGES[k];
   return (C && C.steps && C.steps.length) ? C.steps : null; }catch(e){ return null; } }
@@ -33609,9 +33849,10 @@ function hkGuideReset(){
   return kill.length;
 }
 function hkStepAbort(){
+  __gCollapse=false;
   if(!stepMode) return;
   stepMode=false; stepIdx=-1; __stPrevOk=0;
-  try{ if(S) S.step=-1; }catch(e){}
+  try{ if(S){ S.step=-1; S._hintRung=0; S._hudMiss=0; S._hintBeat=-2; } }catch(e){}
 }
 function hkStepStart(){
   /* Called from loadChallenge AFTER hkGateArm. It does NOT touch the gate: the r450 scrim is
@@ -33626,8 +33867,8 @@ function hkStepStart(){
     if(marathon && marathon.active) return;
     if(hkGateOff()) return;        // the documented dev-harness opt-out — same rule as the gate
     if(hkGuideSeen(cur)) return;   // a REPLAY: a plain, quiet, timed drill (Wolf, binding)
-    stepMode=true; stepIdx=0; __stPrevOk=0;
-    if(S) S.step=0;
+    stepMode=true; stepIdx=0; __stPrevOk=0; __gCollapse=false;
+    if(S){ S.step=0; S._hintRung=0; S._hudMiss=0; S._hintBeat=-2; }
     try{ ev('step_start',{k:cur}); }catch(e){}
     hkStepGateLine();
   }catch(e){}
@@ -33689,14 +33930,123 @@ function hkStepHintHtml(items){
      (NOT #taskLine — that element has been display:none since r49; writing the lesson there
      would have taught nobody. Caught in the r455 render review.) */
   try{
-    if(!stepMode || stepIdx<0) return '';
+    if(!hkGuideOpen()) return '';
     const ST=hkStepsOf(cur), A=ST && ST[stepIdx]; if(!A) return '';
     const i=hkStepFirstOpen(items); if(i<0) return '';
     const bt=(A.beats||[]).filter(x=>x && x.id===i)[0] || (A.beats||[])[0];
     if(!bt) return '';
     const caps=hkStepCaps(bt.id);
-    return '<div class="cl-hint">'+escHtml(String(bt.why||''))+(caps?'<br>'+caps:'')+'</div>';
+    /* §9.0.3 RUNG 2 — the chord is already in the panel; the rung LIGHTS it (`.lit`). The
+       ladder never reveals anything the panel was withholding, and it never touches the ☆
+       (hkStepFirstOpen only ever returns a step's own core beat). */
+    const lit=(hkHintRung()>=2)?' lit':'';
+    return '<div class="cl-hint">'+escHtml(String(bt.why||''))+(caps?'<br><span class="cl-caps'+lit+'">'+caps+'</span>':'')+'</div>';
   }catch(e){ return ''; }
+}
+/* ---- r456 §9.0.2: THE STEP LIST + the open step's `why` (the panel's top block) ---- */
+function hkStepListHtml(items){
+  try{
+    if(!hkGuideOpen()) return '';
+    const ST=hkStepsOf(cur); if(!ST) return '';
+    let h='<div class="cl-steps">';
+    ST.forEach((A,si)=>{
+      const bs=(A.beats||[]), got=bs.filter(b=>b && items[b.id] && items[b.id].ok).length;
+      h+='<div class="cl-step'+(si===stepIdx?' on':'')+(got===bs.length?' done':'')+'">'+
+         '<span class="cs-n">'+(si+1)+'</span><span class="cs-name">'+escHtml(String(A.name||''))+'</span>'+
+         '<span class="cs-cnt">'+got+'/'+bs.length+'</span></div>';
+      /* §9.0.3 RUNG 1 — the open step's `why` is always in the panel; the rung PULSES it. */
+      if(si===stepIdx && A.why)
+        h+='<div class="cl-why'+(hkHintRung()>=1?' lit':'')+'">'+escHtml(String(A.why))+'</div>';
+    });
+    return h+'</div>';
+  }catch(e){ return ''; }
+}
+/* the panel's two controls: the hint button (§9.0.3) and the fold toggle (§9.0.2's table).
+   On a REPLAY the controller stands down, so the toggle is the way back to the guide. */
+function hkGuideFootHtml(){
+  try{
+    if(!hkStepsOf(cur) || tourMode || sandboxMode) return '';
+    const open=hkGuideOpen();
+    const r=hkHintRung();
+    return '<div class="cl-guide">'+
+      (open?'<a id="clHint" class="cl-gbtn"'+(r>=3?' data-max="1"':'')+'>'+(r>=3?'hint · all shown':'hint'+(r?' '+r+'/3':''))+'</a>':'')+
+      '<a id="clFold" class="cl-gbtn">'+(open?'hide the guide':'show the guide')+'</a></div>';
+  }catch(e){ return ''; }
+}
+function hkGuideWire(el){
+  const h=el.querySelector('#clHint'); if(h) h.onclick=(e)=>{ e.preventDefault(); hkGuideHint(); };
+  const f=el.querySelector('#clFold'); if(f) f.onclick=(e)=>{ e.preventDefault(); hkGuideFold(); };
+}
+function hkGuideHint(){
+  /* §9.0.3: the three rungs, in order — concept, keycap, target. The button walks the same
+     ladder the three-wrong-key counter walks; hints never change scoring (the clock is the
+     score, Wolf 2026-09-03) and they never speak for the ☆. */
+  try{ if(!hkGuideOpen()) return;
+    S._hintRung=Math.min(3,(S._hintRung|0)+1); S._hudMiss=0;
+    try{ ev('guide_hint',{k:cur,r:S._hintRung}); }catch(e){}
+    render();
+  }catch(e){}
+}
+function hkGuideFold(){
+  try{
+    if(!hkStepsOf(cur)) return;
+    if(hkGuideOpen()){
+      __gCollapse=true;
+      try{ localStorage.setItem('hk_guide_'+cur,'off'); }catch(e){}   /* §9.0.2: folded mid-first-play stays folded for that key */
+      try{ ev('guide_fold',{k:cur}); }catch(e){}
+    } else {
+      __gCollapse=false;
+      if(!stepMode){ stepMode=true; stepIdx=0; __stPrevOk=0; }
+      hkStepSync();
+      if(S){ S._hintRung=0; S._hudMiss=0; S._hintBeat=-2; S.step=stepIdx; }
+      try{ ev('guide_open',{k:cur}); }catch(e){}
+    }
+    render();
+  }catch(e){}
+}
+/* re-seat the open step on the first step that still has an ungraded beat (the toggle can
+   arm the guide mid-run, on a replay or after a fold) */
+function hkStepSync(){
+  try{
+    const ST=hkStepsOf(cur); if(!ST) return;
+    const items=CHALLENGES[cur].checks(S);
+    let i=ST.length-1;
+    for(let s=0;s<ST.length;s++){
+      if((ST[s].beats||[]).some(b=>b && items[b.id] && !items[b.id].ok)){ i=s; break; }
+    }
+    stepIdx=i; if(S) S.step=i;
+  }catch(e){}
+}
+/* ---- §9.0.3's TRIGGER: three wrong keys on the current beat walks one rung ----
+   A PASSIVE OBSERVER on the keydown path (the hkTourKeyWatch shape): it never calls
+   preventDefault and never returns early, so every key still reaches the live sheet.
+   "Wrong" is §9.0's own definition, generalized off the Tour's per-beat key list, which a
+   Foundations beat does not have: a beat grades an END STATE, so a key is ON ROUTE when the
+   board moved at all — cursor, selection, cells, marks, clipboard, save, a graded beat. A key
+   that changed nothing is the one the player is guessing with. */
+function hkGuideSig(){
+  try{
+    const rg=selRange();
+    return [S.active.r,S.active.c,rg.r1,rg.c1,rg.r2,rg.c2,Object.keys(S.cells).length,
+            undoStack.length,S.markCrit||'',(S.marks||[]).length,(S.savedN|0),(S.clipboard?1:0),
+            (S.touchGot|0),(S.bumpN|0),mode,dialog||'',editing?1:0,editBuf,
+            CHALLENGES[cur].checks(S).filter(x=>x.ok).length].join('|');
+  }catch(e){ return ''; }
+}
+function hkGuideKeyWatch(e){
+  try{
+    if(!hkGuideOpen() || !S || demoPlaying || echoOn || done) return;
+    if(HK_MODK.has(e.key)) return;
+    const before=hkGuideSig();
+    setTimeout(()=>{ try{
+      if(!hkGuideOpen() || !S) return;
+      if(hkGuideSig()!==before){ S._hudMiss=0; return; }
+      S._hudMiss=(S._hudMiss|0)+1;
+      if((S._hudMiss|0)>=3 && (S._hintRung|0)<3){ S._hintRung=(S._hintRung|0)+1; S._hudMiss=0;
+        try{ ev('guide_hint',{k:cur,r:S._hintRung,auto:1}); }catch(_){}
+        render(); }
+    }catch(_){ } }, 0);
+  }catch(_){ }
 }
 function hkStepShows(idx, items){
   /* THE STEP-SCOPED CHECKLIST SLICE. While the guide coaches, the checklist shows the OPEN
@@ -33705,7 +34055,7 @@ function hkStepShows(idx, items){
      other drill; the only difference is which rows are in it. The ☆ and the engine-appended
      save closer always show: they belong to the drill, not to a step. */
   try{
-    if(!stepMode || stepIdx<0) return true;
+    if(!hkGuideOpen()) return true;
     const ST=hkStepsOf(cur), A=ST && ST[stepIdx]; if(!A) return true;
     const it=items && items[idx];
     if(it && (it.bonus || it.save)) return true;
@@ -33742,6 +34092,13 @@ function hkStepTick(items){
   const ST=hkStepsOf(cur); if(!ST || stepIdx<0) return;
   const n=items.filter(x=>x.ok).length;
   if(n!==__stPrevOk) __stPrevOk=n;
+  /* §9.0.3: THE LADDER RESETS ON BEAT ADVANCE (the miss counter already did) — a rung earned
+     on one beat never carries into the next one's first press. */
+  try{ const ob=hkStepFirstOpen(items);
+    /* -2 is "not seated yet" (hkStepStart / hkGuideFold): seat it WITHOUT resetting, or the
+       first paint after arming would swallow a rung the player just asked for. */
+    if(S._hintBeat===undefined || S._hintBeat===-2) S._hintBeat=ob;
+    else if(S._hintBeat!==ob){ S._hintBeat=ob; S._hintRung=0; S._hudMiss=0; } }catch(e){}
   const A=ST[stepIdx];
   if(!(A.beats||[]).every(b=>b && items[b.id] && items[b.id].ok)) return;
   hkStepReveal(A);

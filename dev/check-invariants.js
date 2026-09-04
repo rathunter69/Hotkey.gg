@@ -931,10 +931,13 @@ try {
     if (!cl || Math.abs(cl.pass - par * 2) > 0.01)
       bad(`C24: lesson drill ${k} clocks: pass must be par×2.0 (§2(b)), got ${cl && cl.pass} against par ${par}`);
   }
-  /* reveal:true is legal ONLY on a lesson drill — navigation's game ☆ stays hidden (§1.6) */
+  /* reveal:true is legal ONLY on a lesson drill or a FOUNDATIONS TUTORIAL (r456: a drill that
+     declares `steps` — dev/CURRICULUM_V3.md §9.0, "☆ per drill: exactly one, VISIBLE"). The
+     r423 mystery slot stays the rule everywhere else: on an ordinary board the ☆ is a
+     discovery, and a named one is a checklist item the player would grind (§1.6). */
   for (const k of Object.keys(chunks15))
-    if (/reveal\s*:\s*true/.test(chunks15[k]) && !lessonKeys.includes(k))
-      bad(`C24: ${k} declares reveal:true but is not a lesson drill — the ☆ is a hidden discovery everywhere else (§1.6)`);
+    if (/reveal\s*:\s*true/.test(chunks15[k]) && !lessonKeys.includes(k) && !/\n    steps:\s*\[/.test(chunks15[k]))
+      bad(`C24: ${k} declares reveal:true but is neither a lesson drill nor a Foundations tutorial — the ☆ is a hidden discovery everywhere else (§1.6)`);
   if (!/function hkLessonKey\(k\)\{/.test(idx15))
     bad('C24: hkLessonKey() is gone — §2(a) names it as the single lesson-drill helper');
 
@@ -1061,6 +1064,31 @@ try {
         'would show every beat of every step at once');
   if (!/try\{ hkStepWin\(\); \}catch\(e\)\{\}/.test(idx26))
     bad('C26: checkWin no longer calls hkStepWin — a cleared tutorial would coach again on every replay');
+  /* ---- r456: THE GUIDE PANEL + THE HINT LADDER (dev/CURRICULUM_V3.md §9.0.2 / §9.0.3).
+     Every piece lives inside updateChecklist's own output — the whole point of §9.0.2 is that
+     the guide is NOT a second surface. These guards are the bug classes r456 actually hit. ---- */
+  for (const fn of ['hkGuideOpen', 'hkHintRung', 'hkStepListHtml', 'hkGuideFootHtml', 'hkGuideWire',
+                    'hkGuideHint', 'hkGuideFold', 'hkStepSync', 'hkGuideKeyWatch', 'hkGuideSig'])
+    if (!new RegExp('function ' + fn + '\\(').test(idx26)) bad(`C26: ${fn}() is gone — §9.0.2/§9.0.3's guide panel is part of the checklist`);
+  if (!/html\+=hkStepListHtml\(items\);/.test(idx26))
+    bad('C26: updateChecklist no longer renders the step list (hkStepListHtml) — §9.0.2 puts the ' +
+        'steps and the open step\'s why at the head of the panel');
+  if (!/html\+=hkGuideFootHtml\(\);/.test(idx26))
+    bad('C26: updateChecklist no longer renders the guide\'s controls (hkGuideFootHtml) — §9.0.2 ' +
+        'requires the hint button and the fold toggle, and §9.0.2\'s table requires the toggle on a replay');
+  /* the r456 render review: the beat's line was appended AFTER every row, so on an eleven-row
+     Foundations checklist it read as belonging to the ☆ it followed. It renders under its own row. */
+  if (!/if\(idx===__gOpenBeat\) html\+=hkStepHintHtml\(items\);/.test(idx26))
+    bad('C26: the open beat\'s line is no longer rendered under ITS OWN checklist row — a trailing ' +
+        'explanation on a long panel reads as belonging to the last row, not the open beat (r456 render review)');
+  if (!/if\(stepMode\)\{ try\{ hkGuideKeyWatch\(e\); \}catch\(_\)\{\} \}/.test(idx26))
+    bad('C26: the keydown path no longer arms hkGuideKeyWatch — §9.0.3\'s three-wrong-key trigger ' +
+        'would never fire and the ladder would be button-only');
+  if (!/S\._hintRung=Math\.min\(3,\(S\._hintRung\|0\)\+1\)/.test(idx26))
+    bad('C26: the hint ladder no longer stops at rung 3 (§9.0.3 declares exactly three rungs, in order)');
+  /* §9.0.3: hints never cover the ☆ — the keycap column and the ladder are gated on !isBonus */
+  if (!/&& __g && __g\[idx\] && !isBonus\)/.test(idx26))
+    bad('C26: the checklist keycap column lost its !isBonus gate — §9.0.3: hints NEVER cover the ☆');
   {
     const winBail = /if\(done\|\|demoPlaying[^\n]*\) return;/.exec(idx26);
     if (!winBail) bad('C26: checkWin\'s bail list could not be read');
