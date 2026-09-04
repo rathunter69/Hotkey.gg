@@ -37,9 +37,14 @@ Atlas, and skip the LLC). Reasoning, so the session does not re-derive it:
 | Delaware C-corp (Stripe Atlas) | raising priced equity soon; option pool; SAFEs | ~$500 bundle: incorporation + EIN + bank intro + Stripe account; $400/yr DE franchise + registered agent | double taxation and corporate formalities are overhead a solo bootstrapped product does not need yet; an LLC can convert later |
 
 **Steps (a day of admin, most of it waiting):**
-1. Name availability search on the state's business registry; the entity name can be "Hotkey Labs
-   LLC" or similar — the brand stays hotkey.gg (a DBA is only needed if the site name must appear
-   on legal docs; usually the LLC name + "d/b/a hotkey.gg" on invoices is enough).
+1. Name availability search on the state's business registry. **Decided (2026-09-04): a generic
+   holding-style LLC name with `hotkey.gg` as a DBA.** The LLC owns the product; the DBA is the
+   public brand, so the bank account, Stripe descriptor, and contracts can read "hotkey.gg" while
+   one entity can hold a second product later without re-forming. Pick the holding name to be
+   boring and available (candidates: `Spreadsheet Skills Group LLC`, `Keystroke Labs LLC`,
+   `Redshortcut Holdings LLC`); confirm it on the state registry + USPTO before filing. File the
+   DBA / fictitious-name / trade-name registration for `hotkey.gg` right after the LLC clears —
+   a cheap county or state filing Wolf does himself, no formation-service add-on.
 2. File the **Articles / Certificate of Organization** online with the state. Registered agent:
    Wolf's own address is fine in most states if he does not mind it on the public record;
    otherwise a service (~$100–150/yr) — pick this at filing.
@@ -203,7 +208,7 @@ to fix are parked in ROADMAP §3 and belong to track T3.
 
 1. Is the OBA / employer constraint lifted, and cleared in writing?
 2. Home state (for §1's cost table) — and any plan to raise money within 12 months?
-3. Entity name (brand stays hotkey.gg).
+3. ~~Entity name~~ — **decided: generic holding-style LLC + `hotkey.gg` DBA** (see §1). Holding name still to pick.
 4. Bank: startup-neobank (Mercury/Relay) or existing bank?
 5. Bookkeeping: tool or spreadsheet?
 6. Pricing at launch (replaces the $7 / $19 placeholders) — a product decision that Stripe setup
