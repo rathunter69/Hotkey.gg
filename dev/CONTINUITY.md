@@ -33,6 +33,10 @@ ROADMAP §3, not into the PR.
   eight chapters stay; charts excluded; the whole breadth of desk Excel is in scope; drills must be full-page,
   fulsome, desk-language (the seven rules).
 - **Waiting on Wolf:** merge #250; the five Phase A decisions (§6 of that doc — recommendations stand if silent).
+- **Email addresses are decided:** `dev/BUSINESS_PLAN.md` §5 is the canonical alias table (one mailbox wolf@;
+  hello@/billing@/security@/privacy@/legal@/teams@ public; admin@/postmaster@/abuse@/dmarc@ required; one alias
+  per vendor login; auth@/notifications@/recap@ send-only; ops@ alerts). Add there first, then use on the site.
+  The site mismatches (security.html → hello@, no security.txt, no-reply@) are parked in ROADMAP §3 under T3.
 - **Wolf-side:** `SUPABASE_ACCESS_TOKEN` must be an `sbp_` token; rotate the secret key pasted in chat; one
   `reports` row + one `team_applications` row to review; legal placeholders after the entity exists; Mac KeyTips.
 

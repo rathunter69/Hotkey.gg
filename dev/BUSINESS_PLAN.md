@@ -116,15 +116,64 @@ entitlement read `hkEntitlementRead()`, `loadEntitlement()`, the disabled `#pwCh
 
 ## 5 · Mail, logins, bills — the routing table
 
-`dev/EMAIL_SETUP.md` has the DNS and mailbox how-to. The routing decision:
+`dev/EMAIL_SETUP.md` has the DNS and mailbox how-to. **This table is the canonical list of hotkey.gg
+addresses.** Site pages, Supabase/Resend senders, vendor logins and the security.txt file must match it;
+add an address here first, then use it. One real mailbox; everything else is a Workspace alias (free) or
+a send-only Resend identity.
 
-| address | routes to | used for |
+**The one mailbox**
+
+| address | what it is | used for |
 |---|---|---|
-| `wolf@hotkey.gg` | the one real mailbox (Google Workspace, ~$7/mo) | founder identity: registrar, Cloudflare, GitHub, Supabase owner, Stripe owner, bank |
-| `billing@hotkey.gg` | alias → wolf@ (label: billing) | every vendor invoice + autopay receipts; Stripe account email; Supabase Pro billing. Survives a later hire. |
-| `hello@hotkey.gg` | alias → wolf@ | public support/press (already linked site-wide); Stripe public support contact |
-| `security@hotkey.gg` | alias → wolf@ | disclosure inbox named on `security.html` |
-| `no-reply@` / `auth@` / `recap@` | send-only (Resend) | transactional + campaigns, per EMAIL.md |
+| `wolf@hotkey.gg` | the one real mailbox (Google Workspace Starter, ~$7/mo) | founder identity; owner login on registrar, Cloudflare, GitHub, Supabase, Stripe, bank |
+
+**Customer-facing aliases** (all → wolf@; Gmail filter labels them so one inbox stays sortable)
+
+| address | used for | where it is named |
+|---|---|---|
+| `hello@hotkey.gg` | support, bug reports, general questions, press; Stripe public support contact; the reply-to on every outbound mail | contact.html, footer, receipts, Stripe |
+| `billing@hotkey.gg` | vendor invoices + autopay receipts; Stripe account email; Supabase Pro billing; refund requests | billing.html, Stripe, every vendor account |
+| `security@hotkey.gg` | vulnerability disclosure (today security.html points at hello@ — fix in T3) | security.html, `/.well-known/security.txt` |
+| `privacy@hotkey.gg` | data-access / deletion requests (GDPR/CCPA wording in privacy.html) | privacy.html |
+| `legal@hotkey.gg` | DMCA, terms questions, counsel, registered-agent mail | terms.html, privacy.html |
+| `teams@hotkey.gg` | desks, schools, clubs, enterprise pilots; the address on the team application flow | contact.html "schools", teams page, `team_applications` |
+
+**Required-by-convention aliases** (→ wolf@; never advertised, but mail servers and vendors expect them)
+
+| address | why it exists |
+|---|---|
+| `admin@hotkey.gg` | Google Workspace super-admin recovery; domain-verification mails from vendors |
+| `postmaster@hotkey.gg` | RFC 5321 requirement; bounce and abuse reports from other mail servers |
+| `abuse@hotkey.gg` | RFC 2142; where ISPs and Cloudflare route abuse complaints |
+| `dmarc@hotkey.gg` | `rua=` target in the DMARC record (EMAIL_SETUP §1); aggregate reports land here |
+
+**Vendor-login aliases** (→ wolf@; one alias per vendor so a leaked password or a handoff is one account, not all)
+
+| address | vendor login it owns |
+|---|---|
+| `supabase@hotkey.gg` | Supabase organisation owner |
+| `github@hotkey.gg` | GitHub organisation / deploy account |
+| `cloudflare@hotkey.gg` | Cloudflare account (DNS, Pages) |
+| `stripe@hotkey.gg` | Stripe account owner (billing@ stays the invoice address) |
+| `registrar@hotkey.gg` | domain registrar |
+
+**Send-only identities** (Resend; SPF/DKIM per EMAIL_SETUP §1; replies route to hello@)
+
+| address | sends |
+|---|---|
+| `auth@hotkey.gg` | Supabase custom SMTP: magic links, password resets, email change |
+| `notifications@hotkey.gg` | receipts, streak/recap mails, achievement unlocks, team invites (replaces `no-reply@` — a no-reply sender hurts deliverability and hides replies we want) |
+| `recap@hotkey.gg` | the weekly recap campaign (kept separate so unsubscribes do not touch transactional mail) |
+
+**Internal**
+
+| address | used for |
+|---|---|
+| `ops@hotkey.gg` | machine alerts: Supabase, Cloudflare, uptime, GitHub Actions failures; filtered to its own label |
+
+Not on the list, on purpose: `contact@` (hello@ is the one public address), `info@`, `sales@`
+(teams@ covers it until there is a sales function), `no-reply@` (see notifications@). Site mismatches
+to fix are parked in ROADMAP §3 and belong to track T3.
 
 - **Password manager with a business vault** (1Password Business or Bitwarden): every account
   above, shared later with a co-founder or contractor by vault, never by chat. **Hardware-key 2FA**
@@ -144,7 +193,7 @@ entitlement read `hkEntitlementRead()`, `loadEntitlement()`, the disabled `#pwCh
 | when | do | output |
 |---|---|---|
 | S1 | §0 OBA clearance; pick the state; CPA hour | a written yes; state + entity type decided |
-| S2 | §1 file, EIN, operating agreement, state tax registration; §5 Workspace + aliases + DNS (EMAIL_SETUP §1) | LLC exists; wolf@ / billing@ / hello@ / security@ live |
+| S2 | §1 file, EIN, operating agreement, state tax registration; §5 Workspace + the full alias table + DNS (EMAIL_SETUP §1) | LLC exists; wolf@ and every alias in §5 live |
 | S3 | §2 bank + card; §4 bookkeeping connected; §5 vault, 2FA, register; move every vendor to billing@ + the card | money and logins separated from personal |
 | S4 | §3 Stripe live account, products, Tax, portal; webhook + checkout functions deployed (with SECURITY_PLAN §4); terms/privacy/refund updated with the entity | a live checkout behind the still-OFF flag; the premium flip becomes a pure product decision |
 

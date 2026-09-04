@@ -41,7 +41,7 @@ Status: ☐ not started · ◐ in progress · ☑ done. Sizes: S = a few hours, 
 |---|---|---|---|---|---|
 | **T1** | **Identity sprites wired in** behind a flag: rank emblems, level chip/ring, achievement medals + rings, player card frames, favicon; flag off = zero visible change. | the flag flips on the preview with every surface rendering the sprites | M | ART_DIRECTION.md §6 §7a §7b · ASSET_INVENTORY.md · art/asset-pixel-proto.html | ☐ |
 | **T2** | **Business setup** — LLC, bank, Stripe live (checkout on billing.html, `freeNow` off), accounting, the email/accounts/bills list. | a real PRO purchase completes on production | M+Wolf | BUSINESS_PLAN.md · billing.html "STRIPE GOES HERE" · check-paywall.js | ☐ |
-| **T3** | **Security hardening** — the plan in SECURITY_PLAN.md: RLS review, secret rotation (the keys pasted in chat), headers, abuse limits, the deploy token type. | every item in SECURITY_PLAN.md checked or scheduled | M | SECURITY_PLAN.md · supabase/migrations | ☐ |
+| **T3** | **Security hardening** — the plan in SECURITY_PLAN.md: RLS review, secret rotation (the keys pasted in chat), headers, abuse limits, the deploy token type; plus the email-consistency items in §3 (security@, security.txt). | every item in SECURITY_PLAN.md checked or scheduled | M | SECURITY_PLAN.md · supabase/migrations | ☐ |
 | **T4** | **Legal pages** — replace the 13 `[bracketed]` placeholders (entity line) once T2 names the entity. | zero placeholders on terms/privacy | S | terms.html · privacy.html | ☐ after T2 |
 | **T5** | **Mac ⌥ KeyTips** — verify on a real Mac and fix the chord table. | parity suite green on a Mac run | S | MAC_DESIGN.md | ☐ needs a Mac |
 
@@ -50,6 +50,11 @@ Status: ☐ not started · ◐ in progress · ☑ done. Sizes: S = a few hours, 
 - Two silent engine bugs from the gap matrix, fixed in S2: columns past Z mis-parse; SUMIF/COUNTIF ignore `">100"`.
 - The daily-challenge card opens 1.4 s after load over any board it is eligible for; the harness suppresses it, the product may want a gentler moment.
 - `combo` (keycaps) reads weak at 1×/2× and `cert` at 32 in the icon set — one more hand pass when T1 starts.
+- Email consistency (T3, after the aliases exist — canonical list: BUSINESS_PLAN.md §5): `security.html` sends
+  disclosure reports to `hello@` → `security@`; add `/.well-known/security.txt` (Contact: security@, Policy:
+  /security.html); privacy.html/terms.html name `privacy@`/`legal@`; contact.html "schools" → `teams@`; stray
+  `contact@` in EMAIL.md → `hello@`; `no-reply@` → `notifications@` in EMAIL.md and the Resend templates; Supabase
+  custom SMTP from `auth@`; DMARC `rua=` → `dmarc@`.
 - Wolf-side, no session needed: the GitHub `SUPABASE_ACCESS_TOKEN` must be an `sbp_` personal token; rotate the secret key pasted in chat; one `reports` row and one `team_applications` row to review.
 
 ## 4 · What is already true (so a new session does not re-derive it)
