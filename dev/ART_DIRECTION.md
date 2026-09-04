@@ -475,9 +475,9 @@ keycap. The shipped set:
 | speed | gold keycap, ⚡ legend, motion lines | gold | | daily | desk calendar, torn leaf, ring binding | gold |
 | rapid | steel stopwatch, lit gold dial | steel | | crown | crown on a red cushion | gold |
 | perfect | cut cyan gem on a stone plinth | cyan | | cert | rolled diploma, gold ribbon, red wax seal | red |
-| accuracy | archery target on a stand, one arrow | red | | formula | Σ carved into a stone tablet | green |
+| accuracy | a cell, green tick stamped in it (§7b) | red | | formula | Σ carved into a stone tablet | green |
 | explorer | folded map, red pin, dotted route | green | | mastery | mortarboard + tassel on a book | bronze |
-| combo | three keycaps pressed in sequence | steel | | moon | crescent beside a lit desk lamp | violet |
+| combo | three caps: ctrl · shift · → (§7b) | steel | | moon | crescent + desk lamp; 16 is crescent + stars | violet |
 | comeback | rising bars on a plinth, gold arrow | green | | ice | frosted keycap, snowflake legend, icicles | cyan |
 | streak | flame burning on a keycap | red | | mouse | a mouse wearing the red X | steel |
 | volume | three ledgers stacked | green | | founder | coffee mug with the four brand dots | (brand) |
@@ -553,3 +553,19 @@ contact sheet** rendered old-vs-new at 1×, 2× and 4×, reviewed by eye and ite
 *before* the rest of the set is drawn. Every sprite is checked by rule (row length, closed outline,
 45° run length, baseline row, spark count) before it is looked at, and looked at before it ships.
 The r455 sheet is `art/asset-style-sheet.png`; the checker's rules are the ones above.
+
+## 7b · Round 2 touch-ups (r455) — four glyphs re-cut
+
+_Wolf: "the one I don't love is the target looking one — seems like it could be simpler or a different
+concept." Band 1b of the sheet; render `art/asset-touchups.png`._
+
+- **accuracy — new object.** Three candidates drawn at 32 and 16 beside the old target-on-legs: (a) a cell
+  with a green tick, (b) a bullseye cut to a coin with one arrow, (c) a hollow set-square with a pencil.
+  **(a) ships** — the only one that survives 16 (one hard silhouette, a bright ground, one high-contrast
+  mark; (b) collapses to a red dot at 1×, (c) to grey sticks), and it is the house metaphor: a cell is a
+  pixel, this is the cell you got right. Paper face, red frame, green tick; (b) and (c) stay as candidates.
+- **combo** — three caps, **ctrl · shift · →** cut in ink, the last struck down and lit gold; a `>` arrowhead
+  joins the 3×5 font. The 16 drops the middle cap by decision (§7a.1): two caps read, three smear. The
+  runner-up, a chain link joining two caps, stays on the sheet.
+- **cert** — tails 6 cells wide, not 3: splayed, a dark fold band, a swallow-tail notch, unequal lengths. Width and fold carry the ribbon; the 1× "pair of legs" read is gone.
+- **moon** — horns taper 1-2-3 at both ends; the 16 drops the desk lamp and gives the crescent the canvas, with two stars.
