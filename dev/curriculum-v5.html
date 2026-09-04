@@ -14,11 +14,13 @@ nav.toc a{display:flex;gap:8px;align-items:baseline;padding:6px 8px;border-radiu
 nav.toc a:hover,nav.toc a:focus-visible{background:var(--surface);outline:none}
 nav.toc a b{font-family:"JetBrains Mono",monospace;color:var(--accent-ink);font-weight:500;width:14px}
 nav.toc a i{margin-left:auto;font-style:normal;color:var(--muted);font-family:"JetBrains Mono",monospace;font-size:12px}
-nav.toc .legend{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.5}
+nav.toc .legend{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.6}
 header.top{grid-column:1/-1;border-bottom:2px solid var(--ink);padding-bottom:18px;margin-bottom:8px}
 header.top .eyebrow{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink)}
 header.top h1{font-family:"IBM Plex Serif",Georgia,serif;font-weight:600;font-size:34px;margin:6px 0 8px;text-wrap:balance;line-height:1.15}
-header.top p{max-width:68ch;margin:0;color:var(--muted)}
+header.top p{max-width:70ch;margin:0 0 6px;color:var(--muted)}
+.rules{max-width:70ch;margin:10px 0 0;padding-left:20px;color:var(--muted);font-size:14px}
+.rules li{margin:2px 0}
 .stats{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--muted)}
 .stats b{color:var(--ink);font-weight:500}
 main{min-width:0}
@@ -35,645 +37,522 @@ main{min-width:0}
 .d-head h3{margin:0;font-size:19px;font-weight:600}
 .tag{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:var(--fn-bg);color:var(--accent-ink)}
 .tag.cap{background:var(--pro-bg);color:var(--pro)}
-.tag.eng{background:var(--eng-bg);color:var(--eng)}
+.tag.built{background:var(--key-bg);border:1px solid var(--key-line);color:var(--muted)}
+.tag.eng{background:var(--eng-bg);color:var(--eng);text-transform:none;letter-spacing:0}
 .why{margin:0 0 12px;color:var(--muted);max-width:72ch}
 dl{display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px 18px;margin:0}
 dt{font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:4px}
 dd{margin:0;max-width:72ch}
 dd p{margin:0 0 6px}
 dd p:last-child{margin-bottom:0}
+.rnd{color:var(--muted);font-size:13.5px;margin-top:6px}
 .fns{display:flex;flex-wrap:wrap;gap:6px}
 .key,.fn{font-family:"JetBrains Mono",monospace;font-size:12.5px;padding:2px 8px;border-radius:4px;white-space:nowrap}
 .key{background:var(--key-bg);border:1px solid var(--key-line);box-shadow:0 1.5px 0 var(--key-line)}
 .fn{background:var(--fn-bg);color:var(--accent-ink)}
 .star{color:var(--star)}
-ol{margin:0;padding-left:22px}
-ol li{margin:2px 0}
+ol.steps{margin:0;padding-left:0;list-style:none;display:grid;gap:8px}
+ol.steps>li>b{display:block;font-family:"JetBrains Mono",monospace;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:2px}
+ol.steps ol{margin:0;padding-left:22px}
+ol.steps ol li{margin:1px 0}
 @media (max-width:640px){dl{grid-template-columns:1fr} dt{padding-top:6px}}
 @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style>
 <div class="wrap">
-<header class="top"><div class="eyebrow">hotkey.gg · curriculum v5 · concept for review</div>
+<header class="top"><div class="eyebrow">hotkey.gg · curriculum v5.1 · concept for review</div>
 <h1>Every drill, in plain English</h1>
-<p>Eight chapters, 77 drills. For each one: what it tests, what sits on the grid when the page opens, how the run is scored and rewarded, and the steps the player takes. Nothing here is built yet except drill 1.1; items marked <span class="tag eng">needs engine work</span> wait on the site's spreadsheet learning the feature first.</p>
-<div class="stats"><span><b>77</b> drills</span><span><b>8</b> chapters</span><span><b>8</b> capstones</span><span>free: chapters 1–4 · PRO: chapters 5–8</span><span>charts excluded</span></div>
+<p>Eight chapters, 61 drills, each one a full page of work. For every drill: what it tests, what sits on the 20×10 grid when the page opens, how the run is scored and rewarded, and the player's steps. Nothing here is built except drills 1.1 and 1.8.</p>
+<ol class="rules"><li>One full page, one story a real person would do this week; the finished page is sendable.</li><li>Three steps of three to four outcomes; 60 to 150 seconds for a skilled player.</li><li>Rebuild, don't retype; consequences visible on the page.</li><li>Layout and the broken cells change every run.</li><li>Red cues where the player must act; desk language throughout.</li><li>The star is a skippable habit that saves time, never something earned by finishing.</li><li>Three uses of the same key are three different stories.</li></ol>
+<div class="stats"><span><b>61</b> drills</span><span><b>8</b> chapters</span><span><b>8</b> capstones</span><span>free: chapters 1–4 · PRO: chapters 5–8</span><span>charts excluded</span><span>engine work pending: 24 features</span></div>
 </header>
-<nav class="toc"><a href="#ch1"><b>1</b> Foundations <i>8</i></a><a href="#ch2"><b>2</b> Formatting <i>7</i></a><a href="#ch3"><b>3</b> Formulas I <i>12</i></a><a href="#ch4"><b>4</b> Data &amp; Lookups <i>13</i></a><a href="#ch5"><b>5</b> Formulas II <i>10</i></a><a href="#ch6"><b>6</b> Models I <i>9</i></a><a href="#ch7"><b>7</b> Models II <i>8</i></a><a href="#ch8"><b>8</b> Full Builds <i>10</i></a><div class="legend"><span class="key">key</span> = a keyboard route &nbsp;·&nbsp; <span class="fn">FN</span> = a function or concept<br>★ the hidden pro move that earns the star</div></nav>
-<main><section class="chapter" id="ch1"><header class="ch-head"><div class="ch-num">Chapter 1</div><h2>Foundations</h2><span class="tier free">FREE</span><p>The four tutorials open the guide panel by default and hold the player&#x27;s hand. Then three drills on the hand skills every later chapter assumes, and the capstone.</p></header><article class="drill" id="d1-1">
-<div class="d-head"><span class="d-num">1.1</span><h3>Navigate &amp; Select</h3><span class="tag">tutorial</span></div>
-<p class="why">Every other skill starts with getting to the cell and selecting the right block. This is the ten seconds a banker saves a hundred times a day.</p>
+<nav class="toc"><a href="#ch1"><b>1</b> Foundations <i>8</i></a><a href="#ch2"><b>2</b> Formatting <i>6</i></a><a href="#ch3"><b>3</b> Formulas I <i>9</i></a><a href="#ch4"><b>4</b> Data &amp; Lookups <i>9</i></a><a href="#ch5"><b>5</b> Formulas II <i>7</i></a><a href="#ch6"><b>6</b> Models I <i>7</i></a><a href="#ch7"><b>7</b> Models II <i>7</i></a><a href="#ch8"><b>8</b> Full Builds <i>8</i></a><div class="legend"><span class="key">key</span> = a keyboard route &nbsp;·&nbsp; <span class="fn">FN</span> = a function or concept<br>★ the hidden pro move that earns the star</div></nav>
+<main><section class="chapter" id="ch1"><header class="ch-head"><div class="ch-num">Chapter 1</div><h2>Foundations</h2><span class="tier free">FREE</span><p>The four tutorials hold the player&#x27;s hand with the guide panel open. Then three full-page drills on the hand skills every later chapter assumes, and the capstone.</p></header><article class="drill" id="d-navigation">
+<div class="d-head"><span class="d-num">1.1</span><h3>Navigate &amp; Select</h3><span class="tag">tutorial</span><span class="tag built">built</span></div>
+<p class="why">Every other skill starts with getting to the cell and grabbing the right block. This is the ten seconds a banker saves a hundred times a day.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+arrow</span><span class="key">Shift+arrow</span><span class="key">Ctrl+Shift+arrow</span><span class="key">Ctrl+Space</span><span class="key">Shift+Space</span><span class="key">Ctrl+A</span><span class="key">F5 → Special</span><span class="key">Ctrl+C / Ctrl+V</span><span class="key">Ctrl+S</span></dd>
-<dt>What is on the grid</dt><dd>A 20-row grid: a walled corridor snakes from the top-left corner to a sales table (eight regions by four quarters plus a full year) parked in the far corner. A marked home bay sits at A1.</dd>
-<dt>How it is gamified</dt><dd><p>Three steps: the corridor, the captures, the run home. Checkpoints light as you pass.</p><p><b>Taught.</b> Guide open; each straightaway of the corridor is one Ctrl+arrow; then the table asks for a row, a column, the whole block, and every typed number.</p><p class="star">★ <b>The pro move:</b> Every hall in one press, never cell by cell.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Fly each hall in one press</li><li>Land on the model block</li><li>Select the West row</li><li>Select the Q3 column</li><li>Select the whole table</li><li>Select every typed figure (Go To Special)</li><li>Copy the block</li><li>Deliver it to the home bay</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d1-2">
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+arrow</span><span class="key">Shift+arrow</span><span class="key">Ctrl+Shift+arrow</span><span class="key">Ctrl+Space</span><span class="key">Shift+Space</span><span class="key">Ctrl+A</span><span class="key">F5 → Special → Constants</span><span class="key">Ctrl+C / Ctrl+V</span><span class="key">Ctrl+Home</span><span class="key">Ctrl+S</span></dd>
+<dt>What is on the grid</dt><dd>The full 20×10 page: a random-direction corridor of solid walls snakes from the home range at A1 to a regional sales table (eight regions by four quarters plus a full year) parked in the far corner. Blue markers sit at the end of every straightaway. Layout, marker positions and the table&#x27;s anchor change every run.<p class="rnd"><b>Changes every run:</b> corridor layout · which row and column the memo names · table anchor · values</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 10 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Every straightaway in one press, never cell by cell.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Ride the corridor</b><ol><li>Fly every straightaway in one press</li><li>Collect every marker on the way</li><li>Land on the sales table</li></ol></li><li><b>Capture the ranges</b><ol><li>Select the row the memo names, figures only</li><li>Select the column it names, every region</li><li>Select the whole table, headers and figures</li><li>Select every typed figure in one pass</li></ol></li><li><b>Bring it home</b><ol><li>Copy the table</li><li>Paste it into the home range at A1</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-repairshop">
 <div class="d-head"><span class="d-num">1.2</span><h3>Edit &amp; Repair</h3><span class="tag">tutorial</span></div>
 <p class="why">The first thing anyone does with an inherited file is fix it. Undo is the safety net that lets you move fast.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">F2</span><span class="key">Delete</span><span class="key">Ctrl+Z / Ctrl+Y</span><span class="key">Ctrl+X / Ctrl+V</span><span class="key">Ctrl++ / Ctrl+−</span><span class="key">Shift+Space</span><span class="key">Alt+Shift+→ (group)</span><span class="key">Ctrl+D</span></dd>
-<dt>What is on the grid</dt><dd>A headcount roster on the left, three cargo blocks with marked destination bays on the right, and a small quarterly schedule underneath with a quarter and a line missing.</dd>
-<dt>How it is gamified</dt><dd><p>Three steps: repairs, the dock, the missing floor. The bays are marked on the page with red &quot;paste here&quot; cues.</p><p><b>Taught.</b> Guide open. The &quot;undo trap&quot;: clearing the cell the note flags costs a checkpoint; Ctrl+Z gives it back — the player feels what undo is for.</p><p class="star">★ <b>The pro move:</b> Every block delivered with one cut, never copy-then-delete.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Fix the misspelt name in place</li><li>Re-enter the two wrong figures</li><li>Restore the cell you cleared by mistake</li><li>Move each block to its bay</li><li>Leave the shared block in both places</li><li>Insert the missing quarter and line</li><li>Delete the two squatter rows</li><li>Fill the schedule from the built formula</li><li>Fold the detail band away</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d1-3">
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">F2</span><span class="key">Delete</span><span class="key">Ctrl+Z / Ctrl+Y</span><span class="key">Ctrl+X / Ctrl+V</span><span class="key">Shift+Space / Ctrl+Space</span><span class="key">Ctrl++ / Ctrl+−</span><span class="key">Alt+Shift+→ (group)</span><span class="key">Ctrl+D</span></dd>
+<dt>What is on the grid</dt><dd>Top half: a headcount roster (team, role, headcount, cost) back from review with a misspelt team name, two figures typed into the wrong column, and one review note that is wrong about a cell that is correct. Bottom half: a quarterly cost schedule missing its Q3 column and one line, with two stale rows still in it and a six-row detail band under the total. Three staged blocks sit in a side column with red &#x27;&lt;&lt;&lt; paste here&#x27; cues at their destinations.<p class="rnd"><b>Changes every run:</b> which name carries the typo · which two figures are wrong · which review note is the trap · destination ranges · the missing quarter</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 12 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Every staged block moved with one cut, never copy-then-delete.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Repair in place</b><ol><li>Fix the misspelt team name without retyping the cell</li><li>Re-enter the two figures that landed in the wrong column</li><li>Restore the correct cell you cleared on the note&#x27;s say-so (undo)</li><li>Delete the two stale rows</li></ol></li><li><b>Move the staged data</b><ol><li>Cut each staged block to its destination range</li><li>Leave the shared block in both places (copy)</li><li>Insert the missing Q3 column where the cue points and paste the staged quarter</li></ol></li><li><b>Rebuild the frame</b><ol><li>Insert the missing line and paste it</li><li>Fill the schedule&#x27;s formula across the rebuilt frame</li><li>Confirm the total now covers the new line</li><li>Group the detail band and fold it away</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-powergrid">
 <div class="d-head"><span class="d-num">1.3</span><h3>First Formulas</h3><span class="tag">tutorial</span></div>
 <p class="why">The whole product sits on this: a formula written once and filled everywhere.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">= formulas</span><span class="fn">SUM</span><span class="key">Alt+= (AutoSum)</span><span class="key">F4 anchors</span><span class="key">Ctrl+R / Ctrl+D</span><span class="fn">minus signs on costs</span></dd>
-<dt>What is on the grid</dt><dd>A department budget: five cost lines by four quarters, a total row and a margin row stripped out, and an empty share-of-total block beside it.</dd>
-<dt>How it is gamified</dt><dd><p>Three steps: totals, margin, the anchored block; the block paints in on the fill.</p><p><b>Taught.</b> Guide open; the anchor step shows the same formula with and without the dollar signs and what happens on fill.</p><p class="star">★ <b>The pro move:</b> One anchored formula fills the whole block.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Total the first quarter with AutoSum</li><li>Build the margin</li><li>Make the cost lines carry their sign</li><li>Build one share formula anchored to the total</li><li>Fill it across the block</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d1-4">
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">= formulas</span><span class="key">Alt+= (AutoSum)</span><span class="fn">SUM</span><span class="key">F4 anchors</span><span class="key">Ctrl+R / Ctrl+D</span><span class="key">minus signs on costs</span><span class="key">Alt H F C (blue inputs)</span></dd>
+<dt>What is on the grid</dt><dd>A department budget filling the page: revenue and five cost lines by four quarters plus a full year, the totals row and column stripped, an empty margin row, and an empty share-of-total block to the right that needs one anchored formula. Costs arrived positive.<p class="rnd"><b>Changes every run:</b> which cost lines · values · which quarter is the block&#x27;s anchor</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 10 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> One anchored formula fills the whole share block.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Totals</b><ol><li>Total the first quarter with AutoSum</li><li>Total every quarter and the full year</li><li>Total each line across</li></ol></li><li><b>Signs and margin</b><ol><li>Make the cost lines carry their sign</li><li>Build the margin for the first quarter</li><li>Fill the margin across the year</li></ol></li><li><b>The anchored block</b><ol><li>Build one share-of-total formula anchored to the total</li><li>Fill it across the whole block</li><li>Colour every typed input blue</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-printshop">
 <div class="d-head"><span class="d-num">1.4</span><h3>Format the Page</h3><span class="tag">tutorial</span></div>
 <p class="why">Formatting is not decoration: it is how a reader knows what is typed, what is calculated, and where the totals are.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt H K (comma)</span><span class="key">Ctrl+Shift+%</span><span class="key">Alt H F C (font colour)</span><span class="key">Alt H B P (top border)</span><span class="key">Alt H O I (autofit)</span><span class="key">F5 → Special → Constants</span></dd>
-<dt>What is on the grid</dt><dd>The same department budget, correct but unformatted: bare black numbers, no borders, a squeezed label column.</dd>
-<dt>How it is gamified</dt><dd><p>The page visibly becomes the &quot;before/after&quot; as steps clear.</p><p><b>Taught.</b> Guide open; each format follows the beat that created the cells it dresses.</p><p class="star">★ <b>The pro move:</b> Every typed input found in one Go To Special rather than by eye.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Comma-format the body</li><li>Percent-format the margin rows</li><li>Colour every typed input blue</li><li>Top border on the totals</li><li>Widen the label column to fit</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d1-5">
-<div class="d-head"><span class="d-num">1.5</span><h3>Go To &amp; Find</h3></div>
-<p class="why">On a 60-row vendor list or a 20-tab model, scrolling is how time disappears. Go To Special is the fastest thing in Excel nobody teaches.</p>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt H K (comma)</span><span class="key">Ctrl+Shift+%</span><span class="key">Alt H 9 / 0 (decimals)</span><span class="key">Alt H F C (blue)</span><span class="key">Alt H B P (top border)</span><span class="key">Alt H B O (bottom border)</span><span class="key">Alt H O I (autofit)</span><span class="key">Alt H A R (right-align)</span><span class="key">F5 → Special → Constants</span></dd>
+<dt>What is on the grid</dt><dd>The finished department budget from First Formulas, correct but bare: black numbers with stray decimals, no borders, headers slumped left, a squeezed label column, a margin row showing 0.2345.<p class="rnd"><b>Changes every run:</b> which cells carry stray decimals · which inputs are typed</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 10 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Every typed input found in one Go To Special rather than by eye.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Numbers</b><ol><li>Comma-format the body to zero decimals</li><li>Percent-format the margin row to one decimal</li><li>Right-align the figures under their headers</li></ol></li><li><b>The convention</b><ol><li>Colour every typed input blue</li><li>Bottom-border the header row</li><li>Top-border the totals row and the total column&#x27;s first cell</li></ol></li><li><b>Fit</b><ol><li>Widen the label column to fit</li><li>Set the four quarter columns to one width</li><li>Bold the title and the totals</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-findgo">
+<div class="d-head"><span class="d-num">1.5</span><h3>Go To, Find &amp; Replace</h3></div>
+<p class="why">On a full vendor page, scrolling and hunting is where the hours go. Go To Special and Replace All are the fastest ten seconds in Excel and nobody teaches them.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">F5 (Go To)</span><span class="key">F5 → Special → Blanks / Constants / Formulas</span><span class="key">Ctrl+F</span><span class="key">Ctrl+Enter</span><span class="key">Ctrl+Home / Ctrl+End</span><span class="key">the name box</span></dd>
-<dt>What is on the grid</dt><dd>A 300-row vendor cost list: vendor, code, cost. Blanks scattered in the cost column, three codes that changed, one formula hiding among typed values. A summary block far below.</dd>
-<dt>How it is gamified</dt><dd><p>Step 1 reach; step 2 sweep; step 3 close. The blank count on the checklist falls as zeros land.</p><p><b>Taught.</b> The guide shows F5 and the Special dialog&#x27;s three options: blanks, constants, formulas.</p><p class="star">★ <b>The pro move:</b> All the blanks filled with one entry (select the blanks, type 0, Ctrl+Enter).</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Go to the cell the note names</li><li>Find the first vendor that still says ACME</li><li>Select every blank in the cost column at once and enter</li><li>into all of them</li><li>Select every formula on the page and colour it black</li><li>Return to the top</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d1-6">
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">F5 (Go To)</span><span class="key">F5 → Special → Blanks</span><span class="key">F5 → Special → Constants / Formulas</span><span class="key">Ctrl+F</span><span class="key">Ctrl+H (Replace All)</span><span class="key">Ctrl+Enter</span><span class="key">Ctrl+Home / Ctrl+End</span><span class="key">the name box</span></dd>
+<dt>What is on the grid</dt><dd>A vendor cost register across the whole page: vendor, old code, cost by four quarters, notes; twenty vendors. Blanks scattered through the cost columns, three vendors still carrying a retired code (ACME → ACM), one hardcoded figure typed over a formula in the totals column, and a summary box at the far corner.<p class="rnd"><b>Changes every run:</b> which cells are blank · which three vendors carry the old code · which total is typed over</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 9 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> All the blanks filled with one entry: select the blanks, type 0, Ctrl+Enter.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Reach</b><ol><li>Go to the cell the note names by typing its address</li><li>Find the first vendor still on the old code</li><li>Land on the last used cell and read the summary figure into the note</li></ol></li><li><b>Sweep</b><ol><li>Select every blank in the cost columns at once and enter 0 into all of them</li><li>Replace every old code with the new one in one action</li><li>Select every formula on the page and colour it black</li></ol></li><li><b>Close</b><ol><li>Find the one typed-over total and rebuild it from its neighbour</li><li>Return to the top</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-pastes">
 <div class="d-head"><span class="d-num">1.6</span><h3>Paste Special</h3></div>
 <p class="why">The candidate hands off decks as values; the professional receives data in the wrong shape every week. Paste Special is how both fix it in one motion.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+Alt+V (Paste Special)</span><span class="fn">values</span><span class="fn">formats</span><span class="fn">transpose</span><span class="fn">multiply / divide</span><span class="fn">add</span></dd>
-<dt>What is on the grid</dt><dd>Left: a fee deck that arrived sideways plus a row in thousands and a row of positive costs. Right: the empty target table and a finished block to copy the look from.</dd>
-<dt>How it is gamified</dt><dd><p>Each arriving block is a small puzzle with one right paste; wrong pastes do not light.</p><p><b>Taught.</b> The four routes in the guide: values, formats, transpose, multiply.</p><p class="star">★ <b>The pro move:</b> The final deck pasted as values in one visit to the dialog.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Transpose the fees into the table</li><li>Divide the thousands row by 1,000 in place (paste-multiply)</li><li>Flip the costs negative the same way</li><li>Paste the look of the finished block onto the new one</li><li>Paste the totals over themselves as values</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d1-7">
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+Alt+V</span><span class="key">values</span><span class="key">formats</span><span class="key">transpose</span><span class="key">multiply / divide</span><span class="key">add</span><span class="key">Alt H A R</span></dd>
+<dt>What is on the grid</dt><dd>Left: a fee deck that arrived sideways (four quarters down a column), a row in thousands, a row of costs shown positive, and a block that arrived left-aligned. Right: the target table with a finished, dressed row to copy the look from, two labelled yellow helper cells (Helper — 1000s, Helper — sign flip), and a &#x27;values only&#x27; hand-off strip at the bottom.<p class="rnd"><b>Changes every run:</b> which row is in thousands vs hundreds (the label adapts) · which block is misaligned · values</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 9 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The hand-off pasted as values and formats in one visit to the dialog.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Reshape</b><ol><li>Transpose the fees into the fee row</li><li>Right-align the figures that arrived left</li><li>Convert the flagged row by the factor the label names (paste-multiply from the helper)</li></ol></li><li><b>Convention</b><ol><li>Flip the costs negative from the sign-flip helper</li><li>Paste the finished row&#x27;s look onto the subtotal row, then unbold it</li><li>Add the missing adjustment onto the total row (paste-add)</li></ol></li><li><b>Hand off</b><ol><li>Paste the totals over themselves as values</li><li>Paste the whole deck into the hand-off strip as values only</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-series">
 <div class="d-head"><span class="d-num">1.7</span><h3>Fill &amp; Series</h3></div>
 <p class="why">Building a five-year header by typing is the tell of a beginner. Filling is how a page grows.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+D</span><span class="key">Ctrl+R</span><span class="key">Alt H F I S (fill series)</span><span class="key">Ctrl+Enter</span><span class="key">Ctrl+; (today)</span><span class="key">Alt+Enter</span></dd>
-<dt>What is on the grid</dt><dd>A long-range plan frame: two years typed in the header, a reference column that stops after two numbers, a formula row, and a monthly calendar strip needing twelve month labels.</dd>
-<dt>How it is gamified</dt><dd><p>The frame paints in as each run fills; the month row is a race against the clock only.</p><p><b>Taught.</b> Ctrl+D, Ctrl+R, and the fill-series command; the guide shows why a two-cell seed is enough.</p><p class="star">★ <b>The pro move:</b> The whole frame filled with two fills, nothing typed after the seeds.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Fill the year header to the last column</li><li>Fill the reference numbers down</li><li>Continue the month labels to December</li><li>Fill the formula row across the years</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d1-8">
-<div class="d-head"><span class="d-num">1.8</span><h3>Model Tour</h3><span class="tag cap">capstone</span></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+D</span><span class="key">Ctrl+R</span><span class="key">Alt H F I S (series)</span><span class="key">Ctrl+Enter</span><span class="key">Ctrl+D on one cell (copy above)</span><span class="key">Ctrl+; (today)</span><span class="key">Alt+Enter</span></dd>
+<dt>What is on the grid</dt><dd>A long-range plan frame: a year header with only two years typed, a reference-number column that stops after two, a revenue line with one formula and four empty years, an empty 2-D cost block under it, a monthly calendar strip that needs twelve month labels, and a project tracker block at the foot with a status column to stamp and an owner column to repeat.<p class="rnd"><b>Changes every run:</b> starting year · which block is 2-D · tracker rows</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 10 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The cost block filled in both directions from one selection, not two.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Series</b><ol><li>Continue the year header to the last column</li><li>Fill the reference numbers down</li><li>Continue the month labels to December</li></ol></li><li><b>Fill</b><ol><li>Fill the revenue formula across the years</li><li>Fill the cost block in both directions from its corner</li><li>Repeat the owner down the tracker by copying the cell above</li></ol></li><li><b>Stamp</b><ol><li>Enter Done into every selected status cell in one entry</li><li>Put the two-line note on two lines inside its cell</li><li>Enter today&#x27;s date without typing it</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-modeltour">
+<div class="d-head"><span class="d-num">1.8</span><h3>Model Tour</h3><span class="tag cap">capstone</span><span class="tag built">built</span></div>
+<p class="why">Everything the chapter taught on one quarterly P&amp;L.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">everything in chapter 1</span><span class="fn">#REF! repair</span><span class="key">Ctrl+Home</span></dd>
-<dt>What is on the grid</dt><dd>A quarterly P&amp;L with four broken subtotals and two empty margin rows.</dd>
-<dt>How it is gamified</dt><dd><p>Chains everything the chapter taught into one page; one clean run opens the next chapter&#x27;s milestone.</p><p class="star">★ <b>The pro move:</b> Every #REF! break fixed from a copied neighbour, nothing retyped.</p></dd>
-
-</dl></article></section><section class="chapter" id="ch2"><header class="ch-head"><div class="ch-num">Chapter 2</div><h2>Formatting</h2><span class="tier free">FREE</span><p>The wardrobe, one garment per drill: what to bold, how many decimals, where the borders go, what the dialog can do.</p></header><article class="drill" id="d2-1">
-<div class="d-head"><span class="d-num">2.1</span><h3>Typeset</h3></div>
-<p class="why">A memo with the wrong things bold reads as careless.</p>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+arrow</span><span class="key">F2</span><span class="fn">formula rebuild</span><span class="key">Ctrl+R</span><span class="key">Ctrl+Shift+$ / %</span><span class="key">Alt H B P</span><span class="key">Ctrl+Home</span></dd>
+<dt>What is on the grid</dt><dd>A full operating P&amp;L that cascades from revenue to net income, four subtotal rows each with one #REF! scattered across the columns, two empty margin rows.<p class="rnd"><b>Changes every run:</b> which cell in each subtotal broke · values</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 9 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Every break fixed from a copied neighbour, nothing retyped.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Chase the marks</b><ol><li>Fly to each break with Ctrl+arrows</li><li>Rebuild each subtotal from its neighbour, never retype</li><li>Fill the repair across the row</li></ol></li><li><b>Margins</b><ol><li>Build gross margin and EBITDA margin</li><li>Percent-format both</li></ol></li><li><b>Dress</b><ol><li>Dollar-format the net income line</li><li>Top-border the subtotals</li><li>Finish at A1</li><li>Save</li></ol></li></ol></dd>
+</dl></article></section><section class="chapter" id="ch2"><header class="ch-head"><div class="ch-num">Chapter 2</div><h2>Formatting</h2><span class="tier free">FREE</span><p>The wardrobe, one page per drill: many small real ops per pass, the way a page actually gets dressed before it goes out.</p></header><article class="drill" id="d-typeset">
+<div class="d-head"><span class="d-num">2.1</span><h3>The Memo</h3></div>
+<p class="why">A memo with the wrong things bold reads as careless. Weight, slant, colour, alignment and indent are how a page tells the reader what matters.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+B</span><span class="key">Ctrl+I</span><span class="key">Alt H F C</span><span class="fn">TODAY()</span></dd>
-<dt>What is on the grid</dt><dd>A one-page coverage memo: a header row, six body lines, three notes, a date cell.</dd>
-<dt>How it is gamified</dt><dd><p>Order-free showcase; each fix is an outcome.</p><p><b>Taught.</b> The guide&#x27;s one line: headers bold, notes italic, red means look here.</p><p class="star">★ <b>The pro move:</b> All three notes italicised in one selection.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Bold the header row</li><li>Unbold the imposter line</li><li>Italicise the three notes</li><li>Colour the discontinued line red</li><li>Enter today&#x27;s date in the date cell</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d2-2">
-<div class="d-head"><span class="d-num">2.2</span><h3>Number Formats &amp; Decimals</h3></div>
-<p class="why">A comps page with cents in one column and none in the next is the first thing a VP notices.</p>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+B</span><span class="key">Ctrl+I</span><span class="key">Alt H F C</span><span class="key">Alt H A L / C / R</span><span class="key">Alt H 6 (indent)</span><span class="key">Alt H W (wrap)</span><span class="fn">TODAY()</span><span class="key">Alt+Enter</span></dd>
+<dt>What is on the grid</dt><dd>A one-page coverage memo: a title, an as-of date cell, a header row, twelve body lines with a small figures block, four sub-lines that belong under their parents, three notes that read like data, one discontinued item still listed as live, and a long header that runs into the next column.<p class="rnd"><b>Changes every run:</b> which body line is wrongly bold · which item is discontinued · which header is long</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 11 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> All three notes italicised from one selection.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Weight</b><ol><li>Bold the header row</li><li>Unbold the body line that was bolded by mistake</li><li>Italicise the three notes in one pass</li><li>Colour the discontinued line red</li></ol></li><li><b>Alignment</b><ol><li>Right-align the figures block</li><li>Centre the column headers</li><li>Indent the four sub-lines under their parents</li><li>Wrap the long header</li></ol></li><li><b>Close</b><ol><li>Enter today&#x27;s date in the as-of cell with a formula</li><li>Put the two-line footnote on two lines</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-compspage">
+<div class="d-head"><span class="d-num">2.2</span><h3>The Comps Page</h3></div>
+<p class="why">Number formats are most of the house look. A comps page with cents in one column and none in the next is the first thing a VP notices, and the Format Cells dialog is worth a dozen shortcut keys.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt H 9 / Alt H 0 (decimals)</span><span class="key">Alt H K</span><span class="key">Ctrl+Shift+$</span><span class="key">Alt H A N (accounting)</span><span class="key">Ctrl+1</span></dd>
-<dt>What is on the grid</dt><dd>A trading comps page: five peers down, three dollar columns, a multiple column and a margin column across, a median row at the bottom.</dd>
-<dt>How it is gamified</dt><dd><p>The page gets tidier column by column; the odd cell is the one hunt.</p><p><b>Taught.</b> The guide pairs each format with its key; the odd cell is found by looking, then by Go To Special on the replay.</p><p class="star">★ <b>The pro move:</b> All three dollar columns set from one selection.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Set the three dollar columns to zero decimals</li><li>Set the multiple to one decimal</li><li>Set the margin to one decimal</li><li>Fix the hand-formatted cell</li><li>Bold the median row</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d2-3">
-<div class="d-head"><span class="d-num">2.3</span><h3>Custom Formats</h3></div>
-<p class="why">The house look is mostly custom formats. Knowing the dialog is worth a dozen shortcut keys.</p>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt H 9 / Alt H 0</span><span class="key">Alt H K</span><span class="key">Ctrl+Shift+$</span><span class="key">Alt H A N</span><span class="key">Ctrl+1 → 0.0x</span><span class="key">Ctrl+1 → Mmm-yy</span><span class="key">Ctrl+1 → (#,##0)</span><span class="fn">superscript</span><span class="key">Ctrl+1 → Center across selection</span></dd>
+<dt>What is on the grid</dt><dd>A trading comps page filling the grid: eight peers down; market cap, EV, revenue and EBITDA in dollars, an EV/EBITDA multiple, a margin, a last-reported date; a median row; a title sitting in one cell; a footnote marked with a typed 1. Dollars carry cents, the multiple shows no decimal, the margin runs three places, dates read as serial numbers, negatives show a minus, one cell was hand-formatted longer than its neighbours.<p class="rnd"><b>Changes every run:</b> which cell is hand-formatted · which columns carry stray decimals · values</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 11 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> All four dollar columns set from one selection, and the three dialog formats from three visits, not five.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Decimals</b><ol><li>Set the four dollar columns to zero decimals from one selection</li><li>Set the multiple to one decimal</li><li>Set the margin to one decimal</li><li>Fix the one hand-formatted cell</li></ol></li><li><b>The dialog</b><ol><li>Format the multiples as 0.0x</li><li>Format the date column Mmm-yy</li><li>Show negatives in parentheses across the body</li></ol></li><li><b>Finish</b><ol><li>Superscript the footnote mark</li><li>Centre the title across the table</li><li>Bold the median row and top-border it</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-ruleaudit">
+<div class="d-head"><span class="d-num">2.3</span><h3>Rulings</h3></div>
+<p class="why">Borders are the grammar that says &#x27;this row is computed&#x27;. The wrong border is a wrong sentence.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+1 → Custom</span><span class="fn">0.0x</span><span class="fn">Mmm-yy</span><span class="fn">#,##0;(#,##0)</span><span class="fn">superscript</span><span class="key">Ctrl+1 → Center across selection</span></dd>
-<dt>What is on the grid</dt><dd>A valuation summary: a multiples column, a date column, a body with negatives, a footnote, a title sitting in one cell.</dd>
-<dt>How it is gamified</dt><dd><p>Five before/after cells; each flips as its format lands.</p><p><b>Taught.</b> The guide shows Ctrl+1 and the four tabs the drill uses.</p><p class="star">★ <b>The pro move:</b> Three number formats from three dialog visits, not five.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Format the multiples as 0.0x</li><li>Format the date column Mmm-yy</li><li>Show negatives in parentheses across the body</li><li>Superscript the footnote mark</li><li>Centre the title across the block</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d2-4">
-<div class="d-head"><span class="d-num">2.4</span><h3>Borders &amp; Rulings</h3></div>
-<p class="why">Borders are the grammar that says &quot;this row is computed&quot;. The wrong border is a wrong sentence.</p>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt H B P (top)</span><span class="key">Alt H B O (bottom)</span><span class="key">Alt H B S (outside)</span><span class="key">Alt H B A (all)</span><span class="key">Alt H B T (thick)</span><span class="key">Alt H B D (double)</span></dd>
+<dt>What is on the grid</dt><dd>Left half: a finished segment schedule with four planted ruling mistakes (a bottom border under a total, a box where a rule belongs, a missing header rule, an all-borders block that should be outside-only). Right half: the same schedule&#x27;s raw twin with no rulings at all and a grand total at its foot.<p class="rnd"><b>Changes every run:</b> which four cells are wrong · which block is raw</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 7 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Only the four wrong cells touched; the disclosed count reads 4/4 with nothing else changed.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Audit</b><ol><li>Find and fix the four wrong rulings, healthy cells untouched</li></ol></li><li><b>Apply</b><ol><li>Bottom-border the raw block&#x27;s header row</li><li>Top-border each subtotal</li><li>Box the assumptions block with an outside border only</li></ol></li><li><b>Close</b><ol><li>Thick top border on the grand total</li><li>Double rule under it</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-printpage">
+<div class="d-head"><span class="d-num">2.4</span><h3>The Print Page</h3><span class="tag eng" title="freeze panes">needs engine work: freeze panes</span></div>
+<p class="why">A page that prints with #### or a squeezed label column is unusable. Widths are judgment: autofit is right for one block and wrong for another.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt H B P (top)</span><span class="key">Alt H B O (bottom)</span><span class="key">Alt H B S (outside)</span><span class="key">Alt H B T (thick)</span><span class="key">Alt H B D (double)</span><span class="fn">H B S vs H B A</span></dd>
-<dt>What is on the grid</dt><dd>Left: a finished schedule with four wrong rulings planted. Right: a raw block with headers, a body and a grand total, no borders at all.</dd>
-<dt>How it is gamified</dt><dd><p>Disclosed-error meter for the audit half; the raw block is the apply half.</p><p><b>Taught.</b> The guide shows the five border keys; the checklist discloses &quot;four mistakes&quot;.</p><p class="star">★ <b>The pro move:</b> Only the four wrong cells touched; healthy cells untouched.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Find and fix the four wrong rulings</li><li>Bottom-border the header of the raw block</li><li>Top-border its total</li><li>Box the whole block</li><li>Double-rule under the grand total</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d2-5">
-<div class="d-head"><span class="d-num">2.5</span><h3>Alignment &amp; Widths</h3></div>
-<p class="why">A page that prints with #### or a squeezed label column is unusable.</p>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt H O I (autofit)</span><span class="key">Alt H O W (set width)</span><span class="key">Alt H A C / L / R</span><span class="key">Alt H W (wrap)</span><span class="key">Ctrl+9 (hide rows)</span><span class="key">Ctrl+0 (hide columns)</span><span class="key">Alt W F F (freeze)</span></dd>
+<dt>What is on the grid</dt><dd>A regional revenue print page: two label columns squeezed so the business lines are cut off, four quarter columns at four different widths, a total column showing ####, headers slumped left, a long header that should wrap, two helper columns that should not print, and a header row that should stay put when the page scrolls.<p class="rnd"><b>Changes every run:</b> which columns are squeezed · which header is long · which helper columns</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 9 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Both label columns fitted in one command.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Fit</b><ol><li>Autofit the two label columns</li><li>Set the four quarter columns to one uniform width</li><li>Widen the total column until no #### remains</li></ol></li><li><b>Align</b><ol><li>Centre the headers over their columns</li><li>Right-align the figure block</li><li>Wrap the long header</li></ol></li><li><b>Print-ready</b><ol><li>Hide the two helper columns</li><li>Freeze the header row</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-condfmt">
+<div class="d-head"><span class="d-num">2.5</span><h3>Conditional Flags</h3><span class="tag eng" title="conditional formatting">needs engine work: conditional formatting</span></div>
+<p class="why">The professional&#x27;s monthly report lives on this; the candidate uses it for covenant flags. Rules that colour by value replace a column of IFs.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt H A L / C / R</span><span class="key">Alt H 6 / 5 (indent)</span><span class="key">Alt H W (wrap)</span><span class="key">Alt H O I (autofit)</span><span class="key">Alt H O W (width)</span><span class="fn">####</span></dd>
-<dt>What is on the grid</dt><dd>A regional revenue print page: two label columns, four quarter columns, a total column, headers and sub-lines.</dd>
-<dt>How it is gamified</dt><dd><p>The page &quot;prints&quot; cleanly when done; the checklist watches for any remaining ####.</p><p><b>Taught.</b> Alignment keys and the width commands; the guide explains #### once.</p><p class="star">★ <b>The pro move:</b> Both label columns fitted in one command.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Autofit the label columns</li><li>Set the four quarter columns to one width</li><li>Centre the headers</li><li>Indent the sub-lines</li><li>Wrap the long header</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d2-6">
-<div class="d-head"><span class="d-num">2.6</span><h3>Conditional Formatting</h3> <span class="tag eng">needs engine work</span></div>
-<p class="why">The professional&#x27;s monthly report lives on this; the candidate uses it for covenant flags.</p>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt H L (conditional formatting)</span><span class="key">highlight cells &gt; value</span><span class="key">top 10</span><span class="key">data bars</span><span class="key">clear rules</span><span class="key">manage rules</span></dd>
+<dt>What is on the grid</dt><dd>A budget-vs-actual by department filling the page: twenty lines, budget, actual, variance, variance %, a total row, no visual cue anywhere.<p class="rnd"><b>Changes every run:</b> which lines are over · values</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> One rule covering the whole variance block instead of three.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Rules</b><ol><li>Highlight every variance over 5% red</li><li>Highlight every variance under −5% green</li><li>Shade the ten largest actual lines</li></ol></li><li><b>Bars</b><ol><li>Add data bars to the actuals column</li><li>Clear every rule from the total row</li></ol></li><li><b>Read</b><ol><li>Count the red lines into the summary cell</li><li>Bold the summary</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-housestyle">
+<div class="d-head"><span class="d-num">2.6</span><h3>House Style</h3><span class="tag cap">capstone</span></div>
+<p class="why">A raw P&amp;L fragment goes in the book tonight, wearing the house look.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt H L (conditional formatting)</span><span class="fn">highlight rules</span><span class="fn">top-N</span><span class="fn">data bars</span><span class="fn">clear rules</span></dd>
-<dt>What is on the grid</dt><dd>A budget-vs-actual by department: budget, actual, variance and variance-percent columns, twenty lines.</dd>
-<dt>How it is gamified</dt><dd><p>The page lights up as rules land; the checklist counts the rules in force.</p><p><b>Taught.</b> The rules dialog by keyboard; the guide shows highlight and top-N.</p><p class="star">★ <b>The pro move:</b> One rule covering the whole block instead of three.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Highlight every variance over 5% red</li><li>Shade the ten largest lines</li><li>Add data bars to the actuals</li><li>Clear the rule from the total row</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d2-7">
-<div class="d-head"><span class="d-num">2.7</span><h3>House Style</h3><span class="tag cap">capstone</span></div>
-
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+B</span><span class="key">Alt H F C</span><span class="key">Alt H K</span><span class="key">Ctrl+Shift+%</span><span class="key">Alt H B P</span><span class="key">Alt H O W</span><span class="key">Ctrl+1</span><span class="key">F5 → Special</span></dd>
-<dt>What is on the grid</dt><dd>A raw P&amp;L fragment: title, period headers, revenue and cost lines, two subtotals, a multiple line, no formatting.</dd>
-<dt>How it is gamified</dt><dd><p>8 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> Every hardcode found in one Go To Special pass.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Bold the title and headers</li><li>Colour every typed input blue</li><li>Comma-format the body</li><li>Percent-format the margins</li><li>Top-border the totals</li><li>Set the label column wide</li><li>Custom-format the multiple line</li><li>Save</li></ol></dd>
-</dl></article></section><section class="chapter" id="ch3"><header class="ch-head"><div class="ch-num">Chapter 3</div><h2>Formulas I</h2><span class="tier free">FREE</span><p>Live calculations: anchors, pointing, ratios, totals, the first logic, the first conditional sums, and the text and date functions a professional uses weekly.</p></header><article class="drill" id="d3-1">
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+B</span><span class="key">Alt H F C</span><span class="key">Alt H K</span><span class="key">Ctrl+Shift+%</span><span class="key">Alt H B P</span><span class="key">Alt H O W</span><span class="key">Ctrl+1</span><span class="key">F5 → Special → Constants</span></dd>
+<dt>What is on the grid</dt><dd>A raw P&amp;L fragment: title, period headers, revenue and cost lines, two subtotals, a multiple line, a date row, nothing formatted.<p class="rnd"><b>Changes every run:</b> which cells are hardcodes · values</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 9 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Every hardcode found in one Go To Special pass.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Type</b><ol><li>Bold the title and the headers</li><li>Colour every typed input blue</li><li>Colour every formula black</li></ol></li><li><b>Numbers</b><ol><li>Comma-format the body</li><li>Percent-format the margins</li><li>Format the multiple line 0.0x and the date row Mmm-yy</li></ol></li><li><b>Rulings</b><ol><li>Top-border the subtotals</li><li>Set the label column wide</li><li>Save</li></ol></li></ol></dd>
+</dl></article></section><section class="chapter" id="ch3"><header class="ch-head"><div class="ch-num">Chapter 3</div><h2>Formulas I</h2><span class="tier free">FREE</span><p>One formula mechanic per page, then logic, conditional sums, and the text and date functions a professional uses weekly.</p></header><article class="drill" id="d-anchor">
 <div class="d-head"><span class="d-num">3.1</span><h3>Anchors</h3></div>
 <p class="why">Mixed anchors are the difference between a grid built in one fill and one built by hand.</p>
 <dl>
 <dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">F4 (cycle $A$1 / A$1 / $A1)</span><span class="key">Ctrl+D</span><span class="key">Ctrl+R</span><span class="key">Ctrl+Shift+$</span><span class="key">Alt H B S</span></dd>
-<dt>What is on the grid</dt><dd>A 3×3 pricing grid: three tiers down the side, three price points across the top, nine empty cells.</dd>
-<dt>How it is gamified</dt><dd><p>The grid is empty; one correct formula lights all nine on fill; a wrong anchor lights one.</p><p><b>Taught.</b> The guide shows the four F4 states and which the grid needs.</p><p class="star">★ <b>The pro move:</b> The whole grid from one entry and two fills.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build the first quote with the row and column anchored the right way</li><li>Fill it down</li><li>Fill it across</li><li>Dollar-format the grid</li><li>Box it</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d3-2">
-<div class="d-head"><span class="d-num">3.2</span><h3>Point Mode</h3></div>
-<p class="why">Typed numbers inside formulas are the number-one model error. Pointing is the habit that prevents it.</p>
+<dt>What is on the grid</dt><dd>Three blocks on one pricing page: a 3×3 tier-by-price grid (one formula, two fills), a share-of-total column under it with a fixed denominator, and a 5×5 volume-discount table that needs a row anchor and a column anchor at once.<p class="rnd"><b>Changes every run:</b> tier and price values · which block sits where</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 9 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> All three blocks from one entry and two fills each, F4 doing the anchoring.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>The grid</b><ol><li>Build the first quote with the row and column anchored the right way</li><li>Fill it down</li><li>Fill it across</li></ol></li><li><b>The fixed denominator</b><ol><li>Build the first share with the total anchored</li><li>Fill the column</li></ol></li><li><b>The mixed table</b><ol><li>Build the corner discount with one mixed anchor</li><li>Fill the whole table from that one cell</li><li>Dollar-format and box all three blocks</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-bridge">
+<div class="d-head"><span class="d-num">3.2</span><h3>Point Mode Build</h3><span class="tag eng" title="named ranges">needs engine work: named ranges</span></div>
+<p class="why">Typed numbers inside formulas are the number-one model error. Pointing at an assumption cell, or naming it, is the habit that prevents it.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">point mode (arrow keys inside =)</span><span class="fn">yellow assumption cells</span><span class="key">Ctrl+R</span><span class="key">Ctrl+Enter</span><span class="key">Alt H F C</span></dd>
-<dt>What is on the grid</dt><dd>A five-year operating plan: one year of revenue typed, four empty years, yellow assumption cells above for growth, margin and D&amp;A.</dd>
-<dt>How it is gamified</dt><dd><p>The plan grows year by year; a &quot;typed number&quot; counter must read zero at the end.</p><p><b>Taught.</b> The guide shows a formula built by arrow keys; a typed-number formula is flagged by the audit colour later.</p><p class="star">★ <b>The pro move:</b> Every assumption referenced by pointing; no number typed into a formula.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Colour the starting revenue blue</li><li>Build next year&#x27;s revenue off the growth cell</li><li>Fill it across</li><li>Build EBITDA off the margin cell</li><li>Fill it across</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d3-3">
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">point mode (arrows inside =)</span><span class="key">yellow assumption cells</span><span class="key">Ctrl+R</span><span class="key">Ctrl+Enter</span><span class="key">Alt H F C (blue / black)</span><span class="key">the name box</span><span class="key">F3 (paste name)</span></dd>
+<dt>What is on the grid</dt><dd>A five-year operating plan: one year of revenue typed; growth, margin, D&amp;A and tax assumptions in labelled yellow cells at the top; empty revenue, EBITDA, D&amp;A, EBIT and tax lines; a typed-number counter in the corner that must read zero.<p class="rnd"><b>Changes every run:</b> assumption values · starting revenue · which line is seeded</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 11 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Every assumption referenced by pointing or by name; no number typed into a formula.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Revenue</b><ol><li>Colour the starting revenue blue</li><li>Build next year&#x27;s revenue by pointing at the growth cell</li><li>Fill it across the plan</li></ol></li><li><b>The cascade</b><ol><li>Build EBITDA off the margin cell</li><li>Build D&amp;A and EBIT off their assumptions</li><li>Build the tax line off the rate cell</li><li>Fill the block across</li></ol></li><li><b>Names</b><ol><li>Name the tax-rate cell and the growth cell</li><li>Rebuild the tax line using the name</li><li>Confirm the typed-number counter reads zero</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-ratios">
 <div class="d-head"><span class="d-num">3.3</span><h3>Ratios &amp; Growth</h3></div>
-<p class="why">These are the four numbers every page ends with.</p>
+<p class="why">Margin, share, growth and compound growth are the four numbers every page ends with.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">margin ÷</span><span class="fn">growth ÷ − 1</span><span class="fn">^(1/n) CAGR</span><span class="key">Ctrl+Shift+%</span><span class="key">Alt H 9</span><span class="key">Ctrl+B</span></dd>
-<dt>What is on the grid</dt><dd>A peer coverage page: eight peers down; revenue for two years, EBITDA and EV across; three empty ratio columns.</dd>
-<dt>How it is gamified</dt><dd><p>Three columns paint in; the highest CAGR must be bolded at the end (a read, not a calculation).</p><p><b>Taught.</b> One formula each; the CAGR line shows the exponent once.</p><p class="star">★ <b>The pro move:</b> The CAGR built once with the year count anchored, then filled.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build the margin column</li><li>Build the growth column</li><li>Build the CAGR column</li><li>Percent-format all three</li><li>Bold the highest CAGR</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d3-4">
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">margin ÷</span><span class="fn">share ÷ anchored total</span><span class="fn">growth ÷ − 1</span><span class="fn">^(1/n) CAGR</span><span class="key">Ctrl+Shift+%</span><span class="key">Alt H 9</span><span class="key">Ctrl+B</span></dd>
+<dt>What is on the grid</dt><dd>A peer coverage page across the grid: eight peers down; revenue for five years, EBITDA and EV across; four empty ratio columns (margin, share of group revenue, one-year growth, five-year CAGR) and a highlight cell for the fastest grower.<p class="rnd"><b>Changes every run:</b> peer values · which year is the base</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 9 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The CAGR built once with the exponent anchored, then filled.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Margins and shares</b><ol><li>Build the margin column</li><li>Build the share column with the group total anchored</li><li>Percent-format both</li></ol></li><li><b>Growth</b><ol><li>Build the one-year growth column</li><li>Build the CAGR column with the year count anchored</li><li>Percent-format both</li></ol></li><li><b>Read</b><ol><li>Bold the highest CAGR</li><li>Top-border the group total row</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-foot">
 <div class="d-head"><span class="d-num">3.4</span><h3>Foot</h3></div>
 <p class="why">A page that does not foot is a page nobody trusts.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt+= (AutoSum)</span><span class="fn">SUM across / down</span><span class="fn">the corner total</span><span class="fn">tie check = 0</span><span class="key">Alt H B P</span></dd>
-<dt>What is on the grid</dt><dd>A segment pack: six segments by four quarters with the totals row, totals column and corner all missing; one tie-check cell.</dd>
-<dt>How it is gamified</dt><dd><p>The corner total lights only when both directions agree.</p><p><b>Taught.</b> AutoSum on a selection; the tie check is a one-line formula.</p><p class="star">★ <b>The pro move:</b> Both total lines with one AutoSum each.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Total every segment line across</li><li>Total every quarter down</li><li>Total the corner</li><li>Enter the tie check</li><li>Bold the total row and top-border it</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d3-5">
-<div class="d-head"><span class="d-num">3.5</span><h3>Named Ranges</h3> <span class="tag eng">needs engine work</span></div>
-<p class="why">A formula that reads =Revenue*Margin is readable by the next person.</p>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt+= (AutoSum)</span><span class="fn">SUM across / down</span><span class="fn">the corner total</span><span class="fn">tie check = 0</span><span class="fn">SUBTOTAL by group</span><span class="key">Alt H B P</span></dd>
+<dt>What is on the grid</dt><dd>A segment pack filling the page: three groups of segments by four quarters, every group subtotal, the totals row, the totals column and the corner missing; a tie-check cell that must read zero.<p class="rnd"><b>Changes every run:</b> group sizes · values · which subtotal is seeded wrong</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Both total lines with one AutoSum each over the whole selection.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Across and down</b><ol><li>Total every segment line across with one AutoSum</li><li>Total every quarter down with one AutoSum</li><li>Total the corner</li></ol></li><li><b>Groups</b><ol><li>Build each group&#x27;s subtotal</li><li>Rebuild the grand total from the subtotals, not the lines</li></ol></li><li><b>Prove it</b><ol><li>Enter the tie check between the two routes</li><li>Bold and top-border the totals</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-logic">
+<div class="d-head"><span class="d-num">3.5</span><h3>Logic</h3><span class="tag eng" title="IFS, SWITCH">needs engine work: IFS, SWITCH</span></div>
+<p class="why">A page that says something in words, caps what it pays and never goes below zero: IF, AND, MIN, MAX and IFS are the four formulas behind every flag column.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+F3 (Name Manager)</span><span class="key">the name box</span><span class="key">=Revenue*Margin</span><span class="key">F3 (paste name)</span></dd>
-<dt>What is on the grid</dt><dd>A driver block (tax rate, growth) and a five-year build below that refers to it by cell address.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p><b>Taught.</b> The name box and the name manager by keyboard.</p><p class="star">★ <b>The pro move:</b> Both names created from the name box without opening the manager.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Name the tax rate cell</li><li>Name the growth cell</li><li>Rebuild the tax line using the name</li><li>Rebuild the growth line using the name</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d3-6">
-<div class="d-head"><span class="d-num">3.6</span><h3>Flags</h3></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">IF</span><span class="fn">AND / OR</span><span class="fn">MIN (cap)</span><span class="fn">MAX (floor)</span><span class="fn">IFS / SWITCH</span><span class="fn">COUNTIF</span><span class="key">Alt H F C (red)</span></dd>
+<dt>What is on the grid</dt><dd>A budget-vs-actual on the left: twenty lines, budget, actual, an empty variance column, an empty flag column, a tolerance cell. A bonus schedule on the right: name, grade, formula bonus, the pool cap, empty paid, clawback and band columns.<p class="rnd"><b>Changes every run:</b> which lines are over · tolerance · pool size · grades</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 10 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> One IF(AND()) column instead of two helper columns.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Flags</b><ol><li>Build the variance</li><li>Flag every line over budget in words</li><li>Add the tolerance condition with AND</li><li>Colour the flags red</li></ol></li><li><b>Caps and floors</b><ol><li>Cap each bonus at the pool</li><li>Floor each clawback at zero</li><li>Band each grade with IFS</li></ol></li><li><b>Count</b><ol><li>Count the flagged lines into the summary</li><li>Total the pool paid</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-sumif">
+<div class="d-head"><span class="d-num">3.6</span><h3>Conditional Sums</h3></div>
+<p class="why">&#x27;How much did we spend on travel&#x27; and &#x27;revenue by segment&#x27; are the same formula.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">IF</span><span class="fn">AND</span><span class="fn">OR</span><span class="key">Alt H F C (red)</span><span class="fn">COUNTIF</span></dd>
-<dt>What is on the grid</dt><dd>A budget-vs-actual: twenty lines with budget and actual, an empty variance column, an empty flag column, a tolerance cell.</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> One IF(AND()) column instead of two helper columns.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build the variance</li><li>Flag every line over budget</li><li>Add the tolerance condition with AND</li><li>Colour the flags red</li><li>Count the flags</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d3-7">
-<div class="d-head"><span class="d-num">3.7</span><h3>SUMIF &amp; COUNTIF</h3></div>
-<p class="why">The professional&#x27;s &quot;how much did we spend on travel&quot; and the candidate&#x27;s &quot;revenue by segment&quot;.</p>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">SUMIF</span><span class="fn">COUNTIF</span><span class="fn">AVERAGEIF</span><span class="fn">anchored criteria ranges</span><span class="key">Ctrl+D</span><span class="key">Ctrl+Shift+%</span></dd>
+<dt>What is on the grid</dt><dd>A raw booking ledger down the left (date, segment, region, amount; forty lines) and an empty summary block on the right: one row per segment with total, count, average and share columns; a reconciliation cell to the ledger total.<p class="rnd"><b>Changes every run:</b> segment names · ledger values · which segment is largest</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The summary block filled from one row of anchored formulas.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Totals</b><ol><li>Total each segment&#x27;s revenue with one anchored SUMIF</li><li>Fill it down the block</li></ol></li><li><b>Counts and averages</b><ol><li>Count each segment&#x27;s bookings</li><li>Average each segment&#x27;s booking size</li></ol></li><li><b>Prove it</b><ol><li>Build the share of total</li><li>Enter the reconciliation check to the ledger total</li><li>Bold the largest segment</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-textclean">
+<div class="d-head"><span class="d-num">3.7</span><h3>Clean the Export</h3><span class="tag eng" title="text-to-columns">needs engine work: text-to-columns</span></div>
+<p class="why">Every HR, CRM and vendor export arrives with stray spaces, shouting capitals and names in one column. Cleaning it by hand is where an afternoon goes.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">SUMIF</span><span class="fn">COUNTIF</span><span class="fn">anchored range ($)</span><span class="key">Ctrl+D</span><span class="key">Ctrl+Shift+%</span></dd>
-<dt>What is on the grid</dt><dd>A raw booking ledger (date, segment, amount, forty lines) and an empty summary block: segment, total, count, share.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The summary column filled from one anchored SUMIF.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Total each segment with SUMIF</li><li>Count each segment&#x27;s bookings with COUNTIF</li><li>Build the share of total</li><li>Percent-format it</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d3-8">
-<div class="d-head"><span class="d-num">3.8</span><h3>Text Clean-up</h3></div>
-<p class="why">Every HR, CRM and vendor export arrives with stray spaces and shouting capitals.</p>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">TRIM</span><span class="fn">PROPER / UPPER / LOWER</span><span class="fn">LEFT / RIGHT / MID</span><span class="fn">FIND</span><span class="fn">LEN</span><span class="fn">&amp; / CONCAT</span><span class="fn">TEXTJOIN</span><span class="fn">paste values</span><span class="key">Alt A E (text to columns)</span></dd>
+<dt>What is on the grid</dt><dd>An HR export filling the page: employee code with trailing spaces, full name as &#x27;LAST, first&#x27; in capitals, a product code whose middle three characters are the region, a combined &#x27;city, state&#x27; column; empty helper columns beside each and an empty email column; a second list below that needs a Region-Product key to match.<p class="rnd"><b>Changes every run:</b> which rows carry stray spaces · name formats · code layout</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 11 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> First and last names from one pair of formulas filled down, pasted back in one motion.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Clean</b><ol><li>Trim the codes in a helper column</li><li>Proper-case the names</li><li>Paste both back over the source as values and delete the helpers</li></ol></li><li><b>Split</b><ol><li>Pull the last name with LEFT and FIND</li><li>Pull the first name with MID</li><li>Pull the region from the middle of the product code</li><li>Split city and state with text-to-columns</li></ol></li><li><b>Build</b><ol><li>Build first.last@company in the email column</li><li>Build the Region-Product key</li><li>Match the second list on the key</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-dates">
+<div class="d-head"><span class="d-num">3.8</span><h3>Dates</h3><span class="tag eng" title="DATEDIF, NETWORKDAYS">needs engine work: DATEDIF, NETWORKDAYS</span></div>
+<p class="why">Contract renewals, tenure, days to close, month-end schedules: dates are numbers, and the professional who knows that stops counting on a calendar.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">TRIM</span><span class="fn">PROPER</span><span class="fn">UPPER / LOWER</span><span class="fn">helper column</span><span class="fn">paste values</span><span class="fn">delete column</span></dd>
-<dt>What is on the grid</dt><dd>An HR export: employee code, name, department; codes with trailing spaces, names in capitals; two spare helper columns.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> One helper column does both, pasted back in one motion.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Trim the codes in a helper column</li><li>Proper-case the names</li><li>Paste both back as values over the source</li><li>Delete the helper columns</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d3-9">
-<div class="d-head"><span class="d-num">3.9</span><h3>Split &amp; Extract</h3> <span class="tag eng">needs engine work</span></div>
-
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">LEFT</span><span class="fn">RIGHT</span><span class="fn">MID</span><span class="fn">FIND / SEARCH</span><span class="fn">LEN</span><span class="key">Alt A E (text to columns)</span></dd>
-<dt>What is on the grid</dt><dd>A contact list: a &quot;LAST, first&quot; name column, a product code column, a full-address column, empty target columns beside each.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> First and last names from one pair of formulas filled down.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Pull the last name with LEFT and FIND</li><li>Pull the first name with MID</li><li>Pull the region code from the product code</li><li>Split the address with text-to-columns</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d3-10">
-<div class="d-head"><span class="d-num">3.10</span><h3>Build the Key</h3> <span class="tag eng">needs engine work</span></div>
-<p class="why">Joining two lists usually needs a key that exists on neither.</p>
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">&amp; (ampersand)</span><span class="fn">CONCAT</span><span class="fn">TEXTJOIN</span><span class="fn">TEXT()</span><span class="fn">VLOOKUP / XLOOKUP on the key</span></dd>
-<dt>What is on the grid</dt><dd>A roster with first name, last name, region and product columns, an empty email column, an empty key column, and a second list to match against.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The key built once and used by the lookup without a helper.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build the email</li><li>Build the key</li><li>Build the label &quot;Revenue: $1,200&quot; with the number formatted inside it</li><li>Match the second list on the key</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d3-11">
-<div class="d-head"><span class="d-num">3.11</span><h3>Dates</h3> <span class="tag eng">needs engine work</span></div>
-<p class="why">Contract renewals, tenure, days to close, month-end schedules.</p>
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">TODAY</span><span class="fn">EDATE</span><span class="fn">EOMONTH</span><span class="fn">DATEDIF</span><span class="fn">NETWORKDAYS</span><span class="fn">Mmm-yy format</span><span class="fn">IF on a date</span></dd>
-<dt>What is on the grid</dt><dd>A contract list: customer, start date, term in months; empty renewal, month-end, months-remaining and business-days columns; a flag column.</dd>
-<dt>How it is gamified</dt><dd><p>7 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> All four date columns filled from one row of formulas.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build the renewal date with EDATE</li><li>Snap it to month-end</li><li>Count the months remaining</li><li>Count the business days to renewal</li><li>Format the dates Mmm-yy</li><li>Flag anything renewing this quarter</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d3-12">
-<div class="d-head"><span class="d-num">3.12</span><h3>Close the Quarter</h3><span class="tag cap">capstone</span></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">TODAY</span><span class="fn">EDATE</span><span class="fn">EOMONTH</span><span class="fn">DATEDIF</span><span class="fn">NETWORKDAYS</span><span class="fn">Mmm-yy format</span><span class="fn">IF on a date</span><span class="key">Ctrl+;</span></dd>
+<dt>What is on the grid</dt><dd>A contract register filling the page: customer, start date, term in months, annual value; empty renewal, month-end, months-remaining, business-days-to-renewal and renewing-this-quarter columns; a summary block counting renewals by quarter.<p class="rnd"><b>Changes every run:</b> start dates · terms · today&#x27;s anchor</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 9 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> All four date columns filled from one row of formulas.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Build the dates</b><ol><li>Build the renewal date with EDATE</li><li>Snap it to month-end</li><li>Format both Mmm-yy</li></ol></li><li><b>Count</b><ol><li>Count the months remaining</li><li>Count the business days to renewal</li><li>Flag anything renewing this quarter</li></ol></li><li><b>Summarise</b><ol><li>Count renewals per quarter into the summary</li><li>Stamp today&#x27;s date in the as-of cell</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-qclose">
+<div class="d-head"><span class="d-num">3.9</span><h3>Close the Quarter</h3><span class="tag cap">capstone</span></div>
+<p class="why">One quarterly P&amp;L page: point mode, AutoSum, anchored percentages, growth, a conditional-sum memo.</p>
 <dl>
 <dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">point mode</span><span class="key">Alt+=</span><span class="fn">anchored %</span><span class="fn">growth</span><span class="fn">SUMIF</span><span class="fn">format as you go</span></dd>
-<dt>What is on the grid</dt><dd>One quarterly P&amp;L page: revenue and cost lines by quarter, empty totals, margins, growth and a segment memo.</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> No number typed into any formula.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build the totals</li><li>Build the margins with one anchored formula</li><li>Build year-over-year growth</li><li>Build the segment memo with SUMIF</li><li>Format as you go</li><li>Save</li></ol></dd>
-</dl></article></section><section class="chapter" id="ch4"><header class="ch-head"><div class="ch-num">Chapter 4</div><h2>Data &amp; Lookups</h2><span class="tier free">FREE</span><p>The corporate-day chapter: cleaning an export, sorting and filtering it, reading one table into another, and summarising a ledger with formulas, tables or a pivot.</p></header><article class="drill" id="d4-1">
-<div class="d-head"><span class="d-num">4.1</span><h3>Scrub</h3></div>
-
+<dt>What is on the grid</dt><dd>A quarterly P&amp;L with revenue and cost lines by quarter, empty totals, margins and growth rows, and a segment memo block fed by a small ledger at the foot.<p class="rnd"><b>Changes every run:</b> values · which segment leads</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> No number typed into any formula.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Build</b><ol><li>Total the quarters with AutoSum</li><li>Build the margins with one anchored formula</li><li>Build quarter-over-quarter growth</li></ol></li><li><b>Memo</b><ol><li>Build the segment memo with SUMIF</li><li>Build its share column</li></ol></li><li><b>Dress</b><ol><li>Format each block as you finish it</li><li>Top-border the totals</li><li>Save</li></ol></li></ol></dd>
+</dl></article></section><section class="chapter" id="ch4"><header class="ch-head"><div class="ch-num">Chapter 4</div><h2>Data &amp; Lookups</h2><span class="tier free">FREE</span><p>The corporate-day chapter: cleaning an export, sorting and filtering it, reading one table into another, and summarising a ledger with formulas, a table or a pivot.</p></header><article class="drill" id="d-scrub">
+<div class="d-head"><span class="d-num">4.1</span><h3>Scrub</h3><span class="tag eng" title="remove duplicates">needs engine work: remove duplicates</span></div>
+<p class="why">Every export needs the same first ten minutes: junk out, duplicates out, sorted, totalled.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Shift+Space / Ctrl+−</span><span class="key">Ctrl+Shift+↓</span><span class="key">Alt A S D (sort)</span><span class="key">Alt A S S (sort dialog, two keys)</span><span class="key">Alt+=</span><span class="key">Ctrl+B</span></dd>
-<dt>What is on the grid</dt><dd>A deal-blotter export: ten rows of deals with a repeated header, a page-break line, a stale subtotal and a duplicate mixed in; a late deal staged below.</dd>
-<dt>How it is gamified</dt><dd><p>7 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The table selected to its last row in one press before every sort.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Delete the three junk rows</li><li>Sort largest first</li><li>Delete the duplicate</li><li>Enter the late deal</li><li>Sort again by size then name</li><li>Total and bold</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d4-2">
-<div class="d-head"><span class="d-num">4.2</span><h3>Filter</h3></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Shift+Space / Ctrl+−</span><span class="key">Ctrl+Shift+↓</span><span class="key">Alt A S D / A (sort)</span><span class="key">Alt A S S (sort dialog, two keys)</span><span class="key">Alt A M (remove duplicates)</span><span class="key">Alt+=</span><span class="key">Ctrl+B</span></dd>
+<dt>What is on the grid</dt><dd>A deal-blotter export filling the page: twenty deals with a repeated header row, a page-break line, a stale subtotal, one deal sent twice; a late deal staged below the table with a red cue; a summary strip at the foot.<p class="rnd"><b>Changes every run:</b> where the junk rows sit · which deal is duplicated · the late deal</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The table selected to its last row in one press before every sort.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Junk</b><ol><li>Delete the three junk rows</li><li>Remove the duplicate deal</li><li>Confirm the row count in the summary</li></ol></li><li><b>Order</b><ol><li>Sort the deals largest first</li><li>Enter the late deal and sort again by size then name</li></ol></li><li><b>Close</b><ol><li>Total the size column</li><li>Bold and top-border the total</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-filterpass">
+<div class="d-head"><span class="d-num">4.2</span><h3>Filter &amp; Screens</h3><span class="tag eng" title="MAXIFS, MINIFS, AVERAGEIFS">needs engine work: MAXIFS, MINIFS, AVERAGEIFS</span></div>
+<p class="why">&#x27;Biggest deal in healthcare&#x27;, &#x27;how many at diligence&#x27;, &#x27;average tenure in sales&#x27;: the questions a VP asks on the phone, answered two ways.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+Shift+L (AutoFilter)</span><span class="key">Alt+↓ (picker)</span><span class="fn">filtered SUBTOTAL</span><span class="key">Alt A C (clear)</span></dd>
-<dt>What is on the grid</dt><dd>A coverage pipeline list: deal, sector, status, size, forty lines; two question cards to the right.</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The first screen cleared without walking the picker back.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Turn on the filter</li><li>Filter to one sector and enter the largest deal</li><li>Clear it</li><li>Filter to one status and enter the count and total</li><li>Clear the filter</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d4-3">
-<div class="d-head"><span class="d-num">4.3</span><h3>Remove Duplicates &amp; Text-to-Columns</h3> <span class="tag eng">needs engine work</span></div>
-
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt A M (remove duplicates)</span><span class="key">Alt A E (text to columns)</span><span class="fn">COUNTA</span></dd>
-<dt>What is on the grid</dt><dd>A mailing list with duplicate rows and a combined &quot;city, state&quot; column; a count cell.</dd>
-<dt>How it is gamified</dt><dd><p>4 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> Duplicates removed on two columns at once.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Remove the duplicate rows on email</li><li>Split city and state</li><li>Count the survivors</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d4-4">
-<div class="d-head"><span class="d-num">4.4</span><h3>Hide, Group &amp; Outline</h3></div>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+Shift+L (AutoFilter)</span><span class="key">Alt+↓ (picker)</span><span class="fn">SUBTOTAL</span><span class="key">Alt A C (clear)</span><span class="fn">MAXIFS</span><span class="fn">MINIFS</span><span class="fn">AVERAGEIFS</span><span class="fn">COUNTIFS</span></dd>
+<dt>What is on the grid</dt><dd>A coverage pipeline filling the page: deal, sector, status, size, days open; forty lines; four question cards on the right with empty answer cells.<p class="rnd"><b>Changes every run:</b> sectors and statuses named on the cards · values</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 10 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The first screen cleared without walking the picker back.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Filter</b><ol><li>Turn on the filter</li><li>Filter to the named sector and enter the largest deal</li><li>Clear it and filter to the named status; enter the count and total</li><li>Clear the filter</li></ol></li><li><b>Formulas</b><ol><li>Answer the largest-in-sector card with MAXIFS</li><li>Answer the smallest-at-status card with MINIFS</li><li>Answer the average-days card with AVERAGEIFS</li></ol></li><li><b>Prove it</b><ol><li>Count the deals per sector with COUNTIFS</li><li>Bold the answers</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-unhide">
+<div class="d-head"><span class="d-num">4.3</span><h3>Hide, Group &amp; Outline</h3></div>
 <p class="why">Models are read by people who want the summary and auditors who want the detail. Grouping serves both without two files.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+9 / Ctrl+0 (hide)</span><span class="key">Ctrl+Shift+9 / 0 (unhide)</span><span class="key">Alt+Shift+→ (group)</span><span class="key">Alt+Shift+← (ungroup)</span><span class="fn">outline levels 1/2</span></dd>
-<dt>What is on the grid</dt><dd>A regional tape: three regions, three detail rows each, a consolidated line; detail rows hidden, one column hidden.</dd>
-<dt>How it is gamified</dt><dd><p>Step 1 is discovery (find what is hidden); step 2 builds the outline; step 3 proves it folds.</p><p><b>Taught.</b> Unhide with the selection spanning the gap; group with Alt+Shift+Right; fold and unfold with the outline keys.</p><p class="star">★ <b>The pro move:</b> All three regions folded with one outline-level key.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Unhide the buried detail rows</li><li>Unhide the hidden column</li><li>Group each region&#x27;s detail</li><li>Fold all the detail away</li><li>Unfold one region to check it</li><li>Bold the consolidated line</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d4-5">
-<div class="d-head"><span class="d-num">4.5</span><h3>Lookup</h3> <span class="tag eng">needs engine work</span></div>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+9 / Ctrl+0</span><span class="key">Ctrl+Shift+9 / Ctrl+Shift+0</span><span class="key">Alt+Shift+→ (group)</span><span class="key">Alt+Shift+← (ungroup)</span><span class="fn">outline levels 1 / 2</span><span class="key">Alt A H (hide detail)</span></dd>
+<dt>What is on the grid</dt><dd>A regional tape filling the page: four regions, four detail rows each, a consolidated line per region and a grand total; detail rows for two regions hidden by the analyst who left, one column hidden, two helper columns that should not show, a memo block at the foot.<p class="rnd"><b>Changes every run:</b> which rows and column are hidden · region order</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> All four regions folded with one outline-level key.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Find</b><ol><li>Unhide the buried detail rows</li><li>Unhide the hidden column</li></ol></li><li><b>Outline</b><ol><li>Group each region&#x27;s detail</li><li>Fold all four regions to their consolidated lines</li><li>Unfold one region to check it</li></ol></li><li><b>Close</b><ol><li>Hide the two helper columns</li><li>Bold the grand total and top-border it</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-lookup">
+<div class="d-head"><span class="d-num">4.4</span><h3>Lookups</h3><span class="tag eng" title="XLOOKUP">needs engine work: XLOOKUP</span></div>
 <p class="why">The single most-asked Excel skill in interviews and the one the professional uses to join two lists.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">VLOOKUP</span><span class="fn">INDEX</span><span class="fn">MATCH</span><span class="fn">XLOOKUP</span><span class="key">Alt H F C (green links)</span></dd>
-<dt>What is on the grid</dt><dd>A peer table (eight peers by six metrics) and a three-line pitch screen that reads one metric by name; the table re-orders its columns between steps.</dd>
-<dt>How it is gamified</dt><dd><p>The tier ladder: the re-ordered table appears when tier one clears and breaks the VLOOKUP visibly.</p><p><b>Taught.</b> Three tiers on one page: VLOOKUP works, then the table re-orders and only INDEX/MATCH survives, then XLOOKUP does both in one.</p><p class="star">★ <b>The pro move:</b> The whole screen filled from one lookup formula.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Read the first metric with VLOOKUP</li><li>Fill the screen</li><li>Rebuild the read with INDEX/MATCH after the columns move</li><li>Rebuild it once more with XLOOKUP</li><li>Colour the reads green</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d4-6">
-<div class="d-head"><span class="d-num">4.6</span><h3>Two-way Lookup</h3></div>
-<p class="why">A segment-by-quarter tape where nothing sits where it sat last week.</p>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">VLOOKUP</span><span class="fn">INDEX</span><span class="fn">MATCH</span><span class="fn">XLOOKUP</span><span class="key">Alt H F C (green links)</span><span class="key">Ctrl+D</span></dd>
+<dt>What is on the grid</dt><dd>A peer table on the left (eight peers by six metrics) and a three-line pitch screen on the right that reads one metric by name; a second screen below it. The table&#x27;s columns re-order after the first screen is built.<p class="rnd"><b>Changes every run:</b> which metric the screen names · column order · peer set</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Each screen filled from one lookup formula.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>VLOOKUP</b><ol><li>Read the first metric with VLOOKUP</li><li>Fill the screen</li><li>Colour the reads green</li></ol></li><li><b>The columns move</b><ol><li>Rebuild the read with INDEX and MATCH after the table re-orders</li><li>Fill the screen</li></ol></li><li><b>XLOOKUP</b><ol><li>Build the second screen with XLOOKUP in one formula</li><li>Fill it</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-crosstab">
+<div class="d-head"><span class="d-num">4.5</span><h3>Two-way &amp; Cross-tab</h3></div>
+<p class="why">Find the row and the column at once, then build the whole cross-tab from one formula.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">INDEX(range, MATCH, MATCH)</span><span class="fn">anchored ranges</span><span class="key">Alt H B P</span></dd>
-<dt>What is on the grid</dt><dd>A five-segment by five-quarter reporting tape and two read cards naming a segment and a quarter.</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> Every card answered from one anchored read.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Enter the missing quarter header</li><li>Build the first card read</li><li>Fix it when the tape re-sorts</li><li>Build the second card off the same formula</li><li>Top-border the cards</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d4-7">
-<div class="d-head"><span class="d-num">4.7</span><h3>SUMIFS Cross-tab</h3></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">INDEX(range, MATCH, MATCH)</span><span class="fn">SUMIFS</span><span class="fn">mixed anchors</span><span class="key">Ctrl+R / Ctrl+D</span><span class="key">Alt H B S</span><span class="fn">reconciliation check</span></dd>
+<dt>What is on the grid</dt><dd>Top: a five-segment by five-quarter reporting tape and two read cards naming a segment and a quarter. Bottom: a one-line-per-booking ledger and an empty segment-by-region cross-tab with a reconciliation cell.<p class="rnd"><b>Changes every run:</b> which cards · segment order · ledger values</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The entire cross-tab from one formula.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Two-way reads</b><ol><li>Enter the missing quarter header</li><li>Build the first card read with two MATCHes</li><li>Build the second card off the same anchored formula</li></ol></li><li><b>Cross-tab</b><ol><li>Build the corner cell with both conditions anchored</li><li>Fill the grid in both directions</li></ol></li><li><b>Prove it</b><ol><li>Enter the reconciliation check to the ledger total</li><li>Box the cross-tab</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-recon">
+<div class="d-head"><span class="d-num">4.6</span><h3>Recon</h3></div>
+<p class="why">Month-end: two systems disagree and someone has to say by how much and why.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">SUMIFS</span><span class="fn">mixed anchors ($B3, C$2)</span><span class="key">Ctrl+R / Ctrl+D</span><span class="key">Alt H B S</span><span class="fn">reconciliation check</span></dd>
-<dt>What is on the grid</dt><dd>A one-line-per-booking ledger on the left; an empty segment-by-region cross-tab on the right with a reconciliation cell.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The entire cross-tab from one formula.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build the corner cell with both conditions anchored</li><li>Fill the grid</li><li>Box it</li><li>Enter the reconciliation check to the ledger total</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d4-8">
-<div class="d-head"><span class="d-num">4.8</span><h3>Screens (MAXIFS, MINIFS, AVERAGEIFS)</h3> <span class="tag eng">needs engine work</span></div>
-<p class="why">&quot;Biggest deal in healthcare&quot;, &quot;average tenure in sales&quot; — the questions a VP asks on the phone.</p>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">XLOOKUP / VLOOKUP</span><span class="fn">COUNTIF</span><span class="fn">difference column</span><span class="fn">SUM to zero</span><span class="key">Ctrl+C / Ctrl+V</span><span class="key">Alt H F C (red)</span></dd>
+<dt>What is on the grid</dt><dd>Two lists side by side filling the page: the deal blotter and the finance extract; empty in-finance, difference and duplicate-flag columns; a total cell; a red cue at the row where the missing deal belongs.<p class="rnd"><b>Changes every run:</b> which deal is missing · which amount is wrong · which is duplicated</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The missing deal copied across, name and amount, in one paste.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Match</b><ol><li>Build the in-finance column with a lookup</li><li>Flag any deal that appears twice with COUNTIF</li></ol></li><li><b>Differences</b><ol><li>Add the missing deal to finance</li><li>Build the difference column</li><li>Fix the one amount that is wrong</li></ol></li><li><b>Prove it</b><ol><li>Total the difference to zero</li><li>Colour the corrected cells red</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-tables">
+<div class="d-head"><span class="d-num">4.7</span><h3>Tables &amp; Validation</h3><span class="tag eng" title="Excel Tables, data validation">needs engine work: Excel Tables, data validation</span></div>
+<p class="why">A range that grows, filters and lets formulas refer to columns by name; a column that refuses bad entries.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">MAXIFS</span><span class="fn">MINIFS</span><span class="fn">AVERAGEIFS</span><span class="key">Ctrl+R</span></dd>
-<dt>What is on the grid</dt><dd>The coverage pipeline list with three question cards: largest in a sector, smallest at a status, average tenure.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> All three from a single row of formulas filled across.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Answer the largest-in-sector card</li><li>Answer the smallest-at-status card</li><li>Answer the average card</li><li>Bold the answers</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d4-9">
-<div class="d-head"><span class="d-num">4.9</span><h3>Recon</h3></div>
-<p class="why">Month-end.</p>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+T</span><span class="fn">total row</span><span class="key">structured references [@Amount]</span><span class="key">Alt A V V (validation list)</span><span class="key">date rule</span><span class="key">error alert</span></dd>
+<dt>What is on the grid</dt><dd>A transaction list filling the page: date, vendor, category, amount, status; no total row; a category list block on the right to source the drop-down.<p class="rnd"><b>Changes every run:</b> rows · categories · the bad entry planted</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 9 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The column formula written once for the whole column.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Table</b><ol><li>Make the range a table</li><li>Add the total row</li><li>Build a column formula by name and watch it fill the column</li></ol></li><li><b>Grow</b><ol><li>Add a row and confirm the total moves</li><li>Sort the table by amount from its header</li></ol></li><li><b>Validate</b><ol><li>Restrict the category column to the list</li><li>Restrict the date column to this year</li><li>Fix the planted bad entry</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-pivot">
+<div class="d-head"><span class="d-num">4.8</span><h3>Pivot</h3><span class="tag eng" title="pivot tables">needs engine work: pivot tables</span></div>
+<p class="why">The professional&#x27;s summary tool and the candidate&#x27;s data-room sanity check.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">VLOOKUP / XLOOKUP</span><span class="fn">difference column</span><span class="fn">SUM to zero</span><span class="key">Ctrl+C / Ctrl+V</span></dd>
-<dt>What is on the grid</dt><dd>Two lists side by side: the deal blotter and the finance extract; empty &quot;in finance&quot; and difference columns; a total cell.</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The missing deal copied across, name and amount, in one paste.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build the &quot;in finance&quot; column with a lookup</li><li>Add the missing deal</li><li>Build the difference column</li><li>Fix the one amount that is wrong</li><li>Total the difference to zero</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d4-10">
-<div class="d-head"><span class="d-num">4.10</span><h3>Tables</h3> <span class="tag eng">needs engine work</span></div>
-
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+T (table)</span><span class="fn">total row</span><span class="fn">structured references [@Amount]</span><span class="fn">auto-expanding ranges</span></dd>
-<dt>What is on the grid</dt><dd>A plain transaction list (date, vendor, category, amount) with no total row.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The column formula written once for the whole column.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Make the range a table</li><li>Add the total row</li><li>Build a column formula by name</li><li>Add a row and confirm the total moves</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d4-11">
-<div class="d-head"><span class="d-num">4.11</span><h3>Pivot</h3> <span class="tag eng">needs engine work</span></div>
-<p class="why">The professional&#x27;s summary tool; the candidate&#x27;s data-room sanity check.</p>
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt N V (pivot)</span><span class="fn">field list by keyboard</span><span class="fn">rows / columns / values</span><span class="key">Alt+F5 (refresh)</span></dd>
-<dt>What is on the grid</dt><dd>The booking ledger and an empty area to the right where the pivot lands.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The field list driven entirely by keyboard.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Insert a pivot on the ledger</li><li>Segment to rows, region to columns, amount to values</li><li>Format the values</li><li>Change a ledger line and refresh</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d4-12">
-<div class="d-head"><span class="d-num">4.12</span><h3>Data Validation</h3> <span class="tag eng">needs engine work</span></div>
-
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt A V V (data validation)</span><span class="fn">list source</span><span class="fn">date rule</span><span class="fn">error alert</span></dd>
-<dt>What is on the grid</dt><dd>A project tracker: task, owner, status, due date; the status column accepts anything.</dd>
-<dt>How it is gamified</dt><dd><p>4 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The list sourced from a named range.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Add a list to the status column</li><li>Restrict the date column to this year</li><li>Try a bad entry and see it refused</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d4-13">
-<div class="d-head"><span class="d-num">4.13</span><h3>The Data-Room Tape</h3><span class="tag cap">capstone</span></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt N V (insert pivot)</span><span class="key">field list by keyboard</span><span class="key">rows / columns / values</span><span class="key">Alt+F5 (refresh)</span><span class="key">number format on values</span></dd>
+<dt>What is on the grid</dt><dd>The booking ledger down the left and an empty area on the right where the pivot lands; a formula cross-tab from the previous drill sits at the foot to check against.<p class="rnd"><b>Changes every run:</b> ledger values · which line changes for the refresh</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 6 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The field list driven entirely by keyboard.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Build</b><ol><li>Insert a pivot on the ledger</li><li>Segment to rows, region to columns, amount to values</li></ol></li><li><b>Read</b><ol><li>Format the values</li><li>Confirm the pivot matches the formula cross-tab</li></ol></li><li><b>Refresh</b><ol><li>Change a ledger line and refresh</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-cleanroom">
+<div class="d-head"><span class="d-num">4.9</span><h3>The Data-Room Tape</h3><span class="tag cap">capstone</span></div>
+<p class="why">A dirty export becomes a sendable summary: junk out, sorted, looked up, summarised, grouped.</p>
 <dl>
 <dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">F5 → Special → Blanks</span><span class="key">Ctrl+−</span><span class="key">Alt A S D</span><span class="fn">XLOOKUP</span><span class="fn">SUMIFS</span><span class="key">Alt+Shift+→</span></dd>
-<dt>What is on the grid</dt><dd>A dirty data-room export: junk rows, unsorted deals, a sector lookup table to the side, an empty summary block.</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The junk rows found with one Go To Special on blanks.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Delete the junk rows</li><li>Sort by size</li><li>Look up the sector for each deal</li><li>Summarise by sector with SUMIFS</li><li>Group the detail</li><li>Save</li></ol></dd>
-</dl></article></section><section class="chapter" id="ch5"><header class="ch-head"><div class="ch-num">Chapter 5</div><h2>Formulas II</h2><span class="tier pro">PRO</span><p>Making a page decide and not break: caps and floors, error handling, scenario switches, and the audit skills for someone else&#x27;s file.</p></header><article class="drill" id="d5-1">
-<div class="d-head"><span class="d-num">5.1</span><h3>Caps &amp; Floors</h3> <span class="tag eng">needs engine work</span></div>
-
+<dt>What is on the grid</dt><dd>A dirty data-room export filling the page, a sector lookup table to the side, an empty summary block.<p class="rnd"><b>Changes every run:</b> junk positions · sector map · values</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 7 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The junk rows found with one Go To Special on blanks.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Clean</b><ol><li>Delete the junk rows</li><li>Sort by size</li></ol></li><li><b>Enrich</b><ol><li>Look up the sector for each deal</li><li>Summarise by sector with SUMIFS</li></ol></li><li><b>Ship</b><ol><li>Group the detail</li><li>Dress the summary</li><li>Save</li></ol></li></ol></dd>
+</dl></article></section><section class="chapter" id="ch5"><header class="ch-head"><div class="ch-num">Chapter 5</div><h2>Formulas II</h2><span class="tier pro">PRO</span><p>Making a page decide and not break, then the audit skills for someone else&#x27;s file.</p></header><article class="drill" id="d-wrapfix">
+<div class="d-head"><span class="d-num">5.1</span><h3>Errors</h3></div>
+<p class="why">A board pack that shows #N/A is embarrassing; one that hides a real error with a zero is worse. Know what each error means and the right fix for each.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">MIN</span><span class="fn">MAX</span><span class="fn">IFS</span><span class="fn">SWITCH</span><span class="key">Alt+=</span></dd>
-<dt>What is on the grid</dt><dd>A bonus schedule: name, grade, formula bonus, pool cap, empty paid and clawback columns.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> Cap and floor in one formula.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Cap the bonus at the pool</li><li>Floor the clawback at zero</li><li>Band the grade with IFS</li><li>Total the pool paid</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d5-2">
-<div class="d-head"><span class="d-num">5.2</span><h3>IFERROR</h3></div>
-<p class="why">A board pack that shows #N/A is embarrassing; one that hides a real error with a zero is worse.</p>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">IFERROR</span><span class="fn">IFNA</span><span class="fn">#N/A</span><span class="fn">#REF!</span><span class="fn">#DIV/0!</span><span class="fn">#VALUE!</span><span class="key">F2</span><span class="key">Ctrl+D</span></dd>
+<dt>What is on the grid</dt><dd>Top: a board-pack panel with five lookup reads into a tape, three showing #N/A for three different reasons (genuinely missing, misspelt key, wrong range). Bottom: a segment tab whose costs total lost its rows (#REF!), a share line dividing by zero, text typed where a number belongs, eight red cells downstream.<p class="rnd"><b>Changes every run:</b> which read is which kind of broken · which rows were deleted</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 9 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Both broken reads repaired in one fill with the wrapped one left intact.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>The reads</b><ol><li>Wrap the genuinely missing read to show a dash</li><li>Fix the misspelt key</li><li>Fix the wrong range</li></ol></li><li><b>The wreckage</b><ol><li>Rebuild the total whose rows were deleted</li><li>Guard the share line against a zero</li><li>Fix the text that was typed where a number belongs</li></ol></li><li><b>Prove it</b><ol><li>Confirm the eight red cells clear</li><li>Total the panel</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-cases">
+<div class="d-head"><span class="d-num">5.2</span><h3>Scenario Switch</h3></div>
+<p class="why">A case cell that drives the page is how a real model does scenarios.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">IFERROR</span><span class="fn">IFNA</span><span class="fn">VLOOKUP repair</span><span class="key">Ctrl+D</span></dd>
-<dt>What is on the grid</dt><dd>A board pack panel with five lookup reads into a tape; three reads show #N/A.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> Both broken reads repaired in one fill with the wrapped one left intact.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Wrap the genuinely missing read to show a dash</li><li>Fix the misspelt key</li><li>Fix the wrong range</li><li>Total the panel</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d5-3">
-<div class="d-head"><span class="d-num">5.3</span><h3>Error Triage</h3></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">CHOOSE</span><span class="fn">INDEX on a case cell</span><span class="key">F4</span><span class="key">Ctrl+D</span><span class="key">Ctrl+Alt+V (values)</span></dd>
+<dt>What is on the grid</dt><dd>A case block (three columns of growth, margin and capex), a case-number cell, an empty live driver row, a five-year build below, and an output table to snapshot on the right.<p class="rnd"><b>Changes every run:</b> case values · which case is active at load</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 7 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The driver block built once and filled down.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>The switch</b><ol><li>Build the live driver off the case cell</li><li>Fill the driver block down</li></ol></li><li><b>The build</b><ol><li>Build revenue and EBITDA off the driver</li><li>Fill across the plan</li></ol></li><li><b>Snapshot</b><ol><li>Snapshot all three cases into the table as values</li><li>Change the case and confirm the page moves</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-audit">
+<div class="d-head"><span class="d-num">5.3</span><h3>Review Pass</h3></div>
+<p class="why">Take an inherited page and know in one pass what is typed, what is linked and what is broken.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">#REF!</span><span class="fn">#DIV/0!</span><span class="fn">#VALUE!</span><span class="fn">SUM rebuild</span><span class="fn">IF guard</span><span class="key">F2</span></dd>
-<dt>What is on the grid</dt><dd>A segment tab: a costs block whose total rows were deleted, a share line dividing by zero, a text value where a number belongs; eight red cells downstream.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The total rebuilt in one fill across the quarters.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Rebuild the total whose rows were deleted</li><li>Guard the share line against a zero</li><li>Fix the text that was typed where a number belongs</li><li>Confirm the eight red cells clear</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d5-4">
-<div class="d-head"><span class="d-num">5.4</span><h3>Scenario Switch</h3></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">F5 → Special → Constants</span><span class="key">F5 → Special → Formulas</span><span class="key">Ctrl+` (show formulas)</span><span class="key">Alt H F C (audit colours)</span><span class="key">F2</span><span class="key">Ctrl+R</span></dd>
+<dt>What is on the grid</dt><dd>A divisional operating review filling the page: revenue and cost lines by quarter with typed-over cells, a total that stops a row short, a margin formula pointing at the wrong row, a check line already reading non-zero; the checklist discloses four problems.<p class="rnd"><b>Changes every run:</b> which cells are typed over · which total is short · which margin is wrong</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Every hardcode found in one Go To Special pass.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Colour</b><ol><li>Find every typed-over cell with Go To Special and colour it</li><li>Find every formula and colour it black</li></ol></li><li><b>Fix</b><ol><li>Fix the total that stops short</li><li>Re-point the margin formula</li><li>Rebuild the typed-over cells from their neighbours</li></ol></li><li><b>Prove it</b><ol><li>Show formulas and scan the page</li><li>Confirm the check line reads zero</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-trace">
+<div class="d-head"><span class="d-num">5.4</span><h3>Trace &amp; Evaluate</h3><span class="tag eng" title="trace precedents / dependents, evaluate (F9)">needs engine work: trace precedents / dependents, evaluate (F9)</span></div>
+<p class="why">When the output is wrong, the fast analyst walks the chain rather than re-reading every cell.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">CHOOSE</span><span class="fn">INDEX on a case cell</span><span class="key">Ctrl+Alt+V values</span><span class="key">F4</span></dd>
-<dt>What is on the grid</dt><dd>A case block (three columns of growth and margin), a case-number cell, a live driver row, an output table to snapshot.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The driver block built once and filled down.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build the live driver off the case cell</li><li>Build revenue and EBITDA off the driver</li><li>Snapshot all three cases into the table as values</li><li>Change the case and confirm the page moves</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d5-5">
-<div class="d-head"><span class="d-num">5.5</span><h3>Review Pass</h3></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt M P (precedents)</span><span class="key">Alt M D (dependents)</span><span class="key">Ctrl+[ (go to precedent)</span><span class="key">F5 (back)</span><span class="key">F9 (evaluate a selection)</span></dd>
+<dt>What is on the grid</dt><dd>A one-page model with an output box at the foot; five chained formulas above it, one wrong; a second output whose dependents must all be found.<p class="rnd"><b>Changes every run:</b> which formula is the culprit · chain shape</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 7 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The culprit found without editing any healthy cell.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Trace</b><ol><li>Trace the output back to its inputs</li><li>Step into each precedent in turn</li></ol></li><li><b>Evaluate</b><ol><li>Evaluate the suspect formula piece by piece</li><li>Fix the culprit</li></ol></li><li><b>Dependents</b><ol><li>Find every cell that depends on the second output</li><li>Confirm the output</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-stalelink">
+<div class="d-head"><span class="d-num">5.5</span><h3>Stale Links &amp; Roll-forward Prep</h3></div>
+<p class="why">Re-issued assumptions, typed-in rates and last version&#x27;s tags: the three things that make a model impossible to roll forward.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">F5 → Special → Constants / Formulas</span><span class="key">Ctrl+` (show formulas)</span><span class="key">Alt H F C (audit colours)</span><span class="key">F2</span></dd>
-<dt>What is on the grid</dt><dd>A divisional operating review: revenue and cost lines with typed-over cells, a total that stops short, a margin pointing at the wrong row, a check line reading non-zero.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> Every hardcode found in one pass.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Find every typed-over cell with Go To Special</li><li>Fix the total that stops short</li><li>Re-point the margin formula</li><li>Confirm the check line reads zero</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d5-6">
-<div class="d-head"><span class="d-num">5.6</span><h3>Trace &amp; Evaluate</h3></div>
-
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt M P (trace precedents)</span><span class="key">Alt M D (trace dependents)</span><span class="key">F9 (evaluate a selection)</span><span class="key">Ctrl+[ (go to precedent)</span><span class="key">F5 (back)</span></dd>
-<dt>What is on the grid</dt><dd>One wrong output cell at the bottom, five chained formulas above it, one of them wrong.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The culprit found without editing any healthy cell.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Trace the output back to its inputs</li><li>Evaluate the suspect formula piece by piece</li><li>Fix the culprit</li><li>Confirm the output</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d5-7">
-<div class="d-head"><span class="d-num">5.7</span><h3>Stale Links</h3></div>
-
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">re-point references</span><span class="key">Alt H F C (green)</span><span class="key">Delete</span><span class="key">Ctrl+R</span></dd>
-<dt>What is on the grid</dt><dd>An assumptions page with v1 figures in one column and re-issued v2 figures beside them; a build below still pointing at v1.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The contribution block rebuilt from one corner.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Find the three lines still on v1</li><li>Re-point them at v2</li><li>Colour the links green</li><li>Clear the superseded figures</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d5-8">
-<div class="d-head"><span class="d-num">5.8</span><h3>Make It Tie</h3></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">re-point references</span><span class="key">Alt H F C (green links)</span><span class="key">F2</span><span class="key">Ctrl+H (Replace All)</span><span class="key">Alt H F C (blue)</span><span class="key">Ctrl+R</span></dd>
+<dt>What is on the grid</dt><dd>An assumptions page at the top with v1 figures beside re-issued v2 figures; a five-year build below still pointing at v1, with the growth and cost rates typed inside its formulas; version tags reading v1 in every header.<p class="rnd"><b>Changes every run:</b> which lines are still on v1 · which rates are typed in</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 9 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> All tags replaced in one dialog.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Re-point</b><ol><li>Find the three lines still on v1</li><li>Re-point them at v2</li><li>Colour the links green</li><li>Clear the superseded figures</li></ol></li><li><b>Pull the rates out</b><ol><li>Move each typed rate into an assumption cell</li><li>Re-point the formulas at the cells</li><li>Colour the new inputs blue</li></ol></li><li><b>Tags</b><ol><li>Replace every v1 tag with v2 in one action</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-balcheck">
+<div class="d-head"><span class="d-num">5.6</span><h3>Make It Tie</h3></div>
+<p class="why">A balance sheet check row; finding why it does not read zero.</p>
 <dl>
 <dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">check row = assets − L&amp;E</span><span class="fn">SUM</span><span class="key">F2</span><span class="fn">re-point</span><span class="key">Ctrl+R</span></dd>
-<dt>What is on the grid</dt><dd>A four-year balance sheet, both sides, with zeros pasted over the check row.</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> Only what broke touched.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Rebuild the check row</li><li>Find the year that breaks</li><li>Fix the total that stops short</li><li>Re-point the equity cell</li><li>Confirm all four years tie</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d5-9">
-<div class="d-head"><span class="d-num">5.9</span><h3>Roll-forward Prep</h3></div>
-
+<dt>What is on the grid</dt><dd>A four-year balance sheet filling the page, both sides, with zeros pasted over the check row; one year breaks for two reasons.<p class="rnd"><b>Changes every run:</b> which year breaks · which total is short · which equity cell is wrong</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 7 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Only what broke touched.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>The check</b><ol><li>Rebuild the check row across all four years</li><li>Find the year that breaks</li></ol></li><li><b>The fixes</b><ol><li>Fix the total that stops short</li><li>Re-point the equity cell</li></ol></li><li><b>Prove it</b><ol><li>Confirm all four years tie</li><li>Bold the check row</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-redflags">
+<div class="d-head"><span class="d-num">5.7</span><h3>The Red-Flag Pass</h3><span class="tag cap">capstone</span></div>
+<p class="why">An inherited one-tab model with seven disclosed errors.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+H (replace all)</span><span class="key">F2</span><span class="key">Alt H F C (blue)</span><span class="key">Ctrl+R</span></dd>
-<dt>What is on the grid</dt><dd>A five-year build with growth and cost rates typed inside its formulas; version tags reading v1 in every header.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> All tags replaced in one dialog.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Move each typed rate into an assumption cell</li><li>Re-point the formulas at the cells</li><li>Colour the inputs blue</li><li>Replace every v1 tag with v2 in one action</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d5-10">
-<div class="d-head"><span class="d-num">5.10</span><h3>The Red-Flag Pass</h3><span class="tag cap">capstone</span></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">everything in chapter 5</span><span class="fn">the error meter</span><span class="key">F5 → Special</span></dd>
+<dt>What is on the grid</dt><dd>An inherited model filling the page with seven planted errors: a stale link, a sign flip, a hardcode, a short SUM, a wrong anchor, a circular reference, a typed number.<p class="rnd"><b>Changes every run:</b> which cells carry which error</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 5 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Every hardcode found in one Go To Special pass.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Find</b><ol><li>Find every hardcode in one pass</li><li>Find the stale link and the circular reference</li></ol></li><li><b>Fix</b><ol><li>Fix all seven; the meter fills</li></ol></li><li><b>Prove it</b><ol><li>Check line reads zero</li><li>Save</li></ol></li></ol></dd>
+</dl></article></section><section class="chapter" id="ch6"><header class="ch-head"><div class="ch-num">Chapter 6</div><h2>Models I</h2><span class="tier pro">PRO</span><p>Valuation mechanics, one Excel move per page: statistics, discounting, NPV and IRR, sensitivity and goal seek, multiples.</p></header><article class="drill" id="d-wacc">
+<div class="d-head"><span class="d-num">6.1</span><h3>WACC</h3></div>
+<p class="why">MEDIAN, AVERAGE, MAX and MIN over a peer set, and a rate anchored once.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">everything in chapter 5</span><span class="fn">error meter (7 planted)</span><span class="key">F5 → Special</span></dd>
-<dt>What is on the grid</dt><dd>An inherited one-tab model with seven planted errors and a seven-segment meter on the checklist.</dd>
-<dt>How it is gamified</dt><dd><p>1 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> Every hardcode found in one Go To Special pass.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Save</li></ol></dd>
-</dl></article></section><section class="chapter" id="ch6"><header class="ch-head"><div class="ch-num">Chapter 6</div><h2>Models I</h2><span class="tier pro">PRO</span><p>Valuation mechanics, one Excel move per drill: statistics, discounting, NPV and IRR, sensitivity, goal seek, multiples.</p></header><article class="drill" id="d6-1">
-<div class="d-head"><span class="d-num">6.1</span><h3>Statistics (WACC)</h3></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">MEDIAN</span><span class="fn">AVERAGE</span><span class="fn">MAX / MIN</span><span class="fn">unlever / relever</span><span class="key">F4</span><span class="key">Ctrl+D</span></dd>
+<dt>What is on the grid</dt><dd>A five-comparable beta set (beta, debt, equity, tax) on the left, an empty unlevered-beta column, a statistics block (median, average, high, low) and a WACC block on the right with the target&#x27;s inputs in yellow.<p class="rnd"><b>Changes every run:</b> peer values · target inputs</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The unlevering column from one anchored formula.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Unlever</b><ol><li>Unlever each beta with the tax rate anchored</li><li>Fill the column</li></ol></li><li><b>Statistics</b><ol><li>Take the median, average, high and low</li><li>Relever the median</li></ol></li><li><b>WACC</b><ol><li>Build cost of equity</li><li>Build after-tax cost of debt</li><li>Build WACC</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-dcf">
+<div class="d-head"><span class="d-num">6.2</span><h3>DCF</h3></div>
+<p class="why">From EBIT to enterprise value on one page: the cash row, the discount factors with the exponent, the terminal value, the bridge to equity.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">MEDIAN</span><span class="fn">AVERAGE</span><span class="fn">MAX / MIN</span><span class="fn">unlever / relever formulas</span><span class="key">F4</span><span class="key">Ctrl+D</span></dd>
-<dt>What is on the grid</dt><dd>A five-comparable beta set (beta, debt, equity, tax) and an empty WACC block below.</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The unlevering column from one anchored formula.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Unlever each beta with the tax rate anchored</li><li>Take the median</li><li>Relever</li><li>Build cost of equity</li><li>Build WACC</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d6-2">
-<div class="d-head"><span class="d-num">6.2</span><h3>Discounting (DCF)</h3></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">^ (exponent)</span><span class="fn">1/(1+r)^n</span><span class="fn">SUMPRODUCT</span><span class="fn">NPV as a check</span><span class="key">F4</span><span class="key">Ctrl+R</span></dd>
+<dt>What is on the grid</dt><dd>A five-year DCF filling the page: EBIT, tax, D&amp;A, capex and working-capital lines; an empty unlevered free cash flow line; a rate cell; empty discount-factor and present-value rows; a terminal value block; an equity bridge with net debt and share count.<p class="rnd"><b>Changes every run:</b> operating values · rate · net debt</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 10 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Every factor from one formula with the rate anchored.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Cash</b><ol><li>Build the cash-tax line</li><li>Build NOPAT and unlevered free cash flow</li><li>Fill the block across</li></ol></li><li><b>Discount</b><ol><li>Build the discount-factor row with the rate anchored</li><li>Build present values</li><li>Build and discount the terminal value</li></ol></li><li><b>Bridge</b><ol><li>Total enterprise value</li><li>Bridge to equity value and price per share</li><li>Check the total with NPV</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-npvirr">
+<div class="d-head"><span class="d-num">6.3</span><h3>NPV, IRR &amp; Payback</h3><span class="tag eng" title="PMT">needs engine work: PMT</span></div>
+<p class="why">The professional&#x27;s business case: does the project clear the hurdle, when does it pay back, and what does the financing cost each month.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">^ (exponent)</span><span class="key">1/(1+r)^n</span><span class="fn">SUMPRODUCT</span><span class="key">Ctrl+R</span><span class="key">F4</span></dd>
-<dt>What is on the grid</dt><dd>A five-year free cash flow line, a discount rate cell, empty discount-factor and present-value rows, a terminal value block.</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> Every factor from one formula with the rate anchored.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build the discount factor row</li><li>Build present values</li><li>Build terminal value</li><li>Discount it</li><li>Total enterprise value</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d6-3">
-<div class="d-head"><span class="d-num">6.3</span><h3>NPV &amp; IRR</h3> <span class="tag eng">needs engine work</span></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">NPV</span><span class="fn">IRR</span><span class="fn">cumulative cash (payback)</span><span class="fn">PMT</span><span class="fn">IF</span><span class="key">Ctrl+Shift+%</span></dd>
+<dt>What is on the grid</dt><dd>A capex proposal filling the page: an initial outlay, five years of cash flow, a hurdle-rate cell, a financing block (amount, rate, term), an empty decision box (NPV, IRR, payback year, monthly payment, verdict), and a small two-case comparison beside it.<p class="rnd"><b>Changes every run:</b> cash flows · hurdle · financing terms</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 9 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> NPV built once and re-used by the verdict.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Value</b><ol><li>Build NPV at the hurdle</li><li>Build IRR</li><li>Percent-format the IRR</li></ol></li><li><b>Payback</b><ol><li>Build the cumulative cash line</li><li>Find the payback year</li></ol></li><li><b>Decide</b><ol><li>Build the monthly payment on the financing</li><li>Flag the verdict against the hurdle</li><li>Copy the block onto the second case</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-dcfsens">
+<div class="d-head"><span class="d-num">6.4</span><h3>Sensitivity &amp; Goal Seek</h3><span class="tag eng" title="data table, goal seek">needs engine work: data table, goal seek</span></div>
+<p class="why">Stress the answer two ways, then solve backwards for the input that hits a target.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">NPV</span><span class="fn">IRR</span><span class="fn">PMT</span><span class="fn">cumulative cash (payback)</span><span class="fn">IF</span><span class="key">Ctrl+Shift+%</span></dd>
-<dt>What is on the grid</dt><dd>A capex proposal: an initial outlay, five years of cash flow, a hurdle-rate cell, an empty decision box (NPV, IRR, payback, monthly payment, verdict).</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> NPV built once and re-used by the flag.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build NPV at the hurdle</li><li>Build IRR</li><li>Build the payback year</li><li>Build the monthly payment on the financing</li><li>Flag the decision</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d6-4">
-<div class="d-head"><span class="d-num">6.4</span><h3>Sensitivity</h3> <span class="tag eng">needs engine work</span></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">mixed anchors</span><span class="key">Ctrl+R / Ctrl+D</span><span class="key">Alt A W T (data table)</span><span class="key">Alt A W G (goal seek)</span><span class="key">Alt H K</span><span class="key">Alt H B S</span></dd>
+<dt>What is on the grid</dt><dd>A 5×3 two-way grid (growth across, margin down) with the corner empty; a second identical grid for the data-table route; a small model with a price input and an NPV output; two target cells.<p class="rnd"><b>Changes every run:</b> growth and margin ranges · targets</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> All fifteen cells from one formula.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>The formula grid</b><ol><li>Build the corner cell with both anchors</li><li>Fill the grid</li><li>Comma-format and box it</li></ol></li><li><b>The data table</b><ol><li>Build the same grid as a data table</li><li>Confirm the two grids agree</li></ol></li><li><b>Goal seek</b><ol><li>Seek the price that makes NPV zero</li><li>Seek the growth that hits the EBITDA target</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-comps">
+<div class="d-head"><span class="d-num">6.5</span><h3>Comps</h3></div>
+<p class="why">Multiples, the implied range, and the 0.0x format, on trading comps and then on a precedent tape.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">mixed anchors</span><span class="key">Ctrl+R / Ctrl+D</span><span class="key">Alt A W T (data table)</span><span class="key">Alt H K</span><span class="key">Alt H B S</span></dd>
-<dt>What is on the grid</dt><dd>A 5×3 two-way grid (growth across, margin down) with the corner empty, and a second identical grid for the data-table route.</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> All fifteen cells from one formula.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build the corner cell</li><li>Fill the grid</li><li>Build the same grid as a data table</li><li>Comma-format</li><li>Box it</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d6-5">
-<div class="d-head"><span class="d-num">6.5</span><h3>Goal Seek</h3> <span class="tag eng">needs engine work</span></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">÷ multiples</span><span class="key">Ctrl+Enter over a block</span><span class="fn">MEDIAN / MAX / MIN</span><span class="key">Ctrl+1 → 0.0x</span><span class="fn">implied value ÷</span></dd>
+<dt>What is on the grid</dt><dd>A five-peer trading comps table (EV, revenue, EBITDA) with an empty multiples block, median/high/low rows and an implied-price box; a six-deal precedent tape below with its own empty multiple column.<p class="rnd"><b>Changes every run:</b> peer and deal values · target metrics</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> All ten multiples from one Ctrl+Enter.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Multiples</b><ol><li>Build all ten multiples with one entry over the block</li><li>Format them 0.0x</li></ol></li><li><b>The range</b><ol><li>Build median, high and low</li><li>Build the implied enterprise and equity values</li><li>Build the implied share price</li></ol></li><li><b>Precedents</b><ol><li>Build the multiple paid on each deal</li><li>Build the precedent median and implied value</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-accdil">
+<div class="d-head"><span class="d-num">6.6</span><h3>Accretion / Dilution</h3></div>
+<p class="why">One analysis copied across three financing structures; a block moved as a unit.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Alt A W G (goal seek)</span><span class="fn">set cell / to value / by changing</span></dd>
-<dt>What is on the grid</dt><dd>A small model with a price input, an NPV output, a growth input and an EBITDA output; two target cells.</dd>
-<dt>How it is gamified</dt><dd><p>4 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> Both seeks without touching the mouse.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Seek the price that makes NPV zero</li><li>Seek the growth that makes EBITDA hit the target</li><li>Record both</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d6-6">
-<div class="d-head"><span class="d-num">6.6</span><h3>Comps</h3></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+C / Ctrl+V a block</span><span class="fn">foregone interest</span><span class="fn">pro forma EPS</span><span class="fn">accretion ÷ − 1</span><span class="key">Ctrl+Shift+%</span><span class="key">Ctrl+Shift+↓</span></dd>
+<dt>What is on the grid</dt><dd>Three financing structures side by side filling the page (all cash, mixed, all stock); the first has its lines built, the other two are empty; a summary row across the foot.<p class="rnd"><b>Changes every run:</b> deal terms · structure mixes</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The block copied onto both structures in one paste.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>The first structure</b><ol><li>Build foregone interest</li><li>Build pro forma net income and shares</li><li>Build pro forma EPS and accretion</li></ol></li><li><b>Copy across</b><ol><li>Copy the block onto the other two structures in one paste</li><li>Confirm each recalculates on its own terms</li></ol></li><li><b>Summarise</b><ol><li>Percent-format the accretion lines</li><li>Flag the most accretive structure</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-pitchpage">
+<div class="d-head"><span class="d-num">6.7</span><h3>The Valuation Page</h3><span class="tag cap">capstone</span></div>
+<p class="why">One page that references every method&#x27;s output, never retypes it, and shows the range floor to ceiling.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">÷ multiples</span><span class="key">Ctrl+Enter over a block</span><span class="fn">MEDIAN / MAX / MIN</span><span class="key">Ctrl+1 → 0.0x</span></dd>
-<dt>What is on the grid</dt><dd>A five-peer trading comps table: EV, revenue, EBITDA; an empty multiples block; median, high and low rows; an implied-price box.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> All ten multiples from one Ctrl+Enter.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build all multiples with one entry over the block</li><li>Build median, high, low</li><li>Build implied values</li><li>Format the multiples 0.0x</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d6-7">
-<div class="d-head"><span class="d-num">6.7</span><h3>Accretion / Dilution</h3></div>
-
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+C / Ctrl+V a block</span><span class="fn">accretion ÷ − 1</span><span class="key">Ctrl+Shift+%</span><span class="key">Ctrl+Shift+↓</span></dd>
-<dt>What is on the grid</dt><dd>Three financing structures side by side (all cash, mixed, all stock); the first has its lines built, the other two are empty.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The block copied onto both structures in one paste.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build the first structure</li><li>Copy the block onto the other two</li><li>Build the accretion line</li><li>Percent-format</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d6-8">
-<div class="d-head"><span class="d-num">6.8</span><h3>Returns Bridge</h3></div>
-
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">lever formulas</span><span class="fn">SUM</span><span class="fn">share ÷ anchored total</span><span class="fn">check = 0</span><span class="key">Ctrl+D</span></dd>
-<dt>What is on the grid</dt><dd>An entry and exit block for a deal, three empty lever lines, a total, a share column and a check cell.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The share column from one anchored formula.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build each lever</li><li>Total them</li><li>Build the share column</li><li>Enter the check</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d6-9">
-<div class="d-head"><span class="d-num">6.9</span><h3>The Valuation Page</h3><span class="tag cap">capstone</span></div>
-
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">references (never retype)</span><span class="fn">MIN / MAX floor and ceiling</span><span class="key">Ctrl+Enter</span><span class="key">Alt H B S</span></dd>
-<dt>What is on the grid</dt><dd>A one-page valuation summary: four methods down, low / mid / high across, floor and ceiling cells, a premium column.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The whole page referenced from one selection with Ctrl+Enter.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Reference each method&#x27;s low, mid and high</li><li>Build the floor and ceiling</li><li>Build the premium column</li><li>Format and box it</li><li>Save</li></ol></dd>
-</dl></article></section><section class="chapter" id="ch7"><header class="ch-head"><div class="ch-num">Chapter 7</div><h2>Models II</h2><span class="tier pro">PRO</span><p>Credit, and the roll-forward as a pattern: every schedule is opening plus adds minus subs equals closing.</p></header><article class="drill" id="d7-1">
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">references (never retype)</span><span class="fn">MIN / MAX</span><span class="key">Ctrl+Enter</span><span class="key">Alt H B S</span></dd>
+<dt>What is on the grid</dt><dd>A one-page valuation summary: four methods down, low / mid / high across, floor and ceiling cells, a premium column, all fed from output cells elsewhere on the page.<p class="rnd"><b>Changes every run:</b> method outputs</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 5 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The whole page referenced from one selection with Ctrl+Enter.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Reference</b><ol><li>Reference each method&#x27;s low, mid and high with one selection</li></ol></li><li><b>Range</b><ol><li>Build the floor and ceiling</li><li>Build the premium column</li></ol></li><li><b>Dress</b><ol><li>Format and box it</li><li>Save</li></ol></li></ol></dd>
+</dl></article></section><section class="chapter" id="ch7"><header class="ch-head"><div class="ch-num">Chapter 7</div><h2>Models II</h2><span class="tier pro">PRO</span><p>Credit, and the roll-forward as a pattern: every schedule is opening plus adds minus subs equals closing.</p></header><article class="drill" id="d-rollfwd">
 <div class="d-head"><span class="d-num">7.1</span><h3>Roll Forward</h3></div>
-
+<p class="why">Opening plus additions minus reductions equals closing; next period&#x27;s opening references the last closing; interest off the beginning balance so nothing goes circular.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">opening = prior closing</span><span class="key">closing = opening + adds − subs</span><span class="fn">interest × beginning balance</span><span class="key">Ctrl+R</span><span class="key">Alt H F C (green)</span></dd>
-<dt>What is on the grid</dt><dd>One balance line across five years: opening, additions, reductions, closing, and an interest line that currently points at the closing balance.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The whole corkscrew from one formula pair.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build the closing balance</li><li>Reference next year&#x27;s opening to it</li><li>Build interest off the beginning balance</li><li>Fill the roll</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d7-2">
-<div class="d-head"><span class="d-num">7.2</span><h3>Fixed Assets</h3></div>
-
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">corkscrew</span><span class="fn">depreciation ÷ life</span><span class="fn">accumulated memo</span><span class="key">Ctrl+R</span></dd>
-<dt>What is on the grid</dt><dd>A capex plan row above an empty fixed-asset schedule: opening, capex, depreciation, closing, accumulated depreciation memo.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> All four lines from one fill.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build depreciation</li><li>Build the ending balance</li><li>Reference each opening</li><li>Build the accumulated depreciation memo</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d7-3">
-<div class="d-head"><span class="d-num">7.3</span><h3>Interest &amp; Coverage</h3></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">opening = prior closing</span><span class="fn">closing = opening + adds − subs</span><span class="fn">interest × beginning balance</span><span class="fn">depreciation ÷ life</span><span class="key">Ctrl+R</span><span class="key">Alt H F C (green)</span></dd>
+<dt>What is on the grid</dt><dd>Two schedules on one page: a balance roll across five years with an interest line that currently points at the closing balance (circular), and a fixed-asset schedule below with a capex plan row and empty opening, capex, depreciation, closing and accumulated-depreciation lines.<p class="rnd"><b>Changes every run:</b> starting balances · capex plan · lives</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 9 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The whole corkscrew from one formula pair.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>The pattern</b><ol><li>Build the closing balance</li><li>Reference next year&#x27;s opening to it</li><li>Fill the roll</li></ol></li><li><b>Break the circle</b><ol><li>Build interest off the beginning balance</li><li>Colour the fix green</li></ol></li><li><b>Fixed assets</b><ol><li>Build depreciation off the capex and life</li><li>Build the closing and accumulated lines</li><li>Fill across</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-intsched">
+<div class="d-head"><span class="d-num">7.2</span><h3>Interest &amp; Coverage</h3></div>
+<p class="why">Interest on the beginning balance; coverage with a cap and a floor.</p>
 <dl>
 <dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">beginning-balance interest</span><span class="fn">MIN / MAX coverage</span><span class="key">Ctrl+R</span><span class="key">Ctrl+B</span></dd>
-<dt>What is on the grid</dt><dd>A term-loan block: beginning debt, repayment, ending debt, cash interest, EBITDA, coverage; a cap and a floor cell.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The coverage line in one formula.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build ending debt</li><li>Build beginning debt</li><li>Build cash interest</li><li>Build coverage with MIN/MAX</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d7-4">
-<div class="d-head"><span class="d-num">7.4</span><h3>Revolver</h3></div>
-
+<dt>What is on the grid</dt><dd>A term-loan block filling the page: beginning debt, repayment, ending debt, cash interest, EBITDA, coverage, a cap and a floor cell, a covenant test line.<p class="rnd"><b>Changes every run:</b> balances · rates · EBITDA path</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The coverage line in one formula.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>The roll</b><ol><li>Build ending debt</li><li>Build beginning debt off the prior close</li><li>Fill across</li></ol></li><li><b>Interest</b><ol><li>Build cash interest off the beginning balance</li><li>Fill across</li></ol></li><li><b>Coverage</b><ol><li>Build coverage with the cap and floor</li><li>Flag the covenant test</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-revolver">
+<div class="d-head"><span class="d-num">7.3</span><h3>Revolver</h3></div>
+<p class="why">MAX and MIN as draw and sweep, with a minimum cash balance.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">MAX(0, …) draw</span><span class="fn">MIN(…) sweep</span><span class="key">Ctrl+R</span></dd>
-<dt>What is on the grid</dt><dd>A revolver page: opening balance, cash before revolver, minimum cash, empty draw, sweep, ending balance and post-revolver cash lines.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The schedule across in one pass.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build the draw</li><li>Build the sweep</li><li>Build the ending balance</li><li>Build post-revolver cash</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d7-5">
-<div class="d-head"><span class="d-num">7.5</span><h3>Waterfall</h3></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">MAX(0, …) draw</span><span class="fn">MIN(…) sweep</span><span class="fn">minimum cash</span><span class="key">Ctrl+R</span></dd>
+<dt>What is on the grid</dt><dd>A revolver page filling the grid: opening balance, cash before revolver, minimum cash, capacity; empty draw, sweep, ending balance and post-revolver cash lines across five years.<p class="rnd"><b>Changes every run:</b> cash path · capacity · minimum</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 7 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The schedule across in one pass.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Draw</b><ol><li>Build the draw against minimum cash</li><li>Cap it at capacity</li></ol></li><li><b>Sweep</b><ol><li>Build the sweep</li><li>Build the ending balance</li></ol></li><li><b>Cash</b><ol><li>Build post-revolver cash</li><li>Fill the schedule across</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-waterfall">
+<div class="d-head"><span class="d-num">7.4</span><h3>Waterfall</h3></div>
+<p class="why">Paying down tranches in order with MIN; nothing paid twice.</p>
 <dl>
 <dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">MIN cascade</span><span class="fn">roll-forwards</span><span class="fn">check: applied = repaid</span><span class="fn">copy senior → junior</span></dd>
-<dt>What is on the grid</dt><dd>Two tranches (senior, junior) across three years: cash available, empty paydown and roll-forward lines for each, a check cell.</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The junior tranche built by copying the senior pair.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Total cash available</li><li>Pay the senior tranche, never more than owed</li><li>Pay the junior from what is left</li><li>Roll both forward</li><li>Enter the check: applied equals repaid</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d7-6">
-<div class="d-head"><span class="d-num">7.6</span><h3>Covenant Flags</h3></div>
+<dt>What is on the grid</dt><dd>Two tranches (senior, junior) across three years filling the page: cash available, empty paydown and roll-forward lines for each, a check cell.<p class="rnd"><b>Changes every run:</b> cash path · tranche sizes</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 7 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The junior tranche built by copying the senior pair.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Senior</b><ol><li>Total cash available</li><li>Pay the senior tranche, never more than owed</li><li>Roll it forward</li></ol></li><li><b>Junior</b><ol><li>Pay the junior from what is left by copying the senior pair</li><li>Roll it forward</li></ol></li><li><b>Prove it</b><ol><li>Enter the check: applied equals repaid</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-covtable">
+<div class="d-head"><span class="d-num">7.5</span><h3>Covenant Flags</h3></div>
 <p class="why">The credit agreement runs two tests every quarter; the page has to say pass or fail in words.</p>
 <dl>
 <dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">ratio lines</span><span class="fn">headroom MIN / MAX</span><span class="fn">IF pass / breach</span><span class="fn">MIN over quarters</span><span class="key">Alt H F C (red)</span><span class="key">F5 → Special</span></dd>
-<dt>What is on the grid</dt><dd>A covenant compliance table: two leverage tests by eight quarters, one test finished, the other empty, a tightest-quarter cell.</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> All breach cells coloured from one Go To Special on the flag column.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build the second test&#x27;s ratio line</li><li>Build headroom against the covenant</li><li>Flag each quarter pass or breach</li><li>Find the tightest quarter</li><li>Colour the breaches red</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d7-7">
-<div class="d-head"><span class="d-num">7.7</span><h3>13-Week Cash</h3></div>
-
+<dt>What is on the grid</dt><dd>A covenant compliance table filling the page: two leverage tests by eight quarters, one test finished, the other empty, a headroom row, a tightest-quarter cell, a flag row.<p class="rnd"><b>Changes every run:</b> EBITDA path · covenant levels</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 6 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> All breach cells coloured from one Go To Special on the flag row.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>The second test</b><ol><li>Build the ratio line</li><li>Build headroom against the covenant</li></ol></li><li><b>Flags</b><ol><li>Flag each quarter pass or breach</li><li>Find the tightest quarter</li></ol></li><li><b>Colour</b><ol><li>Colour every breach red in one pass</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-wk13">
+<div class="d-head"><span class="d-num">7.6</span><h3>13-Week Cash</h3></div>
+<p class="why">A weekly calendar built from one date, and a schedule keyed to it.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">date + 7</span><span class="key">Ctrl+R</span><span class="key">Alt+=</span><span class="fn">opening → closing roll</span><span class="fn">cushion line</span></dd>
-<dt>What is on the grid</dt><dd>A 13-week cash roll: receipts and disbursement lines by week, week headers missing after week one, opening and closing cash rows.</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The header and the roll each from one fill.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build week two&#x27;s date from week one</li><li>Fill the header to week 13</li><li>Total each flow line</li><li>Build the roll from opening to closing</li><li>Build the cushion line</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d7-8">
-<div class="d-head"><span class="d-num">7.8</span><h3>Full Waterfall</h3><span class="tag cap">capstone</span></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">date + 7</span><span class="fn">EOMONTH</span><span class="key">Ctrl+R</span><span class="key">Alt+=</span><span class="fn">opening → closing roll</span><span class="fn">variance vs prior</span></dd>
+<dt>What is on the grid</dt><dd>A 13-week cash roll filling the page: receipt and disbursement lines by week, week headers missing after week one, opening and closing cash rows, a prior-forecast row and an empty variance row.<p class="rnd"><b>Changes every run:</b> flows · start date</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 7 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The header and the roll each from one fill.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Calendar</b><ol><li>Build week two&#x27;s date from week one</li><li>Fill the header to week 13</li></ol></li><li><b>Flows</b><ol><li>Total each flow line</li><li>Build the roll from opening to closing</li></ol></li><li><b>Read</b><ol><li>Build the cushion line</li><li>Build the variance against the prior forecast</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-cascade">
+<div class="d-head"><span class="d-num">7.7</span><h3>Full Waterfall</h3><span class="tag cap">capstone</span></div>
+<p class="why">Three facilities, four years, seniority, roll-forwards, interest, a zero check.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">everything in chapter 7</span><span class="fn">three facilities × four years</span><span class="fn">zero check</span></dd>
-<dt>What is on the grid</dt><dd>Three facilities across four years with seniority, interest and roll-forwards, and a zero check at the bottom.</dd>
-<dt>How it is gamified</dt><dd><p>Chains everything the chapter taught into one page; one clean run opens the next chapter&#x27;s milestone.</p><p class="star">★ <b>The pro move:</b> The sanity check entered: repaid equals applied.</p></dd>
-
-</dl></article></section><section class="chapter" id="ch8"><header class="ch-head"><div class="ch-num">Chapter 8</div><h2>Full Builds</h2><span class="tier pro">PRO</span><p>Assembling and shipping a page: statements, schedules, a cover, the hand-off, sheets, protection and print.</p></header><article class="drill" id="d8-1">
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">everything in chapter 7</span><span class="fn">MIN cascade over three facilities</span><span class="fn">zero check</span></dd>
+<dt>What is on the grid</dt><dd>Three facilities across four years with seniority, interest and roll-forwards, and a zero check at the foot.<p class="rnd"><b>Changes every run:</b> cash path · facility terms</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 4 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The sanity check entered: repaid equals applied.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Cascade</b><ol><li>Pay down each facility in order</li></ol></li><li><b>Roll</b><ol><li>Roll each forward with interest</li></ol></li><li><b>Prove it</b><ol><li>Enter the check: repaid equals applied</li><li>Save</li></ol></li></ol></dd>
+</dl></article></section><section class="chapter" id="ch8"><header class="ch-head"><div class="ch-num">Chapter 8</div><h2>Full Builds</h2><span class="tier pro">PRO</span><p>Assembling and shipping a page: statements, schedules, a cover, the hand-off.</p></header><article class="drill" id="d-isbuild">
 <div class="d-head"><span class="d-num">8.1</span><h3>IS Build</h3></div>
-
+<p class="why">An income statement off a driver panel.</p>
 <dl>
 <dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">units × price</span><span class="fn">cost ratios</span><span class="key">Alt+=</span><span class="fn">linked depreciation</span><span class="fn">margin memo</span><span class="key">Ctrl+R</span></dd>
-<dt>What is on the grid</dt><dd>A projection page: the actual year in, a driver panel (units, price, cost ratios) set, five forecast years empty, depreciation linked from elsewhere.</dd>
-<dt>How it is gamified</dt><dd><p>7 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The whole statement block filled across in one pass.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build revenue from units and price</li><li>Build COGS and opex off their ratios</li><li>Total EBITDA</li><li>Build EBIT off the linked depreciation</li><li>Build the margin memo</li><li>Fill the block across the forecast</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d8-2">
+<dt>What is on the grid</dt><dd>A projection page: the actual year in, a driver panel (units, price, cost ratios) set in yellow, five forecast years empty, depreciation linked from elsewhere on the page.<p class="rnd"><b>Changes every run:</b> drivers · actuals</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 8 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The whole statement block filled across in one pass.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Revenue</b><ol><li>Build revenue from units and price</li><li>Fill across</li></ol></li><li><b>Costs</b><ol><li>Build COGS and opex off their ratios</li><li>Total EBITDA</li><li>Build EBIT off the linked depreciation</li></ol></li><li><b>Memo</b><ol><li>Build the margin memo</li><li>Fill the block across the forecast</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-nwcsched">
 <div class="d-head"><span class="d-num">8.2</span><h3>NWC Schedule</h3></div>
-
+<p class="why">Working capital off days assumptions.</p>
 <dl>
 <dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">days drivers</span><span class="fn">× / 365</span><span class="fn">SUM</span><span class="fn">change line</span><span class="key">Ctrl+R</span></dd>
-<dt>What is on the grid</dt><dd>A working-capital schedule: revenue and COGS lines, days assumptions in yellow, empty receivables, inventory, payables, NWC and change lines.</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> All five lines from one fill.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Enter the driver days</li><li>Build receivables off days sales</li><li>Build inventory and payables off their days</li><li>Total net working capital</li><li>Build the increase line the cash flow needs</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d8-3">
-<div class="d-head"><span class="d-num">8.3</span><h3>Three Statements</h3></div>
-
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">cross-block references</span><span class="fn">cash link</span><span class="fn">retained earnings roll</span><span class="fn">check row</span><span class="key">Ctrl+R</span></dd>
-<dt>What is on the grid</dt><dd>Three statements side by side (income, cash flow, balance sheet) for three years, none wired to the others, a check row.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> All four built lines from one fill each.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Reference net income into the cash flow</li><li>Build the cash link</li><li>Build the retained earnings roll</li><li>Build the check row</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d8-4">
-<div class="d-head"><span class="d-num">8.4</span><h3>Debt Block</h3></div>
-
+<dt>What is on the grid</dt><dd>A working-capital schedule: revenue and COGS lines, days assumptions in yellow, empty receivables, inventory, payables, NWC and change lines.<p class="rnd"><b>Changes every run:</b> days · revenue path</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 6 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> All five lines from one fill.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Drivers</b><ol><li>Enter the driver days</li><li>Build receivables off days sales</li></ol></li><li><b>Lines</b><ol><li>Build inventory and payables off their days</li><li>Total net working capital</li></ol></li><li><b>Cash</b><ol><li>Build the increase line the cash flow needs</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-debtblock">
+<div class="d-head"><span class="d-num">8.3</span><h3>Debt Block</h3></div>
+<p class="why">Term loan and revolver together: two rolls, two interest lines, totals.</p>
 <dl>
 <dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">two rolls</span><span class="fn">beginning-balance interest</span><span class="fn">SUM</span><span class="fn">copy term loan → revolver</span></dd>
-<dt>What is on the grid</dt><dd>A debt block: term loan and revolver rolls across five years, two rate cells, interest lines, totals.</dd>
-<dt>How it is gamified</dt><dd><p>6 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The revolver rows built by copying the term-loan rows.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Enter the two rates</li><li>Build the term-loan roll</li><li>Build the revolver roll</li><li>Build both interest lines off beginning balances</li><li>Total debt and total interest</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d8-5">
-<div class="d-head"><span class="d-num">8.5</span><h3>Paper LBO</h3></div>
-
+<dt>What is on the grid</dt><dd>A debt block: term loan and revolver rolls across five years, two rate cells, interest lines, totals.<p class="rnd"><b>Changes every run:</b> balances · rates</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 6 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The revolver rows built by copying the term-loan rows.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Term loan</b><ol><li>Enter the two rates</li><li>Build the term-loan roll</li></ol></li><li><b>Revolver</b><ol><li>Build the revolver roll by copying the term-loan rows</li><li>Build both interest lines off beginning balances</li></ol></li><li><b>Totals</b><ol><li>Total debt and total interest</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-threestmt">
+<div class="d-head"><span class="d-num">8.4</span><h3>Three Statements</h3></div>
+<p class="why">Wiring net income to cash flow, cash to the balance sheet, retained earnings to the year; the check row.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">EV / net debt / equity</span><span class="fn">MOIC</span><span class="fn">IRR</span><span class="fn">IRR by hand as a check</span></dd>
-<dt>What is on the grid</dt><dd>A paper LBO page: entry and exit columns, EBITDA and multiple inputs, empty EV, net debt, equity, MOIC and IRR lines.</dd>
-<dt>How it is gamified</dt><dd><p>7 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> Both built lines across entry and exit, nothing retyped at exit.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Build enterprise value at entry and exit</li><li>Build net debt</li><li>Total sponsor equity</li><li>Build MOIC</li><li>Build IRR</li><li>Build IRR a second way as a check</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d8-6">
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">cross-block references</span><span class="fn">cash link</span><span class="fn">retained earnings roll</span><span class="fn">check row</span><span class="key">Ctrl+R</span></dd>
+<dt>What is on the grid</dt><dd>Three statements side by side (income, cash flow, balance sheet) for three years, none wired to the others, a check row.<p class="rnd"><b>Changes every run:</b> values</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 6 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> All four built lines from one fill each.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Wire</b><ol><li>Reference net income into the cash flow</li><li>Build the cash link to the balance sheet</li></ol></li><li><b>Roll</b><ol><li>Build the retained earnings roll</li></ol></li><li><b>Prove it</b><ol><li>Build the check row</li><li>Bold it</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-lbobuild">
+<div class="d-head"><span class="d-num">8.5</span><h3>Paper LBO</h3></div>
+<p class="why">Entry and exit on one page: EV, net debt, sponsor equity, MOIC, IRR, and where the return came from.</p>
+<dl>
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">EV / net debt / equity</span><span class="fn">MOIC</span><span class="fn">IRR</span><span class="fn">IRR by hand as a check</span><span class="fn">lever attribution</span><span class="fn">share ÷ total</span></dd>
+<dt>What is on the grid</dt><dd>A paper LBO page: entry and exit columns, EBITDA and multiple inputs, empty EV, net debt, equity, MOIC and IRR lines; a returns bridge block below with three empty levers and a check cell.<p class="rnd"><b>Changes every run:</b> entry terms · exit year</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 9 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Both built lines across entry and exit, nothing retyped at exit.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Entry and exit</b><ol><li>Build enterprise value at entry and exit</li><li>Build net debt</li><li>Total sponsor equity</li></ol></li><li><b>Returns</b><ol><li>Build MOIC</li><li>Build IRR</li><li>Build IRR a second way as a check</li></ol></li><li><b>Attribution</b><ol><li>Build the three levers</li><li>Total them against the gain and enter the check</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-dashcover">
 <div class="d-head"><span class="d-num">8.6</span><h3>Model Cover</h3></div>
-
+<p class="why">A cover page that references outputs and never retypes them.</p>
 <dl>
 <dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">= references to outputs</span><span class="key">Ctrl+Enter</span><span class="key">Alt H K / Ctrl+Shift+%</span><span class="fn">&amp; title from a cell</span></dd>
-<dt>What is on the grid</dt><dd>An IC pack cover: six headline metrics by two cases, a title cell, a deal-name cell to build the title from.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> The whole cover box from one selection.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Reference the six outputs</li><li>Format each line</li><li>Build the title from the deal name cell</li><li>Bold the title</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d8-7">
-<div class="d-head"><span class="d-num">8.7</span><h3>Hand-off</h3> <span class="tag eng">needs engine work</span></div>
-
+<dt>What is on the grid</dt><dd>An IC pack cover: six headline metrics by two cases, a title cell, a deal-name cell to build the title from.<p class="rnd"><b>Changes every run:</b> outputs · deal name</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 5 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The whole cover box from one selection.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Reference</b><ol><li>Reference the six outputs in one selection</li></ol></li><li><b>Format</b><ol><li>Format each line</li></ol></li><li><b>Title</b><ol><li>Build the title from the deal name cell</li><li>Bold it</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-handoff">
+<div class="d-head"><span class="d-num">8.7</span><h3>Hand-off</h3><span class="tag eng" title="freeze panes, multiple sheets, protect sheet, print setup">needs engine work: freeze panes, multiple sheets, protect sheet, print setup</span></div>
+<p class="why">The last thing every analyst does on every file, and nothing teaches it: values, colours, names, groups, a header that stays put, inputs on their own sheet, locked and printable.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+Alt+V values + formats</span><span class="key">Alt H F C (blue)</span><span class="key">Ctrl+H</span><span class="key">Alt+Shift+→</span><span class="key">F5 → Special → Formulas</span><span class="key">Alt W F F (freeze)</span></dd>
-<dt>What is on the grid</dt><dd>A finished outputs page carrying live formulas and the project codename, a detail band below it, a header row.</dd>
-<dt>How it is gamified</dt><dd><p>7 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> Values and formats pasted in one Paste Special visit.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Paste the outputs page as values</li><li>Blue the hardcodes it now carries</li><li>Replace the codename with the client name everywhere</li><li>Group and fold the detail</li><li>Go to every remaining formula and confirm none reaches off-page</li><li>Freeze the header</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d8-8">
-<div class="d-head"><span class="d-num">8.8</span><h3>Sheets</h3> <span class="tag eng">needs engine work</span></div>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+Alt+V values + formats</span><span class="key">Alt H F C (blue)</span><span class="key">Ctrl+H</span><span class="key">Alt+Shift+→</span><span class="key">F5 → Special → Formulas</span><span class="key">Alt W F F (freeze)</span><span class="key">Shift+F11 (new sheet)</span><span class="key">Ctrl+PgUp / PgDn</span><span class="key">Alt R P S (protect)</span><span class="key">Alt P R S (print area)</span></dd>
+<dt>What is on the grid</dt><dd>A finished outputs page carrying live formulas and the project codename, a detail band below it, a header row, an inputs block mixed into the build, and the client&#x27;s name in a note.<p class="rnd"><b>Changes every run:</b> codename · which cells are hardcodes</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 10 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> Values and formats pasted in one Paste Special visit.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Values</b><ol><li>Paste the outputs page as values</li><li>Blue the hardcodes it now carries</li><li>Replace the codename with the client name everywhere</li></ol></li><li><b>Structure</b><ol><li>Group and fold the detail</li><li>Move the inputs block to its own sheet and re-point the build</li><li>Freeze the header row</li></ol></li><li><b>Lock and print</b><ol><li>Confirm no remaining formula reaches off-page</li><li>Unlock the inputs and protect the sheet</li><li>Set the print area and fit to one page</li><li>Save</li></ol></li></ol></dd>
+</dl></article><article class="drill" id="d-shipit">
+<div class="d-head"><span class="d-num">8.8</span><h3>Ship the Model</h3><span class="tag cap">capstone</span></div>
+<p class="why">A mini three-statement model plus a headline box: drivers, both sides, the cash link, the zero check, a values hand-off.</p>
 <dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Shift+F11 (new sheet)</span><span class="key">Alt H O R (rename)</span><span class="key">Ctrl+PgUp / PgDn</span><span class="fn">Sheet2!A1 references</span></dd>
-<dt>What is on the grid</dt><dd>A single-sheet model with the inputs block mixed into the build; a second sheet to create and move them to.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> Every sheet change by keyboard.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Insert a sheet and name it</li><li>Move the inputs block to it</li><li>Re-point the build at the new sheet</li><li>Return to the summary</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d8-9">
-<div class="d-head"><span class="d-num">8.9</span><h3>Protect &amp; Print</h3> <span class="tag eng">needs engine work</span></div>
-
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="key">Ctrl+1 → Protection (unlock)</span><span class="key">Alt R P S (protect sheet)</span><span class="key">Alt P R S (print area)</span><span class="key">Alt P S C (fit to page)</span></dd>
-<dt>What is on the grid</dt><dd>A finished one-page model with yellow input cells, ready to lock and print.</dd>
-<dt>How it is gamified</dt><dd><p>5 outcomes in two or three steps; each lights on the finished state, never on a keypress.</p><p class="star">★ <b>The pro move:</b> Inputs unlocked in one Go To Special selection.</p></dd>
-<dt>The player&#8217;s steps</dt><dd><ol><li>Unlock the yellow inputs</li><li>Protect the sheet</li><li>Set the print area</li><li>Fit to one page wide</li><li>Save</li></ol></dd>
-</dl></article><article class="drill" id="d8-10">
-<div class="d-head"><span class="d-num">8.10</span><h3>Ship the Model</h3><span class="tag cap">capstone</span></div>
-
-<dl>
-<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">everything in chapter 8</span><span class="fn">drivers → statements → cash link → zero check</span><span class="fn">values hand-off</span></dd>
-<dt>What is on the grid</dt><dd>A mini three-statement model with a driver panel and a headline box; a blank hand-off page beside it.</dd>
-<dt>How it is gamified</dt><dd><p>Chains everything the chapter taught into one page; one clean run opens the next chapter&#x27;s milestone.</p><p class="star">★ <b>The pro move:</b> The hand-off page pasted as values with formats in one visit.</p></dd>
-
+<dt>Functions &amp; keys tested</dt><dd class="fns"><span class="fn">everything in chapter 8</span></dd>
+<dt>What is on the grid</dt><dd>A mini three-statement model with a driver panel and a headline box; a blank hand-off page beside it.<p class="rnd"><b>Changes every run:</b> drivers</p></dd>
+<dt>How it is gamified</dt><dd><p>Three steps, 5 outcomes, each graded on the finished state of the page, never on a keypress. The next step's part of the page appears when the previous one is done; the clock runs from the first key and the run posts to the drill's board.</p><p class="star">★ <b>The pro move:</b> The hand-off page pasted as values with formats in one visit.</p></dd>
+<dt>The player&#8217;s steps</dt><dd><ol class="steps"><li><b>Build</b><ol><li>Drivers to statements</li><li>Cash link</li><li>Zero check</li></ol></li><li><b>Ship</b><ol><li>Hand-off page as values</li><li>Save</li></ol></li></ol></dd>
 </dl></article></section></main>
 </div>
