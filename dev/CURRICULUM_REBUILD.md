@@ -109,6 +109,15 @@ retires into it; `e2e-depth-mechanics` asserts steps and hints, not cards. Super
 
 ## 2 · The phases (each = one PR, gate green, Wolf playtest between)
 
+| phase | status (r455 close, 2026-09-04) |
+|---|---|
+| A — curriculum map | done |
+| B — clean-slate entry | **landed** (step/act controller; rename `S.act`→`S.step` in flight) |
+| C — lesson wave + re-cut | not started |
+| D — progression ties | not started |
+| E — launch homepage | **landing v3.1 shipped**, ahead of C |
+| F — rank art | round 2 + touch-ups shipped; `themes.js` sprite wiring not started |
+
 ### Phase A — the curriculum map (spec, one session, Wolf review)
 - Produce `dev/CURRICULUM_V3.md`: the nine chapters, every drill's placement (all 74 + the Tour +
   the lesson drills + the five capstones = 74 + 6 lessons + 5 capstones ≈ 85), each drill's

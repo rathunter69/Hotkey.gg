@@ -7,6 +7,14 @@ local server; `../themes.js` supplies today's crests for the side-by-side) and i
 `art/rank-pixel-proto-dark.png` / `-light.png`. Spec history: `dev/ART_SPEC.md` (r118 — the
 LoL-grade commissioning brief), `art/rank-proto.html` (iteration 8 of the crests that shipped)._
 
+## 0 · Status (r455, 2026-09-04)
+Wolf narrowed pixel art to identity assets only — rank, level, achievements, player card, favicon
+(`dev/CURRICULUM_REBUILD.md` §1c) — superseding this memo's original everywhere-pixel scope; the
+drill surface keeps its original chrome. §7a (hand-drawn round 2) + §7b (touch-ups) SHIP; §7's
+EPX-upscaled round 1 is rejected/superseded. Still weak: combo at 1×/2×, cert at 32. **Not
+started:** wiring the sprites into `themes.js` (`hkBadge`/`hkGlyph`/`hkLevelChip`/`rankEmblem`)
+behind a flag.
+
 ## 1 · What exists today
 
 Eight generative SVG **heraldic crests** (`themes.js` `rankEmblem(name, size, bucket)`, ~120 lines
