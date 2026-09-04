@@ -177,8 +177,20 @@ function installOverlayGuards() {
     } catch (e) {}   // robust to a fade in progress; never fail the measurement over this alone
     const c = await clipFor(flags, edge);
     if (c.err) return { err: c.err, px: -1, cls: '' };
-    const shot = await page.screenshot({ clip: c.clip });
-    const m = await paintedPx(shot, edge);
+    /* r456: a border edge is painted by render()'s ::after overlay a frame or two after the class
+       lands; on a slow CI runner one shot in ~40 sampled the RIGHT edge of .ball before that paint
+       and read 0.00px (b2e7e86 was green, e5302de red on the same code). When a border flag is set
+       and the band reads empty, wait two frames and re-shoot — up to three times. An unformatted
+       cell (no flags) is never retried, so a genuinely missing rule still fails. */
+    const wantInk = Object.keys(flags || {}).length > 0;
+    let m = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const shot = await page.screenshot({ clip: c.clip });
+      m = await paintedPx(shot, edge);
+      if (!wantInk || m.run > 0 || attempt === 2) break;
+      await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+      await page.waitForTimeout(120);
+    }
     return { px: m.run, ink: m.ink, cls: c.cls };
   }
 
