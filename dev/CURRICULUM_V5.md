@@ -444,17 +444,7 @@ _Valuation mechanics, one Excel move per page: statistics, discounting, NPV and 
 - **Step 3 — WACC.** Build cost of equity · Build after-tax cost of debt · Build WACC · Save
 - **☆** The unlevering column from one anchored formula.
 
-### 6.2 DCF *(kept · absorbs uFCF and dcfbuild)*
-- **Why.** From EBIT to enterprise value on one page: the cash row, the discount factors with the exponent, the terminal value, the bridge to equity.
-- **Functions & keys.** ^ (exponent) · 1/(1+r)^n · SUMPRODUCT · NPV as a check · F4 · Ctrl+R
-- **On the grid.** A five-year DCF filling the page: EBIT, tax, D&A, capex and working-capital lines; an empty unlevered free cash flow line; a rate cell; empty discount-factor and present-value rows; a terminal value block; an equity bridge with net debt and share count.
-- **Random.** operating values · rate · net debt
-- **Step 1 — Cash.** Build the cash-tax line · Build NOPAT and unlevered free cash flow · Fill the block across
-- **Step 2 — Discount.** Build the discount-factor row with the rate anchored · Build present values · Build and discount the terminal value
-- **Step 3 — Bridge.** Total enterprise value · Bridge to equity value and price per share · Check the total with NPV · Save
-- **☆** Every factor from one formula with the rate anchored.
-
-### 6.3 NPV, IRR & Payback *(new)*
+### 6.2 NPV, IRR & Payback *(new)*
 - **Why.** The professional's business case: does the project clear the hurdle, when does it pay back, and what does the financing cost each month.
 - **Functions & keys.** NPV · IRR · cumulative cash (payback) · PMT · IF · Ctrl+Shift+%
 - **On the grid.** A capex proposal filling the page: an initial outlay, five years of cash flow, a hurdle-rate cell, a financing block (amount, rate, term), an empty decision box (NPV, IRR, payback year, monthly payment, verdict), and a small two-case comparison beside it.
@@ -464,6 +454,16 @@ _Valuation mechanics, one Excel move per page: statistics, discounting, NPV and 
 - **Step 3 — Decide.** Build the monthly payment on the financing · Flag the verdict against the hurdle · Copy the block onto the second case · Save
 - **☆** NPV built once and re-used by the verdict.
 - `engine:` PMT
+
+### 6.3 DCF *(kept · absorbs uFCF and dcfbuild)*
+- **Why.** From EBIT to enterprise value on one page: the cash row, the discount factors with the exponent, the terminal value, the bridge to equity.
+- **Functions & keys.** ^ (exponent) · 1/(1+r)^n · SUMPRODUCT · NPV as a check · F4 · Ctrl+R
+- **On the grid.** A five-year DCF filling the page: EBIT, tax, D&A, capex and working-capital lines; an empty unlevered free cash flow line; a rate cell; empty discount-factor and present-value rows; a terminal value block; an equity bridge with net debt and share count.
+- **Random.** operating values · rate · net debt
+- **Step 1 — Cash.** Build the cash-tax line · Build NOPAT and unlevered free cash flow · Fill the block across
+- **Step 2 — Discount.** Build the discount-factor row with the rate anchored · Build present values · Build and discount the terminal value
+- **Step 3 — Bridge.** Total enterprise value · Bridge to equity value and price per share · Check the total with NPV · Save
+- **☆** Every factor from one formula with the rate anchored.
 
 ### 6.4 Sensitivity & Goal Seek *(kept · absorbs goal seek)*
 - **Why.** Stress the answer two ways, then solve backwards for the input that hits a target.
