@@ -290,11 +290,10 @@ floor on consistency, not a ceiling on craft. Where a form is organic (flame, cr
 silhouette is hand-typed; where it is geometric (target, sun, ring, plate) it is generated from
 primitives — both land in the same array.
 
-**A second master is worth drawing by hand.** The prototype hand-draws six 32×32 masters (speed,
-streak, crown, cert, formula, moon) and derives the other twelve by EPX/scale2x from their 16
-masters. Put side by side, the hand pass wins clearly — it is the difference between "the 16 sprite,
-bigger" and "a drawing with detail". Budget the hand pass for all 18; the EPX derivation is the
-fallback that makes a half-finished set still look intentional.
+**Every master is drawn by hand at its own size** (r455, §7a.1). The r454 prototype derived
+twelve 32s from their 16s by EPX; put beside the six hand-drawn ones the difference was the whole
+verdict, and the round was rejected on it. There is no fallback: a size that has not been drawn
+is a size that does not exist yet.
 
 ### 7.6 · The rarity ring — pixel grammar
 
@@ -315,10 +314,9 @@ The r384 finding survives intact: **the ring is the only place rarity is allowed
 ### 7.7 · Colour axis — the medal set
 
 r384 retired per-family colour ("the wall read as a rainbow") and made every earned medal one
-engraved steel. That law holds in pixels: the default ramp for all 18 category glyphs is **`mono`**,
-and the accent char lifts to a brighter steel rather than a hue. Band 2 of the prototype puts the
-mono row above the family-tinted row so the call can be made from the picture, not the argument
-(see decision B2).
+engraved steel. **Reversed in r455 (§7a.6)**: each category carries its family hue as the object's own
+material, and the rarity ring alone carries rarity. `mono` stays a legal ramp; band 2 of the prototype
+keeps it above the family row for reference.
 
 ### 7.8 · Animation
 
@@ -441,3 +439,117 @@ moment. The medal clocks are *state* (which tier a time held); state that blinks
 row is noise. The streak flame is the third and it should animate at 2 frames — it already carries
 the "you are on a run" read, and a still flame in a pixel set looks unfinished. Everything else
 holds still, and everything that moves obeys `prefers-reduced-motion`.
+
+---
+
+## 7a · The hand-drawn style contract (r455) — supersedes every part of §7 it contradicts
+
+_Wolf on the r454 prototype: "Don't love those assets — some of them look kind of stretched and weird.
+The favicon seems okay. I want it to look like hand drawn pixel art bespoke for the project."_
+
+Why round 1 failed, precisely: (1) only 7 of the 18 achievement glyphs had a hand-drawn 32 master —
+the other 11 were EPX-upscaled from a 16, and EPX smears every diagonal into the "stretched" read;
+(2) the 16s were re-cuts of the generic SVG **symbols** (hexagon badge + abstract glyph) rather than
+drawings of things. Round 2 (`art/asset-pixel-proto.html`, `art/asset-style-sheet.png`) is drawn
+under the following contract. Where §7.5 ("EPX derivation is the fallback") and §7.7 ("the default
+ramp for all 18 glyphs is `mono`") disagree with this section, **this section wins**.
+
+### 7a.1 · Every size is its own drawing
+
+**No algorithmic upscaling anywhere — not EPX, not scale2x, not nearest-neighbour from a smaller
+master.** The card/reveal master is drawn at **32×32**; the chip master is drawn at **16×16**; a 64
+hero master, when it comes, is drawn at 64. A 16 is not the 32 shrunk and a 32 is not the 16 grown:
+the 16 keeps the silhouette and drops the detail by *decision* (the combo chain goes, the target
+keeps its arrow, the mug keeps its four dots). The renderer only ever scales by an integer (§7.2).
+
+### 7a.2 · Every glyph is an object
+
+Each category glyph is a **physical object with volume, seen from a 3/4 top-left view**, that belongs
+on the hotkey.gg desk: keycaps, spreadsheet cells, ledgers, calculator tape, stopwatches, coffee,
+desk lamps, trophies, ribbons, seals, scrolls, coins, gems. A symbol (a Σ, a ⚡, a ☆) may appear
+only as something *on* an object — the Σ is carved into a stone tablet, the ⚡ is the legend on a
+keycap. The shipped set:
+
+| glyph | object | family | | glyph | object | family |
+|---|---|---|---|---|---|---|
+| speed | gold keycap, ⚡ legend, motion lines | gold | | daily | desk calendar, torn leaf, ring binding | gold |
+| rapid | steel stopwatch, lit gold dial | steel | | crown | crown on a red cushion | gold |
+| perfect | cut cyan gem on a stone plinth | cyan | | cert | rolled diploma, gold ribbon, red wax seal | red |
+| accuracy | archery target on a stand, one arrow | red | | formula | Σ carved into a stone tablet | green |
+| explorer | folded map, red pin, dotted route | green | | mastery | mortarboard + tassel on a book | bronze |
+| combo | three keycaps pressed in sequence | steel | | moon | crescent beside a lit desk lamp | violet |
+| comeback | rising bars on a plinth, gold arrow | green | | ice | frosted keycap, snowflake legend, icicles | cyan |
+| streak | flame burning on a keycap | red | | mouse | a mouse wearing the red X | steel |
+| volume | three ledgers stacked | green | | founder | coffee mug with the four brand dots | (brand) |
+
+### 7a.3 · Canvas, fill, baseline, shadow
+
+- **32**: the object fills **24–28 px** of the canvas; its lowest ink row is **row 27**; **row 28** is
+  a 1-row cast shadow (`s` → `--px-shadow`, a translucent ink so it sits on every theme).
+- **16**: the object fills **12–14 px**; lowest ink row **13**; shadow **row 14**.
+- Things that hang (the crescent, the diamond clock) may float above the baseline; the shadow then
+  falls under whatever does touch the ground (the lamp, the plinth).
+
+### 7a.4 · Line, light, tone
+
+- A **1-px ink outline (`o`, `#14161a` on light themes, `#2a2e35` on dark)** closes the whole
+  silhouette. **Interior edges use the shade tone, never ink** — a seal on a ribbon is edged in the
+  seal's own dark, a keycap's top/front crease is a tone change. Ink inside an object is allowed
+  only for a legend, a keyhole, a numeral: things that *are* ink.
+- **Light from top-left.** Highlight tone on the top-left face, mid tone on the front, shade tone on
+  the right/bottom face. A box is drawn oblique: the top face two rows deep and shifted right, the
+  right side one to two columns wide, the corner slants no longer than 3 px.
+- **Three tones per hue + ink + one highlight.** A sprite's *family* material uses the ramp chars
+  `d m l` (and `h` only as the single brightest point); any second or third material uses the fixed
+  chars of the house palette (greys `1‥5`, gold `a b c`, red `e f g`, green `i j k`, bronze
+  `n u v`, cyan `x z`, violet `X Z V`, paper `p q`). **One or two `w` spark pixels** per sprite, never
+  more.
+- **Palette = the 24 of §7.3 plus two**: `p1 #eee2c2` paper and `p0 #c9b283` paper·shade — the
+  scroll, the ledger pages, the calendar leaf, the map's dotted route. No further additions without
+  a motif that cannot be drawn otherwise; the budget was four, two were spent.
+
+### 7a.5 · Curves and diagonals
+
+- **No 1-px-wide 45° diagonal longer than 3 px without a 2-px step** — a run of 4+ single-stepped
+  ink cells reads as a jaggy. A diagonal stroke is drawn as 2×2 or 3×2 blocks stepping two cells at
+  a time (the Σ's slant, the comeback arrow's shaft); an oblique edge is a 2-then-1 stair.
+- **Curves are stepped as pixel circles** (1-2-3 runs: a horizontal run, then 2, then 1, then a
+  vertical run), never mirrored blobs. Two sprites with the same silhouette mirrored are one sprite
+  drawn lazily; the two side points of the crown differ in shade, not just position.
+- **No perfectly symmetric mirror-blobs**: an object has a lit side and a shaded side, and its
+  outline shows it.
+
+### 7a.6 · Colour: family tint on the object, rarity on the ring
+
+The founder's call for the medal wall reverses §7.7: **each category carries its family hue** (the
+table in 7a.2) and **the rarity RING alone carries rarity**, in `HK_RARITY` verbatim. `mono` remains
+a legal ramp (it greys only the family material; paper, gold trim and second hues keep their colour)
+and is kept on the prototype's band 2 for reference only.
+
+### 7a.7 · The rings, chips and UI set follow the same hand
+
+- The **rarity ring** keeps the r454 grammar (ticks → frame → beads → double → fins + crown) but is
+  **placed cell by cell at 32 (a 40 box) and again at 16 (a 20 box)**; the 16 ring is not the 32
+  shrunk. Common = L-bracket corner ticks; rare = 1-px chamfered frame; epic = + 2×2 corner beads;
+  legendary = double frame + beads; mythic = + mid-edge fins + a four-point crown at the apex.
+- The **level chip** is a hand-drawn tier-metal **keycap plate** with the numeral cut in **ink** on its
+  top face (Undertale chrome: type on a solid ground, never shaded type). The **level ring** is a
+  fresh 3-cell annulus, sweep quantised to 24 cells, numeral stamped in the centre.
+- The **UI set** (pass / pro / legendary clocks, ☆ unfound and found, streak flame ×2 frames,
+  ⚔ placement, trophy, cert cap, three podium medals, lock / unlock, timer ×2 frames, target) is
+  drawn at 16 by hand as objects — a steel coin, a cut gem, a five-point star, a chalice, a
+  ribboned medal, a padlock — under the same line/light/tone rules, no baseline requirement.
+- The three animations (flame 2f, ☆ discovery 3f, clock tick 2f) are **redrawn frames**, not
+  transformed copies: the flame's lick flips side, the timer's hands move.
+
+### 7a.8 · The favicon
+
+The r209 grid mark, pixel-cut in r454, is **approved as-is** and unchanged.
+
+### 7a.9 · Process — prove the look before drawing forty things
+
+Any future pass (the eight rank replicas at 64, the mythic uniques) starts with a **six-glyph
+contact sheet** rendered old-vs-new at 1×, 2× and 4×, reviewed by eye and iterated at least twice
+*before* the rest of the set is drawn. Every sprite is checked by rule (row length, closed outline,
+45° run length, baseline row, spark count) before it is looked at, and looked at before it ships.
+The r455 sheet is `art/asset-style-sheet.png`; the checker's rules are the ones above.

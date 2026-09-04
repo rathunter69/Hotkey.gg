@@ -1,5 +1,17 @@
 # ASSET INVENTORY — every native drawn asset on hotkey.gg
 
+> **r455 · round 2 of the prototype — hand-drawn.** Round 1 (r454, the page this inventory first
+> pointed at) was rejected by Wolf on look: "some of them look kind of stretched and weird … I want it
+> to look like hand drawn pixel art bespoke for the project." Two causes, both structural: only 7 of
+> the 18 achievement 32s were drawn by hand — the other 11 were **EPX-upscaled from a 16**, and EPX
+> smears diagonals into the "stretched" read; and the 16s were **re-cuts of the SVG symbols**
+> (hexagon + abstract glyph), not drawings of objects. Round 2 redraws every master by hand at its
+> own size (18 × 32, 18 × 16, the 5 rings at both sizes, the level chip and ring, the 15-sprite UI
+> set, the three animations' frames) with **no algorithmic upscaling anywhere** and **every glyph a
+> physical object** (keycaps, ledgers, a stopwatch, a scroll, a mug). The contract is
+> `dev/ART_DIRECTION.md §7a`; the proof sheet is `art/asset-style-sheet.png`. Palette +2 (paper,
+> paper·shade). The favicon grid mark was approved as-is. Counts and call sites below are unchanged.
+
 _r454 · authored 2026-09-03 for Wolf's direction: **"re-do pixel art for ALL native assets, like the
 achievement icons as well — changing from the weird League of Legends theme to something like pixel
 art from Undertale or Shattered Pixel Dungeon — like voxel art, with some degree of detail."**_
