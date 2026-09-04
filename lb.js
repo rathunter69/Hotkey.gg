@@ -576,15 +576,9 @@ document.addEventListener('click', e=>{
 });
 
 const RANKED_MIN_LVL = (window.HK_RANK&&HK_RANK.RANKED_MIN_LVL)||10;   // r417 audit: SSOT in themes.js HK_RANK (was a comment-synced duplicate)
-function campaignComplete(){
-  try{
-    const PB=JSON.parse(localStorage.getItem('hotkey_pb')||'{}');
-    const CAMP=window.HOTKEY_CAMPAIGN, PARS=window.HOTKEY_PARS||{};
-    if(!CAMP) return false;
-    return CAMP.chapters.every(c=>c.keys.every(k=>PB[k]!==undefined && (!PARS[k] || PB[k]<=PARS[k]*CAMP.GATE)));
-  }catch(e){ return false; }
-}
-function rankedOptedIn(){ try{ return localStorage.getItem('hk_ranked')==='1'; }catch(e){ return false; } }
+/* r455: campaignComplete() and rankedOptedIn() are gone from here — window.hkRankedEntered()
+   (nav.js) is the ONE derived predicate (level >= RANKED_MIN_LVL, or window.hkCampaignComplete(),
+   or the dev unlock); this file only reads it. */
 function heroHtml(){
   const {userStat,meId,mySolves,perDrill}=DATA;
   if(!meId){
@@ -598,7 +592,10 @@ function heroHtml(){
       '</div></div>';
   }
   const me=userStat[meId]||{att:0,sum:0,crowns:0,pod:0,t10:0};
-  // RANKED GATE: RANKED_MIN_LVL unlocks Ranked; entering it shows the season-start infographic.
+  // RANKED GATE: RANKED_MIN_LVL unlocks Ranked. r455 (Wolf: "go with automatic rank at level 10"):
+  // rank is AUTOMATIC at that level — window.hkRankedEntered() (nav.js) is the one predicate and the
+  // Enter Ranked / Not yet ceremony is gone. Below the line the your-card is the unlock panel (copy +
+  // progress bar); at it, the normal card renders and the placement series simply starts.
   {
     /* r371: the gate ran a RETIRED lifetime xp ladder while every other surface uses
        HK_RANK.computeXP — same player, different level, Enter Ranked wrongly withheld. */
@@ -607,26 +604,26 @@ function heroHtml(){
       {t10:me.t10, pod:me.pod, crowns:me.crowns},
       DATA.fSessions.filter(x=>x.user_id===meId)) : 0;
     const lvl0=levelOf(xp0).lvl;
-    if(!rankedOptedIn()){
-      const campDone = campaignComplete();
-      const devUnlock=(function(){ try{ return localStorage.getItem('hk_dev_unlock')==='1'; }catch(e){ return false; } })();
-      const eligible = lvl0>=RANKED_MIN_LVL || campDone || devUnlock;
+    /* r455: write-through of the level cache the predicate reads (hk_xp_est + hk_xp_uid) — the
+       same rule nav.js hydrateLevel applies (max for the same account, SET for a different one),
+       so this panel and the nav pill can never disagree about whether the line is crossed. */
+    try{ const owner=localStorage.getItem('hk_xp_uid')||'', prev=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
+      localStorage.setItem('hk_xp_est', String((!owner||owner===meId) ? Math.max(prev,xp0) : xp0));
+      localStorage.setItem('hk_xp_uid', meId); }catch(e){}
+    if(!(window.hkRankedEntered && window.hkRankedEntered())){
       const lvlPct = Math.min(100, Math.round(100*lvl0/RANKED_MIN_LVL));
       /* r383 (Wolf: the gate copy sat at the top of a tall panel with a dead bottom):
-         .gate-body centers the pitch + CTA vertically \u2014 the same treatment the r368
-         signed-out card got. Copy, gate logic and CTAs unchanged. */
+         .gate-body centers the pitch vertically \u2014 the same treatment the r368
+         signed-out card got. */
       return '<div class="panel me"><h4>your card</h4><div class="gate-body">'+
         '<div style="font-family:var(--mono);font-size:13px;color:var(--muted);line-height:1.8">'+
-        (eligible
-          ? 'Ranked is unlocked ('+(campDone?'all milestones shipped':'LVL '+lvl0)+'). Entering shows your placement on every board you\u2019ve run \u2014 nothing is lost by waiting.'
-          : 'Ranked unlocks at <b style="color:var(--warn)">LVL '+RANKED_MIN_LVL+'</b> or by shipping every track milestone. You\u2019re LVL '+lvl0+'.')+
+        'Ranked unlocks at <b style="color:var(--warn)">LVL '+RANKED_MIN_LVL+'</b> or by shipping every track milestone. You\u2019re LVL '+lvl0+'. Placements start on their own the moment you cross it.'+
         '</div>'+
-        (!eligible?'<div style="margin-top:10px"><div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-bottom:4px">progress to LVL '+RANKED_MIN_LVL+'</div><div style="height:6px;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:'+lvlPct+'%;background:var(--accent);border-radius:99px"></div></div></div>':'')+
-        (eligible?'<div style="display:flex;gap:10px;margin-top:14px"><button class="tab on" id="enterRanked" style="font-size:13px;padding:10px 22px">\u2694 Enter Ranked</button><button class="tab" id="waitRanked" style="font-size:12px;padding:10px 18px">Not yet</button></div>':'')+
+        '<div style="margin-top:10px"><div style="font-family:var(--mono);font-size:10px;color:var(--faint);margin-bottom:4px">progress to LVL '+RANKED_MIN_LVL+'</div><div style="height:6px;background:var(--surface2);border-radius:99px;overflow:hidden"><div style="height:100%;width:'+lvlPct+'%;background:var(--accent);border-radius:99px"></div></div></div>'+
         '</div></div>';
     }
   }
-  // r336 (Wolf): STANDARDIZED PLACEMENT — once you enter ranked, your first rank is withheld
+  // r336 (Wolf): STANDARDIZED PLACEMENT — once you reach the rank level, your first rank is withheld
   // until you post a keyboard-only time on each of the five standard boards (HK_PLACEMENT):
   // the same five for every analyst, one from each band of the arc, so early ranks compare.
   {
@@ -663,8 +660,7 @@ function heroHtml(){
      as the header rank-click card — full scale, the skin riding the .uc itself, the
      5-slot medal showcase, the rank-click stat grammar. The compact variant plus the
      yc-medals / yc-boards attachments EXPANDED the card on this surface and are retired.
-     The one owner action (leave ranked) rides OUTSIDE the card on a slim bar, exactly
-     like the rank-click card's .uc-ownerbar. */
+     (r455: the slim leave-ranked bar that once rode outside the card is gone with the opt-in.) */
   let __fv=null, __lo={frame:null, show:{}, stats:[]};
   try{
     const __mp=(DATA.profs||[]).find(p=>p.id===meId);
@@ -706,9 +702,8 @@ function heroHtml(){
      is replaced by the STANDING BLOCK: tier + bucket in display type, the live rating
      under it (rating = average placement across your boards ×100, LOWER is better — the
      same number the tier roster rows speak, lb.js:881).
-     The capability is NOT stranded: leaving ranked moved to account.html's Ranked card
-     (the "ranked settings" link below points straight at it). Wolf's standing rule —
-     never remove the only path to a capability. */
+     r455: leaving ranked no longer exists (rank is automatic at LVL 10); the link below
+     points at account.html's Ranked STATUS card. */
   const __ratingTxt = (avg===null||avg===undefined||!isFinite(avg))
     ? '—' : (avg*100).toFixed(1);
   const __bucketTxt = t.bucket ? (' · '+t.bucket.toLowerCase()) : '';
@@ -718,30 +713,14 @@ function heroHtml(){
       '<div class="ucs-rank">'+esc(t.name)+'<span class="ucs-bk">'+esc(__bucketTxt)+'</span>'+
         (t.provisional?'<span class="ucs-prov">provisional</span>':'')+'</div>'+
       '<div class="ucs-rating"><b>'+__ratingTxt+'</b><span class="ucs-rl">rating · average placement across your boards, lower is better</span></div>'+
-      '<a class="ucs-set" href="account.html#ranked">ranked settings ↗</a>'+
+      '<a class="ucs-set" href="account.html#ranked">ranked status ↗</a>'+
     '</div>';
   return '<div class="panel me me-col"><div class="me-card'+(__fv?' me-bare':'')+'">'+heroCard+'</div>'+
     standing+'</div>';
 }
 
-function rankedInfographic(){
-  /* r407 (Wolf): the "Ranked Unlocked" card — the shared themes.js component (Variant C:
-     hero crest, 8-tier ladder, place/rank/climb beats, bucket byline). Opting in re-renders
-     the board (load()). Falls back to a bare opt-in if the component is missing. */
-  let reason='you’ve unlocked ranked';
-  try{ const me=(DATA&&DATA.meId&&DATA.userStat[DATA.meId])||null;
-    if(me){ const xp0=window.HK_RANK.computeXP(DATA.fRuns.filter(x=>x.user_id===DATA.meId),
-        {t10:me.t10,pod:me.pod,crowns:me.crowns}, DATA.fSessions.filter(x=>x.user_id===DATA.meId));
-      reason='Level '+levelOf(xp0).lvl+' reached'; }
-  }catch(e){}
-  if(window.hkRankedCard){
-    window.hkRankedCard({ reason,
-      onEnter:()=>{ try{ localStorage.setItem('hk_ranked','1'); }catch(e){} try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} load(); } });
-    return;
-  }
-  // fallback: bare opt-in (component not loaded)
-  try{ localStorage.setItem('hk_ranked','1'); window.hkStatePush&&window.hkStatePush(); load(); }catch(e){}
-}
+/* r455: rankedInfographic() deleted — the season-start card (themes.js hkRankedCard) is now the
+   ONE-TIME reveal nav.js plays when hkRankedEntered() first reads true; nothing here opens it. */
 
 // r452: ladderHtml() deleted — 19 lines, zero callers; the ladder renders from the standings
 // panel now. Its .ld-row/.ld-req rules in lb.css are stranded by this and go in the next
@@ -1534,13 +1513,7 @@ function renderAll(){
   try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx()); }catch(e){}  // r385: card-skin particles (hero)
   document.querySelectorAll('.ros-t').forEach(b=>b.onclick=()=>{ rosterTier=b.dataset.tier; rosterBucket=null; renderAll(); });
   document.querySelectorAll('.ros-bk').forEach(b=>b.onclick=()=>{ rosterBucket=b.dataset.bucket||null; renderAll(); });
-  const er=document.getElementById('enterRanked'); if(er) er.onclick=rankedInfographic;
-  const wr=document.getElementById('waitRanked'); if(wr) wr.onclick=()=>{};
-  /* r426 (Wolf §4b): #leaveRanked no longer renders on this page — the standing block took
-     its slot and account.html's Ranked card owns the action. The binding stays (guarded, a
-     no-op when the node is absent) so a deep link or a future surface that re-mounts the
-     control keeps working; window.hkLeaveRanked is the shared implementation. */
-  const lr=document.getElementById('leaveRanked'); if(lr) lr.onclick=()=>{ window.hkLeaveRanked(); load(); };
+  /* r455: #enterRanked / #waitRanked / #leaveRanked bindings deleted with the opt-in ceremony. */
   try{ window.scrollTo(0, __sy); }catch(e){}
 }
 function wire(){

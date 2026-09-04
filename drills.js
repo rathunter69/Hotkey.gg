@@ -448,8 +448,9 @@ window.hkPlacementRide = function(key, hasPB){
      loadChallenge — opmodel (Full Builds, LVL 11) is the 5th placement board while Ranked opens at
      LVL 10, so a ranked entrant sat at "placement 4/5" forever. One rule, two gates; the caller
      may pass its own "board is posted" test (the trainer's PB map) instead of the stored PB read.
-     The ladder gate additionally requires hk_ranked at its call site — a caller condition, not a
-     second copy of this rule (the paywall rides for any player mid-placement, per r450). */
+     The ladder gate additionally requires window.hkRankedEntered() (r455: derived — LVL 10) at its
+     call site — a caller condition, not a second copy of this rule (the paywall rides for any player
+     mid-placement, per r450). */
   const P = (window.HK_PLACEMENT && window.HK_PLACEMENT.KEYS) || [];
   if(P.indexOf(key) < 0) return false;                     // not a placement board
   try{ if(localStorage.getItem('hk_placement_done') === '1') return false; }catch(e){}   // placed: hole shut

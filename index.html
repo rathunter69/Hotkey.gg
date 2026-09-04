@@ -2236,7 +2236,7 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=304"></script>
+<script src="drills.js?v=305"></script>
 
 
 
@@ -2245,7 +2245,7 @@
 
 
 <link rel="stylesheet" href="nav.css?v=313">
-<script src="themes.js?v=313"></script>
+<script src="themes.js?v=314"></script>
 
 </head>
 <body>
@@ -31585,8 +31585,7 @@ document.addEventListener('click',(e)=>{ const p=$('wqPop');   // r157: same clo
   if(p && p.classList.contains('show') && !e.target.closest('#wqPop') && !e.target.closest('#wqBtn')) p.classList.remove('show'); });
 /* r452: sheetMarkWin() deleted — an empty no-op kept "for one release" in r363, ~89 revisions
    and zero callers ago. */
-/* r452: the Ranked opt-in flag lb.js/nav.js read — used by the ladder's placement ride-through */
-function hkRankedEntered(){ try{ return localStorage.getItem('hk_ranked')==='1'; }catch(e){ return false; } }
+/* r455: the local hkRankedEntered() is gone — window.hkRankedEntered (nav.js) is the ONE derived predicate (LVL >= HK_RANK.RANKED_MIN_LVL) */
 function loadChallenge(key, opts){
   /* r452: any load that is not the Tour's own board leaves the Tour — the picker, a drill
      switch, the ? sheet's replay. Tears down the HUD, any stage card, and the forced ribbon bar. */
@@ -31608,7 +31607,7 @@ function loadChallenge(key, opts){
          Ranked could never post board 5 and sat at "placement 4/5" forever. hkPlacementRide
          (drills.js) is the ONE predicate — ranked-entered AND series incomplete, closing on
          the 5th posted board or the owner latch. */
-      if(__gn && !(hkRankedEntered() && window.hkPlacementRide && window.hkPlacementRide(key, k=>PB[k]!==undefined))){   /* r452: the ladder rides only for RANKED entrants (else day-1 players get opmodel free) */
+      if(__gn && !(window.hkRankedEntered && window.hkRankedEntered() && window.hkPlacementRide && window.hkPlacementRide(key, k=>PB[k]!==undefined))){   /* r452: the ladder rides only for RANKED players (else day-1 players get opmodel free); r455: ranked = LVL 10, derived */
         /* r452 (audit P1-7): the explainer moved INSIDE the "a board is on screen" branch. At
            BOOT there is no board and the marketing landing may still be covering the whole
            viewport, so raising the card here painted it behind the landing — which is a large

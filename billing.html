@@ -95,14 +95,14 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=313"></script>
+<script src="themes.js?v=314"></script>
 <!-- r450: the catalog is loaded HERE so the plan's what's-included list is DERIVED from
      HOTKEY_PREMIUM.groups + the live drill counts (drills.js hkPremiumChapters). No number on
      this page is typed by hand, so a chapter that gains or loses a drill can never leave a
      stale marketing count behind — dev/check-paywall.js §4 asserts every rendered count
      against menuOrder, the same guard shape as the "N banker-grade drills" check in
      dev/e2e-smoke.js. -->
-<script src="drills.js?v=304"></script>
+<script src="drills.js?v=305"></script>
 </head>
 <body>
 <div id="navMount"></div>

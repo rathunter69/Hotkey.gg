@@ -60,6 +60,13 @@ suite gate.yml runs plus the r452 guards) ran green on the merged tip at the clo
 (`.gate-r452.log`; the one red step was a resurrected orphan page, deleted). Merge to main = launch (the curtain is gone). Cache versions on the branch:
 themes.js 313 · nav.css 312 · drills.js 304 · nav.js 305 · lb.js 43.
 
+## 0b · r455 (2026-09-04) — RANK IS AUTOMATIC AT LVL 10
+
+Wolf, verbatim: "go with automatic rank at level 10." Ranked is no longer opted into — `window.hkRankedEntered()` in nav.js is the ONE derived predicate (level ≥ `HK_RANK.RANKED_MIN_LVL`, or every track milestone shipped via `window.hkCampaignComplete()`, or the `hk_dev_unlock` fixture), read sync off the `hk_xp_est` + `hk_xp_uid` level cache the nav chip already uses (lb.js heroHtml write-throughs it too). CI C26 asserts it is defined once and that no product file touches the retired key.
+Retired keys and surfaces: `hk_ranked` ('1'/'0'), `hk_ru_snooze` + `hk_ru_nudged` (the r407 nudge card), nav.js `maybeRankedNudge` + `hkLeaveRanked`, lb.js `rankedOptedIn`/`campaignComplete`/`rankedInfographic` + the Enter Ranked / Not yet buttons, account.html's leave-ranked control, and the `client_state.ranked` field (dead data on old rows — no migration; hydrate ignores it). One tolerance line in nav.js removes an old `hk_ranked` from disk (a '1' seeds the reveal latch; a '0' is not honored).
+Kept: the "Ranked unlocks at LVL 10 · you're LVL n" panel + progress bar on the leaderboard your-card, the `Unranked` pill below LVL 10, `hkPlacementRide` (unchanged — the trainer's ladder gate now rides for anyone the predicate admits), and the season-start infographic as a ONE-TIME non-blocking reveal (`themes.js hkRankedCard`, latched on `hk_rank_reveal_seen`, one dismiss, no state-changing button).
+Cache versions on the branch after r455: themes.js 314 · nav.css 312 · drills.js 305 · nav.js 306 · lb.js 45. Tests updated: dev/e2e-lb.js §B/§C/§E (level-seeded, reveal card, dead server field) and dev/e2e-audit-rank.js T5 (LVL 10 rides, LVL 9 does not).
+
 ## 1 · What the product is
 
 **Hotkey.gg is keyboard-only Excel training for finance professionals.** The tagline on the live

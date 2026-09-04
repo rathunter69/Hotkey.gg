@@ -168,7 +168,7 @@
   .acc-cta.ghost:hover{background:var(--accent-glow)}
 </style>
 <link rel="stylesheet" href="nav.css?v=313">
-<script src="drills.js?v=304"></script>
+<script src="drills.js?v=305"></script>
 
 
 
@@ -183,7 +183,7 @@ window.sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 window.NAV_ACTIVE = '';
 </script>
-<script src="themes.js?v=313"></script>
+<script src="themes.js?v=314"></script>
 </head>
 <body>
 <div id="navMount"></div>
@@ -320,11 +320,10 @@ async function load(){
       </div>
     </div>
 
-    <!-- r426 (Wolf, ROUND2_FEEDBACK §4b): RANKED lives here now. The leaderboard's
-         your-card bottom slot became the rank+rating standing block, so the leave-ranked
-         action needed a permanent home rather than disappearing with the button it rode
-         on. Entering ranked stays where it belongs (the leaderboard's unlock card); this
-         card owns the STATUS + the exit. -->
+    <!-- r426 (Wolf, ROUND2_FEEDBACK §4b): RANKED lives here. r455 (Wolf: "go with automatic rank
+         at level 10"): the leave-ranked control this card was built to house is DELETED — rank is
+         derived from level (nav.js hkRankedEntered), there is nothing to enter or leave. The card
+         is STATUS only. -->
     <div class="acc-row">
       <div class="card acc-grow" id="ranked"><h4>Ranked</h4>
         <div id="rankedBody"><div class="msg">loading&hellip;</div></div>
@@ -636,33 +635,26 @@ async function load(){
     }
   }
   renderDesk();
-  /* ---- r426 (Wolf, ROUND2_FEEDBACK §4b): RANKED status + the relocated LEAVE control.
-     The leaderboard's your-card bottom slot is now the rank+rating standing block, so the
-     leave-ranked action lives here. Entering ranked keeps its home on the leaderboard
-     (the unlock card explains the ladder first) — this card links there rather than
-     duplicating the flow. Leaving is a GLOBAL act: nav.js hkLeaveRanked writes the
-     explicit '0' the r358 hydrate rules refuse to resurrect and pushes to the account. ---- */
+  /* ---- r426 (Wolf, ROUND2_FEEDBACK §4b) / r455: RANKED STATUS. Rank is automatic at
+     HK_RANK.RANKED_MIN_LVL — window.hkIsRanked() is an alias of nav.js hkRankedEntered(), the one
+     derived predicate. No control here changes it (the r426 leave button retired in r455). */
   function renderRanked(){
     const el=document.getElementById('rankedBody'); if(!el) return;
     const on = window.hkIsRanked ? window.hkIsRanked() : false;
+    const minLvl=(window.HK_RANK&&window.HK_RANK.RANKED_MIN_LVL)||10;
     if(on){
-      el.innerHTML = `<div class="rowline"><span class="k">status</span><b style="color:var(--accent)">in ranked</b></div>
-        <div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.7">Your rank, bucket and rating show on the leaderboard and your player card. Leaving hides them everywhere and stops your times counting toward a tier — your runs, PBs and boards are untouched, and you can re-enter any time.</div>
-        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><a class="btn" style="margin:0" href="leaderboard.html">Your standing &rarr;</a><button class="btn ghost" id="rankedLeave" style="margin:0;margin-left:auto">Leave ranked</button></div>`;
-      const lv=document.getElementById('rankedLeave'); let armed=false;
-      if(lv) lv.onclick=()=>{
-        if(!armed){ armed=true; lv.classList.add('danger'); lv.textContent='Really leave? click again';
-          say('rankedMsg','Leaving pulls you off the ladder on every device signed into this account.', true);
-          setTimeout(()=>{ armed=false; lv.classList.remove('danger'); lv.textContent='Leave ranked'; say('rankedMsg',''); }, 3500); return; }
-        try{ window.hkLeaveRanked && window.hkLeaveRanked(); }catch(e){}
-        say('rankedMsg','You’ve left ranked.'); renderRanked(); };
+      el.innerHTML = `<div class="rowline"><span class="k">status</span><b style="color:var(--accent)">ranked</b></div>
+        <div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.7">Your tier, bucket and rating come from your average placement across the boards. The first rank is withheld until the five placement boards are posted.</div>
+        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><a class="btn" style="margin:0" href="leaderboard.html">Your standing &rarr;</a></div>`;
     } else {
-      el.innerHTML = `<div class="rowline"><span class="k">status</span><span style="color:var(--muted)">not in ranked</span></div>
-        <div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.7">You&rsquo;re off the ladder — no tier, no bucket, no rating. Ranked opens from the leaderboard, which walks you through placements first.</div>
-        <div style="margin-top:14px"><a class="btn" style="margin:0" href="leaderboard.html">Open the leaderboard &rarr;</a></div>`;
+      el.innerHTML = `<div class="rowline"><span class="k">status</span><span style="color:var(--muted)">not yet ranked</span></div>
+        <div style="font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.7">Ranked opens automatically at LVL ${minLvl} (or once every track milestone ships). Nothing to enter &mdash; the placement series starts on its own the moment you cross it.</div>`;
     }
   }
   renderRanked();
+  /* r455: the predicate reads the level cache nav.js hydrates async (hk_xp_est) — re-render once
+     the sync lands so a fresh device does not sit on "not yet ranked" until the next load. */
+  try{ window.addEventListener('hk-state-hydrated', renderRanked); setTimeout(renderRanked, 2500); setTimeout(renderRanked, 6000); }catch(e){}
   // r122 SCHOOL TAG (v1.5): derived server-side from the auth email — the domain IS
   // the verification. r252 (T-Q School Flair Phase 1): the derived tag now seeds a
   // full colored-monogram picker (curated ~100 + "Other"). The .edu match only
@@ -819,7 +811,7 @@ async function load(){
   renderSetup();
   // r156: PRO touchpoints — plan card button + the flair PRO tag open the offer sheet
   { const pb=document.getElementById('proSheetBtn'); if(pb) pb.onclick=()=>{ if(window.hkProSheet) window.hkProSheet(); }; }
-  // r451: the devRanked/devRankedOff handlers went with the Beta-tools card above.
+  // r451: the devRanked/devRankedOff handlers went with the Beta-tools card above. r455: the rankedLeave handler went with the opt-in.
 }
 load();
 </script>

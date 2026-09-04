@@ -12,6 +12,9 @@
           checklist/desc but never scanned these fields, and its pattern skips bare
           F-keys (cell refs there are content); picker metadata has no cell refs, so
           bare F1-F12 are flagged here too.
+     C26 — rank is DERIVED (r455): window.hkRankedEntered is defined exactly once (nav.js) and
+          the retired hk_ranked opt-in key is neither read nor written anywhere in product code
+          except the one allowlisted tolerance line.
      C14 — certificate tracks: the arrays hard-coded in the NEWEST issue_certificate migration
           (and its dev/migrate-certificates.sql mirror) are set-equal to HK_TRACKS from drills.js
           — the r359 drift rule, added r452 after the retired keys sat live in the RPC.
@@ -1190,6 +1193,58 @@ try {
   else ok('reference.html carries no local glyph swap');
 } catch (e) {
   bad('C25 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C26 (r455): RANK IS DERIVED — one predicate, no opt-in flag ----
+   Wolf: "go with automatic rank at level 10". Ranked used to be an opt-in ceremony on a
+   localStorage flag (hk_ranked) read by FIVE different readers (index.html hkRankedEntered,
+   nav.js hkIsRanked + navRank's __opted, lb.js rankedOptedIn, account.html) and written by
+   six (the nudge card, the gate panel, the infographic default, leave-ranked, the owner
+   force-flag, the r358 hydrate). r455 collapsed all of that into window.hkRankedEntered()
+   (nav.js: level >= HK_RANK.RANKED_MIN_LVL, or the campaign complete, or the dev unlock).
+   This guard keeps it collapsed:
+     1. hkRankedEntered is DEFINED exactly once across product code (a second definition —
+        including a bare `function hkRankedEntered(){}` in a page, which would shadow the
+        window property — is the drift this exists to catch).
+     2. No product file reads or writes the retired key: no localStorage get/set/remove of
+        'hk_ranked', and no 'hk_ranked' in a wipe list — except the ONE tolerance line in
+        nav.js, allowlisted by exact substring, that retires an old value from disk. */
+try {
+  const PRODUCT = fs.readdirSync('.').filter(f => /\.(html|js)$/.test(f) && !/^(sw|service-worker)\.js$/.test(f));
+  // prose may name the retired pieces (the r455 comments do); only CODE is judged
+  const stripComments = t => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/<!--[\s\S]*?-->/g, '').replace(/^\s*\/\/.*$/mg, '');
+  const TOLERANCE = "try{ if(localStorage.getItem('hk_ranked')==='1') localStorage.setItem('hk_rank_reveal_seen','1'); localStorage.removeItem('hk_ranked'); }catch(e){}";
+  const defs = [], reads = [];
+  for (const f of PRODUCT) {
+    const src = fs.readFileSync(f, 'utf8');
+    const lines = src.split('\n');
+    lines.forEach((ln, i) => {
+      const code = ln.replace(/\/\*.*?\*\//g, '').replace(/^\s*(\/\/|\*|\/\*).*$/, '');   // drop comment-only lines + inline block comments
+      if (/(?:window\.)?hkRankedEntered\s*=\s*function|function\s+hkRankedEntered\s*\(/.test(code)) defs.push(f + ':' + (i + 1));
+      if (/['"]hk_ranked['"]/.test(code) && ln.indexOf(TOLERANCE) < 0) reads.push(f + ':' + (i + 1));
+    });
+  }
+  if (defs.length !== 1) bad(`C26: hkRankedEntered must be defined exactly once (nav.js) — found ${defs.length}: ${defs.join(', ') || 'none'}`);
+  else if (!/^nav\.js:/.test(defs[0])) bad(`C26: hkRankedEntered is defined in ${defs[0]}, not nav.js (the shared chrome every page loads)`);
+  else ok(`hkRankedEntered defined once (${defs[0]})`);
+  if (reads.length) bad(`C26: the retired hk_ranked key is still read/written outside the tolerance line: ${reads.join(', ')}`);
+  else ok('no product file reads or writes hk_ranked (one allowlisted tolerance line)');
+  const nav = fs.readFileSync('nav.js', 'utf8');
+  if (nav.indexOf(TOLERANCE) < 0) bad('C26: the nav.js tolerance line changed — update the C26 allowlist in the same commit');
+  // the readers that must consult the predicate rather than a flag of their own
+  const idx = fs.readFileSync('index.html', 'utf8'), lb = fs.readFileSync('lb.js', 'utf8'), acct = fs.readFileSync('account.html', 'utf8');
+  if (!/window\.hkRankedEntered\(\)\s*&&\s*window\.hkPlacementRide/.test(idx)) bad('C26: index.html loadChallenge no longer gates the placement ride on window.hkRankedEntered()');
+  if (!/window\.hkRankedEntered\(\)/.test(lb)) bad('C26: lb.js heroHtml no longer consults window.hkRankedEntered()');
+  if (!/hkIsRanked\(\)|hkRankedEntered\(\)/.test(acct)) bad('C26: account.html Ranked card no longer consults the derived predicate');
+  for (const [f, pat, what] of [['nav.js', /maybeRankedNudge|hk_ru_snooze|hkLeaveRanked\s*=/, 'the nudge/snooze/leave-ranked ceremony'],
+                                 ['lb.js', /id="enterRanked"|id="waitRanked"|function rankedInfographic/, 'the Enter Ranked / Not yet gate'],
+                                 ['themes.js', /id="hkruGo"|id="hkruLater"|onEnter/, 'an Enter/later button on the reveal card'],
+                                 ['account.html', /id="rankedLeave"|Leave ranked/, 'the leave-ranked control']]) {
+    if (pat.test(stripComments(fs.readFileSync(f, 'utf8')))) bad(`C26: ${f} has ${what} back — rank is automatic at LVL 10, there is nothing to enter or leave`);
+  }
+  ok('the opt-in ceremony stays retired (no nudge, gate buttons, enter/later CTA or leave control)');
+} catch (e) {
+  bad('C26 could not run: ' + String(e.message || e).slice(0, 160));
 }
 
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }
