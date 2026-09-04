@@ -2128,36 +2128,66 @@
   .landing .l-note{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-top:18px; line-height:1.7}
   .landing .l-note b{color:var(--text); font-weight:500}
 
-  /* ------------------------------------------------- landing v2 · the PRO door (Wolf 2026-09-03)
-     Deliberately NOT the paywall UI: no lock glyphs, no #paywallModal, no dollar figure (Stripe
-     is not live and dev/check-paywall.js §3/§4 hold the no-price line). It states the shape of
-     the eventual deal in plain terms and points at billing.html. Chapter names and counts come
-     from HOTKEY_PREMIUM.groups × HOTKEY_DRILLS.groups at render — never typed in. */
-  .landing .l-pro{display:grid; grid-template-columns:1.35fr .9fr; gap:0; margin-top:24px;
-    border:1px solid var(--accent-dim); border-radius:14px; overflow:hidden; background:var(--surface)}
-  .landing .l-pro-main{padding:24px 26px 26px}
-  .landing .l-pro-side{padding:24px 26px 26px; background:var(--accent-glow); border-left:1px solid var(--accent-dim);
-    display:flex; flex-direction:column; justify-content:center; gap:12px}
-  .landing .l-pro-now{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
-    color:var(--accent); margin-bottom:10px}
-  .landing .l-pro h3{font-size:20px; letter-spacing:-.5px; margin-bottom:10px}
-  .landing .l-pro p{font-size:14px; color:var(--muted); line-height:1.6; margin:0 0 12px; max-width:56ch}
-  .landing .l-pro p:last-child{margin-bottom:0}
-  .landing .l-pro p b{color:var(--text); font-weight:600}
-  .landing .l-pro-chaps{display:flex; flex-wrap:wrap; gap:7px; margin:0 0 14px}
+  /* ------------------------------------------------- landing v3 · progression (r455, Wolf 2026-09-04)
+     The ladder the site actually runs on, stated before the price: levels -> rank -> boards ->
+     certificates. The eight rank tiers are drawn with the SHARED window.rankEmblem (themes.js
+     r377) at chip size — no second emblem system on the marketing page, so a tier that gets a
+     new metal relabels here for free. Every count in this band is derived (HK_RANK.TIERS,
+     HK_TRACKS, menuOrder, HOTKEY_CHALLENGE_POOL). */
+  .landing .l-ladder{display:flex; flex-wrap:wrap; gap:8px; margin-top:24px}
+  .landing .l-rank{display:flex; align-items:center; gap:8px; padding:5px 12px 5px 7px;
+    border:1px solid var(--line); border-radius:999px; background:var(--surface)}
+  .landing .l-rank svg{display:block; width:22px; height:auto; flex:none}
+  .landing .l-rank span{font-family:var(--mono); font-size:11px; color:var(--muted); white-space:nowrap}
+  .landing .l-rank.l-top span{color:var(--text)}
+  .landing .l-prog{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:22px; align-items:stretch}
+
+  /* ------------------------------------------------- landing v3 · pricing, two real tiers
+     PRO is a shipping tier now, not a promise, so the page shows the deal: FREE (the chapters
+     outside HOTKEY_PREMIUM.groups) against PRO (the four inside it, each also earnable on the
+     level path). THE PRICE LAW (dev/check-paywall.js §4b): every dollar figure on this page is
+     read out of HOTKEY_PRO.plans at render — a literal price in this markup is a bug, and the
+     guard fails on one. While HOTKEY_PRO.freeNow is true, .l-freenow says billing has not
+     opened; paintLanding REMOVES that node when the flag flips, so there is no copy to edit. */
+  .landing .l-tiers{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:26px; align-items:stretch}
+  .landing .l-tier{border:1px solid var(--line); border-radius:14px; background:var(--surface);
+    display:flex; flex-direction:column; overflow:hidden}
+  .landing .l-tier.l-tier-pro{border-color:var(--accent-dim)}
+  .landing .l-tier-cap{display:flex; align-items:center; gap:9px; min-height:36px; padding:7px 20px;
+    background:var(--surface2); border-bottom:1px solid var(--line); font-family:var(--mono);
+    font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
+  .landing .l-tier.l-tier-pro .l-tier-cap{color:var(--accent); background:var(--accent-glow);
+    border-bottom-color:var(--accent-dim)}
+  .landing .l-tier-body{padding:22px 22px 24px; display:flex; flex-direction:column; flex:1; gap:14px}
+  .landing .l-price{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap}
+  .landing .l-price b{font-family:var(--mono); font-size:29px; font-weight:700; letter-spacing:-1px;
+    color:var(--text); line-height:1}
+  .landing .l-price span{font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+  .landing .l-alt{font-family:var(--mono); font-size:11.5px; color:var(--muted); line-height:1.6; margin:-6px 0 0}
+  .landing .l-alt b{color:var(--text); font-weight:600}
+  .landing .l-freenow{font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.65;
+    border-left:2px solid var(--accent-dim); padding-left:10px; margin:0}
+  .landing .l-tier ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px}
+  .landing .l-tier li{position:relative; padding-left:21px; font-size:13.5px; color:var(--muted); line-height:1.55}
+  .landing .l-tier li::before{content:"\2192"; position:absolute; left:0; top:0;
+    font-family:var(--mono); font-size:12px; color:var(--accent)}
+  .landing .l-tier li b{color:var(--text); font-weight:600}
+  .landing .l-tier .l-btn{margin-top:auto}
+  .landing .l-pro-chaps{display:flex; flex-wrap:wrap; gap:7px; margin:0}
   .landing .l-pro-chip{font-family:var(--mono); font-size:11px; color:var(--text); background:var(--surface2);
     border:1px solid var(--line); border-radius:999px; padding:5px 11px}
   .landing .l-pro-chip span{color:var(--faint)}
-  .landing .l-pro-price{font-family:var(--mono); font-size:12.5px; color:var(--muted); line-height:1.7}
-  .landing .l-pro-price b{color:var(--text); font-weight:600}
+  .landing .l-pro-chip em{font-style:normal; color:var(--accent)}
   .landing .l-btn{display:inline-block; font-family:var(--mono); font-size:13px; color:var(--accent);
     background:transparent; border:1px solid var(--accent-dim); border-radius:9px; padding:11px 20px;
     white-space:nowrap; text-decoration:none; cursor:pointer; align-self:flex-start; transition:.15s}
   .landing .l-btn:hover{background:var(--accent-glow); border-color:var(--accent)}
   .landing .l-btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
 
-  /* ---------------------------------------------------------------- landing v2 · proof */
-  .landing .l-proof{display:grid; grid-template-columns:1.22fr .89fr .89fr; gap:16px; margin-top:26px; align-items:stretch}
+  /* ------------------------------------------------- landing v3 · the panel primitives
+     Written for the r452 "proof" band; that section merged into the progression band in r455
+     (one place says how you climb), and these dress its four panels — the medal clock, the
+     boards, the certificates, the daily challenge. .l-proof retired with the section. */
   .landing .l-panel{background:var(--surface); border:1px solid var(--line); border-radius:12px; overflow:hidden;
     display:flex; flex-direction:column}
   .landing .l-panel-cap{min-height:32px; display:flex; align-items:center; gap:8px; padding:0 14px;
@@ -2200,9 +2230,8 @@
     .landing .l-beats{grid-template-columns:1fr}
     .landing .l-vs{grid-template-columns:1fr}
     .landing .l-rail{grid-template-columns:repeat(2,1fr)}
-    .landing .l-pro{grid-template-columns:1fr}
-    .landing .l-pro-side{border-left:0; border-top:1px solid var(--accent-dim)}
-    .landing .l-proof{grid-template-columns:1fr}
+    .landing .l-tiers{grid-template-columns:1fr}
+    .landing .l-prog{grid-template-columns:repeat(2,1fr)}
     .landing .l-teams{grid-template-columns:1fr; gap:18px; align-items:flex-start}
   }
   @media (max-width:560px){
@@ -2217,7 +2246,10 @@
     .landing .l-top-right .l-hide-sm{display:none}
     .landing-cta{gap:10px}
     .start-btn, .landing .l-quiet{width:100%; justify-content:center; text-align:center}
-    .landing .l-pro-main, .landing .l-pro-side{padding:20px}
+    .landing .l-prog{grid-template-columns:1fr}
+    .landing .l-tier-body{padding:18px 18px 20px}
+    .landing .l-price b{font-size:26px}
+    .landing .l-tier .l-btn{width:100%; text-align:center}
   }
   #guestBanner{position:fixed; bottom:14px; left:50%; transform:translateX(-50%); z-index:25;   /* r356: below the dialogs (z30) and results card (z40) — it used to cover their footers on short screens */
     background:var(--surface); border:1px solid var(--warn); border-radius:8px; padding:8px 14px;
@@ -2401,12 +2433,18 @@
 </div>
 <div class="landing" id="landing">
   <div class="landing-inner">
-    <!-- LANDING V2 (r452) — dev/BETA_RETIRE_LANDING.md Part II, mocked at art/landing-mock.html.
+    <!-- LANDING V3 (r455) — dev/LANDING_V3.md; the v2 shell (r452) and its mock
+         (art/landing-mock.html) still describe the layout.
          Still the r65 DIALOG over the live trainer: Enter → tryEnter() → guest session → tour →
-         first drill, unchanged. What is new is everything under the fold, and the three changes
-         Wolf signed off on 2026-09-03: it is designed against Daylight (the default theme) first,
-         it shows the PRO door instead of hiding it, and "how it works" now argues learning by
-         DOING against watching a class you forget by Thursday.
+         first drill, unchanged. v2 (r452) made it a full page designed against Daylight and put
+         "how it works" on learning by DOING. v3 is the LAUNCH pass (Wolf, 2026-09-04):
+           · the pitch is the audience's motive — learning Excel properly, the hours it gives
+             back, the skill you kept meaning to pick up, being ready for a banking / consulting /
+             corporate-finance seat — not "you build FP&A schedules and can get faster";
+           · PRO is a REAL TIER with a real price read from HOTKEY_PRO.plans, not a promise;
+           · a progression band (levels → rank → boards → certificates → the daily) sits BEFORE
+             the price, because that is the reason to come back;
+           · the hero still shows a page a non-banker recognises (budget vs actual).
          Every count on this page (chapters, drills per chapter, the paid chapters and their
          totals) is written by paintLanding() from HOTKEY_DRILLS / HOTKEY_PREMIUM at render.
          Nothing here is a typed number — e2e-smoke's drill-count guard and check-paywall both
@@ -2418,6 +2456,7 @@
         <div class="l-top-right">
           <button class="l-linkbtn l-hide-sm" data-lgo="lHow">how it works</button>
           <button class="l-linkbtn l-hide-sm" data-lgo="lCatalog">drills</button>
+          <button class="l-linkbtn l-hide-sm" data-lgo="lProgress">progression</button>
           <button class="l-linkbtn l-hide-sm" data-lgo="lPricing">pricing</button>
           <button class="l-linkbtn l-hide-sm" data-lgo="lTeams">desks</button>
           <button class="l-linkbtn" id="landingSignin">log in</button>
@@ -2429,9 +2468,9 @@
       <div class="l-glow"></div>
       <div class="l-wrap l-hero-grid">
         <div>
-          <div class="eyebrow">keyboard-only excel training</div>
-          <h1>Get fast at the pages<br><span class="dim">you actually build.</span></h1>
-          <p class="lede" id="landingLede">Timed drills on a real spreadsheet — debt schedules, three-statement ties, covenant tables. <b>You're graded on the finished page</b>, not on which key you pressed to get there.</p>
+          <div class="eyebrow">learn excel by doing · keyboard only</div>
+          <h1>Learn Excel properly.<br><span class="dim">The hours come back.</span></h1>
+          <p class="lede" id="landingLede">Timed drills on a real spreadsheet — a budget vs actual, a simple P&amp;L, a sales table with a lookup. <b>You're graded on the finished page</b>, not on which key you pressed. It is the skill you keep meaning to pick up, and the one an analyst seat assumes you already have.</p>
           <div class="landing-cta">
             <button class="start-btn" id="startBtn">Press <kbd class="kbd-cta">↵</kbd> to start</button>
             <button class="l-quiet" id="loginBtn">log in</button>
@@ -2440,7 +2479,9 @@
             <span class="mode-chip pick selected" id="chipClassic" title="solve drills at your own pace">Classic</span>
             <span class="mode-chip pick" id="chipRapid" title="one shortcut at a time, as fast as you can">⚡ Rapid-fire</span>
           </div>
-          <div class="micro" id="landingMicro">no account · no install · <b>free while we're building</b><span class="micro-hint">everything is keyboard — reach for the mouse and the run gets flagged</span></div>
+          <!-- r455: "free while we're building" was beta language and the beta is over
+               (r451 retired the curtain). What is true at launch is the friction, not the phase. -->
+          <div class="micro" id="landingMicro">no account to try it · no install · <b>keyboard only</b><span class="micro-hint">everything is keyboard — reach for the mouse and the run gets flagged</span></div>
         </div>
 
         <!-- the hero still. Hand-built, theme-tokened, engine-free — see the CSS note above and
@@ -2448,35 +2489,40 @@
         <div class="l-demo" aria-hidden="true">
           <div class="l-demo-cap">
             <span class="l-dot"></span><span class="l-dot"></span><span class="l-dot"></span>
-            <span>models ii · debt schedule</span>
-            <span class="l-clock">00:41.7 / par 1:52</span>
+            <span>formulas i · budget vs actual</span>
+            <span class="l-clock">00:38.4 / par 1:20</span>
           </div>
-          <div class="l-demo-task">Roll the term loan forward — <b>opening, mandatory amort, sweep, closing</b> — and foot the total.</div>
+          <!-- r455 (Wolf 2026-09-04): the still shows a page ANYONE who works in Excel reads at a
+               glance — a budget vs actual — not the term-loan sweep, which announced "this is for
+               bankers" in the first two seconds. Still hand-built and engine-free (see the CSS note). -->
+          <div class="l-demo-task">Foot both columns, run the variance against budget — <b>amount and percent</b> — and rule off the total.</div>
           <div class="l-sheet">
             <table>
               <tbody>
               <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr>
-              <tr><td class="l-rh">4</td><td class="l-lbl">Term Loan B</td><td class="l-num l-lbl">FY24</td><td class="l-num l-lbl">FY25</td><td class="l-num l-lbl">FY26</td><td class="l-num l-lbl">FY27</td></tr>
-              <tr><td class="l-rh">5</td><td class="l-lbl">Opening balance</td><td class="l-num">400.0</td><td class="l-num">380.0</td><td class="l-num">351.4</td><td class="l-num">312.9</td></tr>
-              <tr><td class="l-rh">6</td><td class="l-lbl">Mandatory amort.</td><td class="l-num l-in">(20.0)</td><td class="l-num l-in">(20.0)</td><td class="l-num l-in">(20.0)</td><td class="l-num l-in">(20.0)</td></tr>
-              <tr><td class="l-rh">7</td><td class="l-lbl">Cash sweep</td><td class="l-num">—</td><td class="l-num">(8.6)</td><td class="l-num">(18.5)</td><td class="l-num l-cur">(27.1)</td></tr>
-              <tr><td class="l-rh">8</td><td class="l-lbl">Closing balance</td><td class="l-num l-tot">380.0</td><td class="l-num l-tot">351.4</td><td class="l-num l-tot">312.9</td><td class="l-num l-tot">265.8</td></tr>
+              <tr><td class="l-rh">4</td><td class="l-lbl">Marketing</td><td class="l-num l-lbl">Budget</td><td class="l-num l-lbl">Actual</td><td class="l-num l-lbl">Var</td><td class="l-num l-lbl">Var %</td></tr>
+              <tr><td class="l-rh">5</td><td class="l-lbl">Salaries</td><td class="l-num l-in">420.0</td><td class="l-num l-in">438.0</td><td class="l-num">(18.0)</td><td class="l-num">(4.3%)</td></tr>
+              <tr><td class="l-rh">6</td><td class="l-lbl">Software</td><td class="l-num l-in">115.0</td><td class="l-num l-in">102.0</td><td class="l-num">13.0</td><td class="l-num">11.3%</td></tr>
+              <tr><td class="l-rh">7</td><td class="l-lbl">Events</td><td class="l-num l-in">240.0</td><td class="l-num l-in">291.0</td><td class="l-num">(51.0)</td><td class="l-num">(21.3%)</td></tr>
+              <tr><td class="l-rh">8</td><td class="l-lbl">Travel</td><td class="l-num l-in">86.0</td><td class="l-num l-in">74.0</td><td class="l-num">12.0</td><td class="l-num l-cur">14.0%</td></tr>
               <tr><td class="l-rh">9</td><td class="l-lbl"></td><td class="l-num"></td><td class="l-num"></td><td class="l-num"></td><td class="l-num"></td></tr>
-              <tr><td class="l-rh">10</td><td class="l-lbl">Total debt</td><td class="l-num">520.0</td><td class="l-num">491.4</td><td class="l-num">452.9</td><td class="l-num">405.8</td></tr>
+              <tr><td class="l-rh">10</td><td class="l-lbl">Total</td><td class="l-num l-tot">861.0</td><td class="l-num l-tot">905.0</td><td class="l-num l-tot">(44.0)</td><td class="l-num l-tot">(5.1%)</td></tr>
               </tbody>
             </table>
           </div>
           <div class="l-demo-keys">
-            <span class="l-cap">alt</span><span class="l-cap">h</span><span class="l-cap lit">o</span><span class="l-cap">i</span>
-            <span class="l-tail">☆ 2 of 3 · 118 keys</span>
+            <span class="l-cap">ctrl</span><span class="l-cap">shift</span><span class="l-cap lit">5</span>
+            <span class="l-tail">☆ 2 of 3 · 61 keys</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Wolf 2026-09-03, change 3: the pitch is learning by DOING, argued against the way this
-         is normally taught. Keep the contrast concrete — a class, a video, a shortcut sheet —
-         and keep the promise measurable (a real page, the keyboard, a grade in three minutes). -->
+    <!-- Wolf 2026-09-03, change 3 (kept in v3): the pitch is learning by DOING, argued against
+         the way this is normally taught. Keep the contrast concrete — a class, a video, a shortcut
+         sheet — and keep the promise measurable (a real page, the keyboard, a grade in three
+         minutes). r455 widens the audience off "a banker": analysts, consultants, corporate
+         finance, anyone who lives in Excel. -->
     <div class="l-sec" id="lHow">
       <div class="l-wrap">
         <div class="l-label">how it works</div>
@@ -2494,7 +2540,7 @@
           <div class="l-col l-new">
             <div class="l-col-cap">hotkey.gg · three minutes, start to graded</div>
             <ul>
-              <li>a real page opens — a debt schedule, a comps tape, a covenant table</li>
+              <li>a real page opens — a budget vs actual, a lookup against a sales table, a model schedule</li>
               <li>you build it with the keyboard, clock running</li>
               <li>you're graded on the <b>finished sheet</b>, and the time goes on a board</li>
             </ul>
@@ -2504,7 +2550,7 @@
           <div class="l-beat">
             <div class="l-n">01</div>
             <h3>A real task, not a lesson</h3>
-            <p>Every drill opens on a page a banker would recognise as their own file. Build the schedule, tie the statements, foot the covenant table. Nothing is a toy example.</p>
+            <p>Every drill opens on a page you would recognise from work — a budget vs actual, a reconciliation, a model schedule. Analyst, consultant, corporate finance, or anyone who lives in Excel: it is your file, not a toy example.</p>
           </div>
           <div class="l-beat">
             <div class="l-n">02</div>
@@ -2514,7 +2560,7 @@
           <div class="l-beat">
             <div class="l-n">03</div>
             <h3>Graded on the finished page</h3>
-            <p>The clock stops when the page is right. Par times, medals at pass / pro / legendary, hidden ☆ for the efficient route, and every clean run posts to the board.</p>
+            <p>The clock stops when the page is right. Par times, medals at pass / pro / legendary, hidden ☆ for the efficient route, and every clean run posts to a board and moves your level.</p>
           </div>
         </div>
       </div>
@@ -2524,73 +2570,85 @@
       <div class="l-wrap">
         <div class="l-label">the catalog</div>
         <h2 id="lCatalogH2">The catalog.</h2>
-        <p class="l-sub">A difficulty spine, not a menu. Foundations teaches the hands; Full Builds hands you a blank sheet and a deadline.</p>
+        <p class="l-sub">A difficulty spine, not a menu. Foundations teaches the hands, the formatting and formula chapters cover the work most weeks actually ask for, and Full Builds hands you a blank sheet and a deadline.</p>
         <div class="l-rail" id="lRail"></div>
         <div class="l-note" id="lRailNote"></div>
       </div>
     </div>
 
-    <!-- Wolf 2026-09-03, change 2: the PRO option is VISIBLE, and honest about where it stands.
-         No price — Stripe is not live, HOTKEY_PRO.plans carries placeholders, and
-         dev/check-paywall.js §3/§4 hold the no-dollar-figure line on every upgrade surface. -->
-    <div class="l-sec" id="lPricing">
+    <!-- r455 (Wolf, standing r452/r453 note): THE PROGRESSION BAND. Ranking, boards and the
+         climb are the reason to come back, so they are stated BEFORE the price rather than
+         buried under it. This section ABSORBED the r452 "proof" band (#lProof) — one place on
+         the page says how you climb, and the desks pitch already has its own section below.
+         Everything numeric here is written by paintLanding() out of HK_RANK.TIERS, HK_TRACKS,
+         HK_RANK.RANKED_MIN_LVL, menuOrder and HOTKEY_CHALLENGE_POOL. Nothing is typed. -->
+    <div class="l-sec" id="lProgress">
       <div class="l-wrap">
-        <div class="l-label">pricing</div>
-        <h2>Free today. PRO when billing opens.</h2>
-        <p class="l-sub">No trial clock, no card, nothing switched off behind your back. Here is exactly what changes the day payments go live.</p>
-        <div class="l-pro">
-          <div class="l-pro-main">
-            <div class="l-pro-now">right now</div>
-            <h3 id="lProNow">The whole catalog is open.</h3>
-            <p id="lProNowP">Every drill is playable, every board is live, every certificate track is earnable. Nothing on this site is locked today.</p>
-            <div class="l-pro-now" style="margin-top:18px">when billing opens</div>
-            <h3 id="lProLater">The back chapters become PRO.</h3>
-            <div class="l-pro-chaps" id="lProChaps"></div>
-            <p id="lProLaterP"></p>
-          </div>
-          <div class="l-pro-side">
-            <div class="l-pro-price"><b>No price yet.</b><br>Payments are not live, so we are not quoting a number we cannot charge.</div>
-            <a class="l-btn" href="billing.html" id="lProPlans">see what PRO will include →</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="l-sec" id="lProof">
-      <div class="l-wrap">
-        <div class="l-label">the board</div>
+        <div class="l-label">progression</div>
         <h2>Every run has a time on it.</h2>
-        <p class="l-sub">Live boards per drill, ranked tiers, daily and weekly gauntlets. Desks for your club or your analyst class, with school standings. Three certificate tracks when the times hold up.</p>
-        <div class="l-proof">
+        <p class="l-sub" id="lProgSub"></p>
+        <!-- the eight tiers, drawn with the shared window.rankEmblem (themes.js) at chip size -->
+        <div class="l-ladder" id="lLadder"></div>
+        <div class="l-note" id="lRankedNote"></div>
+        <div class="l-prog">
           <div class="l-panel">
             <div class="l-panel-cap" id="lBoardCap">the clock</div>
             <div class="l-panel-body" id="lBoard"></div>
           </div>
           <div class="l-panel">
-            <div class="l-panel-cap">desks</div>
-            <div class="l-panel-body">
-              <div class="l-plist">
-                <div><span class="l-k">private boards</span><br>Your club or analyst class gets its own ladder, roster hall, and school colours.</div>
-                <div><span class="l-k">weekly quests</span><br>The staffer pins <b>up to 3 drills</b> with time targets. One click a week.</div>
-              </div>
-            </div>
+            <div class="l-panel-cap">leaderboards</div>
+            <div class="l-panel-body"><div class="l-plist" id="lProgBoards"></div></div>
           </div>
           <div class="l-panel">
             <div class="l-panel-cap">certificates</div>
-            <div class="l-panel-body">
-              <div class="l-plist">
-                <div>Three tracks, earned on <b>held times</b> — not attendance.</div>
-                <div class="l-certs">
-                  <span class="l-cert">keyboard fluency</span>
-                  <span class="l-cert">formulas</span>
-                  <span class="l-cert">modeling</span>
-                </div>
-              </div>
-            </div>
+            <div class="l-panel-body"><div class="l-plist" id="lProgCerts"></div></div>
+          </div>
+          <div class="l-panel">
+            <div class="l-panel-cap">the daily challenge</div>
+            <div class="l-panel-body"><div class="l-plist" id="lProgDaily"></div></div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- r455 (Wolf 2026-09-04): PRO IS A REAL TIER AT LAUNCH, so the page shows the deal instead
+         of promising one. Two columns: FREE = the chapters outside HOTKEY_PREMIUM.groups; PRO =
+         the four inside it, each ALSO earnable on the level path (dev/CURRICULUM_V3.md §3).
+         THE PRICE LAW: every dollar figure below is read from HOTKEY_PRO.plans at render — there
+         is deliberately no price literal in this markup, and dev/check-paywall.js §4b fails the
+         build on one. #lFreeNow is a flag-driven node: paintLanding removes it the moment
+         HOTKEY_PRO.freeNow goes false, so flipping the flag needs no copy edit. -->
+    <div class="l-sec" id="lPricing">
+      <div class="l-wrap">
+        <div class="l-label">pricing</div>
+        <h2>Free to learn. PRO for the back half.</h2>
+        <p class="l-sub" id="lPriceSub"></p>
+        <div class="l-tiers">
+          <div class="l-tier">
+            <div class="l-tier-cap">free</div>
+            <div class="l-tier-body">
+              <div class="l-price"><b>Free</b><span>no account, no card</span></div>
+              <div class="l-pro-chaps" id="lFreeChaps"></div>
+              <ul id="lFreeList"></ul>
+              <button class="l-btn" id="lFreeCta">start the first drill →</button>
+            </div>
+          </div>
+          <div class="l-tier l-tier-pro">
+            <div class="l-tier-cap">pro</div>
+            <div class="l-tier-body">
+              <div class="l-price" id="lProPrice"></div>
+              <p class="l-alt" id="lProAlt"></p>
+              <p class="l-freenow" id="lFreeNow">Billing has not opened yet — PRO is on for everyone, free, until it does.</p>
+              <div class="l-pro-chaps" id="lProChaps"></div>
+              <ul id="lProList"></ul>
+              <a class="l-btn" href="billing.html" id="lProPlans">see what PRO includes →</a>
+            </div>
+          </div>
+        </div>
+        <div class="l-note" id="lProLaterP"></div>
+      </div>
+    </div>
+
 
     <div class="l-sec" id="lTeams">
       <div class="l-wrap">
@@ -29041,6 +29099,7 @@ $('startBtn').addEventListener('click', tryEnter);
 { const ls=$('landingSignin'); if(ls) ls.onclick=()=>{ openAuth('signin'); };
   const lb=$('loginBtn'); if(lb) lb.onclick=()=>{ openAuth('signin'); }; }
 { const s2=$('startBtn2'); if(s2) s2.addEventListener('click', tryEnter); }   /* r452: the close CTA is the same door as the hero's — one tryEnter(), one guest session, one tour */
+{ const fc=$('lFreeCta'); if(fc) fc.addEventListener('click', tryEnter); }    /* r455: so is the FREE tier's CTA — the free tier IS the product, one door to it */
 
 /* ============================================================================
    LANDING V2 (r452) — paintLanding()
@@ -29056,7 +29115,15 @@ $('startBtn').addEventListener('click', tryEnter);
      HOTKEY_DRILLS.groups / .menuOrder / .meta   — chapters, counts, labels
      HOTKEY_CAMPAIGN.chapters                    — the subtitled display names
      hkPremiumGroups() / hkPremiumCount() / hkCatalogCount() / hkPremiumOn()
-     HOTKEY_PARS + HOTKEY_CLOCKS                 — the medal clocks in "the board"
+     HOTKEY_PARS + HOTKEY_CLOCKS                 — the medal clocks in "the clock"
+     HOTKEY_PRO.plans / .freeNow / .features     — r455: the PRO tier's PRICE and perks
+     HK_RANK.TIERS / .RANKED_MIN_LVL             — r455: the rank ladder + the auto-rank level
+     HK_TRACKS · HOTKEY_CHALLENGE_POOL           — r455: certificates + the daily board
+     window.rankEmblem (themes.js)               — r455: the eight tier crests, at chip size
+
+   r455 adds ONE law to the derive-don't-type rule above: no dollar figure may be
+   typed into the landing's markup or this function — every price is read out of
+   HOTKEY_PRO.plans. dev/check-paywall.js §4b fails the build on a literal.
 
    Renders identically with sb === null: nothing here touches the network.
    Everything is wrapped so a catalog shape it does not expect degrades to the
@@ -29082,10 +29149,13 @@ function paintLanding(){
                       return c ? c.name : g.name; };
   const paidGroups = groups.filter(isPaid);
 
-  /* ---- hero lede: the one number in the pitch ---- */
-  set('landingLede', nAll + ' timed drills on a real spreadsheet — debt schedules, three-statement ' +
-      'ties, covenant tables. <b>You’re graded on the finished page</b>, not on which key you pressed ' +
-      'to get there.');
+  /* ---- hero lede: the one number in the pitch. r455 (Wolf 2026-09-04) — the examples are
+         pages a non-banker recognises, and the close names the motive (a skill you meant to
+         pick up; the seat that assumes you have it) rather than the artefact. ---- */
+  set('landingLede', nAll + ' timed drills on a real spreadsheet — a budget vs actual, a simple ' +
+      'P&L, a sales table with a lookup. <b>You’re graded on the finished page</b>, not on which ' +
+      'key you pressed. It is the skill you keep meaning to pick up, and the one an analyst seat ' +
+      'assumes you already have.');
 
   /* ---- the catalog rail ---- */
   set('lCatalogH2', groups.length + ' chapters. ' + nAll + ' drills.');
@@ -29101,26 +29171,97 @@ function paintLanding(){
   }).join(''));
   set('lRailNote', proOn
     ? 'counts read straight off the live catalog · <b>' + nFree + ' drills are free</b> — the back ' +
-      paidGroups.length + ' chapters need PRO'
+      paidGroups.length + ' chapters are PRO, or earned by levelling'
     : 'counts read straight off the live catalog · <b>every chapter is playable today</b> — the back ' +
-      paidGroups.length + ' become PRO when billing opens');
+      paidGroups.length + ' are the PRO chapters');
 
-  /* ---- the PRO door (Wolf 2026-09-03). States the deal, never a price. ---- */
-  set('lProNow',   proOn ? nFree + ' drills stay free, for good.' : 'The whole catalog is open.');
-  set('lProNowP',  proOn
-    ? 'The first ' + (groups.length - paidGroups.length) + ' chapters — ' + nFree + ' of the ' + nAll +
-      ' drills — are free with no account. Boards, ranks, desks and streaks are free on all of them.'
-    : 'All ' + nAll + ' drills are playable, every board is live, and every certificate track is earnable. ' +
-      'Nothing on this site is locked today.');
-  set('lProLater', proOn ? 'These chapters need PRO.'
-                         : 'The back ' + paidGroups.length + ' chapters become PRO.');
-  set('lProChaps', paidGroups.map(g =>
+  /* ============================ r455 · THE PROGRESSION BAND ============================
+     Levels -> rank -> boards -> certificates -> the daily, all counted off the live data.
+     The eight crests come from window.rankEmblem (themes.js r377) so the marketing page and
+     the game wear the SAME emblem system — a retiered ladder relabels here for free. ---- */
+  const TIERS  = ((window.HK_RANK || {}).TIERS) || [];
+  const minLvl = (window.HK_RANK || {}).RANKED_MIN_LVL;
+  const tracks = window.HK_TRACKS || [];
+  const pool   = (window.HOTKEY_CHALLENGE_POOL || []).length;
+
+  set('lProgSub', 'Levels come off every clean run. Rank comes off where your times land against ' +
+      'everyone else\u2019s — ' + TIERS.length + ' tiers, from the floor to the one nobody holds for long. ' +
+      'A live board on every drill, ' + tracks.length + ' certificate tracks, and one daily board the ' +
+      'whole site plays.');
+  set('lLadder', TIERS.map((t, i) =>
+    '<div class="l-rank' + (i === TIERS.length - 1 ? ' l-top' : '') + '">' +
+    (window.rankEmblem ? window.rankEmblem(t.name, 22) : '') +
+    '<span>' + esc(t.name) + '</span></div>').join(''));
+  /* r455: rank is AUTOMATIC at RANKED_MIN_LVL — the opt-in is gone (that change lands in the
+     ranked round; this line reads the same SSOT nav.js and lb.js read, so it cannot drift). */
+  set('lRankedNote', minLvl
+    ? 'you are ranked automatically at <b>level ' + minLvl + '</b> — no opt-in, nothing to join'
+    : '');
+  set('lProgBoards',
+    '<div><span class="l-k">one board per drill</span><br>A live board on all <b>' + nAll +
+      '</b> drills, plus the weekly gauntlets.</div>' +
+    '<div>Rank reads your <b>average placement</b>, not your volume — grinding alone never ' +
+      'moves it.</div>');
+  set('lProgCerts',
+    '<div>' + tracks.length + ' tracks, earned on <b>held times</b> — not attendance.</div>' +
+    '<div class="l-certs">' + tracks.map(t =>
+      '<span class="l-cert">' + esc(t.name) + ' <b>' + t.keys.length + '</b></span>').join('') +
+    '</div>');
+  set('lProgDaily',
+    '<div><span class="l-k">one board, every day</span><br>The same drill and the same seed for ' +
+      'everyone, worldwide, drawn from a pool of <b>' + pool + '</b>.</div>' +
+    '<div>Top ten wear it on their card until the next one opens.</div>');
+
+  /* ============================ r455 · PRICING, TWO REAL TIERS =========================
+     FREE = the chapters outside HOTKEY_PREMIUM.groups. PRO = the four inside it, each also
+     earnable on the level path. THE PRICE COMES FROM HOTKEY_PRO.plans — never a literal
+     (dev/check-paywall.js §4b). Chapter names, counts and the perk list are equally derived. */
+  const PRO    = window.HOTKEY_PRO || {};
+  const plans  = PRO.plans || [];
+  const planOf = id => plans.filter(pl => pl && pl.id === id)[0] || null;
+  const mo     = planOf('monthly') || plans[0] || null;
+  const se     = planOf('season')  || plans[1] || null;
+  const freeGroups = groups.filter(g => !isPaid(g));
+
+  /* THE EARN-IN LEVEL per PRO chapter. Read it from the data wherever the catalog carries it
+     (a group's own `unlock_level`, or a HOTKEY_PREMIUM.unlock_level map); this branch carries
+     NEITHER, so the shipped numbers are dev/CURRICULUM_V3.md §3's recommended curve — PRO
+     chapter k opens at 10 + 3k, i.e. 13 / 16 / 19 / 22 (decision D-8, pending Wolf).
+     USED ON THIS BRANCH: the §3 fallback. The moment drills.js grows the field, this reads it
+     and the fallback goes dead — no copy edit. */
+  const UNLOCK_FALLBACK = [13, 16, 19, 22];
+  const unlockOf = (g, i) => g.unlock_level ||
+    (((window.HOTKEY_PREMIUM || {}).unlock_level || {})[g.name]) || UNLOCK_FALLBACK[i] || null;
+
+  set('lPriceSub', 'The first ' + freeGroups.length + ' chapters are free forever — no account, no ' +
+      'card, no trial clock. PRO opens the ' + paidGroups.length + ' back chapters, and every one of ' +
+      'them is also earnable by levelling, without paying anything.');
+
+  set('lFreeChaps', freeGroups.map(g =>
     '<span class="l-pro-chip">' + esc(disp(g)) + ' <span>' + g.keys.length + '</span></span>').join(''));
-  set('lProLaterP', (proOn ? '' : 'When payments open, ') + '<b>' + nPaid + ' of the ' + nAll +
-      ' drills</b> sit behind PRO. The ' + nFree + ' in front of them stay free for good, and any time you ' +
-      'have already posted keeps its place on the board — nothing you earned gets taken back.');
+  set('lFreeList',
+    '<li>The first ' + freeGroups.length + ' chapters — <b>' + nFree + ' drills</b>, open forever</li>' +
+    '<li>Every leaderboard, your level, and all ' + TIERS.length + ' rank tiers</li>' +
+    '<li>All ' + tracks.length + ' certificate tracks, earnable on free drills alone</li>' +
+    '<li>The daily challenge — one board, the same worldwide</li>' +
+    '<li>Both modes, and joining any desk your club or class runs</li>');
 
-  /* ---- "the board" panel: the medal clocks, derived from the live par ladder
+  set('lProPrice', mo ? '<b>' + esc(mo.price) + '</b><span>' + esc(mo.cap) + '</span>' : '<b>—</b>');
+  set('lProAlt',   se ? 'or <b>' + esc(se.price) + '</b> ' + esc(se.cap) : '');
+  /* the flag drives the line, not an editor: freeNow false and the node is simply gone. */
+  { const fn = document.getElementById('lFreeNow'); if(fn && !PRO.freeNow) fn.remove(); }
+  set('lProChaps', paidGroups.map((g, i) => {
+    const lv = unlockOf(g, i);
+    return '<span class="l-pro-chip">' + esc(disp(g)) + ' <span>' + g.keys.length + '</span>' +
+           (lv ? ' <em>or LVL ' + lv + '</em>' : '') + '</span>';
+  }).join(''));
+  set('lProList', (PRO.features || []).slice(0, 4).map(f =>
+    '<li><b>' + esc(f[0]) + '</b> — ' + esc(f[1]) + '</li>').join(''));
+  set('lProLaterP', 'The PRO chapters hold <b>' + nPaid + ' of the ' + nAll + ' drills</b>. The ' +
+      nFree + ' in front of them are free for good, and any time you have already posted keeps its ' +
+      'place on the board — nothing you earn gets taken back.');
+
+  /* ---- the progression band's "clock" panel: the medal clocks, derived from the live par ladder
          (pass par×1.5 · pro par×1.15 · legendary par×1.0, drills.js:458), so the
          proof panel shows real thresholds rather than invented handles. ---- */
   const pars = D.pars || window.HOTKEY_PARS || {};

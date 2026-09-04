@@ -12,8 +12,21 @@
      §2  PREVIEW   — locked cards render, keyboard still reaches them
      §3  MODAL     — opens on launch, closes by keyboard, decline returns the picker
      §4  BILLING   — counts derive from menuOrder; price is TBD; checkout is disabled
+     §4b LANDING   — r455: the price law, static + runtime
      §5  PLACEMENT — the opmodel carve-out, and the hole closing behind it
      §6  STUB      — hk_entitled='1' unlocks; free-tier history survives either way
+
+   r455 — THE PRICE LAW, restated. Until r455 the rule was "no dollar figure on any upgrade
+   surface", because Stripe was not live and a quoted number could not be charged. PRO is a
+   real tier on the launch landing now, so the rule splits:
+     · billing.html and the in-app upgrade modal STILL quote nothing (§3, §4) — they are the
+       checkout path, and checkout is a disabled stub;
+     · the LANDING may quote a price, and every dollar figure on it must be a string read out
+       of HOTKEY_PRO.plans — never a literal in markup or in paintLanding(). §4b asserts both
+       halves: a static scan of the landing region + its painter (no literal may EXIST), and a
+       runtime read of the rendered page (what is painted must be in plans). A hand-typed
+       price is exactly what drifts the day Wolf changes the number, which is why this is a
+       gate step and not a review habit.
 
    Run: node dev/check-paywall.js            (server on 127.0.0.1:8791)
         BASE=http://127.0.0.1:8830 node dev/check-paywall.js                          */
@@ -249,6 +262,8 @@ function catalogFromSource() {
       out.namesCounts = txt.includes(String(window.hkPremiumCount())) && txt.includes(String(window.hkCatalogCount()));
       out.hasPlans = !!(m && m.querySelector('#pwPlans') && /billing\.html$/.test(m.querySelector('#pwPlans').getAttribute('href')));
       out.hasDecline = !!(m && m.querySelector('#pwBack'));
+      /* r455: still no price HERE. The modal is the checkout path and checkout is a disabled
+         stub; the landing is the one surface allowed to quote, and §4b holds it to plans. */
       out.noPrice = !/\$\s?\d/.test(txt);                                   // never quote a price we can't charge
       // ESC dismisses AND hands back the picker
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
@@ -282,7 +297,7 @@ function catalogFromSource() {
     check('§3 modal', r3.namesCounts, 'the modal carries the live premium and catalog counts');
     check('§3 modal', r3.hasPlans, '"See plans" points at billing.html');
     check('§3 modal', r3.hasDecline, 'a decline path exists');
-    check('§3 modal', r3.noPrice, 'the modal quotes NO dollar figure (pre-Stripe)');
+    check('§3 modal', r3.noPrice, 'the in-app upgrade modal quotes NO dollar figure (pre-Stripe; the landing is the one surface that may, §4b)');
     check('§3 modal', r3.closedByKeyboard, 'Escape dismisses the modal');
     check('§3 modal', r3.declineToPicker, 'declining hands the player back to the picker');
     check('§3 modal', r3.campLocked > 0 && r3.campKeepsClears,
@@ -359,10 +374,65 @@ function catalogFromSource() {
       'the totals match menuOrder (' + r.total + ' of ' + r.all + ' vs ' + CAT.nPrem + ' of ' + CAT.nAll + ')');
     check('§4 billing/' + label, /TBD/.test(r.price) && r.tbdBadge,
       'pricing renders as TBD with a "pricing not set" badge');
-    check('§4 billing/' + label, !r.bodyPrice, 'no dollar figure anywhere in the plans block');
+    check('§4 billing/' + label, !r.bodyPrice, 'no dollar figure anywhere in the plans block (checkout is a disabled stub; the landing quotes instead, §4b)');
     check('§4 billing/' + label, r.ctaDisabled && /Payments launching soon/i.test(r.ctaText),
       'checkout is a disabled "Payments launching soon" stub');
     check('§4 billing/' + label, page.__errs.length === 0, 'zero page errors (' + page.__errs.join(' | ') + ')');
+    await page.close();
+  }
+
+  /* ======================================================================== §4b
+     THE LANDING PRICE LAW. Static half first — it needs no browser and it is the half that
+     catches the literal a reviewer would skim past. The landing markup region and its painter
+     are read straight out of index.html with comments stripped (a comment may cite a price as
+     evidence; painted copy may not contain one). */
+  {
+    const src = fs.readFileSync('index.html', 'utf8');
+    /* html + block + line comments, the e2e-smoke decomment shape (`[^:]` keeps https:// intact) —
+       a comment may cite a price as evidence; only painted copy is under the law. */
+    const decomment = t => t.replace(/<!--[\s\S]*?-->/g, ' ').replace(/\/\*[\s\S]*?\*\//g, ' ')
+                            .replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
+    const slice = (from, to) => {
+      const a = src.indexOf(from); const b = src.indexOf(to, a);
+      if (a < 0 || b < 0) throw new Error('check-paywall §4b: could not slice ' + from.slice(0, 40));
+      return src.slice(a, b);
+    };
+    const markup  = decomment(slice('<div class="landing" id="landing">', 'const SUPABASE_URL'));
+    const painter = decomment(slice('function paintLanding(){', 'try{ paintLanding(); }catch(e){}'));
+    const litM = markup.match(/\$\s?\d/g) || [];
+    const litP = painter.match(/\$\s?\d/g) || [];
+    check('§4b landing', litM.length === 0,
+      'no price literal in the landing markup (' + litM.join(' ') + ')');
+    check('§4b landing', litP.length === 0,
+      'no price literal in paintLanding() (' + litP.join(' ') + ')');
+    check('§4b landing', /HOTKEY_PRO/.test(painter),
+      'paintLanding() reads HOTKEY_PRO for the price');
+  }
+  /* Runtime half, in BOTH flag states — the rendered page may show only plan prices, and the
+     freeNow line is flag-driven in both directions. §1's "flag off = zero visible change" law
+     still holds above; this adds "and the price it shows came from the data". */
+  for (const [label, seed] of [['flag off', () => { try { localStorage.removeItem('hk_premium_preview'); } catch (e) {} }],
+                               ['preview',  () => { try { localStorage.setItem('hk_premium_preview', '1'); } catch (e) {} }]]) {
+    const page = await newPage('index.html', seed);
+    const r = await page.evaluate(() => {
+      const L = document.getElementById('landing');
+      return {
+        shown: (L.textContent.match(/\$\s?[\d,.]+/g) || []).map(x => x.replace(/\s/g, '')),
+        plans: ((window.HOTKEY_PRO || {}).plans || []).map(pl => pl.price),
+        freeNow: !!(window.HOTKEY_PRO || {}).freeNow,
+        freeNowShown: !!document.getElementById('lFreeNow'),
+        billingHref: (document.getElementById('lProPlans') || {}).getAttribute
+          ? document.getElementById('lProPlans').getAttribute('href') : null
+      };
+    });
+    check('§4b landing/' + label, r.shown.length > 0 && r.shown.every(x => r.plans.indexOf(x) >= 0),
+      'every dollar figure on the landing is a HOTKEY_PRO.plans price (' + r.shown.join(' ') + ' vs ' + r.plans.join(' ') + ')');
+    check('§4b landing/' + label, r.plans.every(x => r.shown.indexOf(x) >= 0),
+      'both plans are quoted (' + r.plans.join(' ') + ')');
+    check('§4b landing/' + label, r.freeNow === r.freeNowShown,
+      'the freeNow line tracks HOTKEY_PRO.freeNow (flag=' + r.freeNow + ' shown=' + r.freeNowShown + ')');
+    check('§4b landing/' + label, r.billingHref === 'billing.html', 'the PRO CTA points at billing.html');
+    check('§4b landing/' + label, page.__errs.length === 0, 'zero page errors (' + page.__errs.join(' | ') + ')');
     await page.close();
   }
 
