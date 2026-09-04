@@ -941,6 +941,229 @@ try {
   bad('C24 could not run: ' + String(e.message || e).slice(0, 160));
 }
 
+/* ---- C26 (r455 Phase B, dev/CURRICULUM_REBUILD.md P5): ONE ENTRY SYSTEM + THE LEVEL CONTRACT ----
+   Three findings from the r453 program spec become guards here.
+
+   (1) NO SECOND ONBOARDING SURFACE. The entry was three teaching systems stacked (the modal
+       product tour, the Keyboard Tour, guided rails with F1 hints), and each was right when it
+       was built. Phase B deletes the modal tour, the comfort question, the keyboard card, the
+       warm-up prompt and the guided auto-handoff, and this asserts they stay deleted — the
+       failure mode is a later round quietly re-adding "just one card" to the entry.
+   (2) EXACTLY ONE ENTRY PATH: tryEnter → advanceAccess → dismissLanding → hkEnterFirstBoard →
+       loadChallenge. One function, one route, no fork.
+   (3) THE LEVEL DATA CONTRACT. Every `level:` declaration's acts must PARTITION the drill's core
+       checks (each core beat in exactly one act, none left over, none twice) and every act must
+       carry at least one instruction line pointing at one of its own beats. A level whose acts
+       skip a core beat is a level whose instruction line goes silent mid-run; one that
+       double-books a beat is a level whose acts can never both close. Neither shows up in a
+       smoke test.
+   (4) THE DRILL SURFACE KEEPS ITS CHROME (Wolf, 2026-09-03 round 2, binding): pixel art is for
+       IDENTITY assets only — rank, level, achievements, the player card. A level teaches through
+       the drill's own instruction line (#taskLine) and the ordinary checklist, never through a
+       card or a banner over the board. So the level controller may not raise hkLessonCard and
+       may not paint the HUD; both are asserted below. (The r452 Keyboard Tour keeps its own HUD
+       and stage cards — it is the legacy intro, reachable only from the ? sheet while
+       LEVEL1_LIVE is false, and it is deleted whole when L1 ships.)
+
+   The core-beat count is read statically: `{label:` occurrences inside checks() minus the ☆
+   bonus rows. The engine-appended save closer (saveClose:true) is NOT a core an act may claim —
+   it is the win, and it belongs to the drill, not to a level (index.html hkSaveCloseWire). ---- */
+try {
+  const idx26 = fs.readFileSync('index.html', 'utf8');
+  const nav26 = fs.readFileSync('nav.js', 'utf8');
+
+  /* ---- (1) no second onboarding surface ---- */
+  const DEAD = ['TOUR_STEPS', 'tourShow', 'buildTourPlan', 'tourSkipReq', 'tourReplay',
+                'showComfort', 'showKeyboard', 'hkCardPicker', 'showPrimer', 'startSandbox',
+                'maybeOnboard', 'showOnboard', 'paintOnboard', 'skipOnboard', 'startPlacement'];
+  /* a mention inside a block comment is the deletion NOTE, not the symbol — every check in this
+     first half reads the CODE, with block and line comments stripped */
+  const code26 = idx26.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  for (const d of DEAD) {
+    const re = new RegExp('(function\\s+' + d + '\\s*\\(|const\\s+' + d + '\\s*=|\\b' + d + '\\s*\\()');
+    if (re.test(code26))
+      bad(`C26: '${d}' is back in index.html — P5 allows ONE entry system; the modal product tour, ` +
+          `the comfort question and the warm-up prompt were deleted in r455`);
+  }
+  if (/id="onboard"/.test(idx26))
+    bad('C26: the #onboard "quick warm-up / skip" modal is back in the DOM (P5: no fork at the entry)');
+  if (/localStorage\.getItem\(['"]hk_xlv['"]\)/.test(code26))
+    bad('C26: index.html reads hk_xlv again — the comfort answer it routed on is deleted (P5)');
+  if (/localStorage\.getItem\(['"]hk_tour_done['"]\)/.test(code26))
+    bad('C26: index.html reads hk_tour_done again — the modal product tour it gated is deleted (P5)');
+  if (/window\.__wantGuided/.test(code26))
+    bad('C26: the {guided:true} auto-handoff is back (window.__wantGuided) — rails never default on (P5)');
+
+  /* ---- (2) exactly one entry path ---- */
+  if ((idx26.match(/function tryEnter\(/g) || []).length !== 1)
+    bad('C26: there is not exactly one tryEnter() — the landing has one door');
+  if ((idx26.match(/function hkEnterFirstBoard\(/g) || []).length !== 1)
+    bad('C26: hkEnterFirstBoard() is missing or duplicated — it is the ONE thing dismissLanding calls');
+  {
+    const dl = /function dismissLanding\(\)\{([\s\S]*?)\n\}/.exec(idx26);
+    if (!dl) bad('C26: dismissLanding() not found');
+    else {
+      if (!/hkEnterFirstBoard\(\)/.test(dl[1]))
+        bad('C26: dismissLanding no longer routes through hkEnterFirstBoard — the one entry path is broken');
+      for (const forbidden of ['showComfort', 'tourShow', 'maybeOnboard', 'startKeyboardTour', 'showKeyboard'])
+        if (new RegExp('\\b' + forbidden + '\\s*\\(').test(dl[1]))
+          bad(`C26: dismissLanding calls ${forbidden}() — the entry forked again (P5)`);
+    }
+    const ef = /function hkEnterFirstBoard\(\)\{([\s\S]*?)\n\}/.exec(idx26);
+    if (ef && !/loadChallenge\(/.test(ef[1]))
+      bad('C26: hkEnterFirstBoard never reaches loadChallenge — Enter must land on a board');
+  }
+
+  /* ---- (4) the drill surface keeps its chrome: no card, no banner, from the level side ---- */
+  {
+    const lv = /r455 \(Phase B · dev\/CURRICULUM_REBUILD\.md P5\) THE LEVEL \/ ACT CONTROLLER[\s\S]*?\nfunction hkTip\(/.exec(idx26);
+    if (!lv) bad('C26: the level/act controller block could not be read');
+    else {
+      const body = lv[0].replace(/\/\*[\s\S]*?\*\//g, '');
+      if (/hkLessonCard\s*\(/.test(body))
+        bad('C26: the level controller raises hkLessonCard — an act is not a story card. Wolf round 2: ' +
+            'an act boundary is the checklist advancing plus the instruction line changing, no scrim card');
+      if (/hkHudPaint\s*\(|hkHudShow\s*\(/.test(body))
+        bad('C26: the level controller paints the HUD banner — the drill surface keeps the site\'s ' +
+            'original chrome; the level teaches through #taskLine and the checklist');
+      if (!/cl-hint/.test(body))
+        bad('C26: the level controller no longer renders its line in the checklist\'s own .cl-hint row — ' +
+            'that IS its teaching surface, and it is the row a drill\'s hint() already uses');
+      if (/\$\('taskLine'\)/.test(body))
+        bad('C26: the level controller writes #taskLine, which has been display:none since r49 — ' +
+            'the lesson would be invisible (caught in the r455 render review)');
+    }
+    /* the drill board must not grow a bitmap face: pixel fonts are identity-asset only */
+    if (/font-family:[^;}]*\b(VT323|Press Start|Silkscreen|Pixelify)\b/i.test(idx26))
+      bad('C26: a bitmap/pixel font is set on index.html — pixel art is limited to identity assets ' +
+          '(rank, level, achievements, the player card), never the drill surface');
+  }
+
+  /* ---- the runtime the entry now depends on ---- */
+  for (const fn of ['hkLevelStart', 'hkLevelTick', 'hkLevelShows', 'hkLevelHintHtml', 'hkLevelWin', 'hkLevelHintsReset', 'hkTip'])
+    if (!new RegExp('function ' + fn + '\\(').test(idx26)) bad(`C26: ${fn}() is gone — the level runtime is the entry`);
+  if (!/try\{ hkLevelStart\(\); \}catch\(e\)\{\}/.test(idx26))
+    bad('C26: loadChallenge no longer calls hkLevelStart — a level would never raise its act card');
+  if (!/try\{ hkLevelTick\(items\); \}catch\(e\)\{\}/.test(idx26))
+    bad('C26: updateChecklist no longer calls hkLevelTick — the acts would never grade or advance');
+  if (!/html\+=hkLevelHintHtml\(items\);/.test(idx26))
+    bad('C26: updateChecklist no longer renders the act\'s line (hkLevelHintHtml) — the level would coach silently');
+  if (!/if\(!hkLevelShows\(idx, items\)\) return;/.test(idx26))
+    bad('C26: updateChecklist lost the act-scoped checklist slice (hkLevelShows) — a coaching level ' +
+        'would show every beat of every act at once');
+  if (!/try\{ hkLevelWin\(\); \}catch\(e\)\{\}/.test(idx26))
+    bad('C26: checkWin no longer calls hkLevelWin — a cleared level would coach again on every replay');
+  {
+    const winBail = /if\(done\|\|demoPlaying[^\n]*\) return;/.exec(idx26);
+    if (!winBail) bad('C26: checkWin\'s bail list could not be read');
+    else if (/levelMode/.test(winBail[0]))
+      bad('C26: checkWin bails on levelMode — A LEVEL IS A NORMAL DRILL (it must stop the clock, ' +
+          'show the results card, bank the PB, pay xp and post the run; only the Tour is exempt)');
+    const clkBail = /function startClock\(\)\{ if\([^)]*\)return;/.exec(idx26);
+    if (!clkBail) bad('C26: startClock\'s bail list could not be read');
+    else if (/levelMode/.test(clkBail[0]))
+      bad('C26: startClock refuses levelMode — a level is TIMED like any drill');
+  }
+
+  /* ---- the three tips: exactly three, each latched, each fired once ---- */
+  {
+    const tips = [...idx26.matchAll(/hkTip\('([a-z]+)'/g)].map(m => m[1]).filter((v, i, a) => a.indexOf(v) === i);
+    const want = ['picker', 'pb', 'rank'];
+    for (const t of want) if (!tips.includes(t)) bad(`C26: the '${t}' contextual tip is gone — P5 ships exactly three`);
+    for (const t of tips) if (!want.includes(t)) bad(`C26: an unlisted contextual tip '${t}' — P5 says three, not thirteen`);
+    if (!/localStorage\.getItem\(k\)==='1'\) return false;/.test(idx26))
+      bad('C26: hkTip lost its one-shot latch (hk_tip_<name>) — a tip that repeats is a tour');
+  }
+
+  /* ---- sign-out wipes the teaching state (nav.js) ---- */
+  for (const pref of ['hk_level_seen_', 'hk_tip_'])
+    if (!new RegExp("indexOf\\('" + pref + "'\\)===0").test(nav26))
+      bad(`C26: nav.js's sign-out sweep does not wipe ${pref}<…> — the next account on the machine ` +
+          `would meet level 1 already silenced (or its three tips already spent)`);
+
+  /* ---- (3) the level data contract ---- */
+  const s26 = idx26.indexOf('const CHALLENGES = {');
+  const e26 = idx26.indexOf('STATE + ENGINE', s26);
+  const body26 = idx26.slice(s26, e26);
+  const parts26 = body26.split(/\n  ([a-z][a-z0-9_]*):\s*\{/);
+  const chunks26 = {};
+  for (let i = 1; i < parts26.length; i += 2) chunks26[parts26[i]] = parts26[i + 1] || '';
+  const levelKeys = Object.keys(chunks26).filter(k => /\n    level:\s*\{/.test(chunks26[k]));
+  if (!levelKeys.length) bad('C26: no drill declares a `level` — the runtime built in r455 has no consumer');
+  for (const k of levelKeys) {
+    const ch = chunks26[k];
+    const lv = /\n    level:\s*\{([\s\S]*?)\n    \},?\n/.exec(ch);
+    if (!lv) { bad(`C26: ${k}.level is not a readable literal block`); continue; }
+    const L = lv[1];
+    const n = /\bn:\s*(\d+)/.exec(L);
+    if (!n) bad(`C26: ${k}.level declares no level number \`n\` — the picker's path reads it`);
+    const nextKey = /nextKey:\s*'([a-z0-9_]+)'/.exec(L);
+    if (!nextKey) bad(`C26: ${k}.level declares no nextKey — the results card's hand-off has nowhere to go`);
+    else if (!chunks26[nextKey[1]]) bad(`C26: ${k}.level.nextKey '${nextKey[1]}' is not a drill`);
+
+    /* core-beat count: {label: rows inside checks(), less the ☆ bonus rows. The engine-appended
+       save closer is the drill's win and belongs to no act. */
+    const ci = ch.indexOf('checks(');
+    const tail = ci >= 0 ? ch.slice(ci) : '';
+    const nLabels = (tail.match(/\{label:/g) || []).length;
+    const nBonus = (tail.match(/bonus:\s*true/g) || []).length;
+    const nCore = nLabels - nBonus;
+    if (nCore <= 0) { bad(`C26: could not read ${k}'s core checks (${nLabels} labels, ${nBonus} bonus)`); continue; }
+
+    const beatSets = [...L.matchAll(/beats:\s*\[([0-9,\s]*)\]/g)]
+      .map(m => m[1].split(',').map(x => parseInt(x, 10)).filter(x => !isNaN(x)));
+    const hudSets = [...L.matchAll(/lines:\s*\[([\s\S]*?)\]\s*\}/g)]
+      .map(m => [...m[1].matchAll(/beat:\s*(\d+)/g)].map(x => parseInt(x[1], 10)));
+    if (/\bcard:\s*\{/.test(L))
+      bad(`C26: ${k}.level declares an act \`card\` — acts do not render cards any more ` +
+          `(Wolf round 2: the boundary is the checklist advancing, not a scrim)`);
+    /* an ACT opens a line; `card:{ title:` never does — that is what separates the two titles */
+    const nActs = (L.match(/\n\s*\{ title:'/g) || []).length;
+    if (!beatSets.length || beatSets.length !== nActs)
+      bad(`C26: ${k}.level has ${nActs} act(s) but ${beatSets.length} beats:[] list(s) — every act owns a slice`);
+    if (hudSets.length !== beatSets.length)
+      bad(`C26: ${k}.level has ${beatSets.length} act(s) but ${hudSets.length} lines:[] list(s)`);
+    const all = [].concat(...beatSets);
+    const uniq = [...new Set(all)];
+    if (all.length !== uniq.length)
+      bad(`C26: ${k}.level's acts double-book a beat (${all.join(',')}) — two acts could never both close`);
+    for (const b of uniq) if (b < 0 || b >= nCore)
+      bad(`C26: ${k}.level names beat ${b}, outside its ${nCore} core checks (the ☆ and the save closer belong to no act)`);
+    for (let b = 0; b < nCore; b++) if (!uniq.includes(b))
+      bad(`C26: ${k}.level's acts do not cover core beat ${b} — the HUD would go silent mid-run ` +
+          `(the acts must PARTITION the ${nCore} core checks)`);
+    beatSets.forEach((bs, i) => {
+      const hs = hudSets[i] || [];
+      if (!hs.length) bad(`C26: ${k}.level act ${i + 1} carries no instruction line — the drill's own line is the coach`);
+      for (const h of hs) if (!bs.includes(h))
+        bad(`C26: ${k}.level act ${i + 1} has a line for beat ${h}, which is not one of its beats (${bs.join(',')})`);
+    });
+    /* the instruction line is ONE sentence of drill chrome, not a paragraph of story */
+    const texts = [...L.matchAll(/text:\s*'((?:[^'\\]|\\.)*)'/g)].map(m => m[1]);
+    texts.forEach((t, i) => {
+      const w = t.split(/\s+/).filter(Boolean).length;
+      if (w > 28) bad(`C26: ${k}.level line ${i + 1} is ${w} words — the drill's instruction line is one sentence`);
+      if (!t.trim()) bad(`C26: ${k}.level line ${i + 1} is empty`);
+    });
+    if ((L.match(/keys:\s*\[/g) || []).length < hudSets.reduce((a, h) => a + h.length, 0))
+      bad(`C26: ${k}.level: every instruction line needs its keycaps`);
+  }
+
+  /* ---- the L1 switch, and what it is allowed to turn off ---- */
+  if (!/const LEVEL1_LIVE=(true|false);/.test(idx26))
+    bad('C26: LEVEL1_LIVE is gone — it is the one switch that retires the Keyboard Tour entry');
+  if (/const LEVEL1_LIVE=false;/.test(idx26) && !/id="kbKeyTour"/.test(idx26))
+    bad('C26: LEVEL1_LIVE is false but the ? sheet no longer offers "replay the intro" — ' +
+        'first-contact teaching would disappear between two PRs');
+
+  if (!fail) ok(`one entry system (tryEnter → hkEnterFirstBoard → loadChallenge), ${DEAD.length} retired ` +
+                `onboarding symbols stay retired, 3 contextual tips, ${levelKeys.length} level declaration(s) ` +
+                `partition their core checks with an instruction line per act, and the level controller ` +
+                `raises no card and paints no banner (the drill surface keeps its chrome)`);
+} catch (e) {
+  bad('C26 could not run: ' + String(e.message || e).slice(0, 200));
+}
+
 /* ---- C25 (r452): the Mac chord truth table is SSOT ----
    themes.js's HK_MAC_CHORDS is the only place Mac Excel's real bindings live. Before r452
    reference.html carried its OWN blind glyph swap (macCap: ctrl→⌘, alt→⌥, shift→⇧) and the
