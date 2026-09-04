@@ -678,7 +678,7 @@ window.HK_RANK = {
     {name:'Second-Year Analyst', cls:'tier-diamond',  att:18, pct:0.15, req:'18 drills \u00b7 top 3% \u2014 the true final boss'},
   ],
   PROVISIONAL_W: 6,   // weighted-board exposure needed before ranks above Summer Analyst unlock
-  RANKED_MIN_LVL: 10, // r417 audit: level gate for Ranked opt-in — SSOT here; nav.js + lb.js read it (was comment-synced duplicates)
+  RANKED_MIN_LVL: 10, // r417 audit: the level at which rank is AUTOMATIC (r455) — SSOT here; nav.js hkRankedEntered + lb.js read it
   tierOf(avgPct, att, wsum){
     const T=this.TIERS;
     if(avgPct===null || (att||0)<5) return {...T[0], i:0, bucket:null, full:T[0].name, provisional:false};   // MBA Associate — the floor
@@ -2119,13 +2119,13 @@ window.hkPlayerCard = function(d, opts){
   return h;
 };
 
-/* ---- r407 (Wolf): RANKED UNLOCKED card. The eligibility celebration + opt-in prompt,
-   shared by the leaderboard (rankedInfographic) and the login nudge (nav.js). Variant C:
-   a hero crest, the full 8-tier ladder rendered from real rank emblems, three tight beats
-   (place · rank · climb), a bucket byline, and ONE primary CTA with a de-emphasized "later".
-   Dependency-light: window.rankEmblem + window.HK_RANK.TIERS. Callbacks:
-     opts.onEnter()  — opt in (default: set hk_ranked, push, reload)
-     opts.onLater()  — dismiss (default: just close)
+/* ---- r407 (Wolf): RANKED UNLOCKED card — r455: THE ONE-TIME REVEAL. Rank is automatic at
+   HK_RANK.RANKED_MIN_LVL now, so this card no longer asks anything: it is the season-start
+   infographic nav.js maybeRankReveal plays ONCE (latched on hk_rank_reveal_seen) the first time
+   hkRankedEntered() reads true. Variant C: a hero crest, the full 8-tier ladder rendered from
+   real rank emblems, three tight beats (place · rank · climb), a bucket byline, and ONE dismiss.
+   No button on it changes state. Dependency-light: window.rankEmblem + window.HK_RANK.TIERS.
+     opts.onClose()  — after dismiss (optional)
      opts.reason     — eyebrow text (e.g. 'Level 10 reached')  ---- */
 window.hkRankedCard = function(opts){
   opts = opts || {};
@@ -2160,9 +2160,7 @@ window.hkRankedCard = function(opts){
       '.hkru-cta{margin-top:15px}'+
       '.hkru-go{width:100%;text-align:center;font-family:var(--mono);font-weight:700;font-size:14px;padding:13px;border-radius:11px;cursor:pointer;'+
         'background:var(--accent);color:var(--on-accent,#0c0d0e);border:none}'+
-      '.hkru-go:hover{filter:brightness(1.06)}'+
-      '.hkru-later{display:inline-block;margin-top:11px;font-family:var(--mono);font-size:11px;color:var(--faint);cursor:pointer;text-decoration:underline dotted;opacity:.75}'+
-      '.hkru-later:hover{opacity:1;color:var(--muted)}';
+      '.hkru-go:hover{filter:brightness(1.06)}';
     document.head.appendChild(st);
   }
   const stale=document.getElementById('hkru-modal'); if(stale) stale.remove();
@@ -2172,34 +2170,26 @@ window.hkRankedCard = function(opts){
   T.forEach((t,i)=>{ lad += (i?'<span class="hkru-arw">›</span>':'')+'<span class="hkru-cr">'+em(t,24)+'</span>'; });
   m.innerHTML='<div class="hkru">'+
     '<span class="hkru-x" id="hkruX">×</span>'+
-    '<div class="hkru-eyebrow">◆ '+esc(opts.reason||'you’ve unlocked ranked')+'</div>'+
+    '<div class="hkru-eyebrow">◆ '+esc(opts.reason||'you’re ranked')+'</div>'+
     '<div class="hkru-hero">'+hero+'</div>'+
     '<h2 class="hkru-h">Ranked Unlocked</h2>'+
     '<div class="hkru-lad">'+lad+'</div>'+
     '<div class="hkru-beats">'+
-      '<div class="hkru-beat"><b>Place</b><span>the placement series — 5 standard boards</span></div>'+
+      '<div class="hkru-beat"><b>Place</b><span>the placement series starts now — 5 standard boards</span></div>'+
       '<div class="hkru-beat"><b>Rank</b><span>your average placement sets your tier</span></div>'+
       '<div class="hkru-beat"><b>Climb</b><span>beat the field to promote</span></div>'+
     '</div>'+
     '<div class="hkru-byline">Every tier splits into three <b>buckets</b> — you enter at <b>Bottom</b>, climb to <b>Top</b>, then promote to the next tier.</div>'+
     '<div class="hkru-rew">every tier unlocks its own <b>card skin</b></div>'+
-    '<div class="hkru-cta"><button class="hkru-go" id="hkruGo">Enter Ranked</button>'+
-      '<div><a class="hkru-later" id="hkruLater">maybe later</a></div></div>'+
+    '<div class="hkru-cta"><button class="hkru-go" id="hkruOk">Got it</button></div>'+
     '</div>';
   document.body.appendChild(m);
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-  const close=()=>m.remove();
-  const later=()=>{ try{ opts.onLater && opts.onLater(); }catch(e){} close(); };
-  m.querySelector('#hkruX').onclick=later;
-  m.querySelector('#hkruLater').onclick=later;
-  m.querySelector('#hkruGo').onclick=()=>{
-    try{
-      if(opts.onEnter){ opts.onEnter(); }
-      else { localStorage.setItem('hk_ranked','1'); try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} location.reload(); }
-    }catch(e){}
-    close();
-  };
-  m.addEventListener('click',e=>{ if(e.target===m) later(); });
+  /* r455: every way out is the same dismiss — nothing on this card writes state */
+  const close=()=>{ m.remove(); try{ opts.onClose && opts.onClose(); }catch(e){} };
+  m.querySelector('#hkruX').onclick=close;
+  m.querySelector('#hkruOk').onclick=close;
+  m.addEventListener('click',e=>{ if(e.target===m) close(); });
   try{ if(window.hkInitCardFx) requestAnimationFrame(()=>window.hkInitCardFx(m)); }catch(e){}
   return m;
 };

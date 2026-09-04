@@ -2075,36 +2075,29 @@ const ALTS = [
       {sel:'B'+R.g+':'+R.LC+R.g, keys:[{key:'Alt'},L('h'),L('b'),L('p')]},
       {sel:R.focus, keys:[{key:'Alt'},L('h'),L('b'),L('t')]},
     ]; }` },
-  { key: 'navigation', name: 'ROUND-2 corridor the SLOW way — single-arrow steps both directions (no ctrl-shots, no Ctrl+Home), slow shift-span grab, walk home, paste, Ctrl+End', moves: `C => {
-      // r424 (§4.1 round 2): the corridor is bidirectional — the slow route steps every cell,
-      // grabs the block with plain Shift+arrows, WALKS back to the A1 room instead of the
-      // Ctrl+Home teleport, pastes, then flies Ctrl+End (the finish beat's only route — a
-      // teleport by design; the §1.7 R2(a) coordinates-are-the-game exemption).
-      const M=C._maze, cl=colLetter, T=M.table, p1=M.p1;
+  /* r456 (Foundations 1 "Navigate & Select", CURRICULUM_V3 §9.1's own Alts line). The three
+     r424/r427 corridor alts are RETIRED with the board they tested (the model-block grab and
+     the Ctrl+End finish are no longer beats). Two replace them, exactly as §9.1 specifies:
+     ALT 1 = the ☆-FORFEIT control (walk every hall, grow every range with plain Shift+arrows —
+     all nine cores clear, the star does not, §1.0(c)); ALT 2 = the space-chord route in a
+     different op order (Ctrl+Space before Shift+Space, Ctrl+Shift+Space for the region). */
+  { key: 'navigation', name: 'FOUNDATIONS-1 the SLOW way — every hall walked cell by cell, every range grown with plain Shift+arrows (☆ FORFEITED, all nine cores clear)', moves: `C => {
+      const M=C._maze, N=C._nav, B=N.table, cl=colLetter, p1=M.p1;
       const sk=(a,b)=>{ const dr=b[0]-a[0], dc=b[1]-a[1]; return dr===1?{key:'ArrowDown'}:dr===-1?{key:'ArrowUp'}:dc===1?{key:'ArrowRight'}:{key:'ArrowLeft'}; };
-      const nav1=[]; for(let i=1;i<p1.length;i++) nav1.push(sk(p1[i-1],p1[i]));   // step to the block, one cell at a time (collects pips) — lands bottom-left
-      const BL=[T.r0+T.h-1,T.c0], TR=[T.r0,T.c0+T.w-1];
-      const g=[]; for(let i=0;i<T.w-1;i++) g.push({key:'ArrowRight',shift:true});
-      for(let i=0;i<T.h-1;i++) g.push({key:'ArrowUp',shift:true});
-      g.push({key:'c',ctrl:true});                                               // slow span from the landing corner + copy (active ends top-right)
-      const back=[];                                                             // walk from the top-right corner back to A1: rejoin BL, then reverse p1, then up the room edge
-      for(let i=0;i<T.h-1;i++) back.push({key:'ArrowDown'});
-      for(let i=0;i<T.w-1;i++) back.push({key:'ArrowLeft'});
-      for(let i=p1.length-1;i>0;i--) back.push(sk(p1[i],p1[i-1]));
-      for(let r=p1[0][0];r>1;r--) back.push({key:'ArrowUp'});
+      const nav1=[]; for(let i=1;i<p1.length;i++) nav1.push(sk(p1[i-1],p1[i]));   // step to the block one cell at a time (collects every checkpoint, spends every hall)
+      const row=[]; for(let i=0;i<4;i++) row.push({key:'ArrowRight',shift:true});
+      const col=[]; for(let i=0;i<7;i++) col.push({key:'ArrowDown',shift:true});
       return [
         {sel:cl(p1[0][1])+p1[0][0], keys:nav1},
-        {sel:cl(BL[1])+BL[0], keys:g},
-        {sel:cl(TR[1])+TR[0], keys:back},
-        {sel:'A1', keys:[{key:'v',ctrl:true}]},
-        {sel:'A1', keys:[{key:'End',ctrl:true}]}                                 // finish flight; the harness presses the universal Ctrl+S closer
+        {sel:cl(B.c0+1)+(B.r0+1+N.memoRow), keys:row},                            // the memo's row, grown one cell at a time
+        {sel:cl(B.c0+1+N.memoCol)+(B.r0+1), keys:col},                            // the memo's column, the same way
+        {sel:cl(B.c0)+B.r0, keys:[{key:'ArrowRight',ctrl:true,shift:true},{key:'ArrowDown',ctrl:true,shift:true}]},
+        {sel:cl(B.c0+1)+(B.r0+1), keys:[{key:'F5'},L('s'),L('o')]},               // the ONE one-pass route to the typed set
+        {sel:cl(B.c0)+B.r0, keys:[{key:'ArrowRight',ctrl:true,shift:true},{key:'ArrowDown',ctrl:true,shift:true},{key:'c',ctrl:true}]},
+        {sel:cl(B.c0)+B.r0+':'+cl(B.c0+B.w-1)+(B.r0+B.h-1), keys:[{key:'Home',ctrl:true},{key:'v',ctrl:true}]}
       ]; }` },
-  { key: 'navigation', name: 'ROUND-2 ctrl-shot flights + TL grab (span DOWN then RIGHT) + Wolf sketch order: paste → SAVE → finish flight (win fires on the flight)', moves: `C => {
-      // r424 (§1.8): second route — canonical corridor flights, but the grab anchors at the
-      // TOP-LEFT corner (single steps up the label column, then ctrl+shift down/right), and the
-      // closer follows Wolf's §4.1 sketch order: Ctrl+S BEFORE the bottom-right flight — the
-      // post:true finish beat means the save takes and the win fires on the flight.
-      const M=C._maze, cl=colLetter, T=M.table, p1=M.p1, RN=20, CN=10;
+  { key: 'navigation', name: 'FOUNDATIONS-1 space chords in a different op ORDER — Ctrl+Space column first, Shift+Space row, Ctrl+Shift+Space for the region (the star route)', moves: `C => {
+      const M=C._maze, N=C._nav, B=N.table, cl=colLetter, p1=M.p1, RN=20, CN=10;
       const ek=(r,c,nr,nc)=>{ const a=r*100+c,b=nr*100+nc; return a<b?(r+':'+c+'|'+nr+':'+nc):(nr+':'+nc+'|'+r+':'+c); };
       const can=(r,c,nr,nc)=> nr>=1&&nr<=RN&&nc>=1&&nc<=CN&&M.pass.has(ek(r,c,nr,nc));
       const shoot=(r,c,dr,dc)=>{ let cr=r,cc=c; while(can(cr,cc,cr+dr,cc+dc)){cr+=dr;cc+=dc;} return [cr,cc]; };
@@ -2118,41 +2111,13 @@ const ALTS = [
           if(sh[0]===end[0]&&sh[1]===end[1]){ steps.push({sel:cl(c)+r, keys:[dK(dr,dc)]}); }
           else { for(let k=i;k<j;k++){ const [rr,cc]=path[k]; steps.push({sel:cl(cc)+rr, keys:[sK(dr,dc)]}); } }
           i=j; } };
-      walk(p1);                                                                  // flight chain to the block (collects pips) — lands bottom-left
-      const up=[]; for(let i=0;i<T.h-1;i++) up.push({key:'ArrowUp'});            // single-step up the label column to the top-left corner
-      up.push({key:'ArrowDown',ctrl:true,shift:true},{key:'ArrowRight',ctrl:true,shift:true},{key:'c',ctrl:true});
-      steps.push({sel:cl(T.c0)+(T.r0+T.h-1), keys:up});
-      steps.push({sel:cl(T.c0)+T.r0+':'+cl(T.c0+T.w-1)+(T.r0+T.h-1), keys:[{key:'Home',ctrl:true},{key:'v',ctrl:true}]});
-      steps.push({sel:'A1', keys:[{key:'s',ctrl:true},{key:'End',ctrl:true}]});  // SAVE first, then the finish flight — the win fires on the flight
-      return steps; }` },
-  { key: 'navigation', name: 'ROUND-3 exit ON FOOT — no Ctrl+End at all: paste, walk back down the corridor, and step the carved exit gap to J20 cell by cell', moves: `C => {
-      // r427 (§4.1 ROUND 3, Wolf playtest r2 — "add a small EXIT so you can still get THROUGH the
-      // corridor to complete the 'go to last cell' checklist item"): this route NEVER presses
-      // Ctrl+End. It rides the corridor, grabs and copies the block, teleports home to paste, then
-      // walks all the way back down the corridor and out through the exit gap to J20 on single
-      // arrow steps — proving the finish beat has a legitimate PATH, not only the teleport.
-      const M=C._maze, cl=colLetter, T=M.table, p1=M.p1, RN=20, CN=10;
-      const ek=(r,c,nr,nc)=>{ const a=r*100+c,b=nr*100+nc; return a<b?(r+':'+c+'|'+nr+':'+nc):(nr+':'+nc+'|'+r+':'+c); };
-      const can=(r,c,nr,nc)=> nr>=1&&nr<=RN&&nc>=1&&nc<=CN&&M.pass.has(ek(r,c,nr,nc));
-      const sk=(a,b)=>{ const dr=b[0]-a[0], dc=b[1]-a[1]; return dr===1?{key:'ArrowDown'}:dr===-1?{key:'ArrowUp'}:dc===1?{key:'ArrowRight'}:{key:'ArrowLeft'}; };
-      // BFS the open graph so the walk home from A1 is a real wall-respecting route
-      const bfs=(from,to)=>{ const q=[from], prev={}; prev[from[0]+':'+from[1]]=null;
-        while(q.length){ const [r,c]=q.shift(); if(r===to[0]&&c===to[1]) break;
-          for(const d of [[-1,0],[1,0],[0,-1],[0,1]]){ const nr=r+d[0], nc=c+d[1], k=nr+':'+nc;
-            if(can(r,c,nr,nc) && !(k in prev)){ prev[k]=[r,c]; q.push([nr,nc]); } } }
-        const path=[]; let cur=to; while(cur){ path.unshift(cur); cur=prev[cur[0]+':'+cur[1]]; }
-        return path; };
-      const steps=[];
-      const stepAll=(path)=>{ const keys=[]; for(let i=1;i<path.length;i++) keys.push(sk(path[i-1],path[i]));
-        steps.push({sel:cl(path[0][1])+path[0][0], keys}); };
-      stepAll(p1);                                                               // walk to the block (collects every pip)
-      const BL=[T.r0+T.h-1,T.c0];
-      const grab=[]; for(let i=0;i<T.w-1;i++) grab.push({key:'ArrowRight',shift:true});
-      for(let i=0;i<T.h-1;i++) grab.push({key:'ArrowUp',shift:true});
-      grab.push({key:'c',ctrl:true});
-      steps.push({sel:cl(BL[1])+BL[0], keys:grab});
-      steps.push({sel:cl(T.c0)+T.r0+':'+cl(T.c0+T.w-1)+(T.r0+T.h-1), keys:[{key:'Home',ctrl:true},{key:'v',ctrl:true}]});
-      stepAll(bfs([1,1],[RN,CN]));                                               // A1 → the exit gap → J20, entirely on foot
+      walk(p1);                                                                   // the corridor in flights — the ☆ route
+      steps.push({sel:cl(B.c0+1+N.memoCol)+(B.r0+4), keys:[{key:' ',ctrl:true}]});      // COLUMN first
+      steps.push({sel:cl(B.c0+3)+(B.r0+1+N.memoRow), keys:[{key:' ',shift:true}]});     // then the row, entered from a different cell
+      steps.push({sel:cl(B.c0+2)+(B.r0+5), keys:[{key:' ',ctrl:true,shift:true}]});     // the region by Ctrl+Shift+Space, not Ctrl+A
+      steps.push({sel:cl(B.c0+2)+(B.r0+5), keys:[{key:'F5'},L('s'),L('o')]});
+      steps.push({sel:cl(B.c0+4)+(B.r0+2), keys:[{key:' ',ctrl:true,shift:true},{key:'c',ctrl:true}]});
+      steps.push({sel:cl(B.c0)+B.r0+':'+cl(B.c0+B.w-1)+(B.r0+B.h-1), keys:[{key:'Home',ctrl:true},{key:'v',ctrl:true}]});
       return steps; }` },
   /* r433 (anchor ROUND 1 depth pass, DEPTH_PASS §4.23): the drill grades formula TEXT under the
      doctrine §2.2 anchor-text exception, so these two alts are the proof that the exception buys

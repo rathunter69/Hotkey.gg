@@ -48,6 +48,41 @@ const INK = 45;                // how far a pixel must sit from the cell's own b
                                // "ink" actually means, and it holds in either theme.
 const BAND = 10;               // CSS px each side of the edge
 
+/* r455: CI-ONLY FLAKE, root-caused. CI failed 10 per-edge measurements ("all borders (.ball)",
+   every ".thick" edge, the double rule) while `top` and the whole alignment section stayed
+   green — because the #wbDlg "welcome back" card (index.html ~32198, position:fixed inset:0
+   z-index:130) is appended and faded in by a timer AFTER load, and the per-edge screenshot path
+   never hid it (only the alignment section's overlay sweep did). Two-part fix, both installed
+   as an addInitScript so they run before any page script: suppress the card outright via its
+   own r324 once-per-session guard (sessionStorage.hk_wb), and install the SAME fixed-overlay
+   sweep the alignment section uses as a shared window function, so both call sites share one
+   implementation and either can catch a large fixed overlay this guard doesn't name. */
+function installOverlayGuards() {
+  try {
+    localStorage.setItem('hotkey_onboarded', '1');
+    localStorage.setItem('hk_tour_done', '1');
+    localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');
+    localStorage.setItem('hk_handle_cache', '');
+  } catch (e) {}
+  try { sessionStorage.setItem('hk_wb', '1'); } catch (e) {}   // r324 guard: suppress #wbDlg outright
+  window.__hkHideFixedOverlays = function () {
+    const cleared = [];
+    try {
+      for (const el of document.querySelectorAll('body *')) {
+        const cs = getComputedStyle(el);
+        if (cs.position === 'fixed' && cs.display !== 'none') {
+          const rr = el.getBoundingClientRect();
+          if (rr.width > 600 && rr.height > 300) {
+            cleared.push((el.id || '') + '.' + String(el.className).slice(0, 30));
+            el.style.display = 'none';
+          }
+        }
+      }
+    } catch (e) {}
+    return cleared;
+  };
+}
+
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROME });
   /* r443: PIN the colour scheme. CI's Chromium resolved to dark where the dev box resolved to
@@ -59,15 +94,9 @@ const BAND = 10;               // CSS px each side of the edge
     colorScheme: process.env.SCHEME === 'dark' ? 'dark' : 'light' });
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 160)));
-  // a fresh profile walks the onboarding funnel and swallows every key
-  await page.addInitScript(() => {
-    try {
-      localStorage.setItem('hotkey_onboarded', '1');
-      localStorage.setItem('hk_tour_done', '1');
-      localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');
-      localStorage.setItem('hk_handle_cache', '');
-    } catch (e) {}
-  });
+  // a fresh profile walks the onboarding funnel and swallows every key; installOverlayGuards
+  // (r455) additionally suppresses the welcome-back card and installs the fixed-overlay sweep
+  await page.addInitScript(installOverlayGuards);
   try {
     await page.goto(`${BASE}/index.html`, { waitUntil: 'load', timeout: 20000 });
   } catch (e) {
@@ -77,6 +106,14 @@ const BAND = 10;               // CSS px each side of the edge
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof loadChallenge === 'function',
     null, { timeout: 20000 });
   await page.evaluate(() => { try { _pro = true; } catch (e) {} });
+
+  /* r455: sweep once right after load (in case anything fixed is already up), then again before
+     every single measurement below — the welcome-back card is appended by a post-load timer, so
+     "once at the top" is not enough on a slower CI runner. */
+  async function hideFixedOverlays(pg) {
+    return pg.evaluate(() => (window.__hkHideFixedOverlays ? window.__hkHideFixedOverlays() : []));
+  }
+  await hideFixedOverlays(page);
 
   /* Build a bare sheet with ONE flagged cell, through the engine's own render path, and return
      the clip band for the edge under test. `navigation` is the host because its board is plain
@@ -133,10 +170,27 @@ const BAND = 10;               // CSS px each side of the edge
   }
 
   async function measure(flags, edge) {
+    await hideFixedOverlays(page);   // r455: re-check before every shot — see installOverlayGuards
+    try {
+      await page.waitForFunction(() => document.querySelectorAll('.wb-dlg.show').length === 0,
+        null, { timeout: 2000 });
+    } catch (e) {}   // robust to a fade in progress; never fail the measurement over this alone
     const c = await clipFor(flags, edge);
     if (c.err) return { err: c.err, px: -1, cls: '' };
-    const shot = await page.screenshot({ clip: c.clip });
-    const m = await paintedPx(shot, edge);
+    /* r456: a border edge is painted by render()'s ::after overlay a frame or two after the class
+       lands; on a slow CI runner one shot in ~40 sampled the RIGHT edge of .ball before that paint
+       and read 0.00px (b2e7e86 was green, e5302de red on the same code). When a border flag is set
+       and the band reads empty, wait two frames and re-shoot — up to three times. An unformatted
+       cell (no flags) is never retried, so a genuinely missing rule still fails. */
+    const wantInk = Object.keys(flags || {}).length > 0;
+    let m = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const shot = await page.screenshot({ clip: c.clip });
+      m = await paintedPx(shot, edge);
+      if (!wantInk || m.run > 0 || attempt === 2) break;
+      await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
+      await page.waitForTimeout(120);
+    }
     return { px: m.run, ink: m.ink, cls: c.cls };
   }
 
@@ -279,20 +333,11 @@ const BAND = 10;               // CSS px each side of the edge
            while the pixels showed everything. Something async pops one on the runner mid-probe
            (offline profile flows are the suspects); whichever it is, no modal belongs in a
            border measurement. Hide every large fixed overlay and RECORD what was hidden — if
-           this recurs the failure line will name the element instead of a silhouette. */
-        const cleared = [];
-        try {
-          for (const el of document.querySelectorAll('body *')) {
-            const cs = getComputedStyle(el);
-            if (cs.position === 'fixed' && cs.display !== 'none') {
-              const rr = el.getBoundingClientRect();
-              if (rr.width > 600 && rr.height > 300) {
-                cleared.push((el.id || '') + '.' + String(el.className).slice(0, 30));
-                el.style.display = 'none';
-              }
-            }
-          }
-        } catch (e) {}
+           this recurs the failure line will name the element instead of a silhouette.
+           r455: this sweep is now `window.__hkHideFixedOverlays`, installed by
+           installOverlayGuards (addInitScript, top of file) — the per-edge path below shares
+           this exact function rather than carrying its own copy. */
+        const cleared = window.__hkHideFixedOverlays ? window.__hkHideFixedOverlays() : [];
         S.cells = {}; S.ROWS = 9;
         S.maze = null; S.touch = null; S.tiers = null; S._railZone = null;
         for (const ref of ['C5', 'D5', 'E5']) S.cells[ref] = { ...blankCell(), bt: true };
@@ -447,14 +492,7 @@ const BAND = 10;               // CSS px each side of the edge
       const pg = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: dpr,
         colorScheme: dark ? 'dark' : 'light' });
       pg.on('pageerror', e => errs.push(String(e.message || e).slice(0, 160)));
-      await pg.addInitScript(() => {
-        try {
-          localStorage.setItem('hotkey_onboarded', '1');
-          localStorage.setItem('hk_tour_done', '1');
-          localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');
-          localStorage.setItem('hk_handle_cache', '');
-        } catch (e) {}
-      });
+      await pg.addInitScript(installOverlayGuards);   // r455: same guard set as the per-edge `page`
       await pg.goto(`${BASE}/index.html`, { waitUntil: 'load', timeout: 20000 });
       await pg.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof loadChallenge === 'function',
         null, { timeout: 20000 });

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>level 1 mock — The Corridor · hotkey.gg</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=VT323&display=swap" rel="stylesheet">
+<style>
+/* =========================================================================
+   LEVEL 1 · "THE CORRIDOR" — PLAYABLE PREVIEW MOCK (r455). Unwired: no engine,
+   no supabase, no drills.js. Spec: CURRICULUM_V3 §9.0 (level contract) + §9.1;
+   HUD banner + nudge + act card: TUTORIAL_CHAPTER_SPEC §3.0.2. Pixel language:
+   art/frame-pixel-proto.html (3px stair corners, hard 2px rules, no blur).
+   Palette tokens: themes.js `daylight` (light default) / index.html Graphite (dark).
+   Sheet stays light in dark mode, exactly like the engine (r212 dark chrome, light sheet).
+   ========================================================================= */
+:root{
+  --bg:#dbd8d1; --surface:#ecebe6; --surface2:#e1dfd8; --line:#c6c2b8;
+  --text:#38352d; --muted:#6b665d; --faint:#a09a8f;
+  --accent:#16a862; --accent-dim:#0e7a45; --on-accent:#ffffff; --warn:#9a6700; --bad:#b3261e;
+  --shadow:#b3afa5;
+  --sheet:#fbfbf8; --sheet-hdr:#e9e7e0; --sheet-line:#d3d0c7; --ink:#1f1e1a; --ink-faint:#b2afa6; --sheet-muted:#6b665d;
+  --wall:#38445e; --wall-ink:#56648a; --pip:#2f6bd8; --pip-rim:#1d47a0;
+  --blue:#1657c8; --cursor:#1a7a45; --sel:rgba(58,62,72,.22);
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --px:'VT323','JetBrains Mono',ui-monospace,monospace;
+  --cellfont:Arial,'Calibri','Segoe UI',system-ui,sans-serif;
+}
+html[data-theme="dark"]{
+  --bg:#292b31; --surface:#383b42; --surface2:#43474f; --line:#5a5e68;
+  --text:#f0f1ec; --muted:#a8adb3; --faint:#767d87;
+  --accent:#6ec9a0; --accent-dim:#4a8f72; --on-accent:#0e1a14; --warn:#d9a441; --bad:#c8533f;
+  --shadow:#17181c;
+  --sheet:#f1f1ec; --sheet-hdr:#dcdbd4; --sheet-line:#c9c8c0; --ink:#23221f; --ink-faint:#a5a49c; --sheet-muted:#5f6068;
+  --wall:#2e3950; --pip:#2f6bd8;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+body{background:var(--bg); color:var(--text); font-family:var(--mono); font-size:12px; min-height:100vh; padding:14px 18px 70px}
+.tgt{color:var(--accent-dim); border-bottom:2px solid var(--accent); padding:0 2px}
+.cardwrap{filter:drop-shadow(5px 5px 0 var(--shadow)); position:relative; z-index:22}
+kbd,.px-font{font-family:var(--px)}
+.pxc{clip-path:polygon(6px 0,calc(100% - 6px) 0,calc(100% - 6px) 3px,calc(100% - 3px) 3px,calc(100% - 3px) 6px,100% 6px,
+  100% calc(100% - 6px),calc(100% - 3px) calc(100% - 6px),calc(100% - 3px) calc(100% - 3px),calc(100% - 6px) calc(100% - 3px),calc(100% - 6px) 100%,
+  6px 100%,6px calc(100% - 3px),3px calc(100% - 3px),3px calc(100% - 6px),0 calc(100% - 6px),0 6px,3px 6px,3px 3px,6px 3px)}
+
+/* ---------- top strip ---------- */
+.top{display:flex; align-items:center; gap:18px; height:38px; margin-bottom:10px}
+.brand{font-weight:700; font-size:16px; letter-spacing:-.5px}
+.brand b{color:var(--accent)}
+.lvl{font-family:var(--px); font-size:21px; letter-spacing:1px; color:var(--text)}
+.lvl i{font-style:normal; color:var(--faint); margin:0 8px}
+.crumb{color:var(--muted); font-size:11px; letter-spacing:.1em; text-transform:uppercase; margin-left:auto}
+
+/* ---------- HUD banner (§3.0.2) ---------- */
+.hud{display:flex; align-items:center; gap:14px; background:var(--surface); border:2px solid var(--text);
+  box-shadow:3px 3px 0 var(--shadow); padding:7px 12px; min-height:44px; margin-bottom:8px; font-family:var(--px); font-size:19px; line-height:1}
+.hud .act{color:var(--on-accent); background:var(--accent); padding:3px 8px 2px; font-size:16px; letter-spacing:1px; white-space:nowrap}
+.hud .line{flex:1; display:flex; align-items:center; gap:6px; flex-wrap:wrap; min-width:0}
+.hud .line.pulse{animation:hudPulse .4s step-end}
+@keyframes hudPulse{0%,60%{background:var(--accent); color:var(--on-accent)} 61%,100%{background:transparent}}
+.hud .pips{display:flex; gap:4px; align-items:center}
+.hud .pips i{width:8px; height:8px; background:var(--surface2); box-shadow:inset 0 0 0 2px var(--line)}
+.hud .pips i.on{background:var(--accent); box-shadow:0 0 0 1px var(--accent-dim)}
+.hud .pips i.cur{box-shadow:inset 0 0 0 2px var(--accent)}
+.hud .star{display:flex; align-items:center; gap:5px; color:var(--warn); font-size:15px; letter-spacing:.5px}
+.hud .star.off{color:var(--faint)}
+.hud .star.off svg rect{fill:var(--faint)}
+.hud .clock{font-size:23px; letter-spacing:1px; min-width:86px; text-align:right; font-variant-numeric:tabular-nums}
+.hud .tag{font-family:var(--mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line); padding:3px 6px}
+.nudge{font-family:var(--px); font-size:17px; color:var(--warn); padding:0 6px 6px 14px; display:none; line-height:1.1}
+.nudge.on{display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+.nudge::before{content:'↳'; color:var(--faint)}
+kbd{display:inline-block; font-family:var(--px); font-size:17px; line-height:1; color:var(--text); background:var(--surface2);
+  border:2px solid var(--text); box-shadow:2px 2px 0 var(--shadow); padding:2px 6px 1px; min-width:22px; text-align:center; vertical-align:middle}
+kbd.acc{border-color:var(--accent-dim); color:var(--accent-dim)}
+.sep{color:var(--faint); padding:0 2px}
+
+/* ---------- board: fake Excel ---------- */
+.stage{display:flex; gap:14px; align-items:flex-start}
+.board{position:relative; background:var(--surface); border:2px solid var(--text); box-shadow:3px 3px 0 var(--shadow); padding:0 0 4px; flex:none}
+.xlbar{display:flex; align-items:center; gap:0; height:26px; border-bottom:2px solid var(--line); background:var(--surface2); font-family:var(--cellfont); font-size:12px}
+.xlbar .nb{width:84px; height:100%; border-right:2px solid var(--line); display:flex; align-items:center; padding:0 8px; color:var(--ink); font-weight:700; background:var(--sheet)}
+.xlbar .fxl{width:26px; text-align:center; color:var(--muted); font-style:italic; font-family:Georgia,serif}
+.xlbar .fb{flex:1; height:100%; display:flex; align-items:center; padding:0 8px; background:var(--sheet); color:var(--ink); border-left:2px solid var(--line)}
+.gridwrap{position:relative; background:var(--sheet)}
+table{border-collapse:collapse; font-family:var(--cellfont); font-size:12px; table-layout:fixed}
+th,td{border:1px solid var(--sheet-line); height:22px; position:relative; overflow:hidden; white-space:nowrap}
+th{background:var(--sheet-hdr); color:var(--sheet-muted); font-weight:400; font-size:10.5px; width:44px; text-align:center; font-family:var(--mono)}
+th.rh{width:30px}
+th.cur{background:var(--accent); color:var(--on-accent)}
+td{width:44px; padding:0 5px; color:var(--ink); text-align:left; vertical-align:middle}
+td.num{text-align:right; font-variant-numeric:tabular-nums}
+td.bold{font-weight:700}
+td.blue{color:var(--blue)}
+td.parked{color:var(--ink-faint) !important; font-weight:400 !important}
+td.revealed{animation:reveal .6s step-end}
+@keyframes reveal{0%{background:var(--accent); color:var(--on-accent)} 50%{background:transparent}}
+td.wall{background:var(--wall); border-color:var(--wall); color:var(--wall-ink)}
+td.dissolving{animation:dissolve .55s step-end forwards; border-color:transparent}
+@keyframes dissolve{
+  0%{background:var(--wall)}
+  35%{background:repeating-conic-gradient(var(--wall) 0 25%, transparent 0 50%) 0 0/6px 6px}
+  70%{background:repeating-conic-gradient(var(--wall) 0 25%, transparent 0 50%) 3px 3px/12px 12px}
+  100%{background:transparent}}
+td .pipdot{position:absolute; left:50%; top:50%; width:6px; height:6px; margin:-3px 0 0 -3px; background:var(--pip); box-shadow:0 0 0 1px var(--pip-rim)}
+td .pipdot.lit{background:var(--accent); box-shadow:0 0 0 1px var(--accent-dim), 0 0 0 3px var(--sheet), 0 0 0 4px var(--accent)}
+td.sel::before{content:''; position:absolute; inset:0; background:var(--sel); pointer-events:none}
+td.active::before{display:none}
+td.active{outline:2px solid var(--cursor); outline-offset:-2px; z-index:4}
+td.sel-t{border-top:2px solid var(--cursor)} td.sel-b{border-bottom:2px solid var(--cursor)}
+td.sel-l{border-left:2px solid var(--cursor)} td.sel-r{border-right:2px solid var(--cursor)}
+td.ant-t{border-top:2px dashed var(--accent-dim)} td.ant-b{border-bottom:2px dashed var(--accent-dim)}
+td.ant-l{border-left:2px dashed var(--accent-dim)} td.ant-r{border-right:2px dashed var(--accent-dim)}
+td.lit{animation:litflash .6s step-end}
+@keyframes litflash{0%{background:var(--accent); color:var(--on-accent)} 50%{background:transparent}}
+td.hb{background:color-mix(in srgb, var(--accent) 7%, transparent)}
+td.hb-t{border-top:2px solid var(--accent)} td.hb-b{border-bottom:2px solid var(--accent)}
+td.hb-l{border-left:2px solid var(--accent)} td.hb-r{border-right:2px solid var(--accent)}
+td.hbdim.hb{background:transparent}
+td.hbdim.hb-t{border-top:2px dashed var(--ink-faint)} td.hbdim.hb-b{border-bottom:2px dashed var(--ink-faint)}
+td.hbdim.hb-l{border-left:2px dashed var(--ink-faint)} td.hbdim.hb-r{border-right:2px dashed var(--ink-faint)}
+td.chev{color:var(--accent); font-weight:700; animation:chev 1.1s steps(2) infinite}
+@keyframes chev{0%,100%{opacity:.15} 50%{opacity:.9}}
+/* overlay layer over the grid: home-bay label, SAVED stamp, card ring */
+.ov{position:absolute; inset:0; pointer-events:none; z-index:6}
+.ov .lbl{position:absolute; font-family:var(--px); font-size:14px; letter-spacing:1px; color:var(--accent-dim); padding:1px 4px 0; line-height:1}
+.ov .lbl.dim{color:var(--ink-faint)}
+.stamp{position:absolute; font-family:var(--px); font-size:34px; letter-spacing:3px; color:var(--bad); border:3px solid var(--bad);
+  padding:2px 10px 0; transform:rotate(-8deg); background:var(--sheet); display:none; animation:stampIn .25s steps(2)}
+.stamp.on{display:block}
+@keyframes stampIn{0%{transform:rotate(-8deg) scale(1.6)} 100%{transform:rotate(-8deg) scale(1)}}
+
+/* ---------- memo panel (right) ---------- */
+.memo{width:236px; flex:none; background:var(--surface); border:2px solid var(--text); box-shadow:3px 3px 0 var(--shadow); padding:10px 12px 12px; font-family:var(--px)}
+.memo .mh{font-size:20px; letter-spacing:2px; border-bottom:2px solid var(--text); padding-bottom:5px; margin-bottom:8px; display:flex; justify-content:space-between}
+.memo .mh span{color:var(--faint); font-size:15px}
+.memo .row{display:flex; align-items:center; gap:8px; font-size:18px; line-height:1.15; padding:3px 0; color:var(--muted)}
+.memo .row .d{width:8px; height:8px; flex:none; background:var(--surface2); box-shadow:inset 0 0 0 2px var(--line)}
+.memo .row.on .d{background:var(--accent); box-shadow:0 0 0 1px var(--accent-dim)}
+.memo .row.cur{color:var(--text)}
+.memo .row.cur .d{box-shadow:inset 0 0 0 2px var(--accent)}
+.memo .row.cur::before{content:'▸'; color:var(--accent); margin-left:-2px}
+.memo .row.on{text-decoration:line-through; text-decoration-thickness:2px}
+.memo .foot{margin-top:10px; padding-top:8px; border-top:2px dashed var(--line); font-size:16px; color:var(--muted); line-height:1.2}
+.memo .foot.star{color:var(--warn)} .memo .foot.star.off{color:var(--faint)}
+.memo .foot .sm{font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); display:block; margin-bottom:3px}
+
+/* ---------- act card / complete card (§3.0.2(4) + §9.0) ---------- */
+.scrim{position:absolute; inset:0; z-index:20; background:color-mix(in srgb, var(--bg) 70%, transparent); display:none; align-items:center; justify-content:center}
+.scrim.on{display:flex}
+.ring{position:absolute; border:3px solid var(--accent); z-index:21; pointer-events:none; display:none; animation:ringblink 1s steps(2) infinite}
+@keyframes ringblink{50%{border-color:var(--accent-dim)}}
+.card{width:420px; background:var(--surface); border:3px solid var(--text); padding:14px 18px 16px; font-family:var(--px)}
+.card .ct{font-size:28px; letter-spacing:2px; line-height:1; margin-bottom:8px}
+.card .ct small{display:block; font-size:14px; letter-spacing:3px; color:var(--accent-dim); margin-bottom:4px}
+.card .cb{font-size:19px; line-height:1.2; color:var(--text); margin-bottom:12px}
+.card .ck{display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:12px}
+.card .cf{display:flex; justify-content:space-between; align-items:center; border-top:2px dashed var(--line); padding-top:8px; font-size:16px; color:var(--muted)}
+.card .cf .run{color:var(--bad); font-variant-numeric:tabular-nums}
+.card .cf .run b{font-weight:400; animation:blink 1s steps(2) infinite; display:inline-block; width:8px; height:8px; background:var(--bad); margin-right:6px; vertical-align:middle}
+@keyframes blink{50%{opacity:0}}
+.card .stats{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin:6px 0 12px}
+.card .stats div{border:2px solid var(--line); padding:6px 8px 4px}
+.card .stats b{display:block; font-size:26px; font-weight:400; line-height:1}
+.card .stats span{font-family:var(--mono); font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
+.card .post{font-size:16px; color:var(--muted); margin-bottom:12px}
+.card .post i{font-style:normal; color:var(--accent-dim)}
+.btn{font-family:var(--px); font-size:19px; letter-spacing:1px; color:var(--on-accent); background:var(--accent); border:2px solid var(--accent-dim);
+  box-shadow:3px 3px 0 var(--shadow); padding:6px 14px 4px; cursor:pointer}
+.btn.ghost{background:var(--surface2); color:var(--text); border-color:var(--text)}
+.btn:active{transform:translate(2px,2px); box-shadow:1px 1px 0 var(--shadow)}
+
+/* ---------- Go To Special (fake) ---------- */
+.dlgwrap{position:absolute; left:50%; top:40%; transform:translate(-50%,-50%); z-index:30; filter:drop-shadow(5px 5px 0 var(--shadow)); display:none}
+.dlgwrap.on{display:block}
+.dlg{width:250px; background:var(--surface); border:3px solid var(--text); font-family:var(--px)}
+.dlg .dt{background:var(--text); color:var(--surface); font-size:17px; letter-spacing:1px; padding:3px 8px 1px}
+.dlg .db{padding:8px 10px 10px; font-size:18px; line-height:1.3}
+.dlg .r{display:flex; align-items:center; gap:8px; color:var(--muted)}
+.dlg .r i{width:10px; height:10px; border:2px solid var(--text); display:inline-block}
+.dlg .r.on{color:var(--text)} .dlg .r.on i{background:var(--accent); box-shadow:inset 0 0 0 2px var(--surface)}
+.dlg .r.sub{padding-left:22px; font-size:16px}
+.dlg .r.sub i{width:9px; height:9px}
+.dlg .dk{display:flex; gap:6px; margin-top:8px; align-items:center; font-size:15px; color:var(--muted)}
+
+/* ---------- DEV strip ---------- */
+.dev{position:fixed; left:0; right:0; bottom:0; z-index:50; background:var(--surface2); border-top:2px solid var(--line); font-size:11px}
+.dev summary{cursor:pointer; padding:5px 18px; color:var(--muted); letter-spacing:.14em; text-transform:uppercase; font-size:10px; list-style:none}
+.dev summary::before{content:'▸ '} .dev[open] summary::before{content:'▾ '}
+.dev .row{display:flex; gap:8px; align-items:center; padding:0 18px 10px; flex-wrap:wrap}
+.dev button{font-family:var(--mono); font-size:11px; background:var(--surface); color:var(--text); border:2px solid var(--line); padding:4px 9px; cursor:pointer}
+.dev button.on{border-color:var(--accent); color:var(--accent-dim)}
+.dev .note{color:var(--faint); margin-left:auto}
+@media (prefers-reduced-motion: reduce){ .ring,.card .cf .run b,td.chev,.hud .line{animation:none} }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="brand">hotkey<b>.gg</b></div>
+  <div class="lvl">LEVEL 1<i>·</i>THE CORRIDOR<i>·</i><span style="color:var(--faint)">FOUNDATIONS 1/5</span></div>
+  <div class="crumb">preview mock · not the engine</div>
+</div>
+
+<div class="hud" id="hud">
+  <span class="act" id="hudAct">ACT 1 · THE CORRIDOR</span>
+  <span class="line" id="hudLine"></span>
+  <span class="pips" id="hudPips"></span>
+  <span class="star" id="hudStar"></span>
+  <span class="clock" id="hudClock">00:00.0</span>
+  <span class="tag" id="hudTag">first play</span>
+</div>
+<div class="nudge" id="nudge"></div>
+
+<div class="stage">
+  <div class="board" id="board">
+    <div class="xlbar"><div class="nb" id="namebox">A1</div><div class="fxl">fx</div><div class="fb" id="fbar"></div></div>
+    <div class="gridwrap"><table id="grid"></table><div class="ov" id="ov"></div></div>
+    <div class="scrim" id="scrim"><div class="cardwrap"><div class="card pxc" id="card"></div></div></div>
+    <div class="ring pxc" id="ring"></div>
+    <div class="dlgwrap" id="dlg"><div class="dlg pxc">
+      <div class="dt">GO TO SPECIAL</div>
+      <div class="db">
+        <div class="r"><i></i>Comments</div>
+        <div class="r on"><i></i>Constants</div>
+        <div class="r sub on"><i></i>Numbers</div>
+        <div class="r sub"><i></i>Text</div>
+        <div class="r"><i></i>Formulas</div>
+        <div class="r"><i></i>Blanks</div>
+        <div class="dk"><kbd>↵</kbd> ok <span class="sep">·</span> <kbd>esc</kbd> cancel</div>
+      </div>
+    </div></div>
+  </div>
+  <div class="memo" id="memo"></div>
+</div>
+
+<details class="dev" id="dev" open>
+  <summary>DEV · review controls</summary>
+  <div class="row">
+    <button onclick="devJump(1)">Act 1</button><button onclick="devJump(2)">Act 2</button><button onclick="devJump(3)">Act 3</button><button onclick="devJump(4)">Complete</button>
+    <span style="color:var(--line)">|</span>
+    <button onclick="resetLevel()">reset</button>
+    <button id="btnTheme" onclick="toggleTheme()">theme: light</button>
+    <button id="btnMac" onclick="toggleMac()">Mac keycaps</button>
+    <span class="note">jumps keep the clock running · mock rules: Ctrl+arrow = Excel jump, walls block · nothing here is wired to the engine</span>
+  </div>
+</details>
+
+<script>
+/* =========================================================================
+   LEVEL DATA — the shape the runtime would carry: level:{acts:[{card,beats,hud,reveal}]}.
+   Every beat grades on END STATE (`ok(S)`), never on a keypress (§9.0 grading law).
+   `good` lists the chords the beat expects — used only by the nudge miss-counter (§3.0.2(3)).
+   Keycap tokens: {ctrl} → ⌘ on Mac · {ctrl^} → ⌃ on Mac (the ctrl-arrow jumps) · others literal.
+   ========================================================================= */
+const COLS=16, ROWS=20;
+const BLOCK={r0:11,c0:10,r1:19,c1:15};          // K12:P20 — the model block / sales table
+const BAY  ={r0:0, c0:0, r1:8, c1:5};           // A1:F9  — the home bay (same footprint)
+const REGIONS=['West','East','North','South','Central','Mountain','Pacific','Atlantic'];
+const Q=[[412,388,455,501],[366,371,402,418],[288,301,297,340],[530,512,566,598],[198,214,222,241],[145,151,163,170],[622,640,671,703],[334,352,349,377]];
+/* corridor legs: each is one Ctrl+arrow flight; the pip sits at its end (0-indexed r,c) */
+const LEGS=[
+  {from:[0,0], to:[0,15]},   // A1  → P1   ctrl+→   the first hall
+  {from:[0,15],to:[4,15]},   // P1  → P5   ctrl+↓
+  {from:[4,15],to:[4,7]},    // P5  → H5   ctrl+←
+  {from:[4,7], to:[10,7]},   // H5  → H11  ctrl+↓
+  {from:[10,7],to:[10,0]},   // H11 → A11  ctrl+←
+  {from:[10,0],to:[18,0]},   // A11 → A19  ctrl+↓
+  {from:[18,0],to:[18,8]},   // A19 → I19  ctrl+→
+  {from:[18,8],to:[12,8]},   // I19 → I13  ctrl+↑
+  {from:[12,8],to:[12,9]},   // I13 → J13  ctrl+→ lands on K13 (the block) — no pip, that's beat 3
+];
+const ACTS=[
+ {n:1, name:'THE CORRIDOR', memo:'ROUTE', ring:'sheet', reveal:'table',
+  card:{title:'THE CORRIDOR', sub:'ACT 1 OF 3',
+    body:'You are inside the model, and the model is a maze. Solid walls carve one switchback corridor from the home bay to the model block in the far corner. Hold ctrl and press an arrow: the cursor flies to the end of the hall and stops at the wall. Light every pip on the way.',
+    keys:'{ctrl^}+{→} · {ctrl^}+{↓} · {ctrl^}+{←} · {ctrl^}+{↑}'},
+  beats:[
+   {n:1, label:'Clear the first hall',        hud:'hold {ctrl^} and press {→} to clear the first hall',      good:['ctrl+→'], nudge:'try {ctrl^}+{→} — hold ctrl down first, then tap the arrow', ok:S=>S.pips[0]},
+   {n:2, label:'Clear the corridor',          hud:'ride every hall to the far corner — {ctrl^} + arrow, turn at each corner', good:['ctrl+→','ctrl+↓','ctrl+←','ctrl+↑'], nudge:'{ctrl^}+{↓} at the corner — one press per hall, the wall stops you', ok:S=>S.pips.every(Boolean)},
+   {n:3, label:'Reach the model block',       hud:'one more flight — land on the model block',               good:['ctrl+→'], nudge:'{ctrl^}+{→} from the last corner lands inside the block', ok:S=>inRect(S.cur,BLOCK)},
+  ]},
+ {n:2, name:'CAPTURE', memo:'CAPTURE', ring:'block', reveal:'bay',
+  card:{title:'CAPTURE', sub:'ACT 2 OF 3',
+    body:'The walls come down and the block is a live sales table. The CAPTURE memo names a target; stretch a selection onto it exactly and it lights. A selection is a rectangle you grow from where you stand — shift grows it a cell, ctrl+shift grows it to the edge.',
+    keys:'{shift}+{→} · {ctrl^}+{shift}+{→} · {ctrl}+{space} · {shift}+{space} · {ctrl}+{a} · {F5}'},
+  beats:[
+   {n:4, label:'the West row',                hud:'capture the [West] row of figures, Q1 through FY',        good:['shift+→','ctrl+shift+→','shift+space','shift+←','ctrl+shift+←'], nudge:'stand on West\'s Q1 figure, then {ctrl^}+{shift}+{→} runs to the end of the row',
+        ok:S=>selIs(S,[rect(12,11,12,15),rect(12,0,12,15)])},
+   {n:5, label:'the Q3 column',               hud:'capture the [Q3] column, every region',                   good:['shift+↓','ctrl+shift+↓','ctrl+space','shift+↑','ctrl+shift+↑'], nudge:'stand on Q3\'s first figure, then {ctrl^}+{shift}+{↓}',
+        ok:S=>selIs(S,[rect(12,13,19,13),rect(11,13,19,13),rect(0,13,19,13)])},
+   {n:6, label:'the whole table',             hud:'capture the whole table, headers and figures',            good:['ctrl+a','ctrl+shift+→','ctrl+shift+↓','ctrl+shift+←','ctrl+shift+↑','shift+→','shift+↓','ctrl+shift+end','ctrl+shift+home'], nudge:'stand anywhere inside the table and press {ctrl}+{a}',
+        ok:S=>selIs(S,[BLOCK])},
+   {n:7, label:'every typed figure',          hud:'capture every typed figure on the table in one pass',     good:['F5','ctrl+shift+→','ctrl+shift+↓','shift+→','shift+↓'], nudge:'{F5}, then Special, then Constants — the blue numbers are the typed ones',
+        ok:S=>selIs(S,[rect(12,11,19,14)])},
+  ]},
+ {n:3, name:'THE RUN HOME', memo:'RUN HOME', ring:'bay', reveal:null,
+  card:{title:'THE RUN HOME', sub:'ACT 3 OF 3',
+    body:'Every wall is gone. Take the model block from the far corner, carry it to the home bay at A1, and save the file. Copy, then paste, then save — every drill on this site ends the way every real file does.',
+    keys:'{ctrl}+{c} · {ctrl}+{home} · {ctrl}+{v} · {ctrl}+{s}'},
+  beats:[
+   {n:8, label:'Copy the model block',        hud:'copy the model block',                                    good:['ctrl+c','ctrl+end','ctrl+shift+↑','ctrl+shift+←','ctrl+a','ctrl+shift+→','ctrl+shift+↓','shift+→','shift+↓','shift+↑','shift+←'], nudge:'select K12:P20 first — {ctrl}+{end} then {ctrl^}+{shift}+{↑} {ctrl^}+{shift}+{←} — then {ctrl}+{c}',
+        ok:S=>!!S.clip && covers(S.clip,BLOCK)},
+   {n:9, label:'Deliver it to the home bay',  hud:'deliver it to the home bay at [A1]',                     good:['ctrl+v','ctrl+home'], nudge:'{ctrl}+{home} puts you on A1 — then {ctrl}+{v}',
+        ok:S=>REGIONS.every((nm,i)=>cellAt(S,1+i,0).v===nm)},
+   {n:10,label:'Save the workbook',           hud:'save the workbook',                                       good:['ctrl+s'], nudge:'{ctrl}+{s}', ok:S=>S.saved},
+  ]},
+];
+const BEATS=ACTS.flatMap(a=>a.beats);
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+const key=(r,c)=>r+','+c;
+const rect=(r0,c0,r1,c1)=>({r0,c0,r1,c1});
+const inRect=(p,R)=>p.r>=R.r0&&p.r<=R.r1&&p.c>=R.c0&&p.c<=R.c1;
+const covers=(A,B)=>A.r0<=B.r0&&A.c0<=B.c0&&A.r1>=B.r1&&A.c1>=B.c1;
+const rectSet=R=>{const s=new Set(); for(let r=R.r0;r<=R.r1;r++)for(let c=R.c0;c<=R.c1;c++)s.add(key(r,c)); return s;};
+const sameSet=(a,b)=>a.size===b.size&&[...a].every(k=>b.has(k));
+const colL=c=>String.fromCharCode(65+c);
+const ref=(r,c)=>colL(c)+(r+1);
+const IS_MAC=/Mac|iPhone|iPad/.test(navigator.platform||'');
+let macCaps=IS_MAC;
+
+/* ---------- state ---------- */
+let S;
+function freshState(){
+  const cells=new Map();
+  REGIONS.forEach((nm,i)=>{
+    const r=BLOCK.r0+1+i;
+    cells.set(key(r,BLOCK.c0),{v:nm});
+    Q[i].forEach((q,j)=>cells.set(key(r,BLOCK.c0+1+j),{v:q,num:true,blue:true}));
+    cells.set(key(r,BLOCK.c1),{v:Q[i].reduce((a,b)=>a+b,0),num:true,fx:'=SUM('+ref(r,BLOCK.c0+1)+':'+ref(r,BLOCK.c1-1)+')'});
+  });
+  ['Region','Q1','Q2','Q3','Q4','FY'].forEach((h,j)=>cells.set(key(BLOCK.r0,BLOCK.c0+j),{v:h,bold:true,num:j>0}));
+  const walls=new Set();
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) walls.add(key(r,c));
+  const open=k=>walls.delete(k);
+  rectSet(BAY).forEach(open); rectSet(BLOCK).forEach(open);
+  LEGS.forEach(L=>{const [r0,c0]=L.from,[r1,c1]=L.to; rectSet(rect(Math.min(r0,r1),Math.min(c0,c1),Math.max(r0,r1),Math.max(c0,c1))).forEach(open);});
+  return {cells, walls, act:1, done:[], cur:{r:0,c:0}, anchor:{r:0,c:0}, ext:{r:0,c:0}, sel:rect(0,0,0,0), special:null,
+    pips:LEGS.slice(0,8).map(()=>false), star:true, clip:null, saved:false, t0:performance.now(), tEnd:null,
+    card:null, miss:0, dlg:false, moved:false};
+}
+const cellAt=(S,r,c)=>S.cells.get(key(r,c))||{};
+const nonEmpty=(r,c)=>S.cells.has(key(r,c));
+const passable=(r,c)=>r>=0&&c>=0&&r<ROWS&&c<COLS&&!S.walls.has(key(r,c));
+function selCells(){ return S.special?S.special:rectSet(S.sel); }
+function selIs(S,rects){ const s=selCells(); return rects.some(R=>sameSet(s,rectSet(R))); }
+function curBeat(){ return BEATS.find(b=>!S.done.includes(b.n))||null; }
+function actOf(n){ return ACTS.find(a=>a.beats.some(b=>b.n===n)); }
+
+/* Excel's Ctrl+arrow, fenced by walls: from an empty cell fly to the next non-empty (or the wall);
+   from a non-empty cell run to the end of the block. Returns the path ridden (pips light on the way). */
+function jump(p,dr,dc){
+  let {r,c}=p; const path=[];
+  if(!passable(r+dr,c+dc)) return {r,c,path};
+  if(nonEmpty(r,c)&&nonEmpty(r+dr,c+dc)){ while(passable(r+dr,c+dc)&&nonEmpty(r+dr,c+dc)){ r+=dr;c+=dc;path.push({r,c}); } return {r,c,path}; }
+  r+=dr;c+=dc;path.push({r,c});
+  while(!nonEmpty(r,c)&&passable(r+dr,c+dc)){ r+=dr;c+=dc;path.push({r,c}); }
+  return {r,c,path};
+}
+function ridePips(path){ path.forEach(p=>{ const i=LEGS.findIndex((L,i)=>i<8&&L.to[0]===p.r&&L.to[1]===p.c); if(i>=0) S.pips[i]=true; }); }
+function regionAround(p){   // Ctrl+A: the contiguous non-empty block around the cursor, else the whole sheet
+  if(!nonEmpty(p.r,p.c)) return rect(0,0,ROWS-1,COLS-1);
+  let R={r0:p.r,c0:p.c,r1:p.r,c1:p.c}, grew=true;
+  const rowHas=(r,c0,c1)=>{for(let c=c0;c<=c1;c++)if(nonEmpty(r,c))return true;return false;};
+  const colHas=(c,r0,r1)=>{for(let r=r0;r<=r1;r++)if(nonEmpty(r,c))return true;return false;};
+  while(grew){ grew=false;
+    if(R.r0>0&&rowHas(R.r0-1,R.c0,R.c1)){R.r0--;grew=true;} if(R.r1<ROWS-1&&rowHas(R.r1+1,R.c0,R.c1)){R.r1++;grew=true;}
+    if(R.c0>0&&colHas(R.c0-1,R.r0,R.r1)){R.c0--;grew=true;} if(R.c1<COLS-1&&colHas(R.c1+1,R.r0,R.r1)){R.c1++;grew=true;} }
+  return R;
+}
+function setCur(r,c){ S.cur={r,c}; S.anchor={r,c}; S.ext={r,c}; S.sel=rect(r,c,r,c); S.special=null; }
+function setExt(r,c){ S.ext={r,c}; S.special=null; S.sel=rect(Math.min(S.anchor.r,r),Math.min(S.anchor.c,c),Math.max(S.anchor.r,r),Math.max(S.anchor.c,c)); }
+
+/* ---------- keyboard ---------- */
+const ARROWS={ArrowRight:[0,1,'→'],ArrowLeft:[0,-1,'←'],ArrowDown:[1,0,'↓'],ArrowUp:[-1,0,'↑']};
+function chordOf(e){
+  const m=[]; if(e.ctrlKey||e.metaKey)m.push('ctrl'); if(e.shiftKey)m.push('shift'); if(e.altKey)m.push('alt');
+  let k=e.key; if(ARROWS[k])k=ARROWS[k][2]; else if(k===' ')k='space'; else if(k.length===1)k=k.toLowerCase(); else k=k.length>2?k.toLowerCase():k;
+  if(k==='f5')k='F5'; m.push(k); return m.join('+');
+}
+document.addEventListener('keydown',e=>{
+  const chord=chordOf(e);
+  if(['ctrl','shift','alt','meta'].includes(chord.split('+').pop())) return;   // bare modifier
+  if(S.card==='done') return;
+  if(S.card){ e.preventDefault(); dismissCard(); return; }                     // any key dismisses (§3.0.2(4))
+  if(S.dlg){ e.preventDefault(); if(e.key==='Enter'){ goToSpecial(); } else if(e.key==='Escape'){ S.dlg=false; } grade(); render(); return; }
+  const handled=handle(chord,e);
+  if(handled) e.preventDefault();
+  if(handled==='miss'){ S.miss++; } else if(handled){ if(!curBeatIsNav(chord)) S.miss=0; }
+  grade(); render();
+},{capture:true});
+function curBeatIsNav(chord){ return /^(→|←|↑|↓)$/.test(chord); }
+function handle(chord,e){
+  const b=curBeat(); const good=b&&b.good.includes(chord);
+  const parts=chord.split('+'), ctrl=parts.includes('ctrl'), shift=parts.includes('shift'), k=parts[parts.length-1];
+  if(ARROWS[e.key]){
+    const [dr,dc]=ARROWS[e.key];
+    if(ctrl&&shift){ const j=jump(S.ext,dr,dc); setExt(j.r,j.c); return good?'ok':'miss'; }
+    if(ctrl){ const j=jump(S.cur,dr,dc); ridePips(j.path); setCur(j.r,j.c); S.moved=true; return (good||S.act===1)?'ok':'miss'; }
+    if(shift){ const r=S.ext.r+dr,c=S.ext.c+dc; if(passable(r,c)) setExt(r,c); return good?'ok':'miss'; }
+    const r=S.cur.r+dr,c=S.cur.c+dc;
+    if(passable(r,c)){ if(S.act===1) S.star=false; /* ☆ rule: any arrow-walk in act 1 forfeits */ setCur(r,c); ridePips([S.cur]); S.moved=true; }
+    return 'nav';
+  }
+  if(chord==='ctrl+space'){ S.sel=rect(0,S.sel.c0,ROWS-1,S.sel.c1); S.special=null; return good?'ok':'miss'; }
+  if(chord==='shift+space'){ S.sel=rect(S.sel.r0,0,S.sel.r1,COLS-1); S.special=null; return good?'ok':'miss'; }
+  if(chord==='ctrl+a'){ const R=regionAround(S.cur); S.sel=sameSet(rectSet(R),selCells())?rect(0,0,ROWS-1,COLS-1):R; S.special=null; return good?'ok':'miss'; }
+  if(chord==='ctrl+home'){ if(S.act>1){ setCur(0,0); } return good?'ok':'miss'; }
+  if(chord==='ctrl+end'){ if(S.act>1){ setCur(BLOCK.r1,BLOCK.c1); } return good?'ok':'miss'; }
+  if(chord==='ctrl+shift+home'){ if(S.act>1){ S.ext={r:0,c:0}; setExt(0,0); } return good?'ok':'miss'; }
+  if(chord==='ctrl+shift+end'){ if(S.act>1){ setExt(BLOCK.r1,BLOCK.c1); } return good?'ok':'miss'; }
+  if(chord==='F5'){ S.dlg=true; return good?'ok':'miss'; }
+  if(chord==='ctrl+c'){ const R=S.special?boundsOf(S.special):S.sel; S.clip={...R, data:[...rectSet(R)].map(k=>[k,S.cells.get(k)])}; return good?'ok':'miss'; }
+  if(chord==='ctrl+v'){ if(S.clip){ paste(); } return good?'ok':'miss'; }
+  if(chord==='ctrl+s'){ S.saved=true; S.savedAt=performance.now(); return good?'ok':'miss'; }
+  if(k==='escape'){ S.clip=null; setCur(S.cur.r,S.cur.c); return 'nav'; }
+  if(k==='enter'||k==='tab'||k==='home'||k==='end'||k==='pageup'||k==='pagedown'||k==='delete'||k==='backspace'||k==='f2') return 'miss';
+  if(ctrl||parts.includes('alt')) return 'miss';
+  if(k.length===1) return 'miss';   // typing into the sheet is not a beat here
+  return false;
+}
+function boundsOf(set){ let R=null; set.forEach(k=>{const [r,c]=k.split(',').map(Number); R=R?rect(Math.min(R.r0,r),Math.min(R.c0,c),Math.max(R.r1,r),Math.max(R.c1,c)):rect(r,c,r,c);}); return R; }
+function paste(){
+  const dr=S.cur.r-S.clip.r0, dc=S.cur.c-S.clip.c0;
+  S.clip.data.forEach(([k,cell])=>{ const [r,c]=k.split(',').map(Number); const nr=r+dr,nc=c+dc; if(nr<ROWS&&nc<COLS){ if(cell) S.cells.set(key(nr,nc),{...cell}); else S.cells.delete(key(nr,nc)); } });
+  S.sel=rect(S.cur.r,S.cur.c,Math.min(ROWS-1,S.cur.r+S.clip.r1-S.clip.r0),Math.min(COLS-1,S.cur.c+S.clip.c1-S.clip.c0)); S.special=null;
+  S.saved=false;                                  // an edit invalidates the save latch
+}
+function goToSpecial(){   // Constants → Numbers: every typed figure, wherever it sits on the sheet
+  S.dlg=false; const set=new Set(); S.cells.forEach((cell,k)=>{ if(cell.num&&!cell.fx&&cell.blue) set.add(k); });
+  if(set.size){ S.special=set; const [r,c]=[...set][0].split(',').map(Number); S.cur={r,c}; }
+}
+
+/* ---------- grading: end-state only, beats in order, acts advance on a clean list ---------- */
+function grade(){
+  let b; while((b=curBeat())&&b.ok(S)){
+    S.done.push(b.n); S.miss=0; flashHud();
+    const act=actOf(b.n);
+    if(act.n===2) flashCells(selCells());
+    if(act.beats.every(x=>S.done.includes(x.n))){ if(act.n<3) advanceAct(act.n+1); else finish(); }
+  }
+}
+function advanceAct(n){
+  S.act=n;
+  if(n===2){ [...S.walls].forEach(k=>dissolveQ.add(k)); S.walls.clear(); flashCells(rectSet(BLOCK));   // reveal: the parked table paints in live
+    setTimeout(()=>{ dissolveQ.clear(); render(); },700); }
+  if(n===3){ S.clip=null; flashCells(rectSet(BAY)); }
+  setTimeout(()=>{ if(S.act===n&&S.card!=='done') { S.card=n; render(); } }, n===2?650:400);
+}
+function finish(){ S.tEnd=performance.now(); setTimeout(()=>{ S.card='done'; render(); }, 700); }
+function dismissCard(){ S.card=null; render(); }
+const dissolveQ=new Set(); let flashSet=new Set();
+function flashCells(set){ flashSet=new Set(set); setTimeout(()=>{flashSet=new Set(); render();},650); }
+function flashHud(){ const l=$('hudLine'); l.classList.remove('pulse'); void l.offsetWidth; l.classList.add('pulse'); }
+
+/* ---------- render ---------- */
+function caps(str){   // '{ctrl}+{→} · {shift}+{space}' → keycap strip; bare words stay as text
+  return str.split(' · ').map(g=>g.split('+').map(t=>{
+    const m=t.match(/^\{(.+)\}$/); if(!m) return t;
+    let k=m[1]; if(k==='ctrl') k=macCaps?'⌘':'ctrl'; else if(k==='ctrl^') k=macCaps?'⌃':'ctrl';
+    return '<kbd>'+k+'</kbd>';
+  }).join('<span class="sep">+</span>')).join('<span class="sep">·</span>');
+}
+function hudText(str){ return str.replace(/\{([^}]+)\}/g,(_,k)=>caps('{'+k+'}')).replace(/\[([^\]]+)\]/g,'<b class="tgt">$1</b>'); }
+function pxStar(size){
+  const P=['...#...','..###..','#######','.#####.','..###..','.##.##.','#.....#']; let s='';
+  P.forEach((row,y)=>[...row].forEach((ch,x)=>{ if(ch==='#') s+='<rect x="'+x+'" y="'+y+'" width="1" height="1"/>'; }));
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 7 7" shape-rendering="crispEdges" style="vertical-align:-2px"><g fill="currentColor">'+s+'</g></svg>';
+}
+function fmtClock(ms){ const t=Math.max(0,ms)/1000; const m=Math.floor(t/60), s=Math.floor(t%60), d=Math.floor((t*10)%10); return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'.'+d; }
+function elapsed(){ return (S.tEnd||performance.now())-S.t0; }
+
+function buildGrid(){
+  let h='<tr><th class="rh"></th>'; for(let c=0;c<COLS;c++) h+='<th id="ch'+c+'">'+colL(c)+'</th>'; h+='</tr>';
+  for(let r=0;r<ROWS;r++){ h+='<tr><th class="rh" id="rh'+r+'">'+(r+1)+'</th>'; for(let c=0;c<COLS;c++) h+='<td id="c'+r+'_'+c+'"></td>'; h+='</tr>'; }
+  $('grid').innerHTML=h;
+}
+function render(){
+  const b=curBeat(), act=ACTS.find(a=>a.n===S.act);
+  const sel=selCells(), R=S.sel;
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    const td=$('c'+r+'_'+c), k=key(r,c), cell=S.cells.get(k), cls=[];
+    let html='';
+    if(S.walls.has(k)) cls.push('wall');
+    else if(dissolveQ.has(k)) cls.push('dissolving');
+    if(cell){ html=cell.v; if(cell.num)cls.push('num'); if(cell.bold)cls.push('bold'); if(cell.blue)cls.push('blue');
+      if(S.act===1&&inRect({r,c},BLOCK)) cls.push('parked'); }
+    if(sel.has(k)) cls.push('sel');
+    if(!S.special){ if(r===R.r0&&sel.has(k))cls.push('sel-t'); if(r===R.r1&&sel.has(k))cls.push('sel-b'); if(c===R.c0&&sel.has(k))cls.push('sel-l'); if(c===R.c1&&sel.has(k))cls.push('sel-r'); }
+    if(S.cur.r===r&&S.cur.c===c) cls.push('active');
+    if(S.clip&&inRect({r,c},S.clip)){ if(r===S.clip.r0)cls.push('ant-t'); if(r===S.clip.r1)cls.push('ant-b'); if(c===S.clip.c0)cls.push('ant-l'); if(c===S.clip.c1)cls.push('ant-r'); }
+    if(S.act>=2&&inRect({r,c},BAY)&&!cell){ cls.push('hb'); if(S.act===2)cls.push('hbdim'); if(r===BAY.r0)cls.push('hb-t'); if(r===BAY.r1)cls.push('hb-b'); if(c===BAY.c0)cls.push('hb-l'); if(c===BAY.c1)cls.push('hb-r'); }
+    if(flashSet.has(k)) cls.push('lit');
+    if(S.act===1&&!S.moved&&r===0&&c>=1&&c<=4){ html='›'; cls.push('chev'); }
+    const pi=LEGS.findIndex((L,i)=>i<8&&L.to[0]===r&&L.to[1]===c);
+    if(pi>=0&&S.act===1) html+='<i class="pipdot'+(S.pips[pi]?' lit':'')+'"></i>';
+    td.className=cls.join(' '); td.innerHTML=html;
+  }
+  for(let c=0;c<COLS;c++) $('ch'+c).className=(c>=R.c0&&c<=R.c1)?'cur':'';
+  for(let r=0;r<ROWS;r++) $('rh'+r).className='rh'+((r>=R.r0&&r<=R.r1)?' cur':'');
+  const cur=S.cells.get(key(S.cur.r,S.cur.c))||{};
+  $('namebox').textContent=(S.special||R.r0!==R.r1||R.c0!==R.c1)?(S.special?ref(S.cur.r,S.cur.c):ref(R.r0,R.c0)+':'+ref(R.r1,R.c1)):ref(S.cur.r,S.cur.c);
+  $('fbar').textContent=cur.fx||(cur.v??'');
+  // overlay labels
+  let ov='';
+  if(S.act>=2&&!S.cells.has('0,0')){ const a=$('c'+BAY.r1+'_0').getBoundingClientRect(), g=$('grid').getBoundingClientRect();   // marker clears on paste, like the engine's .ptgt
+    ov+='<div class="lbl'+(S.act===2?' dim':'')+'" style="left:'+(a.left-g.left+3)+'px;top:'+(a.bottom-g.top-17)+'px">HOME BAY</div>'; }
+  ov+='<div class="stamp'+(S.saved?' on':'')+'" style="left:44%;top:5%">SAVED</div>';
+  $('ov').innerHTML=ov;
+  // HUD
+  $('hudAct').textContent='ACT '+act.n+' · '+act.name;
+  $('hudLine').innerHTML=b?hudText(b.hud):'level complete';
+  $('hudPips').innerHTML=BEATS.map(x=>'<i class="'+(S.done.includes(x.n)?'on':(b&&b.n===x.n?'cur':''))+'"></i>').join('');
+  $('hudStar').className='star'+(S.star?'':' off'); $('hudStar').innerHTML=pxStar(14)+(S.star?' one press per hall':' forfeited');
+  $('hudClock').textContent=fmtClock(elapsed());
+  const nudge=$('nudge'); nudge.className='nudge'+(b&&S.miss>=3?' on':''); nudge.innerHTML=b?hudText(b.nudge):'';
+  // memo
+  let m='<div class="mh">'+act.memo+'<span>act '+act.n+'/3</span></div>';
+  act.beats.forEach(x=>{ m+='<div class="row'+(S.done.includes(x.n)?' on':'')+(b&&b.n===x.n?' cur':'')+'"><i class="d"></i>'+x.label+'</div>'; });
+  if(act.n===1) m+='<div class="foot star'+(S.star?'':' off')+'"><span class="sm">☆ visible bonus</span>'+pxStar(13)+' take every hall in one press'+(S.star?'':' — forfeited')+'</div>';
+  if(act.n===2) m+='<div class="foot"><span class="sm">rule</span>a capture lights when the selection matches the target exactly — the end state, never the key</div>';
+  if(act.n===3) m+='<div class="foot"><span class="sm">route</span>block → home bay → save</div>';
+  $('memo').innerHTML=m;
+  // card / ring / dialog
+  const scrim=$('scrim'), ring=$('ring');
+  if(S.card){ scrim.classList.add('on'); $('card').innerHTML=S.card==='done'?doneCard():actCard(ACTS.find(a=>a.n===S.card)); placeRing(S.card==='done'?null:ACTS.find(a=>a.n===S.card).ring); }
+  else { scrim.classList.remove('on'); ring.style.display='none'; }
+  $('dlg').className='dlgwrap'+(S.dlg?' on':'');
+  $('btnTheme').textContent='theme: '+document.documentElement.dataset.theme;
+  $('btnMac').className=macCaps?'on':'';
+  $('btnMac').textContent='Mac keycaps: '+(macCaps?'on':'off');
+}
+function actCard(a){
+  return '<div class="ct"><small>'+a.card.sub+'</small>'+a.card.title+'</div><div class="cb">'+a.card.body+'</div><div class="ck">'+caps(a.card.keys)+'</div>'+
+    '<div class="cf"><span>any key to begin</span><span class="run"><b></b>clock running <span id="cardClock">'+fmtClock(elapsed())+'</span></span></div>';
+}
+function doneCard(){
+  return '<div class="ct"><small>LEVEL 1 · THE CORRIDOR</small>LEVEL COMPLETE</div>'+
+    '<div class="stats"><div><b>'+fmtClock(elapsed())+'</b><span>time</span></div><div><b>10/10</b><span>pips</span></div><div><b style="color:'+(S.star?'var(--warn)':'var(--faint)')+'">'+pxStar(22)+'</b><span>'+(S.star?'☆ earned':'☆ forfeited')+'</span></div></div>'+
+    '<div class="post">posted to the leaderboard · <i>first play</i> · par 01:30 · pass 03:45<br>'+(S.star?'one press per hall — the corridor was a handful of flights':'walked a hall — replay for the ☆, the corridor is nine flights')+'</div>'+
+    '<div style="display:flex;gap:10px"><button class="btn" onclick="return false">NEXT: LEVEL 2 — THE REPAIR SHOP</button><button class="btn ghost" onclick="resetLevel()">replay</button></div>';
+}
+function placeRing(which){
+  const ring=$('ring'), g=$('grid').getBoundingClientRect(), bd=$('board').getBoundingClientRect();
+  let a,b; if(which==='block'){a=$('c'+BLOCK.r0+'_'+BLOCK.c0);b=$('c'+BLOCK.r1+'_'+BLOCK.c1);} else if(which==='bay'){a=$('c0_0');b=$('c'+BAY.r1+'_'+BAY.c1);} else {a=$('c0_0');b=$('c'+(ROWS-1)+'_'+(COLS-1));}
+  if(!which){ ring.style.display='none'; return; }
+  const ra=a.getBoundingClientRect(), rb=b.getBoundingClientRect();
+  ring.style.display='block'; ring.style.left=(ra.left-bd.left-4)+'px'; ring.style.top=(ra.top-bd.top-4)+'px';
+  ring.style.width=(rb.right-ra.left+8)+'px'; ring.style.height=(rb.bottom-ra.top+8)+'px';
+}
+setInterval(()=>{ $('hudClock').textContent=fmtClock(elapsed()); const cc=$('cardClock'); if(cc) cc.textContent=fmtClock(elapsed()); },100);
+
+/* ---------- DEV strip ---------- */
+function resetLevel(){ S=freshState(); dissolveQ.clear(); S.card=1; render(); }
+function devJump(n){
+  const t0=S.t0; S=freshState(); S.t0=t0; dissolveQ.clear();   // jumps keep the clock running
+  if(n>=2){ S.done=[1,2,3]; S.pips=S.pips.map(()=>true); S.walls.clear(); S.act=2; S.moved=true; setCur(BLOCK.r0+1,BLOCK.c0); S.card=2; }
+  if(n>=3){ S.done=[1,2,3,4,5,6,7]; S.act=3; setCur(BLOCK.r1,BLOCK.c1); S.card=3; }
+  if(n===4){ S.done=BEATS.map(b=>b.n); S.clip={...BLOCK,data:[]}; REGIONS.forEach((nm,i)=>{ for(let c=BLOCK.c0;c<=BLOCK.c1;c++) S.cells.set(key(1+i,c-BLOCK.c0),{...S.cells.get(key(BLOCK.r0+1+i,c))}); });
+    for(let c=BLOCK.c0;c<=BLOCK.c1;c++) S.cells.set(key(0,c-BLOCK.c0),{...S.cells.get(key(BLOCK.r0,c))});
+    S.saved=true; S.t0=performance.now()-154300; S.tEnd=performance.now(); setCur(0,0); S.card='done'; }
+  render();
+}
+function toggleTheme(){ const h=document.documentElement; h.dataset.theme=h.dataset.theme==='dark'?'light':'dark'; render(); }
+function toggleMac(){ macCaps=!macCaps; render(); }
+window.addEventListener('resize',render);
+document.querySelectorAll('.dev button').forEach(b=>b.addEventListener('click',()=>b.blur()));
+buildGrid(); resetLevel();
+</script>
+</body>
+</html>

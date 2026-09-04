@@ -43,7 +43,80 @@ A1, B1–B6 and C3, which it absorbs._
 | **P7** | **Certificates = tracks of chapters, unchanged in shape**; `HK_TRACKS` re-derives from the new groups and `migrate-certificates`/the RPC arrays move in the same PR (C15 guards it). | keeps the cert product; the invariant already exists |
 | **P8** | **Frozen:** drill keys, achievement ids, HK_RANK.TIERS order, HK_PLACEMENT keys, localStorage keys. Renamed/moved: group names, chapter ids may be re-cut (a claim-flag migration maps old `hk_camp_xp` ids to new — one-time, client-side). | earned things persist |
 
+## 1a · AMENDMENT (Wolf, 2026-09-03 evening — after the first Phase A map) — supersedes P3/P4 where they conflict
+
+Wolf on the nine-chapter map: "I don't love that layout — the idea is less about lessons and
+execution drills and more about MERGING the two into a gamified format. The original chapter layout
+was actually pretty good; expand Foundations to cover the ribbon and other stuff (an extended long
+set of tutorials) and then sections based on Excel functionalities. The first chapter is very
+gamified — like the pac-man-style course for movement — with similar mechanics that make each drill
+in the first set a GAME as you learn each foundational concept: a game tutorial before the speed
+drills that are more like actual spreadsheets and business tasks."
+
+Binding changes:
+- **P3 (re-cut) is withdrawn.** The eight chapters stay (Foundations · Formatting · Formulas I ·
+  Data & Lookups · Formulas II · Models I · Models II · Full Builds), with their ids c1–c8 and their
+  capstone designations. No claim-flag migration.
+- **P4 becomes: Foundations = THE GAME TUTORIAL.** ~12 mini-game drills, one foundational concept
+  each (move · select · enter/edit · copy/cut/paste · fill · first formulas · anchors · number
+  formats · fonts & colours · alignment & borders · the ribbon · structure ops), each built on a
+  game mechanic the way the movement corridor is (pips, captures, lives, a visible bonus), before
+  the speed drills that look like real spreadsheets. No lesson drills at the head of later chapters;
+  later chapters are re-ordered within themselves only.
+- **P1 (one spine) and P2 (two real tiers) stand.** PRO = the four chapters HOTKEY_PREMIUM names
+  today; earn-in levels per PRO chapter.
+- **Art (new, P9): every native asset goes pixel** — rank emblems, achievement medals, level chip,
+  medal clocks, ☆, streak/crown/placement glyphs, badges, favicon/OG — in a detailed pixel style
+  (Shattered Pixel Dungeon / Undertale register, "voxel-ish with some detail"), replacing the
+  heraldic League-style theme entirely. Plan: dev/ASSET_INVENTORY.md + ART_DIRECTION §7.
+
+Phase A v2 (the revised map) replaces the first map on PR #249.
+
+### 1b · Wolf's answers (2026-09-03, late) — RESOLVED
+- **Foundations = FIVE LEVELS, not twelve mini-games** ("feels shallow"): L1 The Corridor (move & select) ·
+  L2 The Repair Shop (enter, edit, structure, clipboard, fill) · L3 The Power Grid (formulas, anchors,
+  sign convention) · L4 The Print Shop (formats, fonts, alignment, borders, the ribbon both ways) ·
+  L5 Model Tour (the existing capstone). Multi-act game boards, 5–8 min first play, replayable for time.
+- **Level 1 replaces the Keyboard Tour** entirely (its runtime — HUD, cards, tier reveals — becomes
+  the level runtime; the separate pre-game is retired when L1 ships).
+- **Levels post to leaderboards** like any drill: timed, generous pass clocks, one visible ☆ each.
+- **The level names are placeholders**; keep them until playtest.
+- Entry path: landing → Enter → Level 1 act 1. The modal product tour and the guided auto-handoff are
+  deleted; three contextual one-time tips replace the tour's chrome beats.
+
+### 1c · r455 redirect: integrated tutorials, not game levels (Wolf, 2026-09-03) — RESOLVED
+Wolf, on the r454 "level" plan (act cards, pixel HUD, dissolve reveals, story names): "I think we lose
+the similarity to leetcode as a platform… keep the pixel art limited to the rank, level, achievements,
+player card — basically all the customization options, but keep the original style for the actual
+game. This is trying too hard to be like an indie game without building the gameplay or story to
+support it — so we should lean into the idea of teaching and make these an integrated tutorial."
+
+| # | decision | effect |
+|---|---|---|
+| **1** | **Guide panel open by default on the five Foundations keys**, a collapsed toggle everywhere else (CURRICULUM_V3 §9.0.2) | the LeetCode shape: board left, explanation beside it, clock running |
+| **2** | **Route replay is the "editorial", built later** — after Foundations, once the ghost stores keys (§9.0.5) | nothing in the Foundations build designs against it |
+| **3** | **No Practice-vs-Ranked mode.** The clock always runs; every run posts, as every drill does today; hints are free and never change the score | §8 D-4 reads "guide open on play 1", not "clock hidden". (Making the ranked opt-in automatic at a level is a separate spec — not this file) |
+
+What it changes: **P9 (art) narrows** to identity surfaces — rank emblems, level chip, achievements,
+player card; the drill keeps the site's original style. **§1b's five boards stand** (every beat, tag,
+pool, alt, ☆ and par), renamed functionally (Navigate & Select · Edit & Repair · First Formulas ·
+Format the Page · Model Tour; keys unchanged). **Phase B:** the step controller is kept and is what
+is built now (CURRICULUM_V3 §9.0); the pixel chrome — act cards, HUD banner, reveals — is dropped, and
+the Tour's HUD/stage-card runtime goes with the Tour instead of being re-scoped. **Phase C:** Level 1
+becomes the `navigation` **guided drill** (guide panel + three-rung hints); the Keyboard Tour still
+retires into it; `e2e-depth-mechanics` asserts steps and hints, not cards. Superseded by this note:
+§1b "multi-act game boards", the r455 Level 1 pixel mock (rejected direction, kept as a record).
+
 ## 2 · The phases (each = one PR, gate green, Wolf playtest between)
+
+| phase | status (r455 close, 2026-09-04) |
+|---|---|
+| A — curriculum map | done |
+| B — clean-slate entry | **landed** (step/act controller; rename `S.act`→`S.step` in flight) |
+| C — lesson wave + re-cut | not started |
+| D — progression ties | not started |
+| E — launch homepage | **landing v3.1 shipped**, ahead of C |
+| F — rank art | round 2 + touch-ups shipped; `themes.js` sprite wiring not started |
 
 ### Phase A — the curriculum map (spec, one session, Wolf review)
 - Produce `dev/CURRICULUM_V3.md`: the nine chapters, every drill's placement (all 74 + the Tour +

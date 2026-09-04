@@ -59,7 +59,7 @@ window.HOTKEY_DRILLS = {
   // ---------------------------------------------------------------
   meta: {
     // Foundations
-    navigation: { name:'Navigate', label:'Navigation maze',     tab:'Nav',         desc:'One long switchback corridor through solid walls — every straightaway is a single shot, every corner one turn. Collect the pips, copy the model data, bring it home to A1, save, and finish at the far corner of the active area — the wall past the model breaks open if you would rather walk there than fly' },   /* r427 (§4.1 round 3): windier serpentine + the carved exit */
+    navigation: { name:'Navigate & Select', label:'Navigate and select', tab:'Nav', desc:'One long switchback corridor through solid walls: every straightaway is a single shot, every corner one turn. Collect the checkpoints, land on the block and the walls come down — a regional sales table and a memo naming four ranges to capture: one region across the quarters, one quarter down every region, the whole table, and every typed figure on it. Then copy the table, bring it home to the marked room at A1 and save' },   /* r456 (CURRICULUM_V3 §9.1): Foundations 1 — three steps on one board that grows */
     autofit:    { name:'Autofit',  label:'Fix the squeezed columns',tab:'Autofit',  desc:'A print page nobody can read — fit the labels to their content, hold the quarter block to one width, and find out what your own totals do to a narrow column' },   /* r432 (§4.14): reworked to the single print-page board */
     rowops:     { name:'Structure', label:'Rebuild the schedule',   tab:'Structure',desc:'Full structural surgery \u2014 insert the missing line and the missing quarter, delete the squatters, and watch every new row and column arrive already dressed' },   /* r424 (D17): absorbed colops \u2014 rows AND columns in one drill */
     filldr:     { name:'Fill',     label:'Fill down, fill right',   tab:'Fill',     desc:'A quarterly operating build off the revenue feed — three cost lines across the year, EBITDA, Fiscal Year totals, and a ratio block down to EBITDA margin. One anchored formula fills most of it' },   /* r452 (audit §5.3): the old desc ("Fill down and fill right — one formula, whole block") sold a 2-beat exercise; the r427 board is 7 beats at par 44. First sentence stays inside the 158-char meta-description cut in dev/build-drill-pages.js */
@@ -448,8 +448,9 @@ window.hkPlacementRide = function(key, hasPB){
      loadChallenge — opmodel (Full Builds, LVL 11) is the 5th placement board while Ranked opens at
      LVL 10, so a ranked entrant sat at "placement 4/5" forever. One rule, two gates; the caller
      may pass its own "board is posted" test (the trainer's PB map) instead of the stored PB read.
-     The ladder gate additionally requires hk_ranked at its call site — a caller condition, not a
-     second copy of this rule (the paywall rides for any player mid-placement, per r450). */
+     The ladder gate additionally requires window.hkRankedEntered() (r455: derived — LVL 10) at its
+     call site — a caller condition, not a second copy of this rule (the paywall rides for any player
+     mid-placement, per r450). */
   const P = (window.HK_PLACEMENT && window.HK_PLACEMENT.KEYS) || [];
   if(P.indexOf(key) < 0) return false;                     // not a placement board
   try{ if(localStorage.getItem('hk_placement_done') === '1') return false; }catch(e){}   // placed: hole shut
@@ -485,12 +486,18 @@ window.HOTKEY_CLOCKS = {
      whole chapter; the wider Pass keeps the gate about EXECUTION, not speed — the clean-run
      gate itself has no clock at all). pro/leg stay derived (par×1.15 / par×1.0). Keep pass in
      lockstep with HOTKEY_PARS.modeltour: pass = par × 2. */
+  /* r456 (CURRICULUM_V3 §9.1): the FOUNDATIONS override — pass = par x 2.5, not x1.5. A
+     Foundations drill is an integrated tutorial: a FIRST play runs 3-4 minutes because the
+     player is reading the guide beside the board (§9.0.4), and the pass clock is what keeps
+     that play from being a failure. par itself is §9.1's replay par. Keep in lockstep with
+     HOTKEY_PARS.navigation: pass = par x 2.5. */
+  navigation: { pass: 225 },
   modeltour: { pass: 70 },
   gauntlet:  { pass: 94 },   /* r433: the Formatting capstone — par 47 × 2 (§4.20 "Clocks: capstone pass=par×2.0") */
   cascade:   { pass: 322 },   /* r447: the Models II capstone — par 161 × 2 (§4.77 "Clocks: pass=par×2.0 override") */
 };
 
-window.HOTKEY_PARS = {"navigation":20,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":47,"margin":40,"foot":29,"percent":21,"cagr":36,"anchor":22,"bridge":33,"sumif":64,"rollup":80,"fxconvert":35,"cases":97,"sort":31,"scrub":21,"recon":92,"filterpass":26,"unhide":25,"lookup":59,"lookup2":80,"drill":22,"series":44,"audit":28,"triage":40,"wrapfix":26,"balcheck":37,"stalelink":64,"tieout":36,"signerr":35,"versionup":48,"balance":66,"wacc":112,"fcfbuild":40,"dcf":85,"comps":89,"txncomps":52,"football":65,"dcfsens":35,"retbridge":56,"accdil":70,"sourcesuses":92,"lbo":71,"revolver":95,"schedule":69,"intsched":72,"waterfall":77,"cascade":161,"wk13":45,"liqbridge":77,"covtable":36,"debtsched":86,"isbuild":71,"bsbuild":64,"cfslink":66,"nwcsched":102,"threestmt":45,"opmodel":85,"dcfbuild":113,"lbobuild":84,"debtblock":70,"dashcover":47};
+window.HOTKEY_PARS = {"navigation":90,"modeltour":35,"blocksel":34,"filldr":44,"pastes":42,"rowops":30,"editfix":52,"housestyle":44,"ruleoff":31,"ruleaudit":16,"typeset":24,"decimals":25,"center":22,"autofit":36,"combo":27,"gauntlet":47,"margin":40,"foot":29,"percent":21,"cagr":36,"anchor":22,"bridge":33,"sumif":64,"rollup":80,"fxconvert":35,"cases":97,"sort":31,"scrub":21,"recon":92,"filterpass":26,"unhide":25,"lookup":59,"lookup2":80,"drill":22,"series":44,"audit":28,"triage":40,"wrapfix":26,"balcheck":37,"stalelink":64,"tieout":36,"signerr":35,"versionup":48,"balance":66,"wacc":112,"fcfbuild":40,"dcf":85,"comps":89,"txncomps":52,"football":65,"dcfsens":35,"retbridge":56,"accdil":70,"sourcesuses":92,"lbo":71,"revolver":95,"schedule":69,"intsched":72,"waterfall":77,"cascade":161,"wk13":45,"liqbridge":77,"covtable":36,"debtsched":86,"isbuild":71,"bsbuild":64,"cfslink":66,"nwcsched":102,"threestmt":45,"opmodel":85,"dcfbuild":113,"lbobuild":84,"debtblock":70,"dashcover":47};
 
 /* ---- ACHIEVEMENTS: long-grind goals beyond the campaign. Each test() gets
    ctx = {pb, pars, runs (my posted), streak, solves, crowns, podiums, att, menuOrder}

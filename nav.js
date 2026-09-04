@@ -312,8 +312,8 @@
 
   /* r406 (Wolf: "level 4 in game but level 13 on my card"): the in-game HUD + nav level
      run on the local hk_xp_est estimate; the card reprices from canonical server XP. They
-     diverged because the estimate was only hydrated inside the RANKED path — a player who
-     hadn't opted into ranked never got the sync. Level is universal progression, not a
+     diverged because the estimate was only hydrated inside the RANKED path — a player below
+     the rank level never got the sync. Level is universal progression, not a
      competitive-ranked concept, so hydrate it for ANY signed-in user. Memoized fetch. */
   async function hydrateLevel(){
     try{
@@ -328,28 +328,20 @@
     }catch(e){}
   }
 
-  /* r407 (Wolf): LOGIN NUDGE — once a signed-in player is eligible (Level 10, mirroring
-     lb.js RANKED_MIN_LVL) but hasn't opted into ranked, surface the "Ranked Unlocked" card.
-     Fires at most once per session; "maybe later" snoozes it 3 days; entering ranked ends it.
-     Suppressed on the leaderboard (the your-card gate already prompts there). */
-  const RANKED_MIN_LVL = (window.HK_RANK&&HK_RANK.RANKED_MIN_LVL)||10;   // r417 audit: SSOT in themes.js HK_RANK (was a comment-synced duplicate)
-  async function maybeRankedNudge(){
+  /* r455 (Wolf: "go with automatic rank at level 10"): THE RANK REVEAL. Rank is no longer
+     opted into — window.hkRankedEntered() (below, top-level) derives it from level. The one
+     moment kept from the r407 ceremony is the season-start infographic (themes.js hkRankedCard):
+     it plays ONCE, the first time a signed-in player's predicate reads true, latched on
+     hk_rank_reveal_seen. It is a reveal, not a gate — dismissing it changes nothing, and no
+     button on it writes state. Suppressed for guests (nothing to reveal; the pill says sign in). */
+  function maybeRankReveal(lvl){
     try{
-      if(/leaderboard\./.test(location.pathname)) return;
-      if(sessionStorage.getItem('hk_ru_nudged')==='1') return;
-      if(localStorage.getItem('hk_ranked')==='1') return;
-      const snooze=parseInt(localStorage.getItem('hk_ru_snooze')||'0',10)||0;
-      if(snooze>Date.now()) return;
-      const d=await loadProfileData();
-      const lvl=levelOf(computeXP(d, d.myRuns, d.mySessions)).lvl;
-      if(lvl < RANKED_MIN_LVL || !window.hkRankedCard) return;
-      sessionStorage.setItem('hk_ru_nudged','1');
-      window.hkRankedCard({
-        reason:'Level '+lvl+' reached',
-        onEnter:()=>{ try{ localStorage.setItem('hk_ranked','1'); }catch(e){}
-          try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} try{ navRank(); }catch(e){} },
-        onLater:()=>{ try{ localStorage.setItem('hk_ru_snooze', String(Date.now()+3*24*3600*1000)); }catch(e){} }
-      });
+      if(!window._navUser || isAnonUser()) return;
+      if(!(window.hkRankedEntered && window.hkRankedEntered())) return;
+      if(localStorage.getItem('hk_rank_reveal_seen')==='1') return;
+      if(!window.hkRankedCard) return;
+      localStorage.setItem('hk_rank_reveal_seen','1');
+      window.hkRankedCard({ reason: lvl ? 'Level '+lvl+' reached' : 'you\u2019ve unlocked ranked' });
     }catch(e){}
   }
 
@@ -379,18 +371,19 @@
        card can wear any animated skin. Scoped to his email; never touches anyone else. */
     try{ const __em=((window._navUser&&window._navUser.email)||'').toLowerCase();
       if(__em==='wolfcdrake@gmail.com'){
-        let __ch=false;
-        if(localStorage.getItem('hk_ranked')!=='1'){ localStorage.setItem('hk_ranked','1'); __ch=true; }
+        let __ch=false;   /* r455: the hk_ranked force line is gone — rank derives from level for him like everyone */
         if(localStorage.getItem('hk_dev_unlock_cosmetics')!=='1'){ localStorage.setItem('hk_dev_unlock_cosmetics','1'); __ch=true; }
         /* r408 (Wolf): mark placements DONE for his account so the real tier shows and he can
            verify the level/rank wiring end-to-end (his rank still computes from his real runs). */
         if(localStorage.getItem('hk_placement_done')!=='1'){ localStorage.setItem('hk_placement_done','1'); __ch=true; }
         if(__ch){ try{ window.hkStatePush&&window.hkStatePush(); }catch(e){} }
       } }catch(e){}
-    /* r336 (Wolf): the pill honors the ranked opt-in. Not entered -> a quiet "Unranked" chip;
-       entered but mid-placement -> "placement n/5"; only a finished placement shows a tier.
-       The tier cache is consulted only when opted in, so leaving ranked demotes immediately. */
-    const __opted=(function(){ try{ return localStorage.getItem('hk_ranked')==='1'; }catch(e){ return false; } })();
+    /* r336 (Wolf): the pill has three states. Below the rank level -> a quiet "Unranked" chip;
+       ranked but mid-placement -> "placement n/5"; only a finished placement shows a tier.
+       r455: "ranked" is DERIVED (window.hkRankedEntered — level >= HK_RANK.RANKED_MIN_LVL, or the
+       campaign complete, or the dev unlock); the hk_ranked opt-in flag is retired. The tier cache
+       is consulted only when the predicate holds, so a wiped level demotes immediately. */
+    const __opted=!!(window.hkRankedEntered && window.hkRankedEntered());
     /* r384 (Wolf: signed-out mobile wore a rank): guests get NO rank — a muted
        sign-in cue instead. Checked BEFORE the cache read so a guest session that
        somehow inherited hk_rank3 can never wear it. Fully signed-out visitors
@@ -407,11 +400,13 @@
       if(__opted && c && c.exp>Date.now()){ el.innerHTML=pillHtml(c.n, c.b);   /* r423: cache carries the bucket; an old bucketless cache renders rank-only until refresh */
         el.className='pc-tier '+c.c+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile; return; } }catch(e){}
     if(!__opted){
-      hydrateLevel();   // r406 (Wolf): sync level even when not opted into ranked \u2014 fire-and-forget so the chip paints now
+      /* r406 (Wolf): sync level even below the rank level \u2014 fire-and-forget so the chip paints now.
+         r455: the predicate reads the level cache hydrateLevel writes (hk_xp_est), so a fresh device
+         may read "Unranked" for one tick; when the hydrated level crosses the line, re-render. */
+      hydrateLevel().then(()=>{ try{ if(window.hkRankedEntered && window.hkRankedEntered()) navRank(); }catch(e){} });
       el.innerHTML='<span>Unranked</span>';
       el.className='pc-tier tier-unranked topnav-rank'; el.style.display='inline-flex';
-      el.title='not in ranked \u2014 enter from the leaderboard'; el.onclick=openProfile;
-      maybeRankedNudge();   // r407 (Wolf): nudge eligible players who haven't opted in
+      el.title='ranked opens at LVL '+((window.HK_RANK&&HK_RANK.RANKED_MIN_LVL)||10); el.onclick=openProfile;
       return;
     }
     try{
@@ -439,6 +434,7 @@
         el.innerHTML='<span>\u2694 placement '+doneN+'/'+P.length+'</span>';
         el.className='pc-tier tier-unranked topnav-rank'; el.style.display='inline-flex';
         el.title='placement series \u2014 post a time on each of the five standard boards'; el.onclick=openProfile;
+        try{ maybeRankReveal(levelOf(computeXP(d, d.myRuns, d.mySessions)).lvl); }catch(e){}   // r455: the one-time reveal
         return;   // no tier cache write mid-placement
       }
       const t = tierOf(d.avgPct, d.attempted, d.wsum);
@@ -446,6 +442,7 @@
       el.innerHTML=pillHtml(t.name, t.bucket);   /* r423 (Wolf): rank AND bucket on the pill */
       el.className='pc-tier '+t.cls+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile;
       try{ sessionStorage.setItem('hk_rank3', JSON.stringify({n:t.name,c:t.cls,b:t.bucket,exp:Date.now()+6e5})); }catch(e){}
+      try{ maybeRankReveal(levelOf(computeXP(d, d.myRuns, d.mySessions)).lvl); }catch(e){}   // r455: the one-time reveal
     }catch(e){}
   }
   // r226 (Wolf): on sign-out the top bar kept the old rank + level because the caches that
@@ -467,11 +464,14 @@
     try{
       ['hotkey_pb','hk_runs_lite','hotkey_solves','hotkey_streak','hk_camp_xp','hk_clears',
        'hk_clears_day','hk_key_counts','hk_keys_lifetime','hk_keystats_seeded','hk_ach_flags',
-       'hk_ach_seen','hk_feat_ach','hk_band_best','hk_dc_done','hk_ranked','hk_seen_tier',
+       'hk_ach_seen','hk_feat_ach','hk_band_best','hk_dc_done','hk_rank_reveal_seen','hk_seen_tier',
        'hk_xlv','hk_last_drill','hk_placement_done','hk_dev_unlock_cosmetics','hk_beta_unlock',
-       'hk_dev_unlock','hk_dc_top10','hk_seen_frames','hk_run_outbox','hk_entitled'].forEach(k=>localStorage.removeItem(k));   /* r451: hk_beta_unlock renamed hk_dev_unlock_cosmetics; the OLD key stays in this list one round so a device carrying it from a pre-r451 build still gets wiped on sign-out. r416 bugfix: this flag (the master cosmetic-unlock switch the owner shim sets) was NOT wiped on sign-out, so the next account on a shared machine inherited every skin unlocked. r417 audit: hk_dev_unlock (ranked-gate bypass leaked to the next account), hk_dc_top10 (blocked the next account's daily bounty), hk_seen_frames (stale reveal diff), hk_run_outbox (foreign-user rows retried forever under RLS). r450: hk_entitled — the PRE-STRIPE entitlement stub that drills.js hkEntitlementRead() reads. It is an ACCOUNT entitlement mirrored on the device, so it must die with the session exactly like hk_beta_unlock did; whoever wires Stripe keeps it in this list, or drops the key here in the same commit if the read moves to an in-memory server flag. */
+       'hk_dev_unlock','hk_dc_top10','hk_seen_frames','hk_run_outbox','hk_entitled',
+       'hk_tour_done','hk_rank_seen'].forEach(k=>localStorage.removeItem(k));   /* r451: hk_beta_unlock renamed hk_dev_unlock_cosmetics; the OLD key stays in this list one round so a device carrying it from a pre-r451 build still gets wiped on sign-out. r416 bugfix: this flag (the master cosmetic-unlock switch the owner shim sets) was NOT wiped on sign-out, so the next account on a shared machine inherited every skin unlocked. r417 audit: hk_dev_unlock (ranked-gate bypass leaked to the next account), hk_dc_top10 (blocked the next account's daily bounty), hk_seen_frames (stale reveal diff), hk_run_outbox (foreign-user rows retried forever under RLS). r450: hk_entitled — the PRE-STRIPE entitlement stub that drills.js hkEntitlementRead() reads. It is an ACCOUNT entitlement mirrored on the device, so it must die with the session exactly like hk_beta_unlock did; whoever wires Stripe keeps it in this list, or drops the key here in the same commit if the read moves to an in-memory server flag. */
       for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
-        if(k && (k.indexOf('hk_ghost_')===0 || k.indexOf('hk_cert_')===0)) localStorage.removeItem(k); }   // per-drill ghost replays + cert-offer latches (r417 audit: a surviving hk_cert_<track> latch blocked the next account's cert offers)
+        if(k && (k.indexOf('hk_ghost_')===0 || k.indexOf('hk_cert_')===0 ||
+                 k.indexOf('hk_guide_')===0 || k.indexOf('hk_level_seen_')===0 ||
+                 k.indexOf('hk_tip_')===0)) localStorage.removeItem(k); }   // per-drill ghost replays + cert-offer latches (r417 audit: a surviving hk_cert_<track> latch blocked the next account's cert offers) · r455: hk_guide_<key> (the next account would meet Foundations 1 with its guide already silenced) and hk_tip_<name> (its three one-time tips already spent) — both are TEACHING state that belongs to the player, not to the machine, and dev/check-invariants.js C26 asserts they are in this sweep. hk_level_seen_<key> is the pre-rename latch (r455 first cut); it stays in this sweep one round so a device carrying it is cleaned too.
     }catch(e){}
     // r311 (Wolf): sign-out kept "coming back" because the race that redirects after 1200ms
     // can fire BEFORE supabase's network signOut clears its persisted token — the reload then
@@ -496,7 +496,7 @@
   let __pdCache=null;
   /* r416 bugfix: memoize the PROMISE, not the resolved value. The old code assigned __pdCache only
      AFTER the await, so the burst of concurrent callers on page load (navRank, hydrateLevel,
-     maybeRankedNudge, renderProfile) each saw null and fired a full profiles+ENTIRE-runs-table+
+     renderProfile) each saw null and fired a full profiles+ENTIRE-runs-table+
      sessions fetch. Caching the in-flight promise collapses them to one. */
   function loadProfileData(){ return __pdCache || (__pdCache = __loadProfileData()); }
   async function __loadProfileData(){
@@ -1319,19 +1319,55 @@
 })();
 
 
-/* ---- r426 (Wolf, ROUND2_FEEDBACK §4b): LEAVE RANKED, one implementation ----
-   The leaderboard's your-card bottom slot became the rank+rating standing block, so the
-   action moved to account.html's Ranked card. It lives in shared chrome (nav.js) rather
-   than on either page: leaving ranked is a GLOBAL act — it writes the explicit '0' the
-   r358 hydrate rules refuse to resurrect from the server, then pushes so every device
-   agrees. Any surface that wants the control calls this; nothing re-implements it. */
-window.hkLeaveRanked = function(){
-  try{ localStorage.setItem('hk_ranked','0'); }catch(e){}
-  try{ sessionStorage.removeItem('hk_rank3'); }catch(e){}   // the pill must demote immediately
-  try{ window.hkStatePush && window.hkStatePush(); }catch(e){}
-  return true;
+/* ---- r455 (Wolf: "go with automatic rank at level 10"): RANK IS DERIVED, one predicate ----
+   Until r454 ranked was an OPT-IN ceremony: hk_ranked ('1'/'0') in localStorage, an "Enter
+   Ranked" card + 3-day snooze (nav.js maybeRankedNudge), a gate panel on the leaderboard with
+   Enter/Not-yet, a leave-ranked control on account.html, and r358 hydrate rules that refused
+   to resurrect a '1' over an explicit '0'. Runs posted to every board regardless — the flag
+   only gated the tier display, the placement ride and the ceremony. All of that retires here.
+
+   window.hkRankedEntered() is THE predicate, defined exactly once (dev/check-invariants.js C26)
+   and read by every surface: the nav pill (navRank), the leaderboard your-card (lb.js heroHtml),
+   the trainer's placement ride-through (index.html loadChallenge → drills.js hkPlacementRide),
+   and account.html's Ranked status card. It is SYNC, off the same cache the nav level chip
+   reads:
+     · hk_xp_est  — the local XP estimate. Written at every solve (index.html), reconciled to
+                    canonical server XP by hydrateLevel/navRank (nav.js, max for the same
+                    account, SET for a different one) and by lb.js heroHtml (write-through of
+                    the your-card's computeXP). Wiped on sign-out (clearAccountUI).
+     · hk_xp_uid  — the account the estimate belongs to; an estimate tagged to a DIFFERENT
+                    signed-in account reads as 0 (the r117/r418 shared-machine rule).
+   True when levelOf(xp).lvl >= HK_RANK.RANKED_MIN_LVL, OR the campaign is complete (every
+   track milestone shipped — the lb.js gate's alternative unlock since r336), OR hk_dev_unlock
+   (the e2e fixture bypass, nothing in the UI writes it). Nothing here reads hk_ranked. */
+window.hkCampaignComplete = function(){
+  try{
+    const PB=JSON.parse(localStorage.getItem('hotkey_pb')||'{}');
+    const CAMP=window.HOTKEY_CAMPAIGN, PARS=window.HOTKEY_PARS||{};
+    if(!CAMP) return false;
+    return CAMP.chapters.every(c=>c.keys.every(k=>PB[k]!==undefined && (!PARS[k] || PB[k]<=PARS[k]*CAMP.GATE)));
+  }catch(e){ return false; }
 };
-window.hkIsRanked = function(){ try{ return localStorage.getItem('hk_ranked')==='1'; }catch(e){ return false; } };
+window.hkRankedEntered = function(){
+  try{
+    if(localStorage.getItem('hk_dev_unlock')==='1') return true;
+    const min=(window.HK_RANK&&HK_RANK.RANKED_MIN_LVL)||10;
+    let xp=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
+    const owner=localStorage.getItem('hk_xp_uid')||'', uid=(window._navUser&&window._navUser.id)||'';
+    if(owner && uid && owner!==uid) xp=0;   // another account's estimate on this device
+    const lvl=(window.HK_RANK&&window.HK_RANK.levelOf) ? (window.HK_RANK.levelOf(xp).lvl|0) : 1;
+    if(lvl>=min) return true;
+    return window.hkCampaignComplete();
+  }catch(e){ return false; }
+};
+/* r426's hkIsRanked stays as an alias so account.html's status card keeps one name; hkLeaveRanked
+   is DELETED — there is nothing to leave. */
+window.hkIsRanked = function(){ return window.hkRankedEntered(); };
+/* r455 TOLERANCE — the ONE line that still touches the retired key (allowlisted verbatim in
+   check-invariants C26): a device that went through the old ceremony has already seen the
+   infographic, so its '1' seeds the reveal latch; an old '0' (a leave) is NOT honored — rank is
+   automatic now — and either way the key is removed so nothing can read it again. */
+try{ if(localStorage.getItem('hk_ranked')==='1') localStorage.setItem('hk_rank_reveal_seen','1'); localStorage.removeItem('hk_ranked'); }catch(e){}
 /* r426: attribute-safe escape for the shared data-tip tooltips built in this file */
 function __tipEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
@@ -1380,22 +1416,23 @@ window.hkDeskCreatePro = (function(){
 
 /* ---- r77: celebration engine (shared by every page) ---- */
 /* ============================================================
-   r358 ACCOUNT-STATE SYNC — achievements, the daily streak and the ranked opt-in used to
-   live ONLY in this browser's localStorage: clear the browser or switch devices and they
+   r358 ACCOUNT-STATE SYNC — achievements and the daily streak (and, r358–r454, the ranked
+   opt-in) used to live ONLY in this browser's localStorage: clear the browser or switch devices and they
    were gone (the sweep's finding). They ride profiles.client_state (jsonb) now — pushed
    debounced after every change, merged down on every page boot. Requires
    dev/migrate-client-state.sql; without the column the module goes quiet on first error.
    Merge rules: counters take the max, booleans OR, seen-achievements union, the streak's
-   later day wins (same day: higher count), ranked follows any device's opt-in but an
-   explicit local leave still pushes false (leaving ranked is a global act).
+   later day wins (same day: higher count). r455: client_state.ranked is DEAD DATA — rank
+   derives from level (hkRankedEntered); the field is neither written nor read any more (old
+   rows keep it; no migration).
    ============================================================ */
 (function(){
-  const K={flags:'hk_ach_flags', seen:'hk_ach_seen', streak:'hotkey_streak', ranked:'hk_ranked', dcDone:'hk_dc_done', dcTop:'hk_dc_top10'};
+  const K={flags:'hk_ach_flags', seen:'hk_ach_seen', streak:'hotkey_streak', dcDone:'hk_dc_done', dcTop:'hk_dc_top10'};
   let dead=false, t=null;
   const gj=(k,d)=>{ try{ return JSON.parse(localStorage.getItem(k)||d); }catch(e){ try{ return JSON.parse(d); }catch(_){ return null; } } };
   function snapshot(){ return { v:1,
     ach_flags: gj(K.flags,'{}')||{}, ach_seen: gj(K.seen,'[]')||[],
-    streak: gj(K.streak,'{}')||{}, ranked: (function(){ try{ return localStorage.getItem(K.ranked)==='1'; }catch(e){ return false; } })(),
+    streak: gj(K.streak,'{}')||{},
     dc_done: (function(){ try{ return localStorage.getItem(K.dcDone)||''; }catch(e){ return ''; } })(),
     dc_top10: (function(){ try{ return localStorage.getItem(K.dcTop)||''; }catch(e){ return ''; } })() }; }
   async function pushNow(){
@@ -1427,14 +1464,11 @@ window.hkDeskCreatePro = (function(){
         const lk=i===0?K.dcDone:K.dcTop; const lv=localStorage.getItem(lk)||'', sv=cs[f]||'';
         if(sv && sv>lv){ localStorage.setItem(lk, sv); changed=true; }
       }catch(e){} });
-      let rk=null; try{ rk=localStorage.getItem(K.ranked); }catch(e){}
-      const setRanked = cs.ranked && rk===null;
-      if(setRanked) changed=true;
+      /* r455: cs.ranked (the old opt-in) is ignored on the way down — rank derives from level */
       try{
         localStorage.setItem(K.flags, JSON.stringify(lf));
         localStorage.setItem(K.seen, JSON.stringify(un));
         if(st && st.d) localStorage.setItem(K.streak, JSON.stringify(st));
-        if(setRanked) localStorage.setItem(K.ranked,'1');
       }catch(e){}
       if(changed){ try{ window.dispatchEvent(new CustomEvent('hk-state-hydrated')); }catch(e){} }
       return changed;

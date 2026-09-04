@@ -145,14 +145,15 @@ const STUB = (opts) => {
      (LVL 11 + 32 pace clears), so a level-10 player who entered Ranked hit the lock modal
      on the one board left to post and sat at "placement 4/5" forever. drills.js
      hkPlacementRide opens the gate for the five standard boards while the series is
-     incomplete. Both directions are asserted: it opens for the ranked, unplaced player,
-     and it stays SHUT for a player who never entered ranked (it must not become a free
-     pass around the ladder). */
-  console.log('T5 placement ride-through (LVL 10, unplaced)');
+     incomplete. Both directions are asserted: it opens for the LVL 10, unplaced player,
+     and it stays SHUT one level below (it must not become a free pass around the ladder).
+     r455: ranked is DERIVED from level (nav.js hkRankedEntered) — LVL 10 IS ranked, so the
+     "not ranked" seed is LVL 9 (xp 4400 < the 4500 line), not a removed opt-in flag. */
+  console.log('T5 placement ride-through (LVL 10 rides, LVL 9 does not)');
   const seedLvl10 = (ranked) => `try{
-    localStorage.setItem('hk_xp_est','4600'); localStorage.setItem('hk_xp_uid','u1');
-    localStorage.removeItem('hotkey_pb'); localStorage.removeItem('hk_placement_done');
-    ${ranked ? "localStorage.setItem('hk_ranked','1');" : "localStorage.removeItem('hk_ranked');"}
+    localStorage.setItem('hk_xp_est', ${ranked ? "'4600'" : "'4400'"}); localStorage.setItem('hk_xp_uid','u1');
+    localStorage.removeItem('hotkey_pb'); localStorage.removeItem('hk_placement_done'); localStorage.removeItem('hk_dev_unlock');
+    localStorage.setItem('hk_rank_reveal_seen','1');
   }catch(e){}`;
   for (const ranked of [true, false]) {
     const pl = await newPage(seedLvl10(ranked));
@@ -170,10 +171,10 @@ const STUB = (opts) => {
       ok(r5.lvl !== null && r5.lvl < 11 && r5.locked === 'Full Builds',
         'seed is genuinely gate-locked (LVL ' + r5.lvl + ' < 11, group locked)', JSON.stringify(r5));
       ok(r5.cur === 'opmodel' && !r5.gate,
-        'ranked + unplaced: ?drill=opmodel LOADS the 5th placement board (no lock modal)', JSON.stringify(r5));
+        'LVL 10 + unplaced: ?drill=opmodel LOADS the 5th placement board (no lock modal, no opt-in)', JSON.stringify(r5));
     } else {
-      ok(r5.cur !== 'opmodel' && r5.gate,
-        'not in ranked: the same board still bounces off the gate (the ride is narrow)', JSON.stringify(r5));
+      ok(r5.cur !== 'opmodel' && r5.gate && r5.lvl === 9,
+        'LVL 9: the same board still bounces off the gate (the ride is narrow)', JSON.stringify(r5));
     }
     await pl.close();
   }

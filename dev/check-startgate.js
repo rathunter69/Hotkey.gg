@@ -22,6 +22,10 @@
          the gate armed (paying one gate key) and with hk_gate_off logs the SAME keyLog and
          wins the same way. This is the assertion that makes every other suite's hk_gate_off
          honest — without it, opting the battery out would prove nothing about par.
+     §8c r455: a LEVEL drill is gated like every other drill. Wolf's round-2 direction keeps
+         the drill surface on the site's original chrome, so a level adds NO surface here: the
+         same scrim, the same copy, the same swallowed first key — plus one skip line on the
+         gate's own sub-line, and the act controller armed behind it
      §8  the deliberate NON-gates: THE KEYBOARD TOUR, live session, watch-solution demo —
          and the one surface that REPLACES the gate rather than declining it, the r452
          lesson card (§1.5: on a lesson drill the card IS the gate, so one keypress both
@@ -54,6 +58,11 @@ const check = (ok, label, extra) => { if (!ok) fail++; console.log('  ' + (ok ? 
     localStorage.setItem('hk_learn_done', '1');
     localStorage.setItem('hk_handle_cache', '');
     localStorage.setItem('hk_start_coach', '1');
+    /* r455: Foundations 1 (MENU_ORDER[0], the boot board) coaches on a FIRST play — the step
+       controller arms behind the gate and adds a skip line to it, which is a different contract
+       from the plain gate every section below measures. Latched as already-seen here so §1–§7
+       test the plain gate; §8c clears the latch and proves the tutorial contract on its own. */
+    localStorage.setItem('hk_guide_navigation', 'done');
   } catch (e) {} });
   await page.goto(BASE + '/index.html', { waitUntil: 'load' });
   await page.waitForFunction(() => typeof loadChallenge === 'function' && typeof CHALLENGES !== 'undefined'
@@ -340,6 +349,55 @@ const check = (ok, label, extra) => { if (!ok) fail++; console.log('  ' + (ok ? 
     check(!lc3.card && lc3.scrim === 1 && lc3.gate === true,
       'hk_lessons_off puts the plain start gate back (\u00a71.5: dismissable forever)', JSON.stringify(lc3));
     await page.evaluate(() => { try { delete CHALLENGES.filldr.lesson; localStorage.removeItem('hk_lessons_off'); } catch (e) {} });
+  }
+
+  console.log('\n\u00a78c a TUTORIAL is gated like any other drill (r455, Phase B)');
+  {
+    /* The step controller adds no start surface: Wolf's round-2 direction keeps the drill
+       board on the site's original chrome, so what a first-play tutorial shows is the SAME r450
+       scrim every other drill shows. The only difference is one extra line on the scrim's own
+       sub-line ("already fly? skip the tutorial →") and the step controller armed behind it, so
+       the checklist and its hint row speak for step 1 from the first key. */
+    const LK = await page.evaluate(() => MENU_ORDER[0]);
+    await page.evaluate(k => { try { localStorage.removeItem('hk_guide_' + k); } catch (e) {} }, LK);
+    await load(LK);
+    await page.waitForTimeout(400);
+    const a = await page.evaluate(() => ({
+      scrim: document.querySelectorAll('#hkGate').length, gate: hkGate, running,
+      timer: document.getElementById('timer').textContent,
+      copy: (document.querySelector('#hkGate .hk-pause-card b') || {}).textContent || '',
+      skip: (document.getElementById('lcSkip') || {}).textContent || null,
+      card: document.getElementById('tourWrap').classList.contains('on'),
+      hud: !!document.getElementById('hkHud'),
+      stepMode, step: S && S.step,
+      head: (document.querySelector('#checklist .cl-head') || {}).textContent || '',
+    }));
+    check(a.scrim === 1 && a.gate === true, 'a tutorial arms the SAME scrim as every other drill', JSON.stringify({ s: a.scrim, g: a.gate }));
+    check(/press any key to start/i.test(a.copy), '\u2026with the same copy', a.copy);
+    check(!a.card && !a.hud, '\u2026and adds NO card and NO banner (the drill surface keeps its chrome)', JSON.stringify({ c: a.card, h: a.hud }));
+    check(a.running === false && a.timer === '0.00', 'the clock has not started', a.timer);
+    check(/skip the tutorial/i.test(a.skip || ''), 'the one skip line rides the gate\'s own sub-line', String(a.skip));
+    check(a.stepMode === true && a.step === 0, 'the step controller is armed on step 1 behind it', JSON.stringify({ m: a.stepMode, step: a.step }));
+    check(/step 1 of/.test(a.head), '\u2026and the ordinary checklist head names the step', a.head);
+    await key('Shift', 200);
+    const b = await page.evaluate(() => ({ gate: hkGate, running }));
+    check(b.gate === true && b.running === false, 'a bare modifier still does not start the run', JSON.stringify(b));
+    await key('ArrowDown', 340);
+    const c = await page.evaluate(() => ({ gate: hkGate, running, keys: keyLog.length, step: S.step,
+      t: parseFloat(document.getElementById('timer').textContent) }));
+    check(c.running === true && c.gate === false, 'one keypress starts the clock', JSON.stringify({ r: c.running, g: c.gate }));
+    check(c.keys === 0 && c.t < 0.6, '\u2026with the key swallowed and t=0 honest', JSON.stringify({ k: c.keys, t: c.t }));
+    /* a CLEARED tutorial: the coaching goes quiet, the gate does not change at all */
+    await page.evaluate(k => { try { localStorage.setItem('hk_guide_' + k, 'done'); } catch (e) {} }, LK);
+    await load(LK);
+    await page.waitForTimeout(300);
+    const d = await page.evaluate(() => ({ scrim: document.querySelectorAll('#hkGate').length, gate: hkGate,
+      stepMode, step: S && S.step, skip: !!document.getElementById('lcSkip'),
+      head: (document.querySelector('#checklist .cl-head') || {}).textContent || '' }));
+    check(d.scrim === 1 && d.gate === true, 'a cleared tutorial is gated identically', JSON.stringify({ s: d.scrim, g: d.gate }));
+    check(!d.stepMode && d.step === -1, '\u2026with the step controller stood down', JSON.stringify({ m: d.stepMode, s: d.step }));
+    check(!d.skip, '\u2026and no skip line (a first-play affordance only)', String(d.skip));
+    check(/checklist/.test(d.head), '\u2026and the ordinary checklist head back', d.head);
   }
 
   const real = errs.filter(e => !/supabase|Failed to fetch|NetworkError|ERR_/i.test(e));

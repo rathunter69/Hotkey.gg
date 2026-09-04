@@ -1,5 +1,321 @@
 # hotkey.gg — Live Code Audit (2026-07-06, from repo @ main)
 
+## r456 — FOUNDATIONS 1: "Navigate & Select" — the first integrated tutorial
+
+_Spec: `dev/CURRICULUM_V3.md` §9.0 (the shared contract) + §9.1 (this drill's page). Phase B
+(r455) built the step CONTROLLER against `navigation`'s old four-check board; this round builds
+the BOARD the spec describes, extends the controller into the §9.0.2 guide panel and the §9.0.3
+hint ladder, and flips the Tour switch. Every render is on the site's ORIGINAL chrome — no cards,
+no scrim, no pixel HUD, no story text (Wolf round 2, 2026-09-03)._
+
+### The board — three steps, one board that grows (§9.1)
+
+| step | board | beats |
+|---|---|---|
+| **1 · ride the corridor** | the r427/r430 switchback corridor **verbatim** — same generator, same seed pool, same pips, same model block parked at the far corner, same carved exit | 1 first checkpoint · 2 every checkpoint · 3 land on the block |
+| **2 · take the ranges** | step 1's beats open tier 1: **the walls come down**, the block is replaced by an 8-region × Q1–Q4 + FY **sales table** (pre-dressed), and a **memo** at H2:H6 names the four capture targets | 4 the memo's row · 5 the memo's column · 6 the whole table · 7 every typed figure in one pass |
+| **3 · bring it home** | step 2's beats open tier 2: the **marked home range** at A1:F9 (the r430/r432 positional `ptgt` marker, geometry never cells) | 8 the table on the clipboard · 9 delivered at A1 · **10 save** (engine-appended, `saveClose`) |
+
+**Every beat grades an END STATE** (a selection rectangle, `S.marks`, the clipboard rect, the
+landed values, the save latch) — never a keypress, never formula text (DEPTH_PASS_CAMPAIGN §1).
+
+**Beat 7 has exactly one one-pass route by construction:** one FY figure per seed is **typed by
+hand** among seven `=SUM()` formulas, so the typed set is not a rectangle and only
+`F5 → s → o` (Go To Special → Constants) can take it in a single pass. It grades `S.marks` — Go
+To Special's own multi-selection end state — against the 33 refs the build recorded, so no
+keystroke is graded. **Beats 4 and 5 accept three shapes each:** the figures-only rectangle, the
+rectangle with its label/header, or the whole sheet row/column that `Shift+Space` / `Ctrl+Space`
+leave — §9.1's alt route, same end state.
+
+### The ☆ (VISIBLE) — "take every straightaway in one press"
+
+Named in the checklist from the first paint, not hidden behind `☆ ?`: a check may now declare
+`reveal`, which §9.0 requires of a Foundations ☆ ("exactly one, visible") and C24 permits only on
+a lesson drill or a drill that declares `steps`. The results card drops the word "hidden" for it.
+
+**The per-hall rule (decided r456, the spec left it open).** A hall counts as WALKED only if the
+player was inside it and stepped through it cell by cell — **two or more plain single-cell steps
+whose start AND end both lie on that hall**. One step is a reorientation at a corner and is
+forgiven; two is walking. The ☆ = zero halls walked, latched ONCE when beat 3 grades. It reads
+`S.mzWalkLog`, a new plain-step latch in `move()`'s maze branch (the `S.pointLog` / `S.grabLog` /
+`S.gotoSpecials` provenance family): a walked hall and a flown hall are identical once you are
+standing at its end, so the MECHANIC is recorded, never inferred. Telemetry only — nothing core
+requires it (§1.0(c)); the walk route clears all nine cores and forfeits the star.
+
+### The guide panel (§9.0.2) and the hint ladder (§9.0.3) — extended, not rebuilt
+
+The r455 controller already scoped the checklist to the open step and wrote the beat's line into
+the checklist's own `.cl-hint` row. This round adds, inside the SAME aside, in the same type:
+
+- **the step list** (`hkStepListHtml`) — three rows, name + `n/m`, the open one lit, the step's
+  `why` under it;
+- **the keycap column** on the open step's other beats (the open beat's chord rides its own
+  explanation line — one chord, one place);
+- **the two controls** (`hkGuideFootHtml` / `hkGuideWire`): a **hint** button and a **fold**
+  toggle. Folding gives back the plain checklist and latches `hk_guide_<key>='off'` (§9.0.2's
+  table); on a replay the toggle is what re-arms the guide mid-run (`hkStepSync` re-seats the
+  open step off the live grading).
+- **the ladder** — rung 1 pulses the step's concept line, rung 2 lights the open beat's keycaps,
+  rung 3 lights the beat's own `targets()` range on the board (`td.hintring`, no rails, no
+  fence). It walks on the hint button or on **three keys that moved nothing**: `hkGuideKeyWatch`
+  is a passive keydown observer on the `hkTourKeyWatch` contract (no `preventDefault`, no early
+  return) that snapshots cursor/selection/cells/undo/marks/clipboard/save/graded-count and counts
+  a miss only when the whole signature is unchanged — §9.0's "on route means the board changed
+  toward a check", generalized off the Tour's per-beat key list, which a Foundations beat has no
+  equivalent of. The ladder resets on beat advance and **never speaks for the ☆**.
+- **Render-review fix:** the beat's line was appended after ALL rows, which on an eleven-row
+  Foundations checklist read as belonging to the ☆ it followed. It renders under its own row now.
+
+### Engine: three optional tier fields, so a step boundary can CHANGE the board
+
+`hkTiersInit`/`hkTierTick` gained `wipe:[refs]` (cells the rung deletes — the walls), `set:{…}`
+(a shallow assign onto S — the maze swapped for an all-open one, `S.pasteRoom` marked) and
+`park:false` (no dim "▸ unlocks" preview for a region that is hidden behind the board rather
+than parked beside it: §9.1 asks for a plain appear, no dissolve art). `render()`'s paste marker
+reads `S.pasteRoom || S.maze.pasteRoom`, so a board with no maze left can still mark a home range.
+
+### Par, clocks
+
+`dev/e2e-par-sweep.js navigation`: **medKeys 21 across 5 seeds, 0% drift, FLAGGED 0**.
+`parKeys:21`. **par 90** — §9.1's stated replay par, and the band `dev/curriculum-v3.json` already
+held every Foundations level to (60–120 s); `HOTKEY_PARS.navigation` 20 → 90 now agrees with the
+map instead of contradicting it. `HOTKEY_CLOCKS.navigation = {pass:225}` = **par × 2.5** per the
+§9.1 line — a first play runs 3–4 minutes because the player is reading the guide (§9.0.4), and
+the pass clock is what keeps that from being a failure. **Named deviation:** at 21 keys the s/key
+ratio is 4.29 against the house ~1.05 band. That is deliberate and the sweep reports s/key as
+information only (drift is the graded metric) — a tutorial's par is a reading par, not a chord
+count. `HK_PLACEMENT` untouched; `navigation` is still placement board 1.
+
+### The Keyboard Tour — retired behind the flag, NOT deleted
+
+`LEVEL1_LIVE` is **true**. The ? sheet's "▶ replay the intro" link is gone and
+`startKeyboardTour()` has no caller left in the product: Foundations 1 IS the intro, and the entry
+path (`tryEnter → hkEnterFirstBoard → loadChallenge(MENU_ORDER[0])`) lands on `navigation` with the
+guide open. The Tour's ~1400 lines (`CHALLENGES.keyboardtour`, `HK_TOUR_BEATS`, the `hkTour*` /
+`hkHud*` runtime) are **left in place**: `check-invariants` C24 walks the whole board contract,
+and e2e-audit-parity, e2e-visual, check-borders and the drill-page generator all still touch it.
+Untangling that is comfortably more than the ~1 h budget this round was given, so it is a round of
+its own — and the deletion commit now flips nothing, it only removes what this flag already made
+unreachable.
+
+### Alts (§9.1, `dev/e2e-alt-paths.js`) — three retired, two added
+
+The r424/r427 corridor alts are retired with the board they tested (the model-block grab and the
+Ctrl+End finish are no longer beats). **ALT 1 · the ☆-forfeit control:** every hall walked cell by
+cell, every range grown with plain Shift+arrows — all nine cores clear, ☆ forfeited. **ALT 2 · the
+space-chord route in a different op order:** Ctrl+Space column first, then Shift+Space row, then
+`Ctrl+Shift+Space` for the region (not Ctrl+A), entered from a different cell each time.
+
+### Tests
+
+| suite | result |
+|---|---|
+| `dev/verify-navigation.js` (**new**, WORKFLOW §9.1's per-drill probe slot) | **ALL GREEN** — the step partition, both tier boundaries, the four selection end states each by its alt route, the Go To Special beat, both sides of the ☆, the whole panel + ladder |
+| `e2e-depth-mechanics` §S (**new block**) | full keyboard playthrough of all ten beats · ☆ earned on the chord route · ☆ forfeited on the walk route · rung 3 lighting the right range · rungs stop at 3 · no keys on the ☆ — **suite 169 passed, 0 failed** |
+| `e2e-alt-paths` | **ALL 159 PASS** (the two new navigation entries ×3 seeds each) |
+| `e2e-demo-replay navigation` | WIN 3/3 — the demo wins through the ☆ route |
+| `e2e-par-sweep navigation` | 0% drift, FLAGGED 0 |
+| `check-invariants` | C1–C27 clean (C9 tri-length 10, C24 widened, C26's partition over nine cores) |
+| `check-curriculum-map` | clean — the map's Foundations par and `HOTKEY_PARS` now agree |
+| `e2e-audit-onboard` | **86 PASS** (the two hard-coded "of 2" step counts derive from `steps.length` now) |
+| `check-cache-versions` · `check-paywall` · `check-startgate` · `e2e-smoke` | clean |
+
+**New invariants (WORKFLOW §3.3 — every bug class fixed this round gets one).** C26 gains eleven:
+the ten guide-panel/ladder functions exist · `updateChecklist` renders the step list and the two
+controls · **the open beat's line renders under ITS OWN row** (the r456 render-review bug: appended
+after every row, it read as belonging to the ☆ it followed) · the keydown path arms
+`hkGuideKeyWatch` (or the ladder is button-only) · the ladder stops at rung 3 · the keycap column
+keeps its `!isBonus` gate (§9.0.3: hints never cover the ☆). C24 widened rather than dropped, so
+an ordinary drill still cannot name its ☆.
+
+`drills.js?v=305 → 306` across 15 html; drill pages + sitemap + refmap regenerated (74 pages, 0
+orphans). Renders (Daylight, 1440×900, dsf 1): `art/foundations-1-{step1,step2,step3,results}.png`.
+
+### Deviations, named (§0 — never silent)
+
+- **The memo is a static four-line list, not one line at a time.** §9.1 asks for the four targets
+  "one at a time"; the tier ladder gates on CHECKS, so a per-beat memo would need a rung per beat
+  and four parked "▸ unlocks" tags on the board. The one-at-a-time reading is carried by the
+  checklist's own next-beat highlight and the guide panel's open-beat line instead.
+- **§9.1's step-3 aha ("F5 → Special selects a whole class at once") belongs to step 2** here,
+  because the Go To Special beat is beat 7 and beat 7 is step 2's. Step 3's `why` names the
+  clipboard and the marked room.
+- **The old beat "finish at the bottom-right corner of the active area" is gone** — §9.1's ten
+  beats do not include it, and with the walls wiped in step 2 the used range is the table. The
+  carved exit and `maze.tele` stay in the generator (step 1 still ships them verbatim).
+- **par is 4× the house s/key band**, argued above.
+- **The Tour is flagged off, not deleted**, argued above.
+- **§9.0.2's LAST ROW is not built:** the collapsed guide toggle on every OTHER drill's bar,
+  latched globally under `hk_guide`. The toggle here is scoped to drills that declare `steps`,
+  because on a board with no steps it would have nothing to open — it belongs with Foundations 2
+  or with whatever gives an ordinary drill a guide to show. `hints`/`guided` are unchanged.
+- **The aside was NOT widened.** §9.0.2 allows widening it "for the five keys"; the renders show
+  the step list, the keycap column and both controls fitting the existing width at 1440 and at
+  390 (e2e-smoke's no-sideways-scroll pass), so the column stays where every other drill has it.
+- **Cost, named:** while a guide is open, `hkGuideKeyWatch` runs the drill's grader twice more
+  per keystroke (the before/after signature). It is fenced to `stepMode` and to a first play, so
+  it never touches the 73 other boards or any replay.
+
+## r455 — PHASE B: the level/act controller, one entry path, the tour stack deleted
+
+_Program: `dev/CURRICULUM_REBUILD.md` Phase B + P5 ("one entry system"). Wolf's decisions of
+2026-09-03 in two rounds — and the second round changed the shape of this PR mid-build, so read
+the deviations before the code._
+
+**Wolf round 1** (the brief this started from): Foundations becomes five multi-act levels, timed
+like any drill, posting to leaderboards, with a game-style HUD on a first play. **Wolf round 2**
+(binding, after reviewing the pixel HUD / act-card mock): *"pixel art is limited to identity
+assets — rank, level, achievements, player card. The drill board, HUD, cards and checklist keep
+the site's ORIGINAL chrome, exactly as existing drills look today. Foundations will be integrated
+tutorial drills in the leetcode sense (problem + guide + hints + editorial), not game acts with
+story cards."* Everything style-bearing from round 1 was therefore **built and then removed**;
+what shipped is the CONTROLLER, on the site's existing chrome.
+
+### What shipped
+
+**1 · The level/act controller** (`index.html`, ~200 lines). A `CHALLENGES` entry becomes a level
+by declaring:
+
+```
+level:{ n, name, nextKey, acts:[ { title, beats:[check indices],
+                                   lines:[{beat, text, keys:[…]}], reveal:{cells} | tier:<i> } ] }
+```
+
+- `S.act` is the open act. The **checklist is scoped to it** (`hkLevelShows`) — the open act's
+  beats plus everything already cleared, in the ordinary `.cl-item` rows; the ☆ and the engine's
+  save closer always show, because they belong to the drill, not to an act.
+- The act's line for the open beat renders in the checklist's **own `.cl-hint` row** — the row a
+  drill's `hint(S)` already uses. Not one new class, not one new element.
+- The **act-completion handler** (`hkLevelTick`) closes an act when every one of its beats grades,
+  paints its staged reveal (inline `reveal:` or the r421 §2.5 tier ladder) and advances `S.act`.
+  **The clock never stops across a boundary** — a level is one timed run.
+- A level is a **NORMAL drill**: `checkWin` fires, `recordRun` posts, PB/XP/leaderboards/☆ all
+  behave as on any board. No new mode, no bail added to `checkWin` or `startClock`.
+- On the win `hk_level_seen_<key>` latches; every replay is a plain, quiet drill. The ? sheet's
+  **"↻ show level hints again"** clears the flags.
+- `navigation` declares the first one (level 1 · The Corridor), two acts partitioning its four
+  core checks, lines written from its own `guide()` so the line and the F1 ladder cannot drift.
+
+**2 · One entry path.** `tryEnter → advanceAccess → dismissLanding → hkEnterFirstBoard →
+loadChallenge(MENU_ORDER[0])`. No fork, no question, no modal. The one line the comfort question
+left behind — *"already fly? skip the tutorial →"* — rides the r450 start gate's own sub-line and
+lands on the first drill outside the tutorial chapter, latching every level's seen flag.
+
+**3 · Three contextual tips** replace the modal tour's thirteen chrome beats (`hkTip`, latched
+under `hk_tip_<name>`, on the site's existing `#hkToast`): **picker** (first list open — `\` and
+the arrows), **pb** (first personal best), **rank** (first rank-pill tier change, guarded by
+`hk_rank_seen` so a first paint is never mistaken for a move).
+
+**4 · Picker level path.** A chapter holding drills that declare `level.n` gets a numbered path
+strip under its folder row, read off the `CHALLENGES` entries. Nothing is ever locked there — free
+play stays open (standing law); the path is a route the chapter recommends, not a wall.
+
+### What was deleted (index.html, ~440 lines of onboarding)
+
+| symbol | lines | why |
+|---|---|---|
+| `TOUR_STEPS` + `tourShow` + `buildTourPlan` + `tourSkipReq` + `tourReplay` + `__tourI`/`__tourPlan`/`__tourAfter`/`__tourSkipArmed`/`__tourBase` + the post-tour toast | 111 | the modal product tour (P5) |
+| `showComfort` ("how much Excel have you done?") + its three-way route in `dismissLanding` | 44 | the entry does not ask questions |
+| `showKeyboard` ("what keyboard are you on?") | 23 | second modal at the entry; `HK_MAC` auto-detects and the profile popup flips it |
+| `hkCardPicker` (the two cards' arrow/Tab/Enter driver) | 66 | zero callers once both cards went |
+| `maybeOnboard` / `showOnboard` / `paintOnboard` / `skipOnboard` / `closeOnboard` + the `#onboard` markup | 44 | the "quick warm-up / skip" prompt — the last fork |
+| `hkTourOffer` (the "I get around" Tour offer) | 8 | no comfort answer to offer it from |
+| the modal tour's keydown branch + the `#onboard` keydown branch + `hkGateArm`'s `__tourI` guard | 45 | dead with the above |
+| the guided auto-handoff: the r92 fresh-device `toggleGuided()` one-shot, the r159 `hk_xlv` from-zero ramp, and `loadChallenge`'s `{guided:true}` opt (`window.__wantGuided`) | 32 | **rails and hints now default OFF on every board, always** |
+| `startPlacement` | 6 | unreachable since r452; placement is offered from the leaderboard |
+| the round-1 pixel work, removed before commit: the act CARD, the level HUD banner + its keycap-strip CSS, the `body.hk-level` toast lane, `hkLessonCard`'s `onFoot` hook | ~90 | Wolf round 2 |
+
+`hk_tour_done` and `hk_xlv` are no longer read anywhere in the product (one-line migration note at
+the deletion site); both stay in `nav.js`'s sign-out wipe so a device carrying them is cleaned.
+
+### The Keyboard Tour
+
+`LEVEL1_LIVE=false` at the top of the `CHALLENGES` section. While it is false the Tour stays
+loadable from the ? sheet as **"▶ replay the intro"** — its runtime, its HUD and its stage cards
+are untouched, so first-contact teaching does not vanish between two PRs. When the L1 wave flips
+it, that link disappears and `CHALLENGES.keyboardtour` + `HK_TOUR_BEATS` + the `hkTour*` runtime
+can be deleted whole. The HUD's paint/placement were split from the Tour's own copy
+(`hkHudPaint` / `hkHudPlace` / `hkTourHudShow`) — the seam a second consumer would have used — but
+**no second consumer was added**: the level teaches through the checklist.
+
+### Two regressions the render review caught (both fixed)
+
+1. **The daily-challenge card opened over a brand-new player's first board.** Its "fresh players
+   are left alone" guard rode on `!document.querySelector('.ob-card')` — the onboarding cards' own
+   class. Deleting every one of those cards silently made the guard always-true. It now says what
+   it meant: no landing up, no level coaching, no card on screen.
+2. **The act line was written to `#taskLine`, which has been `display:none` since r49** — the
+   lesson would have been invisible. Moved to the checklist's `.cl-hint` row; C26 now fails the
+   build if the controller touches `#taskLine` again.
+
+### Guards (`dev/check-invariants.js` C26)
+
+No second onboarding surface (15 retired symbols, comment-stripped so a deletion note cannot
+satisfy it) · exactly one `tryEnter`/`hkEnterFirstBoard`, and `dismissLanding` may not call any of
+the retired entries · the controller may not raise `hkLessonCard`, may not paint the HUD, may not
+write `#taskLine`, and no bitmap/pixel font may be set on the drill surface · `checkWin` and
+`startClock` may not bail on `levelMode` (a level is a normal drill) · every `level`'s acts
+**partition** the drill's core checks with ≥1 line per act, each line pointing at one of its own
+beats, ≤28 words · exactly three tips, each latched · `hk_level_seen_` and `hk_tip_` in nav.js's
+sign-out sweep · `LEVEL1_LIVE` false implies the ? sheet still offers the intro.
+
+### Suite (port 8814, old → new)
+
+| suite | before | after |
+|---|---|---|
+| check-invariants | C1–C25 clean | **C1–C26 clean** |
+| check-startgate | clean (§1–§8b) | **clean (+ §8c: a level is gated like any other drill)** |
+| e2e-audit-onboard | 73 pass (the Keyboard Tour walk) | **rewritten, 84 pass** (T1–T11: one entry path, the act controller, the boundary, the three tips, the silent replay, the skip line, the deleted surfaces) |
+| e2e-smoke | 7 pages + 19@390 + skin-unlock | unchanged, clean |
+| e2e-guided | 77 (72 railed) | unchanged |
+| e2e-demo-replay navigation combo foot | 3/3 each | unchanged |
+| e2e-audit-parity | 189 | unchanged |
+| check-deeplink | 18 | unchanged |
+| check-landing | 28 | unchanged |
+| check-cache-versions | clean | clean (`nav.js` 305 → 306 across 15 html) |
+
+Renders (Daylight + a dark theme, 1440×900): `level-{1-gate,2-act1,3-act2,4-results,5-picker-tip}-{day,dark}.png`.
+
+### Deviations, named (§0 — never silent)
+
+- **`navigation` ships TWO acts, not the brief's one.** The act boundary — the handler that must
+  advance the checklist without stopping the clock — is the piece most worth proving, and one act
+  cannot prove it. Beat indices are into `checks()`: 0–3 cores, 4 the game ☆ (never an act's
+  beat), 5 the engine-appended save closer (the win; belongs to no act).
+- **No act card and no HUD, against the brief's §1.** Superseded by Wolf round 2. The act's line
+  lives in the checklist's existing hint row and the boundary is the checklist advancing.
+- **`nextKey` points at `autofit`,** the next catalog drill, not at a level 2 — level 2 does not
+  exist until the L1 wave. The results card reads "Level 1 clear — The Corridor · next: Autofit →".
+- **`showKeyboard` and `hkCardPicker` deleted** though the brief did not name them: both were dead
+  once `showComfort` went (`hkCardPicker` had zero callers). Platform stays auto-detected and
+  switchable from the profile popup; themes.js's Mac help sheet still fires.
+- **Not built (the brief's §1, still open for the L1 wave):** the level ☆ per level is the drill's
+  existing ☆ (no new visible-☆ rule), and `HOTKEY_CLOCKS`' "generous pass clocks" for levels are
+  untouched — `navigation` keeps its swept par. Both belong with the L1 content wave.
+
+### Reconciliation, same round: the controller now speaks the spec's language (r455, appended)
+
+_Everything above stands as built; this is a RENAME with no behaviour change, bringing the code to
+`dev/CURRICULUM_V3.md` §9.0's vocabulary — the file's "levels" and "acts" were the pre-§9 game
+framing._ `S.act`→`S.step` · `levelMode/levelAct`→`stepMode/stepIdx` · `hkLevel*`→`hkStep*`
+(`hkStepShows`, `hkStepTick`, `hkStepHintHtml`, `hkStepStart`/`Win`/`Skip`/`Abort`/`Reveal`) and
+the latch pair `hkGuideSeen`/`hkGuideReset` · the checklist head reads **"step 1 of 2"**, not
+"ACT 1 OF 2" · the ? sheet reads **"↻ show the guide again"** · the results card reads
+**"Foundations 1 clear — Navigate & Select · next: Autofit →"** (was "Level 1 clear — The
+Corridor"). **Data shape:** `level:{n,name,nextKey,acts:[…]}` becomes §9.0.1's
+`steps:[{name, why, beats:[{id, why}]}]` plus a sibling `tutorial:{n, name, nextKey}` — the three
+fields §9.0.1's step shape has no home for, and the smallest faithful split. Each act's
+`lines:[{beat,text,keys}]` folded into its beats: `text` became the beat's `why`, and **`keys` was
+DELETED** — the keycaps are now derived at render from `guide()[id]`'s own `<kbd>` runs
+(`hkStepCaps`, §9.0.1's derivation table), so no step literal carries a second copy of a chord.
+**Latch:** `hk_level_seen_<key>='1'` → `hk_guide_<key>='done'` (§9.0.2's table), migrated in one
+line inside `hkGuideSeen()`; the old prefix stays in nav.js's sign-out sweep one round. C26 is
+re-pointed at the step contract and gains two guards — no `keys:` in a step literal, and the
+controller must derive its caps through `hkStepCaps`. Suite: check-invariants C1–C26 clean ·
+check-startgate clean (§8c re-titled "a TUTORIAL is gated like any other drill") · e2e-audit-onboard
+**86 pass** (was 84; +2 for the derived-caps and the tutorial-name assertions) · e2e-smoke clean ·
+check-cache-versions clean (`nav.js` 306 → 307 across 15 html).
+
 ## r452 — THE FULL LOCAL GATE ON THE MERGED BRANCH (close of the build day)
 
 _gate.yml runs only on PRs and pushes to main, so the branch never saw CI. The whole matrix ran

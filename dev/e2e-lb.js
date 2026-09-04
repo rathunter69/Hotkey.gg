@@ -2,9 +2,11 @@
    Supabase is blocked in CI, so the suite injects a synthetic DATA field (the same shape
    load() builds) and drives renderAll() + the real DOM. Covers:
      A. tier sub-menu on the drill boards (r335): dropdown, bucket chips, n-of-m note, restore
-     B. ranked entry (r336): gate card -> placement checklist -> tier card; enter-ranked copy
+     B. ranked entry (r336 / r455): unlock panel below LVL 10 -> placement checklist -> tier card;
+        rank is DERIVED (nav.js hkRankedEntered off the hk_xp_est level cache), the reveal card
      C. nav rank pill (r336): Unranked -> placement n/5 -> tier (stubbed sb + auth)
-     D. seed-field sanity: dev/seed-field.sql parses back and renders non-empty boards\n     E. account-state sync (r358): hkStateHydrate merge rules — flags/seen/streak/ranked
+     D. seed-field sanity: dev/seed-field.sql parses back and renders non-empty boards
+     E. account-state sync (r358): hkStateHydrate merge rules — flags/seen/streak; ranked is dead data (r455)
    Run: python3 -m http.server 8791 &  ·  node dev/e2e-lb.js */
 'use strict';
 const { chromium } = require('playwright-core');
@@ -52,7 +54,7 @@ const PKEYS = (() => {
     DATA = { perDrill, names, meId: 'u3', myTeam: null, teamOnly: false, viewDesk: null, myDesk: null,
       fRuns: runs, fSessions: [], userStat, gUserStat: userStat,
       profs: users.map(u => ({ id: u, handle: names[u] })), runs, sessions: [] };
-    try { localStorage.setItem('hk_ranked', '1'); } catch (e) {}
+    try { localStorage.setItem('hk_xp_est', '4600'); localStorage.setItem('hk_xp_uid', 'u3'); } catch (e) {}   // r455: LVL 10 = ranked
     renderAll();
     return { hasSel: !!document.getElementById('tierSel'),
       chips: document.querySelectorAll('.chip[data-bucket]').length,
@@ -68,7 +70,7 @@ const PKEYS = (() => {
   ok(a1.rows === 10, 'drill board shows the top 10', 'rows=' + a1.rows);
 
   // ---------- B. ranked entry states ----------
-  console.log('B. ranked entry: gate -> placement -> tier');
+  console.log('B. ranked entry: unlock panel -> placement -> tier (rank derived at LVL 10, r455)');
   // NOTE: the page's own boot-time load() settles LATE with Supabase blocked and reassigns
   // DATA — so every section must (re)inject DATA and read the DOM in the SAME evaluate tick.
   const inject = `DATA = { perDrill: window.__f.perDrill, names: window.__f.names, meId: 'u3',
@@ -76,15 +78,31 @@ const PKEYS = (() => {
     fRuns: window.__f.runs.slice(), fSessions: [], userStat: window.__f.userStat,
     gUserStat: window.__f.userStat, profs: Object.keys(window.__f.names).map(u => ({ id: u, handle: window.__f.names[u] })),
     runs: window.__f.runs, sessions: [] };`;
+  /* r455: below the line the your-card is the UNLOCK PANEL (copy + progress bar) and nothing on it
+     asks to enter; the old Enter Ranked / Not yet buttons must stay gone. */
   const b1 = await page.evaluate((inject) => {
-    localStorage.removeItem('hk_ranked'); localStorage.setItem('hk_dev_unlock', '1');
+    localStorage.removeItem('hk_dev_unlock'); localStorage.setItem('hk_xp_est', '0'); localStorage.setItem('hk_xp_uid', 'u3');
     eval(inject); renderAll();
-    return (document.querySelector('.panel.me') || {}).textContent || '';
+    const t = (document.querySelector('.panel.me') || {}).textContent || '';
+    return { t, entered: window.hkRankedEntered(), btn: !!document.getElementById('enterRanked') || !!document.getElementById('waitRanked') };
   }, inject);
-  ok(/Enter Ranked/.test(b1), 'not opted in: Enter-Ranked gate card');
+  ok(!b1.entered && /Ranked unlocks at LVL 10/.test(b1.t) && /You’re LVL \d+/.test(b1.t), 'below LVL 10: the unlock panel names the line and your level', b1.t.slice(0, 80));
+  ok(!b1.btn && !/Enter Ranked|Not yet/.test(b1.t), 'below LVL 10: no Enter Ranked / Not yet buttons (the opt-in ceremony is retired)');
+  const b1b = await page.evaluate((inject) => {
+    localStorage.setItem('hk_xp_est', '4600'); localStorage.setItem('hk_xp_uid', 'u3');   // LVL 10 exactly
+    eval(inject); renderAll();
+    return { entered: window.hkRankedEntered(), t: (document.querySelector('.panel.me') || {}).textContent || '' };
+  }, inject);
+  ok(b1b.entered && !/Ranked unlocks at/.test(b1b.t), 'LVL 10: the predicate flips on its own and the unlock panel is gone (no click)');
+  const b1c = await page.evaluate((inject) => {
+    localStorage.setItem('hk_xp_est', '0'); localStorage.setItem('hk_dev_unlock', '1');
+    const v = window.hkRankedEntered(); localStorage.removeItem('hk_dev_unlock'); localStorage.setItem('hk_xp_est', '4600');
+    return v;
+  }, inject);
+  ok(b1c === true, 'hk_dev_unlock still opens ranked for fixtures (the e2e bypass survives)');
 
   const b2 = await page.evaluate(({ PKEYS, inject }) => {
-    localStorage.setItem('hk_ranked', '1');
+    localStorage.setItem('hk_xp_est', '4600'); localStorage.setItem('hk_xp_uid', 'u3');
     eval(inject);
     PKEYS.slice(0, 2).forEach(k => DATA.fRuns.push({ user_id: 'u3', challenge: k, time_ms: 9000, created_at: '2026-01-02' }));
     renderAll();
@@ -104,24 +122,30 @@ const PKEYS = (() => {
   ok(!/Placement series/.test(b3) && /LVL /.test(b3), 'all five posted: normal tier card returns');
 
   const b4 = await page.evaluate(() => {
-    rankedInfographic();
-    // r407: the Ranked Unlocked card (themes.js hkRankedCard) — names the placement series
-    // and carries the primary Enter Ranked button.
+    /* r455: the Ranked Unlocked card (themes.js hkRankedCard) is the one-time REVEAL — it names
+       the placement series, carries one dismiss, and no button on it writes state. */
+    const before = JSON.stringify(localStorage);
+    window.hkRankedCard({ reason: 'Level 10 reached' });
     const has = /placement series/i.test(document.body.textContent);
-    const hasBtn = !!document.getElementById('hkruGo');
-    const m = document.getElementById('hkru-modal') || document.getElementById('rankedModal');
-    if (m) m.remove();
-    return has && hasBtn;
+    const okBtn = document.getElementById('hkruOk'), enter = document.getElementById('hkruGo') || document.getElementById('hkruLater');
+    if (okBtn) okBtn.click();
+    const gone = !document.getElementById('hkru-modal');
+    return { has, hasOk: !!okBtn, enter: !!enter, gone, same: before === JSON.stringify(localStorage) };
   });
-  ok(b4, 'enter-ranked infographic names the placement series');
+  ok(b4.has && b4.hasOk && b4.gone, 'reveal card names the placement series and dismisses', JSON.stringify(b4));
+  ok(!b4.enter && b4.same, 'reveal card has no Enter/later button and writes no state');
+  ok(typeof await page.evaluate(() => typeof rankedInfographic) === 'string' && (await page.evaluate(() => typeof rankedInfographic)) === 'undefined',
+    'lb.js rankedInfographic (the opt-in opener) is gone');
 
   // ---------- C. nav rank pill ----------
-  console.log('C. nav rank pill honors the opt-in');
+  console.log('C. nav rank pill derives ranked from level (r455)');
   const pill = async (opted, doneKeys) => {
     await page.goto(URL, { waitUntil: 'load' });
     await page.waitForFunction(() => !!document.getElementById('navRankPill'));
     return page.evaluate(({ opted, doneKeys }) => new Promise(res => {
-      try { if (opted) localStorage.setItem('hk_ranked', '1'); else localStorage.removeItem('hk_ranked'); } catch (e) {}
+      /* r455: "opted" = at the rank level. The stubbed runs below carry near-zero server XP, and
+         nav's hydrate takes max(server, local) for the same account, so the local estimate holds. */
+      try { localStorage.setItem('hk_xp_est', opted ? '4600' : '0'); localStorage.setItem('hk_xp_uid', 'u3'); localStorage.setItem('hk_rank_reveal_seen', '1'); } catch (e) {}
       sessionStorage.removeItem('hk_rank3');
       const runs = [];
       ['u1', 'u2', 'u3'].forEach((u, i) => doneKeys.forEach(k =>
@@ -141,8 +165,8 @@ const PKEYS = (() => {
       }, 400);
     }), { opted, doneKeys });
   };
-  ok((await pill(false, PKEYS)) === 'Unranked', 'pill: not opted in -> Unranked');
-  ok(/placement 3\/5/.test(await pill(true, PKEYS.slice(0, 3))), 'pill: mid-placement -> placement 3/5');
+  ok((await pill(false, PKEYS)) === 'Unranked', 'pill: below LVL 10 -> Unranked');
+  ok(/placement 3\/5/.test(await pill(true, PKEYS.slice(0, 3))), 'pill: LVL 10, mid-placement -> placement 3/5 (no opt-in)');
   const p3 = await pill(true, PKEYS);
   ok(!/placement|Unranked|never/.test(p3) && p3.length > 2, 'pill: placement complete -> tier', p3);
 
@@ -184,7 +208,7 @@ const PKEYS = (() => {
     localStorage.setItem('hk_ach_flags', JSON.stringify({ mouseRuns: 2, nightWin: false, slowWins: 1 }));
     localStorage.setItem('hk_ach_seen', JSON.stringify(['a1', 'a2']));
     localStorage.setItem('hotkey_streak', JSON.stringify({ d: '2026-07-18', n: 3 }));
-    localStorage.removeItem('hk_ranked');
+    localStorage.removeItem('hk_ranked'); localStorage.setItem('hk_xp_est', '0'); localStorage.setItem('hk_xp_uid', 'u3'); localStorage.removeItem('hk_dev_unlock');
     const changed = window.hkStateHydrate({ v: 1,
       ach_flags: { mouseRuns: 5, nightWin: true, weekendWin: true },
       ach_seen: ['a2', 'a3'],
@@ -194,11 +218,11 @@ const PKEYS = (() => {
     out.flags = JSON.parse(localStorage.getItem('hk_ach_flags'));
     out.seen = JSON.parse(localStorage.getItem('hk_ach_seen')).sort();
     out.streak = JSON.parse(localStorage.getItem('hotkey_streak'));
+    /* r455: client_state.ranked is DEAD DATA — a server `ranked: true` must not write the retired
+       key, and must not make the predicate true on its own (rank derives from level). */
     out.ranked = localStorage.getItem('hk_ranked');
-    // explicit local leave is respected (server true must not resurrect an explicit '0')
-    localStorage.setItem('hk_ranked', '0');
-    window.hkStateHydrate({ v: 1, ranked: true });
-    out.rankedAfterLeave = localStorage.getItem('hk_ranked');
+    out.enteredAfterHydrate = window.hkRankedEntered();
+
     // same-day streak: higher count wins
     localStorage.setItem('hotkey_streak', JSON.stringify({ d: '2026-07-20', n: 2 }));
     window.hkStateHydrate({ v: 1, streak: { d: '2026-07-20', n: 6 } });
@@ -211,8 +235,8 @@ const PKEYS = (() => {
     'flags merge: counters max, booleans OR, local-only keys kept', JSON.stringify(e1.flags));
   ok(String(e1.seen) === 'a1,a2,a3', 'seen achievements union', String(e1.seen));
   ok(e1.streak.d === '2026-07-19' && e1.streak.n === 1, 'later streak day wins', JSON.stringify(e1.streak));
-  ok(e1.ranked === '1', 'ranked opt-in follows the account');
-  ok(e1.rankedAfterLeave === '0', 'an explicit local leave is not resurrected');
+  ok(e1.ranked === null, 'hydrate no longer writes the retired hk_ranked key (dead server data is ignored)');
+  ok(e1.enteredAfterHydrate === false, 'a server ranked:true cannot make a LVL 1 player ranked — rank derives from level');
   ok(e1.sameDay === 6, 'same-day streak takes the higher count');
   ok(e1.pushIsFn, 'hkStatePush is wired');
 

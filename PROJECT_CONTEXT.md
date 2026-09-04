@@ -5,6 +5,19 @@ standards — READ FIRST; §9 is the wave playbook for Opus-5 sessions, new r428
 **dev/PIPELINE.md's ⚡ r428 header (the live queue)**, dev/AUDIT.md (newest round at the TOP),
 and the dev/ design docs._
 
+## ⚡ NEXT-SESSION HANDOFF (2026-09-04, r455 close — IDENTITY-ONLY PIXEL ART, INTEGRATED TUTORIALS)
+**Read `dev/CONTINUITY.md` §0c first.** Wolf's redirect on the r454 "level" plan: pixel art narrows
+to identity assets only (rank/level/achievements/player card/favicon); the drill surface keeps the
+original leetcode-like chrome; Foundations = integrated tutorials (guide panel + hints + steps),
+not game levels — full quote + sub-decisions in §0c. Same-day ships: rank automatic at LVL 10
+(below), Phase B's step/act controller (rename `S.act`→`S.step` in flight), Foundations' five names
+off `CURRICULUM_V3.md` §9, landing v3.1 (994→493 words, `check-landing.js` now gated), pixel icons
+round 2 + touch-ups (sprite wiring into `themes.js` NOT started), and the `check-borders` CI flake
+fixed. Wolf-side open items and the next-up build order are in CONTINUITY §0c.
+
+## ⚡ r455 (2026-09-04) — RANK IS AUTOMATIC AT LVL 10 (Wolf: "go with automatic rank at level 10")
+The opt-in ceremony is retired: `window.hkRankedEntered()` (nav.js, defined once — CI C26) derives ranked from level (≥ `HK_RANK.RANKED_MIN_LVL`, or campaign complete, or `hk_dev_unlock`) off the `hk_xp_est`/`hk_xp_uid` level cache; the `hk_ranked` key, the Enter Ranked / Not yet gate, the 3-day nudge+snooze (`hk_ru_snooze`, `hk_ru_nudged`), `hkLeaveRanked` + account.html's leave control, `client_state.ranked` (dead data, no migration) and lb.js `rankedInfographic` are gone. Placement starts on its own at LVL 10; the season-start card plays once as a non-blocking reveal (`hk_rank_reveal_seen`). Cache: themes 314 · nav 306 · lb 45 · drills 305.
+
 ## ⚡ NEXT-SESSION HANDOFF (2026-09-03 late, r452 — THE AUDIT + THE BUILD DAY)
 Read `dev/CONTINUITY.md` §0a, then `dev/AUDIT_R452.md`. The beta is retired on the branch, landing v2
 and the Keyboard Tour are built, the frames are pixel, fourteen audit fixes landed with guards. The

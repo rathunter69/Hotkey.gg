@@ -1,6 +1,7 @@
 # HOTKEY.GG — PROJECT CONTINUITY BRIEF
 
-_Written r449 (2026-07-29) at the close of the depth-pass campaign; §0 added r451 (2026-09-03). Purpose: condition a fresh
+_Written r449 (2026-07-29) at the close of the depth-pass campaign; §0 added r451 (2026-09-03);
+§0c added r455 close (2026-09-04). Purpose: condition a fresh
 session — especially one working the BUSINESS PLAN — with everything load-bearing about the
 product, its current state, and where the decisions sit. The operational/engineering companion
 docs are listed in §8; this file is the top of the funnel._
@@ -59,6 +60,60 @@ suite gate.yml runs plus the r452 guards) ran green on the merged tip at the clo
 (`.gate-r452.log`; the one red step was a resurrected orphan page, deleted). **LAUNCHED 2026-09-03 21:44 UTC: PR #247 squash-merged (854cf00); www.hotkey.gg serves the new build via Cloudflare; the two r452 migrations were applied through the Supabase connector because the deploy workflow's SUPABASE_ACCESS_TOKEN secret is stale ("Unauthorized" at `supabase link`) — the MCP recorded them as 20260903214612/…615, so the next successful `db push` will re-run the repo's 20260903000000/…100 files, which are idempotent. Wolf: refresh the repo secret.** The live DB was also cleaned the same hour: 50 seed players + 2 seed desks, 21 smoke/test accounts, and Wolf's own playtest history (backup in the session scratchpad only). Cache versions on the branch:
 (`.gate-r452.log`; the one red step was a resurrected orphan page, deleted). Merge to main = launch (the curtain is gone). Cache versions on the branch:
 themes.js 313 · nav.css 312 · drills.js 304 · nav.js 305 · lb.js 43.
+
+## 0b · r455 (2026-09-04) — RANK IS AUTOMATIC AT LVL 10
+
+Wolf, verbatim: "go with automatic rank at level 10." Ranked is no longer opted into — `window.hkRankedEntered()` in nav.js is the ONE derived predicate (level ≥ `HK_RANK.RANKED_MIN_LVL`, or every track milestone shipped via `window.hkCampaignComplete()`, or the `hk_dev_unlock` fixture), read sync off the `hk_xp_est` + `hk_xp_uid` level cache the nav chip already uses (lb.js heroHtml write-throughs it too). CI C26 asserts it is defined once and that no product file touches the retired key.
+Retired keys and surfaces: `hk_ranked` ('1'/'0'), `hk_ru_snooze` + `hk_ru_nudged` (the r407 nudge card), nav.js `maybeRankedNudge` + `hkLeaveRanked`, lb.js `rankedOptedIn`/`campaignComplete`/`rankedInfographic` + the Enter Ranked / Not yet buttons, account.html's leave-ranked control, and the `client_state.ranked` field (dead data on old rows — no migration; hydrate ignores it). One tolerance line in nav.js removes an old `hk_ranked` from disk (a '1' seeds the reveal latch; a '0' is not honored).
+Kept: the "Ranked unlocks at LVL 10 · you're LVL n" panel + progress bar on the leaderboard your-card, the `Unranked` pill below LVL 10, `hkPlacementRide` (unchanged — the trainer's ladder gate now rides for anyone the predicate admits), and the season-start infographic as a ONE-TIME non-blocking reveal (`themes.js hkRankedCard`, latched on `hk_rank_reveal_seen`, one dismiss, no state-changing button).
+Cache versions on the branch after r455: themes.js 314 · nav.css 312 · drills.js 305 · nav.js 306 · lb.js 45. Tests updated: dev/e2e-lb.js §B/§C/§E (level-seeded, reveal card, dead server field) and dev/e2e-audit-rank.js T5 (LVL 10 rides, LVL 9 does not).
+
+## 0c · r455 close (2026-09-04) — IDENTITY-ONLY PIXEL ART, INTEGRATED TUTORIALS, AUTO-RANK, LANDING v3.1
+
+**The direction change.** Wolf, on the r454 "level" plan (act cards, pixel HUD, story names): "I
+think we lose the similarity to leetcode as a platform… keep the pixel art limited to the rank,
+level, achievements, player card — basically all the customization options, but keep the original
+style for the actual game. This is trying too hard to be like an indie game without building the
+gameplay or story to support it — so we should lean into the idea of teaching and make these an
+integrated tutorial." (`dev/CURRICULUM_REBUILD.md` §1c, `dev/CURRICULUM_V3.md` §9.) Binding: pixel
+art narrows to identity assets (rank emblem, level chip, achievements, player card, favicon); the
+drill board/HUD/checklist keep the site's ORIGINAL leetcode-like chrome; Foundations = integrated
+tutorials (guide panel + hints + steps), not game levels. Sub-decisions: guide panel open by
+default on the five Foundations keys; route replay ("the editorial") built later, once the ghost
+stores keys; no practice-vs-ranked mode — the clock always runs, every run posts, hints stay free.
+
+**What shipped the same day:**
+1. **Rank automatic at LVL 10** — Wolf: "go with automatic rank at level 10." `window.hkRankedEntered()`
+   is the one derived predicate; CI C27 (renumbered — C26 is now Phase B's entry contract below);
+   `hk_ranked`, `hk_ru_snooze`/`hk_ru_nudged`, and the leave-ranked control retired (full record §0b).
+2. **Phase B**: the level/act controller landed on the site's EXISTING chrome — the modal product
+   tour and guided auto-handoff deleted, one entry path, three contextual tips,
+   `e2e-audit-onboard` 73→84 pass. **In flight now, concurrent with this doc round:** renaming
+   `S.act`→`S.step` and `navigation`'s "The Corridor"→"Navigate & Select" to match §9 below.
+3. **Foundations rewritten** as five integrated-tutorial drills, `CURRICULUM_V3.md` §9, keys
+   unchanged: `navigation` Navigate & Select · `repairshop` Edit & Repair · `powergrid` First
+   Formulas · `printshop` Format the Page · `modeltour` Model Tour (capstone).
+4. **Landing v3 → v3.1**: headline "Learn Excel properly. / The hours come back."; PRO a real tier
+   read off `HOTKEY_PRO.plans`; the freeNow line; a progression band; `HK_CHAPTER_SKILLS` gives
+   every chapter card a one-line skills summary; rendered words 994→493; `dev/check-landing.js`
+   (written r452) finally wired into `gate.yml`. Open questions: `dev/LANDING_V3.md` §4/§5.
+5. **Pixel icons round 2** (hand-drawn, every master its own drawing — `ART_DIRECTION.md` §7a) then
+   **touch-ups** (accuracy re-conceived as a cell + green tick; combo's keycap legends; cert's wider
+   ribbon tails; moon's tapered horns) replaced round 1 (EPX-upscaled, symbols not objects — §7,
+   superseded). Still weak: combo at 1×/2×, cert at 32. **Not started:** wiring the sprites into
+   `themes.js` (`hkBadge`/`hkGlyph`/`hkLevelChip`/`rankEmblem`) behind a flag.
+6. **CI**: the `check-borders` flake root-caused — the welcome-back card was fading in over the
+   per-edge shots — and fixed in the harness.
+
+**Wolf-side open items, carried forward (none blocking):** replace the GitHub `SUPABASE_ACCESS_TOKEN`
+secret with an `sbp_` personal token · rotate the Supabase secret key pasted in chat · review one
+`reports` row and one `team_applications` row · legal-page `[bracketed]` placeholders · Stripe still
+not connected (business plan vector 3) · Mac ⌥ KeyTips needs a real Mac to verify.
+
+**Next up, in order:** the act→step rename · Foundations drill builds L1–L4 on the §9 specs (L1
+first, retiring the Keyboard Tour when `LEVEL1_LIVE` flips) · sprite wiring behind a flag · a
+security-plan session · a business-plan session. **Model routing Wolf set:** Opus-tier for
+engine/art judgment, Sonnet-tier for mechanical/doc work, Fable orchestrates only.
 
 ## 1 · What the product is
 

@@ -78,17 +78,26 @@ const KEYS = only.length ? LEDGER.filter(k => only.includes(k)) : LEDGER;
          so the 4-6 cap — written for a single-subject drill — does not describe it. This one has
          NOT been signed off live; it is a reasoned exemption and should be confirmed. */
       const BEAT_CAP_EXEMPT = { blocksel: 7, pastes: 7, gauntlet: 7 };
-      const cap = BEAT_CAP_EXEMPT[k] || 6;
-      if (authored < 4 || authored > cap) out.bad.push('D: ' + authored + ' authored core beats (§1.1 wants 4–' + cap + ')');
+      /* r456: a Foundations TUTORIAL drill (declares `steps`, CURRICULUM_V3 §9.0) is three or four
+         steps on one board and authors 8–12 beats by contract (§9.1 lists ten). The 4–6 cap was
+         written for a single-subject speed drill and does not describe it — structural, like
+         gauntlet. Its ☆ is VISIBLE by the same contract (`reveal:true`, §9.0 "☆ per level: exactly
+         one, visible"), so the mystery-slot and label-leak checks below do not apply either. */
+      const tutorial = Array.isArray(C.steps) && C.steps.length > 0;
+      const floor = tutorial ? 8 : 4;
+      const cap = tutorial ? 12 : (BEAT_CAP_EXEMPT[k] || 6);
+      if (authored < floor || authored > cap) out.bad.push('D: ' + authored + ' authored core beats (' + (tutorial ? '§9.0 tutorial wants 8–12' : '§1.1 wants 4–' + cap) + ')');
+      else if (tutorial) out.note.push('§9.0 tutorial drill at ' + authored + ' beats, ☆ visible by contract');
       else if (BEAT_CAP_EXEMPT[k]) out.note.push('§1.1 exempt at ' + authored + ' beats (' + (k === 'gauntlet' ? 'capstone §2.4, reasoned — unconfirmed' : 'Wolf-approved r2') + ')');
       if (!C.saveClose) out.bad.push('C: saveClose not declared (§1.0(e))');
       const handWritten = rows.filter(c => !c.bonus && /save your work/i.test(c.label)).length;
       if (C.saveClose && handWritten > 1) out.bad.push('C: the save beat appears ' + handWritten + '× — the engine owns it, exactly once');
       const listTxt = (document.getElementById('checklist') || {}).textContent || '';
-      if (!/☆\s*\?/.test(listTxt)) out.bad.push('B: checklist does not render the mystery "☆ ?" slot');
+      const starVisible = tutorial && bonuses[0] && bonuses[0].reveal === true;
+      if (!starVisible && !/☆\s*\?/.test(listTxt)) out.bad.push('B: checklist does not render the mystery "☆ ?" slot');
       const starLabel = (bonuses[0] || {}).label || '';
       const bare = starLabel.replace(/^☆\s*/, '').slice(0, 28);
-      if (bare && listTxt.includes(bare)) out.bad.push('B: the ☆ label leaks on screen before it is earned');
+      if (!starVisible && bare && listTxt.includes(bare)) out.bad.push('B: the ☆ label leaks on screen before it is earned');
 
       // ---- A: the demo clears core AND earns the ☆ ---------------------------------
       clean();

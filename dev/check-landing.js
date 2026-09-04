@@ -6,9 +6,27 @@
      · the catalog h2 and the hero lede carry the live totals, not typed ones
      · the free / "free right now" / PRO badge tracks hkPremiumOn() in BOTH states, driven
        through the dev preview (?premium=preview) so no flag is ever edited to run a test
-     · the PRO door names every HOTKEY_PREMIUM chapter, carries the live premium and catalog
-       counts, points at billing.html, and quotes NO dollar figure in either state
-       (the same no-price line dev/check-paywall.js §3/§4 holds on the other paywall surfaces)
+     · the PRO tier names every HOTKEY_PREMIUM chapter with its earn-in level, carries the
+       live premium and catalog counts, and points at billing.html
+     · r455 THE PRICE LAW — the landing is now allowed to quote a price, and every dollar
+       figure on it must be a string out of HOTKEY_PRO.plans. A literal fails here and in
+       dev/check-paywall.js §4b (which owns the same law on the gate). The old rule was "no
+       dollar figure anywhere"; that retired the day PRO became a real tier.
+     · the freeNow line is FLAG-DRIVEN: present while HOTKEY_PRO.freeNow, gone when it flips,
+       with no copy edit — asserted in both directions
+     · the progression band renders one chip per HK_RANK.TIERS entry (drawn with the shared
+       window.rankEmblem), one cert row per HK_TRACKS entry, and names HK_RANK.RANKED_MIN_LVL
+     · r455.1 THE SKILLS LINE — every chapter card says, in plain words, what that chapter
+       teaches (window.HK_CHAPTER_SKILLS, hand-curated from dev/curriculum-v3.json's `teaches`
+       tags; see the map's comment in index.html). Wolf's v3 note was "make it pithy, so I can
+       identify at a glance what I'll be learning and practising", and this band is the answer,
+       so a chapter added to drills.js without a line fails the build rather than shipping a
+       blank card. The lines also obey the copy law (WORKFLOW §4): no chords in marketing copy.
+     · r455.1 THE WORD BUDGET — the landing's rendered word count is capped. v3 shipped 994
+       words and read as an essay; the v3.1 cut took it to 493 and the cap is set just above
+       that. Copy grows one paragraph at a time and nobody notices until the founder does, so
+       the ratchet is a gate step, not a review habit. Raising the cap is a decision, and it
+       should be made in dev/LANDING_V3.md, not in a copy edit.
      · the hero fits 1280x800 and 390x844 with the CTA above the fold and no horizontal scroll
      · a fresh device lands on Daylight (themes.js r293), the CTA is a real focusable <button>
        that runs tryEnter(), headings descend in order, and there are no exclamation marks
@@ -49,6 +67,15 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
       chapters: rail.length, wantChapters: grp.length,
       counts: rail.map(e => +e.querySelector('.l-ccount').textContent),
       wantCounts: grp.map(g => g.keys.length),
+      /* r455.1: the skills line, per card, in rail order — plus the map itself, so a chapter
+         the map has never heard of is caught even if the rail somehow rendered. */
+      skills: rail.map(e => ((e.querySelector('.l-cskill') || {}).textContent || '').trim()),
+      skillMapMissing: grp.filter(g => !((window.HK_CHAPTER_SKILLS || {})[g.name] || '').trim())
+                          .map(g => g.name),
+      /* r455.1 THE WORD BUDGET: count the rendered prose, art excluded (the rank emblems are
+         SVG and the MBA crest is engraved "#REF!" on purpose — themes.js r377). */
+      words: (() => { const c = L.cloneNode(true); c.querySelectorAll('svg').forEach(e => e.remove());
+        return (c.textContent.trim().match(/[^\s]+/g) || []).length; })(),
       sum: rail.reduce((a, e) => a + (+e.querySelector('.l-ccount').textContent), 0),
       menuOrder: nAll,
       h2: document.getElementById('lCatalogH2').textContent,
@@ -58,8 +85,27 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
       wantPro: window.hkPremiumGroups(), nPrem: window.hkPremiumCount(),
       proLater: document.getElementById('lProLaterP').textContent,
       plansHref: document.getElementById('lProPlans').getAttribute('href'),
-      noPrice: !/\$\s?\d/.test(L.textContent),
-      noBang: !/!/.test(L.textContent),
+      /* r455 THE PRICE LAW: collect every dollar figure the page paints and hold it against
+         HOTKEY_PRO.plans. A price typed into the markup is not in that list, so it fails. */
+      prices: (L.textContent.match(/\$\s?[\d,.]+/g) || []).map(x => x.replace(/\s/g, '')),
+      wantPrices: ((window.HOTKEY_PRO || {}).plans || []).map(pl => pl.price),
+      freeNow: !!(window.HOTKEY_PRO || {}).freeNow,
+      freeNowShown: !!document.getElementById('lFreeNow'),
+      /* prose only — the rank emblems are ART, and the MBA Associate crest is engraved
+         "#REF!" on purpose (themes.js r377). Strip every <svg> before reading the voice. */
+      noBang: !/!/.test((() => { const c = L.cloneNode(true);
+        c.querySelectorAll('svg').forEach(e => e.remove()); return c.textContent; })()),
+      ladder: L.querySelectorAll('#lLadder .l-rank').length,
+      ladderEmblems: L.querySelectorAll('#lLadder .l-rank svg').length,
+      wantTiers: (((window.HK_RANK || {}).TIERS) || []).length,
+      rankedNote: (document.getElementById('lRankedNote') || {}).textContent || '',
+      minLvl: (window.HK_RANK || {}).RANKED_MIN_LVL,
+      certs: L.querySelectorAll('#lProgCerts .l-cert').length,
+      wantTracks: (window.HK_TRACKS || []).length,
+      freeChips: [...L.querySelectorAll('#lFreeChaps .l-pro-chip')].map(e => e.textContent.trim()),
+      wantFree: window.HOTKEY_DRILLS.groups.filter(g => g.keys.length &&
+        window.hkPremiumGroups().indexOf(g.name) < 0).map(g => g.name),
+      freeCta: !!document.getElementById('lFreeCta'),
       heads, ctaTag: cta.tagName, ctaDisabled: cta.disabled,
       hasLede: !!L.querySelector('.lede'),
       board: [...document.querySelectorAll('#lBoard .l-brow')].map(e => e.textContent),
@@ -69,6 +115,17 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(r.chapters === r.wantChapters, 'the rail renders every catalog chapter (' + r.chapters + ')');
   ok(JSON.stringify(r.counts) === JSON.stringify(r.wantCounts), 'per-chapter counts match HOTKEY_DRILLS.groups', JSON.stringify(r.counts));
   ok(r.sum === r.menuOrder, 'rail counts sum to menuOrder.length (' + r.sum + ' == ' + r.menuOrder + ')');
+  /* ---------------------------------------------------------------- r455.1 · the skills line */
+  ok(r.skills.length === r.wantChapters && r.skills.every(s => s.length > 0),
+    'every chapter card carries a skills line (' + r.skills.filter(Boolean).length + '/' + r.wantChapters + ')');
+  ok(r.skillMapMissing.length === 0,
+    'HK_CHAPTER_SKILLS covers every catalog chapter', 'missing: ' + r.skillMapMissing.join(', '));
+  /* the copy law (WORKFLOW §4): marketing copy never embeds a chord. "anchors", not "$/F4". */
+  ok(!r.skills.some(s => /\b(ctrl|alt|shift|F\d)\b/i.test(s)),
+    'no chords in the skills lines (copy law)', r.skills.filter(s => /\b(ctrl|alt|shift|F\d)\b/i.test(s)).join(' | '));
+  /* THE WORD BUDGET (r455.1). v3 = 994 words; the cut = 493. The cap sits at 560 — room for a
+     chapter or two of catalog growth, none for a new paragraph. Raise it in LANDING_V3.md. */
+  ok(r.words <= 560, 'the landing stays pithy: ' + r.words + ' rendered words (cap 560, v3 was 994)');
   ok(r.h2 === r.wantChapters + ' chapters. ' + r.menuOrder + ' drills.', 'the catalog h2 is derived: "' + r.h2 + '"');
   ok(r.lede.indexOf(String(r.menuOrder) + ' timed drills') === 0, 'the hero lede carries the live total');
   ok(r.badges.filter(b => /free right now/i.test(b)).length === r.wantPro.length,
@@ -78,8 +135,21 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(r.proLater.indexOf(r.nPrem + ' of the ' + r.menuOrder + ' drills') > 0,
     'the PRO band carries the live premium/catalog counts');
   ok(r.plansHref === 'billing.html', 'the PRO door points at billing.html');
-  ok(r.noPrice, 'the landing quotes NO dollar figure');
-  ok(r.noBang, 'no exclamation marks (house voice)');
+  ok(r.prices.length > 0 && r.prices.every(x => r.wantPrices.indexOf(x) >= 0),
+    'every dollar figure is read from HOTKEY_PRO.plans (' + r.prices.join(' ') + ' vs ' + r.wantPrices.join(' ') + ')');
+  ok(r.wantPrices.every(x => r.prices.indexOf(x) >= 0),
+    'both plans are quoted (' + r.wantPrices.join(' ') + ')');
+  ok(r.freeNow === r.freeNowShown,
+    'the "billing has not opened" line tracks HOTKEY_PRO.freeNow (flag=' + r.freeNow + ' shown=' + r.freeNowShown + ')');
+  ok(r.noBang, 'no exclamation marks in the prose (house voice)');
+  ok(r.ladder === r.wantTiers && r.ladderEmblems === r.wantTiers,
+    'the rank ladder draws all ' + r.wantTiers + ' HK_RANK tiers with a rankEmblem each (' + r.ladder + '/' + r.ladderEmblems + ')');
+  ok(r.minLvl && r.rankedNote.indexOf('level ' + r.minLvl) >= 0,
+    'the ladder names HK_RANK.RANKED_MIN_LVL, not a typed level: "' + r.rankedNote + '"');
+  ok(r.certs === r.wantTracks, 'one certificate row per HK_TRACKS entry (' + r.certs + ' == ' + r.wantTracks + ')');
+  ok(r.freeChips.length === r.wantFree.length && r.wantFree.every(n => r.freeChips.some(c => c.indexOf(n) === 0)),
+    'the FREE tier names the ' + r.wantFree.length + ' non-premium chapters: ' + r.freeChips.join(' · '));
+  ok(r.freeCta, 'the FREE tier has its own start CTA');
   ok(r.heads[0] === 1 && r.heads.every((h, i) => i === 0 || h - r.heads[i - 1] <= 1), 'headings descend in order: ' + r.heads.join(''));
   ok(r.ctaTag === 'BUTTON' && !r.ctaDisabled, 'the Enter CTA is a real, enabled <button>');
   ok(r.hasLede, 'the landing ships a .lede (the desk-invite write target)');
@@ -131,11 +201,13 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     nPro: [...document.querySelectorAll('#lRail .l-tag.l-soon')].length,
     want: window.hkPremiumGroups().length,
     note: document.getElementById('lRailNote').textContent,
-    noPrice: !/\$\s?\d/.test(document.getElementById('landing').textContent)
+    prices: (document.getElementById('landing').textContent.match(/\$\s?[\d,.]+/g) || []).map(x => x.replace(/\s/g, '')),
+    wantPrices: ((window.HOTKEY_PRO || {}).plans || []).map(pl => pl.price)
   }));
   ok(r2.on && r2.badges.filter(b => /^pro$/i.test(b)).length === r2.want,
     'preview ON: the same chapters relabel to PRO with no copy edit (' + r2.badges.join(' | ') + ')');
-  ok(r2.noPrice, 'still no dollar figure with the paywall ON');
+  ok(r2.prices.length > 0 && r2.prices.every(x => r2.wantPrices.indexOf(x) >= 0),
+    'the price is still plans-derived with the paywall ON (' + r2.prices.join(' ') + ')');
   ok(p.__errs.length === 0, 'zero page errors in the ON state', p.__errs.join(' | '));
   await p.close();
 

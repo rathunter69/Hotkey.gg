@@ -12,6 +12,9 @@
           checklist/desc but never scanned these fields, and its pattern skips bare
           F-keys (cell refs there are content); picker metadata has no cell refs, so
           bare F1-F12 are flagged here too.
+     C27 — rank is DERIVED (r455): window.hkRankedEntered is defined exactly once (nav.js) and
+          the retired hk_ranked opt-in key is neither read nor written anywhere in product code
+          except the one allowlisted tolerance line.
      C14 — certificate tracks: the arrays hard-coded in the NEWEST issue_certificate migration
           (and its dev/migrate-certificates.sql mirror) are set-equal to HK_TRACKS from drills.js
           — the r359 drift rule, added r452 after the retired keys sat live in the RPC.
@@ -928,10 +931,13 @@ try {
     if (!cl || Math.abs(cl.pass - par * 2) > 0.01)
       bad(`C24: lesson drill ${k} clocks: pass must be par×2.0 (§2(b)), got ${cl && cl.pass} against par ${par}`);
   }
-  /* reveal:true is legal ONLY on a lesson drill — navigation's game ☆ stays hidden (§1.6) */
+  /* reveal:true is legal ONLY on a lesson drill or a FOUNDATIONS TUTORIAL (r456: a drill that
+     declares `steps` — dev/CURRICULUM_V3.md §9.0, "☆ per drill: exactly one, VISIBLE"). The
+     r423 mystery slot stays the rule everywhere else: on an ordinary board the ☆ is a
+     discovery, and a named one is a checklist item the player would grind (§1.6). */
   for (const k of Object.keys(chunks15))
-    if (/reveal\s*:\s*true/.test(chunks15[k]) && !lessonKeys.includes(k))
-      bad(`C24: ${k} declares reveal:true but is not a lesson drill — the ☆ is a hidden discovery everywhere else (§1.6)`);
+    if (/reveal\s*:\s*true/.test(chunks15[k]) && !lessonKeys.includes(k) && !/\n    steps:\s*\[/.test(chunks15[k]))
+      bad(`C24: ${k} declares reveal:true but is neither a lesson drill nor a Foundations tutorial — the ☆ is a hidden discovery everywhere else (§1.6)`);
   if (!/function hkLessonKey\(k\)\{/.test(idx15))
     bad('C24: hkLessonKey() is gone — §2(a) names it as the single lesson-drill helper');
 
@@ -939,6 +945,264 @@ try {
                 `HUD copy + runtime seams intact, sandbox retired; ${lessonKeys.length} lesson drill(s) contract-clean`);
 } catch (e) {
   bad('C24 could not run: ' + String(e.message || e).slice(0, 160));
+}
+
+/* ---- C26 (r455 Phase B, dev/CURRICULUM_REBUILD.md P5 · dev/CURRICULUM_V3.md §9.0):
+   ONE ENTRY SYSTEM + THE STEP CONTRACT ----
+   Three findings from the r453 program spec become guards here.
+
+   (1) NO SECOND ONBOARDING SURFACE. The entry was three teaching systems stacked (the modal
+       product tour, the Keyboard Tour, guided rails with F1 hints), and each was right when it
+       was built. Phase B deletes the modal tour, the comfort question, the keyboard card, the
+       warm-up prompt and the guided auto-handoff, and this asserts they stay deleted — the
+       failure mode is a later round quietly re-adding "just one card" to the entry.
+   (2) EXACTLY ONE ENTRY PATH: tryEnter → advanceAccess → dismissLanding → hkEnterFirstBoard →
+       loadChallenge. One function, one route, no fork.
+   (3) THE STEP DATA CONTRACT (§9.0.1). Every `steps:` declaration must PARTITION the drill's
+       core checks (each core beat in exactly one step, none left over, none twice) and every
+       beat must carry its own `why`. A tutorial whose steps skip a core beat is one whose guide
+       line goes silent mid-run; one that double-books a beat is one whose steps can never both
+       close. Neither shows up in a smoke test. And NO STEP LITERAL CARRIES A CHORD: §9.0.1's
+       derivation table says the keycaps come from `guide()[id]`, so a `keys:` in a step is a
+       second copy of a chord and the drift the index-paired contract exists to prevent.
+   (4) THE DRILL SURFACE KEEPS ITS CHROME (Wolf, 2026-09-03 round 2, binding): pixel art is for
+       IDENTITY assets only — rank, level, achievements, the player card. A tutorial teaches
+       through the ordinary checklist and its own `.cl-hint` row, never through a card or a
+       banner over the board. So the step controller may not raise hkLessonCard and may not
+       paint the HUD; both are asserted below. (The r452 Keyboard Tour keeps its own HUD
+       and stage cards — it is the legacy intro, reachable only from the ? sheet while
+       LEVEL1_LIVE is false, and it is deleted whole when L1 ships.)
+
+   The core-beat count is read statically: `{label:` occurrences inside checks() minus the ☆
+   bonus rows. The engine-appended save closer (saveClose:true) is NOT a core a step may claim —
+   it is the win, and it belongs to the drill, not to a step (index.html hkSaveCloseWire). ---- */
+try {
+  const idx26 = fs.readFileSync('index.html', 'utf8');
+  const nav26 = fs.readFileSync('nav.js', 'utf8');
+
+  /* ---- (1) no second onboarding surface ---- */
+  const DEAD = ['TOUR_STEPS', 'tourShow', 'buildTourPlan', 'tourSkipReq', 'tourReplay',
+                'showComfort', 'showKeyboard', 'hkCardPicker', 'showPrimer', 'startSandbox',
+                'maybeOnboard', 'showOnboard', 'paintOnboard', 'skipOnboard', 'startPlacement'];
+  /* a mention inside a block comment is the deletion NOTE, not the symbol — every check in this
+     first half reads the CODE, with block and line comments stripped */
+  const code26 = idx26.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  for (const d of DEAD) {
+    const re = new RegExp('(function\\s+' + d + '\\s*\\(|const\\s+' + d + '\\s*=|\\b' + d + '\\s*\\()');
+    if (re.test(code26))
+      bad(`C26: '${d}' is back in index.html — P5 allows ONE entry system; the modal product tour, ` +
+          `the comfort question and the warm-up prompt were deleted in r455`);
+  }
+  if (/id="onboard"/.test(idx26))
+    bad('C26: the #onboard "quick warm-up / skip" modal is back in the DOM (P5: no fork at the entry)');
+  if (/localStorage\.getItem\(['"]hk_xlv['"]\)/.test(code26))
+    bad('C26: index.html reads hk_xlv again — the comfort answer it routed on is deleted (P5)');
+  if (/localStorage\.getItem\(['"]hk_tour_done['"]\)/.test(code26))
+    bad('C26: index.html reads hk_tour_done again — the modal product tour it gated is deleted (P5)');
+  if (/window\.__wantGuided/.test(code26))
+    bad('C26: the {guided:true} auto-handoff is back (window.__wantGuided) — rails never default on (P5)');
+
+  /* ---- (2) exactly one entry path ---- */
+  if ((idx26.match(/function tryEnter\(/g) || []).length !== 1)
+    bad('C26: there is not exactly one tryEnter() — the landing has one door');
+  if ((idx26.match(/function hkEnterFirstBoard\(/g) || []).length !== 1)
+    bad('C26: hkEnterFirstBoard() is missing or duplicated — it is the ONE thing dismissLanding calls');
+  {
+    const dl = /function dismissLanding\(\)\{([\s\S]*?)\n\}/.exec(idx26);
+    if (!dl) bad('C26: dismissLanding() not found');
+    else {
+      if (!/hkEnterFirstBoard\(\)/.test(dl[1]))
+        bad('C26: dismissLanding no longer routes through hkEnterFirstBoard — the one entry path is broken');
+      for (const forbidden of ['showComfort', 'tourShow', 'maybeOnboard', 'startKeyboardTour', 'showKeyboard'])
+        if (new RegExp('\\b' + forbidden + '\\s*\\(').test(dl[1]))
+          bad(`C26: dismissLanding calls ${forbidden}() — the entry forked again (P5)`);
+    }
+    const ef = /function hkEnterFirstBoard\(\)\{([\s\S]*?)\n\}/.exec(idx26);
+    if (ef && !/loadChallenge\(/.test(ef[1]))
+      bad('C26: hkEnterFirstBoard never reaches loadChallenge — Enter must land on a board');
+  }
+
+  /* ---- (4) the drill surface keeps its chrome: no card, no banner, from the step side ---- */
+  {
+    const lv = /r455 \(Phase B · dev\/CURRICULUM_REBUILD\.md P5 · dev\/CURRICULUM_V3\.md §9\.0\) THE STEP\n   CONTROLLER\.[\s\S]*?\nfunction hkTip\(/.exec(idx26);
+    if (!lv) bad('C26: the step controller block could not be read');
+    else {
+      const body = lv[0].replace(/\/\*[\s\S]*?\*\//g, '');
+      if (/hkLessonCard\s*\(/.test(body))
+        bad('C26: the step controller raises hkLessonCard — a step is not a story card. Wolf round 2: ' +
+            'a step boundary is the checklist advancing plus the guide line changing, no scrim card');
+      if (/hkHudPaint\s*\(|hkHudShow\s*\(/.test(body))
+        bad('C26: the step controller paints the HUD banner — the drill surface keeps the site\'s ' +
+            'original chrome; a tutorial teaches through the checklist');
+      if (!/cl-hint/.test(body))
+        bad('C26: the step controller no longer renders its line in the checklist\'s own .cl-hint row — ' +
+            'that IS its teaching surface, and it is the row a drill\'s hint() already uses');
+      if (/\$\('taskLine'\)/.test(body))
+        bad('C26: the step controller writes #taskLine, which has been display:none since r49 — ' +
+            'the lesson would be invisible (caught in the r455 render review)');
+      if (!/hkStepCaps/.test(body))
+        bad('C26: the step controller no longer derives its keycaps from guide() (hkStepCaps) — ' +
+            '§9.0.1: keys.win comes from guide()[id], never from a second copy in the step literal');
+    }
+    /* the drill board must not grow a bitmap face: pixel fonts are identity-asset only */
+    if (/font-family:[^;}]*\b(VT323|Press Start|Silkscreen|Pixelify)\b/i.test(idx26))
+      bad('C26: a bitmap/pixel font is set on index.html — pixel art is limited to identity assets ' +
+          '(rank, level, achievements, the player card), never the drill surface');
+  }
+
+  /* ---- the runtime the entry now depends on ---- */
+  for (const fn of ['hkStepStart', 'hkStepTick', 'hkStepShows', 'hkStepHintHtml', 'hkStepWin', 'hkGuideReset', 'hkTip'])
+    if (!new RegExp('function ' + fn + '\\(').test(idx26)) bad(`C26: ${fn}() is gone — the step runtime is the entry`);
+  if (!/try\{ hkStepStart\(\); \}catch\(e\)\{\}/.test(idx26))
+    bad('C26: loadChallenge no longer calls hkStepStart — a tutorial would never open its first step');
+  if (!/try\{ hkStepTick\(items\); \}catch\(e\)\{\}/.test(idx26))
+    bad('C26: updateChecklist no longer calls hkStepTick — the steps would never grade or advance');
+  if (!/html\+=hkStepHintHtml\(items\);/.test(idx26))
+    bad('C26: updateChecklist no longer renders the open beat\'s line (hkStepHintHtml) — the guide would coach silently');
+  if (!/if\(!hkStepShows\(idx, items\)\) return;/.test(idx26))
+    bad('C26: updateChecklist lost the step-scoped checklist slice (hkStepShows) — a coaching tutorial ' +
+        'would show every beat of every step at once');
+  if (!/try\{ hkStepWin\(\); \}catch\(e\)\{\}/.test(idx26))
+    bad('C26: checkWin no longer calls hkStepWin — a cleared tutorial would coach again on every replay');
+  /* ---- r456: THE GUIDE PANEL + THE HINT LADDER (dev/CURRICULUM_V3.md §9.0.2 / §9.0.3).
+     Every piece lives inside updateChecklist's own output — the whole point of §9.0.2 is that
+     the guide is NOT a second surface. These guards are the bug classes r456 actually hit. ---- */
+  for (const fn of ['hkGuideOpen', 'hkHintRung', 'hkStepListHtml', 'hkGuideFootHtml', 'hkGuideWire',
+                    'hkGuideHint', 'hkGuideFold', 'hkStepSync', 'hkGuideKeyWatch', 'hkGuideSig'])
+    if (!new RegExp('function ' + fn + '\\(').test(idx26)) bad(`C26: ${fn}() is gone — §9.0.2/§9.0.3's guide panel is part of the checklist`);
+  if (!/html\+=hkStepListHtml\(items\);/.test(idx26))
+    bad('C26: updateChecklist no longer renders the step list (hkStepListHtml) — §9.0.2 puts the ' +
+        'steps and the open step\'s why at the head of the panel');
+  if (!/html\+=hkGuideFootHtml\(\);/.test(idx26))
+    bad('C26: updateChecklist no longer renders the guide\'s controls (hkGuideFootHtml) — §9.0.2 ' +
+        'requires the hint button and the fold toggle, and §9.0.2\'s table requires the toggle on a replay');
+  /* the r456 render review: the beat's line was appended AFTER every row, so on an eleven-row
+     Foundations checklist it read as belonging to the ☆ it followed. It renders under its own row. */
+  if (!/if\(idx===__gOpenBeat\) html\+=hkStepHintHtml\(items\);/.test(idx26))
+    bad('C26: the open beat\'s line is no longer rendered under ITS OWN checklist row — a trailing ' +
+        'explanation on a long panel reads as belonging to the last row, not the open beat (r456 render review)');
+  if (!/if\(stepMode\)\{ try\{ hkGuideKeyWatch\(e\); \}catch\(_\)\{\} \}/.test(idx26))
+    bad('C26: the keydown path no longer arms hkGuideKeyWatch — §9.0.3\'s three-wrong-key trigger ' +
+        'would never fire and the ladder would be button-only');
+  if (!/S\._hintRung=Math\.min\(3,\(S\._hintRung\|0\)\+1\)/.test(idx26))
+    bad('C26: the hint ladder no longer stops at rung 3 (§9.0.3 declares exactly three rungs, in order)');
+  /* §9.0.3: hints never cover the ☆ — the keycap column and the ladder are gated on !isBonus */
+  if (!/&& __g && __g\[idx\] && !isBonus\)/.test(idx26))
+    bad('C26: the checklist keycap column lost its !isBonus gate — §9.0.3: hints NEVER cover the ☆');
+  {
+    const winBail = /if\(done\|\|demoPlaying[^\n]*\) return;/.exec(idx26);
+    if (!winBail) bad('C26: checkWin\'s bail list could not be read');
+    else if (/stepMode/.test(winBail[0]))
+      bad('C26: checkWin bails on stepMode — A TUTORIAL IS A NORMAL DRILL (it must stop the clock, ' +
+          'show the results card, bank the PB, pay xp and post the run; only the Tour is exempt)');
+    const clkBail = /function startClock\(\)\{ if\([^)]*\)return;/.exec(idx26);
+    if (!clkBail) bad('C26: startClock\'s bail list could not be read');
+    else if (/stepMode/.test(clkBail[0]))
+      bad('C26: startClock refuses stepMode — a tutorial is TIMED like any drill');
+  }
+
+  /* ---- the three tips: exactly three, each latched, each fired once ---- */
+  {
+    const tips = [...idx26.matchAll(/hkTip\('([a-z]+)'/g)].map(m => m[1]).filter((v, i, a) => a.indexOf(v) === i);
+    const want = ['picker', 'pb', 'rank'];
+    for (const t of want) if (!tips.includes(t)) bad(`C26: the '${t}' contextual tip is gone — P5 ships exactly three`);
+    for (const t of tips) if (!want.includes(t)) bad(`C26: an unlisted contextual tip '${t}' — P5 says three, not thirteen`);
+    if (!/localStorage\.getItem\(k\)==='1'\) return false;/.test(idx26))
+      bad('C26: hkTip lost its one-shot latch (hk_tip_<name>) — a tip that repeats is a tour');
+  }
+
+  /* ---- sign-out wipes the teaching state (nav.js) ---- */
+  for (const pref of ['hk_guide_', 'hk_tip_'])
+    if (!new RegExp("indexOf\\('" + pref + "'\\)===0").test(nav26))
+      bad(`C26: nav.js's sign-out sweep does not wipe ${pref}<…> — the next account on the machine ` +
+          `would meet Foundations 1 with its guide already silenced (or its three tips already spent)`);
+
+  /* ---- (3) the step data contract (dev/CURRICULUM_V3.md §9.0.1) ---- */
+  const s26 = idx26.indexOf('const CHALLENGES = {');
+  const e26 = idx26.indexOf('STATE + ENGINE', s26);
+  const body26 = idx26.slice(s26, e26);
+  const parts26 = body26.split(/\n  ([a-z][a-z0-9_]*):\s*\{/);
+  const chunks26 = {};
+  for (let i = 1; i < parts26.length; i += 2) chunks26[parts26[i]] = parts26[i + 1] || '';
+  const tutKeys = Object.keys(chunks26).filter(k => /\n    steps:\s*\[/.test(chunks26[k]));
+  if (!tutKeys.length) bad('C26: no drill declares `steps` — the step controller built in r455 has no consumer');
+  for (const k of tutKeys) {
+    const ch = chunks26[k];
+    const sv = /\n    steps:\s*\[([\s\S]*?)\n    \],?\n/.exec(ch);
+    if (!sv) { bad(`C26: ${k}.steps is not a readable literal block`); continue; }
+    const L = sv[1];
+    /* the three fields §9.0.1's step shape has no home for ride in a sibling `tutorial:{}` */
+    const tv = /\n    tutorial:\s*\{([^\n]*)\}/.exec(ch);
+    if (!tv) bad(`C26: ${k} declares steps but no sibling \`tutorial:{n, name, nextKey}\` — the picker's path and the results card's hand-off both read it`);
+    else {
+      const T = tv[1];
+      if (!/\bn:\s*\d+/.test(T)) bad(`C26: ${k}.tutorial declares no number \`n\` — the picker's path reads it`);
+      if (!/name:\s*'/.test(T)) bad(`C26: ${k}.tutorial declares no \`name\` — the results card names the clear`);
+      const nextKey = /nextKey:\s*'([a-z0-9_]+)'/.exec(T);
+      if (!nextKey) bad(`C26: ${k}.tutorial declares no nextKey — the results card's hand-off has nowhere to go`);
+      else if (!chunks26[nextKey[1]]) bad(`C26: ${k}.tutorial.nextKey '${nextKey[1]}' is not a drill`);
+    }
+
+    /* core-beat count: {label: rows inside checks(), less the ☆ bonus rows. The engine-appended
+       save closer is the drill's win and belongs to no step. */
+    const ci = ch.indexOf('checks(');
+    const tail = ci >= 0 ? ch.slice(ci) : '';
+    const nLabels = (tail.match(/\{label:/g) || []).length;
+    const nBonus = (tail.match(/bonus:\s*true/g) || []).length;
+    const nCore = nLabels - nBonus;
+    if (nCore <= 0) { bad(`C26: could not read ${k}'s core checks (${nLabels} labels, ${nBonus} bonus)`); continue; }
+
+    /* a STEP opens with `{ name:'…'`; each of its beats is `{id:<n>, why:'…'}` */
+    const nSteps = (L.match(/\{\s*name:'/g) || []).length;
+    const beatSets = [...L.matchAll(/beats:\s*\[([\s\S]*?)\]\s*\}/g)]
+      .map(m => [...m[1].matchAll(/\bid:\s*(\d+)/g)].map(x => parseInt(x[1], 10)));
+    const whySets = [...L.matchAll(/beats:\s*\[([\s\S]*?)\]\s*\}/g)]
+      .map(m => [...m[1].matchAll(/\bwhy:\s*'((?:[^'\\]|\\.)*)'/g)].map(x => x[1]));
+    if (/\bcard:\s*\{/.test(L))
+      bad(`C26: ${k}.steps declares a step \`card\` — steps do not render cards any more ` +
+          `(Wolf round 2: the boundary is the checklist advancing, not a scrim)`);
+    if (/\bkeys:\s*\[/.test(L))
+      bad(`C26: ${k}.steps carries its own \`keys:[]\` — §9.0.1 DERIVES the keycaps from guide()[id] ` +
+          `(hkStepCaps); a second copy of a chord is exactly the drift the index-paired contract forbids`);
+    if (!beatSets.length || beatSets.length !== nSteps)
+      bad(`C26: ${k} has ${nSteps} step(s) but ${beatSets.length} beats:[] list(s) — every step owns a slice`);
+    if (!/\n\s*\{\s*name:'[^']+',\s*\n?\s*why:'/.test(L) && !/why:\s*'/.test(L))
+      bad(`C26: ${k}'s steps carry no \`why\` — §9.0.1: the step's why is its line of the drill's aha`);
+    const all = [].concat(...beatSets);
+    const uniq = [...new Set(all)];
+    if (all.length !== uniq.length)
+      bad(`C26: ${k}'s steps double-book a beat (${all.join(',')}) — two steps could never both close`);
+    for (const b of uniq) if (b < 0 || b >= nCore)
+      bad(`C26: ${k} names beat ${b}, outside its ${nCore} core checks (the ☆ and the save closer belong to no step)`);
+    for (let b = 0; b < nCore; b++) if (!uniq.includes(b))
+      bad(`C26: ${k}'s steps do not cover core beat ${b} — the guide line would go silent mid-run ` +
+          `(the steps must PARTITION the ${nCore} core checks)`);
+    beatSets.forEach((bs, i) => {
+      const ws = whySets[i] || [];
+      if (ws.length !== bs.length)
+        bad(`C26: ${k} step ${i + 1} has ${bs.length} beat(s) but ${ws.length} \`why\` line(s) — ` +
+            `every beat carries the one line the guide speaks for it`);
+      ws.forEach((t, j) => {
+        const w = t.split(/\s+/).filter(Boolean).length;
+        if (w > 28) bad(`C26: ${k} step ${i + 1} beat ${j + 1}'s why is ${w} words — a beat's line is one sentence`);
+        if (!t.trim()) bad(`C26: ${k} step ${i + 1} beat ${j + 1}'s why is empty`);
+      });
+    });
+  }
+
+  /* ---- the L1 switch, and what it is allowed to turn off ---- */
+  if (!/const LEVEL1_LIVE=(true|false);/.test(idx26))
+    bad('C26: LEVEL1_LIVE is gone — it is the one switch that retires the Keyboard Tour entry');
+  if (/const LEVEL1_LIVE=false;/.test(idx26) && !/id="kbKeyTour"/.test(idx26))
+    bad('C26: LEVEL1_LIVE is false but the ? sheet no longer offers "replay the intro" — ' +
+        'first-contact teaching would disappear between two PRs');
+
+  if (!fail) ok(`one entry system (tryEnter → hkEnterFirstBoard → loadChallenge), ${DEAD.length} retired ` +
+                `onboarding symbols stay retired, 3 contextual tips, ${tutKeys.length} steps declaration(s) ` +
+                `partition their core checks with a why per beat and no chord of their own, and the step ` +
+                `controller raises no card and paints no banner (the drill surface keeps its chrome)`);
+} catch (e) {
+  bad('C26 could not run: ' + String(e.message || e).slice(0, 200));
 }
 
 /* ---- C25 (r452): the Mac chord truth table is SSOT ----
@@ -967,6 +1231,58 @@ try {
   else ok('reference.html carries no local glyph swap');
 } catch (e) {
   bad('C25 could not run: ' + String(e.message || e).slice(0, 120));
+}
+
+/* ---- C27 (r455): RANK IS DERIVED — one predicate, no opt-in flag ----
+   Wolf: "go with automatic rank at level 10". Ranked used to be an opt-in ceremony on a
+   localStorage flag (hk_ranked) read by FIVE different readers (index.html hkRankedEntered,
+   nav.js hkIsRanked + navRank's __opted, lb.js rankedOptedIn, account.html) and written by
+   six (the nudge card, the gate panel, the infographic default, leave-ranked, the owner
+   force-flag, the r358 hydrate). r455 collapsed all of that into window.hkRankedEntered()
+   (nav.js: level >= HK_RANK.RANKED_MIN_LVL, or the campaign complete, or the dev unlock).
+   This guard keeps it collapsed:
+     1. hkRankedEntered is DEFINED exactly once across product code (a second definition —
+        including a bare `function hkRankedEntered(){}` in a page, which would shadow the
+        window property — is the drift this exists to catch).
+     2. No product file reads or writes the retired key: no localStorage get/set/remove of
+        'hk_ranked', and no 'hk_ranked' in a wipe list — except the ONE tolerance line in
+        nav.js, allowlisted by exact substring, that retires an old value from disk. */
+try {
+  const PRODUCT = fs.readdirSync('.').filter(f => /\.(html|js)$/.test(f) && !/^(sw|service-worker)\.js$/.test(f));
+  // prose may name the retired pieces (the r455 comments do); only CODE is judged
+  const stripComments = t => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/<!--[\s\S]*?-->/g, '').replace(/^\s*\/\/.*$/mg, '');
+  const TOLERANCE = "try{ if(localStorage.getItem('hk_ranked')==='1') localStorage.setItem('hk_rank_reveal_seen','1'); localStorage.removeItem('hk_ranked'); }catch(e){}";
+  const defs = [], reads = [];
+  for (const f of PRODUCT) {
+    const src = fs.readFileSync(f, 'utf8');
+    const lines = src.split('\n');
+    lines.forEach((ln, i) => {
+      const code = ln.replace(/\/\*.*?\*\//g, '').replace(/^\s*(\/\/|\*|\/\*).*$/, '');   // drop comment-only lines + inline block comments
+      if (/(?:window\.)?hkRankedEntered\s*=\s*function|function\s+hkRankedEntered\s*\(/.test(code)) defs.push(f + ':' + (i + 1));
+      if (/['"]hk_ranked['"]/.test(code) && ln.indexOf(TOLERANCE) < 0) reads.push(f + ':' + (i + 1));
+    });
+  }
+  if (defs.length !== 1) bad(`C27: hkRankedEntered must be defined exactly once (nav.js) — found ${defs.length}: ${defs.join(', ') || 'none'}`);
+  else if (!/^nav\.js:/.test(defs[0])) bad(`C27: hkRankedEntered is defined in ${defs[0]}, not nav.js (the shared chrome every page loads)`);
+  else ok(`hkRankedEntered defined once (${defs[0]})`);
+  if (reads.length) bad(`C27: the retired hk_ranked key is still read/written outside the tolerance line: ${reads.join(', ')}`);
+  else ok('no product file reads or writes hk_ranked (one allowlisted tolerance line)');
+  const nav = fs.readFileSync('nav.js', 'utf8');
+  if (nav.indexOf(TOLERANCE) < 0) bad('C27: the nav.js tolerance line changed — update the C27 allowlist in the same commit');
+  // the readers that must consult the predicate rather than a flag of their own
+  const idx = fs.readFileSync('index.html', 'utf8'), lb = fs.readFileSync('lb.js', 'utf8'), acct = fs.readFileSync('account.html', 'utf8');
+  if (!/window\.hkRankedEntered\(\)\s*&&\s*window\.hkPlacementRide/.test(idx)) bad('C27: index.html loadChallenge no longer gates the placement ride on window.hkRankedEntered()');
+  if (!/window\.hkRankedEntered\(\)/.test(lb)) bad('C27: lb.js heroHtml no longer consults window.hkRankedEntered()');
+  if (!/hkIsRanked\(\)|hkRankedEntered\(\)/.test(acct)) bad('C27: account.html Ranked card no longer consults the derived predicate');
+  for (const [f, pat, what] of [['nav.js', /maybeRankedNudge|hk_ru_snooze|hkLeaveRanked\s*=/, 'the nudge/snooze/leave-ranked ceremony'],
+                                 ['lb.js', /id="enterRanked"|id="waitRanked"|function rankedInfographic/, 'the Enter Ranked / Not yet gate'],
+                                 ['themes.js', /id="hkruGo"|id="hkruLater"|onEnter/, 'an Enter/later button on the reveal card'],
+                                 ['account.html', /id="rankedLeave"|Leave ranked/, 'the leave-ranked control']]) {
+    if (pat.test(stripComments(fs.readFileSync(f, 'utf8')))) bad(`C27: ${f} has ${what} back — rank is automatic at LVL 10, there is nothing to enter or leave`);
+  }
+  ok('the opt-in ceremony stays retired (no nudge, gate buttons, enter/later CTA or leave control)');
+} catch (e) {
+  bad('C27 could not run: ' + String(e.message || e).slice(0, 160));
 }
 
 if (fail) { console.error(`\nSTATIC INVARIANTS: ${fail} problem(s)`); process.exit(1); }

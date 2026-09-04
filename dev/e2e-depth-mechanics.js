@@ -684,12 +684,14 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
       const a1Empty = ['A1','B1','C1','A2','B2','C2','A3','B3','C3','A4','B4','C4'].every(k => !S.cells[k]);
       for (const mv of C.demo()) { setDemoSel(mv.sel); for (const kk of mv.keys) demoKey(kk); }
       const items = C.checks(S);
-      return { done, a1Empty, pips: (S.touchGot | 0) === S.maze.pips.length,
+      /* r456: the step-2 tier replaces S.maze with an all-open board (pips:[]), so the pip
+         tally is read off the drill's own touch-list, not off the retired maze copy. */
+      return { done, a1Empty, pips: (S.touchGot | 0) === CHALLENGES.navigation._nav.pips.length,
                star: !!(items.find(x => x.bonus) || {}).ok, bumps: S.bumpN | 0 };
     });
-    ok(r2.done === true, 'navigation round-2 demo wins — corridor flights, teleport home, paste, finish flight, save', r2);
+    ok(r2.done === true, 'navigation round-2 demo wins — corridor flights, the table, the ranges, paste, save', r2);
     ok(r2.a1Empty, 'the A1 room ships EMPTY at build (the paste destination)', r2);
-    ok(r2.pips && r2.star && r2.bumps === 0, 'the scripted line collects every pip and earns the zero-bump ☆', r2);
+    ok(r2.pips && r2.star && r2.bumps === 0, 'the scripted line collects every checkpoint and earns the ☆', r2);
   }
 
   console.log('M. fill-chord symmetry (r423 round-2 §7)');
@@ -1140,6 +1142,125 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
       for (const k of Object.keys(PB)) delete PB[k];
       try { Object.assign(PB, JSON.parse(window.__pbSave || '{}')); } catch (e) {}
       try { localStorage.removeItem('hk_camp_xp'); } catch (e) {} });
+  }
+
+  console.log('S. FOUNDATIONS 1 — the ten beats, both sides of the ☆, and the hint ladder (r456, §9.0/§9.1)');
+  {
+    /* THE FULL KEYBOARD PLAYTHROUGH. Every beat is driven by a real KeyboardEvent through the
+       live engine (demoKey is the demo player's own dispatcher) — no state is hand-set except
+       the cursor placement a player would make with arrows. Ten beats, three steps, one board. */
+    const walk = await run(() => {
+      window.__clearCel(); hideResults();
+      try { localStorage.removeItem('hk_guide_navigation'); localStorage.removeItem('hk_gate_off'); } catch (e) {}
+      window.__forceSeed = 4242; loadChallenge('navigation');
+      try { hkGateClear(); } catch (e) {} render();
+      const C = CHALLENGES.navigation, N = C._nav, B = N.table;
+      const out = { head: (document.querySelector('#checklist .cl-head') || {}).textContent || '',
+        steps: document.querySelectorAll('#checklist .cl-steps .cl-step').length,
+        star0: (document.querySelector('#checklist .cl-item.cl-bonus .cl-label') || {}).textContent || '',
+        beats: [] };
+      const grade = () => C.checks(S).map(x => !!x.ok);
+      // ---- STEP 1: every hall in ONE Ctrl+arrow flight (the ☆ route) ----
+      const p = C._maze.p1;
+      let i = 0;
+      while (i < p.length - 1) {
+        const dr = Math.sign(p[i + 1][0] - p[i][0]), dc = Math.sign(p[i + 1][1] - p[i][1]);
+        let j = i + 1;
+        while (j + 1 < p.length && Math.sign(p[j + 1][0] - p[j][0]) === dr && Math.sign(p[j + 1][1] - p[j][1]) === dc) j++;
+        demoKey({ key: dr === 1 ? 'ArrowDown' : dr === -1 ? 'ArrowUp' : dc === 1 ? 'ArrowRight' : 'ArrowLeft', ctrl: true });
+        if (out.beats.length === 0) out.beats.push(grade()[0]);   // beat 1 · the first checkpoint
+        i = j;
+      }
+      const g1 = grade();
+      out.beats.push(g1[1], g1[2]);                                // beats 2-3
+      out.step2 = S.step;                                          // the boundary advanced the controller
+      out.walls = Object.keys(S.cells).filter(k => S.cells[k].fill === 'wall').length;
+      out.headB = (document.querySelector('#checklist .cl-head') || {}).textContent || '';
+      // ---- STEP 2: the four ranges, on the star route ----
+      const cL = n => colLetter(B.c0 + n);
+      setDemoSel(cL(1) + (B.r0 + 1 + N.memoRow)); demoKey({ key: ' ', shift: true });
+      out.beats.push(grade()[3]);                                  // beat 4 · the memo's row
+      setDemoSel(colLetter(B.c0 + 1 + N.memoCol) + (B.r0 + 1)); demoKey({ key: ' ', ctrl: true });
+      out.beats.push(grade()[4]);                                  // beat 5 · the memo's column
+      setDemoSel(cL(1) + (B.r0 + 1)); demoKey({ key: 'a', ctrl: true, code: 'KeyA' });
+      out.beats.push(grade()[5]);                                  // beat 6 · the whole table
+      demoKey({ key: 'F5' }); demoKey({ key: 's', code: 'KeyS' }); demoKey({ key: 'o', code: 'KeyO' });
+      out.marks = (S.marks || []).length; out.typedN = N.typedRefs.length;
+      out.beats.push(grade()[6]);                                  // beat 7 · every typed figure, one pass
+      out.step3 = S.step;
+      out.home = !!S.pasteRoom;
+      // ---- STEP 3 ----
+      setDemoSel(cL(1) + (B.r0 + 1));
+      demoKey({ key: 'a', ctrl: true, code: 'KeyA' }); demoKey({ key: 'c', ctrl: true });
+      out.beats.push(grade()[7]);                                  // beat 8 · the clipboard
+      demoKey({ key: 'Home', ctrl: true }); demoKey({ key: 'v', ctrl: true });
+      out.beats.push(grade()[8]);                                  // beat 9 · delivered at A1
+      demoKey({ key: 's', ctrl: true });
+      const it = C.checks(S);
+      out.beats.push(!!(it.find(x => x.save) || {}).ok);            // beat 10 · saved
+      out.star = !!(it.find(x => x.bonus) || {}).ok;
+      out.walk = (S.mzWalkLog || []).length;
+      out.done = done; out.pb = PB.navigation !== undefined;
+      return out;
+    });
+    ok(/step 1 of 3/.test(walk.head) && walk.steps === 3,
+      'the guide opens on step 1 of 3 and lists all three steps', walk.head);
+    ok(/^☆ Take every straightaway/.test(walk.star0),
+      'the ☆ is VISIBLE from the first paint (reveal) — §9.0 "exactly one, visible"', walk.star0);
+    ok(walk.beats.length === 10 && walk.beats.every(Boolean),
+      'ALL TEN BEATS grade on a keyboard-only playthrough', walk.beats);
+    ok(walk.step2 === 1 && walk.walls === 0 && /step 2 of 3/.test(walk.headB),
+      'step 1 closing opens the tier: the walls come down and the controller advances', walk);
+    ok(walk.marks === walk.typedN && walk.typedN === 33,
+      'beat 7 is the Go To Special pass — 32 quarter figures + the ONE hand-keyed FY (no rectangle can take it)', walk);
+    ok(walk.step3 === 2 && walk.home, 'step 2 closing opens the second rung: the home range is marked at A1', walk);
+    ok(walk.done && walk.pb, 'the tutorial wins and banks a PB like any other drill (§9.0)', walk);
+    ok(walk.star && walk.walk === 0, 'THE ☆ IS EARNED on the chord route — no hall walked', walk);
+
+    const forfeit = await run(() => {
+      window.__clearCel(); hideResults();
+      try { localStorage.removeItem('hk_guide_navigation'); } catch (e) {}
+      window.__forceSeed = 4242; loadChallenge('navigation');
+      try { hkGateClear(); } catch (e) {} render();
+      const C = CHALLENGES.navigation, p = C._maze.p1;
+      for (let i = 0; i + 1 < p.length; i++) {
+        const dr = p[i + 1][0] - p[i][0], dc = p[i + 1][1] - p[i][1];
+        demoKey({ key: dr === 1 ? 'ArrowDown' : dr === -1 ? 'ArrowUp' : dc === 1 ? 'ArrowRight' : 'ArrowLeft' });
+      }
+      const it = C.checks(S);
+      return { cores: it[0].ok && it[1].ok && it[2].ok, star: !!(it.find(x => x.bonus) || {}).ok,
+        walk: (S.mzWalkLog || []).length };
+    });
+    ok(forfeit.cores, 'the SLOW route — every hall walked cell by cell — still clears every step-1 core beat (§1.0(c))', forfeit);
+    ok(forfeit.star === false && forfeit.walk > 0,
+      '…and FORFEITS the ☆: a hall walked is a hall spent (the per-hall rule)', forfeit);
+
+    const ladder = await run(() => {
+      window.__clearCel(); hideResults();
+      try { localStorage.removeItem('hk_guide_navigation'); } catch (e) {}
+      window.__forceSeed = 4242; loadChallenge('navigation');
+      try { hkGateClear(); } catch (e) {} render();
+      const out = { r0: hkHintRung() };
+      hkGuideHint(); out.r1 = hkHintRung();
+      out.why = !!document.querySelector('#checklist .cl-why.lit');
+      hkGuideHint(); out.r2 = hkHintRung();
+      out.caps = !!document.querySelector('#checklist .cl-caps.lit');
+      hkGuideHint(); out.r3 = hkHintRung();
+      out.ring = document.querySelectorAll('#grid td.hintring').length;
+      const C = CHALLENGES.navigation;
+      let t = C.targets()[0]; if (typeof t === 'function') t = t.call(C);
+      out.want = resolveRange(t); out.got = currentTargetRange();
+      out.starCaps = document.querySelectorAll('#checklist .cl-item.cl-bonus .cl-keys').length;
+      hkGuideHint(); out.r4 = hkHintRung();     // the ladder stops at 3
+      return out;
+    });
+    ok(ladder.r0 === 0 && ladder.r1 === 1 && ladder.r2 === 2 && ladder.r3 === 3 && ladder.r4 === 3,
+      'the hint ladder walks rungs 1 → 2 → 3 in order and stops there (§9.0.3)', ladder);
+    ok(ladder.why && ladder.caps, 'rung 1 lights the step\'s concept line, rung 2 the beat\'s keycaps', ladder);
+    ok(ladder.ring > 0 && JSON.stringify(ladder.got) === JSON.stringify(ladder.want),
+      'RUNG 3 LIGHTS THE RIGHT RANGE — the open beat\'s own targets() entry, on the board', ladder);
+    ok(ladder.starCaps === 0, 'no rung ever speaks for the ☆ (§9.0.3: hints never cover it)', ladder);
+    await run(() => { try { localStorage.setItem('hk_gate_off', '1'); } catch (e) {} });
   }
 
   await browser.close();
