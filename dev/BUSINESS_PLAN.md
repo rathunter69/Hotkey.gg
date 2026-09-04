@@ -138,13 +138,15 @@ a send-only Resend identity.
 | `legal@hotkey.gg` | DMCA, terms questions, counsel, registered-agent mail | terms.html, privacy.html |
 | `teams@hotkey.gg` | desks, schools, clubs, enterprise pilots; the address on the team application flow | contact.html "schools", teams page, `team_applications` |
 
-**Required-by-convention aliases** (→ wolf@; never advertised, but mail servers and vendors expect them)
+**Required-by-convention aliases** (→ wolf@; never advertised, but mail servers and vendors expect them. Only
+`admin@` and `dmarc@` are added by hand; the other two exist automatically — 2026-09-04, Wolf added every
+non-reserved alias in this section.)
 
 | address | why it exists |
 |---|---|
 | `admin@hotkey.gg` | Google Workspace super-admin recovery; domain-verification mails from vendors |
-| `postmaster@hotkey.gg` | RFC 5321 requirement; bounce and abuse reports from other mail servers |
-| `abuse@hotkey.gg` | RFC 2142; where ISPs and Cloudflare route abuse complaints |
+| `postmaster@hotkey.gg` | RFC 5321 requirement; bounce reports from other mail servers. **Reserved by Google Workspace** — cannot be added as an alias; Workspace creates it and delivers it to the primary super-admin account (wolf@). Re-point in Admin console → Apps → Gmail → Routing if the super-admin ever changes. |
+| `abuse@hotkey.gg` | RFC 2142; where ISPs and Cloudflare route abuse complaints. **Reserved by Google Workspace**, same handling as postmaster@. |
 | `dmarc@hotkey.gg` | `rua=` target in the DMARC record (EMAIL_SETUP §1); aggregate reports land here |
 
 **Vendor-login aliases** (→ wolf@; one alias per vendor so a leaked password or a handoff is one account, not all)
