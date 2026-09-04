@@ -16,6 +16,17 @@
        with no copy edit — asserted in both directions
      · the progression band renders one chip per HK_RANK.TIERS entry (drawn with the shared
        window.rankEmblem), one cert row per HK_TRACKS entry, and names HK_RANK.RANKED_MIN_LVL
+     · r455.1 THE SKILLS LINE — every chapter card says, in plain words, what that chapter
+       teaches (window.HK_CHAPTER_SKILLS, hand-curated from dev/curriculum-v3.json's `teaches`
+       tags; see the map's comment in index.html). Wolf's v3 note was "make it pithy, so I can
+       identify at a glance what I'll be learning and practising", and this band is the answer,
+       so a chapter added to drills.js without a line fails the build rather than shipping a
+       blank card. The lines also obey the copy law (WORKFLOW §4): no chords in marketing copy.
+     · r455.1 THE WORD BUDGET — the landing's rendered word count is capped. v3 shipped 994
+       words and read as an essay; the v3.1 cut took it to 493 and the cap is set just above
+       that. Copy grows one paragraph at a time and nobody notices until the founder does, so
+       the ratchet is a gate step, not a review habit. Raising the cap is a decision, and it
+       should be made in dev/LANDING_V3.md, not in a copy edit.
      · the hero fits 1280x800 and 390x844 with the CTA above the fold and no horizontal scroll
      · a fresh device lands on Daylight (themes.js r293), the CTA is a real focusable <button>
        that runs tryEnter(), headings descend in order, and there are no exclamation marks
@@ -56,6 +67,15 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
       chapters: rail.length, wantChapters: grp.length,
       counts: rail.map(e => +e.querySelector('.l-ccount').textContent),
       wantCounts: grp.map(g => g.keys.length),
+      /* r455.1: the skills line, per card, in rail order — plus the map itself, so a chapter
+         the map has never heard of is caught even if the rail somehow rendered. */
+      skills: rail.map(e => ((e.querySelector('.l-cskill') || {}).textContent || '').trim()),
+      skillMapMissing: grp.filter(g => !((window.HK_CHAPTER_SKILLS || {})[g.name] || '').trim())
+                          .map(g => g.name),
+      /* r455.1 THE WORD BUDGET: count the rendered prose, art excluded (the rank emblems are
+         SVG and the MBA crest is engraved "#REF!" on purpose — themes.js r377). */
+      words: (() => { const c = L.cloneNode(true); c.querySelectorAll('svg').forEach(e => e.remove());
+        return (c.textContent.trim().match(/[^\s]+/g) || []).length; })(),
       sum: rail.reduce((a, e) => a + (+e.querySelector('.l-ccount').textContent), 0),
       menuOrder: nAll,
       h2: document.getElementById('lCatalogH2').textContent,
@@ -95,6 +115,17 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(r.chapters === r.wantChapters, 'the rail renders every catalog chapter (' + r.chapters + ')');
   ok(JSON.stringify(r.counts) === JSON.stringify(r.wantCounts), 'per-chapter counts match HOTKEY_DRILLS.groups', JSON.stringify(r.counts));
   ok(r.sum === r.menuOrder, 'rail counts sum to menuOrder.length (' + r.sum + ' == ' + r.menuOrder + ')');
+  /* ---------------------------------------------------------------- r455.1 · the skills line */
+  ok(r.skills.length === r.wantChapters && r.skills.every(s => s.length > 0),
+    'every chapter card carries a skills line (' + r.skills.filter(Boolean).length + '/' + r.wantChapters + ')');
+  ok(r.skillMapMissing.length === 0,
+    'HK_CHAPTER_SKILLS covers every catalog chapter', 'missing: ' + r.skillMapMissing.join(', '));
+  /* the copy law (WORKFLOW §4): marketing copy never embeds a chord. "anchors", not "$/F4". */
+  ok(!r.skills.some(s => /\b(ctrl|alt|shift|F\d)\b/i.test(s)),
+    'no chords in the skills lines (copy law)', r.skills.filter(s => /\b(ctrl|alt|shift|F\d)\b/i.test(s)).join(' | '));
+  /* THE WORD BUDGET (r455.1). v3 = 994 words; the cut = 493. The cap sits at 560 — room for a
+     chapter or two of catalog growth, none for a new paragraph. Raise it in LANDING_V3.md. */
+  ok(r.words <= 560, 'the landing stays pithy: ' + r.words + ' rendered words (cap 560, v3 was 994)');
   ok(r.h2 === r.wantChapters + ' chapters. ' + r.menuOrder + ' drills.', 'the catalog h2 is derived: "' + r.h2 + '"');
   ok(r.lede.indexOf(String(r.menuOrder) + ' timed drills') === 0, 'the hero lede carries the live total');
   ok(r.badges.filter(b => /free right now/i.test(b)).length === r.wantPro.length,

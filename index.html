@@ -2041,9 +2041,8 @@
   .landing .micro{font-family:var(--mono); font-size:11.5px; color:var(--muted); line-height:1.8;
     margin-top:20px; max-width:60ch}
   .landing .micro b{color:var(--text); font-weight:500}
-  .micro-hint{display:block; margin-top:6px; color:var(--faint); font-size:11.5px}
-  .micro-hint kbd{font-family:var(--mono); color:var(--muted); background:var(--surface2);
-    border:1px solid var(--line); border-radius:4px; padding:1px 6px; margin:0 1px}
+  /* r455.1: .micro-hint deleted with its only node (the hero's second micro line, cut in the
+     v3.1 pass). Nothing else on any surface wears the class — checked site-wide. */
 
   /* ------------------------------------------- landing v2 · the hero still (see AUDIT r452)
      A hand-built, theme-tokened mini-sheet, NOT the engine. playDemo() drives the real #grid,
@@ -2118,6 +2117,10 @@
     padding:15px 16px 16px; display:flex; flex-direction:column; gap:7px}
   .landing .l-chap .l-cn{font-family:var(--mono); font-size:10px; color:var(--faint); letter-spacing:.14em}
   .landing .l-chap .l-cname{font-size:14.5px; font-weight:700; letter-spacing:-.2px; line-height:1.25}
+  /* r455.1 — the skills line (HK_CHAPTER_SKILLS). This is the ONE piece of copy on the page the
+     founder asked to be readable at a glance ("what I'll be learning and practising"), so it gets
+     --text, not --muted, and sits directly under the chapter name above the count. */
+  .landing .l-chap .l-cskill{font-size:12.5px; line-height:1.45; color:var(--text); opacity:.86}
   .landing .l-chap .l-cmeta{display:flex; align-items:baseline; gap:8px; margin-top:auto; padding-top:8px}
   .landing .l-chap .l-ccount{font-family:var(--mono); font-size:19px; font-weight:700; color:var(--text); line-height:1}
   .landing .l-chap .l-cunit{font-family:var(--mono); font-size:10.5px; color:var(--faint)}
@@ -2140,7 +2143,12 @@
   .landing .l-rank svg{display:block; width:22px; height:auto; flex:none}
   .landing .l-rank span{font-family:var(--mono); font-size:11px; color:var(--muted); white-space:nowrap}
   .landing .l-rank.l-top span{color:var(--text)}
-  .landing .l-prog{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:22px; align-items:stretch}
+  /* r455.1: the progression strip is four SMALL tiles now (caption + about three words), not
+     four prose panels. The clock keeps its rows because they are numbers off the live pars. */
+  .landing .l-prog{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:18px; align-items:stretch}
+  .landing .l-prog .l-panel-body{padding:11px 13px 12px}
+  .landing .l-prog .l-plist{gap:5px; font-size:12.5px}
+  .landing .l-prog .l-plist .l-k{font-size:13px; color:var(--accent); letter-spacing:0}
 
   /* ------------------------------------------------- landing v3 · pricing, two real tiers
      PRO is a shipping tier now, not a promise, so the page shows the deal: FREE (the chapters
@@ -2470,7 +2478,9 @@
         <div>
           <div class="eyebrow">learn excel by doing · keyboard only</div>
           <h1>Learn Excel properly.<br><span class="dim">The hours come back.</span></h1>
-          <p class="lede" id="landingLede">Timed drills on a real spreadsheet — a budget vs actual, a simple P&amp;L, a sales table with a lookup. <b>You're graded on the finished page</b>, not on which key you pressed. It is the skill you keep meaning to pick up, and the one an analyst seat assumes you already have.</p>
+          <!-- r455.1 (Wolf 2026-09-04, "make it pithy"): the lede is one sentence, 16 words.
+               paintLanding() writes the live drill count into the front of it. -->
+          <p class="lede" id="landingLede">Timed drills on a real spreadsheet. <b>You're graded on the finished page</b>, not on the keys.</p>
           <div class="landing-cta">
             <button class="start-btn" id="startBtn">Press <kbd class="kbd-cta">↵</kbd> to start</button>
             <button class="l-quiet" id="loginBtn">log in</button>
@@ -2481,7 +2491,9 @@
           </div>
           <!-- r455: "free while we're building" was beta language and the beta is over
                (r451 retired the curtain). What is true at launch is the friction, not the phase. -->
-          <div class="micro" id="landingMicro">no account to try it · no install · <b>keyboard only</b><span class="micro-hint">everything is keyboard — reach for the mouse and the run gets flagged</span></div>
+          <!-- r455.1: the micro line stays; its second-line hint went with the v3.1 cut — the
+               eyebrow and the beat below already say "keyboard only" twice. -->
+          <div class="micro" id="landingMicro">no account to try it · no install · <b>keyboard only</b></div>
         </div>
 
         <!-- the hero still. Hand-built, theme-tokened, engine-free — see the CSS note above and
@@ -2495,7 +2507,7 @@
           <!-- r455 (Wolf 2026-09-04): the still shows a page ANYONE who works in Excel reads at a
                glance — a budget vs actual — not the term-loan sweep, which announced "this is for
                bankers" in the first two seconds. Still hand-built and engine-free (see the CSS note). -->
-          <div class="l-demo-task">Foot both columns, run the variance against budget — <b>amount and percent</b> — and rule off the total.</div>
+          <div class="l-demo-task">Foot both columns, run the <b>variance</b>, rule off.</div>
           <div class="l-sheet">
             <table>
               <tbody>
@@ -2518,59 +2530,59 @@
       </div>
     </div>
 
-    <!-- Wolf 2026-09-03, change 3 (kept in v3): the pitch is learning by DOING, argued against
-         the way this is normally taught. Keep the contrast concrete — a class, a video, a shortcut
-         sheet — and keep the promise measurable (a real page, the keyboard, a grade in three
-         minutes). r455 widens the audience off "a banker": analysts, consultants, corporate
-         finance, anyone who lives in Excel. -->
+    <!-- Wolf 2026-09-03, change 3: the pitch is learning by DOING, not by watching.
+         r455.1 THE CUT (Wolf 2026-09-04, "too much text — make it pithy, so I can identify at a
+         glance what I'll be learning and practising"): the argument survives, the essay does not.
+         The two-column "usual route vs hotkey.gg" comparison COLLAPSED to one line per column
+         (it was six bullets and 80 words making one point), the section lede is gone, and each
+         01/02/03 beat is a heading plus a single clause. Nothing here is an argument the reader
+         has to assemble — the catalog band below is where the page spends its words now. -->
     <div class="l-sec" id="lHow">
       <div class="l-wrap">
         <div class="l-label">how it works</div>
         <h2>You don't learn this by watching.</h2>
-        <p class="l-sub">The usual route is a class, a YouTube video, or a shortcut sheet taped to the monitor. You watch someone else's hands, you nod, and by Thursday it is gone — because you never once did it yourself.</p>
         <div class="l-vs">
           <div class="l-col l-old">
             <div class="l-col-cap">the usual route</div>
-            <ul>
-              <li>sit through a class, or a video at 1.5×</li>
-              <li>memorise a sheet of chords you will not use today</li>
-              <li>open a real file on Monday and reach for the mouse anyway</li>
-            </ul>
+            <ul><li>watch someone else's hands. By Thursday it's gone.</li></ul>
           </div>
           <div class="l-col l-new">
-            <div class="l-col-cap">hotkey.gg · three minutes, start to graded</div>
-            <ul>
-              <li>a real page opens — a budget vs actual, a lookup against a sales table, a model schedule</li>
-              <li>you build it with the keyboard, clock running</li>
-              <li>you're graded on the <b>finished sheet</b>, and the time goes on a board</li>
-            </ul>
+            <div class="l-col-cap">hotkey.gg</div>
+            <ul><li>build the page yourself, on a clock, <b>graded</b>.</li></ul>
           </div>
         </div>
         <div class="l-beats">
           <div class="l-beat">
             <div class="l-n">01</div>
-            <h3>A real task, not a lesson</h3>
-            <p>Every drill opens on a page you would recognise from work — a budget vs actual, a reconciliation, a model schedule. Analyst, consultant, corporate finance, or anyone who lives in Excel: it is your file, not a toy example.</p>
+            <h3>A real page</h3>
+            <p>A budget vs actual, a lookup, a model schedule.</p>
           </div>
           <div class="l-beat">
             <div class="l-n">02</div>
             <h3>Keyboard only</h3>
-            <p><kbd>alt</kbd> walks the ribbon, <kbd>ctrl</kbd> does the rest, and the mouse is a foul. That constraint is the whole product — it is how fast modelers actually work.</p>
+            <p><kbd>alt</kbd> walks the ribbon, <kbd>ctrl</kbd> the rest. The mouse is a foul.</p>
           </div>
           <div class="l-beat">
             <div class="l-n">03</div>
-            <h3>Graded on the finished page</h3>
-            <p>The clock stops when the page is right. Par times, medals at pass / pro / legendary, hidden ☆ for the efficient route, and every clean run posts to a board and moves your level.</p>
+            <h3>Graded on the result</h3>
+            <p>The clock stops when the page is right.</p>
+            <!-- r455.1: par times, medals, the hidden ☆ and the board all moved to the
+                 progression band below, which is the section that owns them. -->
           </div>
         </div>
       </div>
     </div>
 
+    <!-- r455.1 THE CENTREPIECE (Wolf 2026-09-04): "so I can identify at a glance what I'll be
+         learning and practising". This band is now the answer to that sentence and it is the
+         only place on the page allowed to grow. Each chapter card carries FOUR facts and no
+         prose: the chapter name, the live drill count, the FREE/PRO chip, and ONE line of the
+         Excel skills it teaches in plain words (HK_CHAPTER_SKILLS, next to paintLanding()).
+         The section lede went — the eight skill lines say what a paragraph was trying to. -->
     <div class="l-sec" id="lCatalog">
       <div class="l-wrap">
-        <div class="l-label">the catalog</div>
+        <div class="l-label">what you'll learn</div>
         <h2 id="lCatalogH2">The catalog.</h2>
-        <p class="l-sub">A difficulty spine, not a menu. Foundations teaches the hands, the formatting and formula chapters cover the work most weeks actually ask for, and Full Builds hands you a blank sheet and a deadline.</p>
         <div class="l-rail" id="lRail"></div>
         <div class="l-note" id="lRailNote"></div>
       </div>
@@ -2582,11 +2594,15 @@
          the page says how you climb, and the desks pitch already has its own section below.
          Everything numeric here is written by paintLanding() out of HK_RANK.TIERS, HK_TRACKS,
          HK_RANK.RANKED_MIN_LVL, menuOrder and HOTKEY_CHALLENGE_POOL. Nothing is typed. -->
+    <!-- r455.1: the band keeps the eight emblems and ONE derived line. The four explainer
+         PANELS (90 words of prose about boards, certificates and the daily) shrank to four
+         mini tiles of a caption plus about three words each — the medal clock keeps its four
+         rows because they are NUMBERS, not prose, and they are the only place the page shows
+         what a par actually looks like. #lProgBoards / #lProgDaily retired into the one line. -->
     <div class="l-sec" id="lProgress">
       <div class="l-wrap">
         <div class="l-label">progression</div>
         <h2>Every run has a time on it.</h2>
-        <p class="l-sub" id="lProgSub"></p>
         <!-- the eight tiers, drawn with the shared window.rankEmblem (themes.js) at chip size -->
         <div class="l-ladder" id="lLadder"></div>
         <div class="l-note" id="lRankedNote"></div>
@@ -2604,7 +2620,7 @@
             <div class="l-panel-body"><div class="l-plist" id="lProgCerts"></div></div>
           </div>
           <div class="l-panel">
-            <div class="l-panel-cap">the daily challenge</div>
+            <div class="l-panel-cap">the daily</div>
             <div class="l-panel-body"><div class="l-plist" id="lProgDaily"></div></div>
           </div>
         </div>
@@ -2621,8 +2637,9 @@
     <div class="l-sec" id="lPricing">
       <div class="l-wrap">
         <div class="l-label">pricing</div>
+        <!-- r455.1: the section lede (#lPriceSub, 34 words restating the two columns) is gone;
+             the columns state themselves. Bullets are capped at four items of six words. -->
         <h2>Free to learn. PRO for the back half.</h2>
-        <p class="l-sub" id="lPriceSub"></p>
         <div class="l-tiers">
           <div class="l-tier">
             <div class="l-tier-cap">free</div>
@@ -2630,7 +2647,7 @@
               <div class="l-price"><b>Free</b><span>no account, no card</span></div>
               <div class="l-pro-chaps" id="lFreeChaps"></div>
               <ul id="lFreeList"></ul>
-              <button class="l-btn" id="lFreeCta">start the first drill →</button>
+              <button class="l-btn" id="lFreeCta">start now →</button>
             </div>
           </div>
           <div class="l-tier l-tier-pro">
@@ -2638,10 +2655,10 @@
             <div class="l-tier-body">
               <div class="l-price" id="lProPrice"></div>
               <p class="l-alt" id="lProAlt"></p>
-              <p class="l-freenow" id="lFreeNow">Billing has not opened yet — PRO is on for everyone, free, until it does.</p>
+              <p class="l-freenow" id="lFreeNow">Billing has not opened — PRO is free for everyone until it does.</p>
               <div class="l-pro-chaps" id="lProChaps"></div>
               <ul id="lProList"></ul>
-              <a class="l-btn" href="billing.html" id="lProPlans">see what PRO includes →</a>
+              <a class="l-btn" href="billing.html" id="lProPlans">what PRO includes →</a>
             </div>
           </div>
         </div>
@@ -2655,8 +2672,10 @@
         <div class="l-label">for desks</div>
         <h2>Bring the whole analyst class.</h2>
         <div class="l-teams">
-          <p class="l-sub" style="max-width:70ch">Private boards, weekly assignments the staffer pins in one click, and a cohort report worth forwarding — hours saved, cohort improvement, coverage, momentum. Free for clubs.</p>
-          <a class="l-btn" href="enterprise.html">see how desks work →</a>
+          <!-- r455.1: one line. The four-part cohort-report list moved to enterprise.html, which
+               is where a staffer who clicked through is actually deciding. -->
+          <p class="l-sub" style="max-width:70ch">Private boards, weekly assignments, a cohort report. Free for clubs.</p>
+          <a class="l-btn" href="enterprise.html">how desks work →</a>
         </div>
       </div>
     </div>
@@ -2664,7 +2683,7 @@
     <div class="l-sec l-close">
       <div class="l-wrap">
         <h2>Your first run takes thirty seconds.</h2>
-        <p class="l-sub">one drill · one clock · no mouse</p>
+        <p class="l-sub">one drill · one clock · no mouse</p><!-- r455.1: already one line; kept -->
         <button class="start-btn" id="startBtn2">Press <kbd class="kbd-cta">↵</kbd> to start</button>
       </div>
     </div>
@@ -2674,7 +2693,9 @@
         <div>hotkey<b>.gg</b> — an Excel speedrun trainer.<br>
           <a href="About.html">about</a> · <a href="drills/">drills</a> · <a href="leaderboard.html">leaderboard</a> ·
           <a href="desks.html">desks</a> · <a href="terms.html">terms</a> · <a href="privacy.html">privacy</a></div>
-        <div style="max-width:52ch">Excel is a registered trademark of Microsoft Corporation. hotkey.gg is independent and not affiliated with or endorsed by Microsoft.</div>
+        <!-- r455.1: the disclaimer keeps both legal halves (whose mark, and that we are not
+             theirs); only the doubled "affiliated with or endorsed by" went. -->
+        <div style="max-width:52ch">Excel is a registered trademark of Microsoft Corporation. hotkey.gg is independent and unaffiliated.</div>
       </div>
     </div>
   </div>
@@ -29128,7 +29149,60 @@ $('startBtn').addEventListener('click', tryEnter);
    Renders identically with sb === null: nothing here touches the network.
    Everything is wrapped so a catalog shape it does not expect degrades to the
    markup already in the document rather than throwing on the most-tested page.
+
+   r455.1 — THE CUT (Wolf, 2026-09-04: "Too much text on the landing page — make it
+   pithy, so I can identify at a glance what I'll be learning and practising"). Every
+   string this function writes was halved or deleted, and the words it saved were spent
+   in ONE place: the catalog band, which now says what each chapter teaches. See
+   dev/LANDING_V3.md §"v3.1 — the cut" for the per-section before/after counts.
    ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   HK_CHAPTER_SKILLS — r455.1, HAND-CURATED, ONE PLACE, keyed by the drills.js
+   groups[] chapter name (drills.js:40 is the SSOT for those strings).
+
+   WHY IT IS NOT DERIVED. dev/curriculum-v3.json carries a `teaches` tag array on
+   every drill, and this map summarises the UNION of those tags per chapter — but a
+   tag list is a machine index ("anchor($/F4)", "stat-fn(MEDIAN/AVERAGE)",
+   "corkscrew(roll-forward)"), and the founder's ask was plain words a visitor reads
+   at a glance. Three of the eight chapters (Models II, Full Builds, most of Models I)
+   also carry almost NO tags yet — their drills are whole models, so the curriculum
+   file leans on its per-chapter `teaches_line` instead. So this is a curation, and it
+   lives here, once, rather than half-derived in two places and drifting.
+
+   WHICH TAGS EACH LINE SUMMARISES (dev/curriculum-v3.json, chapters[].drills[].teaches,
+   plus that chapter's teaches_line where the tags run out):
+     Foundations   move · select · select-edge · row/col-select · goto-special ·
+                   copy/paste · enter/edit(F2) · undo · redo · cut · fill(D/R) ·
+                   insert/delete row-col · sum(Alt=) · anchor($/F4) · borders · autofit
+     Formatting    align · bold/italic/color · decimals · comma/currency-fmt ·
+                   percent-fmt · parens-negative · blue-inputs · borders · paste-special
+     Formulas I    sum(Alt=) · point-mode · anchor($/F4) · mixed-anchor · SUMIF(S) ·
+                   growth/CAGR · margin/ratio · fill(D/R) · tie-out/check-row
+     Data & Lookups  sort · filter · VLOOKUP · INDEX/MATCH · stat-fn(MEDIAN/AVERAGE)
+     Formulas II   audit(trace) · show-formulas · IFERROR · IF/MIN/MAX · CHOOSE ·
+                   sign-convention · find/replace · linkage(cross-statement)
+     Models I      teaches_line "discount rate, free cash flow, DCF, comps"; tags
+                   bridge · stat-fn(MEDIAN/AVERAGE)
+     Models II     teaches_line "corkscrews, sweeps, waterfalls, covenants, liquidity";
+                   tag circularity-avoidance
+     Full Builds   teaches_line "three statements, the DCF page, the paper LBO, the cover"
+
+   RULE: one line, plain Excel/finance words, no chords (copy law, WORKFLOW §4), and
+   short enough to read in a card. dev/check-landing.js asserts every rendered chapter
+   card has one, so a chapter added to drills.js without a line fails the gate.
+   --------------------------------------------------------------------------- */
+window.HK_CHAPTER_SKILLS = {
+  'Foundations':    'navigate, select, edit, fill, undo, first formulas',
+  'Formatting':     'decimals, currency, borders, alignment, paste special',
+  'Formulas I':     'anchors, SUM, SUMIF, growth, margins, tie-outs',
+  'Data & Lookups': 'sort, filter, VLOOKUP, INDEX/MATCH, medians',
+  'Formulas II':    'tracing errors, IFERROR, IF/MIN/MAX, signs, links',
+  'Models I':       'WACC, free cash flow, DCF, comps, bridges',
+  'Models II':      'debt schedules, revolvers, waterfalls, covenants, sweeps',
+  'Full Builds':    'three statements, DCF, LBO, from a blank sheet'
+};
+
 function paintLanding(){
   const D = window.HOTKEY_DRILLS;
   if(!D || !document.getElementById('lRail')) return;
@@ -29149,31 +29223,31 @@ function paintLanding(){
                       return c ? c.name : g.name; };
   const paidGroups = groups.filter(isPaid);
 
-  /* ---- hero lede: the one number in the pitch. r455 (Wolf 2026-09-04) — the examples are
-         pages a non-banker recognises, and the close names the motive (a skill you meant to
-         pick up; the seat that assumes you have it) rather than the artefact. ---- */
-  set('landingLede', nAll + ' timed drills on a real spreadsheet — a budget vs actual, a simple ' +
-      'P&L, a sales table with a lookup. <b>You’re graded on the finished page</b>, not on which ' +
-      'key you pressed. It is the skill you keep meaning to pick up, and the one an analyst seat ' +
-      'assumes you already have.');
+  /* ---- hero lede: r455.1, ONE sentence, 16 words, still opening on the live total (the
+         e2e-smoke drill-count guard and check-landing both read the front of this string). ---- */
+  set('landingLede', nAll + ' timed drills on a real spreadsheet. <b>You’re graded on the ' +
+      'finished page</b>, not on the keys.');
 
-  /* ---- the catalog rail ---- */
+  /* ---- the catalog rail — r455.1 THE CENTREPIECE. Four facts per card and no prose: the
+         chapter name, the drill count, the FREE/PRO chip, and the skills line out of
+         HK_CHAPTER_SKILLS (above). A chapter with no line renders without one rather than
+         printing "undefined"; dev/check-landing.js fails the build in that case. ---- */
   set('lCatalogH2', groups.length + ' chapters. ' + nAll + ' drills.');
   set('lRail', groups.map((g, i) => {
     const n = g.keys.length;
     const tag = !isPaid(g) ? '<span class="l-tag l-free">free</span>'
               : (proOn ? '<span class="l-tag l-soon">pro</span>'
                        : '<span class="l-tag l-soon">free right now</span>');
+    const sk = (window.HK_CHAPTER_SKILLS || {})[g.name] || '';
     return '<div class="l-chap"><div class="l-cn">' + ('0' + (i + 1)).slice(-2) + '</div>' +
            '<div class="l-cname">' + esc(disp(g)) + '</div>' + tag +
+           (sk ? '<div class="l-cskill">' + esc(sk) + '</div>' : '') +
            '<div class="l-cmeta"><span class="l-ccount">' + n + '</span>' +
            '<span class="l-cunit">drill' + (n === 1 ? '' : 's') + '</span></div></div>';
   }).join(''));
   set('lRailNote', proOn
-    ? 'counts read straight off the live catalog · <b>' + nFree + ' drills are free</b> — the back ' +
-      paidGroups.length + ' chapters are PRO, or earned by levelling'
-    : 'counts read straight off the live catalog · <b>every chapter is playable today</b> — the back ' +
-      paidGroups.length + ' are the PRO chapters');
+    ? '<b>' + nFree + ' drills free</b> · the back ' + paidGroups.length + ' chapters are PRO, or earned by levelling'
+    : '<b>every chapter is playable today</b> · the back ' + paidGroups.length + ' are PRO');
 
   /* ============================ r455 · THE PROGRESSION BAND ============================
      Levels -> rank -> boards -> certificates -> the daily, all counted off the live data.
@@ -29184,33 +29258,28 @@ function paintLanding(){
   const tracks = window.HK_TRACKS || [];
   const pool   = (window.HOTKEY_CHALLENGE_POOL || []).length;
 
-  set('lProgSub', 'Levels come off every clean run. Rank comes off where your times land against ' +
-      'everyone else\u2019s — ' + TIERS.length + ' tiers, from the floor to the one nobody holds for long. ' +
-      'A live board on every drill, ' + tracks.length + ' certificate tracks, and one daily board the ' +
-      'whole site plays.');
   set('lLadder', TIERS.map((t, i) =>
     '<div class="l-rank' + (i === TIERS.length - 1 ? ' l-top' : '') + '">' +
     (window.rankEmblem ? window.rankEmblem(t.name, 22) : '') +
     '<span>' + esc(t.name) + '</span></div>').join(''));
-  /* r455: rank is AUTOMATIC at RANKED_MIN_LVL — the opt-in is gone (that change lands in the
-     ranked round; this line reads the same SSOT nav.js and lb.js read, so it cannot drift). */
+  /* r455.1 — THE ONE LINE. The band's 46-word lede (#lProgSub, deleted from the markup) and the
+     two prose panels below it collapsed into this single derived string: levels, the auto-rank
+     level (HK_RANK.RANKED_MIN_LVL, the same SSOT nav.js and lb.js read), a board per drill, the
+     certificate tracks. Rank is AUTOMATIC at that level, so there is no opt-in left to explain. */
   set('lRankedNote', minLvl
-    ? 'you are ranked automatically at <b>level ' + minLvl + '</b> — no opt-in, nothing to join'
+    ? 'levels from every clean run \u00b7 ranked automatically at <b>level ' + minLvl +
+      '</b> \u00b7 a board on all <b>' + nAll + '</b> drills \u00b7 <b>' + tracks.length + '</b> certificates'
     : '');
-  set('lProgBoards',
-    '<div><span class="l-k">one board per drill</span><br>A live board on all <b>' + nAll +
-      '</b> drills, plus the weekly gauntlets.</div>' +
-    '<div>Rank reads your <b>average placement</b>, not your volume — grinding alone never ' +
-      'moves it.</div>');
+  /* r455.1: the four explainer cards are icon-plus-three-words tiles now. The clock (below) is
+     the one that keeps rows, because those are NUMBERS off the live par ladder, not prose. */
+  set('lProgBoards', '<div><span class="l-k">\u25c6</span><br>one per drill</div>');
   set('lProgCerts',
-    '<div>' + tracks.length + ' tracks, earned on <b>held times</b> — not attendance.</div>' +
     '<div class="l-certs">' + tracks.map(t =>
       '<span class="l-cert">' + esc(t.name) + ' <b>' + t.keys.length + '</b></span>').join('') +
     '</div>');
   set('lProgDaily',
-    '<div><span class="l-k">one board, every day</span><br>The same drill and the same seed for ' +
-      'everyone, worldwide, drawn from a pool of <b>' + pool + '</b>.</div>' +
-    '<div>Top ten wear it on their card until the next one opens.</div>');
+    '<div><span class="l-k">\u25cf</span><br>one seed, worldwide</div>' +
+    '<div>pool of <b>' + pool + '</b></div>');
 
   /* ============================ r455 · PRICING, TWO REAL TIERS =========================
      FREE = the chapters outside HOTKEY_PREMIUM.groups. PRO = the four inside it, each also
@@ -29233,18 +29302,19 @@ function paintLanding(){
   const unlockOf = (g, i) => g.unlock_level ||
     (((window.HOTKEY_PREMIUM || {}).unlock_level || {})[g.name]) || UNLOCK_FALLBACK[i] || null;
 
-  set('lPriceSub', 'The first ' + freeGroups.length + ' chapters are free forever — no account, no ' +
-      'card, no trial clock. PRO opens the ' + paidGroups.length + ' back chapters, and every one of ' +
-      'them is also earnable by levelling, without paying anything.');
+  /* r455.1: #lPriceSub is gone from the markup — it restated the two columns in 34 words.
+     The columns state themselves, and the note under them carries the split. */
 
   set('lFreeChaps', freeGroups.map(g =>
     '<span class="l-pro-chip">' + esc(disp(g)) + ' <span>' + g.keys.length + '</span></span>').join(''));
+  /* r455.1: four bullets, six words each, still every one of them derived. The fifth
+     ("both modes, and joining any desk...") went — the hero chips and the desks section
+     already carry it, and a five-item list is a list nobody finishes reading. */
   set('lFreeList',
-    '<li>The first ' + freeGroups.length + ' chapters — <b>' + nFree + ' drills</b>, open forever</li>' +
-    '<li>Every leaderboard, your level, and all ' + TIERS.length + ' rank tiers</li>' +
-    '<li>All ' + tracks.length + ' certificate tracks, earnable on free drills alone</li>' +
-    '<li>The daily challenge — one board, the same worldwide</li>' +
-    '<li>Both modes, and joining any desk your club or class runs</li>');
+    '<li><b>' + freeGroups.length + ' chapters</b> — ' + nFree + ' drills, forever</li>' +
+    '<li>Every board, your level, ' + TIERS.length + ' ranks</li>' +
+    '<li>All ' + tracks.length + ' certificate tracks</li>' +
+    '<li>The daily challenge</li>');
 
   set('lProPrice', mo ? '<b>' + esc(mo.price) + '</b><span>' + esc(mo.cap) + '</span>' : '<b>—</b>');
   set('lProAlt',   se ? 'or <b>' + esc(se.price) + '</b> ' + esc(se.cap) : '');
@@ -29255,11 +29325,12 @@ function paintLanding(){
     return '<span class="l-pro-chip">' + esc(disp(g)) + ' <span>' + g.keys.length + '</span>' +
            (lv ? ' <em>or LVL ' + lv + '</em>' : '') + '</span>';
   }).join(''));
+  /* r455.1: the perk NAME only. f[1] is the in-app explainer (one to two lines each) and it
+     was eighty words of the pricing column; billing.html is where a buyer reads it. */
   set('lProList', (PRO.features || []).slice(0, 4).map(f =>
-    '<li><b>' + esc(f[0]) + '</b> — ' + esc(f[1]) + '</li>').join(''));
-  set('lProLaterP', 'The PRO chapters hold <b>' + nPaid + ' of the ' + nAll + ' drills</b>. The ' +
-      nFree + ' in front of them are free for good, and any time you have already posted keeps its ' +
-      'place on the board — nothing you earn gets taken back.');
+    '<li><b>' + esc(f[0]) + '</b></li>').join(''));
+  set('lProLaterP', 'PRO holds <b>' + nPaid + ' of the ' + nAll + ' drills</b> · the other ' +
+      nFree + ' stay free');
 
   /* ---- the progression band's "clock" panel: the medal clocks, derived from the live par ladder
          (pass par×1.5 · pro par×1.15 · legendary par×1.0, drills.js:458), so the

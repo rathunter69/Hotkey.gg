@@ -42,3 +42,124 @@ Standing r452/r453 feedback kept: progression up front, later chapters PRO or ea
 2. **The level-earn path on the landing** — each PRO chip says "or LVL 13". Honest, and it is the anti-paywall argument, but it also tells a visitor the paid half is reachable for free. Keep the numbers here, or say "or earned by levelling" and keep the numbers in-app only?
 3. **13 / 16 / 19 / 22** as recommended, or flatten the tail (13/16/18/20)? The landing is the first surface to publish them, so they harden the day this ships.
 4. **The headline** — A shipped; B and C are one edit away if the hours line reads as a claim.
+
+---
+
+# v3.1 — THE CUT (r455, same day)
+
+_Wolf, 2026-09-04, on the v3 page that had shipped an hour earlier: **"Too much text on the
+landing page - make it pithy - so I can identify at a glance what I'll be learning and
+practising."**_
+
+v3 argued its case. It read like an essay: 994 rendered words, five paragraphs of prose before
+the visitor reached a single Excel skill, and the one band that answered the founder's question —
+what will I actually learn? — was eight cards showing a name and a number. v3.1 halves the page
+and spends the savings in exactly one place: the catalog band now says, per chapter, what you
+learn.
+
+## 1 · Word count, per section, before and after
+
+Rendered words in `#landing` (SVG stripped — the rank emblems are art), 1280×800, flag off.
+Counted with a whitespace split over `textContent`, the same way `dev/check-landing.js` now does
+it on every run.
+
+| section | v3 | v3.1 | Δ |
+|---|---:|---:|---:|
+| top nav | 10 | 10 | — |
+| hero (copy + the still) | 143 | 85 | −41% |
+| how it works | 245 | 70 | −71% |
+| **what you'll learn** (catalog) | 77 | 77 | **0%, but rebuilt** |
+| progression | 162 | 66 | −59% |
+| pricing | 265 | 116 | −56% |
+| for desks | 38 | 21 | −45% |
+| the closer | 18 | 18 | — |
+| footer | 36 | 30 | −17% |
+| **TOTAL** | **994** | **493** | **−50.4%** |
+
+The catalog line is the point of the whole round. It costs the same 77 words it always did, but
+v3 spent 34 of them on a lede about "a difficulty spine, not a menu" and 16 on the cards; v3.1
+spends 48 on eight lines of Excel skills and has no lede at all. Same budget, different answer.
+
+What went, by section:
+- **hero** — the lede went from 47 words to 16 (one sentence, still opening on the live drill
+  count); the micro line's second-line hint went; the still's task line lost four words. Eyebrow,
+  H1 (`Learn Excel properly. / The hours come back.`) and the micro line are untouched.
+- **how it works** — the 38-word section lede deleted; the "usual route vs hotkey.gg" comparison
+  collapsed from six bullets to **one line per column**; the three 01/02/03 beats went from
+  paragraphs (118 words) to a heading plus one clause each (39). Par times, medals and the ☆ moved
+  out of beat 03 and into the progression band, which owns them.
+- **what you'll learn** — see §2.
+- **progression** — the 46-word lede and the two prose panels (boards, the daily) collapsed into
+  ONE derived line under the emblems: `levels from every clean run · ranked automatically at
+  level 10 · a board on all 74 drills · 3 certificates`. The eight rank emblems row is unchanged.
+  The four explainer cards shrank to caption-plus-three-words tiles; the medal clock kept its four
+  rows because those are NUMBERS off the live par ladder, not prose.
+- **pricing** — the 34-word section lede deleted. FREE keeps its price, its chapter chips and now
+  four bullets of ≤6 words; PRO keeps its price, its `or LVL n` chips, the freeNow line (13 words,
+  still flag-driven) and four bullets that are now the perk NAME only — `HOTKEY_PRO.features[n][1]`
+  is the in-app explainer and billing.html is where a buyer reads it. The closing note went from
+  39 words to 12.
+- **desks** — one line. The four-part cohort-report list moved to enterprise.html, where the
+  staffer who clicked through is actually deciding.
+- **footer** — only the doubled "affiliated with or endorsed by" went; both legal halves stay.
+
+## 2 · The eight chapter skill lines
+
+The band is the centrepiece now. Every card carries four facts and no prose: chapter name, live
+drill count, FREE/PRO chip, and one line of what it teaches. The lines live in
+**`HK_CHAPTER_SKILLS`**, a single hand-curated map next to `paintLanding()` in index.html.
+
+| # | chapter | drills | tier | what you learn |
+|---|---|---:|---|---|
+| 01 | Foundations | 7 | FREE | navigate, select, edit, fill, undo, first formulas |
+| 02 | Formatting | 9 | FREE | decimals, currency, borders, alignment, paste special |
+| 03 | Formulas I | 9 | FREE | anchors, SUM, SUMIF, growth, margins, tie-outs |
+| 04 | Data & Lookups | 9 | FREE | sort, filter, VLOOKUP, INDEX/MATCH, medians |
+| 05 | Formulas II | 10 | PRO | tracing errors, IFERROR, IF/MIN/MAX, signs, links |
+| 06 | Models I | 10 | PRO | WACC, free cash flow, DCF, comps, bridges |
+| 07 | Models II | 10 | PRO | debt schedules, revolvers, waterfalls, covenants, sweeps |
+| 08 | Full Builds | 10 | PRO | three statements, DCF, LBO, from a blank sheet |
+
+**Why curated and not derived.** Each line summarises the union of that chapter's `teaches` tags
+in `dev/curriculum-v3.json` — but a tag list is a machine index (`anchor($/F4)`,
+`stat-fn(MEDIAN/AVERAGE)`, `corkscrew(roll-forward)`), and the ask was plain words read at a
+glance. Three chapters also carry almost no tags yet (Models II has one, Full Builds has none —
+their drills are whole models, so the curriculum file leans on its per-chapter `teaches_line`
+instead). So this is a curation, and it lives in ONE place rather than half-derived in two and
+drifting. The map's comment in index.html lists, per chapter, exactly which tags each line
+summarises, so the next editor can check the curation against the source without re-deriving it.
+
+## 3 · The rules v3.1 adds
+
+**The word budget.** `dev/check-landing.js` now counts the landing's rendered words and fails
+above **560** — room for a chapter or two of catalog growth, none for a new paragraph. Copy grows
+one paragraph at a time and nobody notices until the founder does; the ratchet is a gate step, not
+a review habit (WORKFLOW §3.3). Raising the cap is a decision and it is made HERE, not in a copy
+edit.
+
+**Every chapter says what it teaches.** The same guard asserts that every rendered chapter card
+carries a non-empty skills line and that `HK_CHAPTER_SKILLS` covers every `HOTKEY_DRILLS.groups`
+entry — so a chapter added to drills.js without a line fails the build instead of shipping a blank
+card. It also holds the lines to the copy law (WORKFLOW §4): no chords in marketing copy —
+"anchors", never "$/F4".
+
+## 4 · What did not change
+
+The headline. The micro line. The price law and the freeNow rule (§3 above) — both guards still
+pass in both flag states. Every number on the page is still derived: the lede's drill total, the
+catalog h2, the per-chapter counts, the eight rank tiers, `RANKED_MIN_LVL`, the certificate
+tracks, the daily pool, the two plan prices, the premium split. Nothing typed was added.
+
+Screenshots re-rendered at deviceScaleFactor 1: `art/landing-v3-light.png` (1440×3342),
+`art/landing-v3-dark.png` (1440×3342), `art/landing-v3-mobile.png` (390×5651). `.landing` is a
+fixed-position dialog with its own scroller, so a full-page capture means growing the viewport to
+`.landing-inner`'s scrollHeight — `fullPage: true` silently returns one viewport.
+
+Tests: `dev/check-landing.js` 39/39 PASS (was 31 assertions; four added, none removed —
+`lProgSub`/`lPriceSub` were markup nodes, not assertions). `dev/check-paywall.js` clean in both
+flag states.
+
+## 5 · Open questions for Wolf (v3 §4 still stands, plus)
+
+5. **The comparison block.** "the usual route / hotkey.gg" survives as one line each. It is the
+   only argumentative copy left on the page. Keep it, or cut it too and let the beats carry it?
