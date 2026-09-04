@@ -88,6 +88,10 @@ jobs:
       # numbers unwatched on exactly the pushes most likely to change them.
       - name: Paywall (flag off = zero change · preview on = full UX · billing counts)
         run: node dev/check-paywall.js
+      # r455: the landing guard joins the gate (written r452, never wired). Ladder / cert /
+      # freeNow-line / price-from-plans assertions; always-on like the paywall guard beside it.
+      - name: Landing (hero, ladder, certs, freeNow line, price law)
+        run: node dev/check-landing.js
       # r452 (bug sweep P1-4): the theme-contrast matrix joins the gate. It was written in r160
       # and never wired in, and it had rotted to 108/379 RED on a clean tree — the ::after border
       # overlay (r442) moved applied-border ink off boxShadow, .gridwrap stopped painting the sheet, and
