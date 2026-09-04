@@ -387,8 +387,8 @@
   .rm-clock{font-family:var(--mono); font-size:12.5px; margin:2px 0 4px}
   .rm-clock span{color:var(--muted)}
   .rm-bonus{font-family:var(--mono); font-size:12px; color:var(--muted); margin:2px 0}
-  /* r455 (Phase B): a LEVEL's closing line on the results card — the clear, and the next level
-     by name. It sits at the TOP of the card body so the hand-off is the first thing read. */
+  /* r455 (Phase B): a TUTORIAL's closing line on the results card — the clear, and the next
+     tutorial by name. It sits at the TOP of the card body so the hand-off is read first. */
   .rm-level{font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:.02em;
     color:var(--accent); margin:4px 0 2px}
   .rm-bonus.ok{color:var(--warn)}
@@ -1533,9 +1533,9 @@
   .pk-byline.pw.focus .vdr-fname{color:var(--text)}   /* keyboard focus still reads clearly — locked is not unreachable */
   /* r425 §2.4: capstone file rows wear the full-color group ring + CAPSTONE tag
      (border color is inlined per row from HOTKEY_GROUP_COLORS — full color, not the dim token) */
-  /* r455 (Phase B): THE LEVEL PATH. A chapter whose drills declare `level.n` renders them as a
-     numbered path under the folder row — cleared / current / open. Free play is never blocked
-     (standing law), so a level chip is never LOCKED: it is a route, not a wall. */
+  /* r455 (Phase B): THE TUTORIAL PATH. A chapter whose drills declare `tutorial.n` renders
+     them as a numbered path under the folder row — cleared / current / open. Free play is never
+     blocked (standing law), so a path chip is never LOCKED: it is a route, not a wall. */
   .pk-levelpath{display:flex; flex-wrap:wrap; align-items:center; gap:6px;
     margin:2px 0 8px 30px; padding:7px 10px; border:1px solid var(--line); border-radius:8px;
     background:var(--surface2); font-family:var(--mono)}
@@ -2290,7 +2290,7 @@
 </head>
 <body>
 <div id="navMount"></div>
-<script src="nav.js?v=306"></script>
+<script src="nav.js?v=307"></script>
 <div class="app">
   <div class="drillbar">
     <button class="db-nav" id="prevDrill" title="previous drill (←/‹)">‹</button>
@@ -2841,12 +2841,12 @@ function stepFsz(cur,dir){ let i=FSZ_LADDER.indexOf(cur==null?FSZ_BASE:cur); if(
   i=Math.max(0,Math.min(FSZ_LADDER.length-1,i+dir)); return FSZ_LADDER[i]===FSZ_BASE?null:FSZ_LADDER[i]; }
 
 /* r455 (Phase B · CURRICULUM_REBUILD §1a) THE L1 SWITCH. Wolf's decision: Foundations becomes
-   five levels and LEVEL 1 REPLACES THE KEYBOARD TOUR — its acts absorb the Tour's first-contact
-   beats. Until the L1 wave ships The Corridor's three-act board, the Tour stays loadable from
-   the ? sheet as "▶ replay the intro" so first-contact teaching does not disappear between two
-   PRs. Flipping this to true removes that link, and CHALLENGES.keyboardtour + HK_TOUR_BEATS +
-   the hkTour* runtime can be deleted in the same commit (the LEVEL runtime below is the part
-   that survives them). */
+   five integrated tutorials and FOUNDATIONS 1 REPLACES THE KEYBOARD TOUR — its steps absorb
+   the Tour's first-contact beats. Until the L1 wave ships Navigate & Select's three-step board,
+   the Tour stays loadable from the ? sheet as "▶ replay the intro" so first-contact teaching
+   does not disappear between two PRs. Flipping this to true removes that link, and
+   CHALLENGES.keyboardtour + HK_TOUR_BEATS + the hkTour* runtime can be deleted in the same
+   commit (the STEP controller below is the part that survives them). */
 const LEVEL1_LIVE=false;
 
 const CHALLENGES = {
@@ -22692,29 +22692,37 @@ const CHALLENGES = {
   },
   navigation:{
     /* ============================================================================
-       r455 (Phase B) THE LEVEL DECLARATION — the controller's first real consumer.
-       Two ACTS that PARTITION navigation's four core checks, each carrying one instruction
-       line per beat, written from this drill's own guide() text so the line and the F1 ladder
-       can never say different things. No cards and no banner: the act's line goes into the
-       drill's own #taskLine and the checklist scopes to the act's beats (Wolf round 2 — the
-       drill surface keeps the site's original chrome). The L1 wave replaces this with The
-       Corridor's full design; the board changes, this shape does not.
-       DEVIATION, named (§0): the Phase B brief said "one act". It ships as TWO so the act
+       r455 (Phase B) THE STEP DECLARATION — dev/CURRICULUM_V3.md §9.0.1, the step
+       controller's first real consumer.
+       Two STEPS that PARTITION navigation's four core checks, each beat carrying its own
+       `why` — the one line the guide surface speaks for that beat. NO CHORDS live here:
+       the keycaps are DERIVED from this drill's own guide() at render (§9.0.1's derivation
+       table — `keys.win` comes from `guide()[id]`, `keys.mac` from hkMacifyKbds), so the
+       line and the F1 ladder can never say different things. No cards and no banner: the
+       beat's line goes into the checklist's own .cl-hint row and the checklist scopes to
+       the open step's beats (Wolf round 2 — the drill surface keeps the site's original
+       chrome). The §9.1 wave replaces this with Navigate & Select's full three-step board;
+       the board changes, this shape does not.
+       DEVIATION, named (§0): the Phase B brief said "one step". It ships as TWO so the step
        BOUNDARY — the handler that must advance the checklist and the line without stopping the
        clock — is exercised end to end by a real drill today, not only by a later wave.
-       Beat indices are into checks(): 0-3 are the cores, 4 is the game ☆ (hidden, never an
-       act's beat) and 5 is the engine-appended save closer, which is the win and belongs to
-       no act.
+       Beat ids are indices into checks(): 0-3 are the cores, 4 is the ☆ (hidden, never a
+       step's beat) and 5 is the engine-appended save closer, which is the win and belongs to
+       no step. `tutorial:` carries the three fields §9.0.1's step shape has no home for — the
+       Foundations number the picker's path reads, and the name + hand-off the results card
+       prints ("Foundations 1 clear — Navigate & Select · next: …").
        ============================================================================ */
-    level:{ n:1, name:'The Corridor', nextKey:'autofit',
-      acts:[
-        { title:'ride the corridor', beats:[0,1],
-          lines:[ {beat:0, text:'Ride each straightaway in one press — Ctrl and an arrow fly to the wall, over every pip on the line.', keys:['ctrl+→','ctrl+↓','ctrl+←','ctrl+↑']},
-                  {beat:1, text:'Land in the block, span it to its far edges, and copy it.', keys:['ctrl+⇧+arrows','ctrl+c']} ] },
-        { title:'bring it home', beats:[2,3],
-          lines:[ {beat:2, text:'No wall holds a teleport — return to A1 and paste the block into the empty room.', keys:['ctrl+home','ctrl+v']},
-                  {beat:3, text:'Finish at the bottom-right corner of everything on the sheet — your pasted block counts now.', keys:['ctrl+end']} ] }
-      ] },
+    tutorial:{ n:1, name:'Navigate & Select', nextKey:'autofit' },
+    steps:[
+      { name:'ride the corridor',
+        why:'a corridor is a handful of flights, not a hundred steps',
+        beats:[ {id:0, why:'Ride each straightaway in one press — Ctrl and an arrow fly to the wall, over every pip on the line.'},
+                {id:1, why:'Land in the block, span it to its far edges, and copy it.'} ] },
+      { name:'bring it home',
+        why:'the far corners of a sheet are one press away, wall or no wall',
+        beats:[ {id:2, why:'No wall holds a teleport — return to A1 and paste the block into the empty room.'},
+                {id:3, why:'Finish at the bottom-right corner of everything on the sheet — your pasted block counts now.'} ] }
+    ],
     par:20, parKeys:17, saveClose:true,   /* r427 H6b-1r3 (§4.1 ROUND 3): par re-swept ×9 seeds after the serpentine rebuild (8–10 corridor legs, was 6–8) — parKeys = measured demo median · r424 H6b-1r2 (§4.1 ROUND 2): corridor rebuild; r423 §1: Ctrl+S closer (engine-appended final beat) */
     aha:'a corridor is a handful of flights, not a hundred steps — Ctrl+arrow eats the straightaways.',
     prompt:'Solid walls carve one long switchback corridor from your empty corner to the model data. Ride the straightaways, turn at the corners, and collect every pip on the way. Copy the whole block, bring it home to A1, save your work, and finish at the far corner of everything you built — the corridor breaks open past the model if you would rather walk there than fly.',
@@ -24887,9 +24895,10 @@ function hkClearPause(){ paused=false; pausedAt=0; try{ hkPauseShow(false); }cat
      - demoPlaying / echoOn scripted playback owns the keyboard. `watch solution` reloads the
                             board and then fires its own keys; a gate would eat beat one and
                             desynchronize the whole replay (and e2e-demo-replay with it).
-     - a LEVEL act card     r455: on a level drill the act-1 card REPLACES the scrim — one
-                            keypress dismisses it AND starts the clock (hkLevelStart →
-                            hkGatePass), so honest t=0 survives with one surface, not two.
+     - a tutorial's step card  r455, HISTORICAL: round 1's step-1 card would have REPLACED
+                            the scrim (one keypress dismissing it AND starting the clock, so
+                            honest t=0 survived one surface). Wolf round 2 deleted the card;
+                            a Foundations tutorial now wears the plain gate like any board.
      - a live session        marathon / rapid-fire have exactly ONE start — the session's own
                             first key, which is what arms marathon.endAt. Re-gating between
                             every card would stack an overlay into a running countdown and put
@@ -25294,7 +25303,7 @@ function hkMicroOffer(items, tSec){   // post-win: offer the rep? on which beats
   try{
     if(gameMode!=='classic' || challengeMode || weeklyMode || (marathon&&marathon.active) ||
        (typeof race!=='undefined'&&race&&race.drill===cur) || __lastSeed==null) return null;
-    if(CHALLENGES[cur] && CHALLENGES[cur].level) return null;   /* r455: `r` is "again" on a level card */
+    if(CHALLENGES[cur] && CHALLENGES[cur].tutorial) return null;   /* r455: `r` is "again" on a tutorial card */
     const C=CHALLENGES[cur];
     const moves=(typeof C.demo==='function')?C.demo.call(C):C.demo;
     if(!moves||!moves.length) return null;   // the prefill rides the demo script
@@ -25407,7 +25416,7 @@ function checkWin(){
   stopClock(); done=true; $('timer').textContent=t.toFixed(2);
   if(marathon && marathon.active){ try{ playSuccessBlip(1); }catch(e){} sessionSolved(t); return; }   /* r349: marathon solves get the quick blip — the session keeps its pace */
   try{ playWinFanfare(); }catch(e){}   /* r349: a classic win is a MOMENT — the fanfare lands with the results card */
-  try{ hkLevelWin(); }catch(e){}      /* r455: a cleared level goes quiet on every replay */
+  try{ hkStepWin(); }catch(e){}      /* r455: a cleared tutorial goes quiet on every replay */
   const C=CHALLENGES[cur];
   let pb=false;
   const sk=scoreKey();
@@ -25695,11 +25704,11 @@ function showResults(o){
     // r176: a celebration overlay owns the keyboard — Enter there must dismiss
     // the toast, not restart the drill underneath (Wolf's report).
     if(window.__hkCelOpen || ev.defaultPrevented) return;
-    /* r455 (Phase B): on a LEVEL card the hand-off is the primary action — ↵ and alt+→ both
-       take the next level by name, and `r` runs this one back. Every other board keeps the
+    /* r455 (Phase B): on a TUTORIAL card the hand-off is the primary action — ↵ and alt+→ both
+       take the next tutorial by name, and `r` runs this one back. Every other board keeps the
        house loop unchanged (↵ again, n/space next). The mistakes replay stands down on a
-       level (hkMicroOffer) so `r` can never mean two things on the same card. */
-    { let LN=null; try{ const L=CHALLENGES[cur]&&CHALLENGES[cur].level;
+       tutorial (hkMicroOffer) so `r` can never mean two things on the same card. */
+    { let LN=null; try{ const L=CHALLENGES[cur]&&CHALLENGES[cur].tutorial;
         if(L && L.nextKey && CHALLENGES[L.nextKey]) LN=L.nextKey; }catch(e){}
       if(LN){
         if(ev.key==='Enter' || (ev.altKey && ev.key==='ArrowRight')){ ev.preventDefault(); hideResults(); loadChallenge(LN); return; }
@@ -25875,18 +25884,18 @@ function _showResults(o){
      the hint says what's actually behind `d`. Everywhere after, the terse label is right. */
   let __firstCard=false;
   try{ __firstCard=(parseInt(localStorage.getItem('hotkey_solves')||'0',10)||0)<=1; }catch(e){}
-  /* r455 (Phase B): a LEVEL closes with its own line and hands off to the next level BY NAME.
-     Everything else on this card is the ordinary drill card \u2014 a level posts, banks a PB, pays
+  /* r455 (Phase B): a TUTORIAL closes with its own line and hands off to the next one BY NAME.
+     Everything else on this card is the ordinary drill card \u2014 a tutorial posts, banks a PB, pays
      xp and takes its \u2606 exactly like any board. */
-  let levelRow='', __lvNext=null, __lvNextName='';
+  let tutRow='', __tutNext=null, __tutNextName='';
   try{
-    const L=CHALLENGES[cur] && CHALLENGES[cur].level;
+    const L=CHALLENGES[cur] && CHALLENGES[cur].tutorial;
     if(L){
-      __lvNext = (L.nextKey && CHALLENGES[L.nextKey]) ? L.nextKey : null;
-      const NL = __lvNext ? (CHALLENGES[__lvNext].level||null) : null;
-      __lvNextName = __lvNext ? String((NL&&NL.name) || CHALLENGES[__lvNext].name || __lvNext) : '';
-      levelRow='<div class="rm-level">\u2606 Level '+(L.n|0)+' clear'+(L.name?' \u2014 '+escHtml(String(L.name)):'')+
-        (__lvNext?' \u00b7 next: '+escHtml(__lvNextName)+' \u2192':'')+'</div>';
+      __tutNext = (L.nextKey && CHALLENGES[L.nextKey]) ? L.nextKey : null;
+      const NL = __tutNext ? (CHALLENGES[__tutNext].tutorial||null) : null;
+      __tutNextName = __tutNext ? String((NL&&NL.name) || CHALLENGES[__tutNext].name || __tutNext) : '';
+      tutRow='<div class="rm-level">\u2606 Foundations '+(L.n|0)+' clear'+(L.name?' \u2014 '+escHtml(String(L.name)):'')+
+        (__tutNext?' \u00b7 next: '+escHtml(__tutNextName)+' \u2192':'')+'</div>';
     }
   }catch(e){}
   const dHint=__firstCard
@@ -25895,7 +25904,7 @@ function _showResults(o){
   m.innerHTML=`<div class="rm-card">`+
     `<div class="rm-title">solved${o.pb?' · ★ new best':''}</div>`+
     `<div class="rm-time">${o.t}<span>s</span></div>`+
-    levelRow+clockRow+practiceRow+bonusRow+capRow+
+    tutRow+clockRow+practiceRow+bonusRow+capRow+
     hookRow+flowRow+
     `<a class="rm-more-t" id="rmMoreT" data-hint="${escHtml(dHint)}"><kbd>d</kbd> ${escHtml(dHint)}</a>`+
     `<div class="rm-more">`+
@@ -25909,8 +25918,8 @@ function _showResults(o){
     `<div class="rm-rank" id="rmRank"></div>`+
     `</div>`+
     `<div class="rm-opts">`+
-    (__lvNext
-      ? `<button class="rm-key primary" data-act="lvnext"><kbd>↵</kbd>next: ${escHtml(__lvNextName)} \u2192</button>`+
+    (__tutNext
+      ? `<button class="rm-key primary" data-act="lvnext"><kbd>↵</kbd>next: ${escHtml(__tutNextName)} \u2192</button>`+
         `<button class="rm-key" data-act="again"><kbd>r</kbd>again</button>`
       : `<button class="rm-key" data-act="again"><kbd>↵</kbd>again</button>`+
         `<button class="rm-key primary" data-act="next"><kbd>n</kbd>next: ${(CHALLENGES[nextDrillKey()]&&(CHALLENGES[nextDrillKey()].name||nextDrillKey()))||'next'} \u2192</button>`)+
@@ -25928,7 +25937,7 @@ function _showResults(o){
   m.querySelectorAll('.rm-key[data-act]').forEach(b=>{ b.onclick=()=>{
     const a=b.dataset.act;
     if(a==='again'){ hideResults(); restartDrill(); }
-    else if(a==='lvnext'){ hideResults(); loadChallenge(__lvNext); }   /* r455: the level hand-off */
+    else if(a==='lvnext'){ hideResults(); loadChallenge(__tutNext); }   /* r455: the tutorial hand-off */
     else if(a==='next'){ hideResults(); loadChallenge(nextDrillKey()); }
     else if(a==='menu'){ hideResults(); openPicker(); }
     else if(a==='micro'){ window.__microOffer=null; hideResults(); startMicroRun(o.micro.targets); }   /* r421 §2.7 */
@@ -26820,11 +26829,11 @@ function updateChecklist(){
   el.classList.toggle('dense', (items||[]).length>=5 || guided);
   try{ hkSplitTick(items); }catch(e){}   /* r421 §2.1: latch per-beat splits off this grading pass */
   try{ hkTierTick(items); }catch(e){}    /* r421 §2.5: a completed tier paints its next region in live */
-  /* r455 (Phase B): the LEVEL/ACT controller grades its acts in the same pass — the drill's own
-     instruction line follows the open beat, and an act closing paints its staged reveal and
-     advances S.act. The checklist below is the NORMAL one, in the NORMAL chrome; the only
-     difference on a coaching level is which rows are in it (hkLevelShows). */
-  try{ hkLevelTick(items); }catch(e){}
+  /* r455 (Phase B): the STEP controller grades its steps in the same pass — the guide's line
+     follows the open beat, and a step closing paints its staged reveal and advances S.step.
+     The checklist below is the NORMAL one, in the NORMAL chrome; the only difference while the
+     guide is coaching is which rows are in it (hkStepShows). */
+  try{ hkStepTick(items); }catch(e){}
   /* r452 §3.0.2(1): on the Keyboard Tour the checklist shows ONLY the open stage's beats — the
      parked stages' beats never render — and the panel is ABSENT until stage 1's third beat,
      where the folded-in "your checklist" callout fires (§3.0.6). Everything below this line is
@@ -26851,9 +26860,9 @@ function updateChecklist(){
     __headTxt=`replay <span>${gotT}/${microRun.targets.length}</span>`;
     __barPct=microRun.targets.length?Math.round(100*gotT/microRun.targets.length):0;
   } else {
-    /* r455: a coaching level names the open act in the head the checklist already has */
-    const __lvA=(levelMode && levelAct>=0 && hkLevelOf(cur)) ? hkLevelOf(cur) : null;
-    __headTxt=(__lvA?`act ${levelAct+1} of ${__lvA.acts.length}`:'checklist')+` <span>${nCore}/${coreItems.length}</span>`+
+    /* r455: a coaching tutorial names the open step in the head the checklist already has */
+    const __stA=(stepMode && stepIdx>=0) ? hkStepsOf(cur) : null;
+    __headTxt=(__stA?`step ${stepIdx+1} of ${__stA.length}`:'checklist')+` <span>${nCore}/${coreItems.length}</span>`+
       (__bonusItem?` <b class="cl-star${__bonusItem.ok?' on':''}" title="bonus — never blocks the win">☆</b>`:'');
     __barPct=coreItems.length?Math.round(100*nCore/coreItems.length):0;
   }
@@ -26863,10 +26872,10 @@ function updateChecklist(){
   html+=`<div class="cl-bar"><div class="cl-bar-fill" style="width:${__barPct}%"></div></div>`;
   html+=hkErrMeterHtml(items);   /* r421 §2.3: the disclosed-error meter (drills.js meta.errorCount) */
   items.forEach((i,idx)=>{
-    /* r455 (Phase B): THE ACT-SCOPED SLICE. On a coaching level the panel shows the open act's
-       beats plus everything already cleared (hkLevelShows) — same rows, same classes, same
+    /* r455 (Phase B): THE STEP-SCOPED SLICE. While the guide coaches, the panel shows the open
+       step's beats plus everything already cleared (hkStepShows) — same rows, same classes, same
        chrome; only the membership changes. Always true on every other board and on a replay. */
-    if(!hkLevelShows(idx, items)) return;
+    if(!hkStepShows(idx, items)) return;
     // The next incomplete task is ALWAYS highlighted (not just in guided mode) —
     // the player should never wonder what to do next. r392: hints OR guided adds the key
     // hints on top (F1 hints = keys without the lock; guided = keys + the cursor fence).
@@ -26897,7 +26906,7 @@ function updateChecklist(){
     html+=`<div class="cl-item${i.ok?' ok':''}${isNext?' next':''}${isBonus?' cl-bonus':''}${!isTarget?' cl-pre':''}"${btip}><span class="cl-box">${i.ok?'✓':''}</span><span class="cl-label">${lab}</span>${split}${keys}</div>`;
   });
   if(C.hint){ const h=C.hint(S); if(h) html+=`<div class="cl-hint">${h}</div>`; }
-  html+=hkLevelHintHtml(items);   /* r455: a coaching level's open-beat line, in the row a drill's own hint() uses */
+  html+=hkStepHintHtml(items);   /* r455: the open beat's guide line, in the row a drill's own hint() uses */
   html+=__altFooter;   /* r356 (sweep): the alt-routes line was BUILT since r-old but never appended — the whole 'many chords, one sheet' promise was invisible */
   html+=`<div class="cl-esc">stuck or off the rails? <kbd>esc</kbd><kbd>esc</kbd> or <kbd>shift+f11</kbd> restarts the drill</div>`;
   el.innerHTML=html;
@@ -30177,22 +30186,22 @@ function openKbd(){
     '<div class="pc-sub">App navigation only — for Excel shortcuts, see the <a href="reference.html" style="color:var(--accent)">reference</a> page.</div>'+
     '<div class="kb-grid">'+sections+'</div>'+
     /* r450 (flow audit P0-2) → r455: the ONLY teaching-replay affordance in the product. The
-       modal product tour it used to replay is deleted; what a player can bring back now is the
-       LEVEL HINTS — one link, every level, back to a first play (hk_level_seen_* cleared).
+       modal product tour it used to replay is deleted; what a player can bring back now is THE
+       GUIDE — one link, every tutorial, back to a first play (hk_guide_* cleared).
        "▶ replay the intro" is the Keyboard Tour, and it renders ONLY while LEVEL1_LIVE is
-       false: the moment the L1 wave ships The Corridor's three acts, level 1 IS the intro and
-       this link (and CHALLENGES.keyboardtour with it) goes. */
+       false: the moment the L1 wave ships Navigate & Select's full board, Foundations 1 IS the
+       intro and this link (and CHALLENGES.keyboardtour with it) goes. */
     '<div class="pc-foot"><span>'+
       (LEVEL1_LIVE?'':'<a id="kbKeyTour" style="color:var(--accent)">▶ replay the intro</a>')+
-      '<a id="kbLevelHints" style="color:var(--accent);margin-left:'+(LEVEL1_LIVE?'0':'14')+'px">↻ show level hints again</a>'+
+      '<a id="kbGuideAgain" style="color:var(--accent);margin-left:'+(LEVEL1_LIVE?'0':'14')+'px">↻ show the guide again</a>'+
       (CHALLENGES[cur]&&CHALLENGES[cur].lesson?'<a id="kbLesson" style="color:var(--accent);margin-left:14px">▤ this drill’s lesson</a>':'')+
       '</span><a id="kbClose">press <kbd>?</kbd> or <kbd>esc</kbd> to close</a></div>'+
     '</div>';
   const c=$('kbClose'); if(c) c.onclick=closeKbd;
-  const lh=$('kbLevelHints'); if(lh) lh.onclick=()=>{ closeKbd();
-    setTimeout(()=>{ try{ const n=hkLevelHintsReset();
-      showToast(n?('level hints are back on \u2014 '+n+' level'+(n===1?'':'s')+' will coach again'):'level hints were already on');
-      if(hkLevelOf(cur)) loadChallenge(cur);
+  const lh=$('kbGuideAgain'); if(lh) lh.onclick=()=>{ closeKbd();
+    setTimeout(()=>{ try{ const n=hkGuideReset();
+      showToast(n?('the guide is back on \u2014 '+n+' tutorial'+(n===1?'':'s')+' will coach again'):'the guide was already on');
+      if(hkStepsOf(cur)) loadChallenge(cur);
     }catch(e){} }, 140); };
   const kt=$('kbKeyTour'); if(kt) kt.onclick=()=>{ closeKbd(); setTimeout(()=>{ try{ startKeyboardTour(); }catch(e){} }, 140); };
   const kl=$('kbLesson'); if(kl) kl.onclick=()=>{ closeKbd(); setTimeout(()=>{ try{ hkLessonReopen(); }catch(e){} }, 140); };
@@ -30956,7 +30965,7 @@ let __stkIV=null, __stkDoneV=false, __stkLandGone=false;
 function __stkTick(){ try{
   if(!S || done || demoPlaying || echoOn || gameMode!=='classic' || window.__stkDone) return;
   if(authOpen || pickerOpen || modesOpen || themesOpen || kbdOpen || sessionOpen || window.__hkCelOpen) return;
-  if(window.__introCardOpen) return;   /* r455: a level act card owns the screen — no start-coach under it */
+  if(window.__introCardOpen) return;   /* r455: a teaching card owns the screen — no start-coach under it */
   // actually-rendered check — onboarded boots hide the landing without the 'gone' class
   if(!__stkLandGone){
     const l=$('landing'); if(l && !l.classList.contains('gone') && l.getClientRects().length>0) return;
@@ -31419,11 +31428,11 @@ window.addEventListener('load', ()=>{ try{
            `!document.querySelector('.ob-card')` — the onboarding cards' own class. Phase B
            deleted every one of those cards, so the guard silently became always-true and the
            daily card started opening over a brand-new player's first board. Say what was
-           meant instead: no landing still up, no level still coaching, and no card on screen. */
+           meant instead: no landing still up, no guide still coaching, and no card on screen. */
         if(challengeEligible() && !challengeDoneToday()
            && localStorage.getItem('hk_dc_seen')!==challengeKey()
            && !(typeof landingOpen!=='undefined' && landingOpen)
-           && !(typeof levelMode!=='undefined' && levelMode)
+           && !(typeof stepMode!=='undefined' && stepMode)
            && !window.__introCardOpen
            && !document.querySelector('.ob-card')){
           localStorage.setItem('hk_dc_seen', challengeKey());
@@ -31655,7 +31664,7 @@ function gateInfoEsc(e){
 }
 function openGateInfo(gname){
   const g=(window.HOTKEY_GATES&&window.HOTKEY_GATES.groups||{})[gname]; if(!g) return;
-  // r174 → r455: with a teaching card up (a level act card, the Tour's stage card) a locked
+  // r174 → r455: with a teaching card up (the Tour's stage card) a locked
   // tier gets a toast, not a modal — the card's scrim sits above modal z and made the gate
   // card visible-but-unclickable (Wolf's stuck box).
   if(window.__introCardOpen){ try{ showToast(gname+' unlocks as you level \u2014 finish this level first'); }catch(e){} return; }
@@ -31804,9 +31813,10 @@ function loadChallenge(key, opts){
   let __tourReload=false;
   try{ if(tourMode){ if(key!=='keyboardtour') hkTourAbort();
                      else if(tourStage>=0 || __tourCardOn) __tourReload=true; } }catch(e){}
-  /* r455: any load leaves the level that was coaching — the picker, a drill switch, a restart,
-     the results card's "next". hkLevelStart() re-arms below if the NEW board is a level. */
-  try{ hkLevelAbort(); }catch(e){}
+  /* r455: any load leaves the tutorial that was coaching — the picker, a drill switch, a
+     restart, the results card's "next". hkStepStart() re-arms below if the NEW board declares
+     steps. */
+  try{ hkStepAbort(); }catch(e){}
   try{ window.__stkT=Date.now(); window.__stkBase=null; window.__stkDone=false; }catch(e){}
   // r158: progression gate — daily runs and armed races ride through (community
   // moments); everything else locked-tier bounces to the explainer, state untouched.
@@ -31929,11 +31939,11 @@ function loadChallenge(key, opts){
      one keypress dismisses it AND starts the clock, so r450's honest t=0 holds with one
      surface instead of two. No-op on every drill that declares no `lesson`. */
   try{ hkLessonMaybeGate(); }catch(e){}
-  /* r455 (Phase B): arm the LEVEL/ACT controller. It does not touch the r450 gate — it only
-     points the drill's own instruction line at the open act's beat and scopes the checklist to
-     that act. No-op on every drill that declares no `level`, and on a replay of a cleared one
-     (hk_level_seen_<key>). */
-  try{ hkLevelStart(); }catch(e){}
+  /* r455 (Phase B): arm the STEP controller. It does not touch the r450 gate — it only points
+     the checklist's hint row at the open step's beat and scopes the checklist to that step.
+     No-op on every drill that declares no `steps`, and on a replay of a cleared one
+     (hk_guide_<key>). */
+  try{ hkStepStart(); }catch(e){}
   /* r452: a restart of the Tour's own board (Esc\u00b7Esc, Shift+F11) throws the beat latches away
      with S — so re-enter at stage 1 rather than leaving the HUD speaking for a stage whose
      board no longer exists. */
@@ -32095,13 +32105,13 @@ function buildSheetTabs(){   // r147: THE DATA ROOM — VDR file tree (was r80 s
       if(__t){ __t.style.cursor='pointer'; __t.title='what comes with PRO';
         __t.onclick=(e)=>{ e.stopPropagation(); if(window.hkProSheet) window.hkProSheet('The '+g.name+' tier'); }; } }
     tree.appendChild(f);
-    /* r455 (Phase B) THE LEVEL PATH. Any chapter holding drills that declare `level.n` gets a
-       numbered path strip under its folder row, read straight off the CHALLENGES entries — the
-       one place level order lives. Cleared levels wear a check, the open board is `cur`, and
-       nothing is ever LOCKED: free play stays open (standing law), so the path is a route the
-       chapter recommends, not a wall. Non-level drills in the same fold render as they always
-       have, in the byline rows below. */
-    { const lv=g.keys.map(k=>({k, L:(CHALLENGES[k]&&CHALLENGES[k].level)||null}))
+    /* r455 (Phase B) THE TUTORIAL PATH. Any chapter holding drills that declare `tutorial.n`
+       gets a numbered path strip under its folder row, read straight off the CHALLENGES entries
+       — the one place tutorial order lives. Cleared tutorials wear a check, the open board is
+       `cur`, and nothing is ever LOCKED: free play stays open (standing law), so the path is a
+       route the chapter recommends, not a wall. Every other drill in the same fold renders as it
+       always has, in the byline rows below. */
+    { const lv=g.keys.map(k=>({k, L:(CHALLENGES[k]&&CHALLENGES[k].tutorial)||null}))
                      .filter(x=>x.L).sort((a,b)=>(a.L.n|0)-(b.L.n|0));
       if(lv.length){
         const strip=document.createElement('div'); strip.className='pk-levelpath';
@@ -32948,7 +32958,7 @@ function hkEnterFirstBoard(){
   if(first && !deep && CHALLENGES[MENU_ORDER[0]] && cur!==MENU_ORDER[0]){ loadChallenge(MENU_ORDER[0]); return; }
   /* the card was held while the landing covered the viewport (r452 audit P1-7: a card raised
      behind the landing is a card nobody sees) — raise it now the trainer is actually visible */
-  try{ hkLevelStart(); }catch(e){}
+  try{ hkStepStart(); }catch(e){}
 }
 function tryEnter(){ enterRequested=true; ev('enter'); if(!sb){ dismissLanding(); return; } advanceAccess(); }
 
@@ -33382,8 +33392,8 @@ function hkTourFinish(){
   }, ()=>{ __tourCardOn=false; hkTourHandoff(); });
 }
 function hkTourHandoff(){
-  /* r455: the Tour's hand-off is now a plain hand-off — it drops the player on level 1 with
-     rails AND hints off, exactly like every other route onto a board. The level/act controller
+  /* r455: the Tour's hand-off is now a plain hand-off — it drops the player on Foundations 1
+     with rails AND hints off, exactly like every other route onto a board. The step controller
      coaches from here, in the checklist (P5: hints stay off by default; F1 is still by hand). */
   tourMode=false; hkTourHudHide();
   try{ document.body.classList.remove('hk-tour'); }catch(e){}
@@ -33523,99 +33533,108 @@ function hkLessonReopen(){
 }
 
 /* ============================================================================
-   r455 (Phase B · dev/CURRICULUM_REBUILD.md P5) THE LEVEL / ACT CONTROLLER.
+   r455 (Phase B · dev/CURRICULUM_REBUILD.md P5 · dev/CURRICULUM_V3.md §9.0) THE STEP
+   CONTROLLER.
 
    Wolf, 2026-09-03 (round 2, binding — this SUPERSEDES the pixel-game framing of the first
    pass): pixel art is IDENTITY only (rank, level, achievements, the player card). The drill
    surface — board, checklist, instruction line, cards — keeps the site's ORIGINAL chrome,
    exactly as every existing drill looks today. Foundations drills are "integrated tutorial"
    drills in the leetcode sense (problem + guide + hints + editorial), NOT game acts with
-   story cards.
+   story cards. §9.0 names the pieces: STEPS, a guide surface, a hint ladder — never "levels"
+   or "acts", which were this controller's first-cut vocabulary and are gone from it.
 
    So what survives from the first pass is the CONTROLLER, not the costume:
-     · a level is a NORMAL, TIMED drill — checkWin fires, the clock runs, recordRun posts, PB,
-       XP, leaderboards and the ☆ all behave exactly as on any other board. No new modes.
-     · its checks are split into ACTS. The open act is `S.act`, and the checklist shows the
-       open act's slice (plus everything already cleared) in the EXISTING checklist chrome.
-     · the open beat's instruction rides the checklist's OWN `.cl-hint` row — the row a drill
+     · a Foundations drill is a NORMAL, TIMED drill — checkWin fires, the clock runs, recordRun
+       posts, PB, XP, leaderboards and the ☆ all behave exactly as on any other board. No modes.
+     · its checks are grouped into STEPS. The open step is `S.step`, and the checklist shows the
+       open step's slice (plus everything already cleared) in the EXISTING checklist chrome.
+     · the open beat's line rides the checklist's OWN `.cl-hint` row — the row a drill
        already uses for its `hint(S)` copy. That is the whole teaching surface: no banner, no
        overlay, no card, and not one new class.
-     · an act boundary is the checklist advancing to the next slice, with its head naming the
-       act and its hint row naming the beat. Nothing else: no scrim, no card, no animation.
-     · THE CLOCK NEVER STOPS across an act boundary — a level is one timed run.
-     · on the win, `hk_level_seen_<key>` latches and every replay is a plain, quiet drill: the
-       hint row goes back to the drill's own hint(), and the checklist shows every beat.
-       The ? sheet's "↻ show level hints again" clears the flags.
+     · a step boundary is the checklist advancing to the next slice, with its head naming the
+       step and its hint row naming the beat. Nothing else: no scrim, no card, no animation.
+     · THE CLOCK NEVER STOPS across a step boundary — a tutorial is one timed run.
+     · on the win, `hk_guide_<key>` latches 'done' (§9.0.2's latch table) and every replay is a
+       plain, quiet drill: the hint row goes back to the drill's own hint(), and the checklist
+       shows every beat. The ? sheet's "↻ show the guide again" clears the latches.
 
    WHAT IS DELIBERATELY NOT HERE (dropped on Wolf's round-2 direction, recorded so nobody
-   rebuilds it): the act CARD (a scrim card between acts), the HUD BANNER over the grid, the
+   rebuilds it): the step CARD (a scrim card between steps), the HUD BANNER over the grid, the
    target ring, and the dissolve/reveal animation. The r452 Keyboard Tour still owns its own
    HUD and stage cards — it is the legacy intro, reachable only from the ? sheet while
    LEVEL1_LIVE is false, and it is deleted whole when L1 ships.
 
-   ---- THE DATA CONTRACT (a CHALLENGES entry declares it; nothing else changes) ----
+   ---- THE DATA CONTRACT (§9.0.1; a CHALLENGES entry declares it beside checks/guide/targets) --
 
-     level:{
-       n: 1,                          // the level number. The picker's level path reads it.
-       name: 'The Corridor',          // the results card's "Level n clear · next: <name> →"
-       acts: [{
-         title: 'ride the corridor',  // the act's name — the checklist head reads "act n of N"
-         beats: [0,1],                // indices into THIS drill's checks(); the act's slice
-         lines: [{beat:0, text:'…', keys:['ctrl+→']}, …],  // the checklist's hint row per beat, ≥1
-         reveal:{ 'G3':{value:'…'} }  // OPTIONAL staging: cells painted when the act closes
-         // — or `tier:<i>`, which leaves the reveal to build()'s tiers[] and hkTierTick
-       }, …],
-       nextKey: 'blocksel'            // the level this one hands off to
-     }
+     steps: [{
+       name: 'ride the corridor',   // the step header — the checklist head reads "step n of N"
+       why:  'a corridor is a handful of flights, not a hundred steps',   // the step's aha line
+       beats: [{ id:0, why:'…' }],  // id = the index into checks()/guide()/targets(); why = the
+                                    // beat's one line. NO CHORDS: keys are derived from guide()
+       reveal:{ 'G3':{value:'…'} }  // OPTIONAL staging: cells painted when the step closes
+       // — or `tier:<i>`, which leaves the reveal to build()'s tiers[] and hkTierTick
+     }, …]
+     tutorial:{ n:1, name:'Navigate & Select', nextKey:'blocksel' }
+       // the two fields §9.0.1's step shape has no home for: `n` is the Foundations number the
+       // picker's path strip reads, `name`/`nextKey` are what the results card hands off to.
 
-   Invariants (dev/check-invariants.js C26): the acts PARTITION the drill's core checks (each
-   core beat in exactly one act, none left over, none twice), and every act carries at least
-   one instruction line pointing at one of its own beats.
+   DERIVED, never stored (§9.0.1's derivation table): a beat's `hud` line is checks()[id].label
+   (the checklist row IS the instruction), its Windows keycaps are guide()[id]'s own <kbd> runs,
+   and its Mac keycaps are hkMacifyKbds at render. Nothing duplicates a chord.
+
+   Invariants (dev/check-invariants.js C26): the steps PARTITION the drill's core checks (each
+   core beat in exactly one step, none left over, none twice), every beat carries a `why`, and
+   no step literal carries a chord of its own.
    ============================================================================ */
-let levelMode=false;      // the level controller is coaching this board (line + act slice)
-let levelAct=-1;          // the open act; mirrored onto S.act for the checklist and the tests
-let __lvPrevOk=0;         // graded-beat count at the last tick
+let stepMode=false;      // the step controller is coaching this board (line + step slice)
+let stepIdx=-1;          // the open step; mirrored onto S.step for the checklist and the tests
+let __stPrevOk=0;         // graded-beat count at the last tick
 
-function hkLevelOf(k){ try{ const C=CHALLENGES[k];
-  return (C && C.level && C.level.acts && C.level.acts.length) ? C.level : null; }catch(e){ return null; } }
-function hkLevelSeen(k){ try{ return localStorage.getItem('hk_level_seen_'+k)==='1'; }catch(e){ return false; } }
-function hkLevelSeenSet(k){ try{ localStorage.setItem('hk_level_seen_'+k,'1'); }catch(e){} }
-/* the ? sheet's "↻ show level hints again" — one line, every level, back to a first play */
-function hkLevelHintsReset(){
+function hkStepsOf(k){ try{ const C=CHALLENGES[k];
+  return (C && C.steps && C.steps.length) ? C.steps : null; }catch(e){ return null; } }
+function hkTutOf(k){ try{ const C=CHALLENGES[k]; return (C && C.tutorial) ? C.tutorial : null; }catch(e){ return null; } }
+/* §9.0.2's latch table: 'done' on the first posted run, 'off' if the player closed the guide. */
+function hkGuideSeen(k){ try{
+  if(localStorage.getItem('hk_level_seen_'+k)==='1'){ localStorage.setItem('hk_guide_'+k,'done'); localStorage.removeItem('hk_level_seen_'+k); }   /* r455: one-line migration off the pre-rename latch */
+  const v=localStorage.getItem('hk_guide_'+k); return v==='done'||v==='off'; }catch(e){ return false; } }
+function hkGuideSeenSet(k){ try{ localStorage.setItem('hk_guide_'+k,'done'); }catch(e){} }
+/* the ? sheet's "↻ show the guide again" — one line, every tutorial, back to a first play */
+function hkGuideReset(){
   const kill=[];
   try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i);
-        if(k && k.indexOf('hk_level_seen_')===0) kill.push(k); }
+        if(k && k.indexOf('hk_guide_')===0) kill.push(k); }
        kill.forEach(k=>localStorage.removeItem(k)); }catch(e){}
-  try{ ev('level_hints_on',{n:kill.length}); }catch(e){}
+  try{ ev('guide_on',{n:kill.length}); }catch(e){}
   return kill.length;
 }
-function hkLevelAbort(){
-  if(!levelMode) return;
-  levelMode=false; levelAct=-1; __lvPrevOk=0;
-  try{ if(S) S.act=-1; }catch(e){}
+function hkStepAbort(){
+  if(!stepMode) return;
+  stepMode=false; stepIdx=-1; __stPrevOk=0;
+  try{ if(S) S.step=-1; }catch(e){}
 }
-function hkLevelStart(){
+function hkStepStart(){
   /* Called from loadChallenge AFTER hkGateArm. It does NOT touch the gate: the r450 scrim is
      the site's own start surface and it stays exactly as it is on every other drill. All this
-     does is arm the controller so the instruction line and the act slice speak from the first
+     does is arm the controller so the beat's line and the step slice speak from the first
      key. Declines for the same reasons the gate declines, plus one of its own: a REPLAY. */
   try{
-    if(S) S.act=-1;                // every board starts with no open act; a level claims one below
-    if(!hkLevelOf(cur)) return;
+    if(S) S.step=-1;                // every board starts with no open step; a tutorial claims one below
+    if(!hkStepsOf(cur)) return;
     if(tourMode || sandboxMode || demoPlaying || echoOn || microRun || microPrefill) return;
     if(gameMode!=='classic') return;
     if(marathon && marathon.active) return;
     if(hkGateOff()) return;        // the documented dev-harness opt-out — same rule as the gate
-    if(hkLevelSeen(cur)) return;   // a REPLAY: a plain, quiet, timed drill (Wolf, binding)
-    levelMode=true; levelAct=0; __lvPrevOk=0;
-    if(S) S.act=0;
-    try{ ev('level_start',{k:cur}); }catch(e){}
-    hkLevelGateLine();
+    if(hkGuideSeen(cur)) return;   // a REPLAY: a plain, quiet, timed drill (Wolf, binding)
+    stepMode=true; stepIdx=0; __stPrevOk=0;
+    if(S) S.step=0;
+    try{ ev('step_start',{k:cur}); }catch(e){}
+    hkStepGateLine();
   }catch(e){}
 }
-function hkLevelGateLine(){
+function hkStepGateLine(){
   /* THE ONE LINE THE COMFORT QUESTION LEFT BEHIND (P5): a player who already flies skips the
-     tutorial levels outright, without being asked a question first. It rides on the r450 start
+     Foundations tutorials outright, without being asked a question first. It rides on the r450 start
      gate's own sub-line — the existing surface, one extra sentence, no new chrome. */
   try{
     const sub=document.querySelector('#hkGate .hk-gate-sub');
@@ -33623,67 +33642,79 @@ function hkLevelGateLine(){
     const a=document.createElement('a');
     a.id='lcSkip'; a.textContent='already fly? skip the tutorial →';
     a.style.cssText='display:block;margin-top:7px;color:var(--accent);cursor:pointer';
-    a.onclick=(e)=>{ e.preventDefault(); e.stopPropagation(); hkLevelSkip(); };
+    a.onclick=(e)=>{ e.preventDefault(); e.stopPropagation(); hkStepSkip(); };
     sub.appendChild(a);
   }catch(e){}
 }
-function hkLevelSkip(){
-  /* latch every level's seen flag (nothing coaches again) and land on the first drill outside
+function hkStepSkip(){
+  /* latch every tutorial's guide flag (nothing coaches again) and land on the first drill outside
      the tutorial chapter — the first one that is neither gated nor paywalled. */
   try{
-    MENU_ORDER.forEach(k=>{ if(hkLevelOf(k)) hkLevelSeenSet(k); });
-    hkLevelAbort();
+    MENU_ORDER.forEach(k=>{ if(hkStepsOf(k)) hkGuideSeenSet(k); });
+    hkStepAbort();
     try{ hkGateClear(); }catch(e){}
-    try{ ev('level_skip',{}); }catch(e){}
+    try{ ev('step_skip',{}); }catch(e){}
     const g0=GROUP_OF[MENU_ORDER[0]];
     const out=MENU_ORDER.filter(k=>GROUP_OF[k] && GROUP_OF[k]!==g0);
     const k=out.filter(x=>!drillLocked(x) && !drillPaywalled(x))[0] || out[0] || MENU_ORDER[0];
     loadChallenge(k);
   }catch(e){}
 }
-function hkLevelFirstOpen(items){
-  /* the first ungraded beat of the OPEN act — the one the instruction line is speaking for */
-  const L=hkLevelOf(cur); if(!L || levelAct<0) return -1;
-  const A=L.acts[levelAct]; if(!A) return -1;
+function hkStepFirstOpen(items){
+  /* the first ungraded beat of the OPEN step — the one the guide line is speaking for */
+  const ST=hkStepsOf(cur); if(!ST || stepIdx<0) return -1;
+  const A=ST[stepIdx]; if(!A) return -1;
   let it=items;
   if(!it){ try{ it=CHALLENGES[cur].checks(S); }catch(e){ return -1; } }
-  for(const i of (A.beats||[])) if(it[i] && !it[i].ok) return i;
+  for(const b of (A.beats||[])) if(b && it[b.id] && !it[b.id].ok) return b.id;
   return -1;
 }
-function hkLevelHintHtml(items){
-  /* THE ACT'S INSTRUCTION LINE, in the checklist's OWN hint row. `.cl-hint` is the row a drill
+function hkStepCaps(i){
+  /* §9.0.1: a beat's keycaps are DERIVED from the drill's own guide() line — the <kbd> runs of
+     `guide()[i]`, lifted verbatim, so the guide surface and the F1 ladder read one array and no
+     step literal ever carries a second copy of a chord. hkMacifyKbds (themes.js) rewrites them
+     for Mac at render, exactly as it does for every other keycap on the page. */
+  try{
+    const C=CHALLENGES[cur]; if(!C || typeof C.guide!=='function') return '';
+    const g=String(((C.__gCache || (C.__gCache=C.guide.call(C)))||[])[i]||'');
+    const runs=g.match(/<kbd>[\s\S]*?<\/kbd>(?:\s*\+\s*<kbd>[\s\S]*?<\/kbd>)*/g)||[];
+    return runs.join(' ');
+  }catch(e){ return ''; }
+}
+function hkStepHintHtml(items){
+  /* THE OPEN BEAT'S LINE, in the checklist's OWN hint row. `.cl-hint` is the row a drill
      already uses for its `hint(S)` copy (updateChecklist), so this adds no chrome at all: same
-     panel, same class, same type. It carries the open beat's sentence and that beat's chords as
-     ordinary <kbd> caps, exactly like every guide line on the site.
+     panel, same class, same type. It carries the beat's `why` and that beat's chords as
+     ordinary <kbd> caps — derived from guide(), never stored twice (§9.0.1).
      (NOT #taskLine — that element has been display:none since r49; writing the lesson there
      would have taught nobody. Caught in the r455 render review.) */
   try{
-    if(!levelMode || levelAct<0) return '';
-    const L=hkLevelOf(cur), A=L && L.acts[levelAct]; if(!A) return '';
-    const i=hkLevelFirstOpen(items); if(i<0) return '';
-    const ln=(A.lines||[]).filter(x=>x && x.beat===i)[0] || (A.lines||[])[0];
-    if(!ln) return '';
-    const caps=(ln.keys||[]).map(k=>'<kbd>'+escHtml(k)+'</kbd>').join(' ');
-    return '<div class="cl-hint">'+escHtml(String(ln.text||''))+(caps?'<br>'+caps:'')+'</div>';
+    if(!stepMode || stepIdx<0) return '';
+    const ST=hkStepsOf(cur), A=ST && ST[stepIdx]; if(!A) return '';
+    const i=hkStepFirstOpen(items); if(i<0) return '';
+    const bt=(A.beats||[]).filter(x=>x && x.id===i)[0] || (A.beats||[])[0];
+    if(!bt) return '';
+    const caps=hkStepCaps(bt.id);
+    return '<div class="cl-hint">'+escHtml(String(bt.why||''))+(caps?'<br>'+caps:'')+'</div>';
   }catch(e){ return ''; }
 }
-function hkLevelShows(idx, items){
-  /* THE ACT-SCOPED CHECKLIST SLICE. While a level coaches, the checklist shows the OPEN act's
-     beats plus everything already cleared — so the panel reads as the run's progress and never
-     as a wall of beats from three acts away. Same rows, same classes, same chrome as every
+function hkStepShows(idx, items){
+  /* THE STEP-SCOPED CHECKLIST SLICE. While the guide coaches, the checklist shows the OPEN
+     step's beats plus everything already cleared — so the panel reads as the run's progress and
+     never as a wall of beats from three steps away. Same rows, same classes, same chrome as every
      other drill; the only difference is which rows are in it. The ☆ and the engine-appended
-     save closer always show: they belong to the drill, not to an act. */
+     save closer always show: they belong to the drill, not to a step. */
   try{
-    if(!levelMode || levelAct<0) return true;
-    const L=hkLevelOf(cur), A=L && L.acts[levelAct]; if(!A) return true;
+    if(!stepMode || stepIdx<0) return true;
+    const ST=hkStepsOf(cur), A=ST && ST[stepIdx]; if(!A) return true;
     const it=items && items[idx];
     if(it && (it.bonus || it.save)) return true;
     if(it && it.ok) return true;
-    return (A.beats||[]).indexOf(idx)>=0;
+    return (A.beats||[]).some(b=>b && b.id===idx);
   }catch(e){ return true; }
 }
-function hkLevelReveal(A){
-  /* an act may stage its region either through the r421 §2.5 tier ladder (`tier:<i>`, declared
+function hkStepReveal(A){
+  /* a step may stage its region either through the r421 §2.5 tier ladder (`tier:<i>`, declared
      in build().tiers — hkTierTick already owns it) or inline here (`reveal:{ref:cell}`). The
      cells simply appear on the next paint: no dissolve, no flourish. */
   try{
@@ -33696,37 +33727,37 @@ function hkLevelReveal(A){
     if(bottom>S.ROWS) S.ROWS=bottom;
     try{ recalc(); }catch(e){}
     try{ if(guided) railZoneCompute(); }catch(e){}
-    /* repaint OUTSIDE this grading pass — hkLevelTick runs inside updateChecklist, which runs
+    /* repaint OUTSIDE this grading pass — hkStepTick runs inside updateChecklist, which runs
        inside render() (the hkTierTick precedent). */
-    if(!S._lvRepaint){ S._lvRepaint=1;
-      setTimeout(()=>{ try{ S._lvRepaint=0; render(); }catch(e){} }, 0); }
+    if(!S._stRepaint){ S._stRepaint=1;
+      setTimeout(()=>{ try{ S._stRepaint=0; render(); }catch(e){} }, 0); }
   }catch(e){}
 }
-function hkLevelTick(items){
-  /* THE ACT-COMPLETION HANDLER. Driven from updateChecklist — the same pass that runs
-     hkTierTick, so an act's staged region paints in as its last beat grades. An act boundary
+function hkStepTick(items){
+  /* THE STEP-COMPLETION HANDLER. Driven from updateChecklist — the same pass that runs
+     hkTierTick, so a step's staged region paints in as its last beat grades. A step boundary
      costs the player nothing: the clock keeps running, no overlay appears, the checklist
-     advances to the next slice and the instruction line changes. */
-  if(!levelMode || !items) return;
-  const L=hkLevelOf(cur); if(!L || levelAct<0) return;
+     advances to the next slice and the guide's line changes. */
+  if(!stepMode || !items) return;
+  const ST=hkStepsOf(cur); if(!ST || stepIdx<0) return;
   const n=items.filter(x=>x.ok).length;
-  if(n!==__lvPrevOk) __lvPrevOk=n;
-  const A=L.acts[levelAct];
-  if(!(A.beats||[]).every(i=>items[i] && items[i].ok)) return;
-  hkLevelReveal(A);
-  if(levelAct+1>=L.acts.length) return;   // the last act ends on the drill's own win
-  levelAct++;
-  if(S) S.act=levelAct;
+  if(n!==__stPrevOk) __stPrevOk=n;
+  const A=ST[stepIdx];
+  if(!(A.beats||[]).every(b=>b && items[b.id] && items[b.id].ok)) return;
+  hkStepReveal(A);
+  if(stepIdx+1>=ST.length) return;   // the last step ends on the drill's own win
+  stepIdx++;
+  if(S) S.step=stepIdx;
 }
-function hkLevelWin(){
-  /* the level is cleared — latch the seen flag so every replay is a plain drill. Everything
-     else (PB, xp, recordRun, the ☆, the leaderboard post) is the ordinary drill path, because
-     a level IS an ordinary drill. */
+function hkStepWin(){
+  /* the tutorial is cleared — latch hk_guide_<key>='done' so every replay is a plain drill.
+     Everything else (PB, xp, recordRun, the ☆, the leaderboard post) is the ordinary drill
+     path, because a Foundations tutorial IS an ordinary drill. */
   try{
-    if(!hkLevelOf(cur)) return;
-    hkLevelSeenSet(cur);
-    levelMode=false; levelAct=-1;
-    if(S) S.act=-1;
+    if(!hkStepsOf(cur)) return;
+    hkGuideSeenSet(cur);
+    stepMode=false; stepIdx=-1;
+    if(S) S.step=-1;
   }catch(e){}
 }
 

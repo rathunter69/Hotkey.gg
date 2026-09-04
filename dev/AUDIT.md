@@ -137,6 +137,29 @@ Renders (Daylight + a dark theme, 1440×900): `level-{1-gate,2-act1,3-act2,4-res
   existing ☆ (no new visible-☆ rule), and `HOTKEY_CLOCKS`' "generous pass clocks" for levels are
   untouched — `navigation` keeps its swept par. Both belong with the L1 content wave.
 
+### Reconciliation, same round: the controller now speaks the spec's language (r455, appended)
+
+_Everything above stands as built; this is a RENAME with no behaviour change, bringing the code to
+`dev/CURRICULUM_V3.md` §9.0's vocabulary — the file's "levels" and "acts" were the pre-§9 game
+framing._ `S.act`→`S.step` · `levelMode/levelAct`→`stepMode/stepIdx` · `hkLevel*`→`hkStep*`
+(`hkStepShows`, `hkStepTick`, `hkStepHintHtml`, `hkStepStart`/`Win`/`Skip`/`Abort`/`Reveal`) and
+the latch pair `hkGuideSeen`/`hkGuideReset` · the checklist head reads **"step 1 of 2"**, not
+"ACT 1 OF 2" · the ? sheet reads **"↻ show the guide again"** · the results card reads
+**"Foundations 1 clear — Navigate & Select · next: Autofit →"** (was "Level 1 clear — The
+Corridor"). **Data shape:** `level:{n,name,nextKey,acts:[…]}` becomes §9.0.1's
+`steps:[{name, why, beats:[{id, why}]}]` plus a sibling `tutorial:{n, name, nextKey}` — the three
+fields §9.0.1's step shape has no home for, and the smallest faithful split. Each act's
+`lines:[{beat,text,keys}]` folded into its beats: `text` became the beat's `why`, and **`keys` was
+DELETED** — the keycaps are now derived at render from `guide()[id]`'s own `<kbd>` runs
+(`hkStepCaps`, §9.0.1's derivation table), so no step literal carries a second copy of a chord.
+**Latch:** `hk_level_seen_<key>='1'` → `hk_guide_<key>='done'` (§9.0.2's table), migrated in one
+line inside `hkGuideSeen()`; the old prefix stays in nav.js's sign-out sweep one round. C26 is
+re-pointed at the step contract and gains two guards — no `keys:` in a step literal, and the
+controller must derive its caps through `hkStepCaps`. Suite: check-invariants C1–C26 clean ·
+check-startgate clean (§8c re-titled "a TUTORIAL is gated like any other drill") · e2e-audit-onboard
+**86 pass** (was 84; +2 for the derived-caps and the tutorial-name assertions) · e2e-smoke clean ·
+check-cache-versions clean (`nav.js` 306 → 307 across 15 html).
+
 ## r452 — THE FULL LOCAL GATE ON THE MERGED BRANCH (close of the build day)
 
 _gate.yml runs only on PRs and pushes to main, so the branch never saw CI. The whole matrix ran
