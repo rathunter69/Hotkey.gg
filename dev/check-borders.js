@@ -26,8 +26,15 @@
  *
  * So this version MEASURES. It screenshots a band straddling each edge in the REAL app,
  * decodes it through a canvas in the browser (no npm image dependency — CI installs only
- * playwright-core), and counts the longest run of dark pixels across the edge. Then it asserts
- * the painted width, not merely that it differs.
+ * playwright-core), and asserts the painted width, not merely that it differs.
+ *
+ * r457 changed HOW it reads that band, after `Alt H B A — all borders (.ball), right` failed on
+ * the gate about one run in three. The old reader thresholded ONE scanline against its own median
+ * and called the rest ink; r457 shoots the same clip twice — border classes on, then off — and
+ * the rule is the pixels that MOVED, measured on every scanline in the band with the longest run
+ * winning. Nothing is inferred about the background any more, so the sample cell's right-aligned
+ * `7777`, the faint gridline and the theme all subtract themselves out. See bandDiff() for the
+ * full argument, and installOverlayGuards() for what was actually covering the sheet.
  *
  * It also drives the real render path for every case: flags go onto the cell model and through
  * render(), because the third layer of the original bug was render() never emitting bl/br/thick
@@ -39,14 +46,33 @@
 const { chromium } = require('playwright-core');
 
 const BASE = process.env.BASE || 'http://127.0.0.1:8791';
-const DSF = 4;                 // device pixels per CSS px — sub-pixel rounding is the whole story here
+const DSF = Number(process.env.DSF) || 4;   // device pixels per CSS px — sub-pixel rounding is the
+                               // whole story here. Overridable so a run can be repeated at a
+                               // fractional scale: DSF=1.25 reads every edge correctly (2px -> 2.40,
+                               // 3px -> 3.20, both inside the +/-0.5 tolerance), but the Alt H B B
+                               // double rule cannot pass there — its 1px gap is finer than a device
+                               // pixel at that scale, so stroke/gap/stroke reads as one 3.20px run.
+                               // That is a sampling floor, not a border bug; leave the default at 4.
 const INK = 45;                // how far a pixel must sit from the cell's own background to count as
                                // ink. r443: this was an ABSOLUTE luminance threshold (<170), which
                                // silently assumed a light page — on CI the page renders dark, every
                                // pixel in the band scored as ink, and all 20 assertions reported the
                                // full 20px band width. Contrast against the local background is what
-                               // "ink" actually means, and it holds in either theme.
+                               // "ink" actually means, and it holds in either theme. r457: only the
+                               // unformatted-cell baseline and the alignment block still use it; the
+                               // per-edge widths are measured by difference (DELTA) instead.
+const DELTA = 20;              // r457: luminance a pixel must MOVE between the baseline shot (border
+                               // classes off) and the real one to count as rule. Small on purpose —
+                               // a rule Chrome snapped onto a partly-covered device pixel still
+                               // moves ~90, and two identical renders move 0, so noise has no room.
+const VW = Number(process.env.VW) || 1440;  // viewport width. Overridable so a run can be
+                               // repeated at a width that lands the sheet's column edges on
+                               // fractional CSS px (1237 does) — the case the r457 clip snapping
+                               // and the baseline diff are there to survive.
 const BAND = 10;               // CSS px each side of the edge
+const LINES = 8;               // r457: device scanlines in the band. Every one of them is measured
+                               // and the longest run across them wins, so one unlucky scanline can
+                               // no longer decide the answer on its own.
 
 /* r455: CI-ONLY FLAKE, root-caused. CI failed 10 per-edge measurements ("all borders (.ball)",
    every ".thick" edge, the double rule) while `top` and the whole alignment section stayed
@@ -65,6 +91,29 @@ function installOverlayGuards() {
     localStorage.setItem('hk_handle_cache', '');
   } catch (e) {}
   try { sessionStorage.setItem('hk_wb', '1'); } catch (e) {}   // r324 guard: suppress #wbDlg outright
+  /* r457, THE CI FLAKE ROOT-CAUSED. `Alt H B A — all borders (.ball), right` failed about one CI
+     run in three, always alone, always with the r456 retry reading 0.00px on all three attempts —
+     so not a paint race. Dumping the failing clip shows the sheet replaced by flat card cream at
+     lum 234.7, no glyph, no gridline: #dcModal, the DAILY CHALLENGE hero card. index.html ~31655
+     opens it from `setTimeout(..., 1400)` on window load, and `_pro = true` (set at the top of
+     this file so the guard can drive pro-only ops) is exactly what makes challengeEligible() true.
+     It is .onboard-modal — position:fixed, inset:0 — so r455's sweep WOULD hide it; the sweep just
+     runs before the render, and the card lands between the render and the screenshot. It opens
+     once, so precisely ONE measurement is covered and every later one passes after the next
+     sweep — which is why one edge failed while `.ball.thick right` and `Alt H B R right` were
+     green. Which edge it lands on is a stopwatch race: measurement ~13 on the gate runner,
+     measurement ~16 locally. Suppress it the r324 way, through the engine's OWN once-per-day
+     guard, rather than racing it. */
+  try {
+    const dcKey = 'challenge-' + new Date().toISOString().slice(0, 10);   // index.html challengeKey()
+    localStorage.setItem('hk_dc_seen', dcKey);
+    localStorage.setItem('hk_dc_done', dcKey);
+    /* Same class of hazard, same treatment: r365's #startCoach ("how a drill works") is appended
+       to .gridwrap on a zero-solve profile — absolute, not fixed, so the sweep above cannot see
+       it. It lands bottom-left, clear of row 5 today, but nothing keeps it there. Its own
+       once-ever guard turns it off. */
+    localStorage.setItem('hk_start_coach', '1');
+  } catch (e) {}
   window.__hkHideFixedOverlays = function () {
     const cleared = [];
     try {
@@ -90,7 +139,7 @@ function installOverlayGuards() {
      contrast measurement below no longer cares — but pinning makes the run deterministic, and
      SCHEME=dark exercises the other side on demand. Borders in dark are additionally covered by
      dev/e2e-depth-mechanics.js, which asserts both themes. */
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: DSF,
+  const page = await browser.newPage({ viewport: { width: VW, height: 900 }, deviceScaleFactor: DSF,
     colorScheme: process.env.SCHEME === 'dark' ? 'dark' : 'light' });
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 160)));
@@ -119,7 +168,7 @@ function installOverlayGuards() {
      the clip band for the edge under test. `navigation` is the host because its board is plain
      — no guided rail, no target outline, nothing else painting near a cell edge. */
   async function clipFor(flags, edge) {
-    return page.evaluate(({ flags, edge, BAND }) => {
+    return page.evaluate(({ flags, edge, BAND, DSF, LINES }) => {
       loadChallenge('navigation');
       S.cells = {}; S.ROWS = 9;
       S.maze = null; S.touch = null; S.tiers = null; S._railZone = null;
@@ -130,68 +179,165 @@ function installOverlayGuards() {
       const td = [...document.querySelectorAll('#grid td')].find(t => (t.textContent || '').trim() === '7777');
       if (!td) return { err: 'sample cell never rendered' };
       const r = td.getBoundingClientRect();
-      const clip = edge === 'top'    ? { x: r.x + r.width / 2 - 1, y: r.y - BAND,        width: 2, height: BAND * 2 }
-                 : edge === 'bottom' ? { x: r.x + r.width / 2 - 1, y: r.bottom - BAND,   width: 2, height: BAND * 2 }
-                 : edge === 'left'   ? { x: r.x - BAND,        y: r.y + r.height / 2 - 1, width: BAND * 2, height: 2 }
-                 :                     { x: r.right - BAND,    y: r.y + r.height / 2 - 1, width: BAND * 2, height: 2 };
-      return { clip, cls: td.className || '(none)' };
-    }, { flags, edge, BAND });
+      /* r457: the band is LINES device scanlines across its short axis, and the clip is snapped
+         onto whole device pixels — a fractional clip is rounded by the screenshot anyway, and a
+         rounding this file cannot see is a rounding it cannot reason about. Cell edges sit at
+         fractional x (r.right measured 432.641 on a 1440-wide viewport), so this matters. */
+      const thin = LINES / DSF;
+      const snap = v => Math.round(v * DSF) / DSF;
+      const raw = edge === 'top'    ? { x: r.x + r.width / 2 - thin / 2, y: r.y - BAND,      width: thin, height: BAND * 2 }
+                : edge === 'bottom' ? { x: r.x + r.width / 2 - thin / 2, y: r.bottom - BAND, width: thin, height: BAND * 2 }
+                : edge === 'left'   ? { x: r.x - BAND,     y: r.y + r.height / 2 - thin / 2, width: BAND * 2, height: thin }
+                :                     { x: r.right - BAND, y: r.y + r.height / 2 - thin / 2, width: BAND * 2, height: thin };
+      const clip = { x: snap(raw.x), y: snap(raw.y), width: snap(raw.width), height: snap(raw.height) };
+      return { clip, cls: td.className || '(none)',
+               rect: { x: +r.x.toFixed(3), y: +r.y.toFixed(3), right: +r.right.toFixed(3), bottom: +r.bottom.toFixed(3) } };
+    }, { flags, edge, BAND, DSF, LINES });
   }
 
-  /* Decode the shot in the browser (canvas getImageData) so this file needs no image library —
-     CI installs playwright-core and nothing else. Returns the longest dark run in CSS px. */
-  async function paintedPx(buf, edge) {
-    const b64 = buf.toString('base64');
-    return page.evaluate(async ({ b64, edge, DSF, INK }) => {
-      const img = new Image();
-      img.src = 'data:image/png;base64,' + b64;
-      await img.decode();
-      const cv = document.createElement('canvas');
-      cv.width = img.width; cv.height = img.height;
-      const ctx = cv.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      const d = ctx.getImageData(0, 0, img.width, img.height).data;
+  /* r457: THE BASELINE IS THE SAME ELEMENT with its rule classes stripped in place — not a second
+     loadChallenge() + render(). Re-rendering re-lays the table out, and the sample cell's centre
+     landed on either side of a device-pixel boundary between two otherwise identical renders
+     (clip x 389.5 on one, 389.75 on the next), which would misregister the two shots by a whole
+     device pixel and drag the cell's own glyph edges into the difference. Removing the classes
+     touches only the ::after overlay and the overflow mode, so the geometry cannot move — and
+     render() is still what PUT those classes on the cell, which is the claim under test. */
+  async function stripRules(off) {
+    return page.evaluate(({ off }) => {
+      const td = [...document.querySelectorAll('#grid td')].find(t => (t.textContent || '').trim() === '7777');
+      if (!td) return null;
+      if (off) {
+        td.dataset.hkSaved = td.className;
+        td.className = td.className.replace(/\b(?:bt|bb|bl|br|ball|bdbl|thick)\b/g, '').replace(/\s+/g, ' ').trim();
+      } else if (td.dataset.hkSaved !== undefined) {
+        td.className = td.dataset.hkSaved; delete td.dataset.hkSaved;
+      }
+      const r = td.getBoundingClientRect();
+      return { cls: td.className || '(none)',
+               rect: { x: +r.x.toFixed(3), y: +r.y.toFixed(3), right: +r.right.toFixed(3), bottom: +r.bottom.toFixed(3) } };
+    }, { off });
+  }
+
+  /* r457: MEASURE THE EDGE BY DIFFERENCE, over the whole band.
+     ------------------------------------------------------------------------------------------
+     What this replaced, and why. The old reader took ONE scanline of a two-scanline band (it
+     literally only ever sampled index 0 of the short axis), called the median of that line the
+     background, and counted pixels more than INK away from it. Two things ride on that:
+       * one scanline decides everything, so any single-line accident — a snapped rule whose only
+         sampled row is the antialiased one, a glyph, a scrim — IS the answer, and re-shooting the
+         same line (r456) reproduces it rather than curing it;
+       * "background = the median of this line" is a guess. The right edge of the sample cell is
+         the worst case for it: the cell is number-formatted, so `7777` is right-aligned INTO the
+         band, and a band that is half glyph has a glyph-coloured median.
+     The fix needs no guess. Shoot the SAME clip twice — once with the border classes on, once
+     with them off — and the rule is exactly the pixels that MOVED. Everything shared by the two
+     shots (gridline, glyph, selection tint, sheet texture, the theme) subtracts itself out, and
+     DELTA can therefore be small enough that a rule snapped onto a partly-covered device pixel
+     still registers instead of falling under an ink threshold.
+     Scans every scanline in the band and returns the LONGEST run across all of them, so the
+     answer is the widest place the rule paints, not wherever scanline 0 happened to land.
+     `raw` keeps the old median-vs-INK reading for the one assertion that still wants it: an
+     unformatted cell must paint nothing, and there the gridline being faint IS the claim. */
+  async function bandDiff(shotB64, baseB64, edge) {
+    return page.evaluate(async ({ a, b, edge, DSF, INK, DELTA }) => {
+      const load = async (src) => {
+        const img = new Image();
+        img.src = 'data:image/png;base64,' + src;
+        await img.decode();
+        const cv = document.createElement('canvas');
+        cv.width = img.width; cv.height = img.height;
+        const ctx = cv.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        return { d: ctx.getImageData(0, 0, img.width, img.height).data, w: img.width, h: img.height };
+      };
+      const A = await load(a), B = await load(b);
+      if (!A.w || !A.h) return { err: 'empty shot' };
+      if (A.w !== B.w || A.h !== B.h) return { err: `shot ${A.w}x${A.h} vs baseline ${B.w}x${B.h}` };
+      const lum = (I, x, y) => { const p = (I.w * y + x) << 2; return I.d[p] * 0.299 + I.d[p + 1] * 0.587 + I.d[p + 2] * 0.114; };
       const horizontal = (edge === 'left' || edge === 'right');
-      const n = horizontal ? img.width : img.height;
-      const lums = [];
-      for (let i = 0; i < n; i++) {
-        const x = horizontal ? i : 0, y = horizontal ? 0 : i;
-        const p = (img.width * y + x) << 2;
-        lums.push(d[p] * 0.299 + d[p + 1] * 0.587 + d[p + 2] * 0.114);
+      const nScan = horizontal ? A.w : A.h;    // along the axis that crosses the edge
+      const nLine = horizontal ? A.h : A.w;    // the band's scanlines
+      let best = 0, bestInk = 0, bestRaw = 0, mn = 255, mx = 0;
+      for (let L = 0; L < nLine; L++) {
+        const va = [], vb = [];
+        for (let i = 0; i < nScan; i++) {
+          const x = horizontal ? i : L, y = horizontal ? L : i;
+          const v = lum(A, x, y);
+          if (v < mn) mn = v; if (v > mx) mx = v;
+          va.push(v); vb.push(lum(B, x, y));
+        }
+        // DIFF — the rule is what moved between the two shots
+        let run = 0, top = 0, tot = 0;
+        for (let i = 0; i < nScan; i++) {
+          if (Math.abs(va[i] - vb[i]) > DELTA) { run++; tot++; if (run > top) top = run; } else run = 0;
+        }
+        if (top > best) best = top;
+        if (tot > bestInk) bestInk = tot;
+        // RAW — the pre-r457 reading, kept for the unformatted-cell assertion
+        const bg = [...va].sort((p, q) => p - q)[va.length >> 1];
+        let rr = 0, rtop = 0;
+        for (const v of va) { if (Math.abs(v - bg) > INK) { rr++; if (rr > rtop) rtop = rr; } else rr = 0; }
+        if (rtop > bestRaw) bestRaw = rtop;
       }
-      // the band is mostly cell background with a rule crossing it, so the MEDIAN is the background
-      const bg = [...lums].sort((a, b) => a - b)[lums.length >> 1];
-      let best = 0, run = 0, total = 0;
-      for (const lum of lums) {
-        if (Math.abs(lum - bg) > INK) { run++; total++; if (run > best) best = run; } else run = 0;
-      }
-      return { run: best / DSF, ink: total / DSF };
-    }, { b64, edge, DSF, INK });
+      return { run: best / DSF, ink: bestInk / DSF, raw: bestRaw / DSF, spread: +(mx - mn).toFixed(1) };
+    }, { a: shotB64, b: baseB64, edge, DSF, INK, DELTA });
+  }
+
+  const moved = (a, b) => Math.max(...['x', 'y', 'right', 'bottom'].map(k => Math.abs(a[k] - b[k])));
+
+  /* r455/r457: sweep large fixed overlays immediately before EVERY shot, not once per
+     measurement. The r455 sweep ran before the render; #dcModal arrives on its own timer and
+     landed between the render and the screenshot, which no amount of re-shooting could clear. */
+  async function shootClip(clip) {
+    await hideFixedOverlays(page);
+    return (await page.screenshot({ clip })).toString('base64');
   }
 
   async function measure(flags, edge) {
-    await hideFixedOverlays(page);   // r455: re-check before every shot — see installOverlayGuards
     try {
       await page.waitForFunction(() => document.querySelectorAll('.wb-dlg.show').length === 0,
         null, { timeout: 2000 });
     } catch (e) {}   // robust to a fade in progress; never fail the measurement over this alone
-    const c = await clipFor(flags, edge);
-    if (c.err) return { err: c.err, px: -1, cls: '' };
-    /* r456: a border edge is painted by render()'s ::after overlay a frame or two after the class
-       lands; on a slow CI runner one shot in ~40 sampled the RIGHT edge of .ball before that paint
-       and read 0.00px (b2e7e86 was green, e5302de red on the same code). When a border flag is set
-       and the band reads empty, wait two frames and re-shoot — up to three times. An unformatted
-       cell (no flags) is never retried, so a genuinely missing rule still fails. */
     const wantInk = Object.keys(flags || {}).length > 0;
-    let m = null;
+    /* r456, kept: a border edge is painted by render()'s ::after overlay a frame or two after the
+       class lands, so a flagged band that reads empty is re-shot up to three times. r457 rebuilds
+       BOTH shots on each attempt (rule and baseline), because a bad take is just as likely to
+       have spoiled the baseline, and widens the retry condition past "empty": a flat clip means
+       something is covering the sheet, and a diff wider than any rule means the two shots are not
+       the same view. An unformatted cell (no flags) is still never retried, so a genuinely
+       missing rule fails on the first take. */
+    let m = null, why = '', cls = '', geo = '';
     for (let attempt = 0; attempt < 3; attempt++) {
-      const shot = await page.screenshot({ clip: c.clip });
-      m = await paintedPx(shot, edge);
-      if (!wantInk || m.run > 0 || attempt === 2) break;
+      const c = await clipFor(flags, edge);              // the cell with its borders on
+      if (c.err) return { err: c.err, px: -1, cls: '' };
+      cls = c.cls; geo = `clip ${JSON.stringify(c.clip)} right ${c.rect.right}`;
+      const shot = await shootClip(c.clip);
+      const b = await stripRules(true);                  // the same element, rule classes off
+      const base = b ? await shootClip(c.clip) : null;   // ... and THE SAME CLIP
+      await stripRules(false);
+      if (!b) {
+        why = 'sample cell vanished before the baseline shot';
+      } else if (moved(b.rect, c.rect) > 0.001) {
+        why = `stripping the rule classes moved the cell ${moved(b.rect, c.rect)}px — the two shots do not register`;
+      } else {
+        m = await bandDiff(shot, base, edge);
+        why = m.err ? m.err
+            /* A covered clip and a missing rule both read 0, and they are different bugs. When
+               #dcModal was over the sheet the band was UNIFORM card cream (spread 0.0); a band
+               that is simply missing its rule still shows the faint gridline (spread 21.6
+               measured with td.ball::after zeroed). So only near-zero spread means covered — and
+               only that is worth re-shooting. */
+            : (wantInk && m.spread < 4) ? `the band is uniform (spread ${m.spread}) — something is covering the sheet`
+            : (wantInk && m.run <= 0) ? 'no rule anywhere in the band'
+            : (m.run > 6) ? `the whole band moved (${m.run.toFixed(2)}px) — the two shots are not the same view`
+            : '';
+      }
+      if (!why || attempt === 2) break;
       await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))));
       await page.waitForTimeout(120);
     }
-    return { px: m.run, ink: m.ink, cls: c.cls };
+    if (!m) return { err: why || 'no measurement', px: -1, cls };
+    return { px: m.run, ink: m.ink, raw: m.raw, spread: m.spread, cls, why, geo };
   }
 
   let fail = 0;
@@ -200,12 +346,20 @@ function installOverlayGuards() {
     const ok = Math.abs(m.px - want) <= 0.5;
     if (!ok) fail++;
     console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${label.padEnd(46)} painted ${m.px.toFixed(2)}px, want ~${want}px` +
-                (ok ? '' : `   [cls="${m.cls}"]`));
+                (ok ? '' : `   [cls="${m.cls}" ${m.geo || ''}${m.why ? ' — ' + m.why : ''}]`));
   };
 
-  /* BASELINE — an unformatted cell. The gridline is deliberately faint (r405), so it must NOT
-     register as ink; if it ever does, every threshold below is meaningless. */
-  check('unformatted cell paints no rule', await measure({}, 'top'), 0);
+  /* BASELINE — an unformatted cell. Two claims, and r457 keeps both: no border classes means no
+     DIFFERENCE against a second shot of the same cell (px), and the gridline is deliberately
+     faint (r405) so it must not register as ink on its own (raw). The second half is what keeps
+     INK — still used by the alignment block below — honest. */
+  {
+    const m = await measure({}, 'top');
+    const ok = !m.err && m.px === 0 && m.raw < 0.5;
+    if (!ok) fail++;
+    console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${'unformatted cell paints no rule'.padEnd(46)} ` +
+                (m.err ? m.err : `diff ${m.px.toFixed(2)}px, raw ink ${m.raw.toFixed(2)}px, want 0`));
+  }
 
   /* THE FOUR EDGES, each alone — the case that shipped broken twice. */
   const EDGES = [
@@ -489,7 +643,7 @@ function installOverlayGuards() {
 
   for (const dark of [false, true]) {
     for (const dpr of [1, 2]) {
-      const pg = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: dpr,
+      const pg = await browser.newPage({ viewport: { width: VW, height: 900 }, deviceScaleFactor: dpr,
         colorScheme: dark ? 'dark' : 'light' });
       pg.on('pageerror', e => errs.push(String(e.message || e).slice(0, 160)));
       await pg.addInitScript(installOverlayGuards);   // r455: same guard set as the per-edge `page`
