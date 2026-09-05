@@ -4,21 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>hotkey.gg · spreadsheet speedruns</title>
-<meta name="description" content="Keyboard-only Excel training: 74 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="description" content="Keyboard-only Excel training: 75 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="hotkey.gg — train Excel like it's a sport">
-<meta property="og:description" content="Keyboard-only Excel training: 74 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta property="og:description" content="Keyboard-only Excel training: 75 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="hotkey.gg — train Excel like it's a sport">
-<meta name="twitter:description" content="Keyboard-only Excel training: 74 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="twitter:description" content="Keyboard-only Excel training: 75 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"hotkey.gg","alternateName":"hotkey.gg \u2014 Excel shortcut trainer","url":"https://www.hotkey.gg/","description":"An Excel simulator that scores your keyboard speed \u2014 74 drills from navigation to full model builds, with pars, leaderboards, and guided demos."}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"hotkey.gg","alternateName":"hotkey.gg \u2014 Excel shortcut trainer","url":"https://www.hotkey.gg/","description":"An Excel simulator that scores your keyboard speed \u2014 75 drills from navigation to full model builds, with pars, leaderboards, and guided demos."}</script>
 <script>
   // BOOT BEACON: if anything fatal happens while the game loads, paint the error on
   // screen instead of failing silent ("all the elements are gone" must never be a mystery).
@@ -2302,7 +2302,7 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=306"></script>
+<script src="drills.js?v=307"></script>
 
 
 
@@ -23170,6 +23170,99 @@ const CHALLENGES = {
            first paint instead of hiding it behind "☆ ?", because a Foundations discovery the
            player cannot read is not a lesson. Never blocks the win (§2.2). */
         {label:'Take every straightaway in one press', ok:!!pr.atBlock && pr.star===true, bonus:true, reveal:true}
+      ];
+    }
+  },
+  entrybasics:{
+    /* ============================================================================
+       FOUNDATIONS 2 · "Enter, Edit & Fill" (r457, the onboarding rework — Wolf: make
+       Foundations a true light onramp before the fulsome iterated drills). The SECOND
+       integrated tutorial: after Move & Select, the player MAKES cells — type a value,
+       fix one in place with F2 (never retype), fill a formula down a column.
+
+       Ordinary timed catalog drill in every other respect (§9.0): checkWin fires,
+       recordRun posts, PB / XP / ghost / leaderboard behave as on any board; the surface
+       is the site's ORIGINAL chrome. What makes it a tutorial is the guide panel + the
+       step controller (steps[] below) + the ×2.5 pass clock (HOTKEY_CLOCKS.entrybasics).
+
+       THE FOUR BEATS grade an END STATE (a cell's VALUE), never a keypress
+       (DEPTH_PASS_CAMPAIGN §1, binding):
+         0 units typed at B5 · 1 units typed at B6                       → step 1 "type it in"
+         2 the extra-zero rate at C4 corrected                          → step 2 "fix it in place"
+         3 the Cost column filled (D5,D6 = units × rate)                → step 3 "fill it down"
+       The ☆ (visible) is the one-fill efficiency move, read off the S.fillOps latch —
+       typing each total by hand clears the drill too, it just costs the keystrokes. The
+       fix is robust and order-free: D4:D6 are live =B*C formulas, so fixing C4 before or
+       after the fill lands the same end state. ============================================================================ */
+    tutorial:{ n:2, name:'Enter, Edit & Fill', nextKey:'filldr' },
+    steps:[
+      { name:'type it in',
+        why:'a value is one keystroke away — type it, press enter, and the cursor drops to the next row',
+        beats:[ {id:0, why:'Type the units for the second line and press enter.'},
+                {id:1, why:'Do the same for the third line.'} ] },
+      { name:'fix it in place',
+        why:'F2 edits a cell without retyping it — jump in, drop the slip, enter',
+        beats:[ {id:2, why:'One rate was fat-fingered with an extra zero — F2, backspace the extra digit, enter.'} ] },
+      { name:'fill it down',
+        why:'one formula fills a column — build it once, send it down',
+        beats:[ {id:3, why:'Select the cost cell and the two empty ones under it, then fill down.'} ] }
+    ],
+    par:60, parKeys:11, saveClose:true,   /* r457: par is the §9.1-style replay par for an onboarding tutorial (dev/curriculum-v3.json holds the levels to 60–120 s); HOTKEY_CLOCKS.entrybasics overrides pass to par×2.5 so a first play spent reading the guide is not failed on the clock. parKeys is a provisional estimate; dev/e2e-par-sweep.js re-measures on build. Mirrored in HOTKEY_PARS. */
+    aha:'you almost never retype a cell — type it once, F2 to fix a slip, and fill the rest.',
+    prompt:'A small run-rate table came in half-finished. Type the two missing unit counts down the Units column, fix the one rate that was entered with an extra zero — F2 edits it in place, no need to retype the whole cell — then fill the Cost column down from the top so every line multiplies its own units by its own rate. Save when it foots.',
+    req(){ const o=this._o; return 'type <em>'+o.u5+'</em> at <em>B5</em> · <em>'+o.u6+'</em> at <em>B6</em> · <em>F2</em> on <em>C4</em>, backspace the extra zero · select <em>D4:D6</em> <em>ctrl+d</em> · <em>ctrl+s</em>'; },
+    guide(){ const o=this._o; return [
+      'at <kbd>B5</kbd> type <kbd>'+o.u5+'</kbd> and press <kbd>↵</kbd> — typing on a cell starts the entry; enter commits it and steps you down a row',
+      'at <kbd>B6</kbd> type <kbd>'+o.u6+'</kbd> <kbd>↵</kbd> — the same move on the next line',
+      'the '+o.lbl4+' rate reads '+o.badRate+' — an extra zero slipped in: press <kbd>F2</kbd> to edit the cell in place, <kbd>⌫</kbd> the trailing zero, <kbd>↵</kbd> — F2 beats retyping the whole number',
+      'select <kbd>D4:D6</kbd> and press <kbd>ctrl</kbd>+<kbd>d</kbd> — the cost formula in the top cell fills down, each row using its own units and rate (<kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>i</kbd> <kbd>d</kbd> is the ribbon route)',
+      '☆ the discovery: one <kbd>ctrl</kbd>+<kbd>d</kbd> over <kbd>D4:D6</kbd> fills both empty costs at once — typing each total by hand clears the drill too, it just costs the keystrokes',
+    ]; },
+    targets(){ return ['B5','B6','C4','D4:D6', null]; },
+    demo(){ const o=this._o; return [
+      {sel:'B5', keys:[...T(String(o.u5)), Kb.enter]},
+      {sel:'B6', keys:[...T(String(o.u6)), Kb.enter]},
+      {sel:'C4', keys:[{key:'F2'},{key:'Backspace'}, Kb.enter]},   /* F2 edit in place — drop the extra zero */
+      {sel:'D4:D6', keys:[Kb.fillD]},                              /* the ☆: one fill lands both costs (engine appends Ctrl+S) */
+    ]; },
+    build(){
+      const cells={};
+      const POOL=['Analysts','Associates','Seats','Licenses','Terminals','Monitors','Desks','Printers'];
+      for(let k=POOL.length-1;k>0;k--){ const j=rnd(0,k); [POOL[k],POOL[j]]=[POOL[j],POOL[k]]; }
+      const lbl=[POOL[0],POOL[1],POOL[2]];
+      const u=[rnd(3,9)*2, rnd(3,9)*2, rnd(3,9)*2];        // even integers
+      const r=[rnd(6,18)*10, rnd(6,18)*10, rnd(6,18)*10];  // rates, multiples of 10 → integer cost (§1.0(c))
+      cells['A1']={...blankCell(), value:codename()+' — first keystrokes', txt:true, bold:true};
+      cells['A3']={...blankCell(), value:'Line',  txt:true, bold:true};
+      cells['B3']={...blankCell(), value:'Units', txt:true, bold:true, align:'right'};
+      cells['C3']={...blankCell(), value:'Rate',  txt:true, bold:true, align:'right'};
+      cells['D3']={...blankCell(), value:'Cost',  txt:true, bold:true, align:'right'};
+      for(let i=0;i<3;i++){ const row=4+i;
+        cells['A'+row]={...blankCell(), value:lbl[i], txt:true};
+        cells['C'+row]={...blankCell(), value:r[i], fontColor:'blue', fmtStyle:'comma', decimals:0, align:'right'}; }
+      cells['B4']={...blankCell(), value:u[0], fontColor:'blue', fmtStyle:'comma', decimals:0};   // row 4 units seeded
+      cells['D4']={...blankCell(), formula:'=B4*C4', value:u[0]*r[0], fmtStyle:'comma', decimals:0};  // the fill source
+      // THE FAT-FINGER: C4's rate carries an extra trailing zero (10×); F2 + backspace fixes it in place
+      cells['C4']={...blankCell(), value:r[0]*10, fontColor:'blue', fmtStyle:'comma', decimals:0, align:'right'};
+      // B5,B6,D5,D6 ship EMPTY (typed / filled by the player)
+      cells['A8']={...blankCell(), value:'Fill in: '+u[1]+' '+lbl[1]+' and '+u[2]+' '+lbl[2]+'. The '+lbl[0]+' rate should be '+r[0]+' (an extra zero slipped in — fix it with F2). Then fill the Cost column down.', txt:true, it:true, fontColor:'gray'};
+      this._o={ lbl4:lbl[0], lbl5:lbl[1], lbl6:lbl[2], u5:u[1], u6:u[2], r:r, badRate:r[0]*10 };
+      return {ROWS:9, cells, active:{r:5,c:2}, sel:null, colW:{1:130,2:80,3:80,4:90}};
+    },
+    checks(S){
+      const o=this._o, cel=k=>S.cells[k]||{};
+      const numOk=(k,v)=>{ const c=cel(k); return typeof c.value==='number' && Math.abs(c.value-v)<0.5; };
+      const b0=numOk('B5',o.u5);
+      const b1=numOk('B6',o.u6);
+      const b2=numOk('C4',o.r[0]);                                       // the extra zero removed
+      const b3=numOk('D5',o.u5*o.r[1]) && numOk('D6',o.u6*o.r[2]);       // costs filled off each row's own inputs
+      const oneFill=(S.fillOps||[]).some(f=>f.dir==='down' && f.r1<=4 && f.r2>=6 && f.c1<=4 && f.c2>=4);   // D4:D6 in one Ctrl+D
+      return [
+        {label:'Enter the units for '+o.lbl5+' — the second line', ok:b0},
+        {label:'Enter the units for '+o.lbl6+' — the third line', ok:b1},
+        {label:'Fix the '+o.lbl4+' rate — drop the extra zero', ok:b2},
+        {label:'Fill the Cost column down from the top', ok:b3},
+        {label:'Fill both costs from one cell', ok:b3 && oneFill, bonus:true, reveal:true},
       ];
     }
   }

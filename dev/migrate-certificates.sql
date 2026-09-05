@@ -32,7 +32,7 @@ begin
   if v_uid is null then raise exception 'NOT_SIGNED_IN'; end if;
   if coalesce((auth.jwt()->>'is_anonymous')::boolean, false) then raise exception 'GUEST_ACCOUNT'; end if;
   v_keys := case p_track
-    when 'fluency'  then array['navigation','filldr','pastes','blocksel','rowops','editfix','modeltour','typeset','decimals','center','autofit','ruleoff','ruleaudit','combo','housestyle','gauntlet']
+    when 'fluency'  then array['navigation','entrybasics','filldr','pastes','blocksel','rowops','editfix','modeltour','typeset','decimals','center','autofit','ruleoff','ruleaudit','combo','housestyle','gauntlet']
     when 'formulas' then array['margin','foot','anchor','percent','cagr','bridge','sumif','rollup','fxconvert','sort','scrub','filterpass','unhide','lookup','lookup2','recon','drill','series','audit','triage','wrapfix','balcheck','stalelink','cases','tieout','signerr','versionup','balance']
     when 'modeling' then array['wacc','fcfbuild','dcf','comps','txncomps','football','dcfsens','retbridge','accdil','sourcesuses','schedule','intsched','lbo','revolver','waterfall','covtable','liqbridge','wk13','debtsched','cascade','isbuild','bsbuild','cfslink','nwcsched','threestmt','opmodel','dcfbuild','lbobuild','debtblock','dashcover']
     else null end;

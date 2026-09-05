@@ -30,9 +30,10 @@
      "par": 90
     },
     {
-     "key": "repairshop",
+     "key": "entrybasics",
      "kind": "level",
-     "status": "add",
+     "status": "built",
+     "_note": "r457: the onboarding rework replaces the scrapped repairshop/powergrid/printshop 'levels' with light guided drills. entrybasics teaches enter/F2-edit/fill; it inherits repairshop's tag role for now so modeltour's capstone-chain and the vocabulary stay whole. The full Foundations restructure (the 7 iterated drills kept in c1, ribbonways added, the tag graph redistributed, check-curriculum-map (d1) rewritten) lands with the second drill.",
      "requires": [
       "move",
       "select",
@@ -51,7 +52,7 @@
       "schedule",
       "hide/unhide/group"
      ],
-     "par": 105
+     "par": 60
     },
     {
      "key": "powergrid",
