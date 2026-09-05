@@ -278,3 +278,31 @@ reviewed and landed by the orchestrator, gated by the existing 19 suites plus th
 | D-4 | **Register rotation** — a third of prompts stop being deadline stories. | **Yes.** It is the cheapest variety in the catalog. |
 | D-5 | **Chapter names unchanged.** Models I / Models II keep their names although their lesson is now Excel mechanics on finance scenery. | **Keep the names.** They are the audience B draw on the landing; the content under them is what changed. |
 | D-6 | **`schedule` display name → "Fixed Assets".** | Cosmetic; your call. |
+
+---
+
+## 9 · Wave 0 measurement (r457 — the baseline the re-cut is judged against)
+
+`meta.family` + `meta.board` are on all 74 drills; `check-invariants.js` prints C28–C31 as 39 warnings and `V4_STRICT=1`
+fails them (wave 9 flips the default). Boards come off the index.html builders, cross-checked against §4 — they supersede §1 F3.
+
+| chapter | C28 top board (P2 ≤40%) | C29 closer / ☆one-pass (P3 ≤1) | C30 family repeats (P4 = 0) | C31 deadline (P6 ≤50%) |
+|---|---|---|---|---|
+| Foundations (7) | schedule 4 · 57% ✗ | 0 / 3 ✗ | none ✓ | 1/7 · 14% ✓ |
+| Formatting (9) | table 4 · 44% ✗ | 4 / 6 ✗ | F1×3 F4×2 ✗ | 5/9 · 56% ✗ |
+| Formulas I (9) | two-block 3 · 33% ✓ | 3 / 7 ✗ | M2×3 M4×2 M6×2 ✗ | 3/9 · 33% ✓ |
+| Data & Lookups (9) | four boards at 2 · 22% ✓ | 3 / 4 ✗ | M7×3 ✗ | 3/9 · 33% ✓ |
+| Formulas II (10) | schedule 8 · 80% ✗ | 7 / 8 ✗ | M14×3 M8×2 ✗ | 0/10 · 0% ✓ |
+| Models I (10) | table 4 · 40% ✓ | 5 / 6 ✗ | M10×4 ✗ | 7/10 · 70% ✗ |
+| Models II (10) | schedule 6 · 60% ✗ | 10 / 7 ✗ | M5×4 M13×3 ✗ | 7/10 · 70% ✗ |
+| Full Builds (10) | schedule 8 · 80% ✗ | 7 / 6 ✗ | M17×3 M3×2 M15×2 ✗ | 7/10 · 70% ✗ |
+
+**Totals.** Boards schedule 34 · table 17 · two-block 10 · grid 5 · tape 4 · list/form/maze/cover 1 each. Bold+rule closer
+**39/74** · fill-in-one-pass ☆ **47/74** · deadline prompts **33/74 (44%)**, under P6 catalog-wide but 70% in three chapters ·
+**18** chapter family collisions · **3 of 38 families are nobody's primary** — N2 select, E10 text clean-up, F3 custom formats
+(§1 F5, measured). `curriculum-v4.json` carries all 90 entries (74 built + 16 planned) with family, board and the §5 verdict — keep 45 · capstone 8 · new 10 · recut 1 · retire 26; `check-curriculum-map.js --v4` is clean.
+
+**Judgment calls, so waves 1–8 can overrule them.** `intsched` takes M13 not §4's first-listed M5 (the prose adds M5 to a
+roll-forward) · `fcfbuild` E5, the fill being its Excel lesson · `liqbridge` E3 off §5's "into accdil", M5 secondary · `recon`
+`rollup` `lookup2` keep §4's first-listed family even where it repeats — the repeat is the finding. Boards §4 leaves unstated:
+`sort` `scrub` tape · `percent` `fxconvert` `blocksel` `sourcesuses` two-block · `tieout` `lbo` `football` `drill` table · rest schedule.

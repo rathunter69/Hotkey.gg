@@ -5,6 +5,14 @@ standards — READ FIRST; §9 is the wave playbook for Opus-5 sessions, new r428
 **dev/PIPELINE.md's ⚡ r428 header (the live queue)**, dev/AUDIT.md (newest round at the TOP),
 and the dev/ design docs._
 
+## ⚡ NEXT-SESSION HANDOFF (2026-09-04 evening, r458 — ONE SESSION, ONE GOAL)
+**Open `dev/ROADMAP.md` and take the top ☐ row.** Wolf: one session per discrete goal, one PR each, off-goal
+findings to the roadmap's parking lot. State of play in `dev/CONTINUITY.md` §0d: main = #249 (landing v3.1,
+auto-rank, step controller, Foundations 1); PR #250 open and green with the rebuild's groundwork (wave-0
+guards, gap matrix, curriculum v5.1 + Phase A map + `--v5` checker, `check-borders` fix). Next goals: S0 merge
+#250 → S1 Foundations wave 1 → S2 engine pack P1 → the chapter waves. Independent tracks T1–T5 (sprites,
+business/Stripe, security, legal, Mac) are their own sessions.
+
 ## ⚡ NEXT-SESSION HANDOFF (2026-09-04, r455 close — IDENTITY-ONLY PIXEL ART, INTEGRATED TUTORIALS)
 **Read `dev/CONTINUITY.md` §0c first.** Wolf's redirect on the r454 "level" plan: pixel art narrows
 to identity assets only (rank/level/achievements/player card/favicon); the drill surface keeps the

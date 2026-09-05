@@ -1,0 +1,2450 @@
+{
+ "_": "CURRICULUM V4 — the machine-readable v4 map (r457, wave 0 of dev/CATALOG_V4.md §7). Copies curriculum-v3.json's shape and adds the two variety fields (family/board, CATALOG_V4 §3 + §2 P1/P2) and the §5 verdict per drill. WAVE 0 CHANGES NOTHING ELSE: the chapters and the 74 live keys keep the order curriculum-v3.json gave them — the 64-drill order is waves 1–8. Checked by `node dev/check-curriculum-map.js --v4`.",
+ "_verdicts": "keep = built and kept as-is (§5 row 1) · recut = a new key folding two old ones (ratios) · new = a §5 NEW drill or tutorial, not built yet · capstone = the chapter's declared capstone · retire = live today, retired by v4 into the key named in absorbedBy (§5 row RETIRED, 26 keys).",
+ "_planned": "status \"planned\" = named by CATALOG_V4 §4 and not built. 15 new keys (3 tutorials + 7 drills + 5 capstones) plus the ratios re-cut. par on a planned entry with par_estimate true is a design estimate, re-swept at build (§5).",
+ "version": "v4.0",
+ "generated_for": "dev/CATALOG_V4.md §7 wave 0",
+ "status": "WAVE 0 — measurement + guards. Nothing re-cut.",
+ "families": {
+  "N1": {
+   "name": "move & jump",
+   "moves": "arrows, Ctrl+arrows, Ctrl+Home/End, PgUp/PgDn"
+  },
+  "N2": {
+   "name": "select",
+   "moves": "Shift+arrows, Ctrl+Shift+arrows, Ctrl+Space, Shift+Space, Ctrl+A"
+  },
+  "N3": {
+   "name": "go to & go to special",
+   "moves": "F5, F5 to Special (constants / formulas / blanks)"
+  },
+  "N4": {
+   "name": "find & replace",
+   "moves": "Ctrl+F, Ctrl+H, whole-cell, replace-all"
+  },
+  "E1": {
+   "name": "edit in place, undo, redo",
+   "moves": "F2, Esc, Ctrl+Z, Ctrl+Y"
+  },
+  "E2": {
+   "name": "clear & delete",
+   "moves": "Delete, Alt H E A/C/F, Ctrl+minus"
+  },
+  "E3": {
+   "name": "clipboard",
+   "moves": "Ctrl+C/X/V, Ctrl+Enter fill-selection, Ctrl+D copy-above"
+  },
+  "E4": {
+   "name": "paste special",
+   "moves": "values / formats / transpose / multiply / add"
+  },
+  "E5": {
+   "name": "fill & series",
+   "moves": "Ctrl+D/R, Alt H F I S, fill series of dates/years"
+  },
+  "E6": {
+   "name": "insert & delete rows/cols",
+   "moves": "Ctrl+plus, Ctrl+minus, Shift+Space / Ctrl+Space first"
+  },
+  "E7": {
+   "name": "hide / unhide / group",
+   "moves": "Ctrl+9/0, Ctrl+Shift+9/0, Alt Shift arrows, Alt A J/U"
+  },
+  "E8": {
+   "name": "sort",
+   "moves": "Alt A S A/D, Alt A S S dialog, multi-key"
+  },
+  "E9": {
+   "name": "filter",
+   "moves": "Ctrl+Shift+L, Alt+down picker, clear filter"
+  },
+  "E10": {
+   "name": "text clean-up",
+   "moves": "TRIM, PROPER, LEFT/RIGHT/MID, TEXT, text-to-columns (engine: verify)"
+  },
+  "F1": {
+   "name": "bold / italic / colour",
+   "moves": "Ctrl+B/I, Alt H F C, the blue-black-green-red convention"
+  },
+  "F2": {
+   "name": "number formats",
+   "moves": "Alt H K / Alt H 9/0 / Ctrl+Shift+$ % !, Alt H A N"
+  },
+  "F3": {
+   "name": "custom formats",
+   "moves": "Ctrl+1 to 0.0x, Mmm-yy, (#,##0), superscript footnotes, center-across"
+  },
+  "F4": {
+   "name": "borders",
+   "moves": "Alt H B P/O/S/T/D, the totals-take-top-borders canon"
+  },
+  "F5": {
+   "name": "alignment & indent",
+   "moves": "Alt H A L/C/R, Alt H 6/5, wrap Alt H W"
+  },
+  "F6": {
+   "name": "widths & fit",
+   "moves": "Alt H O I/W/A, ####, clipped labels"
+  },
+  "M1": {
+   "name": "SUM & AutoSum",
+   "moves": "Alt=, SUM across/down, the corner"
+  },
+  "M2": {
+   "name": "anchoring",
+   "moves": "F4 cycle, $B$2 vs B$2 vs $B2, one formula fills a grid"
+  },
+  "M3": {
+   "name": "point mode",
+   "moves": "build by pointing at a yellow assumption, Ctrl+Enter"
+  },
+  "M4": {
+   "name": "ratios & growth",
+   "moves": "margin, share, growth, CAGR ^(1/n)"
+  },
+  "M5": {
+   "name": "logic",
+   "moves": "IF, MIN, MAX, AND/OR, nested caps and floors"
+  },
+  "M6": {
+   "name": "conditional sums",
+   "moves": "SUMIF, SUMIFS, COUNTIF, AVERAGEIF"
+  },
+  "M7": {
+   "name": "lookups",
+   "moves": "VLOOKUP, INDEX/MATCH, two-way, XLOOKUP if the engine has it"
+  },
+  "M8": {
+   "name": "error handling",
+   "moves": "IFERROR, #REF!/#DIV/0!/#VALUE! triage"
+  },
+  "M9": {
+   "name": "audit tools",
+   "moves": "F5 Special formulas, Ctrl+` show formulas, trace, F9"
+  },
+  "M10": {
+   "name": "statistics",
+   "moves": "MEDIAN, AVERAGE, MAX/MIN, LARGE/SMALL, RANK"
+  },
+  "M11": {
+   "name": "dates",
+   "moves": "TODAY, EDATE/EOMONTH, weekly headers, Mmm-yy"
+  },
+  "M12": {
+   "name": "scenario switch",
+   "moves": "CHOOSE / INDEX on a case cell, sticky driver"
+  },
+  "M13": {
+   "name": "roll-forward",
+   "moves": "opening + adds - subs = closing, the corkscrew"
+  },
+  "M14": {
+   "name": "check rows & tie-outs",
+   "moves": "assets - L&E = 0, applied vs repaid, sources = uses"
+  },
+  "M15": {
+   "name": "discounting & returns",
+   "moves": "1/(1+r)^n, NPV, IRR, MOIC, PMT (engine: verify NPV/IRR/PMT)"
+  },
+  "M16": {
+   "name": "sign convention",
+   "moves": "costs carry their sign, paste-special x(-1)"
+  },
+  "M17": {
+   "name": "linking & referencing",
+   "moves": "Reference never retype, green links, cross-block wiring"
+  },
+  "M18": {
+   "name": "hand-off",
+   "moves": "paste values, hardcode colour, delete the feed, freeze panes (engine: verify)"
+  }
+ },
+ "chapters": [
+  {
+   "id": "c1",
+   "name": "Foundations",
+   "tier": "free",
+   "unlock_level": null,
+   "capstone": "modeltour",
+   "teaches_line": "the game tutorial — four multi-act levels, one foundational family each, then the model tour",
+   "drills": [
+    {
+     "key": "navigation",
+     "kind": "level",
+     "status": "built",
+     "verdict": "keep",
+     "family": "N1",
+     "board": "maze",
+     "requires": [],
+     "teaches": [
+      "move",
+      "save",
+      "jump(ctrl-arrow)",
+      "select",
+      "select-edge",
+      "row/col-select",
+      "goto-special",
+      "copy/paste"
+     ],
+     "par": 90,
+     "families": [
+      "N2",
+      "E3"
+     ]
+    },
+    {
+     "key": "repairshop",
+     "kind": "level",
+     "status": "planned",
+     "verdict": "new",
+     "family": "E1",
+     "board": "schedule",
+     "requires": [
+      "move",
+      "select",
+      "select-edge",
+      "row/col-select",
+      "copy/paste"
+     ],
+     "teaches": [
+      "enter/edit(F2)",
+      "clear/delete",
+      "undo",
+      "redo",
+      "cut",
+      "fill(D/R)",
+      "insert/delete row-col",
+      "schedule",
+      "hide/unhide/group"
+     ],
+     "par": 105,
+     "families": [
+      "E2",
+      "E3",
+      "E6",
+      "E7"
+     ]
+    },
+    {
+     "key": "powergrid",
+     "kind": "level",
+     "status": "planned",
+     "verdict": "new",
+     "family": "M1",
+     "board": "schedule",
+     "requires": [
+      "enter/edit(F2)",
+      "select",
+      "select-edge",
+      "fill(D/R)"
+     ],
+     "teaches": [
+      "point-mode",
+      "sum(Alt=)",
+      "margin/ratio",
+      "anchor($/F4)",
+      "mixed-anchor",
+      "sign-convention",
+      "costs-negative"
+     ],
+     "par": 110,
+     "families": [
+      "M2",
+      "M16",
+      "E5"
+     ]
+    },
+    {
+     "key": "printshop",
+     "kind": "level",
+     "status": "planned",
+     "verdict": "new",
+     "family": "F1",
+     "board": "table",
+     "requires": [
+      "select",
+      "row/col-select",
+      "goto-special",
+      "enter/edit(F2)",
+      "margin/ratio",
+      "sign-convention"
+     ],
+     "teaches": [
+      "comma/currency-fmt",
+      "decimals",
+      "percent-fmt",
+      "parens-negative",
+      "bold/italic/color",
+      "blue-inputs",
+      "align",
+      "borders(top/outside/bottom)",
+      "autofit"
+     ],
+     "par": 100,
+     "families": [
+      "F2",
+      "F4",
+      "F6"
+     ]
+    },
+    {
+     "key": "findgo",
+     "kind": "existing",
+     "status": "planned",
+     "verdict": "new",
+     "family": "N3",
+     "board": "list",
+     "requires": [
+      "move",
+      "select",
+      "jump(ctrl-arrow)"
+     ],
+     "teaches": [
+      "find/replace",
+      "goto-special"
+     ],
+     "par": 30,
+     "families": [
+      "N4"
+     ],
+     "par_estimate": true
+    },
+    {
+     "key": "modeltour",
+     "kind": "capstone",
+     "status": "built",
+     "verdict": "capstone",
+     "family": "M1",
+     "board": "schedule",
+     "requires": [
+      "move",
+      "jump(ctrl-arrow)",
+      "copy/paste",
+      "fill(D/R)",
+      "percent-fmt",
+      "comma/currency-fmt",
+      "decimals",
+      "bold/italic/color",
+      "blue-inputs",
+      "align",
+      "schedule"
+     ],
+     "teaches": [
+      "margin/ratio"
+     ],
+     "par": 35,
+     "families": [
+      "M4",
+      "F2"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "c2",
+   "name": "Formatting",
+   "tier": "free",
+   "unlock_level": null,
+   "capstone": "gauntlet",
+   "teaches_line": "the banker’s finish — weight, alignment, decimals, rules, widths, paste-special and the house standard",
+   "drills": [
+    {
+     "key": "ruleaudit",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "F4",
+     "board": "schedule",
+     "requires": [
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "schedule"
+     ],
+     "teaches": [],
+     "par": 16
+    },
+    {
+     "key": "center",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "F5",
+     "board": "table",
+     "requires": [
+      "row/col-select",
+      "bold/italic/color",
+      "borders(top/outside/bottom)"
+     ],
+     "teaches": [
+      "align"
+     ],
+     "par": 22,
+     "families": [
+      "F4"
+     ]
+    },
+    {
+     "key": "typeset",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "F1",
+     "board": "form",
+     "requires": [
+      "margin/ratio"
+     ],
+     "teaches": [
+      "bold/italic/color",
+      "date/TODAY"
+     ],
+     "par": 24,
+     "families": [
+      "M11"
+     ]
+    },
+    {
+     "key": "decimals",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "F2",
+     "board": "table",
+     "requires": [
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "margin/ratio"
+     ],
+     "teaches": [
+      "decimals"
+     ],
+     "par": 25,
+     "families": [
+      "N3"
+     ]
+    },
+    {
+     "key": "combo",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "F1",
+     "board": "table",
+     "requires": [
+      "decimals",
+      "bold/italic/color",
+      "align",
+      "autofit"
+     ],
+     "teaches": [
+      "comma/currency-fmt",
+      "blue-inputs"
+     ],
+     "par": 27,
+     "families": [
+      "F2",
+      "F5",
+      "F6"
+     ],
+     "absorbedBy": "autofit"
+    },
+    {
+     "key": "ruleoff",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "F4",
+     "board": "schedule",
+     "requires": [
+      "fill(D/R)",
+      "bold/italic/color",
+      "sign-convention"
+     ],
+     "teaches": [
+      "borders(top/outside/bottom)"
+     ],
+     "par": 31,
+     "families": [
+      "E5"
+     ],
+     "absorbedBy": "ruleaudit"
+    },
+    {
+     "key": "blocksel",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "E3",
+     "board": "two-block",
+     "requires": [
+      "select-edge",
+      "copy/paste",
+      "fill(D/R)",
+      "bold/italic/color",
+      "align",
+      "borders(top/outside/bottom)",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 34,
+     "families": [
+      "F1",
+      "F5"
+     ],
+     "absorbedBy": "navigation"
+    },
+    {
+     "key": "autofit",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "F6",
+     "board": "table",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)"
+     ],
+     "teaches": [],
+     "par": 36,
+     "families": [
+      "F5",
+      "M1"
+     ]
+    },
+    {
+     "key": "pastes",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "E4",
+     "board": "two-block",
+     "requires": [
+      "copy/paste",
+      "comma/currency-fmt",
+      "bold/italic/color",
+      "align",
+      "borders(top/outside/bottom)",
+      "sign-convention"
+     ],
+     "teaches": [
+      "paste-special"
+     ],
+     "par": 42,
+     "families": [
+      "M16"
+     ]
+    },
+    {
+     "key": "housestyle",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "N3",
+     "board": "schedule",
+     "requires": [
+      "percent-fmt",
+      "comma/currency-fmt",
+      "decimals",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "autofit",
+      "goto-special",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 44,
+     "families": [
+      "F1",
+      "F2"
+     ]
+    },
+    {
+     "key": "customfmt",
+     "kind": "existing",
+     "status": "planned",
+     "verdict": "new",
+     "family": "F3",
+     "board": "table",
+     "requires": [
+      "enter/edit(F2)",
+      "select",
+      "decimals",
+      "date/TODAY",
+      "align"
+     ],
+     "teaches": [
+      "custom-fmt(Ctrl+1)",
+      "parens-negative"
+     ],
+     "par": 34,
+     "par_estimate": true
+    },
+    {
+     "key": "gauntlet",
+     "kind": "capstone",
+     "status": "built",
+     "verdict": "capstone",
+     "family": "F1",
+     "board": "two-block",
+     "requires": [
+      "sum(Alt=)",
+      "comma/currency-fmt",
+      "decimals",
+      "bold/italic/color",
+      "blue-inputs",
+      "align",
+      "borders(top/outside/bottom)",
+      "autofit",
+      "hide/unhide/group"
+     ],
+     "teaches": [],
+     "par": 47,
+     "families": [
+      "F2",
+      "F4",
+      "F6",
+      "M1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "c3",
+   "name": "Formulas I",
+   "tier": "free",
+   "unlock_level": null,
+   "capstone": "qclose",
+   "teaches_line": "a formula points at cells — sums, anchors, ratios, growth and roll-ups on a live page",
+   "drills": [
+    {
+     "key": "percent",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M2",
+     "board": "two-block",
+     "requires": [
+      "row/col-select",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "decimals",
+      "bold/italic/color"
+     ],
+     "teaches": [
+      "percent-fmt"
+     ],
+     "par": 21,
+     "families": [
+      "M4"
+     ],
+     "absorbedBy": "anchor"
+    },
+    {
+     "key": "anchor",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M2",
+     "board": "grid",
+     "requires": [
+      "fill(D/R)",
+      "anchor($/F4)",
+      "mixed-anchor",
+      "comma/currency-fmt",
+      "decimals",
+      "borders(top/outside/bottom)"
+     ],
+     "teaches": [],
+     "par": 22
+    },
+    {
+     "key": "foot",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M1",
+     "board": "table",
+     "requires": [
+      "fill(D/R)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)"
+     ],
+     "teaches": [
+      "sum(Alt=)"
+     ],
+     "par": 29,
+     "families": [
+      "M14"
+     ]
+    },
+    {
+     "key": "margin",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M4",
+     "board": "table",
+     "requires": [
+      "fill(D/R)",
+      "percent-fmt",
+      "decimals",
+      "bold/italic/color",
+      "margin/ratio"
+     ],
+     "teaches": [
+      "point-mode",
+      "growth/CAGR"
+     ],
+     "par": 40,
+     "families": [
+      "F2"
+     ],
+     "absorbedBy": "ratios"
+    },
+    {
+     "key": "bridge",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M3",
+     "board": "schedule",
+     "requires": [
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "growth/CAGR",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 33
+    },
+    {
+     "key": "cagr",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M4",
+     "board": "schedule",
+     "requires": [
+      "fill(D/R)",
+      "anchor($/F4)",
+      "percent-fmt",
+      "decimals",
+      "bold/italic/color",
+      "growth/CAGR"
+     ],
+     "teaches": [],
+     "par": 36,
+     "families": [
+      "E5"
+     ],
+     "absorbedBy": "ratios"
+    },
+    {
+     "key": "fxconvert",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M2",
+     "board": "two-block",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "comma/currency-fmt",
+      "decimals",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)"
+     ],
+     "teaches": [],
+     "par": 35,
+     "absorbedBy": "anchor"
+    },
+    {
+     "key": "filldr",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "E5",
+     "board": "schedule",
+     "requires": [
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "margin/ratio",
+      "schedule",
+      "sign-convention"
+     ],
+     "teaches": [
+      "fill(D/R)",
+      "anchor($/F4)",
+      "mixed-anchor"
+     ],
+     "par": 44,
+     "families": [
+      "M2"
+     ],
+     "absorbedBy": "powergrid"
+    },
+    {
+     "key": "sumif",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M6",
+     "board": "tape",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "percent-fmt",
+      "decimals",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "margin/ratio"
+     ],
+     "teaches": [
+      "SUMIF(S)",
+      "tie-out/check-row"
+     ],
+     "par": 64,
+     "families": [
+      "M4"
+     ]
+    },
+    {
+     "key": "rollup",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M6",
+     "board": "two-block",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "mixed-anchor",
+      "borders(top/outside/bottom)",
+      "SUMIF(S)"
+     ],
+     "teaches": [],
+     "par": 80,
+     "families": [
+      "M2",
+      "M14"
+     ]
+    },
+    {
+     "key": "ratios",
+     "kind": "existing",
+     "status": "planned",
+     "verdict": "recut",
+     "family": "M4",
+     "board": "table",
+     "requires": [
+      "enter/edit(F2)",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "percent-fmt"
+     ],
+     "teaches": [
+      "margin/ratio",
+      "growth/CAGR"
+     ],
+     "par": 42,
+     "par_estimate": true
+    },
+    {
+     "key": "ifs",
+     "kind": "existing",
+     "status": "planned",
+     "verdict": "new",
+     "family": "M5",
+     "board": "table",
+     "requires": [
+      "enter/edit(F2)",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "bold/italic/color"
+     ],
+     "teaches": [
+      "IF/MIN/MAX"
+     ],
+     "par": 46,
+     "par_estimate": true
+    },
+    {
+     "key": "qclose",
+     "kind": "capstone",
+     "status": "planned",
+     "verdict": "capstone",
+     "family": "M1",
+     "board": "schedule",
+     "requires": [
+      "point-mode",
+      "sum(Alt=)",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "mixed-anchor",
+      "percent-fmt",
+      "decimals",
+      "growth/CAGR",
+      "SUMIF(S)",
+      "tie-out/check-row",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "sign-convention",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 94,
+     "families": [
+      "M2",
+      "M4",
+      "M6"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "c4",
+   "name": "Data & Lookups",
+   "tier": "free",
+   "unlock_level": null,
+   "capstone": "cleanroom",
+   "teaches_line": "rows, columns, sorts, filters and the two ways to read a value out of a tape",
+   "drills": [
+    {
+     "key": "drill",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M18",
+     "board": "table",
+     "requires": [
+      "select",
+      "select-edge",
+      "row/col-select",
+      "undo",
+      "clear/delete",
+      "copy/paste",
+      "paste-special",
+      "bold/italic/color",
+      "blue-inputs"
+     ],
+     "teaches": [],
+     "par": 22,
+     "families": [
+      "E4"
+     ],
+     "absorbedBy": "pastes"
+    },
+    {
+     "key": "unhide",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "E7",
+     "board": "table",
+     "requires": [
+      "select",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "autofit"
+     ],
+     "teaches": [],
+     "par": 25,
+     "families": [
+      "F6"
+     ]
+    },
+    {
+     "key": "filterpass",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "E9",
+     "board": "list",
+     "requires": [],
+     "teaches": [
+      "filter",
+      "stat-fn(MEDIAN/AVERAGE)"
+     ],
+     "par": 26,
+     "families": [
+      "M10"
+     ]
+    },
+    {
+     "key": "sort",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "E8",
+     "board": "tape",
+     "requires": [
+      "select",
+      "select-edge",
+      "clear/delete",
+      "sum(Alt=)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "tie-out/check-row"
+     ],
+     "teaches": [
+      "sort"
+     ],
+     "par": 31,
+     "families": [
+      "M1"
+     ],
+     "absorbedBy": "scrub"
+    },
+    {
+     "key": "scrub",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "E2",
+     "board": "tape",
+     "requires": [
+      "row/col-select",
+      "clear/delete",
+      "sum(Alt=)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "insert/delete row-col",
+      "sort"
+     ],
+     "teaches": [],
+     "par": 21,
+     "families": [
+      "E6",
+      "E8"
+     ]
+    },
+    {
+     "key": "rowops",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "E6",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "row/col-select",
+      "copy/paste",
+      "comma/currency-fmt",
+      "blue-inputs",
+      "borders(top/outside/bottom)"
+     ],
+     "teaches": [],
+     "par": 30,
+     "families": [
+      "E4"
+     ],
+     "absorbedBy": "repairshop"
+    },
+    {
+     "key": "series",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "E5",
+     "board": "grid",
+     "requires": [
+      "select",
+      "select-edge",
+      "fill(D/R)",
+      "bold/italic/color",
+      "align"
+     ],
+     "teaches": [],
+     "par": 44,
+     "families": [
+      "M11"
+     ]
+    },
+    {
+     "key": "lookup",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M7",
+     "board": "two-block",
+     "requires": [
+      "enter/edit(F2)",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "borders(top/outside/bottom)"
+     ],
+     "teaches": [
+      "INDEX/MATCH",
+      "VLOOKUP"
+     ],
+     "par": 59
+    },
+    {
+     "key": "lookup2",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M7",
+     "board": "grid",
+     "requires": [
+      "enter/edit(F2)",
+      "copy/paste",
+      "paste-special",
+      "anchor($/F4)",
+      "borders(top/outside/bottom)",
+      "sort",
+      "INDEX/MATCH"
+     ],
+     "teaches": [],
+     "par": 80,
+     "families": [
+      "M2"
+     ]
+    },
+    {
+     "key": "recon",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M7",
+     "board": "two-block",
+     "requires": [
+      "select",
+      "enter/edit(F2)",
+      "copy/paste",
+      "paste-special",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "stat-fn(MEDIAN/AVERAGE)",
+      "INDEX/MATCH",
+      "VLOOKUP"
+     ],
+     "teaches": [],
+     "par": 92,
+     "families": [
+      "M6",
+      "M14"
+     ]
+    },
+    {
+     "key": "textclean",
+     "kind": "existing",
+     "status": "planned",
+     "verdict": "new",
+     "family": "E10",
+     "board": "list",
+     "requires": [
+      "enter/edit(F2)",
+      "fill(D/R)",
+      "copy/paste",
+      "paste-special"
+     ],
+     "teaches": [
+      "text-fn(TRIM/PROPER/LEFT)"
+     ],
+     "par": 55,
+     "par_estimate": true
+    },
+    {
+     "key": "cleanroom",
+     "kind": "capstone",
+     "status": "planned",
+     "verdict": "capstone",
+     "family": "E2",
+     "board": "tape",
+     "requires": [
+      "clear/delete",
+      "insert/delete row-col",
+      "sort",
+      "filter",
+      "INDEX/MATCH",
+      "sum(Alt=)",
+      "hide/unhide/group",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "row/col-select"
+     ],
+     "teaches": [],
+     "par": 90,
+     "families": [
+      "E7",
+      "E8",
+      "E9",
+      "M7",
+      "M18"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "c5",
+   "name": "Formulas II",
+   "tier": "pro",
+   "unlock_level": 13,
+   "capstone": "redflags",
+   "teaches_line": "find the break — trace, show formulas, triage the sentinels, flip the signs, make it tie",
+   "drills": [
+    {
+     "key": "wrapfix",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M8",
+     "board": "table",
+     "requires": [
+      "select",
+      "enter/edit(F2)",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "VLOOKUP",
+      "tie-out/check-row"
+     ],
+     "teaches": [
+      "IFERROR"
+     ],
+     "par": 26,
+     "families": [
+      "M7"
+     ]
+    },
+    {
+     "key": "audit",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M9",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "enter/edit(F2)",
+      "fill(D/R)",
+      "comma/currency-fmt",
+      "blue-inputs",
+      "goto-special",
+      "margin/ratio"
+     ],
+     "teaches": [
+      "audit(trace)",
+      "show-formulas"
+     ],
+     "par": 28,
+     "families": [
+      "N3"
+     ]
+    },
+    {
+     "key": "signerr",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M16",
+     "board": "schedule",
+     "requires": [
+      "copy/paste",
+      "paste-special",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "percent-fmt",
+      "decimals",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "margin/ratio"
+     ],
+     "teaches": [
+      "sign-convention"
+     ],
+     "par": 35,
+     "absorbedBy": "powergrid"
+    },
+    {
+     "key": "tieout",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M14",
+     "board": "table",
+     "requires": [
+      "select",
+      "enter/edit(F2)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "audit(trace)",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 36,
+     "families": [
+      "M1",
+      "M17"
+     ],
+     "absorbedBy": "audit"
+    },
+    {
+     "key": "balcheck",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M14",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "enter/edit(F2)",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "tie-out/check-row"
+     ],
+     "teaches": [
+      "corkscrew(roll-forward)",
+      "linkage(cross-statement)"
+     ],
+     "par": 37
+    },
+    {
+     "key": "triage",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M8",
+     "board": "schedule",
+     "requires": [
+      "enter/edit(F2)",
+      "copy/paste",
+      "fill(D/R)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)"
+     ],
+     "teaches": [],
+     "par": 40
+    },
+    {
+     "key": "versionup",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "N4",
+     "board": "schedule",
+     "requires": [
+      "fill(D/R)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "growth/CAGR"
+     ],
+     "teaches": [
+      "find/replace"
+     ],
+     "par": 48,
+     "families": [
+      "M17"
+     ]
+    },
+    {
+     "key": "editfix",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "E1",
+     "board": "schedule",
+     "requires": [
+      "redo",
+      "clear/delete",
+      "schedule"
+     ],
+     "teaches": [
+      "enter/edit(F2)",
+      "undo"
+     ],
+     "par": 52,
+     "families": [
+      "E2",
+      "E3"
+     ],
+     "absorbedBy": "repairshop"
+    },
+    {
+     "key": "stalelink",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M17",
+     "board": "schedule",
+     "requires": [
+      "enter/edit(F2)",
+      "clear/delete",
+      "fill(D/R)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 64
+    },
+    {
+     "key": "balance",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M14",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "linkage(cross-statement)",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 66,
+     "families": [
+      "M1"
+     ],
+     "absorbedBy": "balcheck"
+    },
+    {
+     "key": "cases",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M12",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "margin/ratio"
+     ],
+     "teaches": [
+      "IF/MIN/MAX",
+      "CHOOSE"
+     ],
+     "par": 97
+    },
+    {
+     "key": "redflags",
+     "kind": "capstone",
+     "status": "planned",
+     "verdict": "capstone",
+     "family": "M8",
+     "board": "schedule",
+     "requires": [
+      "enter/edit(F2)",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "goto-special",
+      "find/replace",
+      "sign-convention",
+      "tie-out/check-row",
+      "audit(trace)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "margin/ratio",
+      "blue-inputs"
+     ],
+     "teaches": [],
+     "par": 90,
+     "families": [
+      "M9",
+      "M14",
+      "M16"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "c6",
+   "name": "Models I",
+   "tier": "pro",
+   "unlock_level": 16,
+   "capstone": "pitchpage",
+   "teaches_line": "what a company is worth — discount rate, free cash flow, DCF, comps and the page a VP reads",
+   "drills": [
+    {
+     "key": "dcfsens",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M2",
+     "board": "grid",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "mixed-anchor",
+      "comma/currency-fmt",
+      "decimals",
+      "borders(top/outside/bottom)",
+      "growth/CAGR"
+     ],
+     "teaches": [],
+     "par": 35
+    },
+    {
+     "key": "fcfbuild",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "E5",
+     "board": "schedule",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "sign-convention"
+     ],
+     "teaches": [],
+     "par": 40,
+     "families": [
+      "M1",
+      "M16"
+     ],
+     "absorbedBy": "dcf"
+    },
+    {
+     "key": "retbridge",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M4",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "margin/ratio"
+     ],
+     "teaches": [
+      "bridge"
+     ],
+     "par": 56,
+     "families": [
+      "M14"
+     ]
+    },
+    {
+     "key": "txncomps",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M10",
+     "board": "tape",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "stat-fn(MEDIAN/AVERAGE)",
+      "margin/ratio",
+      "bridge"
+     ],
+     "teaches": [],
+     "par": 52,
+     "absorbedBy": "comps"
+    },
+    {
+     "key": "football",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M10",
+     "board": "table",
+     "requires": [
+      "select",
+      "select-edge",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "borders(top/outside/bottom)",
+      "IF/MIN/MAX"
+     ],
+     "teaches": [],
+     "par": 65,
+     "families": [
+      "M4"
+     ],
+     "absorbedBy": "pitchpage"
+    },
+    {
+     "key": "accdil",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "E3",
+     "board": "table",
+     "requires": [
+      "select",
+      "select-edge",
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "percent-fmt",
+      "decimals",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 70,
+     "families": [
+      "M4"
+     ]
+    },
+    {
+     "key": "dcf",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M15",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 85,
+     "families": [
+      "M2"
+     ]
+    },
+    {
+     "key": "comps",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M10",
+     "board": "table",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "decimals",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "stat-fn(MEDIAN/AVERAGE)",
+      "margin/ratio",
+      "bridge"
+     ],
+     "teaches": [],
+     "par": 89,
+     "families": [
+      "F3"
+     ]
+    },
+    {
+     "key": "sourcesuses",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M14",
+     "board": "two-block",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "percent-fmt",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "margin/ratio",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 92,
+     "families": [
+      "M1",
+      "M4"
+     ],
+     "absorbedBy": "pitchpage"
+    },
+    {
+     "key": "wacc",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M10",
+     "board": "table",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "linkage(cross-statement)"
+     ],
+     "teaches": [
+      "stat-fn(MEDIAN/AVERAGE)"
+     ],
+     "par": 112,
+     "families": [
+      "M2"
+     ]
+    },
+    {
+     "key": "npvirr",
+     "kind": "existing",
+     "status": "planned",
+     "verdict": "new",
+     "family": "M15",
+     "board": "schedule",
+     "requires": [
+      "enter/edit(F2)",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "IF/MIN/MAX",
+      "percent-fmt"
+     ],
+     "teaches": [
+      "NPV/IRR"
+     ],
+     "par": 60,
+     "par_estimate": true
+    },
+    {
+     "key": "pitchpage",
+     "kind": "capstone",
+     "status": "planned",
+     "verdict": "capstone",
+     "family": "M17",
+     "board": "cover",
+     "requires": [
+      "select",
+      "point-mode",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "IF/MIN/MAX",
+      "stat-fn(MEDIAN/AVERAGE)",
+      "comma/currency-fmt",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "date/TODAY",
+      "margin/ratio",
+      "bridge"
+     ],
+     "teaches": [],
+     "par": 88,
+     "families": [
+      "M10"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "c7",
+   "name": "Models II",
+   "tier": "pro",
+   "unlock_level": 19,
+   "capstone": "cascade",
+   "teaches_line": "the debt side and the schedules that feed it — corkscrews, sweeps, waterfalls, covenants, liquidity",
+   "drills": [
+    {
+     "key": "rollfwd",
+     "kind": "existing",
+     "status": "planned",
+     "verdict": "new",
+     "family": "M13",
+     "board": "schedule",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "sign-convention"
+     ],
+     "teaches": [
+      "circularity-avoidance"
+     ],
+     "par": 26
+    },
+    {
+     "key": "covtable",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M5",
+     "board": "table",
+     "requires": [
+      "copy/paste",
+      "fill(D/R)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "IF/MIN/MAX",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 36,
+     "families": [
+      "F1"
+     ]
+    },
+    {
+     "key": "wk13",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M11",
+     "board": "grid",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "corkscrew(roll-forward)",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 45,
+     "families": [
+      "M1"
+     ]
+    },
+    {
+     "key": "schedule",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M13",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "point-mode",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "linkage(cross-statement)"
+     ],
+     "teaches": [],
+     "par": 69
+    },
+    {
+     "key": "lbo",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M15",
+     "board": "table",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "growth/CAGR",
+      "margin/ratio",
+      "bridge",
+      "schedule"
+     ],
+     "teaches": [],
+     "par": 71,
+     "families": [
+      "M4"
+     ],
+     "absorbedBy": "lbobuild"
+    },
+    {
+     "key": "intsched",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M13",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "decimals",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "margin/ratio",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "sign-convention",
+      "circularity-avoidance"
+     ],
+     "teaches": [],
+     "par": 72,
+     "families": [
+      "M5"
+     ]
+    },
+    {
+     "key": "waterfall",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M5",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "copy/paste",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "point-mode",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "IF/MIN/MAX",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 77,
+     "families": [
+      "M13"
+     ]
+    },
+    {
+     "key": "liqbridge",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "E3",
+     "board": "table",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "IF/MIN/MAX",
+      "bridge",
+      "sign-convention"
+     ],
+     "teaches": [],
+     "par": 77,
+     "families": [
+      "M5"
+     ],
+     "absorbedBy": "accdil"
+    },
+    {
+     "key": "debtsched",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M13",
+     "board": "schedule",
+     "requires": [
+      "fill(D/R)",
+      "anchor($/F4)",
+      "percent-fmt",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "IF/MIN/MAX",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "circularity-avoidance"
+     ],
+     "teaches": [],
+     "par": 86,
+     "families": [
+      "M5"
+     ],
+     "absorbedBy": "debtblock"
+    },
+    {
+     "key": "revolver",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M5",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "IF/MIN/MAX",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "circularity-avoidance"
+     ],
+     "teaches": [],
+     "par": 95,
+     "families": [
+      "M13"
+     ]
+    },
+    {
+     "key": "cascade",
+     "kind": "capstone",
+     "status": "built",
+     "verdict": "capstone",
+     "family": "M5",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "IF/MIN/MAX",
+      "corkscrew(roll-forward)"
+     ],
+     "teaches": [],
+     "par": 161,
+     "families": [
+      "M13",
+      "M14"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "c8",
+   "name": "Full Builds",
+   "tier": "pro",
+   "unlock_level": 22,
+   "capstone": "shipit",
+   "teaches_line": "whole models, cold and under the clock — three statements, the DCF page, the paper LBO, the cover",
+   "drills": [
+    {
+     "key": "threestmt",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M17",
+     "board": "two-block",
+     "requires": [
+      "select",
+      "select-edge",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "linkage(cross-statement)",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 45,
+     "families": [
+      "M14"
+     ]
+    },
+    {
+     "key": "dashcover",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M17",
+     "board": "cover",
+     "requires": [
+      "select",
+      "select-edge",
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "percent-fmt",
+      "comma/currency-fmt",
+      "decimals",
+      "bold/italic/color"
+     ],
+     "teaches": [],
+     "par": 47,
+     "families": [
+      "E3"
+     ]
+    },
+    {
+     "key": "bsbuild",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M14",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "copy/paste",
+      "paste-special",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "corkscrew(roll-forward)",
+      "linkage(cross-statement)",
+      "sign-convention",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 64,
+     "families": [
+      "M13"
+     ],
+     "absorbedBy": "threestmt"
+    },
+    {
+     "key": "cfslink",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M17",
+     "board": "schedule",
+     "requires": [
+      "fill(D/R)",
+      "point-mode",
+      "anchor($/F4)",
+      "percent-fmt",
+      "decimals",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "sign-convention"
+     ],
+     "teaches": [],
+     "par": 66,
+     "families": [
+      "M13"
+     ],
+     "absorbedBy": "threestmt"
+    },
+    {
+     "key": "debtblock",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M13",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "corkscrew(roll-forward)",
+      "schedule",
+      "linkage(cross-statement)",
+      "sign-convention"
+     ],
+     "teaches": [],
+     "par": 70,
+     "families": [
+      "M5"
+     ]
+    },
+    {
+     "key": "isbuild",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M3",
+     "board": "schedule",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "percent-fmt",
+      "decimals",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "margin/ratio",
+      "schedule"
+     ],
+     "teaches": [],
+     "par": 71,
+     "families": [
+      "M4"
+     ]
+    },
+    {
+     "key": "lbobuild",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M15",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "growth/CAGR",
+      "margin/ratio",
+      "schedule",
+      "tie-out/check-row"
+     ],
+     "teaches": [],
+     "par": 84,
+     "families": [
+      "M14"
+     ]
+    },
+    {
+     "key": "opmodel",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M3",
+     "board": "schedule",
+     "requires": [
+      "copy/paste",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "percent-fmt",
+      "decimals",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "margin/ratio",
+      "audit(trace)"
+     ],
+     "teaches": [],
+     "par": 85,
+     "families": [
+      "M4"
+     ],
+     "absorbedBy": "isbuild"
+    },
+    {
+     "key": "nwcsched",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "keep",
+     "family": "M4",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "sum(Alt=)",
+      "bold/italic/color",
+      "blue-inputs",
+      "borders(top/outside/bottom)",
+      "schedule"
+     ],
+     "teaches": [],
+     "par": 102,
+     "families": [
+      "M13"
+     ]
+    },
+    {
+     "key": "dcfbuild",
+     "kind": "existing",
+     "status": "built",
+     "verdict": "retire",
+     "family": "M15",
+     "board": "schedule",
+     "requires": [
+      "select",
+      "fill(D/R)",
+      "anchor($/F4)",
+      "margin/ratio",
+      "bridge"
+     ],
+     "teaches": [],
+     "par": 113,
+     "families": [
+      "M2"
+     ],
+     "absorbedBy": "dcf"
+    },
+    {
+     "key": "handoff",
+     "kind": "existing",
+     "status": "planned",
+     "verdict": "new",
+     "family": "M18",
+     "board": "schedule",
+     "requires": [
+      "paste-special",
+      "blue-inputs",
+      "find/replace",
+      "hide/unhide/group",
+      "goto-special"
+     ],
+     "teaches": [
+      "paste-values-handoff"
+     ],
+     "par": 70,
+     "families": [
+      "E4",
+      "E7",
+      "N4"
+     ],
+     "par_estimate": true
+    },
+    {
+     "key": "shipit",
+     "kind": "capstone",
+     "status": "planned",
+     "verdict": "capstone",
+     "family": "M17",
+     "board": "two-block",
+     "requires": [
+      "fill(D/R)",
+      "sum(Alt=)",
+      "anchor($/F4)",
+      "paste-special",
+      "corkscrew(roll-forward)",
+      "linkage(cross-statement)",
+      "tie-out/check-row",
+      "sign-convention",
+      "growth/CAGR",
+      "bold/italic/color",
+      "borders(top/outside/bottom)",
+      "date/TODAY",
+      "schedule",
+      "margin/ratio"
+     ],
+     "teaches": [],
+     "par": 110
+    }
+   ]
+  }
+ ],
+ "retired": [
+  {
+   "key": "keyboardtour",
+   "into": "navigation",
+   "outside_catalog": true,
+   "why": "the Keyboard Tour is replaced by Foundations level 1 (CURRICULUM_V3 §9.1); v4 keeps that retirement."
+  },
+  {
+   "key": "tapepull",
+   "into": "lookup",
+   "outside_catalog": true,
+   "why": "CATALOG_V4 §4 c4.5 — lookup's tier 1 becomes VLOOKUP, which absorbs the v3 tapepull idea before it was ever built. lookup now carries the VLOOKUP teach and filterpass the stat-fn one."
+  }
+ ],
+ "tags": [
+  "CHOOSE",
+  "IF/MIN/MAX",
+  "IFERROR",
+  "INDEX/MATCH",
+  "NPV/IRR",
+  "SUMIF(S)",
+  "VLOOKUP",
+  "align",
+  "anchor($/F4)",
+  "audit(trace)",
+  "autofit",
+  "blue-inputs",
+  "bold/italic/color",
+  "borders(top/outside/bottom)",
+  "bridge",
+  "circularity-avoidance",
+  "clear/delete",
+  "comma/currency-fmt",
+  "copy/paste",
+  "corkscrew(roll-forward)",
+  "costs-negative",
+  "custom-fmt(Ctrl+1)",
+  "cut",
+  "date/TODAY",
+  "decimals",
+  "enter/edit(F2)",
+  "fill(D/R)",
+  "filter",
+  "find/replace",
+  "goto-special",
+  "growth/CAGR",
+  "hide/unhide/group",
+  "insert/delete row-col",
+  "jump(ctrl-arrow)",
+  "linkage(cross-statement)",
+  "margin/ratio",
+  "mixed-anchor",
+  "move",
+  "parens-negative",
+  "paste-special",
+  "paste-values-handoff",
+  "percent-fmt",
+  "point-mode",
+  "redo",
+  "row/col-select",
+  "save",
+  "schedule",
+  "select",
+  "select-edge",
+  "show-formulas",
+  "sign-convention",
+  "sort",
+  "stat-fn(MEDIAN/AVERAGE)",
+  "sum(Alt=)",
+  "text-fn(TRIM/PROPER/LEFT)",
+  "tie-out/check-row",
+  "undo"
+ ],
+ "placement": [
+  "navigation",
+  "combo",
+  "margin",
+  "sort",
+  "opmodel"
+ ],
+ "tracks": {
+  "fluency": {
+   "id": "fluency",
+   "name": "Excel Keyboard Fluency",
+   "chapters": [
+    "c1",
+    "c2"
+   ]
+  },
+  "formulas": {
+   "id": "formulas",
+   "name": "Spreadsheet Formulas & Data",
+   "chapters": [
+    "c3",
+    "c4",
+    "c5"
+   ]
+  },
+  "modeling": {
+   "id": "modeling",
+   "name": "Financial Modeling Keyboard Mastery",
+   "chapters": [
+    "c6",
+    "c7",
+    "c8"
+   ]
+  }
+ }
+}

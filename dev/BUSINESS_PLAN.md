@@ -37,9 +37,14 @@ Atlas, and skip the LLC). Reasoning, so the session does not re-derive it:
 | Delaware C-corp (Stripe Atlas) | raising priced equity soon; option pool; SAFEs | ~$500 bundle: incorporation + EIN + bank intro + Stripe account; $400/yr DE franchise + registered agent | double taxation and corporate formalities are overhead a solo bootstrapped product does not need yet; an LLC can convert later |
 
 **Steps (a day of admin, most of it waiting):**
-1. Name availability search on the state's business registry; the entity name can be "Hotkey Labs
-   LLC" or similar — the brand stays hotkey.gg (a DBA is only needed if the site name must appear
-   on legal docs; usually the LLC name + "d/b/a hotkey.gg" on invoices is enough).
+1. Name availability search on the state's business registry. **Decided (2026-09-04): a generic
+   holding-style LLC name with `hotkey.gg` as a DBA.** The LLC owns the product; the DBA is the
+   public brand, so the bank account, Stripe descriptor, and contracts can read "hotkey.gg" while
+   one entity can hold a second product later without re-forming. Pick the holding name to be
+   boring and available (candidates: `Spreadsheet Skills Group LLC`, `Keystroke Labs LLC`,
+   `Redshortcut Holdings LLC`); confirm it on the state registry + USPTO before filing. File the
+   DBA / fictitious-name / trade-name registration for `hotkey.gg` right after the LLC clears —
+   a cheap county or state filing Wolf does himself, no formation-service add-on.
 2. File the **Articles / Certificate of Organization** online with the state. Registered agent:
    Wolf's own address is fine in most states if he does not mind it on the public record;
    otherwise a service (~$100–150/yr) — pick this at filing.
@@ -116,15 +121,66 @@ entitlement read `hkEntitlementRead()`, `loadEntitlement()`, the disabled `#pwCh
 
 ## 5 · Mail, logins, bills — the routing table
 
-`dev/EMAIL_SETUP.md` has the DNS and mailbox how-to. The routing decision:
+`dev/EMAIL_SETUP.md` has the DNS and mailbox how-to. **This table is the canonical list of hotkey.gg
+addresses.** Site pages, Supabase/Resend senders, vendor logins and the security.txt file must match it;
+add an address here first, then use it. One real mailbox; everything else is a Workspace alias (free) or
+a send-only Resend identity.
 
-| address | routes to | used for |
+**The one mailbox**
+
+| address | what it is | used for |
 |---|---|---|
-| `wolf@hotkey.gg` | the one real mailbox (Google Workspace, ~$7/mo) | founder identity: registrar, Cloudflare, GitHub, Supabase owner, Stripe owner, bank |
-| `billing@hotkey.gg` | alias → wolf@ (label: billing) | every vendor invoice + autopay receipts; Stripe account email; Supabase Pro billing. Survives a later hire. |
-| `hello@hotkey.gg` | alias → wolf@ | public support/press (already linked site-wide); Stripe public support contact |
-| `security@hotkey.gg` | alias → wolf@ | disclosure inbox named on `security.html` |
-| `no-reply@` / `auth@` / `recap@` | send-only (Resend) | transactional + campaigns, per EMAIL.md |
+| `wolf@hotkey.gg` | the one real mailbox (Google Workspace Starter, ~$7/mo) | founder identity; owner login on registrar, Cloudflare, GitHub, Supabase, Stripe, bank |
+
+**Customer-facing aliases** (all → wolf@; Gmail filter labels them so one inbox stays sortable)
+
+| address | used for | where it is named |
+|---|---|---|
+| `hello@hotkey.gg` | support, bug reports, general questions, press; Stripe public support contact; the reply-to on every outbound mail | contact.html, footer, receipts, Stripe |
+| `billing@hotkey.gg` | vendor invoices + autopay receipts; Stripe account email; Supabase Pro billing; refund requests | billing.html, Stripe, every vendor account |
+| `security@hotkey.gg` | vulnerability disclosure (today security.html points at hello@ — fix in T3) | security.html, `/.well-known/security.txt` |
+| `privacy@hotkey.gg` | data-access / deletion requests (GDPR/CCPA wording in privacy.html) | privacy.html |
+| `legal@hotkey.gg` | DMCA, terms questions, counsel, registered-agent mail | terms.html, privacy.html |
+| `teams@hotkey.gg` | desks, schools, clubs, enterprise pilots; the address on the team application flow | contact.html "schools", teams page, `team_applications` |
+
+**Required-by-convention aliases** (→ wolf@; never advertised, but mail servers and vendors expect them. Only
+`admin@` and `dmarc@` are added by hand; the other two exist automatically — 2026-09-04, Wolf added every
+non-reserved alias in this section.)
+
+| address | why it exists |
+|---|---|
+| `admin@hotkey.gg` | Google Workspace super-admin recovery; domain-verification mails from vendors |
+| `postmaster@hotkey.gg` | RFC 5321 requirement; bounce reports from other mail servers. **Reserved by Google Workspace** — cannot be added as an alias; Workspace creates it and delivers it to the primary super-admin account (wolf@). Re-point in Admin console → Apps → Gmail → Routing if the super-admin ever changes. |
+| `abuse@hotkey.gg` | RFC 2142; where ISPs and Cloudflare route abuse complaints. **Reserved by Google Workspace**, same handling as postmaster@. |
+| `dmarc@hotkey.gg` | `rua=` target in the DMARC record (EMAIL_SETUP §1); aggregate reports land here |
+
+**Vendor-login aliases** (→ wolf@; one alias per vendor so a leaked password or a handoff is one account, not all)
+
+| address | vendor login it owns |
+|---|---|
+| `supabase@hotkey.gg` | Supabase organisation owner |
+| `github@hotkey.gg` | GitHub organisation / deploy account |
+| `cloudflare@hotkey.gg` | Cloudflare account (DNS, Pages) |
+| `stripe@hotkey.gg` | Stripe account owner (billing@ stays the invoice address) |
+| `registrar@hotkey.gg` | domain registrar |
+
+**Send-only identities** (Resend; SPF/DKIM per EMAIL_SETUP §1; replies route to hello@)
+
+| address | sends |
+|---|---|
+| `auth@hotkey.gg` | Supabase custom SMTP: magic links, password resets, email change |
+| `notifications@hotkey.gg` | receipts, streak/recap mails, achievement unlocks, team invites (replaces `no-reply@` — a no-reply sender hurts deliverability and hides replies we want) |
+| `recap@hotkey.gg` | the weekly recap campaign (kept separate so unsubscribes do not touch transactional mail) |
+
+**Internal**
+
+| address | used for |
+|---|---|
+| `ops@hotkey.gg` | machine alerts: Supabase, Cloudflare, uptime, GitHub Actions failures; filtered to its own label |
+
+Not on the list, on purpose: `contact@` (hello@ is the one public address), `info@`, `sales@`
+(teams@ covers it until there is a sales function), `no-reply@` (see notifications@). Site mismatches
+to fix are parked in ROADMAP §3 and belong to track T3.
 
 - **Password manager with a business vault** (1Password Business or Bitwarden): every account
   above, shared later with a co-founder or contractor by vault, never by chat. **Hardware-key 2FA**
@@ -144,7 +200,7 @@ entitlement read `hkEntitlementRead()`, `loadEntitlement()`, the disabled `#pwCh
 | when | do | output |
 |---|---|---|
 | S1 | §0 OBA clearance; pick the state; CPA hour | a written yes; state + entity type decided |
-| S2 | §1 file, EIN, operating agreement, state tax registration; §5 Workspace + aliases + DNS (EMAIL_SETUP §1) | LLC exists; wolf@ / billing@ / hello@ / security@ live |
+| S2 | §1 file, EIN, operating agreement, state tax registration; §5 Workspace + the full alias table + DNS (EMAIL_SETUP §1) | LLC exists; wolf@ and every alias in §5 live |
 | S3 | §2 bank + card; §4 bookkeeping connected; §5 vault, 2FA, register; move every vendor to billing@ + the card | money and logins separated from personal |
 | S4 | §3 Stripe live account, products, Tax, portal; webhook + checkout functions deployed (with SECURITY_PLAN §4); terms/privacy/refund updated with the entity | a live checkout behind the still-OFF flag; the premium flip becomes a pure product decision |
 
@@ -152,7 +208,7 @@ entitlement read `hkEntitlementRead()`, `loadEntitlement()`, the disabled `#pwCh
 
 1. Is the OBA / employer constraint lifted, and cleared in writing?
 2. Home state (for §1's cost table) — and any plan to raise money within 12 months?
-3. Entity name (brand stays hotkey.gg).
+3. ~~Entity name~~ — **decided: generic holding-style LLC + `hotkey.gg` DBA** (see §1). Holding name still to pick.
 4. Bank: startup-neobank (Mercury/Relay) or existing bank?
 5. Bookkeeping: tool or spreadsheet?
 6. Pricing at launch (replaces the $7 / $19 placeholders) — a product decision that Stripe setup
