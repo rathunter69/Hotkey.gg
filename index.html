@@ -25011,6 +25011,9 @@ function maybeStartCoach(){
   document.addEventListener('keydown', latch, true);
 }
 function startClock(){ if(running||done||sandboxMode||tourMode)return;   /* r452 §3.0.4(6): the Keyboard Tour is untimed */ running=true; started=performance.now();   // r238: the onboarding sandbox never times
+  /* REFINE p0 (dev/REFINE_PHASE.md §3.1): drill_start = the progression DENOMINATOR — one per
+     timed classic attempt (the guard above makes this body run once per run; resume never re-fires). */
+  try{ if(gameMode==='classic' && !microRun && !(marathon&&marathon.active)) ev('drill_start',{d:cur}); }catch(e){}
   try{ const r=$('result'); if(r && r.classList.contains('ready')){ r.className='result'; r.innerHTML=''; } }catch(e){}   /* r365 */
   try{ const c=document.getElementById('startCoach'); if(c) c.remove(); }catch(e){}
   if(marathon && marathon.active && !marathon.endAt){
@@ -25672,7 +25675,7 @@ function checkWin(){
     }
   }
   lastXpGain={n:xpGain, note:xpNote};
-  logRunLite(t); __achPending=true;   // r80: sweep fires when the player MOVES ON, never over the results box
+  logRunLite(t, __bonus && __bonus.ok); __achPending=true;   // r80: sweep fires when the player MOVES ON, never over the results box (r457: pass the latched ☆ so solve carries it)
   // r79: achievement flags — anti-achievements and time-of-day feats
   try{
     const fl=JSON.parse(localStorage.getItem('hk_ach_flags')||'{}');
@@ -32101,6 +32104,10 @@ function loadChallenge(key, opts){
   weeklyMode = !!(opts && opts.weekly);
   challengeMode = !!(opts && opts.challenge);
   updateDailyBtn(); updateWeeklyBtn(); try{ updateChallengeBtn(); }catch(e){}
+  /* REFINE p0 (dev/REFINE_PHASE.md §3.1): switching away from a live, unsolved classic drill =
+     bounced off the wall (a progression signal). key===cur is a restart, not an abandon — it
+     re-fires drill_start via startClock, so grind reads as start>>solve, never as an abandon. */
+  try{ if(running && !done && key!==cur && gameMode==='classic' && !microRun && !(marathon&&marathon.active)) ev('drill_abandon',{d:cur, ms:Math.round(performance.now()-started)}); }catch(e){}
   cur=key; const C=CHALLENGES[key];
   microRun=null; window.__microOffer=null;   /* r421 §2.7: any load leaves a live rep — the rep never survives a board change */
   if(challengeMode){ _rand = mulberry32(challengeSeed()); __lastSeed=null; }         // r219: same extra-hard board worldwide
@@ -34253,8 +34260,12 @@ function chordifyLog(log){
   return out;
 }
 // r80: lite local run ledger — feeds in-game achievement checks (server runs stay canonical)
-function logRunLite(t){
-  try{ ev('solve',{d:cur, ms:Math.round(t*1000)});
+function logRunLite(t, star){
+  /* REFINE p0 (dev/REFINE_PHASE.md §3.1): solve now carries clear QUALITY — keystrokes vs par,
+     whether the run was clean, and whether the ☆ was taken — so the difficulty curve is readable
+     per drill (how far above par people clear, clean-run rate, ☆ capture rate). */
+  try{ const C=CHALLENGES[cur]||{};
+    ev('solve',{d:cur, ms:Math.round(t*1000), k:keyLog.length, pk:C.parKeys||0, cl:(!mouseUsed&&!guidedUsed)?1:0, st:star?1:0});
     if(!localStorage.getItem('hk_ev_first')){ localStorage.setItem('hk_ev_first','1'); ev('first_solve',{d:cur}); }
   }catch(e){}
   try{
