@@ -55,9 +55,10 @@
      "par": 60
     },
     {
-     "key": "powergrid",
+     "key": "ribbonways",
      "kind": "level",
-     "status": "add",
+     "status": "built",
+     "_note": "r457: onboarding rework — replaces the scrapped powergrid 'level'. ribbonways teaches the ribbon-walk vs chord mental model plus the format vocabulary (comma/percent/border/bold/blue). It inherits powergrid's tag role for now so the dependency graph and modeltour's capstone-chain stay whole; the full Foundations restructure (the 5 iterated drills moved into c1, ribbonways' tags corrected to the formatting set, check-curriculum-map (d1) rewritten) is the next step.",
      "requires": [
       "enter/edit(F2)",
       "select",
@@ -73,7 +74,7 @@
       "sign-convention",
       "costs-negative"
      ],
-     "par": 110
+     "par": 90
     },
     {
      "key": "printshop",

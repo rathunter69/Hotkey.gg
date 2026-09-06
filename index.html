@@ -4,21 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>hotkey.gg · spreadsheet speedruns</title>
-<meta name="description" content="Keyboard-only Excel training: 75 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="description" content="Keyboard-only Excel training: 76 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="hotkey.gg">
 <meta property="og:title" content="hotkey.gg — train Excel like it's a sport">
-<meta property="og:description" content="Keyboard-only Excel training: 75 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta property="og:description" content="Keyboard-only Excel training: 76 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta property="og:url" content="https://www.hotkey.gg/">
 <meta property="og:image" content="https://www.hotkey.gg/art/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="hotkey.gg — train Excel like it's a sport">
-<meta name="twitter:description" content="Keyboard-only Excel training: 75 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
+<meta name="twitter:description" content="Keyboard-only Excel training: 76 banker-grade drills, live leaderboards, and desks for your whole team. No mouse allowed.">
 <meta name="twitter:image" content="https://www.hotkey.gg/art/og.png">
 <link rel="canonical" href="https://www.hotkey.gg/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"hotkey.gg","alternateName":"hotkey.gg \u2014 Excel shortcut trainer","url":"https://www.hotkey.gg/","description":"An Excel simulator that scores your keyboard speed \u2014 75 drills from navigation to full model builds, with pars, leaderboards, and guided demos."}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"hotkey.gg","alternateName":"hotkey.gg \u2014 Excel shortcut trainer","url":"https://www.hotkey.gg/","description":"An Excel simulator that scores your keyboard speed \u2014 76 drills from navigation to full model builds, with pars, leaderboards, and guided demos."}</script>
 <script>
   // BOOT BEACON: if anything fatal happens while the game loads, paint the error on
   // screen instead of failing silent ("all the elements are gone" must never be a mystery).
@@ -2302,7 +2302,7 @@
      tight card look. */
   #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 </style>
-<script src="drills.js?v=307"></script>
+<script src="drills.js?v=308"></script>
 
 
 
@@ -23194,7 +23194,7 @@ const CHALLENGES = {
        typing each total by hand clears the drill too, it just costs the keystrokes. The
        fix is robust and order-free: D4:D6 are live =B*C formulas, so fixing C4 before or
        after the fill lands the same end state. ============================================================================ */
-    tutorial:{ n:2, name:'Enter, Edit & Fill', nextKey:'filldr' },
+    tutorial:{ n:2, name:'Enter, Edit & Fill', nextKey:'ribbonways' },
     steps:[
       { name:'type it in',
         why:'a value is one keystroke away — type it, press enter, and the cursor drops to the next row',
@@ -23263,6 +23263,102 @@ const CHALLENGES = {
         {label:'Fix the '+o.lbl4+' rate — drop the extra zero', ok:b2},
         {label:'Fill the Cost column down from the top', ok:b3},
         {label:'Fill both costs from one cell', ok:b3 && oneFill, bonus:true, reveal:true},
+      ];
+    }
+  },
+  ribbonways:{
+    /* ============================================================================
+       FOUNDATIONS 3 · "Ribbon & Chords" (r457, the onboarding rework). The THIRD
+       integrated tutorial and the one Wolf named specifically: teach the two ways to
+       drive Excel from the keyboard — the ALT ribbon walk (Alt lights the ribbon, then
+       tab-letter → command-letter) and the CTRL chord (one grip, straight to the
+       command) — and when to reach for each. A light dressing pass on a monthly summary:
+       ribbon ops in step 1, the same class of ops as chords in step 2, a free-choice
+       blue-input beat in step 3.
+
+       Every op here is a VERIFIED engine route (harvested from the `gauntlet` demo):
+         Alt H K = comma · Alt H B P = top border · Ctrl+B = bold ·
+         Ctrl+Shift+% = percent · Alt H F C →×4 ↵ = Blue font.
+       Grades END STATE (fmtStyle / bt / bold / fontColor), never a keypress. The ☆ is
+       the one-pass comma, read off the S.fmtOps latch (§1.0(d)) — commaing a row at a
+       time clears the drill too, it just costs the passes. ============================================================================ */
+    tutorial:{ n:3, name:'Ribbon & Chords', nextKey:'filldr' },
+    steps:[
+      { name:'walk the ribbon (Alt)',
+        why:'Alt lights the ribbon — H is the Home tab, then one letter per command; every button is a short walk you can see',
+        beats:[ {id:0, why:'Select the figure block and comma it — Alt, H, K.'},
+                {id:1, why:'Rule the Profit line with a top border — Alt, H, B, P.'} ] },
+      { name:'fire the chord (Ctrl)',
+        why:'a chord skips the walk — one grip goes straight to the command',
+        beats:[ {id:2, why:'Bold the header row — Ctrl+B, no walk.'},
+                {id:3, why:'Percent the Margin line — Ctrl+Shift+%.'} ] },
+      { name:'your call',
+        why:'ribbon to FIND a command, chord to LIVE in it — most commands offer both',
+        beats:[ {id:4, why:'Mark the typed tax rate blue — either the ribbon (Alt H F C) or the Format Cells dialog.'} ] }
+    ],
+    par:90, parKeys:18, saveClose:true,   /* r457: replay par for an onboarding tutorial (§9.1 band 60–120 s); HOTKEY_CLOCKS.ribbonways overrides pass to par×2.5. parKeys provisional; dev/e2e-par-sweep.js re-measures. Mirrored in HOTKEY_PARS. */
+    aha:'the ribbon is how you FIND a command; the chord is how you LIVE in it.',
+    prompt:'A monthly summary came off the model raw — bare numbers, a plain header row, a margin line still reading as a decimal, and a tax rate typed in black. Dress it: comma the figure block and rule the Profit line from the ribbon (Alt lights it up, then Home, then the command), then bold the header and percent the margin with chords (one grip each), and mark the tax rate blue. Almost every command here has BOTH a ribbon walk and a chord — reach for the ribbon to find one, the chord to fly.',
+    req(){ return 'figures <em>B4:D6</em> <em>alt h k</em> · Profit <em>B6:D6</em> <em>alt h b p</em> · header <em>A3:D3</em> <em>ctrl+b</em> · Margin <em>B7:D7</em> <em>ctrl+shift+%</em> · tax rate <em>B9</em> <em>alt h f c</em> → Blue · <em>ctrl+s</em>'; },
+    guide(){ return [
+      'select the nine figures <kbd>B4:D6</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> — Alt lights the ribbon, H is the Home tab, K is comma; watch the KeyTips as you walk',
+      'the Profit line <kbd>B6:D6</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>b</kbd> <kbd>p</kbd> — B drops the Borders menu, P is the top edge a total wears',
+      'the header row <kbd>A3:D3</kbd> · <kbd>ctrl</kbd>+<kbd>b</kbd> — the chord goes straight to Bold, no walk at all',
+      'the Margin line <kbd>B7:D7</kbd> · <kbd>ctrl</kbd>+<kbd>⇧</kbd>+<kbd>%</kbd> — one grip lands percent (the ribbon route is <kbd>alt</kbd> <kbd>h</kbd> <kbd>p</kbd>)',
+      'the tax rate <kbd>B9</kbd> · <kbd>alt</kbd> <kbd>h</kbd> <kbd>f</kbd> <kbd>c</kbd> then <kbd>→</kbd> to Blue · <kbd>↵</kbd> — blue ink is how a desk marks a typed input (<kbd>ctrl</kbd>+<kbd>1</kbd> opens the same Font tab)',
+      '☆ the discovery: comma all nine figures in ONE selection — <kbd>B4:D6</kbd> then <kbd>alt</kbd> <kbd>h</kbd> <kbd>k</kbd> once — instead of a row at a time',
+    ]; },
+    targets(){ return ['B4:D6','B6:D6','A3:D3','B7:D7','B9', null]; },
+    demo(){ return [
+      {sel:'B4:D6', keys:[Kb.alt,L('H'),L('K')]},                    /* comma the whole block in one pass — the ☆ */
+      {sel:'B6:D6', keys:[Kb.alt,L('H'),L('B'),L('P')]},            /* top border on Profit */
+      {sel:'A3:D3', keys:[Kb.bold]},                                 /* bold header — the chord */
+      {sel:'B7:D7', keys:[Kb.pct]},                                  /* percent the margin — the chord */
+      {sel:'B9',    keys:[Kb.alt,L('H'),L('F'),L('C'),{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},{key:'ArrowRight'},Kb.enter]},   /* blue font via the ribbon */
+    ]; },
+    build(){
+      const cells={};
+      const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'];
+      const m0=rnd(0,MON.length-4); const mons=[MON[m0],MON[m0+1],MON[m0+2]];
+      const div=codename();
+      const rev=[rnd(20,60)*10, rnd(20,60)*10, rnd(20,60)*10];
+      const cost=rev.map(v=>-Math.round(v*rnd(45,70)/100));           // costs negative (sign convention)
+      cells['A1']={...blankCell(), value:div+' — monthly summary', txt:true, bold:true};
+      cells['A3']={...blankCell(), value:'Line', txt:true};           // header NOT bold — beat 2 bolds A3:D3
+      ['B','C','D'].forEach((c,i)=>{ cells[c+'3']={...blankCell(), value:mons[i], txt:true, align:'right'}; });
+      cells['A4']={...blankCell(), value:'Revenue', txt:true};
+      cells['A5']={...blankCell(), value:'Costs',   txt:true};
+      cells['A6']={...blankCell(), value:'Profit',  txt:true, bold:true};
+      cells['A7']={...blankCell(), value:'Margin',  txt:true};
+      ['B','C','D'].forEach((c,i)=>{
+        cells[c+'4']={...blankCell(), value:rev[i]};                                    // raw, no number format
+        cells[c+'5']={...blankCell(), value:cost[i]};                                   // raw negative
+        cells[c+'6']={...blankCell(), formula:'='+c+'4+'+c+'5', value:rev[i]+cost[i], bold:true};   // Profit subtotal
+        cells[c+'7']={...blankCell(), formula:'='+c+'6/'+c+'4', value:(rev[i]+cost[i])/rev[i]};      // Margin ratio — a raw decimal
+      });
+      const tax=rnd(20,32)/100;
+      cells['A9']={...blankCell(), value:'Tax rate', txt:true};
+      cells['B9']={...blankCell(), value:tax, decimals:2};            // typed BLACK — should be blue (beat 4)
+      cells['A11']={...blankCell(), value:'Dress the page: comma the figure block, rule the Profit line, bold the header, percent the Margin line, and mark the tax rate blue. Each command has a ribbon walk and a chord.', txt:true, it:true, fontColor:'gray'};
+      this._o={ mons:mons, div:div };
+      return {ROWS:12, cells, active:{r:4,c:2}, sel:null, colW:{1:90,2:80,3:80,4:80}};
+    },
+    checks(S){
+      const cel=k=>S.cells[k]||{};
+      const figs=['B4','C4','D4','B5','C5','D5','B6','C6','D6'];
+      const b0=figs.every(k=>cel(k).fmtStyle==='comma');
+      const b1=['B6','C6','D6'].every(k=>{ const c=cel(k); return !!(c.bt||c.ball); });
+      const b2=['A3','B3','C3','D3'].every(k=>cel(k).bold===true);
+      const b3=['B7','C7','D7'].every(k=>cel(k).fmtStyle==='percent');
+      const b4=cel('B9').fontColor==='blue';
+      const onePass=(S.fmtOps||[]).some(o=>o.r1<=4 && o.r2>=6 && o.c1<=2 && o.c2>=4);   // the 9 figures comma'd in one selection
+      return [
+        {label:'Comma-format the figure block', ok:b0},
+        {label:'Rule the Profit line — a top border', ok:b1},
+        {label:'Bold the header row', ok:b2},
+        {label:'Percent-format the Margin line', ok:b3},
+        {label:'Mark the typed tax rate blue', ok:b4},
+        {label:'Comma the whole figure block in one pass', ok:b0 && onePass, bonus:true, reveal:true},
       ];
     }
   }
