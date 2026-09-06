@@ -58,35 +58,12 @@
      "key": "ribbonways",
      "kind": "level",
      "status": "built",
-     "_note": "r457: onboarding rework — replaces the scrapped powergrid 'level'. ribbonways teaches the ribbon-walk vs chord mental model plus the format vocabulary (comma/percent/border/bold/blue). It inherits powergrid's tag role for now so the dependency graph and modeltour's capstone-chain stay whole; the full Foundations restructure (the 5 iterated drills moved into c1, ribbonways' tags corrected to the formatting set, check-curriculum-map (d1) rewritten) is the next step.",
+     "_note": "r457: Foundations onboarding #3. Its lesson is the ribbon-walk vs chord mental model, taught on a monthly summary (Revenue/Costs/Profit/Margin), so it genuinely introduces the FORMAT vocabulary (comma/percent/decimals/border/bold/blue/align/autofit/parens) AND the sign/ratio/anchor grammar the board carries. Foundations' three onboarding levels (navigation, entrybasics, ribbonways) together carry the whole foundational vocabulary the rest of the catalog builds on — the roles the scrapped powergrid + printshop levels used to hold, folded into the three real drills.",
      "requires": [
       "enter/edit(F2)",
       "select",
       "select-edge",
       "fill(D/R)"
-     ],
-     "teaches": [
-      "point-mode",
-      "sum(Alt=)",
-      "margin/ratio",
-      "anchor($/F4)",
-      "mixed-anchor",
-      "sign-convention",
-      "costs-negative"
-     ],
-     "par": 90
-    },
-    {
-     "key": "printshop",
-     "kind": "level",
-     "status": "add",
-     "requires": [
-      "select",
-      "row/col-select",
-      "goto-special",
-      "enter/edit(F2)",
-      "margin/ratio",
-      "sign-convention"
      ],
      "teaches": [
       "comma/currency-fmt",
@@ -97,9 +74,16 @@
       "blue-inputs",
       "align",
       "borders(top/outside/bottom)",
-      "autofit"
+      "autofit",
+      "point-mode",
+      "sum(Alt=)",
+      "margin/ratio",
+      "anchor($/F4)",
+      "mixed-anchor",
+      "sign-convention",
+      "costs-negative"
      ],
-     "par": 100
+     "par": 90
     },
     {
      "key": "modeltour",

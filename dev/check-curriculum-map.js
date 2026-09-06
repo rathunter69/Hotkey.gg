@@ -166,11 +166,11 @@ const firstTaughtAt = new Map();   // tag -> ref of the first entry that teaches
   {
     const ds = c1.drills || [];
     const body = ds.slice(0, -1);                       // everything but the capstone
-    if (ds.length !== 5) { bad(`(d1) ${c1.id} carries ${ds.length} entries — Foundations is EXACTLY five levels (four kind 'level' + the capstone)`); bad_d++; }
+    if (ds.length !== 4) { bad(`(d1) ${c1.id} carries ${ds.length} entries — Foundations is EXACTLY three onboarding levels + the capstone (r457: navigation · entrybasics · ribbonways · modeltour). The heavily-iterated drills live in Foundations in the live catalog but are classified by TOPIC in this map.`); bad_d++; }
     const strays = body.filter(d => d.kind !== 'level');
-    if (strays.length) { bad(`(d1) ${c1.id} ${c1.name} is the five-level tutorial — every entry before the capstone must be kind 'level'; found ${strays.map(d => d.key + ' (' + d.kind + ')').join(', ')}`); bad_d++; }
+    if (strays.length) { bad(`(d1) ${c1.id} ${c1.name} is the three-level onboarding tutorial — every entry before the capstone must be kind 'level'; found ${strays.map(d => d.key + ' (' + d.kind + ')').join(', ')}`); bad_d++; }
     const nLevels = body.filter(d => d.kind === 'level').length;
-    if (nLevels !== 4) { bad(`(d1) ${c1.id} carries ${nLevels} entries of kind 'level' (want exactly 4)`); bad_d++; }
+    if (nLevels !== 3) { bad(`(d1) ${c1.id} carries ${nLevels} entries of kind 'level' (want exactly 3 — navigation, entrybasics, ribbonways)`); bad_d++; }
     if (body[0] && (body[0].requires || []).length) { bad(`(d1) ${c1.id}/${body[0].key} is level 1 — first contact requires nothing, it has ${body[0].requires.join(', ')}`); bad_d++; }
     for (const d of body)
       if (typeof d.par === 'number' && (d.par < 60 || d.par > 120)) { bad(`(d1) ${c1.id}/${d.key} par ${d.par} — a level runs 60–120 s`); bad_d++; }

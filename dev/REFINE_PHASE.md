@@ -122,3 +122,25 @@ chrome (Phase 2) and art (Phase 3) systems are locked, so the polish sweep has a
 - **r457 (2026-09-05):** phase scoped with Wolf (chrome = Option A, driver = progression).
   Phase 0 progression instrumentation added to `index.html` (`drill_start`, `drill_abandon`,
   enriched `solve`). No migration. This doc written.
+- **r457 (2026-09-06) — THE ONBOARDING REWORK (Wolf's re-scope).** The real driver was the
+  drill catalog itself: `navigation` (a light corridor game) dropped straight into `filldr` (a
+  par-44 operating build) — the `navigation→filldr ×2.20` cliff. Wolf's call: make Foundations a
+  true light onramp, keep the 7 heavily-iterated drills as the graduate-into fulsome tier, scrap
+  the old CV3 `repairshop`/`powergrid`/`printshop` "levels." Delivered:
+  1. **`entrybasics` — Enter, Edit & Fill** (new guided drill #2): type / F2-edit / fill, one ☆
+     on the one-fill move. Grades end state.
+  2. **`ribbonways` — Ribbon & Chords** (new guided drill #3): Step 1 ribbon-walk (Alt), Step 2
+     chord (Ctrl), Step 3 free-choice blue-input; one ☆ on the one-pass comma.
+  3. **Foundations reordered lightest-first:** navigation · entrybasics · ribbonways · rowops 30 ·
+     blocksel 34 · pastes 42 · filldr 44 · editfix 52 · modeltour★. Tutorial handoff chain rewired.
+  4. **Curriculum map restructured:** c1 = 3 onboarding levels + capstone (scrapped placeholders
+     removed; `ribbonways` honestly carries the format+grammar vocabulary the catalog builds on).
+     `check-curriculum-map.js` (d1) rewritten 4-levels→3-levels. The 5 iterated drills are
+     classified by TOPIC in the map (filldr = Formulas-I content, …) but live in Foundations in
+     the game — a deliberate model-vs-packaging split, documented in `drills.js`.
+  5. Fluency certificate track +both drills (RPC migration + mirror); SEO regenerated (76 drills);
+     marketing count 74→76; `drills.js` cache v306→v309.
+  Every affected suite run green (demo-replay of both new drills WIN, depth-mechanics 169/0,
+  onboard 86/86, smoke, landing, paywall, curriculum-map, invariants).
+  **Prod follow-up:** re-apply the fluency certificate RPC so both new drills count live.
+  **Still open:** WS2 bug sweep (needs Wolf's repro examples), WS3 Models/Full-Builds pass.
