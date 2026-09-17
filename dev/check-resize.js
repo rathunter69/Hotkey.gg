@@ -21,6 +21,7 @@
 */
 'use strict';
 const { chromium } = require('playwright-core');
+const { newIsolatedPage } = require('./browser-isolation');
 /* accept either convention the fleet uses: BASE is an origin, URL is a full index.html — some
    harnesses take one, some the other, and a caller exporting URL for the batch must not end up
    requesting /index.html/index.html here */
@@ -47,7 +48,7 @@ const measure = () => {
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true, args: ['--no-sandbox'] });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const page = await newIsolatedPage(browser, BASE, { viewport: { width: 1440, height: 900 } });
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 140)));
   /* r450 start gate: this suite never types, it only measures layout — but loadChallenge() is
@@ -57,7 +58,6 @@ const measure = () => {
     localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');
     localStorage.setItem('hk_xlv', '2');
   } catch (e) {} });
-  await page.route('**/@supabase/**', r => r.abort());
   await page.goto(BASE + '/index.html', { waitUntil: 'load', timeout: 30000 });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof loadChallenge === 'function');
   await page.evaluate(() => { try { _pro = true; } catch (e) {} });

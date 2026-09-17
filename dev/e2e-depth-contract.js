@@ -20,6 +20,7 @@
      node dev/e2e-depth-contract.js [drill ...]     # needs a server on 8791 */
 'use strict';
 const { chromium } = require('playwright-core');
+const { newIsolatedPage } = require('./browser-isolation');
 const fs = require('fs');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const URL = process.env.URL || 'http://127.0.0.1:8791/index.html';
@@ -34,7 +35,7 @@ const KEYS = only.length ? LEDGER.filter(k => only.includes(k)) : LEDGER;
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
-  const page = await browser.newPage();
+  const page = await newIsolatedPage(browser, URL);
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 120)));
   await page.addInitScript(() => { try { ['hotkey_onboarded', 'hk_tour_done', 'hk_learn_done', 'hk_gate_off']

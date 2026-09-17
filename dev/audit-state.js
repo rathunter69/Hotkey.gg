@@ -1,6 +1,7 @@
 'use strict';
 // September 17 audit reproduction. Synthetic data only; all external traffic blocked.
 const { chromium } = require('playwright-core');
+const { newIsolatedContext } = require('./browser-isolation');
 const { createServer } = require('./serve');
 
 (async () => {
@@ -11,8 +12,7 @@ const { createServer } = require('./serve');
   try {
     browser = await chromium.launch({ executablePath: process.env.CHROME, headless: true });
     console.log('Browser:', browser.version());
-    const context = await browser.newContext();
-    await context.route('**/*', r => new URL(r.request().url()).origin === origin ? r.continue() : r.abort());
+    const context = await newIsolatedContext(browser, origin);
     // This diagnostic probes account state, not the first-key/start-clock contract.
     await context.addInitScript(() => localStorage.setItem('hk_gate_off', '1'));
     const page = await context.newPage();
@@ -40,8 +40,7 @@ const { createServer } = require('./serve');
     console.log('SYNC_FIELDS', JSON.stringify(snapshot));
     await context.close();
 
-    const boards = await browser.newContext();
-    await boards.route('**/*', r => new URL(r.request().url()).origin === origin ? r.continue() : r.abort());
+    const boards = await newIsolatedContext(browser, origin);
     await boards.addInitScript(() => {
       window.__auditMode = 'limited';
       window.__auditReads = [];

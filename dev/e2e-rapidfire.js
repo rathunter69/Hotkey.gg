@@ -9,6 +9,7 @@
    Run: URL=http://localhost:8791/index.html node dev/e2e-rapidfire.js */
 'use strict';
 const { chromium } = require('playwright-core');
+const { newIsolatedPage } = require('./browser-isolation');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const URL = process.env.URL || 'http://127.0.0.1:8791/index.html';
 
@@ -20,7 +21,7 @@ function check(name, ok, extra) {
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
-  const page = await browser.newPage({ viewport: { width: 1240, height: 800 } });
+  const page = await newIsolatedPage(browser, URL, { viewport: { width: 1240, height: 800 } });
   const pageErrors = [];
   page.on('pageerror', e => pageErrors.push(String(e.message || e).slice(0, 160)));
   await page.addInitScript(() => {

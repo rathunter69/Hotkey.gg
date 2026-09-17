@@ -44,6 +44,7 @@
  */
 'use strict';
 const { chromium } = require('playwright-core');
+const { newIsolatedPage } = require('./browser-isolation');
 
 const BASE = process.env.BASE || 'http://127.0.0.1:8791';
 const DSF = Number(process.env.DSF) || 4;   // device pixels per CSS px — sub-pixel rounding is the
@@ -139,7 +140,7 @@ function installOverlayGuards() {
      contrast measurement below no longer cares — but pinning makes the run deterministic, and
      SCHEME=dark exercises the other side on demand. Borders in dark are additionally covered by
      dev/e2e-depth-mechanics.js, which asserts both themes. */
-  const page = await browser.newPage({ viewport: { width: VW, height: 900 }, deviceScaleFactor: DSF,
+  const page = await newIsolatedPage(browser, BASE, { viewport: { width: VW, height: 900 }, deviceScaleFactor: DSF,
     colorScheme: process.env.SCHEME === 'dark' ? 'dark' : 'light' });
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 160)));
@@ -643,7 +644,7 @@ function installOverlayGuards() {
 
   for (const dark of [false, true]) {
     for (const dpr of [1, 2]) {
-      const pg = await browser.newPage({ viewport: { width: VW, height: 900 }, deviceScaleFactor: dpr,
+      const pg = await newIsolatedPage(browser, BASE, { viewport: { width: VW, height: 900 }, deviceScaleFactor: dpr,
         colorScheme: dark ? 'dark' : 'light' });
       pg.on('pageerror', e => errs.push(String(e.message || e).slice(0, 160)));
       await pg.addInitScript(installOverlayGuards);   // r455: same guard set as the per-edge `page`
@@ -654,7 +655,7 @@ function installOverlayGuards() {
 
       const tag = `DPR${dpr} ${dark ? 'dark ' : 'light'}`;
       const r = await alignScan(pg, dpr, dark);
-      if (r.err) { fail++; console.log(`  FAIL ${`alignment ${tag}`.padEnd(46)} ${r.err}`); await pg.close(); continue; }
+      if (r.err) { fail++; console.log(`  FAIL ${`alignment ${tag}`.padEnd(46)} ${r.err}`); await pg.context().close(); continue; }
       const run = r.cells.filter(c => c.bt), plain = r.cells.filter(c => !c.bt);
       const shown = r.cells.map(c => `${c.bt ? 'bt' : '--'}c${c.c}[${c.bt ? c.start : c.lineStart},${c.bt ? c.end : c.lineEnd})`).join(' ');
 
@@ -662,7 +663,7 @@ function installOverlayGuards() {
         fail++; console.log(`  FAIL ${`alignment ${tag} — run paints at all`.padEnd(46)} ${shown}${r.diag ? '  diag ' + JSON.stringify(r.diag) : ''}`);
         if (r.img) console.log(`       img ${JSON.stringify(r.img)}  clip ${JSON.stringify(r.clip)}`);
         if (r.b64) console.log(`       png ${r.b64}`);   // ~2KB — paste into a file to SEE what the runner shot
-        await pg.close(); continue;
+        await pg.context().close(); continue;
       }
       /* 1. NO STEP between neighbours. */
       {
@@ -696,7 +697,7 @@ function installOverlayGuards() {
         if (!ok) fail++;
         console.log(`  ${ok ? 'ok  ' : 'FAIL'} ${`alignment ${tag} — run is one unbroken rule`.padEnd(46)} ${r.holes} hole pixel(s) along the rule`);
       }
-      await pg.close();
+      await pg.context().close();
     }
   }
 

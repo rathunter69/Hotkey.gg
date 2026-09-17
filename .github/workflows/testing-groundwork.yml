@@ -1,0 +1,12 @@
+name: testing groundwork
+
+on:
+  push:
+    branches: [codex/testing-security-groundwork]
+
+permissions:
+  contents: read
+
+jobs:
+  full-gate:
+    uses: ./.github/workflows/gate.yml

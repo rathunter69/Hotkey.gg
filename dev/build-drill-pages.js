@@ -12,7 +12,9 @@
 const fs = require('fs');
 const path = require('path');
 const { chromium } = require('playwright-core');
+const { newIsolatedPage } = require('./browser-isolation');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const URL = process.env.URL || 'http://127.0.0.1:8791/index.html';
 const ROOT = path.join(__dirname, '..');
 const OUT = path.join(ROOT, 'drills');
 const SITE = 'https://www.hotkey.gg';
@@ -32,23 +34,23 @@ const jstr = s => JSON.stringify(String(s == null ? '' : s));
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
-  const page = await browser.newPage();
+  const page = await newIsolatedPage(browser, URL);
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
     localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');  } catch (e) {} });
-  await page.goto((process.env.URL || 'http://127.0.0.1:8791/index.html'), { waitUntil: 'load' });
+  await page.goto(URL, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && window.HOTKEY_DRILLS);
 
   // the compendium's chord descriptions — reused as the mini-guide copy
-  const ref = await browser.newPage();
-  await ref.goto((process.env.URL || 'http://127.0.0.1:8791/index.html').replace('index.html', 'reference.html'), { waitUntil: 'load' });
+  const ref = await newIsolatedPage(browser, URL);
+  await ref.goto(URL.replace('index.html', 'reference.html'), { waitUntil: 'load' });
   await ref.waitForFunction(() => typeof DATA !== 'undefined');
   const refDesc = await ref.evaluate(() => {
     const m = {};
     DATA.forEach(sec => sec.items.forEach(it => { if (!m[it.k]) m[it.k] = it.d; }));
     return m;
   });
-  await ref.close();
+  await ref.context().close();
 
   const data = await page.evaluate(() => {
     const groups = HOTKEY_DRILLS.groups.map(g => ({ name: g.name, keys: g.keys.filter(k => CHALLENGES[k]) }));

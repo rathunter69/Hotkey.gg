@@ -2,9 +2,61 @@
 
 Updated: September 17, 2026
 Task: `01a0af90-b973-7572-b7ff-d5bf9f504a52` (starter 4)
-Branch: `codex/git-testing-releases`
-Starting commit: `9df3405fbdcdeac0e2f2f8d4ef4170fb51dc0bdd`
-State: locally verified branch checkpoint; no merge or deployment (remote commit is in file history)
+Branch: `codex/testing-security-groundwork`
+Starting commit: `6c984161c31bc4637dbe88b73a4da8408cefdf1d`
+Tested application source: `c702c6932b342cd36656317f7ce50f1c33b7df3e`
+State: second testing-groundwork batch locally verified; Linux branch gate pending; no merge or deployment
+
+## Second batch — full gate isolation and exact local matrix
+
+Wolf's September 17 groundwork request authorized finishing production-network isolation
+across the full gate and generators, then running the complete pinned suite in a suitable
+isolated environment. This branch starts from the accepted account/testing integration and
+preserves the account repair and its 14-scenario regression suite.
+
+All remaining gate browser contexts now use the redirect-safe helper. This includes visual,
+deep-link, parity, onboarding, alternate paths, Mac input, rapid-fire, guided, formula,
+grid-height, depth, border, pause, resize and start-gate checks, plus both drill-page generator
+pages. Separate fresh-device, theme/DPR, trainer/reference and fixture profiles remain separate.
+The account fixture still fulfills only its synthetic local page, then falls back into the
+shared origin blocker. No assertion, timeout, gameplay source or generated output changed.
+
+`gate.yml` now declares `contents: read`, pins checkout/setup-node v4 to reviewed commit SHAs,
+and supports reusable `workflow_call`. The branch-only `testing-groundwork.yml` calls that exact
+gate on pushes to `codex/testing-security-groundwork`; it references no secrets, environment,
+database, hosting or deployment action. Existing workflows do not run on this branch push.
+
+Fresh local results on the exact integrated source, portable SHA256-verified Node 22.23.2,
+npm 10.9.8, locked Playwright 1.49.1 and its Chromium 131 headless shell build 1148:
+
+- exact `npm ci` passed; package and lock files did not change;
+- all seven static commands passed; 39 catalog-variety warnings remain warnings;
+- isolation canary passed both tests, including the `newIsolatedPage` wrapper, zero sink
+  WebSocket upgrades and inactive service workers;
+- the seven-command smoke suite passed, including 14 account-isolation scenarios;
+- visual 406, deep-link 18, parity 189, onboarding 86, alternate paths 159,
+  Mac input 30, rapid-fire 14, guided 77, formula 102, depth-contract 74,
+  depth-mechanics 169 and resize 34 assertions/checks passed;
+- all-drill replay, grid-height, border render, pause and start-gate suites passed;
+- generator wrote 74 drill pages plus library/sitemap/refmap and produced no tracked content diff.
+
+These local runs cover every command in the browser gate, with its two behavioral-smoke/full-replay
+invocations represented by the full replay and the passing smoke suite. They do not become Linux
+CI evidence until the branch workflow completes at the exact remote SHA. Ignored local logs are
+supplementary. Independent review and the remote result belong in the final checkpoint below.
+
+Independent review found no blocking isolation or workflow defect. It confirmed that every
+active gate browser entry point uses the helper, fixture fallbacks retain the boundary, and
+the branch caller is read-only and references no secrets. Its one cleanup finding was that
+three harnesses closed pages created in explicit contexts; those sites now close the context,
+and the generator, border renderer and all 30 Mac-input checks passed again. The review also
+prompted direct WebSocket and service-worker canary assertions, which pass locally.
+
+Security's separate groundwork checkpoint `14d7e10a79232000ff24d2637ce6adc72b786b1f`
+prepares 56 SQL assertions and official pinned Postgres/Auth image evidence. The SQL remains
+unrun because the genuine Auth/platform bootstrap is not yet scripted and reviewed. Testing did
+not add or dispatch an incomplete database job. The next database batch is Security-owned
+bootstrap/config/assertions first, then Testing can wire a separate no-secrets branch job.
 
 ## Scope and outcome
 
@@ -75,9 +127,9 @@ npm run test:browser -- dev/e2e-audit-onboard.js
 node dev/audit-state.js
 ```
 
-The smoke suite is a limited local baseline, not the complete CI engine matrix, database
-permission coverage, real-user playtesting or a deployment rehearsal. The remaining full
-gate harnesses must receive isolation before routine execution. No real account journey,
+The first-batch smoke suite was a limited local baseline, not the complete CI engine matrix,
+database permission coverage, real-user playtesting or a deployment rehearsal. This second
+batch isolated the remaining gate harnesses and ran their complete local matrix. No real account journey,
 native Mac input, full financial-model review, payment lifecycle, backup restore or rollback
 has passed in this task.
 
@@ -91,8 +143,8 @@ carry forward the audit; product repairs remain with their named owners.
 | D01: main has no enforced review/gate | Fresh GitHub metadata: `protected=false`, required checks off, no contexts, zero rulesets | Git/testing: reviewed main ruleset requires PR review and the actual gate context; demonstrate failed/missing check blocks merge. Do not test by merging an unsafe commit |
 | D02: database delivery fails | Latest run [33814362058](https://github.com/rathunter69/Hotkey.gg/actions/runs/33814362058) still failed at link with invalid token format; migrations/functions skipped. A gate for that source passed independently | Git/testing with Security: correct credentials through settings, pin CLI, rehearse link/migrations/functions in isolation, then verify accepted SHA and actual deployed state during a separately authorized release |
 | D03: clean replay and permission tests absent | No PR database validation; no local container runtime; migrations include a production digest callback | Git/testing + Security + cleanup: follow [isolated setup](../testing-database.md), prove outbound denial and disabled scheduling before replay, test direct-table/RPC role cases, reconcile definitions/history without rewriting migrations |
-| D05: wider browser gate lacks isolation | Five smoke harnesses repaired here; initial review found eleven of 22 gate harnesses without a relevant external blocker, with SDK-only guards in others. Existing onboarding origin filter does not test redirect escape | Git/testing: migrate every remaining context/page and generator to reviewed same-origin isolation, preserve stubs, then run the complete gate |
-| D06: complete exact CI still unproven | Exact npm install, isolated smoke and onboarding pass locally with pinned headless shell, but full Chromium on Windows fails and no foundation CI run exists | Git/testing: complete Node22/locked-dependency/pinned-browser full Linux gate at the exact reviewed source; save version and test evidence |
+| D05: wider browser gate isolation | Resolved in this batch for every active gate harness and generator; redirect, WebSocket and inactive-service-worker canaries pass, and the complete local matrix is green | Keep the helper mandatory when adding a gate browser entry point; legacy scripts outside the gate remain outside this claim |
+| D06: complete exact CI still unproven | Exact npm install and the complete isolated matrix pass locally with the pinned headless shell; the branch Linux run is still pending | Git/testing: complete Node22/locked-dependency/pinned-browser full Linux gate at the exact reviewed source; save the run and SHA evidence |
 | D07: hosting/cache and rollback unverified | Earlier audit observed immutable prototype HTML; Cloudflare/GitHub Pages both publish, origin/build settings remain unconfirmed | Git/testing: verify static-site build/output and serving origin, check preview response headers, tie web/DB/functions to a source SHA, rehearse recovery in isolation |
 | Product/security defects remain | DATA-01/02/03 desk authority, profile privacy and MFA; saved-run duplication/state/rankings; formula and grader defects from existing audit | Security, persistence and engine owners: focused failing-before/passing-after tests plus allowed-route regressions. This tooling branch fixes none of those product defects |
 | Paid launch acceptance remains open | Billing is a scaffold, access/learning rules and public claims need agreement; production account flows and business readiness unverified | Chief with area owners: agreed launch scope and verified acceptance from CURRENT/PRODUCT before any launch decision |
@@ -109,7 +161,7 @@ No new product decision was made. Proposed shared-status update: exact dependenc
 and local Git access now work; replace those old unknowns with the precise browser/CI/DB
 limits above after reviewing this branch. Do not mark Security's separate work integrated.
 
-Next bounded batch: finish browser isolation across the full gate and establish a
-container-capable isolated database host, then replay the chain and add Security's first
-permission regressions. Production delivery/protection changes and rollback rehearsal
-follow their separately reviewed release batch. Keep billing and catalog development paused.
+Next bounded batch: finish the Security-owned platform bootstrap experiment, then run the
+already prepared permission assertions only after that environment is reviewed. Repository
+protection, hosting/rollback rehearsal and production delivery remain separate release work.
+Keep billing and catalog development paused.

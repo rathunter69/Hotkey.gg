@@ -14,6 +14,7 @@
    -- this was the one suite in the fleet that could not be pointed at another port. */
 'use strict';
 const { chromium } = require('playwright-core');
+const { newIsolatedContext } = require('./browser-isolation');
 const BASE = process.env.BASE || 'http://127.0.0.1:8791';
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 let pass = 0, fail = 0;
@@ -48,14 +49,16 @@ function contrast(fgS, bgS) {
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
-  const page = await browser.newPage();
+  const target = BASE + '/index.html';
+  const context = await newIsolatedContext(browser, target);
+  const page = await context.newPage();
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 140)));
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
     localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');    localStorage.setItem('hk_xlv', '2');
   } catch (e) {} });
-  await page.goto(BASE + '/index.html', { waitUntil: 'load' });
+  await page.goto(target, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof applyTheme === 'function');
   await page.evaluate(() => { try { _pro = true; } catch (e) {} });
 
@@ -151,6 +154,7 @@ function contrast(fgS, bgS) {
   await page.evaluate(() => applyTheme('default'));
   const realErrors = errs.filter(e => !/supabase|Failed to fetch|NetworkError|ERR_/i.test(e));
   ok(realErrors.length === 0, 'zero page errors during the sweep', realErrors.join(' | '));
+  await context.close();
   await browser.close();
   console.log((fail ? 'VISUAL MATRIX: ' + fail + ' FAILURE(S), ' : 'VISUAL MATRIX: ALL ') + pass + ' PASS');
   process.exit(fail ? 1 : 0);

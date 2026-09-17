@@ -4,20 +4,22 @@
    the adapter itself is what's under test. */
 'use strict';
 const { chromium } = require('playwright-core');
+const { newIsolatedPage } = require('./browser-isolation');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const URL = process.env.URL || 'http://127.0.0.1:8791/index.html';
 let pass = 0, fail = 0;
 const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { fail++; console.log('  FAIL ' + n + (x ? ' — ' + x : '')); } };
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
-  const page = await browser.newPage();
+  const page = await newIsolatedPage(browser, URL);
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 140)));
   await page.addInitScript(() => { try {
     Object.defineProperty(navigator, 'platform', { get: () => 'MacIntel' });
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
     localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');  } catch (e) {} });
-  await page.goto((process.env.URL || 'http://127.0.0.1:8791/index.html'), { waitUntil: 'load' });
+  await page.goto(URL, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof demoKey === 'function');
   await page.evaluate(() => { try { _pro = true; } catch (e) {} });
 
@@ -193,11 +195,11 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(g.opened && g.hasKeyTips && g.hasFn, 'the mac popup opens and teaches KeyTips + the fn setting');
 
   console.log('G. reference page toggle (Stage 3)');
-  const ref = await browser.newPage();
+  const ref = await newIsolatedPage(browser, URL);
   await ref.addInitScript(() => { try {
     Object.defineProperty(navigator, 'platform', { get: () => 'MacIntel' });
   } catch (e) {} });
-  await ref.goto((process.env.URL || 'http://127.0.0.1:8791/index.html').replace('index.html', 'reference.html'), { waitUntil: 'load' });
+  await ref.goto(URL.replace('index.html', 'reference.html'), { waitUntil: 'load' });
   await ref.waitForTimeout(900);
   const r1 = await ref.evaluate(() => {
     const caps = [...document.querySelectorAll('.cap')].map(c => c.textContent);
@@ -234,7 +236,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(r1.macNow, 'reference defaults to ⌘/⌥ caps on a Mac');
   ok(r1.winBack, 'toggle flips back to windows caps');
   ok(r1.popped, 'mac setup link opens the popup');
-  await ref.close();
+  await ref.context().close();
 
   ok(errs.length === 0, 'zero page errors through the Mac matrix', errs.join(' | '));
   console.log(fail === 0 ? `MAC INPUT: ALL ${pass} PASS` : `MAC INPUT: ${fail} FAIL / ${pass} pass`);

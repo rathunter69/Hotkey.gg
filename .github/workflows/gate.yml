@@ -4,9 +4,12 @@
 # drill-page drift check (regenerate + diff must be clean).
 name: gate
 on:
+  workflow_call:
   pull_request:
   push:
     branches: [main]
+permissions:
+  contents: read
 concurrency:
   group: gate-${{ github.ref }}
   cancel-in-progress: true
@@ -15,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45   # r450: the depth pass grew the engine matrix past 25 min on CI hardware — the last two head runs died at exactly 25:00 (timeout presents as 'cancelled')
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0   # r392: need history to diff the changed files for scope-gating
       # r392 (Wolf): PATH-BASED GATING. The heavy engine matrix (parity/onboard/replay/
@@ -43,7 +46,7 @@ jobs:
           else
             echo "engine=false" >> "$GITHUB_OUTPUT"; echo '=> cosmetic-only: smoke + lb only'
           fi
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: npm

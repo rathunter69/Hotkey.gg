@@ -35,6 +35,7 @@
    Run: CHROME=<chromium> BASE=http://127.0.0.1:8791 node dev/check-startgate.js  */
 'use strict';
 const { chromium } = require('playwright-core');
+const { newIsolatedContext } = require('./browser-isolation');
 const BASE = process.env.BASE || 'http://127.0.0.1:8791';
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const DRILL = 'filldr';                 // a plain Foundations board: no gating tier, short demo
@@ -45,7 +46,7 @@ const check = (ok, label, extra) => { if (!ok) fail++; console.log('  ' + (ok ? 
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
-  const ctx = await browser.newContext({ viewport: { width: 1280, height: 860 } });
+  const ctx = await newIsolatedContext(browser, BASE, { viewport: { width: 1280, height: 860 } });
   const page = await ctx.newPage();
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 160)));
