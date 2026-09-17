@@ -4,6 +4,23 @@ Prepared September 17, 2026. This guide supplies task starters and a working met
 [CURRENT.md](CURRENT.md) owns priorities and status; [PRODUCT.md](PRODUCT.md) owns product
 decisions. This guide is not a second backlog. The master roadmap conversation stays planning-only.
 
+## Communication and chief discussion — Wolf's September 17 clarification
+
+Every Hotkey session and delegated agent should be concise. Lead with the result and user
+impact, then the decision or next step. Prefer a short paragraph or a few bullets. Put detailed
+checks, source history and technical evidence in the saved handoff; link to it instead of
+repeating it in chat. State material failures and limits plainly. Avoid routine command
+narration, repeated unchanged status and large questionnaires. Ask a few connected decisions
+at a time and recommend an option. Concision does not excuse incomplete work or missing evidence.
+
+The chief session is also the home for discussion of the project overview, overall design
+specification and platform at large. Connect audience and product promise to the learner
+journey, modes/paths/progress, visual and interaction principles, access/subscriptions and
+roadmap priorities. Keep PRODUCT.md as the shared specification, with confirmed rules and
+open choices clearly separated. Area sessions investigate their bounded topics and return
+evidence, recommendations and dated user decisions; the chief reconciles cross-area effects.
+Do not duplicate the catalog review or start implementation simply because a design is discussed.
+
 ## Where to start
 
 Use repository **rathunter69/Hotkey.gg**, handover branch **codex/repository-foundation**.
