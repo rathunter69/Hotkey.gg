@@ -159,7 +159,7 @@ confirmed decision and its superseded rule; CURRENT owns status and task sequenc
 
 ### Confirmed catalog/flow decisions — September 17–18
 
-Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/b6a31775fe3c19fd72ea91fe5802f9789c76b5ad/docs/handoffs/catalog-progression.md),
+Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/cc88b716db28c7342ac81882471520f9ae0ac51a/docs/handoffs/catalog-progression.md),
 task 01a0b148-2693-7901-af91-934c83cabe1d. The chief checked the remote handoff and Wolf's
 actual approvals in that task. The September 17 bace206 tentative gate status is superseded
 by the explicit September 18 approval below; other unanswered proposals remain open.
@@ -207,10 +207,34 @@ removing old boards, a new overall rank, exact benchmark membership/access, seed
 rules or implementation. A lesson can change without silently redefining a public benchmark;
 the versioning and old-board transition plan still need agreement.
 
-Wolf answered only the competitive-scope question in the latest three-option packet. The
-other two choices remain pending: fresh variation versus exact replay/separate assessment,
-and deliberate public entry versus automatic posting/a dedicated competition area. Do not
-infer their approval from the scope selection or a general positive response to the discussion.
+At b6a3177, only the competitive-scope question had an answer. Wolf's subsequent response
+at cc88b716 supersedes the fully-unanswered status of the other two choices with **support in
+principle**, conditional on retaining key metrics and an option to speedrun individual drills.
+Fresh independent retries and deliberate public entry can now be developed on that basis;
+exact variant/comparison, entry, eligibility, retry and saving mechanics are not approved.
+Do not turn the qualified response into acceptance of every detailed proposal.
+
+**September 18 — personal metrics and individual-drill speedruns retained:** learning remains
+primary, while learners retain an option to speedrun an individual drill and see useful
+personal metrics. Personal speedruns extend beyond the curated public benchmark/Daily set:
+a drill does not need a public leaderboard to support personal improvement. Preserve existing
+personal bests, results and earned history; exact comparability and transition rules still need
+agreement. Private versus public must not become saved versus unsaved merely because a score
+was not published. This states the design requirement, not a particular storage or UI solution.
+
+The area recommends separate views of learning progress, personal performance and public
+competition. Candidate metrics include helped/independent completion, path/skill progress,
+attempt history, time, comparable PBs and improvement, plus efficiency where meaningful.
+That exact set, formulas and persistence/visibility rules remain proposals. One independent
+success is not automatically mastery, and legitimate alternative routes must remain valid.
+XP, mastery and overall account/competitive rank still need distinct agreed meanings.
+
+Next, demonstrate a learner completing work with help, retrying independently and privately
+improving a comparable drill time while retaining their useful record, alongside a separate
+public benchmark result. This is a design illustration of the requirement; exact controls,
+comparison groups, guest/account storage and independent eligibility remain to be specified.
+Do not repeat the same broad retry/public-entry questionnaire or reopen approved gate/help/
+timer policies.
 
 Wolf also explicitly requested continued concise, high-level mechanics options with practical
 tradeoffs and a reasoned recommendation. Keep this discussion style, capture each actual answer
@@ -223,9 +247,9 @@ subscription inclusion plus qualifying prior work or test-out allows entry; a le
 the skill gets preparation and a retry. A lesson starts without a visible clock, while a
 deliberate speed attempt shows one. Illustrative transitions do not fix the actual checkpoint list.
 
-Next discussion: the two pending independent-retry and public-entry choices, then result,
-mastery and rank distinctions within the selected benchmark/Daily scope, followed by remaining
-reward, credential and access details. D1 exact shared-content mechanics and
+Next discussion: make learning, personal drill-speedrun and public-challenge metrics concrete,
+then settle mastery, XP and account/rank distinctions. Develop the supported-in-principle
+retry/public-entry design while keeping its comparison, persistence and eligibility details open. D1 exact shared-content mechanics and
 D2 publication/rank controls remain open. The chief reconciles the answers without duplicating
 the area's questions. Existing progress, Foundations feedback and the complete-plan-before-
 rebuild requirement remain protected.
