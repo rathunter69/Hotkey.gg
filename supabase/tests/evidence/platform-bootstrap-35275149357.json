@@ -1,0 +1,75 @@
+{
+  "ci": {
+    "runUrl": "https://github.com/rathunter69/Hotkey.gg/actions/runs/35275149357",
+    "jobUrl": "https://github.com/rathunter69/Hotkey.gg/actions/runs/35275149357/job/105383850944",
+    "workflow": ".github/workflows/security-platform-bootstrap.yml",
+    "conclusion": "success",
+    "ubuntu": "24.04.5",
+    "runnerImage": "20260907.300.1",
+    "node": "22.23.2",
+    "npm": "10.9.8",
+    "guardTestsPassed": 4,
+    "artifactId": 10520915514,
+    "artifactZipSha256": "6dccaf68f5ec178886c34ca5f8cfc8696115c11e6ac1efaa710846f44987c3b5",
+    "evidence": "Result JSON transcribed verbatim from completed job log; no credentials or customer records."
+  },
+  "result": {
+    "databaseImage": "supabase/postgres@sha256:5a4314708484bec672de2c09653a5c01fb1c84a998564ac231b0325e2238ed5b",
+    "authImage": "supabase/gotrue@sha256:7e813221b93fbf54b515036438550e483bfaf057b9db52fe9bc1ce91c47e817e",
+    "databaseSource": "d156ba65c14694c12cc5e782bc15b9b8ed2d1376",
+    "authSource": "0204331ca41a5b49f076b6fa3dc6c0d20b996590",
+    "sqlSha256": "f317e410a314263d637c51880ff14ca42fe6e972693b652264476e9b5ad91666",
+    "hotkeyMigrationsExecuted": 0,
+    "permissionAssertionsExecuted": 0,
+    "source": "49b8193b6b6c17c63b97c898d268437ceb191cdf",
+    "runId": "35275149357",
+    "attempt": "1",
+    "stage": "platform-assertions",
+    "result": "PASS",
+    "settingsBeforeAuth": {
+      "cron": "off",
+      "source": "command line",
+      "preload": "pg_stat_statements, pgaudit, plpgsql, plpgsql_check, pg_cron, pg_net, pgsodium, auto_explain, pg_tle, plan_filter, supabase_vault"
+    },
+    "loopbackAuthentication": {
+      "file": "/etc/postgresql/pg_hba.conf",
+      "loopbackTrust": true
+    },
+    "authExitCode": 0,
+    "settingsAfterAuth": {
+      "cron": "off",
+      "source": "command line",
+      "preload": "pg_stat_statements, pgaudit, plpgsql, plpgsql_check, pg_cron, pg_net, pgsodium, auto_explain, pg_tle, plan_filter, supabase_vault"
+    },
+    "authBootstrap": {
+      "migrationCount": 77,
+      "latestMigration": "20260625000000",
+      "authDataEmpty": true
+    },
+    "checks": [
+      {
+        "check": "platform",
+        "postgres": "17.6",
+        "authUsers": 0,
+        "publicTables": 0,
+        "extensions": {
+          "pgtap": "1.3.3",
+          "pg_cron": "1.6.4",
+          "pg_net": "0.20.3"
+        },
+        "defaultACLsVerified": true,
+        "roleMembershipVerified": true
+      },
+      {
+        "check": "claims",
+        "passed": true
+      }
+    ],
+    "settingsFinal": {
+      "cron": "off",
+      "source": "command line",
+      "preload": "pg_stat_statements, pgaudit, plpgsql, plpgsql_check, pg_cron, pg_net, pgsodium, auto_explain, pg_tle, plan_filter, supabase_vault"
+    },
+    "cleanup": "PASS"
+  }
+}

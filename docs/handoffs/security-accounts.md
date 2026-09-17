@@ -1,4 +1,76 @@
-# Security groundwork — current handoff
+# Security platform-only bootstrap — current handoff
+Updated: 2026-09-17
+Task: 01a0af8b-9a97-7593-a1d2-6d2491cfe947
+Chief: 01a0b0fa-d857-7002-ab95-1da0a1cfb858
+Branch: codex/security-platform-bootstrap
+Starting checkpoint: 14d7e10a79232000ff24d2637ce6adc72b786b1f
+Assigned scope: foundation e437d08914fb1cff84a89b0a2216b2b8635164fd
+Exact reviewed and CI-tested source: 49b8193b6b6c17c63b97c898d268437ceb191cdf
+State: one platform-only experiment PASSED; full application replay and all 56 permission assertions remain UNRUN.
+
+## Outcome and exact execution evidence
+
+[CI run 35275149357, attempt 1](https://github.com/rathunter69/Hotkey.gg/actions/runs/35275149357)
+and [platform job 105383850944](https://github.com/rathunter69/Hotkey.gg/actions/runs/35275149357/job/105383850944)
+completed successfully on September 17, 21:10 UTC. The workflow API, job steps and full job log
+were read and matched the exact source above. First run passed; no rerun or image variation.
+Ubuntu 24.04.5, runner image 20260907.300.1; Node 22.23.2/npm 10.9.8. The pinned actions used
+the hosted runner's Node 24 compatibility mode and emitted deprecation warnings; the bootstrap
+script and guard tests ran on the configured Node 22.23.2.
+
+Durable [sanitized result JSON](../../supabase/tests/evidence/platform-bootstrap-35275149357.json)
+contains the image digests, source versions, exact SQL hash, run/job and results. The uploaded
+artifact has ID 10520915514 and seven-day retention; continuity does not depend on its survival.
+
+| Verified runtime result | Evidence |
+|---|---|
+| Real database/Auth bootstrap | Official pinned Postgres 17.6.1.136 and Auth v2.196.0 images; Auth migrate exit 0; 77 recorded platform/Auth migrations, latest 20260625000000. This is NOT the 52 Hotkey migration chain. |
+| Empty platform | All Auth data tables except the schema ledger empty; zero Auth users; zero public application tables, also checked after rollback. |
+| Official objects and permissions | auth.uid(), auth.jwt(), anonymous-user column, expected platform roles, postgres SET ROLE rights, Auth table access and public default ACL checks pass. Real helpers work under anon/authenticated with synthetic claims. No grants/functions or passwords fabricated. |
+| Extension compatibility | PostgreSQL 17.6; actual transactional creation of pgTAP 1.3.3, pg_cron 1.6.4, pg_net 0.20.3 succeeds, then rolls back. No scheduled jobs or HTTP queue entries. |
+| Isolation | Database network none and only loopback; no ports or host/persistent mounts; tmpfs data/socket; immutable images; Auth migrator shares only the DB namespace and serves no API. Scheduler reports off with command-line source before Auth, after Auth and after checks; official first-start entrypoint carries that option through initialization. |
+| Cleanup | Migrator removed before assertions; final named-container removal and separate always-cleanup step pass, confirming both purpose-labelled containers absent. |
+| Explicit excluded work | Hotkey migrations executed: 0. Permission assertions executed: 0. No production project, customer rows, outbound delivery, host installation, app/migration edits, main merge or deployment. |
+
+## Review, ownership and validation
+
+Chief explicitly reserved the new security-platform-bootstrap workflow to this task; Testing
+retains browser/deployment workflow ownership. New files are that distinct workflow and
+supabase/tests/platform-bootstrap.js, platform-bootstrap-check.sql, platform-bootstrap.test.js,
+PLATFORM_BOOTSTRAP.md, plus the saved evidence JSON. Documentation updates are this handoff,
+docs/testing-database.md and supabase/tests/README.md. Existing runner/56-assertion SQL and
+all application, migration, browser gate/deployment files are unchanged from 14d7e10.
+
+Focused source investigation checked the exact Auth configuration and embedded migration
+route. Independent code review caught/fixed a protected Auth-ledger read before dispatch:
+metadata uses the platform admin, while extension/ACL/claims checks retain intended roles.
+Testing task 01a0af90-b973-7572-b7ff-d5bf9f504a52 gave explicit no-blocker safety clearance for
+49b8193 before its first branch push, verifying triggers, permissions, pinned actions/images,
+confinement, cleanup and no application replay. The chief confirmed continuation within the
+existing authorization. No safety-relevant executable change followed that clearance.
+
+Local exact-candidate validation: all seven repository checks pass (39 inherited catalog
+warnings); four bootstrap guard tests plus three existing runner tests pass; syntax, plan and
+diff checks pass. Linux CI reran the four bootstrap guards and passed the actual platform
+experiment. Browser checks are not rerun because this batch changes no browser/runtime code;
+the independent Testing task's browser CI is a separate result.
+
+## Limits and next proposed step
+
+This closes the reviewed platform-bootstrap gap for this exact image pair on the recorded
+Linux host. It is one successful platform initialization, not two reproducible Hotkey replays,
+production parity, an HTTP/Auth user journey, a security repair or an integrated release.
+DATA-01/02/03 remain unrepaired and the 56 SQL permission assertions remain UNRUN.
+
+Chief review/acceptance comes next. The next separate proposed batch is two fresh isolated
+application replays and the expected-failing permission baseline, preserving startup isolation
+and stopping at the first migration failure. The current script intentionally destroys its
+containers and cannot replay application SQL. No further run or repair starts automatically.
+Documentation/evidence-only handoff commits do not match this workflow's trigger paths.
+
+---
+
+# Previous Security groundwork handoff (historical; superseded setup status above)
 Updated: 2026-09-17
 Task: 01a0af8b-9a97-7593-a1d2-6d2491cfe947
 Chief: 01a0b0fa-d857-7002-ab95-1da0a1cfb858
