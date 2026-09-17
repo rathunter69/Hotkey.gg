@@ -116,7 +116,7 @@ select matches(pg_temp.probe($q$insert into public.team_applications(team_id,use
 
 select pg_temp.actor(2);
 select is(auth.jwt()->>'is_anonymous','false','full-account JWT claim is false');
-select is(public.my_pro(),false,'outsider has no PRO entitlement');
+select is((select pro from public.my_pro_status()),false,'outsider has no PRO entitlement');
 select is(pg_temp.probe($q$select * from public.create_desk('Fixture Unpaid RPC',false)$q$),
   'P0001:PRO_REQUIRED','create RPC rejects unpaid full accounts');
 select matches(pg_temp.probe($q$insert into public.teams(name,slug,owner_id)
@@ -165,7 +165,7 @@ select is(pg_temp.probe($q$select public.rotate_invite()$q$),'P0001:NOT_CAPTAIN'
 
 -- Paid creation is an allowed control: assertions inspect both new rows.
 select pg_temp.actor(4);
-select is(public.my_pro(),true,'paid fixture is entitled');
+select is((select pro from public.my_pro_status()),true,'paid fixture is entitled');
 select matches(pg_temp.probe($q$insert into public.teams(name,slug,owner_id,verified)
   values('Fixture Verified Insert','fixture-verified-insert',pg_temp.uid(4),true)$q$),'^42501:',
   'DATA-01: paid deskless owner cannot insert a self-verified desk');
