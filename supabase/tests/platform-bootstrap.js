@@ -12,19 +12,22 @@ const PURPOSE = 'gg.hotkey.platform-bootstrap';
 const ROOT = path.resolve(__dirname, '../..');
 const endpoint = 'unix:///var/run/docker.sock';
 
-function context(env) {
+function context(env, iteration = 0) {
+  if (![0,1,2].includes(iteration)) throw new Error('Only platform-only or two fresh replay instances are allowed');
+  const branch = iteration ? 'codex/security-replay-baseline' : 'codex/security-platform-bootstrap';
   if (env.GITHUB_ACTIONS !== 'true' || env.RUNNER_ENVIRONMENT !== 'github-hosted'
       || env.RUNNER_OS !== 'Linux' || env.RUNNER_ARCH !== 'X64'
       || env.GITHUB_REPOSITORY !== 'rathunter69/Hotkey.gg'
       || env.GITHUB_EVENT_NAME !== 'push'
-      || env.GITHUB_REF !== 'refs/heads/codex/security-platform-bootstrap'
+      || env.GITHUB_REF !== 'refs/heads/' + branch
       || !/^\d+$/.test(env.GITHUB_RUN_ID || '') || !/^\d+$/.test(env.GITHUB_RUN_ATTEMPT || '')
       || !/^[a-f0-9]{40}$/.test(env.GITHUB_SHA || '') || !path.isAbsolute(env.RUNNER_TEMP || '')) {
     throw new Error('Requires the dedicated branch-push job on GitHub-hosted Linux x64');
   }
-  const key = `${env.GITHUB_RUN_ID}-${env.GITHUB_RUN_ATTEMPT}`;
+  const key = `${env.GITHUB_RUN_ID}-${env.GITHUB_RUN_ATTEMPT}${iteration ? '-replay'+iteration : ''}`;
   return { key, db: `hk-security-platform-${key}-db`, auth: `hk-security-platform-${key}-auth`,
-    output: path.join(env.RUNNER_TEMP, 'hotkey-platform-bootstrap') };
+    output: iteration ? path.join(env.RUNNER_TEMP,'hotkey-replay-baseline','instance-'+iteration)
+      : path.join(env.RUNNER_TEMP, 'hotkey-platform-bootstrap') };
 }
 function validateOwned(c, name, image, key) {
   if (c.Name !== '/' + name || c.Config?.Image !== image
@@ -56,7 +59,7 @@ function command(cmd, args, opts = {}) {
   if (r.status !== 0) throw new Error(`${cmd} failed (${r.status}): ${r.stderr || r.stdout}`);
   return r.stdout;
 }
-async function main(args, env = process.env) {
+async function main(args, env = process.env, iteration = 0, afterPlatform = null) {
   if (args.length !== 1 || !['--plan','--run','--cleanup'].includes(args[0])) throw new Error('Usage: platform-bootstrap.js --plan | --run | --cleanup');
   const sqlPath = path.join(__dirname,'platform-bootstrap-check.sql');
   const plan = { databaseImage:DB_IMAGE, authImage:AUTH_IMAGE,
@@ -65,7 +68,7 @@ async function main(args, env = process.env) {
     sqlSha256:crypto.createHash('sha256').update(fs.readFileSync(sqlPath)).digest('hex'),
     hotkeyMigrationsExecuted:0, permissionAssertionsExecuted:0 };
   if (args[0] === '--plan') { console.log(JSON.stringify(plan,null,2)); return; }
-  const ctx = context(env);
+  const ctx = context(env, iteration);
   if (process.platform !== 'linux') throw new Error('Linux Docker only');
   const clean = dockerEnv(env);
   const docker = (a, opts = {}) => command('docker',['--host',endpoint,...a],{env:clean,...opts});
@@ -191,6 +194,13 @@ async function main(args, env = process.env) {
     report.checks = checks;
     report.settingsFinal = verify();
     sql("do $$ begin if exists(select 1 from auth.users) or exists(select 1 from pg_tables where schemaname='public') then raise exception 'Platform check left data'; end if; end $$;");
+    // Only the separate reviewed replay wrapper supplies this hook. The original
+    // platform-only CLI cannot request it; identical isolation and cleanup apply.
+    if (afterPlatform) {
+      report.stage = 'application-baseline';
+      await afterPlatform(ctx.db, report);
+      report.settingsAfterBaseline = verify();
+    }
     report.result = 'PASS';
   } catch (error) {
     failure = error; report.result = 'FAIL'; report.error = error.message;
@@ -200,7 +210,14 @@ async function main(args, env = process.env) {
         validateOwned(c,name,image,ctx.key);
         const logs = cp.spawnSync('docker',['--host',endpoint,'logs','--tail','160',name],{encoding:'utf8',timeout:30000,env:clean});
         if (logs.error || logs.status !== 0) throw new Error('Could not capture named container logs');
-        fs.writeFileSync(path.join(ctx.output,name+'.log'),(logs.stdout || '')+(logs.stderr || ''));
+        let text = (logs.stdout || '')+(logs.stderr || '');
+        if (iteration) {
+          // App replay may store an outbound scheduler command. Keep primary
+          // server diagnostics only; omit statement/context bodies and URLs.
+          text = text.split(/\r?\n/).filter(line=>/\b(?:ERROR|FATAL|PANIC|WARNING):/.test(line))
+            .map(line=>line.replace(/https?:\/\/[^\s'"<>]+/gi,'[redacted-url]').slice(0,1200)).join('\n');
+        }
+        fs.writeFileSync(path.join(ctx.output,name+'.log'),text);
       } catch (logError) { report.logError = logError.message; }
     }
   } finally {
@@ -209,7 +226,15 @@ async function main(args, env = process.env) {
     fs.writeFileSync(path.join(ctx.output,'result.json'),JSON.stringify(report,null,2)+'\n');
     console.log(JSON.stringify(report,null,2));
   }
-  if (failure) throw failure;
+  if (failure) { failure.platformReport = report; throw failure; }
+  return report;
 }
-module.exports = { context, validateOwned, validateAuth, dockerEnv, DB_IMAGE, AUTH_IMAGE, PURPOSE };
+async function replayInstance(iteration, afterPlatform, env = process.env) {
+  if (![1,2].includes(iteration) || typeof afterPlatform !== 'function') throw new Error('Expected one of two replay instances and its guarded runner hook');
+  return main(['--run'],env,iteration,afterPlatform);
+}
+async function cleanupReplay(env = process.env) {
+  for (const iteration of [1,2]) await main(['--cleanup'],env,iteration);
+}
+module.exports = { context, validateOwned, validateAuth, dockerEnv, DB_IMAGE, AUTH_IMAGE, PURPOSE, replayInstance, cleanupReplay };
 if (require.main === module) main(process.argv.slice(2)).catch(e => { console.error(e.message); process.exitCode = 1; });
