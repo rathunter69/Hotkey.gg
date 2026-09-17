@@ -21,6 +21,16 @@ The chosen product sequence remains security/account work → catalog/progressio
 Foundations feedback. The newly authorized documentation/structure batch is a specific early
 cleanup, not a replacement of that sequence.
 
+Wolf's latest September 17 clarification makes the next catalog/flow review explicitly a
+decision review of game modes, ranked play, drills, learning paths, completion/assistance,
+progress/rewards, access and the end-to-end learner journey. Reconcile current behavior with
+deferred, superseded and conflicting older pushes; do not assume historical code is current
+intent. [PRODUCT's systems review](PRODUCT.md#catalog-modes-and-learner-flow-decision-review--september-17-clarification)
+defines the evidence, decision register and acceptance examples. The prior practice/ranked
+switch preference is open for discussion but remains the implementation baseline until Wolf
+decides otherwise. This schedules design/evidence work after groundwork; it does not launch
+another module, restore a mode or authorize a catalog/progress reset.
+
 The October 1 deadline is parked. Subscriptions at launch and customized onboarding remain
 future requirements. Broad feature/content development, live billing and catalog rebuilding
 stay paused. Guided beginner learning, assisted completion without XP, and freely explored
@@ -228,8 +238,10 @@ integration only after its remote handoff and checks. Testing 4ea428b and Securi
 platform bootstrap is accepted; its replay/permission-baseline continuation reports its own
 exact source/result and must not delay or be mistaken for browser-gate acceptance. Structure cleanup and security preparation are saved separately; neither establishes
 the still-pending Linux CI or database result. Then give Wolf one next decision. Do not automatically start
-a later batch from a recommendation. Catalog/progression design remains the next product
-module; subsequent targeted cleanup/site structure and the planned catalog rebuild follow
+a later batch from a recommendation. The catalog/progression and learner-flow decision review
+is the next recommended product module, including the newly requested modes/ranked/paths
+clarification; agree its choices before implementing new rules. Subsequent targeted cleanup/site
+structure and the planned catalog rebuild follow
 the agreed direction. Remaining security blockers continue to constrain release readiness.
 
 Launch acceptance remains pending for real account lifecycle, onboarding/learning, correct
