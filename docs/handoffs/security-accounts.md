@@ -1,3 +1,86 @@
+# Security groundwork — current handoff
+Updated: 2026-09-17
+Task: 01a0af8b-9a97-7593-a1d2-6d2491cfe947
+Chief: 01a0b0fa-d857-7002-ab95-1da0a1cfb858
+Branch: codex/security-groundwork
+Starting integration: 6c984161c31bc4637dbe88b73a4da8408cefdf1d
+Latest guidance read separately: foundation 3e15e662b86368bd7338cb482a37ed1bd4b9a2cf
+Exact validated test-code commit: ce53324 (full SHA in Git history)
+State: test groundwork prepared and locally validated; database execution unavailable; no security schema repair, integration or deployment.
+
+## Scope and outcome
+Chief assigned this bounded preparation on September 17 under Wolf's testing/security request.
+A separate worktree preserves all old branches and dirty source. Reused DATA_SECURITY,
+both cleanup reports and the accepted account/testing integration; no whole-audit rerun.
+
+- Added 56 synthetic pgTAP assertions for DATA-01: outsider self-captain and backdated join;
+  member role/seniority updates; owner verification/school insert and update; anonymous/unpaid
+  direct creation; application eligibility/private/recruiting/five-pending bypass; allowed
+  create/join/recruit/invite/application/acceptance paths. Twelve assertions are predicted to
+  fail on current vulnerable source; this is NOT an executed reproduction or passing protection.
+- Fixtures use genuine database roles and synthetic JWT claims, rollback-only probes and an
+  outer rollback transaction. Missing platform defaults or existing Auth users fail setup.
+- Added a local Docker-only runner: purpose label, immutable image selection, no host/persistent
+  mounts or published ports, network none and loopback only, scheduler disabled from startup.
+  It refuses database URLs and inherited remote connection settings. Preflight precedes SQL;
+  replay stops at the first error. A matching complete-replay manifest is required for tests.
+  pgTAP failures/skips/incomplete output cannot masquerade as success through psql exit zero.
+- Documented DATA-02 public/private profile acceptance and DATA-03 AAL1/AAL2/login/recovery
+  requirements separately. No privacy/MFA implementation or new product rule.
+- Wrote the precise missing host/image contract, command sequence and evidence/cleanup rules.
+  No fake auth schema, customer fixtures, widened app grants or history edits.
+
+Owned/changed files: supabase/tests/README.md; supabase/tests/run-isolated.js;
+supabase/tests/runner.test.js; supabase/tests/database/01-desk-authorization.test.sql;
+docs/testing-database.md; docs/handoffs/security-accounts.md.
+No changes to application files, 52 migrations, configuration, gate.yml, package/lockfile,
+CURRENT.md or PRODUCT.md. Testing owns browser/workflow/development changes; Cleanup owns
+repository documentation/structure. Shared owners were notified, no browser port used.
+
+## Verification and limits
+Validation was run on the exact executable tree committed as ce53324; subsequent handoff
+changes are documentation only. Windows x64; verified portable Node22.23.2/npm10.9.8 reused
+from Testing. No new dependencies installed.
+
+| Check | Result |
+|---|---|
+| npm run check | All seven commands pass; inherited 39 catalog warnings remain. |
+| node --test supabase/tests/runner.test.js | All three tests pass: unsafe container modes rejected; not-ok remains failure; missing/incomplete/TODO/SKIP/bailout cannot be green. These are runner tests, not RLS tests. |
+| run-isolated.js --plan | Succeeds, records source/hash manifest: 52 migration files and one SQL suite. |
+| Capability check --container hk-security-capability-check | Fails before SQL with docker ENOENT. No container/database exists or was contacted. |
+| Host inventory | Docker/Podman/Postgres/CLI absent from PATH and standard installs; no matching services. WSL explicitly not installed. |
+| Independent review | Found/fixed malformed dollar quoting before final validation. Reviewed actor privileges, rollback probes, denial errors, allowed controls, replay marker and final additional cases; no remaining concrete blocker. |
+| Diff review | Application, migration and workflow diff against 6c98416 is empty. git diff --check clean. |
+
+Initial sandbox process runs returned EPERM; permitted local subprocess runs passed. No
+permission review rejected this batch. SQL parsing/execution, fixture results, PostgreSQL
+extension compatibility, full migration replay and two clean replays are UNRUN. This is
+prepared test code, not a completed database audit or a DATA-01 fix. Existing account/browser
+baseline is reused from integration c702c69/6c98416, not rerun for these tests/docs-only changes.
+
+Git/testing confirms GitHub-hosted Linux can provide Docker but has not approved/provisioned
+an exact database platform image or database job. It will not bundle an unreviewed DB job in
+its browser workflow. A reviewed immutable image with genuine empty Supabase auth schema and
+platform defaults, pgTAP/pg_net and pg_cron disabled from first startup is required. See
+[testing-database.md](../testing-database.md) for the runnable host contract. No host service
+installation, remote project creation, production queries, live exploit, email, customer-row
+retrieval, secret rotation, billing action, main merge or deployment occurred.
+
+## Next bounded proposal and chief integration
+Mark Security groundwork as prepared/locally validated with database execution pending;
+DATA-01/02/03 remain unrepaired. The next proposed batch is to review/pin an empty-platform
+image and execute two fresh isolated replays plus this expected-failing baseline on a dedicated
+Linux test host. Capture first failures without skipping/editing old migrations. Only then
+prepare the separately authorized DATA-01 forward permission repair and prove denied/allowed
+cases before/after. DATA-02 and DATA-03 require their own agreed contracts and separate repairs.
+The chief owns prioritization; this proposal does not start schema changes automatically.
+
+All non-secret code/guidance is to be pushed on codex/security-groundwork and verified by remote
+SHA/fetch before completion is reported. Git history supplies the final documentation SHA.
+
+---
+
+## Previous account-isolation handoff (historical; accepted integration linked above)
 # Security and accounts
 Updated: 2026-09-17
 Task: 01a0af8b-9a97-7593-a1d2-6d2491cfe947
@@ -36,3 +119,4 @@ Confirmed scope only; no new product decisions. Proposed CURRENT.md update: DATA
 
 ## Findings and next step
 Next proposed Security batch: DATA-01 desk authorization with isolated guest/member/captain/outsider/direct-table tests and a verified release path. DATA-02 profile privacy, DATA-03 MFA and DATA-06 duplicate saves remain separate, unrepaired findings. Do not start those from this handoff alone. Preserve current learning/progress rules and saved server history.
+
