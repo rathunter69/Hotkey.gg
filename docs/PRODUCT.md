@@ -238,7 +238,7 @@ timer policies.
 
 Wolf also explicitly requested continued concise, high-level mechanics options with practical
 tradeoffs and a reasoned recommendation. Keep this discussion style, capture each actual answer
-separately, and avoid duplicating the area's two pending questions in the chief session.
+separately, and avoid duplicating the area's decision discussion in the chief session.
 
 **Acceptance examples:** reading an instruction or concept explanation does not disqualify
 an otherwise independent result. Revealing solution steps preserves completion but awards no
