@@ -48,12 +48,18 @@ The runner stops on failure, returns a nonzero exit code and closes its preview 
 
 The smoke suite is not the full engine gate. `.github/workflows/gate.yml` retains the complete
 regression matrix, including guided routes, rapid-fire, parity, input, depth mechanics and layout.
-The five smoke harnesses use `dev/browser-isolation.js` before creating pages. It restricts
-HTTP requests to the exact loopback test origin, blocks service workers/WebSockets and rejects
-redirects. The canary uses two ephemeral local servers to verify that disallowed requests
-never reach the sink; run it alone with `node --test dev/browser-isolation.test.js`.
-Wider CI harness isolation remains unfinished; do not assume the whole matrix is safe to
-run with unrestricted production network access. See the Git/testing handoff.
+Every browser harness and the drill-page generator invoked by the gate creates pages through
+`dev/browser-isolation.js`. It permits HTTP requests only to the exact loopback test origin,
+blocks service workers and WebSockets, and rejects redirects before they can escape the route
+handler. Existing synthetic fixture routes remain layered above that fail-closed boundary.
+The canary uses two ephemeral local servers to verify that SDK-shaped, direct and redirected
+cross-origin requests never reach the sink, that cross-origin WebSockets never upgrade, and
+that service workers remain inactive, including through the page-wrapper API; run it alone
+with `node --test dev/browser-isolation.test.js`.
+
+This guarantee covers the gate's browser contexts and generator. Directly runnable legacy
+harnesses outside `.github/workflows/gate.yml` are not all migrated and must not be treated as
+production-safe merely because the gate is isolated. See the Git/testing handoff.
 Review its scope rules when adding production files. Legacy scripts remain directly runnable,
 but many assume a Linux browser path unless `CHROME` is supplied; use the runner on Windows.
 

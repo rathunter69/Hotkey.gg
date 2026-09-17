@@ -2,19 +2,21 @@
    across rounds, plus the r154 fill-ref fix. Real KeyboardEvents via demoKey. */
 'use strict';
 const { chromium } = require('playwright-core');
+const { newIsolatedPage } = require('./browser-isolation');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const URL = process.env.URL || 'http://127.0.0.1:8791/index.html';
 let pass = 0, fail = 0;
 const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { fail++; console.log('  FAIL ' + n + (x ? ' — ' + x : '')); } };
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
-  const page = await browser.newPage();
+  const page = await newIsolatedPage(browser, URL);
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 140)));
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
     localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');  } catch (e) {} });
-  await page.goto(process.env.URL || 'http://127.0.0.1:8791/index.html', { waitUntil: 'load' });   /* r421: URL override — parallel checkouts serve on their own ports */
+  await page.goto(URL, { waitUntil: 'load' });   /* r421: URL override — parallel checkouts serve on their own ports */
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof demoKey === 'function');
   // r159: the matrix probes gated-tier drills ('foot' = Formulas) — flip the real
   // pro entitlement so r158's progression gates never bounce a fresh() board.

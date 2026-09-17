@@ -38,4 +38,9 @@ async function newIsolatedContext(browser, target, options = {}) {
   return context;
 }
 
-module.exports = { loopbackOrigin, newIsolatedContext };
+async function newIsolatedPage(browser, target, options = {}) {
+  const context = await newIsolatedContext(browser, target, options);
+  return context.newPage();
+}
+
+module.exports = { loopbackOrigin, newIsolatedContext, newIsolatedPage };

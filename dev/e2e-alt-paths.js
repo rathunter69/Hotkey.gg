@@ -15,7 +15,9 @@
    Run: node dev/e2e-alt-paths.js [drill ...]   (server on 127.0.0.1:8791) */
 'use strict';
 const { chromium } = require('playwright-core');
+const { newIsolatedPage } = require('./browser-isolation');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const URL = process.env.URL || 'http://127.0.0.1:8791/index.html';
 const REPS = 3;
 const only = process.argv.slice(2);
 
@@ -2505,14 +2507,14 @@ const ALTS = [
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
-  const page = await browser.newPage();
+  const page = await newIsolatedPage(browser, URL);
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
     localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');    localStorage.setItem('hk_xlv', '2');
   } catch (e) {} });
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 120)));
-  await page.goto(process.env.URL || 'http://127.0.0.1:8791/index.html', { waitUntil: 'load' });   /* r422: URL override — parallel checkouts serve on their own ports (the r421 e2e-guided pattern) */
+  await page.goto(URL, { waitUntil: 'load' });   /* r422: URL override — parallel checkouts serve on their own ports (the r421 e2e-guided pattern) */
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof demoKey === 'function');
   await page.evaluate(() => { try { _pro = true; } catch (e) {} });
 

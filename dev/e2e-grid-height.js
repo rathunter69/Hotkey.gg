@@ -11,6 +11,7 @@
    Run: python3 -m http.server 8791 & ; node dev/e2e-grid-height.js */
 'use strict';
 const { chromium } = require('playwright-core');
+const { newIsolatedPage } = require('./browser-isolation');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const URL = process.env.URL || 'http://127.0.0.1:8791/index.html';
 const DRILLS = ['navigation', 'foot', 'combo'];
@@ -32,11 +33,10 @@ const measure = () => {
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
-  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  const page = await newIsolatedPage(browser, URL, { viewport: { width: 1280, height: 900 } });
   await page.addInitScript(() => { try {
     localStorage.setItem('hotkey_onboarded', '1'); localStorage.setItem('hk_tour_done', '1');
     localStorage.setItem('hk_learn_done', '1'); localStorage.setItem('hk_gate_off', '1');  } catch (e) {} });
-  await page.route('**/@supabase/**', r => r.abort());
   await page.goto(URL, { waitUntil: 'load' });
   await page.waitForFunction(() => typeof CHALLENGES !== 'undefined' && typeof loadChallenge === 'function');
   await page.evaluate(() => { try { _pro = true; } catch (e) {} });

@@ -29,6 +29,7 @@
 /* accept either convention the fleet uses: URL is a full index.html, BASE an origin */
 const HK_URL = process.env.URL || ((process.env.BASE || 'http://127.0.0.1:8791').replace(/\/$/, '') + '/index.html');
 const { chromium } = require('playwright-core');
+const { newIsolatedContext } = require('./browser-isolation');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 let pass = 0, fail = 0;
 const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { fail++; console.log('  FAIL ' + n + (x ? ' — ' + x : '')); } };
@@ -52,7 +53,8 @@ const TOASTSPY = () => {
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true, args: ['--no-sandbox'] });
-  const page = await browser.newPage();
+  const context = await newIsolatedContext(browser, HK_URL);
+  const page = await context.newPage();
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 140)));
   await page.route('**/@supabase/**', r => r.abort());
@@ -129,7 +131,7 @@ const TOASTSPY = () => {
   /* a SEPARATE context: this suite's init script re-seeds hotkey_onboarded on every navigation
      (that is what makes §1a-c a returning device), so clearing the key in the page and reloading
      would just set it again. A fresh context is the only honest way to be a first-time visitor. */
-  const fresh = await browser.newContext();
+  const fresh = await newIsolatedContext(browser, HK_URL);
   await fresh.route('**/@supabase/**', r => r.abort());
   await fresh.addInitScript(TOASTSPY);
   const page2 = await fresh.newPage();
@@ -191,6 +193,7 @@ const TOASTSPY = () => {
 
   const real = errs.filter(e => !/supabase|Failed to fetch|NetworkError|ERR_/i.test(e));
   ok(real.length === 0, 'zero page errors across the sweep', real.join(' | '));
+  await context.close();
   await browser.close();
   console.log(fail ? 'DEEP LINK: ' + fail + ' FAILURE(S), ' + pass + ' PASS' : 'DEEP LINK: ALL ' + pass + ' PASS');
   process.exit(fail ? 1 : 0);

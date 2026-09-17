@@ -7,11 +7,12 @@
      3. a key pressed to resume is swallowed, not played onto the board
    Run: CHROME=<chromium> node dev/check-pause.js   (needs the dev server on :8791) */
 const { chromium } = require('playwright-core');
+const { newIsolatedContext } = require('./browser-isolation');
 const BASE = process.env.BASE || 'http://127.0.0.1:8791';
 
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.CHROME });
-  const ctx = await browser.newContext({ viewport: { width: 1280, height: 860 } });
+  const ctx = await newIsolatedContext(browser, BASE, { viewport: { width: 1280, height: 860 } });
   const page = await ctx.newPage();
   let fail = 0;
   const check = (ok, label, extra='') => { if (!ok) fail++; console.log(`  ${ok?'ok  ':'FAIL'} ${label}${extra?'  '+extra:''}`); };
