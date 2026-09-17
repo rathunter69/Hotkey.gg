@@ -64,8 +64,9 @@ All preserve original local work and earlier remote branches.
 | Owner / task | Scope | Exclusive files / boundaries |
 |---|---|---|
 | **Establish testing and blockers**, `01a0af90-b973-7572-b7ff-d5bf9f504a52`; `codex/testing-security-groundwork` | Finish redirect-safe isolation across full gate/generators; run complete pinned checks in a suitable isolated environment, aiming for exact-source Linux CI. Fix test infrastructure; report unrelated application failures. | Test workflow(s), browser helper/canary/harnesses and generator isolation, `dev/run-checks.js`, `docs/DEVELOPMENT.md`, testing handoff. Own port 8791 during browser runs. |
-| **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; `codex/security-groundwork` | Disposable database setup and synthetic DATA-01 direct-table/RPC role cases; review DATA-02/03 acceptance needs using existing evidence. Separate expected vulnerability reproductions from successful protection. | New `supabase/tests/`, security-specific tooling/docs, `docs/testing-database.md`, security handoff. No runtime or migration edits in this groundwork batch. |
+| **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; `codex/security-groundwork` | Preparation complete at 2a4a5f5: 56 synthetic SQL assertions remain UNRUN; seven static checks and three runner unit tests pass. One narrow official-platform image/bootstrap feasibility follow-up is active; no schema repair. | New `supabase/tests/`, security-specific tooling/docs, `docs/testing-database.md`, security handoff. No runtime or migration edits in this groundwork batch. |
 | **Audit starter 3 cleanup candidates**, `01a0af90-7fb2-7571-a5d6-b82354d57540`; `codex/repository-structure` | Complete on its branch at cf8c61b: archived the historical PROJECT_CONTEXT record, kept a root compatibility page, repaired links and recorded the remaining structure plan. Chief verified preserved text and docs-only file manifest. Pending combined-branch integration; no main merge. | `README.md`, `docs/ARCHITECTURE.md`, selected historical documentation/archive paths and non-shared documentation links, `docs/handoffs/repository-structure.md`. No runtime, generated pages, migrations, test harness or workflow edits. |
+| **Integrate account testing changes**, `01a0b0f9-09da-7a62-9dd2-dd9baeac388d`; `codex/groundwork-integration` | Prepare the completed structure/security imports; await Testing's verified remote handoff, then combine and validate. Prove exact executable equivalence to reuse successful full-suite evidence where justified; run combined static/runner checks. | Integration branch and `docs/handoffs/groundwork-integration.md`. Do not overwrite chief guidance or use port 8791 while Testing owns it. No main merge/deployment. |
 | Chief coordinator, this task | Read-only GitHub/security/structure review, ownership coordination, remote handoff reconciliation and next choices. | `docs/CURRENT.md`, `docs/PRODUCT.md`, `docs/handoffs/chief-groundwork.md`. Other tasks send proposed corrections instead of editing these. |
 
 The additional database assessment task `01a0b0f0-0755-7962-b436-a6646a32321d` stays paused
@@ -96,6 +97,7 @@ repairs remain separately scoped.
 | Original Git/testing baseline | [136df03](https://github.com/rathunter69/Hotkey.gg/blob/136df032c119de73e6896ca480381ab77846e872/docs/handoffs/git-testing-releases.md) | Exact dependencies, local Git dry-run access and isolated smoke baseline verified on that branch. Its separate-source gap was later closed for the combined local baseline only. |
 | Additional database assessment | [6a73f8e](https://github.com/rathunter69/Hotkey.gg/blob/6a73f8e649f875f567f44748c9e677d1065ac5d5/docs/handoffs/repository-database.md) | Same keep conclusion; transitional aggregates, missing billing objects and migration-history differences. No data/schema changes. |
 | Account/testing integration | [6c98416](https://github.com/rathunter69/Hotkey.gg/blob/6c984161c31bc4637dbe88b73a4da8408cefdf1d/docs/handoffs/account-testing-integration.md) | Requested combined local checks pass at c702c69, remote provenance verified; explicit CI/live-auth/DB limits remain. Task finished and released port 8791. |
+| Security test preparation | [2a4a5f5](https://github.com/rathunter69/Hotkey.gg/blob/2a4a5f544e968850cdfd27557108de13c3ffcec2/docs/handoffs/security-accounts.md) | Code ce53324 has guarded disposable runner and 56 synthetic role assertions; three runner units/static pass. Twelve predicted vulnerability failures are not executed reproductions. No database replay, permission result or security repair is claimed. |
 | Repository structure cleanup | [cf8c61b](https://github.com/rathunter69/Hotkey.gg/blob/cf8c61bc1a6922325ac63f9d6449795e40484847/docs/handoffs/repository-structure.md) | Historical record moved to docs/history with compatibility page and repaired references. Chief fetched old/new content: same 1,145 lines, only the two Markdown targets on one line changed. No runtime/test/workflow/schema edits; documentation checks passed. |
 | Chief GitHub/security/structure review | [chief-groundwork.md](handoffs/chief-groundwork.md) | Fresh branch/ruleset/tree/workflow source review and bounded structure guidance; no settings or application changes. |
 
@@ -174,9 +176,10 @@ unrun checks. Browser suites own port 8791. Documentation-only changes use focus
 reference validation under TASK_GUIDE's exception, not unnecessary application test reruns.
 Do not call a static pass a playtest, a local subset full CI, or a report an implemented repair.
 
-Next: receive the remaining testing and security handoffs, verify remote source/results,
-reconcile them with the completed structure batch, and coordinate bounded combined verification
-in the dedicated integration task before giving Wolf one next decision. Do not automatically start
+Next: receive Testing's completed handoff and Security's narrow image-feasibility result,
+verify remote source/results, and accept the dedicated combined integration only after its
+checks. Structure cleanup and security preparation are saved separately; neither establishes
+the still-pending full browser/CI or database result. Then give Wolf one next decision. Do not automatically start
 a later batch from a recommendation. Catalog/progression design remains the next product
 module; subsequent targeted cleanup/site structure and the planned catalog rebuild follow
 the agreed direction. Remaining security blockers continue to constrain release readiness.
