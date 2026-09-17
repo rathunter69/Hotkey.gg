@@ -1,5 +1,10 @@
 # WORKFLOW.md — how we build hotkey.gg (process standards, v1.2 · 2026-07-26)
 
+> **Historical process reference.** As of 2026-09-13, [docs/DEVELOPMENT.md](../docs/DEVELOPMENT.md)
+> defines the current workflow and [docs/CURRENT.md](../docs/CURRENT.md) defines the queue.
+> The model-specific orchestration, environment paths and automatic shipping instructions below
+> document the previous environment; they are not prerequisites for current work.
+
 _This is the operating system for every session. PROJECT_CONTEXT.md = what the product is +
 the live handoff. PIPELINE.md = WHAT to build next. AUDIT.md = what each round did.
 AUDIT_R417.md = the current findings base. THIS file = HOW to work._

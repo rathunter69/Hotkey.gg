@@ -1,4 +1,8 @@
 # DRILL DOCTRINE — how hotkey.gg drills are designed, built, tested, and enriched
+> **September 17, 2026:** Product-design reference. Current `AGENTS.md`, `docs/PRODUCT.md`
+> and `docs/DEVELOPMENT.md` supersede historical workflow, tooling paths and shipping instructions
+> below. In particular, the direct-to-main and force-sync instructions are not the current process.
+
 *(r169. The canonical methodology. Written while Fable was on the desk so any
 future session — any model — can execute the same quality bar. If a rule here
 conflicts with older notes in AUDIT.md, this file wins.)*

@@ -1,5 +1,9 @@
 # PIPELINE — the Fable task queue
 
+> **Historical queue.** As of 2026-09-13, use [docs/CURRENT.md](../docs/CURRENT.md) for active
+> work. Multiple "LIVE" headings below describe different past sessions; none is a fresh
+> deployment check or an instruction to execute all of those workstreams.
+
 ## ⚡ LIVE (r451, 2026-09-03): THE FOUR VECTORS — plans written, Wolf decisions pending
 The depth pass is complete (74/74, r449) and the first-session round shipped (r450, #246). The
 active queue is now the four vectors in `dev/CONTINUITY.md` §0: **(1) the tutorial chapter**

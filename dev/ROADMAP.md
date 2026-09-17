@@ -1,5 +1,9 @@
 # ROADMAP — one session, one goal
 
+> **Prior rebuild proposal; status corrected 2026-09-13.** S0 is complete: PR #250 merged as
+> `434bc0e` on 2026-09-05. The remaining waves are not the active queue until reconciled with the
+> separate September onboarding branch. Start with [docs/CURRENT.md](../docs/CURRENT.md).
+
 _2026-09-04 · Wolf: "I want to move to another session and want one session dedicated to one discrete goal. We're
 mixing too many updates and fixes." From here, every session opens on ONE row of this table, ships ONE PR, and
 closes by updating the row. Anything found along the way that is not the row's goal goes into §3 (the parking
@@ -20,7 +24,7 @@ Status: ☐ not started · ◐ in progress · ☑ done. Sizes: S = a few hours, 
 
 | id | goal (one sentence) | done when | size | reads | status |
 |---|---|---|---|---|---|
-| **S0** | **Merge PR #250** (the rebuild's groundwork: wave-0 tags/guards, gap matrix, curriculum v5.1 page, Phase A map + `--v5` checker, `check-borders` fix). No player-facing change. | merged to main | S | this file | ☐ Wolf's word |
+| **S0** | **Merge PR #250** (the rebuild's groundwork: wave-0 tags/guards, gap matrix, curriculum v5.1 page, Phase A map + `--v5` checker, `check-borders` fix). No player-facing change. | merged to main | S | this file | ☑ `434bc0e`, 2026-09-05 |
 | **S1** | **Foundations wave 1** — build tutorials 2–4 (`repairshop` `powergrid` `printshop`), `findgo`, and re-cut `pastes` + `series` to the seven rules; retire `filldr blocksel rowops editfix drill signerr`; C32/C33 as warnings; `--v5` gated. | the eight Foundations drills play end to end on the preview; onboarding suite green; par swept | L | CURRICULUM_V5.md ch.1 · CURRICULUM_V5_PHASE_A.md §1 §4 · DRILLS_WOLF_LIKED.md · CURRICULUM_V3.md §9.0 (the step/guide/hint contract) | ☐ |
 | **S2** | **Engine pack P1** — the function pack (XLOOKUP, IFS, SWITCH, MAXIFS/MINIFS/AVERAGEIFS/COUNTIFS, TEXTJOIN, TEXT, SUBSTITUTE, SEARCH, DATEDIF, NETWORKDAYS, PMT) + comparison criteria in SUMIF/COUNTIF + the columns-past-Z parse fix. | every function in ENGINE_GAP_MATRIX P1 grades in a probe suite; invariant added | M | ENGINE_GAP_MATRIX.md · ENGINE_CHECKS_V4.md | ☐ |
 | **S3** | **Formatting wave** — `typeset` `compspage` `ruleaudit` `printpage` (no freeze) re-cut/new; `housestyle` absorbs `gauntlet`; retire `decimals combo center autofit ruleoff gauntlet`. | chapter 2 plays end to end; C28–C31 numbers for c2 inside the P2/P3 quotas | L | CURRICULUM_V5.md ch.2 · PHASE_A §1 | ☐ |
