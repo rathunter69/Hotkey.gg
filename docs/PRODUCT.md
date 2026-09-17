@@ -159,7 +159,7 @@ confirmed decision and its superseded rule; CURRENT owns status and task sequenc
 
 ### Confirmed catalog/flow decisions — September 17–18
 
-Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/b5c5c7a396d29f84582dd84e19d17e5fca9430f9/docs/handoffs/catalog-progression.md),
+Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/b6a31775fe3c19fd72ea91fe5802f9789c76b5ad/docs/handoffs/catalog-progression.md),
 task 01a0b148-2693-7901-af91-934c83cabe1d. The chief checked the remote handoff and Wolf's
 actual approvals in that task. The September 17 bace206 tentative gate status is superseded
 by the explicit September 18 approval below; other unanswered proposals remain open.
@@ -199,6 +199,23 @@ an old control named “hint” is not enough to decide its treatment. Independe
 viewing solutions, fresh variants, speed/competitive publication, pause and rank rules remain
 open. No live behavior is changed by this specification.
 
+**September 18 — public competition scope approved:** selected standardized skill benchmarks
+and Daily events, alongside personal bests, form the future public competition focus. The
+evolving lesson catalog is not automatically the universal public comparison set. Existing
+scores and earned history remain protected. This selects the scope only; it does not approve
+removing old boards, a new overall rank, exact benchmark membership/access, seed/retry/fairness
+rules or implementation. A lesson can change without silently redefining a public benchmark;
+the versioning and old-board transition plan still need agreement.
+
+Wolf answered only the competitive-scope question in the latest three-option packet. The
+other two choices remain pending: fresh variation versus exact replay/separate assessment,
+and deliberate public entry versus automatic posting/a dedicated competition area. Do not
+infer their approval from the scope selection or a general positive response to the discussion.
+
+Wolf also explicitly requested continued concise, high-level mechanics options with practical
+tradeoffs and a reasoned recommendation. Keep this discussion style, capture each actual answer
+separately, and avoid duplicating the area's two pending questions in the chief session.
+
 **Acceptance examples:** reading an instruction or concept explanation does not disqualify
 an otherwise independent result. Revealing solution steps preserves completion but awards no
 XP. A slow but correct independent result can meet readiness. At a major advanced transition,
@@ -206,8 +223,9 @@ subscription inclusion plus qualifying prior work or test-out allows entry; a le
 the skill gets preparation and a retry. A lesson starts without a visible clock, while a
 deliberate speed attempt shows one. Illustrative transitions do not fix the actual checkpoint list.
 
-Next discussion: independent retries/fresh variants and deliberate speed/competitive posting,
-then remaining reward, credential and access details. D1 exact shared-content mechanics and
+Next discussion: the two pending independent-retry and public-entry choices, then result,
+mastery and rank distinctions within the selected benchmark/Daily scope, followed by remaining
+reward, credential and access details. D1 exact shared-content mechanics and
 D2 publication/rank controls remain open. The chief reconciles the answers without duplicating
 the area's questions. Existing progress, Foundations feedback and the complete-plan-before-
 rebuild requirement remain protected.
