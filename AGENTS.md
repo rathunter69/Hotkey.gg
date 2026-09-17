@@ -34,10 +34,15 @@ For a new area task, read `docs/TASK_GUIDE.md` for its starter scope and coordin
   fully planned catalog redesign. Use this as the proposed order for dedicated repair tasks.
   Broad content/feature development, billing activation and deployment remain paused. A proposed
   improvement is not a bug fix. Do not delete tables or old files solely because they look stale.
-- Future learning direction: guided beginner lessons; assisted completion counts toward learning
-  progress but not XP; basic drills freely explorable and paths recommended. Exact timing,
-  assessment, free/paid boundaries and certificate rules remain to be settled in PRODUCT.md.
-  Structural separation must preserve current behavior until the replacement rules are approved.
+- Future learning is learning-first with optional speed/competition. Wolf approved September 18:
+  advanced subscription access plus short readiness checks only at major skill jumps, satisfied
+  by prior independent work or test-out; helped ordinary completion advances learning without XP.
+  Readiness uses correctness, not speed/XP. Lesson timers are optional/hidden by default; deliberate
+  speed attempts show time. Instructions/explanations are unpenalized; solution-step reveals,
+  Guided help and solution replay mark assistance. Exact paid boundaries/checkpoints, independent
+  retries, scoring/publication/rank and certificate details remain open in PRODUCT.md. Basic drills
+  remain freely explorable. Preserve current behavior until a bounded implementation batch is
+  separately authorized; approved product direction is not automatic implementation permission.
 - The earlier October 1 launch schedule is parked. Subscriptions at launch and customized
   onboarding remain future product requirements, not permission to implement them now.
   Resume feature development only when Wolf says to proceed.
