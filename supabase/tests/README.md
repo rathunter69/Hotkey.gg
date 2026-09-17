@@ -2,11 +2,10 @@
 
 This folder contains test inputs, not deployable migrations. Based on accepted integration
 `6c984161c31bc4637dbe88b73a4da8408cefdf1d` and DATA_SECURITY's September 17 audit.
-The DATA-01 SQL suite is **incomplete**: first execution at 18babfa replayed all 52 migrations,
-then aborted at fixture line 119 on its direct internal `my_pro()` call (SQLSTATE 42501).
-It emitted 12 partial TAP results, no complete plan; no second instance ran. The desired secure
-results and source-predicted failures below do not constitute a completed permission baseline.
-See [durable evidence](evidence/replay-baseline-35276711544.json) and the area handoff.
+The DATA-01 SQL suite now has a **complete failing baseline** at exact source eaab864,
+run 35277724943: two fresh 52-file replays, each followed by all 56 assertions with 44 passing
+controls and the same 12 DATA-01 failures. Cleanup passed; CI correctly failed. No permission
+repair is included. See [durable evidence](evidence/replay-baseline-35277724943.json).
 
 Follow [the isolated-host runbook](../../docs/testing-database.md) before any database work.
 Never run these fixtures through the production connector or linked CLI project.
@@ -24,9 +23,10 @@ No new npm dependency. The separate [platform-only bootstrap](PLATFORM_BOOTSTRAP
 its reviewed Linux CI experiment at exact source 49b8193, run 35275149357; see
 [saved evidence](evidence/platform-bootstrap-35275149357.json). Chief reserved that distinct
 workflow to Security with Testing review. It ran no Hotkey migrations or DATA-01 assertions.
-The subsequent separate [replay baseline](REPLAY_BASELINE.md) ran once after independent
-review; its fixture error stopped the batch and remained a failing job. No fixture repair
-or internal helper grant restoration is included.
+The first [replay baseline](REPLAY_BASELINE.md) stopped at a stale fixture helper call; its
+evidence remains preserved. The separately authorized two-read fixture correction uses the
+supported entitlement RPC and enabled the complete failing baseline above. Internal helper
+grants remain unchanged.
 A stock Postgres image, mock auth functions or ad-hoc table grants cannot establish parity
 with Supabase.
 
@@ -39,20 +39,20 @@ Actor helpers and probes are SECURITY INVOKER. Superuser setup does not perform 
 
 | Boundary | Denied path / assertion | Allowed or existing control | Current evidence |
 |---|---|---|---|
-| Captain authority | Outsider directly inserts itself as captain on another desk | Genuine captain can recruit, rotate invite and accept applications; member cannot rotate | Direct insertion expected to fail the security assertion (known vulnerability) |
-| Paid-seat seniority | Outsider inserts a backdated member row; member updates own joined_at | Invitation RPC grants member with server timestamp | Insert expected vulnerable; update denial is a preservation control |
-| Role change | Member updates own role to captain | Legitimate create installs creator as captain | Existing update denial must remain |
-| Trusted desk identity | Owner updates verified/edu_domain; creator supplies those fields on direct insert | RPC creation defaults to unverified and binds owner to caller | Four assertions expected vulnerable |
-| Creation eligibility | Anonymous session or unpaid full user directly inserts a desk | RPC rejects those users; entitled full user can create | Two direct insert assertions expected vulnerable |
-| Application eligibility | Anonymous Auth session applies by direct insert | RPC requires a full, deskless account | Direct insert expected vulnerable |
-| Private/closed desk | Direct application into private/non-recruiting desk | Matching RPC calls reject | Two direct insert assertions expected vulnerable |
-| Five pending applications | Sixth direct insert | RPC rejects sixth; fixture proves count is five | Direct insert expected vulnerable |
-| Outsider actions | Remove other member, rotate invite, decide application | Captain decision adds ordinary member and clears pending applications | Existing controls must remain |
-| Signed-out actor | Direct membership write and create RPC | Public display contract is not changed | Existing denials must remain |
+| Captain authority | Outsider directly inserts itself as captain on another desk | Genuine captain can recruit, rotate invite and accept applications; member cannot rotate | Bypass reproduced twice; controls pass |
+| Paid-seat seniority | Outsider inserts a backdated member row; member updates own joined_at | Invitation RPC grants member with server timestamp | Insert bypass reproduced twice; update denial passes |
+| Role change | Member updates own role to captain | Legitimate create installs creator as captain | Update denial and allowed control pass twice |
+| Trusted desk identity | Owner updates verified/edu_domain; creator supplies those fields on direct insert | RPC creation defaults to unverified and binds owner to caller | Four bypasses reproduced twice |
+| Creation eligibility | Anonymous session or unpaid full user directly inserts a desk | RPC rejects those users; entitled full user can create | Two bypasses reproduced twice; RPC controls pass |
+| Application eligibility | Anonymous Auth session applies by direct insert | RPC requires a full, deskless account | Bypass reproduced twice; RPC control passes |
+| Private/closed desk | Direct application into private/non-recruiting desk | Matching RPC calls reject | Two bypasses reproduced twice; RPC controls pass |
+| Five pending applications | Sixth direct insert | RPC rejects sixth; fixture proves count is five | Bypass reproduced twice; RPC control passes |
+| Outsider actions | Remove other member, rotate invite, decide application | Captain decision adds ordinary member and clears pending applications | All controls pass twice |
+| Signed-out actor | Direct membership write and create RPC | Public display contract is not changed | Denials pass twice |
 
-There are 12 predicted vulnerable direct-table assertions and 44 context/allowed/denied
-controls (56 total after final additions). Predictions derive from the newest source bodies,
-grants and policies, plus DATA-01 audit evidence. They are not observed test results.
+The 12 source-predicted vulnerable direct-table assertions now fail by identity in both fresh
+instances, with `ok:1` actual probe results. All 44 context/allowed/denied controls pass.
+These are observed source-database results, not production verification or repaired security.
 The intended repair shape (controlled RPC-only writes for these fields/routes) follows the
 audit; if the agreed repair uses another safe route, update exact error expectations with
 that review rather than quietly accepting any exception.

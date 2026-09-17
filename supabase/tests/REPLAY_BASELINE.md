@@ -5,14 +5,21 @@ checkpoint `3dd686d`. This separate branch does not join or block browser/struct
 The platform-only branch, exact tested source `49b8193`, and successful run `35275149357`
 remain preserved. No application runtime, migration history or permission repair is changed.
 
-Result: [run 35276711544](https://github.com/rathunter69/Hotkey.gg/actions/runs/35276711544), exact
+Latest result: [run 35277724943](https://github.com/rathunter69/Hotkey.gg/actions/runs/35277724943),
+exact `eaab8645cf8aaee6e62120f65d24ebd911a047ad`: both fresh 52-file replays and full 56-result
+suites completed. Each has 44 passing controls and identical 12 DATA-01 failures, no unexpected
+control failure. Cleanup passed; CI stays failed. [Saved result](evidence/replay-baseline-35277724943.json).
+Only the two fixture entitlement reads changed to supported my_pro_status().pro; roles and
+all 56 expected outcomes remain unchanged. No application permission repair occurred.
+
+Earlier result: [run 35276711544](https://github.com/rathunter69/Hotkey.gg/actions/runs/35276711544), exact
 source `18babfa80dea4acb31fd30be2ae00b3610d42ed2`, completed the first 52-file replay then stopped
 at fixture line 119: SQLSTATE 42501, permission denied for internal function my_pro. Only 12
 partial TAP lines were emitted; no second instance or complete permission baseline. Cleanup
 passed and the job failed. [Saved result](evidence/replay-baseline-35276711544.json) and
 [handoff](../../docs/handoffs/security-accounts.md) distinguish the fixture blocker from replay.
 
-`replay-baseline.js --plan` inventories exactly 52 migration inputs and the unchanged single
+`replay-baseline.js --plan` inventories exactly 52 migration inputs and the single reviewed
 56-assertion fixture. `--run` works only on the dedicated branch push in this repository's
 GitHub-hosted Linux x64 job. Testing must independently clear the exact candidate before a
 triggering push. The distinct workflow has no main/PR/deployment/manual trigger, uses pinned
