@@ -1,6 +1,6 @@
 # Product direction
 
-Updated September 17, 2026. This is the shared product brief. Current work and launch status
+Updated September 18, 2026. This is the shared product brief. Current work and launch status
 live in [CURRENT.md](CURRENT.md); source locations live in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Confirmed by Wolf on September 17
@@ -105,7 +105,8 @@ security and unfinished behavior need attention before adding more features.
 
 Excel fidelity and accessibility for beginners must work together. Preserve familiar Excel
 behavior while making instructions, feedback and difficulty approachable. How to handle
-timing, assistance, scoring and progression is still to be settled with evidence and Wolf.
+the remaining retry, scoring and progression details must follow the confirmed policies below
+and be settled with evidence and Wolf.
 
 Maintaining the ability to publish through Git is a setup requirement; checking that ability
 is not authorization to deploy a change. Bounded repairs and preparation follow the order below.
@@ -157,53 +158,70 @@ content deletion, progress reset or new access/reward system follows automatical
 this audit. Preserve the Foundations feedback sources below. Update this brief with each
 confirmed decision and its superseded rule; CURRENT owns status and task sequencing.
 
-### Catalog/flow decisions — September 17 follow-up
+### Confirmed catalog/flow decisions — September 17–18
 
-The [updated review and decision record](https://github.com/rathunter69/Hotkey.gg/blob/bace206c421e4f5969f69fc88c39e5191b234f1d/docs/handoffs/catalog-progression.md)
-contains source-based evidence and Wolf's subsequent answers in task
-01a0b148-2693-7901-af91-934c83cabe1d. The chief read that report and the relevant task
-conversation. The initial 0151c3d checkpoint's blanket D1–D3-unanswered status is superseded
-by these scoped answers, not by acceptance of all the lead's recommendations.
+Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/b5c5c7a396d29f84582dd84e19d17e5fca9430f9/docs/handoffs/catalog-progression.md),
+task 01a0b148-2693-7901-af91-934c83cabe1d. The chief checked the remote handoff and Wolf's
+actual approvals in that task. The September 17 bace206 tentative gate status is superseded
+by the explicit September 18 approval below; other unanswered proposals remain open.
 
-**Confirmed:** learning is the main journey, with prominent optional speedrunning/competition:
-learn a skill → complete it independently → improve speed → compete. Wolf approved that
-explanation, preserving playful early exercises, later realistic work, helped learning
-progress without XP and direct entry for experienced competitors subject to eventual rules.
-This replaces treating speed/XP climbing as the primary educational journey. It does not
-approve a particular button, public-posting rule, eligibility test or content architecture.
+**September 17 — learning first:** learning is the main journey, with prominent optional
+speedrunning/competition: learn a skill → complete independently → improve speed → compete.
+Preserve playful early lessons, later realistic work, helped progress without XP and direct
+entry for experienced competitors subject to eventual rules. Later lessons should have gates.
+This replaces a speed/XP climb as the primary educational journey; it does not decide specific
+content identity, public score posting, rank entry or buttons.
 
-**Confirmed direction:** later lessons should be gated. Freely explored basics remain
-preserved. This qualifies the earlier recommendation for unrestricted exploration of all
-entitled exercises; that recommendation was never agreed. Which lessons, what demonstrates
-readiness and where subscription access applies remain open.
+**September 18 — advanced access and readiness approved:**
+- Subscription access opens advanced curriculum; the exact free/paid lesson boundary remains open.
+- Short prerequisite checks occur only at major skill jumps, not before every ordinary lesson.
+- Relevant earlier independent work satisfies readiness; experienced learners can use a short
+  test-out instead of completing the beginner sequence.
+- Ordinary lessons completed with help advance learning, with no assisted XP.
+- Readiness depends on correct independent work, not speed targets or accumulated XP.
 
-**Tentative, awaiting advice/agreement:** Wolf's intuition favors both prerequisite skills
-and a subscription. His wording was a request for a suggestion, not approval of the detailed
-gate policy. The area proposes subscription inclusion plus short independent readiness
-checks only at major skill jumps, accepting equivalent prior results or test-out, with
-ordinary helped lesson completion advancing learning and no speed/XP grind. These mechanics,
-paid boundaries and checkpoint locations remain recommendations.
+This supersedes the tentative skills-plus-subscription preference and the area's earlier
+proposal for unrestricted exploration of every entitled exercise. Freely explored basics
+remain protected. Existing runtime locks and billing stay unchanged until implementation is
+separately authorized. Checkpoint locations, pass thresholds, equivalences, exact curriculum
+and credential requirements remain open.
 
-Acceptance at the confirmed level: a learner can make learning progress with help without
-XP; independent work can lead into optional speed improvement and competition. A later
-lesson may require an agreed gate; its precise unlock logic is not yet approved. Existing
-earned progress must survive. The exact D1 shared-content arrangement and D2 scoring/
-publication/rank controls remain open, alongside D3/D9 gate details.
+**September 18 — lesson timer and assistance approved:**
+- Ordinary lessons hide the timer unless the learner enables it; deliberate speed attempts
+  show time. Enabling a lesson timer does not itself publish a competitive score.
+- Normal task instructions and explanations do not mark an attempt assisted or remove XP
+  eligibility by themselves. Actual XP still depends on the agreed independent-completion rules.
+- Revealing solution steps, using Guided help or replaying a solution marks the attempt
+  assisted: learning progress, no XP. Ordinary helped completion still advances learning.
 
-The next focused decision is the combined gate policy, then assistance/timing/rewards.
-The chief reconciles those answers and their platform-wide consequences without repeating
-the area's questionnaire. No runtime lock, billing setting, ranked switch or catalog content
-has changed or is authorized to change from this planning record.
+This replaces always-visible teaching timing and blanket score-eligible solution hints as
+the desired future rule. Mapping existing controls to these categories still needs design;
+an old control named “hint” is not enough to decide its treatment. Independent retries after
+viewing solutions, fresh variants, speed/competitive publication, pause and rank rules remain
+open. No live behavior is changed by this specification.
 
-## Learning decisions and repair order — latest September 17 response
+**Acceptance examples:** reading an instruction or concept explanation does not disqualify
+an otherwise independent result. Revealing solution steps preserves completion but awards no
+XP. A slow but correct independent result can meet readiness. At a major advanced transition,
+subscription inclusion plus qualifying prior work or test-out allows entry; a learner missing
+the skill gets preparation and a retry. A lesson starts without a visible clock, while a
+deliberate speed attempt shows one. Illustrative transitions do not fix the actual checkpoint list.
+
+Next discussion: independent retries/fresh variants and deliberate speed/competitive posting,
+then remaining reward, credential and access details. D1 exact shared-content mechanics and
+D2 publication/rank controls remain open. The chief reconciles the answers without duplicating
+the area's questions. Existing progress, Foundations feedback and the complete-plan-before-
+rebuild requirement remain protected.
+
+## Learning decisions and repair order — status September 18
 
 | Area | Wolf's direction | Still open |
 |---|---|---|
 | First experience | Lean toward a guided beginner exercise; a short assessment may be a useful hook | Default entry and the experienced-user shortcut |
 | Beginner learning | Interactive lessons that teach hotkeys and how Excel works | Exact help presentation and how much each lesson introduces |
-| Timing | Time targets can matter throughout; untimed free Foundations is a possibility | Whether the clock is shown during teaching, and what speed affects |
-| Assisted completion | Hints/step-by-step help should count for completion progress, not XP | Define what counts as assistance; instruction text should not be silently penalized |
-| Exploration | Users freely explore basics; recommended paths; later lessons should be gated | Which later lessons, readiness evidence, subscription boundary and test-out rules; skills plus subscription is a tentative preference |
+| Timing | Ordinary lesson timer optional and hidden by default; deliberate speed attempts show time | Independent retry, pause, competitive timing and publication rules |
+| Assisted completion | Instructions/explanations unpenalized; solution-step reveals, Guided help and solution replay mean assisted learning progress with no XP | Map existing controls; define fresh independent retries and remaining competitive eligibility |
+| Exploration | Free exploration of basics; advanced subscription access plus readiness at major skill jumps; prior independent work or test-out accepted; helped ordinary completion advances learning | Exact free/paid boundary, checkpoint locations, pass criteria and equivalent evidence |
 | Credentials | Interested in skill-path certificates shareable on LinkedIn, and possibly high-score recognition | Evidence required for a certificate versus a speed badge; no endorsement by LinkedIn implied |
 | Catalog | Prefer a likely full rebuild, but preserve substantial earlier Foundations feedback | A full plan must precede implementation; the old v5 proposal is not automatically selected |
 | Order of work | Easy security/account fixes → catalog/progression separation → repository/database cleanup → site framework → planned catalog redesign | Size/acceptance of each bounded repair or cleanup batch |
@@ -220,8 +238,9 @@ a particular technical framework; it is not permission for a React/Next rewrite.
 - Use the same exercise for guided learning and an independent timed retry. In lessons, suggested
   times provide context and do not fail or block a beginner. Teaching time should not become a
   competitive score. This avoids maintaining duplicate timed and untimed catalogs.
-- Record assisted completion as learning progress; award XP and competitive eligibility for the
-  agreed independent result. Define assistance consistently across hints, rails and solution replay.
+- Apply the approved assistance distinction consistently across current controls. Independent XP
+  and competitive eligibility still need their detailed rules; do not equate every hint label
+  with solution help or treat public posting as already agreed.
 - Make free Foundations useful on its own and include replayable timed basics, so visitors can
   experience both learning and improvement. Candidate paid value: deeper paths, business models
   and assessed skill certificates. Exact inclusions and pricing remain open.
