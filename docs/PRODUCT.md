@@ -11,6 +11,11 @@ fixes come first, then catalog/progression separation, repository/database clean
 structure, and a fully planned catalog redesign. Broad feature work, billing activation and
 the catalog rebuild remain paused. The earlier launch schedule remains parked.
 
+Reconfirmed in Wolf's September 17 successor-chief handover: retain this order, preserve the
+Foundations feedback in a future fully planned catalog rebuild, and retain subscriptions at
+launch as a future product requirement. This restates the existing direction; it does not approve new learning/access rules
+or begin a later module. The chief coordinates; dedicated tasks implement assigned batches.
+
 Hotkey.gg is like LeetCode for Excel and business tasks. People learn by doing realistic
 spreadsheet work, with an emphasis on becoming faster using the keyboard.
 
