@@ -8,6 +8,18 @@ For a new area task, read `docs/TASK_GUIDE.md` for its starter scope and coordin
 
 - Read `docs/PRODUCT.md` for current product direction and carried-forward design decisions.
   Speak to Wolf in concise, clear English; explain the user impact before implementation details.
+- Wolf explicitly requires concise communication from every Hotkey agent/session (September 17).
+  Lead with the outcome, user impact and next decision; use short paragraphs or a few bullets.
+  Keep detailed logs, technical evidence and long inventories in the GitHub handoff. Explain
+  jargon only when it affects a choice; avoid repeated status, routine command narration and
+  large questionnaires. Brevity must still disclose material failures, limits and unrun checks.
+  Pass this rule to delegated agents; resumed tasks read the latest remote shared guidance.
+- The chief orchestration session also owns discussion of the project overview, overall design
+  specification and platform-wide experience: audience/promise, learner journey, system roles,
+  visual/interaction principles, access/business model and priorities. Discuss a coherent product
+  with Wolf, not only delivery status. Area tasks provide focused evidence/options and return
+  confirmed choices; the chief reconciles the shared specification in PRODUCT.md. This expands
+  planning discussion, not application-implementation or deployment authority.
 - Preserve the general UI/UX, ribbon and game workspace. Wolf reconfirmed September 17 that
   pixel art is for account identity/icons and achievements. Learning should progress from
   accessible, playful keyboard interactions to realistic models and finance work. Review
