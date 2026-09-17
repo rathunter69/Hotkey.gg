@@ -6,7 +6,32 @@ Branch: codex/security-groundwork
 Starting integration: 6c984161c31bc4637dbe88b73a4da8408cefdf1d
 Latest guidance read separately: foundation 3e15e662b86368bd7338cb482a37ed1bd4b9a2cf
 Exact validated test-code commit: ce53324df2dba934b4acb495bf28e74f35de9bd3
-State: test groundwork prepared and locally validated; database execution unavailable; no security schema repair, integration or deployment.
+State: test groundwork prepared and locally validated; official image feasibility reviewed, complete Auth bootstrap pending; no security schema repair, integration or deployment.
+
+## Latest checkpoint: official image/bootstrap feasibility
+
+Chief's September 17 follow-up requested one official setup route after accepting `2a4a5f5`.
+This documentation-only checkpoint resolves the public image metadata and source tags for
+Postgres 17.6.1.136 and Auth v2.196.0, recorded with full immutable Linux amd64 digests and
+pinned source links in [testing-database.md](../testing-database.md#official-platform-feasibility-review--september-17).
+Independent review confirms the standalone database image lacks `auth.jwt()` and
+`auth.users.is_anonymous`; its genuine platform grants otherwise match the test preconditions.
+The official Auth migration command supplies the missing schema through its complete chain.
+
+This replaces the generic missing-image blocker with a specific unimplemented/unverified Auth
+bootstrap step. A GitHub-hosted Linux Docker route exists. Testing will integrate a separate
+job after Security supplies a reviewed complete bootstrap; its browser gate remains separate.
+The minimal proposed next action is one platform-only bootstrap check using the pinned pair,
+network none/tmpfs/no ports, scheduler disabled from first startup, and an official Auth
+migrator confined to that network namespace. Verify empty data, Auth objects, ACLs, extensions
+and isolation before any application replay; stop at the first setup failure. No speculative
+variants, fake Auth/grants, production secrets or host installation.
+
+No executable bootstrap was added or dispatched. All 56 SQL assertions, full replay and image
+startup/compatibility remain UNRUN; DATA-01/02/03 remain unrepaired. Changes in this checkpoint
+are only this handoff, docs/testing-database.md and supabase/tests/README.md. Source/registry
+read-only inspection, independent review and diff checks are the new evidence; prior passing
+static/runner checks remain applicable to unchanged executable code at `ce53324`.
 
 ## Scope and outcome
 Chief assigned this bounded preparation on September 17 under Wolf's testing/security request.
@@ -59,18 +84,19 @@ prepared test code, not a completed database audit or a DATA-01 fix. Existing ac
 baseline is reused from integration c702c69/6c98416, not rerun for these tests/docs-only changes.
 
 Git/testing confirms GitHub-hosted Linux can provide Docker but has not approved/provisioned
-an exact database platform image or database job. It will not bundle an unreviewed DB job in
-its browser workflow. A reviewed immutable image with genuine empty Supabase auth schema and
-platform defaults, pgTAP/pg_net and pg_cron disabled from first startup is required. See
+a complete database bootstrap or database job. It will not bundle an unreviewed DB job in
+its browser workflow. The official pair is pinned above; genuine empty Supabase auth schema,
+platform defaults, pgTAP/pg_net and pg_cron disabled from first startup must be verified. See
 [testing-database.md](../testing-database.md) for the runnable host contract. No host service
 installation, remote project creation, production queries, live exploit, email, customer-row
 retrieval, secret rotation, billing action, main merge or deployment occurred.
 
 ## Next bounded proposal and chief integration
 Mark Security groundwork as prepared/locally validated with database execution pending;
-DATA-01/02/03 remain unrepaired. The next proposed batch is to review/pin an empty-platform
-image and execute two fresh isolated replays plus this expected-failing baseline on a dedicated
-Linux test host. Capture first failures without skipping/editing old migrations. Only then
+DATA-01/02/03 remain unrepaired. The next proposed batch is the platform-only official Auth
+bootstrap check above, followed after acceptance by two fresh isolated replays and this
+expected-failing baseline on the dedicated Linux test host. Capture first failures without
+skipping/editing old migrations. Only then
 prepare the separately authorized DATA-01 forward permission repair and prove denied/allowed
 cases before/after. DATA-02 and DATA-03 require their own agreed contracts and separate repairs.
 The chief owns prioritization; this proposal does not start schema changes automatically.
