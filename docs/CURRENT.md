@@ -50,9 +50,10 @@ Node 22.23.2, npm 10.9.8, Playwright 1.49.1 and matching Chromium 131.0.6778.33 
 (build 1148). Two independent reviewers found no remaining integration blocker. The smoke
 command includes canary/account checks; these are not duplicated independent runs.
 
-That establishes the requested **combined local baseline only**. It does not establish full
-Linux CI, the wider engine matrix, live/multi-tab authentication, page-specific loaders beyond
-shared navigation, isolated database replay/permissions, production delivery or recovery.
+That earlier checkpoint establishes the requested **combined local baseline only**. The wider
+local matrix has since passed on Testing's checkpoint below. Full Linux CI remains pending.
+Neither result establishes live/multi-tab authentication, page-specific loaders beyond shared
+navigation, isolated database replay/permissions, production delivery or recovery.
 The full Windows Chromium executable previously failed to launch; the matched headless shell
 passed. Existing 39 catalog-variety warnings and separate audit findings remain unresolved.
 
@@ -63,11 +64,23 @@ All preserve original local work and earlier remote branches.
 
 | Owner / task | Scope | Exclusive files / boundaries |
 |---|---|---|
-| **Establish testing and blockers**, `01a0af90-b973-7572-b7ff-d5bf9f504a52`; `codex/testing-security-groundwork` | Finish redirect-safe isolation across full gate/generators; run complete pinned checks in a suitable isolated environment, aiming for exact-source Linux CI. Fix test infrastructure; report unrelated application failures. | Browser test workflow(s), browser helper/canary/harnesses and generator isolation, `dev/run-checks.js`, `docs/DEVELOPMENT.md`, testing handoff. Own port 8791 during browser runs. |
+| **Establish testing and blockers**, `01a0af90-b973-7572-b7ff-d5bf9f504a52`; `codex/testing-security-groundwork` | Complete local matrix reported green and code saved at 4ea428b. Redirect-safe isolation now covers all active gate harnesses/generator, with redirect/WebSocket/service-worker canaries. Exact-source Linux run 35274460688 remains in progress; final handoff pending. | Browser test workflow(s), browser helper/canary/harnesses and generator isolation, `dev/run-checks.js`, `docs/DEVELOPMENT.md`, testing handoff. Port 8791 released after local checks. Also read-only safety review of Security's separate platform workflow before its first push/run. |
 | **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; `codex/security-groundwork`, with separate experiment `codex/security-platform-bootstrap` | Preparation complete at 2a4a5f5; official image/source feasibility accepted at 14d7e10. All 56 SQL assertions remain UNRUN; static and three runner unit tests pass. Proceed with one platform-only isolated bootstrap experiment within the authorized test-environment groundwork, stopping before application replay or permission fixes. | New `supabase/tests/`, security-specific tooling/docs, `docs/testing-database.md`, security handoff. For the platform-only experiment, also reserve a distinct `.github/workflows/security-platform-bootstrap.yml` after Testing's read-only safety review; no gate/deployment workflow, runtime or migration edits. |
 | **Audit starter 3 cleanup candidates**, `01a0af90-7fb2-7571-a5d6-b82354d57540`; `codex/repository-structure` | Complete on its branch at cf8c61b: archived the historical PROJECT_CONTEXT record, kept a root compatibility page, repaired links and recorded the remaining structure plan. Chief verified preserved text and docs-only file manifest. Pending combined-branch integration; no main merge. | `README.md`, `docs/ARCHITECTURE.md`, selected historical documentation/archive paths and non-shared documentation links, `docs/handoffs/repository-structure.md`. No runtime, generated pages, migrations, test harness or workflow edits. |
-| **Integrate account testing changes**, `01a0b0f9-09da-7a62-9dd2-dd9baeac388d`; `codex/groundwork-integration` | Prepare the completed structure/security imports; await Testing's verified remote handoff, then combine and validate. Prove exact executable equivalence to reuse successful full-suite evidence where justified; run combined static/runner checks. | Integration branch and `docs/handoffs/groundwork-integration.md`. Do not overwrite chief guidance or use port 8791 while Testing owns it. No main merge/deployment. |
+| **Integrate account testing changes**, `01a0b0f9-09da-7a62-9dd2-dd9baeac388d`; `codex/groundwork-integration` | Testing 4ea428b can join accepted cleanup/security preparation. Combined seven static checks, three security-runner units and independent executable-equivalence review reported green. Final remote handoff and Linux conclusion still pending; no completed combined acceptance yet. | Integration branch and `docs/handoffs/groundwork-integration.md`. Preserve exact area executable files and chief guidance; exclude the separate platform-bootstrap experiment. No main merge/deployment. |
 | Chief coordinator, this task | Read-only GitHub/security/structure review, ownership coordination, remote handoff reconciliation and next choices. | `docs/CURRENT.md`, `docs/PRODUCT.md`, `docs/handoffs/chief-groundwork.md`. Other tasks send proposed corrections instead of editing these. |
+
+Testing checkpoint [4ea428b](https://github.com/rathunter69/Hotkey.gg/commit/4ea428ba1504ee04b3d01943df5f7cd1b68a2c4d)
+is remote-verified by the chief: parent 6c98416; 23 test/workflow/generator/documentation files;
+no application runtime, generated content, migration or deployment edits. Its local report
+covers all seven static checks, canaries, account isolation, smoke and full gate suites,
+including onboarding, alternative paths, visual/parity, keyboard, formulas and depth checks.
+Generator verification reported no tracked content differences. The independent Linux
+[run 35274460688](https://github.com/rathunter69/Hotkey.gg/actions/runs/35274460688)
+was observed in progress at exactly 4ea428b; no Linux pass is claimed. Updated browser workflows
+use explicit read-only permissions and pinned actions. Integration may proceed concurrently,
+reusing equivalent executable-source evidence; final acceptance waits for the remote handoff
+and actual Linux result.
 
 The additional database assessment task `01a0b0f0-0755-7962-b436-a6646a32321d` stays paused
 to avoid duplicate cleanup. Testing and Security coordinate any database CI job before editing
@@ -87,8 +100,10 @@ Security's next step remains test-environment groundwork under Wolf's current re
 not a new security repair module. On a separate branch, prepare and independently review
 one platform-only bootstrap using the exact official pair pinned in
 [14d7e10](https://github.com/rathunter69/Hotkey.gg/blob/14d7e10a79232000ff24d2637ce6adc72b786b1f/docs/testing-database.md).
-Testing reviews the distinct branch-only workflow for no publishing, no production secrets
-and minimal permissions before dispatch. Deny container outbound networking, publish no
+Security reports local candidate 49b8193b6b6c17c63b97c898d268437ceb191cdf ready for review;
+it is not yet a remotely saved or executed handoff. Testing reviews the distinct branch-only
+workflow for no publishing, no production secrets and minimal permissions before the triggering
+push/run. Deny container outbound networking, publish no
 ports, use only temporary memory-backed storage, and disable scheduling from first startup.
 Run the official Auth migrator only within the database's isolated network namespace.
 Verify empty data, required genuine platform objects/ACLs/extensions and the isolation
@@ -148,8 +163,9 @@ a repair; no full re-audit is required to continue one bounded change.
 | Hosting/recovery | Cloudflare and GitHub Pages have historical results; active serving origin/build output, preview headers and rollback remain unverified. Moving prototypes inside the served tree does not hide them. |
 | Billing/launch | Checkout remains test-only; webhook/authoritative subscription lifecycle and business readiness remain incomplete. No billing activation. |
 
-Root workflow sources lacked explicit token permissions; effective repository defaults remain
-unverified. Testing is tightening its test-only workflow within its scope. Ignore rules and
+The original root workflow sources lacked explicit token permissions; effective repository
+defaults remain unverified. Testing's 4ea428b checkpoint now tightens its test-only workflows;
+the independent database deployment workflow remains unchanged. Ignore rules and
 the existing secret scanner are useful controls, not proof that repository history/settings
 are free of secrets. No customer records, credentials or private financial details belong in Git.
 
@@ -192,11 +208,12 @@ unrun checks. Browser suites own port 8791. Documentation-only changes use focus
 reference validation under TASK_GUIDE's exception, not unnecessary application test reruns.
 Do not call a static pass a playtest, a local subset full CI, or a report an implemented repair.
 
-Next: receive Testing's completed handoff, integrate accepted Security feasibility 14d7e10,
-and accept the dedicated combined integration only after its checks. Security's separate
+Next: receive Testing's final handoff and Linux result, then accept the dedicated combined
+integration only after its remote handoff and checks. Testing 4ea428b and Security feasibility
+14d7e10 are available for the current integration; no new product module has started. Security's separate
 platform-only experiment reports its own exact source/result; it must not delay or be
 mistaken for the browser gate or an executed database permission test. Structure cleanup and security preparation are saved separately; neither establishes
-the still-pending full browser/CI or database result. Then give Wolf one next decision. Do not automatically start
+the still-pending Linux CI or database result. Then give Wolf one next decision. Do not automatically start
 a later batch from a recommendation. Catalog/progression design remains the next product
 module; subsequent targeted cleanup/site structure and the planned catalog rebuild follow
 the agreed direction. Remaining security blockers continue to constrain release readiness.
