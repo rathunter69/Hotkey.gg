@@ -3,18 +3,25 @@
 Updated September 17, 2026. Security groundwork builds on accepted integration
 `6c984161c31bc4637dbe88b73a4da8408cefdf1d`; it does not repair DATA-01/02/03.
 Executable fixtures and runner: [supabase/tests](../supabase/tests/README.md).
-**No Hotkey database replay or application authorization test has run yet.**
-Runner unit tests are not RLS evidence.
+**Latest baseline:** [run 35276711544](https://github.com/rathunter69/Hotkey.gg/actions/runs/35276711544)
+at exact source `18babfa80dea4acb31fd30be2ae00b3610d42ed2` completed the first fresh replay of all
+52 unchanged Hotkey migrations, then failed in the permission fixture at its direct internal
+`my_pro()` call (line 119, SQLSTATE 42501). Only 12 partial TAP results were emitted; no full
+56-result stream/plan. No second instance ran. Cleanup passed and the job stayed failed.
+See [replay recipe](../supabase/tests/REPLAY_BASELINE.md),
+[durable result](../supabase/tests/evidence/replay-baseline-35276711544.json), and
+[current handoff](handoffs/security-accounts.md). Two-replay reproducibility and the complete
+permission baseline remain unverified; assertions 14–56 are UNRUN. No fixture/grant repair.
 
 **September 17 platform-only update:** the one reviewed bootstrap experiment passed in
 [run 35275149357](https://github.com/rathunter69/Hotkey.gg/actions/runs/35275149357), exact source
 `49b8193b6b6c17c63b97c898d268437ceb191cdf`. Official Auth migration, platform role/claim checks,
 default ACLs, transactional extension installation, empty data, isolation and cleanup passed.
-This includes platform role checks, not the 56 application authorization assertions. Full
-Hotkey replay remains UNRUN. See the [bootstrap recipe](../supabase/tests/PLATFORM_BOOTSTRAP.md)
+This includes platform role checks, not the 56 application authorization assertions. That
+earlier run performed no Hotkey replay. See the [bootstrap recipe](../supabase/tests/PLATFORM_BOOTSTRAP.md)
 and [durable result](../supabase/tests/evidence/platform-bootstrap-35275149357.json). The
 feasibility section below records the earlier finding; its bootstrap gap is now closed for
-this exact pair/host. Any next application replay remains a separately reviewed batch.
+this exact pair/host. The later replay outcome is recorded above.
 
 ## Execution capability
 

@@ -5,6 +5,13 @@ checkpoint `3dd686d`. This separate branch does not join or block browser/struct
 The platform-only branch, exact tested source `49b8193`, and successful run `35275149357`
 remain preserved. No application runtime, migration history or permission repair is changed.
 
+Result: [run 35276711544](https://github.com/rathunter69/Hotkey.gg/actions/runs/35276711544), exact
+source `18babfa80dea4acb31fd30be2ae00b3610d42ed2`, completed the first 52-file replay then stopped
+at fixture line 119: SQLSTATE 42501, permission denied for internal function my_pro. Only 12
+partial TAP lines were emitted; no second instance or complete permission baseline. Cleanup
+passed and the job failed. [Saved result](evidence/replay-baseline-35276711544.json) and
+[handoff](../../docs/handoffs/security-accounts.md) distinguish the fixture blocker from replay.
+
 `replay-baseline.js --plan` inventories exactly 52 migration inputs and the unchanged single
 56-assertion fixture. `--run` works only on the dedicated branch push in this repository's
 GitHub-hosted Linux x64 job. Testing must independently clear the exact candidate before a
