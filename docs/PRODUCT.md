@@ -157,28 +157,43 @@ content deletion, progress reset or new access/reward system follows automatical
 this audit. Preserve the Foundations feedback sources below. Update this brief with each
 confirmed decision and its superseded rule; CURRENT owns status and task sequencing.
 
-### First catalog/flow evidence checkpoint — decisions pending
+### Catalog/flow decisions — September 17 follow-up
 
-The [reviewed system map and decision register](https://github.com/rathunter69/Hotkey.gg/blob/0151c3d57639ccf7508b87a2db096c4f92f81cd0/docs/handoffs/catalog-progression.md)
-is saved from accepted application baseline 00df57a. It is source-based planning evidence,
-not a fresh public-site playtest or approved replacement design. The chief verified the remote
-commit adds only that handoff; the area records focused investigation and independent review.
+The [updated review and decision record](https://github.com/rathunter69/Hotkey.gg/blob/bace206c421e4f5969f69fc88c39e5191b234f1d/docs/handoffs/catalog-progression.md)
+contains source-based evidence and Wolf's subsequent answers in task
+01a0b148-2693-7901-af91-934c83cabe1d. The chief read that report and the relevant task
+conversation. The initial 0151c3d checkpoint's blanket D1–D3-unanswered status is superseded
+by these scoped answers, not by acceptance of all the lead's recommendations.
 
-Wolf has been asked the first three choices in the dedicated review:
-1. **D1:** share an exercise between teaching and independent retries, or separate lessons/drills.
-2. **D2:** explicit scored attempts, automatic eligible posting, or defer public competition.
-3. **D3:** advisory paths without XP/speed locks, advanced prerequisite checks, or existing locks.
+**Confirmed:** learning is the main journey, with prominent optional speedrunning/competition:
+learn a skill → complete it independently → improve speed → compete. Wolf approved that
+explanation, preserving playful early exercises, later realistic work, helped learning
+progress without XP and direct entry for experienced competitors subject to eventual rules.
+This replaces treating speed/XP climbing as the primary educational journey. It does not
+approve a particular button, public-posting rule, eligibility test or content architecture.
 
-All three remain **pending**. The area recommends a shared exercise, explicit scored attempt
-and advisory paths; these are proposals, not confirmed decisions. No older rule is superseded
-until Wolf answers. Avoid asking the same questions again in the chief session; reconcile the
-answers here and discuss their consequences for the overall platform specification.
+**Confirmed direction:** later lessons should be gated. Freely explored basics remain
+preserved. This qualifies the earlier recommendation for unrestricted exploration of all
+entitled exercises; that recommendation was never agreed. Which lessons, what demonstrates
+readiness and where subscription access applies remain open.
 
-The source review found inconsistent help/reward treatment, progression locks despite billing
-being off, distinctions between rank eligibility and score posting, and overlapping active/
-dormant session types. These findings explain the decision agenda; they do not authorize
-automatic repairs, mode removal or new access rules. Next discussion after D1–D3 is assistance,
-timing and rewards. Foundations feedback and existing progress remain protected.
+**Tentative, awaiting advice/agreement:** Wolf's intuition favors both prerequisite skills
+and a subscription. His wording was a request for a suggestion, not approval of the detailed
+gate policy. The area proposes subscription inclusion plus short independent readiness
+checks only at major skill jumps, accepting equivalent prior results or test-out, with
+ordinary helped lesson completion advancing learning and no speed/XP grind. These mechanics,
+paid boundaries and checkpoint locations remain recommendations.
+
+Acceptance at the confirmed level: a learner can make learning progress with help without
+XP; independent work can lead into optional speed improvement and competition. A later
+lesson may require an agreed gate; its precise unlock logic is not yet approved. Existing
+earned progress must survive. The exact D1 shared-content arrangement and D2 scoring/
+publication/rank controls remain open, alongside D3/D9 gate details.
+
+The next focused decision is the combined gate policy, then assistance/timing/rewards.
+The chief reconciles those answers and their platform-wide consequences without repeating
+the area's questionnaire. No runtime lock, billing setting, ranked switch or catalog content
+has changed or is authorized to change from this planning record.
 
 ## Learning decisions and repair order — latest September 17 response
 
@@ -188,7 +203,7 @@ timing and rewards. Foundations feedback and existing progress remain protected.
 | Beginner learning | Interactive lessons that teach hotkeys and how Excel works | Exact help presentation and how much each lesson introduces |
 | Timing | Time targets can matter throughout; untimed free Foundations is a possibility | Whether the clock is shown during teaching, and what speed affects |
 | Assisted completion | Hints/step-by-step help should count for completion progress, not XP | Define what counts as assistance; instruction text should not be silently penalized |
-| Exploration | Users freely explore basics; increasing difficulty and recommended paths | Access to advanced work and how recommendations adapt |
+| Exploration | Users freely explore basics; recommended paths; later lessons should be gated | Which later lessons, readiness evidence, subscription boundary and test-out rules; skills plus subscription is a tentative preference |
 | Credentials | Interested in skill-path certificates shareable on LinkedIn, and possibly high-score recognition | Evidence required for a certificate versus a speed badge; no endorsement by LinkedIn implied |
 | Catalog | Prefer a likely full rebuild, but preserve substantial earlier Foundations feedback | A full plan must precede implementation; the old v5 proposal is not automatically selected |
 | Order of work | Easy security/account fixes → catalog/progression separation → repository/database cleanup → site framework → planned catalog redesign | Size/acceptance of each bounded repair or cleanup batch |
