@@ -2,6 +2,7 @@
 // Actual shared scripts, synthetic users and deferred responses. No external traffic.
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright-core');
+const { newIsolatedContext } = require('./browser-isolation');
 const BASE = process.env.BASE || 'http://127.0.0.1:8791';
 
 function fixtures() {
@@ -59,12 +60,12 @@ function fixtures() {
   let passed = 0;
   try {
     async function shell(late = false, guest = false) {
-      const context = await browser.newContext();
+      const context = await newIsolatedContext(browser, BASE);
       await context.route('**/*', route => {
         const url = new URL(route.request().url());
         if (url.origin !== BASE) return route.abort();
         if (url.pathname === '/__account_fixture.html') return route.fulfill({ contentType: 'text/html', body: '<!doctype html><div id="navMount"></div>' + (guest ? '<script>fixture.initialGuest(); localStorage.setItem("hotkey_pb","{\\"navigation\\":12345}"); localStorage.setItem("hotkey_last_drill","autofit"); localStorage.setItem("hk_guide_navigation","done");</script>' : '') + (late ? '<script>window.lateClient=window.sb; window.sb=null;</script>' : '') + '<script src="themes.js"></script><script src="drills.js"></script><script src="nav.js"></script>' + (late ? '<script>window.sb=window.lateClient; window.__navAuthKick();</script>' : '') + (guest ? '<script>fixture.initialGuest();</script>' : '') });
-        return route.continue();
+        return route.fallback();
       });
       await context.addInitScript(fixtures);
       const page = await context.newPage();
@@ -214,8 +215,7 @@ function fixtures() {
       assert.equal(state.drill, null); assert.equal(state.theme, 'terminal'); assert.equal(state.onboarding, '1'); assert.equal(state.card, false);
       // Real trainer consumes the same resume key after reload; no synthetic Supabase here.
       await context.close();
-      const real = await browser.newContext();
-      await real.route('**/*', r => new URL(r.request().url()).origin === BASE ? r.continue() : r.abort());
+      const real = await newIsolatedContext(browser, BASE);
       const trainer = await real.newPage(); await trainer.goto(BASE + '/index.html');
       await trainer.waitForFunction(() => typeof loadChallenge === 'function');
       await trainer.evaluate(() => { localStorage.setItem('hk_gate_off', '1'); markOnboarded(); loadChallenge('autofit'); clearAccountUI(); });

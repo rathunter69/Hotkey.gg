@@ -48,6 +48,7 @@
 'use strict';
 const HK_URL = process.env.URL || (process.env.BASE ? process.env.BASE + '/index.html' : 'http://127.0.0.1:8791/index.html');
 const { chromium } = require('playwright-core');
+const { newIsolatedContext } = require('./browser-isolation');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 let pass = 0, fail = 0;
 const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { fail++; console.log('  FAIL ' + n + (x ? ' — ' + x : '')); } };
@@ -76,11 +77,7 @@ const STUB = () => {
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
-  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  // This is a stubbed local audit: never load live auth or contact production.
-  const localOrigin = new URL(HK_URL).origin;
-  await ctx.route('**/*', route => new URL(route.request().url()).origin === localOrigin
-    ? route.continue() : route.abort());
+  const ctx = await newIsolatedContext(browser, HK_URL, { viewport: { width: 1440, height: 900 } });
   const page = await ctx.newPage();
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 160)));
