@@ -3,15 +3,17 @@
 Updated September 17, 2026. Security groundwork builds on accepted integration
 `6c984161c31bc4637dbe88b73a4da8408cefdf1d`; it does not repair DATA-01/02/03.
 Executable fixtures and runner: [supabase/tests](../supabase/tests/README.md).
-**Latest baseline:** [run 35276711544](https://github.com/rathunter69/Hotkey.gg/actions/runs/35276711544)
-at exact source `18babfa80dea4acb31fd30be2ae00b3610d42ed2` completed the first fresh replay of all
-52 unchanged Hotkey migrations, then failed in the permission fixture at its direct internal
-`my_pro()` call (line 119, SQLSTATE 42501). Only 12 partial TAP results were emitted; no full
-56-result stream/plan. No second instance ran. Cleanup passed and the job stayed failed.
+**Latest baseline:** [run 35277724943](https://github.com/rathunter69/Hotkey.gg/actions/runs/35277724943)
+at exact source `eaab8645cf8aaee6e62120f65d24ebd911a047ad` completed two fresh 52-file replays
+and two full 56-result suites. Each had 44 passing controls and the same 12 reproduced DATA-01
+failures. All failed probes returned `ok:1`; no unexpected control failure or fixture error.
+Cleanup passed for both; overall CI correctly failed. The two entitlement fixture reads now
+use the supported my_pro_status().pro contract; no application grants/migrations changed.
 See [replay recipe](../supabase/tests/REPLAY_BASELINE.md),
-[durable result](../supabase/tests/evidence/replay-baseline-35276711544.json), and
-[current handoff](handoffs/security-accounts.md). Two-replay reproducibility and the complete
-permission baseline remain unverified; assertions 14–56 are UNRUN. No fixture/grant repair.
+[durable result](../supabase/tests/evidence/replay-baseline-35277724943.json), and
+[current handoff](handoffs/security-accounts.md). Replay reproducibility and a complete failing
+permission baseline are established on this exact platform. All security repairs remain pending.
+The earlier incomplete fixture run is preserved separately in evidence for run 35276711544.
 
 **September 17 platform-only update:** the one reviewed bootstrap experiment passed in
 [run 35275149357](https://github.com/rathunter69/Hotkey.gg/actions/runs/35275149357), exact source
@@ -120,8 +122,9 @@ Prepare an immutable `registry/name@sha256:<64 hex>` image with:
 - PostgreSQL started with `-c cron.launch_active_jobs=off` from its FIRST startup, verified
   with `source='command line'` in pg_settings. Session-only or after-start disabling is refused.
 
-The reviewed candidate digests above are not a validated complete bootstrap. The earlier
-runbook's CLI 2.117.0 observation is not a validated pin. This runner does not invoke CLI.
+The exact image pair and complete bootstrap are validated by the runs linked above; reuse the
+reviewed scripts for that recipe. The earlier runbook's CLI 2.117.0 observation is not a
+validated pin. This runner does not invoke CLI.
 If CLI is used to prepare an empty platform,
 read its pinned help and ensure start/reset cannot replay this repository before isolation.
 
@@ -176,8 +179,10 @@ only for fixture setup. Missing platform default ACLs fail setup instead of fals
 security through under-granting. Each successful hostile probe rolls back its own effects;
 the outer transaction rolls back all fixtures, and Auth emptiness is checked afterward.
 The runner treats pgTAP not-ok as a failing exit even when psql exits zero. TODO/SKIP, missing
-plans, incomplete results and bailouts cannot be green. Twelve current DATA-01 failures are
-predicted from source/audit, NOT executed reproductions. Record unexpected failures separately.
+plans, incomplete results and bailouts cannot be green. The twelve source-predicted DATA-01
+failures were reproduced by identity on both fresh instances in run 35277724943; all 44 other
+controls passed. Future unexpected failures must be recorded separately, not absorbed into
+that expected failure count.
 
 ## Evidence and recovery
 

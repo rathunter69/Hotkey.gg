@@ -1,4 +1,62 @@
-# Security application-replay baseline — current handoff
+# Security reproducible permission baseline — current handoff
+Updated: 2026-09-17
+Branch: codex/security-replay-baseline
+Exact reviewed/tested source: eaab8645cf8aaee6e62120f65d24ebd911a047ad
+State: two fresh 52-file replays PASSED; both complete 56-assertion suites have 44 PASS / 12 FAIL; overall CI FAIL.
+
+## Outcome
+
+[Run 35277724943, attempt 1](https://github.com/rathunter69/Hotkey.gg/actions/runs/35277724943)
+and [job 105392248802](https://github.com/rathunter69/Hotkey.gg/actions/runs/35277724943/job/105392248802)
+executed the exact source above. Both independent fresh platforms replayed all 52 unchanged
+migrations and completed valid 56-result TAP streams. Both had the identical 12 DATA-01
+failures; all 44 context/allowed/denied controls passed. No migration, setup or fixture error.
+The job correctly remains failed. Fixture rollback and named cleanup passed on both instances.
+
+| Reproduced failed boundary | Assertion IDs in each instance |
+|---|---|
+| Direct desk creation bypasses full-account/PRO requirements | 10, 15 |
+| Direct membership allows self-captain and backdated seniority | 16, 17 |
+| Owner/creator can assign verification and school association | 22, 23, 35, 36 |
+| Direct applications bypass full-account, private/closed and five-pending rules | 11, 46, 48, 56 |
+
+All 24 failed probes across the two instances returned `ok:1`: an unauthorized operation
+succeeded and affected one row, then its probe rolled back. This confirms the same 12
+source-predicted weaknesses on the isolated source database; it is not a production exploit
+or a passing repaired-security result. No unexpected control failures replaced predicted ones.
+The [durable result](../../supabase/tests/evidence/replay-baseline-35277724943.json) preserves
+every assertion identity, per-instance input hashes, sanitized probe diagnostics and cleanup.
+Artifact 10520894156 expires after seven days; the committed JSON is the continuity record.
+
+## Narrow correction and review
+
+Chief authorized only two fixture entitlement reads to use the supported
+`(select pro from public.my_pro_status())`, preserving authenticated role and all 56 expected
+outcomes. The final RPC returns the same helper computation for the caller and has the intended
+authenticated grant. The exact fixture path was added to the existing dedicated-branch
+workflow filter so that correction could trigger. These are the only two changed executable
+files relative to 9ea05e6; all 52 migrations, wrappers, images, isolation and failure rules
+remain unchanged. Prior incomplete-run evidence remains at 9ea05e6 / run 35276711544.
+
+Focused independent fixture review and Testing exact-source clearance preceded the push.
+All seven local static commands (39 inherited catalog warnings) and 11 guard tests passed;
+CI repeated the 11 guards successfully. Ubuntu 24.04.5 / runner image 20260907.300.1,
+Node 22.23.2/npm 10.9.8; same official Postgres/Auth image pair and platform versions as before.
+The two-instance ceiling and nonzero failure result were honored. No additional run followed.
+
+## Limits and next decision
+
+Replay reproducibility and the complete failing DATA-01 baseline are now established for
+this exact source/platform. DATA-01 remains unrepaired; DATA-02/privacy and DATA-03/MFA remain
+specification-only. No runtime, application migration, grant, schema repair, production
+change, main merge, deployment or browser/structure integration occurred.
+Chief should review this baseline and separately authorize the smallest DATA-01 forward
+repair. Preserve these failing-before results and the 44 passing controls in that repair.
+Final handoff changes are documentation/evidence only, outside workflow trigger paths.
+
+---
+
+# Previous incomplete application-replay handoff (historical)
 Updated: 2026-09-17
 Task: 01a0af8b-9a97-7593-a1d2-6d2491cfe947
 Chief: 01a0b0fa-d857-7002-ab95-1da0a1cfb858

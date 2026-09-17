@@ -1,0 +1,1041 @@
+{
+  "ci": {
+    "runUrl": "https://github.com/rathunter69/Hotkey.gg/actions/runs/35277724943",
+    "jobUrl": "https://github.com/rathunter69/Hotkey.gg/actions/runs/35277724943/job/105392248802",
+    "workflow": ".github/workflows/security-replay-baseline.yml",
+    "conclusion": "failure",
+    "ubuntu": "24.04.5",
+    "runnerImage": "20260907.300.1",
+    "node": "22.23.2",
+    "npm": "10.9.8",
+    "guardTestsPassed": 11,
+    "artifactId": 10520894156,
+    "artifactZipSha256": "0f7ada550599c1b7e2e473110856cfc95f83de80367868e163e829bc98f5e30e",
+    "evidence": "Completed baseline result transcribed from job log. Both fresh instances completed all52 migrations and all56 assertions; identical12 DATA-01 failures remain failures."
+  },
+  "failedProbeDiagnostics": {
+    "instances": [
+      [
+        {
+          "assertion": 10,
+          "label": "DATA-01: direct creation cannot bypass full-account requirement",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 11,
+          "label": "DATA-01: direct application cannot bypass full-account requirement",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 15,
+          "label": "DATA-01: direct creation cannot bypass PRO requirement",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 16,
+          "label": "DATA-01: outsider cannot self-install as captain",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 17,
+          "label": "DATA-01: outsider cannot manufacture seniority by direct backdated membership",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 22,
+          "label": "DATA-01: owner cannot self-award verified badge",
+          "actual": "ok:1",
+          "expectedPattern": "^(42501:|ok:0$)"
+        },
+        {
+          "assertion": 23,
+          "label": "DATA-01: owner cannot self-award school association",
+          "actual": "ok:1",
+          "expectedPattern": "^(42501:|ok:0$)"
+        },
+        {
+          "assertion": 35,
+          "label": "DATA-01: paid deskless owner cannot insert a self-verified desk",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 36,
+          "label": "DATA-01: paid deskless owner cannot insert a self-assigned school association",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 46,
+          "label": "DATA-01: direct application cannot bypass private desk",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 48,
+          "label": "DATA-01: direct application cannot bypass closed recruiting",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 56,
+          "label": "DATA-01: direct application cannot bypass five-pending limit",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        }
+      ],
+      [
+        {
+          "assertion": 10,
+          "label": "DATA-01: direct creation cannot bypass full-account requirement",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 11,
+          "label": "DATA-01: direct application cannot bypass full-account requirement",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 15,
+          "label": "DATA-01: direct creation cannot bypass PRO requirement",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 16,
+          "label": "DATA-01: outsider cannot self-install as captain",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 17,
+          "label": "DATA-01: outsider cannot manufacture seniority by direct backdated membership",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 22,
+          "label": "DATA-01: owner cannot self-award verified badge",
+          "actual": "ok:1",
+          "expectedPattern": "^(42501:|ok:0$)"
+        },
+        {
+          "assertion": 23,
+          "label": "DATA-01: owner cannot self-award school association",
+          "actual": "ok:1",
+          "expectedPattern": "^(42501:|ok:0$)"
+        },
+        {
+          "assertion": 35,
+          "label": "DATA-01: paid deskless owner cannot insert a self-verified desk",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 36,
+          "label": "DATA-01: paid deskless owner cannot insert a self-assigned school association",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 46,
+          "label": "DATA-01: direct application cannot bypass private desk",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 48,
+          "label": "DATA-01: direct application cannot bypass closed recruiting",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        },
+        {
+          "assertion": 56,
+          "label": "DATA-01: direct application cannot bypass five-pending limit",
+          "actual": "ok:1",
+          "expectedPattern": "^42501:"
+        }
+      ]
+    ]
+  },
+  "result": {
+    "source": "eaab8645cf8aaee6e62120f65d24ebd911a047ad",
+    "runId": "35277724943",
+    "attempt": "1",
+    "reproducible": true,
+    "permissionsPassed": false,
+    "result": "FAIL",
+    "freshInstancesAttempted": 2,
+    "instances": [
+      {
+        "databaseImage": "supabase/postgres@sha256:5a4314708484bec672de2c09653a5c01fb1c84a998564ac231b0325e2238ed5b",
+        "authImage": "supabase/gotrue@sha256:7e813221b93fbf54b515036438550e483bfaf057b9db52fe9bc1ce91c47e817e",
+        "databaseSource": "d156ba65c14694c12cc5e782bc15b9b8ed2d1376",
+        "authSource": "0204331ca41a5b49f076b6fa3dc6c0d20b996590",
+        "sqlSha256": "f317e410a314263d637c51880ff14ca42fe6e972693b652264476e9b5ad91666",
+        "hotkeyMigrationsExecuted": 52,
+        "permissionAssertionsExecuted": 56,
+        "source": "eaab8645cf8aaee6e62120f65d24ebd911a047ad",
+        "runId": "35277724943",
+        "attempt": "1",
+        "stage": "application-baseline",
+        "result": "FAIL",
+        "settingsBeforeAuth": {
+          "cron": "off",
+          "source": "command line",
+          "preload": "pg_stat_statements, pgaudit, plpgsql, plpgsql_check, pg_cron, pg_net, pgsodium, auto_explain, pg_tle, plan_filter, supabase_vault"
+        },
+        "loopbackAuthentication": {
+          "file": "/etc/postgresql/pg_hba.conf",
+          "loopbackTrust": true
+        },
+        "authExitCode": 0,
+        "settingsAfterAuth": {
+          "cron": "off",
+          "source": "command line",
+          "preload": "pg_stat_statements, pgaudit, plpgsql, plpgsql_check, pg_cron, pg_net, pgsodium, auto_explain, pg_tle, plan_filter, supabase_vault"
+        },
+        "authBootstrap": {
+          "migrationCount": 77,
+          "latestMigration": "20260625000000",
+          "authDataEmpty": true
+        },
+        "checks": [
+          {
+            "check": "platform",
+            "postgres": "17.6",
+            "authUsers": 0,
+            "publicTables": 0,
+            "extensions": {
+              "pgtap": "1.3.3",
+              "pg_cron": "1.6.4",
+              "pg_net": "0.20.3"
+            },
+            "defaultACLsVerified": true,
+            "roleMembershipVerified": true
+          },
+          {
+            "check": "claims",
+            "passed": true
+          }
+        ],
+        "settingsFinal": {
+          "cron": "off",
+          "source": "command line",
+          "preload": "pg_stat_statements, pgaudit, plpgsql, plpgsql_check, pg_cron, pg_net, pgsodium, auto_explain, pg_tle, plan_filter, supabase_vault"
+        },
+        "baseline": {
+          "phase": "complete",
+          "replayRequested": true,
+          "replayComplete": true,
+          "completedMigrations": [
+            "supabase/migrations/20251231000000_baseline_r453.sql",
+            "supabase/migrations/20260101000000_sessions.sql",
+            "supabase/migrations/20260101000001_sessions_optimal.sql",
+            "supabase/migrations/20260707000000_team_code.sql",
+            "supabase/migrations/20260707100000_entitlements.sql",
+            "supabase/migrations/20260707200000_handle_rules.sql",
+            "supabase/migrations/20260707300000_flair.sql",
+            "supabase/migrations/20260707400000_handle_blocklist.sql",
+            "supabase/migrations/20260712000000_desks.sql",
+            "supabase/migrations/20260712300000_desk_protected_names.sql",
+            "supabase/migrations/20260712400000_desk_seeds_and_controls.sql",
+            "supabase/migrations/20260712500000_school_tags.sql",
+            "supabase/migrations/20260712600000_desk_assignments.sql",
+            "supabase/migrations/20260712700000_claim_fix.sql",
+            "supabase/migrations/20260712800000_profile_grant_fix.sql",
+            "supabase/migrations/20260712900000_desk_rate_limit_fix.sql",
+            "supabase/migrations/20260713000000_smoke_fixtures.sql",
+            "supabase/migrations/20260713100000_remove_edu_signup_gate.sql",
+            "supabase/migrations/20260713200000_featured_achievements.sql",
+            "supabase/migrations/20260713300000_events.sql",
+            "supabase/migrations/20260714000000_smoke_fixtures_restamp.sql",
+            "supabase/migrations/20260716000000_desk_applications.sql",
+            "supabase/migrations/20260716100000_school_map_lockdown.sql",
+            "supabase/migrations/20260716200000_apply_full_account.sql",
+            "supabase/migrations/20260716300000_desk_full_account.sql",
+            "supabase/migrations/20260716400000_key_stats.sql",
+            "supabase/migrations/20260716500000_delete_account.sql",
+            "supabase/migrations/20260716600000_admin.sql",
+            "supabase/migrations/20260716700000_set_school_tag.sql",
+            "supabase/migrations/20260716800000_digest.sql",
+            "supabase/migrations/20260716900000_beta_codes.sql",
+            "supabase/migrations/20260717100000_run_integrity.sql",
+            "supabase/migrations/20260717200000_security_hardening.sql",
+            "supabase/migrations/20260717300000_desk_pro.sql",
+            "supabase/migrations/20260717400000_edu_trial.sql",
+            "supabase/migrations/20260717500000_desk_pro_seats.sql",
+            "supabase/migrations/20260717600000_profile_theme.sql",
+            "supabase/migrations/20260717700000_desk_recruiting.sql",
+            "supabase/migrations/20260717800000_school_cooldown.sql",
+            "supabase/migrations/20260723000000_sessions_guard.sql",
+            "supabase/migrations/20260724100000_reconcile_adhoc.sql",
+            "supabase/migrations/20260724200000_security_regression_fix.sql",
+            "supabase/migrations/20260725000000_retire_colops.sql",
+            "supabase/migrations/20260725100000_desk_create_pro.sql",
+            "supabase/migrations/20260903000000_certificate_tracks_r452.sql",
+            "supabase/migrations/20260903000100_retire_beta_codes.sql",
+            "supabase/migrations/20260903000300_retire_membership.sql",
+            "supabase/migrations/20260903000400_guest_shell_prune.sql",
+            "supabase/migrations/20260903000500_rpc_grants.sql",
+            "supabase/migrations/20260903000600_policies.sql",
+            "supabase/migrations/20260903000700_indexes_retention.sql",
+            "supabase/migrations/20260903000800_run_stats.sql"
+          ],
+          "tests": [
+            {
+              "file": "supabase/tests/database/01-desk-authorization.test.sql",
+              "total": 56,
+              "failures": [
+                "not ok 10 - DATA-01: direct creation cannot bypass full-account requirement",
+                "not ok 11 - DATA-01: direct application cannot bypass full-account requirement",
+                "not ok 15 - DATA-01: direct creation cannot bypass PRO requirement",
+                "not ok 16 - DATA-01: outsider cannot self-install as captain",
+                "not ok 17 - DATA-01: outsider cannot manufacture seniority by direct backdated membership",
+                "not ok 22 - DATA-01: owner cannot self-award verified badge",
+                "not ok 23 - DATA-01: owner cannot self-award school association",
+                "not ok 35 - DATA-01: paid deskless owner cannot insert a self-verified desk",
+                "not ok 36 - DATA-01: paid deskless owner cannot insert a self-assigned school association",
+                "not ok 46 - DATA-01: direct application cannot bypass private desk",
+                "not ok 48 - DATA-01: direct application cannot bypass closed recruiting",
+                "not ok 56 - DATA-01: direct application cannot bypass five-pending limit"
+              ],
+              "assertions": [
+                "ok 1 - signed-out requests use the anon role",
+                "ok 2 - signed-out request has no subject",
+                "ok 3 - signed-out caller cannot invoke create_desk",
+                "ok 4 - signed-out caller cannot insert another user as captain",
+                "ok 5 - anonymous session has its synthetic subject",
+                "ok 6 - anonymous-session JWT claim is true",
+                "ok 7 - create RPC rejects anonymous sessions",
+                "ok 8 - join RPC rejects anonymous sessions",
+                "ok 9 - application RPC rejects anonymous sessions",
+                "not ok 10 - DATA-01: direct creation cannot bypass full-account requirement",
+                "not ok 11 - DATA-01: direct application cannot bypass full-account requirement",
+                "ok 12 - full-account JWT claim is false",
+                "ok 13 - outsider has no PRO entitlement",
+                "ok 14 - create RPC rejects unpaid full accounts",
+                "not ok 15 - DATA-01: direct creation cannot bypass PRO requirement",
+                "not ok 16 - DATA-01: outsider cannot self-install as captain",
+                "not ok 17 - DATA-01: outsider cannot manufacture seniority by direct backdated membership",
+                "ok 18 - outsider has no captain authority",
+                "ok 19 - outsider cannot rotate invitation",
+                "ok 20 - outsider cannot accept applications",
+                "ok 21 - outsider cannot remove another member",
+                "not ok 22 - DATA-01: owner cannot self-award verified badge",
+                "not ok 23 - DATA-01: owner cannot self-award school association",
+                "ok 24 - fixture owner is a legitimate captain",
+                "ok 25 - captain can pause recruiting",
+                "ok 26 - recruiting change persisted",
+                "ok 27 - captain can resume recruiting",
+                "ok 28 - captain can rotate invitation",
+                "ok 29 - captain receives rotated invitation",
+                "ok 30 - ordinary member cannot update own role to captain",
+                "ok 31 - ordinary member cannot update own seniority",
+                "ok 32 - ordinary member cannot obtain invite code",
+                "ok 33 - ordinary member cannot rotate invitation",
+                "ok 34 - paid fixture is entitled",
+                "not ok 35 - DATA-01: paid deskless owner cannot insert a self-verified desk",
+                "not ok 36 - DATA-01: paid deskless owner cannot insert a self-assigned school association",
+                "ok 37 - paid full account can create through RPC",
+                "ok 38 - create RPC installs creator as captain",
+                "ok 39 - create RPC binds owner to caller",
+                "ok 40 - RPC-created desk starts unverified",
+                "ok 41 - unpaid full account can join by valid invitation",
+                "ok 42 - join RPC grants member role, not captain",
+                "ok 43 - join RPC uses server time for seniority",
+                "ok 44 - existing member cannot apply to another desk",
+                "ok 45 - application RPC respects private desk",
+                "not ok 46 - DATA-01: direct application cannot bypass private desk",
+                "ok 47 - application RPC respects closed recruiting",
+                "not ok 48 - DATA-01: direct application cannot bypass closed recruiting",
+                "ok 49 - deskless full account can apply to recruiting public desk",
+                "ok 50 - allowed application is visible to its applicant",
+                "ok 51 - captain can accept genuine application",
+                "ok 52 - acceptance installs applicant as ordinary member",
+                "ok 53 - acceptance clears applicant pending requests",
+                "ok 54 - rate-limit fixture has five pending applications",
+                "ok 55 - application RPC rejects sixth pending application",
+                "not ok 56 - DATA-01: direct application cannot bypass five-pending limit"
+              ],
+              "data01Failures": [
+                "not ok 10 - DATA-01: direct creation cannot bypass full-account requirement",
+                "not ok 11 - DATA-01: direct application cannot bypass full-account requirement",
+                "not ok 15 - DATA-01: direct creation cannot bypass PRO requirement",
+                "not ok 16 - DATA-01: outsider cannot self-install as captain",
+                "not ok 17 - DATA-01: outsider cannot manufacture seniority by direct backdated membership",
+                "not ok 22 - DATA-01: owner cannot self-award verified badge",
+                "not ok 23 - DATA-01: owner cannot self-award school association",
+                "not ok 35 - DATA-01: paid deskless owner cannot insert a self-verified desk",
+                "not ok 36 - DATA-01: paid deskless owner cannot insert a self-assigned school association",
+                "not ok 46 - DATA-01: direct application cannot bypass private desk",
+                "not ok 48 - DATA-01: direct application cannot bypass closed recruiting",
+                "not ok 56 - DATA-01: direct application cannot bypass five-pending limit"
+              ],
+              "unexpectedControlFailures": []
+            }
+          ],
+          "testsStarted": true,
+          "assertionFailures": true,
+          "files": [
+            {
+              "file": "supabase/migrations/20251231000000_baseline_r453.sql",
+              "sha256": "e5b0025a0bd0ee24fd95d21471454eb12aabbd953636aa16fd05f3d45ebcea6b"
+            },
+            {
+              "file": "supabase/migrations/20260101000000_sessions.sql",
+              "sha256": "fa39d765e25290da2b75b283e6212d44abbc0189b396dd97fcf0cff4fd4b1daf"
+            },
+            {
+              "file": "supabase/migrations/20260101000001_sessions_optimal.sql",
+              "sha256": "f4318461100f36c300bd47959c41fcfa60738d29320efcfc1b6ac16025beb45c"
+            },
+            {
+              "file": "supabase/migrations/20260707000000_team_code.sql",
+              "sha256": "13f59b22409227793f26445beef32527ead7199df7bb7ca8c64d91ab37405b95"
+            },
+            {
+              "file": "supabase/migrations/20260707100000_entitlements.sql",
+              "sha256": "dfc52855f11aea76883cc129e60e2fcb6b00156c0f6e7a2ccdea0e5797590e2f"
+            },
+            {
+              "file": "supabase/migrations/20260707200000_handle_rules.sql",
+              "sha256": "c13c78c6504833a1b32f4ab3b72d17d658b06e7f4beeb7a89fcef26c4dae6232"
+            },
+            {
+              "file": "supabase/migrations/20260707300000_flair.sql",
+              "sha256": "39b0969cf3382f656cfbf23a1f40e2ca2d4b13277b63e3950fcf447a83c84d0b"
+            },
+            {
+              "file": "supabase/migrations/20260707400000_handle_blocklist.sql",
+              "sha256": "faee5db5da5248cbe33daa87ebd07d25a03ad1cf24d31b7b04c8bd9ba7045e97"
+            },
+            {
+              "file": "supabase/migrations/20260712000000_desks.sql",
+              "sha256": "6fe99bb5dd3ae151e8a3c2dcb33dba0d8c0dd40ea05fa14d29cb7bf8d912a98f"
+            },
+            {
+              "file": "supabase/migrations/20260712300000_desk_protected_names.sql",
+              "sha256": "0bdf362d7f39136f21d7ab0b7d1d6f2de399d59812b5de8008a458e53b08143b"
+            },
+            {
+              "file": "supabase/migrations/20260712400000_desk_seeds_and_controls.sql",
+              "sha256": "494f9aa059ad3d8ee0079f3fef013961231e4b84d6e030753ad5bea7ec1af290"
+            },
+            {
+              "file": "supabase/migrations/20260712500000_school_tags.sql",
+              "sha256": "ecabf000e3aa1d5bb31b2f95d885d72beccc4af36c2acd2f72c9f06ca14edb81"
+            },
+            {
+              "file": "supabase/migrations/20260712600000_desk_assignments.sql",
+              "sha256": "8aea441c9438775bcbc3107c05f18b25a09047c72742d5604332b3fd7336346d"
+            },
+            {
+              "file": "supabase/migrations/20260712700000_claim_fix.sql",
+              "sha256": "db0a49a16fa4447212359172573407b2479e7a2429057252bb13ec61eb30ead5"
+            },
+            {
+              "file": "supabase/migrations/20260712800000_profile_grant_fix.sql",
+              "sha256": "e4bb2124b804a74570fd7461e7946470c1f8bcbfe389b137a6cafde675d3244f"
+            },
+            {
+              "file": "supabase/migrations/20260712900000_desk_rate_limit_fix.sql",
+              "sha256": "02c6a7633e58713c24b8032e7cc881e52c6aff4a7e73c6ba108c591bdab67e42"
+            },
+            {
+              "file": "supabase/migrations/20260713000000_smoke_fixtures.sql",
+              "sha256": "73ec1f3963cb357144a00bc3d94cc2616cc6c0ee8a8d57726d9a701f76cd21d9"
+            },
+            {
+              "file": "supabase/migrations/20260713100000_remove_edu_signup_gate.sql",
+              "sha256": "9a90982cce05423ae49ad3de51d4a9a7cb914f69b055bd95c2598742df762819"
+            },
+            {
+              "file": "supabase/migrations/20260713200000_featured_achievements.sql",
+              "sha256": "f223ba6688d06d7410653259e3acbaa56b192ce7059440d6244e4615e3f419b0"
+            },
+            {
+              "file": "supabase/migrations/20260713300000_events.sql",
+              "sha256": "89e83eddbcfdb574371da665904aac74249ff12c339d24de91115b80d3c0d2c0"
+            },
+            {
+              "file": "supabase/migrations/20260714000000_smoke_fixtures_restamp.sql",
+              "sha256": "5fbb7e31bad71b04ab2d1d4ef3d2d53066b3f039b514f8ba09ffba5db9aa5180"
+            },
+            {
+              "file": "supabase/migrations/20260716000000_desk_applications.sql",
+              "sha256": "d2767e78482072c61037256580bcbcde8c3767ae60a0645a54299f93c2763866"
+            },
+            {
+              "file": "supabase/migrations/20260716100000_school_map_lockdown.sql",
+              "sha256": "d93f35f141525161e82e8432a55747d00690db20c885782f4036ea225feb23c2"
+            },
+            {
+              "file": "supabase/migrations/20260716200000_apply_full_account.sql",
+              "sha256": "b0b9aba7a6c228c2c8ff42fdba86840df70659be8dfa6e7072c595bf3a5ebb20"
+            },
+            {
+              "file": "supabase/migrations/20260716300000_desk_full_account.sql",
+              "sha256": "e0f26d1562a27302c0e4226fb26d7aaf4e184626abf3cee926d9aa917ad4ebd6"
+            },
+            {
+              "file": "supabase/migrations/20260716400000_key_stats.sql",
+              "sha256": "126e14f9a6cf3490dcf7c8de5fbfda5f43e10395dfcca964154240012365aa0c"
+            },
+            {
+              "file": "supabase/migrations/20260716500000_delete_account.sql",
+              "sha256": "d99df93db484691acde761fa6d8d59e6ded9af7efa2a872a8e8561e3bacb6b1f"
+            },
+            {
+              "file": "supabase/migrations/20260716600000_admin.sql",
+              "sha256": "c4b962635373ae5bdb914156d1fc60d1686e844a35d862440bc22cfed5b9e6e4"
+            },
+            {
+              "file": "supabase/migrations/20260716700000_set_school_tag.sql",
+              "sha256": "a4f1222eb94f5d38138fe5ae6530bf6b701d3993388f9dcedd7d66bac91ffa21"
+            },
+            {
+              "file": "supabase/migrations/20260716800000_digest.sql",
+              "sha256": "d2a339e175f3a0ec21002dca79aec6ddcf17a21ff29cb36783a6a36215d0a5db"
+            },
+            {
+              "file": "supabase/migrations/20260716900000_beta_codes.sql",
+              "sha256": "e27887e90d118eb9efe0c073f8644f2e2b9532a5ad048c7b47cd306dbe0ed8f1"
+            },
+            {
+              "file": "supabase/migrations/20260717100000_run_integrity.sql",
+              "sha256": "5c9c036b6ce26e5628008c4ebe3e3ac3dea616bf4843acaba5799c6b9a549302"
+            },
+            {
+              "file": "supabase/migrations/20260717200000_security_hardening.sql",
+              "sha256": "5bff8c3b76867f5216e29f1e02d2ae576f36714f36444667b82d11246b222364"
+            },
+            {
+              "file": "supabase/migrations/20260717300000_desk_pro.sql",
+              "sha256": "7329179360e5c7d27191638aace5f88718603ed1bc2e4b83cc0bc7c4eca4f2d0"
+            },
+            {
+              "file": "supabase/migrations/20260717400000_edu_trial.sql",
+              "sha256": "303335dcf0970fc1944bf90893ce23f731d7baf6a07d78cb1ee2b9cdc55254c3"
+            },
+            {
+              "file": "supabase/migrations/20260717500000_desk_pro_seats.sql",
+              "sha256": "47d6985638b05333c07ca9ac396de03d67a131a026d2b7bab9b58d1c70af4656"
+            },
+            {
+              "file": "supabase/migrations/20260717600000_profile_theme.sql",
+              "sha256": "1613688f933e843cd8e14cdd042a3594d7f688e68ade2dfd385d8f638830abad"
+            },
+            {
+              "file": "supabase/migrations/20260717700000_desk_recruiting.sql",
+              "sha256": "c0059304b263fc0dfb4eb81775849a84635318a69b7fe4ef6c4aa6fa8b65433b"
+            },
+            {
+              "file": "supabase/migrations/20260717800000_school_cooldown.sql",
+              "sha256": "1c9a66b3c441e5b1b5bbb69768b6f4905eca4f6c73ce4c05ac7dc7cd8d5edf28"
+            },
+            {
+              "file": "supabase/migrations/20260723000000_sessions_guard.sql",
+              "sha256": "7660c96de60ca94a3ef2e29ddbbd0236e7f5b9d085295c454be0a1df2ca1282c"
+            },
+            {
+              "file": "supabase/migrations/20260724100000_reconcile_adhoc.sql",
+              "sha256": "4dd793032229e7ddc0b09bcc5129b6f0a9387159a4dc8899dff20a6ba385a993"
+            },
+            {
+              "file": "supabase/migrations/20260724200000_security_regression_fix.sql",
+              "sha256": "64b972f98b1b004e8c7a68bc486aa43e293f7acdca046d041420038bbe279ed0"
+            },
+            {
+              "file": "supabase/migrations/20260725000000_retire_colops.sql",
+              "sha256": "8bca59d6f94dc98eda21b8eda40d6b0a2a14fcd744efaeac22cbf607a6559506"
+            },
+            {
+              "file": "supabase/migrations/20260725100000_desk_create_pro.sql",
+              "sha256": "2b2b3b5f3e9fd193cd7ad52897e243e8a9a7b2e08e959c093910d308a2bf205d"
+            },
+            {
+              "file": "supabase/migrations/20260903000000_certificate_tracks_r452.sql",
+              "sha256": "30ed31b5a8a9fa3b1f34349a6149194c1b58288ca04f4110417628f638561181"
+            },
+            {
+              "file": "supabase/migrations/20260903000100_retire_beta_codes.sql",
+              "sha256": "60750c8ecdbfb07d38e9853af3261c181f372904f0202d1d1e03764c396b5c4f"
+            },
+            {
+              "file": "supabase/migrations/20260903000300_retire_membership.sql",
+              "sha256": "b278750b921ab774a2a4080d95ad4725299b4c3b3b5a2c3240883c610becf137"
+            },
+            {
+              "file": "supabase/migrations/20260903000400_guest_shell_prune.sql",
+              "sha256": "a13e9c2cd5445155dc156d51d0d1d23c0f72d888af3a9d9f22b513826bcc3622"
+            },
+            {
+              "file": "supabase/migrations/20260903000500_rpc_grants.sql",
+              "sha256": "4121af177d2188571ea0568a9f4021998e11bf7c9f4c41dec0be5f043c30765f"
+            },
+            {
+              "file": "supabase/migrations/20260903000600_policies.sql",
+              "sha256": "c0eff7740294045e5fcb1adae4126918358c2446743d06eee286636b8b2381d0"
+            },
+            {
+              "file": "supabase/migrations/20260903000700_indexes_retention.sql",
+              "sha256": "085ad97cc514be684750bd4d11b00108a8c200ef5a8caa1ce1edcc8900ab3900"
+            },
+            {
+              "file": "supabase/migrations/20260903000800_run_stats.sql",
+              "sha256": "8827988a756c6fb117033641edda8284fa239c46b82a1dcc51ad5b933762e7a5"
+            },
+            {
+              "file": "supabase/tests/database/01-desk-authorization.test.sql",
+              "sha256": "ed4c25b780898621d9aa599e04a5593a3cd4303432a5e8ff1e67c484d8b965ca"
+            }
+          ],
+          "source": "eaab8645cf8aaee6e62120f65d24ebd911a047ad",
+          "currentTest": "supabase/tests/database/01-desk-authorization.test.sql"
+        },
+        "hotkeyMigrationFailed": null,
+        "error": "Security regression failures. Known baseline vulnerabilities remain failures, not a passing gate.",
+        "cleanup": "PASS"
+      },
+      {
+        "databaseImage": "supabase/postgres@sha256:5a4314708484bec672de2c09653a5c01fb1c84a998564ac231b0325e2238ed5b",
+        "authImage": "supabase/gotrue@sha256:7e813221b93fbf54b515036438550e483bfaf057b9db52fe9bc1ce91c47e817e",
+        "databaseSource": "d156ba65c14694c12cc5e782bc15b9b8ed2d1376",
+        "authSource": "0204331ca41a5b49f076b6fa3dc6c0d20b996590",
+        "sqlSha256": "f317e410a314263d637c51880ff14ca42fe6e972693b652264476e9b5ad91666",
+        "hotkeyMigrationsExecuted": 52,
+        "permissionAssertionsExecuted": 56,
+        "source": "eaab8645cf8aaee6e62120f65d24ebd911a047ad",
+        "runId": "35277724943",
+        "attempt": "1",
+        "stage": "application-baseline",
+        "result": "FAIL",
+        "settingsBeforeAuth": {
+          "cron": "off",
+          "source": "command line",
+          "preload": "pg_stat_statements, pgaudit, plpgsql, plpgsql_check, pg_cron, pg_net, pgsodium, auto_explain, pg_tle, plan_filter, supabase_vault"
+        },
+        "loopbackAuthentication": {
+          "file": "/etc/postgresql/pg_hba.conf",
+          "loopbackTrust": true
+        },
+        "authExitCode": 0,
+        "settingsAfterAuth": {
+          "cron": "off",
+          "source": "command line",
+          "preload": "pg_stat_statements, pgaudit, plpgsql, plpgsql_check, pg_cron, pg_net, pgsodium, auto_explain, pg_tle, plan_filter, supabase_vault"
+        },
+        "authBootstrap": {
+          "migrationCount": 77,
+          "latestMigration": "20260625000000",
+          "authDataEmpty": true
+        },
+        "checks": [
+          {
+            "check": "platform",
+            "postgres": "17.6",
+            "authUsers": 0,
+            "publicTables": 0,
+            "extensions": {
+              "pgtap": "1.3.3",
+              "pg_cron": "1.6.4",
+              "pg_net": "0.20.3"
+            },
+            "defaultACLsVerified": true,
+            "roleMembershipVerified": true
+          },
+          {
+            "check": "claims",
+            "passed": true
+          }
+        ],
+        "settingsFinal": {
+          "cron": "off",
+          "source": "command line",
+          "preload": "pg_stat_statements, pgaudit, plpgsql, plpgsql_check, pg_cron, pg_net, pgsodium, auto_explain, pg_tle, plan_filter, supabase_vault"
+        },
+        "baseline": {
+          "phase": "complete",
+          "replayRequested": true,
+          "replayComplete": true,
+          "completedMigrations": [
+            "supabase/migrations/20251231000000_baseline_r453.sql",
+            "supabase/migrations/20260101000000_sessions.sql",
+            "supabase/migrations/20260101000001_sessions_optimal.sql",
+            "supabase/migrations/20260707000000_team_code.sql",
+            "supabase/migrations/20260707100000_entitlements.sql",
+            "supabase/migrations/20260707200000_handle_rules.sql",
+            "supabase/migrations/20260707300000_flair.sql",
+            "supabase/migrations/20260707400000_handle_blocklist.sql",
+            "supabase/migrations/20260712000000_desks.sql",
+            "supabase/migrations/20260712300000_desk_protected_names.sql",
+            "supabase/migrations/20260712400000_desk_seeds_and_controls.sql",
+            "supabase/migrations/20260712500000_school_tags.sql",
+            "supabase/migrations/20260712600000_desk_assignments.sql",
+            "supabase/migrations/20260712700000_claim_fix.sql",
+            "supabase/migrations/20260712800000_profile_grant_fix.sql",
+            "supabase/migrations/20260712900000_desk_rate_limit_fix.sql",
+            "supabase/migrations/20260713000000_smoke_fixtures.sql",
+            "supabase/migrations/20260713100000_remove_edu_signup_gate.sql",
+            "supabase/migrations/20260713200000_featured_achievements.sql",
+            "supabase/migrations/20260713300000_events.sql",
+            "supabase/migrations/20260714000000_smoke_fixtures_restamp.sql",
+            "supabase/migrations/20260716000000_desk_applications.sql",
+            "supabase/migrations/20260716100000_school_map_lockdown.sql",
+            "supabase/migrations/20260716200000_apply_full_account.sql",
+            "supabase/migrations/20260716300000_desk_full_account.sql",
+            "supabase/migrations/20260716400000_key_stats.sql",
+            "supabase/migrations/20260716500000_delete_account.sql",
+            "supabase/migrations/20260716600000_admin.sql",
+            "supabase/migrations/20260716700000_set_school_tag.sql",
+            "supabase/migrations/20260716800000_digest.sql",
+            "supabase/migrations/20260716900000_beta_codes.sql",
+            "supabase/migrations/20260717100000_run_integrity.sql",
+            "supabase/migrations/20260717200000_security_hardening.sql",
+            "supabase/migrations/20260717300000_desk_pro.sql",
+            "supabase/migrations/20260717400000_edu_trial.sql",
+            "supabase/migrations/20260717500000_desk_pro_seats.sql",
+            "supabase/migrations/20260717600000_profile_theme.sql",
+            "supabase/migrations/20260717700000_desk_recruiting.sql",
+            "supabase/migrations/20260717800000_school_cooldown.sql",
+            "supabase/migrations/20260723000000_sessions_guard.sql",
+            "supabase/migrations/20260724100000_reconcile_adhoc.sql",
+            "supabase/migrations/20260724200000_security_regression_fix.sql",
+            "supabase/migrations/20260725000000_retire_colops.sql",
+            "supabase/migrations/20260725100000_desk_create_pro.sql",
+            "supabase/migrations/20260903000000_certificate_tracks_r452.sql",
+            "supabase/migrations/20260903000100_retire_beta_codes.sql",
+            "supabase/migrations/20260903000300_retire_membership.sql",
+            "supabase/migrations/20260903000400_guest_shell_prune.sql",
+            "supabase/migrations/20260903000500_rpc_grants.sql",
+            "supabase/migrations/20260903000600_policies.sql",
+            "supabase/migrations/20260903000700_indexes_retention.sql",
+            "supabase/migrations/20260903000800_run_stats.sql"
+          ],
+          "tests": [
+            {
+              "file": "supabase/tests/database/01-desk-authorization.test.sql",
+              "total": 56,
+              "failures": [
+                "not ok 10 - DATA-01: direct creation cannot bypass full-account requirement",
+                "not ok 11 - DATA-01: direct application cannot bypass full-account requirement",
+                "not ok 15 - DATA-01: direct creation cannot bypass PRO requirement",
+                "not ok 16 - DATA-01: outsider cannot self-install as captain",
+                "not ok 17 - DATA-01: outsider cannot manufacture seniority by direct backdated membership",
+                "not ok 22 - DATA-01: owner cannot self-award verified badge",
+                "not ok 23 - DATA-01: owner cannot self-award school association",
+                "not ok 35 - DATA-01: paid deskless owner cannot insert a self-verified desk",
+                "not ok 36 - DATA-01: paid deskless owner cannot insert a self-assigned school association",
+                "not ok 46 - DATA-01: direct application cannot bypass private desk",
+                "not ok 48 - DATA-01: direct application cannot bypass closed recruiting",
+                "not ok 56 - DATA-01: direct application cannot bypass five-pending limit"
+              ],
+              "assertions": [
+                "ok 1 - signed-out requests use the anon role",
+                "ok 2 - signed-out request has no subject",
+                "ok 3 - signed-out caller cannot invoke create_desk",
+                "ok 4 - signed-out caller cannot insert another user as captain",
+                "ok 5 - anonymous session has its synthetic subject",
+                "ok 6 - anonymous-session JWT claim is true",
+                "ok 7 - create RPC rejects anonymous sessions",
+                "ok 8 - join RPC rejects anonymous sessions",
+                "ok 9 - application RPC rejects anonymous sessions",
+                "not ok 10 - DATA-01: direct creation cannot bypass full-account requirement",
+                "not ok 11 - DATA-01: direct application cannot bypass full-account requirement",
+                "ok 12 - full-account JWT claim is false",
+                "ok 13 - outsider has no PRO entitlement",
+                "ok 14 - create RPC rejects unpaid full accounts",
+                "not ok 15 - DATA-01: direct creation cannot bypass PRO requirement",
+                "not ok 16 - DATA-01: outsider cannot self-install as captain",
+                "not ok 17 - DATA-01: outsider cannot manufacture seniority by direct backdated membership",
+                "ok 18 - outsider has no captain authority",
+                "ok 19 - outsider cannot rotate invitation",
+                "ok 20 - outsider cannot accept applications",
+                "ok 21 - outsider cannot remove another member",
+                "not ok 22 - DATA-01: owner cannot self-award verified badge",
+                "not ok 23 - DATA-01: owner cannot self-award school association",
+                "ok 24 - fixture owner is a legitimate captain",
+                "ok 25 - captain can pause recruiting",
+                "ok 26 - recruiting change persisted",
+                "ok 27 - captain can resume recruiting",
+                "ok 28 - captain can rotate invitation",
+                "ok 29 - captain receives rotated invitation",
+                "ok 30 - ordinary member cannot update own role to captain",
+                "ok 31 - ordinary member cannot update own seniority",
+                "ok 32 - ordinary member cannot obtain invite code",
+                "ok 33 - ordinary member cannot rotate invitation",
+                "ok 34 - paid fixture is entitled",
+                "not ok 35 - DATA-01: paid deskless owner cannot insert a self-verified desk",
+                "not ok 36 - DATA-01: paid deskless owner cannot insert a self-assigned school association",
+                "ok 37 - paid full account can create through RPC",
+                "ok 38 - create RPC installs creator as captain",
+                "ok 39 - create RPC binds owner to caller",
+                "ok 40 - RPC-created desk starts unverified",
+                "ok 41 - unpaid full account can join by valid invitation",
+                "ok 42 - join RPC grants member role, not captain",
+                "ok 43 - join RPC uses server time for seniority",
+                "ok 44 - existing member cannot apply to another desk",
+                "ok 45 - application RPC respects private desk",
+                "not ok 46 - DATA-01: direct application cannot bypass private desk",
+                "ok 47 - application RPC respects closed recruiting",
+                "not ok 48 - DATA-01: direct application cannot bypass closed recruiting",
+                "ok 49 - deskless full account can apply to recruiting public desk",
+                "ok 50 - allowed application is visible to its applicant",
+                "ok 51 - captain can accept genuine application",
+                "ok 52 - acceptance installs applicant as ordinary member",
+                "ok 53 - acceptance clears applicant pending requests",
+                "ok 54 - rate-limit fixture has five pending applications",
+                "ok 55 - application RPC rejects sixth pending application",
+                "not ok 56 - DATA-01: direct application cannot bypass five-pending limit"
+              ],
+              "data01Failures": [
+                "not ok 10 - DATA-01: direct creation cannot bypass full-account requirement",
+                "not ok 11 - DATA-01: direct application cannot bypass full-account requirement",
+                "not ok 15 - DATA-01: direct creation cannot bypass PRO requirement",
+                "not ok 16 - DATA-01: outsider cannot self-install as captain",
+                "not ok 17 - DATA-01: outsider cannot manufacture seniority by direct backdated membership",
+                "not ok 22 - DATA-01: owner cannot self-award verified badge",
+                "not ok 23 - DATA-01: owner cannot self-award school association",
+                "not ok 35 - DATA-01: paid deskless owner cannot insert a self-verified desk",
+                "not ok 36 - DATA-01: paid deskless owner cannot insert a self-assigned school association",
+                "not ok 46 - DATA-01: direct application cannot bypass private desk",
+                "not ok 48 - DATA-01: direct application cannot bypass closed recruiting",
+                "not ok 56 - DATA-01: direct application cannot bypass five-pending limit"
+              ],
+              "unexpectedControlFailures": []
+            }
+          ],
+          "testsStarted": true,
+          "assertionFailures": true,
+          "files": [
+            {
+              "file": "supabase/migrations/20251231000000_baseline_r453.sql",
+              "sha256": "e5b0025a0bd0ee24fd95d21471454eb12aabbd953636aa16fd05f3d45ebcea6b"
+            },
+            {
+              "file": "supabase/migrations/20260101000000_sessions.sql",
+              "sha256": "fa39d765e25290da2b75b283e6212d44abbc0189b396dd97fcf0cff4fd4b1daf"
+            },
+            {
+              "file": "supabase/migrations/20260101000001_sessions_optimal.sql",
+              "sha256": "f4318461100f36c300bd47959c41fcfa60738d29320efcfc1b6ac16025beb45c"
+            },
+            {
+              "file": "supabase/migrations/20260707000000_team_code.sql",
+              "sha256": "13f59b22409227793f26445beef32527ead7199df7bb7ca8c64d91ab37405b95"
+            },
+            {
+              "file": "supabase/migrations/20260707100000_entitlements.sql",
+              "sha256": "dfc52855f11aea76883cc129e60e2fcb6b00156c0f6e7a2ccdea0e5797590e2f"
+            },
+            {
+              "file": "supabase/migrations/20260707200000_handle_rules.sql",
+              "sha256": "c13c78c6504833a1b32f4ab3b72d17d658b06e7f4beeb7a89fcef26c4dae6232"
+            },
+            {
+              "file": "supabase/migrations/20260707300000_flair.sql",
+              "sha256": "39b0969cf3382f656cfbf23a1f40e2ca2d4b13277b63e3950fcf447a83c84d0b"
+            },
+            {
+              "file": "supabase/migrations/20260707400000_handle_blocklist.sql",
+              "sha256": "faee5db5da5248cbe33daa87ebd07d25a03ad1cf24d31b7b04c8bd9ba7045e97"
+            },
+            {
+              "file": "supabase/migrations/20260712000000_desks.sql",
+              "sha256": "6fe99bb5dd3ae151e8a3c2dcb33dba0d8c0dd40ea05fa14d29cb7bf8d912a98f"
+            },
+            {
+              "file": "supabase/migrations/20260712300000_desk_protected_names.sql",
+              "sha256": "0bdf362d7f39136f21d7ab0b7d1d6f2de399d59812b5de8008a458e53b08143b"
+            },
+            {
+              "file": "supabase/migrations/20260712400000_desk_seeds_and_controls.sql",
+              "sha256": "494f9aa059ad3d8ee0079f3fef013961231e4b84d6e030753ad5bea7ec1af290"
+            },
+            {
+              "file": "supabase/migrations/20260712500000_school_tags.sql",
+              "sha256": "ecabf000e3aa1d5bb31b2f95d885d72beccc4af36c2acd2f72c9f06ca14edb81"
+            },
+            {
+              "file": "supabase/migrations/20260712600000_desk_assignments.sql",
+              "sha256": "8aea441c9438775bcbc3107c05f18b25a09047c72742d5604332b3fd7336346d"
+            },
+            {
+              "file": "supabase/migrations/20260712700000_claim_fix.sql",
+              "sha256": "db0a49a16fa4447212359172573407b2479e7a2429057252bb13ec61eb30ead5"
+            },
+            {
+              "file": "supabase/migrations/20260712800000_profile_grant_fix.sql",
+              "sha256": "e4bb2124b804a74570fd7461e7946470c1f8bcbfe389b137a6cafde675d3244f"
+            },
+            {
+              "file": "supabase/migrations/20260712900000_desk_rate_limit_fix.sql",
+              "sha256": "02c6a7633e58713c24b8032e7cc881e52c6aff4a7e73c6ba108c591bdab67e42"
+            },
+            {
+              "file": "supabase/migrations/20260713000000_smoke_fixtures.sql",
+              "sha256": "73ec1f3963cb357144a00bc3d94cc2616cc6c0ee8a8d57726d9a701f76cd21d9"
+            },
+            {
+              "file": "supabase/migrations/20260713100000_remove_edu_signup_gate.sql",
+              "sha256": "9a90982cce05423ae49ad3de51d4a9a7cb914f69b055bd95c2598742df762819"
+            },
+            {
+              "file": "supabase/migrations/20260713200000_featured_achievements.sql",
+              "sha256": "f223ba6688d06d7410653259e3acbaa56b192ce7059440d6244e4615e3f419b0"
+            },
+            {
+              "file": "supabase/migrations/20260713300000_events.sql",
+              "sha256": "89e83eddbcfdb574371da665904aac74249ff12c339d24de91115b80d3c0d2c0"
+            },
+            {
+              "file": "supabase/migrations/20260714000000_smoke_fixtures_restamp.sql",
+              "sha256": "5fbb7e31bad71b04ab2d1d4ef3d2d53066b3f039b514f8ba09ffba5db9aa5180"
+            },
+            {
+              "file": "supabase/migrations/20260716000000_desk_applications.sql",
+              "sha256": "d2767e78482072c61037256580bcbcde8c3767ae60a0645a54299f93c2763866"
+            },
+            {
+              "file": "supabase/migrations/20260716100000_school_map_lockdown.sql",
+              "sha256": "d93f35f141525161e82e8432a55747d00690db20c885782f4036ea225feb23c2"
+            },
+            {
+              "file": "supabase/migrations/20260716200000_apply_full_account.sql",
+              "sha256": "b0b9aba7a6c228c2c8ff42fdba86840df70659be8dfa6e7072c595bf3a5ebb20"
+            },
+            {
+              "file": "supabase/migrations/20260716300000_desk_full_account.sql",
+              "sha256": "e0f26d1562a27302c0e4226fb26d7aaf4e184626abf3cee926d9aa917ad4ebd6"
+            },
+            {
+              "file": "supabase/migrations/20260716400000_key_stats.sql",
+              "sha256": "126e14f9a6cf3490dcf7c8de5fbfda5f43e10395dfcca964154240012365aa0c"
+            },
+            {
+              "file": "supabase/migrations/20260716500000_delete_account.sql",
+              "sha256": "d99df93db484691acde761fa6d8d59e6ded9af7efa2a872a8e8561e3bacb6b1f"
+            },
+            {
+              "file": "supabase/migrations/20260716600000_admin.sql",
+              "sha256": "c4b962635373ae5bdb914156d1fc60d1686e844a35d862440bc22cfed5b9e6e4"
+            },
+            {
+              "file": "supabase/migrations/20260716700000_set_school_tag.sql",
+              "sha256": "a4f1222eb94f5d38138fe5ae6530bf6b701d3993388f9dcedd7d66bac91ffa21"
+            },
+            {
+              "file": "supabase/migrations/20260716800000_digest.sql",
+              "sha256": "d2a339e175f3a0ec21002dca79aec6ddcf17a21ff29cb36783a6a36215d0a5db"
+            },
+            {
+              "file": "supabase/migrations/20260716900000_beta_codes.sql",
+              "sha256": "e27887e90d118eb9efe0c073f8644f2e2b9532a5ad048c7b47cd306dbe0ed8f1"
+            },
+            {
+              "file": "supabase/migrations/20260717100000_run_integrity.sql",
+              "sha256": "5c9c036b6ce26e5628008c4ebe3e3ac3dea616bf4843acaba5799c6b9a549302"
+            },
+            {
+              "file": "supabase/migrations/20260717200000_security_hardening.sql",
+              "sha256": "5bff8c3b76867f5216e29f1e02d2ae576f36714f36444667b82d11246b222364"
+            },
+            {
+              "file": "supabase/migrations/20260717300000_desk_pro.sql",
+              "sha256": "7329179360e5c7d27191638aace5f88718603ed1bc2e4b83cc0bc7c4eca4f2d0"
+            },
+            {
+              "file": "supabase/migrations/20260717400000_edu_trial.sql",
+              "sha256": "303335dcf0970fc1944bf90893ce23f731d7baf6a07d78cb1ee2b9cdc55254c3"
+            },
+            {
+              "file": "supabase/migrations/20260717500000_desk_pro_seats.sql",
+              "sha256": "47d6985638b05333c07ca9ac396de03d67a131a026d2b7bab9b58d1c70af4656"
+            },
+            {
+              "file": "supabase/migrations/20260717600000_profile_theme.sql",
+              "sha256": "1613688f933e843cd8e14cdd042a3594d7f688e68ade2dfd385d8f638830abad"
+            },
+            {
+              "file": "supabase/migrations/20260717700000_desk_recruiting.sql",
+              "sha256": "c0059304b263fc0dfb4eb81775849a84635318a69b7fe4ef6c4aa6fa8b65433b"
+            },
+            {
+              "file": "supabase/migrations/20260717800000_school_cooldown.sql",
+              "sha256": "1c9a66b3c441e5b1b5bbb69768b6f4905eca4f6c73ce4c05ac7dc7cd8d5edf28"
+            },
+            {
+              "file": "supabase/migrations/20260723000000_sessions_guard.sql",
+              "sha256": "7660c96de60ca94a3ef2e29ddbbd0236e7f5b9d085295c454be0a1df2ca1282c"
+            },
+            {
+              "file": "supabase/migrations/20260724100000_reconcile_adhoc.sql",
+              "sha256": "4dd793032229e7ddc0b09bcc5129b6f0a9387159a4dc8899dff20a6ba385a993"
+            },
+            {
+              "file": "supabase/migrations/20260724200000_security_regression_fix.sql",
+              "sha256": "64b972f98b1b004e8c7a68bc486aa43e293f7acdca046d041420038bbe279ed0"
+            },
+            {
+              "file": "supabase/migrations/20260725000000_retire_colops.sql",
+              "sha256": "8bca59d6f94dc98eda21b8eda40d6b0a2a14fcd744efaeac22cbf607a6559506"
+            },
+            {
+              "file": "supabase/migrations/20260725100000_desk_create_pro.sql",
+              "sha256": "2b2b3b5f3e9fd193cd7ad52897e243e8a9a7b2e08e959c093910d308a2bf205d"
+            },
+            {
+              "file": "supabase/migrations/20260903000000_certificate_tracks_r452.sql",
+              "sha256": "30ed31b5a8a9fa3b1f34349a6149194c1b58288ca04f4110417628f638561181"
+            },
+            {
+              "file": "supabase/migrations/20260903000100_retire_beta_codes.sql",
+              "sha256": "60750c8ecdbfb07d38e9853af3261c181f372904f0202d1d1e03764c396b5c4f"
+            },
+            {
+              "file": "supabase/migrations/20260903000300_retire_membership.sql",
+              "sha256": "b278750b921ab774a2a4080d95ad4725299b4c3b3b5a2c3240883c610becf137"
+            },
+            {
+              "file": "supabase/migrations/20260903000400_guest_shell_prune.sql",
+              "sha256": "a13e9c2cd5445155dc156d51d0d1d23c0f72d888af3a9d9f22b513826bcc3622"
+            },
+            {
+              "file": "supabase/migrations/20260903000500_rpc_grants.sql",
+              "sha256": "4121af177d2188571ea0568a9f4021998e11bf7c9f4c41dec0be5f043c30765f"
+            },
+            {
+              "file": "supabase/migrations/20260903000600_policies.sql",
+              "sha256": "c0eff7740294045e5fcb1adae4126918358c2446743d06eee286636b8b2381d0"
+            },
+            {
+              "file": "supabase/migrations/20260903000700_indexes_retention.sql",
+              "sha256": "085ad97cc514be684750bd4d11b00108a8c200ef5a8caa1ce1edcc8900ab3900"
+            },
+            {
+              "file": "supabase/migrations/20260903000800_run_stats.sql",
+              "sha256": "8827988a756c6fb117033641edda8284fa239c46b82a1dcc51ad5b933762e7a5"
+            },
+            {
+              "file": "supabase/tests/database/01-desk-authorization.test.sql",
+              "sha256": "ed4c25b780898621d9aa599e04a5593a3cd4303432a5e8ff1e67c484d8b965ca"
+            }
+          ],
+          "source": "eaab8645cf8aaee6e62120f65d24ebd911a047ad",
+          "currentTest": "supabase/tests/database/01-desk-authorization.test.sql"
+        },
+        "hotkeyMigrationFailed": null,
+        "error": "Security regression failures. Known baseline vulnerabilities remain failures, not a passing gate.",
+        "cleanup": "PASS"
+      }
+    ]
+  }
+}
