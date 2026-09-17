@@ -58,8 +58,9 @@ practice/ranked mode switch from historical instructions.
 | Remote main | `434bc0e8764e741e0e11f84cf51d61a1755d7c67`, PR #250 merged September 5. Refreshed September 17; unchanged. The last observed main gate/Pages results belong to this old source, not the repair branches. |
 | Shared guidance | `codex/repository-foundation`; read its current remote tip. Foundation introduced guidance/audits and development tooling, not a framework migration or application repair. |
 | Accepted combined application/testing checkpoint | `codex/account-testing-integration`, remote handoff commit `6c984161c31bc4637dbe88b73a4da8408cefdf1d`; exact tested code `c702c6932b342cd36656317f7ce50f1c33b7df3e`. The final commit adds only its handoff document. Not merged into foundation/main or deployed. |
-| Accepted groundwork integration / next area baseline | `codex/groundwork-integration` at `00df57afd8d3299cc7feaf523847b9ca43e54d06`; executable checkpoint `328cae8fa7a5fba3e71690e0c556f8704506b304`. Chief accepted its remote handoff and verified full-tree browser/runtime equality with tested 4ea428b plus exact Security preparation blobs. Start future area branches from this checkpoint (or an explicitly accepted successor), and read latest foundation guidance separately. No main merge/deployment. |
-| Active batch starting point | The three original area branches start from accepted integration 6c98416 and read later foundation guidance separately. The accepted platform-only experiment starts from Security feasibility 14d7e10; replay-baseline work starts from its handoff 3dd686d. These preserve that ancestry and remain outside the browser/structure integration. Preserve both accepted account/testing batches. |
+| Accepted earlier groundwork integration | `codex/groundwork-integration` at `00df57afd8d3299cc7feaf523847b9ca43e54d06`, executable checkpoint 328cae8. Account/browser/structure and Security preparation combined; preserved as the catalog review's valid starting point. Superseded for new implementation branches by 16ee830 below. |
+| Accepted complete test-groundwork / next area baseline | `codex/groundwork-db-integration` at `16ee8306a8c170db9f8fe2e051b44b0519782ae1`, Security executable import 565c34b. Chief verified final remote handoff/tip, unchanged browser/runtime source, and exact Security executable/SQL/workflow equality with eaab864. Combined static7/guard11/plan pass; browser evidence green, reproducible database permission baseline correctly red. Start new implementation areas here and read latest foundation guidance separately. No main merge/deployment. |
+| Earlier source ancestry | The three original area branches start from accepted integration 6c98416 and read later foundation guidance separately. The accepted platform-only experiment starts from Security feasibility 14d7e10; replay-baseline work starts from its handoff 3dd686d. These preserve that ancestry and remain outside the browser/structure integration. Preserve both accepted account/testing batches. |
 
 The chief verified remote ancestry: foundation f2dd564 → account import 2981dec → testing
 import 3271c67 → isolation correction c702c69 → handoff 6c98416. The integration owner ran:
@@ -86,8 +87,8 @@ All preserve original local work and earlier remote branches.
 | **Establish testing and blockers**, `01a0af90-b973-7572-b7ff-d5bf9f504a52`; `codex/testing-security-groundwork` | Complete: full local matrix and exact Linux browser gate pass at 4ea428b; latest docs-only handoff 1f2fa57 accepted. Security replay safety reviews complete; its 44-pass/12-fail result remains separate. | Test/browser file reservations released. No further source batch assigned. Reuse successful exact-source evidence instead of repeating suites for docs-only changes. |
 | **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; `codex/security-replay-baseline` | Baseline complete and accepted at 54640b0, exact tested source eaab864. Two fresh 52-migration replays and two complete 56-assertion suites: each 44 pass/12 identical DATA-01 failures, cleanup pass. Test infrastructure works; permissions remain unrepaired. | `supabase/tests/`, database-test docs/handoff and dedicated test workflows. Current batch complete; no DATA-01 repair assigned. Preserve failed-before evidence. No production/schema/runtime changes. |
 | **Audit starter 3 cleanup candidates**, `01a0af90-7fb2-7571-a5d6-b82354d57540`; `codex/repository-structure` | Complete on its branch at cf8c61b: archived the historical PROJECT_CONTEXT record, kept a root compatibility page, repaired links and recorded the remaining structure plan. Chief verified preserved text and docs-only file manifest. Included in accepted combined checkpoint 00df57a; no main merge. | `README.md`, `docs/ARCHITECTURE.md`, selected historical documentation/archive paths and non-shared documentation links, `docs/handoffs/repository-structure.md`. No runtime, generated pages, migrations, test harness or workflow edits. |
-| **Integrate account testing changes**, `01a0b0f9-09da-7a62-9dd2-dd9baeac388d`; accepted `codex/groundwork-integration`, active `codex/groundwork-db-integration` | Prior combined 00df57a remains accepted. One final test-only consolidation now assigned: add accepted Security tooling/evidence through 54640b0 and Testing final docs 1f2fa57, preserving exact browser and database executable/input source. Run combined static/guard/plan checks; reuse equivalent full execution evidence. | New integration branch from 00df57a and `docs/handoffs/groundwork-db-integration.md`. No duplicate prep import, runtime/migration/package/gate/deploy change, permission repair, main merge or production action. Chief guidance is copied exactly, not independently rewritten. |
-| **Audit catalog and learner flow**, `01a0b148-2693-7901-af91-934c83cabe1d`; `codex/catalog-flow-review` from accepted 00df57a | Evidence/design checkpoint 0151c3d accepted; source map, historical conflicts, decision register and five example journeys prepared. D1 shared exercise, D2 competitive intent and D3 paths/locks are asked but unanswered. No new product rule confirmed. | Owns only `docs/handoffs/catalog-progression.md`; returns dated choices and proposed PRODUCT/CURRENT updates. No runtime/catalog/progress/access/billing edits or automatic additional modules. |
+| **Integrate account testing changes**, `01a0b0f9-09da-7a62-9dd2-dd9baeac388d`; `codex/groundwork-db-integration` | Complete and accepted at 16ee830: all accepted account/browser/structure/database-test groundwork and evidence coexist. Seven combined static checks, 11 guard tests and plan pass; exact executable equivalence preserves original browser and DB results without redundant full reruns. | Integration handoff `docs/handoffs/groundwork-db-integration.md`; reservations released. No permission repair, runtime/migration/package/gate/deploy change, main merge or production action. Latest shared guidance is read separately. |
+| **Audit catalog and learner flow**, `01a0b148-2693-7901-af91-934c83cabe1d`; `codex/catalog-flow-review` from preserved 00df57a | Updated handoff bace206 accepted. Learning-first journey with prominent optional speed/competition and later-lesson gates confirmed. Skills plus subscription is tentative; exact gate policy, D1 content mechanics and D2 scoring/rank controls remain open. | Owns only `docs/handoffs/catalog-progression.md`; returns dated choices and proposed shared updates. No runtime/catalog/progress/access/billing edits. Existing design work need not rebase for test-only 16ee830. |
 | Chief coordinator, this task | Project overview and platform-wide design discussion, priorities, product decisions, GitHub/security/structure review and handoff reconciliation. | `docs/CURRENT.md`, `docs/PRODUCT.md`, `docs/handoffs/chief-groundwork.md`. Other tasks send proposed corrections instead of editing these. |
 
 Testing checkpoint [4ea428b](https://github.com/rathunter69/Hotkey.gg/commit/4ea428ba1504ee04b3d01943df5f7cd1b68a2c4d)
@@ -156,9 +157,9 @@ The 77 official platform/Auth migrations are distinct from the 52 application fi
 
 The next recommended Security batch is a separately scoped DATA-01 forward repair preserving
 the 44 passing controls and failing-before evidence. It has **not** been assigned. DATA-02
-privacy and DATA-03 MFA remain separate. The currently assigned integration batch only
-consolidates accepted test infrastructure and evidence with 00df57a; no application repair.
-It must prove exact source equivalence and run combined static/guard checks before acceptance.
+privacy and DATA-03 MFA remain separate. The final integration at 16ee830 now consolidates this accepted test infrastructure and
+evidence with 00df57a. Source equivalence and combined static/guard/plan checks are verified;
+no application repair is included.
 
 Every area uses economical focused investigation and independent review. Finish the authorized
 batch, record exact tested source/environment, actual pass/fail/unrun checks, file manifest,
@@ -179,8 +180,9 @@ repairs remain separately scoped.
 | Official test-platform feasibility | [14d7e10](https://github.com/rathunter69/Hotkey.gg/blob/14d7e10a79232000ff24d2637ce6adc72b786b1f/docs/handoffs/security-accounts.md) | Pinned official database/Auth image manifests and source SHAs; standalone platform gaps traced. Documentation-only delta over 2a4a5f5, executable code remains ce53324. No bootstrap/replay/SQL result at that historical checkpoint; later results are listed below. |
 | Application replay / earlier incomplete baseline | [9ea05e6](https://github.com/rathunter69/Hotkey.gg/blob/9ea05e64edbe66d075b2fda6e7b313a2f198ae72/docs/handoffs/security-accounts.md) | Exact source 18babfa/run 35276711544: all 52 migrations passed once, then fixture aborted after 12 partial results (10 ok, 2 not ok). No complete 56-result stream or second instance; cleanup passed. Accepted earlier failure evidence, not security clearance; superseded for baseline completeness by 54640b0. |
 | Reproducible permission baseline | [54640b0](https://github.com/rathunter69/Hotkey.gg/blob/54640b07554882dcd3322d84f2bba398fadc94c0/docs/handoffs/security-accounts.md) | Exact eaab864/run 35277724943: two fresh complete 52-migration/56-assertion runs, identical 44 pass/12 permission failures, both cleanups pass. Durable JSON and source/provenance verified. Baseline accepted; permissions unrepaired. |
-| Catalog/flow decision review | [0151c3d](https://github.com/rathunter69/Hotkey.gg/blob/0151c3d57639ccf7508b87a2db096c4f92f81cd0/docs/handoffs/catalog-progression.md) | Sole documentation addition over accepted 00df57a. Source map, historical conflicts, decisions and example journeys; focused investigation/review, link checks. D1–D3 pending; no rule change, playtest or catalog rebuild claimed. |
-| Combined groundwork integration | [00df57a](https://github.com/rathunter69/Hotkey.gg/blob/00df57afd8d3299cc7feaf523847b9ca43e54d06/docs/handoffs/groundwork-integration.md) | Remote tip/handoff verified; browser/runtime tree equals fully tested 4ea428b, Security test blobs equal accepted 14d7e10. Combined static7/runner3/replay-plan and independent review pass. Includes cleanup and latest modes/flow guidance through 45edd. Excludes separate platform/replay experiments. Accepted future area baseline; no main merge or deployment. |
+| Catalog/flow decision review | [bace206](https://github.com/rathunter69/Hotkey.gg/blob/bace206c421e4f5969f69fc88c39e5191b234f1d/docs/handoffs/catalog-progression.md) | Source map and first dated answers; latest user conversation checked by chief. Learning-first hierarchy/later-lesson gates confirmed, detailed skills-plus-subscription gate policy tentative. D1/D2 mechanics remain open; no application rule change or rebuild. |
+| Complete test-groundwork integration | [16ee830](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/docs/handoffs/groundwork-db-integration.md) | Final remote source/handoff verified. Only docs, accepted DB test files and two dedicated test workflows differ from 00df57a; all 10 Security executable/SQL/workflow blobs match eaab864. Browser/runtime unchanged. Static7/guard11/plan pass; browser green and DB reproducible 44/12-fail evidence reused explicitly by equivalence. Latest accepted baseline, no repair/merge/deploy. |
+| Earlier combined groundwork integration | [00df57a](https://github.com/rathunter69/Hotkey.gg/blob/00df57afd8d3299cc7feaf523847b9ca43e54d06/docs/handoffs/groundwork-integration.md) | Remote tip/handoff verified; browser/runtime tree equals fully tested 4ea428b, Security test blobs equal accepted 14d7e10. Combined static7/runner3/replay-plan and independent review pass. Includes cleanup and latest modes/flow guidance through 45edd. Excludes separate platform/replay experiments. Accepted future area baseline; no main merge or deployment. |
 | Full testing groundwork | [1f2fa57](https://github.com/rathunter69/Hotkey.gg/blob/1f2fa577f94911b05ecc50d8b25b7a2a9d16c6f2/docs/handoffs/git-testing-releases.md) | Latest documentation-only summary; accepted 00df57a contains earlier handoff 31af74b. Exact test-tooling source 4ea428b on preserved application c702c69: full local matrix and Linux run 35274460688 pass; chief verified source/run/job and docs-only final delta. Covers active gate isolation and generator drift, not live accounts, DB permissions or launch acceptance. |
 | Isolated platform bootstrap | [3dd686d](https://github.com/rathunter69/Hotkey.gg/blob/3dd686d26edcb53325579fbe479eb01bdf41f773/docs/handoffs/security-accounts.md) | Exact reviewed source 49b8193 passed Linux run 35275149357 on first attempt; durable sanitized JSON committed. Genuine empty platform, Auth helpers/ACLs, extensions, isolation and cleanup verified. Zero Hotkey migrations or permission assertions; not a DATA-01/02/03 repair. |
 | Repository structure cleanup | [cf8c61b](https://github.com/rathunter69/Hotkey.gg/blob/cf8c61bc1a6922325ac63f9d6449795e40484847/docs/handoffs/repository-structure.md) | Historical record moved to docs/history with compatibility page and repaired references. Chief fetched old/new content: same 1,145 lines, only the two Markdown targets on one line changed. No runtime/test/workflow/schema edits; documentation checks passed. |
@@ -262,23 +264,26 @@ unrun checks. Browser suites own port 8791. Documentation-only changes use focus
 reference validation under TASK_GUIDE's exception, not unnecessary application test reruns.
 Do not call a static pass a playtest, a local subset full CI, or a report an implemented repair.
 
-Next: the combined groundwork checkpoint 00df57a is accepted. Wolf has started
-**Audit catalog and learner flow**, task 01a0b148-2693-7901-af91-934c83cabe1d, from that baseline.
-The chief will discuss the project overview, shared design specification and platform at large,
-using the area review's evidence and dated decisions. Keep questions/results concise. Settle
-modes, ranked play, paths and deferred/changed rules before implementation. No catalog rebuild,
-progress reset or new access rules are authorized.
+The testing/security-groundwork and first structure cleanup are now consolidated and accepted
+at 16ee830. Browser verification is green; the database test suite reliably reproduces 12
+permission defects. Completion of test infrastructure is not completion of those repairs.
+Main remains 434bc0e; no merge, deployment or live policy change.
 
-Security's reproducible failing baseline is accepted at 54640b0. The final test-only
-consolidation into codex/groundwork-db-integration is pending, using exact-source equivalence
-plus combined static/guard/plan checks. Do not label its source accepted until the remote
-handoff is verified. The catalog/flow task already has a valid baseline at 00df57a and need not
-wait for database-tool consolidation. Its first three choices remain with Wolf; the chief
-reconciles answers without duplicating the questionnaire.
+Current product discussion: **Audit catalog and learner flow** has recorded learning as the
+main journey, optional prominent speed/competition, and gates for later lessons. The exact
+skills/subscription unlock policy is still under discussion; D1 shared-content mechanics and
+D2 scoring/publication/rank controls are not settled. The chief has reconciled those scoped
+answers in PRODUCT and will discuss the overview/design consequences without duplicating
+the area's questions. A valid existing source review at 00df57a need not restart for test-only
+16ee830.
 
-Recommended next security decision: a focused DATA-01 permission repair. No repair batch is
-started automatically. Later targeted cleanup, site structure and the planned catalog rebuild
-retain the chosen sequence. Main remains 434bc0e; no merge, deployment or live policy change.
+Recommended parallel work in response to Wolf's question: a focused DATA-01 desk-permission
+repair using the existing 12 failing cases and preserving the 44 passing controls. Reuse the
+completed security audit rather than restarting it. This is a recommendation, **not yet a new
+repair assignment**. UI/UX can use existing experience evidence to plan the learning-first
+journey; implementation that depends on lesson gates, help or scoring should follow those
+decisions. No new UI/UX module has been dispatched. Later targeted cleanup, site structure
+and the planned catalog rebuild retain the chosen order.
 
 Launch acceptance remains pending for real account lifecycle, onboarding/learning, correct
 catalog outcomes, saved progress across devices, subscription lifecycle, guest/owner/other-user
