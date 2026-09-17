@@ -5,7 +5,9 @@ Task: `01a0af90-b973-7572-b7ff-d5bf9f504a52` (starter 4)
 Branch: `codex/testing-security-groundwork`
 Starting commit: `6c984161c31bc4637dbe88b73a4da8408cefdf1d`
 Tested application source: `c702c6932b342cd36656317f7ce50f1c33b7df3e`
-State: second testing-groundwork batch locally verified; Linux branch gate pending; no merge or deployment
+Testing-tooling checkpoint: `4ea428ba1504ee04b3d01943df5f7cd1b68a2c4d`
+State: second testing-groundwork batch verified locally and by the exact Linux branch gate;
+no merge or repository-workflow deployment
 
 ## Second batch — full gate isolation and exact local matrix
 
@@ -41,9 +43,8 @@ npm 10.9.8, locked Playwright 1.49.1 and its Chromium 131 headless shell build 1
 - generator wrote 74 drill pages plus library/sitemap/refmap and produced no tracked content diff.
 
 These local runs cover every command in the browser gate, with its two behavioral-smoke/full-replay
-invocations represented by the full replay and the passing smoke suite. They do not become Linux
-CI evidence until the branch workflow completes at the exact remote SHA. Ignored local logs are
-supplementary. Independent review and the remote result belong in the final checkpoint below.
+invocations represented by the full replay and the passing smoke suite. Ignored local logs are
+supplementary; the durable Linux result is recorded below.
 
 Independent review found no blocking isolation or workflow defect. It confirmed that every
 active gate browser entry point uses the helper, fixture fallbacks retain the boundary, and
@@ -52,13 +53,35 @@ three harnesses closed pages created in explicit contexts; those sites now close
 and the generator, border renderer and all 30 Mac-input checks passed again. The review also
 prompted direct WebSocket and service-worker canary assertions, which pass locally.
 
-Security's separate groundwork checkpoint `14d7e10a79232000ff24d2637ce6adc72b786b1f`
-prepares 56 SQL assertions and official pinned Postgres/Auth image evidence. The SQL remains
-unrun because the genuine Auth/platform bootstrap is not yet scripted and reviewed. Testing did
-not add or dispatch an incomplete database job. The next database batch is Security-owned
-bootstrap/config/assertions first, then Testing can wire a separate no-secrets branch job.
+## Second-batch remote checkpoint
 
-## Scope and outcome
+[Linux run 35274460688](https://github.com/rathunter69/Hotkey.gg/actions/runs/35274460688)
+completed successfully on Ubuntu at exact testing-tooling commit
+`4ea428ba1504ee04b3d01943df5f7cd1b68a2c4d`. Its reusable gate used Node 22,
+the locked Playwright 1.49.1 dependency and installed Chromium. All 32 job steps passed:
+dependency installation, seven static checks, the isolation canary, every smoke and full-matrix
+harness, and generator drift. The run finished September 17 at 21:21:46 UTC. Port 8791 is
+released locally.
+
+The branch caller and reusable gate have `contents: read`, contain no secret, environment or
+deployment reference, and ran no repository deployment workflow. No PR or merge was created.
+Automatic hosting-preview settings outside repository workflows were not inspected and are not
+part of this claim.
+
+Security's separate platform-bootstrap code `49b8193b6b6c17c63b97c898d268437ceb191cdf`
+received Testing's exact-SHA safety clearance. Its one authorized
+[platform-only run 35275149357](https://github.com/rathunter69/Hotkey.gg/actions/runs/35275149357)
+passed with cleanup. Security saved the durable result and handoff at
+`3dd686d26edcb53325579fbe479eb01bdf41f773`. That proves the genuine pinned Postgres/Auth
+bootstrap only. The unchanged 52-migration replay and all 56 permission assertions remain
+unrun and are the next Security-owned isolated batch.
+
+## First batch history — original starter-4 checkpoint
+
+This section and its verification table record the earlier `codex/git-testing-releases`
+checkpoint. They remain for provenance. References to a limited smoke baseline, the account
+repair being separate, and the older owned-file list describe that first batch only; the
+second-batch evidence above supersedes them for the integrated source.
 
 Verified the remote foundation tip and preserved the original checkout's pending work by
 creating a separate worktree. Main remains `434bc0e8764e741e0e11f84cf51d61a1755d7c67`.
@@ -88,7 +111,7 @@ both branches. Preserve Security's account-isolation additions to `dev/run-check
 `gate.yml` alongside this branch's network canary additions. Security reported 14 synthetic account cases passing, but its repair is
 not part of this task's tested source. This baseline does not certify Security's commit.
 
-## Verification
+## First-batch verification (historical)
 
 Environment: Windows x64; portable official Node **22.23.2**, SHA256 checked against the
 official release manifest; npm **10.9.8**; locally installed Playwright **1.49.1**.
@@ -142,9 +165,9 @@ carry forward the audit; product repairs remain with their named owners.
 |---|---|---|
 | D01: main has no enforced review/gate | Fresh GitHub metadata: `protected=false`, required checks off, no contexts, zero rulesets | Git/testing: reviewed main ruleset requires PR review and the actual gate context; demonstrate failed/missing check blocks merge. Do not test by merging an unsafe commit |
 | D02: database delivery fails | Latest run [33814362058](https://github.com/rathunter69/Hotkey.gg/actions/runs/33814362058) still failed at link with invalid token format; migrations/functions skipped. A gate for that source passed independently | Git/testing with Security: correct credentials through settings, pin CLI, rehearse link/migrations/functions in isolation, then verify accepted SHA and actual deployed state during a separately authorized release |
-| D03: clean replay and permission tests absent | No PR database validation; no local container runtime; migrations include a production digest callback | Git/testing + Security + cleanup: follow [isolated setup](../testing-database.md), prove outbound denial and disabled scheduling before replay, test direct-table/RPC role cases, reconcile definitions/history without rewriting migrations |
+| D03: clean replay and permission tests absent | The pinned official platform-only bootstrap now passes in isolation, but the unchanged 52-migration chain and all 56 permission assertions remain unrun | Security: stop on the first source incompatibility, prove two fresh clean replays before claiming reproducibility, then run the prepared role/RPC assertions without masking failures or rewriting history |
 | D05: wider browser gate isolation | Resolved in this batch for every active gate harness and generator; redirect, WebSocket and inactive-service-worker canaries pass, and the complete local matrix is green | Keep the helper mandatory when adding a gate browser entry point; legacy scripts outside the gate remain outside this claim |
-| D06: complete exact CI still unproven | Exact npm install and the complete isolated matrix pass locally with the pinned headless shell; the branch Linux run is still pending | Git/testing: complete Node22/locked-dependency/pinned-browser full Linux gate at the exact reviewed source; save the run and SHA evidence |
+| D06: complete exact CI | Resolved for tested application `c702c69` plus testing tooling `4ea428b`: complete local matrix and [Linux run 35274460688](https://github.com/rathunter69/Hotkey.gg/actions/runs/35274460688) passed at the exact remote SHA | Keep the exact dependency/action pins and isolation canary in the required gate; repeat when executable source changes |
 | D07: hosting/cache and rollback unverified | Earlier audit observed immutable prototype HTML; Cloudflare/GitHub Pages both publish, origin/build settings remain unconfirmed | Git/testing: verify static-site build/output and serving origin, check preview response headers, tie web/DB/functions to a source SHA, rehearse recovery in isolation |
 | Product/security defects remain | DATA-01/02/03 desk authority, profile privacy and MFA; saved-run duplication/state/rankings; formula and grader defects from existing audit | Security, persistence and engine owners: focused failing-before/passing-after tests plus allowed-route regressions. This tooling branch fixes none of those product defects |
 | Paid launch acceptance remains open | Billing is a scaffold, access/learning rules and public claims need agreement; production account flows and business readiness unverified | Chief with area owners: agreed launch scope and verified acceptance from CURRENT/PRODUCT before any launch decision |
