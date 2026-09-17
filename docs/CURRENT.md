@@ -136,6 +136,15 @@ failure ends this batch. No application/schema repair, privacy/MFA implementatio
 product module is authorized. The experiment stays outside current browser/structure
 integration and must not delay its handoff.
 
+Testing subsequently cleared corrected exact replay candidate
+18babfa80dea4acb31fd30be2ae00b3610d42ed2 for one isolated run. Its source review confirms
+the 52 migrations, 56-assertion fixture and platform SQL are unchanged from accepted
+3dd686d; all 11 focused guard tests pass. Only a complete first replay/assertion result can
+permit one fresh repeat, and any permission assertion failure keeps the final result failing.
+The chief confirmed execution within the already assigned scope. At clearance, the candidate
+had not been dispatched and all application SQL remains UNRUN; require the actual remote
+source/run/result before changing that status.
+
 Every area uses economical focused investigation and independent review. Finish the authorized
 batch, record exact tested source/environment, actual pass/fail/unrun checks, file manifest,
 unresolved risks and a verified remote handoff. The chief checks compatibility before declaring
