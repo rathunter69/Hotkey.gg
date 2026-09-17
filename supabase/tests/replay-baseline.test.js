@@ -19,6 +19,10 @@ test('a first migration, fixture, or cleanup failure prevents a second platform 
 test('complete assertion failures can repeat fresh replay but can never produce a green baseline',()=>{
   const r=complete();r.result='FAIL';r.baseline.assertionFailures=true;r.baseline.tests[0].failures=['not ok 1 - denied boundary'];
   assert.equal(mayTrySecond(r),true);
+  const short=structuredClone(r);short.baseline.tests[0].total=55;
+  assert.equal(mayTrySecond(short),false);
+  const missing=structuredClone(r);missing.baseline.completedMigrations.pop();
+  assert.equal(mayTrySecond(missing),false);
   assert.deepEqual(classify([r,structuredClone(r)]),{reproducible:true,permissionsPassed:false,result:'FAIL'});
   assert.equal(classify([complete()]).reproducible,false);
   assert.equal(classify([complete(),complete()]).result,'PASS');
