@@ -80,6 +80,53 @@ timing, assistance, scoring and progression is still to be settled with evidence
 Maintaining the ability to publish through Git is a setup requirement; checking that ability
 is not authorization to deploy a change. Bounded repairs and preparation follow the order below.
 
+## Catalog, modes and learner-flow decision review — September 17 clarification
+
+Wolf explicitly asked the successor chief to ensure the coming catalog/flow audit clarifies
+game modes, ranked mode, learning paths and related systems because earlier pushes contain
+deferred or changed decisions. **Confirmed: review and resolve these systems together before
+implementing replacement rules.** This is an audit/design requirement, not a decision to add
+ranked mode or restore any retired mode switch.
+
+The next recommended product module, after current groundwork is verified together, is the
+catalog/progression and learner-flow decision review. Keep it within the existing area
+boundaries: Catalog/progression owns the system/dependency map; UI/UX supplies journey
+evidence; learning design supplies skill/Foundations evidence; saved-progress and Payments
+supply constraints. Coordinate their findings through the chief instead of automatically
+starting all those tasks or separate competing rule systems.
+
+Start from current implemented behavior and reuse existing audits. Trace relevant older
+commits, branch proposals and dated feedback only where they explain conflicting rules.
+An old push proves code existed, not that Wolf still wants it. Distinguish implemented
+behavior, Wolf-confirmed direction, carried-forward preference, deferred choice, superseded
+decision and unapproved proposal. Cite source/commit and date; unresolved conflicts come
+back to Wolf rather than being resolved by whichever document or branch is newest.
+
+| System | Choices to make explicit |
+|---|---|
+| Drills and game modes | What a drill, lesson, practice session, challenge and any distinct game mode mean; which deserve separate experiences and which share the same exercise. Do not assume every historical label should survive. |
+| Ranked play and leaderboards | Whether a distinct ranked mode is wanted at all; how competitive eligibility works; timing, retries, hints/assistance, score validity and fair comparison. Distinguish account rank/progression from ranked play. |
+| Learning paths | Recommended routes versus required sequence, prerequisites/unlocks, free exploration, user choice, onboarding recommendations and how paths reuse drills. |
+| Teaching and completion | Guided versus independent work; what help means; success, retry and next-step behavior; retain confirmed assisted-completion-without-XP direction unless Wolf explicitly changes it. |
+| Progress and rewards | Completion, mastery, XP, ranks, achievements and certificates: what each measures, what earns it, and how catalog/path changes preserve earned history. |
+| Access and subscriptions | Guest/account/free/paid boundaries and where they affect the journey. Subscriptions at launch remain required; the exact offer stays open. |
+| Navigation and flow | How first-time beginners, experienced entrants and returning learners find work, move between systems, understand results and choose what to do next. Preserve the general ribbon/workspace foundation. |
+
+Deliver one plain-English system map and a compact decision register: current behavior;
+conflicting prior guidance with provenance; what is already confirmed; options and tradeoffs;
+chief recommendation; Wolf's decision; which earlier rule it replaces; and concrete acceptance
+examples. Show a few end-to-end learner journeys so choices can be assessed together.
+Discuss manageable groups of dependent decisions with Wolf; do not ask him to reconstruct
+history or decide the whole catalog at once.
+
+The existing preference against a practice/ranked switch is specifically on this review's
+agenda. It remains the implementation baseline until Wolf decides otherwise; his request to
+review ranked mode does not by itself reverse that preference. Similarly, structural
+separation must preserve behavior while unsettled rules remain open. No catalog rebuild,
+content deletion, progress reset or new access/reward system follows automatically from
+this audit. Preserve the Foundations feedback sources below. Update this brief with each
+confirmed decision and its superseded rule; CURRENT owns status and task sequencing.
+
 ## Learning decisions and repair order — latest September 17 response
 
 | Area | Wolf's direction | Still open |
@@ -172,8 +219,10 @@ These are carried forward from recorded feedback, not newly approved feature wor
 - Give concrete instructions, useful location cues, and understandable feedback.
 - Keep existing eight-chapter organization pending catalog decisions. The 61-drill rebuild
   is a proposal, not authorization to delete the current 74-drill catalog.
-- Preserve the prior decision against a practice/ranked mode switch. Current rank-unlock
-  behavior and any changes to it should be reviewed within progression work.
+- The earlier preference against a practice/ranked mode switch remains the current implementation
+  baseline. Wolf explicitly placed modes/ranked play and rank-unlock behavior on the upcoming
+  decision-review agenda; do not treat the historical preference as permanently settled or
+  restore a switch before that review.
 
 Sources: `dev/CONTINUITY.md` section 0d and section 0c, `dev/DRILLS_WOLF_LIKED.md`,
 `dev/DRILL_DOCTRINE.md`, and the status correction in `dev/ART_DIRECTION.md`.
@@ -192,7 +241,8 @@ they must not make beginner lessons needlessly difficult.
 The customization dimensions above are a proposal. Wolf confirmed customization, not these
 exact questions. Start with recommendations drawn from a shared, tested catalog; separate
 curricula for every profession are not yet approved. Guided learning and competitive runs
-need clear scoring rules without adding a new mode-selection system.
+need clear scoring rules; whether any mode-selection system is warranted is now explicitly
+part of the pending modes/flow review, not an approved addition.
 
 ## Decisions still needed
 
