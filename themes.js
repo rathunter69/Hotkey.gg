@@ -2384,8 +2384,12 @@ window.hkEffRarity = function(tier, dataPct, fieldN){
 window.hkFoundingRank = function(sb, me){
   try{
     if(!sb || !me || !me.created_at) return;
+    const account=window.hkAccountToken ? window.hkAccountToken() : null;
     sb.from('profiles').select('id',{count:'exact',head:true}).lte('created_at', me.created_at)
-      .then(r=>{ const c=(r && r.count); if(c!=null){
+      .then(r=>{
+        if(account && !window.hkAccountCurrent(account)) return;
+        if(!window._navUser || window._navUser.id!==me.id) return;
+        const c=(r && r.count); if(c!=null){
         try{ const prev=JSON.parse(localStorage.getItem('hk_founding')||'{}');
           localStorage.setItem('hk_founding', JSON.stringify({rank:c, class:c<=100, partner:!!prev.partner})); }catch(e){}
       } })

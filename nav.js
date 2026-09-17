@@ -13,6 +13,22 @@
 (function(){
   'use strict';
 
+  // Every account lifetime has its own token, including A -> B -> A switches.
+  let accountGeneration=0, authRead=0;
+  let accountOwner=(window._navUser && window._navUser.id)||'';
+  try{ accountOwner=localStorage.getItem('hk_xp_uid') || accountOwner; }catch(e){}
+  window.hkAccountToken=()=>({id:(window._navUser && window._navUser.id)||'', generation:accountGeneration});
+  window.hkAccountCurrent=token=>!!token && token.generation===accountGeneration && token.id===((window._navUser && window._navUser.id)||'');
+  function setAccountUser(user){
+    const id=(user && user.id)||'';
+    if(accountOwner && accountOwner!==id) clearAccountUI({preserveSession:true});
+    if(accountOwner!==id){ accountGeneration++; __pdCache=null; window._navProfile=null; }
+    accountOwner=id;
+    window._navUser=user || null;
+    return window.hkAccountToken();
+  }
+  function requireAccount(token){ if(!token.id || !window.hkAccountCurrent(token)) throw new Error('Account changed'); }
+
   // ---------------------------------------------------------------
   // THEMES — the palette, applyTheme(), currentTheme, and the no-FOUC initial apply now
   // live in themes.js (single source of truth). Each page loads themes.js in <head> BEFORE
@@ -268,6 +284,7 @@
   function closeProfile(){ profileOpen=false; const m=$('profileModal'); if(m) m.classList.remove('show'); }
   async function openProfile(){
     const m=$('profileModal'); if(!m) return;
+    const account=window.hkAccountToken();
     profileOpen=true; m.classList.add('show');
     if(!window.sb || !window._navUser){
       m.innerHTML='<div class="pc-card"><a class="modal-x">\u00d7</a><div class="pc-msg">Sign in to see your card and where you rank against the field.</div>'+
@@ -279,8 +296,10 @@
     m.innerHTML='<div class="pc-card"><div class="pc-msg">loading your card\u2026</div></div>';
     try{
       const data = await loadProfileData();
+      if(!window.hkAccountCurrent(account)) return;
       renderProfile(m, data);
     } catch(e){
+      if(!window.hkAccountCurrent(account)) return;
       m.innerHTML='<div class="pc-card"><a class="modal-x">\u00d7</a><div class="pc-msg">Couldn\u2019t load the rankings right now \u2014 check your connection and try again.</div>'+
         '<div class="pc-foot"><span></span><a id="pcClose">close</a></div></div>';
       const c=$('pcClose'); if(c) c.onclick=closeProfile;
@@ -316,8 +335,10 @@
      the rank level never got the sync. Level is universal progression, not a
      competitive-ranked concept, so hydrate it for ANY signed-in user. Memoized fetch. */
   async function hydrateLevel(){
+    const account=window.hkAccountToken();
     try{
       const d = await loadProfileData();
+      requireAccount(account);
       const srvXp=computeXP(d, d.myRuns, d.mySessions);
       const owner=localStorage.getItem('hk_xp_uid')||'';
       const prev=parseInt(localStorage.getItem('hk_xp_est')||'0',10)||0;
@@ -365,6 +386,7 @@
      (and it still said "mid"). One pill renderer now; every surface calls it. */
   window.hkRankPillHtml = pillHtml;
   async function navRank(){
+    const account=window.hkAccountToken();
     const el=$('navRankPill'); if(!el) return;
     /* r406/r407 (Wolf): the owner account sees the WHOLE site — ranked on + every gateway/
        cosmetic unlocked (hk_dev_unlock_cosmetics is the master switch hkFrameUnlocked honors), so his
@@ -397,13 +419,13 @@
       return;
     }
     try{ const c=JSON.parse(sessionStorage.getItem('hk_rank3')||'null');
-      if(__opted && c && c.exp>Date.now()){ el.innerHTML=pillHtml(c.n, c.b);   /* r423: cache carries the bucket; an old bucketless cache renders rank-only until refresh */
+      if(__opted && c && c.uid===account.id && c.exp>Date.now()){ el.innerHTML=pillHtml(c.n, c.b);   /* r423: cache carries the bucket; an old bucketless cache renders rank-only until refresh */
         el.className='pc-tier '+c.c+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile; return; } }catch(e){}
     if(!__opted){
       /* r406 (Wolf): sync level even below the rank level \u2014 fire-and-forget so the chip paints now.
          r455: the predicate reads the level cache hydrateLevel writes (hk_xp_est), so a fresh device
          may read "Unranked" for one tick; when the hydrated level crosses the line, re-render. */
-      hydrateLevel().then(()=>{ try{ if(window.hkRankedEntered && window.hkRankedEntered()) navRank(); }catch(e){} });
+      hydrateLevel().then(()=>{ if(!window.hkAccountCurrent(account)) return; try{ if(window.hkRankedEntered && window.hkRankedEntered()) navRank(); }catch(e){} });
       el.innerHTML='<span>Unranked</span>';
       el.className='pc-tier tier-unranked topnav-rank'; el.style.display='inline-flex';
       el.title='ranked opens at LVL '+((window.HK_RANK&&HK_RANK.RANKED_MIN_LVL)||10); el.onclick=openProfile;
@@ -411,6 +433,7 @@
     }
     try{
       const d = await loadProfileData();
+      requireAccount(account);
       // r117: LEVEL PERSISTENCE — nav chip & in-game level run on a local estimate
       // (hk_xp_est); a returning player on a fresh device read LVL 1 while their card
       // knew better. Hydrate from canonical XP (PB-hydration pattern, r83). SET, not
@@ -441,7 +464,7 @@
       persistTierBest(t.i, t.bucket);   // r373: plaque-frame unlocks latch the high-water tier (r376: + its bucket)
       el.innerHTML=pillHtml(t.name, t.bucket);   /* r423 (Wolf): rank AND bucket on the pill */
       el.className='pc-tier '+t.cls+' topnav-rank'; el.style.display='inline-flex'; el.onclick=openProfile;
-      try{ sessionStorage.setItem('hk_rank3', JSON.stringify({n:t.name,c:t.cls,b:t.bucket,exp:Date.now()+6e5})); }catch(e){}
+      try{ sessionStorage.setItem('hk_rank3', JSON.stringify({uid:account.id,n:t.name,c:t.cls,b:t.bucket,exp:Date.now()+6e5})); }catch(e){}
       try{ maybeRankReveal(levelOf(computeXP(d, d.myRuns, d.mySessions)).lvl); }catch(e){}   // r455: the one-time reveal
     }catch(e){}
   }
@@ -449,7 +472,13 @@
   // hydrate them (sessionStorage rank, localStorage xp estimate + handle) survived, and the
   // rank pill is its OWN element renderAuthBar never touches. Wipe all of it so a guest never
   // sees stale account info — used by the sign-out button AND the reactive SIGNED_OUT event.
-  function clearAccountUI(){
+  function clearAccountUI(options){
+    accountGeneration++; authRead++; __pdCache=null; accountOwner='';
+    window._navUser=null; window._navProfile=null;
+    try{ window.hkStateCancel && window.hkStateCancel(); }catch(e){}
+    closeProfile(); closeUserMenu();
+    const modal=$('profileModal'); if(modal) modal.innerHTML='';
+    const gallery=$('frameGallery'); if(gallery) gallery.remove();
     try{ localStorage.removeItem('hk_handle_cache'); localStorage.removeItem('hk_xp_est'); }catch(e){}
     try{ sessionStorage.removeItem('hk_rank3'); }catch(e){}
     const rp=$('navRankPill'); if(rp){ rp.style.display='none'; rp.innerHTML=''; }
@@ -465,7 +494,7 @@
       ['hotkey_pb','hk_runs_lite','hotkey_solves','hotkey_streak','hk_camp_xp','hk_clears',
        'hk_clears_day','hk_key_counts','hk_keys_lifetime','hk_keystats_seeded','hk_ach_flags',
        'hk_ach_seen','hk_feat_ach','hk_band_best','hk_dc_done','hk_rank_reveal_seen','hk_seen_tier',
-       'hk_xlv','hk_last_drill','hk_placement_done','hk_dev_unlock_cosmetics','hk_beta_unlock',
+       'hk_xlv','hk_xp_uid','hk_founding','hotkey_last_drill','hk_last_drill','hk_placement_done','hk_dev_unlock_cosmetics','hk_beta_unlock',
        'hk_dev_unlock','hk_dc_top10','hk_seen_frames','hk_run_outbox','hk_entitled',
        'hk_tour_done','hk_rank_seen'].forEach(k=>localStorage.removeItem(k));   /* r451: hk_beta_unlock renamed hk_dev_unlock_cosmetics; the OLD key stays in this list one round so a device carrying it from a pre-r451 build still gets wiped on sign-out. r416 bugfix: this flag (the master cosmetic-unlock switch the owner shim sets) was NOT wiped on sign-out, so the next account on a shared machine inherited every skin unlocked. r417 audit: hk_dev_unlock (ranked-gate bypass leaked to the next account), hk_dc_top10 (blocked the next account's daily bounty), hk_seen_frames (stale reveal diff), hk_run_outbox (foreign-user rows retried forever under RLS). r450: hk_entitled — the PRE-STRIPE entitlement stub that drills.js hkEntitlementRead() reads. It is an ACCOUNT entitlement mirrored on the device, so it must die with the session exactly like hk_beta_unlock did; whoever wires Stripe keeps it in this list, or drops the key here in the same commit if the read moves to an in-memory server flag. */
       for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
@@ -478,7 +507,7 @@
     // re-hydrates the session and you're logged back in. Nuke the token ourselves so the
     // reload ALWAYS starts logged out, hung round-trip or not. (default storageKey = sb-<ref>-auth-token)
     try{
-      for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
+      if(!(options && options.preserveSession)) for(let i=localStorage.length-1;i>=0;i--){ const k=localStorage.key(i);
         if(k && (/^sb-.*-auth-token$/.test(k) || k==='supabase.auth.token')) localStorage.removeItem(k); }
     }catch(e){}
     // r387 (Wolf): the reactive SIGNED_OUT path clears storage but doesn't reload the
@@ -498,13 +527,25 @@
      AFTER the await, so the burst of concurrent callers on page load (navRank, hydrateLevel,
      renderProfile) each saw null and fired a full profiles+ENTIRE-runs-table+
      sessions fetch. Caching the in-flight promise collapses them to one. */
-  function loadProfileData(){ return __pdCache || (__pdCache = __loadProfileData()); }
-  async function __loadProfileData(){
+  function loadProfileData(){
+    const account=window.hkAccountToken();
+    if(!account.id) return Promise.reject(new Error('Not signed in'));
+    if(__pdCache && __pdCache.id===account.id && __pdCache.generation===account.generation) return __pdCache.promise;
+    const entry={id:account.id,generation:account.generation};
+    entry.promise=__loadProfileData(account).catch(error=>{ if(__pdCache===entry) __pdCache=null; throw error; });
+    __pdCache=entry;
+    return entry.promise;
+  }
+  async function __loadProfileData(account){
+    requireAccount(account);
     const p = await window.sb.from('profiles').select('id,handle,flair,featured_ach,school_tag,show_school,team_code');
+    requireAccount(account);
     const r = await window.sb.from('runs').select('user_id,challenge,time_ms,created_at,keystrokes,optimal').eq('mouse_used',false).order('time_ms',{ascending:true});   /* r371: keystrokes+optimal feed the efficiency feats */
+    requireAccount(account);
     let mySessions=[];
-    try{ const se=await window.sb.from('sessions').select('user_id,mode').eq('user_id', window._navUser.id);
+    try{ const se=await window.sb.from('sessions').select('user_id,mode').eq('user_id', account.id);
       mySessions=se.data||[]; }catch(e){}
+    requireAccount(account);
     const profs = p.data || [], runs = r.data || [];
     const names = {}; profs.forEach(x => names[x.id] = x.handle || 'anon');
     const per = {}; MENU_ORDER.forEach(k => per[k] = []);
@@ -514,7 +555,7 @@
       const key = x.challenge + '|' + x.user_id;
       if(!seen[key]){ seen[key] = true; per[x.challenge].push(x); }
     });
-    const me_id = window._navUser.id;
+    const me_id = account.id;
     const drills = MENU_ORDER.map(k => {
       const best = per[k], total = best.length;
       const idx = best.findIndex(b => b.user_id === me_id);
@@ -645,6 +686,7 @@
     }catch(e){ if(onDone) onDone(false); }
   }
   function renderProfile(m, d){
+    const profileAccount=window.hkAccountToken();
     const tier = tierOf(d.avgPct, d.attempted, d.wsum);
     persistTierBest(tier.i, tier.bucket);   // r373: the card render is a rank fetch too — latch here as well (r376: + bucket)
     const fmtMs = ms => (ms/1000).toFixed(2) + 's';
@@ -984,6 +1026,7 @@
             : fr.name+' \u2014 '+(fr.desc||'yours to wear')); };
       g.querySelectorAll('.flair-opt').forEach(b=>{ b.onmouseenter=()=>hintFg(b);
         b.onclick=async()=>{
+        if(!window.hkAccountCurrent(profileAccount)) return;
         hintFg(b);
         if(b.dataset.locked==='1'){
           const fr=(window.HK_FRAMES||[]).find(x=>x.id===b.dataset.flair);
@@ -991,7 +1034,8 @@
         }
         const f=b.dataset.flair==='none'?null:b.dataset.flair;
         try{
-          const {error}=await window.sb.from('profiles').update({flair:f}).eq('id', window._navUser.id);
+          const {error}=await window.sb.from('profiles').update({flair:f}).eq('id', profileAccount.id);
+          if(!window.hkAccountCurrent(profileAccount)) return;
           if(error){ sayFg('Couldn\u2019t save \u2014 try again.', true); return; }
           myFlair=f;
           try{ const meRow=(d._profs||[]).find(x=>x.id===window._navUser.id); if(meRow) meRow.flair=f; }catch(e){}
@@ -1015,20 +1059,61 @@
     if(btn) btn.classList.remove('open');
     if(dd)  dd.classList.remove('open');
   }
+  const authClients=new WeakSet();
+  function ensureAuthSubscription(){
+    const client=window.sb;
+    if(!client || authClients.has(client)) return;
+    authClients.add(client);
+    try{
+    // React to sign-in / sign-out across tabs.
+    // r266: the callback body is DEFERRED (setTimeout 0) — supabase-js v2 holds its auth
+    // lock while emitting, and the profiles query inside re-acquires that same lock via
+    // getSession(); querying synchronously here deadlocked the fetch until a page refresh.
+    client.auth.onAuthStateChange((_evt, session) => {
+      if(window.sb!==client) return;
+      // Invalidate old responses immediately; only database work waits for the auth lock.
+      const account=setAccountUser(session && session.user || null);
+      const eventRead=++authRead;
+      setTimeout(() => { try{
+      if(eventRead!==authRead) return;
+      if(window._navUser){
+        renderAuthBar();   // r297: eager render here too — the sign-in must show even if the profile fetch stalls
+        window.sb.from('profiles').select('id,handle').eq('id', account.id).maybeSingle().then(({ data: prof }) => {
+          if(!window.hkAccountCurrent(account)) return;
+          window._navProfile = prof || null;
+          renderAuthBar();
+          try{ navRank(); }catch(e){}   // r228 (Wolf): populate the rank pill on SIGN-IN, not only on the next refresh (the boot poll had already given up)
+        });
+      } else {
+        window._navProfile = null;
+        // An ownerless INITIAL_SESSION is a returning guest, not a sign-out.
+        // setAccountUser already cleared any actual previous-account transition.
+        if(_evt==='SIGNED_OUT') clearAccountUI();
+        renderAuthBar();
+      }
+    }catch(e){} }, 0); });
+    }catch(e){ authClients.delete(client); }
+  }
   window.__navAuthKick = async function(){
+    ensureAuthSubscription();
+    const read=++authRead;
     try{
       if(window.sb){
         const { data } = await window.sb.auth.getSession();
-        window._navUser = data && data.session ? data.session.user : null;
+        if(read!==authRead) return;
+        const account=setAccountUser(data && data.session ? data.session.user : null);
         if(window._navUser){
           try{ if(window.hkFoundingRank) window.hkFoundingRank(window.sb, window._navUser); }catch(e){}   // r389: founding-cohort flag, cached for every page's ctx
-          try{ const p = await window.sb.from('profiles').select('handle,flair,theme').eq('id', window._navUser.id).maybeSingle();
+          try{ const p = await window.sb.from('profiles').select('handle,flair,theme').eq('id', account.id).maybeSingle();
+            if(!window.hkAccountCurrent(account)) return;
             window._navProfile = p && p.data ? p.data : null; }catch(e){}
           /* r358: merge the account's cross-device state down BEFORE the pill/streak render.
              Separate query on purpose — if the migration hasn't run, ONLY this fails, never
              the handle/theme fetch above. */
-          try{ const cs = await window.sb.from('profiles').select('client_state').eq('id', window._navUser.id).maybeSingle();
+          try{ const cs = await window.sb.from('profiles').select('client_state').eq('id', account.id).maybeSingle();
+            if(!window.hkAccountCurrent(account)) return;
             if(cs && cs.data && cs.data.client_state && window.hkStateHydrate) window.hkStateHydrate(cs.data.client_state); }catch(e){}
+          if(!window.hkAccountCurrent(account)) return;
           // r293: account theme lands on devices with no local pick yet (mobile carry)
           try{ const th=window._navProfile && window._navProfile.theme;
             if(th && window.THEMES && window.THEMES[th] && !localStorage.getItem('hotkey_theme')){
@@ -1272,40 +1357,26 @@
       // validation that returns null on any hiccup) — getUser was why the dropdown showed
       // "logged out" while the page body, which uses getSession, showed logged in. One
       // source of truth across nav + every page.
+      ensureAuthSubscription();
+      const initialRead=++authRead;
       window.sb.auth.getSession().then(({ data }) => {
-        window._navUser = (data && data.session && data.session.user) || null;
+        if(initialRead!==authRead) return;
+        const account=setAccountUser((data && data.session && data.session.user) || null);
         // r297 (Wolf: "open my browser, still logged in, but it doesn't show my account"):
         // render the signed-in state EAGERLY off the cached session — the handle refines
         // when the profile lands. Before this, a slow/failed profiles fetch left the auth
         // slot empty forever even though the session was right there.
         renderAuthBar();
         if(window._navUser){
-          window.sb.from('profiles').select('id,handle').eq('id', window._navUser.id).maybeSingle().then(({ data: prof }) => {
+          window.sb.from('profiles').select('id,handle').eq('id', account.id).maybeSingle().then(({ data: prof }) => {
+            if(!window.hkAccountCurrent(account)) return;
             window._navProfile = prof || null;
             renderAuthBar();
             try{ navRank(); }catch(e){}   // r228 (Wolf): populate the rank pill on SIGN-IN, not only on the next refresh (the boot poll had already given up)
           });
         }
       }).catch(() => renderAuthBar());
-      // React to sign-in / sign-out across tabs.
-      // r266: the callback body is DEFERRED (setTimeout 0) — supabase-js v2 holds its auth
-      // lock while emitting, and the profiles query inside re-acquires that same lock via
-      // getSession(); querying synchronously here deadlocked the fetch until a page refresh.
-      window.sb.auth.onAuthStateChange((_evt, session) => { setTimeout(() => { try{
-        window._navUser = session && session.user || null;
-        if(window._navUser){
-          renderAuthBar();   // r297: eager render here too — the sign-in must show even if the profile fetch stalls
-          window.sb.from('profiles').select('id,handle').eq('id', window._navUser.id).maybeSingle().then(({ data: prof }) => {
-            window._navProfile = prof || null;
-            renderAuthBar();
-            try{ navRank(); }catch(e){}   // r228 (Wolf): populate the rank pill on SIGN-IN, not only on the next refresh (the boot poll had already given up)
-          });
-        } else {
-          window._navProfile = null;
-          clearAccountUI();      // r226: SIGNED_OUT (incl. from another tab) — clear the stale rank/level reactively
-          renderAuthBar();
-        }
-      }catch(e){} }, 0); });
+
     } else {
       renderAuthBar();
     }
@@ -1405,12 +1476,14 @@ window.HK_DESK_CREATE_PRO = true;
 window.hkDeskCreatePro = (function(){
   let cached=null;
   return async function(){
+    const account=window.hkAccountToken();
     if(!window.HK_DESK_CREATE_PRO) return true;
-    if(cached!==null) return cached;
+    if(cached && window.hkAccountCurrent(cached.account)) return cached.pro;
     let pro=false;
     try{ if(window.sb){ const {data}=await window.sb.rpc('my_pro_status');
       const s=(data&&data[0])||null; pro=!!(s&&s.pro); } }catch(e){ pro=false; }
-    cached=pro; return pro;
+    if(!window.hkAccountCurrent(account)) return false;
+    cached={account,pro}; return pro;
   };
 })();
 
@@ -1435,16 +1508,17 @@ window.hkDeskCreatePro = (function(){
     streak: gj(K.streak,'{}')||{},
     dc_done: (function(){ try{ return localStorage.getItem(K.dcDone)||''; }catch(e){ return ''; } })(),
     dc_top10: (function(){ try{ return localStorage.getItem(K.dcTop)||''; }catch(e){ return ''; } })() }; }
-  async function pushNow(){
+  async function pushNow(account){
     try{
-      if(dead || !window.sb) return;
+      if(dead || !window.sb || !window.hkAccountCurrent(account)) return;
       const u=window._navUser; if(!u || !u.id) return;   // guests sync too — the anon row upgrades WITH them
       const { error } = await window.sb.from('profiles')
         .update({ client_state: snapshot(), client_state_at: new Date().toISOString() }).eq('id', u.id);
-      if(error && /client_state|column|schema/i.test(error.message||'')) dead=true;   // migration not run yet
+      if(window.hkAccountCurrent(account) && error && /client_state|column|schema/i.test(error.message||'')) dead=true;   // migration not run yet
     }catch(e){}
   }
-  window.hkStatePush=function(){ try{ clearTimeout(t); t=setTimeout(pushNow, 2500); }catch(e){} };
+  window.hkStateCancel=function(){ clearTimeout(t); t=null; };
+  window.hkStatePush=function(){ try{ const account=window.hkAccountToken(); clearTimeout(t); t=setTimeout(()=>pushNow(account), 2500); }catch(e){} };
   window.hkStateHydrate=function(cs){
     try{
       if(!cs || typeof cs!=='object') return false;
@@ -1672,7 +1746,9 @@ window.hkCelebrate = function(o){
      id+handle, not flair, so we must fetch to avoid dropping a saved loadout), swap only the
      frame, pack it back. Preserves title / shown-elements / highlighted stats. */
   let equipping=false;
+  const equipAccount=window.hkAccountToken();
   const doEquip=async(btn)=>{
+    if(!window.hkAccountCurrent(equipAccount)) return;
     if(!eq || equipping) return;
     const msg=w.querySelector('.hk-cel-eqmsg');
     /* r411 (Wolf): a guest can't own a skin yet — the equip CTA converts to sign-up. Close the
@@ -1687,11 +1763,13 @@ window.hkCelebrate = function(o){
     equipping=true; if(btn){ btn.disabled=true; btn.textContent='equipping…'; }
     try{
       let curRaw=null;
-      try{ const {data}=await window.sb.from('profiles').select('flair').eq('id',window._navUser.id).maybeSingle(); curRaw=(data&&data.flair)||null; }catch(_){}
+      try{ const {data}=await window.sb.from('profiles').select('flair').eq('id',equipAccount.id).maybeSingle(); curRaw=(data&&data.flair)||null; }catch(_){}
+      if(!window.hkAccountCurrent(equipAccount)) return;
       const l = window.hkFlair ? window.hkFlair(curRaw) : {frame:null};
       l.frame = eq.frameId;
       const packed = window.hkFlairPack ? window.hkFlairPack(l) : eq.frameId;
-      const {error} = await window.sb.from('profiles').update({flair:packed}).eq('id', window._navUser.id);
+      const {error} = await window.sb.from('profiles').update({flair:packed}).eq('id', equipAccount.id);
+      if(!window.hkAccountCurrent(equipAccount)) return;
       if(error){ equipping=false; if(msg) msg.textContent='couldn’t save — try again'; if(btn){ btn.disabled=false; btn.textContent='equip now'; } return; }
       try{ if(window._navProfile) window._navProfile.flair=packed; }catch(_){}
       try{ if(window.navRefreshAuth) window.navRefreshAuth(); }catch(_){}
