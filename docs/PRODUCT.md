@@ -34,6 +34,16 @@ The twelve task boundaries in CURRENT.md and TASK_GUIDE.md govern ownership; the
 here organize product decisions, not a competing task list. Wolf requires non-secret continuity
 to be committed and pushed to GitHub so another computer can resume the work.
 
+## Repository-structure follow-up — September 17
+
+Wolf's next request authorized orchestrating testing/security groundwork and making the GitHub
+repository structure cleaner. Bring one bounded, behavior-preserving documentation/structure
+cleanup forward alongside that groundwork. Keep security fixes and structural moves separately
+reviewable. This does not change the later catalog/progression, site or learning-design direction,
+or authorize a framework rewrite, content/progress reset, live release or billing activation.
+The assigned scopes and evidence belong in CURRENT.md; file paths are implementation details,
+not new learning/access rules.
+
 ## Wolf's review guidance — September 17 follow-up
 
 **Preserve:** the general UI/UX, ribbon and game workspace feel good. The broad feature set
