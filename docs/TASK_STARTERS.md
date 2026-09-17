@@ -22,7 +22,9 @@ Use focused audit/repair/review agents economically. Follow the chief-orchestrat
 ```text
 Start the Catalog and progression architecture task for rathunter69/Hotkey.gg from codex/repository-foundation (or its integrated successor in docs/CURRENT.md). Read AGENTS.md, docs/TASK_GUIDE.md and the linked area evidence.
 
-Propose the smallest separation between drills, paths, rewards, certificates and access. Show how changing a path preserves earned progress. Keep this first turn to design and evidence.
+First reconcile game modes, ranked play, drills, learning paths and the learner flow using the systems-review brief in docs/PRODUCT.md. Compare current behavior with dated feedback and conflicting or deferred older pushes; distinguish confirmed choices from historical proposals. Present a plain-English system map, a short decision register with options/recommendations, and a few learner journeys for Wolf to settle. His request to review ranked play does not authorize restoring a retired mode switch.
+
+Propose the smallest separation between drills, paths, completion/assistance, rewards, certificates and access. Show how changing a path preserves earned progress. Keep this first turn to design and evidence; new behavior waits for the relevant product decisions. Coordinate existing UI/learning/progress/payments owners without automatically starting their modules.
 
 Use focused audit/repair/review agents economically. Follow the chief-orchestrator boundaries. Save the outcome, checks, limits, decisions and next step in docs/handoffs/catalog-progression.md; commit and push the handoff to this task's branch and verify its GitHub link. Do not merge main or deploy. Use concise, plain English.
 ```
