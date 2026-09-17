@@ -157,6 +157,29 @@ content deletion, progress reset or new access/reward system follows automatical
 this audit. Preserve the Foundations feedback sources below. Update this brief with each
 confirmed decision and its superseded rule; CURRENT owns status and task sequencing.
 
+### First catalog/flow evidence checkpoint — decisions pending
+
+The [reviewed system map and decision register](https://github.com/rathunter69/Hotkey.gg/blob/0151c3d57639ccf7508b87a2db096c4f92f81cd0/docs/handoffs/catalog-progression.md)
+is saved from accepted application baseline 00df57a. It is source-based planning evidence,
+not a fresh public-site playtest or approved replacement design. The chief verified the remote
+commit adds only that handoff; the area records focused investigation and independent review.
+
+Wolf has been asked the first three choices in the dedicated review:
+1. **D1:** share an exercise between teaching and independent retries, or separate lessons/drills.
+2. **D2:** explicit scored attempts, automatic eligible posting, or defer public competition.
+3. **D3:** advisory paths without XP/speed locks, advanced prerequisite checks, or existing locks.
+
+All three remain **pending**. The area recommends a shared exercise, explicit scored attempt
+and advisory paths; these are proposals, not confirmed decisions. No older rule is superseded
+until Wolf answers. Avoid asking the same questions again in the chief session; reconcile the
+answers here and discuss their consequences for the overall platform specification.
+
+The source review found inconsistent help/reward treatment, progression locks despite billing
+being off, distinctions between rank eligibility and score posting, and overlapping active/
+dormant session types. These findings explain the decision agenda; they do not authorize
+automatic repairs, mode removal or new access rules. Next discussion after D1–D3 is assistance,
+timing and rewards. Foundations feedback and existing progress remain protected.
+
 ## Learning decisions and repair order — latest September 17 response
 
 | Area | Wolf's direction | Still open |
