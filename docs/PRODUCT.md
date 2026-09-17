@@ -104,8 +104,7 @@ Leaderboards and persistent progress need clearer rules and verification. Code r
 security and unfinished behavior need attention before adding more features.
 
 Excel fidelity and accessibility for beginners must work together. Preserve familiar Excel
-behavior while making instructions, feedback and difficulty approachable. How to handle
-the remaining retry, scoring and progression details must follow the confirmed policies below
+behavior while making instructions, feedback and difficulty approachable. The remaining retry, scoring and progression details must follow the confirmed policies below
 and be settled with evidence and Wolf.
 
 Maintaining the ability to publish through Git is a setup requirement; checking that ability
