@@ -1,418 +1,192 @@
 # Current project state
 
-Updated 2026-09-17. Source baseline: remote `main` refreshed through GitHub at
-`434bc0e8764e741e0e11f84cf51d61a1755d7c67` (PR #250 merged, 2026-09-05).
-Repository evidence is supplemented by the read-only Supabase inventory in
-[TRANSITION_REVIEW.md](TRANSITION_REVIEW.md). Production website and billing remain unverified.
+Updated 2026-09-17. Chief coordinator: task `01a0b0fa-d857-7002-ab95-1da0a1cfb858`,
+succeeding `01a0af30-bac0-7b73-9d9e-56f298996c1a`.
+Repository: **rathunter69/Hotkey.gg**. Shared guidance: **codex/repository-foundation**.
+[PRODUCT.md](PRODUCT.md) owns product decisions; [TASK_GUIDE.md](TASK_GUIDE.md) owns the working
+method and area boundaries; [TASK_STARTERS.md](TASK_STARTERS.md) supplies the twelve starters.
+This is the single current queue. Historical guidance does not authorize more work.
 
-## Active objective
+## Current objective and authority
 
-**Master planning and shared context only; repairs belong in dedicated area tasks.**
-Wolf's latest September 17 instruction is to establish confidence in the inherited code and
-setup, and to provide clear guidance across every part of the platform before moving forward.
-The earlier October 1 launch schedule is parked. Subscriptions at launch and customized
-onboarding remain future requirements. See [PRODUCT.md](PRODUCT.md) for the guidance review.
-Handover branch: `codex/repository-foundation` in `rathunter69/Hotkey.gg`.
-Wolf requires continuity on GitHub so work can resume without this PC. This checkpoint contains
-the shared guidance, audit, task starters and existing foundation tooling. The baseline main
-commit above describes the application reviewed, not the tip of the handover branch. Use this
-branch's current remote commit when starting another task, and verify the guidance files exist.
-Saving a checkpoint does not establish that it is merged, deployed, or fully CI-validated.
-Remote checkpoint verified September 17: `d3b244fe62d7d57de73845e2cabe7a0166aa02d0`.
-Five reviewed commits preserve all 41 selected entries: guidance, twelve starters, audit evidence,
-reusable synthetic reproduction, existing foundation tooling and historical-status corrections.
-Remote blob hashes matched every saved file and both intended cache-file deletions; main remained
-at `434bc0e8764e741e0e11f84cf51d61a1755d7c67`. This status note is saved in a subsequent commit;
-use the branch tip for the latest guidance. At that checkpoint no application repair, main merge
-or production deployment was performed. Its exact pinned installation/full CI were unverified;
-subsequent area evidence and remaining limits are recorded in the current status below.
-This task is the chief orchestrator for priorities, cross-area product decisions and handoff
-integration. [TASK_STARTERS.md](TASK_STARTERS.md) contains all twelve prompts. Area tasks maintain
-their own reports under docs/handoffs/ and return verified remote links. They propose changes
-to CURRENT.md/PRODUCT.md; the chief integrates them or explicitly delegates one update.
+The chief owns planning, priorities, shared product guidance and coordination. Application
+repairs and integration remain in dedicated tasks. Wolf's latest request is to orchestrate
+testing/security groundwork, review security and the GitHub file structure, and make that
+structure cleaner. It authorizes the bounded batches below, including bringing one small
+repository-organization change forward. It does not start every later roadmap module.
 
-The existing foundation is sufficient to begin scoped local repairs and product guidance.
-Git/testing's remote handoff verifies the exact pinned dependency installation and a limited
-local baseline on its own branch. The combined account/testing baseline is now accepted from
-its separate integration branch (evidence below). Remaining enabling work: the full exact-source
-CI gate, isolated database permission/migration tests, and a reviewed
-release/rollback path. These belong to Git/testing with Security support; they do not require a new frontend framework or another general audit.
-No production security repair or billing activation should rely on those unverified release steps.
-Wolf's latest clarification reserves this conversation for the overarching plan, roadmap and
-context. The initial account-repair agent was stopped before editing any files. Wolf has now
-started separate area tasks; their current status is recorded below. Keep application
-implementation in those tasks.
+Preserve the general UI, ribbon and game workspace. Pixel art is for identity/achievements.
+The chosen product sequence remains security/account work → catalog/progression separation
+→ targeted cleanup → site structure/interactions → fully planned catalog rebuild preserving
+Foundations feedback. The newly authorized documentation/structure batch is a specific early
+cleanup, not a replacement of that sequence.
 
-The foundation change adds the README and source map, marks old handoffs as historical,
-inventories all 14 non-main remote branches, and introduces shared local/CI check commands.
-All seven static checks passed again September 17. The local runner's wrong-page defect was
-repaired; all 86 onboarding assertions and all five smoke suites passed using the bundled
-Playwright 1.62.1 and installed Chrome 152. Those are historical foundation results. The later
-Git/testing handoff verifies pinned Playwright 1.49.1 with its matching headless shell; the
-full CI gate remains unverified. See [platform audit](audit/README.md) for detailed coverage.
-No product behavior, database records, billing settings or deployments were changed.
-Wolf explicitly requested parallel audit agents. The first coordinated experience/pages,
-engine/content, data/security and delivery/testing pass is complete, with evidence and remaining
-coverage gaps in the linked audit. Existing checks passed; independent probes found defects.
-Task-appropriate model/effort choices and avoiding excess usage are now recorded in AGENTS.md.
-Wolf's subsequent clarification keeps drill/mode/path interactions open for improvement while
-preserving the visual foundation. Catalog changes forcing progression/achievement changes are a
-specific cleanup concern. ARCHITECTURE.md now maps those dependencies and proposes separation;
-no catalog replacement, progress reset or interaction redesign has been implemented. Wolf now
-prefers a future full catalog rebuild with his Foundations feedback preserved, after an agreed plan.
+The October 1 deadline is parked. Subscriptions at launch and customized onboarding remain
+future requirements. Broad feature/content development, live billing and catalog rebuilding
+stay paused. Guided beginner learning, assisted completion without XP, and freely explored
+basics with recommended paths are direction for future design; existing rules stay unchanged
+until the relevant decisions and implementation are approved. Exact timing, assessment,
+paid boundaries, certificates, supported platforms and business facts remain open in PRODUCT.
 
-## Active groundwork and structure batch — September 17 follow-up
+No main merge, deployment, production data changes, table removal, progress reset or broad
+framework rewrite is authorized. Structural moves and security/gameplay changes must remain
+separately reviewable. Do not restore retired tours, invite gates, membership tables or the
+practice/ranked mode switch from historical instructions.
 
-Source: Wolf asked the successor chief to orchestrate testing/security groundwork, review
-security and the GitHub file structure, and make that structure cleaner. This explicitly
-brings a bounded repository-organization batch forward alongside groundwork; it does not
-start catalog/progression implementation or the later site/catalog redesign.
+## Verified source and validation baseline
 
-The chief coordinates and reviews evidence. Existing area tasks execute the following
-non-overlapping scopes from the accepted integration checkpoint `6c98416` (tested code
-`c702c69`), while reading the current remote foundation guidance. Preserve the original
-dirty checkout and all prior area branches. Do not roll back accepted account/test changes.
-
-| Existing task / owner | Authorized bounded batch | File reservations |
-|---|---|---|
-| **Establish testing and blockers**, `01a0af90-b973-7572-b7ff-d5bf9f504a52` | Finish browser isolation across the full gate and generators; run the complete pinned suite in a suitable isolated environment, aiming for Linux CI evidence. Repair test-infrastructure failures; report unrelated application failures without silently changing gameplay. | `.github/workflows/gate.yml`, any new test-only CI workflow, `dev/run-checks.js`, browser helper/canary and browser harnesses/generator isolation, `docs/DEVELOPMENT.md`, testing handoff. Coordinate port 8791. |
-| **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947` | Security groundwork: establish/review a disposable database test setup with outbound denial and scheduling disabled; create synthetic direct-table/RPC role cases for DATA-01 and document the current failing boundaries. Review adjacent DATA-02/03 acceptance needs using existing evidence. | `supabase/tests/` (new tests only), security-specific test tooling/docs, `docs/testing-database.md`, security handoff. No migration, runtime or production edits in this batch. |
-| **Audit starter 3 cleanup candidates**, `01a0af90-7fb2-7571-a5d6-b82354d57540` | Review repository layout and implement one safe, behavior-preserving documentation/archive organization batch. Trace and update consumers, preserve history and Foundations feedback, return a clear before/after layout and remaining proposal. | `README.md`, `docs/ARCHITECTURE.md`, selected historical documentation/archive paths and non-shared documentation links; `docs/handoffs/repository-structure.md`. No browser harness, runtime, generated page, migration or `.github/workflows/` edits. |
-| **Chief coordinator**, `01a0b0fa-d857-7002-ab95-1da0a1cfb858` | Review GitHub security/release configuration and structure evidence, coordinate boundaries, reconcile remote handoffs and next choices. | `docs/CURRENT.md`, `docs/PRODUCT.md`. Other tasks submit proposed changes to these two files. |
-
-The additional database-assessment task stays paused to avoid duplicate cleanup work.
-Security and testing coordinate any proposed CI database job before touching the same workflow.
-A missing disposable environment is a blocker to database execution, never permission to use
-production. Tests may expose expected security failures; record them as confirmed defects,
-not passing protection. Do not install/enable a system service or change account-wide settings
-merely to make a test run. Report a concrete environment need if the available host cannot run it.
-
-All owners use focused investigation/review agents, economical models and existing evidence.
-Each returns its exact tested source, commands/results, unrun checks, file manifest, remaining
-risks and a verified GitHub handoff. The chief will check cross-branch compatibility before
-calling the batch complete. Broader file moves, live GitHub policy changes, main merge,
-deployment, billing activation, data deletion and catalog rebuild remain outside this batch.
-
-## Wolf's chosen repair sequence
-
-1. Small security/account fixes. Proposed first dedicated-task batch: clear the actual last-drill key on sign-out,
-   bind profile caches to the account and prevent late responses from repainting another account.
-   Implemented on Security/accounts at e598752 and combined with testing infrastructure at
-   c702c69; all requested local integration checks pass. Full CI, live account and release
-   verification remain open. No main merge or production deployment.
-2. Separate catalog, paths and progression while preserving current behavior. Agree explicit
-   links to rewards, access, certificates and saved history before changing their rules.
-3. Clean the repository and assess database tables for actual use. Check application readers,
-   server functions, scheduled jobs, migrations and historical records before archiving/removing.
-   A crowded Git page or old table name alone is not evidence that something is unused.
-4. Work on the site's structure and interactions using the clarified product brief.
-5. Rebuild the catalog only after the full learning/content plan is agreed. Preserve original
-   Foundations feedback; do not execute the historical v5 waves by default.
-
-Timing, initial assessment, paid boundaries and certificate standards are recommendations/open
-choices in PRODUCT.md. Assisted completion without XP and freely explored basics with recommended
-paths are the current learning direction; no gameplay rule has been switched.
-
-## Active review sequence
-
-1. **Complete:** Wolf made `source/` primary; the project tool confirms the path and Git repository.
-   Project identity and conversations are preserved. Verify Git sign-in and publishing separately.
-2. Establish the baseline: preserve unfinished changes, identify branch/source provenance,
-   restore runnable checks, and separate actual defects from unfinished or proposed features.
-3. Review each area against code, existing tests and relevant live configuration. Report
-   evidence, impact and uncertainties in plain English. The first inventory is not the full audit.
-4. Work through the guidance review in PRODUCT.md with Wolf. Identify preferences to keep,
-   retired behavior that must stay retired, contradictions and open choices.
-5. Repair demonstrated defects and setup problems in small, reviewable changes with relevant
-   verification. Keep redesigns, new features, broad refactors and deployments outside this phase.
-6. Present the review coverage, repair results, remaining risks and agreed product brief.
-   Wolf decides when confidence is sufficient to resume development and revisit the schedule.
-
-Primary folder verified: `C:\Users\Wolfi\OneDrive\Documents\ChatGPT\Hotkey.gg\source`.
-Git remote remains `https://github.com/rathunter69/Hotkey.gg.git`. Earlier chief attempts at
-local sign-in and network access failed. That setup blocker is superseded by Git/testing's
-[136df03 handoff](https://github.com/rathunter69/Hotkey.gg/blob/136df032c119de73e6896ca480381ab77846e872/docs/handoffs/git-testing-releases.md):
-remote fetch and a noninteractive push dry run succeeded in that task's environment. Do not
-ask Wolf to repeat the earlier login procedure on that old evidence. A new environment must
-still verify its own access; a GitHub connector save does not synchronize the original checkout.
-The successor chief observed pending local foundation work and preserved it.
-
-September 17 successor-chief refresh: GitHub still reports main at `434bc0e`, no open PRs,
-and the latest repository Actions runs are the September 5 main gate and Pages build. These
-historical successes do not validate any September 17 repair branch. No new main merge is
-observed; the reviewed area reports record no deployment. The production hosting state was
-not independently rechecked in this coordination turn.
-
-Earlier delivery evidence reports main unprotected, no required checks or rulesets, uncertain
-hosting origin/build settings, and the September 3 database deployment
-[33814362058](https://github.com/rathunter69/Hotkey.gg/actions/runs/33814362058) failing during
-project linking with migrations/functions skipped. These remain release blockers in the
-Git/testing handoff; the chief did not rerun deployment or change settings.
-
-## What is implemented
-
-- 74 catalog drills in eight chapters. `drills.js` defines membership; `index.html` implements them.
-- An integrated steps/guide tutorial for `navigation`; other proposed Foundations tutorials are
-  not all present on main.
-- Spreadsheet simulation, drill scoring, guides, demos, alternate routes, progression, ranks,
-  player cards, leaderboard pages, desks, certificate tracks, analytics and account surfaces.
-- Premium presentation is disabled (`HOTKEY_PREMIUM.enabled=false`); client PRO perks use
-  `HOTKEY_PRO.freeNow=true` / `PRO_PERKS_FREE=true`. Some server-side desk features have their own gates.
-- Stripe checkout is a test-only scaffold. Billing/entitlement integration and the subscription
-  webhook remain incomplete. Do not equate the displayed pricing with a working purchase flow.
-- GitHub Actions defines browser checks and a separate Supabase deployment workflow. Live
-  Supabase migration versions were inventoried September 17: 52 local versions are present,
-  with nine additional live records. All 54 database function bodies match local source apart
-  from one comment; both deployed Edge Function sources match. Whole-schema/configuration
-  parity and migration replay remain unverified. The connected Supabase project reports healthy.
-
-## Plans are separate from shipped content
-
-| Material | Role now |
+| Source | Verified state |
 |---|---|
-| `drills.js`, `index.html`, current migrations | Implemented application source |
-| `dev/CURRICULUM_V5.md`, `dev/curriculum-v5.json` | Proposed 61-drill rebuild; not the runtime catalog |
-| `dev/gen/curriculum_v51_data.py`, `curriculum_v51_map.py` | Editable sources for the v5.1 proposal |
-| `dev/curriculum-v3.json` | Earlier proposed map, still consumed by a CI check and the v5 generator |
-| `dev/curriculum-v4.json` | Skill-family reference still consumed by the variety guard |
-| `dev/CURRICULUM_V5_PHASE_A.md`, `dev/ROADMAP.md` | Prior rebuild sequence; reconcile before executing waves |
-| `dev/DRILLS_WOLF_LIKED.md`, `dev/DRILL_DOCTRINE.md`, `dev/MODELING_STANDARDS.md` | Product feedback, drill-design and financial-realism references |
-| `art/` | Prototypes and assets; file presence does not mean a design is wired into the app |
-| `PROJECT_CONTEXT.md`, `dev/CONTINUITY.md`, `dev/PIPELINE.md`, `dev/WORKFLOW.md`, older audits | Historical context; not independent active queues |
+| Remote main | `434bc0e8764e741e0e11f84cf51d61a1755d7c67`, PR #250 merged September 5. Refreshed September 17; unchanged. The last observed main gate/Pages results belong to this old source, not the repair branches. |
+| Shared guidance | `codex/repository-foundation`; read its current remote tip. Foundation introduced guidance/audits and development tooling, not a framework migration or application repair. |
+| Accepted combined application/testing checkpoint | `codex/account-testing-integration`, remote handoff commit `6c984161c31bc4637dbe88b73a4da8408cefdf1d`; exact tested code `c702c6932b342cd36656317f7ce50f1c33b7df3e`. The final commit adds only its handoff document. Not merged into foundation/main or deployed. |
+| Active batch starting point | The three area branches below start from accepted integration 6c98416, and read later foundation guidance separately. Preserve both accepted code batches; do not restart from an older source that loses them. |
 
-Keep the v3/v4 files until their actual consumers are migrated. Moving them into an archive today
-would break tooling. The v5 map passing validation means its plan is internally consistent; it
-does not mean its drills or required engine features exist.
+The chief verified remote ancestry: foundation f2dd564 → account import 2981dec → testing
+import 3271c67 → isolation correction c702c69 → handoff 6c98416. The integration owner ran:
+seven static commands, two network-canary tests, 14 account-isolation scenarios, all five
+original smoke suites and 86 onboarding assertions. All passed with fresh locked installation,
+Node 22.23.2, npm 10.9.8, Playwright 1.49.1 and matching Chromium 131.0.6778.33 headless shell
+(build 1148). Two independent reviewers found no remaining integration blocker. The smoke
+command includes canary/account checks; these are not duplicated independent runs.
 
-## Unmerged work to reconcile
+That establishes the requested **combined local baseline only**. It does not establish full
+Linux CI, the wider engine matrix, live/multi-tab authentication, page-specific loaders beyond
+shared navigation, isolated database replay/permissions, production delivery or recovery.
+The full Windows Chromium executable previously failed to launch; the matched headless shell
+passed. Existing 39 catalog-variety warnings and separate audit findings remain unresolved.
 
-`origin/claude/platform-improvements-roadmap-ycogch` at `1703b59324af098f252b8b4dcd8d3fd859338197`
-contains four branch-only commits dated September 5–6. They add progression instrumentation,
-`entrybasics` and `ribbonways` tutorials, and another Foundations sequence. Its `dev/REFINE_PHASE.md`
-describes keeping the existing catalog and refining progression, which conflicts with the 61-drill
-rebuild proposal. This is a substantive alternative, not merely old documentation.
+## Current batch assignments and outcomes — authorized September 17
 
-Review those drills and instrumentation against main before implementing overlapping work. A bulk
-merge would also bring catalog/certificate changes, generated pages and edits to an existing
-migration; reconcile intended behavior and use a new migration for any database change.
+The existing tasks own one bounded batch each; no duplicate tasks or automatic later batches.
+All preserve original local work and earlier remote branches.
 
-[Branch inventory](BRANCH_INVENTORY.md) records the other branch tips. An ancestor branch is
-contained in main. A divergent branch may contain squash-merged or superseded work; commit counts
-alone cannot determine whether to restore or delete it. No remote branches were deleted.
-
-## Parked launch proposal — not the active queue
-
-The dated proposal below is retained as history. Do not execute it during the review pause.
-
-| Dates | Work | Completion evidence |
+| Owner / task | Scope | Exclusive files / boundaries |
 |---|---|---|
-| Sep 17–19 | Complete ingestion by area, fix project-root setup, preserve foundation changes, restore browser checks; settle launch offer and onboarding choices; confirm business/Stripe readiness | Agreed scope, one shared brief, runnable baseline, explicit business blockers |
-| Sep 20–23 | Implement subscriptions and server-verified access; review Supabase permissions and migration differences; polish the first learning path | Test purchase gives the right account access; guided onboarding and saved progress work |
-| Sep 24–26 | Finish the selected launch drills, UI and website; validate cancellation, renewal, failed payment and account recovery | End-to-end test results; representative users complete the loop without assistance |
-| Sep 27–29 | Freeze features; test permissions, scoring, cross-account isolation, supported keyboards, deployment and recovery; finish legal/support/marketing materials | No unresolved release blockers; complete payment lifecycle and production rehearsal |
-| Sep 30–Oct 1 | Final review and controlled paid launch | Verified live configuration, approved real payment test, support and recovery ready |
+| **Establish testing and blockers**, `01a0af90-b973-7572-b7ff-d5bf9f504a52`; `codex/testing-security-groundwork` | Finish redirect-safe isolation across full gate/generators; run complete pinned checks in a suitable isolated environment, aiming for exact-source Linux CI. Fix test infrastructure; report unrelated application failures. | Test workflow(s), browser helper/canary/harnesses and generator isolation, `dev/run-checks.js`, `docs/DEVELOPMENT.md`, testing handoff. Own port 8791 during browser runs. |
+| **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; `codex/security-groundwork` | Disposable database setup and synthetic DATA-01 direct-table/RPC role cases; review DATA-02/03 acceptance needs using existing evidence. Separate expected vulnerability reproductions from successful protection. | New `supabase/tests/`, security-specific tooling/docs, `docs/testing-database.md`, security handoff. No runtime or migration edits in this groundwork batch. |
+| **Audit starter 3 cleanup candidates**, `01a0af90-7fb2-7571-a5d6-b82354d57540`; `codex/repository-structure` | Complete on its branch at cf8c61b: archived the historical PROJECT_CONTEXT record, kept a root compatibility page, repaired links and recorded the remaining structure plan. Chief verified preserved text and docs-only file manifest. Pending combined-branch integration; no main merge. | `README.md`, `docs/ARCHITECTURE.md`, selected historical documentation/archive paths and non-shared documentation links, `docs/handoffs/repository-structure.md`. No runtime, generated pages, migrations, test harness or workflow edits. |
+| Chief coordinator, this task | Read-only GitHub/security/structure review, ownership coordination, remote handoff reconciliation and next choices. | `docs/CURRENT.md`, `docs/PRODUCT.md`, `docs/handoffs/chief-groundwork.md`. Other tasks send proposed corrections instead of editing these. |
 
-When development resumes, revisit dependencies and dates with Wolf. Retain the paid-launch
-requirement unless he changes it; do not silently substitute a free launch.
+The additional database assessment task `01a0b0f0-0755-7962-b436-a6646a32321d` stays paused
+to avoid duplicate cleanup. Testing and Security coordinate any database CI job before editing
+a shared workflow. Security's current environment check found no standard local
+Docker/Podman/Postgres/Supabase CLI or WSL; a disposable Linux test route is being considered,
+not assumed available. Do not install/enable a system service or change account-wide settings
+merely to make a test run.
 
-Recommendation: preserve working catalog content, improve the first experience, and fix
-launch-critical defects. Defer the wholesale 61-drill rebuild, major engine expansion, broad
-file reorganization, and optional new desk/identity features until evidence justifies them.
+Browser tests must block production traffic, including redirects, and use synthetic fixtures.
+Before any database replay, establish outbound denial and disabled scheduling; the migration
+chain contains a production digest callback. Missing infrastructure never permits using
+production. Test-only CI may run only after reviewing triggers, permissions and side effects;
+do not merge main or invoke deployment to make a workflow dispatchable.
 
-## Separate task ownership
+Every area uses economical focused investigation and independent review. Finish the authorized
+batch, record exact tested source/environment, actual pass/fail/unrun checks, file manifest,
+unresolved risks and a verified remote handoff. The chief checks compatibility before declaring
+the combined batch complete. Broader moves, live GitHub policy changes and application/schema
+repairs remain separately scoped.
 
-This task owns the master plan, priorities and shared decisions, with no application implementation.
-Area tasks have begun reporting below. The table defines their bounded sequences; Wolf chooses
-which to open and its scope. Do not auto-start later batches from these briefs or handoffs.
-The saved project's primary folder is now correct. [TASK_GUIDE.md](TASK_GUIDE.md) supplies the
-copyable starter, first-turn scopes, evidence links and agent workflow. Start from the remote
-handover branch named above until it is deliberately integrated; a fresh worktree from main
-lacks this guidance. One editor at a time per shared file, with one integration owner for
-CURRENT.md and PRODUCT.md when tasks overlap. Area tasks must save their handoffs to GitHub.
+## Remote evidence and completed handoffs
 
-Current area status — four initial handoffs plus the integration handoff saved;
-**the requested combined local baseline is verified and accepted for planning**:
-
-Successor chief: task `01a0b0fa-d857-7002-ab95-1da0a1cfb858`, succeeding
-`01a0af30-bac0-7b73-9d9e-56f298996c1a`. This chief read the requested guidance at remote
-foundation `f2dd5645e01101f17194691c5979100862055e3c`, all four reports below at their
-pinned commits, the previous chief's final handover, and the integration task. During this
-refresh the integration task completed and returned its fifth handoff. The chief then verified
-the remote report, branch tip and commit chain. This is a documentation/evidence reconciliation,
-not a new application audit or a chief-run repetition of the suites.
-
-| Area | Remote handoff | State / ownership |
+| Area | Pinned report | Accepted meaning |
 |---|---|---|
-| Security/accounts | [e598752](https://github.com/rathunter69/Hotkey.gg/blob/e598752d8dc39acd500276fbd42d50955018bbeb/docs/handoffs/security-accounts.md), `codex/security-accounts`, task `01a0af8b-9a97-7593-a1d2-6d2491cfe947` | DATA-05 shared-nav repair implemented; subsequent combined local verification accepted below. Not merged into foundation/main or deployed. Reservations released. |
-| Repository/database cleanup | [b852e41](https://github.com/rathunter69/Hotkey.gg/blob/b852e41969e4157e9ce7f93aa48b8dda302f3b29/docs/handoffs/repository-database.md), `codex/repository-database`, task `01a0af90-7fb2-7571-a5d6-b82354d57540` | Assessment complete. All 18 public tables have positive dependencies. No deletion/schema change. Reservation released. |
-| Git/testing/releases | [136df03](https://github.com/rathunter69/Hotkey.gg/blob/136df032c119de73e6896ca480381ab77846e872/docs/handoffs/git-testing-releases.md), `codex/git-testing-releases`, task `01a0af90-b973-7572-b7ff-d5bf9f504a52` | Initial tooling and pinned local baseline verified; subsequent combined local verification accepted below. Full CI and isolated DB checks remain pending. |
-| Additional database review | [6a73f8e](https://github.com/rathunter69/Hotkey.gg/blob/6a73f8e649f875f567f44748c9e677d1065ac5d5/docs/handoffs/repository-database.md), `codex/database-cleanup`, task `01a0b0f0-0755-7962-b436-a6646a32321d` | Assessment complete. Confirms retained tables, missing billing objects and migration-history differences. No data/schema changes. |
-| Account/testing integration | [6c98416](https://github.com/rathunter69/Hotkey.gg/blob/6c984161c31bc4637dbe88b73a4da8408cefdf1d/docs/handoffs/account-testing-integration.md), `codex/account-testing-integration`, task `01a0b0f9-09da-7a62-9dd2-dd9baeac388d`, title **Integrate account testing changes** | Complete: requested combined local checks pass at c702c69; remote handoff and provenance verified. No unresolved integration blocker. Port 8791 released. No main merge/deployment. Shared guidance remains chief-owned. |
+| Account isolation | [e598752](https://github.com/rathunter69/Hotkey.gg/blob/e598752d8dc39acd500276fbd42d50955018bbeb/docs/handoffs/security-accounts.md) | DATA-05 shared-nav repair; late responses/account caches/sign-out reset. Nav v308/themes v315 and generated references preserved in combined checkpoint. No live-account clearance. |
+| Repository/database assessment | [b852e41](https://github.com/rathunter69/Hotkey.gg/blob/b852e41969e4157e9ce7f93aa48b8dda302f3b29/docs/handoffs/repository-database.md) | Positive dependencies for all 18 tables; active old-map/SQL-test consumers; conditional archive candidates. Assessment, not implemented deletion. |
+| Original Git/testing baseline | [136df03](https://github.com/rathunter69/Hotkey.gg/blob/136df032c119de73e6896ca480381ab77846e872/docs/handoffs/git-testing-releases.md) | Exact dependencies, local Git dry-run access and isolated smoke baseline verified on that branch. Its separate-source gap was later closed for the combined local baseline only. |
+| Additional database assessment | [6a73f8e](https://github.com/rathunter69/Hotkey.gg/blob/6a73f8e649f875f567f44748c9e677d1065ac5d5/docs/handoffs/repository-database.md) | Same keep conclusion; transitional aggregates, missing billing objects and migration-history differences. No data/schema changes. |
+| Account/testing integration | [6c98416](https://github.com/rathunter69/Hotkey.gg/blob/6c984161c31bc4637dbe88b73a4da8408cefdf1d/docs/handoffs/account-testing-integration.md) | Requested combined local checks pass at c702c69, remote provenance verified; explicit CI/live-auth/DB limits remain. Task finished and released port 8791. |
+| Repository structure cleanup | [cf8c61b](https://github.com/rathunter69/Hotkey.gg/blob/cf8c61bc1a6922325ac63f9d6449795e40484847/docs/handoffs/repository-structure.md) | Historical record moved to docs/history with compatibility page and repaired references. Chief fetched old/new content: same 1,145 lines, only the two Markdown targets on one line changed. No runtime/test/workflow/schema edits; documentation checks passed. |
+| Chief GitHub/security/structure review | [chief-groundwork.md](handoffs/chief-groundwork.md) | Fresh branch/ruleset/tree/workflow source review and bounded structure guidance; no settings or application changes. |
 
-The previous chief recorded commit-list checks for the completed branches. The successor
-chief independently read all four remote handoff files at the pinned commits above. Test results below are area-task evidence, not tests rerun by the chief or production
-verification. Two initial tasks are assessments. The fifth handoff establishes the bounded
-combined local result below; it does not establish a production-ready release.
+The two database assessments use the same report path on distinct branches. Retain both links;
+do not overwrite one with the other. Their recommendations are complementary: move repository
+test consumers before archiving SQL mirrors; compare extra migration statements and perform
+isolated replay before schema/history reconciliation. Saved-progress owns any future aggregate/
+history contract; Payments owns the billing scaffold; Security owns permission repairs.
 
-Security reports 14 final synthetic account-isolation scenarios and seven static commands
-passing. Existing smoke suites passed at an earlier revision; final listener/guest corrections
-then passed focused/static checks. Its nav/themes changes and asset-version regeneration remain
-on its branch. The later integration result closes combined-source verification for the
-requested local suites only. Live multi-tab auth remains open.
+All 18 public tables remain in use through application, functions, triggers or scheduled jobs.
+`run_stats` still has a writing trigger despite no current app reader. `drill_feedback` has a
+write path. Raw runs and certificates must survive. No current table qualifies for removal.
+`profiles.plan` and `invoices` are missing billing scaffold objects, not unused tables to
+delete or authorization to create speculative schema.
 
-Git/testing verifies Node 22.23.2, npm 10.9.8, exact Playwright 1.49.1 installation and the matching
-Chromium 131.0.6778.33 headless shell. Seven static checks, the network canary, five original
-smoke suites and all 86 onboarding assertions passed on that branch. The full Chromium
-executable still fails on this Windows host. No full CI run is recorded for this source.
+## Security, correctness and release gaps
 
-Automatic approval review had rejected a partially isolated smoke run. The five smoke harnesses
-now use shared isolation, and the canary confirms blocked cross-origin/redirect escape with zero
-requests at its disallowed local sink. The wider browser gate still needs isolation; this
-limited baseline is not permission to bypass it. Security's repair was absent from the original
-Git/testing baseline; it is included in the later combined result below.
+The [platform audit](audit/README.md) owns the evidence. Reuse the relevant area report before
+a repair; no full re-audit is required to continue one bounded change.
 
-Database replay remains blocked by absent local container infrastructure. A concrete
-[isolated-test runbook](https://github.com/rathunter69/Hotkey.gg/blob/136df032c119de73e6896ca480381ab77846e872/docs/testing-database.md)
-records the existing production cron callback hazard. Establish outbound denial and disabled
-scheduling before any replay; do not use production as a fallback. Clean migration replay,
-role/permission tests, release protections, database delivery and recovery remain open.
+| Open issue | Owner / required evidence |
+|---|---|
+| DATA-01 desk write/role bypasses | Security: direct-table and RPC tests for outsider/member/captain/owner/guest/admin plus legitimate routes, then a separately scoped forward migration. |
+| DATA-02 public profile metadata | Security: database-enforced public/private fields and hidden-school tests, preserving owner access. |
+| DATA-03 incomplete MFA | Security: opted-in login/challenge/recovery/protected-action tests. Enrollment success alone is insufficient. |
+| DATA-04/06/07 history/rankings, duplicate saves and result trust | Saved-progress with Security: explicit persistence/competition contract, capped/failed reads, idempotent retries, direct-write constraints. No historical progress reset. |
+| Engine formulas and graders | Engine owner: explicit expected spreadsheet outcomes, live-model grading and legitimate alternative-route regression evidence. Existing demo success does not close these defects. |
+| False save/error messages and beginner flow | UI/persistence owners: truthful feedback, one understandable learning journey; preserve ribbon/workspace. |
+| Release protections | GitHub freshly reports unprotected main, no required contexts and no rulesets. Testing proposes required checks/review after check names/results are established; no live rule changed. |
+| Database delivery | Earlier run [33814362058](https://github.com/rathunter69/Hotkey.gg/actions/runs/33814362058) failed linking; later source still uses floating CLI and independent live deployment. No new deployment attempted. |
+| Isolation, history and schema parity | 52 source migration versions occur in 61 live records, including nine extras. Prior 54 function bodies match except one comment; both deployed function sources matched. This is not whole-schema/grant/configuration parity or clean replay. |
+| Hosting/recovery | Cloudflare and GitHub Pages have historical results; active serving origin/build output, preview headers and rollback remain unverified. Moving prototypes inside the served tree does not hide them. |
+| Billing/launch | Checkout remains test-only; webhook/authoritative subscription lifecycle and business readiness remain incomplete. No billing activation. |
 
-Combined integration acceptance — completed September 17:
+Root workflow sources lacked explicit token permissions; effective repository defaults remain
+unverified. Testing is tightening its test-only workflow within its scope. Ignore rules and
+the existing secret scanner are useful controls, not proof that repository history/settings
+are free of secrets. No customer records, credentials or private financial details belong in Git.
 
-- Remote tested code: [c702c69](https://github.com/rathunter69/Hotkey.gg/commit/c702c6932b342cd36656317f7ce50f1c33b7df3e).
-  Verified GitHub ancestry: foundation f2dd564 → account import 2981dec → testing import 3271c67
-  → shared-isolation correction c702c69 → handoff 6c98416. The final commit adds only
-  `docs/handoffs/account-testing-integration.md`; its executable tree is the tested source.
-- Exact environment: fresh locked install, Node 22.23.2, npm 10.9.8, Playwright 1.49.1,
-  matching Chromium 131.0.6778.33 headless shell (build 1148).
-- All seven static commands, both network-canary tests, all 14 account-isolation scenarios,
-  all five original smoke suites and all 86 onboarding assertions pass. The smoke command
-  includes the canary/account checks; these totals are not separate repeated runs.
-- Both runner/CI additions survive; audit-state setup is deduplicated. Account and onboarding
-  harnesses now use shared redirect-safe isolation. Runtime/nav/themes and generated HTML
-  remain as supplied by the account repair. Two independent reviewers report no blocker.
-- Chief verification checked the remote handoff and each commit's parents/file manifest.
-  Application tests were run by the integration owner and were not rerun for this docs update.
-  The chief accepts the reported local baseline within these explicit limits.
-- Still unverified: full GitHub/Linux CI and wider engine matrix, live/multi-tab authentication,
-  page-specific loaders outside shared navigation, isolated database replay/permissions,
-  production delivery/hosting and recovery. Previously audited defects remain open.
-- The integration task is complete and has released port 8791. No code is merged into
-  foundation/main and no release is authorized. Shared guidance remains on
-  `codex/repository-foundation`; follow-on account/testing work should preserve c702c69 by
-  branching from the verified integration checkpoint and separately reading current shared
-  guidance. Do not restart code work from a source that silently loses either accepted batch.
+## Source and structure constraints
 
-The two database assessments use the same report path on different branches. Keep their
-separate pinned links; neither report should overwrite the other during future integration.
+This is a static application: root HTML/JS/CSS is the runtime, with 74 catalog drills in eight
+chapters. `package.json` supplies development tooling. Consult [ARCHITECTURE.md](ARCHITECTURE.md)
+for editable sources and generated files; do not edit generated drill pages instead of sources.
+Shared runtime JS/CSS changes require synchronized cache versions and drill-page regeneration.
+Structural cleanup preserves behavior and existing grading/alternative-route contracts.
 
-The two cleanup assessments agree: retain all 18 public tables and saved history; preserve
-active v3/v4/test consumers; compare the nine extra live migration entries before reconciliation.
-`run_stats` still has a writing trigger despite no current app reader. `drill_feedback` still
-has a write path. Neither is approved for deletion. Billing's missing `profiles.plan`/`invoices`
-objects belong to the Payments scaffold review, not speculative schema creation.
-The repository report proposes SQL-mirror consolidation after migrating its test consumers.
-The additional database report proposes statement comparison and isolated replay before setup
-reconciliation. These are complementary, unstarted scopes: repository cleanup owns consumer
-consolidation; Git/testing and Security own the safe database-test setup; saved-progress owns
-future aggregate/history rules; Payments owns billing behavior. A future batch needs one named
-lead and coordinated file ownership. Do not start competing cleanup edits from these reports.
-DATA-01 desk authorization remains Security's proposed next batch, requiring isolated tests.
+Old v3/v4 planning files still drive tests/generators; v5/v5.1 is a proposal, not the runtime
+catalog or an approved rebuild. Retain canonical migrations and check the newest function
+definition before any future new migration. Never rewrite applied history for tidiness.
 
-Record further ownership in the area handoff and notify the chief for this record. The shared
-status coordinates work; it does not enforce a filesystem lock.
+Unmerged tutorial/progression alternative:
+[1703b59](https://github.com/rathunter69/Hotkey.gg/tree/1703b59324af098f252b8b4dcd8d3fd859338197),
+`claude/platform-improvements-roadmap-ycogch`. It contains entrybasics/ribbonways tutorials and
+a different Foundations/progression direction. Review against main before overlapping content;
+do not restore wholesale, including its old migration edit. [BRANCH_INVENTORY.md](BRANCH_INVENTORY.md)
+retains other branch provenance. No remote branch deletion is authorized.
 
-| Dedicated task | Problem to address | Suggested turns |
-|---|---|---|
-| Security and accounts | Account-state leaks, public profile metadata, desk permission gaps and incomplete two-factor enforcement | Account isolation → permissions/privacy → login, recovery and two-factor verification |
-| Catalog and progression architecture | Drill changes force changes to paths, achievements, access and certificates | Agree stable links → separate responsibilities preserving behavior → verify existing progress survives |
-| Repository and database cleanup | Conflicting historical guidance/configuration and uncertain unused files/tables | Trace actual usage → consolidate/archive safely → reconcile database history and definitions |
-| Git, testing and releases | Weak release protections, failed database deployment and tests that miss real defects | Reproducible local checks → repair delivery setup → verify a safe release/rollback process |
-| UI/UX, onboarding and web structure | Overlapping tutorials, abrupt difficulty, misleading messages and inconsistent journeys | Agree page/mode/lesson flow → repair one journey at a time → keyboard and accessibility checks |
-| Game engine | Incorrect formula results and grading that accepts disconnected model answers | Formula correctness → realistic model grading → alternative-route and keyboard regression checks |
-| Leaderboards and saved progress | Incomplete rankings, duplicate saves and inconsistent progress across devices | Agree what is saved/counts → reliable saves/history → rankings and score integrity |
-| Desks | Membership, invitations and paid-seat behavior need one coherent set of rules | Agree desk roles/use cases → repair workflows → verify integration with access and billing |
-| Drill catalog and learning design | Full rebuild preferred; the complete learning plan is not yet agreed and Foundations feedback must survive | Preserve feedback and agree learning map → review lesson blueprints → pilot a small set before expanding |
-| Payments and subscriptions | Checkout is a test scaffold and access/pricing rules conflict | Agree free/paid offer → connect payment and access → test full subscription lifecycle |
-| Marketing and launch | Public claims and readiness are inconsistent | Align claims to agreed product → launch/support plan → release-readiness review |
-| LLC, tax and accounting | Business and payment prerequisites remain unknown | Establish jurisdiction/entity facts → verify obligations and deadlines → banking/accounting readiness |
+Keep Foundations source feedback and design rationale listed in PRODUCT. A complete agreed
+skill/prerequisite map, assistance/timing/reward/access/certificate rules, history treatment
+and representative blueprints must precede the catalog rebuild.
 
-Start with security/accounts, then catalog/progression separation and cleanup, as Wolf requested.
-Delivery work can accompany cleanup. Site flows and engine accuracy inform the catalog plan;
-catalog implementation waits for agreement. Business fact-finding can happen early because it may
-block payments; billing activation and the launch date remain separate decisions. Security owns
-the initial desk authorization repair; the Desks task owns the later member experience and rules.
+## Continuity, validation and next decision
 
-Each task reads AGENTS.md, PRODUCT.md and this file, then inspects its relevant sources.
-Start with assessment before edits. Record evidence and proposals separately. Use one bounded
-change per review, and reserve shared files before concurrent edits. Tasks do not independently
-rewrite the product brief or execute an old roadmap. Bring accepted decisions back here.
-Wolf now prioritizes specialist agents for ongoing audits and fixes during active iterations.
-Audit the changed boundary, delegate bounded repairs, and independently review meaningful
-changes while the lead verifies integration. Avoid duplicate full audits and overlapping editors.
+Wolf requires durable non-secret continuity on GitHub. Each area commits/pushes its branch
+handoff, verifies remote commit/file identity, and returns its link to the chief. Local logs
+and chat history are supplementary. If publication fails, state that the handoff is not saved.
 
-## Launch acceptance — all pending
+The original `source/` checkout on this PC remains dirty and behind remote guidance; preserve
+its files. Git/testing's September 17 fetch and noninteractive push dry run supersede earlier
+failed-login instructions for that environment. Verify new environments individually. A remote
+connector save does not synchronize a local checkout, and no reset/force-push is implied.
 
-- Account signup, verification, sign-in, password reset, deletion and sign-out isolation.
-- Customized onboarding, a complete first lesson, understandable results and a useful next step.
-- Tested launch catalog; realistic, correct spreadsheet results and alternative keyboard routes.
-- Progress restored after refresh, reconnection and a second device; valid leaderboard rules.
-- Subscription purchase, authoritative access, billing management, renewal, failed payment,
-  cancellation and duplicate/delayed payment-event handling.
-- Guest/owner/other-user/admin security tests, current secrets and permissions, migration parity.
-- Agreed Windows/Mac/browser support tested; mobile messaging and basic keyboard accessibility.
-- Production hosting, error visibility, backups/recovery and rollback verified.
-- Current business identity, support contacts, terms, privacy and accurate pricing/marketing.
+For code changes run `npm run check` and relevant isolated browser suites; report failures and
+unrun checks. Browser suites own port 8791. Documentation-only changes use focused document/
+reference validation under TASK_GUIDE's exception, not unnecessary application test reruns.
+Do not call a static pass a playtest, a local subset full CI, or a report an implemented repair.
 
-## Decisions and next action
+Next: receive the remaining testing and security handoffs, verify remote source/results,
+reconcile them with the completed structure batch, and coordinate bounded combined verification
+in the dedicated integration task before giving Wolf one next decision. Do not automatically start
+a later batch from a recommendation. Catalog/progression design remains the next product
+module; subsequent targeted cleanup/site structure and the planned catalog rebuild follow
+the agreed direction. Remaining security blockers continue to constrain release readiness.
 
-Confirmed September 17: paid subscriptions on launch day; paths customized during onboarding.
-Latest decision: pause new development and refinement until Wolf is confident in the existing
-code, setup and guidance. The primary project folder is corrected and browser baseline restored.
-Next in this task: coordinate the written task scopes and integrate their remote handoffs.
-All four initial handoffs and the fifth integration handoff are saved on GitHub. The account
-repair and testing changes pass the complete requested combined local baseline at c702c69.
-The chief verified the report/provenance and accepts that bounded result. Full CI, live auth,
-database tests and release readiness remain open. No new module was started by that acceptance. Wolf's subsequent groundwork/structure request
-is separately authorized and scoped in the active-batch section above.
+Launch acceptance remains pending for real account lifecycle, onboarding/learning, correct
+catalog outcomes, saved progress across devices, subscription lifecycle, guest/owner/other-user
+permissions, supported browsers/keyboards, hosting/recovery, business/legal/support and accurate
+public claims. No replacement launch date is set.
 
-Choices presented before the latest request (historical; active assignments above take precedence):
-
-1. **Complete testing/security groundwork first — recommended.** Continue the existing
-   Git/testing task with remaining browser isolation and the full pinned Linux gate, based on
-   the accepted integration code. Scope container-capable isolated database tests separately
-   with Security before desk-permission repairs. This supports the security-first direction;
-   it does not merge main, change production or reopen the whole audit.
-2. **Catalog/progression architecture — next product module.** Start its design/evidence turn:
-   propose stable links among drills, paths, rewards, access and certificates, and show a path
-   change that preserves earned results. No catalog rewrite or new scoring/payment rules.
-
-After Wolf selects the next bounded scope, preserve the chosen order: catalog/progression
-separation → targeted cleanup → site structure/interactions → a fully planned catalog rebuild
-with Foundations feedback preserved. The cleanup assessments are already available; reuse
-them when their implementation turn arrives. Further security defects remain with Security
-and cannot be considered fixed by the account-isolation baseline.
-Wolf's preserve/change guidance is recorded in PRODUCT.md. Pricing, onboarding dimensions, launch catalog,
-supported platforms and current business status remain open. No replacement deadline is set.
-
-## Known baseline issues
-
-- The platform audit records verified desk permission bypasses, publicly readable profile
-  metadata, incomplete MFA enforcement, account-state and duplicate-save defects, incomplete
-  leaderboard reads and false success/error messages. Independent engine checks found incorrect
-  formula results and financial graders accepting disconnected answers. These take precedence
-  over structural cleanup and new features. DATA-05 has a locally verified repair on its area
-  branch; no application/security repair has been integrated into foundation or released yet.
-- The variety guard emits 39 warnings on the current catalog; strict mode is intentionally off.
-- `nav.js`'s `hkFlagPro` reads retired `HOTKEY_PRO.beta` while the current config defines `freeNow`.
-  Repair in a separate entitlement-consistency change with focused coverage.
-- Historical docs mention a failed Supabase deployment token and other operational follow-ups.
-  Verify current service state before treating those dated notes as active incidents.
-- Large inline scripts, shared globals and mixed responsibilities remain. This foundation change
-  prepares their extraction; it does not claim to complete that architectural work.
-
-## Updating this file
-
-Record the source commit, implemented change, validation and next discrete objective when work
-lands. Use Git commit IDs and PRs for provenance. Do not append another competing "LIVE" section
-to the historical handoff documents.
+Earlier detailed foundation chronology and the parked launch proposal remain preserved in the
+[pre-groundwork status snapshot](https://github.com/rathunter69/Hotkey.gg/blob/ad3c7bb58e746e7b2711d44595734bd99f41d8de/docs/CURRENT.md).
+Its completed/old recommendations are historical; this current file and PRODUCT govern active
+scope. Update this file instead of creating competing LIVE queues in old documents.
