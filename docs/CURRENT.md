@@ -23,8 +23,9 @@ Five reviewed commits preserve all 41 selected entries: guidance, twelve starter
 reusable synthetic reproduction, existing foundation tooling and historical-status corrections.
 Remote blob hashes matched every saved file and both intended cache-file deletions; main remained
 at `434bc0e8764e741e0e11f84cf51d61a1755d7c67`. This status note is saved in a subsequent commit;
-use the branch tip for the latest guidance. No application repair, main merge or production
-deployment was performed. Exact pinned installation/full CI remain unverified as described below.
+use the branch tip for the latest guidance. At that checkpoint no application repair, main merge
+or production deployment was performed. Its exact pinned installation/full CI were unverified;
+subsequent area evidence and remaining limits are recorded in the current status below.
 This task is the chief orchestrator for priorities, cross-area product decisions and handoff
 integration. [TASK_STARTERS.md](TASK_STARTERS.md) contains all twelve prompts. Area tasks maintain
 their own reports under docs/handoffs/ and return verified remote links. They propose changes
@@ -37,7 +38,7 @@ with Security support; they do not require a new frontend framework or another g
 No production security repair or billing activation should rely on those unverified release steps.
 Wolf's latest clarification reserves this conversation for the overarching plan, roadmap and
 context. The initial account-repair agent was stopped before editing any files. Wolf has now
-started the separate Security/accounts task; its current ownership is recorded below. Keep
+started separate area tasks; their current status is recorded below. Keep
 application implementation in that task.
 
 The foundation change adds the README and source map, marks old handoffs as historical,
@@ -61,8 +62,8 @@ prefers a future full catalog rebuild with his Foundations feedback preserved, a
 
 1. Small security/account fixes. Proposed first dedicated-task batch: clear the actual last-drill key on sign-out,
    bind profile caches to the account and prevent late responses from repainting another account.
-   Verify with synthetic users; no production deployment is part of this batch. In progress in
-   the separate Security/accounts task, starting from foundation 785b30e.
+   Implemented and locally verified in the separate Security/accounts branch at e598752;
+   pending integration and release verification. No production deployment.
 2. Separate catalog, paths and progression while preserving current behavior. Agree explicit
    links to rewards, access, certificates and saved history before changing their rules.
 3. Clean the repository and assess database tables for actual use. Check application readers,
@@ -188,25 +189,52 @@ file reorganization, and optional new desk/identity features until evidence just
 ## Separate task ownership
 
 This task owns the master plan, priorities and shared decisions, with no application implementation.
-Separate workstream tasks have not been created. The table below proposes small turns for those
-tasks; Wolf chooses which to open and its scope. Do not auto-start implementation from these briefs.
+Area tasks have begun reporting below. The table defines their bounded sequences; Wolf chooses
+which to open and its scope. Do not auto-start later batches from these briefs or handoffs.
 The saved project's primary folder is now correct. [TASK_GUIDE.md](TASK_GUIDE.md) supplies the
 copyable starter, first-turn scopes, evidence links and agent workflow. Start from the remote
 handover branch named above until it is deliberately integrated; a fresh worktree from main
 lacks this guidance. One editor at a time per shared file, with one integration owner for
 CURRENT.md and PRODUCT.md when tasks overlap. Area tasks must save their handoffs to GitHub.
 
-Current implementation ownership — **Security/accounts active**, reported September 17:
+Current area status — reported and reconciled September 17:
 
-- Task ID: `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; branch `codex/security-accounts`.
-- Isolated worktree: `security-accounts`, alongside the original source checkout; starting
-  foundation commit `785b30ee1e89a795bdceaa85415353915eb2ccd2`.
-- Reserved: `nav.js`, focused account-isolation browser tests, required nav asset-version
-  consumers/generated drill pages, and `docs/handoffs/security-accounts.md`.
-- Scope: DATA-05 profile-cache isolation, late account responses, and sign-out resume key only.
-  The task reports preserving the original checkout's pending work; no shared product-brief
-  edits, main merge or deployment are included.
-- Await its verified remote handoff and review before marking any finding repaired/integrated.
+| Area | Remote work and evidence | State / ownership |
+|---|---|---|
+| Security/accounts | [Handoff at e598752](https://github.com/rathunter69/Hotkey.gg/blob/e598752d8dc39acd500276fbd42d50955018bbeb/docs/handoffs/security-accounts.md), branch `codex/security-accounts`, task `01a0af8b-9a97-7593-a1d2-6d2491cfe947` | DATA-05 shared-nav account isolation implemented and locally verified on its branch. Not integrated or deployed. File reservations released. |
+| Repository/database cleanup | [Assessment at b852e41](https://github.com/rathunter69/Hotkey.gg/blob/b852e41969e4157e9ce7f93aa48b8dda302f3b29/docs/handoffs/repository-database.md), branch `codex/repository-database`, task `01a0af90-7fb2-7571-a5d6-b82354d57540` | Report only; all 18 current public tables have positive dependencies and are retained. No deletion or schema change. Report reservation released. |
+| Git/testing/releases | Branch `codex/git-testing-releases`, task `01a0af90-b973-7572-b7ff-d5bf9f504a52`, based on 9df3405 | Active preparation: exact dependency/browser baseline, network-isolated smoke tests, database-test setup assessment and its own handoff. Final remote report pending. |
+
+Chief review confirmed the first two remote reports and commit file lists. Their test results
+are area-task evidence, not tests rerun by the chief or production verification.
+
+Security reports 14 final synthetic account-isolation scenarios and seven static commands
+passing. The existing five smoke suites passed at an earlier revision; final listener/guest
+corrections then passed the focused suite and static checks. Changes include nav.js, a small
+themes.js callback fence, test wiring in dev/run-checks.js and gate.yml, an audit-state harness
+setup line, and nav/themes asset-version regeneration. No catalog rule or database change.
+Live multi-tab auth, pinned/full-CI integration and release verification remain open.
+
+Git/testing reports Node 22.23.2, npm 10.9.8 and exact Playwright 1.49.1 installation passing,
+a successful simulated Git push, and seven static checks. Full Chromium hit a Windows runtime
+dependency error; the matching headless variant subsequently started at version 131.0.6778.33.
+Its smoke baseline remains in progress. Automatic approval review rejected a fallback smoke
+run because network isolation was incomplete; the task is repairing the isolation boundary
+and testing it before retrying. That rejection is not permission to bypass the boundary.
+Local database replay is not ready: Docker is unavailable, and an existing scheduled callback
+can target production. Establish isolated infrastructure and deny external traffic/disable
+scheduled jobs before any replay. No production replay is authorized.
+
+Integration note: Security and Git/testing both touch the explicit audit-state start-gate
+setup; deduplicate that change. Preserve Security's account-isolation suite in run-checks.js
+and gate.yml when integrating Git/testing's smoke isolation. The Git/testing task has been
+notified. The chief has not merged, cherry-picked or deployed either branch.
+
+Cleanup identifies active consumers of curriculum v3/v4 and the certificate SQL mirror.
+Its next proposal is to move the certificate test to canonical migration source and then
+archive four historical SQL mirrors after reference checks. This is a proposal, not deletion
+authorization. DATA-01 desk authorization is Security's proposed next batch; it requires
+isolated permission tests and has not been started by this handoff.
 
 Other tasks must avoid overlapping edits and generators. Record ownership in the area handoff
 and notify the chief for this record; release it on completion or pause. This coordinates work
@@ -260,11 +288,11 @@ Confirmed September 17: paid subscriptions on launch day; paths customized durin
 Latest decision: pause new development and refinement until Wolf is confident in the existing
 code, setup and guidance. The primary project folder is corrected and browser baseline restored.
 Next in this task: coordinate the written task scopes and integrate their remote handoffs.
-The foundation is saved and verified on GitHub. Security/accounts is active. Git/testing
-preparation may proceed alongside it under separate file ownership. Continue outstanding
-product guidance here; repairs belong in the
-selected dedicated tasks. Git sign-in remains a
-separate setup task and must not block read-only review.
+The foundation and first two area handoffs are saved and verified on GitHub. Await Git/testing's
+final isolated test baseline, then assign integration of the account repair with the shared
+harness changes. Keep catalog/progression separation ahead of implementation cleanup, as Wolf
+requested; the cleanup assessment itself is complete. Continue product guidance here. Proposed
+next security and cleanup batches need their own selected scope; no new batch was started here.
 Wolf's preserve/change guidance is recorded in PRODUCT.md. Pricing, onboarding dimensions, launch catalog,
 supported platforms and current business status remain open. No replacement deadline is set.
 
@@ -274,7 +302,8 @@ supported platforms and current business status remain open. No replacement dead
   metadata, incomplete MFA enforcement, account-state and duplicate-save defects, incomplete
   leaderboard reads and false success/error messages. Independent engine checks found incorrect
   formula results and financial graders accepting disconnected answers. These take precedence
-  over structural cleanup and new features; no application/security repair has yet been applied.
+  over structural cleanup and new features. DATA-05 has a locally verified repair on its area
+  branch; no application/security repair has been integrated into foundation or released yet.
 - The variety guard emits 39 warnings on the current catalog; strict mode is intentionally off.
 - `nav.js`'s `hkFlagPro` reads retired `HOTKEY_PRO.beta` while the current config defines `freeNow`.
   Repair in a separate entitlement-consistency change with focused coverage.
