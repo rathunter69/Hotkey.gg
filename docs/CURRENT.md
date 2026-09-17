@@ -84,7 +84,7 @@ All preserve original local work and earlier remote branches.
 | Owner / task | Scope | Exclusive files / boundaries |
 |---|---|---|
 | **Establish testing and blockers**, `01a0af90-b973-7572-b7ff-d5bf9f504a52`; `codex/testing-security-groundwork` | Complete local matrix and exact-source full Linux run 35274460688 passed at 4ea428b; remote docs-only handoff 31af74b accepted. Redirect-safe isolation covers every active gate harness/generator, with redirect/WebSocket/service-worker canaries. | Browser test workflow(s), browser helper/canary/harnesses and generator isolation, `dev/run-checks.js`, `docs/DEVELOPMENT.md`, testing handoff. Port 8791 released after local checks. Also read-only safety review of Security's separate platform workflow before its first push/run. |
-| **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; accepted `codex/security-platform-bootstrap`, active `codex/security-replay-baseline` | Platform-only experiment passed first attempt at 49b8193; durable handoff 3dd686d accepted. Continue one bounded isolated application-replay/permission-baseline batch. Run 35276711544 failed after one successful 52-migration replay: permission fixture aborted after 12 results. Full 56-assertion baseline and second fresh replay remain incomplete; final handoff 9ea05e6 accepted as failed-baseline evidence. One narrow correction to two fixture entitlement reads is assigned, with independent review before a fresh run. DATA-01/02/03 remain unrepaired. | `supabase/tests/`, `docs/testing-database.md`, security handoff and distinct `.github/workflows/security-replay-baseline.yml`. Testing reviews exact candidate before triggering push. No gate/deployment workflow, application runtime or migration edits; separate from current integration. |
+| **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; accepted `codex/security-platform-bootstrap`, active `codex/security-replay-baseline` | Platform-only experiment passed first attempt at 49b8193; durable handoff 3dd686d accepted. Continue one bounded isolated application-replay/permission-baseline batch. Initial incomplete run is preserved at 9ea05e6. Corrected reviewed source eaab864 completed run 35277724943: both fresh instances reportedly replayed all 52 migrations and completed all 56 assertions, each 44 pass/12 identical DATA-01 failures. Chief verified run/source/failure; final durable handoff pending. No fixture error remains; DATA-01/02/03 remain unrepaired. | `supabase/tests/`, `docs/testing-database.md`, security handoff and distinct `.github/workflows/security-replay-baseline.yml`. Testing reviews exact candidate before triggering push. No gate/deployment workflow, application runtime or migration edits; separate from current integration. |
 | **Audit starter 3 cleanup candidates**, `01a0af90-7fb2-7571-a5d6-b82354d57540`; `codex/repository-structure` | Complete on its branch at cf8c61b: archived the historical PROJECT_CONTEXT record, kept a root compatibility page, repaired links and recorded the remaining structure plan. Chief verified preserved text and docs-only file manifest. Included in accepted combined checkpoint 00df57a; no main merge. | `README.md`, `docs/ARCHITECTURE.md`, selected historical documentation/archive paths and non-shared documentation links, `docs/handoffs/repository-structure.md`. No runtime, generated pages, migrations, test harness or workflow edits. |
 | **Integrate account testing changes**, `01a0b0f9-09da-7a62-9dd2-dd9baeac388d`; `codex/groundwork-integration` | Complete and accepted at remote 00df57a. Account repair, full Testing 4ea/31af, structure cf8 and Security preparation/14d coexist; seven combined static checks, three runner units, source-equivalence review and replay-plan pass. Full local/Linux browser evidence reused only after exact executable equivalence; SQL56 remains UNRUN. | Integration branch and `docs/handoffs/groundwork-integration.md`. Preserve exact area executable files and chief guidance; exclude the separate platform-bootstrap experiment. No main merge/deployment. |
 | **Audit catalog and learner flow**, `01a0b148-2693-7901-af91-934c83cabe1d`; `codex/catalog-flow-review` from accepted 00df57a | Wolf started the dedicated decision review. Evidence/design only: reconcile modes, ranked play, paths and learner flow; present manageable choices and preserve Foundations feedback. | Owns only `docs/handoffs/catalog-progression.md`; returns proposed PRODUCT/CURRENT updates to the chief. No runtime/catalog/progress/access/billing edits or automatic additional modules. |
@@ -176,6 +176,22 @@ exact-source clearance before one fresh run under the unchanged two-instance/fir
 limits. Do not restore helper grants, relax assertions or change application/migration code.
 This is a test-fixture compatibility blocker, not evidence of a failing application migration.
 One successful replay does not establish two-run reproducibility.
+
+
+The narrow fixture correction received Testing's exact-source clearance at
+eaab8645cf8aaee6e62120f65d24ebd911a047ad. Only its two supported entitlement reads and exact
+fixture trigger path changed. The chief verified [run 35277724943](https://github.com/rathunter69/Hotkey.gg/actions/runs/35277724943)
+finished failure on that exact source; guard tests, cleanup and evidence upload passed.
+Security and independent Testing review report **two fresh complete replays**, each with
+52 unchanged migrations and all 56 assertions: **44 pass / 12 identical DATA-01 failures**,
+at assertions 10, 11, 15, 16, 17, 22, 23, 35, 36, 46, 48 and 56. No fixture/control error
+remains. The failing result is intentional evidence of existing permission defects; it is
+not a successful security outcome. The final committed result/handoff is still pending.
+
+The next recommended Security batch is a separately scoped DATA-01 repair for direct-table
+full-account/PRO, captain/seniority, verified/school, private/closed recruiting and pending-
+application boundaries, retaining legitimate routes. This recommendation does not start a
+schema change, main merge or deployment. DATA-02 privacy and DATA-03 MFA remain separate.
 
 Every area uses economical focused investigation and independent review. Finish the authorized
 batch, record exact tested source/environment, actual pass/fail/unrun checks, file manifest,
@@ -285,7 +301,8 @@ modes, ranked play, paths and deferred/changed rules before implementation. No c
 progress reset or new access rules are authorized.
 
 Security's separate platform bootstrap is accepted; its isolated application replay/permission
-baseline is incomplete after the fixture failure above and remains outside 00df57a. It supplies evidence for security/release
+baseline has now completed twice with reproducible permission failures; final durable handoff
+verification remains pending. It stays outside 00df57a. It supplies evidence for security/release
 readiness and must not be confused with the passing browser gate. Subsequent targeted cleanup,
 site structure and the planned catalog rebuild retain the chosen sequence. Remaining security
 blockers continue to constrain release readiness.
