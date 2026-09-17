@@ -61,6 +61,38 @@ specific cleanup concern. ARCHITECTURE.md now maps those dependencies and propos
 no catalog replacement, progress reset or interaction redesign has been implemented. Wolf now
 prefers a future full catalog rebuild with his Foundations feedback preserved, after an agreed plan.
 
+## Active groundwork and structure batch — September 17 follow-up
+
+Source: Wolf asked the successor chief to orchestrate testing/security groundwork, review
+security and the GitHub file structure, and make that structure cleaner. This explicitly
+brings a bounded repository-organization batch forward alongside groundwork; it does not
+start catalog/progression implementation or the later site/catalog redesign.
+
+The chief coordinates and reviews evidence. Existing area tasks execute the following
+non-overlapping scopes from the accepted integration checkpoint `6c98416` (tested code
+`c702c69`), while reading the current remote foundation guidance. Preserve the original
+dirty checkout and all prior area branches. Do not roll back accepted account/test changes.
+
+| Existing task / owner | Authorized bounded batch | File reservations |
+|---|---|---|
+| **Establish testing and blockers**, `01a0af90-b973-7572-b7ff-d5bf9f504a52` | Finish browser isolation across the full gate and generators; run the complete pinned suite in a suitable isolated environment, aiming for Linux CI evidence. Repair test-infrastructure failures; report unrelated application failures without silently changing gameplay. | `.github/workflows/gate.yml`, any new test-only CI workflow, `dev/run-checks.js`, browser helper/canary and browser harnesses/generator isolation, `docs/DEVELOPMENT.md`, testing handoff. Coordinate port 8791. |
+| **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947` | Security groundwork: establish/review a disposable database test setup with outbound denial and scheduling disabled; create synthetic direct-table/RPC role cases for DATA-01 and document the current failing boundaries. Review adjacent DATA-02/03 acceptance needs using existing evidence. | `supabase/tests/` (new tests only), security-specific test tooling/docs, `docs/testing-database.md`, security handoff. No migration, runtime or production edits in this batch. |
+| **Audit starter 3 cleanup candidates**, `01a0af90-7fb2-7571-a5d6-b82354d57540` | Review repository layout and implement one safe, behavior-preserving documentation/archive organization batch. Trace and update consumers, preserve history and Foundations feedback, return a clear before/after layout and remaining proposal. | `README.md`, `docs/ARCHITECTURE.md`, selected historical documentation/archive paths and non-shared documentation links; `docs/handoffs/repository-structure.md`. No browser harness, runtime, generated page, migration or `.github/workflows/` edits. |
+| **Chief coordinator**, `01a0b0fa-d857-7002-ab95-1da0a1cfb858` | Review GitHub security/release configuration and structure evidence, coordinate boundaries, reconcile remote handoffs and next choices. | `docs/CURRENT.md`, `docs/PRODUCT.md`. Other tasks submit proposed changes to these two files. |
+
+The additional database-assessment task stays paused to avoid duplicate cleanup work.
+Security and testing coordinate any proposed CI database job before touching the same workflow.
+A missing disposable environment is a blocker to database execution, never permission to use
+production. Tests may expose expected security failures; record them as confirmed defects,
+not passing protection. Do not install/enable a system service or change account-wide settings
+merely to make a test run. Report a concrete environment need if the available host cannot run it.
+
+All owners use focused investigation/review agents, economical models and existing evidence.
+Each returns its exact tested source, commands/results, unrun checks, file manifest, remaining
+risks and a verified GitHub handoff. The chief will check cross-branch compatibility before
+calling the batch complete. Broader file moves, live GitHub policy changes, main merge,
+deployment, billing activation, data deletion and catalog rebuild remain outside this batch.
+
 ## Wolf's chosen repair sequence
 
 1. Small security/account fixes. Proposed first dedicated-task batch: clear the actual last-drill key on sign-out,
@@ -341,9 +373,10 @@ Next in this task: coordinate the written task scopes and integrate their remote
 All four initial handoffs and the fifth integration handoff are saved on GitHub. The account
 repair and testing changes pass the complete requested combined local baseline at c702c69.
 The chief verified the report/provenance and accepts that bounded result. Full CI, live auth,
-database tests and release readiness remain open. No new module is started by this acceptance.
+database tests and release readiness remain open. No new module was started by that acceptance. Wolf's subsequent groundwork/structure request
+is separately authorized and scoped in the active-batch section above.
 
-Next choices for Wolf (recommendations, not assigned work):
+Choices presented before the latest request (historical; active assignments above take precedence):
 
 1. **Complete testing/security groundwork first — recommended.** Continue the existing
    Git/testing task with remaining browser isolation and the full pinned Linux gate, based on
