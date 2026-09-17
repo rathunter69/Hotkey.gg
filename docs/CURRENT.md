@@ -100,10 +100,14 @@ Security's next step remains test-environment groundwork under Wolf's current re
 not a new security repair module. On a separate branch, prepare and independently review
 one platform-only bootstrap using the exact official pair pinned in
 [14d7e10](https://github.com/rathunter69/Hotkey.gg/blob/14d7e10a79232000ff24d2637ce6adc72b786b1f/docs/testing-database.md).
-Security reports local candidate 49b8193b6b6c17c63b97c898d268437ceb191cdf ready for review;
-it is not yet a remotely saved or executed handoff. Testing reviews the distinct branch-only
-workflow for no publishing, no production secrets and minimal permissions before the triggering
-push/run. Deny container outbound networking, publish no
+Testing's independent read-only review cleared exact platform candidate
+49b8193b6b6c17c63b97c898d268437ceb191cdf with no blocker. Guard tests, syntax and plan checks
+passed; the reviewed branch-only workflow has read-only permissions, pinned actions/images,
+no production secrets/deployment triggers, fixed local Docker access, isolated memory-backed
+storage and purpose-labelled cleanup. Security may push/run this one previously authorized
+platform experiment. At clearance, the source was local only and runtime remained UNRUN;
+remote/run evidence is still required. Safety-relevant executable changes require focused
+re-review before another run. Deny container outbound networking, publish no
 ports, use only temporary memory-backed storage, and disable scheduling from first startup.
 Run the official Auth migrator only within the database's isolated network namespace.
 Verify empty data, required genuine platform objects/ACLs/extensions and the isolation
