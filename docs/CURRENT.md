@@ -76,7 +76,7 @@ All preserve original local work and earlier remote branches.
 | Owner / task | Scope | Exclusive files / boundaries |
 |---|---|---|
 | **Establish testing and blockers**, `01a0af90-b973-7572-b7ff-d5bf9f504a52`; `codex/testing-security-groundwork` | Complete local matrix and exact-source full Linux run 35274460688 passed at 4ea428b; remote docs-only handoff 31af74b accepted. Redirect-safe isolation covers every active gate harness/generator, with redirect/WebSocket/service-worker canaries. | Browser test workflow(s), browser helper/canary/harnesses and generator isolation, `dev/run-checks.js`, `docs/DEVELOPMENT.md`, testing handoff. Port 8791 released after local checks. Also read-only safety review of Security's separate platform workflow before its first push/run. |
-| **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; accepted `codex/security-platform-bootstrap`, active `codex/security-replay-baseline` | Platform-only experiment passed first attempt at 49b8193; durable handoff 3dd686d accepted. Continue one bounded isolated application-replay/permission-baseline batch. All 56 SQL assertions remain UNRUN until replay succeeds; DATA-01/02/03 remain unrepaired. | `supabase/tests/`, `docs/testing-database.md`, security handoff and distinct `.github/workflows/security-replay-baseline.yml`. Testing reviews exact candidate before triggering push. No gate/deployment workflow, application runtime or migration edits; separate from current integration. |
+| **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; accepted `codex/security-platform-bootstrap`, active `codex/security-replay-baseline` | Platform-only experiment passed first attempt at 49b8193; durable handoff 3dd686d accepted. Continue one bounded isolated application-replay/permission-baseline batch. Run 35276711544 failed after one successful 52-migration replay: permission fixture aborted after 12 results. Full 56-assertion baseline and second fresh replay remain incomplete; final remote handoff pending. DATA-01/02/03 remain unrepaired. | `supabase/tests/`, `docs/testing-database.md`, security handoff and distinct `.github/workflows/security-replay-baseline.yml`. Testing reviews exact candidate before triggering push. No gate/deployment workflow, application runtime or migration edits; separate from current integration. |
 | **Audit starter 3 cleanup candidates**, `01a0af90-7fb2-7571-a5d6-b82354d57540`; `codex/repository-structure` | Complete on its branch at cf8c61b: archived the historical PROJECT_CONTEXT record, kept a root compatibility page, repaired links and recorded the remaining structure plan. Chief verified preserved text and docs-only file manifest. Included in accepted combined checkpoint 00df57a; no main merge. | `README.md`, `docs/ARCHITECTURE.md`, selected historical documentation/archive paths and non-shared documentation links, `docs/handoffs/repository-structure.md`. No runtime, generated pages, migrations, test harness or workflow edits. |
 | **Integrate account testing changes**, `01a0b0f9-09da-7a62-9dd2-dd9baeac388d`; `codex/groundwork-integration` | Complete and accepted at remote 00df57a. Account repair, full Testing 4ea/31af, structure cf8 and Security preparation/14d coexist; seven combined static checks, three runner units, source-equivalence review and replay-plan pass. Full local/Linux browser evidence reused only after exact executable equivalence; SQL56 remains UNRUN. | Integration branch and `docs/handoffs/groundwork-integration.md`. Preserve exact area executable files and chief guidance; exclude the separate platform-bootstrap experiment. No main merge/deployment. |
 | Chief coordinator, this task | Read-only GitHub/security/structure review, ownership coordination, remote handoff reconciliation and next choices. | `docs/CURRENT.md`, `docs/PRODUCT.md`, `docs/handoffs/chief-groundwork.md`. Other tasks send proposed corrections instead of editing these. |
@@ -148,6 +148,19 @@ permit one fresh repeat, and any permission assertion failure keeps the final re
 The chief confirmed execution within the already assigned scope. At clearance, the candidate
 had not been dispatched and all application SQL remains UNRUN; require the actual remote
 source/run/result before changing that status.
+
+
+The cleared replay run [35276711544](https://github.com/rathunter69/Hotkey.gg/actions/runs/35276711544)
+has now finished **failure** at exact 18babfa80dea4acb31fd30be2ae00b3610d42ed2; the chief
+verified that remote run/source/conclusion. Security and Testing report that all 52 unchanged
+Hotkey migrations completed on the first fresh platform, then the fixture aborted at its
+direct `my_pro()` call with SQLSTATE 42501. The final RPC-grants migration intentionally
+revokes client execution of that helper. Twelve TAP results were emitted (10 pass, 2 fail);
+the full 56-result baseline did not complete, and the guard refused a second instance.
+Cleanup/evidence upload passed. Final durable handoff and bounded fixture diagnosis are
+pending; no corrective run or grant/schema repair is authorized from these partial results.
+This is a test-fixture compatibility blocker, not evidence of a failing application migration.
+One successful replay does not establish two-run reproducibility.
 
 Every area uses economical focused investigation and independent review. Finish the authorized
 batch, record exact tested source/environment, actual pass/fail/unrun checks, file manifest,
@@ -256,7 +269,7 @@ implementation. Settle modes, ranked play, paths and deferred/changed rules befo
 changes. The current prompt request does not authorize a catalog rebuild or new access rules.
 
 Security's separate platform bootstrap is accepted; its isolated application replay/permission
-baseline is still pending and remains outside 00df57a. It supplies evidence for security/release
+baseline is incomplete after the fixture failure above and remains outside 00df57a. It supplies evidence for security/release
 readiness and must not be confused with the passing browser gate. Subsequent targeted cleanup,
 site structure and the planned catalog rebuild retain the chosen sequence. Remaining security
 blockers continue to constrain release readiness.
