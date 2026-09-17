@@ -74,6 +74,8 @@ jobs:
         run: node dev/e2e-smoke.js
       - name: Leaderboard (tier filter, placement, seed field)
         run: node dev/e2e-lb.js
+      - name: Account isolation (synthetic account switches and delayed responses)
+        run: node dev/e2e-account-isolation.js
       # r450: THE PAYWALL GUARD. Always-on, never scope-gated. Its first assertion is that
       # drills.js HOTKEY_PREMIUM.enabled is still FALSE — i.e. that the paywall has not gone
       # live by accident — and its §1 proves the whole r450 surface stays invisible while it

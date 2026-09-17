@@ -16,7 +16,7 @@ const { createServer } = require('./serve');
     const page = await context.newPage();
     await page.goto(origin + '/index.html');
     await page.waitForFunction(() => typeof cur !== 'undefined' && typeof clearAccountUI === 'function');
-    await page.evaluate(() => { markOnboarded(); loadChallenge('autofit'); });
+    await page.evaluate(() => { localStorage.setItem('hk_gate_off', '1'); markOnboarded(); loadChallenge('autofit'); });
     await page.waitForFunction(() => localStorage.getItem('hotkey_last_drill') === 'autofit');
     const signedOut = await page.evaluate(() => {
       clearAccountUI();

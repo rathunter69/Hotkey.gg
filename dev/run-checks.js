@@ -15,6 +15,7 @@ const suites = {
     ['--test', 'dev/tooling.test.js'],
   ],
   smoke: [
+    ['dev/e2e-account-isolation.js'],
     ['dev/e2e-smoke.js'], ['dev/e2e-lb.js'],
     ['dev/check-landing.js'], ['dev/check-paywall.js'],
     ['dev/e2e-demo-replay.js', 'navigation', 'combo', 'foot'],
