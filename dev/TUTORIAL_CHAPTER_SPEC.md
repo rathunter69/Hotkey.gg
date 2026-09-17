@@ -761,7 +761,7 @@ format and the alignment; (2) beat-by-beat formatting with no block selection (�
 | `dev/build-drill-pages.js` → `drills/*.html` ×4 + `sitemap.xml` | SEO | assembly |
 | `index.html` / `About.html` / `enterprise.html` / `billing.html` copy | 74 → 78 | assembly (smoke-guarded) |
 | `nav.js` · `profile.html` · `stats.html` · `lb.js` | read `groups` / `menuOrder` — automatic; verify only | assembly |
-| `dev/DEPTH_PASS.md` §1.0-R5 · `dev/FOUNDATIONS_SPEC.md` header · `dev/ONBOARDING_V3.md` superseded note · `dev/CONTINUITY.md` §0 · `PROJECT_CONTEXT.md` r451 header | docs | assembly |
+| `dev/DEPTH_PASS.md` §1.0-R5 · `dev/FOUNDATIONS_SPEC.md` header · `dev/ONBOARDING_V3.md` superseded note · `dev/CONTINUITY.md` §0 · `docs/history/PROJECT_CONTEXT.md` r451 header | docs | assembly |
 | cache bump `?v=` on `drills.js` and index-referenced scripts across all pages | ship | assembly (CI-enforced) |
 
 **Not touched, and deliberately so:** `HOTKEY_ACHIEVEMENTS` (no re-target — the group name is unchanged),

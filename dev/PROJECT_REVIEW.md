@@ -1,5 +1,5 @@
 # hotkey.gg — COMPREHENSIVE PROJECT REVIEW & FORWARD PIPELINE
-_Built 2026-07-23 from a 6-track subsystem audit (scope/flow · drills/curriculum · engine · cosmetics · security/backend · pipeline/CI). This is the **architecture + roadmap** companion to `PROJECT_CONTEXT.md` (which stays the running handoff/changelog). Read this to understand HOW the system is built and WHERE to take it; read PROJECT_CONTEXT's ⚡ header for the live queue._
+_Built 2026-07-23 from a 6-track subsystem audit (scope/flow · drills/curriculum · engine · cosmetics · security/backend · pipeline/CI). This is a historical architecture + roadmap companion to [the archived project context](../docs/history/PROJECT_CONTEXT.md). Read it for earlier implementation rationale; use [docs/CURRENT.md](../docs/CURRENT.md) for the active queue._
 
 ---
 

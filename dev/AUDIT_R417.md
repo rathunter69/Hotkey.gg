@@ -8,7 +8,7 @@ _Six parallel agent audits (drills/copy · engine parity · account wiring · he
 ---
 ## A. ENGINE EXCEL-PARITY (→ segment H3/H7)
 
-Scope read: full keydown handler (11326–11913), evalFormula (7915–8166), recalc (9930–9964), copy/paste/fill (10062–10853), undo (10546–10564), formats (7851–7898, 8555–8608), structure ops (11164–11256, 11467–11502), plus dev/e2e-audit-parity.js, dev/e2e-formulas.js, and the PROJECT_CONTEXT.md "NOT applied (by choice)" list.
+Scope read: full keydown handler (11326–11913), evalFormula (7915–8166), recalc (9930–9964), copy/paste/fill (10062–10853), undo (10546–10564), formats (7851–7898, 8555–8608), structure ops (11164–11256, 11467–11502), plus dev/e2e-audit-parity.js, dev/e2e-formulas.js, and the `docs/history/PROJECT_CONTEXT.md` "NOT applied (by choice)" list.
 
 ## Ranked divergences
 

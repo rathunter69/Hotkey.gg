@@ -36,7 +36,7 @@ pre-existing uncommitted foundation changes. Remote refs were read locally, not 
 | Payments | Billing page, entitlement helpers, create-checkout function | Test-only scaffold; no deployed subscription webhook listed |
 | Website delivery | Static HTML/CSS/JS, Cloudflare headers, GitHub checks | Current production build settings and release path unverified |
 | Content generation | `dev/build-drill-pages.js`, curriculum generators | Old planning files still have active consumers |
-| Design history | `dev/`, `PROJECT_CONTEXT.md`, `art/` | Old decisions, proposals and instructions overlap |
+| Design history | `dev/`, `docs/history/PROJECT_CONTEXT.md`, `art/` | Old decisions, proposals and instructions overlap |
 
 See ARCHITECTURE.md for editing ownership and generated-file rules.
 
