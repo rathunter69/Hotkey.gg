@@ -40,7 +40,7 @@ practice/ranked mode switch from historical instructions.
 | Remote main | `434bc0e8764e741e0e11f84cf51d61a1755d7c67`, PR #250 merged September 5. Refreshed September 17; unchanged. The last observed main gate/Pages results belong to this old source, not the repair branches. |
 | Shared guidance | `codex/repository-foundation`; read its current remote tip. Foundation introduced guidance/audits and development tooling, not a framework migration or application repair. |
 | Accepted combined application/testing checkpoint | `codex/account-testing-integration`, remote handoff commit `6c984161c31bc4637dbe88b73a4da8408cefdf1d`; exact tested code `c702c6932b342cd36656317f7ce50f1c33b7df3e`. The final commit adds only its handoff document. Not merged into foundation/main or deployed. |
-| Active batch starting point | The three original area branches start from accepted integration 6c98416 and read later foundation guidance separately. The platform-only experiment starts from Security feasibility14d7e10, which preserves that ancestry; it is not yet an accepted integration source. Preserve both accepted account/testing batches. |
+| Active batch starting point | The three original area branches start from accepted integration 6c98416 and read later foundation guidance separately. The accepted platform-only experiment starts from Security feasibility 14d7e10; replay-baseline work starts from its handoff 3dd686d. These preserve that ancestry and remain outside the browser/structure integration. Preserve both accepted account/testing batches. |
 
 The chief verified remote ancestry: foundation f2dd564 → account import 2981dec → testing
 import 3271c67 → isolation correction c702c69 → handoff 6c98416. The integration owner ran:
@@ -65,7 +65,7 @@ All preserve original local work and earlier remote branches.
 | Owner / task | Scope | Exclusive files / boundaries |
 |---|---|---|
 | **Establish testing and blockers**, `01a0af90-b973-7572-b7ff-d5bf9f504a52`; `codex/testing-security-groundwork` | Complete local matrix reported green and code saved at 4ea428b. Redirect-safe isolation now covers all active gate harnesses/generator, with redirect/WebSocket/service-worker canaries. Exact-source Linux run 35274460688 remains in progress; final handoff pending. | Browser test workflow(s), browser helper/canary/harnesses and generator isolation, `dev/run-checks.js`, `docs/DEVELOPMENT.md`, testing handoff. Port 8791 released after local checks. Also read-only safety review of Security's separate platform workflow before its first push/run. |
-| **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; `codex/security-groundwork`, with separate experiment `codex/security-platform-bootstrap` | Preparation complete at 2a4a5f5; official image/source feasibility accepted at 14d7e10. All 56 SQL assertions remain UNRUN; static and three runner unit tests pass. Proceed with one platform-only isolated bootstrap experiment within the authorized test-environment groundwork, stopping before application replay or permission fixes. | New `supabase/tests/`, security-specific tooling/docs, `docs/testing-database.md`, security handoff. For the platform-only experiment, also reserve a distinct `.github/workflows/security-platform-bootstrap.yml` after Testing's read-only safety review; no gate/deployment workflow, runtime or migration edits. |
+| **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; accepted `codex/security-platform-bootstrap`, active `codex/security-replay-baseline` | Platform-only experiment passed first attempt at 49b8193; durable handoff 3dd686d accepted. Continue one bounded isolated application-replay/permission-baseline batch. All 56 SQL assertions remain UNRUN until replay succeeds; DATA-01/02/03 remain unrepaired. | `supabase/tests/`, `docs/testing-database.md`, security handoff and distinct `.github/workflows/security-replay-baseline.yml`. Testing reviews exact candidate before triggering push. No gate/deployment workflow, application runtime or migration edits; separate from current integration. |
 | **Audit starter 3 cleanup candidates**, `01a0af90-7fb2-7571-a5d6-b82354d57540`; `codex/repository-structure` | Complete on its branch at cf8c61b: archived the historical PROJECT_CONTEXT record, kept a root compatibility page, repaired links and recorded the remaining structure plan. Chief verified preserved text and docs-only file manifest. Pending combined-branch integration; no main merge. | `README.md`, `docs/ARCHITECTURE.md`, selected historical documentation/archive paths and non-shared documentation links, `docs/handoffs/repository-structure.md`. No runtime, generated pages, migrations, test harness or workflow edits. |
 | **Integrate account testing changes**, `01a0b0f9-09da-7a62-9dd2-dd9baeac388d`; `codex/groundwork-integration` | Testing 4ea428b can join accepted cleanup/security preparation. Combined seven static checks, three security-runner units and independent executable-equivalence review reported green. Final remote handoff and Linux conclusion still pending; no completed combined acceptance yet. | Integration branch and `docs/handoffs/groundwork-integration.md`. Preserve exact area executable files and chief guidance; exclude the separate platform-bootstrap experiment. No main merge/deployment. |
 | Chief coordinator, this task | Read-only GitHub/security/structure review, ownership coordination, remote handoff reconciliation and next choices. | `docs/CURRENT.md`, `docs/PRODUCT.md`, `docs/handoffs/chief-groundwork.md`. Other tasks send proposed corrections instead of editing these. |
@@ -85,10 +85,9 @@ and actual Linux result.
 The additional database assessment task `01a0b0f0-0755-7962-b436-a6646a32321d` stays paused
 to avoid duplicate cleanup. Testing and Security coordinate any database CI job before editing
 a shared workflow. Security's host check found no local Docker/Podman/Postgres/Supabase CLI or WSL. Feasibility
-review at 14d7e10 pins the official database/Auth pair and confirms a GitHub-hosted Linux
-route. The remaining gap is a complete bootstrap: standalone Postgres lacks auth.jwt() and
-an Auth column required by the fixtures. Official Auth migrations must supply them; no stubs. Do not install/enable a system service or change account-wide settings
-merely to make a test run.
+review at 14d7e10 pinned the official database/Auth pair. The accepted platform-only Linux
+run now closes that bootstrap gap using genuine official Auth migrations, with no stubs or
+host installation. Application migration replay and permission results remain pending.
 
 Browser tests must block production traffic, including redirects, and use synthetic fixtures.
 Before any database replay, establish outbound denial and disabled scheduling; the migration
@@ -96,25 +95,35 @@ chain contains a production digest callback. Missing infrastructure never permit
 production. Test-only CI may run only after reviewing triggers, permissions and side effects;
 do not merge main or invoke deployment to make a workflow dispatchable.
 
-Security's next step remains test-environment groundwork under Wolf's current request,
-not a new security repair module. On a separate branch, prepare and independently review
-one platform-only bootstrap using the exact official pair pinned in
-[14d7e10](https://github.com/rathunter69/Hotkey.gg/blob/14d7e10a79232000ff24d2637ce6adc72b786b1f/docs/testing-database.md).
-Testing's independent read-only review cleared exact platform candidate
-49b8193b6b6c17c63b97c898d268437ceb191cdf with no blocker. Guard tests, syntax and plan checks
-passed; the reviewed branch-only workflow has read-only permissions, pinned actions/images,
-no production secrets/deployment triggers, fixed local Docker access, isolated memory-backed
-storage and purpose-labelled cleanup. Security may push/run this one previously authorized
-platform experiment. At clearance, the source was local only and runtime remained UNRUN;
-remote/run evidence is still required. Safety-relevant executable changes require focused
-re-review before another run. Deny container outbound networking, publish no
-ports, use only temporary memory-backed storage, and disable scheduling from first startup.
-Run the official Auth migrator only within the database's isolated network namespace.
-Verify empty data, required genuine platform objects/ACLs/extensions and the isolation
-settings. Stop at the first genuine setup incompatibility and preserve that evidence.
-Do not run Hotkey migrations or the 56 SQL assertions in this platform-only experiment,
-cycle speculative images, install host services or change live settings. A successful
-bootstrap will be reviewed separately before the application-replay step.
+Security's platform-only experiment **passed on its first reviewed run**:
+[35275149357](https://github.com/rathunter69/Hotkey.gg/actions/runs/35275149357),
+exact source 49b8193b6b6c17c63b97c898d268437ceb191cdf, remote handoff
+3dd686d26edcb53325579fbe479eb01bdf41f773. The chief verified the run/job conclusion,
+exact source and docs/evidence-only final delta. Genuine Auth bootstrap (77 platform/Auth
+migrations), empty Auth/public data, required objects/ACLs/roles, transactional extension
+checks, startup scheduling disabled, isolation and named cleanup passed. Hotkey migrations
+executed: **0**; permission assertions executed: **0**. The 77 platform migrations are not
+the 52 Hotkey migrations. One platform pass is not reproducible application replay, production
+parity, a permission repair or an integrated release.
+
+After accepting this result, the chief assigned one continuation of Wolf's testing/security
+groundwork on `codex/security-replay-baseline` from 3dd686d. Reuse the proven exact image pair
+and bootstrap plus the guarded runner; prepare a distinct branch-only workflow and obtain
+Testing's independent exact-source safety review before triggering it. Preserve network none,
+no ports/host or persistent mounts, memory-backed data, genuine official permissions,
+startup scheduling disabled, pinned actions, minimal permissions, no production secrets,
+exact-source validation and purpose-labelled cleanup.
+
+Replay all 52 source migrations unchanged and in order, aiming for two fresh successful
+replays before claiming reproducibility. Stop at the first migration incompatibility and save
+the exact sanitized filename/error; never skip a failure, patch migration history, manufacture
+objects/grants, vary images or reuse a partially replayed database as a baseline. If replay
+succeeds, run the existing 56 synthetic permission assertions under real roles. Predicted
+failures remain hypotheses until executed; failing assertions cannot be suppressed into a
+green job. Bounded wrapper errors may be corrected and reviewed, but a genuine source replay
+failure ends this batch. No application/schema repair, privacy/MFA implementation or new
+product module is authorized. The experiment stays outside current browser/structure
+integration and must not delay its handoff.
 
 Every area uses economical focused investigation and independent review. Finish the authorized
 batch, record exact tested source/environment, actual pass/fail/unrun checks, file manifest,
@@ -133,6 +142,7 @@ repairs remain separately scoped.
 | Account/testing integration | [6c98416](https://github.com/rathunter69/Hotkey.gg/blob/6c984161c31bc4637dbe88b73a4da8408cefdf1d/docs/handoffs/account-testing-integration.md) | Requested combined local checks pass at c702c69, remote provenance verified; explicit CI/live-auth/DB limits remain. Task finished and released port 8791. |
 | Security test preparation | [2a4a5f5](https://github.com/rathunter69/Hotkey.gg/blob/2a4a5f544e968850cdfd27557108de13c3ffcec2/docs/handoffs/security-accounts.md) | Code ce53324 has guarded disposable runner and 56 synthetic role assertions; three runner units/static pass. Twelve predicted vulnerability failures are not executed reproductions. No database replay, permission result or security repair is claimed. |
 | Official test-platform feasibility | [14d7e10](https://github.com/rathunter69/Hotkey.gg/blob/14d7e10a79232000ff24d2637ce6adc72b786b1f/docs/handoffs/security-accounts.md) | Pinned official database/Auth image manifests and source SHAs; standalone platform gaps traced. Documentation-only delta over 2a4a5f5, executable code remains ce53324. No bootstrap/replay/SQL result yet. |
+| Isolated platform bootstrap | [3dd686d](https://github.com/rathunter69/Hotkey.gg/blob/3dd686d26edcb53325579fbe479eb01bdf41f773/docs/handoffs/security-accounts.md) | Exact reviewed source 49b8193 passed Linux run 35275149357 on first attempt; durable sanitized JSON committed. Genuine empty platform, Auth helpers/ACLs, extensions, isolation and cleanup verified. Zero Hotkey migrations or permission assertions; not a DATA-01/02/03 repair. |
 | Repository structure cleanup | [cf8c61b](https://github.com/rathunter69/Hotkey.gg/blob/cf8c61bc1a6922325ac63f9d6449795e40484847/docs/handoffs/repository-structure.md) | Historical record moved to docs/history with compatibility page and repaired references. Chief fetched old/new content: same 1,145 lines, only the two Markdown targets on one line changed. No runtime/test/workflow/schema edits; documentation checks passed. |
 | Chief GitHub/security/structure review | [chief-groundwork.md](handoffs/chief-groundwork.md) | Fresh branch/ruleset/tree/workflow source review and bounded structure guidance; no settings or application changes. |
 
@@ -215,8 +225,8 @@ Do not call a static pass a playtest, a local subset full CI, or a report an imp
 Next: receive Testing's final handoff and Linux result, then accept the dedicated combined
 integration only after its remote handoff and checks. Testing 4ea428b and Security feasibility
 14d7e10 are available for the current integration; no new product module has started. Security's separate
-platform-only experiment reports its own exact source/result; it must not delay or be
-mistaken for the browser gate or an executed database permission test. Structure cleanup and security preparation are saved separately; neither establishes
+platform bootstrap is accepted; its replay/permission-baseline continuation reports its own
+exact source/result and must not delay or be mistaken for browser-gate acceptance. Structure cleanup and security preparation are saved separately; neither establishes
 the still-pending Linux CI or database result. Then give Wolf one next decision. Do not automatically start
 a later batch from a recommendation. Catalog/progression design remains the next product
 module; subsequent targeted cleanup/site structure and the planned catalog rebuild follow
