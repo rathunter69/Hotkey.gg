@@ -77,6 +77,10 @@ const STUB = () => {
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  // This is a stubbed local audit: never load live auth or contact production.
+  const localOrigin = new URL(HK_URL).origin;
+  await ctx.route('**/*', route => new URL(route.request().url()).origin === localOrigin
+    ? route.continue() : route.abort());
   const page = await ctx.newPage();
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 160)));

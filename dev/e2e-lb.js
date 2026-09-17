@@ -31,6 +31,7 @@ const PKEYS = (() => {
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
   const page = await browser.newPage();
+  await page.route('**/@supabase/**', route => route.abort());
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 150)));
   await page.goto(URL, { waitUntil: 'load' });
@@ -336,6 +337,7 @@ const PKEYS = (() => {
   ok(sigBad.length === 0, 'every computeXP call site passes (runs, pl, sessions)', sigBad.join(' | '));
   // cert page renders its empty state without page errors
   const certPage = await browser.newPage();
+  await certPage.route('**/@supabase/**', route => route.abort());
   const certErrs = [];
   certPage.on('pageerror', e => certErrs.push(String(e.message).slice(0, 120)));
   await certPage.goto(URL.replace('leaderboard.html', 'cert.html'), { waitUntil: 'load' });

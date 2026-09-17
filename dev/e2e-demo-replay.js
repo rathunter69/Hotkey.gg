@@ -32,6 +32,7 @@ const REPS = parseInt(process.env.REPS || '3', 10);
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
   const page = await browser.newPage();
+  await page.route('**/@supabase/**', route => route.abort());
   const pageErrors = [];
   page.on('pageerror', e => pageErrors.push(String(e.message || e).slice(0, 160)));
   await page.addInitScript(() => {

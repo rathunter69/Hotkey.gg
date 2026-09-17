@@ -26,6 +26,7 @@
           C31 prompt register (P6, the deadline register under half of every chapter).
    Run: node dev/check-invariants.js   (V4_STRICT=1 to fail on C28-C31) */
 'use strict';
+const readSource = require('./read-source');
 const fs = require('fs');
 const vm = require('vm');
 let fail = 0;
@@ -36,7 +37,7 @@ const ok = m => console.log('  ok  ' + m);
 try {
   const sandbox = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
   vm.createContext(sandbox);
-  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sandbox);
+  vm.runInContext(readSource('drills.js'), sandbox);
   const W = sandbox.window;
   const D = W.HOTKEY_DRILLS || {};
   const groups = D.groups || [];
@@ -113,7 +114,7 @@ try {
 try {
   const sb = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
   vm.createContext(sb);
-  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sb);
+  vm.runInContext(readSource('drills.js'), sb);
   const meta = (sb.window.HOTKEY_DRILLS || {}).meta || {};
   const keys = Object.keys(meta);
   if (!keys.length) bad('C5: no meta entries parsed from drills.js (shape changed?)');
@@ -134,8 +135,8 @@ try {
 
 /* ---- C3: every SKINS key has a per-class notch override in nav.css ---- */
 try {
-  const themes = fs.readFileSync('themes.js', 'utf8');
-  const cssTxt = fs.readFileSync('nav.css', 'utf8');
+  const themes = readSource('themes.js');
+  const cssTxt = readSource('nav.css');
   const si = themes.indexOf('const SKINS={');
   const block = si >= 0 ? themes.slice(si, themes.indexOf('};', si)) : '';
   const skinKeys = [];
@@ -163,7 +164,7 @@ try {
    detached in a refactor without CI noticing. Also: HOTKEY_CLOCKS keys ⊆ real drills
    (the §2.1 override map can't drift from the catalog). ---- */
 try {
-  const idx = fs.readFileSync('index.html', 'utf8');
+  const idx = readSource('index.html');
   const need = [
     ['function hkSplitTick', 'the §2.1 split-capture latch (hkSplitTick) is gone from index.html'],
     ['hkSplitTick(items)', 'updateChecklist no longer feeds the grading pass into hkSplitTick — splits stop capturing'],
@@ -177,7 +178,7 @@ try {
 
   const sb7 = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
   vm.createContext(sb7);
-  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sb7);
+  vm.runInContext(readSource('drills.js'), sb7);
   const valid7 = new Set(((sb7.window.HOTKEY_DRILLS || {}).groups || []).flatMap(g => g.keys || []));
   const clocks = sb7.window.HOTKEY_CLOCKS || {};
   let cbad = 0;
@@ -199,7 +200,7 @@ try {
    additions to the allowlist require the drill's §4 page claiming the R2(a) exemption. ---- */
 try {
   const BARE_RANGE_ALLOW = new Set(['navigation']);
-  const idx = fs.readFileSync('index.html', 'utf8');
+  const idx = readSource('index.html');
   const start = idx.indexOf('const CHALLENGES = {');
   const end = idx.indexOf('STATE + ENGINE', start);
   let warned = 0, scanned = 0;
@@ -245,7 +246,7 @@ try {
    present and that no drill hand-writes the save beat (the engine owns it, exactly once). ---- */
 try {
   const REWORKED = ['navigation', 'blocksel', 'filldr', 'pastes', 'rowops', 'ruleoff', 'editfix', 'ruleaudit', 'housestyle', 'typeset', 'modeltour', 'combo', 'decimals', 'center', 'autofit', 'margin', 'anchor', 'gauntlet', 'foot', 'percent', 'bridge', 'sumif', 'fxconvert', 'cagr', 'lookup', 'scrub', 'sort', 'recon', 'lookup2', 'unhide', 'rollup', 'filterpass', 'series', 'drill', 'stalelink', 'signerr', 'versionup', 'wrapfix', 'cases', 'audit', 'triage', 'balcheck', 'tieout', 'balance', 'wacc', 'fcfbuild', 'dcf', 'comps', 'txncomps', 'football', 'dcfsens', 'retbridge', 'accdil', 'sourcesuses', 'schedule', 'intsched', 'lbo', 'revolver', 'waterfall', 'covtable', 'liqbridge', 'wk13', 'cascade', 'debtsched', 'isbuild', 'bsbuild', 'cfslink', 'nwcsched', 'threestmt', 'opmodel', 'dcfbuild', 'lbobuild', 'debtblock', 'dashcover'];   // r422 H6b-1 wave 1 · r440: the last three of Formulas II · r444: Models I opens
-  const idx = fs.readFileSync('index.html', 'utf8');
+  const idx = readSource('index.html');
   const start = idx.indexOf('const CHALLENGES = {');
   const end = idx.indexOf('STATE + ENGINE', start);
   // count top-level elements of the FIRST array literal returned by fn `name(){ return [ ... ]; }`
@@ -305,9 +306,9 @@ try {
 try {
   const sb10 = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
   vm.createContext(sb10);
-  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sb10);
+  vm.runInContext(readSource('drills.js'), sb10);
   const meta10 = (sb10.window.HOTKEY_DRILLS || {}).meta || {};
-  const idx10 = fs.readFileSync('index.html', 'utf8');
+  const idx10 = readSource('index.html');
   const s10 = idx10.indexOf('const CHALLENGES = {');
   const e10 = idx10.indexOf('STATE + ENGINE', s10);
   const body10 = idx10.slice(s10, e10);
@@ -354,7 +355,7 @@ try {
   // Stateful line walk rather than a whole-file regex: block comments here run for dozens of
   // lines, and a lone /\/\*[\s\S]*?\*\// pass mis-spans them — it left continuation lines
   // behind while swallowing real code, so genuine copy was hidden and comments still flagged.
-  const raw = fs.readFileSync('index.html', 'utf8');
+  const raw = readSource('index.html');
   const kept = [];
   let inBlock = false;
   for (const line of raw.split('\n')) {
@@ -411,10 +412,10 @@ try {
    NOTE: this counts entries, which is mechanical. It cannot judge whether the two routes are
    genuinely different — that stays a review question. ---- */
 try {
-  const inv = fs.readFileSync('dev/check-invariants.js', 'utf8');
+  const inv = readSource('dev/check-invariants.js');
   const m = /const REWORKED = \[([^\]]*)\]/.exec(inv);
   const reworked = m ? m[1].split(',').map(s => s.trim().replace(/^'|'$/g, '')).filter(Boolean) : [];
-  const alts = fs.readFileSync('dev/e2e-alt-paths.js', 'utf8');
+  const alts = readSource('dev/e2e-alt-paths.js');
   const counts = {};
   // must match an ALTS ENTRY, not a keystroke object — `{key:'z',ctrl:true}` in a moves
   // script has the same shape. Entries are the only ones followed by a `name:` field.
@@ -428,7 +429,7 @@ try {
   // an entry naming a drill that no longer exists is dead weight and hides real coverage gaps
   const sbA = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
   vm.createContext(sbA);
-  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sbA);
+  vm.runInContext(readSource('drills.js'), sbA);
   const live = new Set((sbA.window.HOTKEY_DRILLS || {}).menuOrder || []);
   for (const k of Object.keys(counts))
     if (live.size && !live.has(k)) bad(`C12: dev/e2e-alt-paths.js has ${counts[k]} entr${counts[k] === 1 ? 'y' : 'ies'} for '${k}', which is not in menuOrder (retired drill?)`);
@@ -468,7 +469,7 @@ try {
     .split('\n').map(l => l.replace(/(^|[^:])\/\/.*$/, '$1').replace(/(^|[^-])--.*$/, '$1'))
     .join('\n');
   for (const f of files) {
-    const src = decomment(fs.readFileSync(f, 'utf8'));
+    const src = decomment(readSource(f));
     src.split('\n').forEach((line, i) => {
       for (const k of RETIRED)
         if (new RegExp(`['"\`]${k}['"\`]`).test(line)) {
@@ -516,7 +517,7 @@ try {
     /['"]hk_gate_off['"][^\n]*\]\s*[\s\S]{0,120}?forEach[\s\S]{0,120}?setItem/.test(src);
   let n14 = 0, seen14 = 0;
   for (const f of files) {
-    const raw = fs.readFileSync(f, 'utf8');
+    const raw = readSource(f);
     const boots = /addInitScript/.test(raw) || /goto\([^)]*index\.html/.test(raw) || /goto\(\s*BASE\s*\+\s*['"]\/?index\.html/.test(raw) || /goto\(BASE \+ '\/' \+ url/.test(raw);
     if (!boots || !/loadChallenge\s*\(/.test(raw)) continue;
     seen14++;
@@ -553,7 +554,7 @@ try {
    SOURCE regex, not a runtime read: post-sync the properties legitimately exist, so only the
    text of the file can tell a duplicate from the synced value. ---- */
 try {
-  const idx = fs.readFileSync('index.html', 'utf8');
+  const idx = readSource('index.html');
   const start = idx.indexOf('const CHALLENGES = {');
   const end = idx.indexOf('STATE + ENGINE', start);
   if (start < 0 || end < 0) bad('C16: CHALLENGES block not found in index.html (shape changed?)');
@@ -609,7 +610,7 @@ try {
   };
   const sbC = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
   vm.createContext(sbC);
-  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sbC);
+  vm.runInContext(readSource('drills.js'), sbC);
   const truth = {};
   for (const t of (sbC.window.HK_TRACKS || [])) truth[t.id] = t.keys || [];
 
@@ -617,7 +618,7 @@ try {
   // one to define it is the one that is live.
   const migDir = 'supabase/migrations';
   const defs = fs.readdirSync(migDir).filter(f => f.endsWith('.sql'))
-    .filter(f => /create\s+or\s+replace\s+function\s+public\.issue_certificate/.test(fs.readFileSync(migDir + '/' + f, 'utf8')))
+    .filter(f => /create\s+or\s+replace\s+function\s+public\.issue_certificate/.test(readSource(migDir + '/' + f)))
     .sort();
   if (!defs.length) bad('C15: no migration defines public.issue_certificate');
   const live = defs[defs.length - 1];
@@ -625,7 +626,7 @@ try {
   let n14 = 0;
   for (const [path, tag] of sources) {
     if (!fs.existsSync(path)) continue;
-    const got = trackArrays(fs.readFileSync(path, 'utf8'), path);
+    const got = trackArrays(readSource(path), path);
     for (const t of Object.keys(truth)) {
       if (!got[t]) { n14++; continue; }
       const want = new Set(truth[t]), have = new Set(got[t]);
@@ -650,7 +651,7 @@ try {
 try {
   const sb15 = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
   vm.createContext(sb15);
-  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sb15);
+  vm.runInContext(readSource('drills.js'), sb15);
   const groups15 = ((sb15.window.HOTKEY_DRILLS || {}).groups || []).map(g => g.name);
   const camp15 = (sb15.window.HOTKEY_CAMPAIGN && sb15.window.HOTKEY_CAMPAIGN.chapters) || [];
   if (!groups15.length || !camp15.length) bad('C17: groups[] or HOTKEY_CAMPAIGN.chapters did not parse (shape changed?)');
@@ -678,9 +679,9 @@ try {
 try {
   const sbQ = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
   vm.createContext(sbQ);
-  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sbQ);
+  vm.runInContext(readSource('drills.js'), sbQ);
   const liveQ = new Set((sbQ.window.HOTKEY_DRILLS || {}).menuOrder || []);
-  const lbSrc = fs.readFileSync('lb.js', 'utf8');
+  const lbSrc = readSource('lb.js');
   const blk = /const\s+MG_PROGRAMS\s*=\s*\{([\s\S]*?)\n  \};/.exec(lbSrc);
   if (!blk) bad('C20: MG_PROGRAMS block not found in lb.js (shape changed?)');
   else {
@@ -710,13 +711,13 @@ try {
 try {
   const sbP = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
   vm.createContext(sbP);
-  const drillSrc = fs.readFileSync('drills.js', 'utf8');
+  const drillSrc = readSource('drills.js');
   vm.runInContext(drillSrc, sbP);
   const WP = sbP.window;
   const pk = (WP.HK_PLACEMENT || {}).KEYS || [];
   const gatedGroups = new Set(Object.keys((WP.HOTKEY_GATES || {}).groups || {}));
   const groupOf = (WP.HOTKEY_DRILLS || {}).groupOf || {};
-  const idx = fs.readFileSync('index.html', 'utf8');
+  const idx = readSource('index.html');
   const gateBranch = /const __gn\s*=\s*drillLocked\(key\);[\s\S]{0,900}?if\s*\(__gn([\s\S]{0,220}?)\)\s*\{/.exec(idx);
   const rideDefined = /window\.hkPlacementRide\s*=\s*function/.test(drillSrc);
   const gateRides = !!(gateBranch && /hkPlacementRide/.test(gateBranch[1]));
@@ -746,7 +747,7 @@ try {
   const sbA2 = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {},
                  localStorage: { getItem: () => null, setItem() {} } };
   vm.createContext(sbA2);
-  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sbA2);
+  vm.runInContext(readSource('drills.js'), sbA2);
   const WA = sbA2.window;
   const liveA = new Set((WA.HOTKEY_DRILLS || {}).menuOrder || []);
   const AC = WA.HOTKEY_ACHIEVEMENTS || [];
@@ -788,10 +789,10 @@ try {
 try {
   const sb15 = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console, navigator: {} };
   vm.createContext(sb15);
-  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sb15);
+  vm.runInContext(readSource('drills.js'), sb15);
   const W15 = sb15.window;
   const D15 = W15.HOTKEY_DRILLS || {};
-  const idx15 = fs.readFileSync('index.html', 'utf8');
+  const idx15 = readSource('index.html');
   const KT = 'keyboardtour';
 
   /* ---- the Tour is nowhere in the catalog plumbing ---- */
@@ -983,8 +984,8 @@ try {
    bonus rows. The engine-appended save closer (saveClose:true) is NOT a core a step may claim —
    it is the win, and it belongs to the drill, not to a step (index.html hkSaveCloseWire). ---- */
 try {
-  const idx26 = fs.readFileSync('index.html', 'utf8');
-  const nav26 = fs.readFileSync('nav.js', 'utf8');
+  const idx26 = readSource('index.html');
+  const nav26 = readSource('nav.js');
 
   /* ---- (1) no second onboarding surface ---- */
   const DEAD = ['TOUR_STEPS', 'tourShow', 'buildTourPlan', 'tourSkipReq', 'tourReplay',
@@ -1218,8 +1219,8 @@ try {
    and ⌥= (not a Mac chord) as Excel for Mac. reference.html must DERIVE (hkMacSpec/hkMacNote)
    and must never re-implement the swap locally. */
 try {
-  const themes = fs.readFileSync('themes.js', 'utf8');
-  const ref = fs.readFileSync('reference.html', 'utf8');
+  const themes = readSource('themes.js');
+  const ref = readSource('reference.html');
   const TABLE = /window\.HK_MAC_CHORDS\s*=\s*\{/;
   const rows = (themes.match(/'(?:CTRL|ALT|F\d|SHIFT)[^']*'\s*:\s*\{/g) || []).length;
   if (!TABLE.test(themes)) bad('C25: themes.js no longer defines window.HK_MAC_CHORDS (the Mac truth table)');
@@ -1260,7 +1261,7 @@ try {
   const TOLERANCE = "try{ if(localStorage.getItem('hk_ranked')==='1') localStorage.setItem('hk_rank_reveal_seen','1'); localStorage.removeItem('hk_ranked'); }catch(e){}";
   const defs = [], reads = [];
   for (const f of PRODUCT) {
-    const src = fs.readFileSync(f, 'utf8');
+    const src = readSource(f);
     const lines = src.split('\n');
     lines.forEach((ln, i) => {
       const code = ln.replace(/\/\*.*?\*\//g, '').replace(/^\s*(\/\/|\*|\/\*).*$/, '');   // drop comment-only lines + inline block comments
@@ -1273,10 +1274,10 @@ try {
   else ok(`hkRankedEntered defined once (${defs[0]})`);
   if (reads.length) bad(`C27: the retired hk_ranked key is still read/written outside the tolerance line: ${reads.join(', ')}`);
   else ok('no product file reads or writes hk_ranked (one allowlisted tolerance line)');
-  const nav = fs.readFileSync('nav.js', 'utf8');
+  const nav = readSource('nav.js');
   if (nav.indexOf(TOLERANCE) < 0) bad('C27: the nav.js tolerance line changed — update the C27 allowlist in the same commit');
   // the readers that must consult the predicate rather than a flag of their own
-  const idx = fs.readFileSync('index.html', 'utf8'), lb = fs.readFileSync('lb.js', 'utf8'), acct = fs.readFileSync('account.html', 'utf8');
+  const idx = readSource('index.html'), lb = readSource('lb.js'), acct = readSource('account.html');
   if (!/window\.hkRankedEntered\(\)\s*&&\s*window\.hkPlacementRide/.test(idx)) bad('C27: index.html loadChallenge no longer gates the placement ride on window.hkRankedEntered()');
   if (!/window\.hkRankedEntered\(\)/.test(lb)) bad('C27: lb.js heroHtml no longer consults window.hkRankedEntered()');
   if (!/hkIsRanked\(\)|hkRankedEntered\(\)/.test(acct)) bad('C27: account.html Ranked card no longer consults the derived predicate');
@@ -1284,7 +1285,7 @@ try {
                                  ['lb.js', /id="enterRanked"|id="waitRanked"|function rankedInfographic/, 'the Enter Ranked / Not yet gate'],
                                  ['themes.js', /id="hkruGo"|id="hkruLater"|onEnter/, 'an Enter/later button on the reveal card'],
                                  ['account.html', /id="rankedLeave"|Leave ranked/, 'the leave-ranked control']]) {
-    if (pat.test(stripComments(fs.readFileSync(f, 'utf8')))) bad(`C27: ${f} has ${what} back — rank is automatic at LVL 10, there is nothing to enter or leave`);
+    if (pat.test(stripComments(readSource(f)))) bad(`C27: ${f} has ${what} back — rank is automatic at LVL 10, there is nothing to enter or leave`);
   }
   ok('the opt-in ceremony stays retired (no nudge, gate buttons, enter/later CTA or leave control)');
 } catch (e) {
@@ -1326,7 +1327,7 @@ try {
 
   const sandbox = { window: {}, document: { createElement: () => ({ style: {} }), head: { appendChild() {} } }, console: { warn() {}, log() {} }, navigator: {} };
   vm.createContext(sandbox);
-  vm.runInContext(fs.readFileSync('drills.js', 'utf8'), sandbox);
+  vm.runInContext(readSource('drills.js'), sandbox);
   const D = sandbox.window.HOTKEY_DRILLS || {};
   const groups = D.groups || [];
   const meta = D.meta || {};
@@ -1348,7 +1349,7 @@ try {
   }
 
   /* ---- the static CHALLENGES slice (see the note above) ---- */
-  const idxSrc = fs.readFileSync('index.html', 'utf8').split('\n');
+  const idxSrc = readSource('index.html').split('\n');
   const cStart = idxSrc.findIndex(l => /^const CHALLENGES = \{/.test(l));
   let cEnd = idxSrc.length;
   for (let i = cStart + 1; i < idxSrc.length; i++) if (/^\};/.test(idxSrc[i])) { cEnd = i; break; }
@@ -1412,7 +1413,7 @@ try {
 
   /* ---- C30: family coverage (P4) ---- */
   {
-    const V4 = JSON.parse(fs.readFileSync('dev/curriculum-v4.json', 'utf8'));
+    const V4 = JSON.parse(readSource('dev/curriculum-v4.json'));
     const fams = V4.families || {};
     const ids = Object.keys(fams);
     if (!ids.length) bad('C30: dev/curriculum-v4.json declares no families');

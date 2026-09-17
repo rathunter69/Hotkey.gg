@@ -3,11 +3,18 @@ dev/smoke-results.json
 # session scratch (screenshots, preview generators, temp data)
 scratchpad/
 node_modules/
-package.json
-package-lock.json
 .claude/worktrees/
 
 # r439: local gate transcripts. Written into the repo (not /tmp) so a container
 # restart mid-run does not cost the results — two restarts did exactly that during
 # the r439 retirement verification. Never committed.
 .gate-*.log
+
+# Local credentials and generated development artifacts
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+test-results/
+playwright-report/

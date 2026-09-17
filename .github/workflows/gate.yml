@@ -38,7 +38,7 @@ jobs:
           fi
           CHANGED="$(git diff --name-only "$BASE" "$HEAD")"
           echo "Changed files:"; echo "$CHANGED"
-          if echo "$CHANGED" | grep -qE '^(index\.html|drills\.js|dev/|\.github/workflows/)'; then
+          if echo "$CHANGED" | grep -qE '^(index\.html|drills\.js|dev/|package(-lock)?\.json|\.gitattributes|\.github/workflows/)'; then
             echo "engine=true"  >> "$GITHUB_OUTPUT"; echo '=> engine matrix WILL run'
           else
             echo "engine=false" >> "$GITHUB_OUTPUT"; echo '=> cosmetic-only: smoke + lb only'
@@ -46,10 +46,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
       - name: Install playwright-core + chromium
         run: |
-          npm init -y >/dev/null 2>&1
-          npm install --no-save playwright-core@1.49.1 >/dev/null
+          npm ci --ignore-scripts --no-audit --no-fund
           npx playwright-core install --with-deps chromium
           echo "CHROME=$(node -e "console.log(require('playwright-core').chromium.executablePath())")" >> "$GITHUB_ENV"
       - name: Serve the site
@@ -68,14 +68,8 @@ jobs:
         env:
           GATE_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
-          node dev/check-cache-versions.js
           bash dev/check-secrets.sh
-          node dev/check-invariants.js
-          node dev/check-curriculum-map.js
-      # r452: the run outbox is client-side delivery of every leaderboard score — it wedged in
-      # prod (P1-3) because a server-rejected row was retried forever. Node-level, no browser.
-      - name: Run outbox (terminal vs transient, no wedge)
-        run: node dev/check-outbox.js
+          node dev/run-checks.js static
       - name: Smoke (every page loads, zero page errors + drill invariants)
         run: node dev/e2e-smoke.js
       - name: Leaderboard (tier filter, placement, seed field)

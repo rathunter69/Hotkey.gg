@@ -1,0 +1,18 @@
+{
+  "name": "hotkey-gg",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Keyboard-first Excel practice. Static application; Node is development tooling only.",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node dev/serve.js",
+    "check": "node dev/run-checks.js static",
+    "test": "node dev/run-checks.js static",
+    "test:smoke": "node dev/run-checks.js smoke",
+    "test:browser": "node dev/run-checks.js browser",
+    "browser:install": "playwright-core install chromium",
+    "repo:status": "node dev/repository-status.js",
+    "build:drill-pages": "node dev/run-checks.js browser dev/build-drill-pages.js"
+  },
+  "devDependencies": { "playwright-core": "1.49.1" }
+}
