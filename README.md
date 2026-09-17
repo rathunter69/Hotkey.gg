@@ -17,9 +17,11 @@ GitHub Pages report deployments; the public domain's active serving path is unde
 - [Development and validation](docs/DEVELOPMENT.md): setup, commands, checks and release boundaries.
 - [Branch inventory](docs/BRANCH_INVENTORY.md): recorded remote branches and their relation to main.
 
-These entry points supersede the queue/handoff instructions in `PROJECT_CONTEXT.md`,
+These entry points supersede the queue/handoff instructions in
+[historical PROJECT_CONTEXT.md](docs/history/PROJECT_CONTEXT.md),
 `dev/CONTINUITY.md`, `dev/PIPELINE.md`, and `dev/WORKFLOW.md`. Those files retain historical
 decisions and design rationale; their dated "LIVE" headings are not current deployment evidence.
+The former root path remains as a compatibility page for existing links.
 
 ## Local development
 
