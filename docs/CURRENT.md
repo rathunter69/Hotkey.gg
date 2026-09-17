@@ -18,6 +18,13 @@ the shared guidance, audit, task starters and existing foundation tooling. The b
 commit above describes the application reviewed, not the tip of the handover branch. Use this
 branch's current remote commit when starting another task, and verify the guidance files exist.
 Saving a checkpoint does not establish that it is merged, deployed, or fully CI-validated.
+Remote checkpoint verified September 17: `d3b244fe62d7d57de73845e2cabe7a0166aa02d0`.
+Five reviewed commits preserve all 41 selected entries: guidance, twelve starters, audit evidence,
+reusable synthetic reproduction, existing foundation tooling and historical-status corrections.
+Remote blob hashes matched every saved file and both intended cache-file deletions; main remained
+at `434bc0e8764e741e0e11f84cf51d61a1755d7c67`. This status note is saved in a subsequent commit;
+use the branch tip for the latest guidance. No application repair, main merge or production
+deployment was performed. Exact pinned installation/full CI remain unverified as described below.
 This task is the chief orchestrator for priorities, cross-area product decisions and handoff
 integration. [TASK_STARTERS.md](TASK_STARTERS.md) contains all twelve prompts. Area tasks maintain
 their own reports under docs/handoffs/ and return verified remote links. They propose changes
@@ -239,8 +246,8 @@ changes while the lead verifies integration. Avoid duplicate full audits and ove
 Confirmed September 17: paid subscriptions on launch day; paths customized during onboarding.
 Latest decision: pause new development and refinement until Wolf is confident in the existing
 code, setup and guidance. The primary project folder is corrected and browser baseline restored.
-Next in this task: publish and verify the remote handover checkpoint and coordinate the written
-task scopes. Open Security/accounts first, with Git/testing preparation alongside it under
+Next in this task: coordinate the written task scopes and integrate their remote handoffs.
+The foundation is saved and verified on GitHub. Open Security/accounts first, with Git/testing preparation alongside it under
 separate file ownership. Continue outstanding product guidance here; repairs belong in the
 selected dedicated tasks. Git sign-in remains a
 separate setup task and must not block read-only review.
