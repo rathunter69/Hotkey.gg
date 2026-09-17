@@ -32,6 +32,7 @@
         BASE=http://127.0.0.1:8830 node dev/check-paywall.js                          */
 'use strict';
 const { chromium } = require('playwright-core');
+const { newIsolatedContext } = require('./browser-isolation');
 const fs = require('fs');
 const BASE = process.env.BASE || 'http://127.0.0.1:8791';
 const PINNED = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
@@ -85,17 +86,18 @@ function catalogFromSource() {
   const browser = await chromium.launch({ executablePath: exe, args: ['--no-sandbox'] });
 
   const newPage = async (url, seed) => {
-    const page = await browser.newPage();
+    const context = await newIsolatedContext(browser, BASE);
+    const page = await context.newPage();
     const errs = [];
     page.on('pageerror', e => errs.push('PAGEERROR: ' + e.message));
     page.on('console', mm => { if (mm.type() === 'error' && !/ERR_|supabase|Failed to load resource|net::/i.test(mm.text())) errs.push('CONSOLE.ERR: ' + mm.text()); });
-    await page.route('**/@supabase/**', r => r.abort());
     await page.addInitScript(() => { try { localStorage.setItem('hk_gate_off', '1'); } catch (e) {} });   /* r450 harness contract: suites opt out of the drill-start gate (C14) */
     await page.goto(BASE + '/' + url, { waitUntil: 'load', timeout: 30000 });
     if (seed) await page.evaluate(seed);
     if (seed) { await page.reload({ waitUntil: 'load', timeout: 30000 }); }
     await page.waitForTimeout(900);
     page.__errs = errs;
+    page.__isolatedContext = context;
     return page;
   };
   // a clean device: no preview, no entitlement, no PBs, no placement latch
@@ -153,7 +155,7 @@ function catalogFromSource() {
     check('§1 off', r.campLocks === 0, 'the tracks modal shows no locked milestones');
     check('§1 off', r.nextFromLast !== undefined, 'nextUnlockedFrom() still walks the full catalog');
     check('§1 off', page.__errs.length === 0, 'zero page errors (' + page.__errs.join(' | ') + ')');
-    await page.close();
+    await page.__isolatedContext.close();
   }
 
   /* ======================================================================== §2/§3/§5/§6 */
@@ -333,7 +335,7 @@ function catalogFromSource() {
     check('§6 stub', r6.launched && r6.noModal, 'an entitled player launches a paid drill with no modal');
 
     check('§2 preview', page.__errs.length === 0, 'zero page errors in the ON state (' + page.__errs.join(' | ') + ')');
-    await page.close();
+    await page.__isolatedContext.close();
   }
 
   /* localStorage variant of the preview must work identically to the URL param */
@@ -342,7 +344,7 @@ function catalogFromSource() {
     const r = await page.evaluate(() => ({ on: window.hkPremiumOn(), locked: !window.hkEntitled('lbo') }));
     check('§2 preview', r.on && r.locked, "localStorage hk_premium_preview='1' is honored like the URL param");
     await page.evaluate(() => { try { localStorage.removeItem('hk_premium_preview'); } catch (e) {} });
-    await page.close();
+    await page.__isolatedContext.close();
   }
 
   /* ======================================================================== §4 */
@@ -378,7 +380,7 @@ function catalogFromSource() {
     check('§4 billing/' + label, r.ctaDisabled && /Payments launching soon/i.test(r.ctaText),
       'checkout is a disabled "Payments launching soon" stub');
     check('§4 billing/' + label, page.__errs.length === 0, 'zero page errors (' + page.__errs.join(' | ') + ')');
-    await page.close();
+    await page.__isolatedContext.close();
   }
 
   /* ======================================================================== §4b
@@ -433,7 +435,7 @@ function catalogFromSource() {
       'the freeNow line tracks HOTKEY_PRO.freeNow (flag=' + r.freeNow + ' shown=' + r.freeNowShown + ')');
     check('§4b landing/' + label, r.billingHref === 'billing.html', 'the PRO CTA points at billing.html');
     check('§4b landing/' + label, page.__errs.length === 0, 'zero page errors (' + page.__errs.join(' | ') + ')');
-    await page.close();
+    await page.__isolatedContext.close();
   }
 
   await browser.close();

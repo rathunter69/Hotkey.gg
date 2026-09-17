@@ -5,6 +5,7 @@
    suites — those still run whenever index.html or drills.js changes (see gate.yml).
    Run: node dev/e2e-smoke.js   (server on 127.0.0.1:8791) */
 const { chromium } = require('playwright-core');
+const { newIsolatedContext } = require('./browser-isolation');
 const BASE = process.env.BASE || 'http://127.0.0.1:8791';
 const PAGES = ['index.html', 'profile.html', 'stats.html', 'account.html', 'billing.html', 'leaderboard.html', 'desks.html'];
 /* r452 (audit P1-5/P1-6) — THE PHONE SWEEP. Two pages scrolled sideways on a 390px phone
@@ -31,7 +32,8 @@ const MOBILE_PAGES = ['index.html', 'About.html', 'profile.html', 'stats.html', 
   const browser = await chromium.launch({ executablePath: exe, args: ['--no-sandbox'] });
   const fails = [];
   for (const p of PAGES) {
-    const page = await browser.newPage();
+    const context = await newIsolatedContext(browser, BASE);
+    const page = await context.newPage();
     const errs = [];
     page.on('pageerror', e => errs.push('PAGEERROR: ' + e.message));
     page.on('console', m => { if (m.type() === 'error' && !/ERR_|supabase|Failed to load resource|net::/i.test(m.text())) errs.push('CONSOLE.ERR: ' + m.text()); });
@@ -40,9 +42,8 @@ const MOBILE_PAGES = ['index.html', 'About.html', 'profile.html', 'stats.html', 
        single load and the player-card modal rendered empty, but the filter above only ever read
        type()==='error', so CI saw a clean page. A shared script announcing that its data source
        is missing is exactly the class this suite exists to catch. Same ERR_/supabase carve-out:
-       the sandbox has no egress, so network noise is not a page defect. */
+       this harness blocks external egress, so that network noise is not a page defect. */
     page.on('console', m => { if (m.type() === 'warning' && !/ERR_|supabase|Failed to load resource|net::/i.test(m.text())) errs.push('CONSOLE.WARN: ' + m.text()); });
-    await page.route('**/@supabase/**', r => r.abort());
     try {
       await page.goto(BASE + '/' + p, { waitUntil: 'networkidle', timeout: 30000 });
       await page.waitForTimeout(900);
@@ -52,13 +53,13 @@ const MOBILE_PAGES = ['index.html', 'About.html', 'profile.html', 'stats.html', 
     if (bodyLen < 200) errs.push('EMPTY BODY (' + bodyLen + ' chars) — page did not render');
     if (errs.length) fails.push({ p, errs });
     else console.log('  PASS ' + p + ' — loaded, zero page errors/warnings');
-    await page.close();
+    await context.close();
   }
 
   /* r452 (audit P1-5/P1-6): the 390px no-sideways-scroll sweep — see MOBILE_PAGES above. */
   {
-    const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
-    await page.route('**/@supabase/**', r => r.abort());
+    const context = await newIsolatedContext(browser, BASE, { viewport: { width: 390, height: 844 } });
+    const page = await context.newPage();
     const wide = [];
     for (const p of MOBILE_PAGES) {
       try {
@@ -86,7 +87,7 @@ const MOBILE_PAGES = ['index.html', 'About.html', 'profile.html', 'stats.html', 
     }
     if (wide.length) fails.push({ p: 'mobile-overflow @390x844', errs: wide });
     else console.log('  PASS mobile-overflow — all ' + MOBILE_PAGES.length + ' pages fit 390px');
-    await page.close();
+    await context.close();
   }
   // r393 (Wolf #75) / r411: skin-unlock celebration + equip-now. Drives the PAGE-LOAD sweep
   // (window.hkSkinUnlockSweep, nav.js) and the celebration render on a real index.html,
@@ -97,10 +98,10 @@ const MOBILE_PAGES = ['index.html', 'About.html', 'profile.html', 'stats.html', 
   // fired mid-solve, whose equip CTA navigated the page under synthetic input) is now a no-op
   // book-keeper; hkSkinUnlockSweep runs only on page load. This drives that new path.
   {
-    const page = await browser.newPage();
+    const context = await newIsolatedContext(browser, BASE);
+    const page = await context.newPage();
     const errs = [];
     page.on('pageerror', e => errs.push('PAGEERROR: ' + e.message));
-    await page.route('**/@supabase/**', r => r.abort());
     try {
       await page.goto(BASE + '/index.html', { waitUntil: 'load', timeout: 30000 });
       await page.waitForTimeout(1000);
@@ -206,7 +207,7 @@ const MOBILE_PAGES = ['index.html', 'About.html', 'profile.html', 'stats.html', 
       if (ierr.length) fails.push({ p: 'drill-invariants', errs: ierr });
       else console.log('  PASS drill-invariants — HOTKEY_PARS parity + de-hint copy clean');
     } catch (e) { fails.push({ p: 'skin-unlock', errs: ['THREW: ' + String(e).slice(0, 160)] }); }
-    await page.close();
+    await context.close();
   }
 
   await browser.close();

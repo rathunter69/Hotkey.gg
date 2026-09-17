@@ -13,10 +13,12 @@ const { createServer } = require('./serve');
     console.log('Browser:', browser.version());
     const context = await browser.newContext();
     await context.route('**/*', r => new URL(r.request().url()).origin === origin ? r.continue() : r.abort());
+    // This diagnostic probes account state, not the first-key/start-clock contract.
+    await context.addInitScript(() => localStorage.setItem('hk_gate_off', '1'));
     const page = await context.newPage();
     await page.goto(origin + '/index.html');
     await page.waitForFunction(() => typeof cur !== 'undefined' && typeof clearAccountUI === 'function');
-    await page.evaluate(() => { localStorage.setItem('hk_gate_off', '1'); markOnboarded(); loadChallenge('autofit'); });
+    await page.evaluate(() => { markOnboarded(); loadChallenge('autofit'); });
     await page.waitForFunction(() => localStorage.getItem('hotkey_last_drill') === 'autofit');
     const signedOut = await page.evaluate(() => {
       clearAccountUI();
