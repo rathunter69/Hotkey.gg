@@ -58,10 +58,9 @@ prompted direct WebSocket and service-worker canary assertions, which pass local
 [Linux run 35274460688](https://github.com/rathunter69/Hotkey.gg/actions/runs/35274460688)
 completed successfully on Ubuntu at exact testing-tooling commit
 `4ea428ba1504ee04b3d01943df5f7cd1b68a2c4d`. Its reusable gate used Node 22,
-the locked Playwright 1.49.1 dependency and installed Chromium. All 32 job steps passed:
-dependency installation, seven static checks, the isolation canary, every smoke and full-matrix
-harness, and generator drift. The run finished September 17 at 21:21:46 UTC. Port 8791 is
-released locally.
+the locked Playwright 1.49.1 dependency and installed Chromium. All 35 reported steps passed:
+32 setup/validation steps through generator drift, two post-action cleanup steps and final job
+completion. The run finished September 17 at 21:21:46 UTC. Port 8791 is released locally.
 
 The branch caller and reusable gate have `contents: read`, contain no secret, environment or
 deployment reference, and ran no repository deployment workflow. No PR or merge was created.
@@ -73,8 +72,11 @@ received Testing's exact-SHA safety clearance. Its one authorized
 [platform-only run 35275149357](https://github.com/rathunter69/Hotkey.gg/actions/runs/35275149357)
 passed with cleanup. Security saved the durable result and handoff at
 `3dd686d26edcb53325579fbe479eb01bdf41f773`. That proves the genuine pinned Postgres/Auth
-bootstrap only. The unchanged 52-migration replay and all 56 permission assertions remain
-unrun and are the next Security-owned isolated batch.
+bootstrap only. Security's separately reviewed replay baseline subsequently completed the
+52-migration chain once, then stopped at the first permission-fixture incompatibility; the
+exact failing evidence is in Security's
+[replay handoff](https://github.com/rathunter69/Hotkey.gg/blob/9ea05e64edbe66d075b2fda6e7b313a2f198ae72/docs/handoffs/security-accounts.md),
+and the remaining acceptance is recorded under D03 below.
 
 ## First batch history — original starter-4 checkpoint
 
@@ -165,7 +167,7 @@ carry forward the audit; product repairs remain with their named owners.
 |---|---|---|
 | D01: main has no enforced review/gate | Fresh GitHub metadata: `protected=false`, required checks off, no contexts, zero rulesets | Git/testing: reviewed main ruleset requires PR review and the actual gate context; demonstrate failed/missing check blocks merge. Do not test by merging an unsafe commit |
 | D02: database delivery fails | Latest run [33814362058](https://github.com/rathunter69/Hotkey.gg/actions/runs/33814362058) still failed at link with invalid token format; migrations/functions skipped. A gate for that source passed independently | Git/testing with Security: correct credentials through settings, pin CLI, rehearse link/migrations/functions in isolation, then verify accepted SHA and actual deployed state during a separately authorized release |
-| D03: clean replay and permission tests absent | The pinned official platform-only bootstrap now passes in isolation, but the unchanged 52-migration chain and all 56 permission assertions remain unrun | Security: stop on the first source incompatibility, prove two fresh clean replays before claiming reproducibility, then run the prepared role/RPC assertions without masking failures or rewriting history |
+| D03: replay and permission baseline incomplete | [Run 35276711544](https://github.com/rathunter69/Hotkey.gg/actions/runs/35276711544) completed all 52 migrations once, then produced 12 TAP results: DATA-01 direct creation/application checks failed and the fixture stopped with `42501` because it directly calls intentionally non-client `my_pro()`. The required second replay and complete 56-result stream did not run | Security: reconcile the fixture with the final hardened RPC surface in a dedicated reviewed repair, retain the two observed DATA-01 failures, then prove two fresh 52-file replays and complete 56-result streams without suppressing failures |
 | D05: wider browser gate isolation | Resolved in this batch for every active gate harness and generator; redirect, WebSocket and inactive-service-worker canaries pass, and the complete local matrix is green | Keep the helper mandatory when adding a gate browser entry point; legacy scripts outside the gate remain outside this claim |
 | D06: complete exact CI | Resolved for tested application `c702c69` plus testing tooling `4ea428b`: complete local matrix and [Linux run 35274460688](https://github.com/rathunter69/Hotkey.gg/actions/runs/35274460688) passed at the exact remote SHA | Keep the exact dependency/action pins and isolation canary in the required gate; repeat when executable source changes |
 | D07: hosting/cache and rollback unverified | Earlier audit observed immutable prototype HTML; Cloudflare/GitHub Pages both publish, origin/build settings remain unconfirmed | Git/testing: verify static-site build/output and serving origin, check preview response headers, tie web/DB/functions to a source SHA, rehearse recovery in isolation |
@@ -184,7 +186,6 @@ No new product decision was made. Proposed shared-status update: exact dependenc
 and local Git access now work; replace those old unknowns with the precise browser/CI/DB
 limits above after reviewing this branch. Do not mark Security's separate work integrated.
 
-Next bounded batch: finish the Security-owned platform bootstrap experiment, then run the
-already prepared permission assertions only after that environment is reviewed. Repository
-protection, hosting/rollback rehearsal and production delivery remain separate release work.
-Keep billing and catalog development paused.
+Next bounded batch: Security decides a focused fixture/policy repair from the stopped replay
+evidence; no automatic retry is authorized. Repository protection, hosting/rollback rehearsal
+and production delivery remain separate release work. Keep billing and catalog development paused.
