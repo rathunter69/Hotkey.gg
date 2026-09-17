@@ -5,7 +5,7 @@ Task: `01a0b148-2693-7901-af91-934c83cabe1d`
 Chief: `01a0b0fa-d857-7002-ab95-1da0a1cfb858`
 Branch: `codex/catalog-flow-review`
 Starting commit: `00df57afd8d3299cc7feaf523847b9ca43e54d06`
-Latest shared guidance checked: `codex/repository-foundation` at `44d0ebdd18efbb9bedc972a9269017e9e56cc188`.
+Latest shared guidance checked: `codex/repository-foundation` at `b8b8ca0d6f783fa5396dd39f29fadb9e56a8d147`.
 Initial evidence review used guidance at `79e4d93f8bc1fe486a734e58daedd892fbb13544`.
 Chief follow-up: guidance `0ae29b1c7dfeee3c2551ce52352a65241a979c74` adds concise user-facing
 communication and chief ownership of platform-wide design discussion; this review supplies proposals.
@@ -274,6 +274,73 @@ private/assisted account history already works. Saved-progress owns durable acco
 save/retry and cross-device verification; this task defines the desired experience only. No
 new persistence module, storage schema, data migration or leaderboard removal is authorized.
 
+### September 18: proposed meanings for mastery, XP and competitive rank
+
+**Status: three questions presented; awaiting Wolf's answers.** The chief reconciled the
+preceding qualified response in foundation b8b8ca0, checked here through remote PRODUCT and
+CURRENT. This packet develops the agreed metrics/speedrun requirement; it does not reopen
+the broad retry/public-entry choices or change application behavior.
+
+**Illustrative result history, not current UI or measured user data:**
+
+| Activity | Proposed useful record | Meaning and comparison boundary |
+|---|---|---|
+| Complete a lesson with solution help | Completed with help; learning credit; zero XP | Keeps the learning achievement. It is not independent skill evidence or an independent speed PB. |
+| Solve a fresh task independently | Independent completion; XP eligibility subject to agreed rules | A stronger result, without claiming mastery from one solve. Exact independent-retry eligibility remains open. |
+| Speedrun a drill privately | Personal best 1:24; attempt retained | Private does not mean unsaved. This drill need not have a public board. |
+| Repeat that same speed challenge | New best 1:16; 8 seconds faster; both attempts retained | Comparison assumes the same board/revision and timing/help rules; arbitrary lesson variants cannot silently share this PB. |
+| Enter a public benchmark | Benchmark result 1:31 and its leaderboard position | Its board/rules determine comparison. This time is not compared with the private drill's 1:16 or used to infer improvement across different work. |
+
+Time, attempts, comparable PBs, improvement and meaningful keystroke/efficiency feedback remain
+candidate personal metrics. Exact fields, formulas, save/visibility and guest/account behavior
+are not approved by this example. Efficiency never overrides a legitimate correct route.
+
+**D6a — mastery meaning. Recommendation:** correct independent application across a few varied
+tasks, without a speed requirement. This is evidence about a skill, distinct from lesson
+completion and from being fast on a memorized board. Alternatives: one dedicated skill
+assessment (clear finish line, depends heavily on test coverage), or omit mastery for now and
+show only completion/independent status (simpler, less claim about broader competence).
+Varied evidence requires coherent skill coverage and equivalent task difficulty; exact count,
+recency, qualifying tasks and wording remain open. No extra mastery gate is proposed for
+ordinary learning. The already-approved short readiness check at a major skill jump remains
+separate; learners need not fully master a topic before continuing. No certificate standard,
+decay rule or revocation of existing awards is selected here.
+
+**D6b — XP meaning. Recommendation:** XP/level celebrates independent learning and practice;
+new accomplishments earn most, with smaller, limited repeat-practice rewards. Alternatives:
+similar XP for every independent solve (simple and encouraging, easier to grind), or XP only
+for first completions/milestones (clear finite rewards, little recognition for useful rehearsal).
+Assisted completion still earns zero XP and existing earned XP stays protected. Repeat XP
+does not establish mastery/readiness/rank. The exact amounts, limits, definition of a new
+accomplishment, treatment of PB improvement and anti-duplication rules remain open. A fresh
+random seed or a second path referencing the same exercise is not proposed as a new first-clear
+reward. The question does not decide which post-help retries qualify as independent.
+
+**D7a — account rank meaning. Recommendation:** keep the XP level and an optional competitive
+rank separate; a future rank would use selected standardized benchmarks. Daily events keep
+their own standings and other drills keep personal PBs. Alternative: retain XP and individual
+challenge leaderboards while deferring a new overall rank (simpler, fewer aggregate claims,
+less cross-challenge competitive identity). Benchmark rank gives competitors a long-term
+target but needs sufficient coverage, a fair formula and comparable access/rules. Benchmark
+membership, placement, aggregation, seasons, visibility and whether any Daily result ever
+affects rank remain open. The recommendation here is to keep Daily standings separate from
+the proposed rank, not to infer that Wolf's earlier Daily approval selected a rating formula.
+Paid-only counted boards must not provide a breadth advantage under the proposed fairness
+policy. No new rank calculation is approved; existing earned rank/results remain historical
+evidence under their original rules, without retroactive relabeling or removal.
+
+**Dependencies:** agree meanings before formulas or catalog reward targets. D6a needs a
+skill/evidence map; it informs later achievements and certificates without deciding them.
+D6b depends on assistance/independent eligibility and durable non-duplicated records. D7a
+depends on benchmark comparability, eligibility/access and the future saved-score trust
+contract. Saved-progress, Engine and Security retain implementation ownership; no new work
+is assigned here. A bounded independent product critique clarified mastery versus access,
+repeat rewards versus grind, and proposed versus historical rank. It did not repeat an audit.
+
+**Wolf's choices:** D6a pending; D6b pending; D7a pending. Record each actual answer separately.
+The questions were presented as this single three-item group. Silence is not approval of
+the recommendations or of any supporting detail in this section.
+
 ## Evidence register
 
 All runtime paths/line references below refer to **00df57a**, unless another SHA is named.
@@ -507,12 +574,17 @@ new certificate must be agreed before migration. Nothing in this example authori
   qualified support for D1/D2 and explicit metrics/drill-speedrun conditions, separating the
   recommended metric set/save examples from approved requirements. Sole handoff update; no
   fresh audit/agent/test work needed. Documentation links and whitespace checked.
+- September 18 metrics/reward packet: read remote PRODUCT/CURRENT at b8b8ca0, retained the
+  accepted source review and developed fictional results plus three bounded questions.
+  Reused the reviewer for a narrow product-ambiguity check only. All new reward/rank options
+  remain pending; sole handoff diff, all 17 relative links and whitespace checked.
 
 ## Proposed updates for the chief
 
 **CURRENT proposal:** this dedicated review stays on `codex/catalog-flow-review` from
 00df57a, owning only this handoff. Chief has reconciled b5c5c7a's learning/gate/help/timer
-approvals in foundation 62c15db and benchmark scope in 44d0ebd. Exact D1/D2 mechanics and
+approvals in foundation 62c15db, benchmark scope in 44d0ebd and qualified D1/D2 support/metrics
+requirements in b8b8ca0. Exact D1/D2 mechanics and
 content/access boundaries remain open.
 The newer accepted 16ee830 is for future implementation work; no rebase needed here.
 Wolf selected curated benchmarks/Daily events, then supported fresh variation and deliberate
@@ -533,8 +605,9 @@ discussion style: concise high-level mechanics options with a reasoned recommend
 Product approval does not authorize implementation.
 
 **Next bounded turn:** show a compact example of learning progress, private drill-speedrun
-metrics and public benchmark results together, then settle what mastery/account progression
-should represent. Retain qualified D1/D2 support and its metrics/speedrun conditions; keep
+metrics and public benchmark results together (now presented), then record the answers to
+D6a mastery, D6b XP and D7a account rank. All three new choices are pending. Retain qualified
+D1/D2 support and its metrics/speedrun conditions; keep
 comparison/persistence details explicit without starting implementation.
 Do not reopen the approved gate, assistance or optional-timer policies.
 A complete skill map,
