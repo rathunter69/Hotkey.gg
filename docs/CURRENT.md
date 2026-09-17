@@ -36,8 +36,9 @@ and migration tests, and a working reviewed release/rollback path. These belong 
 with Security support; they do not require a new frontend framework or another general audit.
 No production security repair or billing activation should rely on those unverified release steps.
 Wolf's latest clarification reserves this conversation for the overarching plan, roadmap and
-context. The first account-repair agent was stopped before editing any files; no repair or test
-process remains running. Prepare the task breakdown here; do not launch implementation from it.
+context. The initial account-repair agent was stopped before editing any files. Wolf has now
+started the separate Security/accounts task; its current ownership is recorded below. Keep
+application implementation in that task.
 
 The foundation change adds the README and source map, marks old handoffs as historical,
 inventories all 14 non-main remote branches, and introduces shared local/CI check commands.
@@ -60,7 +61,8 @@ prefers a future full catalog rebuild with his Foundations feedback preserved, a
 
 1. Small security/account fixes. Proposed first dedicated-task batch: clear the actual last-drill key on sign-out,
    bind profile caches to the account and prevent late responses from repainting another account.
-   Verify with synthetic users; no production deployment is part of this batch. Not started.
+   Verify with synthetic users; no production deployment is part of this batch. In progress in
+   the separate Security/accounts task, starting from foundation 785b30e.
 2. Separate catalog, paths and progression while preserving current behavior. Agree explicit
    links to rewards, access, certificates and saved history before changing their rules.
 3. Clean the repository and assess database tables for actual use. Check application readers,
@@ -194,10 +196,21 @@ handover branch named above until it is deliberately integrated; a fresh worktre
 lacks this guidance. One editor at a time per shared file, with one integration owner for
 CURRENT.md and PRODUCT.md when tasks overlap. Area tasks must save their handoffs to GitHub.
 
-Current implementation ownership: **none**. No application repair is running. New tasks must
-record their active objective and file ownership in their area handoff and notify the chief
-for this shared record; release the reservation on completion or pause. This note coordinates
-work and does not enforce a filesystem lock.
+Current implementation ownership — **Security/accounts active**, reported September 17:
+
+- Task ID: `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; branch `codex/security-accounts`.
+- Isolated worktree: `security-accounts`, alongside the original source checkout; starting
+  foundation commit `785b30ee1e89a795bdceaa85415353915eb2ccd2`.
+- Reserved: `nav.js`, focused account-isolation browser tests, required nav asset-version
+  consumers/generated drill pages, and `docs/handoffs/security-accounts.md`.
+- Scope: DATA-05 profile-cache isolation, late account responses, and sign-out resume key only.
+  The task reports preserving the original checkout's pending work; no shared product-brief
+  edits, main merge or deployment are included.
+- Await its verified remote handoff and review before marking any finding repaired/integrated.
+
+Other tasks must avoid overlapping edits and generators. Record ownership in the area handoff
+and notify the chief for this record; release it on completion or pause. This coordinates work
+and does not enforce a filesystem lock.
 
 | Dedicated task | Problem to address | Suggested turns |
 |---|---|---|
@@ -247,8 +260,9 @@ Confirmed September 17: paid subscriptions on launch day; paths customized durin
 Latest decision: pause new development and refinement until Wolf is confident in the existing
 code, setup and guidance. The primary project folder is corrected and browser baseline restored.
 Next in this task: coordinate the written task scopes and integrate their remote handoffs.
-The foundation is saved and verified on GitHub. Open Security/accounts first, with Git/testing preparation alongside it under
-separate file ownership. Continue outstanding product guidance here; repairs belong in the
+The foundation is saved and verified on GitHub. Security/accounts is active. Git/testing
+preparation may proceed alongside it under separate file ownership. Continue outstanding
+product guidance here; repairs belong in the
 selected dedicated tasks. Git sign-in remains a
 separate setup task and must not block read-only review.
 Wolf's preserve/change guidance is recorded in PRODUCT.md. Pricing, onboarding dimensions, launch catalog,
