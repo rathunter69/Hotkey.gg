@@ -37,21 +37,37 @@ function parseTap(output) {
 function execute(command, args, options = {}) {
   const result = cp.spawnSync(command, args, { encoding: 'utf8', timeout: 120000, maxBuffer: 8 * 1024 * 1024, ...options });
   if (result.error) throw result.error;
-  if (result.status !== 0) throw new Error(`${command} failed (${result.status}): ${result.stderr || result.stdout}`);
+  if (result.status !== 0) {
+    const diagnostic = sanitizedError(result.stderr || result.stdout);
+    const error = new Error(`${command} failed (${result.status}): ${diagnostic}`);
+    error.exitCode = result.status;
+    error.sqlState = diagnostic.match(/(?:ERROR|FATAL|PANIC):\s+([A-Z0-9]{5}):/)?.[1] || null;
+    // Preserve only partial synthetic TAP, never failed SQL statements or cron payloads.
+    error.partialTap = String(result.stdout || '').split(/\r?\n/).filter(l=>/^(?:(?:not )?ok\b|1\.\.\d+$|Bail out!)/i.test(l));
+    throw error;
+  }
   return result.stdout;
 }
-function main(args) {
+function sanitizedError(output) {
+  // Keep PostgreSQL's primary error, never SQL CONTEXT/STATEMENT payloads or URLs.
+  const lines = String(output || '').split(/\r?\n/);
+  const primary = lines.find(l => /(?:ERROR|FATAL|PANIC):/.test(l)) || lines.find(l => l.trim()) || 'no error text';
+  return primary.replace(/https?:\/\/[^\s'"<>]+/gi,'[redacted-url]').slice(0,1200);
+}
+function main(args, report = {}) {
   if (args.length === 1 && args[0] === '--plan') { console.log(JSON.stringify({ source: execute('git', ['rev-parse', 'HEAD'], { cwd: root }).trim(), files: manifest() }, null, 2)); return; }
   if (args.length < 2 || args[0] !== '--container' || !/^hk-security-[a-z0-9-]+$/.test(args[1]) || args.slice(2).some(a => a !== '--replay') || args.length > 3) {
     throw new Error('Usage: node supabase/tests/run-isolated.js --plan | --container hk-security-NAME [--replay]');
   }
   const name = args[1], replay = args.includes('--replay');
+  Object.assign(report,{phase:'preflight',replayRequested:replay,replayComplete:false,
+    completedMigrations:[],tests:[],testsStarted:false,assertionFailures:false});
   // Explicit local daemon endpoint; inherited Docker contexts/remote hosts cannot redirect this.
   const endpoint = process.platform === 'win32' ? 'npipe:////./pipe/docker_engine' : 'unix:///var/run/docker.sock';
   const env = { ...process.env };
   for (const key of Object.keys(env)) if (/^(DOCKER_|PG|SUPABASE_)/i.test(key)) delete env[key];
   const docker = a => execute('docker', ['--host', endpoint, ...a], { env });
-  const sql = source => execute('docker', ['--host', endpoint, 'exec', '-i', name, 'psql', '-X', '-qAt', '-v', 'ON_ERROR_STOP=1', '-U', 'postgres', '-d', 'postgres'], { env, input: source });
+  const sql = source => execute('docker', ['--host', endpoint, 'exec', '-i', name, 'psql', '-X', '-qAt', '-v', 'ON_ERROR_STOP=1', '-v', 'VERBOSITY=verbose', '-U', 'postgres', '-d', 'postgres'], { env, input: source });
   const verify = () => {
     validateContainer(JSON.parse(docker(['inspect', name]))[0], name);
     const interfaces = docker(['exec', name, 'sh', '-c', 'ls -1 /sys/class/net']).trim().split(/\s+/);
@@ -61,6 +77,8 @@ function main(args) {
     return settings;
   };
   const files = manifest();
+  report.files = files;
+  report.source = execute('git',['rev-parse','HEAD'],{cwd:root}).trim();
   const migrationHash = crypto.createHash('sha256').update(JSON.stringify(files.filter(f => f.file.startsWith('supabase/migrations/')))).digest('hex');
   const settings = verify();
   // This check happens before any fixture, extension install or migration. No customer data allowed.
@@ -73,38 +91,64 @@ function main(args) {
   end $$;`);
   console.log(JSON.stringify({ source: execute('git', ['rev-parse', 'HEAD'], { cwd: root }).trim(), image: JSON.parse(docker(['inspect', name]))[0].Image, postgres: sql('show server_version;').trim(), settings, files }, null, 2));
   if (replay) {
+    report.phase = 'replay';
     sql("do $$ begin if exists(select 1 from pg_tables where schemaname='public') then raise exception 'Replay requires empty public schema; refusing existing app database'; end if; end $$;");
     for (const item of files.filter(f => f.file.startsWith('supabase/migrations/'))) {
       verify();
       console.log('REPLAY ' + item.file);
+      report.currentMigration = item.file;
       // Original files, original filename order. Abort at the first SQL error; never skip/rewrite.
-      sql(fs.readFileSync(path.join(root, item.file), 'utf8'));
+      try { sql(fs.readFileSync(path.join(root, item.file), 'utf8')); }
+      catch (error) {
+        report.failedMigration = {file:item.file,error:sanitizedError(error.message),exitCode:error.exitCode ?? null,
+          sqlState:error.sqlState ?? null,mayBePartiallyCommitted:true};
+        throw error;
+      }
+      report.completedMigrations.push(item.file);
     }
     // Written only after every original migration succeeds. Tests-only refuses a partial replay.
     sql(`create schema hotkey_test_control;
       revoke all on schema hotkey_test_control from public;
       create table hotkey_test_control.replay_manifest (sha256 text not null);
       insert into hotkey_test_control.replay_manifest values ('${migrationHash}');`);
+    report.replayComplete = true;
+    delete report.currentMigration;
   }
   if (sql('select sha256 from hotkey_test_control.replay_manifest;').trim() !== migrationHash) throw new Error('Missing or mismatched complete replay manifest; recreate a fresh disposable instance');
   verify();
   // Platform installs this extension for Supabase CLI tests too; no app grants are repaired here.
   sql('create schema if not exists extensions; create extension if not exists pgtap with schema extensions;');
   let failed = false;
+  report.phase = 'tests';
   for (const item of files.filter(f => f.file.startsWith('supabase/tests/database/'))) {
     verify();
     console.log('TEST ' + item.file);
-    const output = sql(fs.readFileSync(path.join(root, item.file), 'utf8'));
-    console.log(output);
-    const result = parseTap(output);
+    report.testsStarted = true;
+    report.currentTest = item.file;
+    let result;
+    try {
+      const output = sql(fs.readFileSync(path.join(root, item.file), 'utf8'));
+      console.log(output);
+      result = parseTap(output);
+      report.tests.push({file:item.file,...result,
+        assertions:output.split(/\r?\n/).filter(l=>/^(?:not )?ok\b/.test(l)),
+        data01Failures:result.failures.filter(l=>l.includes('DATA-01:')),
+        unexpectedControlFailures:result.failures.filter(l=>!l.includes('DATA-01:'))});
+    } catch (error) {
+      report.testError = {error:sanitizedError(error.message),exitCode:error.exitCode ?? null,
+        sqlState:error.sqlState ?? null,partialTap:error.partialTap || [],complete:false};
+      throw error;
+    }
     if (result.failures.length) failed = true;
     console.log(JSON.stringify(result));
   }
   verify();
   // Fixture rollback must leave Auth empty, even when security assertions fail.
   sql("do $$ begin if exists(select 1 from auth.users) then raise exception 'Fixture cleanup failed'; end if; end $$;");
+  report.phase = 'complete';
+  report.assertionFailures = failed;
   if (failed) throw new Error('Security regression failures. Known baseline vulnerabilities remain failures, not a passing gate.');
   console.log('All executed database assertions passed; this is not HTTP/Auth-service or production verification.');
 }
-module.exports = { validateContainer, parseTap, manifest, main };
+module.exports = { validateContainer, parseTap, manifest, main, sanitizedError };
 if (require.main === module) { try { main(process.argv.slice(2)); } catch (error) { console.error(error.message); process.exitCode = 1; } }

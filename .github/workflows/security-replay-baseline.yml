@@ -1,0 +1,43 @@
+name: Security isolated replay baseline
+on:
+  push:
+    branches: [codex/security-replay-baseline]
+    paths:
+      - .github/workflows/security-replay-baseline.yml
+      - supabase/tests/platform-bootstrap.js
+      - supabase/tests/platform-bootstrap-check.sql
+      - supabase/tests/run-isolated.js
+      - supabase/tests/replay-baseline.js
+      - supabase/tests/replay-baseline.test.js
+permissions:
+  contents: read
+concurrency:
+  group: security-replay-baseline-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  baseline:
+    if: github.repository == 'rathunter69/Hotkey.gg' && github.event_name == 'push' && github.ref == 'refs/heads/codex/security-replay-baseline'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22.23.2
+      - name: Isolation and baseline guard tests
+        run: node --test supabase/tests/runner.test.js supabase/tests/platform-bootstrap.test.js supabase/tests/replay-baseline.test.js
+      - name: Fresh isolated application baseline
+        run: node supabase/tests/replay-baseline.js --run
+      - name: Remove only named purpose-labelled baseline containers
+        if: always()
+        run: node supabase/tests/replay-baseline.js --cleanup
+      - name: Save sanitized baseline evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: security-replay-baseline-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/hotkey-replay-baseline/
+          if-no-files-found: warn
+          retention-days: 7
