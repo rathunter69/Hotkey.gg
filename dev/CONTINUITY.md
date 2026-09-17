@@ -1,5 +1,9 @@
 # HOTKEY.GG — PROJECT CONTINUITY BRIEF
 
+> **Historical context as of 2026-09-13.** [Current state](../docs/CURRENT.md) supersedes the
+> handoff and next-step instructions below. PR #250 is merged; main still has 74 drills.
+> A separate September branch contains additional onboarding work; see the current-state page.
+
 _Written r449 (2026-07-29) at the close of the depth-pass campaign; §0 added r451 (2026-09-03);
 §0c added r455 close (2026-09-04). Purpose: condition a fresh
 session — especially one working the BUSINESS PLAN — with everything load-bearing about the

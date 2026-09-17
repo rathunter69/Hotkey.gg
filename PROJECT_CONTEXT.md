@@ -1,4 +1,9 @@
-# hotkey.gg — PROJECT_CONTEXT (handover / source of truth)
+# hotkey.gg — PROJECT_CONTEXT (historical handovers)
+
+> **2026-09-13:** Start with [README.md](README.md) and [docs/CURRENT.md](docs/CURRENT.md).
+> The dated handoffs below are historical records. They do not establish current branch,
+> deployment state, queue, or workflow. Retained for product rationale and past decisions.
+
 _Refreshed 2026-07-26 against the live repo (github.com/rathunter69/Hotkey.gg @ main).
 New sessions: the repo IS the handover — read this file, **dev/WORKFLOW.md (the process
 standards — READ FIRST; §9 is the wave playbook for Opus-5 sessions, new r428)**,

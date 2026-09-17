@@ -1,7 +1,16 @@
 # Supabase-in-repo — no more pasting SQL into the dashboard
 
-Database changes live in `supabase/migrations/*.sql` and deploy automatically
-on push via GitHub Actions.
+> **2026-09-17 status:** The connector works. Live history contains all 52 local migration
+> versions plus nine additional records. This is not proof of identical database definitions.
+> See [platform audit](../docs/audit/README.md) for permission findings and
+> [current state](../docs/CURRENT.md) for work priorities. The latest observed deployment
+> (September 3, run 33814362058) failed at project linking with an invalid access-token format;
+> migrations and functions were skipped. No newer Supabase run appeared in the latest 100
+> workflow runs checked September 17. A healthy connector is not a working Git deployment.
+> The dated instructions below are history, not instructions to rerun the live backlog.
+
+Database changes live in `supabase/migrations/*.sql`. The repository workflow is configured
+to deploy on pushes to main that touch `supabase/**`, or on manual dispatch.
 
 > **STATUS 2026-07-24: the pipeline WORKS.** The one-time setup was completed
 > and deploys have run green since 2026-07-13 (verified against the live DB
@@ -27,9 +36,10 @@ on push via GitHub Actions.
    rules, flair, entitlements) is live.
 
 ## How changes work from now on
-- New table/column/policy → Claude adds a timestamped file in `supabase/migrations/`
-  and pushes. The Action applies it. No dashboard pasting.
-- All migrations are idempotent (house rule) — safe to re-run.
+- New table/column/policy changes use a new migration and the current review/release process
+  in `docs/DEVELOPMENT.md`. Preserve earlier migrations and test in an isolated environment.
+- Do not assume a migration is safe to repeat. Inspect its operations and reconcile the live
+  history before any replay or history repair.
 - Edge Functions (Stripe etc., when built) live in `supabase/functions/<name>/`
   and deploy from the same workflow.
 
