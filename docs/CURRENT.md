@@ -7,6 +7,14 @@ Repository: **rathunter69/Hotkey.gg**. Shared guidance: **codex/repository-found
 method and area boundaries; [TASK_STARTERS.md](TASK_STARTERS.md) supplies the twelve starters.
 This is the single current queue. Historical guidance does not authorize more work.
 
+Wolf's latest communication instruction: **all Hotkey agents and sessions stay concise**.
+AGENTS.md and TASK_GUIDE.md carry the rule for active, delegated and resumed work: outcome,
+user impact and next decision in chat; detailed evidence in remote handoffs. The chief also
+leads discussion of the project overview, overall design specification and platform-wide
+experience. PRODUCT.md owns that evolving specification and distinguishes confirmed rules
+from open choices; area tasks supply focused evidence and decisions.
+
+
 ## Current objective and authority
 
 The chief owns planning, priorities, shared product guidance and coordination. Application
@@ -76,10 +84,11 @@ All preserve original local work and earlier remote branches.
 | Owner / task | Scope | Exclusive files / boundaries |
 |---|---|---|
 | **Establish testing and blockers**, `01a0af90-b973-7572-b7ff-d5bf9f504a52`; `codex/testing-security-groundwork` | Complete local matrix and exact-source full Linux run 35274460688 passed at 4ea428b; remote docs-only handoff 31af74b accepted. Redirect-safe isolation covers every active gate harness/generator, with redirect/WebSocket/service-worker canaries. | Browser test workflow(s), browser helper/canary/harnesses and generator isolation, `dev/run-checks.js`, `docs/DEVELOPMENT.md`, testing handoff. Port 8791 released after local checks. Also read-only safety review of Security's separate platform workflow before its first push/run. |
-| **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; accepted `codex/security-platform-bootstrap`, active `codex/security-replay-baseline` | Platform-only experiment passed first attempt at 49b8193; durable handoff 3dd686d accepted. Continue one bounded isolated application-replay/permission-baseline batch. Run 35276711544 failed after one successful 52-migration replay: permission fixture aborted after 12 results. Full 56-assertion baseline and second fresh replay remain incomplete; final remote handoff pending. DATA-01/02/03 remain unrepaired. | `supabase/tests/`, `docs/testing-database.md`, security handoff and distinct `.github/workflows/security-replay-baseline.yml`. Testing reviews exact candidate before triggering push. No gate/deployment workflow, application runtime or migration edits; separate from current integration. |
+| **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; accepted `codex/security-platform-bootstrap`, active `codex/security-replay-baseline` | Platform-only experiment passed first attempt at 49b8193; durable handoff 3dd686d accepted. Continue one bounded isolated application-replay/permission-baseline batch. Run 35276711544 failed after one successful 52-migration replay: permission fixture aborted after 12 results. Full 56-assertion baseline and second fresh replay remain incomplete; final handoff 9ea05e6 accepted as failed-baseline evidence. One narrow correction to two fixture entitlement reads is assigned, with independent review before a fresh run. DATA-01/02/03 remain unrepaired. | `supabase/tests/`, `docs/testing-database.md`, security handoff and distinct `.github/workflows/security-replay-baseline.yml`. Testing reviews exact candidate before triggering push. No gate/deployment workflow, application runtime or migration edits; separate from current integration. |
 | **Audit starter 3 cleanup candidates**, `01a0af90-7fb2-7571-a5d6-b82354d57540`; `codex/repository-structure` | Complete on its branch at cf8c61b: archived the historical PROJECT_CONTEXT record, kept a root compatibility page, repaired links and recorded the remaining structure plan. Chief verified preserved text and docs-only file manifest. Included in accepted combined checkpoint 00df57a; no main merge. | `README.md`, `docs/ARCHITECTURE.md`, selected historical documentation/archive paths and non-shared documentation links, `docs/handoffs/repository-structure.md`. No runtime, generated pages, migrations, test harness or workflow edits. |
 | **Integrate account testing changes**, `01a0b0f9-09da-7a62-9dd2-dd9baeac388d`; `codex/groundwork-integration` | Complete and accepted at remote 00df57a. Account repair, full Testing 4ea/31af, structure cf8 and Security preparation/14d coexist; seven combined static checks, three runner units, source-equivalence review and replay-plan pass. Full local/Linux browser evidence reused only after exact executable equivalence; SQL56 remains UNRUN. | Integration branch and `docs/handoffs/groundwork-integration.md`. Preserve exact area executable files and chief guidance; exclude the separate platform-bootstrap experiment. No main merge/deployment. |
-| Chief coordinator, this task | Read-only GitHub/security/structure review, ownership coordination, remote handoff reconciliation and next choices. | `docs/CURRENT.md`, `docs/PRODUCT.md`, `docs/handoffs/chief-groundwork.md`. Other tasks send proposed corrections instead of editing these. |
+| **Audit catalog and learner flow**, `01a0b148-2693-7901-af91-934c83cabe1d`; `codex/catalog-flow-review` from accepted 00df57a | Wolf started the dedicated decision review. Evidence/design only: reconcile modes, ranked play, paths and learner flow; present manageable choices and preserve Foundations feedback. | Owns only `docs/handoffs/catalog-progression.md`; returns proposed PRODUCT/CURRENT updates to the chief. No runtime/catalog/progress/access/billing edits or automatic additional modules. |
+| Chief coordinator, this task | Project overview and platform-wide design discussion, priorities, product decisions, GitHub/security/structure review and handoff reconciliation. | `docs/CURRENT.md`, `docs/PRODUCT.md`, `docs/handoffs/chief-groundwork.md`. Other tasks send proposed corrections instead of editing these. |
 
 Testing checkpoint [4ea428b](https://github.com/rathunter69/Hotkey.gg/commit/4ea428ba1504ee04b3d01943df5f7cd1b68a2c4d)
 is remote-verified by the chief: parent 6c98416; 23 test/workflow/generator/documentation files;
@@ -157,8 +166,14 @@ Hotkey migrations completed on the first fresh platform, then the fixture aborte
 direct `my_pro()` call with SQLSTATE 42501. The final RPC-grants migration intentionally
 revokes client execution of that helper. Twelve TAP results were emitted (10 pass, 2 fail);
 the full 56-result baseline did not complete, and the guard refused a second instance.
-Cleanup/evidence upload passed. Final durable handoff and bounded fixture diagnosis are
-pending; no corrective run or grant/schema repair is authorized from these partial results.
+Cleanup/evidence upload passed. Final handoff [9ea05e6](https://github.com/rathunter69/Hotkey.gg/blob/9ea05e64edbe66d075b2fda6e7b313a2f198ae72/docs/handoffs/security-accounts.md)
+and durable evidence are now remote-verified; its final commit changes only docs/evidence
+over tested 18babfa. The chief checked the fixture reads and intentional helper revoke.
+After accepting that diagnosis, the chief assigned one narrow test-only correction: use
+supported `my_pro_status().pro` for both entitlement reads, preserving real roles, all 56
+assertions and expected outcomes. Require focused independent fixture review and Testing's
+exact-source clearance before one fresh run under the unchanged two-instance/first-error
+limits. Do not restore helper grants, relax assertions or change application/migration code.
 This is a test-fixture compatibility blocker, not evidence of a failing application migration.
 One successful replay does not establish two-run reproducibility.
 
@@ -179,6 +194,7 @@ repairs remain separately scoped.
 | Account/testing integration | [6c98416](https://github.com/rathunter69/Hotkey.gg/blob/6c984161c31bc4637dbe88b73a4da8408cefdf1d/docs/handoffs/account-testing-integration.md) | Requested combined local checks pass at c702c69, remote provenance verified; explicit CI/live-auth/DB limits remain. Task finished and released port 8791. |
 | Security test preparation | [2a4a5f5](https://github.com/rathunter69/Hotkey.gg/blob/2a4a5f544e968850cdfd27557108de13c3ffcec2/docs/handoffs/security-accounts.md) | Code ce53324 has guarded disposable runner and 56 synthetic role assertions; three runner units/static pass. Twelve predicted vulnerability failures are not executed reproductions. No database replay, permission result or security repair is claimed. |
 | Official test-platform feasibility | [14d7e10](https://github.com/rathunter69/Hotkey.gg/blob/14d7e10a79232000ff24d2637ce6adc72b786b1f/docs/handoffs/security-accounts.md) | Pinned official database/Auth image manifests and source SHAs; standalone platform gaps traced. Documentation-only delta over 2a4a5f5, executable code remains ce53324. No bootstrap/replay/SQL result yet. |
+| Application replay / incomplete permission baseline | [9ea05e6](https://github.com/rathunter69/Hotkey.gg/blob/9ea05e64edbe66d075b2fda6e7b313a2f198ae72/docs/handoffs/security-accounts.md) | Exact source 18babfa/run 35276711544: all 52 migrations passed once, then fixture aborted after 12 partial results (10 ok, 2 not ok). No complete 56-result stream or second instance; cleanup passed. Accepted failure evidence, not security clearance. Narrow test correction assigned separately. |
 | Combined groundwork integration | [00df57a](https://github.com/rathunter69/Hotkey.gg/blob/00df57afd8d3299cc7feaf523847b9ca43e54d06/docs/handoffs/groundwork-integration.md) | Remote tip/handoff verified; browser/runtime tree equals fully tested 4ea428b, Security test blobs equal accepted 14d7e10. Combined static7/runner3/replay-plan and independent review pass. Includes cleanup and latest modes/flow guidance through 45edd. Excludes separate platform/replay experiments. Accepted future area baseline; no main merge or deployment. |
 | Full testing groundwork | [31af74b](https://github.com/rathunter69/Hotkey.gg/blob/31af74b23a3ba65c9adb94254626e88632dabe0c/docs/handoffs/git-testing-releases.md) | Exact test-tooling source 4ea428b on preserved application c702c69: full local matrix and Linux run 35274460688 pass; chief verified source/run/job and docs-only final delta. Covers active gate isolation and generator drift, not live accounts, DB permissions or launch acceptance. |
 | Isolated platform bootstrap | [3dd686d](https://github.com/rathunter69/Hotkey.gg/blob/3dd686d26edcb53325579fbe479eb01bdf41f773/docs/handoffs/security-accounts.md) | Exact reviewed source 49b8193 passed Linux run 35275149357 on first attempt; durable sanitized JSON committed. Genuine empty platform, Auth helpers/ACLs, extensions, isolation and cleanup verified. Zero Hotkey migrations or permission assertions; not a DATA-01/02/03 repair. |
@@ -261,12 +277,12 @@ unrun checks. Browser suites own port 8791. Documentation-only changes use focus
 reference validation under TASK_GUIDE's exception, not unnecessary application test reruns.
 Do not call a static pass a playtest, a local subset full CI, or a report an implemented repair.
 
-Next: the combined groundwork checkpoint 00df57a is accepted. Wolf has requested a
-self-contained prompt to initiate the catalog/progression and learner-flow decision review
-in another session. That next area may start evidence/design from 00df57a while reading the
-latest foundation PRODUCT/CURRENT; this chief has not created a new task or begun its
-implementation. Settle modes, ranked play, paths and deferred/changed rules before application
-changes. The current prompt request does not authorize a catalog rebuild or new access rules.
+Next: the combined groundwork checkpoint 00df57a is accepted. Wolf has started
+**Audit catalog and learner flow**, task 01a0b148-2693-7901-af91-934c83cabe1d, from that baseline.
+The chief will discuss the project overview, shared design specification and platform at large,
+using the area review's evidence and dated decisions. Keep questions/results concise. Settle
+modes, ranked play, paths and deferred/changed rules before implementation. No catalog rebuild,
+progress reset or new access rules are authorized.
 
 Security's separate platform bootstrap is accepted; its isolated application replay/permission
 baseline is incomplete after the fixture failure above and remains outside 00df57a. It supplies evidence for security/release
