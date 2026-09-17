@@ -34,6 +34,36 @@ The twelve task boundaries in CURRENT.md and TASK_GUIDE.md govern ownership; the
 here organize product decisions, not a competing task list. Wolf requires non-secret continuity
 to be committed and pushed to GitHub so another computer can resume the work.
 
+## Chief discussion and shared design specification — September 17 clarification
+
+Wolf explicitly asked all agents/sessions to be concise and the orchestration session to
+include discussion of the project overview, design specification and platform as a whole.
+The chief should lead those product conversations alongside coordination. Detailed technical
+evidence belongs in linked handoffs; discussions with Wolf should expose the few choices that
+matter and their practical consequences.
+
+Use this brief as the shared, evolving specification. Discuss:
+- **Project overview:** who Hotkey serves, what learners gain and the core product promise.
+- **Experience and design:** the first-to-returning-user journey, teaching style, interaction
+  principles and visual foundation.
+- **Platform systems:** how lessons/drills, modes, paths, progress, competition, identity,
+  certificates, community/desks and access fit together; inclusion and rules remain decisions,
+  not an instruction to expand every system.
+- **Business and delivery:** subscriptions/free access, scope, priorities and what must be true
+  before launch, while retaining the parked deadline.
+
+The current overview remains learning Excel/business skills through keyboard-led, hands-on
+work, progressing from accessible playful exercises to realistic models. Personalized
+onboarding and subscriptions at launch remain confirmed requirements. Existing UI/ribbon/
+workspace and Foundations feedback remain protected. The exact mode/path/access/reward
+relationships are open and belong to the active decision review.
+
+Area tasks supply evidence and focused choices; the chief discusses and reconciles the overall
+design without repeating their audits. Record each agreed rule, source/date, superseded rule
+and acceptance example here. Label recommendations and unresolved choices explicitly.
+This clarification changes communication and discussion scope; it does not approve new
+features, a catalog rebuild, billing activation or deployment.
+
 ## Repository-structure follow-up — September 17
 
 Wolf's next request authorized orchestrating testing/security groundwork and making the GitHub
