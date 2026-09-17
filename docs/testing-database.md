@@ -14,9 +14,72 @@ or host/account-wide configuration was installed. The connected Supabase project
 isolated test environment and was not used as a fallback.
 
 Git/testing confirms GitHub-hosted Linux can supply Docker. It has not provisioned a database
-job or reviewed an image/bootstrap. Testing owns workflows; Security has not changed them.
-A future job needs the exact image contract below and no production secrets. The current
-missing prerequisites are a container host AND a reviewed genuine platform image by digest.
+job or reviewed a complete bootstrap. Testing owns workflows; Security has not changed them.
+The September 17 feasibility review below pins official images and identifies the missing
+Auth bootstrap. The blocker is now a reviewed and exercised bootstrap sequence, not inability
+to identify an image or a possible Linux host.
+
+## Official platform feasibility review — September 17
+
+Chief requested one concrete official route after accepting preparation at `2a4a5f5`.
+Reviewed the database/Auth pair from the official Supabase self-host compose, then resolved
+the tags through the public Docker registry and GitHub tag references. No image was pulled,
+container started, Auth service served or database contacted. These are source/metadata
+findings, not runtime compatibility or build-provenance attestation.
+
+| Component | Official tag and source commit | Immutable Linux amd64 manifest |
+|---|---|---|
+| Database | `supabase/postgres:17.6.1.136`, `d156ba65c14694c12cc5e782bc15b9b8ed2d1376` | `supabase/postgres@sha256:5a4314708484bec672de2c09653a5c01fb1c84a998564ac231b0325e2238ed5b` |
+| Auth migrator | `supabase/gotrue:v2.196.0`, `0204331ca41a5b49f076b6fa3dc6c0d20b996590` | `supabase/gotrue@sha256:7e813221b93fbf54b515036438550e483bfaf057b9db52fe9bc1ce91c47e817e` |
+
+The Postgres multi-platform index was
+`sha256:f371b5f3f2ac0a05703f33d6e6134515fb2498cab708fb948a0aeb7481467c00`.
+The platform-specific manifests above avoid silently selecting another architecture.
+Registry image config confirms Postgres uses `docker-entrypoint.sh`, PGDATA
+`/var/lib/postgresql/data`, POSTGRES_USER `supabase_admin`; Auth's command is `auth`.
+The reviewed database Dockerfile copies the official platform migrations and supplies
+`/etc/postgresql/postgresql.conf`. Preserve its required preload libraries; overriding the
+list with only pg_cron is not an established startup recipe.
+
+**Concrete gap:** Postgres alone has no `auth.jwt()` and its `auth.users` lacks
+`is_anonymous`. Independent review scanned the pinned platform SQL and confirmed both are
+absent. The existing runner rejects missing `auth.jwt()` before application replay; the
+fixture also needs the missing column. Platform default ACLs are compatible in source:
+`migrate.sh` runs init scripts as postgres, assigning the public defaults to that role;
+later official grants support Auth-table access and SET ROLE anon/authenticated.
+
+The pinned Auth release owns both missing objects. Its official `auth migrate` command runs
+the embedded migration chain without serving the Auth API. This is a concrete candidate
+bootstrap route, but its full configuration requirements, actual image startup, extension
+availability and compatibility with this database image are **UNRUN**. Do not copy just two
+SQL definitions or substitute fake grants/functions to get through preflight.
+
+**Minimal next proposed action:** Security prepares/reviews one platform-only bootstrap
+script using this exact pair, with Testing providing a separate GitHub-hosted Linux job.
+Pull images before isolation; initialize an empty tmpfs database with network none, no
+published ports or host/persistent mounts, the official config and
+`cron.launch_active_jobs=off` from the first server start. Run only the official Auth migration
+command in the database's otherwise isolated network namespace, connecting through localhost
+as its official Auth migration role with synthetic local-only settings. Stop/remove the Auth
+migrator, then verify database isolation, scheduler source/value, empty Auth/public data,
+required Auth objects/default ACLs and available extension versions. Save the first setup
+failure and stop; no speculative variants. This platform-only check must not replay Hotkey
+migrations or execute the 56 assertions. Only an accepted bootstrap result enables the
+separately coordinated two-fresh-replay baseline below.
+
+Testing confirmed a separate Ubuntu/Docker job is possible but declined an incomplete DB job;
+Security owns the exact bootstrap recipe, Testing owns later integration. Its accepted
+browser gate is independent and unchanged. No approved executable bootstrap or DB job is
+delivered in this documentation-only feasibility checkpoint.
+
+Pinned official evidence:
+
+- [Database build](https://github.com/supabase/postgres/blob/d156ba65c14694c12cc5e782bc15b9b8ed2d1376/Dockerfile-17),
+  [platform migration driver](https://github.com/supabase/postgres/blob/d156ba65c14694c12cc5e782bc15b9b8ed2d1376/migrations/db/migrate.sh),
+  [initial Auth schema](https://github.com/supabase/postgres/blob/d156ba65c14694c12cc5e782bc15b9b8ed2d1376/migrations/db/init-scripts/00000000000001-auth-schema.sql).
+- [Official Auth migrate command](https://github.com/supabase/auth/blob/0204331ca41a5b49f076b6fa3dc6c0d20b996590/cmd/migrate_cmd.go),
+  [JWT function migration](https://github.com/supabase/auth/blob/0204331ca41a5b49f076b6fa3dc6c0d20b996590/migrations/20220531120530_add_auth_jwt_function.up.sql),
+  [anonymous-user migration](https://github.com/supabase/auth/blob/0204331ca41a5b49f076b6fa3dc6c0d20b996590/migrations/20240214120130_add_is_anonymous_column.up.sql).
 
 ## Host and image contract
 
@@ -38,8 +101,9 @@ Prepare an immutable `registry/name@sha256:<64 hex>` image with:
 - PostgreSQL started with `-c cron.launch_active_jobs=off` from its FIRST startup, verified
   with `source='command line'` in pg_settings. Session-only or after-start disabling is refused.
 
-No digest is nominated without review. The earlier runbook's CLI 2.117.0 observation is not
-a validated pin. This runner does not invoke CLI. If CLI is used to prepare an empty platform,
+The reviewed candidate digests above are not a validated complete bootstrap. The earlier
+runbook's CLI 2.117.0 observation is not a validated pin. This runner does not invoke CLI.
+If CLI is used to prepare an empty platform,
 read its pinned help and ensure start/reset cannot replay this repository before isolation.
 
 Required container shape (adapt to the reviewed image's entrypoint and PGDATA; not a tested

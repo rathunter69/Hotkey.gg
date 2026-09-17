@@ -18,8 +18,10 @@ Never run these fixtures through the production connector or linked CLI project.
   `node --test supabase/tests/runner.test.js`. Passing these proves runner logic only.
 
 No new npm dependency or workflow. Git/testing owns future CI wiring. The runner requires a
-reviewed genuine Supabase platform image by digest, which is not yet supplied. A stock Postgres
-image, mock auth functions or ad-hoc table grants cannot establish parity with Supabase.
+reviewed genuine Supabase platform bootstrap. The runbook now records exact official Postgres
+and Auth candidate digests; the complete Auth bootstrap remains unimplemented and UNRUN.
+A stock Postgres image, mock auth functions or ad-hoc table grants cannot establish parity
+with Supabase.
 
 ## DATA-01 boundary matrix
 
