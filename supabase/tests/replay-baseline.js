@@ -7,6 +7,8 @@ const { main: guardedRunner, manifest, sanitizedError } = require('./run-isolate
 
 function mayTrySecond(report) {
   return report?.cleanup === 'PASS' && report?.baseline?.replayComplete === true
+    && report.baseline.completedMigrations?.length === 52
+    && report.baseline.tests?.length === 1 && report.baseline.tests[0].total === 56
     && !report.baseline.testError && report.baseline.phase === 'complete'
     && (report.result === 'PASS' || report.baseline.assertionFailures === true);
 }
