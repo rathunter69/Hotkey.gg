@@ -5,7 +5,7 @@ Chief: 01a0b0fa-d857-7002-ab95-1da0a1cfb858
 Branch: codex/security-groundwork
 Starting integration: 6c984161c31bc4637dbe88b73a4da8408cefdf1d
 Latest guidance read separately: foundation 3e15e662b86368bd7338cb482a37ed1bd4b9a2cf
-Exact validated test-code commit: ce53324 (full SHA in Git history)
+Exact validated test-code commit: ce53324df2dba934b4acb495bf28e74f35de9bd3
 State: test groundwork prepared and locally validated; database execution unavailable; no security schema repair, integration or deployment.
 
 ## Scope and outcome
@@ -119,4 +119,3 @@ Confirmed scope only; no new product decisions. Proposed CURRENT.md update: DATA
 
 ## Findings and next step
 Next proposed Security batch: DATA-01 desk authorization with isolated guest/member/captain/outsider/direct-table tests and a verified release path. DATA-02 profile privacy, DATA-03 MFA and DATA-06 duplicate saves remain separate, unrepaired findings. Do not start those from this handoff alone. Preserve current learning/progress rules and saved server history.
-
