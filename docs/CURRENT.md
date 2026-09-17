@@ -1,6 +1,6 @@
 # Current project state
 
-Updated 2026-09-17. Chief coordinator: task `01a0b0fa-d857-7002-ab95-1da0a1cfb858`,
+Updated 2026-09-18. Chief coordinator: task `01a0b0fa-d857-7002-ab95-1da0a1cfb858`,
 succeeding `01a0af30-bac0-7b73-9d9e-56f298996c1a`.
 Repository: **rathunter69/Hotkey.gg**. Shared guidance: **codex/repository-foundation**.
 [PRODUCT.md](PRODUCT.md) owns product decisions; [TASK_GUIDE.md](TASK_GUIDE.md) owns the working
@@ -43,8 +43,9 @@ The October 1 deadline is parked. Subscriptions at launch and customized onboard
 future requirements. Broad feature/content development, live billing and catalog rebuilding
 stay paused. Guided beginner learning, assisted completion without XP, and freely explored
 basics with recommended paths are direction for future design; existing rules stay unchanged
-until the relevant decisions and implementation are approved. Exact timing, assessment,
-paid boundaries, certificates, supported platforms and business facts remain open in PRODUCT.
+until the relevant decisions and implementation are approved. The September 18 light readiness/subscription policy, optional lesson timer and assistance
+categories are confirmed in PRODUCT; exact curriculum/checkpoints, retry/scoring/publication,
+paid boundaries, certificates, supported platforms and business facts remain open.
 
 No main merge, deployment, production data changes, table removal, progress reset or broad
 framework rewrite is authorized. Structural moves and security/gameplay changes must remain
@@ -88,7 +89,7 @@ All preserve original local work and earlier remote branches.
 | **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; `codex/security-replay-baseline` | Baseline complete and accepted at 54640b0, exact tested source eaab864. Two fresh 52-migration replays and two complete 56-assertion suites: each 44 pass/12 identical DATA-01 failures, cleanup pass. Test infrastructure works; permissions remain unrepaired. | `supabase/tests/`, database-test docs/handoff and dedicated test workflows. Current batch complete; no DATA-01 repair assigned. Preserve failed-before evidence. No production/schema/runtime changes. |
 | **Audit starter 3 cleanup candidates**, `01a0af90-7fb2-7571-a5d6-b82354d57540`; `codex/repository-structure` | Complete on its branch at cf8c61b: archived the historical PROJECT_CONTEXT record, kept a root compatibility page, repaired links and recorded the remaining structure plan. Chief verified preserved text and docs-only file manifest. Included in accepted combined checkpoint 00df57a; no main merge. | `README.md`, `docs/ARCHITECTURE.md`, selected historical documentation/archive paths and non-shared documentation links, `docs/handoffs/repository-structure.md`. No runtime, generated pages, migrations, test harness or workflow edits. |
 | **Integrate account testing changes**, `01a0b0f9-09da-7a62-9dd2-dd9baeac388d`; `codex/groundwork-db-integration` | Complete and accepted at 16ee830: all accepted account/browser/structure/database-test groundwork and evidence coexist. Seven combined static checks, 11 guard tests and plan pass; exact executable equivalence preserves original browser and DB results without redundant full reruns. | Integration handoff `docs/handoffs/groundwork-db-integration.md`; reservations released. No permission repair, runtime/migration/package/gate/deploy change, main merge or production action. Latest shared guidance is read separately. |
-| **Audit catalog and learner flow**, `01a0b148-2693-7901-af91-934c83cabe1d`; `codex/catalog-flow-review` from preserved 00df57a | Updated handoff bace206 accepted. Learning-first journey with prominent optional speed/competition and later-lesson gates confirmed. Skills plus subscription is tentative; exact gate policy, D1 content mechanics and D2 scoring/rank controls remain open. | Owns only `docs/handoffs/catalog-progression.md`; returns dated choices and proposed shared updates. No runtime/catalog/progress/access/billing edits. Existing design work need not rebase for test-only 16ee830. |
+| **Audit catalog and learner flow**, `01a0b148-2693-7901-af91-934c83cabe1d`; `codex/catalog-flow-review` from preserved 00df57a | September 18 handoff b5c5c7a accepted. Advanced subscription access plus readiness at major skill jumps (prior independent result/test-out), helped ordinary progression, optional lesson clock and instruction-versus-solution-help distinction confirmed. Exact paid curriculum/checkpoints, independent retries/content mechanics and scoring/publication/rank remain open. | Owns only `docs/handoffs/catalog-progression.md`; returns dated choices and shared-update proposals. No implementation/billing/catalog changes. Existing review remains valid on 00df57a. |
 | Chief coordinator, this task | Project overview and platform-wide design discussion, priorities, product decisions, GitHub/security/structure review and handoff reconciliation. | `docs/CURRENT.md`, `docs/PRODUCT.md`, `docs/handoffs/chief-groundwork.md`. Other tasks send proposed corrections instead of editing these. |
 
 Testing checkpoint [4ea428b](https://github.com/rathunter69/Hotkey.gg/commit/4ea428ba1504ee04b3d01943df5f7cd1b68a2c4d)
@@ -180,7 +181,7 @@ repairs remain separately scoped.
 | Official test-platform feasibility | [14d7e10](https://github.com/rathunter69/Hotkey.gg/blob/14d7e10a79232000ff24d2637ce6adc72b786b1f/docs/handoffs/security-accounts.md) | Pinned official database/Auth image manifests and source SHAs; standalone platform gaps traced. Documentation-only delta over 2a4a5f5, executable code remains ce53324. No bootstrap/replay/SQL result at that historical checkpoint; later results are listed below. |
 | Application replay / earlier incomplete baseline | [9ea05e6](https://github.com/rathunter69/Hotkey.gg/blob/9ea05e64edbe66d075b2fda6e7b313a2f198ae72/docs/handoffs/security-accounts.md) | Exact source 18babfa/run 35276711544: all 52 migrations passed once, then fixture aborted after 12 partial results (10 ok, 2 not ok). No complete 56-result stream or second instance; cleanup passed. Accepted earlier failure evidence, not security clearance; superseded for baseline completeness by 54640b0. |
 | Reproducible permission baseline | [54640b0](https://github.com/rathunter69/Hotkey.gg/blob/54640b07554882dcd3322d84f2bba398fadc94c0/docs/handoffs/security-accounts.md) | Exact eaab864/run 35277724943: two fresh complete 52-migration/56-assertion runs, identical 44 pass/12 permission failures, both cleanups pass. Durable JSON and source/provenance verified. Baseline accepted; permissions unrepaired. |
-| Catalog/flow decision review | [bace206](https://github.com/rathunter69/Hotkey.gg/blob/bace206c421e4f5969f69fc88c39e5191b234f1d/docs/handoffs/catalog-progression.md) | Source map and first dated answers; latest user conversation checked by chief. Learning-first hierarchy/later-lesson gates confirmed, detailed skills-plus-subscription gate policy tentative. D1/D2 mechanics remain open; no application rule change or rebuild. |
+| Catalog/flow decision review | [b5c5c7a](https://github.com/rathunter69/Hotkey.gg/blob/b5c5c7a396d29f84582dd84e19d17e5fca9430f9/docs/handoffs/catalog-progression.md) | Chief checked remote sole-doc delta and actual user answers. September 18 gate policy, optional lesson timing and assistance boundary explicitly approved; supersedes bace206's tentative status. Exact checkpoints/access boundary, D1 content mechanics and D2 publication/rank remain open; no implementation. |
 | Complete test-groundwork integration | [16ee830](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/docs/handoffs/groundwork-db-integration.md) | Final remote source/handoff verified. Only docs, accepted DB test files and two dedicated test workflows differ from 00df57a; all 10 Security executable/SQL/workflow blobs match eaab864. Browser/runtime unchanged. Static7/guard11/plan pass; browser green and DB reproducible 44/12-fail evidence reused explicitly by equivalence. Latest accepted baseline, no repair/merge/deploy. |
 | Earlier combined groundwork integration | [00df57a](https://github.com/rathunter69/Hotkey.gg/blob/00df57afd8d3299cc7feaf523847b9ca43e54d06/docs/handoffs/groundwork-integration.md) | Remote tip/handoff verified; browser/runtime tree equals fully tested 4ea428b, Security test blobs equal accepted 14d7e10. Combined static7/runner3/replay-plan and independent review pass. Includes cleanup and latest modes/flow guidance through 45edd. Excludes separate platform/replay experiments. Accepted future area baseline; no main merge or deployment. |
 | Full testing groundwork | [1f2fa57](https://github.com/rathunter69/Hotkey.gg/blob/1f2fa577f94911b05ecc50d8b25b7a2a9d16c6f2/docs/handoffs/git-testing-releases.md) | Latest documentation-only summary; accepted 00df57a contains earlier handoff 31af74b. Exact test-tooling source 4ea428b on preserved application c702c69: full local matrix and Linux run 35274460688 pass; chief verified source/run/job and docs-only final delta. Covers active gate isolation and generator drift, not live accounts, DB permissions or launch acceptance. |
@@ -269,13 +270,20 @@ at 16ee830. Browser verification is green; the database test suite reliably repr
 permission defects. Completion of test infrastructure is not completion of those repairs.
 Main remains 434bc0e; no merge, deployment or live policy change.
 
-Current product discussion: **Audit catalog and learner flow** has recorded learning as the
-main journey, optional prominent speed/competition, and gates for later lessons. The exact
-skills/subscription unlock policy is still under discussion; D1 shared-content mechanics and
-D2 scoring/publication/rank controls are not settled. The chief has reconciled those scoped
-answers in PRODUCT and will discuss the overview/design consequences without duplicating
-the area's questions. A valid existing source review at 00df57a need not restart for test-only
-16ee830.
+Current product discussion: learning is the main journey, with prominent optional speed/
+competition. September 18 approved advanced subscription access plus short readiness checks
+at major skill jumps, credit for prior independent work/test-out, helped ordinary progression,
+and correctness rather than speed/XP for readiness. Ordinary lesson clocks are optional and
+hidden by default; deliberate speed attempts show time. Instructions/explanations are
+unpenalized; solution-step reveals, Guided help or solution replay mean assisted progress
+with no XP. PRODUCT contains dated provenance, superseded rules and acceptance examples.
+
+Next discussion: independent retries/fresh variants and deliberate speed/competitive posting,
+then remaining reward/credential/access details. Exact free/paid boundaries, checkpoint
+locations/pass criteria and scoring/publication/rank rules are not approved yet. The chief
+reconciles answers without duplicating the area's questions. No implementation or new module
+is authorized by these product approvals; existing progress and Foundations feedback remain
+protected.
 
 Recommended parallel work in response to Wolf's question: a focused DATA-01 desk-permission
 repair using the existing 12 failing cases and preserving the 44 passing controls. Reuse the
