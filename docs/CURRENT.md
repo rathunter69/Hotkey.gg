@@ -197,48 +197,62 @@ handover branch named above until it is deliberately integrated; a fresh worktre
 lacks this guidance. One editor at a time per shared file, with one integration owner for
 CURRENT.md and PRODUCT.md when tasks overlap. Area tasks must save their handoffs to GitHub.
 
-Current area status — reported and reconciled September 17:
+Current area status — four initial handoffs saved; **testing remains pending**:
 
-| Area | Remote work and evidence | State / ownership |
+| Area | Remote handoff | State / ownership |
 |---|---|---|
-| Security/accounts | [Handoff at e598752](https://github.com/rathunter69/Hotkey.gg/blob/e598752d8dc39acd500276fbd42d50955018bbeb/docs/handoffs/security-accounts.md), branch `codex/security-accounts`, task `01a0af8b-9a97-7593-a1d2-6d2491cfe947` | DATA-05 shared-nav account isolation implemented and locally verified on its branch. Not integrated or deployed. File reservations released. |
-| Repository/database cleanup | [Assessment at b852e41](https://github.com/rathunter69/Hotkey.gg/blob/b852e41969e4157e9ce7f93aa48b8dda302f3b29/docs/handoffs/repository-database.md), branch `codex/repository-database`, task `01a0af90-7fb2-7571-a5d6-b82354d57540` | Report only; all 18 current public tables have positive dependencies and are retained. No deletion or schema change. Report reservation released. |
-| Git/testing/releases | Branch `codex/git-testing-releases`, task `01a0af90-b973-7572-b7ff-d5bf9f504a52`, based on 9df3405 | Active preparation: exact dependency/browser baseline, network-isolated smoke tests, database-test setup assessment and its own handoff. Final remote report pending. |
+| Security/accounts | [e598752](https://github.com/rathunter69/Hotkey.gg/blob/e598752d8dc39acd500276fbd42d50955018bbeb/docs/handoffs/security-accounts.md), `codex/security-accounts`, task `01a0af8b-9a97-7593-a1d2-6d2491cfe947` | DATA-05 shared-nav account isolation implemented and locally verified on its branch. Not integrated or deployed. Reservations released. |
+| Repository/database cleanup | [b852e41](https://github.com/rathunter69/Hotkey.gg/blob/b852e41969e4157e9ce7f93aa48b8dda302f3b29/docs/handoffs/repository-database.md), `codex/repository-database`, task `01a0af90-7fb2-7571-a5d6-b82354d57540` | Assessment complete. All 18 public tables have positive dependencies. No deletion/schema change. Reservation released. |
+| Git/testing/releases | [136df03](https://github.com/rathunter69/Hotkey.gg/blob/136df032c119de73e6896ca480381ab77846e872/docs/handoffs/git-testing-releases.md), `codex/git-testing-releases`, task `01a0af90-b973-7572-b7ff-d5bf9f504a52` | Initial tooling batch and local baseline verified on its own branch; handoff complete. Combined testing, full CI and isolated DB checks remain pending. |
+| Additional database review | [6a73f8e](https://github.com/rathunter69/Hotkey.gg/blob/6a73f8e649f875f567f44748c9e677d1065ac5d5/docs/handoffs/repository-database.md), `codex/database-cleanup`, task `01a0b0f0-0755-7962-b436-a6646a32321d` | Assessment complete. Confirms retained tables, missing billing objects and migration-history differences. No data/schema changes. |
 
-Chief review confirmed the first two remote reports and commit file lists. Their test results
-are area-task evidence, not tests rerun by the chief or production verification.
+The chief read all four remote reports and confirmed commit file lists for the completed
+branches. Test results below are area-task evidence, not tests rerun by the chief or production
+verification. Two of these tasks are assessments, so four completed handoffs do not establish
+four implemented repairs or a working combined release.
 
 Security reports 14 final synthetic account-isolation scenarios and seven static commands
-passing. The existing five smoke suites passed at an earlier revision; final listener/guest
-corrections then passed the focused suite and static checks. Changes include nav.js, a small
-themes.js callback fence, test wiring in dev/run-checks.js and gate.yml, an audit-state harness
-setup line, and nav/themes asset-version regeneration. No catalog rule or database change.
-Live multi-tab auth, pinned/full-CI integration and release verification remain open.
+passing. Existing smoke suites passed at an earlier revision; final listener/guest corrections
+then passed focused/static checks. Its nav/themes changes and asset-version regeneration remain
+on its branch. Live multi-tab auth and combined-source verification remain open.
 
-Git/testing reports Node 22.23.2, npm 10.9.8 and exact Playwright 1.49.1 installation passing,
-a successful simulated Git push, and seven static checks. Full Chromium hit a Windows runtime
-dependency error; the matching headless variant subsequently started at version 131.0.6778.33.
-Its smoke baseline remains in progress. Automatic approval review rejected a fallback smoke
-run because network isolation was incomplete; the task is repairing the isolation boundary
-and testing it before retrying. That rejection is not permission to bypass the boundary.
-Local database replay is not ready: Docker is unavailable, and an existing scheduled callback
-can target production. Establish isolated infrastructure and deny external traffic/disable
-scheduled jobs before any replay. No production replay is authorized.
+Git/testing verifies Node 22.23.2, npm 10.9.8, exact Playwright 1.49.1 installation and the matching
+Chromium 131.0.6778.33 headless shell. Seven static checks, the network canary, five original
+smoke suites and all 86 onboarding assertions passed on that branch. The full Chromium
+executable still fails on this Windows host. No full CI run is recorded for this source.
 
-Integration note: Security and Git/testing both touch the explicit audit-state start-gate
-setup; deduplicate that change. Preserve Security's account-isolation suite in run-checks.js
-and gate.yml when integrating Git/testing's smoke isolation. The Git/testing task has been
-notified. The chief has not merged, cherry-picked or deployed either branch.
+Automatic approval review had rejected a partially isolated smoke run. The five smoke harnesses
+now use shared isolation, and the canary confirms blocked cross-origin/redirect escape with zero
+requests at its disallowed local sink. The wider browser gate still needs isolation; this
+limited baseline is not permission to bypass it. Security's repair was not in the tested source.
 
-Cleanup identifies active consumers of curriculum v3/v4 and the certificate SQL mirror.
-Its next proposal is to move the certificate test to canonical migration source and then
-archive four historical SQL mirrors after reference checks. This is a proposal, not deletion
-authorization. DATA-01 desk authorization is Security's proposed next batch; it requires
-isolated permission tests and has not been started by this handoff.
+Database replay remains blocked by absent local container infrastructure. A concrete
+[isolated-test runbook](https://github.com/rathunter69/Hotkey.gg/blob/136df032c119de73e6896ca480381ab77846e872/docs/testing-database.md)
+records the existing production cron callback hazard. Establish outbound denial and disabled
+scheduling before any replay; do not use production as a fallback. Clean migration replay,
+role/permission tests, release protections, database delivery and recovery remain open.
 
-Other tasks must avoid overlapping edits and generators. Record ownership in the area handoff
-and notify the chief for this record; release it on completion or pause. This coordinates work
-and does not enforce a filesystem lock.
+Integration requirements for the next proposed testing batch:
+- Combine Security and Git/testing in an explicitly assigned integration branch.
+- Preserve both account-isolation and network-canary additions to run-checks.js and gate.yml.
+- Deduplicate the audit-state start-gate setup. Keep required generated asset references.
+- Run account isolation, the network canary, static, smoke and relevant onboarding checks on
+  the combined source; record the exact commit and remaining full-CI/DB limits.
+- The two database assessments use the same report path on different branches. Reconcile their
+  findings deliberately rather than overwriting one report with the other.
+
+Neither code branch has been merged/cherry-picked by the chief or deployed. The latest user
+instruction is to keep testing pending and only suggest the subsequent roadmap after confirming
+the current work is complete and working together. This record does not authorize a new repair
+batch, integration implementation, main merge or release from the master planning task.
+
+Both cleanup reports recommend retaining all current tables, preserving active v3/v4/test
+consumers and comparing the nine extra live migration entries before reconciliation. Their
+SQL-mirror consolidation and isolated-replay proposals remain separate future scopes.
+DATA-01 desk authorization remains Security's proposed next batch, requiring isolated tests.
+
+Record further ownership in the area handoff and notify the chief for this record. The shared
+status coordinates work; it does not enforce a filesystem lock.
 
 | Dedicated task | Problem to address | Suggested turns |
 |---|---|---|
@@ -288,11 +302,11 @@ Confirmed September 17: paid subscriptions on launch day; paths customized durin
 Latest decision: pause new development and refinement until Wolf is confident in the existing
 code, setup and guidance. The primary project folder is corrected and browser baseline restored.
 Next in this task: coordinate the written task scopes and integrate their remote handoffs.
-The foundation and first two area handoffs are saved and verified on GitHub. Await Git/testing's
-final isolated test baseline, then assign integration of the account repair with the shared
-harness changes. Keep catalog/progression separation ahead of implementation cleanup, as Wolf
-requested; the cleanup assessment itself is complete. Continue product guidance here. Proposed
-next security and cleanup batches need their own selected scope; no new batch was started here.
+All four initial handoffs are saved on GitHub. Testing remains pending until the account repair
+and testing changes are checked together at one recorded commit. Suggest that bounded integration
+check next; do not start it from this planning task. After the gate clears, re-present the proposed
+roadmap for Wolf's choice. Preserve catalog/progression separation before implementation cleanup
+and agree the full learning plan before rebuilding content. No new module was started here.
 Wolf's preserve/change guidance is recorded in PRODUCT.md. Pricing, onboarding dimensions, launch catalog,
 supported platforms and current business status remain open. No replacement deadline is set.
 
