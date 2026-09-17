@@ -3,7 +3,18 @@
 Updated September 17, 2026. Security groundwork builds on accepted integration
 `6c984161c31bc4637dbe88b73a4da8408cefdf1d`; it does not repair DATA-01/02/03.
 Executable fixtures and runner: [supabase/tests](../supabase/tests/README.md).
-**No database replay or role test has run yet.** Runner unit tests are not RLS evidence.
+**No Hotkey database replay or application authorization test has run yet.**
+Runner unit tests are not RLS evidence.
+
+**September 17 platform-only update:** the one reviewed bootstrap experiment passed in
+[run 35275149357](https://github.com/rathunter69/Hotkey.gg/actions/runs/35275149357), exact source
+`49b8193b6b6c17c63b97c898d268437ceb191cdf`. Official Auth migration, platform role/claim checks,
+default ACLs, transactional extension installation, empty data, isolation and cleanup passed.
+This includes platform role checks, not the 56 application authorization assertions. Full
+Hotkey replay remains UNRUN. See the [bootstrap recipe](../supabase/tests/PLATFORM_BOOTSTRAP.md)
+and [durable result](../supabase/tests/evidence/platform-bootstrap-35275149357.json). The
+feasibility section below records the earlier finding; its bootstrap gap is now closed for
+this exact pair/host. Any next application replay remains a separately reviewed batch.
 
 ## Execution capability
 
@@ -13,13 +24,14 @@ The permitted runner capability check fails with `docker ENOENT`, before any SQL
 or host/account-wide configuration was installed. The connected Supabase project is not an
 isolated test environment and was not used as a fallback.
 
-Git/testing confirms GitHub-hosted Linux can supply Docker. It has not provisioned a database
-job or reviewed a complete bootstrap. Testing owns workflows; Security has not changed them.
-The September 17 feasibility review below pins official images and identifies the missing
-Auth bootstrap. The blocker is now a reviewed and exercised bootstrap sequence, not inability
-to identify an image or a possible Linux host.
+Git/testing confirmed GitHub-hosted Linux can supply Docker and reviewed the separate
+Security-owned platform-only workflow before dispatch. That experiment has now passed as
+recorded above. Security did not edit Testing's browser gate or deployment workflows.
+The following feasibility history identifies why the standalone database image needed Auth.
 
 ## Official platform feasibility review — September 17
+
+Historical preparation at 14d7e10; completed runtime bootstrap is recorded above.
 
 Chief requested one concrete official route after accepting preparation at `2a4a5f5`.
 Reviewed the database/Auth pair from the official Supabase self-host compose, then resolved
@@ -96,8 +108,8 @@ Prepare an immutable `registry/name@sha256:<64 hex>` image with:
   Do not replace auth functions with stubs or widen application grants to make tests pass.
 - Available pgTAP and pg_net, plus preloaded pg_cron. Record exact Postgres, extension and
   platform source versions. Stock PostgreSQL does not provide the required Supabase schema.
-- No application tables, users, customer data, secrets, linking metadata or external services.
-  No startup migration replay or network-calling initialization scripts.
+- No application tables, users, customer data, production secrets, linking metadata or external
+  services. No startup application migration replay or network-calling initialization scripts.
 - PostgreSQL started with `-c cron.launch_active_jobs=off` from its FIRST startup, verified
   with `source='command line'` in pg_settings. Session-only or after-start disabling is refused.
 
