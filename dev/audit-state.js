@@ -13,6 +13,8 @@ const { createServer } = require('./serve');
     console.log('Browser:', browser.version());
     const context = await browser.newContext();
     await context.route('**/*', r => new URL(r.request().url()).origin === origin ? r.continue() : r.abort());
+    // This diagnostic probes account state, not the first-key/start-clock contract.
+    await context.addInitScript(() => localStorage.setItem('hk_gate_off', '1'));
     const page = await context.newPage();
     await page.goto(origin + '/index.html');
     await page.waitForFunction(() => typeof cur !== 'undefined' && typeof clearAccountUI === 'function');

@@ -7,20 +7,23 @@ Use Node.js 22 or later with npm (CI uses Node 22). Run `npm ci` in the reposito
 does not upgrade it. Run `npm run browser:install` once to install its Chromium build. Linux CI
 uses `npx playwright-core install --with-deps chromium` for system libraries too.
 
-Foundation installation limitation (2026-09-13, updated below): npm registry requests failed
-with connection resets even outside the sandbox. The initial single-package lock entry was assembled from the
+The initial single-package lock entry was assembled from the
 [upstream package manifest](https://github.com/microsoft/playwright/blob/v1.49.1/packages/playwright-core/package.json)
 and the package checksum recorded in an
 [existing npm lockfile](https://github.com/NetOfficeFw/playwright/blob/main/package-lock.json).
-Run `npm ci` and the browser gate before merging this tooling change; do not bypass integrity
-verification if installation fails. Replace this note with the actual result once verified.
+September 17 starter-4 verification: `npm ci --ignore-scripts --no-audit --no-fund`
+passed with Node 22.23.2/npm 10.9.8, installing exactly Playwright 1.49.1 without changing
+the lockfile. The portable official Node archive was SHA256-verified. This closes the
+dependency-installation gap, not the full CI/browser gate. Never bypass package integrity.
 
 September 17 audit update: the bundled Node runtime is available, but npm and the pinned
 project dependency are not installed here. Local checks ran with bundled Playwright 1.62.1
 and installed Chrome 152.0.7977.84. All seven static commands, 86 onboarding assertions and
 the five smoke commands passed after repairing the runner's page routing. The audit reports
 record additional engine checks. These results do not replace an exact pinned install/CI run.
-See [delivery/testing audit](audit/DELIVERY_TESTING.md) for reproduction and scope.
+See [delivery/testing audit](audit/DELIVERY_TESTING.md) for that earlier reproduction and
+[Git/testing handoff](handoffs/git-testing-releases.md) for the newer pinned-dependency
+results, browser limitations and remaining release blockers.
 
 `npm start` serves this checkout on loopback port 8791, with caching disabled. Set `PORT` for a
 different manual preview port. The preview does not emulate Cloudflare headers, redirects or
@@ -31,7 +34,7 @@ Supabase. Stop it before running browser tests, which own port 8791.
 | Command | Purpose |
 |---|---|
 | `npm run check` | Syntax, asset versions, runtime invariants, v3/v5 planning-map checks, outbox and tooling tests; no browser or network required |
-| `npm run test:smoke` | Page smoke, leaderboard, landing, paywall and navigation/combo/foot demo replay with one owned local server |
+| `npm run test:smoke` | Network-isolation canary, page smoke, leaderboard, landing, paywall and navigation/combo/foot demo replay with one owned local server |
 | `npm run test:browser -- dev/e2e-formulas.js` | Run an existing browser harness with the same server/browser setup |
 | `npm run test:browser -- dev/e2e-demo-replay.js navigation pastes` | Target named drills with the existing replay harness |
 | `npm run test:browser -- dev/e2e-alt-paths.js` | Alternative-route regression suite |
@@ -45,6 +48,12 @@ The runner stops on failure, returns a nonzero exit code and closes its preview 
 
 The smoke suite is not the full engine gate. `.github/workflows/gate.yml` retains the complete
 regression matrix, including guided routes, rapid-fire, parity, input, depth mechanics and layout.
+The five smoke harnesses use `dev/browser-isolation.js` before creating pages. It restricts
+HTTP requests to the exact loopback test origin, blocks service workers/WebSockets and rejects
+redirects. The canary uses two ephemeral local servers to verify that disallowed requests
+never reach the sink; run it alone with `node --test dev/browser-isolation.test.js`.
+Wider CI harness isolation remains unfinished; do not assume the whole matrix is safe to
+run with unrestricted production network access. See the Git/testing handoff.
 Review its scope rules when adding production files. Legacy scripts remain directly runnable,
 but many assume a Linux browser path unless `CHROME` is supplied; use the runner on Windows.
 
@@ -79,6 +88,11 @@ Before publishing this tooling change, verify that the existing Cloudflare proje
 its static-site settings rather than inferring a framework build from the manifest.
 
 ## Database and credentials
+
+Use [isolated database setup](testing-database.md) before a clean replay or permission test.
+The migration chain schedules an HTTP call to production; an unlinked local project alone
+does not isolate that callback. The runbook records the missing container-runtime prerequisite
+and the outbound-network/cron controls required before replay. No clean replay has passed yet.
 
 Use new `supabase/migrations/*.sql` files for database changes. Compare a replacement function
 against its newest definition, preserving all existing permission and integrity checks. Historical

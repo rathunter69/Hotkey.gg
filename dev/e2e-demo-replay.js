@@ -7,8 +7,8 @@
      python3 -m http.server 8791 &                       # serve the repo root
      npm i playwright-core                               # anywhere; or NODE_PATH to it
      node dev/e2e-demo-replay.js [drill ...]             # no args = all 55
-   Chromium is preinstalled at /opt/pw-browsers. Supabase CDN is blocked in the
-   sandbox, so sb=false paths exercise — the boot banner there is an artifact.
+   Chromium is preinstalled at /opt/pw-browsers. This harness blocks external
+   traffic, so sb=false paths exercise — the boot banner there is an artifact.
 
    Per drill × REPS random builds: replay demo via setDemoSel + demoKey (the demo
    player's own dispatcher, no sleeps), then assert (a) the engine `done` flag —
@@ -25,14 +25,15 @@
    dev/check-startgate.js and dev/check-pause.js key through the real gate. */
 'use strict';
 const { chromium } = require('playwright-core');
+const { newIsolatedContext } = require('./browser-isolation');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const URL = process.env.URL || 'http://127.0.0.1:8791/index.html';
 const REPS = parseInt(process.env.REPS || '3', 10);
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
-  const page = await browser.newPage();
-  await page.route('**/@supabase/**', route => route.abort());
+  const context = await newIsolatedContext(browser, URL);
+  const page = await context.newPage();
   const pageErrors = [];
   page.on('pageerror', e => pageErrors.push(String(e.message || e).slice(0, 160)));
   await page.addInitScript(() => {
@@ -108,6 +109,7 @@ const REPS = parseInt(process.env.REPS || '3', 10);
     failures++;
     console.log('PAGE ERRORS (' + pageErrors.length + '): ' + [...new Set(pageErrors)].slice(0, 5).join(' | '));
   }
+  await context.close();
   await browser.close();
   console.log(failures ? ('E2E: ' + failures + ' FAILURE CLASS(ES)') : 'E2E: ALL GREEN');
   process.exit(failures ? 1 : 0);

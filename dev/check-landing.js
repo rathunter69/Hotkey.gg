@@ -36,6 +36,7 @@
    Run: node dev/check-landing.js                       (server on 127.0.0.1:8791)
         BASE=http://127.0.0.1:8799 node dev/check-landing.js */
 const { chromium } = require('playwright-core');
+const { newIsolatedContext } = require('./browser-isolation');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const BASE = process.env.BASE || 'http://127.0.0.1:8791';
 let pass = 0, fail = 0;
@@ -44,13 +45,14 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, args: ['--no-sandbox'] });
   const mk = async (q, seed) => {
-    const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+    const context = await newIsolatedContext(browser, BASE, { viewport: { width: 1280, height: 800 } });
+    const page = await context.newPage();
     page.__errs = []; page.on('pageerror', e => page.__errs.push(String(e.message).slice(0, 140)));
-    await page.route('**/@supabase/**', r => r.abort());
     await page.addInitScript(() => { try { localStorage.setItem('hk_beta_ok', '1'); } catch (e) {} });
     if (seed) await page.addInitScript(seed);
     await page.goto(BASE + '/index.html' + (q || ''), { waitUntil: 'load' });
     await page.waitForTimeout(1000);
+    page.__isolatedContext = context;
     return page;
   };
 
@@ -181,7 +183,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     return document.getElementById('landing').classList.contains('gone');
   });
   ok(t, 'clicking the hero CTA runs tryEnter() and dismisses the landing');
-  await p.close();
+  await p.__isolatedContext.close();
 
   // --- close-CTA is the same door
   p = await mk('');
@@ -191,7 +193,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     return document.getElementById('landing').classList.contains('gone');
   });
   ok(t2, 'the close CTA is the same door');
-  await p.close();
+  await p.__isolatedContext.close();
 
   // --- flag ON via the dev preview
   p = await mk('?premium=preview');
@@ -209,7 +211,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   ok(r2.prices.length > 0 && r2.prices.every(x => r2.wantPrices.indexOf(x) >= 0),
     'the price is still plans-derived with the paywall ON (' + r2.prices.join(' ') + ')');
   ok(p.__errs.length === 0, 'zero page errors in the ON state', p.__errs.join(' | '));
-  await p.close();
+  await p.__isolatedContext.close();
 
   // --- returning user never sees the marketing landing
   p = await mk('', () => { try { localStorage.setItem('hotkey_onboarded', '1'); } catch (e) {} });
@@ -218,7 +220,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
     disp: getComputedStyle(document.getElementById('landing')).display
   }));
   ok(r3.cls && r3.disp === 'none', 'html.hk-returning still hides the landing');
-  await p.close();
+  await p.__isolatedContext.close();
 
   // --- the desk-invite preview writes into .lede (BETA_RETIRE_LANDING §1 bug)
   p = await mk('?desk=TESTDESK', () => {
@@ -235,7 +237,7 @@ const ok = (c, n, x) => { if (c) { pass++; console.log('  PASS ' + n); } else { 
   await p.waitForTimeout(1200);
   const r4 = await p.evaluate(() => (document.querySelector('#landing .lede') || {}).textContent || '');
   ok(/invited to join Wharton IB Club/.test(r4), 'the ?desk= deep link writes into .lede', r4.slice(0, 80));
-  await p.close();
+  await p.__isolatedContext.close();
 
   await browser.close();
   console.log((fail ? 'LANDING GUARD: ' + fail + ' FAILURE(S), ' : 'LANDING GUARD: ALL ') + pass + ' PASS');

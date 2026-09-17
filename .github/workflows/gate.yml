@@ -70,6 +70,8 @@ jobs:
         run: |
           bash dev/check-secrets.sh
           node dev/run-checks.js static
+      - name: Browser isolation canary (local synthetic servers only)
+        run: node --test dev/browser-isolation.test.js
       - name: Smoke (every page loads, zero page errors + drill invariants)
         run: node dev/e2e-smoke.js
       - name: Leaderboard (tier filter, placement, seed field)

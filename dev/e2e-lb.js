@@ -1,5 +1,5 @@
 /* LEADERBOARD E2E (r339) — permanent gate coverage for the ranking surface.
-   Supabase is blocked in CI, so the suite injects a synthetic DATA field (the same shape
+   External traffic is blocked by the harness, so the suite injects a synthetic DATA field (the same shape
    load() builds) and drives renderAll() + the real DOM. Covers:
      A. tier sub-menu on the drill boards (r335): dropdown, bucket chips, n-of-m note, restore
      B. ranked entry (r336 / r455): unlock panel below LVL 10 -> placement checklist -> tier card;
@@ -10,6 +10,7 @@
    Run: python3 -m http.server 8791 &  ·  node dev/e2e-lb.js */
 'use strict';
 const { chromium } = require('playwright-core');
+const { newIsolatedContext } = require('./browser-isolation');
 const fs = require('fs');
 const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const URL = process.env.URL || 'http://127.0.0.1:8791/leaderboard.html';
@@ -30,8 +31,8 @@ const PKEYS = (() => {
 
 (async () => {
   const browser = await chromium.launch({ executablePath: EXE, headless: true });
-  const page = await browser.newPage();
-  await page.route('**/@supabase/**', route => route.abort());
+  const context = await newIsolatedContext(browser, URL);
+  const page = await context.newPage();
   const errs = [];
   page.on('pageerror', e => errs.push(String(e.message || e).slice(0, 150)));
   await page.goto(URL, { waitUntil: 'load' });
@@ -336,8 +337,8 @@ const PKEYS = (() => {
   }
   ok(sigBad.length === 0, 'every computeXP call site passes (runs, pl, sessions)', sigBad.join(' | '));
   // cert page renders its empty state without page errors
-  const certPage = await browser.newPage();
-  await certPage.route('**/@supabase/**', route => route.abort());
+  const certContext = await newIsolatedContext(browser, URL);
+  const certPage = await certContext.newPage();
   const certErrs = [];
   certPage.on('pageerror', e => certErrs.push(String(e.message).slice(0, 120)));
   await certPage.goto(URL.replace('leaderboard.html', 'cert.html'), { waitUntil: 'load' });
@@ -345,10 +346,11 @@ const PKEYS = (() => {
   const f3 = await certPage.evaluate(() => (document.getElementById('root') || {}).textContent || '');
   ok(/No certificate id|loading/i.test(f3), 'cert.html renders the no-id state', f3.slice(0, 60));
   ok(certErrs.length === 0, 'cert.html zero page errors', certErrs.join(' | '));
-  await certPage.close();
+  await certContext.close();
 
   ok(errs.length === 0, 'zero page errors', errs.join(' | '));
   console.log(fail === 0 ? ('LB SUITE: ALL ' + pass + ' PASS') : ('LB SUITE: ' + fail + ' FAILURE(S) of ' + (pass + fail)));
+  await context.close();
   await browser.close();
   process.exit(fail ? 1 : 0);
 })();
