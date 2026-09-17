@@ -9,6 +9,7 @@ on:
       - supabase/tests/run-isolated.js
       - supabase/tests/replay-baseline.js
       - supabase/tests/replay-baseline.test.js
+      - supabase/tests/database/01-desk-authorization.test.sql
 permissions:
   contents: read
 concurrency:
