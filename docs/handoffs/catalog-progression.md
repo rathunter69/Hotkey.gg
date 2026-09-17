@@ -5,10 +5,12 @@ Task: `01a0b148-2693-7901-af91-934c83cabe1d`
 Chief: `01a0b0fa-d857-7002-ab95-1da0a1cfb858`
 Branch: `codex/catalog-flow-review`
 Starting commit: `00df57afd8d3299cc7feaf523847b9ca43e54d06`
-Latest shared guidance read: `codex/repository-foundation` at `79e4d93f8bc1fe486a734e58daedd892fbb13544`.
+Latest shared guidance checked: `codex/repository-foundation` at `45faa4243d1ba6321767b76f4ce17896b4298903`.
+Initial evidence review used guidance at `79e4d93f8bc1fe486a734e58daedd892fbb13544`.
 Chief follow-up: guidance `0ae29b1c7dfeee3c2551ce52352a65241a979c74` adds concise user-facing
 communication and chief ownership of platform-wide design discussion; this review supplies proposals.
-State: first evidence/design checkpoint; product questions pending. No replacement rules approved.
+State: learning-first direction confirmed; later-lesson gates favored, with an initial preference
+for prerequisites plus subscription. Exact gate policy and remaining rules are pending.
 Owned files: **only `docs/handoffs/catalog-progression.md`**. CURRENT and PRODUCT remain chief-owned.
 
 ## Scope and outcome
@@ -44,8 +46,50 @@ and [latest product guidance](https://github.com/rathunter69/Hotkey.gg/blob/79e4
 - The old preference against a practice/ranked switch is explicitly reopened for discussion.
   Reviewing it is not approval to restore it or to retain every historical mode.
 
-No new answer to the first three questions is recorded in this checkpoint. Recommendations
-below are proposals by this area lead for Wolf and chief review, not chief-approved decisions.
+The first checkpoint at 0151c3d recorded D1–D3 as unanswered. Subsequent answers are dated
+below. Recommendations remain proposals except where explicitly marked confirmed.
+
+### September 17 follow-up: learning first; later-lesson gates
+
+**Confirmed by Wolf:** learning is the main journey, with speedrunning a prominent optional
+challenge. The proposed loop was “Learn a skill → complete it independently → improve your
+speed → compete.” Wolf asked whether this meant a more educational direction with speedrunning
+in the background, then approved the explanation: “Yes - sounds perfect.” The explanation
+retains playful hands-on early exercises, later realistic spreadsheets/models, helped learning
+progress without XP, and direct access to the competitive experience for experienced players
+subject to its eventual eligibility/access rules. No particular button or assessment was approved.
+
+**Also confirmed at the direction level:** Wolf said it “makes more sense to gate the later
+lessons.” This puts the gate policy explicitly into the next decision, rather than treating
+the area's earlier unrestricted-entitled-exploration recommendation as agreed. It does not settle which lessons,
+what evidence unlocks them, or where the paid boundary falls.
+
+**Tentative preference, not final gate policy:** asked whether gates should use demonstrated
+skills, earlier lesson completion, subscription, or both skills and subscription, Wolf replied:
+“Do you have a suggestion? Intuition is 4.” Option 4 was both prerequisite skills and a
+subscription. Record that inclination without converting a request for advice into approval
+of the detailed policy below.
+
+**Lead recommendation awaiting agreement:** subscription access determines whether advanced
+learning is included; a small readiness check or equivalent earlier independent result gates
+only major jumps in skill requirements. Ordinary lesson completion with help moves learning
+forward. Experienced learners can test out; checks judge correct work rather than speed/XP,
+and learning/retries remain available to prepare for them. Do not require a new test before
+every lesson. The exact free curriculum, checkpoint locations, equivalences and credential
+standards remain to be designed. This narrows D3/D9; it does not activate billing.
+
+**Acceptance examples:** a beginner finishes with help, earns learning progress without XP
+and receives the next suitable lesson. A learner ready for an advanced topic meets both the
+eventual access rule and a targeted prerequisite check, using existing evidence or testing out.
+An experienced learner can pursue timed work without being forced through every beginner lesson.
+Checkpoint mechanics in these examples are proposals; the learning-first priority is confirmed.
+
+**Earlier guidance affected:** the learning-first hierarchy now replaces treating the speed/XP
+climb as the primary educational journey. Later-lesson gates qualify the earlier recommendation
+for unrestricted exploration of all entitled exercises; freely explored basics remain preserved.
+This does not yet replace specific runtime level locks, automatic publication, level-10 rank
+eligibility or placement rules. D1's exact content identity and D2's per-attempt controls remain
+open. Existing earned progress stays protected and no implementation is authorized.
 
 ## Evidence register
 
@@ -165,13 +209,13 @@ using representative blueprints. History preservation is already mandatory;
 only its detailed mapping remains open. Do not ask Wolf to decide prices, all 74 drills or
 every reward threshold before the basic experience is defined.
 
-### First three choices — asked September 17, awaiting Wolf
+### First three choices — asked September 17; updated after learning-first agreement
 
 | ID | Current behavior / conflict | Options and tradeoffs | Lead recommendation | Wolf's confirmed choice |
 |---|---|---|---|---|
-| D1: relationship between lesson and drill | One main workspace with layered tools; only Navigation has the established staged entry. Separate lesson/tour frameworks and alternative branch tutorials cause naming overlap. E2/E4/E7/E8. | **Shared exercise:** teaching and independent retries reuse content and progress identity; must clearly label assistance. **Separate lessons/drills:** allows distinct pacing, but duplicates content and makes transfer/history harder. | A lesson teaches an exercise; an independent retry uses that exercise again. One content identity and workspace, with distinct attempt evidence. New variants may test transfer; they are not duplicate progress. | **Pending.** Integrated teaching is carried-forward direction; this exact arrangement is a proposal. |
-| D2: competitive intent | Eligible classic runs post automatically; rank eligibility is automatic later. No practice/ranked switch. Request explicitly reopens this. E4/E5/E7. | **Explicit scored attempt:** clear start/rules and learner choice; adds an action. **Automatic eligible scoring:** fewer clicks and current continuity; help/eligibility may surprise learners. **Personal bests only for now:** simpler launch scope but postpones social competition. | An explicit “Start scored attempt” action using the same exercise/workspace. Ordinary learning does not publish a competitive score. This separates a run's purpose from an account's rank; no always-visible global toggle is required. Exact eligibility and rank-entry gate remain D7. | **Pending.** Would supersede automatic publication for ordinary learning if selected; does not yet reinstate any old switch. |
-| D3: paths and locks | Level/pace/chapter/PB/PRO rules gate later chapters; chapter-linked certificate tracks double as paths. Confirmed freely explored basics conflict with treating the ladder as universal access control. E3/E4. | **Recommendations:** any exercise included in the user's access can be chosen, with prerequisite advice; users may enter difficult work. **Prerequisite checks for advanced work:** protects sequencing but adds friction/assessment. **Existing level/speed locks:** game-like climb but can require grinding before relevant work. | Recommended paths and prerequisite advice, with no XP/speed locks on exercises included in access. Skill evidence gates credentials/competitive eligibility rather than ordinary learning. Exact advanced free/paid access remains open. | **Pending.** Basic exploration is already confirmed; extending this to all entitled exercises needs this decision. |
+| D1: relationship between lesson and drill | One main workspace with layered tools; only Navigation has the established staged entry. Separate lesson/tour frameworks and alternative branch tutorials cause naming overlap. E2/E4/E7/E8. | **Shared exercise:** teaching and independent retries reuse content and progress identity; must clearly label assistance. **Separate lessons/drills:** allows distinct pacing, but duplicates content and makes transfer/history harder. | A lesson teaches an exercise; an independent retry uses that exercise again. One content identity and workspace, with distinct attempt evidence. New variants may test transfer; they are not duplicate progress. | **Learning → independent completion → speed → optional competition confirmed September 17.** Exact shared-content/revision arrangement remains proposed. |
+| D2: competitive intent | Eligible classic runs post automatically; rank eligibility is automatic later. No practice/ranked switch. Request explicitly reopens this. E4/E5/E7. | **Explicit scored attempt:** clear start/rules and learner choice; adds an action. **Automatic eligible scoring:** fewer clicks and current continuity; help/eligibility may surprise learners. **Personal bests only for now:** simpler launch scope but postpones social competition. | An explicit “Start scored attempt” action using the same exercise/workspace. Ordinary learning does not publish a competitive score. This separates a run's purpose from an account's rank; no always-visible global toggle is required. Exact eligibility and rank-entry gate remain D7. | **Learning primary / speedrunning and competition optional confirmed September 17.** Explicit scored-attempt controls, publication and account-rank entry remain pending; no retired switch restored. |
+| D3: paths and locks | Level/pace/chapter/PB/PRO rules gate later chapters; chapter-linked certificate tracks double as paths. Confirmed freely explored basics conflict with treating the ladder as universal access control. E3/E4. | **Recommendations:** any exercise included in access can be chosen; users may enter difficult work. **Targeted prerequisites:** protects readiness but adds friction. **Existing level/speed locks:** game-like climb but may require grinding. Subscription inclusion is a separate access test. | **Updated proposal:** advisory paths/basic exploration; assisted completion advances ordinary lessons; targeted independent readiness checks or equivalent prior results at major advanced jumps, with test-out. Subscription access also applies where the eventual offer requires it. No speed/XP grind recommended. | **Later-lesson gates favored September 17.** Wolf's “Intuition is 4” favors skills plus subscription but explicitly asks for advice; exact combined policy is pending. Earlier no-prerequisite recommendation is superseded as this area's recommendation, not as implemented behavior. |
 
 ### Subsequent choices — register, not another questionnaire
 
@@ -182,7 +226,7 @@ every reward threshold before the basic experience is defined.
 | D6: progress, mastery and rewards | Completion, clean PB, speed, XP, optional stars, streaks and milestones overlap; assisted state is largely local. | One combined progress score (simple but misleading) or distinct learning/independent/speed evidence (clearer but must stay readable). Repeated independent solves can earn diminishing XP or only new competencies can earn XP. | Results lead with outcome: completed with help / independently; then saved status and next step. Learning completion, demonstrated skill, XP level and speed records remain distinct. Mastery requires repeat/transfer evidence, not one fast guided clear. Keep assisted XP at zero; settle independent/repeat XP amounts later. | No assisted XP and preserve earned progress **confirmed**; exact mastery/XP/achievement rules **pending**. |
 | D7: public competition and account rank | Best-time boards feed relative rank after automatic eligibility and five placements. Daily/session comparisons differ. DATA-04/06/07 limit completeness/trust. | Best-of unlimited standardized attempts vs limited attempts vs randomized sets. Rank gated by activity vs standardized competence. Different layouts/platforms can need distinct comparison pools. | Correct completion first, comparable exercise/rule version and seed policy, explicit assistance exclusion and supported keyboard/tool policy. Prefer unlimited practice plus best eligible score for ordinary boards; fixed-attempt events only if separately desired. Derive rank from competitive evidence, not teaching XP. Do not promise fair verified competition until its implementation evidence exists. Depends on D2/D4/D5; Saved-progress/Security own delivery. | **Pending**, including retention/removal of level-10 entry and the five-board set. |
 | D8: certificates | Three chapter-derived lists of qualifying runs; no pace gate or distinct assessment. Old interest in speed recognition overlaps skill credentials. | Completion certificate (low friction, weaker claim), independent skill assessment (stronger evidence, extra work), speed credential (narrower purpose). | Skill-path certificates based on independent, varied competence; separate speed badges. Guided progress prepares for assessment. Preserve existing issued certificates as earned historical credentials, with their original standard identified. Depends on D4/D6/D7; trust needs DATA-07 work. | Interest in shareable credentials carried forward; exact standards, attempts and paid eligibility **pending**. |
-| D9: guest/account/free/paid | Guest local practice; permanent account for normal uploads; free-for-now flags plus progression locks; desk creation has a real entitlement check. Old price/PRO copy conflicts. | Free Foundations only vs broader free basics/samples; free or paid timed practice/credentials; account before start vs after first result. | Let a guest complete a useful beginner exercise; explain saving at the result and offer an account. Keep useful basics and replay in the candidate free offer; paid depth/models/assessed credentials are options. No final package/price selected. Access must be independent of chapter position and rank. Depends on D1–D8; Payments owns eventual authoritative rules. | Subscriptions at launch **confirmed**; package, prices, trials, desks and guest-history transfer **pending**. |
+| D9: guest/account/free/paid | Guest local practice; permanent account for normal uploads; free-for-now flags plus progression locks; desk creation has a real entitlement check. Old price/PRO copy conflicts. | Free Foundations only vs broader free basics/samples; free or paid timed practice/credentials; account before start vs after first result. | Let a guest complete a useful beginner exercise; explain saving at the result and offer an account. Keep useful basics and replay in the candidate free offer; paid depth/models/assessed credentials are options. No final package/price selected. Access must be independent of chapter position and rank. Depends on D1–D8; Payments owns eventual authoritative rules. | Subscriptions at launch **confirmed**. September 17 inclination: later lessons use skills plus subscription; detailed policy, package, prices, trials, desks and guest-history transfer **pending**. |
 | D10: entry and next step | Fresh device starts Navigation; resume/direct links and several special-session entries exist. Navigation's nextKey is autofit while chapter order next is filldr. Tutorial skip leaves Foundations. No established personalized assessment. | Start with short teaching then personalize; questionnaire first; assessment-first for everyone. | A quick guided success by default, obvious experienced-user shortcut, editable recommendations. Use one next-step resolver across result, path and resume. Returning learner sees last work plus one reasoned suggestion. Placement is optional competitive setup, not a compulsory beginner diagnostic. Depends on D1/D3/D9. | Customized starting points **confirmed**; exact questions/default/assessment **pending**. |
 | D11: versioning/history | Results use drill keys; requirements often derive from today's catalog; some earned rewards already latch. Reusing a key could mix different work. | Reinterpret old records (simple but unfair); version requirements/content and retain evidence (more bookkeeping, preserves meaning). | Stable exercise identity plus scored revisions; version paths, credential requirements and competitive rules. Preserve old attempts, awards and certificates; separate incomparable boards. Explicit equivalence decisions determine whether old work satisfies a new requirement. Depends on final rules and content blueprints. | Preservation/no reset **confirmed**; migration/equivalence method **pending**. |
 | D12: special-session scope | Classic, Rapid-fire and Daily serve different activities; race links and placement add contexts. Marathon, weekly and Tour implementations have no current ordinary entry. | Equal prominence for available modes (choice/complexity); core learning plus optional practice/events (clear entry); core only initially (simpler but loses useful variety). | Core learning first; optional Rapid-fire and Daily have clear distinct purposes. Keep Marathon dormant; race/placement are competitive contexts and weakness queue is a recommendation. Do not revive dormant systems or remove code in this phase. Depends on D1/D2/D5/D7/D10. | **Pending.** |
@@ -196,7 +240,8 @@ These are acceptance examples for the proposal, **not current behavior or agreed
    progress earned; no XP.” Next actions are continue learning or try independently. Saving
    explains what is local and what an account would retain. No automatic competitive entry.
 2. **Experienced learner.** Chooses a relevant formulas/model path or skips to an exercise
-   included in their access. Gets prerequisite advice without grinding XP. Can try independently
+   included in their access. Gets prerequisite advice without grinding XP; at a major advanced
+   jump, prior independent evidence or a short test-out can establish readiness. Can try independently
    or start a scored attempt after seeing its rules. An unfinished diagnostic does not erase
    existing skills/history or block all learning.
 3. **Returning learner improving a skill.** Finds the previous lesson and its helped completion.
@@ -261,20 +306,28 @@ new certificate must be agreed before migration. Nothing in this example authori
   production rankings, fair scoring, supported keyboard parity or subscription readiness.
 - Publication requires committing/pushing this file and checking the remote commit/file identity.
   Its own final commit SHA is supplied by Git history and the chief message, not invented here.
+- September 17 decision follow-up: refreshed remote guidance through 45faa42 and checked this
+  update against Wolf's explicit answers. Changed only this handoff; document diff/whitespace
+  and relative links checked. No new source investigation or application tests were needed.
 
 ## Proposed updates for the chief
 
-**CURRENT proposal:** register this dedicated review on `codex/catalog-flow-review` from
-00df57a, owning only this handoff. First evidence map/register prepared; D1–D3 pending.
+**CURRENT proposal:** this dedicated review stays on `codex/catalog-flow-review` from
+00df57a, owning only this handoff. Evidence checkpoint 0151c3d is accepted. Wolf has now confirmed
+learning as the main journey and optional speedrunning/competition, and favors later-lesson
+gates. Exact D1/D2 mechanics and the combined prerequisite/subscription gate policy remain pending.
 No catalog/progression extraction or new rule implementation has started. Existing security
 and testing owners continue their separate scopes; no new module has been dispatched.
 
-**PRODUCT proposal:** link the reviewed system map and decision register. Preserve September 17
-confirmed constraints. Do not promote any recommendation to a decision until Wolf answers.
-When an answer arrives, record its date, exact choice, earlier rule replaced, acceptance example
-and remaining dependencies. D2 must distinguish per-attempt competition from account rank.
+**PRODUCT proposal:** incorporate the dated follow-up above: learning-first priority confirmed;
+later-lesson gates favored; option 4 (skills plus subscription) is an inclination offered with a
+request for advice, not final approval of detailed rules. Retain assisted progress/no XP and
+existing history. Use the acceptance examples with their stated confirmed/proposed boundaries.
+D2 must still distinguish per-attempt competition from account rank. No exact free/paid offer,
+new checkpoint, publication policy or level-lock removal has been approved.
 
-**Next bounded turn:** record Wolf's D1–D3 answers and reconcile them with the chief; then bring
-one small group covering help, the clock and what completion earns. A complete skill map,
+**Next bounded turn:** settle the combined gate recommendation (subscription inclusion plus
+readiness checks at major jumps, assisted ordinary progression and test-out), then bring one
+small group covering help, the clock and what completion earns. A complete skill map,
 access/credential/competition rules, history policy and representative blueprints still precede
 any catalog rebuild. This handoff is an evidence checkpoint, not the final approved design.
