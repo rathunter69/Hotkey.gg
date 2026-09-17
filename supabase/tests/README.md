@@ -2,8 +2,11 @@
 
 This folder contains test inputs, not deployable migrations. Based on accepted integration
 `6c984161c31bc4637dbe88b73a4da8408cefdf1d` and DATA_SECURITY's September 17 audit.
-The DATA-01 SQL suite is **unexecuted**. It describes the required secure result and intentionally
-fails for known vulnerabilities; it does not label a reproduced vulnerability as protection.
+The DATA-01 SQL suite is **incomplete**: first execution at 18babfa replayed all 52 migrations,
+then aborted at fixture line 119 on its direct internal `my_pro()` call (SQLSTATE 42501).
+It emitted 12 partial TAP results, no complete plan; no second instance ran. The desired secure
+results and source-predicted failures below do not constitute a completed permission baseline.
+See [durable evidence](evidence/replay-baseline-35276711544.json) and the area handoff.
 
 Follow [the isolated-host runbook](../../docs/testing-database.md) before any database work.
 Never run these fixtures through the production connector or linked CLI project.
@@ -21,7 +24,9 @@ No new npm dependency. The separate [platform-only bootstrap](PLATFORM_BOOTSTRAP
 its reviewed Linux CI experiment at exact source 49b8193, run 35275149357; see
 [saved evidence](evidence/platform-bootstrap-35275149357.json). Chief reserved that distinct
 workflow to Security with Testing review. It ran no Hotkey migrations or DATA-01 assertions.
-The original replay runner still needs a separately authorized/reviewed execution batch.
+The subsequent separate [replay baseline](REPLAY_BASELINE.md) ran once after independent
+review; its fixture error stopped the batch and remained a failing job. No fixture repair
+or internal helper grant restoration is included.
 A stock Postgres image, mock auth functions or ad-hoc table grants cannot establish parity
 with Supabase.
 

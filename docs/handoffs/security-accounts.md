@@ -1,4 +1,92 @@
-# Security platform-only bootstrap — current handoff
+# Security application-replay baseline — current handoff
+Updated: 2026-09-17
+Task: 01a0af8b-9a97-7593-a1d2-6d2491cfe947
+Chief: 01a0b0fa-d857-7002-ab95-1da0a1cfb858
+Branch: codex/security-replay-baseline
+Starting accepted platform checkpoint: 3dd686d26edcb53325579fbe479eb01bdf41f773
+Exact reviewed and CI-tested source: 18babfa80dea4acb31fd30be2ae00b3610d42ed2
+State: first fresh 52-file application replay PASSED; permission fixture ERROR; no second instance; overall CI FAIL.
+
+## Actual outcome and first blocker
+
+[Run 35276711544, attempt 1](https://github.com/rathunter69/Hotkey.gg/actions/runs/35276711544)
+and [baseline job 105388980966](https://github.com/rathunter69/Hotkey.gg/actions/runs/35276711544/job/105388980966)
+ran the exact reviewed source above on September 17 at 21:26–21:27 UTC. API conclusion is
+failure. All 11 guard tests passed; baseline step failed; labelled cleanup and evidence upload
+passed. Ubuntu 24.04.5 / runner image 20260907.300.1, Node 22.23.2/npm 10.9.8.
+
+All **52 unchanged application migrations completed** in filename order on the first fresh
+official platform. The complete-replay marker was written and verified. There was no failed
+migration, skipped source file, edited history, alternate image, or partial-replay resume.
+
+The unchanged permission fixture then aborted at
+`supabase/tests/database/01-desk-authorization.test.sql:119`:
+
+```text
+ERROR: 42501: permission denied for function my_pro
+psql exit code: 3
+```
+
+This is a **fixture incompatibility with the final grants**, not a migration failure or
+proof of a new application defect. `20260903000500_rpc_grants.sql:222` intentionally revokes
+the internal helper from authenticated; lines 106–107 document that contract. The fixture
+directly calls it as authenticated at lines 119 and 168. An independent read-only diagnosis
+confirmed the supported client function `my_pro_status()` returns the `pro` field and retains
+authenticated execution. No function/grant/migration/fixture repair occurred in this batch.
+
+Only 12 partial TAP results were emitted: 10 `ok`, with `not ok` at assertions 10 and 11
+(DATA-01 direct anonymous-session desk creation/application boundaries). There was **no
+complete 56-result stream or final TAP plan**. These lines are preserved as incomplete raw
+evidence, not a validated full security baseline or confirmation of the predicted 12 failures.
+Assertion 13's expression aborted; assertions 14–56 remain UNRUN. The wrapper deliberately
+records the complete assertion count as null, rather than manufacturing a valid count.
+
+The strict guard stopped the batch before a second platform. Two-replay reproducibility is
+UNVERIFIED, not disproven. Official bootstrap checks passed again; all existing isolation and
+scheduler checks remained active before every migration. Cleanup confirmed both named
+containers absent, and the separate always-cleanup step passed. The failure stayed nonzero.
+
+## Durable evidence and review
+
+[Saved result JSON](../../supabase/tests/evidence/replay-baseline-35276711544.json) contains
+source, exact 52 migration/fixture hashes, completed filenames, platform versions/controls,
+SQLSTATE, incomplete TAP and cleanup. Artifact 10520333102 has seven-day retention, so this
+committed sanitized evidence is the continuity record. No scheduler payload, production endpoint URL, secret,
+vault content or customer record was copied into it.
+
+Chief assigned this isolated replay batch after accepting 3dd686d, reserving the distinct
+security-replay-baseline workflow and requiring Testing review. New files: that workflow,
+supabase/tests/replay-baseline.js, replay-baseline.test.js, REPLAY_BASELINE.md and evidence JSON.
+Changed existing tooling: platform-bootstrap.js only for reuse/instance context/filtered
+failure logs; run-isolated.js only for structured evidence and sanitized SQLSTATE/TAP output.
+Docs: this handoff, docs/testing-database.md and supabase/tests/README.md. All 52 migration
+files, the existing 56-assertion fixture, and platform-check SQL stayed byte-identical to
+3dd686d. No runtime, browser/deployment workflow, shared guidance or integration edit.
+
+Focused independent review found/fixed a repeat guard gap before dispatch: a failing stream
+must still contain exactly 56 results after 52 migrations before another fresh instance.
+Testing explicitly cleared corrected exact 18babfa after independently checking safety,
+unchanged input trees, all 11 focused tests, syntax and diff. All seven repository static
+checks passed locally on this candidate, with the inherited 39 catalog warnings. No executable
+change or repeat dispatch followed clearance; this is the first and only run of this batch.
+Browser results remain separate and were not rerun for database-only tooling.
+
+## Next bounded proposal and limits
+
+Chief review comes next. Proposed test-only correction: replace the two direct fixture
+`my_pro()` reads with `(select pro from public.my_pro_status())`, retaining actual
+authenticated role and the denied/allowed contracts. Independently review that changed
+fixture and any dispatch before fresh replay attempts. Do not restore internal helper grants.
+This proposal is not implemented or authorization to begin a permission/schema repair.
+
+DATA-01/02/03 remain unrepaired. Full 56-assertion baseline, two fresh successful application
+replays, production parity, HTTP/Auth journeys and deployment remain unverified. No main
+merge, production change, host installation or browser/structure integration was performed.
+Only documentation/evidence changes follow the tested source, outside workflow trigger paths.
+
+---
+
+# Previous Security platform-only bootstrap handoff (historical)
 Updated: 2026-09-17
 Task: 01a0af8b-9a97-7593-a1d2-6d2491cfe947
 Chief: 01a0b0fa-d857-7002-ab95-1da0a1cfb858
