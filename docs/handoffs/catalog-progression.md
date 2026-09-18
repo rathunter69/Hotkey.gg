@@ -6,6 +6,7 @@ Chief: `01a0b0fa-d857-7002-ab95-1da0a1cfb858`
 Branch: `codex/catalog-flow-review`
 Starting commit: `00df57afd8d3299cc7feaf523847b9ca43e54d06`
 Latest shared guidance checked: `codex/repository-foundation` at `b8b8ca0d6f783fa5396dd39f29fadb9e56a8d147`.
+Subsequent remote PRODUCT/CURRENT checks are described in the dated follow-ups below.
 Initial evidence review used guidance at `79e4d93f8bc1fe486a734e58daedd892fbb13544`.
 Chief follow-up: guidance `0ae29b1c7dfeee3c2551ce52352a65241a979c74` adds concise user-facing
 communication and chief ownership of platform-wide design discussion; this review supplies proposals.
@@ -20,6 +21,9 @@ competitive-rank systems are deferred, with existing earned progress/rank histor
 First visit now begins with a guest lesson, followed by personalization and an invitation to
 save. A useful beginner path with repeat practice/personal speedruns and some advanced previews
 is free; advanced learning is subscription curriculum. Exact inclusion/save rules remain open.
+Account history now includes finished attempts and lightweight restarted/ended-unfinished
+summaries; details are private with selected public highlights. Active practice time/days and
+an optional non-gating streak are approved. Exact metric definitions and legacy treatment remain open.
 Owned files: **only `docs/handoffs/catalog-progression.md`**. CURRENT and PRODUCT remain chief-owned.
 
 ## Scope and outcome
@@ -457,6 +461,165 @@ expiry policy, onboarding questions, guest-data migration or a full first-visit 
 runtime access remains unchanged. Subscriptions at launch remain required and billing remains
 inactive. No Payments, Saved-progress, UI/UX or Catalog implementation work is assigned.
 
+### September 18: account records and metrics specification — three principles approved
+
+**Source and scope:** Wolf added, “Think we should also decide on all of the stats and tracking
+metrics user accounts will have to retain”. Account records are now an explicit planning
+deliverable before the catalog rebuild, rather than a detail to leave to implementation.
+The metric/retention choices below are proposals unless already covered by an earlier approval.
+This defines the product contract for Saved-progress; it does not start its implementation,
+create a schema, collect new tracking data or repeat the security/database audit.
+
+**Design principle:** retain enough meaningful evidence to explain progress and improvement;
+show a compact overview with details available. A record being private must not prevent it
+from contributing to personal history. More complete records do not require more reward systems.
+Distinguish a retained event/result from a calculated metric and from permission to display it.
+
+#### Proposed retained account records
+
+| Record group | What the account should remember | Purpose / unresolved boundary |
+|---|---|---|
+| Profile and learning preferences | Account start date, selected display identity/avatar, learning goals and self-reported starting point, keyboard/platform setup, timer preference, activity-day timezone and visibility selections | Personalization and consistent presentation. Self-reported experience is not assessed ability. Existing profile/identity assets stay protected; exact onboarding fields are still open. |
+| Lesson/exercise progress | Stable exercise identity and revision; first/latest completion dates; helped and independent evidence kept separately; last lesson/step for return; path membership/version when relevant | Continuing learning without losing prior work. Retaining a resume pointer does not approve full workbook draft autosave. One exercise appearing in two paths is not two new accomplishments. |
+| Readiness evidence | Skill/prerequisite assessed, qualifying independent result or test-out, date and requirement version | Explain an advanced unlock using the approved correctness-based policy. This is supporting evidence, not a new mastery score. Exact equivalences/pass rules remain open. |
+| Attempt history | Stable attempt identity, exercise/task/rule revision and variant, purpose/mode, start/end dates, finished/restarted/ended-unfinished outcome, assistance category and relevant input/rule flags | Make all useful learning/private/competitive attempts distinguishable and avoid counting a retried save twice. Unfinished-summary retention is a current question; detailed keystroke replay is not approved. A mouse route is not automatically solution assistance; input restrictions must follow the task's stated rules. |
+| Time and activity evidence | Timed-run duration when applicable; separately measured active practice duration; dates needed for activity summaries | A speedrun clock and active learning time measure different things. Hidden lesson-clock display does not make active practice time a competitive result. Idle/background exclusion, pauses, overlapping devices and timing start remain definitions to agree. |
+| Performance details | Completion/objective result; countable actions/keystrokes when meaningful; comparable timing; any clearly defined mode-specific hits/misses | Explain the actual task result and improvement. Store a metric only when its measurement is defined; no assumption that every correction, Backspace or alternative route is an error. Raw action streams/full workbook snapshots are separate decisions. |
+| Retained mode/keyboard history | Existing session results and known aggregate key/chord/function totals, with their original counting scope | Preserve currently useful records pending an explicit disposition. Future Rapid-fire metrics depend on its retained role; aggregate shortcut use is not mastery, and no broader raw keystroke capture is authorized. |
+| Competition results | Challenge/event identity, board/rule revision, attempt evidence, eligibility state/reason, publication choice, submitted result and any dated final event placing | Preserve what was entered and under which standard. A changing live leaderboard position is not a permanent earned placing; Daily and benchmark retry/seed policies remain open. Private/ineligible attempts can remain personal history without public scoring. |
+| XP and earned rewards | XP award amount, reason, originating accomplishment/attempt, date and award-rule version; earned achievements and original requirements | Explain totals, exclude duplicate awards and preserve past earnings when catalog/rules change. One XP level only. Assisted XP stays zero; exact independent/repeat XP formulas remain open. |
+| Certificates and historical rank | Issued certificate/standard/date and existing earned rank/result history with its original meaning | Preserve earned evidence. This does not introduce a new certificate standard, mastery tier or overall rank; current-to-future rank presentation remains a separate choice. |
+| Saving and continuity | Which attempt/progress/reward records were saved, pending or need a retry; their guest/account origin and reconciliation status | Truthful save messages, cross-device continuity and no duplicate totals. Exact guest transfer, ownership and offline behavior belong to the later Saved-progress contract. |
+
+Subscription/access state remains a separate Payments-owned account responsibility; it must
+not become the source of learning history. Existing desk membership/assignments are likewise
+not a new personal proficiency metric or automatic permission to expose private learning
+records. This proposal changes neither area. Account exports/deletion controls and any archive
+or retention limits need an explicit later policy; no purge, expiry of earned progress or
+unlimited raw-replay promise is proposed here.
+
+#### Proposed user-visible metrics and definitions
+
+| Metric/view | Proposed meaning and display | Avoid misleading interpretation |
+|---|---|---|
+| Lessons completed | Unique completed lessons/exercises, with helped versus independent status; both can remain in attempt history | Counts of attempts and distinct lessons are different. Later independent work strengthens the status without deleting earlier helped work. |
+| Path progress | Completed eligible requirements / applicable requirements of a stated path version, plus suggested next lesson | Reordering must not erase completion. A revised path may add future work without revoking old awards; the transition must be explained. |
+| Readiness | Requirement met, or specific preparation still needed, linked to qualifying evidence | No extra mastery ladder and no speed/XP prerequisite. A failed or unfinished check does not erase learning. |
+| Attempt counts/history | Completed attempts separated from restarted/ended-unfinished summaries, filterable by exercise, date, purpose and assistance | A restart is not automatically a skill failure. Network retries must not increase counts. Unknown legacy fields must not become zero or independent by default. |
+| Personal best and improvement | Best qualifying time for the same comparable challenge/rules; date achieved and improvement versus a stated comparable earlier result | Keep old comparison groups accessible when work/rules materially change. Assisted time can be feedback but is not silently an independent PB. |
+| Recent performance | Recent comparable attempt times; a median/trend only when there are enough comparable samples, with the period/sample size stated | No global average speed across unrelated drills or arbitrary random variants. Do not substitute partial history for a lifetime statistic. |
+| Keystrokes/actions | Per-attempt count and change across comparable attempts when the counting rule is meaningful | Modifier keys, shortcut actions, typed characters and edits need explicit definitions. A shorter authored solution is not automatically the only legitimate route. |
+| Outcome/accuracy feedback | Correct objective/checkpoint outcomes; mode-specific hit accuracy only where successes and opportunities are defined | Defer a general account-wide accuracy/efficiency percentage. Spreadsheet editing and legitimate alternate routes do not have one reliable error denominator. |
+| Practice activity | Active practice time and days practiced; helped work counts as practice too | Exclude idle/background time under an agreed rule. No credit duplication across retries/devices; missing historic active time stays unknown rather than estimated as fact. |
+| Streaks, if selected | Current/best activity streak as optional motivation under an explicit day/timezone rule | No lesson gate, XP multiplier or earned-progress loss is approved by a streak display. Exact day qualification and timezone changes remain open. |
+| XP and level | Existing earned XP plus future awards under their stated rules; level derived from the agreed XP schedule | No independent mastery/rank claim. New formulas must not silently recalculate away earlier awards. |
+| Achievements/certificates | Earned items, dates and applicable standards, with existing identity/showcase use preserved | Keep old awards when requirements change; do not imply accreditation or a newly agreed assessment standard. |
+| Public challenge performance | Eligible benchmark/Daily result and the relevant board position; dated final placing if actually established | Different events/revisions are distinct. Publication/visibility needs the agreed choice; no new aggregate competitive rank. |
+
+**Additional existing metrics requiring an explicit disposition:**
+
+| Current metric | Source meaning | Lead recommendation, not yet approved |
+|---|---|---|
+| Accuracy / average keys versus optimal | Mean of authored optimal-key count divided by actual keys, capped per run; labels differ between profile and stats | Do not call it correctness accuracy. Preserve the underlying known counts; show route comparison only where the reference and valid alternatives make it useful. |
+| Time on grid | Sum of posted successful-run durations, excluding unposted helped/mouse attempts and mode-session time | Keep historical scope explicit. Future active practice time is a different measure; do not relabel this incomplete total as all practice time. |
+| Time banked | Sum of per-drill first recorded time minus personal best | If retained, call it recorded drill improvement and state the comparison scope. It is not measured workplace time saved. Never pool materially different boards/rules. |
+| Key totals, most-used chords/functions and shortcut diversity | Mix of saved aggregates, local completion counts and a recent trace sample | Preserve existing records; detailed private view is a candidate. State lifetime versus sampled scope. Using a shortcut once is not proof of proficiency; no new raw input collection is implied. |
+| Keys per minute/second and pace graphs | Posted-run key rate or time relative to authored par, sometimes a recent subset | Optional speed detail for comparable tasks; not an overall learning score. Preserve meaningful history without requiring these on the main account overview. |
+| Speed bands, crowns, podiums and top-10 counts | Mix of par-based bands and changing public standings | Keep earned awards distinct from current competitive position. Optional challenge details; no reintroduced overall rank or speed-based learning gate. |
+| Achievement rarity/progress and rank high-water values | Mix of live derivations, local/synced earned flags and best-ever values for identity rewards | Classify each as current statistic, earned-once item or display choice before migration. Preserve earned items even when live standings or catalog requirements change. |
+
+**Candidate compact overview:** continue learning, lesson/path progress, XP level, recent
+activity if chosen and a recent PB. Full attempt history, per-drill performance and public
+challenge results belong in details. This is a presentation recommendation, not an approved
+new dashboard or a requirement to show every metric on each result screen.
+
+#### Three choices presented and approved
+
+1. **History depth:** recommend every finished attempt, including helped learning and private
+   speedruns, plus lightweight summaries of deliberately restarted or ended-unfinished attempts.
+   This supports honest practice/improvement history; it needs clear attempt boundaries and more
+   storage than milestones alone. Alternatives: finished attempts only (simpler, less context
+   for practice effort), or progress milestones/PBs only (smallest record, loses useful history).
+   Background exits and exact interruption/resume handling remain open; no replay capture is selected.
+2. **Visibility:** recommend private detailed learning/practice history with explicitly selected
+   public summary highlights; deliberate public challenges publish eligible results under their
+   stated rules. Alternative: private learning with performance summaries public by default
+   (easier sharing, less individual control). This concerns future defaults; existing public
+   results are not silently removed or relabelled. Desk-sharing permissions remain separate.
+3. **Habit stats:** recommend active practice time and practice days, with an optional streak
+   display that never gates lessons or removes earned progress. Alternatives: time/days without
+   streaks, or omit habit stats and focus on learning/performance. The benefit is visible effort;
+   the cost is measurement/idle/timezone complexity and possible pressure from streaks.
+
+**Explicit September 18 answers:** Wolf selected “Finished attempts plus unfinished summaries
+(recommended)”, “Private history; selected public highlights (recommended)” and “Practice
+time/days; optional streak display (recommended)”. These approve the three stated principles:
+
+- Retain every finished attempt, including helped lessons and private speedruns, plus
+  lightweight summaries of attempts deliberately restarted or ended unfinished.
+- Detailed learning/practice history is private; users deliberately choose summary highlights
+  to showcase. Public challenge entry separately publishes its eligible result under stated rules.
+- Include active practice time and practice days, with an optional streak display that never
+  gates lessons or removes earned progress.
+
+**Approval limits:** the full proposed record/metric tables are not blanket-approved by those
+answers. Exact formulas, fields, idle/day rules, archive/retention limits, detailed replay
+capture, interrupted-session behavior and legacy-record transition still need definition.
+Earlier preservation, no-assisted-XP and simpler-progression decisions remain in force.
+The optional streak display does not select current freeze rules, XP multipliers or penalties.
+
+**Recommended interpretation for implementation planning:** unfinished summaries should contain
+only enough to explain practice effort (exercise, date, duration when reliable, purpose,
+assistance where known and end reason), not full performance/replay data. Removing a showcased
+highlight changes its public display, not the underlying personal record; private summaries
+must not reveal the private attempt log. Older runs without reliable assistance evidence stay
+“assistance unknown”; retain already-earned XP/PBs/awards/certificates/rank history without
+retrospective helped/independent labels. Any use of old results for new readiness requirements
+needs an explicit equivalence rule rather than assuming missing help data proves independence.
+These clarify the proposed contract; exact field/migration controls remain open.
+
+**Product acceptance examples to refine:** helped completion remains visible on another device
+without XP; a private speedrun still improves its comparable personal PB; retrying a save
+creates one attempt/award; a changed lesson keeps older comparable records and earned rewards;
+a failed history load is shown as unavailable rather than zero progress; profile highlights
+do not expose the underlying private attempt log. Incomplete old data must be labelled honestly.
+
+**Existing evidence reused:** DATA-04 concerns incomplete reads/inconsistent score filtering;
+DATA-06 concerns duplicate save retries inflating counts/XP; DATA-07 limits score trust. EXP-01
+and EXP-03 cover misleading saved/empty states. These are dependencies for eventual delivery,
+not fixes performed here. Saved-progress owns retention/query/retry/sync implementation,
+Security owns privacy/integrity enforcement, Engine owns meaningful grading/measurements,
+UI owns clear presentation and Payments owns access. Coordinate through the chief; no new
+module or parallel implementation is dispatched by this plan.
+
+**Targeted source inventory (00df57a runtime; documentation-only changes since):**
+- Normal posted run fields include time, keystrokes, authored optimal count, input flag and
+  trace; Guided/mouse-used completions are excluded from normal posting (`index.html:34496–34515`).
+  Mode sessions retain duration, score, misses and keys (`34519–34534`). This does not establish
+  a durable log of all helped, unfinished or independent attempts under the new definitions.
+- Every normal completion also writes a device ledger capped at 400 entries, including helped
+  work; device PBs, traces/splits, bands and some rewards are separate local records
+  (`index.html:25647–25675`, `25712–25729`, `34256–34300`). Local history is not a cross-device promise.
+- Profile “accuracy” is the capped optimal/actual-keys ratio (`profile.html:361–364`, `488–504`;
+  `stats.html:289–294`, `374–377`). Time banked uses first recorded versus best time
+  (`stats.html:357–377`); time on grid and keyboard summaries have different input scopes
+  (`stats.html:693–753`). The candidate names/definitions above deliberately distinguish them.
+- XP is recomputed from posted runs/sessions and competitive standings, with a separate local
+  estimate/high-water display (`themes.js:701–759`; `index.html:31255–31289`). Streak advances
+  on normal completed drills, includes a freeze mechanic and is synchronized in client state
+  (`index.html:31228–31254`; `nav.js:1490–1557`). Current formulas are not selected future rules.
+- Achievement context mixes saved, local, derived and earned flags (`drills.js:531–655`;
+  `profile.html:361–434`; `stats.html:451–513`). Rank's live value differs from the saved
+  best-tier values used for identity (`themes.js:662–814`; `nav.js:309–327`). Certificates
+  currently use track run coverage (`stats.html:397–436`; `index.html:25803–25840`).
+- The retained posted fields do not establish solution viewing, hint/step-guide use or
+  reliable historical independence. Future migration must retain original claims and unknowns.
+  The inventory was read-only; no SQL/live data, schema, tests or security investigation.
+
+A bounded independent product review identified three clarifications included above: explicit
+unknown assistance for legacy records, lightweight unfinished-summary scope, and public
+highlights that do not expose or delete underlying private records. None adds a new system.
+
 ## Evidence register
 
 All runtime paths/line references below refer to **00df57a**, unless another SHA is named.
@@ -473,6 +636,7 @@ They describe the accepted source, not a fresh observation of the public site or
 | E7 | [Historical continuity](../../dev/CONTINUITY.md): sections 0b–0d; [merged change a2bc3f7 / PR #249](https://github.com/rathunter69/Hotkey.gg/commit/a2bc3f762df3f360bb6be3182258ebc1ee0780c9) | September 3–4 transition to integrated tutorials, automatic rank at level 10 and retirement of opt-in/out ranked controls. |
 | E8 | [Unmerged tutorial branch at 1703b59](https://github.com/rathunter69/Hotkey.gg/tree/1703b59324af098f252b8b4dcd8d3fd859338197); [branch inventory](../BRANCH_INVENTORY.md) | September 5–6 alternative adds `entrybasics` and `ribbonways`, reorders Foundations and changes curriculum mapping. It also edits an existing certificate migration; do not import wholesale. |
 | E9 | [Foundations synthesis](../../dev/DRILLS_WOLF_LIKED.md), [Round 1](../../dev/ROUND1_FEEDBACK.md), [Round 2](../../dev/ROUND2_FEEDBACK.md), [Round 3](../../dev/WOLF_ROUND3.md), [Depth Pass](../../dev/DEPTH_PASS.md) | Dated July feedback and September synthesis to preserve as design rationale, not blanket approval of old quotas or roadmaps. |
+| E10 | [Stats](../../stats.html), [profile](../../profile.html) and the E3–E5 runtime sources; targeted references in the account-records section | Existing account metrics, formulas, inputs and device-versus-account gaps. Source inspection only; no live account or new database/security audit. |
 
 README, AGENTS, DEVELOPMENT, TASK_GUIDE, TASK_STARTERS, ARCHITECTURE and audit README were read
 from freshly fetched remote foundation guidance. Relevant reports and the accepted integration
@@ -596,6 +760,7 @@ every reward threshold before the basic experience is defined.
 | D10: entry and next step | Fresh device starts Navigation; resume/direct links and several special-session entries exist. Navigation's nextKey is autofit while chapter order next is filldr. Tutorial skip leaves Foundations. No established personalized assessment. | Guest lesson before personalization/signup versus personalization first or account first. Try-first reduces entry friction; earlier questions/account improve initial matching/identity at the cost of more initial steps. | Apply the approved guest-lesson-first entry and experienced shortcut. Propose one clear next-step recommendation across result/path/resume, with editable personalized starting points. The exact result/returning flow remains a next decision. | **Confirmed September 18:** short hands-on lesson without an account, followed by personalization and an invitation to save; clear experienced-user shortcut. Customized starting points retained. Exact onboarding questions, save/guest-transfer behavior, assessment details and next-step controls remain pending. |
 | D11: versioning/history | Results use drill keys; requirements often derive from today's catalog; some earned rewards already latch. Reusing a key could mix different work. | Reinterpret old records (simple but unfair); version requirements/content and retain evidence (more bookkeeping, preserves meaning). | Stable exercise identity plus scored revisions; version paths, credential requirements and competitive rules. Preserve old attempts, awards and certificates; separate incomparable boards. Explicit equivalence decisions determine whether old work satisfies a new requirement. Depends on final rules and content blueprints. | Preservation/no reset **confirmed**; migration/equivalence method **pending**. |
 | D12: special-session scope | Classic, Rapid-fire and Daily serve different activities; race links and placement add contexts. Marathon, weekly and Tour implementations have no current ordinary entry. | Equal prominence for available modes (choice/complexity); core learning plus optional practice/events (clear entry); core only initially (simpler but loses useful variety). | Core learning first; selected public benchmarks/Daily events now agreed. Rapid-fire remains an optional-practice proposal; keep dormant systems dormant, race/placement as contexts and weakness queue as recommendations pending detailed choices. No code removal/revival. | **Daily/benchmark public focus confirmed September 18.** Other mode roles, prominence and mechanics remain pending. |
+| D13: account records, visibility and activity | Account clean-run/session records mix with device-only learning/PBs and derived rewards; no durable general unfinished/help-use history. “Accuracy” means route efficiency, and practice-time scope is incomplete. E10 plus DATA-04/06/07. | Full finished history plus unfinished summaries versus finished-only or milestones/PBs; private details with chosen highlights versus public performance summaries; activity time/days with or without optional streaks. | Apply the three approved principles. Complete the candidate record/metric dictionary, comparison/measurement rules and honest legacy-unknown treatment before implementation; keep retained facts, derived stats and public display distinct. | **Confirmed September 18:** every finished attempt including helped/private work plus lightweight deliberately restarted/ended-unfinished summaries; private detailed history and selected public highlights; active practice time/days and optional non-gating streak. Exact fields/formulas, replay capture, interruptions, day/idle rules, retention/archive and migration remain open. The entire candidate metric table is not blanket-approved. |
 
 ## Proposed journeys to test the choices
 
@@ -704,6 +869,13 @@ new certificate must be agreed before migration. Nothing in this example authori
   six dependent planning outcomes and two entry/access questions, then recorded both explicit
   recommended-option selections separately from still-open exact content/save/pricing rules.
   No new source investigation, agent or app testing is needed for this planning-only update.
+- September 18 account-metrics follow-up: re-read remote PRODUCT/CURRENT, which had incorporated
+  the b26f112 simpler structure. Added the requested comprehensive product-records register,
+  reused the focused source investigator and obtained an independent contract-clarity review.
+  Recorded the three explicit history/visibility/habit approvals without approving every
+  candidate metric/formula. Only this handoff changes; no application tests, live data,
+  SQL/schema or security work. Prior audit defects remain implementation dependencies.
+  Sole-file diff, all 19 relative Markdown links and whitespace checks pass.
 
 ## Proposed updates for the chief
 
@@ -716,7 +888,9 @@ transition remain open. No implementation/new module.
 The remaining plan is now grouped into entry/access, learning journey, records/rewards,
 competition fairness, launch scope and final catalog/transition blueprint. D10 guest-lesson-first
 and D9 useful-free-beginner-path/advanced-subscription principles are now explicitly approved.
-Next make the completion/save/next-step journey concrete, then settle its remaining rules.
+Wolf has now explicitly moved the comprehensive account-records/metrics plan ahead of the
+completion/save/next-step detail. D13 history depth, visibility and habit principles are
+approved; finish the metric definitions and record/legacy contract without adding reward ladders.
 This review still owns only its handoff on 00df57a; the chief retained that source review after
 accepting 16ee830 for future implementation. No rebase/re-audit is required.
 
@@ -732,10 +906,20 @@ then personalize and offer saving, with an experienced shortcut; useful free beg
 including repeats/personal speedruns and some advanced previews, advanced learning paid.
 Exact inclusion, save/transfer behavior, onboarding questions, pricing and competition/
 credential/expiry access are still open. Keep this distinction in the shared decision record.
+Add the three explicit account-records approvals: every finished attempt (including helped
+lessons/private speedruns) and lightweight deliberately restarted/ended-unfinished summaries;
+private details with selected public highlights and separate deliberate public competition;
+active practice time/days and optional non-gating streaks. The full metric/record dictionary,
+formulas, raw replay, retention limits, interruption rules and legacy transition remain proposals.
+Preserve existing records/rewards and avoid relabelling old unknown assistance as independence.
 
 **Next bounded turn:** make the completion, saving and next-lesson journey concrete within
-the now-approved entry/access principles. Bring only the consequential remaining choices,
-such as result emphasis and independent-retry/save behavior, in a manageable group. Keep comparison/persistence,
+the now-approved entry/access principles. Wolf has explicitly brought account-retained stats
+and tracking metrics forward: the history-depth, visibility and habit choices are now approved.
+Next finalize the selected metric definitions and legacy/comparison boundaries before designing
+result/save/next-step behavior. The full candidate set still needs agreement; bring any material
+choices in small groups rather than another large questionnaire.
+Keep comparison/persistence,
 credential standards and eventual historical-rank presentation explicit before implementation.
 Do not reopen the approved gate, assistance or optional-timer policies. A complete skill map,
 access/credential/competition rules, history policy and representative blueprints still precede
