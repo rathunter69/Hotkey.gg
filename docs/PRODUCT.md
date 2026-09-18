@@ -160,7 +160,7 @@ confirmed decision and its superseded rule; CURRENT owns status and task sequenc
 
 ### Confirmed catalog/flow decisions — September 17–18
 
-Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/8d1b2664271393a09eea3d5ffeb87228c988e48c/docs/handoffs/catalog-progression.md),
+Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/7282544ebe257a9a0f550d10017116e678b59a10/docs/handoffs/catalog-progression.md),
 task 01a0b148-2693-7901-af91-934c83cabe1d. The chief checked the remote handoff and Wolf's
 actual approvals in that task. The September 17 bace206 tentative gate status is superseded
 by the explicit September 18 approval below; other unanswered proposals remain open.
@@ -303,6 +303,34 @@ awards, defining lightweight unfinished summaries and separating public highligh
 underlying private record. Exact legacy equivalence, comparison and display controls still
 need agreement. Existing data must not be presented as proof of measurements it never captured.
 
+**September 18 — speedrun metrics, practice days and helped-result choices confirmed:** Wolf's
+reply selected time, personal bests, improvement history and keystroke count for speedrun
+results. Exact key-count semantics and comparable groups remain open; this does not approve
+key efficiency as a correctness/accuracy score.
+
+Meaningful active practice qualifies for a practice day, including helped and unfinished work;
+opening a page alone does not qualify. Exact thresholds, idle exclusion, day/timezone rules
+and measurement remain open. Helped completion still earns no XP, and streaks remain optional
+and do not gate learning or remove progress.
+
+After a helped ordinary lesson, offer Continue and a friendly unassisted-retry option.
+Wolf requested wording such as “solo” instead of “independently”; **Try solo** is working copy,
+not the final label. Primary-button emphasis was not selected, and the retained speedrun
+option remains available. Continuing follows the approved readiness/access rules. Result
+messages must distinguish actual account save, device-only history, pending and failed saves.
+
+**Requested exploration, not approved measurements:** Wolf said time saved versus a normal
+Excel mouse-user benchmark and most/least-used keystrokes could be interesting. No benchmark,
+formula or usage definition is approved. Existing “time banked” measures recorded personal
+first-to-best drill improvement; it is not a mouse-user baseline.
+
+The area proposes a clearly labelled same-task estimate, with the reference explained and any
+total limited to work completed in Hotkey.gg; the alternative is to defer until representative
+testing. It also proposes shortcut/command usage with practice suggestions for encountered
+skills, with counts-only or physical-key alternatives. Both choices remain open. Low usage
+does not establish weakness, and an estimate must not claim measured workplace savings.
+No numerical estimate, benchmark study or new tracking collection is authorized by this discussion.
+
 Wolf also explicitly requested continued concise, high-level mechanics options with practical
 tradeoffs and a reasoned recommendation. Keep this discussion style, capture each actual answer
 separately, and avoid duplicating the area's decision discussion in the chief session.
@@ -319,12 +347,12 @@ experience; XP supplies one account level. Choosing a drill speedrun shows perso
 improvement. Choosing a benchmark shows that challenge's leaderboard position, without a
 new mastery tier or second account ladder. Exact UI and save/reward mechanics remain open.
 
-Next discussion: finish the selected metric definitions and legacy/comparison boundaries,
-following Wolf's request to settle account records first. Then make the end-of-lesson journey
-concrete: completion, saving/pending status and when to continue, retry independently or
-speedrun. Guest/account saving and exact content/access details remain open. Bring material
-choices in small groups; do not reopen approved history/privacy/habit principles, lesson-first
-entry, the useful free beginner offer or the retired reward questionnaire.
+Next discussion: settle the proposed mouse-reference estimate and shortcut-usage approach,
+then finish measurement/comparison and legacy-record boundaries alongside completion/saving/
+next-step design. Guest/account saving and exact content/access details remain open. Bring
+material choices in small groups without reopening confirmed metrics, practice-day and
+helped-result options, history/privacy/habit principles, lesson-first entry or the free offer.
+The earlier reward questionnaire remains retired.
 Develop the supported-in-principle retry/public-entry design while comparison, persistence,
 eligibility and historical-rank transition details remain open. Do not reopen the approved
 gate/help/timer policies. The chief reconciles answers without duplicating the area's questions.
@@ -341,7 +369,8 @@ remain protected; implementation still requires a separately authorized bounded 
 | Assisted completion | Instructions/explanations unpenalized; solution-step reveals, Guided help and solution replay mean assisted learning progress with no XP | Map existing controls; define fresh independent retries and remaining competitive eligibility |
 | Exploration and access | Complete useful free beginner path with repeat practice/personal speedruns and a few advanced previews; advanced lessons/model-building subscription. Major-jump readiness accepts prior independent work or test-out; helped ordinary completion advances learning | Exact content/preview limits, prices, advanced speedrun and competition/credential access, expiry, checkpoint locations and equivalent evidence |
 | Progress and competition | One XP level; helped/independent lesson progress; personal drill-speedrun records; optional selected benchmark/Daily leaderboards. New mastery and overall competitive-rank systems deferred | XP/repeat formulas, exact metrics/save rules, public eligibility and preservation/presentation of historical rank |
-| Account history and habits | Every finished attempt plus lightweight deliberate restart/unfinished summaries; private details with chosen public highlights; active practice time/days and optional non-gating streaks | Metric/record dictionary, formulas, idle/day rules, detailed replay, retention, interruptions, legacy comparisons and saving/visibility controls |
+| Account history and habits | Every finished attempt plus lightweight deliberate restart/unfinished summaries; private details with chosen public highlights; meaningful active practice including helped/unfinished work counts toward days; optional non-gating streaks | Metric/record dictionary, activity threshold, idle/day rules, detailed replay, retention, interruptions, legacy comparisons and saving/visibility controls |
+| Speedrun results and helped retry | Time, comparable PBs, improvement history and keystroke count; helped results offer Continue and a friendly unassisted retry, with speedrunning retained | Key-count/comparison rules, final retry wording and button emphasis; exploratory mouse-reference estimate and shortcut-usage definitions |
 | Credentials | Interested in skill-path certificates shareable on LinkedIn, and possibly high-score recognition | Evidence required for a certificate versus a speed badge; no endorsement by LinkedIn implied |
 | Catalog | Prefer a likely full rebuild, but preserve substantial earlier Foundations feedback | A full plan must precede implementation; the old v5 proposal is not automatically selected |
 | Order of work | Easy security/account fixes → catalog/progression separation → repository/database cleanup → site framework → planned catalog redesign | Size/acceptance of each bounded repair or cleanup batch |
