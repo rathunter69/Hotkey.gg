@@ -25,8 +25,12 @@ Account history now includes finished attempts and lightweight restarted/ended-u
 summaries; details are private with selected public highlights. Active practice time/days and
 an optional non-gating streak are approved. Exact metric definitions and legacy treatment remain open.
 Speedrun time/PBs/improvement/keystroke count and meaningful-active-practice days are confirmed.
-Helped results offer Continue and an unassisted retry; Try solo is the working label. Mouse-user
-time comparisons and most/least-used shortcut metrics are requested directions with definitions open.
+Helped results offer Continue and an unassisted retry; Try solo is the working label. A labelled
+same-task mouse-reference time-saved estimate and shortcut/command-only usage stats are now
+approved directions. Mouse use excludes competitive/timed scores. Calibration, exact input
+measurement and comparison rules remain open. Spreadsheet mouse use now excludes XP as well
+as qualifying time scores; ordinary page controls are allowed. Per-run key presses and
+completed command-use counts remain separate.
 Owned files: **only `docs/handoffs/catalog-progression.md`**. CURRENT and PRODUCT remain chief-owned.
 
 ## Scope and outcome
@@ -677,7 +681,7 @@ not approval of a benchmark, formula, usage definition or a claim about normal w
 No benchmark has been selected or calibrated in this task. Existing “time banked” is personal
 first-to-best drill improvement; it must not be relabelled as a mouse-user comparison.
 
-**Two follow-up questions presented, pending:**
+**Two follow-up questions initially presented; answered in the next dated entry:**
 1. **Mouse comparison:** recommend “Estimated time saved on this task”, with the reference
    explained and any accumulated estimate limited to tasks actually completed in Hotkey.gg.
    Alternative: defer the estimate until representative user testing is available. The estimate
@@ -698,6 +702,108 @@ A speedrunner sees time, comparable PB/improvement and key count. Any future mou
 is distinct from measured personal improvement and any usage recommendation is distinct from
 a mastery claim. This records product choices and open definitions only; no behavior change,
 measurement collection, benchmark study or other module is authorized.
+
+### September 18: task time-saved estimate, mouse score eligibility and command usage
+
+**Source:** Wolf replied, “Go with your rec on time saved on task. I still think if you use
+the mouse your competitive / time score shouldn't count. Usage stats should focus on only
+shortcuts and commands - excluding the intermediate keystrokes but like, alt+e+s+t etc”.
+
+**Confirmed choices:**
+- Use the recommended clearly labelled **estimated time saved on this task**, with the
+  mouse-based reference explained. Any future accumulated estimate is limited to tasks
+  actually completed in Hotkey.gg, not claimed measured workplace savings. The comparison
+  direction/framing is approved; no baseline sample, formula or numerical claim is established.
+- Mouse use makes the attempt ineligible for competitive scores and qualifying timed records,
+  including timed PBs. Retain the learning/attempt history. This is a distinct input-eligibility
+  rule from whether solution assistance was used; do not silently recategorize every mouse
+  action as solution help. Exact mouse-action boundary and learning-XP treatment are asked below.
+- Usage statistics focus **only on shortcuts and commands**, including multi-step keyboard
+  sequences such as Alt → E → S → T. Intermediate keys in that sequence are not separately
+  ranked as most/least-used shortcuts. The proposed record is one completed command activation
+  with its keyboard route where relevant. This rejects physical-key rankings for usage stats;
+  it does not yet redefine the separately selected per-run keystroke count.
+
+**Boundaries:** calibration/validation of a relevant mouse reference remains future work;
+there is no benchmark study or estimate to ship. Existing time banked remains historical
+personal improvement. No automatic least-used practice recommendations were selected by this
+reply: encountered-skill scope, task opportunities, sample period and grouping alternative
+routes remain open. Cancelled/partial command sequences should not inflate completed command
+counts under the recommendation; exact instrumentation remains unapproved. Retain existing
+key/command records during transition rather than deleting them because the future display
+excludes individual physical keys. No detailed raw replay collection is approved.
+
+An ineligible attempt's elapsed time may remain private feedback under the proposed retained
+history contract, clearly excluded from scored records. Exact display and eligibility for
+derived time-saved estimates remain to define; do not quietly count an ineligible mouse run
+as a valid speed score or retroactively remove previously earned awards.
+
+**Three questions presented, then explicitly approved:**
+1. **Mouse boundary:** recommend that mouse interaction with the sheet, ribbon or spreadsheet
+   dialogs disqualifies a timed attempt, while ordinary page controls such as Start/Retry do
+   not disqualify by themselves. Solution help still follows its separate assistance rule.
+   Alternative: any mouse click after the timed attempt starts disqualifies. The recommended
+   boundary protects keyboard task performance without penalizing ordinary page navigation;
+   exact detection/focus/accessibility behavior still needs design.
+2. **Run total versus usage:** recommend actual key presses as the per-run total and completed
+   command uses as separate usage counts. The illustrative Alt → E → S → T sequence is four
+   key presses and one completed command activation. Alternative: show completed command counts
+   only. Separate measures retain effort detail while avoiding a misleading command-use list;
+   held keys, repeats, modifiers and typing still need precise counting rules.
+3. **Mouse use and learning XP:** recommend keeping learning progress but awarding no XP when
+   spreadsheet work uses the mouse, tying XP to keyboard practice and preserving prior earned XP.
+   Alternative: award XP for correct solo work and restrict mouse exclusion to timed scores.
+   Wolf's current mouse statement selects timed eligibility only; it does not itself resolve
+   this XP choice. No-assisted-XP remains independently confirmed in either option.
+
+**Explicit September 18 answers:** Wolf selected “Spreadsheet mouse use disqualifies; page
+controls allowed (recommended)”, “Separate key-press total and command-use counts (recommended)”
+and “Learning progress, but no XP for mouse use (recommended)”. These approve:
+- Mouse interaction with the sheet, ribbon or spreadsheet dialogs excludes qualifying timed/
+  competitive results. Ordinary page controls such as Start and Retry do not disqualify an
+  attempt merely because they were clicked. Solution assistance has its own eligibility effect.
+- Keep actual key presses as the per-run total and completed shortcut/command activations as
+  usage counts. Alt → E → S → T illustrates four key presses and one completed command use.
+- Mouse use to perform spreadsheet work retains learning progress but earns no XP. Existing
+  earned XP remains preserved. This is a future award rule, not a retrospective recalculation.
+
+Exact event measurement, held-key/modifier/repeat semantics, focus/accessibility behavior,
+command mapping and historical equivalence remain to specify. Starting a new attempt, timed
+record comparability and public entry still follow their own rules; page-button permission
+does not make solution help score-eligible.
+
+**Acceptance example:** a keyboard sequence activates one command and appears once in its
+usage count. A mouse-based completion remains in the learner's history but does not replace
+a qualifying keyboard PB or enter a competitive board. An eventual task estimate identifies
+its reference rather than implying general workplace savings. The three choices are now
+confirmed, while calibration/counting details remain open. No implementation,
+collection change, benchmark research, progress reset or new module is authorized.
+
+### September 18: solo-attempt eligibility and guest-to-account continuity — pending
+
+Two next questions develop the approved flow and records rules; both are currently pending:
+
+1. **Try solo after solution help:** recommend judging a new attempt on its own assistance/input
+   record. The supported fresh equivalent task begins with a new assistance status; earlier
+   learning help does not penalize a later attempt. Completing it without solution help or
+   spreadsheet mouse use can qualify for XP and an eligible timed record under the remaining
+   rules. Alternative: record solo completion but withhold XP until a later session (more delay,
+   no selected evidence that this improves the skill claim). This asks the precise post-help
+   eligibility rule, not a repeat of the broad fresh-variation/public-entry choice. Optional
+   lesson timing remains optional; qualifying time must belong to an appropriate comparison
+   group, never a pooled PB across arbitrary unequal variants. Public scoring still requires
+   entry to its challenge and compliance with its rules.
+2. **Creating an account after guest learning:** recommend offering to carry over this device's
+   guest progress and attempt history, showing what will transfer and letting the learner
+   confirm. Keep it private; never include another signed-in account's records. Alternatives:
+   carry only the just-completed lesson (simpler, leaves other guest effort behind), or start
+   account progress fresh and leave guest records on the device (least transfer work, split
+   history). Exact duplicate/conflict handling, previously claimed guest records, eligibility
+   of imported results, offline retries and cross-device verification remain a Saved-progress
+   design dependency. Carrying history into an account is not automatic leaderboard publication.
+
+**Status:** solo eligibility pending; guest carry-over pending. No implementation or account
+data action is authorized by asking these product questions.
 
 ## Evidence register
 
@@ -844,7 +950,11 @@ every reward threshold before the basic experience is defined.
 September 18 follow-up to D10/D13: time, PBs, improvement history and key count are now selected;
 meaningful active practice qualifies for days. Helped results offer Continue plus an unassisted
 retry, with Try solo as the working label and visual emphasis still open. Mouse-reference time
-saved and shortcut usage are requested explorations; the two definition questions above are pending.
+saved framing is now approved as an explicitly estimated same-task comparison, and usage is
+shortcut/command-only. Spreadsheet mouse use excludes qualifying time/competitive scores and
+XP, while page controls are allowed. Per-run key presses and command-use counts are distinct.
+Solo-retry eligibility and guest carry-over are the current pending choices; calibration and
+exact definitions remain open.
 
 ## Proposed journeys to test the choices
 
@@ -965,6 +1075,15 @@ new certificate must be agreed before migration. Nothing in this example authori
   Wolf's direct answer, friendly retry-label preference and interest in two further metrics.
   Reused existing source evidence; no new agent, external benchmark research, audit or tests.
   The two new definition questions remain pending, with no benchmark/formula invented.
+- Subsequent September 18 input-policy follow-up: read the remote chief reconciliation of
+  7282544, then recorded the explicit time-saved framing, mouse-score exclusion and shortcut/
+  command-only usage choices. Preserved unanswered mouse-boundary, run-count and learning-XP
+  details as a new small question group. Reused existing evidence; no new agents, audit,
+  external benchmark research or application tests.
+- Later in that input-policy follow-up, recorded all three explicit recommended selections
+  (spreadsheet/page mouse boundary, separate key/command counts and no mouse XP), then asked
+  only the two dependent solo-eligibility and guest-carry-over questions. Their answers are
+  not assumed. No new investigation or tests were needed for this documentation-only update.
 
 ## Proposed updates for the chief
 
@@ -981,8 +1100,11 @@ Wolf has now explicitly moved the comprehensive account-records/metrics plan ahe
 completion/save/next-step detail. D13 history depth, visibility and habit principles are
 approved; finish the metric definitions and record/legacy contract without adding reward ladders.
 The latest answer selects time/PBs/improvement/key count, meaningful active practice for days,
-and Continue plus a friendly solo-retry option. Two follow-ups now concern the mouse-reference
-estimate and meaningful shortcut-usage definitions; their recommendations are pending.
+and Continue plus a friendly solo-retry option. Mouse-reference task-estimate framing and
+shortcut/command-only usage are now approved, with mouse runs excluded from qualifying time/
+competitive scores. Wolf then approved spreadsheet mouse use excluding XP as well, ordinary
+page controls being allowed, and separate per-run key totals versus command usage. Two pending
+follow-ups concern solo-attempt eligibility after help and guest-to-account history carry-over.
 This review still owns only its handoff on 00df57a; the chief retained that source review after
 accepting 16ee830 for future implementation. No rebase/re-audit is required.
 
@@ -1008,8 +1130,14 @@ Add the latest explicit selections: speedrun time, personal bests, improvement h
 keystroke count; meaningful active practice (including helped/unfinished work) qualifies for
 practice days; helped results offer Continue and an unassisted retry using friendly wording
 such as Try solo, not Try independently. Primary emphasis, final copy and exact measurements
-remain open. Record interest in mouse-reference time saved and most/least-used keystrokes as
-requested exploration, not approved estimates/benchmarks/formulas or correctness measures.
+remain open. Add the subsequent approval of clearly labelled estimated task time saved with
+its mouse reference explained; no benchmark/calibration/formula is selected. Usage stats are
+shortcut/command-only, counting multi-step sequences as command uses rather than intermediate
+physical-key rankings. Mouse use excludes timed/competitive scores; retain learning history
+and earned progress. The subsequent explicit answers define the boundary as sheet/ribbon/
+spreadsheet-dialog mouse use, allow ordinary page controls, retain actual key-press totals
+separate from command uses, and exclude XP for spreadsheet mouse use while keeping learning
+progress. Exact counting/detection/comparison details still remain open.
 
 **Next bounded turn:** make the completion, saving and next-lesson journey concrete within
 the now-approved entry/access principles. Wolf has explicitly brought account-retained stats
@@ -1017,9 +1145,11 @@ and tracking metrics forward: the history-depth, visibility and habit choices ar
 Next finalize the selected metric definitions and legacy/comparison boundaries before designing
 result/save/next-step behavior. The full candidate set still needs agreement; bring any material
 choices in small groups rather than another large questionnaire.
-The prior three-question group is now answered to the extent recorded above. The current two
-questions concern honest mouse-reference estimate framing and shortcut usage/practice suggestions;
-both remain pending. Do not initiate a benchmark study or implementation from this discussion.
+The earlier estimate/usage questions are now answered to the extent recorded above. The
+three input-policy questions are now explicitly answered. The current two concern judging
+Try solo attempts separately from earlier help and offering confirmed private carry-over of
+device guest history into a new account. Both remain pending.
+Do not initiate a benchmark study or implementation from this discussion.
 Keep comparison/persistence,
 credential standards and eventual historical-rank presentation explicit before implementation.
 Do not reopen the approved gate, assistance or optional-timer policies. A complete skill map,
