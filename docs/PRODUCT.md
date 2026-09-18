@@ -160,7 +160,7 @@ confirmed decision and its superseded rule; CURRENT owns status and task sequenc
 
 ### Confirmed catalog/flow decisions — September 17–18
 
-Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/b26f11293374e9c47d5f7486b676093d868633a9/docs/handoffs/catalog-progression.md),
+Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/349da102daa592cbe8f15a0bd3e74923ebcab374/docs/handoffs/catalog-progression.md),
 task 01a0b148-2693-7901-af91-934c83cabe1d. The chief checked the remote handoff and Wolf's
 actual approvals in that task. The September 17 bace206 tentative gate status is superseded
 by the explicit September 18 approval below; other unanswered proposals remain open.
@@ -252,6 +252,32 @@ guest/account storage, visibility and independent eligibility still need agreeme
 Legitimate alternative routes must remain valid. No application change follows from this
 product approval.
 
+**September 18 — lesson-first entry and useful free beginner path approved:** Wolf explicitly
+selected “Try a lesson first (recommended)” and “Useful beginner path free; advanced learning
+paid (recommended)” in the catalog/flow task.
+
+- A first visit begins with a short hands-on lesson without requiring an account, followed by
+  personalization and an invitation to save progress. Experienced users have a clear shortcut
+  to choose a suitable starting point, subject to the agreed readiness/access rules.
+- The free offer includes a complete useful beginner path, repeat practice and personal
+  speedruns for that included content, plus a few advanced previews.
+- Advanced lessons and model-building courses require a subscription. The free speedrun/replay
+  promise does not extend automatically to every advanced drill.
+
+This supersedes the tentative first-visit default and the unresolved broad free-offer choice.
+“Beginner” is a skill scope to design, not an automatic inclusion of every current Foundations
+drill. Useful real spreadsheet work also belongs in beginner learning. Exact content and
+preview limits, prices/trials, onboarding questions, guest-to-account transfer and save rules,
+advanced speedrun access, competition/credential access and subscription expiry remain open.
+Existing help/readiness/timer and simpler-progression decisions remain confirmed. Billing
+activation, replacement rules and implementation are not authorized by this approval.
+
+**Entry/access acceptance examples:** a visitor can finish a useful beginner lesson before
+signup and then receive an invitation to personalize and save. An experienced visitor can
+choose a suitable starting point. A free learner can complete the beginner path and return
+to its practice/speedruns; selected advanced previews illustrate paid learning without
+promising unrestricted advanced access. These examples do not define the save/transfer contract.
+
 Wolf also explicitly requested continued concise, high-level mechanics options with practical
 tradeoffs and a reasoned recommendation. Keep this discussion style, capture each actual answer
 separately, and avoid duplicating the area's decision discussion in the chief session.
@@ -268,8 +294,10 @@ experience; XP supplies one account level. Choosing a drill speedrun shows perso
 improvement. Choosing a benchmark shows that challenge's leaderboard position, without a
 new mastery tier or second account ladder. Exact UI and save/reward mechanics remain open.
 
-Next discussion: settle the entry, saving and free/paid journey around this simpler structure
-in a manageable group. Do not revive the retired three-question packet or add reward ladders.
+Next discussion: make the end-of-lesson journey concrete—what completion records, what is saved
+or pending, and when to continue, retry independently or speedrun. Detailed guest/account
+saving and content/access boundaries still need agreement. Do not reopen lesson-first entry,
+the useful free beginner offer, or the retired reward questionnaire.
 Develop the supported-in-principle retry/public-entry design while comparison, persistence,
 eligibility and historical-rank transition details remain open. Do not reopen the approved
 gate/help/timer policies. The chief reconciles answers without duplicating the area's questions.
@@ -280,34 +308,36 @@ remain protected; implementation still requires a separately authorized bounded 
 
 | Area | Wolf's direction | Still open |
 |---|---|---|
-| First experience | Lean toward a guided beginner exercise; a short assessment may be a useful hook | Default entry and the experienced-user shortcut |
+| First experience | Short hands-on lesson before account creation, followed by personalization and invitation to save; clear experienced-user shortcut | Exact first lesson, personalization questions, controls and guest-to-account saving |
 | Beginner learning | Interactive lessons that teach hotkeys and how Excel works | Exact help presentation and how much each lesson introduces |
 | Timing | Ordinary lesson timer optional and hidden by default; deliberate speed attempts show time | Independent retry, pause, competitive timing and publication rules |
 | Assisted completion | Instructions/explanations unpenalized; solution-step reveals, Guided help and solution replay mean assisted learning progress with no XP | Map existing controls; define fresh independent retries and remaining competitive eligibility |
-| Exploration | Free exploration of basics; advanced subscription access plus readiness at major skill jumps; prior independent work or test-out accepted; helped ordinary completion advances learning | Exact free/paid boundary, checkpoint locations, pass criteria and equivalent evidence |
+| Exploration and access | Complete useful free beginner path with repeat practice/personal speedruns and a few advanced previews; advanced lessons/model-building subscription. Major-jump readiness accepts prior independent work or test-out; helped ordinary completion advances learning | Exact content/preview limits, prices, advanced speedrun and competition/credential access, expiry, checkpoint locations and equivalent evidence |
 | Progress and competition | One XP level; helped/independent lesson progress; personal drill-speedrun records; optional selected benchmark/Daily leaderboards. New mastery and overall competitive-rank systems deferred | XP/repeat formulas, exact metrics/save rules, public eligibility and preservation/presentation of historical rank |
 | Credentials | Interested in skill-path certificates shareable on LinkedIn, and possibly high-score recognition | Evidence required for a certificate versus a speed badge; no endorsement by LinkedIn implied |
 | Catalog | Prefer a likely full rebuild, but preserve substantial earlier Foundations feedback | A full plan must precede implementation; the old v5 proposal is not automatically selected |
 | Order of work | Easy security/account fixes → catalog/progression separation → repository/database cleanup → site framework → planned catalog redesign | Size/acceptance of each bounded repair or cleanup batch |
 
-The user's suggestion of untimed free Foundations with everything else paid is an option under
-discussion, not the settled offer. Do not hard-code new payment gates while separating systems.
+The earlier untimed-free-Foundations/everything-else-paid suggestion is superseded by the
+approved useful free beginner offer and optional-timer policy above; exact content remains
+open. Do not hard-code new payment gates while separating systems.
 "Site framework" means structure, journeys and shared interactions unless Wolf later requests
 a particular technical framework; it is not permission for a React/Next rewrite.
 
 ### Recommendations awaiting agreement
 
-- Begin with a short, satisfying guided exercise; offer experienced users a direct assessment
-  route. Treat this as a product hypothesis until tested, not a measured conversion claim.
+- Design the approved lesson-first entry and experienced-user shortcut. The exact exercise,
+  questions and whether an optional assessment helps still need agreement; no conversion
+  improvement has been measured.
 - Use the same exercise for guided learning and an independent timed retry. In lessons, suggested
   times provide context and do not fail or block a beginner. Teaching time should not become a
   competitive score. This avoids maintaining duplicate timed and untimed catalogs.
 - Apply the approved assistance distinction consistently across current controls. Independent XP
   and competitive eligibility still need their detailed rules; do not equate every hint label
   with solution help or treat public posting as already agreed.
-- Make free Foundations useful on its own and include replayable timed basics, so visitors can
-  experience both learning and improvement. Candidate paid value: deeper paths, business models
-  and assessed skill certificates. Exact inclusions and pricing remain open.
+- Specify the approved free beginner path and selected advanced previews, keeping replay and
+  personal speedruns useful for included free content. Advanced lessons/model-building are paid;
+  exact membership, pricing and whether assessed certificates are paid remain open.
 - Award shareable skill certificates for demonstrated competence, with high-score recognition
   as separate badges. Following a guide and proving an independent skill should remain distinguishable.
 
@@ -382,15 +412,16 @@ they must not make beginner lessons needlessly difficult.
 
 ## Proposed learning loop to validate
 
-1. Onboarding asks about the learner's goal, experience, and keyboard setup.
-2. Recommend a starting lesson and explain why it fits.
-3. Show a realistic task with a clear outcome.
-4. Let the learner work using the keyboard, with help available when needed.
-5. Explain success or failure; show accuracy before speed and efficiency.
-6. Offer a useful retry or a clear next lesson. Save progress to the account.
+1. Offer a short hands-on lesson without requiring an account, with an experienced-user shortcut.
+2. Show a clear task and let the learner use the keyboard, with help available when needed.
+3. Explain the result and what is saved, local or pending; exact records/save mechanics need agreement.
+4. Invite the learner to personalize their starting point and save progress.
+5. Personalization could ask about goals, experience and keyboard setup, then recommend work.
+6. Offer a useful retry or a clear next lesson, preserving the relevant learning/performance record.
 
-The customization dimensions above are a proposal. Wolf confirmed customization, not these
-exact questions. Start with recommendations drawn from a shared, tested catalog; separate
+Lesson-first entry, subsequent personalization/save invitation and the experienced shortcut
+are confirmed. The customization dimensions above and detailed save/next-step controls remain
+proposals; Wolf has not selected these exact questions. Start with recommendations drawn from a shared, tested catalog; separate
 curricula for every profession are not yet approved. Guided learning and competitive runs
 need clear scoring rules; whether any mode-selection system is warranted is now explicitly
 part of the pending modes/flow review, not an approved addition.
