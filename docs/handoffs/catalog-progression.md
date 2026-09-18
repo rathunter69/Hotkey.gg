@@ -17,6 +17,9 @@ speedrunning. Exact metrics/comparison rules, mechanics and access boundaries re
 Visible progression is now confirmed as one XP level, learning completion/independent status,
 personal speedrun records and optional challenge leaderboards. New mastery and overall
 competitive-rank systems are deferred, with existing earned progress/rank history preserved.
+First visit now begins with a guest lesson, followed by personalization and an invitation to
+save. A useful beginner path with repeat practice/personal speedruns and some advanced previews
+is free; advanced learning is subscription curriculum. Exact inclusion/save rules remain open.
 Owned files: **only `docs/handoffs/catalog-progression.md`**. CURRENT and PRODUCT remain chief-owned.
 
 ## Scope and outcome
@@ -390,6 +393,70 @@ relevant. Entering a benchmark shows that challenge's board position, without re
 mastery tier or a second account ladder. This illustrates the agreed structure; exact UI,
 metric formulas, attempt eligibility and save rules still require design and authorization.
 
+### September 18: remaining planning sequence and first-visit/access choices
+
+**Source:** after approving the simpler structure, Wolf asked, “Awesome - what else do we
+have to plan”. The following is the lead's proposed decision order, not permission to start
+implementation or reopen the agreed learning/gate/help/timer/progression choices.
+
+| Order | Planning outcome | Dependency / completion condition |
+|---|---|---|
+| 1. Entry and access | First-visit default, experienced shortcut, guest/account saving journey and useful free versus subscription offer | Select the experience and access principles before exact launch lesson membership or prices. Existing advanced subscription/readiness direction holds. |
+| 2. Learning journey | Personalized starting points, skill prerequisites, readiness checks, lesson/retry/next-step behavior | Use the access principles and retained Foundations feedback; settle which skills need checks before assigning a rebuilt lesson sequence. |
+| 3. Results and rewards | Completion/help/independent records, saved history, comparable PBs, independent-retry eligibility and XP/repeat rules | Define the record users expect before the Saved-progress owner designs delivery. Keep one XP level; no new mastery ladder. |
+| 4. Competition rules | Benchmark/Daily entry, timing, planning/pauses, help, retries, seeds and fair comparison | Use the agreed optional scope and preserved private drill speedruns. Fairness depends on common task/rules/access; no new overall rank. |
+| 5. Launch scope | Decide Rapid-fire's role and which achievements/certificates belong in the initial experience | Tie each to a clear learner purpose and agreed evidence; do not revive dormant modes or add overlapping reward systems by default. |
+| 6. Catalog blueprint and transition | Skill map, representative lesson/drill examples, free/paid/checkpoint placements and progress-preserving transition | Synthesize the preceding choices into a complete agreed rebuild plan. Retain earned history and Foundations feedback; content authoring/rebuild still needs separate authorization. |
+
+The order is for decisions, not six newly assigned workstreams. Timing/record choices inform
+competition; credential requirements inform final content coverage; the final blueprint tests
+the whole journey. Exact thresholds, XP amounts and prices can follow their parent choices.
+The chief continues to own cross-area delivery priorities and shared-document integration.
+
+**Two recommendations presented and approved:**
+
+1. **D10 first visit. Recommendation:** a short hands-on lesson without requiring an account,
+   followed by personalization and an invitation to save progress. Experienced users get a
+   clear shortcut to choose a starting point. This lets users experience the product before
+   signup, but requires truthful local/save status and a deliberate guest-to-account transfer
+   plan. Alternatives: brief personalization before the lesson (better initial matching, more
+   steps before trying); account creation and personalization first (simpler durable identity,
+   highest entry friction). The exact questions, guest transfer/save mechanics and UI remain open.
+2. **D9 free/paid boundary. Recommendation:** a complete useful beginner path, repeat practice
+   and personal speedruns free, with a few advanced previews; advanced lessons and model-building
+   courses require a subscription. This gives free learners a worthwhile outcome and a clear
+   paid expansion, while requiring more free content than a small sampler. Alternative: a
+   smaller free introduction with most structured learning paid (earlier paywall and a shorter
+   free teaching experience). Freely explorable basic drills remain a carried-forward constraint
+   in either case. Exact lesson membership, preview limits, advanced speedrun access, benchmark/
+   Daily access, certificates, price, trial and subscription-expiry rules are not selected here.
+   “Beginner” is a skill scope to design, not an automatic promise that every current Foundations
+   chapter drill is included. Useful real spreadsheet tasks also belong in beginner learning;
+   only advanced model-building is proposed as subscription curriculum.
+
+**Explicit September 18 answers:** Wolf selected “Try a lesson first (recommended)” for D10
+and “Useful beginner path free; advanced learning paid (recommended)” for D9. This approves
+the stated principles: begin with a short lesson without an account, then personalization and
+an invitation to save; provide an experienced-user shortcut. Offer a complete useful free
+beginner path with repeat practice/personal speedruns and a few advanced previews, with
+advanced lessons and model-building courses in the subscription. Exact content and prices
+remain open. The free replay/speedrun promise here applies to included free content; do not
+infer that all advanced drills become freely speedrunnable.
+
+**Acceptance examples:** a new visitor can finish a useful beginner lesson before creating an
+account, then receives an invitation to save and personalize their starting point. An experienced
+visitor can choose a suitable starting point subject to the agreed readiness/access rules. A
+free learner can complete the beginner path and return to its practice/speedruns. A learner can
+preview selected advanced material; continued access to paid advanced curriculum requires a
+subscription and, at major skill jumps, qualifying readiness. An account prompt must accurately
+explain local versus durable progress; guest transfer/save timing still needs a contract.
+
+**Supersedes:** D10's unanswered first-visit default and D9's broad free/paid boundary question.
+It does not select exact lessons/previews, price/trial, credential or competition access, an
+expiry policy, onboarding questions, guest-data migration or a full first-visit UI. Existing
+runtime access remains unchanged. Subscriptions at launch remain required and billing remains
+inactive. No Payments, Saved-progress, UI/UX or Catalog implementation work is assigned.
+
 ## Evidence register
 
 All runtime paths/line references below refer to **00df57a**, unless another SHA is named.
@@ -525,8 +592,8 @@ every reward threshold before the basic experience is defined.
 | D6: progress, mastery and rewards | Completion, clean PB, speed, XP, optional stars, streaks and milestones overlap; assisted state is largely local. | Separate XP/mastery/rank ladders versus one XP level with completion/independent status and personal performance records. The simpler structure reduces status complexity; a separate mastery label would make a broader skill claim. | Apply the confirmed simpler structure: learning progress and private performance/PBs remain useful records; assistance and comparable times stay distinct. Results explain outcome/save/next step. Defer a new mastery system. | **Confirmed September 18:** one XP level, lesson completion/independent progress and personal speedrun records; a new mastery system deferred. No assisted XP and earned-history preservation retained. Exact metric/reward formulas, repeat XP and achievements remain pending; the prior D6a/D6b questionnaire is retired, not approved wholesale. |
 | D7: public competition and account rank | Best-time boards feed relative rank after automatic eligibility and five placements. Daily/session comparisons differ. DATA-04/06/07 limit completeness/trust. | Curated benchmark/Daily boards with personal records versus adding a new aggregate competitive rank. Boards offer narrower comparable goals with fewer account systems; aggregate rank adds identity and fairness/maintenance work. | Retain selected public benchmarks/events and personal drill speedruns beyond that set. Defer a new overall competitive rank. Plan common access/rules, comparable versions and preservation of existing rank history; Saved-progress/Security own eventual delivery. | **Confirmed September 18:** selected benchmark/Daily public focus plus personal drill records; optional challenge leaderboards retained in the simpler structure; a new overall competitive rank deferred. Existing earned rank history is protected. Eligibility, access/retries/integrity, exact boards and transition/presentation of the current rank remain open. D1/D2 supported in principle with metrics conditions. |
 | D8: certificates | Three chapter-derived lists of qualifying runs; no pace gate or distinct assessment. Old interest in speed recognition overlaps skill credentials. | Completion certificate (low friction, weaker claim), independent skill assessment (stronger evidence, extra work), speed credential (narrower purpose). | Skill-path certificates based on independent, varied competence; separate speed badges. Guided progress prepares for assessment. Preserve existing issued certificates as earned historical credentials, with their original standard identified. Depends on D4/D6/D7; trust needs DATA-07 work. | Interest in shareable credentials carried forward; exact standards, attempts and paid eligibility **pending**. |
-| D9: guest/account/free/paid | Guest local practice; permanent account for normal uploads; free-for-now flags plus progression locks; desk creation has a real entitlement check. Old price/PRO copy conflicts. | Free Foundations only vs broader free basics/samples; free or paid timed practice/credentials; account before start vs after first result. | Let a guest complete a useful beginner exercise; explain saving at the result and offer an account. Keep useful basics and replay in the candidate free offer; specify the advanced subscription boundary deliberately. Access must be independent of menu position and rank. Depends on D1–D8; Payments owns eventual authoritative rules. | Subscriptions at launch and the advanced subscription/readiness policy **confirmed September 18**. Exact included lessons, package, prices, trials, desks, competitive/certificate inclusions and guest-history transfer remain **pending**. |
-| D10: entry and next step | Fresh device starts Navigation; resume/direct links and several special-session entries exist. Navigation's nextKey is autofit while chapter order next is filldr. Tutorial skip leaves Foundations. No established personalized assessment. | Start with short teaching then personalize; questionnaire first; assessment-first for everyone. | A quick guided success by default, obvious experienced-user shortcut, editable recommendations. Use one next-step resolver across result, path and resume. Returning learner sees last work plus one reasoned suggestion. Placement is optional competitive setup, not a compulsory beginner diagnostic. Depends on D1/D3/D9. | Customized starting points **confirmed**; exact questions/default/assessment **pending**. |
+| D9: guest/account/free/paid | Guest local practice; permanent account for normal uploads; free-for-now flags plus progression locks; desk creation has a real entitlement check. Old price/PRO copy conflicts. | Complete useful free beginner path with replay/speedruns and advanced previews versus a small free teaching introduction with most structured learning paid. Wider free learning offers a worthwhile result; a smaller sampler places the paywall earlier. | Apply the approved useful-free-path/advanced-subscription split. Exact inclusion must be explicit and independent of menu position or rank. Explain local versus durable saving; Payments owns eventual entitlement rules. | **Confirmed September 18:** useful free beginner path, repeat practice/personal speedruns for included free content and a few advanced previews; advanced lessons/model-building courses require subscription. Subscriptions at launch and correctness-based readiness remain confirmed. Exact lessons/previews, prices/trials, expiry, desks, competition/certificate access and guest-history transfer remain pending. |
+| D10: entry and next step | Fresh device starts Navigation; resume/direct links and several special-session entries exist. Navigation's nextKey is autofit while chapter order next is filldr. Tutorial skip leaves Foundations. No established personalized assessment. | Guest lesson before personalization/signup versus personalization first or account first. Try-first reduces entry friction; earlier questions/account improve initial matching/identity at the cost of more initial steps. | Apply the approved guest-lesson-first entry and experienced shortcut. Propose one clear next-step recommendation across result/path/resume, with editable personalized starting points. The exact result/returning flow remains a next decision. | **Confirmed September 18:** short hands-on lesson without an account, followed by personalization and an invitation to save; clear experienced-user shortcut. Customized starting points retained. Exact onboarding questions, save/guest-transfer behavior, assessment details and next-step controls remain pending. |
 | D11: versioning/history | Results use drill keys; requirements often derive from today's catalog; some earned rewards already latch. Reusing a key could mix different work. | Reinterpret old records (simple but unfair); version requirements/content and retain evidence (more bookkeeping, preserves meaning). | Stable exercise identity plus scored revisions; version paths, credential requirements and competitive rules. Preserve old attempts, awards and certificates; separate incomparable boards. Explicit equivalence decisions determine whether old work satisfies a new requirement. Depends on final rules and content blueprints. | Preservation/no reset **confirmed**; migration/equivalence method **pending**. |
 | D12: special-session scope | Classic, Rapid-fire and Daily serve different activities; race links and placement add contexts. Marathon, weekly and Tour implementations have no current ordinary entry. | Equal prominence for available modes (choice/complexity); core learning plus optional practice/events (clear entry); core only initially (simpler but loses useful variety). | Core learning first; selected public benchmarks/Daily events now agreed. Rapid-fire remains an optional-practice proposal; keep dormant systems dormant, race/placement as contexts and weakness queue as recommendations pending detailed choices. No code removal/revival. | **Daily/benchmark public focus confirmed September 18.** Other mode roles, prominence and mechanics remain pending. |
 
@@ -631,6 +698,12 @@ new certificate must be agreed before migration. Nothing in this example authori
   content. Recorded Wolf's complexity concern separately from his subsequent explicit
   selection of the simpler structure. Retired the earlier question group without assuming
   approval of its formulas or mechanics. Documentation only; no new agent, audit or app tests.
+- September 18 remaining-plan follow-up: re-read remote PRODUCT/CURRENT and reused this
+  decision register. The shared queue still showed the earlier pending reward packet;
+  Wolf's explicit simpler-structure selection at b26f112 remains authoritative. Presented
+  six dependent planning outcomes and two entry/access questions, then recorded both explicit
+  recommended-option selections separately from still-open exact content/save/pricing rules.
+  No new source investigation, agent or app testing is needed for this planning-only update.
 
 ## Proposed updates for the chief
 
@@ -640,6 +713,10 @@ simple learning status, personal drill-speedrun records and optional challenge l
 deferring new mastery and overall-rank systems. Retire the earlier three-part reward
 questionnaire. Exact XP/metric formulas, access/competition rules and historical-rank
 transition remain open. No implementation/new module.
+The remaining plan is now grouped into entry/access, learning journey, records/rewards,
+competition fairness, launch scope and final catalog/transition blueprint. D10 guest-lesson-first
+and D9 useful-free-beginner-path/advanced-subscription principles are now explicitly approved.
+Next make the completion/save/next-step journey concrete, then settle its remaining rules.
 This review still owns only its handoff on 00df57a; the chief retained that source review after
 accepting 16ee830 for future implementation. No rebase/re-audit is required.
 
@@ -650,9 +727,15 @@ New mastery and overall competitive-rank systems are deferred; existing earned p
 rank history are preserved. This supersedes the area's earlier three-system recommendation,
 not any runtime behavior. Exact XP/metric formulas remain open. Keep the approved
 help/timer/readiness and public benchmark/Daily rules; no implementation authority follows.
+Also add the two explicit entry/access approvals: try a short lesson without an account,
+then personalize and offer saving, with an experienced shortcut; useful free beginner path
+including repeats/personal speedruns and some advanced previews, advanced learning paid.
+Exact inclusion, save/transfer behavior, onboarding questions, pricing and competition/
+credential/expiry access are still open. Keep this distinction in the shared decision record.
 
-**Next bounded turn:** use the simpler structure to settle the entry, saving and free/paid
-journey in a manageable group, without introducing more reward ladders. Keep comparison/persistence,
+**Next bounded turn:** make the completion, saving and next-lesson journey concrete within
+the now-approved entry/access principles. Bring only the consequential remaining choices,
+such as result emphasis and independent-retry/save behavior, in a manageable group. Keep comparison/persistence,
 credential standards and eventual historical-rank presentation explicit before implementation.
 Do not reopen the approved gate, assistance or optional-timer policies. A complete skill map,
 access/credential/competition rules, history policy and representative blueprints still precede
