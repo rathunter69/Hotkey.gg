@@ -620,6 +620,39 @@ A bounded independent product review identified three clarifications included ab
 unknown assistance for legacy records, lightweight unfinished-summary scope, and public
 highlights that do not expose or delete underlying private records. None adds a new system.
 
+### September 18: next metric definitions and helped-result flow — pending
+
+**Source:** Wolf asked to keep asking questions to clarify the specifications and flow.
+Continue in small dependent groups; this is not approval of the next recommendations.
+
+Three questions were presented after the account-history/visibility/habit approvals:
+
+1. **Speedrun result metrics:** recommend completion time, comparable personal bests and
+   improvement history, plus keystroke count. These give speedrunners clear feedback without
+   treating key economy as correctness. Alternatives: time/PB/improvement only (simplest), or
+   also show clearly labelled efficiency versus a reference solution (more route feedback,
+   requires meaningful reference counts and recognition of valid alternative solutions).
+   Exact key-count semantics, comparison groups and historical unknowns remain to define.
+2. **Practice-day qualification:** recommend meaningful active practice, including helped
+   work and unfinished attempts, so struggling learners' effort counts. Opening a page alone
+   would not count; an activity threshold remains to be specified. Alternatives: at least one
+   completed lesson/drill with help allowed (simple finish line, omits unfinished effort), or
+   an independent completion (stronger result threshold, discourages learners using help).
+   This changes neither no-assisted-XP nor optional/non-gating streak principles.
+3. **Helped ordinary lesson result:** recommend Continue learning as the main next action,
+   with Try independently available alongside it and speedrunning as another option. State
+   completion/help status and zero XP. Alternatives: recommend an independent retry while
+   allowing continuation (more consolidation, may feel repetitive), or give equal choices
+   without a recommendation (more freedom, more decision effort). Readiness checks at major
+   jumps remain separate; continuing may lead to appropriate preparation rather than bypass
+   a prerequisite. Result copy must describe the actual save state: confirmed account save,
+   device-only guest record, pending or failure. It must never claim a save merely because
+   the worksheet is complete.
+
+**Wolf's choices:** all three pending. A decision on this packet would select the metric
+categories, practice-day principle and result emphasis only, not all exact measurement,
+eligibility, persistence, prerequisite or UI mechanics. No implementation is authorized.
+
 ## Evidence register
 
 All runtime paths/line references below refer to **00df57a**, unless another SHA is named.
@@ -919,6 +952,8 @@ and tracking metrics forward: the history-depth, visibility and habit choices ar
 Next finalize the selected metric definitions and legacy/comparison boundaries before designing
 result/save/next-step behavior. The full candidate set still needs agreement; bring any material
 choices in small groups rather than another large questionnaire.
+The current three-question group covers speedrun metric categories, practice-day qualification
+and the main next action after helped completion; all three are pending.
 Keep comparison/persistence,
 credential standards and eventual historical-rank presentation explicit before implementation.
 Do not reopen the approved gate, assistance or optional-timer policies. A complete skill map,
