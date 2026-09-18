@@ -14,6 +14,9 @@ and the instruction-versus-solution-assistance distinction confirmed. Public com
 focuses on selected benchmarks/Daily events. Fresh independent variations and deliberate public
 entry are supported in principle, conditional on retaining key user metrics and individual-drill
 speedrunning. Exact metrics/comparison rules, mechanics and access boundaries remain open.
+Visible progression is now confirmed as one XP level, learning completion/independent status,
+personal speedrun records and optional challenge leaderboards. New mastery and overall
+competitive-rank systems are deferred, with existing earned progress/rank history preserved.
 Owned files: **only `docs/handoffs/catalog-progression.md`**. CURRENT and PRODUCT remain chief-owned.
 
 ## Scope and outcome
@@ -276,7 +279,9 @@ new persistence module, storage schema, data migration or leaderboard removal is
 
 ### September 18: proposed meanings for mastery, XP and competitive rank
 
-**Status: three questions presented; awaiting Wolf's answers.** The chief reconciled the
+**Historical packet: three questions presented, none individually approved.** Wolf subsequently
+questioned the number of systems and approved the simpler structure recorded below instead.
+The chief reconciled the
 preceding qualified response in foundation b8b8ca0, checked here through remote PRODUCT and
 CURRENT. This packet develops the agreed metrics/speedrun requirement; it does not reopen
 the broad retry/public-entry choices or change application behavior.
@@ -337,9 +342,53 @@ contract. Saved-progress, Engine and Security retain implementation ownership; n
 is assigned here. A bounded independent product critique clarified mastery versus access,
 repeat rewards versus grind, and proposed versus historical rank. It did not repeat an audit.
 
-**Wolf's choices:** D6a pending; D6b pending; D7a pending. Record each actual answer separately.
-The questions were presented as this single three-item group. Silence is not approval of
-the recommendations or of any supporting detail in this section.
+**Status at 01e2bed:** D6a pending; D6b pending; D7a pending. The questions were presented as a
+three-item group; the follow-up below replaces it with the approved simpler structure.
+Silence is not approval of the recommendations or their supporting details.
+
+### September 18: simpler visible progression structure approved
+
+**Source:** Wolf asked, “Is that too many systems?” This is a challenge to the proposed
+complexity, not approval of either the three-system model or a specific replacement.
+After the revised recommendation below, he explicitly answered “Yes, use this simpler
+structure (recommended)” to the single question about one XP level, lesson completion/
+independent progress, personal speedrun records and optional challenge leaderboards,
+deferring a new mastery system and overall rank while preserving earned progress/rank history.
+
+**Revised lead recommendation, now approved:** three separate ladders would be too much for the
+learning-first direction. Retain one visible account level from XP; show ordinary lesson
+progress as completed with help or completed independently; keep times, personal bests and
+improvement records in deliberate drill speedruns. Selected benchmark/Daily leaderboards
+supply optional competition. Defer a new mastery system and a redesigned overall competitive
+rank until either has a clear purpose beyond these existing records.
+
+This preserves useful measurements while reducing the number of statuses and goals users
+must understand. Tradeoff: fewer broad skill credentials and less aggregate competitive
+identity initially. A separate mastery label could return if needed for an agreed purpose;
+an overall rank could return if individual boards prove insufficient. Neither is required
+to preserve skill evidence, short readiness checks or personal speedrunning.
+
+**Single choice presented:** (1) this simpler structure (recommended); (2) retain
+mastery but defer overall competitive rank; (3) retain all three with competition less prominent.
+**Wolf selected option 1.** This replaces the lead's initial recommendation to introduce
+separate mastery and benchmark-rank systems. The earlier three-part reward questionnaire is
+retired: D6a new mastery and D7a a new overall rank are deferred; D6b exact XP/repeat mechanics
+remain open. Selecting one XP level does not approve the earlier diminishing-repeat formula.
+
+**Boundaries:** helped completion still advances ordinary learning and earns no XP. Major
+readiness checks remain based on independent correctness, with prior evidence/test-out.
+XP level is not proof of skill or an access requirement. Existing XP, awards, personal results
+and rank history remain protected; deferring a replacement rank does not authorize deleting
+the current system or freezing/recalculating earned values. The eventual transition/presentation
+of current rank remains a separate plan. The decision does not authorize application changes.
+Certificates/achievements are still unresolved;
+do not infer their removal or approve a new credential system from this simplification.
+
+**Example:** the learner's next lesson and completion status lead the experience; account XP
+offers a single continuing reward. A drill's speedrun results show PB and improvement when
+relevant. Entering a benchmark shows that challenge's board position, without requiring a
+mastery tier or a second account ladder. This illustrates the agreed structure; exact UI,
+metric formulas, attempt eligibility and save rules still require design and authorization.
 
 ## Evidence register
 
@@ -473,8 +522,8 @@ every reward threshold before the basic experience is defined.
 |---|---|---|---|---|
 | D4: assistance | F1 hints remain eligible; guided rails exclude normal XP/PB/upload; baseline directions differ from solution help. “Hints stay free” is ambiguous between price and score. | Count all instructions as help (punitive); count explicit solution help (clear boundary); allow all hints competitively (easy entry, weaker independent claim). | Apply the approved distinction to each actual hint/control. Explain consequences before solution help; keep ordinary directions usable. Define fresh independent retry after viewing a solution. Depends on D1/D2. | **Confirmed September 18:** ordinary instructions/explanations unpenalized; revealing solution steps, Guided help and solution replay make the attempt assisted (learning progress, no XP). Exact control mapping and independent-retry boundaries remain open. Replaces blanket score-free solution hints, not access to teaching. |
 | D5: timing and retries | First-key gate, running clocks, pars, speed bands and some pass targets coexist. Pausing and special sessions differ. Untimed Foundations was an earlier option. | Visible stopwatch throughout (motivating/stressful); optional personal time while learning; enforced competitive clock with explicit start. Unlimited practice vs limited scored attempts affects fairness. | Apply optional lesson timing without treating it as competitive entry. Separately agree competitive start, planning time, pauses, retries and seeds. Unlimited learning retries remain a proposal; competitive retry policy is D7. | **Confirmed September 18:** lesson clock hidden unless enabled; deliberate speed attempts show timing; no speed/XP readiness gate. Exact timer start/pause/retry and competition rules remain pending. Replaces the always-visible teaching-clock direction. |
-| D6: progress, mastery and rewards | Completion, clean PB, speed, XP, optional stars, streaks and milestones overlap; assisted state is largely local. | One combined score (simple but misleading) or distinct learning/independent/speed evidence (clearer, requires readable presentation). Repeat solves can earn diminishing XP or XP can focus on new competencies. | Retain learning progress and private performance history/PBs as separate, useful metrics; distinguish assistance and comparable times. Results explain outcome/save/next step. Propose repeat/transfer evidence for mastery, rather than one fast clear. | Preserve key user metrics and personal drill speedrunning explicitly required September 18; no assisted XP and earned-history preservation already confirmed. Exact metric set/formulas, mastery/XP/achievements remain pending. |
-| D7: public competition and account rank | Best-time boards feed relative rank after automatic eligibility and five placements. Daily/session comparisons differ. DATA-04/06/07 limit completeness/trust. | Curated benchmarks/Daily events (stable comparison, less variety); whole-catalog boards (breadth, curriculum/version coupling); private PBs only initially (simple, public competition deferred). Later decide best-of/limited attempts, seeds, comparison pools and rank entry. | Use selected public benchmarks/events while preserving personal drill speedruns beyond that set. Propose common access/rules and comparable versions. Any overall rating should not reward extra paid-only counted boards. Unlimited practice/best eligible standard score remain proposals. Saved-progress/Security own delivery. | **Confirmed September 18:** selected standardized public benchmarks and Daily events, alongside personal bests and retained drill-speedrun options. Level-10 entry, placement set, rank model/display, access/retries/integrity and old-board transition remain open. D1/D2 supported in principle with metrics conditions. |
+| D6: progress, mastery and rewards | Completion, clean PB, speed, XP, optional stars, streaks and milestones overlap; assisted state is largely local. | Separate XP/mastery/rank ladders versus one XP level with completion/independent status and personal performance records. The simpler structure reduces status complexity; a separate mastery label would make a broader skill claim. | Apply the confirmed simpler structure: learning progress and private performance/PBs remain useful records; assistance and comparable times stay distinct. Results explain outcome/save/next step. Defer a new mastery system. | **Confirmed September 18:** one XP level, lesson completion/independent progress and personal speedrun records; a new mastery system deferred. No assisted XP and earned-history preservation retained. Exact metric/reward formulas, repeat XP and achievements remain pending; the prior D6a/D6b questionnaire is retired, not approved wholesale. |
+| D7: public competition and account rank | Best-time boards feed relative rank after automatic eligibility and five placements. Daily/session comparisons differ. DATA-04/06/07 limit completeness/trust. | Curated benchmark/Daily boards with personal records versus adding a new aggregate competitive rank. Boards offer narrower comparable goals with fewer account systems; aggregate rank adds identity and fairness/maintenance work. | Retain selected public benchmarks/events and personal drill speedruns beyond that set. Defer a new overall competitive rank. Plan common access/rules, comparable versions and preservation of existing rank history; Saved-progress/Security own eventual delivery. | **Confirmed September 18:** selected benchmark/Daily public focus plus personal drill records; optional challenge leaderboards retained in the simpler structure; a new overall competitive rank deferred. Existing earned rank history is protected. Eligibility, access/retries/integrity, exact boards and transition/presentation of the current rank remain open. D1/D2 supported in principle with metrics conditions. |
 | D8: certificates | Three chapter-derived lists of qualifying runs; no pace gate or distinct assessment. Old interest in speed recognition overlaps skill credentials. | Completion certificate (low friction, weaker claim), independent skill assessment (stronger evidence, extra work), speed credential (narrower purpose). | Skill-path certificates based on independent, varied competence; separate speed badges. Guided progress prepares for assessment. Preserve existing issued certificates as earned historical credentials, with their original standard identified. Depends on D4/D6/D7; trust needs DATA-07 work. | Interest in shareable credentials carried forward; exact standards, attempts and paid eligibility **pending**. |
 | D9: guest/account/free/paid | Guest local practice; permanent account for normal uploads; free-for-now flags plus progression locks; desk creation has a real entitlement check. Old price/PRO copy conflicts. | Free Foundations only vs broader free basics/samples; free or paid timed practice/credentials; account before start vs after first result. | Let a guest complete a useful beginner exercise; explain saving at the result and offer an account. Keep useful basics and replay in the candidate free offer; specify the advanced subscription boundary deliberately. Access must be independent of menu position and rank. Depends on D1–D8; Payments owns eventual authoritative rules. | Subscriptions at launch and the advanced subscription/readiness policy **confirmed September 18**. Exact included lessons, package, prices, trials, desks, competitive/certificate inclusions and guest-history transfer remain **pending**. |
 | D10: entry and next step | Fresh device starts Navigation; resume/direct links and several special-session entries exist. Navigation's nextKey is autofit while chapter order next is filldr. Tutorial skip leaves Foundations. No established personalized assessment. | Start with short teaching then personalize; questionnaire first; assessment-first for everyone. | A quick guided success by default, obvious experienced-user shortcut, editable recommendations. Use one next-step resolver across result, path and resume. Returning learner sees last work plus one reasoned suggestion. Placement is optional competitive setup, not a compulsory beginner diagnostic. Depends on D1/D3/D9. | Customized starting points **confirmed**; exact questions/default/assessment **pending**. |
@@ -578,38 +627,33 @@ new certificate must be agreed before migration. Nothing in this example authori
   accepted source review and developed fictional results plus three bounded questions.
   Reused the reviewer for a narrow product-ambiguity check only. All new reward/rank options
   remain pending; sole handoff diff, all 17 relative links and whitespace checked.
+- September 18 simplification follow-up: remote PRODUCT still matches the checked b8b8ca0
+  content. Recorded Wolf's complexity concern separately from his subsequent explicit
+  selection of the simpler structure. Retired the earlier question group without assuming
+  approval of its formulas or mechanics. Documentation only; no new agent, audit or app tests.
 
 ## Proposed updates for the chief
 
-**CURRENT proposal:** this dedicated review stays on `codex/catalog-flow-review` from
-00df57a, owning only this handoff. Chief has reconciled b5c5c7a's learning/gate/help/timer
-approvals in foundation 62c15db, benchmark scope in 44d0ebd and qualified D1/D2 support/metrics
-requirements in b8b8ca0. Exact D1/D2 mechanics and
-content/access boundaries remain open.
-The newer accepted 16ee830 is for future implementation work; no rebase needed here.
-Wolf selected curated benchmarks/Daily events, then supported fresh variation and deliberate
-public entry in principle, provided key metrics and drill speedrunning remain. Exact mechanics
-still need design; demonstrate those conditions instead of repeating the broad choice questions.
-No catalog/progression extraction or new rule implementation has started. Existing security
-and testing owners continue their separate scopes; no new module has been dispatched.
+**CURRENT proposal:** metrics examples have been presented. Wolf questioned whether the
+proposed XP/mastery/rank model has too many systems, then explicitly selected one XP level,
+simple learning status, personal drill-speedrun records and optional challenge leaderboards,
+deferring new mastery and overall-rank systems. Retire the earlier three-part reward
+questionnaire. Exact XP/metric formulas, access/competition rules and historical-rank
+transition remain open. No implementation/new module.
+This review still owns only its handoff on 00df57a; the chief retained that source review after
+accepting 16ee830 for future implementation. No rebase/re-audit is required.
 
-**PRODUCT proposal:** retain selected public benchmarks/Daily events, and add the subsequent
-D1/D2 support in principle with explicit retention of key metrics and individual-drill speedruns.
-Personal speedruns are not confined to public benchmarks. Private saving/statistics must be
-distinguished from score publication; exact metric sets/comparison groups are proposals. Preserve
-old results/earned history. Keep benchmark access, seeds/retries, rank, old-board transition and
-concrete D1/D2 controls open. The earlier fully-unanswered D1/D2 status is now superseded by this
-qualified response, not by approval of all detailed mechanics.
-Preserve the learning/gate/help/timer and benchmark approvals already reconciled through 44d0ebd and Wolf's requested
-discussion style: concise high-level mechanics options with a reasoned recommendation.
-Product approval does not authorize implementation.
+**PRODUCT proposal:** retain all existing confirmed decisions reconciled through b8b8ca0.
+Add his explicit September 18 selection of the simpler structure: one XP level, lesson
+completion/independent progress, personal speedrun records and optional challenge leaderboards.
+New mastery and overall competitive-rank systems are deferred; existing earned progress and
+rank history are preserved. This supersedes the area's earlier three-system recommendation,
+not any runtime behavior. Exact XP/metric formulas remain open. Keep the approved
+help/timer/readiness and public benchmark/Daily rules; no implementation authority follows.
 
-**Next bounded turn:** show a compact example of learning progress, private drill-speedrun
-metrics and public benchmark results together (now presented), then record the answers to
-D6a mastery, D6b XP and D7a account rank. All three new choices are pending. Retain qualified
-D1/D2 support and its metrics/speedrun conditions; keep
-comparison/persistence details explicit without starting implementation.
-Do not reopen the approved gate, assistance or optional-timer policies.
-A complete skill map,
+**Next bounded turn:** use the simpler structure to settle the entry, saving and free/paid
+journey in a manageable group, without introducing more reward ladders. Keep comparison/persistence,
+credential standards and eventual historical-rank presentation explicit before implementation.
+Do not reopen the approved gate, assistance or optional-timer policies. A complete skill map,
 access/credential/competition rules, history policy and representative blueprints still precede
 any catalog rebuild. This handoff is an evidence checkpoint, not the final approved design.
