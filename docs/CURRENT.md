@@ -44,8 +44,11 @@ future requirements. Broad feature/content development, live billing and catalog
 stay paused. Guided beginner learning, assisted completion without XP, and freely explored
 basics with recommended paths are direction for future design; existing rules stay unchanged
 until the relevant decisions and implementation are approved. The September 18 light readiness/subscription policy, optional lesson timer and assistance
-categories are confirmed in PRODUCT; exact curriculum/checkpoints, retry/scoring/publication,
-paid boundaries, certificates, supported platforms and business facts remain open.
+categories are confirmed in PRODUCT. Wolf also approved one XP level, lesson progress, personal
+drill-speedrun records and optional benchmark/Daily leaderboards, deferring new mastery and
+overall competitive-rank systems. Exact curriculum/checkpoints, XP/repeat formulas,
+retry/scoring/publication, paid boundaries, historical-rank presentation, certificates,
+supported platforms and business facts remain open.
 
 No main merge, deployment, production data changes, table removal, progress reset or broad
 framework rewrite is authorized. Structural moves and security/gameplay changes must remain
@@ -89,7 +92,7 @@ All preserve original local work and earlier remote branches.
 | **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; `codex/security-replay-baseline` | Baseline complete and accepted at 54640b0, exact tested source eaab864. Two fresh 52-migration replays and two complete 56-assertion suites: each 44 pass/12 identical DATA-01 failures, cleanup pass. Test infrastructure works; permissions remain unrepaired. | `supabase/tests/`, database-test docs/handoff and dedicated test workflows. Current batch complete; no DATA-01 repair assigned. Preserve failed-before evidence. No production/schema/runtime changes. |
 | **Audit starter 3 cleanup candidates**, `01a0af90-7fb2-7571-a5d6-b82354d57540`; `codex/repository-structure` | Complete on its branch at cf8c61b: archived the historical PROJECT_CONTEXT record, kept a root compatibility page, repaired links and recorded the remaining structure plan. Chief verified preserved text and docs-only file manifest. Included in accepted combined checkpoint 00df57a; no main merge. | `README.md`, `docs/ARCHITECTURE.md`, selected historical documentation/archive paths and non-shared documentation links, `docs/handoffs/repository-structure.md`. No runtime, generated pages, migrations, test harness or workflow edits. |
 | **Integrate account testing changes**, `01a0b0f9-09da-7a62-9dd2-dd9baeac388d`; `codex/groundwork-db-integration` | Complete and accepted at 16ee830: all accepted account/browser/structure/database-test groundwork and evidence coexist. Seven combined static checks, 11 guard tests and plan pass; exact executable equivalence preserves original browser and DB results without redundant full reruns. | Integration handoff `docs/handoffs/groundwork-db-integration.md`; reservations released. No permission repair, runtime/migration/package/gate/deploy change, main merge or production action. Latest shared guidance is read separately. |
-| **Audit catalog and learner flow**, `01a0b148-2693-7901-af91-934c83cabe1d`; `codex/catalog-flow-review` from preserved 00df57a | Proposal checkpoint 01e2bed verified. Illustrative learning/private-PB/public-result records delivered. D6a varied independent mastery, D6b accomplishment-weighted XP with limited repeat rewards, and D7a separate optional benchmark rank are asked and all pending. Earlier approvals and qualified D1/D2 support remain unchanged. | Owns only `docs/handoffs/catalog-progression.md`; awaits actual answers, no duplicate questionnaire. Exact metrics/formulas/comparability/persistence and controls remain open. No extra mastery gate, implementation, new module or history reset authorized. |
+| **Audit catalog and learner flow**, `01a0b148-2693-7901-af91-934c83cabe1d`; `codex/catalog-flow-review` from preserved 00df57a | Confirmed simplification at b26f112 verified against Wolf's explicit answer: one XP level, helped/independent lesson progress, personal drill-speedrun records and optional benchmark/Daily leaderboards. New mastery and overall competitive-rank systems deferred; prior D6a/D6b/D7a questionnaire retired. | Owns only `docs/handoffs/catalog-progression.md`; next discuss entry, saving and free/paid journey. Exact XP/repeat formulas, metrics/comparability/persistence, competition controls and historical-rank presentation remain open. Preserve earned history; no implementation, new module, rank deletion/freezing/recalculation or progress reset authorized. |
 | Chief coordinator, this task | Project overview and platform-wide design discussion, priorities, product decisions, GitHub/security/structure review and handoff reconciliation. | `docs/CURRENT.md`, `docs/PRODUCT.md`, `docs/handoffs/chief-groundwork.md`. Other tasks send proposed corrections instead of editing these. |
 
 Testing checkpoint [4ea428b](https://github.com/rathunter69/Hotkey.gg/commit/4ea428ba1504ee04b3d01943df5f7cd1b68a2c4d)
@@ -181,7 +184,7 @@ repairs remain separately scoped.
 | Official test-platform feasibility | [14d7e10](https://github.com/rathunter69/Hotkey.gg/blob/14d7e10a79232000ff24d2637ce6adc72b786b1f/docs/handoffs/security-accounts.md) | Pinned official database/Auth image manifests and source SHAs; standalone platform gaps traced. Documentation-only delta over 2a4a5f5, executable code remains ce53324. No bootstrap/replay/SQL result at that historical checkpoint; later results are listed below. |
 | Application replay / earlier incomplete baseline | [9ea05e6](https://github.com/rathunter69/Hotkey.gg/blob/9ea05e64edbe66d075b2fda6e7b313a2f198ae72/docs/handoffs/security-accounts.md) | Exact source 18babfa/run 35276711544: all 52 migrations passed once, then fixture aborted after 12 partial results (10 ok, 2 not ok). No complete 56-result stream or second instance; cleanup passed. Accepted earlier failure evidence, not security clearance; superseded for baseline completeness by 54640b0. |
 | Reproducible permission baseline | [54640b0](https://github.com/rathunter69/Hotkey.gg/blob/54640b07554882dcd3322d84f2bba398fadc94c0/docs/handoffs/security-accounts.md) | Exact eaab864/run 35277724943: two fresh complete 52-migration/56-assertion runs, identical 44 pass/12 permission failures, both cleanups pass. Durable JSON and source/provenance verified. Baseline accepted; permissions unrepaired. |
-| Catalog/flow decision review | [01e2bed](https://github.com/rathunter69/Hotkey.gg/blob/01e2bede78ace7b2cbfd31bc6aff9a49bcf46e9a/docs/handoffs/catalog-progression.md) | Chief verified sole-doc delta and proposal status. Metrics example delivered; D6a mastery, D6b XP, D7a rank are all pending recommendations. Retains prior dated approvals and qualified mechanics support; no new confirmed product rule, source re-audit or implementation. |
+| Catalog/flow decision review | [b26f112](https://github.com/rathunter69/Hotkey.gg/blob/b26f11293374e9c47d5f7486b676093d868633a9/docs/handoffs/catalog-progression.md) | Chief verified sole-doc delta from 01e2bed and Wolf's explicit simpler-structure approval. One XP level, lesson progress, personal speedrun records and optional challenge leaderboards; new mastery/overall rank deferred. Earlier three-part questionnaire retired; exact XP/repeat formulas unapproved. Existing earned progress/rank preserved; no source re-audit or implementation. |
 | Complete test-groundwork integration | [16ee830](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/docs/handoffs/groundwork-db-integration.md) | Final remote source/handoff verified. Only docs, accepted DB test files and two dedicated test workflows differ from 00df57a; all 10 Security executable/SQL/workflow blobs match eaab864. Browser/runtime unchanged. Static7/guard11/plan pass; browser green and DB reproducible 44/12-fail evidence reused explicitly by equivalence. Latest accepted baseline, no repair/merge/deploy. |
 | Earlier combined groundwork integration | [00df57a](https://github.com/rathunter69/Hotkey.gg/blob/00df57afd8d3299cc7feaf523847b9ca43e54d06/docs/handoffs/groundwork-integration.md) | Remote tip/handoff verified; browser/runtime tree equals fully tested 4ea428b, Security test blobs equal accepted 14d7e10. Combined static7/runner3/replay-plan and independent review pass. Includes cleanup and latest modes/flow guidance through 45edd. Excludes separate platform/replay experiments. Accepted future area baseline; no main merge or deployment. |
 | Full testing groundwork | [1f2fa57](https://github.com/rathunter69/Hotkey.gg/blob/1f2fa577f94911b05ecc50d8b25b7a2a9d16c6f2/docs/handoffs/git-testing-releases.md) | Latest documentation-only summary; accepted 00df57a contains earlier handoff 31af74b. Exact test-tooling source 4ea428b on preserved application c702c69: full local matrix and Linux run 35274460688 pass; chief verified source/run/job and docs-only final delta. Covers active gate isolation and generator drift, not live accounts, DB permissions or launch acceptance. |
@@ -289,17 +292,21 @@ extend beyond the public benchmark/Daily set; unpublished attempts must not lose
 records. Preserve existing PBs, results and earned history. Exact metric sets, comparison groups,
 persistence/visibility and UI controls remain to be agreed.
 
-The review has now shown illustrative learning-progress, private drill-speedrun and public-
-challenge records. They are examples, not actual user statistics or an approved exact metric set.
-Next: await the three presented choices—D6a mastery from varied independent success without
-speed, D6b most XP for new accomplishments with smaller limited repeat rewards, and D7a an
-optional benchmark-based rank separate from XP level/Daily standings/drill PBs. **All three
-are pending recommendations.** Mastery is not proposed as another ordinary-lesson gate; the
-approved short readiness policy remains. Do not duplicate these questions or reopen broad D1/D2.
-Exact free/paid boundaries, checkpoint details, seeds/retries/fairness, posting and rank remain open. The chief
-reconciles answers without duplicating the area's questions. No implementation or new module
-is authorized by these product approvals; existing progress and Foundations feedback remain
-protected.
+The review showed illustrative learning-progress, private drill-speedrun and public-challenge
+records; they are not actual user statistics or an approved exact metric set. Wolf then questioned
+the complexity and explicitly approved the simpler structure on September 18: **one XP level,
+helped/independent lesson progress, personal drill-speedrun records and optional selected
+benchmark/Daily leaderboards**. A new mastery system and a new overall competitive rank are
+deferred. The D6a/D6b/D7a questionnaire is retired; the earlier capped-repeat XP recommendation
+was not approved. Preserve existing earned XP, awards, personal results and rank history;
+no deletion, freezing or recalculation of current rank is authorized.
+
+Next: discuss entry, saving and the free/paid journey around the simpler structure, in a small
+group of choices. Exact XP/repeat formulas, metric comparisons/persistence, checkpoint details,
+competition access/seeds/retries/fairness, posting and historical-rank presentation remain open.
+The chief reconciles answers without duplicating the area's questions. Keep approved readiness,
+help and optional-timer rules and qualified D1/D2 support. No implementation or new module is
+authorized; existing progress and Foundations feedback remain protected.
 
 Recommended parallel work in response to Wolf's question: a focused DATA-01 desk-permission
 repair using the existing 12 failing cases and preserving the 44 passing controls. Reuse the
