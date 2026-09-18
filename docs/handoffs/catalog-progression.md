@@ -24,6 +24,9 @@ is free; advanced learning is subscription curriculum. Exact inclusion/save rule
 Account history now includes finished attempts and lightweight restarted/ended-unfinished
 summaries; details are private with selected public highlights. Active practice time/days and
 an optional non-gating streak are approved. Exact metric definitions and legacy treatment remain open.
+Speedrun time/PBs/improvement/keystroke count and meaningful-active-practice days are confirmed.
+Helped results offer Continue and an unassisted retry; Try solo is the working label. Mouse-user
+time comparisons and most/least-used shortcut metrics are requested directions with definitions open.
 Owned files: **only `docs/handoffs/catalog-progression.md`**. CURRENT and PRODUCT remain chief-owned.
 
 ## Scope and outcome
@@ -620,7 +623,7 @@ A bounded independent product review identified three clarifications included ab
 unknown assistance for legacy records, lightweight unfinished-summary scope, and public
 highlights that do not expose or delete underlying private records. None adds a new system.
 
-### September 18: next metric definitions and helped-result flow — pending
+### September 18: speedrun metrics, practice days and helped-result options confirmed
 
 **Source:** Wolf asked to keep asking questions to clarify the specifications and flow.
 Continue in small dependent groups; this is not approval of the next recommendations.
@@ -649,9 +652,52 @@ Three questions were presented after the account-history/visibility/habit approv
    device-only guest record, pending or failure. It must never claim a save merely because
    the worksheet is complete.
 
-**Wolf's choices:** all three pending. A decision on this packet would select the metric
-categories, practice-day principle and result emphasis only, not all exact measurement,
-eligibility, persistence, prerequisite or UI mechanics. No implementation is authorized.
+**Wolf's explicit reply:** “Time, personal bests, improvement history, keystroke count, time
+saved (vs. some benchmark of normal excel user with mouse), and most used / least used
+keystrokes could be interesting. Meaningful active practice for practice day per your recc.
+After completing a lesson with help, give options for continue and Try (solo, or something,
+not independently)”.
+
+**Confirmed from this reply:**
+- Speedrun results retain time, personal bests, improvement history and keystroke count.
+  Exact counting semantics and comparable groups remain open; key efficiency is not approved
+  as a correctness/accuracy score.
+- Meaningful active practice qualifies for a practice day, including helped/unfinished work
+  under the recommendation he accepted. Merely opening a page does not qualify. The actual
+  activity threshold, idle/day/timezone rules and measurement still need definition.
+- Helped lesson results offer both continuing and an unassisted retry. Use friendly wording
+  rather than “Try independently”; **Try solo** is the working label, not final copy.
+  Wolf did not select primary-button emphasis or remove the retained speedrun option.
+  Continuing remains subject to the agreed readiness/access rules. Helped completion still
+  earns no XP, and the result must describe the actual account/device/pending save state.
+
+**Requested additions to explore:** time saved versus a mouse-using Excel reference and
+most/least-used keystrokes. “Could be interesting” indicates interest in these directions,
+not approval of a benchmark, formula, usage definition or a claim about normal workplace speed.
+No benchmark has been selected or calibrated in this task. Existing “time banked” is personal
+first-to-best drill improvement; it must not be relabelled as a mouse-user comparison.
+
+**Two follow-up questions presented, pending:**
+1. **Mouse comparison:** recommend “Estimated time saved on this task”, with the reference
+   explained and any accumulated estimate limited to tasks actually completed in Hotkey.gg.
+   Alternative: defer the estimate until representative user testing is available. The estimate
+   could make progress tangible, but needs a relevant, validated same-task reference. It must
+   not claim measured workplace hours saved. Selection/validation of the benchmark, slower-than-
+   reference results, repeat-counting and any cumulative formula remain later decisions; no
+   benchmark research or numerical estimate has been performed for this specification question.
+2. **Usage:** recommend meaningful shortcuts/commands (for example Fill Down or Paste Special),
+   with practice suggestions limited to skills the learner has encountered. Alternatives:
+   shortcut counts only without recommendations, or include physical-key usage too. Individual
+   keys and commands measure different things; low usage may simply reflect task mix. Do not
+   present unfamiliar skills as weaknesses. The candidate label is frequent shortcuts plus
+   relevant skills worth practising; exact opportunity/count/time-window rules remain open.
+
+**Status/acceptance example:** a helped learner can choose Continue or Try solo without a
+forced independent retry; their meaningful effort still contributes to practice activity.
+A speedrunner sees time, comparable PB/improvement and key count. Any future mouse estimate
+is distinct from measured personal improvement and any usage recommendation is distinct from
+a mastery claim. This records product choices and open definitions only; no behavior change,
+measurement collection, benchmark study or other module is authorized.
 
 ## Evidence register
 
@@ -795,6 +841,11 @@ every reward threshold before the basic experience is defined.
 | D12: special-session scope | Classic, Rapid-fire and Daily serve different activities; race links and placement add contexts. Marathon, weekly and Tour implementations have no current ordinary entry. | Equal prominence for available modes (choice/complexity); core learning plus optional practice/events (clear entry); core only initially (simpler but loses useful variety). | Core learning first; selected public benchmarks/Daily events now agreed. Rapid-fire remains an optional-practice proposal; keep dormant systems dormant, race/placement as contexts and weakness queue as recommendations pending detailed choices. No code removal/revival. | **Daily/benchmark public focus confirmed September 18.** Other mode roles, prominence and mechanics remain pending. |
 | D13: account records, visibility and activity | Account clean-run/session records mix with device-only learning/PBs and derived rewards; no durable general unfinished/help-use history. “Accuracy” means route efficiency, and practice-time scope is incomplete. E10 plus DATA-04/06/07. | Full finished history plus unfinished summaries versus finished-only or milestones/PBs; private details with chosen highlights versus public performance summaries; activity time/days with or without optional streaks. | Apply the three approved principles. Complete the candidate record/metric dictionary, comparison/measurement rules and honest legacy-unknown treatment before implementation; keep retained facts, derived stats and public display distinct. | **Confirmed September 18:** every finished attempt including helped/private work plus lightweight deliberately restarted/ended-unfinished summaries; private detailed history and selected public highlights; active practice time/days and optional non-gating streak. Exact fields/formulas, replay capture, interruptions, day/idle rules, retention/archive and migration remain open. The entire candidate metric table is not blanket-approved. |
 
+September 18 follow-up to D10/D13: time, PBs, improvement history and key count are now selected;
+meaningful active practice qualifies for days. Helped results offer Continue plus an unassisted
+retry, with Try solo as the working label and visual emphasis still open. Mouse-reference time
+saved and shortcut usage are requested explorations; the two definition questions above are pending.
+
 ## Proposed journeys to test the choices
 
 These illustrate the proposed complete journey, combining the approved principles above with
@@ -909,6 +960,11 @@ new certificate must be agreed before migration. Nothing in this example authori
   candidate metric/formula. Only this handoff changes; no application tests, live data,
   SQL/schema or security work. Prior audit defects remain implementation dependencies.
   Sole-file diff, all 19 relative Markdown links and whitespace checks pass.
+- September 18 metric/flow-answer follow-up: re-read remote PRODUCT/CURRENT, which incorporated
+  the history/privacy/habit approvals and showed the 7cfcebb questions as pending. Recorded
+  Wolf's direct answer, friendly retry-label preference and interest in two further metrics.
+  Reused existing source evidence; no new agent, external benchmark research, audit or tests.
+  The two new definition questions remain pending, with no benchmark/formula invented.
 
 ## Proposed updates for the chief
 
@@ -924,6 +980,9 @@ and D9 useful-free-beginner-path/advanced-subscription principles are now explic
 Wolf has now explicitly moved the comprehensive account-records/metrics plan ahead of the
 completion/save/next-step detail. D13 history depth, visibility and habit principles are
 approved; finish the metric definitions and record/legacy contract without adding reward ladders.
+The latest answer selects time/PBs/improvement/key count, meaningful active practice for days,
+and Continue plus a friendly solo-retry option. Two follow-ups now concern the mouse-reference
+estimate and meaningful shortcut-usage definitions; their recommendations are pending.
 This review still owns only its handoff on 00df57a; the chief retained that source review after
 accepting 16ee830 for future implementation. No rebase/re-audit is required.
 
@@ -945,6 +1004,12 @@ private details with selected public highlights and separate deliberate public c
 active practice time/days and optional non-gating streaks. The full metric/record dictionary,
 formulas, raw replay, retention limits, interruption rules and legacy transition remain proposals.
 Preserve existing records/rewards and avoid relabelling old unknown assistance as independence.
+Add the latest explicit selections: speedrun time, personal bests, improvement history and
+keystroke count; meaningful active practice (including helped/unfinished work) qualifies for
+practice days; helped results offer Continue and an unassisted retry using friendly wording
+such as Try solo, not Try independently. Primary emphasis, final copy and exact measurements
+remain open. Record interest in mouse-reference time saved and most/least-used keystrokes as
+requested exploration, not approved estimates/benchmarks/formulas or correctness measures.
 
 **Next bounded turn:** make the completion, saving and next-lesson journey concrete within
 the now-approved entry/access principles. Wolf has explicitly brought account-retained stats
@@ -952,8 +1017,9 @@ and tracking metrics forward: the history-depth, visibility and habit choices ar
 Next finalize the selected metric definitions and legacy/comparison boundaries before designing
 result/save/next-step behavior. The full candidate set still needs agreement; bring any material
 choices in small groups rather than another large questionnaire.
-The current three-question group covers speedrun metric categories, practice-day qualification
-and the main next action after helped completion; all three are pending.
+The prior three-question group is now answered to the extent recorded above. The current two
+questions concern honest mouse-reference estimate framing and shortcut usage/practice suggestions;
+both remain pending. Do not initiate a benchmark study or implementation from this discussion.
 Keep comparison/persistence,
 credential standards and eventual historical-rank presentation explicit before implementation.
 Do not reopen the approved gate, assistance or optional-timer policies. A complete skill map,
