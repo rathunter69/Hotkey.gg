@@ -160,7 +160,7 @@ confirmed decision and its superseded rule; CURRENT owns status and task sequenc
 
 ### Confirmed catalog/flow decisions — September 17–18
 
-Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/349da102daa592cbe8f15a0bd3e74923ebcab374/docs/handoffs/catalog-progression.md),
+Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/8d1b2664271393a09eea3d5ffeb87228c988e48c/docs/handoffs/catalog-progression.md),
 task 01a0b148-2693-7901-af91-934c83cabe1d. The chief checked the remote handoff and Wolf's
 actual approvals in that task. The September 17 bace206 tentative gate status is superseded
 by the explicit September 18 approval below; other unanswered proposals remain open.
@@ -248,7 +248,8 @@ from 1:24 to 1:16 with both attempts retained, and a separate public benchmark r
 are fictional design examples, not actual user statistics or approval of exact metrics or
 comparison rules. The area recommends distinct learning, personal-performance and public-
 competition views; the exact presentation, additional metrics, formulas, comparison groups,
-guest/account storage, visibility and independent eligibility still need agreement.
+guest/account saving mechanics, detailed visibility controls and independent eligibility still
+need agreement; the later account-records approval below sets history depth and privacy principles.
 Legitimate alternative routes must remain valid. No application change follows from this
 product approval.
 
@@ -278,6 +279,30 @@ choose a suitable starting point. A free learner can complete the beginner path 
 to its practice/speedruns; selected advanced previews illustrate paid learning without
 promising unrestricted advanced access. These examples do not define the save/transfer contract.
 
+**September 18 — account history, privacy and habit tracking approved:** Wolf explicitly asked
+to decide the statistics and tracking records accounts retain before implementation, then
+selected all three recommendations in the account-metrics question group:
+
+- Retain every finished attempt, including helped lessons and private speedruns, plus lightweight
+  summaries of attempts deliberately restarted or ended unfinished.
+- Keep detailed learning/practice history private, with users choosing summary highlights to
+  showcase. Deliberate public challenge entry separately publishes its eligible result under
+  the stated competition rules.
+- Include active practice time and practice days, with an optional streak display that never
+  gates lessons or removes earned progress.
+
+These are the approved principles, not blanket approval of the handoff's candidate record/
+metric dictionary or dashboard. Exact fields/formulas, active-versus-idle measurement, day/
+timezone rules, interruptions, archive/retention limits, detailed keystroke replays and
+legacy-record migration remain open. An optional streak display does not approve freeze rules,
+XP multipliers or penalties. Existing earned progress/rewards and the no-assisted-XP policy
+remain protected; no new tracking collection, schema or application behavior is authorized.
+
+The area recommends keeping unknown historical assistance explicitly unknown, preserving old
+awards, defining lightweight unfinished summaries and separating public highlights from the
+underlying private record. Exact legacy equivalence, comparison and display controls still
+need agreement. Existing data must not be presented as proof of measurements it never captured.
+
 Wolf also explicitly requested continued concise, high-level mechanics options with practical
 tradeoffs and a reasoned recommendation. Keep this discussion style, capture each actual answer
 separately, and avoid duplicating the area's decision discussion in the chief session.
@@ -294,10 +319,12 @@ experience; XP supplies one account level. Choosing a drill speedrun shows perso
 improvement. Choosing a benchmark shows that challenge's leaderboard position, without a
 new mastery tier or second account ladder. Exact UI and save/reward mechanics remain open.
 
-Next discussion: make the end-of-lesson journey concrete—what completion records, what is saved
-or pending, and when to continue, retry independently or speedrun. Detailed guest/account
-saving and content/access boundaries still need agreement. Do not reopen lesson-first entry,
-the useful free beginner offer, or the retired reward questionnaire.
+Next discussion: finish the selected metric definitions and legacy/comparison boundaries,
+following Wolf's request to settle account records first. Then make the end-of-lesson journey
+concrete: completion, saving/pending status and when to continue, retry independently or
+speedrun. Guest/account saving and exact content/access details remain open. Bring material
+choices in small groups; do not reopen approved history/privacy/habit principles, lesson-first
+entry, the useful free beginner offer or the retired reward questionnaire.
 Develop the supported-in-principle retry/public-entry design while comparison, persistence,
 eligibility and historical-rank transition details remain open. Do not reopen the approved
 gate/help/timer policies. The chief reconciles answers without duplicating the area's questions.
@@ -314,6 +341,7 @@ remain protected; implementation still requires a separately authorized bounded 
 | Assisted completion | Instructions/explanations unpenalized; solution-step reveals, Guided help and solution replay mean assisted learning progress with no XP | Map existing controls; define fresh independent retries and remaining competitive eligibility |
 | Exploration and access | Complete useful free beginner path with repeat practice/personal speedruns and a few advanced previews; advanced lessons/model-building subscription. Major-jump readiness accepts prior independent work or test-out; helped ordinary completion advances learning | Exact content/preview limits, prices, advanced speedrun and competition/credential access, expiry, checkpoint locations and equivalent evidence |
 | Progress and competition | One XP level; helped/independent lesson progress; personal drill-speedrun records; optional selected benchmark/Daily leaderboards. New mastery and overall competitive-rank systems deferred | XP/repeat formulas, exact metrics/save rules, public eligibility and preservation/presentation of historical rank |
+| Account history and habits | Every finished attempt plus lightweight deliberate restart/unfinished summaries; private details with chosen public highlights; active practice time/days and optional non-gating streaks | Metric/record dictionary, formulas, idle/day rules, detailed replay, retention, interruptions, legacy comparisons and saving/visibility controls |
 | Credentials | Interested in skill-path certificates shareable on LinkedIn, and possibly high-score recognition | Evidence required for a certificate versus a speed badge; no endorsement by LinkedIn implied |
 | Catalog | Prefer a likely full rebuild, but preserve substantial earlier Foundations feedback | A full plan must precede implementation; the old v5 proposal is not automatically selected |
 | Order of work | Easy security/account fixes → catalog/progression separation → repository/database cleanup → site framework → planned catalog redesign | Size/acceptance of each bounded repair or cleanup batch |
@@ -376,7 +404,7 @@ and how to recognize correct behavior. Keep proposals separate from confirmed de
 | UI/UX and onboarding | Desired look and feel, teaching style, customization, first-session journey | Preserve general UI; identity-only pixel art and customization confirmed; onboarding review open |
 | Web structure and releases | Pages to keep, navigation, public information, preview/release expectations | Open |
 | Drill catalog | Essential skills, lesson depth, variety, realism, progression and rejected content | Playful early learning → realistic later models confirmed; exact sequence open |
-| Leaderboards and storage | Fair competition, saved progress, identity visibility, retention and recovery | Open |
+| Leaderboards and storage | Fair competition, saved progress, visibility, retention and recovery | History-depth/private-detail/selected-highlight/habit principles approved; exact metric, save, competition and legacy rules open |
 | Desks | Intended users, membership, roles, invitations, assignments and paid features | Open |
 | Marketing and launch | Positioning, claims, audience-specific messaging, support and launch standard | Open; schedule parked |
 | LLC, tax and accounting | Current business facts, responsibilities, jurisdiction and professional advice needed | Open |
@@ -429,6 +457,7 @@ part of the pending modes/flow review, not an approved addition.
 ## Decisions still needed
 
 - Exact onboarding questions, how recommendations change, and how users revise their choices.
+- Account metric definitions, comparable/legacy records, saving and retention rules within the approved history/privacy/habit principles.
 - Which drills belong in the launch learning path, and which September branch tutorials to keep.
 - What a subscription includes, price, billing frequency, trial/refund policy, and desk access.
 - Launch browser/operating-system support, especially Mac keyboard behavior.
