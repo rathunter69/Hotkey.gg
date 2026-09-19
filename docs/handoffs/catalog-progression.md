@@ -1794,3 +1794,71 @@ outside this documentation review.
 Sent the no-required-corrections outcome and boundaries to the UI owner for its chief handoff.
 Only this Catalog review record changes; no duplicate UI work, new investigation, application
 tests, implementation, new product decision or shared-document edit.
+
+## September 19: usable worksheet space — implications for future lesson outlines
+
+**Decision provenance:** UI owner task 01a0b908-48f9-7f32-94b2-d0ca46f13de3 relayed Wolf's
+explicit acceptance of its grid recommendations: all 20 visible rows usable; readable cells
+with fullscreen suggestions and worksheet scrolling as the small-window fallback. It also
+carries forward the familiar 20-row/10-column workspace and reuses the existing right-hand lane
+for instructions, Help and ordinary results. Exact dimensions, scrolling and focus mechanics
+remain to design; implementation is paused. The UI owner subsequently published the
+[approved grid direction at 511fd1f](https://github.com/rathunter69/Hotkey.gg/blob/511fd1fe8ad620722e5c0912c35fec6a317004f5/docs/handoffs/experience-site.md#grid-direction-approved-september-19).
+Its remote branch and pinned file were checked; blob d8a5d8b1ad32e75e0ab0dc1edc496eb3af30eae1
+matches the dated decision record. The earlier evidence checkpoint below still marked questions
+pending and is cited only for its investigation. The chief integrates shared product guidance.
+
+**Evidence reused:**
+[UI grid review at 965bdb9](https://github.com/rathunter69/Hotkey.gg/blob/965bdb9c74e36fd93d8a80845669a3f0cea3a6b5/docs/handoffs/experience-site.md#september-19-clarify-the-earlier-grid-space-work),
+file blob 17e49495688f12872c78c6bd29c6f3b3b470f72b. Its bounded history/source review and 12
+isolated layout measurements are reused, not rerun. Accepted source remains 16ee830, with
+Catalog's retained 00df evidence as previously agreed. Fresh CURRENT
+(blob 0da6661ba33b2e40e9dbfee13bdf8f9c33bfd4d3) still showed this grid packet awaiting answers.
+
+**Catalog implications for the later complete plan:**
+
+- Usable space is not assigned work. A beginner lesson can use a small meaningful region and
+  leave the rest blank, navigable and available for exploration. Do not add graded tasks or
+  advanced prerequisites to satisfy an old 60% density target or fill all 20 rows.
+- Each representative lesson outline should distinguish its skill/outcome, initial data and
+  relevant working region, usable worksheet extent, required navigation and final graded state.
+  A suggested checkpoint remains guidance toward an outcome, not a newly mandated action order
+  or rejection of legitimate alternate routes.
+- Retain the familiar 20-row/10-column starting workspace for ordinary lesson planning. That
+  does not impose a universal 20-row content cap. A larger model needs its own extent and
+  reachability plan, including any additional rows/columns, relevant off-screen targets and
+  keyboard-access requirements. Do not silently crop existing taller content or assume an
+  unlimited worksheet is already supported.
+- The right-hand lane serves instruction/Help/result presentation. Do not create extra workbook
+  columns or curriculum tasks to make room for it. A lesson's logical column-width requirement
+  stays independent of how the display fits the window; resizing must not automatically solve
+  an AutoFit/width exercise or hide a required target.
+- Small-window readability, fullscreen suggestions and scrolling are presentation direction,
+  not a new support claim or input-eligibility exception. Required cells and worksheet/page
+  controls must remain reachable by keyboard. Any classification of pointer-based worksheet
+  scrolling must follow the existing mouse policy through a scoped Catalog/Engine/UI contract;
+  this record does not invent either a scoring exemption or a new disqualification rule.
+
+**Concrete compatibility dependencies, not a repeated audit:**
+
+1. UI's accepted-source evidence says Navigation already has 20 usable rows, whereas Foot and
+   Combo have 14 usable rows plus six inert filler rows. All-visible-row usability therefore
+   changes the logical boundary for those cases; it is not accomplished by styling blank cells.
+   Review navigation/selection, insert/delete behavior, stored cell data and boundary handling.
+2. Tutorial targets, initial/final selections and graders may depend on their current declared
+   extent. Preserve Foundations intent and correct-outcome/legitimate-route grading while
+   checking each affected responsibility before any engine or catalog implementation.
+3. The current renderer is not a general worksheet scroll viewport. UI's small-window samples
+   and width-lesson exceptions do not establish future scrolling, focus or cell reachability.
+   Those require a specifically assigned Engine/UI review and later meaningful validation.
+4. Review whether changed usable bounds alter scored work or timing comparability. Preserve
+   existing PBs/history and use approved separate-until-proven-equivalent groups where needed;
+   do not assume equivalence or create a new score group for every purely cosmetic resize.
+
+**Outcome/ownership:** no conflict found with the confirmed learning-first/content-preservation
+rules. The dependencies above must be resolved before implementation; they are not claimed as
+newly reproduced defects. Catalog owns future lesson extents/outcomes and rule implications;
+UI owns presentation; Engine owns a later scoped navigation/row/grading/input compatibility
+review; storage owns comparison/preservation delivery. The chief routes that Engine review when
+scoped. No new Engine task, content rebuild, layout implementation, tests or data changes start
+here. Only this planning handoff changes, using the existing UI evidence.
