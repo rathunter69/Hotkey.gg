@@ -546,7 +546,7 @@ found no material conflict or new learner state in the initial outline; Storage 
 mismatch in its saving table. Do not extend those reviews into approval of all later proposals
 or working saves, keyboard/platform/audio/accessibility behavior. No implementation is authorized.
 
-**September 19 — historical grid guidance recovered; new grid choices pending:**
+**September 19 — historical grid guidance recovered and future grid direction approved:**
 
 The UI area's [history/source review](https://github.com/rathunter69/Hotkey.gg/blob/965bdb9c74e36fd93d8a80845669a3f0cea3a6b5/docs/handoffs/experience-site.md#september-19-clarify-the-earlier-grid-space-work)
 traces a consistent 20-row visual grid and a stable frame during row operations to earlier
@@ -559,13 +559,27 @@ The area's accepted-source review and 12 isolated measurements report ten column
 Cell dimensions adapt; cell count does not adapt to window size. Sample text stayed 12px;
 width-graded lessons have fitting exceptions and short windows can place the sheet below the fold.
 These are bounded current-behavior observations, not approval of the replacement or proof that
-every layout is usable. Worksheet scrolling is a proposed capability, not implemented behavior.
+every layout is usable. Worksheet scrolling is now approved future direction, not implemented behavior.
 
-Two choices remain with Wolf in the UI task: make every visible row usable; and use readable
-cells/fullscreen suggestions/worksheet scrolling versus requiring a larger window before Start.
-Neither is answered. Catalog/Engine must review navigation, row operations, grading, tutorial
-targets and comparable-history effects before any separately authorized implementation.
-Exact support sizes, panel dimensions and future large-model geometry remain open.
+Wolf then explicitly approved the recommendations, explaining that the platform now centers
+learning before immediate competition. The chief read that answer and the preceding recommendations;
+the [approved direction is recorded at 511fd1f](https://github.com/rathunter69/Hotkey.gg/blob/511fd1fe8ad620722e5c0912c35fec6a317004f5/docs/handoffs/experience-site.md#grid-direction-approved-september-19).
+
+- Retain the familiar standard 20-row/10-column workspace and make every visible row usable.
+  Lessons can use only the space they need; no new density or completion quota is implied.
+- Adapt cell dimensions within readable limits. When space is tight, suggest fullscreen and
+  allow worksheet scrolling; fullscreen is optional rather than the chosen mandatory Start gate.
+- Share the existing right-hand area between instructions, Help and ordinary results, switching
+  its content while preserving worksheet position and a stable frame during row operations.
+  The current 250px panel width is not selected as a new specification.
+
+Both grid questions are answered. This learning-first rationale does not change assistance,
+XP, timing, readiness, certificate or optional-challenge rules, and it does not cap future models
+at 20 rows. Exact cell/panel dimensions, focus/scroll behavior, zoom and supported device thresholds
+remain to design and verify; today's desktop/mobile gates and runtime remain unchanged.
+Catalog/Engine must review navigation, row operations, grading, tutorial targets and history
+compatibility before a separately authorized implementation. The chief will route that bounded
+review when implementation is scoped; no new module, full audit or repair is started by this record.
 
 Wolf also explicitly requested continued concise, high-level mechanics options with practical
 tradeoffs and a reasoned recommendation. Keep this discussion style, capture each actual answer
@@ -610,6 +624,7 @@ remain protected; implementation still requires a separately authorized bounded 
 | Certificates | Completion of substantial named skill sets, including helped/mouse completions; preserve issued credentials; separate from solo readiness/XP/time eligibility | Exact sets/checks, names, versions, account/paid eligibility and legacy equivalence; no independent-skill or accreditation claim |
 | Achievements and home/results | Meaningful and smaller playful achievements; main milestones visible, some discoveries hidden until earned; recognition/occasional identity unlocks, no bonus XP. Continue-first home; ordinary results in the side panel with completed sheet visible, completion/action first and expandable stats; speedruns time/PB first | Exact achievement list/triggers/unlocks, display/access, layouts and historical mappings |
 | Catalog | Prefer a likely full rebuild, but preserve substantial earlier Foundations feedback | A full plan must precede implementation; the old v5 proposal is not automatically selected |
+| Worksheet space | Standard 20×10 workspace with every visible row usable; readable adaptive dimensions, optional fullscreen and worksheet scrolling; one shared instructions/Help/result area; stable frame during row operations | Exact geometry, keyboard focus/scroll contract, supported sizes/devices, grading/tutorial/history compatibility and future large-model extent; implementation separately authorized |
 | Order of work | Easy security/account fixes → catalog/progression separation → repository/database cleanup → site framework → planned catalog redesign | Size/acceptance of each bounded repair or cleanup batch |
 
 The earlier untimed-free-Foundations/everything-else-paid suggestion is superseded by the
