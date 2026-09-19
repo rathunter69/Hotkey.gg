@@ -160,7 +160,7 @@ confirmed decision and its superseded rule; CURRENT owns status and task sequenc
 
 ### Confirmed catalog/flow decisions — September 17–19
 
-Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/927fd4b86f2be720591334639f8e431bd03b6676/docs/handoffs/catalog-progression.md),
+Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/15de791605cbfb4fa6bbc26c2d8f5f4a94139477/docs/handoffs/catalog-progression.md),
 task 01a0b148-2693-7901-af91-934c83cabe1d. The chief checked the remote handoff and Wolf's
 actual approvals in that task. The September 17 bace206 tentative gate status is superseded
 by the explicit September 18 approval below; other unanswered proposals remain open.
@@ -407,7 +407,7 @@ benchmark study, new module or implementation follows from this planning checkpo
 |---|---|---|
 | Platform/setup | Windows is primary. Before the first guest exercise, offer a quick Windows/Mac Excel-setup choice with a suggested default, changeable later. Instructions and shortcut teaching follow that choice. | Verified supported shortcuts/functions/browsers, detection and timed comparison pools remain open. This is desired behavior, not evidence of Mac compatibility or full parity; preserve existing Mac behavior. |
 | XP | Most XP for new eligible accomplishments, smaller limited repeat-practice rewards, no speed multiplier; one XP level. | Amounts/caps, accomplishment/variant definitions and optional-mode awards remain open. No XP for solution-assisted or spreadsheet-mouse attempts; preserve existing earnings and avoid duplicate awards. |
-| Learning format | Focused beginner lessons lead into practical tasks and then larger models. | One learning journey, not three modes. Skill map and representative blueprints still precede any catalog rebuild; preserve Foundations feedback. |
+| Learning format | Broad everyday foundations, focused lessons → practical tasks → larger models, with finance depth later and ribbon/Excel functionality in context | Exact lesson depth, skill map, examples and Foundations-preserving blueprints |
 | Certificates | Completion certificates for selected lesson/drill sets. All required completions count, including solution help and spreadsheet mouse use. | Sets/names, completion checks, versions, account/paid access and legacy equivalence remain open. A completion certificate is not an independent-skill claim or speed award. Preserve issued credentials under their original meaning. |
 | Desks | Separate optional area for enterprise/training-provider use; individual learning remains primary. | WSP/Training the Street are audience examples, not customers, partners or integration commitments. Roles, assignments, reporting, licensing and organization access remain open; no new workstream. |
 | Free depth | Everyday navigation, editing, formatting and basic formulas, teaching ribbon/Excel functionality through enough useful work to show the value of keyboard fluency. Advanced learning/models remain paid. | Exact lessons/previews/prices remain open. This does not make every Excel feature or intermediate course free or establish a numerical savings claim. Free repeats/speedruns apply to included content. |
@@ -460,12 +460,41 @@ definition/detection and public-challenge interruption handling remain open. Hel
 completion can still feel positive and count toward an applicable completion certificate
 without awarding XP or a qualifying timed score. No implementation or new assets are authorized.
 
-**Next proposals, both pending:** use broadly accessible everyday beginner spreadsheet examples
-before deeper finance/modeling work, versus finance-first examples; and ask two short,
-skippable/changeable post-lesson questions about experience and goal, versus goal-only or a
-fuller questionnaire. Windows/Mac setup already comes before the sample lesson. Self-reported
-experience is not readiness evidence. Exact question/goal wording, recommendation mapping and
-save-invitation placement remain open; neither proposal approves new curricula or assessment.
+**September 19 — audience, personalization and home/result priorities approved:**
+
+- Broadly useful everyday Excel foundations come first, with finance/modeling depth later.
+- After the guest lesson, ask two short, skippable/changeable experience-and-goal questions;
+  recommend from the shared catalog. Windows/Mac setup already precedes the lesson. Exact
+  wording, goals, recommendation mapping and save-invitation placement remain open.
+  Self-reported experience is not readiness evidence or a new mandatory progression gate.
+- Returning home leads with one Continue card for unfinished ordinary learning or the next
+  recommended lesson, with easy catalog access. Preserve experienced-user shortcuts and
+  access to records, speedruns and optional practice/challenges. This does not promise resume
+  of interrupted scored attempts.
+- Ordinary results lead with completion/next action, compact actual XP/certificate progress
+  and expandable detailed statistics. Deliberate speedruns lead with time/PBs. Helped results
+  retain Continue primary and Try solo alongside; exact layout/save/comparison rules remain open.
+
+**September 19 — certificate size and achievement mix/discovery/rewards approved:**
+
+- Completion certificates cover substantial named skill sets, such as Excel Foundations,
+  under the inclusive completion rule. Exact sets/checks, versions and account/paid/legacy
+  rules remain open; this does not select a Foundations curriculum or reinstate an assessment.
+- Achievements combine meaningful milestones **and smaller, cheekier accomplishments**.
+  Wolf likes some existing examples; this is not approval of every current name or trigger.
+- Main milestones are visible upfront; some playful achievements stay hidden until earned.
+- Achievements give recognition and occasional identity/cosmetic unlocks, **no bonus XP**.
+  XP stays tied to eligible learning/practice. Preserve prior earned XP and achievements.
+  Exact lists, triggers, frequency, unlocks, art, access and public-showcase choices remain open.
+  No new currency, account ladder or store is selected.
+
+The area's bounded source check found Tourist counts PB-bearing drills despite attempt wording,
+and current `a.hidden` skips celebration rather than implementing secret-until-earned discovery.
+These observations do not select future triggers or establish repaired behavior. Map future
+eligibility/version rules explicitly while preserving earned items and historical meanings.
+
+All questions in this packet are answered. Continue with concrete learner-state examples and
+precise contracts; no application, catalog or stored-history change is authorized.
 
 Wolf also explicitly requested continued concise, high-level mechanics options with practical
 tradeoffs and a reasoned recommendation. Keep this discussion style, capture each actual answer
@@ -483,13 +512,12 @@ experience; XP supplies one account level. Choosing a drill speedrun shows perso
 improvement. Choosing a benchmark shows that challenge's leaderboard position, without a
 new mastery tier or second account ladder. Exact UI and save/reward mechanics remain open.
 
-The six-choice/refinement, feel and recovery packets are answered. Await the beginner-context
-and post-lesson-personalization choices, then apply the agreed feedback/recovery and helped-result
-priority to concrete first-action, helped/solo-result and returning-home examples. Exact layouts,
-sound/motion assets and navigation remain design work. Measurement/calibration, comparison,
-guest-save/import, XP amounts, certificate sets, public-entry and historical transition also
-remain open. Do not reopen answered policies or the retired reward questionnaire. The chief
-reconciles answers without duplicating the area's questions.
+All presented packets through 15de791 are answered. Apply the agreed audience, personalization,
+home/result hierarchy, feedback/recovery and reward policies to concrete learner-state examples.
+Exact layouts/assets, measurement/calibration, comparison, guest-save/import, XP amounts,
+certificate sets, achievement triggers, access and historical transition remain open. Coordinate
+UI, saved-progress and payment planning through the chief without reopening answered policies.
+No implementation follows automatically.
 Existing progress, Foundations feedback and the complete-plan-before-rebuild requirement
 remain protected; implementation still requires a separately authorized bounded batch.
 
@@ -497,7 +525,7 @@ remain protected; implementation still requires a separately authorized bounded 
 
 | Area | Wolf's direction | Still open |
 |---|---|---|
-| First experience and platform | Quick suggested/changeable Windows/Mac setup before the guest exercise; Windows primary; instructions follow setup; lesson before signup, then personalization/save invitation; experienced shortcut | Verified platform scope/parity, exact lesson, broader personalization, controls and guest-saving mechanics |
+| First experience and platform | Quick changeable Windows/Mac setup, Windows primary; guest lesson before signup; afterward two skippable/changeable experience/goal questions and save invitation; experienced shortcut | Verified platform scope/parity, exact lesson/questions/recommendation mapping, controls and guest-saving mechanics |
 | Learning format | Focused lessons → practical tasks → larger models, teaching ribbon/Excel functionality | Exact lesson depth, skill map, examples and Foundations-preserving blueprints |
 | Timing and scored retries | Ordinary learning freely pausable with optional hidden-by-default timer; goal before Start, worksheet reveal starts a continuously running scored clock; unlimited benchmark/Daily attempts, best eligible time | Reveal/focus/interruption mechanics, seeds/comparison groups, access, historical timing transition and public-entry controls |
 | Help and solo retry | One Help entry with visible instructions and stated assistance consequences; solution help earns learning progress but no XP; a fresh Try solo attempt is judged on its own help/input record | Map actual help controls, define equivalent/comparable tasks and remaining award/eligibility details |
@@ -508,7 +536,8 @@ remain protected; implementation still requires a separately authorized bounded 
 | Mouse input | Spreadsheet sheet/ribbon/dialog mouse use retains learning progress but earns no XP or qualifying competitive/timed PB; Start/Retry page controls allowed by themselves; existing earnings/history preserved | Detection/focus/accessibility, historical equivalence and private-feedback/derived-estimate treatment |
 | Entry, sharing and simplicity | Offer reviewed/confirmed private guest-history carry-over at signup; optional Rapid-fire; benchmark/Daily friend sharing without separate race mode; fewer competing modes/settings | Import/ownership mechanics, navigation/action hierarchy, remaining feature dispositions and mode rewards |
 | Feedback and recovery | Brief success feedback for meaningful actions and bigger task finish; soft success sounds after Start with remembered mute, quiet typing; playful/polished/encouraging; calm ordinary-learning undo/retry without lives, XP deductions or forced restart | Exact assets/timing/accessibility and mistake detection; correctness/Help/input and continuously running scored time remain unchanged |
-| Certificates | Completion of selected lesson/drill sets, including helped and spreadsheet-mouse completions; preserve issued credentials; separate from solo readiness/XP/time eligibility | Exact sets/checks, names, versions, account/paid eligibility and legacy equivalence; no independent-skill or accreditation claim |
+| Certificates | Completion of substantial named skill sets, including helped/mouse completions; preserve issued credentials; separate from solo readiness/XP/time eligibility | Exact sets/checks, names, versions, account/paid eligibility and legacy equivalence; no independent-skill or accreditation claim |
+| Achievements and home/results | Meaningful and smaller playful achievements; main milestones visible, some discoveries hidden until earned; recognition/occasional identity unlocks, no bonus XP. Continue-first home; ordinary results completion/action first with expandable stats; speedruns time/PB first | Exact achievement list/triggers/unlocks, display/access, layouts and historical mappings |
 | Catalog | Prefer a likely full rebuild, but preserve substantial earlier Foundations feedback | A full plan must precede implementation; the old v5 proposal is not automatically selected |
 | Order of work | Easy security/account fixes → catalog/progression separation → repository/database cleanup → site framework → planned catalog redesign | Size/acceptance of each bounded repair or cleanup batch |
 
@@ -611,15 +640,13 @@ they must not make beginner lessons needlessly difficult.
 2. Show a clear task and let the learner use the keyboard, with help available when needed.
 3. Explain the result and what is saved, local or pending; exact records/save mechanics need agreement.
 4. Invite the learner to personalize their starting point and save progress.
-5. Personalization could ask about goals, experience and keyboard setup, then recommend work.
+5. Ask the two skippable/changeable experience-and-goal questions and recommend from the shared catalog.
 6. Offer a useful retry or a clear next lesson, preserving the relevant learning/performance record.
 
-Lesson-first entry, subsequent personalization/save invitation and the experienced shortcut
-are confirmed. The customization dimensions above and detailed save/next-step controls remain
-proposals; Wolf has not selected these exact questions. Start with recommendations drawn from a shared, tested catalog; separate
-curricula for every profession are not yet approved. Guided learning and competitive runs
-need clear scoring rules; whether any mode-selection system is warranted is now explicitly
-part of the pending modes/flow review, not an approved addition.
+The entry sequence and two personalization topics are confirmed; exact wording, recommendation
+mapping and saving controls still need design. Separate curricula for every profession are not
+approved. Keep remaining controls consistent with the learning-first structure and fewer-visible-
+choices constraint.
 
 ## Decisions still needed
 
