@@ -84,7 +84,7 @@ navigation, isolated database replay/permissions, production delivery or recover
 The full Windows Chromium executable previously failed to launch; the matched headless shell
 passed. Existing 39 catalog-variety warnings and separate audit findings remain unresolved.
 
-## Current batch assignments and outcomes — authorized September 17
+## Current batch assignments and outcomes — September 17–19
 
 The existing tasks own one bounded batch each; no duplicate tasks or automatic later batches.
 All preserve original local work and earlier remote branches.
@@ -95,7 +95,8 @@ All preserve original local work and earlier remote branches.
 | **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; `codex/security-replay-baseline` | Baseline complete and accepted at 54640b0, exact tested source eaab864. Two fresh 52-migration replays and two complete 56-assertion suites: each 44 pass/12 identical DATA-01 failures, cleanup pass. Test infrastructure works; permissions remain unrepaired. | `supabase/tests/`, database-test docs/handoff and dedicated test workflows. Current batch complete; no DATA-01 repair assigned. Preserve failed-before evidence. No production/schema/runtime changes. |
 | **Audit starter 3 cleanup candidates**, `01a0af90-7fb2-7571-a5d6-b82354d57540`; `codex/repository-structure` | Complete on its branch at cf8c61b: archived the historical PROJECT_CONTEXT record, kept a root compatibility page, repaired links and recorded the remaining structure plan. Chief verified preserved text and docs-only file manifest. Included in accepted combined checkpoint 00df57a; no main merge. | `README.md`, `docs/ARCHITECTURE.md`, selected historical documentation/archive paths and non-shared documentation links, `docs/handoffs/repository-structure.md`. No runtime, generated pages, migrations, test harness or workflow edits. |
 | **Integrate account testing changes**, `01a0b0f9-09da-7a62-9dd2-dd9baeac388d`; `codex/groundwork-db-integration` | Complete and accepted at 16ee830: all accepted account/browser/structure/database-test groundwork and evidence coexist. Seven combined static checks, 11 guard tests and plan pass; exact executable equivalence preserves original browser and DB results without redundant full reruns. | Integration handoff `docs/handoffs/groundwork-db-integration.md`; reservations released. No permission repair, runtime/migration/package/gate/deploy change, main merge or production action. Latest shared guidance is read separately. |
-| **Audit catalog and learner flow**, `01a0b148-2693-7901-af91-934c83cabe1d`; `codex/catalog-flow-review` from preserved 00df57a | 15de791 verified: everyday foundations, two post-lesson questions, Continue-first home, concise ordinary results/expandable stats, substantial completion-certificate sets and mixed playful achievements approved. Main milestones visible, some discoveries hidden; recognition/occasional identity unlocks, no bonus XP. | Owns only `docs/handoffs/catalog-progression.md`; all current questions answered. Next concrete learner states and precise contracts, coordinated with recommended UI/storage/payments planning. Exact lists, triggers, access, layouts and migration remain open; no implementation/module dispatched. |
+| **Audit catalog and learner flow**, `01a0b148-2693-7901-af91-934c83cabe1d`; `codex/catalog-flow-review` from preserved 00df57a | 15de791 verified: everyday foundations, two post-lesson questions, Continue-first home, concise ordinary results/expandable stats, substantial completion-certificate sets and mixed playful achievements approved. Main milestones visible, some discoveries hidden; recognition/occasional identity unlocks, no bonus XP. | Owns only `docs/handoffs/catalog-progression.md`; all current questions answered. Next precise learning/content contracts; active UI planning develops the screen outlines from existing learner-state proposals. Storage/payments remain recommended. Exact lists, triggers, access, layouts and migration remain open; no implementation authorized. |
+| **Plan UI/UX onboarding flows**, `01a0b908-48f9-7f32-94b2-d0ca46f13de3`; planned `codex/experience-site-plan` from accepted 16ee830 | Wolf started Area 5 planning on September 19; chief verified the task prompt. Six screen outlines, navigation/keyboard access, approved feedback/mute and truthful save/error states. Help placement and optional-challenge navigation questions presented, pending. | Owns only `docs/handoffs/experience-site.md`; coordinate learner-state ownership with Catalog, reuse its approved rules/proposals. Shared guidance remains chief-owned. Remote area handoff pending; no application changes, live writes, deployment or billing. |
 | Chief coordinator, this task | Project overview and platform-wide design discussion, priorities, product decisions, GitHub/security/structure review and handoff reconciliation. | `docs/CURRENT.md`, `docs/PRODUCT.md`, `docs/handoffs/chief-groundwork.md`. Other tasks send proposed corrections instead of editing these. |
 
 Testing checkpoint [4ea428b](https://github.com/rathunter69/Hotkey.gg/commit/4ea428ba1504ee04b3d01943df5f7cd1b68a2c4d)
@@ -415,17 +416,23 @@ to screens/navigation; Saved-progress defines records, transfers, failures and c
 Payments defines the paid offer and access lifecycle. Reuse the existing catalog review rather
 than reopening its decisions. Catalog retains content/path meaning; Security retains permission
 repairs; Desks retains enterprise workflows. Planning prompts are saved in
-[TASK_STARTERS.md](TASK_STARTERS.md#planning-follow-ups--september-19). These are recommendations,
-not dispatched tasks or implementation permission. Keep skill-map/representative curriculum
-blueprints with the catalog/learning owner; the full plan still precedes rebuilding.
+[TASK_STARTERS.md](TASK_STARTERS.md#planning-follow-ups--september-19). Wolf has now started
+Area 5 in **Plan UI/UX onboarding flows** (`01a0b908-48f9-7f32-94b2-d0ca46f13de3`).
+Areas 7 and 10 remain recommendations, not dispatched assignments. The UI task owns only
+its experience-site handoff and coordinates with Catalog before overlapping learner states.
+Help-panel placement and optional-challenge navigation are presented choices, not approved
+layouts; the verified remote handoff is still pending. Keep skill-map/curriculum blueprints
+with the catalog/learning owner. All these scopes remain planning-only; the full plan still
+precedes rebuilding.
 
 Recommended parallel work in response to Wolf's question: a focused DATA-01 desk-permission
 repair using the existing 12 failing cases and preserving the 44 passing controls. Reuse the
 completed security audit rather than restarting it. This is a recommendation, **not yet a new
 repair assignment**. UI/UX can use existing experience evidence and the approved learning/gate/help/timer/competition
 scope to plan the journey. Retry/public-entry controls, exact access boundaries and scoring
-still need decisions before dependent implementation. No new UI/UX module has been dispatched. Later targeted cleanup, site structure
-and the planned catalog rebuild retain the chosen order.
+still need decisions before dependent implementation. Area 5 planning is now active under
+Wolf's explicit starter; UI implementation remains paused. Later targeted cleanup, site
+structure and the planned catalog rebuild retain the chosen order.
 
 Launch acceptance remains pending for real account lifecycle, onboarding/learning, correct
 catalog outcomes, saved progress across devices, subscription lifecycle, guest/owner/other-user
