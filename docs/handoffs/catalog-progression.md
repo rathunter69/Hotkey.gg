@@ -36,8 +36,8 @@ before the first exercise. XP favors new accomplishments, with smaller limited r
 and no speed multiplier. Focused lessons lead to practical tasks and larger models. Completion
 certificates cover selected lesson/drill sets and count helped or spreadsheet-mouse completions;
 solo performance remains separate. Desks stays optional for training-provider/business use.
-Satisfying action-completion feedback is now an explicit design intent; frequency, sound and
-tone choices are pending. The free beginner offer includes ribbon/Excel understanding and
+Small success feedback per meaningful completed action and a bigger finish are now confirmed.
+Sound and overall tone remain pending. The free beginner offer includes ribbon/Excel understanding and
 varied useful work, alongside
 navigation, editing, formatting and basic formulas. Detailed scope and migration remain open.
 Owned files: **only `docs/handoffs/catalog-progression.md`**. CURRENT and PRODUCT remain chief-owned.
@@ -1145,7 +1145,7 @@ experience, not a measured physiological outcome or authorization for a new rewa
 Preserve the general UI/ribbon/workspace, identity/achievement use of pixel art, approved
 learning-first structure, and the fewer-modes/settings constraint.
 
-**Three choices presented, currently pending:**
+**Three choices presented; feedback frequency is now answered below, sound and tone pending:**
 1. **Feedback frequency/intensity:** recommend a brief success response for each meaningful
    completed spreadsheet action, with a stronger finish for the completed task. Alternatives:
    strong game-like celebrations through the task, or most celebration only at task completion.
@@ -1160,6 +1160,14 @@ learning-first structure, and the fewer-modes/settings constraint.
    workspace. Alternatives: energetic/arcade-like or calm/professional with restrained celebration.
    These select feedback tone/intensity, not a replacement spreadsheet skin or expansion of
    pixel art beyond the agreed identity/achievement role.
+
+**Subsequent explicit answer, September 19:** Wolf selected "Small success feedback per
+meaningful action; bigger finish (recommended)". This confirms the first choice only. Give
+brief positive acknowledgement when a meaningful spreadsheet action succeeds and a stronger
+celebration when the task finishes. Sound defaults, overall tone, exact effects/animation,
+latency and accessibility behavior remain unselected. The answer does not grant per-action XP,
+new achievements, celebrations on every raw key press or rewards for incorrect outcomes.
+Existing assisted/mouse learning credit and XP/time-score distinctions remain intact.
 
 **Lead design suggestions to evaluate, not newly approved mechanics:**
 - Give helped and mouse-assisted learners clear positive completion feedback and certificate
@@ -1176,7 +1184,7 @@ learning-first structure, and the fewer-modes/settings constraint.
   progress and savings with their agreed meanings; do not invent XP, streak pressure or time
   saved to make a result appear more rewarding.
 
-**Dependencies:** resolve these three feel choices, then apply them to one representative
+**Dependencies:** resolve the remaining sound and tone choices, then apply the agreed feedback to one representative
 spreadsheet action, a helped completion and an eligible solo completion. The examples should
 show feedback, information hierarchy and next action with the existing ribbon intact. Exact
 animation, audio, reduced-motion behavior and validation contracts remain a later bounded spec.
@@ -1482,29 +1490,32 @@ answers/refinements from the dated register above:
   existing issued credentials and separate readiness/solo/performance rules. Exact sets/access open.
 - Desks remains a separate optional feature for business/training-provider use. WSP/Training
   the Street are audience examples, not commercial relationships or integrations.
-- Satisfying action-completion feedback is a desired experience; specific frequency, sound and
-  overall tone remain a pending three-choice group. No physiological benefit is asserted.
+- Brief success feedback for meaningful completed actions, with a bigger task-finish celebration,
+  is explicitly approved. Sound defaults and overall tone remain pending. Exact effects remain
+  design work; this does not award XP per action or assert a physiological benefit.
 - Useful free navigation/editing/formatting/basic formulas, explicitly teaching ribbon and Excel
   functionality with breadth of useful work/time-saving value. Exact curriculum and calibrated
   savings remain open; advanced learning/models stay paid.
 
 **CURRENT proposal:** all six choices and both platform/certificate refinements are answered.
 Replace the prior all-pending status. Review concrete first-lesson/helped-result/returning-home
-states next, applying the new satisfying-action-feedback intent. Three feel choices are now
-pending: feedback frequency/intensity, sound defaults and overall tone. Then settle precise
+states next, applying the approved small-action/bigger-finish feedback. The first feel answer
+is confirmed; only sound defaults and overall tone remain pending. Then settle precise
 XP/certificate/platform/access/metric and migration details. Existing
 mode dispositions not expressly selected remain proposals. Ownership/baselines unchanged:
 only this handoff; 00df57a source evidence retained, 16ee830 implementation baseline.
 
-**Verification for this checkpoint:** began from clean 6d87306; freshly read remote CURRENT
+**Verification for this answer sequence:** began from clean 6d87306; freshly read remote CURRENT
 (file blob c6e3f9ea2e4b22d57cf6aa95e9bc9dbd2258b66a) and PRODUCT
 (file blob aa6700f789699edfc70e72316121c88c9d27ecbc), which preserve the accepted baseline and
 show the prior six-choice packet pending. Reused prior source evidence; no new source/security/
 SQL audit, agent or application tests needed for recording explicit answers and the new feel
 questions. Sole-file diff, 19 relative links and whitespace checks passed. Complete the
-commit/push and remote identity verification for the handoff.
+commit/push and remote identity verification for the handoff. The initial answer/feel packet
+was published and remotely verified at c52d067; this follow-up adds only the first explicit feel
+selection. The other two options remain unanswered.
 
-**Next bounded turn:** record the three pending feel selections, then review the concrete
+**Next bounded turn:** record the two pending sound/tone selections, then review the concrete
 learner states against the simplicity constraint
 and these decisions. Resolve only consequential remaining hierarchy, feature-disposition and
 reward/measurement/access details in small groups; preserve confirmed answers. No catalog
