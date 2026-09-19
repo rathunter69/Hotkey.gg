@@ -179,3 +179,71 @@ Start from useful free everyday foundations and paid advanced lessons/models. Pr
 
 Own only docs/handoffs/payments.md on a dedicated codex/ branch. Planning only: no application changes, live-data changes, main merge, deployment or billing activation. Reuse evidence and focused review. Keep discussion concise, in plain English, with 2–3 choices at a time. Commit/push the area handoff, verify its GitHub link and send it to chief task 01a0b0fa-d857-7002-ab95-1da0a1cfb858. Leave CURRENT/PRODUCT chief-owned.
 ```
+
+## Curriculum roadmap workstream — September 19
+
+**Authorized scope:** Wolf asked for a workstream clarifying chapters/Foundations and what each
+lesson/module teaches, producing a revised roadmap of chapters, tracks, drills and learning
+objectives against the current eight-chapter/74-drill catalog. This authorizes curriculum planning,
+not authoring replacement application content or implementing the rebuild.
+
+**Owner:** continue **Audit catalog and learner flow**, task
+`01a0b148-2693-7901-af91-934c83cabe1d`, on `codex/catalog-flow-review`. Do not start a competing
+Catalog task. The chief assigns `docs/handoffs/drill-catalog.md` exclusively to this owner for
+the teaching roadmap. Existing `docs/handoffs/catalog-progression.md` remains systems/decision
+provenance; do not duplicate its long decision register. CURRENT/PRODUCT remain chief-owned.
+
+### First reviewable planning batch
+
+1. Establish the baseline from CURRENT's accepted code and canonical runtime catalog/source
+   ownership. Account for all current drills and chapter assignments; distinguish runtime,
+   generated pages and historical v3/v4/v5 plans. Record stable IDs and source commit. Reuse
+   existing evidence instead of auditing every drill again.
+2. Trace Foundations feedback to its sources. Preserve playful movement, visible outcomes,
+   meaningful copy/paste, clear location cues, varied fill/paste practice, real consequences and
+   working models. Explicitly mark superseded density/no-scroll/length/timing quotas; do not
+   give novices extra prerequisites to fill a grid.
+3. Propose plain-English meanings and relationships for chapter, module, lesson, drill and track.
+   Avoid adding layers merely to use every term. Consider a shared curriculum with tracks as
+   recommended routes through it, rather than duplicated content; label this a recommendation.
+4. Draft the whole-platform skill/chapter map, from useful everyday foundations through practical
+   spreadsheet tasks to advanced/finance/model work. For each stage show its audience, useful
+   outcome, dependencies and what is introduced, practised and combined. No predetermined
+   replacement chapter/drill count or finance-first beginner assumption.
+5. Map every existing drill to a proposed destination and keep/adapt/combine/split/retire-candidate
+   recommendation with a reason. Mark gaps and overlaps. No deletion follows from a classification;
+   future removal needs consumer/generated-page/history checks. Old-to-new mappings are conceptual
+   provenance, not implemented migration or permission to reset awards/results.
+6. Detail Foundations first, with 3–4 representative blueprints: an accessible first lesson,
+   focused practice, a practical chapter task, and a later model as a contrast. Include what is
+   taught, starting worksheet/working region, required navigation, observable correct outcome,
+   legitimate alternative routes, guidance/help and later independent practice. Distinguish usable
+   space from assigned content, and make larger-model extent/reachability explicit.
+7. Show proposed prerequisites/readiness, free/paid inclusion, certificate-set alignment and
+   history recognition as separate fields/dependencies. Respect settled assistance/input/reward
+   rules; exact access lists, certificate sets, equivalence and lesson order are not yet approved.
+   Coordinate with Payments, Storage and UI; do not invent unverified engine/platform support.
+
+Return a chapter/skill-map table, complete current-drill crosswalk, short Foundations-feedback
+traceability table and the representative blueprints. Identify only consequential open choices,
+with a recommendation. Review the hierarchy, chapter order and Foundations depth with Wolf before
+expanding into every lesson blueprint. This is the first draft of the full rebuild plan, not its
+approval or an invitation to build all proposed modules.
+
+### Subsequent planning gates
+
+- Agree the terminology, chapter/track map and Foundations coverage.
+- Expand approved chapter/module objectives into specific lesson and drill blueprints, checking
+  teach-before-use, useful repetition and realistic combined tasks.
+- Reconcile curriculum/access/certificate/record mappings with existing owners and identify
+  required engine capabilities. Preserve current earned history.
+- Present the complete plan and a small future pilot scope for explicit implementation approval.
+  No content replacement, deletion, progress rewrite, main merge, deployment or billing activation
+  occurs under this workstream.
+
+Use a focused evidence/inventory agent and an independent curriculum reviewer where useful.
+Give them bounded non-overlapping scopes and economical models/effort; avoid repeating successful
+audits/tests. Keep detailed evidence in the handoff and discussions concise, with 2–3 choices at
+a time. Commit/push each non-secret handoff checkpoint, verify its remote identity and send the
+chief its link, decisions, limits and next step. Chief task:
+`01a0b0fa-d857-7002-ab95-1da0a1cfb858`.
