@@ -37,7 +37,7 @@ and no speed multiplier. Focused lessons lead to practical tasks and larger mode
 certificates cover selected lesson/drill sets and count helped or spreadsheet-mouse completions;
 solo performance remains separate. Desks stays optional for training-provider/business use.
 Small success feedback per meaningful completed action and a bigger finish are now confirmed.
-Sound and overall tone remain pending. The free beginner offer includes ribbon/Excel understanding and
+Soft success sounds after Start, with remembered mute and quiet typing, are confirmed; the tone is playful, polished and encouraging. The free beginner offer includes ribbon/Excel understanding and
 varied useful work, alongside
 navigation, editing, formatting and basic formulas. Detailed scope and migration remain open.
 Owned files: **only `docs/handoffs/catalog-progression.md`**. CURRENT and PRODUCT remain chief-owned.
@@ -1123,7 +1123,7 @@ onboarding or general questionnaire before practice is approved.
    clear task. Teach the relevant ribbon/function concept in context, retaining visible task
    instructions and one Help entry. Keep the lesson timer hidden unless enabled.
 2. **Helped result:** show completion, a plain explanation of zero XP for solution help or
-   spreadsheet mouse use, and the actual saving state. Offer Continue and Try solo. Show a
+   spreadsheet mouse use, and the actual saving state. Make Continue primary with Try solo clearly alongside, as confirmed September 19. Show a
    concise certificate-set progress update only when relevant; keep expanded metrics secondary.
 3. **Returning home:** lead with resume or one recommended next lesson and access to the catalog.
    Personal records, per-drill Speedrun, optional Rapid-fire/challenges and Desks stay reachable
@@ -1136,7 +1136,7 @@ rules and preservation/migration. No further answer to this six-choice packet is
 No application behavior, catalog, credentials, earned records, billing or shared document changes
 are authorized or made by this checkpoint.
 
-### September 19: satisfying action feedback and platform feel — direction, then questions
+### September 19: satisfying action feedback and platform feel — all three choices answered
 
 **Source/confirmed intent:** Wolf asked to keep clarifying key features and feel so his full
 platform intent is realized, and wants action completion to feel rewarding (his wording was
@@ -1145,7 +1145,7 @@ experience, not a measured physiological outcome or authorization for a new rewa
 Preserve the general UI/ribbon/workspace, identity/achievement use of pixel art, approved
 learning-first structure, and the fewer-modes/settings constraint.
 
-**Three choices presented; feedback frequency is now answered below, sound and tone pending:**
+**Three choices presented, then explicitly answered below:**
 1. **Feedback frequency/intensity:** recommend a brief success response for each meaningful
    completed spreadsheet action, with a stronger finish for the completed task. Alternatives:
    strong game-like celebrations through the task, or most celebration only at task completion.
@@ -1155,7 +1155,7 @@ learning-first structure, and the fewer-modes/settings constraint.
    that remembers the preference; ordinary typing stays quiet. Alternatives: silent by default
    with optional success sounds, or more arcade audio including typing and reward sounds. Audio
    can reinforce success, while frequent/default sound may be unwelcome in study or work spaces.
-   No default, sound asset, recording or extra onboarding prompt is approved yet.
+   At presentation, defaults were pending; the later answer below selects success audio on after Start. Exact assets/implementation remain open; no extra onboarding prompt is approved.
 3. **Overall feel:** recommend playful, polished and encouraging around the retained spreadsheet
    workspace. Alternatives: energetic/arcade-like or calm/professional with restrained celebration.
    These select feedback tone/intensity, not a replacement spreadsheet skin or expansion of
@@ -1164,10 +1164,19 @@ learning-first structure, and the fewer-modes/settings constraint.
 **Subsequent explicit answer, September 19:** Wolf selected "Small success feedback per
 meaningful action; bigger finish (recommended)". This confirms the first choice only. Give
 brief positive acknowledgement when a meaningful spreadsheet action succeeds and a stronger
-celebration when the task finishes. Sound defaults, overall tone, exact effects/animation,
+celebration when the task finishes. At that point sound and tone were pending; exact effects/animation,
 latency and accessibility behavior remain unselected. The answer does not grant per-action XP,
 new achievements, celebrations on every raw key press or rewards for incorrect outcomes.
 Existing assisted/mouse learning credit and XP/time-score distinctions remain intact.
+
+**Subsequent explicit sound/tone answers, September 19:** Wolf selected "Soft success sounds
+on; easy remembered mute (recommended)" and "Playful, polished and encouraging (recommended)".
+Soft, brief success sounds follow the learner starting, an obvious mute remembers preference,
+and normal typing stays quiet. The tone is playful and encouraging with crisp responses and
+satisfying finishes around the existing spreadsheet workspace. Pixel art stays in identity and
+achievements. All three feel questions are answered; exact sound/animation assets, timing,
+visual treatment and accessibility behavior remain design work. No browser/audio support
+validation or application change is claimed.
 
 **Lead design suggestions to evaluate, not newly approved mechanics:**
 - Give helped and mouse-assisted learners clear positive completion feedback and certificate
@@ -1184,11 +1193,64 @@ Existing assisted/mouse learning credit and XP/time-score distinctions remain in
   progress and savings with their agreed meanings; do not invent XP, streak pressure or time
   saved to make a result appear more rewarding.
 
-**Dependencies:** resolve the remaining sound and tone choices, then apply the agreed feedback to one representative
+**Dependencies:** apply the agreed feedback, sound and tone to one representative
 spreadsheet action, a helped completion and an eligible solo completion. The examples should
 show feedback, information hierarchy and next action with the existing ribbon intact. Exact
 animation, audio, reduced-motion behavior and validation contracts remain a later bounded spec.
 No interface, scoring, content or settings implementation is authorized here.
+
+### September 19: mistakes and helped-result emphasis — both choices answered
+
+**Source:** Wolf asked to continue clarifying key features and feel. With the three feedback
+choices answered, the next two questions apply the desired tone to recovery and next steps.
+
+1. **Ordinary-learning mistakes:** recommend calm recoverable feedback, allowing undo or another
+   try without lives, XP deductions or forced restart. Valid alternative routes and ordinary
+   Excel exploration must not be treated as mistakes; solution steps still follow the Help
+   assistance rule. Alternatives: an immediate corrective teaching hint, or a limited mistake
+   allowance followed by a restart. Calm recovery keeps errors low-pressure. Immediate hints
+   teach sooner but may reveal solutions and make attempts assisted; a failure allowance adds
+   game tension but may frustrate beginners. Exact meaning/detection of a mistake remains open.
+   This proposal does not waive task correctness, help/mouse XP rules or continuous scored time.
+2. **Helped ordinary-lesson result:** recommend Continue as the main action, with Try solo clearly
+   alongside it. Alternatives: Try solo primary with Continue secondary, or equal prominence.
+   Continue reinforces forward learning and the approved helped-completion credit; Try solo
+   primary encourages rehearsal but can feel like the completion was insufficient. Both actions
+   already exist in the approved design direction; this question settles only their emphasis.
+   Speedrun/challenge result actions and final retry wording remain separate details.
+
+**Explicit answers, September 19:** Wolf selected calm recovery without lives, XP deductions or
+forced restart, and Continue primary with Try solo alongside after a helped ordinary lesson.
+Both are confirmed; they were not inferred from the earlier tone choice. Learners can undo or
+keep trying. Valid alternative methods and normal Excel exploration remain welcome; solution
+steps retain their assistance consequence. Final correctness and the help/mouse XP/time rules
+still apply. This does not settle mistake detection or public-challenge interruption rules.
+Continue-primary applies to the helped ordinary-lesson result, not every speedrun/event result.
+The working Try solo label and exact layout remain design details. No behavior change.
+
+### September 19: beginner audience and post-lesson personalization — pending
+
+**Source:** continuing Wolf's request to clarify full platform intent after feedback, recovery
+and helped-result priorities are settled. Two further choices were presented:
+
+1. **Beginner audience/context:** recommend everyday spreadsheet situations accessible to a
+   broad Excel audience, followed by deeper finance and modeling work later. Alternative:
+   finance/analyst scenarios and language from the first lesson. Broad foundations lower the
+   initial domain-knowledge burden; finance-first gives a sharper audience signal but may make
+   simple Excel learning less approachable to non-finance beginners. This does not remove the
+   approved realistic later models or optional business-training Desks use.
+2. **Post-lesson personalization:** recommend two short questions, Excel experience and what
+   the learner wants to do, both skippable/changeable, then suggest a starting point from the
+   shared catalog. Alternatives: goal only and infer level through practice, or a fuller
+   questionnaire for more tailoring. Two questions give a useful starting recommendation with
+   little setup; goal-only gives less initial level information; a fuller survey adds friction.
+   Windows/Mac is already selected before the sample lesson and need not be asked again.
+   Self-reported experience is not qualifying readiness evidence. No profession-specific new
+   curricula, automated assessment or scoring inference is authorized by this proposal.
+
+**Status:** both pending. Exact question wording/goal choices, recommendation mapping and when
+to show the save invitation remain open even if the two-question format is selected. Preserve
+free exploration and the experienced-user shortcut; recommendations are not new mandatory gates.
 
 ## Evidence register
 
@@ -1334,7 +1396,7 @@ every reward threshold before the basic experience is defined.
 
 September 18 follow-up to D10/D13: time, PBs, improvement history and key count are now selected;
 meaningful active practice qualifies for days. Helped results offer Continue plus an unassisted
-retry, with Try solo as the working label and visual emphasis still open. Mouse-reference time
+retry, with Try solo as the working label; September 19 confirms Continue primary with Try solo alongside. Mouse-reference time
 saved framing is now approved as an explicitly estimated same-task comparison, and usage is
 shortcut/command-only. Spreadsheet mouse use excludes qualifying time/competitive scores and
 XP, while page controls are allowed. Per-run key presses and command-use counts are distinct.
@@ -1488,19 +1550,25 @@ answers/refinements from the dated register above:
 - Completion certificates for selected lesson/drill sets; helped and spreadsheet-mouse
   completions count. Replace the independent-assessment certificate recommendation, preserving
   existing issued credentials and separate readiness/solo/performance rules. Exact sets/access open.
+- Ordinary-learning mistakes allow calm recovery, undo or another try, without lives, XP
+  deductions or forced restart; existing correctness/help/mouse rules still apply. After helped
+  ordinary lessons, Continue is primary with Try solo clearly alongside.
 - Desks remains a separate optional feature for business/training-provider use. WSP/Training
   the Street are audience examples, not commercial relationships or integrations.
-- Brief success feedback for meaningful completed actions, with a bigger task-finish celebration,
-  is explicitly approved. Sound defaults and overall tone remain pending. Exact effects remain
-  design work; this does not award XP per action or assert a physiological benefit.
+- Brief success feedback for meaningful completed actions and a bigger task-finish celebration
+  are approved, along with soft success sounds after Start, an obvious remembered mute and quiet
+  typing. Tone is playful, polished and encouraging around the preserved workspace; pixel art
+  stays in identity/achievements. Exact assets/accessibility remain design work; no per-action
+  XP or physiological benefit is implied.
 - Useful free navigation/editing/formatting/basic formulas, explicitly teaching ribbon and Excel
   functionality with breadth of useful work/time-saving value. Exact curriculum and calibrated
   savings remain open; advanced learning/models stay paid.
 
 **CURRENT proposal:** all six choices and both platform/certificate refinements are answered.
 Replace the prior all-pending status. Review concrete first-lesson/helped-result/returning-home
-states next, applying the approved small-action/bigger-finish feedback. The first feel answer
-is confirmed; only sound defaults and overall tone remain pending. Then settle precise
+states next, applying approved feedback/sound/tone, calm mistake recovery and Continue-primary
+helped results. Two new questions are pending: beginner audience/context and the post-lesson
+personalization format. Then settle precise
 XP/certificate/platform/access/metric and migration details. Existing
 mode dispositions not expressly selected remain proposals. Ownership/baselines unchanged:
 only this handoff; 00df57a source evidence retained, 16ee830 implementation baseline.
@@ -1512,10 +1580,11 @@ show the prior six-choice packet pending. Reused prior source evidence; no new s
 SQL audit, agent or application tests needed for recording explicit answers and the new feel
 questions. Sole-file diff, 19 relative links and whitespace checks passed. Complete the
 commit/push and remote identity verification for the handoff. The initial answer/feel packet
-was published and remotely verified at c52d067; this follow-up adds only the first explicit feel
-selection. The other two options remain unanswered.
+was published and remotely verified at c52d067; cf41395 recorded the first explicit feel answer.
+This follow-up records sound/tone and recovery/result selections, then two new pending audience/
+personalization questions. No new source review or application tests were needed.
 
-**Next bounded turn:** record the two pending sound/tone selections, then review the concrete
+**Next bounded turn:** record the two pending audience/personalization selections, then review the concrete
 learner states against the simplicity constraint
 and these decisions. Resolve only consequential remaining hierarchy, feature-disposition and
 reward/measurement/access details in small groups; preserve confirmed answers. No catalog
