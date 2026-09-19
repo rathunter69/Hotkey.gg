@@ -559,8 +559,22 @@ Wolf also said he liked the older completion overlay popup. This latest preferen
 treating the prior side-panel result selection as the required direction: restore the familiar
 overlay in the revised preview, keeping Help/guidance beside the worksheet. It does not approve
 an unseen revision, every historical popup behavior or a new reward/assistance rule.
-The revised UI handoff is pending at this checkpoint; the explicit feedback is preserved here
-from the task read. No application implementation, theme removal or broad redesign is authorized.
+The [revised preservation handoff at 731ee79](https://github.com/rathunter69/Hotkey.gg/blob/731ee791683c603ba4e788c242dcb6834f4f7db3/docs/handoffs/experience-site.md#september-19-preserve-the-existing-visual-system-and-completion-popup)
+is now remote-verified. Wolf also explicitly named the coupled visual files: nav.css/nav.js,
+themes.js, index.html and reference/leaderboard page styles. Read these together, including linked
+styles such as lb.css, before a later authorized change; shared edits affect every consumer.
+
+The area's source review records 27 existing built-in themes with original tokens, Daylight as
+the fresh-user default, preserved valid saved selection, light worksheets within dark themes,
+native button/keycap/navigation/ribbon families, unified worksheet frame and the 6px green cell
+handle. Preserve this existing system. Its revised preview reuses native rendered markup/styles;
+a focused reviewer corrected the completion button family. Theme-token, panel/popup and narrow
+preview checks remain illustration-level evidence, with external fonts blocked/fallback fonts.
+They do not certify production engine, saving, accessibility or all-page/theme compatibility.
+
+The first mockup's styling remains rejected. The revised preview's sample lesson, exact layout,
+copy and focus behavior are still illustrative and have not been approved in full. No application
+implementation, theme removal or broad redesign is authorized.
 
 **September 19 — historical grid guidance recovered and future grid direction approved:**
 
