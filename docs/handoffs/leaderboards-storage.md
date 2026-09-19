@@ -54,17 +54,31 @@ record Wolf's September 18–19 approvals. The table restates constraints, not n
 2. **Delayed public submission:** Wolf selected **“Short published submission grace period
    (recommended)”**. Keep a result privately and show public submission pending while disconnected;
    public credit requires reconnection within a published deadline. This selects a grace period
-   over a strict event-close receipt cutoff. Exact duration, trusted completion evidence, event
-   boundaries and dispute/finalization rules remain open. It does not approve arbitrary late
-   entries or trusting a client-supplied date.
+   over a strict event-close receipt cutoff. The later answer below sets Daily's duration and
+   finish-before-close boundary. Trusted completion evidence, exact event window and dispute/
+   finalization rules remain open. It does not approve trusting a client-supplied date.
+3. **Guest credit, later in this task:** Wolf selected **“Count qualifying guest work once
+   (recommended)”** after signup and confirmed transfer. Qualifying solo work may count toward
+   normal XP, skill prerequisites and comparable personal bests without a mandatory repeat
+   solely because it happened as a guest. Helped work retains completion but no XP. No automatic
+   public posting; Catalog/Security still define trustworthy qualification and deduplication.
+4. **Daily deadline, later in this task:** Wolf selected **“5 minutes after closing
+   (recommended)”** for upload of an attempt finished before closing. Too-late results remain
+   personal history. This resolves Daily's receipt grace length and the presented completion
+   boundary; it does not select an ongoing benchmark's upload lifetime or validation design.
+5. **Record controls, later in this task:** Wolf selected **“Hide private attempts; withdraw
+   public results; keep history (recommended)”**. Users can tidy their private view and withdraw
+   public results without deleting the underlying history. Permanent per-attempt deletion was
+   not selected. Exact public withdrawal scope and finalized-event handling remain to specify.
 
 Acceptance examples: an old 0:55 first-action PB remains visible beside a separate new reveal-clock
 record; neither wins the other's group. A Daily completed within its valid window can await
 submission during the published grace period; a late or unverifiable submission remains private
 history without being described as a public placing.
 
-**Everything below labelled proposed is an implementation contract recommendation.** The two
-answers do not blanket-approve fields, migration rules, public verification or the whole report.
+**Everything below labelled proposed is an implementation contract recommendation** except
+where it explicitly restates the decisions above. These answers do not blanket-approve fields,
+migration rules, public verification or the whole report.
 
 ## Evidence reused and bounded source review
 
@@ -164,8 +178,11 @@ not change an attempt's historical facts.
 5. Import adds private records with original facts, timing labels and assistance uncertainty.
    Preserve guest PBs as imported history in their original groups; do not promote them into
    verified current PBs/public boards, grant fresh XP or claim readiness merely because of import.
-   Whether sufficiently evidenced guest work qualifies for those new benefits is an open
-   Catalog/Security policy. Do not delete earned guest history to enforce that distinction.
+   **Now approved:** qualifying guest solo work counts once toward normal XP, skill prerequisites
+   and comparable PBs after confirmed transfer. Catalog/Security must define how evidence proves
+   that qualification; import alone is not proof and cannot duplicate prior awards. Do not
+   require repeating otherwise qualifying work merely because it was done as a guest, or delete
+   earned guest history to enforce the evidence distinction.
 6. Retry the same import/record identities. Return per-record accepted/already-present/pending/
    conflict outcomes. Partial success must be visible; confirmed items do not re-award on retry.
    Do not deduplicate distinct attempts merely because time/date/task happen to match.
@@ -206,7 +223,7 @@ award processing must itself be deduplicated and recoverable.
 
 **Deliberate end:** finalize the old attempt's lightweight summary locally before starting the successor,
 with honest local-write status; do not block learning while waiting for a network receipt.
-one ID cannot be both counted as two unfinished records and one completed run. A lesson pause
+One ID cannot be both counted as two unfinished records and one completed run. A lesson pause
 is not an end and does not create another attempt. Unfinished means unfinished, not incorrect.
 
 **Crash/background exit:** no guarantee that unload can write. A later recovered checkpoint may
@@ -274,13 +291,12 @@ Recommended fairness details, still proposals:
   creates a different group, not an unexplained replacement of standings.
 - Equal scored times share placing at the declared scoring precision. Key counts are informative,
   not an unstated tiebreak. Display ordering can be deterministic without claiming a better rank.
-- Define one published event timezone/window (recommend UTC with local display). A valid start/
-  finish and a receipt deadline are distinct. **Approved:** short published grace for delayed
-  receipt. **Proposed precise rule:** finish within the event window; only receipt may arrive by
-  close plus grace. This is submission grace, not extra playing time. Bind earlier server-issued
-  entry parameters/evidence to account, event edition and attempt. Exact window, grace duration
-  and trustworthy finish/continuity verification remain to be designed; a client date alone
-  is insufficient. This recommended enforcement design is not claimed as an additional user answer.
+- Define one published event timezone/window (recommend UTC with local display). **Now approved
+  for Daily:** finish before closing; receive the delayed upload within five minutes after
+  closing. This is submission grace, not extra playing time. **Proposed enforcement:** bind
+  earlier server-issued entry parameters/evidence to account, event edition and attempt.
+  Exact event window and trustworthy finish/continuity verification remain to be designed;
+  a client date alone is insufficient. Ongoing benchmark upload lifetime remains open.
 - During a lost connection, preserve private history and mark public entry pending. Fully offline,
   unissued or unverifiable attempts are retained privately, not retroactively entered using a
   forged date. Exact evidence/replay versus other validation design belongs to Security/Engine.
@@ -307,8 +323,11 @@ Public summaries should expose only display identity, challenge/edition/group, q
 and relevant placing/status, plus intentionally chosen highlights. Do not expose guest/device
 IDs, unfinished practice, raw traces, private timestamps/activity, account-state blobs or hidden
 school fields through convenient joins. Exact public fields need Security review. Removing a
-showcase highlight must stop its public read without deleting the underlying personal record;
-withdrawal/anonymization of an entered public result is a separate unresolved policy.
+showcase highlight must stop its public read without deleting the underlying personal record.
+**Now approved:** users may hide private attempts from their normal view and withdraw public
+results while keeping the underlying history. Hiding is presentation, not revocation of earned
+work. Exact withdrawal scope, replacement-best behavior, anonymization and finalized-event
+treatment remain open; permanent per-attempt deletion is not selected.
 
 Security must enforce this at database/API boundaries, including direct table/function requests,
 not just screens. Row restrictions alone do not specify which columns are safe to expose
@@ -341,7 +360,7 @@ These are future acceptance scenarios, **not executed tests in this planning tas
 | “I practiced on two computers.” | Both confirmed sets survive, awards deduplicate, stale snapshots do not remove work; unsent device-only work is identified. |
 | “My old time is faster than my new PB.” | Original PB remains in earlier timing group, new PB explains its standard; no conversion or history reset. |
 | “I retried today's challenge ten times.” | Ten finished attempts retained privately, best eligible result counts once; slower attempts do not replace it; repeat XP follows separate caps. |
-| “My Daily upload arrived during grace / too late.” | Valid timely evidence plus within-deadline receipt can count; otherwise private history survives with a clear public rejection reason. |
+| “My Daily upload arrived during grace / too late.” | An attempt finished before closing and received within five minutes afterward can count if valid; otherwise private history survives with a clear public rejection reason. |
 | “The results API returned only its first page.” | No false lifetime PB/award/rank or empty-account claim; complete pagination or explicit incomplete state. |
 | “I removed my public highlight.” | Public field disappears at the data boundary; private attempt remains; unrelated school/device/private fields were never exposed. |
 
@@ -351,10 +370,10 @@ Discuss only one small packet at a time; answered rules above must not be reopen
 
 | Packet | Recommended next choice | Alternative / owner |
 |---|---|---|
-| 1. Guest eligibility | Import historical facts privately; grant new XP/readiness/current-standard PB eligibility only where a separately approved evidence rule can validate it | Require fresh qualifying solo work for those new benefits; preserve imported facts and known completion, with new path/certificate equivalence specified separately. Catalog + Security decide; no automatic public entry in either option. |
-| 2. Event grace and evidence | Published short receipt grace, finish within event window, trusted issued entry/continuity evidence | Choose duration, exact event window, proof and finalization together; Storage + Security + Engine/Catalog. Do not use receipt grace to extend gameplay. |
+| 1. Guest evidence | Approved: count qualifying guest solo work once after confirmed transfer; preserve known completion and original history | Catalog + Security define reliable evidence, duplicate protection and old-to-new equivalence. Do not reopen mandatory repeat versus qualifying guest credit. No automatic public entry. |
+| 2. Event proof and benchmark expiry | Approved: Daily finish before closing, upload within five minutes afterward | Specify exact event window, trustworthy proof, finalization and ongoing benchmark upload lifetime; Storage + Security + Engine/Catalog. No extra gameplay during grace. |
 | 3. Public comparison details | Fixed benchmark/Daily task per group; equal times share rank; proven-equivalent setup/variants only | Add validated variant families later. Catalog/Engine prove comparability; access remains Payments-owned. |
-| 4. Retention and interruption | All finished records + lightweight deliberate summaries; no silent expiry; label interrupted facts only | Archive presentation/limits, guest device retention, exports/deletion, full resume and public withdrawal require their own explicit decisions. |
+| 4. Record-control detail and interruption | Approved: hide private attempts, withdraw public results, retain underlying history; label interrupted facts only | Specify withdrawal scope/finalized events, archive presentation/limits, guest device retention, exports/account deletion and full resume. No permanent per-attempt deletion selected. |
 
 Metric definitions (keys/commands/active-idle/day/timezone), XP caps/accomplishments, old-to-new
 readiness/certificate equivalence and access expiry remain with their existing owners. This
@@ -368,7 +387,8 @@ Catalog then reviewed the full published `8c7686c649eb15d0dbc5429e79208ea11ff311
 Its sole clarification was to narrow the guest-import alternative to **new XP, solo-readiness
 and current-standard PB recognition**, preserving known imported completion separately. The
 option above now does that; no further material semantic conflict was found in the bounded
-review. This is consistency review, not approval of either guest-eligibility proposal.
+review. That earlier review did not approve either guest-eligibility proposal; Wolf's later
+explicit answer now selects credit for qualifying guest work once, as recorded above.
 The [UI handoff at b0d2f17](https://github.com/rathunter69/Hotkey.gg/blob/b0d2f17929768e1be348510728e5559975544b2c/docs/handoffs/experience-site.md)
 aligns completion/save/award/publication, unknown responses, account receipts, ambiguous imports
 and distinct Retry save versus Retry attempt. Its saving section was checked directly; no
@@ -377,19 +397,20 @@ without a new repair/audit assignment. Its turns returned no readable reply thro
 this report reuses the pinned Security evidence and does **not** claim Security approval of
 new permissions, guest proof or public verification. Send the remote report for that review.
 Chief receives the
-verified file link and the two explicit answers for CURRENT/PRODUCT integration; no shared-file edits.
+verified file link and explicit answers for CURRENT/PRODUCT integration; no shared-file edits.
 
-**Next recommended turn:** settle guest-import eligibility with Catalog/Security using one guest
-helped completion, one guest solo result and one ambiguous legacy record. Then finalize the narrow
-save/receipt/identity acceptance contract before any implementation batch is authorized.
+**Next recommended turn:** ask Catalog/Security to specify evidence and safe transfer for one
+guest helped completion, one guest solo result and one ambiguous legacy record under the now
+approved credit rule. User-facing follow-up can address benchmark upload lifetime and public
+withdrawal scope. Finalize save/receipt/identity acceptance before any implementation is authorized.
 
 ## Verification and limitations
 
 Remote guidance was fetched and pinned; accepted code was checked out separately. Focused source
 review reuses prior synthetic audit evidence and includes an independent read-only investigator.
 A separate contract reviewer checked preservation, identity, privacy, retries, partial reads and
-approval boundaries. Its sole finding led to clarifying receipt grace versus extra gameplay;
-the recommended completion-within-window rule is now explicit and still labelled proposed.
+approval boundaries. Its sole finding clarified receipt grace versus extra gameplay at that
+checkpoint; Wolf later expressly selected five-minute upload grace for a Daily finished before close.
 Pinned GitHub source links were checked against fetched objects; whitespace/single-file scope
 are checked before commit. Reviewed workflow triggers do not deploy this documentation branch.
 Remote commit/file identity is verified after push and returned to the chief in the task message.
@@ -405,7 +426,7 @@ was accessible. No API/schema implementation depends on the unavailable changelo
 This file's Git history supplies the final documentation commit. A handoff is complete only
 after push, remote branch/blob verification and delivery to the chief; this does not merge or deploy it.
 
-## September 19 follow-up: plain-English guest saving and three open choices
+## September 19 follow-up: plain-English guest saving and three choices answered
 
 Wolf asked for questions and stated his expected model: guests save progress locally and sign
 up to save progress. The discussion clarified the existing direction as **device-only saving
@@ -414,16 +435,17 @@ Use “Saved on this device” versus “Saved to your account” only when each
 Signup alone is neither transfer consent nor a successful save receipt. Browser/device storage
 limitations remain; this is the intended product promise, not a claim that it is implemented.
 
-Three connected choices were presented in nontechnical language. **Answers are pending**;
-neither Wolf's request for recommendations nor the selected-by-default controls approve them.
+Three connected choices were presented in nontechnical language. Wolf explicitly selected all
+three recommendations in a submitted reply. This supersedes their pending state at `0be37b8`;
+the actual answers, not default-selected controls or the request for advice, supply approval.
 
-| Question presented | Recommendation | Other selectable options |
+| Question presented | Wolf's selected answer | Alternatives not selected |
 |---|---|---|
 | After confirmed guest transfer, can qualifying solo work receive normal XP, satisfy skill prerequisites and count toward a comparable PB? | Count qualifying guest work once, subject to a trustworthy evidence rule still to be specified with Catalog/Security | Preserve the history/known completion, but require a fresh signed-in solo attempt for those new benefits |
 | For a Daily finished before closing, how long can a delayed upload arrive afterward? | **5 minutes after event closing** | 15 minutes; 1 hour |
 | What control should people have over their records? | Hide private attempts from normal views and withdraw public results, retaining the underlying history | Keep all private attempts visible but allow public withdrawal; or also permit permanent deletion of selected attempts |
 
-The recommended five minutes is a product tradeoff, not a measured network-reliability claim:
+The selected five minutes is a product tradeoff, not a measured network-reliability claim:
 it accommodates a brief connection interruption while keeping final standings prompt. This
 packet concerns Daily's closing deadline; ongoing benchmarks have no selected daily cutoff and
 still need their own stated upload lifetime/edition-validity contract. No extra playing time
@@ -436,9 +458,17 @@ finalized-event treatment and other public surfaces need an explicit design afte
 is chosen. Permanent deletion is an alternative to discuss, not deletion authorization or a
 decision about its effects on awards/certificates. Account deletion/export remain separate.
 
-Both guest-credit options preserve known completion and original earned records. Helped work
+The selected guest-credit rule preserves known completion and original earned records. Helped work
 keeps its completion credit but receives no XP; neither option automatically posts a score.
 Unknown/ambiguous records cannot gain qualifying evidence merely by being imported.
+
+Acceptance examples for the selected principles: a qualifying guest solo lesson is credited
+once after confirmed transfer and does not require a repeat just for signup; a guest helped
+lesson keeps its known completion with zero XP; an ambiguous old record stays preserved without
+invented solo evidence. A Daily finished before closing and uploaded four minutes afterward
+may count after validation; one uploaded six minutes afterward remains private history. Hiding
+an attempt removes it from the normal history view without erasing its facts; public withdrawal
+does not delete the underlying private attempt. These are planning examples, not executed tests.
 
 Latest remote foundation checked: `0767af6347627c09a2cc5ccabe73a660956a9e99`. Recent UI/style
 updates do not change these storage rules. Only this handoff is updated; no new audit, agent,
