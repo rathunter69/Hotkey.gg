@@ -396,6 +396,37 @@ Payments' exact offer/access lifecycle; engine-safe keyboard escape/return and t
 handling. Precise reward amounts, certificate sets, activity measurement and legacy migration
 stay with those owners. None is reopened or decided by this UI proposal.
 
+## September 19 follow-up: preserve the look, refine the interactions
+
+Wolf asked which UI/UX decisions remain and said he likes the current aesthetic and general
+layout while remaining open to suggestions. Treat this as a renewed preference to preserve
+the existing visual foundation, not approval of a wholesale redesign or of every proposal below.
+Shared guidance was refreshed through `3b2063f74e53ede253602c83299ff3dd0263e041`; it accepts
+the initial UI handoff and records the two placement approvals. Baseline/ownership are unchanged.
+
+The useful remaining decisions concern presentation and sequencing. Keep settled Help,
+assistance, Continue/Try solo, rewards and challenge rules out of another questionnaire.
+
+| Remaining choice | UI recommendation; still a proposal |
+|---|---|
+| Visible task guidance | Keep the goal and current outcome/checkpoint visible, with the full outcome checklist expandable. A checkpoint describes the required result, not an automatically revealed solution or mandatory keyboard route. |
+| Result placement | Use the existing side-panel area for ordinary results, keeping the completed worksheet visible. Helped results retain Continue primary and Try solo alongside; full statistics expand. |
+| Post-lesson save invitation | Offer Save to an account as a secondary action after the first result and a quiet Home reminder; avoid interrupting Continue with a signup dialog. The two skippable personalization topics remain agreed; exact wording/ordering stays open. |
+| Catalog browsing | Preserve its visual style; make one recommendation easy to find, retain browse/search, and disclose extra filters only when requested. Exact grouping/labels should follow Catalog's content plan. |
+| Secondary information and controls | Keep detailed progress/history in My progress and less-used lesson options together. Keep Help, mute and essential keyboard access discoverable. Final placement of those other controls remains open. |
+
+**Small question group presented in this task; answers pending:**
+
+1. Visible guidance: short goal/current checkpoint with expandable full checklist (recommended),
+   or full task checklist always visible. Both preserve visible instructions and separate solution help.
+2. Ordinary result placement: side panel beside the completed sheet (recommended), or a compact
+   dialog over the sheet. This chooses presentation, not new result/reward semantics.
+
+Spacing, alignment, consistent buttons, readable text, visible keyboard focus, reduced-motion
+treatment and clear error wording are design/validation work within the chosen aesthetic. They
+do not each need a product poll, and this planning discussion does not authorize app edits.
+Current layouts have not been newly visually inspected or playtested in this follow-up.
+
 ## Verification and handoff
 
 - Reused the remote catalog decision register and audits, plus CURRENT's accepted source and
