@@ -7,9 +7,10 @@ Branch: `codex/experience-site-plan`
 Starting accepted code: `16ee8306a8c170db9f8fe2e051b44b0519782ae1`
 Shared guidance read remotely: `4ec23e01cb958d5dfed5e92875db3f7002eab1e1` on `codex/repository-foundation`.
 Refreshed guidance: `4d964901a4f06493695c11bb8f04c4769d607ab0`; its CURRENT update registers this planning assignment, with no changed product policy.
-Final shared-guidance refresh: `2b16827aecf9b1c773f9b48d9b986c506c061c8a`; incorporates Storage's proven-comparability and short published submission-grace principles. Accepted code baseline and ownership remain unchanged.
+Shared-guidance refresh: `2b16827aecf9b1c773f9b48d9b986c506c061c8a`; incorporates Storage's proven-comparability and short published submission-grace principles.
+Latest shared-guidance read for the grid clarification: `2596378b5073118ff2c3794188727c5ccc57a68f`. Accepted code baseline and ownership remain unchanged.
 Owned file: **only `docs/handoffs/experience-site.md`**.
-State: planning outlines reviewed; full layouts remain proposals except the four explicit choices below. No application implementation, merge or deployment. Final commit identity is supplied by Git history and the verified chief handoff.
+State: planning outlines reviewed; full layouts remain proposals except the six explicit choices below. Grid clarification is recorded separately. No application implementation, merge or deployment. Final commit identity is supplied by Git history and the verified chief handoff.
 
 ## Scope and outcome
 
@@ -18,7 +19,7 @@ One main action leads each ordinary-learning screen; Help, saving and optional c
 clear places. These are presentation proposals except where explicitly marked confirmed.
 They do not define new learner states, rewards, lesson content, storage schemas or access rules.
 
-**Four UI decisions confirmed by Wolf in this task, September 19:**
+**Six UI decisions confirmed by Wolf in this task, September 19:**
 
 1. Help uses a **side panel beside the worksheet**, keeping the worksheet visible.
 2. A **small Challenges link beside Home and Catalog** provides optional challenge access.
@@ -26,8 +27,12 @@ They do not define new learner states, rewards, lesson content, storage schemas 
    The checkpoint describes the required outcome; solution-revealing help remains separate.
 4. **Ordinary lesson results appear in the side panel**, keeping the finished worksheet visible.
    Helped results retain Continue primary and Try solo alongside.
+5. Invite account saving through a **secondary button on the first guest result and a quiet Home
+   reminder**, preserving the option to continue without signup.
+6. Put less-used controls, such as timer visibility and Excel setup, in **one small Lesson options
+   menu**. Help and mute remain visible; keyboard access remains required.
 
-Source: Wolf's explicit selections in this task's two successive question groups. These settle
+Source: Wolf's explicit selections in this task's successive question groups. These settle
 the stated presentation choices only; exact dimensions, narrow-screen treatment, final wording and the other outline
 details remain proposals. They do not authorize implementation or change any learning rule.
 
@@ -35,7 +40,7 @@ details remain proposals. They do not authorize implementation or change any lea
 
 | Evidence | Use and limits |
 |---|---|
-| [Latest-read CURRENT](https://github.com/rathunter69/Hotkey.gg/blob/4ec23e01cb958d5dfed5e92875db3f7002eab1e1/docs/CURRENT.md), [PRODUCT](https://github.com/rathunter69/Hotkey.gg/blob/4ec23e01cb958d5dfed5e92875db3f7002eab1e1/docs/PRODUCT.md), [AGENTS](https://github.com/rathunter69/Hotkey.gg/blob/4ec23e01cb958d5dfed5e92875db3f7002eab1e1/AGENTS.md), [TASK_GUIDE](https://github.com/rathunter69/Hotkey.gg/blob/4ec23e01cb958d5dfed5e92875db3f7002eab1e1/docs/TASK_GUIDE.md) | Authority, ownership, settled September 18–19 policy and documentation-only validation exception. This worktree's older shared documents are not the latest product brief. |
+| [Initial-read CURRENT](https://github.com/rathunter69/Hotkey.gg/blob/4ec23e01cb958d5dfed5e92875db3f7002eab1e1/docs/CURRENT.md), [PRODUCT](https://github.com/rathunter69/Hotkey.gg/blob/4ec23e01cb958d5dfed5e92875db3f7002eab1e1/docs/PRODUCT.md), [AGENTS](https://github.com/rathunter69/Hotkey.gg/blob/4ec23e01cb958d5dfed5e92875db3f7002eab1e1/AGENTS.md), [TASK_GUIDE](https://github.com/rathunter69/Hotkey.gg/blob/4ec23e01cb958d5dfed5e92875db3f7002eab1e1/docs/TASK_GUIDE.md) | Authority, ownership, settled September 18–19 policy and documentation-only validation exception, with subsequent refreshes recorded above. This worktree's older shared documents are not the latest product brief. |
 | [Catalog handoff at 15de791](https://github.com/rathunter69/Hotkey.gg/blob/15de791605cbfb4fa6bbc26c2d8f5f4a94139477/docs/handoffs/catalog-progression.md) | Reuse its proposed beginner, experienced, returning, competitor and certificate-holder journeys; learner semantics and detailed contracts stay with that owner. The dated approvals supersede older proposed wording in the report. |
 | [Catalog ownership confirmation at 194db93](https://github.com/rathunter69/Hotkey.gg/blob/194db93780b4e9a3187271687d2d049e2fe4922f/docs/handoffs/catalog-progression.md#september-19-coordination-with-ui-and-saved-progress-planning) | Catalog confirmed no newer unshared decisions, delegated presentation ownership to this assigned UI task, and will not duplicate these outlines. Reused its first-exercise/helped-result/home sketches as well as its journeys. |
 | [Storage contract at 8c7686c](https://github.com/rathunter69/Hotkey.gg/blob/8c7686c649eb15d0dbc5429e79208ea11ff311e6/docs/handoffs/leaderboards-storage.md) | Owner confirmed no material mismatch with this handoff's b0d2f17 saving table. Receipt/award/publication, unknown replies, owner isolation, partial reads/imports and local failure agree. Detailed implementation contract remains proposed. |
@@ -423,9 +428,9 @@ assistance, Continue/Try solo, rewards and challenge rules out of another questi
 |---|---|
 | Visible task guidance | **Confirmed September 19:** keep the short goal and current outcome/checkpoint visible, with the full outcome checklist expandable. A checkpoint describes the required result, not an automatically revealed solution or mandatory keyboard route. |
 | Result placement | **Confirmed September 19:** ordinary results appear in the side panel, keeping the finished worksheet visible. Helped results retain Continue primary and Try solo alongside; full statistics expand under the earlier approved information hierarchy. |
-| Post-lesson save invitation | **Proposal:** offer Save to an account as a secondary action after the first result and a quiet Home reminder; avoid interrupting Continue with a signup dialog. The two skippable personalization topics remain agreed; exact wording/ordering stays open. |
-| Catalog browsing | **Proposal:** preserve its visual style; make one recommendation easy to find, retain browse/search, and disclose extra filters only when requested. Exact grouping/labels should follow Catalog's content plan. |
-| Secondary information and controls | **Proposal:** keep detailed progress/history in My progress and less-used lesson options together. Keep Help, mute and essential keyboard access discoverable. Final placement of those other controls remains open. |
+| Post-lesson save invitation | **Confirmed September 19:** secondary Save to an account action after the first guest result, plus a quiet Home reminder. Continue without signup remains available. Exact wording remains open; the two skippable personalization topics stay agreed. |
+| Catalog browsing | **Tentative preference, September 19:** Wolf said “Probably next drill along learning path, with recommendation to move to next step in the chapter.” Present the next path/chapter step while retaining browsing; do not treat this as approval of a new sequence or mandatory gate. Catalog owns mapping, chapter-end behavior and content. |
+| Secondary information and controls | **Confirmed September 19:** one small Lesson options menu for less-used controls; Help and mute remain visible. The separate My progress location and exact menu contents/keyboard bindings remain proposals. |
 
 **Small question group: both explicitly answered September 19.**
 
@@ -441,30 +446,143 @@ Exact checklist text/mapping, dimensions, narrow-screen handling and transitions
 No new application tests or agent review were needed to record these explicit answers; the
 sole-document diff and whitespace were checked before its remote checkpoint.
 
-Wolf then asked for questions on the outstanding items. The next small group was presented;
-**all three answers are pending**:
+Wolf then asked for questions on the outstanding items. **He answered all three:**
 
-1. Save invitation after the first guest lesson: secondary button on the result plus a quiet
-   Home reminder (recommended), or a separate optional save step after personalization.
-   Both preserve continuing without signup; neither changes guest-import confirmation or saving rules.
-2. Catalog opening: one recommendation above the browsable catalog (recommended), or the full
-   catalog first with recommended lessons marked. Both preserve direct browsing and the current
-   visual style; Catalog owns recommendation meaning/content.
-3. Secondary lesson controls, such as timer visibility and Excel setup: one small Lesson options
-   menu (recommended), or a compact always-visible controls row. Help and mute remain visible;
-   neither option changes keyboard access, approved timing or platform-support requirements.
+1. Selected the secondary result button plus quiet Home reminder. Guest-import consent and
+   receipt-based saving remain separate; no compulsory signup step is introduced.
+2. Supplied the tentative path/chapter-next-step preference quoted above instead of selecting
+   either layout option. Preserve the qualifier “Probably”; no exact catalog layout is approved.
+3. Selected one small Lesson options menu, retaining visible Help/mute and keyboard access.
 
-These are presentation questions only. No answer is inferred from asking for the options.
+Catalog was notified of this preference and the confirmed presentation choices before any
+next-step mapping was assigned. These choices do not change learning, rewards or access.
 
 Spacing, alignment, consistent buttons, readable text, visible keyboard focus, reduced-motion
 treatment and clear error wording are design/validation work within the chosen aesthetic. They
 do not each need a product poll, and this planning discussion does not authorize app edits.
-Current layouts have not been newly visually inspected or playtested in this follow-up.
+This question-recording pass did not visually inspect or playtest current layouts. The later
+grid clarification below adds bounded browser measurements, not a playtest of these proposals.
+
+## September 19: clarify the earlier grid-space work
+
+Wolf asked to recover the prior Claude work on cell counts, cell sizing and screen adaptation.
+This is a bounded history/source/layout clarification within UI planning. It does not approve
+changing the engine, worksheet boundaries, historical scores or lesson content. Latest guidance
+read for this batch: `2596378b5073118ff2c3794188727c5ccc57a68f`; accepted code remains `16ee830`.
+
+### What was actually decided, and why the notes seem inconsistent
+
+**The consistent 20-row visual grid and stable frame during row operations are carried-forward
+Wolf decisions, not a new UI invention.** Their attribution is preserved in the accepted source
+and regression comments. Older content-density and pixel-size rules need separate treatment.
+
+| Historical evidence | Interpretation to carry forward |
+|---|---|
+| [Early density pass, 4911f07](https://github.com/rathunter69/Hotkey.gg/commit/4911f079d97f3f3dd68921e4536c9b5e6342938b), and [elastic fitting, 466eef7](https://github.com/rathunter69/Hotkey.gg/commit/466eef73fa5c0cafe3f1811b3daea483053bba20) / [height measurement, 851fa19](https://github.com/rathunter69/Hotkey.gg/commit/851fa1945c143ea41499f2dc28354edf9d39d6ad) | Earlier work moved from 8 columns/12 rows to 10 columns/14 rows and smaller text, then made widths/heights adapt. Claude retained G–I because existing lessons used them rather than adopting Wolf's floated column-cut idea. These implementations are not all independent permanent product decisions. |
+| [Foundations specification](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/dev/FOUNDATIONS_SPEC.md#8-the-rich-drill-standard-r229-wolf--internalized-so-its-not-re-explained) | Its older rich-drill recipe says 16 rows and broadly even 80px columns, with a wider label column when needed. This is an authored content recipe attributed to Wolf, not today's universal rendered geometry. |
+| [20-row cap, 383ade1](https://github.com/rathunter69/Hotkey.gg/commit/383ade1ad7843e4ba6ded093d5950482c0d9549b), July 23 | Earlier screen fitting added extra empty rows on tall monitors. The attributed request was to keep about 20 rows and grow their height instead. The first implementation capped computed rows but still permitted fewer on shorter layouts. |
+| [Consistent grid correction, 09f1aa2](https://github.com/rathunter69/Hotkey.gg/commit/09f1aa2481a683363b3fac1fbdd03b5e784e3eb9), July 27; [preserved source](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/index.html#L24176) | Preserves Wolf asking why drills still had different row counts after agreeing on a standard 20-row grid. Renderer changed to at least 20 visible rows, preserving any taller declared content instead of cutting it. This is strong direct-attributed evidence for consistent visible geometry. |
+| [Row-operation regression](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/dev/e2e-grid-height.js#L134) and [rowsAfterOp](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/index.html#L28154) | Preserves Wolf's instruction that inserting/deleting rows should move the contents, without resizing the workspace. Data beyond the loaded boundary can remain stored, but the current renderer is not a general scrolling Excel viewport. Do not mistake stable frame size for proof that every off-frame cell is reachable. |
+| [DEPTH_PASS grid section](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/dev/DEPTH_PASS.md#13-grid-usage) and [current PRODUCT](https://github.com/rathunter69/Hotkey.gg/blob/2596378b5073118ff2c3794188727c5ccc57a68f/docs/PRODUCT.md#preserve-foundations-feedback-before-redesign) | The authored spec strengthens this to 20×10, a 60% content-density target and a content cap. Current guidance demotes old density/length quotas and rejects adding advanced prerequisites simply to fill a beginner screen. It does not explicitly revoke the familiar 20-row visual grid or stable row-operation frame. |
+
+Distinguish **visible grid**, **usable worksheet boundary**, **lesson content**, and **pixel size**.
+They are currently different things. A beginner can retain a familiar sheet without needing
+graded work in every row. Historical 14/16/20 numbers often refer to different layers, and some
+earlier comments describe algorithms later superseded by the code beneath them.
+
+### Accepted code: what adapts and what stays fixed
+
+| Aspect | Verified source behavior at 16ee830 |
+|---|---|
+| Columns | `COLS=10`: A–J. The browser width does not change the number of columns. |
+| Visible rows | `max(S.ROWS,20)`, with hidden rows omitted. Taller declared boards are protected from being cut; 20 is not an enforced runtime maximum. |
+| Usable rows | `S.ROWS=max(built.ROWS,14)`. If that is below 20, the extra visible rows are inert filler cells and the cursor stops at the logical boundary. For example, Navigation uses 20; Foot and Combo use 14 plus six filler rows. |
+| Width adaptation | Most columns expand or shrink to available worksheet width, with a 40px per-column shrink floor. The outer app is capped at 1180px including surrounding layout; large monitors do not make the sheet indefinitely wider. |
+| Graded width lessons | AutoFit/width-verdict exercises opt out of proportional shrinking. Failing columns also resist growth that would visually solve the width problem. These preserve grading meaning, but can exceed the available frame on smaller windows. |
+| Height adaptation | Stage minimum height responds to window height, bounded by a 400–800px rule in normal view; fullscreen uses a different 400–900px rule and hides the site header. Table rows share the available space. The grid does not add empty rows just because the monitor is taller. |
+| Text and row pixels | Later `#grid` density CSS sets 12px cell text and 21px requested cell height; it overrides an earlier generic `--cellh` height rule. Renderer still calculates an 18–40px `--cellh` value, but that is not a reliable description of actual rendered row height. The height-filling table stretches rows. Font size stayed 12px in the measurements below. |
+| Window changes | A document-level observer checks width and height, with a debounced resize listener and fullscreen re-fit. The prior resize/board-change bugs are repaired in accepted source; don't present them as still outstanding. |
+| Small screens | Current CSS gates the trainer at width ≤740px, or coarse-pointer devices ≤1024px, and offers a mobile hub. This is current behavior, not a freshly approved support policy or proof of external-keyboard tablet support. Short desktop windows can still place the sheet below the fold. |
+
+Source anchors: [layout frame](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/index.html#L1406),
+[density CSS](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/index.html#L2295),
+[elastic fit and row math](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/index.html#L24082),
+[inert filler rows](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/index.html#L24277),
+[fullscreen and resize](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/index.html#L29216).
+The opening elastic-fit comment still describes an older linkage between display width and
+overflow verdicts; later engine/display-width separation and width-lesson exceptions govern.
+
+### Focused local measurements, not a new full test run
+
+The lead ran one ephemeral local browser measurement for Navigation, Foot and Combo at four
+window sizes, fixed seed `424242`. Runtime files and the two existing grid/resize suites match
+16ee830 exactly. Used the accepted redirect-blocking browser helper, a new isolated profile,
+Node 24.19.0, Playwright 1.49.1 and Chromium 131 headless shell build 1148; all external traffic and service
+workers blocked. A temporary loopback server owned an OS-assigned port, then closed with the
+browser. No login, user records, live service, application edits or screenshot artifact.
+
+All 12 samples rendered 20 visible rows × 10 columns and 12px cell text. Navigation had 20
+usable rows; Foot/Combo each had 14 usable rows plus six decorative rows. Values below list
+Navigation / Foot / Combo respectively; dimensions are CSS pixels.
+
+| Window | Actual first-cell heights | Worksheet container width | Table widths | Table bottom positions |
+|---|---|---|---|---|
+| 1280×900 | 23.3 / 23.7 / 23.7 | 880 | 870 / 870 / 909 | 743 / 743 / 743 |
+| 960×700 | 21 / 21 / 21 | 646 | 636 / 636 / 909 | 730 / 723 / 723 |
+| 1920×1080 | 31.8 / 32.3 / 32.3 | 880 | 870 / 870 / 909 | 923 / 923 / 923 |
+| 1280×620 | 21 / 21 / 21 | 880 | 870 / 870 / 909 | 693 / 686 / 686 |
+
+This confirms adaptive dimensions rather than adaptive cell counts; a desktop-width cap; actual
+rows differing from the computed target; the width-lesson exception; and below-fold geometry
+at short heights. A table-bottom coordinate beyond window height does not prove content loss,
+but disproves a blanket promise that the entire worksheet is always visible without page scrolling.
+Measurements are not a complete accessibility/readability test, a grade/row-operation playtest,
+phone/Mac validation, or a test of the future side panel.
+
+Reused accepted [testing evidence](git-testing-releases.md): grid-height and 34 resize checks
+passed on the preserved application, with Linux gate evidence at 4ea428b. Their coverage is
+bounded: `check-resize.js` explicitly allows existing 40px-floor and width-lesson exceptions,
+so its green status is not proof that every board fits every window. The long legacy fit sweep
+was read for context, not run; it is unnecessary for this question and lacks the newer isolation
+wrapper. Full static/browser/database suites were not rerun for this documentation-only update.
+
+### Proposed clarification and two questions
+
+Keep the carried-forward 20-row visual baseline and familiar 10-column current workspace while
+planning. Let dimensions adapt within a readable range; do not add tasks solely to fill cells.
+Changing the grid shape is an explicit design decision, not cleanup. Large-model extent remains
+with the later Catalog/Engine plan; this does not impose an old 20-row content cap on every future model.
+
+**UI recommendation, not yet a new layout approval:** reuse the existing right-hand lane for
+instructions, Help and results, switching its content instead of adding another column or
+shrinking the sheet each time Help opens. The current lane is 250px; that exact width is not
+selected for the replacement. Keep column-width grading independent of screen size and leave
+inserting/deleting rows stable in the visible frame. Exact wrapping/scrolling/focus behavior
+needs an Engine/UI contract before implementation.
+
+Two outstanding choices were presented to Wolf; answers are pending:
+
+1. Make all 20 visible rows usable (recommended), or keep editing limited to each lesson's
+   working area with decorative filler. This is an engine-boundary proposal, not a demand to
+   fill 20 rows with lesson content. Before implementation, Catalog/Engine must check navigation,
+   row operations, grading, tutorial targets and comparable-history implications.
+2. When a small window cannot comfortably fit worksheet plus side panel: preserve readable
+   cells, suggest fullscreen and allow worksheet scrolling (recommended), or require a larger
+   window/fullscreen before Start. A real worksheet scroll viewport is not implemented today;
+   choosing it would require a separately authorized design/engine batch. Never crop required
+   cells, auto-complete width lessons by scaling, or claim an unsupported layout is usable.
+
+Independent historical review checked the attribution and distinguished the 20-row/stable-frame
+decisions from authored density recipes. Its final document review found no material correction
+and confirmed both questions remain pending. It did not run the app; the local measurements above
+are the lead's separate evidence. Exact minimum supported size, zoom/readability policy, all-
+visible-cell behavior, small-screen fallback and future large-model geometry remain open.
 
 ## Verification and handoff
 
 - Reused the remote catalog decision register and audits, plus CURRENT's accepted source and
-  integration handoffs. No new source-level defect, compatibility or usability claim is made.
+  integration handoffs. The grid clarification adds source/history findings and 12 bounded
+  browser measurements; it does not claim a full audit or certify usability/compatibility.
 - A focused independent document reviewer checked policy boundaries, keyboard/help/timing and
   save-state consistency. Four refinements were incorporated: separate award confirmation from
   save confirmation; apply receipt/account-snapshot safeguards throughout the screens; explicitly
@@ -478,9 +596,9 @@ Current layouts have not been newly visually inspected or playtested in this fol
 - Storage reviewed the published saving table and reported **no material mismatch**. Its remote
   contract at `8c7686c` was then fetched/read, including newly approved comparison/grace principles;
   the final outline reflects those principles without choosing their unresolved details.
-- All five relative Markdown links resolve in the accepted-baseline worktree. The seven original
-  pinned GitHub file links and added Catalog-review/Storage-contract links resolve to fetched
-  Git objects; the added handoffs were read before this final update.
+- Relative Markdown links resolve in the accepted-baseline worktree. Pinned GitHub file and
+  commit links resolve to fetched Git objects; the added handoffs and historical evidence were
+  read before this update. Exact validation counts belong to the chief checkpoint message.
   This verifies repository targets, not public-site navigation or signed-in browser access.
 - Staged whitespace/scope checks passed: exactly this handoff was added over `16ee830`; an
   explicit comparison excluding it found no other changed files. The separate worktree was clean
@@ -489,18 +607,22 @@ Current layouts have not been newly visually inspected or playtested in this fol
   local/remote handoff blob `7508f671039f61ce5433488e4cc7bfaf1dd7972f` after push and fresh fetch.
   This final review-record update is also committed/pushed and remote-verified before the chief
   handoff; its exact final identity is supplied by Git history and that message.
-- `npm run check`, browser suites, live-auth tests and database tests are **not run** for this
+- `npm run check`, full browser suites, live-auth tests and database tests are **not run** for this
   documentation-only task under TASK_GUIDE/CURRENT's exception. Existing passes are not relabelled
-  as new tests. No application, generated assets, data, settings, billing or deployment changed.
-- All exact wording/layouts beyond the four selections remain proposals. Acceptance scenarios
+  as new tests. The separate isolated layout diagnostic is recorded above. No application,
+  generated assets, live data, account settings, billing or deployment changed.
+- All exact wording/layouts beyond the six selections remain proposals. Acceptance scenarios
   are future checks, not successful playtests; Mac/accessibility/audio and real save behavior
   remain unverified. Existing audit defects remain with their owners.
 
 **Chief integration request:** record this planning assignment, its verified remote handoff and
-the four dated presentation decisions. Keep existing learning/reward rules; do not mark the full
-outline approved, implemented or shipped. CURRENT/PRODUCT edits remain chief-owned.
+the six dated presentation decisions and tentative path/chapter recommendation preference.
+Also retain the historical 20-row/stable-frame provenance and two unresolved grid choices.
+Keep existing learning/reward rules; do not mark the full outline approved, implemented or
+shipped. CURRENT/PRODUCT edits remain chief-owned.
 
-**Next bounded UI turn:** review the first-lesson → Help → helped result outline with Wolf and
-reconcile the Storage/Catalog response contracts, then choose one implementation candidate only
-if separately authorized. Do not start the catalog rebuild or expand the questionnaire to settled
-learning, reward or competition rules.
+**Next bounded UI turn:** record Wolf's two grid answers, then coordinate any usable-boundary
+and worksheet-scrolling proposal with Catalog/Engine before fixing the side-panel dimensions.
+Continue reviewing the first-lesson → Help → helped result outline and Storage/Catalog contracts;
+choose an implementation candidate only if separately authorized. Do not start the catalog
+rebuild or expand the questionnaire to settled learning, reward or competition rules.
