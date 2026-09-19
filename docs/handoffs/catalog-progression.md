@@ -39,7 +39,15 @@ solo performance remains separate. Desks stays optional for training-provider/bu
 Small success feedback per meaningful completed action and a bigger finish are now confirmed.
 Soft success sounds after Start, with remembered mute and quiet typing, are confirmed; the tone is playful, polished and encouraging. The free beginner offer includes ribbon/Excel understanding and
 varied useful work, alongside
-navigation, editing, formatting and basic formulas. Detailed scope and migration remain open.
+navigation, editing, formatting and basic formulas. Beginner examples are broadly useful Excel
+situations, with finance depth later. After the first guest lesson, two short skippable/changeable
+questions ask experience and goal, then recommend a starting point. Returning home leads with
+Continue and easy catalog access. Ordinary results lead with learning/next steps and compact
+rewards, with stats expandable; speedrun results lead with time/PBs. Exact scope, layout/mapping
+and migration remain open. Achievements combine meaningful and smaller cheeky accomplishments;
+main milestones are visible and some playful awards are discoveries. They award recognition
+and occasional identity/cosmetic unlocks, not extra XP. Certificates cover substantial named
+skill sets. Existing earned progress remains protected.
 Owned files: **only `docs/handoffs/catalog-progression.md`**. CURRENT and PRODUCT remain chief-owned.
 
 ## Scope and outcome
@@ -1125,7 +1133,8 @@ onboarding or general questionnaire before practice is approved.
 2. **Helped result:** show completion, a plain explanation of zero XP for solution help or
    spreadsheet mouse use, and the actual saving state. Make Continue primary with Try solo clearly alongside, as confirmed September 19. Show a
    concise certificate-set progress update only when relevant; keep expanded metrics secondary.
-3. **Returning home:** lead with resume or one recommended next lesson and access to the catalog.
+3. **Returning home:** Continue-first with easy catalog access is confirmed September 19; lead
+   with unfinished or next recommended ordinary learning. Exact layout remains proposed.
    Personal records, per-drill Speedrun, optional Rapid-fire/challenges and Desks stay reachable
    with prominence to be settled. Do not impose a learn-first lock on experienced users.
 
@@ -1228,7 +1237,7 @@ still apply. This does not settle mistake detection or public-challenge interrup
 Continue-primary applies to the helped ordinary-lesson result, not every speedrun/event result.
 The working Try solo label and exact layout remain design details. No behavior change.
 
-### September 19: beginner audience and post-lesson personalization — pending
+### September 19: beginner audience and post-lesson personalization — both confirmed
 
 **Source:** continuing Wolf's request to clarify full platform intent after feedback, recovery
 and helped-result priorities are settled. Two further choices were presented:
@@ -1248,10 +1257,114 @@ and helped-result priorities are settled. Two further choices were presented:
    Self-reported experience is not qualifying readiness evidence. No profession-specific new
    curricula, automated assessment or scoring inference is authorized by this proposal.
 
-**Status:** both pending. Exact question wording/goal choices, recommendation mapping and when
-to show the save invitation remain open even if the two-question format is selected. Preserve
-free exploration and the experienced-user shortcut; recommendations are not new mandatory gates.
+**Explicit answers, September 19:** Wolf selected broadly useful Excel foundations with finance
+depth later, and two short skippable/changeable experience-and-goal questions after the first
+guest lesson. Both are confirmed. Recommend a starting point from the shared catalog, retaining
+the earlier Windows/Mac setup and experienced-user shortcut. Exact question wording/goal choices,
+recommendation mapping and when to show the save invitation remain open. Self-reported experience
+is not evidence for a readiness gate; recommendations do not add mandatory progression.
 
+### September 19: returning home and ordinary-result information — both confirmed
+
+**Source:** continuing the learner-flow clarification after audience and personalization were
+confirmed. These choices apply the simplicity requirement to concrete learner states, without
+changing the agreed spreadsheet workspace or creating another mode.
+
+1. **Returning home:** recommend one clear Continue card for unfinished ordinary learning or
+   the next recommended lesson, with easy catalog access. Alternatives: show the full catalog
+   first, or lead with a dashboard of progress, records and activity. Continue gives returning
+   learners an obvious next step; catalog-first favors free exploration; dashboard-first makes
+   metrics prominent but adds competing information. Preserve experienced-user direct routes,
+   per-drill speedruns, optional practice/challenges and progress access. This does not promise
+   restoration of interrupted scored attempts or alter continuous competitive timing.
+2. **Ordinary-lesson result:** recommend completion and next action first, a compact summary
+   of earned XP or certificate progress, and expandable detailed stats. Deliberate speedrun
+   results lead with time and personal bests. Alternatives: full stats/rewards every time, or
+   completion/actions only with all stats on the account page. Expandable detail retains the
+   requested metrics while reducing visual load; the full breakdown is richer but busier;
+   account-only detail makes individual-attempt inspection less convenient. Retention/privacy
+   and help/mouse eligibility do not change. Results must describe actual earned/saved facts.
+
+**Explicit answers, September 19:** Wolf selected Continue learning first with easy catalog
+access, and learning results first with expandable detailed stats. Both are confirmed. Returning
+home leads with one Continue card for unfinished or next recommended ordinary learning. Results
+lead with completion/next action and a compact actual XP/certificate-progress summary; detailed
+stats expand. Deliberate speedrun results lead with time and PBs. Helped results retain the earlier
+Continue-primary/Try-solo-alongside choice. Exact navigation, layout, save states, interruption
+behavior and record comparison still need specification. No implementation is authorized.
+
+### September 19: achievement mix and certificate size — confirmed with nuance
+
+**Source:** continuing the requested mechanics/feel review after the core home/result priorities
+were selected. These choices concern the size/frequency of existing reward types, not another
+progression system or extra account rank.
+
+1. **Achievement frequency:** recommend occasional meaningful milestones, for example completing
+   a skill set or a first eligible personal best. Ordinary meaningful actions already receive
+   small positive feedback; they need not each create a permanent achievement. Alternatives:
+   frequent collectible achievements for smaller accomplishments, or preserve existing earned
+   achievements while deferring new ones. Occasional milestones reduce clutter and make awards
+   distinctive; frequent awards give more collection moments but add visual/criteria overhead;
+   deferral narrows initial design scope. All existing earned achievements remain protected.
+   Examples are illustrative, not an approved achievement list or an XP bonus schedule.
+2. **Certificate size:** recommend substantial named skill sets, such as Excel Foundations.
+   Alternatives: smaller modules with more frequent certificates, or only full-length courses
+   with fewer certificates. Larger named skill sets give each completion certificate a clearer
+   scope; smaller modules make recognition more frequent; full courses make it less frequent
+   and delay that milestone. The approved completion standard still includes helped/mouse work.
+   This question does not reinstate a solo assessment, speed threshold or new mastery ladder.
+
+**Explicit answers, September 19:** Wolf selected substantial named skill sets, such as Excel
+Foundations, for certificates. For achievements he chose meaningful milestones plus smaller
+achievements, noting that he likes some of the existing cheekier ones. Preserve that playful
+range: do not narrow the collection to serious large milestones only. This is a qualified choice,
+not the unmodified occasional-milestones recommendation or approval of every existing trigger.
+All earned achievements remain protected. Exact award list, frequency, triggers, amounts, art,
+certificate sets and paid/legacy rules remain open. The substantial-set choice does not approve
+a specific Foundations curriculum or authorize a rebuild.
+
+**Discovery question, subsequently answered:** recommend making main learning milestones visible
+upfront while some playful achievements remain discoveries until earned. Alternatives: expose
+all achievements/requirements upfront, or keep most achievements hidden until earned. The mixed
+approach offers clear learning goals with occasional surprises; full visibility supports
+completionists but can turn the collection into another checklist; mostly hidden awards give
+less guidance. Exact hidden achievements are not selected, and an earned reward's optional
+public showcase remains governed by the approved privacy rules.
+
+**Explicit discovery and XP answers, September 19:** Wolf selected visible main milestones
+with some playful achievements hidden until earned. He also selected achievements as recognition
+without extra XP, including the proposed occasional identity/cosmetic unlocks. XP remains tied
+to eligible learning/practice; achievement awards do not bypass the help/mouse no-XP rule.
+Existing earned XP and achievements remain preserved. Exact secret-award list, identity unlocks,
+presentation and future criteria remain open; no new currency, account ladder or store selected.
+
+**Bounded existing-achievement evidence at 00df57a:** the existing investigator returned six
+examples; the lead checked the shared definition/flag/consumer slices and confirmed runtime files
+still match that accepted source. This is source inspection, not a live playtest or a selection
+of Wolf's favorite achievements.
+
+| Existing name / ID | Observed condition | Source |
+|---|---|---|
+| Tourist / x_tour | Definition says attempt ten drills, but the in-game context counts catalog drills with a PB: ten PB-bearing drills, not ten arbitrary starts. | drills.js:533; index.html:34322 |
+| Blink / x_sub5 | Any run in the achievement context with time_ms below 5000. | drills.js:535 |
+| No Wasted Keys / x_zero | Any context run with a nonzero optimal count exactly matching keystrokes. | drills.js:536 |
+| Thorough / x_slow | slowWins flag, incremented by a completion over 60 seconds with neither mouse nor Guided. | drills.js:538; index.html:25680–25684 |
+| Old Habits / x_mouse1 | mouseRuns flag, incremented on a completion using the mouse. | drills.js:539; index.html:25676–25681 |
+| Goblin hours / x_night | nightWin flag, latched on a no-mouse, non-Guided completion at local hour 00:00–03:59. | drills.js:541; index.html:25680–25685 |
+
+The in-game achievement sweep consumes these definitions at index.html:34338–34348; profile and
+stats walls also consume the shared collection (profile.html:387–433; stats.html:471–520).
+Current no-Guided flags are not proof of future no-solution-help eligibility. New ordinary/solo/
+scored attempts and timing versions need an explicit future award mapping while preserving earned
+IDs/high-water recognition. The current consumer skips a.hidden entirely, so that field is not
+already the approved secret-until-earned behavior. Do not silently revive retired awards or reuse
+that flag as a complete implementation. Current mouse-achievement descriptions use "ruin" wording;
+a future tone pass should preserve the cheeky character while fitting the approved encouraging
+learning experience. This is a recommendation, not authorization to rewrite earned records.
+
+**Status:** achievement mix, discovery, no-bonus-XP and substantial certificate-set size are
+answered. Only exact lists/criteria, named sets, identity rewards, eligibility mapping and designs
+remain open. No further question from this reward group is awaiting an answer.
 ## Evidence register
 
 All runtime paths/line references below refer to **00df57a**, unless another SHA is named.
@@ -1392,7 +1505,10 @@ every reward threshold before the basic experience is defined.
 | D10: entry and next step | Fresh device starts Navigation; resume/direct links and special-session entries exist. Tutorial nextKey and catalog next disagree; no established personalized assessment. | Guest lesson before personalization/account, with narrow setup before task versus full survey/account first. A quick platform choice prevents mismatched teaching without a broader upfront interview. | Use a small changeable Windows/Mac setup choice, then the guest lesson and later goals/experience/save invitation. Recommend a next step while preserving direct exploration and experienced-user access. | **Confirmed September 18–19:** short guest lesson before broader personalization/signup; Windows primary with suggested, changeable Windows/Mac choice before the first exercise. Reviewed private guest-progress carry-over approved. Exact supported-platform matrix, remaining personalization questions, save/import mechanics and next-step hierarchy remain open. |
 | D11: versioning/history | Results use drill keys; requirements often derive from today's catalog; some earned rewards already latch. Reusing a key could mix different work. | Reinterpret old records (simple but unfair); version requirements/content and retain evidence (more bookkeeping, preserves meaning). | Stable exercise identity plus scored revisions; version paths, credential requirements and competitive rules. Preserve old attempts, awards and certificates; separate incomparable boards. Explicit equivalence decisions determine whether old work satisfies a new requirement. Depends on final rules and content blueprints. | Preservation/no reset **confirmed**; migration/equivalence method **pending**. |
 | D12: special-session scope | Classic, Rapid-fire and Daily serve different activities; races/placement add contexts. Marathon, weekly and Tour have no current ordinary entry. | Equal mode prominence creates choice/complexity; core learning plus optional practice/events narrows the main journey; core only removes useful variety. | Learning first; optional Rapid-fire and selected benchmark/Daily challenges. Friend sharing uses those challenge rules. Keep dormant systems dormant pending agreed disposition; no deletion/revival. | **Confirmed September 18–19:** benchmark/Daily public focus, Rapid-fire optional quick practice without path/prerequisite role, benchmark/Daily friend sharing without a separate race mode. One Help entry and fewer visible choices. Precise navigation, optional-mode awards and other mode dispositions remain open. |
-| D13: account records, visibility and activity | Account clean-run/session records mix with device-only learning/PBs and derived rewards; no durable general unfinished/help-use history. “Accuracy” means route efficiency, and practice-time scope is incomplete. E10 plus DATA-04/06/07. | Full finished history plus unfinished summaries versus finished-only or milestones/PBs; private details with chosen highlights versus public performance summaries; activity time/days with or without optional streaks. | Apply the three approved principles. Complete the candidate record/metric dictionary, comparison/measurement rules and honest legacy-unknown treatment before implementation; keep retained facts, derived stats and public display distinct. | **Confirmed September 18:** every finished attempt including helped/private work plus lightweight deliberately restarted/ended-unfinished summaries; private detailed history and selected public highlights; active practice time/days and optional non-gating streak. Exact fields/formulas, replay capture, interruptions, day/idle rules, retention/archive and migration remain open. The entire candidate metric table is not blanket-approved. |
+| D13: account records, visibility and activity | Account clean-run/session records mix with device-only learning/PBs and derived rewards; no durable general unfinished/help-use history. “Accuracy” means route efficiency, and practice-time scope is incomplete. E10 plus DATA-04/06/07. | Full finished history plus unfinished summaries versus finished-only or milestones/PBs; private details with chosen highlights versus public performance summaries; activity time/days with or without optional streaks. | Apply the three approved principles. Complete the candidate record/metric dictionary, comparison/measurement rules and honest legacy-unknown treatment before implementation; keep retained facts, derived stats and public display distinct. | **Confirmed September 18:** every finished attempt including helped/private work plus lightweight deliberately restarted/ended-unfinished summaries; private detailed history and selected public highlights; active practice time/days and optional non-gating streak. Exact fields/formulas, replay capture, interruptions, day/idle rules, retention/archive and migration remain open. Achievements combine meaningful and smaller cheeky accomplishments;
+main milestones are visible and some playful awards are discoveries. They award recognition
+and occasional identity/cosmetic unlocks, not extra XP. Certificates cover substantial named
+skill sets. Existing earned progress remains protected. The entire candidate metric table is not blanket-approved. |
 
 September 18 follow-up to D10/D13: time, PBs, improvement history and key count are now selected;
 meaningful active practice qualifies for days. Helped results offer Continue plus an unassisted
@@ -1547,12 +1663,23 @@ answers/refinements from the dated register above:
 - Most XP for new accomplishments, smaller limited repeat rewards and no speed multiplier.
   Existing no-help/no-spreadsheet-mouse XP rules and earned-history protection remain.
 - Focused lessons lead to practical tasks and larger models within one learning journey.
-- Completion certificates for selected lesson/drill sets; helped and spreadsheet-mouse
+- Beginner examples use broadly useful everyday Excel situations, with finance/modeling depth
+  later. After the first guest lesson, ask two short skippable/changeable questions about Excel
+  experience and goals, then recommend a starting point from the shared catalog. Exact wording,
+  choices/mapping and save-invitation sequence remain open.
+- Completion certificates cover substantial named skill sets, such as Excel Foundations; helped and spreadsheet-mouse
   completions count. Replace the independent-assessment certificate recommendation, preserving
   existing issued credentials and separate readiness/solo/performance rules. Exact sets/access open.
 - Ordinary-learning mistakes allow calm recovery, undo or another try, without lives, XP
   deductions or forced restart; existing correctness/help/mouse rules still apply. After helped
   ordinary lessons, Continue is primary with Try solo clearly alongside.
+- Returning home leads with one Continue card and easy catalog access. Ordinary results show
+  completion/next action first, compact earned XP/certificate progress and expandable detailed
+  stats; deliberate speedrun results lead with time/PBs. Exact layout and save states remain open.
+- Achievements mix meaningful milestones with smaller playful/cheeky accomplishments; Wolf
+  likes some existing ones. Main milestones are visible; some playful achievements reveal on
+  earning. Achievements provide recognition and occasional identity/cosmetic unlocks, with no
+  bonus XP. Preserve earned items; exact future triggers, hidden list and unlocks remain open.
 - Desks remains a separate optional feature for business/training-provider use. WSP/Training
   the Street are audience examples, not commercial relationships or integrations.
 - Brief success feedback for meaningful completed actions and a bigger task-finish celebration
@@ -1567,8 +1694,11 @@ answers/refinements from the dated register above:
 **CURRENT proposal:** all six choices and both platform/certificate refinements are answered.
 Replace the prior all-pending status. Review concrete first-lesson/helped-result/returning-home
 states next, applying approved feedback/sound/tone, calm mistake recovery and Continue-primary
-helped results. Two new questions are pending: beginner audience/context and the post-lesson
-personalization format. Then settle precise
+helped results. Beginner audience and two-question post-lesson personalization are confirmed.
+Returning-home/result priorities, substantial certificate sets and mixed meaningful/smaller
+cheeky achievements are confirmed, including visible milestones/some secret discoveries and
+no bonus XP for achievements. No question in the current packet remains unanswered.
+Then settle precise
 XP/certificate/platform/access/metric and migration details. Existing
 mode dispositions not expressly selected remain proposals. Ownership/baselines unchanged:
 only this handoff; 00df57a source evidence retained, 16ee830 implementation baseline.
@@ -1582,9 +1712,17 @@ questions. Sole-file diff, 19 relative links and whitespace checks passed. Compl
 commit/push and remote identity verification for the handoff. The initial answer/feel packet
 was published and remotely verified at c52d067; cf41395 recorded the first explicit feel answer.
 This follow-up records sound/tone and recovery/result selections, then two new pending audience/
-personalization questions. No new source review or application tests were needed.
+personalization questions. A subsequent explicit answer confirms both audience/personalization
+choices, followed by both home/result priorities, mixed milestone/cheeky achievements, substantial certificate sets, mixed visible/secret achievements and no achievement bonus XP. All presented questions in this sequence are answered. Before that update, remote CURRENT blob
+b463ecc49e0848ed05ca73a64e9411c6bf1b7eab and PRODUCT blob
+2a044ec7c444a64f5181da50604c301347e35e21 were read; baseline/ownership remain unchanged.
+Shared guidance had reconciled c52d067, while this branch also preserves the later verified
+927fd4b feel/recovery approvals. A bounded existing-achievement inventory was subsequently
+completed by the existing investigator; the lead cross-checked relevant source definitions, flags
+and the in-game consumer. This found the attempt/PB wording mismatch and hidden-flag distinction
+recorded above. No full audit, security work or application tests repeated.
 
-**Next bounded turn:** record the two pending audience/personalization selections, then review the concrete
+**Next bounded turn:** apply the completed decision packet and bounded achievement evidence to the concrete
 learner states against the simplicity constraint
 and these decisions. Resolve only consequential remaining hierarchy, feature-disposition and
 reward/measurement/access details in small groups; preserve confirmed answers. No catalog
