@@ -10,6 +10,7 @@ Refreshed guidance: `4d964901a4f06493695c11bb8f04c4769d607ab0`; its CURRENT upda
 Shared-guidance refresh: `2b16827aecf9b1c773f9b48d9b986c506c061c8a`; incorporates Storage's proven-comparability and short published submission-grace principles.
 Latest shared-guidance read for the grid clarification: `2596378b5073118ff2c3794188727c5ccc57a68f`. Accepted code baseline and ownership remain unchanged.
 Approval-recording refresh: `0984834f524966b0da4cabd971857d189f9283aa`; chief has integrated the six presentation choices and historical grid findings. Wolf's subsequent grid approval is recorded here for the next chief integration.
+Mockup refresh: `d008402eecdf63bf5051aadab73ba910da0436b4`; chief has integrated the grid approval and Catalog's bounded compatibility response. Accepted application baseline remains unchanged.
 Owned file: **only `docs/handoffs/experience-site.md`**.
 State: planning outlines reviewed; the six explicit presentation choices and grid direction below are approved. Remaining exact layouts stay proposals. No application implementation, merge or deployment. Final commit identity is supplied by Git history and the verified chief handoff.
 
@@ -608,6 +609,52 @@ before Wolf answered the questions. It did not run the app; the local measuremen
 lead's separate evidence. This approval-recording update reuses that review and diagnostic without
 claiming new tests. Exact minimum supported size, cell dimensions, zoom behavior, scrolling/focus
 mechanics and future large-model geometry remain open.
+
+## September 19: illustrative layout mockup
+
+Wolf requested a brief mockup. An isolated in-conversation preview illustrates the approved
+structure with the current graphite/green aesthetic (and matching light appearance), ribbon,
+formula bar and 20-row/A–J sheet. This schematic preserves its structure on GitHub:
+
+```text
+hotkey.gg       Home   Catalog   Challenges                  Guest / Sign in
+
+Everyday Excel / First lesson                  Help  Sound off  Lesson options
+Your first worksheet
+
++---------------------------------------------+  +-------------------------+
+| Ribbon tabs and familiar formatting tools    |  | Short goal              |
+| A1 | fx | Shopping list                      |  |                         |
+|    A  B  C  D  E  F  G  H  I  J              |  | Current checkpoint      |
+| 1  [small shopping-list example]             |  |                         |
+| ...                                         |  | Expand full checklist   |
+| 20 [remaining usable worksheet space]        |  |                         |
+| Sheet tab                                   |  | Calm guidance           |
++---------------------------------------------+  +-------------------------+
+```
+
+- The same right-hand area switches to Help or an ordinary result; the sheet keeps its width
+  and position. Help separates explanation from solution steps and states the assistance effect.
+- The helped result keeps the finished sheet visible, Continue primary, Try solo alongside,
+  optional account saving and an honest account-unsaved label. Nothing is actually submitted.
+- The preview selector and optional panel-width/row-height adjustments explore presentation
+  only. Example shopping-list content, copy, 246px panel and 23px rows are illustrative, not
+  approval of the first lesson, final geometry or an implementation contract.
+- The mock sheet is a visual table, not the engine: it does not implement editing, full keyboard
+  navigation or real grading/saving. At narrow conversation widths it stacks the panel and lets
+  the table scroll; that accommodation is not a selected production breakpoint or phone-support policy.
+
+Mockup-only validation: parsed the fragment; checked 20 rows/200 cells, Help/steps/result/retry
+transitions, truthful save-preview feedback and unchanged sheet width across views. Inspected
+the 1024px rendering; a 360px check found no page overflow and retained table scrolling. No browser
+script errors. This isolated preview blocked external requests and did not load application code
+or live services. It is not an application playtest or accessibility certification.
+
+Catalog's [7193044 response](https://github.com/rathunter69/Hotkey.gg/blob/7193044d41b348d3f31df4d3f4ff53457a8b39a8/docs/handoffs/catalog-progression.md#september-19-usable-worksheet-space--implications-for-future-lesson-outlines)
+was fetched/read: no conflict with settled content rules. Future outlines separate working
+region, usable extent, required navigation and graded outcome. Boundary/row-data, tutorial,
+width-grading and history checks remain scoped Engine/UI work. Pointer-scrolling eligibility
+is not silently decided by the visual; no new input-scoring exception or penalty is introduced.
 
 ## Verification and handoff
 
