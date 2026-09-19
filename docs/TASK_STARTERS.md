@@ -187,6 +187,18 @@ lesson/module teaches, producing a revised roadmap of chapters, tracks, drills a
 objectives against the current eight-chapter/74-drill catalog. This authorizes curriculum planning,
 not authoring replacement application content or implementing the rebuild.
 
+**Wolf's later correction:** redesign the catalog and chapter structure completely around learning;
+do not merely reorder the 74 existing drills or guarantee each a future slot. Old-ID mapping is
+for source reuse/history protection. Learner goals must be discrete and name actual visible
+elements in each variant, e.g. “Make Weekly Sales Report bold,” not a vague styling aim or
+“make the title in A1 bold.” Internal geometry/graders may use addresses; ordinary instructions
+use the drill's actual titles/rows/columns/sections/periods. Preserve legitimate solutions.
+
+**First checkpoint delivered:** [71cc00e](https://github.com/rathunter69/Hotkey.gg/blob/71cc00e3b6fa71933a3871360a2d9d059a8ced61/docs/handoffs/drill-catalog.md) supplies the whole map,
+74-ID crosswalk and four blueprints. The ten-chapter proposal, Foundations subdivision and
+project placement await Wolf in the Catalog task. Continue that decision packet rather than
+repeat the inventory or start authoring every lesson. No replacement content is approved.
+
 **Owner:** continue **Audit catalog and learner flow**, task
 `01a0b148-2693-7901-af91-934c83cabe1d`, on `codex/catalog-flow-review`. Do not start a competing
 Catalog task. The chief assigns `docs/handoffs/drill-catalog.md` exclusively to this owner for
