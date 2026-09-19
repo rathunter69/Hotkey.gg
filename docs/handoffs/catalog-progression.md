@@ -1726,3 +1726,42 @@ reward/measurement/access details in small groups; preserve confirmed answers. N
 rebuild, feature deletion, benchmark study, enterprise integration, billing activation, merge
 or implementation. Preserve Foundations feedback and earned records. This is an evolving plan,
 not final catalog/launch approval.
+
+## September 19: coordination with UI and saved-progress planning
+
+The UI planning owner, task 01a0b908-48f9-7f32-94b2-d0ca46f13de3, reported Wolf's assignment to
+translate the approved flow into first guest lesson, Help, helped/solo results, returning home,
+catalog and optional challenge screen outlines. It owns only docs/handoffs/experience-site.md
+on its dedicated branch. The saved-progress owner, task 01a0b908-9ee9-7d31-afb6-9733f5d421bf,
+reported Wolf's planning-only assignment for persistence, privacy, comparison and leaderboard
+contracts, owning docs/handoffs/leaderboards-storage.md on codex/leaderboards-storage-review.
+These are owner-reported user assignments; this note does not dispatch additional modules.
+
+Both should reuse the learner decisions at 15de791605cbfb4fa6bbc26c2d8f5f4a94139477. A fresh
+remote read matched its handoff file blob f274e62b491b350c3ad388baacf142c58337a2f7. Remote CURRENT
+(blob e164a7bef2293d0ee37516b37dc2d5ff9fae3458) and PRODUCT
+(blob ea48f7215d6c74e9860e7ff76d6e75d267ed8752) already reconcile all decisions through that
+checkpoint; there are no newer unshared Catalog approvals. TASK_GUIDE ownership was rechecked
+(blob d21ce8996756a53d334221884357018dcc59880e). Runtime evidence stays at 00df57a by chief
+agreement; 16ee830 remains the accepted implementation baseline, read with latest guidance.
+
+- Catalog retains learner states/transitions, learning/reward/eligibility rules, prerequisite
+  semantics and this decision register. Bring proposed rule changes back here/through the chief.
+- UI owns presentation, navigation, keyboard access and honest save/error copy. Reuse the approved
+  priorities and this handoff's illustrative states; do not mistake the examples for final layouts.
+  Catalog will review semantic conflicts and will not duplicate the assigned screen-outline work.
+- Saved-progress owns persistence/privacy/comparison proposals and eventual reliable delivery.
+  It may define candidate records, idempotency, synchronization and comparison contracts within
+  approved rules, clearly marking unresolved details. UI copy must follow these actual states;
+  Catalog does not independently invent save guarantees, scoring equivalence or retention rules.
+- The chief retains shared PRODUCT/CURRENT and cross-area integration. Payments retains eventual
+  entitlements/paid-access rules. Existing Security/Engine findings and reservations stay with
+  their owners; no implementation, new audit, billing, merge or deployment follows from this note.
+
+All presented Catalog questions remain answered. Still open: precise XP formulas/award events,
+record/metric definitions, equivalent tasks and comparison pools, legacy eligibility/mapping,
+interruption/resume and guest-import mechanics, exact certificate/achievement/access lists and
+final screen layouts. Do not silently resolve these while writing UI or storage specifications.
+
+This checkpoint changes only the coordination record in this handoff. No user product rule,
+source evidence or application behavior changes; no app tests or new agents are needed.
