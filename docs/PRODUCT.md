@@ -518,7 +518,7 @@ records concern new XP, solo-readiness and current-standard PB recognition; know
 completion is preserved, with new path/certificate equivalence specified separately. Neither
 guest-eligibility option is selected. Security review of proof/public permission details remains open.
 
-**September 19 — six UI presentation choices approved:**
+**September 19 — UI presentation choices and later visual-preservation correction:**
 
 Source: Wolf's explicit answers in **Plan UI/UX onboarding flows**
 (`01a0b908-48f9-7f32-94b2-d0ca46f13de3`), read by the chief and recorded in the
@@ -528,8 +528,9 @@ Source: Wolf's explicit answers in **Plan UI/UX onboarding flows**
 - A small Challenges link sits beside Home and Catalog.
 - Keep the short goal and current outcome/checkpoint visible; the full outcome checklist expands.
   A checkpoint describes the required result, not a revealed solution or mandatory keyboard route.
-- Ordinary lesson results appear in the side panel with the completed worksheet visible.
-  Existing Continue/Try solo and expandable-stat priorities remain unchanged.
+- The earlier answer placed ordinary results in the side panel. Wolf's later feedback favors
+  the older completion overlay popup instead; the revised preview should restore that treatment.
+  Continue/Try solo and expandable-stat priorities remain unchanged.
 - Offer a secondary Save to an account action after the first guest result, plus a quiet Home
   reminder. Continuing without signup stays available; import consent and verified saving remain separate.
 - Put less-used controls in one small Lesson options menu, keeping Help and mute visible.
@@ -545,6 +546,21 @@ handling, controls and wording remain proposals. Catalog's [earlier bounded sema
 found no material conflict or new learner state in the initial outline; Storage found no material
 mismatch in its saving table. Do not extend those reviews into approval of all later proposals
 or working saves, keyboard/platform/audio/accessibility behavior. No implementation is authorized.
+
+**Later September 19 steering after the first mockup:** the chief read Wolf's actual feedback
+in UI task `01a0b908-48f9-7f32-94b2-d0ca46f13de3`. He rejected the generic restyling and asked
+to preserve the existing built-in color themes, button design, helpful ribbon UI and key hints,
+selected-cell outline/small green handle, and general look. Use the existing UI infrastructure
+for the revised preview rather than a fresh visual reconstruction. The first
+[mockup record at 079bd2f](https://github.com/rathunter69/Hotkey.gg/blob/079bd2f426a12b4f0a0f1a0e3c83b53cdcfb972c/docs/handoffs/experience-site.md#september-19-illustrative-layout-mockup)
+is evidence of the rejected styling, not visual approval.
+
+Wolf also said he liked the older completion overlay popup. This latest preference supersedes
+treating the prior side-panel result selection as the required direction: restore the familiar
+overlay in the revised preview, keeping Help/guidance beside the worksheet. It does not approve
+an unseen revision, every historical popup behavior or a new reward/assistance rule.
+The revised UI handoff is pending at this checkpoint; the explicit feedback is preserved here
+from the task read. No application implementation, theme removal or broad redesign is authorized.
 
 **September 19 — historical grid guidance recovered and future grid direction approved:**
 
@@ -569,8 +585,9 @@ the [approved direction is recorded at 511fd1f](https://github.com/rathunter69/H
   Lessons can use only the space they need; no new density or completion quota is implied.
 - Adapt cell dimensions within readable limits. When space is tight, suggest fullscreen and
   allow worksheet scrolling; fullscreen is optional rather than the chosen mandatory Start gate.
-- Share the existing right-hand area between instructions, Help and ordinary results, switching
-  its content while preserving worksheet position and a stable frame during row operations.
+- Reuse the existing right-hand area for instructions and Help, preserving worksheet position.
+  The original approval also placed ordinary results there; the later completion-overlay
+  preference above supersedes that result placement. Keep row operations within a stable frame.
   The current 250px panel width is not selected as a new specification.
 
 Both grid questions are answered. This learning-first rationale does not change assistance,
@@ -622,9 +639,9 @@ remain protected; implementation still requires a separately authorized bounded 
 | Entry, sharing and simplicity | Offer reviewed/confirmed private guest-history carry-over at signup; optional Rapid-fire; benchmark/Daily friend sharing without separate race mode; small Challenges link beside Home/Catalog; one Lesson options menu with Help/mute visible; fewer competing modes/settings | Import/ownership mechanics, remaining navigation/action hierarchy, remaining feature dispositions and mode rewards |
 | Feedback and recovery | Brief success feedback for meaningful actions and bigger task finish; soft success sounds after Start with remembered mute, quiet typing; playful/polished/encouraging; calm ordinary-learning undo/retry without lives, XP deductions or forced restart | Exact assets/timing/accessibility and mistake detection; correctness/Help/input and continuously running scored time remain unchanged |
 | Certificates | Completion of substantial named skill sets, including helped/mouse completions; preserve issued credentials; separate from solo readiness/XP/time eligibility | Exact sets/checks, names, versions, account/paid eligibility and legacy equivalence; no independent-skill or accreditation claim |
-| Achievements and home/results | Meaningful and smaller playful achievements; main milestones visible, some discoveries hidden until earned; recognition/occasional identity unlocks, no bonus XP. Continue-first home; ordinary results in the side panel with completed sheet visible, completion/action first and expandable stats; speedruns time/PB first | Exact achievement list/triggers/unlocks, display/access, layouts and historical mappings |
+| Achievements and home/results | Meaningful and smaller playful achievements; main milestones visible, some discoveries hidden until earned; recognition/occasional identity unlocks, no bonus XP. Continue-first home; ordinary results favor the familiar completion overlay after later feedback, completion/action first and expandable stats; speedruns time/PB first | Exact achievement list/triggers/unlocks, display/access, layouts and historical mappings |
 | Catalog | Prefer a likely full rebuild, but preserve substantial earlier Foundations feedback | A full plan must precede implementation; the old v5 proposal is not automatically selected |
-| Worksheet space | Standard 20×10 workspace with every visible row usable; readable adaptive dimensions, optional fullscreen and worksheet scrolling; one shared instructions/Help/result area; stable frame during row operations | Exact geometry, keyboard focus/scroll contract, supported sizes/devices, grading/tutorial/history compatibility and future large-model extent; implementation separately authorized |
+| Worksheet space | Standard 20×10 workspace with every visible row usable; readable adaptive dimensions, optional fullscreen and worksheet scrolling; existing instructions/Help area with later preference for completion overlay; stable frame during row operations | Exact geometry, keyboard focus/scroll contract, supported sizes/devices, grading/tutorial/history compatibility and future large-model extent; implementation separately authorized |
 | Order of work | Easy security/account fixes → catalog/progression separation → repository/database cleanup → site framework → planned catalog redesign | Size/acceptance of each bounded repair or cleanup batch |
 
 The earlier untimed-free-Foundations/everything-else-paid suggestion is superseded by the
