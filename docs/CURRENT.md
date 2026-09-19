@@ -58,6 +58,27 @@ framework rewrite is authorized. Structural moves and security/gameplay changes 
 separately reviewable. Do not restore retired tours, invite gates, membership tables or the
 practice/ranked mode switch from historical instructions.
 
+## Newly authorized curriculum-planning workstream — September 19
+
+Wolf requested a roadmap revising the chapter/74-drill structure: chapters/tracks/modules,
+what each lesson teaches, learning objectives and Foundations coverage. The chief assigns this
+planning batch to the existing **Audit catalog and learner flow** task, not a duplicate session.
+
+Owned deliverable: `docs/handoffs/drill-catalog.md` on its existing `codex/catalog-flow-review`
+branch. The systems handoff remains `catalog-progression.md`; shared CURRENT/PRODUCT stay here.
+[Workstream brief and review gates](TASK_STARTERS.md#curriculum-roadmap-workstream--september-19):
+canonical current catalog and Foundations-feedback baseline; proposed whole-platform skill/
+chapter/track map; every current drill mapped to a reasoned keep/adapt/combine/split/retire-candidate
+destination; detailed Foundations objectives and 3–4 representative lesson blueprints.
+No target count is predetermined. Proposed removals/mappings do not authorize content deletion,
+migration, progress changes or implementation. Review the map and Foundations depth before
+expanding every lesson. UI, Storage and Payments retain their existing responsibilities.
+
+The chief's existing independent reviewer checked ownership and planning boundaries: ground
+inventory in canonical runtime sources, separate historical planning maps, preserve legitimate
+routes/records, and label access/certificate/prerequisite/migration recommendations correctly.
+No duplicate source audit or application tests were needed to define the workstream.
+
 ## Verified source and validation baseline
 
 | Source | Verified state |
@@ -95,9 +116,10 @@ All preserve original local work and earlier remote branches.
 | **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; `codex/security-replay-baseline` | Baseline complete and accepted at 54640b0, exact tested source eaab864. Two fresh 52-migration replays and two complete 56-assertion suites: each 44 pass/12 identical DATA-01 failures, cleanup pass. Test infrastructure works; permissions remain unrepaired. | `supabase/tests/`, database-test docs/handoff and dedicated test workflows. Current batch complete; no DATA-01 repair assigned. Preserve failed-before evidence. No production/schema/runtime changes. |
 | **Audit starter 3 cleanup candidates**, `01a0af90-7fb2-7571-a5d6-b82354d57540`; `codex/repository-structure` | Complete on its branch at cf8c61b: archived the historical PROJECT_CONTEXT record, kept a root compatibility page, repaired links and recorded the remaining structure plan. Chief verified preserved text and docs-only file manifest. Included in accepted combined checkpoint 00df57a; no main merge. | `README.md`, `docs/ARCHITECTURE.md`, selected historical documentation/archive paths and non-shared documentation links, `docs/handoffs/repository-structure.md`. No runtime, generated pages, migrations, test harness or workflow edits. |
 | **Integrate account testing changes**, `01a0b0f9-09da-7a62-9dd2-dd9baeac388d`; `codex/groundwork-db-integration` | Complete and accepted at 16ee830: all accepted account/browser/structure/database-test groundwork and evidence coexist. Seven combined static checks, 11 guard tests and plan pass; exact executable equivalence preserves original browser and DB results without redundant full reruns. | Integration handoff `docs/handoffs/groundwork-db-integration.md`; reservations released. No permission repair, runtime/migration/package/gate/deploy change, main merge or production action. Latest shared guidance is read separately. |
-| **Audit catalog and learner flow**, `01a0b148-2693-7901-af91-934c83cabe1d`; `codex/catalog-flow-review` from preserved 00df57a | 15de791 verified: everyday foundations, two post-lesson questions, Continue-first home, concise ordinary results/expandable stats, substantial completion-certificate sets and mixed playful achievements approved. Main milestones visible, some discoveries hidden; recognition/occasional identity unlocks, no bonus XP. | Owns only `docs/handoffs/catalog-progression.md`; all current questions answered. Next precise learning/content contracts; active UI planning develops screen outlines, and active storage planning develops persistence/comparison contracts. Payments remains recommended. Exact lists, triggers, access, layouts and migration remain open; no implementation authorized. |
+| **Audit catalog and learner flow**, `01a0b148-2693-7901-af91-934c83cabe1d`; `codex/catalog-flow-review` | Prior decision/grid handoff 7193044 retained. Wolf now authorizes a curriculum roadmap against eight current chapters/74 drills: full skill/chapter/track map, drill crosswalk, Foundations feedback and representative lesson blueprints. All replacement structures/counts remain proposals until reviewed. | Chief assigns new exclusive `docs/handoffs/drill-catalog.md` for this bounded teaching-plan batch; `catalog-progression.md` retains systems provenance. Coordinate existing UI/Storage/Payments, preserve records and teach-before-use, no new content/runtime/SQL/generated edits. First new handoff pending; no duplicate Catalog task. |
 | **Plan UI/UX onboarding flows**, `01a0b908-48f9-7f32-94b2-d0ca46f13de3`; `codex/experience-site-plan` from accepted 16ee830 | Latest handoff 23a0025 remote-verified. Native-style preview/popup retained; Wolf says direction is closer and likes file-style browsing, but questions mandatory keyboard site navigation. Picker already supports clicks and keys; pointer-plus-optional-shortcut presentation remains a recommendation. | Owns only `docs/handoffs/experience-site.md`. Element blocking/proportions unresolved; displayed artifact uncertain. Compare existing app/relevant preview at matching dimensions, then review focus/scroll and scoped compatibility. No whole-preview approval, new visual, app changes or new Engine task. |
 | **Review saved progress contracts**, `01a0b908-9ee9-7d31-afb6-9733f5d421bf`; `codex/leaderboards-storage-review` from accepted 16ee830 | Initial planning contract complete and remote-verified at e9f3e6e. Private records/import, duplicate-safe saves, failures, comparisons and public submissions specified as proposals. Confirmed: separate groups until equivalence proven; short published submission grace. Independent and Catalog reviews recorded; UI saving table aligned. | Owns only `docs/handoffs/leaderboards-storage.md`. Next guest-import eligibility examples with Catalog/Security; preserve known completion separately from proposed new benefits. Exact proof/grace/retention and Security review remain open. No application/schema/live changes; CURRENT/PRODUCT chief-owned. |
+| **Plan payments access rules**, `01a0b969-ac99-7553-bc36-42868257ff55` | Wolf has started Area 10 planning; chief read its actual starter and two answers: a few complete advanced previews free, selected public challenges free, certificates follow content. Exact lists/offer/lifecycle remain open; no billing activation. | Owns only `docs/handoffs/payments.md` on its dedicated planning branch; branch/remote handoff not yet verified here. Coordinate curriculum inclusion with Catalog, preserve earned records; CURRENT/PRODUCT chief-owned. |
 | Chief coordinator, this task | Project overview and platform-wide design discussion, priorities, product decisions, GitHub/security/structure review and handoff reconciliation. | `docs/CURRENT.md`, `docs/PRODUCT.md`, `docs/handoffs/chief-groundwork.md`. Other tasks send proposed corrections instead of editing these. |
 
 Testing checkpoint [4ea428b](https://github.com/rathunter69/Hotkey.gg/commit/4ea428ba1504ee04b3d01943df5f7cd1b68a2c4d)
@@ -423,7 +445,9 @@ repairs; Desks retains enterprise workflows. Planning prompts are saved in
 Area 5 in **Plan UI/UX onboarding flows** (`01a0b908-48f9-7f32-94b2-d0ca46f13de3`).
 Wolf also started Area 7 in **Review saved progress contracts**
 (`01a0b908-9ee9-7d31-afb6-9733f5d421bf`), owning only its leaderboards-storage handoff.
-Area 10 remains recommended, not assigned. UI/Catalog/storage have exchanged their boundaries
+Area 10 is now started in **Plan payments access rules**
+(`01a0b969-ac99-7553-bc36-42868257ff55`); its user starter and initial answers were read by the
+chief, with a verified area handoff still pending. UI/Catalog/storage have exchanged their boundaries
 and confirmed-rule references; Catalog records the coordination at 194db93. UI owns screens
 and truthful copy, storage owns persistence/comparison proposals, and Catalog retains state/
 eligibility/content meaning. No task may invent another owner's save guarantees or change
@@ -486,8 +510,9 @@ classification is not silently decided here; no new scoring exemption or penalty
 Next Storage packet uses helped,
 solo and ambiguous guest-history examples to settle new-benefit eligibility while preserving
 known completion. Security review of guest proof/public permissions remains outstanding.
-Keep skill-map/curriculum blueprints with the catalog/learning owner. All scopes are planning-only;
-the full plan still precedes rebuilding.
+The new curriculum roadmap assignment above keeps the skill map and blueprints with the existing
+Catalog/learning owner. Planning scopes remain separate from implementation; the full agreed plan
+still precedes rebuilding.
 
 Recommended parallel work in response to Wolf's question: a focused DATA-01 desk-permission
 repair using the existing 12 failing cases and preserving the 44 passing controls. Reuse the
