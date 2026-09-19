@@ -92,6 +92,15 @@ For a new area task, read `docs/TASK_GUIDE.md` for its starter scope and coordin
 - Grade correct spreadsheet outcomes and accept legitimate routes. Preserve keyboard learning,
   useful guides, clear feedback, and realistic completed work. Do not restore retired tours,
   invite gates, membership tables, or practice/ranked mode switches without a new product decision.
+- Wolf clarified September 19 that the planned curriculum/chapter rebuild must be designed
+  around learning, not merely reorder the current 74 drills or guarantee them replacement slots.
+  Preserve their history and useful source material. Learner-facing goals must be discrete and
+  name actual visible titles, rows, columns, sections or periods in that drill/variant: “Make
+  Weekly Sales Report bold,” not vague styling goals or “make the title in A1 bold.” Coordinates
+  may define internal layouts/graders and be taught as a concept; ordinary task goals use named
+  elements. Precision is not a hidden route/order restriction or assistance penalty. A specific
+  technique requirement must be explicit and separate from correct-outcome completion. The
+  current curriculum map remains proposed; no content rebuild or deletion follows from planning.
 - Structural cleanup must preserve behavior. Do not remove an old file until its remaining
   runtime, generator, test, deployment, and documentation consumers have been checked.
 - Do not call an inventory a completed audit, a passing static check a successful playtest,
