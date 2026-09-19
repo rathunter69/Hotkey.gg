@@ -7,6 +7,7 @@ Branch: `codex/experience-site-plan`
 Starting accepted code: `16ee8306a8c170db9f8fe2e051b44b0519782ae1`
 Shared guidance read remotely: `4ec23e01cb958d5dfed5e92875db3f7002eab1e1` on `codex/repository-foundation`.
 Refreshed guidance: `4d964901a4f06493695c11bb8f04c4769d607ab0`; its CURRENT update registers this planning assignment, with no changed product policy.
+Final shared-guidance refresh: `2b16827aecf9b1c773f9b48d9b986c506c061c8a`; incorporates Storage's proven-comparability and short published submission-grace principles. Accepted code baseline and ownership remain unchanged.
 Owned file: **only `docs/handoffs/experience-site.md`**.
 State: planning outlines reviewed; full layouts remain proposals except the two explicit choices below. No application implementation, merge or deployment. Final commit identity is supplied by Git history and the verified chief handoff.
 
@@ -33,6 +34,7 @@ details remain proposals. They do not authorize implementation or change any lea
 | [Latest-read CURRENT](https://github.com/rathunter69/Hotkey.gg/blob/4ec23e01cb958d5dfed5e92875db3f7002eab1e1/docs/CURRENT.md), [PRODUCT](https://github.com/rathunter69/Hotkey.gg/blob/4ec23e01cb958d5dfed5e92875db3f7002eab1e1/docs/PRODUCT.md), [AGENTS](https://github.com/rathunter69/Hotkey.gg/blob/4ec23e01cb958d5dfed5e92875db3f7002eab1e1/AGENTS.md), [TASK_GUIDE](https://github.com/rathunter69/Hotkey.gg/blob/4ec23e01cb958d5dfed5e92875db3f7002eab1e1/docs/TASK_GUIDE.md) | Authority, ownership, settled September 18–19 policy and documentation-only validation exception. This worktree's older shared documents are not the latest product brief. |
 | [Catalog handoff at 15de791](https://github.com/rathunter69/Hotkey.gg/blob/15de791605cbfb4fa6bbc26c2d8f5f4a94139477/docs/handoffs/catalog-progression.md) | Reuse its proposed beginner, experienced, returning, competitor and certificate-holder journeys; learner semantics and detailed contracts stay with that owner. The dated approvals supersede older proposed wording in the report. |
 | [Catalog ownership confirmation at 194db93](https://github.com/rathunter69/Hotkey.gg/blob/194db93780b4e9a3187271687d2d049e2fe4922f/docs/handoffs/catalog-progression.md#september-19-coordination-with-ui-and-saved-progress-planning) | Catalog confirmed no newer unshared decisions, delegated presentation ownership to this assigned UI task, and will not duplicate these outlines. Reused its first-exercise/helped-result/home sketches as well as its journeys. |
+| [Storage contract at 8c7686c](https://github.com/rathunter69/Hotkey.gg/blob/8c7686c649eb15d0dbc5429e79208ea11ff311e6/docs/handoffs/leaderboards-storage.md) | Owner confirmed no material mismatch with this handoff's b0d2f17 saving table. Receipt/award/publication, unknown replies, owner isolation, partial reads/imports and local failure agree. Detailed implementation contract remains proposed. |
 | [Accepted integration at 16ee830](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/docs/handoffs/groundwork-db-integration.md) and [account/testing handoff](account-testing-integration.md) | Accepted code lineage. Existing browser evidence is green; database permission evidence remains 44 pass/12 fail. Neither establishes the proposed experience or live saving. |
 | [Experience audit](../audit/EXPERIENCE.md), [engine/content audit](../audit/ENGINE_CONTENT.md), [audit index](../audit/README.md), [architecture](../ARCHITECTURE.md) | Reused EXP-01–04 save/error/keyboard findings, onboarding overlap, E7 inconsistent next lesson, and source/generated-page ownership. Findings are not newly reproduced or repaired here. |
 
@@ -75,6 +77,9 @@ These are coordinated draft contracts, not newly approved storage behavior or wo
   satisfy readiness. No XP gates, exact paid list or new checkpoint is chosen here.
 - Keep every approved kind of history private by default, deliberate public challenge results
   separate, and existing earnings/credentials/history intact. No old timing equivalence assumed.
+- Storage's September 19 approvals: compare PBs only across proven-comparable task, clock and
+  Excel-setup groups; retain other groups visibly. Delayed public submissions have a short
+  published grace period, with duration, trusted evidence and finalization still open.
 - Brief meaningful-action success feedback, bigger finish, soft sounds after Start, obvious
   remembered mute, quiet typing. Pixel art stays with identity/achievements.
 
@@ -295,6 +300,13 @@ secondary. Interrupted/invalid/unverified attempts need the contract's truthful 
 fresh Start route; there is no implied clock pause or resume. Old and new timing groups stay
 visibly distinct when a comparison is shown.
 
+Compare times only when task, timing rules and Excel setup are proven comparable; preserve
+other records in clearly labelled groups. For disconnected benchmark/Daily submission, show
+public submission pending and the published grace deadline when defined, independently of
+whether private saving is confirmed. Explain that late/unverifiable results remain private
+history without a public placing. Do not invent a grace duration or claim queued work is durable
+without a receipt/local-write confirmation. Event evidence and finalization stay Storage-owned.
+
 Sharing reuses the same benchmark/Daily identity and rules. A proposed Share link action copies
 the challenge link only after request; no separate race mode, private history exposure or paid
 access bypass. Loading, successfully empty, unavailable and partially loaded boards are distinct;
@@ -350,6 +362,7 @@ Completion, award confirmation, account retention and public posting are separat
 | Owner-bound durable account receipt for this identity/result | “Saved to your account.” | My progress; this alone makes no public-posting claim. |
 | Save failed with a known retained local copy | “Account save failed. This result is still on this device.” | Retry save; retry the same result, never restart the lesson as a saving remedy. |
 | Save failed with no known durable copy | “Not saved — keep this page open.” | Retry save; warn before leaving without claiming the page can survive reload. Unknown remote outcomes use the separate confirmation-pending state above. |
+| Permanent rejection or ownership/payload conflict | Explain the rejected operation and what evidence is still retained | Stop blind retries; account-save rejection and public-score rejection are different outcomes. Recovery follows Storage/Security's contract. |
 | Account session expired | “Sign in again to save to this account.” | Re-authenticate; retain only what is actually retained. Never redirect a pending result into a different account silently. |
 | Guest import review / partial import | Show source history, destination account and Confirm / Not now; then actual confirmed/pending/failed portions | No “all saved” after partial success. Exclude account-owned or ambiguous records; ownership, deduplication and conflicts remain Storage/Security-owned. |
 | Account data load failed | “Your progress couldn't be loaded.” | Retry loading; label a retained last-good snapshot as stale/incomplete and only show it to its owning account. Do not show “no history.” |
@@ -392,11 +405,25 @@ stay with those owners. None is reopened or decided by this UI proposal.
   save confirmation; apply receipt/account-snapshot safeguards throughout the screens; explicitly
   label Pause placement proposed; exclude ambiguous records from guest-import review. No app or
   accessibility test was implied. Lead checked the revised wording against each finding.
-- All five relative Markdown links resolve in the accepted-baseline worktree. All seven pinned
-  GitHub file links resolve to fetched Git objects, including Catalog's coordination checkpoint.
+- Catalog then reviewed the entire published `b0d2f17` outline against its agreed decision
+  register and fresh shared PRODUCT: **no material contradictions or required corrections**.
+  Its [durable semantic review](https://github.com/rathunter69/Hotkey.gg/blob/c08b53b73afcfd3cb5e660b8a9f3d232c028f83e/docs/handoffs/catalog-progression.md#september-19-bounded-semantic-review-of-the-ui-proposal)
+  confirms that these are presentations of existing learner semantics and draft storage facts,
+  not new progression states. It does not approve all layouts or certify runtime behavior.
+- Storage reviewed the published saving table and reported **no material mismatch**. Its remote
+  contract at `8c7686c` was then fetched/read, including newly approved comparison/grace principles;
+  the final outline reflects those principles without choosing their unresolved details.
+- All five relative Markdown links resolve in the accepted-baseline worktree. The seven original
+  pinned GitHub file links and added Catalog-review/Storage-contract links resolve to fetched
+  Git objects; the added handoffs were read before this final update.
   This verifies repository targets, not public-site navigation or signed-in browser access.
-  Final staged scope/whitespace and remote identity are checked at publication; this file's
-  Git history and chief handoff record that checkpoint.
+- Staged whitespace/scope checks passed: exactly this handoff was added over `16ee830`; an
+  explicit comparison excluding it found no other changed files. The separate worktree was clean
+  after the first commit. No runtime or shared-guidance files changed.
+- First remote checkpoint verified: commit `b0d2f17929768e1be348510728e5559975544b2c`, matching
+  local/remote handoff blob `7508f671039f61ce5433488e4cc7bfaf1dd7972f` after push and fresh fetch.
+  This final review-record update is also committed/pushed and remote-verified before the chief
+  handoff; its exact final identity is supplied by Git history and that message.
 - `npm run check`, browser suites, live-auth tests and database tests are **not run** for this
   documentation-only task under TASK_GUIDE/CURRENT's exception. Existing passes are not relabelled
   as new tests. No application, generated assets, data, settings, billing or deployment changed.
