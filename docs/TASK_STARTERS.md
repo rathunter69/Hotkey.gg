@@ -134,3 +134,49 @@ Use focused audit/repair/review agents economically. Follow the chief-orchestrat
 ```text
 Continue the next agreed batch for this area. Re-read the latest shared status and your last remote handoff, check for changes from other tasks, and use focused agents where useful. Complete the authorized work and verification, then update and push the handoff. Bring cross-area decisions to the chief orchestrator.
 ```
+
+## Planning follow-ups — September 19
+
+Wolf requested the original twelve-area overview and the next 2–3 clarification prompts.
+The chief recommends the following planning scopes after the catalog/flow decisions. These
+are copyable options, not automatically dispatched tasks. Reuse an existing area task when
+available and coordinate the catalog owner's concrete learner-state work before overlapping.
+Security permission repairs remain a separate technical priority; curriculum blueprints stay
+with the catalog/learning owner. Latest status and assignments remain in CURRENT.md.
+
+### 1. UI/UX, onboarding and web structure
+
+```text
+Lead the UI/UX, onboarding and web-structure refinement.
+
+Repository: rathunter69/Hotkey.gg. Read the latest remote AGENTS.md, docs/CURRENT.md, docs/PRODUCT.md and docs/TASK_GUIDE.md on codex/repository-foundation, including required reads and linked handoffs. Use CURRENT’s accepted code baseline; don’t assume local files or other tasks share memory.
+
+Turn approved catalog-flow decisions into simple screen outlines: first guest lesson, Help, helped/solo results, returning home, catalog and optional challenges. Preserve the ribbon/workspace and reduce visible choices. Specify navigation, keyboard access, feedback/mute and honest saving/error states. Reuse the catalog task’s learner-state proposals; coordinate ownership before duplicating them. Do not reopen settled learning or reward rules.
+
+Planning only: no application changes, live data writes, deployment or billing activation. Reuse audits and focused review. Own only docs/handoffs/experience-site.md on a dedicated codex/ branch; commit, push and verify it. Send the handoff to chief task 01a0b0fa-d857-7002-ab95-1da0a1cfb858; leave CURRENT/PRODUCT chief-owned. Keep discussions concise, with small groups of selectable options.
+```
+
+### 2. Leaderboards and saved progress
+
+```text
+Lead the saved-progress and leaderboard contract review.
+
+Repository: rathunter69/Hotkey.gg. Read the latest remote AGENTS.md, docs/CURRENT.md, docs/PRODUCT.md and docs/TASK_GUIDE.md on codex/repository-foundation, including required reads and linked handoffs. Use CURRENT’s accepted code baseline; don’t assume local files or other tasks share memory.
+
+Define what is saved and how users can trust it: confirmed guest-history transfer, account separation, helped/solo/private attempts, unfinished summaries, duplicate retries, offline/errors and cross-device history. Specify comparable PB groups, older timing standards, best-of-unlimited benchmark/Daily results and private versus public records. Present plain-English examples and the remaining choices. Preserve earned history; coordinate permission rules with Security and eligibility with Catalog.
+
+Planning only: no application changes, live data writes, deployment or billing activation. Reuse audits and focused review. Own only docs/handoffs/leaderboards-storage.md on a dedicated codex/ branch; commit, push and verify it. Send the handoff to chief task 01a0b0fa-d857-7002-ab95-1da0a1cfb858; leave CURRENT/PRODUCT chief-owned. Keep discussions concise, with small groups of selectable options.
+```
+
+### 3. Payments and subscriptions
+
+```text
+Lead the payments and subscription product review.
+
+Repository: rathunter69/Hotkey.gg. Read the latest remote AGENTS.md, docs/CURRENT.md, docs/PRODUCT.md and docs/TASK_GUIDE.md on codex/repository-foundation, including required reads and linked handoffs. Use CURRENT’s accepted code baseline; don’t assume local files or other tasks share memory.
+
+Start from approved free everyday foundations and paid advanced/model learning. Clarify what subscribers receive, previews, certificate/challenge access, pricing options, billing intervals, trials, cancellations, refunds and expiry. Define what remains accessible when a subscription ends, preserving earned history. Treat enterprise Desks separately; coordinate curriculum boundaries with Catalog. Produce a clear free/paid access table and ask only unresolved questions. Keep checkout inactive.
+
+Planning only: no application changes, live data writes, deployment or billing activation. Reuse audits and focused review. Own only docs/handoffs/payments.md on a dedicated codex/ branch; commit, push and verify it. Send the handoff to chief task 01a0b0fa-d857-7002-ab95-1da0a1cfb858; leave CURRENT/PRODUCT chief-owned. Keep discussions concise, with small groups of selectable options.
+```
+
