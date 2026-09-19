@@ -11,8 +11,9 @@ Shared-guidance refresh: `2b16827aecf9b1c773f9b48d9b986c506c061c8a`; incorporate
 Latest shared-guidance read for the grid clarification: `2596378b5073118ff2c3794188727c5ccc57a68f`. Accepted code baseline and ownership remain unchanged.
 Approval-recording refresh: `0984834f524966b0da4cabd971857d189f9283aa`; chief has integrated the six presentation choices and historical grid findings. Wolf's subsequent grid approval is recorded here for the next chief integration.
 Mockup refresh: `d008402eecdf63bf5051aadab73ba910da0436b4`; chief has integrated the grid approval and Catalog's bounded compatibility response. Accepted application baseline remains unchanged.
+Visual-preservation refresh: `d1b705301a73edb3ee4ff16c97c0701ba283d4fb`; chief records Wolf's rejection of the first mockup's restyling and latest preference for the existing completion popup. Application baseline and ownership are unchanged.
 Owned file: **only `docs/handoffs/experience-site.md`**.
-State: planning outlines reviewed; the six explicit presentation choices and grid direction below are approved. Remaining exact layouts stay proposals. No application implementation, merge or deployment. Final commit identity is supplied by Git history and the verified chief handoff.
+State: planning outlines reviewed; presentation choices and grid direction below are approved, with the earlier result-side-panel choice superseded by Wolf's completion-popup preference. Preserve the existing coupled visual system. The first mockup's restyling was rejected; the revised source-based preview is illustrative, not approved in full. No application implementation, merge or deployment. Final commit identity is supplied by Git history and the verified chief handoff.
 
 ## Scope and outcome
 
@@ -21,27 +22,30 @@ One main action leads each ordinary-learning screen; Help, saving and optional c
 clear places. These are presentation proposals except where explicitly marked confirmed.
 They do not define new learner states, rewards, lesson content, storage schemas or access rules.
 
-**Six UI decisions confirmed by Wolf in this task, September 19:**
+**UI decisions from Wolf's six selections, with his later September 19 correction:**
 
 1. Help uses a **side panel beside the worksheet**, keeping the worksheet visible.
 2. A **small Challenges link beside Home and Catalog** provides optional challenge access.
 3. Keep a **short goal and current checkpoint visible**, with the **full checklist expandable**.
    The checkpoint describes the required outcome; solution-revealing help remains separate.
-4. **Ordinary lesson results appear in the side panel**, keeping the finished worksheet visible.
-   Helped results retain Continue primary and Try solo alongside.
+4. **Keep the familiar completion overlay popup**, with the completed worksheet retained behind
+   it and available on dismissal. This later preference supersedes the earlier result-side-panel
+   selection. Helped results retain Continue primary and Try solo alongside.
 5. Invite account saving through a **secondary button on the first guest result and a quiet Home
    reminder**, preserving the option to continue without signup.
 6. Put less-used controls, such as timer visibility and Excel setup, in **one small Lesson options
    menu**. Help and mute remain visible; keyboard access remains required.
 
-Source: Wolf's explicit selections in this task's successive question groups. These settle
+Source: Wolf's explicit selections in this task's successive question groups and subsequent
+request to preserve the original UI and completion popup. These settle
 the stated presentation choices only; exact dimensions, responsive mechanics, final wording and
 the other outline details remain proposals. They do not authorize implementation or change any learning rule.
 
 **Grid direction subsequently approved, September 19:** retain the familiar 20-row/10-column
 workspace, make all visible rows usable, and adapt cell sizes within readable limits. When the
 worksheet and side panel cannot fit comfortably, suggest fullscreen and allow worksheet scrolling.
-Instructions, Help and ordinary results share the existing right-hand area. Wolf accepted the
+Instructions and Help share the existing right-hand area; completion now uses the familiar
+overlay under Wolf's later correction. Wolf accepted the grid
 recommendation because the platform now centers learning before immediate competition. Exact
 pixel sizes, support thresholds and implementation remain open; see the grid decision record below.
 
@@ -199,9 +203,11 @@ Only supported recovery paths should be offered: no false “resume this score l
 
 ## 3. Helped and solo results
 
-**Confirmed placement:** ordinary lesson results use the side panel, keeping the completed
-worksheet visible. Detailed spacing, focus behavior and transitions remain to design; the
-result panel must not require a competing overlay or automatically reveal a solution.
+**Latest placement preference, September 19:** retain the existing completion overlay popup
+and its visual treatment. This supersedes Wolf's earlier side-panel selection. Keep the completed
+worksheet intact behind the popup; dismissing it returns to that worksheet without losing the
+result or changing the attempt. Detailed spacing, focus behavior and transitions remain to
+design. Completion must not automatically reveal a solution.
 
 ```text
 Lesson complete — with help        (or: Lesson complete — solo)
@@ -354,10 +360,13 @@ These are proposed acceptance requirements for later implementation, not tested 
   still present. Escape closes Help only when Help owns focus; sheet/dialog Escape keeps its
   normal meaning. Narrow layout must retain worksheet visibility or offer an explicit supported
   layout limitation; overlay fallback has not been approved.
-- Auth/import/confirmation dialogs contain focus, have a named heading and close/cancel route,
+- Completion/auth/import/confirmation dialogs contain focus, have a named heading and close/cancel route,
   and restore focus to their opener. Scored time must not silently pause because a dialog opens.
   Full page navigation focuses a useful heading; results announce completion without repeated
-  focus theft. Back to Catalog restores the originating lesson link/filter state.
+  focus theft. The completion popup opens once at the actual finish, focuses its primary action,
+  and lets Escape/View worksheet return to the completed sheet and its previous position.
+  Provide a keyboard-accessible way to reopen the result; that control's placement is still proposed.
+  Back to Catalog restores the originating lesson link/filter state.
 - Announce saving/loading/completion changes once through restrained status messages; do not
   read out every key press. Errors use readable text, not color or sound alone. Detailed failures
   must remain available after a transient toast disappears.
@@ -436,7 +445,7 @@ assistance, Continue/Try solo, rewards and challenge rules out of another questi
 | Choice | Decision or remaining recommendation |
 |---|---|
 | Visible task guidance | **Confirmed September 19:** keep the short goal and current outcome/checkpoint visible, with the full outcome checklist expandable. A checkpoint describes the required result, not an automatically revealed solution or mandatory keyboard route. |
-| Result placement | **Confirmed September 19:** ordinary results appear in the side panel, keeping the finished worksheet visible. Helped results retain Continue primary and Try solo alongside; full statistics expand under the earlier approved information hierarchy. |
+| Result placement | **Updated September 19:** Wolf's later preference restores the existing completion popup, superseding his earlier side-panel selection. Preserve the finished worksheet behind it and on dismissal. Continue/Try solo and expandable details retain their agreed meaning. |
 | Post-lesson save invitation | **Confirmed September 19:** secondary Save to an account action after the first guest result, plus a quiet Home reminder. Continue without signup remains available. Exact wording remains open; the two skippable personalization topics stay agreed. |
 | Catalog browsing | **Tentative preference, September 19:** Wolf said “Probably next drill along learning path, with recommendation to move to next step in the chapter.” Present the next path/chapter step while retaining browsing; do not treat this as approval of a new sequence or mandatory gate. Catalog owns mapping, chapter-end behavior and content. |
 | Secondary information and controls | **Confirmed September 19:** one small Lesson options menu for less-used controls; Help and mute remain visible. The separate My progress location and exact menu contents/keyboard bindings remain proposals. |
@@ -446,11 +455,13 @@ assistance, Continue/Try solo, rewards and challenge rules out of another questi
 1. Wolf selected “Short goal and current checkpoint; expand the full checklist (recommended)”.
    This settles the density of visible outcome guidance; it does not approve automatic solution help.
 2. Wolf selected “In the side panel, keeping the finished worksheet visible (recommended)”.
-   This settles ordinary lesson result placement; it does not change result/reward semantics.
+   This historical selection was later superseded by his preference for the original completion
+   overlay popup. Neither placement changes result/reward semantics.
 
 Acceptance example: a learner can see the goal/current outcome while working, expand the full
-outcome checklist when useful, and review a completed lesson in the adjacent result panel while
-the finished sheet remains visible. Helped completion still presents Continue then Try solo.
+outcome checklist when useful, and review completion in the familiar popup with the completed
+sheet retained behind it and available on dismissal. Helped completion still presents Continue
+then Try solo.
 Exact checklist text/mapping, dimensions, responsive mechanics and transitions remain open;
 the later grid decision below settles the small-window fallback direction.
 No new application tests or agent review were needed to record these explicit answers; the
@@ -567,10 +578,11 @@ Let dimensions adapt within a readable range; do not add tasks solely to fill ce
 Changing the grid shape is an explicit design decision, not cleanup. Large-model extent remains
 with the later Catalog/Engine plan; this does not impose an old 20-row content cap on every future model.
 
-**Accepted layout direction:** reuse the existing right-hand lane for
-instructions, Help and results, switching its content instead of adding another column or
+**Accepted layout direction, with the later popup correction:** reuse the existing right-hand lane for
+instructions and Help, switching its content instead of adding another column or
 shrinking the sheet each time Help opens. The current lane is 250px; that exact width is not
-selected for the replacement. Keep column-width grading independent of screen size and leave
+selected for the replacement. Results use the original completion overlay under Wolf's later
+preference; only their placement changed. Keep column-width grading independent of screen size and leave
 inserting/deleting rows stable in the visible frame. Exact wrapping/scrolling/focus behavior
 needs an Engine/UI contract before implementation.
 
@@ -610,11 +622,13 @@ lead's separate evidence. This approval-recording update reuses that review and 
 claiming new tests. Exact minimum supported size, cell dimensions, zoom behavior, scrolling/focus
 mechanics and future large-model geometry remain open.
 
-## September 19: illustrative layout mockup
+## September 19: first illustrative mockup — styling rejected
 
-Wolf requested a brief mockup. An isolated in-conversation preview illustrates the approved
-structure with the current graphite/green aesthetic (and matching light appearance), ribbon,
-formula bar and 20-row/A–J sheet. This schematic preserves its structure on GitHub:
+Wolf requested a brief mockup. The first isolated preview used a hand-restyled interpretation
+of the existing interface. Wolf rejected that styling: it failed to preserve his themes, button
+design, ribbon helpers and small green selected-cell handle. Its result-side-panel illustration
+also predates his subsequent preference for the original completion popup. The schematic and
+checks below are historical evidence of that first draft, not the current visual specification:
 
 ```text
 hotkey.gg       Home   Catalog   Challenges                  Guest / Sign in
@@ -644,7 +658,7 @@ Your first worksheet
   navigation or real grading/saving. At narrow conversation widths it stacks the panel and lets
   the table scroll; that accommodation is not a selected production breakpoint or phone-support policy.
 
-Mockup-only validation: parsed the fragment; checked 20 rows/200 cells, Help/steps/result/retry
+Historical first-mockup validation: parsed the fragment; checked 20 rows/200 cells, Help/steps/result/retry
 transitions, truthful save-preview feedback and unchanged sheet width across views. Inspected
 the 1024px rendering; a 360px check found no page overflow and retained table scrolling. No browser
 script errors. This isolated preview blocked external requests and did not load application code
@@ -655,6 +669,80 @@ was fetched/read: no conflict with settled content rules. Future outlines separa
 region, usable extent, required navigation and graded outcome. Boundary/row-data, tutorial,
 width-grading and history checks remain scoped Engine/UI work. Pointer-scrolling eligibility
 is not silently decided by the visual; no new input-scoring exception or penalty is introduced.
+
+## September 19: preserve the existing visual system and completion popup
+
+Wolf explicitly asked to keep the current themes, buttons, keycaps and navigation, restore the
+helpful ribbon/button UI and green selected-cell handle, and retain the completion overlay he
+liked. He named `nav.css`, `nav.js`, `themes.js`, the main `index.html` styles and the reference/
+leaderboard page styles as a coupled set to read before changing anything. This corrects the
+first preview; it does not authorize application refactoring during this planning assignment.
+
+The lead and focused reviewer read that set at accepted baseline `16ee830`, including the
+leaderboard's linked `lb.css`. The following is verified existing design, not a new design system:
+
+| Source / existing language | Preservation requirement for later authorized work |
+|---|---|
+| [nav.css](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/nav.css), [nav.js](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/nav.js) | Retain the compact shared navigation, original icons, theme picker, menu/modal families, spacing and keycaps. Shared changes affect every consuming page; review that coupling before extraction or renaming. |
+| [themes.js](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/themes.js) | All **27 existing themes stay built in**, with their original tokens. **Daylight is the fresh-user default**; preserve a valid saved selection. The internal key `default` means Graphite, not the fresh-user default. Do not replace these with an approximation or switch automatically to the host OS appearance. |
+| [index.html](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/index.html#L1406) | Preserve the unified worksheet/checklist frame, formula/name bar, sheet tabs, compact controls and native typography: Hanken Grotesk, JetBrains Mono and spreadsheet cell fonts. Dark themes deliberately retain a light worksheet. Help reuses the existing lane rather than creating a separate floating card. |
+| [Ribbon and selection](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/index.html#L458) | Preserve the active-cell outline, **6×6px green bottom-right handle**, gray selection veil and unfilled active anchor; retain legitimate editing/point-mode exceptions. Keep the Alt ribbon hints, keycaps, button feedback and overlay flyout behavior. Fewer visible choices must not erase useful keyboard teaching. |
+| [Completion styles](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/index.html#L1024) | Reuse the existing scrim, compact rounded result card and button/keycap family. The ordinary-learning message and hierarchy change within that familiar container; old ranked/reward rules are not restored by reusing its appearance. |
+| [reference.html](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/reference.html), [leaderboard.html](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/leaderboard.html), [lb.css](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/lb.css) | Preserve the same compact headers, dense cards/rows, physical keycap treatment and deliberate primary-pill/secondary-button hierarchy. Keep page-specific styles in the preservation review alongside shared files. |
+
+The revised in-conversation preview reuses actual rendered native markup and style rules from
+that accepted source. It includes all 27 exact theme definitions, the original navigation and
+button families, ribbon idle/keytip states, formula bar, cell handle and unified worksheet frame.
+It substitutes only a small illustrative lesson and the agreed presentation flow:
+
+```text
+Existing navigation / theme picker: Home · Catalog · Challenges
+Existing lesson selector and compact controls: Help · mute · Lesson options
++------------------------------------------------------------------+
+| Existing ribbon/key hints                 | Existing checklist lane|
+| Name/formula bar                         | Short goal/checkpoint  |
+| A–J worksheet, 20 rows, green cell handle | Expand full checklist  |
+|                                          | Help when requested    |
+| Existing sheet tab                                              |
++------------------------------------------------------------------+
+At completion: familiar popup over the retained, finished worksheet
+  Correct outcome · helped/solo evidence · honest saving/award states
+  Continue (primary) · Try solo/practise · secondary account invitation
+  Expand details · Escape/View worksheet
+```
+
+This preview replaces the rejected visual interpretation. Its sample budget, wording, exact
+geometry and narrow-frame accommodations remain illustrative. It is not an approved first
+lesson or a runnable spreadsheet engine. The preview's native dialog behavior is a proposed
+focus contract, not evidence that the existing application already traps/restores focus correctly.
+Theme selection, mute and navigation are local preview interactions; application scripts,
+authentication and saving handlers are not executed. No account is created and nothing is saved
+to the product. The local preview is not the durable specification; the source map, decisions,
+schematic, evidence and limits in this GitHub handoff are its portable record.
+
+Focused preview verification: 20 rows/200 cells, all 27 theme-token matches, the original 6px
+green handle, restored native lane padding, original Alt tab hints, Help/solution-step/result
+transitions, popup Escape dismissal and truthful save-preview feedback. Daylight and Graphite
+renderings and the completion popup were visually inspected; the narrow 360px frame had no
+document overflow. No browser script errors. External requests and service workers were blocked,
+so screenshots used available fallback fonts; this is not full font or cross-browser QA.
+The source-based preview remains a planning illustration, not a production accessibility,
+keyboard-engine, audio, navigation or save-state playtest. Existing audit defects retain their
+owners; no full audit or application suite was rerun.
+
+A focused independent reviewer compared the supplied Daylight/Graphite/completion states and
+source against Wolf's preservation request. One material correction was incorporated: Continue
+keeps the original compact `.rm-key` result-button family rather than borrowing the larger
+session-summary `.ss-key` pill. Its first position and initial focus express the primary action.
+The approved secondary account-saving button is a proposed action within the existing button
+family; it is not claimed to reproduce the historical guest text link exactly. The reviewer
+found no other material fidelity or live-write issue within that bounded inspection and ran no
+application tests.
+
+For a future authorized refactor, inventory all consumers before changing shared selectors,
+theme application, menus or modal stacking. Preserve the visual system while changing the
+learning flow. Required verification must cover affected pages and selected/hover/focus/keytip/
+modal states across existing themes; a single lesson screenshot cannot establish compatibility.
 
 ## Verification and handoff
 
@@ -689,13 +777,17 @@ is not silently decided by the visual; no new input-scoring exception or penalty
   documentation-only task under TASK_GUIDE/CURRENT's exception. Existing passes are not relabelled
   as new tests. The separate isolated layout diagnostic is recorded above. No application,
   generated assets, live data, account settings, billing or deployment changed.
-- All exact wording/layouts beyond the six presentation selections and approved grid direction
+- All exact wording/layouts beyond the presentation selections, later visual-preservation/popup
+  correction and approved grid direction
   remain proposals. Acceptance scenarios
   are future checks, not successful playtests; Mac/accessibility/audio and real save behavior
   remain unverified. Existing audit defects remain with their owners.
 
 **Chief integration request:** record this planning assignment, its verified remote handoff and
-the six dated presentation decisions and tentative path/chapter recommendation preference.
+the dated presentation decisions and tentative path/chapter recommendation preference. Record
+the later completion-popup preference as superseding result-side-panel placement; preserve the
+coupled existing themes/buttons/keycaps/navigation/ribbon/selection design. The first mockup's
+styling was rejected, and the revised preview has not been approved in full.
 Also retain the historical 20-row/stable-frame provenance and record Wolf's subsequent approval
 of the grid recommendations: all visible rows usable; readable dimensions with fullscreen
 suggestions/worksheet scrolling; retained familiar frame and shared right-hand lane. Both grid
@@ -703,8 +795,9 @@ questions are answered. Record his learning-first rationale without changing set
 Keep existing learning/reward rules; do not mark the full outline approved, implemented or
 shipped. CURRENT/PRODUCT edits remain chief-owned.
 
-**Next bounded UI turn:** reconcile Catalog/Engine implications of the approved usable-boundary
-and worksheet-scrolling direction before fixing the side-panel dimensions and focus contract.
+**Next bounded UI turn:** review the revised flow within the existing visual system. Reconcile
+Catalog/Engine implications of the approved usable-boundary and worksheet-scrolling direction
+before fixing side-panel dimensions and the Help/completion focus contract.
 Continue reviewing the first-lesson → Help → helped result outline and Storage/Catalog contracts;
 choose an implementation candidate only if separately authorized. Do not start the catalog
 rebuild or expand the questionnaire to settled learning, reward or competition rules.
