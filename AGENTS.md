@@ -24,6 +24,15 @@ For a new area task, read `docs/TASK_GUIDE.md` for its starter scope and coordin
   pixel art is for account identity/icons and achievements. Learning should progress from
   accessible, playful keyboard interactions to realistic models and finance work. Review
   overlapping tutorials/access rules before adding another teaching or monetization system.
+- Wolf explicitly reaffirmed September 19 that refactoring must preserve the existing built-in
+  themes, buttons, keycaps, navigation, helpful ribbon UI, selection outline/green handle and
+  general look. Read the coupled visual set before changing it: nav.css, nav.js, themes.js,
+  index.html styles, reference.html and leaderboard.html styles plus linked lb.css. Check all
+  consumers and affected theme/hover/focus/keytip/modal states before shared changes. Reuse the
+  existing UI infrastructure; the first restyled mockup was rejected. His later preference for
+  the familiar completion overlay supersedes earlier side-panel results; Help stays beside the
+  sheet. PRODUCT records current decisions and preview limits. This grants no implementation
+  authority beyond the active task's scope.
 - Wolf clarified that preserving the visual foundation does not freeze interactions between
   drills, modes and learning paths. Review those interactions and the catalog/progression
   coupling. Wolf now prefers a future full catalog rebuild, while retaining his Foundations
