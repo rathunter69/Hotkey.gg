@@ -31,6 +31,15 @@ approved directions. Mouse use excludes competitive/timed scores. Calibration, e
 measurement and comparison rules remain open. Spreadsheet mouse use now excludes XP as well
 as qualifying time scores; ordinary page controls are allowed. Per-run key presses and
 completed command-use counts remain separate.
+September 19 follow-up: Windows remains primary, with a changeable Windows/Mac setup choice
+before the first exercise. XP favors new accomplishments, with smaller limited repeat rewards
+and no speed multiplier. Focused lessons lead to practical tasks and larger models. Completion
+certificates cover selected lesson/drill sets and count helped or spreadsheet-mouse completions;
+solo performance remains separate. Desks stays optional for training-provider/business use.
+Satisfying action-completion feedback is now an explicit design intent; frequency, sound and
+tone choices are pending. The free beginner offer includes ribbon/Excel understanding and
+varied useful work, alongside
+navigation, editing, formatting and basic formulas. Detailed scope and migration remain open.
 Owned files: **only `docs/handoffs/catalog-progression.md`**. CURRENT and PRODUCT remain chief-owned.
 
 ## Scope and outcome
@@ -898,8 +907,8 @@ workspace, not three current cleanly separated implementations or three replacem
 | Weekly Gauntlet; retired entry; old Keyboard Tour replay hidden; sandbox retired | **Leave out:** avoid restoring overlapping events/onboarding/freeform modes. | Reuse worthwhile teaching only through the agreed lesson plan. Check runtime, tests, generators, data/history and documentation consumers before any later code removal. |
 | Shortcut Reference; searchable page with platform display and practice links | **Keep as a resource:** useful lookup/learning support rather than a game mode. | Correctness/accessibility and links need their owners' work. Help eligibility during scored attempts still follows the content revealed, not the page label. |
 | Profile/card customization, stats and achievement wall; built account features | **Keep/simplify:** identity, one XP level, agreed learning/performance history and earned achievements. | Pixel art stays here; preserve earned items. Exact dashboard, award requirements and legacy recognition remain separate specifications. |
-| Certificates/track coverage; built issuance and claim flow | **Separate scope decision:** keep issued credentials, settle the future educational purpose and evidence before new requirements. | Existing issued credentials and original standards; no new mastery ladder or automatic certificate rewrite. |
-| Desks/team and assignment features; built separate community/account area | **Chief/Desks scope decision:** do not make team membership a required beginner-learning step. | Existing membership/records and permission-repair ownership. This review does not reopen the security audit or assign a Desks rebuild/removal. |
+| Certificates/track coverage; built issuance and claim flow | **Selected September 19:** completion certificates for selected sets, counting helped/mouse completions; solo performance separate. | Preserve issued credentials and original standards. Exact sets/access/versioning remain open; no new mastery ladder or automatic rewrite. |
+| Desks/team and assignment features; built separate community/account area | **Selected September 19:** retain a separate optional feature for business/training-provider use; individual learning remains primary. | Preserve membership/records and permission-repair ownership. Exact business features/access remain open; no rebuild/removal or integration assigned. |
 
 Billing remains a separate required launch capability; its current scaffold is not a reason to
 activate it or another learner mode. Marketing, support, administrative and legal pages remain
@@ -992,11 +1001,12 @@ dispositions, precise navigation/action hierarchy, unresolved reward/certificate
 measurement/access/migration details remain open. No code, setting, stored record or feature
 has been removed, and no new module is assigned.
 
-### September 19: six remaining design/platform decisions — options presented, pending
+### September 19: six design/platform options — presentation history; answers below
 
 **Source:** Wolf asked which other design/platform decisions would help building, then explicitly
 asked for options for all six. The earlier platform/XP questions are included in this group,
-not separate competing questionnaires. All six choices remain pending. This is specification
+not separate competing questionnaires. All six were pending when presented; the dated
+answer record below now supersedes that status. This is specification
 work, not permission to implement, add learner-facing settings or remove existing features.
 
 1. **Keyboard-platform promise:** recommend desktop Windows as the primary experience, with
@@ -1048,7 +1058,8 @@ work, not permission to implement, add learner-facing settings or remove existin
    approved. Exact lesson lists, prices, trials, access expiry and competition/certificate access
    are still open. No billing activation is authorized.
 
-**Status:** all six pending; the question interface offers three selectable options for each.
+**Status at presentation:** all six pending, with three selectable options each. See the
+subsequent answer record for current choices.
 The XP choice belongs to the approved single level, not a revival of the retired mastery/rank
 questionnaire. The certificate proposal does not reinstate a mastery system. No benchmark study,
 new module, content production, framework change, deployment or billing activation is initiated.
@@ -1059,6 +1070,117 @@ precedes award formulas. Certificate purpose determines any assessment contract;
 sets navigation/onboarding scope. Concrete first-lesson/returning/result-state examples should
 then test the small number of visible actions. Coordinate certificate/Desks planning with the
 chief and existing owners, without automatically starting workstreams.
+
+### September 19: six choices answered; platform and certificate refinements confirmed
+
+**Source:** Wolf answered the numbered options directly: Windows primary with a Mac onboarding
+option; 2 A (XP); 3 A (learning format); 4 B, described as a selected-drill completion certificate;
+5 A, with enterprise/training providers such as WSP or Training the Street as the intended use;
+and 6 A, emphasizing ribbon/Excel functionality and enough breadth to engage learners through
+time savings. His subsequent explicit option selections confirmed the two dependent questions:
+quick platform choice before the first exercise, and all completions counting for a completion
+certificate, including solution help or spreadsheet mouse use. Both refinements are answered.
+The earlier tentative certificate wording is now clarified; do not retain the solo-assessment
+recommendation as the selected product direction.
+
+| Decision | Confirmed choice and learner consequence | Still open / boundaries |
+|---|---|---|
+| Windows/Mac setup | Windows primary, with a small Windows/Mac Excel-setup choice before the first exercise, a suggested default and the ability to change it later. Instructions and shortcut teaching follow the chosen setup. | Exact supported shortcuts/functions/browsers, detection reliability and benchmark comparison pools need verification. Choosing Mac must mean a usable adapted experience, not merely changing key labels. Full parity has not been promised or established. Preserve existing Mac behavior. |
+| XP | Most XP for new eligible accomplishments, smaller limited repeat-practice rewards, no speed multiplier. One account XP level remains. | Exact amounts/caps, accomplishments, variants and optional-mode awards remain open. Helped or spreadsheet-mouse attempts still earn zero XP. Preserve past earned XP and prevent duplicate awards in the eventual implementation. |
+| Learning format | Focused beginner lessons lead into practical tasks and then larger models. | These are content formats in one journey, not three modes. Agree representative lesson blueprints and the skill map before replacing catalog content; preserve Foundations feedback. |
+| Certificates | Completion certificates for selected lesson/drill sets. All completed lessons in the required set count, including solution help and spreadsheet mouse use. Solo performance and speed records are separate. | Define sets, names, exact completion checks, versions, account/paid eligibility, presentation and legacy equivalence. Completion certification is not an independent-skill claim. No speed requirement or separate solo assessment is implied; existing issued credentials retain their original meaning. |
+| Desks | Separate optional feature focused on business/training-provider use; the individual learning journey remains primary. | WSP/Training the Street are user-supplied audience examples, not customers, partnerships or promised integrations. Roles, assignments, reporting, licensing, embedding and organization access remain unselected. Coordinate with chief/Desks owner; no enterprise workstream started. |
+| Free depth | Navigation, editing, formatting and basic formulas, with clear ribbon and Excel-functionality teaching and breadth of useful work that demonstrates why keyboard fluency saves time. Advanced learning/models remain subscription curriculum. | Exact free lesson list, advanced previews and prices remain open. Broad useful foundations do not mean every Excel feature or intermediate course is free. Preserve free repeats/personal speedruns on included content. No unsupported savings amount, broad Excel-compatibility claim or billing activation. |
+
+**Conflicts resolved:** the previous independent practical-assessment certificate recommendation
+is superseded by the completion-certificate choice. The current source's clean stored-run
+certificate requirement is evidence of existing behavior, not the new requirement. Completion
+certificates do not replace the separately approved readiness check at major skill jumps: helped
+completion can advance a certificate while the learner still needs qualifying solo evidence or
+a test-out to pass that particular readiness gate. XP and timed eligibility retain their rules.
+The quick platform choice is a narrow exception before the first guest exercise; broader goals,
+experience personalization and the save invitation still follow the lesson. No account-first
+onboarding or general questionnaire before practice is approved.
+
+**Acceptance examples for the future design:**
+
+- A Mac learner confirms Mac before starting. The supported lesson teaches the appropriate
+  commands and follows that setup; a later change is possible. Unsupported tasks require an
+  explicit scoped design, not a promise that Windows command sequences work unchanged.
+- A learner completes the required certificate set using Help and sometimes the ribbon by
+  mouse. Completion credit accumulates toward that certificate. Those affected attempts earn
+  no XP or qualifying timed records. A fresh eligible Try solo attempt is evaluated separately.
+- A beginner explores ribbon commands in context, edits and formats useful data and writes a
+  simple formula across the free path. They see what the actions do and why keyboard routes
+  help. Any numerical task-time saving still requires the previously agreed labelled, calibrated
+  mouse-reference estimate; observed Hotkey personal improvement is a different metric.
+- A training provider can be the intended audience for optional Desks without the new learner
+  needing to create/join a group. This example does not establish any organization relationship.
+
+**Concrete screen proposals to review next, not approved layouts:**
+
+1. **First exercise:** compact Windows/Mac setup, then the existing ribbon/workspace and one
+   clear task. Teach the relevant ribbon/function concept in context, retaining visible task
+   instructions and one Help entry. Keep the lesson timer hidden unless enabled.
+2. **Helped result:** show completion, a plain explanation of zero XP for solution help or
+   spreadsheet mouse use, and the actual saving state. Offer Continue and Try solo. Show a
+   concise certificate-set progress update only when relevant; keep expanded metrics secondary.
+3. **Returning home:** lead with resume or one recommended next lesson and access to the catalog.
+   Personal records, per-drill Speedrun, optional Rapid-fire/challenges and Desks stay reachable
+   with prominence to be settled. Do not impose a learn-first lock on experienced users.
+
+**Next dependencies:** apply platform/setup and learning-depth decisions to sample lesson
+blueprints; specify certificate sets independently of XP, readiness and public boards. Then
+settle result/home hierarchy, remaining feature dispositions, precise reward/metric/access
+rules and preservation/migration. No further answer to this six-choice packet is required.
+No application behavior, catalog, credentials, earned records, billing or shared document changes
+are authorized or made by this checkpoint.
+
+### September 19: satisfying action feedback and platform feel — direction, then questions
+
+**Source/confirmed intent:** Wolf asked to keep clarifying key features and feel so his full
+platform intent is realized, and wants action completion to feel rewarding (his wording was
+"trigger dopamine releases on action completion"). Treat this as a desired satisfying user
+experience, not a measured physiological outcome or authorization for a new reward currency.
+Preserve the general UI/ribbon/workspace, identity/achievement use of pixel art, approved
+learning-first structure, and the fewer-modes/settings constraint.
+
+**Three choices presented, currently pending:**
+1. **Feedback frequency/intensity:** recommend a brief success response for each meaningful
+   completed spreadsheet action, with a stronger finish for the completed task. Alternatives:
+   strong game-like celebrations through the task, or most celebration only at task completion.
+   The recommendation gives regular acknowledgement without repeatedly interrupting spreadsheet
+   work; stronger effects bring more energy but compete with the existing busy workspace.
+2. **Sound:** recommend soft brief success sounds after the learner starts, with one clear mute
+   that remembers the preference; ordinary typing stays quiet. Alternatives: silent by default
+   with optional success sounds, or more arcade audio including typing and reward sounds. Audio
+   can reinforce success, while frequent/default sound may be unwelcome in study or work spaces.
+   No default, sound asset, recording or extra onboarding prompt is approved yet.
+3. **Overall feel:** recommend playful, polished and encouraging around the retained spreadsheet
+   workspace. Alternatives: energetic/arcade-like or calm/professional with restrained celebration.
+   These select feedback tone/intensity, not a replacement spreadsheet skin or expansion of
+   pixel art beyond the agreed identity/achievement role.
+
+**Lead design suggestions to evaluate, not newly approved mechanics:**
+- Give helped and mouse-assisted learners clear positive completion feedback and certificate
+  progress when earned, even though those attempts earn no XP or qualifying timed score.
+  Do not make every visual acknowledgement an XP award, achievement or new progress meter.
+- Respond to meaningful work and correct outcomes, accepting legitimate routes. Do not reward
+  every raw key press or demand the author's exact sequence unless that method is the lesson.
+- Make the finished worksheet/result itself satisfying. Use brief, optional-strength motion
+  and audio as reinforcement; exact motion/accessibility controls and timing need design.
+- Distinguish normal outcome acknowledgement from feedback that reveals a solution. Define the
+  same intended feedback/rules for comparable scored attempts; do not silently provide new
+  unrecorded guidance or change a scored clock through a celebration animation.
+- Use neutral recoverable error feedback that helps learners proceed. Record actual earned
+  progress and savings with their agreed meanings; do not invent XP, streak pressure or time
+  saved to make a result appear more rewarding.
+
+**Dependencies:** resolve these three feel choices, then apply them to one representative
+spreadsheet action, a helped completion and an eligible solo completion. The examples should
+show feedback, information hierarchy and next action with the existing ribbon intact. Exact
+animation, audio, reduced-motion behavior and validation contracts remain a later bounded spec.
+No interface, scoring, content or settings implementation is authorized here.
 
 ## Evidence register
 
@@ -1122,7 +1244,7 @@ menu order and some achievement targets. A path is not yet an independent recomm
 | XP and level | XP rewards clean solves, repeat activity and other performance/session bonuses. Level accumulates activity and influences locks. | Level is not competitive rank or an assessment of competence. XP is recalculated by client code from stored results, not an authoritative server score ledger. |
 | Competitive rank | Eligibility is automatic at level 10 or the campaign-coverage predicate. Then five standard boards (`navigation`, `combo`, `margin`, `sort`, `opmodel`) establish placement. Rating uses relative best-time standings, breadth and field size. | Ordinary eligible drill posting does not wait for level 10. Opening rank eligibility does not instantly establish a placed rank. Placement is not onboarding personalization. |
 | Speed bands / achievements | Cleared, Bronze, Silver, Gold and Elite depend on PB versus par. Other achievements use activity, skills, named drills, rank and current catalog membership. | A speed band or optional star is not a complete general mastery model. Decorative selections are not all server-verified credentials. |
-| Certificates | Three named tracks require qualifying stored runs for all listed drills. Current issuance does not require a time target or milestone completion. | Following a guide is not the agreed future certificate standard; current input trust is limited by DATA-07. |
+| Certificates | Three named tracks require qualifying stored runs for all listed drills. Current issuance does not require a time target or milestone completion. | This source behavior differs from the September 19 completion-certificate decision, which includes helped/mouse completions; replacement rules are not implemented. Input trust is still limited by DATA-07. |
 | Access | Premium enforcement is disabled and perks are free-for-now, but later chapter level/pace locks still operate. Foundations, Formatting and Formulas I have no group level gate. Real PRO bypasses progression locks; existing PBs and chapter coverage provide other routes. | “All drills free” means no active subscription charge, not unrestricted day-one access. Account, entitlement, XP level and skill prerequisites are different concepts. |
 | Guest / account | Guests can use the trainer and local progress. Normal client run posting requires a permanent signed-in account. Creating a desk is a separate real-entitlement boundary. | Guest local success is not automatically a saved cross-device result; billing is not an operational purchase journey. |
 
@@ -1183,7 +1305,7 @@ every reward threshold before the basic experience is defined.
 
 | ID | Current behavior / conflict | Options and tradeoffs | Lead recommendation | Wolf's confirmed choice |
 |---|---|---|---|---|
-| D1: relationship between lesson and drill | One main workspace with layered tools; only Navigation has the established staged entry. Separate lesson/tour frameworks and alternative branch tutorials cause naming overlap. E2/E4/E7/E8. | Exact-board retry (familiar, may reward recall); fresh variation of same task (transfer evidence, requires equivalent grading); separate assessment (clear separation, more content). | Shared skill/task pattern with fresh values/targets for independent work; keep replay and a personal drill speedrun. One exercise identity, distinct attempt evidence and comparable PBs. A fresh solve is not mastery by itself. | **Supported in principle September 18**, conditional on retaining key metrics and individual-drill speedrunning. Exact content/revision/comparison mechanics remain open. Earlier learning-first loop remains confirmed. |
+| D1: relationship between lesson and drill | One main workspace with layered tools; only Navigation has the established staged entry. Separate lesson/tour frameworks and alternative branch tutorials cause naming overlap. E2/E4/E7/E8. | Exact-board retry (familiar, may reward recall); fresh variation of same task (transfer evidence, requires equivalent grading); separate assessment (clear separation, more content). | Shared skill/task pattern with fresh values/targets for independent work; keep replay and a personal drill speedrun. One exercise identity, distinct attempt evidence and comparable PBs. A fresh solve is not mastery by itself. | **Supported in principle September 18**, conditional on retaining key metrics and individual-drill speedrunning. Exact content/revision/comparison mechanics remain open. Earlier learning-first loop remains confirmed; September 19 selects focused lessons leading to practical tasks and larger models. |
 | D2: competitive intent | Eligible classic runs post automatically; rank eligibility is automatic later. No practice/ranked switch. Request explicitly reopens this. E4/E5/E7. | Choose public scoring before start (clear intent, extra choice); publish eligible independent runs automatically (less friction, potential surprise); enter through a dedicated competition area (strong boundary, extra navigation). | Same workspace, distinct learning/private timed/public attempt purposes. Deliberate public intent before start; private drill speedruns still retain personal metrics. No always-visible global switch required. Public submission and private account saving are different actions. | **Supported in principle September 18**, conditional on retained metrics and drill speedrunning. Specific public entry/retry controls, posting/eligibility/rank and private-save mechanics remain open; no retired switch restored. |
 | D3: paths and locks | Level/pace/chapter/PB/PRO rules gate later chapters; chapter-linked certificate tracks double as paths. Confirmed freely explored basics conflict with treating the ladder as universal access control. E3/E4. | **Recommendations only:** easy exploration but possible skill gaps. **Targeted prerequisites:** protects readiness with some friction. **Existing level/speed locks:** game-like climb but may require grinding. Subscription inclusion is a separate access test. | Apply the agreed light-gate policy; design the specific skill dependencies/checkpoints after help and outcome rules are clear. | **Confirmed September 18:** helped ordinary completion advances learning; major skill jumps use correct independent evidence, accepting earlier results or test-out; advanced subscription inclusion also applies. Speed/XP do not gate readiness. Exact lesson boundary, skill map and pass thresholds remain open. Supersedes bace206's tentative status and the original unrestricted-entitled-exploration proposal. |
 
@@ -1191,15 +1313,15 @@ every reward threshold before the basic experience is defined.
 
 | ID | Current behavior / conflicting guidance | Options and tradeoffs | Lead recommendation / dependency | Wolf's confirmed choice |
 |---|---|---|---|---|
-| D4: assistance | F1 hints remain eligible; guided rails exclude normal XP/PB/upload; baseline directions differ from solution help. “Hints stay free” is ambiguous between price and score. | Count all instructions as help (punitive); count explicit solution help (clear boundary); allow all hints competitively (easy entry, weaker independent claim). | Apply the approved distinction to each actual hint/control. Explain consequences before solution help; keep ordinary directions usable. Define fresh independent retry after viewing a solution. Depends on D1/D2. | **Confirmed September 18:** ordinary instructions/explanations unpenalized; revealing solution steps, Guided help and solution replay make the attempt assisted (learning progress, no XP). Exact control mapping and independent-retry boundaries remain open. Replaces blanket score-free solution hints, not access to teaching. |
-| D5: timing and retries | First-key gate, running clocks, pars, speed bands and some pass targets coexist. Pausing and special sessions differ. Untimed Foundations was an earlier option. | Visible stopwatch throughout (motivating/stressful); optional personal time while learning; enforced competitive clock with explicit start. Unlimited practice vs limited scored attempts affects fairness. | Apply optional lesson timing without treating it as competitive entry. Separately agree competitive start, planning time, pauses, retries and seeds. Unlimited learning retries remain a proposal; competitive retry policy is D7. | **Confirmed September 18:** lesson clock hidden unless enabled; deliberate speed attempts show timing; no speed/XP readiness gate. Exact timer start/pause/retry and competition rules remain pending. Replaces the always-visible teaching-clock direction. |
-| D6: progress, mastery and rewards | Completion, clean PB, speed, XP, optional stars, streaks and milestones overlap; assisted state is largely local. | Separate XP/mastery/rank ladders versus one XP level with completion/independent status and personal performance records. The simpler structure reduces status complexity; a separate mastery label would make a broader skill claim. | Apply the confirmed simpler structure: learning progress and private performance/PBs remain useful records; assistance and comparable times stay distinct. Results explain outcome/save/next step. Defer a new mastery system. | **Confirmed September 18:** one XP level, lesson completion/independent progress and personal speedrun records; a new mastery system deferred. No assisted XP and earned-history preservation retained. Exact metric/reward formulas, repeat XP and achievements remain pending; the prior D6a/D6b questionnaire is retired, not approved wholesale. |
-| D7: public competition and account rank | Best-time boards feed relative rank after automatic eligibility and five placements. Daily/session comparisons differ. DATA-04/06/07 limit completeness/trust. | Curated benchmark/Daily boards with personal records versus adding a new aggregate competitive rank. Boards offer narrower comparable goals with fewer account systems; aggregate rank adds identity and fairness/maintenance work. | Retain selected public benchmarks/events and personal drill speedruns beyond that set. Defer a new overall competitive rank. Plan common access/rules, comparable versions and preservation of existing rank history; Saved-progress/Security own eventual delivery. | **Confirmed September 18:** selected benchmark/Daily public focus plus personal drill records; optional challenge leaderboards retained in the simpler structure; a new overall competitive rank deferred. Existing earned rank history is protected. Eligibility, access/retries/integrity, exact boards and transition/presentation of the current rank remain open. D1/D2 supported in principle with metrics conditions. |
-| D8: certificates | Three chapter-derived lists of qualifying runs; no pace gate or distinct assessment. Old interest in speed recognition overlaps skill credentials. | Completion certificate (low friction, weaker claim), independent skill assessment (stronger evidence, extra work), speed credential (narrower purpose). | Skill-path certificates based on independent, varied competence; separate speed badges. Guided progress prepares for assessment. Preserve existing issued certificates as earned historical credentials, with their original standard identified. Depends on D4/D6/D7; trust needs DATA-07 work. | Interest in shareable credentials carried forward; exact standards, attempts and paid eligibility **pending**. |
-| D9: guest/account/free/paid | Guest local practice; permanent account for normal uploads; free-for-now flags plus progression locks; desk creation has a real entitlement check. Old price/PRO copy conflicts. | Complete useful free beginner path with replay/speedruns and advanced previews versus a small free teaching introduction with most structured learning paid. Wider free learning offers a worthwhile result; a smaller sampler places the paywall earlier. | Apply the approved useful-free-path/advanced-subscription split. Exact inclusion must be explicit and independent of menu position or rank. Explain local versus durable saving; Payments owns eventual entitlement rules. | **Confirmed September 18:** useful free beginner path, repeat practice/personal speedruns for included free content and a few advanced previews; advanced lessons/model-building courses require subscription. Subscriptions at launch and correctness-based readiness remain confirmed. Exact lessons/previews, prices/trials, expiry, desks, competition/certificate access and guest-history transfer remain pending. |
-| D10: entry and next step | Fresh device starts Navigation; resume/direct links and several special-session entries exist. Navigation's nextKey is autofit while chapter order next is filldr. Tutorial skip leaves Foundations. No established personalized assessment. | Guest lesson before personalization/signup versus personalization first or account first. Try-first reduces entry friction; earlier questions/account improve initial matching/identity at the cost of more initial steps. | Apply the approved guest-lesson-first entry and experienced shortcut. Propose one clear next-step recommendation across result/path/resume, with editable personalized starting points. The exact result/returning flow remains a next decision. | **Confirmed September 18:** short hands-on lesson without an account, followed by personalization and an invitation to save; clear experienced-user shortcut. Customized starting points retained. Exact onboarding questions, save/guest-transfer behavior, assessment details and next-step controls remain pending. |
+| D4: assistance | F1 hints remain eligible; guided rails exclude normal XP/PB/upload; baseline directions differ from solution help. “Hints stay free” is ambiguous between price and score. | Count all instructions as help (punitive); count explicit solution help (clear boundary); allow all hints competitively (easy entry, weaker independent claim). | Apply the approved distinction to each actual hint/control. Explain consequences before solution help; keep ordinary directions usable. Define fresh independent retry after viewing a solution. Depends on D1/D2. | **Confirmed September 18:** ordinary instructions/explanations unpenalized; revealing solution steps, Guided help and solution replay make the attempt assisted (learning progress, no XP). September 19 confirms one Help entry and a fresh Try solo attempt judged on its own record, with no penalty from earlier help. Exact control mapping and comparable-task rules remain open; ordinary teaching stays usable. |
+| D5: timing and retries | First-key gate, running clocks, pars, speed bands and some pass targets coexist. Pausing and special sessions differ. Untimed Foundations was an earlier option. | Visible stopwatch throughout (motivating/stressful); optional personal time while learning; enforced competitive clock with explicit start. Unlimited practice vs limited scored attempts affects fairness. | Apply optional lesson timing; show the task goal before Start, then reveal the worksheet and start the continuous scored clock together. Ordinary learning is freely pausable. Specify render/focus/interruption and comparison details separately. | **Confirmed September 18–19:** lesson clock hidden unless enabled; ordinary learning pausable; worksheet reveal starts a continuous scored clock after goal preview; unlimited benchmark/Daily attempts with best eligible time. No speed/XP readiness gate. Exact timing implementation, seeds, comparison and legacy transition remain open. |
+| D6: progress, mastery and rewards | Completion, clean PB, speed, XP, optional stars, streaks and milestones overlap; assisted state is largely local. | Separate XP/mastery/rank ladders versus one level with completion and personal records; new-accomplishment rewards versus first-only or equal-repeat rewards. | Apply one XP level and clear completion/performance records. Favor new accomplishments, allow smaller limited practice rewards and no speed multiplier. | **Confirmed September 18–19:** simpler structure; new mastery deferred; new accomplishments earn most XP, repeats smaller limited rewards, no speed multiplier. No XP for solution help or spreadsheet mouse use; earned XP preserved. Exact amounts/caps, award events, metrics and achievements remain open. The old reward questionnaire is not approved wholesale. |
+| D7: public competition and account rank | Best-time boards feed relative rank after automatic eligibility and five placements. Daily/session comparisons differ. DATA-04/06/07 limit completeness/trust. | Curated benchmark/Daily boards with personal records versus adding a new aggregate competitive rank. Boards offer narrower comparable goals with fewer account systems; aggregate rank adds identity and fairness/maintenance work. | Retain selected public benchmarks/events and personal drill speedruns beyond that set. Defer a new overall competitive rank. Plan common access/rules, comparable versions and preservation of existing rank history; Saved-progress/Security own eventual delivery. | **Confirmed September 18:** selected benchmark/Daily public focus plus personal drill records; optional challenge leaderboards retained in the simpler structure; a new overall competitive rank deferred. Existing earned rank history is protected. September 19 confirms unlimited benchmark/Daily retries with best eligible time. Detailed eligibility, access/integrity, comparison pools, exact boards and historical-rank presentation remain open. D1/D2 supported in principle with metrics conditions. |
+| D8: certificates | Three chapter-derived lists require qualifying clean stored runs; no pace gate or distinct assessment. The earlier lead recommendation favored independent assessment. | Completion certificate recognizes finished curriculum; independent assessment supports a different skill claim and adds assessment work; speed recognition is narrower. | Apply selected-set completion certificates, counting helped/mouse completions. Keep solo performance and speed records separate; preserve old issued credentials under original standards. Readiness gates remain separate. | **Confirmed September 19:** completion certificates for selected lesson/drill sets; all completed lessons count, including solution help and spreadsheet mouse use. Supersedes the lead independent-assessment recommendation. Exact sets, naming, completion checks, versioning and account/paid eligibility remain open. No speed or solo-assessment requirement is added. |
+| D9: guest/account/free/paid | Guest local practice; permanent account for normal uploads; free-for-now flags plus progression locks; desk creation has an entitlement check. Old price/PRO copy conflicts. | Useful free beginner outcomes versus a narrow sampler or broad intermediate free offer. More useful free work demonstrates value; exact paid differentiation must remain clear. | Apply the approved free beginner/advanced subscription split. Teach ribbon and Excel functionality through varied useful tasks, independent of menu position or rank. Explain local versus account saving; Payments owns eventual entitlement delivery. | **Confirmed September 18–19:** useful free navigation/editing/formatting/basic-formula learning with ribbon/Excel understanding and breadth to demonstrate time savings; repeats/personal speedruns and selected advanced previews retained. Advanced learning/models subscription; reviewed private guest-history carry-over approved. Exact lessons, prices/trials, expiry, organization/competition/certificate access and import mechanics remain open. |
+| D10: entry and next step | Fresh device starts Navigation; resume/direct links and special-session entries exist. Tutorial nextKey and catalog next disagree; no established personalized assessment. | Guest lesson before personalization/account, with narrow setup before task versus full survey/account first. A quick platform choice prevents mismatched teaching without a broader upfront interview. | Use a small changeable Windows/Mac setup choice, then the guest lesson and later goals/experience/save invitation. Recommend a next step while preserving direct exploration and experienced-user access. | **Confirmed September 18–19:** short guest lesson before broader personalization/signup; Windows primary with suggested, changeable Windows/Mac choice before the first exercise. Reviewed private guest-progress carry-over approved. Exact supported-platform matrix, remaining personalization questions, save/import mechanics and next-step hierarchy remain open. |
 | D11: versioning/history | Results use drill keys; requirements often derive from today's catalog; some earned rewards already latch. Reusing a key could mix different work. | Reinterpret old records (simple but unfair); version requirements/content and retain evidence (more bookkeeping, preserves meaning). | Stable exercise identity plus scored revisions; version paths, credential requirements and competitive rules. Preserve old attempts, awards and certificates; separate incomparable boards. Explicit equivalence decisions determine whether old work satisfies a new requirement. Depends on final rules and content blueprints. | Preservation/no reset **confirmed**; migration/equivalence method **pending**. |
-| D12: special-session scope | Classic, Rapid-fire and Daily serve different activities; race links and placement add contexts. Marathon, weekly and Tour implementations have no current ordinary entry. | Equal prominence for available modes (choice/complexity); core learning plus optional practice/events (clear entry); core only initially (simpler but loses useful variety). | Core learning first; selected public benchmarks/Daily events now agreed. Rapid-fire remains an optional-practice proposal; keep dormant systems dormant, race/placement as contexts and weakness queue as recommendations pending detailed choices. No code removal/revival. | **Daily/benchmark public focus confirmed September 18.** Other mode roles, prominence and mechanics remain pending. |
+| D12: special-session scope | Classic, Rapid-fire and Daily serve different activities; races/placement add contexts. Marathon, weekly and Tour have no current ordinary entry. | Equal mode prominence creates choice/complexity; core learning plus optional practice/events narrows the main journey; core only removes useful variety. | Learning first; optional Rapid-fire and selected benchmark/Daily challenges. Friend sharing uses those challenge rules. Keep dormant systems dormant pending agreed disposition; no deletion/revival. | **Confirmed September 18–19:** benchmark/Daily public focus, Rapid-fire optional quick practice without path/prerequisite role, benchmark/Daily friend sharing without a separate race mode. One Help entry and fewer visible choices. Precise navigation, optional-mode awards and other mode dispositions remain open. |
 | D13: account records, visibility and activity | Account clean-run/session records mix with device-only learning/PBs and derived rewards; no durable general unfinished/help-use history. “Accuracy” means route efficiency, and practice-time scope is incomplete. E10 plus DATA-04/06/07. | Full finished history plus unfinished summaries versus finished-only or milestones/PBs; private details with chosen highlights versus public performance summaries; activity time/days with or without optional streaks. | Apply the three approved principles. Complete the candidate record/metric dictionary, comparison/measurement rules and honest legacy-unknown treatment before implementation; keep retained facts, derived stats and public display distinct. | **Confirmed September 18:** every finished attempt including helped/private work plus lightweight deliberately restarted/ended-unfinished summaries; private detailed history and selected public highlights; active practice time/days and optional non-gating streak. Exact fields/formulas, replay capture, interruptions, day/idle rules, retention/archive and migration remain open. The entire candidate metric table is not blanket-approved. |
 
 September 18 follow-up to D10/D13: time, PBs, improvement history and key count are now selected;
@@ -1218,7 +1340,7 @@ still-pending mechanics. They are **not a claim about current behavior or full f
 
 1. **Complete beginner, guest.** Starts a short movement-and-copy lesson with visible location
    cues. Opens a step hint, finishes the worksheet and sees “Completed with help — learning
-   progress earned; no XP.” Next actions are continue learning or try independently. Saving
+   progress earned; no XP.” Next actions are Continue or Try solo. Saving
    explains what is local and what an account would retain. No automatic competitive entry.
 2. **Experienced learner.** Chooses a relevant formulas/model path or skips to an exercise
    included in their access. Gets prerequisite advice without grinding XP; at a major advanced
@@ -1347,41 +1469,45 @@ new certificate must be agreed before migration. Nothing in this example authori
 
 ## Proposed updates for the chief
 
-**PRODUCT proposal:** retain the existing reconciled decisions through 0961f3c and add the
-explicit September 19 selections with the provenance/limits recorded above:
-- Try solo is a fresh attempt judged on its own help/input record; earlier help does not
-  penalize it. XP/timed eligibility still follows the applicable rules and comparison group.
-- Signup offers reviewed, confirmed, private carry-over of device guest progress/history,
-  excluding other signed-in accounts. Exact import/conflict/validation mechanics remain open.
-- Show the goal before Start; worksheet reveal starts the scored clock, which runs continuously.
-  Ordinary learning is freely pausable. Benchmarks/Daily allow unlimited best-eligible retries.
-- Keep Rapid-fire as optional quick practice, not a path or prerequisite. Friend sharing uses
-  benchmark/Daily tasks and their rules, without a separate race mode or individual-drill races.
-- Avoid overwhelming learners with modes/settings around the existing ribbon/workspace. One
-  Help entry contains levels of support; task instructions remain visible and solution help's
-  assistance consequence is clear. Other navigation/result hierarchy details are proposals.
+**PRODUCT proposal:** retain earlier reconciled approvals and add the September 19 six-choice
+answers/refinements from the dated register above:
+- Windows primary; a small suggested, changeable Windows/Mac setup choice before the first
+  exercise; instructions/shortcuts follow the chosen setup. Broader personalization still follows
+  the guest lesson. Exact verified compatibility and comparison pools remain open.
+- Most XP for new accomplishments, smaller limited repeat rewards and no speed multiplier.
+  Existing no-help/no-spreadsheet-mouse XP rules and earned-history protection remain.
+- Focused lessons lead to practical tasks and larger models within one learning journey.
+- Completion certificates for selected lesson/drill sets; helped and spreadsheet-mouse
+  completions count. Replace the independent-assessment certificate recommendation, preserving
+  existing issued credentials and separate readiness/solo/performance rules. Exact sets/access open.
+- Desks remains a separate optional feature for business/training-provider use. WSP/Training
+  the Street are audience examples, not commercial relationships or integrations.
+- Satisfying action-completion feedback is a desired experience; specific frequency, sound and
+  overall tone remain a pending three-choice group. No physiological benefit is asserted.
+- Useful free navigation/editing/formatting/basic formulas, explicitly teaching ribbon and Excel
+  functionality with breadth of useful work/time-saving value. Exact curriculum and calibrated
+  savings remain open; advanced learning/models stay paid.
 
-**CURRENT proposal:** the solo/guest/clock/mode/help question groups are answered. At Wolf's
-request, six design/platform choices are now presented together and pending: keyboard-platform
-promise, XP principles, learning format, certificates, Desks prominence and concrete free/paid
-depth. The handoff now
-contains the requested keep/combine/simplify/leave-out mode/feature map, active/dormant evidence,
-approved Rapid-fire/friend/help scope and the explicit simplicity constraint. Other proposed
-removals/dispositions are not blanket-approved. The review still owns only this handoff at
-00df57a; 16ee830 remains the accepted implementation baseline. No rebase/full audit or new module.
+**CURRENT proposal:** all six choices and both platform/certificate refinements are answered.
+Replace the prior all-pending status. Review concrete first-lesson/helped-result/returning-home
+states next, applying the new satisfying-action-feedback intent. Three feel choices are now
+pending: feedback frequency/intensity, sound defaults and overall tone. Then settle precise
+XP/certificate/platform/access/metric and migration details. Existing
+mode dispositions not expressly selected remain proposals. Ownership/baselines unchanged:
+only this handoff; 00df57a source evidence retained, 16ee830 implementation baseline.
 
-**Verification for this checkpoint:** began from the clean task branch at 08d1e46. Reused its
-previously verified source evidence and shared guidance; this follow-up only expands the pending
-product-options packet. No new source/security/SQL investigation, agent or application tests.
-Document-only validation passed: sole-file manifest, all 19 relative links and whitespace.
-Commit/push/remote identity verification completes the handoff.
+**Verification for this checkpoint:** began from clean 6d87306; freshly read remote CURRENT
+(file blob c6e3f9ea2e4b22d57cf6aa95e9bc9dbd2258b66a) and PRODUCT
+(file blob aa6700f789699edfc70e72316121c88c9d27ecbc), which preserve the accepted baseline and
+show the prior six-choice packet pending. Reused prior source evidence; no new source/security/
+SQL audit, agent or application tests needed for recording explicit answers and the new feel
+questions. Sole-file diff, 19 relative links and whitespace checks passed. Complete the
+commit/push and remote identity verification for the handoff.
 
-**Next bounded turn:** record the six pending selections without assuming unanswered choices,
-then show a compact default-learning and result-state design applying the
-simplicity constraint, with optional quick practice/challenges clearly secondary. Use it to
-settle remaining hierarchy and proposed mode retirements without another large questionnaire.
-Then address the dependent reward/credential/Desks details, exact metrics/access and comparison/
-retention/legacy rules in dependent groups. Do not reopen answered questions or begin a catalog
-rebuild, feature deletion, benchmark study, billing activation or implementation. Preserve
-Foundations feedback and existing earned records. This remains an evolving plan, not final
-catalog/launch approval.
+**Next bounded turn:** record the three pending feel selections, then review the concrete
+learner states against the simplicity constraint
+and these decisions. Resolve only consequential remaining hierarchy, feature-disposition and
+reward/measurement/access details in small groups; preserve confirmed answers. No catalog
+rebuild, feature deletion, benchmark study, enterprise integration, billing activation, merge
+or implementation. Preserve Foundations feedback and earned records. This is an evolving plan,
+not final catalog/launch approval.
