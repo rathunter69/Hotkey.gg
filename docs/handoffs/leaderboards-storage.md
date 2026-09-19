@@ -8,8 +8,8 @@ Starting code: `16ee8306a8c170db9f8fe2e051b44b0519782ae1`, CURRENT's accepted gr
 Shared guidance read separately: initially `4ec23e01cb958d5dfed5e92875db3f7002eab1e1`; refreshed
 `codex/repository-foundation` at `2b16827aecf9b1c773f9b48d9b986c506c061c8a`. Its delta registers
 active UI/storage planning and these two user answers; accepted code/ownership are unchanged.
-State: completed planning assessment/proposed contract, prepared for a remote branch checkpoint;
-no implementation or deployed change. Final commit identity is supplied by this file's Git history.
+State: completed planning assessment/proposed contract; committed and pushed branch checkpoint,
+not merged or deployed. Final commit identity is supplied by this file's Git history.
 Owned/changed file: **only `docs/handoffs/leaderboards-storage.md`**. CURRENT/PRODUCT remain chief-owned.
 
 ## Scope and outcome
@@ -351,7 +351,7 @@ Discuss only one small packet at a time; answered rules above must not be reopen
 
 | Packet | Recommended next choice | Alternative / owner |
 |---|---|---|
-| 1. Guest eligibility | Import historical facts privately; grant new XP/readiness/current-standard PB eligibility only where a separately approved evidence rule can validate it | Treat imports as history only until fresh qualifying solo work. Catalog + Security decide; no automatic public entry in either option. |
+| 1. Guest eligibility | Import historical facts privately; grant new XP/readiness/current-standard PB eligibility only where a separately approved evidence rule can validate it | Require fresh qualifying solo work for those new benefits; preserve imported facts and known completion, with new path/certificate equivalence specified separately. Catalog + Security decide; no automatic public entry in either option. |
 | 2. Event grace and evidence | Published short receipt grace, finish within event window, trusted issued entry/continuity evidence | Choose duration, exact event window, proof and finalization together; Storage + Security + Engine/Catalog. Do not use receipt grace to extend gameplay. |
 | 3. Public comparison details | Fixed benchmark/Daily task per group; equal times share rank; proven-equivalent setup/variants only | Add validated variant families later. Catalog/Engine prove comparability; access remains Payments-owned. |
 | 4. Retention and interruption | All finished records + lightweight deliberate summaries; no silent expiry; label interrupted facts only | Archive presentation/limits, guest device retention, exports/deletion, full resume and public withdrawal require their own explicit decisions. |
@@ -363,6 +363,12 @@ report does not select numbers, collect additional input data or tie history ret
 Catalog returned [coordination handoff 194db93](https://github.com/rathunter69/Hotkey.gg/blob/194db93780b4e9a3187271687d2d049e2fe4922f/docs/handoffs/catalog-progression.md)
 and confirmed all rules above remain those at 15de791, with no newer unshared decisions. It
 retains eligibility/reward/state semantics and requests the remote contract for semantic review.
+Catalog then reviewed the full published `8c7686c649eb15d0dbc5429e79208ea11ff311e6` report
+(file blob `ccc92587170daef41da6c0dec1ef035ee90f09a3`) against 15de791/194db93 and refreshed PRODUCT.
+Its sole clarification was to narrow the guest-import alternative to **new XP, solo-readiness
+and current-standard PB recognition**, preserving known imported completion separately. The
+option above now does that; no further material semantic conflict was found in the bounded
+review. This is consistency review, not approval of either guest-eligibility proposal.
 The [UI handoff at b0d2f17](https://github.com/rathunter69/Hotkey.gg/blob/b0d2f17929768e1be348510728e5559975544b2c/docs/handoffs/experience-site.md)
 aligns completion/save/award/publication, unknown responses, account receipts, ambiguous imports
 and distinct Retry save versus Retry attempt. Its saving section was checked directly; no
