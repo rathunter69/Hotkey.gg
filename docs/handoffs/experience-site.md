@@ -9,7 +9,7 @@ Shared guidance read remotely: `4ec23e01cb958d5dfed5e92875db3f7002eab1e1` on `co
 Refreshed guidance: `4d964901a4f06493695c11bb8f04c4769d607ab0`; its CURRENT update registers this planning assignment, with no changed product policy.
 Final shared-guidance refresh: `2b16827aecf9b1c773f9b48d9b986c506c061c8a`; incorporates Storage's proven-comparability and short published submission-grace principles. Accepted code baseline and ownership remain unchanged.
 Owned file: **only `docs/handoffs/experience-site.md`**.
-State: planning outlines reviewed; full layouts remain proposals except the two explicit choices below. No application implementation, merge or deployment. Final commit identity is supplied by Git history and the verified chief handoff.
+State: planning outlines reviewed; full layouts remain proposals except the four explicit choices below. No application implementation, merge or deployment. Final commit identity is supplied by Git history and the verified chief handoff.
 
 ## Scope and outcome
 
@@ -18,13 +18,17 @@ One main action leads each ordinary-learning screen; Help, saving and optional c
 clear places. These are presentation proposals except where explicitly marked confirmed.
 They do not define new learner states, rewards, lesson content, storage schemas or access rules.
 
-**Two UI decisions confirmed by Wolf in this task, September 19:**
+**Four UI decisions confirmed by Wolf in this task, September 19:**
 
 1. Help uses a **side panel beside the worksheet**, keeping the worksheet visible.
 2. A **small Challenges link beside Home and Catalog** provides optional challenge access.
+3. Keep a **short goal and current checkpoint visible**, with the **full checklist expandable**.
+   The checkpoint describes the required outcome; solution-revealing help remains separate.
+4. **Ordinary lesson results appear in the side panel**, keeping the finished worksheet visible.
+   Helped results retain Continue primary and Try solo alongside.
 
-Source: Wolf's explicit selections in this task's two-option question group. These settle
-placement only; exact dimensions, narrow-screen treatment, final wording and the other outline
+Source: Wolf's explicit selections in this task's two successive question groups. These settle
+the stated presentation choices only; exact dimensions, narrow-screen treatment, final wording and the other outline
 details remain proposals. They do not authorize implementation or change any learning rule.
 
 ## Sources and coordination
@@ -121,8 +125,10 @@ Goal: [one clear, catalog-owned everyday outcome]
 [Start lesson]                       Choose my starting point
 ```
 
-Start opens the retained worksheet/ribbon with a short visible goal/instruction area, Help and
-mute. No profession survey, account wall or mode picker precedes practice. The experienced
+Start opens the retained worksheet/ribbon with the confirmed short goal/current checkpoint,
+an expandable full outcome checklist, Help and mute. Solution steps remain within classified
+Help rather than appearing automatically as a checkpoint. No profession survey, account wall
+or mode picker precedes practice. The experienced
 shortcut opens Catalog, retaining a route back to the recommended starter. It does not mark
 unplayed lessons complete or imply advanced readiness. Exact starter content stays Catalog-owned;
 do not silently choose between the old Navigation→Autofit and catalog sequence (E7).
@@ -178,6 +184,10 @@ active-time measurement belongs to Saved-progress.
 Only supported recovery paths should be offered: no false “resume this score later” promise.
 
 ## 3. Helped and solo results
+
+**Confirmed placement:** ordinary lesson results use the side panel, keeping the completed
+worksheet visible. Detailed spacing, focus behavior and transitions remain to design; the
+result panel must not require a competing overlay or automatically reveal a solution.
 
 ```text
 Lesson complete — with help        (or: Lesson complete — solo)
@@ -403,24 +413,48 @@ layout while remaining open to suggestions. Treat this as a renewed preference t
 the existing visual foundation, not approval of a wholesale redesign or of every proposal below.
 Shared guidance was refreshed through `3b2063f74e53ede253602c83299ff3dd0263e041`; it accepts
 the initial UI handoff and records the two placement approvals. Baseline/ownership are unchanged.
+Before recording the two answers below, guidance was refreshed through `7a95e428240fad8e539a69c22b79bfcbf179c063`;
+AGENTS/CURRENT/PRODUCT/TASK_GUIDE have no changes from that prior read.
 
 The useful remaining decisions concern presentation and sequencing. Keep settled Help,
 assistance, Continue/Try solo, rewards and challenge rules out of another questionnaire.
 
-| Remaining choice | UI recommendation; still a proposal |
+| Choice | Decision or remaining recommendation |
 |---|---|
-| Visible task guidance | Keep the goal and current outcome/checkpoint visible, with the full outcome checklist expandable. A checkpoint describes the required result, not an automatically revealed solution or mandatory keyboard route. |
-| Result placement | Use the existing side-panel area for ordinary results, keeping the completed worksheet visible. Helped results retain Continue primary and Try solo alongside; full statistics expand. |
-| Post-lesson save invitation | Offer Save to an account as a secondary action after the first result and a quiet Home reminder; avoid interrupting Continue with a signup dialog. The two skippable personalization topics remain agreed; exact wording/ordering stays open. |
-| Catalog browsing | Preserve its visual style; make one recommendation easy to find, retain browse/search, and disclose extra filters only when requested. Exact grouping/labels should follow Catalog's content plan. |
-| Secondary information and controls | Keep detailed progress/history in My progress and less-used lesson options together. Keep Help, mute and essential keyboard access discoverable. Final placement of those other controls remains open. |
+| Visible task guidance | **Confirmed September 19:** keep the short goal and current outcome/checkpoint visible, with the full outcome checklist expandable. A checkpoint describes the required result, not an automatically revealed solution or mandatory keyboard route. |
+| Result placement | **Confirmed September 19:** ordinary results appear in the side panel, keeping the finished worksheet visible. Helped results retain Continue primary and Try solo alongside; full statistics expand under the earlier approved information hierarchy. |
+| Post-lesson save invitation | **Proposal:** offer Save to an account as a secondary action after the first result and a quiet Home reminder; avoid interrupting Continue with a signup dialog. The two skippable personalization topics remain agreed; exact wording/ordering stays open. |
+| Catalog browsing | **Proposal:** preserve its visual style; make one recommendation easy to find, retain browse/search, and disclose extra filters only when requested. Exact grouping/labels should follow Catalog's content plan. |
+| Secondary information and controls | **Proposal:** keep detailed progress/history in My progress and less-used lesson options together. Keep Help, mute and essential keyboard access discoverable. Final placement of those other controls remains open. |
 
-**Small question group presented in this task; answers pending:**
+**Small question group: both explicitly answered September 19.**
 
-1. Visible guidance: short goal/current checkpoint with expandable full checklist (recommended),
-   or full task checklist always visible. Both preserve visible instructions and separate solution help.
-2. Ordinary result placement: side panel beside the completed sheet (recommended), or a compact
-   dialog over the sheet. This chooses presentation, not new result/reward semantics.
+1. Wolf selected “Short goal and current checkpoint; expand the full checklist (recommended)”.
+   This settles the density of visible outcome guidance; it does not approve automatic solution help.
+2. Wolf selected “In the side panel, keeping the finished worksheet visible (recommended)”.
+   This settles ordinary lesson result placement; it does not change result/reward semantics.
+
+Acceptance example: a learner can see the goal/current outcome while working, expand the full
+outcome checklist when useful, and review a completed lesson in the adjacent result panel while
+the finished sheet remains visible. Helped completion still presents Continue then Try solo.
+Exact checklist text/mapping, dimensions, narrow-screen handling and transitions remain open.
+No new application tests or agent review were needed to record these explicit answers; the
+sole-document diff and whitespace were checked before its remote checkpoint.
+
+Wolf then asked for questions on the outstanding items. The next small group was presented;
+**all three answers are pending**:
+
+1. Save invitation after the first guest lesson: secondary button on the result plus a quiet
+   Home reminder (recommended), or a separate optional save step after personalization.
+   Both preserve continuing without signup; neither changes guest-import confirmation or saving rules.
+2. Catalog opening: one recommendation above the browsable catalog (recommended), or the full
+   catalog first with recommended lessons marked. Both preserve direct browsing and the current
+   visual style; Catalog owns recommendation meaning/content.
+3. Secondary lesson controls, such as timer visibility and Excel setup: one small Lesson options
+   menu (recommended), or a compact always-visible controls row. Help and mute remain visible;
+   neither option changes keyboard access, approved timing or platform-support requirements.
+
+These are presentation questions only. No answer is inferred from asking for the options.
 
 Spacing, alignment, consistent buttons, readable text, visible keyboard focus, reduced-motion
 treatment and clear error wording are design/validation work within the chosen aesthetic. They
@@ -458,12 +492,12 @@ Current layouts have not been newly visually inspected or playtested in this fol
 - `npm run check`, browser suites, live-auth tests and database tests are **not run** for this
   documentation-only task under TASK_GUIDE/CURRENT's exception. Existing passes are not relabelled
   as new tests. No application, generated assets, data, settings, billing or deployment changed.
-- All exact wording/layouts beyond the two selections remain proposals. Acceptance scenarios
+- All exact wording/layouts beyond the four selections remain proposals. Acceptance scenarios
   are future checks, not successful playtests; Mac/accessibility/audio and real save behavior
   remain unverified. Existing audit defects remain with their owners.
 
 **Chief integration request:** record this planning assignment, its verified remote handoff and
-the two dated placement decisions. Keep existing learning/reward rules; do not mark the full
+the four dated presentation decisions. Keep existing learning/reward rules; do not mark the full
 outline approved, implemented or shipped. CURRENT/PRODUCT edits remain chief-owned.
 
 **Next bounded UI turn:** review the first-lesson → Help → helped result outline with Wolf and
