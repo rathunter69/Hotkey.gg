@@ -496,6 +496,15 @@ eligibility/version rules explicitly while preserving earned items and historica
 All questions in this packet are answered. Continue with concrete learner-state examples and
 precise contracts; no application, catalog or stored-history change is authorized.
 
+**September 19 — initial subscription-access choices approved:**
+
+The chief read Wolf's explicit answers in **Plan payments access rules**
+(`01a0b969-ac99-7553-bc36-42868257ff55`): a few complete advanced sample lessons for free,
+and free selected public challenges with certificate access following the underlying content.
+Earned certificates/results remain accessible. Exact sample/challenge lists, price, expiry and
+remaining lifecycle details stay with Payments/Catalog. These initial answers do not activate
+billing, approve every challenge as free or settle the entire offer. Remote area handoff is pending.
+
 **September 19 — initial saved-progress comparison and submission principles approved:**
 
 Source: the chief read Wolf's explicit answers in the newly started Area 7 task
@@ -709,6 +718,28 @@ LeetCode is a useful structural reference: it has [study plans](https://leetcode
 alongside its problem library, and [Premium](https://leetcode.com/subscribe/) adds exclusive
 content and tools. This does not establish the best timing, price or free-tier boundary for
 Excel learners; the recommendations above are our product proposals, not copied requirements.
+
+### Curriculum roadmap requested — September 19
+
+Wolf explicitly requested a workstream to clarify chapters/Foundations, what each lesson/module
+teaches, and a revised roadmap of chapters, tracks, drills and learning objectives against the
+current chapter/74-drill structure. The existing catalog is the comparison baseline, not an
+approved final count or unchanged chapter sequence. This is authorization for planning; no
+particular replacement hierarchy, curriculum, content deletion or rebuild is selected.
+
+The existing Catalog owner will produce the first whole-platform skill/chapter map and a current-
+drill crosswalk, then detail Foundations with a few representative lesson blueprints for review.
+Track versus chapter/module/lesson meanings must be explained and kept as simple as useful.
+Using tracks as routes through shared content is a recommendation, not a confirmed architecture.
+Preserve dated Foundations feedback, earned records and legitimate alternative solutions; do not
+revive superseded density/no-scroll/timing quotas. Access, certificate and old-to-new recognition
+mappings remain distinct proposals/dependencies where unsettled.
+
+The [workstream brief](TASK_STARTERS.md#curriculum-roadmap-workstream--september-19) supplies the
+first deliverables and planning gates. This extends curriculum planning in the existing task;
+UI retains presentation, Storage retains persistence and Payments retains paid-access rules.
+The chief integrates decisions. A complete agreed plan still precedes separately authorized
+content implementation.
 
 ### Preserve Foundations feedback before redesign
 
