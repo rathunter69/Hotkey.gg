@@ -992,6 +992,41 @@ dispositions, precise navigation/action hierarchy, unresolved reward/certificate
 measurement/access/migration details remain open. No code, setting, stored record or feature
 has been removed, and no new module is assigned.
 
+### September 19: remaining decisions helpful before building — platform and XP questions
+
+**Source:** Wolf asked which other design/platform decisions would help building. This remains
+specification work, not permission to implement. The highest-impact remaining choices are the
+supported keyboard/platform promise, XP reward principles, representative beginner/advanced
+lesson depth, certificate purpose/initial scope, Desks prominence and the exact free-versus-paid
+learning outcomes. Layout details should follow concrete lesson/screen examples and the agreed
+simplicity constraint rather than becoming more upfront user settings.
+
+**Two questions presented, pending:**
+1. **Keyboard-platform promise:** recommend desktop Windows as the primary experience, with
+   Mac support explicitly scoped and verified before promising parity. Alternatives: full
+   Windows/Mac parity from the first redesigned release, or a shared beginner core with
+   platform-specific advanced content. A narrower promise reduces initial content/test scope;
+   full parity gives a broader consistent offer but affects shortcut teaching, statistics,
+   grading and timed comparison. No compatibility assertion follows from this question.
+   Exact browser versions, mobile browse/training scope, shortcut equivalences and benchmark
+   comparison pools remain to specify. This does not authorize breaking existing Mac support.
+2. **Single XP system:** recommend most XP for new eligible accomplishments, smaller limited
+   repeat-practice rewards and no speed multiplier. Alternatives: first completions/milestones
+   only, or similar XP for every eligible completion. Limited repeat rewards recognize useful
+   rehearsal while reducing grinding; speed records supply their own motivation. Helped or
+   spreadsheet-mouse attempts retain learning progress but earn zero XP, as already approved.
+   Existing earned XP remains protected. Exact amounts/caps, qualifying accomplishments,
+   optional-mode awards, new variants and migration are not selected by this principle question.
+
+**Status:** both pending. This is the remaining XP rule within the approved single level,
+not a revival of the retired mastery/rank questionnaire. No benchmark research, new module,
+content production, framework change, deployment or billing activation is initiated.
+
+**Dependencies/next:** platform scope precedes precise shortcut/command definitions and lesson
+blueprints; XP meaning precedes award formulas. Concrete first-lesson/returning/result-state
+examples should then test the small number of visible actions. Certificate/Desks decisions
+need chief coordination with their existing owners, not automatic workstream creation.
+
 ## Evidence register
 
 All runtime paths/line references below refer to **00df57a**, unless another SHA is named.
@@ -1288,7 +1323,7 @@ explicit September 19 selections with the provenance/limits recorded above:
   Help entry contains levels of support; task instructions remain visible and solution help's
   assistance consequence is clear. Other navigation/result hierarchy details are proposals.
 
-**CURRENT proposal:** this area's September 19 question groups are answered. The handoff now
+**CURRENT proposal:** the solo/guest/clock/mode/help question groups are answered. New keyboard-platform and single-XP principle questions are pending. The handoff now
 contains the requested keep/combine/simplify/leave-out mode/feature map, active/dormant evidence,
 approved Rapid-fire/friend/help scope and the explicit simplicity constraint. Other proposed
 removals/dispositions are not blanket-approved. The review still owns only this handoff at
@@ -1298,10 +1333,10 @@ removals/dispositions are not blanket-approved. The review still owns only this 
 remote shared guidance had reconciled it and retained the accepted baseline. Reused the existing
 mode and page audits with a bounded independent product review. A targeted Marathon-entry read
 resolved one contradictory review claim; no wider source/security/SQL audit or app tests ran.
-Document-only validation passed: sole-file manifest, all 19 relative links and whitespace. Before
-publication. Commit/push/remote identity verification remains the required handoff completion.
+Document-only validation passed: sole-file manifest, all 19 relative links and whitespace.
+Commit/push/remote identity verification completes the handoff.
 
-**Next bounded turn:** show a compact default-learning and result-state design applying the
+**Next bounded turn:** record the pending platform/XP answers, then show a compact default-learning and result-state design applying the
 simplicity constraint, with optional quick practice/challenges clearly secondary. Use it to
 settle remaining hierarchy and proposed mode retirements without another large questionnaire.
 Then address remaining reward/credential/Desks scope, exact metrics/access and comparison/
