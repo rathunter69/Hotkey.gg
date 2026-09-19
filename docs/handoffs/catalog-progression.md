@@ -992,16 +992,13 @@ dispositions, precise navigation/action hierarchy, unresolved reward/certificate
 measurement/access/migration details remain open. No code, setting, stored record or feature
 has been removed, and no new module is assigned.
 
-### September 19: remaining decisions helpful before building — platform and XP questions
+### September 19: six remaining design/platform decisions — options presented, pending
 
-**Source:** Wolf asked which other design/platform decisions would help building. This remains
-specification work, not permission to implement. The highest-impact remaining choices are the
-supported keyboard/platform promise, XP reward principles, representative beginner/advanced
-lesson depth, certificate purpose/initial scope, Desks prominence and the exact free-versus-paid
-learning outcomes. Layout details should follow concrete lesson/screen examples and the agreed
-simplicity constraint rather than becoming more upfront user settings.
+**Source:** Wolf asked which other design/platform decisions would help building, then explicitly
+asked for options for all six. The earlier platform/XP questions are included in this group,
+not separate competing questionnaires. All six choices remain pending. This is specification
+work, not permission to implement, add learner-facing settings or remove existing features.
 
-**Two questions presented, pending:**
 1. **Keyboard-platform promise:** recommend desktop Windows as the primary experience, with
    Mac support explicitly scoped and verified before promising parity. Alternatives: full
    Windows/Mac parity from the first redesigned release, or a shared beginner core with
@@ -1017,15 +1014,51 @@ simplicity constraint rather than becoming more upfront user settings.
    spreadsheet-mouse attempts retain learning progress but earn zero XP, as already approved.
    Existing earned XP remains protected. Exact amounts/caps, qualifying accomplishments,
    optional-mode awards, new variants and migration are not selected by this principle question.
+3. **Learning format:** recommend focused beginner lessons leading to practical tasks, then
+   larger models. Alternatives: project-first teaching, introducing skills within a larger
+   task; or mostly short drills, with larger projects optional. The recommendation connects
+   approachable early practice to realistic spreadsheet ability. Project-first provides context
+   earlier but puts more demands on beginners; drill-heavy content is easier to sample but
+   needs deliberate transfer into real work. These are content formats within the learning
+   journey, not three new modes. Exact lesson length, outcomes, examples and catalog membership
+   still need blueprints and Foundations-feedback review before any rebuild.
+4. **Certificates:** recommend optional certificates after a practical task completed solo,
+   without a speed requirement. Alternatives: a certificate for completing a learning path,
+   or deferring new certificates from the initial redesign. A solo assessment supports a clearer
+   claim about demonstrated ability but requires assessment and retry standards. Path completion
+   is simpler and celebrates participation, including approved helped learning, but supports a
+   different claim. Deferral narrows initial scope. Existing issued certificates remain preserved.
+   Exact keyboard/help eligibility, evidence, assessment comparability, paid access and certificate
+   wording are not settled by selecting a purpose; no accreditation claim is implied.
+5. **Desks/team learning:** recommend a separate optional area while focusing the main redesign
+   on individual learning. Alternatives: make group learning central to the redesigned experience,
+   or leave Desks out of the initial redesigned experience while preserving records. Separation
+   supports existing group uses without adding setup to the beginner journey. A central role
+   expands onboarding, assignment and account-flow scope; leaving it out reduces initial visible
+   scope but needs an agreed transition for existing users. No Desks removal, data change or new
+   team-learning workstream is authorized. Coordinate any later plan with its existing owner.
+6. **Concrete free/paid depth:** within the approved useful free beginner path, recommend free
+   navigation, editing, formatting and basic formulas sufficient to build and tidy a simple
+   spreadsheet. Alternatives: free keyboard/editing/formatting with most formula courses paid,
+   or a broad free intermediate curriculum with advanced models and specializations paid. The
+   recommendation gives beginners a complete practical outcome and leaves deeper analysis/models
+   for subscribers. A narrower free boundary gives an earlier upgrade point but risks a less
+   useful beginner outcome; a broader one gives more free learning but needs a clearer paid offer.
+   Free repeats/personal speedruns on included content and selected advanced previews remain
+   approved. Exact lesson lists, prices, trials, access expiry and competition/certificate access
+   are still open. No billing activation is authorized.
 
-**Status:** both pending. This is the remaining XP rule within the approved single level,
-not a revival of the retired mastery/rank questionnaire. No benchmark research, new module,
-content production, framework change, deployment or billing activation is initiated.
+**Status:** all six pending; the question interface offers three selectable options for each.
+The XP choice belongs to the approved single level, not a revival of the retired mastery/rank
+questionnaire. The certificate proposal does not reinstate a mastery system. No benchmark study,
+new module, content production, framework change, deployment or billing activation is initiated.
 
 **Dependencies/next:** platform scope precedes precise shortcut/command definitions and lesson
-blueprints; XP meaning precedes award formulas. Concrete first-lesson/returning/result-state
-examples should then test the small number of visible actions. Certificate/Desks decisions
-need chief coordination with their existing owners, not automatic workstream creation.
+blueprints; learning format and free learning outcomes precede catalog allocation. XP meaning
+precedes award formulas. Certificate purpose determines any assessment contract; Desks prominence
+sets navigation/onboarding scope. Concrete first-lesson/returning/result-state examples should
+then test the small number of visible actions. Coordinate certificate/Desks planning with the
+chief and existing owners, without automatically starting workstreams.
 
 ## Evidence register
 
@@ -1307,6 +1340,11 @@ new certificate must be agreed before migration. Nothing in this example authori
   only the two dependent solo-eligibility and guest-carry-over questions. Their answers are
   not assumed. No new investigation or tests were needed for this documentation-only update.
 
+- September 19 all-options follow-up: Wolf explicitly requested selectable options for all six
+  remaining design/platform choices. Expanded the pending group and recorded recommendations,
+  alternatives, tradeoffs and dependencies without assuming any selection. No new investigation,
+  agent or application tests; only this handoff changes, with links and whitespace checked.
+
 ## Proposed updates for the chief
 
 **PRODUCT proposal:** retain the existing reconciled decisions through 0961f3c and add the
@@ -1323,23 +1361,26 @@ explicit September 19 selections with the provenance/limits recorded above:
   Help entry contains levels of support; task instructions remain visible and solution help's
   assistance consequence is clear. Other navigation/result hierarchy details are proposals.
 
-**CURRENT proposal:** the solo/guest/clock/mode/help question groups are answered. New keyboard-platform and single-XP principle questions are pending. The handoff now
+**CURRENT proposal:** the solo/guest/clock/mode/help question groups are answered. At Wolf's
+request, six design/platform choices are now presented together and pending: keyboard-platform
+promise, XP principles, learning format, certificates, Desks prominence and concrete free/paid
+depth. The handoff now
 contains the requested keep/combine/simplify/leave-out mode/feature map, active/dormant evidence,
 approved Rapid-fire/friend/help scope and the explicit simplicity constraint. Other proposed
 removals/dispositions are not blanket-approved. The review still owns only this handoff at
 00df57a; 16ee830 remains the accepted implementation baseline. No rebase/full audit or new module.
 
-**Verification for this checkpoint:** fresh remote handoff matched local 0961f3c before editing;
-remote shared guidance had reconciled it and retained the accepted baseline. Reused the existing
-mode and page audits with a bounded independent product review. A targeted Marathon-entry read
-resolved one contradictory review claim; no wider source/security/SQL audit or app tests ran.
+**Verification for this checkpoint:** began from the clean task branch at 08d1e46. Reused its
+previously verified source evidence and shared guidance; this follow-up only expands the pending
+product-options packet. No new source/security/SQL investigation, agent or application tests.
 Document-only validation passed: sole-file manifest, all 19 relative links and whitespace.
 Commit/push/remote identity verification completes the handoff.
 
-**Next bounded turn:** record the pending platform/XP answers, then show a compact default-learning and result-state design applying the
+**Next bounded turn:** record the six pending selections without assuming unanswered choices,
+then show a compact default-learning and result-state design applying the
 simplicity constraint, with optional quick practice/challenges clearly secondary. Use it to
 settle remaining hierarchy and proposed mode retirements without another large questionnaire.
-Then address remaining reward/credential/Desks scope, exact metrics/access and comparison/
+Then address the dependent reward/credential/Desks details, exact metrics/access and comparison/
 retention/legacy rules in dependent groups. Do not reopen answered questions or begin a catalog
 rebuild, feature deletion, benchmark study, billing activation or implementation. Preserve
 Foundations feedback and existing earned records. This remains an evolving plan, not final
