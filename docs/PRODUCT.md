@@ -160,7 +160,7 @@ confirmed decision and its superseded rule; CURRENT owns status and task sequenc
 
 ### Confirmed catalog/flow decisions — September 17–19
 
-Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/c52d067f77b9a3adef0911780a7fe7548bf8592f/docs/handoffs/catalog-progression.md),
+Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/927fd4b86f2be720591334639f8e431bd03b6676/docs/handoffs/catalog-progression.md),
 task 01a0b148-2693-7901-af91-934c83cabe1d. The chief checked the remote handoff and Wolf's
 actual approvals in that task. The September 17 bace206 tentative gate status is superseded
 by the explicit September 18 approval below; other unanswered proposals remain open.
@@ -317,8 +317,8 @@ and do not gate learning or remove progress.
 
 After a helped ordinary lesson, offer Continue and a friendly unassisted-retry option.
 Wolf requested wording such as “solo” instead of “independently”; **Try solo** is working copy,
-not the final label. Primary-button emphasis was not selected, and the retained speedrun
-option remains available. Continuing follows the approved readiness/access rules. Result
+not the final label. Button emphasis was initially open; the later September 19 decision below
+makes Continue primary for helped ordinary lessons. The retained speedrun option remains available. Continuing follows the approved readiness/access rules. Result
 messages must distinguish actual account save, device-only history, pending and failed saves.
 
 **September 18 — task estimate, command usage and mouse boundaries approved:** Wolf first
@@ -428,13 +428,44 @@ personalize/save afterward. A learner completes a certificate set using Help or 
 mouse: completion credit counts, while XP/timed eligibility remains separate. Optional Desks
 can serve a training provider without requiring a new individual learner to join a group.
 
-**September 19 — satisfying feedback requested; feel choices remain open:** Wolf wants action
-completion to feel rewarding and continued clarification of the platform's features and feel.
-Record this as a user-experience goal, not a measured physiological effect or a new reward
-currency. Feedback intensity/frequency, sound defaults and playful/arcade/professional tone are
-the three current pending choices. No sound default, celebration frequency, animation or new
-visual theme is selected. Preserve the familiar ribbon/workspace, limited identity/achievement
-pixel art, valid alternative routes and the fewer-visible-choices constraint.
+**September 19 — feedback, sound and tone approved:** Wolf wants action completion to feel
+rewarding and continued clarification of the platform's features and feel. His explicit
+selections in the dated handoff confirm:
+
+- Small, brief success feedback for each meaningful completed spreadsheet action, with a
+  stronger finish when the task is complete.
+- Soft, brief success sounds on after the learner starts, with an obvious mute that remembers
+  the preference. Ordinary typing stays quiet.
+- A playful, polished and encouraging tone around the preserved spreadsheet workspace.
+  Pixel art remains limited to identity and achievements.
+
+This is a satisfying user-experience goal, not a measured physiological effect or a new reward
+currency. Feedback does not grant per-action XP, new achievements or rewards for every raw key
+press. Exact visuals/audio assets, animation/timing, reduced-motion/accessibility behavior and
+browser/audio validation remain open. Retain valid routes, fewer competing controls and the
+existing help/mouse/score rules; feedback must not silently reveal solutions or pause scored time.
+
+**September 19 — calm learning recovery and helped-result emphasis approved:**
+
+- In ordinary learning, give calm recoverable feedback and allow undo or another try, without
+  lives, XP deductions or forced restart. Welcome valid alternative routes and normal Excel
+  exploration. This does not waive final correctness, change solution Help consequences or
+  relax the approved input/XP/time rules.
+- After a helped ordinary lesson, **Continue is primary**, with **Try solo clearly alongside**.
+  The working retry label and exact layout remain open. This emphasis does not determine every
+  speedrun/challenge result screen, and the retained speedrun option remains available.
+
+These explicitly selected rules resolve the earlier button-emphasis question. Mistake
+definition/detection and public-challenge interruption handling remain open. Helped/mouse-based
+completion can still feel positive and count toward an applicable completion certificate
+without awarding XP or a qualifying timed score. No implementation or new assets are authorized.
+
+**Next proposals, both pending:** use broadly accessible everyday beginner spreadsheet examples
+before deeper finance/modeling work, versus finance-first examples; and ask two short,
+skippable/changeable post-lesson questions about experience and goal, versus goal-only or a
+fuller questionnaire. Windows/Mac setup already comes before the sample lesson. Self-reported
+experience is not readiness evidence. Exact question/goal wording, recommendation mapping and
+save-invitation placement remain open; neither proposal approves new curricula or assessment.
 
 Wolf also explicitly requested continued concise, high-level mechanics options with practical
 tradeoffs and a reasoned recommendation. Keep this discussion style, capture each actual answer
@@ -452,13 +483,13 @@ experience; XP supplies one account level. Choosing a drill speedrun shows perso
 improvement. Choosing a benchmark shows that challenge's leaderboard position, without a
 new mastery tier or second account ladder. Exact UI and save/reward mechanics remain open.
 
-The six-choice packet and both platform/certificate refinements are answered. Await the three
-feel choices, then review concrete first-action, helped/solo-result and returning-home examples
-against the simplicity constraint. Proposed screens, button emphasis, sound/motion and exact
-navigation remain design work, not approved layouts. Exact measurement/calibration, comparison,
-guest-save/import, XP amounts, certificate sets, public-entry and historical transition remain
-open. Do not reopen answered policies or the retired reward questionnaire. The chief reconciles
-answers without duplicating the area's questions.
+The six-choice/refinement, feel and recovery packets are answered. Await the beginner-context
+and post-lesson-personalization choices, then apply the agreed feedback/recovery and helped-result
+priority to concrete first-action, helped/solo-result and returning-home examples. Exact layouts,
+sound/motion assets and navigation remain design work. Measurement/calibration, comparison,
+guest-save/import, XP amounts, certificate sets, public-entry and historical transition also
+remain open. Do not reopen answered policies or the retired reward questionnaire. The chief
+reconciles answers without duplicating the area's questions.
 Existing progress, Foundations feedback and the complete-plan-before-rebuild requirement
 remain protected; implementation still requires a separately authorized bounded batch.
 
@@ -473,9 +504,10 @@ remain protected; implementation still requires a separately authorized bounded 
 | Exploration and access | Complete useful free beginner path with repeat practice/personal speedruns and a few advanced previews; advanced lessons/model-building subscription. Major-jump readiness accepts prior independent work or test-out; helped ordinary completion advances learning | Exact content/preview limits, prices, advanced speedrun and competition/credential access, expiry, checkpoint locations and equivalent evidence |
 | Progress and competition | One XP level: new eligible accomplishments earn most, limited repeats less, no speed multiplier; learning progress, personal speedruns and optional benchmark/Daily boards; new mastery/overall rank deferred | Exact XP amounts/caps/eligibility, metrics/save rules, public eligibility and historical-rank presentation |
 | Account history and habits | Every finished attempt plus lightweight deliberate restart/unfinished summaries; private details with chosen public highlights; meaningful active practice including helped/unfinished work counts toward days; optional non-gating streaks | Metric/record dictionary, activity threshold, idle/day rules, detailed replay, retention, interruptions, legacy comparisons and saving/visibility controls |
-| Speedrun results and helped retry | Time, comparable PBs, improvement history and actual key-press total; completed commands counted separately; labelled task-level mouse estimate; Continue and friendly retry after help; new solo attempt evaluated on its own | Exact counting/comparison/calibration, final retry wording/button emphasis and any practice recommendations |
+| Speedrun results and helped retry | Time, comparable PBs, improvement history and actual key-press total; completed commands counted separately; labelled task-level mouse estimate; Continue primary with Try solo alongside after helped ordinary lessons; new solo attempt evaluated on its own | Exact counting/comparison/calibration, final retry wording/layout, event-result actions and any practice recommendations |
 | Mouse input | Spreadsheet sheet/ribbon/dialog mouse use retains learning progress but earns no XP or qualifying competitive/timed PB; Start/Retry page controls allowed by themselves; existing earnings/history preserved | Detection/focus/accessibility, historical equivalence and private-feedback/derived-estimate treatment |
 | Entry, sharing and simplicity | Offer reviewed/confirmed private guest-history carry-over at signup; optional Rapid-fire; benchmark/Daily friend sharing without separate race mode; fewer competing modes/settings | Import/ownership mechanics, navigation/action hierarchy, remaining feature dispositions and mode rewards |
+| Feedback and recovery | Brief success feedback for meaningful actions and bigger task finish; soft success sounds after Start with remembered mute, quiet typing; playful/polished/encouraging; calm ordinary-learning undo/retry without lives, XP deductions or forced restart | Exact assets/timing/accessibility and mistake detection; correctness/Help/input and continuously running scored time remain unchanged |
 | Certificates | Completion of selected lesson/drill sets, including helped and spreadsheet-mouse completions; preserve issued credentials; separate from solo readiness/XP/time eligibility | Exact sets/checks, names, versions, account/paid eligibility and legacy equivalence; no independent-skill or accreditation claim |
 | Catalog | Prefer a likely full rebuild, but preserve substantial earlier Foundations feedback | A full plan must precede implementation; the old v5 proposal is not automatically selected |
 | Order of work | Easy security/account fixes → catalog/progression separation → repository/database cleanup → site framework → planned catalog redesign | Size/acceptance of each bounded repair or cleanup batch |
