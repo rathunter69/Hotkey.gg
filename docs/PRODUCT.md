@@ -759,10 +759,32 @@ current chapter/74-drill structure. The existing catalog is the comparison basel
 approved final count or unchanged chapter sequence. This is authorization for planning; no
 particular replacement hierarchy, curriculum, content deletion or rebuild is selected.
 
-The existing Catalog owner will produce the first whole-platform skill/chapter map and a current-
-drill crosswalk, then detail Foundations with a few representative lesson blueprints for review.
+**Later September 19 corrections, confirmed in the Catalog owner's dated
+[first-draft handoff](https://github.com/rathunter69/Hotkey.gg/blob/71cc00e3b6fa71933a3871360a2d9d059a8ced61/docs/handoffs/drill-catalog.md):** Wolf wants the catalog and chapter structure
+completely reworked around learning, not simply the existing 74 drills reordered. Existing units
+are source material and historical provenance, not guaranteed replacement slots, titles or counts.
+Define the learning sequence first, then decide what existing material earns a place.
+
+Wolf also requires discrete, explicit goals naming the actual visible elements in each drill:
+“Make Weekly Sales Report bold,” not “make the header more visible” or “make the title in A1 bold.”
+Use the variant's actual title, row, column, section and period labels, with named disambiguation
+where needed. Coordinates may describe internal worksheet geometry/grading; they are not the
+ordinary learner-facing objective format. Teaching cell addresses remains a legitimate concept.
+Clear outcomes do not prescribe a single solution route or mark assistance. If a specific
+technique is being assessed, say so explicitly and distinguish that evidence from ordinary
+correct worksheet completion.
+
+The Catalog owner has delivered the first whole-platform map, all-74-ID crosswalk, feedback
+traceability, 14 provisional beginner objective handles and four representative blueprints.
 Track versus chapter/module/lesson meanings must be explained and kept as simple as useful.
 Using tracks as routes through shared content is a recommendation, not a confirmed architecture.
+The draft proposes ten chapters: Move/select; Edit/organize; Format; Calculate/reuse; Lists/handoff;
+Find/summarize answers; Build/check models; Financial statements; Valuation; Funding/deals.
+Its proposed Foundations path spans the first five. These names, order, chapter/track hierarchy,
+free/paid membership, project placement and objective counts remain unapproved. The owner is
+presenting a small structure/Foundations/project packet; do not duplicate it in the chief task.
+Three old standalone units are retire-candidates only, not approved removals. Exact content
+versions, certificate sets and history equivalence still need agreement.
 Preserve dated Foundations feedback, earned records and legitimate alternative solutions; do not
 revive superseded density/no-scroll/timing quotas. Access, certificate and old-to-new recognition
 mappings remain distinct proposals/dependencies where unsettled.
