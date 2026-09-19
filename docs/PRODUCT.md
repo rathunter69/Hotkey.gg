@@ -518,20 +518,54 @@ records concern new XP, solo-readiness and current-standard PB recognition; know
 completion is preserved, with new path/certificate equivalence specified separately. Neither
 guest-eligibility option is selected. Security review of proof/public permission details remains open.
 
-**September 19 — Help and optional-challenge placement approved:**
+**September 19 — six UI presentation choices approved:**
 
-Source: Wolf's two explicit answers in **Plan UI/UX onboarding flows**
+Source: Wolf's explicit answers in **Plan UI/UX onboarding flows**
 (`01a0b908-48f9-7f32-94b2-d0ca46f13de3`), read by the chief and recorded in the
-[remote UI handoff](https://github.com/rathunter69/Hotkey.gg/blob/6580e834e78cd7042911aa60476289e12e97aa41/docs/handoffs/experience-site.md).
+[remote UI handoff](https://github.com/rathunter69/Hotkey.gg/blob/965bdb9c74e36fd93d8a80845669a3f0cea3a6b5/docs/handoffs/experience-site.md).
 
 - Help appears as a side panel beside the visible worksheet.
 - A small Challenges link sits beside Home and Catalog.
+- Keep the short goal and current outcome/checkpoint visible; the full outcome checklist expands.
+  A checkpoint describes the required result, not a revealed solution or mandatory keyboard route.
+- Ordinary lesson results appear in the side panel with the completed worksheet visible.
+  Existing Continue/Try solo and expandable-stat priorities remain unchanged.
+- Offer a secondary Save to an account action after the first guest result, plus a quiet Home
+  reminder. Continuing without signup stays available; import consent and verified saving remain separate.
+- Put less-used controls in one small Lesson options menu, keeping Help and mute visible.
+  Exact menu contents and keyboard bindings remain open.
 
-These settle placement only. Exact layouts, dimensions, narrow-screen handling, controls and
-wording remain proposals. Catalog's [bounded semantic review](https://github.com/rathunter69/Hotkey.gg/blob/c08b53b73afcfd3cb5e660b8a9f3d232c028f83e/docs/handoffs/catalog-progression.md#september-19-bounded-semantic-review-of-the-ui-proposal)
-found no material conflict or new learner state; Storage found no material mismatch in the
-saving table. Those reviews do not approve the whole design or demonstrate working saves,
-keyboard/platform/audio/accessibility behavior. No implementation is authorized.
+Wolf reaffirmed liking the existing aesthetic/general layout while remaining open to suggestions.
+His catalog wording was tentative: “Probably next drill along learning path, with recommendation
+to move to next step in the chapter.” Preserve that qualifier. Catalog owns the actual mapping,
+chapter-end behavior and content; no exact layout, new sequence or mandatory gate is approved.
+
+These choices settle presentation priorities, not the whole layout. Exact dimensions, narrow-screen
+handling, controls and wording remain proposals. Catalog's [earlier bounded semantic review](https://github.com/rathunter69/Hotkey.gg/blob/c08b53b73afcfd3cb5e660b8a9f3d232c028f83e/docs/handoffs/catalog-progression.md#september-19-bounded-semantic-review-of-the-ui-proposal)
+found no material conflict or new learner state in the initial outline; Storage found no material
+mismatch in its saving table. Do not extend those reviews into approval of all later proposals
+or working saves, keyboard/platform/audio/accessibility behavior. No implementation is authorized.
+
+**September 19 — historical grid guidance recovered; new grid choices pending:**
+
+The UI area's [history/source review](https://github.com/rathunter69/Hotkey.gg/blob/965bdb9c74e36fd93d8a80845669a3f0cea3a6b5/docs/handoffs/experience-site.md#september-19-clarify-the-earlier-grid-space-work)
+traces a consistent 20-row visual grid and a stable frame during row operations to earlier
+Wolf-attributed source/regression records. Carry these forward as historical design preferences,
+distinct from old authored density/length quotas and from a newly confirmed product choice.
+Do not add beginner tasks merely to fill the grid or impose an old content cap on future models.
+
+The area's accepted-source review and 12 isolated measurements report ten columns and at least
+20 visible rows, with some lessons exposing only 14 usable rows plus six inert fillers.
+Cell dimensions adapt; cell count does not adapt to window size. Sample text stayed 12px;
+width-graded lessons have fitting exceptions and short windows can place the sheet below the fold.
+These are bounded current-behavior observations, not approval of the replacement or proof that
+every layout is usable. Worksheet scrolling is a proposed capability, not implemented behavior.
+
+Two choices remain with Wolf in the UI task: make every visible row usable; and use readable
+cells/fullscreen suggestions/worksheet scrolling versus requiring a larger window before Start.
+Neither is answered. Catalog/Engine must review navigation, row operations, grading, tutorial
+targets and comparable-history effects before any separately authorized implementation.
+Exact support sizes, panel dimensions and future large-model geometry remain open.
 
 Wolf also explicitly requested continued concise, high-level mechanics options with practical
 tradeoffs and a reasoned recommendation. Keep this discussion style, capture each actual answer
@@ -562,7 +596,7 @@ remain protected; implementation still requires a separately authorized bounded 
 
 | Area | Wolf's direction | Still open |
 |---|---|---|
-| First experience and platform | Quick changeable Windows/Mac setup, Windows primary; guest lesson before signup; afterward two skippable/changeable experience/goal questions and save invitation; experienced shortcut | Verified platform scope/parity, exact lesson/questions/recommendation mapping, controls and guest-saving mechanics |
+| First experience and platform | Quick changeable Windows/Mac setup, Windows primary; guest lesson before signup; afterward two skippable/changeable experience/goal questions; secondary result save invitation plus quiet Home reminder; experienced shortcut | Verified platform scope/parity, exact lesson/questions/recommendation mapping, controls and guest-saving mechanics |
 | Learning format | Focused lessons → practical tasks → larger models, teaching ribbon/Excel functionality | Exact lesson depth, skill map, examples and Foundations-preserving blueprints |
 | Timing and scored retries | Ordinary learning freely pausable with optional hidden-by-default timer; goal before Start, worksheet reveal starts a continuously running scored clock; unlimited benchmark/Daily attempts, best eligible time | Reveal/focus/interruption mechanics, seeds/comparison groups, access, historical timing transition and public-entry controls |
 | Help and solo retry | One Help entry in a side panel beside the visible worksheet, with visible instructions and stated assistance consequences; solution help earns learning progress but no XP; a fresh Try solo attempt is judged on its own help/input record | Map actual help controls, define equivalent/comparable tasks and remaining award/eligibility details |
@@ -571,10 +605,10 @@ remain protected; implementation still requires a separately authorized bounded 
 | Account history and habits | Every finished attempt plus lightweight deliberate restart/unfinished summaries; private details with chosen public highlights; meaningful active practice including helped/unfinished work counts toward days; optional non-gating streaks | Metric/record dictionary, activity threshold, idle/day rules, detailed replay, retention, interruptions, legacy comparisons and saving/visibility controls |
 | Speedrun results and helped retry | Time, comparable PBs, improvement history and actual key-press total; completed commands counted separately; labelled task-level mouse estimate; Continue primary with Try solo alongside after helped ordinary lessons; new solo attempt evaluated on its own | Exact counting/comparison/calibration, final retry wording/layout, event-result actions and any practice recommendations |
 | Mouse input | Spreadsheet sheet/ribbon/dialog mouse use retains learning progress but earns no XP or qualifying competitive/timed PB; Start/Retry page controls allowed by themselves; existing earnings/history preserved | Detection/focus/accessibility, historical equivalence and private-feedback/derived-estimate treatment |
-| Entry, sharing and simplicity | Offer reviewed/confirmed private guest-history carry-over at signup; optional Rapid-fire; benchmark/Daily friend sharing without separate race mode; small Challenges link beside Home/Catalog; fewer competing modes/settings | Import/ownership mechanics, navigation/action hierarchy, remaining feature dispositions and mode rewards |
+| Entry, sharing and simplicity | Offer reviewed/confirmed private guest-history carry-over at signup; optional Rapid-fire; benchmark/Daily friend sharing without separate race mode; small Challenges link beside Home/Catalog; one Lesson options menu with Help/mute visible; fewer competing modes/settings | Import/ownership mechanics, remaining navigation/action hierarchy, remaining feature dispositions and mode rewards |
 | Feedback and recovery | Brief success feedback for meaningful actions and bigger task finish; soft success sounds after Start with remembered mute, quiet typing; playful/polished/encouraging; calm ordinary-learning undo/retry without lives, XP deductions or forced restart | Exact assets/timing/accessibility and mistake detection; correctness/Help/input and continuously running scored time remain unchanged |
 | Certificates | Completion of substantial named skill sets, including helped/mouse completions; preserve issued credentials; separate from solo readiness/XP/time eligibility | Exact sets/checks, names, versions, account/paid eligibility and legacy equivalence; no independent-skill or accreditation claim |
-| Achievements and home/results | Meaningful and smaller playful achievements; main milestones visible, some discoveries hidden until earned; recognition/occasional identity unlocks, no bonus XP. Continue-first home; ordinary results completion/action first with expandable stats; speedruns time/PB first | Exact achievement list/triggers/unlocks, display/access, layouts and historical mappings |
+| Achievements and home/results | Meaningful and smaller playful achievements; main milestones visible, some discoveries hidden until earned; recognition/occasional identity unlocks, no bonus XP. Continue-first home; ordinary results in the side panel with completed sheet visible, completion/action first and expandable stats; speedruns time/PB first | Exact achievement list/triggers/unlocks, display/access, layouts and historical mappings |
 | Catalog | Prefer a likely full rebuild, but preserve substantial earlier Foundations feedback | A full plan must precede implementation; the old v5 proposal is not automatically selected |
 | Order of work | Easy security/account fixes → catalog/progression separation → repository/database cleanup → site framework → planned catalog redesign | Size/acceptance of each bounded repair or cleanup batch |
 
