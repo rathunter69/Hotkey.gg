@@ -503,7 +503,14 @@ The chief read Wolf's explicit answers in **Plan payments access rules**
 and free selected public challenges with certificate access following the underlying content.
 Earned certificates/results remain accessible. Exact sample/challenge lists, price, expiry and
 remaining lifecycle details stay with Payments/Catalog. These initial answers do not activate
-billing, approve every challenge as free or settle the entire offer. Remote area handoff is pending.
+billing, approve every challenge as free or settle the entire offer. The
+[Area 10 handoff at 00de01d](https://github.com/rathunter69/Hotkey.gg/blob/00de01d76c4fb359e25e62c62be4ef406a368760/docs/handoffs/payments.md)
+is now remote-verified. Its offer/lifecycle table distinguishes confirmed direction from proposals.
+Price, additional trial and advanced replay after expiry are awaiting Wolf's answers in that task;
+cancellation/refund/grace and unissued-certificate timing remain open. Do not duplicate the
+pending questionnaire or adopt its provisional numbers/policies as agreed terms.
+Catalog's boundary review found no conflict but did not approve commercial proposals. Exact
+preview/challenge/credential membership must reconcile with the curriculum roadmap.
 
 **September 19 — initial saved-progress comparison and submission principles approved:**
 
