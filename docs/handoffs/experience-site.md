@@ -9,8 +9,9 @@ Shared guidance read remotely: `4ec23e01cb958d5dfed5e92875db3f7002eab1e1` on `co
 Refreshed guidance: `4d964901a4f06493695c11bb8f04c4769d607ab0`; its CURRENT update registers this planning assignment, with no changed product policy.
 Shared-guidance refresh: `2b16827aecf9b1c773f9b48d9b986c506c061c8a`; incorporates Storage's proven-comparability and short published submission-grace principles.
 Latest shared-guidance read for the grid clarification: `2596378b5073118ff2c3794188727c5ccc57a68f`. Accepted code baseline and ownership remain unchanged.
+Approval-recording refresh: `0984834f524966b0da4cabd971857d189f9283aa`; chief has integrated the six presentation choices and historical grid findings. Wolf's subsequent grid approval is recorded here for the next chief integration.
 Owned file: **only `docs/handoffs/experience-site.md`**.
-State: planning outlines reviewed; full layouts remain proposals except the six explicit choices below. Grid clarification is recorded separately. No application implementation, merge or deployment. Final commit identity is supplied by Git history and the verified chief handoff.
+State: planning outlines reviewed; the six explicit presentation choices and grid direction below are approved. Remaining exact layouts stay proposals. No application implementation, merge or deployment. Final commit identity is supplied by Git history and the verified chief handoff.
 
 ## Scope and outcome
 
@@ -33,8 +34,15 @@ They do not define new learner states, rewards, lesson content, storage schemas 
    menu**. Help and mute remain visible; keyboard access remains required.
 
 Source: Wolf's explicit selections in this task's successive question groups. These settle
-the stated presentation choices only; exact dimensions, narrow-screen treatment, final wording and the other outline
-details remain proposals. They do not authorize implementation or change any learning rule.
+the stated presentation choices only; exact dimensions, responsive mechanics, final wording and
+the other outline details remain proposals. They do not authorize implementation or change any learning rule.
+
+**Grid direction subsequently approved, September 19:** retain the familiar 20-row/10-column
+workspace, make all visible rows usable, and adapt cell sizes within readable limits. When the
+worksheet and side panel cannot fit comfortably, suggest fullscreen and allow worksheet scrolling.
+Instructions, Help and ordinary results share the existing right-hand area. Wolf accepted the
+recommendation because the platform now centers learning before immediate competition. Exact
+pixel sizes, support thresholds and implementation remain open; see the grid decision record below.
 
 ## Sources and coordination
 
@@ -442,7 +450,8 @@ assistance, Continue/Try solo, rewards and challenge rules out of another questi
 Acceptance example: a learner can see the goal/current outcome while working, expand the full
 outcome checklist when useful, and review a completed lesson in the adjacent result panel while
 the finished sheet remains visible. Helped completion still presents Continue then Try solo.
-Exact checklist text/mapping, dimensions, narrow-screen handling and transitions remain open.
+Exact checklist text/mapping, dimensions, responsive mechanics and transitions remain open;
+the later grid decision below settles the small-window fallback direction.
 No new application tests or agent review were needed to record these explicit answers; the
 sole-document diff and whitespace were checked before its remote checkpoint.
 
@@ -546,37 +555,59 @@ so its green status is not proof that every board fits every window. The long le
 was read for context, not run; it is unnecessary for this question and lacks the newer isolation
 wrapper. Full static/browser/database suites were not rerun for this documentation-only update.
 
-### Proposed clarification and two questions
+### Grid direction approved September 19
 
-Keep the carried-forward 20-row visual baseline and familiar 10-column current workspace while
-planning. Let dimensions adapt within a readable range; do not add tasks solely to fill cells.
+Wolf answered the two grid choices and preceding recommendation: **“Go with your recommendation -
+I think it should work for the updated content now that the platform is more centered around
+learning vs. competing immediately.”** This is a planning approval, not permission to implement.
+
+Keep the carried-forward 20-row visual baseline and familiar 10-column current workspace.
+Let dimensions adapt within a readable range; do not add tasks solely to fill cells.
 Changing the grid shape is an explicit design decision, not cleanup. Large-model extent remains
 with the later Catalog/Engine plan; this does not impose an old 20-row content cap on every future model.
 
-**UI recommendation, not yet a new layout approval:** reuse the existing right-hand lane for
+**Accepted layout direction:** reuse the existing right-hand lane for
 instructions, Help and results, switching its content instead of adding another column or
 shrinking the sheet each time Help opens. The current lane is 250px; that exact width is not
 selected for the replacement. Keep column-width grading independent of screen size and leave
 inserting/deleting rows stable in the visible frame. Exact wrapping/scrolling/focus behavior
 needs an Engine/UI contract before implementation.
 
-Two outstanding choices were presented to Wolf; answers are pending:
+**Both grid questions are answered; do not repeat this questionnaire.**
 
-1. Make all 20 visible rows usable (recommended), or keep editing limited to each lesson's
-   working area with decorative filler. This is an engine-boundary proposal, not a demand to
-   fill 20 rows with lesson content. Before implementation, Catalog/Engine must check navigation,
-   row operations, grading, tutorial targets and comparable-history implications.
-2. When a small window cannot comfortably fit worksheet plus side panel: preserve readable
-   cells, suggest fullscreen and allow worksheet scrolling (recommended), or require a larger
-   window/fullscreen before Start. A real worksheet scroll viewport is not implemented today;
-   choosing it would require a separately authorized design/engine batch. Never crop required
-   cells, auto-complete width lessons by scaling, or claim an unsupported layout is usable.
+1. **Make every visible row usable**, including all 20 rows of the standard workspace. This
+   replaces decorative filler as the intended experience; it does not require 20 rows of lesson
+   content or add completion requirements. Before implementation, Catalog/Engine must check
+   navigation, row operations, grading, tutorial targets and comparable-history implications.
+2. **Preserve readable cells, suggest fullscreen and allow worksheet scrolling** when a small
+   window cannot comfortably fit the worksheet plus side panel. Fullscreen is a suggestion,
+   not the chosen mandatory pre-Start gate. A real worksheet scroll viewport is not implemented
+   today; the approved direction needs a separately authorized design/engine batch. Never crop
+   required cells, auto-complete width lessons by scaling, or claim an unsupported layout is usable.
+
+Learning-first rationale: leave room to explore and practise without making blank space feel
+broken or demanding extra tasks to fill it. This changes the intended worksheet presentation,
+not the settled assistance, XP, timing, readiness, certificate or optional-challenge rules.
+
+**Remaining implementation contract, not new product questions:** specify how keyboard focus
+keeps the active cell visible while scrolling, how Help/results preserve worksheet position,
+and how row operations retain data within the stable frame. Define and verify readable sizes,
+zoom behavior and actual supported input/device combinations. Existing desktop/mobile gates
+are unchanged today; this approval alone does not certify a phone or tablet experience.
+Use small-window and width-grading cases from the bounded evidence above when that work is scoped.
+
+Catalog was notified of the approval, learning-first rationale and ownership boundaries. UI owns
+presentation; Catalog retains content and learner-state mapping. No separate active Engine task
+was listed, so the chief must route the bounded engine review before implementation; this update
+does not launch one or duplicate its work. Review impacts on prior records without resetting or
+reinterpreting history automatically.
 
 Independent historical review checked the attribution and distinguished the 20-row/stable-frame
 decisions from authored density recipes. Its final document review found no material correction
-and confirmed both questions remain pending. It did not run the app; the local measurements above
-are the lead's separate evidence. Exact minimum supported size, zoom/readability policy, all-
-visible-cell behavior, small-screen fallback and future large-model geometry remain open.
+before Wolf answered the questions. It did not run the app; the local measurements above are the
+lead's separate evidence. This approval-recording update reuses that review and diagnostic without
+claiming new tests. Exact minimum supported size, cell dimensions, zoom behavior, scrolling/focus
+mechanics and future large-model geometry remain open.
 
 ## Verification and handoff
 
@@ -611,18 +642,22 @@ visible-cell behavior, small-screen fallback and future large-model geometry rem
   documentation-only task under TASK_GUIDE/CURRENT's exception. Existing passes are not relabelled
   as new tests. The separate isolated layout diagnostic is recorded above. No application,
   generated assets, live data, account settings, billing or deployment changed.
-- All exact wording/layouts beyond the six selections remain proposals. Acceptance scenarios
+- All exact wording/layouts beyond the six presentation selections and approved grid direction
+  remain proposals. Acceptance scenarios
   are future checks, not successful playtests; Mac/accessibility/audio and real save behavior
   remain unverified. Existing audit defects remain with their owners.
 
 **Chief integration request:** record this planning assignment, its verified remote handoff and
 the six dated presentation decisions and tentative path/chapter recommendation preference.
-Also retain the historical 20-row/stable-frame provenance and two unresolved grid choices.
+Also retain the historical 20-row/stable-frame provenance and record Wolf's subsequent approval
+of the grid recommendations: all visible rows usable; readable dimensions with fullscreen
+suggestions/worksheet scrolling; retained familiar frame and shared right-hand lane. Both grid
+questions are answered. Record his learning-first rationale without changing settled rules.
 Keep existing learning/reward rules; do not mark the full outline approved, implemented or
 shipped. CURRENT/PRODUCT edits remain chief-owned.
 
-**Next bounded UI turn:** record Wolf's two grid answers, then coordinate any usable-boundary
-and worksheet-scrolling proposal with Catalog/Engine before fixing the side-panel dimensions.
+**Next bounded UI turn:** reconcile Catalog/Engine implications of the approved usable-boundary
+and worksheet-scrolling direction before fixing the side-panel dimensions and focus contract.
 Continue reviewing the first-lesson → Help → helped result outline and Storage/Catalog contracts;
 choose an implementation candidate only if separately authorized. Do not start the catalog
 rebuild or expand the questionnaire to settled learning, reward or competition rules.
