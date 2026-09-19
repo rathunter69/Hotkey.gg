@@ -500,7 +500,8 @@ precise contracts; no application, catalog or stored-history change is authorize
 
 Source: the chief read Wolf's explicit answers in the newly started Area 7 task
 `01a0b908-9ee9-7d31-afb6-9733f5d421bf`: “Separate groups until equivalence is proven” and
-“Short published submission grace period”. The area's detailed remote handoff is still pending.
+“Short published submission grace period”. Its [reviewed planning handoff](https://github.com/rathunter69/Hotkey.gg/blob/e9f3e6e06b84378b57ec03534920ba9bb01f8ee4/docs/handoffs/leaderboards-storage.md)
+is now remote-verified. Its remaining proposed contract is not blanket-approved.
 
 - Compare personal times only when the task, timing rules and Excel setup are proven comparable.
   Keep changed/older tasks in separate visible record groups until equivalence is established.
@@ -512,7 +513,25 @@ Source: the chief read Wolf's explicit answers in the newly started Area 7 task
 The precise grace duration, trusted timing/proof, interruption and event-boundary handling
 remain open. These are approved product principles, not verified saving/submission behavior,
 an accepted storage implementation or permission to change live records. Area 7 owns the
-detailed contract and returns its remote evidence to the chief.
+detailed contract. Catalog's bounded review clarified that proposed restrictions on imported
+records concern new XP, solo-readiness and current-standard PB recognition; known imported
+completion is preserved, with new path/certificate equivalence specified separately. Neither
+guest-eligibility option is selected. Security review of proof/public permission details remains open.
+
+**September 19 — Help and optional-challenge placement approved:**
+
+Source: Wolf's two explicit answers in **Plan UI/UX onboarding flows**
+(`01a0b908-48f9-7f32-94b2-d0ca46f13de3`), read by the chief and recorded in the
+[remote UI handoff](https://github.com/rathunter69/Hotkey.gg/blob/6580e834e78cd7042911aa60476289e12e97aa41/docs/handoffs/experience-site.md).
+
+- Help appears as a side panel beside the visible worksheet.
+- A small Challenges link sits beside Home and Catalog.
+
+These settle placement only. Exact layouts, dimensions, narrow-screen handling, controls and
+wording remain proposals. Catalog's [bounded semantic review](https://github.com/rathunter69/Hotkey.gg/blob/c08b53b73afcfd3cb5e660b8a9f3d232c028f83e/docs/handoffs/catalog-progression.md#september-19-bounded-semantic-review-of-the-ui-proposal)
+found no material conflict or new learner state; Storage found no material mismatch in the
+saving table. Those reviews do not approve the whole design or demonstrate working saves,
+keyboard/platform/audio/accessibility behavior. No implementation is authorized.
 
 Wolf also explicitly requested continued concise, high-level mechanics options with practical
 tradeoffs and a reasoned recommendation. Keep this discussion style, capture each actual answer
@@ -546,13 +565,13 @@ remain protected; implementation still requires a separately authorized bounded 
 | First experience and platform | Quick changeable Windows/Mac setup, Windows primary; guest lesson before signup; afterward two skippable/changeable experience/goal questions and save invitation; experienced shortcut | Verified platform scope/parity, exact lesson/questions/recommendation mapping, controls and guest-saving mechanics |
 | Learning format | Focused lessons → practical tasks → larger models, teaching ribbon/Excel functionality | Exact lesson depth, skill map, examples and Foundations-preserving blueprints |
 | Timing and scored retries | Ordinary learning freely pausable with optional hidden-by-default timer; goal before Start, worksheet reveal starts a continuously running scored clock; unlimited benchmark/Daily attempts, best eligible time | Reveal/focus/interruption mechanics, seeds/comparison groups, access, historical timing transition and public-entry controls |
-| Help and solo retry | One Help entry with visible instructions and stated assistance consequences; solution help earns learning progress but no XP; a fresh Try solo attempt is judged on its own help/input record | Map actual help controls, define equivalent/comparable tasks and remaining award/eligibility details |
+| Help and solo retry | One Help entry in a side panel beside the visible worksheet, with visible instructions and stated assistance consequences; solution help earns learning progress but no XP; a fresh Try solo attempt is judged on its own help/input record | Map actual help controls, define equivalent/comparable tasks and remaining award/eligibility details |
 | Exploration and access | Complete useful free beginner path with repeat practice/personal speedruns and a few advanced previews; advanced lessons/model-building subscription. Major-jump readiness accepts prior independent work or test-out; helped ordinary completion advances learning | Exact content/preview limits, prices, advanced speedrun and competition/credential access, expiry, checkpoint locations and equivalent evidence |
 | Progress and competition | One XP level: new eligible accomplishments earn most, limited repeats less, no speed multiplier; learning progress, personal speedruns and optional benchmark/Daily boards; new mastery/overall rank deferred | Exact XP amounts/caps/eligibility, metrics/save rules, public eligibility and historical-rank presentation |
 | Account history and habits | Every finished attempt plus lightweight deliberate restart/unfinished summaries; private details with chosen public highlights; meaningful active practice including helped/unfinished work counts toward days; optional non-gating streaks | Metric/record dictionary, activity threshold, idle/day rules, detailed replay, retention, interruptions, legacy comparisons and saving/visibility controls |
 | Speedrun results and helped retry | Time, comparable PBs, improvement history and actual key-press total; completed commands counted separately; labelled task-level mouse estimate; Continue primary with Try solo alongside after helped ordinary lessons; new solo attempt evaluated on its own | Exact counting/comparison/calibration, final retry wording/layout, event-result actions and any practice recommendations |
 | Mouse input | Spreadsheet sheet/ribbon/dialog mouse use retains learning progress but earns no XP or qualifying competitive/timed PB; Start/Retry page controls allowed by themselves; existing earnings/history preserved | Detection/focus/accessibility, historical equivalence and private-feedback/derived-estimate treatment |
-| Entry, sharing and simplicity | Offer reviewed/confirmed private guest-history carry-over at signup; optional Rapid-fire; benchmark/Daily friend sharing without separate race mode; fewer competing modes/settings | Import/ownership mechanics, navigation/action hierarchy, remaining feature dispositions and mode rewards |
+| Entry, sharing and simplicity | Offer reviewed/confirmed private guest-history carry-over at signup; optional Rapid-fire; benchmark/Daily friend sharing without separate race mode; small Challenges link beside Home/Catalog; fewer competing modes/settings | Import/ownership mechanics, navigation/action hierarchy, remaining feature dispositions and mode rewards |
 | Feedback and recovery | Brief success feedback for meaningful actions and bigger task finish; soft success sounds after Start with remembered mute, quiet typing; playful/polished/encouraging; calm ordinary-learning undo/retry without lives, XP deductions or forced restart | Exact assets/timing/accessibility and mistake detection; correctness/Help/input and continuously running scored time remain unchanged |
 | Certificates | Completion of substantial named skill sets, including helped/mouse completions; preserve issued credentials; separate from solo readiness/XP/time eligibility | Exact sets/checks, names, versions, account/paid eligibility and legacy equivalence; no independent-skill or accreditation claim |
 | Achievements and home/results | Meaningful and smaller playful achievements; main milestones visible, some discoveries hidden until earned; recognition/occasional identity unlocks, no bonus XP. Continue-first home; ordinary results completion/action first with expandable stats; speedruns time/PB first | Exact achievement list/triggers/unlocks, display/access, layouts and historical mappings |
