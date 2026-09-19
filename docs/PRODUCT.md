@@ -526,13 +526,38 @@ is now remote-verified. Its remaining proposed contract is not blanket-approved.
   public submission as pending. Public credit requires reconnection within a short published
   submission grace period, subject to the eventual eligibility/validation rules.
 
-The precise grace duration, trusted timing/proof, interruption and event-boundary handling
-remain open. These are approved product principles, not verified saving/submission behavior,
-an accepted storage implementation or permission to change live records. Area 7 owns the
-detailed contract. Catalog's bounded review clarified that proposed restrictions on imported
-records concern new XP, solo-readiness and current-standard PB recognition; known imported
-completion is preserved, with new path/certificate equivalence specified separately. Neither
-guest-eligibility option is selected. Security review of proof/public permission details remains open.
+The later answers below settle Daily's grace duration and the guest-credit principle. Trusted
+timing/proof, interruption, exact event-boundary/finalization and ongoing-benchmark upload lifetime
+remain open. These are product principles, not verified saving/submission behavior, an accepted
+storage implementation or permission to change live records. Area 7 owns the detailed contract;
+Security review of guest proof/public permissions and old-to-new equivalence remains open.
+
+**Later September 19 — guest credit, Daily deadline and record controls approved:**
+
+The chief read Wolf's three submitted answers in Area 7 and the
+[verified handoff at 26e71a0](https://github.com/rathunter69/Hotkey.gg/blob/26e71a0f741de3a3e23f8653314a3b2e7f5cf46e/docs/handoffs/leaderboards-storage.md#september-19-follow-up-plain-english-guest-saving-and-three-choices-answered).
+
+- After signup and confirmed transfer, qualifying guest solo work counts once toward normal XP,
+  skill prerequisites and comparable personal bests. No fresh signed-in repeat is required merely
+  because the work began as a guest. Qualification, trustworthy evidence and duplicate protection
+  remain to specify with Catalog/Security. Helped work keeps learning completion with no XP;
+  existing input rules still apply. Ambiguous history gains no invented solo evidence. Certificate
+  equivalence stays separate, and transfer never automatically publishes a score.
+- A Daily attempt must finish before event closing. A valid delayed upload can arrive within
+  five minutes after that closing time. Grace adds no gameplay time; a too-late submission retains
+  personal history without public credit. This fixes the Daily product deadline, not timing proof,
+  finalization or an upload cutoff for ongoing benchmarks.
+- Users may hide private attempts from their normal view and withdraw public results while
+  retaining underlying history. Permanent per-attempt deletion was not selected. Withdrawal scope,
+  replacement-best handling, finalized events, anonymization and account deletion/export remain
+  separate design questions; hiding a record does not remove earned learning or rewards.
+
+Guest saving is device/browser-local before signup. Cross-device account access requires signup
+plus confirmed transfer/saving; signup alone is neither consent nor a durable receipt. Use
+device/account-save labels only when the corresponding write is confirmed. This is the intended
+contract, not a claim that the current app already implements it.
+All three questions are answered. A bounded chief consistency review checked evidence, timing,
+history and curriculum implications; no application or permission test was rerun for recording them.
 
 **September 19 — UI presentation choices and later visual-preservation correction:**
 
@@ -686,10 +711,10 @@ remain protected; implementation still requires a separately authorized bounded 
 | Help and solo retry | One Help entry in a side panel beside the visible worksheet, with visible instructions and stated assistance consequences; solution help earns learning progress but no XP; a fresh Try solo attempt is judged on its own help/input record | Map actual help controls, define equivalent/comparable tasks and remaining award/eligibility details |
 | Exploration and access | Complete useful free beginner path with repeat practice/personal speedruns and a few advanced previews; advanced lessons/model-building subscription. Major-jump readiness accepts prior independent work or test-out; helped ordinary completion advances learning | Exact content/preview limits, prices, advanced speedrun and competition/credential access, expiry, checkpoint locations and equivalent evidence |
 | Progress and competition | One XP level: new eligible accomplishments earn most, limited repeats less, no speed multiplier; learning progress, personal speedruns and optional benchmark/Daily boards; new mastery/overall rank deferred | Exact XP amounts/caps/eligibility, metrics/save rules, public eligibility and historical-rank presentation |
-| Account history and habits | Every finished attempt plus lightweight deliberate restart/unfinished summaries; private details with chosen public highlights; meaningful active practice including helped/unfinished work counts toward days; optional non-gating streaks | Metric/record dictionary, activity threshold, idle/day rules, detailed replay, retention, interruptions, legacy comparisons and saving/visibility controls |
+| Account history and habits | Every finished attempt plus lightweight deliberate restart/unfinished summaries; private details with chosen public highlights; hide private attempts/withdraw public results while retaining history; meaningful active practice including helped/unfinished work counts toward days; optional non-gating streaks | Metric/record dictionary, activity threshold, idle/day rules, detailed replay, retention, interruptions, legacy comparisons and saving/visibility controls |
 | Speedrun results and helped retry | Time, comparable PBs, improvement history and actual key-press total; completed commands counted separately; labelled task-level mouse estimate; Continue primary with Try solo alongside after helped ordinary lessons; new solo attempt evaluated on its own | Exact counting/comparison/calibration, final retry wording/layout, event-result actions and any practice recommendations |
 | Mouse input | Spreadsheet sheet/ribbon/dialog mouse use retains learning progress but earns no XP or qualifying competitive/timed PB; Start/Retry page controls allowed by themselves; existing earnings/history preserved | Detection/focus/accessibility, historical equivalence and private-feedback/derived-estimate treatment |
-| Entry, sharing and simplicity | Offer reviewed/confirmed private guest-history carry-over at signup; optional Rapid-fire; benchmark/Daily friend sharing without separate race mode; small Challenges link beside Home/Catalog; one Lesson options menu with Help/mute visible; fewer competing modes/settings | Import/ownership mechanics, remaining navigation/action hierarchy, remaining feature dispositions and mode rewards |
+| Entry, sharing and simplicity | Offer reviewed/confirmed private guest-history carry-over after signup; qualifying solo work counts once toward normal XP/readiness/comparable PBs, no automatic publication; optional Rapid-fire; benchmark/Daily friend sharing without separate race mode; small Challenges link beside Home/Catalog; one Lesson options menu with Help/mute visible; fewer competing modes/settings | Import/ownership mechanics, remaining navigation/action hierarchy, remaining feature dispositions and mode rewards |
 | Feedback and recovery | Brief success feedback for meaningful actions and bigger task finish; soft success sounds after Start with remembered mute, quiet typing; playful/polished/encouraging; calm ordinary-learning undo/retry without lives, XP deductions or forced restart | Exact assets/timing/accessibility and mistake detection; correctness/Help/input and continuously running scored time remain unchanged |
 | Certificates | Completion of substantial named skill sets, including helped/mouse completions; preserve issued credentials; separate from solo readiness/XP/time eligibility | Exact sets/checks, names, versions, account/paid eligibility and legacy equivalence; no independent-skill or accreditation claim |
 | Achievements and home/results | Meaningful and smaller playful achievements; main milestones visible, some discoveries hidden until earned; recognition/occasional identity unlocks, no bonus XP. Continue-first home; ordinary results favor the familiar completion overlay after later feedback, completion/action first and expandable stats; speedruns time/PB first | Exact achievement list/triggers/unlocks, display/access, layouts and historical mappings |
