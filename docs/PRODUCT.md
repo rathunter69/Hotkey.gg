@@ -1,6 +1,6 @@
 # Product direction
 
-Updated September 18, 2026. This is the shared product brief. Current work and launch status
+Updated September 19, 2026. This is the shared product brief. Current work and launch status
 live in [CURRENT.md](CURRENT.md); source locations live in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Confirmed by Wolf on September 17
@@ -158,9 +158,9 @@ content deletion, progress reset or new access/reward system follows automatical
 this audit. Preserve the Foundations feedback sources below. Update this brief with each
 confirmed decision and its superseded rule; CURRENT owns status and task sequencing.
 
-### Confirmed catalog/flow decisions — September 17–18
+### Confirmed catalog/flow decisions — September 17–19
 
-Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/0961f3c9b3dd70f5b646b51746feb101606a7a3d/docs/handoffs/catalog-progression.md),
+Source: [dated review and acceptance examples](https://github.com/rathunter69/Hotkey.gg/blob/216a2af1fdee9ed7b7f1f2b78123a9fc5f3dd76d/docs/handoffs/catalog-progression.md),
 task 01a0b148-2693-7901-af91-934c83cabe1d. The chief checked the remote handoff and Wolf's
 actual approvals in that task. The September 17 bace206 tentative gate status is superseded
 by the explicit September 18 approval below; other unanswered proposals remain open.
@@ -350,6 +350,55 @@ task mix. Relevant skill/opportunity/window rules and grouping equivalent routes
 Preserve existing key/command records through any later transition. No raw replay collection,
 benchmark study, numerical estimate or implementation is authorized by these product decisions.
 
+**September 19 — fresh attempts, guest saving and scored timing approved:**
+
+- **Try solo** creates a fresh equivalent attempt judged on its own assistance/input record.
+  Earlier solution help does not penalize it or impose a wait until another session. XP and
+  qualifying timed records still require the applicable help/input/award/comparison rules;
+  public scoring requires entering its challenge. Retain the earlier helped attempt.
+- Signup offers to show the device's guest progress/attempt history and carry it privately into
+  the new account after confirmation. Exclude records belonging to other signed-in accounts.
+  Exact ownership, duplicate/conflict handling, retries and imported-result eligibility remain
+  open; carrying history over does not publish it or establish competitive eligibility.
+- Show the goal before Start; revealing the worksheet starts the scored clock at the same
+  time. Scored clocks run continuously. Ordinary learning is freely pausable and keeps its
+  optional visible timer. Exact reveal/render/focus/interruption handling remains open.
+- Public benchmarks and Daily events allow unlimited attempts; the best eligible time counts.
+  Existing help/mouse rules and comparable-task requirements apply. Seeds, access and comparison
+  groups remain open. Keep older first-action-clock records distinguishable from reveal-clock
+  results; the historical timing transition needs a plan.
+
+These replace the pending fresh-solo/guest questions and resolve the presented clock/retry
+choices. They do not approve transfers, new timing instrumentation or changes to stored scores.
+
+**September 19 — optional practice, friend sharing, consolidated Help and fewer choices approved:**
+
+- Retain **Rapid-fire** as optional quick practice, not a learning path or prerequisite.
+  Its placement, duration, assistance/XP and mode-specific result details remain open.
+- Friend sharing uses the same benchmark/Daily challenge under its existing rules, without a
+  separate race mode. Individual-drill friend races were not selected. Exact sharing controls,
+  access and seed/version handling remain open; a link must not silently grant paid access
+  or expose private history.
+- Provide **one Help entry with levels of support**, keeping task instructions visible and
+  explaining when solution assistance affects eligibility. Exact layout and control mapping
+  remain open; this does not approve automatic solution reveals or loss of keyboard access.
+
+Wolf explicitly requires fewer competing modes, settings and visible choices because the
+spreadsheet ribbon/workspace already feels complicated. Preserve that visual foundation while
+reducing surrounding complexity. Keeping a useful feature does not require another prominent
+button or upfront choice. Preserve experienced-user shortcuts, individual-drill speedruns and
+essential keyboard/accessibility controls.
+
+The area recommends default learning with contextual Solo/Speedrun actions, secondary optional
+practice/challenges and quieter settings. That hierarchy is design guidance, not a blanket page
+layout approval. Review compact beginner, returning and result states before deciding placement.
+The built-feature keep/combine/simplify/leave-out map is also a proposal except for explicitly
+approved choices above. Other changes to Classic, Tracks/placement, recommendations, dormant
+modes, profile/stats, certificates or Desks remain subject to agreed disposition and transition.
+Preserve actual runs, earned/high-water recognition, credentials and session history; do not
+invent a durable placement-history record. No feature/code/data deletion, catalog rebuild,
+benchmark study, new module or implementation follows from this planning checkpoint.
+
 Wolf also explicitly requested continued concise, high-level mechanics options with practical
 tradeoffs and a reasoned recommendation. Keep this discussion style, capture each actual answer
 separately, and avoid duplicating the area's decision discussion in the chief session.
@@ -366,36 +415,30 @@ experience; XP supplies one account level. Choosing a drill speedrun shows perso
 improvement. Choosing a benchmark shows that challenge's leaderboard position, without a
 new mastery tier or second account ladder. Exact UI and save/reward mechanics remain open.
 
-Next discussion: two choices are pending in the area task. First, judge a fresh equivalent
-Try solo attempt by its own help/input record without penalizing earlier guided learning.
-Second, offer a reviewed, confirmed and private transfer of device guest history into a new
-account, excluding records belonging to other accounts. Both are recommendations, not approved
-eligibility or transfer rules. Comparison/XP/public-entry conditions, import ownership,
-duplicates/conflicts and imported-result eligibility remain open.
-
-Then finish measurement/calibration, legacy and save/next-step details in small groups.
-Do not reopen confirmed metrics, mouse/XP/counting rules, practice days, helped-result options,
-history/privacy/habit principles, lesson-first entry or the free offer. The earlier reward
-questionnaire remains retired.
-Develop the supported-in-principle retry/public-entry design while comparison, persistence,
-eligibility and historical-rank transition details remain open. Do not reopen the approved
-gate/help/timer policies. The chief reconciles answers without duplicating the area's questions.
+All question groups at the September 19 checkpoint are answered. Next, review a compact
+default-learning and result-state design against the simplicity constraint, then settle remaining
+navigation/hierarchy and feature dispositions. Exact measurement/calibration, comparison,
+guest-save/import, XP, public-entry and historical transition details remain open. Do not reopen
+confirmed solo/guest, clock/retry, practice/sharing/Help, metrics/mouse, history/privacy/habit,
+entry/access or readiness choices. The earlier reward questionnaire remains retired.
+The chief reconciles answers without duplicating the area's questions.
 Existing progress, Foundations feedback and the complete-plan-before-rebuild requirement
 remain protected; implementation still requires a separately authorized bounded batch.
 
-## Learning decisions and repair order — status September 18
+## Learning decisions and repair order — status September 19
 
 | Area | Wolf's direction | Still open |
 |---|---|---|
 | First experience | Short hands-on lesson before account creation, followed by personalization and invitation to save; clear experienced-user shortcut | Exact first lesson, personalization questions, controls and guest-to-account saving |
 | Beginner learning | Interactive lessons that teach hotkeys and how Excel works | Exact help presentation and how much each lesson introduces |
-| Timing | Ordinary lesson timer optional and hidden by default; deliberate speed attempts show time | Independent retry, pause, competitive timing and publication rules |
-| Assisted completion | Instructions/explanations unpenalized; solution-step reveals, Guided help and solution replay mean assisted learning progress with no XP | Map existing controls; define fresh independent retries and remaining competitive eligibility |
+| Timing and scored retries | Ordinary learning freely pausable with optional hidden-by-default timer; goal before Start, worksheet reveal starts a continuously running scored clock; unlimited benchmark/Daily attempts, best eligible time | Reveal/focus/interruption mechanics, seeds/comparison groups, access, historical timing transition and public-entry controls |
+| Help and solo retry | One Help entry with visible instructions and stated assistance consequences; solution help earns learning progress but no XP; a fresh Try solo attempt is judged on its own help/input record | Map actual help controls, define equivalent/comparable tasks and remaining award/eligibility details |
 | Exploration and access | Complete useful free beginner path with repeat practice/personal speedruns and a few advanced previews; advanced lessons/model-building subscription. Major-jump readiness accepts prior independent work or test-out; helped ordinary completion advances learning | Exact content/preview limits, prices, advanced speedrun and competition/credential access, expiry, checkpoint locations and equivalent evidence |
 | Progress and competition | One XP level; helped/independent lesson progress; personal drill-speedrun records; optional selected benchmark/Daily leaderboards. New mastery and overall competitive-rank systems deferred | XP/repeat formulas, exact metrics/save rules, public eligibility and preservation/presentation of historical rank |
 | Account history and habits | Every finished attempt plus lightweight deliberate restart/unfinished summaries; private details with chosen public highlights; meaningful active practice including helped/unfinished work counts toward days; optional non-gating streaks | Metric/record dictionary, activity threshold, idle/day rules, detailed replay, retention, interruptions, legacy comparisons and saving/visibility controls |
-| Speedrun results and helped retry | Time, comparable PBs, improvement history and actual key-press total; completed command usage counted separately; labelled task-level mouse-reference estimate; Continue and friendly unassisted retry after help | Exact counting/comparison/calibration, final retry wording/button emphasis, fresh-solo eligibility and any practice recommendations |
+| Speedrun results and helped retry | Time, comparable PBs, improvement history and actual key-press total; completed commands counted separately; labelled task-level mouse estimate; Continue and friendly retry after help; new solo attempt evaluated on its own | Exact counting/comparison/calibration, final retry wording/button emphasis and any practice recommendations |
 | Mouse input | Spreadsheet sheet/ribbon/dialog mouse use retains learning progress but earns no XP or qualifying competitive/timed PB; Start/Retry page controls allowed by themselves; existing earnings/history preserved | Detection/focus/accessibility, historical equivalence and private-feedback/derived-estimate treatment |
+| Entry, sharing and simplicity | Offer reviewed/confirmed private guest-history carry-over at signup; optional Rapid-fire; benchmark/Daily friend sharing without separate race mode; fewer competing modes/settings | Import/ownership mechanics, navigation/action hierarchy, remaining feature dispositions and mode rewards |
 | Credentials | Interested in skill-path certificates shareable on LinkedIn, and possibly high-score recognition | Evidence required for a certificate versus a speed badge; no endorsement by LinkedIn implied |
 | Catalog | Prefer a likely full rebuild, but preserve substantial earlier Foundations feedback | A full plan must precede implementation; the old v5 proposal is not automatically selected |
 | Order of work | Easy security/account fixes → catalog/progression separation → repository/database cleanup → site framework → planned catalog redesign | Size/acceptance of each bounded repair or cleanup batch |
@@ -411,9 +454,9 @@ a particular technical framework; it is not permission for a React/Next rewrite.
 - Design the approved lesson-first entry and experienced-user shortcut. The exact exercise,
   questions and whether an optional assessment helps still need agreement; no conversion
   improvement has been measured.
-- Use the same exercise for guided learning and an independent timed retry. In lessons, suggested
-  times provide context and do not fail or block a beginner. Teaching time should not become a
-  competitive score. This avoids maintaining duplicate timed and untimed catalogs.
+- Design fresh equivalent Try solo tasks under the approved per-attempt eligibility rules.
+  Define shared content identity and timed comparison groups without turning teaching time
+  into a competitive score or penalizing prior guided learning.
 - Apply the approved assistance distinction consistently across current controls. Independent XP
   and competitive eligibility still need their detailed rules; do not equate every hint label
   with solution help or treat public posting as already agreed.
