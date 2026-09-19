@@ -12,6 +12,7 @@ Latest shared-guidance read for the grid clarification: `2596378b5073118ff2c3794
 Approval-recording refresh: `0984834f524966b0da4cabd971857d189f9283aa`; chief has integrated the six presentation choices and historical grid findings. Wolf's subsequent grid approval is recorded here for the next chief integration.
 Mockup refresh: `d008402eecdf63bf5051aadab73ba910da0436b4`; chief has integrated the grid approval and Catalog's bounded compatibility response. Accepted application baseline remains unchanged.
 Visual-preservation refresh: `d1b705301a73edb3ee4ff16c97c0701ba283d4fb`; chief records Wolf's rejection of the first mockup's restyling and latest preference for the existing completion popup. Application baseline and ownership are unchanged.
+File-picker discussion refresh: `b2dad98f46e521307b8d7b75245068b9511a2628`; chief has integrated the 731ee79 preservation handoff into AGENTS/CURRENT/PRODUCT. TASK_GUIDE, accepted application baseline and area ownership remain unchanged.
 Owned file: **only `docs/handoffs/experience-site.md`**.
 State: planning outlines reviewed; presentation choices and grid direction below are approved, with the earlier result-side-panel choice superseded by Wolf's completion-popup preference. Preserve the existing coupled visual system. The first mockup's restyling was rejected; the revised source-based preview is illustrative, not approved in full. No application implementation, merge or deployment. Final commit identity is supplied by Git history and the verified chief handoff.
 
@@ -744,6 +745,50 @@ theme application, menus or modal stacking. Preserve the visual system while cha
 learning flow. Required verification must cover affected pages and selected/hover/focus/keytip/
 modal states across existing themes; a single lesson screenshot cannot establish compatibility.
 
+## September 19: file-style browsing and learning-workspace comparison
+
+Wolf said the revised direction looks closer to his original concept, but the element blocking
+still looks strange. He likes the old keyboard-driven dropdown and file-structure theme, while
+questioning whether keyboard-only site navigation would be too niche. He asked whether the
+direction resembles LeetCode. This is positive directional feedback and an open discussion,
+not whole-preview approval, a request to copy another product's styling or permission to refactor.
+
+**Verified source:** the existing picker already combines pointer and keyboard access. The
+[picker opener and selection](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/index.html#L29673)
+support clicking the lesson selector, opening at the current lesson, a live breadcrumb, arrow
+movement and selection. Its [folder rows](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/index.html#L32319)
+also have click handlers. The [keyboard handler](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/index.html#L28487)
+provides arrows, Enter, Escape/backslash and numbered folder jumps. This bounded read is not a
+new accessibility certification; its broad key interception still needs the existing focus/input
+review before any separately authorized change. Historical gates, rewards and progress counters
+inside that component are not adopted merely by preserving its appearance.
+
+**Presentation recommendation, not a new approved catalog contract:** preserve the file-style
+picker with clearly labelled, clickable rows and optional visible shortcut hints. Keep familiar
+folder/file hierarchy and breadcrumb orientation; the exact chapter/lesson mapping stays
+Catalog-owned. Open near the current lesson rather than expanding the whole tree. Learners can
+use the primary Continue/next recommendation without navigating a tree. Site navigation remains
+usable by pointer or keyboard; this does not change the separate worksheet input/XP rules.
+Provide normal Tab/focus escape and return, alongside the existing arrow/Enter/Escape model;
+shortcuts must not intercept worksheet/formula editing or unrelated page controls.
+
+The useful LeetCode analogy is the **learning structure**: choose a task, work in a persistent
+workspace, check the outcome and continue. It is an explanation of the proposed flow, not a
+selected visual reference. Hotkey's spreadsheet/ribbon, file-style browsing, built-in themes,
+keycaps, helpful guidance and completion popup remain its visual identity. No new competitive,
+assessment or reward system follows from the analogy.
+
+**Layout feedback remains open.** The conversation supplied state for the older
+`hotkey-lesson-layout.html`, while the latest response referenced `hotkey-preserved-ui.html`;
+that mismatch does not establish which rendering Wolf actually saw. The newer preview also has
+a demonstration height and preview-only controls. Embedded sizing may contribute, but no actual
+screen evidence establishes the cause of the reported blocking. Do not mark alignment, spacing
+or proportions accepted or fixed. Compare the existing app and the relevant preview at the same
+dimensions before proposing layout changes. No new visual was authored for this discussion.
+
+This record uses the existing focused visual review plus the narrow picker source read; no new
+agent audit, application tests, runtime changes or product-data writes were needed.
+
 ## Verification and handoff
 
 - Reused the remote catalog decision register and audits, plus CURRENT's accepted source and
@@ -788,6 +833,9 @@ the dated presentation decisions and tentative path/chapter recommendation prefe
 the later completion-popup preference as superseding result-side-panel placement; preserve the
 coupled existing themes/buttons/keycaps/navigation/ribbon/selection design. The first mockup's
 styling was rejected, and the revised preview has not been approved in full.
+Retain Wolf's file-style picker preference and concern about mandatory keyboard site navigation;
+the pointer-plus-keyboard recommendation and LeetCode flow analogy above are not new approvals.
+Element blocking remains an unresolved preview/layout observation.
 Also retain the historical 20-row/stable-frame provenance and record Wolf's subsequent approval
 of the grid recommendations: all visible rows usable; readable dimensions with fullscreen
 suggestions/worksheet scrolling; retained familiar frame and shared right-hand lane. Both grid
