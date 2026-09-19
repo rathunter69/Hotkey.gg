@@ -1765,3 +1765,32 @@ final screen layouts. Do not silently resolve these while writing UI or storage 
 
 This checkpoint changes only the coordination record in this handoff. No user product rule,
 source evidence or application behavior changes; no app tests or new agents are needed.
+
+## September 19: bounded semantic review of the UI proposal
+
+At the UI owner's request, reviewed the complete
+[experience-site proposal at b0d2f17](https://github.com/rathunter69/Hotkey.gg/blob/b0d2f17929768e1be348510728e5559975544b2c/docs/handoffs/experience-site.md)
+(file blob 7508f671039f61ce5433488e4cc7bfaf1dd7972f) against the confirmed Catalog decisions at
+15de791/coordination at 194db93 and freshly fetched PRODUCT
+(file blob 72dee5615a01e64ea487fc3fcf8c8855eb4258f3). The UI owner reports explicit Wolf approvals
+for side-panel Help beside the visible worksheet and a small Challenges link beside Home/Catalog;
+its other layouts/copy remain proposals. This review does not independently approve those layouts.
+
+**Outcome:** no material contradiction with settled Catalog rules or accidental new learner
+state found; no required correction. Confirmed preservation of help/input distinctions, inclusive
+completion versus readiness/XP/timed evidence, fresh solo attempts, private per-drill speedruns,
+continuous scored timing, best-of-unlimited public retries, existing/unknown historical records,
+access prerequisites and the agreed home/result hierarchy. Outcome, award confirmation,
+persistence receipt and public posting remain separate. Draft loading/local/pending/error displays
+consume the storage contract rather than create another progression system.
+
+The UI proposal does not claim that merely displaying the ordinary lesson timer creates a
+qualifying speedrun or public entry. Keep that distinction without excluding ordinary elapsed
+feedback/history from the approved retained records. Exact comparison, persistence/import,
+interruption and reward contracts remain with their respective owners; no new rule is inferred
+from a screen sketch. All remaining implementation/keyboard/platform/accessibility validation is
+outside this documentation review.
+
+Sent the no-required-corrections outcome and boundaries to the UI owner for its chief handoff.
+Only this Catalog review record changes; no duplicate UI work, new investigation, application
+tests, implementation, new product decision or shared-document edit.
