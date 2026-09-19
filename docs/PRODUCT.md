@@ -496,6 +496,24 @@ eligibility/version rules explicitly while preserving earned items and historica
 All questions in this packet are answered. Continue with concrete learner-state examples and
 precise contracts; no application, catalog or stored-history change is authorized.
 
+**September 19 — initial saved-progress comparison and submission principles approved:**
+
+Source: the chief read Wolf's explicit answers in the newly started Area 7 task
+`01a0b908-9ee9-7d31-afb6-9733f5d421bf`: “Separate groups until equivalence is proven” and
+“Short published submission grace period”. The area's detailed remote handoff is still pending.
+
+- Compare personal times only when the task, timing rules and Excel setup are proven comparable.
+  Keep changed/older tasks in separate visible record groups until equivalence is established.
+  Exact comparison metadata, evidence, ownership and legacy mappings remain to specify.
+- If a public benchmark/Daily result cannot reach the server, retain it privately and show
+  public submission as pending. Public credit requires reconnection within a short published
+  submission grace period, subject to the eventual eligibility/validation rules.
+
+The precise grace duration, trusted timing/proof, interruption and event-boundary handling
+remain open. These are approved product principles, not verified saving/submission behavior,
+an accepted storage implementation or permission to change live records. Area 7 owns the
+detailed contract and returns its remote evidence to the chief.
+
 Wolf also explicitly requested continued concise, high-level mechanics options with practical
 tradeoffs and a reasoned recommendation. Keep this discussion style, capture each actual answer
 separately, and avoid duplicating the area's decision discussion in the chief session.
