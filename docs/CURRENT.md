@@ -95,7 +95,7 @@ All preserve original local work and earlier remote branches.
 | **Begin account isolation fixes**, `01a0af8b-9a97-7593-a1d2-6d2491cfe947`; `codex/security-replay-baseline` | Baseline complete and accepted at 54640b0, exact tested source eaab864. Two fresh 52-migration replays and two complete 56-assertion suites: each 44 pass/12 identical DATA-01 failures, cleanup pass. Test infrastructure works; permissions remain unrepaired. | `supabase/tests/`, database-test docs/handoff and dedicated test workflows. Current batch complete; no DATA-01 repair assigned. Preserve failed-before evidence. No production/schema/runtime changes. |
 | **Audit starter 3 cleanup candidates**, `01a0af90-7fb2-7571-a5d6-b82354d57540`; `codex/repository-structure` | Complete on its branch at cf8c61b: archived the historical PROJECT_CONTEXT record, kept a root compatibility page, repaired links and recorded the remaining structure plan. Chief verified preserved text and docs-only file manifest. Included in accepted combined checkpoint 00df57a; no main merge. | `README.md`, `docs/ARCHITECTURE.md`, selected historical documentation/archive paths and non-shared documentation links, `docs/handoffs/repository-structure.md`. No runtime, generated pages, migrations, test harness or workflow edits. |
 | **Integrate account testing changes**, `01a0b0f9-09da-7a62-9dd2-dd9baeac388d`; `codex/groundwork-db-integration` | Complete and accepted at 16ee830: all accepted account/browser/structure/database-test groundwork and evidence coexist. Seven combined static checks, 11 guard tests and plan pass; exact executable equivalence preserves original browser and DB results without redundant full reruns. | Integration handoff `docs/handoffs/groundwork-db-integration.md`; reservations released. No permission repair, runtime/migration/package/gate/deploy change, main merge or production action. Latest shared guidance is read separately. |
-| **Audit catalog and learner flow**, `01a0b148-2693-7901-af91-934c83cabe1d`; `codex/catalog-flow-review` from preserved 00df57a | Proposal checkpoint 6d87306 verified. At Wolf's request, all six choices are presented and pending: keyboard-platform promise, XP principles, learning format, certificates, Desks prominence and concrete free/paid depth. Earlier September 19 approvals and simplicity constraint remain intact. | Owns only `docs/handoffs/catalog-progression.md`; record selections without assuming unanswered choices, then concrete first-lesson/helped-result/returning-home examples. No new product approval, implementation, deletion or module. |
+| **Audit catalog and learner flow**, `01a0b148-2693-7901-af91-934c83cabe1d`; `codex/catalog-flow-review` from preserved 00df57a | c52d067 verified: all six design choices and both platform/certificate refinements answered. Windows primary/changeable setup, limited-repeat XP, lessons→tasks→models, inclusive completion certificates, optional enterprise Desks and useful free basics approved. | Owns only `docs/handoffs/catalog-progression.md`; only the new feel packet is pending: feedback frequency/intensity, sound defaults and overall tone. Then concrete learning/result/home examples. Exact scope/mechanics/layouts remain open; no implementation or module. |
 | Chief coordinator, this task | Project overview and platform-wide design discussion, priorities, product decisions, GitHub/security/structure review and handoff reconciliation. | `docs/CURRENT.md`, `docs/PRODUCT.md`, `docs/handoffs/chief-groundwork.md`. Other tasks send proposed corrections instead of editing these. |
 
 Testing checkpoint [4ea428b](https://github.com/rathunter69/Hotkey.gg/commit/4ea428ba1504ee04b3d01943df5f7cd1b68a2c4d)
@@ -187,7 +187,7 @@ repairs remain separately scoped.
 | Official test-platform feasibility | [14d7e10](https://github.com/rathunter69/Hotkey.gg/blob/14d7e10a79232000ff24d2637ce6adc72b786b1f/docs/handoffs/security-accounts.md) | Pinned official database/Auth image manifests and source SHAs; standalone platform gaps traced. Documentation-only delta over 2a4a5f5, executable code remains ce53324. No bootstrap/replay/SQL result at that historical checkpoint; later results are listed below. |
 | Application replay / earlier incomplete baseline | [9ea05e6](https://github.com/rathunter69/Hotkey.gg/blob/9ea05e64edbe66d075b2fda6e7b313a2f198ae72/docs/handoffs/security-accounts.md) | Exact source 18babfa/run 35276711544: all 52 migrations passed once, then fixture aborted after 12 partial results (10 ok, 2 not ok). No complete 56-result stream or second instance; cleanup passed. Accepted earlier failure evidence, not security clearance; superseded for baseline completeness by 54640b0. |
 | Reproducible permission baseline | [54640b0](https://github.com/rathunter69/Hotkey.gg/blob/54640b07554882dcd3322d84f2bba398fadc94c0/docs/handoffs/security-accounts.md) | Exact eaab864/run 35277724943: two fresh complete 52-migration/56-assertion runs, identical 44 pass/12 permission failures, both cleanups pass. Durable JSON and source/provenance verified. Baseline accepted; permissions unrepaired. |
-| Catalog/flow decision review | [6d87306](https://github.com/rathunter69/Hotkey.gg/blob/6d873064529f8682e35a3e4c971fc5ddd8848573/docs/handoffs/catalog-progression.md) | Chief verified sole-doc delta from 08d1e46 and remote file identity. The earlier two-question packet is expanded, at Wolf's request, to six selectable choices with recommendations/tradeoffs/dependencies; all are pending. No new confirmed PRODUCT rule, agents, source investigation, audit or app tests. Prior approvals remain valid. |
+| Catalog/flow decision review | [c52d067](https://github.com/rathunter69/Hotkey.gg/blob/c52d067f77b9a3adef0911780a7fe7548bf8592f/docs/handoffs/catalog-progression.md) | Chief verified sole-doc delta from 6d87306 and remote blob; focused review confirmed the approvals, retaining the limit that setup selection does not establish Mac compatibility/parity. Completion certificates include helped/mouse work, superseding the independent-assessment recommendation. New feel options pending; no re-audit or app-test rerun. |
 | Complete test-groundwork integration | [16ee830](https://github.com/rathunter69/Hotkey.gg/blob/16ee8306a8c170db9f8fe2e051b44b0519782ae1/docs/handoffs/groundwork-db-integration.md) | Final remote source/handoff verified. Only docs, accepted DB test files and two dedicated test workflows differ from 00df57a; all 10 Security executable/SQL/workflow blobs match eaab864. Browser/runtime unchanged. Static7/guard11/plan pass; browser green and DB reproducible 44/12-fail evidence reused explicitly by equivalence. Latest accepted baseline, no repair/merge/deploy. |
 | Earlier combined groundwork integration | [00df57a](https://github.com/rathunter69/Hotkey.gg/blob/00df57afd8d3299cc7feaf523847b9ca43e54d06/docs/handoffs/groundwork-integration.md) | Remote tip/handoff verified; browser/runtime tree equals fully tested 4ea428b, Security test blobs equal accepted 14d7e10. Combined static7/runner3/replay-plan and independent review pass. Includes cleanup and latest modes/flow guidance through 45edd. Excludes separate platform/replay experiments. Accepted future area baseline; no main merge or deployment. |
 | Full testing groundwork | [1f2fa57](https://github.com/rathunter69/Hotkey.gg/blob/1f2fa577f94911b05ecc50d8b25b7a2a9d16c6f2/docs/handoffs/git-testing-releases.md) | Latest documentation-only summary; accepted 00df57a contains earlier handoff 31af74b. Exact test-tooling source 4ea428b on preserved application c702c69: full local matrix and Linux run 35274460688 pass; chief verified source/run/job and docs-only final delta. Covers active gate isolation and generator drift, not live accounts, DB permissions or launch acceptance. |
@@ -356,22 +356,25 @@ selected. One Help entry combines levels of support, retains visible instruction
 assistance consequences. Wolf explicitly wants fewer modes/settings/visible choices because
 the ribbon/workspace already looks complicated. Preserve the visual foundation and useful access.
 
-The groups recorded at 216a2af are answered. Wolf then explicitly requested selectable options
-for all six remaining design/platform decisions. **All six are presented and pending** at
-6d87306: keyboard-platform promise, single-XP reward principles, learning format, certificate
-purpose/initial scope, Desks prominence and concrete free/paid learning depth. This supersedes
-the earlier two-question status; those platform/XP questions are included in the same packet.
-Recommendations, alternatives, tradeoffs and dependencies are in the linked handoff, with no
-selection assumed. Preserve existing Mac behavior, earned XP and issued certificates; helped/
-spreadsheet-mouse attempts still earn no XP. The useful free beginner path and other approved
-principles remain. No compatibility claim, formula, new mastery/rank, feature/data removal,
-billing activation or implementation follows from presenting these options.
+**All six choices and both follow-up refinements are answered** at c52d067. Windows is primary,
+with a quick suggested/changeable Windows/Mac setup before the guest exercise; broader
+personalization/save invitation remains afterward. Instructions follow the selected setup,
+but verified compatibility/parity is not established. Most XP goes to new eligible accomplishments,
+with smaller limited repeats and no speed multiplier. Focused lessons lead to practical tasks
+and larger models. Certificates recognise selected-set completion, including helped and
+spreadsheet-mouse work, superseding the solo-assessment recommendation; XP/readiness/time rules
+remain separate. Keep issued credentials and earned history. Desks remain separate and optional
+for enterprise/training providers; WSP/Training the Street are audience examples, not partners.
+Free everyday navigation/editing/formatting/basic formulas teach ribbon/Excel functionality
+with useful breadth; advanced learning/models remain paid. Exact curriculum, verified platform
+scope, amounts/caps, certificate sets/access, Desks capabilities and calibrated savings remain open.
 
-Await the six selections without duplicating questions, then review **concrete first-lesson,
-helped-result and returning-home examples** against the simplicity constraint. Platform scope
-informs shortcut definitions; format/free outcomes inform lesson blueprints; XP and certificate
-purpose inform award/assessment details; Desks prominence informs navigation. Coordinate the
-existing owners without starting new workstreams. The proposed default-learning/contextual Solo-Speedrun/secondary
+Wolf also explicitly wants satisfying action-completion feedback and continued feature/feel
+clarification. **Only the new feel packet is pending:** feedback frequency/intensity, sound
+defaults and playful/arcade/professional tone. No default sound, animation, celebration frequency
+or physiological claim is selected. Await those answers without duplicating questions, then
+review **concrete first-action, helped/solo-result and returning-home examples** against the
+simplicity constraint. Coordinate existing owners without starting new workstreams. The proposed default-learning/contextual Solo-Speedrun/secondary
 practice-challenges/quieter-settings hierarchy remains design guidance, not layout approval. The keep/combine/simplify/leave-out map remains a proposal beyond
 the explicit decisions above. No code/data/feature deletion or new module is authorized.
 Marathon remains without an ordinary entry in the reviewed source; dormant session/runtime
