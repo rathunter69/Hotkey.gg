@@ -404,3 +404,42 @@ was accessible. No API/schema implementation depends on the unavailable changelo
 
 This file's Git history supplies the final documentation commit. A handoff is complete only
 after push, remote branch/blob verification and delivery to the chief; this does not merge or deploy it.
+
+## September 19 follow-up: plain-English guest saving and three open choices
+
+Wolf asked for questions and stated his expected model: guests save progress locally and sign
+up to save progress. The discussion clarified the existing direction as **device-only saving
+before signup; confirmed account transfer/saving for access on other devices afterward**.
+Use “Saved on this device” versus “Saved to your account” only when each write is confirmed.
+Signup alone is neither transfer consent nor a successful save receipt. Browser/device storage
+limitations remain; this is the intended product promise, not a claim that it is implemented.
+
+Three connected choices were presented in nontechnical language. **Answers are pending**;
+neither Wolf's request for recommendations nor the selected-by-default controls approve them.
+
+| Question presented | Recommendation | Other selectable options |
+|---|---|---|
+| After confirmed guest transfer, can qualifying solo work receive normal XP, satisfy skill prerequisites and count toward a comparable PB? | Count qualifying guest work once, subject to a trustworthy evidence rule still to be specified with Catalog/Security | Preserve the history/known completion, but require a fresh signed-in solo attempt for those new benefits |
+| For a Daily finished before closing, how long can a delayed upload arrive afterward? | **5 minutes after event closing** | 15 minutes; 1 hour |
+| What control should people have over their records? | Hide private attempts from normal views and withdraw public results, retaining the underlying history | Keep all private attempts visible but allow public withdrawal; or also permit permanent deletion of selected attempts |
+
+The recommended five minutes is a product tradeoff, not a measured network-reliability claim:
+it accommodates a brief connection interruption while keeping final standings prompt. This
+packet concerns Daily's closing deadline; ongoing benchmarks have no selected daily cutoff and
+still need their own stated upload lifetime/edition-validity contract. No extra playing time
+is proposed. Too-late public submission must not remove the underlying personal attempt.
+
+Record-control examples: hiding an unfinished attempt tidies the history screen without
+removing completed learning or earned rewards; withdrawing a public challenge result removes
+its public entry without deleting the private attempt. Exact scope, replacement-best behavior,
+finalized-event treatment and other public surfaces need an explicit design after the principle
+is chosen. Permanent deletion is an alternative to discuss, not deletion authorization or a
+decision about its effects on awards/certificates. Account deletion/export remain separate.
+
+Both guest-credit options preserve known completion and original earned records. Helped work
+keeps its completion credit but receives no XP; neither option automatically posts a score.
+Unknown/ambiguous records cannot gain qualifying evidence merely by being imported.
+
+Latest remote foundation checked: `0767af6347627c09a2cc5ccabe73a660956a9e99`. Recent UI/style
+updates do not change these storage rules. Only this handoff is updated; no new audit, agent,
+application tests, implementation or live actions are needed for the discussion checkpoint.
