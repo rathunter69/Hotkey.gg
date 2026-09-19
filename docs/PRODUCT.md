@@ -576,6 +576,29 @@ The first mockup's styling remains rejected. The revised preview's sample lesson
 copy and focus behavior are still illustrative and have not been approved in full. No application
 implementation, theme removal or broad redesign is authorized.
 
+**Later September 19 — file-style browsing preference and unresolved layout feedback:**
+
+Source: Wolf's latest UI-task message, read directly by the chief and recorded in the
+[23a0025 handoff](https://github.com/rathunter69/Hotkey.gg/blob/23a00252538b6029d32f249360a7c56b3574db1d/docs/handoffs/experience-site.md#september-19-file-style-browsing-and-learning-workspace-comparison).
+He said the revised direction looks closer to his concept and likes the older keyboard-driven
+dropdown/file-structure theme, while questioning whether keyboard-only site navigation is too
+niche. This is a preservation preference and usability concern, not approval of the whole preview.
+
+The area's bounded source read found the existing picker already supports clicks as well as
+arrow/Enter/Escape navigation. Its recommendation is to preserve the file-style presentation,
+make pointer access clear, retain optional shortcut hints and let Continue avoid tree browsing.
+Exact hierarchy/mapping remains Catalog-owned, and focus/input interception still needs review.
+This recommendation is not a new approved catalog contract and does not change worksheet
+mouse/keyboard assistance, XP or timed-result rules.
+
+Wolf's LeetCode comparison prompted a learning-flow analogy—task, workspace, feedback, continue—
+not an approved visual reference or new competitive system. Keep Hotkey's existing identity.
+His report that the element blocking looks strange remains unresolved: the supplied preview
+identifier and latest artifact differ, so neither the rendering he saw nor its cause is established.
+Embedded sizing is a possibility, not a verified explanation. Compare the relevant preview and
+existing app at matching dimensions before changing proportions. No layout fix or final approval
+is claimed; the task did not author a new visual or rerun application tests for this discussion.
+
 **September 19 — historical grid guidance recovered and future grid direction approved:**
 
 The UI area's [history/source review](https://github.com/rathunter69/Hotkey.gg/blob/965bdb9c74e36fd93d8a80845669a3f0cea3a6b5/docs/handoffs/experience-site.md#september-19-clarify-the-earlier-grid-space-work)
