@@ -1,6 +1,6 @@
 # Payments and subscriptions — Area 10
 
-Updated: 2026-09-19
+Updated: 2026-09-20
 Task: `01a0b969-ac99-7553-bc36-42868257ff55` (Plan payments access rules)
 Branch: `codex/payments-plan`
 Starting commit: `b2dad98f46e521307b8d7b75245068b9511a2628` (`codex/repository-foundation`)
@@ -69,10 +69,11 @@ not a promise of anonymous account saving or public submission.
 | Repeat practice / personal speedruns of free content | Included | Included |
 | Selected complete advanced samples | Included; a few, chosen with Catalog | Included |
 | Other advanced lessons / practical models | Subscription required | Included, subject to separate major-jump readiness |
-| Personal speedruns / replay of paid advanced content | Proposed: follows paid content entitlement | Proposed: included for supported drills while entitled |
+| Personal speedruns / replay of paid advanced content | Requires current advanced entitlement; prior completion alone does not grant permanent replay | Included for supported paid content while entitled; valid group access is another source |
 | Selected public challenges | Included; exact benchmark/Daily selection remains Catalog-owned, with the agreed eligibility and retry rules | Same access and scoring; no purchased scoring advantage |
 | Completion certificates | Access follows required content; earned credentials remain accessible | Includes applicable paid content; exact free/paid/mixed sets and issuance timing open; no separate certificate fee proposed |
 | Saved history, earned XP/awards, prior certificates/results | Preserved; payment lapse does not erase or reclassify them | Same retention and privacy principles |
+| Banking-group invitation access | Full individual learning access for approved invitees until a shared program end date; exact invitation controls proposed | Existing subscriptions and invitation grants must coexist under an explicit billing rule |
 | Business Desks, seats and organization tools | Separate offer to define with Desks | Separate; not bundled by this plan |
 
 The complete free path is not synonymous with the current chapter named Foundations.
@@ -82,20 +83,114 @@ determine entitlement. A free advanced benchmark does not unlock its surrounding
 Preview completion is real completion of that unit; it does not assert completion of a whole
 course, establish readiness without qualifying evidence, or override help/input rules.
 
+## September 20 — trial, expiry and banking-group access
+
+**Explicit user decisions in this task:**
+- **P3 — no extra consumer subscription trial.** The useful free path and selected complete
+  advanced samples remain available. The existing automatic .edu trial is current source
+  behavior, not approved as an exception; its eventual transition remains to be planned.
+- **P4 — after expiry, keep free content playable; require renewal for advanced practice.**
+  Retain earned history, results, credentials and progress. This selects renewal over permanent
+  playability of previously completed paid lessons. Timing for an in-progress attempt and
+  evidence-qualified but unissued certificates remains open. A separate still-valid group or
+  organizational entitlement can continue to supply access; one source expiring must not
+  erase another source.
+- **P5 — provide automatic full access through special codes for banking groups.**
+  Wolf expects codes to be generated automatically/randomly and wants to prevent sharing.
+  This is a future product requirement within the planning task, not permission to implement
+  or issue real codes now. Exact duration, issuer authority, eligibility and revocation
+  remain open. The group is not assumed to be an existing customer or partner.
+
+**Further explicit answers, September 20:**
+- **P6 — $9/month standard, $7/month for students, with the same paid content.**
+  This resolves the monthly pricing choice after Wolf's initial $9-versus-$7 question.
+  Student eligibility/reverification and tax/currency presentation remain to define.
+  That answer alone did not select annual billing; the subsequent P10 answer below does.
+- **P7 — one shared access end date per banking group/program.**
+  Late redemption does not imply a new full-duration term or extend the shared date.
+  The actual dates, redemption cutoff and renewal/extension policy remain open.
+- **P8 — cancel anytime; access continues to the end of the paid period.**
+  This is ordinary cancellation: stop future renewal and show the final access date.
+  Separate refund rights/policies remain applicable.
+- **P9 — a 14-day voluntary money-back guarantee on the first subscription payment,**
+  applying to monthly or annual billing, in addition to mandatory legal rights.
+  This does not select an automatic guarantee on every renewal or resolve all service-failure,
+  mistaken-renewal, refund-processing or access-end details.
+- **P10 — monthly and annual billing.** Annual is $90 standard or $70 student, paid upfront;
+  these annual amounts equal ten of the respective monthly payments. Same included content.
+  Student eligibility/reverification, tax presentation, interval switching and price-change
+  handling remain open. No seasonal billing or extra content tier is selected.
+
+The student price is a discount on the same learning access, not a separate content tier.
+Do not equate the existing .edu trial with a worldwide student verification policy.
+The choice authorizes recording the intended offer; it does not activate billing or establish
+that the final paid catalog, unit economics, taxes and legal terms are ready for launch.
+
+At 100 subscribers, gross monthly revenue is $900 at $9 versus $700 at $7.
+Equal gross revenue needs 9/7 = 1.2857 times as many subscribers at $7: about 29% more.
+This calculation excludes fees, tax, refunds, churn, acquisition cost and support; it does
+not prove which price will convert or retain better. No Hotkey demand/price experiment
+has been run. [Stripe's price-testing guidance](https://stripe.com/resources/more/price-testing)
+supports comparing conversion, revenue and longer-term behavior; it does not validate our
+particular price. The recommendation is product judgment, not measured willingness to pay.
+
+**Recommended group-invitation design — not yet approved in detail:**
+
+1. An authorized operator approves a group/program, access scope, permitted recipients and
+   end-date/duration. The system generates invitations automatically within that scope;
+   no public self-issuance or automatic group approval is implied.
+2. Give each intended recipient a unique random, single-use invitation tied to a verified
+   email/account. One shared reusable group code is not the recommendation. Randomness
+   limits guessing; binding stops a forwarded code being claimed by the wrong account.
+   Single-use alone would not stop someone else redeeming it first.
+3. Redemption grants the approved individual learning access automatically, without payment
+   details or checkout. A server-side atomic redemption binds the grant to the account;
+   duplicate retries return the same grant and simultaneous attempts cannot create two.
+4. Store a non-plaintext token verifier; avoid codes in analytics/logs or public documents.
+   Enforce redemption deadlines, revoked/used states and attempt limits. Show safe failure
+   messages and permit an authorized reissue without adding another entitlement.
+   Exact token design and permission tests remain Security-owned future implementation work.
+5. Define a redemption deadline separately from access expiry. P7 now selects one shared
+   program end date. No exact date, duration, permanent grant, seat cap or automatic renewal
+   is selected. Invitation copy must show the real remaining access before redemption.
+6. Expiry/revocation of a group grant follows the free-versus-advanced access rule while
+   preserving earned history and respecting any other valid access source. Voluntary paid
+   cancellation/refunds and interactions with an existing subscription must be specified;
+   redeeming a group invitation must not silently cancel or keep charging without explanation.
+7. Full learning access does not grant readiness, XP, certificate completion, paid score
+   advantages, another user's private records, or Desks administration/reporting rights.
+   Keep this learning-access program separate from business Desks unless explicitly scoped.
+   This does not restore the retired site-wide beta/invite gate or membership tables.
+
+These controls address invitation sharing/guessing; they are not a guarantee against sharing
+an already-authorized account's credentials. The security pattern is analogous to the
+[OWASP single-use, user-linked token guidance](https://cheatsheetseries.owasp.org/cheatsheets/Forgot_Password_Cheat_Sheet.html);
+applying it to invitations is our design proposal, not a reviewed implementation.
+
+**Answered packet:** monthly/student pricing and shared program end date are confirmed P6/P7.
+Do not repeat them or the answered consumer-trial/advanced-expiry questions.
+**The cancellation/refund/annual-billing packet is now answered:** P8/P9/P10 above.
+P3-P10 are answered. Student eligibility, invitation controls and the stated lifecycle edge
+cases remain open; do not ask Wolf to reconfirm the selected offer.
+
 ## Commercial choices — pending unless explicitly answered
 
 | Topic | Lead recommendation | Alternative / status |
 |---|---|---|
-| Individual price and intervals | Provisional US$9 monthly or US$90 billed annually for the same included content | US$12/$120, or defer price until paid catalog is defined. Question sent; no answer yet. Currency, taxes, unit economics and final launch price remain unvalidated. |
-| Trial | No additional subscription trial; useful free path and full samples demonstrate value | Optional 7-day trial without a payment card. Question sent; no answer yet. |
-| Expired advanced access | Renewal needed for new attempts/replay/speedruns of paid advanced content; retain history | Keep completed paid lessons playable. Question sent; no answer yet. |
-| Cancellation | Self-service at any time; stop renewal, keep access until the paid-through time | Proposed; not yet asked/approved. Show the exact final access date and cancellation confirmation. |
-| Voluntary refunds | Full refund requested within 14 days of the first individual payment, monthly or annual; no routine prorated change-of-mind refund after that window | Proposed commercial policy, not law or approved terms. Renewal mistakes, duplicate charges, service failures and mandatory rights need an explicit policy. |
+| Individual monthly price | $9 standard; $7 for students; same included paid learning | Confirmed P6, September 20. Student eligibility/reverification and tax/currency presentation remain open. |
+| Billing intervals | Monthly or annual; $90 standard/$70 student billed upfront each year, same content | Confirmed P10, September 20. Annual equals ten monthly payments; switching/renewal notices and student renewal eligibility remain open. |
+| Consumer trial | No additional trial; useful free path and samples demonstrate value | Confirmed P3, September 20. Banking-group access is a separate selected requirement; existing .edu-trial transition remains open. |
+| Expired advanced access | Free content stays playable; renewal required for paid advanced practice | Confirmed P4, September 20. Retain earned records; other valid grants remain separate sources. |
+| Cancellation | Cancel anytime; stop renewal, keep access until the paid-through time | Confirmed P8, September 20. Self-service flow and exact date/confirmation wording remain to design. |
+| Voluntary refunds | 14-day money-back guarantee on the first subscription payment, monthly or annual, additional to mandatory rights | Confirmed P9, September 20. Renewal mistakes, duplicate charges, service failures, partial refunds and refund/access timing still need policy detail; no claim of legal readiness. |
 | Failed renewal | Clear update-payment notice and a short bounded grace period before advanced access ends | Duration and conditions open. Never confuse payment grace with Storage's public-result submission grace. |
 | Certificate claim after expiry | If all required evidence qualified while entitled, permit later claim/download without repurchase | Proposal for consistency with earned-history protection. Evidence cutoff, version mapping and account requirement need Catalog/Storage agreement. |
 
-Monthly/annual are proposals, not a settled currency or tax-inclusive price. No seasonal plan,
-lifetime offer, extra individual tier, coupon, automatic trial or enterprise price is selected.
+Monthly and annual offer prices are confirmed. Tax-inclusive/exclusive presentation, billing
+currency/markets and applicable terms need Area 12 review before publication. No seasonal plan,
+lifetime offer, extra individual tier, consumer coupon, automatic consumer trial or enterprise
+price is selected. Automatic banking-group learning-access codes are a separate confirmed
+requirement with issuance/redemption details still proposed.
 Business facts, provider readiness, countries served, tax presentation and consumer-contract
 classification remain Area 12 inputs; do not copy a jurisdiction from this PC's timezone.
 A voluntary refund promise does not replace applicable statutory rights.
@@ -109,10 +204,10 @@ These are planning acceptance cases, not a tested implementation.
 | Guest or free account | Free path, samples and selected public challenges; saving/public-entry rules remain separate | Offer confirmed; exact account/verification rules open |
 | Checkout abandoned, initial payment incomplete or authentication pending | Keep free access; do not label a return-page visit as paid success | Proposed implementation contract |
 | Successful purchase / renewal | Authenticated payer gets the appropriate validated access period, once; readiness unchanged | Proposed implementation contract |
-| Cancellation scheduled | Paid content remains available to the displayed paid-through time; no further renewal | Proposed policy |
-| Expiry | Retain all earned/history records; advanced playback/new attempts follow Wolf's pending expiry answer | History confirmed; playable access pending |
+| Cancellation scheduled | Paid content remains available to the displayed paid-through time; no further renewal | Confirmed P8; exact self-service flow remains design work |
+| Expiry | Free content remains playable; paid advanced practice requires renewal unless another valid grant applies. Retain all earned/history records | Confirmed P4; in-progress attempt handling still open |
 | Payment lookup/network failure | Say verification is pending/unavailable; retain work and history; do not display an invented expiry or grant unlimited access | Offline lease and existing-session details open with Security/Storage |
-| Refund | Track refund and cancellation separately; never falsely promise a completed refund; retain learning/history | Refund policy, access-end timing and failure recovery open |
+| Refund | Apply the approved first-payment 14-day guarantee plus mandatory rights; track refund/cancellation separately and retain history | P9 confirmed; access-end timing, processing/failure recovery and other refunds open |
 | Return after a lapse | Restore access after a valid new purchase and show existing progress; do not re-award old completions | Proposed acceptance contract |
 | Cancel or expire while an attempt/save is in progress | Preserve the attempt and original facts; no data loss. Whether an already-authorized attempt can finish needs a bounded rule | Open with Catalog/Storage/Security |
 | Individual entitlement plus organizational grant | Evaluate each valid source independently; loss of one is not automatic loss of the other | Proposed boundary; Desks owns seat/member rules |
@@ -155,8 +250,9 @@ authorized in this turn.
   The [database assessment](https://github.com/rathunter69/Hotkey.gg/blob/6a73f8e649f875f567f44748c9e677d1065ac5d5/docs/handoffs/repository-database.md)
   found profiles.plan/invoices reads without corresponding deployed schema objects.
 - Existing school/admin/desk grants are not approval for a consumer subscription trial.
-  Runtime automatically invokes a one-time seven-day .edu entitlement trial. Whether it remains,
-  changes or coexists with a consumer trial is open. Preserve and trace existing grant history.
+  Runtime automatically invokes a one-time seven-day .edu entitlement trial. P3 rejects an
+  extra consumer trial; treatment of existing grants and transition of that old feature still
+  need an explicit decision. It has not been selected as an exception. Preserve grant history.
 - Paid lesson data is in the publicly served static application. A journey gate cannot make
   already-served source confidential. Future authoritative service access and content-delivery
   expectations need separate design; this is not permission for a framework rewrite.
@@ -200,6 +296,23 @@ Official documentation checked September 19 for later implementation constraints
 The Supabase skill was read for source review. Its changelog markdown fetch failed; no API,
 configuration, database or live-service change depends on that unavailable reference.
 
+## September 20 verification update
+
+Refreshed remote AGENTS, README, CURRENT, PRODUCT, DEVELOPMENT and TASK_GUIDE at
+`e1719a7ec7daeb8f014a92fefddd6f0a960000c0`. Read the relevant inclusion/credential boundaries
+in Catalog's [71cc00e roadmap](https://github.com/rathunter69/Hotkey.gg/blob/71cc00e3b6fa71933a3871360a2d9d059a8ced61/docs/handoffs/drill-catalog.md)
+and Storage's [26e71a0 contract](https://github.com/rathunter69/Hotkey.gg/blob/26e71a0f741de3a3e23f8653314a3b2e7f5cf46e/docs/handoffs/leaderboards-storage.md).
+New curriculum content allocations remain proposals. Storage's approved five-minute Daily upload
+grace is distinct from still-open payment grace and group grant duration.
+A focused independent review checked the September 20 decisions against the commercial/lifecycle
+tables. Its two clarifications are resolved: the existing .edu-trial transition is not permission
+for an extra consumer trial, and only P3-P10 are marked answered while edge cases stay open.
+Local/remote file identity, one-file scope, whitespace and decision/proposal checks accompany
+publication. No new agent source audit or application test was needed.
+This update records user choices and recommendations only; no code, app tests, new source audit,
+code generation, real invitation, billing operation or deployment. Pinned-source evidence above
+is reused, not relabeled as freshly tested.
+
 ## Verification and next step
 
 Read latest remote AGENTS, README, CURRENT, PRODUCT, DEVELOPMENT and TASK_GUIDE, then relevant
@@ -213,10 +326,18 @@ selected challenge membership, mixed certificate sets, unissued-certificate timi
 suite, payment transaction, real account test or database query was run in this planning task,
 under TASK_GUIDE's documentation exception. No production action or new paid gate.
 
-**For the chief:** Area 10 is now assigned. Integrate P1/P2 as dated decisions and the offer table
-as bounded planning, preserving all marked open questions. Do not mark subscription integration
+**For the chief:** preserve P1/P2 and add September 20 decisions P3/P4/P5: no extra consumer
+trial; free content after expiry with renewal for advanced practice; automatic banking-group
+full-access codes as a future requirement. Add P6/P7: $9/month standard and $7/month student,
+same content; one shared program access end date. Student eligibility and actual dates remain
+open; email binding/single-use controls are recommendations, not a user-approved full design.
+Also add P8/P9/P10: cancellation at paid-period end, 14-day first-payment money-back guarantee
+in addition to required rights, monthly plus $90/$70 annual upfront. This settles the presented
+commercial packet; remaining edge cases are not blanket-approved. Do not mark subscription integration
 complete or checkout ready. This task owns only this handoff.
 
-**Next bounded objective:** finish the current price/trial/expiry questions, then ask one small
-cancellation/refund packet; reconcile Catalog's exact membership and certificate timing.
+**Next bounded objective:** define student eligibility and group invitation issuance/redemption
+with two or three concrete learner examples, then resolve overlapping grants/subscriptions,
+refund access timing and failed-renewal grace. Reconcile Catalog's exact membership, certificate
+timing and Security's future controls. Do not reopen P1-P10 or begin implementation.
 Do not start checkout work while those choices and business/release prerequisites remain open.
