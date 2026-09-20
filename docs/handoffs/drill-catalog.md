@@ -1,6 +1,6 @@
 # Drill catalog and learning roadmap — first review draft
 
-Dated **2026-09-19**. Owner: Catalog/learning task `01a0b148-2693-7901-af91-934c83cabe1d`.
+Initial draft **2026-09-19**; expansion overview added **2026-09-20**. Owner: Catalog/learning task `01a0b148-2693-7901-af91-934c83cabe1d`.
 Branch: `codex/catalog-flow-review`. **Planning only; no replacement content has been authored or implemented.**
 The learning system has been refined; the current eight chapters and 74 drills remain intact.
 This is the first curriculum draft for review, not an approved rebuild plan.
@@ -78,7 +78,7 @@ then can Continue, Try solo or deliberately speedrun it. Do not add a mode selec
 | Chapter | A coherent skill area with useful outcomes. | A catalog section and its lessons. |
 | Lesson | A taught objective with a worksheet task, including practice or a larger project when appropriate. | The primary clickable unit, named for the work they will learn. |
 | Drill | A repeatable exercise/worksheet underlying a lesson; existing IDs remain provenance. A lesson may need several exercises after a split. | “Practice again” or the familiar drill name where helpful; not another mandatory navigation layer. |
-| Module | An authoring grouping of closely related objectives inside a chapter. | No separate required level at launch; use a simple section heading only if it helps browsing. |
+| Module / content pack | A versioned content collection over the shared chapters/lessons, with a clear subject and release boundary. See the September 20 expansion proposal. | No additional mandatory browsing level; lessons remain accessible through the familiar chapter/catalog structure. |
 | Track | A recommended route through shared lessons, chosen for experience/goal. | An optional recommendation such as Everyday Excel or Financial Modeling, with shared completion. |
 
 Do not equate a track with a certificate, subscription, readiness gate or independent copy of a lesson.
@@ -661,3 +661,158 @@ Keep the original systems handoff as provenance; UI, Storage, Payments and Engin
 
 **Next authorized step:** discuss C1–C3 and refine the draft. Expanding all lesson blueprints or authoring
 replacement drills waits for the appropriate subsequent planning/implementation gate.
+
+## September 20 — curriculum overview and future content modules
+
+**New explicit user direction:** Wolf asked for an overview of drills, chapters, progression and organization,
+and wants the modules structured to support follow-on content, such as new advanced finance drills for premium users.
+This confirms planning for curriculum expansion. It does **not** select every chapter, pack, price, cadence,
+separate DLC purchase or implementation batch. The prior chapter/Foundations/project questions remain unanswered.
+The following is the Catalog owner's recommendation for review.
+
+### The curriculum at a glance
+
+| Part of the journey | Proposed chapters | What learners build toward |
+|---|---|---|
+| Excel Foundations — complete useful free beginner path | C01 Move/select; C02 Enter/edit/organize; C03 Format; C04 Calculate/reuse; C05 Lists/handoff | Confident keyboard use and a useful everyday summary, with explicit taught steps and named-element goals. |
+| Applied Excel — proposed advanced subscription content, with selected complete free samples | C06 Find/summarize answers; C07 Build/check models | Summaries, reconciliations and a working plan that responds to changed inputs. |
+| Finance — proposed advanced subscription content, with selected complete free samples | C08 Financial statements; C09 Valuation; C10 Funding/deals | Understand the domain concepts, practise the calculations, then assemble and check meaningful models. |
+| Future specialist modules — premium expansion direction; exact offer pending | Optional themed collections added when planned, such as advanced debt or sector-specific models | A new skill/application beyond the core, with stated preparation and its own coherent outcome. |
+
+The three core groupings explain the journey; they need not become additional navigation layers.
+Ten is the current proposed chapter count, not a target to defend. There is no target of 74 replacement drills.
+The old inventory supplies source material and history mapping, not a required exercise list.
+
+### Chapters, lessons, drills, tracks and modules
+
+Recommend **chapters → lessons** as the normal browsing structure. Each lesson teaches an objective through
+one or more worksheet exercises. Call a repeatable worksheet exercise a drill internally, and use Practice
+again / Try solo / Speedrun as appropriate actions. The learner need not choose a separate lesson mode and
+drill mode for the same work.
+
+A chapter has one understandable purpose. Lessons introduce needed concepts, let the learner practise,
+then combine familiar skills in a practical task. A project sits with the lessons that prepare it.
+These are useful lesson patterns, not four compulsory screens, a fixed drill quota or a timed duration target.
+
+For example, a proposed report-formatting sequence can teach bold and alignment, introduce number display,
+practise width/border judgement, then ask learners to prepare a short report using those skills. Each task
+names its concrete worksheet elements: “Make Weekly Sales Report bold” or “Format Revenue in Monthly Summary
+as currency with two decimal places.” Introduce every required command/concept before relying on it.
+Use smaller focused tasks where they help understanding; do not insert filler solely to extend a chapter.
+
+Tracks are recommendations through shared lessons, tailored to experience and goals. The same completed
+lesson counts wherever it is reused, subject to explicit equivalence; an analyst track is not a duplicate
+catalog with fresh awards for the same work. The returning home screen still leads with Continue.
+
+**Refining the earlier module proposal:** a module/content pack is a versioned collection of shared chapters/lessons that we can author and
+release together. Pack-specific chapters remain ordinary chapters associated with that collection; a pack can also reuse related
+chapters/lessons. It is not automatically a nested “module → chapter → lesson → drill → mode” browsing path.
+The catalog can identify a collection by subject or pack name while showing its lessons through the familiar
+structure. Exact file-style catalog presentation stays with the UI owner.
+
+### Progression without an ever-growing mandatory ladder
+
+Start with a useful guest lesson, personalize afterward, and recommend the next relevant work.
+Basics remain freely explorable. Short readiness checks only occur at meaningful jumps, and equivalent
+earlier qualifying work or a test-out can satisfy them. No speed or XP grind is a prerequisite.
+
+A learner who wants everyday Excel can stop with a useful outcome or continue into analysis/modeling;
+they need not complete finance. An analyst can move into statements and choose valuation or funding work.
+A new liquidity module should require relevant cash-flow and reference skills, not every preceding chapter
+or unrelated WACC work. Introduce any new financial concept inside the module before assessing it.
+
+The existing rules still apply to new content: help/mouse completion retains learning and selected-set
+certificate credit without XP or eligible timed records; fresh solo attempts are judged independently;
+personal speedruns remain available under the content's agreed access and comparison rules.
+Optional public benchmarks/Daily use selected comparable tasks, not automatic boards for every new lesson.
+No new rank, mastery currency or special expansion mode is needed.
+
+### How future premium content can fit
+
+Candidate examples below illustrate packaging only. They are not promised releases, a launch list, verified
+engine capabilities, or financial-methodology approval.
+
+| Candidate expansion | Relevant shared preparation | Distinct learning/application to justify the pack | Possible final task |
+|---|---|---|---|
+| Advanced debt modeling | Driver models, cash-flow basics, introductory debt/interest | Multiple facilities, priority, refinancing assumptions and stress cases beyond the introductory course | Build and check a debt/cash schedule under stated cases. |
+| Sector modeling | References/driver models; relevant statement concepts | A sector's distinct operating drivers and how they connect to financial outputs | A coherent sector operating model; choose a specific sector before authoring. |
+| Acquisition analysis | Statements, funding and relevant valuation concepts | Acquisition effects and transaction-specific assumptions beyond the introductory deal lesson | A checked acquisition case with clearly stated outputs. |
+| Modeling interview cases | Relevant core skills for each case | Transfer learning to a new but fully specified scenario, diagnose and finish a model | Complete a self-contained case; optional personal speedrun, not a new certification exam or game mode. |
+
+A candidate must offer a specific learning gain, not merely rename a core task with different figures.
+Case variants can be valuable practice, but describe them honestly as additional application rather than
+a new skill. Candidate expansions can be released independently once their own dependencies are satisfied;
+do not promise a monthly/weekly cadence in this planning phase.
+
+**Commercial recommendation, not a confirmed pricing decision:** include normal new content packs in the
+premium subscription. This gives the subscription a continuing learning benefit and avoids introducing a
+purchase decision for every small pack. Separate DLC purchases, additional tiers, lifetime access and
+enterprise licenses remain distinct unresolved Payments/Desks decisions. Do not infer that “DLC” means
+separately sold or permanently owned content. Access on expiry follows the eventual Payments policy;
+earned records remain preserved. No checkout or entitlement is activated here.
+
+### Content boundaries that make this possible
+
+For each core or expansion module, the complete plan should state:
+
+| Separate fact | Why it matters |
+|---|---|
+| Purpose, audience and measurable objectives | Explains why this content exists and prevents duplicate lessons. |
+| Stable content identity and revision, with included exercises/variants | Allows additions and corrections without silently replacing the task behind an old result. |
+| Shared lessons versus new lessons | Reuses prior work without duplicating completion or XP. |
+| Recommended preparation and any explicitly approved readiness checkpoint | Gives learners a starting point without turning chapter order into an access rule. |
+| Explicit free/paid/sample/challenge allocation | A pack label or chapter move must not silently change entitlement. |
+| Named-element goals, taught concepts, valid routes and capability requirements | Keeps future content consistent with Wolf's teaching standard and engine/platform reality. |
+| Practical project where useful, and certificate-set membership/version if any | Keeps a completion promise understandable; neither a project nor a certificate is mandatory for every pack. |
+| Recognition, progress and timing comparison mappings | Preserves earned history, supports truthful progress and avoids mixing incomparable PBs. |
+
+These are authoring facts, not settings presented to the learner. A new pack should reuse the existing
+worksheet, Help, results, rewards and saving systems. If its desired teaching genuinely needs a new engine
+capability, identify that explicitly and have the chief assign a separate bounded review rather than
+silently broadening a content release.
+
+**Recommended progress rule:** new expansion modules have their own stated completion requirements.
+Completing the core curriculum should remain a completed accomplishment when an optional pack is added.
+Do not show a formerly completed core path as incomplete merely because the entire catalog grew.
+Issued certificates keep their original meaning. A materially revised curriculum/certificate set needs
+an explicit new version and equivalence decision, not a silent new denominator for the old award. Pack version 2 can show new work and its own current progress while version 1 remains an earned completion under its original requirements; do not relabel the older accomplishment as incomplete.
+A current catalog inventory count may grow, but it should not be the durable definition of earned completion.
+Exact display/version transitions stay with Storage/UI; this is a content-design recommendation, not a
+claim that versioned paths are already implemented.
+
+**Example future journey:** a learner completes the agreed Foundations set, later takes the shared statement
+and debt lessons, and then opens an Advanced Debt pack. Their earlier qualifying lessons satisfy the listed
+preparation without repetition. The pack teaches its new concepts, supplies focused exercises and ends in a
+combined schedule. A later Sector Modeling release appears as another option; it does not remove the learner's
+Foundations completion, earlier certificate or debt records. Public challenge participation remains a separate
+choice under its stated rules.
+
+### Decisions and coordination
+
+| Item | Status as of September 20 |
+|---|---|
+| Structure the platform for follow-on advanced/premium content | **Confirmed direction from Wolf's request.** Planning scope only. |
+| Exact ten chapters, smaller Foundations chapters and project placement | Still proposals; the earlier choice packet is unanswered. |
+| Chapters/lessons as normal browsing; reusable optional tracks; modules as publishable collections | Recommendation refined for extensibility; no new mandatory UI layer approved. |
+| Include ordinary future packs in the subscription | Recommendation awaiting commercial choice; not permission to sell packs or promise lifetime access. |
+| Candidate pack names, launch inventory and release cadence | Illustrative/open; no additional content workstream is started. |
+| Versioned core/pack progress that preserves completed accomplishments | Recommendation within existing history-preservation rules; exact Storage/UI contract remains to specify. |
+
+Read the latest remote shared guidance and prior draft before this addition: CURRENT blob
+`6261b8c2cfef3b1f1d5954ecf2e09044b5ee8015`; AGENTS blob
+`f030d9431b3fb0926e8995deff89624b2567f309`; draft blob
+`58626288853f87c38dc32425bbef952c2582271e`. CURRENT still names 16ee830 as the accepted code baseline.
+Prior 74-ID inventory and source audit are reused; no new source investigation or application tests are needed.
+
+Independent review of this expansion/progression proposal completed. Clarified that packs are versioned collections over the shared chapter/lesson structure, that projects/certificates are optional, and that a new edition can show new work without reducing prior-version completion. No repeated audit or application testing.
+Documentation scope/whitespace and unchanged crosswalk are verified before publication; final remote
+commit/blob checks accompany the handoff. No app, catalog, database, billing or live-state change.
+
+**Proposed chief updates:** record the new extensibility direction as confirmed, link this updated handoff,
+and keep chapter/pack names and commercial recommendations pending. Payments owns subscription inclusion/
+separate purchase/expiry; Storage owns exact progress/recognition contracts; UI owns collection discovery;
+Catalog owns objectives, content boundaries and prerequisites. No other task is automatically expanded.
+
+**Next discussion:** review the curriculum overview and two existing structure/project choices first.
+Then settle a small expansion-policy packet if needed. Do not expand every chapter or promise content
+releases before the basic structure and lesson examples are agreed.
