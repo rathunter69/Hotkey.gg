@@ -19,6 +19,8 @@ import { FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES } from '../engine/sheet.js';
 import { RIBBON_COMMANDS, RIBBON_LAYOUT, MENU_META, VIRTUAL_MENUS, UNIMPLEMENTED_BY_ID, MODAL_DIALOGS,
   itemTip, keyTipAt, runCommand, openMenuPath, recordMouse, closeDialog, leaveRibbon, menuEntries } from './ribbon-commands.js';
 
+const COLLAPSED_W = 62;   // a collapsed group's button + its padding (Excel folds the rightmost groups when the bar is narrow)
+
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const BAR_KEY = 'hk_ribbon_bar';
 const MODE_KEY = 'hk2_ribbon';
@@ -101,6 +103,9 @@ export class RibbonView {
     this._docKey = e => { if (this.localMenu && e.key === 'Escape') { this.localMenu = null; this.render(); e.preventDefault(); e.stopImmediatePropagation(); } };
     document.addEventListener('mousedown', this._docDown, true);
     document.addEventListener('keydown', this._docKey, true);
+    this._fitKey = ''; this._fitSet = new Set(); this._tipGroup = {};   // which groups are folded at the current width, and where a folded tip anchors
+    this._onResize = () => { clearTimeout(this._rzT); this._rzT = setTimeout(() => this.render(), 120); };
+    window.addEventListener('resize', this._onResize);
     this.unsub = session.onChange(what => { if (what === 'key' && this.localMenu) this.localMenu = null; this.render(); });
     this.render();
   }
@@ -112,6 +117,7 @@ export class RibbonView {
     this.dropKill();
     if (this.pasteDialog) this.pasteDialog.remove();
     if (this.fmtDialog) this.fmtDialog.remove();
+    window.removeEventListener('resize', this._onResize); clearTimeout(this._rzT);
     if (this.slot) this.slot.classList.remove('rib-full');
     this.el.remove();
   }
@@ -160,6 +166,11 @@ export class RibbonView {
     if (kind === 'cmd') {
       if (!runCommand(ss, arg)) { ss.emit('mouse'); return; }   // a refused edit keeps the editor open
       this.localMenu = null; recordMouse(ss, 'ribbon:' + arg); ss.emit('mouse'); return;
+    }
+    if (kind === 'group') {
+      const key = 'group:' + arg;
+      this.localMenu = this.localMenu === key ? null : key;
+      recordMouse(ss, 'ribbon:' + key); ss.emit('mouse'); return;
     }
     if (kind === 'menu') {
       const meta = MENU_META[arg];
@@ -269,7 +280,12 @@ export class RibbonView {
   }
   /** The full bar's control for a KeyTip path (button or split), else the tab row. */
   anchorFor(...tips) {
-    for (const t of tips) { const a = t && this.el.querySelector('[data-tip="' + t + '"]'); if (a) return a; }
+    for (const t of tips) {
+      if (!t) continue;
+      if (t.startsWith('group:')) { const g = this.el.querySelector('[data-group="' + t.slice(6).replace(/"/g, '') + '"] .rf-grpbtn'); if (g) return g; continue; }
+      const a = this.el.querySelector('[data-tip="' + t + '"]'); if (a) return a;
+      const grp = this._tipGroup[t]; if (grp) { const g = this.el.querySelector('[data-group="' + grp + '"] .rf-grpbtn'); if (g) return g; }
+    }
     return this.el.querySelector('.rf-tabs') || this.el;
   }
   swatchDropHtml() {
@@ -285,6 +301,7 @@ export class RibbonView {
   }
   /** A menu as a dropdown: the Alt path's MENUS items (with their KeyTips) or a view-owned list. */
   menuDropHtml(key) {
+    if (key.startsWith('group:')) return this.groupDropHtml(key.slice(6));
     const meta = MENU_META[key] || { label: tabName(key) };
     let items;
     const entries = menuEntries(key);
@@ -358,12 +375,11 @@ export class RibbonView {
       html += `<button type="button" class="rf-tab${t.k === tab ? ' on' : ''}${t.live ? '' : ' dead'}" data-tab="${t.k}" role="tab" aria-selected="${t.k === tab}" tabindex="-1">${badge}${esc(t.name)}</button>`;
     });
     html += '<span class="rf-tools">' + (ss.note ? '<span class="rnote">' + esc(ss.note) + '</span>' : '') + this.pinHtml() + '</span></div>';
-    html += '<div class="rf-body">';
-    (RIBBON_LAYOUT[tab] || []).forEach(g => {
-      html += '<div class="rf-grp"><div class="rf-cols">' + g.cols.map(col => this.colHtml(col, pathStr, walking)).join('') + '</div><div class="rf-gname">' + esc(g.name) + '</div></div>';
-    });
-    html += '</div>';
-    el.innerHTML = html;
+    const folded = this.fitFor(tab);
+    el.innerHTML = html + this.bodyHtml(tab, pathStr, walking, folded);
+    // FIT: when the groups overflow the bar, fold the rightmost ones into single dropdown buttons
+    // (Excel's collapse) — measured once per tab and width, so the bar never wraps or hides a group
+    if (this.refit(tab, folded)) el.innerHTML = html + this.bodyHtml(tab, pathStr, walking, folded);
 
     // what floats under the bar
     if (ss.dialog === 'fontcolor' || ss.dialog === 'fillcolor') { this.dropShow(this.anchorFor(ss.dialog === 'fontcolor' ? 'HFC' : 'HH'), this.swatchDropHtml()); return; }
@@ -378,6 +394,66 @@ export class RibbonView {
       this.dropShow(this.anchorFor(pathStr), this.menuDropHtml(pathStr), 'rdrop-menu'); return;
     }
     if (this.localMenu) this.dropShow(this.anchorFor(this.localMenu), this.menuDropHtml(this.localMenu), 'rdrop-menu');
+  }
+  bodyHtml(tab, pathStr, walking, folded) {
+    this._tipGroup = {};
+    let html = '<div class="rf-body">';
+    (RIBBON_LAYOUT[tab] || []).forEach(g => {
+      if (folded.has(g.name)) { html += this.groupBtnHtml(g, pathStr, walking); return; }
+      html += '<div class="rf-grp" data-group="' + esc(g.name) + '"><div class="rf-cols">' + g.cols.map(col => this.colHtml(col, pathStr, walking)).join('') + '</div><div class="rf-gname">' + esc(g.name) + '</div></div>';
+    });
+    return html + '</div>';
+  }
+  /** The folded-group set for this tab at the bar's current width (a new width starts from nothing folded). */
+  fitFor(tab) {
+    const key = tab + ':' + (this.el.clientWidth | 0);
+    if (this._fitKey !== key) { this._fitKey = key; this._fitSet = new Set(); }
+    return this._fitSet;
+  }
+  /** Measure the painted body; fold groups from the right until it fits. True when the set grew (repaint). */
+  refit(tab, folded) {
+    const b = this.el.querySelector('.rf-body'); if (!b || !b.clientWidth) return false;
+    const over = b.scrollWidth - b.clientWidth; if (over <= 0) return false;
+    const groups = [...b.querySelectorAll('.rf-grp')];
+    let saved = 0, grew = false;
+    for (let i = groups.length - 1; i >= 0 && saved < over; i--) {
+      const g = groups[i]; if (g.classList.contains('rf-collapsed')) continue;
+      saved += Math.max(0, g.offsetWidth - COLLAPSED_W); folded.add(g.dataset.group); grew = true;
+    }
+    return grew;
+  }
+  /** A folded group: one big button (the group's first icon, a caret, the name beneath) that opens the group's items; its live KeyTips stack under it. */
+  groupBtnHtml(g, pathStr, walking) {
+    const items = []; const walk = it => { if (it.rows) it.rows.forEach(r => r.forEach(walk)); else items.push(it); }; g.cols.forEach(walk);
+    items.forEach(it => { const t = itemTip(it); if (t) this._tipGroup[t] = g.name; });
+    const first = items.find(it => it.cmd || it.menu) || items[0] || {};
+    const icon = first.cmd ? RIBBON_COMMANDS[first.cmd].icon : first.menu ? (MENU_META[first.menu] || {}).icon || '' : first.dead ? (UNIMPLEMENTED_BY_ID[first.dead] || {}).icon || '' : '';
+    const tips = walking ? items.map(it => keyTipAt(itemTip(it), pathStr)).filter(Boolean) : [];
+    const open = this.localMenu === 'group:' + g.name;
+    const live = items.some(it => it.cmd || it.menu);
+    return '<div class="rf-grp rf-collapsed" data-group="' + esc(g.name) + '"><div class="rf-cols">' +
+      `<button type="button" tabindex="-1" class="rf-btn big rf-grpbtn${open ? ' open' : ''}${live ? '' : ' dis'}" data-act="group:${esc(g.name)}" aria-haspopup="menu" aria-expanded="${open}"${live ? '' : ' aria-disabled="true"'} title="${esc(g.name)} — open the group">` +
+      (tips.length ? '<span class="rf-grptips">' + tips.map(t => '<span class="ri-key">' + t + '</span>').join('') + '</span>' : '') +
+      `<span class="rf-ico">${icon}</span><span class="rf-lbl">${esc(g.name)}</span><span class="rf-caret">▾</span></button></div><div class="rf-gname">${esc(g.name)}</div></div>`;
+  }
+  /** A folded group's dropdown: every item of the group, live ones clickable, menus one level deeper, KeyTips while walking. */
+  groupDropHtml(name) {
+    const ss = this.session; const g = (RIBBON_LAYOUT[this.currentTab()] || []).find(x => x.name === name); if (!g) return '';
+    const walking = ss.mode === 'ribbon' && !ss.dialog; const pathStr = ss.path.join('');
+    const items = []; const walk = it => { if (it.rows) it.rows.forEach(r => r.forEach(walk)); else items.push(it); }; g.cols.forEach(walk);
+    let html = '<div class="rdrop-cap">' + esc(name) + '</div>';
+    items.forEach(it => {
+      const badge = walking ? keyTipAt(itemTip(it), pathStr) : '';
+      const key = badge ? '<span class="ri-key">' + badge + '</span>' : '';
+      if (it.box) { const u = UNIMPLEMENTED_BY_ID[it.dead] || { label: it.dead }; html += '<div class="rdrop-item dis" aria-disabled="true" title="Not available yet">' + key + '<span class="rdrop-ico"></span><span class="rdrop-lbl">' + esc(u.label) + ': ' + esc(it.box) + '</span></div>'; return; }
+      if (it.dead) { const u = UNIMPLEMENTED_BY_ID[it.dead] || { label: it.dead, icon: '' }; html += '<div class="rdrop-item dis" aria-disabled="true" title="Not available yet"><span class="rdrop-ico">' + (u.icon || '') + '</span><span class="rdrop-lbl">' + esc(u.label) + '</span></div>'; return; }
+      if (it.menu) { const meta = MENU_META[it.menu] || { label: it.menu, icon: '' };
+        if (it.cmd) { const cmd = RIBBON_COMMANDS[it.cmd]; html += '<div class="rdrop-item" data-act="cmd:' + it.cmd + '">' + key + '<span class="rdrop-ico">' + cmd.icon + '</span><span class="rdrop-lbl">' + esc(it.label || cmd.label) + '</span></div>'; }
+        html += '<div class="rdrop-item" data-act="menu:' + it.menu + '">' + (it.cmd ? '' : key) + '<span class="rdrop-ico">' + (meta.icon || '') + '</span><span class="rdrop-lbl">' + esc(meta.label) + ' ›</span></div>'; return; }
+      const cmd = RIBBON_COMMANDS[it.cmd]; if (!cmd) return;
+      html += '<div class="rdrop-item' + (it.check && ss.sheet.gridlines ? ' on' : '') + '" data-act="cmd:' + it.cmd + '">' + key + '<span class="rdrop-ico">' + cmd.icon + '</span><span class="rdrop-lbl">' + esc(it.label || cmd.label) + '</span></div>';
+    });
+    return html + '<div class="rdrop-hint">' + (walking ? 'letters pick · esc back · or click' : 'click an item · esc closes') + '</div>';
   }
   colHtml(col, pathStr, walking) {
     if (col.rows) return '<div class="rf-col">' + col.rows.map(row => '<div class="rf-row">' + row.map(it => this.itemHtml(it, pathStr, walking)).join('') + '</div>').join('') + '</div>';
