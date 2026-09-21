@@ -1,0 +1,76 @@
+/* app2/ui/shell.css — the lesson shell: problem list + split-pane lesson view. Loaded after app.css. */
+
+.plist{max-width:1180px; margin:18px auto 40px; font-family:var(--sans)}
+.plist-head h1{font-family:var(--mono); font-size:22px; font-weight:700; letter-spacing:-.3px; margin:6px 0 4px}
+.plist-sub{color:var(--muted); font-size:14px; margin:0 0 6px}
+.plist-stat{font-family:var(--mono); font-size:12px; color:var(--faint); margin:0 0 18px}
+.plist-stat b{color:var(--accent)}
+.chapter h2{font-family:var(--mono); font-size:15px; font-weight:700; margin:22px 0 4px; color:var(--text)}
+.chapter-blurb{color:var(--muted); font-size:13px; margin:0 0 10px}
+.ptable{width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--line); border-radius:10px; overflow:hidden; font-size:13.5px}
+.ptable th{font-family:var(--mono); font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:.4px; color:var(--faint); text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); background:var(--surface2)}
+.ptable td{padding:10px 12px; border-bottom:1px solid color-mix(in srgb, var(--line) 60%, transparent); vertical-align:middle}
+.ptable tr:last-child td{border-bottom:0}
+.prow{cursor:pointer}
+.prow:hover td, .prow:focus-visible td{background:var(--accent-glow)}
+.prow:focus-visible{outline:none}
+.c-num{width:44px; font-family:var(--mono); color:var(--faint)}
+.c-status{width:110px}
+.c-diff{width:110px}
+.c-access{width:80px}
+.c-title a{color:var(--text); text-decoration:none; font-weight:600}
+.c-title a:hover{color:var(--accent)}
+.st{font-family:var(--mono); font-size:11.5px; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted)}
+.st-done{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
+.st-mastered{color:var(--on-accent); background:var(--accent); border-color:var(--accent)}
+.st-started{color:var(--warn); border-color:var(--warn)}
+.diff{font-family:var(--mono); font-size:11.5px; padding:2px 8px; border-radius:6px; border:1px solid var(--line)}
+.diff-easy{color:var(--accent)}
+.diff-medium{color:var(--warn)}
+.diff-hard{color:var(--bad)}
+.tag{font-family:var(--mono); font-size:11px; color:var(--muted); background:var(--surface2); border-radius:5px; padding:1px 6px}
+.access{font-family:var(--mono); font-size:11.5px; color:var(--muted)}
+.access-paid{color:var(--warn)}
+
+/* ---- lesson split pane ---- */
+.lesson{display:flex; gap:16px; align-items:stretch; max-width:1380px; margin:12px auto 24px; min-height:calc(100vh - 140px)}
+.lesson-left{flex:0 0 360px; min-width:0; display:flex; flex-direction:column; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px; font-family:var(--sans); font-size:14px; line-height:1.55}
+.lesson-right{flex:1 1 auto; min-width:0; display:flex; flex-direction:column}
+.lesson-right .stage{flex:1 1 auto}
+.lesson-crumb{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-bottom:6px}
+.lesson-crumb a{color:var(--muted); text-decoration:none}
+.lesson-crumb a:hover{color:var(--accent)}
+.lesson-title{font-family:var(--mono); font-size:19px; font-weight:700; letter-spacing:-.3px; margin:0 0 6px}
+.lesson-meta{display:flex; gap:8px; align-items:center; font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-bottom:12px}
+.lesson-timer{margin-left:auto; color:var(--accent); font-weight:700}
+.lesson-body{flex:1 1 auto; overflow:auto; min-height:0}
+.lesson-body h2{font-size:15px; font-weight:600; margin:0 0 8px}
+.lesson-body p{margin:0 0 10px; color:var(--text)}
+.lesson-body kbd, .goal-keys kbd, .help-keys kbd, .btn kbd{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var(--surface2); border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:1px 6px; white-space:nowrap}
+.lesson-goalsintro{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin:14px 0 4px; text-transform:uppercase; letter-spacing:.4px}
+.goals{list-style:none; margin:0; padding:0}
+.goals-preview li{color:var(--muted); padding:3px 0 3px 14px; position:relative}
+.goals-preview li::before{content:'·'; position:absolute; left:2px; color:var(--faint)}
+.goal{display:grid; grid-template-columns:18px 1fr; gap:2px 8px; padding:9px 10px; border-radius:8px; margin-bottom:4px; color:var(--muted); border:1px solid transparent}
+.goal.current{color:var(--text); background:var(--accent-glow); border-color:var(--accent-dim)}
+.goal.done{color:var(--faint); text-decoration:line-through}
+.goal-mark{font-family:var(--mono); color:var(--accent); font-weight:700}
+.goal-keys{grid-column:2; margin-top:4px; display:flex; flex-wrap:wrap; gap:4px; align-items:center}
+.kx{font-family:var(--mono); font-size:11px; color:var(--faint)}
+.lesson-help{margin-top:10px; border-top:1px solid var(--line); padding-top:10px}
+.help-panel{margin-top:8px; background:var(--surface2); border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-size:13px}
+.help-goal{font-weight:600; margin-bottom:6px}
+.help-keys{display:flex; flex-wrap:wrap; gap:4px; margin-bottom:6px}
+.help-note{color:var(--muted); margin:0}
+.lesson-actions{margin-top:10px; display:flex; gap:8px}
+.btn{font-family:var(--mono); font-size:13px; border-radius:8px; padding:8px 14px; cursor:pointer; border:1px solid var(--line); background:var(--surface2); color:var(--text); display:inline-flex; align-items:center; gap:8px}
+.btn:hover{border-color:var(--accent-dim)}
+.btn-primary{background:var(--accent); color:var(--on-accent, #fff); border-color:var(--accent)}
+.btn-primary kbd{color:var(--on-accent, #fff); background:transparent; border-color:color-mix(in srgb, var(--on-accent, #fff) 45%, transparent)}
+.btn-ghost{background:transparent}
+.done-card{background:var(--surface2); border:1px solid var(--accent-dim); border-radius:12px; padding:16px}
+.done-title{font-family:var(--mono); font-size:16px; font-weight:700; color:var(--accent); margin-bottom:4px}
+.done-stats{color:var(--muted); margin-bottom:12px}
+.done-stats b{color:var(--text)}
+.done-actions{display:flex; gap:8px; flex-wrap:wrap}
+@media(max-width:900px){ .lesson{flex-direction:column} .lesson-left{flex-basis:auto} }
