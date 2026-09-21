@@ -15,6 +15,89 @@ experience. PRODUCT.md owns that evolving specification and distinguishes confir
 from open choices; area tasks supply focused evidence and decisions.
 
 
+## September 21 checkpoint and detailed planning gates
+
+Wolf asks what is next, for more detailed plans, and for a pushed-versus-pending summary.
+The chief refreshed remote branches and existing task reports. Main is still `434bc0e`;
+accepted combined implementation remains `16ee830`. This is a planning continuation,
+not authorization for a new repair, catalog implementation, merge or deployment.
+
+**Completed and saved:** account-cache/sign-out repair; reproducible isolated browser tests and
+hardened test workflows; safe database replay/permission-test infrastructure; a bounded historical
+documentation archive; combined integration and the existing area planning handoffs.
+Browser evidence is green. Two database runs each retain 44 passing checks and 12 reproduced
+permission failures: those defects are not repaired. No table was approved for deletion.
+See the source/evidence tables below for pinned code, runs and limits.
+
+**Newly reconciled:** Payments' [ab68edc handoff](https://github.com/rathunter69/Hotkey.gg/blob/ab68edc09e2d5c6a85b3c31bce3b2ff16b998971/docs/handoffs/payments.md)
+settles P3–P10: no extra consumer trial, advanced access after expiry requires renewal or another
+valid grant, $9/$7 monthly and $90/$70 annual standard/student pricing, cancel through the paid
+period, first-payment 14-day guarantee, and banking-group codes with one shared end date.
+Student verification, invitation controls, overlaps and lifecycle edge cases remain open.
+The [Foundations introduction handoff](https://github.com/rathunter69/Hotkey.gg/blob/bc1bdfa3cff08df0d055cae2a55e089b2a520544/docs/handoffs/foundations-intro-2026-09-21.md)
+and later direct user feedback now feed PRODUCT: highlighted interface teaching and ribbon actions,
+with clear professional wording rather than cutesy analogies. Exact lesson sequence is proposed.
+
+### Detailed plan — existing owners, one reviewable gate at a time
+
+| Gate | Concrete deliverable and owner | Acceptance / next decision |
+|---|---|---|
+| 1. Settle the learning structure | Catalog presents its existing map with plain meanings for chapter, lesson and recommended track; shows the first five proposed Foundations stages and where a practical project follows its preparation | Wolf selects C1/C2/C3. Chief recommends chapters containing lessons, tracks through shared content, smaller Foundations chapters and projects beside their preparation. Ten chapters, exact names/order/counts and membership are still proposals. No duplicate questionnaire or 74-item approval list |
+| 2. Detail the first Foundations sequence | Existing Catalog owner refines a small opening proposal in drill-catalog.md: concepts taught first, prerequisites, starting sheet, named actions, observable outcomes, allowed routes, guidance and a fresh solo variant | A novice is never asked to use an untaught concept. Explain active cell/selection, then ribbon tab/command/menu/dialog in short actions; document normal explanations separately from solution reveals. Exact scope/count/duration remains for review. This bounded proposal may be refined before Gate 1 because it must work under either grouping |
+| 3. Join the learner journey to its contracts | UI maps setup → guest lesson → Help → completion overlay → Continue/Try solo → optional save → returning Home. Storage supplies the actual device/pending/account-save distinctions and proof needed for qualifying guest credit. Payments supplies access transitions | Review the same lesson through the cases below. No owner promises another area's behavior. Preserve native themes/ribbon and keyboard cues; settle the unresolved preview proportions/focus/scroll before final layout approval. Exact UI/save/access details remain proposals until accepted |
+| 4. Complete the rebuild specification | After Gate 1/2 decisions, Catalog expands approved chapters into lesson objectives/prerequisites/practical projects and identifies engine dependencies. Reconcile free/paid/sample/certificate membership with Payments, history/version equivalence with Storage and screen behavior with UI | All planned content has a taught skill, clear success condition, dependency and mapping; all 74 old IDs retain a documented preservation/reuse/retire-candidate disposition. No implicit content deletion or blanket old-to-new score equivalence. Later finance/extension scope is explicit; no fixed future drill count is imposed |
+| 5. Review implementation readiness | Chief presents the complete agreed plan, unresolved blockers and a small proposed pilot with owned files, test cases and integration owner | Only after the full plan is agreed does Wolf separately authorize a bounded implementation batch. Security, grading, save/access and supported-platform gaps cannot be called solved by a design document |
+
+**Shared acceptance examples for Gate 3:**
+- Guest finishes independently: show device-only history accurately; an eligible account credit
+  occurs once only after confirmed transfer, without automatic public posting.
+- Learner reads an explanation versus reveals solution steps: record the distinction. Helped
+  completion advances learning without XP; a fresh solo retry uses its own evidence.
+- Learner uses the worksheet/ribbon/dialog mouse: completion remains; no XP or qualifying timed
+  PB/public score. Clicking ordinary page Start/Retry controls alone is not disqualifying.
+- Network save fails or the account changes: keep the attempt private and its save state honest;
+  show no invented account receipt and import no other account's history.
+- Paid access ends while a group grant remains: preserve earned records and evaluate the valid
+  grant separately; in-progress-attempt and refund/overlap rules still need explicit decisions.
+- A Daily attempt finishes before closing but uploads shortly later: apply the approved maximum
+  five minutes after close without extending gameplay; otherwise preserve private history.
+  Proof/finalization and benchmark upload rules remain open.
+
+**Current assignment:** the chief has asked **Audit catalog and learner flow** to produce Gate 2's
+bounded detailed proposal in its existing handoff, retaining the pending structure choices.
+The request includes the September 21 professional-copy and interface-introduction feedback.
+The result is pending remote verification. Other rows are staged planning dependencies, not
+automatic starts or newly assigned application work. All shared guidance remains chief-owned.
+
+### Next engineering recommendation — focused permission repair
+
+Recommend the existing Security owner take DATA-01 next on a dedicated branch from `16ee830`,
+reading current guidance separately. Reuse the twelve failing cases instead of a new general
+security audit. A concrete future batch must identify the bypasses and intended guest/member/
+administrator permission matrix; add a forward migration preserving the newest safeguards;
+prove the twelve regressions fixed while the existing 44 controls remain valid; include a
+bounded independent security review and any affected browser journey; then return an exact
+remote handoff for the integration owner. No test weakening, production replay, migration-history
+rewrite, main merge or deployment. This repair remains a recommendation, not an assigned code batch.
+Profile privacy, account recovery/MFA, engine correctness, storage reliability and release
+protection/rollback remain separate later blockers.
+
+### What is pushed and what is still pending
+
+All accepted area checkpoints listed below are reachable on GitHub; they are not merged into
+main. Catalog/UI/Storage/Payments plans are saved as proposals with dated confirmed decisions,
+not implemented features. Payments ab68edc and intro bc1bdfa were already remote; this chief
+checkpoint reconciles them and saves the later professional-copy correction and detailed gates.
+
+The transfer owner's verified September 21 inventory found every one of its 42 modified/untracked
+files already represented by exact or line-ending-normalized GitHub content. That is a
+point-in-time finding, not proof every later local draft is published. A fresh chief read confirms
+the original checkout is still dirty and behind remote guidance; preserve it. No new unpushed
+application change was identified by this remote/task status review. The new Catalog plan is
+still pending and must be pushed by its owner. Private task exports, transfer ZIP and local
+visual previews are intentionally separate from GitHub; cloud sync/new-PC receipt is unverified.
+Nothing should be pushed to main merely to make these branch checkpoints appear deployed.
+
 ## Current objective and authority
 
 The chief owns planning, priorities, shared product guidance and coordination. Application
@@ -99,7 +182,7 @@ No duplicate source audit or application tests were needed to define the workstr
 
 | Source | Verified state |
 |---|---|
-| Remote main | `434bc0e8764e741e0e11f84cf51d61a1755d7c67`, PR #250 merged September 5. Refreshed September 19; unchanged. The last observed main gate/Pages results belong to this old source, not the repair branches. |
+| Remote main | `434bc0e8764e741e0e11f84cf51d61a1755d7c67`, PR #250 merged September 5. Refreshed September 21; unchanged. The last observed main gate/Pages results belong to this old source, not the repair branches. |
 | Shared guidance | `codex/repository-foundation`; read its current remote tip. Foundation introduced guidance/audits and development tooling, not a framework migration or application repair. |
 | Accepted combined application/testing checkpoint | `codex/account-testing-integration`, remote handoff commit `6c984161c31bc4637dbe88b73a4da8408cefdf1d`; exact tested code `c702c6932b342cd36656317f7ce50f1c33b7df3e`. The final commit adds only its handoff document. Not merged into foundation/main or deployed. |
 | Accepted earlier groundwork integration | `codex/groundwork-integration` at `00df57afd8d3299cc7feaf523847b9ca43e54d06`, executable checkpoint 328cae8. Account/browser/structure and Security preparation combined; preserved as the catalog review's valid starting point. Superseded for new implementation branches by 16ee830 below. |
@@ -135,7 +218,7 @@ All preserve original local work and earlier remote branches.
 | **Audit catalog and learner flow**, `01a0b148-2693-7901-af91-934c83cabe1d`; `codex/catalog-flow-review` | Latest overview 1ddd1b8 remote-verified. Prior 74-ID crosswalk/Foundations/four blueprints retained. Wolf adds future premium-content extensibility to confirmed learning-led/named-objective direction. Ten chapters, track/module hierarchy, Foundations subdivision and project placement remain proposals. | Owns `docs/handoffs/drill-catalog.md`; systems provenance stays in `catalog-progression.md`. Review existing structure packet before expanding lessons. Optional versioned packs/subscription inclusion and progress-edition design remain recommendations; no additional content workstream, runtime change or rebuild. |
 | **Plan UI/UX onboarding flows**, `01a0b908-48f9-7f32-94b2-d0ca46f13de3`; `codex/experience-site-plan` from accepted 16ee830 | Latest handoff 23a0025 remote-verified. Native-style preview/popup retained; Wolf says direction is closer and likes file-style browsing, but questions mandatory keyboard site navigation. Picker already supports clicks and keys; pointer-plus-optional-shortcut presentation remains a recommendation. | Owns only `docs/handoffs/experience-site.md`. Element blocking/proportions unresolved; displayed artifact uncertain. Compare existing app/relevant preview at matching dimensions, then review focus/scroll and scoped compatibility. No whole-preview approval, new visual, app changes or new Engine task. |
 | **Review saved progress contracts**, `01a0b908-9ee9-7d31-afb6-9733f5d421bf`; `codex/leaderboards-storage-review` from accepted 16ee830 | Latest handoff 26e71a0 remote-verified; three follow-up answers confirmed: qualifying guest solo work counts once after signup/confirmed transfer; Daily finishes before close with upload up to five minutes afterward; hide private attempts/withdraw public results while retaining history. Earlier comparability rule retained. | Owns only `docs/handoffs/leaderboards-storage.md`. All current questions answered. Next specify proof/qualification/dedup, save receipts, event/finalization and withdrawal details with existing owners. No automatic public import or per-attempt deletion selected; no application/schema/live changes. |
-| **Plan payments access rules**, `01a0b969-ac99-7553-bc36-42868257ff55`; `codex/payments-plan` from foundation b2dad98 | First planning handoff 00de01d remote-verified. Confirmed P1/P2: a few complete free advanced samples; selected public challenges free; certificates follow content, earned records retained. Offer/lifecycle proposals and bounded source/review evidence saved. | Owns only `docs/handoffs/payments.md`. Price/trial/expiry packet pending; cancellation/refunds follow. Exact membership stays Catalog-owned. Docs branch is not implementation baseline; future code starts from accepted 16ee830 plus latest guidance. No billing/app changes. |
+| **Plan payments access rules**, `01a0b969-ac99-7553-bc36-42868257ff55`; `codex/payments-plan` from foundation b2dad98 | Latest handoff ab68edc remote-verified. P1–P10 now answered, including standard/student monthly/annual offer, no extra trial, expiry, cancellation, first-payment guarantee and banking-group shared-end-date access. | Owns only `docs/handoffs/payments.md`. Next refine student verification, group controls and lifecycle exceptions; exact content stays Catalog-owned. No repeat commercial questionnaire. Docs branch is not implementation baseline; future code starts from accepted 16ee830 plus latest guidance. No billing/app changes. |
 | Computer-transfer task `01a0c450-84e4-7a82-a9c1-48824dc4e5ff`; `codex/computer-transfer-2026-09-21` | Local transfer package complete; remote handoff 7664589 verified. Owner reports a successful real offline restore of all 15 work areas and 32 captured GitHub tips. Original workspaces unchanged. | Owns `docs/handoffs/computer-transfer.md` and the authorized local transfer deliverable. OneDrive sync/new-PC receipt unverified; native app state/sign-ins not migrated. Snapshot carries implementation 16ee830 and guidance e1719a7 separately; later guidance requires refresh. No app work/deployment. |
 | Chief coordinator, this task | Project overview and platform-wide design discussion, priorities, product decisions, GitHub/security/structure review and handoff reconciliation. | `docs/CURRENT.md`, `docs/PRODUCT.md`, `docs/handoffs/chief-groundwork.md`. Other tasks send proposed corrections instead of editing these. |
 
@@ -364,9 +447,10 @@ Wolf subsequently approved **lesson-first entry**: a short hands-on lesson witho
 then personalization and invitation to save, with an experienced-user shortcut. He also approved
 a **complete useful free beginner path**, its repeat practice/personal speedruns and a few
 advanced previews, with advanced lessons/model-building in the subscription. Free replay
-applies to included free content, not every advanced drill. Exact content/preview rules, prices,
-onboarding questions, guest transfer/save contract, advanced speedrun access, competition/
-credential access and subscription expiry remain open.
+applies to included free content, not every advanced drill. Exact content/preview membership,
+onboarding wording, guest transfer/save mechanics and certificate sets remain open. Later
+Payments answers now settle prices, trial, advanced replay after expiry, cancellation and the
+first-payment guarantee; PRODUCT records the boundaries.
 
 Wolf explicitly brought **account-retained statistics and tracking records** forward. He
 approved every finished attempt, including helped lessons/private speedruns, plus lightweight
@@ -477,8 +561,8 @@ Wolf also started Area 7 in **Review saved progress contracts**
 (`01a0b908-9ee9-7d31-afb6-9733f5d421bf`), owning only its leaderboards-storage handoff.
 Area 10 is now started in **Plan payments access rules**
 (`01a0b969-ac99-7553-bc36-42868257ff55`); its user starter and initial answers were read by the
-chief. Its first planning handoff is now verified at 00de01d; price/trial/expiry questions remain
-pending in that task. The foundation-derived docs branch is not a replacement implementation baseline. UI/Catalog/storage have exchanged their boundaries
+chief. Its latest planning handoff is verified at ab68edc; P1–P10 are now answered and
+recorded in PRODUCT. Student verification, group controls and lifecycle exceptions remain open. The foundation-derived docs branch is not a replacement implementation baseline. UI/Catalog/storage have exchanged their boundaries
 and confirmed-rule references; Catalog records the coordination at 194db93. UI owns screens
 and truthful copy, storage owns persistence/comparison proposals, and Catalog retains state/
 eligibility/content meaning. No task may invent another owner's save guarantees or change
