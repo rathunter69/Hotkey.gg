@@ -55,7 +55,8 @@ for (const h of htmls) {
 console.log('isolation ok: no imports from outside app2/');
 
 // 3. unit tests
-const t = spawnSync(process.execPath, ['--test', join(app2, 'tests')], { stdio: 'inherit' });
+const testFiles = files.filter(f => f.endsWith('.test.js')).sort();
+const t = spawnSync(process.execPath, ['--test', ...testFiles], { stdio: 'inherit' });
 if (t.status !== 0) fail('unit tests failed');
 
 const secs = ((Date.now() - t0) / 1000).toFixed(1);

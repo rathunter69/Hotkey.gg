@@ -4,7 +4,7 @@
 // General never shows binary float noise.
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const loc = (n, dec) => n.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+const loc = (n, dec, group = true) => n.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec, useGrouping: group });
 
 /** Excel serial (days since 1899-12-30) → UTC Date. */
 export function serialToDate(serial) { return new Date(Date.UTC(1899, 11, 30) + Number(serial) * 86400000); }
@@ -30,8 +30,8 @@ export function fmtNum(n, style, dec, scale) {
     const a = loc(Math.abs(n), dec);
     return n < 0 ? '$ (' + a + ')' : '$ ' + a;
   }
-  if (style === 'percent') return loc(n * 100, dec) + '%';
-  if (style === 'mult') return loc(n, dec) + 'x';
+  if (style === 'percent') return loc(n * 100, dec, false) + '%';   // Excel's Percent style is "0%": no thousands separator
+  if (style === 'mult') return loc(n, dec, false) + 'x';
   if (style === 'date') { const d = serialToDate(n); return MONTHS[d.getUTCMonth()] + '-' + String(d.getUTCFullYear()).slice(2); }
   // General
   if (dec > 0 && Math.abs(n) % 1 !== 0) return Number(n).toFixed(dec);

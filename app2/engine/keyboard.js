@@ -1,0 +1,624 @@
+// app2/engine/keyboard.js — the keyboard layer. Headless: turn key events into Sheet operations.
+//
+//   const s = new Session(new Sheet());
+//   s.type('=SUM(A1:A3)'); s.press('Enter');        // or s.run('"=SUM(A1:A3)" Enter')
+//   s.sheet.value('A4')
+//
+// A Session owns everything the old keydown handler kept in module globals (index.html
+// r28413–r29130): the edit buffer and caret, Enter/Edit/Point modes, the Alt ribbon walk with its
+// dialogs, the Tab-run latch and the key log. It never touches the DOM; ui/sheet-view.js reads
+// `session` after every key to paint. Every Excel-parity rule the old build encoded is kept:
+//   · typing replaces (Enter mode: arrows commit), F2 edits (arrows move the caret), F2 toggles
+//   · an arrow inside a formula points: re-points a bare trailing ref, else appends anchor+step;
+//     Shift grows a range, typing exits point mode, Backspace deletes the whole live ref, F4 cycles $
+//   · Enter ↓ / Shift+Enter ↑ / Tab → / Shift+Tab ←; Enter after a Tab run returns home, one row down
+//   · Ctrl+Enter fills the selection (refs translate per cell) and stays put
+//   · Alt opens the ribbon; letters walk MENUS; Esc backs out one level; a bad letter resets to the strip
+//   · Delete clears the selection (formats kept); Backspace clears the active cell and opens an edit
+
+import { Sheet, FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES } from './sheet.js';
+import { evalFormula, formulaRefs, translateFormula } from './formula.js';
+import { refKey, parseRef } from './refs.js';
+import { stepPath, PASTE_OPTS, PASTE_OP_OPTS } from './ribbon.js';
+
+const ARROWS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
+const ARROWSYM = { ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→' };
+const OPERATOR_BOUNDARY = /[=+\-*/^(,&<>]$/;
+const SHIFTED = { '1': '!', '2': '@', '3': '#', '4': '$', '5': '%', '6': '^', '7': '&', '8': '*', '9': '(', '0': ')', '-': '_', '=': '+', '`': '~', ';': ':', ',': '<', '.': '>', '/': '?', '[': '{', ']': '}', '\\': '|', "'": '"' };
+const KEY_ALIASES = { esc: 'Escape', escape: 'Escape', enter: 'Enter', return: 'Enter', tab: 'Tab', space: ' ', spacebar: ' ',
+  up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight', arrowup: 'ArrowUp', arrowdown: 'ArrowDown', arrowleft: 'ArrowLeft', arrowright: 'ArrowRight',
+  home: 'Home', end: 'End', delete: 'Delete', del: 'Delete', backspace: 'Backspace', bs: 'Backspace', pageup: 'PageUp', pagedown: 'PageDown', pgup: 'PageUp', pgdn: 'PageDown',
+  alt: 'Alt', ctrl: 'Control', control: 'Control', shift: 'Shift', f1: 'F1', f2: 'F2', f4: 'F4', f5: 'F5', f9: 'F9', plus: '+', minus: '-', equals: '=', equal: '=' };
+
+/** Physical-key code for a character (so Alt walks work on any layout, like the old codeToChar). */
+export function codeFor(key) {
+  if (/^[a-z]$/i.test(key)) return 'Key' + key.toUpperCase();
+  if (/^[0-9]$/.test(key)) return 'Digit' + key;
+  if (key === '=' || key === '+') return 'Equal';
+  if (key === '-' || key === '_') return 'Minus';
+  return '';
+}
+function codeToChar(code, k) {
+  if (/^Key[A-Z]$/.test(code || '')) return code.slice(3);
+  if (/^Digit[0-9]$/.test(code || '')) return code.slice(5);
+  if (code === 'Equal') return '=';
+  const up = (k && k.length === 1) ? k.toUpperCase() : '';
+  return /^[A-Z0-9=]$/.test(up) ? up : '';
+}
+
+/**
+ * Parse a key spec such as 'Ctrl+Shift+ArrowDown', 'Alt', 'Enter', 'h', 'Ctrl+1' into an event.
+ * Ctrl+digit chords produce the shifted character when Shift is held (Ctrl+Shift+1 → '!').
+ */
+export function parseKeySpec(spec) {
+  const parts = String(spec).split('+');
+  // 'Ctrl++' → ['Ctrl','',''] : the last token was a literal '+'
+  let keyTok = parts.pop();
+  if (keyTok === '' && parts.length) { keyTok = '+'; parts.pop(); }
+  const mods = parts.map(p => p.toLowerCase());
+  const ev = { key: keyTok, ctrlKey: mods.includes('ctrl') || mods.includes('control') || mods.includes('cmd') || mods.includes('meta'), shiftKey: mods.includes('shift'), altKey: mods.includes('alt') || mods.includes('option'), metaKey: false };
+  const al = KEY_ALIASES[keyTok.toLowerCase()];
+  if (al) ev.key = al;
+  if (ev.key.length === 1) {
+    if (ev.shiftKey) { if (/[a-z]/.test(ev.key)) ev.key = ev.key.toUpperCase(); else if (SHIFTED[ev.key]) ev.key = SHIFTED[ev.key]; }
+    else if (/[A-Z]/.test(ev.key) && (ev.ctrlKey || ev.altKey)) ev.key = ev.key.toLowerCase();
+  }
+  ev.code = codeFor(ev.key.length === 1 ? ev.key : '');
+  return ev;
+}
+
+/**
+ * Parse a keystroke script: whitespace-separated key specs; a double-quoted string types its
+ * characters. Example: '"Weekly Sales Report" Enter Up Ctrl+B Alt H B O'.
+ */
+export function parseKeyScript(script) {
+  if (Array.isArray(script)) return script.flatMap(parseKeyScript);
+  const out = []; const s = String(script); let i = 0;
+  while (i < s.length) {
+    const ch = s[i];
+    if (/\s/.test(ch)) { i++; continue; }
+    if (ch === '"') { let j = i + 1, t = ''; while (j < s.length && s[j] !== '"') { t += s[j++]; } out.push({ type: 'text', text: t }); i = j + 1; continue; }
+    let j = i; while (j < s.length && !/\s/.test(s[j])) j++;
+    const tok = s.slice(i, j); i = j;
+    if (/^[0-9.]{2,}$/.test(tok)) { out.push({ type: 'text', text: tok }); continue; }   // 20 types two digits; a single digit is the same either way
+    out.push({ type: 'press', spec: tok });
+  }
+  return out;
+}
+
+export class Session {
+  /**
+   * @param {Sheet} sheet
+   * @param {object} [opts]  onToast(msg), onRefuse(), onKey(label), now() → ms
+   */
+  constructor(sheet, opts = {}) {
+    this.sheet = sheet || new Sheet();
+    this.opts = opts;
+    this.resetEdit();
+    this.mode = 'normal'; this.path = []; this.dialog = null; this.note = '';
+    this.pasteKind = null; this.pasteOp = 'none';
+    this.fontColorIdx = 0; this.fillColorIdx = 0; this.cellStyleIdx = 0; this.colwBuf = ''; this.sortPend = null; this.fxfixPend = null;
+    this.keyLog = [];
+    this.listeners = new Set();
+    this.t0 = null;
+    this.sheet.onChange(() => this.emit('sheet'));
+  }
+  resetEdit() {
+    this.editing = false; this.editBuf = ''; this.editCaret = 0; this.editMode = 'enter';
+    this.editAnchor = null; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null; this.editPointed = false;
+    this.autoSumEdit = false;
+  }
+  onChange(fn) { this.listeners.add(fn); return () => this.listeners.delete(fn); }
+  emit(what) { for (const fn of this.listeners) fn(what, this); }
+  toast(msg) { if (this.opts.onToast) this.opts.onToast(msg); }
+
+  /* ---------------- driving ---------------- */
+  /** Feed one key event ({key, code?, shiftKey, ctrlKey, altKey, metaKey}). Returns true when consumed. */
+  key(ev) {
+    const e = { key: ev.key, code: ev.code || codeFor(ev.key && ev.key.length === 1 ? ev.key : ''), shiftKey: !!ev.shiftKey, ctrlKey: !!(ev.ctrlKey || ev.metaKey), altKey: !!ev.altKey };
+    if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Meta' || e.key === 'CapsLock') return false;
+    const handled = this.dispatch(e);
+    if (handled) this.emit('key');
+    return handled;
+  }
+  press(spec) { return this.key(parseKeySpec(spec)); }
+  type(text) { for (const ch of String(text)) this.key({ key: ch, shiftKey: /[A-Z~!@#$%^&*()_+{}|:"<>?]/.test(ch) }); }
+  /** Run a keystroke script (see parseKeyScript). */
+  run(script) { for (const step of parseKeyScript(script)) { if (step.type === 'text') this.type(step.text); else this.press(step.spec); } }
+  logKey(t) {
+    const a = this.sheet.active;
+    this.keyLog.push({ k: t, t: this.t0 == null ? 0 : (this.opts.now ? this.opts.now() : Date.now()) - this.t0, cell: refKey(a.r, a.c) });
+    if (this.opts.onKey) this.opts.onKey(t);
+  }
+  startClock() { if (this.t0 == null) this.t0 = this.opts.now ? this.opts.now() : Date.now(); }
+
+  /* ---------------- edit lifecycle ---------------- */
+  editRetarget() {
+    const S = this.sheet;
+    if (!S.sel || this.editing) return;
+    const rg = S.selRange();
+    const a = (S.selA && S.selA.r >= 1) ? S.selA : { r: S.sel.r, c: S.sel.c };
+    const isCorner = (a.r === rg.r1 || a.r === rg.r2) && (a.c === rg.c1 || a.c === rg.c2);
+    if (!isCorner || (a.r === S.active.r && a.c === S.active.c)) return;
+    S.sel = { r: (a.r === rg.r1 ? rg.r2 : rg.r1), c: (a.c === rg.c1 ? rg.c2 : rg.c1) };
+    S.active = { r: a.r, c: a.c }; S.selA = { r: a.r, c: a.c };
+  }
+  startEdit(initial, mode) {
+    this.startClock();
+    this.sheet.clearClipboard();
+    this.editRetarget();
+    this.editing = true; this.editBuf = initial; this.editMode = mode || 'enter'; this.editCaret = initial.length;
+    this.editAnchor = { r: this.sheet.active.r, c: this.sheet.active.c };
+    this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null; this.editPointed = false;
+  }
+  cancelEdit() { this.autoSumEdit = false; this.editing = false; this.editBuf = ''; this.editAnchor = null; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null; }
+  /** Commit the buffer into the active cell and move by (dr,dc). Returns false if still editing. */
+  commitEdit(dr, dc) {
+    const S = this.sheet;
+    const asStay = this.autoSumEdit; this.autoSumEdit = false;
+    if (this.editBuf && this.editBuf[0] === '=') {
+      const opens = (this.editBuf.match(/\(/g) || []).length, closes = (this.editBuf.match(/\)/g) || []).length;
+      if (opens > closes) this.editBuf += ')'.repeat(opens - closes);
+    }
+    const buf = this.editBuf.trim();
+    const { r, c } = S.active;
+    const cls = Sheet.classifyInput(buf, S.get(r, c));
+    if (cls.kind === 'fix') { this.fxfixPend = { fixed: cls.fixed, dr, dc, all: false }; this.dialog = 'fxfix'; return false; }
+    if (cls.kind === 'bad') { this.refuse(); return false; }
+    this.editing = false; this.editBuf = ''; this.editAnchor = null; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null;
+    if (cls.kind !== 'empty') { S.pushUndo(); S.applyInput(S.ensure(r, c), cls, r, c); }
+    this.editPointed = false;
+    if ((dr || dc) && !asStay) { S.active = S.clamp(S.active.r + dr, S.active.c + dc); S.sel = null; S.selA = null; }
+    S.commit('edit');
+    return true;
+  }
+  commitEditAll() {
+    const S = this.sheet;
+    if (this.editBuf && this.editBuf[0] === '=') {
+      const opens = (this.editBuf.match(/\(/g) || []).length, closes = (this.editBuf.match(/\)/g) || []).length;
+      if (opens > closes) this.editBuf += ')'.repeat(opens - closes);
+    }
+    const buf = this.editBuf.trim();
+    const ar = S.active.r, ac = S.active.c;
+    const cls = Sheet.classifyInput(buf, S.get(ar, ac));
+    if (cls.kind === 'fix') { this.fxfixPend = { fixed: cls.fixed, dr: 0, dc: 0, all: true }; this.dialog = 'fxfix'; return false; }
+    if (cls.kind === 'bad') { this.refuse(); return false; }
+    this.editing = false; this.editBuf = ''; this.editAnchor = null; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null;
+    if (cls.kind !== 'empty') {
+      S.pushUndo();
+      S.eachSel((cell, rr, cc) => {
+        if (cls.kind === 'formula') { const f = (rr !== ar || cc !== ac) ? translateFormula(cls.formula, rr - ar, cc - ac) : cls.formula; S.applyInput(cell, { kind: 'formula', formula: f }, rr, cc); }
+        else S.applyInput(cell, cls, rr, cc);
+      });
+    }
+    this.editPointed = false; this.autoSumEdit = false;
+    S.commit('edit');
+    return true;
+  }
+  refuse() { this.logKey('⚠'); this.toast('There’s a problem with this formula — fix it or press Esc to discard'); if (this.opts.onRefuse) this.opts.onRefuse(); }
+
+  /* ---------------- point mode ---------------- */
+  startPointerFromArrow(dr, dc) {
+    const S = this.sheet;
+    const r = Math.min(S.rows, Math.max(1, this.editAnchor.r + dr)), c = Math.min(S.cols, Math.max(1, this.editAnchor.c + dc));
+    if (r === this.editAnchor.r && c === this.editAnchor.c) return false;
+    this.editPointerStart = this.editBuf.length; this.editPointer = { r, c }; this.editPointerBase = null;
+    this.editBuf += refKey(r, c); this.editCaret = this.editBuf.length; this.editPointed = true;
+    return true;
+  }
+  pointArrow(dr, dc) {
+    const m = /(\$?[A-Za-z]{1,3}\$?\d+)$/.exec(this.editBuf);
+    if (m && !OPERATOR_BOUNDARY.test(this.editBuf)) {
+      const pr = parseRef(m[1]);
+      if (pr) { this.editPointerStart = this.editBuf.length - m[1].length; this.editPointer = { r: pr.r, c: pr.c }; this.editPointerBase = null; return this.movePointer(dr, dc, false); }
+    }
+    return this.startPointerFromArrow(dr, dc);
+  }
+  writePointerRef() {
+    const p = this.editPointer, b = this.editPointerBase;
+    this.editBuf = this.editBuf.slice(0, this.editPointerStart) + (b ? refKey(b.r, b.c) + ':' + refKey(p.r, p.c) : refKey(p.r, p.c));
+    this.editCaret = this.editBuf.length;
+  }
+  movePointer(dr, dc, extend) {
+    const S = this.sheet;
+    if (extend && !this.editPointerBase) this.editPointerBase = { r: this.editPointer.r, c: this.editPointer.c };
+    if (!extend) this.editPointerBase = null;
+    const r = Math.min(S.rows, Math.max(1, this.editPointer.r + dr)), c = Math.min(S.cols, Math.max(1, this.editPointer.c + dc));
+    if (r === this.editPointer.r && c === this.editPointer.c) return false;
+    this.editPointer = { r, c }; this.writePointerRef(); this.editPointed = true;
+    return true;
+  }
+  /** F4: cycle B2 → $B$2 → B$2 → $B2 → B2 on the live pointer, else on the ref behind the caret. */
+  cycleAnchor() {
+    const cyc = (ac, ar) => { const states = [['', ''], ['$', '$'], ['', '$'], ['$', '']]; const i = states.findIndex(s => s[0] === ac && s[1] === ar); return states[(i + 1) % 4]; };
+    const RX1 = /(\$?)([A-Za-z]{1,3})(\$?)(\d+)$/, RXR = /(\$?)([A-Za-z]{1,3})(\$?)(\d+):(\$?)([A-Za-z]{1,3})(\$?)(\d+)$/;
+    if (!this.editPointer || this.editPointerStart < 0) {
+      const head = this.editBuf.slice(0, this.editCaret);
+      const mr = RXR.exec(head);
+      if (mr) { const nx = cyc(mr[1], mr[3]); const rep = nx[0] + mr[2] + nx[1] + mr[4] + ':' + nx[0] + mr[6] + nx[1] + mr[8]; const start = this.editCaret - mr[0].length; this.editBuf = this.editBuf.slice(0, start) + rep + this.editBuf.slice(this.editCaret); this.editCaret = start + rep.length; return true; }
+      const m = RX1.exec(head); if (!m) return false;
+      const nx = cyc(m[1], m[3]); const rep = nx[0] + m[2] + nx[1] + m[4]; const start = this.editCaret - m[0].length;
+      this.editBuf = this.editBuf.slice(0, start) + rep + this.editBuf.slice(this.editCaret); this.editCaret = start + rep.length; return true;
+    }
+    const cur = this.editBuf.slice(this.editPointerStart);
+    const mr = /^(\$?)([A-Z]{1,3})(\$?)(\d+):(\$?)([A-Z]{1,3})(\$?)(\d+)$/.exec(cur);
+    if (mr) { const nx = cyc(mr[1], mr[3]); this.editBuf = this.editBuf.slice(0, this.editPointerStart) + nx[0] + mr[2] + nx[1] + mr[4] + ':' + nx[0] + mr[6] + nx[1] + mr[8]; this.editCaret = this.editBuf.length; return true; }
+    const m = /^(\$?)([A-Z]{1,3})(\$?)(\d+)$/.exec(cur); if (!m) return false;
+    const nx = cyc(m[1], m[3]); this.editBuf = this.editBuf.slice(0, this.editPointerStart) + nx[0] + m[2] + nx[1] + m[4]; this.editCaret = this.editBuf.length; return true;
+  }
+
+  /* ---------------- tab-run latch ---------------- */
+  tabArm(prev, back, was) {
+    const S = this.sheet; if (!prev) return;
+    const cont = was && was.ar === prev.r && was.ac === prev.c;
+    const home = cont ? { r: was.r, c: was.c } : (back ? null : { r: prev.r, c: prev.c });
+    S.tabHome = home ? { r: home.r, c: home.c, ar: S.active.r, ac: S.active.c } : null;
+  }
+  tabEnterHome() {
+    const S = this.sheet; if (!S.tabHome) return false;
+    const t = S.tabHome; S.tabHome = null;
+    if (S.active.r !== t.ar || S.active.c !== t.ac) return false;
+    S.active = S.clamp(t.r + 1, t.c); S.sel = null; S.selA = null; return true;
+  }
+
+  /* ---------------- ribbon ---------------- */
+  enterRibbon() { this.startClock(); this.mode = 'ribbon'; this.path = []; this.dialog = null; this.note = ''; }
+  exitRibbon(act) { this.mode = 'normal'; this.path = []; this.dialog = null; this.pasteKind = null; this.note = ''; if (act) this.sheet.commit('ribbon'); }
+  openDialog(name, path) { this.mode = 'ribbon'; this.path = path || []; this.dialog = name; this.note = ''; }
+  ribbonKey(e) {
+    const k = e.key;
+    if (k === 'Escape') {
+      if (this.dialog) { this.dialog = null; this.pasteKind = null; this.note = ''; this.sortPend = null; this.colwBuf = ''; if (this.path.length) return true; this.exitRibbon(false); return true; }
+      if (this.path.length) { this.path.pop(); this.note = ''; return true; }
+      this.exitRibbon(false); return true;
+    }
+    const cycle = (prop, n, dir) => { this[prop] = (this[prop] + dir + n) % n; };
+    if (this.dialog === 'paste') {
+      if (k === 'ArrowDown' || k === 'ArrowRight') { this.logKey('↓'); const i = PASTE_OPTS.findIndex(o => o[2] === (this.pasteKind || 'all')); this.pasteKind = PASTE_OPTS[(i + 1) % PASTE_OPTS.length][2]; return true; }
+      if (k === 'ArrowUp' || k === 'ArrowLeft') { this.logKey('↑'); const i = PASTE_OPTS.findIndex(o => o[2] === (this.pasteKind || 'all')); this.pasteKind = PASTE_OPTS[(i - 1 + PASTE_OPTS.length) % PASTE_OPTS.length][2]; return true; }
+    }
+    if (this.dialog === 'colw') {
+      if (/^[0-9.]$/.test(k)) { this.logKey(k); this.colwBuf += k; return true; }
+      if (k === 'Backspace') { this.colwBuf = this.colwBuf.slice(0, -1); return true; }
+      if (k === 'Enter') { this.logKey('↵'); this.applyRibbon('ENTER'); return true; }
+      return true;
+    }
+    if (this.dialog === 'fillcolor') {
+      if (k === 'ArrowLeft') { this.logKey('←'); cycle('fillColorIdx', FILL_SWATCHES.length, -1); return true; }
+      if (k === 'ArrowRight') { this.logKey('→'); cycle('fillColorIdx', FILL_SWATCHES.length, 1); return true; }
+    }
+    if (this.dialog === 'cellstyle') {
+      if (k === 'ArrowLeft') { this.logKey('←'); cycle('cellStyleIdx', CELL_STYLES.length, -1); return true; }
+      if (k === 'ArrowRight') { this.logKey('→'); cycle('cellStyleIdx', CELL_STYLES.length, 1); return true; }
+      if (k === 'Enter') { this.logKey('↵'); this.applyRibbon('ENTER'); return true; }
+      return true;
+    }
+    if (this.dialog === 'fontcolor') {
+      if (k === 'ArrowLeft') { this.logKey('←'); cycle('fontColorIdx', FONT_SWATCHES.length, -1); return true; }
+      if (k === 'ArrowRight') { this.logKey('→'); cycle('fontColorIdx', FONT_SWATCHES.length, 1); return true; }
+      if (k === 'Enter') { this.logKey('↵'); this.applyRibbon('ENTER'); return true; }
+      return true;
+    }
+    if (k === 'Enter') { this.logKey('↵'); this.applyRibbon('ENTER'); return true; }
+    if (k === 'Alt') return true;
+    if (k.length !== 1 && !/^(Key|Digit)/.test(e.code || '') && e.code !== 'Equal') return true;
+    const ch = codeToChar(e.code, k);
+    if (ch) { this.logKey(ch); this.applyRibbon(ch); }
+    return true;
+  }
+  /** One KeyTip key (uppercase letter/digit/'='/'ENTER') at the current ribbon state. */
+  applyRibbon(key) {
+    const S = this.sheet;
+    const done = (act = true) => this.exitRibbon(act);
+    if (this.dialog === 'fmt') {
+      const fmt = (style, dec) => { S.setNumberFormat(style, dec); return done(); };
+      if (key === 'G') return fmt('general', 0);
+      if (key === 'N') return fmt('comma', 0);
+      if (key === 'C') return fmt('currency', 0);
+      if (key === 'P') return fmt('percent', 1);
+      if (key === 'X') return fmt('mult', 1);
+      if (key === 'D') return fmt('date', 0);
+      if (key === 'S') { S.setScale(3); return done(); }
+      if (key === 'M') { S.setScale(6); return done(); }
+      if (key === 'E') { S.toggleSuperscript(); return done(); }
+      if (key === 'K') { S.toggleStrike(); return done(); }
+      if (key === 'A') { S.centerAcross(); return done(); }
+      return;
+    }
+    if (this.dialog === 'paste') {
+      const op2 = PASTE_OP_OPTS.find(o => o[0] === key); if (op2) { this.pasteOp = op2[2]; return; }
+      const opt = PASTE_OPTS.find(o => o[0] === key); if (opt) { this.pasteKind = opt[2]; return; }
+      if (key === 'ENTER') { S.paste(this.pasteKind || 'all', this.pasteOp); this.pasteOp = 'none'; return done(); }
+      return;
+    }
+    if (this.dialog === 'colw') {
+      if (key === 'ENTER') { const n = parseFloat(this.colwBuf); this.colwBuf = ''; if (isFinite(n) && n > 0) S.setColWidth(n); return done(); }
+      return;
+    }
+    if (this.dialog === 'fxfix') {
+      if (key === 'ENTER') {
+        const p = this.fxfixPend; this.fxfixPend = null; this.dialog = null;
+        if (!p || !this.editing) return;
+        this.editBuf = p.fixed; this.editCaret = this.editBuf.length; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null;
+        if (p.all) this.commitEditAll(); else this.commitEdit(p.dr, p.dc);
+      }
+      return;
+    }
+    if (this.dialog === 'sortwarn') {
+      const p = this.sortPend;
+      if (key === 'E' || key === 'ENTER') {
+        this.sortPend = null; if (!p) return done(false);
+        let c1 = p.key, c2 = p.key;
+        const nbr = cc => { if (cc < 1 || cc > S.cols) return false; for (let rr = p.r1; rr <= p.r2; rr++) if (S.nonEmpty(rr, cc)) return true; return false; };
+        while (c1 > 1 && nbr(c1 - 1)) c1--; while (c2 < S.cols && nbr(c2 + 1)) c2++;
+        S.sel = { r: p.r1, c: c1 }; S.active = { r: p.r2, c: c2 }; S.sort(p.dir, p.key); return done();
+      }
+      if (key === 'C') { this.sortPend = null; if (!p) return done(false); S.sel = { r: p.r1, c: p.key }; S.active = { r: p.r2, c: p.key }; S.sort(p.dir); return done(); }
+      return;
+    }
+    if (this.dialog === 'fontcolor') { if (key === 'ENTER') { S.setFontColor(FONT_SWATCHES[this.fontColorIdx].k); return done(); } return; }
+    if (this.dialog === 'fillcolor') {
+      const LETTER = { B: 'blue', G: 'green', Y: 'yellow', R: 'red', N: null };
+      if (key === 'ENTER') { S.setFill(FILL_SWATCHES[this.fillColorIdx].k); return done(); }
+      if (Object.prototype.hasOwnProperty.call(LETTER, key)) { S.setFill(LETTER[key]); return done(); }
+      return;
+    }
+    if (this.dialog === 'series') { if (key === 'ENTER') { S.fillSeries(); return done(); } return; }
+    if (this.dialog === 'cellstyle') { if (key === 'ENTER') { S.applyCellStyle(CELL_STYLES[this.cellStyleIdx].k); return done(); } return; }
+
+    const step = stepPath(this.path, key);
+    if (step.kind === 'tab' || step.kind === 'menu') { this.path = step.path; this.note = ''; return; }
+    if (step.kind === 'dead') { this.note = step.note; return; }
+    if (step.kind === 'ignore') return;
+    if (step.kind === 'reset') { this.path = []; this.note = ''; return; }
+    const np = step.np;
+    switch (np) {
+      case '=': this.exitRibbon(false); this.doAutoSum(); return;
+      case 'WVG': case 'WG': S.gridlines = !S.gridlines; this.toast(S.gridlines ? 'gridlines shown' : 'gridlines hidden — Alt W V G to show'); return done();
+      case 'HVV': S.paste('values'); return done();
+      case 'HVS': case 'ES': this.dialog = 'paste'; this.pasteKind = 'all'; this.pasteOp = 'none'; return;
+      case 'OE': case 'HOE': this.dialog = 'fmt'; return;
+      case 'MP': this.exitRibbon(false); this.jumpPrecedent(); return;
+      case 'MD': this.exitRibbon(false); this.jumpDependent(); return;
+      case 'HFC': this.dialog = 'fontcolor'; this.fontColorIdx = 0; return;
+      case 'HFG': S.fontSize(1); return done();
+      case 'HFK': S.fontSize(-1); return done();
+      case 'HH': this.dialog = 'fillcolor'; this.fillColorIdx = 0; return;
+      case 'HJ': this.dialog = 'cellstyle'; this.cellStyleIdx = 0; return;
+      case 'HFIS': this.dialog = 'series'; return;
+      case 'ASA': case 'ASD': {
+        const dir = np === 'ASD' ? 'desc' : 'asc'; const r = S.selRange();
+        if (r.c1 === r.c2 && r.r1 !== r.r2 && S.sortNeedsExpand()) { this.sortPend = { dir, r1: r.r1, r2: r.r2, key: S.dispActive().c }; this.dialog = 'sortwarn'; return; }
+        S.sort(dir); return done();
+      }
+      case 'HFID': S.fill('down'); return done();
+      case 'HFIR': S.fill('right'); return done();
+      case 'HW': S.toggleWrap(); return done();
+      case 'HK': S.setNumberFormat('comma', 2); return done();
+      case 'HP': S.setNumberFormat('percent', 0); return done();
+      case 'H9': S.changeDecimals(-1); return done();
+      case 'H0': S.changeDecimals(1); return done();
+      case 'HBP': S.border('top'); return done();
+      case 'HBO': S.border('bottom'); return done();
+      case 'HBD': S.border('topbottom'); return done();
+      case 'HBB': S.border('double'); return done();
+      case 'HBA': S.border('all'); return done();
+      case 'HBL': S.border('left'); return done();
+      case 'HBR': S.border('right'); return done();
+      case 'HBS': S.border('outside'); return done();
+      case 'HBT': S.border('thick'); return done();
+      case 'HBN': S.border('none'); return done();
+      case 'HAL': S.setAlign('l'); return done();
+      case 'HAC': S.setAlign('c'); return done();
+      case 'HAR': S.setAlign('r'); return done();
+      case 'HAN': S.setNumberFormat('acct', 0); return done();
+      case 'HIR': S.insert('r'); return done();
+      case 'HIC': S.insert('c'); return done();
+      case 'HDR': S.remove('r'); return done();
+      case 'HDC': S.remove('c'); return done();
+      case 'HEA': S.clearAll(); return done();
+      case 'HEF': S.clearFormats(); return done();
+      case 'HEC': S.clearContents(); return done();
+      case 'H6': S.changeIndent(1); return done();
+      case 'H5': S.changeIndent(-1); return done();
+      case 'H1': S.toggleAllOrNone('bold'); return done();
+      case 'H2': S.toggleAllOrNone('it'); return done();
+      case 'H3': S.toggleAllOrNone('uline'); return done();
+      case 'HOW': this.dialog = 'colw'; this.colwBuf = ''; return;
+      case 'HOI': S.autofitCols(); return done();
+      case 'HOA': return done();
+      case 'HUS': case 'MUS': this.exitRibbon(false); this.doAutoSum(); return;
+      default: this.path = []; this.note = '';
+    }
+  }
+  doAutoSum() {
+    const S = this.sheet;
+    const res = S.autoSum();
+    if (res.committed) return;
+    this.autoSumEdit = true;
+    this.startEdit('=SUM(', 'enter');
+    if (res.range) {
+      const { a, b } = res.range;
+      this.editPointerStart = this.editBuf.length; this.editPointer = { r: b.r, c: b.c };
+      this.editPointerBase = (a.r === b.r && a.c === b.c) ? null : { r: a.r, c: a.c };
+      this.writePointerRef();
+    }
+  }
+  jumpPrecedent() {
+    const S = this.sheet; const c = S.get(S.active.r, S.active.c); if (!c.formula) return;
+    const refs = formulaRefs(c.formula); if (!refs.length) return;
+    const first = refs[0]; const p = first.key ? parseRef(first.key) : { r: first.range.r1, c: first.range.c1 };
+    if (!S.inb(p.r, p.c)) return;
+    S.goTo(p.r, p.c);
+  }
+  jumpDependent() {
+    const S = this.sheet; const { r, c } = S.active;
+    const keys = Object.keys(S.cells).map(k => ({ k, p: parseRef(k) })).filter(x => x.p).sort((a, b) => (a.p.r - b.p.r) || (a.p.c - b.p.c));
+    for (const { k, p } of keys) {
+      const cell = S.cells[k]; if (!cell || !cell.formula) continue;
+      const reads = formulaRefs(cell.formula).some(ref => ref.key ? ref.key === refKey(r, c) : (r >= ref.range.r1 && r <= ref.range.r2 && c >= ref.range.c1 && c <= ref.range.c2));
+      if (reads) { S.goTo(p.r, p.c); return; }
+    }
+  }
+
+  /* ---------------- the dispatcher ---------------- */
+  dispatch(e) {
+    const S = this.sheet; const k = e.key;
+    if (k === 'F4') { /* always ours */ }
+    if (this.mode === 'ribbon') return this.ribbonKey(e);
+
+    // Ctrl+Shift+= / Ctrl+= / Ctrl++ insert, Ctrl+- / Ctrl+_ delete — full rows/columns only
+    if (e.ctrlKey && !this.editing && (k === '+' || k === '=' || k === '-' || k === '_')) {
+      const isInsert = k === '+' || k === '=';
+      if (S.insertOrDelete(isInsert)) { this.startClock(); this.logKey(isInsert ? (e.shiftKey ? 'Ctrl+Shift+=' : 'Ctrl++') : 'Ctrl+-'); }
+      return true;   // swallow browser zoom either way
+    }
+    if (e.ctrlKey && k === '0') return true;
+
+    if (this.editing) return this.editKey(e);
+
+    // type-to-replace
+    if (k.length === 1 && !e.ctrlKey && !e.altKey && k !== '=' && k !== '+' && !(k === ' ' && e.shiftKey)) {
+      this.startEdit(k, 'enter'); this.logKey(k); return true;
+    }
+    if ((k === '=' || k === '+') && !e.ctrlKey && !e.altKey) { this.startEdit(k === '+' ? '=+' : '='); this.logKey(k); return true; }
+    if (k === 'F2' && !e.shiftKey) {
+      this.startClock(); this.logKey('F2'); this.editRetarget();
+      const c = S.get(S.active.r, S.active.c);
+      const initial = c.formula || (c.value != null && c.value !== '' ? (typeof c.value === 'boolean' ? (c.value ? 'TRUE' : 'FALSE') : String(c.value)) : '');
+      this.startEdit(initial, 'edit'); return true;
+    }
+    if (k === 'Delete' && !e.ctrlKey && !e.altKey) { this.startClock(); this.logKey('Delete'); S.deleteContents(); return true; }
+    if (k === 'Backspace' && !e.ctrlKey && !e.altKey) {
+      this.startClock(); this.logKey('⌫'); S.pushUndo();
+      const bc = S.ensure(S.active.r, S.active.c); bc.value = null; bc.formula = null; bc.txt = false; S.commit('edit');
+      this.startEdit('', 'enter'); return true;
+    }
+    if (k === 'Escape' && !e.ctrlKey && !e.altKey) {
+      if (S.clipboard) { S.clearClipboard(); this.logKey('Esc'); }
+      return true;
+    }
+    if (k === 'Alt' && !e.shiftKey && !e.ctrlKey) { this.logKey('Alt'); this.enterRibbon(); return true; }
+    if (e.altKey && !e.ctrlKey) {
+      if (k === '=') { this.logKey('Alt'); this.logKey('='); this.doAutoSum(); return true; }
+      return true;
+    }
+    if (k === 'Enter' && !e.ctrlKey && !e.altKey) {
+      this.startClock();
+      if (!e.shiftKey && S.clipboard) { this.logKey('↵'); S.pasteDrop(); return true; }
+      this.logKey(e.shiftKey ? 'Shift+↵' : '↵');
+      if (!e.shiftKey && this.tabEnterHome()) { S.emit('select'); return true; }
+      S.move(e.shiftKey ? -1 : 1, 0, false, false); return true;
+    }
+    if (k === 'Tab' && !e.ctrlKey && !e.altKey) {
+      this.startClock(); this.logKey(e.shiftKey ? 'Shift+Tab' : 'Tab');
+      const prev = { r: S.active.r, c: S.active.c }, was = S.tabHome;
+      S.move(0, e.shiftKey ? -1 : 1, false, false); this.tabArm(prev, e.shiftKey, was); return true;
+    }
+    if (ARROWS[k] && !e.altKey) {
+      this.startClock(); const [dr, dc] = ARROWS[k];
+      this.logKey((e.ctrlKey ? 'Ctrl+' : '') + (e.shiftKey ? 'Shift+' : '') + ARROWSYM[k]);
+      S.move(dr, dc, e.shiftKey, e.ctrlKey); return true;
+    }
+    if (k === 'PageDown' || k === 'PageUp') {
+      this.startClock(); this.logKey((e.shiftKey ? 'Shift+' : '') + k);
+      const step = k === 'PageDown' ? 10 : -10; S.move(step, 0, e.shiftKey, false); return true;
+    }
+    if (k === 'Home' && !e.altKey) { this.startClock(); this.logKey((e.ctrlKey ? 'Ctrl+' : '') + (e.shiftKey ? 'Shift+' : '') + 'Home'); S.moveHome(e.ctrlKey, e.shiftKey); return true; }
+    if (k === 'End' && !e.altKey) { this.startClock(); this.logKey((e.ctrlKey ? 'Ctrl+' : '') + (e.shiftKey ? 'Shift+' : '') + 'End'); S.moveEnd(e.ctrlKey, e.shiftKey); return true; }
+    if (k === ' ' && e.shiftKey && !e.ctrlKey) { this.startClock(); this.logKey('Shift+Space'); S.selectRow(); return true; }
+    if (k === ' ' && e.ctrlKey && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+Space'); S.selectCol(); return true; }
+    if ((k === ' ' && e.ctrlKey && e.shiftKey) || (e.ctrlKey && e.shiftKey && (k === '8' || k === '*'))) {
+      this.startClock(); this.logKey(k === ' ' ? 'Ctrl+Shift+Space' : 'Ctrl+Shift+8');
+      const a = S.dispActive(); const rg = S.regionAround(a.r, a.c); S.sel = { r: rg.r1, c: rg.c1 }; S.active = { r: rg.r2, c: rg.c2 }; S.selA = { r: a.r, c: a.c }; S.emit('select'); return true;
+    }
+    if (e.ctrlKey && !e.altKey) {
+      const lk = k.toLowerCase();
+      if (lk === 'a') { this.startClock(); this.logKey('Ctrl+A'); S.selectAll(); return true; }
+      if (lk === 'z' && !e.shiftKey) { this.logKey('Ctrl+Z'); S.undo(); return true; }
+      if (lk === 'y' || (lk === 'z' && e.shiftKey)) { this.logKey('Ctrl+Y'); S.redo(); return true; }
+      if (lk === 'c' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+C'); S.copy(false); return true; }
+      if (lk === 'x' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+X'); S.copy(true); return true; }
+      if (lk === 'v' && e.shiftKey) { this.startClock(); this.logKey('Ctrl+Shift+V'); S.paste('values'); return true; }
+      if (lk === 'v') { this.startClock(); this.logKey('Ctrl+V'); S.paste('all'); return true; }
+      if (lk === 'd' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+D'); S.fill('down'); return true; }
+      if (lk === 'r' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+R'); S.fill('right'); return true; }
+      if (lk === 'b' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+B'); S.toggleAllOrNone('bold'); return true; }
+      if (lk === 'i' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+I'); S.toggleAllOrNone('it'); return true; }
+      if (lk === 'u' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+U'); S.toggleAllOrNone('uline'); return true; }
+      if (k === '5' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+5'); S.toggleAllOrNone('strike'); return true; }
+      if (k === '%') { this.startClock(); this.logKey('Ctrl+Shift+%'); S.setNumberFormat('percent', 0); return true; }
+      if (k === '$') { this.startClock(); this.logKey('Ctrl+Shift+$'); S.setNumberFormat('currency', 2); return true; }
+      if (k === '!') { this.startClock(); this.logKey('Ctrl+Shift+!'); S.setNumberFormat('comma', 2); return true; }
+      if (k === '~') { this.startClock(); this.logKey('Ctrl+Shift+~'); S.setNumberFormat('general', 0); return true; }
+      if (k === '1' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+1'); this.openDialog('fmt'); return true; }
+      if (k === ';' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+;'); S.dateStamp(S.active.r, S.active.c); return true; }
+      if (k === '[') { this.startClock(); this.logKey('Ctrl+['); this.jumpPrecedent(); return true; }
+      if (k === ']') { this.startClock(); this.logKey('Ctrl+]'); this.jumpDependent(); return true; }
+      if (lk === 'g' || k === 'F5') return true;
+      return true;   // unknown chords are swallowed, never typed
+    }
+    if (e.ctrlKey && e.altKey && k.toLowerCase() === 'v') { this.startClock(); this.logKey('Ctrl+Alt+V'); this.openDialog('paste', ['E', 'S']); this.pasteKind = 'all'; this.pasteOp = 'none'; return true; }
+    return false;
+  }
+
+  editKey(e) {
+    const S = this.sheet; const k = e.key;
+    if (this.dialog === 'fxfix') {
+      if (k === 'Enter') { this.logKey('↵'); this.applyRibbon('ENTER'); return true; }
+      if (k === 'Escape') { this.dialog = null; this.fxfixPend = null; return true; }
+      return true;
+    }
+    if (k === 'F2') { this.editMode = this.editMode === 'edit' ? 'enter' : 'edit'; this.logKey('F2'); return true; }
+    if (this.editMode === 'edit') {
+      if (k === 'ArrowLeft') { this.editCaret = Math.max(0, this.editCaret - 1); return true; }
+      if (k === 'ArrowRight') { this.editCaret = Math.min(this.editBuf.length, this.editCaret + 1); return true; }
+      if (k === 'ArrowUp' || k === 'Home') { this.editCaret = this.editBuf[0] === '=' ? 1 : 0; return true; }
+      if (k === 'ArrowDown' || k === 'End') { this.editCaret = this.editBuf.length; return true; }
+      if (k === 'Delete') { if (this.editCaret < this.editBuf.length) { this.editBuf = this.editBuf.slice(0, this.editCaret) + this.editBuf.slice(this.editCaret + 1); this.logKey('Delete'); } return true; }
+    }
+    if (k === 'Enter') {
+      if (e.ctrlKey && S.sel) { this.logKey('Ctrl+↵'); this.commitEditAll(); return true; }
+      if (!e.shiftKey && S.tabHome && S.tabHome.ar === S.active.r && S.tabHome.ac === S.active.c) {
+        const th = S.tabHome; if (this.commitEdit(0, 0)) { S.tabHome = th; this.tabEnterHome(); S.emit('select'); }
+        return true;
+      }
+      this.commitEdit(e.shiftKey ? -1 : 1, 0); return true;
+    }
+    if (k === 'Tab') {
+      const prev = { r: S.active.r, c: S.active.c }, was = S.tabHome;
+      if (this.commitEdit(0, e.shiftKey ? -1 : 1)) this.tabArm(prev, e.shiftKey, was);
+      return true;
+    }
+    if (k === 'Escape') { this.cancelEdit(); return true; }
+    if (k === 'Delete') {
+      this.editing = false; this.editBuf = ''; this.editAnchor = null; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null;
+      this.logKey('Delete'); S.pushUndo(); const c = S.ensure(S.active.r, S.active.c); c.value = null; c.formula = null; S.commit('edit'); return true;
+    }
+    if (k === 'F4') { if (this.cycleAnchor()) this.logKey('F4'); return true; }
+    if (k === 'F9') {
+      if (this.editBuf[0] === '=' || this.editBuf[0] === '+') {
+        try { const v = evalFormula(this.editBuf[0] === '+' ? '=' + this.editBuf.slice(1) : this.editBuf, S.evalCtx({ cell: { ...S.active } }));
+          if (v !== undefined && v !== null) { this.editBuf = typeof v === 'boolean' ? (v ? 'TRUE' : 'FALSE') : String(v); this.editCaret = this.editBuf.length; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null; this.logKey('F9'); } } catch (err) { /* keep buffer */ }
+      }
+      return true;
+    }
+    if (k === 'Backspace') {
+      if (this.editPointer) { this.editBuf = this.editBuf.slice(0, this.editPointerStart); this.editCaret = this.editBuf.length; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null; }
+      else if (this.editCaret > 0) { this.editBuf = this.editBuf.slice(0, this.editCaret - 1) + this.editBuf.slice(this.editCaret); this.editCaret--; }
+      this.logKey('⌫'); return true;
+    }
+    if (ARROWS[k]) {
+      const [dr, dc] = ARROWS[k];
+      if (this.editPointer) { if (this.movePointer(dr, dc, e.shiftKey)) this.logKey((e.shiftKey ? '⇧+' : '') + ARROWSYM[k]); return true; }
+      if (this.editAnchor && this.editBuf[0] === '=') { if (this.pointArrow(dr, dc)) this.logKey(ARROWSYM[k]); return true; }
+      S.tabHome = null; this.commitEdit(dr, dc); return true;
+    }
+    if (k.length === 1 && !e.ctrlKey && !e.altKey) {
+      this.editPointer = null; this.editPointerStart = -1;
+      this.editBuf = this.editBuf.slice(0, this.editCaret) + k + this.editBuf.slice(this.editCaret); this.editCaret++;
+      this.logKey(k); return true;
+    }
+    return true;
+  }
+}

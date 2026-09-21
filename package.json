@@ -6,7 +6,7 @@
   "engines": { "node": ">=20" },
   "scripts": {
     "check": "node app2/tests/run-checks.js",
-    "test": "node --test app2/tests/",
+    "test": "node --test \"app2/tests/*.test.js\"",
     "serve": "node app2/tests/serve.js"
   }
 }
