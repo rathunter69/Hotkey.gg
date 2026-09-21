@@ -54,6 +54,11 @@ for (const h of htmls) {
 }
 console.log('isolation ok: no imports from outside app2/');
 
+// 2b. the public lesson and shortcut pages are generated from the lesson data and must not drift
+const pp = spawnSync(process.execPath, [join(here, 'public-pages.js')], { encoding: 'utf8' });
+if (pp.status !== 0) fail((pp.stderr || pp.stdout).trim());
+console.log(pp.stdout.trim());
+
 // 3. unit tests
 const testFiles = files.filter(f => f.endsWith('.test.js')).sort();
 const t = spawnSync(process.execPath, ['--test', ...testFiles], { stdio: 'inherit' });
