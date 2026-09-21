@@ -1,6 +1,6 @@
 # Drill catalog and learning roadmap — first review draft
 
-Initial draft **2026-09-19**; expansion overview added **2026-09-20**. Owner: Catalog/learning task `01a0b148-2693-7901-af91-934c83cabe1d`.
+Initial draft **2026-09-19**; expansion overview **2026-09-20**; opening specification **2026-09-21**. Owner: Catalog/learning task `01a0b148-2693-7901-af91-934c83cabe1d`.
 Branch: `codex/catalog-flow-review`. **Planning only; no replacement content has been authored or implemented.**
 The learning system has been refined; the current eight chapters and 74 drills remain intact.
 This is the first curriculum draft for review, not an approved rebuild plan.
@@ -816,3 +816,180 @@ Catalog owns objectives, content boundaries and prerequisites. No other task is 
 **Next discussion:** review the curriculum overview and two existing structure/project choices first.
 Then settle a small expansion-policy packet if needed. Do not expand every chapter or promise content
 releases before the basic structure and lesson examples are agreed.
+
+## September 21 — compact Foundations opening specification
+
+**Status: detailed proposal for review, not an approved rebuild.** The chief assigned this bounded opening
+plan in the existing Catalog task. C1/C2/C3 remain pending; no chapter grouping, project placement or exact
+lesson membership is inferred from this assignment. The 74-ID crosswalk and four earlier blueprints are
+reused, not re-audited or expanded into the whole curriculum.
+
+### New evidence and how it changes the opening
+
+The [earlier intro sketch](https://github.com/rathunter69/Hotkey.gg/blob/bc1bdfa3cff08df0d055cae2a55e089b2a520544/docs/handoffs/foundations-intro-2026-09-21.md)
+records confirmed direction for highlighted interface areas, anchored explanatory callouts and small
+ribbon actions. Its exact sequence is a proposal. The later user correction was read directly in task
+`01a09ac0-7602-7150-ab0c-d26b0e48b1dd`, user message
+`01a0c487-bfa2-77c0-ad23-f8d0c7198c23`: use clear, consistent language about what actually happens,
+for students and mid-career professionals; no cutesy analogies.
+Earlier messages `01a0c45c-ce5a-7b41-bf9e-abbdedf482c4` and
+`01a0c45b-37bd-7122-8462-7681efcf5a45` request the highlighting/callouts and extra ribbon explanations.
+
+Use **worksheet, active cell, selection, ribbon, tab, command group, command, menu and dialog** consistently.
+Explain the term before using it in an instruction. Engagement comes from small actions, visible results,
+variety and satisfying feedback. Do not use “toolbox,” “drawer,” “wrong turn” or similar analogies in lesson copy.
+
+This proposal places interface/selection/ribbon learning before the earlier Blueprint A copying exercise.
+Blueprint A remains useful later navigation/selection/copy practice, with direct professional wording.
+The previous “copy a table first” order is no longer the recommended opening. This is a sequencing proposal,
+not permission to revive `keyboardtour`, import an unfinished branch or replace current content.
+
+### Packaging independent of the chapter decision
+
+Use four short taught units, then an optional fresh application of the skills just taught. O1–O5 below
+are planning labels, not final production IDs or five mandatory catalog entries. O1/O2 may form one lesson
+if the review shows that keeping selection and its effect together is clearer; there is no duration quota.
+
+Under smaller beginner chapters, the same opening sequence can precede the chapter route and later chapters
+reuse its lessons. Under one Foundations chapter, it is simply the opening section. Neither arrangement
+requires duplicate content, repeated completion or an additional Intro game mode. This unit set is a
+proposed part of the useful free guest-accessible beginner path; exact public lesson/certificate membership
+remains to agree.
+
+**Entry preparation:** no Excel, finance, formula, copy/paste or ribbon knowledge assumed. Explain the chosen
+Windows/Mac setup before the exercise; route labels/instructions must match verified behavior on that setup.
+Ordinary timer hidden by default; no countdown or speed/XP requirement. Experienced learners may choose a
+starting point rather than complete the introduction as a universal gate.
+
+### Common starting worksheet and terminology
+
+Proposed visible worksheet title: **Monthly Sales Report**. A compact table has the headings
+**Department**, **January Revenue** and **February Revenue**, with rows **Sales**, **Operations** and
+**Support**. Values are prefilled; no financial interpretation or calculation is required.
+**Monthly Sales Report** starts unbolded. **Department** starts too narrow for its header; no exercise
+asks learners to discover an unstated defect. No fill color needs to change.
+
+Internal geometry for review: usable A1:J20; title near A2, table near A5:C8, initial active cell immediately
+below the title. A separate **Formatting Example** area can demonstrate a concept without solving the
+learner's target. These are layout notes; learner goals use the actual names above, never coordinate lists.
+Leave unassigned cells usable; density is not an objective.
+
+Every unit begins from a known state. O2 starts with the title unbolded and the **Insert** tab active so opening **Home** is observable. This setup also applies if O1/O2 share one published lesson: prepare and explain the practice starting state at the unit boundary, without counting that setup as a learner action. O3 starts with **Monthly Sales Report** selected, **Home** active and all menus closed. O4 starts at the **Department** header with the column narrower than the requested width; whole-column selection is taught next. Exact non-Home starting-tab support is a UI/Engine dependency, not an assumed new control. If published as separate lessons, each initializes its own copy with
+earlier required effects already present. Do not require a previous unsaved worksheet state or confuse a
+fresh exercise with overwriting an earlier attempt.
+
+| Term taught | Short proposed explanation | What can be highlighted |
+|---|---|---|
+| Worksheet / cell | “A worksheet stores information in cells. Each cell can contain text, a number or a formula.” Formula use comes later. | The sheet, then one cell; no full-screen tour of every control. |
+| Active cell / selection | “The outlined cell is the active cell. Formatting applies to the selected cell or cells.” Explain the selection outline and any separately indicated active cell. | Current selection and actual title; do not imply a specific input method is mandatory. |
+| Ribbon / tab / group | “The ribbon organizes commands into tabs. The Home tab includes the Font group.” | The actual Home tab, then Font group, anchored beside the control. |
+| Command | “Bold makes the contents of the selected cell or cells bold.” | Bold and its current state; preserve the existing keycaps/keytips. |
+| Menu | “A menu shows additional choices. Closing it without choosing an option leaves the worksheet unchanged.” | Fill Color menu and selected worksheet element. |
+| Dialog | “A dialog lets you enter or choose settings. Confirm applies them; Cancel closes it without applying them.” Use actual displayed button names in final copy. | Column Width dialog, its Width field and actual confirmation/cancel controls. |
+
+These control names and dialog behavior are proposed targets pending UI/Engine verification, not a claim
+that all routes already work. Do not invent Mac KeyTips or translate a Windows sequence by substituting
+modifier names. If the proposed dialog is unavailable, revise this unit with an equivalent verified
+control for an already taught concept, or defer it; do not add several untaught mechanics just to visit a dialog.
+
+### Proposed opening sequence
+
+| Unit / preparation | Teach before the action | Exact named learner actions | Observable outcome and legitimate routes |
+|---|---|---|---|
+| O1 — Select what a command will change. No prior knowledge. | Worksheet, cell, active cell, selection; explain a movement/selection input before asking for it. A cell address can be explained as a concept without using it as the task goal. | “Select Monthly Sales Report.” Then “Select the January Revenue values for Sales, Operations and Support.” | The named title is selected, then exactly the named revenue values are selected. Any supported valid selection route can satisfy the outcome. Single-cell and range targets are separate small checkpoints. |
+| O2 — Use a ribbon command. Uses O1. | Ribbon → Home tab → Font group → Bold; selection determines what changes. Explain keyboard labels/routes for the verified setup before practice. | “Select Monthly Sales Report.” “Open the Home tab.” “Make Monthly Sales Report bold.” | Observe the explicitly requested Home-tab state and the title's bold state; no unrelated cells must become bold. Opening Home is assessed because ribbon navigation is expressly the lesson. The Bold outcome accepts a supported ribbon route or direct shortcut; it does not secretly require one literal key sequence. |
+| O3 — Open and close a menu. Uses O1/O2. | A command may open a menu; opening it does not itself apply an option. Teach the supported way to dismiss it and return to the worksheet. | “Open Fill Color in the Home tab.” “Close Fill Color without applying a color to Monthly Sales Report.” | Observe the named menu open, then closed with worksheet focus restored and the original fill unchanged. Valid supported open/dismiss routes count. This proves menu navigation/recovery only, not knowledge of applying fill color. No unrelated color-selection task is implied. |
+| O4 — Apply a dialog setting. Uses selection plus Home/menu concepts. | A column groups cells vertically. Teach the verified whole-column selection route for the chosen setup and distinguish it from selecting only the Department values. Column width changes visibility without changing stored text; explain Width and confirm/cancel before the action. | “Select the entire worksheet column headed Department.” “Open Column Width.” “Set Width to 18 and confirm.” | The specific dialog is observed and the Department column has the requested logical width; stored labels/values remain unchanged. Valid supported ways of reaching the dialog count. Dragging to a matching width alone cannot establish the explicitly requested dialog checkpoint. Exact field units/rendering need Engine/UI confirmation. |
+| O5 — Apply the learned changes to a fresh report. Uses O1/O2/O4; optional practice, not a new readiness gate. | No new technique. Remind learners what bold and column width change; Help remains available. | On **Monthly Expense Report**: “Make Monthly Expense Report bold.” “Set the Expense Category column width to 18.” | Correct title and width with other data preserved; any legitimate supported route satisfies worksheet completion. This unit does not require a particular ribbon/dialog path. Observe command use separately if it is evidence of that technique. |
+
+For O4, a later optional practice variant can explicitly ask to open **Column Width**, then cancel without
+changing **Department**; cancellation is not an extra hidden required checkpoint in the listed unit.
+O5 uses a fresh compact sheet headed **Expense Category**, **Planned Expense**, **Actual Expense**, with
+**Rent**, **Payroll** and **Utilities** prefilled. The title is unbolded and Expense Category starts narrow.
+The proposed width number is a concrete review value, not an immutable design decision or a pixel measurement.
+
+Each goal must show the actual labels of its generated variant. If a label repeats, disambiguate by the
+named section/period. For navigation lessons, grade only the expressly requested interface states;
+for worksheet lessons, grade the resulting worksheet. An alternate route does not justify claiming an
+unobserved ribbon action, and opening a menu does not prove a separate formatting skill.
+
+### Instruction, assistance and a fresh solo attempt
+
+| What appears | Proposed classification within confirmed rules | Example |
+|---|---|---|
+| Concept explanation, task goal, static command reference, or highlight identifying the relevant named element/control | Ordinary teaching/location guidance; does not itself mark assisted. | Explain Bold; point out Home/Font/Bold or Monthly Sales Report; show the keyboard label for a command. |
+| A worked concept example on a separate example target, before the learner's own attempt | Ordinary teaching, provided it is not a replay/solution for the current assessed target. | Show a change to Formatting Example, then let the learner work on Monthly Sales Report. |
+| A live sequence revealing the next keys/actions that solve the current task, automatic current-target execution or replay of its solution | Assisted. Explain this before activating it; completion still advances learning with no XP or eligible timed record. | Walk from the learner's current selection through the exact steps needed to finish the current title. |
+| Clarifying a named target, requested value or reason a goal is unmet | Ordinary feedback when it explains the requirement; must not silently turn into a current-solution route. | “Monthly Sales Report is not bold yet.” A per-key instruction to solve it belongs to assisted Help. |
+
+The introduction must not force every learner into an assisted attempt merely because the lesson explains
+the ribbon. Equally, do not hide a current-task solution walkthrough inside unmarked “tips.”
+Classify teaching content by what it reveals, not by whether it appears in a callout or Help.
+If a default scripted segment really solves the live target, label that coached segment assisted;
+do not quietly grant XP. UI/Catalog must agree the exact behavior before implementation.
+
+Mouse work on the sheet/ribbon/dialog follows the existing rule: valid learning/selected-set certificate
+completion, no XP or eligible timed record. Page controls alone do not disqualify. This introduction does
+not invent a pointer exception or turn normal mistakes into penalties.
+
+After completion, show the familiar result overlay, with Continue primary and Try solo alongside after help.
+Try solo starts a fresh worksheet/attempt with its own help/input record; prior help never carries over as
+a penalty. General instructions and references remain available. A new target/variant must be equivalent
+for the qualification claimed; a changed worksheet is not automatically comparable for PBs.
+O5 illustrates additional application; it is not a mandatory solo certificate exam.
+
+Continue from O1–O4 leads through this opening, then into appropriate navigation/editing and later copying
+work. O5 can be offered as practice. Exact final route depends on the approved catalog map; no permanent
+next-key or chapter membership is implemented here. Per-unit/lesson progress granularity remains to specify.
+
+### UI, Storage and capability dependencies
+
+- **UI:** anchored callouts identify the current concept/control without covering labels, keytips, selection
+  or dialogs. Keep existing themes, ribbon, keycaps and worksheet selection design. Keyboard focus must
+  survive opening/closing callouts, Help, menus, dialogs and the completion overlay. Teach before asking
+  for an unfamiliar control; no long compulsory tour. Exact placement, focus and narrow-screen behavior
+  remain UI-owned. Success feedback names the effect, such as “Monthly Sales Report is now bold.”
+- **Catalog/Engine:** verify actual controls, route availability and platform behavior; distinguish an
+  observed UI-state objective from a worksheet property check. Validate width semantics and row/column
+  selection, cancellation/no-change, known initial state and legitimate alternatives. Callout highlighting
+  must not perform the student's action or change grading by itself. Reuse the approved familiar frame;
+  no new engine feature or retired tour is assumed.
+- **Storage:** define how publishing O1/O2 together or separately maps attempt identity, checkpoints and
+  completion without duplicate awards. Persist actual assistance/input/command-use facts, fresh attempts,
+  known completion and save receipts. Concept exposure alone is not independent-performance evidence.
+  Existing guest-transfer, historical-preservation and comparison rules apply; no new event schema is
+  selected by this document.
+- **Access/certificates:** the opening is proposed for the free beginner path. Exact included lesson IDs,
+  revisions and certificate set are still pending; helped/mouse completion counts when the lesson belongs
+  to that set. No extra trial or new credential gate follows from this teaching plan.
+
+[Payments at ab68edc](https://github.com/rathunter69/Hotkey.gg/blob/ab68edc09e2d5c6a85b3c31bce3b2ff16b998971/docs/handoffs/payments.md)
+now records no extra consumer trial, renewal for advanced practice after expiry, selected standard/student
+monthly and annual prices, cancellation through the paid period, the first-payment 14-day guarantee, and
+banking-group codes/shared end date. Those later choices supersede earlier “pending” commercial references
+where applicable. This Catalog batch changes none of them and does not choose student eligibility, group
+mechanics, exact free lesson/certificate lists or future pack-inclusion policy for Payments.
+
+The chief has now reconciled the latest ribbon/professional-language direction in [shared guidance at 5dada40](https://github.com/rathunter69/Hotkey.gg/blob/5dada401435ce0d349ec40727541b6e63344233e/docs/PRODUCT.md), checked during this batch (PRODUCT blob 2e4834925e20a584cb8ad6a6440c5303afb8d07c). The earlier intro source remains proposal provenance.
+
+### Small review gates and validation
+
+No repeated questionnaire. The few structural recommendations remain:
+1. Keep one shared chapter/lesson catalog, with tracks as recommendations and modules as publishable collections (C1).
+2. Prefer smaller beginner chapters, but keep this opening portable until C2 is answered.
+3. Place practical projects after the skills they use (C3); this opening does not depend on choosing their catalog location.
+
+Before broader lesson expansion, review this exact opening for learner clarity and cognitive load, agree
+whether O1/O2 are one lesson, and resolve the proposed dialog/control and assistance presentation with the
+existing UI owner. These are recommendations/dependencies, not newly approved settings or permission to build.
+
+Focused independent review of the principles and concrete opening checked ordinary ribbon teaching versus assistance,
+menu-navigation evidence versus fill-formatting evidence, and fresh-application outcomes versus technique
+evidence; the distinctions above incorporate that review. The concrete review also clarified selected-cell terminology, teaching whole-column selection before O4, and a known non-Home starting state for O2. Those corrections are incorporated. Reused prior audit/crosswalk/blueprints.
+No new application/browser/database/native Excel tests or complete source audit were run. Documentation
+scope/whitespace and unchanged crosswalk are checked before publication; remote commit/file identity is
+verified afterward. No content, generated page, runtime, SQL, progress, billing or deployment changes.
+
+**Chief handoff:** integrate the confirmed plain-language/ribbon teaching direction and link this proposed
+opening in CURRENT; keep C1/C2/C3 and exact lesson/control/access membership pending. This is a concrete
+opening plan for review under either chapter structure, not acceptance of the full curriculum or a rebuild.
