@@ -26,11 +26,15 @@ export const DEFAULT_LINKS = [
 
 const THEME_DOTS = '<svg width="16" height="16" viewBox="0 0 18 18"><circle cx="5" cy="5" r="3.4" fill="#e74c3c"/><circle cx="13" cy="5" r="3.4" fill="#f39c12"/><circle cx="5" cy="13" r="3.4" fill="#27ae60"/><circle cx="13" cy="13" r="3.4" fill="#3498db"/></svg>';
 
+/** A link's page key: its `key`, else its label, lowercased — so 'Lessons' and 'lessons' both address it. */
+const keyOf = l => String(l.key || l.label || '').toLowerCase();
+const norm = k => String(k == null ? '' : k).toLowerCase();
+
 function navHtml(links, active) {
   const pages = links.map(l => {
-    const key = l.key || String(l.label).toLowerCase();
+    const key = keyOf(l);
     const icon = l.icon || NAV_ICONS[key] || NAV_ICONS.sandbox;
-    return `<a class="topnav-link${key === active ? ' active' : ''}" data-page="${escHtml(key)}" href="${escHtml(l.href)}" title="${escHtml(l.label)}" aria-label="${escHtml(l.label)}">${icon}<span class="tl-label">${escHtml(l.label)}</span></a>`;
+    return `<a class="topnav-link${key === norm(active) ? ' active' : ''}" data-page="${escHtml(key)}" href="${escHtml(l.href)}" title="${escHtml(l.label)}" aria-label="${escHtml(l.label)}">${icon}<span class="tl-label">${escHtml(l.label)}</span></a>`;
   }).join('\n          ');
   return `
     <nav class="topnav">
@@ -56,7 +60,7 @@ function navHtml(links, active) {
  */
 export function mountNav(el, opts = {}) {
   const links = opts.links || DEFAULT_LINKS;
-  let active = opts.active || (links[0] && (links[0].key || links[0].label.toLowerCase()));
+  let active = norm(opts.active || (links[0] && keyOf(links[0])));
   el.innerHTML = navHtml(links, active);
   syncThemeLabels();
 
@@ -104,8 +108,8 @@ export function mountNav(el, opts = {}) {
   window.addEventListener('keydown', onKey, true);
 
   function setActive(key) {
-    active = key;
-    el.querySelectorAll('.topnav-link').forEach(a => a.classList.toggle('active', a.dataset.page === key));
+    active = norm(key);
+    el.querySelectorAll('.topnav-link').forEach(a => a.classList.toggle('active', a.dataset.page === active));
   }
   function destroy() {
     window.removeEventListener('keydown', onKey, true);

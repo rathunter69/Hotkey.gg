@@ -69,6 +69,11 @@ body{padding-top:14px}
 }
 #navMount .topnav{margin-bottom:20px}   /* the trainer's tighter nav gap (index.html 1294) */
 
+/* the trainer's card cap (index.html 1708–1710, loaded BEFORE nav.css): the card caps at the viewport and
+   scrolls INSIDE its own backer — a card that fits shows no scrollbar, a tall one never spawns a page scrollbar */
+.pc-card{background:var(--surface); border:1px solid var(--line); border-radius:16px;
+  width:640px; max-width:96vw; padding:26px 30px 22px; box-shadow:0 28px 80px rgba(0,0,0,.65); margin:auto;
+  max-height:calc(100vh - 80px); overflow-y:auto}
 /* ---------- MODAL BASE (used by the theme picker) ---------- */
 .profile-modal{position:fixed; inset:0; background:rgba(0,0,0,.66); display:none;
   align-items:flex-start; justify-content:center; z-index:62; padding:38px 22px; overflow:auto}
@@ -467,6 +472,11 @@ html.hk-fs .stage-row{min-height:clamp(400px, calc(100vh - 262px), 900px)}
 .stage-main{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; min-height:0}
 .stage-main .fbar{flex:0 0 auto}
 .stage-main .gridwrap{flex:1 1 auto; min-height:0}
+/* a SheetView mounted in a host element of its own (not .stage-main itself) carries the same flex chain */
+.sheet-view{display:flex; flex-direction:column; min-width:0; min-height:0}
+.stage-main > .sheet-view{flex:1 1 auto}
+.sheet-view .fbar{flex:0 0 auto}
+.sheet-view .gridwrap{flex:1 1 auto; min-height:0}
 
 /* ---------- 12. comment triangle (index.html 1809–1810) ---------- */
 td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;

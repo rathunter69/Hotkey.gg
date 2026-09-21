@@ -83,6 +83,7 @@ export class SheetView {
       '<span class="fcontent empty">empty</span>';
     const gw = document.createElement('div'); gw.className = 'gridwrap';
     gw.innerHTML = '<table id="grid"></table><div class="marquee"></div>';
+    el.classList.add('sheet-view');   // the flex-column chain (app.css) so the grid fills its frame from any host element
     el.appendChild(fbar); el.appendChild(gw);
     this.fbar = fbar; this.nameBox = fbar.querySelector('.namebox'); this.fContent = fbar.querySelector('.fcontent'); this.fxActions = fbar.querySelector('.fx-actions');
     this.gw = gw; this.grid = gw.querySelector('table'); this.marquee = gw.querySelector('.marquee');
@@ -108,7 +109,7 @@ export class SheetView {
     if (this.unsub) this.unsub();
     if (this.ro) this.ro.disconnect();
     window.removeEventListener('resize', this._onResize); clearTimeout(this._rzT);
-    this.fbar.remove(); this.gw.remove();
+    this.fbar.remove(); this.gw.remove(); this.el.classList.remove('sheet-view');
   }
 
   /** The one grid write. */
