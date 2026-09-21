@@ -512,7 +512,7 @@ export class Session {
   }
   jumpPrecedent() {
     const S = this.sheet; const a = S.dispActive(); const c = S.get(a.r, a.c); if (!c.formula) return;
-    const refs = formulaRefs(c.formula); if (!refs.length) return;
+    const refs = formulaRefs(c.formula, { rows: S.rows, cols: S.cols }); if (!refs.length) return;
     const first = refs[0]; const p = first.key ? parseRef(first.key) : { r: first.range.r1, c: first.range.c1 };
     if (!S.inb(p.r, p.c)) return;
     S.goTo(p.r, p.c);
@@ -522,7 +522,7 @@ export class Session {
     const keys = Object.keys(S.cells).map(k => ({ k, p: parseRef(k) })).filter(x => x.p).sort((a, b) => (a.p.r - b.p.r) || (a.p.c - b.p.c));
     for (const { k, p } of keys) {
       const cell = S.cells[k]; if (!cell || !cell.formula) continue;
-      const reads = formulaRefs(cell.formula).some(ref => ref.key ? ref.key === refKey(r, c) : (r >= ref.range.r1 && r <= ref.range.r2 && c >= ref.range.c1 && c <= ref.range.c2));
+      const reads = formulaRefs(cell.formula, { rows: S.rows, cols: S.cols }).some(ref => ref.key ? ref.key === refKey(r, c) : (r >= ref.range.r1 && r <= ref.range.r2 && c >= ref.range.c1 && c <= ref.range.c2));
       if (reads) { S.goTo(p.r, p.c); return; }
     }
   }

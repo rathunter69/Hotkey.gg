@@ -103,7 +103,7 @@ function precedentMap(sheet) {
   for (const k in sheet.cells) {
     const c = sheet.cells[k]; if (!c || !c.formula) continue;
     const refs = new Set();
-    for (const ref of formulaRefs(c.formula)) {
+    for (const ref of formulaRefs(c.formula, { rows: sheet.rows, cols: sheet.cols })) {
       if (ref.key) { const p = parseRef(ref.key); if (p && sheet.inb(p.r, p.c)) refs.add(ref.key); }
       else if (ref.range) { const rg = ref.range; for (let r = Math.max(1, rg.r1); r <= Math.min(rg.r2, sheet.rows); r++) for (let cc = Math.max(1, rg.c1); cc <= Math.min(rg.c2, sheet.cols); cc++) refs.add(refKey(r, cc)); }
     }

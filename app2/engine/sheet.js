@@ -305,7 +305,7 @@ export class Sheet {
     const deps = {};
     for (const k of keys) {
       const d = new Set();
-      for (const ref of formulaRefs(this.cells[k].formula)) {
+      for (const ref of formulaRefs(this.cells[k].formula, { rows: this.rows, cols: this.cols })) {
         if (ref.key) { if (fset.has(ref.key)) d.add(ref.key); }
         else { const rg = ref.range; for (let r = Math.max(1, rg.r1); r <= Math.min(rg.r2, this.rows); r++) for (let c = Math.max(1, rg.c1); c <= Math.min(rg.c2, this.cols); c++) { const kk = refKey(r, c); if (fset.has(kk)) d.add(kk); } }
       }

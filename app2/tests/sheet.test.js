@@ -248,3 +248,21 @@ test('an empty entry is a no-op: no undo frame, the redo stack survives', () => 
   const t = new Sheet(); t.commitInput('5', 1, 1); t.undo(); t.select('B2:B3'); assert.deepEqual(t.commitInputAll('', 2, 2), { kind: 'empty' });
   assert.equal(t.redoStack.length, 1); assert.equal(t.undoStack.length, 0); assert.equal(t.redo(), true); assert.equal(t.value('A1'), 5);
 });
+
+test('sheet-level pins for the formula-engine review: arity refusals, error literals, unary plus, whole-column self-references', () => {
+  assert.equal(Sheet.classifyInput('=SUM()').kind, 'bad', 'arity is checked at entry, so classifyInput refuses what Excel refuses');
+  assert.deepEqual(Sheet.classifyInput('=#n/a'), { kind: 'formula', formula: '=#N/A' }, 'error literals are stored upper-cased');
+  const s = new Sheet({ cells: { E1: { value: 'apple' }, A1: { value: 1 }, A2: { value: 2 } } });
+  s.commitInput('=+E1', 1, 6); assert.equal(s.value('F1'), 'apple', '=+E1 shows the text unchanged');
+  s.commitInput('=SUM(A:A)', 6, 1); assert.equal(s.value('A6'), 0, '=SUM(A:A) in column A is circular and reads 0');
+  s.commitInput('=SUM(A1:A2)', 7, 1); assert.equal(s.value('A7'), 3, 'a plain range in the same column is not');
+  const big = new Sheet({ rows: 40, cols: 12, cells: { A1: { value: 5 } } });
+  big.commitInput('=SUM(A:A)', 30, 1); assert.equal(big.value('A30'), 0, 'the sheet size reaches formulaRefs: circular on a 40-row sheet too');
+  big.commitInput('=SUM(A:A)', 2, 2); assert.equal(big.value('B2'), 5);
+  // paste and column insert move whole-column references like any other
+  const p = new Sheet({ cells: { B1: { value: 1 }, B2: { value: 2 }, C1: { formula: '=SUM(B:B)' } } });
+  assert.equal(p.value('C1'), 3);
+  p.select('C1'); p.copy(); p.select('A1'); p.paste('all'); assert.equal(p.formula('A1'), '=SUM(#REF!)'); assert.equal(p.value('A1'), '#REF!');
+  const q = new Sheet({ cells: { B1: { value: 1 }, B2: { value: 2 }, D1: { formula: '=SUM(B:B)' } } });
+  q.select('A1'); q.insert('c'); assert.equal(q.formula('E1'), '=SUM(C:C)'); assert.equal(q.value('E1'), 3);
+});
