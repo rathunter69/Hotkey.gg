@@ -8,8 +8,10 @@
 .chapter h2{font-family:var(--mono); font-size:15px; font-weight:700; margin:22px 0 4px; color:var(--text)}
 .chapter-blurb{color:var(--muted); font-size:13px; margin:0 0 10px}
 .ptable{width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--line); border-radius:10px; overflow:hidden; font-size:13.5px}
+.ptable th, .ptable td{height:auto; text-align:left; overflow:visible; white-space:normal; position:static; transition:none; border:0}
 .ptable th{font-family:var(--mono); font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:.4px; color:var(--faint); text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); background:var(--surface2)}
-.ptable td{padding:10px 12px; border-bottom:1px solid color-mix(in srgb, var(--line) 60%, transparent); vertical-align:middle}
+.ptable td{padding:10px 12px; border-bottom:1px solid color-mix(in srgb, var(--line) 60%, transparent); vertical-align:middle; color:var(--text); font-family:var(--sans)}
+.ptable .c-num{text-align:right}
 .ptable tr:last-child td{border-bottom:0}
 .prow{cursor:pointer}
 .prow:hover td, .prow:focus-visible td{background:var(--accent-glow)}

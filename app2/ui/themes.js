@@ -208,6 +208,7 @@ function ensureScrollbarStyle() {
 }
 
 /** Apply a palette: --<key> vars on <html>, --on-accent, html[data-dark], labels. Does not persist. */
+export const VARS_KEY = 'hotkey_theme_vars';   // the applied palette, for the no-flash inline restore in index.html
 export function applyTheme(name) {
   const t = THEMES[name] || THEMES.default;
   const root = document.documentElement;
@@ -217,6 +218,7 @@ export function applyTheme(name) {
   root.style.setProperty('--on-accent', t.vars.onAccent || onAccent(t.vars.accent || '#6ec9a0'));
   root.setAttribute('data-dark', t.dark ? '1' : '0');   // drives cell-colour visibility overrides
   current = THEMES[name] ? name : 'default';
+  try { localStorage.setItem(VARS_KEY, JSON.stringify({ dark: t.dark, vars: { ...t.vars, 'on-accent': root.style.getPropertyValue('--on-accent') } })); } catch (e) { /* storage blocked */ }
   ensureScrollbarStyle();
   syncThemeLabels();
 }

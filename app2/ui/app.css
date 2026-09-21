@@ -7,10 +7,11 @@
 
 /* ---------- 1. tokens, reset, body, .app (index.html 75–95) ---------- */
 :root{
-  --bg:#292b31; --surface:#383b42; --surface2:#43474f; --line:#5a5e68;
-  --text:#f0f1ec; --muted:#a8adb3; --faint:#767d87;
-  --accent:#6ec9a0; --accent-dim:#4a8f72; --accent-glow:rgba(110,201,160,.2);
-  --warn:#d9a441; --bad:#c8533f;
+  /* static fallback = Daylight, the default theme, so a first visit paints right before themes.js runs */
+  --bg:#dbd8d1; --surface:#ecebe6; --surface2:#e1dfd8; --line:#c6c2b8;
+  --text:#38352d; --muted:#6b665d; --faint:#a09a8f;
+  --accent:#16a862; --accent-dim:#0e7a45; --accent-glow:rgba(22,168,98,.16); --on-accent:#ffffff;
+  --warn:#9a6700; --bad:#b3261e;
   --mono:'JetBrains Mono',ui-monospace,monospace;
   --cellfont:Arial,'Calibri','Segoe UI',system-ui,sans-serif;   /* r72 doctrine: ARIAL leads in the sheet cells; everything outside the grid = JetBrains Mono / Hanken */
   --sans:'Hanken Grotesk',system-ui,sans-serif;
