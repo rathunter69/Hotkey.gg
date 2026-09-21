@@ -1,6 +1,6 @@
 # Product direction
 
-Updated September 19, 2026. This is the shared product brief. Current work and launch status
+Updated September 21, 2026. This is the shared product brief. Current work and launch status
 live in [CURRENT.md](CURRENT.md); source locations live in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## Confirmed by Wolf on September 17
@@ -788,6 +788,27 @@ versions, certificate sets and history equivalence still need agreement.
 Preserve dated Foundations feedback, earned records and legitimate alternative solutions; do not
 revive superseded density/no-scroll/timing quotas. Access, certificate and old-to-new recognition
 mappings remain distinct proposals/dependencies where unsettled.
+
+**September 20 — support future premium content modules:** the Catalog owner's
+[verified overview](https://github.com/rathunter69/Hotkey.gg/blob/1ddd1b88a8ae4dcfe35314001816ff109a28435a/docs/handoffs/drill-catalog.md#september-20--curriculum-overview-and-future-content-modules) records Wolf's explicit request to structure modules
+for follow-on content, such as additional advanced finance drills for premium users.
+Extensibility is confirmed planning direction. It does not approve the proposed ten chapters,
+a named pack, release cadence, separate DLC price or any content implementation. The earlier
+chapter/Foundations/project questions remain unanswered.
+
+The owner's recommendation is chapters/lessons for normal browsing, tracks through shared
+content, and versioned modules/packs as collections that add optional specialist branches.
+No extra mandatory navigation layer or new mode is selected. Including ordinary future packs
+in the subscription is a recommendation awaiting Payments; “DLC” does not itself mean a separate
+purchase or permanent ownership. Candidate debt, sector, acquisition and interview-case packs
+are illustrations, not a launch roadmap or verified engine capabilities.
+
+Existing earned-history protection remains confirmed. The proposed extension is to preserve
+completed core/pack editions and issued certificates while a materially new edition can show
+its own new work. Exact version/equivalence/progress-display rules remain Storage/UI/Catalog
+design work, not implemented or blanket-approved mechanics. New content must state relevant
+preparation and explicit access rather than silently extending a mandatory ladder. Reuse the
+existing worksheet/help/reward/saving systems; identify any new engine dependency separately.
 
 The [workstream brief](TASK_STARTERS.md#curriculum-roadmap-workstream--september-19) supplies the
 first deliverables and planning gates. This extends curriculum planning in the existing task;
