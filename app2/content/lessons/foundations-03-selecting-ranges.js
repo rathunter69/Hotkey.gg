@@ -9,6 +9,8 @@ const REPORT = {
   A7: { value: 'Friday' }, B7: { value: 1675 }, C7: { value: 55 },
 };
 const sel = (sheet, ref) => sheet.selectionText() === ref;
+/** The key was pressed since the current goal became current (the runner's key window, keyLog.slice(goalMark)). */
+const used = (session, label) => session.keyLog.slice(session.goalMark || 0).some(e => e.k === label);
 
 export default {
   id: 'foundations-03-selecting-ranges',
@@ -33,7 +35,7 @@ export default {
   ],
   goals: [
     { id: 'b3-b7', text: 'Select the Sales figures B3:B7 with Shift+↓', keys: '→ ↓ ↓ then Shift+↓ ×4', requires: ['shift-arrow', 'range'], check: s => sel(s, 'B3:B7') },
-    { id: 'c3-c7', text: 'Select the Units figures C3:C7 with a single Ctrl+Shift+↓', keys: '→ then Ctrl+Shift+↓', requires: ['ctrl-shift-arrow'], check: (s, ses) => sel(s, 'C3:C7') && ses.keyLog.some(e => e.k === 'Ctrl+Shift+↓') },
+    { id: 'c3-c7', text: 'Select the Units figures C3:C7 with a single Ctrl+Shift+↓', keys: '→ then Ctrl+Shift+↓', requires: ['ctrl-shift-arrow'], check: (s, ses) => sel(s, 'C3:C7') && used(ses, 'Ctrl+Shift+↓') },
     { id: 'row-2', text: 'Select the whole header row 2 with Shift+Space', keys: '↑ then Shift+Space', requires: ['row-col-select'], check: s => sel(s, 'A2:J2') },
     { id: 'region', text: 'Select the whole report, A1:C7, with Ctrl+A', keys: 'Ctrl+A', requires: ['ctrl-a'], check: s => sel(s, 'A1:C7') },
   ],

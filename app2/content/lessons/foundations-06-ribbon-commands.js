@@ -35,8 +35,15 @@ export default {
   goals: [
     { id: 'bold-title', text: 'Make the title Weekly Sales Report bold with Alt, H, 1', keys: 'Alt H 1', requires: ['keytips', 'home-tab', 'bold-command'], check: s => cell(s, 'A1').bold === true },
     { id: 'bold-headers', text: 'Select the headers Day, Sales and Units (A2:C2) and make them bold', keys: '↓ Shift+→ Shift+→ then Alt H 1', requires: ['bold-command', 'shift-arrow'], check: s => ['A2', 'B2', 'C2'].every(r => cell(s, r).bold === true) },
-    { id: 'border-friday', text: 'Put a bottom border under the Friday figures B7:C7 with Alt, H, B, O', keys: 'Alt H B O', requires: ['borders-menu'], check: s => cell(s, 'B7').bb === true && cell(s, 'C7').bb === true },
-    { id: 'center-headers', text: 'Center the Sales and Units headers (B2:C2) with Alt, H, A, C', keys: 'Alt H A C', requires: ['align-command'], check: s => cell(s, 'B2').align === 'c' && cell(s, 'C2').align === 'c' },
+    { id: 'border-friday', text: 'Put a bottom border under the Friday figures B7:C7 with Alt, H, B, O', keys: '→ ↓ ×5 Shift+→ then Alt H B O', requires: ['borders-menu', 'shift-arrow'], check: s => cell(s, 'B7').bb === true && cell(s, 'C7').bb === true },
+    { id: 'center-headers', text: 'Center the Sales and Units headers (B2:C2) with Alt, H, A, C', keys: '↑ ×5 Shift+→ then Alt H A C', requires: ['align-command', 'shift-arrow'], check: s => cell(s, 'B2').align === 'c' && cell(s, 'C2').align === 'c' },
+  ],
+  // Goals latch, so the formats they leave behind are restated here: undoing one after its tick
+  // keeps the lesson open until it is reapplied.
+  endState: [
+    { text: 'The title and the headers are still bold', check: s => ['A1', 'A2', 'B2', 'C2'].every(r => cell(s, r).bold === true) },
+    { text: 'The bottom border under B7:C7 is still in place', check: s => ['B7', 'C7'].every(r => cell(s, r).bb === true) },
+    { text: 'The Sales and Units headers are still centered', check: s => ['B2', 'C2'].every(r => cell(s, r).align === 'c') },
   ],
   solution: 'Alt H 1 Down Shift+Right Shift+Right Alt H 1 Right Down Down Down Down Down Shift+Right Alt H B O Up Up Up Up Up Shift+Right Alt H A C',
 };

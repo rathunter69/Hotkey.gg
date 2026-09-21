@@ -8,7 +8,8 @@ const START = {
   A6: { value: 'Thursday' }, B6: { value: 1100 }, C6: { value: 36 },
   A7: { value: 'Friday' }, B7: { value: 1675 }, C7: { value: 55 },
 };
-const used = (session, label) => session.keyLog.some(e => e.k === label);
+/** The key was pressed since the current goal became current (the runner's key window, keyLog.slice(goalMark)). */
+const used = (session, label) => session.keyLog.slice(session.goalMark || 0).some(e => e.k === label);
 
 export default {
   id: 'foundations-05-editing-cells',
@@ -32,9 +33,9 @@ export default {
     { mode: 'timed', par: 30 },
   ],
   goals: [
-    { id: 'fix-title', text: 'Fix the title in A1 with F2: change Reprot to Report using Backspace, then Enter', keys: 'F2 ⌫ ×4 port Enter', requires: ['edit-mode-f2', 'backspace'], check: (s, ses) => s.value('A1') === 'Weekly Sales Report' && used(ses, 'F2') },
-    { id: 'replace-b4', text: 'Replace the Tuesday Sales in B4 with 1950 by typing over it', keys: '1950 Enter', requires: ['replace-by-typing'], check: s => s.value('B4') === 1950 },
-    { id: 'fix-wednesday', text: 'Correct Wenesday in A5 to Wednesday: F2, move the insertion point left with ←, insert the missing d, Enter', keys: 'F2 ← ×6 d Enter', requires: ['edit-mode-f2', 'edit-caret'], check: (s, ses) => s.value('A5') === 'Wednesday' && used(ses, 'F2') },
+    { id: 'fix-title', text: 'Fix the title in A1 with F2: change Reprot to Report using Backspace, then Enter', keys: 'F2 ⌫ ×4 "port" Enter', requires: ['edit-mode-f2', 'backspace'], check: (s, ses) => s.value('A1') === 'Weekly Sales Report' && used(ses, 'F2') },
+    { id: 'replace-b4', text: 'Replace the Tuesday Sales in B4 with 1950 by typing over it', keys: '→ ↓ ↓ then "1950" Enter', requires: ['replace-by-typing'], check: s => s.value('B4') === 1950 },
+    { id: 'fix-wednesday', text: 'Correct Wenesday in A5 to Wednesday: F2, move the insertion point left with ←, insert the missing d, Enter', keys: '← then F2 ← ×6 "d" Enter', requires: ['edit-mode-f2', 'edit-caret'], check: (s, ses) => s.value('A5') === 'Wednesday' && used(ses, 'F2') },
   ],
   solution: 'F2 Backspace Backspace Backspace Backspace "port" Enter Right Down Down "1950" Enter Left F2 Left Left Left Left Left Left "d" Enter',
 };

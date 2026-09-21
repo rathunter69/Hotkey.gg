@@ -10,11 +10,16 @@
 // `session` after every key to paint. Every Excel-parity rule the old build encoded is kept:
 //   · typing replaces (Enter mode: arrows commit), F2 edits (arrows move the caret), F2 toggles
 //   · an arrow inside a formula points: re-points a bare trailing ref, else appends anchor+step;
-//     Shift grows a range, typing exits point mode, Backspace deletes the whole live ref, F4 cycles $
+//     Shift grows a range, Ctrl jumps to a block edge, typing/Home/End/F2 exit point mode, Backspace deletes
+//     the whole live ref, F4 cycles $ (never on a name such as LOG10 or a ref outside the sheet)
 //   · Enter ↓ / Shift+Enter ↑ / Tab → / Shift+Tab ←; Enter after a Tab run returns home, one row down
 //   · Ctrl+Enter fills the selection (refs translate per cell) and stays put
 //   · Alt opens the ribbon; letters walk MENUS; Esc backs out one level; a bad letter resets to the strip
-//   · Delete clears the selection (formats kept); Backspace clears the active cell and opens an edit
+//   · Delete clears the selection (formats kept); Backspace opens the active cell as an empty Enter-mode
+//     edit — the sheet is untouched until ↵ commits it (an empty entry over content clears the cell), Esc restores
+//   · every edit, stamp and jump acts on the displayed active cell (Sheet.dispActive) — the white cell of a
+//     row/column/all selection — never on the moving corner
+//   · ↵ / Shift+↵ / Tab / Shift+Tab pressed while editing are logged (on the edited cell) before they commit
 
 import { Sheet, FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES } from './sheet.js';
 import { evalFormula, formulaRefs, translateFormula } from './formula.js';
@@ -24,6 +29,15 @@ import { stepPath, PASTE_OPTS, PASTE_OP_OPTS } from './ribbon.js';
 const ARROWS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
 const ARROWSYM = { ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→' };
 const OPERATOR_BOUNDARY = /[=+\-*/^(,&<>]$/;
+const REF_TAIL = /(\$?[A-Za-z]{1,3}\$?\d+)$/;
+const IDENT_CHAR = /[A-Za-z0-9_.$]/;
+/** A bare cell reference ending `s` ({ref, start}), or null — the tail of a longer name (DAYS360 → AYS360, ATAN2 → TAN2) is not one. */
+function refTail(s) {
+  const m = REF_TAIL.exec(s); if (!m) return null;
+  const start = s.length - m[1].length;
+  if (start > 0 && IDENT_CHAR.test(s[start - 1])) return null;
+  return { ref: m[1], start };
+}
 const SHIFTED = { '1': '!', '2': '@', '3': '#', '4': '$', '5': '%', '6': '^', '7': '&', '8': '*', '9': '(', '0': ')', '-': '_', '=': '+', '`': '~', ';': ':', ',': '<', '.': '>', '/': '?', '[': '{', ']': '}', '\\': '|', "'": '"' };
 const KEY_ALIASES = { esc: 'Escape', escape: 'Escape', enter: 'Enter', return: 'Enter', tab: 'Tab', space: ' ', spacebar: ' ',
   up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight', arrowup: 'ArrowUp', arrowdown: 'ArrowDown', arrowleft: 'ArrowLeft', arrowright: 'ArrowRight',
@@ -50,15 +64,22 @@ function codeToChar(code, k) {
  * Parse a key spec such as 'Ctrl+Shift+ArrowDown', 'Alt', 'Enter', 'h', 'Ctrl+1' into an event.
  * Ctrl+digit chords produce the shifted character when Shift is held (Ctrl+Shift+1 → '!').
  */
-export function parseKeySpec(spec) {
+const MODIFIERS = new Set(['ctrl', 'control', 'cmd', 'meta', 'shift', 'alt', 'option']);
+const hasAlias = t => Object.prototype.hasOwnProperty.call(KEY_ALIASES, t.toLowerCase());
+/** 'Ctrl+Shift+H' → { mods: ['ctrl','shift'], keyTok: 'H' }. 'Ctrl++' splits to ['Ctrl','',''], so the last token was a literal '+'. */
+function splitSpec(spec) {
   const parts = String(spec).split('+');
-  // 'Ctrl++' → ['Ctrl','',''] : the last token was a literal '+'
   let keyTok = parts.pop();
   if (keyTok === '' && parts.length) { keyTok = '+'; parts.pop(); }
-  const mods = parts.map(p => p.toLowerCase());
+  return { mods: parts.map(p => p.toLowerCase()), keyTok };
+}
+/** A key a script may name: one character, an alias (Enter, Esc, Down, Alt, …) or an F-key. */
+const isKeyToken = t => t.length === 1 || hasAlias(t) || /^F\d{1,2}$/i.test(t);
+
+export function parseKeySpec(spec) {
+  const { mods, keyTok } = splitSpec(spec);
   const ev = { key: keyTok, ctrlKey: mods.includes('ctrl') || mods.includes('control') || mods.includes('cmd') || mods.includes('meta'), shiftKey: mods.includes('shift'), altKey: mods.includes('alt') || mods.includes('option'), metaKey: false };
-  const al = KEY_ALIASES[keyTok.toLowerCase()];
-  if (al) ev.key = al;
+  if (hasAlias(keyTok)) ev.key = KEY_ALIASES[keyTok.toLowerCase()];
   if (ev.key.length === 1) {
     if (ev.shiftKey) { if (/[a-z]/.test(ev.key)) ev.key = ev.key.toUpperCase(); else if (SHIFTED[ev.key]) ev.key = SHIFTED[ev.key]; }
     else if (/[A-Z]/.test(ev.key) && (ev.ctrlKey || ev.altKey)) ev.key = ev.key.toLowerCase();
@@ -70,6 +91,8 @@ export function parseKeySpec(spec) {
 /**
  * Parse a keystroke script: whitespace-separated key specs; a double-quoted string types its
  * characters. Example: '"Weekly Sales Report" Enter Up Ctrl+B Alt H B O'.
+ * A token that is neither a key spec nor quoted text throws (naming the token) rather than being
+ * dropped; a held KeyTip chord such as Alt+H expands to Alt then H, which is what a browser delivers.
  */
 export function parseKeyScript(script) {
   if (Array.isArray(script)) return script.flatMap(parseKeyScript);
@@ -81,6 +104,12 @@ export function parseKeyScript(script) {
     let j = i; while (j < s.length && !/\s/.test(s[j])) j++;
     const tok = s.slice(i, j); i = j;
     if (/^[0-9.]{2,}$/.test(tok)) { out.push({ type: 'text', text: tok }); continue; }   // 20 types two digits; a single digit is the same either way
+    const { mods, keyTok } = splitSpec(tok);
+    if (!isKeyToken(keyTok) || mods.some(m => !MODIFIERS.has(m))) throw new Error(`parseKeyScript: unknown key "${tok}" — quote text as "…"`);
+    const alt = mods.includes('alt') || mods.includes('option'), ctrl = mods.some(m => m === 'ctrl' || m === 'control' || m === 'cmd' || m === 'meta');
+    if (alt && !ctrl && /^[A-Za-z0-9]$/.test(keyTok)) {   // Alt+H held = Alt, then H (Alt+= and Ctrl+Alt+V stay chords)
+      out.push({ type: 'press', spec: 'Alt' }, { type: 'press', spec: mods.filter(m => m !== 'alt' && m !== 'option').concat(keyTok).join('+') }); continue;
+    }
     out.push({ type: 'press', spec: tok });
   }
   return out;
@@ -113,9 +142,13 @@ export class Session {
   toast(msg) { if (this.opts.onToast) this.opts.onToast(msg); }
 
   /* ---------------- driving ---------------- */
-  /** Feed one key event ({key, code?, shiftKey, ctrlKey, altKey, metaKey}). Returns true when consumed. */
+  /**
+   * Feed one key event ({key, code?, shiftKey, ctrlKey, altKey, metaKey}). Returns true when consumed.
+   * An event without a key string is ignored: false, state untouched.
+   */
   key(ev) {
-    const e = { key: ev.key, code: ev.code || codeFor(ev.key && ev.key.length === 1 ? ev.key : ''), shiftKey: !!ev.shiftKey, ctrlKey: !!(ev.ctrlKey || ev.metaKey), altKey: !!ev.altKey };
+    if (!ev || typeof ev.key !== 'string') return false;
+    const e = { key: ev.key, code: ev.code || codeFor(ev.key.length === 1 ? ev.key : ''), shiftKey: !!ev.shiftKey, ctrlKey: !!(ev.ctrlKey || ev.metaKey), altKey: !!ev.altKey };
     if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Meta' || e.key === 'CapsLock') return false;
     const handled = this.dispatch(e);
     if (handled) this.emit('key');
@@ -126,7 +159,7 @@ export class Session {
   /** Run a keystroke script (see parseKeyScript). */
   run(script) { for (const step of parseKeyScript(script)) { if (step.type === 'text') this.type(step.text); else this.press(step.spec); } }
   logKey(t) {
-    const a = this.sheet.active;
+    const a = this.sheet.dispActive();   // the white cell the key was pressed on (the edited cell while editing)
     this.keyLog.push({ k: t, t: this.t0 == null ? 0 : (this.opts.now ? this.opts.now() : Date.now()) - this.t0, cell: refKey(a.r, a.c) });
     if (this.opts.onKey) this.opts.onKey(t);
   }
@@ -147,85 +180,111 @@ export class Session {
     this.startClock();
     this.sheet.clearClipboard();
     this.editRetarget();
+    const a = this.sheet.dispActive();   // the white cell — the far corner of a row/column/all selection is never edited
     this.editing = true; this.editBuf = initial; this.editMode = mode || 'enter'; this.editCaret = initial.length;
-    this.editAnchor = { r: this.sheet.active.r, c: this.sheet.active.c };
-    this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null; this.editPointed = false;
+    this.editAnchor = { r: a.r, c: a.c };
+    this.endPoint(); this.editPointed = false;
   }
-  cancelEdit() { this.autoSumEdit = false; this.editing = false; this.editBuf = ''; this.editAnchor = null; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null; }
-  /** Commit the buffer into the active cell and move by (dr,dc). Returns false if still editing. */
-  commitEdit(dr, dc) {
+  cancelEdit() { this.autoSumEdit = false; this.editing = false; this.editBuf = ''; this.editAnchor = null; this.endPoint(); }
+  /** The cell an edit writes to: the displayed active cell it opened on. */
+  editCell() { const a = this.editAnchor || this.sheet.dispActive(); return { r: a.r, c: a.c }; }
+  endPoint() { this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null; }
+  static clearCell(t) { t.value = null; t.formula = null; t.txt = false; }
+  /**
+   * Commit the buffer into the edited cell and move by (dr,dc). Returns false if still editing (a
+   * refused or fix-proposed formula leaves the buffer exactly as typed — classifyInput auto-closes a
+   * missing ')' on its own copy). An empty entry over content clears the cell, like Excel's Backspace ↵.
+   * `via` ({kind:'enter'|'tab'|'move', shift}) is remembered so an accepted autocorrect replays the same key.
+   */
+  commitEdit(dr, dc, via) {
     const S = this.sheet;
     const asStay = this.autoSumEdit; this.autoSumEdit = false;
-    if (this.editBuf && this.editBuf[0] === '=') {
-      const opens = (this.editBuf.match(/\(/g) || []).length, closes = (this.editBuf.match(/\)/g) || []).length;
-      if (opens > closes) this.editBuf += ')'.repeat(opens - closes);
-    }
     const buf = this.editBuf.trim();
-    const { r, c } = S.active;
+    const { r, c } = this.editCell();
     const cls = Sheet.classifyInput(buf, S.get(r, c));
-    if (cls.kind === 'fix') { this.fxfixPend = { fixed: cls.fixed, dr, dc, all: false }; this.dialog = 'fxfix'; return false; }
+    if (cls.kind === 'fix') { this.fxfixPend = { fixed: cls.fixed, dr, dc, all: false, via: via || null }; this.dialog = 'fxfix'; return false; }
     if (cls.kind === 'bad') { this.refuse(); return false; }
-    this.editing = false; this.editBuf = ''; this.editAnchor = null; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null;
+    this.editing = false; this.editBuf = ''; this.editAnchor = null; this.endPoint();
     if (cls.kind !== 'empty') { S.pushUndo(); S.applyInput(S.ensure(r, c), cls, r, c); }
+    else if (S.nonEmpty(r, c)) { S.pushUndo(); Session.clearCell(S.ensure(r, c)); }
     this.editPointed = false;
-    if ((dr || dc) && !asStay) { S.active = S.clamp(S.active.r + dr, S.active.c + dc); S.sel = null; S.selA = null; }
+    if ((dr || dc) && !asStay) { S.active = S.clamp(r + dr, c + dc); S.sel = null; S.selA = null; }
     S.commit('edit');
     return true;
   }
+  /** Ctrl+Enter: the buffer into every selected cell (formulas translate from the edited cell); the cursor stays. */
   commitEditAll() {
     const S = this.sheet;
-    if (this.editBuf && this.editBuf[0] === '=') {
-      const opens = (this.editBuf.match(/\(/g) || []).length, closes = (this.editBuf.match(/\)/g) || []).length;
-      if (opens > closes) this.editBuf += ')'.repeat(opens - closes);
-    }
     const buf = this.editBuf.trim();
-    const ar = S.active.r, ac = S.active.c;
+    const { r: ar, c: ac } = this.editCell();
     const cls = Sheet.classifyInput(buf, S.get(ar, ac));
-    if (cls.kind === 'fix') { this.fxfixPend = { fixed: cls.fixed, dr: 0, dc: 0, all: true }; this.dialog = 'fxfix'; return false; }
+    if (cls.kind === 'fix') { this.fxfixPend = { fixed: cls.fixed, dr: 0, dc: 0, all: true, via: null }; this.dialog = 'fxfix'; return false; }
     if (cls.kind === 'bad') { this.refuse(); return false; }
-    this.editing = false; this.editBuf = ''; this.editAnchor = null; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null;
+    this.editing = false; this.editBuf = ''; this.editAnchor = null; this.endPoint();
     if (cls.kind !== 'empty') {
       S.pushUndo();
       S.eachSel((cell, rr, cc) => {
         if (cls.kind === 'formula') { const f = (rr !== ar || cc !== ac) ? translateFormula(cls.formula, rr - ar, cc - ac) : cls.formula; S.applyInput(cell, { kind: 'formula', formula: f }, rr, cc); }
         else S.applyInput(cell, cls, rr, cc);
       });
+    } else {
+      const rg = S.selRange(); const filled = [];
+      for (let rr = rg.r1; rr <= rg.r2; rr++) for (let cc = rg.c1; cc <= rg.c2; cc++) if (S.nonEmpty(rr, cc)) filled.push([rr, cc]);
+      if (filled.length) { S.pushUndo(); for (const [rr, cc] of filled) Session.clearCell(S.ensure(rr, cc)); }
     }
     this.editPointed = false; this.autoSumEdit = false;
     S.commit('edit');
     return true;
   }
+  /** Enter / Shift+Enter while editing: commit and step ↓ / ↑; a bare Enter that closes a Tab run returns home. */
+  commitEnter(shift) {
+    const S = this.sheet;
+    if (!shift && S.tabHome && S.tabHome.ar === S.active.r && S.tabHome.ac === S.active.c) {
+      const th = S.tabHome;
+      if (this.commitEdit(0, 0, { kind: 'enter', shift: false })) { S.tabHome = th; this.tabEnterHome(); S.emit('select'); }
+      return;
+    }
+    this.commitEdit(shift ? -1 : 1, 0, { kind: 'enter', shift: !!shift });
+  }
+  /** Tab / Shift+Tab while editing: commit, step → / ←, and arm (or extend) the Tab-run latch. */
+  commitTab(shift) {
+    const S = this.sheet;
+    const prev = this.editCell(), was = S.tabHome;
+    if (this.commitEdit(0, shift ? -1 : 1, { kind: 'tab', shift: !!shift })) this.tabArm(prev, shift, was);
+  }
   refuse() { this.logKey('⚠'); this.toast('There’s a problem with this formula — fix it or press Esc to discard'); if (this.opts.onRefuse) this.opts.onRefuse(); }
 
   /* ---------------- point mode ---------------- */
-  startPointerFromArrow(dr, dc) {
-    const S = this.sheet;
-    const r = Math.min(S.rows, Math.max(1, this.editAnchor.r + dr)), c = Math.min(S.cols, Math.max(1, this.editAnchor.c + dc));
-    if (r === this.editAnchor.r && c === this.editAnchor.c) return false;
-    this.editPointerStart = this.editBuf.length; this.editPointer = { r, c }; this.editPointerBase = null;
-    this.editBuf += refKey(r, c); this.editCaret = this.editBuf.length; this.editPointed = true;
+  /** Where a pointer step lands: one cell (clamped), or with Ctrl the block edge Sheet.ctrlJump finds. */
+  pointTarget(from, dr, dc, ctrl) { const S = this.sheet; return ctrl ? S.ctrlJump(from.r, from.c, dr, dc) : S.clamp(from.r + dr, from.c + dc); }
+  startPointerFromArrow(dr, dc, ctrl) {
+    const t = this.pointTarget(this.editAnchor, dr, dc, ctrl);
+    if (t.r === this.editAnchor.r && t.c === this.editAnchor.c) return false;
+    this.editPointerStart = this.editBuf.length; this.editPointer = { r: t.r, c: t.c }; this.editPointerBase = null;
+    this.editBuf += refKey(t.r, t.c); this.editCaret = this.editBuf.length; this.editPointed = true;
     return true;
   }
-  pointArrow(dr, dc) {
-    const m = /(\$?[A-Za-z]{1,3}\$?\d+)$/.exec(this.editBuf);
+  /** An arrow with no live pointer: re-point a bare trailing in-sheet ref, else append anchor+step (=LOG10 ↓ → =LOG10C6, never =J11). */
+  pointArrow(dr, dc, ctrl) {
+    const S = this.sheet;
+    const m = refTail(this.editBuf);
     if (m && !OPERATOR_BOUNDARY.test(this.editBuf)) {
-      const pr = parseRef(m[1]);
-      if (pr) { this.editPointerStart = this.editBuf.length - m[1].length; this.editPointer = { r: pr.r, c: pr.c }; this.editPointerBase = null; return this.movePointer(dr, dc, false); }
+      const pr = parseRef(m.ref);
+      if (pr && S.inb(pr.r, pr.c)) { this.editPointerStart = m.start; this.editPointer = { r: pr.r, c: pr.c }; this.editPointerBase = null; return this.movePointer(dr, dc, false, ctrl); }
     }
-    return this.startPointerFromArrow(dr, dc);
+    return this.startPointerFromArrow(dr, dc, ctrl);
   }
   writePointerRef() {
     const p = this.editPointer, b = this.editPointerBase;
     this.editBuf = this.editBuf.slice(0, this.editPointerStart) + (b ? refKey(b.r, b.c) + ':' + refKey(p.r, p.c) : refKey(p.r, p.c));
     this.editCaret = this.editBuf.length;
   }
-  movePointer(dr, dc, extend) {
-    const S = this.sheet;
+  movePointer(dr, dc, extend, ctrl) {
     if (extend && !this.editPointerBase) this.editPointerBase = { r: this.editPointer.r, c: this.editPointer.c };
     if (!extend) this.editPointerBase = null;
-    const r = Math.min(S.rows, Math.max(1, this.editPointer.r + dr)), c = Math.min(S.cols, Math.max(1, this.editPointer.c + dc));
-    if (r === this.editPointer.r && c === this.editPointer.c) return false;
-    this.editPointer = { r, c }; this.writePointerRef(); this.editPointed = true;
+    const t = this.pointTarget(this.editPointer, dr, dc, ctrl);
+    if (t.r === this.editPointer.r && t.c === this.editPointer.c) return false;
+    this.editPointer = { r: t.r, c: t.c }; this.writePointerRef(); this.editPointed = true;
     return true;
   }
   /** F4: cycle B2 → $B$2 → B$2 → $B2 → B2 on the live pointer, else on the ref behind the caret. */
@@ -233,10 +292,14 @@ export class Session {
     const cyc = (ac, ar) => { const states = [['', ''], ['$', '$'], ['', '$'], ['$', '']]; const i = states.findIndex(s => s[0] === ac && s[1] === ar); return states[(i + 1) % 4]; };
     const RX1 = /(\$?)([A-Za-z]{1,3})(\$?)(\d+)$/, RXR = /(\$?)([A-Za-z]{1,3})(\$?)(\d+):(\$?)([A-Za-z]{1,3})(\$?)(\d+)$/;
     if (!this.editPointer || this.editPointerStart < 0) {
+      const S = this.sheet;
       const head = this.editBuf.slice(0, this.editCaret);
+      // only a whole token that names a cell of this sheet: not the tail of DAYS360, not LOG10 (column LOG)
+      const bounded = m => { const start = this.editCaret - m[0].length; return !(start > 0 && IDENT_CHAR.test(head[start - 1])); };
+      const inSheet = (col, row) => { const p = parseRef(col + row); return !!p && S.inb(p.r, p.c); };
       const mr = RXR.exec(head);
-      if (mr) { const nx = cyc(mr[1], mr[3]); const rep = nx[0] + mr[2] + nx[1] + mr[4] + ':' + nx[0] + mr[6] + nx[1] + mr[8]; const start = this.editCaret - mr[0].length; this.editBuf = this.editBuf.slice(0, start) + rep + this.editBuf.slice(this.editCaret); this.editCaret = start + rep.length; return true; }
-      const m = RX1.exec(head); if (!m) return false;
+      if (mr && bounded(mr) && inSheet(mr[2], mr[4]) && inSheet(mr[6], mr[8])) { const nx = cyc(mr[1], mr[3]); const rep = nx[0] + mr[2] + nx[1] + mr[4] + ':' + nx[0] + mr[6] + nx[1] + mr[8]; const start = this.editCaret - mr[0].length; this.editBuf = this.editBuf.slice(0, start) + rep + this.editBuf.slice(this.editCaret); this.editCaret = start + rep.length; return true; }
+      const m = RX1.exec(head); if (!m || !bounded(m) || !inSheet(m[2], m[4])) return false;
       const nx = cyc(m[1], m[3]); const rep = nx[0] + m[2] + nx[1] + m[4]; const start = this.editCaret - m[0].length;
       this.editBuf = this.editBuf.slice(0, start) + rep + this.editBuf.slice(this.editCaret); this.editCaret = start + rep.length; return true;
     }
@@ -339,8 +402,11 @@ export class Session {
       if (key === 'ENTER') {
         const p = this.fxfixPend; this.fxfixPend = null; this.dialog = null;
         if (!p || !this.editing) return;
-        this.editBuf = p.fixed; this.editCaret = this.editBuf.length; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null;
-        if (p.all) this.commitEditAll(); else this.commitEdit(p.dr, p.dc);
+        this.editBuf = p.fixed; this.editCaret = this.editBuf.length; this.endPoint();
+        if (p.all) this.commitEditAll();
+        else if (p.via && p.via.kind === 'enter') this.commitEnter(p.via.shift);   // keeps the Tab-run home rule
+        else if (p.via && p.via.kind === 'tab') this.commitTab(p.via.shift);       // keeps the latch armed
+        else this.commitEdit(p.dr, p.dc);
       }
       return;
     }
@@ -445,14 +511,14 @@ export class Session {
     }
   }
   jumpPrecedent() {
-    const S = this.sheet; const c = S.get(S.active.r, S.active.c); if (!c.formula) return;
+    const S = this.sheet; const a = S.dispActive(); const c = S.get(a.r, a.c); if (!c.formula) return;
     const refs = formulaRefs(c.formula); if (!refs.length) return;
     const first = refs[0]; const p = first.key ? parseRef(first.key) : { r: first.range.r1, c: first.range.c1 };
     if (!S.inb(p.r, p.c)) return;
     S.goTo(p.r, p.c);
   }
   jumpDependent() {
-    const S = this.sheet; const { r, c } = S.active;
+    const S = this.sheet; const { r, c } = S.dispActive();
     const keys = Object.keys(S.cells).map(k => ({ k, p: parseRef(k) })).filter(x => x.p).sort((a, b) => (a.p.r - b.p.r) || (a.p.c - b.p.c));
     for (const { k, p } of keys) {
       const cell = S.cells[k]; if (!cell || !cell.formula) continue;
@@ -484,15 +550,13 @@ export class Session {
     if ((k === '=' || k === '+') && !e.ctrlKey && !e.altKey) { this.startEdit(k === '+' ? '=+' : '='); this.logKey(k); return true; }
     if (k === 'F2' && !e.shiftKey) {
       this.startClock(); this.logKey('F2'); this.editRetarget();
-      const c = S.get(S.active.r, S.active.c);
+      const a = S.dispActive(); const c = S.get(a.r, a.c);
       const initial = c.formula || (c.value != null && c.value !== '' ? (typeof c.value === 'boolean' ? (c.value ? 'TRUE' : 'FALSE') : String(c.value)) : '');
       this.startEdit(initial, 'edit'); return true;
     }
     if (k === 'Delete' && !e.ctrlKey && !e.altKey) { this.startClock(); this.logKey('Delete'); S.deleteContents(); return true; }
-    if (k === 'Backspace' && !e.ctrlKey && !e.altKey) {
-      this.startClock(); this.logKey('⌫'); S.pushUndo();
-      const bc = S.ensure(S.active.r, S.active.c); bc.value = null; bc.formula = null; bc.txt = false; S.commit('edit');
-      this.startEdit('', 'enter'); return true;
+    if (k === 'Backspace' && !e.ctrlKey && !e.altKey) {   // opens the cell empty; nothing is written until ↵ (Esc restores)
+      this.startClock(); this.logKey('⌫'); this.startEdit('', 'enter'); return true;
     }
     if (k === 'Escape' && !e.ctrlKey && !e.altKey) {
       if (S.clipboard) { S.clearClipboard(); this.logKey('Esc'); }
@@ -528,7 +592,7 @@ export class Session {
     if (k === 'End' && !e.altKey) { this.startClock(); this.logKey((e.ctrlKey ? 'Ctrl+' : '') + (e.shiftKey ? 'Shift+' : '') + 'End'); S.moveEnd(e.ctrlKey, e.shiftKey); return true; }
     if (k === ' ' && e.shiftKey && !e.ctrlKey) { this.startClock(); this.logKey('Shift+Space'); S.selectRow(); return true; }
     if (k === ' ' && e.ctrlKey && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+Space'); S.selectCol(); return true; }
-    if ((k === ' ' && e.ctrlKey && e.shiftKey) || (e.ctrlKey && e.shiftKey && (k === '8' || k === '*'))) {
+    if ((k === ' ' && e.ctrlKey && e.shiftKey) || (e.ctrlKey && !e.altKey && (k === '*' || (k === '8' && e.shiftKey)))) {   // keypad * carries no Shift
       this.startClock(); this.logKey(k === ' ' ? 'Ctrl+Shift+Space' : 'Ctrl+Shift+8');
       const a = S.dispActive(); const rg = S.regionAround(a.r, a.c); S.sel = { r: rg.r1, c: rg.c1 }; S.active = { r: rg.r2, c: rg.c2 }; S.selA = { r: a.r, c: a.c }; S.emit('select'); return true;
     }
@@ -552,13 +616,13 @@ export class Session {
       if (k === '!') { this.startClock(); this.logKey('Ctrl+Shift+!'); S.setNumberFormat('comma', 2); return true; }
       if (k === '~') { this.startClock(); this.logKey('Ctrl+Shift+~'); S.setNumberFormat('general', 0); return true; }
       if (k === '1' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+1'); this.openDialog('fmt'); return true; }
-      if (k === ';' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+;'); S.dateStamp(S.active.r, S.active.c); return true; }
+      if (k === ';' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+;'); const da = S.dispActive(); S.dateStamp(da.r, da.c); return true; }
       if (k === '[') { this.startClock(); this.logKey('Ctrl+['); this.jumpPrecedent(); return true; }
       if (k === ']') { this.startClock(); this.logKey('Ctrl+]'); this.jumpDependent(); return true; }
       if (lk === 'g' || k === 'F5') return true;
       return true;   // unknown chords are swallowed, never typed
     }
-    if (e.ctrlKey && e.altKey && k.toLowerCase() === 'v') { this.startClock(); this.logKey('Ctrl+Alt+V'); this.openDialog('paste', ['E', 'S']); this.pasteKind = 'all'; this.pasteOp = 'none'; return true; }
+    if (e.ctrlKey && e.altKey && k.toLowerCase() === 'v') { this.startClock(); this.logKey('Ctrl+Alt+V'); this.openDialog('paste'); this.pasteKind = 'all'; this.pasteOp = 'none'; return true; }
     return false;
   }
 
@@ -569,50 +633,42 @@ export class Session {
       if (k === 'Escape') { this.dialog = null; this.fxfixPend = null; return true; }
       return true;
     }
-    if (k === 'F2') { this.editMode = this.editMode === 'edit' ? 'enter' : 'edit'; this.logKey('F2'); return true; }
+    if (k === 'F2') { this.editMode = this.editMode === 'edit' ? 'enter' : 'edit'; this.endPoint(); this.logKey('F2'); return true; }   // F2 ends point mode: the ref becomes plain text
+    // Home / End move the insertion point in either mode; Delete is a forward-delete (a no-op at the end) — never a cell wipe
+    if (k === 'Home') { this.endPoint(); this.editCaret = this.editBuf[0] === '=' ? 1 : 0; return true; }
+    if (k === 'End') { this.endPoint(); this.editCaret = this.editBuf.length; return true; }
+    if (k === 'Delete') { if (this.editCaret < this.editBuf.length) { this.editBuf = this.editBuf.slice(0, this.editCaret) + this.editBuf.slice(this.editCaret + 1); this.logKey('Delete'); } return true; }
     if (this.editMode === 'edit') {
       if (k === 'ArrowLeft') { this.editCaret = Math.max(0, this.editCaret - 1); return true; }
       if (k === 'ArrowRight') { this.editCaret = Math.min(this.editBuf.length, this.editCaret + 1); return true; }
-      if (k === 'ArrowUp' || k === 'Home') { this.editCaret = this.editBuf[0] === '=' ? 1 : 0; return true; }
-      if (k === 'ArrowDown' || k === 'End') { this.editCaret = this.editBuf.length; return true; }
-      if (k === 'Delete') { if (this.editCaret < this.editBuf.length) { this.editBuf = this.editBuf.slice(0, this.editCaret) + this.editBuf.slice(this.editCaret + 1); this.logKey('Delete'); } return true; }
+      if (k === 'ArrowUp') { this.editCaret = this.editBuf[0] === '=' ? 1 : 0; return true; }
+      if (k === 'ArrowDown') { this.editCaret = this.editBuf.length; return true; }
     }
+    if (k === 'Enter' && e.altKey) return true;   // Excel's in-cell line break — never a commit (no multi-line cells here, so swallowed)
     if (k === 'Enter') {
-      if (e.ctrlKey && S.sel) { this.logKey('Ctrl+↵'); this.commitEditAll(); return true; }
-      if (!e.shiftKey && S.tabHome && S.tabHome.ar === S.active.r && S.tabHome.ac === S.active.c) {
-        const th = S.tabHome; if (this.commitEdit(0, 0)) { S.tabHome = th; this.tabEnterHome(); S.emit('select'); }
-        return true;
-      }
-      this.commitEdit(e.shiftKey ? -1 : 1, 0); return true;
+      if (e.ctrlKey) { this.logKey('Ctrl+↵'); this.commitEditAll(); return true; }   // one cell or a range: commits in place
+      this.logKey(e.shiftKey ? 'Shift+↵' : '↵'); this.commitEnter(e.shiftKey); return true;
     }
-    if (k === 'Tab') {
-      const prev = { r: S.active.r, c: S.active.c }, was = S.tabHome;
-      if (this.commitEdit(0, e.shiftKey ? -1 : 1)) this.tabArm(prev, e.shiftKey, was);
-      return true;
-    }
+    if (k === 'Tab') { this.logKey(e.shiftKey ? 'Shift+Tab' : 'Tab'); this.commitTab(e.shiftKey); return true; }
     if (k === 'Escape') { this.cancelEdit(); return true; }
-    if (k === 'Delete') {
-      this.editing = false; this.editBuf = ''; this.editAnchor = null; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null;
-      this.logKey('Delete'); S.pushUndo(); const c = S.ensure(S.active.r, S.active.c); c.value = null; c.formula = null; S.commit('edit'); return true;
-    }
     if (k === 'F4') { if (this.cycleAnchor()) this.logKey('F4'); return true; }
     if (k === 'F9') {
       if (this.editBuf[0] === '=' || this.editBuf[0] === '+') {
-        try { const v = evalFormula(this.editBuf[0] === '+' ? '=' + this.editBuf.slice(1) : this.editBuf, S.evalCtx({ cell: { ...S.active } }));
-          if (v !== undefined && v !== null) { this.editBuf = typeof v === 'boolean' ? (v ? 'TRUE' : 'FALSE') : String(v); this.editCaret = this.editBuf.length; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null; this.logKey('F9'); } } catch (err) { /* keep buffer */ }
+        try { const v = evalFormula(this.editBuf[0] === '+' ? '=' + this.editBuf.slice(1) : this.editBuf, S.evalCtx({ cell: this.editCell() }));
+          if (v !== undefined && v !== null) { this.editBuf = typeof v === 'boolean' ? (v ? 'TRUE' : 'FALSE') : String(v); this.editCaret = this.editBuf.length; this.endPoint(); this.logKey('F9'); } } catch (err) { /* keep buffer */ }
       }
       return true;
     }
     if (k === 'Backspace') {
-      if (this.editPointer) { this.editBuf = this.editBuf.slice(0, this.editPointerStart); this.editCaret = this.editBuf.length; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null; }
+      if (this.editPointer) { this.editBuf = this.editBuf.slice(0, this.editPointerStart); this.editCaret = this.editBuf.length; this.endPoint(); }
       else if (this.editCaret > 0) { this.editBuf = this.editBuf.slice(0, this.editCaret - 1) + this.editBuf.slice(this.editCaret); this.editCaret--; }
       this.logKey('⌫'); return true;
     }
     if (ARROWS[k]) {
-      const [dr, dc] = ARROWS[k];
-      if (this.editPointer) { if (this.movePointer(dr, dc, e.shiftKey)) this.logKey((e.shiftKey ? '⇧+' : '') + ARROWSYM[k]); return true; }
-      if (this.editAnchor && this.editBuf[0] === '=') { if (this.pointArrow(dr, dc)) this.logKey(ARROWSYM[k]); return true; }
-      S.tabHome = null; this.commitEdit(dr, dc); return true;
+      const [dr, dc] = ARROWS[k]; const ctrl = e.ctrlKey ? 'Ctrl+' : '';
+      if (this.editPointer) { if (this.movePointer(dr, dc, e.shiftKey, e.ctrlKey)) this.logKey(ctrl + (e.shiftKey ? '⇧+' : '') + ARROWSYM[k]); return true; }
+      if (this.editAnchor && this.editBuf[0] === '=') { if (this.pointArrow(dr, dc, e.ctrlKey)) this.logKey(ctrl + ARROWSYM[k]); return true; }
+      S.tabHome = null; this.commitEdit(dr, dc, { kind: 'move' }); return true;
     }
     if (k.length === 1 && !e.ctrlKey && !e.altKey) {
       this.editPointer = null; this.editPointerStart = -1;

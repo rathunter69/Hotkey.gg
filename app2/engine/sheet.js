@@ -13,7 +13,7 @@
 //   fmtStyle 'general'|'comma'|'currency'|'acct'|'percent'|'mult'|'date'   decimals  scale 0|3|6
 //   bt bb bl br ball thick bdbl  (borders)   fsz (font px | null)   ca (center-across span)  cmt
 
-import { colLetter, refKey, parseRef, parseRange, rectRefs } from './refs.js';
+import { colLetter, colIndex, refKey, parseRef, parseRange, rectRefs } from './refs.js';
 import { evalFormula, translateFormula, autocorrectFormula, adjustFormulaStructure, isErrVal, formulaRefs } from './formula.js';
 import { fmtNum, dispText } from './format.js';
 
@@ -40,6 +40,8 @@ export function blankCell() {
 /** The format fields copy/fill/paste-formats carry (everything but value/formula). */
 export const FMT_FIELDS = ['bold', 'it', 'strike', 'fill', 'wrap', 'fmtStyle', 'decimals', 'bt', 'bb', 'bl', 'br', 'ball',
   'align', 'fontColor', 'uline', 'indent', 'scale', 'thick', 'fsz', 'bdbl', 'cmt', 'txt', 'ca'];
+/** What an inserted row/column inherits from its neighbour: formats (alignment incl. center-across, borders), never a comment or the typed-as-text flag. */
+export const INHERIT_FIELDS = FMT_FIELDS.filter(f => f !== 'cmt' && f !== 'txt');
 
 export const FONT_SWATCHES = [
   { k: 'black', hex: '#000000', name: 'Black' }, { k: 'darkgray', hex: '#404040', name: 'Dark gray' },
@@ -104,7 +106,7 @@ export class Sheet {
     this.lastFlash = null;   // {r1,c1,r2,c2} pasted footprint for the UI's one-shot flash
     if (opts.cells) for (const k in opts.cells) this.setCell(k, opts.cells[k]);
     if (opts.colW) for (const c in opts.colW) { this.colW[c] = opts.colW[c]; this.colSet[c] = true; }
-    if (opts.active) this.active = { r: opts.active.r, c: opts.active.c };
+    if (opts.active) this.active = this.clamp(opts.active.r, opts.active.c);
     this.recalc();
   }
 
@@ -164,12 +166,17 @@ export class Sheet {
     return this.clamp(a.r, a.c);
   }
   eachSel(fn) { const r = this.selRange(); for (let rr = r.r1; rr <= r.r2; rr++) for (let cc = r.c1; cc <= r.c2; cc++) fn(this.ensure(rr, cc), rr, cc); }
-  /** Set the selection to a rectangle 'A1:B3' (or a single ref); active = top-left. */
+  /**
+   * Set the selection to a rectangle 'A1:B3' (or a single ref); active = top-left. Both corners are
+   * clamped to the grid (a range that collapses to one cell becomes a single-cell selection), so
+   * eachSel never materialises cells outside rows × cols.
+   */
   select(rangeText) {
     const rg = parseRange(rangeText); if (!rg) return false;
-    if (rg.r1 === rg.r2 && rg.c1 === rg.c2) { this.active = this.clamp(rg.r1, rg.c1); this.sel = null; this.selA = null; }
-    else { this.sel = { r: rg.r1, c: rg.c1 }; this.active = { r: rg.r2, c: rg.c2 }; this.selA = null; }
-    this.tabHome = null; this.emit('select'); return true;
+    const a = this.clamp(rg.r1, rg.c1), b = this.clamp(rg.r2, rg.c2);
+    if (a.r === b.r && a.c === b.c) { this.active = a; this.sel = null; }
+    else { this.sel = a; this.active = b; }
+    this.selA = null; this.tabHome = null; this.emit('select'); return true;
   }
   goTo(r, c) { this.active = this.clamp(r, c); this.sel = null; this.selA = null; this.tabHome = null; this.emit('select'); }
   selectionText() { const r = this.selRange(); const a = refKey(r.r1, r.c1), b = refKey(r.r2, r.c2); return a === b ? a : a + ':' + b; }
@@ -258,15 +265,18 @@ export class Sheet {
 
   /* ---------------- undo ---------------- */
   snapshot() { return { cells: clone(this.cells), colW: this.colW.slice(), colSet: this.colSet.slice(), rows: this.rows, active: { ...this.active }, sel: this.sel && { ...this.sel } }; }
+  /** Rewind cells AND the whole selection to one moment, so undo/redo re-select the range the operation touched (Excel). */
   restore(s) {
     this.cells = clone(s.cells); this.colW = s.colW.slice(); this.colSet = s.colSet.slice(); this.rows = s.rows;
     if (s.active) this.active = this.clamp(s.active.r, s.active.c);
-    if (this.sel) this.sel = this.clamp(this.sel.r, this.sel.c);
-    if (this.selA && this.selA.r >= 1) this.selA = this.clamp(this.selA.r, this.selA.c);
+    this.sel = s.sel ? this.clamp(s.sel.r, s.sel.c) : null;
+    if (this.sel && this.sel.r === this.active.r && this.sel.c === this.active.c) this.sel = null;
+    this.selA = null; this.tabHome = null;
   }
   pushUndo() { this.undoStack.push(this.snapshot()); if (this.undoStack.length > 60) this.undoStack.shift(); this.redoStack = []; }
-  undo() { if (!this.undoStack.length) return false; this.redoStack.push(this.snapshot()); this.restore(this.undoStack.pop()); this.commit('undo'); return true; }
-  redo() { if (!this.redoStack.length) return false; this.undoStack.push(this.snapshot()); this.restore(this.redoStack.pop()); this.commit('redo'); return true; }
+  /** The frame pushed to the opposite stack keeps the current cells but the undone frame's selection, so redo lands on the same range. */
+  undo() { if (!this.undoStack.length) return false; const prev = this.undoStack.pop(); const cur = this.snapshot(); cur.active = { ...prev.active }; cur.sel = prev.sel && { ...prev.sel }; this.redoStack.push(cur); this.restore(prev); this.commit('undo'); return true; }
+  redo() { if (!this.redoStack.length) return false; const next = this.redoStack.pop(); const cur = this.snapshot(); cur.active = { ...next.active }; cur.sel = next.sel && { ...next.sel }; this.undoStack.push(cur); this.restore(next); this.commit('redo'); return true; }
 
   /* ---------------- recalc ---------------- */
   /**
@@ -278,45 +288,63 @@ export class Sheet {
   recalc() {
     const keys = []; for (const k in this.cells) if (this.cells[k] && this.cells[k].formula) keys.push(k);
     if (!keys.length) return;
-    const ctx = this.evalCtx();
+    const fset = new Set(keys);
+    // Every formula-cell key a formula actually dereferences while evaluating is recorded, so a
+    // dependency that only exists through OFFSET/INDEX/INDIRECT-built ranges still joins the graph.
+    const reads = {}; let cur = null;
+    const ctx = this.evalCtx({ raw: kk => { if (cur && fset.has(kk)) reads[cur].add(kk); return this.raw(kk); } });
     const evalOne = k => {
       const c = this.cells[k];
       const p = parseRef(k);
+      cur = k; reads[k] = new Set();
       try { return evalFormula(c.formula, { ...ctx, cell: p ? { r: p.r, c: p.c } : undefined }); }
       catch (e) { return '#NAME?'; }   // a stored formula that no longer parses reads as an error
+      finally { cur = null; }
     };
-    // static precedents (formula cells only)
-    const fset = new Set(keys);
+    // static precedents (formula cells only), ranges clipped to the grid
     const deps = {};
     for (const k of keys) {
       const d = new Set();
       for (const ref of formulaRefs(this.cells[k].formula)) {
         if (ref.key) { if (fset.has(ref.key)) d.add(ref.key); }
-        else { const rg = ref.range; for (let r = rg.r1; r <= Math.min(rg.r2, this.rows); r++) for (let c = rg.c1; c <= Math.min(rg.c2, this.cols); c++) { const kk = refKey(r, c); if (fset.has(kk)) d.add(kk); } }
+        else { const rg = ref.range; for (let r = Math.max(1, rg.r1); r <= Math.min(rg.r2, this.rows); r++) for (let c = Math.max(1, rg.c1); c <= Math.min(rg.c2, this.cols); c++) { const kk = refKey(r, c); if (fset.has(kk)) d.add(kk); } }
       }
       deps[k] = d;
     }
-    // Tarjan-style cycle detection via iterative DFS colouring
-    const state = {}; const cyclic = new Set(); const order = [];
-    const visit = start => {
-      const stack = [[start, [...deps[start]]]]; state[start] = 1;
-      while (stack.length) {
-        const top = stack[stack.length - 1]; const [k, rest] = top;
-        if (!rest.length) { state[k] = 2; order.push(k); stack.pop(); continue; }
-        const n = rest.pop();
-        if (state[n] === 1) { cyclic.add(n); for (const [sk] of stack) { cyclic.add(sk); if (sk === n) break; } continue; }
-        if (!state[n]) { state[n] = 1; stack.push([n, [...deps[n]]]); }
-      }
+    // cycle detection via iterative DFS colouring: a back edge to n marks the frames from the top
+    // of the stack down to n (exactly the loop's members) — never the ancestors below it
+    const detect = () => {
+      const state = {}; const cyclic = new Set(); const order = [];
+      const visit = start => {
+        const stack = [[start, [...deps[start]]]]; state[start] = 1;
+        while (stack.length) {
+          const top = stack[stack.length - 1]; const [k, rest] = top;
+          if (!rest.length) { state[k] = 2; order.push(k); stack.pop(); continue; }
+          const n = rest.pop();
+          if (state[n] === 1) { for (let i = stack.length - 1; i >= 0; i--) { cyclic.add(stack[i][0]); if (stack[i][0] === n) break; } continue; }
+          if (!state[n]) { state[n] = 1; stack.push([n, [...deps[n]]]); }
+        }
+      };
+      for (const k of keys) if (!state[k]) visit(k);
+      return { cyclic, order };
     };
-    for (const k of keys) if (!state[k]) visit(k);
+    // fold the reads of the last evaluation into deps; true when the graph gained an edge
+    const merge = () => { let added = false; for (const k of keys) { if (!reads[k]) continue; for (const d of reads[k]) if (!deps[k].has(d)) { deps[k].add(d); added = true; } } return added; };
+    let { cyclic, order } = detect();
     // a cell that depends on a cyclic cell inherits nothing special — it just reads the 0
-    for (const k of order) { const c = this.cells[k]; c.value = cyclic.has(k) ? 0 : evalOne(k); }
-    // settle dynamic references (OFFSET etc.) with a short fixed-point pass
+    const evalAll = () => { for (const k of order) { const c = this.cells[k]; c.value = cyclic.has(k) ? 0 : evalOne(k); } };
+    evalAll();
+    if (merge()) { ({ cyclic, order } = detect()); evalAll(); }
+    // settle dynamic references (OFFSET etc.) with a short fixed-point pass; a loop that only
+    // forms once values move is caught by the read log, and anything still moving at the cap is
+    // treated as circular rather than left at an arbitrary iterate
     const CAP = Math.min(50, keys.length + 2);
     for (let pass = 0; pass < CAP; pass++) {
-      let changed = false;
-      for (const k of order) { if (cyclic.has(k)) continue; const c = this.cells[k]; const v = evalOne(k); if (v !== c.value) { c.value = v; changed = true; } }
-      if (!changed) break;
+      const moved = [];
+      for (const k of order) { if (cyclic.has(k)) continue; const c = this.cells[k]; const v = evalOne(k); if (v !== c.value) { c.value = v; moved.push(k); } }
+      if (!moved.length) break;
+      if (merge()) { ({ cyclic, order } = detect()); for (const k of cyclic) this.cells[k].value = 0; continue; }
+      if (pass === CAP - 1) for (const k of moved) { cyclic.add(k); this.cells[k].value = 0; }
     }
   }
 
@@ -337,12 +365,14 @@ export class Sheet {
       return { kind: 'formula', formula: ac.buf };
     }
     const fmt = (cell && cell.fmtStyle) || 'general';
-    if (/^[-+]?\d*\.?\d+$/.test(buf)) { const n = parseFloat(buf); return { kind: 'value', value: fmt === 'percent' ? n / 100 : n }; }
-    if (/^[-+]?[\d,]+\.?\d*$/.test(buf) && /,/.test(buf) && /^[-+]?\d{1,3}(,\d{3})+(\.\d*)?$/.test(buf)) return { kind: 'value', value: parseFloat(buf.replace(/,/g, '')), fmtStyle: fmt === 'general' ? 'comma' : undefined, decimals: fmt === 'general' ? 0 : undefined };
-    if (/^[-+]?\d*\.?\d+%$/.test(buf)) return { kind: 'value', value: parseFloat(buf) / 100, fmtStyle: 'percent', decimals: /\./.test(buf) ? 1 : 0 };
-    if (/^\$-?[\d,]*\.?\d+$/.test(buf)) return { kind: 'value', value: parseFloat(buf.replace(/[$,]/g, '')), fmtStyle: 'currency', decimals: /\./.test(buf) ? 2 : 0 };
-    if (/^\([\d,]+\.?\d*\)$/.test(buf)) return { kind: 'value', value: -parseFloat(buf.replace(/[(),]/g, '')) };
-    if (/^\d+(\.\d+)?[eE][-+]?\d+$/.test(buf)) return { kind: 'value', value: parseFloat(buf) };
+    const pctIn = n => fmt === 'percent' ? n / 100 : n;                                   // automatic percent entry: a bare number into a percent cell is scaled
+    const typedDec = b => Math.min(6, (b.split('.')[1] || '').replace(/\D/g, '').length);   // Excel keeps the typed precision (1,234.56 → 2 places)
+    // number grammar mirrors the formula tokenizer: '1.', '.5', '.5e2', '1.e2' are numbers; '.', '+', '-' are not
+    if (/^[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?$/.test(buf)) return { kind: 'value', value: pctIn(parseFloat(buf)) };
+    if (/^[-+]?\d{1,3}(,\d{3})+(\.\d*)?$/.test(buf)) return { kind: 'value', value: pctIn(parseFloat(buf.replace(/,/g, ''))), fmtStyle: fmt === 'general' ? 'comma' : undefined, decimals: fmt === 'general' ? typedDec(buf) : undefined };
+    if (/^[-+]?(?:\d+\.?\d*|\.\d+)%$/.test(buf)) return { kind: 'value', value: parseFloat(buf) / 100, fmtStyle: 'percent', decimals: typedDec(buf) };
+    if (/^\$-?(?:\d[\d,]*\.?\d*|\.\d+)$/.test(buf)) return { kind: 'value', value: parseFloat(buf.replace(/[$,]/g, '')), fmtStyle: 'currency', decimals: /\./.test(buf) ? 2 : 0 };
+    if (/^\((?:\d[\d,]*\.?\d*|\.\d+)\)$/.test(buf)) return { kind: 'value', value: pctIn(-parseFloat(buf.replace(/[(),]/g, ''))) };
     const up = buf.toUpperCase();
     if (up === 'TRUE' || up === 'FALSE') return { kind: 'value', value: up === 'TRUE' };
     if (isErrVal(up)) return { kind: 'value', value: up };
@@ -356,7 +386,7 @@ export class Sheet {
   commitInput(text, r, c, { pushUndo = true } = {}) {
     const cell = this.get(r, c);
     const cls = Sheet.classifyInput(text, cell);
-    if (cls.kind === 'fix' || cls.kind === 'bad') return cls;
+    if (cls.kind === 'fix' || cls.kind === 'bad' || cls.kind === 'empty') return cls;   // an empty entry changes nothing: no undo frame, redo kept
     if (pushUndo) this.pushUndo();
     const target = this.ensure(r, c);
     this.applyInput(target, cls, r, c);
@@ -378,7 +408,7 @@ export class Sheet {
   /** Ctrl+Enter: the same text into every selected cell; formulas translate relative to the anchor. */
   commitInputAll(text, ar, ac) {
     const cls = Sheet.classifyInput(text, this.get(ar, ac));
-    if (cls.kind === 'fix' || cls.kind === 'bad') return cls;
+    if (cls.kind === 'fix' || cls.kind === 'bad' || cls.kind === 'empty') return cls;
     this.pushUndo();
     this.eachSel((cell, rr, cc) => {
       if (cls.kind === 'formula') {
@@ -488,8 +518,14 @@ export class Sheet {
    */
   paste(kind = 'all', op = 'none') {
     const cb = this.clipboard; if (!cb) return false;
-    this.pushUndo();
     const sr = this.selRange(); const r0 = sr.r1, c0 = sr.c1;
+    if (!(op && op !== 'none')) {   // Excel refuses a paste whose footprint would run off the sheet (the arithmetic ops only write inside the selection)
+      let h = cb.h, w = cb.w;
+      if (kind === 'transpose') { h = cb.w; w = cb.h; }
+      else if (!cb.cut && (sr.r2 - sr.r1 + 1) % cb.h === 0 && (sr.c2 - sr.c1 + 1) % cb.w === 0) { h = sr.r2 - sr.r1 + 1; w = sr.c2 - sr.c1 + 1; }
+      if (r0 + h - 1 > this.rows || c0 + w - 1 > this.cols) return false;
+    }
+    this.pushUndo();
     if (op && op !== 'none') {
       for (let rr = sr.r1; rr <= sr.r2; rr++) for (let cc = sr.c1; cc <= sr.c2; cc++) {
         const s = cb.data[(rr - sr.r1) % cb.h][(cc - sr.c1) % cb.w];
@@ -579,21 +615,40 @@ export class Sheet {
   }
 
   /**
-   * AutoSum (Alt+=). Range form: a column/row selected THROUGH its empty total cell writes the sum
-   * committed and returns {committed:true}. Single-cell form: returns {proposal:'=SUM(A1:A3)',
-   * range} for the editor to open with the range live, or {proposal:'=SUM('} with no neighbours.
+   * AutoSum (Alt+=). Range form (any multi-cell selection) commits the sums and returns
+   * {committed:true}, as Excel does: a column/row selected THROUGH its empty last cell sums into
+   * that cell; a fully filled column, row or block sums into the cell(s) just below it (a filled
+   * row: to its right); a block whose bottom row (or right column) is empty sums into that row
+   * (column). Only columns/rows holding at least one number get a formula; the selection's data
+   * is never overwritten. Single-cell form: returns {proposal:'=SUM(A1:A3)', range} for the
+   * editor to open with the range live, or {proposal:'=SUM('} with no neighbours.
    */
   autoSum() {
-    if (this.sel) {
-      const r2 = this.selRange();
-      if (r2.c1 === r2.c2 && r2.r2 > r2.r1 && !this.nonEmpty(r2.r2, r2.c1)) {
-        let n = 0; for (let rr = r2.r1; rr < r2.r2; rr++) if (typeof this.get(rr, r2.c1).value === 'number') n++;
-        if (n) { this.pushUndo(); const cell = this.ensure(r2.r2, r2.c1); cell.formula = '=SUM(' + refKey(r2.r1, r2.c1) + ':' + refKey(r2.r2 - 1, r2.c1) + ')'; cell.txt = false; this.commit('edit'); return { committed: true }; }
+    const r2 = this.selRange();
+    if (this.sel && (r2.r2 > r2.r1 || r2.c2 > r2.c1)) {
+      const isNum = (rr, cc) => typeof this.get(rr, cc).value === 'number';
+      const blankRow = rr => { for (let cc = r2.c1; cc <= r2.c2; cc++) if (this.nonEmpty(rr, cc)) return false; return true; };
+      const blankCol = cc => { for (let rr = r2.r1; rr <= r2.r2; rr++) if (this.nonEmpty(rr, cc)) return false; return true; };
+      const targets = [];
+      const colSum = (cc, rEnd, tr) => { for (let rr = r2.r1; rr <= rEnd; rr++) if (isNum(rr, cc)) { targets.push({ r: tr, c: cc, f: '=SUM(' + refKey(r2.r1, cc) + ':' + refKey(rEnd, cc) + ')' }); return; } };
+      const rowSum = (rr, cEnd, tc) => { for (let cc = r2.c1; cc <= cEnd; cc++) if (isNum(rr, cc)) { targets.push({ r: rr, c: tc, f: '=SUM(' + refKey(rr, r2.c1) + ':' + refKey(rr, cEnd) + ')' }); return; } };
+      if (r2.r1 === r2.r2) {                  // one row
+        if (!this.nonEmpty(r2.r1, r2.c2)) rowSum(r2.r1, r2.c2 - 1, r2.c2);
+        else if (r2.c2 < this.cols) rowSum(r2.r1, r2.c2, r2.c2 + 1);
+      } else if (r2.c1 === r2.c2) {           // one column
+        if (!this.nonEmpty(r2.r2, r2.c1)) colSum(r2.c1, r2.r2 - 1, r2.r2);
+        else if (r2.r2 < this.rows) colSum(r2.c1, r2.r2, r2.r2 + 1);
+      } else {                                // a block
+        if (blankRow(r2.r2)) { for (let cc = r2.c1; cc <= r2.c2; cc++) colSum(cc, r2.r2 - 1, r2.r2); }
+        else if (blankCol(r2.c2)) { for (let rr = r2.r1; rr <= r2.r2; rr++) rowSum(rr, r2.c2 - 1, r2.c2); }
+        else if (r2.r2 < this.rows) { for (let cc = r2.c1; cc <= r2.c2; cc++) colSum(cc, r2.r2, r2.r2 + 1); }
       }
-      if (r2.r1 === r2.r2 && r2.c2 > r2.c1 && !this.nonEmpty(r2.r1, r2.c2)) {
-        let n = 0; for (let cc = r2.c1; cc < r2.c2; cc++) if (typeof this.get(r2.r1, cc).value === 'number') n++;
-        if (n) { this.pushUndo(); const cell = this.ensure(r2.r1, r2.c2); cell.formula = '=SUM(' + refKey(r2.r1, r2.c1) + ':' + refKey(r2.r1, r2.c2 - 1) + ')'; cell.txt = false; this.commit('edit'); return { committed: true }; }
+      if (targets.length) {
+        this.pushUndo();
+        for (const t of targets) { const cell = this.ensure(t.r, t.c); cell.formula = t.f; cell.txt = false; }
+        this.commit('edit');
       }
+      return { committed: true };   // nothing to sum: a no-op rather than an empty =SUM( over the selection's first cell
     }
     const { r, c } = this.dispActive();
     let a = null, b = null;
@@ -609,7 +664,7 @@ export class Sheet {
   sort(dir, keyCol) {
     const r = this.selRange(); const sortCol = keyCol || this.dispActive().c;
     if (sortCol < r.c1 || sortCol > r.c2 || r.r1 === r.r2) return false;
-    const rows = []; for (let rr = r.r1; rr <= r.r2; rr++) { const row = []; for (let cc = r.c1; cc <= r.c2; cc++) row.push(clone(this.get(rr, cc))); rows.push(row); }
+    const rows = []; for (let rr = r.r1; rr <= r.r2; rr++) { const row = []; for (let cc = r.c1; cc <= r.c2; cc++) row.push(clone(this.get(rr, cc))); row.r0 = rr; rows.push(row); }
     const off = sortCol - r.c1;
     const rank = v => typeof v === 'number' ? 0 : typeof v === 'string' ? 1 : 2;
     const cmp = (a, b) => { const va = a[off].value, vb = b[off].value; if (rank(va) !== rank(vb)) return rank(va) - rank(vb); if (typeof va === 'number') return va - vb; if (typeof va === 'string') return va.localeCompare(vb, 'en', { sensitivity: 'base' }); return (va ? 1 : 0) - (vb ? 1 : 0); };
@@ -617,7 +672,8 @@ export class Sheet {
     filled.sort(cmp); if (dir === 'desc') filled.reverse();
     const all = [...filled, ...blanks];
     this.pushUndo();
-    let i = 0; for (let rr = r.r1; rr <= r.r2; rr++) { let j = 0; for (let cc = r.c1; cc <= r.c2; cc++) { this.cells[refKey(rr, cc)] = all[i][j]; j++; } i++; }
+    // a row that moves takes its formulas with it as a moved cell would: relative refs shift by the row delta, $-anchored parts stay (Excel)
+    let i = 0; for (let rr = r.r1; rr <= r.r2; rr++) { const dr = rr - all[i].r0; let j = 0; for (let cc = r.c1; cc <= r.c2; cc++) { const cell = all[i][j]; if (cell.formula && dr) cell.formula = translateFormula(cell.formula, dr, 0); this.cells[refKey(rr, cc)] = cell; j++; } i++; }
     this.commit('edit'); return true;
   }
   /** True when data sits directly beside a single-column selection (Excel's sort-warning case). */
@@ -628,44 +684,84 @@ export class Sheet {
   }
 
   /* ---------------- structure ---------------- */
+  /** True when the record carries something an insert must not push off the sheet: a format (as Excel counts it) or a comment. */
+  static hasFormat(cell) { return !!cell.cmt || INHERIT_FIELDS.some(f => f === 'decimals' ? false : f === 'fmtStyle' ? cell[f] !== 'general' : !!cell[f]); }
+  /**
+   * Rewrite references that point beyond the grid after a structural shift: a single ref, or a
+   * range whose near corner is off the sheet, becomes #REF!; a range's far corner is clipped to
+   * the edge. (The old build's adjustFormulaCols bound columns this way; rows get the same rule.)
+   */
+  boundFormula(f) {
+    const src = String(f).trim(); const refs = formulaRefs(src); if (!refs.length) return src;
+    const RX = /^(\$?)([A-Z]{1,3})(\$?)(\d+)$/;
+    let out = src;
+    for (let i = refs.length - 1; i >= 0; i--) {
+      const x = refs[i]; let rep = null;
+      if (x.key) { const p = parseRef(x.key); if (p && (p.r > this.rows || p.c > this.cols)) rep = '#REF!'; }
+      else if (x.range) {
+        const rg = x.range;
+        if (rg.r1 > this.rows || rg.c1 > this.cols) rep = '#REF!';
+        else if (rg.r2 > this.rows || rg.c2 > this.cols) {
+          const m = String(x.text).split(':').map(s => RX.exec(s));
+          if (m.length === 2 && m[0] && m[1]) rep = m.map(q => q[1] + colLetter(Math.min(this.cols, colIndex(q[2]))) + q[3] + Math.min(this.rows, +q[4])).join(':');
+        }
+      }
+      if (rep !== null && x.pos !== undefined) out = out.slice(0, x.pos) + rep + out.slice(x.end);
+    }
+    return out;
+  }
   shiftCells(axis, at, delta) {
-    const out = {};
+    const out = {}; const max = axis === 'r' ? this.rows : this.cols;
     for (const k in this.cells) {
       const p = parseRef(k); if (!p) continue;
       const n = axis === 'r' ? p.r : p.c;
       let nn;
       if (delta > 0) nn = n >= at ? n + delta : n;
       else { const cnt = -delta; if (n >= at && n < at + cnt) continue; nn = n >= at + cnt ? n - cnt : n; }
+      if (nn > max) continue;   // pushed off the grid — insert() only lets a blank, unformatted record get here
       out[axis === 'r' ? refKey(nn, p.c) : refKey(p.r, nn)] = this.cells[k];
     }
-    for (const k in out) { const c = out[k]; if (c && c.formula) c.formula = adjustFormulaStructure(c.formula, axis, at, delta); }
-    if (delta > 0 && at > 1) {   // an inserted band dresses like the row above / column to its left
+    for (const k in out) { const c = out[k]; if (c && c.formula) c.formula = this.boundFormula(adjustFormulaStructure(c.formula, axis, at, delta)); }
+    if (delta > 0 && at > 1) {   // an inserted band dresses like the row above / column to its left: formats only, never a comment or the text flag
       const srcKeys = Object.keys(out).filter(k => { const p = parseRef(k); return p && (axis === 'r' ? p.r === at - 1 : p.c === at - 1); });
       for (const sk of srcKeys) { const src = out[sk]; const p = parseRef(sk);
-        if (!FMT_FIELDS.some(f => f !== 'txt' && f !== 'decimals' && f !== 'fmtStyle' ? src[f] : (f === 'fmtStyle' && src[f] !== 'general'))) continue;
-        for (let i = at; i < at + delta; i++) { const key = axis === 'r' ? refKey(i, p.c) : refKey(p.r, i); if (!out[key]) out[key] = blankCell(); copyFmt(out[key], src); out[key].txt = false; } }
+        if (!INHERIT_FIELDS.some(f => f === 'decimals' ? false : f === 'fmtStyle' ? src[f] !== 'general' : !!src[f])) continue;
+        for (let i = at; i < at + delta && i <= max; i++) { const key = axis === 'r' ? refKey(i, p.c) : refKey(p.r, i); if (!out[key]) out[key] = blankCell(); for (const f of INHERIT_FIELDS) out[key][f] = src[f] === undefined ? blankCell()[f] : src[f]; } }
     }
     this.cells = out;
   }
-  /** Insert rows/columns at the selection (requires whole rows / columns selected, like Ctrl+Shift+=). */
+  /**
+   * Insert rows/columns at the selection (requires whole rows / columns selected, like Ctrl+Shift+=).
+   * Returns false, with the sheet untouched, when the shift would push a non-blank or formatted
+   * cell off the grid — Excel's "can't insert new cells because it would push non-empty cells off
+   * the end of the worksheet".
+   */
   insert(axis) {
-    const r = this.selRange(); this.pushUndo(); this.clearClipboard();
-    if (axis === 'r') { const count = r.r2 - r.r1 + 1; this.shiftCells('r', r.r1, count); }
-    else { const count = r.c2 - r.c1 + 1; this.shiftCells('c', r.c1, count); for (let c = this.cols; c >= r.c1 + count; c--) { this.colW[c] = this.colW[c - count]; this.colSet[c] = this.colSet[c - count]; } const inh = r.c1 > 1 ? this.colW[r.c1 - 1] : COLW_DEFAULT; for (let c = r.c1; c < r.c1 + count && c <= this.cols; c++) { this.colW[c] = inh; this.colSet[c] = r.c1 > 1 ? this.colSet[r.c1 - 1] : false; } }
-    this.commit('structure');
+    const r = this.selRange();
+    const count = axis === 'r' ? r.r2 - r.r1 + 1 : r.c2 - r.c1 + 1, at = axis === 'r' ? r.r1 : r.c1, max = axis === 'r' ? this.rows : this.cols;
+    for (const k in this.cells) {
+      const p = parseRef(k); if (!p) continue; const n = axis === 'r' ? p.r : p.c;
+      if (n >= at && n + count > max && (this.nonEmpty(p.r, p.c) || Sheet.hasFormat(this.cells[k]))) return false;
+    }
+    this.pushUndo(); this.clearClipboard();
+    if (axis === 'r') this.shiftCells('r', r.r1, count);
+    else { this.shiftCells('c', r.c1, count); for (let c = this.cols; c >= r.c1 + count; c--) { this.colW[c] = this.colW[c - count]; this.colSet[c] = this.colSet[c - count]; } const inh = r.c1 > 1 ? this.colW[r.c1 - 1] : COLW_DEFAULT; for (let c = r.c1; c < r.c1 + count && c <= this.cols; c++) { this.colW[c] = inh; this.colSet[c] = r.c1 > 1 ? this.colSet[r.c1 - 1] : false; } }
+    this.commit('structure'); return true;
   }
+  /** Delete the selected rows/columns. The cursor lands on the seam but keeps the displayed active cell's column (rows) or row (columns), as Excel does. */
   remove(axis) {
-    const r = this.selRange(); this.pushUndo(); this.clearClipboard();
-    if (axis === 'r') { const count = r.r2 - r.r1 + 1; this.shiftCells('r', r.r1, -count); this.sel = null; this.selA = null; this.active = this.clamp(r.r1, 1); }
-    else { const count = r.c2 - r.c1 + 1; this.shiftCells('c', r.c1, -count); for (let c = r.c1; c <= this.cols - count; c++) { this.colW[c] = this.colW[c + count]; this.colSet[c] = this.colSet[c + count]; } for (let c = Math.max(r.c1, this.cols - count + 1); c <= this.cols; c++) { this.colW[c] = COLW_DEFAULT; this.colSet[c] = false; } this.sel = null; this.selA = null; this.active = this.clamp(1, r.c1); }
+    const r = this.selRange(); const a = this.dispActive(); this.pushUndo(); this.clearClipboard();
+    if (axis === 'r') { const count = r.r2 - r.r1 + 1; this.shiftCells('r', r.r1, -count); this.sel = null; this.selA = null; this.active = this.clamp(r.r1, a.c); }
+    else { const count = r.c2 - r.c1 + 1; this.shiftCells('c', r.c1, -count); for (let c = r.c1; c <= this.cols - count; c++) { this.colW[c] = this.colW[c + count]; this.colSet[c] = this.colSet[c + count]; } for (let c = Math.max(r.c1, this.cols - count + 1); c <= this.cols; c++) { this.colW[c] = COLW_DEFAULT; this.colSet[c] = false; } this.sel = null; this.selA = null; this.active = this.clamp(a.r, r.c1); }
     this.commit('structure');
   }
-  /** Ctrl+Shift+= / Ctrl+- semantics: only when whole rows or whole columns are selected. */
+  /** Ctrl+Shift+= / Ctrl+- semantics: only when whole rows or whole columns are selected. False when nothing happened (partial selection, or a refused insert). */
   insertOrDelete(isInsert) {
     const r = this.selRange();
     const fullRow = r.c1 === 1 && r.c2 === this.cols, fullCol = r.r1 === 1 && r.r2 === this.rows;
     if (!fullRow && !fullCol) return false;
-    if (isInsert) this.insert(fullRow ? 'r' : 'c'); else this.remove(fullRow ? 'r' : 'c');
+    if (isInsert) return this.insert(fullRow ? 'r' : 'c');
+    this.remove(fullRow ? 'r' : 'c');
     return true;
   }
 

@@ -11,7 +11,12 @@ import { showToast } from '../ui/toast.js';
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 /** `Ctrl+1` → <kbd>Ctrl+1</kbd>; everything else escaped. */
 const rich = s => esc(s).replace(/`([^`]+)`/g, (m, k) => `<kbd>${k}</kbd>`);
-const keysHtml = s => s ? s.split(/\s+/).map(t => /^(then|×\d+|,|and|or|…)$/.test(t) || /^[a-z]/.test(t) && !/^[a-z]$/.test(t) ? `<span class="kx">${esc(t)}</span>` : `<kbd>${esc(t)}</kbd>`).join(' ') : '';
+/**
+ * A goal's keys: keycaps for keys, plain text for connectives ('then', '×5') and, as in a solution
+ * script, a double-quoted run is text to type: '"1200" Enter' → type “1200” ⏎.
+ */
+const keysHtml = s => s ? (s.match(/"[^"]*"|\S+/g) || []).map(t => t.startsWith('"') ? `<span class="kx">type “${esc(t.slice(1, -1))}”</span>` :
+  /^(then|×\d+|,|and|or|…)$/.test(t) || /^[a-z]/.test(t) && !/^[a-z]$/.test(t) ? `<span class="kx">${esc(t)}</span>` : `<kbd>${esc(t)}</kbd>`).join(' ') : '';
 
 export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   const el = document.createElement('div');
@@ -64,6 +69,13 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       body.innerHTML = `<ol class="goals">${states.map(g => `<li class="goal ${g.done ? 'done' : g.current ? 'current' : ''}">
           <span class="goal-mark">${g.done ? '✓' : g.current ? '›' : ''}</span><span class="goal-text">${esc(g.text)}</span>
           ${showKeys && g.current && g.keys ? `<div class="goal-keys">${keysHtml(g.keys)}</div>` : ''}</li>`).join('')}</ol>`;
+      // Every goal has landed but an end-state predicate fails (something a goal produced was undone,
+      // a value was changed): show those predicates so the learner sees what still needs to hold.
+      const ends = run.endStates();
+      if (run.doneCount === run.goals.length && !run.finished && ends.length) {
+        body.innerHTML += `<p class="lesson-goalsintro">Still needed</p><ol class="goals goals-end">${ends.map(e => `<li class="goal ${e.ok ? 'done' : 'current'}">
+          <span class="goal-mark">${e.ok ? '✓' : '›'}</span><span class="goal-text">${esc(e.text)}</span></li>`).join('')}</ol>`;
+      }
       $('lessonActions').innerHTML = `<button class="btn btn-ghost" id="restartBtn" type="button">Restart</button>`;
       $('restartBtn').onclick = () => restart(run.mode);
     } else {
@@ -83,10 +95,15 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   }
   function renderHelp() {
     const p = $('helpPanel'); p.hidden = !helpOpen; if (!helpOpen) return;
-    const cur = run.current;
-    p.innerHTML = phase === 'play' && cur ? `<div class="help-goal">${esc(cur.text)}</div><div class="help-keys">${keysHtml(cur.keys || '')}</div>
-      <p class="help-note">Press the keys one after another. <kbd>Esc</kbd> backs out of the Ribbon or a dialog box; <kbd>Ctrl+Z</kbd> undoes.</p>` :
-      `<p class="help-note">Read the notes, then press <kbd>Enter</kbd> or Start. Goals are checked as you go.</p>`;
+    if (phase === 'teach') { p.innerHTML = `<p class="help-note">Read the notes, then press <kbd>Enter</kbd> or Start. Goals are checked as you go.</p>`; return; }
+    if (phase === 'done') { p.innerHTML = `<p class="help-note">Lesson complete. Press <kbd>Enter</kbd> to continue.</p>`; return; }
+    const cur = run.current;   // the current goal, or the first failing end-state predicate once every goal has landed
+    if (!cur) { p.innerHTML = `<p class="help-note">Every goal has landed.</p>`; return; }
+    p.innerHTML = run.doneCount < run.goals.length
+      ? `<div class="help-goal">${esc(cur.text)}</div><div class="help-keys">${keysHtml(cur.keys || '')}</div>
+      <p class="help-note">Press the keys one after another. <kbd>Esc</kbd> backs out of the Ribbon or a dialog box; <kbd>Ctrl+Z</kbd> undoes.</p>`
+      : `<div class="help-goal">${esc(cur.text)}</div>
+      <p class="help-note">Every goal has landed, but the sheet is not yet as the lesson expects. Put this right and the lesson completes; <kbd>Ctrl+Z</kbd> undoes.</p>`;
   }
   function renderTimer() {
     const t = $('lessonTimer');

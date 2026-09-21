@@ -118,3 +118,133 @@ test('toJSON keeps only what differs from a blank cell', () => {
   const s = new Sheet({ cells: { A1: { value: 1, bold: true }, B1: { formula: '=A1*2' } } });
   assert.deepEqual(s.toJSON().cells, { A1: { value: 1, bold: true }, B1: { formula: '=A1*2' } });
 });
+
+test('undo and redo re-select the range the operation touched, never a mix of two selections', () => {
+  const s = seed();
+  s.select('A1:B3'); s.toggleAllOrNone('bold'); s.select('E5:F6');
+  s.undo(); assert.equal(s.selectionText(), 'A1:B3'); assert.equal(s.cellAt('A1').bold, false); assert.deepEqual(s.dispActive(), { r: 1, c: 1 });
+  s.select('H9'); s.redo(); assert.equal(s.selectionText(), 'A1:B3'); assert.equal(s.cellAt('A1').bold, true);
+  const t = seed(); t.select('A1:A3'); t.toggleAllOrNone('bold'); t.move(1, 0, false, false); t.undo(); assert.equal(t.selectionText(), 'A1:A3');
+  const u = seed(); u.goTo(3, 3); u.commitInput('5', 3, 3); u.select('A1:B2'); u.undo(); assert.equal(u.selectionText(), 'C3'); assert.equal(u.value('C3'), null);
+});
+
+test('autosum on a filled selection writes the totals beside it and never overwrites data', () => {
+  const col = new Sheet({ cells: { D1: { value: 10 }, D2: { value: 20 }, D3: { value: 30 }, D4: { value: 40 }, D5: { value: 50 } } });
+  col.select('D1:D5'); assert.deepEqual(col.autoSum(), { committed: true });
+  assert.equal(col.value('D1'), 10); assert.equal(col.formula('D6'), '=SUM(D1:D5)'); assert.equal(col.value('D6'), 150);
+  col.undo(); assert.equal(col.formula('D6'), null);
+  col.goTo(5, 4); col.move(-4, 0, true, false); assert.equal(col.selectionText(), 'D1:D5'); col.autoSum(); assert.equal(col.value('D5'), 50); assert.equal(col.formula('D6'), '=SUM(D1:D5)');   // bottom-up selection
+  const row = new Sheet({ cells: { A1: { value: 1 }, B1: { value: 2 }, C1: { value: 3 } } }); row.select('A1:C1'); row.autoSum();
+  assert.equal(row.value('A1'), 1); assert.equal(row.formula('D1'), '=SUM(A1:C1)'); assert.equal(row.value('D1'), 6);
+  const blk = new Sheet({ cells: { A1: { value: 1 }, B1: { value: 2 }, A2: { value: 3 }, B2: { value: 4 } } }); blk.select('A1:B2'); blk.autoSum();
+  assert.equal(blk.value('A1'), 1); assert.equal(blk.formula('A3'), '=SUM(A1:A2)'); assert.equal(blk.formula('B3'), '=SUM(B1:B2)');
+  const gap = new Sheet({ cells: { A1: { value: 1 }, B1: { value: 2 }, A2: { value: 3 }, B2: { value: 4 } } }); gap.select('A1:B3'); gap.autoSum();
+  assert.equal(gap.formula('A3'), '=SUM(A1:A2)'); assert.equal(gap.formula('B3'), '=SUM(B1:B2)'); assert.equal(gap.formula('A4'), null);   // an empty bottom row takes the totals
+  const side = new Sheet({ cells: { A1: { value: 1 }, B1: { value: 2 }, A2: { value: 3 }, B2: { value: 4 } } }); side.select('A1:C2'); side.autoSum();
+  assert.equal(side.formula('C1'), '=SUM(A1:B1)'); assert.equal(side.formula('C2'), '=SUM(A2:B2)');
+  const txt = new Sheet({ cells: { A1: { value: 'a' }, A2: { value: 'b' } } }); txt.select('A1:A2'); assert.deepEqual(txt.autoSum(), { committed: true });
+  assert.equal(txt.value('A1'), 'a'); assert.equal(txt.formula('A3'), null); assert.equal(txt.undoStack.length, 0);   // nothing numeric: a no-op, not an empty =SUM( over A1
+});
+
+test('sort re-relativises the formulas that move with their row', () => {
+  const s = new Sheet({ cells: { A1: { value: 'Pear' }, B1: { value: 2 }, C1: { value: 5 }, D1: { formula: '=B1*C1' }, A2: { value: 'Apple' }, B2: { value: 3 }, C2: { value: 1 }, D2: { formula: '=B2*C2' }, A3: { value: 'Fig' }, B3: { value: 1 }, C3: { value: 9 }, D3: { formula: '=B3*C3' } } });
+  s.select('A1:D3'); assert.equal(s.sort('asc', 1), true);
+  assert.deepEqual([1, 2, 3].map(r => [s.value('A' + r), s.formula('D' + r), s.value('D' + r)]), [['Apple', '=B1*C1', 3], ['Fig', '=B2*C2', 9], ['Pear', '=B3*C3', 10]]);
+  s.undo(); assert.deepEqual([s.value('A1'), s.formula('D1'), s.formula('D3')], ['Pear', '=B1*C1', '=B3*C3']);
+  const m = new Sheet({ cells: { A1: { value: 'b' }, D1: { formula: '=B$2' }, A2: { value: 'a' }, D2: { formula: '=B2*$F$1' }, B1: { value: 20 }, B2: { value: 3 }, F1: { value: 10 } } });
+  m.select('A1:D2'); m.sort('asc', 1); assert.equal(m.formula('D1'), '=B1*$F$1'); assert.equal(m.value('D1'), 30); assert.equal(m.formula('D2'), '=B$2');   // $-anchored parts stay
+});
+
+test('cycle marking zeroes only the loop, whatever the entry order; every member of a loop reads 0', () => {
+  const mk = order => { const spec = { A1: { value: 10 }, B1: { value: 20 }, C1: { formula: '=C1+1' }, D1: { formula: '=SUM(A1:C1)' } }; const cells = {}; for (const k of order) cells[k] = spec[k]; return new Sheet({ cells }); };
+  assert.equal(mk(['A1', 'B1', 'D1', 'C1']).value('D1'), 30); assert.equal(mk(['A1', 'B1', 'C1', 'D1']).value('D1'), 30);
+  const s = new Sheet({ cells: { A1: { value: 10 }, B1: { value: 20 } } });
+  s.commitInput('=D1+5', 1, 5); s.commitInput('=SUM(A1:C1)', 1, 4); s.commitInput('=C1+1', 1, 3);
+  assert.deepEqual([s.value('E1'), s.value('D1'), s.value('C1')], [35, 30, 0]);
+  const two = new Sheet({ cells: { B2: { formula: '=C2+1' }, C2: { formula: '=B2+1' } } }); assert.deepEqual([two.value('B2'), two.value('C2')], [0, 0]);
+  const tangle = new Sheet({ cells: { A2: { formula: '=B2+1' }, B2: { formula: '=C2+D2+1' }, C2: { formula: '=A2+1' }, D2: { formula: '=C2+1' } } });
+  assert.deepEqual(['A2', 'B2', 'C2', 'D2'].map(k => tangle.value(k)), [0, 0, 0, 0]);
+});
+
+test('a self-reference that only exists through OFFSET is circular and stays 0 across unrelated edits', () => {
+  const one = new Sheet(); one.commitInput('=OFFSET(B1,0,-1)+1', 1, 1); assert.equal(one.value('A1'), 0);
+  one.commitInput('q', 5, 5); assert.equal(one.value('A1'), 0);
+  one.select('A1'); one.toggleAllOrNone('bold'); assert.equal(one.value('A1'), 0);
+  const many = new Sheet({ cells: { C1: { formula: '=1' }, C2: { formula: '=2' }, C3: { formula: '=3' }, C4: { formula: '=4' }, C5: { formula: '=5' }, C6: { formula: '=6' } } });
+  many.commitInput('=OFFSET(B1,0,-1)+1', 1, 1); assert.equal(many.value('A1'), 0);
+  const sm = new Sheet({ cells: { A1: { value: 1 }, A2: { value: 2 }, A3: { formula: '=SUM(OFFSET(A1,0,0,3,1))' } } }); assert.equal(sm.value('A3'), 0);
+  const ch = new Sheet({ cells: { A1: { value: 1 }, B1: { formula: '=OFFSET(A1,0,0)+1' }, C1: { formula: '=OFFSET(B1,0,0)+1' } } });
+  assert.deepEqual([ch.value('B1'), ch.value('C1')], [2, 3]); ch.commitInput('9', 5, 5); assert.deepEqual([ch.value('B1'), ch.value('C1')], [2, 3]);   // a non-cyclic OFFSET chain is stable
+});
+
+test('a paste whose footprint would run off the sheet is refused and leaves everything intact', () => {
+  const s = new Sheet({ cells: { A1: { value: 10 }, A2: { value: 20 }, A3: { value: 30 }, A4: { value: 40 }, A5: { value: 50 }, C1: { formula: '=SUM(A21:A22)' } } });
+  s.select('A1:A5'); s.copy(); s.select('A18'); assert.equal(s.paste('all'), false);
+  assert.deepEqual(Object.keys(s.cells).filter(k => +k.slice(1) > s.rows), []); assert.equal(s.value('A18'), null); assert.equal(s.value('C1'), 0);
+  assert.equal(s.selectionText(), 'A18'); assert.equal(s.undoStack.length, 0); assert.ok(s.clipboard);
+  s.select('A16'); assert.equal(s.paste('all'), true); assert.equal(s.value('A20'), 50);
+  const c = new Sheet({ cells: { J1: { value: 1 }, J2: { value: 2 } } }); c.select('J1:J2'); c.copy(true); c.select('J20');
+  assert.equal(c.paste(), false); assert.equal(c.value('J1'), 1); assert.equal(c.value('J21'), null); assert.ok(c.clipboard);   // the cut source is untouched, the marquee stays
+  const t = new Sheet({ cells: { A1: { value: 1 }, A2: { value: 2 }, A3: { value: 3 }, A4: { value: 4 }, A5: { value: 5 } } }); t.select('A1:A5'); t.copy();
+  t.select('H1'); assert.equal(t.paste('transpose'), false); assert.equal(t.value('K1'), null);
+  t.select('F1'); assert.equal(t.paste('transpose'), true); assert.equal(t.value('J1'), 5);
+  const m = new Sheet({ cells: { A1: { value: 1 } } }); m.select('A1'); m.copy(); m.select('A1:A20'); assert.equal(m.paste(), true); assert.equal(m.value('A20'), 1);   // tiling over an in-grid selection is fine
+});
+
+test('commit parsing keeps typed precision, reads trailing/leading-point numbers, and scales every numeric entry in a percent cell', () => {
+  assert.deepEqual(Sheet.classifyInput('1,234.56'), { kind: 'value', value: 1234.56, fmtStyle: 'comma', decimals: 2 });
+  assert.deepEqual(Sheet.classifyInput('12.55%'), { kind: 'value', value: 0.1255, fmtStyle: 'percent', decimals: 2 });
+  const show = txt => { const s = new Sheet(); s.commitInput(txt, 1, 1); return s.text('A1'); };
+  assert.equal(show('1,234.56'), '1,234.56'); assert.equal(show('12.55%'), '12.55%'); assert.equal(show('1,234.5'), '1,234.5'); assert.equal(show('1,000.00'), '1,000.00'); assert.equal(show('12%'), '12%');
+  assert.deepEqual(Sheet.classifyInput('1.'), { kind: 'value', value: 1 }); assert.deepEqual(Sheet.classifyInput('.5e2'), { kind: 'value', value: 50 });
+  assert.deepEqual(Sheet.classifyInput('1.e2'), { kind: 'value', value: 100 }); assert.deepEqual(Sheet.classifyInput('+1.'), { kind: 'value', value: 1 });
+  assert.deepEqual(Sheet.classifyInput('1.5e-2'), { kind: 'value', value: 0.015 });
+  for (const t of ['.', '+', '-', 'e5']) assert.deepEqual(Sheet.classifyInput(t), { kind: 'value', value: t, txt: true });
+  const s = new Sheet(); s.commitInput('1.', 1, 1); assert.equal(s.cellAt('A1').txt, false); assert.equal(s.value('A1'), 1);
+  assert.deepEqual(Sheet.classifyInput('1,234', { fmtStyle: 'percent' }), { kind: 'value', value: 12.34, fmtStyle: undefined, decimals: undefined });
+  const p = txt => { const t = new Sheet(); t.setCell('A1', { fmtStyle: 'percent' }); t.commitInput(txt, 1, 1); return [t.value('A1'), t.text('A1')]; };
+  assert.deepEqual(p('1234'), [12.34, '1234%']); assert.deepEqual(p('1,234'), [12.34, '1234%']); assert.deepEqual(p('(1,234)'), [-12.34, '-1234%']); assert.deepEqual(p('1e2'), [1, '100%']);
+});
+
+test('an insert that would push a non-blank cell off the grid is refused; a blank pushed off leaves #REF! behind', () => {
+  const s = new Sheet({ cells: { J1: { value: 99 }, A1: { formula: '=J1*2' } } }); s.select('B1:B20'); const before = JSON.stringify(s.toJSON());
+  assert.equal(s.insertOrDelete(true), false); assert.equal(JSON.stringify(s.toJSON()), before); assert.equal(s.undoStack.length, 0); assert.equal(s.value('A1'), 198);
+  const r = new Sheet({ cells: { A20: { value: 7 }, A1: { formula: '=A20+1' } } }); r.select('A2:J2'); assert.equal(r.insertOrDelete(true), false); assert.equal(r.formula('A1'), '=A20+1');
+  const f = new Sheet({ cells: { J1: { bold: true } } }); f.select('A1:A20'); assert.equal(f.insert('c'), false);   // formatting counts as non-blank, like Excel
+  const b = new Sheet({ cells: { A1: { formula: '=J1' }, B1: { formula: '=SUM(H1:J1)' }, C1: { formula: '=SUM(J1:J2)' }, D1: { formula: '=$J$1' } } }); b.select('B1:B20');
+  assert.equal(b.insertOrDelete(true), true); assert.equal(b.formula('A1'), '=#REF!'); assert.equal(b.value('A1'), '#REF!');
+  assert.equal(b.formula('C1'), '=SUM(I1:J1)'); assert.equal(b.formula('D1'), '=SUM(#REF!)'); assert.equal(b.formula('E1'), '=#REF!'); assert.ok(!b.cells.K1);
+  const rr = new Sheet({ cells: { A1: { formula: '=A20' }, B1: { formula: '=SUM(A19:A20)' } } }); rr.select('A2:J2'); assert.equal(rr.insertOrDelete(true), true);
+  assert.equal(rr.formula('A1'), '=#REF!'); assert.equal(rr.formula('B1'), '=SUM(A20:A20)'); assert.ok(!rr.cells.A21);
+});
+
+test('deleting rows keeps the active column and deleting columns keeps the active row', () => {
+  const s = new Sheet({ cells: { C3: { value: 1 }, C4: { value: 2 }, C5: { value: 3 } } }); s.select('C3:C4'); s.remove('r'); assert.equal(s.selectionText(), 'C3'); assert.equal(s.value('C3'), 3);
+  const c = new Sheet(); c.select('C5:D5'); c.remove('c'); assert.equal(c.selectionText(), 'C5');
+  const b = new Sheet(); b.select('B3:D4'); b.remove('r'); assert.equal(b.selectionText(), 'B3');   // the displayed anchor's column, not the far corner's
+  const w = new Sheet(); w.goTo(4, 3); w.selectRow(); assert.equal(w.insertOrDelete(false), true); assert.equal(w.selectionText(), 'C4');   // the Ctrl+- chord too
+});
+
+test('an inserted band inherits formats (alignment, borders) but never a comment or the text flag', () => {
+  const s = new Sheet({ cells: { A1: { value: 'Total', bold: true, cmt: true, ca: 3, bt: true } } }); s.select('A2:J2'); s.insertOrDelete(true);
+  const a2 = s.cellAt('A2'); assert.equal(a2.bold, true); assert.equal(a2.ca, 3); assert.equal(a2.bt, true); assert.equal(a2.cmt, false); assert.equal(a2.txt, false); assert.equal(a2.value, null);
+  assert.equal(s.cellAt('A1').cmt, true); assert.ok(!s.cells.B2);
+  const k = new Sheet({ cells: { A1: { value: 'T', bold: true, cmt: true } } }); k.select('B1:B20'); k.insertOrDelete(true); assert.equal(k.cellAt('B1').bold, true); assert.equal(k.cellAt('B1').cmt, false);
+  const o = new Sheet({ cells: { A1: { value: 'T', cmt: true } } }); o.select('A2:J2'); o.insertOrDelete(true); assert.ok(!o.cells.A2);   // a comment alone is nothing to inherit
+});
+
+test('select() clamps a range to the grid, so selection ops never create off-grid cells', () => {
+  const s = new Sheet(); s.select('A1:Z50'); assert.equal(s.selectionText(), 'A1:J20'); s.toggleAllOrNone('bold');
+  assert.equal(Object.keys(s.cells).length, s.rows * s.cols); assert.ok(!s.cells.Z50);
+  s.select('H15:M25'); assert.equal(s.selectionText(), 'H15:J20');
+  s.select('K21:Z50'); assert.equal(s.selectionText(), 'J20'); assert.equal(s.sel, null);   // collapses to a single cell
+  assert.deepEqual(new Sheet({ active: { r: 99, c: 99 } }).active, { r: 20, c: 10 });
+});
+
+test('an empty entry is a no-op: no undo frame, the redo stack survives', () => {
+  const s = new Sheet(); s.commitInput('5', 1, 1); s.undo(); assert.equal(s.redoStack.length, 1);
+  assert.deepEqual(s.commitInput('', 2, 2), { kind: 'empty' }); assert.equal(s.redoStack.length, 1); assert.equal(s.undoStack.length, 0); assert.ok(!s.cells.B2);
+  assert.equal(s.redo(), true); assert.equal(s.value('A1'), 5);
+  const t = new Sheet(); t.commitInput('5', 1, 1); t.undo(); t.select('B2:B3'); assert.deepEqual(t.commitInputAll('', 2, 2), { kind: 'empty' });
+  assert.equal(t.redoStack.length, 1); assert.equal(t.undoStack.length, 0); assert.equal(t.redo(), true); assert.equal(t.value('A1'), 5);
+});

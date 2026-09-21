@@ -30,7 +30,18 @@
 // Goals are checked in order after every keystroke: goal i counts as done the first time its check
 // passes while every earlier goal is already done, and the lesson is complete when the last goal
 // lands and every endState predicate holds. A check may read the session's keyLog when the point of
-// the goal is the mechanic itself (e.g. "use F2").
+// the goal is the mechanic itself (e.g. "use F2") — but only the key window: the runner sets
+// session.goalMark to keyLog.length each time a goal lands, so a mechanic check reads
+// keyLog.slice(session.goalMark || 0), the keys pressed since its goal became current. A key pressed
+// for an earlier goal, or before the lesson began, never satisfies a later goal.
+//
+// Goals latch: once landed they stay landed (navigation lessons depend on it), so a lesson whose
+// goals leave something on the sheet (a format, a border) should restate it in endState. The
+// runner shows a failing endState as the pending item once every goal has landed.
+
+import { Sheet } from '../engine/sheet.js';
+import { Session } from '../engine/keyboard.js';
+import { parseRef } from '../engine/refs.js';
 
 export const DIFFICULTIES = ['easy', 'medium', 'hard'];
 export const ACCESS = ['free', 'paid'];
@@ -70,16 +81,17 @@ export const CONCEPTS = {
   'borders-menu': 'the Borders menu: Alt, H, B, then a border',
   'align-command': 'alignment commands: Alt, H, A, then L / C / R',
   'escape-backs-out': 'Escape backs out of the Ribbon one level at a time',
-  'dialog-box': 'a dialog box stays open until you confirm or cancel',
+  'dialog-box': 'in Excel a dialog box stays open until you confirm (Enter/OK) or cancel (Esc)',
   'format-cells-dialog': 'the Format Cells dialog box: Ctrl+1',
   'number-formats': 'number formats change how a value is displayed, not the value',
   'ribbon-route-dialog': 'Alt, H, O, E opens Format Cells from the Ribbon',
 };
 
-/** Validate a lesson object. Returns a list of problems (empty when valid). */
+/** Validate a lesson object. Returns a list of problems (empty when valid); never throws. */
 export function validateLesson(l) {
   const errs = [];
   const need = (cond, msg) => { if (!cond) errs.push(msg); };
+  if (!l || typeof l !== 'object') return ['lesson must be an object'];
   need(typeof l.id === 'string' && /^[a-z0-9-]+$/.test(l.id), 'id must be kebab-case');
   need(typeof l.chapter === 'string' && l.chapter, 'chapter missing');
   need(typeof l.title === 'string' && l.title.trim(), 'title missing');
@@ -87,30 +99,65 @@ export function validateLesson(l) {
   need(Array.isArray(l.tags), 'tags must be an array');
   need(ACCESS.includes(l.access), 'access must be free | paid');
   need(Array.isArray(l.concepts) && l.concepts.length > 0, 'concepts must list what the lesson teaches');
-  for (const c of l.concepts || []) need(CONCEPTS[c], `unknown concept "${c}"`);
+  const concepts = Array.isArray(l.concepts) ? l.concepts : [];
+  for (const c of concepts) need(CONCEPTS[c], `unknown concept "${c}"`);
   need(Array.isArray(l.prerequisites), 'prerequisites must be an array');
-  need(l.sheet && typeof l.sheet === 'object', 'sheet (starting sheet) missing');
+  need(isObject(l.sheet), 'sheet (starting sheet) missing');
   need(Array.isArray(l.steps) && l.steps.length > 0, 'steps missing');
-  const modes = (l.steps || []).map(s => s.mode);
+  const steps = Array.isArray(l.steps) ? l.steps.filter(isObject) : [];
+  const modes = steps.map(s => s.mode);
   for (const m of modes) need(MODES.includes(m), `unknown step mode "${m}"`);
   need(modes.indexOf('teach') === 0, 'the first step must be teach');
   const order = modes.map(m => MODES.indexOf(m));
   need(order.every((v, i) => i === 0 || v >= order[i - 1]), 'steps must go teach → guided → solo → timed');
   need(modes.includes('guided') || modes.includes('solo'), 'a lesson needs a guided or solo step');
-  for (const st of l.steps || []) { if (st.mode === 'teach') { need(st.title, 'teach step needs a title'); need(Array.isArray(st.body) && st.body.length, 'teach step needs body paragraphs'); } if (st.mode === 'timed') need(typeof st.par === 'number' && st.par > 0, 'timed step needs par seconds'); }
+  for (const st of steps) { if (st.mode === 'teach') { need(st.title, 'teach step needs a title'); need(Array.isArray(st.body) && st.body.length, 'teach step needs body paragraphs'); } if (st.mode === 'timed') need(typeof st.par === 'number' && st.par > 0, 'timed step needs par seconds'); }
   need(Array.isArray(l.goals) && l.goals.length > 0, 'goals missing');
+  const goals = Array.isArray(l.goals) ? l.goals.filter(isObject) : [];
   const ids = new Set();
-  for (const g of l.goals || []) {
+  for (const g of goals) {
     need(typeof g.id === 'string' && g.id, 'goal id missing'); need(!ids.has(g.id), `duplicate goal id ${g.id}`); ids.add(g.id);
     need(typeof g.text === 'string' && g.text.trim(), `goal ${g.id}: text missing`);
     need(typeof g.check === 'function', `goal ${g.id}: check must be a function`);
     need(Array.isArray(g.requires), `goal ${g.id}: requires must list concept ids`);
-    for (const c of g.requires || []) need(CONCEPTS[c], `goal ${g.id}: unknown concept "${c}"`);
+    for (const c of Array.isArray(g.requires) ? g.requires : []) need(CONCEPTS[c], `goal ${g.id}: unknown concept "${c}"`);
   }
-  for (const e of l.endState || []) { need(typeof e.text === 'string', 'endState entries need text'); need(typeof e.check === 'function', 'endState entries need a check'); }
+  need(l.endState === undefined || Array.isArray(l.endState), 'endState must be an array');
+  const ends = Array.isArray(l.endState) ? l.endState.filter(isObject) : [];
+  for (const e of ends) { need(typeof e.text === 'string', 'endState entries need text'); need(typeof e.check === 'function', 'endState entries need a check'); }
   need(typeof l.solution === 'string' && l.solution.trim(), 'solution keystrokes missing');
+  if (isObject(l.sheet)) validateStartingSheet(l.sheet, goals, ends, need);
   return errs;
 }
+
+/**
+ * Build the starting sheet and run every check against it: a cell key that does not parse, an
+ * active cell outside rows×cols, a sheet that does not build, a check that throws, and a first goal
+ * the starting sheet already satisfies (nothing for the learner to do) are all reported. Later goals
+ * may legitimately hold at the start — they are gated behind the earlier ones.
+ */
+function validateStartingSheet(spec, goals, ends, need) {
+  const cells = isObject(spec.cells) ? spec.cells : {};
+  need(spec.cells === undefined || isObject(spec.cells), 'sheet: cells must be an object of cell records');
+  for (const k in cells) { need(parseRef(k), `sheet: bad cell key "${k}"`); need(isObject(cells[k]), `sheet: cell ${k} must be a record such as { value }`); }
+  const rows = spec.rows || 20, cols = spec.cols || 10;
+  if (spec.active !== undefined) {
+    const a = spec.active;
+    need(isObject(a) && Number.isInteger(a.r) && Number.isInteger(a.c) && a.r >= 1 && a.r <= rows && a.c >= 1 && a.c <= cols, `sheet: active ${JSON.stringify(a)} is outside the ${rows}×${cols} grid`);
+  }
+  let sheet, session;
+  try { sheet = new Sheet({ rows: spec.rows, cols: spec.cols, cells, colW: spec.colW, active: spec.active }); session = new Session(sheet, {}); }
+  catch (e) { need(false, `sheet does not build: ${e.message}`); return; }
+  session.goalMark = 0;
+  const probe = (label, check) => {
+    if (typeof check !== 'function') return null;
+    try { return !!check(sheet, session); } catch (e) { need(false, `${label}: check throws on the starting sheet (${e.message})`); return null; }
+  };
+  goals.forEach((g, i) => { const ok = probe(`goal ${g.id}`, g.check); if (i === 0) need(ok !== true, `goal ${g.id}: already satisfied by the starting sheet`); });
+  for (const e of ends) probe(`endState "${e.text}"`, e.check);
+}
+
+const isObject = v => typeof v === 'object' && v !== null && !Array.isArray(v);
 
 /** Every concept available to a lesson: its own plus its prerequisites', transitively. */
 export function availableConcepts(lesson, byId, seen = new Set()) {

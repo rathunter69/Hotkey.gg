@@ -10,7 +10,8 @@ const REPORT = {
   A10: { value: 'Prepared by' }, B10: { value: 'Sales team' },
 };
 const at = (sheet, ref) => !sheet.sel && sheet.selectionText() === ref;
-const used = (session, label) => session.keyLog.some(e => e.k === label);
+/** The key was pressed since the current goal became current (the runner's key window, keyLog.slice(goalMark)). */
+const used = (session, label) => session.keyLog.slice(session.goalMark || 0).some(e => e.k === label);
 
 export default {
   id: 'foundations-02-moving-around',
@@ -39,7 +40,7 @@ export default {
     { id: 'home', text: 'Press Home to return to column A of the Friday row', keys: 'Home', requires: ['home-key'], check: (s, ses) => at(s, 'A7') && used(ses, 'Home') },
     { id: 'ctrl-end', text: 'Jump to the bottom-right corner of the used area, C10, with Ctrl+End', keys: 'Ctrl+End', requires: ['ctrl-home-end'], check: (s, ses) => at(s, 'C10') && used(ses, 'Ctrl+End') },
     { id: 'ctrl-home', text: 'Return to A1 with Ctrl+Home', keys: 'Ctrl+Home', requires: ['ctrl-home-end'], check: (s, ses) => at(s, 'A1') && used(ses, 'Ctrl+Home') },
-    { id: 'enter-tab', text: 'Move to B2, the Sales header, with one Enter and one Tab', keys: 'Enter Tab', requires: ['enter-tab-move'], check: s => at(s, 'B2') },
+    { id: 'enter-tab', text: 'Move to B2, the Sales header, with one Enter and one Tab', keys: 'Enter Tab', requires: ['enter-tab-move'], check: (s, ses) => at(s, 'B2') && used(ses, '↵') && used(ses, 'Tab') },
   ],
   solution: 'Ctrl+Down Ctrl+Right Home Ctrl+End Ctrl+Home Enter Tab',
 };
