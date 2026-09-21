@@ -62,7 +62,7 @@ try {
       if (step.type === 'text') await page.keyboard.type(step.text);
       else await page.keyboard.press(pwKey(step.spec));
     }
-    const done = await page.waitForSelector('#continueBtn', { timeout: 4000 }).catch(() => null);
+    const done = await page.waitForSelector('.lesson-done:not([hidden]) [data-act="continue"]', { timeout: 4000 }).catch(() => null);
     if (!done) fail(`${lesson.id}: did not complete`);
   }
 } finally {
