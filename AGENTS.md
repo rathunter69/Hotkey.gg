@@ -24,6 +24,11 @@ For a new area task, read `docs/TASK_GUIDE.md` for its starter scope and coordin
   pixel art is for account identity/icons and achievements. Learning should progress from
   accessible, playful keyboard interactions to realistic models and finance work. Review
   overlapping tutorials/access rules before adding another teaching or monetization system.
+- Wolf clarified September 21 that learner-facing explanations and instructions should use direct,
+  consistent, professional Excel terminology, without cutesy analogies. Keep engaging actions,
+  visible progress and feedback. Foundations should explicitly teach interface/ribbon concepts
+  through highlighted areas, anchored callouts and small actions; exact lesson scope stays with
+  Catalog. PRODUCT.md records the source and the explanation-versus-solution-help boundary.
 - Wolf explicitly reaffirmed September 19 that refactoring must preserve the existing built-in
   themes, buttons, keycaps, navigation, helpful ribbon UI, selection outline/green handle and
   general look. Read the coupled visual set before changing it: nav.css, nav.js, themes.js,
