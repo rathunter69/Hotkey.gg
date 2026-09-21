@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found · hotkey.gg</title>
+<meta name="robots" content="noindex">
+<script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#dbd8d1; --surface:#ecebe6; --surface2:#e1dfd8; --line:#c6c2b8;
+    --text:#38352d; --muted:#6b665d; --faint:#a09a8f; --accent:#16a862; --accent-dim:#0e7a45; --on-accent:#ffffff; --bad:#b3261e;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Hanken Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{background:var(--bg); color:var(--text); font-family:var(--sans); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:14px; max-width:480px; width:100%; overflow:hidden}
+  .cap{min-height:34px; display:flex; align-items:center; padding:6px 16px; background:var(--surface2); border-bottom:1px solid var(--line);
+    font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+  .body{padding:22px 24px 24px}
+  .ref{font-family:var(--mono); font-size:13px; color:var(--muted); margin-bottom:6px}
+  .ref b{color:var(--bad)}
+  h1{font-size:21px; letter-spacing:-.3px; margin-bottom:8px}
+  p{font-size:14px; color:var(--muted); line-height:1.65; margin-bottom:16px}
+  .row{display:flex; gap:10px; flex-wrap:wrap}
+  a.btn{font-family:var(--mono); font-size:12.5px; padding:9px 16px; border-radius:8px; text-decoration:none; border:1px solid var(--line); color:var(--text); background:var(--surface2)}
+  a.btn.solid{background:var(--accent); color:var(--on-accent); border-color:var(--accent); font-weight:700}
+  a.btn:hover{border-color:var(--accent-dim)}
+  a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="cap">hotkey.gg · cell reference check</div>
+    <div class="body">
+      <div class="ref">=IFERROR(this_page, <b>#REF!</b>)</div>
+      <h1>That reference does not resolve.</h1>
+      <p>The page you asked for was moved, renamed, or never existed. The sheet itself is fine.</p>
+      <div class="row">
+        <a class="btn solid" href="./index.html#/">Home</a>
+        <a class="btn" href="./index.html#/learn">Learn</a>
+        <a class="btn" href="./index.html#/practice">Practice</a>
+        <a class="btn" href="./index.html#/contact">Report a broken link</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
