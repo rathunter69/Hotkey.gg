@@ -5,6 +5,9 @@ scratchpad/
 node_modules/
 package.json
 package-lock.json
+# rebuild: the new package files are real (scripts only, zero dependencies)
+!/package.json
+!/app2/package.json
 .claude/worktrees/
 
 # r439: local gate transcripts. Written into the repo (not /tmp) so a container
