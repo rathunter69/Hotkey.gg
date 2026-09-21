@@ -7,18 +7,11 @@
 .lesson-main{flex:1 1 auto; min-width:0; display:flex; flex-direction:column}
 .lesson-main .stage{flex:1 1 auto}
 
-/* ---- the divider: drag with the mouse, arrow keys resize, Enter hides or shows the panel ---- */
+/* ---- the divider: drag with the mouse, arrow keys resize, Home resets (the panel is always visible) ---- */
 .lesson-divider{flex:0 0 16px; position:relative; cursor:col-resize; display:flex; align-items:center; justify-content:center; user-select:none; -webkit-user-select:none; border-radius:6px; touch-action:none}
 .lesson-divider::before{content:''; width:2px; height:56px; border-radius:2px; background:var(--line); transition:background .12s}
 .lesson-divider:hover::before, .lesson-divider:focus-visible::before, .lesson-divider.dragging::before{background:var(--accent)}
 .lesson-divider:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
-.divider-btn{position:absolute; top:6px; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:6px; border:1px solid var(--line); background:var(--surface); color:var(--muted); font-family:var(--mono); font-size:12px; line-height:1; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center}
-.divider-btn:hover{color:var(--accent); border-color:var(--accent-dim)}
-.divider-btn:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
-.lesson.panel-collapsed .lesson-panel{display:none}
-.lesson.panel-collapsed .lesson-divider{flex-basis:30px; cursor:default}
-.lesson.panel-collapsed .lesson-divider::before{display:none}
-.lesson.panel-collapsed .divider-btn{top:50%; transform:translate(-50%,-50%); width:26px; height:auto; padding:10px 0; writing-mode:vertical-rl; letter-spacing:.06em}
 
 /* ---- the panel ---- */
 .lesson-panel{flex:0 0 var(--panel-w); width:var(--panel-w); min-width:0; display:flex; flex-direction:column; background:var(--surface); border:1px solid var(--line); border-radius:12px; font-family:var(--sans); font-size:14px; line-height:1.55; overflow:hidden}
@@ -94,5 +87,4 @@
   .lesson{flex-direction:column; padding:0 12px}
   .lesson-divider{display:none}
   .lesson-panel{width:auto; flex-basis:auto}
-  .lesson.panel-collapsed .lesson-panel{display:flex}
 }

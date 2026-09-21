@@ -26,10 +26,10 @@ const keysHtml = s => s ? (s.match(/"[^"]*"|\S+/g) || []).map(t => t.startsWith(
   /^(then|×\d+|,|and|or|…)$/.test(t) || /^[a-z]/.test(t) && !/^[a-z]$/.test(t) ? `<span class="kx">${esc(t)}</span>` : kbd(t)).join(' ') : '';
 
 const PANEL_KEY = 'hk2_panel';
-const PANEL_MIN = 280, PANEL_MAX = 640, PANEL_DEFAULT = 380;
+const PANEL_MIN = 300, PANEL_MAX = 560, PANEL_DEFAULT = 380;   // the divider moves within these limits; the panel is always visible (§4)
 function loadPanel() {
-  try { const v = JSON.parse(localStorage.getItem(PANEL_KEY) || 'null'); if (v && typeof v === 'object') return { w: clampW(v.w), collapsed: !!v.collapsed }; } catch (e) { /* private window, blocked storage */ }
-  return { w: PANEL_DEFAULT, collapsed: false };
+  try { const v = JSON.parse(localStorage.getItem(PANEL_KEY) || 'null'); if (v && typeof v === 'object') return { w: clampW(v.w) }; } catch (e) { /* private window, blocked storage */ }
+  return { w: PANEL_DEFAULT };
 }
 function savePanel(p) { try { localStorage.setItem(PANEL_KEY, JSON.stringify(p)); } catch (e) { /* ignore */ } }
 function clampW(w) { return Number.isFinite(w) ? Math.min(PANEL_MAX, Math.max(PANEL_MIN, Math.round(w))) : PANEL_DEFAULT; }
@@ -54,9 +54,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
         <div id="sheetMount"></div>
       </div></div></div>
     </div>
-    <div class="lesson-divider" id="divider" role="separator" aria-orientation="vertical" aria-label="Lesson panel width. Arrow keys resize it, Enter hides or shows it." tabindex="0" title="Drag to resize the panel">
-      <button class="divider-btn" id="collapseBtn" type="button"></button>
-    </div>
+    <div class="lesson-divider" id="divider" role="separator" aria-orientation="vertical" aria-label="Lesson panel width. Arrow keys resize it, Home resets it." tabindex="0" title="Drag to resize the panel"></div>
     <aside class="lesson-panel" id="panel" aria-label="Lesson panel">
       <div class="panel-head">
         <div class="lesson-crumb"><a href="#/learn">Learn</a> › ${esc(chapter ? chapter.title : '')} › <span>${lessonNumber(lesson.id)}</span></div>
@@ -120,7 +118,9 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   /* ---------------- the panel ---------------- */
   const teachStep = () => lesson.steps.find(s => s.mode === 'teach');
   const modeLabel = () => phase === 'teach' ? 'Read' : run.mode === 'guided' ? 'Guided' : run.mode === 'solo' ? 'Solo' : 'Timed';
-  const assisted = () => run.mode === 'guided' || revealed;
+  // Guided is the normal way to complete a lesson and is NOT assistance (SITE_SPEC §4): only
+  // revealing extra steps through Help ("Show me") marks the attempt assisted.
+  const assisted = () => revealed;
 
   function renderPanel() {
     $('lessonMode').textContent = modeLabel();
@@ -130,9 +130,6 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     if (tab === 'lesson') renderLesson(); else if (tab === 'help') renderHelp(); else renderUsed();
     renderActions();
     renderTimer();
-    $('collapseBtn').textContent = panel.collapsed ? 'Show lesson panel' : '›';
-    $('collapseBtn').setAttribute('aria-label', panel.collapsed ? 'Show the lesson panel' : 'Hide the lesson panel');
-    $('collapseBtn').setAttribute('aria-expanded', panel.collapsed ? 'false' : 'true');
   }
 
   function goalsHtml() {
@@ -186,7 +183,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       p.innerHTML = `<div class="help-goal">${esc(cur.text)}</div><div class="help-keys">${keysHtml(cur.keys || '')}</div>` + footer + notes;
     } else {
       p.innerHTML = `<div class="help-goal">${esc(cur.text)}</div>
-        <p class="help-note">Reading is free. Showing the keys counts as help: this run is then marked assisted${run.mode === 'timed' ? ', and a timed run with help sets no personal best' : ''}.</p>
+        <p class="help-note">Reading is free. Showing the keys counts as help: this attempt is then marked assisted${run.mode === 'timed' ? ', and a timed run with help sets no personal best' : ''}.</p>
         <p><button class="btn" id="revealBtn" type="button">Show me the keys</button></p>` + footer + notes;
       p.querySelector('#revealBtn').onclick = () => { revealed = true; renderPanel(); };   // re-rendered: the button is gone, keys go to the sheet
     }
@@ -231,7 +228,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   /* ---------------- completion ---------------- */
   const fmtSecs = s => s.toFixed(1);
   function statsLine() {
-    const parts = [`<b>${run.startedAt == null ? '—' : fmtSecs(run.elapsed) + ' s'}</b>`, `<b>${run.session.keyLog.length}</b> keystrokes`, assisted() ? 'assisted' : 'solo'];
+    const parts = [`<b>${run.startedAt == null ? '—' : fmtSecs(run.elapsed) + ' s'}</b>`, `<b>${run.session.keyLog.length}</b> keystrokes`, modeLabel().toLowerCase() + (assisted() ? ' · assisted' : '')];
     if (run.mouseCount) parts.push(`mouse ×${run.mouseCount}`);
     if (run.mode === 'timed' && run.par) parts.push(`par ${run.par} s`);
     return parts.join(' · ');
@@ -255,9 +252,9 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       <div class="rm-title" id="doneTitle">Lesson complete</div>
       <div class="rm-lesson">${lessonNumber(lesson.id)} · ${esc(lesson.title)} · ${modeLabel()}</div>
       <div class="rm-time">${secs == null ? '—' : fmtSecs(secs)}<span>s</span></div>
-      <div class="rm-stats"><div>keystrokes<b>${run.session.keyLog.length}</b></div><div>help<b>${assisted() ? 'Assisted' : 'Solo'}</b></div>${run.mouseCount ? `<div>mouse<b>×${run.mouseCount}</b></div>` : ''}${run.mode === 'timed' && run.par ? `<div>par<b>${run.par} s</b></div>` : ''}</div>
+      <div class="rm-stats"><div>keystrokes<b>${run.session.keyLog.length}</b></div><div>${modeLabel().toLowerCase()}<b>${assisted() ? 'Assisted' : run.mode === 'guided' ? 'Complete' : 'Solo'}</b></div>${run.mouseCount ? `<div>mouse<b>×${run.mouseCount}</b></div>` : ''}${run.mode === 'timed' && run.par ? `<div>par<b>${run.par} s</b></div>` : ''}</div>
       ${run.mode === 'timed' ? `<div class="rm-note">${!assisted() && !run.mouseCount ? (pb != null ? `personal best <b>${fmtSecs(pb)} s</b>` : '') : 'help or mouse in a timed run: no personal best'}</div>` : ''}
-      ${run.mode === 'guided' && !revealed ? `<div class="rm-note">Try solo does it again without the keys shown.</div>` : ''}
+      ${assisted() ? `<div class="rm-note">Steps were shown on request, so this attempt counts as assisted. Try solo earns the rest.</div>` : run.mode === 'guided' ? `<div class="rm-note">Try solo does it again without the keys shown.</div>` : ''}
       ${firstEver ? `<div class="rm-save"><b>Your first lesson is done.</b> Progress is saved on this device. Sign-in, which keeps it across devices, arrives in the next phase; see <a href="#/account">Account</a>.</div>` : ''}
       <div class="rm-opts">${doneButtonsHtml()}<button class="btn btn-ghost" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button></div>
       <div class="rm-more">${esc(saveState)}</div>
@@ -318,19 +315,16 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); e.stopPropagation(); selectTab(e.key === 'Home' ? TABS[0] : TABS[TABS.length - 1], true); }
   });
 
-  /* ---------------- divider: drag, keyboard, collapse ---------------- */
+  /* ---------------- divider: drag and keyboard, within limits ---------------- */
   const divider = $('divider');
   function applyPanel() {
     el.style.setProperty('--panel-w', panel.w + 'px');
-    el.classList.toggle('panel-collapsed', panel.collapsed);
     divider.setAttribute('aria-valuenow', String(panel.w)); divider.setAttribute('aria-valuemin', String(PANEL_MIN)); divider.setAttribute('aria-valuemax', String(PANEL_MAX));
     if (sheetView) requestAnimationFrame(() => sheetView.render());
   }
   function setPanelW(w) { panel.w = clampW(w); applyPanel(); }
-  function toggleCollapse() { panel.collapsed = !panel.collapsed; savePanel(panel); applyPanel(); renderPanel(); }
   let drag = null;
   divider.addEventListener('pointerdown', e => {
-    if (e.target.closest('.divider-btn') || panel.collapsed) return;
     drag = { x: e.clientX, w: panel.w }; divider.classList.add('dragging'); divider.setPointerCapture(e.pointerId); e.preventDefault();
   });
   divider.addEventListener('pointermove', e => { if (drag) setPanelW(drag.w + (drag.x - e.clientX)); });
@@ -341,11 +335,9 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     if (e.key === 'ArrowLeft') { setPanelW(panel.w + 24); savePanel(panel); }
     else if (e.key === 'ArrowRight') { setPanelW(panel.w - 24); savePanel(panel); }
     else if (e.key === 'Home') { setPanelW(PANEL_DEFAULT); savePanel(panel); }
-    else if (e.key === 'Enter' || e.key === ' ') toggleCollapse();
     else return;
     e.preventDefault(); e.stopPropagation();
   });
-  $('collapseBtn').onclick = () => { toggleCollapse(); $('collapseBtn').blur(); };
   applyPanel();
 
   /* ---------------- keys: the whole page is the workspace ---------------- */
