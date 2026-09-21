@@ -106,6 +106,11 @@ export class RibbonView {
     this._fitKey = ''; this._fitSet = new Set(); this._tipGroup = {};   // which groups are folded at the current width, and where a folded tip anchors
     this._onResize = () => { clearTimeout(this._rzT); this._rzT = setTimeout(() => this.render(), 120); };
     window.addEventListener('resize', this._onResize);
+    // The bar's own width can change without a window resize (a stylesheet landing after the first
+    // paint, the lesson panel's divider being dragged): re-measure the fold when it does.
+    this._roW = 0;
+    this.ro = typeof ResizeObserver === 'function' ? new ResizeObserver(() => { const w = this.el.clientWidth | 0; if (w && w !== this._roW) { this._roW = w; this._onResize(); } }) : null;
+    if (this.ro) this.ro.observe(this.el);
     this.unsub = session.onChange(what => { if (what === 'key' && this.localMenu) this.localMenu = null; this.render(); });
     this.render();
   }
@@ -118,6 +123,7 @@ export class RibbonView {
     if (this.pasteDialog) this.pasteDialog.remove();
     if (this.fmtDialog) this.fmtDialog.remove();
     window.removeEventListener('resize', this._onResize); clearTimeout(this._rzT);
+    if (this.ro) this.ro.disconnect();
     if (this.slot) this.slot.classList.remove('rib-full');
     this.el.remove();
   }

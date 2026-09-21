@@ -108,7 +108,7 @@ test('a command clicked while KeyTips or a menu are up leaves the walk, and a me
 
 test('recordMouse counts and logs every workspace click and tells the host', () => {
   const seen = []; const s = new Session(new Sheet(), { onMouse: w => seen.push(w) });
-  assert.equal(s.mouse, undefined);
+  assert.deepEqual(s.mouse, { count: 0, log: [] });   // the Session starts the record; the views add to it
   recordMouse(s, 'cell'); recordMouse(s, 'ribbon:H1'); recordMouse(s, 'dialog:fmt');
   assert.equal(s.mouse.count, 3); assert.deepEqual(s.mouse.log.map(x => x.what), ['cell', 'ribbon:H1', 'dialog:fmt']);
   assert.ok(s.mouse.log.every(x => typeof x.t === 'number')); assert.deepEqual(seen, ['cell', 'ribbon:H1', 'dialog:fmt']);

@@ -128,6 +128,7 @@ export class Session {
     this.pasteKind = null; this.pasteOp = 'none';
     this.fontColorIdx = 0; this.fillColorIdx = 0; this.cellStyleIdx = 0; this.colwBuf = ''; this.sortPend = null; this.fxfixPend = null;
     this.keyLog = [];
+    this.mouse = { count: 0, log: [] };   // workspace mouse actions, recorded by the views (SITE_SPEC §6)
     this.listeners = new Set();
     this.t0 = null;
     this.sheet.onChange(() => this.emit('sheet'));

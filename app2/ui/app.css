@@ -573,7 +573,7 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 /* a folded group (the bar is too narrow for its buttons): one big button, its live KeyTips stacked beneath */
 .rf-grp.rf-collapsed .rf-grpbtn{width:50px}
 .rf-grptips{position:absolute; left:50%; bottom:9px; transform:translateX(-50%); display:flex; gap:2px; z-index:3}
-.rf-grptips .ri-key{position:static; transform:none}
+.ribbon-full .rf-grptips .ri-key{position:static; transform:none}
 .rdrop-item.on .rdrop-lbl{color:var(--accent)}
 /* the disabled name / size / number-format boxes */
 .rf-box{position:relative; display:inline-flex; align-items:center; justify-content:space-between; height:17px; padding:0 5px; border:1px solid var(--line); border-radius:4px;
