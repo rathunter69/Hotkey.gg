@@ -6,6 +6,8 @@ import { progress } from './progress.js';
 import { prefs, PLATFORMS } from './prefs.js';
 import { LESSONS } from '../content/index.js';
 import { showToast } from '../ui/toast.js';
+import { mountEffects } from '../ui/effects.js';
+import { storeRibbonMode } from '../ui/ribbon-view.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const SECTIONS = ['desks', 'stats', 'profile', 'settings', 'data'];
@@ -76,8 +78,14 @@ export function mountAccountPage(root, ctx = {}) {
 
   function wire() {
     el.querySelector('#setPlatform').onchange = e => { prefs.set({ platform: e.target.value }); showToast('Keys follow ' + (e.target.value === 'mac' ? 'Mac' : 'Windows')); };
-    el.querySelector('#setRibbon').onchange = e => { prefs.set({ ribbon: e.target.value || null }); showToast('Ribbon: ' + (e.target.value || 'default')); };
-    el.querySelector('#setMute').onchange = e => { prefs.set({ mute: e.target.checked }); showToast(e.target.checked ? 'Sounds muted' : 'Sounds on'); };
+    // The ribbon view and the effects module keep their own remembered keys ('hk2_ribbon', 'hk2_mute');
+    // Settings writes through to them so the workspace and this page always agree.
+    el.querySelector('#setRibbon').onchange = e => {
+      const v = e.target.value || null; prefs.set({ ribbon: v });
+      if (v) storeRibbonMode(v); else { try { localStorage.removeItem('hk2_ribbon'); } catch (err) { /* storage blocked */ } }
+      showToast('Ribbon: ' + (v || 'default'));
+    };
+    el.querySelector('#setMute').onchange = e => { prefs.set({ mute: e.target.checked }); mountEffects().setMuted(e.target.checked); showToast(e.target.checked ? 'Sounds muted' : 'Sounds on'); };
     el.querySelector('#setTheme').onclick = () => { if (ctx.nav && ctx.nav.openThemes) ctx.nav.openThemes(); else { const b = document.getElementById('navThemes'); if (b) b.click(); } };
     el.querySelector('#exportBtn').onclick = () => {
       try {

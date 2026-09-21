@@ -11,16 +11,19 @@ import { RibbonView } from '../ui/ribbon-view.js';
 import { mountKeycaps } from '../ui/keycaps.js';
 import { mountEffects } from '../ui/effects.js';
 import { showToast } from '../ui/toast.js';
+import { keyLabel } from './prefs.js';
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+/** A keycap: the chord as the learner's platform shows it (Ctrl → ⌘, Alt → ⌥ on a Mac). */
+const kbd = k => `<kbd>${esc(keyLabel(k))}</kbd>`;
 /** `Ctrl+1` → <kbd>Ctrl+1</kbd>; everything else escaped. */
-const rich = s => esc(s).replace(/`([^`]+)`/g, (m, k) => `<kbd>${k}</kbd>`);
+const rich = s => esc(s).replace(/`([^`]+)`/g, (m, k) => kbd(k));
 /**
  * A goal's keys: keycaps for keys, plain text for connectives ('then', '×5') and, as in a solution
  * script, a double-quoted run is text to type: '"1200" Enter' → type “1200” ⏎.
  */
 const keysHtml = s => s ? (s.match(/"[^"]*"|\S+/g) || []).map(t => t.startsWith('"') ? `<span class="kx">type “${esc(t.slice(1, -1))}”</span>` :
-  /^(then|×\d+|,|and|or|…)$/.test(t) || /^[a-z]/.test(t) && !/^[a-z]$/.test(t) ? `<span class="kx">${esc(t)}</span>` : `<kbd>${esc(t)}</kbd>`).join(' ') : '';
+  /^(then|×\d+|,|and|or|…)$/.test(t) || /^[a-z]/.test(t) && !/^[a-z]$/.test(t) ? `<span class="kx">${esc(t)}</span>` : kbd(t)).join(' ') : '';
 
 const PANEL_KEY = 'hk2_panel';
 const PANEL_MIN = 280, PANEL_MAX = 640, PANEL_DEFAULT = 380;
@@ -174,9 +177,9 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     if (phase === 'done') { p.innerHTML = `<p class="help-note">Lesson complete. <kbd>Enter</kbd> continues.</p>` + notes; return; }
     const cur = run.current;   // the current goal, or the first failing end-state predicate once every goal has landed
     if (!cur) { p.innerHTML = `<p class="help-note">Every goal has landed.</p>` + notes; return; }
-    const footer = `<p class="help-note">Press the keys one after another. <kbd>Esc</kbd> backs out of the Ribbon or a dialog box; <kbd>Ctrl+Z</kbd> undoes.</p>`;
+    const footer = `<p class="help-note">Press the keys one after another. <kbd>Esc</kbd> backs out of the Ribbon or a dialog box; ${kbd('Ctrl+Z')} undoes.</p>`;
     if (run.doneCount >= run.goals.length) {
-      p.innerHTML = `<div class="help-goal">${esc(cur.text)}</div><p class="help-note">Every goal has landed, but the sheet is not yet as the lesson expects. Put this right and the lesson completes; <kbd>Ctrl+Z</kbd> undoes.</p>` + notes;
+      p.innerHTML = `<div class="help-goal">${esc(cur.text)}</div><p class="help-note">Every goal has landed, but the sheet is not yet as the lesson expects. Put this right and the lesson completes; ${kbd('Ctrl+Z')} undoes.</p>` + notes;
       return;
     }
     if (run.mode === 'guided' || revealed) {
@@ -194,7 +197,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     const used = shortcutsUsed(run.session.keyLog);
     const mouse = run.mouseCount;
     p.innerHTML = (used.length
-      ? `<ul class="used-list">${used.map(u => `<li class="used-row"><span class="used-keys">${u.keys.split(' ').map(k => `<kbd>${esc(k)}</kbd>`).join(' ')}</span><span class="used-count">${u.count > 1 ? '×' + u.count : ''}</span></li>`).join('')}</ul>`
+      ? `<ul class="used-list">${used.map(u => `<li class="used-row"><span class="used-keys">${u.keys.split(' ').map(k => kbd(k)).join(' ')}</span><span class="used-count">${u.count > 1 ? '×' + u.count : ''}</span></li>`).join('')}</ul>`
       : `<p class="used-empty">No shortcuts yet. They are listed here as you press them, with how often.</p>`) +
       (mouse ? `<p class="used-mouse">Mouse: ${mouse} ${mouse === 1 ? 'click' : 'clicks'} on the workspace. Allowed here; the keyboard is what you are practising.</p>` : '');
   }
