@@ -17,7 +17,7 @@ Last updated 2026-09-21. Sequence, status and open decisions. Behaviour of every
 |---|---|---|---|
 | 0 | Structure | app2/ layout, headless engine, unit tests, fast check | DONE |
 | 1 | Learning slice | Lesson format, catalog, lesson view, first 7 Foundations lessons, guest progress | Built; Wolf playtest pending |
-| A | Site shell and onboarding | Layout per SITE_SPEC 2-5 (panel right, full ribbon in Chapter 1, slim mode bar), landing, first run, all pages, reference port, public lesson pages, browser smoke | Wolf playtests a preview link and signs off |
+| A | Site shell and onboarding | Layout per SITE_SPEC 2-5 (panel right, full ribbon in Chapter 1, slim mode bar), landing, first run, all pages, reference port, public lesson pages, browser smoke | Built 2026-09-21; Wolf playtests a preview link and signs off (pending). Cloudflare Pages needs Wolf's account (section 3) |
 | B | Accounts and saved progress | Schema + server functions + SQL permission tests written in app2/supabase/ (not applied); auth (email/password, magic link, Google), handle at signup, guest carry-over, account page, honest save states | Cowork chat reviews and applies migrations to the new Supabase project; permission tests green; advisors clean |
 | C | Chapter 1 complete | All Foundations sections (formatting, basic formulas, copy/paste/fill), chapter project + assessment, test-out | A real beginner gets from lesson 1 to the end without outside help (2-3 people) |
 | D | Game layer | Drill workspace (old trainer layout), pars, PBs, Daily, rapid-fire, boards, rank, XP/level, pixel-art achievements, earned cosmetics, stats | Parity walk against the old build's workspace and themes |

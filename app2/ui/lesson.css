@@ -1,0 +1,98 @@
+/* app2/ui/lesson.css — the lesson workspace (SITE_SPEC §4): sheet and ribbon on the LEFT, the
+   instructions panel on the RIGHT with Lesson | Help | Shortcuts used tabs, a draggable divider
+   between them, and the centered completion overlay (the old build's results card). Loaded after
+   shell.css; the goal, keycap and button rules there are reused. */
+
+.lesson{display:flex; gap:0; align-items:stretch; max-width:1460px; margin:12px auto 24px; padding:0 16px; min-height:calc(100vh - 140px); --panel-w:380px}
+.lesson-main{flex:1 1 auto; min-width:0; display:flex; flex-direction:column}
+.lesson-main .stage{flex:1 1 auto}
+
+/* ---- the divider: drag with the mouse, arrow keys resize, Enter hides or shows the panel ---- */
+.lesson-divider{flex:0 0 16px; position:relative; cursor:col-resize; display:flex; align-items:center; justify-content:center; user-select:none; -webkit-user-select:none; border-radius:6px; touch-action:none}
+.lesson-divider::before{content:''; width:2px; height:56px; border-radius:2px; background:var(--line); transition:background .12s}
+.lesson-divider:hover::before, .lesson-divider:focus-visible::before, .lesson-divider.dragging::before{background:var(--accent)}
+.lesson-divider:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+.divider-btn{position:absolute; top:6px; left:50%; transform:translateX(-50%); width:22px; height:22px; border-radius:6px; border:1px solid var(--line); background:var(--surface); color:var(--muted); font-family:var(--mono); font-size:12px; line-height:1; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center}
+.divider-btn:hover{color:var(--accent); border-color:var(--accent-dim)}
+.divider-btn:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+.lesson.panel-collapsed .lesson-panel{display:none}
+.lesson.panel-collapsed .lesson-divider{flex-basis:30px; cursor:default}
+.lesson.panel-collapsed .lesson-divider::before{display:none}
+.lesson.panel-collapsed .divider-btn{top:50%; transform:translate(-50%,-50%); width:26px; height:auto; padding:10px 0; writing-mode:vertical-rl; letter-spacing:.06em}
+
+/* ---- the panel ---- */
+.lesson-panel{flex:0 0 var(--panel-w); width:var(--panel-w); min-width:0; display:flex; flex-direction:column; background:var(--surface); border:1px solid var(--line); border-radius:12px; font-family:var(--sans); font-size:14px; line-height:1.55; overflow:hidden}
+.panel-head{padding:14px 18px 6px}
+.panel-head .lesson-meta{margin-bottom:6px; flex-wrap:wrap; row-gap:4px}
+.panel-head .lesson-timer{margin-left:0; white-space:nowrap}
+.lesson-progress{color:var(--faint)}
+.lesson-tools{margin-left:auto; display:flex; gap:6px; align-items:center}
+.lesson-tools .btn{padding:3px 8px; font-size:11.5px}
+.panel-tabs{display:flex; gap:2px; padding:0 10px; border-bottom:1px solid var(--line)}
+.panel-tab{font-family:var(--mono); font-size:12px; color:var(--muted); background:none; border:0; border-bottom:2px solid transparent; padding:8px 10px; cursor:pointer; margin-bottom:-1px; border-radius:6px 6px 0 0}
+.panel-tab:hover{color:var(--text)}
+.panel-tab[aria-selected="true"]{color:var(--text); border-bottom-color:var(--accent)}
+.panel-tab:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+.panel-tab .tab-n{color:var(--faint); margin-left:4px}
+.panel-body{flex:1 1 auto; overflow:auto; min-height:0; padding:14px 18px; scrollbar-width:thin; scrollbar-color:var(--line) transparent}
+.panel-body h2{font-size:15px; font-weight:600; margin:0 0 8px}
+.panel-body p{margin:0 0 10px; color:var(--text)}
+.panel-body kbd{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var(--surface2); border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:1px 6px; white-space:nowrap}
+.panel-actions{padding:10px 18px 14px; border-top:1px solid var(--line); display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.panel-actions:empty{display:none}
+.btn:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+/* goals: the gentle keyboard nudge after a mouse action, and the tick that the effects module pops */
+.goal-nudge{grid-column:2; margin-top:6px; font-size:12.5px; color:var(--muted); display:flex; gap:6px; align-items:center; flex-wrap:wrap}
+.goal-nudge::before{content:'⌨'; color:var(--accent); font-size:13px}
+.goal-keys .kx{color:var(--muted); font-size:12px}
+.goal-progress{height:4px; background:var(--surface2); border-radius:99px; margin:0 0 12px; overflow:hidden}
+.goal-progress i{display:block; height:100%; width:0; background:var(--accent); border-radius:99px; transition:width .35s cubic-bezier(.2,.7,.2,1)}
+
+/* Help tab */
+.help-goal{font-weight:600; margin-bottom:6px}
+.help-keys{display:flex; flex-wrap:wrap; gap:4px; margin-bottom:8px; align-items:center}
+.help-keys .kx{color:var(--muted); font-size:12px}
+.help-note{color:var(--muted); margin:0 0 10px}
+.help-warn{color:var(--warn, #b7791f); font-size:12.5px; margin:0 0 10px}
+.help-notes{margin-top:14px; border-top:1px solid var(--line); padding-top:10px}
+.help-notes summary{cursor:pointer; color:var(--muted); font-family:var(--mono); font-size:12px}
+.help-notes summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+.help-notes h2{margin-top:10px}
+.help-links{margin-top:6px; font-size:12.5px; color:var(--muted)}
+.help-links a{color:var(--muted)}
+.help-links a:hover{color:var(--accent)}
+
+/* Shortcuts used tab */
+.used-list{list-style:none; margin:0; padding:0}
+.used-row{display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--line)}
+.used-row:last-child{border-bottom:0}
+.used-keys{display:flex; gap:4px; flex-wrap:wrap}
+.used-count{margin-left:auto; font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+.used-empty{color:var(--muted)}
+.used-mouse{margin-top:12px; font-size:12.5px; color:var(--muted)}
+
+/* ---- completion: the centered overlay (the old results card), Enter continues ---- */
+.lesson-done{position:fixed; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; z-index:40}
+.lesson-done[hidden]{display:none}
+.rm-card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:22px 26px; width:380px; max-width:calc(100vw - 32px); text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.55); max-height:calc(100vh - 48px); overflow-y:auto; font-family:var(--sans)}
+.rm-title{font-family:var(--mono); font-size:12px; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px}
+.rm-lesson{font-family:var(--mono); font-size:13px; color:var(--muted); margin-bottom:14px}
+.rm-time{font-family:var(--mono); font-size:48px; font-weight:700; color:var(--text); line-height:1; letter-spacing:-1.5px}
+.rm-time span{font-size:18px; color:var(--muted); font-weight:400; margin-left:2px}
+.rm-stats{display:flex; justify-content:center; gap:22px; margin:18px 0 14px; font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
+.rm-stats b{display:block; color:var(--text); font-size:17px; font-weight:500; margin-top:4px; letter-spacing:0; text-transform:none}
+.rm-note{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin:0 0 14px}
+.rm-note b{color:var(--text)}
+.rm-save{font-size:13px; color:var(--muted); background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin:0 0 16px; text-align:left; line-height:1.5}
+.rm-save b{color:var(--text)}
+.rm-save a{color:var(--text)}
+.rm-opts{display:flex; gap:8px; justify-content:center; flex-wrap:wrap}
+.rm-more{margin-top:10px; font-family:var(--mono); font-size:11.5px; color:var(--faint)}
+
+@media(max-width:900px){
+  .lesson{flex-direction:column; padding:0 12px}
+  .lesson-divider{display:none}
+  .lesson-panel{width:auto; flex-basis:auto}
+  .lesson.panel-collapsed .lesson-panel{display:flex}
+}
