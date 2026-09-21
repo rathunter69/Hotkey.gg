@@ -12,6 +12,7 @@ import { COLW_DEFAULT, cellNumPx, cellTxtPx } from '../engine/sheet.js';
 import { dispText } from '../engine/format.js';
 import { colLetter, refKey, parseRef } from '../engine/refs.js';
 import { formulaRefs, isErrVal } from '../engine/formula.js';
+import { recordMouse, MODAL_DIALOGS } from './ribbon-commands.js';
 
 // Excel's classic formula-highlighting palette — saturated, universally recognizable, works on
 // both dark and light themes. Same as Office Theme Accents 1, Red, Green, Purple, Accent 2, Gray.
@@ -101,6 +102,15 @@ export class SheetView {
     if (this.ro) this.ro.observe(gw);
     this._onResize = () => { clearTimeout(this._rzT); this._rzT = setTimeout(() => { if (this.destroyed) return; this.render(); requestAnimationFrame(() => { if (!this.destroyed) this.render(); }); }, 120); };
     window.addEventListener('resize', this._onResize);
+    // the mouse (SITE_SPEC §6): click selects, Shift+click extends, drag selects a range, headers
+    // select columns/rows/all, double-click edits — every workspace click recorded on the session
+    this.drag = null;
+    this._onDown = e => this.onMouseDown(e);
+    this._onDbl = e => this.onDblClick(e);
+    this._onMove = e => this.onMouseMove(e);
+    this._onUp = () => this.endDrag();
+    gw.addEventListener('mousedown', this._onDown);
+    gw.addEventListener('dblclick', this._onDbl);
     this.render();
   }
 
@@ -109,7 +119,92 @@ export class SheetView {
     if (this.unsub) this.unsub();
     if (this.ro) this.ro.disconnect();
     window.removeEventListener('resize', this._onResize); clearTimeout(this._rzT);
+    this.endDrag();
+    this.gw.removeEventListener('mousedown', this._onDown); this.gw.removeEventListener('dblclick', this._onDbl);
     this.fbar.remove(); this.gw.remove(); this.el.classList.remove('sheet-view');
+  }
+
+  /* ---------------- mouse ---------------- */
+  /** The grid cell or header under an event: {r,c} for a cell, {hdr:'col',c} / {hdr:'row',r} / {hdr:'all'} for a header. */
+  hit(e) {
+    const t = e.target; if (!t || !t.closest) return null;
+    const td = t.closest('td[data-r]');
+    if (td) return { r: +td.dataset.r, c: +td.dataset.c };
+    const th = t.closest('th'); if (!th || !this.grid.contains(th)) return null;
+    const tr = th.parentElement; const S = this.sheet;
+    if (tr === this.grid.rows[0]) return th.cellIndex === 0 ? { hdr: 'all' } : { hdr: 'col', c: th.cellIndex };
+    const r = parseInt(th.textContent, 10);
+    return (r >= 1 && r <= S.rows) ? { hdr: 'row', r } : null;   // filler rows below the content are inert
+  }
+  onMouseDown(e) {
+    if (e.button !== 0) return;
+    const h = this.hit(e); if (!h) return;
+    e.preventDefault();   // the sheet keeps the keyboard; no text selection starts
+    if (e.detail > 1) return;   // the second press of a double-click: dblclick handles it
+    const ss = this.session, S = this.sheet;
+    if (ss.dialog && MODAL_DIALOGS.has(ss.dialog)) return;   // a modal card owns the input (Excel)
+    if (ss.mode === 'ribbon') ss.exitRibbon(false);          // a click on the sheet dismisses KeyTips and dropdowns
+    if (ss.editing && !ss.commitEdit(0, 0, { kind: 'move' })) { ss.emit('mouse'); return; }   // Excel commits the entry when you click away; a refused one stays open
+    ss.startClock(); S.tabHome = null;
+    if (h.hdr) {
+      if (h.hdr === 'all') { const a = S.dispActive(); S.sel = { r: 1, c: 1 }; S.active = { r: S.rows, c: S.cols }; S.selA = { r: a.r, c: a.c }; }
+      else if (h.hdr === 'col') {
+        if (e.shiftKey && S.sel) { S.sel = { r: 1, c: S.sel.c }; S.active = { r: S.rows, c: h.c }; }
+        else { S.active = { r: 1, c: h.c }; S.sel = null; S.selA = null; S.selectCol(); }
+        this.drag = { kind: 'col', c0: e.shiftKey && S.sel ? S.sel.c : h.c };
+      } else {
+        if (e.shiftKey && S.sel) { S.sel = { r: S.sel.r, c: 1 }; S.active = { r: h.r, c: S.cols }; }
+        else { S.active = { r: h.r, c: 1 }; S.sel = null; S.selA = null; S.selectRow(); }
+        this.drag = { kind: 'row', r0: e.shiftKey && S.sel ? S.sel.r : h.r };
+      }
+      S.emit('select');
+      recordMouse(ss, 'header');
+    } else {
+      if (e.shiftKey) {   // extend from the displayed active cell (the anchor), as Shift+arrow does
+        if (!S.sel) { const a = S.dispActive(); S.sel = { r: a.r, c: a.c }; S.selA = null; }
+        S.active = { r: h.r, c: h.c }; S.emit('select');
+        this.drag = { kind: 'cell', r: S.sel.r, c: S.sel.c };
+      } else { S.goTo(h.r, h.c); this.drag = { kind: 'cell', r: h.r, c: h.c }; }
+      recordMouse(ss, 'cell');
+    }
+    document.addEventListener('mousemove', this._onMove);
+    document.addEventListener('mouseup', this._onUp);
+    ss.emit('mouse');
+  }
+  onMouseMove(e) {
+    const d = this.drag; if (!d) return;
+    if (!(e.buttons & 1)) { this.endDrag(); return; }   // the button was released outside the window
+    const h = this.hit(e); if (!h) return;
+    const S = this.sheet;
+    if (d.kind === 'cell') {
+      if (h.hdr) return;
+      if (S.active.r === h.r && S.active.c === h.c && (S.sel ? true : (h.r === d.r && h.c === d.c))) return;
+      if (h.r === d.r && h.c === d.c) { S.sel = null; S.selA = null; S.active = { r: h.r, c: h.c }; }
+      else { S.sel = { r: d.r, c: d.c }; S.active = { r: h.r, c: h.c }; S.selA = null; }   // the pressed cell stays the white anchor
+    } else if (d.kind === 'col') {
+      const c = h.hdr === 'col' ? h.c : (h.hdr ? null : h.c); if (c == null || S.active.c === c) return;
+      S.sel = { r: 1, c: d.c0 }; S.active = { r: S.rows, c }; S.selA = { r: 1, c: d.c0 };
+    } else {
+      const r = h.hdr === 'row' ? h.r : (h.hdr ? null : h.r); if (r == null || S.active.r === r) return;
+      S.sel = { r: d.r0, c: 1 }; S.active = { r, c: S.cols }; S.selA = { r: d.r0, c: 1 };
+    }
+    S.emit('select');
+  }
+  endDrag() {
+    this.drag = null;
+    document.removeEventListener('mousemove', this._onMove);
+    document.removeEventListener('mouseup', this._onUp);
+  }
+  /** Double-click opens the cell for editing: the session gets an F2, as the keyboard would. */
+  onDblClick(e) {
+    const h = this.hit(e); if (!h || h.hdr) return;
+    e.preventDefault();
+    const ss = this.session;
+    if (ss.editing || (ss.dialog && MODAL_DIALOGS.has(ss.dialog))) return;
+    const a = this.sheet.dispActive();
+    if (a.r !== h.r || a.c !== h.c) this.sheet.goTo(h.r, h.c);
+    ss.key({ key: 'F2' });
+    recordMouse(ss, 'edit');
   }
 
   /** The one grid write. */

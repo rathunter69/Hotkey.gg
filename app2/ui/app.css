@@ -483,6 +483,137 @@ html.hk-fs .stage-row{min-height:clamp(400px, calc(100vh - 262px), 900px)}
 td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
   border-top:8px solid var(--bad); border-left:8px solid transparent}
 
+/* ---------- 12a. the mode bar and its tools (index.html 1308, 1335–1339) ---------- */
+.mode-bar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-family:var(--mono); font-size:12.5px; margin:0 0 10px}
+.mode-bar .mb-title{font-weight:700; letter-spacing:-.2px; color:var(--text)}
+.mode-bar .mb-sub{color:var(--muted); font-size:11.5px}
+.mode-bar .mb-tools{margin-left:auto; display:flex; align-items:center; gap:6px}
+.mb-tool{background:var(--surface2); border:1px solid var(--line);
+  color:var(--text); font-family:var(--mono); font-size:11px; font-weight:500;
+  padding:6px 11px; border-radius:7px; cursor:pointer; transition:.13s; display:inline-flex; align-items:center; gap:7px}
+.mb-tool:hover{color:var(--text); border-color:var(--accent-dim); background:color-mix(in srgb, var(--accent) 8%, var(--surface2))}
+.mb-tool.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
+.mb-tool:focus-visible, .rpin-b:focus-visible, .rf-tab:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.mb-tool svg{width:15px; height:15px; display:block; flex:none}
+.fx-mute .fx-mute-lbl{white-space:nowrap}
+
+/* ---------- 12b. feedback (SITE_SPEC §1): the goal tick and the finish ---------- */
+.fx-tick{position:absolute; right:8px; top:50%; width:18px; height:18px; border-radius:50%;
+  background:var(--accent); color:var(--on-accent,#fff); display:grid; place-items:center;
+  font-family:var(--mono); font-size:11px; font-weight:700; line-height:1; pointer-events:none; z-index:5;
+  transform:translateY(-50%) scale(.4); opacity:0; animation:fxTick .3s cubic-bezier(.2,.9,.3,1.3) forwards}
+.fx-tick.out{animation:fxTickOut .28s ease-in forwards}
+@keyframes fxTick{0%{opacity:0; transform:translateY(-50%) scale(.4)}60%{opacity:1; transform:translateY(-50%) scale(1.15)}100%{opacity:1; transform:translateY(-50%) scale(1)}}
+@keyframes fxTickOut{0%{opacity:1; transform:translateY(-50%) scale(1)}100%{opacity:0; transform:translateY(-50%) scale(.6)}}
+.fx-finish{animation:fxFinish .75s ease-out}
+@keyframes fxFinish{0%{box-shadow:0 0 0 0 var(--accent), 0 0 0 0 var(--accent-glow)}
+  40%{box-shadow:0 0 0 3px var(--accent), 0 0 0 14px var(--accent-glow)}
+  100%{box-shadow:0 0 0 0 transparent, 0 0 0 24px transparent}}
+@media (prefers-reduced-motion: reduce){ .fx-tick, .fx-tick.out, .fx-finish{animation:none} .fx-tick{opacity:1; transform:translateY(-50%)} .fx-tick.out{opacity:0} }
+
+/* ---------- 12c. the FULL RIBBON (SITE_SPEC §4): tab row, groups, labelled buttons, KeyTips ---------- */
+/* the slot stays a constant height in each mode, so the sheet never moves when a menu opens */
+.ribbon-slot.rib-full{--rib-h:96px}
+.ribbon.ribbon-full{height:var(--rib-h,96px); min-height:0; padding:0; gap:0; flex-direction:column; align-items:stretch; flex-wrap:nowrap; overflow:hidden}
+.ribbon.ribbon-full.show{background-image:linear-gradient(var(--accent-glow),var(--accent-glow))}
+.rf-tabs{display:flex; align-items:flex-end; gap:2px; height:25px; padding:2px 8px 0; border-bottom:1px solid var(--line); background:var(--surface); flex:none}
+.rf-tab{position:relative; font-family:var(--mono); font-size:11.5px; color:var(--muted); background:transparent; border:1px solid transparent; border-bottom:0;
+  border-radius:6px 6px 0 0; padding:3px 11px 4px; cursor:pointer; line-height:1.2; transition:color .12s, background .12s}
+.rf-tab:hover{color:var(--text); background:var(--surface2)}
+.rf-tab.on{color:var(--accent); background:var(--surface2); border-color:var(--line); font-weight:600; margin-bottom:-1px; padding-bottom:5px}
+.rf-tab.dead{color:var(--faint)}
+.rf-tab k{position:absolute; left:50%; bottom:-7px; transform:translateX(-50%); display:inline-grid; place-items:center; min-width:16px; height:15px;
+  color:var(--on-accent); background:var(--accent); border-radius:3px; padding:0 4px; font-size:10px; font-weight:800; line-height:1; z-index:3;
+  box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.rf-tab k.dim{background:var(--surface2); color:var(--faint); box-shadow:none; border:1px solid var(--line)}
+.rf-tools{margin-left:auto; display:flex; align-items:center; gap:8px; padding-bottom:3px}
+.rf-tools .rnote{font-size:11px}
+.rf-body{display:flex; align-items:stretch; flex:1 1 auto; min-height:0; padding:2px 4px 0; overflow-x:auto; overflow-y:hidden; scrollbar-width:none}
+.rf-body::-webkit-scrollbar{display:none}
+.rf-grp{display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:0 6px 1px; border-right:1px solid var(--line); flex:none}
+.rf-grp:last-child{border-right:0}
+.rf-cols{display:flex; align-items:flex-start; gap:2px; flex:1 1 auto}
+.rf-col{display:flex; flex-direction:column; gap:1px}
+.rf-row{display:flex; align-items:center; gap:1px}
+.rf-gname{font-family:var(--mono); font-size:9px; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); font-weight:600; line-height:1; padding-top:2px; white-space:nowrap}
+/* buttons: small (icon + label in a row) and big (icon over label); both carry a KeyTip badge in the corner */
+.rf-btn{position:relative; display:inline-flex; align-items:center; gap:4px; height:17px; padding:0 4px; border:1px solid transparent; border-radius:5px;
+  background:transparent; color:var(--text); font-family:var(--mono); font-size:10px; line-height:1; cursor:pointer; white-space:nowrap; transition:background .1s, border-color .1s}
+.rf-btn:hover{background:var(--surface); border-color:var(--line)}
+.rf-btn:active{background:var(--accent-glow)}
+.rf-btn.on{background:var(--accent-glow); border-color:var(--accent-dim); color:var(--accent)}
+.rf-btn.open{background:var(--surface); border-color:var(--accent-dim)}
+.rf-btn.ico{width:22px; padding:0; justify-content:center}
+.rf-btn.ico.rf-arrow{width:14px}
+.rf-btn .rf-ico{display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; color:var(--text); flex:none}
+.rf-btn .rf-ico svg{width:15px; height:15px}
+.rf-btn .rf-ico .ri-g{font-size:12.5px; line-height:1}
+.rf-btn .rf-lbl{color:var(--text)}
+.rf-btn .rf-caret, .rf-box .rf-caret{font-size:8px; color:var(--muted); margin-left:-2px; line-height:1}
+.rf-btn.ico .rf-caret{position:absolute; right:1px; bottom:0; margin:0; font-size:7px}
+.rf-btn.big{flex-direction:column; justify-content:flex-start; gap:2px; height:53px; width:52px; padding:4px 2px 2px; white-space:normal; text-align:center}
+.rf-btn.big .rf-ico{width:24px; height:24px}
+.rf-btn.big .rf-ico svg{width:22px; height:22px}
+.rf-btn.big .rf-ico .ri-g{font-size:18px}
+.rf-btn.big .rf-lbl{font-size:10px; line-height:1.15; max-width:52px}
+.rf-btn.dis, .rf-box.dis{opacity:.42; cursor:not-allowed}
+.rf-btn.dis:hover{background:transparent; border-color:transparent}
+.rf-btn.dis .rf-ico, .rf-btn.dis .rf-lbl{color:var(--muted)}
+/* a split button: face + arrow share one outline */
+.rf-split{position:relative; display:inline-flex; align-items:stretch; border-radius:6px}
+.rf-split .rf-face{border-radius:5px 0 0 5px}
+.rf-split .rf-arrow{border-radius:0 5px 5px 0; width:14px; padding:0; justify-content:center; height:auto}
+.rf-split.big{flex-direction:column; align-items:center; width:52px}
+.rf-split.big .rf-face{border-radius:5px 5px 0 0; height:42px; width:52px; flex-direction:column; justify-content:flex-start; gap:2px; padding:4px 2px 2px; white-space:normal; text-align:center}
+.rf-split.big .rf-face .rf-ico{width:24px; height:24px}
+.rf-split.big .rf-face .rf-ico svg{width:22px; height:22px}
+.rf-split.big .rf-face .rf-lbl{font-size:10px; line-height:1.15}
+.rf-split.big .rf-arrow{border-radius:0 0 5px 5px; width:52px; height:11px}
+.rf-split.open .rf-arrow{background:var(--surface); border-color:var(--accent-dim)}
+/* the disabled name / size / number-format boxes */
+.rf-box{position:relative; display:inline-flex; align-items:center; justify-content:space-between; height:17px; padding:0 5px; border:1px solid var(--line); border-radius:4px;
+  background:var(--surface); font-family:var(--mono); font-size:10px; color:var(--text); white-space:nowrap; overflow:hidden}
+/* the KeyTip badge on a full-bar control: hangs under a small control and sits on a big one's label (Excel), never in the layout flow */
+.ribbon-full .ri-key, .rdrop-menu .ri-key, .rdrop-dialog .ri-key{position:absolute; top:auto; left:50%; bottom:-6px; transform:translateX(-50%); font-family:var(--mono); font-size:10px; font-weight:800; line-height:1.3;
+  color:var(--on-accent); background:var(--accent); border:1px solid color-mix(in srgb, var(--accent-dim) 60%, transparent); border-radius:3px; padding:0 3px; z-index:3; box-shadow:0 1px 3px rgba(0,0,0,.3); pointer-events:none; white-space:nowrap}
+.rf-btn.big > .ri-key, .rf-split.big > .ri-key{bottom:12px}
+.rf-btn.ico > .ri-key{left:auto; right:-4px; transform:none}
+.rf-btn:not(.ico):not(.big) > .ri-key, .rf-box > .ri-key{left:-2px; transform:none}   /* a labelled small button: under its icon, the label stays readable */
+/* menus and small dialogs as anchored dropdowns */
+.rdrop.rdrop-menu, .rdrop.rdrop-dialog{padding:8px 6px 6px; min-width:200px}
+.rdrop-item{position:relative; display:flex; align-items:center; gap:9px; padding:4px 8px 4px 10px; border-radius:6px; font-family:var(--mono); font-size:12px; color:var(--text); cursor:pointer}
+.rdrop-item:hover{background:var(--accent-glow)}
+.rdrop-item.dis{opacity:.45; cursor:not-allowed}
+.rdrop-item.dis:hover{background:transparent}
+.rdrop-item .ri-key{position:static; box-shadow:none; min-width:18px; text-align:center; line-height:1.5}
+.rdrop-menu .rdrop-item .ri-key{position:static}
+.rdrop-ico{display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; color:var(--text); flex:none}
+.rdrop-ico svg{width:16px; height:16px}
+.rdrop-ico .ri-g{font-size:13px}
+.rdrop-lbl{white-space:nowrap}
+.rdrop-chips{display:flex; gap:5px; flex-wrap:wrap; max-width:300px}
+.rdrop-chips .opt{display:inline-flex; align-items:center; color:var(--text); background:var(--surface2); border:1px solid var(--line); border-radius:7px; padding:3px 9px; font-family:var(--mono); font-size:12px; cursor:pointer}
+.rdrop-chips .opt.on{color:var(--accent); border-color:var(--accent)}
+.rdrop-val{font-family:var(--mono); font-size:13px; color:var(--accent); padding:6px 8px; margin:2px 0 4px; background:var(--surface2); border:1px solid var(--line); border-radius:6px; min-height:30px}
+.rdrop-foot{display:flex; justify-content:flex-end; gap:8px; padding-top:8px; margin-top:6px; border-top:1px solid var(--line)}
+.rdrop .pd-btn{cursor:pointer}
+.rdrop .pd-btn:hover{border-color:var(--accent-dim); color:var(--text)}
+.pd-opt[data-act]{cursor:pointer}
+.pd-opt[data-act]:hover{background:var(--accent-glow)}
+.pd-btn[data-act]{cursor:pointer}
+.pd-btn[data-act]:hover{border-color:var(--accent-dim); color:var(--text)}
+.ribbon .ri-cmd[data-act]{cursor:pointer}
+.ribbon .opt[data-act], .ribbon .rtab[data-act]{cursor:pointer}
+.ribbon .opt[data-act]:hover, .ribbon .rtab[data-act]:hover{border-color:var(--accent-dim)}
+/* the full / slim toggle (was the "bar" pin): two segments, the current one lit */
+.rpin{display:inline-flex; align-items:center; padding:0; border:1px solid var(--line); border-radius:99px; overflow:hidden; margin-left:auto; align-self:center; flex:none; cursor:default}
+.rpin:hover{border-color:var(--line)}
+.rpin-b{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.08em; color:var(--faint); background:transparent; border:0; padding:3px 9px; cursor:pointer; line-height:1.2}
+.rpin-b:hover{color:var(--text)}
+.rpin-b.on{color:var(--accent); background:var(--accent-glow)}
+.ribbon.ribbon-lean .rpin{position:sticky; right:0; background:var(--surface2); box-shadow:-6px 0 8px var(--surface2)}
+.rf-tools .rpin{margin-left:0}
+
 /* ---------- 13. density pass (index.html 2296–2298) — MUST stay LAST: the ID-scoped rule beats the base td rule ---------- */
 /* ---- density pass (r36): grid reads like Excel at 100%, not 140% ---- */
 #grid td, #grid th{font-size:12px; height:21px; padding:2px 7px}
