@@ -3,6 +3,36 @@
 Updated September 21, 2026. This is the shared product brief. Current work and launch status
 live in [CURRENT.md](CURRENT.md); source locations live in [ARCHITECTURE.md](ARCHITECTURE.md).
 
+## Foundations introduction and teaching language — September 21
+
+Source: Wolf's explicit replies in **Review Excel learning platform**
+(`01a09ac0-7602-7150-ab0c-d26b0e48b1dd`), read by the chief September 21. The
+[earlier introduction handoff](https://github.com/rathunter69/Hotkey.gg/blob/bc1bdfa3cff08df0d055cae2a55e089b2a520544/docs/handoffs/foundations-intro-2026-09-21.md)
+preserves the opening sketch but predates his later copy correction.
+
+**Confirmed:** start Foundations with an introduction using highlighted interface areas and
+anchored explanatory callouts. Explicitly teach ribbon use for people new to Excel, through
+small actions involving tabs, menus and dialogs with visible effects. Wolf welcomed creative
+interaction, then rejected cutesy language and analogies: use direct, consistent, professional
+terminology suitable for students and mid-career professionals. Keep engagement in the actions,
+visible progress and feedback. This refines earlier playful-tone guidance; it does not remove
+playful exercises or identity/achievement art.
+
+**Proposed detail, not approved lesson scope:** introduce the active cell and selection before
+formatting; explain tab/command/menu in context; name visible worksheet elements in objectives,
+such as “Make Weekly Sales Report bold.” Separate concept explanations, action instructions
+and outcome feedback. Teach safe menu/dialog exit and allow calm recovery. Avoid several untaught
+concepts in one opening task. The previous exact sequence, repair board, length and variant
+examples remain proposals for Catalog's existing blueprints, not a competing curriculum.
+
+Ordinary concept explanations do not mark assistance. Revealing solution steps, Guided help
+or solution replay does; helped completion advances learning without XP. Define each callout's
+actual content before classifying it. Technique-specific ribbon tasks may require the stated UI
+state; ordinary outcome tasks still accept legitimate routes. Preserve the existing workspace,
+themes and completion overlay. This does not restore retired tours, approve an old eight-chapter
+sketch, change input/reward rules or authorize content implementation. Catalog owns the detailed
+opening plan; UI owns presentation and focus behavior.
+
 ## Confirmed by Wolf on September 17
 
 **Direction: repair and rationalize in Wolf's chosen order, in dedicated area tasks.** The master
@@ -270,8 +300,9 @@ paid (recommended)” in the catalog/flow task.
 This supersedes the tentative first-visit default and the unresolved broad free-offer choice.
 “Beginner” is a skill scope to design, not an automatic inclusion of every current Foundations
 drill. Useful real spreadsheet work also belongs in beginner learning. Exact content and
-preview limits, prices/trials, onboarding questions, guest-to-account transfer and save rules,
-advanced speedrun access, competition/credential access and subscription expiry remain open.
+preview membership, onboarding wording, guest-transfer/save mechanics and certificate sets remain
+open. Later September 19–20 decisions below resolve prices, trial, advanced replay after expiry,
+cancellation and the first-payment guarantee; do not reopen those earlier questions.
 Existing help/readiness/timer and simpler-progression decisions remain confirmed. Billing
 activation, replacement rules and implementation are not authorized by this approval.
 
@@ -410,7 +441,7 @@ benchmark study, new module or implementation follows from this planning checkpo
 | Learning format | Broad everyday foundations, focused lessons → practical tasks → larger models, with finance depth later and ribbon/Excel functionality in context | Exact lesson depth, skill map, examples and Foundations-preserving blueprints |
 | Certificates | Completion certificates for selected lesson/drill sets. All required completions count, including solution help and spreadsheet mouse use. | Sets/names, completion checks, versions, account/paid access and legacy equivalence remain open. A completion certificate is not an independent-skill claim or speed award. Preserve issued credentials under their original meaning. |
 | Desks | Separate optional area for enterprise/training-provider use; individual learning remains primary. | WSP/Training the Street are audience examples, not customers, partners or integration commitments. Roles, assignments, reporting, licensing and organization access remain open; no new workstream. |
-| Free depth | Everyday navigation, editing, formatting and basic formulas, teaching ribbon/Excel functionality through enough useful work to show the value of keyboard fluency. Advanced learning/models remain paid. | Exact lessons/previews/prices remain open. This does not make every Excel feature or intermediate course free or establish a numerical savings claim. Free repeats/speedruns apply to included content. |
+| Free depth | Everyday navigation, editing, formatting and basic formulas, teaching ribbon/Excel functionality through enough useful work to show the value of keyboard fluency. Advanced learning/models remain paid. | Exact lessons/previews remain open; the later Payments section records confirmed prices. This does not make every Excel feature or intermediate course free or establish a numerical savings claim. Free repeats/speedruns apply to included content. |
 
 The certificate decision **supersedes the independent practical-assessment recommendation**.
 Helped/mouse-based completion can count toward a certificate while earning no XP or qualifying
@@ -496,21 +527,37 @@ eligibility/version rules explicitly while preserving earned items and historica
 All questions in this packet are answered. Continue with concrete learner-state examples and
 precise contracts; no application, catalog or stored-history change is authorized.
 
-**September 19 — initial subscription-access choices approved:**
+**September 19–20 — subscription offer and access choices approved:**
 
 The chief read Wolf's explicit answers in **Plan payments access rules**
-(`01a0b969-ac99-7553-bc36-42868257ff55`): a few complete advanced sample lessons for free,
-and free selected public challenges with certificate access following the underlying content.
-Earned certificates/results remain accessible. Exact sample/challenge lists, price, expiry and
-remaining lifecycle details stay with Payments/Catalog. These initial answers do not activate
-billing, approve every challenge as free or settle the entire offer. The
-[Area 10 handoff at 00de01d](https://github.com/rathunter69/Hotkey.gg/blob/00de01d76c4fb359e25e62c62be4ef406a368760/docs/handoffs/payments.md)
-is now remote-verified. Its offer/lifecycle table distinguishes confirmed direction from proposals.
-Price, additional trial and advanced replay after expiry are awaiting Wolf's answers in that task;
-cancellation/refund/grace and unissued-certificate timing remain open. Do not duplicate the
-pending questionnaire or adopt its provisional numbers/policies as agreed terms.
-Catalog's boundary review found no conflict but did not approve commercial proposals. Exact
-preview/challenge/credential membership must reconcile with the curriculum roadmap.
+(`01a0b969-ac99-7553-bc36-42868257ff55`) and verified the
+[Area 10 handoff at ab68edc](https://github.com/rathunter69/Hotkey.gg/blob/ab68edc09e2d5c6a85b3c31bce3b2ff16b998971/docs/handoffs/payments.md).
+These are confirmed product decisions, not implemented billing:
+
+| Decision | Confirmed rule | Remaining boundary |
+|---|---|---|
+| P1/P2 — free samples and challenges | A few complete advanced sample lessons and selected public challenges are free; certificate access follows required content and earned records remain accessible | Catalog owns exact samples/challenges and certificate sets; not every challenge is promised free |
+| P3 — consumer trial | No additional consumer subscription trial | Current automatic .edu trial is not an approved exception; transition needs a plan |
+| P4 — expiry | Free content stays playable; new advanced practice/replay needs renewed or other valid advanced access; earned records remain | In-progress attempts and qualified-but-unissued certificate claims remain open |
+| P5/P7 — banking-group access | Automatically/randomly generated codes supply full individual learning access until one shared group/program end date | Actual dates, recipients, issuer powers, redemption deadline, anti-sharing controls and revocation remain to specify; no partnership or Desks administration is implied |
+| P6/P10 — price and interval | Same paid learning: standard $9 monthly or $90 upfront annually; students $7 monthly or $70 upfront annually | Billing currency/markets, tax presentation and student eligibility/reverification remain open; student price is a discount, not another content tier |
+| P8 — cancellation | Cancel anytime; access continues through the paid-period end | Exact self-service flow, notices and interval-switch rules need design |
+| P9 — voluntary guarantee | 14-day money-back guarantee on the first subscription payment, monthly or annual, in addition to mandatory rights | Refund processing/access timing and later renewal/service-failure cases remain open; this is not legal-readiness clearance |
+
+P3–P10 are answered; retire the earlier price/trial/expiry/cancellation/refund questionnaire.
+The guarantee does not automatically renew with every payment. Banking-group access is a
+separate grant, not a new consumer trial or revival of the retired beta/site invite gate.
+An access source expiring must not silently erase another valid source or earned history.
+Purchase or an invitation does not itself grant skill readiness, XP, certificate completion,
+public-score eligibility, other users' records or enterprise administration.
+
+Single-use invitations bound to verified recipients, secure redemption/issuance controls,
+failed-payment grace, paid/group overlap handling and later certificate claims are still design
+recommendations/dependencies. Ordinary future premium-pack inclusion is also unapproved.
+Payments next specifies these edge cases with Catalog/Storage/Security, rather than reopening
+the settled offer. Business/provider facts remain for the appropriate later area; this computer's
+location/timezone does not establish jurisdiction. Checkout remains inactive; no billing, schema,
+catalog or deployment change is authorized.
 
 **September 19 — initial saved-progress comparison and submission principles approved:**
 
@@ -709,7 +756,7 @@ remain protected; implementation still requires a separately authorized bounded 
 | Learning format | Focused lessons → practical tasks → larger models, teaching ribbon/Excel functionality | Exact lesson depth, skill map, examples and Foundations-preserving blueprints |
 | Timing and scored retries | Ordinary learning freely pausable with optional hidden-by-default timer; goal before Start, worksheet reveal starts a continuously running scored clock; unlimited benchmark/Daily attempts, best eligible time | Reveal/focus/interruption mechanics, seeds/comparison groups, access, historical timing transition and public-entry controls |
 | Help and solo retry | One Help entry in a side panel beside the visible worksheet, with visible instructions and stated assistance consequences; solution help earns learning progress but no XP; a fresh Try solo attempt is judged on its own help/input record | Map actual help controls, define equivalent/comparable tasks and remaining award/eligibility details |
-| Exploration and access | Complete useful free beginner path with repeat practice/personal speedruns and a few advanced previews; advanced lessons/model-building subscription. Major-jump readiness accepts prior independent work or test-out; helped ordinary completion advances learning | Exact content/preview limits, prices, advanced speedrun and competition/credential access, expiry, checkpoint locations and equivalent evidence |
+| Exploration and access | Complete useful free beginner path with repeat practice/personal speedruns and a few advanced previews; advanced lessons/model-building subscription. Major-jump readiness accepts prior independent work or test-out; helped ordinary completion advances learning | Exact lesson/preview/challenge/certificate membership, readiness checkpoints and equivalent evidence; commercial offer/expiry rules are confirmed below |
 | Progress and competition | One XP level: new eligible accomplishments earn most, limited repeats less, no speed multiplier; learning progress, personal speedruns and optional benchmark/Daily boards; new mastery/overall rank deferred | Exact XP amounts/caps/eligibility, metrics/save rules, public eligibility and historical-rank presentation |
 | Account history and habits | Every finished attempt plus lightweight deliberate restart/unfinished summaries; private details with chosen public highlights; hide private attempts/withdraw public results while retaining history; meaningful active practice including helped/unfinished work counts toward days; optional non-gating streaks | Metric/record dictionary, activity threshold, idle/day rules, detailed replay, retention, interruptions, legacy comparisons and saving/visibility controls |
 | Speedrun results and helped retry | Time, comparable PBs, improvement history and actual key-press total; completed commands counted separately; labelled task-level mouse estimate; Continue primary with Try solo alongside after helped ordinary lessons; new solo attempt evaluated on its own | Exact counting/comparison/calibration, final retry wording/layout, event-result actions and any practice recommendations |
@@ -741,7 +788,7 @@ a particular technical framework; it is not permission for a React/Next rewrite.
   with solution help or treat public posting as already agreed.
 - Specify the approved free beginner path and selected advanced previews, keeping replay and
   personal speedruns useful for included free content. Advanced lessons/model-building are paid;
-  exact membership, pricing and whether completion certificates are paid remain open.
+  exact membership and certificate sets/issuance remain open; approved prices and content-linked certificate access are recorded above.
 - Specify the approved completion-certificate sets and truthful wording. Keep certificate
   completion separate from solo readiness, XP and timed performance; no new assessment system
   follows from this decision.
@@ -841,7 +888,7 @@ and how to recognize correct behavior. Keep proposals separate from confirmed de
 | Area | Guidance to settle | Review status |
 |---|---|---|
 | Security and accounts | Guest access, private/public information, account control, admin powers | Open |
-| Payments | What is paid, free access, subscriptions, trials, cancellations and refunds | Open; future billing work paused |
+| Payments | Confirmed offer, prices, no extra trial, advanced expiry, cancellation, first-payment guarantee and group-access requirement | Student eligibility, group controls, lifecycle edge cases and business readiness open; billing work paused |
 | Engine and gameplay | Excel behavior, supported keyboards, timing, hints, grading, retry and completion | Preserve ribbon/game UI; teaching and fidelity balance open |
 | UI/UX and onboarding | Desired look and feel, teaching style, customization, first-session journey | Preserve general UI; identity-only pixel art and customization confirmed; onboarding review open |
 | Web structure and releases | Pages to keep, navigation, public information, preview/release expectations | Open |
@@ -899,7 +946,10 @@ choices constraint.
 - Exact onboarding questions, how recommendations change, and how users revise their choices.
 - Account metric definitions, comparable/legacy records, saving and retention rules within the approved history/privacy/habit principles.
 - Which drills belong in the launch learning path, and which September branch tutorials to keep.
-- What a subscription includes, price, billing frequency, trial/refund policy, and desk access.
+- Exact paid-content/certificate membership, student verification, group invitation controls,
+  payment-failure/refund/overlap details, business readiness and separate Desks access.
+  Monthly/annual prices, no additional consumer trial, cancellation and first-payment guarantee
+  are confirmed; do not reopen them.
 - Exact verified browser/operating-system support and Mac keyboard behavior under the approved Windows-primary/changeable-setup direction.
 - Current business entity, jurisdiction, banking and Stripe readiness. Prior internship and
   entity notes are historical; do not assume they describe Wolf's current situation.
