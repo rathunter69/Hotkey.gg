@@ -41,7 +41,7 @@ table('operator precedence and associativity', [
 table('booleans are a type of their own', [
   ['=1=1', true], ['=1<>1', false], ['=TRUE', true], ['=FALSE', false], ['=TRUE()', true],
   ['=TRUE+1', 2], ['=TRUE*5', 5], ['=NOT(0)', true], ['=NOT(TRUE)', false],
-  ['=IF(TRUE,1)', 1], ['=IF(FALSE,1)', false],       // omitted else → FALSE
+  ['=IF(TRUE,1)', 1], ['=IF(FALSE,1)', false], ['=IF("1",1,2)', 1], ['=IF("0",1,2)', 2],       // omitted else → FALSE; numeric text reads as its number
   ['=IF(A1>0,"big")', 'big'], ['=IF(A1<0,"neg")', false],
   ['=IF("TRUE",1,2)', 1], ['=IF("x",1,2)', '#VALUE!'], ['=IF(F1,1,2)', 2],
   ['=B3', true], ['=B3+1', 2], ['=SUM(B3)', 0], ['=SUM(TRUE)', 1], ['=AND(A1>0,A2>1)', true], ['=OR(A1:A3)', true], ['=AND("x")', '#VALUE!'], ['=XOR(TRUE,TRUE)', false],
@@ -104,7 +104,7 @@ table('dates are serial numbers', [
 ]);
 
 table('financial functions', [
-  ['=NPV(0.1,100,100)', 100 / 1.1 + 100 / 1.21], ['=NPV(0.1,D1:D3)', 10 / 1.1 + 20 / 1.21 + 30 / 1.331], ['=NPV(-1,100)', '#NUM!'], ['=IRR(D1:D3)', '#NUM!'],
+  ['=NPV(0.1,100,100)', 100 / 1.1 + 100 / 1.21], ['=NPV(0.1,D1:D3)', 10 / 1.1 + 20 / 1.21 + 30 / 1.331], ['=NPV(-1,100)', '#DIV/0!'], ['=NPV(-2,100)', -100], ['=IRR(D1:D3)', '#NUM!'],
 ]);
 test('PMT / PV / FV / IRR agree with Excel to 4 decimals', () => {
   const near4 = (f, exp) => { const got = ev(f); assert.ok(Math.abs(got - exp) < 5e-5, `${f} → ${got}, expected ${exp}`); };
@@ -115,11 +115,11 @@ test('PMT / PV / FV / IRR agree with Excel to 4 decimals', () => {
 table('multi-letter columns, absolute refs, parsing edge cases', [
   ['=AA1*2', 14], ['=$A$1+$a2', 3], ['=a1+a2', 3], ['=sum(a1:a3)', 6], ['=SUM( A1 : A3 )', 6], ['=(A1)', 1], ['=SUM(-1,2)', 1], ['=-SUM(1,2)', -3], ['=SUM(A1:A3)*(A1>0)', 6],
   ['=IF(A1=1,"one","other")', 'one'], ['=IF(A1>=1,IF(A2>=2,"both","first"),"none")', 'both'], ['=IFS(A1>5,"a",A1>0,"b")', 'b'], ['=IFS(A1>5,"a")', '#N/A'], ['=SWITCH(A2,1,"one",2,"two","other")', 'two'], ['=SWITCH(A3,1,"one","other")', 'other'],
-  ['=IFERROR(1/0,"bad")', 'bad'], ['=IFERROR(1/0)', '#VALUE!'], ['=IF(1/0,1,2)', '#DIV/0!'], ['=IF(TRUE,1,1/0)', 1], ['=IF(FALSE,1/0,2)', 2],
+  ['=IFERROR(1/0,"bad")', 'bad'], ['=IF(1/0,1,2)', '#DIV/0!'], ['=IF(TRUE,1,1/0)', 1], ['=IF(FALSE,1/0,2)', 2],
 ]);
 
 test('syntax errors throw (the commit gate decides), never return a value', () => {
-  for (const f of ['=1+', '=SUM(A1:A3', '=(1', '=1,000', '=@@', '=', '=A1:', '="abc']) assert.throws(() => ev(f), SyntaxError, f);
+  for (const f of ['=1+', '=SUM(A1:A3', '=(1', '=1,000', '=@@', '=', '=A1:', '="abc', '=IFERROR(1/0)', '=IF(1)', '=MAX()']) assert.throws(() => ev(f), SyntaxError, f);
 });
 
 test('textToNumber mirrors Excel text coercion', () => {

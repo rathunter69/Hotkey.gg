@@ -102,6 +102,12 @@ export function tokenize(src) {
      {k:'colrange',a,b} {k:'rowrange',a,b} {k:'un',op,x} {k:'pct',x} {k:'bin',op,l,r}
      {k:'fn',name,args:[node|null]}  (null = omitted argument, e.g. IF(A1,,2))
    ============================================================================ */
+/** Excel refuses a formula at entry when a function has too few arguments ("You've entered too few arguments"). */
+const MIN_ARGS = { SUM: 1, MAX: 1, MIN: 1, ABS: 1, AVERAGE: 1, PRODUCT: 1, MEDIAN: 1, COUNTBLANK: 1, ROUND: 2, ROUNDUP: 2, ROUNDDOWN: 2, MOD: 2, SQRT: 1, POWER: 2, EXP: 1, LN: 1, LOG: 1, LOG10: 1,
+  LARGE: 2, SMALL: 2, RANK: 2, 'RANK.EQ': 2, SUMPRODUCT: 1, SUMIF: 2, COUNTIF: 2, AVERAGEIF: 2, SUMIFS: 3, COUNTIFS: 2, AVERAGEIFS: 3, MAXIFS: 3, MINIFS: 3, AND: 1, OR: 1, XOR: 1, NOT: 1,
+  ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, MATCH: 2, INDEX: 2, VLOOKUP: 3, HLOOKUP: 3, XLOOKUP: 3, OFFSET: 3, ROWS: 1, COLUMNS: 1, LEN: 1, LEFT: 1, RIGHT: 1, MID: 3,
+  FIND: 2, SEARCH: 2, TRIM: 1, UPPER: 1, LOWER: 1, PROPER: 1, CONCATENATE: 1, CONCAT: 1, TEXTJOIN: 3, SUBSTITUTE: 3, REPT: 2, EXACT: 2, VALUE: 1, TEXT: 2, T: 1, N: 1,
+  DATE: 3, YEAR: 1, MONTH: 1, DAY: 1, WEEKDAY: 1, DAYS: 2, EDATE: 2, EOMONTH: 2, YEARFRAC: 2, NPV: 2, IRR: 1, PMT: 3, PV: 3, FV: 3 };
 const BP = { '=': 1, '<>': 1, '<': 1, '<=': 1, '>': 1, '>=': 1, '&': 2, '+': 3, '-': 3, '*': 4, '/': 4, '^': 5 };
 const BP_UNARY = 6, BP_PCT = 7;
 
@@ -229,7 +235,12 @@ export function textToNumber(str) {
 /** General-format text of a number, as & and text functions see it (15 significant digits). */
 export function numToText(n) {
   if (!isFinite(n)) return '#NUM!';
-  const s = String(parseFloat(Number(n).toPrecision(15)));
+  if (Object.is(n, -0)) n = 0;
+  const v = parseFloat(Number(n).toPrecision(15));
+  const a = Math.abs(v);
+  let s;
+  if (v !== 0 && (a >= 1e15 || a < 1e-4)) { s = v.toExponential().replace(/\.?0+e/, 'e'); const m = /^(-?[\d.]+)e([+-]\d+)$/.exec(s); s = m ? m[1] + 'E' + m[2][0] + String(Math.abs(+m[2])).padStart(2, '0') : s; }
+  else s = String(v);
   return s.replace(/e\+?(-?\d+)$/i, (m, e) => 'E' + (e[0] === '-' ? '-' : '+') + String(Math.abs(+e)).padStart(2, '0'));
 }
 
@@ -278,6 +289,8 @@ export function evalFormula(expr, ctx = {}) {
     const u = String(v).trim().toUpperCase();
     if (u === 'TRUE') return true;
     if (u === 'FALSE') return false;
+    const n = textToNumber(u);            // numeric text reads as its number in a logical test
+    if (n !== null) return n !== 0;
     throw err('#VALUE!');
   };
   const toInt = v => Math.trunc(toNum(v));
@@ -316,7 +329,7 @@ export function evalFormula(expr, ctx = {}) {
       if (m) return { op: m[1], val: parseCritVal(m[2]) };
       return { op: '=', val: parseCritVal(v) };
     }
-    return { op: '=', val: v === null ? '' : v };
+    return { op: '=', val: v === null ? 0 : v };   // an empty criteria cell counts as 0, not as ""
   }
   function parseCritVal(t) {
     if (t === '') return '';
@@ -371,6 +384,7 @@ export function evalFormula(expr, ctx = {}) {
     return out;
   }
   const evArgs = (node) => node.args.map(a => a === null ? undefined : ev(a));
+  const arityOk = (name, node) => { if (MIN_ARGS[name] !== undefined && node.args.filter(a => a !== null).length < MIN_ARGS[name]) throw new SyntaxError('too few arguments for ' + name); };
   const A = (args, i) => args[i] === undefined ? undefined : args[i];
   const has = (args, i) => args.length > i && args[i] !== undefined;
 
@@ -383,8 +397,11 @@ export function evalFormula(expr, ctx = {}) {
 
   /* ---- dates ------------------------------------------------------------------- */
   const EPOCH = Date.UTC(1899, 11, 30);
-  const serial = (y, m, d) => Math.floor((Date.UTC(y, m - 1, d) - EPOCH) / 86400000);
-  const dateOf = s => serialToDate(Math.floor(s));
+  // Excel's 1900 date system counts a phantom 29 Feb 1900 (serial 60): serials below 61 are one
+  // day behind the real calendar, and serial 60 itself is 1900-02-29.
+  const serial = (y, m, d) => { if (y === 1900 && m === 2 && d >= 29) return 31 + d; const n = Math.floor((Date.UTC(y, m - 1, d) - EPOCH) / 86400000); return n < 61 ? n - 1 : n; };
+  const dateOf = s => { s = Math.floor(s); if (s < 0) throw err('#NUM!'); return serialToDate(s < 60 ? s + 1 : s); };
+  const ymd = s => { s = Math.floor(s); if (s === 60) return { y: 1900, m: 2, d: 29, wd: 3 }; if (s === 0) return { y: 1900, m: 1, d: 0, wd: 6 }; const d = dateOf(s); return { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, d: d.getUTCDate(), wd: d.getUTCDay() }; };
   const todaySerial = () => ctx.today ? ctx.today() : Math.floor((Date.now() - EPOCH) / 86400000);
 
   /* ---- lookups ----------------------------------------------------------------- */
@@ -444,7 +461,7 @@ export function evalFormula(expr, ctx = {}) {
     // lazy forms first
     switch (name) {
       case 'IF': {
-        if (node.args.length < 1 || node.args.length > 3) throw err('#VALUE!');
+        if (node.args.length < 2 || node.args.length > 3) throw new SyntaxError('IF takes 2 or 3 arguments');
         const c = toBool(ev(node.args[0]));
         const pick = c ? node.args[1] : node.args[2];
         if (pick === undefined) return c ? true : false;
@@ -457,7 +474,7 @@ export function evalFormula(expr, ctx = {}) {
         throw err('#N/A');
       }
       case 'IFERROR': case 'IFNA': {
-        if (node.args.length !== 2) throw err('#VALUE!');
+        if (node.args.length !== 2) throw new SyntaxError(name + ' takes 2 arguments');
         let v;
         try { v = deref(node.args[0] === null ? 0 : ev(node.args[0])); }
         catch (e) { if (!(e instanceof FxError)) throw e; if (name === 'IFNA' && e.code !== '#N/A') throw e; return node.args[1] === null ? 0 : ev(node.args[1]); }
@@ -485,6 +502,20 @@ export function evalFormula(expr, ctx = {}) {
         const v = ev(node.args[0]); if (!isRange(v)) throw err('#VALUE!'); return name === 'ROW' ? v.r1 : v.c1;
       }
     }
+    if (name === 'COUNT' || name === 'COUNTA') {
+      // errors in the argument list are counted (COUNTA) or ignored (COUNT), never propagated
+      const vals = node.args.map(a => { if (a === null) return undefined; try { return ev(a); } catch (e) { if (e instanceof FxError) return { __err: e.code }; throw e; } });
+      let k = 0;
+      for (const v of vals) {
+        if (v === undefined) continue;
+        if (isRange(v)) { for (const key of v.keys()) { const x = raw(key); if (name === 'COUNT' ? typeof x === 'number' : (x !== null && x !== undefined)) k++; } }
+        else if (v && v.__err) { if (name === 'COUNTA') k++; }
+        else if (name === 'COUNT') { if (typeof v === 'number' || typeof v === 'boolean' || (typeof v === 'string' && textToNumber(v) !== null)) k++; }
+        else if (v !== null) k++;
+      }
+      return k;
+    }
+    if (MIN_ARGS[name] !== undefined && node.args.filter(a => a !== null).length < MIN_ARGS[name]) throw new SyntaxError('too few arguments for ' + name);
     const args = evArgs(node);
     const n = args.length;
     const nums = (opts) => collectNums(args, opts);
@@ -496,13 +527,6 @@ export function evalFormula(expr, ctx = {}) {
       case 'MIN': { const xs = nums(); return xs.length ? Math.min(...xs) : 0; }
       case 'MAX': { const xs = nums(); return xs.length ? Math.max(...xs) : 0; }
       case 'MEDIAN': { const xs = nums().sort((a, b) => a - b); if (!xs.length) throw err('#NUM!'); const m = xs.length >> 1; return xs.length % 2 ? xs[m] : (xs[m - 1] + xs[m]) / 2; }
-      case 'COUNT': { let k = 0; for (const v of args) { if (v === undefined || v === null) continue;
-        if (isRange(v)) { for (const key of v.keys()) { const x = raw(key); if (typeof x === 'number') k++; } }
-        else if (typeof v === 'number' || typeof v === 'boolean' || (typeof v === 'string' && textToNumber(v) !== null)) k++; }
-        return k; }
-      case 'COUNTA': { let k = 0; for (const v of args) { if (v === undefined) continue;
-        if (isRange(v)) { for (const key of v.keys()) { const x = raw(key); if (x !== null && x !== undefined) k++; } } else if (v !== null) k++; }
-        return k; }
       case 'COUNTBLANK': { const rg = argRange(args[0]); let k = 0; for (const key of rg.keys()) { const x = raw(key); if (x === null || x === undefined || x === '') k++; } return k; }
       case 'ABS': return Math.abs(toNum(args[0]));
       case 'SIGN': return Math.sign(toNum(args[0]));
@@ -513,7 +537,7 @@ export function evalFormula(expr, ctx = {}) {
       case 'ROUNDDOWN': return roundDown(toNum(args[0]), toInt(args[1]));
       case 'MOD': { const a = toNum(args[0]), b = toNum(args[1]); if (b === 0) throw err('#DIV/0!'); return a - b * Math.floor(a / b); }
       case 'SQRT': { const x = toNum(args[0]); if (x < 0) throw err('#NUM!'); return Math.sqrt(x); }
-      case 'POWER': return checkNum(Math.pow(toNum(args[0]), toNum(args[1])));
+      case 'POWER': { const a = toNum(args[0]), b = toNum(args[1]); if (a === 0 && b < 0) throw err('#DIV/0!'); if (a === 0 && b === 0) throw err('#NUM!'); const v = Math.pow(a, b); if (isNaN(v)) throw err('#NUM!'); return checkNum(v); }
       case 'EXP': return checkNum(Math.exp(toNum(args[0])));
       case 'LN': { const x = toNum(args[0]); if (x <= 0) throw err('#NUM!'); return Math.log(x); }
       case 'LOG': { const x = toNum(args[0]), b = has(args, 1) ? toNum(args[1]) : 10; if (x <= 0 || b <= 0 || b === 1) throw err('#NUM!'); return Math.log(x) / Math.log(b); }
@@ -618,16 +642,23 @@ export function evalFormula(expr, ctx = {}) {
       /* ---- dates ---- */
       case 'TODAY': return todaySerial();
       case 'DATE': return serial(toInt(args[0]), toInt(args[1]), toInt(args[2]));
-      case 'YEAR': return dateOf(toNum(args[0])).getUTCFullYear();
-      case 'MONTH': return dateOf(toNum(args[0])).getUTCMonth() + 1;
-      case 'DAY': return dateOf(toNum(args[0])).getUTCDate();
-      case 'WEEKDAY': { const d = dateOf(toNum(args[0])).getUTCDay(); const t = has(args, 1) ? toInt(args[1]) : 1; if (t === 2) return d === 0 ? 7 : d; if (t === 3) return d === 0 ? 6 : d - 1; return d + 1; }
+      case 'YEAR': return ymd(toNum(args[0])).y;
+      case 'MONTH': return ymd(toNum(args[0])).m;
+      case 'DAY': return ymd(toNum(args[0])).d;
+      case 'WEEKDAY': { const d = ymd(toNum(args[0])).wd; const t = has(args, 1) ? toInt(args[1]) : 1; if (t === 2) return d === 0 ? 7 : d; if (t === 3) return d === 0 ? 6 : d - 1; return d + 1; }
       case 'DAYS': return Math.floor(toNum(args[0])) - Math.floor(toNum(args[1]));
       case 'EDATE': case 'EOMONTH': { const d = dateOf(toNum(args[0])); const y = d.getUTCFullYear(), m = d.getUTCMonth() + toInt(args[1]), dd = d.getUTCDate();
         if (name === 'EOMONTH') return serial(y, m + 2, 0);
         const last = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(); return serial(y, m + 1, Math.min(dd, last)); }
       case 'YEARFRAC': { const a = dateOf(toNum(args[0])), b = dateOf(toNum(args[1])); const basis = has(args, 2) ? toInt(args[2]) : 0;
-        if (basis === 1) { const days = (b - a) / 86400000; return Math.abs(days) / 365; }
+        if (basis === 1) {
+          const days = Math.abs((b - a) / 86400000); const [A1, B1] = a <= b ? [a, b] : [b, a];
+          const y1 = A1.getUTCFullYear(), y2 = B1.getUTCFullYear();
+          const ylen = y => (new Date(Date.UTC(y, 1, 29)).getUTCMonth() === 1) ? 366 : 365;
+          if (y1 === y2) return days / ylen(y1);
+          if (days <= 366) { const feb29 = y => Date.UTC(y, 1, 29); const leapIn = (y) => ylen(y) === 366 && feb29(y) >= A1.getTime() && feb29(y) <= B1.getTime(); return days / ((leapIn(y1) || leapIn(y2)) ? 366 : 365); }
+          let total = 0; for (let y = y1; y <= y2; y++) total += ylen(y); return days / (total / (y2 - y1 + 1));
+        }
         if (basis === 2) return Math.abs((b - a) / 86400000) / 360;
         if (basis === 3) return Math.abs((b - a) / 86400000) / 365;
         let [A, B] = a <= b ? [a, b] : [b, a]; let d1 = A.getUTCDate(), d2 = B.getUTCDate();
@@ -636,7 +667,7 @@ export function evalFormula(expr, ctx = {}) {
         if (isFebEnd(A) && isFebEnd(B)) d2 = 30; if (isFebEnd(A)) d1 = 30; if (d2 === 31 && d1 >= 30) d2 = 30; if (d1 === 31) d1 = 30;
         return ((y2 - y1) * 360 + (m2 - m1) * 30 + (d2 - d1)) / 360; }
       /* ---- financial ---- */
-      case 'NPV': { const rate = toNum(args[0]); const flows = collectNums(args.slice(1)); if (rate <= -1) throw err('#NUM!'); let t = 0; for (let i = 0; i < flows.length; i++) t += flows[i] / Math.pow(1 + rate, i + 1); return t; }
+      case 'NPV': { const rate = toNum(args[0]); const flows = collectNums(args.slice(1)); if (rate === -1) throw err('#DIV/0!'); let t = 0; for (let i = 0; i < flows.length; i++) t += flows[i] / Math.pow(1 + rate, i + 1); return t; }
       case 'IRR': { const flows = collectNums([args[0]]); if (!(flows.some(x => x > 0) && flows.some(x => x < 0))) throw err('#NUM!');
         const f = r => { let t = 0; for (let i = 0; i < flows.length; i++) t += flows[i] / Math.pow(1 + r, i); return t; };
         let lo = -0.999999, hi = 10, flo = f(lo), fhi = f(hi); if (!isFinite(flo) || !isFinite(fhi) || flo * fhi > 0) throw err('#NUM!');
@@ -678,7 +709,7 @@ export function evalFormula(expr, ctx = {}) {
           case '-': return checkNum(a - b);
           case '*': return checkNum(a * b);
           case '/': if (b === 0) throw err('#DIV/0!'); return checkNum(a / b);
-          case '^': { if (a === 0 && b < 0) throw err('#DIV/0!'); const v = Math.pow(a, b); if (isNaN(v)) throw err('#NUM!'); return checkNum(v); }
+          case '^': { if (a === 0 && b < 0) throw err('#DIV/0!'); if (a === 0 && b === 0) throw err('#NUM!'); const v = Math.pow(a, b); if (isNaN(v)) throw err('#NUM!'); return checkNum(v); }
         }
         throw new SyntaxError('operator');
       }
@@ -689,9 +720,9 @@ export function evalFormula(expr, ctx = {}) {
 
   try {
     let v = ev(ast);
-    if (isRange(v)) v = v.size === 1 ? cellVal(v.cell(0)) : (() => { throw err('#VALUE!'); })();
+    if (isRange(v)) v = cellVal(v.cell(0));   // a multi-cell result spills in Excel 365; the formula cell shows its top-left value
     if (v === null || v === undefined) return 0;
-    if (typeof v === 'number') { if (!isFinite(v)) return '#NUM!'; return v; }
+    if (typeof v === 'number') { if (!isFinite(v)) return '#NUM!'; return Object.is(v, -0) ? 0 : v; }
     return v;
   } catch (e) {
     if (e instanceof FxError) return e.code;
@@ -802,7 +833,7 @@ export function normalizeFormula(str) {
   const s = String(str);
   const parts = s.split(/("(?:[^"]|"")*")/);
   return parts.map((seg, k) => k % 2 ? seg : seg
-    .replace(/\$?[A-Za-z]{1,3}\$?\d+(?![A-Za-z0-9_.])/g, m => m.toUpperCase())
+    .replace(/(\$?[A-Za-z]{1,3}\$?)0*(\d+)(?![A-Za-z0-9_.])/g, (m, a, r) => (a + r).toUpperCase())
     .replace(/[A-Za-z_][A-Za-z0-9_.]*(?=\s*\()/g, m => m.toUpperCase())
     .replace(/\b(true|false)\b/gi, m => m.toUpperCase())).join('');
 }
