@@ -11,11 +11,12 @@
 // The Session owns mode/path/dialog; this reads them and writes only through its public methods.
 //
 //   const rv = new RibbonView(ribbonSlotEl, session, { mode: 'full' | 'slim' });   // creates <div class="ribbon" id="ribbon"> in the slot
-//   rv.setMode('slim');                                  // the learner's toggle persists to localStorage 'hk2_ribbon'
+//   rv.setMode('slim');                                  // the learner's toggle persists in prefs (one store: app/prefs.js)
 //   rv.render();                                         // (re-runs on session.onChange)
 
 import { TABS, MENUS, RIBBON_GROUPS, RIBBON_ICONS, RIBBON_MENU_ICONS, FMT_OPTS, PASTE_OPTS, PASTE_OP_OPTS, COMMANDS, tabName } from '../engine/ribbon.js';
 import { FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES } from '../engine/sheet.js';
+import { prefs } from '../app/prefs.js';
 import { RIBBON_COMMANDS, RIBBON_LAYOUT, MENU_META, VIRTUAL_MENUS, UNIMPLEMENTED_BY_ID, MODAL_DIALOGS,
   itemTip, keyTipAt, runCommand, openMenuPath, recordMouse, closeDialog, leaveRibbon, menuEntries } from './ribbon-commands.js';
 
@@ -23,14 +24,13 @@ const COLLAPSED_W = 62;   // a collapsed group's button + its padding (Excel fol
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const BAR_KEY = 'hk_ribbon_bar';
-const MODE_KEY = 'hk2_ribbon';
 const spaced = np => String(np).split('').join(' ');
 
 /** The per-device "always-on lean bar" pin of the old build (slim mode's idle look when set). */
 export function ribbonBarOn() { try { return localStorage.getItem(BAR_KEY) === '1'; } catch (e) { return false; } }
-/** The learner's remembered ribbon mode ('full' | 'slim'), or null when the host's default applies. */
-export function storedRibbonMode() { try { const v = localStorage.getItem(MODE_KEY); return v === 'full' || v === 'slim' ? v : null; } catch (e) { return null; } }
-export function storeRibbonMode(mode) { try { localStorage.setItem(MODE_KEY, mode); } catch (e) { /* storage blocked: the session keeps the choice */ } }
+/** The learner's remembered ribbon mode ('full' | 'slim') from the one settings store, or null when the host's default applies. */
+export function storedRibbonMode() { try { const v = prefs.get().ribbon; return v === 'full' || v === 'slim' ? v : null; } catch (e) { return null; } }
+export function storeRibbonMode(mode) { try { prefs.set({ ribbon: mode === 'full' || mode === 'slim' ? mode : null }); } catch (e) { /* storage blocked: the session keeps the choice */ } }
 
 /** What a click on the tile `k` at menu `menuKey` does: the command, or one level deeper. */
 function tileAct(menuKey, k) {

@@ -3,17 +3,19 @@
 // (the host calls armSounds() on the first keystroke), and an obvious, remembered mute.
 //
 //   const fx = mountEffects();               // { goalTick, finish, click, refuse, setMuted, isMuted, mountMuteButton, armSounds, destroy }
-//   fx.mountMuteButton(modeBarEl);           // "Sound on / Sound off" toggle, aria-pressed, remembered in localStorage 'hk2_mute'
+//   fx.mountMuteButton(modeBarEl);           // "Sound on / Sound off" toggle, aria-pressed, remembered in prefs (one store: app/prefs.js)
 //   fx.armSounds();                          // first keystroke: sounds may play from now on
 //   fx.goalTick(goalLi);  fx.finish(stageEl);  fx.refuse();  fx.click();
 //
 // Sounds are WebAudio sines with a 6 ms attack and an exponential decay (the old build's family),
 // no asset files. Visual effects run whether or not sound is on. Every storage access is guarded.
 
-const MUTE_KEY = 'hk2_mute';
+import { prefs } from '../app/prefs.js';
 
-function readMuted() { try { return localStorage.getItem(MUTE_KEY) === '1'; } catch (e) { return false; } }
-function writeMuted(v) { try { localStorage.setItem(MUTE_KEY, v ? '1' : '0'); } catch (e) { /* storage blocked: the session still honours the choice */ } }
+// The remembered mute lives in the one settings store (prefs.mute), so Settings, the drill bar and
+// the lesson panel always agree.
+function readMuted() { try { return !!prefs.get().mute; } catch (e) { return false; } }
+function writeMuted(v) { try { prefs.set({ mute: !!v }); } catch (e) { /* storage blocked: the session still honours the choice */ } }
 
 const ICO_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
 const ICO_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 5 6M21 9l-5 6"/></svg>';
