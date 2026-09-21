@@ -5,9 +5,9 @@
 // validator on malformed input, negative replays per lesson, and guest progress on corrupt storage.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CHAPTERS, LESSONS, LESSONS_BY_ID } from '../content/index.js';
+import { CHAPTERS, LESSONS, LESSONS_BY_ID, sectionsOf } from '../content/index.js';
 import { validateLesson, availableConcepts } from '../content/schema.js';
-import { LessonRun } from '../app/runner.js';
+import { LessonRun, shortcutsUsed } from '../app/runner.js';
 
 const byId = id => { const l = LESSONS_BY_ID[id]; assert.ok(l, `lesson ${id} is in the catalogue`); return l; };
 const f01 = () => byId('foundations-01-active-cell'), f02 = () => byId('foundations-02-moving-around'), f03 = () => byId('foundations-03-selecting-ranges');
@@ -21,6 +21,32 @@ test('the catalogue is well formed', () => {
   const foundations = CHAPTERS.find(c => c.id === 'foundations');
   assert.ok(foundations.lessons.length >= 5 && foundations.lessons.length <= 8, 'Foundations has 5–8 lessons');
   for (const l of LESSONS) for (const p of l.prerequisites) { assert.ok(LESSONS_BY_ID[p], `${l.id}: prerequisite ${p} exists`); assert.ok(ids.indexOf(p) < ids.indexOf(l.id), `${l.id}: prerequisite ${p} comes earlier`); }
+});
+
+test('every lesson sits in one of its chapter\'s sections, and the sections come out in chapter order', () => {
+  for (const ch of CHAPTERS) {
+    assert.ok(Array.isArray(ch.sections) && ch.sections.length, `${ch.id}: sections listed`);
+    for (const l of ch.lessons) assert.ok(ch.sections.includes(l.section), `${l.id}: section "${l.section}" is one of ${ch.id}'s sections`);
+    const groups = sectionsOf(ch);
+    assert.deepEqual(groups.map(g => g.name), ch.sections.filter(n => ch.lessons.some(l => l.section === n)), `${ch.id}: grouped in section order, empty sections dropped`);
+    assert.deepEqual(groups.flatMap(g => g.lessons.map(l => l.id)), ch.lessons.filter(l => ch.sections.includes(l.section)).sort((a, b) => ch.sections.indexOf(a.section) - ch.sections.indexOf(b.section) || ch.lessons.indexOf(a) - ch.lessons.indexOf(b)).map(l => l.id));
+  }
+  assert.deepEqual(sectionsOf({ sections: ['A'], lessons: [{ id: 'x' }, { id: 'y', section: 'A' }] }).map(g => [g.name, g.lessons.map(l => l.id)]), [['A', ['y']], ['Basics', ['x']]], 'a lesson without a section falls into Basics after the listed sections');
+});
+
+// The Read standard (SITE_SPEC §1: short sentences, direct, never cutesy): every paragraph of a
+// teach step is one or two sentences and stays short; the whole Read fits in a glance.
+const sentences = p => (p.match(/[.!?](\s|$)/g) || []).length;
+test('every Read paragraph is one or two short sentences', () => {
+  for (const l of LESSONS) for (const st of l.steps) if (st.mode === 'teach') {
+    assert.ok(st.body.length >= 2 && st.body.length <= 5, `${l.id}: Read has 2–5 paragraphs (${st.body.length})`);
+    for (const p of st.body) {
+      const n = sentences(p);
+      assert.ok(n >= 1 && n <= 2, `${l.id}: "${p.slice(0, 40)}…" has ${n} sentences`);
+      assert.ok(p.split(/\s+/).length <= 40, `${l.id}: "${p.slice(0, 40)}…" is over 40 words`);
+      assert.ok(!/!\s*$/.test(p) && !/\b(awesome|super|easy peasy|magic|wow)\b/i.test(p), `${l.id}: tone`);
+    }
+  }
 });
 
 for (const lesson of LESSONS) {
@@ -321,5 +347,48 @@ test('#65 / #66 progress.js survives corrupt localStorage shapes', async () => {
     globalThis.localStorage = { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); }, removeItem: () => { throw new Error('blocked'); } };
     assert.equal(progress.record(ID, 'guided', 1), false); assert.equal(progress.touch(ID), false); assert.equal(progress.status(ID), 'todo');
     assert.doesNotThrow(() => progress.clear());
+  } finally { delete globalThis.localStorage; }
+});
+
+/* ---------------- Phase A: mouse recording, the shortcuts-used fold, clean timed PBs ---------------- */
+
+test('shortcutsUsed folds an Alt walk into one entry and drops typed characters', () => {
+  const log = ['Ctrl+↓', 'Alt', 'H', '1', 'W', 'e', 'e', 'k', '↵', 'Alt', 'H', 'B', 'O', 'Esc', '↓', '↓', 'F2', '⌫', '⚠', 'Tab', 'Ctrl+↓'].map(k => ({ k }));
+  assert.deepEqual(shortcutsUsed(log), [
+    { keys: 'Ctrl+↓', count: 2 }, { keys: 'Alt H 1', count: 1 }, { keys: '↵', count: 1 }, { keys: 'Alt H B O', count: 1 },
+    { keys: 'Esc', count: 1 }, { keys: '↓', count: 2 }, { keys: 'F2', count: 1 }, { keys: '⌫', count: 1 }, { keys: 'Tab', count: 1 },
+  ]);
+  assert.deepEqual(shortcutsUsed([]), []);
+  assert.deepEqual(shortcutsUsed([{ k: 'Alt' }]), [{ keys: 'Alt', count: 1 }], 'a bare Alt at the end still shows');
+});
+
+test('a change made without a key (a mouse click on the sheet) is graded, and the mouse callback reaches the session', () => {
+  const seen = [];
+  const run = fresh(f01(), { onMouse: w => seen.push(w) });
+  // the view records a click by calling the session option; the sheet change itself grades the goal
+  run.session.opts.onMouse('cell');
+  run.sheet.goTo(3, 2);   // B3 by mouse
+  assert.equal(run.doneCount, 1, 'the first goal (make B3 active) landed without a key');
+  assert.deepEqual(seen, ['cell']);
+  run.session.mouse = { count: 1, log: [] };
+  assert.equal(run.mouseCount, 1);
+  run.pressSpec('Right'); run.pressSpec('Down'); run.pressSpec('Down'); run.pressSpec('Down'); run.pressSpec('Down');
+  assert.equal(run.doneCount, 2, 'keys still grade');
+});
+
+test('#PB a timed run sets a personal best only when clean (no help, no mouse)', async () => {
+  const store = new Map();
+  globalThis.localStorage = { getItem: k => (store.has(k) ? store.get(k) : null), setItem: (k, v) => store.set(k, String(v)), removeItem: k => store.delete(k) };
+  try {
+    const { progress } = await import('../app/progress.js?pb');
+    progress.clear();
+    assert.equal(progress.record('x', 'timed', 12.34, { clean: false }), true);
+    assert.equal(progress.get('x').best, undefined, 'no PB for an assisted run');
+    progress.record('x', 'timed', 12.34);
+    assert.equal(progress.get('x').best, 12.34, 'a clean run (default) sets it');
+    progress.record('x', 'timed', 9.5, { clean: true });
+    assert.equal(progress.get('x').best, 9.5);
+    progress.record('x', 'timed', 5, { clean: false });
+    assert.equal(progress.get('x').best, 9.5, 'a faster assisted run does not beat it');
   } finally { delete globalThis.localStorage; }
 });

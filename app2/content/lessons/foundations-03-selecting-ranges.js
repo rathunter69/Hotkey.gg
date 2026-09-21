@@ -15,6 +15,7 @@ const used = (session, label) => session.keyLog.slice(session.goalMark || 0).som
 export default {
   id: 'foundations-03-selecting-ranges',
   chapter: 'foundations',
+  section: 'Selecting',
   title: 'Selecting a range',
   difficulty: 'easy',
   tags: ['selection'],
@@ -24,10 +25,10 @@ export default {
   sheet: { cells: REPORT, active: { r: 1, c: 1 } },
   steps: [
     { mode: 'teach', title: 'Ranges', body: [
-      'A range is a rectangular block of cells. It is written as its top-left cell, a colon, and its bottom-right cell: B3:B7 is the five Sales figures.',
-      'To select a range, put the active cell on one corner, then hold `Shift` and press an arrow key. Each press extends the selection by one cell. The selection turns grey; the active cell stays white inside it, and the Name Box still shows the active cell.',
-      '`Ctrl+Shift+Arrow` extends the selection to the edge of the data in one press, exactly as `Ctrl+Arrow` jumps there.',
-      '`Shift+Space` selects the entire row of the active cell. `Ctrl+Space` selects the entire column. `Ctrl+A` selects the current region: the whole block of data around the active cell.',
+      'A range is a rectangular block of cells, written as its top-left cell, a colon and its bottom-right cell. B3:B7 is the five Sales figures.',
+      'Hold `Shift` and press an arrow key to extend the selection one cell at a time. The selection turns grey and the active cell stays white inside it.',
+      '`Ctrl+Shift+Arrow` extends the selection to the edge of the data in one press.',
+      '`Shift+Space` selects the entire row and `Ctrl+Space` the entire column. `Ctrl+A` selects the current region: the whole block of data around the active cell.',
     ] },
     { mode: 'guided' },
     { mode: 'solo' },

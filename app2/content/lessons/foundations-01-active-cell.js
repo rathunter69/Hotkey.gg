@@ -13,6 +13,7 @@ const at = (sheet, ref) => !sheet.sel && sheet.selectionText() === ref;
 export default {
   id: 'foundations-01-active-cell',
   chapter: 'foundations',
+  section: 'The worksheet',
   title: 'The active cell',
   difficulty: 'easy',
   tags: ['navigation', 'basics'],
@@ -22,9 +23,9 @@ export default {
   sheet: { cells: REPORT, active: { r: 1, c: 1 } },
   steps: [
     { mode: 'teach', title: 'The worksheet, cells and the active cell', body: [
-      'A worksheet is a grid. Columns are lettered A, B, C… across the top, and rows are numbered 1, 2, 3… down the left side. Each box in the grid is a cell.',
-      'Every cell has a cell reference: its column letter followed by its row number. B3 is the cell in column B, row 3. The Sales figure for Monday sits in B3.',
-      'One cell is always the active cell. It has the green outline, and the Name Box, at the left end of the Formula Bar, shows its reference. The Formula Bar itself shows what the active cell contains.',
+      'A worksheet is a grid of cells. Columns are lettered across the top and rows are numbered down the left side.',
+      'A cell reference is the column letter followed by the row number. B3 is the cell in column B, row 3: the Sales figure for Monday.',
+      'One cell is always the active cell. It has the green outline, and the Name Box at the left of the Formula Bar shows its reference.',
       'The arrow keys `↑` `↓` `←` `→` move the active cell one cell at a time. Watch the Name Box change as you move.',
     ] },
     { mode: 'guided' },

@@ -16,6 +16,7 @@ const used = (session, label) => session.keyLog.slice(session.goalMark || 0).som
 export default {
   id: 'foundations-02-moving-around',
   chapter: 'foundations',
+  section: 'Moving',
   title: 'Moving around the worksheet',
   difficulty: 'easy',
   tags: ['navigation'],
@@ -25,10 +26,10 @@ export default {
   sheet: { cells: REPORT, active: { r: 3, c: 1 } },
   steps: [
     { mode: 'teach', title: 'Jumping instead of stepping', body: [
-      'One arrow press moves one cell. Hold `Ctrl` with an arrow key and the active cell jumps to the edge of the current block of data. From Monday in A3, `Ctrl+↓` lands on Friday in A7, the last day before the empty row.',
-      'From an empty cell, `Ctrl+Arrow` jumps to the next cell that contains something. That is how you cross a gap.',
-      '`Home` moves to column A of the current row. `Ctrl+Home` goes to A1. `Ctrl+End` goes to the bottom-right corner of the used area: the last row that holds anything and the last column that holds anything, even if that corner cell itself is empty.',
-      '`Enter` moves the active cell down one row and `Tab` moves it right one column, even when you have not typed anything.',
+      'Hold `Ctrl` with an arrow key and the active cell jumps to the edge of the current block of data. From an empty cell it jumps to the next cell that holds something.',
+      '`Home` moves to column A of the current row. `Ctrl+Home` goes to A1.',
+      '`Ctrl+End` goes to the bottom-right corner of the used area: the last row and the last column that hold anything, even if that corner cell is empty.',
+      '`Enter` moves the active cell down one row and `Tab` moves it right one column, even when you have typed nothing.',
     ] },
     { mode: 'guided' },
     { mode: 'solo' },

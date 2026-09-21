@@ -6,6 +6,7 @@
 //   id: 'foundations-01-active-cell',      unique, kebab-case
 //   chapter: 'foundations',                 chapter id (content/index.js)
 //   title: 'The active cell',
+//   section: 'Moving',                 // the chapter section (CHAPTERS[].sections order in content/index.js)
 //   difficulty: 'easy' | 'medium' | 'hard',
 //   tags: ['navigation'],
 //   access: 'free' | 'paid',
@@ -94,6 +95,7 @@ export function validateLesson(l) {
   if (!l || typeof l !== 'object') return ['lesson must be an object'];
   need(typeof l.id === 'string' && /^[a-z0-9-]+$/.test(l.id), 'id must be kebab-case');
   need(typeof l.chapter === 'string' && l.chapter, 'chapter missing');
+  need(typeof l.section === 'string' && l.section.trim(), 'section missing (the chapter section this lesson belongs to)');
   need(typeof l.title === 'string' && l.title.trim(), 'title missing');
   need(DIFFICULTIES.includes(l.difficulty), 'difficulty must be easy | medium | hard');
   need(Array.isArray(l.tags), 'tags must be an array');

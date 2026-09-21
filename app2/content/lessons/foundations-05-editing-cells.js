@@ -14,6 +14,7 @@ const used = (session, label) => session.keyLog.slice(session.goalMark || 0).som
 export default {
   id: 'foundations-05-editing-cells',
   chapter: 'foundations',
+  section: 'Entering and editing',
   title: 'Editing a cell',
   difficulty: 'easy',
   tags: ['data-entry', 'editing'],
@@ -23,10 +24,10 @@ export default {
   sheet: { cells: START, active: { r: 1, c: 1 } },
   steps: [
     { mode: 'teach', title: 'Replacing and editing', body: [
-      'To replace what a cell contains, select it and type the new entry. The old contents disappear the moment you start typing. This is Enter mode.',
-      'To change only part of a cell, press `F2`. The cell opens for editing with the insertion point at the end of its text. This is Edit mode: `←` and `→` move the insertion point, `Home` and `End` jump to the start and end, and `Backspace` deletes the character before the insertion point.',
-      'In both modes, `Enter` confirms the change and `Esc` discards it.',
-      'The title in A1 is misspelled, as is Wednesday in A5, and the Tuesday sales figure should be 1950.',
+      'To replace what a cell holds, select it and type the new entry. The old contents disappear the moment you start typing.',
+      'To change only part of an entry, press `F2`. The cell opens for editing with the insertion point at the end of its text.',
+      'In Edit mode `←` and `→` move the insertion point, `Home` and `End` jump to either end, and `Backspace` deletes the character before it.',
+      '`Enter` confirms the change and `Esc` discards it. This report has two misspellings and one wrong figure.',
     ] },
     { mode: 'guided' },
     { mode: 'solo' },

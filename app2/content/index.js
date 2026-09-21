@@ -12,9 +12,19 @@ export const CHAPTERS = [
     id: 'foundations',
     title: 'Foundations',
     blurb: 'For someone who has never used Excel: the active cell, moving, selecting, entering and editing, then the Ribbon and its dialog boxes.',
+    // Section order inside the chapter (SITE_SPEC §7). Later sections arrive with Phase C.
+    sections: ['The worksheet', 'Moving', 'Selecting', 'Entering and editing', 'The Ribbon and dialog boxes'],
     lessons: [f01, f02, f03, f04, f05, f06, f07],
   },
 ];
+
+/** A chapter's lessons grouped by section, in the chapter's section order: [{ name, lessons }]. */
+export function sectionsOf(chapter) {
+  const order = chapter.sections || [];
+  const groups = new Map(order.map(n => [n, []]));
+  for (const l of chapter.lessons) { const n = l.section || 'Basics'; if (!groups.has(n)) groups.set(n, []); groups.get(n).push(l); }
+  return [...groups].filter(([, ls]) => ls.length).map(([name, lessons]) => ({ name, lessons }));
+}
 
 export const LESSONS = CHAPTERS.flatMap(ch => ch.lessons);
 export const LESSONS_BY_ID = Object.fromEntries(LESSONS.map(l => [l.id, l]));

@@ -17,6 +17,7 @@ const enteredWithTab = (ses, ref, next) => ses.keyLog.some((e, i) => i > 0 && e.
 export default {
   id: 'foundations-04-entering-data',
   chapter: 'foundations',
+  section: 'Entering and editing',
   title: 'Entering data',
   difficulty: 'easy',
   tags: ['data-entry'],
@@ -26,10 +27,10 @@ export default {
   sheet: { cells: START, active: { r: 1, c: 1 } },
   steps: [
     { mode: 'teach', title: 'Typing into cells', body: [
-      'Select a cell and type. What you type appears in the cell and in the Formula Bar at the same time. Nothing is stored until you confirm the entry.',
-      '`Enter` confirms the entry and moves the active cell down. `Tab` confirms it and moves right. `Esc` throws the entry away and leaves the cell as it was.',
-      'Excel tells text and numbers apart on its own: text lines up on the left of the cell, numbers line up on the right. Type 1200 and it becomes a number you can add up later.',
-      '`Delete` clears the contents of the selected cells without opening them for editing.',
+      'Select a cell and type. The entry appears in the cell and in the Formula Bar, but nothing is stored until you confirm it.',
+      '`Enter` confirms the entry and moves down. `Tab` confirms it and moves right, and `Esc` throws it away.',
+      'Excel tells text and numbers apart on its own: text lines up on the left of the cell, numbers on the right.',
+      '`Delete` clears the selected cells without opening them for editing.',
     ] },
     { mode: 'guided' },
     { mode: 'solo' },

@@ -14,6 +14,7 @@ const cell = (s, ref) => s.cellAt(ref);
 export default {
   id: 'foundations-06-ribbon-commands',
   chapter: 'foundations',
+  section: 'The Ribbon and dialog boxes',
   title: 'The Ribbon: tabs and commands',
   difficulty: 'medium',
   tags: ['ribbon', 'formatting'],
@@ -23,10 +24,10 @@ export default {
   sheet: { cells: START, active: { r: 1, c: 1 } },
   steps: [
     { mode: 'teach', title: 'KeyTips', body: [
-      'The Ribbon runs across the top of Excel. Its commands are grouped into tabs: Home, Insert, Page Layout, Formulas, Data, Review and View. The Home tab holds the everyday formatting commands.',
-      'Press `Alt` on its own and KeyTips appear: a letter badge on every tab. Press `H` to open the Home tab and every command shows its own KeyTip. The sequence `Alt` `H` `1` applies Bold to the selected cells.',
-      'Some commands open a menu of further choices. `Alt` `H` `B` opens the Borders menu; pressing `O` then applies a Bottom Border. Alignment works the same way: `Alt` `H` `A` then `C` centers the selection.',
-      'Press `Esc` to back out of the Ribbon one level at a time. Press the keys one after another, not held down together.',
+      'The Ribbon runs across the top of Excel. Its commands are grouped into tabs, and the Home tab holds the everyday formatting commands.',
+      'Press `Alt` on its own and KeyTips appear: a letter badge on every tab. `H` opens the Home tab, then each command shows its own KeyTip: `Alt` `H` `1` applies Bold.',
+      'Some commands open a menu of further choices. `Alt` `H` `B` opens the Borders menu and `O` applies a Bottom Border; `Alt` `H` `A` `C` centers the selection.',
+      'Press the keys one after another, not held down together. `Esc` backs out of the Ribbon one level at a time.',
     ] },
     { mode: 'guided' },
     { mode: 'solo' },

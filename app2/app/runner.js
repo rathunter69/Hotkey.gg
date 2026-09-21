@@ -3,11 +3,12 @@
 
 import { Sheet } from '../engine/sheet.js';
 import { Session, parseKeyScript, parseKeySpec } from '../engine/keyboard.js';
+import { stepPath } from '../engine/ribbon.js';
 
 export class LessonRun {
   /**
    * @param {object} lesson   a lesson module's default export
-   * @param {object} [opts]   mode ('guided' | 'solo' | 'timed'), onKey, onToast, onRefuse, now()
+   * @param {object} [opts]   mode ('guided' | 'solo' | 'timed'), onKey, onToast, onRefuse, onMouse, now()
    */
   constructor(lesson, opts = {}) {
     this.lesson = lesson;
@@ -24,7 +25,7 @@ export class LessonRun {
     if (mode) this.mode = mode;
     const spec = this.lesson.sheet || {};
     this.sheet = new Sheet({ rows: spec.rows, cols: spec.cols, cells: spec.cells ? structuredCloneCells(spec.cells) : undefined, colW: spec.colW, active: spec.active, today: this.opts.today });
-    this.session = new Session(this.sheet, { onKey: this.opts.onKey, onToast: this.opts.onToast, onRefuse: this.opts.onRefuse, now: this.opts.now });
+    this.session = new Session(this.sheet, { onKey: this.opts.onKey, onToast: this.opts.onToast, onRefuse: this.opts.onRefuse, now: this.opts.now, onMouse: this.opts.onMouse });
     // The key window: a mechanic check reads only keys pressed since its goal became current
     // (keyLog.slice(goalMark)), so a key pressed for an earlier goal, or before the lesson began,
     // cannot satisfy a later one.
@@ -32,7 +33,9 @@ export class LessonRun {
     this.doneCount = 0;
     this.finished = false;
     this.finishedAt = null;
-    this.session.onChange(() => this.emit('session'));
+    // A change that did not come through key() (a mouse click on the sheet or ribbon, a dialog
+    // option clicked) is graded too: the engine grades end state, whichever route produced it.
+    this.session.onChange(() => { if (!this.inKey) this.evaluate(); this.emit('session'); });
     this.emit('reset');
   }
 
@@ -58,10 +61,14 @@ export class LessonRun {
   /** Feed one key event; returns true when the session consumed it. */
   key(ev) {
     if (this.finished) return false;
-    const handled = this.session.key(ev);
+    this.inKey = true;
+    let handled;
+    try { handled = this.session.key(ev); } finally { this.inKey = false; }
     if (handled) this.evaluate();
     return handled;
   }
+  /** Workspace mouse actions recorded by the views (SITE_SPEC §6): clicks on the sheet, ribbon or a dialog. */
+  get mouseCount() { return this.session.mouse ? this.session.mouse.count : 0; }
   /** Run a keystroke script through the lesson (the replay test uses this). */
   run(script) {
     for (const step of parseKeyScript(script)) {
@@ -99,3 +106,34 @@ export class LessonRun {
 function safeCheck(g, sheet, session) { try { return !!g.check(sheet, session); } catch (e) { return false; } }
 
 function structuredCloneCells(cells) { const out = {}; for (const k in cells) out[k] = { ...cells[k] }; return out; }
+
+const GLYPH_KEYS = new Set(['↑', '↓', '←', '→', '↵', '⌫']);
+/**
+ * The shortcuts pressed in a run, folded for the "Shortcuts used" tab: an Alt walk and the KeyTip
+ * keys after it read as one entry ('Alt H B O'), ending with the key that resolves to a command
+ * (or leaves the Ribbon), so a letter typed afterwards is not swallowed; arrows, chords, Enter,
+ * Tab, F-keys and the like count on their own; typed characters and the refusal marker do not.
+ * → [{ keys, count }] in first-use order
+ */
+export function shortcutsUsed(log) {
+  const counts = new Map();
+  const add = k => counts.set(k, (counts.get(k) || 0) + 1);
+  let alt = null;   // { keys, path } while inside an Alt walk
+  for (const e of log) {
+    const k = e.k;
+    if (k === 'Alt') { if (alt) add(alt.keys.join(' ')); alt = { keys: ['Alt'], path: [] }; continue; }
+    if (alt) {
+      if (/^[A-Z0-9=]$/.test(k)) {
+        const r = stepPath(alt.path, k);
+        alt.keys.push(k);
+        if (r.kind === 'menu' || r.kind === 'tab') { alt.path = r.path; continue; }
+        add(alt.keys.join(' ')); alt = null; continue;   // a command, or a step that leaves the Ribbon: the walk ends here
+      }
+      add(alt.keys.join(' ')); alt = null;
+    }
+    if (k === '⚠' || (k.length === 1 && !GLYPH_KEYS.has(k))) continue;
+    add(k);
+  }
+  if (alt) add(alt.keys.join(' '));
+  return [...counts].map(([keys, count]) => ({ keys, count }));
+}

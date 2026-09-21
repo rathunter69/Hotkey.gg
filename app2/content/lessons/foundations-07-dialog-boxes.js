@@ -30,6 +30,7 @@ const appliedViaRibbon = (ses, key) => {
 export default {
   id: 'foundations-07-dialog-boxes',
   chapter: 'foundations',
+  section: 'The Ribbon and dialog boxes',
   title: 'Dialog boxes: Format Cells',
   difficulty: 'medium',
   tags: ['ribbon', 'formatting', 'number-formats'],
@@ -39,11 +40,11 @@ export default {
   sheet: { cells: START, active: { r: 1, c: 1 } },
   steps: [
     { mode: 'teach', title: 'Commands that ask a question', body: [
-      'Some commands do not act at once. They open a dialog box: a panel of choices. In Excel a dialog box stays open until you confirm it with `Enter` (OK) or cancel it with `Esc`. Format Cells is the dialog box you will use most. This trainer shortens it: the letter you press applies at once and closes the card, and `Esc` still cancels.',
-      '`Ctrl+1` opens Format Cells for the selected cells. On its Number tab the Category list holds General, Number, Currency, Percentage and more. Typing the first letter of a category selects it, so `G`, `N`, `C` and `P` pick those four; in Excel you then press `Enter` to apply it.',
-      'What each category shows differs a little between Excel and this trainer. In Excel, Number starts at two decimal places with no thousands separator, 1200.00; the separator is a check box in that category, or the Comma Style button on the Home tab. Percentage starts at two decimal places, 5.00%; 0.05 reads as 5% only with the decimal places set to 0. Here `N` shows a whole number with a thousands separator, 1,200; `C` shows $1,200; `P` shows one decimal place, 5.0%.',
+      'Some commands open a dialog box: a panel of choices that stays open until you confirm it with `Enter` or cancel it with `Esc`.',
+      '`Ctrl+1` opens Format Cells for the selected cells. On its Number tab, typing the first letter of a category picks it: `N` Number, `C` Currency, `P` Percentage.',
+      'This trainer shortens the dialog box: the letter applies at once and closes the card. Its Number format shows 1,200 and Percentage shows 5.0%, where Excel\'s defaults show two decimal places.',
       'A number format changes how a value is displayed, never the value itself. 0.05 shown as 5.0% is still 0.05 in the Formula Bar.',
-      'The same dialog box can be reached from the Ribbon: `Alt` `H` `O` opens the Format menu on the Home tab and `E` chooses Format Cells.',
+      'The Ribbon reaches the same dialog box: `Alt` `H` `O` opens the Format menu and `E` chooses Format Cells.',
     ] },
     { mode: 'guided' },
     { mode: 'solo' },

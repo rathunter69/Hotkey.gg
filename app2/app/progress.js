@@ -34,8 +34,12 @@ export const progress = {
   get(id) { const s = load(); return s.lessons[id] || null; },
   all() { return load().lessons; },
   status(id) { const p = this.get(id); return !p ? 'todo' : p.timed || p.solo ? 'mastered' : p.completed ? 'done' : 'started'; },
-  /** Record a finished run. mode: 'guided' | 'solo' | 'timed'; secs: elapsed seconds. Returns false when nothing was saved. */
-  record(id, mode, secs) {
+  /**
+   * Record a finished run. mode: 'guided' | 'solo' | 'timed'; secs: elapsed seconds. A timed run
+   * sets a personal best only when it was clean (opts.clean, default true): SITE_SPEC §6 — any
+   * help or workspace mouse use in a timed run means no PB. Returns false when nothing was saved.
+   */
+  record(id, mode, secs, opts = {}) {
     try {
       const s = load();
       const p = s.lessons[id] || {};
@@ -44,7 +48,7 @@ export const progress = {
       if (mode === 'timed') {
         p.timed = true;
         const prev = Number.isFinite(p.best) ? p.best : null;
-        if (Number.isFinite(secs) && secs >= 0 && (prev == null || secs < prev)) p.best = Math.round(secs * 100) / 100;
+        if (opts.clean !== false && Number.isFinite(secs) && secs >= 0 && (prev == null || secs < prev)) p.best = Math.round(secs * 100) / 100;
       }
       p.at = Date.now();
       s.lessons[id] = p;
