@@ -18,6 +18,7 @@ import { DrillRun } from './drill-run.js';
 import { store } from './store.js';
 import { dailyDrill, shareText } from './daily.js';
 import { dayOf } from './records.js';
+import { gameCtx, celebrate } from './stats.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const SVG = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"';
@@ -229,7 +230,7 @@ export function mountDrillPage(root, ctx = {}) {
       <div class="sc-pars">pass ${drill.pars.pass}s · pro ${drill.pars.pro}s · legendary ${drill.pars.legendary}s${pbBefore ? ` · your best ${fmtSecs(pbBefore.secs)}s` : ''}${daily ? ` · attempts today: ${attemptsToday()}` : ''}</div></div>`;
     $('drillHost').appendChild(startCard);
   }
-  function dismissStartCard() { started = true; if (startCard) { startCard.remove(); startCard = null; } track('drill_start', { drill_id: drill.id }); }
+  function dismissStartCard() { started = true; if (startCard) { startCard.remove(); startCard = null; } effects.clockStart(); track('drill_start', { drill_id: drill.id }); }
 
   function focusStage() {
     const host = $('drillHost'); if (!host.hasAttribute('tabindex')) host.setAttribute('tabindex', '-1');
@@ -337,11 +338,15 @@ export function mountDrillPage(root, ctx = {}) {
   function finish() {
     finishedShown = true;
     stopReplay(); $('demoBtn').classList.remove('on');
+    const ctxBefore = gameCtx();
     const attempt = run.toAttempt();
     store.addAttempt(attempt);
     track('drill_complete', { drill_id: drill.id, secs: attempt.secs, tier: attempt.tier, clean: attempt.clean });
     const newPb = attempt.clean && (!pbBefore || attempt.secs < pbBefore.secs);
+    effects.clockStop();
     effects.finish($('drillHost'));
+    if (newPb) effects.newPB(); else if (attempt.tier !== 'none') effects.parTier(attempt.tier);
+    celebrate(effects, ctxBefore);
     const eff = Math.min(100, Math.round(100 * drill.optimalKeys / Math.max(attempt.keys, drill.optimalKeys)));
     const pbAttempt = pbBefore ? store.attempts({ ref: drill.id }).find(a => a.id === pbBefore.attemptId) : null;
     const pbSplits = pbAttempt ? pbAttempt.splits : [];

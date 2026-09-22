@@ -10,6 +10,7 @@ import { track } from './telemetry.js';
 import { store } from './store.js';
 import { attemptId, dayOf } from './records.js';
 import { mulberry32 } from '../engine/rng.js';
+import { gameCtx, celebrate } from './stats.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -120,7 +121,7 @@ export function mountRapidPage(root) {
       if (progress >= pr.expect.length) {
         points += hitPoints(combo); combo++; hits++;
         bestCombo = Math.max(bestCombo, combo);
-        if (sb) sb.fx.click();
+        if (sb) sb.fx.hit();
         paintScore();
         nextPrompt();
       }
@@ -128,7 +129,7 @@ export function mountRapidPage(root) {
     }
     // a wrong chord: the combo breaks, the matcher restarts (the wrong key may start the sequence)
     misses++;
-    if (combo > 0 && sb) sb.fx.refuse();
+    if (combo > 0 && sb) sb.fx.comboBreak();
     combo = 0;
     progress = label === pr.expect[0] ? 1 : 0;
     paintScore();
@@ -152,8 +153,10 @@ export function mountRapidPage(root) {
     if (tickH) { clearInterval(tickH); tickH = null; }
     if (stallH) { clearTimeout(stallH); stallH = null; }
     const keys = sb ? sb.session.keyLog.length : 0;
+    const ctxBefore = gameCtx();
     store.addAttempt({ id: attemptId(), kind: 'rapid', ref: 'rapid-' + dur, day: dayOf(), seed: null, secs: dur, keys, clean: false, helped: false, mouse: sb ? sb.session.mouse.count : 0, tier: 'none', splits: [hits, misses, bestCombo, points], trace: [], at: Date.now() });
     track('rapid_complete', { dur, hits, misses, points });
+    if (sb) celebrate(sb.fx, ctxBefore);
     if (sb) { sb.destroy(); sb = null; }
     const prevBest = Math.max(0, ...store.attempts({ kind: 'rapid' }).slice(0, -1).filter(a => a.ref === 'rapid-' + dur).map(a => (a.splits && a.splits[3]) || 0));
     el.innerHTML = `<div class="page rapid-pick"><div class="rm-card" style="margin:40px auto">

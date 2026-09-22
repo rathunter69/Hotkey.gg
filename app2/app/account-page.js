@@ -11,13 +11,16 @@ import { validateHandle } from './handle.js';
 import { track } from './telemetry.js';
 import { LESSONS } from '../content/index.js';
 import { showToast } from '../ui/toast.js';
+import { statsFor } from './stats.js';
+import { records } from './records.js';
+import { badgesHtml } from '../ui/badges.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const SECTIONS = ['desks', 'stats', 'profile', 'settings', 'data'];
 
 /** Everything this device holds for the learner, as one JSON-able record (guest export). */
 export function exportRecord() {
-  return { site: 'hotkey.gg', version: 1, exportedAt: new Date().toISOString(), progress: progress.all(), prefs: prefs.get() };
+  return { site: 'hotkey.gg', version: 1, exportedAt: new Date().toISOString(), progress: progress.all(), prefs: prefs.get(), records: { attempts: records.attempts(), pbs: records.pbs() } };
 }
 
 function download(name, data) {
@@ -108,6 +111,31 @@ export function mountAccountPage(root, ctx = {}) {
       </section>`;
   }
 
+  /** The Stats section (SITE_SPEC §8): real numbers from progress + records, one source. */
+  function statsCard() {
+    const s = statsFor();
+    const fmtDur = secs => { const m = Math.floor(secs / 60); return m >= 60 ? Math.floor(m / 60) + 'h ' + (m % 60) + 'm' : m >= 1 ? m + 'm ' + Math.round(secs % 60) + 's' : Math.round(secs) + 's'; };
+    if (!s.attempts && !Object.keys(s.ctx.progress).length) {
+      return `<section class="acard" id="sec-stats"><div class="acard-cap">stats</div><div class="acard-body"><h2>Stats</h2><p>Nothing yet: stats build from your lessons, drills and Dailies as you play.</p></div></section>`;
+    }
+    const improving = s.improvement.filter(r => r.first > r.best);
+    return `<section class="acard" id="sec-stats"><div class="acard-cap">stats</div><div class="acard-body">
+      <h2>Stats</h2>
+      <div class="stats-grid">
+        <div class="stat-cell"><b>${s.ctx.level}</b><span>level · ${s.ctx.xp} XP</span></div>
+        <div class="stat-cell"><b>${fmtDur(s.timePractised)}</b><span>timed practice</span></div>
+        <div class="stat-cell"><b>${s.attempts}</b><span>recorded runs</span></div>
+        <div class="stat-cell"><b>${s.keystrokes}</b><span>keystrokes in runs</span></div>
+        <div class="stat-cell"><b>${Object.keys(s.ctx.pbs).length}</b><span>personal bests</span></div>
+        <div class="stat-cell"><b>${s.streak}</b><span>day streak</span></div>
+      </div>
+      ${improving.length ? `<p class="stats-improve">Improvement: ${improving.slice(0, 4).map(r => `${esc(r.title)} <b>${r.first.toFixed(1)}s → ${r.best.toFixed(1)}s</b>`).join(' · ')}</p>` : ''}
+      ${s.shortcuts.length ? `<p class="stats-keys">Most-used shortcuts (from your best runs): ${s.shortcuts.sort((a, b) => b.count - a.count).slice(0, 6).map(u => `<kbd>${esc(u.keys)}</kbd>${u.count > 1 ? '×' + u.count : ''}`).join(' ')}</p>` : ''}
+      ${s.timeSaved > 5 ? `<p class="page-fine">Estimated time saved vs a mouse-and-menus route: ~${fmtDur(s.timeSaved)}. An estimate: keystroke counts against a slow route at half a second an action.</p>` : ''}
+      <div class="stats-badges">${badgesHtml(s.ctx)}</div>
+    </div></section>`;
+  }
+
   function render() {
     const signedIn = auth.state() === 'in';
     const all = store.all(); const p = prefs.get();
@@ -117,9 +145,9 @@ export function mountAccountPage(root, ctx = {}) {
       <div class="acct-grid">
         ${signedIn ? profileCard() : signinCard()}
         <div class="acct-col">
+          ${statsCard()}
           ${[['desks', 'Desks', 'Create a desk, invite by code or link, a private board and assignments from a captain.', 'Desks arrive after accounts.'],
-            ['stats', 'Stats', 'Time, personal bests, improvement history, keystroke counts, shortcuts used, and an estimated time saved.', 'Stats arrive with timed play.'],
-            ['profile', 'Profile', 'Handle, level, rank, featured achievements, best times. School and desk by opt-in only.', 'The public profile page arrives with the game layer.']].map(([id, t, d, note]) =>
+            ['profile', 'Profile', 'Handle, level, rank, featured achievements, best times. School and desk by opt-in only.', 'The public profile page arrives with accounts.']].map(([id, t, d, note]) =>
             `<section class="acard" id="sec-${id}"><div class="acard-cap">${t.toLowerCase()}</div><div class="acard-body"><h2>${t}</h2><p>${d}</p><p class="coming">${note} Coming in a later phase.</p></div></section>`).join('')}
         </div>
       </div>
@@ -129,6 +157,8 @@ export function mountAccountPage(root, ctx = {}) {
           <label class="set">Keys follow<select id="setPlatform">${PLATFORMS.map(v => `<option value="${v}"${p.platform === v ? ' selected' : ''}>${v === 'mac' ? 'Mac (⌘, ⌥)' : 'Windows (Ctrl, Alt)'}</option>`).join('')}</select><span class="set-note">Instructions and keycaps follow this. Stays with this device.</span></label>
           <label class="set">Ribbon<select id="setRibbon"><option value=""${!p.ribbon ? ' selected' : ''}>Default (full in Chapter 1, slim after)</option><option value="full"${p.ribbon === 'full' ? ' selected' : ''}>Always the full ribbon</option><option value="slim"${p.ribbon === 'slim' ? ' selected' : ''}>Always the slim strip</option></select><span class="set-note">Alt shows KeyTips on either.</span></label>
           <label class="set set-check"><input id="setMute" type="checkbox"${p.mute ? ' checked' : ''}> Mute sounds<span class="set-note">Sounds are soft and off until you start.</span></label>
+          <label class="set">Celebrations<select id="setEffects">${[['full', 'Full (ticks, chimes, banners)'], ['subtle', 'Subtle (small and quiet)'], ['off', 'Off (results only)']].map(([v, t]) => `<option value="${v}"${p.effects === v ? ' selected' : ''}>${t}</option>`).join('')}</select><span class="set-note">Also follows your system's reduced-motion setting.</span></label>
+          <label class="set set-check"><input id="setGhost" type="checkbox"${p.ghost !== false ? ' checked' : ''}> PB ghost in drills<span class="set-note">A faint cursor races your best run once you have one.</span></label>
           <div class="set"><span>Theme</span><button class="btn btn-ghost" id="setTheme" type="button">Open the theme picker</button><span class="set-note">${signedIn ? 'Follows your account.' : 'Also top right, on every page.'}</span></div>
         </div>
       </section>
@@ -246,6 +276,8 @@ export function mountAccountPage(root, ctx = {}) {
     el.querySelector('#setPlatform').onchange = e => { prefs.set({ platform: e.target.value }); showToast('Keys follow ' + (e.target.value === 'mac' ? 'Mac' : 'Windows')); };
     el.querySelector('#setRibbon').onchange = e => { const v = e.target.value || null; prefs.set({ ribbon: v }); showToast('Ribbon: ' + (v || 'default')); };
     el.querySelector('#setMute').onchange = e => { prefs.set({ mute: e.target.checked }); showToast(e.target.checked ? 'Sounds muted' : 'Sounds on'); };
+    el.querySelector('#setEffects').onchange = e => { prefs.set({ effects: e.target.value }); showToast('Celebrations: ' + e.target.value); };
+    el.querySelector('#setGhost').onchange = e => { prefs.set({ ghost: e.target.checked }); showToast(e.target.checked ? 'Ghost on' : 'Ghost off'); };
     el.querySelector('#setTheme').onclick = () => { if (ctx.nav && ctx.nav.openThemes) ctx.nav.openThemes(); else { const b = document.getElementById('navThemes'); if (b) b.click(); } };
 
     // data
@@ -267,7 +299,7 @@ export function mountAccountPage(root, ctx = {}) {
     const del = el.querySelector('#deleteBtn');
     if (del) del.onclick = () => {
       if (!confirm('Delete all progress and settings saved on this device? This cannot be undone.')) return;
-      progress.clear(); prefs.clear();
+      progress.clear(); prefs.clear(); records.clear();
       showToast('Local data deleted');
       render();
     };

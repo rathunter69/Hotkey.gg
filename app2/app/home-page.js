@@ -5,6 +5,11 @@ import { CHAPTERS, LESSONS, lessonNumber, chapterOf } from '../content/index.js'
 import { store } from './store.js';
 import { prefs } from './prefs.js';
 import { CHAPTER_PLAN, pickNextLesson, statusOf } from './learn-page.js';
+import { DRILLS } from '../content/drills.js';
+import { dailyFor } from './daily.js';
+import { dayOf } from './records.js';
+import { gameCtx } from './stats.js';
+import { bestTier } from './practice-page.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -12,6 +17,9 @@ export function mountHomePage(root) {
   const el = document.createElement('div');
   el.className = 'home';
   const all = store.all(); const p = prefs.get(); const skipped = p.skipped;
+  const ctx = gameCtx();
+  const pbCount = Object.keys(ctx.pbs).length;
+  const legendaries = DRILLS.filter(d => bestTier(store.attempts({ ref: d.id })) === 'legendary').length;
   const next = pickNextLesson(LESSONS, all, skipped);
   const ch1 = CHAPTERS.find(c => c.id === 'foundations') || { lessons: [] };
   const done = ch1.lessons.filter(l => ['done', 'mastered'].includes(statusOf(l.id, all, skipped))).length;
@@ -54,8 +62,14 @@ export function mountHomePage(root) {
       <div class="home-col">
         <section class="home-card">
           <div class="hc-cap">the daily</div>
-          <div class="hc-body"><h2>One drill a day, same for everyone.</h2><p>The Daily arrives with timed play. Free for everyone; the streak is optional and never takes anything away.</p><a class="btn btn-ghost" href="#/practice">Practice</a></div>
+          <div class="hc-body"><h2>One drill a day, same for everyone.</h2><p>Today: <b>${esc((DRILLS.find(d => d.id === dailyFor(dayOf()).drillId) || {}).title || '—')}</b>${ctx.streakDays > 1 ? ` · ${ctx.streakDays}-day streak` : ''}. Free for everyone; the streak never takes anything away.</p><a class="btn btn-ghost" href="#/daily">Play the Daily</a></div>
         </section>
+        ${ctx.attempts.length ? `<section class="home-card">
+          <div class="hc-cap">your game</div>
+          <div class="hc-body"><p><b>Level ${ctx.level}</b> · ${ctx.levelInfo.into}/${ctx.levelInfo.need} XP${pbCount ? ` · ${pbCount} personal best${pbCount === 1 ? '' : 's'}` : ''}${legendaries ? ` · ${legendaries} legendary` : ''}</p>
+          <p class="muted-line">Rank: Unranked — boards open with accounts, and rank stays hidden until the field fills.</p>
+          <a href="#/practice">Practice →</a> · <a href="#/account?section=stats">Stats →</a></div>
+        </section>` : ''}
         <section class="home-card">
           <div class="hc-cap">${store.saveState() === 'device' ? 'saved on this device' : 'saved to your account'}</div>
           <div class="hc-body"><p>${Object.keys(all).length} lesson${Object.keys(all).length === 1 ? '' : 's'} with progress · ${p.platform === 'mac' ? 'Mac' : 'Windows'} keys${p.experience ? ` · ${{ new: 'new to Excel', sometimes: 'uses Excel sometimes', daily: 'uses Excel daily' }[p.experience]}` : ''}</p><a href="#/account">Account and settings →</a></div>

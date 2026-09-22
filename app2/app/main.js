@@ -21,6 +21,9 @@ import { store } from './store.js';
 import { auth } from './auth.js';
 import { track, installErrorLog } from './telemetry.js';
 import { lessonById } from '../content/index.js';
+import { gameCtx } from './stats.js';
+import { earnedSet } from '../ui/badges.js';
+import { themeStates } from './cosmetics.js';
 
 const NAV_LINKS = [
   { key: 'learn', label: 'Learn', href: '#/learn' },
@@ -162,7 +165,15 @@ export function startApp({ navEl, rootEl, footEl }) {
   const legacy = legacyQuery(location.search);
   if (legacy) { try { history.replaceState(null, '', legacy); } catch (e) { /* file:// etc.: route as-is */ } }
   prefs.reflect();
-  const nav = mountNav(navEl, { links: NAV_LINKS, active: 'learn', account: true, onTheme: k => store.setTheme(k), onSignOut: () => auth.signOut() });
+  const nav = mountNav(navEl, {
+    links: NAV_LINKS, active: 'learn', account: true,
+    onTheme: k => store.setTheme(k), onSignOut: () => auth.signOut(),
+    // cosmetic locks (Phase D): resolved lazily when the picker opens
+    themeLocks: () => {
+      const ctx = gameCtx();
+      return Object.fromEntries(themeStates({ level: ctx.level, earned: earnedSet(ctx), rankIndex: ctx.rankIndex }).map(s => [s.key, s.lock]));
+    },
+  });
   const footer = footEl ? mountFooter(footEl) : null;
 
   // ---- accounts: boot auth (PKCE ?code= returns are exchanged inside ready(); the hash
@@ -205,6 +216,7 @@ export function startApp({ navEl, rootEl, footEl }) {
       if (!drill) name = 'notfound';
     }
     nav.setActive(navKeyFor(name === 'home' ? 'root' : name));
+    try { nav.setLevel(gameCtx().level); } catch (e) { /* records unreadable: no chip */ }
     document.title = titleFor(name, lesson ? lesson.title : name === 'drill' ? (drill ? drill.title : 'Sandbox') : '');
     document.body.dataset.route = name;
     window.scrollTo(0, 0);

@@ -106,11 +106,15 @@ export function mountNav(el, opts = {}) {
     if (!themesOpen) lastFocus = document.activeElement;
     themesOpen = true; modal.classList.add('show');
     const cur = currentTheme();
+    // cosmetic locks (Phase D): the host supplies opts.themeLocks() → { key: lockLabel | null }
+    let locks = {};
+    if (opts.themeLocks) { try { locks = opts.themeLocks() || {}; } catch (e) { locks = {}; } }
     const swatches = themeList().map(([key, t]) => {
-      const v = t.vars; const isSel = key === cur;
-      return `<button type="button" class="th-card${isSel ? ' sel' : ''}" data-key="${key}" aria-pressed="${isSel}" style="background:${v.bg}; color:${v.text}; border-color:${isSel ? v.accent : v.line}">` +
+      const v = t.vars; const isSel = key === cur; const lock = locks[key] || null;
+      return `<button type="button" class="th-card${isSel ? ' sel' : ''}${lock ? ' theme-locked' : ''}" data-key="${key}" ${lock ? `data-lock="${escHtml(lock)}"` : ''} aria-pressed="${isSel}" style="background:${v.bg}; color:${v.text}; border-color:${isSel ? v.accent : v.line}" title="${lock ? escHtml(t.name + ' — ' + lock) : escHtml(t.name)}">` +
         `<div class="th-name">${escHtml(t.name)}</div>` +
         `<div class="th-bars"><span style="background:${v.accent}"></span><span style="background:${v.warn}"></span><span style="background:${v.bad}"></span></div>` +
+        (lock ? `<div class="pc-lock">${escHtml(lock)}</div>` : '') +
         `</button>`;
     }).join('');
     modal.innerHTML = '<div class="pc-card" style="width:600px"><button type="button" class="modal-x" aria-label="close">×</button>' +
@@ -120,6 +124,7 @@ export function mountNav(el, opts = {}) {
       '<div class="pc-foot"><span></span><a id="thClose" href="#" role="button">close</a></div>' +
       '</div>';
     modal.querySelectorAll('.th-card').forEach(b => b.onclick = () => {
+      if (b.dataset.lock) { b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 300); return; }   // locked: the label says how it opens
       const k = b.dataset.key; applyTheme(k); saveTheme(k); if (opts.onTheme) { try { opts.onTheme(k); } catch (e) { /* app hook */ } } openThemes();   // re-render so the ✓ moves
       const again = modal.querySelector(`.th-card[data-key="${k}"]`); if (again) again.focus();
     });
@@ -219,11 +224,22 @@ export function mountNav(el, opts = {}) {
       }
     }
   }
+  /** The level chip (Phase D): shows from level 2 — a fresh visitor sees no game furniture. */
+  function setLevel(lvl) {
+    let chip = el.querySelector('#navLevel');
+    if (!Number.isFinite(lvl) || lvl < 2) { if (chip) chip.remove(); return; }
+    if (!chip) {
+      chip = document.createElement('span'); chip.id = 'navLevel'; chip.className = 'nav-level';
+      const tools = el.querySelector('.topnav-tools'); if (tools) tools.insertBefore(chip, tools.firstChild);
+    }
+    chip.textContent = 'L' + lvl;
+    chip.title = 'Level ' + lvl + ' — XP from lessons, drills and the Daily';
+  }
   function destroy() {
     window.removeEventListener('keydown', onKey, true);
     document.removeEventListener('mousedown', onDocClick);
     modal.removeEventListener('click', onModalClick);
     el.innerHTML = '';
   }
-  return { openThemes, closeThemes, openMenu, closeMenu, setActive, setSaveState, setUser, destroy, get isOpen() { return themesOpen; }, get menuOpen() { return menuOpen; } };
+  return { openThemes, closeThemes, openMenu, closeMenu, setActive, setSaveState, setUser, setLevel, destroy, get isOpen() { return themesOpen; }, get menuOpen() { return menuOpen; } };
 }

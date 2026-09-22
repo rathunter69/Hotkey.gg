@@ -6,6 +6,7 @@
 import { LessonRun, shortcutsUsed } from './runner.js';
 import { store } from './store.js';
 import { attemptId, dayOf, traceOf } from './records.js';
+import { gameCtx, celebrate } from './stats.js';
 import { track } from './telemetry.js';
 import { nextLesson, chapterOf, lessonNumber } from '../content/index.js';
 import { SheetView } from '../ui/sheet-view.js';
@@ -328,6 +329,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   function finish() {
     phase = 'done';
     track('lesson_complete', { lesson_id: lesson.id, mode: run.mode });
+    const ctxBefore = gameCtx();
     const before = store.all();
     firstEver = !Object.values(before).some(p => p.completed);
     const saved = store.record(lesson.id, run.mode, run.elapsed, {
@@ -358,6 +360,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     saveState = saved ? store.saveText() : 'Couldn’t save on this device (storage blocked); the lesson still counts for this visit';
     if (timerH) { clearInterval(timerH); timerH = null; }
     effects.finish($('stage'));
+    celebrate(effects, ctxBefore);
     tab = 'lesson';
     renderPanel();
     renderOverlay();
