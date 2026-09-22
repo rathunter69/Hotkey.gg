@@ -175,6 +175,7 @@ export const GAME_OUTBOX_KEY = 'hk2_game_outbox_v1';
 const GAME_SYNC_KEY = 'hk2_game_sync_v1';
 let gameFlushTimer = null;
 let gameFlushDelay = 1000;
+let gameRpcMissing = false;   // 0007 not applied yet: park the queue instead of retrying forever
 function readGameOutbox() { return ownedOutbox(readJson(GAME_OUTBOX_KEY), uid()); }
 function writeGameOutbox(items) { writeJson(GAME_OUTBOX_KEY, { uid: uid(), items }); }
 
@@ -187,7 +188,7 @@ export function attemptToWire(a) {
 }
 
 function scheduleGameFlush(delay) {
-  if (gameFlushTimer || typeof setTimeout !== 'function') return;
+  if (gameRpcMissing || gameFlushTimer || typeof setTimeout !== 'function') return;
   gameFlushTimer = setTimeout(() => { gameFlushTimer = null; flushGameOutbox(); }, delay == null ? gameFlushDelay : delay);
 }
 async function flushGameOutbox() {
@@ -202,7 +203,12 @@ async function flushGameOutbox() {
     const { _guest, ...p } = item;
     const { error } = await sb.rpc('rpc_submit_game_attempt', { p, p_guest: !!_guest });
     if (!auth.current(t)) return;
-    if (error) failed = !String(error.message || '').includes('bad attempt');   // malformed: drop, retrying cannot help
+    if (error) {
+      const msg = String(error.message || '');
+      if (msg.includes('bad attempt')) failed = false;                     // malformed: drop, retrying cannot help
+      else if (/does not exist|schema cache|PGRST202/i.test(msg)) { gameRpcMissing = true; return; }   // server not there yet: park until the next hydrate
+      else failed = true;
+    }
   } catch (e) {
     if (!auth.current(t)) return;
     failed = true;
@@ -416,7 +422,9 @@ export const store = {
       if (profile.handle) announceUser();
     }
     if (readOutbox().length) { setSave('retry'); scheduleFlush(0); } else setSave('account');
+    gameRpcMissing = false;   // a fresh session may have 0007 by now
     maybeGameSync();
+    if (readGameOutbox().length) scheduleGameFlush(0);
   },
   /** The theme picker calls this on every pick; signed in, the pick rides the account. */
   setTheme(name) {
