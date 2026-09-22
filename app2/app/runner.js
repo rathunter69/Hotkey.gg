@@ -34,6 +34,9 @@ export class LessonRun {
       for (const sh of sheets.slice(1)) if (this.session.addSheet) this.session.addSheet(sh.name, build(sh));
     }
     this.landedAt = [];   // when each goal landed (the session clock), for split times
+    // Demo goals (goal.demo = { script, cadence }): the platform plays the keys itself while the
+    // learner watches. The session records which demos have finished so the goal's check can read it.
+    this.session.demoDone = new Set();
     // The key window: a mechanic check reads only keys pressed since its goal became current
     // (keyLog.slice(goalMark)), so a key pressed for an earlier goal, or before the lesson began,
     // cannot satisfy a later one.
@@ -92,12 +95,30 @@ export class LessonRun {
   }
   /** Workspace mouse actions recorded by the views (SITE_SPEC §6): clicks on the sheet, ribbon or a dialog. */
   get mouseCount() { return this.session.mouse ? this.session.mouse.count : 0; }
-  /** Run a keystroke script through the lesson (the replay test uses this). */
+  /** Run a keystroke script through the lesson (the replay test uses this). A pending demo plays first, synchronously. */
   run(script) {
+    this.playPendingDemo();
     for (const step of parseKeyScript(script)) {
       if (step.type === 'text') { for (const ch of step.text) this.key({ key: ch, shiftKey: /[A-Z~!@#$%^&*()_+{}|:"<>?]/.test(ch) }); }
       else this.pressSpec(step.spec);
+      this.playPendingDemo();
     }
+  }
+  /** The current goal's demo, if it has one and it has not played yet. */
+  pendingDemo() { const g = this.current; return g && g.demo && !this.session.demoDone.has(g.id) ? g : null; }
+  /** The keys of a demo goal, as steps the view can play one at a time: [{ spec } | { text }]. */
+  demoSteps(goal) { return parseKeyScript(goal.demo.script); }
+  /** Feed one demo step (the view plays them on a cadence). */
+  demoStep(step) {
+    if (step.type === 'text') { for (const ch of step.text) this.session.key({ key: ch, shiftKey: /[A-Z~!@#$%^&*()_+{}|:"<>?]/.test(ch) }); }
+    else this.session.key(parseKeySpec(step.spec));
+  }
+  /** The demo has finished: the goal can land. */
+  finishDemo(goal) { this.session.demoDone.add(goal.id); this.evaluate(); this.emit('demo'); }
+  /** Play the current goal's demo at once (headless replay, or the learner skipping ahead). */
+  playPendingDemo() {
+    let g;
+    while ((g = this.pendingDemo())) { for (const step of this.demoSteps(g)) this.demoStep(step); this.finishDemo(g); }
   }
   pressSpec(spec) { return this.key(parseKeySpec(spec)); }
 

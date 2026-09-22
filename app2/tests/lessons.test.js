@@ -109,9 +109,12 @@ for (const lesson of LESSONS) {
   test(`${lesson.id}: every guided hint lands exactly its goal from where the previous goal left off`, () => {
     const run = fresh(lesson);
     lesson.goals.forEach((g, i) => {
+      if (g.demo) { run.run(''); assert.ok(run.doneCount >= i + 1, `${lesson.id} goal ${g.id}: the demo plays itself and lands its goal`); return; }
       assert.ok(typeof g.keys === 'string' && g.keys.trim(), `${lesson.id} goal ${g.id} has a guided hint`);
       run.run(hintScript(g.keys));
-      assert.equal(run.doneCount, i + 1, `${lesson.id} goal ${g.id}: pressing exactly the hint "${g.keys}" should land this goal and no other (selection now ${run.sheet.selectionText()})`);
+      // a demo goal that follows plays itself as soon as this goal lands, so it may already be done too
+      let expect = i + 1; while (expect < lesson.goals.length && lesson.goals[expect].demo && run.doneCount > expect) expect++;
+      assert.equal(run.doneCount, expect, `${lesson.id} goal ${g.id}: pressing exactly the hint "${g.keys}" should land this goal and no other (selection now ${run.sheet.selectionText()})`);
     });
     assert.ok(run.finished, `${lesson.id}: the hints, one after another, complete the lesson`);
   });
@@ -405,4 +408,24 @@ test('#PB a timed run sets a personal best only when clean (no help, no mouse)',
     progress.record('x', 'timed', 5, { clean: false });
     assert.equal(progress.get('x').best, 9.5, 'a faster assisted run does not beat it');
   } finally { delete globalThis.localStorage; }
+});
+
+test('demo goals: the platform plays the script, the goal lands only when it has finished, and the split is timed', () => {
+  const welcome = byId('welcome-race');
+  const demos = welcome.goals.filter(g => g.demo);
+  assert.ok(demos.length >= 2 && welcome.race && welcome.race.length >= 2, 'the Welcome lesson has demo goals and race pairs');
+  let t = 0;
+  const run = new LessonRun(welcome, { mode: 'guided', now: () => (t += 100) });
+  assert.equal(run.pendingDemo() && run.pendingDemo().id, demos[0].id, 'the first goal is a demo waiting to play');
+  assert.equal(run.doneCount, 0);
+  const steps = run.demoSteps(demos[0]);
+  assert.ok(steps.length > 5, 'the demo has keys to press');
+  for (const step of steps.slice(0, 3)) run.demoStep(step);
+  assert.equal(run.doneCount, 0, 'a partly played demo has not landed');
+  for (const step of steps.slice(3)) run.demoStep(step);
+  run.finishDemo(demos[0]);
+  assert.equal(run.doneCount, 1, 'the demo goal lands when the demo finishes');
+  assert.ok(run.splits()[0] > 0, 'the demo leg has a split time');
+  assert.equal(run.pendingDemo(), null, 'the learner\'s goal is next');
+  for (const pair of welcome.race) { assert.ok(welcome.goals.find(g => g.id === pair.slow).demo, `${pair.label}: the slow leg is a demo`); assert.ok(!welcome.goals.find(g => g.id === pair.fast).demo, `${pair.label}: the fast leg is the learner\'s`); }
 });

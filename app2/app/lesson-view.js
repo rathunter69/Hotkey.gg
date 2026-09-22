@@ -81,7 +81,8 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   effects.mountMuteButton($('lessonTools'));
 
   let sheetView = null, ribbonView = null, sheetTabs = null, timerH = null;
-  let phase = mode === 'guided' ? 'teach' : 'play';   // 'teach' | 'play' | 'done'
+  let phase = 'play';        // 'play' | 'done' — the sheet is live at once; the Read text sits at the top of the panel
+  let demo = null;           // { goal, steps, i, timer } while the platform plays a demo goal for the learner to watch
   let tab = 'lesson';                                   // 'lesson' | 'help' | 'used'
   let revealed = false;      // keys shown on request in a solo or timed run: the run is assisted (§6)
   let nudgeAt = -1;          // the goal index a workspace mouse action happened on: show the keyboard nudge there
@@ -114,15 +115,16 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       ribbonView.render(); sheetView.render();
       if (run.finished && phase !== 'done') finish();
       renderPanel();
+      maybeStartDemo();
     });
     sheetView.render(); ribbonView.render();
   }
 
   /* ---------------- the panel ---------------- */
-  const modeLabel = () => phase === 'teach' ? 'Read' : run.mode === 'guided' ? 'Guided' : run.mode === 'solo' ? 'Solo' : 'Timed';
+  const modeLabel = () => run.mode === 'guided' ? 'Guided' : run.mode === 'solo' ? 'Solo' : 'Timed';
   /** Keys show on the goal line only where the goal introduces a shortcut (its teach line) in Guided mode, or after Help revealed them (§4). */
   const keysShown = g => (run.mode === 'guided' && !!g.teach) || revealed;
-  const raceOf = id => (lesson.race || []).find(r => r.goal === id);
+  const raceOf = id => (lesson.race || []).find(r => r.slow === id || r.fast === id);
   const fmtSecs = s => s.toFixed(1);
   // Guided is the normal way to complete a lesson and is NOT assistance (SITE_SPEC §4): only
   // revealing extra steps through Help ("Show me") marks the attempt assisted.
@@ -130,7 +132,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
 
   function renderPanel() {
     $('lessonMode').textContent = modeLabel();
-    $('lessonProgress').textContent = phase === 'teach' ? '' : `${run.doneCount} / ${run.goals.length}`;
+    $('lessonProgress').textContent = `${run.doneCount} / ${run.goals.length}`;
     for (const b of el.querySelectorAll('.panel-tab')) { const on = b.dataset.tab === tab; b.setAttribute('aria-selected', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1; }
     $('panelBody').setAttribute('aria-labelledby', tab === 'lesson' ? 'tabLesson' : tab === 'help' ? 'tabHelp' : 'tabUsed');
     if (tab === 'lesson') renderLesson(); else if (tab === 'help') renderHelp(); else renderUsed();
@@ -144,19 +146,17 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       <ol class="goals">${states.map((g, i) => {
         const showKeys = keysShown(g); const race = raceOf(g.id);
         // The current goal carries its one-line teaching point (Guided only) and the action on the same line, with the keycaps
-        return `<li class="goal ${g.done ? 'done' : g.current ? 'current' : ''}" data-goal="${i}">
-        <span class="goal-mark">${g.done ? '✓' : g.current ? '›' : ''}</span><span class="goal-text">${g.current && run.mode === 'guided' && g.teach ? `<span class="goal-teach">${rich(g.teach)}</span> ` : ''}${esc(g.text)}${race && g.done && splits[i] != null ? ` <span class="goal-split">${fmtSecs(splits[i])} s</span>` : race && g.current ? ` <span class="goal-split live" data-goal-clock="${i}">0.0 s</span>` : ''}</span>
+        const watching = g.current && demo && demo.goal.id === g.id;
+        return `<li class="goal ${g.done ? 'done' : g.current ? 'current' : ''}${watching ? ' watching' : ''}" data-goal="${i}">
+        <span class="goal-mark">${g.done ? '✓' : g.current ? (watching ? '▶' : '›') : ''}</span><span class="goal-text">${g.current && run.mode === 'guided' && g.teach ? `<span class="goal-teach">${rich(g.teach)}</span> ` : ''}${esc(g.text)}${race && g.done && splits[i] != null ? ` <span class="goal-split">${fmtSecs(splits[i])} s</span>` : race && g.current ? ` <span class="goal-split live" data-goal-clock="${i}">0.0 s</span>` : ''}${watching ? ` <span class="goal-demo">watching · Esc skips</span>` : ''}</span>
         ${showKeys && g.current && g.keys ? `<div class="goal-keys">${keysHtml(g.keys)}</div>` : ''}
         ${g.current && nudgeAt === i ? `<div class="goal-nudge">Try it with the keyboard${!showKeys && g.keys ? ': the Help tab shows the keys' : ''}.</div>` : ''}</li>`; }).join('')}</ol>`;
   }
 
   function renderLesson() {
     const body = $('panelBody');
-    if (phase === 'teach') {
-      body.innerHTML = `<p class="lesson-read">${rich(lesson.read)}</p>` +
-        `<p class="lesson-goalsintro">You will</p><ol class="goals goals-preview">${lesson.goals.map(g => `<li>${esc(g.text)}</li>`).join('')}</ol>`;
-    } else if (phase === 'play') {
-      body.innerHTML = goalsHtml();
+    if (phase === 'play') {
+      body.innerHTML = `<p class="lesson-read">${rich(lesson.read)}</p>` + goalsHtml();
       // Every goal has landed but an end-state predicate fails (something a goal produced was undone,
       // a value was changed): show those predicates so the learner sees what still needs to hold.
       const ends = run.endStates();
@@ -180,7 +180,6 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     const taught = lesson.goals.slice(0, Math.min(run.doneCount + 1, lesson.goals.length)).filter(g => g.teach);
     const notes = `<details class="help-notes"><summary>Read the notes again</summary><p>${rich(lesson.read)}</p>${taught.length ? `<p class="lesson-goalsintro">Taught so far</p><ul class="help-taught">${taught.map(g => `<li>${rich(g.teach)}</li>`).join('')}</ul>` : ''}</details>
       <div class="help-links"><a href="#/reference">Shortcut reference</a></div>`;
-    if (phase === 'teach') { p.innerHTML = `<p class="help-note">Read the notes, then press <kbd>Enter</kbd> or Start. Each goal is checked as you go.</p>` + notes; return; }
     if (phase === 'done') { p.innerHTML = `<p class="help-note">Lesson complete. <kbd>Enter</kbd> continues.</p>` + notes; return; }
     const cur = run.current;   // the current goal, or the first failing end-state predicate once every goal has landed
     if (!cur) { p.innerHTML = `<p class="help-note">Every goal has landed.</p>` + notes; return; }
@@ -212,10 +211,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
 
   function renderActions() {
     const a = $('panelActions');
-    if (phase === 'teach') {
-      a.innerHTML = `<button class="btn btn-primary" id="startBtn" type="button">Start <kbd>Enter</kbd></button>`;
-      $('startBtn').onclick = startPlay;
-    } else if (phase === 'play') {
+    if (phase === 'play') {
       a.innerHTML = `<button class="btn btn-ghost" id="restartBtn" type="button">Restart</button>`;
       $('restartBtn').onclick = () => { restart(run.mode); };
     } else a.innerHTML = '';
@@ -226,7 +222,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     // a race goal shows its own clock while it is open (it starts with the first key of that goal)
     const live = el.querySelector('[data-goal-clock]');
     if (live && phase === 'play') { const start = run.goalStart(+live.dataset.goalClock); live.textContent = start == null ? '0.0 s' : fmtSecs(Math.max(0, (Date.now() - start) / 1000)) + ' s'; }
-    if (run.mode !== 'timed' || phase === 'teach') { t.textContent = ''; return; }
+    if (run.mode !== 'timed') { t.textContent = ''; return; }
     t.textContent = run.elapsed.toFixed(1) + ' s' + (run.par ? ' / par ' + run.par : '');
   }
 
@@ -240,14 +236,18 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   }
 
   /* ---------------- completion ---------------- */
-  /** The race block (a lesson with `race`): the two goals' split times side by side, and how many times faster the second was. */
+  /** The race block (a lesson with `race` pairs): each round's slow leg and fast leg side by side, totals, and how many times faster. */
   function raceHtml() {
     if (!lesson.race) return '';
     const splits = run.splits(); const idx = id => lesson.goals.findIndex(g => g.id === id);
-    const cols = lesson.race.map(r => ({ label: r.label, secs: splits[idx(r.goal)] }));
-    const [a, b] = cols; const ratio = a.secs != null && b.secs != null && b.secs > 0 ? a.secs / b.secs : null;
-    return `<div class="race"><div class="race-cols">${cols.map(c => `<div class="race-col"><span class="race-label">${esc(c.label)}</span><b class="race-time">${c.secs == null ? '—' : fmtSecs(c.secs)}<span>s</span></b></div>`).join('')}</div>
-      ${ratio != null && ratio >= 1.2 ? `<div class="race-note">${ratio >= 10 ? Math.round(ratio) : ratio.toFixed(1)}× faster with one shortcut.</div>` : ''}</div>`;
+    const rows = lesson.race.map(r => ({ label: r.label, slow: splits[idx(r.slow)], fast: splits[idx(r.fast)] }));
+    const sum = k => rows.reduce((a, r) => a + (r[k] == null ? 0 : r[k]), 0);
+    const slow = sum('slow'), fast = sum('fast'); const ratio = fast > 0 ? slow / fast : null;
+    const cell = v => v == null ? '—' : fmtSecs(v) + ' s';
+    return `<div class="race"><table class="race-table"><thead><tr><th></th><th>Slow way</th><th>Your way</th></tr></thead><tbody>
+      ${rows.map(r => `<tr><td>${esc(r.label)}</td><td>${cell(r.slow)}</td><td class="race-fast">${cell(r.fast)}</td></tr>`).join('')}
+      <tr class="race-total"><td>Total</td><td>${cell(slow)}</td><td class="race-fast">${cell(fast)}</td></tr></tbody></table>
+      ${ratio != null && ratio >= 1.2 ? `<div class="race-note">${ratio >= 10 ? Math.round(ratio) : ratio.toFixed(1)}× faster with shortcuts.</div>` : ''}</div>`;
   }
   const closingHtml = () => (lesson.closing || []).map(t => `<p class="rm-closing">${rich(t)}</p>`).join('');
   function statsLine() {
@@ -287,7 +287,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     overlay.hidden = false;
     const primary = overlay.querySelector('[data-act="continue"]'); if (primary) primary.focus();
   }
-  function closeOverlay() { overlay.hidden = true; el.querySelector('#panelBody').focus && el.querySelector('#panelBody').focus(); }
+  function closeOverlay() { overlay.hidden = true; focusWorkspace(); }
   function finish() {
     phase = 'done';
     const before = progress.all();
@@ -302,18 +302,45 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   }
 
   /* ---------------- phases ---------------- */
-  function startPlay() {
-    phase = 'play';
-    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-    renderPanel();
+  /** Keyboard focus lands on the workspace, so the first key goes to the sheet (never to the page). */
+  function focusWorkspace() {
+    const stage = $('stage'); if (!stage) return;
+    if (!stage.hasAttribute('tabindex')) stage.setAttribute('tabindex', '-1');
+    try { window.focus(); } catch (e) { /* ignore */ }
+    try { stage.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
   }
   function restart(newMode) {
+    stopDemo();
     phase = 'play'; revealed = false; nudgeAt = -1; prevDone = 0; overlay.hidden = true; tab = 'lesson';
-    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     run.reset(newMode);
     mountViews();
     if (!timerH) timerH = setInterval(renderTimer, 200);
     renderPanel();
+    focusWorkspace();
+    maybeStartDemo();
+  }
+
+  /* ---------------- demo goals: the platform presses the keys while the learner watches ---------------- */
+  function stopDemo() { if (demo && demo.timer) clearInterval(demo.timer); demo = null; }
+  /** Start the current goal's demo if it has one and it has not played; the keys go in on the goal's cadence. */
+  function maybeStartDemo() {
+    if (phase !== 'play' || demo) return;
+    const g = run.pendingDemo(); if (!g) return;
+    demo = { goal: g, steps: run.demoSteps(g), i: 0, timer: null };
+    renderPanel();
+    demo.timer = setInterval(() => {
+      if (!demo) return;
+      if (demo.i < demo.steps.length) { run.demoStep(demo.steps[demo.i++]); return; }
+      const d = demo; clearInterval(d.timer); demo = null; run.finishDemo(d.goal);
+    }, Math.max(40, (g.demo && g.demo.cadence) || 110));
+  }
+  /** Esc during a demo: play the rest at once. `demo` stays set while the rest plays so a re-render cannot start it again. */
+  function skipDemo() {
+    if (!demo) return;
+    const d = demo; if (d.timer) clearInterval(d.timer); d.timer = null;
+    while (d.i < d.steps.length) run.demoStep(d.steps[d.i++]);
+    demo = null;
+    run.finishDemo(d.goal);
   }
 
   /* ---------------- mouse (§6): recorded, allowed in lessons, with a gentle keyboard nudge ---------------- */
@@ -376,7 +403,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       return;
     }
     if ((tag === 'BUTTON' || tag === 'A' || tag === 'SUMMARY') && (e.key === 'Enter' || e.key === ' ')) return;   // the control handles its own activation
-    if (phase === 'teach') { if (e.key === 'Enter') { e.preventDefault(); startPlay(); } return; }
+    if (demo) { if (e.key === 'Escape') skipDemo(); if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length > 1) e.preventDefault(); return; }   // watching: keys wait, arrows never scroll the page
     if (phase === 'done') { if (e.key === 'Enter') { e.preventDefault(); const c = el.querySelector('[data-act="continue"]'); if (c) c.click(); } return; }
     if (run.key(e)) { e.preventDefault(); effects.armSounds(); }
   }
@@ -387,8 +414,11 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
 
   mountViews();
   renderPanel();
+  focusWorkspace();
+  maybeStartDemo();
   return {
     destroy() {
+      stopDemo();
       document.removeEventListener('keydown', onKey); document.removeEventListener('keyup', onKeyUp);
       if (timerH) clearInterval(timerH);
       if (sheetView) sheetView.destroy(); if (ribbonView) ribbonView.destroy(); if (sheetTabs) sheetTabs.destroy();

@@ -27,7 +27,9 @@
 //       check: (sheet, session) => boolean }, end-state predicate
 //   ],
 //   endState: [ { text, check } ],           optional extra predicates that must hold when the last goal lands
-//   race: [ { goal: 'arrows', label: 'Arrow keys' }, { goal: 'ctrl-down', label: 'Ctrl+↓' } ],   optional: goal split times shown side by side
+//   race: [ { label: 'Down the list', slow: 'watch-crawl', fast: 'ctrl-up' } ],   optional: pairs of goals whose split times are shown side by side
+//   a goal may instead be a demo the platform plays while the learner watches (the Welcome lesson):
+//     { id: 'watch-crawl', demo: { script: 'Down Down …', cadence: 120 }, text: 'Watch: …', requires: [...], check: (s, ses) => ses.demoDone.has('watch-crawl') }
 //   closing: ['sentence', …],                optional paragraphs on the completion overlay
 //   solution: 'Ctrl+Down Ctrl+Right Home',   reference solution as keystrokes (parseKeyScript)
 // }
@@ -147,7 +149,11 @@ export function validateLesson(l) {
     need(typeof g.check === 'function', `goal ${g.id}: check must be a function`);
     need(Array.isArray(g.requires), `goal ${g.id}: requires must list concept ids`);
     for (const c of Array.isArray(g.requires) ? g.requires : []) need(CONCEPTS[c], `goal ${g.id}: unknown concept "${c}"`);
-    need(typeof g.keys === 'string' && g.keys.trim(), `goal ${g.id}: keys (the route as keycaps) missing`);
+    if (g.demo !== undefined) {
+      need(isObject(g.demo) && typeof g.demo.script === 'string' && g.demo.script.trim(), `goal ${g.id}: demo needs a script`);
+      need(g.demo === undefined || g.keys === undefined, `goal ${g.id}: a demo goal has no keys (the platform presses them)`);
+      need(!isObject(g.demo) || g.demo.cadence === undefined || (typeof g.demo.cadence === 'number' && g.demo.cadence >= 40 && g.demo.cadence <= 1000), `goal ${g.id}: demo cadence is milliseconds per key, 40-1000`);
+    } else need(typeof g.keys === 'string' && g.keys.trim(), `goal ${g.id}: keys (the route as keycaps) missing`);
     // Adaptive rule (SITE_SPEC §4): the goal that first uses a concept this lesson teaches carries the
     // one-line teaching point; a goal that only reuses taught concepts carries none.
     const fresh = (Array.isArray(g.requires) ? g.requires : []).filter(c => concepts.includes(c) && !introduced.has(c));
@@ -155,7 +161,7 @@ export function validateLesson(l) {
     else if (Array.isArray(l.concepts) && Array.isArray(g.requires)) need(g.teach === undefined, `goal ${g.id}: reuses taught concepts only, so it must not carry a teach line`);
     if (typeof g.teach === 'string') { need(sentenceCount(g.teach) === 1 && /[.!?]$/.test(g.teach.trim()), `goal ${g.id}: teach must be one sentence ending in a full stop`); need(wordCount(g.teach) <= 30, `goal ${g.id}: teach is over 30 words`); }
   }
-  need(l.race === undefined || (Array.isArray(l.race) && l.race.length === 2 && l.race.every(r => isObject(r) && ids.has(r.goal) && typeof r.label === 'string')), 'race must name two goals with labels');
+  need(l.race === undefined || (Array.isArray(l.race) && l.race.length >= 1 && l.race.every(r => isObject(r) && typeof r.label === 'string' && ids.has(r.slow) && ids.has(r.fast))), 'race must be pairs { label, slow, fast } naming goals');
   need(l.closing === undefined || (Array.isArray(l.closing) && l.closing.every(t => typeof t === 'string')), 'closing must be an array of paragraphs');
   need(l.endState === undefined || Array.isArray(l.endState), 'endState must be an array');
   const ends = Array.isArray(l.endState) ? l.endState.filter(isObject) : [];
@@ -181,7 +187,7 @@ function validateStartingSheet(spec, goals, ends, need) {
     need(isObject(a) && Number.isInteger(a.r) && Number.isInteger(a.c) && a.r >= 1 && a.r <= rows && a.c >= 1 && a.c <= cols, `sheet: active ${JSON.stringify(a)} is outside the ${rows}×${cols} grid`);
   }
   let sheet, session;
-  try { sheet = new Sheet({ rows: spec.rows, cols: spec.cols, cells, colW: spec.colW, active: spec.active }); session = new Session(sheet, {}); }
+  try { sheet = new Sheet({ rows: spec.rows, cols: spec.cols, cells, colW: spec.colW, active: spec.active }); session = new Session(sheet, {}); session.demoDone = new Set(); }   // as the runner sets it up
   catch (e) { need(false, `sheet does not build: ${e.message}`); return; }
   session.goalMark = 0;
   const probe = (label, check) => {

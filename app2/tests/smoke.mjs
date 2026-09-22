@@ -54,10 +54,11 @@ try {
   // play the first and last lesson end to end by keyboard
   for (const lesson of [LESSONS[0], LESSONS[LESSONS.length - 1]]) {
     await page.goto(base + '#/lesson/' + lesson.id);
-    const start = await page.waitForSelector('#startBtn', { timeout: 5000 }).catch(() => null);
-    if (!start) { fail(`${lesson.id}: lesson did not open`); continue; }
-    await page.keyboard.press('Enter');
+    const opened = await page.waitForSelector('.goal.current, #startBtn', { timeout: 5000 }).catch(() => null);
+    if (!opened) { fail(`${lesson.id}: lesson did not open`); continue; }
+    if (await page.$('#startBtn')) await page.keyboard.press('Enter');
     await page.waitForSelector('.goal.current');
+    await page.waitForFunction(() => !document.querySelector('.goal.current .goal-demo'), null, { timeout: 30000 }).catch(() => {});   // a demo goal plays itself first
     for (const step of parseKeyScript(lesson.solution)) {
       if (step.type === 'text') await page.keyboard.type(step.text);
       else await page.keyboard.press(pwKey(step.spec));
