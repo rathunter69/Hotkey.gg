@@ -44,8 +44,9 @@ test('Go To: the Ribbon route Alt H F D G opens the same dialog on its menu path
   s.run('"D2" Enter'); assert.equal(s.sheet.selectionText(), 'D2'); assert.equal(s.mode, 'normal');
   s.run('Alt H F D G Escape'); assert.equal(s.dialog, null); assert.deepEqual(s.path, ['H', 'F', 'D']); assert.equal(s.mode, 'ribbon');
   s.run('Escape Escape Escape Escape'); assert.equal(s.mode, 'normal');
-  s.run('Alt H F D F'); assert.match(s.note, /Find/); assert.deepEqual(s.path, ['H', 'F', 'D']);   // a dead item notes and stays put
-  assert.equal(COMMANDS.HFDG, 'Go To…'); assert.ok(DEAD.HFDF);
+  s.run('Alt H F D F'); assert.equal(s.dialog, 'find'); assert.deepEqual(s.path, ['H', 'F', 'D']);   // Find lives on the same menu path (phase C)
+  s.run('Escape Escape Escape Escape Escape');
+  assert.equal(COMMANDS.HFDG, 'Go To…'); assert.equal(COMMANDS.HFDF, 'Find…'); assert.ok(DEAD.HFDV);
 });
 
 test('Go To: a sheet-qualified reference switches sheets first', () => {

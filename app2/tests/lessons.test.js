@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { CHAPTERS, LESSONS, LESSONS_BY_ID, sectionsOf, sectionNames } from '../content/index.js';
-import { validateLesson, availableConcepts, sentenceCount } from '../content/schema.js';
+import { validateLesson, availableConcepts, sentenceCount, goalBounds } from '../content/schema.js';
 import { LessonRun, shortcutsUsed } from '../app/runner.js';
 
 const byId = id => { const l = LESSONS_BY_ID[id]; assert.ok(l, `lesson ${id} is in the catalogue`); return l; };
@@ -34,8 +34,9 @@ test('every lesson sits in one of its chapter\'s sections; the catalogue lists e
     assert.deepEqual(groups.flatMap(g => g.lessons.map(l => l.id)), ch.lessons.slice().sort((a, b) => names.indexOf(a.section) - names.indexOf(b.section) || ch.lessons.indexOf(a) - ch.lessons.indexOf(b)).map(l => l.id));
   }
   const foundations = CHAPTERS.find(c => c.id === 'foundations');
-  assert.equal(sectionNames(foundations).length, 9, 'Chapter 1 shows all nine sections of SITE_SPEC §7');
-  assert.ok(sectionsOf(foundations).some(g => g.lessons.length === 0 && g.blurb), 'an upcoming section carries its blurb');
+  assert.equal(sectionNames(foundations).length, 10, 'Chapter 1 shows all ten sections (SITE_SPEC §7 + the project section)');
+  assert.ok(sectionsOf(foundations).every(g => g.lessons.length > 0), 'every Chapter 1 section has lessons (the chapter is complete)');
+  assert.equal(sectionsOf({ sections: [{ name: 'Soon', blurb: 'arrives later' }], lessons: [] })[0].blurb, 'arrives later', 'an upcoming (empty) section still carries its blurb');
   assert.deepEqual(sectionsOf({ sections: ['A'], lessons: [{ id: 'x' }, { id: 'y', section: 'A' }] }).map(g => [g.name, g.lessons.map(l => l.id)]), [['A', ['y']], ['Basics', ['x']]], 'a lesson without a section falls into Basics after the listed sections');
 });
 
@@ -60,7 +61,8 @@ test('the adaptive lesson format is enforced', () => {
   assert.equal(sentenceCount('Numbers like 1,200.00 and 5.0% are not sentence ends. This is the second.'), 2);
   for (const l of LESSONS) {
     assert.ok(!/\b(awesome|super|easy peasy|magic|wow|gonna|kinda)\b/i.test(l.read + l.goals.map(g => (g.teach || '') + g.text).join(' ')), `${l.id}: tone`);
-    assert.ok(l.goals.length >= 3 && l.goals.length <= 6, `${l.id}: 3-6 goals`);
+    const b = goalBounds(l.kind);
+    assert.ok(l.goals.length >= b.min && l.goals.length <= b.max, `${l.id}: ${b.min}-${b.max} goals for kind ${l.kind || 'lesson'}`);
   }
 });
 
@@ -245,7 +247,7 @@ test('#38 / #69 a failing end state is surfaced as the pending item instead of a
 
 test('#41 the lesson clock is the engine clock: keys that do nothing do not start it', () => {
   let t = 1000;
-  for (const ev of [{ key: 'Escape' }, { key: '0', ctrlKey: true }, { key: 'k', ctrlKey: true }]) {
+  for (const ev of [{ key: 'Escape' }, { key: 'k', ctrlKey: true }]) {   // Ctrl+0 hides a column since phase C: it is real work and starts the clock
     const r = new LessonRun(f01(), { mode: 'timed', now: () => t });
     t = 1000; r.key(ev); t = 6000;
     assert.equal(r.startedAt, null, `${JSON.stringify(ev)} does not start the clock`); assert.equal(r.elapsed, 0);
@@ -360,9 +362,24 @@ test('#65 / #66 progress.js survives corrupt localStorage shapes', async () => {
     progress.record(ID, 'timed', NaN);
     assert.equal(progress.get(ID).best, 7.26, 'a non-finite time never becomes the best');
     assert.equal(progress.status(ID), 'mastered');
+    // chapter gates (#C5): chapterPass latches, chapter() reads, corrupt shapes normalise to {}
+    for (const raw of ['{"chapters":"x"}', '{"chapters":[]}', '{"chapters":{"foundations":"yes"}}', '{"chapters":{"foundations":{"assessment":"maybe","other":1}}}', '{}']) {
+      store.hk2_progress_v1 = raw;
+      assert.deepEqual(progress.chapter('foundations'), raw.includes('"maybe"') ? { assessment: true } : {}, `${raw}: chapter() normalises`);
+    }
+    store.hk2_progress_v1 = '{}';
+    assert.equal(progress.chapterPass('foundations', 'nonsense'), false, 'an unknown gate is refused');
+    assert.ok(progress.chapterPass('foundations', 'testout'));
+    assert.ok(progress.chapterPass('foundations', 'assessment'));
+    assert.deepEqual(progress.chapter('foundations'), { testout: true, assessment: true });
+    assert.deepEqual(progress.chapter('formatting'), {}, 'an unpassed chapter reads empty');
+    progress.record(ID, 'guided', 3);
+    assert.deepEqual(progress.chapter('foundations'), { testout: true, assessment: true }, 'a lesson record does not disturb the gates');
     // a broken storage API cannot throw out of record()/touch()
     globalThis.localStorage = { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); }, removeItem: () => { throw new Error('blocked'); } };
     assert.equal(progress.record(ID, 'guided', 1), false); assert.equal(progress.touch(ID), false); assert.equal(progress.status(ID), 'todo');
+    assert.equal(progress.chapterPass('foundations', 'testout'), false, 'blocked storage: chapterPass reports failure');
+    assert.deepEqual(progress.chapter('foundations'), {}, 'blocked storage: chapter() reads empty');
     assert.doesNotThrow(() => progress.clear());
   } finally { delete globalThis.localStorage; }
 });

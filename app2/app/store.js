@@ -11,6 +11,7 @@
 // Everything account-scoped carries an auth token; a reply for a stale token is dropped, and a
 // cache or outbox written by another uid is discarded, never sent.
 import { progress } from './progress.js';
+import { records } from './records.js';
 import { prefs } from './prefs.js';
 import { auth } from './auth.js';
 import { applyTheme, saveTheme, currentTheme } from '../ui/themes.js';
@@ -264,6 +265,26 @@ export const store = {
     scheduleFlush(0);
     return cached || queued;
   },
+
+  /* ---- chapter gates: local for now (an account mirror arrives with paid access in Phase E) ---- */
+  chapter(ch) { return progress.chapter(ch); },
+  chapterPass(ch, what) { return progress.chapterPass(ch, what); },
+
+  /* ---- run records (Phase D): local store; the account mirror is the attempts table (plan §4).
+     When accounts carry attempts, addAttempt gains an outbox push like record() above. ---- */
+  addAttempt(a) { return records.addAttempt(a); },
+  pb(ref) { return records.pb(ref); },
+  pbRecords() { return records.pbs(); },
+  attempts(f) { return records.attempts(f); },
+  trace(ref) { return records.trace(ref); },
+  /** The board for a ref: your clean times, best first — the honest local list until boards ship. */
+  boards(ref) {
+    return records.attempts({ ref }).filter(a => a.clean && a.secs != null)
+      .sort((x, y) => x.secs - y.secs)
+      .map(a => ({ secs: a.secs, keys: a.keys, tier: a.tier, at: a.at, mine: true }));
+  },
+  /** Rank needs real boards (Phase B): every guest is Unranked, honestly. */
+  rank() { return null; },
 
   /* ---- learner state: prefs stays the read path; the store writes through ---- */
   skipped() { return prefs.get().skipped; },

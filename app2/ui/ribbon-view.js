@@ -285,6 +285,22 @@ export class RibbonView {
   static field(val, foc, act, cls) {
     return `<span class="od-field${foc ? ' foc' : ''}${cls ? ' ' + cls : ''}"${act ? ` data-act="${act}"` : ''}>${esc(val)}${foc ? '<i class="od-caret"></i>' : ''}</span>`;
   }
+  findHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const F = RibbonView.field;
+    return `<div class="gt-ref"><label>Find what:</label>${F(d.find, d.focus === 'find', 'dset:focus:find', 'wide')}</div>` +
+      (d.replace ? `<div class="gt-ref"><label>Replace with:</label>${F(d.repl, d.focus === 'repl', 'dset:focus:repl', 'wide')}</div>` : '') +
+      (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : `<div class="od-caplbl">${d.replace ? 'Tab switches fields · ↵ Find Next · Alt+A Replace All' : '↵ Find Next'} · esc close</div>`);
+  }
+  gotoSpecialHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const R = RibbonView.radio;
+    return '<div class="od-sect">Select</div>' +
+      R(d.pick === 'blanks', 'letter:K', 'Blan<u>k</u>s', 'K') +
+      R(d.pick === 'constants', 'letter:O', 'C<u>o</u>nstants', 'O') +
+      R(d.pick === 'formulas', 'letter:F', '<u>F</u>ormulas', 'F') +
+      (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">within the selection (the region around the active cell when nothing is selected) · ↵ OK · esc cancel</div>');
+  }
   gotoHtml() {
     const ss = this.session;
     const recent = (ss.gotoRecent || []).map(r => `<div class="od-item"><span class="od-ico"></span>${esc(r)}</div>`).join('') || '<div class="gt-empty">previous locations appear here</div>';
@@ -418,7 +434,7 @@ export class RibbonView {
     // the workbook cards (ui/workbook.css): Go To, Excel Options, Page Setup — real-looking, every control clickable
     if (ss.dialog === 'goto' || this.gotoDialog) {
       const d = this.gotoDialog || (this.gotoDialog = this.wideCard('gotoDialog', 'Go To', 'pd-mid'));
-      this.showCard(d, ss.dialog === 'goto', ss.dialog === 'goto' ? this.gotoHtml() : '', RibbonView.okCancel('OK', '<span class="pd-btn dis" aria-disabled="true" title="Not available yet">Special…</span>'));
+      this.showCard(d, ss.dialog === 'goto', ss.dialog === 'goto' ? this.gotoHtml() : '', RibbonView.okCancel('OK', '<span class="pd-btn" data-act="dset:special:1">Special… <kbd>alt+s</kbd></span>'));
     }
     if (ss.dialog === 'options' || this.optionsDialog) {
       const d = this.optionsDialog || (this.optionsDialog = this.wideCard('optionsDialog', 'Excel Options', 'pd-wide'));
@@ -441,6 +457,18 @@ export class RibbonView {
     if (ss.dialog === 'movesheet' || this.moveDialog) {
       const d = this.moveDialog || (this.moveDialog = this.wideCard('moveSheetDialog', 'Move or Copy', 'pd-mid'));
       this.showCard(d, ss.dialog === 'movesheet' && !!ss.dlg, ss.dialog === 'movesheet' ? this.moveHtml() : '', RibbonView.okCancel('OK'));
+    }
+    // Find / Replace (Ctrl+F / Ctrl+H) and Go To Special (Alt H F D S) — phase C
+    if (ss.dialog === 'find' || this.findDialog) {
+      const d = this.findDialog || (this.findDialog = this.wideCard('findDialog', 'Find and Replace', 'pd-mid'));
+      if (ss.dialog === 'find' && d.querySelector('.pd-cap')) d.querySelector('.pd-cap').textContent = ss.dlg && ss.dlg.replace ? 'Find and Replace' : 'Find';
+      this.showCard(d, ss.dialog === 'find' && !!ss.dlg, ss.dialog === 'find' ? this.findHtml() : '',
+        (ss.dlg && ss.dlg.replace ? '<span class="pd-btn" data-act="dset:replaceAll:1">Replace All <kbd>alt+a</kbd></span>' : '') +
+        '<span class="pd-spacer"></span><span class="pd-btn" data-act="cancel">Close <kbd>esc</kbd></span><span class="pd-btn ok" data-act="enter">Find Next <kbd>↵</kbd></span>');
+    }
+    if (ss.dialog === 'gotospecial' || this.specialDialog) {
+      const d = this.specialDialog || (this.specialDialog = this.wideCard('gotoSpecialDialog', 'Go To Special', 'pd-mid'));
+      this.showCard(d, ss.dialog === 'gotospecial' && !!ss.dlg, ss.dialog === 'gotospecial' ? this.gotoSpecialHtml() : '', RibbonView.okCancel('OK'));
     }
   }
 
@@ -508,6 +536,7 @@ export class RibbonView {
     const ss = this.session;
     const foot = (ok, cancel) => '<div class="rdrop-foot"><span class="pd-btn" data-act="cancel">' + cancel + ' <kbd>esc</kbd></span><span class="pd-btn ok" data-act="enter">' + ok + ' <kbd>↵</kbd></span></div>';
     if (ss.dialog === 'colw') return '<div class="rdrop-cap">column width</div><div class="rdrop-val">' + esc(ss.colwBuf || '…') + '</div><div class="rdrop-hint">type a width (Excel units)</div>' + foot('OK', 'Cancel');
+    if (ss.dialog === 'rowh') return '<div class="rdrop-cap">row height</div><div class="rdrop-val">' + esc(ss.rowhBuf || '…') + '</div><div class="rdrop-hint">type a height (points)</div>' + foot('OK', 'Cancel');
     if (ss.dialog === 'sortwarn') return '<div class="rdrop-cap">sort warning</div><div class="rdrop-hint">data sits NEXT to your column</div>' +
       '<div class="rdrop-item" data-act="letter:E"><span class="ri-key">E</span><span class="rdrop-lbl">Expand the selection</span></div>' +
       '<div class="rdrop-item" data-act="letter:C"><span class="ri-key">C</span><span class="rdrop-lbl">Continue with the current selection</span></div>' +
@@ -577,7 +606,7 @@ export class RibbonView {
     // what floats under the bar
     if (ss.dialog === 'fontcolor' || ss.dialog === 'fillcolor') { this.dropShow(this.anchorFor(ss.dialog === 'fontcolor' ? 'HFC' : 'HH'), this.swatchDropHtml()); return; }
     if (ss.dialog === 'cellstyle') { this.dropShow(this.anchorFor('HJ'), this.styleDropHtml(), 'rdrop-gallery'); return; }
-    if (ss.dialog === 'colw') { this.dropShow(this.anchorFor('HO'), this.smallDialogHtml(), 'rdrop-dialog'); return; }
+    if (ss.dialog === 'colw' || ss.dialog === 'rowh') { this.dropShow(this.anchorFor('HO'), this.smallDialogHtml(), 'rdrop-dialog'); return; }
     if (ss.dialog === 'sortwarn') { this.dropShow(this.anchorFor('ASA', 'HSF'), this.smallDialogHtml(), 'rdrop-dialog'); return; }
     if (ss.dialog === 'series') { this.dropShow(this.anchorFor('HFI'), this.smallDialogHtml(), 'rdrop-dialog'); return; }
     if (ss.dialog === 'fxfix') { this.dropShow(this.anchorFor(), this.smallDialogHtml(), 'rdrop-dialog'); return; }
@@ -746,6 +775,11 @@ export class RibbonView {
       el.innerHTML = '<span class="path">column width →</span><span class="opt" style="font-family:var(--mono)">' + esc(ss.colwBuf || '…') + '</span><span class="opt">type a width (Excel units) · ↵ apply · esc cancel</span>';
       return;
     }
+    if (ss.dialog === 'rowh') {
+      el.className = 'ribbon show';
+      el.innerHTML = '<span class="path">row height →</span><span class="opt" style="font-family:var(--mono)">' + esc(ss.rowhBuf || '…') + '</span><span class="opt">type a height (points) · ↵ apply · esc cancel</span>';
+      return;
+    }
     if (ss.dialog === 'sortwarn') {
       el.className = 'ribbon show';
       el.innerHTML = '<span class="path">sort warning →</span><span class="opt" data-act="letter:E"><k>e</k>Expand the selection</span><span class="opt" data-act="letter:C"><k>c</k>Continue with the current selection</span><span class="opt">data sits NEXT to your column — ↵ = expand (Excel’s default) · esc cancel</span>';
@@ -756,6 +790,12 @@ export class RibbonView {
       el.innerHTML = '<span class="path">series →</span><span class="opt">linear, step from selection · <kbd>↵</kbd> apply · <kbd>esc</kbd> cancel</span>';
       return;
     }
+    if (ss.dialog === 'find') { el.className = 'ribbon show';   // the floating card carries the fields
+      el.innerHTML = '<span class="path">' + (ss.dlg && ss.dlg.replace ? 'replace' : 'find') + ' →</span><span class="opt" style="font-family:var(--mono)">' + esc(ss.dlg ? (ss.dlg.focus === 'repl' ? ss.dlg.repl : ss.dlg.find) || '…' : '…') + '</span><span class="opt">↵ find next' + (ss.dlg && ss.dlg.replace ? ' · alt+a replace all · tab switches fields' : '') + ' · esc close</span>';
+      return; }
+    if (ss.dialog === 'gotospecial') { el.className = 'ribbon show';
+      el.innerHTML = '<span class="path">go to special →</span><span class="opt" data-act="letter:K"><k>k</k>Blanks</span><span class="opt" data-act="letter:O"><k>o</k>Constants</span><span class="opt" data-act="letter:F"><k>f</k>Formulas</span><span class="opt">↵ OK · esc cancel</span>';
+      return; }
     if (ss.dialog === 'goto') { el.className = 'ribbon show';   // the floating card carries the field
       el.innerHTML = '<span class="path">go to →</span><span class="opt" style="font-family:var(--mono)">' + esc(ss.dialogBuf || '…') + '</span><span class="opt">type a cell or range · ↵ go · esc cancel</span>';
       return; }

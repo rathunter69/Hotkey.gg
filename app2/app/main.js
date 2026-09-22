@@ -21,6 +21,9 @@ import { store } from './store.js';
 import { auth } from './auth.js';
 import { track, installErrorLog } from './telemetry.js';
 import { lessonById } from '../content/index.js';
+import { gameCtx } from './stats.js';
+import { earnedSet } from '../ui/badges.js';
+import { themeStates } from './cosmetics.js';
 
 const NAV_LINKS = [
   { key: 'learn', label: 'Learn', href: '#/learn' },
@@ -55,6 +58,8 @@ export function parseRoute(hash) {
   else if (path === '/practice') name = 'practice';
   else if ((m = /^\/drill\/([a-z0-9-]+)$/.exec(path))) { name = 'drill'; params.id = m[1]; }
   else if (path === '/sandbox') { name = 'drill'; params.id = 'sandbox'; }
+  else if (path === '/daily') { name = 'drill'; params.daily = true; }
+  else if (path === '/rapid') name = 'rapid';
   else if (['/leaderboard', '/reference', '/pricing', '/teams', '/account', '/about', '/terms', '/privacy', '/eula', '/contact'].includes(path)) name = path.slice(1);
   else name = 'notfound';
   return { name, params, query, path };
@@ -63,7 +68,7 @@ export function parseRoute(hash) {
 /** Which nav link a route lights up. */
 export function navKeyFor(name) {
   if (['root', 'landing', 'start', 'learn', 'lesson'].includes(name)) return 'learn';
-  if (name === 'practice' || name === 'drill') return 'practice';
+  if (name === 'practice' || name === 'drill' || name === 'rapid') return 'practice';
   if (name === 'leaderboard' || name === 'reference') return name;
   return '';
 }
@@ -109,6 +114,7 @@ const LOADERS = {
   lesson: { file: './lesson-view.js', pick: m => m.mountLessonView },
   practice: { file: './practice-page.js', pick: m => m.mountPracticePage },
   drill: { file: './drill-page.js', pick: m => m.mountDrillPage },
+  rapid: { file: './rapid-fire.js', pick: m => m.mountRapidPage },
   leaderboard: { file: './leaderboard-page.js', pick: m => m.mountLeaderboardPage },
   reference: { file: './reference-page.js', pick: m => m.mountReferencePage },
   pricing: { file: './pricing-page.js', pick: m => m.mountPricingPage },
@@ -159,7 +165,15 @@ export function startApp({ navEl, rootEl, footEl }) {
   const legacy = legacyQuery(location.search);
   if (legacy) { try { history.replaceState(null, '', legacy); } catch (e) { /* file:// etc.: route as-is */ } }
   prefs.reflect();
-  const nav = mountNav(navEl, { links: NAV_LINKS, active: 'learn', account: true, onTheme: k => store.setTheme(k), onSignOut: () => auth.signOut() });
+  const nav = mountNav(navEl, {
+    links: NAV_LINKS, active: 'learn', account: true,
+    onTheme: k => store.setTheme(k), onSignOut: () => auth.signOut(),
+    // cosmetic locks (Phase D): resolved lazily when the picker opens
+    themeLocks: () => {
+      const ctx = gameCtx();
+      return Object.fromEntries(themeStates({ level: ctx.level, earned: earnedSet(ctx), rankIndex: ctx.rankIndex }).map(s => [s.key, s.lock]));
+    },
+  });
   const footer = footEl ? mountFooter(footEl) : null;
 
   // ---- accounts: boot auth (PKCE ?code= returns are exchanged inside ready(); the hash
@@ -196,14 +210,19 @@ export function startApp({ navEl, rootEl, footEl }) {
     if (name === 'root') name = isReturning() ? 'home' : 'landing';
     let lesson = null;
     if (name === 'lesson') { lesson = lessonById(r.params.id); if (!lesson) name = 'notfound'; }
-    if (name === 'drill' && r.params.id !== 'sandbox') name = 'notfound';
+    let drill = null;
+    if (name === 'drill' && !r.params.daily && r.params.id !== 'sandbox') {
+      drill = (await import('../content/drills.js')).drillById(r.params.id);
+      if (!drill) name = 'notfound';
+    }
     nav.setActive(navKeyFor(name === 'home' ? 'root' : name));
-    document.title = titleFor(name, lesson ? lesson.title : name === 'drill' ? 'Sandbox' : '');
+    try { nav.setLevel(gameCtx().level); } catch (e) { /* records unreadable: no chip */ }
+    document.title = titleFor(name, lesson ? lesson.title : name === 'drill' ? (drill ? drill.title : 'Sandbox') : '');
     document.body.dataset.route = name;
     window.scrollTo(0, 0);
 
     // the workspace routes need a keyboard and width; below the breakpoint show the notice instead
-    if ((name === 'lesson' || name === 'drill') && narrowMq && narrowMq.matches) { current = narrowNotice(rootEl, lesson); return; }
+    if ((name === 'lesson' || name === 'drill' || name === 'rapid') && narrowMq && narrowMq.matches) { current = narrowNotice(rootEl, lesson); return; }
 
     const entry = LOADERS[name] || LOADERS.notfound;
     let mount;

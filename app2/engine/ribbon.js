@@ -21,7 +21,8 @@ export const MENUS = {
   'HE': [['A', 'Clear all'], ['F', 'Clear formats'], ['C', 'Clear contents']],
   'HI': [['R', 'Insert rows'], ['C', 'Insert columns'], ['S', 'Insert sheet']],
   'HD': [['R', 'Delete rows'], ['C', 'Delete columns'], ['S', 'Delete sheet']],
-  'HO': [['I', 'Autofit width'], ['A', 'Autofit height'], ['W', 'Column width…'], ['R', 'Rename sheet'], ['M', 'Move or copy sheet…'], ['E', 'Format cells…']],   // Excel's Format menu: R and M sit among the sheet items, E last
+  'HO': [['H', 'Row height…'], ['A', 'Autofit height'], ['W', 'Column width…'], ['I', 'Autofit width'], ['U', 'Hide & Unhide'], ['R', 'Rename sheet'], ['M', 'Move or copy sheet…'], ['E', 'Format cells…']],   // Excel's Format menu: sizes, visibility, the sheet items, E last
+  'HOU': [['R', 'Hide Rows'], ['C', 'Hide Columns'], ['O', 'Unhide Rows'], ['L', 'Unhide Columns']],
   'HB': [['O', 'Bottom'], ['P', 'Top'], ['L', 'Left'], ['R', 'Right'], ['N', 'No border'], ['A', 'All'], ['S', 'Outside'], ['T', 'Thick box'], ['B', 'Double bottom'], ['D', 'Top & bottom']],
   'HU': [['S', 'Sum']],
   'HA': [['L', 'Left'], ['C', 'Center'], ['R', 'Right'], ['N', '$ Accounting']],
@@ -37,8 +38,9 @@ export const MENUS = {
   'A': [['S', 'Sort']],
   'AS': [['A', 'Sort A→Z'], ['D', 'Sort Z→A']],
   'E': [['S', 'Paste special…']],
-  'W': [['V', 'Show']],
+  'W': [['V', 'Show'], ['F', 'Freeze Panes']],
   'WV': [['G', 'Gridlines']],
+  'WF': [['F', 'Freeze Panes'], ['R', 'Freeze Top Row'], ['C', 'Freeze First Column']],
 };
 
 /** Excel's real Home-tab groups — the renderer draws each as a labelled cluster. */
@@ -104,7 +106,7 @@ export const tabName = k => (TABS.find(t => t.k === k) || { name: k }).name;
  */
 export const DEAD = {
   'FI': 'Info', 'FN': 'New', 'FO': 'Open', 'FS': 'Save', 'FA': 'Save As', 'FP': 'Print', 'FH': 'Share', 'FE': 'Export', 'FC': 'Close', 'FD': 'Account',
-  'HFDF': 'Find', 'HFDR': 'Replace', 'HFDS': 'Go To Special', 'HFDU': 'Formulas', 'HFDN': 'Constants', 'HFDV': 'Data Validation', 'HFDO': 'Select Objects',
+  'HFDV': 'Data Validation', 'HFDO': 'Select Objects',
   'PM': 'Margins', 'PA': 'Print Area', 'PB': 'Breaks', 'PG': 'Background', 'PI': 'Print Titles', 'PSZ': 'Size',
 };
 
@@ -170,6 +172,9 @@ export const COMMANDS = {
   'HEA': 'Clear all', 'HEF': 'Clear formats', 'HEC': 'Clear contents', 'HUS': 'AutoSum', 'MUS': 'AutoSum', 'MP': 'Trace precedents', 'MD': 'Trace dependents',
   'HVV': 'Paste values', 'HVS': 'Paste special…', 'ES': 'Paste special…', 'ASA': 'Sort A to Z', 'ASD': 'Sort Z to A', 'WVG': 'Gridlines', 'WG': 'Gridlines',
   'FT': 'Excel Options…', 'HFDG': 'Go To…', 'PSP': 'Page Setup…', 'POP': 'Portrait', 'POL': 'Landscape',
+  'HFDF': 'Find…', 'HFDR': 'Replace…', 'HFDS': 'Go To Special…', 'HFDU': 'Select formulas', 'HFDN': 'Select constants',
+  'HOH': 'Row height…', 'HOUR': 'Hide rows', 'HOUC': 'Hide columns', 'HOUO': 'Unhide rows', 'HOUL': 'Unhide columns',
+  'WFF': 'Freeze panes', 'WFR': 'Freeze top row', 'WFC': 'Freeze first column',
 };
 
 /**

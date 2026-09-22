@@ -12,6 +12,31 @@ import entering_data from './lessons/entering-data.js';
 import editing_cells from './lessons/editing-cells.js';
 import ribbon_commands from './lessons/ribbon-commands.js';
 import dialog_boxes from './lessons/dialog-boxes.js';
+import page_keys from './lessons/page-keys.js';
+import go_to_cells from './lessons/go-to-cells.js';
+import select_blocks from './lessons/select-blocks.js';
+import go_to_special from './lessons/go-to-special.js';
+import undo_redo from './lessons/undo-redo.js';
+import fill_down_right from './lessons/fill-down-right.js';
+import find_replace from './lessons/find-replace.js';
+import insert_delete_rows from './lessons/insert-delete-rows.js';
+import widths_heights from './lessons/widths-heights.js';
+import hide_freeze from './lessons/hide-freeze.js';
+import home_tab_tour from './lessons/home-tab-tour.js';
+import format_cells_tabs from './lessons/format-cells-tabs.js';
+import fills_and_colours from './lessons/fills-and-colours.js';
+import first_formula from './lessons/first-formula.js';
+import sum_family from './lessons/sum-family.js';
+import autosum from './lessons/autosum.js';
+import absolute_refs from './lessons/absolute-refs.js';
+import cross_sheet from './lessons/cross-sheet.js';
+import formula_errors from './lessons/formula-errors.js';
+import copy_cut_paste from './lessons/copy-cut-paste.js';
+import paste_special from './lessons/paste-special.js';
+import fill_series from './lessons/fill-series.js';
+import weekly_report_project from './lessons/weekly-report-project.js';
+import foundations_assessment from './lessons/foundations-assessment.js';
+import foundations_testout from './lessons/foundations-testout.js';
 
 export const CHAPTERS = [
   {
@@ -30,8 +55,20 @@ export const CHAPTERS = [
       { name: 'The Ribbon and dialogs', blurb: 'The Home tab by KeyTips, Format Cells tab by tab, bold, borders, fills, font colour, alignment.' },
       { name: 'Basic formulas', blurb: '= and operators, SUM, AVERAGE, MIN, MAX and COUNT, AutoSum, relative and absolute references, F4, common errors.' },
       { name: 'Copy, paste and fill', blurb: 'Copy, cut and paste, Paste Special, fill series, the Flash Fill idea.' },
+      { name: 'Project and assessment', blurb: 'Build the weekly report end to end, then prove it against the clock; or test out of the chapter.' },
     ],
-    lessons: [welcome_race, workbook_sheets_cells, managing_sheets, ribbon_and_keytips, excel_options, page_setup, active_cell, moving_around, selecting_ranges, entering_data, editing_cells, ribbon_commands, dialog_boxes],
+    lessons: [
+      welcome_race,
+      workbook_sheets_cells, managing_sheets, ribbon_and_keytips, excel_options, page_setup,
+      active_cell, moving_around, page_keys, go_to_cells,
+      selecting_ranges, select_blocks, go_to_special,
+      entering_data, editing_cells, undo_redo, fill_down_right, find_replace,
+      insert_delete_rows, widths_heights, hide_freeze,
+      ribbon_commands, dialog_boxes, home_tab_tour, format_cells_tabs, fills_and_colours,
+      first_formula, sum_family, autosum, absolute_refs, cross_sheet, formula_errors,
+      copy_cut_paste, paste_special, fill_series,
+      weekly_report_project, foundations_assessment, foundations_testout,
+    ],
   },
 ];
 

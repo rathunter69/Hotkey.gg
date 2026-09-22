@@ -53,6 +53,7 @@ import { parseRef } from '../engine/refs.js';
 export const DIFFICULTIES = ['easy', 'medium', 'hard'];
 export const ACCESS = ['free', 'paid'];
 export const MODES = ['guided', 'solo', 'timed'];   // how a lesson is played; the Read phase precedes them
+export const KINDS = ['lesson', 'project', 'assessment', 'testout'];   // ordinary lesson, chapter project, timed assessment, chapter test-out
 
 /** Concept ids and their display names — the vocabulary lessons teach and require. */
 export const CONCEPTS = {
@@ -113,10 +114,52 @@ export const CONCEPTS = {
   'fit-to-page': 'Fit to 1 page wide by 1 tall scales the print to a single page',
   'font-color': 'Font Color: Alt, H, F, C, then → to a swatch and Enter',
   'input-colour-convention': 'the model colour convention: hardcoded inputs blue, formulas black',
+  // Moving and selecting, beyond the basics (phase C)
+  'page-keys': 'PgDn and PgUp move a screen down and up; Alt+PgDn and Alt+PgUp a screen right and left',
+  'select-all-sheet': 'Ctrl+A selects the current region; pressed again it selects the whole sheet',
+  'go-to-special': 'Go To Special (Alt, H, F, D, S) selects every blank, constant or formula cell inside the selection',
+  // Entering and editing (phase C)
+  'undo-redo': 'Ctrl+Z undoes the last change; Ctrl+Y redoes it',
+  'fill-down-right': 'Ctrl+D fills the selection from its top row; Ctrl+R fills it from its left column',
+  'ctrl-enter-fill': 'Ctrl+Enter commits an entry into every selected cell at once',
+  'find-replace': 'Find (Ctrl+F) jumps to matching text; Replace (Ctrl+H) swaps it out everywhere',
+  // Rows, columns and sheets (phase C)
+  'insert-delete-rows': 'Ctrl+Shift+= inserts and Ctrl+- deletes the selected whole rows or columns',
+  'column-width': 'Column Width (Alt, H, O, W) sets the selected columns\' width in Excel units',
+  'row-height': 'Row Height (Alt, H, O, H) sets the selected rows\' height in points',
+  'autofit': 'AutoFit (Alt, H, O, I for width, Alt, H, O, A for height) sizes to the content',
+  'hide-unhide': 'Ctrl+9 hides the selected rows and Ctrl+0 the columns; Ctrl+Shift+( and Ctrl+Shift+) unhide inside the selection',
+  'freeze-panes': 'Freeze Panes (Alt, W, F) keeps the rows above and columns left of the seam in view',
+  // The Ribbon and dialogs (phase C)
+  'format-cells-tabs': 'the Format Cells categories answer to their first letter: N Number, C Currency, P Percentage, A Center Across',
+  'bold-italic-underline': 'Ctrl+B bold, Ctrl+I italic, Ctrl+U underline — and Alt, H, 1 / 2 / 3 from the Ribbon',
+  'fills-and-colours': 'Fill Color is Alt, H, H then a letter or arrows; a fill marks a cell, never its value',
+  'center-across': 'Center Across Selection (Format Cells, A) centres a title over columns without merging cells',
+  // Basic formulas (phase C)
+  'formula-basics': 'a formula starts with = and recalculates whenever its inputs change',
+  'formula-operators': 'the arithmetic operators: + - * / and parentheses to group',
+  'sum-family': 'SUM, AVERAGE, MIN, MAX and COUNT each take a range: =SUM(B3:B7)',
+  'autosum': 'AutoSum (Alt+=) proposes =SUM over the numbers above or to the left; Enter accepts it',
+  'relative-absolute': 'a relative reference (B3) shifts when copied; $ anchors it: $B$3 never moves',
+  'f4-anchor': 'F4 cycles the anchors on the reference at the insertion point: B3, $B$3, B$3, $B3',
+  'cross-sheet-ref': 'a reference on another sheet names the sheet first: =Costs!B3',
+  'formula-errors': '#DIV/0!, #NAME?, #VALUE! and #REF! each say what broke: the input, the name, the type, the reference',
+  // Copy, paste and fill (phase C)
+  'copy-cut-paste': 'Ctrl+C copies, Ctrl+X cuts, Ctrl+V pastes at the selection; Esc drops the marquee',
+  'paste-enter-drop': 'after a copy, Enter pastes once and drops the marquee',
+  'paste-special': 'Paste Special (Ctrl+Alt+V) pastes one aspect: values V, formats T, transpose E, or an operation',
+  'fill-series': 'Fill Series (Alt, H, F, I, S) continues the step your first two cells set',
+  'flash-fill': 'Flash Fill (Ctrl+E in Excel) fills a column by the pattern of your examples',
 };
 
-/** Sentences in a text: terminators followed by a space or the end (decimals like 5.0% and 1,200.00 are not terminators). */
-export function sentenceCount(text) { return (String(text).match(/[.!?](?=\s|$)/g) || []).length; }
+/** How many goals a lesson of this kind may carry: ordinary lessons stay 3-6; a project, assessment or test-out combines a section's work in 6-10. */
+export function goalBounds(kind) { return kind && kind !== 'lesson' ? { min: 3, max: 10 } : { min: 3, max: 6 }; }
+
+/** Sentences in a text: terminators followed by a space or the end. Decimals (5.0%, 1,200.00) and Excel error codes (#NAME?, #DIV/0!) are not terminators. */
+export function sentenceCount(text) {
+  const t = String(text).replace(/#(?:NULL!|DIV\/0!|VALUE!|REF!|NAME\?|NUM!|N\/A)/gi, 'ERR');
+  return (t.match(/[.!?](?=\s|$)/g) || []).length;
+}
 export function wordCount(text) { return String(text).trim().split(/\s+/).filter(Boolean).length; }
 
 /** Validate a lesson object. Returns a list of problems (empty when valid); never throws. */
@@ -131,7 +174,12 @@ export function validateLesson(l) {
   need(DIFFICULTIES.includes(l.difficulty), 'difficulty must be easy | medium | hard');
   need(Array.isArray(l.tags), 'tags must be an array');
   need(ACCESS.includes(l.access), 'access must be free | paid');
-  need(Array.isArray(l.concepts) && l.concepts.length > 0, 'concepts must list what the lesson teaches');
+  const kind = l.kind === undefined ? 'lesson' : l.kind;
+  need(KINDS.includes(kind), 'kind must be lesson | project | assessment | testout');
+  if (kind === 'assessment' || kind === 'testout') need(typeof l.timeLimit === 'number' && l.timeLimit > 0, kind + ' needs a timeLimit (seconds)');
+  else need(l.timeLimit === undefined, 'only an assessment or test-out carries a timeLimit');
+  // a project/assessment/testout combines taught material: it may teach nothing new
+  need(Array.isArray(l.concepts) && (l.concepts.length > 0 || kind !== 'lesson'), 'concepts must list what the lesson teaches');
   const concepts = Array.isArray(l.concepts) ? l.concepts : [];
   for (const c of concepts) need(CONCEPTS[c], `unknown concept "${c}"`);
   need(Array.isArray(l.prerequisites), 'prerequisites must be an array');
@@ -171,7 +219,7 @@ export function validateLesson(l) {
   const ends = Array.isArray(l.endState) ? l.endState.filter(isObject) : [];
   for (const e of ends) { need(typeof e.text === 'string', 'endState entries need text'); need(typeof e.check === 'function', 'endState entries need a check'); }
   need(typeof l.solution === 'string' && l.solution.trim(), 'solution keystrokes missing');
-  if (isObject(l.sheet)) validateStartingSheet(l.sheet, goals, ends, need);
+  if (isObject(l.sheet)) validateStartingSheet(l, goals, ends, need);
   return errs;
 }
 
@@ -181,7 +229,8 @@ export function validateLesson(l) {
  * the starting sheet already satisfies (nothing for the learner to do) are all reported. Later goals
  * may legitimately hold at the start — they are gated behind the earlier ones.
  */
-function validateStartingSheet(spec, goals, ends, need) {
+function validateStartingSheet(l, goals, ends, need) {
+  const spec = l.sheet;
   const cells = isObject(spec.cells) ? spec.cells : {};
   need(spec.cells === undefined || isObject(spec.cells), 'sheet: cells must be an object of cell records');
   for (const k in cells) { need(parseRef(k), `sheet: bad cell key "${k}"`); need(isObject(cells[k]), `sheet: cell ${k} must be a record such as { value }`); }
@@ -191,7 +240,17 @@ function validateStartingSheet(spec, goals, ends, need) {
     need(isObject(a) && Number.isInteger(a.r) && Number.isInteger(a.c) && a.r >= 1 && a.r <= rows && a.c >= 1 && a.c <= cols, `sheet: active ${JSON.stringify(a)} is outside the ${rows}×${cols} grid`);
   }
   let sheet, session;
-  try { sheet = new Sheet({ rows: spec.rows, cols: spec.cols, cells, colW: spec.colW, active: spec.active }); session = new Session(sheet, {}); session.demoDone = new Set(); }   // as the runner sets it up
+  const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells, colW: sp.colW, active: sp.active, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze });
+  try {
+    sheet = build({ ...spec, cells });
+    session = new Session(sheet, {}); session.demoDone = new Set();
+    // the workbook, exactly as LessonRun.reset assembles it, so cross-sheet checks probe correctly
+    const sheets = Array.isArray(l.sheets) ? l.sheets : [];
+    if (sheets.length) {
+      if (sheets[0] && sheets[0].name) session.sheets[0].name = sheets[0].name;
+      for (const sh of sheets.slice(1)) session.addSheet(sh.name, build(sh));
+    }
+  }   // as the runner sets it up
   catch (e) { need(false, `sheet does not build: ${e.message}`); return; }
   session.goalMark = 0;
   const probe = (label, check) => {
@@ -213,4 +272,45 @@ export function availableConcepts(lesson, byId, seen = new Set()) {
     for (const c of availableConcepts(p, byId, seen)) out.add(c);
   }
   return out;
+}
+
+/**
+ * Validate a drill (SITE_SPEC §5): a timed exercise of 1-12 checkpoints with explicit pars and an
+ * optimal keystroke count. Unlike a lesson it teaches nothing — no read, no teach lines, no
+ * concept bookkeeping — so a checkpoint carries only { id, text, keys, check }. Returns a list of
+ * problems (empty when valid); never throws.
+ */
+export function validateDrill(d) {
+  const errs = [];
+  const need = (cond, msg) => { if (!cond) errs.push(msg); };
+  if (!d || typeof d !== 'object') return ['drill must be an object'];
+  need(typeof d.id === 'string' && /^[a-z0-9-]+$/.test(d.id), 'id must be kebab-case');
+  need(typeof d.chapter === 'string' && d.chapter, 'chapter missing');
+  need(typeof d.title === 'string' && d.title.trim(), 'title missing');
+  need(typeof d.task === 'string' && d.task.trim() && sentenceCount(d.task) === 1, 'task must be one sentence');
+  need(ACCESS.includes(d.access), 'access must be free | paid');
+  need(d.benchmark === undefined || typeof d.benchmark === 'boolean', 'benchmark must be true or false');
+  need(d.seed === undefined || typeof d.seed === 'function', 'seed must be a function (rng) => cells patch');
+  need(isObject(d.sheet), 'sheet (starting sheet) missing');
+  need(d.sheets === undefined || (Array.isArray(d.sheets) && d.sheets.every(isObject)), 'sheets must be an array of { name, cells } records');
+  need(Number.isInteger(d.optimalKeys) && d.optimalKeys > 0, 'optimalKeys must be a positive integer');
+  const p = d.pars;
+  need(isObject(p) && ['pass', 'pro', 'legendary'].every(k => typeof p[k] === 'number' && Number.isFinite(p[k])), 'pars must give pass, pro and legendary in seconds');
+  if (isObject(p)) need(p.pass > p.pro && p.pro > p.legendary && p.legendary > 0, 'pars must fall strictly: pass > pro > legendary > 0');
+  need(Array.isArray(d.goals) && d.goals.length >= 1 && d.goals.length <= 12, 'goals: 1-12 checkpoints');
+  const goals = Array.isArray(d.goals) ? d.goals.filter(isObject) : [];
+  const ids = new Set();
+  for (const g of goals) {
+    need(typeof g.id === 'string' && g.id, 'goal id missing'); need(!ids.has(g.id), `duplicate goal id ${g.id}`); ids.add(g.id);
+    need(typeof g.text === 'string' && g.text.trim(), `goal ${g.id}: text missing`);
+    need(typeof g.keys === 'string' && g.keys.trim(), `goal ${g.id}: keys (the route as keycaps) missing`);
+    need(typeof g.check === 'function', `goal ${g.id}: check must be a function`);
+    need(g.teach === undefined && g.requires === undefined && g.demo === undefined, `goal ${g.id}: a drill checkpoint carries no teach, requires or demo`);
+  }
+  need(d.endState === undefined || Array.isArray(d.endState), 'endState must be an array');
+  const ends = Array.isArray(d.endState) ? d.endState.filter(isObject) : [];
+  for (const e of ends) { need(typeof e.text === 'string', 'endState entries need text'); need(typeof e.check === 'function', 'endState entries need a check'); }
+  need(typeof d.solution === 'string' && d.solution.trim(), 'solution keystrokes missing');
+  if (isObject(d.sheet)) validateStartingSheet(d, goals, ends, need);
+  return errs;
 }

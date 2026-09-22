@@ -5,6 +5,8 @@
 // finish gets a bigger one (§1, ui/effects.js).
 import { LessonRun, shortcutsUsed } from './runner.js';
 import { store } from './store.js';
+import { attemptId, dayOf, traceOf } from './records.js';
+import { gameCtx, celebrate } from './stats.js';
 import { track } from './telemetry.js';
 import { nextLesson, chapterOf, lessonNumber } from '../content/index.js';
 import { SheetView } from '../ui/sheet-view.js';
@@ -47,6 +49,8 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   ensureCss();
   const chapter = chapterOf(lesson);
   const fullRibbon = chapter && chapter.id === 'foundations';   // Chapter 1: the full ribbon bar is on by default (§4)
+  const timedOnly = lesson.kind === 'assessment' || lesson.kind === 'testout';   // these run against the clock, no help, no other mode
+  if (timedOnly) mode = 'timed';
   const el = document.createElement('div');
   el.className = 'lesson';
   el.innerHTML = `
@@ -157,7 +161,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
 
   function renderLesson() {
     const body = $('panelBody');
-    if (phase === 'play') {
+    if (phase !== 'done') {   // 'play', and 'timeup' behind its overlay: the goals as they stood
       body.innerHTML = `<p class="lesson-read">${rich(lesson.read)}</p>` + goalsHtml();
       // Every goal has landed but an end-state predicate fails (something a goal produced was undone,
       // a value was changed): show those predicates so the learner sees what still needs to hold.
@@ -169,7 +173,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       tickNewGoals();
       const cur = body.querySelector('.goal.current'); if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'nearest' });   // the active goal is always visible (§4)
     } else {
-      body.innerHTML = goalsHtml() + `<div class="done-card"><div class="done-title">Lesson complete</div>
+      body.innerHTML = goalsHtml() + `<div class="done-card"><div class="done-title">${doneTitle()}</div>
         ${raceHtml()}<div class="done-stats">${statsLine()}</div>
         <div class="done-actions">${doneButtonsHtml()}</div></div>`;
       wireDoneButtons(body);
@@ -193,6 +197,9 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     const goalLine = `<div class="help-goal">${cur.teach && run.mode === 'guided' ? `<span class="goal-teach">${rich(cur.teach)}</span> ` : ''}${esc(cur.text)}</div>`;
     if (keysShown(cur)) {
       p.innerHTML = goalLine + `<div class="help-keys">${keysHtml(cur.keys || '')}</div>` + footer + notes;
+    } else if (timedOnly) {
+      // No "Show me the keys" in an assessment or test-out: the run proves the chapter stuck.
+      p.innerHTML = goalLine + `<p class="help-note">No help in ${lesson.kind === 'assessment' ? 'an assessment' : 'a test-out'}: every key this run needs was taught in the chapter${lesson.kind === 'testout' ? '’s lessons, which stay open if this run shows a gap' : ''}.</p>` + footer + notes;
     } else {
       p.innerHTML = goalLine +
         `<p class="help-note">Reading is free. Showing the keys counts as help: this attempt is then marked assisted${run.mode === 'timed' ? ', and a timed run with help sets no personal best' : ''}.</p>
@@ -213,7 +220,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
 
   function renderActions() {
     const a = $('panelActions');
-    if (phase === 'play') {
+    if (phase !== 'done') {
       a.innerHTML = `<button class="btn btn-ghost" id="restartBtn" type="button">Restart</button>`;
       $('restartBtn').onclick = () => { restart(run.mode); };
     } else a.innerHTML = '';
@@ -225,6 +232,13 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     const live = el.querySelector('[data-goal-clock]');
     if (live && phase === 'play') { const start = run.goalStart(+live.dataset.goalClock); live.textContent = start == null ? '0.0 s' : fmtSecs(Math.max(0, (Date.now() - start) / 1000)) + ' s'; }
     if (run.mode !== 'timed') { t.textContent = ''; return; }
+    // An assessment or test-out counts down from its time limit; the clock starts on the first action.
+    if (lesson.timeLimit) {
+      const left = Math.max(0, lesson.timeLimit - (run.startedAt == null ? 0 : run.elapsed));
+      t.textContent = left.toFixed(1) + ' s left';
+      if (phase === 'play' && run.startedAt != null && left <= 0 && !run.finished) timeUp();
+      return;
+    }
     t.textContent = run.elapsed.toFixed(1) + ' s' + (run.par ? ' / par ' + run.par : '');
   }
 
@@ -252,6 +266,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       ${ratio != null && ratio >= 1.2 ? `<div class="race-note">${ratio >= 10 ? Math.round(ratio) : ratio.toFixed(1)}× faster with shortcuts.</div>` : ''}</div>`;
   }
   const closingHtml = () => (lesson.closing || []).map(t => `<p class="rm-closing">${rich(t)}</p>`).join('');
+  const doneTitle = () => lesson.kind === 'assessment' ? 'Assessment passed' : lesson.kind === 'testout' ? 'Tested out — chapter cleared' : lesson.kind === 'project' ? 'Project complete' : 'Lesson complete';
   function statsLine() {
     const parts = [`<b>${run.startedAt == null ? '—' : fmtSecs(run.elapsed) + ' s'}</b>`, `<b>${run.session.keyLog.length}</b> keystrokes`, modeLabel().toLowerCase() + (assisted() ? ' · assisted' : '')];
     if (run.mouseCount) parts.push(`mouse ×${run.mouseCount}`);
@@ -274,7 +289,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     const secs = run.startedAt == null ? null : run.elapsed;
     const best = store.get(lesson.id); const pb = best && Number.isFinite(best.best) ? best.best : null;
     overlay.innerHTML = `<div class="rm-card">
-      <div class="rm-title" id="doneTitle">Lesson complete</div>
+      <div class="rm-title" id="doneTitle">${doneTitle()}</div>
       <div class="rm-lesson">${lessonNumber(lesson.id)} · ${esc(lesson.title)} · ${modeLabel()}</div>
       ${lesson.race ? raceHtml() : `<div class="rm-time">${secs == null ? '—' : fmtSecs(secs)}<span>s</span></div>`}
       <div class="rm-stats"><div>keystrokes<b>${run.session.keyLog.length}</b></div><div>${modeLabel().toLowerCase()}<b>${assisted() ? 'Assisted' : run.mode === 'guided' ? 'Complete' : 'Solo'}</b></div>${run.mouseCount ? `<div>mouse<b>×${run.mouseCount}</b></div>` : ''}${run.mode === 'timed' && run.par ? `<div>par<b>${run.par} s</b></div>` : ''}</div>
@@ -290,9 +305,31 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     const primary = overlay.querySelector('[data-act="continue"]'); if (primary) primary.focus();
   }
   function closeOverlay() { overlay.hidden = true; focusWorkspace(); }
+  /** The time limit ran out on an assessment or test-out: nothing is recorded, the run offers itself again. */
+  function timeUp() {
+    stopDemo();
+    phase = 'timeup';
+    track('lesson_timeup', { lesson_id: lesson.id, mode: run.mode });
+    if (timerH) { clearInterval(timerH); timerH = null; }
+    renderPanel();
+    overlay.innerHTML = `<div class="rm-card">
+      <div class="rm-title" id="doneTitle">Time’s up — try again</div>
+      <div class="rm-lesson">${lessonNumber(lesson.id)} · ${esc(lesson.title)}</div>
+      <div class="rm-stats"><div>goals<b>${run.doneCount} / ${run.goals.length}</b></div><div>limit<b>${lesson.timeLimit} s</b></div></div>
+      <div class="rm-note">${lesson.kind === 'testout' ? 'No harm done: nothing is recorded, and the chapter’s lessons are always open.' : 'Nothing is recorded for a run that ran out. The report is the same every time — another run is more practice.'}</div>
+      <div class="rm-opts"><button class="btn btn-primary" data-act="continue" type="button">Try again <kbd>Enter</kbd></button>
+        <a class="btn" href="#/learn">Back to Learn</a>
+        <button class="btn btn-ghost" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button></div>
+    </div>`;
+    overlay.querySelector('[data-act="continue"]').onclick = () => restart('timed');
+    overlay.querySelector('[data-act="look"]').onclick = closeOverlay;
+    overlay.hidden = false;
+    const primary = overlay.querySelector('[data-act="continue"]'); if (primary) primary.focus();
+  }
   function finish() {
     phase = 'done';
     track('lesson_complete', { lesson_id: lesson.id, mode: run.mode });
+    const ctxBefore = gameCtx();
     const before = store.all();
     firstEver = !Object.values(before).some(p => p.completed);
     const saved = store.record(lesson.id, run.mode, run.elapsed, {
@@ -301,9 +338,29 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       mouseCount: run.mouseCount,
       assisted: assisted(),
     });
+    // A timed run is also an attempt record (one source for Stats; the account mirror is Phase B's attempts table).
+    if (run.mode === 'timed') {
+      store.addAttempt({
+        id: attemptId(), kind: 'lesson-timed', ref: lesson.id, day: dayOf(), seed: null,
+        secs: run.elapsed, keys: run.session.keyLog.length,
+        clean: !assisted() && !run.mouseCount, helped: assisted(), mouse: run.mouseCount,
+        tier: 'none', splits: run.splits().filter(Number.isFinite), trace: traceOf(run.session.keyLog), at: Date.now(),
+      });
+    }
+    // A finished assessment or test-out inside its time limit passes the chapter gate (§7);
+    // a test-out also marks every not-yet-completed chapter lesson skipped, like placement does.
+    if (timedOnly) {
+      store.chapterPass(lesson.chapter, lesson.kind);
+      if (lesson.kind === 'testout' && chapter) {
+        const all = store.all();
+        const ids = chapter.lessons.filter(l => l.id !== lesson.id && !(all[l.id] && all[l.id].completed)).map(l => l.id);
+        if (ids.length) store.skip(ids);
+      }
+    }
     saveState = saved ? store.saveText() : 'Couldn’t save on this device (storage blocked); the lesson still counts for this visit';
     if (timerH) { clearInterval(timerH); timerH = null; }
     effects.finish($('stage'));
+    celebrate(effects, ctxBefore);
     tab = 'lesson';
     renderPanel();
     renderOverlay();
@@ -331,7 +388,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   function restart(newMode) {
     stopDemo();
     phase = 'play'; revealed = false; nudgeAt = -1; prevDone = 0; overlay.hidden = true; tab = 'lesson';
-    run.reset(newMode);
+    run.reset(timedOnly ? 'timed' : newMode);
     mountViews();
     if (!timerH) timerH = setInterval(renderTimer, 200);
     renderPanel();
@@ -423,6 +480,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     }
     if ((tag === 'BUTTON' || tag === 'A' || tag === 'SUMMARY') && (e.key === 'Enter' || e.key === ' ')) return;   // the control handles its own activation
     if (demo) { if (e.key === 'Escape') skipDemo(); if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length > 1) e.preventDefault(); return; }   // watching: keys wait, arrows never scroll the page
+    if (phase === 'timeup') { if (e.key === 'Enter') { e.preventDefault(); restart('timed'); } return; }   // the run is over; Enter starts the next attempt
     if (phase === 'done') { if (e.key === 'Enter') { e.preventDefault(); const c = el.querySelector('[data-act="continue"]'); if (c) c.click(); } return; }
     if (run.key(e)) { e.preventDefault(); effects.armSounds(); }
   }

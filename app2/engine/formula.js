@@ -77,7 +77,21 @@ export function tokenize(src) {
     }
     if ((m = RE_ERR.exec(rest))) { out.push({ t: 'err', v: m[0].toUpperCase(), pos: i, end: i + m[0].length }); i += m[0].length; continue; }
     if ((m = RE_NUM.exec(rest))) { out.push({ t: 'num', v: parseFloat(m[0]), pos: i, end: i + m[0].length }); i += m[0].length; continue; }
-    if (ch === '$' || /[A-Za-z_]/.test(ch)) {
+    if (ch === "'" || ch === '$' || /[A-Za-z_]/.test(ch)) {
+      // sheet-prefixed reference: Name!A1 or 'My Sheet'!A1 — the prefix and the ref are ONE token
+      // (the whole span, so text rewriters replace it as a unit); the corner after ':' stays plain
+      const sm = /^(?:'((?:[^']|'')+)'|([A-Za-z_][A-Za-z0-9_.]*))!/.exec(rest);
+      if (sm) {
+        const sheetName = sm[1] ? sm[1].replace(/''/g, "'") : sm[2];
+        const tail = rest.slice(sm[0].length);
+        const rm2 = /^\$?[A-Za-z]{1,3}\$?\d+/.exec(tail);
+        if (!rm2 || !RE_REF.test(rm2[0])) throw new SyntaxError('bad reference after ' + sheetName + '!');
+        const nx2 = tail[rm2[0].length];
+        if (nx2 && /[A-Za-z0-9_.]/.test(nx2)) throw new SyntaxError('bad reference after ' + sheetName + '!');
+        out.push({ t: 'ref', v: rm2[0].toUpperCase(), sheet: sheetName.toUpperCase(), sheetTxt: sm[0], pos: i, end: i + sm[0].length + rm2[0].length });
+        i += sm[0].length + rm2[0].length; continue;
+      }
+      if (ch === "'") throw new SyntaxError('unexpected character ' + ch);
       // reference ($A$1, a1), function name (SUM( ), or a bare name (TRUE, FALSE, A for A:A)
       const dm = /^\$?[A-Za-z]{1,3}\$?\d+/.exec(rest);
       const im = RE_IDENT.exec(rest);
@@ -174,10 +188,10 @@ export function parseFormula(src) {
         const c = peek();
         if (c && c.t === 'op' && c.v === ':') {
           const d = toks[p + 1];
-          if (d && d.t === 'ref') { p += 2; return { k: 'range', a: tk.v, b: d.v }; }
+          if (d && d.t === 'ref' && !d.sheet) { p += 2; return tk.sheet ? { k: 'range', a: tk.v, b: d.v, sheet: tk.sheet } : { k: 'range', a: tk.v, b: d.v }; }
           throw new SyntaxError('bad range');
         }
-        return { k: 'ref', ref: tk.v };
+        return tk.sheet ? { k: 'ref', ref: tk.v, sheet: tk.sheet } : { k: 'ref', ref: tk.v };
       }
       case 'name': {
         const nm = tk.v.replace(/^\$/, '');
@@ -244,13 +258,14 @@ export function parseFormula(src) {
    A value is: number | string | boolean | null (blank) | Range. Errors travel as thrown FxError.
    ============================================================================ */
 export class Range {
-  constructor(r1, c1, r2, c2) { this.r1 = r1; this.c1 = c1; this.r2 = r2; this.c2 = c2; }
+  constructor(r1, c1, r2, c2, sheet) { this.r1 = r1; this.c1 = c1; this.r2 = r2; this.c2 = c2; if (sheet) this.sheet = sheet; }
   get rows() { return this.r2 - this.r1 + 1; }
   get cols() { return this.c2 - this.c1 + 1; }
   get size() { return this.rows * this.cols; }
-  cell(i) { const r = this.r1 + Math.floor(i / this.cols), c = this.c1 + (i % this.cols); return refKey(r, c); }
-  at(r, c) { return refKey(this.r1 + r, this.c1 + c); }
-  keys() { const out = []; for (let r = this.r1; r <= this.r2; r++) for (let c = this.c1; c <= this.c2; c++) out.push(refKey(r, c)); return out; }
+  pfx(k) { return this.sheet ? this.sheet + '!' + k : k; }
+  cell(i) { const r = this.r1 + Math.floor(i / this.cols), c = this.c1 + (i % this.cols); return this.pfx(refKey(r, c)); }
+  at(r, c) { return this.pfx(refKey(this.r1 + r, this.c1 + c)); }
+  keys() { const out = []; for (let r = this.r1; r <= this.r2; r++) for (let c = this.c1; c <= this.c2; c++) out.push(this.pfx(refKey(r, c))); return out; }
 }
 const isRange = v => v instanceof Range;
 
@@ -319,7 +334,15 @@ function globTest(toks, str) {
    EVALUATOR
    ============================================================================ */
 export function evalFormula(expr, ctx = {}) {
-  const raw = ctx.raw || (() => null);
+  const rawIn = ctx.raw || (() => null);
+  // a key of the form NAME!B3 comes from a sheet-prefixed reference: ctx.sheetRaw resolves it
+  // against the workbook; without a resolver a cross-sheet read is #REF! (as an error VALUE,
+  // so the reading formula shows #REF! rather than throwing out of the evaluator)
+  const raw = k => {
+    const b = k.indexOf('!');
+    if (b < 0) return rawIn(k);
+    return ctx.sheetRaw ? ctx.sheetRaw(k.slice(0, b), k.slice(b + 1)) : '#REF!';
+  };
   const ROWS = ctx.rows || 20, COLS = ctx.cols || 10;
   const ast = parseFormula(expr);   // SyntaxError propagates: the commit gate decides what to do
 
@@ -362,9 +385,9 @@ export function evalFormula(expr, ctx = {}) {
   const toInt = v => Math.trunc(toNum(v));
   const capText = s => { if (s.length > MAX_TEXT) throw err('#VALUE!'); return s; };
   const argRange = v => { if (isRange(v)) return v; throw err('#VALUE!'); };
-  const rangeOf = (a, b) => {
+  const rangeOf = (a, b, sheet) => {
     const A = refParts(a), B = refParts(b);
-    return new Range(Math.min(A.r, B.r), Math.min(A.c, B.c), Math.max(A.r, B.r), Math.max(A.c, B.c));
+    return new Range(Math.min(A.r, B.r), Math.min(A.c, B.c), Math.max(A.r, B.r), Math.max(A.c, B.c), sheet);
   };
   function refParts(ref) {
     const m = /^\$?([A-Z]{1,3})\$?(\d+)$/.exec(ref);
@@ -942,8 +965,8 @@ export function evalFormula(expr, ctx = {}) {
       case 'err': throw err(node.v);
       case 'name': throw err('#NAME?');
       case 'paren': return ev(node.x);
-      case 'ref': { const p = refParts(node.ref); return new Range(p.r, p.c, p.r, p.c); }
-      case 'range': return rangeOf(node.a, node.b);
+      case 'ref': { const p = refParts(node.ref); return new Range(p.r, p.c, p.r, p.c, node.sheet); }
+      case 'range': return rangeOf(node.a, node.b, node.sheet);
       case 'colrange': { const a = colIndex(node.a), b = colIndex(node.b); return new Range(1, Math.min(a, b), ROWS, Math.max(a, b)); }
       case 'rowrange': return new Range(Math.min(node.a, node.b), 1, Math.max(node.a, node.b), COLS);
       case 'un': { const v = ev(node.x); if (node.op === '+') return v; return -toNum(v); }   // unary plus is a no-op in Excel: text stays text
@@ -1004,9 +1027,11 @@ export function formulaRefs(expr, opts = {}) {
     const t = toks[i];
     const n1 = toks[i + 1], n2 = toks[i + 2];
     if (isColonTok(n1)) {
-      if (t.t === 'ref' && n2 && n2.t === 'ref') {
+      if (t.t === 'ref' && n2 && n2.t === 'ref' && !n2.sheet) {
         const a = parts(t.v), b = parts(n2.v);
-        out.push(span(t, n2, { r1: Math.min(a.r, b.r), c1: Math.min(a.c, b.c), r2: Math.max(a.r, b.r), c2: Math.max(a.c, b.c) }));
+        const rec = span(t, n2, { r1: Math.min(a.r, b.r), c1: Math.min(a.c, b.c), r2: Math.max(a.r, b.r), c2: Math.max(a.c, b.c) });
+        if (t.sheet) rec.sheet = t.sheet;
+        out.push(rec);
         i += 2; continue;
       }
       if (isColTok(t) && isColTok(n2)) {
@@ -1021,7 +1046,9 @@ export function formulaRefs(expr, opts = {}) {
     }
     if (t.t === 'ref') {
       const a = parts(t.v);
-      out.push({ key: refKey(a.r, a.c), pos: t.pos + off, end: t.end + off, text: s.slice(t.pos, t.end) });
+      const rec = { key: refKey(a.r, a.c), pos: t.pos + off, end: t.end + off, text: s.slice(t.pos, t.end) };
+      if (t.sheet) rec.sheet = t.sheet;
+      out.push(rec);
     }
   }
   return out;
@@ -1058,10 +1085,10 @@ export function translateFormula(f, dr, dc) {
   for (let i = 0; i < toks.length; i++) {
     const t = toks[i], n1 = toks[i + 1], n2 = toks[i + 2];
     let rep = null, end = t.end;
-    if (isColonTok(n1) && t.t === 'ref' && n2 && n2.t === 'ref') { rep = pair(shiftRef(t.v), shiftRef(n2.v)); end = n2.end; i += 2; }
+    if (isColonTok(n1) && t.t === 'ref' && n2 && n2.t === 'ref') { rep = pair(shiftRef(t.v), shiftRef(n2.v)); if (t.sheetTxt && rep !== '#REF!') rep = t.sheetTxt + rep; end = n2.end; i += 2; }
     else if (isColonTok(n1) && isColTok(t) && isColTok(n2)) { rep = pair(shiftCol(t), shiftCol(n2)); end = n2.end; i += 2; }
     else if (isColonTok(n1) && isRowTok(t) && isRowTok(n2)) { rep = pair(shiftRow(t), shiftRow(n2)); end = n2.end; i += 2; }
-    else if (t.t === 'ref') { rep = shiftRef(t.v); if (rep === null) rep = '#REF!'; }
+    else if (t.t === 'ref') { rep = shiftRef(t.v); if (rep === null) rep = '#REF!'; else if (t.sheetTxt) rep = t.sheetTxt + rep; }
     if (rep !== null) { out += body.slice(last, t.pos) + rep; last = end; }
   }
   out += body.slice(last);
@@ -1092,7 +1119,7 @@ export function autocorrectFormula(buf) {
 /** Upper-case references, function names, TRUE/FALSE and error literals outside string literals. */
 export function normalizeFormula(str) {
   const s = String(str);
-  const parts = s.split(/("(?:[^"]|"")*")/);
+  const parts = s.split(/("(?:[^"]|"")*"|'(?:[^']|'')*')/);
   return parts.map((seg, k) => k % 2 ? seg : seg
     .replace(/(\$?[A-Za-z]{1,3}\$?)0*(\d+)(?![A-Za-z0-9_.])/g, (m, a, r) => (a + r).toUpperCase())
     .replace(/[A-Za-z_][A-Za-z0-9_.]*(?=\s*\()/g, m => m.toUpperCase())
@@ -1141,7 +1168,7 @@ export function adjustFormulaStructure(f, axis, at, delta) {
       const s = seam(Math.min(va, vb), Math.max(va, vb));
       if (!s) rep = '#REF!';
       else { const [x, y] = va <= vb ? s : [s[1], s[0]]; rep = pre(t) + txt(x) + ':' + pre(n2) + txt(y); }
-    } else if (t.t !== 'ref') continue;
+    } else if (t.t !== 'ref' || t.sheet) { if (t.sheet && isColonTok(n1) && n2 && n2.t === 'ref') i += 2; continue; }
     else if (isColonTok(n1) && n2 && n2.t === 'ref') {
       const a = parts(t.v), b = parts(n2.v);
       const s = axis === 'r' ? seam(Math.min(a.r, b.r), Math.max(a.r, b.r)) : seam(Math.min(a.c, b.c), Math.max(a.c, b.c));

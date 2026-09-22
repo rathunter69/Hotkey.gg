@@ -69,8 +69,10 @@ try {
   if (acct.chip !== 'guest') fail(`#/account: user chip reads "${acct.chip}", not guest`);
   if (acct.saveLine !== 'Saved on this device') fail(`#/account: save state reads "${acct.saveLine}"`);
 
-  // play the first and last lesson end to end by keyboard
-  for (const lesson of [LESSONS[0], LESSONS[LESSONS.length - 1]]) {
+  // play the first and last lesson end to end by keyboard, plus the phase-C feature carriers
+  // (find/replace dialog, hide+freeze, cross-sheet formulas, the two-sheet project)
+  const extras = ['find-replace', 'hide-freeze', 'cross-sheet', 'weekly-report-project'].map(id => LESSONS.find(l => l.id === id));
+  for (const lesson of [LESSONS[0], ...extras, LESSONS[LESSONS.length - 1]]) {
     await page.goto(base + '#/lesson/' + lesson.id);
     const opened = await page.waitForSelector('.goal.current, #startBtn', { timeout: 5000 }).catch(() => null);
     if (!opened) { fail(`${lesson.id}: lesson did not open`); continue; }
@@ -85,6 +87,35 @@ try {
     await page.waitForFunction(() => !document.querySelector('.goal-demo'), null, { timeout: 30000 }).catch(() => {});
     const done = await page.waitForSelector('.lesson-done:not([hidden]) [data-act="continue"]', { timeout: 4000 }).catch(() => null);
     if (!done) fail(`${lesson.id}: did not complete`);
+  }
+
+  // the drill workspace (Phase D): start card key never lands, solution replays to a tier,
+  // the attempt lands in records, and after a reload the PB ghost toggle is enabled
+  {
+    const { DRILLS_BY_ID } = await import('../content/drills.js');
+    const drill = DRILLS_BY_ID['edge-jumps'];
+    await page.goto(base + '#/drill/edge-jumps');
+    const card = await page.waitForSelector('.start-card', { timeout: 5000 }).catch(() => null);
+    if (!card) fail('edge-jumps: no start card');
+    await page.keyboard.press('Space');
+    await page.waitForTimeout(120);
+    if (await page.$('.start-card')) fail('edge-jumps: start card did not dismiss');
+    if (await page.evaluate(() => document.querySelector('#drKeys').textContent) !== '0') fail('edge-jumps: the start key landed on the sheet');
+    for (const step of parseKeyScript(drill.solution)) {
+      if (step.type === 'text') await page.keyboard.type(step.text);
+      else await page.keyboard.press(pwKey(step.spec));
+    }
+    const res = await page.waitForSelector('.lesson-done:not([hidden]) .tstamp.hit', { timeout: 4000 }).catch(() => null);
+    if (!res) fail('edge-jumps: no tier stamp on the result card');
+    const rec = await page.evaluate(() => { try { return JSON.parse(localStorage.getItem('hk2_records_v1')); } catch (e) { return null; } });
+    const att = rec && rec.attempts && rec.attempts.find(a => a.ref === 'edge-jumps');
+    if (!att) fail('edge-jumps: no attempt recorded');
+    else if (!att.clean || att.tier === 'none') fail(`edge-jumps: attempt not clean/tiered (${JSON.stringify({ clean: att.clean, tier: att.tier })})`);
+    if (!(rec && rec.pbs && rec.pbs['edge-jumps'])) fail('edge-jumps: no PB recorded');
+    await page.reload();
+    await page.waitForSelector('.start-card', { timeout: 5000 }).catch(() => fail('edge-jumps: reload lost the drill'));
+    const ghost = await page.evaluate(() => { const b = document.querySelector('#ghostToggle'); return b ? !b.disabled : null; });
+    if (ghost !== true) fail('edge-jumps: ghost toggle not enabled after a PB');
   }
 } finally {
   if (errors.length) { failures += errors.length; console.log('ERRORS\n' + errors.join('\n')); }

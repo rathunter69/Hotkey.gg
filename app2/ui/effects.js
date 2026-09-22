@@ -56,7 +56,7 @@ export function mountEffects(opts = {}) {
 
   /** A green ✓ pops on the goal element (~300 ms) with a single soft note. */
   function goalTick(el) {
-    if (el && el.appendChild) {
+    if (el && el.appendChild && visualsOn()) {
       try {
         if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
         const tick = document.createElement('span'); tick.className = 'fx-tick'; tick.setAttribute('aria-hidden', 'true'); tick.textContent = '✓';
@@ -69,7 +69,7 @@ export function mountEffects(opts = {}) {
   }
   /** The finish: an accent ring pulses out from the stage (~700 ms) under a two-note chime. */
   function finish(stageEl) {
-    if (stageEl && stageEl.classList) {
+    if (stageEl && stageEl.classList && visualsOn() && level() === 'full') {
       stageEl.classList.remove('fx-finish'); void stageEl.offsetWidth;   // restart the animation on a repeat
       stageEl.classList.add('fx-finish');
       later(() => stageEl.classList.remove('fx-finish'), 800);
@@ -103,12 +103,75 @@ export function mountEffects(opts = {}) {
     if (hostEl) hostEl.appendChild(b);
     return b;
   }
+  /* ---------------- named moments (Phase D): every celebration in one vocabulary ----------------
+     Visual intensity follows prefs.effects ('full' | 'subtle' | 'off') and prefers-reduced-motion;
+     sound stays governed by mute alone. `busy` queues achievement banners while a run is live. */
+  function level() { try { return prefs.get().effects || 'full'; } catch (e) { return 'full'; } }
+  function visualsOn() {
+    if (level() === 'off') return false;
+    try { if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) return false; } catch (e) { /* no DOM */ }
+    return true;
+  }
+  let busy = false;
+  const queued = [];
+  function banner(html, cls) {
+    if (!visualsOn()) return;
+    try {
+      const b = document.createElement('div');
+      b.className = 'fx-banner ' + (cls || '') + (level() === 'subtle' ? ' subtle' : '');
+      b.setAttribute('role', 'status');
+      b.innerHTML = html;
+      document.body.appendChild(b);
+      later(() => b.classList.add('in'), 20);
+      later(() => b.classList.remove('in'), 3400);
+      later(() => b.remove(), 3900);
+    } catch (e) { /* decoration */ }
+  }
+  const goalDone = el => goalTick(el);
+  const lessonDone = stageEl => finish(stageEl);
+  function newShortcut() { tone(1175, 0, 0.08, 0.06); tone(1568, 0.07, 0.1, 0.06); }
+  function newPB() { tone(784, 0, 0.09, 0.08); tone(988, 0.08, 0.09, 0.08); tone(1319, 0.16, 0.16, 0.09); banner('★ New personal best', 'fx-pb'); }
+  function parTier(tier) {
+    const notes = { pass: [660], pro: [660, 880], legendary: [660, 880, 1175] }[tier] || [];
+    notes.forEach((f, i) => tone(f, i * 0.09, 0.12, 0.08));
+  }
+  function levelUp(lvl) { tone(523, 0, 0.1, 0.08); tone(659, 0.09, 0.1, 0.08); tone(784, 0.18, 0.18, 0.09); banner('▲ Level ' + lvl, 'fx-level'); }
+  function rankUp(name) { tone(659, 0, 0.12, 0.09); tone(988, 0.11, 0.22, 0.1); banner('◆ ' + String(name), 'fx-rank'); }
+  /**
+   * An achievement landed. Banners always show one at a time (a legendary first run can earn
+   * half a dozen at once); while a run is live (setBusy(true)) they hold until it rests.
+   */
+  let draining = false;
+  function drainAchievements() {
+    if (draining || busy) return;
+    draining = true;
+    const step = () => {
+      const def = queued.shift();
+      if (!def || busy) { draining = false; return; }
+      tone(880, 0, 0.09, 0.07); tone(1319, 0.08, 0.16, 0.08);
+      banner('<b>' + String((def && def.name) || 'Achievement') + '</b><span>' + String((def && def.desc) || '') + '</span>', 'fx-ach r-' + ((def && def.rarity) || 'common'));
+      later(step, 1100);
+    };
+    step();
+  }
+  function achievement(def) { queued.push(def); drainAchievements(); }
+  function setBusy(v) { busy = !!v; if (!busy) drainAchievements(); }
+  function clockStart() { tone(1046, 0, 0.05, 0.05); }
+  function clockStop() { tone(1046, 0, 0.06, 0.06); tone(1568, 0.06, 0.1, 0.06); }
+  function hit() { tone(1319, 0, 0.05, 0.06); }
+  function comboBreak() { tone(220, 0, 0.08, 0.09); tone(165, 0.05, 0.1, 0.07); }
+
   function destroy() {
     for (const h of timers) clearTimeout(h); timers.clear();
     for (const b of buttons) b.remove(); buttons.clear();
+    try { document.querySelectorAll('.fx-banner').forEach(b => b.remove()); } catch (e) { /* no DOM */ }
     if (ctx && ctx.close) { try { ctx.close(); } catch (e) { /* already closed */ } }
     ctx = null;
   }
 
-  return { session: opts.sessionRef || null, goalTick, finish, click, refuse, setMuted, isMuted, mountMuteButton, armSounds, isArmed: () => armed, destroy };
+  return {
+    session: opts.sessionRef || null,
+    goalTick, finish, click, refuse, setMuted, isMuted, mountMuteButton, armSounds, isArmed: () => armed, destroy,
+    goalDone, lessonDone, newShortcut, newPB, parTier, levelUp, rankUp, achievement, setBusy, clockStart, clockStop, hit, comboBreak, visualsOn,
+  };
 }

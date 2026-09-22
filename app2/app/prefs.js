@@ -14,6 +14,7 @@ export const PREFS_KEY = 'hk2_prefs';
 export const PLATFORMS = ['win', 'mac'];
 export const EXPERIENCES = ['new', 'sometimes', 'daily'];
 export const RIBBON_MODES = ['full', 'slim'];
+export const EFFECT_LEVELS = ['full', 'subtle', 'off'];   // celebration intensity (SITE_SPEC §1)
 
 const isPlainObject = v => typeof v === 'object' && v !== null && !Array.isArray(v);
 
@@ -33,7 +34,7 @@ export function detectPlatform(nav) {
 
 /** Defaults for a device that has never saved anything. */
 export function defaultPrefs(detected) {
-  return { platform: PLATFORMS.includes(detected) ? detected : 'win', experience: null, firstRunDone: false, skipped: [], ribbon: null, mute: false };
+  return { platform: PLATFORMS.includes(detected) ? detected : 'win', experience: null, firstRunDone: false, skipped: [], ribbon: null, mute: false, effects: 'full', ghost: true };
 }
 
 /**
@@ -55,6 +56,8 @@ export function normalisePrefs(raw, detected) {
   }
   if (RIBBON_MODES.includes(raw.ribbon)) out.ribbon = raw.ribbon;
   out.mute = raw.mute === true;
+  if (EFFECT_LEVELS.includes(raw.effects)) out.effects = raw.effects;
+  out.ghost = raw.ghost !== false;   // the PB ghost defaults on; it only exists once a PB does
   return out;
 }
 

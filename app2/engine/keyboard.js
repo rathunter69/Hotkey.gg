@@ -146,9 +146,11 @@ function makeSettings(session) {
   return st;
 }
 const clampInt = (v, lo, hi, dflt) => { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : dflt; };
-const DIALOGS_WB = new Set(['goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet']);   // the dialogs dialogKey drives
+const DIALOGS_WB = new Set(['goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial']);   // the dialogs dialogKey drives
 /** Excel's messages around the sheet commands (the views show them verbatim). */
 export const LAST_SHEET_NOTE = 'A workbook must contain at least one visible worksheet.';
+export const FIND_NONE_NOTE = "We couldn't find what you were looking for.";
+export const SPECIAL_NONE_NOTE = 'No cells were found.';
 export const DELETE_SHEET_PROMPT = 'Microsoft Excel will permanently delete this sheet. Do you want to continue?';
 
 export class Session {
@@ -162,7 +164,7 @@ export class Session {
     this.resetEdit();
     this.mode = 'normal'; this.path = []; this.dialog = null; this.note = '';
     this.pasteKind = null; this.pasteOp = 'none';
-    this.fontColorIdx = 0; this.fillColorIdx = 0; this.cellStyleIdx = 0; this.colwBuf = ''; this.sortPend = null; this.fxfixPend = null;
+    this.fontColorIdx = 0; this.fillColorIdx = 0; this.cellStyleIdx = 0; this.colwBuf = ''; this.rowhBuf = ''; this.sortPend = null; this.fxfixPend = null;
     this.keyLog = [];
     this.mouse = { count: 0, log: [] };   // workspace mouse actions, recorded by the views (SITE_SPEC §6)
     this.listeners = new Set();
@@ -170,12 +172,31 @@ export class Session {
     // the workbook: `sheet` is re-pointed at the active entry (never proxied); the views read it fresh
     this.sheets = [{ name: 'Sheet1', sheet: this.sheet }];
     this.sheetIndex = 0;
+    this._xr = false;   // cross-sheet recalc reentry guard
     this.pageRows = 0; this.pageCols = 0;   // a screenful for PageDown / Alt+PageDown — the view sets them; 0 = 10
     this.settings = makeSettings(this);
     this.dialogBuf = '';     // Go To's Reference field
     this.dlg = null;         // an Options / Page Setup draft while its dialog is open
     this.gotoRecent = [];    // the Go To dialog's list of previous locations (Excel keeps them)
-    this.sheet.onChange(() => this.emit('sheet'));
+    this.wireSheet(this.sheet);
+  }
+  /**
+   * Workbook plumbing every sheet gets: the resolver cross-sheet formulas read through
+   * (name → Sheet, case-insensitive, live over `sheets`), the sheet list (live.js clones the
+   * whole workbook), and a change listener that recalculates the OTHER sheets after any
+   * mutation — two passes, so an A → B → A chain settles (recalc never emits: no loops).
+   */
+  wireSheet(sh) {
+    sh.resolver = name => { const e = this.sheets.find(x => x.name.toLowerCase() === String(name).toLowerCase()); return e ? e.sheet : null; };
+    sh.allSheets = () => this.sheets.map(e => ({ name: e.name, sheet: e.sheet }));
+    sh.onChange(what => {
+      if (!this._xr && this.sheets.length > 1 && what !== 'select' && what !== 'clipboard') {
+        this._xr = true;
+        try { for (let pass = 0; pass < 2; pass++) for (const e of this.sheets) if (e.sheet !== sh) e.sheet.recalc(); }
+        finally { this._xr = false; }
+      }
+      this.emit('sheet');
+    });
   }
   resetEdit() {
     this.editing = false; this.editBuf = ''; this.editCaret = 0; this.editMode = 'enter';
@@ -377,7 +398,7 @@ export class Session {
     const k = e.key;
     if (DIALOGS_WB.has(this.dialog)) return this.dialogKey(e);
     if (k === 'Escape') {
-      if (this.dialog) { this.dialog = null; this.pasteKind = null; this.note = ''; this.sortPend = null; this.colwBuf = ''; if (this.path.length) return true; this.exitRibbon(false); return true; }
+      if (this.dialog) { this.dialog = null; this.pasteKind = null; this.note = ''; this.sortPend = null; this.colwBuf = ''; this.rowhBuf = ''; if (this.path.length) return true; this.exitRibbon(false); return true; }
       if (this.path.length) { this.path.pop(); this.note = ''; return true; }
       this.exitRibbon(false); return true;
     }
@@ -389,6 +410,12 @@ export class Session {
     if (this.dialog === 'colw') {
       if (/^[0-9.]$/.test(k)) { this.logKey(k); this.colwBuf += k; return true; }
       if (k === 'Backspace') { this.colwBuf = this.colwBuf.slice(0, -1); return true; }
+      if (k === 'Enter') { this.logKey('↵'); this.applyRibbon('ENTER'); return true; }
+      return true;
+    }
+    if (this.dialog === 'rowh') {
+      if (/^[0-9.]$/.test(k)) { this.logKey(k); this.rowhBuf += k; return true; }
+      if (k === 'Backspace') { this.rowhBuf = this.rowhBuf.slice(0, -1); return true; }
       if (k === 'Enter') { this.logKey('↵'); this.applyRibbon('ENTER'); return true; }
       return true;
     }
@@ -443,6 +470,10 @@ export class Session {
     }
     if (this.dialog === 'colw') {
       if (key === 'ENTER') { const n = parseFloat(this.colwBuf); this.colwBuf = ''; if (isFinite(n) && n > 0) S.setColWidth(n); return done(); }
+      return;
+    }
+    if (this.dialog === 'rowh') {
+      if (key === 'ENTER') { const n = parseFloat(this.rowhBuf); this.rowhBuf = ''; if (isFinite(n) && n > 0) S.setRowHeight(n); return done(); }
       return;
     }
     if (this.dialog === 'fxfix') {
@@ -560,10 +591,27 @@ export class Session {
       case 'H3': S.toggleAllOrNone('uline'); return done();
       case 'HOW': this.dialog = 'colw'; this.colwBuf = ''; return;
       case 'HOI': S.autofitCols(); return done();
-      case 'HOA': return done();
+      case 'HOA': S.autofitRows(); return done();
       case 'HUS': case 'MUS': this.exitRibbon(false); this.doAutoSum(); return;
       case 'FT': this.openOptions(); return;
       case 'HFDG': this.openGoTo(); return;
+      case 'HFDF': this.openFind(false); return;
+      case 'HFDR': this.openFind(true); return;
+      case 'HFDS': this.openGoToSpecial(); return;
+      case 'HFDU': this.exitRibbon(false); if (!S.selectSpecial('formulas')) this.toast(SPECIAL_NONE_NOTE); return;
+      case 'HFDN': this.exitRibbon(false); if (!S.selectSpecial('constants')) this.toast(SPECIAL_NONE_NOTE); return;
+      case 'HOH': this.dialog = 'rowh'; this.rowhBuf = ''; return;
+      case 'HOUR': S.hideRows(); return done();
+      case 'HOUC': S.hideCols(); return done();
+      case 'HOUO': S.unhideRows(); return done();
+      case 'HOUL': S.unhideCols(); return done();
+      case 'WFF': {   // Freeze Panes toggles at the active cell; Excel's label flips to Unfreeze
+        const a = S.dispActive();
+        S.freeze = (S.freeze.r || S.freeze.c) ? { r: 0, c: 0 } : { r: a.r - 1, c: a.c - 1 };
+        return done();
+      }
+      case 'WFR': S.freeze = { r: 1, c: 0 }; return done();
+      case 'WFC': S.freeze = { r: 0, c: 1 }; return done();
       case 'PSP': this.openPageSetup(); return;
       case 'POP': this.setOrientation('portrait'); return done();
       case 'POL': this.setOrientation('landscape'); return done();
@@ -581,7 +629,7 @@ export class Session {
     if (!isSheetName(nm)) throw new Error('addSheet: "' + nm + '" is not a legal sheet name (1–31 characters, none of [ ] : * ? / \\)');
     if (this.sheets.some(x => x.name.toLowerCase() === nm.toLowerCase())) throw new Error('addSheet: a sheet named "' + nm + '" already exists');
     const sh = sheet || new Sheet();
-    sh.onChange(() => this.emit('sheet'));
+    this.wireSheet(sh);
     const i = at == null ? this.sheets.length : Math.max(0, Math.min(this.sheets.length, at | 0));
     this.sheets.splice(i, 0, { name: nm, sheet: sh });
     this.sheetIndex = this.sheets.findIndex(x => x.sheet === this.sheet);   // the active entry may have moved right
@@ -670,7 +718,8 @@ export class Session {
     const idx = i == null ? this.sheetIndex : i | 0; const src = this.sheets[idx]; if (!src) return -1;
     const S = src.sheet; const j = S.toJSON();
     const colW = {}; S.colW.forEach((w, c) => { if (S.colSet[c]) colW[c] = w; });
-    const copy = new Sheet({ rows: S.rows, cols: S.cols, cells: j.cells, colW, active: j.active, today: S.today || undefined });
+    const copy = new Sheet({ rows: S.rows, cols: S.cols, cells: j.cells, colW, active: j.active, today: S.today || undefined,
+      rowH: j.rowH, hiddenRows: j.hiddenRows, hiddenCols: j.hiddenCols, freeze: j.freeze });
     copy.gridlines = S.gridlines;
     const at = this.addSheet(this.copySheetName(src.name), copy, before == null ? idx + 1 : Math.max(0, Math.min(this.sheets.length, before | 0)));
     this.switchSheet(at);
@@ -727,6 +776,54 @@ export class Session {
     if (key === 'Enter') { const { index, before, copy } = d; this.exitRibbon(false); if (copy) this.copySheet(index, before); else this.moveSheet(index, before); return; }
     if (key === 'ArrowUp' || key === 'ArrowDown') { d.before = Math.max(0, Math.min(this.sheets.length, d.before + (key === 'ArrowDown' ? 1 : -1))); return; }
     if (key === 'C') d.copy = !d.copy;
+  }
+
+  /* ---------------- Find & Replace (Ctrl+F / Ctrl+H, Alt H F D F / R) ---------------- */
+  openFind(replace) {
+    this.startClock();
+    this.openDialog('find', this.mode === 'ribbon' ? this.path : []);
+    this.dlg = { kind: 'find', find: '', repl: '', focus: 'find', replace: !!replace };
+  }
+  /** The Find / Replace card's keys: Tab switches fields, ↵ = Find Next, A = Replace All. Modeless in Excel; Esc closes it here as everywhere. */
+  findKey(key) {
+    const d = this.dlg; if (!d) return;
+    const S = this.sheet;
+    if (key === 'Enter') {
+      const ref = S.findNext(d.find);
+      this.note = ref ? '' : FIND_NONE_NOTE;
+      return;   // the card stays open, as Excel's does
+    }
+    if (key === 'Tab' || key === 'Shift+Tab') { if (d.replace) { d.focus = d.focus === 'find' ? 'repl' : 'find'; } return; }
+    if (key === 'Backspace') { d[d.focus] = d[d.focus].slice(0, -1); this.note = ''; return; }
+    if (key.length === 1) { d[d.focus] = (d[d.focus] + key).slice(0, 64); this.note = ''; return; }   // letters keep their typed case (dialogKey exempts 'find')
+    if (key === 'ReplaceAll' && d.replace) {
+      const n = S.replaceAll(d.find, d.repl);
+      this.note = n ? 'All done. We made ' + n + ' replacement' + (n === 1 ? '' : 's') + '.' : FIND_NONE_NOTE;
+    }
+  }
+
+  /* ---------------- Go To Special (Alt H F D S, Go To › Alt+S) ---------------- */
+  openGoToSpecial() {
+    this.startClock();
+    this.openDialog('gotospecial', this.mode === 'ribbon' ? this.path : []);
+    this.dlg = { kind: 'gotospecial', pick: 'blanks' };
+  }
+  gotoSpecialKey(key) {
+    const d = this.dlg; if (!d) return;
+    if (key === 'K') { d.pick = 'blanks'; return; }
+    if (key === 'O') { d.pick = 'constants'; return; }
+    if (key === 'F') { d.pick = 'formulas'; return; }
+    if (key === 'ArrowUp' || key === 'ArrowDown') {
+      const order = ['blanks', 'constants', 'formulas'];
+      const i = order.indexOf(d.pick);
+      d.pick = order[Math.max(0, Math.min(order.length - 1, i + (key === 'ArrowDown' ? 1 : -1)))];
+      return;
+    }
+    if (key === 'Enter') {
+      const pick = d.pick;
+      this.exitRibbon(false);
+      if (!this.sheet.selectSpecial(pick)) { this.openGoToSpecial(); this.dlg.pick = pick; this.note = SPECIAL_NONE_NOTE; }
+    }
   }
 
   /* ---------------- Go To (Ctrl+G, F5, Alt H F D G) ---------------- */
@@ -791,6 +888,7 @@ export class Session {
   dialogTabOrder() {
     const d = this.dlg; if (!d) return [];
     if (d.kind === 'pagesetup') return ['orient', 'adjustTo', 'fitWide', 'fitTall'];
+    if (d.kind === 'find') return d.replace ? ['find', 'repl'] : ['find'];
     if (d.kind !== 'options') return [];   // Rename Sheet, Delete Sheet and Move or Copy have one control each: nothing to Tab between
     if (d.page === 'formulas') return ['pages', 'calc', 'iter'].concat(d.iterative ? ['maxIter', 'maxChange'] : []);
     if (d.page === 'advanced') return ['pages', 'gridlines'];
@@ -807,6 +905,8 @@ export class Session {
     if (field === 'qatPick' && d.kind === 'options') { const i = value | 0; if (i < 0 || i >= POPULAR_COMMANDS.length) return false; d.qatPick = i; d.focus = 'qatLeft'; return true; }
     if (field === 'qatSel' && d.kind === 'options') { const i = value | 0; if (i < 0 || i >= d.qat.length) return false; d.qatSel = i; d.focus = 'qatRight'; return true; }
     if (field === 'before' && d.kind === 'movesheet') { const i = value | 0; if (i < 0 || i > this.sheets.length) return false; d.before = i; return true; }   // a click on a "Before sheet" row
+    if (field === 'special' && this.dialog === 'goto') { this.openGoToSpecial(); return true; }        // the Go To card's Special… button
+    if (field === 'replaceAll' && this.dialog === 'find' && d.kind === 'find' && d.replace) { this.findKey('ReplaceAll'); return true; }   // the card's Replace All button
     return false;
   }
   /**
@@ -816,6 +916,8 @@ export class Session {
    */
   dlgKey(key) {
     if (this.dialog === 'goto') return this.gotoKey(key);
+    if (this.dialog === 'find') return this.findKey(key);
+    if (this.dialog === 'gotospecial') return this.gotoSpecialKey(key);
     if (this.dialog === 'options') return this.optionsKey(key);
     if (this.dialog === 'pagesetup') return this.pageSetupKey(key);
     if (this.dialog === 'renamesheet') return this.renameKey(key);
@@ -900,13 +1002,23 @@ export class Session {
   /** The keys of an open Go To / Options / Page Setup / sheet dialog: logged, then routed to dlgKey. A sheet name keeps the case typed; every other dialog takes the letter upper-case. */
   dialogKey(e) {
     const k = e.key;
+    // Alt arms the dialog's accelerators (Excel's Alt+S Special…, Alt+A Replace All): a held
+    // chord arrives as e.altKey, a scripted walk as Alt then the letter — both reach the branch
+    if (k === 'Alt') { this._dlgAlt = true; return true; }
+    const altish = e.altKey || this._dlgAlt; this._dlgAlt = false;
+    if (altish && !e.ctrlKey && k.length === 1) {
+      const ch = k.toUpperCase();
+      if (this.dialog === 'goto' && ch === 'S') { this.logKey('Alt+S'); this.openGoToSpecial(); return true; }
+      if (this.dialog === 'find' && ch === 'A') { this.logKey('Alt+A'); this.findKey('ReplaceAll'); return true; }
+      return true;
+    }
     if (k === 'Escape') { this.logKey('Esc'); this.cancelDialog(); return true; }
     if (k === 'Enter') { this.logKey('↵'); this.dlgKey('Enter'); return true; }
     if (k === 'Tab') { const t = e.shiftKey ? 'Shift+Tab' : 'Tab'; this.logKey(t); this.dlgKey(t); return true; }
     if (ARROWS[k]) { this.logKey(ARROWSYM[k]); this.dlgKey(k); return true; }
     if (k === 'Backspace') { this.logKey('⌫'); this.dlgKey('Backspace'); return true; }
     if (k === ' ') { this.logKey('Space'); this.dlgKey(' '); return true; }
-    if (k.length === 1 && !e.ctrlKey && !e.altKey) { const ch = /[a-z]/i.test(k) ? k.toUpperCase() : k; this.logKey(ch); this.dlgKey(this.dialog === 'renamesheet' ? k : ch); return true; }
+    if (k.length === 1 && !e.ctrlKey && !e.altKey) { const ch = /[a-z]/i.test(k) ? k.toUpperCase() : k; this.logKey(ch); this.dlgKey(this.dialog === 'renamesheet' || this.dialog === 'find' ? k : ch); return true; }
     return true;   // a modal dialog swallows everything else
   }
 
@@ -969,7 +1081,18 @@ export class Session {
       if (S.insertOrDelete(isInsert)) { this.startClock(); this.logKey(isInsert ? (e.shiftKey ? 'Ctrl+Shift+=' : 'Ctrl++') : 'Ctrl+-'); }
       return true;   // swallow browser zoom either way
     }
-    if (e.ctrlKey && k === '0') return true;
+    // Ctrl+9 / Ctrl+0 hide the selection's rows / columns; Ctrl+Shift+( / ) unhide inside it
+    // (Ctrl+Shift+9/0 arrive as the shifted characters). While editing they are swallowed so the
+    // browser's zoom never fires.
+    if (e.ctrlKey && !e.altKey && (k === '9' || k === '0' || k === '(' || k === ')')) {
+      if (this.editing) return true;
+      this.startClock();
+      if (k === '9') { this.logKey('Ctrl+9'); S.hideRows(); }
+      else if (k === '0') { this.logKey('Ctrl+0'); S.hideCols(); }
+      else if (k === '(') { this.logKey('Ctrl+Shift+('); S.unhideRows(); }
+      else { this.logKey('Ctrl+Shift+)'); S.unhideCols(); }
+      return true;
+    }
 
     if (this.editing) return this.editKey(e);
 
@@ -1063,6 +1186,8 @@ export class Session {
       if (k === '[') { this.startClock(); this.logKey('Ctrl+['); this.jumpPrecedent(); return true; }
       if (k === ']') { this.startClock(); this.logKey('Ctrl+]'); this.jumpDependent(); return true; }
       if (lk === 'g' && !e.shiftKey) { this.logKey('Ctrl+G'); this.openGoTo(); return true; }
+      if (lk === 'f' && !e.shiftKey) { this.logKey('Ctrl+F'); this.openFind(false); return true; }
+      if (lk === 'h' && !e.shiftKey) { this.logKey('Ctrl+H'); this.openFind(true); return true; }
       return true;   // unknown chords are swallowed, never typed
     }
     if (e.ctrlKey && e.altKey && k.toLowerCase() === 'v') { this.startClock(); this.logKey('Ctrl+Alt+V'); this.openDialog('paste'); this.pasteKind = 'all'; this.pasteOp = 'none'; return true; }
