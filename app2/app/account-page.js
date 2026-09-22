@@ -33,7 +33,8 @@ export function mountAccountPage(root, ctx = {}) {
   const want = ctx.query && SECTIONS.includes(ctx.query.section) ? ctx.query.section : null;
   let tab = 'signin';          // signin | signup | magic
   let busy = false;
-  let notice = null;           // { kind: 'error'|'check', text }
+  let notice = null;
+  let lastEmail = '';           // { kind: 'error'|'check', text }
   let destroyed = false;
   const offAuth = auth.onChange(() => { if (!destroyed) { notice = null; render(); } });
   const onUser = () => { if (!destroyed) render(); };
@@ -53,7 +54,7 @@ export function mountAccountPage(root, ctx = {}) {
       : `
         <div class="acct-tabs" role="tablist">${seg('signin', 'Sign in')}${seg('signup', 'Create account')}${seg('magic', 'Magic link')}</div>
         <form id="authForm" class="acct-form">
-          <label>Email<input id="authEmail" type="email" autocomplete="email" required${unavailable ? ' disabled' : ''}></label>
+          <label>Email<input id="authEmail" type="email" value="${esc(lastEmail)}" autocomplete="email" required${unavailable ? ' disabled' : ''}></label>
           ${tab === 'magic' ? '' : `<label>Password<input id="authPw" type="password" autocomplete="${tab === 'signup' ? 'new-password' : 'current-password'}" minlength="8" required${unavailable ? ' disabled' : ''}></label>`}
           ${notice && notice.kind === 'error' ? `<p class="form-msg form-err" role="alert">${esc(notice.text)}</p>` : ''}
           <div class="data-actions">
@@ -97,6 +98,11 @@ export function mountAccountPage(root, ctx = {}) {
             <div class="data-actions"><button class="btn btn-primary" type="submit"${busy ? ' disabled' : ''}>Save handle</button></div>
           </form>
           <label class="set set-check"><input id="pubToggle" type="checkbox"${prof && prof.public_profile ? ' checked' : ''}> Public profile<span class="set-note">Handle, level, rank and best times on boards and your profile page. Off = nothing public.</span></label>
+          <form id="redeemForm" class="acct-form">
+            <label>Have a code?<input id="redeemInput" type="text" placeholder="XXXX-XXXX-XXXX" maxlength="32" autocomplete="off" spellcheck="false" style="text-transform:uppercase"></label>
+            <p class="form-msg" id="redeemMsg" role="status" aria-live="polite"></p>
+            <div class="data-actions"><button class="btn btn-ghost" type="submit">Redeem</button></div>
+          </form>
           <div class="data-actions"><button class="btn btn-ghost" id="signOutBtn" type="button">Sign out</button></div>
         </div>
       </section>`;
@@ -151,14 +157,14 @@ export function mountAccountPage(root, ctx = {}) {
       const email = el.querySelector('#authEmail').value.trim();
       const pwEl = el.querySelector('#authPw');
       const pw = pwEl ? pwEl.value : '';
+      lastEmail = email;
       busy = true; notice = null; render();
-      const emailEl = el.querySelector('#authEmail'); if (emailEl) emailEl.value = email;
       let res;
       if (tab === 'signin') res = await auth.signInPassword(email, pw);
       else if (tab === 'signup') res = await auth.signUpPassword(email, pw);
       else res = await auth.magicLink(email);
       busy = false;
-      if (res && res.error) notice = { kind: 'error', text: res.error };
+      if (res && res.error) notice = { kind: 'error', text: /Failed to fetch|NetworkError|fetch failed/i.test(res.error) ? 'Network error — check your connection and try again.' : res.error };
       else if (res && res.confirm) { notice = { kind: 'check', text: tab === 'magic' ? 'The sign-in link is on its way; it works on this device.' : 'Click the confirmation link to finish creating your account.' }; if (tab === 'signup') track('signup'); }
       else { notice = null; track(tab === 'signup' ? 'signup' : 'sign_in'); }   // signed in: onChange re-renders
       render();
@@ -209,6 +215,32 @@ export function mountAccountPage(root, ctx = {}) {
     };
     const out = el.querySelector('#signOutBtn');
     if (out) out.onclick = () => auth.signOut();
+    const redeem = el.querySelector('#redeemForm');
+    if (redeem) redeem.onsubmit = async e => {
+      e.preventDefault();
+      const code = el.querySelector('#redeemInput').value.trim().toUpperCase();
+      const msg = el.querySelector('#redeemMsg');
+      if (!code) { msg.textContent = 'Enter the code you were given.'; return; }
+      const sb = auth.client(); if (!sb) return;
+      const t = auth.token();
+      try {
+        const { data, error } = await sb.rpc('rpc_redeem', { p_code: code });
+        if (!auth.current(t)) return;
+        if (error) {
+          const m = String(error.message || '');
+          msg.textContent = m.includes('bad code') ? 'That code is not right — check it and try again.'
+            : m.includes('already used') ? 'That code has already been used.'
+            : m.includes('expired') ? 'That code has expired.'
+            : m.includes('too many tries') ? 'Too many tries — wait an hour.'
+            : 'Could not redeem — try again.';
+          return;
+        }
+        const until = data && data.ends_at ? new Date(data.ends_at).toLocaleDateString() : null;
+        msg.textContent = until ? `Paid access is on until ${until}.` : 'Paid access is on.';
+        showToast('Code redeemed');
+        el.querySelector('#redeemInput').value = '';
+      } catch (err) { if (auth.current(t)) msg.textContent = 'Network error — try again.'; }
+    };
 
     // settings (device prefs, unchanged)
     el.querySelector('#setPlatform').onchange = e => { prefs.set({ platform: e.target.value }); showToast('Keys follow ' + (e.target.value === 'mac' ? 'Mac' : 'Windows')); };

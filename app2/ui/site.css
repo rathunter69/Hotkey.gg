@@ -11,7 +11,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .prow:focus-visible{outline-offset:-2px}
 .start-btn:focus-visible{outline-color:var(--text)}
 .vis-hidden{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
-input[type=text], input[type=search], input[type=email], input[type=number], input[type=date], select, textarea{
+input[type=text], input[type=search], input[type=email], input[type=password], input[type=number], input[type=date], select, textarea{
   font-family:var(--mono); font-size:13px; color:var(--text); background:var(--surface); border:1px solid var(--line);
   border-radius:8px; padding:8px 11px; min-width:0; user-select:text; -webkit-user-select:text}
 input::placeholder{color:var(--faint)}
