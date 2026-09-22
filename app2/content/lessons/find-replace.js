@@ -36,5 +36,6 @@ export default {
     { text: 'B10 still reads Finance', check: s => s.value('B10') === 'Finance' },
   ],
   closing: ['Replace All reports how many cells it changed — read that number: four here, and if it says forty, stop and look. It is one undo step, so a wrong replace is one Ctrl+Z from gone.'],
-  solution: 'Ctrl+F "Wenesday" Enter Escape Ctrl+H "Sales team" Tab "Finance" Alt+A Escape Ctrl+H "Q1" Tab "Q2" Alt+A Escape',
+  // No trailing Escape: Replace All lands the last goal, and the completion overlay takes over from the dialog.
+  solution: 'Ctrl+F "Wenesday" Enter Escape Ctrl+H "Sales team" Tab "Finance" Alt+A Escape Ctrl+H "Q1" Tab "Q2" Alt+A',
 };

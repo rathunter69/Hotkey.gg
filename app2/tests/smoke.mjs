@@ -69,8 +69,10 @@ try {
   if (acct.chip !== 'guest') fail(`#/account: user chip reads "${acct.chip}", not guest`);
   if (acct.saveLine !== 'Saved on this device') fail(`#/account: save state reads "${acct.saveLine}"`);
 
-  // play the first and last lesson end to end by keyboard
-  for (const lesson of [LESSONS[0], LESSONS[LESSONS.length - 1]]) {
+  // play the first and last lesson end to end by keyboard, plus the phase-C feature carriers
+  // (find/replace dialog, hide+freeze, cross-sheet formulas, the two-sheet project)
+  const extras = ['find-replace', 'hide-freeze', 'cross-sheet', 'weekly-report-project'].map(id => LESSONS.find(l => l.id === id));
+  for (const lesson of [LESSONS[0], ...extras, LESSONS[LESSONS.length - 1]]) {
     await page.goto(base + '#/lesson/' + lesson.id);
     const opened = await page.waitForSelector('.goal.current, #startBtn', { timeout: 5000 }).catch(() => null);
     if (!opened) { fail(`${lesson.id}: lesson did not open`); continue; }
