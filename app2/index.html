@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hotkey.gg — Learn Excel by doing</title>
+<meta name="description" content="Learn Excel by doing: guided lessons and real-world drills on a real spreadsheet in your browser. Chapter 1 is free. No account needed to start.">
+<link rel="icon" href="./favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<!-- the saved palette lands before the first paint: a classic script restores the vars themes.js persisted -->
+<script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<script type="module">import { loadTheme } from './ui/themes.js'; loadTheme();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./ui/app.css">
+<link rel="stylesheet" href="./ui/shell.css">
+<link rel="stylesheet" href="./ui/site.css">
+<link rel="stylesheet" href="./ui/reference.css">
+<link rel="stylesheet" href="./ui/lesson.css" id="lessonCss">
+<link rel="stylesheet" href="./ui/workbook.css">
+</head>
+<body>
+<div id="navMount"></div>
+<div class="app"><main id="root"></main></div>
+<div id="footMount"></div>
+<!-- pinned supabase-js UMD (classic script, never imported): exposes window.supabase for app/auth.js -->
+<script defer src="./vendor/supabase.js"></script>
+<script type="module">
+  import { startApp } from './app/main.js';
+  startApp({ navEl: document.getElementById('navMount'), rootEl: document.getElementById('root'), footEl: document.getElementById('footMount') });
+</script>
+</body>
+</html>

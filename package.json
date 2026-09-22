@@ -1,0 +1,12 @@
+{
+  "name": "hotkey-gg",
+  "version": "0.0.0",
+  "private": true,
+  "description": "hotkey.gg — keyboard-first Excel training. Static site; Node is development tooling only. No runtime dependencies.",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "check": "node app2/tests/run-checks.js",
+    "test": "node --test \"app2/tests/*.test.js\"",
+    "serve": "node app2/tests/serve.js"
+  }
+}

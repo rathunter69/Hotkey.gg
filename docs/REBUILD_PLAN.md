@@ -1,0 +1,75 @@
+# hotkey.gg rebuild plan
+
+Last updated 2026-09-22. Sequence, status and open decisions. Behaviour of every page and system lives in docs/SITE_SPEC.md; how content is authored in docs/LESSON_FRAMEWORK.md; per-phase build detail in docs/phases/<X>.md. These plus CLAUDE.md replace all earlier planning docs. Decisions and status only; no changelog.
+
+## 1. Direction
+- Learning-first Excel platform: read -> guided -> solo -> timed. Speed, rank and boards are the layer learners graduate into.
+- Six big chapters; Chapter 1 (Foundations) is free, the rest paid. Content written from zero.
+- Keep the old build's visual identity and its trainer layout for timed play; lessons use a split pane with the panel on the right.
+- Existing user data is not preserved. New database, new schema.
+- Developer: Claude Code (Opus) sessions on branch `rebuild`, new code under `app2/`. This Cowork project chat reviews branches, applies database migrations, and owns security/legal/launch/ops.
+- Business: LLC formed; Mercury for banking and accounting. Any payment processor stays in test mode until Wolf says go.
+
+## 1a. MVP definition (what Opus builds unattended before a full review)
+The MVP is the **free product complete, with paid content built but gated behind a manual flag**:
+- All of Chapter 1 (Foundations), accounts, and the full game layer (drills, pars, PBs, Daily, boards, rank, XP, achievements, cosmetics, stats).
+- Chapters 2-3 written as lessons but locked behind a `paid` entitlement that Wolf grants by admin/redeem code. No checkout in the MVP.
+- Desks, certificates, group codes, school flair and real checkout come after the MVP is reviewed (Phases F, E-checkout).
+Wolf reviews the MVP as a whole once D lands; individual phase previews still happen.
+
+## 2. Phases (cutover-first; each has an exit check)
+| # | Phase | What | Exit check |
+|---|---|---|---|
+| 0 | Structure | app2/ layout, headless engine, unit tests, fast check | DONE |
+| 1 | Learning slice | Lesson format, catalog, lesson view, first Foundations lessons, guest progress | DONE |
+| A | Site shell and onboarding | Full site, landing, first run, catalog, lesson workspace, ribbon, reference, Welcome + How-Excel-works, effects | DONE pending Wolf's final sign-off |
+| **X** | **Cutover (do first)** | Cloudflare Pages serving app2 at hotkey.gg; old build tagged `legacy-v1` and archived; `rebuild` becomes the deployed source; old Supabase project deleted and new one created; redirects from old URLs; real draft legal pages live; Microsoft disclaimer. Quiet swap, no announcement. Live site = full site with Chapter 1 playable as guest and later chapters marked "coming". | CODE DONE 2026-09-22 (_headers/_redirects/sitemap/robots/legal drafts/db-deploy workflow). WAITING ON WOLF: Pages project `hotkey-gg` still builds `main` at the repo root — set build output dir to `app2` and production branch per G step 5, then domains; archive + PR to main is G step 7, his OK |
+| B | Accounts and saved progress | Schema + RPCs + pgTAP tests written under app2/supabase/; auth (email + magic link now, Google when OAuth ready); handle at signup; guest->account carry-over; account page; honest save states; admin/redeem entitlement grant | CODE DONE 2026-09-22 (migrations 0001–0005 incl. admin/redeem entitlements + 6 pgTAP files, 197 assertions, validated on a local shimmed Postgres; client + UI live behind config.js; 295 node tests + smoke green). WAITING ON REVIEW SESSION: apply migrations to wepejasrnskvftgnnecr, pgTAP on the real stack, advisors |
+| C | Chapter 1 complete | All Foundations sections per LESSON_FRAMEWORK; chapter project + timed assessment; test-out | CODE DONE 2026-09-22 (37 lessons across all ten sections incl. two-sheet project, 300 s assessment, 240 s test-out with chapter gate + skip; engine grew Find/Replace, Go To Special, row heights/hide/freeze, cross-sheet refs; 373 node tests + 6-lesson browser smoke green). WAITING ON WOLF: 2-3 real beginners get from lesson 1 to the end unaided |
+| D | Game layer | Drill workspace (old trainer layout), pars, PBs, PB ghost, Daily, rapid-fire, boards, rank (hidden until field fills; seeded pace-setter ghosts, not fake human rows), XP/level (~30, generous early), ~40 achievements (milestones, skill feats, speed/streak, hidden), cosmetics, stats | CODE DONE 2026-09-22 (6 drills with pass/pro/legendary pars, DrillRun workspace with start card/pace bar/PB ghost/result splits, records store hk2_records_v1, Daily + rapid-fire, XP/level + old rank math ported, 43 achievements + pixel badges, theme unlocks, Stats live; boards/rank show local-honest states until accounts. 398 node tests + smoke green). WAITING ON WOLF: parity walk vs old build; MVP review |
+| E | Paid tier | Chapters 2-3 lessons + samples; entitlements processor-agnostic; then merchant-of-record checkout (test mode), student verification, group codes, pricing wiring | Test-mode purchase, cancel, expiry, refund, group grant pass end to end |
+| F | Desks, schools, certificates | Desks v1, school flair, two-tier certificates, all writes via RPC | pgTAP covers every desk rule |
+| G | Public launch | Chapters 4-6 to agreed depth, legal final (reviewed), checkout live, announce | Launch checklist complete |
+
+Note: cutover (X) happens before B. The live site runs guest-only (local progress) from X until B ships accounts. That is expected and honest.
+
+## 3. Shipping
+- Blocking check: static + node unit tests, under 30s. Browser smoke (network blocked except localhost) as a separate non-blocking job. Full browser matrix nightly/on demand.
+- Hosting: Cloudflare Pages. Production branch is `rebuild` (renamed to `main`'s role at cutover), output directory `app2`, preview link per branch, one-click rollback, no manual ?v= bumps.
+- `supabase-deploy.yml` (old) is removed at cutover; rebuild SQL lives under app2/supabase/ and is applied by this chat, never by CI.
+
+## 4. Security and database
+- Done 2026-09-21 on the OLD project: `desk_direct_write_lockdown` closed the 12 desk write bypasses on the live site.
+- Supabase switch (Wolf's chosen sequence: delete old, then create new — no overlap cost, brief gap):
+  1. This chat exports a schema + data backup of the old project (for the record; data is not migrated).
+  2. Wolf deletes the old project in the Supabase dashboard (irreversible; only he can) and creates a fresh one, same region, and pastes the new project ref here.
+  3. This chat applies the Phase B migrations to the new project and runs the security advisors.
+  During the gap (between delete and new-schema-live) the site is guest-only anyway, so nothing user-facing breaks. Do the delete/create right before B, not at cutover, so the site isn't pointed at a dead project.
+- New schema rules in SITE_SPEC 12. Advisors after every schema change. No two-factor until after launch.
+- Phase D → B contract: the game layer's guest records (`app2/app/records.js`, key `hk2_records_v1`) are the shape of a future `attempts` table — `{id uuid unique (idempotent retries), kind drill|daily|rapid|lesson-timed, ref, day, seed, secs, keys, clean, helped, mouse, tier, splits jsonb, trace jsonb capped at 600 entries (clean runs only), at}`. PBs, boards, XP and rank all DERIVE from attempts server-side; timed lesson runs write an attempt too (kind `lesson-timed`) so Stats has one source, while `progress.lessons.best` stays the lesson-page convenience copy. Rank keeps the old placement math (speed-derived percentiles over benchmark boards, prior-weighted; see `app2/app/rank.js`) — hidden until a board has real depth, per the spec.
+
+## 5. Legal and launch checklist (Wolf owns; lawyer/accountant confirm)
+- At cutover (X): real plain-English **draft** Terms, Privacy, EULA covering guest data and no-accounts-yet, plus the Microsoft non-affiliation disclaimer and a contact email, all marked pre-review. Good enough to be live for a free guest product.
+- Before paid launch (G): lawyer review; add prices, 14-day guarantee, cancellation, account deletion, minimum age, analytics.
+- Processor: merchant of record (Paddle or Lemon Squeezy) is the lean; accountant confirms sales-tax position before E ends.
+- Google sign-in: OAuth app under the LLC's Google Workspace (unblocks Google auth in B).
+- Email: sending domain; unsubscribe on every non-transactional email.
+- Before public launch: backups/PITR confirmed, branch protection + required check, support address, refund/cancel runbook, real-user preview testing.
+
+## 6. Ongoing ops (set up during B-D)
+- First-party events table + client error log with a weekly digest; uptime check; weekly health check.
+- Monthly dependency/Supabase review; quarterly backup restore test.
+- Release routine: preview -> Wolf OK -> deploy; rollback one click.
+
+## 7. Old build
+- Reference for look, layout and copy; never imported.
+- At cutover: tag `legacy-v1`, keep one `archive/legacy` branch, remove old runtime and Codex docs from the deployed source, delete stale claude/* and codex/* branches after Wolf confirms.
+- Extraction from the old build is considered complete (look, layout, copy, reference content, rank ladder, engine-defect list). Nothing further is owed to it.
+
+## 8. Open decisions (do not block the MVP)
+- Accountant confirmation of merchant of record vs Stripe direct (before E).
+- Chapter 4-6 section depth at launch.
+- Google OAuth client ID (drops into B when ready).
+
+## 9. Engine rules carried from the audit of the old evaluator
+All fixed and pinned in app2/tests/excel-defects.test.js; keep green: blanks/text ignored by AVERAGE/MEDIAN/MIN/MAX; INDEX bounds; ROUND half-away-from-zero; TRUE/FALSE literals; VLOOKUP/MATCH match types; criteria operators in COUNTIF/SUMIF/SUMIFS + AVERAGEIF/COUNTIFS; YEARFRAC basis; case-insensitive text compare. Liveness grading uses the perturbation rule in app2/engine/live.js, never a regex.

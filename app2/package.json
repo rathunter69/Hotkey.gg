@@ -1,0 +1,6 @@
+{
+  "name": "hotkey-app2",
+  "private": true,
+  "type": "module",
+  "description": "Marks every .js under app2/ as an ES module for Node (the browser loads them as <script type=module>). No dependencies."
+}
