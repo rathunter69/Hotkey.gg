@@ -29,11 +29,11 @@ const REPORT = {
 
 /** The placement tasks. Each names visible cells; passing one marks its `skips` lessons as skipped. */
 export const PLACEMENT_TASKS = [
-  { id: 'move', text: 'Make C4 (Tuesday, Units) the active cell', keys: 'arrow keys, or Ctrl+Arrow to jump', skips: ['welcome-race', 'active-cell', 'moving-around'],
+  { id: 'move', text: 'Make C4 (Tuesday, Units) the active cell', keys: 'arrow keys, or Ctrl+Arrow to jump', skips: ['welcome-race', 'workbook-sheets-cells', 'active-cell', 'moving-around'],
     check: (s, ses) => !ses.editing && !s.sel && s.selectionText() === 'C4' },
   { id: 'select', text: 'Select the range B2:B6', keys: 'Shift+Arrow from B2', skips: ['selecting-ranges'],
     check: (s, ses) => !ses.editing && !!s.sel && s.selectionText() === 'B2:B6' },
-  { id: 'type-bold', text: 'Type Total in A8, then make A8 bold', keys: 'type, Enter, then Ctrl+B or Alt H B', skips: ['entering-data', 'ribbon-commands'],
+  { id: 'type-bold', text: 'Type Total in A8, then make A8 bold', keys: 'type, Enter, then Ctrl+B or Alt H B', skips: ['ribbon-and-keytips', 'entering-data', 'ribbon-commands'],
     check: (s, ses) => { if (ses.editing) return false; const c = s.cellAt('A8'); return !!c && String(c.value == null ? '' : c.value).trim().toLowerCase() === 'total' && !!c.bold; } },
 ];
 

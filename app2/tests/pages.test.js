@@ -77,10 +77,12 @@ test('pickNextLesson: the first lesson neither completed nor skipped, in catalog
 });
 
 test('pickNextLesson: works on the real catalogue with placement skips', () => {
+  // 'move' skips the Welcome race, the workbook lesson and the Moving section; 'select' the Selecting section;
+  // the section-1 Options and Page Setup lessons are never skipped, so a daily user starts there at the latest
   const skipped = skipsFor(['move', 'select']);
   const next = pickNextLesson(LESSONS, {}, skipped);
-  assert.equal(next.id, 'entering-data');
-  assert.equal(pickNextLesson(LESSONS, {}, skipsFor(['move', 'select', 'type-bold'])).id, 'editing-cells');
+  assert.equal(next.id, 'ribbon-and-keytips');
+  assert.equal(pickNextLesson(LESSONS, {}, skipsFor(['move', 'select', 'type-bold'])).id, 'excel-options');
   assert.equal(pickNextLesson(LESSONS, {}, []).id, 'welcome-race');
 });
 
@@ -148,10 +150,12 @@ test('navKeyFor and titleFor', () => {
 /* ---------------- placement, teams form, shell lists ---------------- */
 test('placement: passed tasks map to skipped lessons that exist, without duplicates', () => {
   assert.deepEqual(skipsFor([]), []);
-  assert.deepEqual(skipsFor(['move']), ['welcome-race', 'active-cell', 'moving-around']);
-  assert.deepEqual(skipsFor(['move', 'move', 'select']), ['welcome-race', 'active-cell', 'moving-around', 'selecting-ranges']);
+  assert.deepEqual(skipsFor(['move']), ['welcome-race', 'workbook-sheets-cells', 'active-cell', 'moving-around']);
+  assert.deepEqual(skipsFor(['move', 'move', 'select']), ['welcome-race', 'workbook-sheets-cells', 'active-cell', 'moving-around', 'selecting-ranges']);
+  assert.deepEqual(skipsFor(['type-bold']), ['ribbon-and-keytips', 'entering-data', 'ribbon-commands']);
   const ids = new Set(LESSONS.map(l => l.id));
   for (const t of PLACEMENT_TASKS) for (const id of t.skips) assert.ok(ids.has(id), `${t.id} skips a real lesson: ${id}`);
+  for (const id of ['excel-options', 'page-setup']) assert.ok(!skipsFor(PLACEMENT_TASKS.map(t => t.id)).includes(id), `${id} is never skipped by placement`);
   assert.equal(PLACEMENT_TASKS.length, 3);
 });
 

@@ -90,6 +90,23 @@ export const CONCEPTS = {
   'format-cells-dialog': 'the Format Cells dialog box: Ctrl+1',
   'number-formats': 'number formats change how a value is displayed, not the value',
   'ribbon-route-dialog': 'Alt, H, O, E opens Format Cells from the Ribbon',
+  // How Excel works (Chapter 1, section 1)
+  'workbook': 'a workbook is the Excel file; each worksheet in it is a tab along the bottom',
+  'sheet-tabs': 'Ctrl+PgDn moves to the next worksheet, Ctrl+PgUp to the previous one',
+  'go-to': 'Go To (Ctrl+G or F5) jumps to any reference you type: a cell, a range, or a cell on another sheet',
+  'sheet-reference': 'a reference on another sheet names the sheet first: Costs!B3',
+  'ribbon-tabs': 'the Ribbon tabs (Home, Page Layout, Formulas, Data, View…) each group related commands',
+  'gridlines': 'View › Show › Gridlines (Alt, W, V, G) hides or shows the sheet gridlines',
+  'excel-options': 'Excel Options (Alt, F, T) holds the settings that live outside the grid',
+  'calc-mode': 'Workbook Calculation: Automatic recalculates on every change, Manual waits for F9',
+  'iterative-calc': 'Enable iterative calculation lets a workbook resolve a circular reference, such as interest on an average balance',
+  'quick-access-toolbar': 'the Quick Access Toolbar above the Ribbon: pinned commands, run with Alt then their number',
+  'calculate-now': 'F9 recalculates the workbook (Calculate Now)',
+  'page-setup': 'the Page Setup dialog box (Alt, P, S, P): orientation and scaling for printing',
+  'orientation': 'Portrait or Landscape: which way the printed page turns',
+  'fit-to-page': 'Fit to 1 page wide by 1 tall scales the print to a single page',
+  'font-color': 'Font Color: Alt, H, F, C, then → to a swatch and Enter',
+  'input-colour-convention': 'the model colour convention: hardcoded inputs blue, formulas black',
 };
 
 /** Sentences in a text: terminators followed by a space or the end (decimals like 5.0% and 1,200.00 are not terminators). */

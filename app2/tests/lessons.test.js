@@ -19,7 +19,7 @@ test('the catalogue is well formed', () => {
   const ids = LESSONS.map(l => l.id);
   assert.equal(new Set(ids).size, ids.length, 'lesson ids are unique');
   const foundations = CHAPTERS.find(c => c.id === 'foundations');
-  assert.ok(foundations.lessons.length >= 5 && foundations.lessons.length <= 8, 'Foundations has 5–8 lessons');
+  assert.ok(foundations.lessons.length >= 5, 'Foundations has at least the first slice of lessons');
   for (const l of LESSONS) for (const p of l.prerequisites) { assert.ok(LESSONS_BY_ID[p], `${l.id}: prerequisite ${p} exists`); assert.ok(ids.indexOf(p) < ids.indexOf(l.id), `${l.id}: prerequisite ${p} comes earlier`); }
 });
 
