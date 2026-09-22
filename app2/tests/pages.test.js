@@ -191,3 +191,22 @@ test('the footer and account menu carry the spec lists', () => {
   assert.deepEqual(ACCOUNT_ITEMS.filter(i => !i.divider).map(i => i.label), ['Sign in', 'Desks', 'Stats', 'Profile', 'Settings']);
   assert.ok(ACCOUNT_ITEMS.filter(i => !i.divider).every(i => i.href.startsWith('#/account')));
 });
+
+/* ---------------- legal pages ---------------- */
+test('legal pages: real drafts, DRAFT banner gated on LEGAL_STATUS.reviewed, disclaimer and contact present', async () => {
+  const { LEGAL, LEGAL_STATUS, renderLegal } = await import('../app/legal-pages.js');
+  assert.equal(LEGAL_STATUS.reviewed, false, 'the flip to reviewed:true is a WOLF-approved commit');
+  assert.match(LEGAL_STATUS.updated, /^\d{4}-\d{2}-\d{2}$/);
+  for (const kind of ['terms', 'privacy', 'eula', 'contact']) {
+    const draft = renderLegal(kind, { reviewed: false, updated: '2026-09-22' });
+    assert.match(draft, /draft-banner/, kind + ': banner while unreviewed');
+    const final = renderLegal(kind, { reviewed: true, updated: '2026-09-22' });
+    assert.ok(!/draft-banner/.test(final), kind + ': no banner when reviewed');
+    assert.ok(!/pre-review/.test(final), kind + ': no pre-review note when reviewed');
+    assert.match(final, /Last updated 2026-09-22/);
+    assert.match(draft, /not affiliated with, sponsored by, or endorsed by Microsoft/, kind + ': Microsoft disclaimer');
+    for (const [, body] of LEGAL[kind].sections) assert.ok(body.length > 80, kind + ': every section is a real draft, not a placeholder');
+  }
+  assert.match(renderLegal('contact'), /hello@hotkey\.gg/, 'contact page has the support address');
+  assert.match(renderLegal('privacy'), /privacy@hotkey\.gg/);
+});
