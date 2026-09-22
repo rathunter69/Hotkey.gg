@@ -140,6 +140,27 @@ ${addins.length ? `<h2>Add-ins (Windows)</h2>${addins.map(cat => `<h3>${esc(cat)
   return frame({ title: 'Excel shortcuts · hotkey.gg', description: 'Every Excel keyboard shortcut in the hotkey.gg reference, Windows and Mac, with the lesson that teaches it.', up, body });
 }
 
+const ORIGIN = 'https://www.hotkey.gg';
+
+/** Every crawlable URL on the site: the app, both indexes, every generated page. */
+export function sitemapUrls() {
+  return [
+    `${ORIGIN}/`,
+    `${ORIGIN}/lessons/`,
+    ...LESSONS.map(l => `${ORIGIN}/lessons/${l.id}.html`),
+    `${ORIGIN}/shortcuts/`,
+    ...REFERENCE.map(e => `${ORIGIN}/shortcuts/${e.id}.html`),
+  ];
+}
+
+export function renderSitemap() {
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls().map(u => `  <url><loc>${esc(u)}</loc></url>`).join('\n')}\n</urlset>\n`;
+}
+
+export function renderRobots() {
+  return `User-agent: *\nAllow: /\nSitemap: ${ORIGIN}/sitemap.xml\n`;
+}
+
 /** Every generated page: Map of app2-relative path → html. */
 export function pages() {
   const out = new Map();
@@ -148,6 +169,8 @@ export function pages() {
   for (const l of LESSONS) out.set(`lessons/${l.id}.html`, renderLessonPage(l));
   out.set('shortcuts/index.html', renderShortcutsIndex());
   for (const e of REFERENCE) out.set(`shortcuts/${e.id}.html`, renderShortcutPage(e));
+  out.set('sitemap.xml', renderSitemap());
+  out.set('robots.txt', renderRobots());
   return out;
 }
 

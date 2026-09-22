@@ -1,0 +1,19 @@
+# Old-build URLs → rebuild routes. One rule per line: source destination status.
+# Fragment destinations verified on the pages.dev preview; if Cloudflare ever strips
+# the fragment, switch these to /legacy/<name>.html stubs with a meta refresh.
+/drills/* /lessons/ 301
+/reference.html /shortcuts/ 301
+/leaderboard.html /#/leaderboard 301
+/About.html /#/about 301
+/enterprise.html /#/teams 301
+/billing.html /#/pricing 301
+/terms.html /#/terms 301
+/privacy.html /#/privacy 301
+/contact.html /#/contact 301
+/account.html /#/account 301
+/profile.html /#/account 301
+/stats.html /#/account 301
+/desks.html /#/account 301
+/cert.html /#/account 301
+/security.html /#/privacy 301
+/admin.html / 302

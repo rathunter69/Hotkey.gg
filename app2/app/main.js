@@ -75,6 +75,18 @@ export function titleFor(name, extra) {
   return T[name] || 'hotkey.gg';
 }
 
+/**
+ * The old build's 75 SEO pages linked `index.html?drill=<key>`. `_redirects` cannot match query
+ * strings, so the shell resolves them at boot. Pure: takes `location.search`, returns the URL to
+ * replaceState to, or null when the search string is not a legacy CTA.
+ */
+export function legacyQuery(search) {
+  const s = String(search == null ? '' : search);
+  if (!s) return null;
+  const q = new URLSearchParams(s.startsWith('?') ? s.slice(1) : s);
+  return q.has('drill') ? '/#/practice' : null;
+}
+
 /** A first-time visitor has neither saved prefs nor any lesson progress. */
 export function isReturning() {
   try { return prefs.stored() || Object.keys(progress.all()).length > 0; } catch (e) { return false; }
@@ -142,6 +154,8 @@ function narrowNotice(root, lesson) {
 export function startApp({ navEl, rootEl, footEl }) {
   let current = null;      // { destroy() }
   let gen = 0;             // bumps on every route: a slow import for an old route never mounts
+  const legacy = legacyQuery(location.search);
+  if (legacy) { try { history.replaceState(null, '', legacy); } catch (e) { /* file:// etc.: route as-is */ } }
   prefs.reflect();
   const nav = mountNav(navEl, { links: NAV_LINKS, active: 'learn', account: true });
   const footer = footEl ? mountFooter(footEl) : null;
