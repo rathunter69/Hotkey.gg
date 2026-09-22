@@ -308,7 +308,18 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     if (!stage.hasAttribute('tabindex')) stage.setAttribute('tabindex', '-1');
     try { window.focus(); } catch (e) { /* ignore */ }
     try { stage.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
+    paintFocusHint();
   }
+  // Embedded in another page (a preview frame), the browser may keep the keyboard on the outer page
+  // until the learner clicks inside: say so on the sheet instead of leaving keys to scroll the page.
+  function paintFocusHint() {
+    const stage = $('stage'); if (!stage) return;
+    let hint = stage.querySelector('.focus-hint');
+    const away = typeof document.hasFocus === 'function' && !document.hasFocus();
+    if (away && !hint) { hint = document.createElement('div'); hint.className = 'focus-hint'; hint.innerHTML = '<span>Click the sheet to start typing</span>'; stage.appendChild(hint); }
+    if (!away && hint) hint.remove();
+  }
+  window.addEventListener('focus', paintFocusHint); window.addEventListener('blur', paintFocusHint);
   function restart(newMode) {
     stopDemo();
     phase = 'play'; revealed = false; nudgeAt = -1; prevDone = 0; overlay.hidden = true; tab = 'lesson';
@@ -419,6 +430,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   return {
     destroy() {
       stopDemo();
+      window.removeEventListener('focus', paintFocusHint); window.removeEventListener('blur', paintFocusHint);
       document.removeEventListener('keydown', onKey); document.removeEventListener('keyup', onKeyUp);
       if (timerH) clearInterval(timerH);
       if (sheetView) sheetView.destroy(); if (ribbonView) ribbonView.destroy(); if (sheetTabs) sheetTabs.destroy();

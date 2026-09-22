@@ -13,6 +13,8 @@
 .lesson .stage-row{min-height:0; flex:1 1 auto}
 .lesson .stage-main{min-height:0}
 .lesson-main .stage:focus{outline:none}
+.lesson-main .stage{position:relative}
+.focus-hint{position:absolute; left:50%; bottom:56px; transform:translateX(-50%); z-index:5; pointer-events:none; font-family:var(--mono); font-size:12px; color:var(--on-accent); background:var(--accent); border-radius:99px; padding:6px 14px; box-shadow:0 6px 20px rgba(0,0,0,.18)}
 
 /* ---- the divider: drag with the mouse, arrow keys resize, Home resets (the panel is always visible) ---- */
 .lesson-divider{flex:0 0 16px; position:relative; cursor:col-resize; display:flex; align-items:center; justify-content:center; user-select:none; -webkit-user-select:none; border-radius:6px; touch-action:none}
