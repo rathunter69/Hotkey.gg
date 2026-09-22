@@ -122,13 +122,20 @@ ${e.addin ? `<p class="muted small">${esc(ADDIN_DISCLAIMER)}</p>` : ''}`;
   return frame({ title: `${e.name} (${e.win}) — Excel shortcut · hotkey.gg`, description: `${e.name}: ${e.win} on Windows, ${e.mac} on Mac. ${e.what}`, up, body });
 }
 
+/** An add-in category (every entry carries `addin`): grouped at the bottom of the index under one heading, as on the reference page. */
+const isAddinCategory = cat => { const rows = REFERENCE.filter(e => e.category === cat); return rows.length > 0 && rows.every(e => e.addin); };
+
 export function renderShortcutsIndex() {
   const up = '../'; const app = up + 'index.html';
+  const note = cat => CATEGORY_NOTES[cat] ? `<p class="muted small">${esc(CATEGORY_NOTES[cat])}</p>` : '';
+  const list = cat => `<ul class="list">${REFERENCE.filter(e => e.category === cat).map(e => `<li><span class="k">${chordHtml(e.win)}</span> <a href="${esc(e.id)}.html">${esc(e.name)}</a>${e.lessonId ? ` <span class="muted small">· Lesson ${lessonNumber(e.lessonId)}</span>` : ''}</li>`).join('')}</ul>`;
+  const native = CATEGORIES.filter(cat => !isAddinCategory(cat) && REFERENCE.some(e => e.category === cat));
+  const addins = CATEGORIES.filter(isAddinCategory);
   const body = `<div class="crumb"><a href="${app}#/reference">Reference</a> › Shortcuts</div>
 <h1>Excel shortcuts</h1>
 <p class="muted">Every shortcut in the reference, with the lesson that teaches it where one exists.</p>
-${CATEGORIES.map(cat => { const rows = REFERENCE.filter(e => e.category === cat); return rows.length ? `<h2>${esc(cat)}</h2>${CATEGORY_NOTES[cat] ? `<p class="muted small">${esc(CATEGORY_NOTES[cat])}</p>` : ''}<ul class="list">${rows.map(e => `<li><span class="k">${chordHtml(e.win)}</span> <a href="${esc(e.id)}.html">${esc(e.name)}</a>${e.lessonId ? ` <span class="muted small">· Lesson ${lessonNumber(e.lessonId)}</span>` : ''}</li>`).join('')}</ul>` : ''; }).join('')}
-<p class="muted small">${esc(ADDIN_DISCLAIMER)}</p>
+${native.map(cat => `<h2>${esc(cat)}</h2>${note(cat)}${list(cat)}`).join('')}
+${addins.length ? `<h2>Add-ins (Windows)</h2>${addins.map(cat => `<h3>${esc(cat)}</h3>${note(cat)}${list(cat)}`).join('')}<p class="muted small">${esc(ADDIN_DISCLAIMER)}</p>` : ''}
 <div class="cta"><a class="btn" href="${app}#/reference">Open the reference</a></div>`;
   return frame({ title: 'Excel shortcuts · hotkey.gg', description: 'Every Excel keyboard shortcut in the hotkey.gg reference, Windows and Mac, with the lesson that teaches it.', up, body });
 }

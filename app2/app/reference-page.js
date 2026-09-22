@@ -8,12 +8,24 @@
 // ↑/↓ move a visible focus through the rows, Home/End jump, Enter opens the row's lesson, Esc
 // clears the search. Chips take ←/→. The learner's keyboard (localStorage `hk2_platform`, 'win' |
 // 'mac') defaults from the browser and is written back when toggled.
+//
+// The add-in categories (Macabacus, FactSet: every entry in them carries `addin`) sit under one
+// "Add-ins (Windows)" section at the very bottom, a <details> that is closed by default and
+// remembers nothing. The chips carry one "Add-ins" chip for both; choosing it opens the section
+// and filters to it. A search that matches an add-in row opens the section so the row is visible;
+// clearing the search closes it again unless the learner opened it. Row navigation skips the
+// section while it is closed. Add-ins never take the Mac swap: the cards keep their Windows-only note.
 import { lessonById, lessonNumber } from '../content/index.js';
 
 export const PLATFORM_KEY = 'hk2_platform';
+/** The chip value that filters to every add-in row (a pseudo-category, like 'all'). */
+export const ADDINS_CAT = 'addins';
+/** The heading of the collapsed section (and of the public index's group). */
+export const ADDINS_TITLE = 'Add-ins (Windows)';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const SEARCH_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>';
+const CHEVRON = '<svg class="ref-addins-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
 
 /** 'mac' when the browser reports a Mac (or iOS) platform, else 'win'. */
 export function detectPlatform(nav = typeof navigator !== 'undefined' ? navigator : null) {
@@ -47,6 +59,52 @@ export function searchText(e, lesson) {
     lesson ? `lesson ${lessonNumber(lesson.id)} ${lesson.title}` : (e.addin ? 'add-in' : 'coming soon')].filter(Boolean).join(' '));
 }
 
+/* ---------- the add-in group ---------- */
+
+/**
+ * Split the categories (display order kept) into the native ones and the add-in ones: a category is
+ * an add-in category when every entry in it carries `addin`. Empty categories are dropped.
+ */
+export function groupCategories(reference, categories) {
+  const native = [], addins = [];
+  for (const name of categories) {
+    const entries = reference.filter(e => e.category === name);
+    if (!entries.length) continue;
+    (entries.every(e => e.addin) ? addins : native).push(name);
+  }
+  return { native, addins };
+}
+/** The category chips: All, each native category, then one Add-ins chip when there are add-ins. */
+export function chipList(reference, categories) {
+  const { native, addins } = groupCategories(reference, categories);
+  return [{ cat: 'all', label: 'All' }, ...native.map(c => ({ cat: c, label: c })), ...(addins.length ? [{ cat: ADDINS_CAT, label: 'Add-ins' }] : [])];
+}
+/** Whether an entry passes the chip filter. */
+export function inCategory(entry, cat) {
+  return cat === 'all' || (cat === ADDINS_CAT ? !!entry.addin : entry.category === cat);
+}
+
+/**
+ * The open state of the add-ins section: `user` when the learner opened it (the summary or the
+ * Add-ins chip), `auto` when a search match opened it, `lastQ` the query that state belongs to.
+ * The section is open when either flag is set. Pure, so the rules are unit-tested without a DOM.
+ */
+export const ADDINS_CLOSED = Object.freeze({ user: false, auto: false, lastQ: '' });
+export const addinsOpen = s => s.user || s.auto;
+/**
+ * After a filter pass: a query that matches an add-in row (`hit`) opens the section; no query, or
+ * one that matches nothing there, withdraws that automatic opening. A section the learner closed by
+ * hand during a query stays closed for that exact query and opens again once the query changes.
+ */
+export function addinsAfterSearch(s, q, hit) {
+  const auto = !q || !hit ? false : (q !== s.lastQ ? true : s.auto);
+  return { user: s.user, auto, lastQ: q };
+}
+/** After the learner toggles it: opening is remembered as theirs; closing also drops any automatic opening. */
+export function addinsAfterToggle(s, open) {
+  return { user: open, auto: open ? s.auto : false, lastQ: s.lastQ };
+}
+
 const isEditable = t => !!t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
 
 function ensureCss() {
@@ -67,8 +125,9 @@ export function mountReferencePage(root, opts = {}) {
   let platform = readPlatform();
   let data = null;            // the loaded content module
   let category = 'all';
-  let rows = [], cards = [];  // { entry, el, hay } · { name, el, rows, addin }
-  let search = null, count = null, empty = null, disclaimer = null;
+  let rows = [], cards = [];  // { entry, el, hay, addin } · { name, el, rows, addin }
+  let addins = null;          // { el: <details>, state } when the data has add-in categories
+  let search = null, count = null, empty = null;
   let disposed = false;
 
   /* ---------- load ---------- */
@@ -111,10 +170,24 @@ export function mountReferencePage(root, opts = {}) {
       <span class="ref-text"><span class="ref-name">${esc(e.name)}</span><span class="ref-what">${esc(e.what)}${e.note ? ` <span class="ref-note">· ${esc(e.note)}</span>` : ''}</span></span>
       ${tail}</div>`;
   }
+  /** One category card; `addin` cards carry the Windows-only note that shows under the Mac keyboard. */
+  function buildCard(name, entries, addin) {
+    const NOTES = data.CATEGORY_NOTES || {};
+    const card = document.createElement('section');
+    card.className = 'ref-card'; card.dataset.cat = name;
+    card.innerHTML = `<h2>${esc(name)}<span class="n">${entries.length}</span></h2>` +
+      (addin ? `<p class="ref-cardnote warn ref-wonly" hidden>Windows only: this add-in has no Mac build, so these stay Windows chords.</p>` : '') +
+      (NOTES[name] ? `<p class="ref-cardnote">${esc(NOTES[name])}</p>` : '') +
+      entries.map(rowHtml).join('');
+    const cardRows = entries.map(e => { const rowEl = card.querySelector(`.ref-row[data-id="${CSS.escape(e.id)}"]`); return { entry: e, el: rowEl, hay: searchText(e, e.lessonId ? lessonById(e.lessonId) : null), addin }; });
+    rows.push(...cardRows);
+    cards.push({ name, el: card, rows: cardRows, addin });
+    return card;
+  }
 
   function render() {
     const { REFERENCE, CATEGORIES } = data;
-    const NOTES = data.CATEGORY_NOTES || {};
+    const groups = groupCategories(REFERENCE, CATEGORIES);
     el.innerHTML = `
       <header class="ref-head">
         <h1>Shortcut <span class="em">reference</span></h1>
@@ -135,35 +208,34 @@ export function mountReferencePage(root, opts = {}) {
         </div>
         <div class="ref-chips" id="refChips" role="group" aria-label="Category"></div>
       </div>
-      <main class="ref-grid" id="refGrid"></main>
-      <p class="ref-disclaimer" id="refDisclaimer" hidden>${esc(data.ADDIN_DISCLAIMER || '')}</p>`;
-    search = el.querySelector('#refSearch'); count = el.querySelector('#refCount'); disclaimer = el.querySelector('#refDisclaimer');
+      <div class="ref-grid" id="refGrid"></div>
+      ${groups.addins.length ? `<details class="ref-addins" id="refAddins">
+        <summary class="ref-addins-sum" id="refAddinsSum">${CHEVRON}<span class="ref-addins-title">${esc(ADDINS_TITLE)}</span><span class="ref-addins-hint">${esc(groups.addins.join(' · '))}</span><span class="n" id="refAddinsN"></span></summary>
+        <div class="ref-grid ref-addins-grid" id="refAddinsGrid"></div>
+        <p class="ref-disclaimer" id="refDisclaimer">${esc(data.ADDIN_DISCLAIMER || '')}</p>
+      </details>` : ''}`;
+    search = el.querySelector('#refSearch'); count = el.querySelector('#refCount');
 
-    // chips
+    // chips: All, the native categories, one Add-ins chip
     const chips = el.querySelector('#refChips');
-    chips.innerHTML = ['all', ...CATEGORIES].map(c => `<button type="button" class="ref-chip" data-cat="${esc(c)}" aria-pressed="${c === category}">${c === 'all' ? 'All' : esc(c)}</button>`).join('');
+    chips.innerHTML = chipList(REFERENCE, CATEGORIES).map(c => `<button type="button" class="ref-chip" data-cat="${esc(c.cat)}" aria-pressed="${c.cat === category}">${esc(c.label)}</button>`).join('');
 
-    // cards
+    // cards: the native categories in the grid, the add-ins inside the collapsed section
     const grid = el.querySelector('#refGrid');
-    cards = []; rows = [];
-    for (const name of CATEGORIES) {
-      const entries = REFERENCE.filter(e => e.category === name);
-      if (!entries.length) continue;
-      const addin = entries.every(e => e.addin);
-      const card = document.createElement('section');
-      card.className = 'ref-card'; card.dataset.cat = name;
-      card.innerHTML = `<h2>${esc(name)}<span class="n">${entries.length}</span></h2>` +
-        (addin ? `<p class="ref-cardnote warn ref-wonly" hidden>Windows only: this add-in has no Mac build, so these stay Windows chords.</p>` : '') +
-        (NOTES[name] ? `<p class="ref-cardnote">${esc(NOTES[name])}</p>` : '') +
-        entries.map(rowHtml).join('');
-      const cardRows = entries.map(e => { const rowEl = card.querySelector(`.ref-row[data-id="${CSS.escape(e.id)}"]`); return { entry: e, el: rowEl, hay: searchText(e, e.lessonId ? lessonById(e.lessonId) : null) }; });
-      rows.push(...cardRows);
-      cards.push({ name, el: card, rows: cardRows, addin });
-      grid.appendChild(card);
-    }
+    cards = []; rows = []; addins = null;
+    for (const name of groups.native) grid.appendChild(buildCard(name, REFERENCE.filter(e => e.category === name), false));
     empty = document.createElement('div');
     empty.className = 'ref-empty'; empty.hidden = true;
     grid.appendChild(empty);
+    if (groups.addins.length) {
+      const details = el.querySelector('#refAddins'); const agrid = el.querySelector('#refAddinsGrid');
+      let n = 0;
+      for (const name of groups.addins) { const entries = REFERENCE.filter(e => e.category === name); n += entries.length; agrid.appendChild(buildCard(name, entries, true)); }
+      el.querySelector('#refAddinsN').textContent = String(n);
+      addins = { el: details, state: ADDINS_CLOSED };
+      details.open = false;
+      details.addEventListener('toggle', onToggle);
+    }
 
     applyPlatform();
     apply();
@@ -179,7 +251,9 @@ export function mountReferencePage(root, opts = {}) {
     if (p !== 'win' && p !== 'mac') return;
     platform = p; savePlatform(p); applyPlatform();
   }
-  function visibleRows() { return rows.filter(r => !r.el.hidden); }
+  /** The add-in rows count as visible only while their section is shown and open. */
+  const addinsShowing = () => !!addins && !addins.el.hidden && addins.el.open;
+  function visibleRows() { const show = addinsShowing(); return rows.filter(r => !r.el.hidden && (!r.addin || show)); }
   function updateTabStops() {
     const vis = visibleRows();
     const focused = vis.find(r => r.el === document.activeElement);
@@ -187,13 +261,19 @@ export function mountReferencePage(root, opts = {}) {
     const first = focused || vis[0];
     if (first) first.el.tabIndex = 0;
   }
+  /** Put the <details> where the state says; the toggle event that follows sees no difference and leaves the state alone. */
+  function syncAddins() {
+    if (!addins) return;
+    const open = addinsOpen(addins.state);
+    if (addins.el.open !== open) addins.el.open = open;
+  }
   function apply() {
     const q = normQuery(search.value);
     let shown = 0;
     for (const card of cards) {
       let any = false;
       for (const r of card.rows) {
-        const hit = (category === 'all' || r.entry.category === category) && (!q || r.hay.includes(q));
+        const hit = inCategory(r.entry, category) && (!q || r.hay.includes(q));
         r.el.hidden = !hit;
         if (hit) { any = true; shown++; }
       }
@@ -205,8 +285,18 @@ export function mountReferencePage(root, opts = {}) {
       empty.innerHTML = `<span>No shortcuts match ${q ? `“${esc(search.value.trim())}”` : 'that filter'}.</span><button class="btn btn-ghost" type="button" id="refClear">Clear the search</button>`;
       empty.querySelector('#refClear').onclick = () => { clearSearch(); search.focus(); };
     } else empty.hidden = true;
-    disclaimer.hidden = !cards.some(c => c.addin && !c.el.hidden);
+    if (addins) {
+      const hit = cards.some(c => c.addin && !c.el.hidden);
+      addins.el.hidden = !hit;   // the filter leaves nothing under it: the whole section goes, summary included
+      addins.state = addinsAfterSearch(addins.state, q, hit);
+      syncAddins();
+    }
     updateTabStops();
+  }
+  function setCategory(cat) {
+    category = cat;
+    if (cat === ADDINS_CAT && addins) addins.state = addinsAfterToggle(addins.state, true);   // choosing the chip opens the section
+    syncChips(); apply();
   }
   function clearSearch() { if (search.value) { search.value = ''; } category = 'all'; syncChips(); apply(); }
   function syncChips() { el.querySelectorAll('.ref-chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.cat === category))); }
@@ -220,11 +310,23 @@ export function mountReferencePage(root, opts = {}) {
     const a = rowEl.querySelector('a.ref-lesson');
     if (a) location.hash = a.getAttribute('href');
   }
+  /** Esc clears the search; when that closes the section around the focused row, the search takes the focus back. */
+  function escapeClears(e, rowEl) {
+    if (!search.value) return;
+    e.preventDefault(); search.value = ''; apply();
+    if (rowEl && !visibleRows().some(r => r.el === rowEl)) { search.focus(); search.select(); }
+  }
 
   /* ---------- events ---------- */
+  // The learner (or the browser's find-in-page) flipped the <details>: a mismatch with the state says so.
+  const onToggle = () => {
+    if (!addins) return;
+    if (addins.el.open !== addinsOpen(addins.state)) addins.state = addinsAfterToggle(addins.state, addins.el.open);
+    updateTabStops();
+  };
   const onClick = e => {
     const plat = e.target.closest('.ref-plat button'); if (plat) { setPlatform(plat.dataset.plat); return; }
-    const chip = e.target.closest('.ref-chip'); if (chip) { category = chip.dataset.cat; syncChips(); apply(); return; }
+    const chip = e.target.closest('.ref-chip'); if (chip) { setCategory(chip.dataset.cat); return; }
     const row = e.target.closest('.ref-row'); if (row && !e.target.closest('a')) { const r = rows.find(x => x.el === row); if (r) focusRow(r); }
   };
   const onInput = e => { if (e.target === search) apply(); };
@@ -233,7 +335,7 @@ export function mountReferencePage(root, opts = {}) {
     const t = e.target;
     if (t === search) {
       if (e.key === 'ArrowDown' || e.key === 'Enter') { const v = visibleRows(); if (v[0]) { e.preventDefault(); focusRow(v[0]); } }
-      else if (e.key === 'Escape') { if (search.value) { e.preventDefault(); search.value = ''; apply(); } }
+      else if (e.key === 'Escape') escapeClears(e, null);
       return;
     }
     const rowEl = t.closest ? t.closest('.ref-row') : null;
@@ -244,15 +346,15 @@ export function mountReferencePage(root, opts = {}) {
       else if (e.key === 'Home') { e.preventDefault(); focusRow(v[0]); }
       else if (e.key === 'End') { e.preventDefault(); focusRow(v[v.length - 1]); }
       else if (e.key === 'Enter') { e.preventDefault(); openRow(rowEl); }
-      else if (e.key === 'Escape') { if (search.value) { e.preventDefault(); search.value = ''; apply(); } }
+      else if (e.key === 'Escape') escapeClears(e, rowEl);
       return;
     }
     if (t.classList && t.classList.contains('ref-chip')) {
       const chips = [...el.querySelectorAll('.ref-chip')]; const i = chips.indexOf(t);
       if (e.key === 'ArrowRight') { e.preventDefault(); chips[(i + 1) % chips.length].focus(); }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); chips[(i - 1 + chips.length) % chips.length].focus(); }
-      else if (e.key === 'Escape' && search.value) { e.preventDefault(); search.value = ''; apply(); }
     }
+    if (e.key === 'Escape') escapeClears(e, null);   // from a chip, the keyboard toggle or the add-ins summary
   };
   // `/` from anywhere on the page (not inside a text field) jumps to the search box.
   const onWindowKey = e => {

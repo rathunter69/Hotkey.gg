@@ -3,10 +3,11 @@
 // by the old rule, the chord notation parsing, and the old reference's content all present.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { REFERENCE, CATEGORIES, CATEGORY_NOTES, macChord, macNote, parseChord, referenceByChord, referenceById, lessonForConcept } from '../content/reference.js';
-import { LESSONS_BY_ID } from '../content/index.js';
+import { REFERENCE, CATEGORIES, CATEGORY_NOTES, ADDIN_DISCLAIMER, macChord, macNote, parseChord, referenceByChord, referenceById, lessonForConcept } from '../content/reference.js';
+import { LESSONS_BY_ID, lessonNumber } from '../content/index.js';
 import { CONCEPTS } from '../content/schema.js';
-import { detectPlatform, chordHtml, searchText } from '../app/reference-page.js';
+import { detectPlatform, chordHtml, searchText, groupCategories, chipList, inCategory, ADDINS_CAT, ADDINS_TITLE, ADDINS_CLOSED, addinsOpen, addinsAfterSearch, addinsAfterToggle } from '../app/reference-page.js';
+import { renderShortcutsIndex } from './public-pages.js';
 
 const nonEmpty = v => typeof v === 'string' && v.trim().length > 0;
 
@@ -148,6 +149,57 @@ test('page helpers: platform detection, keycap markup, search text', () => {
   assert.equal((chordHtml('Alt H B O', parseChord).match(/class="ref-seq"/g) || []).length, 4);
   assert.ok(chordHtml('<b>', parseChord).includes('&lt;b&gt;'), 'keys are escaped');
   const e = referenceById('ctrl-b'); const t = searchText(e, LESSONS_BY_ID[e.lessonId]);
-  for (const q of ['ctrl b', 'ctrl+b', 'bold', 'cmd b', 'command b', 'lesson 6', 'formatting']) assert.ok(t.includes(q.replace('+', ' ')), `"${q}" finds Ctrl+B`);
+  for (const q of ['ctrl b', 'ctrl+b', 'bold', 'cmd b', 'command b', `lesson ${lessonNumber(e.lessonId)}`, 'formatting']) assert.ok(t.includes(q.replace('+', ' ')), `"${q}" finds Ctrl+B`);
   assert.ok(searchText(referenceById('ctrl-9'), null).includes('coming soon'));
+});
+
+test('the add-in categories group under one "Add-ins (Windows)" section, last, with one chip and one public heading', () => {
+  const g = groupCategories(REFERENCE, CATEGORIES);
+  assert.deepEqual(g.addins, ['Macabacus', 'FactSet']);
+  assert.deepEqual(g.native, CATEGORIES.slice(0, -2), 'every native category, in display order');
+  assert.deepEqual(CATEGORIES.slice(-2), g.addins, 'the add-in categories come last');
+  for (const c of g.native) assert.ok(REFERENCE.filter(e => e.category === c).every(e => !e.addin), `${c} carries no add-in rows`);
+  assert.equal(ADDINS_TITLE, 'Add-ins (Windows)');
+  // one chip for both add-ins, after the native chips
+  const chips = chipList(REFERENCE, CATEGORIES);
+  assert.deepEqual(chips.map(c => c.label), ['All', ...g.native, 'Add-ins']);
+  assert.equal(chips[0].cat, 'all'); assert.equal(chips[chips.length - 1].cat, ADDINS_CAT);
+  assert.ok(!chips.some(c => c.label === 'Macabacus' || c.label === 'FactSet'), 'no per-vendor chip');
+  assert.deepEqual(chipList(REFERENCE.filter(e => !e.addin), CATEGORIES).map(c => c.label), ['All', ...g.native], 'no Add-ins chip without add-in rows');
+  // the chip filter
+  assert.ok(inCategory(referenceById('macabacus-ctrl-shift-r'), ADDINS_CAT) && inCategory(referenceById('factset-ctrl-alt-k'), ADDINS_CAT));
+  const b = referenceById('ctrl-b');
+  assert.ok(!inCategory(b, ADDINS_CAT) && inCategory(b, 'all') && inCategory(b, 'Formatting') && !inCategory(b, 'Borders'));
+  assert.equal(REFERENCE.filter(e => inCategory(e, ADDINS_CAT)).length, 44);
+  // the public shortcuts index: the native categories, then the one heading with both lists and the disclaimer beneath them
+  const html = renderShortcutsIndex();
+  assert.deepEqual([...html.matchAll(/<h2>([^<]+)<\/h2>/g)].map(m => m[1]), [...g.native, 'Add-ins (Windows)']);
+  const at = s => { const i = html.indexOf(s); assert.ok(i >= 0, `index has "${s.slice(0, 40)}"`); return i; };
+  const heading = at('<h2>Add-ins (Windows)</h2>');
+  assert.ok(heading > at('<h2>Workbook</h2>'), 'the add-ins come after the last native category');
+  assert.ok(heading < at('<h3>Macabacus</h3>') && at('<h3>Macabacus</h3>') < at(CATEGORY_NOTES.Macabacus) && at(CATEGORY_NOTES.Macabacus) < at('macabacus-ctrl-shift-r.html'));
+  assert.ok(at('macabacus-ctrl-alt-minus.html') < at('<h3>FactSet</h3>') && at('<h3>FactSet</h3>') < at(CATEGORY_NOTES.FactSet) && at(CATEGORY_NOTES.FactSet) < at('factset-ctrl-alt-shift-k.html'));
+  assert.ok(at('factset-ctrl-alt-k.html') < at(ADDIN_DISCLAIMER) && at(ADDIN_DISCLAIMER) < at('Open the reference'), 'the disclaimer sits under both lists');
+  assert.equal((html.slice(heading).match(/<li>/g) || []).length, 44, 'every add-in row is under the heading');
+  assert.equal((html.match(/<li>/g) || []).length, REFERENCE.length, 'every row is on the index');
+});
+
+test('the add-ins section: closed by default, a matching search opens it, clearing closes it unless the learner opened it', () => {
+  let s = ADDINS_CLOSED;
+  assert.equal(addinsOpen(s), false);
+  s = addinsAfterSearch(s, 'macabacus', true); assert.equal(addinsOpen(s), true, 'a search that matches an add-in row opens it');
+  s = addinsAfterSearch(s, 'macabacus fill', true); assert.equal(addinsOpen(s), true);
+  s = addinsAfterSearch(s, '', false); assert.equal(addinsOpen(s), false, 'clearing the search closes it again');
+  s = addinsAfterSearch(s, 'bold', false); assert.equal(addinsOpen(s), false, 'a search with no add-in match leaves it closed');
+  // closed by hand during a query: stays closed for that query, opens again when the query changes
+  s = addinsAfterSearch(s, 'ctrl shift', true); assert.equal(addinsOpen(s), true);
+  s = addinsAfterToggle(s, false); assert.equal(addinsOpen(s), false, 'the learner closes it');
+  s = addinsAfterSearch(s, 'ctrl shift', true); assert.equal(addinsOpen(s), false, 'the same query does not reopen what the learner closed');
+  s = addinsAfterSearch(s, 'ctrl shift r', true); assert.equal(addinsOpen(s), true, 'a changed query opens it again');
+  // opened by hand (the summary or the Add-ins chip): it stays open through and after a search
+  s = addinsAfterToggle(ADDINS_CLOSED, true); assert.equal(addinsOpen(s), true);
+  s = addinsAfterSearch(s, 'bold', false); assert.equal(addinsOpen(s), true, 'a search elsewhere does not close what the learner opened');
+  s = addinsAfterSearch(s, '', false); assert.equal(addinsOpen(s), true, 'clearing keeps it open');
+  s = addinsAfterToggle(s, false); assert.equal(addinsOpen(s), false, 'closed by hand');
+  assert.deepEqual(ADDINS_CLOSED, { user: false, auto: false, lastQ: '' }, 'the initial state is never mutated');
 });
