@@ -4,6 +4,12 @@
 // the ResizeObserver / resize re-fit (29275–29299). Every class name and inline style is the old
 // one, so app.css applies unchanged.
 //
+// The sheet is Excel at 100% (SITE_SPEC §4): every row and column of the model paints at the engine's
+// column width (64px default; autofit and Column Width change it) and a fixed 20px row height, inside
+// .gridwrap, a scroll box the frame sizes. Row and column headers stick; after every render the active
+// cell is scrolled into view the way Excel does it (whole rows and columns, never the window); and the
+// session learns how many rows and columns one screen holds (pageRows / pageCols) for PageUp/PageDown.
+//
 //   const view = new SheetView(stageMainEl, session);   // appends .fbar + .gridwrap to el
 //   view.render();                                       // (re-runs on session.onChange)
 //   view.destroy();
@@ -17,7 +23,12 @@ import { recordMouse, MODAL_DIALOGS } from './ribbon-commands.js';
 // Excel's classic formula-highlighting palette — saturated, universally recognizable, works on
 // both dark and light themes. Same as Office Theme Accents 1, Red, Green, Purple, Accent 2, Gray.
 export const REF_PALETTE = ['#4286D0', '#C62828', '#2E7D32', '#8E24AA', '#EF6C00', '#6D4C41'];
-const ROW_CAP = 20;   // the 20-row standard canvas
+// Excel's defaults at 100% zoom (SITE_SPEC §4). app.css carries the same numbers as --cellh / --cellpad /
+// --rowhdrw fallbacks; the view writes --cellh and --cellpad on the wrap so the two never drift.
+export const ROW_H = 20;       // px, Excel's 15pt default row
+export const ROWHDR_W = 36;    // px, the row-number column: three digits at 11px
+export const CELL_PAD = 3;     // px each side of a cell's text
+const HASH_PX = 9.2;           // one '#' of the #### verdict at the 11pt cell font (8.2px glyph + 1px letter-spacing)
 
 export function escHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
@@ -74,7 +85,7 @@ export class SheetView {
    * @param {import('../engine/keyboard.js').Session} session
    */
   constructor(el, session) {
-    this.el = el; this.session = session; this.sheet = session.sheet;
+    this.el = el; this.session = session; this.sheet = session.sheet;   // re-read from the session on every render: a workbook switches sheets
     this.destroyed = false;
     const fbar = document.createElement('div'); fbar.className = 'fbar'; fbar.style.position = 'relative';
     fbar.innerHTML =
@@ -88,19 +99,19 @@ export class SheetView {
     el.appendChild(fbar); el.appendChild(gw);
     this.fbar = fbar; this.nameBox = fbar.querySelector('.namebox'); this.fContent = fbar.querySelector('.fcontent'); this.fxActions = fbar.querySelector('.fx-actions');
     this.gw = gw; this.grid = gw.querySelector('table'); this.marquee = gw.querySelector('.marquee');
-    this._renderedGwH = 0; this._renderedGwW = 0; this._measureRetry = 0; this._roPend = false; this._rzT = null;
-    this.ew = {}; this.VR = ROW_CAP;
+    this._roPend = false; this._rzT = null;
+    this.ew = [];   // the column widths the last render painted with (the engine's colW; index = column)
+    this._shape = ''; this._tds = null; this._cls = null; this._sty = null; this._txt = null;   // the painted table, for the patch path (see render)
 
     this.unsub = session.onChange(() => this.render());
-    // re-fit when the box settles to a different size (>6px either axis)
+    // the box changed size (the divider moved, the window resized, the first layout landed): the
+    // painted grid is unchanged, so only re-scroll to the active cell and re-count the screen
     this.ro = typeof ResizeObserver === 'function' ? new ResizeObserver(() => {
       if (this._roPend) return; this._roPend = true;
-      requestAnimationFrame(() => { this._roPend = false; if (this.destroyed) return;
-        const w = this.gw; if (w.clientHeight <= 100) return;
-        if (Math.abs(w.clientHeight - this._renderedGwH) > 6 || Math.abs(w.clientWidth - this._renderedGwW) > 6) this.render(); });
+      requestAnimationFrame(() => { this._roPend = false; if (!this.destroyed) this.refit(); });
     }) : null;
     if (this.ro) this.ro.observe(gw);
-    this._onResize = () => { clearTimeout(this._rzT); this._rzT = setTimeout(() => { if (this.destroyed) return; this.render(); requestAnimationFrame(() => { if (!this.destroyed) this.render(); }); }, 120); };
+    this._onResize = () => { clearTimeout(this._rzT); this._rzT = setTimeout(() => { if (!this.destroyed) this.refit(); }, 120); };
     window.addEventListener('resize', this._onResize);
     // the mouse (SITE_SPEC §6): click selects, Shift+click extends, drag selects a range, headers
     // select columns/rows/all, double-click edits — every workspace click recorded on the session
@@ -131,17 +142,17 @@ export class SheetView {
     const td = t.closest('td[data-r]');
     if (td) return { r: +td.dataset.r, c: +td.dataset.c };
     const th = t.closest('th'); if (!th || !this.grid.contains(th)) return null;
-    const tr = th.parentElement; const S = this.sheet;
+    const tr = th.parentElement; const S = this.sheet = this.session.sheet;
     if (tr === this.grid.rows[0]) return th.cellIndex === 0 ? { hdr: 'all' } : { hdr: 'col', c: th.cellIndex };
     const r = parseInt(th.textContent, 10);
-    return (r >= 1 && r <= S.rows) ? { hdr: 'row', r } : null;   // filler rows below the content are inert
+    return (r >= 1 && r <= S.rows) ? { hdr: 'row', r } : null;
   }
   onMouseDown(e) {
     if (e.button !== 0) return;
     const h = this.hit(e); if (!h) return;
     e.preventDefault();   // the sheet keeps the keyboard; no text selection starts
     if (e.detail > 1) return;   // the second press of a double-click: dblclick handles it
-    const ss = this.session, S = this.sheet;
+    const ss = this.session, S = this.sheet = ss.sheet;
     if (ss.dialog && MODAL_DIALOGS.has(ss.dialog)) return;   // a modal card owns the input (Excel)
     if (ss.mode === 'ribbon') ss.exitRibbon(false);          // a click on the sheet dismisses KeyTips and dropdowns
     if (ss.editing && !ss.commitEdit(0, 0, { kind: 'move' })) { ss.emit('mouse'); return; }   // Excel commits the entry when you click away; a refused one stays open
@@ -175,7 +186,7 @@ export class SheetView {
     const d = this.drag; if (!d) return;
     if (!(e.buttons & 1)) { this.endDrag(); return; }   // the button was released outside the window
     const h = this.hit(e); if (!h) return;
-    const S = this.sheet;
+    const S = this.sheet = this.session.sheet;
     if (d.kind === 'cell') {
       if (h.hdr) return;
       if (S.active.r === h.r && S.active.c === h.c && (S.sel ? true : (h.r === d.r && h.c === d.c))) return;
@@ -199,163 +210,221 @@ export class SheetView {
   onDblClick(e) {
     const h = this.hit(e); if (!h || h.hdr) return;
     e.preventDefault();
-    const ss = this.session;
+    const ss = this.session, S = this.sheet = ss.sheet;
     if (ss.editing || (ss.dialog && MODAL_DIALOGS.has(ss.dialog))) return;
-    const a = this.sheet.dispActive();
-    if (a.r !== h.r || a.c !== h.c) this.sheet.goTo(h.r, h.c);
+    const a = S.dispActive();
+    if (a.r !== h.r || a.c !== h.c) S.goTo(h.r, h.c);
     ss.key({ key: 'F2' });
     recordMouse(ss, 'edit');
   }
 
-  /** The one grid write. */
+  /**
+   * Paint the model. The first paint (and any change of shape: rows, columns, a column width) writes
+   * the whole table in one innerHTML; every other render computes each cell's class / style / text
+   * as before and touches only the cells whose triple changed, so a cursor move restyles two cells
+   * instead of re-laying-out 2,600.
+   */
   render() {
     if (this.destroyed) return;
-    const S = this.sheet, ss = this.session, gw = this.gw;
-    const COLS = S.cols, ROWS = S.rows, colW = S.colW;
+    const ss = this.session, S = this.sheet = ss.sheet, gw = this.gw;
+    const COLS = S.cols, ROWS = S.rows, colW = S.colW, cells = S.cells;
+    const W = [0], L = ['']; let totalW = ROWHDR_W;
+    for (let c = 1; c <= COLS; c++) { const w = colW[c] || COLW_DEFAULT; W[c] = w; totalW += w; L[c] = colLetter(c); }
+    this.ew = W;
+    const N = ROWS * COLS, shape = ROWS + 'x' + COLS + ':' + W.join(',');
+    const patch = this._shape === shape && !!this._tds && this._tds.length === N && this.grid.rows.length === ROWS + 1;
+    if (!patch) { this._cls = new Array(N); this._sty = new Array(N); this._txt = new Array(N); }
+    const oldCls = this._cls, oldSty = this._sty, oldTxt = this._txt, tds = this._tds;
 
-    // ELASTIC FIT (r55): distribute the gridwrap's spare width across all columns, or scale them
-    // down (floor 40px) — the sheet fills its box on any screen without cutting columns.
-    const availW = gw.clientWidth - 28 - 30;      // padding 14×2 + row header
-    this._renderedGwW = gw.clientWidth;
-    let base = 0; for (let c = 1; c <= COLS; c++) base += (colW[c] || 72);
-    const ew = {};
-    if (availW > base) {
-      const per = Math.floor((availW - base) / COLS);
-      for (let c = 1; c <= COLS; c++) ew[c] = (colW[c] || 72) + per;
-    } else if (base > availW && availW > 0) {
-      const scale = availW / base;
-      for (let c = 1; c <= COLS; c++) ew[c] = Math.max(40, Math.round((colW[c] || 72) * scale));
-    } else {
-      for (let c = 1; c <= COLS; c++) ew[c] = (colW[c] || 72);
-    }
-    this.ew = ew;   // display widths (elastic); the #### verdict below reads the ENGINE widths
-
-    // row canvas: the 20-row standard, floored at content; measured once the box has laid out
-    let rowH = ROWS <= 8 ? 32 : (ROWS <= 10 ? 29 : (ROWS <= 12 ? 26 : 24));   // pre-measure fallback
-    const VR = Math.max(ROWS, ROW_CAP);
-    if (gw.clientHeight > 100) {
-      const availH = gw.clientHeight - 17 - 31;   // usable height minus header
-      rowH = Math.max(18, Math.min(40, Math.floor(availH / VR)));
-      this._renderedGwH = gw.clientHeight;
-    } else if (!this._measureRetry) {
-      // first paint often lands before the box has laid out — schedule ONE post-layout re-render
-      this._measureRetry = 1;
-      requestAnimationFrame(() => requestAnimationFrame(() => { this._measureRetry = 0; if (!this.destroyed && this.gw.clientHeight > 100) this.render(); }));
-    }
-    gw.style.setProperty('--cellh', rowH + 'px');
-    this.VR = VR;
-
-    const sr = S.selRange();
+    const sr = S.selRange(), hasSel = !!S.sel;
     let refColors = {};
     if (ss.editing) refColors = parseFormulaRefs(ss.editBuf).cellColors;
     const editing = ss.editing, editPointer = ss.editPointer;
-
-    // header row — no active-column highlight (the old build had none)
-    let gh = '<tr><th class="rowhdr"></th>';
-    for (let c = 1; c <= COLS; c++) gh += `<th style="min-width:${ew[c]}px">${colLetter(c)}</th>`;
-    gh += '</tr>';
-
     // the DISPLAYED active cell is the selection ANCHOR (Excel-true)
     const dA = S.dispActive();
-    // FULL-COLUMN selection reads to the BOTTOM OF THE CANVAS: filler rows carry the tint + side
-    // edges and the green bottom edge rides the LAST RENDERED row, not the frame seam.
-    const fullColSel = !!(S.sel && sr.r1 <= 1 && sr.r2 >= ROWS && VR > ROWS);
-    for (let r = 1; r <= VR; r++) {
-      if (r > ROWS) {   // empty Excel-style filler rows below the content (visual only — cursor clamps at ROWS)
-        let fr = '<tr><th class="rowhdr">' + r + '</th>';
-        for (let c = 1; c <= COLS; c++) {
-          let fcls = 'fillcell';
-          if (fullColSel && c >= sr.c1 && c <= sr.c2) {
-            fcls += ' sel';
-            if (c === sr.c1) fcls += ' sel-l'; if (c === sr.c2) fcls += ' sel-r';
-            if (r === VR) fcls += ' sel-b';
-          }
-          fr += '<td class="' + fcls + '"></td>';
-        }
-        gh += fr + '</tr>'; continue;
-      }
-      let row = `<tr><th class="rowhdr">${r}</th>`;
-      for (let c = 1; c <= COLS; c++) {
-        const cell = S.get(r, c);
-        const isNum = typeof cell.value === 'number';
-        const cls = [];
-        if (cell.bold) cls.push('bold'); if (cell.txt && !isNum) cls.push('txt');
-        if (isErrVal(cell.value)) cls.push('err');
-        if (cell.it) cls.push('it'); if (cell.strike) cls.push('strike');
-        if (cell.uline) cls.push('uline');
-        if (cell.cmt) cls.push('cmt');
-        if (cell.wrap) cls.push('wrap'); if (cell.fill) cls.push('fill-' + cell.fill);
-        if (cell.bt) cls.push('bt'); if (cell.bb) cls.push('bb'); if (cell.ball) cls.push('ball'); if (cell.bdbl) cls.push('bdbl');
-        if (cell.bl) cls.push('bl'); if (cell.br) cls.push('br'); if (cell.thick) cls.push('thick');
-        if (cell.align) cls.push('align-' + cell.align);
-        if (cell.fontColor) cls.push('fc-' + cell.fontColor);
-        const isActive = (r === dA.r && c === dA.c);
-        const inSel = (r >= sr.r1 && r <= sr.r2 && c >= sr.c1 && c <= sr.c2);
-        if (isActive) cls.push('active');
-        else if (inSel && S.sel) cls.push('sel');
-        const isPoint = editing && editPointer && r === editPointer.r && c === editPointer.c;
-        if (isPoint) cls.push('point');
-        if (S.sel && inSel) { if (r === sr.r1) cls.push('sel-t'); if (r === sr.r2 && !fullColSel) cls.push('sel-b'); if (c === sr.c1) cls.push('sel-l'); if (c === sr.c2) cls.push('sel-r'); }
-        // Excel's fill-handle — the tiny green square at the selection's bottom-right (or on the lone active cell)
-        if (S.sel) { if (r === sr.r2 && c === sr.c2) cls.push('fh'); } else if (isActive) cls.push('fh');
 
-        let txt = escHtml(dispText(cell));
-        if (editing && isActive) {
-          // Editing cell: the formula buffer with coloured refs (matches the formula bar), in the pop-out overlay
-          const { refs } = parseFormulaRefs(ss.editBuf);
-          cls.push('editing');
-          txt = '<span class="edbox"><span class="edin">' + buildFormulaHTML(ss.editBuf, refs, ss.editCaret) + '</span></span>';
-        }
-        else if (cell.txt && (cell.ca | 0) > 1 && typeof cell.value === 'string') {
-          // CENTER ACROSS SELECTION — the anchor's text centers over its stored span; no merged cells
-          let caw = 0; for (let k2 = 0; k2 < cell.ca && c + k2 <= COLS; k2++) caw += ew[c + k2];
-          cls.push('spill');
-          txt = '<span class="sp" style="width:' + (caw - 12) + 'px;max-width:' + (caw - 12) + 'px;text-align:center;display:inline-block">' + txt + '</span>';
-        }
-        else if (cell.txt && !cell.wrap && typeof cell.value === 'string') {
-          // EXCEL PARITY — long text SPILLS across empty right neighbours, clipping at the first occupied cell
-          const est = cellTxtPx(cell);
-          if (est > ew[c]) {
-            let spillW = ew[c], cc = c + 1;
-            while (cc <= COLS) { const n = S.get(r, cc); if (n && n.value !== null && n.value !== '') break; spillW += ew[cc]; cc++; }
-            if (spillW > ew[c]) {
-              cls.push('spill');
-              // the highlighted anchor's outline/tint covers ONLY its own cell; the text paints on top
-              const hi = (isActive || (inSel && S.sel)) ? '<span class="sphi" style="width:' + ew[c] + 'px"></span>' : '';
-              txt = hi + '<span class="sp" style="max-width:' + (spillW - 12) + 'px">' + txt + '</span>';
+    let gh = '';
+    if (!patch) {
+      gw.style.setProperty('--cellh', ROW_H + 'px'); gw.style.setProperty('--cellpad', CELL_PAD + 'px');
+      this.grid.style.width = totalW + 'px';   // table-layout:fixed — the <col> widths are the column widths
+      // column widths, then the header row — no active-column highlight (the old build had none)
+      gh = '<colgroup><col style="width:' + ROWHDR_W + 'px">';
+      for (let c = 1; c <= COLS; c++) gh += '<col style="width:' + W[c] + 'px">';
+      gh += '</colgroup><tr><th class="rowhdr"></th>';
+      for (let c = 1; c <= COLS; c++) gh += '<th>' + L[c] + '</th>';
+      gh += '</tr>';
+    }
+
+    let i = 0;   // flat cell index, row-major
+    for (let r = 1; r <= ROWS; r++) {
+      const rowIn = hasSel && r >= sr.r1 && r <= sr.r2;
+      let row = patch ? '' : '<tr><th class="rowhdr">' + r + '</th>';
+      for (let c = 1; c <= COLS; c++, i++) {
+        const isActive = (r === dA.r && c === dA.c);
+        const inSel = rowIn && c >= sr.c1 && c <= sr.c2;
+        const isPoint = !!(editing && editPointer && r === editPointer.r && c === editPointer.c);
+        let cls = isActive ? 'active' : (inSel ? 'sel' : '');
+        if (isPoint) cls += ' point';
+        if (inSel) { if (r === sr.r1) cls += ' sel-t'; if (r === sr.r2) cls += ' sel-b'; if (c === sr.c1) cls += ' sel-l'; if (c === sr.c2) cls += ' sel-r'; }
+        // Excel's fill-handle — the tiny green square at the selection's bottom-right (or on the lone active cell)
+        if (hasSel ? (r === sr.r2 && c === sr.c2) : isActive) cls += ' fh';
+        const key = L[c] + r;
+        const refColor = refColors[key];
+        let style = '';
+        if (refColor && !isActive && !isPoint) style = 'outline:2px solid ' + refColor + ';outline-offset:-2px;z-index:2';
+        const rec = cells[key];
+        let txt = '';
+        if (rec || (editing && isActive)) {
+          const cell = rec || S.get(r, c);
+          const isNum = typeof cell.value === 'number';
+          if (cell.bold) cls += ' bold'; if (cell.txt && !isNum) cls += ' txt';
+          if (isErrVal(cell.value)) cls += ' err';
+          if (cell.it) cls += ' it'; if (cell.strike) cls += ' strike';
+          if (cell.uline) cls += ' uline';
+          if (cell.cmt) cls += ' cmt';
+          if (cell.wrap) cls += ' wrap'; if (cell.fill) cls += ' fill-' + cell.fill;
+          if (cell.bt) cls += ' bt'; if (cell.bb) cls += ' bb'; if (cell.ball) cls += ' ball'; if (cell.bdbl) cls += ' bdbl';
+          if (cell.bl) cls += ' bl'; if (cell.br) cls += ' br'; if (cell.thick) cls += ' thick';
+          if (cell.align) cls += ' align-' + cell.align;
+          if (cell.fontColor) cls += ' fc-' + cell.fontColor;
+
+          txt = escHtml(dispText(cell));
+          if (editing && isActive) {
+            // Editing cell: the formula buffer with coloured refs (matches the formula bar), in the pop-out overlay
+            const { refs } = parseFormulaRefs(ss.editBuf);
+            cls += ' editing';
+            txt = '<span class="edbox"><span class="edin">' + buildFormulaHTML(ss.editBuf, refs, ss.editCaret) + '</span></span>';
+          }
+          else if (cell.txt && (cell.ca | 0) > 1 && typeof cell.value === 'string') {
+            // CENTER ACROSS SELECTION — the anchor's text centers over its stored span; no merged cells
+            let caw = 0; for (let k2 = 0; k2 < cell.ca && c + k2 <= COLS; k2++) caw += W[c + k2];
+            cls += ' spill';
+            txt = '<span class="sp" style="width:' + (caw - 2 * CELL_PAD) + 'px;max-width:' + (caw - 2 * CELL_PAD) + 'px;text-align:center;display:inline-block">' + txt + '</span>';
+          }
+          else if (cell.txt && !cell.wrap && typeof cell.value === 'string') {
+            // EXCEL PARITY — long text SPILLS across empty right neighbours, clipping at the first occupied cell
+            const est = cellTxtPx(cell);
+            if (est > W[c]) {
+              let spillW = W[c], cc = c + 1;
+              while (cc <= COLS) { const n = cells[L[cc] + r]; if (n && n.value !== null && n.value !== '') break; spillW += W[cc]; cc++; }
+              if (spillW > W[c]) {
+                cls += ' spill';
+                // the highlighted anchor's outline/tint covers ONLY its own cell; the text paints on top
+                const hi = (isActive || inSel) ? '<span class="sphi" style="width:' + W[c] + 'px"></span>' : '';
+                txt = hi + '<span class="sp" style="max-width:' + (spillW - 2 * CELL_PAD) + 'px">' + txt + '</span>';
+              }
             }
           }
-        }
-        else if (isNum && !cell.wrap) {
-          // #### reads the ENGINE width (unscaled colW), never the elastic display width
-          const tw = cellNumPx(cell);
-          const ownW = colW[c] || COLW_DEFAULT;
-          if (tw > ownW) { cls.push('over'); txt = '#'.repeat(Math.max(3, Math.floor(ew[c] / 8))); }
+          else if (isNum && !cell.wrap) {
+            // #### when the number needs more than the column's engine width
+            const tw = cellNumPx(cell);
+            if (tw > W[c]) { cls += ' over'; txt = '#'.repeat(Math.max(3, Math.floor((W[c] - 2 * CELL_PAD) / HASH_PX))); }
+          }
+
+          if (cell.indent) {   // Alt H 6/5 indent — pad the content gutter (right edge for right-aligned cells)
+            const pad = CELL_PAD + (cell.indent | 0) * 13;
+            style += (cell.align === 'r') ? (';padding-right:' + pad + 'px') : (';padding-left:' + pad + 'px');
+          }
+          if (cell.fsz) style += ';font-size:' + cell.fsz + 'px';   // grow/shrink font (Alt H F G/K)
         }
 
-        const refColor = refColors[refKey(r, c)];
-        let extraStyle = '';
-        if (refColor && !isActive && !isPoint) {
-          extraStyle = `;outline:2px solid ${refColor};outline-offset:-2px;z-index:2`;
+        if (patch) {
+          if (oldCls[i] !== cls) { tds[i].className = cls; oldCls[i] = cls; }
+          if (oldSty[i] !== style) { tds[i].style.cssText = style; oldSty[i] = style; }
+          if (oldTxt[i] !== txt) { tds[i].innerHTML = txt; oldTxt[i] = txt; }
+        } else {
+          oldCls[i] = cls; oldSty[i] = style; oldTxt[i] = txt;
+          row += '<td data-r="' + r + '" data-c="' + c + '" class="' + cls + '"' + (style ? ' style="' + style + '"' : '') + '>' + txt + '</td>';
         }
-        if (cell.indent) {   // Alt H 6/5 indent — pad the content gutter (right edge for right-aligned cells)
-          const pad = 9 + (cell.indent | 0) * 13;
-          extraStyle += (cell.align === 'r') ? (';padding-right:' + pad + 'px') : (';padding-left:' + pad + 'px');
-        }
-        if (cell.fsz) extraStyle += ';font-size:' + cell.fsz + 'px';   // grow/shrink font (Alt H F G/K)
-        row += `<td data-r="${r}" data-c="${c}" class="${cls.join(' ')}" style="min-width:${ew[c]}px;max-width:${ew[c]}px${extraStyle}">${txt}</td>`;
       }
-      gh += row + '</tr>';
+      if (!patch) gh += row + '</tr>';
     }
-    this.grid.innerHTML = gh;   // the one and only grid write
+    if (!patch) {
+      this.grid.innerHTML = gh;   // the one full grid write
+      this._tds = Array.prototype.slice.call(this.grid.querySelectorAll('td'));
+      this._shape = shape;
+    }
 
     try { document.body.classList.toggle('hide-gridlines', !S.gridlines); } catch (e) { /* no body */ }
-    this.positionMarquee();
     const f = S.lastFlash;
-    if (f) { S.lastFlash = null;
+    if (f) { S.lastFlash = null;   // the one-shot paste flash: drop the class, flush, add it, so a repeat paste animates again
+      const hit = [];
       for (let r = f.r1; r <= f.r2; r++) for (let c = f.c1; c <= f.c2; c++) {
-        const td = this.grid.querySelector(`td[data-r="${r}"][data-c="${c}"]`); if (td) td.classList.add('pasted'); } }
+        const td = this.grid.querySelector('td[data-r="' + r + '"][data-c="' + c + '"]'); if (td) { td.classList.remove('pasted'); hit.push(td); } }
+      if (hit.length) { void this.grid.offsetWidth; for (const td of hit) td.classList.add('pasted'); }
+    }
+    this.keepActiveInView();
+    this.positionMarquee();
+    this.measurePage();
     this.updateFormulaBar();
+  }
+
+  /** The box changed size: the grid stands, the scroll position and the screen count follow. */
+  refit() { if (this.destroyed || !this.grid.rows.length) return; this.keepActiveInView(); this.positionMarquee(); this.measurePage(); }
+
+  /**
+   * The scroll box's geometry in content pixels, from the painted table: y0/x0 are where cell A1
+   * starts (the sticky header row and row-header column sit above / left of it), viewH/viewW the
+   * data area that shows. Null until the box has laid out.
+   */
+  box() {
+    const gw = this.gw, rows = this.grid.rows;
+    if (gw.clientHeight <= 0 || gw.clientWidth <= 0 || rows.length < 2) return null;
+    const y0 = rows[1].offsetTop, x0 = rows[1].cells[1] ? rows[1].cells[1].offsetLeft : rows[1].cells[0].offsetWidth;
+    return { y0, x0, viewH: gw.clientHeight - y0, viewW: gw.clientWidth - x0 };
+  }
+
+  /**
+   * Scroll .gridwrap (never the window) the least it takes to show the displayed active cell whole.
+   * Excel-true: rows and columns stay aligned, so a cell just below the box scrolls exactly one row,
+   * Ctrl+↓ on an empty column lands on the last row with the box scrolled there, Ctrl+Home goes
+   * back to the top-left.
+   */
+  keepActiveInView() {
+    const gw = this.gw, grid = this.grid, S = this.sheet;
+    const b = this.box(); if (!b) return;
+    const a = S.dispActive();
+    const td = grid.querySelector(`td[data-r="${a.r}"][data-c="${a.c}"]`); if (!td) return;
+    const tr = td.parentElement, rows = grid.rows;
+    const top = tr.offsetTop - b.y0, bottom = top + tr.offsetHeight;
+    const left = td.offsetLeft - b.x0, right = left + td.offsetWidth;
+    let st = gw.scrollTop, sl = gw.scrollLeft;
+    if (top < st) st = top;
+    else if (bottom > st + b.viewH) {   // the first row-aligned offset that shows the whole row
+      const need = bottom - b.viewH;
+      let i = Math.max(1, Math.min(rows.length - 1, Math.ceil(need / ROW_H) + 1));
+      while (i < rows.length - 1 && rows[i].offsetTop - b.y0 < need) i++;
+      while (i > 1 && rows[i - 1].offsetTop - b.y0 >= need) i--;
+      st = rows[i].offsetTop - b.y0;
+    }
+    if (left < sl) sl = left;
+    else if (right > sl + b.viewW) {    // the first column-aligned offset that shows the whole column
+      const need = right - b.viewW, tds = tr.cells;
+      let x = left;
+      for (let c = 1; c < tds.length; c++) { const l = tds[c].offsetLeft - b.x0; if (l >= need) { x = l; break; } }
+      sl = x;
+    }
+    st = Math.max(0, Math.round(st)); sl = Math.max(0, Math.round(sl));
+    if (st !== gw.scrollTop) gw.scrollTop = st;
+    if (sl !== gw.scrollLeft) gw.scrollLeft = sl;
+  }
+
+  /** session.pageRows / pageCols: the rows and columns fully visible in the box at its current scroll (one screen). */
+  measurePage() {
+    const ss = this.session, gw = this.gw, rows = this.grid.rows;
+    const b = this.box(); if (!b) return;
+    const st = gw.scrollTop, sl = gw.scrollLeft;
+    let nr = 0;
+    for (let i = 1; i < rows.length; i++) {
+      const t = rows[i].offsetTop - b.y0 - st; if (t + rows[i].offsetHeight > b.viewH + 0.5) break;
+      if (t >= -0.5) nr++;
+    }
+    let nc = 0; const tds = rows[1].cells;
+    for (let c = 1; c < tds.length; c++) {
+      const l = tds[c].offsetLeft - b.x0 - sl; if (l + tds[c].offsetWidth > b.viewW + 0.5) break;
+      if (l >= -0.5) nc++;
+    }
+    ss.pageRows = Math.max(1, nr); ss.pageCols = Math.max(1, nc);
   }
 
   /** The marching ants over the copied block (sheet.clipboard.rect), placed over the live cells. */

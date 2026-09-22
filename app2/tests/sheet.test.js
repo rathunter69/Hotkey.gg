@@ -1,8 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Sheet } from '../engine/sheet.js';
+import { Sheet, COLW_DEFAULT } from '../engine/sheet.js';
 
-const seed = () => new Sheet({ cells: { A1: { value: 10 }, A2: { value: 20 }, A3: { value: 30 }, B1: { value: 'Sales', bold: true } } });
+// The default sheet is Excel-sized (100 × 26). Tests about the grid's EDGES (whole-row selections
+// such as A2:J2, a push off the bottom, clamping) say their size explicitly: a 20 × 10 grid.
+const SMALL = { rows: 20, cols: 10 };
+const seed = () => new Sheet({ ...SMALL, cells: { A1: { value: 10 }, A2: { value: 20 }, A3: { value: 30 }, B1: { value: 'Sales', bold: true } } });
 
 test('seeding and reading back', () => {
   const s = seed();
@@ -97,21 +100,21 @@ test('sort keeps rows together and blanks last', () => {
 });
 
 test('insert and delete rows/columns shift cells, formulas and widths', () => {
-  const s = new Sheet({ cells: { A1: { value: 1 }, A2: { value: 2 }, A3: { formula: '=SUM(A1:A2)' }, C1: { formula: '=A1' } }, colW: { 1: 120 } });
+  const s = new Sheet({ ...SMALL, cells: { A1: { value: 1 }, A2: { value: 2 }, A3: { formula: '=SUM(A1:A2)' }, C1: { formula: '=A1' } }, colW: { 1: 120 } });
   s.select('A1:J1'); assert.equal(s.insertOrDelete(true), true);
   assert.equal(s.value('A1'), null); assert.equal(s.value('A2'), 1); assert.equal(s.formula('A4'), '=SUM(A2:A3)'); assert.equal(s.formula('C2'), '=A2');
   s.setCell('E1', { formula: '=A2' }); s.recalc(); assert.equal(s.value('E1'), 1);
   s.select('A2:J2'); s.insertOrDelete(false); assert.equal(s.formula('A3'), '=SUM(A2:A2)'); assert.equal(s.formula('E1'), '=#REF!'); assert.equal(s.value('E1'), '#REF!'); assert.equal(s.formula('C1'), null);
-  s.select('A1:A20'); s.insertOrDelete(true); assert.equal(s.formula('B3'), '=SUM(B2:B2)'); assert.equal(s.colW[2], 120); assert.equal(s.colW[1], 78); assert.equal(s.formula('F1'), '=#REF!');
+  s.select('A1:A20'); s.insertOrDelete(true); assert.equal(s.formula('B3'), '=SUM(B2:B2)'); assert.equal(s.colW[2], 120); assert.equal(s.colW[1], COLW_DEFAULT); assert.equal(s.formula('F1'), '=#REF!');
   s.select('B2'); assert.equal(s.insertOrDelete(true), false);   // partial selection: the chord does nothing
 });
 
 test('column widths: autofit, explicit width, auto-grow after number formats', () => {
   const s = new Sheet({ cells: { A1: { value: 1234567.891 } } });
   assert.equal(s.overflowsCol(1), true);
-  s.select('A1'); s.autofitCols(); assert.equal(s.overflowsCol(1), false); assert.ok(s.colW[1] > 78);
+  s.select('A1'); s.autofitCols(); assert.equal(s.overflowsCol(1), false); assert.ok(s.colW[1] > COLW_DEFAULT);
   s.setColWidth(10); assert.equal(s.colW[1], 75);
-  const t = new Sheet({ cells: { B1: { value: 123456 } } }); t.select('B1'); t.setNumberFormat('currency', 2); assert.ok(t.colW[2] > 78);
+  const t = new Sheet({ cells: { B1: { value: 123456 } } }); t.select('B1'); t.setNumberFormat('currency', 2); assert.ok(t.colW[2] > COLW_DEFAULT);
 });
 
 test('toJSON keeps only what differs from a blank cell', () => {
@@ -178,17 +181,17 @@ test('a self-reference that only exists through OFFSET is circular and stays 0 a
 });
 
 test('a paste whose footprint would run off the sheet is refused and leaves everything intact', () => {
-  const s = new Sheet({ cells: { A1: { value: 10 }, A2: { value: 20 }, A3: { value: 30 }, A4: { value: 40 }, A5: { value: 50 }, C1: { formula: '=SUM(A21:A22)' } } });
+  const s = new Sheet({ ...SMALL, cells: { A1: { value: 10 }, A2: { value: 20 }, A3: { value: 30 }, A4: { value: 40 }, A5: { value: 50 }, C1: { formula: '=SUM(A21:A22)' } } });
   s.select('A1:A5'); s.copy(); s.select('A18'); assert.equal(s.paste('all'), false);
   assert.deepEqual(Object.keys(s.cells).filter(k => +k.slice(1) > s.rows), []); assert.equal(s.value('A18'), null); assert.equal(s.value('C1'), 0);
   assert.equal(s.selectionText(), 'A18'); assert.equal(s.undoStack.length, 0); assert.ok(s.clipboard);
   s.select('A16'); assert.equal(s.paste('all'), true); assert.equal(s.value('A20'), 50);
-  const c = new Sheet({ cells: { J1: { value: 1 }, J2: { value: 2 } } }); c.select('J1:J2'); c.copy(true); c.select('J20');
+  const c = new Sheet({ ...SMALL, cells: { J1: { value: 1 }, J2: { value: 2 } } }); c.select('J1:J2'); c.copy(true); c.select('J20');
   assert.equal(c.paste(), false); assert.equal(c.value('J1'), 1); assert.equal(c.value('J21'), null); assert.ok(c.clipboard);   // the cut source is untouched, the marquee stays
-  const t = new Sheet({ cells: { A1: { value: 1 }, A2: { value: 2 }, A3: { value: 3 }, A4: { value: 4 }, A5: { value: 5 } } }); t.select('A1:A5'); t.copy();
+  const t = new Sheet({ ...SMALL, cells: { A1: { value: 1 }, A2: { value: 2 }, A3: { value: 3 }, A4: { value: 4 }, A5: { value: 5 } } }); t.select('A1:A5'); t.copy();
   t.select('H1'); assert.equal(t.paste('transpose'), false); assert.equal(t.value('K1'), null);
   t.select('F1'); assert.equal(t.paste('transpose'), true); assert.equal(t.value('J1'), 5);
-  const m = new Sheet({ cells: { A1: { value: 1 } } }); m.select('A1'); m.copy(); m.select('A1:A20'); assert.equal(m.paste(), true); assert.equal(m.value('A20'), 1);   // tiling over an in-grid selection is fine
+  const m = new Sheet({ ...SMALL, cells: { A1: { value: 1 } } }); m.select('A1'); m.copy(); m.select('A1:A20'); assert.equal(m.paste(), true); assert.equal(m.value('A20'), 1);   // tiling over an in-grid selection is fine
 });
 
 test('commit parsing keeps typed precision, reads trailing/leading-point numbers, and scales every numeric entry in a percent cell', () => {
@@ -207,14 +210,14 @@ test('commit parsing keeps typed precision, reads trailing/leading-point numbers
 });
 
 test('an insert that would push a non-blank cell off the grid is refused; a blank pushed off leaves #REF! behind', () => {
-  const s = new Sheet({ cells: { J1: { value: 99 }, A1: { formula: '=J1*2' } } }); s.select('B1:B20'); const before = JSON.stringify(s.toJSON());
+  const s = new Sheet({ ...SMALL, cells: { J1: { value: 99 }, A1: { formula: '=J1*2' } } }); s.select('B1:B20'); const before = JSON.stringify(s.toJSON());
   assert.equal(s.insertOrDelete(true), false); assert.equal(JSON.stringify(s.toJSON()), before); assert.equal(s.undoStack.length, 0); assert.equal(s.value('A1'), 198);
-  const r = new Sheet({ cells: { A20: { value: 7 }, A1: { formula: '=A20+1' } } }); r.select('A2:J2'); assert.equal(r.insertOrDelete(true), false); assert.equal(r.formula('A1'), '=A20+1');
-  const f = new Sheet({ cells: { J1: { bold: true } } }); f.select('A1:A20'); assert.equal(f.insert('c'), false);   // formatting counts as non-blank, like Excel
-  const b = new Sheet({ cells: { A1: { formula: '=J1' }, B1: { formula: '=SUM(H1:J1)' }, C1: { formula: '=SUM(J1:J2)' }, D1: { formula: '=$J$1' } } }); b.select('B1:B20');
+  const r = new Sheet({ ...SMALL, cells: { A20: { value: 7 }, A1: { formula: '=A20+1' } } }); r.select('A2:J2'); assert.equal(r.insertOrDelete(true), false); assert.equal(r.formula('A1'), '=A20+1');
+  const f = new Sheet({ ...SMALL, cells: { J1: { bold: true } } }); f.select('A1:A20'); assert.equal(f.insert('c'), false);   // formatting counts as non-blank, like Excel
+  const b = new Sheet({ ...SMALL, cells: { A1: { formula: '=J1' }, B1: { formula: '=SUM(H1:J1)' }, C1: { formula: '=SUM(J1:J2)' }, D1: { formula: '=$J$1' } } }); b.select('B1:B20');
   assert.equal(b.insertOrDelete(true), true); assert.equal(b.formula('A1'), '=#REF!'); assert.equal(b.value('A1'), '#REF!');
   assert.equal(b.formula('C1'), '=SUM(I1:J1)'); assert.equal(b.formula('D1'), '=SUM(#REF!)'); assert.equal(b.formula('E1'), '=#REF!'); assert.ok(!b.cells.K1);
-  const rr = new Sheet({ cells: { A1: { formula: '=A20' }, B1: { formula: '=SUM(A19:A20)' } } }); rr.select('A2:J2'); assert.equal(rr.insertOrDelete(true), true);
+  const rr = new Sheet({ ...SMALL, cells: { A1: { formula: '=A20' }, B1: { formula: '=SUM(A19:A20)' } } }); rr.select('A2:J2'); assert.equal(rr.insertOrDelete(true), true);
   assert.equal(rr.formula('A1'), '=#REF!'); assert.equal(rr.formula('B1'), '=SUM(A20:A20)'); assert.ok(!rr.cells.A21);
 });
 
@@ -226,19 +229,20 @@ test('deleting rows keeps the active column and deleting columns keeps the activ
 });
 
 test('an inserted band inherits formats (alignment, borders) but never a comment or the text flag', () => {
-  const s = new Sheet({ cells: { A1: { value: 'Total', bold: true, cmt: true, ca: 3, bt: true } } }); s.select('A2:J2'); s.insertOrDelete(true);
+  const s = new Sheet({ ...SMALL, cells: { A1: { value: 'Total', bold: true, cmt: true, ca: 3, bt: true } } }); s.select('A2:J2'); s.insertOrDelete(true);
   const a2 = s.cellAt('A2'); assert.equal(a2.bold, true); assert.equal(a2.ca, 3); assert.equal(a2.bt, true); assert.equal(a2.cmt, false); assert.equal(a2.txt, false); assert.equal(a2.value, null);
   assert.equal(s.cellAt('A1').cmt, true); assert.ok(!s.cells.B2);
-  const k = new Sheet({ cells: { A1: { value: 'T', bold: true, cmt: true } } }); k.select('B1:B20'); k.insertOrDelete(true); assert.equal(k.cellAt('B1').bold, true); assert.equal(k.cellAt('B1').cmt, false);
-  const o = new Sheet({ cells: { A1: { value: 'T', cmt: true } } }); o.select('A2:J2'); o.insertOrDelete(true); assert.ok(!o.cells.A2);   // a comment alone is nothing to inherit
+  const k = new Sheet({ ...SMALL, cells: { A1: { value: 'T', bold: true, cmt: true } } }); k.select('B1:B20'); k.insertOrDelete(true); assert.equal(k.cellAt('B1').bold, true); assert.equal(k.cellAt('B1').cmt, false);
+  const o = new Sheet({ ...SMALL, cells: { A1: { value: 'T', cmt: true } } }); o.select('A2:J2'); o.insertOrDelete(true); assert.ok(!o.cells.A2);   // a comment alone is nothing to inherit
 });
 
 test('select() clamps a range to the grid, so selection ops never create off-grid cells', () => {
-  const s = new Sheet(); s.select('A1:Z50'); assert.equal(s.selectionText(), 'A1:J20'); s.toggleAllOrNone('bold');
+  const s = new Sheet(SMALL); s.select('A1:Z50'); assert.equal(s.selectionText(), 'A1:J20'); s.toggleAllOrNone('bold');
   assert.equal(Object.keys(s.cells).length, s.rows * s.cols); assert.ok(!s.cells.Z50);
   s.select('H15:M25'); assert.equal(s.selectionText(), 'H15:J20');
   s.select('K21:Z50'); assert.equal(s.selectionText(), 'J20'); assert.equal(s.sel, null);   // collapses to a single cell
-  assert.deepEqual(new Sheet({ active: { r: 99, c: 99 } }).active, { r: 20, c: 10 });
+  assert.deepEqual(new Sheet({ ...SMALL, active: { r: 99, c: 99 } }).active, { r: 20, c: 10 });
+  const d = new Sheet(); assert.deepEqual(new Sheet({ active: { r: 999, c: 99 } }).active, { r: d.rows, c: d.cols });   // the Excel-sized default clamps the same way
 });
 
 test('an empty entry is a no-op: no undo frame, the redo stack survives', () => {

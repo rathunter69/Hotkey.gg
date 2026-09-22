@@ -143,12 +143,18 @@ body{padding-top:14px}
 .ftimer.run{color:var(--accent)}
 
 /* ---------- 4. grid wrap, table, cells, spill, fills (index.html 151–260) ---------- */
-.gridwrap{background:transparent; border:0; border-radius:0;
-  padding:0 10px 3px 0; overflow:visible; position:relative; min-width:0;   /* r79: sheet flush to the frame's top-left, like the real thing */
-  align-self:stretch; display:flex; flex-direction:column}
+/* The sheet is Excel at 100% (SITE_SPEC §4). The wrap is a SCROLL BOX: the frame's flex chain (section
+   11) gives it its height and width, and its own content adds nothing to either (the table is absolutely
+   positioned inside it), so a 100-row sheet never grows the page or pushes the panel. The table paints
+   every row and column of the model at the engine widths with table-layout:fixed; sheet-view.js writes
+   the table width and the <col> widths, and --cellh / --cellpad, from the same numbers these tokens
+   fall back to. r79: sheet flush to the frame's top-left, like the real thing. */
+.gridwrap{background:transparent; border:0; border-radius:0; padding:0; margin:0;
+  overflow:auto; position:relative; min-width:0; min-height:0; align-self:stretch; display:block;
+  --cellh:20px; --cellpad:3px; --cellfs:14.67px; --rowhdrw:36px}   /* Excel's defaults: 20px rows, 11pt cells, a 36px row-number column */
 /* r304: the sheet background paints on the TABLE, not the wrap */
-.gridwrap table{flex:1 1 auto; height:100%; background:var(--surface)}   /* r70b: flex-basis alone doesn't stretch display:table in all engines — height:100% against the resolved gridwrap height does. Rows share the surplus; --cellh is the floor. */
-table{border-collapse:collapse; font-family:var(--cellfont); font-size:13.5px}   /* r65: Calibri renders smaller — sized up */
+.gridwrap table{position:absolute; top:0; left:0; table-layout:fixed; background:var(--surface); font-size:var(--cellfs,14.67px)}
+table{border-collapse:collapse; font-family:var(--cellfont); font-size:13.5px}   /* r65: Calibri renders smaller — sized up (tables outside the grid; the grid sets its own size above) */
 /* r216: the edit caret is a zero-width CSS bar constrained inside the text's line box, so entering
    edit mode never reflows the row. */
 .edcaret{display:inline-block; width:0; height:.92em; border-right:1.6px solid var(--accent);
@@ -162,7 +168,7 @@ th{background:var(--surface2); color:var(--muted); font-weight:500; text-align:c
 td{padding:0 9px; height:var(--cellh, 24px); color:var(--text); white-space:nowrap; vertical-align:middle; transition:background .08s}
 td.txt{text-align:left}
 td.spill{overflow:visible; z-index:3}   /* r107: Excel-parity text spill (see render) */
-td.spill .sp{position:absolute; left:9px; top:0; bottom:0; display:flex; align-items:center;
+td.spill .sp{position:absolute; left:var(--cellpad,3px); top:0; bottom:0; display:flex; align-items:center;
   white-space:nowrap; overflow:hidden; pointer-events:none; text-align:left}
 /* r312: a spilling cell's highlight is SINGLE-CELL, not spanning. .sphi width is the cell's own width (set in render). */
 td.active.spill, td.sel.spill{outline:none; background:transparent}
@@ -238,12 +244,16 @@ td.over{color:var(--warn); letter-spacing:1px}
    empty neighbors to the right. */
 td.editing{text-align:left; color:var(--text); background:transparent; box-shadow:none; padding:0; overflow:visible; z-index:6}
 td.editing .edbox{position:absolute; left:0; top:0; bottom:0; min-width:100%; width:max-content; max-width:640px;
-  display:flex; align-items:center; padding:0 8px; box-sizing:border-box; background:var(--bg); color:var(--text);
+  display:flex; align-items:center; padding:0 var(--cellpad,3px); box-sizing:border-box; background:var(--bg); color:var(--text);
   box-shadow:inset 0 0 0 2px var(--accent); z-index:6}
 td.editing .edin{white-space:nowrap}
 
 /* ---------- 5. gridline softener + gridlines toggle (index.html 286, 289) ---------- */
-#grid td{border-color:color-mix(in srgb, var(--line) 52%, transparent)}
+/* The mix is computed ONCE on the wrap and inherited by 2,600 cells as a plain colour: registered, so the
+   browser stores it typed instead of re-evaluating color-mix() per cell (a third of a full repaint's style time). */
+@property --gridline{syntax:'<color>'; inherits:true; initial-value:transparent}
+.gridwrap{--gridline:color-mix(in srgb, var(--line) 52%, transparent)}
+#grid td{border-color:var(--gridline)}
 body.hide-gridlines #grid td{border-color:transparent}
 
 /* ---------- 6. cursor tokens, active, point, selection, fill-handle, marquee (463, 471–494, 501–514) ---------- */
@@ -620,9 +630,11 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 .rf-tools .rpin{margin-left:0}
 
 /* ---------- 13. density pass (index.html 2296–2298) — MUST stay LAST: the ID-scoped rule beats the base td rule ---------- */
-/* ---- density pass (r36): grid reads like Excel at 100%, not 140% ---- */
-#grid td, #grid th{font-size:12px; height:21px; padding:2px 7px}
-#grid th{font-size:10.5px}
-#grid td.fillcell{pointer-events:none}   /* r399: empty canvas rows below the data — inert, purely visual */
+/* ---- Excel at 100% (SITE_SPEC §4): 20px rows, 11pt Arial/Calibri-class cells, 11px headers that stick ---- */
+#grid td, #grid th{font-size:var(--cellfs,14.67px); height:var(--cellh,20px); padding:0 var(--cellpad,3px); line-height:1.15}   /* 11pt sits in a 20px row with 1.5px to spare, like Calibri 11 in Excel's 15pt row */
+#grid th{font-size:11px; padding:0 2px; position:sticky; z-index:7; background:var(--surface2)}   /* above every cell layer (active 4, editing 6, marquee 6); the ribbon slot (12) and dialogs (30) stay above */
+#grid tr:first-child th{top:0}               /* the column letters ride the top edge of the scroll box */
+#grid th.rowhdr{left:0}                      /* the row numbers ride the left edge */
+#grid tr:first-child th.rowhdr{z-index:8}    /* the corner sits over both */
 /* r353: the Paste Special / Format Cells wrapper is positioning-only; .pd-box carries the one tight card look. */
 #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
