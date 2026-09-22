@@ -61,7 +61,7 @@ export function renderLegal(kind, status = LEGAL_STATUS) {
   const banner = status.reviewed ? '' : `<div class="draft-banner" role="status"><b>DRAFT</b> This page is a plain-English draft awaiting legal review. It states our real intent but is not yet the final text.</div>\n    `;
   return `${banner}<div class="page-head"><h1>${esc(L.title)}</h1><p class="page-sub">${esc(L.intro)}</p></div>
     <div class="legal-body">${L.sections.map(([h, p], i) => `<section class="legal-sec"><h2>${i + 1}. ${esc(h)}</h2><p>${esc(p)}</p></section>`).join('')}</div>
-    <p class="page-fine">Last updated ${esc(status.updated)}${status.reviewed ? '' : ' (draft, pre-review)'}. ${esc(MS_DISCLAIMER)} Questions go to the <a href="#/contact">contact page</a>.</p>`;
+    <p class="page-fine">Last updated ${esc(status.updated)}${status.reviewed ? '' : ' (draft, pre-review)'}. ${esc(MS_DISCLAIMER)}${kind === 'contact' ? '' : ' Questions go to the <a href="#/contact">contact page</a>.'}</p>`;
 }
 
 export function mountLegalPage(root, kind) {
