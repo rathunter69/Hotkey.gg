@@ -28,9 +28,9 @@ export function recordMouse(session, what) {
 }
 
 /** Dialogs that own the input while open: the sheet and the bar behind them ignore clicks (Excel's modal cards). */
-export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'sortwarn', 'series', 'fxfix', 'goto', 'options', 'pagesetup']);
+export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'sortwarn', 'series', 'fxfix', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet']);
 /** The dialogs drawn as floating cards over the sheet (ribbon-view drawDialog), not as anchored dropdowns. */
-export const CARD_DIALOGS = new Set(['fmt', 'paste', 'goto', 'options', 'pagesetup']);
+export const CARD_DIALOGS = new Set(['fmt', 'paste', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet']);
 
 /** Leave the Alt walk without acting (a mouse command supersedes any open KeyTip path or dropdown). */
 export function leaveRibbon(session) { if (session.mode === 'ribbon') session.exitRibbon(false); }
@@ -148,6 +148,11 @@ export const ICON = {
   insertCols: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18"/><path d="M12 10v4M10 12h4" stroke-width="2.5"/>'),
   deleteRows: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18"/><path d="M10 10l4 4M14 10l-4 4"/>'),
   deleteCols: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18"/><path d="M10 10l4 4M14 10l-4 4"/>'),
+  // the sheet commands: a grid with its tab strip along the bottom, then a plus / a cross / a text cursor / an arrow
+  insertSheet: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 16h18M7 21v-5"/><path d="M12 6v7M8.5 9.5h7"/>'),
+  deleteSheet: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 16h18M7 21v-5"/><path d="M9 6.5l6 6M15 6.5l-6 6"/>'),
+  renameSheet: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 16h18M7 21v-5"/><path d="M10 6h4M12 6v7M10 13h4"/>'),
+  moveSheet: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 16h18M7 21v-5"/><path d="M7 9.5h10M13.5 6l3.5 3.5-3.5 3.5"/>'),
   // File backstage, Page Layout, Go To and the Quick Access Toolbar
   info: svg('<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/>'),
   newDoc: svg('<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 12v6M9 15h6"/>'),
@@ -241,6 +246,11 @@ export const RIBBON_COMMANDS = {
   'HOW': C('Column width…', 'Cells', 'H', ICON.colWidth, dialog('colw', s => { s.colwBuf = ''; })),
   'HOE': C('Format cells…', 'Cells', 'H', ICON.format, fmtCells, 'Ctrl+1'),
   'OE': C('Format cells…', 'Cells', 'H', ICON.format, fmtCells, 'Ctrl+1'),
+  // Home · Cells › the sheet commands: the same Session methods the KeyTips reach (the tabs strip's ⊕ and double-click share them)
+  'HIS': C('Insert sheet', 'Cells', 'H', ICON.insertSheet, s => { leaveRibbon(s); s.startClock(); s.insertSheet(); }, 'Shift+F11'),
+  'HDS': C('Delete sheet', 'Cells', 'H', ICON.deleteSheet, s => { leaveRibbon(s); s.startClock(); s.askDeleteSheet(); }),
+  'HOR': C('Rename sheet', 'Cells', 'H', ICON.renameSheet, s => { leaveRibbon(s); s.openRenameSheet(); }),
+  'HOM': C('Move or copy sheet…', 'Cells', 'H', ICON.moveSheet, s => { leaveRibbon(s); s.openMoveSheet(); }),
   // Home · Editing
   'HUS': C('AutoSum', 'Editing', 'H', ICON.sum, autoSum, 'Alt+='),
   'HFIS': C('Series…', 'Editing', 'H', ICON.series, dialog('series')),

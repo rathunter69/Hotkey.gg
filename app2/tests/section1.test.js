@@ -1,33 +1,35 @@
-// app2/tests/section1.test.js — Chapter 1, section 1 "How Excel works": the four lessons' own
+// app2/tests/section1.test.js — Chapter 1, section 1 "How Excel works": the five lessons' own
 // checks beyond the generic lesson tests (lessons.test.js validates the format, replays the solution
-// and every hint). Here: the workbook the first lesson builds, what each mechanic goal accepts and
-// refuses (Go To by the dialog box, the sheet keys, an open Ribbon tab, the recorded settings), and
-// the end states that keep a lesson open when a landed goal is undone or flipped back. Headless.
+// and every hint). Here: the workbooks the sheet lessons build, what each mechanic goal accepts and
+// refuses (Go To by the dialog box, the sheet keys, the sheet commands and their confirm card, an
+// open Ribbon tab, the recorded settings), and the end states that keep a lesson open when a landed
+// goal is undone or flipped back. Headless.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { CHAPTERS, LESSONS, LESSONS_BY_ID, sectionsOf } from '../content/index.js';
 import { CONCEPTS } from '../content/schema.js';
 import { LessonRun } from '../app/runner.js';
 
-const S1 = ['workbook-sheets-cells', 'ribbon-and-keytips', 'excel-options', 'page-setup'];
+const S1 = ['workbook-sheets-cells', 'managing-sheets', 'ribbon-and-keytips', 'excel-options', 'page-setup'];
+// the prerequisite each section-1 lesson names: a chain from the Welcome race, with the sheet lesson a side branch off the workbook lesson
+const PREREQ = { 'workbook-sheets-cells': 'welcome-race', 'managing-sheets': 'workbook-sheets-cells', 'ribbon-and-keytips': 'workbook-sheets-cells', 'excel-options': 'ribbon-and-keytips', 'page-setup': 'excel-options' };
 const byId = id => { const l = LESSONS_BY_ID[id]; assert.ok(l, `${id} is in the catalogue`); return l; };
 const fresh = id => new LessonRun(byId(id), { now: () => 0 });
+const namesOf = run => run.session.sheets.map(s => s.name);
 
-test('section 1: four free lessons in "How Excel works", right after the Welcome race, chained by prerequisite', () => {
+test('section 1: five free lessons in "How Excel works", right after the Welcome race, each on a prerequisite that comes earlier', () => {
   const ch = CHAPTERS.find(c => c.id === 'foundations');
   const sec = sectionsOf(ch).find(g => g.name === 'How Excel works');
   assert.deepEqual(sec.lessons.map(l => l.id), S1);
-  assert.deepEqual(LESSONS.slice(0, 6).map(l => l.id), ['welcome-race', ...S1, 'active-cell']);
-  let prev = 'welcome-race';
+  assert.deepEqual(LESSONS.slice(0, 7).map(l => l.id), ['welcome-race', ...S1, 'active-cell']);
   for (const id of S1) {
     const l = byId(id);
     assert.equal(l.access, 'free', `${id} is free`); assert.equal(l.section, 'How Excel works');
-    assert.deepEqual(l.prerequisites, [prev], `${id} follows ${prev}`);
+    assert.deepEqual(l.prerequisites, [PREREQ[id]], `${id} follows ${PREREQ[id]}`);
     assert.ok(l.goals.length >= 3 && l.goals.length <= 5, `${id}: 3-5 goals`);
-    prev = id;
   }
   // every concept the section adds has a gloss and is taught by one of its lessons
-  for (const c of ['workbook', 'sheet-tabs', 'go-to', 'sheet-reference', 'ribbon-tabs', 'gridlines', 'excel-options', 'calc-mode', 'iterative-calc', 'quick-access-toolbar', 'calculate-now', 'page-setup', 'orientation', 'fit-to-page', 'font-color', 'input-colour-convention']) {
+  for (const c of ['workbook', 'sheet-tabs', 'go-to', 'sheet-reference', 'rename-sheet', 'insert-sheet', 'delete-sheet', 'move-sheet', 'ribbon-tabs', 'gridlines', 'excel-options', 'calc-mode', 'iterative-calc', 'quick-access-toolbar', 'calculate-now', 'page-setup', 'orientation', 'fit-to-page', 'font-color', 'input-colour-convention']) {
     assert.ok(CONCEPTS[c], `${c} has a gloss`);
     assert.ok(S1.some(id => byId(id).concepts.includes(c)), `${c} is taught in section 1`);
   }
@@ -37,13 +39,13 @@ test('section 1: four free lessons in "How Excel works", right after the Welcome
 
 test('lesson 1: the run is a two-sheet workbook, Sales first and Costs with its own cells, rebuilt on reset', () => {
   const run = fresh('workbook-sheets-cells');
-  assert.deepEqual(run.session.sheets.map(s => s.name), ['Sales', 'Costs']);
+  assert.deepEqual(namesOf(run), ['Sales', 'Costs']);
   assert.equal(run.session.sheetIndex, 0); assert.equal(run.sheet.value('A1'), 'Weekly Sales Report'); assert.equal(run.sheet.value('C4'), 31);
   const costs = run.session.sheets[1].sheet;
   assert.equal(costs.value('A1'), 'Weekly Costs'); assert.equal(costs.value('B3'), 640); assert.equal(costs.colW[1], 84);
   run.run('Ctrl+PgDn "x" Enter'); assert.equal(costs.value('A1'), 'x');
   run.reset();
-  assert.deepEqual(run.session.sheets.map(s => s.name), ['Sales', 'Costs']); assert.equal(run.session.sheetIndex, 0);
+  assert.deepEqual(namesOf(run), ['Sales', 'Costs']); assert.equal(run.session.sheetIndex, 0);
   assert.equal(run.session.sheets[1].sheet.value('A1'), 'Weekly Costs', 'reset rebuilds the second sheet from the lesson data');
 });
 
@@ -78,9 +80,50 @@ test('lesson 1: the sheet goals need the sheet keys, and Go To onto the other sh
   assert.equal(run.session.sheets[0].sheet.selectionText(), 'B3:B7', 'the Sales sheet keeps its own selection');
 });
 
-/* ---------------- lesson 2: the Ribbon and KeyTips ---------------- */
+/* ---------------- lesson 2: sheets — insert, rename and delete ---------------- */
 
-test('lesson 2: goal 1 needs the View tab open; gridlines by end state; Home then Esc, Esc by the key window and the mode', () => {
+test('lesson 2: the run is a three-sheet workbook — Sales, a blank Sheet2 and a stale Old — rebuilt on reset', () => {
+  const run = fresh('managing-sheets');
+  assert.deepEqual(namesOf(run), ['Sales', 'Sheet2', 'Old']); assert.equal(run.session.sheetIndex, 0);
+  assert.equal(run.sheet.value('A1'), 'Weekly Sales Report'); assert.equal(run.sheet.colW[1], 84);
+  assert.equal(run.session.sheetHasContent(1), false, 'Sheet2 is blank: deleting it would not ask');
+  assert.equal(run.session.sheetHasContent(2), true, 'Old holds data: deleting it asks first'); assert.equal(run.session.sheets[2].sheet.value('A1'), 'Old sales (superseded)');
+  run.run('Ctrl+PgDn Alt H O R "Costs" Enter Ctrl+PgDn Alt H D S Enter'); assert.deepEqual(namesOf(run), ['Sales', 'Costs']); assert.equal(run.doneCount, 2);
+  run.reset();
+  assert.deepEqual(namesOf(run), ['Sales', 'Sheet2', 'Old']); assert.equal(run.session.sheetIndex, 0); assert.equal(run.doneCount, 0);
+  assert.equal(run.session.sheets[2].sheet.value('B3'), 1150, 'reset rebuilds the Old sheet from the lesson data');
+});
+
+test('lesson 2: every goal grades the sheet names in order — the route is free, the wrong sheet or the wrong place is not', () => {
+  const L = 'managing-sheets';
+  let run = fresh(L);
+  // goal 1: Sales renamed Costs is the wrong sheet; Sheet2 renamed by the KeyTips, or by the tab's double-click path from anywhere, counts; the case matters
+  run.run('Alt H O R "Costs" Enter'); assert.deepEqual(namesOf(run), ['Costs', 'Sheet2', 'Old']); assert.equal(run.doneCount, 0, 'Sales renamed Costs is not the goal');
+  run.run('Alt H O R "Sales" Enter Ctrl+PgDn Alt H O R "Costs" Enter'); assert.deepEqual(namesOf(run), ['Sales', 'Costs', 'Old']); assert.equal(run.doneCount, 1);
+  run = fresh(L); run.session.openRenameSheet(1); run.run('"costs" Enter'); assert.equal(run.doneCount, 0, 'costs is not Costs');
+  run.session.openRenameSheet(1); run.run('"Costs" Enter'); assert.equal(run.doneCount, 1, 'the strip\'s double-click route counts'); assert.equal(run.session.sheetIndex, 0);
+  // goal 2: Old goes through the confirm card; Esc keeps it; a blank sheet would not ask
+  run.run('Ctrl+PgDn Ctrl+PgDn Alt H D S'); assert.equal(run.session.dialog, 'deletesheet'); assert.equal(run.session.sheets.length, 3); assert.equal(run.doneCount, 1);
+  run.run('Escape'); assert.equal(run.session.dialog, null); assert.equal(run.session.sheets.length, 3); assert.equal(run.doneCount, 1, 'Cancel keeps the sheet'); run.run('Escape Escape Escape');
+  run.run('Alt H D S Enter'); assert.deepEqual(namesOf(run), ['Sales', 'Costs']); assert.equal(run.session.sheetIndex, 1, 'Costs, the previous sheet, becomes active'); assert.equal(run.doneCount, 2);
+  // goal 3: the new sheet must sit between Sales and Costs — Shift+F11 from Costs; from Sales it lands in front and the goal waits; Alt H I S is the same insert
+  run.run('Ctrl+PgUp Shift+F11'); assert.deepEqual(namesOf(run), ['Sheet3', 'Sales', 'Costs']); assert.equal(run.doneCount, 2, 'inserted in front of Sales: not the goal');
+  run.run('Alt H D S'); assert.deepEqual(namesOf(run), ['Sales', 'Costs']); assert.equal(run.session.dialog, null, 'a blank sheet goes without the confirm');
+  run.run('Ctrl+PgDn Alt H I S'); assert.deepEqual(namesOf(run), ['Sales', 'Sheet3', 'Costs']); assert.equal(run.session.sheetIndex, 1); assert.equal(run.doneCount, 3);
+  // goal 4 then 5: the name must be Summary; a copy is not a move; the move by Move or Copy lands it
+  run.run('Alt H O R "Summary" Enter'); assert.deepEqual(namesOf(run), ['Sales', 'Summary', 'Costs']); assert.equal(run.doneCount, 4);
+  run.run('Alt H O M C Up Enter'); assert.deepEqual(namesOf(run), ['Summary (2)', 'Sales', 'Summary', 'Costs']); assert.equal(run.doneCount, 4, 'a copy at the front is not Summary moved');
+  run.run('Alt H D S'); assert.deepEqual(namesOf(run), ['Sales', 'Summary', 'Costs']); assert.equal(run.session.sheetIndex, 0);
+  run.run('Ctrl+PgDn Alt H O M Up Enter'); assert.deepEqual(namesOf(run), ['Summary', 'Sales', 'Costs']); assert.ok(run.finished);
+  assert.equal(run.session.sheets[1].sheet.value('B7'), 1675, 'the Sales table travelled with its sheet');
+  // the last sheet never goes, and the message is Excel's
+  run = fresh(L); run.run('Ctrl+PgDn Alt H D S Ctrl+PgDn Alt H D S Enter'); assert.deepEqual(namesOf(run), ['Sales']);
+  run.run('Alt H D S'); assert.deepEqual(namesOf(run), ['Sales']); assert.equal(run.session.note, 'A workbook must contain at least one visible worksheet.');
+});
+
+/* ---------------- lesson 3: the Ribbon and KeyTips ---------------- */
+
+test('lesson 3: goal 1 needs the View tab open; gridlines by end state; Home then Esc, Esc by the key window and the mode', () => {
   const L = 'ribbon-and-keytips';
   let run = fresh(L);
   run.run('Alt H'); assert.equal(run.session.mode, 'ribbon'); assert.equal(run.doneCount, 0, 'Home is not View');
@@ -99,9 +142,9 @@ test('lesson 2: goal 1 needs the View tab open; gridlines by end state; Home the
   run.run('Alt W V G Alt H Escape Escape'); assert.ok(run.finished);
 });
 
-/* ---------------- lesson 3: Excel Options ---------------- */
+/* ---------------- lesson 4: Excel Options ---------------- */
 
-test('lesson 3: the goals grade the recorded settings; Cancel records nothing; F9 counts only in its window; flipping back keeps the lesson open', () => {
+test('lesson 4: the goals grade the recorded settings; Cancel records nothing; F9 counts only in its window; flipping back keeps the lesson open', () => {
   const L = 'excel-options';
   let run = fresh(L);
   run.run('F9'); assert.equal(run.doneCount, 0);
@@ -121,9 +164,9 @@ test('lesson 3: the goals grade the recorded settings; Cancel records nothing; F
   run.run('F9'); assert.ok(run.finished); assert.equal(run.sheet.value('B8'), 6355);
 });
 
-/* ---------------- lesson 4: page setup and best practices ---------------- */
+/* ---------------- lesson 5: page setup and best practices ---------------- */
 
-test('lesson 4: Page Setup or the Orientation button lands Landscape; Fit to 1 by 1; the colour convention is restated as end state', () => {
+test('lesson 5: Page Setup or the Orientation button lands Landscape; Fit to 1 by 1; the colour convention is restated as end state', () => {
   const L = 'page-setup';
   let run = fresh(L);
   assert.equal(run.sheet.value('B10'), 5400, 'the formulas evaluate: 240 × 25 less 10%');

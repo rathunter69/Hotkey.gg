@@ -22,6 +22,11 @@
 //   · ↵ / Shift+↵ / Tab / Shift+Tab pressed while editing are logged (on the edited cell) before they commit
 //   · the workbook: `sheets` [{name, sheet}], `sheet` is always the active one; Ctrl+PgDn / Ctrl+PgUp
 //     step between sheets (no wrap); Go To (Ctrl+G, F5) jumps to a cell or selects a range
+//   · sheet management, each a Home-tab command with a card where Excel has one: Shift+F11 / Alt H I S
+//     insert a sheet before the active one; Alt H O R (or a double-click on the tab) opens Rename
+//     Sheet with the name selected; Alt H D S deletes the active sheet — at once when blank, after
+//     Excel's "permanently delete" confirm when it holds anything, never the last sheet; Alt H O M
+//     opens Move or Copy (↑ ↓ pick the sheet it goes before or "(move to end)", C = Create a copy)
 //   · settings Excel keeps outside the grid (calculation mode, iterative calculation, gridlines, the
 //     Quick Access Toolbar, page setup) are RECORDED by real-looking dialogs (Alt F T, Alt P S P):
 //     the dialog edits a draft (`dlg`), ↵ = OK writes it into `settings`, Esc = Cancel discards it
@@ -141,7 +146,10 @@ function makeSettings(session) {
   return st;
 }
 const clampInt = (v, lo, hi, dflt) => { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : dflt; };
-const DIALOGS_WB = new Set(['goto', 'options', 'pagesetup']);   // the dialogs dialogKey drives
+const DIALOGS_WB = new Set(['goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet']);   // the dialogs dialogKey drives
+/** Excel's messages around the sheet commands (the views show them verbatim). */
+export const LAST_SHEET_NOTE = 'A workbook must contain at least one visible worksheet.';
+export const DELETE_SHEET_PROMPT = 'Microsoft Excel will permanently delete this sheet. Do you want to continue?';
 
 export class Session {
   /**
@@ -538,6 +546,10 @@ export class Session {
       case 'HIC': S.insert('c'); return done();
       case 'HDR': S.remove('r'); return done();
       case 'HDC': S.remove('c'); return done();
+      case 'HIS': this.exitRibbon(false); this.insertSheet(); return;   // what Shift+F11 does
+      case 'HDS': this.askDeleteSheet(); return;                          // blank: gone; anything on it: the confirm card; the last sheet: a note, the walk stays
+      case 'HOR': this.openRenameSheet(); return;
+      case 'HOM': this.openMoveSheet(); return;
       case 'HEA': S.clearAll(); return done();
       case 'HEF': S.clearFormats(); return done();
       case 'HEC': S.clearContents(); return done();
@@ -588,6 +600,134 @@ export class Session {
   }
   /** Shift+F11: a new sheet before the active one, made active (Excel). */
   insertSheet() { const i = this.addSheet(undefined, undefined, this.sheetIndex); this.switchSheet(i); return i; }
+  /** Whether sheet `i` (the active one by default) holds anything: a value, a formula or a format on any cell. Excel asks before deleting such a sheet. */
+  sheetHasContent(i) {
+    const e = this.sheets[i == null ? this.sheetIndex : i | 0]; if (!e) return false;
+    const cells = e.sheet.cells;
+    for (const k in cells) { const c = cells[k]; if ((c.value != null && c.value !== '') || c.formula || Sheet.hasFormat(c)) return true; }
+    return false;
+  }
+  /** Why `name` cannot be sheet `except`'s name, as Excel words it ('' when it can): blank, an illegal character, too long, or another sheet's name (case-insensitively). */
+  sheetNameProblem(name, except) {
+    const t = String(name == null ? '' : name);
+    if (!t.trim()) return 'A sheet name cannot be blank.';
+    if (/[\[\]:*?/\\]/.test(t)) return 'A sheet name cannot contain [ ] : * ? / \\';
+    if (t.length > SHEET_NAME_MAX) return 'A sheet name can have at most 31 characters.';
+    if (this.sheets.some((x, j) => j !== except && x.name.toLowerCase() === t.toLowerCase())) return 'That name is already taken.';
+    return '';
+  }
+  /** Rename sheet `i`. False (nothing changes) unless the name is Excel-legal and no other sheet's; the same name back is fine. */
+  renameSheet(i, name) {
+    const idx = i | 0; if (!this.sheets[idx]) return false;
+    const nm = String(name == null ? '' : name);
+    if (this.sheetNameProblem(nm, idx)) return false;
+    if (this.sheets[idx].name !== nm) { this.sheets[idx].name = nm; this.emit('sheets'); }
+    return true;
+  }
+  /**
+   * Delete sheet `i` (the active one by default). The last sheet never goes (false, with Excel's note).
+   * When the active sheet goes, the next one (the previous one at the end) becomes active and an
+   * entry in progress on it is dropped. Not undoable, as in Excel — hence the confirm card.
+   */
+  deleteSheet(i) {
+    const idx = i == null ? this.sheetIndex : i | 0; if (!this.sheets[idx]) return false;
+    if (this.sheets.length <= 1) { this.note = LAST_SHEET_NOTE; this.toast(LAST_SHEET_NOTE); return false; }
+    const wasActive = idx === this.sheetIndex;
+    if (wasActive && this.editing) this.cancelEdit();
+    this.sheets.splice(idx, 1);
+    if (wasActive) { this.sheetIndex = Math.min(idx, this.sheets.length - 1); this.sheet = this.sheets[this.sheetIndex].sheet; }
+    else this.sheetIndex = this.sheets.findIndex(x => x.sheet === this.sheet);
+    this.emit('sheets');
+    if (wasActive) this.emit('sheet');
+    return true;
+  }
+  /**
+   * Move sheet `from` to sit before position `to` in the current order (`to` = sheets.length puts it
+   * last: Excel's "(move to end)"). False when nothing would change. The active sheet stays active.
+   */
+  moveSheet(from, to) {
+    const n = this.sheets.length; const f = from | 0; if (!this.sheets[f]) return false;
+    const t = Math.max(0, Math.min(n, to == null ? n : to | 0));
+    if (t === f || t === f + 1) return false;
+    const [entry] = this.sheets.splice(f, 1);
+    this.sheets.splice(t > f ? t - 1 : t, 0, entry);
+    this.sheetIndex = this.sheets.findIndex(x => x.sheet === this.sheet);
+    this.emit('sheets');
+    return true;
+  }
+  /** 'Sales' → 'Sales (2)', then '(3)'…, as Excel names a copied sheet; a name already numbered counts on from its base, and a long name is trimmed to fit. */
+  copySheetName(name) {
+    const base = String(name).replace(/ \(\d+\)$/, '');
+    const taken = new Set(this.sheets.map(x => x.name.toLowerCase()));
+    for (let n = 2; ; n++) { const sfx = ' (' + n + ')'; const nm = base.slice(0, SHEET_NAME_MAX - sfx.length) + sfx; if (!taken.has(nm.toLowerCase())) return nm; }
+  }
+  /**
+   * Copy sheet `i` (the active one by default: cells, formats, widths, gridlines) to sit before
+   * position `before` (default: right after the original), named 'Name (2)'; the copy becomes the
+   * active sheet, as in Excel. Returns the copy's index.
+   */
+  copySheet(i, before) {
+    const idx = i == null ? this.sheetIndex : i | 0; const src = this.sheets[idx]; if (!src) return -1;
+    const S = src.sheet; const j = S.toJSON();
+    const colW = {}; S.colW.forEach((w, c) => { if (S.colSet[c]) colW[c] = w; });
+    const copy = new Sheet({ rows: S.rows, cols: S.cols, cells: j.cells, colW, active: j.active, today: S.today || undefined });
+    copy.gridlines = S.gridlines;
+    const at = this.addSheet(this.copySheetName(src.name), copy, before == null ? idx + 1 : Math.max(0, Math.min(this.sheets.length, before | 0)));
+    this.switchSheet(at);
+    return at;
+  }
+
+  /* ---------------- Rename Sheet (Alt H O R, a double-click on the tab), Delete Sheet (Alt H D S), Move or Copy (Alt H O M) ---------------- */
+  /** Open Rename Sheet on sheet `i` (the active one by default): the name is prefilled and selected, so typing replaces it. */
+  openRenameSheet(i) {
+    const idx = i == null ? this.sheetIndex : Math.max(0, Math.min(this.sheets.length - 1, i | 0));
+    this.startClock(); this.openDialog('renamesheet', this.mode === 'ribbon' ? this.path : []);
+    this.dlg = { kind: 'renamesheet', index: idx, name: this.sheets[idx].name, selected: true };
+  }
+  /** Open Move or Copy for the active sheet: the "Before sheet" highlight starts on the sheet itself (Excel's default), Create a copy off. */
+  openMoveSheet() {
+    this.startClock(); this.openDialog('movesheet', this.mode === 'ribbon' ? this.path : []);
+    this.dlg = { kind: 'movesheet', index: this.sheetIndex, before: this.sheetIndex, copy: false };
+  }
+  /**
+   * Home › Delete › Delete Sheet on the active sheet: a blank sheet goes at once, one that holds
+   * anything opens the confirm card (Enter = Delete, Esc = Cancel), and the last sheet never goes —
+   * Excel's note is set and the walk stays where it is. True when the sheet went or the card opened.
+   */
+  askDeleteSheet() {
+    const i = this.sheetIndex;
+    if (this.sheets.length <= 1) { this.note = LAST_SHEET_NOTE; this.toast(LAST_SHEET_NOTE); return false; }
+    if (!this.sheetHasContent(i)) { this.exitRibbon(false); return this.deleteSheet(i); }
+    this.startClock(); this.openDialog('deletesheet', this.mode === 'ribbon' ? this.path : []);
+    this.dlg = { kind: 'deletesheet', index: i };
+    return true;
+  }
+  /** The Rename Sheet keys: typing replaces the selected name then appends (letters keep their case; the log has them upper-case), Backspace edits, Enter = OK with Excel's message when the name will not do. */
+  renameKey(key) {
+    const d = this.dlg; if (!d) return;
+    if (key === 'Enter') {
+      const err = this.sheetNameProblem(d.name, d.index);
+      if (err) { this.note = err; return; }   // the card stays open, as Excel's does
+      const { index, name } = d;
+      this.exitRibbon(false);
+      this.renameSheet(index, name);
+      return;
+    }
+    if (key === 'Backspace') { d.name = d.selected ? '' : d.name.slice(0, -1); d.selected = false; this.note = ''; return; }
+    if (key.length === 1) { const next = (d.selected ? '' : d.name) + key; if (next.length > SHEET_NAME_MAX) return; d.name = next; d.selected = false; this.note = ''; }
+  }
+  /** The confirm card's keys: Enter = Delete (Esc = Cancel is dialogKey's). */
+  deleteKey(key) {
+    const d = this.dlg; if (!d) return;
+    if (key === 'Enter') { const { index } = d; this.exitRibbon(false); this.deleteSheet(index); }
+  }
+  /** The Move or Copy keys: ↑ ↓ move the "Before sheet" highlight (the last row is "(move to end)"), C toggles Create a copy, Enter = OK. */
+  moveKey(key) {
+    const d = this.dlg; if (!d) return;
+    if (key === 'Enter') { const { index, before, copy } = d; this.exitRibbon(false); if (copy) this.copySheet(index, before); else this.moveSheet(index, before); return; }
+    if (key === 'ArrowUp' || key === 'ArrowDown') { d.before = Math.max(0, Math.min(this.sheets.length, d.before + (key === 'ArrowDown' ? 1 : -1))); return; }
+    if (key === 'C') d.copy = !d.copy;
+  }
 
   /* ---------------- Go To (Ctrl+G, F5, Alt H F D G) ---------------- */
   openGoTo() { this.startClock(); this.openDialog('goto', this.mode === 'ribbon' ? this.path : []); this.dialogBuf = ''; this.dlg = null; }
@@ -651,6 +791,7 @@ export class Session {
   dialogTabOrder() {
     const d = this.dlg; if (!d) return [];
     if (d.kind === 'pagesetup') return ['orient', 'adjustTo', 'fitWide', 'fitTall'];
+    if (d.kind !== 'options') return [];   // Rename Sheet, Delete Sheet and Move or Copy have one control each: nothing to Tab between
     if (d.page === 'formulas') return ['pages', 'calc', 'iter'].concat(d.iterative ? ['maxIter', 'maxChange'] : []);
     if (d.page === 'advanced') return ['pages', 'gridlines'];
     return ['pages', 'qatLeft', 'qatRight'];
@@ -665,6 +806,7 @@ export class Session {
     if (field === 'page' && d.kind === 'options') { if (!OPTIONS_LIVE_PAGES.includes(value)) return false; d.page = value; d.focus = 'pages'; return true; }
     if (field === 'qatPick' && d.kind === 'options') { const i = value | 0; if (i < 0 || i >= POPULAR_COMMANDS.length) return false; d.qatPick = i; d.focus = 'qatLeft'; return true; }
     if (field === 'qatSel' && d.kind === 'options') { const i = value | 0; if (i < 0 || i >= d.qat.length) return false; d.qatSel = i; d.focus = 'qatRight'; return true; }
+    if (field === 'before' && d.kind === 'movesheet') { const i = value | 0; if (i < 0 || i > this.sheets.length) return false; d.before = i; return true; }   // a click on a "Before sheet" row
     return false;
   }
   /**
@@ -676,6 +818,9 @@ export class Session {
     if (this.dialog === 'goto') return this.gotoKey(key);
     if (this.dialog === 'options') return this.optionsKey(key);
     if (this.dialog === 'pagesetup') return this.pageSetupKey(key);
+    if (this.dialog === 'renamesheet') return this.renameKey(key);
+    if (this.dialog === 'deletesheet') return this.deleteKey(key);
+    if (this.dialog === 'movesheet') return this.moveKey(key);
   }
   optionsKey(key) {
     const d = this.dlg; if (!d) return;
@@ -752,7 +897,7 @@ export class Session {
     this.exitRibbon(true);
     this.emit('settings');
   }
-  /** The keys of an open Go To / Options / Page Setup dialog: logged, then routed to dlgKey. */
+  /** The keys of an open Go To / Options / Page Setup / sheet dialog: logged, then routed to dlgKey. A sheet name keeps the case typed; every other dialog takes the letter upper-case. */
   dialogKey(e) {
     const k = e.key;
     if (k === 'Escape') { this.logKey('Esc'); this.cancelDialog(); return true; }
@@ -761,7 +906,7 @@ export class Session {
     if (ARROWS[k]) { this.logKey(ARROWSYM[k]); this.dlgKey(k); return true; }
     if (k === 'Backspace') { this.logKey('⌫'); this.dlgKey('Backspace'); return true; }
     if (k === ' ') { this.logKey('Space'); this.dlgKey(' '); return true; }
-    if (k.length === 1 && !e.ctrlKey && !e.altKey) { const ch = /[a-z]/i.test(k) ? k.toUpperCase() : k; this.logKey(ch); this.dlgKey(ch); return true; }
+    if (k.length === 1 && !e.ctrlKey && !e.altKey) { const ch = /[a-z]/i.test(k) ? k.toUpperCase() : k; this.logKey(ch); this.dlgKey(this.dialog === 'renamesheet' ? k : ch); return true; }
     return true;   // a modal dialog swallows everything else
   }
 

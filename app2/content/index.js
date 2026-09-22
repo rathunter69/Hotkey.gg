@@ -1,6 +1,7 @@
 // app2/content/index.js — the catalogue: chapters in order, each with its lessons in order.
 import welcome_race from './lessons/welcome-race.js';
 import workbook_sheets_cells from './lessons/workbook-sheets-cells.js';
+import managing_sheets from './lessons/managing-sheets.js';
 import ribbon_and_keytips from './lessons/ribbon-and-keytips.js';
 import excel_options from './lessons/excel-options.js';
 import page_setup from './lessons/page-setup.js';
@@ -30,7 +31,7 @@ export const CHAPTERS = [
       { name: 'Basic formulas', blurb: '= and operators, SUM, AVERAGE, MIN, MAX and COUNT, AutoSum, relative and absolute references, F4, common errors.' },
       { name: 'Copy, paste and fill', blurb: 'Copy, cut and paste, Paste Special, fill series, the Flash Fill idea.' },
     ],
-    lessons: [welcome_race, workbook_sheets_cells, ribbon_and_keytips, excel_options, page_setup, active_cell, moving_around, selecting_ranges, entering_data, editing_cells, ribbon_commands, dialog_boxes],
+    lessons: [welcome_race, workbook_sheets_cells, managing_sheets, ribbon_and_keytips, excel_options, page_setup, active_cell, moving_around, selecting_ranges, entering_data, editing_cells, ribbon_commands, dialog_boxes],
   },
 ];
 

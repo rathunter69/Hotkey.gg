@@ -204,3 +204,39 @@ test('the Quick Access Toolbar: every entry has an icon; a click runs the same t
   m = fresh(); runQatCommand(m, 'fillColor'); assert.equal(m.dialog, 'fillcolor');   // a dialog entry opens its dialog, as the KeyTips do
   m = fresh(); m.sheet.goTo(5, 1); m.type('q'); assert.equal(runQatCommand(m, 'copy'), true); assert.equal(m.sheet.value('A5'), 'q'); assert.ok(m.sheet.clipboard);   // an open edit commits first
 });
+
+/* ---------------- the sheet commands: Insert / Delete / Rename / Move or Copy Sheet ---------------- */
+test('the sheet commands have entries, sit on the Home menus with their KeyTips, and a click reaches the same workbook and dialog state as the KeyTips', () => {
+  for (const id of ['HIS', 'HDS', 'HOR', 'HOM']) { const c = RIBBON_COMMANDS[id]; assert.ok(c && c.label && c.icon && typeof c.run === 'function', id); assert.ok(COMMANDS[id], id + ' is an Alt path'); assert.equal(c.group, 'Cells'); assert.equal(c.tab, 'H'); }
+  assert.equal(RIBBON_COMMANDS.HIS.keys, 'Shift+F11');
+  for (const [menu, key] of [['HI', 'S'], ['HD', 'S'], ['HO', 'R'], ['HO', 'M']]) assert.ok(menuEntries(menu).some(([k]) => k === key), menu + ' lists ' + key);
+  assert.equal(keyTipAt('HIS', 'HI'), 'S'); assert.equal(keyTipAt('HDS', 'HD'), 'S'); assert.equal(keyTipAt('HOR', 'HO'), 'R'); assert.equal(keyTipAt('HOM', 'HO'), 'M');
+  for (const d of ['renamesheet', 'deletesheet', 'movesheet']) { assert.ok(MODAL_DIALOGS.has(d), d + ' is modal'); assert.ok(CARD_DIALOGS.has(d), d + ' is a card'); }
+  const namesOf = s => s.sheets.map(x => x.name);
+  // Insert Sheet: the same new sheet, before the active one, made active
+  const { k: ki, m: mi } = sameAs('Alt H I S', 'HIS'); assert.deepEqual(namesOf(mi), ['Sheet2', 'Sheet1']); assert.deepEqual(namesOf(ki), namesOf(mi)); assert.equal(mi.sheetIndex, 0); assert.equal(ki.sheetIndex, 0);
+  // Delete Sheet: a blank active sheet goes at once; one with data asks, and Delete (Enter) by click removes it
+  const { k: kd, m: md } = sameAs('Alt H D S', 'HDS', s => s.run('Shift+F11')); assert.deepEqual(namesOf(md), ['Sheet1']); assert.deepEqual(namesOf(kd), ['Sheet1']); assert.equal(md.sheet.value('A1'), 1234.567);
+  let s = fresh(); s.addSheet('Two'); runCommand(s, 'HDS'); assert.equal(s.dialog, 'deletesheet'); assert.equal(s.mode, 'ribbon'); assert.deepEqual(s.path, []); assert.deepEqual(s.dlg, { kind: 'deletesheet', index: 0 });
+  let k = fresh(); k.addSheet('Two'); k.run('Alt H D S'); assert.deepEqual(k.dlg, s.dlg);
+  s.applyRibbon('ENTER'); k.run('Enter'); assert.deepEqual(namesOf(s), ['Two']); assert.deepEqual(namesOf(k), ['Two']); assert.equal(s.mode, 'normal'); assert.equal(k.mode, 'normal');
+  s = fresh(); s.addSheet('Two'); runCommand(s, 'HDS'); closeDialog(s); assert.equal(s.dialog, null); assert.equal(s.mode, 'normal'); assert.equal(s.dlg, null); assert.deepEqual(namesOf(s), ['Sheet1', 'Two']);   // Cancel by mouse
+  s = fresh(); runCommand(s, 'HDS'); assert.deepEqual(namesOf(s), ['Sheet1']); assert.equal(s.note, 'A workbook must contain at least one visible worksheet.'); assert.equal(s.mode, 'normal'); assert.equal(s.dialog, null);   // the last sheet stays
+  // Rename Sheet: the card by click = Alt H O R (an empty path, so one Esc closes it); the keyboard types the name either way
+  s = fresh(); runCommand(s, 'HOR'); assert.equal(s.dialog, 'renamesheet'); assert.equal(s.mode, 'ribbon'); assert.deepEqual(s.path, []); k = fresh(); k.run('Alt H O R'); assert.deepEqual(k.dlg, s.dlg);
+  s.run('"Data" Enter'); k.run('"Data" Enter'); assert.deepEqual(namesOf(s), ['Data']); assert.deepEqual(namesOf(k), ['Data']); assert.equal(s.mode, 'normal'); assert.equal(k.mode, 'normal');
+  s = fresh(); runCommand(s, 'HOR'); s.applyRibbon('ENTER'); assert.equal(s.mode, 'normal'); assert.deepEqual(namesOf(s), ['Sheet1']);   // OK on the untouched name just closes
+  s = fresh(); s.addSheet('Two'); runCommand(s, 'HOR'); s.run('"two"'); s.applyRibbon('ENTER'); assert.equal(s.dialog, 'renamesheet'); assert.equal(s.note, 'That name is already taken.');
+  closeDialog(s); assert.equal(s.mode, 'normal'); assert.deepEqual(namesOf(s), ['Sheet1', 'Two']);
+  s = fresh(); runCommand(s, 'HOR'); s.run('Escape'); assert.equal(s.mode, 'normal'); assert.equal(s.dialog, null);
+  // Move or Copy: the card by click = Alt H O M; a click on a "Before sheet" row is dialogSet, the checkbox is the letter C, OK is Enter
+  s = fresh(); s.addSheet('Two'); s.addSheet('Three'); runCommand(s, 'HOM'); assert.equal(s.dialog, 'movesheet'); assert.deepEqual(s.path, []);
+  k = fresh(); k.addSheet('Two'); k.addSheet('Three'); k.run('Alt H O M'); assert.deepEqual(k.dlg, s.dlg);
+  assert.equal(s.dialogSet('before', 3), true); s.applyRibbon('ENTER'); k.run('Down Down Down Enter');
+  assert.deepEqual(namesOf(s), ['Two', 'Three', 'Sheet1']); assert.deepEqual(namesOf(k), namesOf(s)); assert.equal(s.sheetIndex, 2); assert.equal(k.sheetIndex, 2); assert.equal(s.mode, 'normal');
+  runCommand(s, 'HOM'); s.applyRibbon('C'); assert.equal(s.dlg.copy, true); assert.equal(s.dialogSet('before', 0), true); s.applyRibbon('ENTER'); k.run('Alt H O M C Up Up Enter');
+  assert.deepEqual(namesOf(s), ['Sheet1 (2)', 'Two', 'Three', 'Sheet1']); assert.deepEqual(namesOf(k), namesOf(s)); assert.equal(state(s), state(k)); assert.equal(s.sheetIndex, 0); assert.equal(s.mode, 'normal');
+  // a click while editing commits first, as every ribbon click does
+  s = fresh(); s.sheet.goTo(5, 1); s.type('hi'); assert.equal(runCommand(s, 'HOR'), true); assert.equal(s.sheet.value('A5'), 'hi'); assert.equal(s.dialog, 'renamesheet');
+  s = fresh(); s.sheet.goTo(5, 1); s.type('=@@'); assert.equal(runCommand(s, 'HIS'), false); assert.equal(s.editing, true); assert.equal(s.sheets.length, 1);
+});

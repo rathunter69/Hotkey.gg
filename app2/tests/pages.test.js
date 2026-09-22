@@ -81,8 +81,8 @@ test('pickNextLesson: works on the real catalogue with placement skips', () => {
   // the section-1 Options and Page Setup lessons are never skipped, so a daily user starts there at the latest
   const skipped = skipsFor(['move', 'select']);
   const next = pickNextLesson(LESSONS, {}, skipped);
-  assert.equal(next.id, 'ribbon-and-keytips');
-  assert.equal(pickNextLesson(LESSONS, {}, skipsFor(['move', 'select', 'type-bold'])).id, 'excel-options');
+  assert.equal(next.id, 'managing-sheets');   // the first lesson no placement task covers
+  assert.equal(pickNextLesson(LESSONS, {}, skipsFor(['move', 'select', 'type-bold'])).id, 'managing-sheets');   // no placement task covers sheet management
   assert.equal(pickNextLesson(LESSONS, {}, []).id, 'welcome-race');
 });
 

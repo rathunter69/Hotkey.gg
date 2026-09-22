@@ -238,3 +238,115 @@ test('parseKeyScript accepts every workbook key the lessons will write', () => {
   assert.deepEqual(parseKeyScript('Alt+F T'), [{ type: 'press', spec: 'Alt' }, { type: 'press', spec: 'F' }, { type: 'press', spec: 'T' }]);
   const s = fresh(); s.run('F9'); assert.deepEqual(keys(s), ['F9']); assert.equal(s.mode, 'normal');
 });
+
+/* ---------------- sheet management: Rename Sheet, Insert Sheet, Delete Sheet, Move or Copy ---------------- */
+const namesOf = s => s.sheets.map(x => x.name);
+
+test('Rename Sheet: Alt H O R opens the card with the name selected; typing replaces it, Backspace edits, Enter commits a legal unused name; every key logs', () => {
+  const s = fresh(); s.addSheet('Costs');
+  s.run('Alt H O R'); assert.equal(s.mode, 'ribbon'); assert.equal(s.dialog, 'renamesheet'); assert.deepEqual(s.path, ['H', 'O']);
+  assert.deepEqual(s.dlg, { kind: 'renamesheet', index: 0, name: 'Sheet1', selected: true });
+  s.run('"Sales"'); assert.equal(s.dlg.name, 'Sales'); assert.equal(s.dlg.selected, false);   // the first key replaces the selected name; the case typed is kept
+  s.run('Backspace'); assert.equal(s.dlg.name, 'Sale'); s.run('"s Q1" Enter');
+  assert.deepEqual(namesOf(s), ['Sales Q1', 'Costs']); assert.equal(s.mode, 'normal'); assert.equal(s.dialog, null); assert.equal(s.dlg, null);
+  assert.deepEqual(keys(s), ['Alt', 'H', 'O', 'R', 'S', 'A', 'L', 'E', 'S', '⌫', 'S', 'Space', 'Q', '1', '↵']);   // letters log upper-case, as in every dialog
+  // Backspace on the selected name clears it; Enter on a blank, a taken or an illegal name keeps the card open with Excel's message
+  s.run('Alt H O R Backspace'); assert.equal(s.dlg.name, ''); s.run('Enter'); assert.equal(s.dialog, 'renamesheet'); assert.equal(s.note, 'A sheet name cannot be blank.');
+  s.run('"costs" Enter'); assert.equal(s.note, 'That name is already taken.'); assert.equal(s.dialog, 'renamesheet');   // case-insensitive, like Excel
+  s.run('Backspace Backspace Backspace Backspace Backspace "a/b" Enter'); assert.equal(s.note, 'A sheet name cannot contain [ ] : * ? / \\');
+  s.run('"x"'); assert.equal(s.note, '');   // the next key clears the message
+  s.run('Escape'); assert.equal(s.dialog, null); assert.deepEqual(s.path, ['H', 'O']); assert.equal(s.mode, 'ribbon');   // Cancel returns to the menu it came from
+  assert.deepEqual(namesOf(s), ['Sales Q1', 'Costs']); assert.equal(keys(s).at(-1), 'Esc');
+  s.run('Escape Escape Escape'); assert.equal(s.mode, 'normal');
+  // the same name back (or with its case changed) is accepted; a 32nd character is refused at the keyboard
+  s.run('Alt H O R "SALES q1" Enter'); assert.equal(s.sheets[0].name, 'SALES q1'); assert.equal(s.mode, 'normal');
+  s.run('Alt H O R "' + 'x'.repeat(40) + '" Enter'); assert.equal(s.sheets[0].name, 'x'.repeat(31));
+  assert.equal(COMMANDS.HOR, 'Rename sheet'); assert.deepEqual(stepPath(['H', 'O'], 'R'), { kind: 'command', np: 'HOR' }); assert.ok(MENUS.HO.some(([k, l]) => k === 'R' && /Rename/.test(l)));
+});
+
+test('Rename Sheet by the tab: openRenameSheet(i) is the double-click path (an empty path, so one Esc closes it); renameSheet validates on its own', () => {
+  const s = fresh(); s.addSheet('Two');
+  s.openRenameSheet(1); assert.equal(s.dialog, 'renamesheet'); assert.equal(s.mode, 'ribbon'); assert.deepEqual(s.path, []); assert.deepEqual(s.dlg, { kind: 'renamesheet', index: 1, name: 'Two', selected: true });
+  s.run('"Data" Enter'); assert.deepEqual(namesOf(s), ['Sheet1', 'Data']); assert.equal(s.mode, 'normal'); assert.equal(s.sheetIndex, 0);   // renaming a tab does not switch to it
+  s.openRenameSheet(1); s.run('Escape'); assert.equal(s.mode, 'normal'); assert.equal(s.dialog, null); assert.equal(s.dlg, null);
+  s.openRenameSheet(9); assert.equal(s.dlg.index, 1); s.run('Escape');   // clamped
+  assert.equal(s.renameSheet(0, 'Inputs'), true); assert.equal(s.sheets[0].name, 'Inputs');
+  assert.equal(s.renameSheet(0, 'data'), false); assert.equal(s.renameSheet(0, ''), false); assert.equal(s.renameSheet(0, '  '), false); assert.equal(s.renameSheet(0, 'a:b'), false);
+  assert.equal(s.renameSheet(0, 'y'.repeat(32)), false); assert.equal(s.renameSheet(5, 'x'), false);
+  assert.equal(s.renameSheet(0, 'Inputs'), true);   // the same name back
+  assert.deepEqual(namesOf(s), ['Inputs', 'Data']);
+  assert.equal(s.sheetNameProblem('Data', 1), ''); assert.equal(s.sheetNameProblem('data', 0), 'That name is already taken.'); assert.equal(s.sheetNameProblem('z'.repeat(32), 0), 'A sheet name can have at most 31 characters.');
+  let seen = 0; s.onChange(w => { if (w === 'sheets') seen++; });
+  s.renameSheet(1, 'Costs'); assert.equal(seen, 1); s.renameSheet(1, 'Costs'); assert.equal(seen, 1);   // the strip repaints on a change, not on a no-op
+});
+
+test('Insert Sheet: Alt H I S is Shift+F11 — a new sheet before the active one, made active — and the log shows the walk', () => {
+  const s = fresh(); s.addSheet('Two'); s.switchSheet(1);
+  s.run('Alt H I S'); assert.deepEqual(namesOf(s), ['Sheet1', 'Sheet3', 'Two']); assert.equal(s.sheetIndex, 1); assert.equal(s.mode, 'normal'); assert.equal(s.dialog, null);
+  assert.deepEqual(keys(s), ['Alt', 'H', 'I', 'S']);
+  s.run('Shift+F11'); assert.deepEqual(namesOf(s), ['Sheet1', 'Sheet4', 'Sheet3', 'Two']); assert.equal(s.sheetIndex, 1);
+  assert.equal(COMMANDS.HIS, 'Insert sheet'); assert.ok(MENUS.HI.some(([k]) => k === 'S')); assert.deepEqual(stepPath(['H', 'I'], 'S'), { kind: 'command', np: 'HIS' });
+});
+
+test('Delete Sheet: Alt H D S deletes a blank sheet at once, asks first on a sheet with data or formats, and never deletes the last sheet', () => {
+  const s = fresh({ A1: { value: 'keep' } }); s.addSheet('Blank'); s.addSheet('Fmt', new Sheet({ cells: { B2: { bold: true } } })); s.addSheet('Last');
+  s.switchSheet(1); s.run('Alt H D S'); assert.deepEqual(namesOf(s), ['Sheet1', 'Fmt', 'Last']); assert.equal(s.dialog, null); assert.equal(s.mode, 'normal');
+  assert.equal(s.sheetIndex, 1); assert.equal(s.sheet, s.sheets[1].sheet);   // the next sheet becomes active
+  assert.deepEqual(keys(s), ['Alt', 'H', 'D', 'S']);
+  s.run('Alt H D S'); assert.equal(s.dialog, 'deletesheet'); assert.deepEqual(s.path, ['H', 'D']); assert.deepEqual(s.dlg, { kind: 'deletesheet', index: 1 });   // a format alone counts as content
+  assert.deepEqual(namesOf(s), ['Sheet1', 'Fmt', 'Last']);
+  s.run('X'); assert.equal(s.dialog, 'deletesheet');   // only Enter and Esc do anything on the confirm card
+  s.run('Escape'); assert.equal(s.dialog, null); assert.deepEqual(s.path, ['H', 'D']); assert.equal(s.sheets.length, 3); s.run('Escape Escape Escape');
+  s.run('Alt H D S Enter'); assert.deepEqual(namesOf(s), ['Sheet1', 'Last']); assert.equal(s.sheetIndex, 1); assert.equal(s.mode, 'normal'); assert.equal(s.dlg, null);
+  assert.deepEqual(keys(s).slice(4), ['Alt', 'H', 'D', 'S', 'X', 'Esc', 'Alt', 'H', 'D', 'S', '↵']);
+  s.run('Alt H D S'); assert.deepEqual(namesOf(s), ['Sheet1']); assert.equal(s.sheetIndex, 0); assert.equal(s.sheet.value('A1'), 'keep');   // the last in the list went: the previous one becomes active
+  s.run('Alt H D S'); assert.equal(s.sheets.length, 1); assert.equal(s.note, 'A workbook must contain at least one visible worksheet.'); assert.equal(s.mode, 'ribbon'); assert.deepEqual(s.path, ['H', 'D']); assert.equal(s.dialog, null);
+  s.run('Escape Escape Escape'); assert.equal(s.mode, 'normal'); assert.equal(s.note, '');
+  // the API: deleting a sheet other than the active one keeps the active sheet; an entry in progress on a deleted active sheet is dropped
+  s.addSheet('Two'); s.addSheet('Three'); s.switchSheet(2);
+  assert.equal(s.deleteSheet(0), true); assert.deepEqual(namesOf(s), ['Two', 'Three']); assert.equal(s.sheetIndex, 1); assert.equal(s.sheet, s.sheets[1].sheet);
+  s.run('"abc"'); assert.equal(s.editing, true); assert.equal(s.deleteSheet(), true); assert.equal(s.editing, false); assert.equal(s.sheetIndex, 0); assert.deepEqual(namesOf(s), ['Two']); assert.equal(s.sheet.value('A1'), null);
+  assert.equal(s.deleteSheet(), false); assert.equal(s.deleteSheet(7), false);
+  assert.equal(s.sheetHasContent(0), false); s.run('"x" Enter'); assert.equal(s.sheetHasContent(0), true); assert.equal(s.sheetHasContent(3), false);
+  assert.equal(COMMANDS.HDS, 'Delete sheet'); assert.ok(MENUS.HD.some(([k]) => k === 'S')); assert.deepEqual(stepPath(['H', 'D'], 'S'), { kind: 'command', np: 'HDS' });
+});
+
+test('Move or Copy: Alt H O M lists the sheets; ↑ ↓ pick the sheet it goes before or (move to end), C ticks Create a copy, Enter = OK, Esc cancels', () => {
+  const s = fresh({ A1: { value: 1 }, B1: { formula: '=A1*2', bold: true } }, { colW: { 1: 90 } }); s.addSheet('Two'); s.addSheet('Three');
+  s.run('Alt H O M'); assert.equal(s.dialog, 'movesheet'); assert.deepEqual(s.path, ['H', 'O']); assert.deepEqual(s.dlg, { kind: 'movesheet', index: 0, before: 0, copy: false });
+  s.run('Down Down Down Down Down'); assert.equal(s.dlg.before, 3);   // clamped at (move to end)
+  s.run('Enter'); assert.deepEqual(namesOf(s), ['Two', 'Three', 'Sheet1']); assert.equal(s.sheetIndex, 2); assert.equal(s.sheet.value('A1'), 1); assert.equal(s.mode, 'normal');   // the moved sheet stays active
+  assert.deepEqual(keys(s), ['Alt', 'H', 'O', 'M', '↓', '↓', '↓', '↓', '↓', '↵']);
+  s.run('Alt H O M Up Up Up Up Enter'); assert.deepEqual(namesOf(s), ['Sheet1', 'Two', 'Three']); assert.equal(s.sheetIndex, 0);
+  s.run('Alt H O M Down Enter'); assert.deepEqual(namesOf(s), ['Sheet1', 'Two', 'Three']); assert.equal(s.mode, 'normal');   // before the next sheet: where it already is
+  s.run('Alt H O M Down Escape'); assert.equal(s.dialog, null); assert.deepEqual(s.path, ['H', 'O']); assert.deepEqual(namesOf(s), ['Sheet1', 'Two', 'Three']); s.run('Escape Escape Escape');
+  // a copy: Sheet1 (2), inserted before the highlighted row, made active, with the cells, formats and widths of the original
+  s.run('Alt H O M C'); assert.equal(s.dlg.copy, true); s.run('C'); assert.equal(s.dlg.copy, false); s.run('C Down Down Down Enter');
+  assert.deepEqual(namesOf(s), ['Sheet1', 'Two', 'Three', 'Sheet1 (2)']); assert.equal(s.sheetIndex, 3);
+  assert.deepEqual(s.sheet.toJSON(), s.sheets[0].sheet.toJSON()); assert.equal(s.sheet.value('B1'), 2); assert.equal(s.sheet.colW[1], 90); assert.notEqual(s.sheet, s.sheets[0].sheet);
+  s.run('"9" Enter'); assert.equal(s.sheet.value('A1'), 9); assert.equal(s.sheets[0].sheet.value('A1'), 1);   // independent of the original
+  s.switchSheet(0); s.run('Alt H O M C Enter'); assert.deepEqual(namesOf(s), ['Sheet1 (3)', 'Sheet1', 'Two', 'Three', 'Sheet1 (2)']); assert.equal(s.sheetIndex, 0);
+  // the API
+  assert.equal(s.moveSheet(0, 0), false); assert.equal(s.moveSheet(0, 1), false); assert.equal(s.moveSheet(9, 0), false);
+  assert.equal(s.moveSheet(4, 0), true); assert.deepEqual(namesOf(s), ['Sheet1 (2)', 'Sheet1 (3)', 'Sheet1', 'Two', 'Three']); assert.equal(s.sheetIndex, 1);
+  assert.equal(s.moveSheet(1), true); assert.equal(s.sheets.at(-1).name, 'Sheet1 (3)'); assert.equal(s.sheetIndex, 4);   // no `to`: the end
+  assert.equal(s.copySheetName('Two'), 'Two (2)'); assert.equal(s.copySheetName('Sheet1 (2)'), 'Sheet1 (4)'); assert.equal(s.copySheetName('a'.repeat(31)).length, 31);
+  assert.equal(s.copySheet(2), 3); assert.equal(s.sheets[3].name, 'Two (2)'); assert.equal(s.sheetIndex, 3); assert.equal(s.copySheet(9), -1);   // right after the original by default
+  assert.equal(s.dialogSet('before', 2), false);   // no dialog open
+  s.run('Alt H O M'); assert.equal(s.dialogSet('before', 6), true); assert.equal(s.dlg.before, 6); assert.equal(s.dialogSet('before', 7), false); assert.equal(s.dialogSet('before', -1), false); assert.equal(s.dialogSet('focus', 'pages'), false);
+  s.run('Escape Escape Escape Escape'); assert.equal(s.mode, 'normal');
+  assert.equal(COMMANDS.HOM, 'Move or copy sheet…'); assert.ok(MENUS.HO.some(([k]) => k === 'M'));
+});
+
+test('parseKeyScript accepts the sheet-management spellings the lessons will write, and they run', () => {
+  const press = specs => specs.map(spec => ({ type: 'press', spec }));
+  assert.deepEqual(parseKeyScript('Alt H O R "Costs" Enter'), [...press(['Alt', 'H', 'O', 'R']), { type: 'text', text: 'Costs' }, { type: 'press', spec: 'Enter' }]);
+  assert.deepEqual(parseKeyScript('Alt H D S Enter'), press(['Alt', 'H', 'D', 'S', 'Enter']));
+  assert.deepEqual(parseKeyScript('Alt H I S'), press(['Alt', 'H', 'I', 'S']));
+  assert.deepEqual(parseKeyScript('Alt H O M Up Enter'), press(['Alt', 'H', 'O', 'M', 'Up', 'Enter']));
+  assert.deepEqual(parseKeyScript('Alt+H O R'), press(['Alt', 'H', 'O', 'R']));
+  const s = fresh({ A1: { value: 'data' } }); s.addSheet('Two');
+  s.run('Alt H O R "Costs" Enter Alt H I S Alt H O R "Scratch" Enter Alt H D S Ctrl+PgDn Alt H D S Enter Alt H O M Down Down Enter');
+  assert.deepEqual(namesOf(s), ['Costs']); assert.equal(s.mode, 'normal'); assert.equal(s.sheet.value('A1'), 'data');
+  assert.deepEqual(keys(s), ['Alt', 'H', 'O', 'R', 'C', 'O', 'S', 'T', 'S', '↵', 'Alt', 'H', 'I', 'S', 'Alt', 'H', 'O', 'R', 'S', 'C', 'R', 'A', 'T', 'C', 'H', '↵', 'Alt', 'H', 'D', 'S', 'Ctrl+PgDn', 'Alt', 'H', 'D', 'S', '↵', 'Alt', 'H', 'O', 'M', '↓', '↓', '↵']);
+});

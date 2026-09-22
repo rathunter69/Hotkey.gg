@@ -60,9 +60,11 @@ try {
     await page.waitForSelector('.goal.current');
     await page.waitForFunction(() => !document.querySelector('.goal.current .goal-demo'), null, { timeout: 30000 }).catch(() => {});   // a demo goal plays itself first
     for (const step of parseKeyScript(lesson.solution)) {
+      await page.waitForFunction(() => !document.querySelector('.goal-demo'), null, { timeout: 30000 }).catch(() => {});   // a demo goal plays itself; keys wait
       if (step.type === 'text') await page.keyboard.type(step.text);
       else await page.keyboard.press(pwKey(step.spec));
     }
+    await page.waitForFunction(() => !document.querySelector('.goal-demo'), null, { timeout: 30000 }).catch(() => {});
     const done = await page.waitForSelector('.lesson-done:not([hidden]) [data-act="continue"]', { timeout: 4000 }).catch(() => null);
     if (!done) fail(`${lesson.id}: did not complete`);
   }

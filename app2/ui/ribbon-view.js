@@ -20,6 +20,7 @@
 import { TABS, MENUS, RIBBON_GROUPS, RIBBON_ICONS, RIBBON_MENU_ICONS, FMT_OPTS, PASTE_OPTS, PASTE_OP_OPTS, COMMANDS, tabName,
   QAT_COMMANDS, POPULAR_COMMANDS, OPTIONS_PAGES, OPTIONS_LIVE_PAGES } from '../engine/ribbon.js';
 import { FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES } from '../engine/sheet.js';
+import { DELETE_SHEET_PROMPT } from '../engine/keyboard.js';
 import { prefs } from '../app/prefs.js';
 import { RIBBON_COMMANDS, RIBBON_LAYOUT, MENU_META, VIRTUAL_MENUS, UNIMPLEMENTED_BY_ID, MODAL_DIALOGS, CARD_DIALOGS, MENU_ITEM_ICONS, QAT_ICONS,
   itemTip, keyTipAt, runCommand, runQatCommand, openMenuPath, recordMouse, closeDialog, leaveRibbon, menuEntries } from './ribbon-commands.js';
@@ -101,6 +102,7 @@ export class RibbonView {
     this.localMenu = null;     // a view-owned dropdown (a MENU_META key with `items`), e.g. Home › Sort & Filter
     this.drop = null; this.pasteDialog = null; this.fmtDialog = null;
     this.gotoDialog = null; this.optionsDialog = null; this.pagesetupDialog = null;   // the workbook cards (ui/workbook.css)
+    this.renameDialog = null; this.deleteDialog = null; this.moveDialog = null;         // the sheet cards: Rename Sheet, Delete Sheet, Move or Copy
     this._onClick = e => this.onClick(e);
     this._onDown = e => { if (e.button === 0 && !e.target.closest('input,textarea,select')) e.preventDefault(); };   // a press never steals focus from the sheet, nor starts a text selection
     this.el.addEventListener('click', this._onClick);
@@ -128,7 +130,7 @@ export class RibbonView {
     this.dropKill();
     if (this.pasteDialog) this.pasteDialog.remove();
     if (this.fmtDialog) this.fmtDialog.remove();
-    for (const d of [this.gotoDialog, this.optionsDialog, this.pagesetupDialog]) if (d) d.remove();
+    for (const d of [this.gotoDialog, this.optionsDialog, this.pagesetupDialog, this.renameDialog, this.deleteDialog, this.moveDialog]) if (d) d.remove();
     window.removeEventListener('resize', this._onResize); clearTimeout(this._rzT);
     if (this.ro) this.ro.disconnect();
     if (this.slot) this.slot.classList.remove('rib-full');
@@ -353,6 +355,27 @@ export class RibbonView {
       '<div class="od-row dis"><span class="od-lbl">First page number:</span><span class="od-field dis">Auto</span></div>' +
       '<div class="od-sub" style="margin-top:6px">↑ ↓ change the focused control · Tab moves between fields · digits type into the focused field</div>';
   }
+  /* ---- the sheet cards (Rename Sheet, Delete Sheet, Move or Copy): one control each, every row clickable ---- */
+  renameHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const val = d.selected ? `<span class="od-seltext">${esc(d.name)}</span>` : esc(d.name);   // prefilled and selected: typing replaces it
+    return `<div class="gt-ref"><label>Sheet name:</label><span class="od-field foc wide">${val}<i class="od-caret"></i></span></div>` +
+      (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">up to 31 characters, none of [ ] : * ? / \\ · ↵ OK · esc cancel</div>');
+  }
+  deleteHtml() {
+    return `<div class="ds-msg"><span class="ds-icon" aria-hidden="true">!</span><span>${esc(DELETE_SHEET_PROMPT)}</span></div>` +
+      '<div class="od-caplbl">a deleted sheet cannot be undone · ↵ delete · esc cancel</div>';
+  }
+  moveHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const row = (i, label) => `<div class="od-item${d.before === i ? ' on' : ''}" data-act="dset:before:${i}" role="option" aria-selected="${d.before === i}"><span class="od-ico"></span>${label}</div>`;
+    const list = ss.sheets.map((sh, i) => row(i, esc(sh.name))).join('') + row(ss.sheets.length, '(move to end)');
+    return `<div class="od-caplbl">Move selected sheet: <b>${esc((ss.sheets[d.index] || {}).name || '')}</b></div>` +
+      '<div class="od-row dis"><span class="od-lbl">To book:</span><span class="od-combo">(current workbook)</span></div>' +
+      `<div class="od-caplbl" style="margin-top:6px">Before sheet:</div><div class="od-list foc mv-list" role="listbox" aria-label="Before sheet">${list}</div>` +
+      RibbonView.check(d.copy, 'letter:C', 'Create a copy', 'C') +
+      '<div class="od-caplbl">↑ ↓ pick the sheet it goes before · C toggles Create a copy · ↵ OK · esc cancel</div>';
+  }
   drawDialog() {
     const ss = this.session;
     if (ss.dialog === 'paste' || this.pasteDialog) {
@@ -405,6 +428,19 @@ export class RibbonView {
       const d = this.pagesetupDialog || (this.pagesetupDialog = this.wideCard('pagesetupDialog', 'Page Setup', 'pd-mid'));
       this.showCard(d, ss.dialog === 'pagesetup' && !!ss.dlg, ss.dialog === 'pagesetup' ? this.pageSetupHtml() : '',
         RibbonView.okCancel('OK', '<span class="pd-btn dis" aria-disabled="true">Print…</span><span class="pd-btn dis" aria-disabled="true">Print Preview</span><span class="pd-btn dis" aria-disabled="true">Options…</span>'));
+    }
+    // the sheet cards: Rename Sheet (Alt H O R, a double-click on the tab), Delete Sheet's confirm (Alt H D S), Move or Copy (Alt H O M)
+    if (ss.dialog === 'renamesheet' || this.renameDialog) {
+      const d = this.renameDialog || (this.renameDialog = this.wideCard('renameSheetDialog', 'Rename Sheet', 'pd-mid'));
+      this.showCard(d, ss.dialog === 'renamesheet' && !!ss.dlg, ss.dialog === 'renamesheet' ? this.renameHtml() : '', RibbonView.okCancel('OK'));
+    }
+    if (ss.dialog === 'deletesheet' || this.deleteDialog) {
+      const d = this.deleteDialog || (this.deleteDialog = this.wideCard('deleteSheetDialog', 'Delete Sheet', 'pd-mid'));
+      this.showCard(d, ss.dialog === 'deletesheet' && !!ss.dlg, ss.dialog === 'deletesheet' ? this.deleteHtml() : '', RibbonView.okCancel('Delete'));
+    }
+    if (ss.dialog === 'movesheet' || this.moveDialog) {
+      const d = this.moveDialog || (this.moveDialog = this.wideCard('moveSheetDialog', 'Move or Copy', 'pd-mid'));
+      this.showCard(d, ss.dialog === 'movesheet' && !!ss.dlg, ss.dialog === 'movesheet' ? this.moveHtml() : '', RibbonView.okCancel('OK'));
     }
   }
 
@@ -728,6 +764,15 @@ export class RibbonView {
       return; }
     if (ss.dialog === 'pagesetup') { el.className = 'ribbon show';
       el.innerHTML = '<span class="path">page setup →</span><span class="opt">T portrait · L landscape · A adjust to · F fit to · ↵ OK · esc cancel</span>';
+      return; }
+    if (ss.dialog === 'renamesheet') { el.className = 'ribbon show';   // the floating card carries the field
+      el.innerHTML = '<span class="path">rename sheet →</span><span class="opt" style="font-family:var(--mono)">' + esc(ss.dlg && ss.dlg.name ? ss.dlg.name : '…') + '</span><span class="opt">type the new name · ↵ OK · esc cancel</span>';
+      return; }
+    if (ss.dialog === 'deletesheet') { el.className = 'ribbon show';
+      el.innerHTML = '<span class="path">delete sheet →</span><span class="opt">the sheet holds data — it cannot be undone · ↵ delete · esc cancel</span>';
+      return; }
+    if (ss.dialog === 'movesheet') { el.className = 'ribbon show';
+      el.innerHTML = '<span class="path">move or copy sheet →</span><span class="opt">↑ ↓ pick the sheet it goes before · C create a copy · ↵ OK · esc cancel</span>';
       return; }
     if (ss.dialog) {   // a dialog this painter has no card for — a minimal strip so Esc always reads
       el.className = 'ribbon show';

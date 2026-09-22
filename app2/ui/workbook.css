@@ -11,6 +11,7 @@
   border:1px solid var(--line); border-bottom:0; border-top:2.5px solid var(--line); border-radius:7px 7px 0 0; padding:8px 15px 9px; cursor:pointer; transition:.12s; user-select:none}
 .wb-tab:hover{color:var(--text)}
 .wb-tab.cur{color:var(--text); background:var(--bg); font-weight:700; border-color:var(--accent-dim); border-top-color:var(--accent); cursor:default}
+.wb-tab.ren{color:var(--accent); border-top-color:var(--accent); box-shadow:0 0 0 2px var(--accent-glow)}   /* being renamed: previews the draft name */
 .wb-add{flex:none; align-self:center; margin-left:4px; width:22px; height:22px; border-radius:99px; border:1px solid var(--line); background:var(--surface); color:var(--muted); font-size:14px; line-height:1; cursor:pointer; padding:0}
 .wb-add:hover{color:var(--accent); border-color:var(--accent-dim)}
 
@@ -48,8 +49,8 @@
 .ribbon-full .rf-launch > .ri-key{left:auto; right:-3px; bottom:-4px; transform:none}   /* the KeyTip rides on the launcher box, as Excel draws it */
 .rf-gname:has(.rf-launch){padding-right:16px}
 
-/* ---------- the workbook cards (Go To, Excel Options, Page Setup): fixed over the sheet, one tight card ---------- */
-#gotoDialog, #optionsDialog, #pagesetupDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
+/* ---------- the workbook cards (Go To, Excel Options, Page Setup, Rename / Delete / Move or Copy Sheet): fixed over the sheet, one tight card ---------- */
+#gotoDialog, #optionsDialog, #pagesetupDialog, #renameSheetDialog, #deleteSheetDialog, #moveSheetDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
 .pd-box.pd-wide{width:690px; max-width:calc(100vw - 16px)}
 .pd-box.pd-mid{width:420px; max-width:calc(100vw - 16px)}
 .wb-body{padding:8px 12px 4px; font-family:var(--sans); color:var(--text)}
@@ -122,6 +123,13 @@
 .ps-orient{display:flex; gap:24px; padding:2px 6px 6px}
 .ps-page{display:inline-block; width:14px; height:18px; border:1.5px solid currentColor; border-radius:2px; margin-right:4px; vertical-align:middle; opacity:.8}
 .ps-page.land{width:18px; height:14px}
+/* Rename Sheet: the prefilled name shows selected until the first key replaces it */
+.od-seltext{background:var(--accent); color:var(--on-accent); border-radius:2px; padding:0 1px}
+/* Delete Sheet: Excel's message-box line, with its warning mark */
+.ds-msg{display:flex; align-items:flex-start; gap:10px; padding:6px 4px 8px; font-size:12.5px; line-height:1.45; color:var(--text)}
+.ds-icon{flex:none; display:inline-grid; place-items:center; width:22px; height:22px; border-radius:99px; border:2px solid var(--bad); color:var(--bad); font-family:var(--mono); font-size:13px; font-weight:800; line-height:1}
+/* Move or Copy: the Before sheet list is as tall as the workbook */
+.od-list.mv-list{height:auto; max-height:150px; margin-bottom:6px}
 /* Go To: the previous-locations list and the Reference field */
 .gt-recent{height:96px; overflow-y:auto; border:1px solid var(--line); border-radius:5px; background:var(--surface); padding:3px; margin-bottom:8px}
 .gt-recent .od-item{cursor:default}
