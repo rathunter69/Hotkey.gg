@@ -273,3 +273,44 @@ export function availableConcepts(lesson, byId, seen = new Set()) {
   }
   return out;
 }
+
+/**
+ * Validate a drill (SITE_SPEC §5): a timed exercise of 1-12 checkpoints with explicit pars and an
+ * optimal keystroke count. Unlike a lesson it teaches nothing — no read, no teach lines, no
+ * concept bookkeeping — so a checkpoint carries only { id, text, keys, check }. Returns a list of
+ * problems (empty when valid); never throws.
+ */
+export function validateDrill(d) {
+  const errs = [];
+  const need = (cond, msg) => { if (!cond) errs.push(msg); };
+  if (!d || typeof d !== 'object') return ['drill must be an object'];
+  need(typeof d.id === 'string' && /^[a-z0-9-]+$/.test(d.id), 'id must be kebab-case');
+  need(typeof d.chapter === 'string' && d.chapter, 'chapter missing');
+  need(typeof d.title === 'string' && d.title.trim(), 'title missing');
+  need(typeof d.task === 'string' && d.task.trim() && sentenceCount(d.task) === 1, 'task must be one sentence');
+  need(ACCESS.includes(d.access), 'access must be free | paid');
+  need(d.benchmark === undefined || typeof d.benchmark === 'boolean', 'benchmark must be true or false');
+  need(d.seed === undefined || typeof d.seed === 'function', 'seed must be a function (rng) => cells patch');
+  need(isObject(d.sheet), 'sheet (starting sheet) missing');
+  need(d.sheets === undefined || (Array.isArray(d.sheets) && d.sheets.every(isObject)), 'sheets must be an array of { name, cells } records');
+  need(Number.isInteger(d.optimalKeys) && d.optimalKeys > 0, 'optimalKeys must be a positive integer');
+  const p = d.pars;
+  need(isObject(p) && ['pass', 'pro', 'legendary'].every(k => typeof p[k] === 'number' && Number.isFinite(p[k])), 'pars must give pass, pro and legendary in seconds');
+  if (isObject(p)) need(p.pass > p.pro && p.pro > p.legendary && p.legendary > 0, 'pars must fall strictly: pass > pro > legendary > 0');
+  need(Array.isArray(d.goals) && d.goals.length >= 1 && d.goals.length <= 12, 'goals: 1-12 checkpoints');
+  const goals = Array.isArray(d.goals) ? d.goals.filter(isObject) : [];
+  const ids = new Set();
+  for (const g of goals) {
+    need(typeof g.id === 'string' && g.id, 'goal id missing'); need(!ids.has(g.id), `duplicate goal id ${g.id}`); ids.add(g.id);
+    need(typeof g.text === 'string' && g.text.trim(), `goal ${g.id}: text missing`);
+    need(typeof g.keys === 'string' && g.keys.trim(), `goal ${g.id}: keys (the route as keycaps) missing`);
+    need(typeof g.check === 'function', `goal ${g.id}: check must be a function`);
+    need(g.teach === undefined && g.requires === undefined && g.demo === undefined, `goal ${g.id}: a drill checkpoint carries no teach, requires or demo`);
+  }
+  need(d.endState === undefined || Array.isArray(d.endState), 'endState must be an array');
+  const ends = Array.isArray(d.endState) ? d.endState.filter(isObject) : [];
+  for (const e of ends) { need(typeof e.text === 'string', 'endState entries need text'); need(typeof e.check === 'function', 'endState entries need a check'); }
+  need(typeof d.solution === 'string' && d.solution.trim(), 'solution keystrokes missing');
+  if (isObject(d.sheet)) validateStartingSheet(d, goals, ends, need);
+  return errs;
+}
