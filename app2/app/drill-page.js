@@ -16,6 +16,8 @@ import { track } from './telemetry.js';
 import { DRILLS, drillById } from '../content/drills.js';
 import { DrillRun } from './drill-run.js';
 import { store } from './store.js';
+import { dailyDrill, shareText } from './daily.js';
+import { dayOf } from './records.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const SVG = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"';
@@ -52,11 +54,13 @@ const TIER_LABEL = { pass: 'Pass', pro: 'Pro', legendary: 'Legendary', none: '�
 
 export function mountDrillPage(root, ctx = {}) {
   ensureCss();
-  const id = (ctx.params && ctx.params.id) || 'sandbox';
-  const drill = id === 'sandbox' ? SANDBOX : drillById(id) || SANDBOX;
+  const daily = !!(ctx.params && ctx.params.daily) && (() => { const d = dailyDrill(dayOf()); return d.drill ? d : null; })();
+  const id = daily ? daily.drill.id : (ctx.params && ctx.params.id) || 'sandbox';
+  const drill = daily ? daily.drill : id === 'sandbox' ? SANDBOX : drillById(id) || SANDBOX;
   const pos = NAV.findIndex(d => d.id === drill.id) + 1;
-  const prev = NAV[pos - 2] || null, next = NAV[pos] || null;
+  const prev = daily ? null : NAV[pos - 2] || null, next = daily ? null : NAV[pos] || null;
   const graded = drill !== SANDBOX;
+  const attemptsToday = () => store.attempts({ kind: 'daily', day: dayOf() }).length;
 
   const el = document.createElement('div');
   el.className = 'drill-page';
@@ -72,9 +76,9 @@ export function mountDrillPage(root, ctx = {}) {
     <div class="drillbar">
       ${prev ? `<a class="db-nav" href="#/drill/${esc(prev.id)}" title="previous drill: ${esc(prev.title)}" aria-label="previous drill">‹</a>` : '<button class="db-nav" type="button" disabled>‹</button>'}
       <a class="db-current" id="drillPick" href="#/practice" title="all drills">
-        <span class="db-cat">${esc(drill.chapter)}</span>
+        <span class="db-cat">${daily ? '◆ the daily' : esc(drill.chapter)}</span>
         <span class="db-name">${esc(drill.title)}</span>
-        <span class="db-pos">${pos} / ${NAV.length}</span>
+        <span class="db-pos">${daily ? esc(dayOf()) : pos + ' / ' + NAV.length}</span>
         <span class="db-more">all drills</span>
       </a>
       ${next ? `<a class="db-nav" href="#/drill/${esc(next.id)}" title="next drill: ${esc(next.title)}" aria-label="next drill">›</a>` : '<button class="db-nav" type="button" disabled>›</button>'}
@@ -187,6 +191,9 @@ export function mountDrillPage(root, ctx = {}) {
     run = new DrillRun(drill, {
       onToast: showToast,
       onRefuse: () => { effects.refuse(); if (sheetView && sheetView.shake) sheetView.shake(); },
+      seedCells: daily ? daily.seedCells : null,
+      seed: daily ? daily.seed : null,
+      kind: daily ? 'daily' : 'drill',
     });
     sheetView = new SheetView($('drillHost'), run.session);
     ribbonView = new RibbonView($('drillHost').querySelector('.ribbon'), run.session, { mode: 'slim' });
@@ -217,9 +224,9 @@ export function mountDrillPage(root, ctx = {}) {
     if (startCard) startCard.remove();
     startCard = document.createElement('div');
     startCard.className = 'start-card';
-    startCard.innerHTML = `<div class="sc-inner"><div class="sc-title">Press any key to start</div>
-      <div class="sc-sub">The clock starts on your first key — this one never lands on the sheet.</div>
-      <div class="sc-pars">pass ${drill.pars.pass}s · pro ${drill.pars.pro}s · legendary ${drill.pars.legendary}s${pbBefore ? ` · your best ${fmtSecs(pbBefore.secs)}s` : ''}</div></div>`;
+    startCard.innerHTML = `<div class="sc-inner">${daily ? `<div class="sc-cat">◆ The Daily · ${esc(dayOf())} · the same drill for everyone</div><div class="sc-title">${esc(drill.title)}</div>` : `<div class="sc-title">Press any key to start</div>`}
+      <div class="sc-sub">${daily ? 'Press any key to start — the clock starts on your first key, and that one never lands on the sheet.' : 'The clock starts on your first key — this one never lands on the sheet.'}</div>
+      <div class="sc-pars">pass ${drill.pars.pass}s · pro ${drill.pars.pro}s · legendary ${drill.pars.legendary}s${pbBefore ? ` · your best ${fmtSecs(pbBefore.secs)}s` : ''}${daily ? ` · attempts today: ${attemptsToday()}` : ''}</div></div>`;
     $('drillHost').appendChild(startCard);
   }
   function dismissStartCard() { started = true; if (startCard) { startCard.remove(); startCard = null; } track('drill_start', { drill_id: drill.id }); }
@@ -356,13 +363,21 @@ export function mountDrillPage(root, ctx = {}) {
         const d = mine != null && theirs != null ? mine - theirs : null;
         return `<div class="split-row"><span class="sp-name">${esc(g.text)}</span><span class="sp-time">${mine == null ? '—' : fmtSecs(mine) + 's'}</span><span class="sp-delta ${d == null ? '' : d <= 0 ? 'ahead' : 'behind'}">${d == null ? '' : (d <= 0 ? '−' : '+') + fmtSecs(Math.abs(d))}</span></div>`;
       }).join('')}</div>
+      ${daily ? `<div class="rm-note">Daily attempt ${attemptsToday()} today — the board is the same all day, so keep going.</div>` : ''}
       <div class="rm-opts">
         <button class="btn btn-primary" data-act="retry" type="button">Retry <kbd>Enter</kbd></button>
+        ${daily ? '<button class="btn" data-act="share" type="button">Copy result</button>' : ''}
         ${next ? `<a class="btn" href="#/drill/${esc(next.id)}">Next drill</a>` : ''}
         <a class="btn" href="#/practice">All drills</a>
         <button class="btn btn-ghost" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button>
       </div>
     </div>`;
+    const share = overlay.querySelector('[data-act="share"]');
+    if (share) share.onclick = () => {
+      const text = shareText(dayOf(), drill.title, attempt.secs, attempt.tier);
+      try { navigator.clipboard.writeText(text).then(() => showToast('Result copied'), () => showToast('Couldn’t copy — clipboard blocked')); }
+      catch (e) { showToast('Couldn’t copy — clipboard blocked'); }
+    };
     overlay.querySelector('[data-act="retry"]').onclick = () => retry();
     overlay.querySelector('[data-act="look"]').onclick = () => { overlay.hidden = true; focusStage(); };
     overlay.hidden = false;
