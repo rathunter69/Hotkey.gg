@@ -5,6 +5,7 @@
 import { CHAPTER_PLAN } from './learn-page.js';
 import { CHAPTERS } from '../content/index.js';
 import { store } from './store.js';
+import { track } from './telemetry.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -134,6 +135,7 @@ export function landingHtml() {
 }
 
 export function mountLandingPage(root) {
+  track('landing_view');
   const el = document.createElement('div');
   el.innerHTML = landingHtml();
   root.appendChild(el);

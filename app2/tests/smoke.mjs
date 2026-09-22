@@ -51,6 +51,24 @@ try {
     const text = await page.evaluate(() => document.body.innerText.trim().length);
     if (!text) fail(`${route}: empty page`);
   }
+  // accounts (phase B): with every non-loopback request blocked, the account page still renders
+  // the sign-in form, the user chip reads guest, and the save state stays honest
+  await page.goto(base + '#/account');
+  await page.waitForTimeout(400);
+  const acct = await page.evaluate(() => ({
+    hasVendor: !!(window.supabase && window.supabase.createClient),
+    form: !!document.querySelector('#authForm'),
+    emailDisabled: !!(document.querySelector('#authEmail') && document.querySelector('#authEmail').disabled),
+    notConfigured: /Sign-in is not configured/.test(document.body.innerText),
+    chip: (document.querySelector('#userState') || {}).textContent || '',
+    saveLine: (document.querySelector('#umState') || {}).textContent || '',
+  }));
+  if (!acct.form) fail('#/account: sign-in form missing');
+  if (acct.hasVendor && (acct.emailDisabled || acct.notConfigured)) fail('#/account: form disabled although the client exists');
+  if (!acct.hasVendor && !acct.notConfigured) fail('#/account: no client and no "Sign-in is not configured" notice');
+  if (acct.chip !== 'guest') fail(`#/account: user chip reads "${acct.chip}", not guest`);
+  if (acct.saveLine !== 'Saved on this device') fail(`#/account: save state reads "${acct.saveLine}"`);
+
   // play the first and last lesson end to end by keyboard
   for (const lesson of [LESSONS[0], LESSONS[LESSONS.length - 1]]) {
     await page.goto(base + '#/lesson/' + lesson.id);

@@ -14,6 +14,7 @@ import { progress } from './progress.js';
 import { prefs } from './prefs.js';
 import { auth } from './auth.js';
 import { applyTheme, saveTheme, currentTheme } from '../ui/themes.js';
+import { track } from './telemetry.js';
 
 export const CACHE_KEY = 'hk2_cache_v1';
 export const OUTBOX_KEY = 'hk2_outbox_v1';
@@ -118,18 +119,18 @@ function setSave(state) { lastSave = state; announce(state); }
 function uid() { const u = auth.user(); return u ? u.id : null; }
 function signedIn() { return auth.state() === 'in'; }
 
-function readCache() {
-  const c = readJson(CACHE_KEY);
-  if (!isObj(c) || c.uid !== uid() || !isObj(c.lessons)) return null;   // foreign or corrupt: discard
-  return c.lessons;
+/** The cache belongs to exactly one uid; anything else (foreign, corrupt) is discarded. Pure. */
+export function ownedCache(raw, forUid) {
+  return isObj(raw) && forUid && raw.uid === forUid && isObj(raw.lessons) ? raw.lessons : null;
 }
+/** The outbox too — a foreign account's queued attempts are NEVER sent. Pure. */
+export function ownedOutbox(raw, forUid) {
+  return isObj(raw) && forUid && raw.uid === forUid && Array.isArray(raw.items) ? raw.items : [];
+}
+function readCache() { return ownedCache(readJson(CACHE_KEY), uid()); }
 function writeCache(lessons) { writeJson(CACHE_KEY, { uid: uid(), lessons }); }
 
-function readOutbox() {
-  const o = readJson(OUTBOX_KEY);
-  if (!isObj(o) || o.uid !== uid() || !Array.isArray(o.items)) return [];  // foreign: NEVER sent
-  return o.items;
-}
+function readOutbox() { return ownedOutbox(readJson(OUTBOX_KEY), uid()); }
 function writeOutbox(items) { writeJson(OUTBOX_KEY, { uid: uid(), items }); }
 
 function scheduleFlush(delay) {
@@ -212,7 +213,7 @@ async function maybeCarryOver(sb, t) {
       // carried (or this blob's chance is spent): the local copy must not carry twice
       progress.clear();
       removeKey(GUEST_ID_KEY);
-      if (!error) profile = { ...profile, carried_at: new Date().toISOString() };
+      if (!error) { profile = { ...profile, carried_at: new Date().toISOString() }; track('carry_over', { lessons: payload.lessons, bests: payload.bests }); }
     }
   } catch (e) { /* network: try again next sign-in */ }
 }

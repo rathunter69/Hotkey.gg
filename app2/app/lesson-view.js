@@ -5,6 +5,7 @@
 // finish gets a bigger one (§1, ui/effects.js).
 import { LessonRun, shortcutsUsed } from './runner.js';
 import { store } from './store.js';
+import { track } from './telemetry.js';
 import { nextLesson, chapterOf, lessonNumber } from '../content/index.js';
 import { SheetView } from '../ui/sheet-view.js';
 import { RibbonView } from '../ui/ribbon-view.js';
@@ -99,6 +100,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     onMouse: what => onMouse(what),
   });
   store.touch(lesson.id);
+  track('lesson_start', { lesson_id: lesson.id, mode: run.mode });
 
   /* ---------------- views ---------------- */
   function mountViews() {
@@ -290,6 +292,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   function closeOverlay() { overlay.hidden = true; focusWorkspace(); }
   function finish() {
     phase = 'done';
+    track('lesson_complete', { lesson_id: lesson.id, mode: run.mode });
     const before = store.all();
     firstEver = !Object.values(before).some(p => p.completed);
     const saved = store.record(lesson.id, run.mode, run.elapsed, {

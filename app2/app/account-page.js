@@ -8,6 +8,7 @@ import { prefs, PLATFORMS } from './prefs.js';
 import { store } from './store.js';
 import { auth } from './auth.js';
 import { validateHandle } from './handle.js';
+import { track } from './telemetry.js';
 import { LESSONS } from '../content/index.js';
 import { showToast } from '../ui/toast.js';
 
@@ -158,8 +159,8 @@ export function mountAccountPage(root, ctx = {}) {
       else res = await auth.magicLink(email);
       busy = false;
       if (res && res.error) notice = { kind: 'error', text: res.error };
-      else if (res && res.confirm) notice = { kind: 'check', text: tab === 'magic' ? 'The sign-in link is on its way; it works on this device.' : 'Click the confirmation link to finish creating your account.' };
-      else notice = null;   // signed in: onChange re-renders
+      else if (res && res.confirm) { notice = { kind: 'check', text: tab === 'magic' ? 'The sign-in link is on its way; it works on this device.' : 'Click the confirmation link to finish creating your account.' }; if (tab === 'signup') track('signup'); }
+      else { notice = null; track(tab === 'signup' ? 'signup' : 'sign_in'); }   // signed in: onChange re-renders
       render();
     };
     const g = el.querySelector('#googleBtn');

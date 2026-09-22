@@ -19,6 +19,7 @@ import { mountFooter } from '../ui/footer.js';
 import { prefs } from './prefs.js';
 import { store } from './store.js';
 import { auth } from './auth.js';
+import { track, installErrorLog } from './telemetry.js';
 import { lessonById } from '../content/index.js';
 
 const NAV_LINKS = [
@@ -169,6 +170,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     nav.setUser(u ? { handle: p && p.handle, level: p && p.level } : null);
     nav.setSaveState(store.saveText());
   }
+  installErrorLog();
   auth.ready().then(() => { syncUser(); if (auth.state() === 'in') store.hydrate().then(syncUser); });
   auth.onChange(() => {
     if (auth.state() === 'in') { syncUser(); store.hydrate().then(() => { syncUser(); route(); }); }
