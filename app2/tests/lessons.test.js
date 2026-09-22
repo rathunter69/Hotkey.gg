@@ -35,7 +35,8 @@ test('every lesson sits in one of its chapter\'s sections; the catalogue lists e
   }
   const foundations = CHAPTERS.find(c => c.id === 'foundations');
   assert.equal(sectionNames(foundations).length, 10, 'Chapter 1 shows all ten sections (SITE_SPEC §7 + the project section)');
-  assert.ok(sectionsOf(foundations).some(g => g.lessons.length === 0 && g.blurb), 'an upcoming section carries its blurb');
+  assert.ok(sectionsOf(foundations).every(g => g.lessons.length > 0), 'every Chapter 1 section has lessons (the chapter is complete)');
+  assert.equal(sectionsOf({ sections: [{ name: 'Soon', blurb: 'arrives later' }], lessons: [] })[0].blurb, 'arrives later', 'an upcoming (empty) section still carries its blurb');
   assert.deepEqual(sectionsOf({ sections: ['A'], lessons: [{ id: 'x' }, { id: 'y', section: 'A' }] }).map(g => [g.name, g.lessons.map(l => l.id)]), [['A', ['y']], ['Basics', ['x']]], 'a lesson without a section falls into Basics after the listed sections');
 });
 
@@ -361,9 +362,24 @@ test('#65 / #66 progress.js survives corrupt localStorage shapes', async () => {
     progress.record(ID, 'timed', NaN);
     assert.equal(progress.get(ID).best, 7.26, 'a non-finite time never becomes the best');
     assert.equal(progress.status(ID), 'mastered');
+    // chapter gates (#C5): chapterPass latches, chapter() reads, corrupt shapes normalise to {}
+    for (const raw of ['{"chapters":"x"}', '{"chapters":[]}', '{"chapters":{"foundations":"yes"}}', '{"chapters":{"foundations":{"assessment":"maybe","other":1}}}', '{}']) {
+      store.hk2_progress_v1 = raw;
+      assert.deepEqual(progress.chapter('foundations'), raw.includes('"maybe"') ? { assessment: true } : {}, `${raw}: chapter() normalises`);
+    }
+    store.hk2_progress_v1 = '{}';
+    assert.equal(progress.chapterPass('foundations', 'nonsense'), false, 'an unknown gate is refused');
+    assert.ok(progress.chapterPass('foundations', 'testout'));
+    assert.ok(progress.chapterPass('foundations', 'assessment'));
+    assert.deepEqual(progress.chapter('foundations'), { testout: true, assessment: true });
+    assert.deepEqual(progress.chapter('formatting'), {}, 'an unpassed chapter reads empty');
+    progress.record(ID, 'guided', 3);
+    assert.deepEqual(progress.chapter('foundations'), { testout: true, assessment: true }, 'a lesson record does not disturb the gates');
     // a broken storage API cannot throw out of record()/touch()
     globalThis.localStorage = { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); }, removeItem: () => { throw new Error('blocked'); } };
     assert.equal(progress.record(ID, 'guided', 1), false); assert.equal(progress.touch(ID), false); assert.equal(progress.status(ID), 'todo');
+    assert.equal(progress.chapterPass('foundations', 'testout'), false, 'blocked storage: chapterPass reports failure');
+    assert.deepEqual(progress.chapter('foundations'), {}, 'blocked storage: chapter() reads empty');
     assert.doesNotThrow(() => progress.clear());
   } finally { delete globalThis.localStorage; }
 });

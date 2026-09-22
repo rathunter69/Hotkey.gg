@@ -265,6 +265,10 @@ export const store = {
     return cached || queued;
   },
 
+  /* ---- chapter gates: local for now (an account mirror arrives with paid access in Phase E) ---- */
+  chapter(ch) { return progress.chapter(ch); },
+  chapterPass(ch, what) { return progress.chapterPass(ch, what); },
+
   /* ---- learner state: prefs stays the read path; the store writes through ---- */
   skipped() { return prefs.get().skipped; },
   skip(ids) { prefs.skip(ids); this.pushLearner(); },

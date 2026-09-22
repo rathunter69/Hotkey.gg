@@ -98,13 +98,20 @@ export function mountLearnPage(root) {
       <span class="cat-keys"><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>Enter</kbd> open</span>
     </div>`;
     let shown = 0;
+    // Chapter 2 unlocks when Chapter 1 is complete (every lesson done) or tested out (SITE_SPEC §7);
+    // paid access itself arrives in Phase E — this is the catalog state only.
+    const ch1 = CHAPTERS.find(x => x.id === 'foundations');
+    const gate = store.chapter('foundations');
+    const ch1Cleared = !!gate.testout || (ch1 && ch1.lessons.every(l => { const p = all[l.id]; return p && p.completed; }));
     for (const plan of CHAPTER_PLAN) {
       const ch = CHAPTERS.find(x => x.id === plan.id);
       if (!ch) {
-        html += `<section class="chapter chapter-locked"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(plan.title)}</h2><span class="access access-paid">Paid · coming</span></div><p class="chapter-blurb">${esc(plan.line)}</p></section>`;
+        const unlock = plan.n === 2 ? `<p class="chapter-unlock">${ch1Cleared ? 'Unlocked — Chapter 1 is behind you. Its lessons arrive with the paid tier.' : 'Unlocks when Chapter 1 is complete or tested out.'}</p>` : '';
+        html += `<section class="chapter chapter-locked"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(plan.title)}</h2><span class="access ${plan.n === 2 && ch1Cleared ? 'access-free">Unlocked · coming' : 'access-paid">Paid · coming'}</span></div><p class="chapter-blurb">${esc(plan.line)}</p>${unlock}</section>`;
         continue;
       }
-      html += `<section class="chapter"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(ch.title)}</h2><span class="access access-free">Free</span></div><p class="chapter-blurb">${esc(ch.blurb)}</p>`;
+      const testout = plan.id === 'foundations' ? (gate.testout ? '<span class="chapter-testout tested">Tested out ✓</span>' : '<a class="chapter-testout" href="#/lesson/foundations-testout">Already know this? Test out</a>') : '';
+      html += `<section class="chapter"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(ch.title)}</h2><span class="access access-free">Free</span>${testout}</div><p class="chapter-blurb">${esc(ch.blurb)}</p>`;
       const filtering = !!(filters.q || (filters.status && filters.status !== 'all') || (filters.difficulty && filters.difficulty !== 'all') || (filters.access && filters.access !== 'all'));
       for (const sec of (typeof sectionsOf === 'function' ? sectionsOf(ch) : groupBySection(ch.lessons))) {
         const rows = sec.lessons.filter(l => matchesFilters(l, statusOf(l.id, all, skipped), filters));

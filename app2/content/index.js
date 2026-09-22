@@ -34,6 +34,9 @@ import formula_errors from './lessons/formula-errors.js';
 import copy_cut_paste from './lessons/copy-cut-paste.js';
 import paste_special from './lessons/paste-special.js';
 import fill_series from './lessons/fill-series.js';
+import weekly_report_project from './lessons/weekly-report-project.js';
+import foundations_assessment from './lessons/foundations-assessment.js';
+import foundations_testout from './lessons/foundations-testout.js';
 
 export const CHAPTERS = [
   {
@@ -64,6 +67,7 @@ export const CHAPTERS = [
       ribbon_commands, dialog_boxes, home_tab_tour, format_cells_tabs, fills_and_colours,
       first_formula, sum_family, autosum, absolute_refs, cross_sheet, formula_errors,
       copy_cut_paste, paste_special, fill_series,
+      weekly_report_project, foundations_assessment, foundations_testout,
     ],
   },
 ];

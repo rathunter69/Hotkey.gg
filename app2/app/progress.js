@@ -16,6 +16,19 @@ function cleanEntry(e) {
   return out;
 }
 
+/** Keep only chapter records of the shape {assessment: true, testout: true}; anything else drops. */
+function cleanChapters(v) {
+  const out = {};
+  if (!isPlainObject(v)) return out;
+  for (const ch in v) {
+    if (!isPlainObject(v[ch])) continue;
+    const rec = {};
+    for (const k of ['assessment', 'testout']) if (v[ch][k]) rec[k] = true;
+    if (Object.keys(rec).length) out[ch] = rec;
+  }
+  return out;
+}
+
 function load() {
   try {
     const raw = localStorage.getItem(KEY);
@@ -24,8 +37,8 @@ function load() {
     if (isPlainObject(v) && isPlainObject(v.lessons)) {
       for (const id in v.lessons) { const e = cleanEntry(v.lessons[id]); if (e) lessons[id] = e; }
     }
-    return { lessons };
-  } catch (e) { return { lessons: {} }; }
+    return { lessons, chapters: cleanChapters(isPlainObject(v) ? v.chapters : null) };
+  } catch (e) { return { lessons: {}, chapters: {} }; }
 }
 function save(state) { try { localStorage.setItem(KEY, JSON.stringify(state)); return true; } catch (e) { return false; } }
 
@@ -59,5 +72,13 @@ export const progress = {
     try { const s = load(); if (!s.lessons[id]) { s.lessons[id] = { started: true, at: Date.now() }; return save(s); } return true; }
     catch (e) { return false; }
   },
+  /** A chapter gate passed: what = 'assessment' | 'testout'. Latches; returns false when nothing was saved. */
+  chapterPass(ch, what) {
+    if (what !== 'assessment' && what !== 'testout') return false;
+    try { const s = load(); const rec = s.chapters[ch] || {}; rec[what] = true; s.chapters[ch] = rec; return save(s); }
+    catch (e) { return false; }
+  },
+  /** The chapter's gate record: { assessment?: true, testout?: true } (empty when nothing passed). */
+  chapter(ch) { return load().chapters[ch] || {}; },
   clear() { try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } },
 };
