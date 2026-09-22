@@ -639,3 +639,11 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 #grid tr:first-child th.rowhdr{z-index:8}    /* the corner sits over both */
 /* r353: the Paste Special / Format Cells wrapper is positioning-only; .pd-box carries the one tight card look. */
 #pasteDialog,#fmtDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
+
+/* ---- phase C: hidden rows/columns, row heights, the freeze seam ---- */
+#grid tr.hidrow{display:none}
+#grid td.hidc, #grid th.hidc{padding:0 !important; border-left:0 !important; border-right:0 !important; font-size:0 !important; overflow:hidden}
+#grid th.seam-c{border-left:3px double var(--line)}
+#grid th.rowhdr.seam-r{border-top:3px double var(--line)}
+#grid td.frz-b{border-bottom:2px solid var(--faint)}
+#grid td.frz-r{border-right:2px solid var(--faint)}

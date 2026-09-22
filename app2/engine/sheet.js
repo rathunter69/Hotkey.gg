@@ -18,6 +18,7 @@ import { evalFormula, translateFormula, autocorrectFormula, adjustFormulaStructu
 import { fmtNum, dispText } from './format.js';
 
 export const COLW_DEFAULT = 64;   // px: Excel's default column width at 100% (8.43 characters); autofit widens beyond this
+export const ROWH_DEFAULT = 20;   // px: Excel's default row height at 100% (15pt)
 export const CHARPX = 8.6;        // mono digit width the #### test assumes
 export const TXTPX = 6.9;         // proportional label glyph
 export const PAD_NUM = 12, PAD_TXT = 20, FIT_SLACK = 4, COLW_MAX = 220;
@@ -101,11 +102,20 @@ export class Sheet {
     this.undoStack = []; this.redoStack = [];
     this.tabHome = null;
     this.gridlines = true;
+    this.rowH = new Array(this.rows + 1).fill(ROWH_DEFAULT);   // px per row (Excel default 20)
+    this.hiddenRows = new Set(); this.hiddenCols = new Set();
+    this.freeze = { r: 0, c: 0 };          // rows/cols frozen above/left of the seam (0 = none)
+    this.multi = null;                     // Go To Special: an explicit list of cell keys, or null
+    this.resolver = null;                  // name → Sheet, set by the Session that owns the workbook
     this.today = opts.today || null;
     this.listeners = new Set();
     this.lastFlash = null;   // {r1,c1,r2,c2} pasted footprint for the UI's one-shot flash
     if (opts.cells) for (const k in opts.cells) this.setCell(k, opts.cells[k]);
     if (opts.colW) for (const c in opts.colW) { this.colW[c] = opts.colW[c]; this.colSet[c] = true; }
+    if (opts.rowH) for (const r in opts.rowH) this.rowH[r] = opts.rowH[r];
+    if (opts.hiddenRows) for (const r of opts.hiddenRows) this.hiddenRows.add(r | 0);
+    if (opts.hiddenCols) for (const c of opts.hiddenCols) this.hiddenCols.add(c | 0);
+    if (opts.freeze) this.freeze = { r: opts.freeze.r | 0, c: opts.freeze.c | 0 };
     if (opts.active) this.active = this.clamp(opts.active.r, opts.active.c);
     this.recalc();
   }
@@ -145,7 +155,12 @@ export class Sheet {
   formula(ref) { const p = parseRef(ref); const c = p && this.cells[refKey(p.r, p.c)]; return c ? c.formula : null; }
   /** raw() for the evaluator: the value another cell sees (null when blank). */
   raw(k) { const c = this.cells[k]; return c ? c.value : null; }
-  evalCtx(extra) { return { raw: k => this.raw(k), rows: this.rows, cols: this.cols, today: this.today || undefined, ...extra }; }
+  evalCtx(extra) {
+    return { raw: k => this.raw(k), rows: this.rows, cols: this.cols, today: this.today || undefined,
+      // NAME!B3: another sheet of the workbook (the Session wires `resolver`); no workbook = #REF!
+      sheetRaw: (name, key) => { const sh = this.resolver ? this.resolver(name) : null; return sh ? sh.raw(key) : '#REF!'; },
+      ...extra };
+  }
 
   /* ---------------- selection ---------------- */
   selRange() {
@@ -165,21 +180,28 @@ export class Sheet {
     }
     return this.clamp(a.r, a.c);
   }
-  eachSel(fn) { const r = this.selRange(); for (let rr = r.r1; rr <= r.r2; rr++) for (let cc = r.c1; cc <= r.c2; cc++) fn(this.ensure(rr, cc), rr, cc); }
+  eachSel(fn) {
+    if (this.multi && this.multi.length) { for (const k of this.multi) { const p = parseRef(k); if (p) fn(this.ensure(p.r, p.c), p.r, p.c); } return; }
+    const r = this.selRange(); for (let rr = r.r1; rr <= r.r2; rr++) for (let cc = r.c1; cc <= r.c2; cc++) fn(this.ensure(rr, cc), rr, cc);
+  }
   /**
    * Set the selection to a rectangle 'A1:B3' (or a single ref); active = top-left. Both corners are
    * clamped to the grid (a range that collapses to one cell becomes a single-cell selection), so
    * eachSel never materialises cells outside rows × cols.
    */
   select(rangeText) {
+    this.multi = null;
     const rg = parseRange(rangeText); if (!rg) return false;
     const a = this.clamp(rg.r1, rg.c1), b = this.clamp(rg.r2, rg.c2);
     if (a.r === b.r && a.c === b.c) { this.active = a; this.sel = null; }
     else { this.sel = a; this.active = b; }
     this.selA = null; this.tabHome = null; this.emit('select'); return true;
   }
-  goTo(r, c) { this.active = this.clamp(r, c); this.sel = null; this.selA = null; this.tabHome = null; this.emit('select'); }
-  selectionText() { const r = this.selRange(); const a = refKey(r.r1, r.c1), b = refKey(r.r2, r.c2); return a === b ? a : a + ':' + b; }
+  goTo(r, c) { this.multi = null; this.active = this.clamp(r, c); this.sel = null; this.selA = null; this.tabHome = null; this.emit('select'); }
+  selectionText() {
+    if (this.multi && this.multi.length) return this.multi.join(',');
+    const r = this.selRange(); const a = refKey(r.r1, r.c1), b = refKey(r.r2, r.c2); return a === b ? a : a + ':' + b;
+  }
 
   /** Excel's Ctrl+arrow: to the edge of the current data block, or to the next block. */
   ctrlJump(r, c, dr, dc) {
@@ -219,7 +241,7 @@ export class Sheet {
    * Shift extends from the anchor; Ctrl jumps block edges; Ctrl+Shift extends by a jump.
    */
   move(dr, dc, shift, ctrl) {
-    this.tabHome = null;
+    this.tabHome = null; this.multi = null;
     if (!shift && this.sel) { const a = this.dispActive(); this.active = { r: a.r, c: a.c }; this.sel = null; this.selA = null; }
     let nr, nc;
     if (ctrl) { const j = this.ctrlJump(this.active.r, this.active.c, dr, dc); nr = j.r; nc = j.c; }
@@ -230,7 +252,7 @@ export class Sheet {
     this.emit('select');
   }
   moveHome(ctrl, shift) {   // Home → column A of this row; Ctrl+Home → A1
-    this.tabHome = null;
+    this.tabHome = null; this.multi = null;
     const a = this.sel && !shift ? this.dispActive() : this.active;
     const t = ctrl ? { r: 1, c: 1 } : { r: a.r, c: 1 };
     if (shift) { if (!this.sel) { this.sel = { r: this.active.r, c: this.active.c }; this.selA = null; } }
@@ -238,7 +260,7 @@ export class Sheet {
     this.active = t; this.emit('select');
   }
   moveEnd(ctrl, shift) {    // End → last used cell in the row; Ctrl+End → bottom-right of the used range
-    this.tabHome = null;
+    this.tabHome = null; this.multi = null;
     const a = this.sel && !shift ? this.dispActive() : this.active;
     let t;
     if (ctrl) t = this.usedRange();
@@ -248,14 +270,17 @@ export class Sheet {
     this.active = t; this.emit('select');
   }
   selectRow() {   // Shift+Space: the active cell's row(s); the cursor stays where it is
+    this.multi = null;
     const rg = this.selRange(); const a = this.dispActive();
     this.sel = { r: rg.r1, c: 1 }; this.active = { r: rg.r2, c: this.cols }; this.selA = { r: a.r, c: a.c }; this.emit('select');
   }
   selectCol() {   // Ctrl+Space
+    this.multi = null;
     const rg = this.selRange(); const a = this.dispActive();
     this.sel = { r: 1, c: rg.c1 }; this.active = { r: this.rows, c: rg.c2 }; this.selA = { r: a.r, c: a.c }; this.emit('select');
   }
   selectAll() {   // Ctrl+A: the current region first, the whole sheet when already on it (or on a blank)
+    this.multi = null;
     const a = this.dispActive(); const rg = this.regionAround(a.r, a.c); const cur = this.selRange();
     const same = this.sel && cur.r1 === rg.r1 && cur.r2 === rg.r2 && cur.c1 === rg.c1 && cur.c2 === rg.c2;
     const whole = same || (rg.r1 === rg.r2 && rg.c1 === rg.c2);
@@ -264,10 +289,15 @@ export class Sheet {
   }
 
   /* ---------------- undo ---------------- */
-  snapshot() { return { cells: clone(this.cells), colW: this.colW.slice(), colSet: this.colSet.slice(), rows: this.rows, active: { ...this.active }, sel: this.sel && { ...this.sel } }; }
+  snapshot() { return { cells: clone(this.cells), colW: this.colW.slice(), colSet: this.colSet.slice(), rows: this.rows, active: { ...this.active }, sel: this.sel && { ...this.sel },
+    rowH: this.rowH.slice(), hiddenRows: [...this.hiddenRows], hiddenCols: [...this.hiddenCols], freeze: { ...this.freeze } }; }
   /** Rewind cells AND the whole selection to one moment, so undo/redo re-select the range the operation touched (Excel). */
   restore(s) {
     this.cells = clone(s.cells); this.colW = s.colW.slice(); this.colSet = s.colSet.slice(); this.rows = s.rows;
+    if (s.rowH) this.rowH = s.rowH.slice();
+    this.hiddenRows = new Set(s.hiddenRows || []); this.hiddenCols = new Set(s.hiddenCols || []);
+    this.freeze = s.freeze ? { ...s.freeze } : { r: 0, c: 0 };
+    this.multi = null;
     if (s.active) this.active = this.clamp(s.active.r, s.active.c);
     this.sel = s.sel ? this.clamp(s.sel.r, s.sel.c) : null;
     if (this.sel && this.sel.r === this.active.r && this.sel.c === this.active.c) this.sel = null;
@@ -306,6 +336,7 @@ export class Sheet {
     for (const k of keys) {
       const d = new Set();
       for (const ref of formulaRefs(this.cells[k].formula, { rows: this.rows, cols: this.cols })) {
+        if (ref.sheet) continue;   // another sheet's cell: the Session's cross-sheet recalc covers it
         if (ref.key) { if (fset.has(ref.key)) d.add(ref.key); }
         else { const rg = ref.range; for (let r = Math.max(1, rg.r1); r <= Math.min(rg.r2, this.rows); r++) for (let c = Math.max(1, rg.c1); c <= Math.min(rg.c2, this.cols); c++) { const kk = refKey(r, c); if (fset.has(kk)) d.add(kk); } }
       }
@@ -429,8 +460,9 @@ export class Sheet {
   /* ---------------- formatting ---------------- */
   /** Excel's mixed-selection rule: set on all unless every cell already has it, then clear all. */
   toggleAllOrNone(prop) {
-    const r = this.selRange(); let all = true;
-    for (let rr = r.r1; rr <= r.r2 && all; rr++) for (let cc = r.c1; cc <= r.c2; cc++) if (!this.get(rr, cc)[prop]) { all = false; break; }
+    let all = true;
+    if (this.multi && this.multi.length) { for (const k of this.multi) { const q = parseRef(k); if (q && !this.get(q.r, q.c)[prop]) { all = false; break; } } }
+    else { const r = this.selRange(); for (let rr = r.r1; rr <= r.r2 && all; rr++) for (let cc = r.c1; cc <= r.c2; cc++) if (!this.get(rr, cc)[prop]) { all = false; break; } }
     this.pushUndo(); const target = !all; this.eachSel(c => c[prop] = target); this.commit('format');
     return target;
   }
@@ -518,6 +550,7 @@ export class Sheet {
    */
   paste(kind = 'all', op = 'none') {
     const cb = this.clipboard; if (!cb) return false;
+    this.multi = null;
     const sr = this.selRange(); const r0 = sr.r1, c0 = sr.c1;
     if (!(op && op !== 'none')) {   // Excel refuses a paste whose footprint would run off the sheet (the arithmetic ops only write inside the selection)
       let h = cb.h, w = cb.w;
@@ -697,6 +730,7 @@ export class Sheet {
     let out = src;
     for (let i = refs.length - 1; i >= 0; i--) {
       const x = refs[i]; let rep = null;
+      if (x.sheet) continue;
       if (x.key) { const p = parseRef(x.key); if (p && (p.r > this.rows || p.c > this.cols)) rep = '#REF!'; }
       else if (x.range) {
         const rg = x.range;
@@ -744,15 +778,29 @@ export class Sheet {
       if (n >= at && n + count > max && (this.nonEmpty(p.r, p.c) || Sheet.hasFormat(this.cells[k]))) return false;
     }
     this.pushUndo(); this.clearClipboard();
-    if (axis === 'r') this.shiftCells('r', r.r1, count);
-    else { this.shiftCells('c', r.c1, count); for (let c = this.cols; c >= r.c1 + count; c--) { this.colW[c] = this.colW[c - count]; this.colSet[c] = this.colSet[c - count]; } const inh = r.c1 > 1 ? this.colW[r.c1 - 1] : COLW_DEFAULT; for (let c = r.c1; c < r.c1 + count && c <= this.cols; c++) { this.colW[c] = inh; this.colSet[c] = r.c1 > 1 ? this.colSet[r.c1 - 1] : false; } }
+    if (axis === 'r') {
+      this.shiftCells('r', r.r1, count);
+      const inh = r.r1 > 1 ? this.rowH[r.r1 - 1] : ROWH_DEFAULT;
+      this.rowH.splice(r.r1, 0, ...new Array(count).fill(inh)); this.rowH.length = this.rows + 1;
+      this.hiddenRows = new Set([...this.hiddenRows].map(n => n >= r.r1 ? n + count : n).filter(n => n <= this.rows));
+      if (this.freeze.r >= r.r1) this.freeze.r = Math.min(this.rows - 1, this.freeze.r + count);
+    }
+    else { this.shiftCells('c', r.c1, count);
+      this.hiddenCols = new Set([...this.hiddenCols].map(n => n >= r.c1 ? n + count : n).filter(n => n <= this.cols));
+      if (this.freeze.c >= r.c1) this.freeze.c = Math.min(this.cols - 1, this.freeze.c + count); for (let c = this.cols; c >= r.c1 + count; c--) { this.colW[c] = this.colW[c - count]; this.colSet[c] = this.colSet[c - count]; } const inh = r.c1 > 1 ? this.colW[r.c1 - 1] : COLW_DEFAULT; for (let c = r.c1; c < r.c1 + count && c <= this.cols; c++) { this.colW[c] = inh; this.colSet[c] = r.c1 > 1 ? this.colSet[r.c1 - 1] : false; } }
     this.commit('structure'); return true;
   }
   /** Delete the selected rows/columns. The cursor lands on the seam but keeps the displayed active cell's column (rows) or row (columns), as Excel does. */
   remove(axis) {
     const r = this.selRange(); const a = this.dispActive(); this.pushUndo(); this.clearClipboard();
-    if (axis === 'r') { const count = r.r2 - r.r1 + 1; this.shiftCells('r', r.r1, -count); this.sel = null; this.selA = null; this.active = this.clamp(r.r1, a.c); }
-    else { const count = r.c2 - r.c1 + 1; this.shiftCells('c', r.c1, -count); for (let c = r.c1; c <= this.cols - count; c++) { this.colW[c] = this.colW[c + count]; this.colSet[c] = this.colSet[c + count]; } for (let c = Math.max(r.c1, this.cols - count + 1); c <= this.cols; c++) { this.colW[c] = COLW_DEFAULT; this.colSet[c] = false; } this.sel = null; this.selA = null; this.active = this.clamp(a.r, r.c1); }
+    if (axis === 'r') { const count = r.r2 - r.r1 + 1; this.shiftCells('r', r.r1, -count);
+      this.rowH.splice(r.r1, count); while (this.rowH.length < this.rows + 1) this.rowH.push(ROWH_DEFAULT);
+      this.hiddenRows = new Set([...this.hiddenRows].filter(n => n < r.r1 || n > r.r2).map(n => n > r.r2 ? n - count : n));
+      if (this.freeze.r > r.r2) this.freeze.r -= count; else if (this.freeze.r >= r.r1) this.freeze.r = Math.max(0, r.r1 - 1);
+      this.sel = null; this.selA = null; this.active = this.clamp(r.r1, a.c); }
+    else { const count = r.c2 - r.c1 + 1; this.shiftCells('c', r.c1, -count);
+      this.hiddenCols = new Set([...this.hiddenCols].filter(n => n < r.c1 || n > r.c2).map(n => n > r.c2 ? n - count : n));
+      if (this.freeze.c > r.c2) this.freeze.c -= count; else if (this.freeze.c >= r.c1) this.freeze.c = Math.max(0, r.c1 - 1); for (let c = r.c1; c <= this.cols - count; c++) { this.colW[c] = this.colW[c + count]; this.colSet[c] = this.colSet[c + count]; } for (let c = Math.max(r.c1, this.cols - count + 1); c <= this.cols; c++) { this.colW[c] = COLW_DEFAULT; this.colSet[c] = false; } this.sel = null; this.selA = null; this.active = this.clamp(a.r, r.c1); }
     this.commit('structure');
   }
   /** Ctrl+Shift+= / Ctrl+- semantics: only when whole rows or whole columns are selected. False when nothing happened (partial selection, or a refused insert). */
@@ -765,6 +813,123 @@ export class Sheet {
     return true;
   }
 
+  /* ---------------- Go To Special (HFDS / Go To › Special) ---------------- */
+  /**
+   * Select every blank / constant / formula cell inside the current selection (the region around
+   * the active cell when nothing is selected). Sets `multi` (an explicit key list the format and
+   * clear operations act on), active = the first key. False when nothing qualifies — Excel says
+   * "No cells were found." and the selection stays.
+   */
+  selectSpecial(kind) {
+    let rg = this.selRange();
+    if (!this.sel) rg = this.regionAround(this.active.r, this.active.c);
+    const keys = [];
+    for (let rr = rg.r1; rr <= rg.r2; rr++) for (let cc = rg.c1; cc <= rg.c2; cc++) {
+      const cell = this.get(rr, cc);
+      const isFormula = !!cell.formula;
+      const isBlank = !isFormula && (cell.value === null || cell.value === '');
+      const ok = kind === 'blanks' ? isBlank : kind === 'formulas' ? isFormula : kind === 'constants' ? (!isFormula && !isBlank) : false;
+      if (ok) keys.push(refKey(rr, cc));
+    }
+    if (!keys.length) return false;
+    const first = parseRef(keys[0]);
+    this.sel = null; this.selA = null; this.tabHome = null;
+    this.active = { r: first.r, c: first.c };
+    this.multi = keys;
+    this.emit('select');
+    return true;
+  }
+
+  /* ---------------- Find & Replace (Ctrl+F / Ctrl+H) ---------------- */
+  /**
+   * The next cell whose display value contains `text` (case-insensitive), scanning row-major
+   * after `from` (default: the active cell) and wrapping once. Moves the active cell there and
+   * returns the key, or null (nothing moves) when there is no match.
+   */
+  findNext(text, from) {
+    const t = String(text == null ? '' : text).toLowerCase(); if (!t) return null;
+    const start = from || this.dispActive();
+    const match = (r, c) => {
+      const cell = this.get(r, c); if (cell.value === null || cell.value === '') return false;
+      return String(cell.value).toLowerCase().includes(t) || (cell.formula && String(cell.formula).toLowerCase().includes(t));
+    };
+    const total = this.rows * this.cols;
+    let idx = (start.r - 1) * this.cols + (start.c - 1);
+    for (let step = 1; step <= total; step++) {
+      const i = (idx + step) % total;
+      const r = Math.floor(i / this.cols) + 1, c = (i % this.cols) + 1;
+      if (match(r, c)) { this.goTo(r, c); return refKey(r, c); }
+    }
+    return null;
+  }
+  /**
+   * Replace every occurrence of `find` (case-insensitive, substring) in values and formulas with
+   * `repl`, across the whole sheet, in one undo step. Returns the number of cells changed.
+   */
+  replaceAll(find, repl) {
+    const t = String(find == null ? '' : find); if (!t) return 0;
+    const rx = new RegExp(t.replace(/[.*+?^$()|[\]{}\\]/g, '\\$&'), 'gi');
+    const to = String(repl == null ? '' : repl);
+    const hits = [];
+    for (const k in this.cells) {
+      const cell = this.cells[k];
+      if (cell.formula && rx.test(cell.formula)) hits.push(k);
+      else if (typeof cell.value === 'string' && (rx.lastIndex = 0, rx.test(cell.value))) hits.push(k);
+      rx.lastIndex = 0;
+    }
+    if (!hits.length) return 0;
+    this.pushUndo();
+    for (const k of hits) {
+      const cell = this.cells[k];
+      if (cell.formula) cell.formula = cell.formula.replace(rx, to);
+      else cell.value = cell.value.replace(rx, to);
+      rx.lastIndex = 0;
+    }
+    this.commit('edit');
+    return hits.length;
+  }
+
+  /* ---------------- row height, hide/unhide, freeze ---------------- */
+  /** Row Height (Alt H O H): points, as Excel's dialog takes them; px = pts × 4/3. */
+  setRowHeight(pts) {
+    const n = Number(pts); if (!isFinite(n) || n <= 0) return false;
+    const px = Math.max(2, Math.min(160, Math.round(n * 4 / 3)));
+    const r = this.selRange(); this.pushUndo();
+    for (let rr = r.r1; rr <= r.r2; rr++) this.rowH[rr] = px;
+    this.commit('layout'); return true;
+  }
+  /** AutoFit Row Height (Alt H O A): default height, doubled per extra wrapped line. */
+  autofitRows() {
+    const r = this.selRange(); this.pushUndo();
+    for (let rr = r.r1; rr <= r.r2; rr++) {
+      let h = ROWH_DEFAULT;
+      for (let cc = 1; cc <= this.cols; cc++) {
+        const cell = this.get(rr, cc);
+        if (!cell.wrap || typeof cell.value !== 'string' || !cell.value) continue;
+        const w = this.colW[cc] || COLW_DEFAULT;
+        const lines = Math.max(1, Math.ceil(cellTxtPx(Object.assign({}, cell, { wrap: false })) / Math.max(20, w - 2 * 3)));
+        h = Math.max(h, ROWH_DEFAULT * lines);
+      }
+      this.rowH[rr] = h;
+    }
+    this.commit('layout'); return true;
+  }
+  /** Ctrl+9 / Ctrl+0: hide the selection's rows / columns. */
+  hideRows() { const r = this.selRange(); this.pushUndo(); for (let rr = r.r1; rr <= r.r2; rr++) this.hiddenRows.add(rr); this.commit('layout'); }
+  hideCols() { const c = this.selRange(); this.pushUndo(); for (let cc = c.c1; cc <= c.c2; cc++) this.hiddenCols.add(cc); this.commit('layout'); }
+  /** Ctrl+Shift+( / Ctrl+Shift+): unhide the hidden rows / columns inside the selection. */
+  unhideRows() { const r = this.selRange(); this.pushUndo(); for (let rr = r.r1; rr <= r.r2; rr++) this.hiddenRows.delete(rr); this.commit('layout'); }
+  unhideCols() { const c = this.selRange(); this.pushUndo(); for (let cc = c.c1; cc <= c.c2; cc++) this.hiddenCols.delete(cc); this.commit('layout'); }
+
   /* ---------------- serialisation ---------------- */
-  toJSON() { const cells = {}; for (const k in this.cells) { const c = this.cells[k]; const b = blankCell(); const o = {}; for (const f in c) if (c[f] !== b[f] && !(f === 'value' && c.formula)) o[f] = c[f]; if (Object.keys(o).length) cells[k] = o; } return { rows: this.rows, cols: this.cols, cells, active: { ...this.active } }; }
+  toJSON() {
+    const cells = {}; for (const k in this.cells) { const c = this.cells[k]; const b = blankCell(); const o = {}; for (const f in c) if (c[f] !== b[f] && !(f === 'value' && c.formula)) o[f] = c[f]; if (Object.keys(o).length) cells[k] = o; }
+    const out = { rows: this.rows, cols: this.cols, cells, active: { ...this.active } };
+    const rowH = {}; this.rowH.forEach((h, r) => { if (r >= 1 && h !== ROWH_DEFAULT) rowH[r] = h; });
+    if (Object.keys(rowH).length) out.rowH = rowH;
+    if (this.hiddenRows.size) out.hiddenRows = [...this.hiddenRows];
+    if (this.hiddenCols.size) out.hiddenCols = [...this.hiddenCols];
+    if (this.freeze.r || this.freeze.c) out.freeze = { ...this.freeze };
+    return out;
+  }
 }

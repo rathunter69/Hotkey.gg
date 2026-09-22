@@ -245,7 +245,7 @@ test('#38 / #69 a failing end state is surfaced as the pending item instead of a
 
 test('#41 the lesson clock is the engine clock: keys that do nothing do not start it', () => {
   let t = 1000;
-  for (const ev of [{ key: 'Escape' }, { key: '0', ctrlKey: true }, { key: 'k', ctrlKey: true }]) {
+  for (const ev of [{ key: 'Escape' }, { key: 'k', ctrlKey: true }]) {   // Ctrl+0 hides a column since phase C: it is real work and starts the clock
     const r = new LessonRun(f01(), { mode: 'timed', now: () => t });
     t = 1000; r.key(ev); t = 6000;
     assert.equal(r.startedAt, null, `${JSON.stringify(ev)} does not start the clock`); assert.equal(r.elapsed, 0);

@@ -28,9 +28,9 @@ export function recordMouse(session, what) {
 }
 
 /** Dialogs that own the input while open: the sheet and the bar behind them ignore clicks (Excel's modal cards). */
-export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'sortwarn', 'series', 'fxfix', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet']);
+export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'rowh', 'sortwarn', 'series', 'fxfix', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial']);
 /** The dialogs drawn as floating cards over the sheet (ribbon-view drawDialog), not as anchored dropdowns. */
-export const CARD_DIALOGS = new Set(['fmt', 'paste', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet']);
+export const CARD_DIALOGS = new Set(['fmt', 'paste', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial']);
 
 /** Leave the Alt walk without acting (a mouse command supersedes any open KeyTip path or dropdown). */
 export function leaveRibbon(session) { if (session.mode === 'ribbon') session.exitRibbon(false); }
@@ -242,7 +242,7 @@ export const RIBBON_COMMANDS = {
   'HDR': C('Delete sheet rows', 'Cells', 'H', ICON.deleteRows, direct(S => S.remove('r'))),
   'HDC': C('Delete sheet columns', 'Cells', 'H', ICON.deleteCols, direct(S => S.remove('c'))),
   'HOI': C('AutoFit column width', 'Cells', 'H', ICON.autofit, direct(S => S.autofitCols())),
-  'HOA': C('AutoFit row height', 'Cells', 'H', ICON.rowHeight, direct(S => S.commit('ribbon'))),   // the engine's rows are one height: a no-op, as Alt H O A is
+  'HOA': C('AutoFit row height', 'Cells', 'H', ICON.rowHeight, direct(S => S.autofitRows())),
   'HOW': C('Column width…', 'Cells', 'H', ICON.colWidth, dialog('colw', s => { s.colwBuf = ''; })),
   'HOE': C('Format cells…', 'Cells', 'H', ICON.format, fmtCells, 'Ctrl+1'),
   'OE': C('Format cells…', 'Cells', 'H', ICON.format, fmtCells, 'Ctrl+1'),
@@ -273,6 +273,21 @@ export const RIBBON_COMMANDS = {
   'FT': C('Excel Options…', 'File', 'F', ICON.options, s => { leaveRibbon(s); s.openOptions(); }),
   // Home · Editing › Find & Select
   'HFDG': C('Go To…', 'Editing', 'H', ICON.goTo, s => { leaveRibbon(s); s.openGoTo(); }, 'Ctrl+G'),
+  'HFDF': C('Find…', 'Editing', 'H', ICON.find, s => { leaveRibbon(s); s.openFind(false); }, 'Ctrl+F'),
+  'HFDR': C('Replace…', 'Editing', 'H', ICON.replace, s => { leaveRibbon(s); s.openFind(true); }, 'Ctrl+H'),
+  'HFDS': C('Go To Special…', 'Editing', 'H', ICON.goTo, s => { leaveRibbon(s); s.openGoToSpecial(); }),
+  'HFDU': C('Select formulas', 'Editing', 'H', ICON.fx, s => { leaveRibbon(s); s.startClock(); s.sheet.selectSpecial('formulas'); }),
+  'HFDN': C('Select constants', 'Editing', 'H', ICON.pasteValues, s => { leaveRibbon(s); s.startClock(); s.sheet.selectSpecial('constants'); }),
+  // Home · Cells › Format: sizes and visibility (phase C)
+  'HOH': C('Row height…', 'Cells', 'H', ICON.rowHeight, dialog('rowh', s2 => { s2.rowhBuf = ''; })),
+  'HOUR': C('Hide rows', 'Cells', 'H', ICON.rowHeight, direct(S => S.hideRows()), 'Ctrl+9'),
+  'HOUC': C('Hide columns', 'Cells', 'H', ICON.colWidth, direct(S => S.hideCols()), 'Ctrl+0'),
+  'HOUO': C('Unhide rows', 'Cells', 'H', ICON.rowHeight, direct(S => S.unhideRows()), 'Ctrl+Shift+('),
+  'HOUL': C('Unhide columns', 'Cells', 'H', ICON.colWidth, direct(S => S.unhideCols()), 'Ctrl+Shift+)'),
+  // View · Window: Freeze Panes (phase C)
+  'WFF': C('Freeze panes', 'Window', 'W', ICON.freeze, direct((S, s2) => { const a = S.dispActive(); S.freeze = (S.freeze.r || S.freeze.c) ? { r: 0, c: 0 } : { r: a.r - 1, c: a.c - 1 }; S.commit('layout'); })),
+  'WFR': C('Freeze top row', 'Window', 'W', ICON.freeze, direct(S => { S.freeze = { r: 1, c: 0 }; S.commit('layout'); })),
+  'WFC': C('Freeze first column', 'Window', 'W', ICON.freeze, direct(S => { S.freeze = { r: 0, c: 1 }; S.commit('layout'); })),
   // Page Layout · Page Setup
   'PSP': C('Page Setup…', 'Page Setup', 'P', ICON.launcher, s => { leaveRibbon(s); s.openPageSetup(); }),
   'POP': C('Portrait', 'Page Setup', 'P', ICON.portrait, direct((S, s) => { s.setOrientation('portrait'); S.commit('ribbon'); })),
@@ -347,7 +362,7 @@ export const UNIMPLEMENTED = [
   U('ViewNormal', 'Normal', 'Workbook Views', 'W', ICON.viewNormal), U('ViewPageBreak', 'Page Break Preview', 'Workbook Views', 'W', ICON.viewBreak), U('ViewPageLayout', 'Page Layout', 'Workbook Views', 'W', ICON.viewLayout),
   U('Ruler', 'Ruler', 'Show', 'W', ICON.ruler), U('FormulaBar', 'Formula Bar', 'Show', 'W', ICON.fx), U('Headings', 'Headings', 'Show', 'W', ICON.headings),
   U('Zoom', 'Zoom', 'Zoom', 'W', ICON.zoom), U('Zoom100', '100%', 'Zoom', 'W', ICON.zoom100),
-  U('FreezePanes', 'Freeze Panes', 'Window', 'W', ICON.freeze), U('NewWindow', 'New Window', 'Window', 'W', ICON.newWindow),
+  U('NewWindow', 'New Window', 'Window', 'W', ICON.newWindow),
 ];
 export const UNIMPLEMENTED_BY_ID = Object.fromEntries(UNIMPLEMENTED.map(u => [u.id, u]));
 
@@ -368,12 +383,13 @@ export const MENU_META = {
   'HSF': { label: 'Sort & Filter', icon: ICON.filter, items: [{ cmd: 'ASA' }, { cmd: 'ASD' }, { dead: 'Filter' }] },
   'F': { label: 'File', icon: ICON.options }, 'HFD': { label: 'Find & Select', icon: ICON.find },
   'PO': { label: 'Orientation', icon: ICON.pageOrient }, 'PS': { label: 'Page Setup', icon: ICON.launcher, virtual: true },
+  'HOU': { label: 'Hide & Unhide', icon: ICON.rowHeight }, 'WF': { label: 'Freeze Panes', icon: ICON.freeze },
 };
 export const VIRTUAL_MENUS = new Set(Object.keys(MENU_META).filter(k => MENU_META[k].virtual));
 /** Icons for menu items that are neither commands nor submenus (the dead entries of MENUS, engine/ribbon.js DEAD), by path. */
 export const MENU_ITEM_ICONS = {
   'FI': ICON.info, 'FN': ICON.newDoc, 'FO': ICON.open, 'FS': ICON.save, 'FA': ICON.saveAs, 'FP': ICON.print, 'FH': ICON.share, 'FE': ICON.exportDoc, 'FC': ICON.close, 'FD': ICON.account,
-  'HFDF': ICON.find, 'HFDR': ICON.replace, 'HFDS': ICON.goTo, 'HFDU': ICON.fx, 'HFDN': ICON.pasteValues, 'HFDV': ICON.validation, 'HFDO': ICON.shapes,
+  'HFDV': ICON.validation, 'HFDO': ICON.shapes,
 };
 
 // Item kinds: { cmd } a live command button · { menu } a dropdown button · { dead } a disabled Excel
@@ -436,7 +452,7 @@ export const RIBBON_LAYOUT = {
     { name: 'Workbook Views', cols: [big({ dead: 'ViewNormal' }), big({ dead: 'ViewPageBreak' }), big({ dead: 'ViewPageLayout' })] },
     { name: 'Show', cols: [{ rows: [[{ dead: 'Ruler' }], [{ cmd: 'WVG', check: true }]] }, { rows: [[{ dead: 'FormulaBar' }], [{ dead: 'Headings' }]] }] },
     { name: 'Zoom', cols: [big({ dead: 'Zoom' }), big({ dead: 'Zoom100' })] },
-    { name: 'Window', cols: [big({ dead: 'FreezePanes' }), big({ dead: 'NewWindow' })] },
+    { name: 'Window', cols: [big({ menu: 'WF' }), big({ dead: 'NewWindow' })] },
   ],
 };
 

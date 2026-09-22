@@ -70,11 +70,21 @@ function sameValue(a, b) {
   return a === b;
 }
 
-/** A scratch copy of the sheet, recalculated, so the rule never touches the sheet it inspects. */
+/**
+ * A scratch copy of the sheet, recalculated, so the rule never touches the sheet it inspects.
+ * A sheet in a workbook (Session sets `allSheets`) is cloned WITH its siblings, wired to a
+ * resolver over the clones, so cross-sheet formulas keep working and probes on 'COSTS!B3'
+ * land on the cloned Costs, never the real one.
+ */
 function cloneSheet(sheet) {
-  const test = new Sheet({ rows: sheet.rows, cols: sheet.cols, today: sheet.today || undefined });
-  test.cells = clone(sheet.cells); test.recalc();
-  return test;
+  const one = src => { const t = new Sheet({ rows: src.rows, cols: src.cols, today: src.today || undefined }); t.cells = clone(src.cells); return t; };
+  if (typeof sheet.allSheets !== 'function') { const test = one(sheet); test.recalc(); return test; }
+  const entries = sheet.allSheets().map(e => ({ name: e.name, sheet: one(e.sheet), src: e.sheet }));
+  const lookup = name => { const e = entries.find(x => x.name.toLowerCase() === String(name).toLowerCase()); return e ? e.sheet : null; };
+  for (const e of entries) e.sheet.resolver = lookup;
+  for (const e of entries) e.sheet.recalc();
+  const mine = entries.find(e => e.src === sheet);
+  return mine ? mine.sheet : one(sheet);
 }
 
 /**
@@ -84,14 +94,22 @@ function cloneSheet(sheet) {
  */
 function probe(test, key, base, inputs) {
   for (const inKey of inputs) {
-    const cell = test.cells[inKey] || (test.cells[inKey] = { value: null, formula: null });
+    // 'COSTS!B3' names a cell of another sheet in the cloned workbook
+    const bang = inKey.indexOf('!');
+    const host = bang < 0 ? test : (test.resolver ? test.resolver(inKey.slice(0, bang)) : null);
+    if (!host) continue;
+    const k = bang < 0 ? inKey : inKey.slice(bang + 1);
+    const cell = host.cells[k] || (host.cells[k] = { value: null, formula: null });
     if (cell.formula) continue;   // only inputs are nudged; formula cells move through their own inputs
     const orig = cell.value; let moved = false;
     for (const v of perturbations(orig)) {
-      cell.value = v; test.recalc();
+      cell.value = v;
+      if (host !== test) host.recalc();
+      test.recalc();
       if (!sameValue(test.value(key), base)) { moved = true; break; }
     }
     cell.value = orig;
+    if (host !== test) host.recalc();
     if (moved) return true;
   }
   return false;
@@ -104,8 +122,9 @@ function precedentMap(sheet) {
     const c = sheet.cells[k]; if (!c || !c.formula) continue;
     const refs = new Set();
     for (const ref of formulaRefs(c.formula, { rows: sheet.rows, cols: sheet.cols })) {
-      if (ref.key) { const p = parseRef(ref.key); if (p && sheet.inb(p.r, p.c)) refs.add(ref.key); }
-      else if (ref.range) { const rg = ref.range; for (let r = Math.max(1, rg.r1); r <= Math.min(rg.r2, sheet.rows); r++) for (let cc = Math.max(1, rg.c1); cc <= Math.min(rg.c2, sheet.cols); cc++) refs.add(refKey(r, cc)); }
+      const pfx = ref.sheet ? ref.sheet + '!' : '';
+      if (ref.key) { const p = parseRef(ref.key); if (p && sheet.inb(p.r, p.c)) refs.add(pfx + ref.key); }
+      else if (ref.range) { const rg = ref.range; for (let r = Math.max(1, rg.r1); r <= Math.min(rg.r2, sheet.rows); r++) for (let cc = Math.max(1, rg.c1); cc <= Math.min(rg.c2, sheet.cols); cc++) refs.add(pfx + refKey(r, cc)); }
     }
     map[k] = { refs, dynamic: formulaFunctions(c.formula).some(f => DYNAMIC_FNS.includes(f)) };
   }

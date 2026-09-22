@@ -42,6 +42,7 @@ export function parseFormulaRefs(buf) {
   if (!buf || buf[0] !== '=') return { refs, cellColors };
   let ix = 0;
   for (const ref of formulaRefs(buf)) {
+    if (ref.sheet) continue;   // a cross-sheet ref outlines nothing here (its cells are not on this grid)
     let r1, c1, r2, c2;
     if (ref.range) ({ r1, c1, r2, c2 } = ref.range);
     else { const p = parseRef(ref.key); if (!p) continue; r1 = r2 = p.r; c1 = c2 = p.c; }
@@ -229,9 +230,12 @@ export class SheetView {
     const ss = this.session, S = this.sheet = ss.sheet, gw = this.gw;
     const COLS = S.cols, ROWS = S.rows, colW = S.colW, cells = S.cells;
     const W = [0], L = ['']; let totalW = ROWHDR_W;
-    for (let c = 1; c <= COLS; c++) { const w = colW[c] || COLW_DEFAULT; W[c] = w; totalW += w; L[c] = colLetter(c); }
+    const hidC = S.hiddenCols || new Set(), hidR = S.hiddenRows || new Set();
+    const rowH = S.rowH || [];
+    const freeze = S.freeze || { r: 0, c: 0 };
+    for (let c = 1; c <= COLS; c++) { const w = hidC.has(c) ? 0 : (colW[c] || COLW_DEFAULT); W[c] = w; totalW += w; L[c] = colLetter(c); }
     this.ew = W;
-    const N = ROWS * COLS, shape = ROWS + 'x' + COLS + ':' + W.join(',');
+    const N = ROWS * COLS, shape = ROWS + 'x' + COLS + ':' + W.join(',') + '|' + [...hidR].join('.') + '|' + rowH.join('.') + '|' + freeze.r + ',' + freeze.c;
     const patch = this._shape === shape && !!this._tds && this._tds.length === N && this.grid.rows.length === ROWS + 1;
     if (!patch) { this._cls = new Array(N); this._sty = new Array(N); this._txt = new Array(N); }
     const oldCls = this._cls, oldSty = this._sty, oldTxt = this._txt, tds = this._tds;
@@ -251,19 +255,23 @@ export class SheetView {
       gh = '<colgroup><col style="width:' + ROWHDR_W + 'px">';
       for (let c = 1; c <= COLS; c++) gh += '<col style="width:' + W[c] + 'px">';
       gh += '</colgroup><tr><th class="rowhdr"></th>';
-      for (let c = 1; c <= COLS; c++) gh += '<th>' + L[c] + '</th>';
+      for (let c = 1; c <= COLS; c++) gh += '<th class="' + (hidC.has(c) ? 'hidc' : hidC.has(c - 1) ? 'seam-c' : '') + '">' + L[c] + '</th>';
       gh += '</tr>';
     }
 
     let i = 0;   // flat cell index, row-major
     for (let r = 1; r <= ROWS; r++) {
       const rowIn = hasSel && r >= sr.r1 && r <= sr.r2;
-      let row = patch ? '' : '<tr><th class="rowhdr">' + r + '</th>';
+      const rh = rowH[r] || ROW_H;
+      let row = patch ? '' : '<tr' + (hidR.has(r) ? ' class="hidrow"' : rh !== ROW_H ? ' style="height:' + rh + 'px"' : '') + '><th class="rowhdr' + (hidR.has(r - 1) ? ' seam-r' : '') + '">' + r + '</th>';
       for (let c = 1; c <= COLS; c++, i++) {
         const isActive = (r === dA.r && c === dA.c);
         const inSel = rowIn && c >= sr.c1 && c <= sr.c2;
         const isPoint = !!(editing && editPointer && r === editPointer.r && c === editPointer.c);
         let cls = isActive ? 'active' : (inSel ? 'sel' : '');
+        if (hidC.has(c)) cls += ' hidc';
+        if (freeze.r && r === freeze.r) cls += ' frz-b';
+        if (freeze.c && c === freeze.c) cls += ' frz-r';
         if (isPoint) cls += ' point';
         if (inSel) { if (r === sr.r1) cls += ' sel-t'; if (r === sr.r2) cls += ' sel-b'; if (c === sr.c1) cls += ' sel-l'; if (c === sr.c2) cls += ' sel-r'; }
         // Excel's fill-handle — the tiny green square at the selection's bottom-right (or on the lone active cell)
