@@ -1,0 +1,10 @@
+# Supabase CLI config for the rebuild. Lets every CLI call take --workdir app2:
+#   supabase link --project-ref <ref> --workdir app2
+#   supabase db push --workdir app2          (review session / db-deploy workflow only)
+#   supabase test db --workdir app2          (pgTAP, against the CLI's local stack)
+project_id = "hotkey-app2"
+
+[db]
+# New projects default to Postgres 17; if `supabase link` reports a different major on the
+# real project, fix this number in the same commit.
+major_version = 17
