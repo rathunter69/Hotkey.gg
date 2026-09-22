@@ -17,7 +17,7 @@ import { colLetter, colIndex, refKey, parseRef, parseRange, rectRefs } from './r
 import { evalFormula, translateFormula, autocorrectFormula, adjustFormulaStructure, isErrVal, formulaRefs } from './formula.js';
 import { fmtNum, dispText } from './format.js';
 
-export const COLW_DEFAULT = 78;   // px; autofit widens beyond this
+export const COLW_DEFAULT = 64;   // px: Excel's default column width at 100% (8.43 characters); autofit widens beyond this
 export const CHARPX = 8.6;        // mono digit width the #### test assumes
 export const TXTPX = 6.9;         // proportional label glyph
 export const PAD_NUM = 12, PAD_TXT = 20, FIT_SLACK = 4, COLW_MAX = 220;
@@ -89,8 +89,8 @@ export class Sheet {
    * @param {() => number} [opts.today]  Excel serial for TODAY()
    */
   constructor(opts = {}) {
-    this.rows = opts.rows || 20;
-    this.cols = opts.cols || 10;
+    this.rows = opts.rows || 100;   // the visible canvas is Excel-like: many rows and columns, scrolled by the view
+    this.cols = opts.cols || 26;
     this.cells = {};
     this.active = { r: 1, c: 1 };
     this.sel = null;        // anchor corner of a range selection, null = single cell
