@@ -17,7 +17,7 @@ const fail = (msg) => { console.error('\nCHECK FAILED: ' + msg); process.exit(1)
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
     const p = join(dir, name);
-    if (statSync(p).isDirectory()) { if (name !== 'node_modules') walk(p, out); }
+    if (statSync(p).isDirectory()) { if (name !== 'node_modules' && name !== 'vendor') walk(p, out); }
     else if (/\.(js|mjs)$/.test(name)) out.push(p);
   }
   return out;

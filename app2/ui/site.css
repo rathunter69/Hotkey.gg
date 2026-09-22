@@ -404,3 +404,11 @@ html.hk-fs .drill-page{max-width:none; padding:0 12px}
 .placeholder{font-family:var(--mono); font-size:11px; color:var(--faint); margin:0 !important}
 .notfound{min-height:50vh; display:flex; align-items:center}
 .nf-card{margin:0 auto; width:100%}
+
+/* ---- account: the sign-in form (phase B) ---- */
+.acct-tabs{display:flex; gap:8px; margin:14px 0 12px; flex-wrap:wrap}
+.acct-form{display:flex; flex-direction:column; gap:10px; margin:6px 0 14px; max-width:420px}
+.acct-form label{display:flex; flex-direction:column; gap:4px; font-family:var(--mono); font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted)}
+.acct-form input{font-size:14px}
+.form-err{color:var(--bad)}
+.acct-check{background:var(--surface2); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin:12px 0; font-size:14px}

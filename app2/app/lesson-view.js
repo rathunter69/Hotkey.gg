@@ -4,7 +4,7 @@
 // completion overlay. Mouse works and is recorded (§6); every completed goal gets a tick and the
 // finish gets a bigger one (§1, ui/effects.js).
 import { LessonRun, shortcutsUsed } from './runner.js';
-import { progress } from './progress.js';
+import { store } from './store.js';
 import { nextLesson, chapterOf, lessonNumber } from '../content/index.js';
 import { SheetView } from '../ui/sheet-view.js';
 import { RibbonView } from '../ui/ribbon-view.js';
@@ -98,7 +98,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     onRefuse: () => { effects.refuse(); if (sheetView && sheetView.shake) sheetView.shake(); },
     onMouse: what => onMouse(what),
   });
-  progress.touch(lesson.id);
+  store.touch(lesson.id);
 
   /* ---------------- views ---------------- */
   function mountViews() {
@@ -270,7 +270,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   }
   function renderOverlay() {
     const secs = run.startedAt == null ? null : run.elapsed;
-    const best = progress.get(lesson.id); const pb = best && Number.isFinite(best.best) ? best.best : null;
+    const best = store.get(lesson.id); const pb = best && Number.isFinite(best.best) ? best.best : null;
     overlay.innerHTML = `<div class="rm-card">
       <div class="rm-title" id="doneTitle">Lesson complete</div>
       <div class="rm-lesson">${lessonNumber(lesson.id)} · ${esc(lesson.title)} · ${modeLabel()}</div>
@@ -279,7 +279,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       ${run.mode === 'timed' ? `<div class="rm-note">${!assisted() && !run.mouseCount ? (pb != null ? `personal best <b>${fmtSecs(pb)} s</b>` : '') : 'help or mouse in a timed run: no personal best'}</div>` : ''}
       ${assisted() ? `<div class="rm-note">Steps were shown on request, so this attempt counts as assisted. Try solo earns the rest.</div>` : run.mode === 'guided' ? `<div class="rm-note">Try solo does it again without the keys shown.</div>` : ''}
       ${closingHtml()}
-      ${firstEver ? `<div class="rm-save"><b>Your first lesson is done.</b> Progress is saved on this device. Sign-in, which keeps it across devices, arrives in the next phase; see <a href="#/account">Account</a>.</div>` : ''}
+      ${firstEver && store.saveState() === 'device' ? `<div class="rm-save"><b>Your first lesson is done.</b> Progress is saved on this device. <a href="#/account">Create a free account</a> to keep it across devices — everything you have done carries over.</div>` : ''}
       <div class="rm-opts">${doneButtonsHtml()}<button class="btn btn-ghost" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button></div>
       <div class="rm-more">${esc(saveState)}</div>
     </div>`;
@@ -290,10 +290,15 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   function closeOverlay() { overlay.hidden = true; focusWorkspace(); }
   function finish() {
     phase = 'done';
-    const before = progress.all();
+    const before = store.all();
     firstEver = !Object.values(before).some(p => p.completed);
-    const saved = progress.record(lesson.id, run.mode, run.elapsed, { clean: !assisted() && !run.mouseCount });
-    saveState = saved ? 'Saved on this device' : 'Couldn’t save on this device (storage blocked); the lesson still counts for this visit';
+    const saved = store.record(lesson.id, run.mode, run.elapsed, {
+      clean: !assisted() && !run.mouseCount,
+      keystrokes: run.session.keyLog.length,
+      mouseCount: run.mouseCount,
+      assisted: assisted(),
+    });
+    saveState = saved ? store.saveText() : 'Couldn’t save on this device (storage blocked); the lesson still counts for this visit';
     if (timerH) { clearInterval(timerH); timerH = null; }
     effects.finish($('stage'));
     tab = 'lesson';

@@ -59,7 +59,7 @@ function navHtml(links, active, account) {
               <button class="user-btn" id="userBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="userDropdown" title="account">${NAV_ICONS.user}<span class="user-guest" id="userState">guest</span><span class="um-caret">▾</span></button>
               <div class="user-dropdown" id="userDropdown" role="menu" aria-labelledby="userBtn">
                 <div class="um-state" id="umState" role="presentation">Saved on this device</div>
-                ${ACCOUNT_ITEMS.map(it => it.divider ? '<div class="um-divider" role="separator"></div>' : `<a role="menuitem" tabindex="-1" class="${it.accent ? 'um-accent' : ''}" href="${escHtml(it.href)}">${escHtml(it.label)}</a>`).join('\n                ')}
+                ${ACCOUNT_ITEMS.map(it => it.divider ? '<div class="um-divider" role="separator"></div>' : `<a role="menuitem" tabindex="-1" ${it.accent ? 'id="umAuth" class="um-accent"' : 'class=""'} href="${escHtml(it.href)}">${escHtml(it.label)}</a>`).join('\n                ')}
               </div>
             </div>
           </div>` : '';
@@ -95,6 +95,7 @@ export function mountNav(el, opts = {}) {
   const modal = el.querySelector('#themesModal');
   let themesOpen = false;
   let lastFocus = null;
+  let signedIn = false;
 
   function closeThemes() {
     if (!themesOpen) return;
@@ -114,12 +115,12 @@ export function mountNav(el, opts = {}) {
     }).join('');
     modal.innerHTML = '<div class="pc-card" style="width:600px"><button type="button" class="modal-x" aria-label="close">×</button>' +
       '<div class="pc-head"><div class="pc-name">themes</div></div>' +
-      '<div class="pc-sub">Pick a theme. Your pick is saved on this device.</div>' +
+      `<div class="pc-sub">Pick a theme. Your pick is ${signedIn ? 'saved to your account' : 'saved on this device'}.</div>` +
       '<div class="th-grid">' + swatches + '</div>' +
       '<div class="pc-foot"><span></span><a id="thClose" href="#" role="button">close</a></div>' +
       '</div>';
     modal.querySelectorAll('.th-card').forEach(b => b.onclick = () => {
-      const k = b.dataset.key; applyTheme(k); saveTheme(k); openThemes();   // re-render so the ✓ moves
+      const k = b.dataset.key; applyTheme(k); saveTheme(k); if (opts.onTheme) { try { opts.onTheme(k); } catch (e) { /* app hook */ } } openThemes();   // re-render so the ✓ moves
       const again = modal.querySelector(`.th-card[data-key="${k}"]`); if (again) again.focus();
     });
     const c = modal.querySelector('#thClose'); if (c) c.onclick = e => { e.preventDefault(); closeThemes(); };
@@ -191,11 +192,38 @@ export function mountNav(el, opts = {}) {
   }
   /** The honest save state shown in the menu: "Saved on this device" | "Saved to your account" | "Couldn't save, will retry". */
   function setSaveState(text) { const s = el.querySelector('#umState'); if (s) s.textContent = text; }
+  /**
+   * Reflect the signed-in user: the button shows the handle (or "guest"), the accent menu item
+   * flips between "Sign in" and a Sign out button wired to opts.onSignOut.
+   */
+  function setUser(user) {
+    signedIn = !!user;
+    const state = el.querySelector('#userState');
+    if (state) {
+      state.textContent = user ? (user.handle || '…') : 'guest';
+      state.classList.toggle('user-guest', !user);
+    }
+    const slot = el.querySelector('#umAuth');
+    if (slot) {
+      if (user) {
+        const btn = document.createElement('button');
+        btn.type = 'button'; btn.id = 'umAuth'; btn.className = 'um-accent'; btn.setAttribute('role', 'menuitem'); btn.tabIndex = -1;
+        btn.textContent = 'Sign out';
+        btn.onclick = () => { closeMenu(false); if (opts.onSignOut) { try { opts.onSignOut(); } catch (e) { /* app hook */ } } };
+        slot.replaceWith(btn);
+      } else if (slot.tagName !== 'A') {
+        const a = document.createElement('a');
+        a.id = 'umAuth'; a.className = 'um-accent'; a.setAttribute('role', 'menuitem'); a.tabIndex = -1;
+        a.href = '#/account'; a.textContent = 'Sign in';
+        slot.replaceWith(a);
+      }
+    }
+  }
   function destroy() {
     window.removeEventListener('keydown', onKey, true);
     document.removeEventListener('mousedown', onDocClick);
     modal.removeEventListener('click', onModalClick);
     el.innerHTML = '';
   }
-  return { openThemes, closeThemes, openMenu, closeMenu, setActive, setSaveState, destroy, get isOpen() { return themesOpen; }, get menuOpen() { return menuOpen; } };
+  return { openThemes, closeThemes, openMenu, closeMenu, setActive, setSaveState, setUser, destroy, get isOpen() { return themesOpen; }, get menuOpen() { return menuOpen; } };
 }

@@ -2,7 +2,7 @@
 // (the next lesson not completed or skipped), chapter progress, the Daily (honest: it arrives with
 // timed play), and a link to the catalog.
 import { CHAPTERS, LESSONS, lessonNumber, chapterOf } from '../content/index.js';
-import { progress } from './progress.js';
+import { store } from './store.js';
 import { prefs } from './prefs.js';
 import { CHAPTER_PLAN, pickNextLesson, statusOf } from './learn-page.js';
 
@@ -11,7 +11,7 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&a
 export function mountHomePage(root) {
   const el = document.createElement('div');
   el.className = 'home';
-  const all = progress.all(); const p = prefs.get(); const skipped = p.skipped;
+  const all = store.all(); const p = prefs.get(); const skipped = p.skipped;
   const next = pickNextLesson(LESSONS, all, skipped);
   const ch1 = CHAPTERS.find(c => c.id === 'foundations') || { lessons: [] };
   const done = ch1.lessons.filter(l => ['done', 'mastered'].includes(statusOf(l.id, all, skipped))).length;
@@ -57,7 +57,7 @@ export function mountHomePage(root) {
           <div class="hc-body"><h2>One drill a day, same for everyone.</h2><p>The Daily arrives with timed play. Free for everyone; the streak is optional and never takes anything away.</p><a class="btn btn-ghost" href="#/practice">Practice</a></div>
         </section>
         <section class="home-card">
-          <div class="hc-cap">saved on this device</div>
+          <div class="hc-cap">${store.saveState() === 'device' ? 'saved on this device' : 'saved to your account'}</div>
           <div class="hc-body"><p>${Object.keys(all).length} lesson${Object.keys(all).length === 1 ? '' : 's'} with progress · ${p.platform === 'mac' ? 'Mac' : 'Windows'} keys${p.experience ? ` · ${{ new: 'new to Excel', sometimes: 'uses Excel sometimes', daily: 'uses Excel daily' }[p.experience]}` : ''}</p><a href="#/account">Account and settings →</a></div>
         </section>
       </div>

@@ -2,14 +2,14 @@
 // rapid-fire arrive with the game layer (Phase D); today it offers the Sandbox and timed runs on
 // lessons already completed. Honest about what is not here yet.
 import { LESSONS, lessonNumber } from '../content/index.js';
-import { progress } from './progress.js';
+import { store } from './store.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 export function mountPracticePage(root) {
   const el = document.createElement('div');
   el.className = 'page practice';
-  const all = progress.all();
+  const all = store.all();
   const done = LESSONS.filter(l => all[l.id] && all[l.id].completed);
   el.innerHTML = `<div class="page-head"><h1>Practice</h1><p class="page-sub">Timed play is the layer you graduate into. Reading time is free; the clock starts on your first key press.</p></div>
     <div class="practice-grid">

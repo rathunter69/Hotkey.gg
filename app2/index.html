@@ -23,6 +23,8 @@
 <div id="navMount"></div>
 <div class="app"><main id="root"></main></div>
 <div id="footMount"></div>
+<!-- pinned supabase-js UMD (classic script, never imported): exposes window.supabase for app/auth.js -->
+<script defer src="./vendor/supabase.js"></script>
 <script type="module">
   import { startApp } from './app/main.js';
   startApp({ navEl: document.getElementById('navMount'), rootEl: document.getElementById('root'), footEl: document.getElementById('footMount') });

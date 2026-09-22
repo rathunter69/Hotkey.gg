@@ -10,7 +10,7 @@ import { RibbonView } from '../ui/ribbon-view.js';
 import { mountKeycaps } from '../ui/keycaps.js';
 import { showToast } from '../ui/toast.js';
 import { prefs, keyLabel } from './prefs.js';
-import { progress } from './progress.js';
+import { store } from './store.js';
 import { LESSONS, lessonNumber } from '../content/index.js';
 import { pickNextLesson } from './learn-page.js';
 
@@ -115,7 +115,7 @@ export function mountFirstRun(root) {
       el.querySelector('#frSkipTask').blur();   // keys go to the sheet; the buttons stay one Tab away
     } else if (step === 'result') {
       const skipped = skipsFor(passed);
-      const all = progress.all();
+      const all = store.all();
       const next = pickNextLesson(LESSONS, all, skipped) || LESSONS[LESSONS.length - 1];
       const n = lessonNumber(next.id);
       el.innerHTML = card('placement · result',
@@ -166,7 +166,7 @@ export function mountFirstRun(root) {
     renderTasks();
   }
   function finish(skipped, lessonId) {
-    prefs.set({ platform, experience, firstRunDone: true, skipped });
+    store.setLearner({ platform, experience, firstRunDone: true, skipped });
     location.hash = '#/lesson/' + (lessonId || FIRST_LESSON);
   }
 

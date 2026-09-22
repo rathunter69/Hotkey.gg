@@ -4,6 +4,7 @@
 // Primary button "Start learning" → #/start. No signup wall.
 import { CHAPTER_PLAN } from './learn-page.js';
 import { CHAPTERS } from '../content/index.js';
+import { store } from './store.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -55,7 +56,7 @@ export function landingHtml() {
             <a class="start-btn" id="startLearning" href="#/start">Start learning <kbd class="kbd-cta">↵</kbd></a>
             <a class="l-quiet" href="#/learn">Browse the catalog</a>
           </div>
-          <div class="micro">No account to start · nothing to install · your progress is saved on this device</div>
+          <div class="micro">No account to start · nothing to install · your progress is ${store.saveState() === 'device' ? 'saved on this device' : 'saved to your account'}</div>
         </div>
         ${previewCard()}
       </div>

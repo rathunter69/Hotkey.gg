@@ -17,7 +17,8 @@
 import { mountNav } from '../ui/nav.js';
 import { mountFooter } from '../ui/footer.js';
 import { prefs } from './prefs.js';
-import { progress } from './progress.js';
+import { store } from './store.js';
+import { auth } from './auth.js';
 import { lessonById } from '../content/index.js';
 
 const NAV_LINKS = [
@@ -87,9 +88,9 @@ export function legacyQuery(search) {
   return q.has('drill') ? '/#/practice' : null;
 }
 
-/** A first-time visitor has neither saved prefs nor any lesson progress. */
+/** A first-time visitor has neither saved prefs, nor lesson progress, nor a signed-in session. */
 export function isReturning() {
-  try { return prefs.stored() || Object.keys(progress.all()).length > 0; } catch (e) { return false; }
+  try { return prefs.stored() || !!auth.user() || Object.keys(store.all()).length > 0; } catch (e) { return false; }
 }
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -157,8 +158,24 @@ export function startApp({ navEl, rootEl, footEl }) {
   const legacy = legacyQuery(location.search);
   if (legacy) { try { history.replaceState(null, '', legacy); } catch (e) { /* file:// etc.: route as-is */ } }
   prefs.reflect();
-  const nav = mountNav(navEl, { links: NAV_LINKS, active: 'learn', account: true });
+  const nav = mountNav(navEl, { links: NAV_LINKS, active: 'learn', account: true, onTheme: k => store.setTheme(k), onSignOut: () => auth.signOut() });
   const footer = footEl ? mountFooter(footEl) : null;
+
+  // ---- accounts: boot auth (PKCE ?code= returns are exchanged inside ready(); the hash
+  // router never reads location.search, so the return lands on #/account untouched)
+  function syncUser() {
+    const u = auth.user();
+    const p = store.profile();
+    nav.setUser(u ? { handle: p && p.handle, level: p && p.level } : null);
+    nav.setSaveState(store.saveText());
+  }
+  auth.ready().then(() => { syncUser(); if (auth.state() === 'in') store.hydrate().then(syncUser); });
+  auth.onChange(() => {
+    if (auth.state() === 'in') { syncUser(); store.hydrate().then(() => { syncUser(); route(); }); }
+    else { store.reset(); syncUser(); route(); }
+  });
+  window.addEventListener('hk:save', e => nav.setSaveState(store.saveText(e.detail)));
+  window.addEventListener('hk:user', () => syncUser());
   const narrowMq = typeof matchMedia === 'function' ? matchMedia(NARROW_QUERY) : null;
 
   function unmount() {
