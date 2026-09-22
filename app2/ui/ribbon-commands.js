@@ -11,7 +11,7 @@
 //   runCommand(session, 'H1');            // bold, exactly as Alt H 1 / Ctrl+B would
 //   recordMouse(session, 'ribbon:H1');    // SITE_SPEC §6: every workspace click is recorded
 
-import { COMMANDS, MENUS, TABS, RIBBON_ICONS, RIBBON_MENU_ICONS } from '../engine/ribbon.js';
+import { COMMANDS, MENUS, TABS, RIBBON_ICONS, RIBBON_MENU_ICONS, QAT_COMMANDS } from '../engine/ribbon.js';
 
 /* ---------------- mouse recording (SITE_SPEC §6) ---------------- */
 /**
@@ -28,7 +28,9 @@ export function recordMouse(session, what) {
 }
 
 /** Dialogs that own the input while open: the sheet and the bar behind them ignore clicks (Excel's modal cards). */
-export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'sortwarn', 'series', 'fxfix']);
+export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'sortwarn', 'series', 'fxfix', 'goto', 'options', 'pagesetup']);
+/** The dialogs drawn as floating cards over the sheet (ribbon-view drawDialog), not as anchored dropdowns. */
+export const CARD_DIALOGS = new Set(['fmt', 'paste', 'goto', 'options', 'pagesetup']);
 
 /** Leave the Alt walk without acting (a mouse command supersedes any open KeyTip path or dropdown). */
 export function leaveRibbon(session) { if (session.mode === 'ribbon') session.exitRibbon(false); }
@@ -36,6 +38,7 @@ export function leaveRibbon(session) { if (session.mode === 'ribbon') session.ex
 /** A mouse Cancel on a dialog or dropdown: what Esc does, without a key. */
 export function closeDialog(session) {
   session.dialog = null; session.pasteKind = null; session.note = ''; session.sortPend = null; session.colwBuf = '';
+  session.dlg = null; session.dialogBuf = '';
   if (session.fxfixPend) session.fxfixPend = null;
   if (session.mode === 'ribbon') session.exitRibbon(false);
 }
@@ -145,6 +148,31 @@ export const ICON = {
   insertCols: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18"/><path d="M12 10v4M10 12h4" stroke-width="2.5"/>'),
   deleteRows: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18"/><path d="M10 10l4 4M14 10l-4 4"/>'),
   deleteCols: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18"/><path d="M10 10l4 4M14 10l-4 4"/>'),
+  // File backstage, Page Layout, Go To and the Quick Access Toolbar
+  info: svg('<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/>'),
+  newDoc: svg('<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 12v6M9 15h6"/>'),
+  open: svg('<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'),
+  save: svg('<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/>'),
+  saveAs: svg('<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M7 3v5h8"/><path d="M9 17l2-5 4 4-5 2z"/>'),
+  print: svg('<path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M6 14h12v7H6z"/>'),
+  share: svg('<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>'),
+  exportDoc: svg('<path d="M12 3v12M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/>'),
+  close: svg('<path d="M18 6 6 18M6 6l12 12"/>'),
+  account: svg('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'),
+  options: svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'),
+  goTo: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 12h9M13 9l3 3-3 3"/>'),
+  replace: svg('<path d="M4 7h10l-3-3M20 17H10l3 3"/><rect x="4" y="11" width="6" height="6" rx="1"/><rect x="14" y="7" width="6" height="6" rx="1"/>'),
+  launcher: svg('<path d="M5 5v14h14"/><path d="M9 9l10 10M19 12v7h-7"/>'),
+  portrait: svg('<rect x="6" y="3" width="12" height="18" rx="1"/><path d="M9 8h6M9 12h6M9 16h4"/>'),
+  landscape: svg('<rect x="3" y="6" width="18" height="12" rx="1"/><path d="M7 10h10M7 14h7"/>'),
+  breaks: svg('<rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 12h18" stroke-dasharray="3 3"/><path d="M12 3v18" stroke-dasharray="3 3"/>'),
+  background: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l5-5 4 4 3-3 6 6"/><circle cx="16" cy="8" r="1.5"/>'),
+  printTitles: svg('<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18" stroke-width="3"/><path d="M3 14h18"/>'),
+  undo: svg('<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>'),
+  redo: svg('<path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/>'),
+  colors: svg('<circle cx="7" cy="8" r="3"/><circle cx="17" cy="8" r="3"/><circle cx="12" cy="16" r="3"/>'),
+  fonts: glyph('Aa', SERIF),
+  effects: svg('<rect x="4" y="4" width="12" height="12" rx="2"/><rect x="8" y="8" width="12" height="12" rx="2" stroke-dasharray="2 2"/>'),
 };
 
 /* ---------------- the command table ---------------- */
@@ -231,6 +259,14 @@ export const RIBBON_COMMANDS = {
   // View
   'WVG': C('Gridlines', 'Show', 'W', ICON.gridlines, gridlines),
   'WG': C('Gridlines', 'Show', 'W', ICON.gridlines, gridlines),
+  // File backstage
+  'FT': C('Excel Options…', 'File', 'F', ICON.options, s => { leaveRibbon(s); s.openOptions(); }),
+  // Home · Editing › Find & Select
+  'HFDG': C('Go To…', 'Editing', 'H', ICON.goTo, s => { leaveRibbon(s); s.openGoTo(); }, 'Ctrl+G'),
+  // Page Layout · Page Setup
+  'PSP': C('Page Setup…', 'Page Setup', 'P', ICON.launcher, s => { leaveRibbon(s); s.openPageSetup(); }),
+  'POP': C('Portrait', 'Page Setup', 'P', ICON.portrait, direct((S, s) => { s.setOrientation('portrait'); S.commit('ribbon'); })),
+  'POL': C('Landscape', 'Page Setup', 'P', ICON.landscape, direct((S, s) => { s.setOrientation('landscape'); S.commit('ribbon'); })),
   // Mouse-only faces of engine features that have a chord but no Alt path (Excel's Clipboard buttons)
   'PASTE': C('Paste', 'Clipboard', 'H', ICON.paste, direct(S => S.paste('all')), 'Ctrl+V'),
   'CUT': C('Cut', 'Clipboard', 'H', ICON.cut, direct(S => S.copy(true)), 'Ctrl+X'),
@@ -250,6 +286,24 @@ export function runCommand(session, id) {
   cmd.run(session); return true;
 }
 
+/* ---------------- the Quick Access Toolbar (session.settings.qat) ---------------- */
+/** Icons for the toolbar entries by id (engine/ribbon.js QAT_COMMANDS); an Alt-walk entry borrows its command's icon. */
+const QAT_OWN_ICONS = { save: ICON.save, undo: ICON.undo, redo: ICON.redo, copy: ICON.copy, paste: ICON.paste, formatPainter: ICON.painter, freezePanes: ICON.freeze,
+  mergeCenter: ICON.merge, printPreview: ICON.print, spelling: ICON.spelling, borders: ICON.borders };
+export const QAT_ICONS = Object.fromEntries(Object.keys(QAT_COMMANDS).map(id => { const q = QAT_COMMANDS[id]; return [id, QAT_OWN_ICONS[id] || (q.np && RIBBON_COMMANDS[q.np] ? RIBBON_COMMANDS[q.np].icon : '')]; }));
+/**
+ * A click on a toolbar entry: an Alt-walk entry runs through runCommand (an open edit commits first,
+ * as any ribbon click does), the rest through the session's own runner — the same paths Alt+digit
+ * takes. True when something ran; a command the engine lacks is a recorded no-op.
+ */
+export function runQatCommand(session, id) {
+  const q = QAT_COMMANDS[id]; if (!q) return false;
+  if (q.np && RIBBON_COMMANDS[q.np]) return runCommand(session, q.np);
+  if (session.editing && !session.commitEdit(0, 0, { kind: 'move' })) return false;
+  leaveRibbon(session);
+  return !!session.runQat(id);
+}
+
 /* ---------------- the disabled Excel commands ---------------- */
 const U = (id, label, group, tab, icon) => ({ id, label, group, tab, icon: icon || '' });
 export const UNIMPLEMENTED = [
@@ -264,8 +318,11 @@ export const UNIMPLEMENTED = [
   U('Pictures', 'Pictures', 'Illustrations', 'N', ICON.picture), U('Shapes', 'Shapes', 'Illustrations', 'N', ICON.shapes),
   U('ChartColumn', 'Column', 'Charts', 'N', ICON.chartCol), U('ChartLine', 'Line', 'Charts', 'N', ICON.chartLine), U('ChartPie', 'Pie', 'Charts', 'N', ICON.chartPie),
   U('Link', 'Link', 'Links', 'N', ICON.link), U('TextBox', 'Text Box', 'Text', 'N', ICON.textBox), U('HeaderFooter', 'Header & Footer', 'Text', 'N', ICON.headerFooter),
-  U('Themes', 'Themes', 'Themes', 'P', ICON.themes), U('Margins', 'Margins', 'Page Setup', 'P', ICON.margins), U('PageOrientation', 'Orientation', 'Page Setup', 'P', ICON.pageOrient),
+  U('Themes', 'Themes', 'Themes', 'P', ICON.themes), U('ThemeColors', 'Colors', 'Themes', 'P', ICON.colors), U('ThemeFonts', 'Fonts', 'Themes', 'P', ICON.fonts), U('ThemeEffects', 'Effects', 'Themes', 'P', ICON.effects),
+  U('Margins', 'Margins', 'Page Setup', 'P', ICON.margins), U('PageOrientation', 'Orientation', 'Page Setup', 'P', ICON.pageOrient),
   U('PageSize', 'Size', 'Page Setup', 'P', ICON.pageSize), U('PrintArea', 'Print Area', 'Page Setup', 'P', ICON.printArea),
+  U('Breaks', 'Breaks', 'Page Setup', 'P', ICON.breaks), U('Background', 'Background', 'Page Setup', 'P', ICON.background), U('PrintTitles', 'Print Titles', 'Page Setup', 'P', ICON.printTitles),
+  U('ScaleWidth', 'Width', 'Scale to Fit', 'P'), U('ScaleHeight', 'Height', 'Scale to Fit', 'P'), U('ScaleScale', 'Scale', 'Scale to Fit', 'P'),
   U('SheetGridlines', 'Gridlines', 'Sheet Options', 'P', ICON.gridlines), U('SheetHeadings', 'Headings', 'Sheet Options', 'P', ICON.headings),
   U('InsertFunction', 'Insert Function', 'Function Library', 'M', ICON.fx), U('RecentlyUsed', 'Recently Used', 'Function Library', 'M'),
   U('Financial', 'Financial', 'Function Library', 'M'), U('Logical', 'Logical', 'Function Library', 'M'), U('TextFn', 'Text', 'Function Library', 'M'),
@@ -299,8 +356,15 @@ export const MENU_META = {
   'WV': { label: 'Show', icon: ICON.gridlines, virtual: true }, 'AS': { label: 'Sort', icon: ICON.sortAZ, virtual: true },
   'E': { label: 'Edit', icon: ICON.paste }, 'O': { label: 'Format', icon: ICON.format },
   'HSF': { label: 'Sort & Filter', icon: ICON.filter, items: [{ cmd: 'ASA' }, { cmd: 'ASD' }, { dead: 'Filter' }] },
+  'F': { label: 'File', icon: ICON.options }, 'HFD': { label: 'Find & Select', icon: ICON.find },
+  'PO': { label: 'Orientation', icon: ICON.pageOrient }, 'PS': { label: 'Page Setup', icon: ICON.launcher, virtual: true },
 };
 export const VIRTUAL_MENUS = new Set(Object.keys(MENU_META).filter(k => MENU_META[k].virtual));
+/** Icons for menu items that are neither commands nor submenus (the dead entries of MENUS, engine/ribbon.js DEAD), by path. */
+export const MENU_ITEM_ICONS = {
+  'FI': ICON.info, 'FN': ICON.newDoc, 'FO': ICON.open, 'FS': ICON.save, 'FA': ICON.saveAs, 'FP': ICON.print, 'FH': ICON.share, 'FE': ICON.exportDoc, 'FC': ICON.close, 'FD': ICON.account,
+  'HFDF': ICON.find, 'HFDR': ICON.replace, 'HFDS': ICON.goTo, 'HFDU': ICON.fx, 'HFDN': ICON.pasteValues, 'HFDV': ICON.validation, 'HFDO': ICON.shapes,
+};
 
 // Item kinds: { cmd } a live command button · { menu } a dropdown button · { dead } a disabled Excel
 // command (UNIMPLEMENTED id) · { box } a disabled name/size/format box. `big` = icon over label
@@ -326,7 +390,7 @@ export const RIBBON_LAYOUT = {
     ] }] },
     { name: 'Styles', cols: [{ rows: [[{ dead: 'CondFormat', caret: true }], [{ dead: 'FormatTable', caret: true }], [{ cmd: 'HJ', caret: true }]] }] },
     { name: 'Cells', cols: [{ rows: [[{ menu: 'HI' }], [{ menu: 'HD' }], [{ menu: 'HO' }]] }] },
-    { name: 'Editing', cols: [{ rows: [[{ menu: 'HU' }], [{ menu: 'HFI' }], [{ menu: 'HE' }]] }, { rows: [[{ menu: 'HSF' }], [{ dead: 'FindSelect', caret: true }]] }] },
+    { name: 'Editing', cols: [{ rows: [[{ menu: 'HU' }], [{ menu: 'HFI' }], [{ menu: 'HE' }]] }, { rows: [[{ menu: 'HSF' }], [{ menu: 'HFD' }]] }] },
   ],
   N: [
     { name: 'Tables', cols: [big({ dead: 'PivotTable' }), big({ dead: 'Table' })] },
@@ -335,9 +399,12 @@ export const RIBBON_LAYOUT = {
     { name: 'Links', cols: [big({ dead: 'Link' })] },
     { name: 'Text', cols: [{ rows: [[{ dead: 'TextBox' }], [{ dead: 'HeaderFooter' }]] }] },
   ],
+  // Page Layout: the Page Setup group is Excel's (Margins ▾ … Print Titles) with its dialog launcher live (Alt P S P);
+  // Orientation ▾ is a real menu (Alt P O P / L); the rest render disabled
   P: [
-    { name: 'Themes', cols: [big({ dead: 'Themes' })] },
-    { name: 'Page Setup', cols: [big({ dead: 'Margins' }), big({ dead: 'PageOrientation' }), big({ dead: 'PageSize' }), big({ dead: 'PrintArea' })] },
+    { name: 'Themes', cols: [big({ dead: 'Themes', caret: true }), { rows: [[{ dead: 'ThemeColors', caret: true }], [{ dead: 'ThemeFonts', caret: true }], [{ dead: 'ThemeEffects', caret: true }]] }] },
+    { name: 'Page Setup', launcher: 'PSP', cols: [big({ dead: 'Margins', caret: true }), big({ menu: 'PO' }), big({ dead: 'PageSize', caret: true }), big({ dead: 'PrintArea', caret: true }), big({ dead: 'Breaks', caret: true }), big({ dead: 'Background' }), big({ dead: 'PrintTitles' })] },
+    { name: 'Scale to Fit', cols: [{ rows: [[{ box: 'Width: Automatic', dead: 'ScaleWidth', w: 110 }], [{ box: 'Height: Automatic', dead: 'ScaleHeight', w: 110 }], [{ box: 'Scale: 100%', dead: 'ScaleScale', w: 110 }]] }] },
     { name: 'Sheet Options', cols: [{ rows: [[{ dead: 'SheetGridlines' }], [{ dead: 'SheetHeadings' }]] }] },
   ],
   M: [

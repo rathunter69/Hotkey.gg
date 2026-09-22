@@ -1,0 +1,130 @@
+/* app2/ui/workbook.css — the workbook layer: the sheet-tabs strip (ui/sheet-tabs.js), the Quick Access
+   Toolbar in the ribbon's tab row, the File backstage menu, and the Go To / Excel Options / Page Setup
+   cards (ui/ribbon-view.js). Theme tokens only, so every palette is covered; the card look is app.css's
+   .pd-box idiom (Format Cells / Paste Special), widened where Excel's dialog is wide. */
+
+/* ---------- sheet tabs (the old build's strip: SHEETS chip, raised current tab) ---------- */
+.wb-tabs{display:flex; align-items:flex-end; gap:3px; padding:0 10px; height:38px; flex:none; background:var(--surface2); border-top:1px solid var(--line); overflow-x:auto; scrollbar-width:none}
+.wb-tabs::-webkit-scrollbar{display:none}
+.wb-lead{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.14em; color:var(--accent); margin-right:8px; padding:3px 10px; align-self:center; white-space:nowrap; flex:none; border:1px solid currentColor; border-radius:99px; opacity:.92}
+.wb-tab{flex:0 0 auto; min-width:52px; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family:var(--mono); font-size:12.5px; color:var(--muted); background:var(--surface);
+  border:1px solid var(--line); border-bottom:0; border-top:2.5px solid var(--line); border-radius:7px 7px 0 0; padding:8px 15px 9px; cursor:pointer; transition:.12s; user-select:none}
+.wb-tab:hover{color:var(--text)}
+.wb-tab.cur{color:var(--text); background:var(--bg); font-weight:700; border-color:var(--accent-dim); border-top-color:var(--accent); cursor:default}
+.wb-add{flex:none; align-self:center; margin-left:4px; width:22px; height:22px; border-radius:99px; border:1px solid var(--line); background:var(--surface); color:var(--muted); font-size:14px; line-height:1; cursor:pointer; padding:0}
+.wb-add:hover{color:var(--accent); border-color:var(--accent-dim)}
+
+/* ---------- the tab row with the toolbar and the File tab in it: compact, and a tab label never wraps ---------- */
+.rf-tabs{gap:1px; padding-left:6px; padding-right:6px}
+.rf-tabs .rf-tab{white-space:nowrap; flex:none; padding-left:9px; padding-right:9px}
+.rf-tabs .rf-tools{flex:none; gap:6px}
+.rf-tabs .rf-tools .rnote{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px}
+
+/* ---------- Quick Access Toolbar: small icons left of the tabs, numeric KeyTips while Alt is up ---------- */
+.rf-qat{display:inline-flex; align-items:center; gap:0; align-self:center; margin-right:4px; padding:0 5px 2px 0; border-right:1px solid var(--line); flex:none}
+.rf-qbtn{position:relative; display:inline-grid; place-items:center; width:18px; height:19px; padding:0; border:1px solid transparent; border-radius:4px; background:transparent; color:var(--text); cursor:pointer}
+.rf-qbtn:hover{background:var(--surface2); border-color:var(--line)}
+.rf-qbtn .rf-ico{display:inline-flex; width:14px; height:14px; align-items:center; justify-content:center}
+.rf-qbtn .rf-ico svg{width:14px; height:14px}
+.rf-qbtn .rf-ico .ri-g{font-size:11px}
+.rf-qbtn.dim{color:var(--muted)}
+.rf-qbtn.rf-qmore{width:12px; color:var(--faint); font-size:9px}
+.ribbon-full .rf-qbtn > .ri-key{left:50%; transform:translateX(-50%); bottom:-9px}
+
+/* ---------- the File tab (a backstage menu, not a body of groups) ---------- */
+.rf-tab.rf-file{color:var(--on-accent); background:var(--accent); border-color:var(--accent); font-weight:700; margin-right:4px}
+.rf-tab.rf-file:hover, .rf-tab.rf-file.on{color:var(--on-accent); background:var(--accent-dim); border-color:var(--accent-dim)}
+.rf-tab.rf-file k{bottom:-9px}
+.rdrop.rdrop-backstage{min-width:230px; padding:6px 6px 6px}
+.rdrop-backstage .rdrop-cap{color:var(--accent)}
+.rdrop-backstage .rdrop-item{padding:5px 10px 5px 10px}
+.rdrop-backstage .rdrop-item.rdrop-last{margin-top:4px; border-top:1px solid var(--line); border-radius:0 0 6px 6px; padding-top:8px}
+.ribbon .ri-cmd.dis{opacity:.45}
+/* the dialog launcher in a group's name row (Excel's ↘ box) */
+.rf-gname{position:relative}
+.rf-launch{position:absolute; right:-2px; bottom:0; width:13px; height:13px; padding:0; border:1px solid var(--line); border-radius:2px; background:var(--surface); color:var(--muted); cursor:pointer; display:inline-grid; place-items:center}
+.rf-launch:hover{color:var(--accent); border-color:var(--accent-dim)}
+.rf-launch svg{width:9px; height:9px}
+.ribbon-full .rf-launch > .ri-key{left:auto; right:-3px; bottom:-4px; transform:none}   /* the KeyTip rides on the launcher box, as Excel draws it */
+.rf-gname:has(.rf-launch){padding-right:16px}
+
+/* ---------- the workbook cards (Go To, Excel Options, Page Setup): fixed over the sheet, one tight card ---------- */
+#gotoDialog, #optionsDialog, #pagesetupDialog{position:fixed; z-index:30; display:none; flex-direction:column; font-size:12px}
+.pd-box.pd-wide{width:690px; max-width:calc(100vw - 16px)}
+.pd-box.pd-mid{width:420px; max-width:calc(100vw - 16px)}
+.wb-body{padding:8px 12px 4px; font-family:var(--sans); color:var(--text)}
+.wb-err{margin:4px 0 2px; font-family:var(--mono); font-size:11px; color:var(--bad)}
+.pd-btn.dis{opacity:.45; cursor:not-allowed}
+.pd-foot .pd-spacer{flex:1 1 auto}
+.pd-btn .pd-key{margin-left:6px}
+/* section header: Excel's bold caption over a rule */
+.od-sect{display:flex; align-items:center; gap:8px; margin:6px 0 4px; font-size:12px; font-weight:700; color:var(--text); white-space:nowrap}
+.od-sect::after{content:''; flex:1 1 auto; height:1px; background:var(--line)}
+/* rows: radio, checkbox, plain */
+.od-row{display:flex; align-items:center; gap:8px; padding:2px 6px; border-radius:6px; font-size:12px; line-height:1.5; min-height:22px; color:var(--text)}
+.od-row.ind{margin-left:22px}
+.od-row.ind2{margin-left:44px}
+.od-row[data-act]{cursor:pointer}
+.od-row[data-act]:hover{background:var(--accent-glow)}
+.od-row.on{color:var(--accent)}
+.od-row.dis{color:var(--muted); opacity:.6}
+.od-row .pd-key{margin-left:auto}
+.od-row .pd-radio{width:14px}
+.od-box{display:inline-grid; place-items:center; width:13px; height:13px; border:1px solid var(--line); border-radius:3px; background:var(--surface); font-size:10px; line-height:1; color:var(--accent); flex:none}
+.od-box.on{border-color:var(--accent)}
+.od-box.on::after{content:'✓'; font-weight:800}
+.od-row.foc .od-box, .od-row.foc .pd-radio{outline:2px solid var(--accent-glow); outline-offset:1px; border-radius:3px}
+.od-lbl{white-space:nowrap}
+/* a text/number field with a caret when focused */
+.od-field{display:inline-flex; align-items:center; min-width:56px; height:20px; padding:0 6px; border:1px solid var(--line); border-radius:4px; background:var(--surface); font-family:var(--mono); font-size:11.5px; color:var(--text); cursor:text; white-space:nowrap}
+.od-field.wide{min-width:180px; flex:1 1 auto}
+.od-field.foc{border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-glow)}
+.od-field.dis{color:var(--muted); cursor:default; background:var(--surface2)}
+.od-caret{display:inline-block; width:1px; height:13px; margin-left:1px; background:var(--accent); animation:wb-blink 1s steps(2, start) infinite}
+@keyframes wb-blink{to{visibility:hidden}}
+.od-combo{display:inline-flex; align-items:center; justify-content:space-between; gap:8px; height:20px; padding:0 6px; border:1px solid var(--line); border-radius:4px; background:var(--surface2); font-family:var(--mono); font-size:11px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%}
+.od-combo::after{content:'▾'; color:var(--faint)}
+.od-caplbl{font-size:11px; color:var(--muted); margin:0 0 3px 2px}
+.od-unit{color:var(--muted)}
+/* Excel Options: page list on the left, the page on the right */
+.od-wrap{display:flex; gap:12px; min-height:300px}
+.od-pages{flex:0 0 178px; border:1px solid var(--line); border-radius:6px; background:var(--surface2); padding:4px; align-self:stretch}
+.od-page{display:flex; align-items:center; justify-content:space-between; gap:6px; padding:3px 7px; border-radius:5px; font-size:11.5px; color:var(--text); white-space:nowrap}
+.od-page[data-act]{cursor:pointer}
+.od-page[data-act]:hover{background:var(--accent-glow)}
+.od-page.dis{color:var(--faint)}
+.od-page.on{background:var(--accent); color:var(--on-accent); font-weight:600}
+.od-page.on .pd-key{background:var(--on-accent); color:var(--accent); border-color:var(--on-accent)}
+.od-page.foc{outline:2px solid var(--accent-glow); outline-offset:1px}
+.od-body{flex:1 1 auto; min-width:0; padding:0 2px}
+.od-body h3{margin:0 0 6px; font-size:13px; font-weight:700; color:var(--text)}
+.od-body .od-sub{font-size:11.5px; color:var(--muted); margin:0 0 6px}
+/* the Quick Access Toolbar page: two lists and Add / Remove between them */
+.od-qat{display:flex; gap:10px; align-items:stretch}
+.od-col{flex:1 1 0; min-width:0; display:flex; flex-direction:column; gap:4px}
+.od-mid{display:flex; flex-direction:column; justify-content:center; gap:8px; flex:none; width:104px}
+.od-mid .pd-btn{display:flex; align-items:center; justify-content:space-between; gap:6px; white-space:nowrap; cursor:pointer}
+.od-list{height:190px; overflow-y:auto; border:1px solid var(--line); border-radius:5px; background:var(--surface); padding:3px; scrollbar-width:thin}
+.od-list.foc{border-color:var(--accent); box-shadow:0 0 0 2px var(--accent-glow)}
+.od-item{display:flex; align-items:center; gap:7px; padding:2px 6px; border-radius:4px; font-size:11.5px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer}
+.od-item:hover{background:var(--accent-glow)}
+.od-item.on{background:var(--accent); color:var(--on-accent)}
+.od-item .od-ico{display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; flex:none}
+.od-item .od-ico svg{width:14px; height:14px}
+.od-item .od-ico .ri-g{font-size:11px}
+.od-item.dim{color:var(--muted)}
+.od-item.on.dim{color:var(--on-accent); opacity:.85}
+/* Page Setup: its tab strip, the two page thumbnails */
+.ps-tabs{display:flex; gap:2px; margin:-2px 0 8px; border-bottom:1px solid var(--line)}
+.ps-tab{padding:4px 12px 5px; font-family:var(--mono); font-size:11.5px; color:var(--muted); border:1px solid transparent; border-bottom:0; border-radius:6px 6px 0 0}
+.ps-tab.on{color:var(--accent); background:var(--surface2); border-color:var(--line); margin-bottom:-1px; padding-bottom:6px; font-weight:600}
+.ps-tab.dis{color:var(--faint)}
+.ps-orient{display:flex; gap:24px; padding:2px 6px 6px}
+.ps-page{display:inline-block; width:14px; height:18px; border:1.5px solid currentColor; border-radius:2px; margin-right:4px; vertical-align:middle; opacity:.8}
+.ps-page.land{width:18px; height:14px}
+/* Go To: the previous-locations list and the Reference field */
+.gt-recent{height:96px; overflow-y:auto; border:1px solid var(--line); border-radius:5px; background:var(--surface); padding:3px; margin-bottom:8px}
+.gt-recent .od-item{cursor:default}
+.gt-recent .gt-empty{font-family:var(--mono); font-size:11px; color:var(--faint); padding:4px 6px}
+.gt-ref{display:flex; align-items:center; gap:8px; margin:2px 0 4px}
+.gt-ref label{font-size:12px; color:var(--text); white-space:nowrap}

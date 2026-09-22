@@ -5,8 +5,9 @@ import assert from 'node:assert/strict';
 import { Sheet } from '../engine/sheet.js';
 import { Session } from '../engine/keyboard.js';
 import { COMMANDS, MENUS, TABS } from '../engine/ribbon.js';
-import { RIBBON_COMMANDS, MOUSE_ONLY, UNIMPLEMENTED, UNIMPLEMENTED_BY_ID, RIBBON_LAYOUT, MENU_META, VIRTUAL_MENUS,
-  runCommand, recordMouse, keyTipAt, itemTip, layoutItems, tableGaps, openMenuPath, closeDialog, MODAL_DIALOGS } from '../ui/ribbon-commands.js';
+import { RIBBON_COMMANDS, MOUSE_ONLY, UNIMPLEMENTED, UNIMPLEMENTED_BY_ID, RIBBON_LAYOUT, MENU_META, VIRTUAL_MENUS, MENU_ITEM_ICONS, QAT_ICONS, CARD_DIALOGS,
+  runCommand, runQatCommand, recordMouse, keyTipAt, itemTip, layoutItems, tableGaps, openMenuPath, closeDialog, MODAL_DIALOGS, menuEntries } from '../ui/ribbon-commands.js';
+import { DEAD, QAT_COMMANDS, POPULAR_COMMANDS } from '../engine/ribbon.js';
 
 const CELLS = { A1: { value: 1234.567 }, A2: { value: 'x' }, B1: { value: 10 }, B2: { value: 20 }, B4: { formula: '=B1+B2' }, C1: { value: 3 }, C2: { value: 1 }, C3: { value: 2 } };
 const fresh = () => new Session(new Sheet({ cells: JSON.parse(JSON.stringify(CELLS)) }), { now: () => 0 });
@@ -128,7 +129,9 @@ test('the disabled Excel commands are listed with labels and groups, and never c
 });
 
 test('the full-bar layout: every tab drawn, every item resolvable, every Home KeyTip reachable, badges Excel-true', () => {
-  for (const t of TABS) assert.ok(Array.isArray(RIBBON_LAYOUT[t.k]) && RIBBON_LAYOUT[t.k].length, t.name + ' has groups');
+  for (const t of TABS) { if (t.backstage) continue; assert.ok(Array.isArray(RIBBON_LAYOUT[t.k]) && RIBBON_LAYOUT[t.k].length, t.name + ' has groups'); }
+  assert.ok(TABS.find(t => t.k === 'F').backstage && !RIBBON_LAYOUT.F, 'File is a backstage menu, not a body of groups');
+  for (const g of Object.values(RIBBON_LAYOUT).flat()) if (g.launcher) assert.ok(RIBBON_COMMANDS[g.launcher], g.name + ' launcher ' + g.launcher);
   const homeNames = RIBBON_LAYOUT.H.map(g => g.name);
   assert.deepEqual(homeNames, ['Clipboard', 'Font', 'Alignment', 'Number', 'Styles', 'Cells', 'Editing']);
   for (const it of layoutItems()) {
@@ -150,4 +153,54 @@ test('the full-bar layout: every tab drawn, every item resolvable, every Home Ke
   assert.equal(keyTipAt('H1', 'H'), '1'); assert.equal(keyTipAt('HFC', 'H'), 'FC'); assert.equal(keyTipAt('HFC', 'HF'), 'C');
   assert.equal(keyTipAt('HB', 'H'), 'B'); assert.equal(keyTipAt('HB', 'HB'), ''); assert.equal(keyTipAt('HBO', 'H1'), ''); assert.equal(keyTipAt('H1', ''), ''); assert.equal(keyTipAt('', 'H'), '');
   assert.equal(itemTip({ menu: 'HV', cmd: 'PASTE' }), 'HV'); assert.equal(itemTip({ cmd: 'H1' }), 'H1'); assert.equal(itemTip({ dead: 'Filter' }), '');
+});
+
+/* ---------------- the workbook layer: File backstage, Go To, Page Layout, the Quick Access Toolbar ---------------- */
+test('the new commands have entries, and the mouse reaches the same dialog state as the keyboard walk', () => {
+  for (const id of ['FT', 'HFDG', 'PSP', 'POP', 'POL']) { const c = RIBBON_COMMANDS[id]; assert.ok(c && c.label && c.icon && typeof c.run === 'function', id); assert.ok(COMMANDS[id], id + ' is an Alt path'); }
+  // Options: File › Options by click = Alt F T
+  let s = fresh(); runCommand(s, 'FT'); assert.equal(s.mode, 'ribbon'); assert.equal(s.dialog, 'options'); assert.deepEqual(s.path, []); assert.equal(s.dlg.page, 'formulas');
+  let k = fresh(); k.run('Alt F T'); assert.equal(k.dialog, 'options'); assert.deepEqual(k.dlg, s.dlg);
+  s.applyRibbon('M'); s.applyRibbon('ENTER'); k.run('M Enter');   // a click on Manual and OK, vs the keys
+  assert.equal(s.settings.calcMode, 'manual'); assert.equal(k.settings.calcMode, 'manual'); assert.equal(s.mode, 'normal'); assert.equal(k.mode, 'normal');
+  s = fresh(); runCommand(s, 'FT'); closeDialog(s); assert.equal(s.dialog, null); assert.equal(s.mode, 'normal'); assert.equal(s.dlg, null);   // Cancel by mouse
+  // a click on a page, a list item or a field goes through dialogSet, the same draft the keys edit
+  s = fresh(); runCommand(s, 'FT'); assert.equal(s.dialogSet('page', 'qat'), true); s.applyRibbon('A'); assert.equal(s.dlg.qat.length, 4);
+  k = fresh(); k.run('Alt F T Q A'); assert.deepEqual(k.dlg.qat, s.dlg.qat);
+  // Page Setup: the launcher by click = Alt P S P; Orientation ▾ items = Alt P O P / L
+  s = fresh(); runCommand(s, 'PSP'); assert.equal(s.dialog, 'pagesetup'); assert.deepEqual(s.path, []); k = fresh(); k.run('Alt P S P'); assert.deepEqual(k.dlg, s.dlg);
+  s.applyRibbon('L'); s.applyRibbon('ENTER'); assert.equal(s.settings.pageSetup.orientation, 'landscape'); assert.equal(s.mode, 'normal');
+  const { k: kl, m: ml } = sameAs('Alt P O L', 'POL'); assert.equal(ml.settings.pageSetup.orientation, 'landscape'); assert.equal(kl.settings.pageSetup.orientation, 'landscape');
+  sameAs('Alt P O P', 'POP', x => x.run('Alt P O L'));
+  // Go To: Home › Find & Select › Go To… by click = Alt H F D G = Ctrl+G
+  s = fresh(); runCommand(s, 'HFDG'); assert.equal(s.dialog, 'goto'); assert.deepEqual(s.path, []); assert.equal(s.dialogBuf, '');
+  k = fresh(); k.run('Ctrl+G'); assert.equal(k.dialog, 'goto'); assert.deepEqual(k.path, []);
+  s.applyRibbon('B'); s.applyRibbon('4'); s.applyRibbon('ENTER'); assert.equal(s.sheet.selectionText(), 'B4'); assert.equal(s.mode, 'normal');
+  s = fresh(); runCommand(s, 'HFDG'); s.applyRibbon('Z'); s.applyRibbon('ENTER'); assert.equal(s.dialog, 'goto'); assert.equal(s.note, 'Reference is not valid.'); closeDialog(s); assert.equal(s.mode, 'normal');
+  // a click while editing commits first, as every ribbon click does
+  s = fresh(); s.sheet.goTo(5, 1); s.type('hi'); assert.equal(runCommand(s, 'FT'), true); assert.equal(s.sheet.value('A5'), 'hi'); assert.equal(s.dialog, 'options');
+  for (const d of ['goto', 'options', 'pagesetup']) { assert.ok(MODAL_DIALOGS.has(d), d + ' is modal'); assert.ok(CARD_DIALOGS.has(d), d + ' is a card'); }
+});
+
+test('the File backstage and the Page Layout tab are laid out: menus labelled, dead items iconed, the launcher on its group', () => {
+  assert.equal(MENU_META.F.label, 'File'); assert.equal(MENU_META.PO.label, 'Orientation'); assert.ok(VIRTUAL_MENUS.has('PS')); assert.equal(MENU_META.HFD.label, 'Find & Select');
+  const entries = menuEntries('F'); assert.equal(entries.length, 11); assert.equal(entries.at(-1)[0], 'T');
+  for (const [key] of entries) { const np = 'F' + key; assert.ok(RIBBON_COMMANDS[np] || (DEAD[np] && MENU_ITEM_ICONS[np]), np + ' is live or dead-with-icon'); }
+  for (const [key] of menuEntries('HFD')) { const np = 'HFD' + key; assert.ok(RIBBON_COMMANDS[np] || DEAD[np], np); }
+  const ps = RIBBON_LAYOUT.P.find(g => g.name === 'Page Setup'); assert.ok(ps); assert.equal(ps.launcher, 'PSP');
+  assert.ok(layoutItems('P').some(it => it.menu === 'PO'), 'Orientation ▾ on the Page Layout tab');
+  assert.ok(layoutItems('H').some(it => it.menu === 'HFD'), 'Find & Select ▾ on the Home tab');
+  assert.equal(keyTipAt('PSP', 'P'), 'SP'); assert.equal(keyTipAt('PSP', 'PS'), 'P'); assert.equal(keyTipAt('PO', 'P'), 'O');
+  assert.ok(TABS.find(t => t.k === 'P').live);
+});
+
+test('the Quick Access Toolbar: every entry has an icon; a click runs the same thing Alt+digit does', () => {
+  for (const id of Object.keys(QAT_COMMANDS)) assert.equal(typeof QAT_ICONS[id], 'string', id + ' icon');
+  for (const id of POPULAR_COMMANDS) assert.ok(QAT_ICONS[id].length, id + ' has an icon');
+  let m = fresh(); runQatCommand(m, 'bold'); let k = fresh(); k.settings.qat = ['bold']; k.run('Alt 1'); assert.equal(state(m), state(k)); assert.equal(m.mode, 'normal');
+  m = fresh(); m.run('"z" Enter'); assert.equal(runQatCommand(m, 'undo'), true); assert.equal(m.sheet.value('A1'), 1234.567);
+  assert.equal(runQatCommand(m, 'redo'), true); assert.equal(m.sheet.value('A1'), 'z');
+  assert.equal(runQatCommand(m, 'save'), false); assert.equal(runQatCommand(m, 'nope'), false); assert.equal(m.mode, 'normal');
+  m = fresh(); runQatCommand(m, 'fillColor'); assert.equal(m.dialog, 'fillcolor');   // a dialog entry opens its dialog, as the KeyTips do
+  m = fresh(); m.sheet.goTo(5, 1); m.type('q'); assert.equal(runQatCommand(m, 'copy'), true); assert.equal(m.sheet.value('A5'), 'q'); assert.ok(m.sheet.clipboard);   // an open edit commits first
 });

@@ -3,9 +3,10 @@
 // the Session in keyboard.js owns `path`/`dialog` and asks stepPath() what a key means.
 
 export const TABS = [
+  { k: 'F', name: 'File', live: true, backstage: true },   // the backstage: a menu, not a tab of groups
   { k: 'H', name: 'Home', live: true },
   { k: 'N', name: 'Insert', live: false },
-  { k: 'P', name: 'Page Layout', live: false },
+  { k: 'P', name: 'Page Layout', live: true },
   { k: 'M', name: 'Formulas', live: true },
   { k: 'A', name: 'Data', live: true },
   { k: 'R', name: 'Review', live: false },
@@ -13,6 +14,8 @@ export const TABS = [
 ];
 
 export const MENUS = {
+  // File backstage (Excel's KeyTips): everything but Options is dead in the engine (DEAD below)
+  'F': [['I', 'Info'], ['N', 'New'], ['O', 'Open'], ['S', 'Save'], ['A', 'Save As'], ['P', 'Print'], ['H', 'Share'], ['E', 'Export'], ['C', 'Close'], ['D', 'Account'], ['T', 'Options']],
   'H': [['V', 'Paste'], ['1', 'Bold'], ['2', 'Italic'], ['3', 'Underline'], ['F', 'Font'], ['A', 'Align'], ['5', 'Indent −'], ['6', 'Indent +'], ['H', 'Fill'], ['B', 'Borders'], ['J', 'Cell styles'], ['W', 'Wrap'], ['K', 'Comma'], ['P', 'Percent'], ['9', 'Dec −'], ['0', 'Dec +'], ['I', 'Insert'], ['D', 'Delete'], ['O', 'Cells'], ['E', 'Clear'], ['U', 'Σ Sum']],
   'HV': [['V', 'Paste values'], ['S', 'Paste special…']],
   'HE': [['A', 'Clear all'], ['F', 'Clear formats'], ['C', 'Clear contents']],
@@ -22,8 +25,13 @@ export const MENUS = {
   'HB': [['O', 'Bottom'], ['P', 'Top'], ['L', 'Left'], ['R', 'Right'], ['N', 'No border'], ['A', 'All'], ['S', 'Outside'], ['T', 'Thick box'], ['B', 'Double bottom'], ['D', 'Top & bottom']],
   'HU': [['S', 'Sum']],
   'HA': [['L', 'Left'], ['C', 'Center'], ['R', 'Right'], ['N', '$ Accounting']],
-  'HF': [['C', 'Font color'], ['G', 'Grow font'], ['K', 'Shrink font'], ['I', 'Fill']],
+  'HF': [['C', 'Font color'], ['G', 'Grow font'], ['K', 'Shrink font'], ['I', 'Fill'], ['D', 'Find & Select']],   // Excel shares the H F prefix between Font and Fill / Find & Select
   'HFI': [['S', 'Series…'], ['D', 'Down'], ['R', 'Right']],
+  'HFD': [['F', 'Find…'], ['R', 'Replace…'], ['G', 'Go To…'], ['S', 'Go To Special…'], ['U', 'Formulas'], ['N', 'Constants'], ['V', 'Data Validation'], ['O', 'Select Objects']],
+  // Page Layout: Excel's real KeyTips — Margins M, Orientation O, Size S Z, Print Area A, Breaks B, Background G, Print Titles I, the Page Setup launcher S P
+  'P': [['M', 'Margins'], ['O', 'Orientation'], ['S', 'Page Setup'], ['A', 'Print Area'], ['B', 'Breaks'], ['G', 'Background'], ['I', 'Print Titles']],
+  'PO': [['P', 'Portrait'], ['L', 'Landscape']],
+  'PS': [['P', 'Page Setup…'], ['Z', 'Size']],
   'M': [['U', 'Σ AutoSum'], ['P', 'Trace precedents'], ['D', 'Trace dependents']],
   'MU': [['S', 'Sum']],
   'A': [['S', 'Sort']],
@@ -36,6 +44,7 @@ export const MENUS = {
 /** Excel's real Home-tab groups — the renderer draws each as a labelled cluster. */
 export const RIBBON_GROUPS = {
   'A': [['Sort & Filter', ['S']]],
+  'P': [['Page Setup', ['M', 'O', 'S', 'A', 'B', 'G', 'I']]],
   'H': [
     ['Clipboard', ['V']],
     ['Font', ['1', '2', '3', 'F', 'B', 'H']],
@@ -89,6 +98,64 @@ export const PASTE_OPTS = [
 
 export const tabName = k => (TABS.find(t => t.k === k) || { name: k }).name;
 
+/**
+ * Menu items Excel has that the engine does not: the walk shows them (so the menus read like
+ * Excel's) and a press leaves the path where it is with a note, exactly as a dead tab does.
+ */
+export const DEAD = {
+  'FI': 'Info', 'FN': 'New', 'FO': 'Open', 'FS': 'Save', 'FA': 'Save As', 'FP': 'Print', 'FH': 'Share', 'FE': 'Export', 'FC': 'Close', 'FD': 'Account',
+  'HFDF': 'Find', 'HFDR': 'Replace', 'HFDS': 'Go To Special', 'HFDU': 'Formulas', 'HFDN': 'Constants', 'HFDV': 'Data Validation', 'HFDO': 'Select Objects',
+  'PM': 'Margins', 'PA': 'Print Area', 'PB': 'Breaks', 'PG': 'Background', 'PI': 'Print Titles', 'PSZ': 'Size',
+};
+
+/* ---------------- Excel Options, Page Setup and the Quick Access Toolbar (data the Session reads) ---------------- */
+/** The Options dialog's page list, in Excel's order. Pages with a `key` are live (their accelerator letter); the rest are shown dimmed. */
+export const OPTIONS_PAGES = [
+  { k: 'general', label: 'General' }, { k: 'formulas', label: 'Formulas', key: 'F' }, { k: 'data', label: 'Data' }, { k: 'proofing', label: 'Proofing' },
+  { k: 'save', label: 'Save' }, { k: 'language', label: 'Language' }, { k: 'accessibility', label: 'Accessibility' }, { k: 'advanced', label: 'Advanced', key: 'V' },
+  { k: 'ribbon', label: 'Customize Ribbon' }, { k: 'qat', label: 'Quick Access Toolbar', key: 'Q' }, { k: 'addins', label: 'Add-ins' }, { k: 'trust', label: 'Trust Center' },
+];
+export const OPTIONS_LIVE_PAGES = OPTIONS_PAGES.filter(p => p.key).map(p => p.k);   // ['formulas', 'advanced', 'qat']
+
+/**
+ * Quick Access Toolbar commands by id. `np` runs an Alt-walk command (keyboard.js execCommand),
+ * `act` a Sheet operation with no Alt path (undo, redo, copy, paste); neither = a real Excel
+ * command the engine lacks (the toolbar shows it, a press is a no-op). Labels are Excel's.
+ */
+export const QAT_COMMANDS = {
+  autosum: { label: 'AutoSum', np: 'HUS', keys: 'Alt+=' },
+  bold: { label: 'Bold', np: 'H1', keys: 'Ctrl+B' },
+  borders: { label: 'Borders', np: 'HBA' },
+  center: { label: 'Center', np: 'HAC' },
+  copy: { label: 'Copy', act: 'copy', keys: 'Ctrl+C' },
+  decDecimal: { label: 'Decrease Decimal', np: 'H9' },
+  decFont: { label: 'Decrease Font Size', np: 'HFK' },
+  deleteRows: { label: 'Delete Sheet Rows', np: 'HDR' },
+  fillColor: { label: 'Fill Color', np: 'HH' },
+  fontColor: { label: 'Font Color', np: 'HFC' },
+  formatCells: { label: 'Format Cells', np: 'HOE', keys: 'Ctrl+1' },
+  formatPainter: { label: 'Format Painter' },
+  freezePanes: { label: 'Freeze Panes' },
+  incDecimal: { label: 'Increase Decimal', np: 'H0' },
+  incFont: { label: 'Increase Font Size', np: 'HFG' },
+  insertRows: { label: 'Insert Sheet Rows', np: 'HIR' },
+  mergeCenter: { label: 'Merge & Center' },
+  paste: { label: 'Paste', act: 'paste', keys: 'Ctrl+V' },
+  pasteSpecial: { label: 'Paste Special', np: 'HVS', keys: 'Ctrl+Alt+V' },
+  pasteValues: { label: 'Paste Values', np: 'HVV' },
+  printPreview: { label: 'Print Preview and Print' },
+  redo: { label: 'Redo', act: 'redo', keys: 'Ctrl+Y' },
+  save: { label: 'Save', keys: 'Ctrl+S' },
+  sortAsc: { label: 'Sort Ascending', np: 'ASA' },
+  sortDesc: { label: 'Sort Descending', np: 'ASD' },
+  spelling: { label: 'Spelling', keys: 'F7' },
+  undo: { label: 'Undo', act: 'undo', keys: 'Ctrl+Z' },
+};
+/** Options › Quick Access Toolbar › "Choose commands from: Popular Commands" — Excel lists them alphabetically. */
+export const POPULAR_COMMANDS = Object.keys(QAT_COMMANDS).sort((a, b) => QAT_COMMANDS[a].label.localeCompare(QAT_COMMANDS[b].label));
+/** Excel's default toolbar. */
+export const QAT_DEFAULT = ['save', 'undo', 'redo'];
+
 /** Every terminal command path the walk can fire, with its human label. */
 export const COMMANDS = {
   'H1': 'Bold', 'H2': 'Italic', 'H3': 'Underline', 'H5': 'Decrease indent', 'H6': 'Increase indent',
@@ -101,6 +168,7 @@ export const COMMANDS = {
   'HOI': 'AutoFit column width', 'HOA': 'AutoFit row height', 'HOW': 'Column width…', 'HOE': 'Format cells…', 'OE': 'Format cells…',
   'HEA': 'Clear all', 'HEF': 'Clear formats', 'HEC': 'Clear contents', 'HUS': 'AutoSum', 'MUS': 'AutoSum', 'MP': 'Trace precedents', 'MD': 'Trace dependents',
   'HVV': 'Paste values', 'HVS': 'Paste special…', 'ES': 'Paste special…', 'ASA': 'Sort A to Z', 'ASD': 'Sort Z to A', 'WVG': 'Gridlines', 'WG': 'Gridlines',
+  'FT': 'Excel Options…', 'HFDG': 'Go To…', 'PSP': 'Page Setup…', 'POP': 'Portrait', 'POL': 'Landscape',
 };
 
 /**
@@ -108,7 +176,7 @@ export const COMMANDS = {
  *   {kind:'command', np}        a terminal command
  *   {kind:'menu', path}         one level deeper
  *   {kind:'tab', path}          a live tab opened from the strip
- *   {kind:'dead', note}         a tab with nothing wired
+ *   {kind:'dead', note}         a tab, or a menu item (DEAD), with nothing wired — the path stays put
  *   {kind:'reset'}              an unknown step — back to the tab strip
  */
 export function stepPath(path, key) {
@@ -123,6 +191,7 @@ export function stepPath(path, key) {
   const np = path.join('') + key;
   if (COMMANDS[np] !== undefined) return { kind: 'command', np };
   if (MENUS[np] !== undefined) return { kind: 'menu', path: path.concat(key) };
+  if (DEAD[np] !== undefined) return { kind: 'dead', note: DEAD[np] + ' — nothing here yet' };
   return { kind: 'reset' };
 }
 

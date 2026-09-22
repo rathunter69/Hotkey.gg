@@ -20,11 +20,16 @@
 //   · every edit, stamp and jump acts on the displayed active cell (Sheet.dispActive) — the white cell of a
 //     row/column/all selection — never on the moving corner
 //   · ↵ / Shift+↵ / Tab / Shift+Tab pressed while editing are logged (on the edited cell) before they commit
+//   · the workbook: `sheets` [{name, sheet}], `sheet` is always the active one; Ctrl+PgDn / Ctrl+PgUp
+//     step between sheets (no wrap); Go To (Ctrl+G, F5) jumps to a cell or selects a range
+//   · settings Excel keeps outside the grid (calculation mode, iterative calculation, gridlines, the
+//     Quick Access Toolbar, page setup) are RECORDED by real-looking dialogs (Alt F T, Alt P S P):
+//     the dialog edits a draft (`dlg`), ↵ = OK writes it into `settings`, Esc = Cancel discards it
 
 import { Sheet, FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES } from './sheet.js';
 import { evalFormula, formulaRefs, translateFormula } from './formula.js';
-import { refKey, parseRef } from './refs.js';
-import { stepPath, PASTE_OPTS, PASTE_OP_OPTS } from './ribbon.js';
+import { refKey, parseRef, parseRange, rangeText } from './refs.js';
+import { stepPath, PASTE_OPTS, PASTE_OP_OPTS, QAT_COMMANDS, QAT_DEFAULT, POPULAR_COMMANDS, OPTIONS_LIVE_PAGES } from './ribbon.js';
 
 const ARROWS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
 const ARROWSYM = { ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→' };
@@ -115,6 +120,29 @@ export function parseKeyScript(script) {
   return out;
 }
 
+/* ---------------- workbook helpers ---------------- */
+export const SHEET_NAME_MAX = 31;
+/** Excel's rule for a sheet name: 1–31 characters, none of [ ] : * ? / \, not blank. */
+export function isSheetName(name) {
+  const t = String(name == null ? '' : name);
+  return t.length >= 1 && t.length <= SHEET_NAME_MAX && t.trim().length > 0 && !/[\[\]:*?/\\]/.test(t);
+}
+/** 'Sheet2', 'Sheet3', … — the first Sheet<n> not already in `sheets` (Excel numbers from the count). */
+export function nextSheetName(sheets) {
+  const taken = new Set(sheets.map(x => String(x.name).toLowerCase()));
+  for (let n = sheets.length + 1; ; n++) if (!taken.has('sheet' + n)) return 'Sheet' + n;
+}
+/** The recorded settings, fresh. `gridlines` is an accessor on the ACTIVE sheet's flag, so the two can never drift. */
+function makeSettings(session) {
+  const st = { calcMode: 'automatic', iterative: false, maxIterations: 100, maxChange: 0.001 };
+  Object.defineProperty(st, 'gridlines', { enumerable: true, get: () => !!session.sheet.gridlines, set: v => { session.sheet.gridlines = !!v; } });
+  st.qat = QAT_DEFAULT.slice();
+  st.pageSetup = { orientation: 'portrait', scaling: 'adjust', adjustTo: 100, fitWide: 1, fitTall: 1 };
+  return st;
+}
+const clampInt = (v, lo, hi, dflt) => { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : dflt; };
+const DIALOGS_WB = new Set(['goto', 'options', 'pagesetup']);   // the dialogs dialogKey drives
+
 export class Session {
   /**
    * @param {Sheet} sheet
@@ -131,6 +159,14 @@ export class Session {
     this.mouse = { count: 0, log: [] };   // workspace mouse actions, recorded by the views (SITE_SPEC §6)
     this.listeners = new Set();
     this.t0 = null;
+    // the workbook: `sheet` is re-pointed at the active entry (never proxied); the views read it fresh
+    this.sheets = [{ name: 'Sheet1', sheet: this.sheet }];
+    this.sheetIndex = 0;
+    this.pageRows = 0; this.pageCols = 0;   // a screenful for PageDown / Alt+PageDown — the view sets them; 0 = 10
+    this.settings = makeSettings(this);
+    this.dialogBuf = '';     // Go To's Reference field
+    this.dlg = null;         // an Options / Page Setup draft while its dialog is open
+    this.gotoRecent = [];    // the Go To dialog's list of previous locations (Excel keeps them)
     this.sheet.onChange(() => this.emit('sheet'));
   }
   resetEdit() {
@@ -327,10 +363,11 @@ export class Session {
 
   /* ---------------- ribbon ---------------- */
   enterRibbon() { this.startClock(); this.mode = 'ribbon'; this.path = []; this.dialog = null; this.note = ''; }
-  exitRibbon(act) { this.mode = 'normal'; this.path = []; this.dialog = null; this.pasteKind = null; this.note = ''; if (act) this.sheet.commit('ribbon'); }
+  exitRibbon(act) { this.mode = 'normal'; this.path = []; this.dialog = null; this.pasteKind = null; this.note = ''; this.dlg = null; this.dialogBuf = ''; if (act) this.sheet.commit('ribbon'); }
   openDialog(name, path) { this.mode = 'ribbon'; this.path = path || []; this.dialog = name; this.note = ''; }
   ribbonKey(e) {
     const k = e.key;
+    if (DIALOGS_WB.has(this.dialog)) return this.dialogKey(e);
     if (k === 'Escape') {
       if (this.dialog) { this.dialog = null; this.pasteKind = null; this.note = ''; this.sortPend = null; this.colwBuf = ''; if (this.path.length) return true; this.exitRibbon(false); return true; }
       if (this.path.length) { this.path.pop(); this.note = ''; return true; }
@@ -374,6 +411,7 @@ export class Session {
   applyRibbon(key) {
     const S = this.sheet;
     const done = (act = true) => this.exitRibbon(act);
+    if (DIALOGS_WB.has(this.dialog)) { this.dlgKey(key === 'ENTER' ? 'Enter' : key); return; }
     if (this.dialog === 'fmt') {
       const fmt = (style, dec) => { S.setNumberFormat(style, dec); return done(); };
       if (key === 'G') return fmt('general', 0);
@@ -433,12 +471,29 @@ export class Session {
     if (this.dialog === 'series') { if (key === 'ENTER') { S.fillSeries(); return done(); } return; }
     if (this.dialog === 'cellstyle') { if (key === 'ENTER') { S.applyCellStyle(CELL_STYLES[this.cellStyleIdx].k); return done(); } return; }
 
+    // Alt then a digit: the Quick Access Toolbar's numeric KeyTips (Excel shows 1..9 on it)
+    if (!this.path.length && /^[1-9]$/.test(key)) {
+      const id = this.settings.qat[+key - 1];
+      if (!id) return;
+      this.runQat(id);
+      if (this.mode === 'ribbon' && !this.dialog) this.exitRibbon(false);
+      return;
+    }
     const step = stepPath(this.path, key);
     if (step.kind === 'tab' || step.kind === 'menu') { this.path = step.path; this.note = ''; return; }
     if (step.kind === 'dead') { this.note = step.note; return; }
     if (step.kind === 'ignore') return;
     if (step.kind === 'reset') { this.path = []; this.note = ''; return; }
-    const np = step.np;
+    this.execCommand(step.np);
+  }
+  /**
+   * Run one terminal Alt-walk command by its path id ('H1', 'HBO', 'FT', …), from wherever the walk
+   * is: the same switch a KeyTip lands in, so the Quick Access Toolbar and the mouse table share it.
+   * A direct command acts and leaves the Ribbon; a dialog command opens its dialog and stays.
+   */
+  execCommand(np) {
+    const S = this.sheet;
+    const done = (act = true) => this.exitRibbon(act);
     switch (np) {
       case '=': this.exitRibbon(false); this.doAutoSum(); return;
       case 'WVG': case 'WG': S.gridlines = !S.gridlines; this.toast(S.gridlines ? 'gridlines shown' : 'gridlines hidden — Alt W V G to show'); return done();
@@ -495,8 +550,237 @@ export class Session {
       case 'HOI': S.autofitCols(); return done();
       case 'HOA': return done();
       case 'HUS': case 'MUS': this.exitRibbon(false); this.doAutoSum(); return;
+      case 'FT': this.openOptions(); return;
+      case 'HFDG': this.openGoTo(); return;
+      case 'PSP': this.openPageSetup(); return;
+      case 'POP': this.setOrientation('portrait'); return done();
+      case 'POL': this.setOrientation('landscape'); return done();
       default: this.path = []; this.note = '';
     }
+  }
+
+  /* ---------------- the workbook ---------------- */
+  /**
+   * Append (or insert at `at`) a sheet. `name` defaults to the next free Sheet<n>; it must be
+   * Excel-legal (isSheetName) and unique, case-insensitively, or this throws. Returns the new index.
+   */
+  addSheet(name, sheet, at) {
+    const nm = name == null || name === '' ? nextSheetName(this.sheets) : String(name);
+    if (!isSheetName(nm)) throw new Error('addSheet: "' + nm + '" is not a legal sheet name (1–31 characters, none of [ ] : * ? / \\)');
+    if (this.sheets.some(x => x.name.toLowerCase() === nm.toLowerCase())) throw new Error('addSheet: a sheet named "' + nm + '" already exists');
+    const sh = sheet || new Sheet();
+    sh.onChange(() => this.emit('sheet'));
+    const i = at == null ? this.sheets.length : Math.max(0, Math.min(this.sheets.length, at | 0));
+    this.sheets.splice(i, 0, { name: nm, sheet: sh });
+    this.sheetIndex = this.sheets.findIndex(x => x.sheet === this.sheet);   // the active entry may have moved right
+    this.emit('sheets');
+    return i;
+  }
+  /** Make sheet `i` (clamped) the active one: an open edit is cancelled, the Ribbon walk closed. True when it changed. */
+  switchSheet(i) {
+    const idx = Math.max(0, Math.min(this.sheets.length - 1, i | 0));
+    if (idx === this.sheetIndex) return false;
+    if (this.editing) this.cancelEdit();
+    if (this.mode === 'ribbon') this.exitRibbon(false);
+    this.sheetIndex = idx; this.sheet = this.sheets[idx].sheet;
+    this.emit('sheet');
+    return true;
+  }
+  /** Shift+F11: a new sheet before the active one, made active (Excel). */
+  insertSheet() { const i = this.addSheet(undefined, undefined, this.sheetIndex); this.switchSheet(i); return i; }
+
+  /* ---------------- Go To (Ctrl+G, F5, Alt H F D G) ---------------- */
+  openGoTo() { this.startClock(); this.openDialog('goto', this.mode === 'ribbon' ? this.path : []); this.dialogBuf = ''; this.dlg = null; }
+  /**
+   * Resolve a Go To reference: 'B4', 'a1:c3', '$B$4', or 'Sheet2!B4' (a sheet of this workbook,
+   * case-insensitive). A cell becomes the active cell, a range is selected with its top-left active.
+   * False (nothing moves) when it is not a reference inside the sheet.
+   */
+  goToRef(text) {
+    let t = String(text == null ? '' : text).trim(); if (!t) return false;
+    let target = -1;
+    const bang = t.lastIndexOf('!');
+    if (bang >= 0) {
+      let nm = t.slice(0, bang).trim(); if (/^'.*'$/.test(nm)) nm = nm.slice(1, -1).replace(/''/g, "'");
+      target = this.sheets.findIndex(x => x.name.toLowerCase() === nm.toLowerCase());
+      if (target < 0) return false;
+      t = t.slice(bang + 1);
+    }
+    const S = target >= 0 ? this.sheets[target].sheet : this.sheet;
+    const rg = parseRange(t); if (!rg || !S.inb(rg.r1, rg.c1) || !S.inb(rg.r2, rg.c2)) return false;
+    if (target >= 0) this.switchSheet(target);
+    if (rg.r1 === rg.r2 && rg.c1 === rg.c2) S.goTo(rg.r1, rg.c1); else S.select(rangeText(rg));
+    const where = (target >= 0 ? this.sheets[target].name + '!' : '') + rangeText(rg);
+    this.gotoRecent = [where].concat(this.gotoRecent.filter(x => x !== where)).slice(0, 4);
+    return true;
+  }
+  gotoKey(key) {
+    if (key === 'Enter') {
+      const ref = this.dialogBuf;
+      const path = this.path;
+      this.exitRibbon(false);
+      if (this.goToRef(ref)) return;
+      this.openDialog('goto', path); this.dialogBuf = ref; this.note = 'Reference is not valid.';   // Excel's message; the dialog stays open
+      return;
+    }
+    if (key === 'Backspace') { this.dialogBuf = this.dialogBuf.slice(0, -1); this.note = ''; return; }
+    if (key.length === 1 && /[A-Za-z0-9:$!' ]/.test(key) && this.dialogBuf.length < 64) { this.dialogBuf += key.toUpperCase(); this.note = ''; }
+  }
+
+  /* ---------------- Excel Options (Alt F T) and Page Setup (Alt P S P): recorded settings ---------------- */
+  setOrientation(o) { this.settings.pageSetup.orientation = o === 'landscape' ? 'landscape' : 'portrait'; this.emit('settings'); }
+  /** The Options draft: every control's working value, discarded on Cancel. `focus` names the control ↑/↓/Tab/digits act on. */
+  optionsDraft(page) {
+    const st = this.settings;
+    return { kind: 'options', page: OPTIONS_LIVE_PAGES.includes(page) ? page : 'formulas', focus: 'pages',
+      calcMode: st.calcMode, iterative: !!st.iterative, maxIterations: String(st.maxIterations), maxChange: String(st.maxChange),
+      gridlines: !!st.gridlines, qat: st.qat.slice(), qatPick: 0, qatSel: 0 };
+  }
+  pageSetupDraft() {
+    const p = this.settings.pageSetup;
+    return { kind: 'pagesetup', tab: 'page', focus: 'orient', orientation: p.orientation, scaling: p.scaling, adjustTo: String(p.adjustTo), fitWide: String(p.fitWide), fitTall: String(p.fitTall) };
+  }
+  openOptions(page) { this.startClock(); this.openDialog('options', this.mode === 'ribbon' ? this.path : []); this.dlg = this.optionsDraft(page); }
+  openPageSetup() { this.startClock(); this.openDialog('pagesetup', this.mode === 'ribbon' ? this.path : []); this.dlg = this.pageSetupDraft(); }
+  /** Esc / Cancel: the draft goes; a dialog opened from a menu returns to it, one opened by a chord closes to the grid. */
+  cancelDialog() {
+    this.dlg = null; this.dialogBuf = ''; this.note = ''; this.dialog = null;
+    if (!this.path.length) this.exitRibbon(false);
+  }
+  /** The Tab order of the open dialog's controls. */
+  dialogTabOrder() {
+    const d = this.dlg; if (!d) return [];
+    if (d.kind === 'pagesetup') return ['orient', 'adjustTo', 'fitWide', 'fitTall'];
+    if (d.page === 'formulas') return ['pages', 'calc', 'iter'].concat(d.iterative ? ['maxIter', 'maxChange'] : []);
+    if (d.page === 'advanced') return ['pages', 'gridlines'];
+    return ['pages', 'qatLeft', 'qatRight'];
+  }
+  /**
+   * A mouse-set field of the open draft ('focus', 'page', 'qatPick', 'qatSel'), recorded by the
+   * view as a dialog click. The same state the keys reach. True when applied.
+   */
+  dialogSet(field, value) {
+    const d = this.dlg; if (!d) return false;
+    if (field === 'focus') { if (this.dialogTabOrder().includes(value)) d.focus = value; else return false; return true; }
+    if (field === 'page' && d.kind === 'options') { if (!OPTIONS_LIVE_PAGES.includes(value)) return false; d.page = value; d.focus = 'pages'; return true; }
+    if (field === 'qatPick' && d.kind === 'options') { const i = value | 0; if (i < 0 || i >= POPULAR_COMMANDS.length) return false; d.qatPick = i; d.focus = 'qatLeft'; return true; }
+    if (field === 'qatSel' && d.kind === 'options') { const i = value | 0; if (i < 0 || i >= d.qat.length) return false; d.qatSel = i; d.focus = 'qatRight'; return true; }
+    return false;
+  }
+  /**
+   * One key inside Go To / Options / Page Setup, already logged: 'Enter' (OK), 'Tab' / 'Shift+Tab',
+   * 'ArrowUp' / 'ArrowDown', 'Backspace', ' ', or one character (letters upper-case). The view's
+   * clicks call this with the same values, so a click and a key reach the same state.
+   */
+  dlgKey(key) {
+    if (this.dialog === 'goto') return this.gotoKey(key);
+    if (this.dialog === 'options') return this.optionsKey(key);
+    if (this.dialog === 'pagesetup') return this.pageSetupKey(key);
+  }
+  optionsKey(key) {
+    const d = this.dlg; if (!d) return;
+    const PAGE_KEY = { F: 'formulas', V: 'advanced', Q: 'qat' };
+    const FIRST = { formulas: 'calc', advanced: 'gridlines', qat: 'qatLeft' };
+    if (key === 'Enter') { this.optionsOk(); return; }
+    if (key === 'Tab' || key === 'Shift+Tab') { const o = this.dialogTabOrder(); const i = Math.max(0, o.indexOf(d.focus)); d.focus = o[(i + (key === 'Tab' ? 1 : o.length - 1)) % o.length]; return; }
+    if (PAGE_KEY[key]) { d.page = PAGE_KEY[key]; d.focus = FIRST[d.page]; return; }   // a page letter jumps into that page's first control
+    if (key === 'ArrowUp' || key === 'ArrowDown') {
+      const dir = key === 'ArrowDown' ? 1 : -1;
+      if (d.focus === 'pages') { const i = OPTIONS_LIVE_PAGES.indexOf(d.page); d.page = OPTIONS_LIVE_PAGES[Math.max(0, Math.min(OPTIONS_LIVE_PAGES.length - 1, i + dir))]; }
+      else if (d.focus === 'calc') d.calcMode = dir > 0 ? 'manual' : 'automatic';
+      else if (d.focus === 'qatLeft') d.qatPick = Math.max(0, Math.min(POPULAR_COMMANDS.length - 1, d.qatPick + dir));
+      else if (d.focus === 'qatRight') d.qatSel = Math.max(0, Math.min(d.qat.length - 1, d.qatSel + dir));
+      return;
+    }
+    if (key === ' ') { if (d.focus === 'iter') d.iterative = !d.iterative; else if (d.focus === 'gridlines') d.gridlines = !d.gridlines; return; }
+    if (key === 'Backspace') { if (d.focus === 'maxIter') d.maxIterations = d.maxIterations.slice(0, -1); else if (d.focus === 'maxChange') d.maxChange = d.maxChange.slice(0, -1); return; }
+    if (/^[0-9.]$/.test(key)) {
+      if (d.focus === 'maxIter' && key !== '.' && d.maxIterations.length < 5) d.maxIterations += key;
+      else if (d.focus === 'maxChange' && d.maxChange.length < 8 && !(key === '.' && d.maxChange.includes('.'))) d.maxChange += key;
+      return;
+    }
+    if (d.page === 'formulas') {
+      if (key === 'A') { d.calcMode = 'automatic'; d.focus = 'calc'; }
+      else if (key === 'M') { d.calcMode = 'manual'; d.focus = 'calc'; }
+      else if (key === 'I') { d.iterative = !d.iterative; d.focus = 'iter'; }
+      else if (key === 'X' && d.iterative) d.focus = 'maxIter';
+      else if (key === 'C' && d.iterative) d.focus = 'maxChange';
+    } else if (d.page === 'advanced') {
+      if (key === 'G') { d.gridlines = !d.gridlines; d.focus = 'gridlines'; }
+    } else if (d.page === 'qat') {
+      if (key === 'A') { const id = POPULAR_COMMANDS[d.qatPick]; if (id) { d.qat.push(id); d.qatSel = d.qat.length - 1; } }
+      else if (key === 'R') { if (d.qat.length) { d.qat.splice(d.qatSel, 1); d.qatSel = Math.max(0, Math.min(d.qatSel, d.qat.length - 1)); } }
+    }
+  }
+  /** OK: every draft value lands in `settings` (gridlines on the sheet), the dialog closes to the grid. */
+  optionsOk() {
+    const d = this.dlg, st = this.settings; if (!d) return;
+    st.calcMode = d.calcMode === 'manual' ? 'manual' : 'automatic';
+    st.iterative = !!d.iterative;
+    st.maxIterations = clampInt(d.maxIterations, 1, 32767, st.maxIterations);
+    const mc = parseFloat(d.maxChange); if (Number.isFinite(mc) && mc >= 0) st.maxChange = mc;
+    st.gridlines = d.gridlines;
+    st.qat = d.qat.slice();
+    this.exitRibbon(true);
+    this.emit('settings');
+  }
+  pageSetupKey(key) {
+    const d = this.dlg; if (!d) return;
+    const field = { adjustTo: 3, fitWide: 2, fitTall: 2 };   // digits each field takes
+    if (key === 'Enter') { this.pageSetupOk(); return; }
+    if (key === 'Tab' || key === 'Shift+Tab') { const o = this.dialogTabOrder(); const i = Math.max(0, o.indexOf(d.focus)); d.focus = o[(i + (key === 'Tab' ? 1 : o.length - 1)) % o.length]; return; }
+    if (key === 'T') { d.orientation = 'portrait'; d.focus = 'orient'; return; }
+    if (key === 'L') { d.orientation = 'landscape'; d.focus = 'orient'; return; }
+    if (key === 'A') { d.scaling = 'adjust'; d.focus = 'adjustTo'; return; }
+    if (key === 'F') { d.scaling = 'fit'; d.focus = 'fitWide'; return; }
+    if (key === 'ArrowUp' || key === 'ArrowDown') {
+      const up = key === 'ArrowUp';
+      if (d.focus === 'orient') d.orientation = up ? 'portrait' : 'landscape';
+      else if (field[d.focus]) { const n = clampInt(d[d.focus], 0, 9999, 0) + (up ? 1 : -1); d[d.focus] = String(Math.max(d.focus === 'adjustTo' ? 10 : 1, n)); }   // the spinner
+      return;
+    }
+    if (key === 'Backspace') { if (field[d.focus]) d[d.focus] = d[d.focus].slice(0, -1); return; }
+    if (/^[0-9]$/.test(key) && field[d.focus] && d[d.focus].length < field[d.focus]) d[d.focus] += key;
+  }
+  pageSetupOk() {
+    const d = this.dlg, p = this.settings.pageSetup; if (!d) return;
+    p.orientation = d.orientation === 'landscape' ? 'landscape' : 'portrait';
+    p.scaling = d.scaling === 'fit' ? 'fit' : 'adjust';
+    p.adjustTo = clampInt(d.adjustTo, 10, 400, p.adjustTo);
+    p.fitWide = clampInt(d.fitWide, 1, 99, p.fitWide);
+    p.fitTall = clampInt(d.fitTall, 1, 99, p.fitTall);
+    this.exitRibbon(true);
+    this.emit('settings');
+  }
+  /** The keys of an open Go To / Options / Page Setup dialog: logged, then routed to dlgKey. */
+  dialogKey(e) {
+    const k = e.key;
+    if (k === 'Escape') { this.logKey('Esc'); this.cancelDialog(); return true; }
+    if (k === 'Enter') { this.logKey('↵'); this.dlgKey('Enter'); return true; }
+    if (k === 'Tab') { const t = e.shiftKey ? 'Shift+Tab' : 'Tab'; this.logKey(t); this.dlgKey(t); return true; }
+    if (ARROWS[k]) { this.logKey(ARROWSYM[k]); this.dlgKey(k); return true; }
+    if (k === 'Backspace') { this.logKey('⌫'); this.dlgKey('Backspace'); return true; }
+    if (k === ' ') { this.logKey('Space'); this.dlgKey(' '); return true; }
+    if (k.length === 1 && !e.ctrlKey && !e.altKey) { const ch = /[a-z]/i.test(k) ? k.toUpperCase() : k; this.logKey(ch); this.dlgKey(ch); return true; }
+    return true;   // a modal dialog swallows everything else
+  }
+
+  /* ---------------- the Quick Access Toolbar ---------------- */
+  /**
+   * Run a toolbar entry by id: an Alt-walk command runs exactly as its KeyTips would, undo / redo /
+   * copy / paste act on the sheet, and a command the engine lacks (Save, Format Painter…) is a no-op.
+   * True when something ran.
+   */
+  runQat(id) {
+    const q = QAT_COMMANDS[id]; if (!q) return false;
+    this.startClock();
+    if (q.np) { this.execCommand(q.np); return true; }
+    const S = this.sheet;
+    if (q.act === 'undo') return S.undo();
+    if (q.act === 'redo') return S.redo();
+    if (q.act === 'copy') { S.copy(false); return true; }
+    if (q.act === 'paste') return S.paste('all');
+    return false;
   }
   doAutoSum() {
     const S = this.sheet;
@@ -555,6 +839,9 @@ export class Session {
       const initial = c.formula || (c.value != null && c.value !== '' ? (typeof c.value === 'boolean' ? (c.value ? 'TRUE' : 'FALSE') : String(c.value)) : '');
       this.startEdit(initial, 'edit'); return true;
     }
+    if (k === 'F5' && !e.ctrlKey && !e.altKey && !e.shiftKey) { this.logKey('F5'); this.openGoTo(); return true; }
+    if (k === 'F11' && e.shiftKey && !e.ctrlKey && !e.altKey) { this.startClock(); this.logKey('Shift+F11'); this.insertSheet(); return true; }
+    if (k === 'F9' && !e.ctrlKey && !e.altKey && !e.shiftKey) { this.startClock(); this.logKey('F9'); S.commit('recalc'); return true; }   // Calculate Now (every sheet is always current: recorded manual mode changes nothing)
     if (k === 'Delete' && !e.ctrlKey && !e.altKey) { this.startClock(); this.logKey('Delete'); S.deleteContents(); return true; }
     if (k === 'Backspace' && !e.ctrlKey && !e.altKey) {   // opens the cell empty; nothing is written until ↵ (Esc restores)
       this.startClock(); this.logKey('⌫'); this.startEdit('', 'enter'); return true;
@@ -566,6 +853,10 @@ export class Session {
     if (k === 'Alt' && !e.shiftKey && !e.ctrlKey) { this.logKey('Alt'); this.enterRibbon(); return true; }
     if (e.altKey && !e.ctrlKey) {
       if (k === '=') { this.logKey('Alt'); this.logKey('='); this.doAutoSum(); return true; }
+      if (k === 'PageDown' || k === 'PageUp') {   // a screen right / left
+        this.startClock(); this.logKey('Alt+' + (k === 'PageDown' ? 'PgDn' : 'PgUp'));
+        S.move(0, (this.pageCols || 10) * (k === 'PageDown' ? 1 : -1), e.shiftKey, false); return true;
+      }
       return true;
     }
     if (k === 'Enter' && !e.ctrlKey && !e.altKey) {
@@ -586,8 +877,14 @@ export class Session {
       S.move(dr, dc, e.shiftKey, e.ctrlKey); return true;
     }
     if (k === 'PageDown' || k === 'PageUp') {
-      this.startClock(); this.logKey((e.shiftKey ? 'Shift+' : '') + k);
-      const step = k === 'PageDown' ? 10 : -10; S.move(step, 0, e.shiftKey, false); return true;
+      this.startClock();
+      const down = k === 'PageDown';
+      if (e.ctrlKey) {   // the next / previous sheet — no wrap (Excel); at the end nothing moves but the key still counts
+        this.logKey('Ctrl+' + (e.shiftKey ? 'Shift+' : '') + (down ? 'PgDn' : 'PgUp'));
+        this.switchSheet(this.sheetIndex + (down ? 1 : -1)); return true;
+      }
+      this.logKey((e.shiftKey ? 'Shift+' : '') + k);
+      const step = (this.pageRows || 10) * (down ? 1 : -1); S.move(step, 0, e.shiftKey, false); return true;
     }
     if (k === 'Home' && !e.altKey) { this.startClock(); this.logKey((e.ctrlKey ? 'Ctrl+' : '') + (e.shiftKey ? 'Shift+' : '') + 'Home'); S.moveHome(e.ctrlKey, e.shiftKey); return true; }
     if (k === 'End' && !e.altKey) { this.startClock(); this.logKey((e.ctrlKey ? 'Ctrl+' : '') + (e.shiftKey ? 'Shift+' : '') + 'End'); S.moveEnd(e.ctrlKey, e.shiftKey); return true; }
@@ -620,7 +917,7 @@ export class Session {
       if (k === ';' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+;'); const da = S.dispActive(); S.dateStamp(da.r, da.c); return true; }
       if (k === '[') { this.startClock(); this.logKey('Ctrl+['); this.jumpPrecedent(); return true; }
       if (k === ']') { this.startClock(); this.logKey('Ctrl+]'); this.jumpDependent(); return true; }
-      if (lk === 'g' || k === 'F5') return true;
+      if (lk === 'g' && !e.shiftKey) { this.logKey('Ctrl+G'); this.openGoTo(); return true; }
       return true;   // unknown chords are swallowed, never typed
     }
     if (e.ctrlKey && e.altKey && k.toLowerCase() === 'v') { this.startClock(); this.logKey('Ctrl+Alt+V'); this.openDialog('paste'); this.pasteKind = 'all'; this.pasteOp = 'none'; return true; }
@@ -635,6 +932,12 @@ export class Session {
       return true;
     }
     if (k === 'F2') { this.editMode = this.editMode === 'edit' ? 'enter' : 'edit'; this.endPoint(); this.logKey('F2'); return true; }   // F2 ends point mode: the ref becomes plain text
+    if ((k === 'PageDown' || k === 'PageUp') && e.ctrlKey && !e.altKey) {   // the next / previous sheet: an Enter-mode entry commits first (as an arrow would); F2 and point mode swallow it
+      if (this.editMode === 'edit' || this.editPointer) return true;
+      S.tabHome = null;
+      if (!this.commitEdit(0, 0, { kind: 'move' })) return true;
+      return this.dispatch(e);
+    }
     // Home / End move the insertion point in either mode; Delete is a forward-delete (a no-op at the end) — never a cell wipe
     if (k === 'Home') { this.endPoint(); this.editCaret = this.editBuf[0] === '=' ? 1 : 0; return true; }
     if (k === 'End') { this.endPoint(); this.editCaret = this.editBuf.length; return true; }

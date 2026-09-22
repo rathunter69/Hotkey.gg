@@ -9,16 +9,20 @@
 // Both modes: every button, tile, dropdown item, card option and swatch is clickable and runs
 // through ui/ribbon-commands.js, and every workspace click is recorded on the session (§6).
 // The Session owns mode/path/dialog; this reads them and writes only through its public methods.
+// The workbook layer (ui/workbook.css): the Quick Access Toolbar left of the tabs (Alt shows its
+// numeric KeyTips), the File tab opening the backstage menu, the Page Layout group launcher, and
+// the Go To / Excel Options / Page Setup cards drawn in the Format Cells idiom, every control clickable.
 //
 //   const rv = new RibbonView(ribbonSlotEl, session, { mode: 'full' | 'slim' });   // creates <div class="ribbon" id="ribbon"> in the slot
 //   rv.setMode('slim');                                  // the learner's toggle persists in prefs (one store: app/prefs.js)
 //   rv.render();                                         // (re-runs on session.onChange)
 
-import { TABS, MENUS, RIBBON_GROUPS, RIBBON_ICONS, RIBBON_MENU_ICONS, FMT_OPTS, PASTE_OPTS, PASTE_OP_OPTS, COMMANDS, tabName } from '../engine/ribbon.js';
+import { TABS, MENUS, RIBBON_GROUPS, RIBBON_ICONS, RIBBON_MENU_ICONS, FMT_OPTS, PASTE_OPTS, PASTE_OP_OPTS, COMMANDS, tabName,
+  QAT_COMMANDS, POPULAR_COMMANDS, OPTIONS_PAGES, OPTIONS_LIVE_PAGES } from '../engine/ribbon.js';
 import { FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES } from '../engine/sheet.js';
 import { prefs } from '../app/prefs.js';
-import { RIBBON_COMMANDS, RIBBON_LAYOUT, MENU_META, VIRTUAL_MENUS, UNIMPLEMENTED_BY_ID, MODAL_DIALOGS,
-  itemTip, keyTipAt, runCommand, openMenuPath, recordMouse, closeDialog, leaveRibbon, menuEntries } from './ribbon-commands.js';
+import { RIBBON_COMMANDS, RIBBON_LAYOUT, MENU_META, VIRTUAL_MENUS, UNIMPLEMENTED_BY_ID, MODAL_DIALOGS, CARD_DIALOGS, MENU_ITEM_ICONS, QAT_ICONS,
+  itemTip, keyTipAt, runCommand, runQatCommand, openMenuPath, recordMouse, closeDialog, leaveRibbon, menuEntries } from './ribbon-commands.js';
 
 const COLLAPSED_W = 62;   // a collapsed group's button + its padding (Excel folds the rightmost groups when the bar is narrow)
 
@@ -55,9 +59,10 @@ export function leanRibbonHtml(menuKey, withExtra) {
   const tile = (k) => { const ico = icons[k];
     const tip = String(lblOf[k]).replace(/<[^>]+>/g, '') + ' — alt ' + chord + ' ' + k.toLowerCase();
     const act = tileAct(menuKey, k); const actAttr = act ? ' data-act="' + act + '"' : '';
+    const dis = !act && MENUS[menuKey + k.toUpperCase()] === undefined ? ' dis' : '';   // an Excel item the engine lacks (a press shows a note)
     // KeyTip BADGES render UPPERCASE (Excel's keytips are capital letters); data-k stays lowercase (dropdown anchor lookup)
-    if (ico) return '<span class="ri-cmd" data-k="' + k.toLowerCase() + '"' + actAttr + ' title="' + esc(tip) + '"><span class="ri-key">' + k.toUpperCase() + '</span><span class="ri-ico">' + ico + '</span></span>';
-    return '<span class="ri-cmd ri-txt" data-k="' + k.toLowerCase() + '"' + actAttr + ' title="' + esc(tip) + '"><span class="ri-key">' + k.toUpperCase() + '</span><span class="ri-lbl">' + lblOf[k] + '</span></span>'; };
+    if (ico) return '<span class="ri-cmd' + dis + '" data-k="' + k.toLowerCase() + '"' + actAttr + ' title="' + esc(tip) + '"><span class="ri-key">' + k.toUpperCase() + '</span><span class="ri-ico">' + ico + '</span></span>';
+    return '<span class="ri-cmd ri-txt' + dis + '" data-k="' + k.toLowerCase() + '"' + actAttr + ' title="' + esc(tip) + '"><span class="ri-key">' + k.toUpperCase() + '</span><span class="ri-lbl">' + lblOf[k] + '</span></span>'; };
   const used = new Set();
   let html = '';
   (groups || []).forEach(([, keys]) => {
@@ -95,6 +100,7 @@ export class RibbonView {
     this.tab = 'H';            // the full bar's selected tab
     this.localMenu = null;     // a view-owned dropdown (a MENU_META key with `items`), e.g. Home › Sort & Filter
     this.drop = null; this.pasteDialog = null; this.fmtDialog = null;
+    this.gotoDialog = null; this.optionsDialog = null; this.pagesetupDialog = null;   // the workbook cards (ui/workbook.css)
     this._onClick = e => this.onClick(e);
     this._onDown = e => { if (e.button === 0 && !e.target.closest('input,textarea,select')) e.preventDefault(); };   // a press never steals focus from the sheet, nor starts a text selection
     this.el.addEventListener('click', this._onClick);
@@ -122,6 +128,7 @@ export class RibbonView {
     this.dropKill();
     if (this.pasteDialog) this.pasteDialog.remove();
     if (this.fmtDialog) this.fmtDialog.remove();
+    for (const d of [this.gotoDialog, this.optionsDialog, this.pagesetupDialog]) if (d) d.remove();
     window.removeEventListener('resize', this._onResize); clearTimeout(this._rzT);
     if (this.ro) this.ro.disconnect();
     if (this.slot) this.slot.classList.remove('rib-full');
@@ -158,17 +165,29 @@ export class RibbonView {
   clickTab(k) {
     const ss = this.session; const t = TABS.find(x => x.k === k); if (!t) return;
     if (MODAL_DIALOGS.has(ss.dialog)) return;
+    if (t.backstage) {   // File: the backstage menu opens (and closes) under the tab — the same Alt F state
+      this.localMenu = null;
+      if (ss.mode === 'ribbon' && ss.path[0] === k && !ss.dialog) leaveRibbon(ss);
+      else { if (ss.editing && !ss.commitEdit(0, 0, { kind: 'move' })) { ss.emit('mouse'); return; } openMenuPath(ss, k); }
+      recordMouse(ss, 'ribbon:' + k); ss.emit('mouse'); return;
+    }
     this.tab = k; this.localMenu = null;
     if (ss.mode === 'ribbon') ss.exitRibbon(false);   // the mouse took over: KeyTips go, the tab shows
     recordMouse(ss, 'ribbon:' + k);
     ss.emit('mouse');
   }
-  /** One control's action: 'cmd:<id>' 'menu:<key>' 'letter:<K>' 'enter' 'cancel' 'swatch:<i>' 'style:<i>'. */
+  /** One control's action: 'cmd:<id>' 'menu:<key>' 'letter:<K>' 'enter' 'cancel' 'swatch:<i>' 'style:<i>' 'dset:<field>:<value>' 'qat:<i>' 'qatmore'. */
   act(act) {
     const ss = this.session;
-    const [kind, arg] = String(act).split(':');
-    const inDialog = kind === 'letter' || kind === 'enter' || kind === 'cancel' || kind === 'swatch' || kind === 'style';
+    const [kind, arg, arg2] = String(act).split(':');
+    const inDialog = kind === 'letter' || kind === 'enter' || kind === 'cancel' || kind === 'swatch' || kind === 'style' || kind === 'dset';
     if (MODAL_DIALOGS.has(ss.dialog) && !inDialog) return;   // a modal card owns the input
+    if (kind === 'dset') { const d = ss.dialog; if (ss.dialogSet(arg, arg2)) recordMouse(ss, 'dialog:' + d); ss.emit('mouse'); return; }
+    if (kind === 'qat') {   // a Quick Access Toolbar icon: the same runner Alt+digit uses
+      const id = (ss.settings.qat || [])[+arg]; if (!id) return;
+      this.localMenu = null; runQatCommand(ss, id); recordMouse(ss, 'qat:' + id); ss.emit('mouse'); return;
+    }
+    if (kind === 'qatmore') { this.localMenu = null; if (ss.editing && !ss.commitEdit(0, 0, { kind: 'move' })) { ss.emit('mouse'); return; } leaveRibbon(ss); ss.openOptions('qat'); recordMouse(ss, 'ribbon:qat'); ss.emit('mouse'); return; }   // Customize ▾ → More Commands…
     if (kind === 'cmd') {
       if (!runCommand(ss, arg)) { ss.emit('mouse'); return; }   // a refused edit keeps the editor open
       this.localMenu = null; recordMouse(ss, 'ribbon:' + arg); ss.emit('mouse'); return;
@@ -225,9 +244,114 @@ export class RibbonView {
     // float the card over the SHEET like Excel — lower half so source rows stay readable
     try { const gw = (this.slot && this.slot.parentElement && this.slot.parentElement.querySelector('.gridwrap')) || document.querySelector('.gridwrap');
       if (gw) { const wr = gw.getBoundingClientRect();
-        d.style.left = Math.max(8, wr.left + wr.width / 2 - 140) + 'px';
-        const want = Math.round(wr.top + wr.height * 0.30);
+        const w = d.offsetWidth || 280;
+        d.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, wr.left + wr.width / 2 - w / 2)) + 'px';
+        const want = Math.round(wr.top + wr.height * (w > 300 ? 0.12 : 0.30));
         d.style.top = Math.max(8, Math.min(want, window.innerHeight - (d.offsetHeight || 360) - 14)) + 'px'; } } catch (e) { /* not laid out */ }
+  }
+  /** A workbook card: title row, a free-form body (.wb-body) and a footer, in the .pd-box idiom; `cls` widens it. */
+  wideCard(id, title, cls) {
+    let d = document.getElementById(id);
+    if (!d) {
+      d = document.createElement('div'); d.className = 'pd-backdrop wb-card'; d.id = id;
+      d.innerHTML = '<div class="pd-box ' + cls + '"><div class="pd-title">' + title + ' <span class="x">esc to cancel</span></div><div class="wb-body"></div><div class="pd-foot"></div></div>';
+      document.body.appendChild(d);
+      d.addEventListener('click', this._onClick);
+      d.addEventListener('mousedown', this._onDown);
+    }
+    return d;
+  }
+  /** Show `d` with a body and footer while `on`, else hide it. */
+  showCard(d, on, body, foot) {
+    if (!on) { d.style.display = 'none'; return; }
+    d.style.display = 'flex';
+    d.querySelector('.wb-body').innerHTML = body;
+    d.querySelector('.pd-foot').innerHTML = foot;
+    this.positionDialog(d);
+  }
+  static okCancel(ok, extra) {
+    return (extra || '') + '<span class="pd-spacer"></span><span class="pd-btn" data-act="cancel">Cancel <kbd>esc</kbd></span><span class="pd-btn ok" data-act="enter">' + (ok || 'OK') + ' <kbd>↵</kbd></span>';
+  }
+  /* ---- the workbook cards' HTML ---- */
+  static radio(on, act, label, key, extra) {
+    return `<div class="od-row od-radio${on ? ' on' : ''}${extra && extra.foc ? ' foc' : ''}${extra && extra.cls ? ' ' + extra.cls : ''}" data-act="${act}"><span class="pd-radio">${on ? '●' : '○'}</span><span class="od-lbl">${label}</span>${key ? `<span class="pd-key">${key}</span>` : ''}</div>`;
+  }
+  static check(on, act, label, key, extra) {
+    const dis = !act;
+    return `<div class="od-row${dis ? ' dis' : ''}${extra && extra.foc ? ' foc' : ''}${extra && extra.cls ? ' ' + extra.cls : ''}"${act ? ` data-act="${act}"` : ''}><span class="od-box${on ? ' on' : ''}"></span><span class="od-lbl">${label}</span>${key ? `<span class="pd-key">${key}</span>` : ''}</div>`;
+  }
+  static field(val, foc, act, cls) {
+    return `<span class="od-field${foc ? ' foc' : ''}${cls ? ' ' + cls : ''}"${act ? ` data-act="${act}"` : ''}>${esc(val)}${foc ? '<i class="od-caret"></i>' : ''}</span>`;
+  }
+  gotoHtml() {
+    const ss = this.session;
+    const recent = (ss.gotoRecent || []).map(r => `<div class="od-item"><span class="od-ico"></span>${esc(r)}</div>`).join('') || '<div class="gt-empty">previous locations appear here</div>';
+    return `<div class="od-caplbl">Go to:</div><div class="gt-recent">${recent}</div>` +
+      `<div class="gt-ref"><label>Reference:</label>${RibbonView.field(ss.dialogBuf, true, '', 'wide')}</div>` +
+      (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">a cell (B4) or a range (A1:C3) · ↵ go · esc cancel</div>');
+  }
+  optionsHtml() {
+    const d = this.session.dlg; if (!d) return '';
+    let pages = '<div class="od-pages" role="listbox" aria-label="Options pages">';
+    OPTIONS_PAGES.forEach(p => {
+      const on = d.page === p.k, live = !!p.key;
+      pages += `<div class="od-page${on ? ' on' : ''}${live ? '' : ' dis'}${on && d.focus === 'pages' ? ' foc' : ''}"${live ? ` data-act="letter:${p.key}"` : ''}>${esc(p.label)}${live ? `<span class="pd-key">${p.key}</span>` : ''}</div>`;
+    });
+    pages += '</div>';
+    const R = RibbonView.radio, C = RibbonView.check, F = RibbonView.field;
+    let body = '';
+    if (d.page === 'formulas') {
+      const iter = d.iterative;
+      body = '<h3>Change options related to formula calculation, performance, and error handling.</h3>' +
+        '<div class="od-sect">Calculation options</div>' +
+        '<div class="od-row"><span class="od-lbl">Workbook Calculation</span></div>' +
+        R(d.calcMode === 'automatic', 'letter:A', 'Automatic', 'A', { foc: d.focus === 'calc', cls: 'ind' }) +
+        `<div class="od-row od-radio dis ind"><span class="pd-radio">○</span><span class="od-lbl">Automatic except for data tables</span></div>` +
+        R(d.calcMode === 'manual', 'letter:M', 'Manual', 'M', { foc: d.focus === 'calc', cls: 'ind' }) +
+        C(true, '', 'Recalculate workbook before saving', '', { cls: 'ind2' }) +
+        C(iter, 'letter:I', 'Enable iterative calculation', 'I', { foc: d.focus === 'iter' }) +
+        `<div class="od-row ind${iter ? '' : ' dis'}"><span class="od-lbl">Maximum Iterations:</span>${F(d.maxIterations, d.focus === 'maxIter', iter ? 'dset:focus:maxIter' : '', iter ? '' : 'dis')}${iter ? '<span class="pd-key">X</span>' : ''}</div>` +
+        `<div class="od-row ind${iter ? '' : ' dis'}"><span class="od-lbl">Maximum Change:</span>${F(d.maxChange, d.focus === 'maxChange', iter ? 'dset:focus:maxChange' : '', iter ? '' : 'dis')}${iter ? '<span class="pd-key">C</span>' : ''}</div>` +
+        '<div class="od-sect">Working with formulas</div>' +
+        C(false, '', 'R1C1 reference style') + C(true, '', 'Formula AutoComplete') + C(true, '', 'Use table names in formulas') +
+        '<div class="od-sect">Error Checking</div>' + C(true, '', 'Enable background error checking');
+    } else if (d.page === 'advanced') {
+      body = '<h3>Advanced options for working with Excel.</h3>' +
+        `<div class="od-sect">Display options for this worksheet</div><div class="od-row"><span class="od-combo">${esc((this.session.sheets[this.session.sheetIndex] || {}).name || 'Sheet1')}</span></div>` +
+        C(true, '', 'Show row and column headers') + C(false, '', 'Show formulas in cells instead of their calculated results') + C(false, '', 'Show page breaks') +
+        C(true, '', 'Show a zero in cells that have zero value') + C(true, '', 'Show outline symbols if an outline is applied') +
+        C(d.gridlines, 'letter:G', 'Show gridlines', 'G', { foc: d.focus === 'gridlines' }) +
+        `<div class="od-row ind dis"><span class="od-lbl">Gridline color</span><span class="od-combo">Automatic</span></div>` +
+        '<div class="od-sect">Display</div>' + C(true, '', 'Show formula bar') + C(true, '', 'Show function ScreenTips');
+    } else {
+      const item = (id, i, on, act) => { const q = QAT_COMMANDS[id] || { label: id }; const live = !!(q.np || q.act);
+        return `<div class="od-item${on ? ' on' : ''}${live ? '' : ' dim'}" data-act="${act}:${i}"><span class="od-ico">${QAT_ICONS[id] || ''}</span>${esc(q.label)}</div>`; };
+      body = '<h3>Customize the Quick Access Toolbar.</h3>' +
+        '<div class="od-qat">' +
+        `<div class="od-col"><div class="od-caplbl">Choose commands from:</div><span class="od-combo">Popular Commands</span><div class="od-list${d.focus === 'qatLeft' ? ' foc' : ''}" role="listbox">` +
+        POPULAR_COMMANDS.map((id, i) => item(id, i, i === d.qatPick, 'dset:qatPick')).join('') + '</div></div>' +
+        `<div class="od-mid"><span class="pd-btn" data-act="letter:A">Add &gt;&gt;<span class="pd-key">A</span></span><span class="pd-btn" data-act="letter:R">&lt;&lt; Remove<span class="pd-key">R</span></span></div>` +
+        `<div class="od-col"><div class="od-caplbl">Customize Quick Access Toolbar:</div><span class="od-combo">For all documents (default)</span><div class="od-list${d.focus === 'qatRight' ? ' foc' : ''}" role="listbox">` +
+        d.qat.map((id, i) => item(id, i, i === d.qatSel, 'dset:qatSel')).join('') + '</div></div>' +
+        '</div><div class="od-sub" style="margin-top:6px">↑ ↓ move the highlight · Tab switches lists · the toolbar shows above the ribbon tabs</div>';
+    }
+    return `<div class="od-wrap">${pages}<div class="od-body">${body}</div></div>`;
+  }
+  pageSetupHtml() {
+    const d = this.session.dlg; if (!d) return '';
+    const R = RibbonView.radio, F = RibbonView.field;
+    return '<div class="ps-tabs"><span class="ps-tab on">Page</span><span class="ps-tab dis">Margins</span><span class="ps-tab dis">Header/Footer</span><span class="ps-tab dis">Sheet</span></div>' +
+      '<div class="od-sect">Orientation</div><div class="ps-orient">' +
+      R(d.orientation === 'portrait', 'letter:T', '<span class="ps-page"></span>Portrait', 'T', { foc: d.focus === 'orient' }) +
+      R(d.orientation === 'landscape', 'letter:L', '<span class="ps-page land"></span>Landscape', 'L', { foc: d.focus === 'orient' }) + '</div>' +
+      '<div class="od-sect">Scaling</div>' +
+      `<div class="od-row od-radio${d.scaling === 'adjust' ? ' on' : ''}" data-act="letter:A"><span class="pd-radio">${d.scaling === 'adjust' ? '●' : '○'}</span><span class="od-lbl">Adjust to:</span>${F(d.adjustTo, d.focus === 'adjustTo', 'dset:focus:adjustTo')}<span class="od-unit">% normal size</span><span class="pd-key">A</span></div>` +
+      `<div class="od-row od-radio${d.scaling === 'fit' ? ' on' : ''}" data-act="letter:F"><span class="pd-radio">${d.scaling === 'fit' ? '●' : '○'}</span><span class="od-lbl">Fit to:</span>${F(d.fitWide, d.focus === 'fitWide', 'dset:focus:fitWide')}<span class="od-unit">page(s) wide by</span>${F(d.fitTall, d.focus === 'fitTall', 'dset:focus:fitTall')}<span class="od-unit">tall</span><span class="pd-key">F</span></div>` +
+      '<div class="od-sect"></div>' +
+      '<div class="od-row dis"><span class="od-lbl">Paper size:</span><span class="od-combo" style="min-width:200px">Letter (8.5" × 11")</span></div>' +
+      '<div class="od-row dis"><span class="od-lbl">Print quality:</span><span class="od-combo" style="min-width:120px">600 dpi</span></div>' +
+      '<div class="od-row dis"><span class="od-lbl">First page number:</span><span class="od-field dis">Auto</span></div>' +
+      '<div class="od-sub" style="margin-top:6px">↑ ↓ change the focused control · Tab moves between fields · digits type into the focused field</div>';
   }
   drawDialog() {
     const ss = this.session;
@@ -267,6 +391,20 @@ export class RibbonView {
         fd.querySelector('.pd-opts').innerHTML = frows;
         this.positionDialog(fd);
       }
+    }
+    // the workbook cards (ui/workbook.css): Go To, Excel Options, Page Setup — real-looking, every control clickable
+    if (ss.dialog === 'goto' || this.gotoDialog) {
+      const d = this.gotoDialog || (this.gotoDialog = this.wideCard('gotoDialog', 'Go To', 'pd-mid'));
+      this.showCard(d, ss.dialog === 'goto', ss.dialog === 'goto' ? this.gotoHtml() : '', RibbonView.okCancel('OK', '<span class="pd-btn dis" aria-disabled="true" title="Not available yet">Special…</span>'));
+    }
+    if (ss.dialog === 'options' || this.optionsDialog) {
+      const d = this.optionsDialog || (this.optionsDialog = this.wideCard('optionsDialog', 'Excel Options', 'pd-wide'));
+      this.showCard(d, ss.dialog === 'options' && !!ss.dlg, ss.dialog === 'options' ? this.optionsHtml() : '', RibbonView.okCancel('OK'));
+    }
+    if (ss.dialog === 'pagesetup' || this.pagesetupDialog) {
+      const d = this.pagesetupDialog || (this.pagesetupDialog = this.wideCard('pagesetupDialog', 'Page Setup', 'pd-mid'));
+      this.showCard(d, ss.dialog === 'pagesetup' && !!ss.dlg, ss.dialog === 'pagesetup' ? this.pageSetupHtml() : '',
+        RibbonView.okCancel('OK', '<span class="pd-btn dis" aria-disabled="true">Print…</span><span class="pd-btn dis" aria-disabled="true">Print Preview</span><span class="pd-btn dis" aria-disabled="true">Options…</span>'));
     }
   }
 
@@ -315,14 +453,15 @@ export class RibbonView {
       const np = key + k; const cmd = RIBBON_COMMANDS[np];
       if (cmd) return { act: 'cmd:' + np, key: k, label: cmd.label, icon: cmd.icon };
       if (MENUS[np]) return { act: 'menu:' + np, key: k, label: String(lbl).replace(/<[^>]+>/g, ''), icon: (MENU_META[np] || {}).icon || '', sub: true };
-      return { key: k, label: String(lbl).replace(/<[^>]+>/g, ''), icon: '', dis: true };
+      return { key: k, label: String(lbl).replace(/<[^>]+>/g, ''), icon: MENU_ITEM_ICONS[np] || '', dis: true };
     });
     else items = (meta.items || []).map(it => it.cmd ? { act: 'cmd:' + it.cmd, label: RIBBON_COMMANDS[it.cmd].label, icon: RIBBON_COMMANDS[it.cmd].icon }
       : { label: (UNIMPLEMENTED_BY_ID[it.dead] || { label: it.dead }).label, icon: (UNIMPLEMENTED_BY_ID[it.dead] || {}).icon || '', dis: true });
     const showKeys = entries.length > 0;
     let html = '<div class="rdrop-cap">' + esc(meta.label) + '</div>';
-    items.forEach(it => {
-      html += '<div class="rdrop-item' + (it.dis ? ' dis' : '') + '"' + (it.act ? ' data-act="' + it.act + '"' : '') + (it.dis ? ' aria-disabled="true" title="Not available yet"' : '') + '>' +
+    items.forEach((it, i) => {
+      const last = key === 'F' && i === items.length - 1 ? ' rdrop-last' : '';   // the backstage sets Options apart, as Excel does
+      html += '<div class="rdrop-item' + (it.dis ? ' dis' : '') + last + '"' + (it.act ? ' data-act="' + it.act + '"' : '') + (it.dis ? ' aria-disabled="true" title="Not available yet"' : '') + '>' +
         (showKeys ? '<span class="ri-key">' + esc(it.key) + '</span>' : '') + '<span class="rdrop-ico">' + (it.icon || '') + '</span><span class="rdrop-lbl">' + esc(it.label) + (it.sub ? ' ›' : '') + '</span></div>';
     });
     html += '<div class="rdrop-hint">' + (showKeys ? 'letters pick · esc back · or click' : 'click an item · esc closes') + '</div>';
@@ -366,8 +505,19 @@ export class RibbonView {
   /** The tab on show: the Alt walk's tab while walking (and it sticks, as in Excel), else the clicked one. */
   currentTab() {
     const ss = this.session;
-    if (ss.mode === 'ribbon' && ss.path.length && TABS.some(t => t.k === ss.path[0])) this.tab = ss.path[0];
+    if (ss.mode === 'ribbon' && ss.path.length && TABS.some(t => t.k === ss.path[0] && !t.backstage)) this.tab = ss.path[0];
     return this.tab;
+  }
+  /** The Quick Access Toolbar (session.settings.qat): small icons left of the tabs; Alt shows 1..9 on them. */
+  qatHtml(walking, pathStr) {
+    const ss = this.session; const ids = (ss.settings && ss.settings.qat) || [];
+    let h = '<span class="rf-qat" role="toolbar" aria-label="Quick Access Toolbar">';
+    ids.forEach((id, i) => {
+      const q = QAT_COMMANDS[id]; if (!q) return;
+      const badge = walking && !pathStr && i < 9 ? '<span class="ri-key">' + (i + 1) + '</span>' : '';
+      h += `<button type="button" tabindex="-1" class="rf-qbtn${q.np || q.act ? '' : ' dim'}" data-act="qat:${i}" title="${esc(q.label + (q.keys ? ' (' + q.keys + ')' : '') + (i < 9 ? ' · Alt ' + (i + 1) : ''))}">${badge}<span class="rf-ico">${QAT_ICONS[id] || ''}</span></button>`;
+    });
+    return h + '<button type="button" tabindex="-1" class="rf-qbtn rf-qmore" data-act="qatmore" title="Customize Quick Access Toolbar">▾</button></span>';
   }
   paintFull() {
     const ss = this.session, el = this.el;
@@ -375,10 +525,11 @@ export class RibbonView {
     const pathStr = ss.path.join('');
     const tab = this.currentTab();
     el.className = 'ribbon ribbon-full' + (ss.mode === 'ribbon' ? ' show' : '');
-    let html = '<div class="rf-tabs" role="tablist">';
+    let html = '<div class="rf-tabs" role="tablist">' + this.qatHtml(walking, pathStr);
     TABS.forEach(t => {
       const badge = walking && !pathStr ? '<k class="' + (t.live ? '' : 'dim') + '">' + t.k + '</k>' : '';
-      html += `<button type="button" class="rf-tab${t.k === tab ? ' on' : ''}${t.live ? '' : ' dead'}" data-tab="${t.k}" role="tab" aria-selected="${t.k === tab}" tabindex="-1">${badge}${esc(t.name)}</button>`;
+      const on = t.backstage ? (ss.mode === 'ribbon' && ss.path[0] === t.k) : t.k === tab;
+      html += `<button type="button" class="rf-tab${on ? ' on' : ''}${t.live ? '' : ' dead'}${t.backstage ? ' rf-file' : ''}" data-tab="${t.k}" role="tab" aria-selected="${on}" tabindex="-1"${t.backstage ? ' aria-haspopup="menu"' : ''}>${badge}${esc(t.name)}</button>`;
     });
     html += '<span class="rf-tools">' + (ss.note ? '<span class="rnote">' + esc(ss.note) + '</span>' : '') + this.pinHtml() + '</span></div>';
     const folded = this.fitFor(tab);
@@ -394,8 +545,9 @@ export class RibbonView {
     if (ss.dialog === 'sortwarn') { this.dropShow(this.anchorFor('ASA', 'HSF'), this.smallDialogHtml(), 'rdrop-dialog'); return; }
     if (ss.dialog === 'series') { this.dropShow(this.anchorFor('HFI'), this.smallDialogHtml(), 'rdrop-dialog'); return; }
     if (ss.dialog === 'fxfix') { this.dropShow(this.anchorFor(), this.smallDialogHtml(), 'rdrop-dialog'); return; }
-    if (ss.dialog === 'paste' || ss.dialog === 'fmt') return;   // the cards carry the options
+    if (CARD_DIALOGS.has(ss.dialog)) return;   // the cards carry the options
     if (ss.dialog) { this.dropShow(this.anchorFor(), this.smallDialogHtml(), 'rdrop-dialog'); return; }
+    if (walking && pathStr === 'F') { this.dropShow(this.el.querySelector('.rf-tab[data-tab="F"]') || this.anchorFor(), this.menuDropHtml('F'), 'rdrop-menu rdrop-backstage'); return; }   // the backstage
     if (walking && pathStr && menuEntries(pathStr).length && !VIRTUAL_MENUS.has(pathStr) && !TABS.some(t => t.k === pathStr)) {
       this.dropShow(this.anchorFor(pathStr), this.menuDropHtml(pathStr), 'rdrop-menu'); return;
     }
@@ -406,9 +558,16 @@ export class RibbonView {
     let html = '<div class="rf-body">';
     (RIBBON_LAYOUT[tab] || []).forEach(g => {
       if (folded.has(g.name)) { html += this.groupBtnHtml(g, pathStr, walking); return; }
-      html += '<div class="rf-grp" data-group="' + esc(g.name) + '"><div class="rf-cols">' + g.cols.map(col => this.colHtml(col, pathStr, walking)).join('') + '</div><div class="rf-gname">' + esc(g.name) + '</div></div>';
+      html += '<div class="rf-grp" data-group="' + esc(g.name) + '"><div class="rf-cols">' + g.cols.map(col => this.colHtml(col, pathStr, walking)).join('') + '</div><div class="rf-gname">' + esc(g.name) + this.launcherHtml(g, pathStr, walking) + '</div></div>';
     });
     return html + '</div>';
+  }
+  /** Excel's dialog launcher (the ↘ box in a group's name row): the group's `launcher` command, with its KeyTip while walking. */
+  launcherHtml(g, pathStr, walking) {
+    if (!g.launcher) return '';
+    const cmd = RIBBON_COMMANDS[g.launcher]; if (!cmd) return '';
+    const badge = walking ? keyTipAt(g.launcher, pathStr) : '';
+    return `<button type="button" tabindex="-1" class="rf-launch" data-act="cmd:${g.launcher}" data-tip="${g.launcher}" title="${esc(cmd.label + ' · Alt ' + spaced(g.launcher))}">${badge ? '<span class="ri-key">' + badge + '</span>' : ''}${cmd.icon}</button>`;
   }
   /** The folded-group set for this tab at the bar's current width (a new width starts from nothing folded). */
   fitFor(tab) {
@@ -432,15 +591,16 @@ export class RibbonView {
   groupBtnHtml(g, pathStr, walking) {
     const items = []; const walk = it => { if (it.rows) it.rows.forEach(r => r.forEach(walk)); else items.push(it); }; g.cols.forEach(walk);
     items.forEach(it => { const t = itemTip(it); if (t) this._tipGroup[t] = g.name; });
+    if (g.launcher) this._tipGroup[g.launcher] = g.name;
     const first = items.find(it => it.cmd || it.menu) || items[0] || {};
     const icon = first.cmd ? RIBBON_COMMANDS[first.cmd].icon : first.menu ? (MENU_META[first.menu] || {}).icon || '' : first.dead ? (UNIMPLEMENTED_BY_ID[first.dead] || {}).icon || '' : '';
     const tips = walking ? items.map(it => keyTipAt(itemTip(it), pathStr)).filter(Boolean) : [];
     const open = this.localMenu === 'group:' + g.name;
-    const live = items.some(it => it.cmd || it.menu);
+    const live = items.some(it => it.cmd || it.menu) || !!g.launcher;
     return '<div class="rf-grp rf-collapsed" data-group="' + esc(g.name) + '"><div class="rf-cols">' +
       `<button type="button" tabindex="-1" class="rf-btn big rf-grpbtn${open ? ' open' : ''}${live ? '' : ' dis'}" data-act="group:${esc(g.name)}" aria-haspopup="menu" aria-expanded="${open}"${live ? '' : ' aria-disabled="true"'} title="${esc(g.name)} — open the group">` +
       (tips.length ? '<span class="rf-grptips">' + tips.map(t => '<span class="ri-key">' + t + '</span>').join('') + '</span>' : '') +
-      `<span class="rf-ico">${icon}</span><span class="rf-lbl">${esc(g.name)}</span><span class="rf-caret">▾</span></button></div><div class="rf-gname">${esc(g.name)}</div></div>`;
+      `<span class="rf-ico">${icon}</span><span class="rf-lbl">${esc(g.name)}</span><span class="rf-caret">▾</span></button></div><div class="rf-gname">${esc(g.name)}${this.launcherHtml(g, pathStr, walking)}</div></div>`;
   }
   /** A folded group's dropdown: every item of the group, live ones clickable, menus one level deeper, KeyTips while walking. */
   groupDropHtml(name) {
@@ -459,6 +619,10 @@ export class RibbonView {
       const cmd = RIBBON_COMMANDS[it.cmd]; if (!cmd) return;
       html += '<div class="rdrop-item' + (it.check && ss.sheet.gridlines ? ' on' : '') + '" data-act="cmd:' + it.cmd + '">' + key + '<span class="rdrop-ico">' + cmd.icon + '</span><span class="rdrop-lbl">' + esc(it.label || cmd.label) + '</span></div>';
     });
+    if (g.launcher && RIBBON_COMMANDS[g.launcher]) {   // the group's dialog launcher rides along when the group is folded
+      const cmd = RIBBON_COMMANDS[g.launcher]; const badge = walking ? keyTipAt(g.launcher, pathStr) : '';
+      html += '<div class="rdrop-item" data-act="cmd:' + g.launcher + '">' + (badge ? '<span class="ri-key">' + badge + '</span>' : '') + '<span class="rdrop-ico">' + cmd.icon + '</span><span class="rdrop-lbl">' + esc(cmd.label) + '</span></div>';
+    }
     return html + '<div class="rdrop-hint">' + (walking ? 'letters pick · esc back · or click' : 'click an item · esc closes') + '</div>';
   }
   colHtml(col, pathStr, walking) {
@@ -556,6 +720,15 @@ export class RibbonView {
       el.innerHTML = '<span class="path">series →</span><span class="opt">linear, step from selection · <kbd>↵</kbd> apply · <kbd>esc</kbd> cancel</span>';
       return;
     }
+    if (ss.dialog === 'goto') { el.className = 'ribbon show';   // the floating card carries the field
+      el.innerHTML = '<span class="path">go to →</span><span class="opt" style="font-family:var(--mono)">' + esc(ss.dialogBuf || '…') + '</span><span class="opt">type a cell or range · ↵ go · esc cancel</span>';
+      return; }
+    if (ss.dialog === 'options') { el.className = 'ribbon show';
+      el.innerHTML = '<span class="path">excel options →</span><span class="opt">F formulas · V advanced · Q quick access toolbar · letters pick · ↵ OK · esc cancel</span>';
+      return; }
+    if (ss.dialog === 'pagesetup') { el.className = 'ribbon show';
+      el.innerHTML = '<span class="path">page setup →</span><span class="opt">T portrait · L landscape · A adjust to · F fit to · ↵ OK · esc cancel</span>';
+      return; }
     if (ss.dialog) {   // a dialog this painter has no card for — a minimal strip so Esc always reads
       el.className = 'ribbon show';
       el.innerHTML = '<span class="path">' + esc(ss.dialog) + ' →</span><span class="opt">esc cancel</span>';

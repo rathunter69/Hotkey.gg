@@ -4,6 +4,7 @@ import { Sheet } from '../engine/sheet.js';
 import { Session, parseKeySpec, parseKeyScript } from '../engine/keyboard.js';
 
 const fresh = (cells, sheetOpts) => { const log = []; const s = new Session(new Sheet({ ...(cells ? { cells } : {}), ...(sheetOpts || {}) }), { onKey: k => log.push(k), now: () => 0 }); s.log = log; return s; };
+const SMALL = { rows: 20, cols: 10 };   // the tests below name the far edge (J20, K) — the size is explicit, whatever the Sheet default is
 
 test('key specs and scripts parse', () => {
   assert.deepEqual(parseKeySpec('Ctrl+Shift+ArrowDown'), { key: 'ArrowDown', ctrlKey: true, shiftKey: true, altKey: false, metaKey: false, code: '' });
@@ -34,7 +35,7 @@ test('formulas: typing, auto-close, point mode, F4, F2 edit mode, Ctrl+Enter', (
 });
 
 test('selection chords and clipboard keys', () => {
-  const s = fresh({ A1: { value: 1 }, A2: { value: 2 }, A3: { value: 3 }, B1: { value: 'x' } }); const S = s.sheet;
+  const s = fresh({ A1: { value: 1 }, A2: { value: 2 }, A3: { value: 3 }, B1: { value: 'x' } }, SMALL); const S = s.sheet;
   s.run('Ctrl+Shift+Down'); assert.equal(S.selectionText(), 'A1:A3');
   s.run('Ctrl+C Right Right Ctrl+V'); assert.equal(S.value('C3'), 3); assert.equal(S.selectionText(), 'C1:C3'); assert.ok(S.clipboard);
   s.run('Escape'); assert.equal(S.clipboard, null);
@@ -108,14 +109,14 @@ test('#8 #9 #57: edits, stamps and jumps act on the displayed active cell, never
   s.run('Right Down Shift+Right Backspace Escape'); assert.equal(S.value('B2'), 5); assert.equal(S.value('C2'), 6);
   s.run('Backspace Enter'); assert.equal(S.value('B2'), null); assert.equal(S.value('C2'), 6);
   const cells = { A1: { value: 'Day' }, B1: { value: 'Sales' }, C1: { value: 'Units' }, A2: { value: 'Mon' }, B2: { value: 10 }, C2: { value: 1 }, A3: { value: 'Tue' }, B3: { value: 20 }, C3: { value: 2 } };
-  s = fresh(cells, { active: { r: 3, c: 2 } }); S = s.sheet;
+  s = fresh(cells, { active: { r: 3, c: 2 }, ...SMALL }); S = s.sheet;
   s.run('Shift+Space "x" Enter'); assert.equal(S.value('B3'), 'x'); assert.equal(S.value('J3'), null); assert.equal(S.selectionText(), 'B4');
-  s = fresh(cells, { active: { r: 2, c: 3 } }); S = s.sheet;
+  s = fresh(cells, { active: { r: 2, c: 3 }, ...SMALL }); S = s.sheet;
   s.run('Ctrl+Space "=B2*2" Ctrl+Enter'); assert.equal(S.formula('C2'), '=B2*2'); assert.equal(S.value('C2'), 20); assert.equal(S.formula('C1'), '=B1*2'); assert.equal(S.formula('C20'), '=B20*2'); assert.equal(S.selectionText(), 'C1:C20');
-  s = fresh(cells, { active: { r: 2, c: 2 } }); S = s.sheet;
+  s = fresh(cells, { active: { r: 2, c: 2 }, ...SMALL }); S = s.sheet;
   s.run('Ctrl+A F2'); assert.equal(s.editBuf, '10'); assert.deepEqual(s.editAnchor, { r: 2, c: 2 }); s.run('Escape');
   s.run('Ctrl+Shift+Space "y" Enter'); assert.equal(S.value('B2'), 'y'); assert.equal(S.value('C3'), 2);
-  s = fresh(undefined, { today: () => 46000 }); S = s.sheet;
+  s = fresh(undefined, { today: () => 46000, ...SMALL }); S = s.sheet;
   s.run('Shift+Down Shift+Down Ctrl+;'); assert.equal(S.value('A1'), 46000); assert.equal(S.cellAt('A1').fmtStyle, 'date'); assert.equal(S.value('A3'), null);
   s.run('Right Right Down Shift+Space Ctrl+;'); assert.equal(S.value('C2'), 46000); assert.equal(S.value('J2'), null);
   s = fresh({ A1: { formula: '=C1' }, A3: { formula: '=D3' }, E1: { formula: '=A1' }, F3: { formula: '=A3' } }); S = s.sheet;
@@ -190,7 +191,7 @@ test('#56: point mode and F4 leave LOG10-style names and out-of-sheet refs alone
     ['"=SUM(A1:A3)+LOG10" Down', '=SUM(A1:A3)+LOG10C6'], ['"=LOG10(" Down', '=LOG10(C6'], ['"=1+A1" Down', '=1+A2'],
     ['"=LOG10" F4', '=LOG10'], ['"=DAYS360" F4', '=DAYS360'], ['"=ATAN2" F4', '=ATAN2'], ['"=K5" F4', '=K5'], ['"=B2" F4', '=$B$2'], ['"=A1:B2" F4', '=$A$1:$B$2']];
   for (const [script, buf] of cases) {
-    const s = fresh(undefined, { active: { r: 5, c: 3 } });
+    const s = fresh(undefined, { active: { r: 5, c: 3 }, ...SMALL });   // ten columns: K5 and ZZ5 lie outside the sheet
     s.run(script); assert.equal(s.editBuf, buf, script);
     assert.equal(s.log.includes('F4'), /F4/.test(script) && buf.includes('$'), script + ' logs F4 only when it changed a ref');
   }
