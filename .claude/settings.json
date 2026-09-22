@@ -1,7 +1,5 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(bash dev/sbp-query.sh *)"
-    ]
+    "allow": []
   }
 }
