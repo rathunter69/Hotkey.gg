@@ -5,13 +5,13 @@
 // validator on malformed input, negative replays per lesson, and guest progress on corrupt storage.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CHAPTERS, LESSONS, LESSONS_BY_ID, sectionsOf } from '../content/index.js';
-import { validateLesson, availableConcepts } from '../content/schema.js';
+import { CHAPTERS, LESSONS, LESSONS_BY_ID, sectionsOf, sectionNames } from '../content/index.js';
+import { validateLesson, availableConcepts, sentenceCount } from '../content/schema.js';
 import { LessonRun, shortcutsUsed } from '../app/runner.js';
 
 const byId = id => { const l = LESSONS_BY_ID[id]; assert.ok(l, `lesson ${id} is in the catalogue`); return l; };
-const f01 = () => byId('foundations-01-active-cell'), f02 = () => byId('foundations-02-moving-around'), f03 = () => byId('foundations-03-selecting-ranges');
-const f04 = () => byId('foundations-04-entering-data'), f05 = () => byId('foundations-05-editing-cells'), f06 = () => byId('foundations-06-ribbon-commands'), f07 = () => byId('foundations-07-dialog-boxes');
+const f01 = () => byId('active-cell'), f02 = () => byId('moving-around'), f03 = () => byId('selecting-ranges');
+const f04 = () => byId('entering-data'), f05 = () => byId('editing-cells'), f06 = () => byId('ribbon-commands'), f07 = () => byId('dialog-boxes');
 const fresh = (lesson, opts = {}) => new LessonRun(lesson, { now: () => 0, ...opts });
 
 test('the catalogue is well formed', () => {
@@ -23,29 +23,44 @@ test('the catalogue is well formed', () => {
   for (const l of LESSONS) for (const p of l.prerequisites) { assert.ok(LESSONS_BY_ID[p], `${l.id}: prerequisite ${p} exists`); assert.ok(ids.indexOf(p) < ids.indexOf(l.id), `${l.id}: prerequisite ${p} comes earlier`); }
 });
 
-test('every lesson sits in one of its chapter\'s sections, and the sections come out in chapter order', () => {
+test('every lesson sits in one of its chapter\'s sections; the catalogue lists every section in order, empty ones as upcoming', () => {
   for (const ch of CHAPTERS) {
-    assert.ok(Array.isArray(ch.sections) && ch.sections.length, `${ch.id}: sections listed`);
-    for (const l of ch.lessons) assert.ok(ch.sections.includes(l.section), `${l.id}: section "${l.section}" is one of ${ch.id}'s sections`);
+    const names = sectionNames(ch);
+    assert.ok(names.length, `${ch.id}: sections listed`);
+    for (const l of ch.lessons) assert.ok(names.includes(l.section), `${l.id}: section "${l.section}" is one of ${ch.id}'s sections`);
     const groups = sectionsOf(ch);
-    assert.deepEqual(groups.map(g => g.name), ch.sections.filter(n => ch.lessons.some(l => l.section === n)), `${ch.id}: grouped in section order, empty sections dropped`);
-    assert.deepEqual(groups.flatMap(g => g.lessons.map(l => l.id)), ch.lessons.filter(l => ch.sections.includes(l.section)).sort((a, b) => ch.sections.indexOf(a.section) - ch.sections.indexOf(b.section) || ch.lessons.indexOf(a) - ch.lessons.indexOf(b)).map(l => l.id));
+    assert.deepEqual(groups.map(g => g.name), names, `${ch.id}: every section comes out, in chapter order`);
+    for (const g of groups) assert.ok(typeof g.blurb === 'string', `${ch.id} › ${g.name}: has a blurb string`);
+    assert.deepEqual(groups.flatMap(g => g.lessons.map(l => l.id)), ch.lessons.slice().sort((a, b) => names.indexOf(a.section) - names.indexOf(b.section) || ch.lessons.indexOf(a) - ch.lessons.indexOf(b)).map(l => l.id));
   }
+  const foundations = CHAPTERS.find(c => c.id === 'foundations');
+  assert.equal(sectionNames(foundations).length, 9, 'Chapter 1 shows all nine sections of SITE_SPEC §7');
+  assert.ok(sectionsOf(foundations).some(g => g.lessons.length === 0 && g.blurb), 'an upcoming section carries its blurb');
   assert.deepEqual(sectionsOf({ sections: ['A'], lessons: [{ id: 'x' }, { id: 'y', section: 'A' }] }).map(g => [g.name, g.lessons.map(l => l.id)]), [['A', ['y']], ['Basics', ['x']]], 'a lesson without a section falls into Basics after the listed sections');
 });
 
-// The Read standard (SITE_SPEC §1: short sentences, direct, never cutesy): every paragraph of a
-// teach step is one or two sentences and stays short; the whole Read fits in a glance.
-const sentences = p => (p.match(/[.!?](\s|$)/g) || []).length;
-test('every Read paragraph is one or two short sentences', () => {
-  for (const l of LESSONS) for (const st of l.steps) if (st.mode === 'teach') {
-    assert.ok(st.body.length >= 2 && st.body.length <= 5, `${l.id}: Read has 2–5 paragraphs (${st.body.length})`);
-    for (const p of st.body) {
-      const n = sentences(p);
-      assert.ok(n >= 1 && n <= 2, `${l.id}: "${p.slice(0, 40)}…" has ${n} sentences`);
-      assert.ok(p.split(/\s+/).length <= 40, `${l.id}: "${p.slice(0, 40)}…" is over 40 words`);
-      assert.ok(!/!\s*$/.test(p) && !/\b(awesome|super|easy peasy|magic|wow)\b/i.test(p), `${l.id}: tone`);
-    }
+// The adaptive format (SITE_SPEC §4): the Read is two or three sentences in total; every goal is one
+// action sentence; the goal that first uses a concept the lesson teaches carries a one-line teaching
+// point and a reuse goal carries none. validateLesson enforces it; this pins the rule with examples.
+test('the adaptive lesson format is enforced', () => {
+  const base = f02();
+  assert.deepEqual(validateLesson(base), []);
+  const readLong = { ...base, read: 'One. Two. Three. Four.' };
+  assert.ok(validateLesson(readLong).some(e => /read must be two or three sentences \(it has 4\)/.test(e)));
+  const readShort = { ...base, read: 'Just one sentence.' };
+  assert.ok(validateLesson(readShort).some(e => /read must be two or three sentences/.test(e)));
+  const noTeach = { ...base, goals: base.goals.map((g, i) => (i === 0 ? { ...g, teach: undefined } : g)) };
+  assert.ok(validateLesson(noTeach).some(e => /goal ctrl-down: introduces ctrl-arrow and needs a one-line teach/.test(e)));
+  const extraTeach = { ...base, goals: base.goals.map((g, i) => (i === 1 ? { ...g, teach: 'Ctrl+→ jumps right.' } : g)) };
+  assert.ok(validateLesson(extraTeach).some(e => /goal ctrl-right: reuses taught concepts only/.test(e)));
+  const twoSentences = { ...base, goals: base.goals.map((g, i) => (i === 0 ? { ...g, text: 'Move down. Then stop.' } : g)) };
+  assert.ok(validateLesson(twoSentences).some(e => /goal ctrl-down: the action must be one sentence/.test(e)));
+  const noStop = { ...base, goals: base.goals.map((g, i) => (i === 0 ? { ...g, teach: 'Ctrl+↓ jumps to the edge of the data' } : g)) };
+  assert.ok(validateLesson(noStop).some(e => /goal ctrl-down: teach must be one sentence ending in a full stop/.test(e)));
+  assert.equal(sentenceCount('Numbers like 1,200.00 and 5.0% are not sentence ends. This is the second.'), 2);
+  for (const l of LESSONS) {
+    assert.ok(!/\b(awesome|super|easy peasy|magic|wow|gonna|kinda)\b/i.test(l.read + l.goals.map(g => (g.teach || '') + g.text).join(' ')), `${l.id}: tone`);
+    assert.ok(l.goals.length >= 3 && l.goals.length <= 6, `${l.id}: 3-6 goals`);
   }
 });
 
@@ -55,7 +70,6 @@ for (const lesson of LESSONS) {
     assert.deepEqual(errs, [], errs.join('; '));
     const avail = availableConcepts(lesson, LESSONS_BY_ID);
     for (const g of lesson.goals) for (const c of g.requires) assert.ok(avail.has(c), `${lesson.id} goal ${g.id} requires "${c}" which is not taught here or earlier`);
-    for (const st of lesson.steps) if (st.mode === 'teach') for (const p of st.body) assert.ok(!/\b(gonna|kinda|magic|super easy|awesome)\b/i.test(p), 'professional terminology');
 
     let t = 0;
     const run = new LessonRun(lesson, { mode: 'guided', now: () => (t += 100) });
@@ -284,8 +298,8 @@ test('#67 validateLesson instantiates the starting sheet and probes every check'
   assert.ok(validateLesson(presolved).some(e => /goal to-a1: already satisfied by the starting sheet/.test(e)), 'a pre-satisfied first goal is reported');
   const bad = { ...base, sheet: { cells: { Monday: { value: 1 } }, active: { r: 1, c: 1 } } };
   assert.ok(validateLesson(bad).some(e => /bad cell key "Monday"/.test(e)), 'a bad cell key is reported');
-  const off = { ...base, sheet: { cells: {}, active: { r: 99, c: 99 } } };
-  assert.ok(validateLesson(off).some(e => /active .* is outside the 20×10 grid/.test(e)), 'an active cell outside the grid is reported');
+  const off = { ...base, sheet: { cells: {}, active: { r: 999, c: 99 } } };
+  assert.ok(validateLesson(off).some(e => /active .* is outside the 100×26 grid/.test(e)), 'an active cell outside the grid is reported');
   const badEnd = { ...base, endState: [{ text: 'boom', check: () => { throw new Error('no'); } }] };
   assert.ok(validateLesson(badEnd).some(e => /endState "boom": check throws/.test(e)), 'a throwing endState check is reported');
   // later goals may hold at the start: f01's 'to-a1' is gated behind the first two and validates clean
@@ -295,7 +309,7 @@ test('#67 validateLesson instantiates the starting sheet and probes every check'
 test('#68 validateLesson returns problems instead of throwing on malformed input', () => {
   const base = f01();
   const cases = [
-    [{ steps: 'teach' }, /steps missing/], [{ steps: {} }, /steps missing/], [{ goals: {} }, /goals missing/],
+    [{ read: 42 }, /read missing/], [{ par: 'fast' }, /par \(timed-mode seconds\) missing/], [{ goals: {} }, /goals missing/],
     [{ endState: {} }, /endState must be an array/], [{ concepts: 'active-cell' }, /concepts must list what the lesson teaches/],
     [{ sheet: 'nope' }, /sheet \(starting sheet\) missing/], [{ sheet: { cells: { A1: 'x' } } }, /cell A1 must be a record/],
   ];
@@ -316,7 +330,7 @@ test('#65 / #66 progress.js survives corrupt localStorage shapes', async () => {
   globalThis.localStorage = { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); }, removeItem: k => { delete store[k]; } };
   try {
     const { progress } = await import('../app/progress.js');
-    const ID = 'foundations-01-active-cell';
+    const ID = 'active-cell';
     for (const raw of ['{"lessons":"corrupt"}', '{"lessons":1}', '{"lessons":[]}', '[]', 'null', '"x"', '{',
       `{"lessons":{"${ID}":"done"}}`, `{"lessons":{"${ID}":true}}`, `{"lessons":{"${ID}":5}}`, `{"lessons":{"${ID}":null}}`, `{"lessons":{"${ID}":[]}}`]) {
       store.hk2_progress_v1 = raw;
@@ -328,7 +342,7 @@ test('#65 / #66 progress.js survives corrupt localStorage shapes', async () => {
       assert.equal(progress.status(ID), 'done', `${raw}: record wrote a fresh entry`);
       assert.doesNotThrow(() => Object.values(progress.all()).filter(p => p.completed).length, `${raw}: all() is safe to filter`);
     }
-    store.hk2_progress_v1 = `{"lessons":{"${ID}":null,"foundations-02-moving-around":{"completed":true}}}`;
+    store.hk2_progress_v1 = `{"lessons":{"${ID}":null,"moving-around":{"completed":true}}}`;
     assert.equal(Object.values(progress.all()).filter(p => p.completed).length, 1, 'a null entry is dropped, not counted');
     // a corrupt best is replaced by a real timed time; a good best is only lowered
     for (const best of ['"abc"', '{"x":1}', '"5"', '-1', 'null', 'Infinity']) {

@@ -105,3 +105,7 @@
 .plist .c-title{overflow:hidden; text-overflow:ellipsis}
 .cat-empty{padding:18px 14px; color:var(--muted); font-family:var(--mono); font-size:13px; text-align:center; background:var(--surface); border:1px dashed var(--line); border-radius:10px; display:flex; gap:12px; align-items:center; justify-content:center}
 @media (max-width:760px){ .cat-keys{display:none} .c-tags, .ptable .c-tags{display:none} }
+/* catalog: sections with nothing built yet */
+.section-upcoming{color:var(--faint)}
+.section-upcoming .upcoming{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.5px; color:var(--faint); border:1px solid var(--line); border-radius:99px; padding:1px 7px; margin-left:6px; vertical-align:middle}
+.section-blurb{color:var(--faint); font-size:13px; margin:-2px 0 14px}

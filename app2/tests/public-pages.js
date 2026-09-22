@@ -9,7 +9,7 @@
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CHAPTERS, LESSONS, chapterOf, lessonNumber, nextLesson } from '../content/index.js';
+import { CHAPTERS, LESSONS, chapterOf, lessonNumber, nextLesson, sectionsOf } from '../content/index.js';
 import { REFERENCE, CATEGORIES, CATEGORY_NOTES, ADDIN_DISCLAIMER, parseChord } from '../content/reference.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -75,7 +75,7 @@ ${body}
 }
 
 export function renderLessonPage(lesson) {
-  const ch = chapterOf(lesson); const n = lessonNumber(lesson.id); const teach = lesson.steps.find(s => s.mode === 'teach');
+  const ch = chapterOf(lesson); const n = lessonNumber(lesson.id);
   const up = '../'; const app = up + 'index.html';
   const i = LESSONS.indexOf(lesson); const prev = i > 0 ? LESSONS[i - 1] : null; const next = nextLesson(lesson.id);
   const taught = REFERENCE.filter(e => e.lessonId === lesson.id);
@@ -83,15 +83,14 @@ export function renderLessonPage(lesson) {
 <h1>Lesson ${n}: ${esc(lesson.title)}</h1>
 <div class="meta">${esc(ch.title)} · ${esc(lesson.section)} · ${esc(lesson.difficulty)} · <span class="${lesson.access === 'free' ? 'free' : ''}">${lesson.access === 'free' ? 'Free' : 'Paid'}</span></div>
 <div class="card">
-<h2 style="margin-top:0">${esc(teach.title)}</h2>
-${teach.body.map(p => `<p>${rich(p)}</p>`).join('\n')}
+<p style="margin:0">${rich(lesson.read)}</p>
 </div>
 <h2>What you will do</h2>
-<ol class="goals">${lesson.goals.map(g => `<li>${esc(g.text)}</li>`).join('')}</ol>
+<ol class="goals">${lesson.goals.map(g => `<li>${g.teach ? `<span class="muted">${rich(g.teach)}</span> ` : ''}${esc(g.text)}</li>`).join('')}</ol>
 <div class="cta"><a class="btn" href="${app}#/lesson/${esc(lesson.id)}">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
 ${taught.length ? `<h2>Shortcuts in this lesson</h2><ul class="list">${taught.map(e => `<li><span class="k">${chordHtml(e.win)}</span> <a href="../shortcuts/${esc(e.id)}.html">${esc(e.name)}</a></li>`).join('')}</ul>` : ''}
 <div class="prevnext"><span>${prev ? `← <a href="${esc(prev.id)}.html">Lesson ${n - 1}: ${esc(prev.title)}</a>` : ''}</span><span>${next ? `<a href="${esc(next.id)}.html">Lesson ${n + 1}: ${esc(next.title)}</a> →` : ''}</span></div>`;
-  return frame({ title: `Lesson ${n}: ${lesson.title} — ${ch.title} · hotkey.gg`, description: plain(teach.body[0]), up, body });
+  return frame({ title: `Lesson ${n}: ${lesson.title} — ${ch.title} · hotkey.gg`, description: plain(lesson.read), up, body });
 }
 
 export function renderLessonsIndex() {
@@ -100,7 +99,7 @@ export function renderLessonsIndex() {
 <h1>Excel lessons</h1>
 <p class="muted">Every lesson runs on a real in-browser spreadsheet. Read, do it guided, do it solo, then race the clock.</p>
 ${CHAPTERS.map(ch => `<h2>${esc(ch.title)}</h2><p class="muted small">${esc(ch.blurb)}</p>` +
-  (ch.sections || []).map(sec => { const ls = ch.lessons.filter(l => l.section === sec); return ls.length ? `<h3>${esc(sec)}</h3><ul class="list">${ls.map(l => `<li><a href="${esc(l.id)}.html">Lesson ${lessonNumber(l.id)}: ${esc(l.title)}</a> <span class="muted small">· ${esc(l.difficulty)}</span></li>`).join('')}</ul>` : ''; }).join('')).join('')}
+  sectionsOf(ch).map(sec => `<h3>${esc(sec.name)}</h3>` + (sec.lessons.length ? `<ul class="list">${sec.lessons.map(l => `<li><a href="${esc(l.id)}.html">Lesson ${lessonNumber(l.id)}: ${esc(l.title)}</a> <span class="muted small">· ${esc(l.difficulty)}</span></li>`).join('')}</ul>` : `<p class="muted small">Upcoming. ${esc(sec.blurb)}</p>`)).join('')).join('')}
 <div class="cta"><a class="btn" href="${app}#/learn">Open the catalogue</a></div>`;
   return frame({ title: 'Excel lessons · hotkey.gg', description: 'Learn Excel by doing: guided lessons on a real in-browser spreadsheet, from the active cell to formulas.', up, body });
 }

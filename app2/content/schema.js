@@ -3,29 +3,33 @@
 // A lesson is a plain ES module exporting one object:
 //
 // {
-//   id: 'foundations-01-active-cell',      unique, kebab-case
+//   id: 'moving-around',                    unique, kebab-case (no numbers: the catalogue order numbers lessons)
 //   chapter: 'foundations',                 chapter id (content/index.js)
-//   title: 'The active cell',
-//   section: 'Moving',                 // the chapter section (CHAPTERS[].sections order in content/index.js)
+//   section: 'Moving',                      the chapter section (CHAPTERS[].sections in content/index.js)
+//   title: 'Moving around the worksheet',
 //   difficulty: 'easy' | 'medium' | 'hard',
 //   tags: ['navigation'],
 //   access: 'free' | 'paid',
-//   concepts: ['active-cell', 'name-box'],  concept ids TAUGHT here (see CONCEPTS below)
-//   prerequisites: ['foundations-00-…'],    lesson ids that must be completed first
+//   concepts: ['ctrl-arrow', 'home-key'],   concept ids TAUGHT here (see CONCEPTS below)
+//   prerequisites: ['active-cell'],         lesson ids that must be completed first
+//   read: 'What the lesson is. What you will do. Why it pays off at work.',   two or three sentences, total
 //   sheet: { cells: {...}, active: {r,c}, colW: {...} },   the starting sheet (Sheet constructor options)
-//   steps: [                                 in order: teach → guided → solo → timed
-//     { mode: 'teach',  title, body: ['paragraph', …] },   `Ctrl+1` in a paragraph renders as a keycap
-//     { mode: 'guided' },                    goals shown one at a time with their keys
-//     { mode: 'solo' },                      goals without keys
-//     { mode: 'timed', par: 20 },            solo against the clock (seconds)
-//   ],
+//   sheets: [{ name: 'Sheet1' }, { name: 'Sheet2', cells: {...} }],   optional workbook: names and extra sheets
+//   par: 20,                                 timed-mode par, seconds
 //   goals: [                                 sequential; each names a VISIBLE element of the sheet
-//     { id: 'bold-title', text: 'Make Weekly Sales Report bold', keys: 'Ctrl+B',
-//       requires: ['bold-command'],          concept ids this goal needs (must be taught here or earlier)
+//     { id: 'ctrl-down',
+//       teach: 'Ctrl+↓ jumps to the edge of the data.',   one sentence, ONLY on the goal that first introduces
+//                                                         a concept this lesson teaches (SITE_SPEC §4: adaptive,
+//                                                         the teaching point rides the first use; reuse shows the action only)
+//       text: 'Move from A3 (Monday) to A7 (Friday).',   the action, one sentence
+//       keys: 'Ctrl+↓',                      the route as keycaps; shown with a teach line, else through Help
+//       requires: ['ctrl-arrow'],            concept ids this goal needs (must be taught here or earlier)
 //       check: (sheet, session) => boolean }, end-state predicate
 //   ],
 //   endState: [ { text, check } ],           optional extra predicates that must hold when the last goal lands
-//   solution: '"Weekly Sales Report" Enter Up Ctrl+B',   reference solution as keystrokes (parseKeyScript)
+//   race: [ { goal: 'arrows', label: 'Arrow keys' }, { goal: 'ctrl-down', label: 'Ctrl+↓' } ],   optional: goal split times shown side by side
+//   closing: ['sentence', …],                optional paragraphs on the completion overlay
+//   solution: 'Ctrl+Down Ctrl+Right Home',   reference solution as keystrokes (parseKeyScript)
 // }
 //
 // Goals are checked in order after every keystroke: goal i counts as done the first time its check
@@ -46,7 +50,7 @@ import { parseRef } from '../engine/refs.js';
 
 export const DIFFICULTIES = ['easy', 'medium', 'hard'];
 export const ACCESS = ['free', 'paid'];
-export const MODES = ['teach', 'guided', 'solo', 'timed'];
+export const MODES = ['guided', 'solo', 'timed'];   // how a lesson is played; the Read phase precedes them
 
 /** Concept ids and their display names — the vocabulary lessons teach and require. */
 export const CONCEPTS = {
@@ -88,6 +92,10 @@ export const CONCEPTS = {
   'ribbon-route-dialog': 'Alt, H, O, E opens Format Cells from the Ribbon',
 };
 
+/** Sentences in a text: terminators followed by a space or the end (decimals like 5.0% and 1,200.00 are not terminators). */
+export function sentenceCount(text) { return (String(text).match(/[.!?](?=\s|$)/g) || []).length; }
+export function wordCount(text) { return String(text).trim().split(/\s+/).filter(Boolean).length; }
+
 /** Validate a lesson object. Returns a list of problems (empty when valid); never throws. */
 export function validateLesson(l) {
   const errs = [];
@@ -105,25 +113,33 @@ export function validateLesson(l) {
   for (const c of concepts) need(CONCEPTS[c], `unknown concept "${c}"`);
   need(Array.isArray(l.prerequisites), 'prerequisites must be an array');
   need(isObject(l.sheet), 'sheet (starting sheet) missing');
-  need(Array.isArray(l.steps) && l.steps.length > 0, 'steps missing');
-  const steps = Array.isArray(l.steps) ? l.steps.filter(isObject) : [];
-  const modes = steps.map(s => s.mode);
-  for (const m of modes) need(MODES.includes(m), `unknown step mode "${m}"`);
-  need(modes.indexOf('teach') === 0, 'the first step must be teach');
-  const order = modes.map(m => MODES.indexOf(m));
-  need(order.every((v, i) => i === 0 || v >= order[i - 1]), 'steps must go teach → guided → solo → timed');
-  need(modes.includes('guided') || modes.includes('solo'), 'a lesson needs a guided or solo step');
-  for (const st of steps) { if (st.mode === 'teach') { need(st.title, 'teach step needs a title'); need(Array.isArray(st.body) && st.body.length, 'teach step needs body paragraphs'); } if (st.mode === 'timed') need(typeof st.par === 'number' && st.par > 0, 'timed step needs par seconds'); }
+  need(l.sheets === undefined || (Array.isArray(l.sheets) && l.sheets.every(isObject)), 'sheets must be an array of { name, cells } records');
+  for (const sh of Array.isArray(l.sheets) ? l.sheets.filter(isObject) : []) need(typeof sh.name === 'string' && /^[^[\]:*?/\\]{1,31}$/.test(sh.name), `sheet name "${sh.name}" is not Excel-legal`);
+  // The Read phase: two or three sentences, total (what the lesson is, what you will do, why it pays off).
+  need(typeof l.read === 'string' && l.read.trim(), 'read missing (two or three sentences)');
+  if (typeof l.read === 'string') { const n = sentenceCount(l.read); need(n >= 2 && n <= 3, `read must be two or three sentences (it has ${n})`); need(wordCount(l.read) <= 80, 'read is over 80 words'); need(!/`/.test(l.read) || true, ''); }
+  need(typeof l.par === 'number' && l.par > 0, 'par (timed-mode seconds) missing');
   need(Array.isArray(l.goals) && l.goals.length > 0, 'goals missing');
   const goals = Array.isArray(l.goals) ? l.goals.filter(isObject) : [];
   const ids = new Set();
+  const introduced = new Set();   // lesson concepts a goal has introduced so far
   for (const g of goals) {
     need(typeof g.id === 'string' && g.id, 'goal id missing'); need(!ids.has(g.id), `duplicate goal id ${g.id}`); ids.add(g.id);
     need(typeof g.text === 'string' && g.text.trim(), `goal ${g.id}: text missing`);
+    if (typeof g.text === 'string') { need(sentenceCount(g.text) === 1 && /[.!?]$/.test(g.text.trim()), `goal ${g.id}: the action must be one sentence ending in a full stop`); need(wordCount(g.text) <= 26, `goal ${g.id}: the action is over 26 words`); }
     need(typeof g.check === 'function', `goal ${g.id}: check must be a function`);
     need(Array.isArray(g.requires), `goal ${g.id}: requires must list concept ids`);
     for (const c of Array.isArray(g.requires) ? g.requires : []) need(CONCEPTS[c], `goal ${g.id}: unknown concept "${c}"`);
+    need(typeof g.keys === 'string' && g.keys.trim(), `goal ${g.id}: keys (the route as keycaps) missing`);
+    // Adaptive rule (SITE_SPEC §4): the goal that first uses a concept this lesson teaches carries the
+    // one-line teaching point; a goal that only reuses taught concepts carries none.
+    const fresh = (Array.isArray(g.requires) ? g.requires : []).filter(c => concepts.includes(c) && !introduced.has(c));
+    if (fresh.length) { need(typeof g.teach === 'string' && g.teach.trim(), `goal ${g.id}: introduces ${fresh.join(', ')} and needs a one-line teach`); fresh.forEach(c => introduced.add(c)); }
+    else if (Array.isArray(l.concepts) && Array.isArray(g.requires)) need(g.teach === undefined, `goal ${g.id}: reuses taught concepts only, so it must not carry a teach line`);
+    if (typeof g.teach === 'string') { need(sentenceCount(g.teach) === 1 && /[.!?]$/.test(g.teach.trim()), `goal ${g.id}: teach must be one sentence ending in a full stop`); need(wordCount(g.teach) <= 30, `goal ${g.id}: teach is over 30 words`); }
   }
+  need(l.race === undefined || (Array.isArray(l.race) && l.race.length === 2 && l.race.every(r => isObject(r) && ids.has(r.goal) && typeof r.label === 'string')), 'race must name two goals with labels');
+  need(l.closing === undefined || (Array.isArray(l.closing) && l.closing.every(t => typeof t === 'string')), 'closing must be an array of paragraphs');
   need(l.endState === undefined || Array.isArray(l.endState), 'endState must be an array');
   const ends = Array.isArray(l.endState) ? l.endState.filter(isObject) : [];
   for (const e of ends) { need(typeof e.text === 'string', 'endState entries need text'); need(typeof e.check === 'function', 'endState entries need a check'); }
@@ -142,7 +158,7 @@ function validateStartingSheet(spec, goals, ends, need) {
   const cells = isObject(spec.cells) ? spec.cells : {};
   need(spec.cells === undefined || isObject(spec.cells), 'sheet: cells must be an object of cell records');
   for (const k in cells) { need(parseRef(k), `sheet: bad cell key "${k}"`); need(isObject(cells[k]), `sheet: cell ${k} must be a record such as { value }`); }
-  const rows = spec.rows || 20, cols = spec.cols || 10;
+  const rows = spec.rows || 100, cols = spec.cols || 26;   // the Sheet defaults
   if (spec.active !== undefined) {
     const a = spec.active;
     need(isObject(a) && Number.isInteger(a.r) && Number.isInteger(a.c) && a.r >= 1 && a.r <= rows && a.c >= 1 && a.c <= cols, `sheet: active ${JSON.stringify(a)} is outside the ${rows}×${cols} grid`);

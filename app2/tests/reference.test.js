@@ -50,16 +50,16 @@ test('every category is in CATEGORIES, in display order, and CATEGORIES has no e
 
 test('the Foundations shortcuts resolve to the lesson that teaches them', () => {
   const expect = {
-    'ctrl-b': 'foundations-06-ribbon-commands',
-    'alt-h-1': 'foundations-06-ribbon-commands',
-    'alt-h-b-o': 'foundations-06-ribbon-commands',
-    'ctrl-1': 'foundations-07-dialog-boxes',
-    'ctrl-arrow': 'foundations-02-moving-around',
-    'ctrl-shift-arrow': 'foundations-03-selecting-ranges',
-    'shift-space': 'foundations-03-selecting-ranges',
-    'ctrl-space': 'foundations-03-selecting-ranges',
-    'ctrl-a': 'foundations-03-selecting-ranges',
-    'f2-edit': 'foundations-05-editing-cells',
+    'ctrl-b': 'ribbon-commands',
+    'alt-h-1': 'ribbon-commands',
+    'alt-h-b-o': 'ribbon-commands',
+    'ctrl-1': 'dialog-boxes',
+    'ctrl-arrow': 'moving-around',
+    'ctrl-shift-arrow': 'selecting-ranges',
+    'shift-space': 'selecting-ranges',
+    'ctrl-space': 'selecting-ranges',
+    'ctrl-a': 'selecting-ranges',
+    'f2-edit': 'editing-cells',
   };
   for (const [id, lessonId] of Object.entries(expect)) {
     const e = referenceById(id);
@@ -67,9 +67,9 @@ test('the Foundations shortcuts resolve to the lesson that teaches them', () => 
     assert.equal(e.lessonId, lessonId, `${id} (${e.win}) links to ${lessonId}`);
   }
   // by chord too: Ctrl+B and Alt H 1 are the same command, both taught in lesson 6
-  assert.equal(referenceByChord('Ctrl+B')[0].lessonId, 'foundations-06-ribbon-commands');
-  assert.equal(referenceByChord('Alt H 1')[0].lessonId, 'foundations-06-ribbon-commands');
-  assert.equal(referenceByChord('ctrl + 1')[0].lessonId, 'foundations-07-dialog-boxes');
+  assert.equal(referenceByChord('Ctrl+B')[0].lessonId, 'ribbon-commands');
+  assert.equal(referenceByChord('Alt H 1')[0].lessonId, 'ribbon-commands');
+  assert.equal(referenceByChord('ctrl + 1')[0].lessonId, 'dialog-boxes');
   assert.ok(REFERENCE.filter(e => e.lessonId).length >= 30, 'Foundations covers at least 30 rows');
 });
 

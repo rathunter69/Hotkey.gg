@@ -31,8 +31,8 @@ const NARROW_QUERY = '(max-width: 900px)';
 
 /**
  * Parse a location hash into { name, params, query }. Pure; exported for the tests.
- *   parseRoute('#/lesson/foundations-01-active-cell?mode=solo')
- *     → { name:'lesson', params:{ id:'foundations-01-active-cell' }, query:{ mode:'solo' } }
+ *   parseRoute('#/lesson/active-cell?mode=solo')
+ *     → { name:'lesson', params:{ id:'active-cell' }, query:{ mode:'solo' } }
  * Unknown paths give name 'notfound'. '#/sandbox' (the old shell's route) maps to the drill.
  */
 export function parseRoute(hash) {

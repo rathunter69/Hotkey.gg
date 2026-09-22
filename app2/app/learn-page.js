@@ -105,9 +105,14 @@ export function mountLearnPage(root) {
         continue;
       }
       html += `<section class="chapter"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(ch.title)}</h2><span class="access access-free">Free</span></div><p class="chapter-blurb">${esc(ch.blurb)}</p>`;
+      const filtering = !!(filters.q || (filters.status && filters.status !== 'all') || (filters.difficulty && filters.difficulty !== 'all') || (filters.access && filters.access !== 'all'));
       for (const sec of (typeof sectionsOf === 'function' ? sectionsOf(ch) : groupBySection(ch.lessons))) {
         const rows = sec.lessons.filter(l => matchesFilters(l, statusOf(l.id, all, skipped), filters));
-        if (!rows.length) continue;
+        if (!rows.length) {
+          // A section with nothing built yet still shows (SITE_SPEC §7: the chapter's shape is visible), unless the learner is filtering.
+          if (!sec.lessons.length && !filtering) html += `<h3 class="section-h section-upcoming">${esc(sec.name)} <span class="upcoming">Upcoming</span></h3><p class="section-blurb">${esc(sec.blurb || '')}</p>`;
+          continue;
+        }
         shown += rows.length;
         html += `<h3 class="section-h">${esc(sec.name)}</h3>
           <table class="ptable"><thead><tr><th class="c-num">#</th><th class="c-status">Status</th><th class="c-title">Title</th><th class="c-diff">Difficulty</th><th class="c-tags">Tags</th><th class="c-access">Access</th></tr></thead><tbody>`;

@@ -24,8 +24,16 @@ export class LessonRun {
   reset(mode) {
     if (mode) this.mode = mode;
     const spec = this.lesson.sheet || {};
-    this.sheet = new Sheet({ rows: spec.rows, cols: spec.cols, cells: spec.cells ? structuredCloneCells(spec.cells) : undefined, colW: spec.colW, active: spec.active, today: this.opts.today });
-    this.session = new Session(this.sheet, { onKey: this.opts.onKey, onToast: this.opts.onToast, onRefuse: this.opts.onRefuse, now: this.opts.now, onMouse: this.opts.onMouse });
+    const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells ? structuredCloneCells(sp.cells) : undefined, colW: sp.colW, active: sp.active, today: this.opts.today });
+    const first = build(spec);
+    this.session = new Session(first, { onKey: this.opts.onKey, onToast: this.opts.onToast, onRefuse: this.opts.onRefuse, now: this.opts.now, onMouse: this.opts.onMouse });
+    // A workbook: lesson.sheets names the sheets ([0] is the starting sheet) and adds the others.
+    const sheets = Array.isArray(this.lesson.sheets) ? this.lesson.sheets : [];
+    if (sheets.length && this.session.sheets) {
+      if (sheets[0] && sheets[0].name) this.session.sheets[0].name = sheets[0].name;
+      for (const sh of sheets.slice(1)) if (this.session.addSheet) this.session.addSheet(sh.name, build(sh));
+    }
+    this.landedAt = [];   // when each goal landed (the session clock), for split times
     // The key window: a mechanic check reads only keys pressed since its goal became current
     // (keyLog.slice(goalMark)), so a key pressed for an earlier goal, or before the lesson began,
     // cannot satisfy a later one.
@@ -39,7 +47,20 @@ export class LessonRun {
     this.emit('reset');
   }
 
+  /** The active sheet (a workbook lesson can switch sheets; the session owns the pointer). */
+  get sheet() { return this.session.sheet; }
   get goals() { return this.lesson.goals; }
+  /**
+   * Seconds each landed goal took: from the moment it became current (the previous goal landing, or
+   * the first key for the first goal) to the moment it landed. null while a goal is open.
+   */
+  splits() {
+    return this.goals.map((g, i) => {
+      const end = this.landedAt[i]; if (end == null) return null;
+      const start = i === 0 ? this.session.t0 : this.landedAt[i - 1];
+      return start == null ? null : Math.max(0, (end - start) / 1000);
+    });
+  }
   /**
    * What the learner should do next: the current goal, or, once every goal has landed but an
    * end-state predicate still fails, that predicate (it has `text` and no `keys`). null when finished.
@@ -56,7 +77,7 @@ export class LessonRun {
     if (this.startedAt == null) return 0;
     return ((this.finishedAt == null ? now : this.finishedAt) - this.startedAt) / 1000;
   }
-  get par() { const t = (this.lesson.steps || []).find(s => s.mode === 'timed'); return t ? t.par : null; }
+  get par() { return typeof this.lesson.par === 'number' ? this.lesson.par : null; }
 
   /** Feed one key event; returns true when the session consumed it. */
   key(ev) {
@@ -82,6 +103,7 @@ export class LessonRun {
   evaluate() {
     let moved = false;
     while (this.doneCount < this.goals.length && safeCheck(this.goals[this.doneCount], this.sheet, this.session)) {
+      this.landedAt[this.doneCount] = this.opts.now ? this.opts.now() : Date.now();
       this.doneCount++; moved = true;
       this.session.goalMark = this.session.keyLog.length;   // the next goal's key window starts here
     }

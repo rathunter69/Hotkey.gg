@@ -116,8 +116,11 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   }
 
   /* ---------------- the panel ---------------- */
-  const teachStep = () => lesson.steps.find(s => s.mode === 'teach');
   const modeLabel = () => phase === 'teach' ? 'Read' : run.mode === 'guided' ? 'Guided' : run.mode === 'solo' ? 'Solo' : 'Timed';
+  /** Keys show on the goal line only where the goal introduces a shortcut (its teach line) in Guided mode, or after Help revealed them (§4). */
+  const keysShown = g => (run.mode === 'guided' && !!g.teach) || revealed;
+  const raceOf = id => (lesson.race || []).find(r => r.goal === id);
+  const fmtSecs = s => s.toFixed(1);
   // Guided is the normal way to complete a lesson and is NOT assistance (SITE_SPEC §4): only
   // revealing extra steps through Help ("Show me") marks the attempt assisted.
   const assisted = () => revealed;
@@ -133,19 +136,21 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   }
 
   function goalsHtml() {
-    const states = run.goalStates(); const showKeys = run.mode === 'guided' || revealed;
+    const states = run.goalStates(); const splits = run.splits();
     return `<div class="goal-progress"><i style="width:${Math.round(100 * run.doneCount / run.goals.length)}%"></i></div>
-      <ol class="goals">${states.map((g, i) => `<li class="goal ${g.done ? 'done' : g.current ? 'current' : ''}" data-goal="${i}">
-        <span class="goal-mark">${g.done ? '✓' : g.current ? '›' : ''}</span><span class="goal-text">${esc(g.text)}</span>
+      <ol class="goals">${states.map((g, i) => {
+        const showKeys = keysShown(g); const race = raceOf(g.id);
+        // The current goal carries its one-line teaching point (Guided only) and the action on the same line, with the keycaps
+        return `<li class="goal ${g.done ? 'done' : g.current ? 'current' : ''}" data-goal="${i}">
+        <span class="goal-mark">${g.done ? '✓' : g.current ? '›' : ''}</span><span class="goal-text">${g.current && run.mode === 'guided' && g.teach ? `<span class="goal-teach">${rich(g.teach)}</span> ` : ''}${esc(g.text)}${race && g.done && splits[i] != null ? ` <span class="goal-split">${fmtSecs(splits[i])} s</span>` : ''}</span>
         ${showKeys && g.current && g.keys ? `<div class="goal-keys">${keysHtml(g.keys)}</div>` : ''}
-        ${g.current && nudgeAt === i ? `<div class="goal-nudge">Try it with the keyboard${!showKeys && g.keys ? ': the Help tab shows the keys' : ''}.</div>` : ''}</li>`).join('')}</ol>`;
+        ${g.current && nudgeAt === i ? `<div class="goal-nudge">Try it with the keyboard${!showKeys && g.keys ? ': the Help tab shows the keys' : ''}.</div>` : ''}</li>`; }).join('')}</ol>`;
   }
 
   function renderLesson() {
     const body = $('panelBody');
     if (phase === 'teach') {
-      const t = teachStep();
-      body.innerHTML = `<h2>${esc(t.title)}</h2>` + t.body.map(p => `<p>${rich(p)}</p>`).join('') +
+      body.innerHTML = `<p class="lesson-read">${rich(lesson.read)}</p>` +
         `<p class="lesson-goalsintro">You will</p><ol class="goals goals-preview">${lesson.goals.map(g => `<li>${esc(g.text)}</li>`).join('')}</ol>`;
     } else if (phase === 'play') {
       body.innerHTML = goalsHtml();
@@ -160,7 +165,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       const cur = body.querySelector('.goal.current'); if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'nearest' });   // the active goal is always visible (§4)
     } else {
       body.innerHTML = goalsHtml() + `<div class="done-card"><div class="done-title">Lesson complete</div>
-        <div class="done-stats">${statsLine()}</div>
+        ${raceHtml()}<div class="done-stats">${statsLine()}</div>
         <div class="done-actions">${doneButtonsHtml()}</div></div>`;
       wireDoneButtons(body);
     }
@@ -168,7 +173,9 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
 
   function renderHelp() {
     const p = $('panelBody');
-    const notes = `<details class="help-notes"><summary>Read the notes again</summary><h2>${esc(teachStep().title)}</h2>${teachStep().body.map(t => `<p>${rich(t)}</p>`).join('')}</details>
+    // Reading is always free (§6): the Read text and the teaching points introduced so far.
+    const taught = lesson.goals.slice(0, Math.min(run.doneCount + 1, lesson.goals.length)).filter(g => g.teach);
+    const notes = `<details class="help-notes"><summary>Read the notes again</summary><p>${rich(lesson.read)}</p>${taught.length ? `<p class="lesson-goalsintro">Taught so far</p><ul class="help-taught">${taught.map(g => `<li>${rich(g.teach)}</li>`).join('')}</ul>` : ''}</details>
       <div class="help-links"><a href="#/reference">Shortcut reference</a></div>`;
     if (phase === 'teach') { p.innerHTML = `<p class="help-note">Read the notes, then press <kbd>Enter</kbd> or Start. Each goal is checked as you go.</p>` + notes; return; }
     if (phase === 'done') { p.innerHTML = `<p class="help-note">Lesson complete. <kbd>Enter</kbd> continues.</p>` + notes; return; }
@@ -179,11 +186,12 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       p.innerHTML = `<div class="help-goal">${esc(cur.text)}</div><p class="help-note">Every goal has landed, but the sheet is not yet as the lesson expects. Put this right and the lesson completes; ${kbd('Ctrl+Z')} undoes.</p>` + notes;
       return;
     }
-    if (run.mode === 'guided' || revealed) {
-      p.innerHTML = `<div class="help-goal">${esc(cur.text)}</div><div class="help-keys">${keysHtml(cur.keys || '')}</div>` + footer + notes;
+    const goalLine = `<div class="help-goal">${cur.teach && run.mode === 'guided' ? `<span class="goal-teach">${rich(cur.teach)}</span> ` : ''}${esc(cur.text)}</div>`;
+    if (keysShown(cur)) {
+      p.innerHTML = goalLine + `<div class="help-keys">${keysHtml(cur.keys || '')}</div>` + footer + notes;
     } else {
-      p.innerHTML = `<div class="help-goal">${esc(cur.text)}</div>
-        <p class="help-note">Reading is free. Showing the keys counts as help: this attempt is then marked assisted${run.mode === 'timed' ? ', and a timed run with help sets no personal best' : ''}.</p>
+      p.innerHTML = goalLine +
+        `<p class="help-note">Reading is free. Showing the keys counts as help: this attempt is then marked assisted${run.mode === 'timed' ? ', and a timed run with help sets no personal best' : ''}.</p>
         <p><button class="btn" id="revealBtn" type="button">Show me the keys</button></p>` + footer + notes;
       p.querySelector('#revealBtn').onclick = () => { revealed = true; renderPanel(); };   // re-rendered: the button is gone, keys go to the sheet
     }
@@ -226,7 +234,16 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   }
 
   /* ---------------- completion ---------------- */
-  const fmtSecs = s => s.toFixed(1);
+  /** The race block (a lesson with `race`): the two goals' split times side by side, and how many times faster the second was. */
+  function raceHtml() {
+    if (!lesson.race) return '';
+    const splits = run.splits(); const idx = id => lesson.goals.findIndex(g => g.id === id);
+    const cols = lesson.race.map(r => ({ label: r.label, secs: splits[idx(r.goal)] }));
+    const [a, b] = cols; const ratio = a.secs != null && b.secs != null && b.secs > 0 ? a.secs / b.secs : null;
+    return `<div class="race"><div class="race-cols">${cols.map(c => `<div class="race-col"><span class="race-label">${esc(c.label)}</span><b class="race-time">${c.secs == null ? '—' : fmtSecs(c.secs)}<span>s</span></b></div>`).join('')}</div>
+      ${ratio != null && ratio >= 1.2 ? `<div class="race-note">${ratio >= 10 ? Math.round(ratio) : ratio.toFixed(1)}× faster with one shortcut.</div>` : ''}</div>`;
+  }
+  const closingHtml = () => (lesson.closing || []).map(t => `<p class="rm-closing">${rich(t)}</p>`).join('');
   function statsLine() {
     const parts = [`<b>${run.startedAt == null ? '—' : fmtSecs(run.elapsed) + ' s'}</b>`, `<b>${run.session.keyLog.length}</b> keystrokes`, modeLabel().toLowerCase() + (assisted() ? ' · assisted' : '')];
     if (run.mouseCount) parts.push(`mouse ×${run.mouseCount}`);
@@ -251,10 +268,11 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     overlay.innerHTML = `<div class="rm-card">
       <div class="rm-title" id="doneTitle">Lesson complete</div>
       <div class="rm-lesson">${lessonNumber(lesson.id)} · ${esc(lesson.title)} · ${modeLabel()}</div>
-      <div class="rm-time">${secs == null ? '—' : fmtSecs(secs)}<span>s</span></div>
+      ${lesson.race ? raceHtml() : `<div class="rm-time">${secs == null ? '—' : fmtSecs(secs)}<span>s</span></div>`}
       <div class="rm-stats"><div>keystrokes<b>${run.session.keyLog.length}</b></div><div>${modeLabel().toLowerCase()}<b>${assisted() ? 'Assisted' : run.mode === 'guided' ? 'Complete' : 'Solo'}</b></div>${run.mouseCount ? `<div>mouse<b>×${run.mouseCount}</b></div>` : ''}${run.mode === 'timed' && run.par ? `<div>par<b>${run.par} s</b></div>` : ''}</div>
       ${run.mode === 'timed' ? `<div class="rm-note">${!assisted() && !run.mouseCount ? (pb != null ? `personal best <b>${fmtSecs(pb)} s</b>` : '') : 'help or mouse in a timed run: no personal best'}</div>` : ''}
       ${assisted() ? `<div class="rm-note">Steps were shown on request, so this attempt counts as assisted. Try solo earns the rest.</div>` : run.mode === 'guided' ? `<div class="rm-note">Try solo does it again without the keys shown.</div>` : ''}
+      ${closingHtml()}
       ${firstEver ? `<div class="rm-save"><b>Your first lesson is done.</b> Progress is saved on this device. Sign-in, which keeps it across devices, arrives in the next phase; see <a href="#/account">Account</a>.</div>` : ''}
       <div class="rm-opts">${doneButtonsHtml()}<button class="btn btn-ghost" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button></div>
       <div class="rm-more">${esc(saveState)}</div>

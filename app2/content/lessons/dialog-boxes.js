@@ -1,4 +1,4 @@
-// Foundations 7 — Dialog boxes
+// Foundations · The Ribbon and dialogs — Dialog boxes: Format Cells
 const START = {
   A1: { value: 'Weekly Sales Report', bold: true },
   A2: { value: 'Day', bold: true }, B2: { value: 'Sales', bold: true, align: 'c' }, C2: { value: 'Growth', bold: true, align: 'c' },
@@ -28,32 +28,22 @@ const appliedViaRibbon = (ses, key) => {
 };
 
 export default {
-  id: 'foundations-07-dialog-boxes',
+  id: 'dialog-boxes',
   chapter: 'foundations',
-  section: 'The Ribbon and dialog boxes',
+  section: 'The Ribbon and dialogs',
   title: 'Dialog boxes: Format Cells',
   difficulty: 'medium',
   tags: ['ribbon', 'formatting', 'number-formats'],
   access: 'free',
   concepts: ['dialog-box', 'format-cells-dialog', 'number-formats', 'ribbon-route-dialog'],
-  prerequisites: ['foundations-06-ribbon-commands'],
+  prerequisites: ['ribbon-commands'],
+  read: 'Some commands do not act at once: they open a dialog box and wait for your choice. In this lesson you open Format Cells with Ctrl+1 and from the Ribbon to give the Weekly Sales Report proper number formats, which change how a value is shown, never the value itself. Number formatting is the difference between raw figures and a report someone can read.',
   sheet: { cells: START, active: { r: 1, c: 1 } },
-  steps: [
-    { mode: 'teach', title: 'Commands that ask a question', body: [
-      'Some commands open a dialog box: a panel of choices that stays open until you confirm it with `Enter` or cancel it with `Esc`.',
-      '`Ctrl+1` opens Format Cells for the selected cells. On its Number tab, typing the first letter of a category picks it: `N` Number, `C` Currency, `P` Percentage.',
-      'This trainer shortens the dialog box: the letter applies at once and closes the card. Its Number format shows 1,200 and Percentage shows 5.0%, where Excel\'s defaults show two decimal places.',
-      'A number format changes how a value is displayed, never the value itself. 0.05 shown as 5.0% is still 0.05 in the Formula Bar.',
-      'The Ribbon reaches the same dialog box: `Alt` `H` `O` opens the Format menu and `E` chooses Format Cells.',
-    ] },
-    { mode: 'guided' },
-    { mode: 'solo' },
-    { mode: 'timed', par: 25 },
-  ],
+  par: 25,
   goals: [
-    { id: 'comma-sales', text: 'Select the Sales figures B3:B8 and apply the Number format with Ctrl+1, then N', keys: '↓ ↓ → Ctrl+Shift+↓ then Ctrl+1 N', requires: ['format-cells-dialog', 'number-formats', 'ctrl-shift-arrow'], check: s => ['B3', 'B4', 'B5', 'B6', 'B7', 'B8'].every(r => cell(s, r).fmtStyle === 'comma') },
-    { id: 'percent-growth', text: 'Select the Growth figures C3:C7 and format them as percentages with Ctrl+1, then P', keys: '→ Ctrl+Shift+↓ then Ctrl+1 P', requires: ['format-cells-dialog', 'number-formats', 'ctrl-shift-arrow'], check: s => ['C3', 'C4', 'C5', 'C6', 'C7'].every(r => cell(s, r).fmtStyle === 'percent') },
-    { id: 'currency-total', text: 'Open Format Cells on the Total in B8 through the Ribbon, Alt, H, O, E, and apply Currency with C', keys: '← Ctrl+↓ then Alt H O E C', requires: ['ribbon-route-dialog', 'ctrl-arrow'], check: (s, ses) => cell(s, 'B8').fmtStyle === 'currency' && appliedViaRibbon(ses, 'C') },
+    { id: 'comma-sales', teach: 'Ctrl+1 opens the Format Cells dialog box, and here the first letter of a category applies it: N is Number.', text: 'Select the Sales figures B3:B8 and apply the Number format.', keys: '↓ ↓ → Ctrl+Shift+↓ then Ctrl+1 N', requires: ['format-cells-dialog', 'number-formats', 'ctrl-shift-arrow'], check: s => ['B3', 'B4', 'B5', 'B6', 'B7', 'B8'].every(r => cell(s, r).fmtStyle === 'comma') },
+    { id: 'percent-growth', text: 'Select the Growth figures C3:C7 and apply the Percentage format (P).', keys: '→ Ctrl+Shift+↓ then Ctrl+1 P', requires: ['format-cells-dialog', 'number-formats', 'ctrl-shift-arrow'], check: s => ['C3', 'C4', 'C5', 'C6', 'C7'].every(r => cell(s, r).fmtStyle === 'percent') },
+    { id: 'currency-total', teach: 'The Ribbon reaches the same dialog box: Alt, H, O opens the Format menu and E chooses Format Cells.', text: 'Open Format Cells on the Total in B8 through the Ribbon and apply Currency (C).', keys: '← Ctrl+↓ then Alt H O E C', requires: ['ribbon-route-dialog', 'ctrl-arrow'], check: (s, ses) => cell(s, 'B8').fmtStyle === 'currency' && appliedViaRibbon(ses, 'C') },
   ],
   // Goals latch, so the formats the first two goals produce are restated here (B8 is left out: the
   // last goal legitimately turns it to Currency). Undoing one keeps the lesson open until it is back.

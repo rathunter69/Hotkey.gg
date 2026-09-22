@@ -25,7 +25,7 @@ export function mountHomePage(root) {
         <div class="hc-body">
           <div class="hc-crumb">${esc(chapterOf(next).title)} · lesson ${lessonNumber(next.id)}</div>
           <h1>${esc(next.title)}</h1>
-          <p>${esc(((next.steps || []).find(s => s.mode === 'teach') || { body: [''] }).body[0]).replace(/`([^`]+)`/g, '<kbd>$1</kbd>')}</p>
+          <p>${esc(next.read || '').replace(/`([^`]+)`/g, '<kbd>$1</kbd>')}</p>
           <div class="hc-actions"><a class="btn btn-primary" id="homeContinue" href="#/lesson/${esc(next.id)}">${started ? 'Continue' : 'Start'} <kbd>Enter</kbd></a><a class="btn btn-ghost" href="#/learn">All lessons</a></div>
         </div>
       </section>`

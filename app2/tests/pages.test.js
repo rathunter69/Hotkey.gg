@@ -79,9 +79,9 @@ test('pickNextLesson: the first lesson neither completed nor skipped, in catalog
 test('pickNextLesson: works on the real catalogue with placement skips', () => {
   const skipped = skipsFor(['move', 'select']);
   const next = pickNextLesson(LESSONS, {}, skipped);
-  assert.equal(next.id, 'foundations-04-entering-data');
-  assert.equal(pickNextLesson(LESSONS, {}, skipsFor(['move', 'select', 'type-bold'])).id, 'foundations-05-editing-cells');
-  assert.equal(pickNextLesson(LESSONS, {}, []).id, 'foundations-01-active-cell');
+  assert.equal(next.id, 'entering-data');
+  assert.equal(pickNextLesson(LESSONS, {}, skipsFor(['move', 'select', 'type-bold'])).id, 'editing-cells');
+  assert.equal(pickNextLesson(LESSONS, {}, []).id, 'active-cell');
 });
 
 test('matchesFilters: status, difficulty, access and a word search', () => {
@@ -121,8 +121,8 @@ test('parseRoute: every documented route, with params and query', () => {
   assert.equal(parseRoute('#/start').name, 'start');
   assert.equal(parseRoute('#/learn').name, 'learn');
   assert.equal(parseRoute('#/learn/').name, 'learn', 'trailing slash tolerated');
-  const l = parseRoute('#/lesson/foundations-01-active-cell?mode=solo');
-  assert.equal(l.name, 'lesson'); assert.equal(l.params.id, 'foundations-01-active-cell'); assert.equal(l.query.mode, 'solo');
+  const l = parseRoute('#/lesson/active-cell?mode=solo');
+  assert.equal(l.name, 'lesson'); assert.equal(l.params.id, 'active-cell'); assert.equal(l.query.mode, 'solo');
   assert.equal(parseRoute('#/lesson/Bad_Id').name, 'notfound');
   assert.equal(parseRoute('#/lesson/').name, 'notfound');
   assert.equal(parseRoute('#/practice').name, 'practice');
@@ -148,8 +148,8 @@ test('navKeyFor and titleFor', () => {
 /* ---------------- placement, teams form, shell lists ---------------- */
 test('placement: passed tasks map to skipped lessons that exist, without duplicates', () => {
   assert.deepEqual(skipsFor([]), []);
-  assert.deepEqual(skipsFor(['move']), ['foundations-01-active-cell', 'foundations-02-moving-around']);
-  assert.deepEqual(skipsFor(['move', 'move', 'select']), ['foundations-01-active-cell', 'foundations-02-moving-around', 'foundations-03-selecting-ranges']);
+  assert.deepEqual(skipsFor(['move']), ['active-cell', 'moving-around']);
+  assert.deepEqual(skipsFor(['move', 'move', 'select']), ['active-cell', 'moving-around', 'selecting-ranges']);
   const ids = new Set(LESSONS.map(l => l.id));
   for (const t of PLACEMENT_TASKS) for (const id of t.skips) assert.ok(ids.has(id), `${t.id} skips a real lesson: ${id}`);
   assert.equal(PLACEMENT_TASKS.length, 3);
