@@ -81,7 +81,7 @@ test('pickNextLesson: works on the real catalogue with placement skips', () => {
   const next = pickNextLesson(LESSONS, {}, skipped);
   assert.equal(next.id, 'entering-data');
   assert.equal(pickNextLesson(LESSONS, {}, skipsFor(['move', 'select', 'type-bold'])).id, 'editing-cells');
-  assert.equal(pickNextLesson(LESSONS, {}, []).id, 'active-cell');
+  assert.equal(pickNextLesson(LESSONS, {}, []).id, 'welcome-race');
 });
 
 test('matchesFilters: status, difficulty, access and a word search', () => {
@@ -148,8 +148,8 @@ test('navKeyFor and titleFor', () => {
 /* ---------------- placement, teams form, shell lists ---------------- */
 test('placement: passed tasks map to skipped lessons that exist, without duplicates', () => {
   assert.deepEqual(skipsFor([]), []);
-  assert.deepEqual(skipsFor(['move']), ['active-cell', 'moving-around']);
-  assert.deepEqual(skipsFor(['move', 'move', 'select']), ['active-cell', 'moving-around', 'selecting-ranges']);
+  assert.deepEqual(skipsFor(['move']), ['welcome-race', 'active-cell', 'moving-around']);
+  assert.deepEqual(skipsFor(['move', 'move', 'select']), ['welcome-race', 'active-cell', 'moving-around', 'selecting-ranges']);
   const ids = new Set(LESSONS.map(l => l.id));
   for (const t of PLACEMENT_TASKS) for (const id of t.skips) assert.ok(ids.has(id), `${t.id} skips a real lesson: ${id}`);
   assert.equal(PLACEMENT_TASKS.length, 3);

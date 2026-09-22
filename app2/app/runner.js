@@ -54,6 +54,8 @@ export class LessonRun {
    * Seconds each landed goal took: from the moment it became current (the previous goal landing, or
    * the first key for the first goal) to the moment it landed. null while a goal is open.
    */
+  /** When goal i became current on the session clock: the previous goal's landing, or the first key for the first goal. */
+  goalStart(i) { return i === 0 ? this.session.t0 : (this.landedAt[i - 1] == null ? null : this.landedAt[i - 1]); }
   splits() {
     return this.goals.map((g, i) => {
       const end = this.landedAt[i]; if (end == null) return null;

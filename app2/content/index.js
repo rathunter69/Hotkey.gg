@@ -1,4 +1,5 @@
 // app2/content/index.js — the catalogue: chapters in order, each with its lessons in order.
+import welcome_race from './lessons/welcome-race.js';
 import active_cell from './lessons/active-cell.js';
 import moving_around from './lessons/moving-around.js';
 import selecting_ranges from './lessons/selecting-ranges.js';
@@ -11,7 +12,7 @@ export const CHAPTERS = [
   {
     id: 'foundations',
     title: 'Foundations',
-    blurb: 'For someone who has never used Excel: the active cell, moving, selecting, entering and editing, then the Ribbon and its dialog boxes.',
+    blurb: 'Everything a first-week analyst or a total beginner needs before formulas get serious: how Excel works, moving, selecting, entering and editing, rows and columns, the Ribbon and its dialog boxes, basic formulas, copy and paste.',
     // Chapter 1's sections in order (SITE_SPEC §7). A section with no lessons yet still shows in the
     // catalog as upcoming, so the chapter's shape is visible; its blurb says what arrives there.
     sections: [
@@ -25,7 +26,7 @@ export const CHAPTERS = [
       { name: 'Basic formulas', blurb: '= and operators, SUM, AVERAGE, MIN, MAX and COUNT, AutoSum, relative and absolute references, F4, common errors.' },
       { name: 'Copy, paste and fill', blurb: 'Copy, cut and paste, Paste Special, fill series, the Flash Fill idea.' },
     ],
-    lessons: [active_cell, moving_around, selecting_ranges, entering_data, editing_cells, ribbon_commands, dialog_boxes],
+    lessons: [welcome_race, active_cell, moving_around, selecting_ranges, entering_data, editing_cells, ribbon_commands, dialog_boxes],
   },
 ];
 

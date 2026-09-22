@@ -120,7 +120,7 @@ for (const lesson of LESSONS) {
 /* ---------------- runner contract ---------------- */
 
 test('a run can be reset and goals latch in order', () => {
-  const run = fresh(LESSONS[0]);
+  const run = fresh(f01());
   run.run('Right Down Down');
   assert.equal(run.doneCount, 1);
   run.run('Ctrl+Home');

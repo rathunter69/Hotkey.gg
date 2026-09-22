@@ -15,7 +15,7 @@ import { LESSONS, lessonNumber } from '../content/index.js';
 import { pickNextLesson } from './learn-page.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const FIRST_LESSON = 'active-cell';
+const FIRST_LESSON = LESSONS[0].id;   // the catalogue's first lesson (the Welcome race)
 
 const REPORT = {
   A1: { value: 'Weekly Sales Report', bold: true },
@@ -29,7 +29,7 @@ const REPORT = {
 
 /** The placement tasks. Each names visible cells; passing one marks its `skips` lessons as skipped. */
 export const PLACEMENT_TASKS = [
-  { id: 'move', text: 'Make C4 (Tuesday, Units) the active cell', keys: 'arrow keys, or Ctrl+Arrow to jump', skips: ['active-cell', 'moving-around'],
+  { id: 'move', text: 'Make C4 (Tuesday, Units) the active cell', keys: 'arrow keys, or Ctrl+Arrow to jump', skips: ['welcome-race', 'active-cell', 'moving-around'],
     check: (s, ses) => !ses.editing && !s.sel && s.selectionText() === 'C4' },
   { id: 'select', text: 'Select the range B2:B6', keys: 'Shift+Arrow from B2', skips: ['selecting-ranges'],
     check: (s, ses) => !ses.editing && !!s.sel && s.selectionText() === 'B2:B6' },

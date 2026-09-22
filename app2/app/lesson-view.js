@@ -142,7 +142,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
         const showKeys = keysShown(g); const race = raceOf(g.id);
         // The current goal carries its one-line teaching point (Guided only) and the action on the same line, with the keycaps
         return `<li class="goal ${g.done ? 'done' : g.current ? 'current' : ''}" data-goal="${i}">
-        <span class="goal-mark">${g.done ? '✓' : g.current ? '›' : ''}</span><span class="goal-text">${g.current && run.mode === 'guided' && g.teach ? `<span class="goal-teach">${rich(g.teach)}</span> ` : ''}${esc(g.text)}${race && g.done && splits[i] != null ? ` <span class="goal-split">${fmtSecs(splits[i])} s</span>` : ''}</span>
+        <span class="goal-mark">${g.done ? '✓' : g.current ? '›' : ''}</span><span class="goal-text">${g.current && run.mode === 'guided' && g.teach ? `<span class="goal-teach">${rich(g.teach)}</span> ` : ''}${esc(g.text)}${race && g.done && splits[i] != null ? ` <span class="goal-split">${fmtSecs(splits[i])} s</span>` : race && g.current ? ` <span class="goal-split live" data-goal-clock="${i}">0.0 s</span>` : ''}</span>
         ${showKeys && g.current && g.keys ? `<div class="goal-keys">${keysHtml(g.keys)}</div>` : ''}
         ${g.current && nudgeAt === i ? `<div class="goal-nudge">Try it with the keyboard${!showKeys && g.keys ? ': the Help tab shows the keys' : ''}.</div>` : ''}</li>`; }).join('')}</ol>`;
   }
@@ -220,6 +220,9 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
 
   function renderTimer() {
     const t = $('lessonTimer');
+    // a race goal shows its own clock while it is open (it starts with the first key of that goal)
+    const live = el.querySelector('[data-goal-clock]');
+    if (live && phase === 'play') { const start = run.goalStart(+live.dataset.goalClock); live.textContent = start == null ? '0.0 s' : fmtSecs(Math.max(0, (Date.now() - start) / 1000)) + ' s'; }
     if (run.mode !== 'timed' || phase === 'teach') { t.textContent = ''; return; }
     t.textContent = run.elapsed.toFixed(1) + ' s' + (run.par ? ' / par ' + run.par : '');
   }
