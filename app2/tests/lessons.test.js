@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { CHAPTERS, LESSONS, LESSONS_BY_ID, sectionsOf, sectionNames } from '../content/index.js';
-import { validateLesson, availableConcepts, sentenceCount } from '../content/schema.js';
+import { validateLesson, availableConcepts, sentenceCount, goalBounds } from '../content/schema.js';
 import { LessonRun, shortcutsUsed } from '../app/runner.js';
 
 const byId = id => { const l = LESSONS_BY_ID[id]; assert.ok(l, `lesson ${id} is in the catalogue`); return l; };
@@ -34,7 +34,7 @@ test('every lesson sits in one of its chapter\'s sections; the catalogue lists e
     assert.deepEqual(groups.flatMap(g => g.lessons.map(l => l.id)), ch.lessons.slice().sort((a, b) => names.indexOf(a.section) - names.indexOf(b.section) || ch.lessons.indexOf(a) - ch.lessons.indexOf(b)).map(l => l.id));
   }
   const foundations = CHAPTERS.find(c => c.id === 'foundations');
-  assert.equal(sectionNames(foundations).length, 9, 'Chapter 1 shows all nine sections of SITE_SPEC §7');
+  assert.equal(sectionNames(foundations).length, 10, 'Chapter 1 shows all ten sections (SITE_SPEC §7 + the project section)');
   assert.ok(sectionsOf(foundations).some(g => g.lessons.length === 0 && g.blurb), 'an upcoming section carries its blurb');
   assert.deepEqual(sectionsOf({ sections: ['A'], lessons: [{ id: 'x' }, { id: 'y', section: 'A' }] }).map(g => [g.name, g.lessons.map(l => l.id)]), [['A', ['y']], ['Basics', ['x']]], 'a lesson without a section falls into Basics after the listed sections');
 });
@@ -60,7 +60,8 @@ test('the adaptive lesson format is enforced', () => {
   assert.equal(sentenceCount('Numbers like 1,200.00 and 5.0% are not sentence ends. This is the second.'), 2);
   for (const l of LESSONS) {
     assert.ok(!/\b(awesome|super|easy peasy|magic|wow|gonna|kinda)\b/i.test(l.read + l.goals.map(g => (g.teach || '') + g.text).join(' ')), `${l.id}: tone`);
-    assert.ok(l.goals.length >= 3 && l.goals.length <= 6, `${l.id}: 3-6 goals`);
+    const b = goalBounds(l.kind);
+    assert.ok(l.goals.length >= b.min && l.goals.length <= b.max, `${l.id}: ${b.min}-${b.max} goals for kind ${l.kind || 'lesson'}`);
   }
 });
 

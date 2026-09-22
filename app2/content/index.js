@@ -30,6 +30,7 @@ export const CHAPTERS = [
       { name: 'The Ribbon and dialogs', blurb: 'The Home tab by KeyTips, Format Cells tab by tab, bold, borders, fills, font colour, alignment.' },
       { name: 'Basic formulas', blurb: '= and operators, SUM, AVERAGE, MIN, MAX and COUNT, AutoSum, relative and absolute references, F4, common errors.' },
       { name: 'Copy, paste and fill', blurb: 'Copy, cut and paste, Paste Special, fill series, the Flash Fill idea.' },
+      { name: 'Project and assessment', blurb: 'Build the weekly report end to end, then prove it against the clock; or test out of the chapter.' },
     ],
     lessons: [welcome_race, workbook_sheets_cells, managing_sheets, ribbon_and_keytips, excel_options, page_setup, active_cell, moving_around, selecting_ranges, entering_data, editing_cells, ribbon_commands, dialog_boxes],
   },
