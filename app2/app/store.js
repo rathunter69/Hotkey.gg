@@ -11,7 +11,7 @@
 // Everything account-scoped carries an auth token; a reply for a stale token is dropped, and a
 // cache or outbox written by another uid is discarded, never sent.
 import { progress } from './progress.js';
-import { records } from './records.js';
+import { records, cleanAttempt } from './records.js';
 import { prefs } from './prefs.js';
 import { auth } from './auth.js';
 import { applyTheme, saveTheme, currentTheme } from '../ui/themes.js';
@@ -168,6 +168,75 @@ async function flushOutbox() {
   if (readOutbox().length) scheduleFlush(0); else setSave('account');
 }
 
+/* ---- game attempts (Phase D follow-up): a second outbox to rpc_submit_game_attempt.
+   Local records.js stays the UI's source (ghost, stats, PBs work offline); the server mirror
+   accrues for boards, deduped by attempt id, so a dual write can never double count. ---- */
+export const GAME_OUTBOX_KEY = 'hk2_game_outbox_v1';
+const GAME_SYNC_KEY = 'hk2_game_sync_v1';
+let gameFlushTimer = null;
+let gameFlushDelay = 1000;
+function readGameOutbox() { return ownedOutbox(readJson(GAME_OUTBOX_KEY), uid()); }
+function writeGameOutbox(items) { writeJson(GAME_OUTBOX_KEY, { uid: uid(), items }); }
+
+/** A local attempt as the RPC payload (records.cleanAttempt shapes it; `at` becomes client_at). */
+export function attemptToWire(a) {
+  const c = cleanAttempt(a);
+  if (!c) return null;
+  const { at, ...rest } = c;
+  return { ...rest, client_at: new Date(at).toISOString() };
+}
+
+function scheduleGameFlush(delay) {
+  if (gameFlushTimer || typeof setTimeout !== 'function') return;
+  gameFlushTimer = setTimeout(() => { gameFlushTimer = null; flushGameOutbox(); }, delay == null ? gameFlushDelay : delay);
+}
+async function flushGameOutbox() {
+  if (!signedIn()) return;
+  const t = auth.token();
+  const items = readGameOutbox();
+  if (!items.length) return;
+  const sb = auth.client(); if (!sb) return;
+  const item = items[0];
+  let failed = false;
+  try {
+    const { _guest, ...p } = item;
+    const { error } = await sb.rpc('rpc_submit_game_attempt', { p, p_guest: !!_guest });
+    if (!auth.current(t)) return;
+    if (error) failed = !String(error.message || '').includes('bad attempt');   // malformed: drop, retrying cannot help
+  } catch (e) {
+    if (!auth.current(t)) return;
+    failed = true;
+  }
+  if (failed) {
+    gameFlushDelay = Math.min(gameFlushDelay * 2, 60000);
+    scheduleGameFlush();
+    return;
+  }
+  writeGameOutbox(readGameOutbox().filter(i => i.id !== item.id));
+  gameFlushDelay = 1000;
+  if (readGameOutbox().length) scheduleGameFlush(0);
+}
+
+/** Once per account on this device: replay the guest game records into the account (id-deduped). */
+function maybeGameSync() {
+  const me = uid(); if (!me) return;
+  const synced = readJson(GAME_SYNC_KEY);
+  if (isObj(synced) && synced.uid === me) return;
+  const wired = records.attempts().map(a => {
+    const w = attemptToWire(a);
+    if (!w) return null;
+    const pb = records.pb(a.ref);
+    if (pb && pb.attemptId === a.id) w.trace = records.trace(a.ref);   // the PB run carries the ghost
+    return { ...w, _guest: true };
+  }).filter(Boolean);
+  if (wired.length) {
+    const have = new Set(readGameOutbox().map(i => i.id));
+    writeGameOutbox(readGameOutbox().concat(wired.filter(w => !have.has(w.id))));
+  }
+  writeJson(GAME_SYNC_KEY, { uid: me, at: Date.now() });
+  if (readGameOutbox().length) scheduleGameFlush(0);
+}
+
 /** Page rpc_my_progress until a short page; null on any failure (the cache stays). */
 async function fetchAllProgress(sb, t) {
   const rows = [];
@@ -270,9 +339,16 @@ export const store = {
   chapter(ch) { return progress.chapter(ch); },
   chapterPass(ch, what) { return progress.chapterPass(ch, what); },
 
-  /* ---- run records (Phase D): local store; the account mirror is the attempts table (plan §4).
-     When accounts carry attempts, addAttempt gains an outbox push like record() above. ---- */
-  addAttempt(a) { return records.addAttempt(a); },
+  /* ---- run records (Phase D): records.js is the UI's source; signed in, every attempt also
+     rides the game outbox to rpc_submit_game_attempt (0007), deduped server-side by id. ---- */
+  addAttempt(a) {
+    const ok = records.addAttempt(a);
+    if (signedIn()) {
+      const w = attemptToWire(a);
+      if (w) { writeGameOutbox(readGameOutbox().concat([w])); scheduleGameFlush(0); }
+    }
+    return ok;
+  },
   pb(ref) { return records.pb(ref); },
   pbRecords() { return records.pbs(); },
   attempts(f) { return records.attempts(f); },
@@ -340,6 +416,7 @@ export const store = {
       if (profile.handle) announceUser();
     }
     if (readOutbox().length) { setSave('retry'); scheduleFlush(0); } else setSave('account');
+    maybeGameSync();
   },
   /** The theme picker calls this on every pick; signed in, the pick rides the account. */
   setTheme(name) {
