@@ -56,8 +56,8 @@ Top nav: **Learn · Practice · Leaderboard · Reference**, theme picker, accoun
 ## 6. Rules: help, mouse, XP, rank
 - Help: reading explanations is always free. Revealing steps ("show me") in a lesson gives reduced XP; Try solo earns the rest. Any help in a timed run means no PB and no board entry.
 - Mouse: works everywhere (sheet, ribbon, dialogs). In lessons it is allowed and earns XP, with a gentle "try it with the keyboard" nudge. In timed runs, mouse use on the workspace means no PB and no board entry. Page controls like Start and Retry never count as mouse use.
-- XP and level: one level. Most XP from first completions, small capped XP for repeats, no speed bonus. Achievements give no XP.
-- Rank: kept. Speed-based tiers from benchmark drills, separate from level. Appears once a learner starts timed play.
+- XP and level: one level track, generous early, about 30 levels. Finishing Chapter 1 reaches roughly level 8-10; levels slow after that. Most XP from first completions; small capped XP for repeats; no speed bonus. Achievements give no XP. The exact curve is a single formula in one module so it can be tuned after launch; Opus picks sensible constants and states them.
+- Rank: kept, but hidden until it means something. Speed-based tiers from benchmark drills, separate from level. The rank pill stays hidden for a drill/field until it has enough posted times to be meaningful (about 20), then turns on by itself. The field may be seeded with clearly-synthetic "pace-setter" ghost times used only to calibrate pars and tier cutoffs; these are NEVER shown as fake human rows on a public board or profile. Real boards show real people only.
 - Pars: pass / pro / legendary on every timed drill.
 - Unlocking: open within a chapter with a recommended order. The next chapter needs the previous chapter complete or a passed test-out. Paid chapters also need access.
 - Daily: free for everyone. Streak is optional, counts practice days, and never takes anything away.
@@ -211,4 +211,13 @@ Visible but not loud. Nobody should have to hunt for it, and a solo learner shou
 - Supabase: a fresh project replaces the old one (see plan for timing). RLS on every table; the client never writes tables directly, only server functions; public profile fields separated from private; every attempt has a client-generated ID so retries never double count; progress, XP and records are derived server-side from attempts; results are paged, never one capped read.
 - Hosting: Cloudflare Pages. Preview link per branch, one-click rollback, no manual cache-version bumps.
 - Analytics: first-party events table (landing -> lesson 1 -> signup -> chapter complete -> paid) and a lightweight client error log with a weekly digest. No third-party scripts.
-- Launch: one public launch with paid on day one. Before it: preview-link testing with a handful of real beginners and finance users.
+- Launch sequence: cutover FIRST (the rebuild replaces the old site while it is still Chapter 1 + guest mode), then build the rest live. See section 13.
+
+## 13. MVP, rollout and access
+- **Cutover is the first step.** hotkey.gg serves the rebuild (app2 via Cloudflare Pages) as soon as Phase A is signed off. The old build is archived. This is a quiet swap: no announcement until the MVP (accounts + game layer) is solid.
+- **What a visitor sees during the build:** the full site. Landing, Chapter 1 fully playable as a guest (progress saved on device), Reference, Pricing and Teams pages present. Later chapters and any not-yet-built system show a quiet "coming" state, never a broken or empty page. It should read as a real early-access product, not a stub.
+- **MVP scope (built before a full review):** free product complete (all of Chapter 1, accounts, full game layer) plus Chapters 2-3 written but locked behind a `paid` entitlement. No checkout in the MVP.
+- **Granting paid access before checkout exists:** entitlements are processor-agnostic from day one (a row: this account has access from source X until date Y). Two grant paths ship in the MVP: (1) an admin action Wolf uses to mark an account paid; (2) single-use redeem codes Wolf generates and hands to testers. Real checkout later writes the same entitlement, so nothing here is throwaway.
+- **Achievements in the MVP (~40):** four flavours, all wanted — milestones (first lesson, each section, each chapter, first solo/timed/PB/Daily), skill feats (keyboard-only, no-help, under-par, full section solo, clean audit), speed/streak (practice-day streaks, N drills in a day, beat pro/legendary, top-N on a board), and hidden/playful (cheeky secrets revealed only when earned). Pixel-art, four rarities, no XP.
+- **Legal at cutover:** real plain-English draft Terms, Privacy and EULA covering guest data and the no-accounts-yet state, the Microsoft non-affiliation disclaimer, and a contact email, all clearly marked pre-review. Lawyer review before paid launch.
+- **Auth in the MVP:** email + magic link. Google is coded and switches on when the OAuth client ID is supplied. No two-factor until after launch.
