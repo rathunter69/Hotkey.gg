@@ -21,7 +21,7 @@ export default {
   concepts: ['worksheet', 'cell-reference', 'active-cell', 'name-box', 'formula-bar', 'arrow-keys'],
   prerequisites: [],
   read: 'A worksheet is a grid of cells, and one of them is always the active cell: the one with the green outline. In this lesson you move it around the Weekly Sales Report with the arrow keys and watch its reference in the Name Box. Knowing exactly where you are is the start of everything else in Excel.',
-  sheet: { cells: REPORT, active: { r: 1, c: 1 } },
+  sheet: { cells: REPORT, active: { r: 1, c: 1 }, colW: { 1: 84 } },   // column A fitted to its day names, as an author would
   par: 12,
   goals: [
     { id: 'to-b3', teach: 'The arrow keys move the active cell one cell at a time, and the Name Box shows its reference: column letter, then row number.', text: 'Make B3, the Monday Sales of 1200, the active cell.', keys: '→ ↓ ↓', requires: ['arrow-keys', 'cell-reference'], check: s => at(s, 'B3') },

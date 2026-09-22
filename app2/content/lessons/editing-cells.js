@@ -22,7 +22,7 @@ export default {
   concepts: ['replace-by-typing', 'edit-mode-f2', 'edit-caret', 'backspace'],
   prerequisites: ['entering-data'],
   read: 'Data is rarely right the first time. In this lesson you fix a misspelled title, a wrong figure and a misspelled day in the Weekly Sales Report. Knowing when to retype a cell and when to edit it saves time all day long.',
-  sheet: { cells: START, active: { r: 1, c: 1 } },
+  sheet: { cells: START, active: { r: 1, c: 1 }, colW: { 1: 84 } },   // column A fitted to its day names, as an author would
   par: 30,
   goals: [
     { id: 'fix-title', teach: 'F2 opens the cell for editing with the insertion point at the end, and Backspace deletes the character before it.', text: 'Fix the title in A1: change Reprot to Report.', keys: 'F2 ⌫ ×4 "port" Enter', requires: ['edit-mode-f2', 'backspace'], check: (s, ses) => s.value('A1') === 'Weekly Sales Report' && used(ses, 'F2') },

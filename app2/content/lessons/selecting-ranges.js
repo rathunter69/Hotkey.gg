@@ -25,7 +25,7 @@ export default {
   concepts: ['range', 'shift-arrow', 'ctrl-shift-arrow', 'row-col-select', 'ctrl-a'],
   prerequisites: ['moving-around'],
   read: 'Formatting, copying and formulas all start with a selection. In this lesson you select ranges of the Weekly Sales Report from the keyboard: a column of figures, a whole row and the entire block. Selecting without the mouse is the habit that makes everything after it quick.',
-  sheet: { cells: REPORT, active: { r: 1, c: 1 } },
+  sheet: { cells: REPORT, active: { r: 1, c: 1 }, colW: { 1: 84 } },   // column A fitted to its day names, as an author would
   par: 12,
   goals: [
     { id: 'b3-b7', teach: 'A range is a block of cells, and Shift+Arrow extends the selection one cell at a time from the active cell.', text: 'Select the Sales figures B3:B7.', keys: '→ ↓ ↓ then Shift+↓ ×4', requires: ['shift-arrow', 'range'], check: s => sel(s, 'B3:B7') },

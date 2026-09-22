@@ -40,7 +40,7 @@ const isTyping = t => !!t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' 
  *                         modeBar (false hides the bar with the mute button), onKey/onToast/onRefuse/onMouse
  */
 export function mountSandbox(root, opts = {}) {
-  const sheet = new Sheet({ rows: opts.rows || 20, cols: opts.cols || 10, cells: opts.cells === undefined ? SEED : opts.cells, active: opts.active || { r: 1, c: 1 } });
+  const sheet = new Sheet({ rows: opts.rows, cols: opts.cols, cells: opts.cells === undefined ? SEED : opts.cells, active: opts.active || { r: 1, c: 1 } });
   const fx = mountEffects();
   const session = new Session(sheet, {
     onToast: msg => { showToast(msg); if (opts.onToast) opts.onToast(msg); },

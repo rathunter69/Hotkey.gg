@@ -24,7 +24,7 @@ export default {
   concepts: ['ctrl-arrow', 'home-key', 'ctrl-home-end', 'enter-tab-move'],
   prerequisites: ['active-cell'],
   read: 'One arrow press moves one cell, which is slow on a real sheet. In this lesson you jump around the Weekly Sales Report with Ctrl, Home and End instead. This makes you much faster on sheets full of data.',
-  sheet: { cells: REPORT, active: { r: 3, c: 1 } },
+  sheet: { cells: REPORT, active: { r: 3, c: 1 }, colW: { 1: 84 } },   // column A fitted to its day names, as an author would
   par: 10,
   goals: [
     { id: 'ctrl-down', teach: 'Ctrl+↓ jumps to the edge of the data.', text: 'Move from A3 (Monday) to A7 (Friday).', keys: 'Ctrl+↓', requires: ['ctrl-arrow'], check: (s, ses) => at(s, 'A7') && used(ses, 'Ctrl+↓') },

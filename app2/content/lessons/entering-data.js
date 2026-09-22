@@ -24,7 +24,7 @@ export default {
   concepts: ['type-to-enter', 'enter-commits', 'tab-commits', 'escape-cancels', 'text-vs-number', 'delete-clears'],
   prerequisites: ['moving-around'],
   read: 'A sheet is only useful once there is data in it. In this lesson you fill in the Weekly Sales Report by typing into cells and confirming each entry with Enter or Tab. Quick, accurate entry is the first thing anyone notices about a good Excel user.',
-  sheet: { cells: START, active: { r: 1, c: 1 } },
+  sheet: { cells: START, active: { r: 1, c: 1 }, colW: { 1: 84 } },   // column A fitted to its day names, as an author would
   par: 40,
   goals: [
     { id: 'title', teach: 'Type into a cell, then Enter confirms the entry and moves down, while Esc throws it away.', text: 'In A1, type Weekly Sales Report and press Enter.', keys: '"Weekly Sales Report" Enter', requires: ['type-to-enter', 'enter-commits', 'escape-cancels'], check: s => s.value('A1') === 'Weekly Sales Report' },

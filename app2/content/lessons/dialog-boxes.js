@@ -38,7 +38,7 @@ export default {
   concepts: ['dialog-box', 'format-cells-dialog', 'number-formats', 'ribbon-route-dialog'],
   prerequisites: ['ribbon-commands'],
   read: 'Some commands do not act at once: they open a dialog box and wait for your choice. In this lesson you open Format Cells with Ctrl+1 and from the Ribbon to give the Weekly Sales Report proper number formats, which change how a value is shown, never the value itself. Number formatting is the difference between raw figures and a report someone can read.',
-  sheet: { cells: START, active: { r: 1, c: 1 } },
+  sheet: { cells: START, active: { r: 1, c: 1 }, colW: { 1: 84 } },   // column A fitted to its day names, as an author would
   par: 25,
   goals: [
     { id: 'comma-sales', teach: 'Ctrl+1 opens the Format Cells dialog box, and here the first letter of a category applies it: N is Number.', text: 'Select the Sales figures B3:B8 and apply the Number format.', keys: '↓ ↓ → Ctrl+Shift+↓ then Ctrl+1 N', requires: ['format-cells-dialog', 'number-formats', 'ctrl-shift-arrow'], check: s => ['B3', 'B4', 'B5', 'B6', 'B7', 'B8'].every(r => cell(s, r).fmtStyle === 'comma') },

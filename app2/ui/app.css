@@ -249,11 +249,11 @@ td.editing .edbox{position:absolute; left:0; top:0; bottom:0; min-width:100%; wi
 td.editing .edin{white-space:nowrap}
 
 /* ---------- 5. gridline softener + gridlines toggle (index.html 286, 289) ---------- */
-/* The mix is computed ONCE on the wrap and inherited by 2,600 cells as a plain colour: registered, so the
-   browser stores it typed instead of re-evaluating color-mix() per cell (a third of a full repaint's style time). */
-@property --gridline{syntax:'<color>'; inherits:true; initial-value:transparent}
-.gridwrap{--gridline:color-mix(in srgb, var(--line) 52%, transparent)}
-#grid td{border-color:var(--gridline)}
+/* The softened gridline is computed ONCE, on the table, and reaches the 2,600 cells by inheritance as a plain
+   colour: a var()/color-mix() written on the td itself is substituted and re-parsed per cell and was 40% of a
+   full paint's style time. (Selection edges td.sel-* keep the precedence they always had against this rule.) */
+#grid{border-color:color-mix(in srgb, var(--line) 52%, transparent)}
+#grid tbody, #grid tr, #grid td{border-color:inherit}
 body.hide-gridlines #grid td{border-color:transparent}
 
 /* ---------- 6. cursor tokens, active, point, selection, fill-handle, marquee (463, 471–494, 501–514) ---------- */
@@ -632,6 +632,7 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 /* ---------- 13. density pass (index.html 2296–2298) — MUST stay LAST: the ID-scoped rule beats the base td rule ---------- */
 /* ---- Excel at 100% (SITE_SPEC §4): 20px rows, 11pt Arial/Calibri-class cells, 11px headers that stick ---- */
 #grid td, #grid th{font-size:var(--cellfs,14.67px); height:var(--cellh,20px); padding:0 var(--cellpad,3px); line-height:1.15}   /* 11pt sits in a 20px row with 1.5px to spare, like Calibri 11 in Excel's 15pt row */
+#grid td{transition:none}   /* no 80ms background fade on 2,600 cells: it cost a fifth of a full paint and was never visible */
 #grid th{font-size:11px; padding:0 2px; position:sticky; z-index:7; background:var(--surface2)}   /* above every cell layer (active 4, editing 6, marquee 6); the ribbon slot (12) and dialogs (30) stay above */
 #grid tr:first-child th{top:0}               /* the column letters ride the top edge of the scroll box */
 #grid th.rowhdr{left:0}                      /* the row numbers ride the left edge */

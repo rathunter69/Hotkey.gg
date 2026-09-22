@@ -22,7 +22,7 @@ export default {
   concepts: ['ribbon', 'keytips', 'home-tab', 'bold-command', 'borders-menu', 'align-command', 'escape-backs-out'],
   prerequisites: ['selecting-ranges', 'editing-cells'],
   read: 'The Ribbon holds every command in Excel, and Alt lets you reach any of them from the keyboard. In this lesson you format the Weekly Sales Report with KeyTips, pressing the keys one after another and backing out with Esc: bold, a border and centered headers. Ribbon chords are how fast users format without touching the mouse.',
-  sheet: { cells: START, active: { r: 1, c: 1 } },
+  sheet: { cells: START, active: { r: 1, c: 1 }, colW: { 1: 84 } },   // column A fitted to its day names, as an author would
   par: 25,
   goals: [
     { id: 'bold-title', teach: 'Alt shows a KeyTip on every tab, H opens Home, and the next KeyTip runs a command: Alt, H, 1 is Bold.', text: 'Make the title Weekly Sales Report bold.', keys: 'Alt H 1', requires: ['keytips', 'home-tab', 'bold-command'], check: s => cell(s, 'A1').bold === true },
