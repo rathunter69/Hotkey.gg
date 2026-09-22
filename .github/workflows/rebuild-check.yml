@@ -3,9 +3,9 @@
 name: rebuild-check
 on:
   push:
-    branches: [rebuild]
+    branches: [main, rebuild]
   pull_request:
-    branches: [rebuild]
+    branches: [main, rebuild]
 permissions:
   contents: read
 concurrency:

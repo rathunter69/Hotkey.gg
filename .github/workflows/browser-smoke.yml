@@ -3,7 +3,9 @@
 name: browser-smoke
 on:
   push:
-    branches: [rebuild]
+    branches: [main, rebuild]
+  pull_request:
+    branches: [main, rebuild]
   workflow_dispatch:
 permissions:
   contents: read
