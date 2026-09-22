@@ -196,9 +196,13 @@ export function startApp({ navEl, rootEl, footEl }) {
     if (name === 'root') name = isReturning() ? 'home' : 'landing';
     let lesson = null;
     if (name === 'lesson') { lesson = lessonById(r.params.id); if (!lesson) name = 'notfound'; }
-    if (name === 'drill' && r.params.id !== 'sandbox') name = 'notfound';
+    let drill = null;
+    if (name === 'drill' && r.params.id !== 'sandbox') {
+      drill = (await import('../content/drills.js')).drillById(r.params.id);
+      if (!drill) name = 'notfound';
+    }
     nav.setActive(navKeyFor(name === 'home' ? 'root' : name));
-    document.title = titleFor(name, lesson ? lesson.title : name === 'drill' ? 'Sandbox' : '');
+    document.title = titleFor(name, lesson ? lesson.title : name === 'drill' ? (drill ? drill.title : 'Sandbox') : '');
     document.body.dataset.route = name;
     window.scrollTo(0, 0);
 

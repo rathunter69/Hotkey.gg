@@ -371,6 +371,20 @@ export class SheetView {
   refit() { if (this.destroyed || !this.grid.rows.length) return; this.keepActiveInView(); this.positionMarquee(); this.measurePage(); }
 
   /**
+   * A cell's painted box in .gridwrap content pixels ({ left, top, width, height }), for an
+   * overlay positioned inside the scroll box (the PB ghost cursor). Null while the cell has no
+   * <td> (hidden row/column, or the grid has not laid out).
+   */
+  cellRect(ref) {
+    const p = parseRef(String(ref || ''));
+    if (!p) return null;
+    const td = this.grid.querySelector(`td[data-r="${p.r}"][data-c="${p.c}"]`);
+    if (!td) return null;
+    const tr = td.parentElement;
+    return { left: td.offsetLeft, top: tr.offsetTop, width: td.offsetWidth, height: tr.offsetHeight };
+  }
+
+  /**
    * The scroll box's geometry in content pixels, from the painted table: y0/x0 are where cell A1
    * starts (the sticky header row and row-header column sit above / left of it), viewH/viewW the
    * data area that shows. Null until the box has laid out.
