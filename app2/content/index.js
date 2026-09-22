@@ -25,6 +25,15 @@ import hide_freeze from './lessons/hide-freeze.js';
 import home_tab_tour from './lessons/home-tab-tour.js';
 import format_cells_tabs from './lessons/format-cells-tabs.js';
 import fills_and_colours from './lessons/fills-and-colours.js';
+import first_formula from './lessons/first-formula.js';
+import sum_family from './lessons/sum-family.js';
+import autosum from './lessons/autosum.js';
+import absolute_refs from './lessons/absolute-refs.js';
+import cross_sheet from './lessons/cross-sheet.js';
+import formula_errors from './lessons/formula-errors.js';
+import copy_cut_paste from './lessons/copy-cut-paste.js';
+import paste_special from './lessons/paste-special.js';
+import fill_series from './lessons/fill-series.js';
 
 export const CHAPTERS = [
   {
@@ -53,6 +62,8 @@ export const CHAPTERS = [
       entering_data, editing_cells, undo_redo, fill_down_right, find_replace,
       insert_delete_rows, widths_heights, hide_freeze,
       ribbon_commands, dialog_boxes, home_tab_tour, format_cells_tabs, fills_and_colours,
+      first_formula, sum_family, autosum, absolute_refs, cross_sheet, formula_errors,
+      copy_cut_paste, paste_special, fill_series,
     ],
   },
 ];

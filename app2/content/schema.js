@@ -155,8 +155,11 @@ export const CONCEPTS = {
 /** How many goals a lesson of this kind may carry: ordinary lessons stay 3-6; a project, assessment or test-out combines a section's work in 6-10. */
 export function goalBounds(kind) { return kind && kind !== 'lesson' ? { min: 3, max: 10 } : { min: 3, max: 6 }; }
 
-/** Sentences in a text: terminators followed by a space or the end (decimals like 5.0% and 1,200.00 are not terminators). */
-export function sentenceCount(text) { return (String(text).match(/[.!?](?=\s|$)/g) || []).length; }
+/** Sentences in a text: terminators followed by a space or the end. Decimals (5.0%, 1,200.00) and Excel error codes (#NAME?, #DIV/0!) are not terminators. */
+export function sentenceCount(text) {
+  const t = String(text).replace(/#(?:NULL!|DIV\/0!|VALUE!|REF!|NAME\?|NUM!|N\/A)/gi, 'ERR');
+  return (t.match(/[.!?](?=\s|$)/g) || []).length;
+}
 export function wordCount(text) { return String(text).trim().split(/\s+/).filter(Boolean).length; }
 
 /** Validate a lesson object. Returns a list of problems (empty when valid); never throws. */
