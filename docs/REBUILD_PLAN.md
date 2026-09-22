@@ -46,6 +46,7 @@ Note: cutover (X) happens before B. The live site runs guest-only (local progres
   3. This chat applies the Phase B migrations to the new project and runs the security advisors.
   During the gap (between delete and new-schema-live) the site is guest-only anyway, so nothing user-facing breaks. Do the delete/create right before B, not at cutover, so the site isn't pointed at a dead project.
 - New schema rules in SITE_SPEC 12. Advisors after every schema change. No two-factor until after launch.
+- Phase D → B contract: the game layer's guest records (`app2/app/records.js`, key `hk2_records_v1`) are the shape of a future `attempts` table — `{id uuid unique (idempotent retries), kind drill|daily|rapid|lesson-timed, ref, day, seed, secs, keys, clean, helped, mouse, tier, splits jsonb, trace jsonb capped at 600 entries (clean runs only), at}`. PBs, boards, XP and rank all DERIVE from attempts server-side; timed lesson runs write an attempt too (kind `lesson-timed`) so Stats has one source, while `progress.lessons.best` stays the lesson-page convenience copy. Rank keeps the old placement math (speed-derived percentiles over benchmark boards, prior-weighted; see `app2/app/rank.js`) — hidden until a board has real depth, per the spec.
 
 ## 5. Legal and launch checklist (Wolf owns; lawyer/accountant confirm)
 - At cutover (X): real plain-English **draft** Terms, Privacy, EULA covering guest data and no-accounts-yet, plus the Microsoft non-affiliation disclaimer and a contact email, all marked pre-review. Good enough to be live for a free guest product.

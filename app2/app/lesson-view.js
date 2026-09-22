@@ -5,6 +5,7 @@
 // finish gets a bigger one (§1, ui/effects.js).
 import { LessonRun, shortcutsUsed } from './runner.js';
 import { store } from './store.js';
+import { attemptId, dayOf, traceOf } from './records.js';
 import { track } from './telemetry.js';
 import { nextLesson, chapterOf, lessonNumber } from '../content/index.js';
 import { SheetView } from '../ui/sheet-view.js';
@@ -335,6 +336,15 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       mouseCount: run.mouseCount,
       assisted: assisted(),
     });
+    // A timed run is also an attempt record (one source for Stats; the account mirror is Phase B's attempts table).
+    if (run.mode === 'timed') {
+      store.addAttempt({
+        id: attemptId(), kind: 'lesson-timed', ref: lesson.id, day: dayOf(), seed: null,
+        secs: run.elapsed, keys: run.session.keyLog.length,
+        clean: !assisted() && !run.mouseCount, helped: assisted(), mouse: run.mouseCount,
+        tier: 'none', splits: run.splits().filter(Number.isFinite), trace: traceOf(run.session.keyLog), at: Date.now(),
+      });
+    }
     // A finished assessment or test-out inside its time limit passes the chapter gate (§7);
     // a test-out also marks every not-yet-completed chapter lesson skipped, like placement does.
     if (timedOnly) {
