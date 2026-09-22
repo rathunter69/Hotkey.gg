@@ -8,6 +8,7 @@ import { progress } from './progress.js';
 import { nextLesson, chapterOf, lessonNumber } from '../content/index.js';
 import { SheetView } from '../ui/sheet-view.js';
 import { RibbonView } from '../ui/ribbon-view.js';
+import { mountSheetTabs } from '../ui/sheet-tabs.js';
 import { mountKeycaps } from '../ui/keycaps.js';
 import { mountEffects } from '../ui/effects.js';
 import { showToast } from '../ui/toast.js';
@@ -52,7 +53,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       <div class="stage" id="stage"><div class="stage-row"><div class="stage-main">
         <div class="ribbon-slot" id="ribbonSlot"><div class="ribbon" id="ribbon"></div></div>
         <div id="sheetMount"></div>
-      </div></div></div>
+      </div></div><div id="sheetTabs"></div></div>
     </div>
     <div class="lesson-divider" id="divider" role="separator" aria-orientation="vertical" aria-label="Lesson panel width. Arrow keys resize it, Home resets it." tabindex="0" title="Drag to resize the panel"></div>
     <aside class="lesson-panel" id="panel" aria-label="Lesson panel">
@@ -79,7 +80,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   const effects = mountEffects();
   effects.mountMuteButton($('lessonTools'));
 
-  let sheetView = null, ribbonView = null, timerH = null;
+  let sheetView = null, ribbonView = null, sheetTabs = null, timerH = null;
   let phase = mode === 'guided' ? 'teach' : 'play';   // 'teach' | 'play' | 'done'
   let tab = 'lesson';                                   // 'lesson' | 'help' | 'used'
   let revealed = false;      // keys shown on request in a solo or timed run: the run is assisted (§6)
@@ -102,10 +103,12 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   function mountViews() {
     if (sheetView) sheetView.destroy();
     if (ribbonView) ribbonView.destroy();
+    if (sheetTabs) sheetTabs.destroy();
     $('sheetMount').innerHTML = '';
     $('ribbonSlot').innerHTML = '<div class="ribbon" id="ribbon"></div>';
     sheetView = new SheetView($('sheetMount'), run.session);
     ribbonView = new RibbonView($('ribbon'), run.session, { mode: fullRibbon ? 'full' : 'slim' });
+    sheetTabs = mountSheetTabs($('sheetTabs'), run.session);   // the workbook's sheet tabs, like Excel's strip along the bottom
     run.onChange(what => {
       if (what === 'reset') return;
       ribbonView.render(); sheetView.render();
@@ -388,7 +391,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     destroy() {
       document.removeEventListener('keydown', onKey); document.removeEventListener('keyup', onKeyUp);
       if (timerH) clearInterval(timerH);
-      if (sheetView) sheetView.destroy(); if (ribbonView) ribbonView.destroy();
+      if (sheetView) sheetView.destroy(); if (ribbonView) ribbonView.destroy(); if (sheetTabs) sheetTabs.destroy();
       keycaps.destroy(); if (effects.destroy) effects.destroy();
       overlay.remove(); el.remove();
     },

@@ -4,6 +4,7 @@
 // with pass / pro / legendary pars ("—" until Phase D). Today it hosts the existing mountSandbox.
 // The clock starts on the first key press (session.t0).
 import { mountSandbox } from './sandbox.js';
+import { mountSheetTabs } from '../ui/sheet-tabs.js';
 import { prefs, keyLabel } from './prefs.js';
 import { showToast } from '../ui/toast.js';
 
@@ -75,7 +76,7 @@ export function mountDrillPage(root, ctx = {}) {
           <div class="cl-esc"><kbd>Esc</kbd> backs out of the Ribbon or a dialog box · <kbd>${esc(keyLabel('Ctrl+Z', p.platform))}</kbd> undoes</div>
         </aside>
       </div>
-      <div class="sheettabs" id="sheetTabs"><span class="st-lead">SHEETS</span><span class="st-tab cur" role="tab" aria-selected="true">Sheet1</span></div>
+      <div id="sheetTabs"></div>
     </div>
     <div class="bar drill-status">
       <div class="stat">time <b id="drTime">0.0</b> · keys <b id="drKeys">0</b></div>
@@ -88,6 +89,7 @@ export function mountDrillPage(root, ctx = {}) {
 
   const SB_OPTS = { modeBar: false, ribbonMode: 'slim' };   // the drill page carries its own mode bar (§5)
   let sb = mountSandbox($('drillHost'), SB_OPTS);
+  let tabs = mountSheetTabs($('sheetTabs'), sb.session);   // the workbook's sheet tabs (Ctrl+PgDn / PgUp, click, ⊕)
   const tickH = setInterval(() => {
     if (!sb) return;
     const t0 = sb.session.t0; $('drTime').textContent = t0 == null ? '0.0' : fmt((Date.now() - t0) / 1000);
@@ -113,7 +115,7 @@ export function mountDrillPage(root, ctx = {}) {
     $('fsToggle').classList.toggle('on', on);
     try { if (on && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {}); else if (!on && document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {}); } catch (e) { /* not allowed */ }
   };
-  $('drReset').onclick = () => { if (sb) sb.destroy(); sb = mountSandbox($('drillHost'), SB_OPTS); showToast('Sheet reset'); $('drReset').blur(); };
+  $('drReset').onclick = () => { if (sb) sb.destroy(); if (tabs) tabs.destroy(); sb = mountSandbox($('drillHost'), SB_OPTS); tabs = mountSheetTabs($('sheetTabs'), sb.session); showToast('Sheet reset'); $('drReset').blur(); };
 
   const onKey = e => {
     if (e.key === 'F1') { e.preventDefault(); $('helpToggle').click(); }
@@ -129,7 +131,7 @@ export function mountDrillPage(root, ctx = {}) {
       clearInterval(tickH);
       document.removeEventListener('keydown', onKey); document.removeEventListener('fullscreenchange', onFsChange);
       document.documentElement.classList.remove('hk-fs');
-      if (sb) sb.destroy(); sb = null;
+      if (sb) sb.destroy(); sb = null; if (tabs) tabs.destroy(); tabs = null;
       el.remove();
     },
   };
