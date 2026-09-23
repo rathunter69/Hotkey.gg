@@ -159,6 +159,8 @@ export function mountAccountPage(root, ctx = {}) {
           <label class="set set-check"><input id="setMute" type="checkbox"${p.mute ? ' checked' : ''}> Mute sounds<span class="set-note">Sounds are soft and off until you start.</span></label>
           <label class="set">Celebrations<select id="setEffects">${[['full', 'Full (ticks, chimes, banners)'], ['subtle', 'Subtle (small and quiet)'], ['off', 'Off (results only)']].map(([v, t]) => `<option value="${v}"${p.effects === v ? ' selected' : ''}>${t}</option>`).join('')}</select><span class="set-note">Also follows your system's reduced-motion setting.</span></label>
           <label class="set set-check"><input id="setGhost" type="checkbox"${p.ghost !== false ? ' checked' : ''}> PB ghost in drills<span class="set-note">A faint cursor races your best run once you have one.</span></label>
+          <label class="set">Density<select id="setDensity">${[['comfortable', 'Comfortable (a step up, breathing room)'], ['compact', 'Compact (tighter, more on screen)']].map(([v, t]) => `<option value="${v}"${p.density === v ? ' selected' : ''}>${t}</option>`).join('')}</select><span class="set-note">Type, keycaps and the Ribbon; the sheet stays at Excel’s 100%.</span></label>
+          <label class="set">Lesson panel<select id="setPanelSide">${[['right', 'Right of the sheet'], ['left', 'Left of the sheet']].map(([v, t]) => `<option value="${v}"${p.panelSide === v ? ' selected' : ''}>${t}</option>`).join('')}</select><span class="set-note">Also a button on the workspace strip.</span></label>
           <div class="set"><span>Theme</span><button class="btn btn-ghost" id="setTheme" type="button">Open the theme picker</button><span class="set-note">${signedIn ? 'Follows your account.' : 'Also top right, on every page.'}</span></div>
         </div>
       </section>
@@ -278,6 +280,8 @@ export function mountAccountPage(root, ctx = {}) {
     el.querySelector('#setMute').onchange = e => { prefs.set({ mute: e.target.checked }); showToast(e.target.checked ? 'Sounds muted' : 'Sounds on'); };
     el.querySelector('#setEffects').onchange = e => { prefs.set({ effects: e.target.value }); showToast('Celebrations: ' + e.target.value); };
     el.querySelector('#setGhost').onchange = e => { prefs.set({ ghost: e.target.checked }); showToast(e.target.checked ? 'Ghost on' : 'Ghost off'); };
+    el.querySelector('#setDensity').onchange = e => { prefs.set({ density: e.target.value }); showToast('Density: ' + e.target.value); };
+    el.querySelector('#setPanelSide').onchange = e => { prefs.set({ panelSide: e.target.value }); showToast('Panel: ' + e.target.value); };
     el.querySelector('#setTheme').onclick = () => { if (ctx.nav && ctx.nav.openThemes) ctx.nav.openThemes(); else { const b = document.getElementById('navThemes'); if (b) b.click(); } };
 
     // data

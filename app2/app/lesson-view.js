@@ -19,7 +19,12 @@ import { mountSheetTabs } from '../ui/sheet-tabs.js';
 import { mountKeycaps } from '../ui/keycaps.js';
 import { mountEffects } from '../ui/effects.js';
 import { showToast } from '../ui/toast.js';
-import { keyLabel } from './prefs.js';
+import { keyLabel, prefs } from './prefs.js';
+import { flowNext } from './flow.js';
+import { inferTarget, altPath, pulseTarget, clearPulse, glowRibbon } from '../ui/cues.js';
+import { beatFor, pageDelivered } from './beats.js';
+import { schedule, grade as scheduleGrade, dueToday } from './schedule.js';
+import { shouldOfferInstall, installAvailable, promptInstall } from './install.js';
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 /** A keycap: the chord as the learner's platform shows it (Ctrl → ⌘, Alt → ⌥ on a Mac). */
@@ -49,7 +54,7 @@ function ensureCss() {
   document.head.appendChild(link);
 }
 
-export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
+export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt, seed: seedOpt } = {}) {
   ensureCss();
   const chapter = chapterOf(lesson);
   const fullRibbon = chapter && chapter.id === 'foundations';   // Chapter 1: the full ribbon bar is on by default (§4)
@@ -57,8 +62,28 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   if (timedOnly) mode = 'timed';
   const isChallenge = lesson.kind === 'challenge';   // the module challenge: seeded, all goals at once, countdown, tier pars (C2)
   if (isChallenge) mode = 'challenge';
+  const isMicro = lesson.kind === 'micro';           // a due-today micro-drill (app/schedule.js): no record, no XP, one memory note
+  const next = flowNext();                           // the experience pass: strip, cues, beats, panel side — behind ?flow=next
+  const at = moduleOf(lesson);
+  const wrap = document.createElement('div');
+  wrap.className = 'ws' + (next ? ' ws-next' : '');
   const el = document.createElement('div');
-  el.className = 'lesson';
+  el.className = 'lesson' + (next && panelOpt === 'overlay' ? ' panel-overlay' : '');
+  if (next) {
+    const ctx0 = gameCtx();
+    const crumb = at
+      ? `<a href="#/learn">Learn</a> › <span>${esc(chapter ? chapter.title : '')}</span> › <span>1.${at.k - 1} ${esc(at.module.title)}</span> › <b>${isChallenge ? 'Challenge' : `Lesson ${at.n} of ${at.of}`}</b>`
+      : isMicro ? `<a href="#/">Home</a> › <span>Due today</span> › <b>${esc(lesson.title)}</b>`
+      : `<a href="#/learn">Learn</a> › <span>${esc(chapter ? chapter.title : '')}</span> › <b>${esc(lesson.title)}</b>`;
+    wrap.innerHTML = `<div class="ws-strip" id="wsStrip" role="navigation" aria-label="You are here">
+      <div class="ws-crumb">${crumb}<span class="ws-ring" id="wsRing"></span></div>
+      <div class="ws-tools">
+        <span class="ws-level" id="wsLevel" title="Level ${ctx0.level} · XP from lessons, challenges and the Daily">L${ctx0.level} <i>${ctx0.levelInfo.into}/${ctx0.levelInfo.need} XP</i></span>
+        <span id="wsMute"></span>
+        <button type="button" class="mb-tool" id="wsSide" title="Move the panel to the other side">Panel: ${prefs.get().panelSide === 'left' ? 'left' : 'right'}</button>
+        <button type="button" class="mb-tool" id="wsFull" title="Fullscreen (F11 in most browsers)">Fullscreen</button>
+      </div></div>`;
+  }
   el.innerHTML = `
     <div class="lesson-main">
       <div class="stage" id="stage"><div class="stage-row"><div class="stage-main">
@@ -83,7 +108,8 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       <div class="panel-body" id="panelBody" role="tabpanel" aria-labelledby="tabLesson"></div>
       <div class="panel-actions" id="panelActions"></div>
     </aside>`;
-  root.appendChild(el);
+  wrap.appendChild(el);
+  root.appendChild(wrap);
   const overlay = document.createElement('div');
   overlay.className = 'lesson-done'; overlay.hidden = true; overlay.setAttribute('role', 'dialog'); overlay.setAttribute('aria-modal', 'true'); overlay.setAttribute('aria-labelledby', 'doneTitle');
   root.appendChild(overlay);
@@ -91,7 +117,14 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
 
   const keycaps = mountKeycaps();
   const effects = mountEffects();
-  effects.mountMuteButton($('lessonTools'));
+  effects.mountMuteButton(next ? wrap.querySelector('#wsMute') : $('lessonTools'));
+  // the strip's tools (experience pass): panel side, fullscreen
+  if (next) {
+    wrap.querySelector('#wsSide').onclick = () => { const side = prefs.get().panelSide === 'left' ? 'right' : 'left'; prefs.set({ panelSide: side }); wrap.querySelector('#wsSide').textContent = 'Panel: ' + side; if (sheetView) requestAnimationFrame(() => sheetView.render()); };
+    wrap.querySelector('#wsFull').onclick = () => { try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); } catch (e) { /* not allowed here */ } };
+  }
+  const onFs = () => { try { document.documentElement.classList.toggle('hk-fs', !!document.fullscreenElement); if (sheetView) requestAnimationFrame(() => sheetView.render()); } catch (e) { /* no DOM */ } };
+  document.addEventListener('fullscreenchange', onFs);
 
   let sheetView = null, ribbonView = null, sheetTabs = null, timerH = null;
   let phase = 'play';        // 'play' | 'done' — the sheet is live at once; the Read text sits at the top of the panel
@@ -108,6 +141,16 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   let lastTier = null;       // a clean challenge's tier from the pars, for the overlay stamp
   let lastTimedOut = false;  // a soft-timed first challenge run that finished past the limit: completes, no tier
   let xpGained = 0;          // what the run earned, for the overlay's count-up
+  // the experience pass: cues on the goal's target and the Ribbon route, the ~8 s stuck hint, the
+  // memory notes the queue reads, the module's story beat
+  const cuesOn = next && fullRibbon && mode === 'guided' && !isChallenge;
+  let cueGoal = -1;          // the goal index the cue last fired for
+  let cueTokens = [];        // the current goal's Alt route, as KeyTip letters
+  let stuckH = null, helpH = null;
+  let hintAt = -1;           // the goal index the stuck hint is showing for
+  const hinted = new Set();  // goal indexes that were hinted or revealed (the queue grades them lower)
+  let notedDone = 0;         // goals already noted to the queue
+  let beat = null;           // the story-beat card while it shows
 
   // The first attempt at a challenge is soft-timed (C2 addendum): the clock runs and decides the
   // tier, but time-up does not end the run. From the second attempt the limit is hard.
@@ -121,7 +164,8 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     onMouse: what => onMouse(what),
     onGoal: (i, secs) => track('goal_complete', { lesson_id: lesson.id, goal: i, secs: Math.round(secs * 10) / 10 }),
   });
-  store.touch(lesson.id);
+  if (!isMicro) store.touch(lesson.id);
+  if (Number.isFinite(+seedOpt)) run.opts.seedNo = +seedOpt;
   track('lesson_start', { lesson_id: lesson.id, mode: run.mode });
 
   /* ---------------- views ---------------- */
@@ -134,12 +178,18 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     sheetView = new SheetView($('sheetMount'), run.session);
     ribbonView = new RibbonView($('ribbon'), run.session, { mode: fullRibbon ? 'full' : 'slim' });
     sheetTabs = mountSheetTabs($('sheetTabs'), run.session);   // the workbook's sheet tabs, like Excel's strip along the bottom
+    // the Ribbon view re-renders on its own session listener (registered above, so it fires after
+    // the run's); the route glow is re-applied from a listener registered after it, so it lands
+    // on the freshly painted bar
+    run.session.onChange(() => { if (cuesOn && phase === 'play') glowRibbon($('ribbon'), cueTokens, run.session.path, run.session.mode, document.getElementById('ribbonDrop')); });
     run.onChange(what => {
       if (what === 'reset') return;
       ribbonView.render(); sheetView.render();
       if (run.finished && phase !== 'done') finish();
       renderPanel();
       maybeStartDemo();
+      noteGoals();
+      cueCurrent();
     });
     sheetView.render(); ribbonView.render();
   }
@@ -147,7 +197,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   /* ---------------- the panel ---------------- */
   const modeLabel = () => run.mode === 'guided' ? 'Guided' : run.mode === 'solo' ? 'Solo' : run.mode === 'challenge' ? 'Challenge' : 'Timed';
   /** Keys show on the goal line only where the goal introduces a shortcut (its teach line) in Guided mode, or after Help revealed them (§4). */
-  const keysShown = g => (run.mode === 'guided' && !!g.teach) || revealed;
+  const keysShown = g => (run.mode === 'guided' && !!g.teach) || revealed || hintAt === run.doneCount;
   const raceOf = id => (lesson.race || []).find(r => r.slow === id || r.fast === id);
   const fmtSecs = s => s.toFixed(1);
   // Guided is the normal way to complete a lesson and is NOT assistance (SITE_SPEC §4): only
@@ -169,10 +219,10 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   /** "Lesson n of m · Module k of 7" with the module's ring; empty for the legacy lessons. */
   function renderModuleLine() {
     const slot = $('moduleLine'); if (!slot) return;
-    const at = moduleOf(lesson);
     if (!at) { slot.innerHTML = ''; slot.hidden = true; return; }
     const all = store.all();
     const doneInModule = at.module.lessons.filter(l => { const p = all[l.id]; return (p && p.completed) || l.id === lesson.id && phase === 'done'; }).length;
+    const wsRing = wrap.querySelector('#wsRing'); if (wsRing) wsRing.innerHTML = ring(doneInModule, at.module.lessons.length, { size: 18, stroke: 3 });
     slot.hidden = false;
     slot.innerHTML = `${ring(doneInModule, at.module.lessons.length, { size: 20 })} ${lesson.kind === 'challenge'
       ? `<span>Challenge · Module ${at.k} of ${at.of7}</span>`
@@ -205,7 +255,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     card.innerHTML = `<div class="task-label">${isGoal ? 'Now' : 'Still needed'} <span class="task-count">${run.doneCount} / ${run.goals.length}</span></div>
       <div class="task-goal">${esc(cur.text)}</div>
       ${isGoal && run.mode === 'guided' && cur.teach ? `<div class="task-teach">${rich(cur.teach)}</div>` : ''}
-      ${isGoal && keysShown(cur) && cur.keys ? `<div class="task-keys">${keysHtml(cur.keys)}</div>` : ''}
+      ${isGoal && keysShown(cur) && cur.keys ? `<div class="task-keys${hintAt === run.doneCount && !(run.mode === 'guided' && cur.teach) && !revealed ? ' task-hint' : ''}">${keysHtml(cur.keys)}</div>` : ''}
       ${isGoal && nudgeAt === run.doneCount ? `<div class="goal-nudge">Try it with the keyboard${!keysShown(cur) && cur.keys ? ': the Help tab shows the keys' : ''}.</div>` : ''}
       ${conv ? `<span class="conv-chip" title="${esc(conv.name)}">${esc(cur.convention)} · ${esc(conv.short)}</span>` : ''}`;
   }
@@ -275,7 +325,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       p.innerHTML = goalLine +
         `<p class="help-note">Reading is free. Showing the keys counts as help: this attempt is then marked assisted${run.mode === 'timed' ? ', and a timed run with help sets no personal best' : ''}.</p>
         <p><button class="btn" id="revealBtn" type="button">Show me the keys</button></p>` + footer + notes;
-      p.querySelector('#revealBtn').onclick = () => { revealed = true; startGhost(); };   // the ghost plays the keys on the sheet, then puts it back (C2 gap 9a)
+      p.querySelector('#revealBtn').onclick = () => { revealed = true; hinted.add(run.doneCount); startGhost(); };   // the ghost plays the keys on the sheet, then puts it back (C2 gap 9a)
     }
   }
 
@@ -292,8 +342,10 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   function renderActions() {
     const a = $('panelActions');
     if (phase !== 'done') {
-      a.innerHTML = `<button class="btn btn-ghost" id="restartBtn" type="button">Restart</button>`;
+      const overlayMode = el.classList.contains('panel-overlay');
+      a.innerHTML = `<button class="btn btn-ghost" id="restartBtn" type="button">Restart</button>${overlayMode ? `<button class="btn btn-ghost" id="goalsBtn" type="button" aria-expanded="${el.classList.contains('goals-open')}">Goals ${run.doneCount}/${run.goals.length} ${el.classList.contains('goals-open') ? '▴' : '▾'}</button>` : ''}`;
       $('restartBtn').onclick = () => { restart(run.mode); };
+      const gb = $('goalsBtn'); if (gb) gb.onclick = () => { el.classList.toggle('goals-open'); renderActions(); gb.blur(); };
     } else a.innerHTML = '';
   }
 
@@ -346,6 +398,12 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     return parts.join(' · ');
   }
   function doneButtonsHtml() {
+    if (isMicro) {
+      const q = dueToday(schedule.state(), {}).items.filter(i => i.id !== lesson.concept);
+      const nextDue = q[0] || null;
+      return `<a class="btn btn-primary" data-act="due-next" href="${nextDue ? (nextDue.kind === 'challenge' ? '#/lesson/' + esc(nextDue.id) : '#/due/' + esc(nextDue.id)) : '#/'}">${nextDue ? 'Next due: ' + esc(nextDue.title) : 'Home'} <kbd>Enter</kbd></a>
+        <button class="btn" data-act="alt" type="button">Again</button>`;
+    }
     const nxt = nextLesson(lesson.id);
     // A challenge retries by seed: Enter replays the very sheet, N deals a fresh one (C2 gap 9b).
     if (isChallenge) {
@@ -366,7 +424,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     const nxt = nextLesson(lesson.id);
     const on = (act, fn) => { const b = scope.querySelector(`[data-act="${act}"]`); if (b) b.onclick = fn; };
     on('continue', () => { location.hash = nxt ? '#/lesson/' + nxt.id : '#/learn'; });
-    on('alt', () => restart(run.mode === 'guided' ? 'solo' : run.mode === 'solo' ? 'timed' : 'timed'));
+    on('alt', () => restart(isMicro ? 'guided' : run.mode === 'guided' ? 'solo' : run.mode === 'solo' ? 'timed' : 'timed'));
     on('retry-same', () => restartChallenge(false));
     on('retry-new', () => restartChallenge(true));
     on('look', closeOverlay);
@@ -397,21 +455,28 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     const secs = run.startedAt == null ? null : run.elapsed;
     const opt = run.optimalKeys;
     overlay.innerHTML = `<div class="rm-card">
-      <div class="rm-title" id="doneTitle">${isChallenge && lastTier ? esc(lastTier[0].toUpperCase() + lastTier.slice(1)) + '!' : doneTitle()}</div>
-      <div class="rm-lesson">${lessonNumber(lesson.id)} · ${esc(lesson.title)} · ${modeLabel()}</div>
+      <div class="rm-title" id="doneTitle">${isChallenge && lastTier ? esc(lastTier[0].toUpperCase() + lastTier.slice(1)) + '!' : isMicro ? 'Done' : doneTitle()}</div>
+      <div class="rm-lesson">${isMicro ? 'Due today · ' + esc(lesson.title) : lessonNumber(lesson.id) + ' · ' + esc(lesson.title) + ' · ' + modeLabel()}</div>
       ${lesson.race ? raceHtml() : `<div class="rm-time">${secs == null ? '—' : fmtSecs(secs)}<span>s</span></div>`}
       ${isChallenge && lesson.pars ? `<div class="tier-stamps">${['pass', 'pro', 'legendary'].map(t => `<span class="tstamp ${lastTier && ['pass', 'pro', 'legendary'].indexOf(t) <= ['pass', 'pro', 'legendary'].indexOf(lastTier) ? 'hit' : ''}">${t} ${lesson.pars[t]}s</span>`).join('')}</div>` : ''}
       <div class="rm-stats"><div>keystrokes<b>${run.session.keyLog.length}${isChallenge && opt ? ' / ' + opt : ''}</b></div>${run.mouseCount ? `<div>mouse<b>×${run.mouseCount}</b></div>` : ''}${run.mode === 'timed' && run.par ? `<div>par<b>${run.par} s</b></div>` : ''}${xpGained ? `<div>earned<b class="rm-xp">+0 XP</b></div>` : ''}</div>
       ${lastTimedOut ? `<div class="rm-note">Over the limit — no tier. The module still counts.</div>` : ''}
       ${lastClean ? `<div class="rm-clean">✓ Clean sheet — no mouse, no help</div>` : assisted() ? `<div class="rm-note">Assisted — steps were shown on request.</div>` : ''}
+      ${next && isChallenge && at ? `<div class="rm-page">▣ ${esc(pageDelivered(at))}</div>` : ''}
       ${closingHtml()}
-      ${nextJobHtml()}
+      ${isMicro ? '' : nextJobHtml()}
       ${firstEver && store.saveState() === 'device' ? `<div class="rm-save"><b>Your first lesson is done.</b> Progress is saved on this device. <a href="#/account">Create a free account</a> to keep it across devices — everything you have done carries over.</div>` : ''}
+      ${installOffer ? `<div class="rm-save rm-install"><b>Install hotkey.gg as an app.</b> One click; it opens in its own window and stays in your dock. <span class="rm-install-acts"><button class="btn btn-primary" data-act="install" type="button">Install</button><button class="btn btn-ghost" data-act="install-no" type="button">Not now</button></span></div>` : ''}
       <div class="rm-opts">${doneButtonsHtml()}<button class="btn btn-ghost" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button>${(run.mode === 'timed' || isChallenge) && lesson.solution ? '<button class="btn btn-ghost" data-act="route" type="button">Watch the reference route</button>' : ''}</div>
       <div class="rm-more">${esc(saveState)}</div>
     </div>`;
     wireDoneButtons(overlay);
     countUpXp(overlay);
+    if (installOffer) {
+      track('install_prompt', { outcome: 'shown' }); prefs.set({ installPromptAt: Date.now() });
+      overlay.querySelector('[data-act="install"]').onclick = async () => { const r = await promptInstall(); track('install_prompt', { outcome: r }); const c = overlay.querySelector('.rm-install'); if (c) c.remove(); };
+      overlay.querySelector('[data-act="install-no"]').onclick = () => { track('install_prompt', { outcome: 'dismissed' }); const c = overlay.querySelector('.rm-install'); if (c) c.remove(); };
+    }
     overlay.hidden = false;
     const primary = overlay.querySelector(isChallenge ? '[data-act="retry-same"]' : '[data-act="continue"]'); if (primary) primary.focus();
   }
@@ -439,12 +504,25 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     overlay.hidden = false;
     const primary = overlay.querySelector('[data-act="continue"]'); if (primary) primary.focus();
   }
+  let installOffer = false;
   function finish() {
     phase = 'done';
+    stopStuck();
     track('lesson_complete', { lesson_id: lesson.id, mode: run.mode });
+    if (isMicro) {
+      // a micro-drill: one memory note, nothing recorded, no XP (the queue is an offer, not a ledger)
+      lastClean = !assisted() && !run.mouseCount; lastTier = null; xpGained = 0; saveState = '';
+      schedule.note([lesson.concept], scheduleGrade({ ok: true, secs: run.elapsed, hint: assisted() }));
+      if (timerH) { clearInterval(timerH); timerH = null; }
+      effects.finish($('stage'));
+      tab = 'lesson'; renderPanel(); renderOverlay();
+      return;
+    }
     const ctxBefore = gameCtx();
     const before = store.all();
     firstEver = !Object.values(before).some(p => p.completed);
+    const completedCount = Object.values(before).filter(p => p.completed).length + (before[lesson.id] && before[lesson.id].completed ? 0 : 1);
+    installOffer = next && shouldOfferInstall(prefs.get(), completedCount, installAvailable());
     lastClean = !assisted() && !run.mouseCount;
     // A clean challenge earns the tier its time and its keystrokes reach (pro ≤ 1.5× the reference
     // route, legendary ≤ 1.2×); help, mouse or a run past the limit records the pass with none.
@@ -490,7 +568,9 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     if (timerH) { clearInterval(timerH); timerH = null; }
     effects.finish($('stage'));
     if (lastClean && effects.cleanSheet) effects.cleanSheet();
+    if (next && isChallenge && effects.packPage) effects.packPage();
     celebrate(effects, ctxBefore);
+    const lv = wrap.querySelector('#wsLevel'); if (lv) { const c2 = gameCtx(); lv.innerHTML = `L${c2.level} <i>${c2.levelInfo.into}/${c2.levelInfo.need} XP</i>`; }
     tab = 'lesson';
     renderPanel();
     renderOverlay();
@@ -520,6 +600,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     stopDemo();
     phase = 'play'; revealed = false; nudgeAt = -1; prevDone = 0; overlay.hidden = true; tab = 'lesson'; lastTimedOut = false;
     run.opts.soft = firstAttempt();   // the second attempt onward runs against a hard limit
+    cueGoal = -1; hintAt = -1; hinted.clear(); notedDone = 0; stopStuck();
     run.reset(timedOnly ? 'timed' : newMode);
     mountViews();
     if (!timerH) timerH = setInterval(renderTimer, 200);
@@ -583,6 +664,64 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     if (nudgeAt !== run.doneCount) { nudgeAt = run.doneCount; renderPanel(); }
   }
 
+  /* ---------------- the experience pass: cues, the stuck hint, memory notes, the story beat ---------------- */
+  /** A new current goal: pulse its target once, remember its Ribbon route, arm the stuck hint. Every change: re-glow the route's next control. */
+  function cueCurrent() {
+    if (!cuesOn || phase !== 'play') return;
+    const cur = run.current;
+    if (run.doneCount !== cueGoal) {
+      cueGoal = run.doneCount; hintAt = -1;
+      clearPulse(el);
+      cueTokens = cur ? altPath(cur.keys) : [];
+      if (cur && !demo && !ghost) {
+        const sh = run.session.sheets && run.session.sheets[run.session.sheetIndex];
+        pulseTarget($('stage'), inferTarget(cur), sh ? sh.name : null, $('sheetTabs'));
+      }
+      armStuck();
+    }
+    glowRibbon($('ribbon'), cueTokens, run.session.path, run.session.mode, document.getElementById('ribbonDrop'));
+  }
+  /** ~8 s on one goal: the keys appear as a hint; ~20 s: the Help tab pulses. Both stop when the goal lands. */
+  function armStuck() {
+    stopStuck();
+    if (!next || run.mode === 'timed' || run.mode === 'challenge' || timedOnly) return;
+    const idx = run.doneCount;
+    stuckH = setTimeout(() => { if (phase === 'play' && run.doneCount === idx && !demo && !ghost) { hintAt = idx; hinted.add(idx); renderTaskCard(); } }, 8000);
+    helpH = setTimeout(() => { if (phase === 'play' && run.doneCount === idx) { const t = $('tabHelp'); if (t) t.classList.add('pulse'); } }, 20000);
+  }
+  function stopStuck() { if (stuckH) clearTimeout(stuckH); if (helpH) clearTimeout(helpH); stuckH = helpH = null; const t = $('tabHelp'); if (t) t.classList.remove('pulse'); }
+  /** Every goal that just landed feeds the queue: its shortcuts, graded by how long it took and whether a hint was shown. */
+  function noteGoals() {
+    if (isMicro) return;   // the micro-drill notes itself on finish
+    const splits = run.splits();
+    while (notedDone < run.doneCount) {
+      const i = notedDone++;
+      const g = run.goals[i]; if (!g || !Array.isArray(g.requires) || !g.requires.length) continue;
+      schedule.note(g.requires, scheduleGrade({ ok: true, secs: splits[i], hint: hinted.has(i) }));
+    }
+  }
+  /** The module's story beat, once, before the first lesson of the module (decision 4). */
+  function showBeat() {
+    const b = next ? beatFor(lesson, at, prefs.get().beatsSeen) : null;
+    if (!b) return;
+    beat = document.createElement('div');
+    beat.className = 'ws-beat'; beat.setAttribute('role', 'dialog'); beat.setAttribute('aria-modal', 'true'); beat.setAttribute('aria-labelledby', 'beatTitle');
+    beat.innerHTML = `<div class="ws-beat-card"><div class="fr2-card-eyebrow">${esc(b.eyebrow)}</div><h1 id="beatTitle">${esc(b.title)}</h1><p>${esc(b.body)}</p>
+      <div class="ws-beat-acts"><button class="btn btn-primary" type="button" id="beatGo">Start the job <kbd>Enter</kbd></button></div></div>`;
+    root.appendChild(beat);
+    beat.querySelector('#beatGo').onclick = closeBeat;
+    beat.querySelector('#beatGo').focus();
+    stopStuck();
+  }
+  function closeBeat() {
+    if (!beat) return;
+    const id = beat.dataset.id || (lesson.module || '');
+    beat.remove(); beat = null;
+    prefs.set({ beatsSeen: [...prefs.get().beatsSeen, lesson.module].filter(Boolean) });
+    focusWorkspace(); armStuck();
+    void id;
+  }
+
   /* ---------------- tabs ---------------- */
   const TABS = ['lesson', 'help', 'used'];
   function selectTab(name, focus) {
@@ -610,7 +749,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   divider.addEventListener('pointerdown', e => {
     drag = { x: e.clientX, w: panel.w }; divider.classList.add('dragging'); divider.setPointerCapture(e.pointerId); e.preventDefault();
   });
-  divider.addEventListener('pointermove', e => { if (drag) setPanelW(drag.w + (drag.x - e.clientX)); });
+  divider.addEventListener('pointermove', e => { if (drag) setPanelW(drag.w + (drag.x - e.clientX) * (prefs.get().panelSide === 'left' ? -1 : 1)); });
   const endDrag = () => { if (!drag) return; drag = null; divider.classList.remove('dragging'); savePanel(panel); };
   divider.addEventListener('pointerup', endDrag); divider.addEventListener('pointercancel', endDrag);
   divider.addEventListener('keydown', e => {
@@ -629,12 +768,13 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) return;
     if (t && (t.closest('.panel-tabs') || t === divider)) return;   // handled by their own listeners
     if (e.key === 'F1') { e.preventDefault(); selectTab(tab === 'help' ? 'lesson' : 'help'); return; }
+    if (beat) { if (e.key === 'Enter' || e.key === 'Escape' || e.key === ' ') { e.preventDefault(); closeBeat(); } else if (e.key.length > 1) e.preventDefault(); return; }
     if (!overlay.hidden) {
       if (e.key === 'Escape') { e.preventDefault(); closeOverlay(); }
       else if (isChallenge && (e.key === 'n' || e.key === 'N')) { e.preventDefault(); restartChallenge(true); }
       else if (e.key === 'Enter' && !(tag === 'BUTTON' || tag === 'A')) {
         e.preventDefault();
-        const b = overlay.querySelector(isChallenge ? '[data-act="retry-same"], [data-act="continue"]' : '[data-act="continue"]');
+        const b = overlay.querySelector(isChallenge ? '[data-act="retry-same"], [data-act="continue"]' : isMicro ? '[data-act="due-next"]' : '[data-act="continue"]');
         if (b) b.click();
       }
       return;
@@ -655,7 +795,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       return;
     }
     if (phase === 'done') {
-      if (e.key === 'Enter') { e.preventDefault(); const c = el.querySelector(isChallenge ? '[data-act="retry-same"], [data-act="continue"]' : '[data-act="continue"]'); if (c) c.click(); }
+      if (e.key === 'Enter') { e.preventDefault(); const c = el.querySelector(isChallenge ? '[data-act="retry-same"], [data-act="continue"]' : isMicro ? '[data-act="due-next"]' : '[data-act="continue"]'); if (c) c.click(); }
       else if (isChallenge && (e.key === 'n' || e.key === 'N')) { e.preventDefault(); restartChallenge(true); }
       return;
     }
@@ -670,16 +810,20 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   renderPanel();
   focusWorkspace();
   maybeStartDemo();
+  cueCurrent();
+  showBeat();
   return {
     destroy() {
       if (ghost) { clearInterval(ghost.timer); ghost = null; run.endGhost(); }
-      stopDemo();
+      stopDemo(); stopStuck();
+      if (beat) { beat.remove(); beat = null; }
+      document.removeEventListener('fullscreenchange', onFs);
       window.removeEventListener('focus', paintFocusHint); window.removeEventListener('blur', paintFocusHint);
       document.removeEventListener('keydown', onKey); document.removeEventListener('keyup', onKeyUp);
       if (timerH) clearInterval(timerH);
       if (sheetView) sheetView.destroy(); if (ribbonView) ribbonView.destroy(); if (sheetTabs) sheetTabs.destroy();
       keycaps.destroy(); if (effects.destroy) effects.destroy();
-      overlay.remove(); el.remove();
+      overlay.remove(); el.remove(); wrap.remove();
     },
   };
 }
