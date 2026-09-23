@@ -27,6 +27,8 @@ export function cleanAttempt(a) {
   out.helped = a.helped === true;
   out.mouse = Number.isInteger(a.mouse) && a.mouse >= 0 ? a.mouse : 0;
   out.tier = TIERS.includes(a.tier) ? a.tier : 'none';
+  out.first = a.first === true;         // the first attempt at this ref (a soft-timed challenge run, C2 addendum)
+  out.timedOut = a.timedOut === true;   // finished past the time limit: completes the module, earns no tier
   out.splits = Array.isArray(a.splits) ? a.splits.filter(finite).slice(0, 32) : [];
   out.trace = out.clean && Array.isArray(a.trace)
     ? a.trace.filter(e => isPlainObject(e) && typeof e.k === 'string' && finite(e.t)).slice(0, MAX_TRACE).map(e => ({ k: e.k, t: e.t, cell: typeof e.cell === 'string' ? e.cell : null }))
@@ -92,6 +94,8 @@ export const records = {
   },
   /** The ghost trace of the ref's PB run: [{k, t, cell}]; empty when there is none. */
   trace(ref) { return load().traces[ref] || []; },
+  /** No attempt at this ref yet: the next run is the first (soft-timed for a challenge). */
+  first(ref) { return !load().attempts.some(a => a.ref === ref); },
   clear() { try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } },
 };
 

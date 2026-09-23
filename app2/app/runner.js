@@ -108,6 +108,10 @@ export class LessonRun {
     return ((this.finishedAt == null ? now : this.finishedAt) - this.startedAt) / 1000;
   }
   get par() { return typeof this.lesson.par === 'number' ? this.lesson.par : null; }
+  /** The reference route's key count: the authored `optimalKeys`, else the solution's presses (the efficiency axis, C2 addendum). */
+  get optimalKeys() { return Number.isInteger(this.lesson.optimalKeys) && this.lesson.optimalKeys > 0 ? this.lesson.optimalKeys : keyCount(this.lesson.solution); }
+  /** A timed run past its limit (the clock started, the limit is set, the time is up). */
+  get timedOut() { return typeof this.lesson.timeLimit === 'number' && this.startedAt != null && this.elapsed > this.lesson.timeLimit; }
 
   /** Feed one key event; returns true when the session consumed it. */
   key(ev) {
@@ -133,13 +137,18 @@ export class LessonRun {
   pendingDemo() { const g = this.current; return g && g.demo && !this.session.demoDone.has(g.id) ? g : null; }
   /** The keys of a demo goal, as steps the view can play one at a time: [{ spec } | { text }]. */
   demoSteps(goal) { return parseKeyScript(goal.demo.script); }
-  /** Feed one demo step (the view plays them on a cadence). */
+  /**
+   * Feed one demo step (the view plays them on a cadence). A closer's demo (goal.closer) plays as
+   * a ghost: the first step freezes the run, so the perturbation it types goes back afterwards.
+   */
   demoStep(step) {
+    const g = this.current;
+    if (g && g.closer && !this.ghostSnap) this.beginGhost();
     if (step.type === 'text') { for (const ch of step.text) this.session.key({ key: ch, shiftKey: /[A-Z~!@#$%^&*()_+{}|:"<>?]/.test(ch) }); }
     else this.session.key(parseKeySpec(step.spec));
   }
-  /** The demo has finished: the goal can land. */
-  finishDemo(goal) { this.session.demoDone.add(goal.id); this.evaluate(); this.emit('demo'); }
+  /** The demo has finished: the goal can land. A closer's ghost is put back first, so the after state stays exact. */
+  finishDemo(goal) { if (goal.closer && this.ghostSnap) this.endGhost(); this.session.demoDone.add(goal.id); this.evaluate(); this.emit('demo'); }
   /** Play the current goal's demo at once (headless replay, or the learner skipping ahead). */
   playPendingDemo() {
     let g;
@@ -198,9 +207,12 @@ export class LessonRun {
     if (this.ghosting) return false;   // a ghost's keys never land a goal
     let moved = false;
     while (this.doneCount < this.goals.length && safeCheck(this.goals[this.doneCount], this.sheet, this.session)) {
-      this.landedAt[this.doneCount] = this.opts.now ? this.opts.now() : Date.now();
+      const now = this.opts.now ? this.opts.now() : Date.now();
+      this.landedAt[this.doneCount] = now;
       this.doneCount++; moved = true;
       this.session.goalMark = this.session.keyLog.length;   // the next goal's key window starts here
+      // the funnel (C2 addendum): a goal landed, and how long since the first key — fire-and-forget
+      if (typeof this.opts.onGoal === 'function') { try { this.opts.onGoal(this.doneCount - 1, this.startedAt == null ? 0 : Math.max(0, (now - this.startedAt) / 1000)); } catch (e) { /* a listener's bug never blocks the run */ } }
     }
     if (this.doneCount === this.goals.length && this.endStates().every(e => e.ok) && this.graderStates().every(g => g.ok)) {
       this.finished = true;
@@ -254,6 +266,13 @@ export function hintToScript(keys) {
 }
 
 function structuredCloneCells(cells) { const out = {}; for (const k in cells) out[k] = { ...cells[k] }; return out; }
+
+/** How many key presses a keystroke script is: every press counts one, a quoted run counts its characters. */
+export function keyCount(script) {
+  let n = 0;
+  try { for (const step of parseKeyScript(script || '')) n += step.type === 'text' ? step.text.length : 1; } catch (e) { return 0; }
+  return n;
+}
 
 const GLYPH_KEYS = new Set(['↑', '↓', '←', '→', '↵', '⌫']);
 /**

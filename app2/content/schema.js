@@ -154,12 +154,23 @@ export const CONCEPTS = {
   'fill-series': 'Fill Series (Alt, H, F, I, S) continues the step your first two cells set',
   'flash-fill': 'Flash Fill (Ctrl+E in Excel) fills a column by the pattern of your examples',
   'qat-run': 'Alt then a number runs that Quick Access Toolbar command from anywhere',
+  // C2 (Project Volt): the module lessons' additions
+  'enter-tab-direction': 'Tab commits and moves right; Enter after a Tab run returns to the column you started in, one row down',
+  'replace-all': 'Replace All (Ctrl+H, then Alt+A) swaps every match on the sheet in one step and reports how many cells changed',
+  'group-ungroup': 'Alt+Shift+→ groups the selected whole rows or columns into an outline that folds and unfolds; Alt+Shift+← ungroups',
+  'show-formulas': 'Ctrl+` shows every formula\'s text in place of its value; press it again to return',
+  'print-titles': 'Page Setup › Sheet: the rows to repeat at the top of every printed page, and the footer with its file, date and page fields',
+  'pointing': 'while a formula is open, an arrow key points at a cell and writes its reference for you',
+  'counta': 'COUNT counts numbers; COUNTA counts every non-empty cell, text included',
+  'check-cell': 'a check cell is a live difference between two things that must agree, so it reads 0 when they tie',
+  'audit-pass': 'the audit pass: Go To Special, show formulas and tracing find what a reviewer would',
 };
 
 /**
  * How many goals a lesson of this kind may carry. Module lessons (C2, framework v2) run denser:
  * one job of 5-8 goals; challenges 4-7; projects 10-15. The legacy bounds hold for the old
- * lessons until the rewrite deletes them.
+ * lessons until the rewrite deletes them. A lesson's closer (goal.closer, the "does it tie"
+ * beat the platform plays at the end) is not counted: countedGoals() leaves it out.
  */
 export function goalBounds(kind, moduleLesson = false) {
   if (moduleLesson) {
@@ -167,6 +178,9 @@ export function goalBounds(kind, moduleLesson = false) {
   }
   return kind && kind !== 'lesson' ? { min: 3, max: 10 } : { min: 3, max: 6 };
 }
+
+/** The goals that count towards the band: every goal but the closer. */
+export const countedGoals = goals => (Array.isArray(goals) ? goals : []).filter(g => !(g && g.closer));
 
 /** Sentences in a text: terminators followed by a space or the end. Decimals (5.0%, 1,200.00) and Excel error codes (#NAME?, #DIV/0!) are not terminators. */
 export function sentenceCount(text) {
@@ -251,11 +265,23 @@ export function validateLesson(l) {
   for (const g of goals) {
     need(typeof g.id === 'string' && g.id, 'goal id missing'); need(!ids.has(g.id), `duplicate goal id ${g.id}`); ids.add(g.id);
     need(typeof g.text === 'string' && g.text.trim(), `goal ${g.id}: text missing`);
-    if (typeof g.text === 'string') { need(sentenceCount(g.text) === 1 && /[.!?]$/.test(g.text.trim()), `goal ${g.id}: the action must be one sentence ending in a full stop`); need(wordCount(g.text) <= 26, `goal ${g.id}: the action is over 26 words`); }
+    if (typeof g.text === 'string') {
+      // one action sentence; the closer may open with its question ("Does it tie? Watch …")
+      const n = sentenceCount(g.text);
+      need((g.closer ? n >= 1 && n <= 2 : n === 1) && /[.!?]$/.test(g.text.trim()), `goal ${g.id}: the action must be one sentence ending in a full stop`);
+      need(wordCount(g.text) <= 26, `goal ${g.id}: the action is over 26 words`);
+    }
     need(typeof g.check === 'function', `goal ${g.id}: check must be a function`);
     need(Array.isArray(g.requires) || kind === 'challenge', `goal ${g.id}: requires must list concept ids`);
     for (const c of Array.isArray(g.requires) ? g.requires : []) need(CONCEPTS[c], `goal ${g.id}: unknown concept "${c}"`);
     if (g.convention !== undefined) need(CONVENTIONS[g.convention], `goal ${g.id}: unknown convention "${g.convention}"`);
+    if (g.closer !== undefined) {
+      // The "does it tie" closer (C2 addendum): the last goal, played by the platform as a ghost —
+      // it perturbs an input, the learner watches the sheet answer, the sheet goes back as it was.
+      need(g.closer === true && moduleLesson && kind === 'lesson', `goal ${g.id}: closer is only a module lesson's last goal`);
+      need(goals[goals.length - 1] === g, `goal ${g.id}: the closer must be the last goal`);
+      need(isObject(g.demo), `goal ${g.id}: a closer is a demo the platform plays (demo: { script })`);
+    }
     if (g.demo !== undefined) {
       need(isObject(g.demo) && typeof g.demo.script === 'string' && g.demo.script.trim(), `goal ${g.id}: demo needs a script`);
       need(g.demo === undefined || g.keys === undefined, `goal ${g.id}: a demo goal has no keys (the platform presses them)`);

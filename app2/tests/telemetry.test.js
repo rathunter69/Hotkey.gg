@@ -32,7 +32,7 @@ test('the client event names satisfy the SQL check in 0003_events.sql', () => {
   const m = sql.match(/name text not null check \(name ~ '([^']+)'\)/);
   assert.ok(m, 'the events.name check regex is in the migration');
   const sqlRe = new RegExp(m[1]);
-  assert.deepEqual(EVENTS, ['landing_view', 'lesson_start', 'lesson_complete', 'signup', 'sign_in', 'carry_over']);
+  assert.deepEqual(EVENTS, ['landing_view', 'lesson_start', 'lesson_complete', 'lesson_timeup', 'signup', 'sign_in', 'carry_over', 'drill_complete', 'goal_complete', 'challenge_result']);
   for (const name of EVENTS) {
     assert.match(name, sqlRe, `${name} passes the SQL check`);
     assert.match(name, EVENT_NAME_RE, `${name} passes the client check`);

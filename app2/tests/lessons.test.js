@@ -6,7 +6,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { CHAPTERS, LESSONS, LESSONS_BY_ID, sectionsOf, sectionNames } from '../content/index.js';
-import { validateLesson, availableConcepts, sentenceCount, goalBounds } from '../content/schema.js';
+import { validateLesson, availableConcepts, sentenceCount, goalBounds, countedGoals } from '../content/schema.js';
 import { LessonRun, shortcutsUsed } from '../app/runner.js';
 
 const byId = id => { const l = LESSONS_BY_ID[id]; assert.ok(l, `lesson ${id} is in the catalogue`); return l; };
@@ -62,7 +62,8 @@ test('the adaptive lesson format is enforced', () => {
   for (const l of LESSONS) {
     assert.ok(!/\b(awesome|super|easy peasy|magic|wow|gonna|kinda)\b/i.test(l.read + l.goals.map(g => (g.teach || '') + g.text).join(' ')), `${l.id}: tone`);
     const b = goalBounds(l.kind, typeof l.module === 'string');
-    assert.ok(l.goals.length >= b.min && l.goals.length <= b.max, `${l.id}: ${b.min}-${b.max} goals for kind ${l.kind || 'lesson'}`);
+    const n = countedGoals(l.goals).length;
+    assert.ok(n >= b.min && n <= b.max, `${l.id}: ${b.min}-${b.max} goals for kind ${l.kind || 'lesson'} (has ${n} plus ${l.goals.length - n} closer)`);
   }
 });
 

@@ -194,7 +194,7 @@ const NATIVE = [
     R('ctrl-r', 'Ctrl+R', 'Fill right', 'Fill right from the cell to the left.'),
     R('f4-repeat', 'F4', 'Repeat the last action', 'Repeat the last action (when not editing).', { macVaries: true }),
     R('f9', 'F9', 'Recalculate', 'Recalculate all open workbooks (Calculate Now, when calculation is set to Manual).', { concept: 'calculate-now' }),
-    R('ctrl-backtick', 'Ctrl+`', 'Show formulas', 'Toggle between showing formulas and showing values.'),
+    R('ctrl-backtick', 'Ctrl+`', 'Show formulas', 'Toggle between showing formulas and showing values.', { concept: 'show-formulas' }),
   ]],
   ['Copy and paste', [
     R('ctrl-c', 'Ctrl+C', 'Copy', 'Copy the selected cells.'),
@@ -213,8 +213,8 @@ const NATIVE = [
     R('unhide-all-rows', 'Ctrl+A Alt H O U O', 'Unhide every row', 'Unhide every row: select all first, then Format, Hide & Unhide, Unhide Rows.'),
   ]],
   ['Data and outline', [
-    R('group', 'Shift+Alt+→', 'Group', 'Group the selected rows.'),
-    R('ungroup', 'Shift+Alt+←', 'Ungroup', 'Ungroup the selected rows.'),
+    R('group', 'Shift+Alt+→', 'Group', 'Group the selected rows or columns into an outline.', { concept: 'group-ungroup' }),
+    R('ungroup', 'Shift+Alt+←', 'Ungroup', 'Ungroup the selected rows or columns.', { concept: 'group-ungroup' }),
     R('alt-a-h', 'Alt A H', 'Hide detail', 'Hide (fold) the group detail.'),
     R('alt-a-j', 'Alt A J', 'Show detail', 'Show the group detail.'),
     R('ctrl-shift-l', 'Ctrl+Shift+L', 'AutoFilter', 'Toggle AutoFilter on the header row.'),

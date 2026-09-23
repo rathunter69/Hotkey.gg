@@ -120,3 +120,93 @@ test('records, XP and progress carry the challenge kind', async () => {
     assert.equal(progress.get('challenge-inherited-file').challenge, true);
   } finally { delete globalThis.localStorage; }
 });
+
+/* ---------------- the C2 addendum: efficiency tiers, soft-timed first attempts, the closer ---------------- */
+import { tierFor, KEY_RATIO } from '../app/pars.js';
+import { keyCount } from '../app/runner.js';
+
+test('tierFor: pass is time only; pro and legendary also need the keys within their ratio of the reference route; a timed-out run earns none', () => {
+  const pars = { pass: 90, pro: 54, legendary: 36 };
+  assert.equal(tierFor(30, pars), 'legendary', 'no key data: time alone, as drills do');
+  assert.equal(tierFor(30, pars, { keys: 100, optimalKeys: 100 }), 'legendary');
+  assert.equal(tierFor(30, pars, { keys: 121, optimalKeys: 100 }), 'pro', 'legendary time, too many keys: pro');
+  assert.equal(tierFor(30, pars, { keys: 151, optimalKeys: 100 }), 'pass', 'over 1.5×: pass on time alone');
+  assert.equal(tierFor(50, pars, { keys: 150, optimalKeys: 100 }), 'pro');
+  assert.equal(tierFor(50, pars, { keys: 151, optimalKeys: 100 }), 'pass');
+  assert.equal(tierFor(89, pars, { keys: 9999, optimalKeys: 100 }), 'pass', 'pass never looks at keys');
+  assert.equal(tierFor(30, pars, { keys: 30, optimalKeys: 100, timedOut: true }), 'none', 'over the limit: no tier');
+  assert.deepEqual(KEY_RATIO, { pro: 1.5, legendary: 1.2 });
+  assert.equal(keyCount('Ctrl+Home "USD" Enter Alt H F C Right Enter'), 11, 'a quoted run counts its characters');
+  assert.equal(keyCount(''), 0);
+});
+
+test('records: first and timedOut ride the attempt; records.first() reads the history', async () => {
+  const att = cleanAttempt({ id: 'c-2', kind: 'challenge', ref: 'x', secs: 200, keys: 80, clean: true, tier: 'none', first: true, timedOut: true, at: 1 });
+  assert.equal(att.first, true); assert.equal(att.timedOut, true);
+  assert.equal(cleanAttempt({ id: 'c-3', kind: 'challenge', ref: 'x', at: 1 }).first, false, 'absent means false');
+  const mem = {}; globalThis.localStorage = { getItem: k => mem[k] ?? null, setItem: (k, v) => { mem[k] = String(v); }, removeItem: k => { delete mem[k]; } };
+  try {
+    const { records } = await import('../app/records.js?first');
+    records.clear();
+    assert.equal(records.first('challenge-complete-the-feed'), true);
+    records.addAttempt({ id: 'a', kind: 'challenge', ref: 'challenge-complete-the-feed', secs: 100, keys: 50, clean: false, at: 1, first: true });
+    assert.equal(records.first('challenge-complete-the-feed'), false, 'one attempt, however it went, and the next is not the first');
+    assert.equal(records.attempts({ ref: 'challenge-complete-the-feed' })[0].first, true);
+  } finally { delete globalThis.localStorage; }
+});
+
+test('the runner: timedOut reads the limit against the clock; optimalKeys derives from the solution; onGoal fires per landed goal with the seconds', () => {
+  let t = 0;
+  const landed = [];
+  const run = new LessonRun(CH, { seedNo: 3, now: () => t, onGoal: (i, secs) => landed.push([i, secs]) });
+  assert.equal(run.optimalKeys, keyCount(CH.solution));
+  assert.equal(run.timedOut, false, 'no clock yet');
+  t = 1000; run.run('"Weekly check" Enter');   // the first key starts the clock at t=1000
+  assert.deepEqual(landed, [[0, 0]], 'goal 0 landed on the clock-starting key');
+  t = 1000 + 181 * 1000;
+  assert.equal(run.timedOut, true, 'past the 180 s limit');
+  run.run('Ctrl+G "B1" Enter "=Raw!C2" Enter');
+  assert.equal(landed.length, 2); assert.equal(landed[1][0], 1); assert.equal(Math.round(landed[1][1]), 181);
+  assert.equal(run.doneCount, 2, 'a soft-timed run keeps grading past the limit; the view decides whether to stop it');
+});
+
+test('a closer goal plays as a ghost: the perturbation shows, then the sheet is exactly as it stood, and the goal lands', () => {
+  const lesson = {
+    id: 'closer-fixture', chapter: 'foundations', section: 'Open and set up', title: 'x', kind: 'lesson', module: 'open-and-set-up', workbook: 'voltline-weekly',
+    state: { before: 'S1d', after: 'S1d' }, difficulty: 'easy', tags: [], access: 'free', minutes: 5, headline: 'x', conventions: ['B1'], teaches: ['type-to-enter'],
+    brief: 'One goal, then the tie. Press `Enter`.',
+    goals: [
+      { id: 'a', teach: 'Type.', text: 'Type x into Report!A1.', keys: '"x" ↵', requires: ['type-to-enter'], check: (s, ses) => ses.sheets[0].sheet.value('A1') === 'x' },
+      { id: 'b', text: 'Move down.', keys: '↓', requires: [], check: (s, ses) => ses.sheets[0].sheet.selectionText() === 'A3' },
+      { id: 'c', text: 'Move down again.', keys: '↓', requires: [], check: (s, ses) => ses.sheets[0].sheet.selectionText() === 'A4' },
+      { id: 'd', text: 'Move down once more.', keys: '↓', requires: [], check: (s, ses) => ses.sheets[0].sheet.selectionText() === 'A5' },
+      { id: 'e', text: 'And once more.', keys: '↓', requires: [], check: (s, ses) => ses.sheets[0].sheet.selectionText() === 'A6' },
+      { id: 'tie', closer: true, demo: { script: 'Ctrl+PgDn Ctrl+PgDn Down Down Down Right "0.99" Enter Ctrl+Down Ctrl+Down Escape', cadence: 60 }, text: 'Does it tie? Watch the wholesale price change and the energy bill answer.', requires: [], check: (s, ses) => ses.demoDone.has('tie') },
+    ],
+    solution: '"x" Enter Down Down Down Down',
+  };
+  assert.deepEqual(validateLesson(lesson), []);
+  assert.ok(validateLesson({ ...lesson, goals: [lesson.goals[5], ...lesson.goals.slice(0, 5)] }).some(e => /closer must be the last goal/.test(e)));
+  assert.ok(validateLesson({ ...lesson, goals: lesson.goals.map((g, i) => (i === 5 ? { ...g, demo: undefined, keys: 'x' } : g)) }).some(e => /a closer is a demo/.test(e)));
+  const run = new LessonRun(lesson, { now: () => 0 });
+  for (const ch of 'x') run.key({ key: ch });   // key by key: run() would play the pending demo itself, as the headless replay should
+  for (const spec of ['Enter', 'Down', 'Down', 'Down', 'Down']) run.pressSpec(spec);
+  assert.equal(run.doneCount, 5, 'five goals landed; the closer is pending as a demo');
+  assert.equal(run.pendingDemo().id, 'tie');
+  const before = JSON.stringify(run.session.sheets.map(e => e.sheet.snapshot()));
+  const steps = run.demoSteps(run.pendingDemo());
+  for (const st of steps.slice(0, 9)) run.demoStep(st);
+  assert.equal(run.session.sheets[2].sheet.value('B4'), 0.99, 'mid-demo the input has changed');
+  assert.ok(Math.abs(run.session.sheets[2].sheet.value('B14') - 84000 * 0.99) < 1e-6, 'and the dependent moved');
+  assert.equal(run.doneCount, 5, 'nothing a ghost presses lands a goal');
+  for (const st of steps.slice(9)) run.demoStep(st);
+  run.finishDemo(run.goals[5]);
+  assert.equal(JSON.stringify(run.session.sheets.map(e => e.sheet.snapshot())), before, 'the sheet is exactly as it stood');
+  assert.equal(run.session.sheetIndex, 0);
+  assert.equal(run.doneCount, 6); assert.ok(run.finished, 'the closer landed and the lesson is complete');
+  // and the headless replay plays the closer itself, leaving the after state exact (the chain test relies on it)
+  const again = new LessonRun(lesson, { now: () => 0 });
+  again.run(lesson.solution);
+  assert.ok(again.finished);
+  assert.equal(again.session.sheets[2].sheet.value('B4'), 0.13, 'the perturbation went back');
+});

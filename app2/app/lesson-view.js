@@ -7,6 +7,7 @@ import { LessonRun, shortcutsUsed } from './runner.js';
 import { parseKeyScript } from '../engine/keyboard.js';
 import { store } from './store.js';
 import { attemptId, dayOf, traceOf } from './records.js';
+import { tierFor } from './pars.js';
 import { gameCtx, celebrate } from './stats.js';
 import { track } from './telemetry.js';
 import { nextLesson, chapterOf, lessonNumber, moduleOf } from '../content/index.js';
@@ -105,14 +106,20 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   let saveState = '';
   let lastClean = false;     // the finished run: no mouse, no help (the clean-sheet mark, §6)
   let lastTier = null;       // a clean challenge's tier from the pars, for the overlay stamp
+  let lastTimedOut = false;  // a soft-timed first challenge run that finished past the limit: completes, no tier
   let xpGained = 0;          // what the run earned, for the overlay's count-up
 
+  // The first attempt at a challenge is soft-timed (C2 addendum): the clock runs and decides the
+  // tier, but time-up does not end the run. From the second attempt the limit is hard.
+  const firstAttempt = () => isChallenge && store.attempts({ ref: lesson.id }).length === 0;
   const run = new LessonRun(lesson, {
     mode,
+    soft: firstAttempt(),
     onKey: k => keycaps.flash(k),
     onToast: showToast,
     onRefuse: () => { effects.refuse(); if (sheetView && sheetView.shake) sheetView.shake(); },
     onMouse: what => onMouse(what),
+    onGoal: (i, secs) => track('goal_complete', { lesson_id: lesson.id, goal: i, secs: Math.round(secs * 10) / 10 }),
   });
   store.touch(lesson.id);
   track('lesson_start', { lesson_id: lesson.id, mode: run.mode });
@@ -299,6 +306,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     // An assessment, test-out or challenge counts down from its time limit; the clock starts on the first action.
     if (lesson.timeLimit) {
       const left = Math.max(0, lesson.timeLimit - (run.startedAt == null ? 0 : run.elapsed));
+      if (run.opts.soft && left <= 0 && run.startedAt != null) { t.textContent = 'over the limit'; return; }   // a first attempt runs on; the tier is gone, the module is not
       t.textContent = left.toFixed(1) + ' s left';
       if (phase === 'play' && run.startedAt != null && left <= 0 && !run.finished) timeUp();
       return;
@@ -387,12 +395,14 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     // Bare numbers, the clean-sheet mark, the XP count-up and the next job — no comparison
     // sentences, no before/after view (C2 gap 9b).
     const secs = run.startedAt == null ? null : run.elapsed;
+    const opt = run.optimalKeys;
     overlay.innerHTML = `<div class="rm-card">
       <div class="rm-title" id="doneTitle">${isChallenge && lastTier ? esc(lastTier[0].toUpperCase() + lastTier.slice(1)) + '!' : doneTitle()}</div>
       <div class="rm-lesson">${lessonNumber(lesson.id)} · ${esc(lesson.title)} · ${modeLabel()}</div>
       ${lesson.race ? raceHtml() : `<div class="rm-time">${secs == null ? '—' : fmtSecs(secs)}<span>s</span></div>`}
-      ${isChallenge && lesson.pars ? `<div class="tier-stamps">${['pass', 'pro', 'legendary'].map(t => `<span class="tstamp ${lastClean && secs != null && secs <= lesson.pars[t] ? 'hit' : ''}">${t} ${lesson.pars[t]}s</span>`).join('')}</div>` : ''}
-      <div class="rm-stats"><div>keystrokes<b>${run.session.keyLog.length}</b></div>${run.mouseCount ? `<div>mouse<b>×${run.mouseCount}</b></div>` : ''}${run.mode === 'timed' && run.par ? `<div>par<b>${run.par} s</b></div>` : ''}${xpGained ? `<div>earned<b class="rm-xp">+0 XP</b></div>` : ''}</div>
+      ${isChallenge && lesson.pars ? `<div class="tier-stamps">${['pass', 'pro', 'legendary'].map(t => `<span class="tstamp ${lastTier && ['pass', 'pro', 'legendary'].indexOf(t) <= ['pass', 'pro', 'legendary'].indexOf(lastTier) ? 'hit' : ''}">${t} ${lesson.pars[t]}s</span>`).join('')}</div>` : ''}
+      <div class="rm-stats"><div>keystrokes<b>${run.session.keyLog.length}${isChallenge && opt ? ' / ' + opt : ''}</b></div>${run.mouseCount ? `<div>mouse<b>×${run.mouseCount}</b></div>` : ''}${run.mode === 'timed' && run.par ? `<div>par<b>${run.par} s</b></div>` : ''}${xpGained ? `<div>earned<b class="rm-xp">+0 XP</b></div>` : ''}</div>
+      ${lastTimedOut ? `<div class="rm-note">Over the limit — no tier. The module still counts.</div>` : ''}
       ${lastClean ? `<div class="rm-clean">✓ Clean sheet — no mouse, no help</div>` : assisted() ? `<div class="rm-note">Assisted — steps were shown on request.</div>` : ''}
       ${closingHtml()}
       ${nextJobHtml()}
@@ -436,12 +446,16 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     const before = store.all();
     firstEver = !Object.values(before).some(p => p.completed);
     lastClean = !assisted() && !run.mouseCount;
-    // A clean challenge earns the tier its time reaches; help or mouse means the pass records with none.
+    // A clean challenge earns the tier its time and its keystrokes reach (pro ≤ 1.5× the reference
+    // route, legendary ≤ 1.2×); help, mouse or a run past the limit records the pass with none.
+    lastTimedOut = isChallenge && run.timedOut;
     lastTier = null;
     if (isChallenge && lastClean && lesson.pars) {
-      const p = lesson.pars;
-      lastTier = run.elapsed <= p.legendary ? 'legendary' : run.elapsed <= p.pro ? 'pro' : run.elapsed <= p.pass ? 'pass' : null;
+      const t = tierFor(run.elapsed, lesson.pars, { keys: run.session.keyLog.length, optimalKeys: run.optimalKeys, timedOut: lastTimedOut });
+      lastTier = t === 'none' ? null : t;
     }
+    const wasFirst = !!run.opts.soft;
+    if (isChallenge) track('challenge_result', { ref: lesson.id, tier: lastTier || 'none', secs: Math.round(run.elapsed * 10) / 10, keys: run.session.keyLog.length, first: wasFirst, timed_out: lastTimedOut });
     const saved = store.record(lesson.id, run.mode, run.elapsed, {
       clean: lastClean,
       keystrokes: run.session.keyLog.length,
@@ -457,7 +471,8 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
         seed: isChallenge && Number.isInteger(run.seedNo) ? run.seedNo : null,
         secs: run.elapsed, keys: run.session.keyLog.length,
         clean: lastClean, helped: assisted(), mouse: run.mouseCount,
-        tier: lastTier || 'none', splits: run.splits().filter(Number.isFinite), trace: traceOf(run.session.keyLog), at: Date.now(),
+        tier: lastTier || 'none', first: wasFirst, timedOut: lastTimedOut,
+        splits: run.splits().filter(Number.isFinite), trace: traceOf(run.session.keyLog), at: Date.now(),
       });
     }
     // A finished assessment or test-out inside its time limit passes the chapter gate (§7);
@@ -503,7 +518,8 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   function restart(newMode) {
     if (ghost) { clearInterval(ghost.timer); ghost = null; run.endGhost(); }
     stopDemo();
-    phase = 'play'; revealed = false; nudgeAt = -1; prevDone = 0; overlay.hidden = true; tab = 'lesson';
+    phase = 'play'; revealed = false; nudgeAt = -1; prevDone = 0; overlay.hidden = true; tab = 'lesson'; lastTimedOut = false;
+    run.opts.soft = firstAttempt();   // the second attempt onward runs against a hard limit
     run.reset(timedOnly ? 'timed' : newMode);
     mountViews();
     if (!timerH) timerH = setInterval(renderTimer, 200);

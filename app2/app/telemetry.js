@@ -1,11 +1,15 @@
-// app2/app/telemetry.js — first-party analytics (SITE_SPEC §12): the six funnel events and the
+// app2/app/telemetry.js — first-party analytics (SITE_SPEC §12): the funnel events and the
 // client error log, through rpc_track / rpc_log_error (0003_events.sql). Fire-and-forget: every
 // call is wrapped, nothing here can break a lesson, and without config (tests, local, guest-only
 // builds) every call is a silent no-op. No third-party scripts, ever.
 import { auth } from './auth.js';
 
-/** The event names the client fires; the SQL check is the regex in 0003_events.sql. */
-export const EVENTS = ['landing_view', 'lesson_start', 'lesson_complete', 'signup', 'sign_in', 'carry_over'];
+/**
+ * The event names the client fires; the SQL check is the regex in 0003_events.sql. C2 adds the
+ * per-goal and per-challenge events the north-star reads from `events`: goal_complete
+ * {lesson_id, goal, secs} and challenge_result {ref, tier, secs, keys, first, timed_out}.
+ */
+export const EVENTS = ['landing_view', 'lesson_start', 'lesson_complete', 'lesson_timeup', 'signup', 'sign_in', 'carry_over', 'drill_complete', 'goal_complete', 'challenge_result'];
 export const EVENT_NAME_RE = /^[a-z_]{1,40}$/;
 
 const SESSION_KEY = 'hk2_session';
