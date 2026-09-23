@@ -257,3 +257,65 @@ test('#64: an event without a key string is ignored in every mode', () => {
   }
   s.run('Escape Escape'); assert.equal(s.mode, 'normal');
 });
+
+/* ---------------- C2 gaps 5 and 6: show formulas, Page Setup titles / footer / print gridlines; Esc logged ---------------- */
+
+test('Ctrl+` toggles show formulas, as does Formulas › Show Formulas (Alt M H); the setting is a session flag the view reads', () => {
+  const s = fresh({ A1: { value: 2 }, A2: { formula: '=A1*3' } });
+  assert.equal(s.settings.showFormulas, false);
+  s.run('Ctrl+`'); assert.equal(s.settings.showFormulas, true); assert.equal(s.log.at(-1), 'Ctrl+`');
+  s.run('Ctrl+`'); assert.equal(s.settings.showFormulas, false);
+  s.run('Alt M H'); assert.equal(s.settings.showFormulas, true); assert.equal(s.mode, 'normal');
+  assert.equal(s.sheet.value('A2'), 6, 'values keep computing underneath');
+  s.run('Ctrl+Shift+`'); assert.equal(s.settings.showFormulas, true, 'Ctrl+Shift+` is still the General format, not the toggle');
+});
+
+test('Page Setup (Alt P S P): rows to repeat, the footer sections and print gridlines are typed fields; Alt+letter reaches any control; OK records them', () => {
+  const s = fresh();
+  s.run('Alt P S P'); assert.equal(s.dialog, 'pagesetup'); assert.equal(s.dlg.tab, 'page');
+  s.run('L F'); assert.equal(s.dlg.orientation, 'landscape'); assert.equal(s.dlg.scaling, 'fit');
+  s.run('Alt+R'); assert.equal(s.dlg.tab, 'sheet'); assert.equal(s.dlg.focus, 'titlesRows');
+  s.run('"$1:$3"'); assert.equal(s.dlg.titlesRows, '$1:$3', 'a text field takes what is typed');
+  s.run('Alt+H'); assert.equal(s.dlg.tab, 'hf'); assert.equal(s.dlg.focus, 'footL');
+  s.run('"&[file]" Tab "Voltline" Tab "&[Date]"'); assert.equal(s.dlg.footL, '&[file]'); assert.equal(s.dlg.footC, 'Voltline'); assert.equal(s.dlg.footR, '&[Date]');
+  s.run('Alt+G'); assert.equal(s.dlg.tab, 'sheet'); assert.equal(s.dlg.printGridlines, true);
+  s.run('Alt+G'); assert.equal(s.dlg.printGridlines, false);
+  s.run('Enter'); assert.equal(s.mode, 'normal'); assert.equal(s.dialog, null);
+  const p = s.settings.pageSetup;
+  assert.equal(p.orientation, 'landscape'); assert.equal(p.scaling, 'fit');
+  assert.equal(p.titlesRows, '1:3', 'stored as Excel does'); assert.deepEqual(p.footer, { left: '&[File]', centre: 'Voltline', right: '&[Date]' }); assert.equal(p.printGridlines, false);
+  assert.ok(s.log.includes('Alt+R') && s.log.includes('Alt+H'), 'the accelerators are logged as chords');
+  // Print Titles (Alt P I) opens the Sheet page directly; Esc cancels the draft
+  s.run('Alt P I'); assert.equal(s.dialog, 'pagesetup'); assert.equal(s.dlg.tab, 'sheet'); assert.equal(s.dlg.titlesRows, '1:3');
+  s.run('Backspace Backspace Backspace "9" Escape'); assert.equal(s.settings.pageSetup.titlesRows, '1:3', 'Cancel discards the draft');
+  s.run('Escape Escape'); assert.equal(s.mode, 'normal');   // Cancel returns to the Page Layout tab it was opened from; Esc backs out of the walk
+  // the bare letter only acts when no text field has the focus: on the Page page L is Landscape, in a footer field it types
+  s.run('Alt P S P T'); assert.equal(s.dlg.orientation, 'portrait'); s.run('L'); assert.equal(s.dlg.orientation, 'landscape');
+  s.run('Alt+H "L"'); assert.equal(s.dlg.footL, '&[File]L'); s.run('Escape Escape Escape Escape'); assert.equal(s.mode, 'normal');
+  // an invalid rows-to-repeat clears the titles
+  s.run('Alt P I Backspace Backspace Backspace "x" Enter'); assert.equal(s.settings.pageSetup.titlesRows, ''); assert.equal(s.mode, 'normal');
+});
+
+test('Esc that discards an entry in progress is logged, on the edited cell', () => {
+  const s = fresh({ B2: { value: 'keep' } }); const S = s.sheet;
+  s.run('Right Down "typo" Escape');
+  assert.equal(S.value('B2'), 'keep'); assert.equal(s.editing, false);
+  assert.equal(s.log.at(-1), 'Esc'); assert.equal(s.keyLog.at(-1).cell, 'B2');
+  s.run('Escape'); assert.equal(s.log.at(-1), 'Esc', 'a bare Esc with nothing to cancel is not logged');
+  assert.equal(s.keyLog.filter(e => e.k === 'Esc').length, 1);
+});
+
+test('Fill Series continues the weekday and month lists from one cell; numbers still step; a range AutoFit fits the selected cells only', () => {
+  const s = fresh({ B14: { value: 'Mon' }, B16: { value: 'JAN' }, A1: { value: 'A very long title sits in the first row of the report' }, A5: { value: 'South Lamar' }, A6: { value: 'Airport' } });
+  const S = s.sheet;
+  S.select('B14:G14'); s.run('Alt H F I S Enter');
+  assert.deepEqual(['B14', 'C14', 'D14', 'E14', 'F14', 'G14'].map(r => S.value(r)), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
+  assert.equal(S.cellAt('D14').txt, true);
+  S.select('B16:E16'); S.fillSeries(); assert.deepEqual(['C16', 'D16', 'E16'].map(r => S.value(r)), ['FEB', 'MAR', 'APR'], 'the list keeps the cell’s case');
+  S.setCell('B18', { value: 'Fri' }); S.select('B18:E18'); S.fillSeries(); assert.deepEqual(['C18', 'D18', 'E18'].map(r => S.value(r)), ['Sat', 'Sun', 'Mon'], 'the list wraps');
+  S.setCell('B20', { value: 'hello' }); S.select('B20:D20'); assert.equal(S.fillSeries(), false, 'plain text is not a series');
+  S.select('A5:A6'); S.autofitCols();
+  assert.equal(S.colW[1], S.neededWidth(1, 5, 6), 'fit to the site names, not the title');
+  assert.ok(S.colW[1] < S.neededWidth(1));
+  S.select('A1:A100'); S.autofitCols(); assert.equal(S.colW[1], S.neededWidth(1), 'whole column: the title counts');
+});

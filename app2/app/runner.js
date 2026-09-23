@@ -4,7 +4,7 @@
 import { Sheet } from '../engine/sheet.js';
 import { Session, parseKeyScript, parseKeySpec } from '../engine/keyboard.js';
 import { stepPath } from '../engine/ribbon.js';
-import { workbookState } from '../content/workbooks/index.js';
+import { workbookState, applyStatePatch } from '../content/workbooks/index.js';
 import { mulberry32 } from '../engine/rng.js';
 
 export class LessonRun {
@@ -25,7 +25,7 @@ export class LessonRun {
   /** Fresh sheet + session at the lesson's starting state. */
   reset(mode) {
     if (mode) this.mode = mode;
-    const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells ? structuredCloneCells(sp.cells) : undefined, colW: sp.colW, active: sp.active, today: this.opts.today, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines });
+    const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells ? structuredCloneCells(sp.cells) : undefined, colW: sp.colW, active: sp.active, today: this.opts.today, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups });
     // A module lesson (C2): the starting workbook is a named state of the module workbook — the
     // file the previous lesson left — not an inline sheet. The legacy path stays for drills and
     // the old lessons until the rewrite completes.
@@ -36,25 +36,10 @@ export class LessonRun {
     // and a ghost can replay the very sheet the run was set on.
     if (moduleState && this.lesson.kind === 'challenge' && typeof this.lesson.seed === 'function') {
       this.seedNo = Number.isFinite(this.opts.seedNo) ? this.opts.seedNo >>> 0 : (Math.random() * 4294967296) >>> 0;
-      const patch = this.lesson.seed(mulberry32(this.seedNo)) || {};
-      for (const key in patch) {
-        const [shName, ref] = key.includes('!') ? key.split('!') : [moduleState.sheets[0].name, key];
-        const sh = moduleState.sheets.find(x => x.name === shName);
-        if (!sh) continue;
-        sh.cells = sh.cells || {};
-        if (patch[key] === null) delete sh.cells[ref]; else sh.cells[ref] = patch[key];
-      }
+      applyStatePatch(moduleState, this.lesson.seed(mulberry32(this.seedNo)) || {});
     }
-    if (moduleState && this.opts.statePatch) {
-      // a challenge seed's patch: { '<Sheet>!<ref>': cellRecord | null } applied over `before`
-      for (const key in this.opts.statePatch) {
-        const [shName, ref] = key.includes('!') ? key.split('!') : [moduleState.sheets[0].name, key];
-        const sh = moduleState.sheets.find(x => x.name === shName);
-        if (!sh) continue;
-        sh.cells = sh.cells || {};
-        if (this.opts.statePatch[key] === null) delete sh.cells[ref]; else sh.cells[ref] = this.opts.statePatch[key];
-      }
-    }
+    // a test's or a Daily's patch: { '<Sheet>!<ref>': cellRecord | null, '<Sheet>!#colW': {…} } applied over `before`
+    if (moduleState && this.opts.statePatch) applyStatePatch(moduleState, this.opts.statePatch);
     const spec = moduleState ? moduleState.sheets[0] : this.lesson.sheet || {};
     const first = build(spec);
     this.session = new Session(first, { onKey: this.opts.onKey, onToast: this.opts.onToast, onRefuse: this.opts.onRefuse, now: this.opts.now, onMouse: this.opts.onMouse });

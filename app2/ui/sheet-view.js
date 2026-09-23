@@ -150,6 +150,21 @@ export class SheetView {
   }
   onMouseDown(e) {
     if (e.button !== 0) return;
+    // the outline bar's ⊖ / ⊕ (C2 gap 4): fold or unfold that group, recorded like any header click
+    const ob = e.target && e.target.closest ? e.target.closest('.ol-btn') : null;
+    if (ob && this.grid.contains(ob)) {
+      e.preventDefault();
+      const ss0 = this.session, S0 = this.sheet = ss0.sheet;
+      if (ss0.dialog && MODAL_DIALOGS.has(ss0.dialog)) return;
+      if (ss0.mode === 'ribbon') ss0.exitRibbon(false);
+      if (ss0.editing && !ss0.commitEdit(0, 0, { kind: 'move' })) { ss0.emit('mouse'); return; }
+      const [axis, idx] = String(ob.dataset.ol || '').split(':');
+      const g = S0.groups[axis === 'r' ? 'rows' : 'cols'][+idx];
+      if (g) { ss0.startClock(); S0.setGroupFold(axis, +idx, !g.collapsed); }
+      recordMouse(ss0, 'header');
+      ss0.emit('mouse');
+      return;
+    }
     const h = this.hit(e); if (!h) return;
     e.preventDefault();   // the sheet keeps the keyboard; no text selection starts
     if (e.detail > 1) return;   // the second press of a double-click: dblclick handles it
@@ -233,9 +248,18 @@ export class SheetView {
     const hidC = S.hiddenCols || new Set(), hidR = S.hiddenRows || new Set();
     const rowH = S.rowH || [];
     const freeze = S.freeze || { r: 0, c: 0 };
-    for (let c = 1; c <= COLS; c++) { const w = hidC.has(c) ? 0 : (colW[c] || COLW_DEFAULT); W[c] = w; totalW += w; L[c] = colLetter(c); }
+    // the outline (C2 gap 4): a collapsed group folds its rows / columns away in the view — never
+    // through hiddenRows / hiddenCols, so graders can tell grouped from hidden — and every group
+    // draws a bracket on the header with a ⊖ / ⊕ on the row or column just past it (Excel's bar)
+    const groups = S.groups || { rows: [], cols: [] };
+    const foldC = new Set(), foldR = new Set(), olC = new Set(), olR = new Set(), btnC = {}, btnR = {};
+    groups.cols.forEach((g, i) => { for (let c = g.c1; c <= g.c2; c++) { if (g.collapsed) foldC.add(c); else olC.add(c); } btnC[Math.min(COLS, g.c2 + 1)] = { i, on: !!g.collapsed }; });
+    groups.rows.forEach((g, i) => { for (let r = g.r1; r <= g.r2; r++) { if (g.collapsed) foldR.add(r); else olR.add(r); } btnR[Math.min(ROWS, g.r2 + 1)] = { i, on: !!g.collapsed }; });
+    const showFx = !!(ss.settings && ss.settings.showFormulas);   // Ctrl+` (C2 gap 5): formula text in place of values
+    for (let c = 1; c <= COLS; c++) { const w = hidC.has(c) || foldC.has(c) ? 0 : (colW[c] || COLW_DEFAULT); W[c] = w; totalW += w; L[c] = colLetter(c); }
     this.ew = W;
-    const N = ROWS * COLS, shape = ROWS + 'x' + COLS + ':' + W.join(',') + '|' + [...hidR].join('.') + '|' + rowH.join('.') + '|' + freeze.r + ',' + freeze.c;
+    const olBtn = (axis, b) => (b ? '<button type="button" tabindex="-1" class="ol-btn' + (b.on ? ' on' : '') + '" data-ol="' + axis + ':' + b.i + '" title="' + (b.on ? 'Show detail' : 'Hide detail') + '">' + (b.on ? '+' : '−') + '</button>' : '');
+    const N = ROWS * COLS, shape = ROWS + 'x' + COLS + ':' + W.join(',') + '|' + [...hidR].join('.') + '|' + rowH.join('.') + '|' + freeze.r + ',' + freeze.c + '|' + JSON.stringify(groups);
     const patch = this._shape === shape && !!this._tds && this._tds.length === N && this.grid.rows.length === ROWS + 1;
     if (!patch) { this._cls = new Array(N); this._sty = new Array(N); this._txt = new Array(N); }
     const oldCls = this._cls, oldSty = this._sty, oldTxt = this._txt, tds = this._tds;
@@ -255,7 +279,7 @@ export class SheetView {
       gh = '<colgroup><col style="width:' + ROWHDR_W + 'px">';
       for (let c = 1; c <= COLS; c++) gh += '<col style="width:' + W[c] + 'px">';
       gh += '</colgroup><tr><th class="rowhdr"></th>';
-      for (let c = 1; c <= COLS; c++) gh += '<th class="' + (hidC.has(c) ? 'hidc' : hidC.has(c - 1) ? 'seam-c' : '') + '">' + L[c] + '</th>';
+      for (let c = 1; c <= COLS; c++) gh += '<th class="' + (hidC.has(c) || foldC.has(c) ? 'hidc' : hidC.has(c - 1) ? 'seam-c' : '') + (olC.has(c) ? ' ol-c' : '') + (btnC[c] ? ' ol-host' : '') + '">' + olBtn('c', btnC[c]) + L[c] + '</th>';
       gh += '</tr>';
     }
 
@@ -263,13 +287,13 @@ export class SheetView {
     for (let r = 1; r <= ROWS; r++) {
       const rowIn = hasSel && r >= sr.r1 && r <= sr.r2;
       const rh = rowH[r] || ROW_H;
-      let row = patch ? '' : '<tr' + (hidR.has(r) ? ' class="hidrow"' : rh !== ROW_H ? ' style="height:' + rh + 'px"' : '') + '><th class="rowhdr' + (hidR.has(r - 1) ? ' seam-r' : '') + '">' + r + '</th>';
+      let row = patch ? '' : '<tr' + (hidR.has(r) || foldR.has(r) ? ' class="hidrow"' : rh !== ROW_H ? ' style="height:' + rh + 'px"' : '') + '><th class="rowhdr' + (hidR.has(r - 1) ? ' seam-r' : '') + (olR.has(r) ? ' ol-r' : '') + (btnR[r] ? ' ol-host' : '') + '">' + olBtn('r', btnR[r]) + r + '</th>';
       for (let c = 1; c <= COLS; c++, i++) {
         const isActive = (r === dA.r && c === dA.c);
         const inSel = rowIn && c >= sr.c1 && c <= sr.c2;
         const isPoint = !!(editing && editPointer && r === editPointer.r && c === editPointer.c);
         let cls = isActive ? 'active' : (inSel ? 'sel' : '');
-        if (hidC.has(c)) cls += ' hidc';
+        if (hidC.has(c) || foldC.has(c)) cls += ' hidc';
         if (freeze.r && r === freeze.r) cls += ' frz-b';
         if (freeze.c && c === freeze.c) cls += ' frz-r';
         if (isPoint) cls += ' point';
@@ -297,12 +321,15 @@ export class SheetView {
           if (cell.fontColor) cls += ' fc-' + cell.fontColor;
 
           txt = escHtml(dispText(cell));
+          const fxShown = showFx && !!cell.formula && !(editing && isActive);
+          if (fxShown) { cls += ' txt fxshow'; txt = escHtml(cell.formula); }   // show formulas: the text, left-aligned, no #### verdict
           if (editing && isActive) {
             // Editing cell: the formula buffer with coloured refs (matches the formula bar), in the pop-out overlay
             const { refs } = parseFormulaRefs(ss.editBuf);
             cls += ' editing';
             txt = '<span class="edbox"><span class="edin">' + buildFormulaHTML(ss.editBuf, refs, ss.editCaret) + '</span></span>';
           }
+          else if (fxShown) { /* painted above */ }
           else if (cell.txt && (cell.ca | 0) > 1 && typeof cell.value === 'string') {
             // CENTER ACROSS SELECTION — the anchor's text centers over its stored span; no merged cells
             let caw = 0; for (let k2 = 0; k2 < cell.ca && c + k2 <= COLS; k2++) caw += W[c + k2];

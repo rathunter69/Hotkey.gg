@@ -177,7 +177,7 @@ test('lesson 5: Page Setup or the Orientation button lands Landscape; Fit to 1 b
   run.run('Alt P S P A Enter'); assert.equal(run.doneCount, 1, 'Adjust to is not Fit to');
   run.run('Alt P S P F Backspace 2 Enter'); assert.equal(run.session.settings.pageSetup.fitWide, 2); assert.equal(run.doneCount, 1, 'Fit to 2 pages wide is not the goal');
   run.run('Alt P S P F Backspace 1 Enter');
-  assert.deepEqual(run.session.settings.pageSetup, { orientation: 'landscape', scaling: 'fit', adjustTo: 100, fitWide: 1, fitTall: 1 }); assert.equal(run.doneCount, 2);
+  assert.deepEqual(run.session.settings.pageSetup, { orientation: 'landscape', scaling: 'fit', adjustTo: 100, fitWide: 1, fitTall: 1, titlesRows: '', footer: { left: '', centre: '', right: '' }, printGridlines: false }); assert.equal(run.doneCount, 2);
   // colouring: Shift+arrows select as well as Go To does; colouring the formulas too, or undoing, keeps the lesson open
   run.run('Ctrl+Home Down Down Right Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down'); assert.equal(run.sheet.selectionText(), 'B3:B10');
   run.run('Alt H F C Right Right Right Right Enter');

@@ -33,9 +33,9 @@ export const MENUS = {
   'P': [['M', 'Margins'], ['O', 'Orientation'], ['S', 'Page Setup'], ['A', 'Print Area'], ['B', 'Breaks'], ['G', 'Background'], ['I', 'Print Titles']],
   'PO': [['P', 'Portrait'], ['L', 'Landscape']],
   'PS': [['P', 'Page Setup…'], ['Z', 'Size']],
-  'M': [['U', 'Σ AutoSum'], ['P', 'Trace precedents'], ['D', 'Trace dependents']],
+  'M': [['U', 'Σ AutoSum'], ['P', 'Trace precedents'], ['D', 'Trace dependents'], ['H', 'Show formulas']],
   'MU': [['S', 'Sum']],
-  'A': [['S', 'Sort']],
+  'A': [['S', 'Sort'], ['G', 'Group'], ['U', 'Ungroup'], ['H', 'Hide detail'], ['J', 'Show detail']],   // Excel's Outline group: Group, Ungroup, Hide / Show Detail
   'AS': [['A', 'Sort A→Z'], ['D', 'Sort Z→A']],
   'E': [['S', 'Paste special…']],
   'W': [['V', 'Show'], ['F', 'Freeze Panes']],
@@ -45,7 +45,7 @@ export const MENUS = {
 
 /** Excel's real Home-tab groups — the renderer draws each as a labelled cluster. */
 export const RIBBON_GROUPS = {
-  'A': [['Sort & Filter', ['S']]],
+  'A': [['Sort & Filter', ['S']], ['Outline', ['G', 'U', 'H', 'J']]],
   'P': [['Page Setup', ['M', 'O', 'S', 'A', 'B', 'G', 'I']]],
   'H': [
     ['Clipboard', ['V']],
@@ -107,7 +107,7 @@ export const tabName = k => (TABS.find(t => t.k === k) || { name: k }).name;
 export const DEAD = {
   'FI': 'Info', 'FN': 'New', 'FO': 'Open', 'FS': 'Save', 'FA': 'Save As', 'FP': 'Print', 'FH': 'Share', 'FE': 'Export', 'FC': 'Close', 'FD': 'Account',
   'HFDV': 'Data Validation', 'HFDO': 'Select Objects',
-  'PM': 'Margins', 'PA': 'Print Area', 'PB': 'Breaks', 'PG': 'Background', 'PI': 'Print Titles', 'PSZ': 'Size',
+  'PM': 'Margins', 'PA': 'Print Area', 'PB': 'Breaks', 'PG': 'Background', 'PSZ': 'Size',
 };
 
 /* ---------------- Excel Options, Page Setup and the Quick Access Toolbar (data the Session reads) ---------------- */
@@ -171,7 +171,8 @@ export const COMMANDS = {
   'HOI': 'AutoFit column width', 'HOA': 'AutoFit row height', 'HOW': 'Column width…', 'HOE': 'Format cells…', 'OE': 'Format cells…',
   'HEA': 'Clear all', 'HEF': 'Clear formats', 'HEC': 'Clear contents', 'HUS': 'AutoSum', 'MUS': 'AutoSum', 'MP': 'Trace precedents', 'MD': 'Trace dependents',
   'HVV': 'Paste values', 'HVS': 'Paste special…', 'ES': 'Paste special…', 'ASA': 'Sort A to Z', 'ASD': 'Sort Z to A', 'WVG': 'Gridlines', 'WG': 'Gridlines',
-  'FT': 'Excel Options…', 'HFDG': 'Go To…', 'PSP': 'Page Setup…', 'POP': 'Portrait', 'POL': 'Landscape',
+  'FT': 'Excel Options…', 'HFDG': 'Go To…', 'PSP': 'Page Setup…', 'POP': 'Portrait', 'POL': 'Landscape', 'PI': 'Print Titles…',
+  'AG': 'Group', 'AU': 'Ungroup', 'AH': 'Hide detail', 'AJ': 'Show detail', 'MH': 'Show formulas',
   'HFDF': 'Find…', 'HFDR': 'Replace…', 'HFDS': 'Go To Special…', 'HFDU': 'Select formulas', 'HFDN': 'Select constants',
   'HOH': 'Row height…', 'HOUR': 'Hide rows', 'HOUC': 'Hide columns', 'HOUO': 'Unhide rows', 'HOUL': 'Unhide columns',
   'WFF': 'Freeze panes', 'WFR': 'Freeze top row', 'WFC': 'Freeze first column',

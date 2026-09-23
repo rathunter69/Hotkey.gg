@@ -50,7 +50,7 @@ import { Sheet } from '../engine/sheet.js';
 import { Session } from '../engine/keyboard.js';
 import { parseRef } from '../engine/refs.js';
 import { CONVENTIONS } from './conventions.js';
-import { WORKBOOKS, workbookState } from './workbooks/index.js';
+import { WORKBOOKS, workbookState, applyStatePatch } from './workbooks/index.js';
 import { mulberry32 } from '../engine/rng.js';
 
 export const DIFFICULTIES = ['easy', 'medium', 'hard'];
@@ -285,7 +285,7 @@ export function validateLesson(l) {
  * may legitimately hold at the start — they are gated behind the earlier ones.
  */
 function validateStartingSheet(l, goals, ends, need, opts = {}) {
-  const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells, colW: sp.colW, active: sp.active, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines });
+  const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells, colW: sp.colW, active: sp.active, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups });
   let sheet, session;
   if (opts.moduleLesson) {
     // a module lesson starts from the previous lesson's `after` (the named workbook state);
@@ -296,14 +296,8 @@ function validateStartingSheet(l, goals, ends, need, opts = {}) {
       let patch;
       try { patch = l.seed(mulberry32(1)); } catch (e) { need(false, `seed throws: ${e.message}`); return; }
       need(isObject(patch), 'seed must return a patch object');
-      for (const key in patch || {}) {
-        const [shName, ref] = key.includes('!') ? key.split('!') : [state.sheets[0].name, key];
-        const sh = state.sheets.find(x => x.name === shName);
-        need(!!sh, `seed patches unknown sheet in "${key}"`);
-        if (!sh) continue;
-        sh.cells = sh.cells || {};
-        if (patch[key] === null) delete sh.cells[ref]; else sh.cells[ref] = patch[key];
-      }
+      for (const key in patch || {}) { const shName = key.includes('!') ? key.split('!')[0] : state.sheets[0].name; need(state.sheets.some(x => x.name === shName), `seed patches unknown sheet in "${key}"`); }
+      applyStatePatch(state, patch || {});
     }
     try {
       session = new Session(build(state.sheets[0]), {}); session.demoDone = new Set();

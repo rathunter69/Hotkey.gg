@@ -142,16 +142,35 @@ function makeSettings(session) {
   const st = { calcMode: 'automatic', iterative: false, maxIterations: 100, maxChange: 0.001 };
   Object.defineProperty(st, 'gridlines', { enumerable: true, get: () => !!session.sheet.gridlines, set: v => { session.sheet.gridlines = !!v; } });
   st.qat = QAT_DEFAULT.slice();
-  st.pageSetup = { orientation: 'portrait', scaling: 'adjust', adjustTo: 100, fitWide: 1, fitTall: 1 };
+  st.showFormulas = false;   // Ctrl+` / Formulas › Show Formulas (C2 gap 5): the view paints formula text instead of values
+  st.pageSetup = { orientation: 'portrait', scaling: 'adjust', adjustTo: 100, fitWide: 1, fitTall: 1,
+    titlesRows: '', footer: { left: '', centre: '', right: '' }, printGridlines: false };   // C2 gap 6: Sheet and Header/Footer pages
   return st;
 }
 const clampInt = (v, lo, hi, dflt) => { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : dflt; };
+/** Page Setup's typed-text controls (Sheet › Rows to repeat at top; Header/Footer › the three footer sections). */
+const PAGESETUP_TEXT = new Set(['titlesRows', 'footL', 'footC', 'footR']);
+/** 'Rows to repeat at top' as Excel stores it: '$1:$3' / '1:3' / '2' → '1:3' / '2:2'; anything else is no titles. */
+export function normTitlesRows(text) {
+  const m = /^\s*\$?(\d{1,7})(?:\s*:\s*\$?(\d{1,7}))?\s*$/.exec(String(text == null ? '' : text));
+  if (!m) return '';
+  const a = +m[1], b = m[2] == null ? a : +m[2];
+  if (a < 1 || b < a) return '';
+  return a + ':' + b;
+}
+/** Footer text with Excel's field codes canonical: &[file] → &[File], &[DATE] → &[Date], &[page] → &[Page], &[pages] → &[Pages], &[tab] → &[Tab]. */
+export function normFooterText(text) {
+  const CANON = { file: 'File', date: 'Date', page: 'Page', pages: 'Pages', tab: 'Tab', time: 'Time', path: 'Path' };
+  return String(text == null ? '' : text).slice(0, 64).replace(/&\[([a-z]+)\]/gi, (m, w) => (CANON[w.toLowerCase()] ? '&[' + CANON[w.toLowerCase()] + ']' : m));
+}
 const DIALOGS_WB = new Set(['goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial']);   // the dialogs dialogKey drives
 /** Excel's messages around the sheet commands (the views show them verbatim). */
 export const LAST_SHEET_NOTE = 'A workbook must contain at least one visible worksheet.';
 export const FIND_NONE_NOTE = "We couldn't find what you were looking for.";
 export const SPECIAL_NONE_NOTE = 'No cells were found.';
 export const DELETE_SHEET_PROMPT = 'Microsoft Excel will permanently delete this sheet. Do you want to continue?';
+export const GROUP_SELECT_NOTE = 'Select whole rows or whole columns to group them.';
+export const NO_GROUP_NOTE = 'No group here.';
 
 export class Session {
   /**
@@ -396,6 +415,8 @@ export class Session {
   openDialog(name, path) { this.mode = 'ribbon'; this.path = path || []; this.dialog = name; this.note = ''; }
   ribbonKey(e) {
     const k = e.key;
+    // a held Alt+Shift+→ / ← (Group / Ungroup): the Alt press already opened the KeyTips, the chord closes them and acts
+    if (!this.dialog && !this.path.length && e.altKey && e.shiftKey && !e.ctrlKey && (k === 'ArrowRight' || k === 'ArrowLeft')) { this.exitRibbon(false); this.groupChord(k === 'ArrowRight'); return true; }
     if (DIALOGS_WB.has(this.dialog)) return this.dialogKey(e);
     if (k === 'Escape') {
       if (this.dialog) { this.dialog = null; this.pasteKind = null; this.note = ''; this.sortPend = null; this.colwBuf = ''; this.rowhBuf = ''; if (this.path.length) return true; this.exitRibbon(false); return true; }
@@ -536,6 +557,12 @@ export class Session {
     switch (np) {
       case '=': this.exitRibbon(false); this.doAutoSum(); return;
       case 'WVG': case 'WG': S.gridlines = !S.gridlines; this.toast(S.gridlines ? 'gridlines shown' : 'gridlines hidden — Alt W V G to show'); return done();
+      case 'AG': this.exitRibbon(false); this.groupChord(true, true); return;      // Data › Group (= Alt+Shift+→)
+      case 'AU': this.exitRibbon(false); this.groupChord(false, true); return;     // Data › Ungroup (= Alt+Shift+←)
+      case 'AH': this.exitRibbon(false); this.startClock(); if (!S.foldAtActive(true)) this.toast(NO_GROUP_NOTE); return;    // Data › Hide Detail
+      case 'AJ': this.exitRibbon(false); this.startClock(); if (!S.foldAtActive(false)) this.toast(NO_GROUP_NOTE); return;   // Data › Show Detail
+      case 'MH': this.exitRibbon(false); this.toggleShowFormulas(); return;        // Formulas › Show Formulas (= Ctrl+`)
+      case 'PI': this.openPageSetup('sheet'); return;                             // Page Layout › Print Titles: Page Setup on its Sheet page
       case 'HVV': S.paste('values'); return done();
       case 'HVS': case 'ES': this.dialog = 'paste'; this.pasteKind = 'all'; this.pasteOp = 'none'; return;
       case 'OE': case 'HOE': this.dialog = 'fmt'; return;
@@ -719,7 +746,7 @@ export class Session {
     const S = src.sheet; const j = S.toJSON();
     const colW = {}; S.colW.forEach((w, c) => { if (S.colSet[c]) colW[c] = w; });
     const copy = new Sheet({ rows: S.rows, cols: S.cols, cells: j.cells, colW, active: j.active, today: S.today || undefined,
-      rowH: j.rowH, hiddenRows: j.hiddenRows, hiddenCols: j.hiddenCols, freeze: j.freeze });
+      rowH: j.rowH, hiddenRows: j.hiddenRows, hiddenCols: j.hiddenCols, freeze: j.freeze, groups: j.groups });
     copy.gridlines = S.gridlines;
     const at = this.addSheet(this.copySheetName(src.name), copy, before == null ? idx + 1 : Math.max(0, Math.min(this.sheets.length, before | 0)));
     this.switchSheet(at);
@@ -873,12 +900,22 @@ export class Session {
       calcMode: st.calcMode, iterative: !!st.iterative, maxIterations: String(st.maxIterations), maxChange: String(st.maxChange),
       gridlines: !!st.gridlines, qat: st.qat.slice(), qatPick: 0, qatSel: 0 };
   }
-  pageSetupDraft() {
-    const p = this.settings.pageSetup;
-    return { kind: 'pagesetup', tab: 'page', focus: 'orient', orientation: p.orientation, scaling: p.scaling, adjustTo: String(p.adjustTo), fitWide: String(p.fitWide), fitTall: String(p.fitTall) };
+  /**
+   * The Page Setup draft: three pages of Excel's dialog — Page (orientation, scaling), Header/Footer
+   * (the three footer sections; &[File] &[Date] &[Page] &[Pages] &[Tab] are the tokens) and Sheet
+   * (rows to repeat at top, print gridlines). Text fields take typed characters as typed; every
+   * control answers to Alt+letter from anywhere, and to its bare letter when no text field has focus.
+   */
+  pageSetupDraft(tab) {
+    const p = this.settings.pageSetup; const f = p.footer || {};
+    const t = tab === 'hf' || tab === 'sheet' ? tab : 'page';
+    return { kind: 'pagesetup', tab: t, focus: t === 'hf' ? 'footL' : t === 'sheet' ? 'titlesRows' : 'orient',
+      orientation: p.orientation, scaling: p.scaling, adjustTo: String(p.adjustTo), fitWide: String(p.fitWide), fitTall: String(p.fitTall),
+      titlesRows: String(p.titlesRows || ''), printGridlines: !!p.printGridlines,
+      footL: String(f.left || ''), footC: String(f.centre || ''), footR: String(f.right || '') };
   }
   openOptions(page) { this.startClock(); this.openDialog('options', this.mode === 'ribbon' ? this.path : []); this.dlg = this.optionsDraft(page); }
-  openPageSetup() { this.startClock(); this.openDialog('pagesetup', this.mode === 'ribbon' ? this.path : []); this.dlg = this.pageSetupDraft(); }
+  openPageSetup(tab) { this.startClock(); this.openDialog('pagesetup', this.mode === 'ribbon' ? this.path : []); this.dlg = this.pageSetupDraft(tab); }
   /** Esc / Cancel: the draft goes; a dialog opened from a menu returns to it, one opened by a chord closes to the grid. */
   cancelDialog() {
     this.dlg = null; this.dialogBuf = ''; this.note = ''; this.dialog = null;
@@ -887,7 +924,7 @@ export class Session {
   /** The Tab order of the open dialog's controls. */
   dialogTabOrder() {
     const d = this.dlg; if (!d) return [];
-    if (d.kind === 'pagesetup') return ['orient', 'adjustTo', 'fitWide', 'fitTall'];
+    if (d.kind === 'pagesetup') return d.tab === 'hf' ? ['footL', 'footC', 'footR'] : d.tab === 'sheet' ? ['titlesRows', 'printGrid'] : ['orient', 'adjustTo', 'fitWide', 'fitTall'];
     if (d.kind === 'find') return d.replace ? ['find', 'repl'] : ['find'];
     if (d.kind !== 'options') return [];   // Rename Sheet, Delete Sheet and Move or Copy have one control each: nothing to Tab between
     if (d.page === 'formulas') return ['pages', 'calc', 'iter'].concat(d.iterative ? ['maxIter', 'maxChange'] : []);
@@ -973,20 +1010,34 @@ export class Session {
   }
   pageSetupKey(key) {
     const d = this.dlg; if (!d) return;
-    const field = { adjustTo: 3, fitWide: 2, fitTall: 2 };   // digits each field takes
+    const field = { adjustTo: 3, fitWide: 2, fitTall: 2 };   // digits each numeric field takes
+    const textFocus = PAGESETUP_TEXT.has(d.focus);
     if (key === 'Enter') { this.pageSetupOk(); return; }
     if (key === 'Tab' || key === 'Shift+Tab') { const o = this.dialogTabOrder(); const i = Math.max(0, o.indexOf(d.focus)); d.focus = o[(i + (key === 'Tab' ? 1 : o.length - 1)) % o.length]; return; }
-    if (key === 'T') { d.orientation = 'portrait'; d.focus = 'orient'; return; }
-    if (key === 'L') { d.orientation = 'landscape'; d.focus = 'orient'; return; }
-    if (key === 'A') { d.scaling = 'adjust'; d.focus = 'adjustTo'; return; }
-    if (key === 'F') { d.scaling = 'fit'; d.focus = 'fitWide'; return; }
+    // accelerators: Alt+letter from anywhere; the bare letter only when no text field has the focus
+    const acc = key.startsWith('Alt+') ? key.slice(4) : (!textFocus && /^[A-Z]$/.test(key) ? key : null);
+    if (acc) {
+      if (acc === 'P') { d.tab = 'page'; d.focus = 'orient'; return; }
+      if (acc === 'H') { d.tab = 'hf'; d.focus = 'footL'; return; }
+      if (acc === 'R') { d.tab = 'sheet'; d.focus = 'titlesRows'; return; }
+      if (acc === 'G') { d.tab = 'sheet'; d.focus = 'printGrid'; d.printGridlines = !d.printGridlines; return; }
+      if (d.tab === 'hf') { if (acc === 'L') d.focus = 'footL'; else if (acc === 'C') d.focus = 'footC'; else if (acc === 'R') d.focus = 'footR'; return; }
+      if (d.tab === 'sheet') return;
+      if (acc === 'T') { d.orientation = 'portrait'; d.focus = 'orient'; return; }
+      if (acc === 'L') { d.orientation = 'landscape'; d.focus = 'orient'; return; }
+      if (acc === 'A') { d.scaling = 'adjust'; d.focus = 'adjustTo'; return; }
+      if (acc === 'F') { d.scaling = 'fit'; d.focus = 'fitWide'; return; }
+      return;
+    }
     if (key === 'ArrowUp' || key === 'ArrowDown') {
       const up = key === 'ArrowUp';
       if (d.focus === 'orient') d.orientation = up ? 'portrait' : 'landscape';
       else if (field[d.focus]) { const n = clampInt(d[d.focus], 0, 9999, 0) + (up ? 1 : -1); d[d.focus] = String(Math.max(d.focus === 'adjustTo' ? 10 : 1, n)); }   // the spinner
       return;
     }
-    if (key === 'Backspace') { if (field[d.focus]) d[d.focus] = d[d.focus].slice(0, -1); return; }
+    if (key === ' ') { if (d.focus === 'printGrid') d.printGridlines = !d.printGridlines; return; }
+    if (key === 'Backspace') { if (field[d.focus]) d[d.focus] = d[d.focus].slice(0, -1); else if (textFocus) d[d.focus] = d[d.focus].slice(0, -1); return; }
+    if (textFocus) { if (key.length === 1 && d[d.focus].length < 64) d[d.focus] += key; return; }
     if (/^[0-9]$/.test(key) && field[d.focus] && d[d.focus].length < field[d.focus]) d[d.focus] += key;
   }
   pageSetupOk() {
@@ -996,6 +1047,9 @@ export class Session {
     p.adjustTo = clampInt(d.adjustTo, 10, 400, p.adjustTo);
     p.fitWide = clampInt(d.fitWide, 1, 99, p.fitWide);
     p.fitTall = clampInt(d.fitTall, 1, 99, p.fitTall);
+    p.titlesRows = normTitlesRows(d.titlesRows);
+    p.footer = { left: normFooterText(d.footL), centre: normFooterText(d.footC), right: normFooterText(d.footR) };
+    p.printGridlines = !!d.printGridlines;
     this.exitRibbon(true);
     this.emit('settings');
   }
@@ -1010,6 +1064,7 @@ export class Session {
       const ch = k.toUpperCase();
       if (this.dialog === 'goto' && ch === 'S') { this.logKey('Alt+S'); this.openGoToSpecial(); return true; }
       if (this.dialog === 'find' && ch === 'A') { this.logKey('Alt+A'); this.findKey('ReplaceAll'); return true; }
+      if (this.dialog === 'pagesetup') { this.logKey('Alt+' + ch); this.pageSetupKey('Alt+' + ch); return true; }
       return true;
     }
     if (k === 'Escape') { this.logKey('Esc'); this.cancelDialog(); return true; }
@@ -1018,7 +1073,11 @@ export class Session {
     if (ARROWS[k]) { this.logKey(ARROWSYM[k]); this.dlgKey(k); return true; }
     if (k === 'Backspace') { this.logKey('⌫'); this.dlgKey('Backspace'); return true; }
     if (k === ' ') { this.logKey('Space'); this.dlgKey(' '); return true; }
-    if (k.length === 1 && !e.ctrlKey && !e.altKey) { const ch = /[a-z]/i.test(k) ? k.toUpperCase() : k; this.logKey(ch); this.dlgKey(this.dialog === 'renamesheet' || this.dialog === 'find' ? k : ch); return true; }
+    if (k.length === 1 && !e.ctrlKey && !e.altKey) {
+      const ch = /[a-z]/i.test(k) ? k.toUpperCase() : k; this.logKey(ch);
+      const typed = this.dialog === 'renamesheet' || this.dialog === 'find' || (this.dialog === 'pagesetup' && this.dlg && PAGESETUP_TEXT.has(this.dlg.focus));   // a text field keeps the case typed
+      this.dlgKey(typed ? k : ch); return true;
+    }
     return true;   // a modal dialog swallows everything else
   }
 
@@ -1068,6 +1127,25 @@ export class Session {
       if (reads) { S.goTo(p.r, p.c); return; }
     }
   }
+
+  /**
+   * Group (Alt+Shift+→) or ungroup (Alt+Shift+←) the selection's whole rows or columns — one outline
+   * level, folded and unfolded from the outline bar or Data › Hide / Show Detail. A selection that is
+   * neither whole rows nor whole columns does nothing but say so. The chord is logged as one key;
+   * the ribbon route logs its own walk.
+   */
+  groupChord(isGroup, fromRibbon) {
+    const S = this.sheet; const r = S.selRange();
+    this.startClock();
+    if (!fromRibbon) this.logKey(isGroup ? 'Alt+Shift+→' : 'Alt+Shift+←');
+    const axis = r.c1 === 1 && r.c2 === S.cols ? 'r' : r.r1 === 1 && r.r2 === S.rows ? 'c' : null;
+    if (!axis) { this.toast(GROUP_SELECT_NOTE); return false; }
+    const ok = isGroup ? S.group(axis) : S.ungroup(axis);
+    if (!ok && !isGroup) this.toast(NO_GROUP_NOTE);
+    return ok;
+  }
+  /** Ctrl+` / Formulas › Show Formulas: the view paints every formula's text instead of its value. */
+  toggleShowFormulas() { this.startClock(); this.settings.showFormulas = !this.settings.showFormulas; this.emit('settings'); this.sheet.emit('layout'); }
 
   /* ---------------- the dispatcher ---------------- */
   dispatch(e) {
@@ -1121,6 +1199,7 @@ export class Session {
     if (k === 'Alt' && !e.shiftKey && !e.ctrlKey) { this.logKey('Alt'); this.enterRibbon(); return true; }
     if (e.altKey && !e.ctrlKey) {
       if (k === '=') { this.logKey('Alt'); this.logKey('='); this.doAutoSum(); return true; }
+      if (e.shiftKey && (k === 'ArrowRight' || k === 'ArrowLeft')) { this.groupChord(k === 'ArrowRight'); return true; }   // Group / Ungroup
       if (k === 'PageDown' || k === 'PageUp') {   // a screen right / left
         this.startClock(); this.logKey('Alt+' + (k === 'PageDown' ? 'PgDn' : 'PgUp'));
         S.move(0, (this.pageCols || 10) * (k === 'PageDown' ? 1 : -1), e.shiftKey, false); return true;
@@ -1183,6 +1262,7 @@ export class Session {
       if (k === '~') { this.startClock(); this.logKey('Ctrl+Shift+~'); S.setNumberFormat('general', 0); return true; }
       if (k === '1' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+1'); this.openDialog('fmt'); return true; }
       if (k === ';' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+;'); const da = S.dispActive(); S.dateStamp(da.r, da.c); return true; }
+      if (k === '`' && !e.shiftKey) { this.logKey('Ctrl+`'); this.toggleShowFormulas(); return true; }
       if (k === '[') { this.startClock(); this.logKey('Ctrl+['); this.jumpPrecedent(); return true; }
       if (k === ']') { this.startClock(); this.logKey('Ctrl+]'); this.jumpDependent(); return true; }
       if (lk === 'g' && !e.shiftKey) { this.logKey('Ctrl+G'); this.openGoTo(); return true; }
@@ -1224,7 +1304,7 @@ export class Session {
       this.logKey(e.shiftKey ? 'Shift+↵' : '↵'); this.commitEnter(e.shiftKey); return true;
     }
     if (k === 'Tab') { this.logKey(e.shiftKey ? 'Shift+Tab' : 'Tab'); this.commitTab(e.shiftKey); return true; }
-    if (k === 'Escape') { this.cancelEdit(); return true; }
+    if (k === 'Escape') { this.logKey('Esc'); this.cancelEdit(); return true; }
     if (k === 'F4') { if (this.cycleAnchor()) this.logKey('F4'); return true; }
     if (k === 'F9') {
       if (this.editBuf[0] === '=' || this.editBuf[0] === '+') {

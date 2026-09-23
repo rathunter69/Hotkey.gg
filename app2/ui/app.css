@@ -647,3 +647,13 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 #grid th.rowhdr.seam-r{border-top:3px double var(--line)}
 #grid td.frz-b{border-bottom:2px solid var(--faint)}
 #grid td.frz-r{border-right:2px solid var(--faint)}
+
+/* ---- C2 gap 4: the outline bar — a bracket over a grouped band, ⊖ / ⊕ on the row or column past it; a folded band hides like Excel's ---- */
+#grid tr:first-child th.ol-c{box-shadow:inset 0 3px 0 var(--accent)}
+#grid th.rowhdr.ol-r{box-shadow:inset 3px 0 0 var(--accent)}
+#grid th.ol-host{overflow:visible}
+#grid th .ol-btn{position:absolute; left:1px; top:1px; width:13px; height:13px; padding:0; line-height:11px; font-family:var(--mono); font-size:11px; font-weight:700; color:var(--accent); background:var(--surface); border:1px solid var(--accent); border-radius:2px; cursor:pointer; z-index:9}
+#grid th .ol-btn:hover{background:var(--accent); color:var(--on-accent)}
+#grid tr:first-child th .ol-btn{left:auto; right:1px; top:auto; bottom:1px}
+/* ---- C2 gap 5: show formulas (Ctrl+`) — formula text sits left like text, never a #### verdict ---- */
+#grid td.fxshow{font-family:var(--mono); font-size:12px; text-align:left}

@@ -12,7 +12,7 @@ import { Session } from '../engine/keyboard.js';
 import { LessonRun } from '../app/runner.js';
 import { LESSONS } from '../content/index.js';
 
-const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells, colW: sp.colW, active: sp.active, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines });
+const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells, colW: sp.colW, active: sp.active, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups });
 
 test('every state builds into a real workbook session without throwing', () => {
   for (const id in STATES) {

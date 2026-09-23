@@ -173,6 +173,11 @@ export const ICON = {
   breaks: svg('<rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 12h18" stroke-dasharray="3 3"/><path d="M12 3v18" stroke-dasharray="3 3"/>'),
   background: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l5-5 4 4 3-3 6 6"/><circle cx="16" cy="8" r="1.5"/>'),
   printTitles: svg('<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18" stroke-width="3"/><path d="M3 14h18"/>'),
+  // the Outline group (C2 gap 4): a bracket with a plus / minus, and the fold buttons
+  group: svg('<path d="M4 6h16"/><path d="M4 6v4M20 6v4"/><rect x="9" y="13" width="6" height="6" rx="1"/><path d="M12 14.5v3M10.5 16h3"/>'),
+  ungroup: svg('<path d="M4 6h16" stroke-dasharray="3 2"/><path d="M4 6v4M20 6v4"/><rect x="9" y="13" width="6" height="6" rx="1"/><path d="M10.5 16h3"/>'),
+  hideDetail: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8"/>'),
+  showDetail: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M12 8v8"/>'),
   undo: svg('<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>'),
   redo: svg('<path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/>'),
   colors: svg('<circle cx="7" cy="8" r="3"/><circle cx="17" cy="8" r="3"/><circle cx="12" cy="16" r="3"/>'),
@@ -266,6 +271,13 @@ export const RIBBON_COMMANDS = {
   // Data
   'ASA': C('Sort A to Z', 'Sort & Filter', 'A', ICON.sortAZ, sortRun('asc')),
   'ASD': C('Sort Z to A', 'Sort & Filter', 'A', ICON.sortZA, sortRun('desc')),
+  // Data · Outline (C2 gap 4): the same Session route the chords take, so a click and Alt+Shift+→ leave one state
+  'AG': C('Group', 'Outline', 'A', ICON.group, s => { leaveRibbon(s); s.groupChord(true, true); }, 'Alt+Shift+→'),
+  'AU': C('Ungroup', 'Outline', 'A', ICON.ungroup, s => { leaveRibbon(s); s.groupChord(false, true); }, 'Alt+Shift+←'),
+  'AH': C('Hide detail', 'Outline', 'A', ICON.hideDetail, direct(S => { S.foldAtActive(true); })),
+  'AJ': C('Show detail', 'Outline', 'A', ICON.showDetail, direct(S => { S.foldAtActive(false); })),
+  // Formulas · Formula Auditing: Show Formulas (C2 gap 5)
+  'MH': C('Show formulas', 'Formula Auditing', 'M', ICON.showFormulas, s => { leaveRibbon(s); s.toggleShowFormulas(); }, 'Ctrl+`'),
   // View
   'WVG': C('Gridlines', 'Show', 'W', ICON.gridlines, gridlines),
   'WG': C('Gridlines', 'Show', 'W', ICON.gridlines, gridlines),
@@ -290,6 +302,7 @@ export const RIBBON_COMMANDS = {
   'WFC': C('Freeze first column', 'Window', 'W', ICON.freeze, direct(S => { S.freeze = { r: 0, c: 1 }; S.commit('layout'); })),
   // Page Layout · Page Setup
   'PSP': C('Page Setup…', 'Page Setup', 'P', ICON.launcher, s => { leaveRibbon(s); s.openPageSetup(); }),
+  'PI': C('Print Titles…', 'Page Setup', 'P', ICON.printTitles, s => { leaveRibbon(s); s.openPageSetup('sheet'); }),
   'POP': C('Portrait', 'Page Setup', 'P', ICON.portrait, direct((S, s) => { s.setOrientation('portrait'); S.commit('ribbon'); })),
   'POL': C('Landscape', 'Page Setup', 'P', ICON.landscape, direct((S, s) => { s.setOrientation('landscape'); S.commit('ribbon'); })),
   // Mouse-only faces of engine features that have a chord but no Alt path (Excel's Clipboard buttons)
@@ -346,12 +359,12 @@ export const UNIMPLEMENTED = [
   U('Themes', 'Themes', 'Themes', 'P', ICON.themes), U('ThemeColors', 'Colors', 'Themes', 'P', ICON.colors), U('ThemeFonts', 'Fonts', 'Themes', 'P', ICON.fonts), U('ThemeEffects', 'Effects', 'Themes', 'P', ICON.effects),
   U('Margins', 'Margins', 'Page Setup', 'P', ICON.margins), U('PageOrientation', 'Orientation', 'Page Setup', 'P', ICON.pageOrient),
   U('PageSize', 'Size', 'Page Setup', 'P', ICON.pageSize), U('PrintArea', 'Print Area', 'Page Setup', 'P', ICON.printArea),
-  U('Breaks', 'Breaks', 'Page Setup', 'P', ICON.breaks), U('Background', 'Background', 'Page Setup', 'P', ICON.background), U('PrintTitles', 'Print Titles', 'Page Setup', 'P', ICON.printTitles),
+  U('Breaks', 'Breaks', 'Page Setup', 'P', ICON.breaks), U('Background', 'Background', 'Page Setup', 'P', ICON.background),
   U('ScaleWidth', 'Width', 'Scale to Fit', 'P'), U('ScaleHeight', 'Height', 'Scale to Fit', 'P'), U('ScaleScale', 'Scale', 'Scale to Fit', 'P'),
   U('SheetGridlines', 'Gridlines', 'Sheet Options', 'P', ICON.gridlines), U('SheetHeadings', 'Headings', 'Sheet Options', 'P', ICON.headings),
   U('InsertFunction', 'Insert Function', 'Function Library', 'M', ICON.fx), U('RecentlyUsed', 'Recently Used', 'Function Library', 'M'),
   U('Financial', 'Financial', 'Function Library', 'M'), U('Logical', 'Logical', 'Function Library', 'M'), U('TextFn', 'Text', 'Function Library', 'M'),
-  U('RemoveArrows', 'Remove Arrows', 'Formula Auditing', 'M', ICON.removeArrows), U('ShowFormulas', 'Show Formulas', 'Formula Auditing', 'M', ICON.showFormulas),
+  U('RemoveArrows', 'Remove Arrows', 'Formula Auditing', 'M', ICON.removeArrows),
   U('EvaluateFormula', 'Evaluate Formula', 'Formula Auditing', 'M', ICON.evaluate), U('CalculateNow', 'Calculate Now', 'Calculation', 'M', ICON.calc),
   U('FromText', 'From Text/CSV', 'Get & Transform Data', 'A', ICON.fromText), U('FromWeb', 'From Web', 'Get & Transform Data', 'A', ICON.fromWeb),
   U('SortDialog', 'Sort', 'Sort & Filter', 'A', ICON.sortAZ), U('DataFilter', 'Filter', 'Sort & Filter', 'A', ICON.filter), U('ClearFilter', 'Clear', 'Sort & Filter', 'A', ICON.clear),
@@ -429,19 +442,20 @@ export const RIBBON_LAYOUT = {
   // Orientation ▾ is a real menu (Alt P O P / L); the rest render disabled
   P: [
     { name: 'Themes', cols: [big({ dead: 'Themes', caret: true }), { rows: [[{ dead: 'ThemeColors', caret: true }], [{ dead: 'ThemeFonts', caret: true }], [{ dead: 'ThemeEffects', caret: true }]] }] },
-    { name: 'Page Setup', launcher: 'PSP', cols: [big({ dead: 'Margins', caret: true }), big({ menu: 'PO' }), big({ dead: 'PageSize', caret: true }), big({ dead: 'PrintArea', caret: true }), big({ dead: 'Breaks', caret: true }), big({ dead: 'Background' }), big({ dead: 'PrintTitles' })] },
+    { name: 'Page Setup', launcher: 'PSP', cols: [big({ dead: 'Margins', caret: true }), big({ menu: 'PO' }), big({ dead: 'PageSize', caret: true }), big({ dead: 'PrintArea', caret: true }), big({ dead: 'Breaks', caret: true }), big({ dead: 'Background' }), big({ cmd: 'PI' })] },
     { name: 'Scale to Fit', cols: [{ rows: [[{ box: 'Width: Automatic', dead: 'ScaleWidth', w: 110 }], [{ box: 'Height: Automatic', dead: 'ScaleHeight', w: 110 }], [{ box: 'Scale: 100%', dead: 'ScaleScale', w: 110 }]] }] },
     { name: 'Sheet Options', cols: [{ rows: [[{ dead: 'SheetGridlines' }], [{ dead: 'SheetHeadings' }]] }] },
   ],
   M: [
     { name: 'Function Library', cols: [big({ dead: 'InsertFunction' }), big({ menu: 'MU', cmd: 'MUS', label: 'AutoSum' }), { rows: [[{ dead: 'RecentlyUsed' }], [{ dead: 'Financial' }], [{ dead: 'Logical' }]] }, { rows: [[{ dead: 'TextFn' }]] }] },
-    { name: 'Formula Auditing', cols: [{ rows: [[{ cmd: 'MP' }], [{ cmd: 'MD' }], [{ dead: 'RemoveArrows' }]] }, { rows: [[{ dead: 'ShowFormulas' }], [{ dead: 'EvaluateFormula' }]] }] },
+    { name: 'Formula Auditing', cols: [{ rows: [[{ cmd: 'MP' }], [{ cmd: 'MD' }], [{ dead: 'RemoveArrows' }]] }, { rows: [[{ cmd: 'MH', check: 'showFormulas' }], [{ dead: 'EvaluateFormula' }]] }] },
     { name: 'Calculation', cols: [big({ dead: 'CalculateNow' })] },
   ],
   A: [
     { name: 'Get & Transform Data', cols: [big({ dead: 'FromText' }), big({ dead: 'FromWeb' })] },
     { name: 'Sort & Filter', cols: [{ rows: [[ico({ cmd: 'ASA' })], [ico({ cmd: 'ASD' })]] }, big({ dead: 'SortDialog' }), big({ dead: 'DataFilter' }), { rows: [[{ dead: 'ClearFilter' }]] }] },
     { name: 'Data Tools', cols: [big({ dead: 'TextToColumns' }), big({ dead: 'RemoveDuplicates' }), big({ dead: 'DataValidation' })] },
+    { name: 'Outline', cols: [big({ cmd: 'AG' }), big({ cmd: 'AU' }), { rows: [[{ cmd: 'AH' }], [{ cmd: 'AJ' }]] }] },
   ],
   R: [
     { name: 'Proofing', cols: [big({ dead: 'Spelling' }), big({ dead: 'Thesaurus' })] },

@@ -218,6 +218,8 @@ export function diffStates(a, b) {
     if (!same(sa.hiddenRows || [], sb.hiddenRows || [])) out.push({ sheet: name, kind: 'hiddenRows', key: 'hiddenRows', a: sa.hiddenRows, b: sb.hiddenRows });
     if (!same(sa.hiddenCols || [], sb.hiddenCols || [])) out.push({ sheet: name, kind: 'hiddenCols', key: 'hiddenCols', a: sa.hiddenCols, b: sb.hiddenCols });
     if (!same(sa.freeze || { r: 0, c: 0 }, sb.freeze || { r: 0, c: 0 })) out.push({ sheet: name, kind: 'freeze', key: 'freeze', a: sa.freeze, b: sb.freeze });
+    const NOG = { rows: [], cols: [] };
+    if (!same(sa.groups || NOG, sb.groups || NOG)) out.push({ sheet: name, kind: 'groups', key: 'groups', a: sa.groups, b: sb.groups });
   }
   if (!same(a.settings || {}, b.settings || {})) out.push({ sheet: '*', kind: 'settings', key: 'settings', a: a.settings, b: b.settings });
   return out;

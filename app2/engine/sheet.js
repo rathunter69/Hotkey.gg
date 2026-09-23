@@ -67,6 +67,23 @@ export const CELL_STYLES = [
 ];
 
 const clone = o => JSON.parse(JSON.stringify(o));
+/** Excel's built-in fill lists: the weekday and month names, short and long. */
+const FILL_LISTS = [
+  ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+  ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+];
+/** The fill list a cell's text starts, with its position and the list re-cased like the cell (MON → TUE, mon → tue), or null. */
+export function seriesList(text) {
+  const t = String(text).trim(); if (!t) return null;
+  for (const names of FILL_LISTS) {
+    const at = names.findIndex(n => n.toLowerCase() === t.toLowerCase());
+    if (at < 0) continue;
+    const recase = t === t.toUpperCase() ? n => n.toUpperCase() : t === t.toLowerCase() ? n => n.toLowerCase() : n => n;
+    return { at, names: names.map(recase) };
+  }
+  return null;
+}
 const copyFmt = (dst, src) => { for (const k of FMT_FIELDS) dst[k] = src[k] === undefined ? blankCell()[k] : src[k]; };
 
 /* ---- width verdicts (one definition each) ---- */
@@ -105,6 +122,7 @@ export class Sheet {
     this.rowH = new Array(this.rows + 1).fill(ROWH_DEFAULT);   // px per row (Excel default 20)
     this.hiddenRows = new Set(); this.hiddenCols = new Set();
     this.freeze = { r: 0, c: 0 };          // rows/cols frozen above/left of the seam (0 = none)
+    this.groups = { rows: [], cols: [] };  // the outline (C2 gap 4): [{r1,r2,collapsed}] / [{c1,c2,collapsed}], one level
     this.multi = null;                     // Go To Special: an explicit list of cell keys, or null
     this.resolver = null;                  // name → Sheet, set by the Session that owns the workbook
     this.today = opts.today || null;
@@ -116,6 +134,7 @@ export class Sheet {
     if (opts.hiddenRows) for (const r of opts.hiddenRows) this.hiddenRows.add(r | 0);
     if (opts.hiddenCols) for (const c of opts.hiddenCols) this.hiddenCols.add(c | 0);
     if (opts.freeze) this.freeze = { r: opts.freeze.r | 0, c: opts.freeze.c | 0 };
+    if (opts.groups) this.groups = normGroups(opts.groups);
     if (opts.gridlines === false) this.gridlines = false;
     if (opts.active) this.active = this.clamp(opts.active.r, opts.active.c);
     this.recalc();
@@ -291,13 +310,14 @@ export class Sheet {
 
   /* ---------------- undo ---------------- */
   snapshot() { return { cells: clone(this.cells), colW: this.colW.slice(), colSet: this.colSet.slice(), rows: this.rows, active: { ...this.active }, sel: this.sel && { ...this.sel },
-    rowH: this.rowH.slice(), hiddenRows: [...this.hiddenRows], hiddenCols: [...this.hiddenCols], freeze: { ...this.freeze } }; }
+    rowH: this.rowH.slice(), hiddenRows: [...this.hiddenRows], hiddenCols: [...this.hiddenCols], freeze: { ...this.freeze }, groups: clone(this.groups) }; }
   /** Rewind cells AND the whole selection to one moment, so undo/redo re-select the range the operation touched (Excel). */
   restore(s) {
     this.cells = clone(s.cells); this.colW = s.colW.slice(); this.colSet = s.colSet.slice(); this.rows = s.rows;
     if (s.rowH) this.rowH = s.rowH.slice();
     this.hiddenRows = new Set(s.hiddenRows || []); this.hiddenCols = new Set(s.hiddenCols || []);
     this.freeze = s.freeze ? { ...s.freeze } : { r: 0, c: 0 };
+    this.groups = s.groups ? normGroups(s.groups) : { rows: [], cols: [] };
     this.multi = null;
     if (s.active) this.active = this.clamp(s.active.r, s.active.c);
     this.sel = s.sel ? this.clamp(s.sel.r, s.sel.c) : null;
@@ -514,9 +534,10 @@ export class Sheet {
   }
 
   /* ---------------- column widths ---------------- */
-  neededWidth(c) {
+  /** The width column `c` needs for its content — the whole column, or only rows r1..r2 when given. */
+  neededWidth(c, r1 = 1, r2 = this.rows) {
     let w = COLW_DEFAULT;
-    for (let r = 1; r <= this.rows; r++) { const cell = this.get(r, c); if (cell.wrap) continue; w = Math.max(w, cellNumPx(cell) + FIT_SLACK, cellTxtPx(cell) + FIT_SLACK); }
+    for (let r = Math.max(1, r1); r <= Math.min(this.rows, r2); r++) { const cell = this.get(r, c); if (cell.wrap) continue; w = Math.max(w, cellNumPx(cell) + FIT_SLACK, cellTxtPx(cell) + FIT_SLACK); }
     return Math.min(Math.ceil(w), COLW_MAX);
   }
   /** #### verdict: the column's widest number does not fit its own (unscaled) width. */
@@ -526,7 +547,13 @@ export class Sheet {
     const fr = this.selRange();
     for (let c = fr.c1; c <= fr.c2; c++) { if (this.colSet[c]) continue; const need = this.neededWidth(c); if (need > this.colW[c]) this.colW[c] = need; }
   }
-  autofitCols() { const r = this.selRange(); this.pushUndo(); for (let c = r.c1; c <= r.c2; c++) { this.colW[c] = this.neededWidth(c); this.colSet[c] = true; } this.commit('layout'); }
+  /** AutoFit Column Width (Alt H O I): whole columns fit everything in them; a range fits to the selected cells only, as Excel does (the title row can be left out). */
+  autofitCols() {
+    const r = this.selRange(); const whole = r.r1 === 1 && r.r2 === this.rows;
+    this.pushUndo();
+    for (let c = r.c1; c <= r.c2; c++) { this.colW[c] = whole ? this.neededWidth(c) : this.neededWidth(c, r.r1, r.r2); this.colSet[c] = true; }
+    this.commit('layout');
+  }
   /** Column width in Excel character units (Excel's dialog); ≈ 7px per unit + 5 padding. */
   setColWidth(units) {
     const px = Math.max(16, Math.min(COLW_MAX, Math.round(Number(units) * 7 + 5)));
@@ -636,12 +663,23 @@ export class Sheet {
     else { for (let rr = r.r1; rr <= r.r2; rr++) { const src = this.get(rr, r.c2); for (let c = r.c2 - 1; c >= r.c1; c--) stamp(this.ensure(rr, c), src, 0, c - r.c2); } }
     this.commit('fill'); return true;
   }
-  /** Linear series over the selection from its first two numbers (or step 1 from one). */
+  /**
+   * Fill Series over the selection: a linear series from its first two numbers (or step 1 from
+   * one), or — as Excel's custom lists do — the weekday / month names continued from the first
+   * cell ('Mon' → Tue, Wed…; 'January' → February…), the case of the first cell kept.
+   */
   fillSeries() {
     const r = this.selRange(); const vertical = r.r1 !== r.r2 && r.c1 === r.c2; const horizontal = r.r1 === r.r2 && r.c1 !== r.c2;
     if (!vertical && !horizontal) return false;
     const cells = []; if (vertical) for (let rr = r.r1; rr <= r.r2; rr++) cells.push([rr, r.c1]); else for (let cc = r.c1; cc <= r.c2; cc++) cells.push([r.r1, cc]);
-    const first = this.get(...cells[0]); if (typeof first.value !== 'number') return false;
+    const first = this.get(...cells[0]);
+    const list = typeof first.value === 'string' ? seriesList(first.value) : null;
+    if (list) {
+      this.pushUndo();
+      for (let i = 1; i < cells.length; i++) { const cell = this.ensure(...cells[i]); copyFmt(cell, first); cell.formula = null; cell.value = list.names[(list.at + i) % list.names.length]; cell.txt = true; }
+      this.commit('fill'); return true;
+    }
+    if (typeof first.value !== 'number') return false;
     const second = this.get(...cells[1]); const step = typeof second.value === 'number' ? second.value - first.value : 1;
     this.pushUndo();
     for (let i = 1; i < cells.length; i++) { const cell = this.ensure(...cells[i]); copyFmt(cell, first); cell.formula = null; cell.value = first.value + step * i; }
@@ -785,9 +823,11 @@ export class Sheet {
       this.rowH.splice(r.r1, 0, ...new Array(count).fill(inh)); this.rowH.length = this.rows + 1;
       this.hiddenRows = new Set([...this.hiddenRows].map(n => n >= r.r1 ? n + count : n).filter(n => n <= this.rows));
       if (this.freeze.r >= r.r1) this.freeze.r = Math.min(this.rows - 1, this.freeze.r + count);
+      this.groups.rows = this.shiftGroups('r', r.r1, count);
     }
     else { this.shiftCells('c', r.c1, count);
       this.hiddenCols = new Set([...this.hiddenCols].map(n => n >= r.c1 ? n + count : n).filter(n => n <= this.cols));
+      this.groups.cols = this.shiftGroups('c', r.c1, count);
       if (this.freeze.c >= r.c1) this.freeze.c = Math.min(this.cols - 1, this.freeze.c + count); for (let c = this.cols; c >= r.c1 + count; c--) { this.colW[c] = this.colW[c - count]; this.colSet[c] = this.colSet[c - count]; } const inh = r.c1 > 1 ? this.colW[r.c1 - 1] : COLW_DEFAULT; for (let c = r.c1; c < r.c1 + count && c <= this.cols; c++) { this.colW[c] = inh; this.colSet[c] = r.c1 > 1 ? this.colSet[r.c1 - 1] : false; } }
     this.commit('structure'); return true;
   }
@@ -797,10 +837,12 @@ export class Sheet {
     if (axis === 'r') { const count = r.r2 - r.r1 + 1; this.shiftCells('r', r.r1, -count);
       this.rowH.splice(r.r1, count); while (this.rowH.length < this.rows + 1) this.rowH.push(ROWH_DEFAULT);
       this.hiddenRows = new Set([...this.hiddenRows].filter(n => n < r.r1 || n > r.r2).map(n => n > r.r2 ? n - count : n));
+      this.groups.rows = this.shiftGroups('r', r.r1, -count);
       if (this.freeze.r > r.r2) this.freeze.r -= count; else if (this.freeze.r >= r.r1) this.freeze.r = Math.max(0, r.r1 - 1);
       this.sel = null; this.selA = null; this.active = this.clamp(r.r1, a.c); }
     else { const count = r.c2 - r.c1 + 1; this.shiftCells('c', r.c1, -count);
       this.hiddenCols = new Set([...this.hiddenCols].filter(n => n < r.c1 || n > r.c2).map(n => n > r.c2 ? n - count : n));
+      this.groups.cols = this.shiftGroups('c', r.c1, -count);
       if (this.freeze.c > r.c2) this.freeze.c -= count; else if (this.freeze.c >= r.c1) this.freeze.c = Math.max(0, r.c1 - 1); for (let c = r.c1; c <= this.cols - count; c++) { this.colW[c] = this.colW[c + count]; this.colSet[c] = this.colSet[c + count]; } for (let c = Math.max(r.c1, this.cols - count + 1); c <= this.cols; c++) { this.colW[c] = COLW_DEFAULT; this.colSet[c] = false; } this.sel = null; this.selA = null; this.active = this.clamp(a.r, r.c1); }
     this.commit('structure');
   }
@@ -922,6 +964,89 @@ export class Sheet {
   unhideRows() { const r = this.selRange(); this.pushUndo(); for (let rr = r.r1; rr <= r.r2; rr++) this.hiddenRows.delete(rr); this.commit('layout'); }
   unhideCols() { const c = this.selRange(); this.pushUndo(); for (let cc = c.c1; cc <= c.c2; cc++) this.hiddenCols.delete(cc); this.commit('layout'); }
 
+  /* ---------------- grouping / outline (C2 gap 4) ---------------- */
+  /**
+   * Group the selection's whole rows ('r') or whole columns ('c') into one outline level
+   * (Alt+Shift+→, Data › Group): a band that touches an existing group joins it. False, with
+   * nothing changed, when the selection is not whole rows / columns or the band is already a group.
+   */
+  group(axis) {
+    const r = this.selRange();
+    const full = axis === 'r' ? (r.c1 === 1 && r.c2 === this.cols) : (r.r1 === 1 && r.r2 === this.rows);
+    if (!full) return false;
+    const [a, b] = axis === 'r' ? [r.r1, r.r2] : [r.c1, r.c2];
+    const key = axis === 'r' ? 'rows' : 'cols', k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2';
+    if (this.groups[key].some(g => g[k1] <= a && g[k2] >= b)) return false;   // already inside a group: one level, nothing to add
+    this.pushUndo();
+    let lo = a, hi = b; const keep = [];
+    for (const g of this.groups[key]) { if (g[k2] < lo - 1 || g[k1] > hi + 1) keep.push(g); else { lo = Math.min(lo, g[k1]); hi = Math.max(hi, g[k2]); } }
+    keep.push({ [k1]: lo, [k2]: hi, collapsed: false });
+    keep.sort((x, y) => x[k1] - y[k1]);
+    this.groups[key] = keep;
+    this.commit('layout'); return true;
+  }
+  /** Ungroup (Alt+Shift+←, Data › Ungroup): the selection's whole rows / columns leave whatever group they are in; a group cut in two survives as two. False when nothing changed. */
+  ungroup(axis) {
+    const r = this.selRange();
+    const full = axis === 'r' ? (r.c1 === 1 && r.c2 === this.cols) : (r.r1 === 1 && r.r2 === this.rows);
+    if (!full) return false;
+    const [a, b] = axis === 'r' ? [r.r1, r.r2] : [r.c1, r.c2];
+    const key = axis === 'r' ? 'rows' : 'cols', k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2';
+    const out = []; let changed = false;
+    for (const g of this.groups[key]) {
+      if (g[k2] < a || g[k1] > b) { out.push(g); continue; }
+      changed = true;
+      if (g[k1] < a) out.push({ ...g, [k2]: a - 1 });
+      if (g[k2] > b) out.push({ ...g, [k1]: b + 1 });
+    }
+    if (!changed) return false;
+    this.pushUndo();
+    this.groups[key] = out;
+    this.commit('layout'); return true;
+  }
+  /** The group (with its index) holding row / column `n` on an axis, or null. */
+  groupAt(axis, n) {
+    const key = axis === 'r' ? 'rows' : 'cols', k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2';
+    const i = this.groups[key].findIndex(g => n >= g[k1] && n <= g[k2]);
+    return i < 0 ? null : { i, g: this.groups[key][i] };
+  }
+  /** Fold (collapsed = true) or unfold one group by index; false when there is no such group or nothing changes. */
+  setGroupFold(axis, i, collapsed) {
+    const g = this.groups[axis === 'r' ? 'rows' : 'cols'][i]; if (!g || !!g.collapsed === !!collapsed) return false;
+    this.pushUndo(); g.collapsed = !!collapsed; this.commit('layout'); return true;
+  }
+  /**
+   * Hide Detail (Alt A H) / Show Detail (Alt A J): fold or unfold the group the displayed active cell
+   * sits in — its row group first, else its column group. False when it is in no group.
+   */
+  foldAtActive(collapsed) {
+    const a = this.dispActive();
+    const hit = this.groupAt('r', a.r) ? ['r', this.groupAt('r', a.r).i] : this.groupAt('c', a.c) ? ['c', this.groupAt('c', a.c).i] : null;
+    if (!hit) return false;
+    return this.setGroupFold(hit[0], hit[1], collapsed);
+  }
+  /** Is row / column `n` inside a collapsed group (folded away in the view, never `hidden`)? */
+  isFolded(axis, n) { const h = this.groupAt(axis, n); return !!(h && h.g.collapsed); }
+  /** Shift an axis's groups for an insert (delta > 0 at `at`) or a delete (delta < 0: the band at..at−delta−1 goes). */
+  shiftGroups(axis, at, delta) {
+    const list = this.groups[axis === 'r' ? 'rows' : 'cols'], k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2', max = axis === 'r' ? this.rows : this.cols;
+    const out = [];
+    for (const g of list) {
+      let a = g[k1], b = g[k2];
+      if (delta > 0) { if (a >= at) a += delta; if (b >= at) b += delta; }   // an insert inside the band grows it; above it, moves it
+      else {
+        const cnt = -delta, end = at + cnt - 1, shift = n => (n > end ? n - cnt : n);
+        if (a >= at && b <= end) continue;                       // the whole group went
+        a = a >= at && a <= end ? at : shift(a);
+        b = b >= at && b <= end ? at - 1 : shift(b);
+        if (b < a) continue;
+      }
+      if (a > max) continue;
+      out.push({ ...g, [k1]: a, [k2]: Math.min(b, max) });
+    }
+    return out;
+  }
+
   /* ---------------- serialisation ---------------- */
   toJSON() {
     const cells = {}; for (const k in this.cells) { const c = this.cells[k]; const b = blankCell(); const o = {}; for (const f in c) if (c[f] !== b[f] && !(f === 'value' && c.formula)) o[f] = c[f]; if (Object.keys(o).length) cells[k] = o; }
@@ -931,6 +1056,15 @@ export class Sheet {
     if (this.hiddenRows.size) out.hiddenRows = [...this.hiddenRows];
     if (this.hiddenCols.size) out.hiddenCols = [...this.hiddenCols];
     if (this.freeze.r || this.freeze.c) out.freeze = { ...this.freeze };
+    if (this.groups.rows.length || this.groups.cols.length) out.groups = clone(this.groups);
     return out;
   }
+}
+
+/** A groups record with sane shapes: rows [{r1,r2,collapsed}], cols [{c1,c2,collapsed}], sorted, each band r1 ≤ r2. */
+export function normGroups(g) {
+  const band = (x, k1, k2) => { if (!x || typeof x !== 'object') return null; const a = x[k1] | 0, b = x[k2] | 0; if (a < 1 || b < a) return null; return { [k1]: a, [k2]: b, collapsed: x.collapsed === true }; };
+  const rows = (Array.isArray(g && g.rows) ? g.rows : []).map(x => band(x, 'r1', 'r2')).filter(Boolean).sort((x, y) => x.r1 - y.r1);
+  const cols = (Array.isArray(g && g.cols) ? g.cols : []).map(x => band(x, 'c1', 'c2')).filter(Boolean).sort((x, y) => x.c1 - y.c1);
+  return { rows, cols };
 }

@@ -682,7 +682,8 @@ export class RibbonView {
         if (it.cmd) { const cmd = RIBBON_COMMANDS[it.cmd]; html += '<div class="rdrop-item" data-act="cmd:' + it.cmd + '">' + key + '<span class="rdrop-ico">' + cmd.icon + '</span><span class="rdrop-lbl">' + esc(it.label || cmd.label) + '</span></div>'; }
         html += '<div class="rdrop-item" data-act="menu:' + it.menu + '">' + (it.cmd ? '' : key) + '<span class="rdrop-ico">' + (meta.icon || '') + '</span><span class="rdrop-lbl">' + esc(meta.label) + ' ›</span></div>'; return; }
       const cmd = RIBBON_COMMANDS[it.cmd]; if (!cmd) return;
-      html += '<div class="rdrop-item' + (it.check && ss.sheet.gridlines ? ' on' : '') + '" data-act="cmd:' + it.cmd + '">' + key + '<span class="rdrop-ico">' + cmd.icon + '</span><span class="rdrop-lbl">' + esc(it.label || cmd.label) + '</span></div>';
+      const on = it.check === 'showFormulas' ? !!ss.settings.showFormulas : it.check ? !!ss.sheet.gridlines : false;
+      html += '<div class="rdrop-item' + (on ? ' on' : '') + '" data-act="cmd:' + it.cmd + '">' + key + '<span class="rdrop-ico">' + cmd.icon + '</span><span class="rdrop-lbl">' + esc(it.label || cmd.label) + '</span></div>';
     });
     if (g.launcher && RIBBON_COMMANDS[g.launcher]) {   // the group's dialog launcher rides along when the group is folded
       const cmd = RIBBON_COMMANDS[g.launcher]; const badge = walking ? keyTipAt(g.launcher, pathStr) : '';
@@ -721,7 +722,7 @@ export class RibbonView {
     const cmd = RIBBON_COMMANDS[it.cmd]; if (!cmd) return '';
     const label = it.label || cmd.label;
     const title = label + (cmd.keys ? ' (' + cmd.keys + ')' : '') + (COMMANDS[it.cmd] !== undefined ? ' · Alt ' + spaced(it.cmd) : '');
-    const pressed = it.check ? !!ss.sheet.gridlines : undefined;
+    const pressed = it.check ? (it.check === 'showFormulas' ? !!ss.settings.showFormulas : !!ss.sheet.gridlines) : undefined;   // a toggle's pressed state
     return this.btnHtml({ act: 'cmd:' + it.cmd, tip: it.cmd, label, icon: cmd.icon, big: it.big, iconOnly: it.iconOnly, caret: it.caret, badge: badgeHtml, title, pressed });
   }
   btnHtml(o) {
