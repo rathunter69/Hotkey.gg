@@ -40,7 +40,7 @@ test('every test({}) returns {done:false} without throwing; progress stays withi
 
 test('a played ctx earns the right badges', () => {
   const ctx = {
-    progress: { 'welcome-race': { completed: true } },
+    progress: { 'welcome-race': { completed: true }, 'welcome-export': { completed: true } },
     attempts: [
       { kind: 'drill', ref: 'edge-jumps', day: '2026-09-22', secs: 3.9, keys: 8, clean: true, helped: false, mouse: 0, tier: 'legendary', at: Date.parse('2026-09-22T13:00:00Z') },
       { kind: 'rapid', ref: 'rapid-60', day: '2026-09-22', secs: 60, keys: 40, clean: false, mouse: 0, tier: 'none', splits: [12, 2, 11, 520], at: Date.parse('2026-09-22T13:10:00Z') },

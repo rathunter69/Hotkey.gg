@@ -150,9 +150,9 @@ const S1c = derive(S1b, s => {
 // 1.1.4 Colour, label, one hardcode per cell (on Inputs)
 const S1d = derive(S1c, s => {
   const c = sheetOf(s, 'Inputs').cells;
-  c.A2 = { value: 'USD unless stated', it: true };
+  c.A2 = { value: 'USD unless stated' };
   c.B4 = { value: 0.13, fontColor: 'blue' };
-  c.C4 = { value: 'per utility contract', it: true };
+  c.C4 = { value: 'per utility contract' };
   c.B5 = { ...c.B5, fontColor: 'blue' };
   c.B6 = { ...c.B6, fontColor: 'blue' };
   c.B14 = { ...c.B14, formula: '=B6*B4' };
@@ -178,9 +178,19 @@ export function stateOf(id) {
 /* ---------------- diffing (the chain test and audit graders read this) ---------------- */
 
 const CELL_KEYS = ['value', 'formula', ...FMT_FIELDS];   // the engine's own format field list, so the diff can never miss a prop
+// Engine defaults that mean "nothing set": a live sheet materialises full records, an authored
+// state carries only what it means, and the diff must treat the two alike. txt is derived from
+// how a value was entered, never authored, so it is ignored entirely.
+const ZERO_DEFAULT = new Set(['indent', 'scale', 'ca', 'decimals', 'fsz']);
 const cellNorm = c => {
   const out = {};
-  for (const k of CELL_KEYS) if (c && c[k] !== undefined && c[k] !== null && c[k] !== false) out[k] = c[k];
+  for (const k of CELL_KEYS) {
+    if (!c || c[k] === undefined || c[k] === null || c[k] === false) continue;
+    if (k === 'txt') continue;
+    if (ZERO_DEFAULT.has(k) && c[k] === 0) continue;
+    if (k === 'fmtStyle' && c[k] === 'general') continue;
+    out[k] = c[k];
+  }
   if (out.formula) delete out.value;   // a formula cell's value is computed; authored states carry only the formula
   return out;
 };

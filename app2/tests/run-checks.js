@@ -32,7 +32,8 @@ for (const f of files) {
 console.log(`syntax ok: ${files.length} modules`);
 
 // 2. isolation — static import specifiers must stay inside app2/
-const IMPORT_RX = /(?:^|[^\w$])(?:import|export)\s*(?:[\w${},*\s]+from\s*)?['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+// [^\w$-]: a hyphen before the keyword means a kebab-case id ('welcome-export'), not a statement
+const IMPORT_RX = /(?:^|[^\w$-])(?:import|export)\s*(?:[\w${},*\s]+from\s*)?['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
 for (const f of files) {
   const src = readFileSync(f, 'utf8');
   let m;

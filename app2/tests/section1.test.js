@@ -21,7 +21,8 @@ test('section 1: five free lessons in "How Excel works", right after the Welcome
   const ch = CHAPTERS.find(c => c.id === 'foundations');
   const sec = sectionsOf(ch).find(g => g.name === 'How Excel works');
   assert.deepEqual(sec.lessons.map(l => l.id), S1);
-  assert.deepEqual(LESSONS.slice(0, 7).map(l => l.id), ['welcome-race', ...S1, 'active-cell']);
+  const i0 = LESSONS.findIndex(l => l.id === 'welcome-race');   // the legacy block starts here mid-rewrite
+  assert.deepEqual(LESSONS.slice(i0, i0 + 7).map(l => l.id), ['welcome-race', ...S1, 'active-cell']);
   for (const id of S1) {
     const l = byId(id);
     assert.equal(l.access, 'free', `${id} is free`); assert.equal(l.section, 'How Excel works');

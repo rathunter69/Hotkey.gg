@@ -136,3 +136,28 @@ test('every module lesson chains: before is the previous lesson\'s after', () =>
   }
   assert.ok(true);
 });
+
+/* ---------------- the solution produces exactly the after state (C2: the chain is real) ---------------- */
+/** A live session, extracted in the authored-state shape so diffStates can compare them. */
+function sessionToState(ses) {
+  return {
+    sheets: ses.sheets.map(e => ({
+      name: e.name, cells: e.sheet.cells,
+      gridlines: e.sheet.gridlines === false ? false : undefined,
+      hiddenRows: [...e.sheet.hiddenRows], hiddenCols: [...e.sheet.hiddenCols], freeze: { ...e.sheet.freeze },
+    })),
+    settings: { calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat.slice() },
+  };
+}
+
+test('every module lesson\'s solution replays to exactly its after state', () => {
+  for (const l of LESSONS.filter(x => x.workbook && x.state && x.kind !== 'challenge')) {
+    const run = new LessonRun(l, { now: () => 0 });
+    run.run(l.solution);
+    assert.ok(run.finished, `${l.id}: solution finishes`);
+    const after = workbookState(l.workbook, l.state.after);
+    // column widths and row heights become graded ground at 1.4.2; until then the extraction skips them
+    const diff = diffStates(sessionToState(run.session), after).filter(d => d.kind !== 'colW' && d.kind !== 'rowH');
+    assert.deepEqual(diff, [], `${l.id}: the solution leaves exactly ${l.state.after} — extra diffs: ${JSON.stringify(diff.slice(0, 4))}`);
+  }
+});

@@ -153,6 +153,7 @@ export const CONCEPTS = {
   'paste-special': 'Paste Special (Ctrl+Alt+V) pastes one aspect: values V, formats T, transpose E, or an operation',
   'fill-series': 'Fill Series (Alt, H, F, I, S) continues the step your first two cells set',
   'flash-fill': 'Flash Fill (Ctrl+E in Excel) fills a column by the pattern of your examples',
+  'qat-run': 'Alt then a number runs that Quick Access Toolbar command from anywhere',
 };
 
 /**
@@ -264,7 +265,7 @@ export function validateLesson(l) {
     // one-line teaching point; a goal that only reuses taught concepts carries none.
     const fresh = (Array.isArray(g.requires) ? g.requires : []).filter(c => concepts.includes(c) && !introduced.has(c));
     if (fresh.length) { need(typeof g.teach === 'string' && g.teach.trim(), `goal ${g.id}: introduces ${fresh.join(', ')} and needs a one-line teach`); fresh.forEach(c => introduced.add(c)); }
-    else if (Array.isArray(l.concepts) && Array.isArray(g.requires)) need(g.teach === undefined, `goal ${g.id}: reuses taught concepts only, so it must not carry a teach line`);
+    else if (Array.isArray(conceptsRaw) && Array.isArray(g.requires)) need(g.teach === undefined, `goal ${g.id}: reuses taught concepts only, so it must not carry a teach line`);
     if (typeof g.teach === 'string') { need(sentenceCount(g.teach) === 1 && /[.!?]$/.test(g.teach.trim()), `goal ${g.id}: teach must be one sentence ending in a full stop`); need(wordCount(g.teach) <= 30, `goal ${g.id}: teach is over 30 words`); }
   }
   need(l.race === undefined || (Array.isArray(l.race) && l.race.length >= 1 && l.race.every(r => isObject(r) && typeof r.label === 'string' && ids.has(r.slow) && ids.has(r.fast))), 'race must be pairs { label, slow, fast } naming goals');
@@ -345,7 +346,7 @@ const isObject = v => typeof v === 'object' && v !== null && !Array.isArray(v);
 
 /** Every concept available to a lesson: its own plus its prerequisites', transitively. */
 export function availableConcepts(lesson, byId, seen = new Set()) {
-  const out = new Set(lesson.concepts || []);
+  const out = new Set(lesson.teaches || lesson.concepts || []);
   for (const pid of lesson.prerequisites || []) {
     if (seen.has(pid)) continue; seen.add(pid);
     const p = byId[pid]; if (!p) continue;

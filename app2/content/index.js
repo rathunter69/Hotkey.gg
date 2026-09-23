@@ -1,4 +1,17 @@
 // app2/content/index.js — the catalogue: chapters in order, each with its lessons in order.
+// The C2 rewrite lands module by module: the new module lessons (Project Volt, voltline-weekly)
+// sit first, the legacy sections below them until the rewrite replaces the old set.
+import welcome_export from './lessons/welcome-export.js';
+import inherited_workbook from './lessons/inherited-workbook.js';
+import ribbon_by_keyboard from './lessons/ribbon-by-keyboard.js';
+import analyst_setup from './lessons/analyst-setup.js';
+import colour_label_hardcode from './lessons/colour-label-hardcode.js';
+import challenge_inherited_file from './lessons/challenge-inherited-file.js';
+import jump_dont_scroll from './lessons/jump-dont-scroll.js';
+import select_like_you_mean_it from './lessons/select-like-you-mean-it.js';
+import around_the_workbook from './lessons/around-the-workbook.js';
+import typed_vs_calculated from './lessons/typed-vs-calculated.js';
+import challenge_find_and_mark from './lessons/challenge-find-and-mark.js';
 import welcome_race from './lessons/welcome-race.js';
 import workbook_sheets_cells from './lessons/workbook-sheets-cells.js';
 import managing_sheets from './lessons/managing-sheets.js';
@@ -47,6 +60,8 @@ export const CHAPTERS = [
     // catalog as upcoming, so the chapter's shape is visible; its blurb says what arrives there.
     sections: [
       { name: 'Welcome', blurb: 'One lesson with a race in it: what this platform does and why it beats a video.' },
+      { name: 'Open and set up', blurb: 'The workbook management sent, tidied to house standard: tabs, gridlines, Excel Options, the Quick Access Toolbar, and the analyst’s color-and-label conventions.' },
+      { name: 'Move and select', blurb: 'Jumps, never scrolls: Ctrl+Arrow, the selection set, Go To for far and cross-sheet targets, and Go To Special.' },
       { name: 'How Excel works', blurb: 'Workbook, sheets, cells and references; the Ribbon and Alt chords; Formula Bar and Name Box; the Options that matter; page setup; best practices.' },
       { name: 'Moving', blurb: 'Arrows, Ctrl+Arrow, Home and End, Page keys, Go To, between sheets and workbooks.' },
       { name: 'Selecting', blurb: 'Shift+Arrow, Ctrl+Shift+Arrow, whole rows and columns, Ctrl+A regions, Go To Special.' },
@@ -58,6 +73,9 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'Build the weekly report end to end, then prove it against the clock; or test out of the chapter.' },
     ],
     lessons: [
+      welcome_export,
+      inherited_workbook, ribbon_by_keyboard, analyst_setup, colour_label_hardcode, challenge_inherited_file,
+      jump_dont_scroll, select_like_you_mean_it, around_the_workbook, typed_vs_calculated, challenge_find_and_mark,
       welcome_race,
       workbook_sheets_cells, managing_sheets, ribbon_and_keytips, excel_options, page_setup,
       active_cell, moving_around, page_keys, go_to_cells,

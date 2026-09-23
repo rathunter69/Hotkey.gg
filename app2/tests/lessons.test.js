@@ -34,7 +34,7 @@ test('every lesson sits in one of its chapter\'s sections; the catalogue lists e
     assert.deepEqual(groups.flatMap(g => g.lessons.map(l => l.id)), ch.lessons.slice().sort((a, b) => names.indexOf(a.section) - names.indexOf(b.section) || ch.lessons.indexOf(a) - ch.lessons.indexOf(b)).map(l => l.id));
   }
   const foundations = CHAPTERS.find(c => c.id === 'foundations');
-  assert.equal(sectionNames(foundations).length, 10, 'Chapter 1 shows all ten sections (SITE_SPEC §7 + the project section)');
+  assert.equal(sectionNames(foundations).length, 12, 'Chapter 1 mid-rewrite: the ten legacy sections plus the first two authored modules');
   assert.ok(sectionsOf(foundations).every(g => g.lessons.length > 0), 'every Chapter 1 section has lessons (the chapter is complete)');
   assert.equal(sectionsOf({ sections: [{ name: 'Soon', blurb: 'arrives later' }], lessons: [] })[0].blurb, 'arrives later', 'an upcoming (empty) section still carries its blurb');
   assert.deepEqual(sectionsOf({ sections: ['A'], lessons: [{ id: 'x' }, { id: 'y', section: 'A' }] }).map(g => [g.name, g.lessons.map(l => l.id)]), [['A', ['y']], ['Basics', ['x']]], 'a lesson without a section falls into Basics after the listed sections');
@@ -61,7 +61,7 @@ test('the adaptive lesson format is enforced', () => {
   assert.equal(sentenceCount('Numbers like 1,200.00 and 5.0% are not sentence ends. This is the second.'), 2);
   for (const l of LESSONS) {
     assert.ok(!/\b(awesome|super|easy peasy|magic|wow|gonna|kinda)\b/i.test(l.read + l.goals.map(g => (g.teach || '') + g.text).join(' ')), `${l.id}: tone`);
-    const b = goalBounds(l.kind);
+    const b = goalBounds(l.kind, typeof l.module === 'string');
     assert.ok(l.goals.length >= b.min && l.goals.length <= b.max, `${l.id}: ${b.min}-${b.max} goals for kind ${l.kind || 'lesson'}`);
   }
 });
@@ -71,7 +71,7 @@ for (const lesson of LESSONS) {
     const errs = validateLesson(lesson);
     assert.deepEqual(errs, [], errs.join('; '));
     const avail = availableConcepts(lesson, LESSONS_BY_ID);
-    for (const g of lesson.goals) for (const c of g.requires) assert.ok(avail.has(c), `${lesson.id} goal ${g.id} requires "${c}" which is not taught here or earlier`);
+    for (const g of lesson.goals) for (const c of g.requires || []) assert.ok(avail.has(c), `${lesson.id} goal ${g.id} requires "${c}" which is not taught here or earlier`);
 
     let t = 0;
     const run = new LessonRun(lesson, { mode: 'guided', now: () => (t += 100) });
@@ -478,10 +478,17 @@ export function goToOffence(tokens, anchor) {
   }
   return null;
 }
-/** More than three consecutive plain arrows (×N counts as N presses)? */
+/**
+ * More than three consecutive plain arrows (×N counts as N presses)? Arrows inside the Ribbon or
+ * a dialog (after a bare Alt, Ctrl+G, F5 or Ctrl+1, until Enter or Esc closes it) are list
+ * navigation, not sheet movement, and never count.
+ */
 export function arrowGrind(tokens) {
-  let streak = 0, prevArrow = false;
+  let streak = 0, prevArrow = false, inDialog = false;
   for (const t of tokens) {
+    if (t === 'Alt' || t === 'Ctrl+G' || t === 'F5' || t === 'Ctrl+1') { inDialog = true; streak = 0; prevArrow = false; continue; }
+    if (/^(↵|Enter|Esc|Escape)$/.test(t)) { inDialog = false; streak = 0; prevArrow = false; continue; }
+    if (inDialog) continue;
     const rep = /^×(\d+)$/.exec(t);
     if (rep && prevArrow) { streak += +rep[1] - 1; }
     else if (isArrow(t)) { streak += 1; prevArrow = true; }
@@ -515,6 +522,8 @@ test('module hints never use Go To as movement glue and never grind arrows', () 
   assert.ok(arrowGrind(hintTokens('↓ ×5')), '×N counts as N presses');
   assert.ok(!arrowGrind(hintTokens('↓ ↓ ↓ then Ctrl+↓')), 'three arrows and a jump is fine');
   assert.ok(!arrowGrind(hintTokens('Ctrl+↓ Ctrl+↓ Ctrl+↓ Ctrl+↓')), 'modified arrows are jumps, not grinding');
+  assert.ok(!arrowGrind(hintTokens('Alt F T Q ↓ ×9 A ↵')), 'arrows inside a dialog are list navigation');
+  assert.ok(arrowGrind(hintTokens('Alt F T Q ↓ ↵ ↓ ↓ ↓ ↓')), 'the exemption ends when the dialog closes');
   // and every module lesson obeys it
   for (const l of LESSONS.filter(x => typeof x.module === 'string')) {
     l.goals.forEach((g, gi) => {
