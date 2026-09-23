@@ -352,3 +352,25 @@ test('parseKeyScript accepts the sheet-management spellings the lessons will wri
   assert.deepEqual(namesOf(s), ['Costs']); assert.equal(s.mode, 'normal'); assert.equal(s.sheet.value('A1'), 'data');
   assert.deepEqual(keys(s), ['Alt', 'H', 'O', 'R', 'C', 'O', 'S', 'T', 'S', '↵', 'Alt', 'H', 'I', 'S', 'Alt', 'H', 'O', 'R', 'S', 'C', 'R', 'A', 'T', 'C', 'H', '↵', 'Alt', 'H', 'D', 'S', 'Ctrl+PgDn', 'Alt', 'H', 'D', 'S', '↵', 'Alt', 'H', 'O', 'M', '↓', '↓', '↵']);
 });
+
+test('the clipboard is the workbook’s: a block copied on one sheet pastes on another, a cut clears its source there', () => {
+  const s = fresh({ A1: { value: 1 }, A2: { value: 2 }, B1: { formula: '=A1*10' } });
+  const data = new Sheet({ cells: { C3: { value: 'keep' } } }); s.addSheet('Data', data);
+  const raw = s.sheet;
+  s.run('Shift+Down Shift+Right Ctrl+C');                                // A1:B2 on Sheet1
+  assert.ok(raw.clipboard); assert.equal(raw.clipboard.src, raw); assert.equal(data.clipboard, raw.clipboard);   // one clipboard, seen from every sheet
+  s.run('Ctrl+PgDn'); assert.equal(s.sheet, data);
+  s.run('Down Down Right Right Right Ctrl+V');                             // pasted at D3 on Data
+  assert.equal(data.value('D3'), 1); assert.equal(data.value('D4'), 2); assert.equal(data.cellAt('E3').formula, '=D3*10'); assert.equal(data.value('E3'), 10);
+  assert.equal(raw.value('A1'), 1);                                        // a copy leaves the source alone
+  assert.ok(data.clipboard);                                               // Ctrl+V keeps the block for another paste
+  s.run('Escape'); assert.equal(raw.clipboard, null); assert.equal(data.clipboard, null);
+  // a cut pasted on another sheet moves the block: the source sheet loses it (and can undo that on its own stack)
+  s.run('Ctrl+PgUp Ctrl+Home Ctrl+X Ctrl+PgDn Ctrl+Home Ctrl+V');
+  assert.equal(data.value('A1'), 1); assert.equal(raw.value('A1'), null); assert.equal(raw.cells.A1, undefined); assert.equal(data.clipboard, null);
+  assert.equal(data.value('C3'), 'keep');
+  const before = raw.undoStack.length; assert.ok(before > 0); raw.undo(); assert.equal(raw.value('A1'), 1); assert.equal(data.value('A1'), 1);
+  // Copy then Enter drops once, across sheets too
+  s.run('Ctrl+PgUp Ctrl+Home Down Ctrl+C Ctrl+PgDn Ctrl+Home Down Down Down Down Down Enter');
+  assert.equal(data.value('A6'), 2); assert.equal(data.clipboard, null); assert.equal(data.selectionText(), 'A6');
+});

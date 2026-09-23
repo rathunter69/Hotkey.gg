@@ -192,6 +192,7 @@ export class Session {
     this.sheets = [{ name: 'Sheet1', sheet: this.sheet }];
     this.sheetIndex = 0;
     this._xr = false;   // cross-sheet recalc reentry guard
+    this._clip = null;  // the workbook's one clipboard (every sheet reads and writes it: wireSheet)
     this.pageRows = 0; this.pageCols = 0;   // a screenful for PageDown / Alt+PageDown — the view sets them; 0 = 10
     this.settings = makeSettings(this);
     this.dialogBuf = '';     // Go To's Reference field
@@ -206,6 +207,10 @@ export class Session {
    * mutation — two passes, so an A → B → A chain settles (recalc never emits: no loops).
    */
   wireSheet(sh) {
+    // one clipboard per workbook (Excel): a block copied on one sheet pastes on another. The sheet's
+    // own field becomes an accessor onto the Session's, so Sheet.copy/paste/pasteDrop need no workbook awareness.
+    if (sh.clipboard && !this._clip) this._clip = sh.clipboard;
+    Object.defineProperty(sh, 'clipboard', { configurable: true, enumerable: true, get: () => this._clip, set: v => { this._clip = v; } });
     sh.resolver = name => { const e = this.sheets.find(x => x.name.toLowerCase() === String(name).toLowerCase()); return e ? e.sheet : null; };
     sh.allSheets = () => this.sheets.map(e => ({ name: e.name, sheet: e.sheet }));
     sh.onChange(what => {

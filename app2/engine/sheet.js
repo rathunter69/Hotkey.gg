@@ -568,7 +568,9 @@ export class Sheet {
     const r = this.selRange(); const data = [];
     for (let rr = r.r1; rr <= r.r2; rr++) { const row = []; for (let cc = r.c1; cc <= r.c2; cc++) row.push(clone(this.get(rr, cc))); data.push(row); }
     const cols = []; for (let cc = r.c1; cc <= r.c2; cc++) cols.push(this.colW[cc]);
-    this.clipboard = { data, cols, h: r.r2 - r.r1 + 1, w: r.c2 - r.c1 + 1, rect: { ...r }, cut: !!cut };
+    // `src` is the sheet the block came from: a workbook shares one clipboard (Session.wireSheet), so a
+    // cut pasted on another sheet clears its source there, and the marquee shows only on that sheet
+    this.clipboard = { data, cols, h: r.r2 - r.r1 + 1, w: r.c2 - r.c1 + 1, rect: { ...r }, cut: !!cut, src: this };
     this.emit('clipboard');
   }
   clearClipboard() { if (this.clipboard) { this.clipboard = null; this.emit('clipboard'); } }
@@ -600,11 +602,14 @@ export class Sheet {
       this.lastFlash = { ...sr }; this.commit('paste'); return true;
     }
     if (cb.cut) {
-      for (let rr = cb.rect.r1; rr <= cb.rect.r2; rr++) for (let cc = cb.rect.c1; cc <= cb.rect.c2; cc++) delete this.cells[refKey(rr, cc)];
+      const from = cb.src && cb.src !== this ? cb.src : null;   // a cut from another sheet: its cells go there (own undo entry)
+      if (from) from.pushUndo();
+      for (let rr = cb.rect.r1; rr <= cb.rect.r2; rr++) for (let cc = cb.rect.c1; cc <= cb.rect.c2; cc++) delete (from || this).cells[refKey(rr, cc)];
       for (let i = 0; i < cb.h; i++) for (let j = 0; j < cb.w; j++) { const cell = this.ensure(r0 + i, c0 + j); const s = cb.data[i][j]; Object.assign(cell, clone(s)); }
       this.clipboard = null;
       this.lastFlash = { r1: r0, c1: c0, r2: r0 + cb.h - 1, c2: c0 + cb.w - 1 };
       this.sel = cb.h * cb.w > 1 ? { r: r0, c: c0 } : null; this.active = cb.h * cb.w > 1 ? { r: r0 + cb.h - 1, c: c0 + cb.w - 1 } : { r: r0, c: c0 }; this.selA = null;
+      if (from) from.commit('paste');
       this.commit('paste'); return true;
     }
     const selH = sr.r2 - sr.r1 + 1, selW = sr.c2 - sr.c1 + 1;

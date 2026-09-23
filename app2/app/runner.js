@@ -25,6 +25,7 @@ export class LessonRun {
   /** Fresh sheet + session at the lesson's starting state. */
   reset(mode) {
     if (mode) this.mode = mode;
+    this.ghostSnap = null; this.ghosting = false;   // a restart mid-ghost: the freeze belongs to the session being thrown away
     const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells ? structuredCloneCells(sp.cells) : undefined, colW: sp.colW, active: sp.active, today: this.opts.today, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups });
     // A module lesson (C2): the starting workbook is a named state of the module workbook — the
     // file the previous lesson left — not an inline sheet. The legacy path stays for drills and
@@ -169,7 +170,8 @@ export class LessonRun {
     if (this.ghostSnap) return;
     const ses = this.session;
     this.ghostSnap = {
-      sheets: ses.sheets.map(e => ({ snap: e.sheet.snapshot(), clip: e.sheet.clipboard, gridlines: e.sheet.gridlines, undo: e.sheet.undoStack.length, redo: e.sheet.redoStack.length })),
+      sheets: ses.sheets.map(e => ({ snap: e.sheet.snapshot(), gridlines: e.sheet.gridlines, undo: e.sheet.undoStack.length, redo: e.sheet.redoStack.length })),
+      clip: ses.sheet.clipboard,   // the workbook's one clipboard
       idx: ses.sheetIndex, t0: ses.t0, keyLen: ses.keyLog.length, mouse: ses.mouse.count,
       settings: JSON.parse(JSON.stringify({ calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat, pageSetup: ses.settings.pageSetup })),
     };
@@ -182,8 +184,8 @@ export class LessonRun {
     const g = this.ghostSnap; if (!g) return;
     const ses = this.session;
     ses.sheets.length = g.sheets.length;   // a ghost that inserted a sheet loses it again
-    g.sheets.forEach((s, i) => { const sh = ses.sheets[i].sheet; sh.restore(s.snap); sh.clipboard = s.clip; sh.gridlines = s.gridlines; sh.undoStack.length = s.undo; sh.redoStack.length = s.redo; });
-    ses.sheetIndex = g.idx; ses.sheet = ses.sheets[g.idx].sheet;
+    g.sheets.forEach((s, i) => { const sh = ses.sheets[i].sheet; sh.restore(s.snap); sh.gridlines = s.gridlines; sh.undoStack.length = s.undo; sh.redoStack.length = s.redo; });
+    ses.sheetIndex = g.idx; ses.sheet = ses.sheets[g.idx].sheet; ses.sheet.clipboard = g.clip;
     ses.t0 = g.t0; ses.keyLog.length = g.keyLen; ses.mouse.count = g.mouse;
     Object.assign(ses.settings, g.settings);
     ses.resetEdit(); ses.mode = 'normal'; ses.path = []; ses.dialog = null; ses.dlg = null; ses.dialogBuf = ''; ses.pasteKind = null; ses.note = '';
@@ -195,8 +197,8 @@ export class LessonRun {
     const g = this.ghostSnap; if (!g) return;
     const ses = this.session;
     ses.sheets.length = g.sheets.length;
-    g.sheets.forEach((s, j) => { const sh = ses.sheets[j].sheet; sh.restore(s.snap); sh.clipboard = s.clip; sh.gridlines = s.gridlines; sh.undoStack.length = s.undo; sh.redoStack.length = s.redo; });
-    ses.sheetIndex = g.idx; ses.sheet = ses.sheets[g.idx].sheet;
+    g.sheets.forEach((s, j) => { const sh = ses.sheets[j].sheet; sh.restore(s.snap); sh.gridlines = s.gridlines; sh.undoStack.length = s.undo; sh.redoStack.length = s.redo; });
+    ses.sheetIndex = g.idx; ses.sheet = ses.sheets[g.idx].sheet; ses.sheet.clipboard = g.clip;
     ses.resetEdit(); ses.mode = 'normal'; ses.path = []; ses.dialog = null; ses.dlg = null; ses.dialogBuf = ''; ses.pasteKind = null;
     for (let j = 0; j <= i && j < steps.length; j++) this.demoStep(steps[j]);
     this.emit('session');

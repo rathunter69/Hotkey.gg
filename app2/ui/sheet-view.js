@@ -476,10 +476,11 @@ export class SheetView {
     ss.pageRows = Math.max(1, nr); ss.pageCols = Math.max(1, nc);
   }
 
-  /** The marching ants over the copied block (sheet.clipboard.rect), placed over the live cells. */
+  /** The marching ants over the copied block (sheet.clipboard.rect), placed over the live cells — only on the sheet the block was copied from. */
   positionMarquee() {
     const m = this.marquee; if (!m) return;
-    const rect = this.sheet.clipboard && this.sheet.clipboard.rect;
+    const cb = this.sheet.clipboard;
+    const rect = cb && (!cb.src || cb.src === this.sheet) ? cb.rect : null;
     if (!rect) { m.style.display = 'none'; return; }
     const a = this.grid.querySelector(`td[data-r="${rect.r1}"][data-c="${rect.c1}"]`);
     const b = this.grid.querySelector(`td[data-r="${rect.r2}"][data-c="${rect.c2}"]`);

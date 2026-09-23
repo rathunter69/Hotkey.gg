@@ -217,7 +217,7 @@ const S3b = derive(S3a, s => {
 });
 
 /** The Report page's title and the header the skeleton carries. */
-export const REPORT_TITLE = 'Voltline — Austin Weekly KPI Report, w/c 15 Sep 2026';
+export const REPORT_TITLE = 'Voltline - Austin Weekly KPI Report, w/c 15 Sep 2026';   // typed by the learner (1.3.3): plain hyphen, every key on every keyboard
 export const UNITS_LINE = 'USD unless stated';
 const STALE_WEEK = 'w/c 08 Sep', THIS_WEEK = 'w/c 15 Sep';
 

@@ -6,6 +6,7 @@
 // state, and the hint vocabulary law. Exit 1 with the first problems listed; exit 0 = clean.
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
+import { readdirSync } from 'node:fs';
 import { validateLesson, availableConcepts, countedGoals, goalBounds } from '../content/schema.js';
 import { LESSONS_BY_ID } from '../content/index.js';
 import { LessonRun } from '../app/runner.js';
@@ -26,8 +27,16 @@ for (const e of validateLesson(lesson)) bad('validate: ' + e);
 const b = goalBounds(lesson.kind, typeof lesson.module === 'string');
 const n = countedGoals(lesson.goals || []).length;
 if (n < b.min || n > b.max) bad(`goals: ${n} counted, band is ${b.min}-${b.max}`);
-// 2. concepts: this lesson's own, plus its prerequisites' through the catalogue
+// 2. concepts: this lesson's own, plus its prerequisites' through the catalogue — and through the
+// sibling files in content/lessons/ that are not registered yet (a module is authored before it lands)
 const byId = { ...LESSONS_BY_ID, [lesson.id]: lesson };
+{
+  const dir = resolve(file, '..');
+  for (const name of readdirSync(dir)) {
+    if (!name.endsWith('.js')) continue;
+    try { const m = (await import(pathToFileURL(resolve(dir, name)).href)).default; if (m && typeof m.id === 'string' && !byId[m.id]) byId[m.id] = m; } catch (e) { /* a sibling mid-edit is not this file's problem */ }
+  }
+}
 const avail = availableConcepts(lesson, byId);
 for (const g of lesson.goals || []) for (const c of g.requires || []) if (!avail.has(c)) bad(`goal ${g.id} requires "${c}", taught neither here nor by a prerequisite`);
 for (const c of lesson.uses || []) if (!avail.has(c) || (lesson.teaches || []).includes(c)) bad(`uses "${c}" is ${(lesson.teaches || []).includes(c) ? 'also taught here' : 'not taught by any prerequisite'}`);
