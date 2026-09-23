@@ -405,10 +405,10 @@ export function mountDrillPage(root, ctx = {}) {
     if (e.key === 'Escape' && document.documentElement.classList.contains('hk-fs') && !document.fullscreenElement) { document.documentElement.classList.remove('hk-fs'); $('fsToggle').classList.remove('on'); }
     if (!overlay.hidden) {
       if (e.key === 'Escape') { e.preventDefault(); overlay.hidden = true; focusStage(); }
-      else if (e.key === 'Enter' || e.key === 'r' || e.key === 'R') { e.preventDefault(); retry(); }
+      else if (e.key === 'Enter' || e.key === 'r' || e.key === 'R' || e.key === 'n' || e.key === 'N') { e.preventDefault(); retry(); }
       return;
     }
-    if (run.finished) { if (e.key === 'Enter' || e.key === 'r' || e.key === 'R') { e.preventDefault(); retry(); } return; }
+    if (run.finished) { if (e.key === 'Enter' || e.key === 'r' || e.key === 'R' || e.key === 'n' || e.key === 'N') { e.preventDefault(); retry(); } return; }
     if (replay) { if (e.key === 'Escape') { e.preventDefault(); stopReplay(); $('demoBtn').classList.remove('on'); } return; }   // watching: your keys wait
     if (!started) {
       // the start card's key: dismiss and swallow — it never lands on the sheet

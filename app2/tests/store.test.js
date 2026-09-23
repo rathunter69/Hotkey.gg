@@ -131,3 +131,15 @@ test('the game outbox is uid-owned like the lesson outbox', async () => {
   assert.deepEqual(owned({ uid: 'u1', items: [{ id: 'a' }] }, 'u2'), [], 'a foreign account’s queued attempts are never sent');
   assert.deepEqual(owned({ uid: 'u1', items: [{ id: 'a' }] }, 'u1'), [{ id: 'a' }]);
 });
+
+test('mergeRun carries the challenge kind: flag, clean best and a tier that never regresses', () => {
+  let l = {};
+  l = mergeRun(l, 'ch', 'challenge', 80, true, { tier: 'pass' });
+  assert.deepEqual(l.ch, { completed: true, challenge: true, best: 80, tier: 'pass', at: l.ch.at });
+  l = mergeRun(l, 'ch', 'challenge', 55, true, { tier: 'legendary' });
+  assert.equal(l.ch.tier, 'legendary'); assert.equal(l.ch.best, 55);
+  l = mergeRun(l, 'ch', 'challenge', 70, false, { tier: 'pass' });
+  assert.equal(l.ch.tier, 'legendary', 'a later lower tier never regresses the stamp');
+  assert.equal(l.ch.best, 55, 'an unclean run sets no best');
+  assert.equal(l.ch.timed, undefined, 'a challenge is not a timed lesson');
+});

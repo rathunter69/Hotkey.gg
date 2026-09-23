@@ -156,6 +156,10 @@ export function mountEffects(opts = {}) {
   }
   function achievement(def) { queued.push(def); drainAchievements(); }
   function setBusy(v) { busy = !!v; if (!busy) drainAchievements(); }
+  /** A clean sheet (no mouse, no help): a bright, rising pair — quieter than a PB. */
+  function cleanSheet() { tone(988, 0, 0.08, 0.06); tone(1319, 0.07, 0.14, 0.07); }
+  /** A pack page filled (a module's challenge passed): a settling three-note stamp. */
+  function packPage() { tone(784, 0, 0.1, 0.08); tone(988, 0.09, 0.1, 0.08); tone(1175, 0.18, 0.2, 0.09); banner('▣ Page added to the pack', 'fx-pack'); }
   function clockStart() { tone(1046, 0, 0.05, 0.05); }
   function clockStop() { tone(1046, 0, 0.06, 0.06); tone(1568, 0.06, 0.1, 0.06); }
   function hit() { tone(1319, 0, 0.05, 0.06); }
@@ -172,6 +176,6 @@ export function mountEffects(opts = {}) {
   return {
     session: opts.sessionRef || null,
     goalTick, finish, click, refuse, setMuted, isMuted, mountMuteButton, armSounds, isArmed: () => armed, destroy,
-    goalDone, lessonDone, newShortcut, newPB, parTier, levelUp, rankUp, achievement, setBusy, clockStart, clockStop, hit, comboBreak, visualsOn,
+    goalDone, lessonDone, newShortcut, newPB, parTier, levelUp, rankUp, achievement, setBusy, clockStart, clockStop, hit, comboBreak, visualsOn, cleanSheet, packPage,
   };
 }

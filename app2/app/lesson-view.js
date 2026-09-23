@@ -54,6 +54,8 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   const fullRibbon = chapter && chapter.id === 'foundations';   // Chapter 1: the full ribbon bar is on by default (§4)
   const timedOnly = lesson.kind === 'assessment' || lesson.kind === 'testout';   // these run against the clock, no help, no other mode
   if (timedOnly) mode = 'timed';
+  const isChallenge = lesson.kind === 'challenge';   // the module challenge: seeded, all goals at once, countdown, tier pars (C2)
+  if (isChallenge) mode = 'challenge';
   const el = document.createElement('div');
   el.className = 'lesson';
   el.innerHTML = `
@@ -101,6 +103,9 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   let panel = loadPanel();
   let firstEver = false;     // the first completion this device has seen: the save invitation (§3)
   let saveState = '';
+  let lastClean = false;     // the finished run: no mouse, no help (the clean-sheet mark, §6)
+  let lastTier = null;       // a clean challenge's tier from the pars, for the overlay stamp
+  let xpGained = 0;          // what the run earned, for the overlay's count-up
 
   const run = new LessonRun(lesson, {
     mode,
@@ -133,7 +138,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   }
 
   /* ---------------- the panel ---------------- */
-  const modeLabel = () => run.mode === 'guided' ? 'Guided' : run.mode === 'solo' ? 'Solo' : 'Timed';
+  const modeLabel = () => run.mode === 'guided' ? 'Guided' : run.mode === 'solo' ? 'Solo' : run.mode === 'challenge' ? 'Challenge' : 'Timed';
   /** Keys show on the goal line only where the goal introduces a shortcut (its teach line) in Guided mode, or after Help revealed them (§4). */
   const keysShown = g => (run.mode === 'guided' && !!g.teach) || revealed;
   const raceOf = id => (lesson.race || []).find(r => r.slow === id || r.fast === id);
@@ -290,8 +295,8 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     // a race goal shows its own clock while it is open (it starts with the first key of that goal)
     const live = el.querySelector('[data-goal-clock]');
     if (live && phase === 'play') { const start = run.goalStart(+live.dataset.goalClock); live.textContent = start == null ? '0.0 s' : fmtSecs(Math.max(0, (Date.now() - start) / 1000)) + ' s'; }
-    if (run.mode !== 'timed') { t.textContent = ''; return; }
-    // An assessment or test-out counts down from its time limit; the clock starts on the first action.
+    if (run.mode !== 'timed' && run.mode !== 'challenge') { t.textContent = ''; return; }
+    // An assessment, test-out or challenge counts down from its time limit; the clock starts on the first action.
     if (lesson.timeLimit) {
       const left = Math.max(0, lesson.timeLimit - (run.startedAt == null ? 0 : run.elapsed));
       t.textContent = left.toFixed(1) + ' s left';
@@ -334,36 +339,71 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   }
   function doneButtonsHtml() {
     const nxt = nextLesson(lesson.id);
+    // A challenge retries by seed: Enter replays the very sheet, N deals a fresh one (C2 gap 9b).
+    if (isChallenge) {
+      return `<button class="btn btn-primary" data-act="retry-same" type="button">Retry — same sheet <kbd>Enter</kbd></button>
+        <button class="btn" data-act="retry-new" type="button">New sheet <kbd>N</kbd></button>
+        <button class="btn" data-act="continue" type="button">${nxt ? 'Continue' : 'Back to Learn'}</button>`;
+    }
     const alt = run.mode === 'guided' ? 'Try solo' : run.mode === 'solo' ? 'Try timed' : 'Try again';
     return `<button class="btn btn-primary" data-act="continue" type="button">${nxt ? 'Continue' : 'Back to Learn'} <kbd>Enter</kbd></button>
       <button class="btn" data-act="alt" type="button">${alt}</button>`;
   }
+  /** Restart a challenge: the same seed replays the identical sheet; a new seed deals fresh clothing. */
+  function restartChallenge(newSeed) {
+    run.opts.seedNo = newSeed ? undefined : run.seedNo;
+    restart('challenge');
+  }
   function wireDoneButtons(scope) {
     const nxt = nextLesson(lesson.id);
-    scope.querySelector('[data-act="continue"]').onclick = () => { location.hash = nxt ? '#/lesson/' + nxt.id : '#/learn'; };
-    scope.querySelector('[data-act="alt"]').onclick = () => restart(run.mode === 'guided' ? 'solo' : run.mode === 'solo' ? 'timed' : 'timed');
-    const look = scope.querySelector('[data-act="look"]'); if (look) look.onclick = closeOverlay;
+    const on = (act, fn) => { const b = scope.querySelector(`[data-act="${act}"]`); if (b) b.onclick = fn; };
+    on('continue', () => { location.hash = nxt ? '#/lesson/' + nxt.id : '#/learn'; });
+    on('alt', () => restart(run.mode === 'guided' ? 'solo' : run.mode === 'solo' ? 'timed' : 'timed'));
+    on('retry-same', () => restartChallenge(false));
+    on('retry-new', () => restartChallenge(true));
+    on('look', closeOverlay);
     // after a timed or challenge run: watch the reference route play over the finished sheet, then it goes back
-    const route = scope.querySelector('[data-act="route"]'); if (route) route.onclick = () => { closeOverlay(); startGhost(parseKeyScript(lesson.solution)); };
+    on('route', () => { closeOverlay(); startGhost(parseKeyScript(lesson.solution)); });
+  }
+  /** One line naming the next lesson's job: the first sentence of its brief (or read, or its title). */
+  function nextJobHtml() {
+    const nxt = nextLesson(lesson.id); if (!nxt) return '';
+    const src = String(nxt.brief || nxt.read || nxt.title);
+    return `<div class="rm-next">Next: ${rich(src.split(/(?<=[.!?])\s+/)[0])}</div>`;
+  }
+  /** Count the XP line up from 0 to what the run earned (~600 ms). */
+  function countUpXp(scope) {
+    const elx = scope.querySelector('.rm-xp'); if (!elx || !xpGained) return;
+    const t0 = Date.now(); const dur = 600;
+    const tick = () => {
+      if (!elx.isConnected) return;
+      const f = Math.min(1, (Date.now() - t0) / dur);
+      elx.textContent = '+' + Math.round(xpGained * f) + ' XP';
+      if (f < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
   }
   function renderOverlay() {
+    // Bare numbers, the clean-sheet mark, the XP count-up and the next job — no comparison
+    // sentences, no before/after view (C2 gap 9b).
     const secs = run.startedAt == null ? null : run.elapsed;
-    const best = store.get(lesson.id); const pb = best && Number.isFinite(best.best) ? best.best : null;
     overlay.innerHTML = `<div class="rm-card">
-      <div class="rm-title" id="doneTitle">${doneTitle()}</div>
+      <div class="rm-title" id="doneTitle">${isChallenge && lastTier ? esc(lastTier[0].toUpperCase() + lastTier.slice(1)) + '!' : doneTitle()}</div>
       <div class="rm-lesson">${lessonNumber(lesson.id)} · ${esc(lesson.title)} · ${modeLabel()}</div>
       ${lesson.race ? raceHtml() : `<div class="rm-time">${secs == null ? '—' : fmtSecs(secs)}<span>s</span></div>`}
-      <div class="rm-stats"><div>keystrokes<b>${run.session.keyLog.length}</b></div><div>${modeLabel().toLowerCase()}<b>${assisted() ? 'Assisted' : run.mode === 'guided' ? 'Complete' : 'Solo'}</b></div>${run.mouseCount ? `<div>mouse<b>×${run.mouseCount}</b></div>` : ''}${run.mode === 'timed' && run.par ? `<div>par<b>${run.par} s</b></div>` : ''}</div>
-      ${run.mode === 'timed' ? `<div class="rm-note">${!assisted() && !run.mouseCount ? (pb != null ? `personal best <b>${fmtSecs(pb)} s</b>` : '') : 'help or mouse in a timed run: no personal best'}</div>` : ''}
-      ${assisted() ? `<div class="rm-note">Steps were shown on request, so this attempt counts as assisted. Try solo earns the rest.</div>` : run.mode === 'guided' ? `<div class="rm-note">Try solo does it again without the keys shown.</div>` : ''}
+      ${isChallenge && lesson.pars ? `<div class="tier-stamps">${['pass', 'pro', 'legendary'].map(t => `<span class="tstamp ${lastClean && secs != null && secs <= lesson.pars[t] ? 'hit' : ''}">${t} ${lesson.pars[t]}s</span>`).join('')}</div>` : ''}
+      <div class="rm-stats"><div>keystrokes<b>${run.session.keyLog.length}</b></div>${run.mouseCount ? `<div>mouse<b>×${run.mouseCount}</b></div>` : ''}${run.mode === 'timed' && run.par ? `<div>par<b>${run.par} s</b></div>` : ''}${xpGained ? `<div>earned<b class="rm-xp">+0 XP</b></div>` : ''}</div>
+      ${lastClean ? `<div class="rm-clean">✓ Clean sheet — no mouse, no help</div>` : assisted() ? `<div class="rm-note">Assisted — steps were shown on request.</div>` : ''}
       ${closingHtml()}
+      ${nextJobHtml()}
       ${firstEver && store.saveState() === 'device' ? `<div class="rm-save"><b>Your first lesson is done.</b> Progress is saved on this device. <a href="#/account">Create a free account</a> to keep it across devices — everything you have done carries over.</div>` : ''}
-      <div class="rm-opts">${doneButtonsHtml()}<button class="btn btn-ghost" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button>${(run.mode === 'timed' || lesson.kind === 'challenge') && lesson.solution ? '<button class="btn btn-ghost" data-act="route" type="button">Watch the reference route</button>' : ''}</div>
+      <div class="rm-opts">${doneButtonsHtml()}<button class="btn btn-ghost" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button>${(run.mode === 'timed' || isChallenge) && lesson.solution ? '<button class="btn btn-ghost" data-act="route" type="button">Watch the reference route</button>' : ''}</div>
       <div class="rm-more">${esc(saveState)}</div>
     </div>`;
     wireDoneButtons(overlay);
+    countUpXp(overlay);
     overlay.hidden = false;
-    const primary = overlay.querySelector('[data-act="continue"]'); if (primary) primary.focus();
+    const primary = overlay.querySelector(isChallenge ? '[data-act="retry-same"]' : '[data-act="continue"]'); if (primary) primary.focus();
   }
   function closeOverlay() { overlay.hidden = true; focusWorkspace(); }
   /** The time limit ran out on an assessment or test-out: nothing is recorded, the run offers itself again. */
@@ -379,10 +419,12 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       <div class="rm-stats"><div>goals<b>${run.doneCount} / ${run.goals.length}</b></div><div>limit<b>${lesson.timeLimit} s</b></div></div>
       <div class="rm-note">${lesson.kind === 'testout' ? 'No harm done: nothing is recorded, and the chapter’s lessons are always open.' : 'Nothing is recorded for a run that ran out. The report is the same every time — another run is more practice.'}</div>
       <div class="rm-opts"><button class="btn btn-primary" data-act="continue" type="button">Try again <kbd>Enter</kbd></button>
+        ${isChallenge ? '<button class="btn" data-act="new" type="button">New sheet <kbd>N</kbd></button>' : ''}
         <a class="btn" href="#/learn">Back to Learn</a>
         <button class="btn btn-ghost" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button></div>
     </div>`;
-    overlay.querySelector('[data-act="continue"]').onclick = () => restart('timed');
+    overlay.querySelector('[data-act="continue"]').onclick = () => (isChallenge ? restartChallenge(false) : restart('timed'));
+    const nw = overlay.querySelector('[data-act="new"]'); if (nw) nw.onclick = () => restartChallenge(true);
     overlay.querySelector('[data-act="look"]').onclick = closeOverlay;
     overlay.hidden = false;
     const primary = overlay.querySelector('[data-act="continue"]'); if (primary) primary.focus();
@@ -393,19 +435,29 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     const ctxBefore = gameCtx();
     const before = store.all();
     firstEver = !Object.values(before).some(p => p.completed);
+    lastClean = !assisted() && !run.mouseCount;
+    // A clean challenge earns the tier its time reaches; help or mouse means the pass records with none.
+    lastTier = null;
+    if (isChallenge && lastClean && lesson.pars) {
+      const p = lesson.pars;
+      lastTier = run.elapsed <= p.legendary ? 'legendary' : run.elapsed <= p.pro ? 'pro' : run.elapsed <= p.pass ? 'pass' : null;
+    }
     const saved = store.record(lesson.id, run.mode, run.elapsed, {
-      clean: !assisted() && !run.mouseCount,
+      clean: lastClean,
       keystrokes: run.session.keyLog.length,
       mouseCount: run.mouseCount,
       assisted: assisted(),
+      tier: lastTier || undefined,
     });
-    // A timed run is also an attempt record (one source for Stats; the account mirror is Phase B's attempts table).
-    if (run.mode === 'timed') {
+    // A timed or challenge run is also an attempt record (one source for Stats, PBs, boards and
+    // XP; a challenge carries its seed so a ghost can replay the very sheet it was set on).
+    if (run.mode === 'timed' || isChallenge) {
       store.addAttempt({
-        id: attemptId(), kind: 'lesson-timed', ref: lesson.id, day: dayOf(), seed: null,
+        id: attemptId(), kind: isChallenge ? 'challenge' : 'lesson-timed', ref: lesson.id, day: dayOf(),
+        seed: isChallenge && Number.isInteger(run.seedNo) ? run.seedNo : null,
         secs: run.elapsed, keys: run.session.keyLog.length,
-        clean: !assisted() && !run.mouseCount, helped: assisted(), mouse: run.mouseCount,
-        tier: 'none', splits: run.splits().filter(Number.isFinite), trace: traceOf(run.session.keyLog), at: Date.now(),
+        clean: lastClean, helped: assisted(), mouse: run.mouseCount,
+        tier: lastTier || 'none', splits: run.splits().filter(Number.isFinite), trace: traceOf(run.session.keyLog), at: Date.now(),
       });
     }
     // A finished assessment or test-out inside its time limit passes the chapter gate (§7);
@@ -419,8 +471,10 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       }
     }
     saveState = saved ? store.saveText() : 'Couldn’t save on this device (storage blocked); the lesson still counts for this visit';
+    xpGained = Math.max(0, gameCtx().xp - ctxBefore.xp);
     if (timerH) { clearInterval(timerH); timerH = null; }
     effects.finish($('stage'));
+    if (lastClean && effects.cleanSheet) effects.cleanSheet();
     celebrate(effects, ctxBefore);
     tab = 'lesson';
     renderPanel();
@@ -561,7 +615,12 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     if (e.key === 'F1') { e.preventDefault(); selectTab(tab === 'help' ? 'lesson' : 'help'); return; }
     if (!overlay.hidden) {
       if (e.key === 'Escape') { e.preventDefault(); closeOverlay(); }
-      else if (e.key === 'Enter' && !(tag === 'BUTTON' || tag === 'A')) { e.preventDefault(); overlay.querySelector('[data-act="continue"]').click(); }
+      else if (isChallenge && (e.key === 'n' || e.key === 'N')) { e.preventDefault(); restartChallenge(true); }
+      else if (e.key === 'Enter' && !(tag === 'BUTTON' || tag === 'A')) {
+        e.preventDefault();
+        const b = overlay.querySelector(isChallenge ? '[data-act="retry-same"], [data-act="continue"]' : '[data-act="continue"]');
+        if (b) b.click();
+      }
       return;
     }
     if ((tag === 'BUTTON' || tag === 'A' || tag === 'SUMMARY') && (e.key === 'Enter' || e.key === ' ')) return;   // the control handles its own activation
@@ -574,8 +633,16 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       return;
     }
     if (demo) { if (e.key === 'Escape') skipDemo(); if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length > 1) e.preventDefault(); return; }   // watching: keys wait, arrows never scroll the page
-    if (phase === 'timeup') { if (e.key === 'Enter') { e.preventDefault(); restart('timed'); } return; }   // the run is over; Enter starts the next attempt
-    if (phase === 'done') { if (e.key === 'Enter') { e.preventDefault(); const c = el.querySelector('[data-act="continue"]'); if (c) c.click(); } return; }
+    if (phase === 'timeup') {   // the run is over; Enter starts the next attempt (a challenge: the same sheet; N deals fresh)
+      if (e.key === 'Enter') { e.preventDefault(); if (isChallenge) restartChallenge(false); else restart('timed'); }
+      else if (isChallenge && (e.key === 'n' || e.key === 'N')) { e.preventDefault(); restartChallenge(true); }
+      return;
+    }
+    if (phase === 'done') {
+      if (e.key === 'Enter') { e.preventDefault(); const c = el.querySelector(isChallenge ? '[data-act="retry-same"], [data-act="continue"]' : '[data-act="continue"]'); if (c) c.click(); }
+      else if (isChallenge && (e.key === 'n' || e.key === 'N')) { e.preventDefault(); restartChallenge(true); }
+      return;
+    }
     if (run.key(e)) { e.preventDefault(); effects.armSounds(); }
   }
   function onKeyUp(e) { if (e.key === 'Alt') e.preventDefault(); }

@@ -44,15 +44,21 @@ export function newId() {
  * the server's apply_attempt: completed always; solo/timed per mode; best only on a clean timed
  * run, never regressing. Pure; exported for the tests.
  */
-export function mergeRun(lessons, id, mode, secs, clean) {
+export function mergeRun(lessons, id, mode, secs, clean, opts = {}) {
+  const TIER_RANK = { pass: 1, pro: 2, legendary: 3 };
   const out = { ...lessons };
   const p = { ...(out[id] || {}) };
   p.completed = true;
   if (mode === 'solo') p.solo = true;
-  if (mode === 'timed') {
-    p.timed = true;
+  if (mode === 'timed' || mode === 'challenge') {
+    if (mode === 'timed') p.timed = true;
     const prev = Number.isFinite(p.best) ? p.best : null;
     if (clean !== false && Number.isFinite(secs) && secs >= 0 && (prev == null || secs < prev)) p.best = Math.round(secs * 100) / 100;
+  }
+  if (mode === 'challenge') {
+    p.challenge = true;
+    const t = opts.tier;
+    if (TIER_RANK[t] && (!p.tier || TIER_RANK[t] > TIER_RANK[p.tier])) p.tier = t;
   }
   p.at = Date.now();
   out[id] = p;
@@ -323,8 +329,11 @@ export const store = {
       announce(ok ? 'device' : 'retry');
       return ok;
     }
-    cacheLessons = mergeRun(this.all(), id, mode, secs, opts.clean);
+    cacheLessons = mergeRun(this.all(), id, mode, secs, opts.clean, opts);
     const cached = writeCache(cacheLessons);
+    // A challenge is a game run: its server record is the game attempt (addAttempt, kind
+    // 'challenge' — 0008), not a lesson attempt; only the optimistic cache is written here.
+    if (mode === 'challenge') return cached;
     const item = {
       id: newId(),
       lesson_id: id,
