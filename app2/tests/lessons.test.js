@@ -446,3 +446,82 @@ test('demo goals: the platform plays the script, the goal lands only when it has
   assert.equal(run.pendingDemo(), null, 'the learner\'s goal is next');
   for (const pair of welcome.race) { assert.ok(welcome.goals.find(g => g.id === pair.slow).demo, `${pair.label}: the slow leg is a demo`); assert.ok(!welcome.goals.find(g => g.id === pair.fast).demo, `${pair.label}: the fast leg is the learner\'s`); }
 });
+
+/* ---------------- C2 hint vocabulary (framework v2 §5) ----------------
+   Go To is a tool, not movement glue: a hint may reach for Ctrl+G / F5 only when the target is on
+   another sheet, more than a screen away (≥ 20 rows or ≥ 10 columns), or the dialog is the door to
+   Go To Special. And no hint grinds arrows: more than three consecutive plain arrow presses only on
+   goals flagged `slowRound` (the Welcome's deliberate slow legs). The rules bind the module lessons
+   (`l.module`); the legacy 38 are exempt until the rewrite replaces them. */
+import { workbookState } from '../content/workbooks/index.js';
+
+const hintTokens = keys => String(keys || '').match(/"[^"]*"|\S+/g) || [];
+const CELL_RE = /^\$?([A-Z]{1,3})\$?(\d{1,7})$/;
+const cellRC = ref => { const m = CELL_RE.exec(String(ref).replace(/^.*!/, '').split(':')[0].replace(/\$/g, '')); if (!m) return null; let c = 0; for (const ch of m[1]) c = c * 26 + ch.charCodeAt(0) - 64; return { r: +m[2], c }; };
+const isArrow = t => /^(↑|↓|←|→|Up|Down|Left|Right)$/.test(t);
+
+/** Every Ctrl+G / F5 in a hint, judged: null when fine, else the reason it reads as movement glue. */
+export function goToOffence(tokens, anchor) {
+  for (let i = 0; i < tokens.length; i++) {
+    if (tokens[i] !== 'Ctrl+G' && tokens[i] !== 'F5') continue;
+    const after = tokens.slice(i + 1, i + 4);
+    if (after.some(t => t === 'Alt+S')) { continue; }                       // the door to Go To Special
+    const quoted = after.find(t => t.startsWith('"'));
+    const ref = quoted ? quoted.slice(1, -1) : '';
+    if (ref.includes('!')) { anchor = cellRC(ref) || anchor; continue; }    // another sheet: a jump, not glue
+    const to = cellRC(ref);
+    if (!to) return `types "${ref}" — not a reference and not Go To Special`;
+    if (anchor && Math.abs(to.r - anchor.r) < 20 && Math.abs(to.c - anchor.c) < 10) {
+      return `jumps to ${ref} from ${'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[anchor.c - 1] || '?'}${anchor.r} — a screen or less away`;
+    }
+    anchor = to;
+  }
+  return null;
+}
+/** More than three consecutive plain arrows (×N counts as N presses)? */
+export function arrowGrind(tokens) {
+  let streak = 0, prevArrow = false;
+  for (const t of tokens) {
+    const rep = /^×(\d+)$/.exec(t);
+    if (rep && prevArrow) { streak += +rep[1] - 1; }
+    else if (isArrow(t)) { streak += 1; prevArrow = true; }
+    else { streak = 0; prevArrow = false; continue; }
+    if (streak > 3) return true;
+  }
+  return false;
+}
+/** Where the hint's cursor last verifiably stood before goal `gi`: the previous goals' last typed ref, else the state's active cell. */
+function anchorBefore(lesson, gi) {
+  for (let j = gi - 1; j >= 0; j--) {
+    const qs = hintTokens(lesson.goals[j].keys).filter(t => t.startsWith('"'));
+    for (let k = qs.length - 1; k >= 0; k--) { const rc = cellRC(qs[k].slice(1, -1).split(':').pop()); if (rc) return rc; }
+  }
+  try {
+    const st = workbookState(lesson.workbook, lesson.state.before);
+    const sh = st.sheets.find(s => s.active) || st.sheets[0];
+    return cellRC((sh && typeof sh.active === 'string' && sh.active) || 'A1') || { r: 1, c: 1 };
+  } catch (e) { return { r: 1, c: 1 }; }
+}
+
+test('module hints never use Go To as movement glue and never grind arrows', () => {
+  // the rule itself, pinned on fixtures
+  assert.equal(goToOffence(hintTokens('Ctrl+G "B4" ↵'), { r: 2, c: 1 }), 'jumps to B4 from A2 — a screen or less away');
+  assert.equal(goToOffence(hintTokens('Ctrl+G "A45" ↵'), { r: 2, c: 1 }), null, 'more than a screen down is a jump');
+  assert.equal(goToOffence(hintTokens('Ctrl+G "N2" ↵'), { r: 2, c: 1 }), null, 'more than a screen across is a jump');
+  assert.equal(goToOffence(hintTokens('Ctrl+G "Inputs!B4" ↵'), { r: 2, c: 1 }), null, 'another sheet is a jump');
+  assert.equal(goToOffence(hintTokens('Ctrl+G Alt+S "K" ↵'), { r: 2, c: 1 }), null, 'Go To Special is the dialog’s own job');
+  assert.equal(goToOffence(hintTokens('F5 "C3" ↵'), { r: 1, c: 1 }), 'jumps to C3 from A1 — a screen or less away');
+  assert.ok(arrowGrind(hintTokens('↓ ↓ ↓ ↓')), 'four arrows grind');
+  assert.ok(arrowGrind(hintTokens('↓ ×5')), '×N counts as N presses');
+  assert.ok(!arrowGrind(hintTokens('↓ ↓ ↓ then Ctrl+↓')), 'three arrows and a jump is fine');
+  assert.ok(!arrowGrind(hintTokens('Ctrl+↓ Ctrl+↓ Ctrl+↓ Ctrl+↓')), 'modified arrows are jumps, not grinding');
+  // and every module lesson obeys it
+  for (const l of LESSONS.filter(x => typeof x.module === 'string')) {
+    l.goals.forEach((g, gi) => {
+      const toks = hintTokens(g.keys);
+      const bad = goToOffence(toks, anchorBefore(l, gi));
+      assert.equal(bad, null, `Go To used as movement glue in ${l.id}/${g.id}: ${bad}`);
+      if (!g.slowRound) assert.ok(!arrowGrind(toks), `arrow grinding in ${l.id}/${g.id}: more than three plain arrows in a row`);
+    });
+  }
+});
