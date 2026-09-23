@@ -17,6 +17,8 @@ import { DRILLS, drillById } from '../content/drills.js';
 import { DrillRun } from './drill-run.js';
 import { store } from './store.js';
 import { dailyDrill, shareText } from './daily.js';
+import { dailyCardHtml } from '../ui/result-card.js';
+import { flowNext } from './flow.js';
 import { dayOf } from './records.js';
 import { gameCtx, celebrate } from './stats.js';
 
@@ -377,6 +379,15 @@ export function mountDrillPage(root, ctx = {}) {
         <button class="btn btn-ghost" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button>
       </div>
     </div>`;
+    // the Daily's shareable card (experience pass, decision 14): replaces the bare time on the Daily's overlay
+    if (daily && flowNext()) {
+      const host = document.createElement('div');
+      host.innerHTML = dailyCardHtml({ day: dayOf(), title: drill.title, secs: attempt.secs, tier: attempt.tier, keys: attempt.keys, refKeys: drill.optimalKeys, pos: null, of: null, attempts: attemptsToday(), clean: attempt.clean, handle: (store.profile() || {}).handle || null });
+      const card = overlay.querySelector('.rm-card');
+      const time = card.querySelector('.rm-time'); const stamps = card.querySelector('.tier-stamps');
+      if (time) time.replaceWith(host.firstElementChild); if (stamps) stamps.remove();
+      card.classList.add('rm-card-daily');
+    }
     const share = overlay.querySelector('[data-act="share"]');
     if (share) share.onclick = () => {
       const text = shareText(dayOf(), drill.title, attempt.secs, attempt.tier);

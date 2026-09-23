@@ -55,6 +55,7 @@ function navHtml(links, active, account) {
   }).join('\n          ');
   const acct = account ? `
           <div class="auth-slot" id="authSlot">
+            <a class="nav-signin" id="navSignIn" href="#/account">Sign in</a>
             <div class="user-menu" id="userMenu">
               <button class="user-btn" id="userBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="userDropdown" title="account">${NAV_ICONS.user}<span class="user-guest" id="userState">guest</span><span class="um-caret">▾</span></button>
               <div class="user-dropdown" id="userDropdown" role="menu" aria-labelledby="userBtn">
@@ -203,6 +204,7 @@ export function mountNav(el, opts = {}) {
    */
   function setUser(user) {
     signedIn = !!user;
+    const si = el.querySelector('#navSignIn'); if (si) si.hidden = !!user;
     const state = el.querySelector('#userState');
     if (state) {
       state.textContent = user ? (user.handle || '…') : 'guest';
