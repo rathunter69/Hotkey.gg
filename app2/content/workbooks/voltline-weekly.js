@@ -9,7 +9,7 @@
 // $0.13 = energy cost); sessions and tariffs arrive in Chapter 3. Figures are deterministic
 // (seeded once, rounded to tens) so checks can read the sheet and still assert exact numbers.
 import { mulberry32 } from '../../engine/rng.js';
-import { FMT_FIELDS } from '../../engine/sheet.js';
+import { FMT_FIELDS, Sheet, ROWH_DEFAULT } from '../../engine/sheet.js';
 
 export const SITES = ['Domain', 'Mueller', 'Riverside', 'South Lamar', 'Airport'];
 export const SITE_PRICE = { Domain: 0.45, Mueller: 0.44, Riverside: 0.46, 'South Lamar': 0.43, Airport: 0.48 };
@@ -30,6 +30,12 @@ export const KWH = (() => {
 
 /** The Raw feed row for (site, dayIndex): 1-based sheet row. Site-major: Domain 2–13 … Airport 50–61. */
 export const rawRow = (site, d) => 2 + SITES.indexOf(site) * 12 + d;
+/** The old platform's site codes (the stale column 1.4.1 deletes). */
+export const OLD_CODES = { Domain: 'AUS-01', Mueller: 'AUS-02', Riverside: 'AUS-03', 'South Lamar': 'AUS-04', Airport: 'AUS-05' };
+/** Cedar Park, the site that opens in 1.4.1: management's emailed week (not on the feed yet). */
+export const CEDAR_PARK = { kwh: 2140, revenue: 1005.8, energy: 278.2 };
+/** Where the platform feed's site-totals block sits on Raw (H6:M13): the live SUMs 1.3.4 freezes and 1.4.1 watches. */
+export const RAW_TOTALS = { headerRow: 7, firstRow: 8, totalRow: 13, cols: { site: 'H', kwh: 'I', revenue: 'J', energy: 'K', prior: 'L', code: 'M' } };
 
 /* ---------------- the S0 sheets ---------------- */
 
@@ -62,9 +68,27 @@ function rawCells() {
   delete cells.C61; delete cells.D61; delete cells.E61; delete cells.F61;   // Airport Saturday never came through (1.3.1)
   cells.H3 = { value: 'draft', it: true };    // a stray note (1.3.1 clears it)
   cells.A64 = { value: 'Notes', bold: true };
-  cells.A65 = { value: 'w/c 08 Sep feed checked — EA' };   // the stale week label Replace All updates (1.3.5)
+  cells.A65 = { value: 'w/c 08 Sep feed checked — EA' };   // last week's note; the stale label 1.3.5 replaces lives on Report and Inputs
   cells.A66 = { value: 'Airport Saturday missing from feed' };
   cells.A67 = { value: 'prices per site tariff card' };
+  // the platform appends a site-totals block beside the feed: live SUMs over each site's two weeks,
+  // last week's revenue, and the old platform's site code (stale). 1.3.4 freezes these into the
+  // Report's values; 1.4.1 deletes the codes and watches a deleted column turn the block #REF!.
+  cells.H6 = { value: 'Site totals (platform)', bold: true };
+  cells.H7 = { value: 'Site', bold: true }; cells.I7 = { value: 'kWh sold', bold: true }; cells.J7 = { value: 'Revenue ($)', bold: true };
+  cells.K7 = { value: 'Energy cost ($)', bold: true }; cells.L7 = { value: 'Prior week rev ($)', bold: true }; cells.M7 = { value: 'Old code', bold: true };
+  SITES.forEach((site, i) => {
+    const r = 8 + i, tw = `${8 + 12 * i}:${13 + 12 * i}`, lw = `${2 + 12 * i}:${7 + 12 * i}`;   // this week's rows, last week's rows
+    const rows = (col, band) => col + band.split(':')[0] + ':' + col + band.split(':')[1];
+    cells['H' + r] = { value: site };
+    cells['I' + r] = { formula: `=SUM(${rows('C', tw)})` };
+    cells['J' + r] = { formula: `=SUM(${rows('E', tw)})` };
+    cells['K' + r] = { formula: `=SUM(${rows('F', tw)})` };
+    cells['L' + r] = { formula: `=SUM(${rows('E', lw)})` };
+    cells['M' + r] = { value: OLD_CODES[site] };
+  });
+  cells.H13 = { value: 'Total', bold: true };
+  for (const col of ['I', 'J', 'K', 'L']) cells[col + '13'] = { formula: `=SUM(${col}8:${col}12)` };
   return cells;
 }
 
@@ -72,6 +96,7 @@ function rawCells() {
 function sheet2Cells() {
   return {
     A1: { value: 'Inputs', bold: true },
+    A3: { value: 'Week' }, B3: { value: 'w/c 08 Sep' },   // the reporting week, still last week's: 1.3.3 copies it, 1.3.5 replaces it everywhere
     A4: { value: 'Wholesale energy price ($/kWh)' },       // B4 empty: the price is buried in B14 until 1.1.4 splits it out
     A5: { value: 'Target gross margin' }, B5: { value: 0.65, fmtStyle: 'percent', decimals: 0 },
     A6: { value: 'Est. kWh this week (cluster)' }, B6: { value: 84000, fmtStyle: 'comma', decimals: 0 },
@@ -123,7 +148,7 @@ const sheetOf = (state, name) => state.sheets.find(s => s.name === name);
 
 const S0 = {
   sheets: [
-    { name: 'Raw', cells: rawCells(), colW: { 1: 76, 2: 92, 4: 92, 5: 88, 6: 104 }, active: { r: 1, c: 1 } },
+    { name: 'Raw', cells: rawCells(), colW: { 1: 76, 2: 92, 4: 92, 5: 88, 6: 104, 8: 96, 9: 76, 10: 92, 11: 108, 12: 128, 13: 72 }, active: { r: 1, c: 1 } },
     { name: 'Sheet2', cells: sheet2Cells(), colW: { 1: 180 } },
     { name: 'Old wk37', cells: oldWk37Cells(), colW: { 1: 76, 2: 92 } },
     { name: 'Costs', cells: costsCells(), colW: { 1: 92, 2: 108, 3: 122, 4: 122, 5: 92 } },
@@ -165,14 +190,148 @@ const S2a = derive(S1d, s => {
     c[k] = { ...c[k], fontColor: 'blue' };
 });
 
-export const STATES = { S0, S1a, S1b, S1c, S1d, S2a };
-// S3a–S8raw arrive with modules 1.3–1.8 (later C2 runs); each derives from the one before.
+/* ---------------- module 1.3: enter, edit, copy and fill ---------------- */
+
+/** The engine's own view of a sheet spec: the computed values of its formulas (the pasted-value states read them). */
+const liveSheet = spec => new Sheet({ cells: clone(spec.cells), colW: spec.colW });
+
+// 1.3.1 Enter the missing day: Airport Saturday typed in, the five blank energy costs zeroed, the stray note cleared
+const S3a = derive(S2a, s => {
+  const c = sheetOf(s, 'Raw').cells;
+  const kwh = KWH.Airport[11];
+  c.C61 = { value: kwh }; c.D61 = { value: SITE_PRICE.Airport }; c.E61 = { value: r2(kwh * SITE_PRICE.Airport) }; c.F61 = { value: r2(kwh * WHOLESALE) };
+  for (const r of [12, 19, 28, 44, 47]) c['F' + r] = { value: 0 };
+  c.H3 = { it: true };   // Delete clears the note and leaves its italic behind, as Excel does
+});
+/** The four figures management emailed for Airport's Saturday (1.3.1 types them; the challenge seeds its own). */
+export const MISSING_DAY = { kwh: KWH.Airport[11], price: SITE_PRICE.Airport, revenue: r2(KWH.Airport[11] * SITE_PRICE.Airport), energy: r2(KWH.Airport[11] * WHOLESALE) };
+
+// 1.3.2 Fix it in place: two typos, the text-number, the wrong figure
+export const WRONG_FIGURE = { ref: 'E41', wrong: 81500, right: r2(KWH['South Lamar'][3] * SITE_PRICE['South Lamar']) };
+const S3b = derive(S3a, s => {
+  const c = sheetOf(s, 'Raw').cells;
+  c.B14 = { value: 'Mueller' };
+  c.B27 = { value: 'Riverside' };
+  c.C33 = { value: 1240, fmtStyle: 'comma', decimals: 0 };   // F2, Backspace the trailing space, Enter: "1,240" reads as a number
+  c.E41 = { value: WRONG_FIGURE.right };
+});
+
+/** The Report page's title and the header the skeleton carries. */
+export const REPORT_TITLE = 'Voltline — Austin Weekly KPI Report, w/c 15 Sep 2026';
+export const UNITS_LINE = 'USD unless stated';
+const STALE_WEEK = 'w/c 08 Sep', THIS_WEEK = 'w/c 15 Sep';
+
+// 1.3.3 Copy, cut, paste, fill: the Report skeleton from Raw and Inputs; the Notes block moved beside the feed
+const S3c = derive(S3b, s => {
+  const raw = sheetOf(s, 'Raw').cells, rep = sheetOf(s, 'Report').cells;
+  rep.A1 = { value: REPORT_TITLE };
+  rep.A2 = { value: UNITS_LINE };
+  rep.A4 = { value: 'Site' }; rep.B4 = { value: 'Week' };
+  rep.C4 = { value: 'kWh sold', bold: true }; rep.D4 = { value: 'Revenue ($)', bold: true }; rep.E4 = { value: 'Energy cost ($)', bold: true };   // pasted from Raw I7:K7
+  SITES.forEach((site, i) => { rep['A' + (5 + i)] = { value: site }; rep['B' + (5 + i)] = { value: STALE_WEEK }; });   // sites from Inputs A9:A13; the week label from Inputs!B3, filled down
+  rep.A12 = { value: 'kWh sold by day' };
+  rep.A13 = { value: 'Week' }; for (const col of ['B', 'C', 'D', 'E', 'F', 'G']) rep[col + '13'] = { value: STALE_WEEK };   // one label, filled right
+  rep.A14 = { value: 'Day' }; rep.A15 = { value: 'Date' };
+  SITES.forEach((site, i) => { rep['A' + (16 + i)] = { value: site }; });   // the site list again, dropped with Enter
+  // the Notes block cut from under the feed to beside it (H1:H4), so the feed's block ends at row 61
+  raw.H1 = { value: 'Notes', bold: true }; raw.H2 = { value: raw.A65.value }; raw.H3 = { value: raw.A66.value }; raw.H4 = { value: raw.A67.value };
+  delete raw.A64; delete raw.A65; delete raw.A66; delete raw.A67;
+});
+
+// 1.3.4 Paste Special: this week's totals and last week's revenue frozen as values, the total row pasted live, headers styled, the site list transposed
+const S3d = derive(S3c, s => {
+  const rep = sheetOf(s, 'Report').cells;
+  const live = liveSheet(sheetOf(s, 'Raw'));
+  rep.F4 = { value: 'Gross profit ($)', bold: true }; rep.G4 = { value: 'Avg price ($/kWh)', bold: true };   // typed, then Paste Formats from E4
+  rep.H4 = { value: 'Prior week rev ($)', bold: true }; rep.I4 = { value: 'Old code', bold: true };            // Paste Values from Raw L7:M12, then Paste Formats
+  SITES.forEach((site, i) => {
+    const r = 5 + i, rr = 8 + i;
+    rep['C' + r] = { value: live.value('I' + rr) }; rep['D' + r] = { value: live.value('J' + rr) }; rep['E' + r] = { value: live.value('K' + rr) };   // values, not links (1.6.4 links them)
+    rep['H' + r] = { value: live.value('L' + rr) };
+    rep['I' + r] = { value: OLD_CODES[site] };
+  });
+  rep.A10 = { value: 'Total' };
+  rep.C10 = { formula: '=SUM(C5:C9)' }; rep.D10 = { formula: '=SUM(D5:D9)' }; rep.E10 = { formula: '=SUM(E5:E9)' };   // Raw I13:K13 pasted plain: the references follow
+  rep.A22 = { value: 'Energy cost sensitivity ($/wk)' }; rep.A23 = { value: 'Price per kWh' };
+  SITES.forEach((site, i) => { rep[String.fromCharCode(66 + i) + '23'] = { value: site }; });   // A5:A9 transposed
+});
+
+// 1.3.5 Find, replace, fill a timeline: the week label current on Report and Inputs, the Airport typo fixed, Mon–Sat and the dates filled
+const S3e = derive(S3d, s => {
+  const rep = sheetOf(s, 'Report').cells;
+  for (let i = 0; i < 5; i++) rep['B' + (5 + i)] = { value: THIS_WEEK };
+  for (const col of ['B', 'C', 'D', 'E', 'F', 'G']) rep[col + '13'] = { value: THIS_WEEK };
+  sheetOf(s, 'Inputs').cells.B3 = { value: THIS_WEEK };
+  sheetOf(s, 'Raw').cells.B55 = { value: 'Airport' };
+  ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach((d, i) => { rep[String.fromCharCode(66 + i) + '14'] = { value: d }; });
+  for (let i = 0; i < 6; i++) rep[String.fromCharCode(66 + i) + '15'] = { value: 15 + i };
+});
+
+/* ---------------- module 1.4: structure ---------------- */
+
+// 1.4.1 Rows and columns that keep the totals honest: Cedar Park's row inside the block, the Old code column gone, a Margin % column inserted
+const S4a = derive(S3e, s => {
+  const old = sheetOf(s, 'Report').cells;
+  const rep = {};
+  const shiftRef = (ref, dr, dc) => { const m = /^([A-Z]+)(\d+)$/.exec(ref); return String.fromCharCode(m[1].charCodeAt(0) + dc) + (+m[2] + dr); };
+  for (const ref in old) {
+    const m = /^([A-Z]+)(\d+)$/.exec(ref); const col = m[1], row = +m[2];
+    if (col === 'I') continue;                                   // Old code: deleted
+    const dc = col >= 'H' ? 1 : 0;                               // Margin % inserted at H: H → I
+    const dr = row >= 9 ? 1 : 0;                                 // Cedar Park inserted at row 9
+    rep[shiftRef(ref, dr, dc)] = old[ref];
+  }
+  rep.A9 = { value: 'Cedar Park' }; rep.B9 = { value: THIS_WEEK };
+  rep.C9 = { value: CEDAR_PARK.kwh }; rep.D9 = { value: CEDAR_PARK.revenue }; rep.E9 = { value: CEDAR_PARK.energy };
+  rep.C11 = { formula: '=SUM(C5:C10)' }; rep.D11 = { formula: '=SUM(D5:D10)' }; rep.E11 = { formula: '=SUM(E5:E10)' };   // the total follows the insert
+  rep.H4 = { value: 'Margin %', bold: true };   // the inserted column dresses like G: bold header
+  sheetOf(s, 'Report').cells = rep;
+});
+
+// 1.4.2 Widths, heights, AutoFit: day columns at 12, the comparison columns at 14, the label column fit to its sites, headers wrapped
+const S4b = derive(S4a, s => {
+  const sh = sheetOf(s, 'Report');
+  const W12 = 12 * 7 + 5, W14 = 14 * 7 + 5;
+  const fit = liveSheet(sh);
+  sh.colW = { 1: fit.neededWidth(1, 5, 11), 2: W12, 3: W12, 4: W12, 5: W12, 6: W12, 7: W12, 8: W14, 9: W14 };
+  for (const col of ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']) sh.cells[col + '4'] = { ...sh.cells[col + '4'], wrap: true };
+  const sized = new Sheet({ cells: clone(sh.cells), colW: sh.colW }); sized.select('A4:I4'); sized.autofitRows();
+  if (sized.rowH[4] !== ROWH_DEFAULT) sh.rowH = { 4: sized.rowH[4] };
+});
+
+// 1.4.3 Hide, group, freeze: the two working columns grouped (not hidden), the heads frozen at B5
+const S4c = derive(S4b, s => {
+  const sh = sheetOf(s, 'Report');
+  sh.groups = { rows: [], cols: [{ c1: 5, c2: 6, collapsed: false }] };
+  sh.freeze = { r: 4, c: 1 };
+});
+
+export const STATES = { S0, S1a, S1b, S1c, S1d, S2a, S3a, S3b, S3c, S3d, S3e, S4a, S4b, S4c };
+export const STATE_ORDER = Object.keys(STATES);
+// S5a–S8raw arrive with modules 1.5–1.8 (later C2 runs); each derives from the one before.
 
 /** A deep clone of a named state (runners mutate their copy, never the master). */
 export function stateOf(id) {
   const s = STATES[id];
   if (!s) throw new Error('unknown workbook state ' + id);
   return clone(s);
+}
+
+/**
+ * A live session, extracted in the authored-state shape so diffStates can compare them: cells,
+ * the widths that were set (colSet), non-default row heights, hidden, freeze, the outline.
+ */
+export function sessionToState(ses) {
+  return {
+    sheets: ses.sheets.map(e => {
+      const S = e.sheet; const colW = {}; const rowH = {};
+      S.colW.forEach((w, c) => { if (c >= 1 && S.colSet[c]) colW[c] = w; });
+      S.rowH.forEach((h, r) => { if (r >= 1 && h !== ROWH_DEFAULT) rowH[r] = h; });
+      return { name: e.name, cells: S.cells, colW, rowH, gridlines: S.gridlines === false ? false : undefined,
+        hiddenRows: [...S.hiddenRows], hiddenCols: [...S.hiddenCols], freeze: { ...S.freeze }, groups: S.groups };
+    }),
+    settings: { calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat.slice() },
+  };
 }
 
 /* ---------------- diffing (the chain test and audit graders read this) ---------------- */

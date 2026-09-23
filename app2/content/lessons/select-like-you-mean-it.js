@@ -36,8 +36,8 @@ export default {
       check: (s, ses) => sel(s, 'A1:F61') && windowKeys(ses).includes('Ctrl+A') },
     { id: 'sheet', teach: 'Ctrl+A pressed again widens to the entire sheet.', text: 'Press Ctrl+A a second time: the entire sheet.', keys: 'Ctrl+A', requires: ['select-all-sheet'],
       check: (s, ses) => sel(s, 'A1:Z100') && windowKeys(ses).includes('Ctrl+A') },
-    { id: 'to-end', text: 'Collapse to A1 with Ctrl+Home, then take everything used with Ctrl+Shift+End.', keys: 'Ctrl+Home then Ctrl+Shift+End', requires: ['ctrl-home-end'],
-      check: (s, ses) => sel(s, 'A1:H67') && windowKeys(ses).includes('Ctrl+Shift+End') },
+    { id: 'to-end', text: 'Collapse to A1 with Ctrl+Home, then take everything used — feed, notes and the totals block — with Ctrl+Shift+End.', keys: 'Ctrl+Home then Ctrl+Shift+End', requires: ['ctrl-home-end'],
+      check: (s, ses) => sel(s, 'A1:M67') && windowKeys(ses).includes('Ctrl+Shift+End') },
   ],
   solution: 'Ctrl+PgDn Ctrl+Right Left Ctrl+Shift+Down Ctrl+Home Shift+Space Ctrl+Right Left Ctrl+Space Ctrl+A Ctrl+A Ctrl+Home Ctrl+Shift+End',
 };

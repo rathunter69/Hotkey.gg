@@ -164,6 +164,8 @@ export const CONCEPTS = {
   'counta': 'COUNT counts numbers; COUNTA counts every non-empty cell, text included',
   'check-cell': 'a check cell is a live difference between two things that must agree, so it reads 0 when they tie',
   'audit-pass': 'the audit pass: Go To Special, show formulas and tracing find what a reviewer would',
+  'ref-error': '#REF! means a formula pointed at a cell that was deleted; Ctrl+Z brings the cell and the formula back',
+  'wrap-text': 'Wrap Text (Alt, H, W) folds a long entry inside its cell; AutoFit Row Height (Alt, H, O, A) then sizes the row to it',
 };
 
 /**
