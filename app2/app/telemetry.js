@@ -8,8 +8,10 @@ import { auth } from './auth.js';
  * The event names the client fires; the SQL check is the regex in 0003_events.sql. C2 adds the
  * per-goal and per-challenge events the north-star reads from `events`: goal_complete
  * {lesson_id, goal, secs} and challenge_result {ref, tier, secs, keys, first, timed_out}.
+ * The experience pass adds landing_demo {where, outcome}, briefing_done {skipped} and
+ * install_prompt {outcome}.
  */
-export const EVENTS = ['landing_view', 'lesson_start', 'lesson_complete', 'lesson_timeup', 'signup', 'sign_in', 'carry_over', 'drill_complete', 'goal_complete', 'challenge_result'];
+export const EVENTS = ['landing_view', 'lesson_start', 'lesson_complete', 'lesson_timeup', 'signup', 'sign_in', 'carry_over', 'drill_complete', 'goal_complete', 'challenge_result', 'landing_demo', 'briefing_done', 'install_prompt'];
 export const EVENT_NAME_RE = /^[a-z_]{1,40}$/;
 
 const SESSION_KEY = 'hk2_session';

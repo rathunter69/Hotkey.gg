@@ -9,7 +9,11 @@
 //   #/drill/sandbox    the drill workspace hosting the free sheet
 //   #/leaderboard  #/reference  #/pricing  #/teams  #/account
 //   #/about  #/terms  #/privacy  #/eula  #/contact
+//   #/due/<shortcut>   a due-today micro-drill (app/schedule.js), behind ?flow=next
+//   #/storyboard/<id>  unlisted: the experience-pass storyboard screens (app/storyboard.js)
 //   anything else      404
+// `?flow=next` on any route turns the redesigned landing / first run / Home / Learn on for this
+// browser (app/flow.js); the LOADERS `next` entries are what it swaps in.
 //
 // Page modules load lazily with import(); a failed load renders an error card with Retry, never
 // an empty page. Below ~900px the lesson and drill routes show a readable notice instead of the
@@ -17,9 +21,11 @@
 import { mountNav } from '../ui/nav.js';
 import { mountFooter } from '../ui/footer.js';
 import { prefs } from './prefs.js';
+import { applyFlowQuery, reflectFlow } from './flow.js';
 import { store } from './store.js';
 import { auth } from './auth.js';
 import { track, installErrorLog } from './telemetry.js';
+import { captureInstall } from './install.js';
 import { lessonById } from '../content/index.js';
 import { gameCtx } from './stats.js';
 import { earnedSet } from '../ui/badges.js';
@@ -60,6 +66,8 @@ export function parseRoute(hash) {
   else if (path === '/sandbox') { name = 'drill'; params.id = 'sandbox'; }
   else if (path === '/daily') { name = 'drill'; params.daily = true; }
   else if (path === '/rapid') name = 'rapid';
+  else if ((m = /^\/due\/([a-z0-9-]+)$/.exec(path))) { name = 'due'; params.id = m[1]; }
+  else if ((m = /^\/storyboard(?:\/([a-z0-9-]+))?$/.exec(path))) { name = 'storyboard'; params.id = m[1] || 'index'; }
   else if (['/leaderboard', '/reference', '/pricing', '/teams', '/account', '/about', '/terms', '/privacy', '/eula', '/contact'].includes(path)) name = path.slice(1);
   else name = 'notfound';
   return { name, params, query, path };
@@ -68,7 +76,7 @@ export function parseRoute(hash) {
 /** Which nav link a route lights up. */
 export function navKeyFor(name) {
   if (['root', 'landing', 'start', 'learn', 'lesson'].includes(name)) return 'learn';
-  if (name === 'practice' || name === 'drill' || name === 'rapid') return 'practice';
+  if (name === 'practice' || name === 'drill' || name === 'rapid' || name === 'due') return 'practice';
   if (name === 'leaderboard' || name === 'reference') return name;
   return '';
 }
@@ -78,7 +86,8 @@ export function titleFor(name, extra) {
   const T = { root: 'hotkey.gg — Learn Excel by doing', landing: 'hotkey.gg — Learn Excel by doing', home: 'Home · hotkey.gg', start: 'Get started · hotkey.gg', learn: 'Learn · hotkey.gg',
     lesson: (extra ? extra + ' · ' : '') + 'hotkey.gg', practice: 'Practice · hotkey.gg', drill: (extra ? extra + ' · ' : '') + 'Practice · hotkey.gg', leaderboard: 'Leaderboard · hotkey.gg',
     reference: 'Reference · hotkey.gg', pricing: 'Pricing · hotkey.gg', teams: 'Teams · hotkey.gg', account: 'Account · hotkey.gg', about: 'About · hotkey.gg',
-    terms: 'Terms · hotkey.gg', privacy: 'Privacy · hotkey.gg', eula: 'EULA · hotkey.gg', contact: 'Contact · hotkey.gg', notfound: 'Page not found · hotkey.gg' };
+    terms: 'Terms · hotkey.gg', privacy: 'Privacy · hotkey.gg', eula: 'EULA · hotkey.gg', contact: 'Contact · hotkey.gg', notfound: 'Page not found · hotkey.gg',
+    due: 'Due today · hotkey.gg', storyboard: 'Storyboard · hotkey.gg' };
   return T[name] || 'hotkey.gg';
 }
 
@@ -107,10 +116,13 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&a
  * module map, so a Retry re-imports the file under a fresh `?retry=N` query (see loadPage).
  */
 const LOADERS = {
-  landing: { file: './landing-page.js', pick: m => m.mountLandingPage },
-  home: { file: './home-page.js', pick: m => m.mountHomePage },
-  start: { file: './first-run.js', pick: m => m.mountFirstRun },
-  learn: { file: './learn-page.js', pick: m => m.mountLearnPage },
+  // `next`: the experience-pass screens behind the ?flow=next flag (app/flow.js); on go they replace the live ones
+  landing: { file: './landing-page.js', pick: m => m.mountLandingPage, next: { file: './landing-next.js', pick: m => m.mountLandingPage } },
+  home: { file: './home-page.js', pick: m => m.mountHomePage, next: { file: './home-next.js', pick: m => m.mountHomePage } },
+  start: { file: './first-run.js', pick: m => m.mountFirstRun, next: { file: './first-run-next.js', pick: m => m.mountFirstRun } },
+  learn: { file: './learn-page.js', pick: m => m.mountLearnPage, next: { file: './learn-next.js', pick: m => m.mountLearnPage } },
+  due: { file: './home-next.js', pick: m => m.mountDuePage },
+  storyboard: { file: './storyboard.js', pick: m => m.mountStoryboard },
   lesson: { file: './lesson-view.js', pick: m => m.mountLessonView },
   practice: { file: './practice-page.js', pick: m => m.mountPracticePage },
   drill: { file: './drill-page.js', pick: m => m.mountDrillPage },
@@ -165,6 +177,7 @@ export function startApp({ navEl, rootEl, footEl }) {
   const legacy = legacyQuery(location.search);
   if (legacy) { try { history.replaceState(null, '', legacy); } catch (e) { /* file:// etc.: route as-is */ } }
   prefs.reflect();
+  reflectFlow();
   const nav = mountNav(navEl, {
     links: NAV_LINKS, active: 'learn', account: true,
     onTheme: k => store.setTheme(k), onSignOut: () => auth.signOut(),
@@ -185,6 +198,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     nav.setSaveState(store.saveText());
   }
   installErrorLog();
+  captureInstall();
   auth.ready().then(() => { syncUser(); if (auth.state() === 'in') store.hydrate().then(syncUser); });
   auth.onChange(() => {
     if (auth.state() === 'in') { syncUser(); store.hydrate().then(() => { syncUser(); route(); }); }
@@ -206,6 +220,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     const r = parseRoute(location.hash || '#/');
     const myGen = ++gen;
     unmount();
+    const next = applyFlowQuery(r.query); reflectFlow(next);
     let name = r.name;
     if (name === 'root') name = isReturning() ? 'home' : 'landing';
     let lesson = null;
@@ -222,9 +237,10 @@ export function startApp({ navEl, rootEl, footEl }) {
     window.scrollTo(0, 0);
 
     // the workspace routes need a keyboard and width; below the breakpoint show the notice instead
-    if ((name === 'lesson' || name === 'drill' || name === 'rapid') && narrowMq && narrowMq.matches) { current = narrowNotice(rootEl, lesson); return; }
+    if ((name === 'lesson' || name === 'drill' || name === 'rapid' || name === 'due') && narrowMq && narrowMq.matches) { current = narrowNotice(rootEl, lesson); return; }
 
-    const entry = LOADERS[name] || LOADERS.notfound;
+    const base = LOADERS[name] || LOADERS.notfound;
+    const entry = next && base.next ? base.next : base;
     let mount;
     try { mount = await loadPage(entry); }
     catch (e) {
@@ -235,7 +251,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     if (myGen !== gen) return;
     try {
       const ctx = { query: r.query, params: r.params, nav };
-      const res = name === 'lesson' ? mount(rootEl, lesson, { mode: r.query.mode || 'guided' }) : mount(rootEl, ctx);
+      const res = name === 'lesson' ? mount(rootEl, lesson, { mode: r.query.mode || 'guided', panel: r.query.panel, seed: r.query.seed }) : mount(rootEl, ctx);
       current = res && typeof res.destroy === 'function' ? res : { destroy() { rootEl.innerHTML = ''; } };
     } catch (e) {
       console.error(e);
