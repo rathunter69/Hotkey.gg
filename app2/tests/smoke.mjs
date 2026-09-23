@@ -89,6 +89,54 @@ try {
     if (!done) fail(`${lesson.id}: did not complete`);
   }
 
+  // the experience pass (behind ?flow=next): the first run end to end in one frame — demo,
+  // three briefing cards, orientation, picker, then the Welcome race opens; the dashboard, the
+  // data room and a due-today micro-drill render; ?flow=off puts the live screens back
+  {
+    await page.goto(base + '#/start?flow=next&replay=1');
+    const frame = await page.waitForSelector('.fr2-frame', { timeout: 5000 }).catch(() => null);
+    if (!frame) fail('first run (next): no frame');
+    else {
+      const size = async () => page.evaluate(() => { const r = document.querySelector('.fr2-frame').getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)].join('x'); });
+      const s0 = await size();
+      await page.waitForFunction(() => /2 \/ 4|3 \/ 4|4 \/ 4/.test((document.querySelector('#demoCount') || {}).textContent || ''), null, { timeout: 15000 }).catch(() => fail('first run (next): the demo did not press keys'));
+      const steps = [];
+      // the demo takes two Enters (finish, then continue), the four cards one each, the picker one: seven, and the hash leaves #/start
+      for (let i = 0; i < 8; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(250); if (!/#\/start/.test(page.url())) break; steps.push((await page.evaluate(() => (document.querySelector('#frEyebrow') || {}).textContent || '')) + ' ' + await size()); }
+      const sizes = new Set(steps.map(x => x.split(' ').pop()));
+      if (sizes.size > 1 || !sizes.has(s0)) fail('first run (next): the frame changed size between steps: ' + steps.join(' | '));
+      await page.waitForFunction(() => /#\/lesson\/welcome-export/.test(location.hash), null, { timeout: 4000 }).catch(() => fail('first run (next): did not land on the Welcome race (' + page.url() + ')'));
+      const prefsRec = await page.evaluate(() => { try { return JSON.parse(localStorage.getItem('hk2_prefs')); } catch (e) { return null; } });
+      if (!prefsRec || !prefsRec.briefingDone || !prefsRec.firstRunDone) fail('first run (next): prefs not written');
+    }
+    await page.goto(base + '#/?flow=next&demo=1'); await page.waitForTimeout(400);
+    for (const sel of ['.hm-continue', '.hm-due-list li', '.hm-daily', '.deal', '.hm-rings .hm-ring', '.hm-level']) if (!(await page.$(sel))) fail('home (next): missing ' + sel);
+    await page.goto(base + '#/learn?flow=next'); await page.waitForTimeout(400);
+    for (const sel of ['.dr-tree .dr-folder.open', '.dr-doc', '.dr-step.next', '.dr-thumb', '.dr-folder.locked']) if (!(await page.$(sel))) fail('data room (next): missing ' + sel);
+    if (await page.$('.mp-toggle')) fail('data room (next): the path/list toggle is still there');
+    // a micro-drill from the queue plays in the workspace and completes on its route
+    const { microLesson } = await import('../app/schedule.js');
+    const micro = microLesson('ctrl-shift-arrow');
+    await page.goto(base + '#/due/ctrl-shift-arrow?flow=next');
+    const ws = await page.waitForSelector('.ws-strip', { timeout: 5000 }).catch(() => null);
+    if (!ws) fail('due (next): no workspace strip');
+    for (const step of parseKeyScript(micro.solution)) { if (step.type === 'text') await page.keyboard.type(step.text); else await page.keyboard.press(pwKey(step.spec)); }
+    const dueDone = await page.waitForSelector('.lesson-done:not([hidden]) [data-act="due-next"]', { timeout: 4000 }).catch(() => null);
+    if (!dueDone) fail('due (next): the micro-drill did not complete');
+    const sched = await page.evaluate(() => { try { return JSON.parse(localStorage.getItem('hk2_schedule_v1')); } catch (e) { return null; } });
+    if (!sched || !sched['ctrl-shift-arrow']) fail('due (next): no memory note recorded');
+    // a Chapter 1 lesson under the flag: the strip, the story beat, then a cue on the first goal's target
+    await page.goto(base + '#/lesson/welcome-export?flow=next'); await page.waitForTimeout(500);
+    if (!(await page.$('.ws-beat'))) fail('lesson (next): no story beat before the module’s first lesson');
+    await page.keyboard.press('Enter'); await page.waitForTimeout(300);
+    if (await page.$('.ws-beat')) fail('lesson (next): Enter did not close the beat');
+    // the flag off: the live landing is back
+    await page.goto(base + '#/landing?flow=off'); await page.waitForTimeout(400);
+    if (await page.$('.ld2')) fail('flow=off: the next landing still shows');
+    if (!(await page.$('.ld'))) fail('flow=off: the live landing did not come back');
+    await page.evaluate(() => { localStorage.removeItem('hk2_prefs'); localStorage.removeItem('hk2_schedule_v1'); localStorage.removeItem('hk2_flow'); });
+  }
+
   // the drill workspace (Phase D): start card key never lands, solution replays to a tier,
   // the attempt lands in records, and after a reload the PB ghost toggle is enabled
   {

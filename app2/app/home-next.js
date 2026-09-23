@@ -16,6 +16,7 @@ import { schedule, dueToday, demoState, microLesson } from './schedule.js';
 import { dealStripHtml } from './deal-strip.js';
 import { ring } from '../ui/ring.js';
 import { levelOf } from './xp.js';
+import { mountLessonView } from './lesson-view.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const TIER_MARK = { legendary: '◆◆◆', pro: '◆◆', pass: '◆', none: '—' };
@@ -122,14 +123,13 @@ export function mountHomePage(root, pageCtx = {}) {
 }
 
 /** #/due/<shortcut>: the micro-drill in the lesson workspace; an unknown id shows the queue instead. */
-export async function mountDuePage(root, ctx = {}) {
+export function mountDuePage(root, ctx = {}) {
   const id = ctx.params && ctx.params.id;
   const lesson = microLesson(id);
   if (!lesson) {
     root.innerHTML = `<div class="nf-card"><div class="nf-cap">due today</div><div class="nf-body"><h1>Nothing to drill here.</h1><p>That item is not in today’s queue.</p><div class="nf-row"><a class="btn btn-primary" href="#/">Home</a></div></div></div>`;
     return { destroy() { root.innerHTML = ''; } };
   }
-  const { mountLessonView } = await import('./lesson-view.js');
   return mountLessonView(root, lesson, { mode: 'guided' });
 }
 

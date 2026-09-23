@@ -251,7 +251,9 @@ export function startApp({ navEl, rootEl, footEl }) {
     if (myGen !== gen) return;
     try {
       const ctx = { query: r.query, params: r.params, nav };
-      const res = name === 'lesson' ? mount(rootEl, lesson, { mode: r.query.mode || 'guided', panel: r.query.panel, seed: r.query.seed }) : mount(rootEl, ctx);
+      let res = name === 'lesson' ? mount(rootEl, lesson, { mode: r.query.mode || 'guided', panel: r.query.panel, seed: r.query.seed }) : mount(rootEl, ctx);
+      // a page that mounts asynchronously still hands back its destroy(); a route that moved on meanwhile tears it down at once
+      if (res && typeof res.then === 'function') { res = await res; if (myGen !== gen) { if (res && typeof res.destroy === 'function') { try { res.destroy(); } catch (e) { /* ignore */ } } return; } }
       current = res && typeof res.destroy === 'function' ? res : { destroy() { rootEl.innerHTML = ''; } };
     } catch (e) {
       console.error(e);
