@@ -49,11 +49,14 @@
 import { Sheet } from '../engine/sheet.js';
 import { Session } from '../engine/keyboard.js';
 import { parseRef } from '../engine/refs.js';
+import { CONVENTIONS } from './conventions.js';
+import { WORKBOOKS, workbookState } from './workbooks/index.js';
+import { mulberry32 } from '../engine/rng.js';
 
 export const DIFFICULTIES = ['easy', 'medium', 'hard'];
 export const ACCESS = ['free', 'paid'];
-export const MODES = ['guided', 'solo', 'timed'];   // how a lesson is played; the Read phase precedes them
-export const KINDS = ['lesson', 'project', 'assessment', 'testout'];   // ordinary lesson, chapter project, timed assessment, chapter test-out
+export const MODES = ['guided', 'solo', 'timed', 'challenge'];   // how a lesson is played; the Brief precedes them
+export const KINDS = ['lesson', 'project', 'assessment', 'testout', 'challenge'];   // + C2: the module's timed, seeded challenge
 
 /** Concept ids and their display names — the vocabulary lessons teach and require. */
 export const CONCEPTS = {
@@ -152,8 +155,17 @@ export const CONCEPTS = {
   'flash-fill': 'Flash Fill (Ctrl+E in Excel) fills a column by the pattern of your examples',
 };
 
-/** How many goals a lesson of this kind may carry: ordinary lessons stay 3-6; a project, assessment or test-out combines a section's work in 6-10. */
-export function goalBounds(kind) { return kind && kind !== 'lesson' ? { min: 3, max: 10 } : { min: 3, max: 6 }; }
+/**
+ * How many goals a lesson of this kind may carry. Module lessons (C2, framework v2) run denser:
+ * one job of 5-8 goals; challenges 4-7; projects 10-15. The legacy bounds hold for the old
+ * lessons until the rewrite deletes them.
+ */
+export function goalBounds(kind, moduleLesson = false) {
+  if (moduleLesson) {
+    return { lesson: { min: 5, max: 8 }, challenge: { min: 4, max: 7 }, project: { min: 10, max: 15 }, assessment: { min: 8, max: 14 }, testout: { min: 8, max: 10 } }[kind || 'lesson'] || { min: 5, max: 8 };
+  }
+  return kind && kind !== 'lesson' ? { min: 3, max: 10 } : { min: 3, max: 6 };
+}
 
 /** Sentences in a text: terminators followed by a space or the end. Decimals (5.0%, 1,200.00) and Excel error codes (#NAME?, #DIV/0!) are not terminators. */
 export function sentenceCount(text) {
@@ -175,21 +187,62 @@ export function validateLesson(l) {
   need(Array.isArray(l.tags), 'tags must be an array');
   need(ACCESS.includes(l.access), 'access must be free | paid');
   const kind = l.kind === undefined ? 'lesson' : l.kind;
-  need(KINDS.includes(kind), 'kind must be lesson | project | assessment | testout');
+  const moduleLesson = typeof l.module === 'string' && l.module.length > 0;   // C2 framework v2
+  need(KINDS.includes(kind), 'kind must be lesson | project | assessment | testout | challenge');
   if (kind === 'assessment' || kind === 'testout') need(typeof l.timeLimit === 'number' && l.timeLimit > 0, kind + ' needs a timeLimit (seconds)');
-  else need(l.timeLimit === undefined, 'only an assessment or test-out carries a timeLimit');
-  // a project/assessment/testout combines taught material: it may teach nothing new
-  need(Array.isArray(l.concepts) && (l.concepts.length > 0 || kind !== 'lesson'), 'concepts must list what the lesson teaches');
-  const concepts = Array.isArray(l.concepts) ? l.concepts : [];
+  else if (kind === 'challenge') need(typeof l.timeLimit === 'number' && l.timeLimit >= 150 && l.timeLimit <= 180, 'a challenge needs a timeLimit of 150-180 seconds');
+  else need(l.timeLimit === undefined, 'only an assessment, test-out or challenge carries a timeLimit');
+  // v2 renames concepts → teaches; the alias holds through the migration. A project, assessment,
+  // test-out or challenge combines taught material: it may teach nothing new.
+  const conceptsRaw = l.teaches !== undefined ? l.teaches : l.concepts;
+  need(kind === 'lesson'
+    ? Array.isArray(conceptsRaw) && conceptsRaw.length > 0
+    : conceptsRaw === undefined || Array.isArray(conceptsRaw), 'teaches/concepts must list what the lesson teaches');
+  const concepts = Array.isArray(conceptsRaw) ? conceptsRaw : [];
   for (const c of concepts) need(CONCEPTS[c], `unknown concept "${c}"`);
-  need(Array.isArray(l.prerequisites), 'prerequisites must be an array');
-  need(isObject(l.sheet), 'sheet (starting sheet) missing');
+  if (l.uses !== undefined) { need(Array.isArray(l.uses), 'uses must be an array of concept ids'); for (const c of Array.isArray(l.uses) ? l.uses : []) need(CONCEPTS[c], `unknown concept in uses: "${c}"`); }
+  need(Array.isArray(l.prerequisites) || moduleLesson, 'prerequisites must be an array');
+  if (moduleLesson) {
+    need(WORKBOOKS[l.workbook], `unknown workbook "${l.workbook}" (content/workbooks)`);
+    need(isObject(l.state) && typeof l.state.before === 'string', 'a module lesson needs state.before');
+    need(kind === 'challenge' || typeof l.state.after === 'string', 'a module lesson needs state.after');
+    if (kind !== 'challenge') {
+      need(typeof l.headline === 'string' && l.headline.trim(), 'headline (the one concept the lesson exists to teach) missing');
+      need(Array.isArray(l.conventions) && l.conventions.length > 0 && l.conventions.every(id => CONVENTIONS[id]), 'every module lesson carries at least one canon convention id');
+    } else if (l.conventions !== undefined) {
+      need(Array.isArray(l.conventions) && l.conventions.every(id => CONVENTIONS[id]), 'challenge conventions must be canon ids');
+    }
+    need(typeof l.minutes === 'number' && l.minutes > 0 && l.minutes <= 15, 'minutes (5-7 for lessons, 2-3 for challenges) missing');
+  }
+  if (kind === 'challenge') {
+    need(typeof l.seed === 'function', 'a challenge is a generator: seed(rng) → patch');
+    need(Array.isArray(l.graders) && l.graders.length > 0 && l.graders.every(g => typeof g === 'function'), 'a challenge carries graders: [(session) => {ok, why}]');
+    need(isObject(l.pars) && l.pars.pass > l.pars.pro && l.pars.pro > l.pars.legendary && l.pars.legendary > 0, 'challenge pars must fall strictly: pass > pro > legendary > 0');
+    for (const g of Array.isArray(l.goals) ? l.goals : []) need(g && g.teach === undefined, 'a challenge goal carries no teach line');
+  }
+  need(isObject(l.sheet) || moduleLesson, 'sheet (starting sheet) missing');
   need(l.sheets === undefined || (Array.isArray(l.sheets) && l.sheets.every(isObject)), 'sheets must be an array of { name, cells } records');
   for (const sh of Array.isArray(l.sheets) ? l.sheets.filter(isObject) : []) need(typeof sh.name === 'string' && /^[^[\]:*?/\\]{1,31}$/.test(sh.name), `sheet name "${sh.name}" is not Excel-legal`);
-  // The Read phase: two or three sentences, total (what the lesson is, what you will do, why it pays off).
-  need(typeof l.read === 'string' && l.read.trim(), 'read missing (two or three sentences)');
-  if (typeof l.read === 'string') { const n = sentenceCount(l.read); need(n >= 2 && n <= 3, `read must be two or three sentences (it has ${n})`); need(wordCount(l.read) <= 80, 'read is over 80 words'); need(!/`/.test(l.read) || true, ''); }
-  need(typeof l.par === 'number' && l.par > 0, 'par (timed-mode seconds) missing');
+  if (moduleLesson) {
+    // The Brief (v2): the situation, the task, the payoff — at most three sentences, ending in
+    // the headline keycap; a challenge carries one line.
+    need(typeof l.brief === 'string' && l.brief.trim(), 'brief missing');
+    if (typeof l.brief === 'string') {
+      const n = sentenceCount(l.brief);
+      if (kind === 'challenge') need(n <= 2 && wordCount(l.brief) <= 40, 'a challenge brief is one line');
+      else {
+        need(n >= 1 && n <= 3, `brief must be at most three sentences (it has ${n})`);
+        need(wordCount(l.brief) <= 70, 'brief is over 70 words');
+        need(/`[^`]+`[.!]?\s*$/.test(l.brief.trim()), 'the brief ends with the headline keycap (`Ctrl+…`)');
+      }
+    }
+  } else {
+    // The Read phase (legacy): two or three sentences, total.
+    need(typeof l.read === 'string' && l.read.trim(), 'read missing (two or three sentences)');
+    if (typeof l.read === 'string') { const n = sentenceCount(l.read); need(n >= 2 && n <= 3, `read must be two or three sentences (it has ${n})`); need(wordCount(l.read) <= 80, 'read is over 80 words'); }
+  }
+  if (kind === 'challenge') need(l.par === undefined, 'a challenge carries pars, not par');
+  else if (!moduleLesson) need(typeof l.par === 'number' && l.par > 0, 'par (timed-mode seconds) missing');
   need(Array.isArray(l.goals) && l.goals.length > 0, 'goals missing');
   const goals = Array.isArray(l.goals) ? l.goals.filter(isObject) : [];
   const ids = new Set();
@@ -199,8 +252,9 @@ export function validateLesson(l) {
     need(typeof g.text === 'string' && g.text.trim(), `goal ${g.id}: text missing`);
     if (typeof g.text === 'string') { need(sentenceCount(g.text) === 1 && /[.!?]$/.test(g.text.trim()), `goal ${g.id}: the action must be one sentence ending in a full stop`); need(wordCount(g.text) <= 26, `goal ${g.id}: the action is over 26 words`); }
     need(typeof g.check === 'function', `goal ${g.id}: check must be a function`);
-    need(Array.isArray(g.requires), `goal ${g.id}: requires must list concept ids`);
+    need(Array.isArray(g.requires) || kind === 'challenge', `goal ${g.id}: requires must list concept ids`);
     for (const c of Array.isArray(g.requires) ? g.requires : []) need(CONCEPTS[c], `goal ${g.id}: unknown concept "${c}"`);
+    if (g.convention !== undefined) need(CONVENTIONS[g.convention], `goal ${g.id}: unknown convention "${g.convention}"`);
     if (g.demo !== undefined) {
       need(isObject(g.demo) && typeof g.demo.script === 'string' && g.demo.script.trim(), `goal ${g.id}: demo needs a script`);
       need(g.demo === undefined || g.keys === undefined, `goal ${g.id}: a demo goal has no keys (the platform presses them)`);
@@ -219,7 +273,7 @@ export function validateLesson(l) {
   const ends = Array.isArray(l.endState) ? l.endState.filter(isObject) : [];
   for (const e of ends) { need(typeof e.text === 'string', 'endState entries need text'); need(typeof e.check === 'function', 'endState entries need a check'); }
   need(typeof l.solution === 'string' && l.solution.trim(), 'solution keystrokes missing');
-  if (isObject(l.sheet)) validateStartingSheet(l, goals, ends, need);
+  if (isObject(l.sheet) || moduleLesson) validateStartingSheet(l, goals, ends, need, { moduleLesson, kind });
   return errs;
 }
 
@@ -229,29 +283,55 @@ export function validateLesson(l) {
  * the starting sheet already satisfies (nothing for the learner to do) are all reported. Later goals
  * may legitimately hold at the start — they are gated behind the earlier ones.
  */
-function validateStartingSheet(l, goals, ends, need) {
-  const spec = l.sheet;
-  const cells = isObject(spec.cells) ? spec.cells : {};
-  need(spec.cells === undefined || isObject(spec.cells), 'sheet: cells must be an object of cell records');
-  for (const k in cells) { need(parseRef(k), `sheet: bad cell key "${k}"`); need(isObject(cells[k]), `sheet: cell ${k} must be a record such as { value }`); }
-  const rows = spec.rows || 100, cols = spec.cols || 26;   // the Sheet defaults
-  if (spec.active !== undefined) {
-    const a = spec.active;
-    need(isObject(a) && Number.isInteger(a.r) && Number.isInteger(a.c) && a.r >= 1 && a.r <= rows && a.c >= 1 && a.c <= cols, `sheet: active ${JSON.stringify(a)} is outside the ${rows}×${cols} grid`);
-  }
+function validateStartingSheet(l, goals, ends, need, opts = {}) {
+  const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells, colW: sp.colW, active: sp.active, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines });
   let sheet, session;
-  const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells, colW: sp.colW, active: sp.active, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze });
-  try {
-    sheet = build({ ...spec, cells });
-    session = new Session(sheet, {}); session.demoDone = new Set();
-    // the workbook, exactly as LessonRun.reset assembles it, so cross-sheet checks probe correctly
-    const sheets = Array.isArray(l.sheets) ? l.sheets : [];
-    if (sheets.length) {
-      if (sheets[0] && sheets[0].name) session.sheets[0].name = sheets[0].name;
-      for (const sh of sheets.slice(1)) session.addSheet(sh.name, build(sh));
+  if (opts.moduleLesson) {
+    // a module lesson starts from the previous lesson's `after` (the named workbook state);
+    // a challenge additionally wears the seed's clothing before the first key
+    let state;
+    try { state = workbookState(l.workbook, l.state.before); } catch (e) { need(false, e.message); return; }
+    if (opts.kind === 'challenge' && typeof l.seed === 'function') {
+      let patch;
+      try { patch = l.seed(mulberry32(1)); } catch (e) { need(false, `seed throws: ${e.message}`); return; }
+      need(isObject(patch), 'seed must return a patch object');
+      for (const key in patch || {}) {
+        const [shName, ref] = key.includes('!') ? key.split('!') : [state.sheets[0].name, key];
+        const sh = state.sheets.find(x => x.name === shName);
+        need(!!sh, `seed patches unknown sheet in "${key}"`);
+        if (!sh) continue;
+        sh.cells = sh.cells || {};
+        if (patch[key] === null) delete sh.cells[ref]; else sh.cells[ref] = patch[key];
+      }
     }
-  }   // as the runner sets it up
-  catch (e) { need(false, `sheet does not build: ${e.message}`); return; }
+    try {
+      session = new Session(build(state.sheets[0]), {}); session.demoDone = new Set();
+      session.sheets[0].name = state.sheets[0].name;
+      for (const sh of state.sheets.slice(1)) session.addSheet(sh.name, build(sh));
+      sheet = session.sheet;
+    } catch (e) { need(false, `module state does not build: ${e.message}`); return; }
+  } else {
+    const spec = l.sheet;
+    const cells = isObject(spec.cells) ? spec.cells : {};
+    need(spec.cells === undefined || isObject(spec.cells), 'sheet: cells must be an object of cell records');
+    for (const k in cells) { need(parseRef(k), `sheet: bad cell key "${k}"`); need(isObject(cells[k]), `sheet: cell ${k} must be a record such as { value }`); }
+    const rows = spec.rows || 100, cols = spec.cols || 26;   // the Sheet defaults
+    if (spec.active !== undefined) {
+      const a = spec.active;
+      need(isObject(a) && Number.isInteger(a.r) && Number.isInteger(a.c) && a.r >= 1 && a.r <= rows && a.c >= 1 && a.c <= cols, `sheet: active ${JSON.stringify(a)} is outside the ${rows}×${cols} grid`);
+    }
+    try {
+      sheet = build({ ...spec, cells });
+      session = new Session(sheet, {}); session.demoDone = new Set();
+      // the workbook, exactly as LessonRun.reset assembles it, so cross-sheet checks probe correctly
+      const sheets = Array.isArray(l.sheets) ? l.sheets : [];
+      if (sheets.length) {
+        if (sheets[0] && sheets[0].name) session.sheets[0].name = sheets[0].name;
+        for (const sh of sheets.slice(1)) session.addSheet(sh.name, build(sh));
+      }
+    }   // as the runner sets it up
+    catch (e) { need(false, `sheet does not build: ${e.message}`); return; }
+  }
   session.goalMark = 0;
   const probe = (label, check) => {
     if (typeof check !== 'function') return null;

@@ -5,6 +5,7 @@ import { Sheet } from '../engine/sheet.js';
 import { Session, parseKeyScript, parseKeySpec } from '../engine/keyboard.js';
 import { stepPath } from '../engine/ribbon.js';
 import { workbookState } from '../content/workbooks/index.js';
+import { mulberry32 } from '../engine/rng.js';
 
 export class LessonRun {
   /**
@@ -30,6 +31,20 @@ export class LessonRun {
     // the old lessons until the rewrite completes.
     const moduleState = this.lesson.workbook && this.lesson.state && this.lesson.state.before
       ? workbookState(this.lesson.workbook, this.lesson.state.before) : null;
+    // A challenge is a generator: the seed decides the clothing, figures and planting positions
+    // (content only, never workload). The seed number is remembered so the attempt can carry it
+    // and a ghost can replay the very sheet the run was set on.
+    if (moduleState && this.lesson.kind === 'challenge' && typeof this.lesson.seed === 'function') {
+      this.seedNo = Number.isFinite(this.opts.seedNo) ? this.opts.seedNo >>> 0 : (Math.random() * 4294967296) >>> 0;
+      const patch = this.lesson.seed(mulberry32(this.seedNo)) || {};
+      for (const key in patch) {
+        const [shName, ref] = key.includes('!') ? key.split('!') : [moduleState.sheets[0].name, key];
+        const sh = moduleState.sheets.find(x => x.name === shName);
+        if (!sh) continue;
+        sh.cells = sh.cells || {};
+        if (patch[key] === null) delete sh.cells[ref]; else sh.cells[ref] = patch[key];
+      }
+    }
     if (moduleState && this.opts.statePatch) {
       // a challenge seed's patch: { '<Sheet>!<ref>': cellRecord | null } applied over `before`
       for (const key in this.opts.statePatch) {
@@ -95,7 +110,10 @@ export class LessonRun {
   get current() {
     if (this.finished) return null;
     if (this.doneCount < this.goals.length) return this.goals[this.doneCount];
-    return this.endStates().find(e => !e.ok) || null;
+    const end = this.endStates().find(e => !e.ok);
+    if (end) return end;
+    const grader = this.graderStates().find(g => !g.ok);
+    return grader ? { text: grader.why, grader: true } : null;
   }
   /** The lesson clock is the engine clock: it starts on the first key that does something. */
   get startedAt() { return this.session.t0; }
@@ -152,7 +170,7 @@ export class LessonRun {
       this.doneCount++; moved = true;
       this.session.goalMark = this.session.keyLog.length;   // the next goal's key window starts here
     }
-    if (this.doneCount === this.goals.length && this.endStates().every(e => e.ok)) {
+    if (this.doneCount === this.goals.length && this.endStates().every(e => e.ok) && this.graderStates().every(g => g.ok)) {
       this.finished = true;
       this.finishedAt = this.opts.now ? this.opts.now() : Date.now();
       moved = true;
@@ -167,6 +185,17 @@ export class LessonRun {
   /** End-state predicates with their current status: [{text, check, ok}]. */
   endStates() {
     return (this.lesson.endState || []).map(e => ({ ...e, ok: safeCheck(e, this.sheet, this.session) }));
+  }
+  /**
+   * A challenge's convention graders over the current workbook: [{ ok, why }]. Correct numbers
+   * with a broken convention is not a pass; the first failing `why` is the one line shown.
+   */
+  graderStates() {
+    if (!Array.isArray(this.lesson.graders)) return [];
+    return this.lesson.graders.map(fn => {
+      try { const r = fn(this.session); return { ok: !!(r && r.ok), why: (r && r.why) || 'a convention check failed' }; }
+      catch (e) { return { ok: false, why: 'a convention check failed' }; }
+    });
   }
 }
 

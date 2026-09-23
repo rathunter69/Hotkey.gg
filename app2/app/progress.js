@@ -10,11 +10,13 @@ const isPlainObject = v => typeof v === 'object' && v !== null && !Array.isArray
 function cleanEntry(e) {
   if (!isPlainObject(e)) return null;
   const out = {};
-  for (const k of ['completed', 'solo', 'timed', 'started']) if (e[k]) out[k] = true;
+  for (const k of ['completed', 'solo', 'timed', 'started', 'challenge']) if (e[k]) out[k] = true;
+  if (['pass', 'pro', 'legendary'].includes(e.tier)) out.tier = e.tier;
   if (Number.isFinite(e.best) && e.best >= 0) out.best = e.best;
   if (Number.isFinite(e.at)) out.at = e.at;
   return out;
 }
+const TIER_RANK = { pass: 1, pro: 2, legendary: 3 };
 
 /** Keep only chapter records of the shape {assessment: true, testout: true}; anything else drops. */
 function cleanChapters(v) {
@@ -58,10 +60,16 @@ export const progress = {
       const p = s.lessons[id] || {};
       p.completed = true;
       if (mode === 'solo') p.solo = true;
-      if (mode === 'timed') {
-        p.timed = true;
+      if (mode === 'timed' || mode === 'challenge') {
+        if (mode === 'timed') p.timed = true;
         const prev = Number.isFinite(p.best) ? p.best : null;
         if (opts.clean !== false && Number.isFinite(secs) && secs >= 0 && (prev == null || secs < prev)) p.best = Math.round(secs * 100) / 100;
+      }
+      if (mode === 'challenge') {
+        // a recorded challenge run is a pass at some tier; the entry keeps the best tier ever
+        p.challenge = true;
+        const t = opts.tier;
+        if (TIER_RANK[t] && (!p.tier || TIER_RANK[t] > TIER_RANK[p.tier])) p.tier = t;
       }
       p.at = Date.now();
       s.lessons[id] = p;

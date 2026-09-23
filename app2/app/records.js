@@ -8,7 +8,7 @@ const KEY = 'hk2_records_v1';
 const MAX_ATTEMPTS = 500;   // a runaway history cannot eat localStorage
 const MAX_TRACE = 600;      // ghost trace entries per PB (the brief's cap)
 
-export const ATTEMPT_KINDS = ['drill', 'daily', 'rapid', 'lesson-timed'];
+export const ATTEMPT_KINDS = ['drill', 'daily', 'rapid', 'lesson-timed', 'challenge'];
 const TIERS = ['none', 'pass', 'pro', 'legendary'];
 
 const isPlainObject = v => typeof v === 'object' && v !== null && !Array.isArray(v);
