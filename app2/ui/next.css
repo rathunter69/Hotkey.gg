@@ -294,11 +294,12 @@ html[data-panel="left"] .ws-next .lesson{flex-direction:row-reverse}
 /* the pill: one line, the current goal, out of the way */
 .lesson.panel-overlay.pill .lesson-panel{width:auto; max-width:420px; border-radius:99px; cursor:pointer}
 .lesson.panel-overlay.pill .panel-head, .lesson.panel-overlay.pill .panel-tabs, .lesson.panel-overlay.pill .panel-body, .lesson.panel-overlay.pill .panel-actions,
-.lesson.panel-overlay.pill .task-teach, .lesson.panel-overlay.pill .task-keys, .lesson.panel-overlay.pill .task-extra, .lesson.panel-overlay.pill .conv-chip, .lesson.panel-overlay.pill .goal-nudge, .lesson.panel-overlay.pill .task-list{display:none}
+.lesson.panel-overlay.pill .task-label, .lesson.panel-overlay.pill .task-teach, .lesson.panel-overlay.pill .task-keys, .lesson.panel-overlay.pill .task-extra, .lesson.panel-overlay.pill .conv-chip, .lesson.panel-overlay.pill .goal-nudge, .lesson.panel-overlay.pill .task-list{display:none}
 .lesson.panel-overlay.pill .task-card{padding:8px 16px; border:0; background:transparent; display:flex; align-items:center; gap:10px}
 .lesson.panel-overlay.pill .task-label{margin:0}
 .lesson.panel-overlay.pill .task-label .task-count{margin-left:6px}
-.lesson.panel-overlay.pill .task-goal{font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:300px}
+.lesson.panel-overlay.pill .task-goal::before{content:'now · '; color:var(--accent); font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase}
+.lesson.panel-overlay.pill .task-goal{font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:360px}
 /* hidden by Ctrl+Shift+K: a small pill brings it back */
 .lesson.panel-hidden .lesson-panel{display:none}
 .panel-show{position:absolute; right:16px; bottom:56px; z-index:20; font-family:var(--mono); font-size:11.5px; color:var(--muted); background:var(--surface); border:1px solid var(--line); border-radius:99px; padding:6px 12px; cursor:pointer}
