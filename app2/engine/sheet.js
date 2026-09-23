@@ -116,6 +116,7 @@ export class Sheet {
     if (opts.hiddenRows) for (const r of opts.hiddenRows) this.hiddenRows.add(r | 0);
     if (opts.hiddenCols) for (const c of opts.hiddenCols) this.hiddenCols.add(c | 0);
     if (opts.freeze) this.freeze = { r: opts.freeze.r | 0, c: opts.freeze.c | 0 };
+    if (opts.gridlines === false) this.gridlines = false;
     if (opts.active) this.active = this.clamp(opts.active.r, opts.active.c);
     this.recalc();
   }

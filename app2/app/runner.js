@@ -4,6 +4,7 @@
 import { Sheet } from '../engine/sheet.js';
 import { Session, parseKeyScript, parseKeySpec } from '../engine/keyboard.js';
 import { stepPath } from '../engine/ribbon.js';
+import { workbookState } from '../content/workbooks/index.js';
 
 export class LessonRun {
   /**
@@ -23,15 +24,36 @@ export class LessonRun {
   /** Fresh sheet + session at the lesson's starting state. */
   reset(mode) {
     if (mode) this.mode = mode;
-    const spec = this.lesson.sheet || {};
-    const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells ? structuredCloneCells(sp.cells) : undefined, colW: sp.colW, active: sp.active, today: this.opts.today, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze });
+    const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells ? structuredCloneCells(sp.cells) : undefined, colW: sp.colW, active: sp.active, today: this.opts.today, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines });
+    // A module lesson (C2): the starting workbook is a named state of the module workbook — the
+    // file the previous lesson left — not an inline sheet. The legacy path stays for drills and
+    // the old lessons until the rewrite completes.
+    const moduleState = this.lesson.workbook && this.lesson.state && this.lesson.state.before
+      ? workbookState(this.lesson.workbook, this.lesson.state.before) : null;
+    if (moduleState && this.opts.statePatch) {
+      // a challenge seed's patch: { '<Sheet>!<ref>': cellRecord | null } applied over `before`
+      for (const key in this.opts.statePatch) {
+        const [shName, ref] = key.includes('!') ? key.split('!') : [moduleState.sheets[0].name, key];
+        const sh = moduleState.sheets.find(x => x.name === shName);
+        if (!sh) continue;
+        sh.cells = sh.cells || {};
+        if (this.opts.statePatch[key] === null) delete sh.cells[ref]; else sh.cells[ref] = this.opts.statePatch[key];
+      }
+    }
+    const spec = moduleState ? moduleState.sheets[0] : this.lesson.sheet || {};
     const first = build(spec);
     this.session = new Session(first, { onKey: this.opts.onKey, onToast: this.opts.onToast, onRefuse: this.opts.onRefuse, now: this.opts.now, onMouse: this.opts.onMouse });
-    // A workbook: lesson.sheets names the sheets ([0] is the starting sheet) and adds the others.
-    const sheets = Array.isArray(this.lesson.sheets) ? this.lesson.sheets : [];
+    // A workbook: the state's sheets, or lesson.sheets ([0] is the starting sheet), name the tabs.
+    const sheets = moduleState ? moduleState.sheets : Array.isArray(this.lesson.sheets) ? this.lesson.sheets : [];
     if (sheets.length && this.session.sheets) {
       if (sheets[0] && sheets[0].name) this.session.sheets[0].name = sheets[0].name;
       for (const sh of sheets.slice(1)) if (this.session.addSheet) this.session.addSheet(sh.name, build(sh));
+    }
+    if (moduleState && moduleState.settings) {
+      const st = moduleState.settings;
+      if (st.calcMode) this.session.settings.calcMode = st.calcMode;
+      if (st.iterative !== undefined) this.session.settings.iterative = !!st.iterative;
+      if (Array.isArray(st.qat)) this.session.settings.qat = st.qat.slice();
     }
     this.landedAt = [];   // when each goal landed (the session clock), for split times
     // Demo goals (goal.demo = { script, cadence }): the platform plays the keys itself while the
