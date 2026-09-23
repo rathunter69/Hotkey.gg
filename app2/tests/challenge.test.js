@@ -138,6 +138,7 @@ test('tierFor: pass is time only; pro and legendary also need the keys within th
   assert.deepEqual(KEY_RATIO, { pro: 1.5, legendary: 1.2 });
   assert.equal(keyCount('Ctrl+Home "USD" Enter Alt H F C Right Enter'), 11, 'a quoted run counts its characters');
   assert.equal(keyCount(''), 0);
+  assert.equal(keyCount('Alt+= Enter'), 3, 'AutoSum is logged as Alt then =, so it counts two');
 });
 
 test('records: first and timedOut ride the attempt; records.first() reads the history', async () => {
@@ -199,9 +200,11 @@ test('a closer goal plays as a ghost: the perturbation shows, then the sheet is 
   assert.equal(run.session.sheets[2].sheet.value('B4'), 0.99, 'mid-demo the input has changed');
   assert.ok(Math.abs(run.session.sheets[2].sheet.value('B14') - 84000 * 0.99) < 1e-6, 'and the dependent moved');
   assert.equal(run.doneCount, 5, 'nothing a ghost presses lands a goal');
+  run.session.settings.showFormulas = true; run.session.sheet.clipboard = { data: [[{ value: 1 }]], cols: [64], h: 1, w: 1, rect: { r1: 1, c1: 1, r2: 1, c2: 1 }, cut: false };   // what a ghost's Ctrl+` / Ctrl+C would leave
   for (const st of steps.slice(9)) run.demoStep(st);
   run.finishDemo(run.goals[5]);
   assert.equal(JSON.stringify(run.session.sheets.map(e => e.sheet.snapshot())), before, 'the sheet is exactly as it stood');
+  assert.equal(run.session.settings.showFormulas, false, 'Show Formulas goes back too'); assert.equal(run.session.sheet.clipboard, null, 'and the clipboard');
   assert.equal(run.session.sheetIndex, 0);
   assert.equal(run.doneCount, 6); assert.ok(run.finished, 'the closer landed and the lesson is complete');
   // and the headless replay plays the closer itself, leaving the after state exact (the chain test relies on it)
@@ -209,4 +212,18 @@ test('a closer goal plays as a ghost: the perturbation shows, then the sheet is 
   again.run(lesson.solution);
   assert.ok(again.finished);
   assert.equal(again.session.sheets[2].sheet.value('B4'), 0.13, 'the perturbation went back');
+  // the closer's playback is the platform's time, not the learner's: the recorded time stops when the ghost begins
+  let t = 0; const timed = new LessonRun(lesson, { now: () => t });
+  for (const ch of 'x') timed.key({ key: ch });
+  t = 4000; for (const spec of ['Enter', 'Down', 'Down', 'Down', 'Down']) timed.pressSpec(spec);
+  const tsteps = timed.demoSteps(timed.pendingDemo());
+  t = 5000; timed.demoStep(tsteps[0]); t = 12000; for (const st of tsteps.slice(1)) timed.demoStep(st);
+  timed.finishDemo(timed.goals[5]);
+  assert.ok(timed.finished); assert.equal(timed.finishedAt, 5000); assert.equal(timed.elapsed, 5); assert.equal(timed.landedAt[5], 5000);
+  // a restart mid-ghost throws the freeze away with the session it belonged to
+  const rs = new LessonRun(lesson, { now: () => 0 });
+  for (const ch of 'x') rs.key({ key: ch }); for (const spec of ['Enter', 'Down', 'Down', 'Down', 'Down']) rs.pressSpec(spec);
+  rs.demoStep(rs.demoSteps(rs.pendingDemo())[0]); assert.equal(rs.ghosting, true);
+  rs.reset(); assert.equal(rs.ghosting, false); assert.equal(rs.ghostSnap, null);
+  rs.run(lesson.solution); assert.ok(rs.finished, 'the new run can finish');
 });

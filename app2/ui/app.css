@@ -656,4 +656,4 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 #grid th .ol-btn:hover{background:var(--accent); color:var(--on-accent)}
 #grid tr:first-child th .ol-btn{left:auto; right:1px; top:auto; bottom:1px}
 /* ---- C2 gap 5: show formulas (Ctrl+`) — formula text sits left like text, never a #### verdict ---- */
-#grid td.fxshow{font-family:var(--mono); font-size:12px; text-align:left}
+#grid td.fxshow{font-family:var(--mono); font-size:12px; text-align:left !important}   /* formula text reads left whatever the cell's alignment */

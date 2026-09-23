@@ -149,7 +149,13 @@ export class LessonRun {
     else this.session.key(parseKeySpec(step.spec));
   }
   /** The demo has finished: the goal can land. A closer's ghost is put back first, so the after state stays exact. */
-  finishDemo(goal) { if (goal.closer && this.ghostSnap) this.endGhost(); this.session.demoDone.add(goal.id); this.evaluate(); this.emit('demo'); }
+  finishDemo(goal) {
+    const at = goal.closer && this.ghostSnap ? this.ghostSnap.at : null;
+    if (goal.closer && this.ghostSnap) this.endGhost();
+    this.session.demoDone.add(goal.id); this.evaluate();
+    if (at != null && this.finished) { this.finishedAt = at; this.landedAt[this.goals.length - 1] = at; }   // the closer's playback is not on the learner's clock
+    this.emit('demo');
+  }
   /** Play the current goal's demo at once (headless replay, or the learner skipping ahead). */
   playPendingDemo() {
     let g;
@@ -173,7 +179,8 @@ export class LessonRun {
       sheets: ses.sheets.map(e => ({ snap: e.sheet.snapshot(), gridlines: e.sheet.gridlines, undo: e.sheet.undoStack.length, redo: e.sheet.redoStack.length })),
       clip: ses.sheet.clipboard,   // the workbook's one clipboard
       idx: ses.sheetIndex, t0: ses.t0, keyLen: ses.keyLog.length, mouse: ses.mouse.count,
-      settings: JSON.parse(JSON.stringify({ calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat, pageSetup: ses.settings.pageSetup })),
+      settings: JSON.parse(JSON.stringify({ calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat, pageSetup: ses.settings.pageSetup, showFormulas: !!ses.settings.showFormulas })),
+      at: this.opts.now ? this.opts.now() : Date.now(),   // when the ghost began: a closer's playback is the platform's time, not the learner's
     };
     this.ghosting = true;
   }
@@ -272,7 +279,7 @@ function structuredCloneCells(cells) { const out = {}; for (const k in cells) ou
 /** How many key presses a keystroke script is: every press counts one, a quoted run counts its characters. */
 export function keyCount(script) {
   let n = 0;
-  try { for (const step of parseKeyScript(script || '')) n += step.type === 'text' ? step.text.length : 1; } catch (e) { return 0; }
+  try { for (const step of parseKeyScript(script || '')) n += step.type === 'text' ? step.text.length : step.spec === 'Alt+=' ? 2 : 1; } catch (e) { return 0; }   // the session logs AutoSum as Alt then =
   return n;
 }
 

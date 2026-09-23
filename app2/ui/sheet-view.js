@@ -145,7 +145,7 @@ export class SheetView {
     const th = t.closest('th'); if (!th || !this.grid.contains(th)) return null;
     const tr = th.parentElement; const S = this.sheet = this.session.sheet;
     if (tr === this.grid.rows[0]) return th.cellIndex === 0 ? { hdr: 'all' } : { hdr: 'col', c: th.cellIndex };
-    const r = parseInt(th.textContent, 10);
+    const r = parseInt(th.dataset.row || th.textContent, 10);   // data-row: the header's text may start with the outline's ⊖ / ⊕
     return (r >= 1 && r <= S.rows) ? { hdr: 'row', r } : null;
   }
   onMouseDown(e) {
@@ -154,6 +154,7 @@ export class SheetView {
     const ob = e.target && e.target.closest ? e.target.closest('.ol-btn') : null;
     if (ob && this.grid.contains(ob)) {
       e.preventDefault();
+      if (e.detail > 1) return;   // the second press of a double-click: one fold, not two
       const ss0 = this.session, S0 = this.sheet = ss0.sheet;
       if (ss0.dialog && MODAL_DIALOGS.has(ss0.dialog)) return;
       if (ss0.mode === 'ribbon') ss0.exitRibbon(false);
@@ -253,8 +254,10 @@ export class SheetView {
     // draws a bracket on the header with a ⊖ / ⊕ on the row or column just past it (Excel's bar)
     const groups = S.groups || { rows: [], cols: [] };
     const foldC = new Set(), foldR = new Set(), olC = new Set(), olR = new Set(), btnC = {}, btnR = {};
-    groups.cols.forEach((g, i) => { for (let c = g.c1; c <= g.c2; c++) { if (g.collapsed) foldC.add(c); else olC.add(c); } btnC[Math.min(COLS, g.c2 + 1)] = { i, on: !!g.collapsed }; });
-    groups.rows.forEach((g, i) => { for (let r = g.r1; r <= g.r2; r++) { if (g.collapsed) foldR.add(r); else olR.add(r); } btnR[Math.min(ROWS, g.r2 + 1)] = { i, on: !!g.collapsed }; });
+    // the button sits just past the band (Excel's summary row / column); a band ending on the sheet's last row or column keeps it just before, where it stays reachable folded
+    const host = (g2, g1, max) => (g2 < max ? g2 + 1 : g1 > 1 ? g1 - 1 : 0);
+    groups.cols.forEach((g, i) => { for (let c = g.c1; c <= g.c2; c++) { if (g.collapsed) foldC.add(c); else olC.add(c); } const h = host(g.c2, g.c1, COLS); if (h) btnC[h] = { i, on: !!g.collapsed }; });
+    groups.rows.forEach((g, i) => { for (let r = g.r1; r <= g.r2; r++) { if (g.collapsed) foldR.add(r); else olR.add(r); } const h = host(g.r2, g.r1, ROWS); if (h) btnR[h] = { i, on: !!g.collapsed }; });
     const showFx = !!(ss.settings && ss.settings.showFormulas);   // Ctrl+` (C2 gap 5): formula text in place of values
     for (let c = 1; c <= COLS; c++) { const w = hidC.has(c) || foldC.has(c) ? 0 : (colW[c] || COLW_DEFAULT); W[c] = w; totalW += w; L[c] = colLetter(c); }
     this.ew = W;
@@ -287,7 +290,7 @@ export class SheetView {
     for (let r = 1; r <= ROWS; r++) {
       const rowIn = hasSel && r >= sr.r1 && r <= sr.r2;
       const rh = rowH[r] || ROW_H;
-      let row = patch ? '' : '<tr' + (hidR.has(r) || foldR.has(r) ? ' class="hidrow"' : rh !== ROW_H ? ' style="height:' + rh + 'px"' : '') + '><th class="rowhdr' + (hidR.has(r - 1) ? ' seam-r' : '') + (olR.has(r) ? ' ol-r' : '') + (btnR[r] ? ' ol-host' : '') + '">' + olBtn('r', btnR[r]) + r + '</th>';
+      let row = patch ? '' : '<tr' + (hidR.has(r) || foldR.has(r) ? ' class="hidrow"' : rh !== ROW_H ? ' style="height:' + rh + 'px"' : '') + '><th class="rowhdr' + (hidR.has(r - 1) ? ' seam-r' : '') + (olR.has(r) ? ' ol-r' : '') + (btnR[r] ? ' ol-host' : '') + '" data-row="' + r + '">' + olBtn('r', btnR[r]) + r + '</th>';
       for (let c = 1; c <= COLS; c++, i++) {
         const isActive = (r === dA.r && c === dA.c);
         const inSel = rowIn && c >= sr.c1 && c <= sr.c2;

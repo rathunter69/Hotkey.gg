@@ -265,11 +265,26 @@ export class Sheet {
     if (!shift && this.sel) { const a = this.dispActive(); this.active = { r: a.r, c: a.c }; this.sel = null; this.selA = null; }
     let nr, nc;
     if (ctrl) { const j = this.ctrlJump(this.active.r, this.active.c, dr, dc); nr = j.r; nc = j.c; }
-    else { nc = Math.min(this.cols, Math.max(1, this.active.c + dc)); nr = Math.min(this.rows, Math.max(1, this.active.r + dr)); }
+    else { nc = this.stepVisible('c', this.active.c, dc); nr = this.stepVisible('r', this.active.r, dr); }
     if (shift) { if (!this.sel) { this.sel = { r: this.active.r, c: this.active.c }; this.selA = null; } }
     else this.sel = null;
     this.active = { r: nr, c: nc };
     this.emit('select');
+  }
+  /** Row / column `n` is on screen: neither hidden (Ctrl+9 / Ctrl+0) nor inside a collapsed group. */
+  isVisible(axis, n) { return !(axis === 'r' ? this.hiddenRows : this.hiddenCols).has(n) && !this.isFolded(axis, n); }
+  /** `d` visible steps from `from` on an axis, as the arrow keys walk (Excel skips hidden and folded rows / columns); stops at the edge. */
+  stepVisible(axis, from, d) {
+    if (!d) return from;
+    const max = axis === 'r' ? this.rows : this.cols, sign = d > 0 ? 1 : -1;
+    let n = from;
+    for (let left = Math.abs(d); left > 0; left--) {
+      let m = n + sign;
+      while (m >= 1 && m <= max && !this.isVisible(axis, m)) m += sign;
+      if (m < 1 || m > max) break;
+      n = m;
+    }
+    return n;
   }
   moveHome(ctrl, shift) {   // Home → column A of this row; Ctrl+Home → A1
     this.tabHome = null; this.multi = null;
@@ -979,12 +994,19 @@ export class Sheet {
     const r = this.selRange();
     const full = axis === 'r' ? (r.c1 === 1 && r.c2 === this.cols) : (r.r1 === 1 && r.r2 === this.rows);
     if (!full) return false;
-    const [a, b] = axis === 'r' ? [r.r1, r.r2] : [r.c1, r.c2];
+    return this.groupSpan(axis, axis === 'r' ? r.r1 : r.c1, axis === 'r' ? r.r2 : r.c2);
+  }
+  /** Group rows / columns a..b on an axis (the Group dialog's Rows / Columns answer over a cell range takes this route). */
+  groupSpan(axis, a, b) {
     const key = axis === 'r' ? 'rows' : 'cols', k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2';
     if (this.groups[key].some(g => g[k1] <= a && g[k2] >= b)) return false;   // already inside a group: one level, nothing to add
     this.pushUndo();
-    let lo = a, hi = b; const keep = [];
-    for (const g of this.groups[key]) { if (g[k2] < lo - 1 || g[k1] > hi + 1) keep.push(g); else { lo = Math.min(lo, g[k1]); hi = Math.max(hi, g[k2]); } }
+    let lo = a, hi = b, keep = this.groups[key].slice();
+    for (let merged = true; merged;) {   // every band touching the new one joins it, however the joins chain
+      merged = false; const rest = [];
+      for (const g of keep) { if (g[k2] < lo - 1 || g[k1] > hi + 1) rest.push(g); else { lo = Math.min(lo, g[k1]); hi = Math.max(hi, g[k2]); merged = true; } }
+      keep = rest;
+    }
     keep.push({ [k1]: lo, [k2]: hi, collapsed: false });
     keep.sort((x, y) => x[k1] - y[k1]);
     this.groups[key] = keep;
@@ -995,7 +1017,10 @@ export class Sheet {
     const r = this.selRange();
     const full = axis === 'r' ? (r.c1 === 1 && r.c2 === this.cols) : (r.r1 === 1 && r.r2 === this.rows);
     if (!full) return false;
-    const [a, b] = axis === 'r' ? [r.r1, r.r2] : [r.c1, r.c2];
+    return this.ungroupSpan(axis, axis === 'r' ? r.r1 : r.c1, axis === 'r' ? r.r2 : r.c2);
+  }
+  /** Ungroup rows / columns a..b on an axis (the Ungroup dialog's answer over a cell range). */
+  ungroupSpan(axis, a, b) {
     const key = axis === 'r' ? 'rows' : 'cols', k1 = axis === 'r' ? 'r1' : 'c1', k2 = axis === 'r' ? 'r2' : 'c2';
     const out = []; let changed = false;
     for (const g of this.groups[key]) {
@@ -1008,6 +1033,11 @@ export class Sheet {
     this.pushUndo();
     this.groups[key] = out;
     this.commit('layout'); return true;
+  }
+  /** Data › Ungroup › Clear Outline: every group on the sheet goes. False when there was none. */
+  clearOutline() {
+    if (!this.groups.rows.length && !this.groups.cols.length) return false;
+    this.pushUndo(); this.groups = { rows: [], cols: [] }; this.commit('layout'); return true;
   }
   /** The group (with its index) holding row / column `n` on an axis, or null. */
   groupAt(axis, n) {
@@ -1026,7 +1056,10 @@ export class Sheet {
    */
   foldAtActive(collapsed) {
     const a = this.dispActive();
-    const hit = this.groupAt('r', a.r) ? ['r', this.groupAt('r', a.r).i] : this.groupAt('c', a.c) ? ['c', this.groupAt('c', a.c).i] : null;
+    // inside the band, or on the summary row / column just past it — where the ⊖ / ⊕ sits and where a folded band leaves you (Excel acts on that group too)
+    const find = (axis, n) => { const h = this.groupAt(axis, n); if (h) return h; const list = this.groups[axis === 'r' ? 'rows' : 'cols'], k2 = axis === 'r' ? 'r2' : 'c2'; const i = list.findIndex(g => g[k2] + 1 === n); return i < 0 ? null : { i, g: list[i] }; };
+    const hr = find('r', a.r), hc = hr ? null : find('c', a.c);
+    const hit = hr ? ['r', hr.i] : hc ? ['c', hc.i] : null;
     if (!hit) return false;
     return this.setGroupFold(hit[0], hit[1], collapsed);
   }

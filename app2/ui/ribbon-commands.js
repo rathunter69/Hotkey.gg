@@ -12,6 +12,7 @@
 //   recordMouse(session, 'ribbon:H1');    // SITE_SPEC §6: every workspace click is recorded
 
 import { COMMANDS, MENUS, TABS, RIBBON_ICONS, RIBBON_MENU_ICONS, QAT_COMMANDS } from '../engine/ribbon.js';
+import { NO_GROUP_NOTE } from '../engine/keyboard.js';
 
 /* ---------------- mouse recording (SITE_SPEC §6) ---------------- */
 /**
@@ -28,9 +29,9 @@ export function recordMouse(session, what) {
 }
 
 /** Dialogs that own the input while open: the sheet and the bar behind them ignore clicks (Excel's modal cards). */
-export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'rowh', 'sortwarn', 'series', 'fxfix', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial']);
+export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'rowh', 'sortwarn', 'series', 'fxfix', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group']);
 /** The dialogs drawn as floating cards over the sheet (ribbon-view drawDialog), not as anchored dropdowns. */
-export const CARD_DIALOGS = new Set(['fmt', 'paste', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial']);
+export const CARD_DIALOGS = new Set(['fmt', 'paste', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group']);
 
 /** Leave the Alt walk without acting (a mouse command supersedes any open KeyTip path or dropdown). */
 export function leaveRibbon(session) { if (session.mode === 'ribbon') session.exitRibbon(false); }
@@ -272,10 +273,11 @@ export const RIBBON_COMMANDS = {
   'ASA': C('Sort A to Z', 'Sort & Filter', 'A', ICON.sortAZ, sortRun('asc')),
   'ASD': C('Sort Z to A', 'Sort & Filter', 'A', ICON.sortZA, sortRun('desc')),
   // Data · Outline (C2 gap 4): the same Session route the chords take, so a click and Alt+Shift+→ leave one state
-  'AG': C('Group', 'Outline', 'A', ICON.group, s => { leaveRibbon(s); s.groupChord(true, true); }, 'Alt+Shift+→'),
-  'AU': C('Ungroup', 'Outline', 'A', ICON.ungroup, s => { leaveRibbon(s); s.groupChord(false, true); }, 'Alt+Shift+←'),
-  'AH': C('Hide detail', 'Outline', 'A', ICON.hideDetail, direct(S => { S.foldAtActive(true); })),
-  'AJ': C('Show detail', 'Outline', 'A', ICON.showDetail, direct(S => { S.foldAtActive(false); })),
+  'AGG': C('Group…', 'Outline', 'A', ICON.group, s => { leaveRibbon(s); s.groupChord(true, true); }, 'Alt+Shift+→'),
+  'AUU': C('Ungroup…', 'Outline', 'A', ICON.ungroup, s => { leaveRibbon(s); s.groupChord(false, true); }, 'Alt+Shift+←'),
+  'AUC': C('Clear outline', 'Outline', 'A', ICON.ungroup, direct((S, s) => { if (!S.clearOutline()) s.toast(NO_GROUP_NOTE); })),
+  'AH': C('Hide detail', 'Outline', 'A', ICON.hideDetail, direct((S, s) => { if (!S.foldAtActive(true)) s.toast(NO_GROUP_NOTE); })),
+  'AJ': C('Show detail', 'Outline', 'A', ICON.showDetail, direct((S, s) => { if (!S.foldAtActive(false)) s.toast(NO_GROUP_NOTE); })),
   // Formulas · Formula Auditing: Show Formulas (C2 gap 5)
   'MH': C('Show formulas', 'Formula Auditing', 'M', ICON.showFormulas, s => { leaveRibbon(s); s.toggleShowFormulas(); }, 'Ctrl+`'),
   // View
@@ -390,6 +392,7 @@ export const MENU_META = {
   'HV': { label: 'Paste', icon: ICON.paste }, 'HB': { label: 'Borders', icon: ICON.borders },
   'HI': { label: 'Insert', icon: ICON.insert }, 'HD': { label: 'Delete', icon: ICON.del }, 'HO': { label: 'Format', icon: ICON.format },
   'HE': { label: 'Clear', icon: ICON.clear }, 'HFI': { label: 'Fill', icon: ICON.fillMenu }, 'HU': { label: 'AutoSum', icon: ICON.sum }, 'MU': { label: 'AutoSum', icon: ICON.sum },
+  'AG': { label: 'Group', icon: ICON.group }, 'AU': { label: 'Ungroup', icon: ICON.ungroup },
   'HA': { label: 'Alignment', icon: ICON.alignL, virtual: true }, 'HF': { label: 'Font', icon: ICON.fontName, virtual: true },
   'WV': { label: 'Show', icon: ICON.gridlines, virtual: true }, 'AS': { label: 'Sort', icon: ICON.sortAZ, virtual: true },
   'E': { label: 'Edit', icon: ICON.paste }, 'O': { label: 'Format', icon: ICON.format },
@@ -455,7 +458,7 @@ export const RIBBON_LAYOUT = {
     { name: 'Get & Transform Data', cols: [big({ dead: 'FromText' }), big({ dead: 'FromWeb' })] },
     { name: 'Sort & Filter', cols: [{ rows: [[ico({ cmd: 'ASA' })], [ico({ cmd: 'ASD' })]] }, big({ dead: 'SortDialog' }), big({ dead: 'DataFilter' }), { rows: [[{ dead: 'ClearFilter' }]] }] },
     { name: 'Data Tools', cols: [big({ dead: 'TextToColumns' }), big({ dead: 'RemoveDuplicates' }), big({ dead: 'DataValidation' })] },
-    { name: 'Outline', cols: [big({ cmd: 'AG' }), big({ cmd: 'AU' }), { rows: [[{ cmd: 'AH' }], [{ cmd: 'AJ' }]] }] },
+    { name: 'Outline', cols: [big({ menu: 'AG', cmd: 'AGG', label: 'Group' }), big({ menu: 'AU', cmd: 'AUU', label: 'Ungroup' }), { rows: [[{ cmd: 'AH' }], [{ cmd: 'AJ' }]] }] },
   ],
   R: [
     { name: 'Proofing', cols: [big({ dead: 'Spelling' }), big({ dead: 'Thesaurus' })] },

@@ -9,7 +9,7 @@
 // $0.13 = energy cost); sessions and tariffs arrive in Chapter 3. Figures are deterministic
 // (seeded once, rounded to tens) so checks can read the sheet and still assert exact numbers.
 import { mulberry32 } from '../../engine/rng.js';
-import { FMT_FIELDS, Sheet, ROWH_DEFAULT } from '../../engine/sheet.js';
+import { FMT_FIELDS, Sheet, ROWH_DEFAULT, normGroups } from '../../engine/sheet.js';
 
 export const SITES = ['Domain', 'Mueller', 'Riverside', 'South Lamar', 'Airport'];
 export const SITE_PRICE = { Domain: 0.45, Mueller: 0.44, Riverside: 0.46, 'South Lamar': 0.43, Airport: 0.48 };
@@ -378,7 +378,7 @@ export function diffStates(a, b) {
     if (!same(sa.hiddenCols || [], sb.hiddenCols || [])) out.push({ sheet: name, kind: 'hiddenCols', key: 'hiddenCols', a: sa.hiddenCols, b: sb.hiddenCols });
     if (!same(sa.freeze || { r: 0, c: 0 }, sb.freeze || { r: 0, c: 0 })) out.push({ sheet: name, kind: 'freeze', key: 'freeze', a: sa.freeze, b: sb.freeze });
     const NOG = { rows: [], cols: [] };
-    if (!same(sa.groups || NOG, sb.groups || NOG)) out.push({ sheet: name, kind: 'groups', key: 'groups', a: sa.groups, b: sb.groups });
+    if (!same(normGroups(sa.groups || NOG), normGroups(sb.groups || NOG))) out.push({ sheet: name, kind: 'groups', key: 'groups', a: sa.groups, b: sb.groups });
   }
   if (!same(a.settings || {}, b.settings || {})) out.push({ sheet: '*', kind: 'settings', key: 'settings', a: a.settings, b: b.settings });
   return out;

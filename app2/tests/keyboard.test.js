@@ -278,22 +278,27 @@ test('Page Setup (Alt P S P): rows to repeat, the footer sections and print grid
   s.run('"$1:$3"'); assert.equal(s.dlg.titlesRows, '$1:$3', 'a text field takes what is typed');
   s.run('Alt+H'); assert.equal(s.dlg.tab, 'hf'); assert.equal(s.dlg.focus, 'footL');
   s.run('"&[file]" Tab "Voltline" Tab "&[Date]"'); assert.equal(s.dlg.footL, '&[file]'); assert.equal(s.dlg.footC, 'Voltline'); assert.equal(s.dlg.footR, '&[Date]');
+  s.run('Alt+C'); assert.equal(s.dlg.focus, 'footC'); s.run('" Energy"'); assert.equal(s.dlg.footC, 'Voltline Energy', 'a space types into a section');
+  s.run('Alt+R'); assert.equal(s.dlg.tab, 'hf'); assert.equal(s.dlg.focus, 'footR', 'Alt+R on the Header/Footer page is the Right section, not the Sheet page');
+  s.run('Alt+S'); assert.equal(s.dlg.tab, 'sheet'); assert.equal(s.dlg.focus, 'titlesRows', 'Alt+S is the Sheet page'); s.run('Alt+H');
   s.run('Alt+G'); assert.equal(s.dlg.tab, 'sheet'); assert.equal(s.dlg.printGridlines, true);
   s.run('Alt+G'); assert.equal(s.dlg.printGridlines, false);
   s.run('Enter'); assert.equal(s.mode, 'normal'); assert.equal(s.dialog, null);
   const p = s.settings.pageSetup;
   assert.equal(p.orientation, 'landscape'); assert.equal(p.scaling, 'fit');
-  assert.equal(p.titlesRows, '1:3', 'stored as Excel does'); assert.deepEqual(p.footer, { left: '&[File]', centre: 'Voltline', right: '&[Date]' }); assert.equal(p.printGridlines, false);
+  assert.equal(p.titlesRows, '$1:$3', 'stored as Excel shows it back'); assert.deepEqual(p.footer, { left: '&[File]', centre: 'Voltline Energy', right: '&[Date]' }); assert.equal(p.printGridlines, false);
   assert.ok(s.log.includes('Alt+R') && s.log.includes('Alt+H'), 'the accelerators are logged as chords');
   // Print Titles (Alt P I) opens the Sheet page directly; Esc cancels the draft
-  s.run('Alt P I'); assert.equal(s.dialog, 'pagesetup'); assert.equal(s.dlg.tab, 'sheet'); assert.equal(s.dlg.titlesRows, '1:3');
-  s.run('Backspace Backspace Backspace "9" Escape'); assert.equal(s.settings.pageSetup.titlesRows, '1:3', 'Cancel discards the draft');
+  s.run('Alt P I'); assert.equal(s.dialog, 'pagesetup'); assert.equal(s.dlg.tab, 'sheet'); assert.equal(s.dlg.titlesRows, '$1:$3');
+  s.run('Backspace Backspace Backspace Backspace Backspace "9" Escape'); assert.equal(s.settings.pageSetup.titlesRows, '$1:$3', 'Cancel discards the draft');
   s.run('Escape Escape'); assert.equal(s.mode, 'normal');   // Cancel returns to the Page Layout tab it was opened from; Esc backs out of the walk
   // the bare letter only acts when no text field has the focus: on the Page page L is Landscape, in a footer field it types
   s.run('Alt P S P T'); assert.equal(s.dlg.orientation, 'portrait'); s.run('L'); assert.equal(s.dlg.orientation, 'landscape');
   s.run('Alt+H "L"'); assert.equal(s.dlg.footL, '&[File]L'); s.run('Escape Escape Escape Escape'); assert.equal(s.mode, 'normal');
-  // an invalid rows-to-repeat clears the titles
-  s.run('Alt P I Backspace Backspace Backspace "x" Enter'); assert.equal(s.settings.pageSetup.titlesRows, ''); assert.equal(s.mode, 'normal');
+  // an invalid rows-to-repeat is refused: the dialog stays open and says so (Excel); a blank one clears the titles
+  s.run('Alt P I Backspace Backspace Backspace Backspace Backspace "x" Enter'); assert.equal(s.dialog, 'pagesetup'); assert.equal(s.note, 'Reference is not valid.'); assert.equal(s.settings.pageSetup.titlesRows, '$1:$3');
+  s.run('Backspace'); assert.equal(s.note, '', 'the next key clears the note'); s.run('"2" Enter'); assert.equal(s.settings.pageSetup.titlesRows, '$2:$2'); assert.equal(s.mode, 'normal');
+  s.run('Alt P I Backspace Backspace Backspace Backspace Backspace Enter'); assert.equal(s.settings.pageSetup.titlesRows, ''); assert.equal(s.mode, 'normal');
 });
 
 test('Esc that discards an entry in progress is logged, on the edited cell', () => {

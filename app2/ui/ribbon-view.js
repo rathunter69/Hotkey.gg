@@ -356,9 +356,23 @@ export class RibbonView {
     return `<div class="od-wrap">${pages}<div class="od-body">${body}</div></div>`;
   }
   pageSetupHtml() {
-    const d = this.session.dlg; if (!d) return '';
-    const R = RibbonView.radio, F = RibbonView.field;
-    return '<div class="ps-tabs"><span class="ps-tab on">Page</span><span class="ps-tab dis">Margins</span><span class="ps-tab dis">Header/Footer</span><span class="ps-tab dis">Sheet</span></div>' +
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const R = RibbonView.radio, F = RibbonView.field, C = RibbonView.check;
+    const tab = (key, label) => `<span class="ps-tab${d.tab === key ? ' on' : ''}" data-act="dset:tab:${key}">${label}</span>`;
+    const tabs = '<div class="ps-tabs">' + tab('page', '<u>P</u>age') + '<span class="ps-tab dis">Margins</span>' + tab('hf', '<u>H</u>eader/Footer') + tab('sheet', '<u>S</u>heet') + '</div>';
+    if (d.tab === 'hf') {   // the three footer sections (Excel's Custom Footer dialog, folded onto the tab): Alt+L / C / R, Tab between them
+      const sect = (key, label, u) => `<div class="gt-ref"><label><u>${u}</u>${label}:</label>${F(d[key], d.focus === key, 'dset:focus:' + key, 'wide')}</div>`;
+      return tabs + '<div class="od-sect">Footer</div>' + sect('footL', 'eft section', 'L') + sect('footC', 'enter section', 'C') + sect('footR', 'ight section', 'R') +
+        '<div class="od-caplbl">&amp;[Page] &amp;[Pages] &amp;[File] &amp;[Tab] &amp;[Date] are the codes · Tab moves between sections · Alt+L Alt+C Alt+R</div>';
+    }
+    if (d.tab === 'sheet') {
+      return tabs + '<div class="od-sect">Print titles</div>' +
+        `<div class="gt-ref"><label><u>R</u>ows to repeat at top:</label>${F(d.titlesRows, d.focus === 'titlesRows', 'dset:focus:titlesRows', 'wide')}</div>` +
+        '<div class="od-row dis"><span class="od-lbl">Columns to repeat at left:</span><span class="od-field dis" style="min-width:120px"></span></div>' +
+        '<div class="od-sect">Print</div>' + C(d.printGridlines, 'dset:grid:1', '<u>G</u>ridlines', 'G', { foc: d.focus === 'printGrid' }) +
+        (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">rows as $1:$3 or 1:3 · Tab moves between fields · Space or Alt+G toggles Gridlines</div>');
+    }
+    return tabs +
       '<div class="od-sect">Orientation</div><div class="ps-orient">' +
       R(d.orientation === 'portrait', 'letter:T', '<span class="ps-page"></span>Portrait', 'T', { foc: d.focus === 'orient' }) +
       R(d.orientation === 'landscape', 'letter:L', '<span class="ps-page land"></span>Landscape', 'L', { foc: d.focus === 'orient' }) + '</div>' +
@@ -370,6 +384,14 @@ export class RibbonView {
       '<div class="od-row dis"><span class="od-lbl">Print quality:</span><span class="od-combo" style="min-width:120px">600 dpi</span></div>' +
       '<div class="od-row dis"><span class="od-lbl">First page number:</span><span class="od-field dis">Auto</span></div>' +
       '<div class="od-sub" style="margin-top:6px">↑ ↓ change the focused control · Tab moves between fields · digits type into the focused field</div>';
+  }
+  /** The Group / Ungroup dialog (Alt+Shift+→ / ← or Alt A G G / Alt A U U over a cell range): Rows or Columns, Rows preselected. */
+  groupHtml() {
+    const d = this.session.dlg; if (!d) return '';
+    const R = RibbonView.radio;
+    return '<div class="od-sect">' + (d.ungroup ? 'Ungroup' : 'Group') + '</div>' +
+      R(d.axis === 'r', 'letter:R', '<u>R</u>ows', 'R') + R(d.axis === 'c', 'letter:C', '<u>C</u>olumns', 'C') +
+      '<div class="od-caplbl">↑ ↓ or R / C choose · ↵ OK · esc cancel</div>';
   }
   /* ---- the sheet cards (Rename Sheet, Delete Sheet, Move or Copy): one control each, every row clickable ---- */
   renameHtml() {
@@ -446,6 +468,11 @@ export class RibbonView {
         RibbonView.okCancel('OK', '<span class="pd-btn dis" aria-disabled="true">Print…</span><span class="pd-btn dis" aria-disabled="true">Print Preview</span><span class="pd-btn dis" aria-disabled="true">Options…</span>'));
     }
     // the sheet cards: Rename Sheet (Alt H O R, a double-click on the tab), Delete Sheet's confirm (Alt H D S), Move or Copy (Alt H O M)
+    if (ss.dialog === 'group' || this.groupDialog) {
+      const d = this.groupDialog || (this.groupDialog = this.wideCard('groupDialog', 'Group', 'pd-mid'));
+      if (ss.dlg && ss.dlg.kind === 'group') { const t = d.querySelector('.pd-title'); if (t && t.firstChild) t.firstChild.nodeValue = (ss.dlg.ungroup ? 'Ungroup' : 'Group') + ' '; }
+      this.showCard(d, ss.dialog === 'group' && !!ss.dlg, ss.dialog === 'group' ? this.groupHtml() : '', RibbonView.okCancel('OK'));
+    }
     if (ss.dialog === 'renamesheet' || this.renameDialog) {
       const d = this.renameDialog || (this.renameDialog = this.wideCard('renameSheetDialog', 'Rename Sheet', 'pd-mid'));
       this.showCard(d, ss.dialog === 'renamesheet' && !!ss.dlg, ss.dialog === 'renamesheet' ? this.renameHtml() : '', RibbonView.okCancel('OK'));

@@ -36,6 +36,8 @@ export const MENUS = {
   'M': [['U', 'Σ AutoSum'], ['P', 'Trace precedents'], ['D', 'Trace dependents'], ['H', 'Show formulas']],
   'MU': [['S', 'Sum']],
   'A': [['S', 'Sort'], ['G', 'Group'], ['U', 'Ungroup'], ['H', 'Hide detail'], ['J', 'Show detail']],   // Excel's Outline group: Group, Ungroup, Hide / Show Detail
+  'AG': [['G', 'Group…'], ['A', 'Auto Outline']],      // split buttons, as in Excel: Alt A G G groups, Alt A U U ungroups
+  'AU': [['U', 'Ungroup…'], ['C', 'Clear Outline']],
   'AS': [['A', 'Sort A→Z'], ['D', 'Sort Z→A']],
   'E': [['S', 'Paste special…']],
   'W': [['V', 'Show'], ['F', 'Freeze Panes']],
@@ -107,7 +109,7 @@ export const tabName = k => (TABS.find(t => t.k === k) || { name: k }).name;
 export const DEAD = {
   'FI': 'Info', 'FN': 'New', 'FO': 'Open', 'FS': 'Save', 'FA': 'Save As', 'FP': 'Print', 'FH': 'Share', 'FE': 'Export', 'FC': 'Close', 'FD': 'Account',
   'HFDV': 'Data Validation', 'HFDO': 'Select Objects',
-  'PM': 'Margins', 'PA': 'Print Area', 'PB': 'Breaks', 'PG': 'Background', 'PSZ': 'Size',
+  'PM': 'Margins', 'PA': 'Print Area', 'PB': 'Breaks', 'PG': 'Background', 'PSZ': 'Size', 'AGA': 'Auto Outline',
 };
 
 /* ---------------- Excel Options, Page Setup and the Quick Access Toolbar (data the Session reads) ---------------- */
@@ -172,7 +174,7 @@ export const COMMANDS = {
   'HEA': 'Clear all', 'HEF': 'Clear formats', 'HEC': 'Clear contents', 'HUS': 'AutoSum', 'MUS': 'AutoSum', 'MP': 'Trace precedents', 'MD': 'Trace dependents',
   'HVV': 'Paste values', 'HVS': 'Paste special…', 'ES': 'Paste special…', 'ASA': 'Sort A to Z', 'ASD': 'Sort Z to A', 'WVG': 'Gridlines', 'WG': 'Gridlines',
   'FT': 'Excel Options…', 'HFDG': 'Go To…', 'PSP': 'Page Setup…', 'POP': 'Portrait', 'POL': 'Landscape', 'PI': 'Print Titles…',
-  'AG': 'Group', 'AU': 'Ungroup', 'AH': 'Hide detail', 'AJ': 'Show detail', 'MH': 'Show formulas',
+  'AGG': 'Group…', 'AUU': 'Ungroup…', 'AUC': 'Clear outline', 'AH': 'Hide detail', 'AJ': 'Show detail', 'MH': 'Show formulas',
   'HFDF': 'Find…', 'HFDR': 'Replace…', 'HFDS': 'Go To Special…', 'HFDU': 'Select formulas', 'HFDN': 'Select constants',
   'HOH': 'Row height…', 'HOUR': 'Hide rows', 'HOUC': 'Hide columns', 'HOUO': 'Unhide rows', 'HOUL': 'Unhide columns',
   'WFF': 'Freeze panes', 'WFR': 'Freeze top row', 'WFC': 'Freeze first column',
