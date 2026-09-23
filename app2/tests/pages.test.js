@@ -210,3 +210,48 @@ test('legal pages: real drafts, DRAFT banner gated on LEGAL_STATUS.reviewed, dis
   assert.match(renderLegal('contact'), /hello@hotkey\.gg/, 'contact page has the support address');
   assert.match(renderLegal('privacy'), /privacy@hotkey\.gg/);
 });
+
+/* ---------------- the Learn path model (C2 gap 9) ---------------- */
+import { moduleStatus, pathModel } from '../app/learn-page.js';
+import { CHAPTERS, modulesOf, moduleOf } from '../content/index.js';
+
+const MOD = { id: 'open-and-set-up', lessons: [{ id: 'm1' }, { id: 'm2' }], challenge: { id: 'mc', title: 'The challenge' } };
+test('moduleStatus: lessons plus the challenge pass make complete; lessons alone stop at lessons-done', () => {
+  assert.equal(moduleStatus(MOD, {}), 'todo');
+  assert.equal(moduleStatus(MOD, { m1: { started: true } }), 'started');
+  assert.equal(moduleStatus(MOD, { m1: { completed: true } }), 'started');
+  assert.equal(moduleStatus(MOD, { m1: { completed: true }, m2: { completed: true } }), 'lessons-done');
+  assert.equal(moduleStatus(MOD, { m1: { completed: true }, m2: { completed: true }, mc: { challenge: true, tier: 'pass' } }), 'complete');
+  assert.equal(moduleStatus({ ...MOD, challenge: null }, { m1: { completed: true }, m2: { completed: true } }), 'complete', 'a module without a challenge (the Welcome) completes on its lessons');
+  assert.equal(moduleStatus(MOD, { mc: { challenge: true } }), 'started', 'a challenge pass alone is a start, not completion');
+});
+
+test('pathModel: items in order with the challenge last, one next-up, ring counts', () => {
+  const chapter = { id: 'x', lessons: [
+    { id: 'a', title: 'A', module: 'one', section: 'One' },
+    { id: 'b', title: 'B', module: 'one', section: 'One' },
+    { id: 'c', title: 'C', module: 'one', section: 'One', kind: 'challenge' },
+    { id: 'd', title: 'D', module: 'two', section: 'Two' },
+  ] };
+  const mods = pathModel(chapter, { a: { completed: true }, c: { challenge: true, tier: 'pro' } }, []);
+  assert.equal(mods.length, 2);
+  assert.deepEqual(mods[0].items.map(i => i.kind), ['lesson', 'lesson', 'challenge']);
+  assert.equal(mods[0].items[2].tier, 'pro');
+  assert.equal(mods[0].done, 2, 'the done ring counts lessons and the challenge alike');
+  assert.equal(mods[0].total, 3);
+  const nexts = mods.flatMap(m => m.items.filter(i => i.next));
+  assert.equal(nexts.length, 1, 'exactly one item pulses as next up');
+  assert.equal(nexts[0].id, 'b', 'the first open item in path order');
+  assert.equal(pathModel(CHAPTERS[0], {}, []).length, modulesOf(CHAPTERS[0]).length, 'the real chapter renders its authored modules');
+});
+
+test('moduleOf places a lesson inside its module and counts the chapter\'s modules', () => {
+  assert.equal(moduleOf({ id: 'legacy' }), null, 'legacy lessons sit in no module');
+  const mods = modulesOf(CHAPTERS[0]);
+  for (const m of mods) {
+    for (const [i, l] of m.lessons.entries()) {
+      const at = moduleOf(l);
+      assert.equal(at.module.id, m.id); assert.equal(at.n, i + 1); assert.equal(at.of, m.lessons.length); assert.equal(at.of7, mods.length);
+    }
+  }
+});
