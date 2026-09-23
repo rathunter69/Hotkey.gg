@@ -10,6 +10,8 @@ import { track } from './telemetry.js';
 import { store } from './store.js';
 import { attemptId, dayOf } from './records.js';
 import { mulberry32 } from '../engine/rng.js';
+import { schedule, rapidOrder, RAPID_CONCEPT } from './schedule.js';
+import { flowNext } from './flow.js';
 import { gameCtx, celebrate } from './stats.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -82,7 +84,8 @@ export function mountRapidPage(root) {
   function startRound(seconds) {
     dur = seconds; phase = 'run';
     hits = 0; misses = 0; combo = 0; bestCombo = 0; points = 0; oi = 0; progress = 0;
-    order = deckOrder(Date.now() >>> 0);
+    // the experience pass (decision 12): prompts come from the least-remembered shortcuts first, not at random
+    order = flowNext() ? rapidOrder(RAPID_DECK, schedule.state(), Date.now() >>> 0) : deckOrder(Date.now() >>> 0);
     el.innerHTML = `
       <div class="rf-head">
         <div class="rf-instr" id="rfInstr">—</div>
@@ -120,6 +123,7 @@ export function mountRapidPage(root) {
       progress++;
       if (progress >= pr.expect.length) {
         points += hitPoints(combo); combo++; hits++;
+        schedule.note([RAPID_CONCEPT[pr.id] || pr.id], (Date.now() - promptAt) / 1000 <= 3 ? 5 : 4);   // a hit feeds the due-today queue
         bestCombo = Math.max(bestCombo, combo);
         if (sb) sb.fx.hit();
         paintScore();
@@ -129,6 +133,7 @@ export function mountRapidPage(root) {
     }
     // a wrong chord: the combo breaks, the matcher restarts (the wrong key may start the sequence)
     misses++;
+    schedule.note([RAPID_CONCEPT[pr.id] || pr.id], 1);
     if (combo > 0 && sb) sb.fx.comboBreak();
     combo = 0;
     progress = label === pr.expect[0] ? 1 : 0;
