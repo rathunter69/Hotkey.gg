@@ -4,6 +4,7 @@
 // completion overlay. Mouse works and is recorded (§6); every completed goal gets a tick and the
 // finish gets a bigger one (§1, ui/effects.js).
 import { LessonRun, shortcutsUsed } from './runner.js';
+import { parseKeyScript } from '../engine/keyboard.js';
 import { store } from './store.js';
 import { attemptId, dayOf, traceOf } from './records.js';
 import { gameCtx, celebrate } from './stats.js';
@@ -92,6 +93,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   let sheetView = null, ribbonView = null, sheetTabs = null, timerH = null;
   let phase = 'play';        // 'play' | 'done' — the sheet is live at once; the Read text sits at the top of the panel
   let demo = null;           // { goal, steps, i, timer } while the platform plays a demo goal for the learner to watch
+  let ghost = null;          // { steps, i, timer, paused } while "Show me" replays the keys and puts the sheet back (C2 gap 9a)
   let tab = 'lesson';                                   // 'lesson' | 'help' | 'used'
   let revealed = false;      // keys shown on request in a solo or timed run: the run is assisted (§6)
   let nudgeAt = -1;          // the goal index a workspace mouse action happened on: show the keyboard nudge there
@@ -178,6 +180,12 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
         ${grader ? `<div class="task-extra">${esc(grader.why)}</div>` : ''}`;
       return;
     }
+    if (ghost) {
+      card.innerHTML = `<div class="task-label">Watch</div>
+        <div class="task-goal">${esc(run.current ? run.current.text : '')}</div>
+        <div class="task-extra">The keys play on the sheet, then it goes back as it was. <kbd>Esc</kbd> hands back now; <kbd>←</kbd> <kbd>→</kbd> step.</div>`;
+      return;
+    }
     const cur = run.current;
     if (!cur) { card.innerHTML = ''; return; }
     const isGoal = !!cur.keys || !cur.grader && run.doneCount < run.goals.length;
@@ -255,7 +263,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       p.innerHTML = goalLine +
         `<p class="help-note">Reading is free. Showing the keys counts as help: this attempt is then marked assisted${run.mode === 'timed' ? ', and a timed run with help sets no personal best' : ''}.</p>
         <p><button class="btn" id="revealBtn" type="button">Show me the keys</button></p>` + footer + notes;
-      p.querySelector('#revealBtn').onclick = () => { revealed = true; renderPanel(); };   // re-rendered: the button is gone, keys go to the sheet
+      p.querySelector('#revealBtn').onclick = () => { revealed = true; startGhost(); };   // the ghost plays the keys on the sheet, then puts it back (C2 gap 9a)
     }
   }
 
@@ -335,6 +343,8 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     scope.querySelector('[data-act="continue"]').onclick = () => { location.hash = nxt ? '#/lesson/' + nxt.id : '#/learn'; };
     scope.querySelector('[data-act="alt"]').onclick = () => restart(run.mode === 'guided' ? 'solo' : run.mode === 'solo' ? 'timed' : 'timed');
     const look = scope.querySelector('[data-act="look"]'); if (look) look.onclick = closeOverlay;
+    // after a timed or challenge run: watch the reference route play over the finished sheet, then it goes back
+    const route = scope.querySelector('[data-act="route"]'); if (route) route.onclick = () => { closeOverlay(); startGhost(parseKeyScript(lesson.solution)); };
   }
   function renderOverlay() {
     const secs = run.startedAt == null ? null : run.elapsed;
@@ -348,7 +358,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       ${assisted() ? `<div class="rm-note">Steps were shown on request, so this attempt counts as assisted. Try solo earns the rest.</div>` : run.mode === 'guided' ? `<div class="rm-note">Try solo does it again without the keys shown.</div>` : ''}
       ${closingHtml()}
       ${firstEver && store.saveState() === 'device' ? `<div class="rm-save"><b>Your first lesson is done.</b> Progress is saved on this device. <a href="#/account">Create a free account</a> to keep it across devices — everything you have done carries over.</div>` : ''}
-      <div class="rm-opts">${doneButtonsHtml()}<button class="btn btn-ghost" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button></div>
+      <div class="rm-opts">${doneButtonsHtml()}<button class="btn btn-ghost" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button>${(run.mode === 'timed' || lesson.kind === 'challenge') && lesson.solution ? '<button class="btn btn-ghost" data-act="route" type="button">Watch the reference route</button>' : ''}</div>
       <div class="rm-more">${esc(saveState)}</div>
     </div>`;
     wireDoneButtons(overlay);
@@ -437,6 +447,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   }
   window.addEventListener('focus', paintFocusHint); window.addEventListener('blur', paintFocusHint);
   function restart(newMode) {
+    if (ghost) { clearInterval(ghost.timer); ghost = null; run.endGhost(); }
     stopDemo();
     phase = 'play'; revealed = false; nudgeAt = -1; prevDone = 0; overlay.hidden = true; tab = 'lesson';
     run.reset(timedOnly ? 'timed' : newMode);
@@ -468,6 +479,30 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     while (d.i < d.steps.length) run.demoStep(d.steps[d.i++]);
     demo = null;
     run.finishDemo(d.goal);
+  }
+
+  /* ---------------- ghost replay (C2 gap 9a): "Show me" plays the keys and puts the sheet back ---------------- */
+  /** Play `steps` (default: the current goal's hint) as a ghost: ~350 ms a key, keycaps flashing, then restore and hand back. */
+  function startGhost(steps) {
+    if (ghost || demo) return;
+    steps = steps || (run.current && run.current.keys ? run.ghostSteps(run.current.keys) : []);
+    if (!steps.length) { renderPanel(); return; }
+    run.beginGhost();
+    ghost = { steps, i: 0, timer: null, paused: false };
+    renderPanel();
+    ghost.timer = setInterval(() => {
+      if (!ghost || ghost.paused) return;
+      if (ghost.i < ghost.steps.length) { run.ghostStep(ghost.steps[ghost.i++]); return; }
+      stopGhost(true);
+    }, 350);
+  }
+  function stopGhost(finished) {
+    if (!ghost) return;
+    clearInterval(ghost.timer); ghost = null;
+    run.endGhost();
+    renderPanel();
+    if (finished && phase === 'play') showToast('Your turn.');
+    focusWorkspace();
   }
 
   /* ---------------- mouse (§6): recorded, allowed in lessons, with a gentle keyboard nudge ---------------- */
@@ -530,6 +565,14 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       return;
     }
     if ((tag === 'BUTTON' || tag === 'A' || tag === 'SUMMARY') && (e.key === 'Enter' || e.key === ' ')) return;   // the control handles its own activation
+    if (ghost) {   // watching the ghost: Esc hands back, ← → pause and step, Space pauses, everything else waits
+      e.preventDefault();
+      if (e.key === 'Escape') stopGhost(false);
+      else if (e.key === 'ArrowRight') { ghost.paused = true; if (ghost.i < ghost.steps.length) run.ghostStep(ghost.steps[ghost.i++]); else stopGhost(true); }
+      else if (e.key === 'ArrowLeft') { ghost.paused = true; if (ghost.i > 0) { ghost.i--; run.ghostSeek(ghost.steps, ghost.i - 1); } }
+      else if (e.key === ' ') ghost.paused = !ghost.paused;
+      return;
+    }
     if (demo) { if (e.key === 'Escape') skipDemo(); if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length > 1) e.preventDefault(); return; }   // watching: keys wait, arrows never scroll the page
     if (phase === 'timeup') { if (e.key === 'Enter') { e.preventDefault(); restart('timed'); } return; }   // the run is over; Enter starts the next attempt
     if (phase === 'done') { if (e.key === 'Enter') { e.preventDefault(); const c = el.querySelector('[data-act="continue"]'); if (c) c.click(); } return; }
@@ -546,6 +589,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
   maybeStartDemo();
   return {
     destroy() {
+      if (ghost) { clearInterval(ghost.timer); ghost = null; run.endGhost(); }
       stopDemo();
       window.removeEventListener('focus', paintFocusHint); window.removeEventListener('blur', paintFocusHint);
       document.removeEventListener('keydown', onKey); document.removeEventListener('keyup', onKeyUp);

@@ -162,8 +162,55 @@ export class LessonRun {
   }
   pressSpec(spec) { return this.key(parseKeySpec(spec)); }
 
+  /* ---------------- ghost replay (C2 gap 9a): "Show me" plays the keys, then puts everything back ---------------- */
+  /** The current goal's hint as playable steps (glyphs and connectives normalised away). */
+  ghostSteps(keys) { return parseKeyScript(hintToScript(keys)); }
+  /**
+   * Freeze the run before a ghost plays: every sheet's state, the workbook pointer, the clock and
+   * the key log. While `ghosting`, evaluate() is a no-op, so nothing a ghost presses can land a
+   * goal or finish the run; endGhost() restores the freeze, so no cell, selection, undo entry,
+   * key-log line or settings change survives either.
+   */
+  beginGhost() {
+    if (this.ghostSnap) return;
+    const ses = this.session;
+    this.ghostSnap = {
+      sheets: ses.sheets.map(e => ({ snap: e.sheet.snapshot(), clip: e.sheet.clipboard, gridlines: e.sheet.gridlines, undo: e.sheet.undoStack.length, redo: e.sheet.redoStack.length })),
+      idx: ses.sheetIndex, t0: ses.t0, keyLen: ses.keyLog.length, mouse: ses.mouse.count,
+      settings: JSON.parse(JSON.stringify({ calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat, pageSetup: ses.settings.pageSetup })),
+    };
+    this.ghosting = true;
+  }
+  /** Feed one ghost step (the view plays them on a cadence; keycaps flash through onKey as usual). */
+  ghostStep(step) { this.demoStep(step); }
+  /** The ghost is over (finished, skipped or scrubbed): put the run back exactly as it stood. */
+  endGhost() {
+    const g = this.ghostSnap; if (!g) return;
+    const ses = this.session;
+    ses.sheets.length = g.sheets.length;   // a ghost that inserted a sheet loses it again
+    g.sheets.forEach((s, i) => { const sh = ses.sheets[i].sheet; sh.restore(s.snap); sh.clipboard = s.clip; sh.gridlines = s.gridlines; sh.undoStack.length = s.undo; sh.redoStack.length = s.redo; });
+    ses.sheetIndex = g.idx; ses.sheet = ses.sheets[g.idx].sheet;
+    ses.t0 = g.t0; ses.keyLog.length = g.keyLen; ses.mouse.count = g.mouse;
+    Object.assign(ses.settings, g.settings);
+    ses.resetEdit(); ses.mode = 'normal'; ses.path = []; ses.dialog = null; ses.dlg = null; ses.dialogBuf = ''; ses.pasteKind = null; ses.note = '';
+    this.ghostSnap = null; this.ghosting = false;
+    this.emit('session');
+  }
+  /** Rewind a paused ghost to just after step i: restore the freeze, replay 0..i instantly. */
+  ghostSeek(steps, i) {
+    const g = this.ghostSnap; if (!g) return;
+    const ses = this.session;
+    ses.sheets.length = g.sheets.length;
+    g.sheets.forEach((s, j) => { const sh = ses.sheets[j].sheet; sh.restore(s.snap); sh.clipboard = s.clip; sh.gridlines = s.gridlines; sh.undoStack.length = s.undo; sh.redoStack.length = s.redo; });
+    ses.sheetIndex = g.idx; ses.sheet = ses.sheets[g.idx].sheet;
+    ses.resetEdit(); ses.mode = 'normal'; ses.path = []; ses.dialog = null; ses.dlg = null; ses.dialogBuf = ''; ses.pasteKind = null;
+    for (let j = 0; j <= i && j < steps.length; j++) this.demoStep(steps[j]);
+    this.emit('session');
+  }
+
   /** Advance goals whose checks now pass, in order; mark the lesson finished when all land. */
   evaluate() {
+    if (this.ghosting) return false;   // a ghost's keys never land a goal
     let moved = false;
     while (this.doneCount < this.goals.length && safeCheck(this.goals[this.doneCount], this.sheet, this.session)) {
       this.landedAt[this.doneCount] = this.opts.now ? this.opts.now() : Date.now();
@@ -200,6 +247,26 @@ export class LessonRun {
 }
 
 function safeCheck(g, sheet, session) { try { return !!g.check(sheet, session); } catch (e) { return false; } }
+
+/**
+ * A goal's hint, as a playable key script: glyphs become key names (↵ → Enter, Ctrl+↓ → Ctrl+Down),
+ * '×N' repeats the previous press, and connective words ('then', 'and', 'twice') fall away. Quoted
+ * runs stay text to type. The ghost replay and the reference-route replay both play through this.
+ */
+const HINT_GLYPHS = { '↵': 'Enter', '⌫': 'Backspace', '↑': 'Up', '↓': 'Down', '←': 'Left', '→': 'Right', Esc: 'Escape' };
+export function hintToScript(keys) {
+  const out = [];
+  for (const t of String(keys || '').match(/"[^"]*"|\S+/g) || []) {
+    if (t.startsWith('"')) { out.push(t); continue; }
+    const rep = /^×(\d+)$/.exec(t);
+    if (rep) { const last = out[out.length - 1]; if (last) for (let i = 1; i < Math.min(+rep[1], 50); i++) out.push(last); continue; }
+    const norm = t.split('+').map(p => HINT_GLYPHS[p] || p).join('+');
+    if (/^[a-z]/.test(norm) && norm.length > 1) continue;   // 'then', 'and', 'twice' — prose, not keys
+    if (norm === ',' || norm === '…') continue;
+    out.push(norm);
+  }
+  return out.join(' ');
+}
 
 function structuredCloneCells(cells) { const out = {}; for (const k in cells) out[k] = { ...cells[k] }; return out; }
 

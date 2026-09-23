@@ -525,3 +525,40 @@ test('module hints never use Go To as movement glue and never grind arrows', () 
     });
   }
 });
+
+/* ---------------- ghost replay (C2 gap 9a): "Show me" plays the keys and puts everything back ---------------- */
+import { hintToScript } from '../app/runner.js';
+
+test('hintToScript: glyphs become key names, ×N repeats, prose falls away', () => {
+  assert.equal(hintToScript('Ctrl+G "C3:C7" ↵ then Ctrl+D'), 'Ctrl+G "C3:C7" Enter Ctrl+D');
+  assert.equal(hintToScript('↓ ×3'), 'Down Down Down');
+  assert.equal(hintToScript('Ctrl+↓ and Shift+→'), 'Ctrl+Down Shift+Right');
+  assert.equal(hintToScript('"1200" ↵ ⌫ Esc'), '"1200" Enter Backspace Escape');
+  assert.equal(hintToScript(''), '');
+});
+
+test('the ghost plays the hint on the live sheet and endGhost leaves no trace at all', () => {
+  const lesson = f02();
+  const run = fresh(lesson);
+  const before = {
+    snaps: run.session.sheets.map(e => JSON.stringify(e.sheet.snapshot())),
+    keys: run.session.keyLog.length, t0: run.session.t0, done: run.doneCount, idx: run.session.sheetIndex,
+  };
+  run.beginGhost();
+  const steps = run.ghostSteps(run.current.keys);
+  assert.ok(steps.length > 0, 'the first goal has a playable hint');
+  for (const s of steps) run.ghostStep(s);
+  assert.ok(run.session.keyLog.length > before.keys, 'the ghost really pressed keys');
+  assert.equal(run.doneCount, 0, 'nothing a ghost presses lands a goal');
+  run.endGhost();
+  assert.deepEqual(run.session.sheets.map(e => JSON.stringify(e.sheet.snapshot())), before.snaps, 'every sheet is exactly as it stood');
+  assert.equal(run.session.keyLog.length, before.keys, 'no key-log line survives');
+  assert.equal(run.session.t0, before.t0, 'the clock did not start');
+  assert.equal(run.doneCount, before.done);
+  assert.equal(run.session.sheetIndex, before.idx);
+  assert.equal(run.session.mode, 'normal');
+  assert.equal(run.session.sheet.undoStack.length, 0, 'no undo entry survives');
+  // and the run still plays out normally afterwards
+  run.run(lesson.solution);
+  assert.ok(run.finished, 'the solution still finishes after a ghost');
+});
