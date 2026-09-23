@@ -4,6 +4,16 @@
 
 const KEY = 'hk2_progress_v1';
 
+/**
+ * The lesson id migration map: a retired id → the lesson that now carries its ground. A record
+ * under a retired id folds into the new one as `started` (the learner began that ground; nothing
+ * they did not do is marked done), then the old key goes. Run 4 extends this map when the legacy
+ * lessons are deleted.
+ */
+export const LESSON_ID_MAP = {
+  'welcome-export': 'inherited-workbook',   // the Welcome race folded into 1.1.1's opening goals (C2 Run 2 addendum)
+};
+
 const isPlainObject = v => typeof v === 'object' && v !== null && !Array.isArray(v);
 
 /** Keep only what a lesson entry may hold, with the types record() writes; null for anything else. */
@@ -38,6 +48,12 @@ function load() {
     const lessons = {};
     if (isPlainObject(v) && isPlainObject(v.lessons)) {
       for (const id in v.lessons) { const e = cleanEntry(v.lessons[id]); if (e) lessons[id] = e; }
+      for (const old in LESSON_ID_MAP) {
+        if (!lessons[old]) continue;
+        const to = LESSON_ID_MAP[old];
+        if (!lessons[to]) lessons[to] = { started: true, ...(Number.isFinite(lessons[old].at) ? { at: lessons[old].at } : {}) };
+        delete lessons[old];
+      }
     }
     return { lessons, chapters: cleanChapters(isPlainObject(v) ? v.chapters : null) };
   } catch (e) { return { lessons: {}, chapters: {} }; }

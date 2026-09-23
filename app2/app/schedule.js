@@ -17,6 +17,7 @@
 //
 // Every read and write is guarded; a private window or corrupt storage never breaks a page.
 import { mulberry32 } from '../engine/rng.js';
+import { MICRO_MODULES } from '../content/micro.js';
 
 export const SCHEDULE_KEY = 'hk2_schedule_v1';
 export const DAY = 86400000;
@@ -142,6 +143,7 @@ const cellOf = (ses, sheetName, ref) => { const sh = (ses.sheets || []).find(x =
  * goal's `requires` list feeds the queue with no extra authoring.
  */
 export const MICRO = {
+  ...MICRO_MODULES,   // modules 1.3–1.4 (content/micro.js): the same shape, authored with the modules
   'ctrl-arrow': { title: 'Jump to the edge', task: 'Get to the bottom of the feed and back to the top without scrolling.', secs: 30, state: 'S0',
     goals: [
       { id: 'down', text: 'Jump to the last date in the feed, A61.', keys: 'Ctrl+↓', requires: ['ctrl-arrow'], check: (s, ses) => at(s, 'A61') && used(ses, 'Ctrl+↓') },
