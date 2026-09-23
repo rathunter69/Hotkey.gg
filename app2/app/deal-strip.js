@@ -20,7 +20,7 @@ export const STAGES = [
 /** The current stage and its module progress from the progress map. Pure over `all`. */
 export function dealState(all) {
   const ch = CHAPTERS.find(c => c.id === 'foundations');
-  const mods = ch ? modulesOf(ch) : [];
+  const mods = ch ? modulesOf(ch).filter(m => m.id !== 'welcome') : [];
   const done = mods.filter(m => moduleStatus(m, all) === 'complete').length;
   const started = mods.find(m => moduleStatus(m, all) !== 'complete');
   const stage = STAGES[0];

@@ -1,6 +1,5 @@
-// app2/app/landing-next.js — the landing, redesigned (experience pass, decision 2): "You don't
-// learn Excel by watching. You learn it by doing it again." with two alternates behind ?h=2 / ?h=3
-// for the storyboard, the subhead a non-banker self-selects into (decision 13), a live
+// app2/app/landing-next.js — the landing, redesigned (experience pass, decision 2): "Excel isn't
+// learned. It's practiced." (Wolf's pick) with two alternates behind ?h=2 / ?h=3, the subhead a non-banker self-selects into (decision 13), a live
 // self-playing lesson the visitor can take over by typing, the six modes shown as short muted
 // looping clips of the real product composed as a page (posters until the clips are recorded),
 // a prominent Sign in for returning learners, then how it works, Project Volt, free vs paid,
@@ -12,10 +11,10 @@ import { STAGES } from './deal-strip.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-/** The headline and its two alternates (storyboarded; ?h=2 and ?h=3 show them). */
+/** The headline and its two alternates (?h=2 and ?h=3 still show them). */
 export const HEADLINES = [
+  { a: 'Excel isn’t learned.', b: 'It’s practiced.' },                          // shipped (Wolf, 2026-09-23 B)
   { a: 'You don’t learn Excel by watching.', b: 'You learn it by doing it again.' },
-  { a: 'Excel isn’t learned.', b: 'It’s practiced.' },
   { a: 'Nobody learned Excel from a video.', b: '' },
 ];
 export const SUBHEAD = 'Learn Excel the way analysts are taught — on a real sheet, one job at a time.';

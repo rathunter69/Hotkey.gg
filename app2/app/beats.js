@@ -29,15 +29,17 @@ export const MODULE_BEATS = {
 export function beatFor(lesson, at, seen = []) {
   if (!lesson || !at || at.n !== 1 || lesson.kind === 'challenge') return null;
   const id = lesson.module;
+  if (id === 'welcome') return null;   // retired (B2): the Welcome's moves open 1.1.1
   if (!id || seen.includes(id)) return null;
   const b = MODULE_BEATS[id];
   if (b) return { id, ...b };
   const planned = PLANNED_MODULES.find(p => p.title === at.module.title);
-  return { id, eyebrow: `Module 1.${at.k - 1} · ${at.module.title.toLowerCase()}`, title: at.module.title + '.', body: (planned && planned.objective) || '' };
+  return { id, eyebrow: `Module ${(planned && planned.n) || '1.' + at.k} · ${at.module.title.toLowerCase()}`, title: at.module.title + '.', body: (planned && planned.objective) || '' };
 }
 
 /** The chapter-end line when a module's challenge passes: what page went into the pack. */
 export function pageDelivered(at) {
   if (!at) return '';
-  return `Page 1.${at.k - 1} — ${at.module.title} — delivered to the pack.`;
+  const planned = PLANNED_MODULES.find(p => p.title === at.module.title);
+  return `Page ${(planned && planned.n) || '1.' + at.k} — ${at.module.title} — delivered to the data room.`;
 }

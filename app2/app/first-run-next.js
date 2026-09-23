@@ -1,13 +1,14 @@
-// app2/app/first-run-next.js — the first run, redesigned (experience pass, decision 1): one
-// frame, one size, for the whole sequence. Start learning → a ~20-second self-playing demo of a
-// real lesson → the three-card Project Volt briefing (who you are / what management sent / what
-// you'll deliver) → the orientation card (lessons, challenges, drills, the Daily, boards, level
-// and XP, and where each lives) → the platform + experience picker → the Welcome race. Enter
-// advances, Esc skips the briefing, the briefing shows once (prefs.briefingDone). Nothing
+// app2/app/first-run-next.js — the first run (experience pass, decision 1; order per Wolf's B
+// review): one frame, one size, for the whole sequence. Start learning → a ~20-second
+// self-playing demo of a real lesson → the orientation card (where things are: Learn, Practice,
+// the Daily, boards, level and XP) → the three Project Volt cards (the company and the sale /
+// this week's report / the data room) → keyboard + experience → straight into lesson 1.1.1.
+// Enter advances, Esc skips the briefing, the briefing shows once (prefs.briefingDone). Nothing
 // jumps: the frame keeps its size from the first step to the last.
 //
-// Voice (decision 10): a senior Wall Street Prep instructor with prior IB and PE experience —
-// plain, confident, dry; the why in one line; never tongue-in-cheek. American spelling.
+// Voice (B3): a finance instructor explaining a deal process to a capable person outside
+// finance. Plain sentences, one idea each; any term is defined in the same breath; nobody is
+// required to be an analyst. American spelling.
 import { mountDemo } from '../ui/demo-player.js';
 import { prefs } from './prefs.js';
 import { store } from './store.js';
@@ -15,35 +16,36 @@ import { track } from './telemetry.js';
 import { LESSONS } from '../content/index.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const FIRST_LESSON = LESSONS[0].id;
+/** Lesson 1.1.1: the first lesson of the first module (the Welcome race is retired, B2). */
+export const FIRST_LESSON = (LESSONS.find(l => l.module === 'open-and-set-up') || LESSONS[0]).id;
 
-/** The briefing, three cards, then the orientation card. Exported so the copy is testable (American spelling, voice). */
+/** The three Project Volt cards (B3 voice). Exported so the copy is testable. */
 export const BRIEFING = [
-  { key: 'who', eyebrow: 'Project Volt · 1 of 3', title: 'You are the analyst on the Voltline sale.',
-    body: ['Voltline Charging Inc. runs 40 EV fast-charging sites. Its owners have hired the deal team you just joined to sell the business.',
-      'Your job is the pack the buyers will read. Every number in it comes off your sheet.'] },
-  { key: 'sent', eyebrow: 'Project Volt · 2 of 3', title: 'Management sent the Austin file.',
-    body: ['The weekly site report for the Austin cluster: five sites, two weeks of daily figures. It arrived the way inherited files do — a tab still called Sheet2, a dead half-export, a price buried inside a formula.',
-      'A buyer’s analyst will open this file. It has to be right before then.'] },
-  { key: 'deliver', eyebrow: 'Project Volt · 3 of 3', title: 'By the end of Chapter 1: page one of the pack.',
-    body: ['A one-page weekly KPI report that ties, formatted to house style, live to its inputs.',
-      'You build it one job at a time: set the file up, move and select without the mouse, enter and fix, structure, format, add the formulas, present it. Every lesson is one of those jobs on this file.'] },
+  { key: 'who', eyebrow: 'The deal · 1 of 3', title: 'A company is being sold. You prepare the numbers.',
+    body: ['Voltline runs 40 electric-car charging sites. Its owners are selling the company.',
+      'Before any buyer sees a number, someone has to make the numbers clean, consistent and checked. That is you: an analyst, someone in finance or operations, a founder. It does not matter which.'] },
+  { key: 'sent', eyebrow: 'The deal · 2 of 3', title: 'It starts with this week’s site report.',
+    body: ['It arrived the way files usually do: a tab still called Sheet2, an old export nobody deleted, a price typed inside a formula.',
+      'You will turn it into a page a buyer can trust, using the methods investment banks train their people in. One job at a time, on the real file.'] },
+  { key: 'deliver', eyebrow: 'The deal · 3 of 3', title: 'Every finished page goes into the data room.',
+    body: ['A sale runs in stages. Each chapter here is one stage, and each one ends with a finished page.',
+      'The pages go into the data room: the folder buyers will read. By the end of Chapter 1, page one is in it, built by you.'] },
 ];
 
 export const ORIENTATION = {
   eyebrow: 'How this place works', title: 'Where things are.',
   rows: [
-    { where: 'Learn', what: 'Lessons, in modules. Each module ends in a challenge: a seeded, timed run on a fresh file, scored pass, pro or legendary. Passing it, at any tier, completes the module.' },
-    { where: 'Practice', what: 'Drills and rapid-fire for reps, and the Daily: one ninety-second sheet, the same for everyone, once a day.' },
-    { where: 'Leaderboard', what: 'Boards for every challenge and for the Daily. Clean runs only: no help, no mouse.' },
-    { where: 'Level', what: 'Finishing lessons and challenges earns XP; XP is your level, shown in the top bar. Speed earns pars and board places, never XP.' },
+    { where: 'Learn', what: 'The path. Lessons in short modules, each one job on the file. A module ends with a challenge: the same job on a fresh file, against the clock.' },
+    { where: 'Practice', what: 'The reps. Drills and rapid-fire with no story, and the Daily: one ninety-second sheet, the same for everyone, once a day.' },
+    { where: 'Leaderboard', what: 'A board for every challenge and for the Daily. Clean runs only: no help, no mouse.' },
+    { where: 'Level', what: 'Finishing lessons and challenges earns XP, and XP is your level, shown in the top bar. Speed earns places on the boards, not XP.' },
   ],
-  fine: 'Keyboard first. Sound is on at low volume from your first key; the mute is in the workspace.',
+  fine: 'Keyboard first. Sound is on at low volume from your first key; the mute is on the workspace.',
 };
 
 /** Step order for a first visit; a returning visitor who has read the briefing only sees the picker. */
 export function stepsFor(briefingDone) {
-  return briefingDone ? ['picker'] : ['demo', 'who', 'sent', 'deliver', 'orient', 'picker'];
+  return briefingDone ? ['picker'] : ['demo', 'orient', 'who', 'sent', 'deliver', 'picker'];
 }
 
 export function mountFirstRun(root, ctx = {}) {
@@ -88,23 +90,23 @@ export function mountFirstRun(root, ctx = {}) {
       const c = BRIEFING.find(b => b.key === s);
       $('frKeys').innerHTML = '<kbd>Enter</kbd> next · <kbd>Esc</kbd> skip';
       body.innerHTML = `<article class="fr2-card"><div class="fr2-card-eyebrow">${esc(c.eyebrow)}</div><h1>${esc(c.title)}</h1>${c.body.map(p => `<p>${esc(p)}</p>`).join('')}</article>`;
-      actions([{ id: 'back', label: 'Back' }, { id: 'next', label: s === 'deliver' ? 'Continue' : 'Next', primary: true, kbd: 'Enter' }]);
+      actions([{ id: 'back', label: 'Back' }, { id: 'next', label: s === 'deliver' ? 'Set up' : 'Next', primary: true, kbd: 'Enter' }]);
     } else if (s === 'orient') {
       $('frKeys').innerHTML = '<kbd>Enter</kbd> next · <kbd>Esc</kbd> skip';
       body.innerHTML = `<article class="fr2-card fr2-orient"><div class="fr2-card-eyebrow">${esc(ORIENTATION.eyebrow)}</div><h1>${esc(ORIENTATION.title)}</h1>
           <dl class="fr2-map">${ORIENTATION.rows.map(r => `<div><dt>${esc(r.where)}</dt><dd>${esc(r.what)}</dd></div>`).join('')}</dl>
           <p class="fr2-fine">${esc(ORIENTATION.fine)}</p></article>`;
-      actions([{ id: 'back', label: 'Back' }, { id: 'next', label: 'Continue', primary: true, kbd: 'Enter' }]);
+      actions([{ id: 'back', label: 'Back' }, { id: 'next', label: 'The deal', primary: true, kbd: 'Enter' }]);
     } else {
       $('frKeys').innerHTML = '<kbd>↑</kbd><kbd>↓</kbd> pick · <kbd>Enter</kbd> start';
       body.innerHTML = `<article class="fr2-card fr2-picker">
-          <div class="fr2-card-eyebrow">Set up</div><h1>Two questions, then the Welcome race.</h1>
+          <div class="fr2-card-eyebrow">Set up</div><h1>Two questions, then the first job.</h1>
           <div class="fr2-q"><div class="fr2-qt">Which keyboard?</div>${options('platform', [{ v: 'win', t: 'Windows', s: 'Ctrl, Alt, the Ribbon KeyTips' }, { v: 'mac', t: 'Mac', s: '⌘ and ⌥ stand in for Ctrl and Alt; KeyTips work the same' }], platform)}</div>
-          <div class="fr2-q"><div class="fr2-qt">How much Excel?</div>${options('experience', [{ v: 'new', t: 'New to Excel', s: 'Every lesson, in order' }, { v: 'sometimes', t: 'I use it sometimes', s: 'Same path; the challenges will move you fast' }, { v: 'daily', t: 'I use it daily', s: 'Start at the Welcome; test out of Chapter 1 from Learn any time' }], experience)}</div>
+          <div class="fr2-q"><div class="fr2-qt">How much Excel?</div>${options('experience', [{ v: 'new', t: 'New to Excel', s: 'Every lesson, in order' }, { v: 'sometimes', t: 'I use it sometimes', s: 'Same path; the challenges will move you fast' }, { v: 'daily', t: 'I use it daily', s: 'Same start; test out of Chapter 1 from Learn any time' }], experience)}</div>
           <p class="fr2-fine">Instructions and keycaps follow the keyboard choice. Both settings change any time from Settings. Progress is saved on this device.</p>
         </article>`;
       wireOptions();
-      actions([...(steps.length > 1 ? [{ id: 'back', label: 'Back' }] : []), { id: 'start', label: 'Start the Welcome race', primary: true, kbd: 'Enter' }]);
+      actions([...(steps.length > 1 ? [{ id: 'back', label: 'Back' }] : []), { id: 'start', label: 'Start lesson 1.1.1', primary: true, kbd: 'Enter' }]);
     }
   }
 

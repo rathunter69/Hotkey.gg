@@ -74,10 +74,12 @@ try {
   const extras = ['find-replace', 'hide-freeze', 'cross-sheet', 'weekly-report-project'].map(id => LESSONS.find(l => l.id === id));
   for (const lesson of [LESSONS[0], ...extras, LESSONS[LESSONS.length - 1]]) {
     await page.goto(base + '#/lesson/' + lesson.id);
-    const opened = await page.waitForSelector('.goal.current, #startBtn', { timeout: 5000 }).catch(() => null);
+    // the goal list sits behind the floating card (B4), so wait for it attached, not visible
+    const opened = await page.waitForSelector('.goal.current, #startBtn', { timeout: 5000, state: 'attached' }).catch(() => null);
     if (!opened) { fail(`${lesson.id}: lesson did not open`); continue; }
     if (await page.$('#startBtn')) await page.keyboard.press('Enter');
-    await page.waitForSelector('.goal.current');
+    if (await page.$('.ws-beat')) await page.keyboard.press('Enter');   // a module's story beat, once
+    await page.waitForSelector('.goal.current', { state: 'attached' });
     await page.waitForFunction(() => !document.querySelector('.goal.current .goal-demo'), null, { timeout: 30000 }).catch(() => {});   // a demo goal plays itself first
     for (const step of parseKeyScript(lesson.solution)) {
       await page.waitForFunction(() => !document.querySelector('.goal-demo'), null, { timeout: 30000 }).catch(() => {});   // a demo goal plays itself; keys wait
@@ -105,7 +107,7 @@ try {
       for (let i = 0; i < 8; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(250); if (!/#\/start/.test(page.url())) break; steps.push((await page.evaluate(() => (document.querySelector('#frEyebrow') || {}).textContent || '')) + ' ' + await size()); }
       const sizes = new Set(steps.map(x => x.split(' ').pop()));
       if (sizes.size > 1 || !sizes.has(s0)) fail('first run (next): the frame changed size between steps: ' + steps.join(' | '));
-      await page.waitForFunction(() => /#\/lesson\/welcome-export/.test(location.hash), null, { timeout: 4000 }).catch(() => fail('first run (next): did not land on the Welcome race (' + page.url() + ')'));
+      await page.waitForFunction(() => /#\/lesson\/inherited-workbook/.test(location.hash), null, { timeout: 4000 }).catch(() => fail('first run (next): did not land on lesson 1.1.1 (' + page.url() + ')'));
       const prefsRec = await page.evaluate(() => { try { return JSON.parse(localStorage.getItem('hk2_prefs')); } catch (e) { return null; } });
       if (!prefsRec || !prefsRec.briefingDone || !prefsRec.firstRunDone) fail('first run (next): prefs not written');
     }
@@ -126,7 +128,8 @@ try {
     const sched = await page.evaluate(() => { try { return JSON.parse(localStorage.getItem('hk2_schedule_v1')); } catch (e) { return null; } });
     if (!sched || !sched['ctrl-shift-arrow']) fail('due (next): no memory note recorded');
     // a Chapter 1 lesson under the flag: the strip, the story beat, then a cue on the first goal's target
-    await page.goto(base + '#/lesson/welcome-export?flow=next'); await page.waitForTimeout(500);
+    await page.evaluate(() => { try { const p = JSON.parse(localStorage.getItem('hk2_prefs') || '{}'); p.beatsSeen = []; localStorage.setItem('hk2_prefs', JSON.stringify(p)); } catch (e) { /* ignore */ } });
+    await page.goto(base + '#/lesson/inherited-workbook?flow=next'); await page.waitForTimeout(500);
     if (!(await page.$('.ws-beat'))) fail('lesson (next): no story beat before the module’s first lesson');
     await page.keyboard.press('Enter'); await page.waitForTimeout(300);
     if (await page.$('.ws-beat')) fail('lesson (next): Enter did not close the beat');

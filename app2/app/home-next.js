@@ -20,6 +20,9 @@ import { mountLessonView } from './lesson-view.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const TIER_MARK = { legendary: '◆◆◆', pro: '◆◆', pass: '◆', none: '—' };
+/** Retired lessons (B2: the Welcome race folds into 1.1.1) never come up as next; the content session removes them. */
+export const RETIRED = new Set(['welcome-export', 'welcome-race']);
+export const liveLessons = () => LESSONS.filter(l => !RETIRED.has(l.id) && l.module !== 'welcome');
 
 /** The modules of Chapter 1 with what each teaches, for the Keep-sharp rule. */
 export function moduleCtx(all) {
@@ -29,11 +32,11 @@ export function moduleCtx(all) {
 
 /** A seeded first-week state for the storyboard: four lessons done, the fifth started, a Daily played, the queue as demoState(). */
 export function demoCtx(now = Date.now()) {
-  const done = ['welcome-export', 'inherited-workbook', 'ribbon-by-keyboard', 'analyst-setup'];
+  const done = ['inherited-workbook', 'ribbon-by-keyboard', 'analyst-setup'];
   const all = {};
   for (const id of done) all[id] = { completed: true, started: true, at: now - 2 * 86400000, best: 140 };
   all['colour-label-hardcode'] = { started: true, at: now - 3600000 };
-  const xp = 4 * 50 + 30;
+  const xp = 3 * 50 + 30;
   return { all, queue: demoState(now), daily: { played: true, tier: 'pro', secs: 61.4, pos: 12, of: 38 }, xp, level: levelOf(xp), demo: true };
 }
 
@@ -52,14 +55,14 @@ export function mountHomePage(root, pageCtx = {}) {
   const all = c.all; const skipped = c.demo ? [] : prefs.get().skipped;
   const el = document.createElement('div');
   el.className = 'hm';
-  const next = pickNextLesson(LESSONS, all, skipped);
+  const next = pickNextLesson(liveLessons(), all, skipped);
   const at = next ? moduleOf(next) : null;
   const started = next && all[next.id] && all[next.id].started;
   const day = dayOf();
   const dailyDrill = DRILLS.find(d => d.id === dailyFor(day).drillId) || null;
   const queue = dueToday(c.queue, moduleCtx(all));
   const ch1 = CHAPTERS.find(x => x.id === 'foundations');
-  const mods = ch1 ? pathModel(ch1, all, skipped) : [];
+  const mods = ch1 ? pathModel(ch1, all, skipped).filter(m => m.id !== 'welcome') : [];
 
   const continueCard = next
     ? `<section class="hm-continue" aria-label="Continue">
@@ -97,7 +100,7 @@ export function mountHomePage(root, pageCtx = {}) {
 
   const modules = `<section class="hm-card hm-modules" aria-label="Modules">
       <div class="hm-cap">chapter 1 · foundations <span>${mods.filter(m => m.status === 'complete').length} of ${mods.length} modules</span></div>
-      <div class="hm-rings">${mods.map((m, i) => `<a class="hm-ring hm-${esc(m.status)}" href="#/learn" title="${esc(m.title)} · ${m.done} of ${m.total}">${ring(m.done, m.total, { size: 44, stroke: 4 })}<span class="hm-ring-n">1.${i}</span><span class="hm-ring-t">${esc(m.title)}</span></a>`).join('')}</div>
+      <div class="hm-rings">${mods.map((m, i) => `<a class="hm-ring hm-${esc(m.status)}" href="#/learn" title="${esc(m.title)} · ${m.done} of ${m.total}">${ring(m.done, m.total, { size: 44, stroke: 4 })}<span class="hm-ring-n">1.${i + 1}</span><span class="hm-ring-t">${esc(m.title)}</span></a>`).join('')}</div>
     </section>`;
 
   const level = `<section class="hm-card hm-level" aria-label="Level">
@@ -109,10 +112,21 @@ export function mountHomePage(root, pageCtx = {}) {
   const completedN = Object.values(all).filter(p => p && p.completed).length;
   const nudge = !c.demo && completedN >= 1 && store.saveState() === 'device' && !prefs.get().saveNudgeDone
     ? `<div class="hm-nudge" id="hmNudge" role="status"><span><b>Your progress is saved on this device.</b> Create a free account to keep it across devices — everything carries over.</span><span class="hm-nudge-acts"><a class="btn btn-primary" href="#/account">Create account</a><button class="btn btn-ghost" type="button" id="hmNudgeNo">Not now</button></span></div>` : '';
-  el.innerHTML = `${nudge}${continueCard}
-    <div class="hm-row">${dueCard}${dailyCard}</div>
+  // Learn and Practice are two different things (B6): the path with its story on the left, the reps on the right
+  const hints = !prefs.get().dashHintsSeen;
+  if (hints && !c.demo) prefs.set({ dashHintsSeen: true });
+  el.innerHTML = `${nudge}
+    <div class="hm-halves">
+      <section class="hm-half hm-learn" aria-label="Learn">
+        <div class="hm-half-head"><h2>Learn</h2>${hints ? '<p>The path: chapters, modules, lessons and their challenges, one story on one file.</p>' : ''}</div>
+        ${continueCard}${modules}
+      </section>
+      <section class="hm-half hm-practice" aria-label="Practice">
+        <div class="hm-half-head"><h2>Practice</h2>${hints ? '<p>The reps: timed, no story. What is due today, the Daily, drills and rapid-fire.</p>' : ''}</div>
+        ${dueCard}${dailyCard}${level}
+      </section>
+    </div>
     ${dealStripHtml(all)}
-    <div class="hm-row hm-row-below">${modules}${level}</div>
     ${c.demo ? '<p class="hm-fine hm-demo-note">Storyboard: a seeded first-week state (day five). Nothing here is saved.</p>' : ''}`;
   root.appendChild(el);
   const no = el.querySelector('#hmNudgeNo'); if (no) no.onclick = () => { prefs.set({ saveNudgeDone: true }); const n = el.querySelector('#hmNudge'); if (n) n.remove(); };

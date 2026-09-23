@@ -7,12 +7,12 @@ import { dayOf } from './records.js';
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 export const SCREENS = [
-  { h: 'Landing', items: [['#/landing?flow=next&h=1', 'Headline 1 · You don’t learn Excel by watching. You learn it by doing it again.'], ['#/landing?flow=next&h=2', 'Headline 2 · Excel isn’t learned. It’s practiced.'], ['#/landing?flow=next&h=3', 'Headline 3 · Nobody learned Excel from a video.']] },
-  { h: 'First run (one frame)', items: [['#/start?flow=next&replay=1', 'Demo → briefing (3 cards) → orientation → picker → the Welcome race']] },
+  { h: 'Landing', items: [['#/landing?flow=next&h=1', 'Headline 1 (shipped) · Excel isn’t learned. It’s practiced.'], ['#/landing?flow=next&h=2', 'Headline 2 · You don’t learn Excel by watching. You learn it by doing it again.'], ['#/landing?flow=next&h=3', 'Headline 3 · Nobody learned Excel from a video.']] },
+  { h: 'First run (one frame)', items: [['#/start?flow=next&replay=1', 'Demo → orientation → the deal (3 cards) → picker → lesson 1.1.1']] },
   { h: 'Home', items: [['#/?flow=next&demo=1', 'Dashboard on a seeded first-week state (Continue, Due today, the Daily, the deal strip, rings, level)'], ['#/?flow=next', 'Dashboard on this browser’s real state']] },
   { h: 'Learn · the data room', items: [['#/learn?flow=next', 'Folders, numbered documents, steps, challenge tiers, pack pages']] },
   { h: 'Workspace · panel layout variants (same lesson)', items: [['#/lesson/inherited-workbook?flow=next&panel=right', 'Panel RIGHT (the spec default)'], ['#/lesson/inherited-workbook?flow=next&panel=left', 'Panel LEFT (flip with the strip button; ?panel=left forces it for the storyboard)'], ['#/lesson/inherited-workbook?flow=next&panel=overlay', 'OVERLAY: a floating task card over the sheet, goals collapsed behind it']] },
-  { h: 'Workspace · cues', items: [['#/lesson/welcome-export?flow=next', 'The Welcome: target pulses at goal start, the story beat first'], ['#/lesson/inherited-workbook?flow=next', 'Module 1.1 lesson 1: Ribbon route glow (goal 4 · Alt H O R), the stuck hint after ~8 s']] },
+  { h: 'Workspace · cues', items: [['#/lesson/inherited-workbook?flow=next', 'Module 1.1 lesson 1: the story beat, the target pulse, the Ribbon route glow (goal 4 · Alt H O R), the stuck hint after ~8 s']] },
   { h: 'Due today', items: [['#/due/ctrl-shift-arrow?flow=next', 'A 30-second micro-drill from the queue']] },
   { h: 'The Daily result card', items: [['#/storyboard/daily-card', 'Sample numbers, all four tiers']] },
 ];

@@ -153,8 +153,12 @@
 .hm-actions{display:flex; gap:10px; flex-wrap:wrap}
 .hm-c-ring{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:22px 30px; border-left:1px solid var(--line); color:var(--accent); font-family:var(--mono); font-size:11.5px; text-transform:uppercase; letter-spacing:.1em}
 .hm-c-ring .ring text{font-family:var(--mono); font-weight:700}
-.hm-row{display:grid; grid-template-columns:1.25fr .75fr; gap:16px; align-items:stretch}
-.hm-row-below{grid-template-columns:1.25fr .75fr; margin-top:0}
+.hm-halves{display:grid; grid-template-columns:1.2fr .8fr; gap:18px; align-items:start}
+.hm-half{display:flex; flex-direction:column; gap:14px; min-width:0}
+.hm-half-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; padding:2px 4px 0}
+.hm-half-head h2{font-family:var(--mono); font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0}
+.hm-half-head p{font-size:13.5px; color:var(--muted); margin:0}
+.hm-continue{margin-bottom:0}
 .hm-card{background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden; display:flex; flex-direction:column}
 .hm-due-list{list-style:none; margin:0; padding:6px 10px}
 .hm-due-list li a{display:grid; grid-template-columns:30px 1fr auto; gap:12px; align-items:center; padding:11px 10px; border-radius:10px; text-decoration:none; color:var(--text); transition:background .12s}
@@ -187,7 +191,7 @@
 .hm-level-track{height:8px; border-radius:99px; background:var(--surface2); overflow:hidden}
 .hm-level-track i{display:block; height:100%; background:var(--accent); border-radius:99px; transition:width .4s cubic-bezier(.2,.7,.2,1)}
 .hm p.hm-demo-note{margin:14px 0 0; text-align:center}
-@media (max-width:900px){ .hm-row, .hm-row-below{grid-template-columns:1fr} .hm-continue{grid-template-columns:1fr} .hm-c-ring{border-left:0; border-top:1px solid var(--line)} }
+@media (max-width:900px){ .hm-halves{grid-template-columns:1fr} .hm-continue{grid-template-columns:1fr} .hm-c-ring{border-left:0; border-top:1px solid var(--line)} }
 
 /* ---------- 6. the data room (app/learn-next.js) ---------- */
 .dr{font-family:var(--sans); margin:8px auto 40px}
@@ -272,29 +276,44 @@ html[data-dark="1"] .dr-thumb{background:#f7f6f1}
 .ws-level{font-weight:700; color:var(--accent); border:1px solid var(--accent-dim); border-radius:7px; padding:3px 9px; white-space:nowrap}
 .ws-level i{font-style:normal; color:var(--muted); font-weight:500; margin-left:5px}
 .ws-next .lesson{height:calc(100vh - 152px); margin:8px 0 16px; width:100%; align-self:stretch}
-html[data-flow="next"][data-density="comfortable"] .ws-next .lesson{height:calc(100vh - 160px)}
+html[data-density="comfortable"] .ws-next .lesson{height:calc(100vh - 160px)}
 html.hk-fs .ws-next .lesson{height:calc(100vh - 72px)}
 html.hk-fs .app{max-width:none}
 .ws-next .panel-head .lesson-crumb, .ws-next .module-line{display:none}
 .ws-next .panel-head{padding-top:12px}
 /* the panel's side (decision 6): a setting, right by default */
 html[data-panel="left"] .ws-next .lesson{flex-direction:row-reverse}
-/* the overlay prototype (?panel=overlay): a floating task card over the sheet, the goal list behind a toggle */
+/* the floating panel (B4, the default): a card over the sheet that docks to the emptiest quadrant, never over the
+   target or the ribbon (its top is the grid's top), collapses to a one-line pill while a cell is edited; the goal list
+   opens from the Goals toggle or by clicking the pill. Ctrl+Shift+K hides it, Ctrl+Shift+J moves it. */
 .lesson.panel-overlay{position:relative}
 .lesson.panel-overlay .lesson-divider{display:none}
-.lesson.panel-overlay .lesson-panel{position:absolute; top:14px; right:14px; width:380px; flex:none; height:auto; max-height:calc(100% - 28px); box-shadow:0 24px 60px -20px rgba(0,0,0,.5); z-index:20; border-color:var(--accent-dim); background:color-mix(in srgb, var(--surface) 96%, transparent); backdrop-filter:blur(3px)}
-html[data-panel="left"] .lesson.panel-overlay .lesson-panel{right:auto; left:14px}
+.lesson.panel-overlay .lesson-panel{position:absolute; top:14px; left:auto; right:auto; width:380px; flex:none; height:auto; max-height:calc(100% - 28px); box-shadow:0 24px 60px -20px rgba(0,0,0,.5); z-index:20; border-color:var(--accent-dim); background:color-mix(in srgb, var(--surface) 96%, transparent); backdrop-filter:blur(3px); transition:left .22s cubic-bezier(.2,.7,.2,1), top .22s cubic-bezier(.2,.7,.2,1)}
 .lesson.panel-overlay .panel-body{display:none}
 .lesson.panel-overlay.goals-open .panel-body{display:block; max-height:38vh}
+/* the pill: one line, the current goal, out of the way */
+.lesson.panel-overlay.pill .lesson-panel{width:auto; max-width:420px; border-radius:99px; cursor:pointer}
+.lesson.panel-overlay.pill .panel-head, .lesson.panel-overlay.pill .panel-tabs, .lesson.panel-overlay.pill .panel-body, .lesson.panel-overlay.pill .panel-actions,
+.lesson.panel-overlay.pill .task-teach, .lesson.panel-overlay.pill .task-keys, .lesson.panel-overlay.pill .task-extra, .lesson.panel-overlay.pill .conv-chip, .lesson.panel-overlay.pill .goal-nudge, .lesson.panel-overlay.pill .task-list{display:none}
+.lesson.panel-overlay.pill .task-card{padding:8px 16px; border:0; background:transparent; display:flex; align-items:center; gap:10px}
+.lesson.panel-overlay.pill .task-label{margin:0}
+.lesson.panel-overlay.pill .task-label .task-count{margin-left:6px}
+.lesson.panel-overlay.pill .task-goal{font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:300px}
+/* hidden by Ctrl+Shift+K: a small pill brings it back */
+.lesson.panel-hidden .lesson-panel{display:none}
+.panel-show{position:absolute; right:16px; bottom:56px; z-index:20; font-family:var(--mono); font-size:11.5px; color:var(--muted); background:var(--surface); border:1px solid var(--line); border-radius:99px; padding:6px 12px; cursor:pointer}
+.panel-show:hover{color:var(--accent); border-color:var(--accent-dim)}
+/* the perimeter outline (B7): one ring around the target range, drawn inside the scroll box like the marquee */
+@keyframes cueRing{0%{opacity:0; box-shadow:0 0 0 0 var(--accent-glow)} 15%{opacity:1; box-shadow:0 0 0 6px var(--accent-glow)} 70%{opacity:1; box-shadow:0 0 0 2px transparent} 100%{opacity:0}}
+.cue-ring{position:absolute; pointer-events:none; z-index:6; border:2px solid var(--accent); border-radius:2px; box-sizing:border-box; animation:cueRing 1.8s ease-out 1 forwards}
+@media (prefers-reduced-motion: reduce){ .cue-ring{animation:none; opacity:1; box-shadow:0 0 0 3px var(--accent-glow)} }
 /* cues (decision 4): the target pulses once at goal start; a Ribbon route glows the tab, then the button */
-@keyframes cuePulse{0%{box-shadow:inset 0 0 0 0 var(--accent)} 25%{box-shadow:inset 0 0 0 2.5px var(--accent), 0 0 0 5px var(--accent-glow)} 100%{box-shadow:inset 0 0 0 0 transparent, 0 0 0 0 transparent}}
-#grid td.cue-pulse{animation:cuePulse 1.6s ease-out 1; z-index:5}
 @keyframes cueTab{0%,100%{box-shadow:none} 50%{box-shadow:0 0 0 3px var(--accent-glow); border-top-color:var(--accent)}}
 .wb-tab.cue-pulse{animation:cueTab 1.1s ease-in-out 2}
 @keyframes cueGlow{0%,100%{box-shadow:0 0 0 2px var(--accent), 0 0 10px var(--accent-glow)} 50%{box-shadow:0 0 0 3px var(--accent), 0 0 18px var(--accent-glow)}}
 .cue-glow{position:relative; z-index:2; border-radius:6px; animation:cueGlow 1.3s ease-in-out infinite}
 .rf-tab.cue-glow{color:var(--text)}
-@media (prefers-reduced-motion: reduce){ #grid td.cue-pulse{animation:none; box-shadow:inset 0 0 0 2px var(--accent)} .cue-glow{animation:none; box-shadow:0 0 0 2px var(--accent)} .wb-tab.cue-pulse{animation:none; border-top-color:var(--accent)} }
+@media (prefers-reduced-motion: reduce){ .cue-glow{animation:none; box-shadow:0 0 0 2px var(--accent)} .wb-tab.cue-pulse{animation:none; border-top-color:var(--accent)} }
 /* the ~8 s stuck hint and the 20 s Help pulse */
 .task-keys.task-hint::before{content:'hint'; font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); margin-right:4px}
 @keyframes tabPulse{50%{background:var(--accent-glow); color:var(--accent)}}
@@ -311,7 +330,7 @@ html[data-panel="left"] .lesson.panel-overlay .lesson-panel{right:auto; left:14p
 
 /* ---------- 8. the nav's Sign in (decision 2), the storyboard index ---------- */
 .nav-signin{display:none; font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--text); text-decoration:none; border:1px solid var(--line); border-radius:8px; padding:6px 12px; margin-right:6px; transition:.13s; white-space:nowrap}
-html[data-flow="next"] .nav-signin{display:inline-flex}
+.nav-signin{display:inline-flex}
 .nav-signin:hover{border-color:var(--accent-dim); color:var(--accent)}
 .nav-signin[hidden]{display:none !important}
 @media (max-width:760px){ .nav-signin{display:none !important} }

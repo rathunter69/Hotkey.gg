@@ -4,107 +4,106 @@
    Two attributes on <html>, both set before first paint (index.html) and kept by prefs.reflect():
      data-flow="next"        the redesigned flow is on for this browser (app/flow.js)
      data-density            "comfortable" (the step up, the default once the flow ships) | "compact" (today's sizes)
-   Everything here is scoped to data-flow="next" so the live site does not move until Wolf says go;
-   on go the [data-flow="next"] prefix comes off and "compact" stays as the smaller setting.
+   Shipped on go (2026-09-23 B): the flag scoping came off; "compact" stays as the smaller setting.
 
    The sheet itself stays Excel at 100% (SITE_SPEC §4): the grid is the one thing that must look
    like the real program. What steps up is everything around it. */
 
-/* ---------- 1. the page uses its width: 1180 → 1600, centered, never edge-to-edge ---------- */
-html[data-flow="next"] .app, html[data-flow="next"] .topnav-in, html[data-flow="next"] .wrap, html[data-flow="next"] .sf-in,
-html[data-flow="next"] .plist, html[data-flow="next"] .page, html[data-flow="next"] .home, html[data-flow="next"] .drill-page{max-width:1600px}
-html[data-flow="next"] .app{padding:0 32px}
-html[data-flow="next"] .topnav-in, html[data-flow="next"] .sf-in{padding:0 32px}
-@media (max-width:1100px){ html[data-flow="next"] .app, html[data-flow="next"] .topnav-in, html[data-flow="next"] .sf-in{padding:0 24px} }
+/* ---------- 1. the page uses its width: 1180 → 1340, centered — the comfy middle, never edge-to-edge ---------- */
+.app, .topnav-in, .wrap, .sf-in,
+.plist, .page, .home, .drill-page{max-width:1340px}
+.app{padding:0 32px}
+.topnav-in, .sf-in{padding:0 32px}
+@media (max-width:1100px){ .app, .topnav-in, .sf-in{padding:0 24px} }
 
 /* ---------- 2. comfortable: the step up ---------- */
 /* nav */
-html[data-flow="next"][data-density="comfortable"] .topnav-in{height:64px}
-html[data-flow="next"][data-density="comfortable"] .topnav-brand{font-size:17px}
-html[data-flow="next"][data-density="comfortable"] .topnav-link{font-size:14px; padding:8px 13px}
-html[data-flow="next"][data-density="comfortable"] .topnav .tl-label{font-size:13.5px}
-html[data-flow="next"][data-density="comfortable"] .topnav-theme-name{font-size:13px}
-html[data-flow="next"][data-density="comfortable"] .user-btn{font-size:14px}
-html[data-flow="next"][data-density="comfortable"] .nav-level{font-size:13px; padding:4px 9px}
+html[data-density="comfortable"] .topnav-in{height:64px}
+html[data-density="comfortable"] .topnav-brand{font-size:17px}
+html[data-density="comfortable"] .topnav-link{font-size:14px; padding:8px 13px}
+html[data-density="comfortable"] .topnav .tl-label{font-size:13.5px}
+html[data-density="comfortable"] .topnav-theme-name{font-size:13px}
+html[data-density="comfortable"] .user-btn{font-size:14px}
+html[data-density="comfortable"] .nav-level{font-size:13px; padding:4px 9px}
 /* shared type */
-html[data-flow="next"][data-density="comfortable"] .btn{font-size:14px; padding:9px 16px; border-radius:9px}
-html[data-flow="next"][data-density="comfortable"] kbd{font-size:12.5px}
-html[data-flow="next"][data-density="comfortable"] .page p, html[data-flow="next"][data-density="comfortable"] .home p{font-size:15px}
-html[data-flow="next"][data-density="comfortable"] .page-sub, html[data-flow="next"][data-density="comfortable"] .plist-sub{font-size:15.5px}
-html[data-flow="next"][data-density="comfortable"] .page-head h1, html[data-flow="next"][data-density="comfortable"] .plist-head h1, html[data-flow="next"][data-density="comfortable"] .home h1{font-size:24px}
-html[data-flow="next"][data-density="comfortable"] #hkToast{font-size:13.5px; padding:10px 20px}
-html[data-flow="next"][data-density="comfortable"] .mb-tool{font-size:12px; padding:7px 12px}
+html[data-density="comfortable"] .btn{font-size:14px; padding:9px 16px; border-radius:9px}
+html[data-density="comfortable"] kbd{font-size:12.5px}
+html[data-density="comfortable"] .page p, html[data-density="comfortable"] .home p{font-size:15px}
+html[data-density="comfortable"] .page-sub, html[data-density="comfortable"] .plist-sub{font-size:15.5px}
+html[data-density="comfortable"] .page-head h1, html[data-density="comfortable"] .plist-head h1, html[data-density="comfortable"] .home h1{font-size:24px}
+html[data-density="comfortable"] #hkToast{font-size:13.5px; padding:10px 20px}
+html[data-density="comfortable"] .mb-tool{font-size:12px; padding:7px 12px}
 /* the key-flash HUD */
-html[data-flow="next"][data-density="comfortable"] .keyflash .kchip{font-size:15px; padding:4px 11px; border-radius:6px}
-html[data-flow="next"][data-density="comfortable"] .keyflash{right:22px; bottom:22px; gap:6px}
+html[data-density="comfortable"] .keyflash .kchip{font-size:15px; padding:4px 11px; border-radius:6px}
+html[data-density="comfortable"] .keyflash{right:22px; bottom:22px; gap:6px}
 /* the lesson panel */
-html[data-flow="next"][data-density="comfortable"] .lesson-panel{font-size:16px}
-html[data-flow="next"][data-density="comfortable"] .lesson-title{font-size:21px}
-html[data-flow="next"][data-density="comfortable"] .panel-tab{font-size:13.5px; padding:9px 12px}
-html[data-flow="next"][data-density="comfortable"] .task-card{padding:14px 20px}
-html[data-flow="next"][data-density="comfortable"] .task-label{font-size:11px}
-html[data-flow="next"][data-density="comfortable"] .task-goal{font-size:16.5px}
-html[data-flow="next"][data-density="comfortable"] .task-teach{font-size:15px}
-html[data-flow="next"][data-density="comfortable"] .task-extra{font-size:14px}
-html[data-flow="next"][data-density="comfortable"] .panel-body{padding:16px 20px}
-html[data-flow="next"][data-density="comfortable"] .panel-body kbd, html[data-flow="next"][data-density="comfortable"] .task-keys kbd,
-html[data-flow="next"][data-density="comfortable"] .lesson-body kbd, html[data-flow="next"][data-density="comfortable"] .goal-keys kbd,
-html[data-flow="next"][data-density="comfortable"] .help-keys kbd{font-size:13px; padding:2px 7px}
-html[data-flow="next"][data-density="comfortable"] .lesson-brief{font-size:15px}
-html[data-flow="next"][data-density="comfortable"] .goal{padding:10px 12px}
-html[data-flow="next"][data-density="comfortable"] .module-line{font-size:12.5px}
-html[data-flow="next"][data-density="comfortable"] .lesson-meta{font-size:12.5px}
-html[data-flow="next"][data-density="comfortable"] .conv-chip{font-size:11.5px}
-html[data-flow="next"][data-density="comfortable"] .rm-card{width:420px; padding:24px 28px}
-html[data-flow="next"][data-density="comfortable"] .rm-time{font-size:54px}
+html[data-density="comfortable"] .lesson-panel{font-size:16px}
+html[data-density="comfortable"] .lesson-title{font-size:21px}
+html[data-density="comfortable"] .panel-tab{font-size:13.5px; padding:9px 12px}
+html[data-density="comfortable"] .task-card{padding:14px 20px}
+html[data-density="comfortable"] .task-label{font-size:11px}
+html[data-density="comfortable"] .task-goal{font-size:16.5px}
+html[data-density="comfortable"] .task-teach{font-size:15px}
+html[data-density="comfortable"] .task-extra{font-size:14px}
+html[data-density="comfortable"] .panel-body{padding:16px 20px}
+html[data-density="comfortable"] .panel-body kbd, html[data-density="comfortable"] .task-keys kbd,
+html[data-density="comfortable"] .lesson-body kbd, html[data-density="comfortable"] .goal-keys kbd,
+html[data-density="comfortable"] .help-keys kbd{font-size:13px; padding:2px 7px}
+html[data-density="comfortable"] .lesson-brief{font-size:15px}
+html[data-density="comfortable"] .goal{padding:10px 12px}
+html[data-density="comfortable"] .module-line{font-size:12.5px}
+html[data-density="comfortable"] .lesson-meta{font-size:12.5px}
+html[data-density="comfortable"] .conv-chip{font-size:11.5px}
+html[data-density="comfortable"] .rm-card{width:420px; padding:24px 28px}
+html[data-density="comfortable"] .rm-time{font-size:54px}
 /* the sheet tabs strip */
-html[data-flow="next"][data-density="comfortable"] .wb-tabs .wb-tab, html[data-flow="next"][data-density="comfortable"] .st-tab{font-size:13px}
+html[data-density="comfortable"] .wb-tabs .wb-tab, html[data-density="comfortable"] .st-tab{font-size:13px}
 /* the full ribbon: tabs, groups, buttons and KeyTips all one step up (Wolf: "ribbon text feels small") */
-html[data-flow="next"][data-density="comfortable"] .ribbon-slot.rib-full{--rib-h:110px}
-html[data-flow="next"][data-density="comfortable"] .rf-tabs{height:29px; padding:3px 10px 0}
-html[data-flow="next"][data-density="comfortable"] .rf-tab{font-size:13px; padding:4px 13px 5px}
-html[data-flow="next"][data-density="comfortable"] .rf-tab k{min-width:18px; height:17px; font-size:11px}
-html[data-flow="next"][data-density="comfortable"] .rf-body{padding:3px 6px 0}
-html[data-flow="next"][data-density="comfortable"] .rf-grp{padding:0 8px 2px}
-html[data-flow="next"][data-density="comfortable"] .rf-cols{gap:3px}
-html[data-flow="next"][data-density="comfortable"] .rf-gname{font-size:10px; padding-top:3px}
-html[data-flow="next"][data-density="comfortable"] .rf-btn{height:20px; font-size:11.5px; padding:0 5px; gap:5px}
-html[data-flow="next"][data-density="comfortable"] .rf-btn .rf-ico{width:18px; height:18px}
-html[data-flow="next"][data-density="comfortable"] .rf-btn .rf-ico svg{width:17px; height:17px}
-html[data-flow="next"][data-density="comfortable"] .rf-btn .rf-ico .ri-g{font-size:14px}
-html[data-flow="next"][data-density="comfortable"] .rf-btn.ico{width:25px}
-html[data-flow="next"][data-density="comfortable"] .rf-btn.big{height:62px; width:60px; padding:5px 2px 2px; gap:3px}
-html[data-flow="next"][data-density="comfortable"] .rf-btn.big .rf-ico{width:28px; height:28px}
-html[data-flow="next"][data-density="comfortable"] .rf-btn.big .rf-ico svg{width:26px; height:26px}
-html[data-flow="next"][data-density="comfortable"] .rf-btn.big .rf-ico .ri-g{font-size:21px}
-html[data-flow="next"][data-density="comfortable"] .rf-btn.big .rf-lbl{font-size:11px; max-width:60px}
-html[data-flow="next"][data-density="comfortable"] .rf-split.big{width:60px}
-html[data-flow="next"][data-density="comfortable"] .rf-split.big .rf-face{height:50px; width:60px}
-html[data-flow="next"][data-density="comfortable"] .rf-split.big .rf-face .rf-ico{width:28px; height:28px}
-html[data-flow="next"][data-density="comfortable"] .rf-split.big .rf-face .rf-ico svg{width:26px; height:26px}
-html[data-flow="next"][data-density="comfortable"] .rf-split.big .rf-face .rf-lbl{font-size:11px}
-html[data-flow="next"][data-density="comfortable"] .rf-split.big .rf-arrow{width:60px; height:12px}
-html[data-flow="next"][data-density="comfortable"] .rf-split .rf-arrow{width:16px}
-html[data-flow="next"][data-density="comfortable"] .rf-box{height:20px; font-size:11.5px; padding:0 6px}
-html[data-flow="next"][data-density="comfortable"] .ribbon-full .ri-key, html[data-flow="next"][data-density="comfortable"] .rdrop-menu .ri-key,
-html[data-flow="next"][data-density="comfortable"] .rdrop-dialog .ri-key{font-size:11px; padding:0 4px}
-html[data-flow="next"][data-density="comfortable"] .rf-grp.rf-collapsed .rf-grpbtn{width:58px}
-html[data-flow="next"][data-density="comfortable"] .rdrop-item{font-size:13px; padding:5px 9px 5px 11px}
-html[data-flow="next"][data-density="comfortable"] .rf-qbtn{width:24px; height:24px}
+html[data-density="comfortable"] .ribbon-slot.rib-full{--rib-h:110px}
+html[data-density="comfortable"] .rf-tabs{height:29px; padding:3px 10px 0}
+html[data-density="comfortable"] .rf-tab{font-size:13px; padding:4px 13px 5px}
+html[data-density="comfortable"] .rf-tab k{min-width:18px; height:17px; font-size:11px}
+html[data-density="comfortable"] .rf-body{padding:3px 6px 0}
+html[data-density="comfortable"] .rf-grp{padding:0 8px 2px}
+html[data-density="comfortable"] .rf-cols{gap:3px}
+html[data-density="comfortable"] .rf-gname{font-size:10px; padding-top:3px}
+html[data-density="comfortable"] .rf-btn{height:20px; font-size:11.5px; padding:0 5px; gap:5px}
+html[data-density="comfortable"] .rf-btn .rf-ico{width:18px; height:18px}
+html[data-density="comfortable"] .rf-btn .rf-ico svg{width:17px; height:17px}
+html[data-density="comfortable"] .rf-btn .rf-ico .ri-g{font-size:14px}
+html[data-density="comfortable"] .rf-btn.ico{width:25px}
+html[data-density="comfortable"] .rf-btn.big{height:62px; width:60px; padding:5px 2px 2px; gap:3px}
+html[data-density="comfortable"] .rf-btn.big .rf-ico{width:28px; height:28px}
+html[data-density="comfortable"] .rf-btn.big .rf-ico svg{width:26px; height:26px}
+html[data-density="comfortable"] .rf-btn.big .rf-ico .ri-g{font-size:21px}
+html[data-density="comfortable"] .rf-btn.big .rf-lbl{font-size:11px; max-width:60px}
+html[data-density="comfortable"] .rf-split.big{width:60px}
+html[data-density="comfortable"] .rf-split.big .rf-face{height:50px; width:60px}
+html[data-density="comfortable"] .rf-split.big .rf-face .rf-ico{width:28px; height:28px}
+html[data-density="comfortable"] .rf-split.big .rf-face .rf-ico svg{width:26px; height:26px}
+html[data-density="comfortable"] .rf-split.big .rf-face .rf-lbl{font-size:11px}
+html[data-density="comfortable"] .rf-split.big .rf-arrow{width:60px; height:12px}
+html[data-density="comfortable"] .rf-split .rf-arrow{width:16px}
+html[data-density="comfortable"] .rf-box{height:20px; font-size:11.5px; padding:0 6px}
+html[data-density="comfortable"] .ribbon-full .ri-key, html[data-density="comfortable"] .rdrop-menu .ri-key,
+html[data-density="comfortable"] .rdrop-dialog .ri-key{font-size:11px; padding:0 4px}
+html[data-density="comfortable"] .rf-grp.rf-collapsed .rf-grpbtn{width:58px}
+html[data-density="comfortable"] .rdrop-item{font-size:13px; padding:5px 9px 5px 11px}
+html[data-density="comfortable"] .rf-qbtn{width:24px; height:24px}
 /* the slim strip */
-html[data-flow="next"][data-density="comfortable"] .ribbon-slot:not(.rib-full){--rib-h:38px}
-html[data-flow="next"][data-density="comfortable"] .ribbon:not(.ribbon-full){font-size:13px; min-height:38px}
-html[data-flow="next"][data-density="comfortable"] .ribbon .rtab k, html[data-flow="next"][data-density="comfortable"] .ribbon .opt k{font-size:13.5px; min-width:22px; height:22px}
-html[data-flow="next"][data-density="comfortable"] .ribbon.ribbon-lean .ri-lbl{font-size:12px}
+html[data-density="comfortable"] .ribbon-slot:not(.rib-full){--rib-h:38px}
+html[data-density="comfortable"] .ribbon:not(.ribbon-full){font-size:13px; min-height:38px}
+html[data-density="comfortable"] .ribbon .rtab k, html[data-density="comfortable"] .ribbon .opt k{font-size:13.5px; min-width:22px; height:22px}
+html[data-density="comfortable"] .ribbon.ribbon-lean .ri-lbl{font-size:12px}
 /* the formula bar and name box: a half step, still Excel-sized */
-html[data-flow="next"][data-density="comfortable"] .fbar{font-size:13.5px}
+html[data-density="comfortable"] .fbar{font-size:13.5px}
 /* the workspace frame follows the taller nav */
-html[data-flow="next"][data-density="comfortable"] .lesson{height:calc(100vh - 110px)}
+html[data-density="comfortable"] .lesson{height:calc(100vh - 110px)}
 /* the Learn / Home / Practice cards */
-html[data-flow="next"][data-density="comfortable"] .hc-cap, html[data-flow="next"][data-density="comfortable"] .pcard-cap, html[data-flow="next"][data-density="comfortable"] .fr-cap,
-html[data-flow="next"][data-density="comfortable"] .acard-cap, html[data-flow="next"][data-density="comfortable"] .tcard-cap, html[data-flow="next"][data-density="comfortable"] .l-tier-cap{font-size:11px; min-height:36px}
-html[data-flow="next"][data-density="comfortable"] .hc-body, html[data-flow="next"][data-density="comfortable"] .pcard-body{padding:22px 24px 24px}
-html[data-flow="next"][data-density="comfortable"] .drow .dt b{font-size:15px}
-html[data-flow="next"][data-density="comfortable"] .drow .dt span{font-size:13.5px}
+html[data-density="comfortable"] .hc-cap, html[data-density="comfortable"] .pcard-cap, html[data-density="comfortable"] .fr-cap,
+html[data-density="comfortable"] .acard-cap, html[data-density="comfortable"] .tcard-cap, html[data-density="comfortable"] .l-tier-cap{font-size:11px; min-height:36px}
+html[data-density="comfortable"] .hc-body, html[data-density="comfortable"] .pcard-body{padding:22px 24px 24px}
+html[data-density="comfortable"] .drow .dt b{font-size:15px}
+html[data-density="comfortable"] .drow .dt span{font-size:13.5px}
 
 /* ---------- 3. compact keeps today's sizes; only the width rule above applies ---------- */

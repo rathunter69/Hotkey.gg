@@ -19,15 +19,22 @@ const COL_RX = /\bcolumn\s+([A-Z])\b/;
  * (a goal reads "from A3 to A7": the destination comes last). A sheet-qualified reference keeps
  * its sheet. "row 8" and "column D" count as a row or column. Pure.
  */
-export function inferTarget(goal) {
+export function inferTarget(goal, sheetNames = []) {
   if (!goal) return null;
   if (typeof goal.target === 'string' && goal.target) return parseOne(goal.target) || null;
-  const text = String(goal.text || '');
+  // references inside a formula the goal quotes ("read =B4+C4+D4") are not targets
+  const text = String(goal.text || '').replace(/=\S+/g, ' ');
   let last = null, m;
   REF_RX.lastIndex = 0;
   while ((m = REF_RX.exec(text))) {
     const ref = m[2] + m[3] + (m[4] ? ':' + m[4] + m[5] : '');
     last = m[1] ? { sheet: m[1].trim(), ref } : ref;
+  }
+  if (last && typeof last === 'string' && sheetNames.length) {
+    // "On Costs, land on E4": the sheet named in passing qualifies the cell
+    const on = /\b(?:[Oo]n|[Tt]o|[Ii]n|[Oo]f)\s+([A-Z][\w ]{0,20}?)(?=[,:;.!]|\s+(?:sheet|tab)\b)/.exec(text);
+    const hit = on && sheetNames.find(n => n.toLowerCase() === on[1].trim().toLowerCase());
+    if (hit) last = { sheet: hit, ref: last };
   }
   if (last) return last;
   const r = ROW_RX.exec(text); if (r) return `A${r[1]}:Z${r[1]}`;
@@ -57,30 +64,75 @@ export function cellsOf(ref, cap = 240) {
   return out;
 }
 
+/** The union of two cell boxes ({ left, top, width, height }): the range's perimeter. Pure. */
+export function rangeBox(a, b) {
+  if (!a) return b || null; if (!b) return a;
+  const left = Math.min(a.left, b.left), top = Math.min(a.top, b.top);
+  return { left, top, width: Math.max(a.left + a.width, b.left + b.width) - left, height: Math.max(a.top + a.height, b.top + b.height) - top };
+}
+/** The first and last cell of a ref or range: ['A1', 'C4'] (a single cell twice). Pure. */
+export function rangeCorners(ref) {
+  const m = /^([A-Z]{1,2})(\d{1,3})(?::([A-Z]{1,2})(\d{1,3}))?$/.exec(String(ref || ''));
+  if (!m) return null;
+  return [m[1] + m[2], m[3] ? m[3] + m[4] : m[1] + m[2]];
+}
+
 /**
- * Pulse the target once: the cells if the target is on the active sheet, else the sheet's tab.
- * `activeSheet` is the current sheet name; `tabsEl` the sheet-tabs strip. Returns how many
- * elements were marked (the tests read it).
+ * Pulse the target once: ONE outline around the range's perimeter (B7 — never per-cell borders),
+ * drawn as an overlay inside the sheet's scroll box like the marquee; or the sheet's tab when the
+ * target is on another sheet. `view` is the SheetView (cellRect + gw); `activeSheet` the current
+ * sheet name; `tabsEl` the sheet-tabs strip. Returns the box it drew (or 'tab' / null).
  */
-export function pulseTarget(stageEl, target, activeSheet, tabsEl) {
-  if (!stageEl || !target) return 0;
+export function pulseTarget(view, target, activeSheet, tabsEl) {
+  if (!view || !target) return null;
   const ref = typeof target === 'string' ? target : target.ref;
   const sheet = typeof target === 'string' ? null : target.sheet;
-  let n = 0;
   if (sheet && activeSheet && sheet.toLowerCase() !== String(activeSheet).toLowerCase()) {
     const tab = tabsEl && [...tabsEl.querySelectorAll('.wb-tab')].find(t => t.textContent.trim().toLowerCase() === sheet.toLowerCase());
-    if (tab) { restart(tab, 'cue-pulse'); n = 1; }
-    return n;
+    if (tab) { restart(tab, 'cue-pulse'); return 'tab'; }
+    return null;
   }
-  for (const [r, c] of cellsOf(ref)) {
-    const td = stageEl.querySelector(`td[data-r="${r}"][data-c="${c}"]`);
-    if (td) { restart(td, 'cue-pulse'); n++; }
-  }
-  return n;
+  const corners = rangeCorners(ref); if (!corners) return null;
+  const box = rangeBox(view.cellRect(corners[0]), view.cellRect(corners[1]));
+  if (!box || !view.gw) return null;
+  clearPulse(view.gw);
+  const ring = document.createElement('div');
+  ring.className = 'cue-ring'; ring.setAttribute('aria-hidden', 'true');
+  ring.style.left = box.left + 'px'; ring.style.top = box.top + 'px'; ring.style.width = box.width + 'px'; ring.style.height = box.height + 'px';
+  view.gw.appendChild(ring);
+  ring.addEventListener('animationend', () => ring.remove(), { once: true });
+  setTimeout(() => ring.remove(), 2200);
+  return box;
 }
 function restart(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
 /** Take every pulse off (a new goal, a restart). */
-export function clearPulse(rootEl) { if (rootEl) for (const el of rootEl.querySelectorAll('.cue-pulse')) el.classList.remove('cue-pulse'); }
+export function clearPulse(rootEl) { if (rootEl) for (const el of rootEl.querySelectorAll('.cue-pulse, .cue-ring')) { if (el.classList.contains('cue-ring')) el.remove(); else el.classList.remove('cue-pulse'); } }
+
+/**
+ * Where the floating panel goes (B4): the quadrant of the visible sheet box farthest from the
+ * target, never over it. `box` = { w, h } of the visible sheet, `target` = { left, top, width,
+ * height } inside it (null → top-right), `panel` = { w, h }, `keep` = the current quadrant (kept
+ * while it still clears the target, so the card does not hop). Pure.
+ */
+export const QUADRANTS = ['tr', 'tl', 'br', 'bl'];
+export function pickDock(box, target, panel, keep, pad = 12) {
+  const rects = {};
+  for (const q of QUADRANTS) {
+    rects[q] = { left: q.endsWith('r') ? Math.max(pad, box.w - panel.w - pad) : pad, top: q.startsWith('b') ? Math.max(pad, box.h - panel.h - pad) : pad, width: panel.w, height: panel.h };
+  }
+  const hits = (r, t) => !!t && r.left < t.left + t.width + pad && r.left + r.width + pad > t.left && r.top < t.top + t.height + pad && r.top + r.height + pad > t.top;
+  if (!target) return { q: keep && QUADRANTS.includes(keep) ? keep : 'tr', rect: rects[keep && QUADRANTS.includes(keep) ? keep : 'tr'] };
+  if (keep && rects[keep] && !hits(rects[keep], target)) return { q: keep, rect: rects[keep] };
+  const tc = { x: target.left + target.width / 2, y: target.top + target.height / 2 };
+  let best = null;
+  for (const q of QUADRANTS) {
+    const r = rects[q]; const c = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    const d = Math.hypot(c.x - tc.x, c.y - tc.y) - (hits(r, target) ? 1e6 : 0);
+    if (!best || d > best.d) best = { q, d, rect: r };
+  }
+  return { q: best.q, rect: best.rect };
+}
+
 
 /**
  * Glow the next control on a Ribbon route. Before Alt: the tab the route needs. While walking:

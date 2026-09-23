@@ -3,11 +3,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { flowFromQuery, flowOn, DEFAULT_ON } from '../app/flow.js';
-import { inferTarget, altPath, cellsOf } from '../ui/cues.js';
+import { inferTarget, altPath, cellsOf, rangeBox, rangeCorners, pickDock, QUADRANTS } from '../ui/cues.js';
 import { beatFor, MODULE_BEATS, pageDelivered } from '../app/beats.js';
 import { shouldOfferInstall } from '../app/install.js';
 import { dailyCardHtml, efficiency, prettyDay } from '../ui/result-card.js';
-import { BRIEFING, ORIENTATION, stepsFor } from '../app/first-run-next.js';
+import { BRIEFING, ORIENTATION, stepsFor, FIRST_LESSON } from '../app/first-run-next.js';
 import { HEADLINES, SUBHEAD, MODES, landingHtml } from '../app/landing-next.js';
 import { DEMO_LESSON, demoScript } from '../ui/demo-player.js';
 import { STAGES, dealState } from '../app/deal-strip.js';
@@ -18,7 +18,7 @@ import { LESSONS, moduleOf } from '../content/index.js';
 import { EVENTS } from '../app/telemetry.js';
 
 test('flow: the flag is off by default, ?flow=next turns it on, ?flow=off turns it off', () => {
-  assert.equal(DEFAULT_ON, false);
+  assert.equal(DEFAULT_ON, true);
   assert.equal(flowFromQuery({ flow: 'next' }), 'next');
   assert.equal(flowFromQuery({ flow: 'on' }), 'next');
   assert.equal(flowFromQuery({ flow: 'off' }), 'off');
@@ -51,6 +51,8 @@ test('cues: the target is the last reference a goal names; rows, columns and oth
   assert.equal(inferTarget({ text: 'Select column D.' }), 'D1:D100');
   assert.equal(inferTarget({ text: 'Walk the tabs to the end and back.' }), null);
   assert.equal(inferTarget({ text: 'Go to A1', target: 'F61' }), 'F61', 'an explicit target wins');
+  assert.deepEqual(inferTarget({ text: 'On Costs, land on the Domain total E4 and read =B4+C4+D4 in the formula bar.' }, ['Raw', 'Costs']), { sheet: 'Costs', ref: 'E4' }, 'a quoted formula is not a target; the sheet named in passing qualifies the cell');
+  assert.equal(inferTarget({ text: 'Jump to the feed’s last date with Ctrl+↓ — the Name Box now reads A61.' }, ['Raw', 'Costs']), 'A61');
   assert.equal(inferTarget(null), null);
 });
 
@@ -110,15 +112,22 @@ test('first run: three briefing cards, the orientation names the five places and
   const all = [...BRIEFING.flatMap(b => [b.title, ...b.body]), ORIENTATION.title, ...ORIENTATION.rows.flatMap(r => [r.where, r.what]), ORIENTATION.fine];
   for (const s of all) assert.doesNotMatch(s, /colour|practis|organis|centre|grey\b|analyse/i, 'American spelling: ' + s.slice(0, 40));
   const orient = ORIENTATION.rows.map(r => r.what).join(' ');
-  for (const w of ['Lessons', 'challenge', 'Drills', 'rapid-fire', 'the Daily', 'Boards', 'XP', 'level']) assert.ok(orient.includes(w), w);
+  for (const w of ['Lessons', 'challenge', 'Drills', 'rapid-fire', 'the Daily', 'board', 'XP', 'level']) assert.ok(orient.includes(w), w);
   assert.deepEqual(ORIENTATION.rows.map(r => r.where), ['Learn', 'Practice', 'Leaderboard', 'Level']);
-  assert.deepEqual(stepsFor(false), ['demo', 'who', 'sent', 'deliver', 'orient', 'picker']);
+  assert.deepEqual(stepsFor(false), ['demo', 'orient', 'who', 'sent', 'deliver', 'picker']);
+  assert.equal(FIRST_LESSON, 'inherited-workbook', 'the first run hands off to 1.1.1');
+  // B3: plain sentences; any jargon is defined in the same breath; nobody is required to be an analyst
+  const joined = BRIEFING.flatMap(b => [b.title, ...b.body]).join(' ');
+  assert.ok(/data room: the folder buyers will read/.test(joined), 'the data room is defined where it appears');
+  assert.doesNotMatch(joined, /house style|VDR|sell-side|first-year/i);
+  for (const p of BRIEFING.flatMap(b => b.body)) for (const sentence of p.split(/(?<=[.!?])\s+/)) assert.ok(sentence.split(' ').length <= 30, 'short sentence: ' + sentence);
   assert.deepEqual(stepsFor(true), ['picker']);
 });
 
 test('landing: the headline and its two alternates, the subhead, six modes, a Sign in, Enter starts', () => {
   assert.equal(HEADLINES.length, 3);
-  assert.equal(HEADLINES[0].a + ' ' + HEADLINES[0].b, 'You don’t learn Excel by watching. You learn it by doing it again.');
+  assert.equal(HEADLINES[0].a + ' ' + HEADLINES[0].b, 'Excel isn’t learned. It’s practiced.');
+  assert.equal(HEADLINES[1].a, 'You don’t learn Excel by watching.');
   assert.equal(SUBHEAD, 'Learn Excel the way analysts are taught — on a real sheet, one job at a time.');
   assert.deepEqual(MODES.map(m => m.key), ['lesson', 'challenge', 'drill', 'daily', 'rapid', 'boards']);
   const html = landingHtml(0);
@@ -150,9 +159,37 @@ test('deal strip: six stages, the first free; the state counts modules from prog
   assert.ok(STAGES.every(s => s.stage && s.sends && s.delivers && s.modules > 0));
   const d0 = dealState({});
   assert.equal(d0.done, 0); assert.equal(d0.stage.n, 1); assert.equal(d0.planned, 7);
-  assert.equal(PLANNED_MODULES.length, 7 + 1, 'the Welcome plus seven modules');
+  assert.equal(PLANNED_MODULES.length, 7, 'seven modules; the Welcome is retired');
 });
 
 test('telemetry: the three new events exist', () => {
   for (const e of ['landing_demo', 'briefing_done', 'install_prompt']) assert.ok(EVENTS.includes(e), e);
+});
+
+test('cues (B7): the pulse is one box around the range perimeter, from its corner cells', () => {
+  assert.deepEqual(rangeCorners('B3'), ['B3', 'B3']);
+  assert.deepEqual(rangeCorners('E1:E60'), ['E1', 'E60']);
+  assert.equal(rangeCorners('nope'), null);
+  const a = { left: 100, top: 20, width: 64, height: 20 }, b = { left: 228, top: 120, width: 64, height: 20 };
+  assert.deepEqual(rangeBox(a, b), { left: 100, top: 20, width: 192, height: 120 });
+  assert.deepEqual(rangeBox(a, null), a);
+  assert.deepEqual(rangeBox(null, null), null);
+});
+
+test('floating panel (B4): docks to the quadrant farthest from the target, never over it, and stays put while it clears it', () => {
+  const box = { w: 1000, h: 600 }, panel = { w: 380, h: 260 };
+  assert.deepEqual(QUADRANTS, ['tr', 'tl', 'br', 'bl']);
+  assert.equal(pickDock(box, null, panel, null).q, 'tr', 'no target: top right');
+  assert.equal(pickDock(box, null, panel, 'bl').q, 'bl', 'no target: keep the current quadrant');
+  const topRight = { left: 800, top: 40, width: 64, height: 20 };
+  const d1 = pickDock(box, topRight, panel, 'tr');
+  assert.equal(d1.q, 'bl', 'a target under the card sends it to the far corner');
+  assert.ok(d1.rect.top + d1.rect.height <= box.h && d1.rect.left >= 0);
+  const topLeft = { left: 40, top: 40, width: 64, height: 20 };
+  assert.equal(pickDock(box, topLeft, panel, 'bl').q, 'bl', 'still clear: the card does not hop');
+  assert.equal(pickDock(box, topLeft, panel, 'tl').q, 'br', 'covered: it moves to the far corner');
+  const middle = { left: 450, top: 280, width: 64, height: 20 };
+  const d2 = pickDock(box, middle, panel, 'tr');
+  assert.equal(d2.q, 'tr', 'a mid-sheet target is clear of the top-right card at this size');
+  for (const q of QUADRANTS) { const r = pickDock(box, null, panel, q).rect; assert.ok(r.left >= 12 && r.top >= 12 && r.left + r.width <= box.w - 12 + 1e-9 && r.top + r.height <= box.h - 12 + 1e-9, q + ' inside the box'); }
 });

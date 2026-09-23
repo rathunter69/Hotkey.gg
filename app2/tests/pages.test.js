@@ -15,7 +15,7 @@ import { ACCOUNT_ITEMS } from '../ui/nav.js';
 /* ---------------- prefs ---------------- */
 test('prefs: defaults follow the detected platform', () => {
   assert.deepEqual(defaultPrefs('mac'), { platform: 'mac', experience: null, firstRunDone: false, skipped: [], ribbon: null, mute: false, effects: 'full', ghost: true,
-    density: 'comfortable', panelSide: 'right', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false });
+    density: 'comfortable', panelSide: 'overlay', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false, dashHintsSeen: false });
   assert.equal(defaultPrefs('amiga').platform, 'win');
   assert.equal(PREFS_KEY, 'hk2_prefs');
 });
@@ -30,7 +30,7 @@ test('prefs: corrupt and wrong-typed values normalise to defaults', () => {
 test('prefs: valid values survive; skipped keeps unique non-empty strings, capped', () => {
   const p = normalisePrefs({ platform: 'mac', experience: 'daily', firstRunDone: true, skipped: ['a', 'a', '', 7, null, 'b'], ribbon: 'slim', mute: true }, 'win');
   assert.deepEqual(p, { platform: 'mac', experience: 'daily', firstRunDone: true, skipped: ['a', 'b'], ribbon: 'slim', mute: true, effects: 'full', ghost: true,
-    density: 'comfortable', panelSide: 'right', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false });
+    density: 'comfortable', panelSide: 'overlay', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false, dashHintsSeen: false });
   const many = normalisePrefs({ skipped: Array.from({ length: 2000 }, (_, i) => 'l' + i) }, 'win');
   assert.equal(many.skipped.length, 500);
 });

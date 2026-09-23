@@ -18,7 +18,6 @@ const TIER_MARK = { legendary: '◆◆◆', pro: '◆◆', pass: '◆' };
 
 /** The Chapter 1 modules as the map plans them, for the ones not yet authored (the content session is writing 1.3–1.7). */
 export const PLANNED_MODULES = [
-  { n: '1.0', title: 'Welcome', objective: 'The feed in sixty seconds: the slow way, then the fast way, both on your clock.' },
   { n: '1.1', title: 'Open and set up', objective: 'Tidy the file as it arrived: tabs, gridlines, Excel Options, the QAT, the color-and-label conventions.' },
   { n: '1.2', title: 'Move and select', objective: 'Jumps, never scrolls: Ctrl+Arrow, the selection set, Go To, Go To Special.' },
   { n: '1.3', title: 'Enter, edit, copy and fill', objective: 'The missing day, the typos, the Report skeleton, Paste Special, Find and Replace, a timeline.' },
@@ -29,7 +28,7 @@ export const PLANNED_MODULES = [
 ];
 
 /** The document number for a module id, from its position among the built modules. */
-const docNo = (chapterN, k) => `${chapterN}.${k}`;
+const docNo = (chapterN, k) => `${chapterN}.${k + 1}`;
 
 /**
  * The pack-page thumbnail for a module: the sheet its lessons changed most, rendered as a small
@@ -82,8 +81,11 @@ export function mountLearnPage(root, ctx = {}) {
     const all = store.all(); const skipped = prefs.get().skipped;
     const ch1 = CHAPTERS.find(x => x.id === 'foundations');
     const gate = store.chapter('foundations');
-    const mods = ch1 ? modulesOf(ch1) : [];
-    const path = ch1 ? pathModel(ch1, all, skipped) : [];
+    // the Welcome module is retired (B2): its moves open lesson 1.1.1
+    const mods = ch1 ? modulesOf(ch1).filter(m => m.id !== 'welcome') : [];
+    const path = ch1 ? pathModel(ch1, all, skipped).filter(m => m.id !== 'welcome') : [];
+    // the path marked "next" on the retired module: move the mark to the first open item that is shown
+    if (!path.some(m => m.items.some(it => it.next))) { const it = path.flatMap(m => m.items).find(x => x.st !== 'done' && x.st !== 'mastered' && x.st !== 'skipped'); if (it) it.next = true; }
     const modsDone = path.filter(m => m.status === 'complete').length;
     const tree = CHAPTER_PLAN.map(pl => {
       const st = STAGES.find(s => s.id === pl.id) || {};
@@ -124,7 +126,7 @@ export function mountLearnPage(root, ctx = {}) {
           </div>
           <div class="dr-doc-page${passed ? ' filled' : ''}">
             ${pageThumbHtml(m)}
-            <div class="dr-page-cap"><b>Page ${docNo(1, k)}</b> ${passed ? 'delivered' : m.challenge ? 'fills in when the challenge passes' : 'no page: the Welcome'}</div>
+            <div class="dr-page-cap"><b>Page ${docNo(1, k)}</b> ${passed ? 'delivered' : 'fills in when the challenge passes'}</div>
             ${m.challenge && passed ? `<a class="dr-replay" href="#/lesson/${esc(m.challenge.id)}?seed=new">Replay · new seed →</a>` : ''}
           </div>
         </article>`;
@@ -135,7 +137,7 @@ export function mountLearnPage(root, ctx = {}) {
       }
       docs += '</div>';
       // the archive: the legacy lessons, one folder, collapsed
-      const legacy = ch1 ? ch1.lessons.filter(l => typeof l.module !== 'string') : [];
+      const legacy = ch1 ? ch1.lessons.filter(l => typeof l.module !== 'string' || l.module === 'welcome') : [];
       if (legacy.length) {
         docs += `<div class="dr-archive"><button type="button" class="dr-folder dr-archive-btn${archiveOpen ? ' open' : ''}" id="drArchive" aria-expanded="${archiveOpen}"><span class="dr-folder-ico" aria-hidden="true">${archiveOpen ? '▾' : '▸'}</span><span class="dr-folder-t">Archive · earlier lessons</span><span class="dr-folder-meta"><span class="dr-count">${legacy.length}</span></span><span class="dr-tease">The first draft of Chapter 1. Still playable; replaced module by module as the rewrite lands.</span></button>
           ${archiveOpen ? `<ol class="dr-steps dr-archive-list">${legacy.map(l => { const st = statusOf(l.id, all, skipped); return `<li class="dr-step st-${esc(st)}"><a href="#/lesson/${esc(l.id)}" data-open="${esc(l.id)}"><span class="dr-step-n">${lessonNumber(l.id)}</span><span class="dr-step-t">${esc(l.title)}</span><span class="dr-step-m">${esc(l.section || '')}</span><span class="dr-step-st">${st === 'done' || st === 'mastered' ? '✓' : st === 'started' ? '…' : ''}</span></a></li>`; }).join('')}</ol>` : ''}</div>`;

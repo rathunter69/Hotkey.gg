@@ -21,7 +21,7 @@ import { mountEffects } from '../ui/effects.js';
 import { showToast } from '../ui/toast.js';
 import { keyLabel, prefs } from './prefs.js';
 import { flowNext } from './flow.js';
-import { inferTarget, altPath, pulseTarget, clearPulse, glowRibbon } from '../ui/cues.js';
+import { inferTarget, altPath, pulseTarget, clearPulse, glowRibbon, pickDock, QUADRANTS } from '../ui/cues.js';
 import { beatFor, pageDelivered } from './beats.js';
 import { schedule, grade as scheduleGrade, dueToday } from './schedule.js';
 import { shouldOfferInstall, installAvailable, promptInstall } from './install.js';
@@ -68,7 +68,11 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
   const wrap = document.createElement('div');
   wrap.className = 'ws' + (next ? ' ws-next' : '');
   const el = document.createElement('div');
-  el.className = 'lesson' + (next && panelOpt === 'overlay' ? ' panel-overlay' : '');
+  // the panel (B4): the adaptive floating card by default, docked right or left as a setting; ?panel= overrides for a look
+  const panelMode = ['overlay', 'right', 'left'].includes(panelOpt) ? panelOpt : prefs.get().panelSide;
+  const overlayMode = next && panelMode === 'overlay';
+  el.className = 'lesson' + (overlayMode ? ' panel-overlay' : '');
+  if (next) el.dataset.panel = panelMode;
   if (next) {
     const ctx0 = gameCtx();
     const crumb = at
@@ -80,7 +84,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
       <div class="ws-tools">
         <span class="ws-level" id="wsLevel" title="Level ${ctx0.level} · XP from lessons, challenges and the Daily">L${ctx0.level} <i>${ctx0.levelInfo.into}/${ctx0.levelInfo.need} XP</i></span>
         <span id="wsMute"></span>
-        <button type="button" class="mb-tool" id="wsSide" title="Move the panel to the other side">Panel: ${prefs.get().panelSide === 'left' ? 'left' : 'right'}</button>
+        <button type="button" class="mb-tool" id="wsSide" title="Panel: floating card, docked right, docked left (Ctrl+Shift+K hides it, Ctrl+Shift+J moves the card)">Panel: ${panelMode === 'overlay' ? 'floating' : panelMode}</button>
         <button type="button" class="mb-tool" id="wsFull" title="Fullscreen (F11 in most browsers)">Fullscreen</button>
       </div></div>`;
   }
@@ -120,7 +124,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
   effects.mountMuteButton(next ? wrap.querySelector('#wsMute') : $('lessonTools'));
   // the strip's tools (experience pass): panel side, fullscreen
   if (next) {
-    wrap.querySelector('#wsSide').onclick = () => { const side = prefs.get().panelSide === 'left' ? 'right' : 'left'; prefs.set({ panelSide: side }); wrap.querySelector('#wsSide').textContent = 'Panel: ' + side; if (sheetView) requestAnimationFrame(() => sheetView.render()); };
+    wrap.querySelector('#wsSide').onclick = () => { const order = ['overlay', 'right', 'left']; const side = order[(order.indexOf(panelMode) + 1) % order.length]; prefs.set({ panelSide: side }); location.hash = location.hash.replace(/[?&]panel=[a-z]+/, ''); location.reload(); };
     wrap.querySelector('#wsFull').onclick = () => { try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); } catch (e) { /* not allowed here */ } };
   }
   const onFs = () => { try { document.documentElement.classList.toggle('hk-fs', !!document.fullscreenElement); if (sheetView) requestAnimationFrame(() => sheetView.render()); } catch (e) { /* no DOM */ } };
@@ -151,6 +155,11 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
   const hinted = new Set();  // goal indexes that were hinted or revealed (the queue grades them lower)
   let notedDone = 0;         // goals already noted to the queue
   let beat = null;           // the story-beat card while it shows
+  let dock = 'tr';           // the floating panel's quadrant (B4); recomputed on goal change and scroll
+  let dockPinned = false;    // Ctrl+Shift+J moved it by hand: keep that until the next goal
+  let pill = false;          // collapsed to a one-line pill while a cell is being edited
+  let targetBox = null;      // the current goal's target box in sheet content pixels (dock avoids it)
+  let scrollRaf = 0;
 
   // The first attempt at a challenge is soft-timed (C2 addendum): the clock runs and decides the
   // tier, but time-up does not end the run. From the second attempt the limit is hard.
@@ -181,7 +190,11 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     // the Ribbon view re-renders on its own session listener (registered above, so it fires after
     // the run's); the route glow is re-applied from a listener registered after it, so it lands
     // on the freshly painted bar
-    run.session.onChange(() => { if (cuesOn && phase === 'play') glowRibbon($('ribbon'), cueTokens, run.session.path, run.session.mode, document.getElementById('ribbonDrop')); });
+    run.session.onChange(() => {
+      if (cuesOn && phase === 'play') glowRibbon($('ribbon'), cueTokens, run.session.path, run.session.mode, document.getElementById('ribbonDrop'));
+      if (overlayMode) { const editing = !!run.session.editing; if (editing !== pill) { pill = editing; el.classList.toggle('pill', pill); if (!pill) dockPanel(); } }
+    });
+    if (overlayMode && sheetView && sheetView.gw) sheetView.gw.addEventListener('scroll', onSheetScroll, { passive: true });
     run.onChange(what => {
       if (what === 'reset') return;
       ribbonView.render(); sheetView.render();
@@ -345,7 +358,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
       const overlayMode = el.classList.contains('panel-overlay');
       a.innerHTML = `<button class="btn btn-ghost" id="restartBtn" type="button">Restart</button>${overlayMode ? `<button class="btn btn-ghost" id="goalsBtn" type="button" aria-expanded="${el.classList.contains('goals-open')}">Goals ${run.doneCount}/${run.goals.length} ${el.classList.contains('goals-open') ? '▴' : '▾'}</button>` : ''}`;
       $('restartBtn').onclick = () => { restart(run.mode); };
-      const gb = $('goalsBtn'); if (gb) gb.onclick = () => { el.classList.toggle('goals-open'); renderActions(); gb.blur(); };
+      const gb = $('goalsBtn'); if (gb) gb.onclick = () => { el.classList.toggle('goals-open'); renderActions(); gb.blur(); requestAnimationFrame(dockPanel); };
     } else a.innerHTML = '';
   }
 
@@ -675,9 +688,12 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
       cueTokens = cur ? altPath(cur.keys) : [];
       if (cur && !demo && !ghost) {
         const sh = run.session.sheets && run.session.sheets[run.session.sheetIndex];
-        pulseTarget($('stage'), inferTarget(cur), sh ? sh.name : null, $('sheetTabs'));
-      }
+        const drawn = pulseTarget(sheetView, inferTarget(cur, (run.session.sheets || []).map(x => x.name)), sh ? sh.name : null, $('sheetTabs'));
+        targetBox = drawn && typeof drawn === 'object' ? drawn : null;
+      } else targetBox = null;
+      dockPinned = false;
       armStuck();
+      dockPanel();
     }
     glowRibbon($('ribbon'), cueTokens, run.session.path, run.session.mode, document.getElementById('ribbonDrop'));
   }
@@ -721,6 +737,34 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     focusWorkspace(); armStuck();
     void id;
   }
+
+  /* ---------------- the floating panel (B4): docks to the emptiest quadrant, away from the target and the ribbon ---------------- */
+  /** Place the card: the quadrant of the visible sheet farthest from the goal's target, kept while it still clears it. */
+  function dockPanel() {
+    if (!overlayMode || !sheetView || !sheetView.gw) return;
+    const gw = sheetView.gw; const panelEl = $('panel'); if (!panelEl) return;
+    const g = gw.getBoundingClientRect(); const l = el.getBoundingClientRect();
+    if (!g.width || !g.height) return;
+    const b = sheetView.box ? sheetView.box() : null;
+    const box = { w: g.width, h: g.height };
+    // the target in the visible box's pixels (scrolled; the sticky headers are part of the box)
+    const t = targetBox ? { left: targetBox.left - gw.scrollLeft, top: targetBox.top - gw.scrollTop, width: targetBox.width, height: targetBox.height } : null;
+    const pw = Math.min(panelEl.offsetWidth || 380, box.w - 24), ph = Math.min(panelEl.offsetHeight || 260, box.h - 24);
+    const pick = pickDock(box, t && t.top + t.height > (b ? b.y0 : 0) && t.top < box.h ? t : null, { w: pw, h: ph }, dockPinned ? dock : dock);
+    dock = pick.q;
+    // never over the ribbon or the formula bar: the box starts at the grid's top edge, so a top quadrant sits just under them
+    panelEl.style.left = (g.left - l.left + pick.rect.left) + 'px';
+    panelEl.style.top = (g.top - l.top + pick.rect.top) + 'px';
+    panelEl.style.maxHeight = (box.h - 24) + 'px';
+    el.dataset.dock = dock;
+  }
+  function onSheetScroll() { if (scrollRaf) return; scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; dockPanel(); }); }
+  /** Ctrl+Shift+J: move the card to the next quadrant by hand (sticks until the next goal). */
+  function cycleDock() { if (!overlayMode) return; dockPinned = true; dock = QUADRANTS[(QUADRANTS.indexOf(dock) + 1) % QUADRANTS.length]; const keep = targetBox; targetBox = null; dockPanel(); targetBox = keep; showToast('Panel: ' + { tr: 'top right', tl: 'top left', br: 'bottom right', bl: 'bottom left' }[dock]); }
+  /** Ctrl+Shift+K: hide or show the panel (a small pill stays so it can come back by mouse). */
+  function togglePanel() { const hidden = el.classList.toggle('panel-hidden'); let b = el.querySelector('#panelShow'); if (hidden && !b) { b = document.createElement('button'); b.type = 'button'; b.id = 'panelShow'; b.className = 'panel-show'; b.textContent = 'Show panel · Ctrl+Shift+K'; b.onclick = togglePanel; el.appendChild(b); } else if (!hidden && b) b.remove(); if (!hidden) dockPanel(); focusWorkspace(); }
+  const onResize = () => dockPanel();
+  window.addEventListener('resize', onResize);
 
   /* ---------------- tabs ---------------- */
   const TABS = ['lesson', 'help', 'used'];
@@ -768,6 +812,8 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) return;
     if (t && (t.closest('.panel-tabs') || t === divider)) return;   // handled by their own listeners
     if (e.key === 'F1') { e.preventDefault(); selectTab(tab === 'help' ? 'lesson' : 'help'); return; }
+    if (next && e.ctrlKey && e.shiftKey && !e.altKey && (e.key === 'K' || e.key === 'k')) { e.preventDefault(); togglePanel(); return; }
+    if (next && e.ctrlKey && e.shiftKey && !e.altKey && (e.key === 'J' || e.key === 'j')) { e.preventDefault(); cycleDock(); return; }
     if (beat) { if (e.key === 'Enter' || e.key === 'Escape' || e.key === ' ') { e.preventDefault(); closeBeat(); } else if (e.key.length > 1) e.preventDefault(); return; }
     if (!overlay.hidden) {
       if (e.key === 'Escape') { e.preventDefault(); closeOverlay(); }
@@ -812,12 +858,19 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
   maybeStartDemo();
   cueCurrent();
   showBeat();
+  if (overlayMode) {
+    requestAnimationFrame(dockPanel);
+    $('panel').addEventListener('click', e => { if (el.classList.contains('pill') && !e.target.closest('button, a')) { el.classList.remove('pill'); el.classList.add('goals-open'); renderActions(); dockPanel(); } });
+  }
   return {
     destroy() {
       if (ghost) { clearInterval(ghost.timer); ghost = null; run.endGhost(); }
       stopDemo(); stopStuck();
       if (beat) { beat.remove(); beat = null; }
       document.removeEventListener('fullscreenchange', onFs);
+      window.removeEventListener('resize', onResize);
+      if (sheetView && sheetView.gw) sheetView.gw.removeEventListener('scroll', onSheetScroll);
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
       window.removeEventListener('focus', paintFocusHint); window.removeEventListener('blur', paintFocusHint);
       document.removeEventListener('keydown', onKey); document.removeEventListener('keyup', onKeyUp);
       if (timerH) clearInterval(timerH);

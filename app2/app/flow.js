@@ -7,10 +7,10 @@
 //   applyFlowQuery(q) → reads a parsed route query ({ flow }) and persists the switch
 //   reflectFlow()     → sets html[data-flow] (the router calls it on every route)
 //
-// On go: DEFAULT_ON flips to true and the storage switch becomes a way to turn it OFF.
+// On go (done): DEFAULT_ON is true and the storage switch is the way to turn it OFF.
 
 export const FLOW_KEY = 'hk2_flow';
-export const DEFAULT_ON = false;
+export const DEFAULT_ON = true;   // flipped on go (2026-09-23 B); ?flow=off stays as the escape hatch for a week
 
 function readStored() {
   try { return localStorage.getItem(FLOW_KEY); } catch (e) { return null; }

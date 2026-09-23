@@ -16,7 +16,7 @@ export const EXPERIENCES = ['new', 'sometimes', 'daily'];
 export const RIBBON_MODES = ['full', 'slim'];
 export const EFFECT_LEVELS = ['full', 'subtle', 'off'];   // celebration intensity (SITE_SPEC §1)
 export const DENSITIES = ['comfortable', 'compact'];       // the two-state density switch (experience pass, decision 6)
-export const PANEL_SIDES = ['right', 'left'];              // the lesson panel's side (decision 6); right is the spec default
+export const PANEL_SIDES = ['overlay', 'right', 'left'];   // the lesson panel: the adaptive floating card (default, B4), or docked right / left
 
 const isPlainObject = v => typeof v === 'object' && v !== null && !Array.isArray(v);
 
@@ -37,7 +37,7 @@ export function detectPlatform(nav) {
 /** Defaults for a device that has never saved anything. */
 export function defaultPrefs(detected) {
   return { platform: PLATFORMS.includes(detected) ? detected : 'win', experience: null, firstRunDone: false, skipped: [], ribbon: null, mute: false, effects: 'full', ghost: true,
-    density: 'comfortable', panelSide: 'right', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false };
+    density: 'comfortable', panelSide: 'overlay', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false, dashHintsSeen: false };
 }
 
 /**
@@ -71,6 +71,7 @@ export function normalisePrefs(raw, detected) {
     out.beatsSeen = [...seen];
   }
   out.saveNudgeDone = raw.saveNudgeDone === true;
+  out.dashHintsSeen = raw.dashHintsSeen === true;
   return out;
 }
 
