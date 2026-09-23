@@ -181,6 +181,7 @@ const CELL_KEYS = ['value', 'formula', ...FMT_FIELDS];   // the engine's own for
 const cellNorm = c => {
   const out = {};
   for (const k of CELL_KEYS) if (c && c[k] !== undefined && c[k] !== null && c[k] !== false) out[k] = c[k];
+  if (out.formula) delete out.value;   // a formula cell's value is computed; authored states carry only the formula
   return out;
 };
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
