@@ -34,7 +34,7 @@ export function mountLeaderboardPage(root, ctx = {}) {
       <div class="boards" role="tabpanel">
         ${b.key === 'benchmark'
           ? DRILLS.filter(d => d.benchmark).concat(DRILLS.filter(d => !d.benchmark)).map(d =>
-              localBoard(d.title, d.benchmark ? 'benchmark' : 'drill', store.boards(d.id), store.boards(d.id).length ? 'Your clean times. The global field opens with accounts.' : 'No clean time yet — a run without help or mouse posts here.')).join('')
+              localBoard(d.title, d.benchmark ? 'benchmark' : 'drill', store.boards(d.id).map(r => ({ ...r, mid: (r.tier && r.tier !== 'none' ? r.tier + ' · ' : '') + r.keys + '/~' + d.optimalKeys })), store.boards(d.id).length ? 'Your clean times, with keys against the reference route. The global field opens with accounts.' : 'No clean time yet — a run without help or mouse posts here.')).join('')
           : b.key === 'daily'
           ? (() => { const day = dayOf(); const pick = dailyFor(day); const drill = DRILLS.find(d => d.id === pick.drillId);
               const rows = store.attempts({ kind: 'daily', day }).filter(a => a.clean && a.secs != null).sort((x, y) => x.secs - y.secs).map(a => ({ secs: a.secs, mid: a.tier !== 'none' ? a.tier : '' }));
