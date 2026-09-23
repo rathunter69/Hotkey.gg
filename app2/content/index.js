@@ -86,6 +86,35 @@ export function sectionsOf(chapter) {
   return [...groups.values()];
 }
 
+/**
+ * A chapter's modules (framework v2): lessons sharing a `module` id, grouped in catalog order,
+ * each ending in its challenge — [{ id, title, lessons, challenge }]. `title` is the lessons'
+ * shared `section` name; `lessons` excludes the challenge. Legacy lessons (no `module`) are not
+ * in any module and keep the sectioned catalog until the rewrite replaces them.
+ */
+export function modulesOf(chapter) {
+  const out = []; const idx = {};
+  for (const l of chapter.lessons) {
+    if (typeof l.module !== 'string') continue;
+    if (idx[l.module] == null) { idx[l.module] = out.length; out.push({ id: l.module, title: l.section || l.module, lessons: [], challenge: null }); }
+    const m = out[idx[l.module]];
+    if (l.kind === 'challenge') m.challenge = l; else m.lessons.push(l);
+  }
+  return out;
+}
+/** The module a lesson belongs to, with the lesson's place in it: { module, n, of, k, of7 } — or null. */
+export function moduleOf(lesson) {
+  if (!lesson || typeof lesson.module !== 'string') return null;
+  const ch = CHAPTERS.find(c => c.id === lesson.chapter);
+  if (!ch) return null;
+  const mods = modulesOf(ch);
+  const k = mods.findIndex(m => m.id === lesson.module);
+  if (k < 0) return null;
+  const m = mods[k];
+  const n = m.lessons.findIndex(l => l.id === lesson.id);
+  return { module: m, n: n >= 0 ? n + 1 : m.lessons.length + 1, of: m.lessons.length, k: k + 1, of7: mods.length };
+}
+
 export const LESSONS = CHAPTERS.flatMap(ch => ch.lessons);
 export const LESSONS_BY_ID = Object.fromEntries(LESSONS.map(l => [l.id, l]));
 export const chapterOf = lesson => CHAPTERS.find(ch => ch.id === lesson.chapter);

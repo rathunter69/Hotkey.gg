@@ -8,7 +8,9 @@ import { store } from './store.js';
 import { attemptId, dayOf, traceOf } from './records.js';
 import { gameCtx, celebrate } from './stats.js';
 import { track } from './telemetry.js';
-import { nextLesson, chapterOf, lessonNumber } from '../content/index.js';
+import { nextLesson, chapterOf, lessonNumber, moduleOf } from '../content/index.js';
+import { CONVENTIONS } from '../content/conventions.js';
+import { ring } from '../ui/ring.js';
 import { SheetView } from '../ui/sheet-view.js';
 import { RibbonView } from '../ui/ribbon-view.js';
 import { mountSheetTabs } from '../ui/sheet-tabs.js';
@@ -65,6 +67,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
       <div class="panel-head">
         <div class="lesson-crumb"><a href="#/learn">Learn</a> › ${esc(chapter ? chapter.title : '')} › <span>${lessonNumber(lesson.id)}</span></div>
         <h1 class="lesson-title">${esc(lesson.title)}</h1>
+        <div class="module-line" id="moduleLine"></div>
         <div class="lesson-meta"><span class="diff diff-${esc(lesson.difficulty)}">${esc(lesson.difficulty)}</span> <span class="lesson-mode" id="lessonMode"></span> <span class="lesson-progress" id="lessonProgress"></span> <span class="lesson-timer" id="lessonTimer"></span><span class="lesson-tools" id="lessonTools"></span></div>
       </div>
       <div class="panel-tabs" role="tablist" aria-label="Panel">
@@ -72,6 +75,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
         <button class="panel-tab" role="tab" id="tabHelp" type="button" aria-selected="false" aria-controls="panelBody" data-tab="help" tabindex="-1">Help <span class="tab-n">F1</span></button>
         <button class="panel-tab" role="tab" id="tabUsed" type="button" aria-selected="false" aria-controls="panelBody" data-tab="used" tabindex="-1">Shortcuts used</button>
       </div>
+      <div class="task-card" id="taskCard" aria-live="polite"></div>
       <div class="panel-body" id="panelBody" role="tabpanel" aria-labelledby="tabLesson"></div>
       <div class="panel-actions" id="panelActions"></div>
     </aside>`;
@@ -141,28 +145,75 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     $('lessonProgress').textContent = `${run.doneCount} / ${run.goals.length}`;
     for (const b of el.querySelectorAll('.panel-tab')) { const on = b.dataset.tab === tab; b.setAttribute('aria-selected', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1; }
     $('panelBody').setAttribute('aria-labelledby', tab === 'lesson' ? 'tabLesson' : tab === 'help' ? 'tabHelp' : 'tabUsed');
+    renderModuleLine();
+    renderTaskCard();
     if (tab === 'lesson') renderLesson(); else if (tab === 'help') renderHelp(); else renderUsed();
     renderActions();
     renderTimer();
+  }
+
+  /** "Lesson n of m · Module k of 7" with the module's ring; empty for the legacy lessons. */
+  function renderModuleLine() {
+    const slot = $('moduleLine'); if (!slot) return;
+    const at = moduleOf(lesson);
+    if (!at) { slot.innerHTML = ''; slot.hidden = true; return; }
+    const all = store.all();
+    const doneInModule = at.module.lessons.filter(l => { const p = all[l.id]; return (p && p.completed) || l.id === lesson.id && phase === 'done'; }).length;
+    slot.hidden = false;
+    slot.innerHTML = `${ring(doneInModule, at.module.lessons.length, { size: 20 })} ${lesson.kind === 'challenge'
+      ? `<span>Challenge · Module ${at.k} of ${at.of7}</span>`
+      : `<span>Lesson ${at.n} of ${at.of} · Module ${at.k} of ${at.of7}</span>`}`;
+  }
+
+  /** The one thing to do now, pinned above the scrolling body: goal + teach + keys + convention. */
+  function renderTaskCard() {
+    const card = $('taskCard'); if (!card) return;
+    if (phase === 'done') { card.innerHTML = ''; return; }
+    // A challenge pins the whole worklist: all goals at once, ticked as they land.
+    if (lesson.kind === 'challenge') {
+      const states = run.goalStates();
+      const grader = run.doneCount === run.goals.length ? run.graderStates().find(g => !g.ok) : null;
+      card.innerHTML = `<div class="task-label">Challenge <span class="task-count">${run.doneCount} / ${run.goals.length}</span></div>
+        <ul class="task-list">${states.map(g => `<li class="${g.done ? 'done' : ''}">${esc(g.text)}</li>`).join('')}</ul>
+        ${grader ? `<div class="task-extra">${esc(grader.why)}</div>` : ''}`;
+      return;
+    }
+    const cur = run.current;
+    if (!cur) { card.innerHTML = ''; return; }
+    const isGoal = !!cur.keys || !cur.grader && run.doneCount < run.goals.length;
+    const conv = cur.convention && CONVENTIONS[cur.convention];
+    card.innerHTML = `<div class="task-label">${isGoal ? 'Now' : 'Still needed'} <span class="task-count">${run.doneCount} / ${run.goals.length}</span></div>
+      <div class="task-goal">${esc(cur.text)}</div>
+      ${isGoal && run.mode === 'guided' && cur.teach ? `<div class="task-teach">${rich(cur.teach)}</div>` : ''}
+      ${isGoal && keysShown(cur) && cur.keys ? `<div class="task-keys">${keysHtml(cur.keys)}</div>` : ''}
+      ${isGoal && nudgeAt === run.doneCount ? `<div class="goal-nudge">Try it with the keyboard${!keysShown(cur) && cur.keys ? ': the Help tab shows the keys' : ''}.</div>` : ''}
+      ${conv ? `<span class="conv-chip" title="${esc(conv.name)}">${esc(cur.convention)} · ${esc(conv.short)}</span>` : ''}`;
   }
 
   function goalsHtml() {
     const states = run.goalStates(); const splits = run.splits();
     return `<div class="goal-progress"><i style="width:${Math.round(100 * run.doneCount / run.goals.length)}%"></i></div>
       <ol class="goals">${states.map((g, i) => {
-        const showKeys = keysShown(g); const race = raceOf(g.id);
-        // The current goal carries its one-line teaching point (Guided only) and the action on the same line, with the keycaps
+        const race = raceOf(g.id);
+        // the current goal's teach, keys and nudge live in the pinned task card; the list stays lean
         const watching = g.current && demo && demo.goal.id === g.id;
         return `<li class="goal ${g.done ? 'done' : g.current ? 'current' : ''}${watching ? ' watching' : ''}" data-goal="${i}">
-        <span class="goal-mark">${g.done ? '✓' : g.current ? (watching ? '▶' : '›') : ''}</span><span class="goal-text">${g.current && run.mode === 'guided' && g.teach ? `<span class="goal-teach">${rich(g.teach)}</span> ` : ''}${esc(g.text)}${race && g.done && splits[i] != null ? ` <span class="goal-split">${fmtSecs(splits[i])} s</span>` : race && g.current ? ` <span class="goal-split live" data-goal-clock="${i}">0.0 s</span>` : ''}${watching ? ` <span class="goal-demo">watching · Esc skips</span>` : ''}</span>
-        ${showKeys && g.current && g.keys ? `<div class="goal-keys">${keysHtml(g.keys)}</div>` : ''}
-        ${g.current && nudgeAt === i ? `<div class="goal-nudge">Try it with the keyboard${!showKeys && g.keys ? ': the Help tab shows the keys' : ''}.</div>` : ''}</li>`; }).join('')}</ol>`;
+        <span class="goal-mark">${g.done ? '✓' : g.current ? (watching ? '▶' : '›') : ''}</span><span class="goal-text">${esc(g.text)}${race && g.done && splits[i] != null ? ` <span class="goal-split">${fmtSecs(splits[i])} s</span>` : race && g.current ? ` <span class="goal-split live" data-goal-clock="${i}">0.0 s</span>` : ''}${watching ? ` <span class="goal-demo">watching · Esc skips</span>` : ''}</span></li>`; }).join('')}</ol>`;
+  }
+
+  /** The brief, one line until opened: the first sentence as the summary, the rest behind it. */
+  function briefHtml() {
+    const text = String(lesson.brief || lesson.read || '');
+    if (!text) return '';
+    const first = (text.split(/(?<=\.)\s+/)[0] || text);
+    const rest = text.slice(first.length).trim();
+    return `<details class="lesson-brief"><summary>${rich(first)}</summary>${rest ? `<p>${rich(rest)}</p>` : ''}</details>`;
   }
 
   function renderLesson() {
     const body = $('panelBody');
     if (phase !== 'done') {   // 'play', and 'timeup' behind its overlay: the goals as they stood
-      body.innerHTML = `<p class="lesson-read">${rich(lesson.read)}</p>` + goalsHtml();
+      body.innerHTML = briefHtml() + goalsHtml();
       // Every goal has landed but an end-state predicate fails (something a goal produced was undone,
       // a value was changed): show those predicates so the learner sees what still needs to hold.
       const ends = run.endStates();
@@ -184,7 +235,7 @@ export function mountLessonView(root, lesson, { mode = 'guided' } = {}) {
     const p = $('panelBody');
     // Reading is always free (§6): the Read text and the teaching points introduced so far.
     const taught = lesson.goals.slice(0, Math.min(run.doneCount + 1, lesson.goals.length)).filter(g => g.teach);
-    const notes = `<details class="help-notes"><summary>Read the notes again</summary><p>${rich(lesson.read)}</p>${taught.length ? `<p class="lesson-goalsintro">Taught so far</p><ul class="help-taught">${taught.map(g => `<li>${rich(g.teach)}</li>`).join('')}</ul>` : ''}</details>
+    const notes = `<details class="help-notes"><summary>Read the notes again</summary><p>${rich(lesson.read || lesson.brief || '')}</p>${taught.length ? `<p class="lesson-goalsintro">Taught so far</p><ul class="help-taught">${taught.map(g => `<li>${rich(g.teach)}</li>`).join('')}</ul>` : ''}</details>
       <div class="help-links"><a href="#/reference">Shortcut reference</a></div>`;
     if (phase === 'done') { p.innerHTML = `<p class="help-note">Lesson complete. <kbd>Enter</kbd> continues.</p>` + notes; return; }
     const cur = run.current;   // the current goal, or the first failing end-state predicate once every goal has landed
