@@ -270,7 +270,8 @@ export class SheetView {
     const sr = S.selRange(), hasSel = !!S.sel;
     let refColors = {};
     if (ss.editing) refColors = parseFormulaRefs(ss.editBuf).cellColors;
-    const editing = ss.editing, editPointer = ss.editPointer;
+    // an entry pointing on another sheet (Ctrl+PgDn mid-formula) shows only in the formula bar here: the editor box stays on its own sheet
+    const editing = ss.editing && (ss.editOrigin == null || ss.editOrigin === ss.sheetIndex), editPointer = ss.editPointer;
     // the DISPLAYED active cell is the selection ANCHOR (Excel-true)
     const dA = S.dispActive();
 
