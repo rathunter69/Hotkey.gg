@@ -35,7 +35,7 @@ test('every lesson sits in one of its chapter\'s sections; the catalogue lists e
     assert.deepEqual(groups.flatMap(g => g.lessons.map(l => l.id)), ch.lessons.slice().sort((a, b) => names.indexOf(a.section) - names.indexOf(b.section) || ch.lessons.indexOf(a) - ch.lessons.indexOf(b)).map(l => l.id));
   }
   const foundations = CHAPTERS.find(c => c.id === 'foundations');
-  assert.equal(sectionNames(foundations).length, 14, 'Chapter 1 mid-rewrite: the ten legacy sections (the Welcome still holds the legacy race) plus the four authored modules');
+  assert.equal(sectionNames(foundations).length, 17, 'Chapter 1 mid-rewrite: the ten legacy sections (the Welcome still holds the legacy race) plus the seven authored modules');
   assert.ok(sectionsOf(foundations).every(g => g.lessons.length > 0), 'every Chapter 1 section has lessons (the chapter is complete)');
   assert.equal(sectionsOf({ sections: [{ name: 'Soon', blurb: 'arrives later' }], lessons: [] })[0].blurb, 'arrives later', 'an upcoming (empty) section still carries its blurb');
   assert.deepEqual(sectionsOf({ sections: ['A'], lessons: [{ id: 'x' }, { id: 'y', section: 'A' }] }).map(g => [g.name, g.lessons.map(l => l.id)]), [['A', ['y']], ['Basics', ['x']]], 'a lesson without a section falls into Basics after the listed sections');

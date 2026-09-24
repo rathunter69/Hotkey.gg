@@ -47,7 +47,7 @@ const inputsBlue = sh => INPUTS.every(ref => sh.cellAt(ref).fontColor === 'blue'
 const titleAcross = sh => sh.cellAt('A1').ca === TITLE_SPAN;
 
 export default {
-  id: 'challenge-team-format',
+  id: 'challenge-to-standard-in-three-minutes',
   chapter: 'foundations',
   section: 'Format',
   module: 'format',
@@ -94,7 +94,7 @@ export default {
     return patch;
   },
   goals: [
-    { id: 'figures-comma', text: 'The figures C5:F10 are General with stray decimals: give them comma style with no decimals, and the loss in Gross profit reads in parentheses.', convention: 'D1',
+    { id: 'figures-comma', text: 'The figures C5:F10 are General with stray decimals: give them comma style, no decimals, and the Gross profit loss reads in parentheses.', convention: 'D1',
       keys: 'Ctrl+↓ ×2 ↓ → ×2 Ctrl+Shift+↓ Shift+→ ×3 Ctrl+Shift+1 then Alt H 9 Alt H 9',
       check: (s, ses) => { const rep = report(ses); return !!rep && figuresComma(rep) && settled(ses); } },
     { id: 'margin-percent', text: 'Margin % in G5:G10 is a fraction: show it as a percentage to one decimal, Total included.', convention: 'D2',

@@ -58,7 +58,7 @@ export default {
       check: (s, ses) => { const rep = report(ses); return !!rep && checkLine(rep, 0) && settled(ses); } },
     { id: 'sites-check', text: 'In B35, the six sites’ kWh must sum to the Total row: enter =SUM(C5:C10)-C11, and it reads 0 while the total row is honest.', keys: '"=SUM(C5:C10)-C11" ↵', requires: ['check-cell', 'sum-family', 'formula-operators', 'type-to-enter'],
       check: (s, ses) => { const rep = report(ses); return !!rep && checkLine(rep, 1) && settled(ses); } },
-    { id: 'margin-check', text: 'In B36, a margin outside 0 to 100% is a mistake somewhere: enter =IF(AND(H11>=0,H11<=1),0,1), which reads 0 only while the margin is plausible.', keys: '"=IF(AND(H11>=0,H11<=1),0,1)" ↵', requires: ['check-cell', 'formula-basics', 'formula-operators', 'type-to-enter'],
+    { id: 'margin-check', text: 'In B36, a margin outside 0 to 100% is a mistake somewhere: enter =IF(AND(H11>=0,H11<=1),0,1), which reads 0 while the margin is plausible.', keys: '"=IF(AND(H11>=0,H11<=1),0,1)" ↵', requires: ['check-cell', 'formula-basics', 'formula-operators', 'type-to-enter'],
       check: (s, ses) => { const rep = report(ses); return !!rep && checkLine(rep, 2) && settled(ses); } },
     { id: 'format', text: 'Give the three checks B34:B36 the figures’ format, comma style with no decimals, so all three read a plain 0.', keys: '↑ Ctrl+Shift+↑ Ctrl+Shift+1 then Alt H 9 Alt H 9', requires: ['number-formats', 'ctrl-shift-arrow', 'arrow-keys'],
       check: (s, ses) => { const rep = report(ses); return !!rep && allChecks(rep) && checksFormatted(rep) && settled(ses); } },

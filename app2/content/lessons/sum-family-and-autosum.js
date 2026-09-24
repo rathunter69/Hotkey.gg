@@ -34,7 +34,7 @@ const summaryLine = (rep, i) => normFormula(rep.formula('B' + (S + 1 + i))) === 
 const comma0 = c => c.fmtStyle === 'comma' && (c.decimals || 0) === 0;
 
 export default {
-  id: 'sum-family-autosum',
+  id: 'sum-family-and-autosum',
   chapter: 'foundations',
   section: 'Formulas',
   module: 'formulas',

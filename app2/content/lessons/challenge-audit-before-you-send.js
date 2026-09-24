@@ -77,7 +77,7 @@ const printReady = ses => { const p = setup(ses); return p.orientation === 'land
 const pageNumbered = ses => (setup(ses).footer || {}).centre === PAGE_FOOTER;
 
 export default {
-  id: 'challenge-audit-before-send',
+  id: 'challenge-audit-before-you-send',
   chapter: 'foundations',
   section: 'Present and audit',
   module: 'present-and-audit',
@@ -136,7 +136,7 @@ export default {
     { id: 'no-grid', text: 'A grid was drawn over the daily table B15:G21 with the gridlines on: remove every border and turn the gridlines off.',
       keys: 'Ctrl+↓ ×2 ↓ Ctrl+← → Ctrl+Shift+↓ Ctrl+Shift+→ then Alt H B N then Alt W V G',
       check: (s, ses) => { const rep = report(ses); return !!rep && noGrid(rep) && gridlinesOff(rep) && settled(ses); } },
-    { id: 'daily-links', text: 'One daily-table cell is a typed number among links: select B17:G21, open B17 with F2, commit it to every cell with Ctrl+Enter, then Ctrl+` off.', convention: 'F3',
+    { id: 'daily-links', text: 'One daily-table cell is a typed number among links: select B17:G21, open B17 with F2, commit it to every cell with Ctrl+Enter, Ctrl+` off.', convention: 'F3',
       keys: '↓ ×2 Ctrl+Shift+↓ Ctrl+Shift+→ F2 Ctrl+↵ then Ctrl+`',
       check: (s, ses) => { const rep = report(ses); return !!rep && dailyLinked(rep) && !ses.settings.showFormulas && settled(ses); } },
     { id: 'page-number', text: 'The page prints landscape on one sheet but carries no page number: put Page &[Page] of &[Pages] in the center footer section.', convention: 'G1',

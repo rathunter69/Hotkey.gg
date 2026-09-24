@@ -36,7 +36,7 @@ export default {
   conventions: ['D5', 'B3', 'D8'],
   teaches: ['bold-italic-underline', 'borders-menu', 'fills-and-colours'],
   uses: ['keytips', 'row-col-select', 'shift-arrow', 'ctrl-arrow', 'ctrl-home-end', 'sheet-tabs'],
-  prerequisites: ['numbers-a-banker-reads'],
+  prerequisites: ['numbers-a-banker-can-read'],
   brief: 'The Report’s figures now read right, but nothing on the page tells the eye where to look: the title, the first two headers and the total row all sit in plain text. Bold the title and size it up, bold the header and total rows, give the total row a top border, and tint the input block on Inputs. The key is `Alt H B`.',
   goals: [
     { id: 'title-bold', teach: 'Ctrl+B makes the selection bold, Ctrl+I italic and Ctrl+U underlined; on a mixed selection it follows the active cell, so start from a plain cell and every cell goes on.', text: 'The title in A1 is plain text: make it bold with Ctrl+B so the page has a heading.', keys: 'Ctrl+B', requires: ['bold-italic-underline'],

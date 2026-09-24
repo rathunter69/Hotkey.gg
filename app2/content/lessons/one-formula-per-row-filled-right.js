@@ -31,7 +31,7 @@ const blockLinked = ses => bothSheets(ses, (rep, rw) => DAILY_ROWS.every(r => ro
 const showing = ses => !!(ses.settings && ses.settings.showFormulas);
 
 export default {
-  id: 'one-formula-per-row',
+  id: 'one-formula-per-row-filled-right',
   chapter: 'foundations',
   section: 'Formulas',
   module: 'formulas',

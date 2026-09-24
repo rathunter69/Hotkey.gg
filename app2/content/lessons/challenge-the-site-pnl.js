@@ -59,7 +59,7 @@ const totalsLive = sh => ['B', 'C', 'D', 'E'].every(col => {
 const marginLive = sh => holds(sh, 'F5', '=E5/C5') && colConsistent(sh, 'F', ALL_ROWS) && ALL_ROWS.every(r => near(sh.value('F' + r), sh.value('E' + r) / sh.value('C' + r)));
 
 export default {
-  id: 'challenge-site-pl',
+  id: 'challenge-the-site-pnl',
   chapter: 'foundations',
   section: 'Formulas',
   module: 'formulas',
@@ -72,7 +72,7 @@ export default {
   access: 'free',
   minutes: 3,
   conventions: ['B1', 'B2', 'B4', 'E1', 'E5', 'C3'],
-  prerequisites: ['read-the-error'],
+  prerequisites: ['read-the-error-follow-the-trail'],
   brief: 'A sister cluster’s P&L, profit and loss by site, arrived typed from last week with 0.13 typed inside its formulas, two errors and no totals: link it to Raw, anchor the rate, one formula per column, total it, add margin.',
   deviations: ['margin runs to F10 so the Total row carries its own margin; the brief said F5:F9'],
   timeLimit: 170,
@@ -124,7 +124,7 @@ export default {
     { id: 'link-revenue', text: 'Revenue in C5:C9 the same way, pointing at Raw’s J8, then color both link columns B5:C9 green: a link to another sheet is green.', convention: 'B2',
       keys: '→ Ctrl+Shift+↓ "=" Ctrl+PgDn Ctrl+→ → ×3 Ctrl+↓ → ↓ Ctrl+↵ ← Shift+→ Ctrl+Shift+↓ then Alt H F C → ×8 ↵',
       check: (s, ses) => { const rep = report(ses); return !!rep && linked(rep, 'B') && linked(rep, 'C') && green(rep, span('B', 'C', FIRST_SITE, LAST_SITE)) && settled(ses); } },
-    { id: 'rate-anchored', text: 'Energy cost D5:D9 multiplies by a typed 0.13 and D8 is an error: enter =B5*Inputs!$B$4, anchored with F4, into all five with Ctrl+Enter; it stays black.', convention: 'B4',
+    { id: 'rate-anchored', text: 'Energy cost D5:D9 multiplies by a typed 0.13 and D8 is an error: put =B5*Inputs!$B$4, anchored with F4, into all five with Ctrl+Enter.', convention: 'B4',
       keys: '→ ×2 Ctrl+Shift+↓ "=" ← ×2 "*" Ctrl+PgDn ×2 → Ctrl+↓ ↓ F2 F4 Ctrl+↵',
       check: (s, ses) => { const rep = report(ses); return !!rep && rateLinked(rep) && settled(ses); } },
     { id: 'gross-profit', text: 'Gross profit E5:E9 mixes typed numbers, formulas and a #REF! in E7: select E5:E9, point =C5-D5 and commit it into every row with Ctrl+Enter.', convention: 'C3',

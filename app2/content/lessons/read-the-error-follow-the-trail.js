@@ -31,7 +31,7 @@ const costPerKwh = sh => normFormula(sh.formula('B10')) === '=E9/B11' && isNum(s
 const traced = ses => windowKeys(ses).includes('Ctrl+[');
 
 export default {
-  id: 'read-the-error',
+  id: 'read-the-error-follow-the-trail',
   chapter: 'foundations',
   section: 'Formulas',
   module: 'formulas',
@@ -47,7 +47,7 @@ export default {
   conventions: ['F5', 'F3', 'B1'],
   teaches: ['formula-errors'],
   uses: ['edit-mode-f2', 'edit-caret', 'backspace', 'pointing', 'ctrl-enter-fill', 'fill-down-right', 'copy-cut-paste', 'paste-special', 'cross-sheet-ref', 'input-colour-convention', 'sheet-tabs', 'ctrl-arrow', 'shift-arrow', 'home-key', 'arrow-keys', 'type-to-enter'],
-  prerequisites: ['one-formula-per-row'],
+  prerequisites: ['one-formula-per-row-filled-right'],
   brief: 'Costs came back from a colleague with its Total column showing error codes instead of figures, and the cost per kWh line broken with them. Each code is a message about what broke: read it, follow the trail to the cell the formula reads, and fix the input or the formula, never paste a number over it. The key is `Ctrl+[`.',
   goals: [
     { id: 'ref-fix', teach: 'Each error code is a message: #REF! a deleted reference, #NAME? a name Excel does not know, #VALUE! text where a number belongs, #N/A a lookup that found nothing.', text: 'On Costs, Mueller’s total E5 says #REF!, a reference that was deleted: replace the dead tail with a pointer to D5 so it reads =B5+C5+D5.', keys: 'Ctrl+PgDn ×3 Ctrl+↓ Ctrl+→ ↓ ×2 F2 ⌫ ×5 F2 ← ↵', requires: ['formula-errors', 'edit-mode-f2', 'backspace', 'pointing', 'sheet-tabs', 'ctrl-arrow', 'arrow-keys'], convention: 'F5',

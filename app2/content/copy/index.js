@@ -248,10 +248,10 @@ export const COPY = {
    "module": "format",
    "order": "1.5.1",
    "title": "Numbers a banker can read",
-   "brief": "Thousands separators, no decimals, negatives in parentheses for the figures; one decimal for Margin %; three for the energy price; a percentage for the target margin; currency on the total row. Do it with Ctrl+1 first, then with the shortcuts.",
-   "closing": "",
-   "wow": "Every line reads the same way down the page. A negative shows in parentheses, so nobody mistakes it for a dash.",
-   "convention_line": "Parentheses, never a leading minus · One decimals setting per line",
+   "brief": "The Report’s figures are typed the way the feed sent them, with stray decimals and no thousands separators, and a reader who has to squint at 18439.2 in a total stops trusting the page. Format Cells gives every figure the format the team uses, from one dialog, and the shortcut chords, Ctrl+Shift+1, 4 and 5, do the same in one press. The key is `Ctrl+1`.",
+   "closing": "Every figure on the Report now reads the way the team formats it: one decimals setting down each line (D2), the $ on the first and total rows only (D4), and negatives in parentheses by style, never a leading minus (D1). || Ctrl+1 did all of it from one dialog, and the shortcut chords, Ctrl+Shift+1, 4 and 5 with Alt H 9 and 0 for the decimals, did the same in one press; Cedar Park’s kWh still moves the Total.",
+   "wow": "",
+   "convention_line": "Parentheses, never a leading minus · One decimals setting per line · $ on the first and total rows",
    "mac_note": "",
    "story_beat": ""
   },
@@ -260,9 +260,9 @@ export const COPY = {
    "module": "format",
    "order": "1.5.2",
    "title": "Fonts, fills, borders",
-   "brief": "Bold the title and totals and give the totals a top border, not a grid. Fill the input block a light tint, color the two typed rates blue, and size the title one step up.",
-   "closing": "",
-   "wow": "A reviewer can now tell an input from a formula and a total from a line item without reading a single number.",
+   "brief": "The Report’s figures now read right, but nothing on the page tells the eye where to look: the title, the first two headers and the total row all sit in plain text. Bold the title and size it up, bold the header and total rows, give the total row a top border, and tint the input block on Inputs. The key is `Alt H B`.",
+   "closing": "Shift+Space selected a whole row and one press dressed every cell in it: the header row and the total row went bold together, and the total took a top border, never a grid (D5). || The title is the one cell on the page a size up (D8), the input block on Inputs carries the tint that says “change these” (B3), and Cedar Park’s kWh still moves the bold Total.",
+   "wow": "",
    "convention_line": "A top border, never an all-borders grid · A tint marks the input block · No color for decoration",
    "mac_note": "",
    "story_beat": ""
@@ -272,9 +272,9 @@ export const COPY = {
    "module": "format",
    "order": "1.5.3",
    "title": "Alignment and titles",
-   "brief": "Center the title across the report with Center Across Selection, never merge. Right-align the headers over the numbers, indent the day lines under each site, and wrap the long note.",
-   "closing": "",
-   "wow": "Insert a column through the title: it still sits centered, because nothing was merged.",
+   "brief": "The Report’s figures and fonts are right, but the title sits in the corner, the headers sit left while their numbers sit right, and the daily table’s lines all start flush. Center the title across the page without merging, right-align the headers over numbers, indent the daily lines and wrap the long note on Inputs. The key is `Ctrl+1`.",
+   "closing": "The title is centered across the page and no cell was merged, so Ctrl+Shift+→ still sweeps the row and every fill and sort will still work (D7). || The headers sit over their numbers and the daily lines are indented under their heading, so the hierarchy reads without a word added (D6) — and Cedar Park’s kWh still moves the Total.",
+   "wow": "",
    "convention_line": "Merged cells break everything · Indent sub-items; headers over numbers",
    "mac_note": "",
    "story_beat": ""
@@ -284,10 +284,10 @@ export const COPY = {
    "module": "format",
    "order": "1.5.4",
    "title": "The style pass",
-   "brief": "A second, unformatted block arrives: the Costs summary. Bring it to the same standard in one pass with F4 to repeat the last format, the number shortcuts and the Quick Access Toolbar, then remove a stray all-borders grid.",
-   "closing": "",
-   "wow": "Two blocks, one look, in under a minute: formatting is a pass you make, not a job you do cell by cell.",
-   "convention_line": "A top border, never an all-borders grid · Parentheses, never a leading minus · One decimals setting per line",
+   "brief": "A colleague sent the Costs sheet with the figures in General format, Excel’s plain unformatted numbers, and an all-borders grid drawn over the whole block, so it does not read like the rest of the file. Bring it to the format the team uses in one pass: format once, then repeat that format on the next column with a single press. The key is `F4`.",
+   "closing": "The Costs block now reads like the rest of the file: one decimals setting down every figure column (D2), headers right over their numbers, the Total column bold, and the grid gone, because a grid is not structure and a total’s top border is (D5). || You set the comma style once and F4 put it on the next column in one press: format once, F4 everywhere. The toolbar above the ribbon (the QAT, A2) is where the one-press formatting buttons live, and its Alt+6 is All Borders, the button that drew this grid; keep it for the formats you apply first, and let F4 carry them to the next block.",
+   "wow": "",
+   "convention_line": "One decimals setting per line · A top border, never an all-borders grid · Indent sub-items; headers over numbers · Alt+number beats a long Alt chord",
    "mac_note": "",
    "story_beat": ""
   },
@@ -295,11 +295,11 @@ export const COPY = {
    "id": "challenge-to-standard-in-three-minutes",
    "module": "format",
    "order": "1.5.C",
-   "title": "Challenge: to standard in three minutes",
-   "brief": "A seeded, unformatted weekly report for another cluster: figures, percentages, a title, totals and an input block. Bring it to the standard.",
+   "title": "Challenge: the team’s format in three minutes",
+   "brief": "A sister cluster’s weekly report arrived as a bordered grid of General numbers with a minus in the gross profit: give it the format the team uses, from the figures to the centered title, in three minutes.",
    "closing": "",
    "wow": "",
-   "convention_line": "Parentheses, never a leading minus · One decimals setting per line · A top border, never an all-borders grid · Merged cells break everything · Inputs blue, formulas black",
+   "convention_line": "Parentheses, never a leading minus · One decimals setting per line · A top border, never an all-borders grid · Inputs blue, formulas black · Merged cells break everything",
    "mac_note": "",
    "story_beat": ""
   },
@@ -308,10 +308,10 @@ export const COPY = {
    "module": "formulas",
    "order": "1.6.1",
    "title": "Point, don’t type",
-   "brief": "Build gross profit, gross margin % and average price per kWh for one site by pointing at the cells with the arrow keys, never typing an address. Read each formula back with F2.",
-   "closing": "",
-   "wow": "Change the site’s revenue on Raw and watch all three lines move. You built them by pointing, so they point back.",
-   "convention_line": "Build references by pointing; F2 to read back",
+   "brief": "The Report holds this week’s kWh, revenue and energy cost for six sites, and the associate, the colleague who checks your page, wants three calculated lines beside them: gross profit, the average price per kWh and the margin. You build each one by pointing at the cells with the arrow keys, then fill the three formulas down the six sites in one press. The key is `=`.",
+   "closing": "Every calculated line on the Report was built by pointing, never by typing a reference: = then the arrow keys wrote D5 and E5 for you, and F2 showed them lit in color when you read it back (E1). || One row of three formulas, filled down six sites in one press; the $ stays on the first and total rows only (D4), and Domain’s average price answers the moment its kWh changes.",
+   "wow": "",
+   "convention_line": "Build references by pointing; F2 to read back · $ on the first and total rows",
    "mac_note": "",
    "story_beat": ""
   },
@@ -320,9 +320,9 @@ export const COPY = {
    "module": "formulas",
    "order": "1.6.2",
    "title": "SUM family and AutoSum",
-   "brief": "Total the six sites with Alt+= in one press across the block. Then AVERAGE, MIN, MAX, COUNT and COUNTA for the week summary, and see what a blank does to AVERAGE.",
-   "closing": "",
-   "wow": "Six totals from one press, and the summary line tells you a blank is not a zero.",
+   "brief": "The total row is missing its Gross profit SUM, the total’s average price and margin are still blank, and the associate wants a week summary under the report: the average, best and lowest site, and a count of the figures and of the site names. AutoSum over the whole block writes every column’s SUM in one press, and the SUM family covers the rest. The key is `Alt+=`.",
+   "closing": "One press of Alt+= over the six sites’ figures wrote every column’s SUM into the row below at once, Gross profit included. That is E5: AutoSum the whole block in one press, never one column at a time; when the total row is still empty, take it into the selection and the SUMs land in it. || The total row’s average price and margin came in by pointing, and the Week summary reads the six sites with AVERAGE, MAX, MIN, COUNT and COUNTA — clear one site’s kWh and the average and COUNT move while COUNTA does not, because a blank is not a zero.",
+   "wow": "",
    "convention_line": "Alt+= once, across the block",
    "mac_note": "",
    "story_beat": ""
@@ -332,9 +332,9 @@ export const COPY = {
    "module": "formulas",
    "order": "1.6.3",
    "title": "Anchors: $ and F4",
-   "brief": "The wholesale energy price and target margin live on Inputs. Write one energy-cost line that fills down without breaking, cycle F4 through the four anchor states, and fix a mixed-anchor table of sites by price scenario.",
-   "closing": "",
-   "wow": "One input cell, referenced thirty times. Change it once and the whole table follows.",
+   "brief": "The associate, the colleague who checks your page, wants each site’s weekly energy cost at three wholesale prices, what the company pays per kWh: a grid beside the report, sites down, prices across. One formula covers all eighteen cells if its two references are anchored the right way, and F4 sets the anchors for you so you never type a $. The key is `F4`.",
+   "closing": "One formula, =$C5*J$4, covered all eighteen cells: F4 set the anchors while you typed, so the fill stopped breaking in both directions (E2). || The three prices live in their own cells, blue, and the formulas point at them instead of carrying the number inside: one input, one cell (B4). Change a price and its whole column answers.",
+   "wow": "",
    "convention_line": "Know the four anchor states · One input, one cell; formulas reference it",
    "mac_note": "",
    "story_beat": ""
@@ -344,9 +344,9 @@ export const COPY = {
    "module": "formulas",
    "order": "1.6.4",
    "title": "Link across sheets",
-   "brief": "Replace the typed site figures on Report with live links to Raw and Costs, fill them down, and color the links green. External-workbook links would be red, and are avoided.",
-   "closing": "",
-   "wow": "The Report is fully live: correct a figure in the feed and page one updates without anyone retyping.",
+   "brief": "The Report’s site figures are a pasted snapshot of Raw’s totals, so the next feed will leave them stale. Replace them with live links, pointing across sheets while the formula is open, and compute energy cost from the wholesale price on Inputs, so the page updates itself. The key is `Ctrl+PgDn`.",
+   "closing": "The Report is live: pointing across sheets wrote every link for you, Ctrl+Enter put a column of them in at once, and the wholesale price on Inputs now drives every energy cost, gross profit and margin. || Links to another sheet are green (B2), so a reader knows which figures come from elsewhere; a link to another workbook would show red, and the team avoids those (E7).",
+   "wow": "",
    "convention_line": "Links green; external links avoided · Check for stray links before sending",
    "mac_note": "",
    "story_beat": ""
@@ -356,10 +356,10 @@ export const COPY = {
    "module": "formulas",
    "order": "1.6.5",
    "title": "One formula per row, filled right",
-   "brief": "Build this week’s six-day block. Write each line once in the Monday column, select across the week with Ctrl+Shift+→ and fill with Ctrl+R; fix a row whose Thursday was retyped; show the formulas with Ctrl+` to see the pattern.",
-   "closing": "",
-   "wow": "Show formulas: every row is one formula, repeated. That pattern is what a reviewer checks first.",
-   "convention_line": "Write once, fill right · Ctrl+D down, Ctrl+R across",
+   "brief": "The daily table on the Report has to read off Raw’s by-day block, the platform’s kWh for each site on each day. The associate, the colleague who checks your page, filled rows 18 to 21 already and retyped one cell over its formula; Domain’s row 17 is yours, and one formula filled right covers the six days. The key is `Ctrl+R`.",
+   "closing": "Domain’s week went in as one formula filled right, never six typed links (C3), and Ctrl+` showed the pattern with the one dead number standing out; F2 then Ctrl+Enter filled the row back from its own formula instead of retyping it (E3). || Every link in the daily table reads green (B2), and Domain’s Monday on the feed moves the Report’s B17 the moment it changes.",
+   "wow": "",
+   "convention_line": "Write once, fill right · Ctrl+D down, Ctrl+R across · Links green; external links avoided",
    "mac_note": "",
    "story_beat": ""
   },
@@ -368,10 +368,10 @@ export const COPY = {
    "module": "formulas",
    "order": "1.6.6",
    "title": "Read the error, follow the trail",
-   "brief": "Five planted errors sit on Costs: #REF!, #DIV/0!, #NAME?, #VALUE! and #N/A. Read each code, trace it with Ctrl+[ and Ctrl+], and fix the input or the formula. Never paste a value over it.",
-   "closing": "",
-   "wow": "Five errors, five causes, five fixes upstream. Costs is clean and nothing was hardcoded to make it so.",
-   "convention_line": "The count, the proposal, the error code · Go To Special, show formulas, trace",
+   "brief": "Costs came back from a colleague with its Total column showing error codes instead of figures, and the cost per kWh line broken with them. Each code is a message about what broke: read it, follow the trail to the cell the formula reads, and fix the input or the formula, never paste a number over it. The key is `Ctrl+[`.",
+   "closing": "Five error codes, five messages read and answered at the source: a deleted reference, a misspelled name, a word where a figure belongs, a lookup that found nothing, a division by an empty cell (F5), and Ctrl+[ followed the trail to the cell a formula reads, across sheets too (F3). || Not one number was pasted over a formula: the totals are live, black like every formula (B1), and Domain’s lease still moves the cost per kWh.",
+   "wow": "",
+   "convention_line": "The count, the proposal, the error code · Go To Special, show formulas, trace · Inputs blue, formulas black",
    "mac_note": "",
    "story_beat": ""
   },
@@ -380,10 +380,10 @@ export const COPY = {
    "module": "formulas",
    "order": "1.6.C",
    "title": "Challenge: the site P&L",
-   "brief": "A seeded site block with typed figures, an Inputs sheet, two errors and one hardcoded rate: link it, total it, anchor it, fix it, fill the week right.",
+   "brief": "A sister cluster’s P&L, profit and loss by site, arrived typed from last week with 0.13 typed inside its formulas, two errors and no totals: link it to Raw, anchor the rate, one formula per column, total it, add margin.",
    "closing": "",
    "wow": "",
-   "convention_line": "Links green; external links avoided · Inputs blue, formulas black · Write once, fill right · One input, one cell; formulas reference it",
+   "convention_line": "Inputs blue, formulas black · Links green; external links avoided · One input, one cell; formulas reference it · Build references by pointing; F2 to read back · Alt+= once, across the block · Write once, fill right",
    "mac_note": "",
    "story_beat": ""
   },
@@ -392,9 +392,9 @@ export const COPY = {
    "module": "present-and-audit",
    "order": "1.7.1",
    "title": "Fit to one page",
-   "brief": "Set the Report up to print: landscape, fit to one page wide, rows 1 to 3 as print titles, a footer with the file name and date, gridlines off in print. Then read the page the way the MD will.",
-   "closing": "",
-   "wow": "Print preview shows one page, titled, dated and footed. The report is a document now, not a sheet.",
+   "brief": "The Report is finished and the deal team, the people running the sale, will print it and read it on paper, where a page that spills onto a second sheet reads as careless. Set it to print landscape on one page, with the title rows repeated and the file name and date in the footer, so every copy says what it is. The key is `Alt P S P`.",
+   "closing": "The Report now prints on one landscape page with its title rows on every sheet and the file name and date in the footer: the print set-up is part of the model (G1), and a page reads the way the buyer reads it, title, units, timeline, then the answer (G2). || Before it goes out, save it as a new version rather than over the only copy (A6); the sheet itself did not change, and Cedar Park’s kWh still moves the Total.",
+   "wow": "",
    "convention_line": "Fit to page, titles, footer · Title, units, timeline, then the answer · Never overwrite the only copy",
    "mac_note": "",
    "story_beat": ""
@@ -404,9 +404,9 @@ export const COPY = {
    "module": "present-and-audit",
    "order": "1.7.2",
    "title": "The checks row",
-   "brief": "Add a Checks block under the report: report revenue less Raw revenue, sites sum less grand total, margin between 0 and 100%. Label each check, and freeze the block in view.",
-   "closing": "",
-   "wow": "Three checks, three zeros. Break a link on purpose and one of them turns non-zero: the page tells you before a buyer does.",
+   "brief": "The Report is ready to print, but nothing on it says whether it is right: the deal team, the people running the sale, want a line for each thing that must agree before the page goes out. Three such lines under the week summary make a checks row, the first thing a reviewer looks for. The key is `=`.",
+   "closing": "The checks row goes to zero when the page ties: three live differences, one for each thing that must agree, so a broken link or a bad total shows as a number before anyone else sees it (F1). || The revenue check reads the feed across sheets, and Ctrl+[ takes a reviewer straight to the first figure it compares.",
+   "wow": "",
    "convention_line": "The check is a live difference → 0",
    "mac_note": "",
    "story_beat": ""
@@ -416,10 +416,10 @@ export const COPY = {
    "module": "present-and-audit",
    "order": "1.7.3",
    "title": "Hardcode hunt",
-   "brief": "The associate marked up a version of Report with eight planted faults from the day-one list: a literal in a formula, a black input, a retyped Thursday, a title centered with spaces, a minus sign, missing units, an all-borders grid, a hidden column. Find each with Go To Special, show formulas and tracing; fix every one and change nothing else.",
-   "closing": "",
-   "wow": "Eight faults found, eight fixed, nothing else touched. That is the audit pass you make before anything leaves your desk.",
-   "convention_line": "Go To Special, show formulas, trace",
+   "brief": "The associate’s marked-up copy of the Report came back with eight faults from the day-one list, the faults a reviewer checks first, and the page goes to the buyer tonight. The audit pass finds them the way a reviewer would, with Go To Special, show formulas and your eyes on the page, and you fix every one without changing anything else. The key is Ctrl with the backtick key, `Ctrl+Backtick`.",
+   "closing": "Eight faults found in a colleague’s file in two minutes, the way a reviewer finds them: Go To Special for the typed numbers, show formulas for the literal and the retyped Thursday, the page for the rest (F3). || Cedar Park’s emailed figures now read blue, so the one row that is not a link says so (B1), and the title is centered across the page, not merged (D7).",
+   "wow": "",
+   "convention_line": "Go To Special, show formulas, trace · Inputs blue, formulas black · Merged cells break everything",
    "mac_note": "",
    "story_beat": ""
   },
@@ -428,10 +428,10 @@ export const COPY = {
    "module": "present-and-audit",
    "order": "1.7.C",
    "title": "Challenge: audit before you send",
-   "brief": "A seeded report with five planted faults from the list: find and fix all five in three minutes, then set landscape and fit to page.",
+   "brief": "A sister cluster’s finished Report goes to the buyer in three minutes and its checks row ties, yet it carries five faults an audit pass finds: fix every one, change nothing else, then add the page number.",
    "closing": "",
    "wow": "",
-   "convention_line": "Go To Special, show formulas, trace · Fit to page, titles, footer",
+   "convention_line": "Go To Special, show formulas, trace · Inputs blue, formulas black · Merged cells break everything · Fit to page, titles, footer",
    "mac_note": "",
    "story_beat": ""
   },
@@ -1612,6 +1612,966 @@ export const COPY = {
     "lesson_id": "challenge-reshape-the-report",
     "goal_index": "5",
     "text": "Freeze the panes at B4 so the title, units, header row and site column stay in view.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "numbers-a-banker-can-read": [
+   {
+    "lesson_id": "numbers-a-banker-can-read",
+    "goal_index": "0",
+    "text": "Select the kWh sold figures C5:C11, Total included, and give them thousands separators with no decimals: Ctrl+1, then N.",
+    "teach": "A number format changes how a value shows, not the value itself: Ctrl+1 opens Format Cells, whose categories answer to their first letter, N Number, C Currency, P Percentage.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "numbers-a-banker-can-read",
+    "goal_index": "1",
+    "text": "Give Revenue, Energy cost and Gross profit D5:F11 comma style in one press, Ctrl+Shift+1, then Alt H 9 twice: negatives read in parentheses.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "numbers-a-banker-can-read",
+    "goal_index": "2",
+    "text": "The $ goes on a money column’s first and total rows only: make D5:F5, D11:F11 and Prior week’s I5 currency with no decimals, Ctrl+1 then C.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "numbers-a-banker-can-read",
+    "goal_index": "3",
+    "text": "Prior week rev I6:I10 gets thousands separators with no decimals, Cedar Park’s empty I9 included, while I5 keeps the column’s $.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "numbers-a-banker-can-read",
+    "goal_index": "4",
+    "text": "Avg price ($/kWh) shows cents: select G5:G11 from the bottom, Ctrl+Shift+↑ then Shift+↓ off the header, and give it currency, Ctrl+Shift+4.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "numbers-a-banker-can-read",
+    "goal_index": "5",
+    "text": "Margin % H5:H11 reads as a percentage to one decimal: select it the same way, Ctrl+Shift+5 for percent, then Alt H 0 for the decimal.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "numbers-a-banker-can-read",
+    "goal_index": "6",
+    "text": "The daily table B17:G21 will hold thirty kWh figures: format the whole block at once, comma style with Ctrl+Shift+1, then Alt H 9 twice.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "numbers-a-banker-can-read",
+    "goal_index": "7",
+    "text": "On Inputs, the wholesale energy price B4 is quoted to the tenth of a cent: currency with Ctrl+Shift+4, then Alt H 0 for the third decimal.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "numbers-a-banker-can-read",
+    "goal_index": "8",
+    "text": "Does it tie? Watch Cedar Park’s kWh in C9 change to 3,000 and the Total in C11 answer, thousands separator and all.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "fonts-fills-borders": [
+   {
+    "lesson_id": "fonts-fills-borders",
+    "goal_index": "0",
+    "text": "The title in A1 is plain text: make it bold with Ctrl+B so the page has a heading.",
+    "teach": "Ctrl+B makes the selection bold, Ctrl+I italic and Ctrl+U underlined; on a mixed selection it follows the active cell, so start from a plain cell and every cell goes on.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "fonts-fills-borders",
+    "goal_index": "1",
+    "text": "One font, one size, and the title is the one exception: take A1 one size up with Increase Font Size, Alt H F G.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "fonts-fills-borders",
+    "goal_index": "2",
+    "text": "Site and Week in A4:B4 were never bold: select the whole header row 4 with Shift+Space and one Ctrl+B bolds every header at once.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "fonts-fills-borders",
+    "goal_index": "3",
+    "text": "Jump down the site list to the Total in A11, select the whole row 11 with Shift+Space and make the total row bold.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "fonts-fills-borders",
+    "goal_index": "4",
+    "text": "A total takes a top border, never a grid: with row 11 still selected, add the top border with Alt H B P.",
+    "teach": "The Borders menu is Alt H B, then a letter: P a top border, O a bottom, A all borders, N none.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "fonts-fills-borders",
+    "goal_index": "5",
+    "text": "On Inputs, the cells a reader may change are B3:B6: select the block and tint it light blue with Alt H H then Enter.",
+    "teach": "Fill Color is Alt H H, then Enter for the light blue tint or arrows to another swatch; a fill marks a cell, never its value.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "fonts-fills-borders",
+    "goal_index": "6",
+    "text": "Does it tie? Watch Cedar Park’s kWh in C9 change to 3,000 and the Total in C11 answer, in bold above its top border.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "alignment-and-titles": [
+   {
+    "lesson_id": "alignment-and-titles",
+    "goal_index": "0",
+    "text": "The title in A1 belongs over the page: select A1:I1 and center it across the selection with Ctrl+1 then A, never Merge & Center.",
+    "teach": "Center Across Selection (Ctrl+1, then A) centers a title over the selected columns without merging them; a merged cell breaks selection, fill and sorting.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "alignment-and-titles",
+    "goal_index": "1",
+    "text": "A merged title would have stopped you here: go to A1 and press Ctrl+Shift+→ — the selection still sweeps along the row in one press.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "alignment-and-titles",
+    "goal_index": "2",
+    "text": "Numbers align right, so their headers should too: select kWh sold through Prior week rev, C4:I4, and right-align them with Alt H A R.",
+    "teach": "The alignment commands are Alt H A then a letter, L left, C center, R right; a header sits over its numbers when it is aligned the way they are.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "alignment-and-titles",
+    "goal_index": "3",
+    "text": "The units line USD unless stated in A2 is a note, not a figure: make it italic with Ctrl+I so it reads as one.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "alignment-and-titles",
+    "goal_index": "4",
+    "text": "The eight lines under kWh sold by day belong to it: jump to A13, select A14:A21 below it and indent them once with Alt H 6.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "alignment-and-titles",
+    "goal_index": "5",
+    "text": "On Inputs, the source note per utility contract in C4 runs past its column: wrap it inside the cell with Alt H W.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "alignment-and-titles",
+    "goal_index": "6",
+    "text": "Does it tie? Watch Cedar Park’s kWh in C9 change to 3,000 and the Total in C11 answer under the centered title.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "the-style-pass": [
+   {
+    "lesson_id": "the-style-pass",
+    "goal_index": "0",
+    "text": "On Costs, select the three cost columns B4:D8 and give them thousands separators with no decimals in one action, Ctrl+1 then N.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "the-style-pass",
+    "goal_index": "1",
+    "text": "The Total column needs the same format: select E4:E8 and press F4 once; the whole Format Cells action you just did lands on all five cells.",
+    "teach": "F4 outside a formula repeats your last action, a format, a border, a width, an insert, on whatever is selected now: format once, F4 everywhere.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "the-style-pass",
+    "goal_index": "2",
+    "text": "The four headers B3:E3 sit over numbers, so right-align them with Alt H A R; Site in A3 sits over names and stays as it is.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "the-style-pass",
+    "goal_index": "3",
+    "text": "Total ($/wk) is the column a reader looks for first: select E4:E8 again and make it bold with Ctrl+B.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "the-style-pass",
+    "goal_index": "4",
+    "text": "A grid is not structure: select the whole block A3:E8 with Ctrl+A and take every border off with Alt H B N.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "the-style-pass",
+    "goal_index": "5",
+    "text": "Does it tie? Watch Domain’s lease in B4 change to 2,500 and its Total in E4 answer, bold and with its thousands separator.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "challenge-to-standard-in-three-minutes": [
+   {
+    "lesson_id": "challenge-to-standard-in-three-minutes",
+    "goal_index": "0",
+    "text": "The figures C5:F10 are General with stray decimals: give them comma style, no decimals, and the Gross profit loss reads in parentheses.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-to-standard-in-three-minutes",
+    "goal_index": "1",
+    "text": "Margin % in G5:G10 is a fraction: show it as a percentage to one decimal, Total included.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-to-standard-in-three-minutes",
+    "goal_index": "2",
+    "text": "A grid of borders sits over the whole block A4:G10: remove every border from it, because a grid is not structure.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-to-standard-in-three-minutes",
+    "goal_index": "3",
+    "text": "The Total row A10:G10 is a total: make it bold and give it a single top border.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-to-standard-in-three-minutes",
+    "goal_index": "4",
+    "text": "Only the typed figures in C5:E9 are inputs: color them blue, and leave the formulas beside them in automatic black.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-to-standard-in-three-minutes",
+    "goal_index": "5",
+    "text": "The title in A1 belongs over the page: center it across A1:G1 with Center Across Selection, never a merge.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "point-dont-type": [
+   {
+    "lesson_id": "point-dont-type",
+    "goal_index": "0",
+    "text": "Domain’s gross profit is revenue less energy cost: build =D5-E5 in F5 by pointing at the two cells with the arrow keys, not typing them.",
+    "teach": "A formula starts with = and recalculates when its inputs change; while it is open, each arrow key points at a cell and writes its reference for you.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "point-dont-type",
+    "goal_index": "1",
+    "text": "Domain’s average price is revenue divided by kWh: build =D5/C5 in G5 by pointing, jumping the pointer across the row with Ctrl+Left.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "point-dont-type",
+    "goal_index": "2",
+    "text": "Domain’s margin is gross profit divided by revenue: build =F5/D5 in H5 the same way, with a Ctrl+Left jump to reach D5.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "point-dont-type",
+    "goal_index": "3",
+    "text": "Read one back before you trust it: open F5 with F2 so its inputs D5 and E5 light up in color, then leave it unchanged.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "point-dont-type",
+    "goal_index": "4",
+    "text": "Five sites still have no calculated lines: select F5:H10 with Domain’s three formulas at the top and fill them down with Ctrl+D.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "point-dont-type",
+    "goal_index": "5",
+    "text": "The fill carried Domain’s $ sign down the gross-profit column: put F6:F10, and only those, back in comma style with no decimals.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "point-dont-type",
+    "goal_index": "6",
+    "text": "Does it tie? Watch Domain’s kWh in C5 change to 3,000 and its average price in G5 answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "sum-family-and-autosum": [
+   {
+    "lesson_id": "sum-family-and-autosum",
+    "goal_index": "0",
+    "text": "Select the six sites’ figures C5:F10 and press Alt+= once: every column’s SUM lands in the total row, Gross profit’s F11 included.",
+    "teach": "AutoSum, Alt+=, on one empty cell proposes a SUM over the numbers above; over a whole block it writes every column’s SUM into the row below in one press.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "sum-family-and-autosum",
+    "goal_index": "1",
+    "text": "The total row needs its average price: G11 is total revenue over total kWh, D11 divided by C11, pointed the way the site rows were.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "sum-family-and-autosum",
+    "goal_index": "2",
+    "text": "The total row needs its margin: H11 is total gross profit over total revenue, F11 divided by D11, pointed the same way.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "sum-family-and-autosum",
+    "goal_index": "3",
+    "text": "Start a Week summary block under the report: Week summary in A26, bold, then the five line labels A27:A31 as one Enter run.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "sum-family-and-autosum",
+    "goal_index": "4",
+    "text": "Type the first three lines: B27 =AVERAGE(C5:C10) for the average site, B28 =MAX(C5:C10) for the best, B29 =MIN(C5:C10) for the lowest.",
+    "teach": "SUM, AVERAGE, MAX, MIN and COUNT each take one range, =AVERAGE(C5:C10), and a blank inside the range is left out, not counted as zero.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "sum-family-and-autosum",
+    "goal_index": "5",
+    "text": "The three kWh lines B27:B29 read as figures: thousands separators and no decimals, the same comma format the report above uses.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "sum-family-and-autosum",
+    "goal_index": "6",
+    "text": "Count the figures and the names: B30 =COUNT(C5:C10) counts the kWh figures, B31 =COUNTA(A5:A10) counts the site names.",
+    "teach": "COUNT counts the numbers in a range and COUNTA counts every non-empty cell, text included, so COUNT checks the figures and COUNTA checks the names.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "sum-family-and-autosum",
+    "goal_index": "7",
+    "text": "Does it tie? Watch Riverside’s kWh in C7 clear: the average in B27 and the count in B30 answer, and Sites listed in B31 does not.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "anchors-dollar-and-f4": [
+   {
+    "lesson_id": "anchors-dollar-and-f4",
+    "goal_index": "0",
+    "text": "Head the scenario grid: Energy cost at price ($/wk) in J3, bold, then the three prices 0.12, 0.13 and 0.14 across J4:L4 as one Tab run.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "anchors-dollar-and-f4",
+    "goal_index": "1",
+    "text": "The prices are inputs, not headers: select J4:L4, switch off the bold row 4 gave them, color them blue, show them as currency, 2 decimals.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "anchors-dollar-and-f4",
+    "goal_index": "2",
+    "text": "Domain’s cost at $0.12 is kWh times price: in J5 point at C5, F4 until it reads $C5, type *, point at J4, F4 until J$4.",
+    "teach": "F4 inside an open formula cycles the anchors on the reference at the caret, C5, $C$5, C$5, $C5: a $ pins the column or row it sits before.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "anchors-dollar-and-f4",
+    "goal_index": "3",
+    "text": "Give J5 thousands separators, no decimals, then fill it right across J5:L5 with Ctrl+R: $C5 stays on the kWh column, the price moves.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "anchors-dollar-and-f4",
+    "goal_index": "4",
+    "text": "Now the five sites below: extend the selection to J5:L10 and fill down with Ctrl+D; J$4 stays on the price row while the kWh moves.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "anchors-dollar-and-f4",
+    "goal_index": "5",
+    "text": "Read one from the middle of the grid before you trust it: open K7 with F2, see $C7 and K$4 lit in color, then Esc.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "anchors-dollar-and-f4",
+    "goal_index": "6",
+    "text": "The old sensitivity stub under the daily block, a half-built what-if table, is covered by the grid now: select A23:F24 and clear it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "anchors-dollar-and-f4",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the middle price in K4 change to $0.20 and every site’s cost under it, down to Airport’s K10, answer at once.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "link-across-sheets": [
+   {
+    "lesson_id": "link-across-sheets",
+    "goal_index": "0",
+    "text": "Domain’s kWh sold in C5 is a typed copy: replace it with a live link to Raw’s site total I8, pointing across sheets.",
+    "teach": "A reference on another sheet names the sheet first, =Raw!I8: Ctrl+PgDn while the formula is open shows that sheet, and the arrows point there.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "link-across-sheets",
+    "goal_index": "1",
+    "text": "Mueller, Riverside and South Lamar follow: select C6:C8, point one link at Raw’s I9 and commit it into all three with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "link-across-sheets",
+    "goal_index": "2",
+    "text": "Revenue the same way: select D5:D8, point one link at Raw’s J8 and commit it into all four; the reference shifts a row per cell.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "link-across-sheets",
+    "goal_index": "3",
+    "text": "Airport sits below Cedar Park’s emailed row: select C10:D10, point at Raw’s I12 and Ctrl+Enter writes both links, kWh and revenue, at once.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "link-across-sheets",
+    "goal_index": "4",
+    "text": "Energy cost is kWh times the wholesale price on Inputs: select E5:E10, point =C5*Inputs!$B$4, anchor the price (F2, F4), Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "link-across-sheets",
+    "goal_index": "5",
+    "text": "A link to another sheet is green in the format the team uses: color the energy costs E5:E10 green with Font Color, Alt H F C.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "link-across-sheets",
+    "goal_index": "6",
+    "text": "Format once, F4 everywhere: select C5:D8 and press F4 to repeat the green, then C10:D10, leaving Cedar Park’s typed C9:D9 automatic.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "link-across-sheets",
+    "goal_index": "7",
+    "text": "Does it tie? Watch the wholesale price on Inputs change to 0.200 and every energy cost in E5:E10, gross profit and margin answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "one-formula-per-row-filled-right": [
+   {
+    "lesson_id": "one-formula-per-row-filled-right",
+    "goal_index": "0",
+    "text": "Domain’s Monday in B17 is empty: link it to Domain’s Monday I32 in Raw’s by-day block, pointing across sheets.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "one-formula-per-row-filled-right",
+    "goal_index": "1",
+    "text": "Write the row once: with Monday’s link at the left of B17:G17, fill it right and all six days take the same pattern.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "one-formula-per-row-filled-right",
+    "goal_index": "2",
+    "text": "One of the associate’s cells is a number, not a link: show every formula in the daily table and find the one that stands out, E19.",
+    "teach": "Ctrl+` shows every formula’s text in place of its value, so a typed number stands out from the links; press it again to return.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "one-formula-per-row-filled-right",
+    "goal_index": "3",
+    "text": "Riverside’s Thursday E19 was retyped: refill B19:G19 from its own Monday formula with F2 then Ctrl+Enter, never by retyping.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "one-formula-per-row-filled-right",
+    "goal_index": "4",
+    "text": "Bring the values back to the daily table: every cell in B17:G21 now reads as a live link.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "one-formula-per-row-filled-right",
+    "goal_index": "5",
+    "text": "A link to another sheet is shown green, the format the team uses: select B17:G17 and color Domain’s row with Alt H F C.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "one-formula-per-row-filled-right",
+    "goal_index": "6",
+    "text": "Does it tie? Watch Domain’s Monday kWh on Raw’s C8 change to 3,000 and the Report’s B17 answer through the by-day block.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "read-the-error-follow-the-trail": [
+   {
+    "lesson_id": "read-the-error-follow-the-trail",
+    "goal_index": "0",
+    "text": "On Costs, Mueller’s total E5 says #REF!, a reference that was deleted: replace the dead tail with a pointer to D5 so it reads =B5+C5+D5.",
+    "teach": "Each error code is a message: #REF! a deleted reference, #NAME? a name Excel does not know, #VALUE! text where a number belongs, #N/A a lookup that found nothing.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "read-the-error-follow-the-trail",
+    "goal_index": "1",
+    "text": "E6 says #NAME?: SUMM is not a function Excel knows, so edit the name in place to SUM and the total reads 2,580 again.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "read-the-error-follow-the-trail",
+    "goal_index": "2",
+    "text": "E7 says #VALUE!: Ctrl+[ lands on B7, and along that row D7 says tbc where the flat 260 network fee belongs: fill it down from D6.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "read-the-error-follow-the-trail",
+    "goal_index": "3",
+    "text": "Airport’s E8 says #N/A and holds nothing worth keeping: select E5:E8, press F2 on E5, and Ctrl+Enter writes its formula into all four rows.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "read-the-error-follow-the-trail",
+    "goal_index": "4",
+    "text": "B10 now says #DIV/0!, a division by nothing: Ctrl+[ jumps to E9, Ctrl+] back, and it divides by the empty B12, so edit it to =E9/B11.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "read-the-error-follow-the-trail",
+    "goal_index": "5",
+    "text": "B11 is a link to the Report: press Ctrl+[ on it and the trail crosses sheets to Report’s C11, the kWh the cost is spread over.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "read-the-error-follow-the-trail",
+    "goal_index": "6",
+    "text": "Back on Costs, E5:E8 are formulas, not inputs, and must read black like E4: copy E4 and paste its format only onto them with Paste Formats.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "read-the-error-follow-the-trail",
+    "goal_index": "7",
+    "text": "Does it tie? Watch Domain’s lease in B4 change to 2,500 and the cost per kWh in B10 answer through the Total.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "challenge-the-site-pnl": [
+   {
+    "lesson_id": "challenge-the-site-pnl",
+    "goal_index": "0",
+    "text": "kWh sold in B5:B9 is typed from last week’s page: select B5:B9, point one link at Raw’s site total I8, then Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-the-site-pnl",
+    "goal_index": "1",
+    "text": "Revenue in C5:C9 the same way, pointing at Raw’s J8, then color both link columns B5:C9 green: a link to another sheet is green.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-the-site-pnl",
+    "goal_index": "2",
+    "text": "Energy cost D5:D9 multiplies by a typed 0.13 and D8 is an error: put =B5*Inputs!$B$4, anchored with F4, into all five with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-the-site-pnl",
+    "goal_index": "3",
+    "text": "Gross profit E5:E9 mixes typed numbers, formulas and a #REF! in E7: select E5:E9, point =C5-D5 and commit it into every row with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-the-site-pnl",
+    "goal_index": "4",
+    "text": "The Total row B10:E10 is empty: select B5:E10, the block plus its blank edge, and one Alt+= writes every column’s SUM.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-the-site-pnl",
+    "goal_index": "5",
+    "text": "Margin % in F5:F10 is gross profit over revenue: select F5:F10, point =E5/C5 and commit it into all six rows with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "fit-to-one-page": [
+   {
+    "lesson_id": "fit-to-one-page",
+    "goal_index": "0",
+    "text": "Before you set the page, read how far it runs: jump to the last used cell, Z31, then come back to the top of the sheet.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "fit-to-one-page",
+    "goal_index": "1",
+    "text": "A page wider than it is tall prints landscape: turn the Report with Alt P O L.",
+    "teach": "Page Layout › Orientation, Alt P O then L for landscape or P for portrait, turns the printed page without opening a dialog box.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "fit-to-one-page",
+    "goal_index": "2",
+    "text": "One page, however wide the columns run: open Page Setup, choose Fit to, leave the counts at 1 page wide by 1 tall, and OK it.",
+    "teach": "Page Setup, Alt P S P, holds every print setting on its tabbed pages; F picks Fit to, one page wide by one page tall, and Enter is OK.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "fit-to-one-page",
+    "goal_index": "3",
+    "text": "The title, the units line and the header row must top every printed page: set Print Titles to rows 1:4 with Alt P I.",
+    "teach": "Print Titles, Alt P I, opens Page Setup on its Sheet page; the rows typed as Rows to repeat at top, 1:4, print at the top of every page.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "fit-to-one-page",
+    "goal_index": "4",
+    "text": "A printed page must say which file it came from: on Page Setup’s Header/Footer page (Alt+H), put &[File] in the left footer section.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "fit-to-one-page",
+    "goal_index": "5",
+    "text": "A printed page must also say when it was printed: on the Header/Footer page, Alt+R moves to the right section; put &[Date] there and OK it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "fit-to-one-page",
+    "goal_index": "6",
+    "text": "Does it tie? Watch Cedar Park’s kWh in C9 change to 3,000 and the Total in C11 answer: the print set-up changed nothing on the sheet.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "the-checks-row": [
+   {
+    "lesson_id": "the-checks-row",
+    "goal_index": "0",
+    "text": "Head a Checks block under the week summary: Checks in A33, bold, then the three check labels in A34:A36 as one Enter run.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "the-checks-row",
+    "goal_index": "1",
+    "text": "In B34, take the five linked sites’ revenue D5:D8 and D10 and subtract the feed’s own total, pointing at Raw’s J13 across sheets.",
+    "teach": "A check cell is a live difference between two things that must agree, so it reads 0 when they tie and shows the gap when they do not.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "the-checks-row",
+    "goal_index": "2",
+    "text": "In B35, the six sites’ kWh must sum to the Total row: enter =SUM(C5:C10)-C11, and it reads 0 while the total row is honest.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "the-checks-row",
+    "goal_index": "3",
+    "text": "In B36, a margin outside 0 to 100% is a mistake somewhere: enter =IF(AND(H11>=0,H11<=1),0,1), which reads 0 while the margin is plausible.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "the-checks-row",
+    "goal_index": "4",
+    "text": "Give the three checks B34:B36 the figures’ format, comma style with no decimals, so all three read a plain 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "the-checks-row",
+    "goal_index": "5",
+    "text": "A reviewer will ask what the first check compares: from B34, Ctrl+[ follows the trail to D5, the first revenue figure it reads.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "the-checks-row",
+    "goal_index": "6",
+    "text": "Does it tie? Watch a number typed over Mueller’s revenue link in D6 and the revenue check in B34 leave zero: the break is caught.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "hardcode-hunt": [
+   {
+    "lesson_id": "hardcode-hunt",
+    "goal_index": "0",
+    "text": "Typed numbers hide among the links: select C5:E10, run Go To Special for Constants, and color Cedar Park’s emailed figures blue.",
+    "teach": "The audit pass is three looks: Go To Special for typed numbers among links, show formulas for a number in a formula row, the page for the rest.",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "hardcode-hunt",
+    "goal_index": "1",
+    "text": "E9 multiplies the emailed kWh, so the whole Cedar Park row is marked blue until the feed carries the site: move to E9 and press F4.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "hardcode-hunt",
+    "goal_index": "2",
+    "text": "Mueller’s average price G6 divides by a typed 6850, which Ctrl+` shows at a glance: rewrite it as =D6/C6 by pointing.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "hardcode-hunt",
+    "goal_index": "3",
+    "text": "In the daily table Mueller’s Thursday E18 is a number in a formula row: select B18:G18, F2 on the link in G18, Ctrl+Enter, Ctrl+` off.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "hardcode-hunt",
+    "goal_index": "4",
+    "text": "Prior week rev is hidden between H and J, and a buyer who finds one hidden column looks for more: select H:J and press Ctrl+Shift+).",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "hardcode-hunt",
+    "goal_index": "5",
+    "text": "The title was centered by typing spaces in front of it: retype it in A1 without them, then center it across A1:I1 with Ctrl+1 then A.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "hardcode-hunt",
+    "goal_index": "6",
+    "text": "The units line is gone, so a reader cannot tell which currency the figures are in: in A2 press Ctrl+I, then type USD unless stated.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "hardcode-hunt",
+    "goal_index": "7",
+    "text": "A grid sits over the daily table with gridlines on: select B15:G21, take every border off with Alt H B N, then Alt W V G.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "hardcode-hunt",
+    "goal_index": "8",
+    "text": "Does it tie? Watch Cedar Park’s kWh in C9 change to 3,000 and the Total in C11 answer: the page is clean and still live.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "challenge-audit-before-you-send": [
+   {
+    "lesson_id": "challenge-audit-before-you-send",
+    "goal_index": "0",
+    "text": "The title was centered with spaces and the units line is gone: delete the spaces, center A1 across A1:I1, restore USD unless stated in A2.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-audit-before-you-send",
+    "goal_index": "1",
+    "text": "Cedar Park’s emailed figures sit black among the green links: Go To Special constants over C5:D10 finds them; color them blue.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-audit-before-you-send",
+    "goal_index": "2",
+    "text": "Show formulas: one Avg price cell divides by a typed kWh figure, so rewrite G5:G10 as one formula, =D5/C5, with Ctrl+Enter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-audit-before-you-send",
+    "goal_index": "3",
+    "text": "A grid was drawn over the daily table B15:G21 with the gridlines on: remove every border and turn the gridlines off.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-audit-before-you-send",
+    "goal_index": "4",
+    "text": "One daily-table cell is a typed number among links: select B17:G21, open B17 with F2, commit it to every cell with Ctrl+Enter, Ctrl+` off.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "challenge-audit-before-you-send",
+    "goal_index": "5",
+    "text": "The page prints landscape on one sheet but carries no page number: put Page &[Page] of &[Pages] in the center footer section.",
     "teach": "",
     "why": "",
     "hint_stuck": ""

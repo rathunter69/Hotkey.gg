@@ -47,7 +47,7 @@ export default {
   conventions: ['B2', 'E7'],
   teaches: ['cross-sheet-ref'],
   uses: ['pointing', 'formula-basics', 'formula-operators', 'ctrl-enter-fill', 'relative-absolute', 'f4-anchor', 'f4-repeat', 'edit-mode-f2', 'font-color', 'keytips', 'sheet-tabs', 'ctrl-arrow', 'ctrl-shift-arrow', 'shift-arrow'],
-  prerequisites: ['anchors-dollar-f4'],
+  prerequisites: ['anchors-dollar-and-f4'],
   brief: 'The Report’s site figures are a pasted snapshot of Raw’s totals, so the next feed will leave them stale. Replace them with live links, pointing across sheets while the formula is open, and compute energy cost from the wholesale price on Inputs, so the page updates itself. The key is `Ctrl+PgDn`.',
   goals: [
     { id: 'link-kwh', teach: 'A reference on another sheet names the sheet first, =Raw!I8: Ctrl+PgDn while the formula is open shows that sheet, and the arrows point there.', text: 'Domain’s kWh sold in C5 is a typed copy: replace it with a live link to Raw’s site total I8, pointing across sheets.', keys: 'Ctrl+↓ ×2 ↓ → ×2 "=" Ctrl+PgDn Ctrl+→ → ×3 Ctrl+↓ ↓ ↵', requires: ['cross-sheet-ref', 'pointing', 'formula-basics', 'sheet-tabs', 'ctrl-arrow'], convention: 'E7',
@@ -58,7 +58,7 @@ export default {
       check: (s, ses) => { const rep = report(ses); return !!rep && linkedRows(rep, 'C', 'I', [5, 6, 7, 8]) && linkedRows(rep, 'D', 'J', [5, 6, 7, 8]) && !ses.editing; } },
     { id: 'airport', text: 'Airport sits below Cedar Park’s emailed row: select C10:D10, point at Raw’s I12 and Ctrl+Enter writes both links, kWh and revenue, at once.', keys: '← Ctrl+↓ ↑ Shift+→ "=" Ctrl+PgDn Ctrl+→ → ×3 Ctrl+↓ ×2 ↑ Ctrl+↵', requires: ['cross-sheet-ref', 'pointing', 'ctrl-enter-fill', 'relative-absolute', 'shift-arrow', 'sheet-tabs', 'ctrl-arrow'],
       check: (s, ses) => { const rep = report(ses); return !!rep && linkedRows(rep, 'C', 'I', LINK_ROWS) && linkedRows(rep, 'D', 'J', LINK_ROWS) && cedarTyped(rep) && !ses.editing; } },
-    { id: 'energy-cost', text: 'Energy cost is kWh times the wholesale price on Inputs: select E5:E10, enter =C5*Inputs!$B$4 by pointing, F2 then F4 anchoring the price, Ctrl+Enter.', keys: 'Ctrl+↑ ↓ → ×2 Ctrl+Shift+↓ Shift+↑ "=" ← ×2 "*" Ctrl+PgDn ×2 → Ctrl+↓ ↓ F2 F4 Ctrl+↵', requires: ['cross-sheet-ref', 'pointing', 'formula-operators', 'f4-anchor', 'edit-mode-f2', 'ctrl-enter-fill', 'ctrl-shift-arrow', 'shift-arrow', 'sheet-tabs', 'ctrl-arrow'],
+    { id: 'energy-cost', text: 'Energy cost is kWh times the wholesale price on Inputs: select E5:E10, point =C5*Inputs!$B$4, anchor the price (F2, F4), Ctrl+Enter.', keys: 'Ctrl+↑ ↓ → ×2 Ctrl+Shift+↓ Shift+↑ "=" ← ×2 "*" Ctrl+PgDn ×2 → Ctrl+↓ ↓ F2 F4 Ctrl+↵', requires: ['cross-sheet-ref', 'pointing', 'formula-operators', 'f4-anchor', 'edit-mode-f2', 'ctrl-enter-fill', 'ctrl-shift-arrow', 'shift-arrow', 'sheet-tabs', 'ctrl-arrow'],
       check: (s, ses) => { const rep = report(ses); return !!rep && SITE_ROWS.every(r => energyLinked(rep, r)) && cedarTyped(rep) && !ses.editing; } },
     { id: 'green-links', text: 'A link to another sheet is green in the format the team uses: color the energy costs E5:E10 green with Font Color, Alt H F C.', keys: 'Alt H F C → ×8 ↵', requires: ['font-color', 'keytips'], convention: 'B2',
       check: (s, ses) => { const rep = report(ses); return !!rep && SITE_ROWS.every(r => green(rep.cellAt('E' + r))) && allLinksIn(rep); } },

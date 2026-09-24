@@ -22,6 +22,22 @@ import rows_cols_honest_totals from './lessons/rows-cols-honest-totals.js';
 import widths_heights_autofit from './lessons/widths-heights-autofit.js';
 import hide_group_freeze from './lessons/hide-group-freeze.js';
 import challenge_reshape_the_report from './lessons/challenge-reshape-the-report.js';
+import numbers_a_banker_can_read from './lessons/numbers-a-banker-can-read.js';
+import fonts_fills_borders from './lessons/fonts-fills-borders.js';
+import alignment_and_titles from './lessons/alignment-and-titles.js';
+import the_style_pass from './lessons/the-style-pass.js';
+import challenge_to_standard_in_three_minutes from './lessons/challenge-to-standard-in-three-minutes.js';
+import point_dont_type from './lessons/point-dont-type.js';
+import sum_family_and_autosum from './lessons/sum-family-and-autosum.js';
+import anchors_dollar_and_f4 from './lessons/anchors-dollar-and-f4.js';
+import link_across_sheets from './lessons/link-across-sheets.js';
+import one_formula_per_row_filled_right from './lessons/one-formula-per-row-filled-right.js';
+import read_the_error_follow_the_trail from './lessons/read-the-error-follow-the-trail.js';
+import challenge_the_site_pnl from './lessons/challenge-the-site-pnl.js';
+import fit_to_one_page from './lessons/fit-to-one-page.js';
+import the_checks_row from './lessons/the-checks-row.js';
+import hardcode_hunt from './lessons/hardcode-hunt.js';
+import challenge_audit_before_you_send from './lessons/challenge-audit-before-you-send.js';
 import welcome_race from './lessons/welcome-race.js';
 import workbook_sheets_cells from './lessons/workbook-sheets-cells.js';
 import managing_sheets from './lessons/managing-sheets.js';
@@ -74,6 +90,9 @@ export const CHAPTERS = [
       { name: 'Move and select', blurb: 'Jumps, never scrolls: Ctrl+Arrow, the selection set, Go To for far and cross-sheet targets, and Go To Special.' },
       { name: 'Enter, edit, copy and fill', blurb: 'The feed completed and cleaned, then the report skeleton built from it: Tab and Enter, F2, the clipboard, Paste Special values, Replace All and a filled timeline.' },
       { name: 'Structure', blurb: 'Rows and columns that keep the totals honest, widths and heights, and grouping, freezing and never hiding: the report reshaped without breaking it.' },
+      { name: 'Format', blurb: 'Numbers a banker can read, fonts, fills and borders, alignment and titles, and a style pass with F4: the format the team uses, applied once and repeated.' },
+      { name: 'Formulas', blurb: 'Point, don’t type; SUM and its family with AutoSum; anchors and F4; links across sheets; one formula per row filled right; the errors and what they mean.' },
+      { name: 'Present and audit', blurb: 'Fit to one page, a checks row that reads zero, and the hardcode hunt before the page goes in the pack.' },
       { name: 'How Excel works', blurb: 'Workbook, sheets, cells and references; the Ribbon and Alt chords; Formula Bar and Name Box; the Options that matter; page setup; best practices.' },
       { name: 'Moving', blurb: 'Arrows, Ctrl+Arrow, Home and End, Page keys, Go To, between sheets and workbooks.' },
       { name: 'Selecting', blurb: 'Shift+Arrow, Ctrl+Shift+Arrow, whole rows and columns, Ctrl+A regions, Go To Special.' },
@@ -89,6 +108,9 @@ export const CHAPTERS = [
       jump_dont_scroll, select_like_you_mean_it, around_the_workbook, typed_vs_calculated, challenge_find_and_mark,
       enter_the_missing_day, fix_it_in_place, copy_cut_paste_fill, paste_special_values, find_replace_timeline, challenge_complete_the_feed,
       rows_cols_honest_totals, widths_heights_autofit, hide_group_freeze, challenge_reshape_the_report,
+      numbers_a_banker_can_read, fonts_fills_borders, alignment_and_titles, the_style_pass, challenge_to_standard_in_three_minutes,
+      point_dont_type, sum_family_and_autosum, anchors_dollar_and_f4, link_across_sheets, one_formula_per_row_filled_right, read_the_error_follow_the_trail, challenge_the_site_pnl,
+      fit_to_one_page, the_checks_row, hardcode_hunt, challenge_audit_before_you_send,
       welcome_race,
       workbook_sheets_cells, managing_sheets, ribbon_and_keytips, excel_options, page_setup,
       active_cell, moving_around, page_keys, go_to_cells,

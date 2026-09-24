@@ -38,7 +38,7 @@ export default {
   conventions: ['G1', 'G2', 'A6'],
   teaches: ['orientation', 'page-setup', 'fit-to-page', 'print-titles'],
   uses: ['keytips', 'ribbon-tabs', 'ctrl-home-end'],
-  prerequisites: ['read-the-error'],
+  prerequisites: ['read-the-error-follow-the-trail'],
   brief: 'The Report is finished and the deal team, the people running the sale, will print it and read it on paper, where a page that spills onto a second sheet reads as careless. Set it to print landscape on one page, with the title rows repeated and the file name and date in the footer, so every copy says what it is. The key is `Alt P S P`.',
   goals: [
     { id: 'read-the-page', text: 'Before you set the page, read how far it runs: jump to the last used cell, Z31, then come back to the top of the sheet.', keys: 'Ctrl+End Ctrl+Home', requires: ['ctrl-home-end'],
@@ -49,7 +49,7 @@ export default {
       check: (s, ses) => landscape(ses) && fitsOnePage(ses) && !ses.dialog },
     { id: 'print-titles', teach: 'Print Titles, Alt P I, opens Page Setup on its Sheet page; the rows typed as Rows to repeat at top, 1:4, print at the top of every page.', text: 'The title, the units line and the header row must top every printed page: set Print Titles to rows 1:4 with Alt P I.', keys: 'Alt P I "1:4" ↵', requires: ['print-titles', 'page-setup', 'keytips'],
       check: (s, ses) => landscape(ses) && fitsOnePage(ses) && titlesSet(ses) && !ses.dialog },
-    { id: 'footer-file', text: 'A printed page must say which file it came from: on Page Setup’s Header/Footer page, Alt+H, put the field code &[File] in the left footer section.', keys: 'Alt P S P Alt+H "&[File]" ↵', requires: ['print-titles', 'page-setup', 'keytips'],
+    { id: 'footer-file', text: 'A printed page must say which file it came from: on Page Setup’s Header/Footer page (Alt+H), put &[File] in the left footer section.', keys: 'Alt P S P Alt+H "&[File]" ↵', requires: ['print-titles', 'page-setup', 'keytips'],
       check: (s, ses) => landscape(ses) && fitsOnePage(ses) && titlesSet(ses) && footerLeft(ses) && !ses.dialog },
     { id: 'footer-date', text: 'A printed page must also say when it was printed: on the Header/Footer page, Alt+R moves to the right section; put &[Date] there and OK it.', keys: 'Alt P S P Alt+H Alt+R "&[Date]" ↵', requires: ['print-titles', 'page-setup', 'keytips'], convention: 'G1',
       check: (s, ses) => wholeSetup(ses) && !ses.dialog },
