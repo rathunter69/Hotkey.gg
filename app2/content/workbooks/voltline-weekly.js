@@ -9,7 +9,7 @@
 // $0.13 = energy cost); sessions and tariffs arrive in Chapter 3. Figures are deterministic
 // (seeded once, rounded to tens) so checks can read the sheet and still assert exact numbers.
 import { mulberry32 } from '../../engine/rng.js';
-import { FMT_FIELDS, Sheet, ROWH_DEFAULT, normGroups } from '../../engine/sheet.js';
+import { FMT_FIELDS, Sheet, ROWH_DEFAULT, normGroups, stepFsz } from '../../engine/sheet.js';
 
 export const SITES = ['Domain', 'Mueller', 'Riverside', 'South Lamar', 'Airport'];
 export const SITE_PRICE = { Domain: 0.45, Mueller: 0.44, Riverside: 0.46, 'South Lamar': 0.43, Airport: 0.48 };
@@ -36,6 +36,8 @@ export const OLD_CODES = { Domain: 'AUS-01', Mueller: 'AUS-02', Riverside: 'AUS-
 export const CEDAR_PARK = { kwh: 2140, revenue: 1005.8, energy: 278.2 };
 /** Where the platform feed's site-totals block sits on Raw (H6:M13): the live SUMs 1.3.4 freezes and 1.4.1 watches. */
 export const RAW_TOTALS = { headerRow: 7, firstRow: 8, totalRow: 13, cols: { site: 'H', kwh: 'I', revenue: 'J', energy: 'K', prior: 'L', code: 'M' } };
+/** The platform's by-day block on Raw (H30:N36): Mon–Sat of this week across I:N, the five feed sites down rows 32–36 (1.6.5 links the Report's daily block to it); below row 27 so 1.3.2's Find Next walk meets the feed's typos first. */
+export const RAW_BYDAY = { headerRow: 31, firstRow: 32, days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], dayCols: ['I', 'J', 'K', 'L', 'M', 'N'] };
 
 /* ---------------- the S0 sheets ---------------- */
 
@@ -89,6 +91,15 @@ function rawCells() {
   });
   cells.H13 = { value: 'Total', bold: true };
   for (const col of ['I', 'J', 'K', 'L']) cells[col + '13'] = { formula: `=SUM(${col}8:${col}12)` };
+  // …and this week's kWh by site and day (H30:N36), live off the feed: the Report's daily block links to it in 1.6.5
+  cells['H' + (RAW_BYDAY.headerRow - 1)] = { value: 'kWh by day, this week (platform)', bold: true };
+  cells['H' + RAW_BYDAY.headerRow] = { value: 'Site', bold: true };
+  RAW_BYDAY.days.forEach((d, j) => { cells[RAW_BYDAY.dayCols[j] + RAW_BYDAY.headerRow] = { value: d, bold: true }; });
+  SITES.forEach((site, i) => {
+    const r = RAW_BYDAY.firstRow + i;
+    cells['H' + r] = { value: site };
+    RAW_BYDAY.dayCols.forEach((col, j) => { cells[col + r] = { formula: `=C${8 + 12 * i + j}` }; });
+  });
   return cells;
 }
 
@@ -306,9 +317,175 @@ const S4c = derive(S4b, s => {
   sh.freeze = { r: 4, c: 1 };
 });
 
-export const STATES = { S0, S1a, S1b, S1c, S1d, S2a, S3a, S3b, S3c, S3d, S3e, S4a, S4b, S4c };
+/* ---------------- module 1.5: format (the format the team uses) ---------------- */
+
+const fmt = (cells, refs, style, decimals) => { for (const ref of refs) cells[ref] = { ...(cells[ref] || {}), fmtStyle: style, decimals }; };
+const span = (col1, col2, r1, r2) => { const out = []; for (let c = col1.charCodeAt(0); c <= col2.charCodeAt(0); c++) for (let r = r1; r <= r2; r++) out.push(String.fromCharCode(c) + r); return out; };
+const each = (cells, refs, fn) => { for (const ref of refs) { cells[ref] = { ...(cells[ref] || {}) }; fn(cells[ref]); } };
+/** The Report's site rows and total row, its money columns, and the columns the formats cover. */
+export const REPORT = { siteRows: [5, 6, 7, 8, 9, 10], totalRow: 11, cedarRow: 9, money: ['D', 'E', 'F'], dailyRows: [17, 18, 19, 20, 21], dayCols: ['B', 'C', 'D', 'E', 'F', 'G'], summaryRow: 26, checksRow: 33 };
+export const TITLE_FSZ = stepFsz(null, 1);   // one step up the ladder (Alt H F G)
+export const SCENARIO_PRICES = [0.12, 0.13, 0.14];   // the energy-price scenarios of 1.6.3 (J4:L4)
+
+// 1.5.1 Numbers a banker can read: thousands separators and no decimals on the figures, $ on the first and total rows,
+// avg price to 2 decimals, Margin % to one decimal, the wholesale price to 3 decimals; negatives read in parentheses by style
+const S5a = derive(S4c, s => {
+  const c = sheetOf(s, 'Report').cells;
+  fmt(c, span('C', 'F', 5, 11), 'comma', 0);
+  fmt(c, span('I', 'I', 5, 10), 'comma', 0);
+  fmt(c, ['D5', 'E5', 'F5', 'I5', 'D11', 'E11', 'F11'], 'currency', 0);   // D4: $ on the first and total rows of a money column
+  fmt(c, span('G', 'G', 5, 11), 'currency', 2);
+  fmt(c, span('H', 'H', 5, 11), 'percent', 1);
+  fmt(c, span('B', 'G', 17, 21), 'comma', 0);   // the daily block, at scale
+  const inp = sheetOf(s, 'Inputs').cells;
+  inp.B4 = { ...inp.B4, fmtStyle: 'currency', decimals: 3 };
+});
+
+// 1.5.2 Fonts, fills, borders: the title bold and one size up, the total row bold with a top border, the input block tinted
+const S5b = derive(S5a, s => {
+  const c = sheetOf(s, 'Report').cells;
+  c.A1 = { ...c.A1, bold: true, fsz: TITLE_FSZ };
+  each(c, span('A', 'Z', 11, 11), x => { x.bold = true; x.bt = true; });   // D5: the whole total row (Shift+Space) bold with a top border, never a grid
+  each(c, span('A', 'Z', 4, 4), x => { x.bold = true; });                    // the whole header row bold (A4:B4 were not)
+  const inp = sheetOf(s, 'Inputs').cells;
+  each(inp, span('B', 'B', 3, 6), x => { x.fill = 'blue'; });   // B3: the input block carries a light tint
+});
+
+// 1.5.3 Alignment and titles: the title centered across the page (never merged), headers right over their numbers, the daily site lines indented, a long label wrapped
+const S5c = derive(S5b, s => {
+  const c = sheetOf(s, 'Report').cells;
+  c.A1 = { ...c.A1, ca: 9 };   // D7: Center Across Selection over A1:I1
+  each(c, span('C', 'I', 4, 4), x => { x.align = 'r'; });
+  each(c, span('A', 'A', 14, 21), x => { x.indent = 1; });   // D6: the lines under the daily table's heading indented
+  c.A2 = { ...c.A2, it: true };                                // the units line reads as a note
+  const inp = sheetOf(s, 'Inputs').cells;
+  inp.C4 = { ...inp.C4, wrap: true };
+});
+
+// 1.5.4 The style pass: the Costs block brought to the same standard (figures comma 0, its total column bold, headers right), the stray grid gone
+const S5d = derive(S5c, s => {
+  const c = sheetOf(s, 'Costs').cells;
+  fmt(c, span('B', 'E', 4, 8), 'comma', 0);
+  each(c, span('E', 'E', 4, 8), x => { x.bold = true; });
+  each(c, span('B', 'E', 3, 3), x => { x.align = 'r'; });
+});
+/** What 1.5.4 plants at its start: the associate's all-borders grid over the Costs block (the lesson removes it). */
+export const PLANT_COSTS_GRID = Object.fromEntries(span('A', 'E', 3, 8).map(ref => ['Costs!' + ref, { ball: true }]));
+
+/* ---------------- module 1.6: formulas ---------------- */
+
+// 1.6.1 Point, don't type: gross profit, avg price and margin for Domain by pointing, then filled down the six sites
+const S6a = derive(S5d, s => {
+  const c = sheetOf(s, 'Report').cells;
+  for (const r of REPORT.siteRows) { c['F' + r] = { ...c['F' + r], formula: `=D${r}-E${r}` }; c['G' + r] = { ...c['G' + r], formula: `=D${r}/C${r}` }; c['H' + r] = { ...c['H' + r], formula: `=F${r}/D${r}` }; }
+});
+
+// 1.6.2 SUM family and AutoSum: the gross-profit total by Alt+= over the block, the total row's avg price and margin, a week summary (AVERAGE, MAX, MIN, COUNT, COUNTA)
+export const SUMMARY_LINES = [
+  ['Average kWh per site', '=AVERAGE(C5:C10)', 'comma'], ['Best site (kWh)', '=MAX(C5:C10)', 'comma'], ['Lowest site (kWh)', '=MIN(C5:C10)', 'comma'],
+  ['Sites with figures', '=COUNT(C5:C10)', 'general'], ['Sites listed', '=COUNTA(A5:A10)', 'general'],
+];
+const S6b = derive(S6a, s => {
+  const c = sheetOf(s, 'Report').cells;
+  c.F11 = { ...c.F11, formula: '=SUM(F5:F10)' };
+  c.G11 = { ...c.G11, formula: '=D11/C11' }; c.H11 = { ...c.H11, formula: '=F11/D11' };
+  c['A' + REPORT.summaryRow] = { value: 'Week summary', bold: true };
+  SUMMARY_LINES.forEach(([label, formula, style], i) => { const r = REPORT.summaryRow + 1 + i; c['A' + r] = { value: label }; c['B' + r] = { formula, ...(style === 'comma' ? { fmtStyle: 'comma', decimals: 0 } : {}) }; });
+});
+
+// 1.6.3 Anchors: the energy-cost scenario grid beside the report (sites down, three prices across), one formula with mixed anchors filled both ways; the old stub under the daily table cleared
+const S6c = derive(S6b, s => {
+  const c = sheetOf(s, 'Report').cells;
+  c.J3 = { value: 'Energy cost at price ($/wk)', bold: true };
+  SCENARIO_PRICES.forEach((p, j) => { const col = String.fromCharCode(74 + j); c[col + '4'] = { value: p, fontColor: 'blue', fmtStyle: 'currency', decimals: 2 }; });
+  for (const r of REPORT.siteRows) for (let j = 0; j < 3; j++) { const col = String.fromCharCode(74 + j); c[col + r] = { formula: `=$C${r}*${col}$4`, fmtStyle: 'comma', decimals: 0 }; }
+  for (const ref of span('A', 'F', 23, 24)) delete c[ref];
+});
+
+// 1.6.4 Link across sheets: the site figures are links to Raw's totals (green), energy cost is kWh × the wholesale price on Inputs; Cedar Park's emailed figures stay typed
+const S6d = derive(S6c, s => {
+  const c = sheetOf(s, 'Report').cells;
+  REPORT.siteRows.forEach(r => {
+    if (r !== REPORT.cedarRow) { const rr = r < REPORT.cedarRow ? 8 + (r - 5) : 12; c['C' + r] = { ...c['C' + r], formula: `=Raw!I${rr}`, fontColor: 'green' }; c['D' + r] = { ...c['D' + r], formula: `=Raw!J${rr}`, fontColor: 'green' }; }
+    c['E' + r] = { ...c['E' + r], formula: `=C${r}*Inputs!$B$4`, fontColor: 'green' };
+  });
+});
+
+// 1.6.5 One formula per row, filled right: the daily block links to Raw's by-day block, one formula filled across and down, green
+const S6e = derive(S6d, s => {
+  const c = sheetOf(s, 'Report').cells;
+  REPORT.dailyRows.forEach((r, i) => REPORT.dayCols.forEach((col, j) => { c[col + r] = { ...c[col + r], formula: `=Raw!${RAW_BYDAY.dayCols[j]}${RAW_BYDAY.firstRow + i}`, fontColor: 'green' }; }));
+});
+/** What 1.6.5 plants: the associate already filled rows 18–21 — and retyped Riverside's Thursday (E19) over its formula. */
+export const PLANT_DAILY = (() => {
+  const out = {};
+  REPORT.dailyRows.slice(1).forEach((r, i) => REPORT.dayCols.forEach((col, j) => { out[`Report!${col}${r}`] = { formula: `=Raw!${RAW_BYDAY.dayCols[j]}${RAW_BYDAY.firstRow + 1 + i}`, fontColor: 'green', fmtStyle: 'comma', decimals: 0 }; }));
+  out['Report!E19'] = { value: KWH.Riverside[9], fontColor: 'green', fmtStyle: 'comma', decimals: 0 };   // Thursday retyped: the right number, dead
+  return out;
+})();
+
+// 1.6.6 Read the error, follow the trail: the Costs block's totals are live formulas again, its cost-per-kWh line reads a link to the Report
+const S6f = derive(S6e, s => {
+  const c = sheetOf(s, 'Costs').cells;
+  for (const r of [5, 6, 7, 8]) c['E' + r] = { ...c['E' + r], formula: `=B${r}+C${r}+D${r}`, fontColor: null };
+  c.D7 = { ...c.D7, value: 260 };
+  c.A9 = { value: 'Total', bold: true }; c.E9 = { formula: '=SUM(E4:E8)', bold: true, fmtStyle: 'comma', decimals: 0 };
+  c.A10 = { value: 'Cost per kWh sold ($)' }; c.B10 = { formula: '=E9/B11', fmtStyle: 'currency', decimals: 3 };
+  c.A11 = { value: 'kWh sold this week' }; c.B11 = { formula: '=Report!C11', fontColor: 'green', fmtStyle: 'comma', decimals: 0 };
+});
+/** What 1.6.6 plants: five errors on Costs — #REF!, #NAME?, #VALUE! (a text figure), #N/A, #DIV/0! — around the same lines. */
+export const PLANT_COSTS_ERRORS = {
+  'Costs!E5': { formula: '=B5+C5+#REF!', fontColor: 'blue' },
+  'Costs!E6': { formula: '=SUMM(B6:D6)', fontColor: 'blue' },
+  'Costs!D7': { value: 'tbc', fontColor: 'blue' }, 'Costs!E7': { formula: '=B7+C7+D7', fontColor: 'blue' },   // a word where a figure belongs: #VALUE!
+  'Costs!E8': { formula: '=VLOOKUP("Airport ",A4:D8,4,FALSE)', fontColor: 'blue' },
+  'Costs!A9': { value: 'Total', bold: true }, 'Costs!E9': { formula: '=SUM(E4:E8)', bold: true, fmtStyle: 'comma', decimals: 0 },
+  'Costs!A10': { value: 'Cost per kWh sold ($)' }, 'Costs!B10': { formula: '=E9/B12', fmtStyle: 'currency', decimals: 3 },
+  'Costs!A11': { value: 'kWh sold this week' }, 'Costs!B11': { formula: '=Report!C11', fontColor: 'green', fmtStyle: 'comma', decimals: 0 },
+};
+
+/* ---------------- module 1.7: present and audit ---------------- */
+
+/** The Report's print set-up after 1.7.1 (G1): landscape, one page wide, the heads repeated, file and date in the footer. */
+export const REPORT_PAGE_SETUP = { orientation: 'landscape', scaling: 'fit', adjustTo: 100, fitWide: 1, fitTall: 1, titlesRows: '$1:$4', footer: { left: '&[File]', centre: '', right: '&[Date]' }, printGridlines: false };
+const S7a = derive(S6f, s => { s.settings.pageSetup = clone(REPORT_PAGE_SETUP); });
+
+// 1.7.2 The checks row: three live differences that read zero when the page ties (F1)
+export const CHECK_LINES = [
+  ['Report revenue ties to the feed', '=SUM(D5:D8,D10)-Raw!J13'],
+  ['Sites sum to the total', '=SUM(C5:C10)-C11'],
+  ['Margin within 0–100%', '=IF(AND(H11>=0,H11<=1),0,1)'],
+];
+const S7b = derive(S7a, s => {
+  const c = sheetOf(s, 'Report').cells;
+  c['A' + REPORT.checksRow] = { value: 'Checks', bold: true };
+  CHECK_LINES.forEach(([label, formula], i) => { const r = REPORT.checksRow + 1 + i; c['A' + r] = { value: label }; c['B' + r] = { formula, fmtStyle: 'comma', decimals: 0 }; });
+});
+
+// 1.7.3 Hardcode hunt: the associate's markup fixed — the one thing that stays fixed is Cedar Park's emailed figures shown as the inputs they are (B1)
+const S7c = derive(S7b, s => {
+  const c = sheetOf(s, 'Report').cells;
+  for (const ref of ['C9', 'D9', 'E9']) c[ref] = { ...c[ref], fontColor: 'blue' };
+});
+/** What 1.7.3 plants: seven of the eight violations (the eighth, Cedar Park's black inputs, is already in S7b). */
+export const PLANT_AUDIT = (() => {
+  const out = {};
+  out['Report!G6'] = { formula: '=D6/6850', fmtStyle: 'currency', decimals: 2 };                  // a literal where C6 belongs
+  out['Report!E18'] = { value: KWH.Mueller[9], fontColor: 'green', fmtStyle: 'comma', decimals: 0 };   // Mueller's Thursday retyped
+  out['Report!A1'] = { value: '            ' + REPORT_TITLE, bold: true, fsz: TITLE_FSZ };            // centered by padding, Center Across gone
+  out['Report!A2'] = null;                                                                          // the units line gone
+  for (const ref of span('B', 'G', 15, 21)) out['Report!' + ref] = { ball: true };                 // a grid over the daily table…
+  out['Report!#gridlines'] = true;                                                                  // …with gridlines on
+  out['Report!#hiddenCols'] = [9];                                                                  // Prior week rev hidden
+  return out;
+})();
+const AUDIT_CELLS = ['G6', 'E18', 'A1', 'A2', ...span('B', 'G', 15, 21), 'C9', 'D9', 'E9'];
+/** The cells 1.7.3 may change (its graders diff against S7c and allow nothing else). */
+export const AUDIT_ALLOWED = AUDIT_CELLS;
+
+export const STATES = { S0, S1a, S1b, S1c, S1d, S2a, S3a, S3b, S3c, S3d, S3e, S4a, S4b, S4c, S5a, S5b, S5c, S5d, S6a, S6b, S6c, S6d, S6e, S6f, S7a, S7b, S7c };
 export const STATE_ORDER = Object.keys(STATES);
-// S5a–S8raw arrive with modules 1.5–1.8 (later C2 runs); each derives from the one before.
+// S8raw / S8done arrive with module 1.8 (Run 4).
 
 /** A deep clone of a named state (runners mutate their copy, never the master). */
 export function stateOf(id) {
@@ -330,9 +507,12 @@ export function sessionToState(ses) {
       return { name: e.name, cells: S.cells, colW, rowH, gridlines: S.gridlines === false ? false : undefined,
         hiddenRows: [...S.hiddenRows], hiddenCols: [...S.hiddenCols], freeze: { ...S.freeze }, groups: S.groups };
     }),
-    settings: { calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat.slice() },
+    settings: { calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat.slice(), pageSetup: clone(ses.settings.pageSetup) },
   };
 }
+/** The engine's Page Setup default: what a state means when it says nothing about printing. */
+export const PAGE_SETUP_DEFAULT = { orientation: 'portrait', scaling: 'adjust', adjustTo: 100, fitWide: 1, fitTall: 1, titlesRows: '', footer: { left: '', centre: '', right: '' }, printGridlines: false };
+const normSettings = st => ({ ...(st || {}), pageSetup: { ...PAGE_SETUP_DEFAULT, ...((st || {}).pageSetup || {}), footer: { ...PAGE_SETUP_DEFAULT.footer, ...(((st || {}).pageSetup || {}).footer || {}) } } });
 
 /* ---------------- diffing (the chain test and audit graders read this) ---------------- */
 
@@ -380,6 +560,6 @@ export function diffStates(a, b) {
     const NOG = { rows: [], cols: [] };
     if (!same(normGroups(sa.groups || NOG), normGroups(sb.groups || NOG))) out.push({ sheet: name, kind: 'groups', key: 'groups', a: sa.groups, b: sb.groups });
   }
-  if (!same(a.settings || {}, b.settings || {})) out.push({ sheet: '*', kind: 'settings', key: 'settings', a: a.settings, b: b.settings });
+  if (!same(normSettings(a.settings), normSettings(b.settings))) out.push({ sheet: '*', kind: 'settings', key: 'settings', a: a.settings, b: b.settings });
   return out;
 }

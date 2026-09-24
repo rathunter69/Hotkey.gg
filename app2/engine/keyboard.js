@@ -229,6 +229,7 @@ export class Session {
   resetEdit() {
     this.editing = false; this.editBuf = ''; this.editCaret = 0; this.editMode = 'enter';
     this.editAnchor = null; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null; this.editPointed = false;
+    this.editOrigin = null;   // the sheet an open formula entry belongs to while another sheet shows for pointing (Ctrl+PgDn mid-formula)
     this.autoSumEdit = false;
   }
   onChange(fn) { this.listeners.add(fn); return () => this.listeners.delete(fn); }
@@ -279,7 +280,11 @@ export class Session {
     this.editAnchor = { r: a.r, c: a.c };
     this.endPoint(); this.editPointed = false;
   }
-  cancelEdit() { this.autoSumEdit = false; this.editing = false; this.editBuf = ''; this.editAnchor = null; this.endPoint(); }
+  cancelEdit() { this.leaveOrigin(); this.autoSumEdit = false; this.editing = false; this.editBuf = ''; this.editAnchor = null; this.endPoint(); }
+  /** Pointing across sheets is over (commit, cancel): the entry's own sheet shows again. */
+  leaveOrigin() { const i = this.editOrigin; if (i == null) return; this.editOrigin = null; if (i !== this.sheetIndex && this.sheets[i]) { this.sheetIndex = i; this.sheet = this.sheets[i].sheet; this.emit('sheet'); } }
+  /** `Sheet!` for a ref pointed on another sheet than the entry's own; '' at home. */
+  sheetPrefix() { if (this.editOrigin == null || this.editOrigin === this.sheetIndex) return ''; const n = this.sheets[this.sheetIndex].name; return (/^[A-Za-z_][A-Za-z0-9_.]*$/.test(n) ? n : "'" + n.replace(/'/g, "''") + "'") + '!'; }
   /** The cell an edit writes to: the displayed active cell it opened on. */
   editCell() { const a = this.editAnchor || this.sheet.dispActive(); return { r: a.r, c: a.c }; }
   endPoint() { this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null; }
@@ -291,6 +296,7 @@ export class Session {
    * `via` ({kind:'enter'|'tab'|'move', shift}) is remembered so an accepted autocorrect replays the same key.
    */
   commitEdit(dr, dc, via) {
+    this.leaveOrigin();
     const S = this.sheet;
     const asStay = this.autoSumEdit; this.autoSumEdit = false;
     const buf = this.editBuf.trim();
@@ -308,6 +314,7 @@ export class Session {
   }
   /** Ctrl+Enter: the buffer into every selected cell (formulas translate from the edited cell); the cursor stays. */
   commitEditAll() {
+    this.leaveOrigin();
     const S = this.sheet;
     const buf = this.editBuf.trim();
     const { r: ar, c: ac } = this.editCell();
@@ -352,10 +359,12 @@ export class Session {
   /** Where a pointer step lands: one cell (clamped), or with Ctrl the block edge Sheet.ctrlJump finds. */
   pointTarget(from, dr, dc, ctrl) { const S = this.sheet; return ctrl ? S.ctrlJump(from.r, from.c, dr, dc) : S.clamp(from.r + dr, from.c + dc); }
   startPointerFromArrow(dr, dc, ctrl) {
-    const t = this.pointTarget(this.editAnchor, dr, dc, ctrl);
-    if (t.r === this.editAnchor.r && t.c === this.editAnchor.c) return false;
+    const pre = this.sheetPrefix();
+    const base = pre ? this.sheet.dispActive() : this.editAnchor;   // on another sheet the pointer sets off from that sheet's active cell
+    const t = this.pointTarget(base, dr, dc, ctrl);
+    if (t.r === base.r && t.c === base.c) return false;
     this.editPointerStart = this.editBuf.length; this.editPointer = { r: t.r, c: t.c }; this.editPointerBase = null;
-    this.editBuf += refKey(t.r, t.c); this.editCaret = this.editBuf.length; this.editPointed = true;
+    this.editBuf += pre + refKey(t.r, t.c); this.editCaret = this.editBuf.length; this.editPointed = true;
     return true;
   }
   /** An arrow with no live pointer: re-point a bare trailing in-sheet ref, else append anchor+step (=LOG10 ↓ → =LOG10C6, never =J11). */
@@ -363,14 +372,15 @@ export class Session {
     const S = this.sheet;
     const m = refTail(this.editBuf);
     if (m && !OPERATOR_BOUNDARY.test(this.editBuf)) {
-      const pr = parseRef(m.ref);
-      if (pr && S.inb(pr.r, pr.c)) { this.editPointerStart = m.start; this.editPointer = { r: pr.r, c: pr.c }; this.editPointerBase = null; return this.movePointer(dr, dc, false, ctrl); }
+      const pr = parseRef(m.ref); const pre = this.sheetPrefix();
+      const prefixed = pre && this.editBuf.slice(Math.max(0, m.start - pre.length), m.start) === pre;   // a Sheet!ref pointed here re-points as one token
+      if (pr && S.inb(pr.r, pr.c) && (!pre || prefixed)) { this.editPointerStart = m.start - (prefixed ? pre.length : 0); this.editPointer = { r: pr.r, c: pr.c }; this.editPointerBase = null; return this.movePointer(dr, dc, false, ctrl); }
     }
     return this.startPointerFromArrow(dr, dc, ctrl);
   }
   writePointerRef() {
     const p = this.editPointer, b = this.editPointerBase;
-    this.editBuf = this.editBuf.slice(0, this.editPointerStart) + (b ? refKey(b.r, b.c) + ':' + refKey(p.r, p.c) : refKey(p.r, p.c));
+    this.editBuf = this.editBuf.slice(0, this.editPointerStart) + this.sheetPrefix() + (b ? refKey(b.r, b.c) + ':' + refKey(p.r, p.c) : refKey(p.r, p.c));
     this.editCaret = this.editBuf.length;
   }
   movePointer(dr, dc, extend, ctrl) {
@@ -1132,6 +1142,11 @@ export class Session {
     const S = this.sheet; const a = S.dispActive(); const c = S.get(a.r, a.c); if (!c.formula) return;
     const refs = formulaRefs(c.formula, { rows: S.rows, cols: S.cols }); if (!refs.length) return;
     const first = refs[0]; const p = first.key ? parseRef(first.key) : { r: first.range.r1, c: first.range.c1 };
+    if (first.sheet) {   // a link: the precedent is on another sheet (Excel follows it)
+      const i = this.sheets.findIndex(x => x.name.toLowerCase() === String(first.sheet).toLowerCase()); if (i < 0) return;
+      const T = this.sheets[i].sheet; if (!T.inb(p.r, p.c)) return;
+      this.switchSheet(i); T.goTo(p.r, p.c); return;
+    }
     if (!S.inb(p.r, p.c)) return;
     S.goTo(p.r, p.c);
   }
@@ -1317,7 +1332,12 @@ export class Session {
       return true;
     }
     if (k === 'F2') { this.editMode = this.editMode === 'edit' ? 'enter' : 'edit'; this.endPoint(); this.logKey('F2'); return true; }   // F2 ends point mode: the ref becomes plain text
-    if ((k === 'PageDown' || k === 'PageUp') && e.ctrlKey && !e.altKey) {   // the next / previous sheet: an Enter-mode entry commits first (as an arrow would); F2 and point mode swallow it
+    if ((k === 'PageDown' || k === 'PageUp') && e.ctrlKey && !e.altKey) {   // the next / previous sheet: an Enter-mode entry commits first (as an arrow would); F2 swallows it
+      if (this.editBuf[0] === '=' && this.editMode !== 'edit') {   // a formula being entered stays open on its cell: the next sheet shows, and arrows point there as Sheet!refs (Excel)
+        const idx = Math.max(0, Math.min(this.sheets.length - 1, this.sheetIndex + (k === 'PageDown' ? 1 : -1)));
+        if (idx !== this.sheetIndex) { if (this.editOrigin == null) this.editOrigin = this.sheetIndex; this.sheetIndex = idx; this.sheet = this.sheets[idx].sheet; this.endPoint(); this.logKey(k === 'PageDown' ? 'Ctrl+PgDn' : 'Ctrl+PgUp'); this.emit('sheet'); }
+        return true;
+      }
       if (this.editMode === 'edit' || this.editPointer) return true;
       S.tabHome = null;
       if (!this.commitEdit(0, 0, { kind: 'move' })) return true;

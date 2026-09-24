@@ -93,7 +93,7 @@ test('sheets: Ctrl+PgDn / Ctrl+PgUp step without wrapping and always log; an ope
   s.run('Ctrl+PageDown'); assert.equal(s.sheetIndex, 1); assert.equal(keys(s).at(-1), 'Ctrl+PgDn');   // either spelling in a script
   s.run('"abc"'); assert.equal(s.editing, true); s.run('Ctrl+PgDn'); assert.equal(s.editing, false); assert.equal(s.sheetIndex, 2); assert.equal(s.sheets[1].sheet.value('A1'), 'abc');   // Enter mode: the entry commits, then the sheet changes (Excel)
   s.run('Ctrl+PgUp F2 Ctrl+PgDn'); assert.equal(s.editing, true); assert.equal(s.sheetIndex, 1); s.run('Escape');   // Edit mode (F2) swallows it
-  s.run('"=" Down Ctrl+PgDn'); assert.equal(s.editing, true); assert.equal(s.sheetIndex, 1); s.run('Escape');           // so does point mode
+  s.run('"=" Down Ctrl+PgDn'); assert.equal(s.editing, true); assert.equal(s.sheetIndex, 2); assert.equal(s.editBuf, '=A2'); s.run('Escape'); assert.equal(s.sheetIndex, 1);   // a formula entry stays open and the next sheet shows for pointing; Esc comes home
   s.run('Alt H'); assert.equal(s.mode, 'ribbon'); s.run('Ctrl+PgUp'); assert.equal(s.mode, 'ribbon');   // a dialog-less walk swallows the chord (Excel ignores it too)
   s.run('Escape Escape'); s.run('Ctrl+PgDn'); assert.equal(s.mode, 'normal'); assert.equal(s.sheetIndex, 2); s.run('Ctrl+PgUp'); assert.equal(s.sheetIndex, 1);
   // Shift+F11 inserts a sheet before the active one and goes to it
@@ -373,4 +373,17 @@ test('the clipboard is the workbook’s: a block copied on one sheet pastes on a
   // Copy then Enter drops once, across sheets too
   s.run('Ctrl+PgUp Ctrl+Home Down Ctrl+C Ctrl+PgDn Ctrl+Home Down Down Down Down Down Enter');
   assert.equal(data.value('A6'), 2); assert.equal(data.clipboard, null); assert.equal(data.selectionText(), 'A6');
+});
+
+test('pointing across sheets: Ctrl+PgDn mid-formula shows the next sheet, arrows write Sheet!refs, Enter commits on the sheet the entry began; Ctrl+[ follows a link', () => {
+  const s = fresh({ A1: { value: 'x' } }); const data = new Sheet({ cells: { B2: { value: 5 }, B3: { value: 7 } } }); s.addSheet('Data', data); const first = s.sheet;
+  s.run('Down "=" Ctrl+PgDn Right Down'); assert.equal(s.sheet, data); assert.equal(s.editBuf, '=Data!B2'); assert.equal(s.editing, true);
+  s.run('Down'); assert.equal(s.editBuf, '=Data!B3', 'the pointer moves on that sheet');
+  s.run('"+" Ctrl+PgUp Up'); assert.equal(s.sheet, first); assert.equal(s.editBuf, '=Data!B3+A1', 'back on the entry’s own sheet, pointing is plain again');
+  s.run('Enter'); assert.equal(s.sheet, first); assert.equal(first.cellAt('A2').formula, '=Data!B3+A1'); assert.equal(s.sheetIndex, 0); assert.equal(first.selectionText(), 'A3');
+  s.run('"=SUM(" Ctrl+PgDn Right Down Ctrl+Shift+Down ")" Enter'); assert.equal(first.cellAt('A3').formula, '=SUM(Data!B2:B3)'); assert.equal(first.value('A3'), 12); assert.equal(first.selectionText(), 'A4');
+  s.run('"=" Ctrl+PgDn Escape'); assert.equal(s.sheet, first); assert.equal(s.editing, false, 'Esc comes home too');
+  s.run('"text" Ctrl+PgDn'); assert.equal(first.value('A4'), 'text'); assert.equal(s.sheet, data, 'a text entry commits, then the sheet switches');
+  s.run('Ctrl+PgUp'); first.goTo(3, 1); s.run('Ctrl+['); assert.equal(s.sheet, data); assert.equal(data.selectionText(), 'B2', 'Ctrl+[ follows the link to its sheet');
+  assert.ok(s.keyLog.map(e => e.k).includes('Ctrl+PgDn'));
 });

@@ -39,6 +39,9 @@ export class LessonRun {
       this.seedNo = Number.isFinite(this.opts.seedNo) ? this.opts.seedNo >>> 0 : (Math.random() * 4294967296) >>> 0;
       applyStatePatch(moduleState, this.lesson.seed(mulberry32(this.seedNo)) || {});
     }
+    // A lesson's planting (C2 Run 3): what arrived in the file for this lesson to fix — the associate's grid, a
+    // retyped Thursday, five errors on Costs — applied over `before` so the chain of states stays honest.
+    if (moduleState && this.lesson.plant && typeof this.lesson.plant === 'object') applyStatePatch(moduleState, this.lesson.plant);
     // a test's or a Daily's patch: { '<Sheet>!<ref>': cellRecord | null, '<Sheet>!#colW': {…} } applied over `before`
     if (moduleState && this.opts.statePatch) applyStatePatch(moduleState, this.opts.statePatch);
     const spec = moduleState ? moduleState.sheets[0] : this.lesson.sheet || {};
@@ -55,6 +58,7 @@ export class LessonRun {
       if (st.calcMode) this.session.settings.calcMode = st.calcMode;
       if (st.iterative !== undefined) this.session.settings.iterative = !!st.iterative;
       if (Array.isArray(st.qat)) this.session.settings.qat = st.qat.slice();
+      if (st.pageSetup && typeof st.pageSetup === 'object') { const p = JSON.parse(JSON.stringify(st.pageSetup)); this.session.settings.pageSetup = { ...this.session.settings.pageSetup, ...p, footer: { ...this.session.settings.pageSetup.footer, ...(p.footer || {}) } }; }
     }
     this.landedAt = [];   // when each goal landed (the session clock), for split times
     // Demo goals (goal.demo = { script, cadence }): the platform plays the keys itself while the

@@ -50,7 +50,7 @@ export default {
     { id: 'headers', text: 'Back to the top, then along the headers to the last column, F1.', keys: 'Ctrl+Home Ctrl+→',
       check: (s, ses) => at(s, 'F1') && windowKeys(ses).includes('Ctrl+→') },
     { id: 'all-used', text: 'Select everything used on the sheet from A1 in one stroke.', keys: 'Ctrl+Home Ctrl+Shift+End',
-      check: (s, ses) => s.selectionText() === 'A1:M67' && windowKeys(ses).includes('Ctrl+Shift+End') },
+      check: (s, ses) => s.selectionText() === 'A1:N67' && windowKeys(ses).includes('Ctrl+Shift+End') },
     { id: 'revenue-block', text: 'Select the Revenue figures E2:E60, edge to edge.', keys: 'Ctrl+Home Ctrl+→ ← ↓ then Ctrl+Shift+↓',
       check: (s, ses) => s.selectionText() === 'E2:E60' && windowKeys(ses).includes('Ctrl+Shift+↓') },
     { id: 'mark-strays', text: 'Go To Special, Constants — then color every typed number in the block blue.', keys: 'Alt H F D S O ↵ then Alt H F C → ×4 ↵',

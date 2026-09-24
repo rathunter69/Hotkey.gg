@@ -162,3 +162,37 @@ test('every module lesson\'s solution replays to exactly its after state', () =>
     assert.deepEqual(diff, [], `${l.id}: the solution leaves exactly ${l.state.after} — extra diffs: ${JSON.stringify(diff.slice(0, 4))}`);
   }
 });
+
+/* ---------------- modules 1.5–1.7 (C2 Run 3): the format, formula, print and check states, and what the lessons plant ---------------- */
+import { PLANT_COSTS_GRID, PLANT_DAILY, PLANT_COSTS_ERRORS, PLANT_AUDIT, REPORT_PAGE_SETUP, PAGE_SETUP_DEFAULT } from '../content/workbooks/voltline-weekly.js';
+import { applyStatePatch } from '../content/workbooks/index.js';
+const liveOf = st => { const build = sp => new Sheet({ cells: structuredClone(sp.cells), colW: sp.colW, hiddenCols: sp.hiddenCols, gridlines: sp.gridlines }); const ses = new Session(build(st.sheets[0]), { now: () => 0 }); ses.sheets[0].name = st.sheets[0].name; for (const sh of st.sheets.slice(1)) ses.addSheet(sh.name, build(sh)); for (let i = 0; i < 2; i++) for (const e of ses.sheets) e.sheet.recalc(); return ses; };
+const sheetIn = (ses, name) => ses.sheets.find(x => x.name === name).sheet;
+
+test('1.5: the figures read as a banker reads them; 1.6: every Report figure is live and green, energy cost runs off the one wholesale price; 1.7: the checks read zero', () => {
+  const r5 = stateOf('S5a').sheets[0].cells;
+  assert.deepEqual([r5.C5.fmtStyle, r5.C5.decimals, r5.D5.fmtStyle, r5.D11.fmtStyle, r5.G5.decimals, r5.H5.fmtStyle], ['comma', 0, 'currency', 'currency', 2, 'percent']);
+  const r5b = stateOf('S5b').sheets[0].cells; assert.equal(r5b.A11.bt, true); assert.equal(r5b.C11.bold, true); assert.equal(r5b.A1.fsz, 16);
+  const r5c = stateOf('S5c').sheets[0].cells; assert.equal(r5c.A1.ca, 9); assert.equal(r5c.C4.align, 'r'); assert.equal(r5c.A17.indent, 1);
+  const d6 = liveOf(workbookState('voltline-weekly', 'S6d')), R = sheetIn(d6, 'Report');
+  assert.equal(R.cellAt('C5').formula, '=Raw!I8'); assert.equal(R.cellAt('C5').fontColor, 'green'); assert.equal(R.value('C5'), 6710);
+  assert.ok(Math.abs(R.value('E5') - 6710 * 0.13) < 1e-6, 'energy cost is kWh × the wholesale price on Inputs'); assert.equal(R.cellAt('C9').formula, null, 'Cedar Park stays typed');
+  const e6 = liveOf(workbookState('voltline-weekly', 'S6e')); assert.equal(sheetIn(e6, 'Report').cellAt('B17').formula, '=Raw!I32'); assert.equal(sheetIn(e6, 'Report').value('G21'), 2500, 'Airport Saturday is the emailed day');
+  const f6 = liveOf(workbookState('voltline-weekly', 'S6f')), C = sheetIn(f6, 'Costs'); assert.equal(C.cellAt('E5').formula, '=B5+C5+D5'); assert.equal(C.value('E9'), 12410); assert.ok(Math.abs(C.value('B10') - 12410 / 40530) < 1e-9);
+  assert.deepEqual(stateOf('S7a').settings.pageSetup, REPORT_PAGE_SETUP); assert.deepEqual(diffStates(stateOf('S6f'), stateOf('S7a')).map(d => d.kind), ['settings']);
+  const b7 = liveOf(workbookState('voltline-weekly', 'S7b')), R7 = sheetIn(b7, 'Report'); assert.deepEqual([R7.value('B34'), R7.value('B35'), R7.value('B36')], [0, 0, 0], 'the checks tie');
+  assert.deepEqual(diffStates(stateOf('S7b'), stateOf('S7c')).map(d => d.key), ['C9', 'D9', 'E9']);
+  assert.ok(PAGE_SETUP_DEFAULT.titlesRows === '');
+});
+
+test('the plantings: a grid on Costs, a retyped Thursday, five error codes, the associate\'s eight-violation markup', () => {
+  const g = workbookState('voltline-weekly', 'S5c'); applyStatePatch(g, PLANT_COSTS_GRID); assert.equal(g.sheets.find(s => s.name === 'Costs').cells.A3.ball, true);
+  const d = workbookState('voltline-weekly', 'S6d'); applyStatePatch(d, PLANT_DAILY); const dr = sheetIn(liveOf(d), 'Report');
+  assert.equal(dr.cellAt('E19').formula, null); assert.equal(dr.value('E19'), sheetIn(liveOf(workbookState('voltline-weekly', 'S6e')), 'Report').value('E19'), 'the right number, dead'); assert.equal(dr.cellAt('B18').formula, '=Raw!I33');
+  const e = workbookState('voltline-weekly', 'S6e'); applyStatePatch(e, PLANT_COSTS_ERRORS); const ec = sheetIn(liveOf(e), 'Costs');
+  assert.deepEqual([ec.text('E5'), ec.text('E6'), ec.text('E7'), ec.text('E8')], ['#REF!', '#NAME?', '#VALUE!', '#N/A']);
+  assert.equal(ec.text('B10'), '#REF!', 'the total carries E5\'s error until it is fixed; then B10 reads #DIV/0!');
+  const a = workbookState('voltline-weekly', 'S7b'); applyStatePatch(a, PLANT_AUDIT); const ar = sheetIn(liveOf(a), 'Report');
+  assert.equal(ar.cellAt('G6').formula, '=D6/6850'); assert.equal(ar.cellAt('E18').formula, null); assert.ok(String(ar.value('A1')).startsWith(' ')); assert.equal(ar.cellAt('A1').ca, 0); assert.equal(ar.value('A2'), null);
+  assert.equal(ar.hiddenCols.has(9), true); assert.equal(ar.gridlines, true); assert.equal(ar.cellAt('B15').ball, true);
+});
