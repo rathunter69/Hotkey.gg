@@ -20,15 +20,18 @@ const LINE = i => HEAD + 1 + i;
 const LABELS = CHECK_LINES.map(l => l[0]);
 const comma0 = c => c.fmtStyle === 'comma' && (c.decimals || 0) === 0;
 
+/** Same words: a keyboard hyphen counts as the dash in 'Margin within 0–100%' (nobody can type an en dash). */
+const sameText = (a, b) => String(a ?? '').replace(/[\u2013\u2014]/g, '-').trim() === String(b).replace(/[\u2013\u2014]/g, '-').trim();
 /** A33 reads Checks in bold and A34:A36 carry the three labels as written. */
 const labelsIn = rep => rep.value('A' + HEAD) === 'Checks' && rep.cellAt('A' + HEAD).bold === true
-  && LABELS.every((label, i) => rep.value('A' + LINE(i)) === label);
+  && LABELS.every((label, i) => sameText(rep.value('A' + LINE(i)), label));
 /** Check line i holds exactly its formula and reads zero — the two sides agree. */
 const checkLine = (rep, i) => normFormula(rep.formula('B' + LINE(i))) === normFormula(CHECK_LINES[i][1]) && near(rep.value('B' + LINE(i)), 0);
 const allChecks = rep => CHECK_LINES.every((_, i) => checkLine(rep, i));
 const checksFormatted = rep => CHECK_LINES.every((_, i) => comma0(rep.cellAt('B' + LINE(i))));
-/** Ctrl+[ was pressed this goal: the trail from B34 to the first figure it reads. */
-const traced = ses => windowKeys(ses).includes('Ctrl+[');
+/** The trail was followed this goal: Ctrl+[ (or Formulas › Trace Precedents, Alt M P) landed on the first figure a check reads. */
+const PRECEDENTS = ['D5', 'C5', 'H11'];
+const traced = ses => { const w = windowKeys(ses); const rep = report(ses); return !!rep && (w.includes('Ctrl+[') || /\bAlt M P\b/.test(w.join(' '))) && PRECEDENTS.includes(rep.selectionText()); };
 
 export default {
   id: 'the-checks-row',
@@ -45,9 +48,9 @@ export default {
   headline: '=',
   conventions: ['F1'],
   teaches: ['check-cell'],
-  uses: ['sum-family', 'formula-basics', 'formula-operators', 'cross-sheet-ref', 'pointing', 'formula-errors', 'number-formats', 'bold-italic-underline', 'type-to-enter', 'sheet-tabs', 'ctrl-arrow', 'ctrl-home-end', 'home-key', 'shift-arrow', 'arrow-keys'],
+  uses: ['sum-family', 'formula-basics', 'formula-operators', 'cross-sheet-ref', 'pointing', 'formula-errors', 'number-formats', 'bold-italic-underline', 'type-to-enter', 'sheet-tabs', 'ctrl-arrow', 'ctrl-home-end', 'home-key', 'ctrl-shift-arrow', 'arrow-keys'],
   prerequisites: ['fit-to-one-page'],
-  brief: 'The Report is ready to print, but nothing on it says whether it is right: the deal team wants a check for each thing that must agree before the page goes out. A check is a live difference between two figures, so it reads zero when they tie and shows the gap when they do not. The key is `=`.',
+  brief: 'The Report is ready to print, but nothing on it says whether it is right: the deal team, the people running the sale, want a line for each thing that must agree before the page goes out. Three such lines under the week summary make a checks row, the first thing a reviewer looks for. The key is `=`.',
   goals: [
     { id: 'labels', text: 'Head a Checks block under the week summary: Checks in A33, bold, then the three check labels in A34:A36 as one Enter run.', keys: `Ctrl+End Home ↓ ×2 Ctrl+B "Checks" ↵ ${LABELS.map(l => `"${l}" ↵`).join(' ')}`, requires: ['type-to-enter', 'bold-italic-underline', 'ctrl-home-end', 'home-key', 'arrow-keys'],
       check: (s, ses) => { const rep = report(ses); return !!rep && labelsIn(rep) && settled(ses); } },
@@ -57,9 +60,9 @@ export default {
       check: (s, ses) => { const rep = report(ses); return !!rep && checkLine(rep, 1) && settled(ses); } },
     { id: 'margin-check', text: 'In B36, a margin outside 0 to 100% is a mistake somewhere: enter =IF(AND(H11>=0,H11<=1),0,1), which reads 0 only while the margin is plausible.', keys: '"=IF(AND(H11>=0,H11<=1),0,1)" ↵', requires: ['check-cell', 'formula-basics', 'formula-operators', 'type-to-enter'],
       check: (s, ses) => { const rep = report(ses); return !!rep && checkLine(rep, 2) && settled(ses); } },
-    { id: 'format', text: 'Give the three checks B34:B36 the figures’ format in one press, comma style with Ctrl+Shift+1, then Alt H 9 twice: all three read 0.', keys: '↑ ×3 Shift+↓ ×2 Ctrl+Shift+1 then Alt H 9 Alt H 9', requires: ['number-formats', 'shift-arrow', 'arrow-keys'],
+    { id: 'format', text: 'Give the three checks B34:B36 the figures’ format, comma style with no decimals, so all three read a plain 0.', keys: '↑ Ctrl+Shift+↑ Ctrl+Shift+1 then Alt H 9 Alt H 9', requires: ['number-formats', 'ctrl-shift-arrow', 'arrow-keys'],
       check: (s, ses) => { const rep = report(ses); return !!rep && allChecks(rep) && checksFormatted(rep) && settled(ses); } },
-    { id: 'trace', text: 'A reviewer will ask what the first check compares: from B34, Ctrl+[ follows the trail to D5, the first revenue figure it reads.', keys: 'Ctrl+[', requires: ['formula-errors'],
+    { id: 'trace', text: 'A reviewer will ask what the first check compares: from B34, Ctrl+[ follows the trail to D5, the first revenue figure it reads.', keys: '↑ ×2 Ctrl+[', requires: ['formula-errors', 'arrow-keys'],
       check: (s, ses) => { const rep = report(ses); return !!rep && allChecks(rep) && checksFormatted(rep) && traced(ses) && settled(ses); } },
     { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Report!D6" Enter "3000" Enter Ctrl+G "Report!B34" Enter Escape Escape Escape', cadence: 320 }, text: 'Does it tie? Watch a number typed over Mueller’s revenue link in D6 and the revenue check in B34 leave zero: the break is caught.', requires: [],
       check: (s, ses) => ses.demoDone.has('tie') },
@@ -72,5 +75,5 @@ export default {
     'The checks row goes to zero when the page ties: three live differences, one for each thing that must agree, so a broken link or a bad total shows as a number before anyone else sees it (F1).',
     'The revenue check reads the feed across sheets, and Ctrl+[ takes a reviewer straight to the first figure it compares.',
   ],
-  solution: `Ctrl+End Home Down Down Ctrl+B "Checks" Enter ${LABELS.map(l => `"${l}" Enter`).join(' ')} Ctrl+Up Up Up Right "=SUM(D5:D8,D10)-" Ctrl+PgDn Ctrl+Right Right Right Ctrl+Down Ctrl+Down Ctrl+Down Right Right Enter "=SUM(C5:C10)-C11" Enter "=IF(AND(H11>=0,H11<=1),0,1)" Enter Up Up Up Shift+Down Shift+Down Ctrl+Shift+1 Alt H 9 Alt H 9 Ctrl+[`,
+  solution: `Ctrl+End Home Down Down Ctrl+B "Checks" Enter ${LABELS.map(l => `"${l}" Enter`).join(' ')} Ctrl+Up Up Up Right "=SUM(D5:D8,D10)-" Ctrl+PgDn Ctrl+Right Right Right Ctrl+Down Ctrl+Down Ctrl+Down Right Right Enter "=SUM(C5:C10)-C11" Enter "=IF(AND(H11>=0,H11<=1),0,1)" Enter Up Ctrl+Shift+Up Ctrl+Shift+1 Alt H 9 Alt H 9 Up Up Ctrl+[`,
 };

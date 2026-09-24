@@ -8,7 +8,6 @@
 // like the rest. The closer changes Domain's Monday on the feed and B17 answers.
 import { RAW_BYDAY, REPORT, PLANT_DAILY } from '../workbooks/voltline-weekly.js';
 
-const windowKeys = ses => ses.keyLog.slice(ses.goalMark || 0).map(e => e.k);
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
 const report = ses => sheetOf(ses, 'Report');
 const raw = ses => sheetOf(ses, 'Raw');
@@ -30,7 +29,6 @@ const rowGreen = (rep, r) => DAY_COLS.every(col => rep.cellAt(col + r).fontColor
 const bothSheets = (ses, fn) => { const rep = report(ses), rw = raw(ses); return !!rep && !!rw && fn(rep, rw); };
 const blockLinked = ses => bothSheets(ses, (rep, rw) => DAILY_ROWS.every(r => rowLinked(rep, rw, r)));
 const showing = ses => !!(ses.settings && ses.settings.showFormulas);
-const toggled = ses => windowKeys(ses).includes('Ctrl+`');
 
 export default {
   id: 'one-formula-per-row',
@@ -48,21 +46,21 @@ export default {
   headline: 'Ctrl+R',
   conventions: ['C3', 'E3', 'B2'],
   teaches: ['show-formulas'],
-  uses: ['cross-sheet-ref', 'pointing', 'sheet-tabs', 'fill-down-right', 'ctrl-enter-fill', 'edit-mode-f2', 'font-color', 'input-colour-convention', 'shift-arrow', 'ctrl-shift-arrow', 'ctrl-arrow', 'ctrl-home-end', 'arrow-keys'],
+  uses: ['cross-sheet-ref', 'pointing', 'sheet-tabs', 'fill-down-right', 'ctrl-enter-fill', 'edit-mode-f2', 'font-color', 'input-colour-convention', 'keytips', 'shift-arrow', 'ctrl-shift-arrow', 'ctrl-arrow', 'ctrl-home-end', 'arrow-keys'],
   prerequisites: ['link-across-sheets'],
   brief: 'The daily table on the Report has to read off Raw’s by-day block, the platform’s kWh for each site on each day. The associate, the colleague who checks your page, filled rows 18 to 21 already and retyped one cell over its formula; Domain’s row 17 is yours, and one formula filled right covers the six days. The key is `Ctrl+R`.',
   goals: [
-    { id: 'link-monday', text: 'Domain’s Monday in B17 is yours to link: type =, Ctrl+PgDn to Raw, point at Domain’s Monday I32 in the by-day block, Enter.', keys: 'Ctrl+Home Ctrl+↓ ×5 → Ctrl+↑ ↑ "=" Ctrl+PgDn Ctrl+→ → ×2 Ctrl+↓ ×4 ↓ ×2 → ↵', requires: ['cross-sheet-ref', 'pointing', 'sheet-tabs', 'ctrl-arrow', 'ctrl-home-end', 'arrow-keys'],
+    { id: 'link-monday', text: 'Domain’s Monday in B17 is empty: link it to Domain’s Monday I32 in Raw’s by-day block, pointing across sheets.', keys: 'Ctrl+Home Ctrl+↓ ×5 → Ctrl+↑ ↑ "=" Ctrl+PgDn Ctrl+→ → ×2 Ctrl+↓ ×4 ↓ ×2 → ↵', requires: ['cross-sheet-ref', 'pointing', 'sheet-tabs', 'ctrl-arrow', 'ctrl-home-end', 'arrow-keys'],
       check: (s, ses) => bothSheets(ses, (rep, rw) => linked(rep, rw, 'B', 17)) && settled(ses) },
-    { id: 'fill-right', text: 'Write the row once, then fill it right: select B17:G17 with Monday’s formula at the left and press Ctrl+R for the six days.', keys: '↑ Shift+→ ×5 Ctrl+R', requires: ['fill-down-right', 'shift-arrow'], convention: 'C3',
+    { id: 'fill-right', text: 'Write the row once: with Monday’s link at the left of B17:G17, fill it right and all six days take the same pattern.', keys: '↑ Shift+→ ×5 Ctrl+R', requires: ['fill-down-right', 'shift-arrow'], convention: 'C3',
       check: (s, ses) => bothSheets(ses, (rep, rw) => rowLinked(rep, rw, 17)) && settled(ses) },
-    { id: 'show-formulas', teach: 'Ctrl+` shows every formula’s text in place of its value, so a typed number stands out from the links; press it again to return.', text: 'One of the associate’s cells is a number, not a link: press Ctrl+` to show formulas and find the one that stands out, E19.', keys: 'Ctrl+`', requires: ['show-formulas'],
-      check: (s, ses) => showing(ses) && toggled(ses) && bothSheets(ses, (rep, rw) => rowLinked(rep, rw, 17)) && settled(ses) },
-    { id: 'refill-row', text: 'Riverside’s Thursday E19 was retyped: select B19:G19, press F2 on its Monday formula, then Ctrl+Enter fills the row from it.', keys: '↓ ×2 Ctrl+Shift+→ F2 Ctrl+↵', requires: ['ctrl-enter-fill', 'edit-mode-f2', 'ctrl-shift-arrow', 'arrow-keys'], convention: 'E3',
+    { id: 'show-formulas', teach: 'Ctrl+` shows every formula’s text in place of its value, so a typed number stands out from the links; press it again to return.', text: 'One of the associate’s cells is a number, not a link: show every formula in the daily table and find the one that stands out, E19.', keys: 'Ctrl+`', requires: ['show-formulas'],
+      check: (s, ses) => showing(ses) && bothSheets(ses, (rep, rw) => rowLinked(rep, rw, 17)) && settled(ses) },
+    { id: 'refill-row', text: 'Riverside’s Thursday E19 was retyped: refill B19:G19 from its own Monday formula with F2 then Ctrl+Enter, never by retyping.', keys: '↓ ×2 Ctrl+Shift+→ F2 Ctrl+↵', requires: ['ctrl-enter-fill', 'edit-mode-f2', 'ctrl-shift-arrow', 'arrow-keys'], convention: 'E3',
       check: (s, ses) => bothSheets(ses, (rep, rw) => rowLinked(rep, rw, 19) && rowGreen(rep, 19) && rowLinked(rep, rw, 17)) && settled(ses) },
-    { id: 'formulas-off', text: 'Press Ctrl+` again to bring the values back: every cell in the daily table is now a live link.', keys: 'Ctrl+`', requires: ['show-formulas'],
-      check: (s, ses) => !showing(ses) && toggled(ses) && blockLinked(ses) && settled(ses) },
-    { id: 'links-green', text: 'A link to another sheet is shown green, the format the team uses: select B17:G17 and color Domain’s row with Alt H F C.', keys: '↑ ×2 Ctrl+Shift+→ Alt H F C → ×8 ↵', requires: ['font-color', 'input-colour-convention', 'ctrl-shift-arrow', 'arrow-keys'], convention: 'B2',
+    { id: 'formulas-off', text: 'Bring the values back to the daily table: every cell in B17:G21 now reads as a live link.', keys: 'Ctrl+`', requires: ['show-formulas'],
+      check: (s, ses) => !showing(ses) && blockLinked(ses) && settled(ses) },
+    { id: 'links-green', text: 'A link to another sheet is shown green, the format the team uses: select B17:G17 and color Domain’s row with Alt H F C.', keys: '↑ ×2 Ctrl+Shift+→ Alt H F C → ×8 ↵', requires: ['font-color', 'input-colour-convention', 'keytips', 'ctrl-shift-arrow', 'arrow-keys'], convention: 'B2',
       check: (s, ses) => { const rep = report(ses); return !!rep && DAILY_ROWS.every(r => rowGreen(rep, r)) && blockLinked(ses) && !showing(ses) && settled(ses); } },
     { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Raw!C8" Enter "3000" Enter Ctrl+G "Report!B17" Enter Escape Escape Escape', cadence: 320 }, text: 'Does it tie? Watch Domain’s Monday kWh on Raw’s C8 change to 3,000 and the Report’s B17 answer through the by-day block.', requires: [],
       check: (s, ses) => ses.demoDone.has('tie') },

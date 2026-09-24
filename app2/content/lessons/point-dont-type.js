@@ -6,7 +6,6 @@
 // sites in one press. The fill carries Domain's $ format down the gross-profit column, so the last
 // goal puts comma style back on F6:F10 ($ belongs to the first and total rows only). The closer
 // perturbs Domain's kWh and its average price answers.
-const windowKeys = ses => ses.keyLog.slice(ses.goalMark || 0).map(e => e.k);
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
 const report = ses => sheetOf(ses, 'Report');
 const settled = ses => !ses.editing && !ses.dialog;
@@ -48,17 +47,17 @@ export default {
   prerequisites: ['the-style-pass'],
   brief: 'The Report holds this week’s kWh, revenue and energy cost for six sites, and the associate, the colleague who checks your page, wants three calculated lines beside them: gross profit, the average price per kWh and the margin. You build each one by pointing at the cells with the arrow keys, then fill the three formulas down the six sites in one press. The key is `=`.',
   goals: [
-    { id: 'gross-profit', teach: 'A formula starts with = and recalculates when its inputs change; while it is open, each arrow key points at a cell and writes its reference for you.', text: 'Domain’s gross profit is revenue less energy cost: in F5 type =, point left at D5, type -, point at E5 and press Enter.', keys: 'Ctrl+Home Ctrl+↓ ×2 ↓ Ctrl+→ → "=" ← ×2 "-" ← ↵', requires: ['formula-basics', 'formula-operators', 'pointing', 'ctrl-home-end', 'ctrl-arrow', 'arrow-keys'], convention: 'E1',
+    { id: 'gross-profit', teach: 'A formula starts with = and recalculates when its inputs change; while it is open, each arrow key points at a cell and writes its reference for you.', text: 'Domain’s gross profit is revenue less energy cost: build =D5-E5 in F5 by pointing at the two cells with the arrow keys, not typing them.', keys: 'Ctrl+Home Ctrl+↓ ×2 ↓ Ctrl+→ → "=" ← ×2 "-" ← ↵', requires: ['formula-basics', 'formula-operators', 'pointing', 'ctrl-home-end', 'ctrl-arrow', 'arrow-keys'], convention: 'E1',
       check: (s, ses) => { const sh = report(ses); return !!sh && holds(sh, 'F5', '=D5-E5') && near(sh.value('F5'), sh.value('D5') - sh.value('E5')) && settled(ses); } },
-    { id: 'avg-price', text: 'Domain’s average price is revenue divided by kWh: in G5 point at D5, type /, then jump the pointer with Ctrl+Left and point at C5.', keys: '↑ → "=" ← ×3 "/" Ctrl+← ×2 → ×2 ↵', requires: ['formula-operators', 'pointing', 'ctrl-arrow', 'arrow-keys'],
+    { id: 'avg-price', text: 'Domain’s average price is revenue divided by kWh: build =D5/C5 in G5 by pointing, jumping the pointer across the row with Ctrl+Left.', keys: '↑ → "=" ← ×3 "/" Ctrl+← ×2 → ×2 ↵', requires: ['formula-operators', 'pointing', 'ctrl-arrow', 'arrow-keys'],
       check: (s, ses) => { const sh = report(ses); return !!sh && holds(sh, 'G5', '=D5/C5') && near(sh.value('G5'), sh.value('D5') / sh.value('C5')) && settled(ses); } },
-    { id: 'margin', text: 'Domain’s margin is gross profit divided by revenue: in H5 point at F5, type /, jump the pointer with Ctrl+Left and point at D5.', keys: '↑ → "=" ← ×2 "/" Ctrl+← ×2 → ×3 ↵', requires: ['formula-operators', 'pointing', 'ctrl-arrow', 'arrow-keys'],
+    { id: 'margin', text: 'Domain’s margin is gross profit divided by revenue: build =F5/D5 in H5 the same way, with a Ctrl+Left jump to reach D5.', keys: '↑ → "=" ← ×2 "/" Ctrl+← ×2 → ×3 ↵', requires: ['formula-operators', 'pointing', 'ctrl-arrow', 'arrow-keys'],
       check: (s, ses) => { const sh = report(ses); return !!sh && holds(sh, 'H5', '=F5/D5') && near(sh.value('H5'), sh.value('F5') / sh.value('D5')) && settled(ses); } },
-    { id: 'read-back', text: 'Read one back before you trust it: on F5 press F2, its inputs D5 and E5 light up in color, then Esc leaves it unchanged.', keys: '↑ ← ×2 F2 Esc', requires: ['edit-mode-f2', 'escape-cancels', 'arrow-keys'],
-      check: (s, ses) => { const sh = report(ses); return !!sh && holds(sh, 'F5', '=D5-E5') && windowKeys(ses).includes('F2') && settled(ses); } },
+    { id: 'read-back', text: 'Read one back before you trust it: open F5 with F2 so its inputs D5 and E5 light up in color, then leave it unchanged.', keys: '↑ ← ×2 F2 Esc', requires: ['edit-mode-f2', 'escape-cancels', 'arrow-keys'],
+      check: (s, ses) => { const sh = report(ses); return !!sh && holds(sh, 'F5', '=D5-E5') && ses.keyLog.slice(ses.goalMark || 0).some(e => e.k === 'F2' && e.cell === 'F5') && settled(ses); } },
     { id: 'fill-down', text: 'Five sites still have no calculated lines: select F5:H10 with Domain’s three formulas at the top and fill them down with Ctrl+D.', keys: 'Shift+→ ×2 Shift+↓ ×5 Ctrl+D', requires: ['fill-down-right', 'shift-arrow'],
       check: (s, ses) => { const sh = report(ses); return !!sh && SITE_ROWS.every(r => rowLive(sh, r)) && settled(ses); } },
-    { id: 'dollar-back', text: 'The fill carried Domain’s $ sign down the gross-profit column: select F6:F10 and set them back to comma style with Ctrl+1, then N.', keys: '↓ Ctrl+Shift+↓ Ctrl+1 N', requires: ['number-formats', 'format-cells-dialog', 'ctrl-shift-arrow', 'arrow-keys'], convention: 'D4',
+    { id: 'dollar-back', text: 'The fill carried Domain’s $ sign down the gross-profit column: put F6:F10, and only those, back in comma style with no decimals.', keys: '↓ Ctrl+Shift+↓ Ctrl+1 N', requires: ['number-formats', 'format-cells-dialog', 'ctrl-shift-arrow', 'arrow-keys'], convention: 'D4',
       check: (s, ses) => { const sh = report(ses); return !!sh && fmtIs(sh, FILLED, 'comma', 0) && fmtIs(sh, ['F5'], 'currency', 0) && SITE_ROWS.every(r => rowLive(sh, r)) && settled(ses); } },
     { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Report!C5" Enter "3000" Enter Ctrl+G "Report!G5" Enter Escape Escape Escape', cadence: 320 }, text: 'Does it tie? Watch Domain’s kWh in C5 change to 3,000 and its average price in G5 answer.', requires: [],
       check: (s, ses) => ses.demoDone.has('tie') },

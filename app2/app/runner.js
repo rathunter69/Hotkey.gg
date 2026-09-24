@@ -52,6 +52,7 @@ export class LessonRun {
     if (sheets.length && this.session.sheets) {
       if (sheets[0] && sheets[0].name) this.session.sheets[0].name = sheets[0].name;
       for (const sh of sheets.slice(1)) if (this.session.addSheet) this.session.addSheet(sh.name, build(sh));
+      for (let pass = 0; pass < 2; pass++) for (const e of this.session.sheets) e.sheet.recalc();   // cross-sheet links read their sheets once every sheet exists (no #REF! until the first edit)
     }
     if (moduleState && moduleState.settings) {
       const st = moduleState.settings;

@@ -299,6 +299,7 @@ test('Page Setup (Alt P S P): rows to repeat, the footer sections and print grid
   s.run('Alt P I Backspace Backspace Backspace Backspace Backspace "x" Enter'); assert.equal(s.dialog, 'pagesetup'); assert.equal(s.note, 'Reference is not valid.'); assert.equal(s.settings.pageSetup.titlesRows, '$1:$3');
   s.run('Backspace'); assert.equal(s.note, '', 'the next key clears the note'); s.run('"2" Enter'); assert.equal(s.settings.pageSetup.titlesRows, '$2:$2'); assert.equal(s.mode, 'normal');
   s.run('Alt P I Backspace Backspace Backspace Backspace Backspace Enter'); assert.equal(s.settings.pageSetup.titlesRows, ''); assert.equal(s.mode, 'normal');
+  s.run('Alt P S P F "2" Tab "3" Enter'); assert.deepEqual([s.settings.pageSetup.fitWide, s.settings.pageSetup.fitTall], [2, 3], 'the first digit into a fresh field replaces the pre-filled 1');
 });
 
 test('Esc that discards an entry in progress is logged, on the edited cell', () => {

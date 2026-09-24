@@ -407,11 +407,13 @@ export class Session {
       const nx = cyc(m[1], m[3]); const rep = nx[0] + m[2] + nx[1] + m[4]; const start = this.editCaret - m[0].length;
       this.editBuf = this.editBuf.slice(0, start) + rep + this.editBuf.slice(this.editCaret); this.editCaret = start + rep.length; return true;
     }
-    const cur = this.editBuf.slice(this.editPointerStart);
+    const whole = this.editBuf.slice(this.editPointerStart);
+    const pm = /^((?:'[^']+'|[A-Za-z_][\w.]*)!)?/.exec(whole); const pre = pm ? pm[1] || '' : '';   // a pointer on another sheet carries Sheet! — the anchors cycle behind it
+    const cur = whole.slice(pre.length), base = this.editBuf.slice(0, this.editPointerStart) + pre;
     const mr = /^(\$?)([A-Z]{1,3})(\$?)(\d+):(\$?)([A-Z]{1,3})(\$?)(\d+)$/.exec(cur);
-    if (mr) { const nx = cyc(mr[1], mr[3]); this.editBuf = this.editBuf.slice(0, this.editPointerStart) + nx[0] + mr[2] + nx[1] + mr[4] + ':' + nx[0] + mr[6] + nx[1] + mr[8]; this.editCaret = this.editBuf.length; return true; }
+    if (mr) { const nx = cyc(mr[1], mr[3]); this.editBuf = base + nx[0] + mr[2] + nx[1] + mr[4] + ':' + nx[0] + mr[6] + nx[1] + mr[8]; this.editCaret = this.editBuf.length; return true; }
     const m = /^(\$?)([A-Z]{1,3})(\$?)(\d+)$/.exec(cur); if (!m) return false;
-    const nx = cyc(m[1], m[3]); this.editBuf = this.editBuf.slice(0, this.editPointerStart) + nx[0] + m[2] + nx[1] + m[4]; this.editCaret = this.editBuf.length; return true;
+    const nx = cyc(m[1], m[3]); this.editBuf = base + nx[0] + m[2] + nx[1] + m[4]; this.editCaret = this.editBuf.length; return true;
   }
 
   /* ---------------- tab-run latch ---------------- */
@@ -1037,7 +1039,7 @@ export class Session {
     const textFocus = PAGESETUP_TEXT.has(d.focus);
     if (key === 'Enter') { this.pageSetupOk(); return; }
     this.note = '';   // a refused reference's note clears on the next key
-    if (key === 'Tab' || key === 'Shift+Tab') { const o = this.dialogTabOrder(); const i = Math.max(0, o.indexOf(d.focus)); d.focus = o[(i + (key === 'Tab' ? 1 : o.length - 1)) % o.length]; return; }
+    if (key === 'Tab' || key === 'Shift+Tab') { const o = this.dialogTabOrder(); const i = Math.max(0, o.indexOf(d.focus)); d.focus = o[(i + (key === 'Tab' ? 1 : o.length - 1)) % o.length]; d.fresh = d.focus; return; }   // a freshly focused field: the first digit replaces what it held (Excel selects the field's text)
     // accelerators: Alt+letter from anywhere; the bare letter only when no text field has the focus
     const acc = key.startsWith('Alt+') ? key.slice(4) : (!textFocus && /^[A-Z]$/.test(key) ? key : null);
     if (acc) {
@@ -1050,8 +1052,8 @@ export class Session {
       if (d.tab === 'sheet') return;
       if (acc === 'T') { d.orientation = 'portrait'; d.focus = 'orient'; return; }
       if (acc === 'L') { d.orientation = 'landscape'; d.focus = 'orient'; return; }
-      if (acc === 'A') { d.scaling = 'adjust'; d.focus = 'adjustTo'; return; }
-      if (acc === 'F') { d.scaling = 'fit'; d.focus = 'fitWide'; return; }
+      if (acc === 'A') { d.scaling = 'adjust'; d.focus = 'adjustTo'; d.fresh = 'adjustTo'; return; }
+      if (acc === 'F') { d.scaling = 'fit'; d.focus = 'fitWide'; d.fresh = 'fitWide'; return; }
       return;
     }
     if (key === 'ArrowUp' || key === 'ArrowDown') {
@@ -1063,7 +1065,7 @@ export class Session {
     if (key === ' ') { if (d.focus === 'printGrid') { d.printGridlines = !d.printGridlines; return; } if (!textFocus) return; }   // a space types into a text field
     if (key === 'Backspace') { if (field[d.focus]) d[d.focus] = d[d.focus].slice(0, -1); else if (textFocus) d[d.focus] = d[d.focus].slice(0, -1); return; }
     if (textFocus) { if (key.length === 1 && d[d.focus].length < 64) d[d.focus] += key; return; }
-    if (/^[0-9]$/.test(key) && field[d.focus] && d[d.focus].length < field[d.focus]) d[d.focus] += key;
+    if (/^[0-9]$/.test(key) && field[d.focus]) { if (d.fresh === d.focus) { d[d.focus] = key; d.fresh = null; } else if (d[d.focus].length < field[d.focus]) d[d.focus] += key; }
   }
   pageSetupOk() {
     const d = this.dlg, p = this.settings.pageSetup; if (!d) return;

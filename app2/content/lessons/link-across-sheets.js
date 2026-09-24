@@ -21,8 +21,8 @@ const linksRaw = (rep, ref, rawRef) => { const c = rep.cellAt(ref); return normF
 const linkedRows = (rep, col, rawCol, rows) => rows.every(r => linksRaw(rep, col + r, rawCol + (r < 9 ? r + 3 : 12)));
 /** Cedar Park's C9:D9 stay as management emailed them: typed numbers, no formula. */
 const cedarTyped = rep => ['C9', 'D9'].every(ref => { const c = rep.cellAt(ref); return !c.formula && isNum(c.value); });
-/** E<r> is =C<r>*Inputs!$B$4 with the price anchored both ways, and reads a number. */
-const energyLinked = (rep, r) => { const c = rep.cellAt('E' + r); return normFormula(c.formula) === `=C${r}*INPUTS!$B$4` && isNum(c.value); };
+/** E<r> is =C<r>*Inputs!$B$4 (either operand order) with the price anchored both ways, and reads a number. */
+const energyLinked = (rep, r) => { const c = rep.cellAt('E' + r); const f = normFormula(c.formula); return (f === `=C${r}*INPUTS!$B$4` || f === `=INPUTS!$B$4*C${r}`) && isNum(c.value); };
 const SITE_ROWS = [5, 6, 7, 8, 9, 10];
 const LINK_ROWS = [5, 6, 7, 8, 10];
 const allLinksIn = rep => LINK_ROWS.every(r => linksRaw(rep, 'C' + r, 'I' + (r < 9 ? r + 3 : 12)) && linksRaw(rep, 'D' + r, 'J' + (r < 9 ? r + 3 : 12)))
@@ -50,11 +50,11 @@ export default {
   prerequisites: ['anchors-dollar-f4'],
   brief: 'The Report’s site figures are a pasted snapshot of Raw’s totals, so the next feed will leave them stale. Replace them with live links, pointing across sheets while the formula is open, and compute energy cost from the wholesale price on Inputs, so the page updates itself. The key is `Ctrl+PgDn`.',
   goals: [
-    { id: 'link-kwh', teach: 'A reference on another sheet names the sheet first, =Raw!I8: Ctrl+PgDn while the formula is open shows that sheet, and the arrows point there.', text: 'Domain’s kWh sold in C5 is a typed copy: replace it with a live link to Raw’s site total I8, pointing across sheets.', keys: 'Ctrl+↓ ×2 ↓ → ×2 "=" Ctrl+PgDn Ctrl+→ → ×3 Ctrl+↓ ↓ ↵', requires: ['cross-sheet-ref', 'pointing', 'formula-basics', 'sheet-tabs', 'ctrl-arrow'],
+    { id: 'link-kwh', teach: 'A reference on another sheet names the sheet first, =Raw!I8: Ctrl+PgDn while the formula is open shows that sheet, and the arrows point there.', text: 'Domain’s kWh sold in C5 is a typed copy: replace it with a live link to Raw’s site total I8, pointing across sheets.', keys: 'Ctrl+↓ ×2 ↓ → ×2 "=" Ctrl+PgDn Ctrl+→ → ×3 Ctrl+↓ ↓ ↵', requires: ['cross-sheet-ref', 'pointing', 'formula-basics', 'sheet-tabs', 'ctrl-arrow'], convention: 'E7',
       check: (s, ses) => { const rep = report(ses); return !!rep && linksRaw(rep, 'C5', 'I8') && !ses.editing; } },
     { id: 'kwh-at-scale', text: 'Mueller, Riverside and South Lamar follow: select C6:C8, point one link at Raw’s I9 and commit it into all three with Ctrl+Enter.', keys: 'Shift+↓ ×2 "=" Ctrl+PgDn Ctrl+→ → ×3 Ctrl+↓ ↓ ×2 Ctrl+↵', requires: ['cross-sheet-ref', 'pointing', 'ctrl-enter-fill', 'relative-absolute', 'shift-arrow', 'sheet-tabs', 'ctrl-arrow'],
       check: (s, ses) => { const rep = report(ses); return !!rep && linkedRows(rep, 'C', 'I', [5, 6, 7, 8]) && !ses.editing; } },
-    { id: 'revenue', text: 'Revenue the same way: select D5:D8, point at Raw’s J8 and press Ctrl+Enter, and the reference shifts a row for each cell.', keys: '↑ → Shift+↓ ×3 "=" Ctrl+PgDn Ctrl+→ → ×3 Ctrl+↓ → ↓ Ctrl+↵', requires: ['cross-sheet-ref', 'pointing', 'ctrl-enter-fill', 'relative-absolute', 'shift-arrow', 'sheet-tabs', 'ctrl-arrow'],
+    { id: 'revenue', text: 'Revenue the same way: select D5:D8, point one link at Raw’s J8 and commit it into all four; the reference shifts a row per cell.', keys: '↑ → Shift+↓ ×3 "=" Ctrl+PgDn Ctrl+→ → ×3 Ctrl+↓ → ↓ Ctrl+↵', requires: ['cross-sheet-ref', 'pointing', 'ctrl-enter-fill', 'relative-absolute', 'shift-arrow', 'sheet-tabs', 'ctrl-arrow'],
       check: (s, ses) => { const rep = report(ses); return !!rep && linkedRows(rep, 'C', 'I', [5, 6, 7, 8]) && linkedRows(rep, 'D', 'J', [5, 6, 7, 8]) && !ses.editing; } },
     { id: 'airport', text: 'Airport sits below Cedar Park’s emailed row: select C10:D10, point at Raw’s I12 and Ctrl+Enter writes both links, kWh and revenue, at once.', keys: '← Ctrl+↓ ↑ Shift+→ "=" Ctrl+PgDn Ctrl+→ → ×3 Ctrl+↓ ×2 ↑ Ctrl+↵', requires: ['cross-sheet-ref', 'pointing', 'ctrl-enter-fill', 'relative-absolute', 'shift-arrow', 'sheet-tabs', 'ctrl-arrow'],
       check: (s, ses) => { const rep = report(ses); return !!rep && linkedRows(rep, 'C', 'I', LINK_ROWS) && linkedRows(rep, 'D', 'J', LINK_ROWS) && cedarTyped(rep) && !ses.editing; } },

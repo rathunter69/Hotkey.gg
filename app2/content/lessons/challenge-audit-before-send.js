@@ -33,9 +33,11 @@ const UNITS = 'USD unless stated';
 const PAGE_FOOTER = 'Page &[Page] of &[Pages]';
 const BASE = stateOf('S7b').sheets[0].cells;        // the un-planted Report, as the module left it
 /** The cells the fixes may touch; everything else must read exactly as it arrived. */
-const ALLOWED = ['A1', 'A2', 'C9', 'D9', ...span(AVG_COL, AVG_COL, 5, 10), ...GRID_BLOCK];
-/** The seed's clothing: the five site rows, the daily table's labels, the week label cells. */
-const CLOTHED = [...FEED_ROWS.map(r => 'A' + r), ...DAILY_ROWS.map(r => 'A' + r), ...SITE_ROWS.map(r => 'B' + r), ...DAY_COLS.map(c => c + 14)];
+const ALLOWED = ['A1', 'A2', 'C9', 'D9', 'E9', ...span(AVG_COL, AVG_COL, 5, 10), ...GRID_BLOCK];   // E9: hardcode-hunt taught it blue too (B1)
+/** A record the engine created but never gave a meaningful field (e.g. a whole-row border pass touching H15) is no change. */
+const ZEROABLE = new Set(['indent', 'scale', 'ca', 'decimals']);
+const meaningful = c => !!c && Object.entries(c).some(([k, v]) => v != null && v !== false && !(v === 0 && ZEROABLE.has(k)) && !(k === 'fmtStyle' && v === 'general') && k !== 'txt');
+const pruned = rep => ({ cells: Object.fromEntries(Object.entries(rep.cells || {}).filter(([, c]) => meaningful(c))) });
 
 /** The cluster the seed dressed the file in, read back from Inputs' site list (never touched by the fixes). */
 const clusterOf = ses => { const inp = inputs(ses); if (!inp) return null; const first = inp.value('A9'); return CLUSTERS.find(c => c.sites[0] === first) || null; };
@@ -67,8 +69,8 @@ const dailyLinked = rep => DAILY_ROWS.every((r, i) => DAY_COLS.every((col, j) =>
   return normFormula(c.formula) === `=RAW!${RAW_BYDAY.dayCols[j]}${RAW_BYDAY.firstRow + i}` && c.fontColor === 'green' && c.fmtStyle === 'comma' && (c.decimals || 0) === 0 && isNum(c.value); }));
 const titleRight = (rep, ses) => { const cluster = clusterOf(ses); const c = rep.cellAt('A1');
   return !!cluster && c.value === titleFor(cluster) && c.ca === 9 && c.bold === true; };
-const unitsBack = rep => { const c = rep.cellAt('A2'); return c.value === UNITS && c.it === true; };
-const noGrid = rep => GRID_BLOCK.every(ref => { const c = rep.cellAt(ref); return !c.ball && !c.bt && !c.bb && !c.bl && !c.br; });
+const unitsBack = rep => rep.cellAt('A2').value === UNITS;   // the italic is invisible on an empty cell; Ctrl+I then typing (hardcode-hunt's route) must pass too
+const noGrid = rep => GRID_BLOCK.every(ref => { const c = rep.cellAt(ref); return !c.ball && !c.bt && !c.bb && !c.bl && !c.br && !c.thick && !c.bdbl; });
 const gridlinesOff = rep => rep.gridlines === false;
 const setup = ses => (ses.settings && ses.settings.pageSetup) || {};
 const printReady = ses => { const p = setup(ses); return p.orientation === 'landscape' && p.scaling === 'fit' && p.fitWide === 1 && p.fitTall === 1; };
@@ -123,7 +125,7 @@ export default {
   },
   goals: [
     { id: 'title-units', text: 'The title was centered with spaces and the units line is gone: delete the spaces, center A1 across A1:I1, restore USD unless stated in A2.', convention: 'D7',
-      keys: 'F2 Home Delete ×12 ↵ ↑ Shift+→ ×8 Ctrl+1 A ↓ "USD unless stated" ↵',
+      keys: 'F2 Home Delete ×12 ↵ ↓ ×2 Ctrl+→ ← ×3 Ctrl+↑ Ctrl+Shift+← Ctrl+1 A Ctrl+← ↓ "USD unless stated" ↵',
       check: (s, ses) => { const rep = report(ses); return !!rep && titleRight(rep, ses) && unitsBack(rep) && settled(ses); } },
     { id: 'inputs-blue', text: 'Cedar Park’s emailed figures sit black among the green links: Go To Special constants over C5:D10 finds them; color them blue.', convention: 'B1',
       keys: 'Ctrl+↓ ↓ → ×2 Ctrl+Shift+↓ Shift+↑ Shift+→ then Alt H F D S O ↵ then Alt H F C → ×4 ↵',
@@ -132,10 +134,10 @@ export default {
       keys: 'Ctrl+` Ctrl+↓ Ctrl+→ ← Ctrl+↑ ↓ Ctrl+Shift+↓ Shift+↑ "=D5/C5" Ctrl+↵',
       check: (s, ses) => { const rep = report(ses); return !!rep && avgPriceLive(rep) && settled(ses); } },
     { id: 'no-grid', text: 'A grid was drawn over the daily table B15:G21 with the gridlines on: remove every border and turn the gridlines off.',
-      keys: 'Ctrl+↓ ×2 ↓ Shift+← ×5 Ctrl+Shift+↓ then Alt H B N then Alt W V G',
+      keys: 'Ctrl+↓ ×2 ↓ Ctrl+← → Ctrl+Shift+↓ Ctrl+Shift+→ then Alt H B N then Alt W V G',
       check: (s, ses) => { const rep = report(ses); return !!rep && noGrid(rep) && gridlinesOff(rep) && settled(ses); } },
-    { id: 'daily-links', text: 'One daily-table cell is a typed number among links: select B17:G21, open G17 with F2 and commit it to every cell with Ctrl+Enter.', convention: 'F3',
-      keys: '↓ ×2 Shift+← ×5 Ctrl+Shift+↓ F2 Ctrl+↵ then Ctrl+`',
+    { id: 'daily-links', text: 'One daily-table cell is a typed number among links: select B17:G21, open B17 with F2, commit it to every cell with Ctrl+Enter, then Ctrl+` off.', convention: 'F3',
+      keys: '↓ ×2 Ctrl+Shift+↓ Ctrl+Shift+→ F2 Ctrl+↵ then Ctrl+`',
       check: (s, ses) => { const rep = report(ses); return !!rep && dailyLinked(rep) && !ses.settings.showFormulas && settled(ses); } },
     { id: 'page-number', text: 'The page prints landscape on one sheet but carries no page number: put Page &[Page] of &[Pages] in the center footer section.', convention: 'G1',
       keys: `Alt P S P Alt+H Alt+C "${PAGE_FOOTER}" ↵`,
@@ -143,10 +145,7 @@ export default {
   ],
   graders: [
     ses => { const rep = report(ses); const want = expectedCells(ses); if (!rep || !want) return { ok: false, why: 'No Report sheet.' };
-      return unchangedExcept(rep, want, [...ALLOWED, ...CLOTHED]); },
-    ses => { const rep = report(ses); const want = expectedCells(ses); if (!rep || !want) return { ok: false, why: 'No Report sheet.' };
-      for (const ref of CLOTHED) if (rep.value(ref) !== want[ref].value) return { ok: false, why: `${ref} changed — fix the faults and nothing else` };
-      return { ok: true }; },
+      return unchangedExcept(pruned(rep), want, ALLOWED); },
     ses => { const rep = report(ses); if (!rep) return { ok: false, why: 'No Report sheet.' };
       for (const r of SITE_ROWS) { const ref = AVG_COL + r; const lit = noLiteralInFormula(rep, ref); if (!lit.ok) return lit;
         if (normFormula(rep.formula(ref)) !== `=D${r}/C${r}`) return { ok: false, why: `${ref} is not revenue over kWh — one formula down the column` }; }
@@ -173,5 +172,5 @@ export default {
       return { ok: true }; },
     ses => printReady(ses) && pageNumbered(ses) ? { ok: true } : { ok: false, why: 'the footer has no page number — Page &[Page] of &[Pages] in the center section, landscape, fit to one page' },
   ],
-  solution: `F2 Home Delete Delete Delete Delete Delete Delete Delete Delete Delete Delete Delete Delete Enter Up Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right Ctrl+1 A Down "USD unless stated" Enter Ctrl+Down Down Right Right Ctrl+Shift+Down Shift+Up Shift+Right Alt H F D S O Enter Alt H F C Right Right Right Right Enter Ctrl+\` Ctrl+Down Ctrl+Right Left Ctrl+Up Down Ctrl+Shift+Down Shift+Up "=D5/C5" Ctrl+Enter Ctrl+Down Ctrl+Down Down Shift+Left Shift+Left Shift+Left Shift+Left Shift+Left Ctrl+Shift+Down Alt H B N Alt W V G Down Down Shift+Left Shift+Left Shift+Left Shift+Left Shift+Left Ctrl+Shift+Down F2 Ctrl+Enter Ctrl+\` Alt P S P Alt+H Alt+C "${PAGE_FOOTER}" Enter`,
+  solution: `F2 Home Delete Delete Delete Delete Delete Delete Delete Delete Delete Delete Delete Delete Enter Down Down Ctrl+Right Left Left Left Ctrl+Up Ctrl+Shift+Left Ctrl+1 A Ctrl+Left Down "USD unless stated" Enter Ctrl+Down Down Right Right Ctrl+Shift+Down Shift+Up Shift+Right Alt H F D S O Enter Alt H F C Right Right Right Right Enter Ctrl+\` Ctrl+Down Ctrl+Right Left Ctrl+Up Down Ctrl+Shift+Down Shift+Up "=D5/C5" Ctrl+Enter Ctrl+Down Ctrl+Down Down Ctrl+Left Right Ctrl+Shift+Down Ctrl+Shift+Right Alt H B N Alt W V G Down Down Ctrl+Shift+Down Ctrl+Shift+Right F2 Ctrl+Enter Ctrl+\` Alt P S P Alt+H Alt+C "${PAGE_FOOTER}" Enter`,
 };

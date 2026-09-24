@@ -28,10 +28,10 @@ const SITE_ROWS = [5, 6, 7, 8, 9];
 const ALL_ROWS = [5, 6, 7, 8, 9, 10];
 const TYPED_PROFIT = [5, 9];          // the two gross-profit rows typed as numbers
 const REF_ERROR_ROW = 7;             // E7 =C7-#REF!
-const VALUE_ERROR_ROW = 8;           // D8 =B8*Inputs!A9 — a site name where the rate belongs
+const VALUE_ERROR_ROW = 8;           // D8 =B8*Inputs!A12 — a site name where the rate belongs
 const RAW_FIRST = RAW_TOTALS.firstRow;   // Raw's site totals block: rows 8–12, kWh in I, revenue in J
 const LINKS = { B: RAW_TOTALS.cols.kwh, C: RAW_TOTALS.cols.revenue };
-const RATE = '=B5*INPUTS!$B$4';
+const RATES = ['=B5*Inputs!$B$4', '=Inputs!$B$4*B5', '=B5*Inputs!B$4', '=Inputs!B$4*B5'];   // any anchor a down-fill needs, either operand order
 
 /** A1-style refs for a rectangular block, column letters inclusive. */
 const span = (col1, col2, r1_, r2_) => { const out = []; for (let c = col1.charCodeAt(0); c <= col2.charCodeAt(0); c++) for (let r = r1_; r <= r2_; r++) out.push(String.fromCharCode(c) + r); return out; };
@@ -48,7 +48,7 @@ const colConsistent = (sh, col, rows) => {
   if (!base) return false;
   return rows.every((r, i) => normFormula(sh.formula(col + r)) === normFormula(translateFormula(base, i, 0)));
 };
-const rateLinked = sh => holds(sh, 'D5', RATE) && colConsistent(sh, 'D', SITE_ROWS) && SITE_ROWS.every(r => isNum(sh.value('D' + r)));
+const rateLinked = sh => RATES.some(f => holds(sh, 'D5', f)) && colConsistent(sh, 'D', SITE_ROWS) && SITE_ROWS.every(r => isNum(sh.value('D' + r)));
 const profitLive = sh => holds(sh, 'E5', '=C5-D5') && colConsistent(sh, 'E', SITE_ROWS) && SITE_ROWS.every(r => near(sh.value('E' + r), sh.value('C' + r) - sh.value('D' + r)));
 /** B10:E10 are SUMs over the five site rows and each reads its column's sum. */
 const totalsLive = sh => ['B', 'C', 'D', 'E'].every(col => {
@@ -73,7 +73,8 @@ export default {
   minutes: 3,
   conventions: ['B1', 'B2', 'B4', 'E1', 'E5', 'C3'],
   prerequisites: ['read-the-error'],
-  brief: 'A sister cluster’s site P&L, profit and loss by site, arrived typed from last week with a hardcoded rate, two errors and no totals: link it to Raw, anchor the rate, one formula per column, total it, add the margin.',
+  brief: 'A sister cluster’s P&L, profit and loss by site, arrived typed from last week with 0.13 typed inside its formulas, two errors and no totals: link it to Raw, anchor the rate, one formula per column, total it, add margin.',
+  deviations: ['margin runs to F10 so the Total row carries its own margin; the brief said F5:F9'],
   timeLimit: 170,
   pars: parsFrom(50, { pass: 150, pro: 90 }),
   seed: rng => {
@@ -123,13 +124,13 @@ export default {
     { id: 'link-revenue', text: 'Revenue in C5:C9 the same way, pointing at Raw’s J8, then color both link columns B5:C9 green: a link to another sheet is green.', convention: 'B2',
       keys: '→ Ctrl+Shift+↓ "=" Ctrl+PgDn Ctrl+→ → ×3 Ctrl+↓ → ↓ Ctrl+↵ ← Shift+→ Ctrl+Shift+↓ then Alt H F C → ×8 ↵',
       check: (s, ses) => { const rep = report(ses); return !!rep && linked(rep, 'B') && linked(rep, 'C') && green(rep, span('B', 'C', FIRST_SITE, LAST_SITE)) && settled(ses); } },
-    { id: 'rate-anchored', text: 'Energy cost D5:D9 multiplies by a typed 0.13 and D8 shows #VALUE!: enter =B5*Inputs!$B$4, the rate anchored with F4, into all five with Ctrl+Enter.', convention: 'B4',
+    { id: 'rate-anchored', text: 'Energy cost D5:D9 multiplies by a typed 0.13 and D8 is an error: enter =B5*Inputs!$B$4, anchored with F4, into all five with Ctrl+Enter; it stays black.', convention: 'B4',
       keys: '→ ×2 Ctrl+Shift+↓ "=" ← ×2 "*" Ctrl+PgDn ×2 → Ctrl+↓ ↓ F2 F4 Ctrl+↵',
       check: (s, ses) => { const rep = report(ses); return !!rep && rateLinked(rep) && settled(ses); } },
     { id: 'gross-profit', text: 'Gross profit E5:E9 mixes typed numbers, formulas and a #REF! in E7: select E5:E9, point =C5-D5 and commit it into every row with Ctrl+Enter.', convention: 'C3',
       keys: '→ Ctrl+Shift+↓ "=" ← ×2 "-" ← Ctrl+↵',
       check: (s, ses) => { const rep = report(ses); return !!rep && profitLive(rep) && settled(ses); } },
-    { id: 'total-row', text: 'The Total row B10:E10 is empty: select B5:E10, the block plus its blank edge, and press Alt+= once for every column’s SUM.', convention: 'E5',
+    { id: 'total-row', text: 'The Total row B10:E10 is empty: select B5:E10, the block plus its blank edge, and one Alt+= writes every column’s SUM.', convention: 'E5',
       keys: '← ×3 Ctrl+Shift+↓ Shift+↓ Shift+→ ×3 then Alt+=',
       check: (s, ses) => { const rep = report(ses); return !!rep && totalsLive(rep) && settled(ses); } },
     { id: 'margin', text: 'Margin % in F5:F10 is gross profit over revenue: select F5:F10, point =E5/C5 and commit it into all six rows with Ctrl+Enter.', convention: 'E1',
@@ -137,16 +138,21 @@ export default {
       check: (s, ses) => { const rep = report(ses); return !!rep && marginLive(rep) && settled(ses); } },
   ],
   graders: [
-    // Liveness: the engine's rule walks precedents on one sheet, so a pure link (=Raw!I8) is probed at its
-    // source — the formula is checked exactly by `linked` and Raw's total must move with the feed; every other
-    // figure moves through Inputs!B4 and is probed on the Report itself; B10:C10 sum only links, so `totalsLive` holds them.
+    // Liveness: live.js follows a cross-sheet reference but never nudges a formula cell on the other sheet, so a
+    // pure link to Raw's SUM (=Raw!I8) is judged dead; the link is checked exactly by `linked` and Raw's total is
+    // probed at its source; every other figure moves through Inputs!B4 and is probed on the Report itself;
+    // B10:C10 sum only links, so `totalsLive` holds them.
     ses => { const rep = report(ses), raw = sheetOf(ses, 'Raw'); if (!rep || !raw) return { ok: false, why: 'No Report sheet.' };
       for (const col of ['B', 'C']) for (let i = 0; i < SITE_ROWS.length; i++) {
         const ref = col + SITE_ROWS[i], src = LINKS[col] + (RAW_FIRST + i);
         if (!rep.cellAt(ref).formula) return { ok: false, why: `${ref} is a typed number where a live link belongs` };
         const r = liveness(raw, src); if (!r.ok) return { ok: false, why: `${ref} reads Raw!${src}, which ${r.why.replace(/^\S+ /, '')}` };
       }
-      for (const ref of span('D', 'F', FIRST_SITE, TOTAL_ROW)) { const r = liveness(rep, ref); if (!r.ok) return r; }
+      for (const ref of span('D', 'F', FIRST_SITE, TOTAL_ROW)) {
+        const c = rep.cellAt(ref);
+        if (!c.formula && c.value == null) return { ok: false, why: `${ref} is empty — every figure cell in B5:F10 is a live formula` };
+        const r = liveness(rep, ref); if (!r.ok) return r;
+      }
       return { ok: true }; },
     ses => { const rep = report(ses); if (!rep) return { ok: false, why: 'No Report sheet.' };
       const bad = FIGURES.find(ref => isError(rep.value(ref)));

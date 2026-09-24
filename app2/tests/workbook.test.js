@@ -386,4 +386,5 @@ test('pointing across sheets: Ctrl+PgDn mid-formula shows the next sheet, arrows
   s.run('"text" Ctrl+PgDn'); assert.equal(first.value('A4'), 'text'); assert.equal(s.sheet, data, 'a text entry commits, then the sheet switches');
   s.run('Ctrl+PgUp'); first.goTo(3, 1); s.run('Ctrl+['); assert.equal(s.sheet, data); assert.equal(data.selectionText(), 'B2', 'Ctrl+[ follows the link to its sheet');
   assert.ok(s.keyLog.map(e => e.k).includes('Ctrl+PgDn'));
+  s.run('Ctrl+PgUp'); first.goTo(6, 1); s.run('"=" Ctrl+PgDn Right Down F4'); assert.equal(s.editBuf, '=Data!$B$2', 'F4 cycles the anchors behind the sheet name'); s.run('F4'); assert.equal(s.editBuf, '=Data!B$2'); s.run('Escape');
 });
