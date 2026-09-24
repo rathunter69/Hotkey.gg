@@ -118,8 +118,8 @@ export default {
     patch[`Report!${AVG_COL}${litRow}`] = { ...BASE[AVG_COL + litRow], formula: `=D${litRow}/${weekKwh(litRow)}` };
     for (const ref of GRID_BLOCK) patch['Report!' + ref] = { ...BASE[ref], ball: true };         // a grid over the daily table…
     patch['Report!#gridlines'] = true;                                                          // …with gridlines on
-    const i = Math.floor(rng() * DAILY_ROWS.length), j = Math.floor(rng() * DAY_COLS.length);   // one daily cell retyped over its link — never G17, the cell the fix edits from
-    const [ri, cj] = i === 0 && j === 5 ? [1, 5] : [i, j];
+    const i = Math.floor(rng() * DAILY_ROWS.length), j = Math.floor(rng() * DAY_COLS.length);   // one daily cell retyped over its link — never B17, the cell the fix edits from
+    const [ri, cj] = i === 0 && j === 0 ? [1, 0] : [i, j];
     const { formula: _f, ...dead } = BASE[DAY_COLS[cj] + DAILY_ROWS[ri]]; patch[`Report!${DAY_COLS[cj]}${DAILY_ROWS[ri]}`] = { ...dead, value: dayKwh(ri, cj), ball: true };
     return patch;
   },
