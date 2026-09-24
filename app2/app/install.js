@@ -9,6 +9,9 @@
 //   promptInstall()           → Promise<'accepted' | 'dismissed' | 'unavailable'>
 //   shouldOfferInstall(prefs, completedCount)  pure: once, after lesson 2
 
+/** The install card's line (lesson-view.js); site.csv install_prompt overrides. First sentence bold. */
+export const INSTALL_PROMPT = 'Install hotkey.gg as an app. One click; it opens in its own window and stays in your dock.';
+
 let deferred = null;
 
 export function captureInstall() {

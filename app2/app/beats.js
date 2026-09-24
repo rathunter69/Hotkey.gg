@@ -5,9 +5,12 @@
 //
 //   beatFor(lesson, moduleAt)  → { id, eyebrow, title, body } for the first lesson of a module, else null
 import { PLANNED_MODULES } from './learn-next.js';
-import { copyFor } from '../content/copy/index.js';   // Wolf's written beat copy lays over the inline text (C2 Run 3)
+import { moduleCopy, siteCopy, splitParas } from '../content/copy/apply.js';
 
-export const MODULE_BEATS = {
+/** The chapter-end line's shape; site.csv page_delivered overrides. {n} the module number, {module} its name, {page} modules.csv page_name. */
+export const PAGE_DELIVERED = 'Page {n} — {page} — delivered to the data room.';
+
+const BEATS_DEFAULT = {
   welcome: { eyebrow: 'Module 1.0 · the Welcome', title: 'Sixty seconds on the feed.',
     body: 'Management sent the Austin cluster’s site feed: sixty rows, six columns. Before anything gets built, get to the bottom of it the slow way and the fast way, both on your own clock. The difference is the whole idea.' },
   'open-and-set-up': { eyebrow: 'Module 1.1 · open and set up', title: 'The file arrived the way inherited files do.',
@@ -19,12 +22,19 @@ export const MODULE_BEATS = {
   structure: { eyebrow: 'Module 1.4 · structure', title: 'Cedar Park opened this week.',
     body: 'A sixth site row, a margin column, a stale column to remove, and a total that has to follow every edit. Then the widths, heights, groups and frozen panes that make the page readable.' },
   format: { eyebrow: 'Module 1.5 · format', title: 'Numbers a banker can read.',
-    body: 'Thousands separators, no stray decimals, negatives in parentheses; bold totals with a top border; inputs blue with a light tint; the title centered across the page. House style, applied once and then repeated in a single pass.' },
+    body: 'Thousands separators, no stray decimals, negatives in parentheses; bold totals with a top border; inputs blue with a light tint; the title centered across the page. The standard, applied once and then repeated in a single pass.' },
   formulas: { eyebrow: 'Module 1.6 · formulas', title: 'Make the page live.',
     body: 'Every figure on the Report links to Raw and Inputs, so a corrected feed flows through without retyping. SUM and its family, anchoring with F4, links across sheets, and what each error means.' },
   'present-and-audit': { eyebrow: 'Module 1.7 · present and audit', title: 'Sign the page off.',
     body: 'The buyer’s analyst opens page one first. Check the totals tie, the conventions hold, the print fits one page, and nothing is hardcoded that should not be. Then it goes in the pack.' },
 };
+
+/** modules.csv story_beat ("Title || body") overrides a module's built-in beat; a row with only a body keeps the built-in title. */
+export const MODULE_BEATS = Object.fromEntries(Object.entries(BEATS_DEFAULT).map(([id, b]) => {
+  const row = moduleCopy(id); const paras = row ? splitParas(row.story_beat) : [];
+  if (!paras.length) return [id, b];
+  return [id, { eyebrow: b.eyebrow, title: paras.length > 1 ? paras[0] : b.title, body: paras.length > 1 ? paras.slice(1).join(' ') : paras[0] }];
+}));
 
 /** The beat for a lesson, when it opens a module the learner has not seen the beat for. Pure over `seen`. */
 export function beatFor(lesson, at, seen = []) {
@@ -33,7 +43,7 @@ export function beatFor(lesson, at, seen = []) {
   if (id === 'welcome') return null;   // retired (B2): the Welcome's moves open 1.1.1
   if (!id || seen.includes(id)) return null;
   const b = MODULE_BEATS[id];
-  if (b) return { id, eyebrow: copyFor('beat/' + id, 'eyebrow', b.eyebrow), title: copyFor('beat/' + id, 'title', b.title), body: copyFor('beat/' + id, 'body', b.body) };
+  if (b) return { id, ...b };
   const planned = PLANNED_MODULES.find(p => p.title === at.module.title);
   return { id, eyebrow: `Module ${(planned && planned.n) || '1.' + at.k} · ${at.module.title.toLowerCase()}`, title: at.module.title + '.', body: (planned && planned.objective) || '' };
 }
@@ -42,5 +52,7 @@ export function beatFor(lesson, at, seen = []) {
 export function pageDelivered(at) {
   if (!at) return '';
   const planned = PLANNED_MODULES.find(p => p.title === at.module.title);
-  return `Page ${(planned && planned.n) || '1.' + at.k} — ${at.module.title} — delivered to the data room.`;
+  const row = moduleCopy(at.module.id);
+  const page = (row && row.page_name && row.page_name.trim()) || at.module.title;
+  return siteCopy('page_delivered', PAGE_DELIVERED).replace(/\{n\}/g, (planned && planned.n) || '1.' + at.k).replace(/\{module\}/g, at.module.title).replace(/\{page\}/g, page);
 }

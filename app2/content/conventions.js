@@ -36,7 +36,7 @@ export const CONVENTIONS = {
   D5: { name: 'Totals bold with a top border', short: 'A top border, never an all-borders grid' },
   D6: { name: 'Indent hierarchy, right-aligned headers', short: 'Indent sub-items; headers over numbers' },
   D7: { name: 'Center Across Selection, never merge', short: 'Merged cells break everything' },
-  D8: { name: 'One font, one size', short: 'No colour for decoration' },
+  D8: { name: 'One font, one size', short: 'No color for decoration' },
   D9: { name: 'Custom formats do the labelling', short: 'Units live in the format, not typed text' },
   // E. Formulas and keystrokes
   E1: { name: 'Point, don’t type', short: 'Build references by pointing; F2 to read back' },

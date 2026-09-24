@@ -8,19 +8,20 @@ import { mountDemo } from '../ui/demo-player.js';
 import { store } from './store.js';
 import { track } from './telemetry.js';
 import { STAGES } from './deal-strip.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 /** The headline and its two alternates (?h=2 and ?h=3 still show them). */
 export const HEADLINES = [
-  { a: 'Excel isn’t learned.', b: 'It’s practiced.' },                          // shipped (Wolf, 2026-09-23 B)
+  { a: siteCopy('landing_headline_a', 'Excel isn’t learned.'), b: siteCopy('landing_headline_b', 'It’s practiced.') },   // shipped (Wolf, 2026-09-23 B); site.csv overrides
   { a: 'You don’t learn Excel by watching.', b: 'You learn it by doing it again.' },
   { a: 'Nobody learned Excel from a video.', b: '' },
 ];
-export const SUBHEAD = 'Learn Excel the way analysts are taught — on a real sheet, one job at a time.';
+export const SUBHEAD = siteCopy('landing_subhead', 'Learn Excel the way analysts are taught — on a real sheet, one job at a time.');
 
 /** The six modes, in the order a learner meets them. Each clip is a muted loop of the real product; `poster` shows until it loads. */
-export const MODES = [
+const MODES_DEFAULT = [
   { key: 'lesson', size: 'wide', title: 'Lessons', line: 'One job at a time on a live sheet. The keys are shown the first time; the sheet is graded on where it ends up, so any correct route counts.', where: 'Learn' },
   { key: 'challenge', size: '', title: 'Challenges', line: 'Every module ends in a seeded, timed run on a fresh file. Pass completes the module; pro and legendary are what you come back for.', where: 'Learn' },
   { key: 'drill', size: '', title: 'Drills', line: 'The same generators stripped of the story. Pars, personal bests, and a ghost of your own best run to race.', where: 'Practice' },
@@ -28,6 +29,7 @@ export const MODES = [
   { key: 'rapid', size: '', title: 'Rapid-fire', line: 'One shortcut at a time against the clock, drawn from the ones you remember least. Recall is the game.', where: 'Practice' },
   { key: 'boards', size: 'wide', title: 'Boards', line: 'A board for every challenge and for the Daily. Clean runs only: no help, no mouse. Rank turns on when the field fills.', where: 'Leaderboard' },
 ];
+export const MODES = MODES_DEFAULT.map(m => ({ ...m, line: siteCopy('mode_' + m.key, m.line) }));
 
 const HOW = [
   { n: '01', h: 'One line of why', p: 'Each goal carries its own teaching point: what the key does and why an analyst reaches for it.' },

@@ -1,0 +1,35 @@
+key,text
+briefing_1_eyebrow,The deal · 1 of 3
+briefing_1_title,A company is being sold. You prepare the numbers.
+briefing_1_body,"Voltline runs 40 electric-car charging sites. Its owners are selling the company. || Before any buyer sees a number, someone has to make the numbers clean, consistent and checked. That is you: an analyst, someone in finance or operations, a founder. It does not matter which."
+briefing_2_eyebrow,The deal · 2 of 3
+briefing_2_title,It starts with this week’s site report.
+briefing_2_body,"It arrived the way files usually do: a tab still called Sheet2, an old export nobody deleted, a price typed inside a formula. || You will turn it into a page a buyer can trust, using the methods investment banks train their people in. One job at a time, on the real file."
+briefing_3_eyebrow,The deal · 3 of 3
+briefing_3_title,Every finished page goes into the data room.
+briefing_3_body,"A sale runs in stages. Each chapter here is one stage, and each one ends with a finished page. || The pages go into the data room: the folder buyers will read. By the end of Chapter 1, page one is in it, built by you."
+orientation_eyebrow,How this place works
+orientation_title,Where things are.
+orientation_learn,"The path. Lessons in short modules, each one job on the file. A module ends with a challenge: the same job on a fresh file, against the clock."
+orientation_practice,"The reps. Drills and rapid-fire with no story, and the Daily: one ninety-second sheet, the same for everyone, once a day."
+orientation_leaderboard,"A board for every challenge and for the Daily. Clean runs only: no help, no mouse."
+orientation_level,"Finishing lessons and challenges earns XP, and XP is your level, shown in the top bar. Speed earns places on the boards, not XP."
+orientation_fine,Keyboard first. Sound is on at low volume from your first key; the mute is on the workspace.
+landing_headline_a,Excel isn’t learned.
+landing_headline_b,It’s practiced.
+landing_subhead,"Learn Excel the way analysts are taught — on a real sheet, one job at a time."
+mode_lesson,"One job at a time on a live sheet. The keys are shown the first time; the sheet is graded on where it ends up, so any correct route counts."
+mode_challenge,"Every module ends in a seeded, timed run on a fresh file. Pass completes the module; pro and legendary are what you come back for."
+mode_drill,"The same generators stripped of the story. Pars, personal bests, and a ghost of your own best run to race."
+mode_daily,"Ninety seconds, the same sheet for everyone, once a day. A result card built to be shared."
+mode_rapid,"One shortcut at a time against the clock, drawn from the ones you remember least. Recall is the game."
+mode_boards,"A board for every challenge and for the Daily. Clean runs only: no help, no mouse. Rank turns on when the field fills."
+dash_learn,"The path: chapters, modules, lessons and their challenges, one story on one file."
+dash_practice,"The reps: timed, no story. What is due today, the Daily, drills and rapid-fire."
+deal_strip_stage_1,The data comes in
+deal_strip_deliverable_1,"The weekly KPI page: clean, live, formatted, checked, print-ready"
+page_delivered,Page {n} — {page} — delivered to the data room.
+save_nudge,Your progress is saved on this device. Create a free account to keep it across devices — everything carries over.
+install_prompt,Install hotkey.gg as an app. One click; it opens in its own window and stays in your dock.
+due_empty,"Nothing due. Play the Daily, or carry on with the next lesson."
+due_foot,Short reps on what you are about to forget. Nothing is lost by skipping a day.

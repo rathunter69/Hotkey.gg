@@ -14,13 +14,14 @@ import { prefs } from './prefs.js';
 import { store } from './store.js';
 import { track } from './telemetry.js';
 import { LESSONS } from '../content/index.js';
+import { siteCopy, splitParas } from '../content/copy/apply.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 /** Lesson 1.1.1: the first lesson of the first module (the Welcome race is retired, B2). */
 export const FIRST_LESSON = (LESSONS.find(l => l.module === 'open-and-set-up') || LESSONS[0]).id;
 
-/** The three Project Volt cards (B3 voice). Exported so the copy is testable. */
-export const BRIEFING = [
+/** The three Project Volt cards (B3 voice). Built-in lines here; site.csv (briefing_n_*) overrides. Exported so the copy is testable. */
+const BRIEFING_DEFAULT = [
   { key: 'who', eyebrow: 'The deal · 1 of 3', title: 'A company is being sold. You prepare the numbers.',
     body: ['Voltline runs 40 electric-car charging sites. Its owners are selling the company.',
       'Before any buyer sees a number, someone has to make the numbers clean, consistent and checked. That is you: an analyst, someone in finance or operations, a founder. It does not matter which.'] },
@@ -31,8 +32,12 @@ export const BRIEFING = [
     body: ['A sale runs in stages. Each chapter here is one stage, and each one ends with a finished page.',
       'The pages go into the data room: the folder buyers will read. By the end of Chapter 1, page one is in it, built by you.'] },
 ];
+export const BRIEFING = BRIEFING_DEFAULT.map((c, i) => ({
+  key: c.key, eyebrow: siteCopy(`briefing_${i + 1}_eyebrow`, c.eyebrow), title: siteCopy(`briefing_${i + 1}_title`, c.title),
+  body: siteCopy(`briefing_${i + 1}_body`) ? splitParas(siteCopy(`briefing_${i + 1}_body`)) : c.body,
+}));
 
-export const ORIENTATION = {
+const ORIENTATION_DEFAULT = {
   eyebrow: 'How this place works', title: 'Where things are.',
   rows: [
     { where: 'Learn', what: 'The path. Lessons in short modules, each one job on the file. A module ends with a challenge: the same job on a fresh file, against the clock.' },
@@ -41,6 +46,11 @@ export const ORIENTATION = {
     { where: 'Level', what: 'Finishing lessons and challenges earns XP, and XP is your level, shown in the top bar. Speed earns places on the boards, not XP.' },
   ],
   fine: 'Keyboard first. Sound is on at low volume from your first key; the mute is on the workspace.',
+};
+export const ORIENTATION = {
+  eyebrow: siteCopy('orientation_eyebrow', ORIENTATION_DEFAULT.eyebrow), title: siteCopy('orientation_title', ORIENTATION_DEFAULT.title),
+  rows: ORIENTATION_DEFAULT.rows.map(r => ({ where: r.where, what: siteCopy('orientation_' + r.where.toLowerCase(), r.what) })),
+  fine: siteCopy('orientation_fine', ORIENTATION_DEFAULT.fine),
 };
 
 /** Step order for a first visit; a returning visitor who has read the briefing only sees the picker. */

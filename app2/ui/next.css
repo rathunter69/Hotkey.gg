@@ -294,7 +294,7 @@ html[data-panel="left"] .ws-next .lesson{flex-direction:row-reverse}
 /* the pill: one line, the current goal, out of the way */
 .lesson.panel-overlay.pill .lesson-panel{width:auto; max-width:420px; border-radius:99px; cursor:pointer}
 .lesson.panel-overlay.pill .panel-head, .lesson.panel-overlay.pill .panel-tabs, .lesson.panel-overlay.pill .panel-body, .lesson.panel-overlay.pill .panel-actions,
-.lesson.panel-overlay.pill .task-label, .lesson.panel-overlay.pill .task-teach, .lesson.panel-overlay.pill .task-keys, .lesson.panel-overlay.pill .task-extra, .lesson.panel-overlay.pill .conv-chip, .lesson.panel-overlay.pill .goal-nudge, .lesson.panel-overlay.pill .task-list{display:none}
+.lesson.panel-overlay.pill .task-label, .lesson.panel-overlay.pill .task-teach, .lesson.panel-overlay.pill .task-why, .lesson.panel-overlay.pill .task-stuck, .lesson.panel-overlay.pill .task-keys, .lesson.panel-overlay.pill .task-extra, .lesson.panel-overlay.pill .conv-chip, .lesson.panel-overlay.pill .goal-nudge, .lesson.panel-overlay.pill .task-list{display:none}
 .lesson.panel-overlay.pill .task-card{padding:8px 16px; border:0; background:transparent; display:flex; align-items:center; gap:10px}
 .lesson.panel-overlay.pill .task-label{margin:0}
 .lesson.panel-overlay.pill .task-label .task-count{margin-left:6px}

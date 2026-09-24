@@ -12,12 +12,13 @@ import { statusOf, moduleStatus, pathModel, CHAPTER_PLAN } from './learn-page.js
 import { STAGES, dealStripHtml } from './deal-strip.js';
 import { workbookState, WORKBOOKS } from '../content/workbooks/index.js';
 import { ring } from '../ui/ring.js';
+import { moduleCopy } from '../content/copy/apply.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const TIER_MARK = { legendary: '◆◆◆', pro: '◆◆', pass: '◆' };
 
 /** The Chapter 1 modules as the map plans them, for the ones not yet authored (the content session is writing 1.3–1.7). */
-export const PLANNED_MODULES = [
+const PLANNED_DEFAULT = [
   { n: '1.1', title: 'Open and set up', objective: 'Tidy the file as it arrived: tabs, gridlines, Excel Options, the QAT, the color-and-label conventions.' },
   { n: '1.2', title: 'Move and select', objective: 'Jumps, never scrolls: Ctrl+Arrow, the selection set, Go To, Go To Special.' },
   { n: '1.3', title: 'Enter, edit, copy and fill', objective: 'The missing day, the typos, the Report skeleton, Paste Special, Find and Replace, a timeline.' },
@@ -26,6 +27,9 @@ export const PLANNED_MODULES = [
   { n: '1.6', title: 'Formulas', objective: 'SUM and its family, relative and absolute references, links across sheets, the errors and what they mean.' },
   { n: '1.7', title: 'Present and audit', objective: 'The KPI page checked, print-ready and signed off: page one of the pack.' },
 ];
+const PLANNED_IDS = { '1.1': 'open-and-set-up', '1.2': 'move-and-select', '1.3': 'enter-edit-copy-fill', '1.4': 'structure', '1.5': 'format', '1.6': 'formulas', '1.7': 'present-and-audit' };
+/** The seven planned modules; modules.csv (name, objective) overrides the built-in lines by module id. */
+export const PLANNED_MODULES = PLANNED_DEFAULT.map(p => { const row = moduleCopy(PLANNED_IDS[p.n]); return row ? { ...p, title: (row.name || '').trim() || p.title, objective: (row.objective || '').trim() || p.objective } : p; });
 
 /** The document number for a module id, from its position among the built modules. */
 const docNo = (chapterN, k) => `${chapterN}.${k + 1}`;

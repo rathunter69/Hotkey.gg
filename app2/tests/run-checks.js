@@ -1,6 +1,7 @@
 // npm run check — the whole gate for the rebuild branch. Must finish in < 30 s.
 //   1. syntax: every app2/**/*.js parses as an ES module (node --check)
 //   2. isolation: nothing under app2/ imports from outside app2/ (the old build is off-limits)
+//   2b. public pages and content/copy/index.js are generated and must not drift; copy-check's rules hold
 //   3. unit tests: node --test app2/tests/
 // No dependencies, no framework, no browser.
 import { spawnSync } from 'node:child_process';
@@ -56,12 +57,16 @@ for (const h of htmls) {
 console.log('isolation ok: no imports from outside app2/');
 
 // 2b. the public lesson and shortcut pages are generated from the lesson data and must not drift
-const cs = spawnSync(process.execPath, [join(here, 'copy-sync.js')], { encoding: 'utf8' });
-if (cs.status !== 0) { process.stdout.write(cs.stdout || ''); process.stderr.write(cs.stderr || ''); console.log('CHECK FAILED: the copy layer is stale (node app2/tests/copy-sync.js --write)'); process.exit(1); }
-process.stdout.write(cs.stdout || '');
 const pp = spawnSync(process.execPath, [join(here, 'public-pages.js')], { encoding: 'utf8' });
 if (pp.status !== 0) fail((pp.stderr || pp.stdout).trim());
 console.log(pp.stdout.trim());
+
+// 2c. the copy layer: content/copy/index.js is inlined from the CSVs and must not drift; the copy rules hold
+for (const script of ['copy-build.js', 'copy-check.js']) {
+  const r = spawnSync(process.execPath, [join(here, script)], { encoding: 'utf8' });
+  if (r.status !== 0) fail((r.stderr || r.stdout).trim());
+  const lines = (r.stdout + r.stderr).trim().split('\n'); console.log(lines[lines.length - 1]);
+}
 
 // 3. unit tests
 const testFiles = files.filter(f => f.endsWith('.test.js')).sort();

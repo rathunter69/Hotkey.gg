@@ -10,6 +10,14 @@ import { prefs } from './prefs.js';
 import { pickNextLesson, statusOf, moduleStatus, pathModel } from './learn-page.js';
 import { DRILLS } from '../content/drills.js';
 import { dailyFor } from './daily.js';
+import { siteCopy } from '../content/copy/apply.js';
+
+/** The dashboard's built-in lines; site.csv (dash_*, due_*, save_nudge) overrides. Exported for the copy export. */
+export const DASH_LINES = { learn: 'The path: chapters, modules, lessons and their challenges, one story on one file.', practice: 'The reps: timed, no story. What is due today, the Daily, drills and rapid-fire.' };
+export const DUE_LINES = { foot: 'Short reps on what you are about to forget. Nothing is lost by skipping a day.', empty: 'Nothing due. Play the Daily, or carry on with the next lesson.' };
+/** The first sentence in bold, the rest plain (the nudge and the empty-queue line). */
+const lead = t => { const m = /^(.*?[.!?])(\s+.*)?$/s.exec(String(t || '')); return m ? `<b>${esc(m[1])}</b>${m[2] ? esc(m[2]) : ''}` : esc(t); };
+export const SAVE_NUDGE = 'Your progress is saved on this device. Create a free account to keep it across devices — everything carries over.';
 import { dayOf } from './records.js';
 import { gameCtx } from './stats.js';
 import { schedule, dueToday, demoState, microLesson } from './schedule.js';
@@ -81,8 +89,8 @@ export function mountHomePage(root, pageCtx = {}) {
   const dueCard = `<section class="hm-card hm-due" aria-label="Due today">
       <div class="hm-cap">due today${queue.items.length ? ` <span>${queue.items.length} item${queue.items.length === 1 ? '' : 's'} · ${queue.secs} s</span>` : ''}</div>
       ${queue.items.length ? `<ol class="hm-due-list">${queue.items.map((it, i) => `<li><a href="${it.kind === 'challenge' ? '#/lesson/' + esc(it.id) : '#/due/' + esc(it.id)}"><span class="hm-due-n">${i + 1}</span><span class="hm-due-body"><b>${esc(it.title)}</b><span>${esc(it.task)}</span></span><span class="hm-due-secs">${it.secs} s</span></a></li>`).join('')}</ol>
-        <p class="hm-due-foot">Short reps on what you are about to forget. Nothing is lost by skipping a day.</p>`
-        : `<div class="hm-empty"><b>Nothing due.</b> Play the Daily, or carry on with the next lesson.</div>`}
+        <p class="hm-due-foot">${esc(siteCopy('due_foot', DUE_LINES.foot))}</p>`
+        : `<div class="hm-empty">${lead(siteCopy('due_empty', DUE_LINES.empty))}</div>`}
     </section>`;
 
   const dailyCard = `<section class="hm-card hm-daily" aria-label="The Daily">
@@ -111,18 +119,18 @@ export function mountHomePage(root, pageCtx = {}) {
 
   const completedN = Object.values(all).filter(p => p && p.completed).length;
   const nudge = !c.demo && completedN >= 1 && store.saveState() === 'device' && !prefs.get().saveNudgeDone
-    ? `<div class="hm-nudge" id="hmNudge" role="status"><span><b>Your progress is saved on this device.</b> Create a free account to keep it across devices — everything carries over.</span><span class="hm-nudge-acts"><a class="btn btn-primary" href="#/account">Create account</a><button class="btn btn-ghost" type="button" id="hmNudgeNo">Not now</button></span></div>` : '';
+    ? `<div class="hm-nudge" id="hmNudge" role="status"><span>${lead(siteCopy('save_nudge', SAVE_NUDGE))}</span><span class="hm-nudge-acts"><a class="btn btn-primary" href="#/account">Create account</a><button class="btn btn-ghost" type="button" id="hmNudgeNo">Not now</button></span></div>` : '';
   // Learn and Practice are two different things (B6): the path with its story on the left, the reps on the right
   const hints = !prefs.get().dashHintsSeen;
   if (hints && !c.demo) prefs.set({ dashHintsSeen: true });
   el.innerHTML = `${nudge}
     <div class="hm-halves">
       <section class="hm-half hm-learn" aria-label="Learn">
-        <div class="hm-half-head"><h2>Learn</h2>${hints ? '<p>The path: chapters, modules, lessons and their challenges, one story on one file.</p>' : ''}</div>
+        <div class="hm-half-head"><h2>Learn</h2>${hints ? `<p>${esc(siteCopy('dash_learn', DASH_LINES.learn))}</p>` : ''}</div>
         ${continueCard}${modules}
       </section>
       <section class="hm-half hm-practice" aria-label="Practice">
-        <div class="hm-half-head"><h2>Practice</h2>${hints ? '<p>The reps: timed, no story. What is due today, the Daily, drills and rapid-fire.</p>' : ''}</div>
+        <div class="hm-half-head"><h2>Practice</h2>${hints ? `<p>${esc(siteCopy('dash_practice', DASH_LINES.practice))}</p>` : ''}</div>
         ${dueCard}${dailyCard}${level}
       </section>
     </div>

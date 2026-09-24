@@ -18,7 +18,6 @@
 // Every read and write is guarded; a private window or corrupt storage never breaks a page.
 import { mulberry32 } from '../engine/rng.js';
 import { MICRO_MODULES } from '../content/micro.js';
-import { copyFor } from '../content/copy/index.js';   // Wolf's written micro-drill copy lays over the inline text (C2 Run 3)
 
 export const SCHEDULE_KEY = 'hk2_schedule_v1';
 export const DAY = 86400000;
@@ -225,9 +224,9 @@ export const RAPID_CONCEPT = {
 export function microLesson(id) {
   const m = MICRO[id]; if (!m) return null;
   return {
-    id: 'due-' + id, kind: 'micro', chapter: 'foundations', section: 'Due today', title: copyFor('micro/' + id, 'title', m.title), difficulty: 'easy', tags: ['due'], access: 'free',
+    id: 'due-' + id, kind: 'micro', chapter: 'foundations', section: 'Due today', title: m.title, difficulty: 'easy', tags: ['due'], access: 'free',
     workbook: 'voltline-weekly', state: { before: m.state, after: m.state }, minutes: 1, concept: id,
-    brief: copyFor('micro/' + id, 'task', m.task), goals: m.goals.map(g => { const t = copyFor('micro/' + id, `goal.${g.id}.text`, g.text); return t === g.text ? g : { ...g, text: t }; }), solution: m.solution, secs: m.secs, teaches: [], requires: [id],
+    brief: m.task, goals: m.goals, solution: m.solution, secs: m.secs, teaches: [], requires: [id],
   };
 }
 
