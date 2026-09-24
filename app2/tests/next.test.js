@@ -3,7 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { flowFromQuery, flowOn, DEFAULT_ON } from '../app/flow.js';
-import { inferTarget, altPath, cellsOf, rangeBox, rangeCorners, pickDock, QUADRANTS } from '../ui/cues.js';
+import { inferTarget, altPath, cellsOf, rangeBox, rangeCorners, placeNear, SIDES } from '../ui/cues.js';
 import { beatFor, MODULE_BEATS, pageDelivered } from '../app/beats.js';
 import { shouldOfferInstall } from '../app/install.js';
 import { dailyCardHtml, efficiency, prettyDay } from '../ui/result-card.js';
@@ -80,7 +80,7 @@ test('beats: once per module, on its first lesson, never on a challenge; every b
   const ch = LESSONS.find(l => l.id === 'challenge-inherited-file');
   assert.equal(beatFor(ch, moduleOf(ch), []), null);
   for (const l of LESSONS) { const m = moduleOf(l); if (m && m.n === 1 && l.kind !== 'challenge') assert.ok(MODULE_BEATS[l.module], 'a beat for ' + l.module); }
-  assert.match(pageDelivered(at), /^Page 1\.1 — Open and set up — delivered/);
+  assert.match(pageDelivered(at), /^Page 1\.1 — The workbook, set up to standard — delivered/);
   for (const k in MODULE_BEATS) for (const s of [MODULE_BEATS[k].title, MODULE_BEATS[k].body]) assert.doesNotMatch(s, /colour|practis|organis|centre|grey\b/i, 'American spelling in ' + k);
 });
 
@@ -176,20 +176,53 @@ test('cues (B7): the pulse is one box around the range perimeter, from its corne
   assert.deepEqual(rangeBox(null, null), null);
 });
 
-test('floating panel (B4): docks to the quadrant farthest from the target, never over it, and stays put while it clears it', () => {
-  const box = { w: 1000, h: 600 }, panel = { w: 380, h: 260 };
-  assert.deepEqual(QUADRANTS, ['tr', 'tl', 'br', 'bl']);
-  assert.equal(pickDock(box, null, panel, null).q, 'tr', 'no target: top right');
-  assert.equal(pickDock(box, null, panel, 'bl').q, 'bl', 'no target: keep the current quadrant');
-  const topRight = { left: 800, top: 40, width: 64, height: 20 };
-  const d1 = pickDock(box, topRight, panel, 'tr');
-  assert.equal(d1.q, 'bl', 'a target under the card sends it to the far corner');
-  assert.ok(d1.rect.top + d1.rect.height <= box.h && d1.rect.left >= 0);
-  const topLeft = { left: 40, top: 40, width: 64, height: 20 };
-  assert.equal(pickDock(box, topLeft, panel, 'bl').q, 'bl', 'still clear: the card does not hop');
-  assert.equal(pickDock(box, topLeft, panel, 'tl').q, 'br', 'covered: it moves to the far corner');
-  const middle = { left: 450, top: 280, width: 64, height: 20 };
-  const d2 = pickDock(box, middle, panel, 'tr');
-  assert.equal(d2.q, 'tr', 'a mid-sheet target is clear of the top-right card at this size');
-  for (const q of QUADRANTS) { const r = pickDock(box, null, panel, q).rect; assert.ok(r.left >= 12 && r.top >= 12 && r.left + r.width <= box.w - 12 + 1e-9 && r.top + r.height <= box.h - 12 + 1e-9, q + ' inside the box'); }
+test('placeNear: the card sits beside the target, a cell or two away, on the first side that fits', () => {
+  const box = { w: 1000, h: 600, x0: 40, y0: 22 }, panel = { w: 380, h: 260 };
+  const cell = (left, top, width = 64, height = 20) => ({ left, top, width, height });
+  const clear = (r, t) => r.left >= t.left + t.width || r.left + r.width <= t.left || r.top >= t.top + t.height || r.top + r.height <= t.top;
+  const inside = r => r.left >= box.x0 && r.top >= box.y0 && r.left + r.width <= box.w - 12 && r.top + r.height <= box.h - 12;
+  assert.deepEqual(SIDES, ['right', 'below', 'left', 'above']);
+  // left edge (A5): right of it, one and a half cells away, top-aligned
+  const a5 = cell(40, 102); const p1 = placeNear(box, a5, panel);
+  assert.equal(p1.side, 'right'); assert.equal(p1.rect.left, 40 + 64 + 96); assert.equal(p1.rect.top, 102);
+  // right edge (a cell at the box's far right): no room right → below, pulled in so it stays on screen
+  const far = cell(900, 122); const p2 = placeNear(box, far, panel);
+  assert.equal(p2.side, 'below'); assert.equal(p2.rect.top, 122 + 20 + 40); assert.equal(p2.rect.left, 1000 - 12 - 380);
+  // bottom right corner: no room right or below → left of it, its top clamped to the box
+  const br = cell(900, 560); const p3 = placeNear(box, br, panel);
+  assert.equal(p3.side, 'left'); assert.equal(p3.rect.left, 900 - 96 - 380); assert.equal(p3.rect.top, 600 - 12 - 260);
+  // a wide block along the bottom (a whole row, scrolled to the bottom): only above fits
+  const row = cell(40, 560, 960, 20); const p4 = placeNear(box, row, panel);
+  assert.equal(p4.side, 'above'); assert.equal(p4.rect.top, 560 - 40 - 260);
+  // top edge, mid-sheet (C1): right of it
+  const c1 = cell(168, 22); assert.equal(placeNear(box, c1, panel).side, 'right');
+  // a whole column down the left (A1:A100 selected): right of it
+  const colA = cell(40, 22, 64, 578); const p5 = placeNear(box, colA, panel);
+  assert.equal(p5.side, 'right'); assert.ok(clear(p5.rect, colA));
+  // every edge case: never over the target, the headers, or the box's far edges
+  for (const [name, t, p] of [['A5', a5, p1], ['far right', far, p2], ['bottom right', br, p3], ['bottom row', row, p4], ['column A', colA, p5]]) {
+    assert.ok(clear(p.rect, t), name + ': the card is clear of the target'); assert.ok(inside(p.rect), name + ': the card is inside the data area');
+  }
+  // the target fills the view: nothing fits beside it, so the farthest corner, still inside the data area
+  const all = cell(40, 22, 960, 578); const p6 = placeNear(box, all, panel);
+  assert.equal(p6.side, 'free'); assert.ok(inside(p6.rect));
+  // a target scrolled wholly out of the box is no target: the card stays where it was
+  const keep = { side: 'below', rect: { left: 300, top: 300, width: 380, height: 260 } };
+  assert.deepEqual(placeNear(box, cell(-200, -100), panel, { keep }), keep);
+  assert.equal(placeNear(box, null, panel).side, 'free');
+  assert.deepEqual(placeNear(box, null, panel).rect, { left: 1000 - 12 - 380, top: 22 + 12, width: 380, height: 260 }, 'no target, nothing kept: top right of the data area');
+  // Ctrl+Shift+J asks for a side first; one that does not fit falls through
+  assert.equal(placeNear(box, a5, panel, { prefer: ['below'] }).side, 'below');
+  assert.equal(placeNear(box, a5, panel, { prefer: ['left'] }).side, 'right', 'left of A5 does not fit: the next side that does');
+  // a Ribbon goal: under the bar, beside the glowing group
+  const rb = placeNear(box, null, panel, { ribbon: { left: 200, right: 320 } });
+  assert.equal(rb.side, 'ribbon'); assert.equal(rb.rect.left, 336); assert.equal(rb.rect.top, 22 + 12);
+  const rbFar = placeNear(box, null, panel, { ribbon: { left: 800, right: 950 } });
+  assert.equal(rbFar.rect.left, 800 - 16 - 380, 'no room right of the group: left of it');
+  // a tight box: the full gap does not fit on any side, the one-cell gap right of the target does
+  const tight = placeNear({ w: 1020, h: 559, x0: 40, y0: 22 }, cell(448, 220, 104, 20), { w: 380, h: 334 });
+  assert.equal(tight.side, 'right'); assert.equal(tight.rect.left, 448 + 104 + 64);
+  // a small box: the card shrinks to the data area and stays inside
+  const small = placeNear({ w: 420, h: 300, x0: 40, y0: 22 }, cell(100, 100), { w: 380, h: 260 });
+  assert.ok(small.rect.width <= 420 - 40 - 12 && small.rect.height <= 300 - 22 - 12);
 });

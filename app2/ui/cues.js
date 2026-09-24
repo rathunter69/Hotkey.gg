@@ -109,30 +109,63 @@ function restart(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.cl
 export function clearPulse(rootEl) { if (rootEl) for (const el of rootEl.querySelectorAll('.cue-pulse, .cue-ring')) { if (el.classList.contains('cue-ring')) el.remove(); else el.classList.remove('cue-pulse'); } }
 
 /**
- * Where the floating panel goes (B4): the quadrant of the visible sheet box farthest from the
- * target, never over it. `box` = { w, h } of the visible sheet, `target` = { left, top, width,
- * height } inside it (null → top-right), `panel` = { w, h }, `keep` = the current quadrant (kept
- * while it still clears the target, so the card does not hop). Pure.
+ * Where the floating panel goes (B4, Wolf 2026-09-23): adjacent to the goal's target, a cell or
+ * two away (one cell when the box is tight), preferring right of it, then below, then left, then above; never over the target,
+ * never over the row and column headers (the box's x0/y0), never off the visible sheet. Pure.
+ *   box     { w, h, x0, y0 }: the visible scroll box in its own pixels; the data area starts at (x0, y0)
+ *   target  { left, top, width, height } in box pixels (scrolled), or null when the goal has no cell target
+ *   panel   { w, h }
+ *   opts    gapX (default 96 ≈ 1.5 cells), gapY (40 = 2 rows), pad (12: the margin to the box's far edges),
+ *           prefer (the side order; the first entry is what Ctrl+Shift+J asked for), ribbon ({ left, right }
+ *           of the glowing Ribbon group in box pixels: the card docks under it, beside the group),
+ *           keep ({ side, rect } of the current placement: kept while there is no target to dock to)
+ *   → { side: 'right' | 'below' | 'left' | 'above' | 'ribbon' | 'free', rect: { left, top, width, height } }
  */
-export const QUADRANTS = ['tr', 'tl', 'br', 'bl'];
-export function pickDock(box, target, panel, keep, pad = 12) {
-  const rects = {};
-  for (const q of QUADRANTS) {
-    rects[q] = { left: q.endsWith('r') ? Math.max(pad, box.w - panel.w - pad) : pad, top: q.startsWith('b') ? Math.max(pad, box.h - panel.h - pad) : pad, width: panel.w, height: panel.h };
+export const SIDES = ['right', 'below', 'left', 'above'];
+export function placeNear(box, target, panel, opts = {}) {
+  const gapX = opts.gapX == null ? 96 : opts.gapX, gapY = opts.gapY == null ? 40 : opts.gapY, pad = opts.pad == null ? 12 : opts.pad;
+  const x0 = box.x0 || 0, y0 = box.y0 || 0;
+  const w = Math.min(panel.w, Math.max(0, box.w - x0 - pad)), h = Math.min(panel.h, Math.max(0, box.h - y0 - pad));
+  const maxL = box.w - pad - w, maxT = box.h - pad - h;
+  const cx = v => Math.max(x0, Math.min(maxL, v)), cy = v => Math.max(y0, Math.min(maxT, v));
+  const rect = (left, top) => ({ left, top, width: w, height: h });
+  const inside = r => r.left >= x0 && r.top >= y0 && r.left + r.width <= box.w - pad + 1e-9 && r.top + r.height <= box.h - pad + 1e-9;
+  // a target partly off the box is clipped to the data area; one wholly off it is no target
+  let t = null;
+  if (target) {
+    const l = Math.max(x0, target.left), tp = Math.max(y0, target.top), r = Math.min(box.w, target.left + target.width), b = Math.min(box.h, target.top + target.height);
+    if (r > l && b > tp) t = { left: l, top: tp, width: r - l, height: b - tp };
   }
-  const hits = (r, t) => !!t && r.left < t.left + t.width + pad && r.left + r.width + pad > t.left && r.top < t.top + t.height + pad && r.top + r.height + pad > t.top;
-  if (!target) return { q: keep && QUADRANTS.includes(keep) ? keep : 'tr', rect: rects[keep && QUADRANTS.includes(keep) ? keep : 'tr'] };
-  if (keep && rects[keep] && !hits(rects[keep], target)) return { q: keep, rect: rects[keep] };
-  const tc = { x: target.left + target.width / 2, y: target.top + target.height / 2 };
+  if (!t) {
+    if (opts.ribbon && Number.isFinite(opts.ribbon.left) && Number.isFinite(opts.ribbon.right)) {
+      const right = opts.ribbon.right + 16, left = opts.ribbon.left - 16 - w;
+      const l = right <= maxL ? right : left >= x0 ? left : cx(opts.ribbon.left);
+      return { side: 'ribbon', rect: rect(l, y0 + pad) };
+    }
+    if (opts.keep && opts.keep.rect && inside(opts.keep.rect)) return { side: opts.keep.side || 'free', rect: { ...opts.keep.rect } };
+    return { side: 'free', rect: rect(maxL, y0 + pad) };
+  }
+  const order = [...(opts.prefer || []), ...SIDES].filter((s, i, a) => SIDES.includes(s) && a.indexOf(s) === i);
+  // two passes: the full gap (a cell and a half / two rows), then the one-cell gap when the box is tight
+  for (const [gx, gy] of [[gapX, gapY], [Math.min(gapX, 64), Math.min(gapY, 20)]]) {
+    for (const side of order) {
+      let r = null;
+      if (side === 'right') { const l = t.left + t.width + gx; if (l <= maxL) r = rect(l, cy(t.top)); }
+      else if (side === 'below') { const tp = t.top + t.height + gy; if (tp <= maxT) r = rect(cx(t.left), tp); }
+      else if (side === 'left') { const l = t.left - gx - w; if (l >= x0) r = rect(l, cy(t.top)); }
+      else if (side === 'above') { const tp = t.top - gy - h; if (tp >= y0) r = rect(cx(t.left), tp); }
+      if (r && inside(r)) return { side, rect: r };
+    }
+  }
+  // nothing fits beside it (the target fills the view): the corner farthest from its centre
+  const tc = { x: t.left + t.width / 2, y: t.top + t.height / 2 };
   let best = null;
-  for (const q of QUADRANTS) {
-    const r = rects[q]; const c = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    const d = Math.hypot(c.x - tc.x, c.y - tc.y) - (hits(r, target) ? 1e6 : 0);
-    if (!best || d > best.d) best = { q, d, rect: r };
+  for (const [l, tp] of [[maxL, y0 + pad], [x0, y0 + pad], [maxL, maxT], [x0, maxT]]) {
+    const r = rect(l, tp); const d = Math.hypot(l + w / 2 - tc.x, tp + h / 2 - tc.y);
+    if (!best || d > best.d) best = { d, r };
   }
-  return { q: best.q, rect: best.rect };
+  return { side: 'free', rect: best.r };
 }
-
 
 /**
  * Glow the next control on a Ribbon route. Before Alt: the tab the route needs. While walking:

@@ -21,10 +21,11 @@ import { mountEffects } from '../ui/effects.js';
 import { showToast } from '../ui/toast.js';
 import { keyLabel, prefs } from './prefs.js';
 import { flowNext } from './flow.js';
-import { inferTarget, altPath, pulseTarget, clearPulse, glowRibbon, pickDock, QUADRANTS } from '../ui/cues.js';
+import { inferTarget, altPath, pulseTarget, clearPulse, glowRibbon, placeNear, SIDES } from '../ui/cues.js';
 import { beatFor, pageDelivered } from './beats.js';
 import { schedule, grade as scheduleGrade, dueToday } from './schedule.js';
-import { shouldOfferInstall, installAvailable, promptInstall } from './install.js';
+import { shouldOfferInstall, installAvailable, promptInstall, INSTALL_PROMPT } from './install.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 /** A keycap: the chord as the learner's platform shows it (Ctrl → ⌘, Alt → ⌥ on a Mac). */
@@ -155,7 +156,9 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
   const hinted = new Set();  // goal indexes that were hinted or revealed (the queue grades them lower)
   let notedDone = 0;         // goals already noted to the queue
   let beat = null;           // the story-beat card while it shows
-  let dock = 'tr';           // the floating panel's quadrant (B4); recomputed on goal change and scroll
+  let dock = 'free';         // the floating panel's side of the target (B4); recomputed on goal change and scroll
+  let dockRect = null;       // its last rect in box pixels: kept while a goal has no target, so the card does not hop
+  let dockedGoal = -1, dockedGlow = 0;   // what the last dock was computed for (the goal; the glowing Ribbon control count)
   let dockPinned = false;    // Ctrl+Shift+J moved it by hand: keep that until the next goal
   let pill = false;          // collapsed to a one-line pill while a cell is being edited
   let targetBox = null;      // the current goal's target box in sheet content pixels (dock avoids it)
@@ -268,6 +271,8 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     card.innerHTML = `<div class="task-label">${isGoal ? 'Now' : 'Still needed'} <span class="task-count">${run.doneCount} / ${run.goals.length}</span></div>
       <div class="task-goal">${esc(cur.text)}</div>
       ${isGoal && run.mode === 'guided' && cur.teach ? `<div class="task-teach">${rich(cur.teach)}</div>` : ''}
+      ${isGoal && run.mode === 'guided' && cur.why ? `<div class="task-why">${rich(cur.why)}</div>` : ''}
+      ${isGoal && hintAt === run.doneCount && cur.hintStuck ? `<div class="task-stuck">${rich(cur.hintStuck)}</div>` : ''}
       ${isGoal && keysShown(cur) && cur.keys ? `<div class="task-keys${hintAt === run.doneCount && !(run.mode === 'guided' && cur.teach) && !revealed ? ' task-hint' : ''}">${keysHtml(cur.keys)}</div>` : ''}
       ${isGoal && nudgeAt === run.doneCount ? `<div class="goal-nudge">Try it with the keyboard${!keysShown(cur) && cur.keys ? ': the Help tab shows the keys' : ''}.</div>` : ''}
       ${conv ? `<span class="conv-chip" title="${esc(conv.name)}">${esc(cur.convention)} · ${esc(conv.short)}</span>` : ''}`;
@@ -402,7 +407,8 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
       <tr class="race-total"><td>Total</td><td>${cell(slow)}</td><td class="race-fast">${cell(fast)}</td></tr></tbody></table>
       ${ratio != null && ratio >= 1.2 ? `<div class="race-note">${ratio >= 10 ? Math.round(ratio) : ratio.toFixed(1)}× faster with shortcuts.</div>` : ''}</div>`;
   }
-  const closingHtml = () => (lesson.closing || []).map(t => `<p class="rm-closing">${rich(t)}</p>`).join('');
+  const leadBold = t => { const m = /^(.*?[.!?])(\s+.*)?$/s.exec(String(t || '')); return m ? `<b>${esc(m[1])}</b>${m[2] ? esc(m[2]) : ''}` : esc(t); };
+  const closingHtml = () => (lesson.wow ? `<p class="rm-wow">${rich(lesson.wow)}</p>` : '') + (lesson.closing || []).map(t => `<p class="rm-closing">${rich(t)}</p>`).join('');
   const doneTitle = () => lesson.kind === 'assessment' ? 'Assessment passed' : lesson.kind === 'testout' ? 'Tested out — chapter cleared' : lesson.kind === 'project' ? 'Project complete' : 'Lesson complete';
   function statsLine() {
     const parts = [`<b>${run.startedAt == null ? '—' : fmtSecs(run.elapsed) + ' s'}</b>`, `<b>${run.session.keyLog.length}</b> keystrokes`, modeLabel().toLowerCase() + (assisted() ? ' · assisted' : '')];
@@ -479,7 +485,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
       ${closingHtml()}
       ${isMicro ? '' : nextJobHtml()}
       ${firstEver && store.saveState() === 'device' ? `<div class="rm-save"><b>Your first lesson is done.</b> Progress is saved on this device. <a href="#/account">Create a free account</a> to keep it across devices — everything you have done carries over.</div>` : ''}
-      ${installOffer ? `<div class="rm-save rm-install"><b>Install hotkey.gg as an app.</b> One click; it opens in its own window and stays in your dock. <span class="rm-install-acts"><button class="btn btn-primary" data-act="install" type="button">Install</button><button class="btn btn-ghost" data-act="install-no" type="button">Not now</button></span></div>` : ''}
+      ${installOffer ? `<div class="rm-save rm-install">${leadBold(siteCopy('install_prompt', INSTALL_PROMPT))} <span class="rm-install-acts"><button class="btn btn-primary" data-act="install" type="button">Install</button><button class="btn btn-ghost" data-act="install-no" type="button">Not now</button></span></div>` : ''}
       <div class="rm-opts">${doneButtonsHtml()}<button class="btn btn-ghost" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button>${(run.mode === 'timed' || isChallenge) && lesson.solution ? '<button class="btn btn-ghost" data-act="route" type="button">Watch the reference route</button>' : ''}</div>
       <div class="rm-more">${esc(saveState)}</div>
     </div>`;
@@ -613,7 +619,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     stopDemo();
     phase = 'play'; revealed = false; nudgeAt = -1; prevDone = 0; overlay.hidden = true; tab = 'lesson'; lastTimedOut = false;
     run.opts.soft = firstAttempt();   // the second attempt onward runs against a hard limit
-    cueGoal = -1; hintAt = -1; hinted.clear(); notedDone = 0; stopStuck();
+    cueGoal = -1; dockedGoal = -1; hintAt = -1; hinted.clear(); notedDone = 0; stopStuck();
     run.reset(timedOnly ? 'timed' : newMode);
     mountViews();
     if (!timerH) timerH = setInterval(renderTimer, 200);
@@ -693,9 +699,10 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
       } else targetBox = null;
       dockPinned = false;
       armStuck();
-      dockPanel();
     }
-    glowRibbon($('ribbon'), cueTokens, run.session.path, run.session.mode, document.getElementById('ribbonDrop'));
+    const glowing = glowRibbon($('ribbon'), cueTokens, run.session.path, run.session.mode, document.getElementById('ribbonDrop'));
+    // the card follows the glow (a Ribbon goal: beside the tab, then beside the group's control as the route is walked)
+    if (run.doneCount !== dockedGoal || (!targetBox && glowing !== dockedGlow)) { dockedGoal = run.doneCount; dockedGlow = glowing; dockPanel(); }
   }
   /** ~8 s on one goal: the keys appear as a hint; ~20 s: the Help tab pulses. Both stop when the goal lands. */
   function armStuck() {
@@ -738,29 +745,35 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     void id;
   }
 
-  /* ---------------- the floating panel (B4): docks to the emptiest quadrant, away from the target and the ribbon ---------------- */
-  /** Place the card: the quadrant of the visible sheet farthest from the goal's target, kept while it still clears it. */
+  /* ---------------- the floating panel (B4): beside the goal's target, a cell or two away ---------------- */
+  /** Place the card next to the current goal's target (right, below, left, above), under the glowing Ribbon group for a Ribbon goal, else where it was. */
   function dockPanel() {
     if (!overlayMode || !sheetView || !sheetView.gw) return;
     const gw = sheetView.gw; const panelEl = $('panel'); if (!panelEl) return;
     const g = gw.getBoundingClientRect(); const l = el.getBoundingClientRect();
     if (!g.width || !g.height) return;
-    const b = sheetView.box ? sheetView.box() : null;
-    const box = { w: g.width, h: g.height };
-    // the target in the visible box's pixels (scrolled; the sticky headers are part of the box)
+    const b = sheetView.box() || { x0: 0, y0: 0 };
+    const box = { w: g.width, h: g.height, x0: b.x0, y0: b.y0 };
+    // the target in the visible box's pixels (scrolled; the sticky headers stay at the box's top and left)
     const t = targetBox ? { left: targetBox.left - gw.scrollLeft, top: targetBox.top - gw.scrollTop, width: targetBox.width, height: targetBox.height } : null;
     const pw = Math.min(panelEl.offsetWidth || 380, box.w - 24), ph = Math.min(panelEl.offsetHeight || 260, box.h - 24);
-    const pick = pickDock(box, t && t.top + t.height > (b ? b.y0 : 0) && t.top < box.h ? t : null, { w: pw, h: ph }, dockPinned ? dock : dock);
-    dock = pick.q;
-    // never over the ribbon or the formula bar: the box starts at the grid's top edge, so a top quadrant sits just under them
+    // a Ribbon goal: the glowing control's span, in box pixels (the card docks under the bar beside it)
+    let ribbon = null;
+    if (!t && cueTokens.length) {
+      const glow = el.querySelector('#ribbon .cue-glow, #ribbonDrop .cue-glow');
+      if (glow) { const r = glow.getBoundingClientRect(); ribbon = { left: r.left - g.left, right: r.right - g.left }; }
+    }
+    const pick = placeNear(box, t, { w: pw, h: ph }, { prefer: dockPinned ? [dock] : [], ribbon, keep: dockRect ? { side: dock, rect: dockRect } : null });
+    dock = pick.side; dockRect = pick.rect;
+    // never over the ribbon or the formula bar: the box starts under them, so a rect inside it is clear of both
     panelEl.style.left = (g.left - l.left + pick.rect.left) + 'px';
     panelEl.style.top = (g.top - l.top + pick.rect.top) + 'px';
     panelEl.style.maxHeight = (box.h - 24) + 'px';
     el.dataset.dock = dock;
   }
   function onSheetScroll() { if (scrollRaf) return; scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; dockPanel(); }); }
-  /** Ctrl+Shift+J: move the card to the next quadrant by hand (sticks until the next goal). */
-  function cycleDock() { if (!overlayMode) return; dockPinned = true; dock = QUADRANTS[(QUADRANTS.indexOf(dock) + 1) % QUADRANTS.length]; const keep = targetBox; targetBox = null; dockPanel(); targetBox = keep; showToast('Panel: ' + { tr: 'top right', tl: 'top left', br: 'bottom right', bl: 'bottom left' }[dock]); }
+  /** Ctrl+Shift+J: ask for the next side by hand (sticks until the next goal; a side that does not fit falls through to the next). */
+  function cycleDock() { if (!overlayMode) return; dockPinned = true; dock = SIDES[(SIDES.indexOf(dock) + 1) % SIDES.length]; dockPanel(); showToast('Panel: ' + { right: 'right of the target', below: 'below the target', left: 'left of the target', above: 'above the target', ribbon: 'under the Ribbon group', free: 'top right' }[dock]); }
   /** Ctrl+Shift+K: hide or show the panel (a small pill stays so it can come back by mouse). */
   function togglePanel() { const hidden = el.classList.toggle('panel-hidden'); let b = el.querySelector('#panelShow'); if (hidden && !b) { b = document.createElement('button'); b.type = 'button'; b.id = 'panelShow'; b.className = 'panel-show'; b.textContent = 'Show panel · Ctrl+Shift+K'; b.onclick = togglePanel; el.appendChild(b); } else if (!hidden && b) b.remove(); if (!hidden) dockPanel(); focusWorkspace(); }
   const onResize = () => dockPanel();
