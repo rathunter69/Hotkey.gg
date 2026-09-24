@@ -123,4 +123,90 @@ export const MICRO_MODULES = {
       { id: 'unfreeze', text: 'Alt W F F again unfreezes them.', keys: 'Alt W F F', requires: ['freeze-panes'],
         check: (s, ses) => { const sh = report(ses); return !!sh && sh.freeze.r === 0 && sh.freeze.c === 0; } },
     ], solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Down Right Alt W F F Alt W F F' },
+  /* ---------------- 1.5 format ---------------- */
+  'format-cells-dialog': { title: 'Format Cells', task: 'Give a column the comma format, no decimals, from the dialog.', secs: 30, state: 'S4c',
+    goals: [
+      { id: 'dialog', text: 'Select the kWh figures C5:C11 and, in Format Cells (Ctrl+1), pick the comma format with no decimals (N).', keys: 'Ctrl+Home Ctrl+↓ ×2 ↓ → ×2 Ctrl+Shift+↓ then Ctrl+1 N', requires: ['format-cells-dialog'],
+        check: (s, ses) => [5, 6, 7, 8, 9, 10, 11].every(r => { const c = cell(ses, 'Report', 'C' + r); return c && c.fmtStyle === 'comma' && c.decimals === 0; }) && used(ses, 'Ctrl+1') },
+    ], solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Down Right Right Ctrl+Shift+Down Ctrl+1 N' },
+  'number-formats': { title: 'The chord set', task: 'Comma, no decimals, on a block of figures in three presses.', secs: 35, state: 'S4c',
+    goals: [
+      { id: 'chord', text: 'Select D5:F11 and press Ctrl+Shift+1, then Alt H 9 twice: thousands separators, no decimals, negatives in parentheses.', keys: 'Ctrl+Home Ctrl+↓ ×2 ↓ → ×3 Ctrl+Shift+↓ Shift+→ ×2 Ctrl+Shift+1 then Alt H 9 then Alt H 9', requires: ['number-formats'],
+        check: (s, ses) => ['D', 'E', 'F'].every(col => [5, 6, 7, 8, 9, 10, 11].every(r => { const c = cell(ses, 'Report', col + r); return c && c.fmtStyle === 'comma' && c.decimals === 0; })) && used(ses, 'Ctrl+Shift+!') },
+    ], solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Down Right Right Right Ctrl+Shift+Down Shift+Right Shift+Right Ctrl+Shift+1 Alt H 9 Alt H 9' },
+  'borders-menu': { title: 'A top border', task: 'Give the total row a top border, the way the team marks a total.', secs: 30, state: 'S5a',
+    goals: [
+      { id: 'top', text: 'Select the whole total row 11 and give it a top border with Alt H B P — a border, never a grid.', keys: 'Ctrl+Home Ctrl+↓ ×3 Shift+Space then Alt H B P', requires: ['borders-menu'],
+        check: (s, ses) => { const a = cell(ses, 'Report', 'A11'), c = cell(ses, 'Report', 'C11'); return !!a && a.bt === true && !!c && c.bt === true && !a.ball; } },
+    ], solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Ctrl+Down Shift+Space Alt H B P' },
+  'center-across': { title: 'Center across, never merge', task: 'Center the title over the page without merging a single cell.', secs: 35, state: 'S5b',
+    goals: [
+      { id: 'ca', text: 'Select A1:I1 and center the title across the selection from Format Cells (Ctrl+1, A).', keys: 'Ctrl+Home ↓ ×3 Ctrl+→ ↑ ×3 Ctrl+Shift+← then Ctrl+1 A', requires: ['center-across'],
+        check: (s, ses) => { const c = cell(ses, 'Report', 'A1'); return !!c && c.ca === 9; } },
+    ], solution: 'Ctrl+Home Down Down Down Ctrl+Right Up Up Up Ctrl+Shift+Left Ctrl+1 A' },
+  'f4-repeat': { title: 'Format once, F4 everywhere', task: 'Format one block, then repeat it on the next with a single key.', secs: 40, state: 'S5c',
+    goals: [
+      { id: 'first', text: 'On Costs, give B4:D8 the comma format with no decimals from Format Cells (Ctrl+1, N).', keys: 'Ctrl+PgDn ×3 Ctrl+Home Ctrl+↓ ↓ → Ctrl+Shift+↓ Shift+→ ×2 then Ctrl+1 N', requires: ['format-cells-dialog'],
+        check: (s, ses) => ['B', 'C', 'D'].every(col => [4, 5, 6, 7, 8].every(r => { const c = cell(ses, 'Costs', col + r); return c && c.fmtStyle === 'comma' && c.decimals === 0; })) },
+      { id: 'repeat', text: 'Select the total column E4:E8 and press F4: the same format lands in one press.', keys: '→ ×3 Ctrl+Shift+↓ F4', requires: ['f4-repeat'],
+        check: (s, ses) => [4, 5, 6, 7, 8].every(r => { const c = cell(ses, 'Costs', 'E' + r); return c && c.fmtStyle === 'comma' && c.decimals === 0; }) && used(ses, 'F4') },
+    ], solution: 'Ctrl+PgDn Ctrl+PgDn Ctrl+PgDn Ctrl+Home Ctrl+Down Down Right Ctrl+Shift+Down Shift+Right Shift+Right Ctrl+1 N Right Right Right Ctrl+Shift+Down F4' },
+  /* ---------------- 1.6 formulas ---------------- */
+  'pointing': { title: 'Point, don’t type', task: 'Write a formula by pointing at its cells.', secs: 35, state: 'S5d',
+    goals: [
+      { id: 'point', text: 'In F5, write Domain’s gross profit as revenue less energy cost by pointing: =D5-E5.', keys: 'Ctrl+Home Ctrl+↓ ×2 ↓ Ctrl+→ → "=" ← ← "-" ← ↵', requires: ['pointing'],
+        check: (s, ses) => { const c = cell(ses, 'Report', 'F5'); return !!c && c.formula === '=D5-E5'; } },
+    ], solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Down Ctrl+Right Right "=" Left Left "-" Left Enter' },
+  'autosum': { title: 'AutoSum the block', task: 'Total every column of a block in one press.', secs: 35, state: 'S6a',
+    goals: [
+      { id: 'block', text: 'Select the figures C5:F10 and press Alt+=: the SUMs land in row 11, gross profit included.', keys: 'Ctrl+Home Ctrl+↓ ×2 ↓ → ×2 Ctrl+Shift+↓ Shift+↑ Shift+→ ×3 Alt+=', requires: ['autosum'],
+        check: (s, ses) => { const c = cell(ses, 'Report', 'F11'); return !!c && c.formula === '=SUM(F5:F10)'; } },
+    ], solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Down Right Right Ctrl+Shift+Down Shift+Up Shift+Right Shift+Right Shift+Right Alt+=' },
+  'sum-family': { title: 'AVERAGE and COUNT', task: 'Two of SUM’s family on the site block.', secs: 40, state: 'S6a',
+    goals: [
+      { id: 'avg', text: 'In B27, the average kWh per site: =AVERAGE(C5:C10).', keys: 'Ctrl+G "B27" ↵ "=AVERAGE(C5:C10)" ↵', requires: ['sum-family'],
+        check: (s, ses) => { const c = cell(ses, 'Report', 'B27'); return !!c && /^=AVERAGE\(C5:C10\)$/i.test(c.formula || ''); } },
+      { id: 'count', text: 'Under it in B28, how many sites carry a figure: =COUNT(C5:C10).', keys: '"=COUNT(C5:C10)" ↵', requires: ['sum-family'],
+        check: (s, ses) => { const c = cell(ses, 'Report', 'B28'); return !!c && /^=COUNT\(C5:C10\)$/i.test(c.formula || ''); } },
+    ], solution: 'Ctrl+G "B27" Enter "=AVERAGE(C5:C10)" Enter "=COUNT(C5:C10)" Enter' },
+  'f4-anchor': { title: 'Anchor with F4', task: 'One formula whose anchors let it fill both ways.', secs: 45, state: 'S6b',
+    goals: [
+      { id: 'price', text: 'Type a price scenario, 0.12, in J4.', keys: 'Ctrl+Home ↓ ×3 Ctrl+→ → "0.12" ↵', requires: ['type-to-enter'],
+        check: (s, ses) => val(ses, 'Report', 'J4') === 0.12 },
+      { id: 'anchor', text: 'In J5, point at Domain’s kWh and the price, anchoring each with F4: =$C5*J$4.', keys: '"=" Ctrl+← Ctrl+← → ×2 F4 ×3 "*" ↑ F4 ×2 ↵', requires: ['f4-anchor'],
+        check: (s, ses) => { const c = cell(ses, 'Report', 'J5'); return !!c && c.formula === '=$C5*J$4'; } },
+    ], solution: 'Ctrl+Home Down Down Down Ctrl+Right Right "0.12" Enter "=" Ctrl+Left Ctrl+Left Right Right F4 F4 F4 "*" Up F4 F4 Enter' },
+  'cross-sheet-ref': { title: 'Point across sheets', task: 'Link a figure on the Report to the feed by pointing on the other sheet.', secs: 45, state: 'S6c',
+    goals: [
+      { id: 'link', text: 'In C5, type = then Ctrl+PgDn to Raw, point at Domain’s kWh total I8 and press Enter: the Report reads =Raw!I8.', keys: 'Ctrl+Home Ctrl+↓ ×2 ↓ → ×2 "=" Ctrl+PgDn Ctrl+→ → ×2 Ctrl+↓ ×2 ↓ ×2 → ↵', requires: ['cross-sheet-ref'],
+        check: (s, ses) => { const c = cell(ses, 'Report', 'C5'); return !!c && c.formula === '=Raw!I8' && used(ses, 'Ctrl+PgDn'); } },
+    ], solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Down Right Right "=" Ctrl+PgDn Ctrl+Right Right Right Ctrl+Down Ctrl+Down Down Down Right Enter' },
+  'show-formulas': { title: 'Show the pattern', task: 'See every formula on the page at once, then put the figures back.', secs: 30, state: 'S6e',
+    goals: [
+      { id: 'on', text: 'Press Ctrl+` : the grid shows formulas instead of figures, and any typed number stands out.', keys: 'Ctrl+`', requires: ['show-formulas'],
+        check: (s, ses) => !!ses.settings.showFormulas && used(ses, 'Ctrl+`') },
+      { id: 'off', text: 'Press Ctrl+` again: the figures are back.', keys: 'Ctrl+`', requires: ['show-formulas'],
+        check: (s, ses) => !ses.settings.showFormulas && used(ses, 'Ctrl+`') },
+    ], solution: 'Ctrl+` Ctrl+`' },
+  'formula-errors': { title: '#NAME? means a name', task: 'Read an error code and fix the formula behind it.', secs: 40, state: 'S6e', plant: { 'Costs!E6': { formula: '=SUMM(B6:D6)' } },
+    goals: [
+      { id: 'name', text: 'On Costs, E6 reads #NAME?: open it with F2 and fix SUMM to SUM.', keys: 'Ctrl+PgDn ×3 Ctrl+Home Ctrl+↓ ×2 ↑ ×2 Ctrl+→ F2 Home → ×4 ⌫ ↵', requires: ['formula-errors'],
+        check: (s, ses) => { const c = cell(ses, 'Costs', 'E6'); return !!c && /^=SUM\(B6:D6\)$/i.test(c.formula || ''); } },
+    ], solution: 'Ctrl+PgDn Ctrl+PgDn Ctrl+PgDn Ctrl+Home Ctrl+Down Ctrl+Down Up Up Ctrl+Right F2 Home Right Right Right Right Backspace Enter' },
+  /* ---------------- 1.7 present and audit ---------------- */
+  'orientation': { title: 'Landscape', task: 'Turn the page sideways for a wide report.', secs: 30, state: 'S6f',
+    goals: [
+      { id: 'land', text: 'Set the page to landscape from the Page Layout tab: Alt P O L.', keys: 'Alt P O L', requires: ['orientation'],
+        check: (s, ses) => ses.settings.pageSetup.orientation === 'landscape' },
+    ], solution: 'Alt P O L' },
+  'print-titles': { title: 'Rows to repeat', task: 'Keep the heads on every printed page.', secs: 30, state: 'S6f',
+    goals: [
+      { id: 'titles', text: 'Open Print Titles (Alt P I), type 1:4 as the rows to repeat at top, and press Enter.', keys: 'Alt P I "1:4" ↵', requires: ['print-titles'],
+        check: (s, ses) => ses.settings.pageSetup.titlesRows === '$1:$4' },
+    ], solution: 'Alt P I "1:4" Enter' },
+  'check-cell': { title: 'A check that reads zero', task: 'Write one live difference that proves two figures agree.', secs: 40, state: 'S7a',
+    goals: [
+      { id: 'check', text: 'In B35, the sites less the total: =SUM(C5:C10)-C11 — it reads 0 when the page ties.', keys: 'Ctrl+G "B35" ↵ "=SUM(C5:C10)-C11" ↵', requires: ['check-cell'],
+        check: (s, ses) => { const c = cell(ses, 'Report', 'B35'); const sh = report(ses); return !!c && /^=SUM\(C5:C10\)-C11$/i.test(c.formula || '') && !!sh && sh.value('B35') === 0; } },
+    ], solution: 'Ctrl+G "B35" Enter "=SUM(C5:C10)-C11" Enter' },
 };

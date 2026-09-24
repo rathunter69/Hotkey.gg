@@ -225,7 +225,7 @@ export function microLesson(id) {
   const m = MICRO[id]; if (!m) return null;
   return {
     id: 'due-' + id, kind: 'micro', chapter: 'foundations', section: 'Due today', title: m.title, difficulty: 'easy', tags: ['due'], access: 'free',
-    workbook: 'voltline-weekly', state: { before: m.state, after: m.state }, minutes: 1, concept: id,
+    workbook: 'voltline-weekly', state: { before: m.state, after: m.state }, minutes: 1, concept: id, plant: m.plant,
     brief: m.task, goals: m.goals, solution: m.solution, secs: m.secs, teaches: [], requires: [id],
   };
 }
