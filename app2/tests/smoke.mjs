@@ -71,7 +71,8 @@ try {
 
   // play the first and last lesson end to end by keyboard, plus the phase-C feature carriers
   // (find/replace dialog, hide+freeze, cross-sheet formulas, the two-sheet project)
-  const extras = ['find-replace', 'hide-freeze', 'cross-sheet', 'weekly-report-project'].map(id => LESSONS.find(l => l.id === id));
+  // the module lessons that carry the new engine ground (paste special, grouping/freeze) and one seeded challenge, plus the legacy carriers
+  const extras = ['copy-cut-paste-fill', 'hide-group-freeze', 'challenge-reshape-the-report', 'find-replace', 'cross-sheet', 'weekly-report-project'].map(id => LESSONS.find(l => l.id === id));
   for (const lesson of [LESSONS[0], ...extras, LESSONS[LESSONS.length - 1]]) {
     await page.goto(base + '#/lesson/' + lesson.id);
     // the goal list sits behind the floating card (B4), so wait for it attached, not visible

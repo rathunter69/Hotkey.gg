@@ -83,8 +83,8 @@ test('pickNextLesson: works on the real catalogue with placement skips', () => {
   // the section-1 Options and Page Setup lessons are never skipped, so a daily user starts there at the latest
   // the placement tasks cover legacy ids only, so mid-rewrite the module lessons always come first
   const skipped = skipsFor(['move', 'select']);
-  assert.equal(pickNextLesson(LESSONS, {}, skipped).id, 'welcome-export');
-  assert.equal(pickNextLesson(LESSONS, {}, []).id, 'welcome-export');
+  assert.equal(pickNextLesson(LESSONS, {}, skipped).id, 'inherited-workbook');
+  assert.equal(pickNextLesson(LESSONS, {}, []).id, 'inherited-workbook');
   // within the legacy block the placement skips still steer to the first uncovered lesson
   const legacy = LESSONS.slice(LESSONS.findIndex(l => l.id === 'welcome-race'));
   assert.equal(pickNextLesson(legacy, {}, skipped).id, 'managing-sheets');

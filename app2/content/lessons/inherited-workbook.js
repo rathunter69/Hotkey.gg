@@ -55,7 +55,7 @@ export default {
   ],
   closing: [
     'That difference is the whole idea: your hands learn the fast way on a real sheet, job by job.',
-    'This feed becomes a one-page weekly report — page one of the sale pack. You build it in this chapter.',
+    'This feed becomes a one-page weekly report — page one of the sale pack, the document the buyers read. You build it in this chapter.',
   ],
   solution: rep('Down', 60) + ' Ctrl+Home Ctrl+Down Shift+Up Shift+Up Ctrl+Shift+Up Ctrl+PgDn Ctrl+PgDn Ctrl+PgDn Down Down Down Ctrl+Right Ctrl+PgUp Ctrl+PgUp Alt H O R "Inputs" Enter Ctrl+PgDn Alt H D S Enter Shift+F11 Alt H O R "Report" Enter Alt H O M Up Up Enter',
 };

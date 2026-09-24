@@ -2,7 +2,6 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://www.hotkey.gg/</loc></url>
   <url><loc>https://www.hotkey.gg/lessons/</loc></url>
-  <url><loc>https://www.hotkey.gg/lessons/welcome-export.html</loc></url>
   <url><loc>https://www.hotkey.gg/lessons/inherited-workbook.html</loc></url>
   <url><loc>https://www.hotkey.gg/lessons/ribbon-by-keyboard.html</loc></url>
   <url><loc>https://www.hotkey.gg/lessons/analyst-setup.html</loc></url>
@@ -13,6 +12,16 @@
   <url><loc>https://www.hotkey.gg/lessons/around-the-workbook.html</loc></url>
   <url><loc>https://www.hotkey.gg/lessons/typed-vs-calculated.html</loc></url>
   <url><loc>https://www.hotkey.gg/lessons/challenge-find-and-mark.html</loc></url>
+  <url><loc>https://www.hotkey.gg/lessons/enter-the-missing-day.html</loc></url>
+  <url><loc>https://www.hotkey.gg/lessons/fix-it-in-place.html</loc></url>
+  <url><loc>https://www.hotkey.gg/lessons/copy-cut-paste-fill.html</loc></url>
+  <url><loc>https://www.hotkey.gg/lessons/paste-special-values.html</loc></url>
+  <url><loc>https://www.hotkey.gg/lessons/find-replace-timeline.html</loc></url>
+  <url><loc>https://www.hotkey.gg/lessons/challenge-complete-the-feed.html</loc></url>
+  <url><loc>https://www.hotkey.gg/lessons/rows-cols-honest-totals.html</loc></url>
+  <url><loc>https://www.hotkey.gg/lessons/widths-heights-autofit.html</loc></url>
+  <url><loc>https://www.hotkey.gg/lessons/hide-group-freeze.html</loc></url>
+  <url><loc>https://www.hotkey.gg/lessons/challenge-reshape-the-report.html</loc></url>
   <url><loc>https://www.hotkey.gg/lessons/welcome-race.html</loc></url>
   <url><loc>https://www.hotkey.gg/lessons/workbook-sheets-cells.html</loc></url>
   <url><loc>https://www.hotkey.gg/lessons/managing-sheets.html</loc></url>
