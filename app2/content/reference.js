@@ -192,7 +192,7 @@ const NATIVE = [
     R('alt-equals', 'Alt+=', 'AutoSum', 'AutoSum the adjacent range.'),
     R('ctrl-d', 'Ctrl+D', 'Fill down', 'Fill down from the cell above.'),
     R('ctrl-r', 'Ctrl+R', 'Fill right', 'Fill right from the cell to the left.'),
-    R('f4-repeat', 'F4', 'Repeat the last action', 'Repeat the last action (when not editing).', { macVaries: true }),
+    R('f4-repeat', 'F4', 'Repeat the last action', 'Repeat the last action (when not editing).', { macVaries: true, concept: 'f4-repeat' }),
     R('f9', 'F9', 'Recalculate', 'Recalculate all open workbooks (Calculate Now, when calculation is set to Manual).', { concept: 'calculate-now' }),
     R('ctrl-backtick', 'Ctrl+`', 'Show formulas', 'Toggle between showing formulas and showing values.', { concept: 'show-formulas' }),
   ]],

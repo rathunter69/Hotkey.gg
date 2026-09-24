@@ -114,6 +114,7 @@ export class Sheet {
     this.sel = null;        // anchor corner of a range selection, null = single cell
     this.selA = null;       // parked displayed-active cell (Shift+Space / Ctrl+Space / Ctrl+A)
     this.clipboard = null;
+    this.lastAction = null;   // what F4 repeats outside Edit mode (C2 gap 10): a format, a border, a width, an insert… as a sheet-free descriptor
     this.colW = new Array(this.cols + 1).fill(COLW_DEFAULT);
     this.colSet = new Array(this.cols + 1).fill(false);   // width set explicitly (never auto-grown)
     this.undoStack = []; this.redoStack = [];
@@ -500,10 +501,27 @@ export class Sheet {
     if (this.multi && this.multi.length) { for (const k of this.multi) { const q = parseRef(k); if (q && !this.get(q.r, q.c)[prop]) { all = false; break; } } }
     else { const r = this.selRange(); for (let rr = r.r1; rr <= r.r2 && all; rr++) for (let cc = r.c1; cc <= r.c2; cc++) if (!this.get(rr, cc)[prop]) { all = false; break; } }
     this.pushUndo(); const target = !all; this.eachSel(c => c[prop] = target); this.commit('format');
+    this.lastAction = { op: 'format', fn: c => { c[prop] = target; }, what: 'format' };   // F4 repeats the state it set, not the toggle (Excel)
     return target;
   }
   /** Apply a mutation to every selected cell inside one undo step. */
-  formatSel(fn, what = 'format') { this.pushUndo(); this.eachSel(fn); this.commit(what); }
+  formatSel(fn, what = 'format') { this.lastAction = { op: 'format', fn, what }; this.pushUndo(); this.eachSel(fn); this.commit(what); }
+  /** F4 outside Edit mode: do the last format / border / width / height / insert / delete / hide again, on the current selection. False when there is nothing to repeat. */
+  repeatLast() {
+    const a = this.lastAction; if (!a) return false;
+    if (a.op === 'format') { this.formatSel(a.fn, a.what); return true; }
+    if (a.op === 'border') { this.border(a.kind); return true; }
+    if (a.op === 'centerAcross') { this.centerAcross(); return true; }
+    if (a.op === 'colW') { this.setColWidth(a.units); return true; }
+    if (a.op === 'rowH') { this.setRowHeight(a.pts); return true; }
+    if (a.op === 'insert') return this.insertOrDelete(true);
+    if (a.op === 'remove') return this.insertOrDelete(false);
+    if (a.op === 'hideRows') { this.hideRows(); return true; }
+    if (a.op === 'hideCols') { this.hideCols(); return true; }
+    if (a.op === 'unhideRows') { this.unhideRows(); return true; }
+    if (a.op === 'unhideCols') { this.unhideCols(); return true; }
+    return false;
+  }
   setNumberFormat(style, decimals) {
     this.formatSel(c => { c.fmtStyle = style; if (decimals !== undefined) c.decimals = decimals; if (style === 'general') c.scale = 0; });
     this.autoGrowSelectedCols();
@@ -518,7 +536,7 @@ export class Sheet {
   fontSize(dir) { this.formatSel(c => { c.fsz = stepFsz(c.fsz, dir); }); }
   toggleStrike() { this.formatSel(c => { c.strike = !c.strike; }); }
   toggleSuperscript() { this.formatSel(c => { if (c.txt && typeof c.value === 'string') c.value = c.value.endsWith('¹') ? c.value.slice(0, -1) : c.value + '¹'; }); }
-  centerAcross() { const r = this.selRange(); this.pushUndo(); const a = this.ensure(r.r1, r.c1); a.ca = r.c2 - r.c1 + 1; this.commit('format'); }
+  centerAcross() { const r = this.selRange(); this.lastAction = { op: 'centerAcross' }; this.pushUndo(); const a = this.ensure(r.r1, r.c1); a.ca = r.c2 - r.c1 + 1; this.commit('format'); }
   applyCellStyle(k) { const st = CELL_STYLES.find(s => s.k === k); if (!st) return; this.formatSel(c => st.apply(c)); }
   /**
    * Borders: 'top' | 'bottom' | 'left' | 'right' | 'all' | 'topbottom' | 'double' (bottom) |
@@ -527,6 +545,7 @@ export class Sheet {
   border(kind) {
     const r = this.selRange();
     if (kind === 'outside' || kind === 'thick') {
+      this.lastAction = { op: 'border', kind };
       this.pushUndo(); const thick = kind === 'thick';
       if (r.r1 === r.r2 && r.c1 === r.c2) { const a = this.ensure(r.r1, r.c1); a.ball = true; if (thick) a.thick = true; }
       else {
@@ -573,6 +592,7 @@ export class Sheet {
   setColWidth(units) {
     const px = Math.max(16, Math.min(COLW_MAX, Math.round(Number(units) * 7 + 5)));
     if (!isFinite(px)) return;
+    this.lastAction = { op: 'colW', units: Number(units) };
     const r = this.selRange(); this.pushUndo();
     for (let c = r.c1; c <= r.c2; c++) { this.colW[c] = px; this.colSet[c] = true; }
     this.commit('layout');
@@ -871,6 +891,7 @@ export class Sheet {
     const r = this.selRange();
     const fullRow = r.c1 === 1 && r.c2 === this.cols, fullCol = r.r1 === 1 && r.r2 === this.rows;
     if (!fullRow && !fullCol) return false;
+    this.lastAction = { op: isInsert ? 'insert' : 'remove' };
     if (isInsert) return this.insert(fullRow ? 'r' : 'c');
     this.remove(fullRow ? 'r' : 'c');
     return true;
@@ -957,6 +978,7 @@ export class Sheet {
   setRowHeight(pts) {
     const n = Number(pts); if (!isFinite(n) || n <= 0) return false;
     const px = Math.max(2, Math.min(160, Math.round(n * 4 / 3)));
+    this.lastAction = { op: 'rowH', pts: n };
     const r = this.selRange(); this.pushUndo();
     for (let rr = r.r1; rr <= r.r2; rr++) this.rowH[rr] = px;
     this.commit('layout'); return true;
@@ -978,11 +1000,11 @@ export class Sheet {
     this.commit('layout'); return true;
   }
   /** Ctrl+9 / Ctrl+0: hide the selection's rows / columns. */
-  hideRows() { const r = this.selRange(); this.pushUndo(); for (let rr = r.r1; rr <= r.r2; rr++) this.hiddenRows.add(rr); this.commit('layout'); }
-  hideCols() { const c = this.selRange(); this.pushUndo(); for (let cc = c.c1; cc <= c.c2; cc++) this.hiddenCols.add(cc); this.commit('layout'); }
+  hideRows() { const r = this.selRange(); this.lastAction = { op: 'hideRows' }; this.pushUndo(); for (let rr = r.r1; rr <= r.r2; rr++) this.hiddenRows.add(rr); this.commit('layout'); }
+  hideCols() { const c = this.selRange(); this.lastAction = { op: 'hideCols' }; this.pushUndo(); for (let cc = c.c1; cc <= c.c2; cc++) this.hiddenCols.add(cc); this.commit('layout'); }
   /** Ctrl+Shift+( / Ctrl+Shift+): unhide the hidden rows / columns inside the selection. */
-  unhideRows() { const r = this.selRange(); this.pushUndo(); for (let rr = r.r1; rr <= r.r2; rr++) this.hiddenRows.delete(rr); this.commit('layout'); }
-  unhideCols() { const c = this.selRange(); this.pushUndo(); for (let cc = c.c1; cc <= c.c2; cc++) this.hiddenCols.delete(cc); this.commit('layout'); }
+  unhideRows() { const r = this.selRange(); this.lastAction = { op: 'unhideRows' }; this.pushUndo(); for (let rr = r.r1; rr <= r.r2; rr++) this.hiddenRows.delete(rr); this.commit('layout'); }
+  unhideCols() { const c = this.selRange(); this.lastAction = { op: 'unhideCols' }; this.pushUndo(); for (let cc = c.c1; cc <= c.c2; cc++) this.hiddenCols.delete(cc); this.commit('layout'); }
 
   /* ---------------- grouping / outline (C2 gap 4) ---------------- */
   /**

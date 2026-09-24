@@ -145,6 +145,7 @@ export const CONCEPTS = {
   'autosum': 'AutoSum (Alt+=) proposes =SUM over the numbers above or to the left; Enter accepts it',
   'relative-absolute': 'a relative reference (B3) shifts when copied; $ anchors it: $B$3 never moves',
   'f4-anchor': 'F4 cycles the anchors on the reference at the insertion point: B3, $B$3, B$3, $B3',
+  'f4-repeat': 'F4 outside a formula repeats the last action — a format, a border, a width, an insert — on the new selection',
   'cross-sheet-ref': 'a reference on another sheet names the sheet first: =Costs!B3',
   'formula-errors': '#DIV/0!, #NAME?, #VALUE! and #REF! each say what broke: the input, the name, the type, the reference',
   // Copy, paste and fill (phase C)

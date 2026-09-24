@@ -1,0 +1,297 @@
+id,field,text,draft
+enter-the-missing-day,title,Enter the missing day,y
+enter-the-missing-day,brief,"Airport’s Saturday never came through on the platform feed, and management has emailed the four figures. Enter the day, put 0 into the five blank energy costs in one press, and clear a stray note — the site totals answer the moment the day lands. A row of figures goes in without touching the arrow keys: the key is `Tab`.",y
+enter-the-missing-day,goal.to-gap.text,"Airport’s Saturday never came through: jump to the first blank cell of its row, Raw!C61.",y
+enter-the-missing-day,goal.kwh-price.text,"Management emailed the day: enter 2,500 kWh in C61 and the price $0.48 in D61, moving right with Tab.",y
+enter-the-missing-day,goal.kwh-price.teach,"Tab commits the entry and steps one cell right, and Excel remembers where the run began — that is where Enter will return you.",y
+enter-the-missing-day,goal.revenue-energy.text,"Finish the row with the revenue $1,200.00 in E61 and the energy cost $325.00 in F61, then Enter to land in C62.",y
+enter-the-missing-day,goal.revenue-energy.teach,"Enter after a Tab run commits and drops to the column the run started in, one row down — where the next record begins.",y
+enter-the-missing-day,goal.keep-airport.text,"Start retyping the site name over B61, then look again — Airport is right, so discard the entry and keep it.",y
+enter-the-missing-day,goal.keep-airport.teach,"Esc throws away an entry you have started: the cell keeps what it had, and nothing is committed.",y
+enter-the-missing-day,goal.pick-blanks.text,"Five Energy cost cells in column F are blank: select the feed from the top, pick out the blanks with Go To Special and count them.",y
+enter-the-missing-day,goal.zero-blanks.text,Type 0 once and commit it into all five blank Energy cost cells at the same time.,y
+enter-the-missing-day,goal.zero-blanks.teach,"Ctrl+Enter commits one entry into every selected cell at once — five blanks, one press.",y
+enter-the-missing-day,goal.clear-draft.text,"A stray “draft” note sits in H3, above the site totals block: clear it.",y
+enter-the-missing-day,goal.clear-draft.teach,Delete clears what the cell holds and leaves its formatting behind — the italic stays for whatever is typed there next.,y
+enter-the-missing-day,goal.tie.text,"Does it tie? Watch Airport’s Saturday kWh in C61 change to 3,000 and the Airport line of the site totals, I12, answer.",y
+enter-the-missing-day,closing.1,"The emailed day is on the feed, and the Airport total moved the moment it landed. Read what Excel tells you (F5): Go To Special lights up the five blanks before you commit, and a total that answers says the entry is in.",y
+enter-the-missing-day,endState.1,C61:F61 hold the four emailed figures,y
+enter-the-missing-day,endState.2,The five blank Energy cost cells read 0,y
+enter-the-missing-day,endState.3,H3 is clear,y
+fix-it-in-place,title,Fix it in place,y
+fix-it-in-place,brief,"The feed is complete but not clean: two site names are misspelled, one kWh figure was typed as text, and E41 shows 81500 for a single day's revenue. Find each cell, open it and change only what is wrong — a reviewer trusts the person who reads a cell before retyping it. The key is `F2`.",y
+fix-it-in-place,goal.find-muller.text,Mueller is misspelled somewhere in the 60-row feed: move to Raw and find Muller.,y
+fix-it-in-place,goal.find-muller.teach,"Ctrl+F opens Find: type part of what you want, Enter jumps to the next cell containing it, Esc closes the card.",y
+fix-it-in-place,goal.caret-fix.text,"Open B14 with F2, move the insertion point to just after Mu, and insert the e so it reads Mueller.",y
+fix-it-in-place,goal.caret-fix.teach,"In Edit mode, Home and End send the insertion point to either end of the entry and ← → step it one character; typing inserts there.",y
+fix-it-in-place,goal.find-riversid.text,"Riverside lost its e in one row: find Riversid, Find Next past the first hit (a correct Riverside), and add the e.",y
+fix-it-in-place,goal.text-number.text,"C33 shows 1,240 on the left — text with a trailing space: find it, open it, delete the space and commit it as a number.",y
+fix-it-in-place,goal.text-number.teach,"A figure sitting on the left is text, not a number; Backspace deletes the character before the insertion point, so the trailing space goes and 1,240 snaps right.",y
+fix-it-in-place,goal.retype.text,E41 reads 81500 for one day of South Lamar revenue when kWh × price says 1075: find it and type 1075 over it.,y
+fix-it-in-place,goal.retype.teach,Typing on a cell replaces its whole contents — no F2 when nothing in the old entry is worth keeping.,y
+fix-it-in-place,goal.undo.text,"The associate asks what was there before: Ctrl+Z, and E41 shows 81500 again.",y
+fix-it-in-place,goal.undo.teach,"Ctrl+Z undoes the last change and Ctrl+Y puts it back, so a fix can be tried, read and kept.",y
+fix-it-in-place,goal.redo.text,The figure was wrong after all: Ctrl+Y puts 1075 back in E41.,y
+fix-it-in-place,goal.tie.text,"Does it tie? Watch C33, a Riverside kWh figure, change to 2,000 and Riverside’s kWh total in I10 answer.",y
+fix-it-in-place,closing.1,"Every fix went in place: F2 opened the cell, the insertion point moved, only the wrong characters changed — and the site totals beside the feed answered without being asked.",y
+fix-it-in-place,closing.2,"Read what Excel shows you: a figure on the left is text, and a revenue far above its neighbors is a typo, not a record day.",y
+fix-it-in-place,endState.1,B14 reads Mueller,y
+fix-it-in-place,endState.2,every Riverside row reads Riverside,y
+fix-it-in-place,endState.3,"C33 is the number 1,240",y
+fix-it-in-place,endState.4,E41 reads 1075,y
+copy-cut-paste-fill,title,"Copy, cut, paste, fill",y
+copy-cut-paste-fill,brief,"Report is still blank and the associate wants its skeleton before the figures arrive: title, units, headers, the site list and the week label, plus the feed’s Notes block moved beside the feed. Nothing is typed twice — the headers already sit on Raw, the sites on Inputs, and one label fills five rows and six columns. The key is `Ctrl+C`.",y
+copy-cut-paste-fill,goal.title-headers.text,"Title the page: “Voltline - Austin Weekly KPI Report, w/c 15 Sep 2026” in A1, “USD unless stated” in A2, then Site and Week in A4:B4.",y
+copy-cut-paste-fill,goal.paste-headers.text,"The feed’s totals block already carries the figure headers: copy Raw!I7:K7 and paste them onto C4:E4, then drop the marquee.",y
+copy-cut-paste-fill,goal.paste-headers.teach,"Ctrl+C copies and Ctrl+X cuts the selection; Ctrl+V pastes it at the cursor, formats included; Esc drops the marquee, the moving border around what you copied.",y
+copy-cut-paste-fill,goal.site-list.text,The site list lives on Inputs: copy Inputs!A9:A13 and drop it under Site at A5 with Enter.,y
+copy-cut-paste-fill,goal.site-list.teach,"After a copy, Enter pastes once and drops the marquee in the same press — the paste for a single destination.",y
+copy-cut-paste-fill,goal.week-down.text,"Copy the reporting week from Inputs!B3 onto B5, then fill it down the five site rows B5:B9 with Ctrl+D.",y
+copy-cut-paste-fill,goal.week-down.teach,"Ctrl+D fills the selection from its top row and Ctrl+R from its left column — one entry, filled, never retyped.",y
+copy-cut-paste-fill,goal.daily-labels.text,"Label the daily block below the table: kWh sold by day in A12, then Week, Day and Date in A13:A15.",y
+copy-cut-paste-fill,goal.sites-again.text,The daily block needs the same five sites: copy A5:A9 and drop them at A16 with Enter.,y
+copy-cut-paste-fill,goal.week-across.text,"The daily block’s Week row takes the same label: copy it from B9 to B13, then fill it right across B13:G13 with Ctrl+R.",y
+copy-cut-paste-fill,goal.move-notes.text,The Notes block sits under the feed where nobody reads it: cut Raw!A64:A67 and paste it beside the feed at H1.,y
+copy-cut-paste-fill,goal.tie.text,"Does it tie? Watch Domain’s Monday kWh in Raw!C8 change to 3,000 and Domain’s kWh total in I8 answer.",y
+copy-cut-paste-fill,closing.1,"The Report has its shape, and nothing on it was typed twice: the headers came from Raw, the sites from Inputs, and one week label went down five rows and across six columns from a single copy — fill, don’t retype (E3).",y
+copy-cut-paste-fill,closing.2,"The Notes block now sits beside the feed where a reader finds it, and the feed’s block ends where the data ends.",y
+copy-cut-paste-fill,endState.1,C4:E4 carry the three bold figure headers,y
+copy-cut-paste-fill,endState.2,A5:A9 and A16:A20 list the five sites,y
+copy-cut-paste-fill,endState.3,B5:B9 and B13:G13 read w/c 08 Sep,y
+copy-cut-paste-fill,endState.4,The Notes block sits at Raw!H1:H4 and A64:A67 is clear,y
+paste-special-values,title,"Paste Special: values, formats, transpose",y
+paste-special-values,brief,"The Report needs this week’s site totals and last week’s revenue beside them — as numbers that stay put once the page is sent, not links that move with the feed. Paste Special brings one aspect of what you copied: values only, formats only, or a block turned on its side, so the snapshot is taken on purpose. The key is `Ctrl+Alt+V`.",y
+paste-special-values,goal.kpi-headers.text,Two more figure columns are coming: type Gross profit ($) in F4 and Avg price ($/kWh) in G4 as one Tab run.,y
+paste-special-values,goal.prior-week-values.text,The associate wants last week beside this week: copy Raw’s Prior week rev and Old code block L7:M12 and paste values only onto H4.,y
+paste-special-values,goal.prior-week-values.teach,"Paste Special, Ctrl+Alt+V, pastes one aspect of the copy — V values only, T formats only, E transposed — then Enter confirms.",y
+paste-special-values,goal.header-style.text,"Four new headers, one style: copy the kWh sold header C4 and paste its format only onto F4:I4 with Paste Formats.",y
+paste-special-values,goal.this-week-values.text,"Snapshot this week: copy the five sites’ live totals Raw!I8:K12 and paste values only onto C5, so the page holds numbers, not links.",y
+paste-special-values,goal.total-row.text,"Type Total in A10, then copy Raw’s total row I13:K13 and paste it plain onto C10: the SUM re-points to C5:C9.",y
+paste-special-values,goal.total-row.teach,"A pasted formula keeps its shape, not its cells: the references shift with the move, so =SUM(I8:I12) becomes =SUM(C5:C9) — a $ would pin them.",y
+paste-special-values,goal.sensitivity-labels.text,Start the sensitivity block (how energy cost moves with price) under the daily table: Energy cost sensitivity ($/wk) in A22 and Price per kWh in A23.,y
+paste-special-values,goal.transpose-sites.text,"The sensitivity table needs the sites across its top: copy A5:A9 and paste them transposed onto B23, one row of five.",y
+paste-special-values,goal.tie.text,"Does it tie? Watch Domain’s Monday kWh in Raw’s C8 change: the live total I8 moves, and the Report’s snapshot C5 stays put.",y
+paste-special-values,closing.1,"The Report now carries this week’s and last week’s site figures as a snapshot: the feed can move, the page will not — Paste Special on purpose (E4).",y
+paste-special-values,closing.2,"The total row went in plain, and its SUM followed the paste to C5:C9; the site list stands across the sensitivity table without a name retyped.",y
+paste-special-values,endState.1,"C5:E9 and H5:H9 hold typed numbers, not formulas",y
+paste-special-values,endState.2,F4:I4 read as bold headers,y
+paste-special-values,endState.3,C10:E10 are live SUMs over C5:C9,y
+find-replace-timeline,title,"Find, replace, fill a timeline",y
+find-replace-timeline,brief,"Last week’s label, w/c 08 Sep (week commencing), still sits in twelve cells across the Report and Inputs, one Airport row on the feed is spelled Airprot, and the daily table has no day header. Replace the label on the Report and on Inputs, reading the count each time, find and fix the typo, then let Fill Series write Mon–Sat and the dates. The key is `Ctrl+H`.",y
+find-replace-timeline,goal.replace-all-report.text,Eleven cells on the Report still read w/c 08 Sep: swap every one for w/c 15 Sep with Replace All and read the count — eleven.,y
+find-replace-timeline,goal.replace-all-report.teach,"Ctrl+H opens Replace: type what to find, Tab, what to put there, then Alt+A replaces every match on this sheet and reports how many cells changed.",y
+find-replace-timeline,goal.replace-all-inputs.text,Replace All only touches the active sheet: move to Inputs and replace the stale week label in B3 the same way — the count reads one.,y
+find-replace-timeline,goal.find-airprot.text,One Airport row on the feed is spelled Airprot: move to Raw and find it with Ctrl+F.,y
+find-replace-timeline,goal.retype-airport.text,Nothing in Airprot is worth keeping: type Airport over B55.,y
+find-replace-timeline,goal.day-header.text,"Back on the Report, the daily table needs its day header: type Mon in B14, select B14:G14 and let Fill Series carry it to Sat.",y
+find-replace-timeline,goal.day-header.teach,"Fill Series (Alt, H, F, I, S) continues the pattern your first cells set across the selection: Mon runs to Sat, 15 and 16 run on to 20.",y
+find-replace-timeline,goal.date-seeds.text,"The dates go under the days: type the first two, 15 and 16, into B15 and C15 as a Tab run.",y
+find-replace-timeline,goal.date-series.text,Select B15:G15 and Fill Series carries 15 and 16 on to 20.,y
+find-replace-timeline,goal.tie.text,"Does it tie? Watch Airport’s Monday kWh in Raw’s C56 change to 3,000 and the Airport line of the site totals, I12, answer.",y
+find-replace-timeline,closing.1,"The stale week label is gone from both sheets in two Replace Alls, and Excel reported how many cells it touched each time — read what it tells you (F5).",y
+find-replace-timeline,closing.2,"The daily table now carries one timeline row: Mon to Sat with the dates under them, written as a series rather than typed six times (C2).",y
+find-replace-timeline,endState.1,No cell on the Report or Inputs still reads w/c 08 Sep,y
+find-replace-timeline,endState.2,Every Airport row on Raw reads Airport,y
+find-replace-timeline,endState.3,B14:G14 read Mon to Sat and B15:G15 read 15 to 20,y
+challenge-complete-the-feed,title,Challenge: complete the feed,y
+challenge-complete-the-feed,brief,"A fresh cut of the Austin feed came in with a day missing, a text figure and typos: complete it, clean it, then start the Summary tab with a snapshot and the week’s timeline.",y
+challenge-complete-the-feed,goal.missing-day.text,"Airport’s Saturday never came through: enter management’s figures in C61:F61 — 2,500 kWh, $0.48, $1,200.00 revenue and $325.00 energy cost.",y
+challenge-complete-the-feed,goal.lone-typo.text,Mueller is misspelled Muller in one row of the 60-row feed: find it and fix it in place.,y
+challenge-complete-the-feed,goal.repeated-typo.text,Riverside reads Riverisde in three rows: Replace All of them in one step and read the count.,y
+challenge-complete-the-feed,goal.text-number.text,"The kWh figure 1,240 in the Riverside rows was typed as text and sits on the left: make it a number.",y
+challenge-complete-the-feed,goal.summary-header.text,"Copy the site totals header H7:K7, insert a sheet named Summary in front, drop the header on its A1 and label E1 Snapshot.",y
+challenge-complete-the-feed,goal.snapshot-values.text,"With the feed complete, paste Raw’s site rows H8:K12 as values onto Summary!A2: a snapshot is values, never a live formula.",y
+challenge-complete-the-feed,goal.summary-timeline.text,"Under the snapshot, type Day in A8 and fill a Mon–Sat timeline across B8:G8.",y
+rows-cols-honest-totals,title,Rows and columns that keep the totals honest,y
+rows-cols-honest-totals,brief,"Cedar Park opened this week and needs a row inside the Report block, the old platform’s Old code column has to go, and a Margin % column is coming. Insert and delete whole rows and columns and watch the total row follow every edit — then see what happens to a SUM when the column it reads is deleted. The key is `Ctrl+Shift+=`.",y
+rows-cols-honest-totals,goal.insert-row.text,Cedar Park opened this week: select Airport’s row 9 and insert a blank row above it — the Total in C11 follows to =SUM(C5:C10).,y
+rows-cols-honest-totals,goal.insert-row.teach,"Ctrl+Shift+= inserts whole rows or columns at the selection, Ctrl+- deletes them, and a SUM whose range straddles the insert grows to take the new row in.",y
+rows-cols-honest-totals,goal.name-site.text,"Name the new site: type Cedar Park in A9, then fill the week label down from B8 into B9 with Ctrl+D.",y
+rows-cols-honest-totals,goal.figures.text,"Management emailed Cedar Park’s week: enter 2,140 kWh, $1,005.80 revenue and $278.20 energy cost across C9:E9 with Tab — the totals in C11:E11 grow together.",y
+rows-cols-honest-totals,goal.drop-old-code.text,The Old code column is the old platform’s: select column I from its header I4 and delete the whole column in one press.,y
+rows-cols-honest-totals,goal.margin-col.text,Margin % belongs before Prior week rev: insert a column at H and type Margin % in H4 — the header comes out bold.,y
+rows-cols-honest-totals,goal.break-revenue.text,"On Raw, delete the Revenue column E and read the site totals block: every Revenue SUM now says #REF! instead of a number.",y
+rows-cols-honest-totals,goal.break-revenue.teach,"#REF! means the formula pointed at a cell that no longer exists: delete a column a SUM reads and it breaks, and Ctrl+Z brings both back.",y
+rows-cols-honest-totals,goal.heal.text,"Read the error, then undo: Ctrl+Z brings the Revenue column back and Domain’s Revenue SUM in J8 reads a number again.",y
+rows-cols-honest-totals,goal.tie.text,"Does it tie? Watch Cedar Park’s kWh in C9 change to 3,000 and the Total in C11 answer.",y
+rows-cols-honest-totals,closing.1,"Cedar Park’s row went in inside the block, the Old code column came out and Margin % went in, and the total row followed every edit without a formula retyped — a total that follows its rows is the first check (F1).",y
+rows-cols-honest-totals,closing.2,"Deleting the column a SUM reads turned it to #REF!: that is a message, not damage — read it (F5) — and Ctrl+Z put the feed and its totals back.",y
+rows-cols-honest-totals,endState.1,A9:E9 hold Cedar Park’s row and Airport sits on row 10,y
+rows-cols-honest-totals,endState.2,C11:E11 are live SUMs over rows 5 to 10 and tie,y
+rows-cols-honest-totals,endState.3,"H4 reads Margin %, I4 Prior week rev ($), and no Old code remains",y
+rows-cols-honest-totals,endState.4,Raw’s Revenue column and the site totals are intact,y
+widths-heights-autofit,title,"Widths, heights, AutoFit",y
+widths-heights-autofit,brief,"The Report’s columns are still Excel’s defaults: South Lamar is cut off at the default width, the header row is clipped, and every column sits at 8.43 characters wide. Set the day columns to one width and the comparison columns to another, fit the label column to its site names, size the title row, and wrap the headers so nothing is clipped. The key is `Alt H O W`.",y
+widths-heights-autofit,goal.day-widths.text,The daily table’s six day columns B:G should share one width: select them from its timeline row and set Column Width 12.,y
+widths-heights-autofit,goal.day-widths.teach,"Column Width (Alt, H, O, W) sets every selected column to one width in Excel character units: select the columns first, then type the number and Enter.",y
+widths-heights-autofit,goal.comparison-widths.text,Margin % and Prior week rev ($) in H:I are the comparison columns: select both from the header row and set them to 14.,y
+widths-heights-autofit,goal.fit-labels.text,"Fit the label column to its site names, not the title: select A5:A11 and AutoFit — column A sizes to South Lamar.",y
+widths-heights-autofit,goal.fit-labels.teach,"AutoFit Column Width (Alt, H, O, I) sizes a column to its content — a whole column fits everything in it, a selected range fits only those cells.",y
+widths-heights-autofit,goal.title-height.text,"The title row is cramped at the default height: from A1, set Row Height 24 points.",y
+widths-heights-autofit,goal.title-height.teach,"Row Height (Alt, H, O, H) sets the selected rows’ height in points; AutoFit Row Height (Alt, H, O, A) sizes a row back to its content.",y
+widths-heights-autofit,goal.fit-title.text,Twenty-four was a guess: AutoFit Row Height puts row 1 back to what its one line of text needs.,y
+widths-heights-autofit,goal.wrap-headers.text,"At these widths the headers B4:I4 are clipped: select them from B4, wrap the text, then AutoFit row 4 to two lines.",y
+widths-heights-autofit,goal.wrap-headers.teach,"Wrap Text (Alt, H, W) folds a long entry onto more lines inside its cell, and AutoFit Row Height then sizes the row to the wrapped lines.",y
+widths-heights-autofit,goal.autofit-vs-equal.text,"See why the day columns were set by hand: AutoFit B:G at once, read the uneven widths, then Ctrl+Z puts the equal 12 back.",y
+widths-heights-autofit,goal.tie.text,"Does it tie? Watch Cedar Park’s kWh in C9 change to 3,000 and the Total in C11 answer through the new widths.",y
+widths-heights-autofit,closing.1,"The Report’s columns now read as a page: the six day columns share one width, the comparison columns another, the label column fits its longest site name, and nothing in the header row is clipped — equal period columns (C2).",y
+widths-heights-autofit,closing.2,"AutoFit fits whatever happens to sit in a column — one stray label lower down in E breaks the equal period columns — so set period columns by hand, and let AutoFit size the labels and the wrapped rows.",y
+widths-heights-autofit,endState.1,B:G are width 12 and H:I width 14,y
+widths-heights-autofit,endState.2,Column A is fitted to its site labels,y
+widths-heights-autofit,endState.3,B4:I4 wrap and row 4 stands two lines high,y
+widths-heights-autofit,endState.4,Row 1 is back at its default height,y
+hide-group-freeze,title,"Hide, group, freeze",y
+hide-group-freeze,brief,"The Report’s Energy cost and Gross profit columns are workings the reader does not need, and a buyer’s analyst who finds a hidden column will wonder what else is hidden. Hide them the way most people do, then unhide them and group them instead, and freeze the heads so the page scrolls without losing them. The key is `Alt+Shift+→`.",y
+hide-group-freeze,goal.hide.text,Energy cost and Gross profit are working columns: select the whole of E:F from the header row and hide them with Ctrl+0.,y
+hide-group-freeze,goal.hide.teach,Ctrl+0 hides the selected columns and Ctrl+9 the rows; Ctrl+Shift+) and Ctrl+Shift+( unhide whatever is hidden inside the selection.,y
+hide-group-freeze,goal.unhide.text,A buyer’s analyst will find a hidden column and wonder what else is hidden: select D:G across the gap and unhide with Ctrl+Shift+).,y
+hide-group-freeze,goal.rows-at-scale.text,"Rows hide the same way: select the whole daily table, rows 13:21, hide them with Ctrl+9, then bring them back with Ctrl+Shift+(.",y
+hide-group-freeze,goal.group.text,"Group, don’t hide: select the whole of E:F again and group the two working columns with Alt+Shift+→.",y
+hide-group-freeze,goal.group.teach,Alt+Shift+→ groups the selected whole columns or rows into an outline with a button to fold and unfold; Alt+Shift+← ungroups them.,y
+hide-group-freeze,goal.fold.text,"Fold the group with Hide Detail, Alt A H: the two columns tuck behind an outline button instead of vanishing.",y
+hide-group-freeze,goal.unfold.text,"Unfold it with Show Detail, Alt A J: the workings are there when a reader wants them, and the group stays.",y
+hide-group-freeze,goal.freeze.text,"The title, units, header row and site column must stay in view: land on B5 and freeze panes there with Alt W F F.",y
+hide-group-freeze,goal.freeze.teach,Freeze Panes (Alt W F F) pins every row above and every column left of the active cell so they stay in view as the sheet scrolls.,y
+hide-group-freeze,goal.tie.text,"Does it tie? Watch Cedar Park’s kWh in C9 change to 3,000 and the Total in C11 answer, with the heads frozen in place.",y
+hide-group-freeze,closing.1,"The two working columns are grouped, not hidden: a hidden column vanishes and gets forgotten, a grouped one shows its button and folds away when the reader wants the page clean (C7).",y
+hide-group-freeze,closing.2,"The title, units, header row and site labels are frozen at B5, so the Report scrolls without losing its heads (C8) — and Cedar Park’s kWh still moves the Total.",y
+hide-group-freeze,endState.1,"E:F are grouped and unfolded, and nothing on the Report is hidden",y
+hide-group-freeze,endState.2,The panes are frozen at B5,y
+challenge-reshape-the-report,title,Challenge: reshape the report,y
+challenge-reshape-the-report,brief,"A sister cluster’s KPI report arrived with a site missing, a stale column, uneven widths, a hidden column and nothing frozen: reshape it to house standard, and the totals must still tie.",y
+challenge-reshape-the-report,goal.depot-row.text,"The Depot site opened: insert a row inside the block, above the last site, and enter Depot, 1,800 kWh, $828 revenue, $234 energy cost.",y
+challenge-reshape-the-report,goal.old-code.text,"Old code in column H is the old platform’s site code: delete the whole column, not just its cells.",y
+challenge-reshape-the-report,goal.equal-widths.text,The six figure columns B:G are six different widths: select them from the header row and set Column Width 12.,y
+challenge-reshape-the-report,goal.unhide.text,A figure column is hidden — a buyer’s analyst would find it and wonder: unhide it inside the same selection.,y
+challenge-reshape-the-report,goal.group-working.text,Gross profit and Avg price in E:F are working columns: group them rather than hiding them.,y
+challenge-reshape-the-report,goal.freeze.text,"Freeze the panes at B4 so the title, units, header row and site column stay in view.",y
+beat/enter-edit-copy-fill,eyebrow,"Module 1.3 · enter, edit, copy and fill",y
+beat/enter-edit-copy-fill,title,A day is missing and the figures have typos.,y
+beat/enter-edit-copy-fill,body,"Airport’s Saturday never came through; management emailed the four figures. Enter them, fix the feed in place, and build the Report skeleton from Raw with the clipboard and the fill keys.",y
+beat/structure,eyebrow,Module 1.4 · structure,y
+beat/structure,title,Cedar Park opened this week.,y
+beat/structure,body,"A sixth site row, a margin column, a stale column to remove, and a total that has to follow every edit. Then the widths, heights, groups and frozen panes that make the page readable.",y
+beat/format,eyebrow,Module 1.5 · format,y
+beat/format,title,Numbers a banker can read.,y
+beat/format,body,"Thousands separators, no stray decimals, negatives in parentheses; bold totals with a top border; inputs blue with a light tint; the title centered across the page. House style, applied once and then repeated in a single pass.",y
+beat/formulas,eyebrow,Module 1.6 · formulas,y
+beat/formulas,title,Make the page live.,y
+beat/formulas,body,"Every figure on the Report links to Raw and Inputs, so a corrected feed flows through without retyping. SUM and its family, anchoring with F4, links across sheets, and what each error means.",y
+beat/present-and-audit,eyebrow,Module 1.7 · present and audit,y
+beat/present-and-audit,title,Sign the page off.,y
+beat/present-and-audit,body,"The buyer’s analyst opens page one first. Check the totals tie, the conventions hold, the print fits one page, and nothing is hardcoded that should not be. Then it goes in the pack.",y
+micro/enter-tab-direction,title,A row in one run,y
+micro/enter-tab-direction,task,"Enter three day names across a row with Tab, and let Enter bring you back under the first.",y
+micro/enter-tab-direction,goal.run.text,"On the Report, enter Mon, Tue and Wed in B14:D14 as one Tab run, then Enter: the cursor lands on B15, under Mon.",y
+micro/escape-cancels,title,Back out of an entry,y
+micro/escape-cancels,task,"Start typing over the title, then throw the entry away with Esc.",y
+micro/escape-cancels,goal.esc.text,"Type anything over the Report title in A1, then press Esc: the title is untouched.",y
+micro/ctrl-enter-fill,title,Five cells in one press,y
+micro/ctrl-enter-fill,task,Put this week’s label in all five site rows with one entry.,y
+micro/ctrl-enter-fill,goal.fill.text,"Select the week labels B5:B9, type w/c 15 Sep once and press Ctrl+Enter: all five change together.",y
+micro/edit-caret,title,Edit in place,y
+micro/edit-caret,task,Add to a cell’s text without retyping it.,y
+micro/edit-caret,goal.append.text,"Open B2 with F2 — the caret sits at the end — and add a space and (Austin), so it reads Domain (Austin).",y
+micro/find-replace,title,Find a date,y
+micro/find-replace,task,Land on the feed’s first Saturday without scrolling.,y
+micro/find-replace,goal.find.text,"Ctrl+F, 13-Sep, Enter, then Esc: the cursor is on the feed’s first Saturday, A7.",y
+micro/undo-redo,title,Undo and redo,y
+micro/undo-redo,task,"Break a figure, take it back, put the break back, take it back again.",y
+micro/undo-redo,goal.undo.text,"Overwrite Domain’s first kWh in C2 with 0 and press Enter, then Ctrl+Z: 1070 is back.",y
+micro/undo-redo,goal.redo.text,Ctrl+Y puts the 0 back; one more Ctrl+Z restores the feed.,y
+micro/copy-cut-paste,title,"Copy, cut, paste",y
+micro/copy-cut-paste,task,"Carry the headers down the page, then move the units line.",y
+micro/copy-cut-paste,goal.copy.text,Copy the headers C4:E4 with Ctrl+C and paste them over the week labels at C13 with Ctrl+V.,y
+micro/copy-cut-paste,goal.cut.text,"Move the units line: cut A2 with Ctrl+X and paste it one row down, on A3.",y
+micro/fill-down-right,title,Fill right,y
+micro/fill-down-right,task,Correct one label and push it across the row.,y
+micro/fill-down-right,goal.right.text,"Retype B13 as w/c 15 Sep, then select B13:G13 and Ctrl+R fills the row from it.",y
+micro/paste-special,title,"Values, not formulas",y
+micro/paste-special,task,Freeze the total row as numbers in place.,y
+micro/paste-special,goal.values.text,"Copy the totals C10:E10, then Paste Special › Values over themselves (Ctrl+Alt+V, V, Enter): the SUMs become plain numbers.",y
+micro/replace-all,title,Replace All,y
+micro/replace-all,task,Swap last week’s label for this week’s everywhere on the page in one go.,y
+micro/replace-all,goal.all.text,"Ctrl+H: find w/c 08 Sep, replace with w/c 15 Sep, Replace All (Alt+A), then Esc — eleven cells change.",y
+micro/fill-series,title,Mon to Sat,y
+micro/fill-series,task,Type one day and let Fill Series write the rest.,y
+micro/fill-series,goal.series.text,"Type Mon in B14, select B14:G14 and Fill Series (Alt H F I S, Enter): the row reads Mon to Sat.",y
+micro/insert-delete-rows,title,"A row in, a row out",y
+micro/insert-delete-rows,task,Insert a row inside the site block and watch the total follow; then take it out.,y
+micro/insert-delete-rows,goal.insert.text,Select Cedar Park’s row 9 and insert a row above it with Ctrl+Shift+=: the Total moves to row 12 and still sums C5:C11.,y
+micro/insert-delete-rows,goal.delete.text,"Delete the blank row again with Ctrl+-: the Total is back on row 11, summing C5:C10.",y
+micro/ref-error,title,#REF! and back,y
+micro/ref-error,task,"Delete a row a formula depends on, read the error, heal it with undo.",y
+micro/ref-error,goal.break.text,"On Inputs, delete the wholesale price row 4 with Ctrl+-: the energy bill formula below now shows #REF!.",y
+micro/ref-error,goal.heal.text,Ctrl+Z puts the row back and the bill reads =B6*B4 again.,y
+micro/column-width,title,Set a width,y
+micro/column-width,task,Give the Site column a width you choose.,y
+micro/column-width,goal.width.text,Select column A and set Column Width (Alt H O W) to 16.,y
+micro/autofit,title,AutoFit,y
+micro/autofit,task,Let the column size itself to its longest entry.,y
+micro/autofit,goal.fit.text,Select column A and AutoFit it (Alt H O I): it opens out to the title’s full length.,y
+micro/wrap-text,title,Wrap a header,y
+micro/wrap-text,task,Make a long header wrap inside its column.,y
+micro/wrap-text,goal.wrap.text,Land on the Revenue ($) header D4 and wrap it with Alt H W.,y
+micro/hide-unhide,title,"Hide, then unhide",y
+micro/hide-unhide,task,"Hide two columns the way most people do, then bring them back.",y
+micro/hide-unhide,goal.hide.text,Select columns E:F and hide them with Ctrl+0.,y
+micro/hide-unhide,goal.unhide.text,"Select across the gap, D:G, and unhide with Ctrl+Shift+).",y
+micro/group-ungroup,title,"Group, not hide",y
+micro/group-ungroup,task,"Fold two working columns behind an outline button, then ungroup them.",y
+micro/group-ungroup,goal.group.text,Select columns E:F and group them with Alt+Shift+→: a button appears above the next column.,y
+micro/group-ungroup,goal.ungroup.text,"With E:F still selected, Alt+Shift+← ungroups them.",y
+micro/freeze-panes,title,Freeze the heads,y
+micro/freeze-panes,task,Keep the header rows and the site column on screen while the page scrolls.,y
+micro/freeze-panes,goal.freeze.text,"Land on B5, the first cell below the headers and right of the sites, and Freeze Panes (Alt W F F).",y
+micro/freeze-panes,goal.unfreeze.text,Alt W F F again unfreezes them.,y
+micro/ctrl-arrow,title,Jump to the edge,y
+micro/ctrl-arrow,task,Get to the bottom of the feed and back to the top without scrolling.,y
+micro/ctrl-arrow,goal.down.text,"Jump to the last date in the feed, A61.",y
+micro/ctrl-arrow,goal.right.text,"Back to the top with Ctrl+↑, then across to the last header, F1.",y
+micro/ctrl-home-end,title,Top and bottom,y
+micro/ctrl-home-end,task,"Land on the last used cell, then back on A1.",y
+micro/ctrl-home-end,goal.end.text,Go to the last used cell on Raw with Ctrl+End.,y
+micro/ctrl-home-end,goal.home.text,Back to A1 with Ctrl+Home.,y
+micro/ctrl-shift-arrow,title,Select to the edge,y
+micro/ctrl-shift-arrow,task,Select the whole Revenue column of the feed in one move.,y
+micro/ctrl-shift-arrow,goal.sel.text,"From E1, select the Revenue column to its last figure, E1:E60.",y
+micro/shift-arrow,title,Grow a selection,y
+micro/shift-arrow,task,Select one site’s week of dates by hand.,y
+micro/shift-arrow,goal.sel.text,"Select the first six dates, A2:A7.",y
+micro/row-col-select,title,"Whole row, whole column",y
+micro/row-col-select,task,Select a row and a column of the feed with the keyboard.,y
+micro/row-col-select,goal.row.text,"Select row 1, the header row.",y
+micro/row-col-select,goal.col.text,"Step down to A2, then select the whole of column A.",y
+micro/ctrl-a,title,The current region,y
+micro/ctrl-a,task,Select the whole feed in one press.,y
+micro/ctrl-a,goal.all.text,"Select the feed, A1:F61.",y
+micro/sheet-tabs,title,Walk the tabs,y
+micro/sheet-tabs,task,Move to the Costs sheet and back to Raw by keyboard.,y
+micro/sheet-tabs,goal.costs.text,Go to the Costs sheet.,y
+micro/sheet-tabs,goal.raw.text,Back to Raw.,y
+micro/go-to,title,Go To a far cell,y
+micro/go-to,task,"Land on a cell by address, across sheets.",y
+micro/go-to,goal.goto.text,Go to Costs!E4 by address.,y
+micro/rename-sheet,title,Rename a tab,y
+micro/rename-sheet,task,Give the scratch tab its proper name.,y
+micro/rename-sheet,goal.ren.text,Rename Sheet2 to Inputs.,y
+micro/gridlines,title,Gridlines off,y
+micro/gridlines,task,Turn the gridlines off on the sheet a reader sees.,y
+micro/gridlines,goal.grid.text,Turn the gridlines off on Raw.,y
+micro/format-cells-dialog,title,"Format Cells, and out",y
+micro/format-cells-dialog,task,Open Format Cells by shortcut and back out cleanly.,y
+micro/format-cells-dialog,goal.open.text,Open Format Cells on C2.,y
+micro/format-cells-dialog,goal.esc.text,Back out with Esc.,y
+micro/font-color,title,Blue for an input,y
+micro/font-color,task,Color a typed figure blue the way a model reads it.,y
+micro/font-color,goal.blue.text,"On Costs, color the Domain lease B4 blue.",y
+micro/go-to-special,title,Find the constants,y
+micro/go-to-special,task,Select every typed number in a block in one go.,y
+micro/go-to-special,goal.const.text,"On Costs, select A3:E8, then Go To Special → Constants.",y
+micro/bold-command,title,Bold the header,y
+micro/bold-command,task,Make the feed’s header row bold.,y
+micro/bold-command,goal.bold.text,Select row 1 and make it bold.,y
+micro/keytips,title,Walk the Ribbon,y
+micro/keytips,task,Reach a command by KeyTips and back out one level at a time.,y
+micro/keytips,goal.walk.text,"Press Alt, then H: the Home tab’s KeyTips show.",y
+micro/keytips,goal.back.text,"Back out with Esc, one level at a time, until the sheet has the keys again.",y

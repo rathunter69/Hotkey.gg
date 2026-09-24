@@ -195,6 +195,7 @@ export class Session {
     this.sheetIndex = 0;
     this._xr = false;   // cross-sheet recalc reentry guard
     this._clip = null;  // the workbook's one clipboard (every sheet reads and writes it: wireSheet)
+    this._repeat = null;   // what F4 repeats (C2 gap 10), workbook-wide like the clipboard
     this.pageRows = 0; this.pageCols = 0;   // a screenful for PageDown / Alt+PageDown — the view sets them; 0 = 10
     this.settings = makeSettings(this);
     this.dialogBuf = '';     // Go To's Reference field
@@ -213,6 +214,7 @@ export class Session {
     // own field becomes an accessor onto the Session's, so Sheet.copy/paste/pasteDrop need no workbook awareness.
     if (sh.clipboard && !this._clip) this._clip = sh.clipboard;
     Object.defineProperty(sh, 'clipboard', { configurable: true, enumerable: true, get: () => this._clip, set: v => { this._clip = v; } });
+    Object.defineProperty(sh, 'lastAction', { configurable: true, enumerable: true, get: () => this._repeat, set: v => { this._repeat = v; } });   // F4 repeats across sheets too
     sh.resolver = name => { const e = this.sheets.find(x => x.name.toLowerCase() === String(name).toLowerCase()); return e ? e.sheet : null; };
     sh.allSheets = () => this.sheets.map(e => ({ name: e.name, sheet: e.sheet }));
     sh.onChange(what => {
@@ -1215,6 +1217,10 @@ export class Session {
       this.startEdit(initial, 'edit'); return true;
     }
     if (k === 'F5' && !e.ctrlKey && !e.altKey && !e.shiftKey) { this.logKey('F5'); this.openGoTo(); return true; }
+    if (k === 'F4' && !e.ctrlKey && !e.altKey && !e.shiftKey) {   // repeat the last action on the current selection (Excel's F4 / Ctrl+Y outside Edit mode)
+      if (S.lastAction) { this.startClock(); this.logKey('F4'); S.repeatLast(); }
+      return true;
+    }
     if (k === 'F11' && e.shiftKey && !e.ctrlKey && !e.altKey) { this.startClock(); this.logKey('Shift+F11'); this.insertSheet(); return true; }
     if (k === 'F9' && !e.ctrlKey && !e.altKey && !e.shiftKey) { this.startClock(); this.logKey('F9'); S.commit('recalc'); return true; }   // Calculate Now (every sheet is always current: recorded manual mode changes nothing)
     if (k === 'Delete' && !e.ctrlKey && !e.altKey) { this.startClock(); this.logKey('Delete'); S.deleteContents(); return true; }

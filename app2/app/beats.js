@@ -5,6 +5,7 @@
 //
 //   beatFor(lesson, moduleAt)  → { id, eyebrow, title, body } for the first lesson of a module, else null
 import { PLANNED_MODULES } from './learn-next.js';
+import { copyFor } from '../content/copy/index.js';   // Wolf's written beat copy lays over the inline text (C2 Run 3)
 
 export const MODULE_BEATS = {
   welcome: { eyebrow: 'Module 1.0 · the Welcome', title: 'Sixty seconds on the feed.',
@@ -32,7 +33,7 @@ export function beatFor(lesson, at, seen = []) {
   if (id === 'welcome') return null;   // retired (B2): the Welcome's moves open 1.1.1
   if (!id || seen.includes(id)) return null;
   const b = MODULE_BEATS[id];
-  if (b) return { id, ...b };
+  if (b) return { id, eyebrow: copyFor('beat/' + id, 'eyebrow', b.eyebrow), title: copyFor('beat/' + id, 'title', b.title), body: copyFor('beat/' + id, 'body', b.body) };
   const planned = PLANNED_MODULES.find(p => p.title === at.module.title);
   return { id, eyebrow: `Module ${(planned && planned.n) || '1.' + at.k} · ${at.module.title.toLowerCase()}`, title: at.module.title + '.', body: (planned && planned.objective) || '' };
 }

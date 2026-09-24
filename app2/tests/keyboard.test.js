@@ -324,3 +324,19 @@ test('Fill Series continues the weekday and month lists from one cell; numbers s
   assert.ok(S.colW[1] < S.neededWidth(1));
   S.select('A1:A100'); S.autofitCols(); assert.equal(S.colW[1], S.neededWidth(1), 'whole column: the title counts');
 });
+
+test('F4 outside Edit mode repeats the last action on the new selection: formats, borders, widths, inserts, across sheets (C2 gap 10)', () => {
+  const s = fresh({ A1: { value: 1 }, B2: { value: 2 }, C1: { value: 3 }, D1: { value: 4 }, A5: { value: -5 } }); const S = s.sheet;
+  s.run('F4'); assert.equal(s.log.includes('F4'), false, 'nothing to repeat yet: no-op, unlogged');
+  s.run('Ctrl+B Right Down F4'); assert.equal(S.cellAt('B2').bold, true); assert.equal(s.log.at(-1), 'F4');
+  s.run('Ctrl+B F4'); assert.equal(S.cellAt('B2').bold, false, 'F4 repeats the state the toggle set, not a toggle');
+  S.goTo(1, 3); s.run('Ctrl+Shift+! Right F4'); assert.equal(S.cellAt('D1').fmtStyle, 'comma'); assert.equal(S.cellAt('D1').decimals, 2);
+  s.run('Alt H 0 Left F4'); assert.equal(S.cellAt('C1').decimals, 3, 'a decimals step repeats');
+  S.goTo(1, 1); s.run('Alt H B P Down Down Down Down F4'); assert.equal(S.cellAt('A1').bt, true); assert.equal(S.cellAt('A5').bt, true, 'a border repeats');
+  S.goTo(1, 1); s.run('Ctrl+Space Alt H O W "12" Enter Right Ctrl+Space F4'); assert.equal(S.colW[1], 89); assert.equal(S.colW[2], 89, 'a column width repeats');
+  S.goTo(2, 1); s.run('Shift+Space Ctrl+Shift+= F4'); assert.equal(S.value('B4'), 2, 'the insert repeats (B2 moved down twice)');
+  S.goTo(1, 1); s.run('Ctrl+Space Shift+Right Ctrl+0'); S.goTo(1, 4); s.run('Ctrl+Space F4'); assert.equal(S.hiddenCols.has(4), true, 'hide columns repeats');
+  // the action carries across sheets, like the clipboard; and Edit-mode F4 still cycles anchors
+  s.addSheet('Data'); s.run('Ctrl+PgDn'); s.sheet.goTo(2, 2); s.run('Ctrl+I Ctrl+PgUp'); S.goTo(5, 1); s.run('F4'); assert.equal(S.cellAt('A5').it, true);
+  s.run('"=B2" F4'); assert.equal(s.editBuf, '=$B$2'); s.run('Escape');
+});

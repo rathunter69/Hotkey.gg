@@ -2,6 +2,7 @@
 // The C2 rewrite lands module by module: the new module lessons (Project Volt, voltline-weekly)
 // sit first, the legacy sections below them until the rewrite replaces the old set.
 import inherited_workbook from './lessons/inherited-workbook.js';
+import { applyCopy } from './copy/index.js';
 import ribbon_by_keyboard from './lessons/ribbon-by-keyboard.js';
 import analyst_setup from './lessons/analyst-setup.js';
 import colour_label_hardcode from './lessons/colour-label-hardcode.js';
@@ -145,6 +146,9 @@ export function moduleOf(lesson) {
   return { module: m, n: n >= 0 ? n + 1 : m.lessons.length + 1, of: m.lessons.length, k: k + 1, of7: mods.length };
 }
 
+// the copy layer (C2 Run 3): every lesson ships with Wolf's written copy laid over its inline strings
+for (const ch of CHAPTERS) { ch.lessonsRaw = ch.lessons; ch.lessons = ch.lessons.map(applyCopy); }
+export const LESSONS_RAW = CHAPTERS.flatMap(ch => ch.lessonsRaw);
 export const LESSONS = CHAPTERS.flatMap(ch => ch.lessons);
 export const LESSONS_BY_ID = Object.fromEntries(LESSONS.map(l => [l.id, l]));
 export const chapterOf = lesson => CHAPTERS.find(ch => ch.id === lesson.chapter);

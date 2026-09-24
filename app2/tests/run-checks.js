@@ -56,6 +56,9 @@ for (const h of htmls) {
 console.log('isolation ok: no imports from outside app2/');
 
 // 2b. the public lesson and shortcut pages are generated from the lesson data and must not drift
+const cs = spawnSync(process.execPath, [join(here, 'copy-sync.js')], { encoding: 'utf8' });
+if (cs.status !== 0) { process.stdout.write(cs.stdout || ''); process.stderr.write(cs.stderr || ''); console.log('CHECK FAILED: the copy layer is stale (node app2/tests/copy-sync.js --write)'); process.exit(1); }
+process.stdout.write(cs.stdout || '');
 const pp = spawnSync(process.execPath, [join(here, 'public-pages.js')], { encoding: 'utf8' });
 if (pp.status !== 0) fail((pp.stderr || pp.stdout).trim());
 console.log(pp.stdout.trim());
