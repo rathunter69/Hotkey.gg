@@ -240,6 +240,42 @@ try {
     const ghost = await page.evaluate(() => { const b = document.querySelector('#ghostToggle'); return b ? !b.disabled : null; });
     if (ghost !== true) fail('edge-jumps: ghost toggle not enabled after a PB');
   }
+
+  // failure paths (experience pass C, item 9), in their own context so the module map starts clean: a page file that
+  // fails shows Retry and Retry mounts it; a failed dependency (which the browser keeps failing) recovers through the
+  // reload Retry falls back to; a landing whose demo player never arrives keeps a still with a way in
+  {
+    const ctx2 = await browser.newContext({ viewport: { width: 1400, height: 900 }, serviceWorkers: 'block' });
+    let block = null;
+    await ctx2.route('**/*', route => {
+      let u; try { u = new URL(route.request().url()); } catch (e) { return route.abort('blockedbyclient'); }
+      if (u.origin !== `http://127.0.0.1:${PORT}`) return route.abort('blockedbyclient');
+      if (block && block.test(u.pathname)) return route.abort('failed');
+      return route.continue();
+    });
+    await ctx2.addInitScript(() => { if (!localStorage.getItem('hk2_prefs')) localStorage.setItem('hk2_prefs', JSON.stringify({ platform: 'win', firstRunDone: true, briefingDone: true, mute: true })); });
+    const p2 = await ctx2.newPage();
+    block = /\/app\/home-next\.js$/;
+    await p2.goto(base + '#/');
+    if (!(await p2.waitForSelector('#errRetry', { timeout: 5000 }).catch(() => null))) fail('failure: a Home that did not load shows no Retry');
+    block = null;
+    await p2.click('#errRetry').catch(() => {});
+    if (!(await p2.waitForSelector('.hm', { timeout: 5000 }).catch(() => null))) fail('failure: Retry did not bring Home back');
+    const p3 = await ctx2.newPage();
+    block = /\/app\/deal-strip\.js$/;
+    await p3.goto(base + '#/');
+    if (!(await p3.waitForSelector('#errRetry', { timeout: 5000 }).catch(() => null))) fail('failure: a Home whose dependency failed shows no Retry');
+    block = null;
+    await p3.click('#errRetry').catch(() => {});
+    if (!(await p3.waitForSelector('.hm', { timeout: 8000 }).catch(() => null))) fail('failure: Retry did not recover from a failed dependency');
+    const p4 = await ctx2.newPage();
+    block = /\/ui\/demo-player\.js$/;
+    await p4.goto(base + '#/landing');
+    if (!(await p4.waitForSelector('.dp-poster .dp-poster-note:not([hidden])', { timeout: 5000 }).catch(() => null))) fail('failure: the landing without its demo player shows no still and note');
+    block = null;
+    await ctx2.close();
+    t('failure paths');
+  }
 } finally {
   if (errors.length) { failures += errors.length; console.log('ERRORS\n' + errors.join('\n')); }
   const secs = ((Date.now() - T0) / 1000).toFixed(1);
