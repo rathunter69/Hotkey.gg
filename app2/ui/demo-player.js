@@ -265,6 +265,9 @@ function clipToColumns(sheetEl, session) {
     }
     const w = Math.round(edge + chrome) + 'px';
     if (gw.style.maxWidth !== w) gw.style.maxWidth = w;
+    // the strip past the last column is blank sheet, not a hole in the frame (dark themes keep a light sheet)
+    const tb = gw.querySelector('table'), paper = tb ? getComputedStyle(tb).backgroundColor : '';
+    if (paper && sheetEl.style.backgroundColor !== paper) sheetEl.style.backgroundColor = paper;
   };
   const soon = () => { if (!raf) raf = requestAnimationFrame(measure); };
   const unsub = session.onChange(soon);
