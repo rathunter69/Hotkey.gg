@@ -61,19 +61,33 @@
 .dp-stage .stage{flex:1 1 auto; min-height:0; border-radius:10px}
 .dp-stage .stage-row{min-height:0; flex:1 1 auto}
 .dp-stage .stage-main{min-height:0}
+.dp[tabindex]{outline:none; transition:border-color .15s, box-shadow .15s}
+.dp[tabindex]:focus-within{border-color:var(--accent)}
+.dp[tabindex]:focus-visible{box-shadow:0 0 0 3px var(--accent-glow), 0 30px 68px -32px rgba(0,0,0,.42)}
+.dp-stage{position:relative}
 .dp-panel{min-width:0; min-height:0; display:flex; flex-direction:column; padding:10px 10px 10px 10px; gap:0; overflow:hidden}
 .dp-panel .task-card{border:1px solid var(--accent-dim); border-radius:10px; background:color-mix(in srgb, var(--accent-glow) 70%, var(--surface)); padding:12px 14px}
 .dp-panel .task-goal{font-size:15px}
 .dp-panel .task-teach{font-size:13px}
 .dp-panel .task-keys{margin-top:8px}
 .dp-panel .task-keys kbd, .dp-panel .task-teach kbd{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var(--surface2); border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:1px 6px; white-space:nowrap}
-.dp-goals{margin:10px 0 0; padding:0; list-style:none; font-size:13.5px}
+.dp-goals{position:relative; margin:10px 0 0; padding:0; list-style:none; font-size:13.5px; flex:0 1 auto; min-height:0; overflow:hidden}
 .dp-goals .goal{padding:7px 9px; margin-bottom:3px}
-.dp-hand{margin-top:auto; font-size:13px; color:var(--muted); background:var(--surface); border:1px solid var(--accent-dim); border-radius:10px; padding:10px 12px; line-height:1.5}
+.dp-hand{margin-top:auto; font-size:13px; color:var(--muted); background:var(--surface); border:1px solid var(--accent-dim); border-radius:10px; padding:10px 12px; line-height:1.5; flex:none}
 .dp-hand b{color:var(--accent)}
-.dp-keys{position:absolute; left:50%; bottom:18px; transform:translateX(-50%); right:auto}
-.dp-keys.show{opacity:1}
-.dp .keyflash.demo .kchip{font-size:17px; padding:7px 13px}
+/* the key echo has a band of its own and never sits over the cells: the foot of the task panel here, a sheet-tab strip in the compact card */
+.dp-keyband{flex:none; margin-top:auto; padding:10px 2px 0; border-top:1px solid var(--line); min-height:78px; display:flex; flex-direction:column; gap:8px}
+.dp-panel .dp-hand:not([hidden]) + .dp-keyband{margin-top:10px}
+.dp-keyband-cap{font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
+.dp .keyflash.dp-keys{position:static; left:auto; right:auto; bottom:auto; transform:none; z-index:auto; flex-wrap:wrap; align-content:flex-end; gap:6px; min-height:0; overflow:hidden}
+.dp .keyflash.dp-keys.show{opacity:1}
+.dp .keyflash.demo .kchip{font-size:14px; padding:4px 10px; border-radius:7px; box-shadow:none}
+@media (max-height:760px){ .dp-keyband{min-height:46px; padding-top:8px} .dp-keyband-cap{display:none} }
+/* reduced motion: the demo waits on its first frame with a way to start it */
+.dp-play{position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); z-index:5; font-family:var(--mono); font-size:14px; font-weight:700; color:var(--on-accent); background:var(--accent);
+  border:0; border-radius:10px; padding:12px 20px; cursor:pointer; box-shadow:0 10px 34px var(--accent-glow)}
+.dp-play:hover{filter:brightness(1.08)}
+.dp-play:focus-visible{outline:2px solid var(--text); outline-offset:3px}
 /* the compact card on the landing: task on top, sheet, keys along the bottom */
 .dp-compact .dp-grid{grid-template-columns:1fr; grid-template-rows:auto 1fr}
 .dp-compact .dp-panel{order:-1; padding:10px 10px 0; flex-direction:row; align-items:stretch; gap:10px}
@@ -82,8 +96,11 @@
 .dp-compact .dp-hand{margin:0; flex:0 0 200px}
 .dp-compact .dp-stage{padding:10px}
 .dp-compact .dp-stage .ribbon-slot{display:none}
-.dp-compact .dp-keys{bottom:14px}
-.dp-compact .keyflash.demo .kchip{font-size:14px; padding:5px 10px}
+.dp-compact .dp-keyband{margin:0; min-height:0; height:36px; padding:0 8px 0 0; border-top:1px solid var(--line); background:var(--surface2); flex-direction:row; align-items:center; justify-content:space-between; gap:10px; overflow:hidden}
+.dp-sheettab{align-self:stretch; display:flex; align-items:center; padding:0 14px; margin-top:-1px; background:var(--surface); border:1px solid var(--line); border-top-color:var(--surface);
+  font-family:var(--cellfont, var(--sans)); font-size:12.5px; font-weight:600; color:var(--accent); white-space:nowrap}
+.dp-compact .keyflash.dp-keys{flex-wrap:nowrap; justify-content:flex-end; gap:5px; min-width:0}
+.dp-compact .keyflash.demo .kchip{font-size:12.5px; padding:2px 8px; border-radius:5px; line-height:1.5}
 
 /* ---------- 3. the landing (app/landing-next.js) ---------- */
 .ld2{position:relative; font-family:var(--sans); margin:-20px -32px 0; padding:0 32px; overflow:hidden}
@@ -422,6 +439,7 @@ html[data-density="comfortable"] .lesson.panel-overlay .task-card{padding:11px 1
 .dp-poster-img{flex:1 1 auto; min-height:0; overflow:hidden; background:var(--surface2); display:flex; align-items:flex-start; justify-content:center}
 .dp-poster-img img{display:block; width:100%; height:100%; object-fit:cover; object-position:top left; color:var(--muted); font-family:var(--mono); font-size:12px}
 .dp-poster-note{padding:8px 14px; font-family:var(--mono); font-size:12px; color:var(--muted); border-top:1px solid var(--line)}
+.dp-poster-note[hidden]{display:none}
 .dp-poster-note a{color:var(--accent)}
 /* the loading skeleton (C2, item 9): the page's shape while its module arrives */
 .sk{max-width:1340px; margin:8px auto 24px; display:flex; flex-direction:column; gap:12px}
