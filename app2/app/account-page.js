@@ -39,6 +39,7 @@ export function mountAccountPage(root, ctx = {}) {
   let notice = null;
   let lastEmail = '';           // { kind: 'error'|'check', text }
   let destroyed = false;
+  let confirmDelete = false;    // the typed delete confirmation is open
   const offAuth = auth.onChange(() => { if (!destroyed) { notice = null; render(); } });
   const onUser = () => { if (!destroyed) render(); };
   window.addEventListener('hk:user', onUser);
@@ -136,6 +137,20 @@ export function mountAccountPage(root, ctx = {}) {
     </div></section>`;
   }
 
+  /** What the learner types to delete: their handle, or DELETE while the profile is still loading. */
+  function deleteWord() { const prof = store.profile(); return prof && prof.handle ? prof.handle : 'DELETE'; }
+  function deleteConfirmHtml() {
+    return `<div class="acct-form acct-delete" role="group" aria-labelledby="delTitle">
+        <p id="delTitle"><b>Delete your account for good.</b> Profile, attempts, bests and board entries go, and it cannot be undone. Type <kbd>${esc(deleteWord())}</kbd> to confirm.</p>
+        <label>Confirm<input id="deleteWordInput" type="text" autocomplete="off" spellcheck="false" autocapitalize="off"></label>
+        <p class="form-msg form-err" id="deleteMsg" role="alert"></p>
+        <div class="data-actions">
+          <button class="btn btn-danger" id="deleteConfirmBtn" type="button" disabled>Delete my account</button>
+          <button class="btn btn-ghost" id="deleteCancelBtn" type="button">Keep my account</button>
+        </div>
+      </div>`;
+  }
+
   function render() {
     const signedIn = auth.state() === 'in';
     const all = store.all(); const p = prefs.get();
@@ -170,8 +185,9 @@ export function mountAccountPage(root, ctx = {}) {
           <p>${signedIn ? 'Your progress lives in your account. Export everything we hold, or delete the account and all of it.' : "Progress and settings live in this browser's storage. Export them as a file, or delete them here."}</p>
           <div class="data-actions">
             <button class="btn btn-ghost" id="exportBtn" type="button">Export data (JSON)</button>
-            ${signedIn ? '<button class="btn btn-danger" id="deleteAcctBtn" type="button">Delete account</button>' : '<button class="btn btn-danger" id="deleteBtn" type="button">Delete local data</button>'}
+            ${signedIn ? (confirmDelete ? '' : '<button class="btn btn-danger" id="deleteAcctBtn" type="button">Delete account</button>') : '<button class="btn btn-danger" id="deleteBtn" type="button">Delete local data</button>'}
           </div>
+          ${signedIn && confirmDelete ? deleteConfirmHtml() : ''}
           <p class="page-fine">${ids.length ? `${ids.length} of ${LESSONS.length} lessons have progress${secs ? `; best times total ${secs.toFixed(1)} s` : ''}.` : 'Nothing is stored yet.'}${signedIn ? ' Deleting the account removes your profile, attempts and board entries. It cannot be undone.' : ''}</p>
         </div>
       </section>`;
@@ -246,7 +262,16 @@ export function mountAccountPage(root, ctx = {}) {
       } catch (err) { if (auth.current(t)) { showToast('Could not save — try again'); e.target.checked = !v; } }
     };
     const out = el.querySelector('#signOutBtn');
-    if (out) out.onclick = () => auth.signOut();
+    if (out) out.onclick = async () => {
+      if (busy) return;
+      busy = true; out.disabled = true; out.textContent = 'Signing out…';
+      // give queued runs a moment to reach the account; sign-out then wipes this device
+      const clear = await store.drain(3000);
+      const left = store.pending();
+      busy = false;
+      if (!clear && left && !confirm(`${left} run${left === 1 ? ' has' : 's have'} not reached your account yet and will be lost from this device. Sign out anyway?`)) { render(); return; }
+      auth.signOut();
+    };
     const redeem = el.querySelector('#redeemForm');
     if (redeem) redeem.onsubmit = async e => {
       e.preventDefault();
@@ -308,16 +333,37 @@ export function mountAccountPage(root, ctx = {}) {
       render();
     };
     const delAcct = el.querySelector('#deleteAcctBtn');
-    if (delAcct) delAcct.onclick = async () => {
-      if (!confirm('Delete your account? Profile, attempts, bests and board entries are removed permanently. This cannot be undone.')) return;
-      const sb = auth.client(); if (!sb) return;
-      try {
-        const { error } = await sb.rpc('rpc_delete_account');
-        if (error) { showToast('Could not delete — try again or contact support'); return; }
-        await auth.signOut();
-        showToast('Account deleted');
-      } catch (e) { showToast('Could not delete — try again or contact support'); }
-    };
+    // Deleting the account is a typed confirmation, never a dialog: Enter cannot carry through it
+    // (the button stays disabled until the handle is typed, and there is no form to submit)
+    if (delAcct) delAcct.onclick = () => { confirmDelete = true; render(); const f = el.querySelector('#deleteWordInput'); if (f) f.focus(); };
+    const delWord = el.querySelector('#deleteWordInput');
+    const delGo = el.querySelector('#deleteConfirmBtn');
+    const delCancel = el.querySelector('#deleteCancelBtn');
+    if (delCancel) delCancel.onclick = () => { confirmDelete = false; render(); };
+    if (delWord && delGo) {
+      delWord.oninput = () => { delGo.disabled = delWord.value.trim() !== deleteWord(); };
+      delWord.onkeydown = e => { if (e.key === 'Enter') e.preventDefault(); };
+      delGo.onclick = async () => {
+        if (busy || delWord.value.trim() !== deleteWord()) return;
+        const sb = auth.client(); if (!sb) return;
+        const t = auth.token();
+        const msg = el.querySelector('#deleteMsg');
+        busy = true; delGo.disabled = true; delGo.textContent = 'Deleting…';
+        try {
+          const { error } = await sb.rpc('rpc_delete_account');
+          if (!auth.current(t)) return;
+          busy = false;
+          if (error) { delGo.disabled = false; delGo.textContent = 'Delete my account'; msg.textContent = 'Could not delete — try again or contact support.'; return; }
+          confirmDelete = false;
+          await auth.signOut();
+          showToast('Account deleted');
+        } catch (e) {
+          if (!auth.current(t)) return;
+          busy = false; delGo.disabled = false; delGo.textContent = 'Delete my account';
+          msg.textContent = 'Network error — nothing was deleted. Try again.';
+        }
+      };
+    }
     if (want) { const s = el.querySelector('#sec-' + want); if (s) { s.classList.add('flash'); s.scrollIntoView({ block: 'center' }); const f = s.querySelector('select, input, button'); if (f) f.focus({ preventScroll: true }); } }
   }
   render();
