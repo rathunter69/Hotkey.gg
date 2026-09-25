@@ -110,7 +110,7 @@ try {
       const s0 = await size();
       await page.waitForFunction(() => /2 \/ 4|3 \/ 4|4 \/ 4/.test((document.querySelector('#demoCount') || {}).textContent || ''), null, { timeout: 15000 }).catch(() => fail('journey: the first-run demo did not press keys'));
       const steps = [];
-      // the demo takes two Enters (finish, then continue), the four cards one each, the picker one: seven, and the hash leaves #/start
+      // Enter moves on at once (Skip demo while it plays, Continue once done), then the four cards one each and the picker one; the hash leaves #/start
       for (let i = 0; i < 8; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(250); if (!/#\/start/.test(page.url())) break; steps.push((await page.evaluate(() => (document.querySelector('#frEyebrow') || {}).textContent || '')) + ' ' + await size()); }
       const sizes = new Set(steps.map(x => x.split(' ').pop()));
       if (sizes.size > 1 || !sizes.has(s0)) fail('journey: the first-run frame changed size between steps: ' + steps.join(' | '));
@@ -119,9 +119,9 @@ try {
       if (!prefsRec || !prefsRec.briefingDone || !prefsRec.firstRunDone) fail('journey: first-run prefs not written');
     }
     t('first run');
-    // 1.1.1: the module's story beat once, the strip reads 1.1, then the whole lesson by keyboard
-    if (!(await page.waitForSelector('.ws-beat', { timeout: 5000 }).catch(() => null))) fail('journey: no story beat before lesson 1.1.1');
-    await page.keyboard.press('Enter'); await page.waitForTimeout(250);
+    // 1.1.1: the deal cards told 1.1's story, so no beat repeats it; the strip reads 1.1, then the whole lesson by keyboard
+    await page.waitForSelector('.ws-crumb', { timeout: 5000 }).catch(() => null); await page.waitForTimeout(250);
+    if (await page.$('.ws-beat')) { fail('journey: 1.1.1 repeats the deal as a story beat after the first run'); await page.keyboard.press('Enter'); await page.waitForTimeout(250); }
     const crumb = await page.evaluate(() => (document.querySelector('.ws-crumb') || {}).textContent || '');
     if (!/1\.1 Open and set up/.test(crumb)) fail('journey: the strip does not read 1.1 Open and set up: ' + crumb);
     await play(LESSONS.find(l => l.id === 'inherited-workbook').solution);
@@ -277,7 +277,8 @@ try {
     const p4 = await ctx2.newPage();
     block = /\/ui\/demo-player\.js$/;
     await p4.goto(base + '#/landing');
-    if (!(await p4.waitForSelector('.dp-poster .dp-poster-note:not([hidden])', { timeout: 5000 }).catch(() => null))) fail('failure: the landing without its demo player shows no still and note');
+    if (!(await p4.waitForSelector('.dp-poster img', { timeout: 5000 }).catch(() => null))) fail('failure: the landing without its demo player shows no still');
+    await p4.waitForFunction(() => /didn.t load/i.test((document.querySelector('#ldDemoNote') || {}).textContent || ''), null, { timeout: 5000 }).catch(() => fail('failure: the landing does not say its live demo did not load'));
     block = null;
     await ctx2.close();
     t('failure paths');
