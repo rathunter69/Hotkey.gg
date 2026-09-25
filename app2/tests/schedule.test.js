@@ -137,3 +137,28 @@ test('every micro-drill names a real concept and its solution replays to complet
   }
   assert.equal(microLesson('nope'), null);
 });
+
+test('one review per shortcut per day (C2): many goals using a shortcut in one sitting are one repetition', async () => {
+  const { applyEvent, dueToday, backfillFrom, DAY } = await import('../app/schedule.js');
+  const t0 = Date.UTC(2026, 8, 20, 10);
+  let st = {};
+  for (let i = 0; i < 5; i++) st = applyEvent(st, { ids: ['ctrl-arrow'], q: 5 }, t0 + i * 60000);   // five goals, five minutes
+  assert.equal(st['ctrl-arrow'].reps, 1, 'one repetition');
+  assert.equal(st['ctrl-arrow'].ivl, 1, 'due again tomorrow, as the header promises');
+  assert.ok(dueToday(st, {}, t0 + DAY + 1000).items.some(i => i.id === 'ctrl-arrow'), 'due the next day');
+  // a slip later the same day still counts: back to a one-day interval
+  let st2 = applyEvent({}, { ids: ['go-to'], q: 5 }, t0);
+  st2 = applyEvent(st2, { ids: ['go-to'], q: 3 }, t0 + DAY);          // day two: interval 3
+  assert.equal(st2['go-to'].ivl, 3);
+  st2 = applyEvent(st2, { ids: ['go-to'], q: 2 }, t0 + DAY + 3600000); // a hint the same day
+  assert.equal(st2['go-to'].ivl, 1); assert.equal(st2['go-to'].reps, 0);
+  // the next day is a new review
+  const st3 = applyEvent(st, { ids: ['ctrl-arrow'], q: 5 }, t0 + DAY + 5000);
+  assert.equal(st3['ctrl-arrow'].reps, 2); assert.equal(st3['ctrl-arrow'].ivl, 3);
+  // backfill: ten lessons finished the same day give each shortcut one review, not ten
+  const lessons = Array.from({ length: 10 }, (_, i) => ({ id: 'l' + i, goals: [{ requires: ['sheet-tabs', 'ctrl-arrow'] }] }));
+  const all = Object.fromEntries(lessons.map((l, i) => [l.id, { completed: true, at: t0 + i * 600000 }]));
+  const bf = backfillFrom(all, lessons, t0 + DAY + 1);
+  assert.equal(bf['sheet-tabs'].ivl, 1); assert.equal(bf['ctrl-arrow'].reps, 1);
+});
+

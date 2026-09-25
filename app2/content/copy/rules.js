@@ -19,4 +19,5 @@ export const SITE_KEYS = [
   'dash_learn', 'dash_practice',
   'deal_strip_stage_1', 'deal_strip_deliverable_1',
   'page_delivered', 'save_nudge', 'install_prompt', 'due_empty', 'due_foot',
+  'tab_keys_note', 'due_fresh', 'archive_line',
 ];

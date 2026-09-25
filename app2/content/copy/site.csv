@@ -33,3 +33,6 @@ save_nudge,Your progress is saved on this device. Create a free account to keep 
 install_prompt,Install hotkey.gg as an app. One click; it opens in its own window and stays in your dock.
 due_empty,"Nothing due. Play the Daily, or carry on with the next lesson."
 due_foot,Short reps on what you are about to forget. Nothing is lost by skipping a day.
+tab_keys_note,"Your browser may keep Ctrl+PgDn and Ctrl+PgUp for its own tabs. Fullscreen hands them to the sheet, and so does the installed app."
+due_fresh,Nothing here yet. Shortcuts you learn come back here the next day as thirty-second refreshers.
+archive_line,"Earlier versions of these lessons, kept playable. The modules above are the chapter."

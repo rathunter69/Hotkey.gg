@@ -11,8 +11,6 @@ import { moduleCopy, siteCopy, splitParas } from '../content/copy/apply.js';
 export const PAGE_DELIVERED = 'Page {n} — {page} — delivered to the data room.';
 
 const BEATS_DEFAULT = {
-  welcome: { eyebrow: 'Module 1.0 · the Welcome', title: 'Sixty seconds on the feed.',
-    body: 'Management sent the Austin cluster’s site feed: sixty rows, six columns. Before anything gets built, get to the bottom of it the slow way and the fast way, both on your own clock. The difference is the whole idea.' },
   'open-and-set-up': { eyebrow: 'Module 1.1 · open and set up', title: 'The file arrived the way inherited files do.',
     body: 'A tab still called Sheet2, a dead half-export, no page for the report, a price buried inside a formula. Set it up to house standard first: the tab names you choose now are the names every reference carries later.' },
   'move-and-select': { eyebrow: 'Module 1.2 · move and select', title: 'The associate has questions about the feed.',

@@ -188,7 +188,8 @@ export function clearPulse(rootEl) { if (rootEl) for (const el of rootEl.querySe
  *           glowing Ribbon control in box pixels: the card docks under the bar beside it),
  *           keep ({ side, rect } of the current placement: kept while nothing better is on offer, so the
  *           card does not hop), obstacles ([{ left, top, width, height }]: the filled cells showing — what
- *           the learner is reading; the card covers as few as it can)
+ *           the learner is reading; the card covers as few as it can), hard (rects it must not cover when
+ *           any place avoids them: the active cell and selection, an open dialog or Ribbon menu)
  *   → { side: 'right' | 'below' | 'left' | 'above' | 'ribbon' | 'free', rect: { left, top, width, height }, covers }
  */
 export const SIDES = ['right', 'below', 'left', 'above'];
@@ -198,15 +199,16 @@ export const coverage = (r, obstacles) => (obstacles || []).reduce((n, o) => n +
 export function placeNear(box, target, panel, opts = {}) {
   const gapX = opts.gapX == null ? 96 : opts.gapX, gapY = opts.gapY == null ? 40 : opts.gapY, pad = opts.pad == null ? 12 : opts.pad;
   const x0 = box.x0 || 0, y0 = box.y0 || 0;
-  const obstacles = opts.obstacles || [];
+  const obstacles = opts.obstacles || [], hard = opts.hard || [];
+  const cost = r => coverage(r, obstacles) + 1000 * coverage(r, hard);
   const w = Math.min(panel.w, Math.max(0, box.w - x0 - pad)), h = Math.min(panel.h, Math.max(0, box.h - y0 - pad));
   const maxL = box.w - pad - w, maxT = box.h - pad - h;
   const cx = v => Math.max(x0, Math.min(maxL, v)), cy = v => Math.max(y0, Math.min(maxT, v));
   const rect = (left, top) => ({ left, top, width: w, height: h });
   const inside = r => r.left >= x0 && r.top >= y0 && r.left + r.width <= box.w - pad + 1e-9 && r.top + r.height <= box.h - pad + 1e-9;
   const done = (side, r) => ({ side, rect: r, covers: coverage(r, obstacles) });
-  // the fewest filled cells covered; ties go to the earliest candidate (the preference order)
-  const best = cands => cands.reduce((b, c) => { const n = coverage(c.rect, obstacles); return !b || n < b.covers ? { ...c, covers: n } : b; }, null);
+  // the fewest filled cells covered (an active cell, selection or open dialog counts a thousand); ties go to the earliest candidate
+  const best = cands => { const b = cands.reduce((acc, c) => { const n = cost(c.rect); return !acc || n < acc.n ? { ...c, n } : acc; }, null); return b ? done(b.side, b.rect) : null; };
   const prefer = (opts.prefer || []).filter(x => SIDES.includes(x));
   // a target partly off the box is clipped to the data area; one wholly off it is no target
   let t = null;
@@ -214,7 +216,9 @@ export function placeNear(box, target, panel, opts = {}) {
     const l = Math.max(x0, target.left), tp = Math.max(y0, target.top), r = Math.min(box.w, target.left + target.width), b = Math.min(box.h, target.top + target.height);
     if (r > l && b > tp) t = { left: l, top: tp, width: r - l, height: b - tp };
   }
-  const keep = opts.keep && opts.keep.rect && inside(opts.keep.rect) && !(t && overlaps(opts.keep.rect, t)) ? { side: opts.keep.side || 'free', rect: { ...opts.keep.rect } } : null;
+  // the current place, at the card's current size (a taller card is pulled up so its footer stays inside)
+  const kr = opts.keep && opts.keep.rect ? rect(cx(opts.keep.rect.left), cy(opts.keep.rect.top)) : null;
+  const keep = kr && inside(kr) && !(t && overlaps(kr, t)) ? { side: opts.keep.side || 'free', rect: kr } : null;
   if (!t) {
     if (opts.ribbon && Number.isFinite(opts.ribbon.left) && Number.isFinite(opts.ribbon.right)) {
       const cands = [];
@@ -240,14 +244,14 @@ export function placeNear(box, target, panel, opts = {}) {
     }
     const asked = prefer.length && cands.find(c => c.side === prefer[0]);
     if (asked) return done(asked.side, asked.rect);
-    if (cands.length && !obstacles.length) return done(cands[0].side, cands[0].rect);
+    if (cands.length && !obstacles.length && !hard.length) return done(cands[0].side, cands[0].rect);
   }
   if (cands.length) return best(cands);
-  // nothing fits beside it (the target fills the view): the corner farthest from its centre
+  // nothing fits beside it (the target fills the view): the corner farthest from its centre, clear of the active cell
   const tc = { x: t.left + t.width / 2, y: t.top + t.height / 2 };
   let far = null;
   for (const [l, tp] of [[maxL, y0 + pad], [x0, y0 + pad], [maxL, maxT], [x0, maxT]]) {
-    const r = rect(l, tp); const d = Math.hypot(l + w / 2 - tc.x, tp + h / 2 - tc.y);
+    const r = rect(l, tp); const d = Math.hypot(l + w / 2 - tc.x, tp + h / 2 - tc.y) - 1e6 * coverage(r, hard);
     if (!far || d > far.d) far = { d, r };
   }
   return done('free', far.r);

@@ -31,6 +31,17 @@ export function dealState(all) {
 /** The strip: stage pips, the stage line, the deliverable and the module count. */
 export function dealStripHtml(all, opts = {}) {
   const d = dealState(all);
+  // Chapter 1 behind the learner (opts.done): stage 1 is delivered and the strip points at what comes next
+  if (opts.done) {
+    const nx = STAGES[1];
+    const pips = STAGES.map(s => `<i class="${s.n === 1 ? 'past' : s.n === 2 ? 'now' : ''}" title="Stage ${s.n} · ${esc(s.stage)}"></i>`).join('');
+    return `<div class="deal deal-done ${opts.compact ? 'deal-compact' : ''}" role="group" aria-label="Where we are in the deal">
+    <span class="deal-pips" aria-hidden="true">${pips}</span>
+    <span class="deal-stage"><b>Stage 1 delivered.</b> Page one of the pack is in the data room.</span>
+    <span class="deal-deliver">Next: stage 2 · ${esc(nx.stage)} (${esc(nx.access)}). ${esc(nx.sends)}.</span>
+    <span class="deal-count"><a href="#/learn?ch=${esc(nx.id)}">See Chapter 2 →</a></span>
+  </div>`;
+  }
   const pips = STAGES.map(s => `<i class="${s.n < d.stage.n ? 'past' : s.n === d.stage.n ? 'now' : ''}" title="Stage ${s.n} · ${esc(s.stage)}"></i>`).join('');
   return `<div class="deal ${opts.compact ? 'deal-compact' : ''}" role="group" aria-label="Where we are in the deal">
     <span class="deal-pips" aria-hidden="true">${pips}</span>

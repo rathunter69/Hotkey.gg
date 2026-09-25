@@ -267,6 +267,16 @@ test('placeNear: the card sits beside the target, a cell or two away, on the fir
   // a Ribbon goal: beside the glowing control, on the side that covers less
   const rbSide = placeNear(box, null, panel, { ribbon: { left: 500, right: 560 }, obstacles: [cell(600, 60, 300, 200)] });
   assert.equal(rbSide.side, 'ribbon'); assert.equal(rbSide.rect.left, 500 - 16 - 380, 'the right side is covered: left of the control');
+  // hard obstacles (C2): the active cell and an open dialog are never covered when any place avoids them
+  const active = cell(700, 102);   // right of e5 at the full gap would cover this cell
+  const h1 = placeNear(box, e5, panel, { hard: [active] });
+  assert.notEqual(h1.side, 'right'); assert.equal(coverage(h1.rect, [active]), 0);
+  const dialog = { left: 560, top: 60, width: 300, height: 200 };   // a dialog where the top-right corner would put the card
+  const h2 = placeNear(box, null, panel, { hard: [dialog] });
+  assert.equal(coverage(h2.rect, [dialog]), 0, 'no target: a corner clear of the dialog');
+  // the kept place is re-derived at the card's current size: a taller card is pulled up so its footer stays inside
+  const tall = placeNear(box, null, { w: 380, h: 420 }, { keep: { side: 'free', rect: { left: 600, top: 300, width: 380, height: 200 } } });
+  assert.ok(tall.rect.top + tall.rect.height <= box.h - 12 + 1e-9, 'the whole card fits');
   // a small box: the card shrinks to the data area and stays inside
   const small = placeNear({ w: 420, h: 300, x0: 40, y0: 22 }, cell(100, 100), { w: 380, h: 260 });
   assert.ok(small.rect.width <= 420 - 40 - 12 && small.rect.height <= 300 - 22 - 12);

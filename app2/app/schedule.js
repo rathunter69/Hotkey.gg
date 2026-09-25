@@ -72,11 +72,29 @@ export function strength(item, now = Date.now()) {
   return Math.pow(0.5, Math.max(0, now - item.last) / ivlMs);
 }
 
-/** Apply one event { ids:[…], q } (or { id, q }) to a state map. Pure. */
+/** The learner's calendar day of a timestamp ('2026-09-25'), for the one-review-a-day rule. Pure. */
+export const dayKey = t => { const d = new Date(t); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+
+/**
+ * Apply one event { ids:[…], q } (or { id, q }) to a state map. At most one review per shortcut per
+ * day (C2): a shortcut used in five goals of one lesson is one repetition, not five — otherwise the
+ * most-practised shortcuts would jump weeks ahead and never come due. A later slip the same day
+ * still counts: it takes the item back to a one-day interval. Pure.
+ */
 export function applyEvent(state, ev, now = Date.now()) {
   const out = { ...(isPlainObject(state) ? state : {}) };
   const ids = Array.isArray(ev.ids) ? ev.ids : ev.id ? [ev.id] : [];
-  for (const id of ids) if (typeof id === 'string' && id) out[id] = review(out[id], ev.q, now);
+  const g = Math.max(0, Math.min(5, Math.round(finite(ev.q) ? ev.q : 3)));
+  for (const id of ids) {
+    if (typeof id !== 'string' || !id) continue;
+    const prev = out[id];
+    if (isPlainObject(prev) && prev.last && dayKey(prev.last) === dayKey(now)) {
+      if (g < 3 && (prev.q == null || prev.q >= 3)) out[id] = { ...prev, ivl: 1, reps: 0, due: now + DAY, last: now, q: g, ef: Math.max(1.3, Math.round((prev.ef - 0.2) * 100) / 100) };
+      else if (prev.q != null && g < prev.q) out[id] = { ...prev, q: g };
+      continue;
+    }
+    out[id] = review(prev, g, now);
+  }
   return out;
 }
 
@@ -190,7 +208,7 @@ export const MICRO = {
     ], solution: 'Ctrl+End Ctrl+Home' },
   'ctrl-shift-arrow': { title: 'Select to the edge', task: 'Select the whole Revenue column of the feed in one move.', secs: 30, state: 'S0',
     goals: [
-      { id: 'sel', text: 'From E1, select the Revenue column to its last figure, E1:E60.', keys: 'Ctrl+→ ← then Ctrl+Shift+↓', requires: ['ctrl-shift-arrow'], check: (s, ses) => s.selectionText() === 'E1:E60' && used(ses, 'Ctrl+Shift+↓') },
+      { id: 'sel', text: 'Go to the Revenue header, E1, then select the column to its last figure in one press: E1:E60.', keys: 'Ctrl+→ ← then Ctrl+Shift+↓', requires: ['ctrl-shift-arrow'], check: (s, ses) => s.selectionText() === 'E1:E60' && used(ses, 'Ctrl+Shift+↓') },
     ], solution: 'Ctrl+Right Left Ctrl+Shift+Down' },
   'shift-arrow': { title: 'Grow a selection', task: 'Select one site’s week of dates by hand.', secs: 30, state: 'S0',
     goals: [
@@ -269,7 +287,7 @@ export function microLesson(id) {
 /**
  * Up to three items for today, ninety seconds in all: a micro-drill per due shortcut (the
  * weakest first), or one Keep-sharp challenge when a whole completed module has decayed (every
- * shortcut it taught is due). `ctx.modules` = [{ id, title, challengeId, complete, teaches:[…] }].
+ * shortcut it taught is due). `ctx.modules` = [{ id, title, challengeId, challengeSecs, complete, teaches:[…] }].
  * Pure.
  */
 export function dueToday(state, ctx = {}, now = Date.now()) {
@@ -279,7 +297,8 @@ export function dueToday(state, ctx = {}, now = Date.now()) {
   for (const m of ctx.modules || []) {
     const ids = (m.teaches || []).filter(id => MICRO[id]);
     if (m.complete && m.challengeId && ids.length >= 2 && ids.every(id => dueSet.has(id))) {
-      return { items: [{ kind: 'challenge', id: m.challengeId, title: 'Keep sharp: ' + m.title, task: 'The whole module has gone quiet. One pass of its challenge brings every move back.', secs: 90, why: ids }], secs: 90 };
+      const secs = Number.isFinite(m.challengeSecs) && m.challengeSecs > 0 ? m.challengeSecs : 90;
+      return { items: [{ kind: 'challenge', id: m.challengeId, title: 'Keep sharp: ' + m.title, task: 'The whole module has gone quiet. One pass of its challenge brings every move back.', secs, why: ids }], secs };
     }
   }
   const items = [];

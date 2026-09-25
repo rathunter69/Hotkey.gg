@@ -12,8 +12,8 @@ import { statusOf, moduleStatus, pathModel, CHAPTER_PLAN } from './learn-page.js
 import { STAGES, dealStripHtml } from './deal-strip.js';
 import { workbookState, WORKBOOKS } from '../content/workbooks/index.js';
 import { ring } from '../ui/ring.js';
-import { moduleCopy } from '../content/copy/apply.js';
-import { moduleNumber, isFinalItem, FINAL_MODULE } from './numbering.js';
+import { moduleCopy, siteCopy } from '../content/copy/apply.js';
+import { moduleNumber, itemNumber, isFinalItem, FINAL_MODULE } from './numbering.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const TIER_MARK = { legendary: '◆◆◆', pro: '◆◆', pass: '◆' };
@@ -32,6 +32,8 @@ const PLANNED_IDS = { '1.1': 'open-and-set-up', '1.2': 'move-and-select', '1.3':
 /** The seven planned modules; modules.csv (name, objective) overrides the built-in lines by module id. */
 export const PLANNED_MODULES = PLANNED_DEFAULT.map(p => { const row = moduleCopy(PLANNED_IDS[p.n]); return row ? { ...p, title: (row.name || '').trim() || p.title, objective: (row.objective || '').trim() || p.objective } : p; });
 
+/** A step's state in words at the row's end: done, in progress, next (a lone glyph read as clipped text). */
+const stepMark = (st, isNext) => st === 'done' || st === 'mastered' ? '✓' : st === 'started' ? 'in progress' : isNext ? 'next' : '';
 /** A challenge's name in a list whose flag already says "challenge": 'Challenge: find and mark' → 'Find and mark'. */
 const challengeName = t => { const x = String(t || '').replace(/^Challenge:\s*/i, ''); return x.charAt(0).toUpperCase() + x.slice(1); };
 /** What a module's finished page is called (modules.csv page_name), else the module's title. */
@@ -46,11 +48,15 @@ const docNo = (chapterN, k, id) => moduleNumber(id, k + 1) || `${chapterN}.${k +
  */
 export function pageThumbHtml(module, delivered = false) {
   try {
-    const last = module.lessons[module.lessons.length - 1];
-    const first = module.lessons[0];
+    // the page is the one the module builds: its project's when it has one (1.8), else its last lesson's
+    const building = module.lessons.filter(l => l.kind !== 'testout' && l.kind !== 'assessment');
+    const last = building.find(l => l.kind === 'project') || building[building.length - 1];
+    const first = building[0];
     if (!last || !last.workbook || !last.state) return '';
     const wb = WORKBOOKS[last.workbook];
     const after = workbookState(last.workbook, last.state.after);
+    // not delivered yet: the same sheet as it stood when the module began, so passing visibly fills the page
+    const shown = !delivered && first && first.state ? workbookState(last.workbook, first.state.before) : after;
     // the sheet the module worked on: the one with the most cell changes since the module began;
     // failing that (a module that only added or renamed sheets), the first sheet with anything on it
     const filled = after.sheets.filter(s => Object.keys(s.cells || {}).length);
@@ -63,8 +69,9 @@ export function pageThumbHtml(module, delivered = false) {
       if (top) sheet = after.sheets.find(s => s.name === top) || sheet;
       else { const added = after.sheets.filter(s => !before.sheets.some(b => b.name === s.name) && Object.keys(s.cells || {}).length); if (added[0]) sheet = added[0]; }
     }
-    const cells = sheet.cells || {};
-    const rows = []; const ROWS = 9, COLS = 5;
+    const src = shown.sheets.find(x => x.name === sheet.name);
+    const cells = (src && src.cells) || {};
+    const rows = []; const ROWS = 9, COLS = 4;
     for (let r = 1; r <= ROWS; r++) {
       let tr = '';
       for (let c = 1; c <= COLS; c++) {
@@ -72,11 +79,11 @@ export function pageThumbHtml(module, delivered = false) {
         let v = cell ? (cell.formula ? '#' : cell.value == null ? '' : String(cell.value)) : '';
         if (typeof cell?.value === 'number') v = cell.value >= 1000 ? Math.round(cell.value).toLocaleString('en-US') : String(cell.value);
         const cls = [cell && cell.bold ? 'b' : '', cell && cell.fontColor === 'blue' ? 'blue' : '', typeof cell?.value === 'number' || cell?.formula ? 'num' : ''].filter(Boolean).join(' ');
-        tr += `<td class="${cls}">${esc(v.slice(0, 14))}</td>`;
+        tr += `<td class="${cls}">${esc(v.slice(0, c === 1 ? 20 : 10))}</td>`;
       }
       rows.push(`<tr>${tr}</tr>`);
     }
-    return `<div class="dr-thumb${delivered ? ' delivered' : ''}" title="${esc(sheet.name)}"><div class="dr-thumb-tab">${esc(sheet.name)}</div><table>${rows.join('')}</table>${delivered ? '<span class="dr-stamp">delivered</span>' : ''}</div>`;
+    return `<div class="dr-thumb${delivered ? ' delivered' : ''}" title="${esc(sheet.name)}${delivered ? ' · delivered' : ' · as it arrived'}"><div class="dr-thumb-tab">${esc(sheet.name)}</div><table><colgroup><col class="c1"><col><col><col></colgroup>${rows.join('')}</table>${delivered ? '<span class="dr-stamp">delivered</span>' : ''}</div>`;
   } catch (e) { return ''; }
 }
 
@@ -119,7 +126,8 @@ export function mountLearnPage(root, ctx = {}) {
         const pm = path[k]; const plan = PLANNED_MODULES[k] || {};
         const sec = (sectionsOf(ch1).find(s => s.name === m.title) || {});
         const chP = m.challenge ? (all[m.challenge.id] || null) : null;
-        const passed = !!(chP && (chP.challenge || chP.completed));
+        const project = !m.challenge ? m.lessons.find(l => l.kind === 'project') : null;
+        const passed = !!(chP && (chP.challenge || chP.completed)) || !!(project && all[project.id] && all[project.id].completed);
         const tier = chP && chP.tier;
         const status = moduleStatus(m, all);
         const statusText = status === 'complete' ? 'Complete' : status === 'lessons-done' ? 'Lessons done · challenge open' : status === 'started' ? 'In progress' : 'Not started';
@@ -129,20 +137,20 @@ export function mountLearnPage(root, ctx = {}) {
             <div class="dr-doc-row"><h3>${esc(m.title)}</h3><span class="dr-status st-${esc(status)}">${statusText}</span></div>
             <p class="dr-obj">${esc(sec.blurb || plan.objective || '')}</p>
             <ol class="dr-steps">
-              ${m.lessons.map((l, i) => { const st = statusOf(l.id, all, skipped); const isNext = pm.items[i] && pm.items[i].next; return `<li class="dr-step st-${esc(st)}${isNext ? ' next' : ''}"><a href="#/lesson/${esc(l.id)}" data-open="${esc(l.id)}"><span class="dr-step-n">${docNo(1, k, m.id)}.${i + 1}</span><span class="dr-step-t">${esc(l.title)}</span><span class="dr-step-m">${l.minutes ? l.minutes + ' min' : ''}</span><span class="dr-step-st">${st === 'done' || st === 'mastered' ? '✓' : st === 'started' ? '…' : isNext ? 'next' : ''}</span></a></li>`; }).join('')}
-              ${m.challenge ? `<li class="dr-step dr-challenge st-${passed ? 'done' : 'todo'}${pm.items[pm.items.length - 1] && pm.items[pm.items.length - 1].next ? ' next' : ''}"><a href="#/lesson/${esc(m.challenge.id)}" data-open="${esc(m.challenge.id)}"><span class="dr-step-n">⚑</span><span class="dr-step-t">${esc(challengeName(m.challenge.title))}<span class="dr-pars">${m.challenge.pars ? 'challenge · pass ' + m.challenge.pars.pass + ' s · pro ' + m.challenge.pars.pro + ' s · legendary ' + m.challenge.pars.legendary + ' s' : 'challenge'}</span></span><span class="dr-step-m">${m.challenge.minutes ? m.challenge.minutes + ' min' : ''}</span><span class="dr-step-st">${passed ? (tier && TIER_MARK[tier] ? TIER_MARK[tier] + ' ' + tier : '✓ passed') : ''}</span></a></li>` : ''}
+              ${m.lessons.map((l, i) => { if (l.kind === 'testout') return ''; const st = statusOf(l.id, all, skipped); const isNext = pm.items[i] && pm.items[i].next; return `<li class="dr-step dr-st-${esc(st)}${isNext ? ' next' : ''}"><a href="#/lesson/${esc(l.id)}" data-open="${esc(l.id)}"><span class="dr-step-n">${esc(itemNumber(l, { module: m, k: k + 1, n: i + 1 }) || docNo(1, k, m.id) + '.' + (i + 1))}</span><span class="dr-step-t">${esc(l.title)}</span><span class="dr-step-m">${l.minutes ? l.minutes + ' min' : ''}</span><span class="dr-step-st">${stepMark(st, isNext)}</span></a></li>`; }).join('')}
+              ${m.challenge ? `<li class="dr-step dr-challenge dr-st-${passed ? 'done' : 'todo'}${pm.items[pm.items.length - 1] && pm.items[pm.items.length - 1].next ? ' next' : ''}"><a href="#/lesson/${esc(m.challenge.id)}" data-open="${esc(m.challenge.id)}"><span class="dr-step-n">⚑</span><span class="dr-step-t">${esc(challengeName(m.challenge.title))}<span class="dr-pars">${m.challenge.pars ? 'challenge · pass ' + m.challenge.pars.pass + ' s · pro ' + m.challenge.pars.pro + ' s · legendary ' + m.challenge.pars.legendary + ' s' : 'challenge'}</span></span><span class="dr-step-m">${m.challenge.minutes ? m.challenge.minutes + ' min' : ''}</span><span class="dr-step-st">${passed ? (tier && TIER_MARK[tier] ? TIER_MARK[tier] + ' ' + tier : '✓ passed') : ''}</span></a></li>` : ''}
             </ol>
           </div>
           <div class="dr-doc-page${passed ? ' filled' : ''}">
             ${pageThumbHtml(m, passed)}
-            <div class="dr-page-cap"><b>Page ${docNo(1, k, m.id)}</b> ${passed ? `${esc(pageName(m))} · delivered` : 'fills in when the challenge passes'}</div>
-            ${m.challenge && passed ? `<a class="dr-replay" href="#/lesson/${esc(m.challenge.id)}?seed=new">Replay the challenge · new sheet →</a>` : ''}
+            <div class="dr-page-cap"><b>Page ${docNo(1, k, m.id)}</b> ${passed ? `${esc(pageName(m))} · delivered` : m.challenge ? 'fills in when the challenge passes' : 'fills in when the project is built'}</div>
+            ${m.challenge && passed ? `<a class="dr-replay" href="#/lesson/${esc(m.challenge.id)}?seed=new" title="Replay the challenge on a fresh sheet">Replay · new sheet →</a>` : ''}
           </div>
         </article>`;
       });
       // 1.8: the chapter's project, assessment and test-out (module or section, whichever the catalogue carries)
       const finals = ch1 ? ch1.lessons.filter(isFinalItem) : [];
-      if (finals.length) {
+      if (finals.length && !mods.some(m => m.id === FINAL_MODULE.id)) {
         const main = finals.filter(l => l.kind !== 'testout');
         const doneN = main.filter(l => { const p = all[l.id]; return p && p.completed; }).length;
         const passed = !!gate.assessment || !!gate.testout;
@@ -156,10 +164,10 @@ export function mountLearnPage(root, ctx = {}) {
           <div class="dr-doc-main">
             <div class="dr-doc-row"><h3>${esc((row && row.name) || FINAL_MODULE.title)}</h3><span class="dr-status st-${status}">${statusText}</span></div>
             <p class="dr-obj">${esc((row && row.objective) || 'Build the weekly report end to end, then prove it against the clock; or test out of the chapter.')}</p>
-            <ol class="dr-steps">${finals.map(l => { const st = statusOf(l.id, all, skipped); const isNext = nextFinal && nextFinal.id === l.id && !mods.some((m2, k2) => path[k2] && path[k2].items.some(it => it.next)); return `<li class="dr-step st-${esc(st)}${isNext ? ' next' : ''}"><a href="#/lesson/${esc(l.id)}" data-open="${esc(l.id)}"><span class="dr-step-n">${FINAL_MODULE.n}.${label[l.kind] || ''}</span><span class="dr-step-t">${esc(l.title)}</span><span class="dr-step-m">${l.minutes ? l.minutes + ' min' : ''}</span><span class="dr-step-st">${st === 'done' || st === 'mastered' || (l.kind === 'testout' && gate.testout) ? '✓' : st === 'started' ? '…' : isNext ? 'next' : ''}</span></a></li>`; }).join('')}</ol>
+            <ol class="dr-steps">${finals.filter(l => l.kind !== 'testout').map(l => { const st = statusOf(l.id, all, skipped); const isNext = nextFinal && nextFinal.id === l.id && !mods.some((m2, k2) => path[k2] && path[k2].items.some(it => it.next)); return `<li class="dr-step dr-st-${esc(st)}${isNext ? ' next' : ''}"><a href="#/lesson/${esc(l.id)}" data-open="${esc(l.id)}"><span class="dr-step-n">${FINAL_MODULE.n}.${label[l.kind] || ''}</span><span class="dr-step-t">${esc(l.title)}</span><span class="dr-step-m">${l.minutes ? l.minutes + ' min' : l.timeLimit ? Math.round(l.timeLimit / 60) + ' min limit' : ''}</span><span class="dr-step-st">${stepMark(st, isNext)}</span></a></li>`; }).join('')}</ol>
           </div>
           <div class="dr-doc-page${passed ? ' filled' : ''}"><div class="dr-thumb-slot${passed ? ' delivered' : ''}"><span>Page ${FINAL_MODULE.n}</span></div>
-            <div class="dr-page-cap"><b>Page ${FINAL_MODULE.n}</b> ${passed ? `${esc((row && row.page_name) || 'The weekly KPI report')} · delivered` : 'the finished report: fills in when the assessment passes'}</div></div>
+            <div class="dr-page-cap"><b>Page ${FINAL_MODULE.n}</b> ${passed ? `${esc((row && row.page_name) || 'The weekly KPI report')} · delivered` : '· the finished weekly report — fills in when the assessment passes'}</div></div>
         </article>`;
       }
       for (let k = mods.length; k < PLANNED_MODULES.length; k++) {
@@ -170,10 +178,10 @@ export function mountLearnPage(root, ctx = {}) {
     } else {
       const pl = CHAPTER_PLAN.find(p => p.id === openChapter) || CHAPTER_PLAN[1];
       const st = STAGES.find(s => s.id === pl.id) || {};
-      const ch1Cleared = !!gate.testout || (ch1 && ch1.lessons.every(l => { const p = all[l.id]; return p && p.completed; }));
+      const ch1Cleared = !!gate.testout || !!gate.assessment || (ch1 && modulesOf(ch1).filter(m => m.id !== 'welcome').every(m => moduleStatus(m, all) === 'complete'));
       docs += `<div class="dr-ch-head"><div><div class="dr-ch-eyebrow">Folder ${pl.n} · stage ${st.n} of 6 · ${esc(st.stage || '')}</div><h2>${esc(pl.title)} <span class="l-tag">paid</span></h2>
           <p><b>Management sends:</b> ${esc(st.sends || '')}.<br><b>You deliver:</b> ${esc(st.delivers || '')}.</p><p>${esc(pl.line)}</p>
-          <p class="dr-lock">${pl.n === 2 ? (ch1Cleared ? 'Unlocked — Chapter 1 is behind you. Its lessons arrive with the paid tier.' : 'Opens when Chapter 1 is complete or tested out, with the paid tier.') : 'Arrives with the paid tier, in order.'} <a href="#/pricing">See pricing →</a></p></div></div>`;
+          <p class="dr-lock">${pl.n === 2 ? (ch1Cleared ? 'Unlocked — Chapter 1 is behind you. Its lessons arrive with the paid tier.' : 'Opens when Chapter 1 is complete or tested out, with the paid tier.') : 'Arrives with the paid tier, in order.'} <a class="dr-price" href="#/pricing">See pricing →</a></p></div></div>`;
     }
 
     el.innerHTML = `<div class="dr-head"><div><h1>Project Volt · data room</h1><p class="dr-sub">One deal, six chapters. Each chapter is a stage of the sale and produces one page of the pack. Your progress is ${esc(store.saveLine())}.</p></div>
@@ -196,16 +204,30 @@ export function mountLearnPage(root, ctx = {}) {
     const nextI = list.findIndex(a => a.closest('.dr-step').classList.contains('next'));
     setFocus(focusIdx >= 0 ? focusIdx : nextI >= 0 ? nextI : 0, false);
   }
-  el.addEventListener('keydown', e => {
-    const a = e.target.closest && e.target.closest('.dr-step a'); if (!a) return;
-    const list = steps(); const i = list.indexOf(a);
-    if (e.key === 'ArrowDown' || e.key === 'j') { e.preventDefault(); setFocus(i + 1, true); }
-    else if (e.key === 'ArrowUp' || e.key === 'k') { e.preventDefault(); setFocus(i - 1, true); }
-    else if (e.key === 'Home') { e.preventDefault(); setFocus(0, true); }
-    else if (e.key === 'End') { e.preventDefault(); setFocus(list.length - 1, true); }
-  });
+  // the header's promise holds from the first key: ↑ ↓ (or j k) move through the steps, Enter opens, without tabbing in first
+  let kbMoved = false;
+  const isTyping = t => !!t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
+  const onKey = e => {
+    if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || isTyping(e.target)) return;
+    const list = steps(); if (!list.length) return;
+    const inList = e.target.closest && e.target.closest('.dr-step a');
+    const i = inList ? list.indexOf(inList) : focusIdx;
+    const go = j => { e.preventDefault(); kbMoved = true; el.classList.add('kb-mode'); setFocus(j, true); };
+    if (e.key === 'ArrowDown' || e.key === 'j') go(inList || kbMoved ? i + 1 : i);
+    else if (e.key === 'ArrowUp' || e.key === 'k') go(inList || kbMoved ? i - 1 : i);
+    else if (e.key === 'Home' && inList) go(0);
+    else if (e.key === 'End' && inList) go(list.length - 1);
+    else if (e.key === 'Enter' && !inList && e.target === document.body && focusIdx >= 0) { e.preventDefault(); list[focusIdx].click(); }
+  };
+  document.addEventListener('keydown', onKey);
   el.addEventListener('focusin', e => { const a = e.target.closest && e.target.closest('.dr-step a'); if (a) { const i = steps().indexOf(a); if (i >= 0) setFocus(i, false); } });
+  // #/learn?ch=formatting opens that chapter's folder; #/learn?doc=<module> scrolls to its document (Home's rings link here)
+  const q = (ctx && ctx.query) || {};
+  if (q.ch && CHAPTER_PLAN.some(p => p.id === q.ch)) openChapter = q.ch;
   render();
   root.appendChild(el);
-  return { destroy() { el.remove(); } };
+  if (q.doc) { const d = el.querySelector(`.dr-doc[data-doc="${CSS && CSS.escape ? CSS.escape(q.doc) : q.doc}"]`); if (d) requestAnimationFrame(() => { d.scrollIntoView({ block: 'start' }); window.scrollBy(0, -12); d.classList.add('dr-flash'); }); }
+  // the next-up row pulses once when the learner comes back (SITE_SPEC §6a)
+  const nx = el.querySelector('.dr-step.next'); if (nx) nx.classList.add('pulse-once');
+  return { destroy() { document.removeEventListener('keydown', onKey); el.remove(); } };
 }

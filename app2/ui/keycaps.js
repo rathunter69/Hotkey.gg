@@ -13,9 +13,15 @@ export function mountKeycaps(session, opts = {}) {
   let timer = null, chips = [];
   const hold = opts.hold || 1400;
 
-  function flash(t) {
-    chips.push(String(t)); if (chips.length > 6) chips.shift();
-    el.innerHTML = chips.map((x, i) => `<span class="kchip${i === chips.length - 1 ? ' new' : ''}">${esc(x)}</span>`).join('');
+  function flash(t, ctx) {
+    const label = String(t);
+    // typing is text, not keys: consecutive printable characters gather into one quoted chip ("Inputs").
+    // The host says when the learner is typing (a cell entry or a dialog field) — a KeyTip letter is a key.
+    const typed = !!(ctx && ctx.typing) && isTyped(label);
+    const last = chips[chips.length - 1];
+    if (typed && last && last.typed && last.text.length < 24) last.text += label;
+    else { chips.push({ text: label, typed }); if (chips.length > 6) chips.shift(); }
+    el.innerHTML = chips.map((x, i) => `<span class="kchip${x.typed ? ' typed' : ''}${i === chips.length - 1 ? ' new' : ''}">${esc(x.typed ? '“' + x.text + '”' : x.text)}</span>`).join('');
     el.classList.add('show');
     clearTimeout(timer);
     timer = setTimeout(() => { el.classList.remove('show'); chips = []; }, hold);
@@ -31,3 +37,5 @@ export function mountKeycaps(session, opts = {}) {
 }
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+/** A label that is a typed character rather than a key: one printable character that is not an arrow or a keycap glyph. Pure. */
+export const isTyped = label => typeof label === 'string' && [...label].length === 1 && !/[↑↓←→↵⏎⇧⌘⌥⌃⎋⇥⌫]/.test(label) && label.trim() !== '';
