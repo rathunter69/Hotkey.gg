@@ -270,7 +270,11 @@ export const MICRO_IDS = Object.keys(MICRO);
 /** The rapid-fire deck's prompt ids mapped to the concept the queue scores them under. */
 export const RAPID_CONCEPT = {
   bold: 'bold-command', 'edge-down': 'ctrl-arrow', home: 'ctrl-home-end', region: 'ctrl-a', col: 'row-col-select', row: 'row-col-select',
+  'copy-paste': 'copy-cut-paste', 'cut-paste': 'copy-cut-paste', 'fill-down': 'fill-down-right', 'fill-right': 'fill-down-right',
+  percent: 'number-formats', currency: 'number-formats', 'undo-redo': 'undo-redo',
 };
+/** Rapid-fire prompts no Chapter 1 micro-drill covers: played, never scored into the queue. */
+export const RAPID_UNSCORED = ['italic', 'underline', 'strike'];
 
 /** A micro-drill as a lesson object the lesson workspace can mount (kind 'micro'). Null for an unknown id. */
 export function microLesson(id) {
@@ -290,13 +294,17 @@ export function microLesson(id) {
  * shortcut it taught is due). `ctx.modules` = [{ id, title, challengeId, challengeSecs, complete, teaches:[…] }].
  * Pure.
  */
+/** How many days past due every shortcut of a finished module must be before Keep sharp offers its challenge. */
+export const COLD_DAYS = 3;
+
 export function dueToday(state, ctx = {}, now = Date.now()) {
   const due = dueItems(state, now).filter(d => MICRO[d.id]);
-  const dueSet = new Set(due.map(d => d.id));
-  // a whole module gone cold: offer its challenge instead of three of its shortcuts
+  // a whole module gone cold: every shortcut it taught is due AND days overdue (the day after a module is
+  // finished everything is due at once; that is a first review, not a module gone quiet)
+  const coldSet = new Set(due.filter(d => d.overdueDays >= COLD_DAYS).map(d => d.id));
   for (const m of ctx.modules || []) {
     const ids = (m.teaches || []).filter(id => MICRO[id]);
-    if (m.complete && m.challengeId && ids.length >= 2 && ids.every(id => dueSet.has(id))) {
+    if (m.complete && m.challengeId && ids.length >= 2 && ids.every(id => coldSet.has(id))) {
       const secs = Number.isFinite(m.challengeSecs) && m.challengeSecs > 0 ? m.challengeSecs : 90;
       return { items: [{ kind: 'challenge', id: m.challengeId, title: 'Keep sharp: ' + m.title, task: 'The whole module has gone quiet. One pass of its challenge brings every move back.', secs, why: ids }], secs };
     }

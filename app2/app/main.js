@@ -192,14 +192,16 @@ function narrowCrumb(lesson, content) {
 
 function narrowNotice(root, lesson, content) {
   const el = document.createElement('div'); el.className = 'narrow-page';
-  const teach = lesson && (lesson.steps || []).find(s => s.mode === 'teach');
+  const teach = lesson && (lesson.steps || []).find(s => s.mode === 'teach');   // the old schema's teach step
   const crumb = lesson ? narrowCrumb(lesson, content || {}) : '';
+  const code = t => esc(t).replace(/`([^`]+)`/g, '<kbd>$1</kbd>');
   el.innerHTML = `<div class="narrow-msg" role="status"><div class="narrow-cap">hotkey.gg</div>
       <h1>hotkey.gg needs a keyboard and a wider screen.</h1>
       <p>Lessons and drills run on a real spreadsheet with the keyboard. Open this page on a laptop or desktop, at least 900px wide.</p>
       <div class="narrow-actions"><a class="btn btn-ghost" href="#/learn">Back to Learn</a></div></div>` +
     (lesson ? `<article class="narrow-lesson">${crumb ? `<div class="lesson-crumb">${esc(crumb)}</div>` : ''}<h2>${esc(lesson.title)}</h2>` +
-      (teach ? `<h3>${esc(teach.title)}</h3>` + teach.body.map(p => `<p>${esc(p).replace(/`([^`]+)`/g, '<kbd>$1</kbd>')}</p>`).join('') : '') +
+      (lesson.brief ? `<p class="narrow-brief">${code(lesson.brief)}</p>` : '') +
+      (teach ? `<h3>${esc(teach.title)}</h3>` + teach.body.map(p => `<p>${code(p)}</p>`).join('') : '') +
       `<p class="lesson-goalsintro">You will:</p><ol class="goals goals-preview">${(lesson.goals || []).map(g => `<li>${esc(g.text)}</li>`).join('')}</ol></article>` : '');
   root.appendChild(el);
   return { destroy() { el.remove(); } };
@@ -248,7 +250,19 @@ export function startApp({ navEl, rootEl, footEl }) {
   }
   installErrorLog();
   captureInstall();
-  auth.ready().then(() => { syncUser(); if (auth.state() === 'in') store.hydrate().then(syncUser); });
+  // signed in at boot: the page mounted from the device cache, so once the account's records arrive a
+  // dashboard page that would read differently is drawn again (never a workspace mid-run)
+  const snapshot = () => { try { return JSON.stringify(store.all()); } catch (e) { return ''; } };
+  auth.ready().then(() => {
+    syncUser();
+    if (auth.state() !== 'in') return;
+    const before = snapshot();
+    store.hydrate().then(() => {
+      syncUser();
+      const n = document.body.dataset.route;
+      if ((n === 'home' || n === 'learn' || n === 'practice') && snapshot() !== before) route();
+    });
+  });
   auth.onChange(() => {
     if (auth.state() === 'in') { syncUser(); store.hydrate().then(() => { syncUser(); route(); }); }
     else { store.reset(); syncUser(); route(); }

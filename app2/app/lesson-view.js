@@ -34,6 +34,8 @@ import { WORKBOOKS } from '../content/workbooks/index.js';
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 /** A keycap: the chord as the learner's platform shows it (Ctrl → ⌘, Alt → ⌥ on a Mac). */
 const kbd = k => `<kbd>${esc(keyLabel(k))}</kbd>`;
+/** Module 1.8's items are named for what they are, not counted as lessons. */
+const FINAL_LABEL = { project: 'Project', assessment: 'Assessment', testout: 'Test out' };
 /** `Ctrl+1` → <kbd>Ctrl+1</kbd>; everything else escaped. */
 const rich = s => esc(s).replace(/`([^`]+)`/g, (m, k) => kbd(k));
 /**
@@ -85,7 +87,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
   if (next) {
     const ctx0 = gameCtx();
     const crumb = at
-      ? `<a href="#/learn">Learn</a> › <span>${esc(chapter ? chapter.title : '')}</span> › <span>${esc(moduleNumber(at.module.id, at.k))} ${esc(at.module.title)}</span> › <b>${isChallenge ? 'Challenge' : `Lesson ${at.n} of ${at.of}`}</b>`
+      ? `<a href="#/learn">Learn</a> › <span>${esc(chapter ? chapter.title : '')}</span> › <span>${esc(moduleNumber(at.module.id, at.k))} ${esc(at.module.title)}</span> › <b>${isChallenge ? 'Challenge' : FINAL_LABEL[lesson.kind] || `Lesson ${at.n} of ${at.of}`}</b>`
       : isMicro ? `<a href="#/">Home</a> › <span>Practice · due today</span> › <b>${esc(lesson.title)}</b>`
       : isFinalItem(lesson) ? `<a href="#/learn">Learn</a> › <span>${esc(chapter ? chapter.title : '')}</span> › <span>${FINAL_MODULE.n} ${esc(FINAL_MODULE.title)}</span> › <b>${esc(lesson.title)}</b>`
       : `<a href="#/learn">Learn</a> › <span>${esc(chapter ? chapter.title : '')}</span> › <b>${esc(lesson.title)}</b>`;
@@ -337,7 +339,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     slot.hidden = false;
     slot.innerHTML = `${ring(doneInModule, at.module.lessons.length, { size: 20 })} ${lesson.kind === 'challenge'
       ? `<span>Challenge · Module ${esc(moduleNumber(at.module.id, at.k))}</span>`
-      : `<span>Lesson ${at.n} of ${at.of} · Module ${esc(moduleNumber(at.module.id, at.k))}</span>`}`;
+      : `<span>${FINAL_LABEL[lesson.kind] ? FINAL_LABEL[lesson.kind] : `Lesson ${at.n} of ${at.of}`} · Module ${esc(moduleNumber(at.module.id, at.k))}</span>`}`;
   }
 
   /** The one thing to do now, pinned above the scrolling body: goal + teach + keys + convention. */
@@ -501,7 +503,8 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     // An assessment, test-out or challenge counts down from its time limit; the clock starts on the first action.
     if (lesson.timeLimit) {
       // reading is free: until the first key the clock says when it starts (SITE_SPEC §5, §6a pre-run)
-      if (run.startedAt == null && phase === 'play') { t.textContent = `clock starts on your first key · ${lesson.timeLimit} s`; t.classList.add('pre'); return; }
+      // the pass par is the number Home and Learn show; the limit is named as one
+      if (run.startedAt == null && phase === 'play') { t.textContent = `clock starts on your first key · ` + (lesson.pars && lesson.pars.pass ? `pass ${lesson.pars.pass} s · limit ${lesson.timeLimit} s` : `${lesson.timeLimit} s`); t.classList.add('pre'); return; }
       t.classList.remove('pre');
       const left = Math.max(0, lesson.timeLimit - (run.startedAt == null ? 0 : run.elapsed));
       if (run.opts.soft && left <= 0 && run.startedAt != null) { t.textContent = 'over the limit'; return; }   // a first attempt runs on; the tier is gone, the module is not
@@ -560,9 +563,11 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
       const fresh = `<button class="btn" data-act="retry-new" type="button">New sheet <kbd>N</kbd></button>`;
       return challengeLead() === 'continue' ? cont + same + fresh : same + fresh + cont;
     }
-    const alt = run.mode === 'guided' ? 'Try solo' : run.mode === 'solo' ? 'Try timed' : 'Try again';
+    // the module challenge replaces the old solo and timed rungs (SITE_SPEC §4): the module's last lesson names it
+    if (nxt && nxt.kind === 'challenge') return `<button class="btn btn-primary" data-act="continue" type="button">Start the challenge <kbd>Enter</kbd></button>
+      <a class="btn" href="#/learn">Back to Learn</a>`;
     return `<button class="btn btn-primary" data-act="continue" type="button">${nxt ? 'Continue' : 'Back to Learn'} <kbd>Enter</kbd></button>
-      <button class="btn" data-act="alt" type="button">${alt}</button>`;
+      <button class="btn" data-act="alt" type="button">Again</button>`;
   }
   /** What Enter does on a finished challenge: continue after the first pass, retry on a replay. */
   let firstPassNow = false;
@@ -576,7 +581,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     const nxt = nextLesson(lesson.id);
     const on = (act, fn) => { const b = scope.querySelector(`[data-act="${act}"]`); if (b) b.onclick = fn; };
     on('continue', () => { location.hash = nxt ? '#/lesson/' + nxt.id : '#/learn'; });
-    on('alt', () => restart(isMicro ? 'guided' : run.mode === 'guided' ? 'solo' : run.mode === 'solo' ? 'timed' : 'timed'));
+    on('alt', () => restart(isMicro ? 'guided' : run.mode));
     on('retry-same', () => restartChallenge(false));
     on('retry-new', () => restartChallenge(true));
     on('look', closeOverlay);

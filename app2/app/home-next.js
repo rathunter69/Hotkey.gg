@@ -47,7 +47,7 @@ export function demoCtx(now = Date.now()) {
   for (const id of done) all[id] = { completed: true, started: true, at: now - 2 * 86400000, best: 140 };
   all['colour-label-hardcode'] = { started: true, at: now - 3600000 };
   const xp = 3 * 50 + 30;
-  return { all, queue: demoState(now), daily: { played: true, tier: 'pro', secs: 61.4, pos: 12, of: 38 }, xp, level: levelOf(xp), demo: true };
+  return { all, queue: demoState(now), daily: { played: true, tier: 'pro', secs: 61.4, pos: 12, of: 38 }, xp, level: levelOf(xp), streak: 4, demo: true };
 }
 
 function realCtx() {
@@ -59,7 +59,7 @@ function realCtx() {
   const clean = played.filter(a => a.clean).sort((a, b) => a.secs - b.secs);
   const best = clean[0] || null;
   const daily = best ? { played: true, clean: true, tier: best.tier, secs: best.secs, pos: null, of: null } : played.length ? { played: true, clean: false } : { played: false };
-  return { all, queue: schedule.stateOrBackfill(all, liveLessons()), daily, xp: ctx.xp, level: ctx.levelInfo, demo: false };
+  return { all, queue: schedule.stateOrBackfill(all, liveLessons()), daily, xp: ctx.xp, level: ctx.levelInfo, streak: ctx.streakDays || 0, demo: false };
 }
 
 /** The day, as the learner reads it: 'Thu 25 Sep'. */
@@ -119,7 +119,7 @@ export function mountHomePage(root, pageCtx = {}) {
     : d.played ? `<p class="hm-daily-line">Played today, with help or the mouse: no time posted. A clean run posts one.</p>`
     : `<p class="hm-daily-line">${esc(siteCopy('mode_daily', 'Ninety seconds, the same sheet for everyone, once a day.'))}</p>`;
   const dailyCard = `<section class="hm-card hm-daily" aria-label="The Daily">
-      <div class="hm-cap">the daily <span>${esc(prettyDay(day))}</span></div>
+      <div class="hm-cap">the daily <span>${esc(prettyDay(day))}${c.streak > 1 ? ` · <b class="hm-streak">${c.streak}-day streak</b>` : ''}</span></div>
       <div class="hm-daily-body">
         <div class="hm-daily-title">${esc(dailyDrill ? dailyDrill.title : '—')}</div>
         ${dailyStats}

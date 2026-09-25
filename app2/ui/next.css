@@ -255,6 +255,10 @@ html[data-dark="1"] .dr-thumb{background:#f7f6f1}
 .dr-thumb td.num{text-align:right}
 .dr-thumb td.b{font-weight:700}
 .dr-thumb td.blue{color:#1c62d6}
+/* the page is paper in every theme: its cells keep paper ink (the global td colour would follow a dark theme's text) */
+.dr-thumb td{color:#222}
+.dr-thumb td.blue{color:#1c62d6}
+.dr-thumb .dr-thumb-tab{color:#555}
 .dr-page-cap{font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.5}
 .dr-page-cap b{color:var(--text)}
 .dr-doc-page.filled .dr-page-cap b{color:var(--accent)}
@@ -338,7 +342,7 @@ html[data-panel="left"] .ws-next .lesson{flex-direction:row-reverse}
 .rm-page-slot .dr-thumb{animation:rmSlot .5s cubic-bezier(.2,.8,.25,1) .35s both}
 .rm-page-slot .dr-thumb table{font-size:5.5px}
 .rm-page-slot .dr-thumb td{height:8px; padding:0 2px}
-.rm-page-slot .dr-stamp{font-size:7px; padding:0 3px; right:3px; bottom:3px}
+.rm-page-slot .dr-stamp{font-size:7px; padding:0 3px; right:3px; top:1px; bottom:auto}
 @keyframes rmSlot{0%{opacity:0; transform:translateY(-14px) scale(.92)} 100%{opacity:1; transform:none}}
 @media (prefers-reduced-motion: reduce){ .rm-page-slot .dr-thumb{animation:none} }
 .rm-install-acts{display:flex; gap:8px; margin-top:10px}
@@ -457,7 +461,7 @@ html[data-density="comfortable"] .lesson.panel-overlay .task-card{padding:11px 1
 .dr-pars{display:block; font-family:var(--mono); font-size:10.5px; color:var(--faint); font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .dr-thumb{position:relative; border-style:dashed; filter:grayscale(1) opacity(.42)}
 .dr-thumb.delivered{border-style:solid; border-color:var(--accent-dim); filter:none; box-shadow:0 8px 20px -10px rgba(0,0,0,.35)}
-.dr-stamp{position:absolute; right:6px; bottom:6px; font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); background:color-mix(in srgb, var(--surface) 88%, transparent); border:1.5px solid var(--accent); border-radius:4px; padding:1px 5px; transform:rotate(-4deg)}
+.dr-stamp{position:absolute; right:6px; top:1px; bottom:auto; font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); background:color-mix(in srgb, var(--surface) 88%, transparent); border:1.5px solid var(--accent); border-radius:4px; padding:1px 5px; transform:rotate(-4deg)}   /* on the tab row, never on the page's figures */
 .dr-thumb-slot{height:118px; border:1px dashed var(--line); border-radius:6px; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:11px; color:var(--faint); background:repeating-linear-gradient(0deg, transparent 0 10px, color-mix(in srgb, var(--line) 45%, transparent) 10px 11px)}
 .dr-thumb-slot.delivered{border-style:solid; border-color:var(--accent-dim); color:var(--accent)}
 .dr-replay{display:inline-block; margin-top:2px}
@@ -477,6 +481,10 @@ html[data-density="comfortable"] .lesson.panel-overlay .task-card{padding:11px 1
 .hm-half-head{display:block; padding:2px 0 0}
 .hm-half-head p{margin-top:4px; text-wrap:pretty}
 .hm-ring-t{text-wrap:balance}
+.hm-cap .hm-streak{color:var(--accent); font-weight:700}
+/* the narrow-screen notice: a gap under its cap, and the lesson's brief readable */
+.narrow-msg h1{margin-top:16px}
+.narrow-lesson .narrow-brief{font-size:15px; line-height:1.55; color:var(--text)}
 
 /* ---------- the floating card, third pass (C2): a flexible body, one progress count, the tick on the card ---------- */
 .lesson.panel-overlay .lesson-panel{display:flex; flex-direction:column}

@@ -3,7 +3,7 @@
 // reference solution replayed through the lesson runner.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { grade, review, freshItem, strength, applyEvent, dueItems, dueToday, rapidOrder, normaliseState, demoState, MICRO, MICRO_IDS, microLesson, DAY, RAPID_CONCEPT } from '../app/schedule.js';
+import { grade, review, freshItem, strength, applyEvent, dueItems, dueToday, rapidOrder, normaliseState, demoState, MICRO, MICRO_IDS, microLesson, DAY, RAPID_CONCEPT, RAPID_UNSCORED, COLD_DAYS } from '../app/schedule.js';
 import { LessonRun } from '../app/runner.js';
 import { parseKeyScript } from '../engine/keyboard.js';
 import { RAPID_DECK } from '../app/rapid-fire.js';
@@ -88,18 +88,30 @@ test('dueToday: up to three micro-drills, ninety-odd seconds, weakest first; emp
 test('dueToday: a whole cold module becomes one Keep-sharp challenge', () => {
   let s = applyEvent({}, { ids: ['sheet-tabs', 'rename-sheet', 'keytips', 'gridlines'], q: 4 }, T0);
   const ctx = { modules: [{ id: 'open-and-set-up', title: 'Open and set up', challengeId: 'challenge-inherited-file', complete: true, teaches: ['sheet-tabs', 'rename-sheet', 'keytips', 'gridlines', 'workbook'] }] };
-  const q = dueToday(s, ctx, T0 + 3 * DAY);
+  // the day after the module was finished everything is due at once: that is a first review (micro-drills), not a module gone quiet
+  const early = dueToday(s, ctx, T0 + 1.2 * DAY);
+  assert.ok(early.items.length > 0 && early.items.every(i => i.kind === 'micro'), 'a module finished yesterday gets micro items, not Keep sharp');
+  assert.ok(dueToday(s, ctx, T0 + (1 + COLD_DAYS - 0.5) * DAY).items.every(i => i.kind === 'micro'));
+  const q = dueToday(s, ctx, T0 + (1 + COLD_DAYS + 1) * DAY);
   assert.equal(q.items.length, 1);
   assert.equal(q.items[0].kind, 'challenge');
   assert.equal(q.items[0].id, 'challenge-inherited-file');
   assert.equal(q.secs, 90);
   // one of them refreshed yesterday: no longer a whole module, so micro-drills again
-  s = applyEvent(s, { ids: ['keytips'], q: 5 }, T0 + 2.5 * DAY);
-  const q2 = dueToday(s, ctx, T0 + 3 * DAY);
+  s = applyEvent(s, { ids: ['keytips'], q: 5 }, T0 + (COLD_DAYS + 1) * DAY);
+  const q2 = dueToday(s, ctx, T0 + (1 + COLD_DAYS + 1) * DAY);
   assert.ok(q2.items.every(i => i.kind === 'micro'));
   // an incomplete module never swaps in its challenge
-  const q3 = dueToday(applyEvent({}, { ids: ['sheet-tabs', 'rename-sheet', 'keytips', 'gridlines'], q: 4 }, T0), { modules: [{ ...ctx.modules[0], complete: false }] }, T0 + 3 * DAY);
+  const q3 = dueToday(applyEvent({}, { ids: ['sheet-tabs', 'rename-sheet', 'keytips', 'gridlines'], q: 4 }, T0), { modules: [{ ...ctx.modules[0], complete: false }] }, T0 + (1 + COLD_DAYS + 1) * DAY);
   assert.ok(q3.items.every(i => i.kind === 'micro'));
+});
+
+test('rapid-fire: every prompt scores into a micro-drill the queue knows, or is named as unscored', () => {
+  for (const p of RAPID_DECK) {
+    if (RAPID_UNSCORED.includes(p.id)) continue;
+    assert.ok(RAPID_CONCEPT[p.id], 'rapid prompt ' + p.id + ' maps to no concept');
+    assert.ok(MICRO[RAPID_CONCEPT[p.id]], 'rapid prompt ' + p.id + ' maps to ' + RAPID_CONCEPT[p.id] + ', which has no micro-drill');
+  }
 });
 
 test('rapidOrder: weakest first, unseen in the middle, strong last; seeded ties; a permutation', () => {

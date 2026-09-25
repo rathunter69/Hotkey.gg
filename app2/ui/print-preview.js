@@ -85,7 +85,7 @@ export function associateLine(diffs, sheetName = 'Report') {
     else if (d.a && !d.b) what = `${d.key} holds something the page does not need`;
     else if (String(a.formula || '') !== String(b.formula || '')) what = `${d.key} ${b.formula ? 'does not hold the formula the page needs' : 'holds a formula where a value belongs'}`;
     else if (a.value !== b.value) what = `${d.key} reads differently from the feed`;
-    else if (a.fontColor !== b.fontColor) what = `${d.key} is the wrong colour for what it holds`;
+    else if (a.fontColor !== b.fontColor) what = `${d.key} is the wrong color for what it holds`;
     else if (a.fmtStyle !== b.fmtStyle || a.decimals !== b.decimals) what = `${d.key}'s number format is off the house style`;
     else what = `${d.key}'s formatting is off the house style`;
     return `The associate would have flagged ${what}${where}.`;
