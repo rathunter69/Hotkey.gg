@@ -11,7 +11,7 @@
 
 /* ---------- 1. the page uses its width: 1180 → 1340, centered — the comfy middle, never edge-to-edge ---------- */
 .app, .topnav-in, .wrap, .sf-in,
-.plist, .page, .home, .drill-page{max-width:1340px}
+.plist, .page, .home, .drill-page, .ref{max-width:1340px}
 .app{padding:0 32px}
 .topnav-in, .sf-in{padding:0 32px}
 @media (max-width:1100px){ .app, .topnav-in, .sf-in{padding:0 24px} }
