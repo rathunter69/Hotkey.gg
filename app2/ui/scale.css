@@ -28,9 +28,12 @@ html[data-density="comfortable"] .nav-level{font-size:13px; padding:4px 9px}
 /* shared type */
 html[data-density="comfortable"] .btn{font-size:14px; padding:9px 16px; border-radius:9px}
 html[data-density="comfortable"] kbd{font-size:12.5px}
-html[data-density="comfortable"] .page p, html[data-density="comfortable"] .home p{font-size:15px}
-html[data-density="comfortable"] .page-sub, html[data-density="comfortable"] .plist-sub{font-size:15.5px}
-html[data-density="comfortable"] .page-head h1, html[data-density="comfortable"] .plist-head h1, html[data-density="comfortable"] .home h1{font-size:24px}
+/* bare paragraphs only, at the lowest specificity: a paragraph with a class (.page-fine, .lb-sub …) keeps its own size */
+:where(html[data-density="comfortable"] .page, html[data-density="comfortable"] .home) p{font-size:15px}
+html[data-density="comfortable"] .page-sub, html[data-density="comfortable"] .plist-sub, html[data-density="comfortable"] .ref-sub{font-size:15.5px}
+/* one page title size on every page: Practice, Leaderboard, Pricing, Account, Learn, Reference */
+html[data-density="comfortable"] .page-head h1, html[data-density="comfortable"] .plist-head h1, html[data-density="comfortable"] .home h1,
+html[data-density="comfortable"] .dr-head h1, html[data-density="comfortable"] .ref-head h1{font-size:24px}
 html[data-density="comfortable"] #hkToast{font-size:13.5px; padding:10px 20px}
 html[data-density="comfortable"] .mb-tool{font-size:12px; padding:7px 12px}
 /* the key-flash HUD */
