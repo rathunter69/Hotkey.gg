@@ -42,14 +42,23 @@ page.on('console', m => { if (m.type() === 'error' && !/blockedbyclient|net::ERR
 const base = `http://127.0.0.1:${PORT}/app2/index.html`;
 let failures = 0;
 const fail = msg => { failures++; console.log('FAIL', msg); };
-/** Press a key script on the page; a goal the platform demonstrates plays itself first, keys wait. */
+/** A goal the platform demonstrates ("does it tie?") shows "watching · Esc skips": the smoke skips it, as a learner may. */
+async function skipDemos() {
+  for (let i = 0; i < 30; i++) {
+    const watching = await page.$('.goal-demo');
+    if (!watching) return;
+    await page.keyboard.press('Escape'); await page.waitForTimeout(40);
+  }
+}
+/** Press a key script on the page; a demonstrated goal is skipped with Esc before the keys go on. */
 async function play(script) {
   for (const step of parseKeyScript(script)) {
-    await page.waitForFunction(() => !document.querySelector('.goal-demo'), null, { timeout: 30000 }).catch(() => {});
+    await skipDemos();
     if (step.type === 'text') await page.keyboard.type(step.text);
     else await page.keyboard.press(pwKey(step.spec));
   }
-  await page.waitForFunction(() => !document.querySelector('.goal-demo'), null, { timeout: 30000 }).catch(() => {});
+  // a closer demo starts a beat after the last goal lands
+  await page.waitForTimeout(150); await skipDemos();
 }
 const t = label => console.log(`  ${label} at ${((Date.now() - T0) / 1000).toFixed(1)}s`);
 
@@ -158,15 +167,11 @@ try {
     if (await page.$('#startBtn')) await page.keyboard.press('Enter');
     if (await page.$('.ws-beat')) await page.keyboard.press('Enter');   // a module's story beat, once
     await page.waitForSelector('.goal.current', { state: 'attached' });
-    await page.waitForFunction(() => !document.querySelector('.goal.current .goal-demo'), null, { timeout: 30000 }).catch(() => {});   // a demo goal plays itself first
-    for (const step of parseKeyScript(lesson.solution)) {
-      await page.waitForFunction(() => !document.querySelector('.goal-demo'), null, { timeout: 30000 }).catch(() => {});   // a demo goal plays itself; keys wait
-      if (step.type === 'text') await page.keyboard.type(step.text);
-      else await page.keyboard.press(pwKey(step.spec));
-    }
-    await page.waitForFunction(() => !document.querySelector('.goal-demo'), null, { timeout: 30000 }).catch(() => {});
-    const done = await page.waitForSelector('.lesson-done:not([hidden]) [data-act="continue"]', { timeout: 4000 }).catch(() => null);
+    const t0 = Date.now();
+    await play(lesson.solution);
+    const done = await page.waitForSelector('.lesson-done:not([hidden]) [data-act="continue"], .lesson-done:not([hidden]) [data-act="retry-same"]', { timeout: 4000 }).catch(() => null);
     if (!done) fail(`${lesson.id}: did not complete`);
+    t(`${lesson.id} (${((Date.now() - t0) / 1000).toFixed(1)}s)`);
   }
 
   // the experience pass: the seeded dashboard, the data room, a due-today micro-drill, a story beat,
