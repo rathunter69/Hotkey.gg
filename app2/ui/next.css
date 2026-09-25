@@ -273,11 +273,14 @@ html[data-dark="1"] .dr-thumb{background:#f7f6f1}
 .ws-crumb b{color:var(--text); font-weight:700}
 .ws-ring{display:inline-flex; margin-left:6px; color:var(--accent)}
 .ws-tools{display:flex; gap:6px; align-items:center; flex:none}
+/* every control in the strip is one height and one type size, the level chip included */
+.ws-tools .ws-level, .ws-tools .mb-tool, .ws-tools .fx-mute{height:30px; box-sizing:border-box; display:inline-flex; align-items:center; font-size:12px; line-height:1; padding-top:0; padding-bottom:0}
+html[data-density="compact"] .ws-tools .ws-level, html[data-density="compact"] .ws-tools .mb-tool, html[data-density="compact"] .ws-tools .fx-mute{height:26px; font-size:11.5px}
+#wsMute{display:inline-flex}
+.ws-tools .fx-mute{gap:5px}
 .ws-level{font-weight:700; color:var(--accent); border:1px solid var(--accent-dim); border-radius:7px; padding:3px 9px; white-space:nowrap}
 .ws-level i{font-style:normal; color:var(--muted); font-weight:500; margin-left:5px}
-.ws-next .lesson{height:calc(100vh - 152px); margin:8px 0 16px; width:100%; align-self:stretch}
-html[data-density="comfortable"] .ws-next .lesson{height:calc(100vh - 160px)}
-html.hk-fs .ws-next .lesson{height:calc(100vh - 72px)}
+.ws-next .lesson{width:100%; align-self:stretch}
 html.hk-fs .app{max-width:none}
 .ws-next .panel-head .lesson-crumb, .ws-next .module-line{display:none}
 .ws-next .panel-head{padding-top:12px}
@@ -387,10 +390,10 @@ html[data-panel="left"] .ws-next .lesson{flex-direction:row-reverse}
 /* ---------- experience pass C: the strip's More menu, the key echo in the tab bar ---------- */
 .ws-more-wrap{position:relative}
 .ws-more span{font-size:9px; margin-left:4px; color:var(--muted)}
-.ws-menu{position:absolute; right:0; top:calc(100% + 6px); z-index:80; min-width:250px; padding:6px; background:var(--surface); border:1px solid var(--line); border-radius:10px; box-shadow:0 18px 40px -18px color-mix(in srgb, var(--ink, #000) 45%, transparent); font-family:var(--mono); font-size:12px}
+.ws-menu{position:absolute; right:0; top:calc(100% + 6px); z-index:80; min-width:300px; padding:6px; background:var(--surface); border:1px solid var(--line); border-radius:10px; box-shadow:0 18px 40px -18px color-mix(in srgb, var(--ink, #000) 45%, transparent); font-family:var(--mono); font-size:12px}
 .ws-menu[hidden]{display:none}
 .ws-menu-cap{font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); padding:6px 8px 4px}
-.ws-menu-item{display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; padding:7px 8px; background:none; border:0; border-radius:6px; color:var(--text); font:inherit; text-align:left; cursor:pointer}
+.ws-menu-item{display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; white-space:nowrap; padding:7px 8px; background:none; border:0; border-radius:6px; color:var(--text); font:inherit; text-align:left; cursor:pointer}
 .ws-menu-item:hover, .ws-menu-item:focus-visible{background:var(--surface2); outline:none}
 .ws-menu-item.on{color:var(--accent)}
 .ws-menu-item i{font-style:normal; color:var(--accent)}
@@ -438,7 +441,13 @@ html[data-density="comfortable"] .lesson.panel-overlay .task-card{padding:11px 1
 .sk-bar.sk-fbar{height:30px; animation:none; background:var(--surface); border-bottom:1px solid var(--line)}
 .sk-frame .sk-grid{flex:1 1 auto; border-radius:0; background:repeating-linear-gradient(0deg, transparent 0 19px, var(--line) 19px 20px), repeating-linear-gradient(90deg, transparent 0 63px, var(--line) 63px 64px); opacity:.5}
 .sk-float{position:absolute; right:24px; top:150px; width:360px}
-.sk-dr{display:grid; grid-template-columns:230px 1fr; gap:16px}
+.sk-dr{display:grid; grid-template-columns:280px 1fr; gap:18px}
+.sk-hero{display:grid; grid-template-columns:minmax(0, .92fr) minmax(0, 1.08fr); gap:52px; align-items:center; padding:44px 0 56px}
+.sk-bar.sk-h1{height:40px; width:88%; border-radius:10px}
+.sk-bar.sk-h1.sk-short{width:60%}
+.sk-bar.sk-cta{height:44px; width:200px; border-radius:11px; margin-top:14px}
+.sk-card.sk-demo{height:clamp(320px, 42vh, 460px)}
+.sk-card.sk-fr{width:min(1180px, 100%); height:clamp(560px, calc(100vh - 150px), 760px); align-self:center}
 .sk-tree{display:flex; flex-direction:column; gap:10px}
 .sk-tree .sk-bar{height:44px; border-radius:10px}
 @media (prefers-reduced-motion: reduce){ .sk-bar, .sk-card, .sk-grid{animation:none} }
@@ -464,6 +473,10 @@ html[data-density="comfortable"] .lesson.panel-overlay .task-card{padding:11px 1
 .hm-ring-t{font-size:11px}
 @media (max-width:1180px){ .hm-rings{grid-template-columns:repeat(4, minmax(0, 1fr))} }
 .hm-half-head p{line-height:1.45; min-height:calc(2 * 1.45em)}
+/* both column heads are one shape (label above, hint below, two lines reserved) so the first cards line up; flush with the card edges */
+.hm-half-head{display:block; padding:2px 0 0}
+.hm-half-head p{margin-top:4px; text-wrap:pretty}
+.hm-ring-t{text-wrap:balance}
 
 /* ---------- the floating card, third pass (C2): a flexible body, one progress count, the tick on the card ---------- */
 .lesson.panel-overlay .lesson-panel{display:flex; flex-direction:column}
@@ -504,14 +517,26 @@ html[data-density="comfortable"] .lesson.panel-overlay .task-card{padding:11px 1
 .ws-tools .mb-tool.on{color:var(--accent); border-color:var(--accent-dim); background:var(--surface2)}
 body[data-route="lesson"] #navLevel, body[data-route="due"] #navLevel{display:none}
 .keyflash .kchip.typed{font-style:normal; color:var(--muted)}
-/* the workspace fills the window and the page does not scroll under it (SITE_SPEC §4: the sheet never scrolls off screen) */
-body[data-route="lesson"] .site-footer, body[data-route="due"] .site-footer{display:none}
-body[data-route="lesson"] .ws-next .lesson, body[data-route="due"] .ws-next .lesson{margin-bottom:0}
-body[data-route="lesson"] .app, body[data-route="due"] .app{padding-bottom:0}
-body[data-route="lesson"] #app, body[data-route="due"] #app{padding-bottom:0; margin-bottom:0}
-body[data-route="lesson"] .ws-next .lesson, body[data-route="due"] .ws-next .lesson{height:calc(100vh - 164px)}
-html[data-density="comfortable"] body[data-route="lesson"] .ws-next .lesson, html[data-density="comfortable"] body[data-route="due"] .ws-next .lesson{height:calc(100vh - 172px)}
-html.hk-fs body[data-route="lesson"] .ws-next .lesson, html.hk-fs body[data-route="due"] .ws-next .lesson{height:calc(100vh - 84px)}
+/* the workspace fills the window and the page does not scroll under it (SITE_SPEC §4: the sheet never scrolls off screen).
+   One flex column from <body> down to the frame: whatever the nav, the strip and the density take, the frame gets the rest,
+   with no hand-tuned heights. The nav stays where it is on every page (no jump entering a lesson); only the gap under it
+   tightens, and the strip sits closer (experience pass C, item 5). */
+body[data-route="lesson"], body[data-route="due"]{height:100vh; min-height:0; padding-bottom:0; display:flex; flex-direction:column; overflow:hidden}
+body[data-route="lesson"] > *, body[data-route="due"] > *{flex:none}
+body[data-route="lesson"] #navMount .topnav, body[data-route="due"] #navMount .topnav{margin-bottom:4px}
+body[data-route="lesson"] .site-footer, body[data-route="due"] .site-footer, body[data-route="lesson"] #footMount, body[data-route="due"] #footMount{display:none}
+body[data-route="lesson"] > .app, body[data-route="due"] > .app{flex:1 1 auto; min-height:0; display:flex; flex-direction:column; padding-bottom:10px}
+body[data-route="lesson"] #root, body[data-route="due"] #root{flex:1 1 auto; min-height:0; display:flex; flex-direction:column}
+body[data-route="lesson"] #root > .ws-next, body[data-route="due"] #root > .ws-next{flex:1 1 auto; min-height:0}
+body[data-route="lesson"] .ws-next .ws-strip, body[data-route="due"] .ws-next .ws-strip{margin-top:0}
+body[data-route="lesson"] .ws-next .lesson, body[data-route="due"] .ws-next .lesson{height:auto; flex:1 1 auto; min-height:420px; margin:8px 0 0}
+html.hk-fs body[data-route="lesson"] > .app, html.hk-fs body[data-route="due"] > .app{padding-top:8px}
+/* a status toast on a workspace floats just above the sheet-tab bar, never on it */
+body[data-route="lesson"] #hkToast, body[data-route="due"] #hkToast, body[data-route="drill"] #hkToast{bottom:62px}
+html.hk-fs body[data-route="lesson"] #hkToast, html.hk-fs body[data-route="due"] #hkToast{bottom:56px}
+/* Compact means more sheet: a shorter nav on every page (so it never jumps between pages) and a slimmer strip */
+html[data-density="compact"] .topnav-in{height:52px}
+html[data-density="compact"] .ws-strip{min-height:32px; padding-top:2px; padding-bottom:2px}
 
 /* ---------- the data room and Home, third pass (C2, the dashboard review) ---------- */
 @media (min-width:1260px){ .dr-grid{grid-template-columns:300px 1fr} }

@@ -101,8 +101,9 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
             <div class="ws-menu-cap">Lesson panel</div>
             ${['overlay', 'right', 'left'].map(m => `<button type="button" role="menuitemradio" aria-checked="${m === panelMode}" class="ws-menu-item${m === panelMode ? ' on' : ''}" data-side="${m}"><span>${sideName[m]}</span>${m === panelMode ? '<i>✓</i>' : ''}</button>`).join('')}
             ${panelMode === 'overlay' ? `<div class="ws-menu-sep"></div>
-            <button type="button" role="menuitem" class="ws-menu-item" data-act="move"><span>Move the card</span>${kbd('Ctrl+Shift+J')}</button>
-            <button type="button" role="menuitem" class="ws-menu-item" data-act="hide"><span>Hide or show the card</span>${kbd('Ctrl+Shift+K')}</button>` : ''}
+            <!-- literal Ctrl on a Mac too: the handler reads ctrlKey, and ⌘⇧J/K belong to the browser -->
+            <button type="button" role="menuitem" class="ws-menu-item" data-act="move"><span>Move the card</span><kbd>Ctrl+Shift+J</kbd></button>
+            <button type="button" role="menuitem" class="ws-menu-item" data-act="hide"><span>Hide or show the card</span><kbd>Ctrl+Shift+K</kbd></button>` : ''}
           </div></div>
       </div></div>`;
   }
