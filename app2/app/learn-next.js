@@ -155,7 +155,7 @@ export function mountLearnPage(root, ctx = {}) {
           <p class="dr-lock">${pl.n === 2 ? (ch1Cleared ? 'Unlocked — Chapter 1 is behind you. Its lessons arrive with the paid tier.' : 'Opens when Chapter 1 is complete or tested out, with the paid tier.') : 'Arrives with the paid tier, in order.'} <a href="#/pricing">See pricing →</a></p></div></div>`;
     }
 
-    el.innerHTML = `<div class="dr-head"><div><h1>Project Volt · data room</h1><p class="dr-sub">One deal, six chapters. Each chapter is a stage of the sale and produces one page of the pack. Your progress is ${store.saveState() === 'device' ? 'saved on this device' : 'saved to your account'}.</p></div>
+    el.innerHTML = `<div class="dr-head"><div><h1>Project Volt · data room</h1><p class="dr-sub">One deal, six chapters. Each chapter is a stage of the sale and produces one page of the pack. Your progress is ${esc(store.saveLine())}.</p></div>
         <span class="cat-keys"><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>Enter</kbd> open</span></div>
       ${dealStripHtml(all)}
       <div class="dr-grid"><nav class="dr-tree" aria-label="Chapters">${tree}</nav><section class="dr-main">${docs}</section></div>`;

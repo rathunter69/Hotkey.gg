@@ -57,7 +57,7 @@ export function landingHtml() {
             <a class="start-btn" id="startLearning" href="#/start">Start learning <kbd class="kbd-cta">↵</kbd></a>
             <a class="l-quiet" href="#/learn">Browse the catalog</a>
           </div>
-          <div class="micro">No account to start · nothing to install · your progress is ${store.saveState() === 'device' ? 'saved on this device' : 'saved to your account'}</div>
+          <div class="micro">No account to start · nothing to install · your progress is ${esc(store.saveLine())}</div>
         </div>
         ${previewCard()}
       </div>

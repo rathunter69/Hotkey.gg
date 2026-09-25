@@ -487,7 +487,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
       ${firstEver && store.saveState() === 'device' ? `<div class="rm-save"><b>Your first lesson is done.</b> Progress is saved on this device. <a href="#/account">Create a free account</a> to keep it across devices — everything you have done carries over.</div>` : ''}
       ${installOffer ? `<div class="rm-save rm-install">${leadBold(siteCopy('install_prompt', INSTALL_PROMPT))} <span class="rm-install-acts"><button class="btn btn-primary" data-act="install" type="button">Install</button><button class="btn btn-ghost" data-act="install-no" type="button">Not now</button></span></div>` : ''}
       <div class="rm-opts">${doneButtonsHtml()}<button class="btn btn-ghost" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button>${(run.mode === 'timed' || isChallenge) && lesson.solution ? '<button class="btn btn-ghost" data-act="route" type="button">Watch the reference route</button>' : ''}</div>
-      <div class="rm-more">${esc(saveState)}</div>
+      <div class="rm-more"${saveState === null ? ' data-save-text' : ''}>${esc(saveState === null ? store.saveText() : saveState)}</div>
     </div>`;
     wireDoneButtons(overlay);
     countUpXp(overlay);
@@ -582,7 +582,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
         if (ids.length) store.skip(ids);
       }
     }
-    saveState = saved ? store.saveText() : 'Couldn’t save on this device (storage blocked); the lesson still counts for this visit';
+    saveState = saved ? null : 'Couldn’t save on this device (storage blocked); the lesson still counts for this visit';
     xpGained = Math.max(0, gameCtx().xp - ctxBefore.xp);
     if (timerH) { clearInterval(timerH); timerH = null; }
     effects.finish($('stage'));

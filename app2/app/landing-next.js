@@ -52,7 +52,7 @@ export function landingHtml(h = 0) {
             <a class="start-btn" id="startLearning" href="#/start">Start learning <kbd class="kbd-cta">↵</kbd></a>
             <a class="l-quiet ld2-signin" id="ldSignIn" href="#/account">Sign in</a>
           </div>
-          <div class="micro">Chapter 1 is free · no account to start · nothing to install · progress ${store.saveState() === 'device' ? 'saved on this device' : 'saved to your account'}</div>
+          <div class="micro">Chapter 1 is free · no account to start · nothing to install · progress ${esc(store.saveLine())}</div>
         </div>
         <div class="ld2-hero-demo">
           <div id="ldDemo"></div>

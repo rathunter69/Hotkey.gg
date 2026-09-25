@@ -71,7 +71,7 @@ export function mountHomePage(root) {
           <a href="#/practice">Practice →</a> · <a href="#/account?section=stats">Stats →</a></div>
         </section>` : ''}
         <section class="home-card">
-          <div class="hc-cap">${store.saveState() === 'device' ? 'saved on this device' : 'saved to your account'}</div>
+          <div class="hc-cap">${esc(store.saveLine())}</div>
           <div class="hc-body"><p>${Object.keys(all).length} lesson${Object.keys(all).length === 1 ? '' : 's'} with progress · ${p.platform === 'mac' ? 'Mac' : 'Windows'} keys${p.experience ? ` · ${{ new: 'new to Excel', sometimes: 'uses Excel sometimes', daily: 'uses Excel daily' }[p.experience]}` : ''}</p><a href="#/account">Account and settings →</a></div>
         </section>
       </div>

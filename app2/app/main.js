@@ -204,7 +204,11 @@ export function startApp({ navEl, rootEl, footEl }) {
     if (auth.state() === 'in') { syncUser(); store.hydrate().then(() => { syncUser(); route(); }); }
     else { store.reset(); syncUser(); route(); }
   });
-  window.addEventListener('hk:save', e => nav.setSaveState(store.saveText(e.detail)));
+  window.addEventListener('hk:save', e => {
+    nav.setSaveState(store.saveText(e.detail));
+    // a result card showing the save line follows it ("Saving…" → "Saved to your account")
+    document.querySelectorAll('[data-save-text]').forEach(n => { n.textContent = store.saveText(e.detail); });
+  });
   window.addEventListener('hk:user', () => syncUser());
   const narrowMq = typeof matchMedia === 'function' ? matchMedia(NARROW_QUERY) : null;
 

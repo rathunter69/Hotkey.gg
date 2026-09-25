@@ -127,7 +127,7 @@ export function mountLearnPage(root) {
     const next = pickNextLesson(LESSONS, all, skipped);
     const c = counts();
     let html = `<div class="plist-head"><h1>Learn</h1>
-      <p class="plist-sub">Six chapters, from the first cell to a full model. Chapter 1 is free. Your progress is ${store.saveState() === 'device' ? 'saved on this device' : 'saved to your account'}.</p>
+      <p class="plist-sub">Six chapters, from the first cell to a full model. Chapter 1 is free. Your progress is ${esc(store.saveLine())}.</p>
       <p class="plist-stat"><b>${c.done}</b> of <b>${c.total}</b> lessons done${c.skipped ? ` · <b>${c.skipped}</b> skipped` : ''}${next ? ` · next up: <a href="#/lesson/${esc(next.id)}">${esc(next.title)}</a>` : ' · Chapter 1 complete'}</p></div>`;
     html += `<div class="cat-tools" role="search">
       <label class="cat-search"><span class="vis-hidden">Search lessons</span><input id="catSearch" type="search" placeholder="Search lessons  ( / )" autocomplete="off" value="${esc(filters.q)}"></label>
