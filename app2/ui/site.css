@@ -184,6 +184,9 @@ html[data-dark="1"] .l-sheet td.l-in{color:#6ea8f7}
 .l-price .l-or{margin:0 4px; color:var(--muted)}
 .l-alt{font-family:var(--mono); font-size:11.5px; color:var(--muted); line-height:1.6; margin:-6px 0 0}
 .l-alt b{color:var(--text); font-weight:600}
+/* the student price keeps the size it has always shown at (a pricing-page change waits for Wolf's go-ahead) */
+.page .l-alt{font-size:14px; margin:0 0 10px}
+html[data-density="comfortable"] .page .l-alt{font-size:15px}
 .l-tier ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px}
 .l-tier li{position:relative; padding-left:21px; font-size:13.5px; color:var(--muted); line-height:1.55}
 .l-tier li::before{content:"\2192"; position:absolute; left:0; top:0; font-family:var(--mono); font-size:12px; color:var(--accent)}
