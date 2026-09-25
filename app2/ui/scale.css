@@ -105,8 +105,19 @@ html[data-density="comfortable"] .lesson{height:calc(100vh - 110px)}
 /* the Learn / Home / Practice cards */
 html[data-density="comfortable"] .hc-cap, html[data-density="comfortable"] .pcard-cap, html[data-density="comfortable"] .fr-cap,
 html[data-density="comfortable"] .acard-cap, html[data-density="comfortable"] .tcard-cap, html[data-density="comfortable"] .l-tier-cap{font-size:11px; min-height:36px}
+html[data-density="comfortable"] .lb .board-cap, html[data-density="comfortable"] .ref-card h2{min-height:36px}
+html[data-density="comfortable"] .lb .board-cap h2, html[data-density="comfortable"] .ref-card h2{font-size:11px}
 html[data-density="comfortable"] .hc-body, html[data-density="comfortable"] .pcard-body{padding:22px 24px 24px}
-html[data-density="comfortable"] .drow .dt b{font-size:15px}
-html[data-density="comfortable"] .drow .dt span{font-size:13.5px}
+html[data-density="comfortable"] .drill-row .drow{font-size:15px}
+html[data-density="comfortable"] .drill-row .dt-task{font-size:13.5px}
 
-/* ---------- 3. compact keeps today's sizes; only the width rule above applies ---------- */
+/* ---------- 3. compact: today's type sizes, and the content pages tighten (never the workspace) ---------- */
+html[data-density="compact"] .page-head{margin-bottom:14px}
+html[data-density="compact"] .practice-grid, html[data-density="compact"] .practice-main, html[data-density="compact"] .practice-rail{gap:12px}
+html[data-density="compact"] .pcard-body, html[data-density="compact"] .acard-body, html[data-density="compact"] .tcard-body,
+html[data-density="compact"] .hc-body{padding:14px 16px 16px}
+/* a drill row on one line where it fits: the task runs on after the title */
+html[data-density="compact"] .drill-list{gap:5px}
+html[data-density="compact"] .drill-row{padding:6px 12px}
+html[data-density="compact"] .dt-line, html[data-density="compact"] .dt-task{display:inline}
+html[data-density="compact"] .dt-task{margin:0}
