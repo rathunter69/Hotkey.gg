@@ -4,7 +4,10 @@
 // the Daily, boards, level and XP) → the three Project Volt cards (the company and the sale /
 // this week's report / the data room) → keyboard + experience → straight into lesson 1.1.1.
 // Enter advances, Esc skips the briefing, the briefing shows once (prefs.briefingDone). Nothing
-// jumps: the frame keeps its size from the first step to the last.
+// jumps: the frame keeps its size from the first step to the last, and the cards sit at one
+// height so a heading stays put from step to step. The picker: ← → choose within a question,
+// ↑ ↓ move between the two, Enter starts; the choices are saved only when the first job opens.
+// A learner who read the deal cards is not shown module 1.1's story beat again in 1.1.1.
 //
 // Voice (B3): a finance instructor explaining a deal process to a capable person outside
 // finance. Plain sentences, one idea each; any term is defined in the same breath; nobody is
@@ -17,8 +20,27 @@ import { LESSONS } from '../content/index.js';
 import { siteCopy, splitParas } from '../content/copy/apply.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-/** Lesson 1.1.1: the first lesson of the first module (the Welcome race is retired, B2). */
-export const FIRST_LESSON = (LESSONS.find(l => l.module === 'open-and-set-up') || LESSONS[0]).id;
+/** Module 1.1, and its first lesson 1.1.1, where the first run hands off (the Welcome race is retired, B2). */
+export const FIRST_MODULE = 'open-and-set-up';
+export const FIRST_LESSON = (LESSONS.find(l => l.module === FIRST_MODULE) || LESSONS[0]).id;
+/** The deal cards: they tell module 1.1's story, so a learner who read them skips that module's beat. */
+const DEAL_STEPS = ['who', 'sent', 'deliver'];
+
+/** The prefs patch the first run writes as it hands off: the two choices, done flags, and 1.1's beat marked seen when the deal was read. Pure. */
+export function finishPatch({ platform, experience, sawDeal }, beatsSeen = []) {
+  const patch = { platform, experience, firstRunDone: true, briefingDone: true, skipped: [] };
+  if (sawDeal) patch.beatsSeen = [...new Set([...(beatsSeen || []), FIRST_MODULE])];
+  return patch;
+}
+
+/** The picker's arrow keys. Pure. ← → move within a question (wrapping); ↑ ↓ move between the two questions. */
+export function pickerMove(key, group, i, n) {
+  if (key === 'ArrowRight') return { pick: (i + 1) % n };
+  if (key === 'ArrowLeft') return { pick: (i - 1 + n) % n };
+  if (key === 'ArrowDown') return group === 'platform' ? { group: 'experience' } : { stay: true };
+  if (key === 'ArrowUp') return group === 'experience' ? { group: 'platform' } : { stay: true };
+  return null;
+}
 
 /** The three Project Volt cards (B3 voice). Built-in lines here; site.csv (briefing_n_*) overrides. Exported so the copy is testable. */
 const BRIEFING_DEFAULT = [
@@ -69,7 +91,8 @@ export function mountFirstRun(root, ctx = {}) {
   let platform = prefs.get().platform;
   let experience = prefs.get().experience || 'new';
   let demo = null;
-  let skipped = false;
+  let skipped = false, sawDeal = false;
+  const reduced = (() => { try { return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
 
   el.innerHTML = `<div class="fr2-frame" id="frFrame" role="region" aria-label="Getting started">
       <div class="fr2-head"><span class="fr2-eyebrow" id="frEyebrow"></span><span class="fr2-keys" id="frKeys"></span></div>
@@ -88,21 +111,28 @@ export function mountFirstRun(root, ctx = {}) {
     const body = $('frBody');
     const n = idx + 1, of = steps.length;
     $('frDots').innerHTML = steps.map((k, i) => `<i class="${i < idx ? 'past' : i === idx ? 'now' : ''}"></i>`).join('');
-    $('frEyebrow').textContent = of > 1 ? `Getting started · ${n} of ${of}` : 'Set up';
+    // the deal cards count themselves (The deal · 1 of 3) and the dots count the whole run: the frame just names it there
+    $('frEyebrow').textContent = of < 2 ? 'Set up' : DEAL_STEPS.includes(s) ? 'Getting started' : `Getting started · ${n} of ${of}`;
     if (s === 'demo') {
-      $('frKeys').innerHTML = '<kbd>Enter</kbd> continue';
+      $('frKeys').innerHTML = '<kbd>Enter</kbd> continue · <kbd>Esc</kbd> skip';
       body.innerHTML = `<div class="fr2-demo">
           <div class="fr2-demo-cap"><h1>This is a lesson.</h1><p>The keys are pressed on a real sheet. The sheet is graded on what it ends up as, so any correct route counts.</p></div>
           <div class="fr2-demo-host" id="frDemoHost"></div>
         </div>`;
       const host = $('frDemoHost');
       demo = mountDemoPoster(host);
-      cancelDemo = loadLiveDemo(host, { onDone: () => { track('landing_demo', { where: 'first_run', outcome: 'finished' }); } }, d => { if (step() === 'demo') demo = d; else d.destroy(); }, demo);
+      cancelDemo = loadLiveDemo(host, {
+        autoplay: !reduced,
+        onPlay: syncDemoButton, onChange: syncDemoButton,
+        onDone: () => { track('landing_demo', { where: 'first_run', outcome: 'finished' }); syncDemoButton(); },
+      }, d => { if (step() === 'demo') { demo = d; syncDemoButton(); } else d.destroy(); }, demo);
       actions([{ id: 'next', label: 'Continue', primary: true, kbd: 'Enter' }]);
-    } else if (s === 'who' || s === 'sent' || s === 'deliver') {
+      syncDemoButton();
+    } else if (DEAL_STEPS.includes(s)) {
       const c = BRIEFING.find(b => b.key === s);
+      sawDeal = true;
       $('frKeys').innerHTML = '<kbd>Enter</kbd> next · <kbd>Esc</kbd> skip';
-      body.innerHTML = `<article class="fr2-card"><div class="fr2-card-eyebrow">${esc(c.eyebrow)}</div><h1>${esc(c.title)}</h1>${c.body.map(p => `<p>${esc(p)}</p>`).join('')}</article>`;
+      body.innerHTML = `<article class="fr2-card fr2-deal"><div class="fr2-card-eyebrow">${esc(c.eyebrow)}</div><h1>${esc(c.title)}</h1>${c.body.map(p => `<p>${esc(p)}</p>`).join('')}</article>`;
       actions([{ id: 'back', label: 'Back' }, { id: 'next', label: s === 'deliver' ? 'Set up' : 'Next', primary: true, kbd: 'Enter' }]);
     } else if (s === 'orient') {
       $('frKeys').innerHTML = '<kbd>Enter</kbd> next · <kbd>Esc</kbd> skip';
@@ -111,11 +141,11 @@ export function mountFirstRun(root, ctx = {}) {
           <p class="fr2-fine">${esc(ORIENTATION.fine)}</p></article>`;
       actions([{ id: 'back', label: 'Back' }, { id: 'next', label: 'The deal', primary: true, kbd: 'Enter' }]);
     } else {
-      $('frKeys').innerHTML = '<kbd>↑</kbd><kbd>↓</kbd> pick · <kbd>Enter</kbd> start';
+      $('frKeys').innerHTML = '<kbd>←</kbd><kbd>→</kbd> pick · <kbd>↑</kbd><kbd>↓</kbd> next question · <kbd>Enter</kbd> start';
       body.innerHTML = `<article class="fr2-card fr2-picker">
           <div class="fr2-card-eyebrow">Set up</div><h1>Two questions, then the first job.</h1>
-          <div class="fr2-q"><div class="fr2-qt">Which keyboard?</div>${options('platform', [{ v: 'win', t: 'Windows', s: 'Ctrl, Alt, the Ribbon KeyTips' }, { v: 'mac', t: 'Mac', s: '⌘ and ⌥ stand in for Ctrl and Alt; KeyTips work the same' }], platform)}</div>
-          <div class="fr2-q"><div class="fr2-qt">How much Excel?</div>${options('experience', [{ v: 'new', t: 'New to Excel', s: 'Every lesson, in order' }, { v: 'sometimes', t: 'I use it sometimes', s: 'Same path; the challenges will move you fast' }, { v: 'daily', t: 'I use it daily', s: 'Same start; test out of Chapter 1 from Learn any time' }], experience)}</div>
+          <div class="fr2-q"><div class="fr2-qt" id="frQPlatform">Which keyboard?</div>${options('platform', 'frQPlatform', [{ v: 'win', t: 'Windows', s: 'Ctrl, Alt, the Ribbon KeyTips' }, { v: 'mac', t: 'Mac', s: '⌘ and ⌥ stand in for Ctrl and Alt; KeyTips work the same' }], platform)}</div>
+          <div class="fr2-q"><div class="fr2-qt" id="frQExperience">How much Excel?</div>${options('experience', 'frQExperience', [{ v: 'new', t: 'New to Excel', s: 'Every lesson, in order' }, { v: 'sometimes', t: 'I use it sometimes', s: 'Same path; the challenges will move you fast' }, { v: 'daily', t: 'I use it daily', s: 'Same start; test out of Chapter 1 from Learn any time' }], experience)}</div>
           <p class="fr2-fine">Instructions and keycaps follow the keyboard choice. Both settings change any time from Settings. Progress is saved on this device.</p>
         </article>`;
       wireOptions();
@@ -123,19 +153,35 @@ export function mountFirstRun(root, ctx = {}) {
     }
   }
 
-  const options = (name, list, cur) => `<div class="fr-options fr2-options" role="radiogroup" aria-label="${esc(name)}" data-name="${esc(name)}">${list.map(o =>
+  /** The demo step's button says what it will do: skip the demo while it plays, continue once it is done (or still). Both move on. */
+  function syncDemoButton() {
+    if (step() !== 'demo') return;
+    const b = $('frActions').querySelector('[data-act="next"]');
+    const label = demo && demo.playing && !demo.done ? 'Skip demo' : 'Continue';
+    if (b && b.firstChild && b.firstChild.nodeType === 3 && b.firstChild.nodeValue.trim() !== label) b.firstChild.nodeValue = label + ' ';
+  }
+
+  const options = (name, labelId, list, cur) => `<div class="fr-options fr2-options" role="radiogroup" aria-labelledby="${labelId}" data-name="${esc(name)}">${list.map(o =>
     `<button type="button" class="fr-opt${o.v === cur ? ' on' : ''}" role="radio" aria-checked="${o.v === cur}" tabindex="${o.v === cur ? 0 : -1}" data-v="${esc(o.v)}"><span class="fr-opt-t">${esc(o.t)}</span>${o.s ? `<span class="fr-opt-s">${esc(o.s)}</span>` : ''}</button>`).join('')}</div>`;
+  /** The two radio groups, updated in place (no re-render, so the card does not replay its entrance on every key). */
   function wireOptions() {
     for (const group of el.querySelectorAll('.fr2-options')) {
+      const name = group.dataset.name;
       const opts = [...group.querySelectorAll('.fr-opt')];
-      const pick = v => { if (group.dataset.name === 'platform') { platform = v; prefs.set({ platform }); } else experience = v; render(); focusGroup(group.dataset.name); };
+      const pick = v => {
+        if (name === 'platform') platform = v; else experience = v;   // saved on the way into the lesson, not on every key
+        for (const b of opts) { const on = b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; }
+        focusGroup(name);
+      };
       opts.forEach((b, i) => {
         b.onclick = () => pick(b.dataset.v);
         b.onkeydown = e => {
-          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); pick(opts[(i + 1) % opts.length].dataset.v); }
-          else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); pick(opts[(i - 1 + opts.length) % opts.length].dataset.v); }
-          else if (e.key === ' ') { e.preventDefault(); pick(b.dataset.v); }
-          else if (e.key === 'Tab' && !e.shiftKey && group.dataset.name === 'platform') { e.preventDefault(); focusGroup('experience'); }
+          if (e.key === ' ') { e.preventDefault(); pick(b.dataset.v); return; }
+          const mv = pickerMove(e.key, name, i, opts.length);
+          if (!mv) return;
+          e.preventDefault();
+          if (mv.pick != null) pick(opts[mv.pick].dataset.v);
+          else if (mv.group) focusGroup(mv.group);
         };
       });
     }
@@ -152,8 +198,8 @@ export function mountFirstRun(root, ctx = {}) {
     else if (id === 'back') { if (idx > 0) { idx--; render(); } }
     else if (id === 'start') finish();
   }
+  /** Next step. On the demo it moves on at once, played out or not: the button said Skip demo or Continue. */
   function next() {
-    if (step() === 'demo' && demo && !demo.done) { demo.skip(); return; }   // the first Enter finishes the demo, the second moves on
     if (idx + 1 < steps.length) { idx++; render(); } else finish();
   }
   /** Esc: skip what is left of the briefing and land on the picker (the demo included). */
@@ -164,13 +210,16 @@ export function mountFirstRun(root, ctx = {}) {
   }
   function finish() {
     if (!briefingDone) track('briefing_done', { skipped });
-    store.setLearner({ platform, experience, firstRunDone: true, briefingDone: true, skipped: [] });
+    store.setLearner(finishPatch({ platform, experience, sawDeal }, prefs.get().beatsSeen));
     location.hash = '#/lesson/' + FIRST_LESSON;
   }
 
   const isTyping = t => !!t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
+  // a focused button other than a picker option (Back, Next, the demo's Play) does what it says: its own click, not the frame's Enter
+  const ownButton = t => !!(t && t.closest && t.closest('button') && !t.closest('.fr-opt'));
   const onKey = e => {
     if (isTyping(e.target) || e.defaultPrevented) return;
+    if ((e.key === 'Enter' || e.key === ' ') && ownButton(e.target)) return;
     if (e.key === 'Enter') { e.preventDefault(); if (step() === 'picker') finish(); else next(); }
     else if (e.key === 'Escape') { e.preventDefault(); skipToPicker(); }
     else if (e.key === 'Backspace' && step() !== 'picker') { e.preventDefault(); act('back'); }
