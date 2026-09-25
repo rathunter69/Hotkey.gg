@@ -3,7 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { flowFromQuery, flowOn, DEFAULT_ON } from '../app/flow.js';
-import { inferTarget, altPath, cellsOf, rangeBox, rangeCorners, placeNear, SIDES } from '../ui/cues.js';
+import { inferTarget, altPath, cellsOf, rangeBox, rangeCorners, placeNear, SIDES, rangesOf, targetParts, coverage, unionBox } from '../ui/cues.js';
 import { beatFor, MODULE_BEATS, pageDelivered } from '../app/beats.js';
 import { shouldOfferInstall } from '../app/install.js';
 import { dailyCardHtml, efficiency, prettyDay } from '../ui/result-card.js';
@@ -54,6 +54,32 @@ test('cues: the target is the last reference a goal names; rows, columns and oth
   assert.deepEqual(inferTarget({ text: 'On Costs, land on the Domain total E4 and read =B4+C4+D4 in the formula bar.' }, ['Raw', 'Costs']), { sheet: 'Costs', ref: 'E4' }, 'a quoted formula is not a target; the sheet named in passing qualifies the cell');
   assert.equal(inferTarget({ text: 'Jump to the feed’s last date with Ctrl+↓ — the Name Box now reads A61.' }, ['Raw', 'Costs']), 'A61');
   assert.equal(inferTarget(null), null);
+});
+
+test('cues (C2): whole columns, lists of cells, sheets reached in passing, and sheet tabs', () => {
+  const S = ['Raw', 'Sheet2', 'Old wk37', 'Costs'];
+  // a whole-column span, however it is written
+  assert.equal(inferTarget({ text: 'Select A:A with Ctrl+Space.' }), 'A1:A100');
+  assert.equal(inferTarget({ text: 'Hide D:F, the working columns.' }), 'D1:F100');
+  assert.equal(inferTarget({ text: 'Hide rows 3–5 for now.' }), 'A3:Z5');
+  // a list named together is one target of several ranges (one outline each); a route's destination still wins
+  assert.equal(inferTarget({ text: 'Color the typed inputs B5 and B6 blue.' }), 'B5,B6');
+  assert.equal(inferTarget({ text: 'Mark B5, B7 and D6:D8 blue.' }), 'B5,B7,D6:D8');
+  assert.equal(inferTarget({ text: 'Copy it from B9 to B13, then fill it right across B13:G13 with Ctrl+R.' }), 'B13:G13');
+  assert.deepEqual(rangesOf('B5,B7, D6:D8'), ['B5', 'B7', 'D6:D8']);
+  // the sheet reached before the reference qualifies it — the Costs table in 1.1.1 — but a possessive does not
+  assert.deepEqual(inferTarget({ text: 'Walk the tabs to Costs and land on the Domain total E4: the formula bar shows =B4+C4+D4.' }, S), { sheet: 'Costs', ref: 'E4' });
+  assert.equal(inferTarget({ text: 'Copy Raw’s total row I13:K13 and paste it onto C10.' }, S), 'C10');
+  assert.deepEqual(inferTarget({ text: 'Read Costs!B7 now.' }, S), { sheet: 'Costs', ref: 'B7' }, 'a word before the sheet is not part of its name');
+  // no cell: the sheet the goal ends on is the target, cued on its tab
+  assert.deepEqual(inferTarget({ text: 'Sheet2 is the associate’s inputs scratch — go there and rename it Inputs.' }, S), { sheet: 'Sheet2', tab: true });
+  assert.deepEqual(inferTarget({ text: 'Old wk37 is a dead half-export — delete it and confirm.' }, S), { sheet: 'Old wk37', tab: true });
+  assert.deepEqual(inferTarget({ text: 'Warm up the tab keys: Ctrl+PgDn to Costs at the end, Ctrl+PgUp back to Raw.' }, S), { sheet: 'Raw', tab: true });
+  assert.equal(inferTarget({ text: 'Walk to the View tab with Alt, W.' }, S), null, 'a Ribbon tab is not a sheet');
+  assert.deepEqual(targetParts({ sheet: 'Raw', tab: true }), { sheet: 'Raw', ref: null, tab: true });
+  assert.deepEqual(targetParts('B5,B6'), { sheet: null, ref: 'B5,B6', tab: false });
+  assert.deepEqual(unionBox([{ left: 0, top: 0, width: 10, height: 10 }, { left: 20, top: 30, width: 10, height: 10 }]), { left: 0, top: 0, width: 30, height: 40 });
+  assert.equal(unionBox([]), null);
 });
 
 test('cues: cellsOf expands a ref or range and caps; altPath reads the KeyTip letters', () => {
@@ -208,7 +234,8 @@ test('placeNear: the card sits beside the target, a cell or two away, on the fir
   assert.equal(p6.side, 'free'); assert.ok(inside(p6.rect));
   // a target scrolled wholly out of the box is no target: the card stays where it was
   const keep = { side: 'below', rect: { left: 300, top: 300, width: 380, height: 260 } };
-  assert.deepEqual(placeNear(box, cell(-200, -100), panel, { keep }), keep);
+  const kept = placeNear(box, cell(-200, -100), panel, { keep });
+  assert.deepEqual({ side: kept.side, rect: kept.rect }, keep);
   assert.equal(placeNear(box, null, panel).side, 'free');
   assert.deepEqual(placeNear(box, null, panel).rect, { left: 1000 - 12 - 380, top: 22 + 12, width: 380, height: 260 }, 'no target, nothing kept: top right of the data area');
   // Ctrl+Shift+J asks for a side first; one that does not fit falls through
@@ -222,6 +249,24 @@ test('placeNear: the card sits beside the target, a cell or two away, on the fir
   // a tight box: the full gap does not fit on any side, the one-cell gap right of the target does
   const tight = placeNear({ w: 1020, h: 559, x0: 40, y0: 22 }, cell(448, 220, 104, 20), { w: 380, h: 334 });
   assert.equal(tight.side, 'right'); assert.equal(tight.rect.left, 448 + 104 + 64);
+  // what the learner is reading (C2): with every side open, the card takes the one over the fewest filled cells
+  const sideTable = []; for (let r = 0; r < 8; r++) for (let c = 0; c < 5; c++) sideTable.push(cell(600 + c * 64, 102 + r * 20));
+  const e5 = cell(168, 102);
+  const p7 = placeNear(box, e5, panel, { obstacles: sideTable });
+  assert.equal(p7.side, 'below', 'right of the target would cover the side table: below covers nothing');
+  assert.equal(p7.covers, 0);
+  assert.equal(coverage(p7.rect, sideTable), 0);
+  assert.equal(placeNear(box, e5, panel).side, 'right', 'no content given: right, as before');
+  assert.equal(placeNear(box, e5, panel, { obstacles: sideTable, prefer: ['right'] }).side, 'right', 'Ctrl+Shift+J wins over coverage');
+  // no target: the corner over the least content, or where the card already is when that is as good
+  const feed = []; for (let r = 0; r < 25; r++) for (let c = 0; c < 6; c++) feed.push(cell(40 + c * 64, 22 + r * 20));
+  const free = placeNear(box, null, panel, { obstacles: feed });
+  assert.equal(free.covers, 0); assert.ok(free.rect.left >= 40 + 6 * 64, 'the card sits clear of the feed');
+  const stay = { side: 'free', rect: { left: 600, top: 60, width: 380, height: 260 } };
+  assert.deepEqual(placeNear(box, null, panel, { obstacles: feed, keep: stay }).rect, stay.rect, 'as good as any corner: it stays');
+  // a Ribbon goal: beside the glowing control, on the side that covers less
+  const rbSide = placeNear(box, null, panel, { ribbon: { left: 500, right: 560 }, obstacles: [cell(600, 60, 300, 200)] });
+  assert.equal(rbSide.side, 'ribbon'); assert.equal(rbSide.rect.left, 500 - 16 - 380, 'the right side is covered: left of the control');
   // a small box: the card shrinks to the data area and stays inside
   const small = placeNear({ w: 420, h: 300, x0: 40, y0: 22 }, cell(100, 100), { w: 380, h: 260 });
   assert.ok(small.rect.width <= 420 - 40 - 12 && small.rect.height <= 300 - 22 - 12);

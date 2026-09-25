@@ -13,6 +13,7 @@ import { STAGES, dealStripHtml } from './deal-strip.js';
 import { workbookState, WORKBOOKS } from '../content/workbooks/index.js';
 import { ring } from '../ui/ring.js';
 import { moduleCopy } from '../content/copy/apply.js';
+import { moduleNumber, isFinalItem, FINAL_MODULE } from './numbering.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const TIER_MARK = { legendary: '◆◆◆', pro: '◆◆', pass: '◆' };
@@ -31,14 +32,19 @@ const PLANNED_IDS = { '1.1': 'open-and-set-up', '1.2': 'move-and-select', '1.3':
 /** The seven planned modules; modules.csv (name, objective) overrides the built-in lines by module id. */
 export const PLANNED_MODULES = PLANNED_DEFAULT.map(p => { const row = moduleCopy(PLANNED_IDS[p.n]); return row ? { ...p, title: (row.name || '').trim() || p.title, objective: (row.objective || '').trim() || p.objective } : p; });
 
-/** The document number for a module id, from its position among the built modules. */
-const docNo = (chapterN, k) => `${chapterN}.${k + 1}`;
+/** A challenge's name in a list whose flag already says "challenge": 'Challenge: find and mark' → 'Find and mark'. */
+const challengeName = t => { const x = String(t || '').replace(/^Challenge:\s*/i, ''); return x.charAt(0).toUpperCase() + x.slice(1); };
+/** What a module's finished page is called (modules.csv page_name), else the module's title. */
+const pageName = m => { const row = moduleCopy(m.id); return (row && row.page_name && row.page_name.trim()) || m.title; };
+/** The document number for a module: the curriculum map's (app/numbering.js), else its place among the built modules. */
+const docNo = (chapterN, k, id) => moduleNumber(id, k + 1) || `${chapterN}.${k + 1}`;
 
 /**
  * The pack-page thumbnail for a module: the sheet its lessons changed most, rendered as a small
- * table from the last lesson's `after` state. Falls back to the first sheet. Pure HTML.
+ * table from the last lesson's `after` state. Falls back to the first sheet. `delivered`: the
+ * module's challenge has passed, so the page shows filled and stamped. Pure HTML.
  */
-export function pageThumbHtml(module) {
+export function pageThumbHtml(module, delivered = false) {
   try {
     const last = module.lessons[module.lessons.length - 1];
     const first = module.lessons[0];
@@ -70,7 +76,7 @@ export function pageThumbHtml(module) {
       }
       rows.push(`<tr>${tr}</tr>`);
     }
-    return `<div class="dr-thumb" title="${esc(sheet.name)}"><div class="dr-thumb-tab">${esc(sheet.name)}</div><table>${rows.join('')}</table></div>`;
+    return `<div class="dr-thumb${delivered ? ' delivered' : ''}" title="${esc(sheet.name)}"><div class="dr-thumb-tab">${esc(sheet.name)}</div><table>${rows.join('')}</table>${delivered ? '<span class="dr-stamp">delivered</span>' : ''}</div>`;
   } catch (e) { return ''; }
 }
 
@@ -107,7 +113,7 @@ export function mountLearnPage(root, ctx = {}) {
     if (openChapter === 'foundations') {
       const stage = STAGES[0];
       docs += `<div class="dr-ch-head"><div><div class="dr-ch-eyebrow">Folder 1 · stage 1 of 6 · ${esc(stage.stage)}</div><h2>Foundations</h2>
-          <p>Management sent the weekly site report for the Austin cluster, untidy. The deliverable is the weekly KPI page: clean, live, formatted, checked, print-ready. Seven modules, each one job on that file.</p></div>
+          <p>Management sent the weekly site report for the Austin cluster, untidy. The deliverable is the weekly KPI page: clean, live, formatted, checked, print-ready. Seven modules, each one job on that file, then the project and assessment.</p></div>
           <div class="dr-ch-tools">${gate.testout ? '<span class="chapter-testout tested">Tested out ✓</span>' : '<a class="btn btn-ghost" href="#/lesson/foundations-testout">Already know this? Test out</a>'}</div></div>`;
       docs += '<div class="dr-docs">';
       mods.forEach((m, k) => {
@@ -119,29 +125,51 @@ export function mountLearnPage(root, ctx = {}) {
         const status = moduleStatus(m, all);
         const statusText = status === 'complete' ? 'Complete' : status === 'lessons-done' ? 'Lessons done · challenge open' : status === 'started' ? 'In progress' : 'Not started';
         docs += `<article class="dr-doc dr-${esc(status)}" data-doc="${esc(m.id)}">
-          <div class="dr-doc-num"><span>${docNo(1, k)}</span>${ring(pm.done, pm.total, { size: 30, stroke: 3.5 })}</div>
+          <div class="dr-doc-num"><span>${docNo(1, k, m.id)}</span>${ring(pm.done, pm.total, { size: 30, stroke: 3.5 })}</div>
           <div class="dr-doc-main">
             <div class="dr-doc-row"><h3>${esc(m.title)}</h3><span class="dr-status st-${esc(status)}">${statusText}</span></div>
             <p class="dr-obj">${esc(sec.blurb || plan.objective || '')}</p>
             <ol class="dr-steps">
-              ${m.lessons.map((l, i) => { const st = statusOf(l.id, all, skipped); const isNext = pm.items[i] && pm.items[i].next; return `<li class="dr-step st-${esc(st)}${isNext ? ' next' : ''}"><a href="#/lesson/${esc(l.id)}" data-open="${esc(l.id)}"><span class="dr-step-n">${docNo(1, k)}.${i + 1}</span><span class="dr-step-t">${esc(l.title)}</span><span class="dr-step-m">${l.minutes ? l.minutes + ' min' : ''}</span><span class="dr-step-st">${st === 'done' || st === 'mastered' ? '✓' : st === 'started' ? '…' : isNext ? 'next' : ''}</span></a></li>`; }).join('')}
-              ${m.challenge ? `<li class="dr-step dr-challenge st-${passed ? 'done' : 'todo'}${pm.items[pm.items.length - 1] && pm.items[pm.items.length - 1].next ? ' next' : ''}"><a href="#/lesson/${esc(m.challenge.id)}" data-open="${esc(m.challenge.id)}"><span class="dr-step-n">⚑</span><span class="dr-step-t">${esc(m.challenge.title)}</span><span class="dr-step-m">${m.challenge.pars ? 'pass ' + m.challenge.pars.pass + ' s · pro ' + m.challenge.pars.pro + ' s · legendary ' + m.challenge.pars.legendary + ' s' : ''}</span><span class="dr-step-st">${passed ? (tier && TIER_MARK[tier] ? TIER_MARK[tier] + ' ' + tier : '✓ passed') : ''}</span></a></li>` : ''}
+              ${m.lessons.map((l, i) => { const st = statusOf(l.id, all, skipped); const isNext = pm.items[i] && pm.items[i].next; return `<li class="dr-step st-${esc(st)}${isNext ? ' next' : ''}"><a href="#/lesson/${esc(l.id)}" data-open="${esc(l.id)}"><span class="dr-step-n">${docNo(1, k, m.id)}.${i + 1}</span><span class="dr-step-t">${esc(l.title)}</span><span class="dr-step-m">${l.minutes ? l.minutes + ' min' : ''}</span><span class="dr-step-st">${st === 'done' || st === 'mastered' ? '✓' : st === 'started' ? '…' : isNext ? 'next' : ''}</span></a></li>`; }).join('')}
+              ${m.challenge ? `<li class="dr-step dr-challenge st-${passed ? 'done' : 'todo'}${pm.items[pm.items.length - 1] && pm.items[pm.items.length - 1].next ? ' next' : ''}"><a href="#/lesson/${esc(m.challenge.id)}" data-open="${esc(m.challenge.id)}"><span class="dr-step-n">⚑</span><span class="dr-step-t">${esc(challengeName(m.challenge.title))}<span class="dr-pars">${m.challenge.pars ? 'challenge · pass ' + m.challenge.pars.pass + ' s · pro ' + m.challenge.pars.pro + ' s · legendary ' + m.challenge.pars.legendary + ' s' : 'challenge'}</span></span><span class="dr-step-m">${m.challenge.minutes ? m.challenge.minutes + ' min' : ''}</span><span class="dr-step-st">${passed ? (tier && TIER_MARK[tier] ? TIER_MARK[tier] + ' ' + tier : '✓ passed') : ''}</span></a></li>` : ''}
             </ol>
           </div>
           <div class="dr-doc-page${passed ? ' filled' : ''}">
-            ${pageThumbHtml(m)}
-            <div class="dr-page-cap"><b>Page ${docNo(1, k)}</b> ${passed ? 'delivered' : 'fills in when the challenge passes'}</div>
-            ${m.challenge && passed ? `<a class="dr-replay" href="#/lesson/${esc(m.challenge.id)}?seed=new">Replay · new seed →</a>` : ''}
+            ${pageThumbHtml(m, passed)}
+            <div class="dr-page-cap"><b>Page ${docNo(1, k, m.id)}</b> ${passed ? `${esc(pageName(m))} · delivered` : 'fills in when the challenge passes'}</div>
+            ${m.challenge && passed ? `<a class="dr-replay" href="#/lesson/${esc(m.challenge.id)}?seed=new">Replay the challenge · new sheet →</a>` : ''}
           </div>
         </article>`;
       });
+      // 1.8: the chapter's project, assessment and test-out (module or section, whichever the catalogue carries)
+      const finals = ch1 ? ch1.lessons.filter(isFinalItem) : [];
+      if (finals.length) {
+        const main = finals.filter(l => l.kind !== 'testout');
+        const doneN = main.filter(l => { const p = all[l.id]; return p && p.completed; }).length;
+        const passed = !!gate.assessment || !!gate.testout;
+        const status = passed ? 'complete' : doneN ? 'started' : 'not-started';
+        const statusText = passed ? 'Complete' : doneN ? 'In progress' : 'Not started';
+        const nextFinal = main.find(l => !(all[l.id] && all[l.id].completed));
+        const label = { project: 'P', assessment: 'A', testout: 'T' };
+        const row = moduleCopy(FINAL_MODULE.id);
+        docs += `<article class="dr-doc dr-${status} dr-final" data-doc="${FINAL_MODULE.id}">
+          <div class="dr-doc-num"><span>${FINAL_MODULE.n}</span>${ring(doneN, main.length || 1, { size: 30, stroke: 3.5 })}</div>
+          <div class="dr-doc-main">
+            <div class="dr-doc-row"><h3>${esc((row && row.name) || FINAL_MODULE.title)}</h3><span class="dr-status st-${status}">${statusText}</span></div>
+            <p class="dr-obj">${esc((row && row.objective) || 'Build the weekly report end to end, then prove it against the clock; or test out of the chapter.')}</p>
+            <ol class="dr-steps">${finals.map(l => { const st = statusOf(l.id, all, skipped); const isNext = nextFinal && nextFinal.id === l.id && !mods.some((m2, k2) => path[k2] && path[k2].items.some(it => it.next)); return `<li class="dr-step st-${esc(st)}${isNext ? ' next' : ''}"><a href="#/lesson/${esc(l.id)}" data-open="${esc(l.id)}"><span class="dr-step-n">${FINAL_MODULE.n}.${label[l.kind] || ''}</span><span class="dr-step-t">${esc(l.title)}</span><span class="dr-step-m">${l.minutes ? l.minutes + ' min' : ''}</span><span class="dr-step-st">${st === 'done' || st === 'mastered' || (l.kind === 'testout' && gate.testout) ? '✓' : st === 'started' ? '…' : isNext ? 'next' : ''}</span></a></li>`; }).join('')}</ol>
+          </div>
+          <div class="dr-doc-page${passed ? ' filled' : ''}"><div class="dr-thumb-slot${passed ? ' delivered' : ''}"><span>Page ${FINAL_MODULE.n}</span></div>
+            <div class="dr-page-cap"><b>Page ${FINAL_MODULE.n}</b> ${passed ? `${esc((row && row.page_name) || 'The weekly KPI report')} · delivered` : 'the finished report: fills in when the assessment passes'}</div></div>
+        </article>`;
+      }
       for (let k = mods.length; k < PLANNED_MODULES.length; k++) {
         const plan = PLANNED_MODULES[k];
         docs += `<article class="dr-doc dr-coming"><div class="dr-doc-num"><span>${esc(plan.n)}</span></div><div class="dr-doc-main"><div class="dr-doc-row"><h3>${esc(plan.title)}</h3><span class="dr-status st-coming">Coming</span></div><p class="dr-obj">${esc(plan.objective)}</p></div><div class="dr-doc-page"><div class="dr-page-cap"><b>Page ${esc(plan.n)}</b> not yet</div></div></article>`;
       }
       docs += '</div>';
       // the archive: the legacy lessons, one folder, collapsed
-      const legacy = ch1 ? ch1.lessons.filter(l => typeof l.module !== 'string' || l.module === 'welcome') : [];
+      const legacy = ch1 ? ch1.lessons.filter(l => (typeof l.module !== 'string' || l.module === 'welcome') && !isFinalItem(l)) : [];
       if (legacy.length) {
         docs += `<div class="dr-archive"><button type="button" class="dr-folder dr-archive-btn${archiveOpen ? ' open' : ''}" id="drArchive" aria-expanded="${archiveOpen}"><span class="dr-folder-ico" aria-hidden="true">${archiveOpen ? '▾' : '▸'}</span><span class="dr-folder-t">Archive · earlier lessons</span><span class="dr-folder-meta"><span class="dr-count">${legacy.length}</span></span><span class="dr-tease">The first draft of Chapter 1. Still playable; replaced module by module as the rewrite lands.</span></button>
           ${archiveOpen ? `<ol class="dr-steps dr-archive-list">${legacy.map(l => { const st = statusOf(l.id, all, skipped); return `<li class="dr-step st-${esc(st)}"><a href="#/lesson/${esc(l.id)}" data-open="${esc(l.id)}"><span class="dr-step-n">${lessonNumber(l.id)}</span><span class="dr-step-t">${esc(l.title)}</span><span class="dr-step-m">${esc(l.section || '')}</span><span class="dr-step-st">${st === 'done' || st === 'mastered' ? '✓' : st === 'started' ? '…' : ''}</span></a></li>`; }).join('')}</ol>` : ''}</div>`;

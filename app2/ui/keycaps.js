@@ -3,12 +3,13 @@
 // resetFlash (27198, 27301–27312) and the markup at 2438.
 //
 //   const caps = mountKeycaps(session);   // hooks session.opts.onKey (chains any existing handler)
+//   mountKeycaps(null, { parent, cls: 'in-frame' })   // the lesson workspace: inside the frame, over the sheet-tab bar
 //   caps.flash('Ctrl+B'); caps.reset(); caps.destroy();
 
 export function mountKeycaps(session, opts = {}) {
   const parent = opts.parent || document.body;
   let el = opts.el || null;
-  if (!el) { el = document.createElement('div'); el.className = 'keyflash'; el.id = 'keyflash'; parent.appendChild(el); }
+  if (!el) { el = document.createElement('div'); el.className = 'keyflash' + (opts.cls ? ' ' + opts.cls : ''); el.id = 'keyflash'; el.setAttribute('aria-hidden', 'true'); parent.appendChild(el); }
   let timer = null, chips = [];
   const hold = opts.hold || 1400;
 

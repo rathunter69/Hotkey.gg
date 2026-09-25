@@ -120,6 +120,8 @@ export function mountEffects(opts = {}) {
       const b = document.createElement('div');
       b.className = 'fx-banner ' + (cls || '') + (level() === 'subtle' ? ' subtle' : '');
       b.setAttribute('role', 'status');
+      // the corner lane (SITE_SPEC §6a): banners stack upward from the bottom-left, never over a result card
+      b.style.setProperty('--fx-i', String(document.querySelectorAll('.fx-banner').length));
       b.innerHTML = html;
       document.body.appendChild(b);
       later(() => b.classList.add('in'), 20);
@@ -158,8 +160,8 @@ export function mountEffects(opts = {}) {
   function setBusy(v) { busy = !!v; if (!busy) drainAchievements(); }
   /** A clean sheet (no mouse, no help): a bright, rising pair — quieter than a PB. */
   function cleanSheet() { tone(988, 0, 0.08, 0.06); tone(1319, 0.07, 0.14, 0.07); }
-  /** A pack page filled (a module's challenge passed): a settling three-note stamp. */
-  function packPage() { tone(784, 0, 0.1, 0.08); tone(988, 0.09, 0.1, 0.08); tone(1175, 0.18, 0.2, 0.09); banner('▣ Page added to the pack', 'fx-pack'); }
+  /** A pack page filled (a module's challenge passed, the first time): a settling three-note stamp. */
+  function packPage() { tone(784, 0, 0.1, 0.08); tone(988, 0.09, 0.1, 0.08); tone(1175, 0.18, 0.2, 0.09); }   // the page itself slots into the result card (lesson-view)
   function clockStart() { tone(1046, 0, 0.05, 0.05); }
   function clockStop() { tone(1046, 0, 0.06, 0.06); tone(1568, 0.06, 0.1, 0.06); }
   function hit() { tone(1319, 0, 0.05, 0.06); }

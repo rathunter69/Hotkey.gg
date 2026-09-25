@@ -21,8 +21,10 @@ import { mountEffects } from '../ui/effects.js';
 import { showToast } from '../ui/toast.js';
 import { keyLabel, prefs } from './prefs.js';
 import { flowNext } from './flow.js';
-import { inferTarget, altPath, pulseTarget, clearPulse, glowRibbon, placeNear, SIDES } from '../ui/cues.js';
+import { inferTarget, altPath, pulseTarget, clearPulse, glowRibbon, placeNear, SIDES, targetBoxes, targetParts, unionBox } from '../ui/cues.js';
+import { moduleNumber, itemNumber, isFinalItem, FINAL_MODULE } from './numbering.js';
 import { beatFor, pageDelivered } from './beats.js';
+import { pageThumbHtml } from './learn-next.js';
 import { schedule, grade as scheduleGrade, dueToday } from './schedule.js';
 import { shouldOfferInstall, installAvailable, promptInstall, INSTALL_PROMPT } from './install.js';
 import { siteCopy } from '../content/copy/apply.js';
@@ -77,16 +79,25 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
   if (next) {
     const ctx0 = gameCtx();
     const crumb = at
-      ? `<a href="#/learn">Learn</a> › <span>${esc(chapter ? chapter.title : '')}</span> › <span>1.${at.k - 1} ${esc(at.module.title)}</span> › <b>${isChallenge ? 'Challenge' : `Lesson ${at.n} of ${at.of}`}</b>`
+      ? `<a href="#/learn">Learn</a> › <span>${esc(chapter ? chapter.title : '')}</span> › <span>${esc(moduleNumber(at.module.id, at.k))} ${esc(at.module.title)}</span> › <b>${isChallenge ? 'Challenge' : `Lesson ${at.n} of ${at.of}`}</b>`
       : isMicro ? `<a href="#/">Home</a> › <span>Due today</span> › <b>${esc(lesson.title)}</b>`
+      : isFinalItem(lesson) ? `<a href="#/learn">Learn</a> › <span>${esc(chapter ? chapter.title : '')}</span> › <span>${FINAL_MODULE.n} ${esc(FINAL_MODULE.title)}</span> › <b>${esc(lesson.title)}</b>`
       : `<a href="#/learn">Learn</a> › <span>${esc(chapter ? chapter.title : '')}</span> › <b>${esc(lesson.title)}</b>`;
+    const sideName = { overlay: 'Floating card', right: 'Docked right', left: 'Docked left' };
     wrap.innerHTML = `<div class="ws-strip" id="wsStrip" role="navigation" aria-label="You are here">
       <div class="ws-crumb">${crumb}<span class="ws-ring" id="wsRing"></span></div>
       <div class="ws-tools">
         <span class="ws-level" id="wsLevel" title="Level ${ctx0.level} · XP from lessons, challenges and the Daily">L${ctx0.level} <i>${ctx0.levelInfo.into}/${ctx0.levelInfo.need} XP</i></span>
         <span id="wsMute"></span>
-        <button type="button" class="mb-tool" id="wsSide" title="Panel: floating card, docked right, docked left (Ctrl+Shift+K hides it, Ctrl+Shift+J moves the card)">Panel: ${panelMode === 'overlay' ? 'floating' : panelMode}</button>
-        <button type="button" class="mb-tool" id="wsFull" title="Fullscreen (F11 in most browsers)">Fullscreen</button>
+        <button type="button" class="mb-tool" id="wsFull" title="Fullscreen: the sheet gets the whole screen, and the browser's own shortcuts stay out of the way">Fullscreen</button>
+        <div class="ws-more-wrap"><button type="button" class="mb-tool ws-more" id="wsMore" aria-haspopup="menu" aria-expanded="false" title="Panel and workspace options">More <span aria-hidden="true">▾</span></button>
+          <div class="ws-menu" id="wsMenu" role="menu" hidden>
+            <div class="ws-menu-cap">Lesson panel</div>
+            ${['overlay', 'right', 'left'].map(m => `<button type="button" role="menuitemradio" aria-checked="${m === panelMode}" class="ws-menu-item${m === panelMode ? ' on' : ''}" data-side="${m}"><span>${sideName[m]}</span>${m === panelMode ? '<i>✓</i>' : ''}</button>`).join('')}
+            ${panelMode === 'overlay' ? `<div class="ws-menu-sep"></div>
+            <button type="button" role="menuitem" class="ws-menu-item" data-act="move"><span>Move the card</span>${kbd('Ctrl+Shift+J')}</button>
+            <button type="button" role="menuitem" class="ws-menu-item" data-act="hide"><span>Hide or show the card</span>${kbd('Ctrl+Shift+K')}</button>` : ''}
+          </div></div>
       </div></div>`;
   }
   el.innerHTML = `
@@ -99,8 +110,8 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     <div class="lesson-divider" id="divider" role="separator" aria-orientation="vertical" aria-label="Lesson panel width. Arrow keys resize it, Home resets it." tabindex="0" title="Drag to resize the panel"></div>
     <aside class="lesson-panel" id="panel" aria-label="Lesson panel">
       <div class="panel-head">
-        <div class="lesson-crumb"><a href="#/learn">Learn</a> › ${esc(chapter ? chapter.title : '')} › <span>${lessonNumber(lesson.id)}</span></div>
-        <h1 class="lesson-title">${esc(lesson.title)}</h1>
+        <div class="lesson-crumb"><a href="#/learn">Learn</a> › ${esc(chapter ? chapter.title : '')} › <span>${esc(itemNumber(lesson, at) || String(lessonNumber(lesson.id)))}</span></div>
+        <h1 class="lesson-title" title="${esc(lesson.title)}">${esc(lesson.title)}</h1>
         <div class="module-line" id="moduleLine"></div>
         <div class="lesson-meta"><span class="diff diff-${esc(lesson.difficulty)}">${esc(lesson.difficulty)}</span> <span class="lesson-mode" id="lessonMode"></span> <span class="lesson-progress" id="lessonProgress"></span> <span class="lesson-timer" id="lessonTimer"></span><span class="lesson-tools" id="lessonTools"></span></div>
       </div>
@@ -120,12 +131,29 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
   root.appendChild(overlay);
   const $ = id => el.querySelector('#' + id);
 
-  const keycaps = mountKeycaps();
+  // the key echo sits in the sheet-tab bar's empty right end, so the floating card never lands on it
+  const keycaps = mountKeycaps(null, next ? { parent: $('stage'), cls: 'in-frame' } : {});
+  let onDocClick = null;
   const effects = mountEffects();
   effects.mountMuteButton(next ? wrap.querySelector('#wsMute') : $('lessonTools'));
   // the strip's tools (experience pass): panel side, fullscreen
   if (next) {
-    wrap.querySelector('#wsSide').onclick = () => { const order = ['overlay', 'right', 'left']; const side = order[(order.indexOf(panelMode) + 1) % order.length]; prefs.set({ panelSide: side }); location.hash = location.hash.replace(/[?&]panel=[a-z]+/, ''); location.reload(); };
+    const more = wrap.querySelector('#wsMore'), menu = wrap.querySelector('#wsMenu');
+    const closeMenu = (refocus) => { if (menu.hidden) return; menu.hidden = true; more.setAttribute('aria-expanded', 'false'); if (refocus) focusWorkspace(); };
+    more.onclick = e => { e.stopPropagation(); const open = menu.hidden; menu.hidden = !open; more.setAttribute('aria-expanded', String(open)); if (open) { const first = menu.querySelector('.ws-menu-item'); if (first) first.focus(); } };
+    menu.addEventListener('click', e => {
+      const b = e.target.closest('.ws-menu-item'); if (!b) return;
+      if (b.dataset.side) { if (b.dataset.side !== panelMode) { prefs.set({ panelSide: b.dataset.side }); location.hash = location.hash.replace(/[?&]panel=[a-z]+/, ''); location.reload(); } else closeMenu(true); return; }
+      closeMenu(false);
+      if (b.dataset.act === 'move') cycleDock(); else if (b.dataset.act === 'hide') togglePanel();
+    });
+    menu.addEventListener('keydown', e => {
+      const items = [...menu.querySelectorAll('.ws-menu-item')]; const i = items.indexOf(document.activeElement);
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeMenu(true); }
+      else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); e.stopPropagation(); items[(i + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length].focus(); }
+    });
+    onDocClick = e => { if (!e.target.closest('.ws-more-wrap')) closeMenu(false); };
+    document.addEventListener('click', onDocClick);
     wrap.querySelector('#wsFull').onclick = () => { try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); } catch (e) { /* not allowed here */ } };
   }
   const onFs = () => { try { document.documentElement.classList.toggle('hk-fs', !!document.fullscreenElement); if (sheetView) requestAnimationFrame(() => sheetView.render()); } catch (e) { /* no DOM */ } };
@@ -146,6 +174,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
   let lastTier = null;       // a clean challenge's tier from the pars, for the overlay stamp
   let lastTimedOut = false;  // a soft-timed first challenge run that finished past the limit: completes, no tier
   let xpGained = 0;          // what the run earned, for the overlay's count-up
+  let deliveredNow = false;  // this pass delivered the module's page for the first time (the moment plays once per page)
   // the experience pass: cues on the goal's target and the Ribbon route, the ~8 s stuck hint, the
   // memory notes the queue reads, the module's story beat
   const cuesOn = next && fullRibbon && mode === 'guided' && !isChallenge;
@@ -161,7 +190,9 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
   let dockedGoal = -1, dockedGlow = 0;   // what the last dock was computed for (the goal; the glowing Ribbon control count)
   let dockPinned = false;    // Ctrl+Shift+J moved it by hand: keep that until the next goal
   let pill = false;          // collapsed to a one-line pill while a cell is being edited
-  let targetBox = null;      // the current goal's target box in sheet content pixels (dock avoids it)
+  let cueTarget = null;      // the current goal's target (inferTarget): its box is measured afresh on every dock, on whichever sheet shows
+  let lastSheet = -1;        // the sheet index last seen, to spot a move to another sheet
+  let pillH = null;          // the pending collapse (150 ms after an edit starts) or expand (after it settles)
   let scrollRaf = 0;
 
   // The first attempt at a challenge is soft-timed (C2 addendum): the clock runs and decides the
@@ -195,7 +226,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     // on the freshly painted bar
     run.session.onChange(() => {
       if (cuesOn && phase === 'play') glowRibbon($('ribbon'), cueTokens, run.session.path, run.session.mode, document.getElementById('ribbonDrop'));
-      if (overlayMode) { const editing = !!run.session.editing; if (editing !== pill) { pill = editing; el.classList.toggle('pill', pill); if (!pill) dockPanel(); } }
+      if (overlayMode) setPill(!!run.session.editing);
     });
     if (overlayMode && sheetView && sheetView.gw) sheetView.gw.addEventListener('scroll', onSheetScroll, { passive: true });
     run.onChange(what => {
@@ -241,8 +272,8 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     const wsRing = wrap.querySelector('#wsRing'); if (wsRing) wsRing.innerHTML = ring(doneInModule, at.module.lessons.length, { size: 18, stroke: 3 });
     slot.hidden = false;
     slot.innerHTML = `${ring(doneInModule, at.module.lessons.length, { size: 20 })} ${lesson.kind === 'challenge'
-      ? `<span>Challenge · Module ${at.k} of ${at.of7}</span>`
-      : `<span>Lesson ${at.n} of ${at.of} · Module ${at.k} of ${at.of7}</span>`}`;
+      ? `<span>Challenge · Module ${esc(moduleNumber(at.module.id, at.k))}</span>`
+      : `<span>Lesson ${at.n} of ${at.of} · Module ${esc(moduleNumber(at.module.id, at.k))}</span>`}`;
   }
 
   /** The one thing to do now, pinned above the scrolling body: goal + teach + keys + convention. */
@@ -475,13 +506,13 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     const opt = run.optimalKeys;
     overlay.innerHTML = `<div class="rm-card">
       <div class="rm-title" id="doneTitle">${isChallenge && lastTier ? esc(lastTier[0].toUpperCase() + lastTier.slice(1)) + '!' : isMicro ? 'Done' : doneTitle()}</div>
-      <div class="rm-lesson">${isMicro ? 'Due today · ' + esc(lesson.title) : lessonNumber(lesson.id) + ' · ' + esc(lesson.title) + ' · ' + modeLabel()}</div>
+      <div class="rm-lesson">${isMicro ? 'Due today · ' + esc(lesson.title) : esc(itemNumber(lesson, at) || String(lessonNumber(lesson.id))) + ' · ' + esc(lesson.title) + ' · ' + modeLabel()}</div>
       ${lesson.race ? raceHtml() : `<div class="rm-time">${secs == null ? '—' : fmtSecs(secs)}<span>s</span></div>`}
       ${isChallenge && lesson.pars ? `<div class="tier-stamps">${['pass', 'pro', 'legendary'].map(t => `<span class="tstamp ${lastTier && ['pass', 'pro', 'legendary'].indexOf(t) <= ['pass', 'pro', 'legendary'].indexOf(lastTier) ? 'hit' : ''}">${t} ${lesson.pars[t]}s</span>`).join('')}</div>` : ''}
       <div class="rm-stats"><div>keystrokes<b>${run.session.keyLog.length}${isChallenge && opt ? ' / ' + opt : ''}</b></div>${run.mouseCount ? `<div>mouse<b>×${run.mouseCount}</b></div>` : ''}${run.mode === 'timed' && run.par ? `<div>par<b>${run.par} s</b></div>` : ''}${xpGained ? `<div>earned<b class="rm-xp">+0 XP</b></div>` : ''}</div>
       ${lastTimedOut ? `<div class="rm-note">Over the limit — no tier. The module still counts.</div>` : ''}
       ${lastClean ? `<div class="rm-clean">✓ Clean sheet — no mouse, no help</div>` : assisted() ? `<div class="rm-note">Assisted — steps were shown on request.</div>` : ''}
-      ${next && isChallenge && at ? `<div class="rm-page">▣ ${esc(pageDelivered(at))}</div>` : ''}
+      ${deliveredNow ? `<div class="rm-page"><div class="rm-page-slot" aria-hidden="true">${pageThumbHtml(at.module, true)}</div><div class="rm-page-line">${esc(pageDelivered(at))}</div></div>` : ''}
       ${closingHtml()}
       ${isMicro ? '' : nextJobHtml()}
       ${firstEver && store.saveState() === 'device' ? `<div class="rm-save"><b>Your first lesson is done.</b> Progress is saved on this device. <a href="#/account">Create a free account</a> to keep it across devices — everything you have done carries over.</div>` : ''}
@@ -509,7 +540,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     renderPanel();
     overlay.innerHTML = `<div class="rm-card">
       <div class="rm-title" id="doneTitle">Time’s up — try again</div>
-      <div class="rm-lesson">${lessonNumber(lesson.id)} · ${esc(lesson.title)}</div>
+      <div class="rm-lesson">${esc(itemNumber(lesson, at) || String(lessonNumber(lesson.id)))} · ${esc(lesson.title)}</div>
       <div class="rm-stats"><div>goals<b>${run.doneCount} / ${run.goals.length}</b></div><div>limit<b>${lesson.timeLimit} s</b></div></div>
       <div class="rm-note">${lesson.kind === 'testout' ? 'No harm done: nothing is recorded, and the chapter’s lessons are always open.' : 'Nothing is recorded for a run that ran out. The report is the same every time — another run is more practice.'}</div>
       <div class="rm-opts"><button class="btn btn-primary" data-act="continue" type="button">Try again <kbd>Enter</kbd></button>
@@ -587,7 +618,9 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     if (timerH) { clearInterval(timerH); timerH = null; }
     effects.finish($('stage'));
     if (lastClean && effects.cleanSheet) effects.cleanSheet();
-    if (next && isChallenge && effects.packPage) effects.packPage();
+    // the module's page goes into the pack the first time its challenge passes, and only then
+    deliveredNow = !!(next && isChallenge && at && !prefs.get().pagesDelivered.includes(at.module.id));
+    if (deliveredNow) { prefs.set({ pagesDelivered: [...prefs.get().pagesDelivered, at.module.id] }); if (effects.packPage) effects.packPage(); }
     celebrate(effects, ctxBefore);
     const lv = wrap.querySelector('#wsLevel'); if (lv) { const c2 = gameCtx(); lv.innerHTML = `L${c2.level} <i>${c2.levelInfo.into}/${c2.levelInfo.need} XP</i>`; }
     tab = 'lesson';
@@ -619,7 +652,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     stopDemo();
     phase = 'play'; revealed = false; nudgeAt = -1; prevDone = 0; overlay.hidden = true; tab = 'lesson'; lastTimedOut = false;
     run.opts.soft = firstAttempt();   // the second attempt onward runs against a hard limit
-    cueGoal = -1; dockedGoal = -1; hintAt = -1; hinted.clear(); notedDone = 0; stopStuck();
+    cueGoal = -1; dockedGoal = -1; cueTarget = null; lastSheet = -1; hintAt = -1; hinted.clear(); notedDone = 0; stopStuck();
     run.reset(timedOnly ? 'timed' : newMode);
     mountViews();
     if (!timerH) timerH = setInterval(renderTimer, 200);
@@ -693,16 +726,25 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
       clearPulse(el);
       cueTokens = cur ? altPath(cur.keys) : [];
       if (cur && !demo && !ghost) {
-        const sh = run.session.sheets && run.session.sheets[run.session.sheetIndex];
-        const drawn = pulseTarget(sheetView, inferTarget(cur, (run.session.sheets || []).map(x => x.name)), sh ? sh.name : null, $('sheetTabs'));
-        targetBox = drawn && typeof drawn === 'object' ? drawn : null;
-      } else targetBox = null;
+        cueTarget = inferTarget(cur, (run.session.sheets || []).map(x => x.name));
+        pulseTarget(sheetView, cueTarget, activeSheetName(), $('sheetTabs'));
+      } else cueTarget = null;
+      lastSheet = run.session.sheetIndex;
       dockPinned = false;
       armStuck();
     }
     const glowing = glowRibbon($('ribbon'), cueTokens, run.session.path, run.session.mode, document.getElementById('ribbonDrop'));
+    // another sheet came up: the old sheet's ring goes, and arriving where the target is pulses it there once
+    let moved = false;
+    if (run.session.sheetIndex !== lastSheet) {
+      lastSheet = run.session.sheetIndex; moved = true;
+      clearPulse(sheetView && sheetView.gw);
+      const { sheet, tab } = targetParts(cueTarget);
+      if (cueTarget && !tab && sheet && sheet.toLowerCase() === String(activeSheetName()).toLowerCase()) pulseTarget(sheetView, cueTarget, activeSheetName(), $('sheetTabs'));
+    }
     // the card follows the glow (a Ribbon goal: beside the tab, then beside the group's control as the route is walked)
-    if (run.doneCount !== dockedGoal || (!targetBox && glowing !== dockedGlow)) { dockedGoal = run.doneCount; dockedGlow = glowing; dockPanel(); }
+    const hasBox = !!currentTargetBox();
+    if (moved || run.doneCount !== dockedGoal || (!hasBox && glowing !== dockedGlow)) { dockedGoal = run.doneCount; dockedGlow = glowing; dockPanel(); }
   }
   /** ~8 s on one goal: the keys appear as a hint; ~20 s: the Help tab pulses. Both stop when the goal lands. */
   function armStuck() {
@@ -746,16 +788,34 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
   }
 
   /* ---------------- the floating panel (B4): beside the goal's target, a cell or two away ---------------- */
-  /** Place the card next to the current goal's target (right, below, left, above), under the glowing Ribbon group for a Ribbon goal, else where it was. */
+  const activeSheetName = () => { const sh = run.session.sheets && run.session.sheets[run.session.sheetIndex]; return sh ? sh.name : null; };
+  /** The current goal's target on the sheet that shows, in .gridwrap content pixels, or null (another sheet, a tab, nothing). */
+  function currentTargetBox() { return cueTarget && sheetView ? unionBox(targetBoxes(sheetView, cueTarget, activeSheetName())) : null; }
+  /** The filled cells showing, in the visible box's pixels: what the learner is reading, which the card keeps off. */
+  function readingCells(gw) {
+    const out = []; const grid = sheetView && sheetView.grid; if (!grid) return out;
+    const sl = gw.scrollLeft, st = gw.scrollTop, W = gw.clientWidth, H = gw.clientHeight;
+    for (const td of grid.querySelectorAll('td[data-r]')) {
+      if (!td.textContent.trim()) continue;
+      const left = td.offsetLeft - sl, top = td.parentElement.offsetTop - st;
+      if (left > W || top > H || left + td.offsetWidth < 0 || top + td.offsetHeight < 0) continue;
+      out.push({ left, top, width: td.offsetWidth, height: td.offsetHeight });
+      if (out.length > 1200) break;
+    }
+    return out;
+  }
+  /** Place the card next to the current goal's target (the side over the least content), under the glowing Ribbon control for a Ribbon goal, else over the emptiest corner. */
   function dockPanel() {
     if (!overlayMode || !sheetView || !sheetView.gw) return;
     const gw = sheetView.gw; const panelEl = $('panel'); if (!panelEl) return;
     const g = gw.getBoundingClientRect(); const l = el.getBoundingClientRect();
     if (!g.width || !g.height) return;
     const b = sheetView.box() || { x0: 0, y0: 0 };
-    const box = { w: g.width, h: g.height, x0: b.x0, y0: b.y0 };
+    // the visible box, less the part below the window's bottom edge (a tall sheet on a short screen)
+    const box = { w: g.width, h: Math.max(160, Math.min(g.height, window.innerHeight - g.top - 8)), x0: b.x0, y0: b.y0 };
     // the target in the visible box's pixels (scrolled; the sticky headers stay at the box's top and left)
-    const t = targetBox ? { left: targetBox.left - gw.scrollLeft, top: targetBox.top - gw.scrollTop, width: targetBox.width, height: targetBox.height } : null;
+    const tb = currentTargetBox();
+    const t = tb ? { left: tb.left - gw.scrollLeft, top: tb.top - gw.scrollTop, width: tb.width, height: tb.height } : null;
     const pw = Math.min(panelEl.offsetWidth || 380, box.w - 24), ph = Math.min(panelEl.offsetHeight || 260, box.h - 24);
     // a Ribbon goal: the glowing control's span, in box pixels (the card docks under the bar beside it)
     let ribbon = null;
@@ -763,13 +823,29 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
       const glow = el.querySelector('#ribbon .cue-glow, #ribbonDrop .cue-glow');
       if (glow) { const r = glow.getBoundingClientRect(); ribbon = { left: r.left - g.left, right: r.right - g.left }; }
     }
-    const pick = placeNear(box, t, { w: pw, h: ph }, { prefer: dockPinned ? [dock] : [], ribbon, keep: dockRect ? { side: dock, rect: dockRect } : null });
+    const pick = placeNear(box, t, { w: pw, h: ph }, { prefer: dockPinned ? [dock] : [], ribbon, keep: dockRect ? { side: dock, rect: dockRect } : null, obstacles: readingCells(gw) });
     dock = pick.side; dockRect = pick.rect;
     // never over the ribbon or the formula bar: the box starts under them, so a rect inside it is clear of both
     panelEl.style.left = (g.left - l.left + pick.rect.left) + 'px';
     panelEl.style.top = (g.top - l.top + pick.rect.top) + 'px';
     panelEl.style.maxHeight = (box.h - 24) + 'px';
     el.dataset.dock = dock;
+  }
+  /**
+   * Typing into a cell folds the card to a one-line pill so the entry has room — calmly: it folds
+   * 150 ms into the edit (a keystroke that commits at once never folds it), and unfolds when the
+   * edit ends by Enter, Tab or Esc and stays ended for 180 ms (a Tab run from cell to cell stays
+   * folded instead of flickering open between entries).
+   */
+  function setPill(editing) {
+    if (pillH) { clearTimeout(pillH); pillH = null; }
+    if (editing === pill) return;
+    pillH = setTimeout(() => {
+      pillH = null;
+      if (!!run.session.editing !== editing || editing === pill) return;
+      pill = editing; el.classList.toggle('pill', pill);
+      if (!pill) dockPanel();
+    }, editing ? 150 : 180);
   }
   function onSheetScroll() { if (scrollRaf) return; scrollRaf = requestAnimationFrame(() => { scrollRaf = 0; dockPanel(); }); }
   /** Ctrl+Shift+J: ask for the next side by hand (sticks until the next goal; a side that does not fit falls through to the next). */
@@ -884,6 +960,8 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
       window.removeEventListener('resize', onResize);
       if (sheetView && sheetView.gw) sheetView.gw.removeEventListener('scroll', onSheetScroll);
       if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      if (pillH) clearTimeout(pillH);
+      if (onDocClick) document.removeEventListener('click', onDocClick);
       window.removeEventListener('focus', paintFocusHint); window.removeEventListener('blur', paintFocusHint);
       document.removeEventListener('keydown', onKey); document.removeEventListener('keyup', onKeyUp);
       if (timerH) clearInterval(timerH);

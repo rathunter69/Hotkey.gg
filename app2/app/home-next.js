@@ -11,6 +11,7 @@ import { pickNextLesson, statusOf, moduleStatus, pathModel } from './learn-page.
 import { DRILLS } from '../content/drills.js';
 import { dailyFor } from './daily.js';
 import { siteCopy } from '../content/copy/apply.js';
+import { moduleNumber, isFinalItem, FINAL_MODULE } from './numbering.js';
 
 /** The dashboard's built-in lines; site.csv (dash_*, due_*, save_nudge) overrides. Exported for the copy export. */
 export const DASH_LINES = { learn: 'The path: chapters, modules, lessons and their challenges, one story on one file.', practice: 'The reps: timed, no story. What is due today, the Daily, drills and rapid-fire.' };
@@ -54,7 +55,7 @@ function realCtx() {
   const day = dayOf();
   const todays = store.attempts({ kind: 'daily', day }).filter(a => a.clean && a.secs != null).sort((a, b) => a.secs - b.secs);
   const best = todays[0] || null;
-  return { all, queue: schedule.state(), daily: best ? { played: true, tier: best.tier, secs: best.secs, pos: null, of: null } : { played: false }, xp: ctx.xp, level: ctx.levelInfo, demo: false };
+  return { all, queue: schedule.stateOrBackfill(all, liveLessons()), daily: best ? { played: true, tier: best.tier, secs: best.secs, pos: null, of: null } : { played: false }, xp: ctx.xp, level: ctx.levelInfo, demo: false };
 }
 
 export function mountHomePage(root, pageCtx = {}) {
@@ -81,7 +82,7 @@ export function mountHomePage(root, pageCtx = {}) {
           <p>${esc(String(next.brief || next.read || '').split(/(?<=[.!?])\s+/)[0]).replace(/`([^`]+)`/g, '<kbd>$1</kbd>')}</p>
           <div class="hm-actions"><a class="btn btn-primary" id="homeContinue" href="#/lesson/${esc(next.id)}">${started ? 'Continue' : 'Start'} <kbd>Enter</kbd></a><a class="btn btn-ghost" href="#/learn">Data room</a></div>
         </div>
-        ${at ? `<div class="hm-c-ring">${ring(at.module.lessons.filter(l => all[l.id] && all[l.id].completed).length, at.module.lessons.length, { size: 72, stroke: 6, label: 'auto' })}<span>module ${at.k} of ${at.of7}</span></div>` : ''}
+        ${at ? `<div class="hm-c-ring">${ring(at.module.lessons.filter(l => all[l.id] && all[l.id].completed).length, at.module.lessons.length, { size: 72, stroke: 6, label: 'auto' })}<span>module ${esc(moduleNumber(at.module.id, at.k))}</span></div>` : ''}
       </section>`
     : `<section class="hm-continue"><div class="hm-cap">chapter 1 complete</div><div class="hm-c-main"><h1>Foundations: done.</h1><p>Page one of the pack is delivered. Keep it sharp from Practice, or open the data room.</p>
         <div class="hm-actions"><a class="btn btn-primary" id="homeContinue" href="#/practice">Practice <kbd>Enter</kbd></a><a class="btn btn-ghost" href="#/learn">Data room</a></div></div></section>`;
@@ -106,9 +107,18 @@ export function mountHomePage(root, pageCtx = {}) {
       </div>
     </section>`;
 
+  // 1.8: the project and assessment, as a ring beside the seven modules
+  function finalRing() {
+    const finals = ch1 ? ch1.lessons.filter(l => isFinalItem(l) && l.kind !== 'testout') : [];
+    if (!finals.length) return '';
+    const gate = store.chapter('foundations');
+    const done = finals.filter(l => all[l.id] && all[l.id].completed).length;
+    const st = gate.assessment || gate.testout ? 'complete' : done ? 'started' : 'not-started';
+    return `<a class="hm-ring hm-${st}" href="#/learn" title="${esc(FINAL_MODULE.title)} · ${done} of ${finals.length}">${ring(gate.testout ? finals.length : done, finals.length, { size: 44, stroke: 4 })}<span class="hm-ring-n">${FINAL_MODULE.n}</span><span class="hm-ring-t">Project and assessment</span></a>`;
+  }
   const modules = `<section class="hm-card hm-modules" aria-label="Modules">
       <div class="hm-cap">chapter 1 · foundations <span>${mods.filter(m => m.status === 'complete').length} of ${mods.length} modules</span></div>
-      <div class="hm-rings">${mods.map((m, i) => `<a class="hm-ring hm-${esc(m.status)}" href="#/learn" title="${esc(m.title)} · ${m.done} of ${m.total}">${ring(m.done, m.total, { size: 44, stroke: 4 })}<span class="hm-ring-n">1.${i + 1}</span><span class="hm-ring-t">${esc(m.title)}</span></a>`).join('')}</div>
+      <div class="hm-rings">${mods.map((m, i) => `<a class="hm-ring hm-${esc(m.status)}" href="#/learn" title="${esc(m.title)} · ${m.done} of ${m.total}">${ring(m.done, m.total, { size: 44, stroke: 4 })}<span class="hm-ring-n">${esc(moduleNumber(m.id, i + 1))}</span><span class="hm-ring-t">${esc(m.title)}</span></a>`).join('')}${finalRing()}</div>
     </section>`;
 
   const level = `<section class="hm-card hm-level" aria-label="Level">

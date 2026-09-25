@@ -11,6 +11,7 @@
 //
 //   schedule.note(ids, q)            record an outcome for shortcut ids (q 0–5, see grade())
 //   schedule.state()                 the stored map { id: { ef, ivl, due, reps, last, q } }
+//   schedule.stateOrBackfill(all, lessons)  the same, rebuilt once from completed lessons when this device has none
 //   dueToday(state, ctx, now)        → { items:[{ kind:'micro'|'challenge', id, title, task, secs, why }], secs }
 //   rapidOrder(deck, state, seed)    → deck indices, lowest memory first (rapid-fire draws from here)
 //   microLesson(id)                  → a small lesson object the lesson workspace can mount (#/due/<id>)
@@ -114,6 +115,26 @@ export function normaliseState(raw) {
   }
   return out;
 }
+/**
+ * A schedule rebuilt from lessons already completed (C2): a learner whose progress arrived without
+ * this device's memory notes — signed in on a new device, or finished lessons before the queue
+ * existed — gets each completed lesson's shortcuts reviewed once, as a solid pass (q 4), on the
+ * day the lesson was completed, oldest first. Only shortcuts that have a micro-drill count. Pure.
+ *   all      the progress map { id: { completed, at } }
+ *   lessons  the catalogue's lessons (goals carry `requires`)
+ */
+export function backfillFrom(all, lessons, now = Date.now()) {
+  const done = (lessons || []).filter(l => l && all && all[l.id] && all[l.id].completed)
+    .map(l => ({ l, at: finite(all[l.id].at) && all[l.id].at <= now ? all[l.id].at : now - DAY }))
+    .sort((a, b) => a.at - b.at);
+  let state = {};
+  for (const { l, at } of done) {
+    const ids = [...new Set((l.goals || []).flatMap(g => (g && Array.isArray(g.requires) ? g.requires : [])).filter(id => MICRO[id]))];
+    if (ids.length) state = applyEvent(state, { ids, q: 4 }, at);
+  }
+  return state;
+}
+
 function load() { try { return normaliseState(JSON.parse(localStorage.getItem(SCHEDULE_KEY) || 'null')); } catch (e) { return {}; } }
 function save(s) { try { localStorage.setItem(SCHEDULE_KEY, JSON.stringify(s)); return true; } catch (e) { return false; } }
 
@@ -126,6 +147,18 @@ export const schedule = {
     return save(applyEvent(load(), { ids: list, q }, now));
   },
   clear() { try { localStorage.removeItem(SCHEDULE_KEY); } catch (e) { /* ignore */ } },
+  /**
+   * The stored schedule, or — when this device has none yet and lessons are complete — one rebuilt
+   * from them (backfillFrom) and saved, so Due today is right from the first visit. Never
+   * overwrites notes already here.
+   */
+  stateOrBackfill(all, lessons, now = Date.now()) {
+    const cur = load();
+    if (Object.keys(cur).length) return cur;
+    const built = backfillFrom(all, lessons, now);
+    if (Object.keys(built).length) save(built);
+    return built;
+  },
 };
 
 /* ---------------- micro-drills: one shortcut, 30–45 s, on the module workbook's clothing ---------------- */

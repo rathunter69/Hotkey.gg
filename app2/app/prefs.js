@@ -37,7 +37,8 @@ export function detectPlatform(nav) {
 /** Defaults for a device that has never saved anything. */
 export function defaultPrefs(detected) {
   return { platform: PLATFORMS.includes(detected) ? detected : 'win', experience: null, firstRunDone: false, skipped: [], ribbon: null, mute: false, effects: 'full', ghost: true,
-    density: 'comfortable', panelSide: 'overlay', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false, dashHintsSeen: false };
+    density: 'comfortable', panelSide: 'overlay', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false, dashHintsSeen: false,
+    pagesDelivered: [], tabKeysNoted: false };
 }
 
 /**
@@ -72,6 +73,14 @@ export function normalisePrefs(raw, detected) {
   }
   out.saveNudgeDone = raw.saveNudgeDone === true;
   out.dashHintsSeen = raw.dashHintsSeen === true;
+  // the pack pages whose delivery moment has played (C2): it plays once per page, never again
+  if (Array.isArray(raw.pagesDelivered)) {
+    const seen = new Set();
+    for (const id of raw.pagesDelivered) { if (typeof id === 'string' && id && !seen.has(id) && seen.size < 100) seen.add(id); }
+    out.pagesDelivered = [...seen];
+  }
+  // the one note, in a browser tab, that the browser may take Ctrl+PgUp/PgDn (C2)
+  out.tabKeysNoted = raw.tabKeysNoted === true;
   return out;
 }
 
