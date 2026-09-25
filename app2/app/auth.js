@@ -8,6 +8,7 @@
 //   const t = auth.token();                  { id, generation }
 //   auth.current(t)                          false once the owner changed — DROP the result
 //   auth.onChange(fn)                        fn(user|null) after every owner change
+//   auth.lostUid()                           the account whose session died under it (expiry, 401), or null
 //
 // Every module that awaits anything account-related takes a token first and checks current()
 // after; a stale token means the reply is thrown away, silently. A → B → A is three generations.
@@ -22,6 +23,7 @@ let generation = 0;       // bumps on EVERY owner change, including A→B→A
 let currentUser = null;
 let listeners = [];
 let readyPromise = null;
+let lost = null;          // the uid whose session expired under it (this page load only)
 
 /** Pure core of the generation rule, exported for the tests. */
 export function makeOwnerTracker() {
@@ -39,9 +41,20 @@ export function makeOwnerTracker() {
  * The device keys sign-out must clear so the next account (or guest) never sees this one's data,
  * and the prefs fields that are learner state rather than device state. Exported for the tests.
  */
-export const SIGNOUT_WIPE_KEYS = ['hk2_progress_v1', 'hk2_outbox_v1', 'hk2_cache_v1', 'hk2_guest_id', 'hotkey_theme'];
-export function signOutWipe(storage) {
-  for (const k of SIGNOUT_WIPE_KEYS) { try { storage.removeItem(k); } catch (e) { /* blocked */ } }
+// records, the game-sync marker and the review schedule are account history on this device: left
+// behind, the next account to sign in here would replay them into ITS account as guest runs
+export const SIGNOUT_WIPE_KEYS = ['hk2_progress_v1', 'hk2_outbox_v1', 'hk2_cache_v1', 'hk2_game_outbox_v1', 'hk2_guest_id', 'hotkey_theme', 'hk2_records_v1', 'hk2_game_sync_v1', 'hk2_schedule_v1'];
+/**
+ * A session that died on its own (expiry, revoked refresh token, a 401 the refresh cannot fix) is
+ * not a sign-out: the uid-owned cache and outboxes stay, so nothing queued is lost and the same
+ * account picks them up on its next sign-in (another uid can never read or send them).
+ */
+export const EXPIRY_KEEP_KEYS = ['hk2_outbox_v1', 'hk2_cache_v1', 'hk2_game_outbox_v1'];
+export function signOutWipe(storage, opts = {}) {
+  for (const k of SIGNOUT_WIPE_KEYS) {
+    if (opts.expired && EXPIRY_KEEP_KEYS.includes(k)) continue;
+    try { storage.removeItem(k); } catch (e) { /* blocked */ }
+  }
   // supabase-js persists its session as sb-<ref>-auth-token; remove it ourselves so a hung
   // network signOut can never re-hydrate the session on the next load (old nav.js r311)
   try {
@@ -59,6 +72,7 @@ function setOwner(id, user) {
   if (next === owner) { currentUser = user || currentUser; return false; }
   owner = next;
   generation++;
+  if (next) lost = null;
   currentUser = user || null;
   return true;
 }
@@ -83,7 +97,9 @@ export const auth = {
           const u = session && session.user ? session.user : null;
           if (event === 'SIGNED_OUT') {
             // reactive sign-out (another tab, expiry): same wipe as the button
-            if (owner) { setOwner('', null); try { signOutWipe(localStorage); resetLearnerPrefs(); } catch (e) { /* blocked */ } emit(null); }
+            // An explicit sign-out elsewhere already wiped this device; otherwise it is expiry:
+            // degrade to guest and keep the uid-owned queue (see EXPIRY_KEEP_KEYS)
+            if (owner) expireNow();
             return;
           }
           // INITIAL_SESSION with no user is a returning guest, not a sign-out: do not wipe
@@ -107,6 +123,22 @@ export const auth = {
   token() { return { id: owner, generation }; },
   current(t) { return !!t && t.generation === generation && t.id === owner; },
   onChange(fn) { listeners.push(fn); return () => { listeners = listeners.filter(f => f !== fn); }; },
+  lostUid() { return owner ? null : lost; },
+
+  /**
+   * An RPC answered 401 / 'not signed in': refresh once; if the session cannot be revived, drop to
+   * guest without touching the uid-owned queue. Resolves true when the session is alive again.
+   */
+  async recover(t) {
+    if (!client || !this.current(t)) return false;
+    let ok = false;
+    try { const { data, error } = await client.auth.refreshSession(); ok = !error && !!(data && data.session); } catch (e) { ok = false; }
+    if (!this.current(t)) return false;
+    if (ok) return true;
+    expireNow();
+    try { await client.auth.signOut({ scope: 'local' }); } catch (e) { /* the local state is already guest */ }
+    return false;
+  },
 
   async signInPassword(email, password) {
     if (!client) return { error: 'Sign-in is not configured' };
@@ -138,6 +170,7 @@ export const auth = {
    * account-following theme go; platform/ribbon/mute stay (they belong to the machine).
    */
   async signOut() {
+    lost = null;
     setOwner('', null);
     try { signOutWipe(localStorage); } catch (e) { /* blocked */ }
     resetLearnerPrefs();
@@ -145,6 +178,17 @@ export const auth = {
     if (client) { try { await client.auth.signOut(); } catch (e) { /* the local wipe already happened */ } }
   },
 };
+
+/** Session died: guest from here on, uid-owned queue kept, `lost` remembers whose it is. */
+function expireNow() {
+  const was = owner;
+  if (!was) return;
+  setOwner('', null);
+  lost = was;
+  try { signOutWipe(localStorage, { expired: true }); } catch (e) { /* blocked */ }
+  resetLearnerPrefs();
+  emit(null);
+}
 
 function redirectTo() {
   try { return location.origin + location.pathname + '#/account'; } catch (e) { return undefined; }

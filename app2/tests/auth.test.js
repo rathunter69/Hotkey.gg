@@ -74,3 +74,12 @@ test('validateHandle mirrors the server rules', () => {
   assert.ok(validateHandle(null), 'null');
   assert.match('Under_Score_9', HANDLE_RE);
 });
+
+test('signOutWipe on expiry keeps the uid-owned queue and cache, and wipes the rest', () => {
+  const m = new Map();
+  const s = { get length() { return m.size; }, key(i) { return [...m.keys()][i] ?? null; }, getItem(k) { return m.has(k) ? m.get(k) : null; }, setItem(k, v) { m.set(k, String(v)); }, removeItem(k) { m.delete(k); } };
+  for (const k of SIGNOUT_WIPE_KEYS) s.setItem(k, '1');
+  signOutWipe(s, { expired: true });
+  for (const k of ['hk2_outbox_v1', 'hk2_cache_v1', 'hk2_game_outbox_v1']) assert.equal(s.getItem(k), '1', k + ' kept for the same account');
+  for (const k of ['hk2_records_v1', 'hk2_progress_v1', 'hk2_game_sync_v1']) assert.equal(s.getItem(k), null, k + ' wiped');
+});

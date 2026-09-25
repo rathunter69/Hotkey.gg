@@ -6,8 +6,10 @@
 //                paging rpc_my_progress, and an outbox (hk2_outbox_v1) of attempts flushed with
 //                backoff — the lesson never waits on the network
 //
-// Save state is honest and announced: saveState() returns 'device' | 'account' | 'retry' and
-// every change fires a `hk:save` window event with the same value (nav shows the §1 strings).
+// Save state is honest and announced: saveState() returns 'device' | 'pending' | 'account' |
+// 'retry' | 'failed' and every change fires a `hk:save` window event with the same value (nav
+// shows the §1 strings). A session that expires mid-run degrades to guest reads and writes while
+// the dead account's cache and outboxes stay on the device for its next sign-in (auth.lostUid).
 // Everything account-scoped carries an auth token; a reply for a stale token is dropped, and a
 // cache or outbox written by another uid is discarded, never sent.
 import { progress } from './progress.js';
@@ -84,6 +86,45 @@ export function rowsToLessons(rows) {
 }
 
 /**
+ * The caller's challenge runs (game_attempts rows, kind 'challenge') folded into a lessons map:
+ * any run is a pass (a finished challenge always records), the best tier across runs is the
+ * stamp, the fastest clean time is the best. A challenge passes as a game attempt, never a lesson
+ * attempt, so rpc_my_progress alone cannot rebuild a module after the cache is gone. Pure.
+ */
+export function mergeChallengeRuns(lessons, rows) {
+  let out = { ...(lessons || {}) };
+  for (const r of rows || []) {
+    if (!r || typeof r.ref !== 'string' || !r.ref) continue;
+    const secs = r.secs == null ? null : Number(r.secs);
+    out = mergeRun(out, r.ref, 'challenge', secs, r.clean === true, { tier: r.tier });
+    const at = r.client_at ? Date.parse(r.client_at) : NaN;
+    if (Number.isFinite(at)) out[r.ref] = { ...out[r.ref], at };
+  }
+  return out;
+}
+
+/**
+ * Runs still queued on this device, laid over what the server returned, so a hydrate never hides
+ * work that has not reached the account yet. Lesson items follow mergeRun; game items only
+ * matter here when they are challenges (the rest live in records.js). Pure.
+ */
+export function overlayQueued(lessons, lessonItems, gameItems) {
+  let out = { ...(lessons || {}) };
+  for (const i of lessonItems || []) if (i && typeof i.lesson_id === 'string') out = mergeRun(out, i.lesson_id, i.mode, i.secs, !i.assisted && !i.mouse_count);
+  for (const g of gameItems || []) if (g && g.kind === 'challenge' && typeof g.ref === 'string') out = mergeRun(out, g.ref, 'challenge', g.secs, g.clean === true, { tier: g.tier });
+  return out;
+}
+
+/** A PostgREST reply that means the session is gone (expired JWT, revoked, auth.uid() null). Pure. */
+export function isAuthError(error, status) {
+  if (status === 401 || status === 403 && /jwt/i.test(String(error && error.message))) return true;
+  if (!error) return false;
+  const code = String(error.code || '');
+  if (code === 'PGRST301' || code === 'PGRST302' || code === '401') return true;
+  return /jwt expired|invalid jwt|not signed in|JWSError/i.test(String(error.message || ''));
+}
+
+/**
  * Guest progress + prefs → the rpc_carry_over payload: one synthetic guided attempt per
  * completed lesson (secs null), plus solo/timed attempts carrying the flags and the best.
  * Pure over its inputs; exported for the tests.
@@ -115,8 +156,11 @@ let profile = null;          // { handle, level, xp, theme, experience, first_ru
 let cacheLessons = null;     // the account's lessons map (progress.js shape), null while not hydrated
 let flushTimer = null;
 let flushDelay = 1000;
-let lastSave = 'account';    // 'account' | 'retry' while signed in
+let lastSave = 'account';    // 'pending' | 'account' | 'retry' for the account
+let guestSave = 'device';    // 'device' | 'failed' (storage blocked) for a guest
 let hydrated = false;
+let flushing = null;         // the in-flight drain (one at a time: two drains could both send items[0])
+let gameFlushing = null;
 
 function announce(state) {
   try { if (typeof window !== 'undefined' && typeof CustomEvent === 'function') window.dispatchEvent(new CustomEvent('hk:save', { detail: state })); } catch (e) { /* no DOM */ }
@@ -125,6 +169,9 @@ function setSave(state) { lastSave = state; announce(state); }
 
 function uid() { const u = auth.user(); return u ? u.id : null; }
 function signedIn() { return auth.state() === 'in'; }
+/** Whose device state the store reads and writes: the signed-in uid, or the one whose session just expired. */
+function acct() { return uid() || (typeof auth.lostUid === 'function' ? auth.lostUid() : null); }
+function accountMode() { return !!acct(); }
 
 /** The cache belongs to exactly one uid; anything else (foreign, corrupt) is discarded. Pure. */
 export function ownedCache(raw, forUid) {
@@ -134,44 +181,71 @@ export function ownedCache(raw, forUid) {
 export function ownedOutbox(raw, forUid) {
   return isObj(raw) && forUid && raw.uid === forUid && Array.isArray(raw.items) ? raw.items : [];
 }
-function readCache() { return ownedCache(readJson(CACHE_KEY), uid()); }
-function writeCache(lessons) { writeJson(CACHE_KEY, { uid: uid(), lessons }); }
+function readCache() { return ownedCache(readJson(CACHE_KEY), acct()); }
+function writeCache(lessons) { return writeJson(CACHE_KEY, { uid: acct(), lessons }); }
 
-function readOutbox() { return ownedOutbox(readJson(OUTBOX_KEY), uid()); }
-function writeOutbox(items) { writeJson(OUTBOX_KEY, { uid: uid(), items }); }
+function readOutbox() { return ownedOutbox(readJson(OUTBOX_KEY), acct()); }
+function writeOutbox(items) { return writeJson(OUTBOX_KEY, { uid: acct(), items }); }
 
 function scheduleFlush(delay) {
   if (flushTimer || typeof setTimeout !== 'function') return;
   flushTimer = setTimeout(() => { flushTimer = null; flushOutbox(); }, delay == null ? flushDelay : delay);
 }
+function clearFlushTimer() { if (flushTimer) { clearTimeout(flushTimer); flushTimer = null; } }
 
-async function flushOutbox() {
-  if (!signedIn()) return;
-  const t = auth.token();
-  const items = readOutbox();
-  if (!items.length) { setSave('account'); return; }
-  const sb = auth.client();
-  if (!sb) return;
-  const item = items[0];
-  let failed = false;
+/**
+ * Send one queued item. 'sent' (stored, or a duplicate the server ignored by id), 'drop' (a
+ * malformed payload retrying cannot fix), 'retry' (network / server), 'auth' (session gone),
+ * 'missing' (the RPC is not deployed yet), 'stale' (the owner changed mid-flight).
+ */
+async function sendOne(sb, t, rpc, args) {
   try {
-    const { error } = await sb.rpc('rpc_record_attempt', { p: item });
-    if (!auth.current(t)) return;                        // owner changed mid-flight: drop
-    if (error) failed = !String(error.message || '').includes('bad attempt');
-    // 'bad attempt' is a malformed payload: retrying it forever cannot help — drop it
+    const { error, status } = await sb.rpc(rpc, args);
+    if (!auth.current(t)) return 'stale';
+    if (!error) return 'sent';
+    if (isAuthError(error, status)) return 'auth';
+    const msg = String(error.message || '');
+    if (msg.includes('bad attempt')) return 'drop';
+    if (/does not exist|schema cache|PGRST202/i.test(msg)) return 'missing';
+    return 'retry';
   } catch (e) {
-    if (!auth.current(t)) return;
-    failed = true;
+    return auth.current(t) ? 'retry' : 'stale';
   }
-  if (failed) {
-    setSave('retry');
-    flushDelay = Math.min(flushDelay * 2, 60000);
-    scheduleFlush();
-    return;
-  }
-  writeOutbox(readOutbox().filter(i => i.id !== item.id));
-  flushDelay = 1000;
-  if (readOutbox().length) scheduleFlush(0); else setSave('account');
+}
+
+/**
+ * Drain the lesson outbox in order, oldest first, one request at a time. An item leaves the
+ * queue only once the server has it; ids are client-made, so a reply lost after the insert
+ * resends a duplicate the server ignores — nothing is ever counted twice.
+ */
+function flushOutbox() {
+  if (flushing) return flushing;
+  // .finally is always async: an early return can never clear the slot before it is set
+  flushing = (async () => {
+    {
+      clearFlushTimer();
+      for (let guard = 0; guard < 500; guard++) {
+        if (!signedIn()) return;
+        const t = auth.token();
+        const items = readOutbox();
+        if (!items.length) { flushDelay = 1000; setSave('account'); return; }
+        const sb = auth.client(); if (!sb) return;
+        const item = items[0];
+        const r = await sendOne(sb, t, 'rpc_record_attempt', { p: item });
+        if (r === 'stale') return;
+        if (r === 'auth') { setSave('retry'); if (await auth.recover(t)) continue; return; }
+        if (r === 'retry' || r === 'missing') {
+          setSave('retry');
+          flushDelay = Math.min(flushDelay * 2, 60000);
+          scheduleFlush();
+          return;
+        }
+        writeOutbox(readOutbox().filter(i => i.id !== item.id));   // sent or dropped
+        flushDelay = 1000;
+      }
+    }
+  })().finally(() => { flushing = null; });
+  return flushing;
 }
 
 /* ---- game attempts (Phase D follow-up): a second outbox to rpc_submit_game_attempt.
@@ -182,8 +256,8 @@ const GAME_SYNC_KEY = 'hk2_game_sync_v1';
 let gameFlushTimer = null;
 let gameFlushDelay = 1000;
 let gameRpcMissing = false;   // 0007 not applied yet: park the queue instead of retrying forever
-function readGameOutbox() { return ownedOutbox(readJson(GAME_OUTBOX_KEY), uid()); }
-function writeGameOutbox(items) { writeJson(GAME_OUTBOX_KEY, { uid: uid(), items }); }
+function readGameOutbox() { return ownedOutbox(readJson(GAME_OUTBOX_KEY), acct()); }
+function writeGameOutbox(items) { return writeJson(GAME_OUTBOX_KEY, { uid: acct(), items }); }
 
 /** A local attempt as the RPC payload (records.cleanAttempt shapes it; `at` becomes client_at). */
 export function attemptToWire(a) {
@@ -197,36 +271,35 @@ function scheduleGameFlush(delay) {
   if (gameRpcMissing || gameFlushTimer || typeof setTimeout !== 'function') return;
   gameFlushTimer = setTimeout(() => { gameFlushTimer = null; flushGameOutbox(); }, delay == null ? gameFlushDelay : delay);
 }
-async function flushGameOutbox() {
-  if (!signedIn()) return;
-  const t = auth.token();
-  const items = readGameOutbox();
-  if (!items.length) return;
-  const sb = auth.client(); if (!sb) return;
-  const item = items[0];
-  let failed = false;
-  try {
-    const { _guest, ...p } = item;
-    const { error } = await sb.rpc('rpc_submit_game_attempt', { p, p_guest: !!_guest });
-    if (!auth.current(t)) return;
-    if (error) {
-      const msg = String(error.message || '');
-      if (msg.includes('bad attempt')) failed = false;                     // malformed: drop, retrying cannot help
-      else if (/does not exist|schema cache|PGRST202/i.test(msg)) { gameRpcMissing = true; return; }   // server not there yet: park until the next hydrate
-      else failed = true;
+function flushGameOutbox() {
+  if (gameFlushing) return gameFlushing;
+  // .finally is always async: an early return can never clear the slot before it is set
+  gameFlushing = (async () => {
+    {
+      if (gameFlushTimer) { clearTimeout(gameFlushTimer); gameFlushTimer = null; }
+      for (let guard = 0; guard < 1000; guard++) {
+        if (!signedIn()) return;
+        const t = auth.token();
+        const items = readGameOutbox();
+        if (!items.length) { gameFlushDelay = 1000; return; }
+        const sb = auth.client(); if (!sb) return;
+        const item = items[0];
+        const { _guest, ...p } = item;
+        const r = await sendOne(sb, t, 'rpc_submit_game_attempt', { p, p_guest: !!_guest });
+        if (r === 'stale') return;
+        if (r === 'missing') { gameRpcMissing = true; return; }   // server not there yet: park until the next hydrate
+        if (r === 'auth') { if (await auth.recover(t)) continue; return; }
+        if (r === 'retry') {
+          gameFlushDelay = Math.min(gameFlushDelay * 2, 60000);
+          scheduleGameFlush();
+          return;
+        }
+        writeGameOutbox(readGameOutbox().filter(i => i.id !== item.id));
+        gameFlushDelay = 1000;
+      }
     }
-  } catch (e) {
-    if (!auth.current(t)) return;
-    failed = true;
-  }
-  if (failed) {
-    gameFlushDelay = Math.min(gameFlushDelay * 2, 60000);
-    scheduleGameFlush();
-    return;
-  }
-  writeGameOutbox(readGameOutbox().filter(i => i.id !== item.id));
-  gameFlushDelay = 1000;
-  if (readGameOutbox().length) scheduleGameFlush(0);
+  })().finally(() => { gameFlushing = null; });
+  return gameFlushing;
 }
 
 /** Once per account on this device: replay the guest game records into the account (id-deduped). */
@@ -261,6 +334,31 @@ async function fetchAllProgress(sb, t) {
     if (data.length < 200) break;
     after = data[data.length - 1].lesson_id;
   }
+  return rows;
+}
+
+/** The caller's challenge runs (owner-only select under RLS); null on any failure. */
+async function fetchChallengeRuns(sb, t) {
+  try {
+    const { data, error } = await sb.from('game_attempts').select('ref, tier, secs, clean, client_at').eq('kind', 'challenge').order('created_at', { ascending: true }).limit(2000);
+    if (!auth.current(t) || error || !Array.isArray(data)) return null;
+    return data;
+  } catch (e) { return null; }
+}
+
+/** Page rpc_my_game (the caller's clean-run PBs); null on any failure. */
+async function fetchGamePbs(sb, t) {
+  const rows = [];
+  let after = '';
+  try {
+    for (let page = 0; page < 20; page++) {
+      const { data, error } = await sb.rpc('rpc_my_game', { p_after: after, p_limit: 200 });
+      if (!auth.current(t) || error || !Array.isArray(data)) return null;
+      rows.push(...data);
+      if (data.length < 200) break;
+      after = data[data.length - 1].ref;
+    }
+  } catch (e) { return null; }
   return rows;
 }
 
@@ -304,14 +402,14 @@ async function maybeCarryOver(sb, t) {
 
 export const store = {
   /* ---- reads: cache when signed in and hydrated, else the guest modules ---- */
-  all() { if (signedIn()) { const c = cacheLessons || readCache(); if (c) return c; } return progress.all(); },
+  all() { if (accountMode()) { const c = cacheLessons || readCache(); if (c) return c; } return progress.all(); },
   get(id) { return this.all()[id] || null; },
   status(id) {
     const p = this.get(id);
     return !p ? 'todo' : p.timed || p.solo ? 'mastered' : p.completed ? 'done' : 'started';
   },
   touch(id) {
-    if (signedIn()) {
+    if (accountMode()) {
       const c = this.all();
       if (!c[id]) { cacheLessons = { ...c, [id]: { started: true, at: Date.now() } }; writeCache(cacheLessons); }
       return true;
@@ -324,9 +422,10 @@ export const store = {
    * outbox push, background flush. Returns false only when nothing could be stored at all.
    */
   record(id, mode, secs, opts = {}) {
-    if (!signedIn()) {
+    if (!accountMode()) {
       const ok = progress.record(id, mode, secs, opts);
-      announce(ok ? 'device' : 'retry');
+      guestSave = ok ? 'device' : 'failed';
+      announce(guestSave);
       return ok;
     }
     cacheLessons = mergeRun(this.all(), id, mode, secs, opts.clean, opts);
@@ -345,8 +444,9 @@ export const store = {
       client_at: new Date().toISOString(),
     };
     const queued = writeOutbox(readOutbox().concat([item]));
-    setSave('retry');            // honest until the flush confirms
-    scheduleFlush(0);
+    if (!signedIn()) setSave('retry');                   // session expired: queued for the next sign-in
+    else if (lastSave !== 'retry') setSave('pending');   // honest until the drain confirms
+    if (signedIn()) flushOutbox();
     return cached || queued;
   },
 
@@ -358,9 +458,9 @@ export const store = {
      rides the game outbox to rpc_submit_game_attempt (0007), deduped server-side by id. ---- */
   addAttempt(a) {
     const ok = records.addAttempt(a);
-    if (signedIn()) {
+    if (accountMode()) {
       const w = attemptToWire(a);
-      if (w) { writeGameOutbox(readGameOutbox().concat([w])); scheduleGameFlush(0); }
+      if (w) { writeGameOutbox(readGameOutbox().concat([w])); if (signedIn() && !gameRpcMissing) flushGameOutbox(); }
     }
     return ok;
   },
@@ -397,11 +497,16 @@ export const store = {
   },
 
   /* ---- save state ---- */
-  saveState() { return signedIn() ? lastSave : 'device'; },
+  saveState() { return accountMode() ? lastSave : guestSave; },
   /** The §1 string for a state (nav and pages share one wording). */
   saveText(state) {
     const s = state || this.saveState();
-    return s === 'account' ? 'Saved to your account' : s === 'retry' ? 'Couldn’t save, will retry' : 'Saved on this device';
+    return SAVE_TEXT[s] || SAVE_TEXT.device;
+  },
+  /** The same state as a phrase after "Your progress is …" (landing, learn, home). */
+  saveLine(state) {
+    const s = state || this.saveState();
+    return SAVE_LINE[s] || SAVE_LINE.device;
   },
 
   /* ---- account ---- */
@@ -420,9 +525,18 @@ export const store = {
     if (prof) profile = prof;
     await maybeCarryOver(sb, t);
     if (!auth.current(t)) return;
-    const rows = await fetchAllProgress(sb, t);
+    const [rows, runs, pbs] = await Promise.all([fetchAllProgress(sb, t), fetchChallengeRuns(sb, t), fetchGamePbs(sb, t)]);
     if (!auth.current(t)) return;
-    if (rows) { cacheLessons = rowsToLessons(rows); writeCache(cacheLessons); hydrated = true; }
+    if (rows) {
+      // the server's lessons + its challenge passes (modules rebuild from both) + anything still queued here
+      let l = rowsToLessons(rows);
+      if (runs) l = mergeChallengeRuns(l, runs);
+      else l = mergeChallengeRuns(l, Object.entries(readCache() || {}).filter(([, v]) => v && v.challenge).map(([ref, v]) => ({ ref, tier: v.tier, secs: v.best, clean: v.best != null })));
+      cacheLessons = overlayQueued(l, readOutbox(), readGameOutbox());
+      writeCache(cacheLessons);
+      hydrated = true;
+    }
+    if (pbs) records.importPbs(pbs);   // PBs survive a new device or a sign-out wipe (the ghost trace stays local)
     if (profile) {
       // the profile is the source of learner state once signed in
       prefs.set({ experience: profile.experience || null, firstRunDone: !!profile.first_run_done, skipped: profile.skipped_lessons || [] });
@@ -430,10 +544,10 @@ export const store = {
       try { if (profile.theme && profile.theme !== currentTheme()) { applyTheme(profile.theme); saveTheme(profile.theme); } } catch (e) { /* no DOM */ }
       if (profile.handle) announceUser();
     }
-    if (readOutbox().length) { setSave('retry'); scheduleFlush(0); } else setSave('account');
+    if (readOutbox().length) { setSave('pending'); flushOutbox(); } else setSave('account');
     gameRpcMissing = false;   // a fresh session may have 0007 by now
     maybeGameSync();
-    if (readGameOutbox().length) scheduleGameFlush(0);
+    if (readGameOutbox().length) flushGameOutbox();
   },
   /** The theme picker calls this on every pick; signed in, the pick rides the account. */
   setTheme(name) {
@@ -445,9 +559,53 @@ export const store = {
       .catch(() => { /* next pick retries */ });
   },
   /** Drop the in-memory account state (sign-out path; auth cleared the device keys already). */
-  reset() { profile = null; cacheLessons = null; hydrated = false; lastSave = 'account'; flushDelay = 1000; announce('device'); },
+  reset() {
+    profile = null; cacheLessons = null; hydrated = false; flushDelay = 1000; gameFlushDelay = 1000;
+    clearFlushTimer(); if (gameFlushTimer) { clearTimeout(gameFlushTimer); gameFlushTimer = null; }
+    lastSave = auth.lostUid && auth.lostUid() && (readOutbox().length || readGameOutbox().length) ? 'retry' : 'account';
+    announce(this.saveState());
+  },
   flushNow() { return flushOutbox(); },
+  /** Both queues, now; resolves when they are empty or stuck (the sign-out button waits on this, capped). */
+  async drain(ms = 3000) {
+    if (!signedIn()) return this.pending() === 0;
+    const until = Date.now() + ms;
+    const passes = (async () => {
+      // an in-flight drain may be the one about to back off: a couple of fresh passes, then stop
+      for (let i = 0; i < 3 && this.pending() && signedIn() && Date.now() < until; i++) {
+        await Promise.all([flushOutbox(), gameRpcMissing ? null : flushGameOutbox()]);
+      }
+    })();
+    let timer = null;
+    await Promise.race([passes, new Promise(r => { timer = setTimeout(r, ms); })]);
+    clearTimeout(timer);
+    return this.pending() === 0;
+  },
+  /** Runs queued on this device that the account does not have yet. */
+  pending() { return accountMode() ? readOutbox().length + readGameOutbox().length : 0; },
 };
+
+const SAVE_TEXT = {
+  device: 'Saved on this device',
+  pending: 'Saving to your account…',
+  account: 'Saved to your account',
+  retry: 'Couldn’t save, will retry',
+  failed: 'Couldn’t save on this device',
+};
+const SAVE_LINE = {
+  device: 'saved on this device',
+  pending: 'being saved to your account',
+  account: 'saved to your account',
+  retry: 'kept on this device until your account can be reached',
+  failed: 'not being saved: this browser is blocking storage',
+};
+
+// back online: drain now instead of waiting out the backoff
+try {
+  if (typeof window !== 'undefined' && window.addEventListener) {
+    window.addEventListener('online', () => { if (signedIn()) { flushDelay = 1000; gameFlushDelay = 1000; flushOutbox(); if (!gameRpcMissing) flushGameOutbox(); } });
+  }
+} catch (e) { /* no DOM */ }
 
 function announceUser() {
   try {

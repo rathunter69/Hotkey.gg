@@ -96,6 +96,28 @@ export const records = {
   trace(ref) { return load().traces[ref] || []; },
   /** No attempt at this ref yet: the next run is the first (soft-timed for a challenge). */
   first(ref) { return !load().attempts.some(a => a.ref === ref); },
+  /**
+   * Seed PBs from the account (rpc_my_game rows) after sign-in: a server PB takes the slot when
+   * this device has none or a slower one. The ghost trace of a PB set elsewhere stays empty.
+   */
+  importPbs(rows) {
+    if (!Array.isArray(rows) || !rows.length) return false;
+    try {
+      const s = load();
+      let changed = false;
+      for (const r of rows) {
+        const secs = r && r.secs != null ? Number(r.secs) : NaN;
+        if (!r || typeof r.ref !== 'string' || !finite(secs) || secs < 0) continue;
+        const prev = s.pbs[r.ref];
+        if (prev && prev.secs <= secs) continue;
+        const at = r.at ? Date.parse(r.at) : NaN;
+        s.pbs[r.ref] = { ref: r.ref, secs, keys: Number.isInteger(r.keys) ? r.keys : 0, attemptId: typeof r.attempt_id === 'string' ? r.attempt_id : null, at: finite(at) ? at : 0 };
+        if (!prev || prev.attemptId !== s.pbs[r.ref].attemptId) delete s.traces[r.ref];
+        changed = true;
+      }
+      return changed ? save(s) : false;
+    } catch (e) { return false; }
+  },
   clear() { try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } },
 };
 
