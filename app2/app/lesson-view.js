@@ -504,7 +504,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     if (lesson.timeLimit) {
       // reading is free: until the first key the clock says when it starts (SITE_SPEC §5, §6a pre-run)
       // the pass par is the number Home and Learn show; the limit is named as one
-      if (run.startedAt == null && phase === 'play') { t.textContent = `clock starts on your first key · ` + (lesson.pars && lesson.pars.pass ? `pass ${lesson.pars.pass} s · limit ${lesson.timeLimit} s` : `${lesson.timeLimit} s`); t.classList.add('pre'); return; }
+      if (run.startedAt == null && phase === 'play') { t.innerHTML = `clock starts on your first key · <span class="nw">` + (lesson.pars && lesson.pars.pass ? `pass ${+lesson.pars.pass} s · limit ${+lesson.timeLimit} s` : `${+lesson.timeLimit} s`) + '</span>'; t.classList.add('pre'); return; }
       t.classList.remove('pre');
       const left = Math.max(0, lesson.timeLimit - (run.startedAt == null ? 0 : run.elapsed));
       if (run.opts.soft && left <= 0 && run.startedAt != null) { t.textContent = 'over the limit'; return; }   // a first attempt runs on; the tier is gone, the module is not

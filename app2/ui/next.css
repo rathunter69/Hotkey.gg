@@ -559,6 +559,8 @@ html[data-density="comfortable"] .lesson.panel-overlay .task-card{padding:11px 1
 @media (prefers-reduced-motion: reduce){ .tab-count.pop{animation:none} }
 /* before the first key of a timed run: when the clock starts, quietly */
 .lesson-timer.pre{color:var(--faint); font-size:11px; font-family:var(--mono)}
+.panel-head .lesson-timer.pre{white-space:normal; flex-basis:100%; line-height:1.4}
+.lesson-timer.pre .nw{white-space:nowrap}   /* the pre-run line wraps inside the card, never past its edge */
 /* the once-in-the-browser note on the first Ctrl+PgUp/PgDn goal */
 .task-tabkeys{margin-top:8px; padding:8px 10px; font-size:12.5px; line-height:1.45; color:var(--text); background:var(--surface); border:1px dashed var(--accent-dim); border-radius:8px}
 .task-tabkeys .btn{margin-top:6px; padding:3px 10px; font-size:12px}

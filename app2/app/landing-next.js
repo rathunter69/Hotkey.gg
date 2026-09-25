@@ -57,8 +57,8 @@ export function microClauses(line) { return String(line || '').split(' · ').map
 
 /** The line under the hero demo, by state: waiting, focused (keys go to the sheet), taken over, failed to load. */
 const DEMO_NOTES = {
-  idle: 'A real lesson, playing itself. <b>Click it, then type</b>: the sheet is yours.',
-  still: 'A real lesson, ready to play. <b>Play it</b>, or click it and type: the sheet is yours.',
+  idle: 'Four goals from Chapter 1 on a real sheet, playing themselves. <b>Click it, then type</b>: the sheet is yours.',
+  still: 'Four goals from Chapter 1 on a real sheet, ready to play. <b>Play it</b>, or click it and type: the sheet is yours.',
   focus: 'Your keys go to the sheet now. <b>Type</b> to take it over; <b>Tab</b> moves on.',
   taken: '<b>Yours.</b> Same four goals, any route. <a href="#/start">Start learning</a> when you want the real thing.',
   failed: 'The live demo didn’t load; the still shows the finished sheet. <a href="#/start">Start learning</a> to do it yourself.',

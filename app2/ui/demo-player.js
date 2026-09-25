@@ -108,7 +108,7 @@ export function mountDemo(host, o = {}) {
     ? '<div class="dp-keyband"><span class="dp-sheettab" id="demoTab"></span><div class="keyflash demo dp-keys" id="demoKeys" aria-hidden="true"></div></div>'
     : '<div class="dp-keyband"><span class="dp-keyband-cap">keys pressed</span><div class="keyflash demo dp-keys" id="demoKeys" aria-hidden="true"></div></div>';
   el.innerHTML = `
-    <div class="dp-head"><span class="dp-dots"><i></i><i></i><i></i></span><span class="dp-cap">a lesson · chapter 1 · move and select</span><span class="dp-count" id="demoCount">0 / 4</span></div>
+    <div class="dp-head"><span class="dp-dots"><i></i><i></i><i></i></span><span class="dp-cap">chapter 1 · four goals from three modules</span><span class="dp-count" id="demoCount">0 / 4</span></div>
     <div class="dp-grid">
       <div class="dp-stage"><div class="stage"><div class="stage-row"><div class="stage-main">
         <div class="ribbon-slot rib-full" id="demoRibbonSlot"><div class="ribbon" id="demoRibbon"></div></div><div id="demoSheet"></div>

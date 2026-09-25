@@ -17,7 +17,7 @@ const POSTERS = { full: './clips/demo-full.jpg', compact: './clips/demo-compact.
 export function mountDemoPoster(host, o = {}) {
   const el = document.createElement('div');
   el.className = 'dp dp-poster' + (o.compact ? ' dp-compact' : '');
-  el.innerHTML = `<div class="dp-head"><span class="dp-dots"><i></i><i></i><i></i></span><span class="dp-cap">a lesson · chapter 1 · move and select</span><span class="dp-count" id="demoCount">4 / 4</span></div>
+  el.innerHTML = `<div class="dp-head"><span class="dp-dots"><i></i><i></i><i></i></span><span class="dp-cap">chapter 1 · four goals from three modules</span><span class="dp-count" id="demoCount">4 / 4</span></div>
     <div class="dp-poster-img"><img src="${o.compact ? POSTERS.compact : POSTERS.full}" alt="A finished lesson: the Austin site feed with its header row bold and the gridlines off, all four goals done" decoding="async"></div>
     <div class="dp-poster-note" hidden>The live demo did not load; this still shows the finished sheet. <a href="#/lesson/inherited-workbook">Open lesson 1.1.1</a> to do it yourself.</div>`;
   if (host) host.appendChild(el);
