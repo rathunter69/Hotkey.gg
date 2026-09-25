@@ -25,12 +25,15 @@ try{var f=localStorage.getItem('hk2_flow');document.documentElement.setAttribute
 <meta name="theme-color" content="#16a862">
 </head>
 <body>
-<div id="navMount"></div>
-<div class="app"><main id="root"></main></div>
+<!-- the shell paints with the HTML: a nav bar and a page shape stand in until the app mounts over them -->
+<div id="navMount"><nav class="topnav" aria-label="site"><div class="topnav-in"><a class="topnav-brand" href="#/">hotkey<b>.gg</b></a></div></nav></div>
+<div class="app"><main id="root"><div class="sk sk-boot" role="status" aria-label="Loading"><span class="sk-sr">Loading…</span><div class="sk-bar sk-title"></div><div class="sk-bar sk-sub"></div><div class="sk-col"><div class="sk-card"></div><div class="sk-card"></div></div></div></main></div>
 <div id="footMount"></div>
+<!-- boot watchdog: if the app never replaces the boot shape (a module failed, or the network stalled), say so and offer a reload -->
+<script>(function(){function stuck(){var r=document.getElementById('root');if(!r||!r.querySelector('.sk-boot'))return;r.innerHTML='<div class="err-card" role="alert"><div class="err-cap">hotkey.gg · could not load</div><div class="err-body"><h1>hotkey.gg did not finish loading.</h1><p>Part of the site did not arrive. Check your connection and reload.</p><div class="err-actions"><button class="btn btn-primary" type="button" onclick="location.reload()">Reload</button></div></div></div>';}window.__hkBootFail=stuck;setTimeout(stuck,12000);})();</script>
 <!-- pinned supabase-js UMD (classic script, never imported): exposes window.supabase for app/auth.js -->
 <script defer src="./vendor/supabase.js"></script>
-<script type="module">
+<script type="module" onerror="window.__hkBootFail&&window.__hkBootFail()">
   import { startApp } from './app/main.js';
   startApp({ navEl: document.getElementById('navMount'), rootEl: document.getElementById('root'), footEl: document.getElementById('footMount') });
 </script>

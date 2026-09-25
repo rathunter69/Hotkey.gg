@@ -13,14 +13,21 @@ const SHAPES = {
   // Home: Learn on the left (continue + modules), Practice on the right (due, the Daily, level)
   home: () => `<div class="sk-halves"><div class="sk-col">${card('sk-tall', 4)}${card('', 2)}</div><div class="sk-col">${card('', 2)}${card('', 3)}${card('', 2)}</div></div>${bar('sk-strip')}`,
   // the data room: title, deal strip, the folder tree and the module documents
-  learn: () => `${bar('sk-title')}${bar('sk-sub')}${bar('sk-strip')}<div class="sk-dr"><div class="sk-tree">${bar()}${bar()}${bar()}${bar()}</div><div class="sk-col">${card('sk-tall', 5)}${card('', 5)}${card('', 5)}</div></div>`,
+  learn: () => `${bar('sk-title')}${bar('sk-sub')}${bar('sk-strip')}<div class="sk-dr"><div class="sk-tree">${Array.from({ length: 6 }, () => bar()).join('')}</div><div class="sk-col">${card('sk-tall', 5)}${card('', 5)}${card('', 5)}</div></div>`,
+  // the landing: the headline column beside the demo card
+  hero: () => `<div class="sk-hero"><div class="sk-col">${bar('sk-h1')}${bar('sk-h1 sk-short')}${bar('sk-sub')}${bar('sk-sub sk-short')}${bar('sk-cta')}</div><div class="sk-card sk-demo"></div></div>`,
+  // the first run: one frame, the size of the real one
+  frame: () => `<div class="sk-card sk-fr"></div>`,
   // anything else: a title and three cards
   page: () => `${bar('sk-title')}${bar('sk-sub')}<div class="sk-col">${card('', 3)}${card('', 3)}${card('', 3)}</div>`,
 };
-const SHAPE_OF = { lesson: 'ws', drill: 'ws', due: 'ws', rapid: 'ws', home: 'home', learn: 'learn' };
+const SHAPE_OF = { lesson: 'ws', drill: 'ws', due: 'ws', rapid: 'ws', home: 'home', learn: 'learn', landing: 'hero', root: 'hero', start: 'frame' };
+
+/** The shape a route paints: 'ws' | 'home' | 'learn' | 'hero' | 'frame' | 'page'. Exported for the tests. */
+export const shapeOf = name => SHAPE_OF[name] || 'page';
 
 /** The placeholder for a route name. */
 export function skeletonHtml(name) {
-  const shape = SHAPE_OF[name] || 'page';
+  const shape = shapeOf(name);
   return `<div class="sk sk-${shape}" role="status" aria-live="polite" aria-label="Loading"><span class="sk-sr">Loading…</span>${SHAPES[shape]()}</div>`;
 }

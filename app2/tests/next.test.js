@@ -13,7 +13,9 @@ import { DEMO_LESSON, demoScript } from '../ui/demo-player.js';
 import { STAGES, dealState } from '../app/deal-strip.js';
 import { PLANNED_MODULES } from '../app/learn-next.js';
 import { LessonRun } from '../app/runner.js';
-import { parseRoute, titleFor, navKeyFor } from '../app/main.js';
+import { parseRoute, titleFor, navKeyFor, pageLabel, storyboardAllowed, HOME_TITLE } from '../app/main.js';
+import { skeletonHtml, shapeOf } from '../ui/skeleton.js';
+import { readFileSync } from 'node:fs';
 import { LESSONS, moduleOf } from '../content/index.js';
 import { EVENTS } from '../app/telemetry.js';
 
@@ -39,6 +41,40 @@ test('routes: the due micro-drill and the storyboard parse; the flow query rides
   assert.equal(parseRoute('#/learn?flow=next').query.flow, 'next');
   assert.equal(titleFor('storyboard'), 'Storyboard · hotkey.gg');
   assert.equal(titleFor('due'), 'Due today · hotkey.gg');
+});
+
+test('router: error cards name pages as people do; the storyboard is local-only; one landing title', () => {
+  assert.equal(pageLabel('home'), 'Home');
+  assert.equal(pageLabel('learn'), 'Learn');
+  assert.equal(pageLabel('drill', { daily: true }), 'The Daily');
+  assert.equal(pageLabel('drill', { id: 'edge-jumps' }), 'This drill');
+  assert.equal(pageLabel('start'), 'Getting started');
+  assert.equal(pageLabel('notfound'), 'This page');
+  for (const n of ['home', 'learn', 'practice', 'rapid', 'due', 'start', 'landing', 'lesson', 'reference']) assert.doesNotMatch(pageLabel(n), /^The (home|rapid|due|start|notfound) page/);
+  assert.equal(storyboardAllowed('127.0.0.1', {}), true);
+  assert.equal(storyboardAllowed('localhost', {}), true);
+  assert.equal(storyboardAllowed('hotkey.gg', {}), false);
+  assert.equal(storyboardAllowed('hotkey.gg', { dev: '1' }), true);
+  // the landing's tab title is index.html's own, so a shared link and the tab agree
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  assert.equal(/<title>([^<]+)<\/title>/.exec(html)[1], HOME_TITLE);
+  assert.equal(titleFor('landing'), HOME_TITLE);
+  assert.equal(titleFor('root'), HOME_TITLE);
+  assert.equal(navKeyFor('landing'), '');
+  assert.equal(navKeyFor('start'), '');
+});
+
+test('skeleton: every routed page has a placeholder shaped like it', () => {
+  const routes = ['root', 'landing', 'home', 'start', 'learn', 'lesson', 'practice', 'drill', 'rapid', 'due', 'leaderboard', 'reference', 'pricing', 'teams', 'account', 'about', 'notfound'];
+  const expect = { root: 'hero', landing: 'hero', start: 'frame', home: 'home', learn: 'learn', lesson: 'ws', drill: 'ws', rapid: 'ws', due: 'ws' };
+  for (const r of routes) {
+    assert.equal(shapeOf(r), expect[r] || 'page', r);
+    const h = skeletonHtml(r);
+    assert.match(h, new RegExp('class="sk sk-' + shapeOf(r) + '"'), r);
+    assert.match(h, /role="status"/);
+  }
+  // the data room rail: one bar per chapter folder (six), so the page does not jump when it lands
+  assert.equal((skeletonHtml('learn').match(/<div class="sk-tree">(.*?)<\/div><div class="sk-col">/)[1].match(/sk-bar/g) || []).length, 6);
 });
 
 test('cues: the target is the last reference a goal names; rows, columns and other sheets count', () => {

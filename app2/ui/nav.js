@@ -229,7 +229,7 @@ export function mountNav(el, opts = {}) {
   /** The level chip (Phase D): shows from level 2 — a fresh visitor sees no game furniture. */
   function setLevel(lvl) {
     let chip = el.querySelector('#navLevel');
-    if (!Number.isFinite(lvl) || lvl < 2) { if (chip) chip.remove(); return; }
+    if (!Number.isFinite(lvl) || lvl < 1) { if (chip) chip.remove(); return; }   // L1 shows too: the orientation card points at it
     if (!chip) {
       chip = document.createElement('span'); chip.id = 'navLevel'; chip.className = 'nav-level';
       const tools = el.querySelector('.topnav-tools'); if (tools) tools.insertBefore(chip, tools.firstChild);

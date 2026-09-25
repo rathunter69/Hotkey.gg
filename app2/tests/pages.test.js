@@ -142,7 +142,7 @@ test('parseRoute: every documented route, with params and query', () => {
 });
 
 test('navKeyFor and titleFor', () => {
-  assert.equal(navKeyFor('root'), 'learn'); assert.equal(navKeyFor('lesson'), 'learn'); assert.equal(navKeyFor('start'), 'learn');
+  assert.equal(navKeyFor('root'), ''); assert.equal(navKeyFor('landing'), ''); assert.equal(navKeyFor('lesson'), 'learn'); assert.equal(navKeyFor('start'), ''); assert.equal(navKeyFor('learn'), 'learn');
   assert.equal(navKeyFor('drill'), 'practice'); assert.equal(navKeyFor('leaderboard'), 'leaderboard'); assert.equal(navKeyFor('reference'), 'reference');
   assert.equal(navKeyFor('pricing'), '');
   assert.equal(titleFor('learn'), 'Learn · hotkey.gg');

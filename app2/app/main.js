@@ -26,12 +26,13 @@ import { store } from './store.js';
 import { auth } from './auth.js';
 import { track, installErrorLog } from './telemetry.js';
 import { captureInstall } from './install.js';
-import { lessonById } from '../content/index.js';
 import { LEGACY_IDS } from './progress.js';
-import { gameCtx } from './stats.js';
-import { earnedSet } from '../ui/badges.js';
-import { themeStates } from './cosmetics.js';
 import { skeletonHtml } from '../ui/skeleton.js';
+import { itemNumber } from './numbering.js';
+// the lesson catalogue and the XP/cosmetics stack load lazily (they are most of the module graph):
+// the nav, the footer and a page skeleton paint first, then the level chip and theme locks catch up
+const lessonsMod = () => import('../content/index.js');
+const statsMod = () => Promise.all([import('./stats.js'), import('../ui/badges.js'), import('./cosmetics.js')]);
 
 const NAV_LINKS = [
   { key: 'learn', label: 'Learn', href: '#/learn' },
@@ -75,17 +76,20 @@ export function parseRoute(hash) {
   return { name, params, query, path };
 }
 
-/** Which nav link a route lights up. */
+/** Which nav link a route lights up. The landing, the first run and Home light none: they are not Learn. */
 export function navKeyFor(name) {
-  if (['root', 'landing', 'start', 'learn', 'lesson'].includes(name)) return 'learn';
+  if (name === 'learn' || name === 'lesson') return 'learn';
   if (name === 'practice' || name === 'drill' || name === 'rapid' || name === 'due') return 'practice';
   if (name === 'leaderboard' || name === 'reference') return name;
   return '';
 }
 
+/** index.html's own <title>: the landing keeps it, so the tab and a shared link agree. */
+export const HOME_TITLE = 'hotkey.gg — Excel isn\u2019t learned. It\u2019s practiced.';
+
 /** The document title for a route. */
 export function titleFor(name, extra) {
-  const T = { root: 'hotkey.gg — Learn Excel by doing', landing: 'hotkey.gg — Learn Excel by doing', home: 'Home · hotkey.gg', start: 'Get started · hotkey.gg', learn: 'Learn · hotkey.gg',
+  const T = { root: HOME_TITLE, landing: HOME_TITLE, home: 'Home · hotkey.gg', start: 'Get started · hotkey.gg', learn: 'Learn · hotkey.gg',
     lesson: (extra ? extra + ' · ' : '') + 'hotkey.gg', practice: 'Practice · hotkey.gg', drill: (extra ? extra + ' · ' : '') + 'Practice · hotkey.gg', leaderboard: 'Leaderboard · hotkey.gg',
     reference: 'Reference · hotkey.gg', pricing: 'Pricing · hotkey.gg', teams: 'Teams · hotkey.gg', account: 'Account · hotkey.gg', about: 'About · hotkey.gg',
     terms: 'Terms · hotkey.gg', privacy: 'Privacy · hotkey.gg', eula: 'EULA · hotkey.gg', contact: 'Contact · hotkey.gg', notfound: 'Page not found · hotkey.gg',
@@ -152,25 +156,58 @@ async function loadPage(entry) {
   } catch (e) { retries[entry.file] = n + 1; throw e; }
 }
 
-function errorCard(root, what, retry) {
+/** What the error card calls a route's page ("Learn did not load."). Exported for the tests. */
+export function pageLabel(name, params) {
+  const L = { home: 'Home', landing: 'The front page', root: 'Home', start: 'Getting started', learn: 'Learn', lesson: 'This lesson',
+    practice: 'Practice', drill: params && params.daily ? 'The Daily' : 'This drill', rapid: 'Rapid-fire', due: 'Due today',
+    leaderboard: 'The leaderboard', reference: 'The shortcut reference', pricing: 'Pricing', teams: 'Teams', account: 'Your account' };
+  return L[name] || 'This page';
+}
+
+/**
+ * The card a page that failed shows instead of an empty screen. `kind` 'fetch' (a file did not
+ * arrive: the connection is the likely cause) or 'mount' (the page threw: our fault, not theirs).
+ * The secondary action never points back at the page that just failed.
+ */
+function errorCard(root, { name, params, kind }, retry) {
+  const label = pageLabel(name, params);
+  const onHome = name === 'home' || name === 'root' || name === 'landing';
+  const body = kind === 'mount'
+    ? 'Something broke on our side. Retry, or go to ' + (onHome ? 'Learn' : 'Home') + '.'
+    : label + ' could not be fetched. Check your connection and try again.';
   root.innerHTML = `<div class="err-card" role="alert"><div class="err-cap">hotkey.gg · could not load</div>
-    <div class="err-body"><h1>This page did not load.</h1><p>${esc(what)} could not be fetched. Check your connection and try again.</p>
-    <div class="err-actions"><button class="btn btn-primary" id="errRetry" type="button">Retry</button><a class="btn btn-ghost" href="#/">Home</a></div></div></div>`;
+    <div class="err-body"><h1>${esc(label)} did not load.</h1><p>${esc(body)}</p>
+    <div class="err-actions"><button class="btn btn-primary" id="errRetry" type="button">Retry</button>${onHome ? '<a class="btn btn-ghost" href="#/learn">Learn</a>' : '<a class="btn btn-ghost" href="#/">Home</a>'}</div></div></div>`;
   const b = root.querySelector('#errRetry'); b.onclick = retry; b.focus();
 }
 
-function narrowNotice(root, lesson) {
+/** A lesson's number for the narrow notice ('Lesson 1.2.3', 'Challenge 1.1'); '' when it has none. */
+function narrowCrumb(lesson, content) {
+  try {
+    const num = itemNumber(lesson, content.moduleOf ? content.moduleOf(lesson) : null);
+    if (!num) return '';
+    return lesson.kind === 'challenge' ? 'Challenge ' + num.replace(/\.C$/, '') : 'Lesson ' + num;
+  } catch (e) { return ''; }
+}
+
+function narrowNotice(root, lesson, content) {
   const el = document.createElement('div'); el.className = 'narrow-page';
   const teach = lesson && (lesson.steps || []).find(s => s.mode === 'teach');
+  const crumb = lesson ? narrowCrumb(lesson, content || {}) : '';
   el.innerHTML = `<div class="narrow-msg" role="status"><div class="narrow-cap">hotkey.gg</div>
       <h1>hotkey.gg needs a keyboard and a wider screen.</h1>
       <p>Lessons and drills run on a real spreadsheet with the keyboard. Open this page on a laptop or desktop, at least 900px wide.</p>
-      <div class="narrow-actions"><a class="btn btn-ghost" href="#/learn">Back to the catalog</a></div></div>` +
-    (lesson ? `<article class="narrow-lesson"><div class="lesson-crumb">Lesson ${esc(lesson.id)}</div><h2>${esc(lesson.title)}</h2>` +
+      <div class="narrow-actions"><a class="btn btn-ghost" href="#/learn">Back to Learn</a></div></div>` +
+    (lesson ? `<article class="narrow-lesson">${crumb ? `<div class="lesson-crumb">${esc(crumb)}</div>` : ''}<h2>${esc(lesson.title)}</h2>` +
       (teach ? `<h3>${esc(teach.title)}</h3>` + teach.body.map(p => `<p>${esc(p).replace(/`([^`]+)`/g, '<kbd>$1</kbd>')}</p>`).join('') : '') +
       `<p class="lesson-goalsintro">You will:</p><ol class="goals goals-preview">${(lesson.goals || []).map(g => `<li>${esc(g.text)}</li>`).join('')}</ol></article>` : '');
   root.appendChild(el);
   return { destroy() { el.remove(); } };
+}
+
+/** The storyboard is internal: it opens on a local server or with ?dev=1, and is a 404 elsewhere. */
+export function storyboardAllowed(host, query) {
+  return /^(localhost|127\.0\.0\.1|\[::1\])$/.test(String(host || '')) || !!(query && query.dev === '1');
 }
 
 export function startApp({ navEl, rootEl, footEl }) {
@@ -183,13 +220,23 @@ export function startApp({ navEl, rootEl, footEl }) {
   const nav = mountNav(navEl, {
     links: NAV_LINKS, active: 'learn', account: true,
     onTheme: k => store.setTheme(k), onSignOut: () => auth.signOut(),
-    // cosmetic locks (Phase D): resolved lazily when the picker opens
+    // cosmetic locks (Phase D): resolved when the picker opens, from the stack loaded after first paint
     themeLocks: () => {
-      const ctx = gameCtx();
-      return Object.fromEntries(themeStates({ level: ctx.level, earned: earnedSet(ctx), rankIndex: ctx.rankIndex }).map(s => [s.key, s.lock]));
+      if (!stats) return {};
+      const ctx = stats.gameCtx();
+      return Object.fromEntries(stats.themeStates({ level: ctx.level, earned: stats.earnedSet(ctx), rankIndex: ctx.rankIndex }).map(s => [s.key, s.lock]));
     },
   });
   const footer = footEl ? mountFooter(footEl) : null;
+  let stats = null;   // { gameCtx, earnedSet, themeStates } once the lazy stack arrives
+  // the level chip: none on the landing and the first run (a visitor has no level yet), L1 upward elsewhere
+  function refreshLevel() {
+    const name = document.body.dataset.route;
+    if (name === 'landing' || name === 'start') { nav.setLevel(null); return; }
+    const set = () => { try { nav.setLevel(stats.gameCtx().level); } catch (e) { /* records unreadable: no chip */ } };
+    if (stats) set();
+    else statsMod().then(([st, b, c]) => { stats = { gameCtx: st.gameCtx, earnedSet: b.earnedSet, themeStates: c.themeStates }; set(); }).catch(() => { /* retried on the next route */ });
+  }
 
   // ---- accounts: boot auth (PKCE ?code= returns are exchanged inside ready(); the hash
   // router never reads location.search, so the return lands on #/account untouched)
@@ -208,6 +255,7 @@ export function startApp({ navEl, rootEl, footEl }) {
   });
   window.addEventListener('hk:save', e => {
     nav.setSaveState(store.saveText(e.detail));
+    refreshLevel();   // a record was just written: XP may have crossed a level
     // a result card showing the save line follows it ("Saving…" → "Saved to your account")
     document.querySelectorAll('[data-save-text]').forEach(n => { n.textContent = store.saveText(e.detail); });
   });
@@ -229,21 +277,30 @@ export function startApp({ navEl, rootEl, footEl }) {
     const next = applyFlowQuery(r.query); reflectFlow(next);
     let name = r.name;
     if (name === 'root') name = isReturning() ? 'home' : 'landing';
-    let lesson = null;
-    if (name === 'lesson') { lesson = lessonById(r.params.id); if (!lesson) { if (LEGACY_IDS.has(r.params.id)) { location.replace('#/learn'); return; } name = 'notfound'; } }   // a deleted lesson's URL goes to the catalog (Run 4)
+    if (name === 'storyboard' && !storyboardAllowed(location.hostname, r.query)) name = 'notfound';
+    let lesson = null, content = null;
+    if (name === 'lesson') {
+      const early = setTimeout(() => { if (myGen === gen && !rootEl.firstChild) rootEl.innerHTML = skeletonHtml('lesson'); }, 50);
+      try { content = await lessonsMod(); } catch (e) { clearTimeout(early); if (myGen === gen) fetchFailed({ name, params: r.params }); return; }
+      clearTimeout(early);
+      if (myGen !== gen) return;
+      lesson = content.lessonById(r.params.id);
+      if (!lesson) { if (LEGACY_IDS.has(r.params.id)) { location.replace('#/learn'); return; } name = 'notfound'; }   // a deleted lesson's URL goes to the catalog (Run 4)
+    }
     let drill = null;
     if (name === 'drill' && !r.params.daily && r.params.id !== 'sandbox') {
-      drill = (await import('../content/drills.js')).drillById(r.params.id);
+      try { drill = (await import('../content/drills.js')).drillById(r.params.id); } catch (e) { if (myGen === gen) fetchFailed({ name, params: r.params }); return; }
+      if (myGen !== gen) return;
       if (!drill) name = 'notfound';
     }
     nav.setActive(navKeyFor(name === 'home' ? 'root' : name));
-    try { nav.setLevel(gameCtx().level); } catch (e) { /* records unreadable: no chip */ }
     document.title = titleFor(name, lesson ? lesson.title : name === 'drill' ? (drill ? drill.title : 'Sandbox') : '');
     document.body.dataset.route = name;
+    refreshLevel();
     window.scrollTo(0, 0);
 
     // the workspace routes need a keyboard and width; below the breakpoint show the notice instead
-    if ((name === 'lesson' || name === 'drill' || name === 'rapid' || name === 'due') && narrowMq && narrowMq.matches) { current = narrowNotice(rootEl, lesson); return; }
+    if ((name === 'lesson' || name === 'drill' || name === 'rapid' || name === 'due') && narrowMq && narrowMq.matches) { current = narrowNotice(rootEl, lesson, content); return; }
 
     const base = LOADERS[name] || LOADERS.notfound;
     const entry = next && base.next ? base.next : base;
@@ -253,11 +310,10 @@ export function startApp({ navEl, rootEl, footEl }) {
     try { mount = await loadPage(entry); }
     catch (e) {
       clearTimeout(skel);
-      if (myGen !== gen) return;
-      rootEl.innerHTML = '';
-      errorCard(rootEl, 'The ' + name + ' page', route);
+      if (myGen === gen) fetchFailed({ name, params: r.params });
       return;
     }
+    retrying = false;
     clearTimeout(skel);
     if (myGen !== gen) return;
     if (rootEl.querySelector('.sk')) rootEl.innerHTML = '';
@@ -269,8 +325,17 @@ export function startApp({ navEl, rootEl, footEl }) {
       current = res && typeof res.destroy === 'function' ? res : { destroy() { rootEl.innerHTML = ''; } };
     } catch (e) {
       console.error(e);
-      errorCard(rootEl, 'The ' + name + ' page', route);
+      errorCard(rootEl, { name, params: r.params, kind: 'mount' }, route);
     }
+  }
+  let retrying = false;
+  function retryRoute() { retrying = true; route(); }
+  // a Retry that fails again is a dependency the module map cached as failed: only a reload refetches it
+  function fetchFailed(what) {
+    if (retrying && (typeof navigator === 'undefined' || navigator.onLine !== false)) { retrying = false; location.reload(); return; }
+    retrying = false;
+    rootEl.innerHTML = '';
+    errorCard(rootEl, { ...what, kind: 'fetch' }, retryRoute);
   }
 
   window.addEventListener('hashchange', route);
