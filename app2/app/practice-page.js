@@ -1,11 +1,12 @@
-// app2/app/practice-page.js — Practice (SITE_SPEC §5): the drill list with pars, personal bests
-// and best tiers; the Daily; rapid-fire; the sandbox; timed runs on completed lessons. The paid
+// app2/app/practice-page.js — Practice (SITE_SPEC §2, §5): the drill list with pars, personal bests
+// and best tiers (the module challenges among them); the Daily; rapid-fire; the sandbox. The module
+// challenge replaced the per-lesson timed run (SITE_SPEC §4), so lessons are not listed here. The paid
 // chapters' drills arrive with their chapters.
 //
-// Layout: the drill list (with Timed runs under it) takes two thirds; a rail stacks the Daily,
+// Layout: the drill list takes two thirds; a rail stacks the Daily,
 // Keep sharp, rapid-fire and the sandbox. Each drill names the module that teaches its keys:
 // "taught in 1.2" once that module's lessons are done, "after 1.6" until then. Nothing locks.
-import { LESSONS, lessonNumber, CHAPTERS, modulesOf, moduleOf } from '../content/index.js';
+import { lessonNumber, CHAPTERS, modulesOf, moduleOf } from '../content/index.js';
 import { DRILLS } from '../content/drills.js';
 import { store } from './store.js';
 import { prefs } from './prefs.js';
@@ -17,9 +18,6 @@ import { moduleNumber, itemNumber } from './numbering.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const TIER_LABEL = { pass: 'pass', pro: 'pro', legendary: 'legendary' };
-/** How many timed runs the card lists before it hands over to Learn. */
-export const RUNS_SHOWN = 10;
-
 /** One unit format for every time on the page: 'best 12.3 s', pars '4 s'. */
 export const fmtSecs = n => (Math.round(n * 10) / 10).toFixed(1) + ' s';
 
@@ -92,17 +90,6 @@ export function keepSharp(all, now = Date.now(), attemptsFor = ref => store.atte
   return null;
 }
 
-/** The Timed runs list: the first RUNS_SHOWN completed lessons, then ONE link to the rest in Learn. Pure. */
-export function timedRunsHtml(done, all) {
-  const items = done.slice(0, RUNS_SHOWN).map(l => {
-    const { n, title } = runLabel(l);
-    const best = all[l.id] && all[l.id].best != null ? 'best ' + fmtSecs(all[l.id].best) : 'no time yet';
-    return `<li><a href="#/lesson/${esc(l.id)}?mode=timed"><span class="pl-n">${esc(n)}</span> ${esc(title)}</a><span class="muted">${best}</span></li>`;
-  });
-  if (done.length > RUNS_SHOWN) items.push(`<li class="pl-more"><a href="#/learn">See all ${done.length} in Learn</a></li>`);
-  return `<ul class="plain-list runs-list">${items.join('')}</ul>`;
-}
-
 /** One drill row. `a.drow` is the row's link: its title, stretched over the whole row, so the module tag can be a link of its own. */
 function drillRowHtml(d, all, skipped) {
   const pb = store.pb(d.id);
@@ -128,7 +115,6 @@ export function mountPracticePage(root) {
   el.className = 'page practice';
   const all = store.all();
   const skipped = prefs.get().skipped;
-  const done = LESSONS.filter(l => all[l.id] && all[l.id].completed);
   const day = dayOf();
   const daily = dailyFor(day);
   const dailyDrill = DRILLS.find(d => d.id === daily.drillId);
@@ -147,13 +133,6 @@ export function mountPracticePage(root) {
               <div class="drill-head" aria-hidden="true"><span></span><span>pass</span><span>pro</span><span>legendary</span><span>tier</span><span>best</span></div>
               ${rows}
             </div>
-          </div>
-        </section>
-        <section class="pcard pcard-runs">
-          <div class="pcard-cap"><span>timed runs</span>${done.length ? `<span class="pcard-tag">${done.length} lesson${done.length === 1 ? '' : 's'} done</span>` : ''}</div>
-          <div class="pcard-body">
-            ${done.length ? `<p>Lessons you have completed, against the clock.</p>${timedRunsHtml(done, all)}`
-              : `<h2>Lessons you have completed, against the clock</h2><p>Complete a lesson first; it then appears here with a Timed option. <a href="#/learn">Open the catalog</a>.</p>`}
           </div>
         </section>
       </div>

@@ -1,11 +1,10 @@
 // The Practice page's pure parts: which module teaches each drill, when that module counts as
-// taught, the curriculum labels on timed runs and challenges, one time format, and the Timed
-// runs list handing over to Learn in ONE element.
+// taught, the curriculum labels on challenges, and one time format.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DRILLS } from '../content/drills.js';
 import { lessonById, CHAPTERS, modulesOf } from '../content/index.js';
-import { DRILL_MODULE, drillModule, moduleTaught, runLabel, challengeName, fmtSecs, timedRunsHtml, RUNS_SHOWN } from '../app/practice-page.js';
+import { DRILL_MODULE, drillModule, moduleTaught, runLabel, challengeName, fmtSecs } from '../app/practice-page.js';
 
 test('practice: every drill names the chapter 1 module that teaches its keys', () => {
   const ids = new Set(modulesOf(CHAPTERS[0]).map(m => m.id));
@@ -40,7 +39,7 @@ test('practice: a module is taught once every lesson is completed or skipped, ne
   assert.equal(moduleTaught(null, all, []), false);
 });
 
-test('practice: timed runs and challenges read as the curriculum writes them', () => {
+test('practice: lessons and challenges read as the curriculum writes them', () => {
   assert.deepEqual(runLabel(lessonById('around-the-workbook')), { n: '1.2.3', title: lessonById('around-the-workbook').title });
   const ch = lessonById('challenge-inherited-file');
   const label = runLabel(ch);
@@ -56,15 +55,3 @@ test('practice: one time format, a space before the unit', () => {
   assert.equal(fmtSecs(150), '150.0 s');
 });
 
-test('practice: the Timed runs list ends in ONE link to Learn when it overflows', () => {
-  const done = modulesOf(CHAPTERS[0]).flatMap(m => m.lessons).slice(0, RUNS_SHOWN + 3);
-  const all = Object.fromEntries(done.map(l => [l.id, { completed: true }]));
-  all[done[0].id].best = 41.33;
-  const html = timedRunsHtml(done, all);
-  assert.equal((html.match(/<li/g) || []).length, RUNS_SHOWN + 1);
-  assert.match(html, /<li class="pl-more"><a href="#\/learn">See all 13 in Learn<\/a><\/li><\/ul>$/);
-  assert.match(html, /best 41\.3 s/);
-  const short = timedRunsHtml(done.slice(0, 2), all);
-  assert.equal((short.match(/<li/g) || []).length, 2);
-  assert.doesNotMatch(short, /See all/);
-});

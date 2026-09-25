@@ -288,8 +288,6 @@ html[data-dark="1"] .l-sheet td.l-in{color:#6ea8f7}
 /* the body keeps buttons at their own width (flex-start); lists and grids take the full width */
 .pcard-body .plain-list, .acard-body .plain-list, .pcard-body .drill-list, .acard-body .stats-grid, .acard-body .stats-badges{width:100%; align-self:stretch}
 .pcard h2 .pl-n{font-family:var(--mono); font-size:.8em; font-weight:500; color:var(--muted)}
-.runs-list .pl-n{font-family:var(--mono); font-size:12px; color:var(--muted); margin-right:4px}
-.runs-list li.pl-more{justify-content:flex-start}
 @media (max-width:1000px){ .practice-grid{grid-template-columns:minmax(0,1fr)} .practice-rail{order:-1; display:grid; grid-template-columns:1fr 1fr} }
 @media (max-width:640px){ .practice-rail{grid-template-columns:1fr} }
 
