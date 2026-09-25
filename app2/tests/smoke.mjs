@@ -1,6 +1,7 @@
 // Browser smoke — the non-blocking CI job (REBUILD_PLAN §3): under 2 minutes, every network request
 // that is not loopback is blocked, never run against production. Usage:
 //   node app2/tests/smoke.mjs            (serves the repo itself on a free port)
+//   SMOKE_FULL=1 node app2/tests/smoke.mjs   (adds the project and test-out replays; no time budget)
 // Requires Playwright: locally the global install at /opt/node22/lib/node_modules/playwright, in CI
 // `npm install --no-save playwright@<pinned>`; the module is resolved from either.
 import { createRequire } from 'node:module';
@@ -14,6 +15,8 @@ try { ({ chromium } = require('playwright')); } catch (e) { ({ chromium } = requ
 
 const PORT = Number(process.env.PORT || 8765);
 const T0 = Date.now();
+const FULL = process.env.SMOKE_FULL === '1';
+const BUDGET_S = 120;   // the brief's ceiling for the blocking smoke; the full run is exempt
 const server = spawn(process.execPath, [new URL('./serve.js', import.meta.url).pathname], { env: { ...process.env, PORT: String(PORT) }, stdio: 'ignore' });
 await new Promise(r => setTimeout(r, 700));
 
@@ -165,7 +168,10 @@ try {
   // (find/replace dialog, hide+freeze, cross-sheet formulas, the two-sheet project)
   // one lesson per module that carries new engine ground (paste special, grouping/freeze, F4 repeat, cross-sheet pointing, the audit), one seeded challenge, the project; the last lesson is the test-out
   const extras = ['copy-cut-paste-fill', 'hide-group-freeze', 'the-style-pass', 'link-across-sheets', 'hardcode-hunt', 'challenge-audit-before-you-send', 'weekly-kpi-project'].map(id => LESSONS.find(l => l.id === id)).filter(Boolean);
-  for (const lesson of [...extras, LESSONS[LESSONS.length - 1]]) {   // 1.1.1 is played by the journey above
+  // the two longest replays (the project, ~30 s, and the test-out) run with SMOKE_FULL=1 (nightly, on demand) so the
+  // blocking run stays well inside its two minutes; lessons.test.js replays every solution headless on every gate
+  const longOnes = FULL ? [LESSONS.find(l => l.id === 'weekly-kpi-project'), LESSONS[LESSONS.length - 1]].filter(Boolean) : [];
+  for (const lesson of [...extras.filter(l => l.id !== 'weekly-kpi-project'), ...longOnes]) {   // 1.1.1 is played by the journey above
     await page.goto(base + '#/lesson/' + lesson.id);
     // the goal list sits behind the floating card (B4), so wait for it attached, not visible
     const opened = await page.waitForSelector('.goal.current, #startBtn', { timeout: 5000, state: 'attached' }).catch(() => null);
@@ -279,6 +285,7 @@ try {
 } finally {
   if (errors.length) { failures += errors.length; console.log('ERRORS\n' + errors.join('\n')); }
   const secs = ((Date.now() - T0) / 1000).toFixed(1);
+  if (!FULL && +secs > BUDGET_S) { failures++; console.log(`FAIL the smoke took ${secs}s, over its ${BUDGET_S}s budget`); }
   console.log(failures ? `SMOKE FAILED: ${failures} problem(s) in ${secs}s` : `SMOKE OK in ${secs}s`);
   await browser.close();
   server.kill();
