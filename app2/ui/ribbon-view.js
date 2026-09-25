@@ -79,6 +79,41 @@ export function leanRibbonHtml(menuKey, withExtra) {
   return html;
 }
 
+/**
+ * A big button's label as Excel sets it: one line when it is short or a single word, else two lines
+ * split at the space that keeps the longer line shortest ("Page Break" / "Preview", "Text to" /
+ * "Columns"). Never three: the third line is what overprinted the group caption. `fit` is the
+ * characters a 52px button holds on one line at the compact size (mono, 10px).
+ */
+export function bigLabelLines(label, fit = 7) {
+  const s = String(label == null ? '' : label).trim().replace(/\s+/g, ' ');
+  const words = s.split(' ');
+  if (words.length < 2 || s.length <= fit) return [s];
+  let best = null;
+  for (let i = 1; i < words.length; i++) {
+    const a = words.slice(0, i).join(' '), b = words.slice(i).join(' ');
+    const cost = Math.max(a.length, b.length);
+    if (!best || cost < best.cost) best = { cost, lines: [a, b] };
+  }
+  return best.lines;
+}
+/** The label (and menu arrow) of a big button: a two-line label carries its arrow after the last word, a one-line label keeps it on its own row. */
+function bigLabelHtml(label, caret) {
+  const lines = bigLabelLines(label); const inline = caret && lines.length > 1;
+  return '<span class="rf-lbl">' + lines.map((ln, i) => '<span class="rf-ln">' + esc(ln) + (inline && i === lines.length - 1 ? '<span class="rf-caret">▾</span>' : '') + '</span>').join('') + '</span>' +
+    (caret && !inline ? '<span class="rf-caret">▾</span>' : '');
+}
+
+/**
+ * Where a dropdown `w` wide opens under an anchor spanning [aL, aR]: left edges aligned, or right edges
+ * aligned when that would cross `hi` (Excel flips a menu opened near the window's edge), always inside [lo, hi].
+ */
+export function dropLeft(aL, aR, w, lo, hi) {
+  let x = aL;
+  if (x + w > hi) x = aR - w;
+  return Math.round(Math.max(lo, Math.min(x, hi - w)));
+}
+
 const swatchesHtml = (SW, idx) => SW.map((sw, i) => { const bg = (sw.k === null) ? 'repeating-linear-gradient(45deg,#bbb 0 4px,#eee 4px 8px)' : sw.hex;
   return '<span class="fc-swatch' + (i === idx ? ' on' : '') + '" data-act="swatch:' + i + '" title="' + esc(sw.name) + '" style="background:' + bg + '"></span>'; }).join('');
 
@@ -232,7 +267,7 @@ export class RibbonView {
     if (!d) {
       d = document.createElement('div'); d.className = 'pd-backdrop'; d.id = id;
       d.innerHTML = '<div class="pd-box">' +
-        '<div class="pd-title">' + title + ' <span class="x">esc to cancel</span></div>' +
+        '<div class="pd-title">' + title + '</div>' +
         '<div class="pd-group">' + (groupTitle ? '<h4>' + groupTitle + '</h4>' : '') + '<div class="pd-opts"></div></div>' +
         '<div class="pd-foot">' + footer + '</div>' +
         '</div>';
@@ -256,7 +291,7 @@ export class RibbonView {
     let d = document.getElementById(id);
     if (!d) {
       d = document.createElement('div'); d.className = 'pd-backdrop wb-card'; d.id = id;
-      d.innerHTML = '<div class="pd-box ' + cls + '"><div class="pd-title">' + title + ' <span class="x">esc to cancel</span></div><div class="wb-body"></div><div class="pd-foot"></div></div>';
+      d.innerHTML = '<div class="pd-box ' + cls + '"><div class="pd-title">' + title + '</div><div class="wb-body"></div><div class="pd-foot"></div></div>';
       document.body.appendChild(d);
       d.addEventListener('click', this._onClick);
       d.addEventListener('mousedown', this._onDown);
@@ -470,7 +505,7 @@ export class RibbonView {
     // the sheet cards: Rename Sheet (Alt H O R, a double-click on the tab), Delete Sheet's confirm (Alt H D S), Move or Copy (Alt H O M)
     if (ss.dialog === 'group' || this.groupDialog) {
       const d = this.groupDialog || (this.groupDialog = this.wideCard('groupDialog', 'Group', 'pd-mid'));
-      if (ss.dlg && ss.dlg.kind === 'group') { const t = d.querySelector('.pd-title'); if (t && t.firstChild) t.firstChild.nodeValue = (ss.dlg.ungroup ? 'Ungroup' : 'Group') + ' '; }
+      if (ss.dlg && ss.dlg.kind === 'group') { const t = d.querySelector('.pd-title'); if (t && t.firstChild) t.firstChild.nodeValue = ss.dlg.ungroup ? 'Ungroup' : 'Group'; }
       this.showCard(d, ss.dialog === 'group' && !!ss.dlg, ss.dialog === 'group' ? this.groupHtml() : '', RibbonView.okCancel('OK'));
     }
     if (ss.dialog === 'renamesheet' || this.renameDialog) {
@@ -510,7 +545,13 @@ export class RibbonView {
     const a = typeof anchor === 'string' ? this.el.querySelector('.ri-cmd[data-k="' + anchor + '"]') : anchor;
     const ar = (a || this.el).getBoundingClientRect();
     const dw = d.offsetWidth;
-    d.style.left = Math.max(8, Math.min(window.innerWidth - dw - 8, ar.left)) + 'px';
+    // inside the workspace frame (the ribbon spans it), never past it; clientWidth, not innerWidth, so a page
+    // scrollbar cannot squeeze the menu and push its hint onto a second line
+    const vw = document.documentElement.clientWidth || window.innerWidth;
+    const fr = this.el.getBoundingClientRect();
+    let lo = Math.max(8, fr.left), hi = Math.min(vw - 8, fr.right);
+    if (hi - lo < dw) { lo = 8; hi = vw - 8; }   // a frame narrower than the menu: the window bounds it
+    d.style.left = dropLeft(ar.left, ar.right, dw, lo, hi) + 'px';
     d.style.top = (ar.bottom + 4) + 'px';
   }
   /** The full bar's control for a KeyTip path (button or split), else the tab row. */
@@ -692,7 +733,7 @@ export class RibbonView {
     return '<div class="rf-grp rf-collapsed" data-group="' + esc(g.name) + '"><div class="rf-cols">' +
       `<button type="button" tabindex="-1" class="rf-btn big rf-grpbtn${open ? ' open' : ''}${live ? '' : ' dis'}" data-act="group:${esc(g.name)}" aria-haspopup="menu" aria-expanded="${open}"${live ? '' : ' aria-disabled="true"'} title="${esc(g.name)} — open the group">` +
       (tips.length ? '<span class="rf-grptips">' + tips.map(t => '<span class="ri-key">' + t + '</span>').join('') + '</span>' : '') +
-      `<span class="rf-ico">${icon}</span><span class="rf-lbl">${esc(g.name)}</span><span class="rf-caret">▾</span></button></div><div class="rf-gname">${esc(g.name)}${this.launcherHtml(g, pathStr, walking)}</div></div>`;
+      `<span class="rf-ico">${icon}</span>${bigLabelHtml(g.name, true)}</button></div><div class="rf-gname">${esc(g.name)}${this.launcherHtml(g, pathStr, walking)}</div></div>`;
   }
   /** A folded group's dropdown: every item of the group, live ones clickable, menus one level deeper, KeyTips while walking. */
   groupDropHtml(name) {
@@ -728,7 +769,7 @@ export class RibbonView {
     const badgeHtml = badge ? '<span class="ri-key">' + badge + '</span>' : '';
     if (it.box) {
       const u = UNIMPLEMENTED_BY_ID[it.dead] || { label: it.dead };
-      return `<span class="rf-box dis" aria-disabled="true" title="${esc(u.label)} — not available yet" style="width:${it.w | 0}px">${badgeHtml}<span class="rf-box-v">${esc(it.box)}</span><span class="rf-caret">▾</span></span>`;
+      return `<span class="rf-box dis" aria-disabled="true" title="${esc(u.label)} — not available yet" style="min-width:${it.w | 0}px">${badgeHtml}<span class="rf-box-v">${esc(it.box)}</span><span class="rf-caret">▾</span></span>`;
     }
     if (it.dead) {
       const u = UNIMPLEMENTED_BY_ID[it.dead] || { label: it.dead, icon: '' };
@@ -756,8 +797,9 @@ export class RibbonView {
     const cls = 'rf-btn' + (o.big ? ' big' : '') + (o.iconOnly ? ' ico' : '') + (o.cls ? ' ' + o.cls : '') + (o.open ? ' open' : '') + (o.pressed ? ' on' : '');
     const attrs = (o.act ? ' data-act="' + o.act + '"' : '') + (o.tip ? ' data-tip="' + o.tip + '"' : '') + (o.disabled ? ' aria-disabled="true"' : '') +
       (o.haspopup ? ' aria-haspopup="menu" aria-expanded="' + !!o.open + '"' : '') + (o.pressed !== undefined ? ' aria-pressed="' + !!o.pressed + '"' : '');
+    const caret = o.caret ? '<span class="rf-caret">▾</span>' : '';
     return `<button type="button" tabindex="-1" class="${cls}"${attrs} title="${esc(o.title || o.label)}">${o.badge || ''}<span class="rf-ico">${o.icon || ''}</span>` +
-      (o.iconOnly ? '' : `<span class="rf-lbl">${esc(o.label)}</span>`) + (o.caret ? '<span class="rf-caret">▾</span>' : '') + '</button>';
+      (o.iconOnly ? caret : o.big ? bigLabelHtml(o.label, o.caret) : `<span class="rf-lbl">${esc(o.label)}</span>` + caret) + '</button>';
   }
 
   /* ================= slim mode (today's strip) ================= */

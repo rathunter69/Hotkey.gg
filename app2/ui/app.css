@@ -542,10 +542,10 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 .rf-body::-webkit-scrollbar{display:none}
 .rf-grp{display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:0 6px 1px; border-right:1px solid var(--line); flex:none}
 .rf-grp:last-child{border-right:0}
-.rf-cols{display:flex; align-items:flex-start; gap:2px; flex:1 1 auto}
+.rf-cols{display:flex; align-items:flex-start; gap:2px; flex:1 1 auto; min-height:0}
 .rf-col{display:flex; flex-direction:column; gap:1px}
 .rf-row{display:flex; align-items:center; gap:1px}
-.rf-gname{font-family:var(--mono); font-size:9px; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); font-weight:600; line-height:1; padding-top:2px; white-space:nowrap}
+.rf-gname{font-family:var(--mono); font-size:9px; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); font-weight:600; line-height:1; padding-top:2px; white-space:nowrap; flex:none}   /* its row is reserved: nothing above ever prints on it */
 /* buttons: small (icon + label in a row) and big (icon over label); both carry a KeyTip badge in the corner */
 .rf-btn{position:relative; display:inline-flex; align-items:center; gap:4px; height:17px; padding:0 4px; border:1px solid transparent; border-radius:5px;
   background:transparent; color:var(--text); font-family:var(--mono); font-size:10px; line-height:1; cursor:pointer; white-space:nowrap; transition:background .1s, border-color .1s}
@@ -566,6 +566,12 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 .rf-btn.big .rf-ico svg{width:22px; height:22px}
 .rf-btn.big .rf-ico .ri-g{font-size:18px}
 .rf-btn.big .rf-lbl{font-size:10px; line-height:1.15; max-width:52px}
+/* a big label is set on at most two lines (ribbon-view bigLabelLines: "Page Break" / "Preview", as Excel sets it); a line never
+   rewraps, so the button widens past its 52/60px for a long line instead of spilling onto a neighbour or the caption row */
+.rf-btn.big:not(.rf-grpbtn){min-width:max-content}
+.ribbon.ribbon-full .rf-btn.big .rf-lbl{max-width:none; flex:none}   /* beats the density step's max-width (scale.css); never squeezed, so a second line is never cut */
+.rf-btn.big .rf-ln{display:block; white-space:nowrap}
+.rf-btn.big .rf-ln .rf-caret{margin-left:3px}   /* a two-line label's menu arrow sits after its last word ("Panes ▾"), not on a third row */
 .rf-btn.dis, .rf-box.dis{opacity:.42; cursor:not-allowed}
 .rf-btn.dis:hover{background:transparent; border-color:transparent}
 .rf-btn.dis .rf-ico, .rf-btn.dis .rf-lbl{color:var(--muted)}
@@ -582,20 +588,26 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 .rf-split.open .rf-arrow{background:var(--surface); border-color:var(--accent-dim)}
 /* a folded group (the bar is too narrow for its buttons): one big button, its live KeyTips stacked beneath */
 .rf-grp.rf-collapsed .rf-grpbtn{width:50px}
+.ribbon.ribbon-full .rf-btn.rf-grpbtn .rf-lbl{max-width:100%}
+.rf-btn.rf-grpbtn .rf-ln{overflow:hidden; text-overflow:ellipsis}
 .rf-grptips{position:absolute; left:50%; bottom:9px; transform:translateX(-50%); display:flex; gap:2px; z-index:3}
 .ribbon-full .rf-grptips .ri-key{position:static; transform:none}
 .rdrop-item.on .rdrop-lbl{color:var(--accent)}
 /* the disabled name / size / number-format boxes */
 .rf-box{position:relative; display:inline-flex; align-items:center; justify-content:space-between; height:17px; padding:0 5px; border:1px solid var(--line); border-radius:4px;
   background:var(--surface); font-family:var(--mono); font-size:10px; color:var(--text); white-space:nowrap; overflow:hidden}
-/* the KeyTip badge on a full-bar control: hangs under a small control and sits on a big one's label (Excel), never in the layout flow */
-.ribbon-full .ri-key, .rdrop-menu .ri-key, .rdrop-dialog .ri-key{position:absolute; top:auto; left:50%; bottom:-6px; transform:translateX(-50%); font-family:var(--mono); font-size:10px; font-weight:800; line-height:1.3;
+.rf-row > .rf-box:only-child{flex:1 0 auto}   /* the Excel width is a floor (inline min-width): a box grows to its text, and a column's boxes share one width */
+.rf-box > .rf-caret{margin-left:6px}   /* a box sized to its text keeps its arrow clear of the last letter */
+/* the KeyTip badge on a full-bar control: hangs under a small control and sits on a big one's icon, never in the layout flow;
+   sized to its letters (right:auto: the base .ribbon .ri-key's right:2px plus a left stretched it over the whole button, hiding the label) */
+.ribbon-full .ri-key, .rdrop-menu .ri-key, .rdrop-dialog .ri-key{position:absolute; top:auto; left:50%; right:auto; bottom:-6px; width:max-content; transform:translateX(-50%); font-family:var(--mono); font-size:10px; font-weight:800; line-height:1.3;
   color:var(--on-accent); background:var(--accent); border:1px solid color-mix(in srgb, var(--accent-dim) 60%, transparent); border-radius:3px; padding:0 3px; z-index:3; box-shadow:0 1px 3px rgba(0,0,0,.3); pointer-events:none; white-space:nowrap}
-.rf-btn.big > .ri-key, .rf-split.big > .ri-key{bottom:12px}
+.rf-btn.big > .ri-key, .rf-split.big > .ri-key{top:1.4em; bottom:auto}   /* on the icon's lower half: the label under it stays readable at either density */
 .rf-btn.ico > .ri-key{left:auto; right:-4px; transform:none}
 .rf-btn:not(.ico):not(.big) > .ri-key, .rf-box > .ri-key{left:-2px; transform:none}   /* a labelled small button: under its icon, the label stays readable */
 /* menus and small dialogs as anchored dropdowns */
 .rdrop.rdrop-menu, .rdrop.rdrop-dialog{padding:8px 6px 6px; min-width:200px}
+.rdrop-menu .rdrop-hint{white-space:nowrap; padding:5px 8px 3px 10px; margin-top:4px; border-top:1px solid var(--line)}   /* the footer hint: one line, lined up with the items, off the menu's edge */
 .rdrop-item{position:relative; display:flex; align-items:center; gap:9px; padding:4px 8px 4px 10px; border-radius:6px; font-family:var(--mono); font-size:12px; color:var(--text); cursor:pointer}
 .rdrop-item:hover{background:var(--accent-glow)}
 .rdrop-item.dis{opacity:.45; cursor:not-allowed}
