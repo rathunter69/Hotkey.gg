@@ -145,6 +145,7 @@ export function mountDemo(host, o = {}) {
     // a short frame shows fewer goals: the list keeps the current one in view, at its top (the ticked ones scroll away above it)
     const now = list.querySelector('.goal.current');
     list.scrollTop = now && now.offsetTop + now.offsetHeight > list.clientHeight ? now.offsetTop : 0;
+    list.classList.toggle('dp-goals-more', list.scrollHeight - list.scrollTop > list.clientHeight + 1);   // more below: fade the cut line out
   }
 
   function step() {
