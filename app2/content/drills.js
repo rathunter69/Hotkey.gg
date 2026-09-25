@@ -13,6 +13,7 @@ import format_cells_numbers from './drills/format-cells-numbers.js';
 import formula_sprint from './drills/formula-sprint.js';
 import paste_surgeon from './drills/paste-surgeon.js';
 import weekly_sales_report from './drills/weekly-sales-report.js';
+import { LESSONS } from './index.js';
 
 export const DRILLS = [
   edge_jumps,
@@ -28,6 +29,19 @@ export const DRILLS = [
   paste_surgeon,
   weekly_sales_report,
 ];
+
+/**
+ * The module challenges (C2 Run 4) registered as drills: each entry is a thin catalogue record
+ * over the challenge lesson (kind 'challenge'); the drill page and the Daily hand it to the
+ * lesson workspace (`#/lesson/<id>`), which runs it seeded, timed and tier-scored. Two are the
+ * benchmarks that feed rank once boards exist.
+ */
+const BENCHMARK_CHALLENGES = new Set(['challenge-to-standard-in-three-minutes', 'challenge-the-site-pnl']);
+export const CHALLENGE_DRILLS = LESSONS.filter(l => l.kind === 'challenge').map(l => ({
+  id: l.id, kind: 'challenge', chapter: l.chapter, module: l.module, title: l.title, task: l.brief || '', access: l.access,
+  pars: l.pars, optimalKeys: l.optimalKeys, benchmark: BENCHMARK_CHALLENGES.has(l.id) || undefined, lesson: l,
+}));
+DRILLS.push(...CHALLENGE_DRILLS);
 
 export const DRILLS_BY_ID = Object.fromEntries(DRILLS.map(d => [d.id, d]));
 export const drillById = id => DRILLS_BY_ID[id] || null;

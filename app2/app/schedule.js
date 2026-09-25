@@ -19,6 +19,7 @@
 // Every read and write is guarded; a private window or corrupt storage never breaks a page.
 import { mulberry32 } from '../engine/rng.js';
 import { MICRO_MODULES } from '../content/micro.js';
+import { applyMicroCopy } from '../content/copy/apply.js';
 
 export const SCHEDULE_KEY = 'hk2_schedule_v1';
 export const DAY = 86400000;
@@ -256,11 +257,11 @@ export const RAPID_CONCEPT = {
 /** A micro-drill as a lesson object the lesson workspace can mount (kind 'micro'). Null for an unknown id. */
 export function microLesson(id) {
   const m = MICRO[id]; if (!m) return null;
-  return {
+  return applyMicroCopy({
     id: 'due-' + id, kind: 'micro', chapter: 'foundations', section: 'Due today', title: m.title, difficulty: 'easy', tags: ['due'], access: 'free',
     workbook: 'voltline-weekly', state: { before: m.state, after: m.state }, minutes: 1, concept: id, plant: m.plant,
     brief: m.task, goals: m.goals, solution: m.solution, secs: m.secs, teaches: [], requires: [id],
-  };
+  }, id);
 }
 
 /* ---------------- the offer (pure) ---------------- */

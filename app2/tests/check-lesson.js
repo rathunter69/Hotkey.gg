@@ -7,7 +7,7 @@
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 import { readdirSync } from 'node:fs';
-import { validateLesson, availableConcepts, countedGoals, goalBounds } from '../content/schema.js';
+import { validateLesson, availableConcepts, countedGoals, goalBounds, SEEDED_KINDS } from '../content/schema.js';
 import { LESSONS_BY_ID } from '../content/index.js';
 import { LessonRun } from '../app/runner.js';
 import { workbookState } from '../content/workbooks/index.js';
@@ -42,8 +42,8 @@ for (const g of lesson.goals || []) for (const c of g.requires || []) if (!avail
 for (const c of lesson.uses || []) if (!avail.has(c) || (lesson.teaches || []).includes(c)) bad(`uses "${c}" is ${(lesson.teaches || []).includes(c) ? 'also taught here' : 'not taught by any prerequisite'}`);
 
 if (!problems.length) {
-  if (lesson.kind === 'challenge') {
-    // 3a. a challenge: the solution passes on several seeds; the workload never moves
+  if (SEEDED_KINDS.includes(lesson.kind)) {
+    // 3a. a seeded kind (challenge, assessment, test-out): the solution passes on several seeds; the workload never moves
     const counts = new Set();
     for (let seedNo = 1; seedNo <= SEEDS; seedNo++) {
       counts.add(Object.keys(lesson.seed(mulberry32(seedNo))).length);

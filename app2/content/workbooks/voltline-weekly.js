@@ -20,13 +20,14 @@ export const DAYS = ['08-Sep-26', '09-Sep-26', '10-Sep-26', '11-Sep-26', '12-Sep
 
 const r2 = v => Math.round(v * 100) / 100;
 
-/** kWh per site-day: deterministic (one fixed seed), 400–2,600 rounded to tens. */
-export const KWH = (() => {
-  const rng = mulberry32(20260915);
+/** kWh per site-day for a feed: deterministic from one seed, 400–2,600 rounded to tens. */
+export const kwhFor = (seed, days = DAYS) => {
+  const rng = mulberry32(seed);
   const out = {};
-  for (const site of SITES) { out[site] = DAYS.map(() => Math.round((400 + rng() * 2200) / 10) * 10); }
+  for (const site of SITES) { out[site] = days.map(() => Math.round((400 + rng() * 2200) / 10) * 10); }
   return out;
-})();
+};
+export const KWH = kwhFor(20260915);
 
 /** The Raw feed row for (site, dayIndex): 1-based sheet row. Site-major: Domain 2–13 … Airport 50–61. */
 export const rawRow = (site, d) => 2 + SITES.indexOf(site) * 12 + d;
@@ -41,38 +42,32 @@ export const RAW_BYDAY = { headerRow: 31, firstRow: 32, days: ['Mon', 'Tue', 'We
 
 /* ---------------- the S0 sheets ---------------- */
 
-function rawCells() {
+/**
+ * The platform's feed sheet for one fortnight: headers, 60 rows (5 sites × 12 days), the
+ * site-totals block H6:M13 (live SUMs over each site's two weeks, last week's revenue, the old
+ * platform's site code), this week's kWh by site and day (H30:N36), and the feed's Notes block
+ * (below the feed at A64, or beside it at H1 once 1.3.3 has moved it).
+ */
+function feedCells({ kwh, days, notes, notesBeside = false }) {
   const cells = {
     A1: { value: 'Date', bold: true }, B1: { value: 'Site', bold: true }, C1: { value: 'kWh sold', bold: true },
     D1: { value: 'Price ($/kWh)', bold: true }, E1: { value: 'Revenue ($)', bold: true }, F1: { value: 'Energy cost ($)', bold: true },
   };
-  const BLANK_F = new Set([12, 19, 28, 44, 47]);   // five missing Energy cost cells (1.2.1 finds the first; 1.3.1 fills them)
   for (const site of SITES) {
     for (let d = 0; d < 12; d++) {
       const r = rawRow(site, d);
-      const kwh = KWH[site][d], price = SITE_PRICE[site];
-      cells['A' + r] = { value: DAYS[d] };
+      const k = kwh[site][d], price = SITE_PRICE[site];
+      cells['A' + r] = { value: days[d] };
       cells['B' + r] = { value: site };
-      cells['C' + r] = { value: kwh };
+      cells['C' + r] = { value: k };
       cells['D' + r] = { value: price };
-      cells['E' + r] = { value: r2(kwh * price) };
-      if (!BLANK_F.has(r)) cells['F' + r] = { value: r2(kwh * WHOLESALE) };
+      cells['E' + r] = { value: r2(k * price) };
+      cells['F' + r] = { value: r2(k * WHOLESALE) };
     }
   }
-  // the plantings later lessons rely on (map §1.3): typos, a text-number, a wrong figure, the missing day
-  cells.B14 = { value: 'Muller' };            // Mueller day 1 (1.3.2 fixes)
-  cells.B27 = { value: 'Riversid' };          // Riverside day 2 (1.3.2)
-  cells.B55 = { value: 'Airprot' };           // Airport day 6 (1.3.5, Ctrl+F)
-  cells.C33 = { value: '1,240 ' };            // a text-number (1.3.2); its row still ties once fixed
-  cells.E33 = { value: r2(1240 * SITE_PRICE.Riverside) };
-  cells.F33 = { value: r2(1240 * WHOLESALE) };
-  cells.E41 = { value: 81500 };               // wrong figure, South Lamar day 4 (1.3.2)
-  delete cells.C61; delete cells.D61; delete cells.E61; delete cells.F61;   // Airport Saturday never came through (1.3.1)
-  cells.H3 = { value: 'draft', it: true };    // a stray note (1.3.1 clears it)
-  cells.A64 = { value: 'Notes', bold: true };
-  cells.A65 = { value: 'w/c 08 Sep feed checked — EA' };   // last week's note; the stale label 1.3.5 replaces lives on Report and Inputs
-  cells.A66 = { value: 'Airport Saturday missing from feed' };
-  cells.A67 = { value: 'prices per site tariff card' };
+  const noteAt = notesBeside ? i => 'H' + (1 + i) : i => 'A' + (64 + i);
+  cells[noteAt(0)] = { value: 'Notes', bold: true };
+  notes.forEach((t, i) => { cells[noteAt(1 + i)] = { value: t }; });
   // the platform appends a site-totals block beside the feed: live SUMs over each site's two weeks,
   // last week's revenue, and the old platform's site code (stale). 1.3.4 freezes these into the
   // Report's values; 1.4.1 deletes the codes and watches a deleted column turn the block #REF!.
@@ -100,6 +95,26 @@ function rawCells() {
     cells['H' + r] = { value: site };
     RAW_BYDAY.dayCols.forEach((col, j) => { cells[col + r] = { formula: `=C${8 + 12 * i + j}` }; });
   });
+  return cells;
+}
+/** The Raw feed's colW, shared by every feed the platform sends. */
+const RAW_COLW = { 1: 76, 2: 92, 4: 92, 5: 88, 6: 104, 8: 96, 9: 76, 10: 92, 11: 108, 12: 128, 13: 72 };
+
+/** S0's Raw: the w/c 15 Sep feed as it arrived, with the plantings the chapter's lessons rely on. */
+function rawCells() {
+  const cells = feedCells({ kwh: KWH, days: DAYS, notes: ['w/c 08 Sep feed checked — EA', 'Airport Saturday missing from feed', 'prices per site tariff card'] });   // last week's note; the stale label 1.3.5 replaces lives on Report and Inputs
+  const BLANK_F = [12, 19, 28, 44, 47];   // five missing Energy cost cells (1.2.1 finds the first; 1.3.1 fills them)
+  for (const r of BLANK_F) delete cells['F' + r];
+  // the plantings later lessons rely on (map §1.3): typos, a text-number, a wrong figure, the missing day
+  cells.B14 = { value: 'Muller' };            // Mueller day 1 (1.3.2 fixes)
+  cells.B27 = { value: 'Riversid' };          // Riverside day 2 (1.3.2)
+  cells.B55 = { value: 'Airprot' };           // Airport day 6 (1.3.5, Ctrl+F)
+  cells.C33 = { value: '1,240 ' };            // a text-number (1.3.2); its row still ties once fixed
+  cells.E33 = { value: r2(1240 * SITE_PRICE.Riverside) };
+  cells.F33 = { value: r2(1240 * WHOLESALE) };
+  cells.E41 = { value: 81500 };               // wrong figure, South Lamar day 4 (1.3.2)
+  delete cells.C61; delete cells.D61; delete cells.E61; delete cells.F61;   // Airport Saturday never came through (1.3.1)
+  cells.H3 = { value: 'draft', it: true };    // a stray note (1.3.1 clears it)
   return cells;
 }
 
@@ -159,7 +174,7 @@ const sheetOf = (state, name) => state.sheets.find(s => s.name === name);
 
 const S0 = {
   sheets: [
-    { name: 'Raw', cells: rawCells(), colW: { 1: 76, 2: 92, 4: 92, 5: 88, 6: 104, 8: 96, 9: 76, 10: 92, 11: 108, 12: 128, 13: 72 }, active: { r: 1, c: 1 } },
+    { name: 'Raw', cells: rawCells(), colW: { ...RAW_COLW }, active: { r: 1, c: 1 } },
     { name: 'Sheet2', cells: sheet2Cells(), colW: { 1: 180 } },
     { name: 'Old wk37', cells: oldWk37Cells(), colW: { 1: 76, 2: 92 } },
     { name: 'Costs', cells: costsCells(), colW: { 1: 92, 2: 108, 3: 122, 4: 122, 5: 92 } },
@@ -454,7 +469,7 @@ const S7a = derive(S6f, s => { s.settings.pageSetup = clone(REPORT_PAGE_SETUP); 
 export const CHECK_LINES = [
   ['Report revenue ties to the feed', '=SUM(D5:D8,D10)-Raw!J13'],
   ['Sites sum to the total', '=SUM(C5:C10)-C11'],
-  ['Margin within 0–100%', '=IF(AND(H11>=0,H11<=1),0,1)'],
+  ['Margin within 0-100%', '=IF(AND(H11>=0,H11<=1),0,1)'],
 ];
 const S7b = derive(S7a, s => {
   const c = sheetOf(s, 'Report').cells;
@@ -483,9 +498,100 @@ const AUDIT_CELLS = ['G6', 'E18', 'A1', 'A2', ...span('B', 'G', 15, 21), 'C9', '
 /** The cells 1.7.3 may change (its graders diff against S7c and allow nothing else). */
 export const AUDIT_ALLOWED = AUDIT_CELLS;
 
-export const STATES = { S0, S1a, S1b, S1c, S1d, S2a, S3a, S3b, S3c, S3d, S3e, S4a, S4b, S4c, S5a, S5b, S5c, S5d, S6a, S6b, S6c, S6d, S6e, S6f, S7a, S7b, S7c };
+/* ---------------- module 1.8: the next feed (project, assessment) ---------------- */
+
+/** Mon–Sat of w/c 15 Sep then w/c 22 Sep 2026: the fortnight management's next export covers. */
+export const DAYS_NEXT = ['15-Sep-26', '16-Sep-26', '17-Sep-26', '18-Sep-26', '19-Sep-26', '20-Sep-26',
+  '22-Sep-26', '23-Sep-26', '24-Sep-26', '25-Sep-26', '26-Sep-26', '27-Sep-26'];
+export const KWH_NEXT = kwhFor(20260922, DAYS_NEXT);
+export const WEEK_NEXT = 'w/c 22 Sep';
+export const REPORT_TITLE_NEXT = 'Voltline - Austin Weekly KPI Report, w/c 22 Sep 2026';
+/**
+ * The project's page (1.8): the same shape the chapter built, simplified to what one sitting can
+ * make — five feed sites (no Cedar Park), the total row, the daily block, the checks. No scenario
+ * grid, no week summary. Rows and columns the project's goals and the assessment's graders read.
+ */
+export const REPORT_NEXT = { siteRows: [5, 6, 7, 8, 9], totalRow: 10, money: ['D', 'E', 'F'], lastCol: 'H',
+  dailyTitleRow: 12, dailyHeaderRow: 13, dailyRows: [14, 15, 16, 17, 18], dayCols: ['B', 'C', 'D', 'E', 'F', 'G'], checksRow: 20 };
+export const CHECK_LINES_NEXT = [
+  ['Report revenue ties to the feed', '=D10-Raw!J13'],
+  ['Sites sum to the total', '=SUM(C5:C9)-C10'],
+  ['Margin within 0-100%', '=IF(AND(H10>=0,H10<=1),0,1)'],
+];
+export const HEADERS_NEXT = ['Site', 'Week', 'kWh sold', 'Revenue ($)', 'Energy cost ($)', 'Gross profit ($)', 'Avg price ($/kWh)', 'Margin %'];
+
+// S8raw: management's next feed, the shape the chapter left the file in — Report blank, Inputs and
+// Costs as 1.7 left them but dated for the new week, the QAT and calc settings kept.
+const S8raw = derive(S7c, s => {
+  const rep = sheetOf(s, 'Report');
+  s.sheets = [{ name: 'Report', cells: {}, active: { r: 1, c: 1 } }, sheetOf(s, 'Raw'), sheetOf(s, 'Inputs'), sheetOf(s, 'Costs')];
+  void rep;
+  const raw = sheetOf(s, 'Raw');
+  raw.cells = feedCells({ kwh: KWH_NEXT, days: DAYS_NEXT, notesBeside: true, notes: ['w/c 15 Sep feed checked — EA', 'all 60 rows through', 'prices per site tariff card'] });
+  raw.colW = { ...RAW_COLW }; raw.active = { r: 1, c: 1 };
+  sheetOf(s, 'Inputs').cells.B3 = { ...sheetOf(s, 'Inputs').cells.B3, value: WEEK_NEXT };
+  const costs = sheetOf(s, 'Costs').cells;
+  costs.A1 = { ...costs.A1, value: 'Voltline — Austin site costs, w/c 22 Sep 2026' };
+  for (const ref of ['A10', 'B10', 'A11', 'B11']) delete costs[ref];   // the cost-per-kWh line read the old page; the new page is not built yet
+  delete s.settings.pageSetup;
+});
+
+/**
+ * Build the project's Report over a fresh feed: the page S8done holds, or the same page in a seed's
+ * clothing (the assessment's graders call it with the cluster's title, week and site names).
+ */
+export function buildReport(state, { title = REPORT_TITLE_NEXT, week = WEEK_NEXT, sites = SITES } = {}) {
+  const R = REPORT_NEXT;
+  const sh = sheetOf(state, 'Report');
+  const c = {};
+  c.A1 = { value: title, bold: true, fsz: TITLE_FSZ, ca: 8 };   // D7: Center Across Selection over A1:H1
+  c.A2 = { value: UNITS_LINE, it: true };                        // C5: units stated once
+  HEADERS_NEXT.forEach((h, i) => { const col = String.fromCharCode(65 + i); c[col + '4'] = { value: h, bold: true, ...(i >= 2 ? { align: 'r', wrap: true } : {}) }; });   // D6
+  R.siteRows.forEach((r, i) => {
+    const rr = 8 + i;   // Raw's site-totals row
+    c['A' + r] = { value: sites[i] };
+    c['B' + r] = { value: week };
+    c['C' + r] = { formula: `=Raw!I${rr}`, fontColor: 'green', fmtStyle: 'comma', decimals: 0 };          // B2: links green
+    c['D' + r] = { formula: `=Raw!J${rr}`, fontColor: 'green', fmtStyle: 'comma', decimals: 0 };
+    c['E' + r] = { formula: `=C${r}*Inputs!$B$4`, fontColor: 'green', fmtStyle: 'comma', decimals: 0 };   // B4: the price lives on Inputs
+    c['F' + r] = { formula: `=D${r}-E${r}`, fmtStyle: 'comma', decimals: 0 };                            // one formula per row, filled down
+    c['G' + r] = { formula: `=D${r}/C${r}`, fmtStyle: 'currency', decimals: 2 };
+    c['H' + r] = { formula: `=F${r}/D${r}`, fmtStyle: 'percent', decimals: 1 };
+  });
+  const t = R.totalRow, first = R.siteRows[0], last = R.siteRows[R.siteRows.length - 1];
+  c['A' + t] = { value: 'Total' };
+  for (const col of ['C', 'D', 'E', 'F']) c[col + t] = { formula: `=SUM(${col}${first}:${col}${last})`, fmtStyle: 'comma', decimals: 0 };
+  c['G' + t] = { formula: `=D${t}/C${t}`, fmtStyle: 'currency', decimals: 2 };
+  c['H' + t] = { formula: `=F${t}/D${t}`, fmtStyle: 'percent', decimals: 1 };
+  for (const ref of ['D' + first, 'E' + first, 'F' + first, 'D' + t, 'E' + t, 'F' + t]) c[ref] = { ...c[ref], fmtStyle: 'currency', decimals: 0 };   // D4: $ on the first and total rows
+  each(c, span('A', 'Z', t, t), x => { x.bold = true; x.bt = true; });   // D5: the total row bold with a top border
+  // the daily block: this week's kWh by site and day, linked to Raw's by-day block, one formula filled across and down
+  c['A' + R.dailyTitleRow] = { value: 'kWh sold by day', bold: true };
+  c['A' + R.dailyHeaderRow] = { value: 'Site', bold: true };
+  RAW_BYDAY.days.forEach((d, j) => { c[R.dayCols[j] + R.dailyHeaderRow] = { value: d, bold: true, align: 'r' }; });
+  R.dailyRows.forEach((r, i) => {
+    c['A' + r] = { value: sites[i], indent: 1 };
+    R.dayCols.forEach((col, j) => { c[col + r] = { formula: `=Raw!${RAW_BYDAY.dayCols[j]}${RAW_BYDAY.firstRow + i}`, fontColor: 'green', fmtStyle: 'comma', decimals: 0 }; });
+  });
+  // the checks: three live differences that read zero when the page ties (F1)
+  c['A' + R.checksRow] = { value: 'Checks', bold: true };
+  CHECK_LINES_NEXT.forEach(([label, formula], i) => { const r = R.checksRow + 1 + i; c['A' + r] = { value: label }; c['B' + r] = { formula, fmtStyle: 'comma', decimals: 0 }; });
+  sh.cells = c;
+  sh.gridlines = false;                                   // A3
+  const W12 = 12 * 7 + 5, W14 = 14 * 7 + 5;
+  const fit = liveSheet(sh);
+  sh.colW = { 1: fit.neededWidth(1, first, R.dailyRows[R.dailyRows.length - 1]), 2: W12, 3: W12, 4: W12, 5: W12, 6: W12, 7: W14, 8: W14 };
+  const sized = new Sheet({ cells: clone(sh.cells), colW: sh.colW }); sized.select('A4:H4'); sized.autofitRows();
+  if (sized.rowH[4] !== ROWH_DEFAULT) sh.rowH = { 4: sized.rowH[4] };
+  sh.freeze = { r: 4, c: 1 };                              // C8
+  state.settings.pageSetup = clone(REPORT_PAGE_SETUP);     // G1: landscape, one page, the heads repeated, file and date in the footer
+  return state;
+}
+const S8done = derive(S8raw, s => buildReport(s));
+
+export const STATES = { S0, S1a, S1b, S1c, S1d, S2a, S3a, S3b, S3c, S3d, S3e, S4a, S4b, S4c, S5a, S5b, S5c, S5d, S6a, S6b, S6c, S6d, S6e, S6f, S7a, S7b, S7c, S8raw, S8done };
+/** The chain the lessons walk; S8raw and S8done are the project's fresh feed, not a step after S7c. */
 export const STATE_ORDER = Object.keys(STATES);
-// S8raw / S8done arrive with module 1.8 (Run 4).
 
 /** A deep clone of a named state (runners mutate their copy, never the master). */
 export function stateOf(id) {

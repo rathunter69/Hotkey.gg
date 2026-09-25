@@ -50,3 +50,13 @@ export function siteCopy(key, fallback = '') {
 }
 
 export function moduleCopy(id) { return (COPY && COPY.modules && COPY.modules[id]) || null; }
+/** micro.csv's row for a micro-drill (by its concept id), or null. */
+export function microCopy(id) { return (COPY && COPY.micro && COPY.micro[id]) || null; }
+/** A micro-drill lesson with micro.csv's words laid over it: the prompt is its brief, the teach line rides its first goal. */
+export function applyMicroCopy(lesson, id) {
+  const row = microCopy(id); if (!lesson || !row) return lesson;
+  const out = { ...lesson, goals: Array.isArray(lesson.goals) ? lesson.goals.map(g => ({ ...g })) : lesson.goals };
+  if (nz(row.prompt)) out.brief = row.prompt;
+  if (nz(row.teach) && Array.isArray(out.goals) && out.goals[0]) out.goals[0].teach = row.teach;
+  return out;
+}

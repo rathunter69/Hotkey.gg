@@ -57,6 +57,8 @@ export const DIFFICULTIES = ['easy', 'medium', 'hard'];
 export const ACCESS = ['free', 'paid'];
 export const MODES = ['guided', 'solo', 'timed', 'challenge'];   // how a lesson is played; the Brief precedes them
 export const KINDS = ['lesson', 'project', 'assessment', 'testout', 'challenge'];   // + C2: the module's timed, seeded challenge
+/** The kinds whose workbook wears a seed's clothing before the first key (runner and validator agree). */
+export const SEEDED_KINDS = ['challenge', 'assessment', 'testout'];
 
 /** Concept ids and their display names — the vocabulary lessons teach and require. */
 export const CONCEPTS = {
@@ -223,7 +225,7 @@ export function validateLesson(l) {
   if (moduleLesson) {
     need(WORKBOOKS[l.workbook], `unknown workbook "${l.workbook}" (content/workbooks)`);
     need(isObject(l.state) && typeof l.state.before === 'string', 'a module lesson needs state.before');
-    need(kind === 'challenge' || typeof l.state.after === 'string', 'a module lesson needs state.after');
+    need(SEEDED_KINDS.includes(kind) || typeof l.state.after === 'string', 'a module lesson needs state.after (a seeded kind is graded by its goals)');
     if (l.plant !== undefined) need(isObject(l.plant) && Object.keys(l.plant).every(k => /^[A-Za-z0-9 ]+!(#?[A-Za-z]+[0-9]*)$/.test(k)), 'plant is a state patch: { "Sheet!A1": cell | null, "Sheet!#colW": {…} }');
     if (kind !== 'challenge') {
       need(typeof l.headline === 'string' && l.headline.trim(), 'headline (the one concept the lesson exists to teach) missing');
@@ -237,8 +239,14 @@ export function validateLesson(l) {
     need(typeof l.seed === 'function', 'a challenge is a generator: seed(rng) → patch');
     need(Array.isArray(l.graders) && l.graders.length > 0 && l.graders.every(g => typeof g === 'function'), 'a challenge carries graders: [(session) => {ok, why}]');
     need(isObject(l.pars) && l.pars.pass > l.pars.pro && l.pars.pro > l.pars.legendary && l.pars.legendary > 0, 'challenge pars must fall strictly: pass > pro > legendary > 0');
-    for (const g of Array.isArray(l.goals) ? l.goals : []) need(g && g.teach === undefined, 'a challenge goal carries no teach line');
   }
+  // A module's assessment and test-out are seeded like a challenge (fresh clothing every run) and
+  // may carry pars for the efficiency tier; the project, assessment and test-out combine taught
+  // material, so no goal teaches (C2 Run 4).
+  if (moduleLesson && (kind === 'assessment' || kind === 'testout')) need(typeof l.seed === 'function', kind + ' is seeded: seed(rng) → patch');
+  if (kind !== 'challenge' && l.seed !== undefined) need(typeof l.seed === 'function' && (kind === 'assessment' || kind === 'testout'), 'only a challenge, assessment or test-out carries a seed');
+  if (kind !== 'challenge' && l.pars !== undefined) need(isObject(l.pars) && (kind === 'assessment' || kind === 'testout') && l.pars.pass > l.pars.pro && l.pars.pro > l.pars.legendary && l.pars.legendary > 0, 'pars (pass > pro > legendary > 0) belong to a challenge, assessment or test-out');
+  if (kind !== 'lesson') for (const g of Array.isArray(l.goals) ? l.goals : []) need(g && g.teach === undefined, `a ${kind} goal carries no teach line`);
   need(isObject(l.sheet) || moduleLesson, 'sheet (starting sheet) missing');
   need(l.sheets === undefined || (Array.isArray(l.sheets) && l.sheets.every(isObject)), 'sheets must be an array of { name, cells } records');
   for (const sh of Array.isArray(l.sheets) ? l.sheets.filter(isObject) : []) need(typeof sh.name === 'string' && /^[^[\]:*?/\\]{1,31}$/.test(sh.name), `sheet name "${sh.name}" is not Excel-legal`);
@@ -282,7 +290,7 @@ export function validateLesson(l) {
     if (g.closer !== undefined) {
       // The "does it tie" closer (C2 addendum): the last goal, played by the platform as a ghost —
       // it perturbs an input, the learner watches the sheet answer, the sheet goes back as it was.
-      need(g.closer === true && moduleLesson && kind === 'lesson', `goal ${g.id}: closer is only a module lesson's last goal`);
+      need(g.closer === true && moduleLesson && kind !== 'challenge', `goal ${g.id}: closer is only a module lesson's (or project's, assessment's, test-out's) last goal`);
       need(goals[goals.length - 1] === g, `goal ${g.id}: the closer must be the last goal`);
       need(isObject(g.demo), `goal ${g.id}: a closer is a demo the platform plays (demo: { script })`);
     }
@@ -322,7 +330,7 @@ function validateStartingSheet(l, goals, ends, need, opts = {}) {
     // a challenge additionally wears the seed's clothing before the first key
     let state;
     try { state = workbookState(l.workbook, l.state.before); } catch (e) { need(false, e.message); return; }
-    if (opts.kind === 'challenge' && typeof l.seed === 'function') {
+    if (SEEDED_KINDS.includes(opts.kind) && typeof l.seed === 'function') {
       let patch;
       try { patch = l.seed(mulberry32(1)); } catch (e) { need(false, `seed throws: ${e.message}`); return; }
       need(isObject(patch), 'seed must return a patch object');

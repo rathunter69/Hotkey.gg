@@ -23,6 +23,7 @@ import { PLANNED_MODULES } from '../app/learn-next.js';
 import { STAGES } from '../app/deal-strip.js';
 import { DASH_LINES, DUE_LINES, SAVE_NUDGE } from '../app/home-next.js';
 import { INSTALL_PROMPT } from '../app/install.js';
+import { MICRO } from '../app/schedule.js';
 
 const conv = ids => (ids || []).map(id => (CONVENTIONS[id] ? CONVENTIONS[id].short : id)).join(' · ');
 
@@ -114,13 +115,13 @@ export const PLANNED = [
     brief: 'A seeded report with five planted faults from the list: find and fix all five in three minutes, then set landscape and fit to page.',
     wow: '', conventions: ['F3', 'G1'] },
   // 1.8 project, assessment, test-out
-  { id: 'project-the-weekly-kpi-report', module: 'project-and-assessment', order: '1.8.P', title: 'Project: the weekly KPI report', kind: 'project',
+  { id: 'weekly-kpi-project', module: 'project-and-assessment', order: '1.8.P', title: 'Project: the weekly KPI report', kind: 'project',
     brief: 'Management’s next feed has arrived and the Report is blank. Build the linked, totaled, margin-bearing, formatted, checked, print-ready one-page report the chapter has been building. This is page one of the Project Volt pack.',
     wow: 'Page one of the data room, built by you from a raw feed, and every number on it ties.', conventions: ['B1', 'B2', 'B4', 'C5', 'D1', 'D2', 'D5', 'D7', 'F1', 'G1'] },
-  { id: 'assessment-monday-morning', module: 'project-and-assessment', order: '1.8.A', title: 'Assessment: Monday morning', kind: 'assessment',
+  { id: 'foundations-assessment', module: 'project-and-assessment', order: '1.8.A', title: 'Assessment: Monday morning', kind: 'assessment',
     brief: 'Same brief, fresh figures, one extra site. Eight minutes on the clock from your first key, solo and keyboard-only, for the Verified certificate.',
     wow: '', conventions: ['B1', 'B2', 'B4', 'C5', 'D1', 'D2', 'D5', 'D7', 'F1', 'G1'] },
-  { id: 'test-out-of-foundations', module: 'project-and-assessment', order: '1.8.T', title: 'Test out of Foundations', kind: 'testout',
+  { id: 'foundations-testout', module: 'project-and-assessment', order: '1.8.T', title: 'Test out of Foundations', kind: 'testout',
     brief: 'Ten tasks across the seven modules on one seeded workbook, five minutes. Pass, and the chapter is skipped.',
     wow: '', conventions: [] },
 ];
@@ -162,7 +163,7 @@ export function exportCopy(current) {
     const at = moduleOf(l);
     const r = lessonRow(l.id);
     fill(r, 'module', l.module);
-    fill(r, 'order', at ? `${moduleN(l.module, at.k)}.${l.kind === 'challenge' ? 'C' : at.n}` : '');
+    fill(r, 'order', at ? `${moduleN(l.module, at.k)}.${{ challenge: 'C', project: 'P', assessment: 'A', testout: 'T' }[l.kind] || at.n}` : '');
     fill(r, 'title', l.title); fill(r, 'brief', l.brief || l.read || ''); fill(r, 'closing', joinParas(l.closing));
     fill(r, 'wow', l.wow); fill(r, 'convention_line', l.conventionLine || conv(l.conventions)); fill(r, 'mac_note', l.macNote); fill(r, 'story_beat', l.storyBeat);
     lessons.push(r); seen.add(l.id);
@@ -201,7 +202,12 @@ export function exportCopy(current) {
   const defaults = siteDefaults();
   const keys = [...SITE_KEYS, ...Object.keys(current.site).filter(k => !SITE_KEYS.includes(k))];
   for (const k of keys) site.push({ key: k, text: (current.site[k] && current.site[k].trim()) ? current.site[k] : (defaults[k] || '') });
-  return { lessons, goals, modules, site };
+  // micro-drills: one row per drill, in schedule order; the prompt is the drill's task line, the teach its first goal's (usually empty: the drill repeats a taught key)
+  const micro = [];
+  const cur = current.micro || {};
+  for (const id in MICRO) { const m = MICRO[id]; const r = { id, prompt: (cur[id] && cur[id].prompt) || '', teach: (cur[id] && cur[id].teach) || '' }; fill(r, 'prompt', m.task); fill(r, 'teach', (m.goals && m.goals[0] && m.goals[0].teach) || ''); micro.push(r); }
+  for (const id in cur) if (!MICRO[id]) micro.push({ id, prompt: cur[id].prompt || '', teach: cur[id].teach || '' });
+  return { lessons, goals, modules, site, micro };
 }
 
 function orderKey(order) {
@@ -217,7 +223,7 @@ if (isMain) {
   const current = readCopyDir(COPY_DIR);
   const out = exportCopy(current);
   mkdirSync(dir, { recursive: true });
-  const texts = { 'lessons.csv': toCsv(HEADERS['lessons.csv'], out.lessons), 'goals.csv': toCsv(HEADERS['goals.csv'], out.goals), 'modules.csv': toCsv(HEADERS['modules.csv'], out.modules), 'site.csv': toCsv(HEADERS['site.csv'], out.site) };
+  const texts = { 'lessons.csv': toCsv(HEADERS['lessons.csv'], out.lessons), 'goals.csv': toCsv(HEADERS['goals.csv'], out.goals), 'modules.csv': toCsv(HEADERS['modules.csv'], out.modules), 'site.csv': toCsv(HEADERS['site.csv'], out.site), 'micro.csv': toCsv(HEADERS['micro.csv'], out.micro) };
   let changed = 0;
   for (const f of FILES) {
     const p = join(dir, f);

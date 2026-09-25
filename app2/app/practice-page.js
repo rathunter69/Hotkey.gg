@@ -1,7 +1,7 @@
 // app2/app/practice-page.js — Practice (SITE_SPEC §5): the drill list with pars, personal bests
 // and best tiers; the Daily; rapid-fire; the sandbox; timed runs on completed lessons. The paid
 // chapters' drills arrive with their chapters.
-import { LESSONS, lessonNumber } from '../content/index.js';
+import { LESSONS, lessonNumber, CHAPTERS, modulesOf } from '../content/index.js';
 import { DRILLS } from '../content/drills.js';
 import { store } from './store.js';
 import { dailyFor } from './daily.js';
@@ -18,6 +18,30 @@ export function bestTier(attempts) {
   return best;
 }
 
+/**
+ * The Keep-sharp offer (C2 Run 4): one challenge from a module EARLIER than the learner's current
+ * one that has not been passed cleanly in the last 14 days — the earliest such module. Offered,
+ * never nagged: null when nothing qualifies (nothing started yet, or every earlier challenge is
+ * fresh). `all` is the progress map; `now` an epoch ms or a 'YYYY-MM-DD' day.
+ */
+export function keepSharp(all, now = Date.now(), attemptsFor = ref => store.attempts({ ref })) {
+  const ch1 = CHAPTERS[0]; if (!ch1) return null;
+  const mods = modulesOf(ch1).filter(m => m.id !== 'welcome' && m.challenge);
+  let current = -1;
+  mods.forEach((m, i) => { if (m.lessons.some(l => all[l.id] && (all[l.id].completed || all[l.id].started)) || (all[m.challenge.id] && (all[m.challenge.id].completed || all[m.challenge.id].challenge))) current = i; });
+  if (current <= 0) return null;
+  const nowMs = typeof now === 'number' ? now : Date.parse(now + 'T00:00:00Z');
+  const cutoff = nowMs - 14 * 86400000;
+  for (let i = 0; i < current; i++) {
+    const m = mods[i];
+    const clean = attemptsFor(m.challenge.id).filter(a => a.clean && !a.timedOut && a.secs != null);
+    const last = clean.reduce((acc, a) => Math.max(acc, a.at || 0), 0);
+    if (last >= cutoff) continue;
+    return { module: m, challenge: m.challenge, n: '1.' + (i + 1), last: last || null, days: last ? Math.floor((nowMs - last) / 86400000) : null };
+  }
+  return null;
+}
+
 export function mountPracticePage(root) {
   const el = document.createElement('div');
   el.className = 'page practice';
@@ -31,14 +55,15 @@ export function mountPracticePage(root) {
   const rows = DRILLS.map(d => {
     const pb = store.pb(d.id);
     const tier = bestTier(store.attempts({ ref: d.id }));
-    return `<a class="drow" href="#/drill/${esc(d.id)}">
-      <span class="dt"><b>${esc(d.title)}${d.benchmark ? ' <span class="muted">· benchmark</span>' : ''}</b><span>${esc(d.task)}</span></span>
+    return `<a class="drow" href="${d.kind === 'challenge' ? '#/lesson/' : '#/drill/'}${esc(d.id)}">
+      <span class="dt"><b>${esc(d.title)}${d.kind === 'challenge' ? ' <span class="muted">· module challenge</span>' : ''}${d.benchmark ? ' <span class="muted">· benchmark</span>' : ''}</b><span>${esc(d.task)}</span></span>
       <span class="dpars">${d.pars.pass} / ${d.pars.pro} / ${d.pars.legendary}s</span>
       <span class="dtier ${tier !== 'none' ? 't-' + tier : ''}">${tier !== 'none' ? TIER_LABEL[tier] : '—'}</span>
       <span class="dpb">${pb ? 'best ' + pb.secs.toFixed(1) + 's' : 'no time'}</span>
     </a>`;
   }).join('');
 
+  const keep = keepSharp(all, dayOf());
   el.innerHTML = `<div class="page-head"><h1>Practice</h1><p class="page-sub">Timed play is the layer you graduate into. The clock starts on your first key; help or mouse means no personal best and no posted time.</p></div>
     <div class="practice-grid">
       <section class="pcard pcard-now" style="grid-column:1 / -1">
@@ -47,6 +72,14 @@ export function mountPracticePage(root) {
           <div class="drill-list">${rows}</div>
         </div>
       </section>
+      ${keep ? `<section class="pcard pcard-now pcard-keep">
+        <div class="pcard-cap"><span>keep sharp</span><span class="pcard-tag on">an earlier module</span></div>
+        <div class="pcard-body">
+          <h2>${esc(keep.challenge.title)}</h2>
+          <p>Module ${esc(keep.n)} · ${esc(keep.module.title)}: ${keep.last ? 'last clean pass ' + keep.days + ' days ago' : 'no clean pass on record'}. Two to three minutes; the keys are the ones the module taught.</p>
+          <a class="btn" href="#/lesson/${esc(keep.challenge.id)}">Run the challenge</a>
+        </div>
+      </section>` : ''}
       <section class="pcard pcard-now">
         <div class="pcard-cap"><span>the daily</span><span class="pcard-tag on">${dailyDone ? dailyDone + ' attempt' + (dailyDone === 1 ? '' : 's') + ' today' : 'open now'}</span></div>
         <div class="pcard-body">

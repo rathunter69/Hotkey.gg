@@ -435,39 +435,39 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
-  "project-the-weekly-kpi-report": {
-   "id": "project-the-weekly-kpi-report",
+  "weekly-kpi-project": {
+   "id": "weekly-kpi-project",
    "module": "project-and-assessment",
    "order": "1.8.P",
    "title": "Project: the weekly KPI report",
-   "brief": "Management’s next feed has arrived and the Report is blank. Build the linked, totaled, margin-bearing, formatted, checked, print-ready one-page report the chapter has been building. This is page one of the Project Volt pack.",
-   "closing": "",
-   "wow": "Page one of the data room, built by you from a raw feed, and every number on it ties.",
+   "brief": "Management’s next feed is in, w/c 22 Sep, and the Report is blank: page one of the pack, the document the buyers read, is yours to build start to finish. Every step is one the chapter taught, from the title to the print set-up, and the page must tie before it goes out. The key is `Ctrl+PgDn`.",
+   "closing": "Page one of the pack is done: a fresh feed, a blank sheet, and fourteen steps later a linked, totaled, formatted and print-ready report whose checks read zero (F1). || The associate would have checked what the checks row checks — revenue ties to the feed, the sites sum to the total, the margin is plausible — then that every link is green (B2), every figure carries the team’s format with $ on the first and total rows, and the page prints on one landscape sheet with its heads repeated (G1).",
+   "wow": "",
    "convention_line": "Inputs blue, formulas black · Links green; external links avoided · One input, one cell; formulas reference it · A units line: \"USD unless stated\" · Parentheses, never a leading minus · One decimals setting per line · A top border, never an all-borders grid · Merged cells break everything · The check is a live difference → 0 · Fit to page, titles, footer",
    "mac_note": "",
    "story_beat": ""
   },
-  "assessment-monday-morning": {
-   "id": "assessment-monday-morning",
+  "foundations-assessment": {
+   "id": "foundations-assessment",
    "module": "project-and-assessment",
    "order": "1.8.A",
    "title": "Assessment: Monday morning",
-   "brief": "Same brief, fresh figures, one extra site. Eight minutes on the clock from your first key, solo and keyboard-only, for the Verified certificate.",
-   "closing": "",
+   "brief": "Monday 7:10am. The associate wants the page before the 9:00: a sister cluster’s w/c 22 Sep feed sits on Raw, the Report is blank, and the page is the one the project built, links, totals, margins, daily block, checks, formats and print set-up, in eight minutes. The key is `Ctrl+PgDn`.",
+   "closing": "Page one of the pack, the document the buyers read, built from a blank sheet in one sitting on a feed you had never seen: every figure a live link or a formula, the checks at zero, the print set-up done. || The associate would have looked at the same things the goals did: green links and blue-free formulas (B1, B2), the price anchored on Inputs (B4), $ only on the first and total rows (D4), a top border on the total (D5), and a page that fits one sheet (G1).",
    "wow": "",
    "convention_line": "Inputs blue, formulas black · Links green; external links avoided · One input, one cell; formulas reference it · A units line: \"USD unless stated\" · Parentheses, never a leading minus · One decimals setting per line · A top border, never an all-borders grid · Merged cells break everything · The check is a live difference → 0 · Fit to page, titles, footer",
    "mac_note": "",
    "story_beat": ""
   },
-  "test-out-of-foundations": {
-   "id": "test-out-of-foundations",
+  "foundations-testout": {
+   "id": "foundations-testout",
    "module": "project-and-assessment",
    "order": "1.8.T",
    "title": "Test out of Foundations",
-   "brief": "Ten tasks across the seven modules on one seeded workbook, five minutes. Pass, and the chapter is skipped.",
-   "closing": "",
+   "brief": "Already know the chapter? A sister cluster’s finished Report arrived with ten faults across everything Foundations covers: the view, the inputs, the feed, the week label, the panes, a hidden column, a number format, a total and a link. Fix all ten in five minutes and the chapter is yours; the key that gets you to each one is `Ctrl+G`.",
+   "closing": "Ten faults across the seven modules of Foundations, found and fixed in one sitting: the page reads clean, every input says so in blue (B1), every link is live and green (B2), and the checks row ties. || That is the chapter: moving without the mouse, marking what is typed, keeping the formulas live, and leaving a page the reader can trust.",
    "wow": "",
-   "convention_line": "",
+   "convention_line": "Borders carry structure, not gridlines · Inputs blue, formulas black · Links green; external links avoided · Keep the timeline and labels in view · One decimals setting per line · Go To Special, show formulas, trace · Fit to page, titles, footer",
    "mac_note": "",
    "story_beat": ""
   }
@@ -2576,6 +2576,324 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "weekly-kpi-project": [
+   {
+    "lesson_id": "weekly-kpi-project",
+    "goal_index": "0",
+    "text": "Give the page its title in A1, bold and one size up, and the units line USD unless stated in A2 in italic.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "weekly-kpi-project",
+    "goal_index": "1",
+    "text": "Tab the eight headers, Site to Margin %, into A4:H4; bold them, right-align and wrap C4:H4, then center the title across A1:H1.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "weekly-kpi-project",
+    "goal_index": "2",
+    "text": "Copy the five site names from Inputs A9:A13 into A5:A9, then type the week label w/c 22 Sep in B5 and fill it down to B9.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "weekly-kpi-project",
+    "goal_index": "3",
+    "text": "Point C5 and D5 at Raw’s I8 and J8 across sheets, E5 at C5 × the wholesale price on Inputs anchored, all three green.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "weekly-kpi-project",
+    "goal_index": "4",
+    "text": "Point Domain’s gross profit F5 =D5-E5, average price G5 =D5/C5 and margin H5 =F5/D5, one after another with Tab.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "weekly-kpi-project",
+    "goal_index": "5",
+    "text": "Row 5 is the page’s one formula row: select C5:H9 with Ctrl+Shift+End and fill it down the five sites with Ctrl+D.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "weekly-kpi-project",
+    "goal_index": "6",
+    "text": "Select C5:F10, the block plus its blank edge: one Alt+= totals every column; point G10 =D10/C10 and H10 =F10/D10; type Total in A10.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "weekly-kpi-project",
+    "goal_index": "7",
+    "text": "Format C5:F10 comma style with no decimals, G5:G10 currency 2, H5:H10 percent 1, then currency 0 on D5:F5 and again on D10:F10 with F4.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "weekly-kpi-project",
+    "goal_index": "8",
+    "text": "The Total row is bold with a top border, never a grid: select the whole row 10 with Shift+Space, Ctrl+B, then Alt H B P.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "weekly-kpi-project",
+    "goal_index": "9",
+    "text": "Head the daily block: A12 kWh sold by day bold, A13:G13 Site and Mon to Sat bold with the days right-aligned, A14:A18 the sites indented.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "weekly-kpi-project",
+    "goal_index": "10",
+    "text": "Select A13:G18, Go To Special for Blanks, point one link at Raw’s I32 and Ctrl+Enter fills all thirty cells; comma 0, green.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "weekly-kpi-project",
+    "goal_index": "11",
+    "text": "Head a Checks block at A20 with its three labels, then the three checks in B21:B23 reading 0, the first pointed at Raw’s J13, comma 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "weekly-kpi-project",
+    "goal_index": "12",
+    "text": "Set columns B:F to width 12 and G:H to 14, then AutoFit column A to its site names A5:A18 and row 4 to its wrapped headers.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "weekly-kpi-project",
+    "goal_index": "13",
+    "text": "Freeze panes at B5, gridlines off, then set the page to print: landscape, one page, rows 1:4 repeated, &[File] and &[Date] in the footer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "weekly-kpi-project",
+    "goal_index": "14",
+    "text": "Does it tie? Watch Domain’s Monday kWh on Raw change to 3,000 and the Total in C10 answer while the checks in B21:B23 stay zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "foundations-assessment": [
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "0",
+    "text": "A1: Voltline - City Weekly KPI Report, w/c 22 Sep 2026, with the city as Costs A1 names it; A2: USD unless stated.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "1",
+    "text": "Row 4, bold: Site, Week, kWh sold, Revenue ($), Energy cost ($), Gross profit ($), Avg price ($/kWh), Margin % across A4:H4.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "2",
+    "text": "The five sites from Inputs A9:A13 into A5:A9, and the week label w/c 22 Sep in B5:B9.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "3",
+    "text": "kWh sold and revenue C5:D9 as live links to Raw’s site totals I8:J12, pointed across sheets.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "4",
+    "text": "Energy cost E5:E9 is kWh times the wholesale price, =C5*Inputs!$B$4 anchored, then color every link C5:E9 green.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "5",
+    "text": "F5:F9 =D5-E5, G5:G9 =D5/C5, H5:H9 =F5/D5 filled down; Total in A10, C10:F10 by AutoSum, G10 =D10/C10, H10 =F10/D10.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "6",
+    "text": "Daily block: kWh sold by day in A12, Site and Mon–Sat bold in row 13, sites indented in A14:A18, B14:G18 green links to Raw’s by-day block.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "7",
+    "text": "Checks in A20, bold; the three labels A21:A23; B21 =D10-Raw!J13, B22 =SUM(C5:C9)-C10, B23 =IF(AND(H10>=0,H10<=1),0,1), all reading 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "8",
+    "text": "Number formats: C5:F10, B14:G18 and B21:B23 comma 0; G5:G10 currency 2; H5:H10 percent 1; D5:F5 and D10:F10 currency 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "9",
+    "text": "Style: total row bold, top border; title bold, a size up, centered across A1:H1; A2 italic; C4:H4 wrapped; C4:H4 and B13:G13 right-aligned.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "10",
+    "text": "Widths: B:F 12, G:H 14, column A AutoFit to the sites, row 4 AutoFit; freeze panes at B5; gridlines off.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "11",
+    "text": "Page setup: landscape, fit to one page, rows 1:4 as print titles, &[File] in the left footer and &[Date] in the right.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "12",
+    "text": "Does it tie? Watch the first site’s Monday kWh on Raw change to 3,000 and the Report’s total in C10 answer while the checks stay zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "foundations-testout": [
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "0",
+    "text": "The Report shows its gridlines: turn them off, as a page someone reads should be.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "1",
+    "text": "Every week label on the Report still reads w/c 08 Sep: replace all of them with w/c 15 Sep in one pass.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "2",
+    "text": "The panes are unfrozen, so the headers scroll away: freeze them at B5 so rows 1–4 and column A stay in view.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "3",
+    "text": "The second site’s revenue in D6 is a typed number where its link belongs: make it =Raw!J9 again.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "4",
+    "text": "The average prices in G5:G11 lost their format: show them as currency with two decimals.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "5",
+    "text": "Margin % is hidden between G and I: select G:I and unhide it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "6",
+    "text": "The gross-profit total in F11 was retyped as a number: make it =SUM(F5:F10) again.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "7",
+    "text": "On Inputs the wholesale price in B4 is an input shown black: color it blue.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "8",
+    "text": "On Costs the typed figures in B4:D8 read black: select the constants with Go To Special and color them blue.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "9",
+    "text": "On Raw the site name in B14 has a doubled last letter: open it and remove the extra letter.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "10",
+    "text": "Does it tie? Watch the first site’s Monday on Raw change to 3,000 and the Total in C11 answer, with the checks below still reading zero.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
   ]
  },
  "modules": {
@@ -2632,7 +2950,7 @@ export const COPY = {
    "id": "project-and-assessment",
    "name": "Project, assessment, test-out",
    "objective": "Build the weekly report end to end, then prove it against the clock; or test out of the chapter.",
-   "story_beat": "",
+   "story_beat": "Management’s next feed is in. || A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.",
    "page_name": "The weekly KPI report"
   }
  },
@@ -2671,5 +2989,247 @@ export const COPY = {
   "install_prompt": "Install hotkey.gg as an app. One click; it opens in its own window and stays in your dock.",
   "due_empty": "Nothing due. Play the Daily, or carry on with the next lesson.",
   "due_foot": "Short reps on what you are about to forget. Nothing is lost by skipping a day."
+ },
+ "micro": {
+  "enter-tab-direction": {
+   "id": "enter-tab-direction",
+   "prompt": "Enter three day names across a row with Tab, and let Enter bring you back under the first.",
+   "teach": ""
+  },
+  "escape-cancels": {
+   "id": "escape-cancels",
+   "prompt": "Start typing over the title, then throw the entry away with Esc.",
+   "teach": ""
+  },
+  "ctrl-enter-fill": {
+   "id": "ctrl-enter-fill",
+   "prompt": "Put this week’s label in all five site rows with one entry.",
+   "teach": ""
+  },
+  "edit-caret": {
+   "id": "edit-caret",
+   "prompt": "Add to a cell’s text without retyping it.",
+   "teach": ""
+  },
+  "find-replace": {
+   "id": "find-replace",
+   "prompt": "Land on the feed’s first Saturday without scrolling.",
+   "teach": ""
+  },
+  "undo-redo": {
+   "id": "undo-redo",
+   "prompt": "Break a figure, take it back, put the break back, take it back again.",
+   "teach": ""
+  },
+  "copy-cut-paste": {
+   "id": "copy-cut-paste",
+   "prompt": "Carry the headers down the page, then move the units line.",
+   "teach": ""
+  },
+  "fill-down-right": {
+   "id": "fill-down-right",
+   "prompt": "Correct one label and push it across the row.",
+   "teach": ""
+  },
+  "paste-special": {
+   "id": "paste-special",
+   "prompt": "Freeze the total row as numbers in place.",
+   "teach": ""
+  },
+  "replace-all": {
+   "id": "replace-all",
+   "prompt": "Swap last week’s label for this week’s everywhere on the page in one go.",
+   "teach": ""
+  },
+  "fill-series": {
+   "id": "fill-series",
+   "prompt": "Type one day and let Fill Series write the rest.",
+   "teach": ""
+  },
+  "insert-delete-rows": {
+   "id": "insert-delete-rows",
+   "prompt": "Insert a row inside the site block and watch the total follow; then take it out.",
+   "teach": ""
+  },
+  "ref-error": {
+   "id": "ref-error",
+   "prompt": "Delete a row a formula depends on, read the error, heal it with undo.",
+   "teach": ""
+  },
+  "column-width": {
+   "id": "column-width",
+   "prompt": "Give the Site column a width you choose.",
+   "teach": ""
+  },
+  "autofit": {
+   "id": "autofit",
+   "prompt": "Let the column size itself to its longest entry.",
+   "teach": ""
+  },
+  "wrap-text": {
+   "id": "wrap-text",
+   "prompt": "Make a long header wrap inside its column.",
+   "teach": ""
+  },
+  "hide-unhide": {
+   "id": "hide-unhide",
+   "prompt": "Hide two columns the way most people do, then bring them back.",
+   "teach": ""
+  },
+  "group-ungroup": {
+   "id": "group-ungroup",
+   "prompt": "Fold two working columns behind an outline button, then ungroup them.",
+   "teach": ""
+  },
+  "freeze-panes": {
+   "id": "freeze-panes",
+   "prompt": "Keep the header rows and the site column on screen while the page scrolls.",
+   "teach": ""
+  },
+  "format-cells-dialog": {
+   "id": "format-cells-dialog",
+   "prompt": "Open Format Cells by shortcut and back out cleanly.",
+   "teach": ""
+  },
+  "number-formats": {
+   "id": "number-formats",
+   "prompt": "Comma, no decimals, on a block of figures in three presses.",
+   "teach": ""
+  },
+  "borders-menu": {
+   "id": "borders-menu",
+   "prompt": "Give the total row a top border, the way the team marks a total.",
+   "teach": ""
+  },
+  "center-across": {
+   "id": "center-across",
+   "prompt": "Center the title over the page without merging a single cell.",
+   "teach": ""
+  },
+  "f4-repeat": {
+   "id": "f4-repeat",
+   "prompt": "Format one block, then repeat it on the next with a single key.",
+   "teach": ""
+  },
+  "pointing": {
+   "id": "pointing",
+   "prompt": "Write a formula by pointing at its cells.",
+   "teach": ""
+  },
+  "autosum": {
+   "id": "autosum",
+   "prompt": "Total every column of a block in one press.",
+   "teach": ""
+  },
+  "sum-family": {
+   "id": "sum-family",
+   "prompt": "Two of SUM’s family on the site block.",
+   "teach": ""
+  },
+  "f4-anchor": {
+   "id": "f4-anchor",
+   "prompt": "One formula whose anchors let it fill both ways.",
+   "teach": ""
+  },
+  "cross-sheet-ref": {
+   "id": "cross-sheet-ref",
+   "prompt": "Link a figure on the Report to the feed by pointing on the other sheet.",
+   "teach": ""
+  },
+  "show-formulas": {
+   "id": "show-formulas",
+   "prompt": "See every formula on the page at once, then put the figures back.",
+   "teach": ""
+  },
+  "formula-errors": {
+   "id": "formula-errors",
+   "prompt": "Read an error code and fix the formula behind it.",
+   "teach": ""
+  },
+  "orientation": {
+   "id": "orientation",
+   "prompt": "Turn the page sideways for a wide report.",
+   "teach": ""
+  },
+  "print-titles": {
+   "id": "print-titles",
+   "prompt": "Keep the heads on every printed page.",
+   "teach": ""
+  },
+  "check-cell": {
+   "id": "check-cell",
+   "prompt": "Write one live difference that proves two figures agree.",
+   "teach": ""
+  },
+  "ctrl-arrow": {
+   "id": "ctrl-arrow",
+   "prompt": "Get to the bottom of the feed and back to the top without scrolling.",
+   "teach": ""
+  },
+  "ctrl-home-end": {
+   "id": "ctrl-home-end",
+   "prompt": "Land on the last used cell, then back on A1.",
+   "teach": ""
+  },
+  "ctrl-shift-arrow": {
+   "id": "ctrl-shift-arrow",
+   "prompt": "Select the whole Revenue column of the feed in one move.",
+   "teach": ""
+  },
+  "shift-arrow": {
+   "id": "shift-arrow",
+   "prompt": "Select one site’s week of dates by hand.",
+   "teach": ""
+  },
+  "row-col-select": {
+   "id": "row-col-select",
+   "prompt": "Select a row and a column of the feed with the keyboard.",
+   "teach": ""
+  },
+  "ctrl-a": {
+   "id": "ctrl-a",
+   "prompt": "Select the whole feed in one press.",
+   "teach": ""
+  },
+  "sheet-tabs": {
+   "id": "sheet-tabs",
+   "prompt": "Move to the Costs sheet and back to Raw by keyboard.",
+   "teach": ""
+  },
+  "go-to": {
+   "id": "go-to",
+   "prompt": "Land on a cell by address, across sheets.",
+   "teach": ""
+  },
+  "rename-sheet": {
+   "id": "rename-sheet",
+   "prompt": "Give the scratch tab its proper name.",
+   "teach": ""
+  },
+  "gridlines": {
+   "id": "gridlines",
+   "prompt": "Turn the gridlines off on the sheet a reader sees.",
+   "teach": ""
+  },
+  "font-color": {
+   "id": "font-color",
+   "prompt": "Color a typed figure blue the way a model reads it.",
+   "teach": ""
+  },
+  "go-to-special": {
+   "id": "go-to-special",
+   "prompt": "Select every typed number in a block in one go.",
+   "teach": ""
+  },
+  "bold-command": {
+   "id": "bold-command",
+   "prompt": "Make the feed’s header row bold.",
+   "teach": ""
+  },
+  "keytips": {
+   "id": "keytips",
+   "prompt": "Reach a command by KeyTips and back out one level at a time.",
+   "teach": ""
+  }
  }
 };

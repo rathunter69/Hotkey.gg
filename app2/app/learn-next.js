@@ -84,7 +84,6 @@ export function mountLearnPage(root, ctx = {}) {
   const el = document.createElement('div');
   el.className = 'dr';
   let openChapter = 'foundations';
-  let archiveOpen = false;
   let focusIdx = -1;
 
   function render() {
@@ -168,12 +167,6 @@ export function mountLearnPage(root, ctx = {}) {
         docs += `<article class="dr-doc dr-coming"><div class="dr-doc-num"><span>${esc(plan.n)}</span></div><div class="dr-doc-main"><div class="dr-doc-row"><h3>${esc(plan.title)}</h3><span class="dr-status st-coming">Coming</span></div><p class="dr-obj">${esc(plan.objective)}</p></div><div class="dr-doc-page"><div class="dr-page-cap"><b>Page ${esc(plan.n)}</b> not yet</div></div></article>`;
       }
       docs += '</div>';
-      // the archive: the legacy lessons, one folder, collapsed
-      const legacy = ch1 ? ch1.lessons.filter(l => (typeof l.module !== 'string' || l.module === 'welcome') && !isFinalItem(l)) : [];
-      if (legacy.length) {
-        docs += `<div class="dr-archive"><button type="button" class="dr-folder dr-archive-btn${archiveOpen ? ' open' : ''}" id="drArchive" aria-expanded="${archiveOpen}"><span class="dr-folder-ico" aria-hidden="true">${archiveOpen ? '▾' : '▸'}</span><span class="dr-folder-t">Archive · earlier lessons</span><span class="dr-folder-meta"><span class="dr-count">${legacy.length}</span></span><span class="dr-tease">The first draft of Chapter 1. Still playable; replaced module by module as the rewrite lands.</span></button>
-          ${archiveOpen ? `<ol class="dr-steps dr-archive-list">${legacy.map(l => { const st = statusOf(l.id, all, skipped); return `<li class="dr-step st-${esc(st)}"><a href="#/lesson/${esc(l.id)}" data-open="${esc(l.id)}"><span class="dr-step-n">${lessonNumber(l.id)}</span><span class="dr-step-t">${esc(l.title)}</span><span class="dr-step-m">${esc(l.section || '')}</span><span class="dr-step-st">${st === 'done' || st === 'mastered' ? '✓' : st === 'started' ? '…' : ''}</span></a></li>`; }).join('')}</ol>` : ''}</div>`;
-      }
     } else {
       const pl = CHAPTER_PLAN.find(p => p.id === openChapter) || CHAPTER_PLAN[1];
       const st = STAGES.find(s => s.id === pl.id) || {};
@@ -199,7 +192,6 @@ export function mountLearnPage(root, ctx = {}) {
   }
   function wire() {
     for (const b of el.querySelectorAll('.dr-folder[data-ch]')) b.onclick = () => { openChapter = b.dataset.ch; render(); };
-    const arch = el.querySelector('#drArchive'); if (arch) arch.onclick = () => { archiveOpen = !archiveOpen; render(); };
     const list = steps();
     const nextI = list.findIndex(a => a.closest('.dr-step').classList.contains('next'));
     setFocus(focusIdx >= 0 ? focusIdx : nextI >= 0 ? nextI : 0, false);

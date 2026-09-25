@@ -28,6 +28,8 @@ import { pageThumbHtml } from './learn-next.js';
 import { schedule, grade as scheduleGrade, dueToday } from './schedule.js';
 import { shouldOfferInstall, installAvailable, promptInstall, INSTALL_PROMPT } from './install.js';
 import { siteCopy } from '../content/copy/apply.js';
+import { printPreviewHtml, associateLine } from '../ui/print-preview.js';
+import { WORKBOOKS } from '../content/workbooks/index.js';
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 /** A keycap: the chord as the learner's platform shows it (Ctrl → ⌘, Alt → ⌥ on a Mac). */
@@ -57,7 +59,7 @@ function ensureCss() {
   document.head.appendChild(link);
 }
 
-export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt, seed: seedOpt } = {}) {
+export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt, seed: seedOpt, daily: dailyOpt } = {}) {
   ensureCss();
   const chapter = chapterOf(lesson);
   const fullRibbon = chapter && chapter.id === 'foundations';   // Chapter 1: the full ribbon bar is on by default (§4)
@@ -197,7 +199,8 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
 
   // The first attempt at a challenge is soft-timed (C2 addendum): the clock runs and decides the
   // tier, but time-up does not end the run. From the second attempt the limit is hard.
-  const firstAttempt = () => isChallenge && store.attempts({ ref: lesson.id }).length === 0;
+  // The assessment and test-out (seeded, timed) get the same soft first attempt (C2 Run 4).
+  const firstAttempt = () => (isChallenge || timedOnly) && store.attempts({ ref: lesson.id }).length === 0;
   const run = new LessonRun(lesson, {
     mode,
     soft: firstAttempt(),
@@ -482,6 +485,18 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     on('route', () => { closeOverlay(); startGhost(parseKeyScript(lesson.solution)); });
   }
   /** One line naming the next lesson's job: the first sentence of its brief (or read, or its title). */
+  /** The chapter's ending (C2 Run 4): the project finishes on the print preview of the KPI page, the checks green, and one line of what the associate would have flagged. */
+  function projectEndHtml() {
+    try {
+      const wb = WORKBOOKS[lesson.workbook]; if (!wb) return '';
+      const entry = run.session.sheets.find(x => x.name === 'Report') || run.session.sheets[0];
+      const after = wb.stateOf(lesson.state.after);
+      const afterRep = after.sheets.find(x => x.name === entry.name) || after.sheets[0];
+      const checks = Object.keys(afterRep.cells || {}).filter(ref => /^B\d+$/.test(ref) && afterRep.cells[ref].formula && /^=.*(-|IF\()/.test(afterRep.cells[ref].formula) && +ref.slice(1) > 15);
+      const line = associateLine(wb.diffStates(wb.sessionToState(run.session), after), entry.name);
+      return `<div class="rm-preview">${printPreviewHtml(entry.sheet, run.session.settings.pageSetup || {}, { checks, tab: entry.name })}<p class="rm-assoc">${esc(line)}</p></div>`;
+    } catch (e) { return ''; }
+  }
   function nextJobHtml() {
     const nxt = nextLesson(lesson.id); if (!nxt) return '';
     const src = String(nxt.brief || nxt.read || nxt.title);
@@ -508,11 +523,12 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
       <div class="rm-title" id="doneTitle">${isChallenge && lastTier ? esc(lastTier[0].toUpperCase() + lastTier.slice(1)) + '!' : isMicro ? 'Done' : doneTitle()}</div>
       <div class="rm-lesson">${isMicro ? 'Due today · ' + esc(lesson.title) : esc(itemNumber(lesson, at) || String(lessonNumber(lesson.id))) + ' · ' + esc(lesson.title) + ' · ' + modeLabel()}</div>
       ${lesson.race ? raceHtml() : `<div class="rm-time">${secs == null ? '—' : fmtSecs(secs)}<span>s</span></div>`}
-      ${isChallenge && lesson.pars ? `<div class="tier-stamps">${['pass', 'pro', 'legendary'].map(t => `<span class="tstamp ${lastTier && ['pass', 'pro', 'legendary'].indexOf(t) <= ['pass', 'pro', 'legendary'].indexOf(lastTier) ? 'hit' : ''}">${t} ${lesson.pars[t]}s</span>`).join('')}</div>` : ''}
+      ${(isChallenge || timedOnly) && lesson.pars ? `<div class="tier-stamps">${['pass', 'pro', 'legendary'].map(t => `<span class="tstamp ${lastTier && ['pass', 'pro', 'legendary'].indexOf(t) <= ['pass', 'pro', 'legendary'].indexOf(lastTier) ? 'hit' : ''}">${t} ${lesson.pars[t]}s</span>`).join('')}</div>` : ''}
       <div class="rm-stats"><div>keystrokes<b>${run.session.keyLog.length}${isChallenge && opt ? ' / ' + opt : ''}</b></div>${run.mouseCount ? `<div>mouse<b>×${run.mouseCount}</b></div>` : ''}${run.mode === 'timed' && run.par ? `<div>par<b>${run.par} s</b></div>` : ''}${xpGained ? `<div>earned<b class="rm-xp">+0 XP</b></div>` : ''}</div>
-      ${lastTimedOut ? `<div class="rm-note">Over the limit — no tier. The module still counts.</div>` : ''}
+      ${lastTimedOut ? `<div class="rm-note">${timedOnly ? `Over the limit — no tier, and the ${lesson.kind === 'testout' ? 'chapter is not skipped' : 'gate is not passed'}. The run still counts; the next attempt runs against a hard clock.` : 'Over the limit — no tier. The module still counts.'}</div>` : ''}
       ${lastClean ? `<div class="rm-clean">✓ Clean sheet — no mouse, no help</div>` : assisted() ? `<div class="rm-note">Assisted — steps were shown on request.</div>` : ''}
       ${deliveredNow ? `<div class="rm-page"><div class="rm-page-slot" aria-hidden="true">${pageThumbHtml(at.module, true)}</div><div class="rm-page-line">${esc(pageDelivered(at))}</div></div>` : ''}
+      ${lesson.kind === 'project' && next ? projectEndHtml() : ''}
       ${closingHtml()}
       ${isMicro ? '' : nextJobHtml()}
       ${firstEver && store.saveState() === 'device' ? `<div class="rm-save"><b>Your first lesson is done.</b> Progress is saved on this device. <a href="#/account">Create a free account</a> to keep it across devices — everything you have done carries over.</div>` : ''}
@@ -576,9 +592,9 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     lastClean = !assisted() && !run.mouseCount;
     // A clean challenge earns the tier its time and its keystrokes reach (pro ≤ 1.5× the reference
     // route, legendary ≤ 1.2×); help, mouse or a run past the limit records the pass with none.
-    lastTimedOut = isChallenge && run.timedOut;
+    lastTimedOut = (isChallenge || timedOnly) && run.timedOut;
     lastTier = null;
-    if (isChallenge && lastClean && lesson.pars) {
+    if ((isChallenge || timedOnly) && lastClean && lesson.pars) {
       const t = tierFor(run.elapsed, lesson.pars, { keys: run.session.keyLog.length, optimalKeys: run.optimalKeys, timedOut: lastTimedOut });
       lastTier = t === 'none' ? null : t;
     }
@@ -596,16 +612,18 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     if (run.mode === 'timed' || isChallenge) {
       store.addAttempt({
         id: attemptId(), kind: isChallenge ? 'challenge' : 'lesson-timed', ref: lesson.id, day: dayOf(),
-        seed: isChallenge && Number.isInteger(run.seedNo) ? run.seedNo : null,
+        seed: Number.isInteger(run.seedNo) ? run.seedNo : null,
         secs: run.elapsed, keys: run.session.keyLog.length,
         clean: lastClean, helped: assisted(), mouse: run.mouseCount,
         tier: lastTier || 'none', first: wasFirst, timedOut: lastTimedOut,
         splits: run.splits().filter(Number.isFinite), trace: traceOf(run.session.keyLog), at: Date.now(),
       });
+      // a challenge reached from the Daily (drills.js registers the module challenges) is today's Daily attempt too
+      if (isChallenge && dailyOpt) store.addAttempt({ id: attemptId(), kind: 'daily', ref: lesson.id, day: dayOf(), seed: Number.isInteger(run.seedNo) ? run.seedNo : null, secs: run.elapsed, keys: run.session.keyLog.length, clean: lastClean, helped: assisted(), mouse: run.mouseCount, tier: lastTier || 'none', splits: run.splits().filter(Number.isFinite), trace: traceOf(run.session.keyLog), at: Date.now() });
     }
     // A finished assessment or test-out inside its time limit passes the chapter gate (§7);
     // a test-out also marks every not-yet-completed chapter lesson skipped, like placement does.
-    if (timedOnly) {
+    if (timedOnly && !lastTimedOut) {   // a soft first attempt that ran over completes the item, not the gate
       store.chapterPass(lesson.chapter, lesson.kind);
       if (lesson.kind === 'testout' && chapter) {
         const all = store.all();
@@ -619,7 +637,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     effects.finish($('stage'));
     if (lastClean && effects.cleanSheet) effects.cleanSheet();
     // the module's page goes into the pack the first time its challenge passes, and only then
-    deliveredNow = !!(next && isChallenge && at && !prefs.get().pagesDelivered.includes(at.module.id));
+    deliveredNow = !!(next && (isChallenge || lesson.kind === 'project') && at && !prefs.get().pagesDelivered.includes(at.module.id));
     if (deliveredNow) { prefs.set({ pagesDelivered: [...prefs.get().pagesDelivered, at.module.id] }); if (effects.packPage) effects.packPage(); }
     celebrate(effects, ctxBefore);
     const lv = wrap.querySelector('#wsLevel'); if (lv) { const c2 = gameCtx(); lv.innerHTML = `L${c2.level} <i>${c2.levelInfo.into}/${c2.levelInfo.need} XP</i>`; }

@@ -27,6 +27,8 @@ const BEATS_DEFAULT = {
     body: 'Every figure on the Report links to Raw and Inputs, so a corrected feed flows through without retyping. SUM and its family, anchoring with F4, links across sheets, and what each error means.' },
   'present-and-audit': { eyebrow: 'Module 1.7 · present and audit', title: 'Sign the page off.',
     body: 'The buyer’s analyst opens page one first. Check the totals tie, the conventions hold, the print fits one page, and nothing is hardcoded that should not be. Then it goes in the pack.' },
+  'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
+    body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };
 
 /** modules.csv story_beat ("Title || body") overrides a module's built-in beat; a row with only a body keeps the built-in title. */

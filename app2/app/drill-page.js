@@ -60,6 +60,8 @@ export function mountDrillPage(root, ctx = {}) {
   const daily = !!(ctx.params && ctx.params.daily) && (() => { const d = dailyDrill(dayOf()); return d.drill ? d : null; })();
   const id = daily ? daily.drill.id : (ctx.params && ctx.params.id) || 'sandbox';
   const drill = daily ? daily.drill : id === 'sandbox' ? SANDBOX : drillById(id) || SANDBOX;
+  // a module challenge in the catalogue runs in the lesson workspace (seeded, timed, tier-scored); the Daily passes its seed
+  if (drill.kind === 'challenge') { location.replace('#/lesson/' + encodeURIComponent(drill.id) + (daily ? '?daily=1&seed=' + daily.seed : '')); return { destroy() {} }; }
   const pos = NAV.findIndex(d => d.id === drill.id) + 1;
   const prev = daily ? null : NAV[pos - 2] || null, next = daily ? null : NAV[pos] || null;
   const graded = drill !== SANDBOX;

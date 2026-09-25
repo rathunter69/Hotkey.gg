@@ -6,6 +6,7 @@ import { Session, parseKeyScript, parseKeySpec } from '../engine/keyboard.js';
 import { stepPath } from '../engine/ribbon.js';
 import { workbookState, applyStatePatch } from '../content/workbooks/index.js';
 import { mulberry32 } from '../engine/rng.js';
+import { SEEDED_KINDS } from '../content/schema.js';
 
 export class LessonRun {
   /**
@@ -35,7 +36,7 @@ export class LessonRun {
     // A challenge is a generator: the seed decides the clothing, figures and planting positions
     // (content only, never workload). The seed number is remembered so the attempt can carry it
     // and a ghost can replay the very sheet the run was set on.
-    if (moduleState && this.lesson.kind === 'challenge' && typeof this.lesson.seed === 'function') {
+    if (moduleState && SEEDED_KINDS.includes(this.lesson.kind) && typeof this.lesson.seed === 'function') {
       this.seedNo = Number.isFinite(this.opts.seedNo) ? this.opts.seedNo >>> 0 : (Math.random() * 4294967296) >>> 0;
       applyStatePatch(moduleState, this.lesson.seed(mulberry32(this.seedNo)) || {});
     }

@@ -91,7 +91,7 @@ test('the checked-in copy passes its own rules and the inlined index matches the
   const copy = readCopyDir(COPY_DIR);
   const findings = checkCopy(copy);
   assert.deepEqual(findings.filter(f => f.level === 'error'), [], 'no violations in content/copy');
-  assert.deepEqual(JSON.parse(renderIndex(copy).replace(/^[\s\S]*?export const COPY = /, '').replace(/;\s*$/, '')), { lessons: copy.lessons, goals: copy.goals, modules: copy.modules, site: copy.site });
+  assert.deepEqual(JSON.parse(renderIndex(copy).replace(/^[\s\S]*?export const COPY = /, '').replace(/;\s*$/, '')), { lessons: copy.lessons, goals: copy.goals, modules: copy.modules, site: copy.site, micro: copy.micro });
   for (const f in HEADERS) assert.ok(Array.isArray(HEADERS[f]));
 });
 

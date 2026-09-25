@@ -4,6 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { STATES, STATE_ORDER, stateOf, diffStates, sessionToState, KWH, SITES, rawRow, SITE_PRICE } from '../content/workbooks/voltline-weekly.js';
+import { SEEDED_KINDS } from '../content/schema.js';
 import { WORKBOOKS, workbookState } from '../content/workbooks/index.js';
 import { CLUSTERS, pickCluster, siteNames } from '../content/workbooks/clusters.js';
 import { mulberry32 } from '../engine/rng.js';
@@ -145,6 +146,7 @@ test('every module lesson chains: before is the previous lesson\'s after', () =>
   for (const l of moduleLessons) { if (!byModule.has(l.module)) byModule.set(l.module, []); byModule.get(l.module).push(l); }
   let prevAfter = null;
   for (const l of moduleLessons) {
+    if (l.module === 'project-and-assessment') continue;   // 1.8 opens management's next feed (S8raw), not the chain's end
     if (prevAfter != null && l.kind !== 'challenge') assert.equal(l.state.before, prevAfter, `${l.id}: starts where the last lesson ended`);
     if (l.kind !== 'challenge') prevAfter = l.state.after || l.state.before;
   }
@@ -153,7 +155,7 @@ test('every module lesson chains: before is the previous lesson\'s after', () =>
 
 /* ---------------- the solution produces exactly the after state (C2: the chain is real) ---------------- */
 test('every module lesson\'s solution replays to exactly its after state', () => {
-  for (const l of LESSONS.filter(x => x.workbook && x.state && x.kind !== 'challenge')) {
+  for (const l of LESSONS.filter(x => x.workbook && x.state && !SEEDED_KINDS.includes(x.kind))) {
     const run = new LessonRun(l, { now: () => 0 });
     run.run(l.solution);
     assert.ok(run.finished, `${l.id}: solution finishes`);

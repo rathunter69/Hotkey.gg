@@ -12,7 +12,26 @@ const KEY = 'hk2_progress_v1';
  */
 export const LESSON_ID_MAP = {
   'welcome-export': 'inherited-workbook',   // the Welcome race folded into 1.1.1's opening goals (C2 Run 2 addendum)
+  'welcome-race': 'inherited-workbook',     // the legacy race: the same ground (Run 4)
+  'managing-sheets': 'inherited-workbook',
+  'excel-options': 'analyst-setup',
+  'page-setup': 'fit-to-one-page',
+  'weekly-report-project': 'weekly-kpi-project',
+  // 'foundations-assessment' and 'foundations-testout' keep their ids
 };
+/** The legacy lesson ids deleted in Run 4: their records are dropped on load (bar the map above) and their URLs go to the catalog. */
+export const LEGACY_IDS = new Set(['welcome-race', 'workbook-sheets-cells', 'managing-sheets', 'ribbon-and-keytips', 'excel-options', 'page-setup', 'active-cell', 'moving-around', 'selecting-ranges', 'entering-data', 'editing-cells', 'ribbon-commands', 'dialog-boxes', 'page-keys', 'go-to-cells', 'select-blocks', 'go-to-special', 'undo-redo', 'fill-down-right', 'find-replace', 'insert-delete-rows', 'widths-heights', 'hide-freeze', 'home-tab-tour', 'format-cells-tabs', 'fills-and-colours', 'first-formula', 'sum-family', 'autosum', 'absolute-refs', 'cross-sheet', 'formula-errors', 'copy-cut-paste', 'paste-special', 'fill-series', 'weekly-report-project', 'welcome-export']);
+/** Apply the id migration once over a lessons map (in place): mapped ids fold into their successor as started; other legacy ids are dropped. */
+export function migrateIds(lessons) {
+  for (const old in LESSON_ID_MAP) {
+    if (!lessons[old]) continue;
+    const to = LESSON_ID_MAP[old];
+    if (!lessons[to]) lessons[to] = { started: true, ...(Number.isFinite(lessons[old].at) ? { at: lessons[old].at } : {}) };
+    delete lessons[old];
+  }
+  for (const id in lessons) if (LEGACY_IDS.has(id)) delete lessons[id];
+  return lessons;
+}
 
 const isPlainObject = v => typeof v === 'object' && v !== null && !Array.isArray(v);
 
@@ -48,12 +67,7 @@ function load() {
     const lessons = {};
     if (isPlainObject(v) && isPlainObject(v.lessons)) {
       for (const id in v.lessons) { const e = cleanEntry(v.lessons[id]); if (e) lessons[id] = e; }
-      for (const old in LESSON_ID_MAP) {
-        if (!lessons[old]) continue;
-        const to = LESSON_ID_MAP[old];
-        if (!lessons[to]) lessons[to] = { started: true, ...(Number.isFinite(lessons[old].at) ? { at: lessons[old].at } : {}) };
-        delete lessons[old];
-      }
+      migrateIds(lessons);
     }
     return { lessons, chapters: cleanChapters(isPlainObject(v) ? v.chapters : null) };
   } catch (e) { return { lessons: {}, chapters: {} }; }

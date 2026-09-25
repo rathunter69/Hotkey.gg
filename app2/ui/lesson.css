@@ -162,3 +162,17 @@
 .task-why{font-size:13.5px; color:var(--muted); margin-top:4px; line-height:1.5; font-style:italic}
 .task-stuck{font-size:13.5px; color:var(--text); margin-top:6px; line-height:1.5; padding:6px 8px; border-left:3px solid var(--accent); background:var(--surface2); border-radius:0 6px 6px 0}
 .rm-wow{font-size:15px; color:var(--text); text-align:left; margin:2px 0 10px; line-height:1.5; font-weight:600}
+
+/* ---- the chapter's ending: the KPI page as it prints (ui/print-preview.js) ---- */
+.rm-card:has(.rm-preview){width:640px}
+.rm-preview{margin:6px 0 14px}
+.pp-page{background:#fff; color:#111; border:1px solid #cfcfcf; box-shadow:0 6px 24px rgba(0,0,0,.35); padding:14px 16px 10px; margin:0 auto; width:100%; max-width:560px; min-height:300px; display:flex; flex-direction:column; text-align:left; overflow:hidden}
+.pp-page.pp-land{min-height:260px}
+.pp-sheet{border-collapse:collapse; width:100%; font:9px/1.35 Arial, Helvetica, sans-serif; table-layout:fixed}
+.pp-sheet td{padding:1px 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; vertical-align:bottom}
+.pp-sheet td.pp-title{background:#f4f4f4}
+.pp-sheet td.pp-ok{background:#d9f2df; color:#1e7d34; font-weight:700}
+.pp-sheet td.pp-bad{background:#fbe0e0; color:#b12; font-weight:700}
+.pp-footer{margin-top:auto; padding-top:8px; display:flex; justify-content:space-between; font:8px Arial, Helvetica, sans-serif; color:#555}
+.pp-cap{font-family:var(--mono); font-size:11px; color:var(--muted); margin:6px 0 0}
+.rm-assoc{font-family:var(--sans); font-size:13px; color:var(--text); margin:10px 0 0}

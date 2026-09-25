@@ -14,12 +14,14 @@
 //   R9  why ≤ 110 characters
 //   R10 goal text is one sentence ending in a full stop; teach and why are one sentence
 //   R11 site.csv carries every key the screens read
+//   R12 micro.csv carries a row for every micro-drill (warn: the drill keeps its JS prompt)
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readCopyDir, COPY_DIR } from './copy-build.js';
 import { LESSONS } from '../content/index.js';
 import { WORKBOOKS } from '../content/workbooks/index.js';
 import { RIBBON_WORDS, SITE_KEYS } from '../content/copy/rules.js';
+import { MICRO } from '../app/schedule.js';
 
 export const BRITISH = /\b(colou?r(?:ed|ing|s)?\b(?<=colour\w*)|colour\w*|practis(?:e|es|ed|ing)|centre\w*|organis(?:e|es|ed|ing|ation)|recognis\w*|analys(?:e|ed|es|ing)\b|grey\b|favour\w*|licence|behaviour\w*|utilis\w*|programme\b)/i;
 export const HOUSE_STYLE = /\bhouse style\b/i;
@@ -92,6 +94,8 @@ export function checkCopy(copy, lessons = LESSONS) {
   for (const id in copy.modules) { const m = copy.modules[id]; textFields(`modules.csv ${id}`, [['name', m.name], ['objective', m.objective], ['story_beat', m.story_beat], ['page_name', m.page_name]]); }
   for (const k in copy.site) textFields(`site.csv ${k}`, [['text', copy.site[k]]]);
   for (const k of SITE_KEYS) if (!(k in copy.site)) warn('R11', `site.csv ${k}`, 'missing key (the screen falls back to its built-in line)');
+  for (const id in copy.micro || {}) { const m = copy.micro[id]; textFields(`micro.csv ${id}`, [['prompt', m.prompt], ['teach', m.teach]]); if (m.teach && sentenceCount(m.teach) > 1) err('R10', `micro.csv ${id}`, `teach must be one sentence: "${m.teach}"`); }
+  if (copy.micro) for (const id in MICRO) if (!copy.micro[id]) warn('R12', `micro.csv ${id}`, 'missing row (the drill keeps its JS prompt)');
   return out;
 }
 

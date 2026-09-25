@@ -22,14 +22,14 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 test('guest path: store.record delegates to progress.js unchanged', () => {
   mem.clear();
   assert.equal(store.saveState(), 'device');
-  assert.equal(store.record('active-cell', 'timed', 21.5, { clean: true }), true);
-  assert.deepEqual(progress.get('active-cell'), store.get('active-cell'));
-  assert.equal(store.get('active-cell').best, 21.5);
-  assert.equal(store.status('active-cell'), 'mastered');
+  assert.equal(store.record('inherited-workbook', 'timed', 21.5, { clean: true }), true);
+  assert.deepEqual(progress.get('inherited-workbook'), store.get('inherited-workbook'));
+  assert.equal(store.get('inherited-workbook').best, 21.5);
+  assert.equal(store.status('inherited-workbook'), 'mastered');
   assert.equal(mem.has(OUTBOX_KEY), false, 'no outbox for a guest');
   // help or mouse: no best, exactly as progress.js
-  store.record('active-cell', 'timed', 5, { clean: false });
-  assert.equal(store.get('active-cell').best, 21.5);
+  store.record('inherited-workbook', 'timed', 5, { clean: false });
+  assert.equal(store.get('inherited-workbook').best, 21.5);
   progress.clear();
 });
 

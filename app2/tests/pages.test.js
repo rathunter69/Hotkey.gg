@@ -79,16 +79,15 @@ test('pickNextLesson: the first lesson neither completed nor skipped, in catalog
 });
 
 test('pickNextLesson: works on the real catalogue with placement skips', () => {
-  // 'move' skips the Welcome race, the workbook lesson and the Moving section; 'select' the Selecting section;
-  // the section-1 Options and Page Setup lessons are never skipped, so a daily user starts there at the latest
-  // the placement tasks cover legacy ids only, so mid-rewrite the module lessons always come first
+  // 'move' skips 1.2.1, 'select' 1.2.2, 'type-bold' 1.1.2: the first lesson (1.1.1) is never skipped, so everyone starts there
   const skipped = skipsFor(['move', 'select']);
   assert.equal(pickNextLesson(LESSONS, {}, skipped).id, 'inherited-workbook');
   assert.equal(pickNextLesson(LESSONS, {}, []).id, 'inherited-workbook');
-  // within the legacy block the placement skips still steer to the first uncovered lesson
-  const legacy = LESSONS.slice(LESSONS.findIndex(l => l.id === 'welcome-race'));
-  assert.equal(pickNextLesson(legacy, {}, skipped).id, 'managing-sheets');
-  assert.equal(pickNextLesson(legacy, {}, skipsFor(['move', 'select', 'type-bold'])).id, 'managing-sheets');
+  // once 1.1 is done, the placement skips steer past the skipped lessons to the first uncovered one
+  const done = Object.fromEntries(['inherited-workbook', 'ribbon-by-keyboard', 'analyst-setup', 'colour-label-hardcode', 'challenge-inherited-file'].map(id => [id, { completed: true }]));
+  assert.equal(pickNextLesson(LESSONS, done, []).id, 'jump-dont-scroll');
+  assert.equal(pickNextLesson(LESSONS, done, skipped).id, 'around-the-workbook');
+  assert.equal(pickNextLesson(LESSONS, done, skipsFor(['move'])).id, 'select-like-you-mean-it');
 });
 
 test('matchesFilters: status, difficulty, access and a word search', () => {
@@ -155,12 +154,12 @@ test('navKeyFor and titleFor', () => {
 /* ---------------- placement, teams form, shell lists ---------------- */
 test('placement: passed tasks map to skipped lessons that exist, without duplicates', () => {
   assert.deepEqual(skipsFor([]), []);
-  assert.deepEqual(skipsFor(['move']), ['welcome-race', 'workbook-sheets-cells', 'active-cell', 'moving-around']);
-  assert.deepEqual(skipsFor(['move', 'move', 'select']), ['welcome-race', 'workbook-sheets-cells', 'active-cell', 'moving-around', 'selecting-ranges']);
-  assert.deepEqual(skipsFor(['type-bold']), ['ribbon-and-keytips', 'entering-data', 'ribbon-commands']);
+  assert.deepEqual(skipsFor(['move']), ['jump-dont-scroll']);
+  assert.deepEqual(skipsFor(['move', 'move', 'select']), ['jump-dont-scroll', 'select-like-you-mean-it']);
+  assert.deepEqual(skipsFor(['type-bold']), ['ribbon-by-keyboard']);
   const ids = new Set(LESSONS.map(l => l.id));
   for (const t of PLACEMENT_TASKS) for (const id of t.skips) assert.ok(ids.has(id), `${t.id} skips a real lesson: ${id}`);
-  for (const id of ['excel-options', 'page-setup']) assert.ok(!skipsFor(PLACEMENT_TASKS.map(t => t.id)).includes(id), `${id} is never skipped by placement`);
+  for (const id of ['inherited-workbook', 'analyst-setup', 'colour-label-hardcode']) assert.ok(!skipsFor(PLACEMENT_TASKS.map(t => t.id)).includes(id), `${id} is never skipped by placement`);
   assert.equal(PLACEMENT_TASKS.length, 3);
 });
 

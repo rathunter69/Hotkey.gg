@@ -10,7 +10,7 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&a
 
 /** The six stages of the sale (docs/proposals/CURRICULUM_MAP): what management sends, what the analyst delivers. */
 export const STAGES = [
-  { n: 1, id: 'foundations', stage: siteCopy('deal_strip_stage_1', 'The data comes in'), sends: 'The weekly site report for the Austin cluster, untidy', delivers: siteCopy('deal_strip_deliverable_1', 'The weekly KPI page: clean, live, formatted, checked, print-ready'), modules: 7, access: 'free' },
+  { n: 1, id: 'foundations', stage: siteCopy('deal_strip_stage_1', 'The data comes in'), sends: 'The weekly site report for the Austin cluster, untidy', delivers: siteCopy('deal_strip_deliverable_1', 'The weekly KPI page: clean, live, formatted, checked, print-ready'), modules: 8, access: 'free' },
   { n: 2, id: 'formatting', stage: 'Historical financials for the book', sends: 'Three years of P&L as a raw dump', delivers: 'The historical financials section, presentation quality', modules: 7, access: 'paid' },
   { n: 3, id: 'formulas', stage: 'The KPI databook', sends: 'Site master, tariff master, a session export, a summary that does not tie', delivers: 'The operating KPI databook, every number reconciled', modules: 7, access: 'paid' },
   { n: 4, id: 'data', stage: 'Diligence and the management case', sends: 'The data room opens; buyer questions arrive', delivers: 'The diligence pack, the utilization dashboard, the management case', modules: 6, access: 'paid' },

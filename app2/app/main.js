@@ -27,6 +27,7 @@ import { auth } from './auth.js';
 import { track, installErrorLog } from './telemetry.js';
 import { captureInstall } from './install.js';
 import { lessonById } from '../content/index.js';
+import { LEGACY_IDS } from './progress.js';
 import { gameCtx } from './stats.js';
 import { earnedSet } from '../ui/badges.js';
 import { themeStates } from './cosmetics.js';
@@ -229,7 +230,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     let name = r.name;
     if (name === 'root') name = isReturning() ? 'home' : 'landing';
     let lesson = null;
-    if (name === 'lesson') { lesson = lessonById(r.params.id); if (!lesson) name = 'notfound'; }
+    if (name === 'lesson') { lesson = lessonById(r.params.id); if (!lesson) { if (LEGACY_IDS.has(r.params.id)) { location.replace('#/learn'); return; } name = 'notfound'; } }   // a deleted lesson's URL goes to the catalog (Run 4)
     let drill = null;
     if (name === 'drill' && !r.params.daily && r.params.id !== 'sandbox') {
       drill = (await import('../content/drills.js')).drillById(r.params.id);
@@ -262,7 +263,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     if (rootEl.querySelector('.sk')) rootEl.innerHTML = '';
     try {
       const ctx = { query: r.query, params: r.params, nav };
-      let res = name === 'lesson' ? mount(rootEl, lesson, { mode: r.query.mode || 'guided', panel: r.query.panel, seed: r.query.seed }) : mount(rootEl, ctx);
+      let res = name === 'lesson' ? mount(rootEl, lesson, { mode: r.query.mode || 'guided', panel: r.query.panel, seed: r.query.seed, daily: r.query.daily }) : mount(rootEl, ctx);
       // a page that mounts asynchronously still hands back its destroy(); a route that moved on meanwhile tears it down at once
       if (res && typeof res.then === 'function') { res = await res; if (myGen !== gen) { if (res && typeof res.destroy === 'function') { try { res.destroy(); } catch (e) { /* ignore */ } } return; } }
       current = res && typeof res.destroy === 'function' ? res : { destroy() { rootEl.innerHTML = ''; } };

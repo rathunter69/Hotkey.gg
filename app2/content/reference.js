@@ -101,7 +101,7 @@ export function macNote(win) {
 // The Welcome race introduces a couple of shortcuts for the wow moment; the reference links to the
 // lesson that teaches them properly, so Welcome lessons only count when nothing else covers a concept.
 const LESSON_BY_CONCEPT = {};
-for (const l of LESSONS.filter(l => l.section !== 'Welcome').concat(LESSONS.filter(l => l.section === 'Welcome'))) for (const c of l.concepts || []) if (!(c in LESSON_BY_CONCEPT)) LESSON_BY_CONCEPT[c] = l.id;
+for (const l of LESSONS.filter(l => l.section !== 'Welcome').concat(LESSONS.filter(l => l.section === 'Welcome'))) for (const c of l.teaches || l.concepts || []) if (!(c in LESSON_BY_CONCEPT)) LESSON_BY_CONCEPT[c] = l.id;
 
 /** The id of the first lesson that teaches a concept (Welcome lessons last), or null. */
 export const lessonForConcept = concept => (concept && LESSON_BY_CONCEPT[concept]) || null;

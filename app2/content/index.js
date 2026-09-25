@@ -1,6 +1,6 @@
 // app2/content/index.js — the catalogue: chapters in order, each with its lessons in order.
-// The C2 rewrite lands module by module: the new module lessons (Project Volt, voltline-weekly)
-// sit first, the legacy sections below them until the rewrite replaces the old set.
+// Chapter 1 (C2, framework v2): seven modules of lessons on the Project Volt workbook, each ending
+// in its challenge, then the project, the assessment and the test-out (1.8).
 import inherited_workbook from './lessons/inherited-workbook.js';
 import { applyCopy } from './copy/apply.js';
 import ribbon_by_keyboard from './lessons/ribbon-by-keyboard.js';
@@ -38,42 +38,7 @@ import fit_to_one_page from './lessons/fit-to-one-page.js';
 import the_checks_row from './lessons/the-checks-row.js';
 import hardcode_hunt from './lessons/hardcode-hunt.js';
 import challenge_audit_before_you_send from './lessons/challenge-audit-before-you-send.js';
-import welcome_race from './lessons/welcome-race.js';
-import workbook_sheets_cells from './lessons/workbook-sheets-cells.js';
-import managing_sheets from './lessons/managing-sheets.js';
-import ribbon_and_keytips from './lessons/ribbon-and-keytips.js';
-import excel_options from './lessons/excel-options.js';
-import page_setup from './lessons/page-setup.js';
-import active_cell from './lessons/active-cell.js';
-import moving_around from './lessons/moving-around.js';
-import selecting_ranges from './lessons/selecting-ranges.js';
-import entering_data from './lessons/entering-data.js';
-import editing_cells from './lessons/editing-cells.js';
-import ribbon_commands from './lessons/ribbon-commands.js';
-import dialog_boxes from './lessons/dialog-boxes.js';
-import page_keys from './lessons/page-keys.js';
-import go_to_cells from './lessons/go-to-cells.js';
-import select_blocks from './lessons/select-blocks.js';
-import go_to_special from './lessons/go-to-special.js';
-import undo_redo from './lessons/undo-redo.js';
-import fill_down_right from './lessons/fill-down-right.js';
-import find_replace from './lessons/find-replace.js';
-import insert_delete_rows from './lessons/insert-delete-rows.js';
-import widths_heights from './lessons/widths-heights.js';
-import hide_freeze from './lessons/hide-freeze.js';
-import home_tab_tour from './lessons/home-tab-tour.js';
-import format_cells_tabs from './lessons/format-cells-tabs.js';
-import fills_and_colours from './lessons/fills-and-colours.js';
-import first_formula from './lessons/first-formula.js';
-import sum_family from './lessons/sum-family.js';
-import autosum from './lessons/autosum.js';
-import absolute_refs from './lessons/absolute-refs.js';
-import cross_sheet from './lessons/cross-sheet.js';
-import formula_errors from './lessons/formula-errors.js';
-import copy_cut_paste from './lessons/copy-cut-paste.js';
-import paste_special from './lessons/paste-special.js';
-import fill_series from './lessons/fill-series.js';
-import weekly_report_project from './lessons/weekly-report-project.js';
+import weekly_kpi_project from './lessons/weekly-kpi-project.js';
 import foundations_assessment from './lessons/foundations-assessment.js';
 import foundations_testout from './lessons/foundations-testout.js';
 
@@ -82,10 +47,8 @@ export const CHAPTERS = [
     id: 'foundations',
     title: 'Foundations',
     blurb: 'Everything a first-week analyst or a total beginner needs before formulas get serious: how Excel works, moving, selecting, entering and editing, rows and columns, the Ribbon and its dialog boxes, basic formulas, copy and paste.',
-    // Chapter 1's sections in order (SITE_SPEC §7). A section with no lessons yet still shows in the
-    // catalog as upcoming, so the chapter's shape is visible; its blurb says what arrives there.
+    // Chapter 1's sections in order (SITE_SPEC §7): the seven modules and the closing project block.
     sections: [
-      { name: 'Welcome', blurb: 'The legacy three-shortcut race; its moves now open lesson 1.1.1. Goes with the legacy lessons.' },
       { name: 'Open and set up', blurb: 'The workbook management sent, tidied to house standard: tabs, gridlines, Excel Options, the Quick Access Toolbar, and the analyst’s color-and-label conventions.' },
       { name: 'Move and select', blurb: 'Jumps, never scrolls: Ctrl+Arrow, the selection set, Go To for far and cross-sheet targets, and Go To Special.' },
       { name: 'Enter, edit, copy and fill', blurb: 'The feed completed and cleaned, then the report skeleton built from it: Tab and Enter, F2, the clipboard, Paste Special values, Replace All and a filled timeline.' },
@@ -93,14 +56,6 @@ export const CHAPTERS = [
       { name: 'Format', blurb: 'Numbers a banker can read, fonts, fills and borders, alignment and titles, and a style pass with F4: the format the team uses, applied once and repeated.' },
       { name: 'Formulas', blurb: 'Point, don’t type; SUM and its family with AutoSum; anchors and F4; links across sheets; one formula per row filled right; the errors and what they mean.' },
       { name: 'Present and audit', blurb: 'Fit to one page, a checks row that reads zero, and the hardcode hunt before the page goes in the pack.' },
-      { name: 'How Excel works', blurb: 'Workbook, sheets, cells and references; the Ribbon and Alt chords; Formula Bar and Name Box; the Options that matter; page setup; best practices.' },
-      { name: 'Moving', blurb: 'Arrows, Ctrl+Arrow, Home and End, Page keys, Go To, between sheets and workbooks.' },
-      { name: 'Selecting', blurb: 'Shift+Arrow, Ctrl+Shift+Arrow, whole rows and columns, Ctrl+A regions, Go To Special.' },
-      { name: 'Entering and editing', blurb: 'Type, Enter and Tab, F2, Escape, Delete and Backspace, fill down and right, undo and redo, Find and Replace.' },
-      { name: 'Rows, columns and sheets', blurb: 'Insert and delete, width and height, autofit, hide and unhide, group, freeze panes, sheet tabs.' },
-      { name: 'The Ribbon and dialogs', blurb: 'The Home tab by KeyTips, Format Cells tab by tab, bold, borders, fills, font colour, alignment.' },
-      { name: 'Basic formulas', blurb: '= and operators, SUM, AVERAGE, MIN, MAX and COUNT, AutoSum, relative and absolute references, F4, common errors.' },
-      { name: 'Copy, paste and fill', blurb: 'Copy, cut and paste, Paste Special, fill series, the Flash Fill idea.' },
       { name: 'Project and assessment', blurb: 'Build the weekly report end to end, then prove it against the clock; or test out of the chapter.' },
     ],
     lessons: [
@@ -111,16 +66,7 @@ export const CHAPTERS = [
       numbers_a_banker_can_read, fonts_fills_borders, alignment_and_titles, the_style_pass, challenge_to_standard_in_three_minutes,
       point_dont_type, sum_family_and_autosum, anchors_dollar_and_f4, link_across_sheets, one_formula_per_row_filled_right, read_the_error_follow_the_trail, challenge_the_site_pnl,
       fit_to_one_page, the_checks_row, hardcode_hunt, challenge_audit_before_you_send,
-      welcome_race,
-      workbook_sheets_cells, managing_sheets, ribbon_and_keytips, excel_options, page_setup,
-      active_cell, moving_around, page_keys, go_to_cells,
-      selecting_ranges, select_blocks, go_to_special,
-      entering_data, editing_cells, undo_redo, fill_down_right, find_replace,
-      insert_delete_rows, widths_heights, hide_freeze,
-      ribbon_commands, dialog_boxes, home_tab_tour, format_cells_tabs, fills_and_colours,
-      first_formula, sum_family, autosum, absolute_refs, cross_sheet, formula_errors,
-      copy_cut_paste, paste_special, fill_series,
-      weekly_report_project, foundations_assessment, foundations_testout,
+      weekly_kpi_project, foundations_assessment, foundations_testout,
     ],
   },
 ];

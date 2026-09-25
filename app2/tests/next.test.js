@@ -184,7 +184,7 @@ test('deal strip: six stages, the first free; the state counts modules from prog
   assert.equal(STAGES[0].access, 'free');
   assert.ok(STAGES.every(s => s.stage && s.sends && s.delivers && s.modules > 0));
   const d0 = dealState({});
-  assert.equal(d0.done, 0); assert.equal(d0.stage.n, 1); assert.equal(d0.planned, 7);
+  assert.equal(d0.done, 0); assert.equal(d0.stage.n, 1); assert.equal(d0.planned, 8, 'seven modules plus Project and assessment');
   assert.equal(PLANNED_MODULES.length, 7, 'seven modules; the Welcome is retired');
 });
 

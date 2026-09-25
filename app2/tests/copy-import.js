@@ -27,7 +27,7 @@ if (errors) { console.error(`IMPORT FAILED: ${errors} violation(s) — fix them 
 
 // the diff per row: key → changed fields
 const current = readCopyDir(COPY_DIR);
-const keyOf = { 'lessons.csv': r => r.id, 'goals.csv': r => r.lesson_id + '#' + r.goal_index, 'modules.csv': r => r.id, 'site.csv': r => r.key };
+const keyOf = { 'lessons.csv': r => r.id, 'goals.csv': r => r.lesson_id + '#' + r.goal_index, 'modules.csv': r => r.id, 'site.csv': r => r.key, 'micro.csv': r => r.id };
 let changes = 0;
 for (const f of FILES) {
   const a = parseCsv(readFileSync(join(COPY_DIR, f), 'utf8')).rows, b = parseCsv(readFileSync(join(dir, f), 'utf8')).rows;
