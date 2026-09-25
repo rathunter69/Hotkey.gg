@@ -35,6 +35,13 @@ await context.route('**/*', route => {
   if (origin !== `http://127.0.0.1:${PORT}`) return route.abort('blockedbyclient');
   return route.continue();
 });
+// A goal the platform demonstrates ("does it tie?") says "watching · Esc skips": the smoke skips it the moment it
+// appears, as a learner may, from inside the page — no round trip per key (test code; nothing in the app changes)
+await context.addInitScript(() => {
+  const skip = () => { if (document.querySelector('.goal-demo')) (document.activeElement || document.body).dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })); };
+  const start = () => new MutationObserver(skip).observe(document.documentElement, { subtree: true, childList: true });
+  if (document.documentElement) start(); else document.addEventListener('DOMContentLoaded', start);
+});
 const page = await context.newPage();
 const errors = [];
 page.on('pageerror', e => errors.push('pageerror: ' + e.message));
@@ -53,7 +60,6 @@ async function skipDemos() {
 /** Press a key script on the page; a demonstrated goal is skipped with Esc before the keys go on. */
 async function play(script) {
   for (const step of parseKeyScript(script)) {
-    await skipDemos();
     if (step.type === 'text') await page.keyboard.type(step.text);
     else await page.keyboard.press(pwKey(step.spec));
   }
