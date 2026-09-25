@@ -4,7 +4,7 @@
 // looping clips of the real product composed as a page (posters until the clips are recorded),
 // a prominent Sign in for returning learners, then how it works, Project Volt, free vs paid,
 // teams and the close. Enter anywhere starts.
-import { mountDemo } from '../ui/demo-player.js';
+import { mountDemoPoster, loadLiveDemo } from '../ui/demo-poster.js';
 import { store } from './store.js';
 import { track } from './telemetry.js';
 import { STAGES } from './deal-strip.js';
@@ -151,11 +151,14 @@ export function mountLandingPage(root, ctx = {}) {
   el.innerHTML = landingHtml(h);
   root.appendChild(el);
   let tookOver = false;
-  const demo = mountDemo(el.querySelector('#ldDemo'), {
+  // a still of the lesson paints at once; the live demo loads behind it and takes its place (a failed load keeps the still)
+  const host = el.querySelector('#ldDemo');
+  let demo = mountDemoPoster(host, { compact: true });
+  const cancelDemo = loadLiveDemo(host, {
     compact: true, loop: true,
     onDone: () => { if (!tookOver) track('landing_demo', { where: 'landing', outcome: 'finished' }); },
     onTakeover: () => { tookOver = true; track('landing_demo', { where: 'landing', outcome: 'takeover' }); const n = el.querySelector('#ldDemoNote'); if (n) n.innerHTML = '<b>Yours.</b> Same four goals, any route. <a href="#/start">Start learning</a> when you want the real thing.'; },
-  });
+  }, d => { demo = d; }, demo);
   const isTyping = t => !!t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.tagName === 'BUTTON' || t.tagName === 'A' || t.isContentEditable);
   /** A key the sheet would understand: arrows, letters, Ctrl/Alt chords, Enter once the sheet is the visitor's. */
   const sheetKey = e => e.altKey || e.ctrlKey || e.metaKey || /^Arrow|^F\d$|^(Home|End|PageUp|PageDown|Delete|Backspace|Tab|Escape|Enter)$/.test(e.key) || e.key.length === 1;
@@ -168,5 +171,5 @@ export function mountLandingPage(root, ctx = {}) {
   const onKeyUp = e => { if (e.key === 'Alt' && demo.taken) e.preventDefault(); };
   document.addEventListener('keydown', onKey);
   document.addEventListener('keyup', onKeyUp);
-  return { destroy() { document.removeEventListener('keydown', onKey); document.removeEventListener('keyup', onKeyUp); demo.destroy(); el.remove(); } };
+  return { destroy() { cancelDemo(); document.removeEventListener('keydown', onKey); document.removeEventListener('keyup', onKeyUp); demo.destroy(); el.remove(); } };
 }

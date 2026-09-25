@@ -9,7 +9,7 @@
 // Voice (B3): a finance instructor explaining a deal process to a capable person outside
 // finance. Plain sentences, one idea each; any term is defined in the same breath; nobody is
 // required to be an analyst. American spelling.
-import { mountDemo } from '../ui/demo-player.js';
+import { mountDemoPoster, loadLiveDemo } from '../ui/demo-poster.js';
 import { prefs } from './prefs.js';
 import { store } from './store.js';
 import { track } from './telemetry.js';
@@ -79,7 +79,8 @@ export function mountFirstRun(root, ctx = {}) {
   const $ = id => el.querySelector('#' + id);
 
   const step = () => steps[idx];
-  function teardownDemo() { if (demo) { demo.destroy(); demo = null; } }
+  let cancelDemo = () => {};
+  function teardownDemo() { cancelDemo(); if (demo) { demo.destroy(); demo = null; } }
 
   function render() {
     teardownDemo();
@@ -94,7 +95,9 @@ export function mountFirstRun(root, ctx = {}) {
           <div class="fr2-demo-cap"><h1>This is a lesson.</h1><p>The keys are pressed on a real sheet. The sheet is graded on what it ends up as, so any correct route counts.</p></div>
           <div class="fr2-demo-host" id="frDemoHost"></div>
         </div>`;
-      demo = mountDemo($('frDemoHost'), { onDone: () => { track('landing_demo', { where: 'first_run', outcome: 'finished' }); } });
+      const host = $('frDemoHost');
+      demo = mountDemoPoster(host);
+      cancelDemo = loadLiveDemo(host, { onDone: () => { track('landing_demo', { where: 'first_run', outcome: 'finished' }); } }, d => { if (step() === 'demo') demo = d; else d.destroy(); }, demo);
       actions([{ id: 'next', label: 'Continue', primary: true, kbd: 'Enter' }]);
     } else if (s === 'who' || s === 'sent' || s === 'deliver') {
       const c = BRIEFING.find(b => b.key === s);

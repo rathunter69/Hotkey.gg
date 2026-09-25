@@ -30,6 +30,7 @@ import { lessonById } from '../content/index.js';
 import { gameCtx } from './stats.js';
 import { earnedSet } from '../ui/badges.js';
 import { themeStates } from './cosmetics.js';
+import { skeletonHtml } from '../ui/skeleton.js';
 
 const NAV_LINKS = [
   { key: 'learn', label: 'Learn', href: '#/learn' },
@@ -246,13 +247,19 @@ export function startApp({ navEl, rootEl, footEl }) {
     const base = LOADERS[name] || LOADERS.notfound;
     const entry = next && base.next ? base.next : base;
     let mount;
+    // a page module that is not in hand within 50 ms gets the page's shape painted meanwhile (C2)
+    const skel = setTimeout(() => { if (myGen === gen && !rootEl.firstChild) rootEl.innerHTML = skeletonHtml(name); }, 50);
     try { mount = await loadPage(entry); }
     catch (e) {
+      clearTimeout(skel);
       if (myGen !== gen) return;
+      rootEl.innerHTML = '';
       errorCard(rootEl, 'The ' + name + ' page', route);
       return;
     }
+    clearTimeout(skel);
     if (myGen !== gen) return;
+    if (rootEl.querySelector('.sk')) rootEl.innerHTML = '';
     try {
       const ctx = { query: r.query, params: r.params, nav };
       let res = name === 'lesson' ? mount(rootEl, lesson, { mode: r.query.mode || 'guided', panel: r.query.panel, seed: r.query.seed }) : mount(rootEl, ctx);

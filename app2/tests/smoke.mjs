@@ -42,6 +42,16 @@ page.on('console', m => { if (m.type() === 'error' && !/blockedbyclient|net::ERR
 const base = `http://127.0.0.1:${PORT}/app2/index.html`;
 let failures = 0;
 const fail = msg => { failures++; console.log('FAIL', msg); };
+/** Press a key script on the page; a goal the platform demonstrates plays itself first, keys wait. */
+async function play(script) {
+  for (const step of parseKeyScript(script)) {
+    await page.waitForFunction(() => !document.querySelector('.goal-demo'), null, { timeout: 30000 }).catch(() => {});
+    if (step.type === 'text') await page.keyboard.type(step.text);
+    else await page.keyboard.press(pwKey(step.spec));
+  }
+  await page.waitForFunction(() => !document.querySelector('.goal-demo'), null, { timeout: 30000 }).catch(() => {});
+}
+const t = label => console.log(`  ${label} at ${((Date.now() - T0) / 1000).toFixed(1)}s`);
 
 try {
   // every route renders
@@ -69,11 +79,78 @@ try {
   if (acct.chip !== 'guest') fail(`#/account: user chip reads "${acct.chip}", not guest`);
   if (acct.saveLine !== 'Saved on this device') fail(`#/account: save state reads "${acct.saveLine}"`);
 
+  // the fresh-visitor journey (experience pass C): landing → first run → 1.1.1 → 1.1.C → Home →
+  // Learn → Practice → the Daily, one profile from empty storage, every non-loopback request blocked
+  {
+    await page.goto(base + '#/'); await page.evaluate(() => localStorage.clear()); await page.reload();
+    if (!(await page.waitForSelector('.ld2', { timeout: 5000 }).catch(() => null))) fail('journey: a fresh visitor does not get the landing');
+    await page.keyboard.press('Enter');   // Enter anywhere starts
+    const frame = await page.waitForSelector('.fr2-frame', { timeout: 5000 }).catch(() => null);
+    if (!frame) fail('journey: Enter on the landing did not open the first run');
+    else {
+      const size = async () => page.evaluate(() => { const r = document.querySelector('.fr2-frame').getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)].join('x'); });
+      const s0 = await size();
+      await page.waitForFunction(() => /2 \/ 4|3 \/ 4|4 \/ 4/.test((document.querySelector('#demoCount') || {}).textContent || ''), null, { timeout: 15000 }).catch(() => fail('journey: the first-run demo did not press keys'));
+      const steps = [];
+      // the demo takes two Enters (finish, then continue), the four cards one each, the picker one: seven, and the hash leaves #/start
+      for (let i = 0; i < 8; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(250); if (!/#\/start/.test(page.url())) break; steps.push((await page.evaluate(() => (document.querySelector('#frEyebrow') || {}).textContent || '')) + ' ' + await size()); }
+      const sizes = new Set(steps.map(x => x.split(' ').pop()));
+      if (sizes.size > 1 || !sizes.has(s0)) fail('journey: the first-run frame changed size between steps: ' + steps.join(' | '));
+      await page.waitForFunction(() => /#\/lesson\/inherited-workbook/.test(location.hash), null, { timeout: 4000 }).catch(() => fail('journey: the first run did not land on lesson 1.1.1 (' + page.url() + ')'));
+      const prefsRec = await page.evaluate(() => { try { return JSON.parse(localStorage.getItem('hk2_prefs')); } catch (e) { return null; } });
+      if (!prefsRec || !prefsRec.briefingDone || !prefsRec.firstRunDone) fail('journey: first-run prefs not written');
+    }
+    t('first run');
+    // 1.1.1: the module's story beat once, the strip reads 1.1, then the whole lesson by keyboard
+    if (!(await page.waitForSelector('.ws-beat', { timeout: 5000 }).catch(() => null))) fail('journey: no story beat before lesson 1.1.1');
+    await page.keyboard.press('Enter'); await page.waitForTimeout(250);
+    const crumb = await page.evaluate(() => (document.querySelector('.ws-crumb') || {}).textContent || '');
+    if (!/1\.1 Open and set up/.test(crumb)) fail('journey: the strip does not read 1.1 Open and set up: ' + crumb);
+    await play(LESSONS.find(l => l.id === 'inherited-workbook').solution);
+    if (!(await page.waitForSelector('.lesson-done:not([hidden]) [data-act="continue"]', { timeout: 4000 }).catch(() => null))) fail('journey: 1.1.1 did not complete');
+    t('1.1.1');
+    // 1.1.C: the module challenge passes with a tier, and the page is delivered
+    await page.goto(base + '#/lesson/challenge-inherited-file');
+    await page.waitForSelector('.goal.current, #startBtn', { state: 'attached', timeout: 5000 }).catch(() => fail('journey: 1.1.C did not open'));
+    if (await page.$('#startBtn')) await page.keyboard.press('Enter');
+    await play(LESSONS.find(l => l.id === 'challenge-inherited-file').solution);
+    if (!(await page.waitForSelector('.lesson-done:not([hidden]) .tstamp.hit', { timeout: 5000 }).catch(() => null))) fail('journey: 1.1.C passed with no tier stamp');
+    if (!(await page.$('.lesson-done:not([hidden]) .rm-page'))) fail('journey: 1.1.C passed without delivering its page');
+    t('1.1.C');
+    // Home: the Continue card names the next lesson; no card is an empty box; the deal strip is there
+    await page.goto(base + '#/'); await page.waitForSelector('.hm', { timeout: 5000 }).catch(() => fail('journey: Home did not render'));
+    const home = await page.evaluate(() => ({
+      next: (document.querySelector('.hm-continue h1') || {}).textContent || '',
+      empty: [...document.querySelectorAll('.hm-card, .hm-continue, .deal')].filter(c => !c.innerText.trim()).map(c => c.className),
+      cards: ['.hm-continue', '.hm-due', '.hm-daily', '.deal'].filter(sel => !document.querySelector(sel)),
+    }));
+    if (!/Ribbon by keyboard/.test(home.next)) fail('journey: Home continue card reads "' + home.next + '", not the next lesson');
+    if (home.empty.length) fail('journey: Home has empty boxes: ' + home.empty.join(', '));
+    if (home.cards.length) fail('journey: Home is missing ' + home.cards.join(', '));
+    // Learn: the data room shows module 1.1's document with the delivered page
+    await page.goto(base + '#/learn'); await page.waitForSelector('.dr-doc', { timeout: 5000 }).catch(() => fail('journey: the data room did not render'));
+    if (!(await page.$('.dr-doc[data-doc="open-and-set-up"] .dr-thumb.delivered'))) fail('journey: the data room does not show page 1.1 as delivered');
+    // Practice renders its drills
+    await page.goto(base + '#/practice'); await page.waitForTimeout(300);
+    if ((await page.$$('a.drow[href^="#/drill/"]')).length < 3) fail('journey: Practice shows fewer than three drills');
+    t('home, learn, practice');
+    // the Daily: start card, the drill by keyboard, the result card
+    const { dailyFor } = await import('../app/daily.js'); const { DRILLS } = await import('../content/drills.js');
+    const day = await page.evaluate(() => new Date().toISOString().slice(0, 10));   // the Daily's day key (records.js dayOf)
+    const daily = DRILLS.find(d => d.id === dailyFor(day).drillId);
+    await page.goto(base + '#/daily');
+    if (!(await page.waitForSelector('.start-card', { timeout: 5000 }).catch(() => null))) fail('journey: the Daily has no start card');
+    await page.keyboard.press('Space'); await page.waitForTimeout(120);
+    if (daily) await play(daily.solution); else fail('journey: no Daily drill for ' + day);
+    if (!(await page.waitForSelector('.lesson-done:not([hidden]) .dc', { timeout: 5000 }).catch(() => null))) fail('journey: the Daily did not end on its result card');
+    t('the Daily');
+  }
+
   // play the first and last lesson end to end by keyboard, plus the phase-C feature carriers
   // (find/replace dialog, hide+freeze, cross-sheet formulas, the two-sheet project)
   // the module lessons that carry the new engine ground (paste special, grouping/freeze) and one seeded challenge, plus the legacy carriers
   const extras = ['copy-cut-paste-fill', 'hide-group-freeze', 'the-style-pass', 'link-across-sheets', 'hardcode-hunt', 'challenge-audit-before-you-send', 'find-replace', 'weekly-report-project'].map(id => LESSONS.find(l => l.id === id));
-  for (const lesson of [LESSONS[0], ...extras, LESSONS[LESSONS.length - 1]]) {
+  for (const lesson of [...extras, LESSONS[LESSONS.length - 1]]) {   // 1.1.1 is played by the journey above
     await page.goto(base + '#/lesson/' + lesson.id);
     // the goal list sits behind the floating card (B4), so wait for it attached, not visible
     const opened = await page.waitForSelector('.goal.current, #startBtn', { timeout: 5000, state: 'attached' }).catch(() => null);
@@ -92,26 +169,9 @@ try {
     if (!done) fail(`${lesson.id}: did not complete`);
   }
 
-  // the experience pass (behind ?flow=next): the first run end to end in one frame — demo,
-  // three briefing cards, orientation, picker, then the Welcome race opens; the dashboard, the
-  // data room and a due-today micro-drill render; ?flow=off puts the live screens back
+  // the experience pass: the seeded dashboard, the data room, a due-today micro-drill, a story beat,
+  // and ?flow=off putting the live screens back
   {
-    await page.goto(base + '#/start?flow=next&replay=1');
-    const frame = await page.waitForSelector('.fr2-frame', { timeout: 5000 }).catch(() => null);
-    if (!frame) fail('first run (next): no frame');
-    else {
-      const size = async () => page.evaluate(() => { const r = document.querySelector('.fr2-frame').getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)].join('x'); });
-      const s0 = await size();
-      await page.waitForFunction(() => /2 \/ 4|3 \/ 4|4 \/ 4/.test((document.querySelector('#demoCount') || {}).textContent || ''), null, { timeout: 15000 }).catch(() => fail('first run (next): the demo did not press keys'));
-      const steps = [];
-      // the demo takes two Enters (finish, then continue), the four cards one each, the picker one: seven, and the hash leaves #/start
-      for (let i = 0; i < 8; i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(250); if (!/#\/start/.test(page.url())) break; steps.push((await page.evaluate(() => (document.querySelector('#frEyebrow') || {}).textContent || '')) + ' ' + await size()); }
-      const sizes = new Set(steps.map(x => x.split(' ').pop()));
-      if (sizes.size > 1 || !sizes.has(s0)) fail('first run (next): the frame changed size between steps: ' + steps.join(' | '));
-      await page.waitForFunction(() => /#\/lesson\/inherited-workbook/.test(location.hash), null, { timeout: 4000 }).catch(() => fail('first run (next): did not land on lesson 1.1.1 (' + page.url() + ')'));
-      const prefsRec = await page.evaluate(() => { try { return JSON.parse(localStorage.getItem('hk2_prefs')); } catch (e) { return null; } });
-      if (!prefsRec || !prefsRec.briefingDone || !prefsRec.firstRunDone) fail('first run (next): prefs not written');
-    }
     await page.goto(base + '#/?flow=next&demo=1'); await page.waitForTimeout(400);
     for (const sel of ['.hm-continue', '.hm-due-list li', '.hm-daily', '.deal', '.hm-rings .hm-ring', '.hm-level']) if (!(await page.$(sel))) fail('home (next): missing ' + sel);
     await page.goto(base + '#/learn?flow=next'); await page.waitForTimeout(400);
