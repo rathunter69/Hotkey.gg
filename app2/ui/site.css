@@ -463,22 +463,29 @@ html.hk-fs .drill-page{max-width:none; padding:0 12px}
 .badge .px{image-rendering:pixelated}
 .badge-name{font-size:11px; color:var(--muted); line-height:1.2}
 .badge.earned .badge-name{color:var(--ink)}
-.badge.r-rare{border-color:#4a9eda66}
-.badge.r-epic{border-color:#a06bd666}
-.badge.r-legendary{border-color:#e0913f88; box-shadow:0 0 12px #e0913f22}
+/* rarity colours are theme tokens (app.css :root), so every theme's shelf reads natively (§6a) */
+.badge.r-rare{border-color:color-mix(in srgb, var(--rar-rare) 40%, transparent)}
+.badge.r-epic{border-color:color-mix(in srgb, var(--rar-epic) 40%, transparent)}
+.badge.r-legendary{border-color:color-mix(in srgb, var(--rar-legendary) 55%, transparent); box-shadow:0 0 12px color-mix(in srgb, var(--rar-legendary) 14%, transparent)}
 .badge-q{font-size:26px; font-weight:800; color:var(--muted); height:34px; display:flex; align-items:center}
 .badge-prog{width:70%; height:4px; border-radius:3px; background:color-mix(in srgb, var(--line) 60%, transparent); overflow:hidden}
 .badge-prog i{display:block; height:100%; background:var(--accent)}
 
 /* ---------- fx banners (named moments) ---------- */
-.fx-banner{position:fixed; left:24px; bottom:calc(24px + var(--fx-i, 0) * 60px); transform:translateX(-18px); opacity:0; z-index:220; max-width:min(380px, calc(100vw - 48px)); background:var(--surface); border:1px solid var(--accent); border-radius:12px; padding:10px 18px; font-weight:700; box-shadow:0 10px 34px color-mix(in srgb, var(--ink) 16%, transparent); transition:.28s; pointer-events:none; display:flex; flex-wrap:wrap; gap:2px 10px; align-items:baseline}
+.fx-banner{position:fixed; left:24px; bottom:calc(24px + var(--fx-i, 0) * 60px); transform:translateX(-18px); opacity:0; z-index:220; max-width:min(380px, calc(100vw - 48px)); background:var(--surface); border:1px solid var(--accent); border-radius:12px; padding:10px 18px; font-weight:700; box-shadow:0 10px 34px color-mix(in srgb, var(--ink) 16%, transparent); transition:opacity .28s, transform .28s; pointer-events:none; display:flex; flex-wrap:wrap; gap:2px 10px; align-items:baseline}
 .fx-banner.in{opacity:1; transform:none}
-@media (prefers-reduced-motion: reduce){ .fx-banner{transform:none; transition:opacity .2s} }
+/* Subtle and reduced motion: a fade in place (effects.js bannerMotion); Off: shown still, no transition */
+.fx-banner.fx-fade{transform:none; transition:opacity .25s}
+.fx-banner.fx-static{transform:none; transition:none}
+@media (prefers-reduced-motion: reduce){ .fx-banner{transform:none; transition:opacity .25s} .fx-banner.fx-static{transition:none} }
 .fx-banner.subtle{border-color:var(--line); font-weight:600}
 .fx-banner span{color:var(--muted); font-weight:500; font-size:12.5px}
-.fx-banner.r-rare{border-color:#4a9eda}
-.fx-banner.r-epic{border-color:#a06bd6}
-.fx-banner.r-legendary{border-color:#e0913f}
+.fx-banner.r-rare{border-color:var(--rar-rare)}
+.fx-banner.r-epic{border-color:var(--rar-epic)}
+.fx-banner.r-legendary{border-color:var(--rar-legendary)}
+/* the Daily card's BOARD cell for a guest (ui/result-card.js boardCell) */
+.dc .dc-signin{color:var(--accent); text-decoration:none}
+.dc .dc-signin:hover, .dc .dc-signin:focus-visible{text-decoration:underline}
 
 /* ---------- practice drill list ---------- */
 .drill-list{display:flex; flex-direction:column; gap:8px; margin-top:8px}
@@ -491,8 +498,8 @@ html.hk-fs .drill-page{max-width:none; padding:0 12px}
 .drow .dpb{font-family:var(--mono); font-size:12.5px; min-width:86px; text-align:right}
 .drow .dtier{font-family:var(--mono); font-size:11px; border:1px solid var(--line); border-radius:6px; padding:3px 7px; color:var(--muted)}
 .drow .dtier.t-pass{color:var(--ink); border-color:var(--ink)}
-.drow .dtier.t-pro{color:#4a9eda; border-color:#4a9eda}
-.drow .dtier.t-legendary{color:#e0913f; border-color:#e0913f}
+.drow .dtier.t-pro{color:var(--tier-pro); border-color:var(--tier-pro)}
+.drow .dtier.t-legendary{color:var(--tier-legendary); border-color:var(--tier-legendary)}
 .lb-mine .row .tm{font-family:var(--mono)}
 .theme-locked{opacity:.45; position:relative}
 .theme-locked .pc-lock{font-size:10px; color:var(--muted)}

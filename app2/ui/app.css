@@ -15,6 +15,19 @@
   --mono:'JetBrains Mono',ui-monospace,monospace;
   --cellfont:Arial,'Calibri','Segoe UI',system-ui,sans-serif;   /* r72 doctrine: ARIAL leads in the sheet cells; everything outside the grid = JetBrains Mono / Hanken */
   --sans:'Hanken Grotesk',system-ui,sans-serif;
+  /* derived tokens — every theme gets them from its own palette (themes.js writes only the palette
+     keys on <html>, and these resolve against them there). --ink: text-coloured shadows and the
+     pixel-art outline. Tiers and rarities keep the site's idiom (pro/rare blue, epic violet,
+     legendary amber) but take their lightness from the theme's text and a tint of its accent and
+     warn, so they sit natively on light and dark themes alike (§6a). */
+  --ink:var(--text);
+  --tier-pass:var(--accent);
+  --tier-pro:color-mix(in oklab, color-mix(in oklab, #4a9eda 80%, var(--accent)) 75%, var(--text));
+  --tier-legendary:color-mix(in oklab, color-mix(in oklab, #e0913f 70%, var(--warn, #d9892b)) 82%, var(--text));
+  --rar-common:var(--accent);
+  --rar-rare:var(--tier-pro);
+  --rar-epic:color-mix(in oklab, color-mix(in oklab, #a06bd6 80%, var(--accent)) 75%, var(--text));
+  --rar-legendary:var(--tier-legendary);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scrollbar-gutter:stable; height:100%}
@@ -275,8 +288,16 @@ td.sel-r{border-right:1.5px solid var(--cell-cursor)}
 td.fh::after{content:''; position:absolute; right:0; bottom:0; width:6px; height:6px;
   background:var(--cell-cursor); z-index:6}   /* r317: flush + tight in the corner, Excel-style */
 td.editing.fh::after, td.point.fh::after{display:none}   /* no handle mid-edit / while pointing */
-@keyframes pasteflash{0%{background:var(--accent)}100%{background:transparent}}
-td.pasted{animation:pasteflash .5s ease-out}
+/* the paste flash (§6a: opacity only): an accent veil over each pasted cell fades out. It rides
+   ::before, which stays rendered for as long as the cell is .pasted (even as the active cell or a
+   spill), so moving the selection never restarts it; multiply keeps the cell's text dark under it.
+   A pasted cell that is still selected carries its grey selection veil as a background layer instead. */
+@keyframes pasteflash{0%{opacity:.9}100%{opacity:0}}
+td.pasted::before{content:''; display:block; position:absolute; inset:0; background:var(--accent); mix-blend-mode:multiply;
+  pointer-events:none; opacity:0; animation:pasteflash .5s ease-out}
+td.pasted.active::before, td.pasted.spill::before{display:block}
+td.pasted.sel:not(.spill){background-image:linear-gradient(var(--sel-grey),var(--sel-grey))}
+td.pasted.sel.active{background-image:none}
 .pastedest{position:absolute; display:none; pointer-events:none; z-index:5;
   border:2px solid var(--cell-cursor); opacity:.95; border-radius:2px;
   box-shadow:0 0 0 2px color-mix(in srgb, var(--cell-cursor) 22%, transparent)}
@@ -409,8 +430,8 @@ td.thick.ball::after{border-width:3px}
   color:var(--on-accent,#0c0d0e); background:var(--accent); border-radius:3px; padding:0 3px; line-height:1.5}
 
 /* ---------- 9. solved flash (778–779), dead tabs / note / swatches / filter chips (781–793), paste-special + format-cells card (799–822) ---------- */
-@keyframes flash{0%{background:var(--accent-glow)}100%{background:transparent}}
-.gridwrap.solved{animation:flash .5s ease-out}
+/* (the old whole-sheet "solved" background flash is gone: nothing sets .solved in the rebuild, and
+   the finish ring in 12b is the one completion cue) */
 .ribbon .rtab.dim{color:var(--faint); background:transparent; border-color:transparent}
 .ribbon .rtab.dim k{color:var(--faint); background:var(--surface2)}
 .ribbon .rnote{color:var(--warn); margin-left:6px}
@@ -515,11 +536,19 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 .fx-tick.out{animation:fxTickOut .28s ease-in forwards}
 @keyframes fxTick{0%{opacity:0; transform:translateY(-50%) scale(.4)}60%{opacity:1; transform:translateY(-50%) scale(1.15)}100%{opacity:1; transform:translateY(-50%) scale(1)}}
 @keyframes fxTickOut{0%{opacity:1; transform:translateY(-50%) scale(1)}100%{opacity:0; transform:translateY(-50%) scale(.6)}}
-.fx-finish{animation:fxFinish .75s ease-out}
-@keyframes fxFinish{0%{box-shadow:0 0 0 0 var(--accent), 0 0 0 0 var(--accent-glow)}
-  40%{box-shadow:0 0 0 3px var(--accent), 0 0 0 14px var(--accent-glow)}
-  100%{box-shadow:0 0 0 0 transparent, 0 0 0 24px transparent}}
-@media (prefers-reduced-motion: reduce){ .fx-tick, .fx-tick.out, .fx-finish{animation:none} .fx-tick{opacity:1; transform:translateY(-50%)} .fx-tick.out{opacity:0} }
+/* reduced motion: the tick fades in still and fades out (movement swapped for a fade, never dropped) */
+.fx-tick.still{transform:translateY(-50%); animation:fxTickFade .2s ease-out forwards}
+.fx-tick.still.out{animation:fxTickFadeOut .25s ease-in forwards}
+@keyframes fxTickFade{0%{opacity:0}100%{opacity:1}}
+@keyframes fxTickFadeOut{0%{opacity:1}100%{opacity:0}}
+/* the finish: a fixed layer on the stage's box (effects.js places it) whose accent ring fades out
+   while it grows a touch — opacity and transform only; the ring under the result overlay (z 40) */
+.fx-ring{position:fixed; z-index:30; pointer-events:none; opacity:0; transform-origin:center;
+  box-shadow:0 0 0 3px var(--accent), 0 0 0 12px var(--accent-glow); animation:fxRing .75s ease-out forwards}
+.fx-ring.still{animation-name:fxRingFade}
+@keyframes fxRing{0%{opacity:0; transform:scale(.992)}35%{opacity:1; transform:scale(1)}100%{opacity:0; transform:scale(1.012)}}
+@keyframes fxRingFade{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){ .fx-tick{transform:translateY(-50%); animation:fxTickFade .2s ease-out forwards} .fx-tick.out{animation:fxTickFadeOut .25s ease-in forwards} .fx-ring{animation-name:fxRingFade} }
 
 /* ---------- 12c. the FULL RIBBON (SITE_SPEC §4): tab row, groups, labelled buttons, KeyTips ---------- */
 /* the slot stays a constant height in each mode, so the sheet never moves when a menu opens */

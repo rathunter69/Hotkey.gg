@@ -24,6 +24,17 @@ export function efficiency(keys, refKeys) {
   return Math.min(100, Math.round(100 * refKeys / Math.max(keys, refKeys)));
 }
 
+/**
+ * The BOARD cell: the position when the board gave one; an assisted run posts nowhere ('—'); a
+ * guest's run has no board place until they sign in, so say that (never the jargon 'local'); a
+ * signed-in run whose place is not known yet shows '—'. Returns HTML. Pure.
+ */
+export function boardCell(r) {
+  if (r.pos) return '#' + esc(r.pos) + (r.of ? ' <i>of ' + esc(r.of) + '</i>' : '');
+  if (r.clean === false || r.handle) return '—';
+  return '<a class="dc-signin" href="#/account">sign in</a>';
+}
+
 export function dailyCardHtml(r) {
   const tier = r.clean === false ? 'none' : (r.tier || 'none');
   const eff = efficiency(r.keys, r.refKeys);
@@ -38,7 +49,7 @@ export function dailyCardHtml(r) {
     <div class="dc-stats">
       <div><span>keys</span><b>${Number.isFinite(r.keys) ? r.keys : '—'}${Number.isFinite(r.refKeys) ? ` <i>/ ${r.refKeys}</i>` : ''}</b></div>
       <div><span>efficiency</span><b>${eff == null ? '—' : eff + '%'}</b></div>
-      <div><span>board</span><b>${r.pos ? '#' + r.pos + (r.of ? ' <i>of ' + r.of + '</i>' : '') : r.clean === false ? '—' : 'local'}</b></div>
+      <div><span>board</span><b>${boardCell(r)}</b></div>
       <div><span>attempt</span><b>${r.attempts || 1}</b></div>
     </div>
     <div class="dc-foot"><span>${r.handle ? '@' + esc(r.handle) : 'guest'}</span><span>hotkey.gg/#/daily</span></div>
