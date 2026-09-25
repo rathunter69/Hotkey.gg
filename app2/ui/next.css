@@ -542,6 +542,10 @@ html.hk-fs body[data-route="lesson"] > .app, html.hk-fs body[data-route="due"] >
 /* a status toast on a workspace floats just above the sheet-tab bar, never on it */
 body[data-route="lesson"] #hkToast, body[data-route="due"] #hkToast, body[data-route="drill"] #hkToast{bottom:62px}
 html.hk-fs body[data-route="lesson"] #hkToast, html.hk-fs body[data-route="due"] #hkToast{bottom:56px}
+/* the drill and Daily workspace: no footer under the sheet, and the sheet takes the room the footer left (critic pass) */
+body[data-route="drill"] .site-footer, body[data-route="drill"] #footMount{display:none}
+body[data-route="drill"] .drill-page .stage-row{min-height:clamp(400px, calc(100vh - 304px), 900px)}
+html[data-density="compact"] body[data-route="drill"] .drill-page .stage-row{min-height:clamp(400px, calc(100vh - 284px), 900px)}
 /* Compact means more sheet: a shorter nav on every page (so it never jumps between pages) and a slimmer strip */
 html[data-density="compact"] .topnav-in{height:52px}
 html[data-density="compact"] .ws-strip{min-height:32px; padding-top:2px; padding-bottom:2px}
