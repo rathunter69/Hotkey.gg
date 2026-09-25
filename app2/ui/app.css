@@ -392,16 +392,20 @@ td.thick.ball::after{border-width:3px}
 .ribbon.ribbon-lean .ri-g{font-size:13px}
 .ribbon.ribbon-lean .ri-key{position:static; font-size:9.5px; line-height:1.5; order:2}
 .ribbon.ribbon-lean .rgrp-ico{padding:1px 6px}
-/* r426: THE OPEN MENU — an overlay with room to breathe: wraps instead of scrolling, every glyph
-   steps up to a legible size (KeyTip 9→11px, labels 11→12.5px, icons 15→18px, glyphs 13→15px). */
-.ribbon.ribbon-open{padding-right:12px; flex-wrap:wrap; overflow-x:visible; row-gap:3px}
-.ribbon.ribbon-open .rgrp-ico .rgrp-chips{flex-wrap:wrap}
+/* r426: THE OPEN MENU — every glyph steps up to a legible size (KeyTip 9→11px, labels 11→12.5px,
+   icons 15→18px, glyphs 13→15px). It stays ONE row, like the lean bar: a second row landed as an
+   orphan over the formula bar, so a menu too wide for the sheet scrolls sideways instead (the
+   KeyTips still reach every command). Groups sit a little tighter so Home fits at 1280. */
+.ribbon.ribbon-open{padding-right:12px; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden}
+.ribbon.ribbon-open .rgrp-ico .rgrp-chips{flex-wrap:nowrap}
+.ribbon.ribbon-lean.ribbon-open .rgrp-ico{padding:1px 3px}
+.ribbon.ribbon-open > .path{flex:none; white-space:nowrap}   /* "Home →" never folds onto two lines */
 .ribbon.ribbon-open .ri-key{font-size:11px; font-weight:800; line-height:1.35}
 .ribbon.ribbon-open .ri-lbl{font-size:12.5px}
 .ribbon.ribbon-open .ri-g{font-size:15px}
 .ribbon.ribbon-open .ri-ico{height:20px}
 .ribbon.ribbon-open .ri-ico svg{width:18px; height:18px}
-.ribbon.ribbon-open .ri-cmd{padding:2px 4px; gap:4px}
+.ribbon.ribbon-open .ri-cmd{padding:2px; gap:3px}
 /* r343: menus without icons use badge+label chips — same family, same 34px row */
 .ribbon.ribbon-lean .ri-cmd.ri-txt{gap:5px}
 .ribbon.ribbon-lean .ri-lbl{font-family:var(--mono); font-size:11px; color:var(--text); white-space:nowrap}
@@ -574,7 +578,11 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 .rf-cols{display:flex; align-items:flex-start; gap:2px; flex:1 1 auto; min-height:0}
 .rf-col{display:flex; flex-direction:column; gap:1px}
 .rf-row{display:flex; align-items:center; gap:1px}
-.rf-gname{font-family:var(--mono); font-size:9px; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); font-weight:600; line-height:1; padding-top:2px; white-space:nowrap; flex:none}   /* its row is reserved: nothing above ever prints on it */
+/* the number-format row ($ % , and the two decimal buttons): its glyphs (",000", ".00") are wider than an
+   icon button, so the buttons fit their glyphs and keep 2px apart instead of running together */
+.rf-row:has(> [data-tip="H0"]){gap:2px}
+.rf-row:has(> [data-tip="H0"]) > .rf-btn.ico{width:auto; min-width:22px; padding:0 3px}
+.rf-gname{font-family:var(--mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); font-weight:600; line-height:1; padding-top:2px; white-space:nowrap; flex:none}   /* its row is reserved: nothing above ever prints on it */
 /* buttons: small (icon + label in a row) and big (icon over label); both carry a KeyTip badge in the corner */
 .rf-btn{position:relative; display:inline-flex; align-items:center; gap:4px; height:17px; padding:0 4px; border:1px solid transparent; border-radius:5px;
   background:transparent; color:var(--text); font-family:var(--mono); font-size:10px; line-height:1; cursor:pointer; white-space:nowrap; transition:background .1s, border-color .1s}
