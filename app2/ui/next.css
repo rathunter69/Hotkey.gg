@@ -590,3 +590,10 @@ html[data-density="compact"] .dr-doc-main{padding:10px 14px 8px}
 html[data-density="compact"] .dr-doc h3{font-size:16px}
 html[data-density="compact"] .dr-folder{padding:8px 10px}
 html[data-density="compact"] .deal{padding:8px 14px; font-size:13px}
+
+/* the theme picker (critic pass): the grid scrolls inside the card so the close link never falls below the fold,
+   and a locked card's label sits clear of its swatch bars */
+.pc-card:has(.th-grid){overflow:hidden}
+.pc-card .th-grid{flex:1 1 auto; min-height:0; overflow-y:auto; padding:2px 2px 8px; margin-bottom:0; border-bottom:1px solid var(--line)}
+.pc-card:has(.th-grid) .pc-foot{flex:none; margin-top:12px}
+.th-card .pc-lock{margin-top:6px}
