@@ -212,3 +212,6 @@ body.hk-result-open .keyflash, body.hk-result-open #hkToast{opacity:0 !important
 /* after "Look at the sheet": the result as a bar in the card's footer */
 .panel-actions .done-bar-t{font-family:var(--mono); font-size:12px; color:var(--accent); font-weight:700; margin-right:auto}
 .panel-actions .btn{font-size:12.5px}
+.rm-card .tstamp.got.tier-pass{--tier-got:var(--tier-pass, var(--accent))}
+.rm-card .tstamp.got.tier-pro{--tier-got:var(--tier-pro, var(--accent))}
+.rm-card .tstamp.got.tier-legendary{--tier-got:var(--tier-legendary, var(--accent))}

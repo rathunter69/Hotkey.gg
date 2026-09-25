@@ -628,7 +628,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
       <div class="rm-title" id="doneTitle">${isChallenge && lastTier ? esc(lastTier[0].toUpperCase() + lastTier.slice(1)) : isMicro ? 'Done' : doneTitle()}</div>
       <div class="rm-lesson">${lessonLine}</div>
       ${lesson.race ? raceHtml() : `<div class="rm-time">${secs == null ? '—' : fmtSecs(secs)}<span>s</span></div>`}
-      ${(isChallenge || timedOnly) && lesson.pars ? `<div class="tier-stamps">${TIERS.map((t, i) => `<span class="tstamp${i === tierIx ? ' got' : i < tierIx ? ' hit' : ''}">${i < tierIx ? '✓ ' : ''}${t} ${lesson.pars[t]}s</span>`).join('')}</div>` : ''}
+      ${(isChallenge || timedOnly) && lesson.pars ? `<div class="tier-stamps">${TIERS.map((t, i) => `<span class="tstamp${i === tierIx ? ' got tier-' + t : i < tierIx ? ' hit' : ''}">${i < tierIx ? '✓ ' : ''}${t} ${lesson.pars[t]}s</span>`).join('')}</div>` : ''}
       <div class="rm-stats"><div>keys<b>${run.session.keyLog.length}${isChallenge && opt ? ' / ' + opt : ''}</b></div>${run.mouseCount ? `<div>mouse<b>×${run.mouseCount}</b></div>` : ''}${run.mode === 'timed' && run.par ? `<div>par<b>${run.par} s</b></div>` : ''}${xpGained ? `<div>earned<b class="rm-xp">+0 XP</b></div>` : ''}</div>
       ${lastTimedOut ? `<div class="rm-note">${timedOnly ? `Over the limit — no tier, and the ${lesson.kind === 'testout' ? 'chapter is not skipped' : 'gate is not passed'}. The run still counts; the next attempt runs against a hard clock.` : 'Over the limit — no tier. The module still counts.'}</div>` : ''}
       ${lastClean ? `<div class="rm-clean">✓ Clean sheet — no mouse, no help</div>` : assisted() ? `<div class="rm-note">Assisted — steps were shown on request.</div>` : ''}
