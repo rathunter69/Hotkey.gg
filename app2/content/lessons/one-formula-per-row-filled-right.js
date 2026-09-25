@@ -50,7 +50,7 @@ export default {
   prerequisites: ['link-across-sheets'],
   brief: 'The daily table on the Report has to read off Raw’s by-day block, the platform’s kWh for each site on each day. The associate, the colleague who checks your page, filled rows 18 to 21 already and retyped one cell over its formula; Domain’s row 17 is yours, and one formula filled right covers the six days. The key is `Ctrl+R`.',
   goals: [
-    { id: 'link-monday', text: 'Domain’s Monday in B17 is empty: link it to Domain’s Monday I32 in Raw’s by-day block, pointing across sheets.', keys: 'Ctrl+Home Ctrl+↓ ×5 → Ctrl+↑ ↑ "=" Ctrl+PgDn Ctrl+→ → ×2 Ctrl+↓ ×4 ↓ ×2 → ↵', requires: ['cross-sheet-ref', 'pointing', 'sheet-tabs', 'ctrl-arrow', 'ctrl-home-end', 'arrow-keys'],
+    { id: 'link-monday', text: 'Domain’s Monday in B17 is empty: link it to Domain’s Monday I32 in Raw’s by-day block, pointing across sheets.', keys: 'Ctrl+Home Ctrl+↓ ×3 ↓ "=" Ctrl+PgDn Ctrl+→ → ×2 Ctrl+↓ ×4 ↓ ×2 → ↵', requires: ['cross-sheet-ref', 'pointing', 'sheet-tabs', 'ctrl-arrow', 'ctrl-home-end', 'arrow-keys'],
       check: (s, ses) => bothSheets(ses, (rep, rw) => linked(rep, rw, 'B', 17)) && settled(ses) },
     { id: 'fill-right', text: 'Write the row once: with Monday’s link at the left of B17:G17, fill it right and all six days take the same pattern.', keys: '↑ Shift+→ ×5 Ctrl+R', requires: ['fill-down-right', 'shift-arrow'], convention: 'C3',
       check: (s, ses) => bothSheets(ses, (rep, rw) => rowLinked(rep, rw, 17)) && settled(ses) },
@@ -74,5 +74,5 @@ export default {
     'Domain’s week went in as one formula filled right, never six typed links (C3), and Ctrl+` showed the pattern with the one dead number standing out; F2 then Ctrl+Enter filled the row back from its own formula instead of retyping it (E3).',
     'Every link in the daily table reads green (B2), and Domain’s Monday on the feed moves the Report’s B17 the moment it changes.',
   ],
-  solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Ctrl+Down Ctrl+Down Ctrl+Down Right Ctrl+Up Up "=" Ctrl+PgDn Ctrl+Right Right Right Ctrl+Down Ctrl+Down Ctrl+Down Ctrl+Down Down Down Right Enter Up Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right Ctrl+R Ctrl+` Down Down Ctrl+Shift+Right F2 Ctrl+Enter Ctrl+` Up Up Ctrl+Shift+Right Alt H F C Right Right Right Right Right Right Right Right Enter',
+  solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Ctrl+Down Down "=" Ctrl+PgDn Ctrl+Right Right Right Ctrl+Down Ctrl+Down Ctrl+Down Ctrl+Down Down Down Right Enter Up Shift+Right Shift+Right Shift+Right Shift+Right Shift+Right Ctrl+R Ctrl+` Down Down Ctrl+Shift+Right F2 Ctrl+Enter Ctrl+` Up Up Ctrl+Shift+Right Alt H F C Right Right Right Right Right Right Right Right Enter',
 };

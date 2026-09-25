@@ -41,8 +41,8 @@ export default {
   prerequisites: ['read-the-error-follow-the-trail'],
   brief: 'The Report is finished and the deal team, the people running the sale, will print it and read it on paper, where a page that spills onto a second sheet reads as careless. Set it to print landscape on one page, with the title rows repeated and the file name and date in the footer, so every copy says what it is. The key is `Alt P S P`.',
   goals: [
-    { id: 'read-the-page', text: 'Before you set the page, read how far it runs: jump to the last used cell, Z31, then come back to the top of the sheet.', keys: 'Ctrl+End Ctrl+Home', requires: ['ctrl-home-end'],
-      check: (s, ses) => { const sh = report(ses); return !!sh && onReport(ses) && windowKeys(ses).includes('Ctrl+End') && sh.selectionText() === 'A1' && !ses.dialog && !ses.editing; } },
+    { id: 'read-the-page', text: 'Before you set the page, read how far it runs: jump to the last used cell, Z31, then Ctrl+Home back to B5, the first unfrozen cell.', keys: 'Ctrl+End Ctrl+Home', requires: ['ctrl-home-end'],
+      check: (s, ses) => { const sh = report(ses); return !!sh && onReport(ses) && windowKeys(ses).includes('Ctrl+End') && sh.selectionText() === 'B5' && !ses.dialog && !ses.editing; } },
     { id: 'landscape', teach: 'Page Layout › Orientation, Alt P O then L for landscape or P for portrait, turns the printed page without opening a dialog box.', text: 'A page wider than it is tall prints landscape: turn the Report with Alt P O L.', keys: 'Alt P O L', requires: ['orientation', 'keytips', 'ribbon-tabs'],
       check: (s, ses) => landscape(ses) && !ses.dialog },
     { id: 'fit', teach: 'Page Setup, Alt P S P, holds every print setting on its tabbed pages; F picks Fit to, one page wide by one page tall, and Enter is OK.', text: 'One page, however wide the columns run: open Page Setup, choose Fit to, leave the counts at 1 page wide by 1 tall, and OK it.', keys: 'Alt P S P F ↵', requires: ['page-setup', 'fit-to-page', 'keytips', 'ribbon-tabs'], convention: 'G1',
@@ -62,7 +62,7 @@ export default {
     { text: 'The footer carries the file name on the left and the date on the right', check: (s, ses) => footerLeft(ses) && footerRight(ses) },
   ],
   deviations: [
-    'read-the-page is a read-back goal (Ctrl+End then Ctrl+Home) like the F2 read-backs in 1.6.1 and 1.6.3: its check reads the key window plus the resting state, since reading the page changes nothing.',
+    'read-the-page is a read-back goal (Ctrl+End then Ctrl+Home) like the F2 read-backs in 1.6.1 and 1.6.3: its check reads the key window plus the resting state, since reading the page changes nothing. The Report is frozen at B5 from S4c, so Ctrl+Home rests on B5, the first unfrozen cell, as in Excel.',
     'No at-scale goal: a print set-up changes settings, not rows; read-the-page is the composition goal.',
   ],
   closing: [

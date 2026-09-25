@@ -290,10 +290,11 @@ export class Sheet {
   moveHome(ctrl, shift) {   // Home → column A of this row; Ctrl+Home → A1
     this.tabHome = null; this.multi = null;
     const a = this.sel && !shift ? this.dispActive() : this.active;
-    const t = ctrl ? { r: 1, c: 1 } : { r: a.r, c: 1 };
+    const fz = this.freeze || { r: 0, c: 0 };
+    const t = ctrl ? { r: fz.r + 1, c: fz.c + 1 } : { r: a.r, c: 1 };   // Ctrl+Home under frozen panes lands on the first unfrozen cell (Excel)
     if (shift) { if (!this.sel) { this.sel = { r: this.active.r, c: this.active.c }; this.selA = null; } }
     else { this.sel = null; this.selA = null; }
-    this.active = t; this.emit('select');
+    this.active = this.clamp(t.r, t.c); this.emit('select');
   }
   moveEnd(ctrl, shift) {    // End → last used cell in the row; Ctrl+End → bottom-right of the used range
     this.tabHome = null; this.multi = null;

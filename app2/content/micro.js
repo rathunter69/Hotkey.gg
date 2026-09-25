@@ -75,11 +75,11 @@ export const MICRO_MODULES = {
   /* ---------------- 1.4 structure ---------------- */
   'insert-delete-rows': { title: 'A row in, a row out', task: 'Insert a row inside the site block and watch the total follow; then take it out.', secs: 40, state: 'S4c',
     goals: [
-      { id: 'insert', text: 'Select Cedar Park’s row 9 and insert a row above it with Ctrl+Shift+=: the Total moves to row 12 and still sums C5:C11.', keys: 'Ctrl+Home Ctrl+↓ ×3 ↑ ×2 Shift+Space Ctrl+Shift+=', requires: ['insert-delete-rows'],
+      { id: 'insert', text: 'Select Cedar Park’s row 9 and insert a row above it with Ctrl+Shift+=: the Total moves to row 12 and still sums C5:C11.', keys: 'Ctrl+Home Ctrl+↓ ↑ Shift+Space Ctrl+Shift+=', requires: ['insert-delete-rows'],
         check: (s, ses) => { const c = cell(ses, 'Report', 'C12'); return !!c && c.formula === '=SUM(C5:C11)' && val(ses, 'Report', 'A10') === 'Cedar Park' && used(ses, 'Ctrl+Shift+='); } },
       { id: 'delete', text: 'Delete the blank row again with Ctrl+-: the Total is back on row 11, summing C5:C10.', keys: 'Ctrl+-', requires: ['insert-delete-rows'],
         check: (s, ses) => { const c = cell(ses, 'Report', 'C11'); return !!c && c.formula === '=SUM(C5:C10)' && val(ses, 'Report', 'A9') === 'Cedar Park' && used(ses, 'Ctrl+-'); } },
-    ], solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Ctrl+Down Up Up Shift+Space Ctrl+Shift+= Ctrl+-' },
+    ], solution: 'Ctrl+Home Ctrl+Down Up Shift+Space Ctrl+Shift+= Ctrl+-' },
   'ref-error': { title: '#REF! and back', task: 'Delete a row a formula depends on, read the error, heal it with undo.', secs: 40, state: 'S3e',
     goals: [
       { id: 'break', text: 'On Inputs, delete the wholesale price row 4 with Ctrl+-: the energy bill formula below now shows #REF!.', keys: 'Ctrl+PgDn ×2 Ctrl+Home ↓ ×3 Shift+Space Ctrl+-', requires: ['ref-error'],
@@ -89,14 +89,14 @@ export const MICRO_MODULES = {
     ], solution: 'Ctrl+PgDn Ctrl+PgDn Ctrl+Home Down Down Down Shift+Space Ctrl+- Ctrl+Z' },
   'column-width': { title: 'Set a width', task: 'Give the Site column a width you choose.', secs: 30, state: 'S4c',
     goals: [
-      { id: 'width', text: 'Select column A and set Column Width (Alt H O W) to 16.', keys: 'Ctrl+Home Ctrl+Space Alt H O W "16" ↵', requires: ['column-width'],
+      { id: 'width', text: 'Select column A and set Column Width (Alt H O W) to 16.', keys: 'Ctrl+Home ← Ctrl+Space Alt H O W "16" ↵', requires: ['column-width'],
         check: (s, ses) => { const sh = report(ses); return !!sh && sh.colW[1] === 16 * 7 + 5; } },
-    ], solution: 'Ctrl+Home Ctrl+Space Alt H O W "16" Enter' },
+    ], solution: 'Ctrl+Home Left Ctrl+Space Alt H O W "16" Enter' },
   'autofit': { title: 'AutoFit', task: 'Let the column size itself to its longest entry.', secs: 30, state: 'S4c',
     goals: [
-      { id: 'fit', text: 'Select column A and AutoFit it (Alt H O I): it opens out to the title’s full length.', keys: 'Ctrl+Home Ctrl+Space Alt H O I', requires: ['autofit'],
+      { id: 'fit', text: 'Select column A and AutoFit it (Alt H O I): it opens out to the title’s full length.', keys: 'Ctrl+Home ← Ctrl+Space Alt H O I', requires: ['autofit'],
         check: (s, ses) => { const sh = report(ses); return !!sh && sh.colW[1] > 200; } },
-    ], solution: 'Ctrl+Home Ctrl+Space Alt H O I' },
+    ], solution: 'Ctrl+Home Left Ctrl+Space Alt H O I' },
   'wrap-text': { title: 'Wrap a header', task: 'Make a long header wrap inside its column.', secs: 30, state: 'S3e',
     goals: [
       { id: 'wrap', text: 'Land on the Revenue ($) header D4 and wrap it with Alt H W.', keys: 'Ctrl+Home Ctrl+↓ ×2 → ×3 Alt H W', requires: ['wrap-text'],
@@ -126,24 +126,24 @@ export const MICRO_MODULES = {
   /* ---------------- 1.5 format ---------------- */
   'format-cells-dialog': { title: 'Format Cells', task: 'Give a column the comma format, no decimals, from the dialog.', secs: 30, state: 'S4c',
     goals: [
-      { id: 'dialog', text: 'Select the kWh figures C5:C11 and, in Format Cells (Ctrl+1), pick the comma format with no decimals (N).', keys: 'Ctrl+Home Ctrl+↓ ×2 ↓ → ×2 Ctrl+Shift+↓ then Ctrl+1 N', requires: ['format-cells-dialog'],
+      { id: 'dialog', text: 'Select the kWh figures C5:C11 and, in Format Cells (Ctrl+1), pick the comma format with no decimals (N).', keys: 'Ctrl+Home → Ctrl+Shift+↓ then Ctrl+1 N', requires: ['format-cells-dialog'],
         check: (s, ses) => [5, 6, 7, 8, 9, 10, 11].every(r => { const c = cell(ses, 'Report', 'C' + r); return c && c.fmtStyle === 'comma' && c.decimals === 0; }) && used(ses, 'Ctrl+1') },
-    ], solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Down Right Right Ctrl+Shift+Down Ctrl+1 N' },
+    ], solution: 'Ctrl+Home Right Ctrl+Shift+Down Ctrl+1 N' },
   'number-formats': { title: 'The chord set', task: 'Comma, no decimals, on a block of figures in three presses.', secs: 35, state: 'S4c',
     goals: [
-      { id: 'chord', text: 'Select D5:F11 and press Ctrl+Shift+1, then Alt H 9 twice: thousands separators, no decimals, negatives in parentheses.', keys: 'Ctrl+Home Ctrl+↓ ×2 ↓ → ×3 Ctrl+Shift+↓ Shift+→ ×2 Ctrl+Shift+1 then Alt H 9 then Alt H 9', requires: ['number-formats'],
+      { id: 'chord', text: 'Select D5:F11 and press Ctrl+Shift+1, then Alt H 9 twice: thousands separators, no decimals, negatives in parentheses.', keys: 'Ctrl+Home → ×2 Ctrl+Shift+↓ Shift+→ ×2 Ctrl+Shift+1 then Alt H 9 then Alt H 9', requires: ['number-formats'],
         check: (s, ses) => ['D', 'E', 'F'].every(col => [5, 6, 7, 8, 9, 10, 11].every(r => { const c = cell(ses, 'Report', col + r); return c && c.fmtStyle === 'comma' && c.decimals === 0; })) && used(ses, 'Ctrl+Shift+!') },
-    ], solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Down Right Right Right Ctrl+Shift+Down Shift+Right Shift+Right Ctrl+Shift+1 Alt H 9 Alt H 9' },
+    ], solution: 'Ctrl+Home Right Right Ctrl+Shift+Down Shift+Right Shift+Right Ctrl+Shift+1 Alt H 9 Alt H 9' },
   'borders-menu': { title: 'A top border', task: 'Give the total row a top border, the way the team marks a total.', secs: 30, state: 'S5a',
     goals: [
-      { id: 'top', text: 'Select the whole total row 11 and give it a top border with Alt H B P — a border, never a grid.', keys: 'Ctrl+Home Ctrl+↓ ×3 Shift+Space then Alt H B P', requires: ['borders-menu'],
+      { id: 'top', text: 'Select the whole total row 11 and give it a top border with Alt H B P — a border, never a grid.', keys: 'Ctrl+Home ← Ctrl+↓ Shift+Space then Alt H B P', requires: ['borders-menu'],
         check: (s, ses) => { const a = cell(ses, 'Report', 'A11'), c = cell(ses, 'Report', 'C11'); return !!a && a.bt === true && !!c && c.bt === true && !a.ball; } },
-    ], solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Ctrl+Down Shift+Space Alt H B P' },
+    ], solution: 'Ctrl+Home Left Ctrl+Down Shift+Space Alt H B P' },
   'center-across': { title: 'Center across, never merge', task: 'Center the title over the page without merging a single cell.', secs: 35, state: 'S5b',
     goals: [
-      { id: 'ca', text: 'Select A1:I1 and center the title across the selection from Format Cells (Ctrl+1, A).', keys: 'Ctrl+Home ↓ ×3 Ctrl+→ ↑ ×3 Ctrl+Shift+← then Ctrl+1 A', requires: ['center-across'],
+      { id: 'ca', text: 'Select A1:I1 and center the title across the selection from Format Cells (Ctrl+1, A).', keys: 'Ctrl+Home ↑ Ctrl+→ ↑ ×3 Ctrl+Shift+← then Ctrl+1 A', requires: ['center-across'],
         check: (s, ses) => { const c = cell(ses, 'Report', 'A1'); return !!c && c.ca === 9; } },
-    ], solution: 'Ctrl+Home Down Down Down Ctrl+Right Up Up Up Ctrl+Shift+Left Ctrl+1 A' },
+    ], solution: 'Ctrl+Home Up Ctrl+Right Up Up Up Ctrl+Shift+Left Ctrl+1 A' },
   'f4-repeat': { title: 'Format once, F4 everywhere', task: 'Format one block, then repeat it on the next with a single key.', secs: 40, state: 'S5c',
     goals: [
       { id: 'first', text: 'On Costs, give B4:D8 the comma format with no decimals from Format Cells (Ctrl+1, N).', keys: 'Ctrl+PgDn ×3 Ctrl+Home Ctrl+↓ ↓ → Ctrl+Shift+↓ Shift+→ ×2 then Ctrl+1 N', requires: ['format-cells-dialog'],
@@ -154,14 +154,14 @@ export const MICRO_MODULES = {
   /* ---------------- 1.6 formulas ---------------- */
   'pointing': { title: 'Point, don’t type', task: 'Write a formula by pointing at its cells.', secs: 35, state: 'S5d',
     goals: [
-      { id: 'point', text: 'In F5, write Domain’s gross profit as revenue less energy cost by pointing: =D5-E5.', keys: 'Ctrl+Home Ctrl+↓ ×2 ↓ Ctrl+→ → "=" ← ← "-" ← ↵', requires: ['pointing'],
+      { id: 'point', text: 'In F5, write Domain’s gross profit as revenue less energy cost by pointing: =D5-E5.', keys: 'Ctrl+Home Ctrl+→ → "=" ← ← "-" ← ↵', requires: ['pointing'],
         check: (s, ses) => { const c = cell(ses, 'Report', 'F5'); return !!c && c.formula === '=D5-E5'; } },
-    ], solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Down Ctrl+Right Right "=" Left Left "-" Left Enter' },
+    ], solution: 'Ctrl+Home Ctrl+Right Right "=" Left Left "-" Left Enter' },
   'autosum': { title: 'AutoSum the block', task: 'Total every column of a block in one press.', secs: 35, state: 'S6a',
     goals: [
-      { id: 'block', text: 'Select the figures C5:F10 and press Alt+=: the SUMs land in row 11, gross profit included.', keys: 'Ctrl+Home Ctrl+↓ ×2 ↓ → ×2 Ctrl+Shift+↓ Shift+↑ Shift+→ ×3 Alt+=', requires: ['autosum'],
+      { id: 'block', text: 'Select the figures C5:F10 and press Alt+=: the SUMs land in row 11, gross profit included.', keys: 'Ctrl+Home → Ctrl+Shift+↓ Shift+↑ Shift+→ ×3 Alt+=', requires: ['autosum'],
         check: (s, ses) => { const c = cell(ses, 'Report', 'F11'); return !!c && c.formula === '=SUM(F5:F10)'; } },
-    ], solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Down Right Right Ctrl+Shift+Down Shift+Up Shift+Right Shift+Right Shift+Right Alt+=' },
+    ], solution: 'Ctrl+Home Right Ctrl+Shift+Down Shift+Up Shift+Right Shift+Right Shift+Right Alt+=' },
   'sum-family': { title: 'AVERAGE and COUNT', task: 'Two of SUM’s family on the site block.', secs: 40, state: 'S6a',
     goals: [
       { id: 'avg', text: 'In B27, the average kWh per site: =AVERAGE(C5:C10).', keys: 'Ctrl+G "B27" ↵ "=AVERAGE(C5:C10)" ↵', requires: ['sum-family'],
@@ -171,16 +171,16 @@ export const MICRO_MODULES = {
     ], solution: 'Ctrl+G "B27" Enter "=AVERAGE(C5:C10)" Enter "=COUNT(C5:C10)" Enter' },
   'f4-anchor': { title: 'Anchor with F4', task: 'One formula whose anchors let it fill both ways.', secs: 45, state: 'S6b',
     goals: [
-      { id: 'price', text: 'Type a price scenario, 0.12, in J4.', keys: 'Ctrl+Home ↓ ×3 Ctrl+→ → "0.12" ↵', requires: ['type-to-enter'],
+      { id: 'price', text: 'Type a price scenario, 0.12, in J4.', keys: 'Ctrl+Home ↑ Ctrl+→ → "0.12" ↵', requires: ['type-to-enter'],
         check: (s, ses) => val(ses, 'Report', 'J4') === 0.12 },
       { id: 'anchor', text: 'In J5, point at Domain’s kWh and the price, anchoring each with F4: =$C5*J$4.', keys: '"=" Ctrl+← Ctrl+← → ×2 F4 ×3 "*" ↑ F4 ×2 ↵', requires: ['f4-anchor'],
         check: (s, ses) => { const c = cell(ses, 'Report', 'J5'); return !!c && c.formula === '=$C5*J$4'; } },
-    ], solution: 'Ctrl+Home Down Down Down Ctrl+Right Right "0.12" Enter "=" Ctrl+Left Ctrl+Left Right Right F4 F4 F4 "*" Up F4 F4 Enter' },
+    ], solution: 'Ctrl+Home Up Ctrl+Right Right "0.12" Enter "=" Ctrl+Left Ctrl+Left Right Right F4 F4 F4 "*" Up F4 F4 Enter' },
   'cross-sheet-ref': { title: 'Point across sheets', task: 'Link a figure on the Report to the feed by pointing on the other sheet.', secs: 45, state: 'S6c',
     goals: [
-      { id: 'link', text: 'In C5, type = then Ctrl+PgDn to Raw, point at Domain’s kWh total I8 and press Enter: the Report reads =Raw!I8.', keys: 'Ctrl+Home Ctrl+↓ ×2 ↓ → ×2 "=" Ctrl+PgDn Ctrl+→ → ×2 Ctrl+↓ ×2 ↓ ×2 → ↵', requires: ['cross-sheet-ref'],
+      { id: 'link', text: 'In C5, type = then Ctrl+PgDn to Raw, point at Domain’s kWh total I8 and press Enter: the Report reads =Raw!I8.', keys: 'Ctrl+Home → "=" Ctrl+PgDn Ctrl+→ → ×2 Ctrl+↓ ×2 ↓ ×2 → ↵', requires: ['cross-sheet-ref'],
         check: (s, ses) => { const c = cell(ses, 'Report', 'C5'); return !!c && c.formula === '=Raw!I8' && used(ses, 'Ctrl+PgDn'); } },
-    ], solution: 'Ctrl+Home Ctrl+Down Ctrl+Down Down Right Right "=" Ctrl+PgDn Ctrl+Right Right Right Ctrl+Down Ctrl+Down Down Down Right Enter' },
+    ], solution: 'Ctrl+Home Right "=" Ctrl+PgDn Ctrl+Right Right Right Ctrl+Down Ctrl+Down Down Down Right Enter' },
   'show-formulas': { title: 'Show the pattern', task: 'See every formula on the page at once, then put the figures back.', secs: 30, state: 'S6e',
     goals: [
       { id: 'on', text: 'Press Ctrl+` : the grid shows formulas instead of figures, and any typed number stands out.', keys: 'Ctrl+`', requires: ['show-formulas'],

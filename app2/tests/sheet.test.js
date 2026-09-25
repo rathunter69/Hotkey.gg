@@ -270,3 +270,11 @@ test('sheet-level pins for the formula-engine review: arity refusals, error lite
   const q = new Sheet({ cells: { B1: { value: 1 }, B2: { value: 2 }, D1: { formula: '=SUM(B:B)' } } });
   q.select('A1'); q.insert('c'); assert.equal(q.formula('E1'), '=SUM(C:C)'); assert.equal(q.value('E1'), 3);
 });
+
+test('Ctrl+Home under frozen panes lands on the first unfrozen cell, as Excel does', () => {
+  const s = new Sheet({ cells: { A1: { value: 1 } } });
+  s.goTo(9, 9); s.moveHome(true, false); assert.equal(s.selectionText(), 'A1');
+  s.freeze = { r: 4, c: 1 }; s.goTo(9, 9); s.moveHome(true, false); assert.equal(s.selectionText(), 'B5');
+  s.moveHome(false, false); assert.equal(s.selectionText(), 'A5', 'plain Home still goes to column A');
+  s.freeze = { r: 1, c: 0 }; s.goTo(9, 9); s.moveHome(true, false); assert.equal(s.selectionText(), 'A2');
+});

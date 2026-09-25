@@ -35,7 +35,7 @@ export default {
   headline: 'Alt H B',
   conventions: ['D5', 'B3', 'D8'],
   teaches: ['bold-italic-underline', 'borders-menu', 'fills-and-colours'],
-  uses: ['keytips', 'row-col-select', 'shift-arrow', 'ctrl-arrow', 'ctrl-home-end', 'sheet-tabs'],
+  uses: ['keytips', 'row-col-select', 'shift-arrow', 'ctrl-arrow', 'sheet-tabs'],
   prerequisites: ['numbers-a-banker-can-read'],
   brief: 'The Report’s figures now read right, but nothing on the page tells the eye where to look: the title, the first two headers and the total row all sit in plain text. Bold the title and size it up, bold the header and total rows, give the total row a top border, and tint the input block on Inputs. The key is `Alt H B`.',
   goals: [
@@ -45,7 +45,7 @@ export default {
       check: (s, ses) => { const rep = report(ses); return !!rep && rep.cellAt('A1').fsz === TITLE_FSZ; } },
     { id: 'header-row', text: 'Site and Week in A4:B4 were never bold: select the whole header row 4 with Shift+Space and one Ctrl+B bolds every header at once.', keys: '↓ ×3 Shift+Space Ctrl+B', requires: ['bold-italic-underline', 'row-col-select'],
       check: (s, ses) => { const rep = report(ses); return !!rep && allBold(rep, HEADER); } },
-    { id: 'total-row', text: 'Jump down the site list to the Total in A11, select the whole row 11 with Shift+Space and make the total row bold.', keys: 'Ctrl+Home Ctrl+↓ ×3 Shift+Space Ctrl+B', requires: ['bold-italic-underline', 'row-col-select', 'ctrl-arrow', 'ctrl-home-end'],
+    { id: 'total-row', text: 'Ctrl+↓ jumps down the site list to the Total in A11: select the whole row 11 with Shift+Space and make it bold.', keys: 'Ctrl+↓ Shift+Space Ctrl+B', requires: ['bold-italic-underline', 'row-col-select', 'ctrl-arrow'],
       check: (s, ses) => { const rep = report(ses); return !!rep && allBold(rep, TOTAL) && allBold(rep, HEADER); } },
     { id: 'total-border', teach: 'The Borders menu is Alt H B, then a letter: P a top border, O a bottom, A all borders, N none.', text: 'A total takes a top border, never a grid: with row 11 still selected, add the top border with Alt H B P.', keys: 'Alt H B P', requires: ['borders-menu'], convention: 'D5',
       check: (s, ses) => { const rep = report(ses); return !!rep && allTop(rep, TOTAL) && noGrid(rep) && allBold(rep, TOTAL); } },
@@ -63,5 +63,5 @@ export default {
     'Shift+Space selected a whole row and one press dressed every cell in it: the header row and the total row went bold together, and the total took a top border, never a grid (D5).',
     'The title is the one cell on the page a size up (D8), the input block on Inputs carries the tint that says “change these” (B3), and Cedar Park’s kWh still moves the bold Total.',
   ],
-  solution: 'Ctrl+B Alt H F G Down Down Down Shift+Space Ctrl+B Ctrl+Home Ctrl+Down Ctrl+Down Ctrl+Down Shift+Space Ctrl+B Alt H B P Ctrl+PgDn Ctrl+PgDn Down Down Right Shift+Down Shift+Down Shift+Down Alt H H Enter',
+  solution: 'Ctrl+B Alt H F G Down Down Down Shift+Space Ctrl+B Ctrl+Down Shift+Space Ctrl+B Alt H B P Ctrl+PgDn Ctrl+PgDn Down Down Right Shift+Down Shift+Down Shift+Down Alt H H Enter',
 };
