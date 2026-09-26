@@ -15,7 +15,7 @@
 //   view.destroy();
 
 import { COLW_DEFAULT, cellNumPx, cellTxtPx } from '../engine/sheet.js';
-import { dispText, dispColor } from '../engine/format.js';
+import { dispText, dispColor, HASHES } from '../engine/format.js';
 import { colLetter, refKey, parseRef } from '../engine/refs.js';
 import { formulaRefs, isErrVal } from '../engine/formula.js';
 import { recordMouse, MODAL_DIALOGS } from './ribbon-commands.js';
@@ -324,9 +324,12 @@ export class SheetView {
           if (cell.bl) cls += ' bl'; if (cell.br) cls += ' br'; if (cell.thick) cls += ' thick';
           if (cell.align) cls += ' align-' + cell.align;
           const fcKey = dispColor(cell) || cell.fontColor;   // a custom code's [Red] section wins over the font colour, as in Excel
-          if (fcKey) cls += ' fc-' + fcKey;
+          if (fcKey) { if (fcKey[0] === '#') style += ';color:' + fcKey; else cls += ' fc-' + fcKey; }   // [Color 9]: a palette hex the swatches lack
 
-          txt = escHtml(dispText(cell));
+          const shown = dispText(cell);
+          // the td collapses spaces (white-space:nowrap): a number keeps every one — the _) pad that lines
+          // 1,235 up under (1,235), the accounting $   -   — and text keeps its leading and trailing run
+          txt = isNum ? escHtml(shown).replace(/ /g, '&nbsp;') : escHtml(shown).replace(/^ +| +$/g, m => '&nbsp;'.repeat(m.length));
           const fxShown = showFx && !!cell.formula && !(editing && isActive);
           if (fxShown) { cls += ' txt fxshow'; txt = escHtml(cell.formula); }   // show formulas: the text, left-aligned, no #### verdict
           if (editing && isActive) {
@@ -357,9 +360,10 @@ export class SheetView {
             }
           }
           else if (isNum && !cell.wrap) {
-            // #### when the number needs more than the column's engine width
+            // #### when the number needs more than the column's engine width, or when its format cannot
+            // show it at all (a negative date, a value no section fits): the engine's own # fill
             const tw = cellNumPx(cell);
-            if (tw > W[c]) { cls += ' over'; txt = '#'.repeat(Math.max(3, Math.floor((W[c] - 2 * CELL_PAD) / HASH_PX))); }
+            if (tw > W[c] || shown === HASHES) { cls += ' over'; txt = '#'.repeat(Math.max(3, Math.floor((W[c] - 2 * CELL_PAD) / HASH_PX))); }
           }
 
           if (cell.indent) {   // Alt H 6/5 indent — pad the content gutter (right edge for right-aligned cells)
@@ -368,13 +372,20 @@ export class SheetView {
           }
           if (cell.fsz) style += ';font-size:' + cell.fsz + 'px';   // grow/shrink font (Alt H F G/K)
         }
-        const cfc = cf && cf[key];   // a rule's paint: fill / font colour / border / data bar / colour scale, over the cell's own
+        const cfc = cf && cf[key];   // a rule's paint: fill (a colour scale's too) / font colour / border / data bar, over the cell's own
         if (cfc) {
-          const bg = cfc.fill || cfc.scale;
-          if (bg) { cls += ' cf-fill'; style += ';--cf-fill:' + bg; }
+          if (cfc.fill) { cls += ' cf-fill'; style += ';--cf-fill:' + cfc.fill; }
           if (cfc.fontColor) { cls += ' cf-fc'; style += ';--cf-fc:' + cfc.fontColor; }
           if (cfc.border) { cls += ' cf-bd'; style += ';--cf-bd:' + cfc.border; }
-          if (cfc.bar) { cls += ' cf-bar'; style += ';--cf-bar:' + cfc.bar.color + ';--cf-pct:' + Math.round(cfc.bar.pct * 100) + '%'; }
+          if (cfc.bar) {
+            // Excel's automatic bar: a positive value runs right from the axis (where zero sits: the left
+            // edge unless the range holds negatives) in the rule colour, a negative runs left from it in red
+            const b = cfc.bar, axis = b.axis || 0;
+            const x1 = b.neg ? axis * (1 - b.pct) : axis, x2 = b.neg ? axis : axis + b.pct * (1 - axis), col = b.neg ? '#ff0000' : b.color;
+            const pc = x => (Math.round(x * 1000) / 10) + '%';
+            cls += ' cf-bar';   // the class keeps the bar from repeating; the gradient itself is inline, since the stylesheet's template only knows a left-anchored bar
+            style += ';background-image:linear-gradient(90deg, transparent ' + pc(x1) + ', ' + col + ' ' + pc(x1) + ', ' + col + ' ' + pc(x2) + ', transparent ' + pc(x2) + ') !important';
+          }
         }
 
         if (patch) {

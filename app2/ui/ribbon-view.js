@@ -355,11 +355,13 @@ export class RibbonView {
       `<div class="gt-ref">${F(d.v1, d.focus === 'v1', 'dset:focus:v1', 'wide')}${d.op === 'between' ? '<label>and</label>' + F(d.v2, d.focus === 'v2', 'dset:focus:v2', 'wide') : ''}</div>`;
     body += '<div class="od-sect">with</div><div class="cf-styles' + (d.focus === 'style' ? ' foc' : '') + '">' +
       CF_STYLE_KEYS.map((k, i) => RibbonView.cfChip(k, i, i === d.styleIdx, 'dset:style:' + i)).join('') + '</div>';
-    body += ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">' + (d.op === 'formula' ? 'type a formula for the top-left cell' : 'type a number or a =formula') + ' · ← → pick a style · ↵ OK · esc cancel</div>';
+    body += ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">' + (d.op === 'formula' ? 'type a formula for the active cell' : 'type a number, text, a date or a =formula') + ' · ← → pick a style · ↵ OK · esc cancel</div>';
     return body;
   }
+  /** A preset's value as the Rules Manager prints it: text in quotes, TRUE / FALSE, a number or a =formula as stored. */
+  static cfValueText(v) { return typeof v === 'boolean' ? (v ? 'TRUE' : 'FALSE') : typeof v === 'string' && v.trimStart()[0] !== '=' ? '"' + v + '"' : String(v); }
   static cfRuleDesc(r) {
-    if (r.kind === 'cellValue') return 'Cell Value ' + (CF_OP_LABEL[r.op] || r.op).toLowerCase() + ' ' + r.v1 + (r.op === 'between' || r.op === 'notBetween' ? ' and ' + r.v2 : '');
+    if (r.kind === 'cellValue') return 'Cell Value ' + (CF_OP_LABEL[r.op] || r.op).toLowerCase() + ' ' + RibbonView.cfValueText(r.v1) + (r.op === 'between' || r.op === 'notBetween' ? ' and ' + RibbonView.cfValueText(r.v2) : '');
     if (r.kind === 'formula') return 'Formula: ' + r.formula;
     if (r.kind === 'dataBar') return 'Data Bar';
     return 'Graded Color Scale';
@@ -374,7 +376,8 @@ export class RibbonView {
     const rules = ss.sheet.condFmt;
     let rows = '<div class="cf-rule cf-rule-h"><span>Rule (applied in order shown)</span><span>Format</span><span>Applies to</span><span>Stop If True</span></div>';
     if (!rules.length) rows += '<div class="cf-empty">No rules on this worksheet.</div>';
-    rules.forEach((r, i) => { rows += `<div class="od-row cf-rule${i === d.sel ? ' on foc' : ''}" data-act="dset:rule:${i}"><span class="od-lbl">${esc(RibbonView.cfRuleDesc(r))}</span>${RibbonView.cfRulePreview(r)}<span class="od-lbl">=${esc(r.range)}</span><span class="od-box${r.stopIfTrue ? ' on' : ''}"></span></div>`; });
+    // Stop If True is greyed out on a data bar or a colour scale, as Excel greys it; the Applies-to lists every area, comma-joined
+    rules.forEach((r, i) => { const noStop = r.kind === 'dataBar' || r.kind === 'colorScale'; rows += `<div class="od-row cf-rule${i === d.sel ? ' on foc' : ''}" data-act="dset:rule:${i}"><span class="od-lbl">${esc(RibbonView.cfRuleDesc(r))}</span>${RibbonView.cfRulePreview(r)}<span class="od-lbl">=${esc(r.range)}</span><span class="od-box${r.stopIfTrue ? ' on' : ''}"${noStop ? ' style="opacity:.35" title="Not available for this rule type"' : ''}></span></div>`; });
     return '<div class="od-sect">Rules for this worksheet</div><div class="cf-rules">' + rows + '</div>' +
       '<div class="cf-btns"><span class="pd-btn" data-act="dset:ruleact:Delete">Delete Rule <kbd>del</kbd></span><span class="pd-btn" data-act="dset:ruleact:U">Move Up <kbd>u</kbd></span><span class="pd-btn" data-act="dset:ruleact:D">Move Down <kbd>d</kbd></span><span class="pd-btn" data-act="dset:ruleact:S">Stop If True <kbd>s</kbd></span></div>' +
       '<div class="od-caplbl">↑ ↓ pick a rule · every change applies at once · ↵ close · esc close</div>';

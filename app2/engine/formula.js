@@ -179,7 +179,7 @@ export function parseFormula(src) {
         // whole-row range: 1:1, $1:$1
         const c = peek();
         if (c && c.t === 'op' && c.v === ':' && toks[p + 1] && toks[p + 1].t === 'num' && Number.isInteger(tk.v) && Number.isInteger(toks[p + 1].v)) {
-          p += 2; return { k: 'rowrange', a: tk.v, b: toks[p - 1].v };
+          p += 2; return { k: 'rowrange', a: tk.v, b: toks[p - 1].v, absA: !!tk.abs, absB: !!toks[p - 1].abs };   // the $ flags, for an offset evaluation (conditional formatting)
         }
         if (tk.abs) throw new SyntaxError('unexpected $');
         return { k: 'num', v: tk.v };
@@ -200,7 +200,7 @@ export function parseFormula(src) {
         const c = peek();
         if (c && c.t === 'op' && c.v === ':' && /^[A-Z]{1,3}$/.test(nm)) {
           const d = toks[p + 1];
-          if (d && d.t === 'name' && /^\$?[A-Z]{1,3}$/.test(d.v)) { p += 2; return { k: 'colrange', a: nm, b: d.v.replace(/^\$/, '') }; }
+          if (d && d.t === 'name' && /^\$?[A-Z]{1,3}$/.test(d.v)) { p += 2; return { k: 'colrange', a: nm, b: d.v.replace(/^\$/, ''), absA: tk.v[0] === '$', absB: d.v[0] === '$' }; }
         }
         if (nm === 'TRUE') return { k: 'bool', v: true };
         if (nm === 'FALSE') return { k: 'bool', v: false };
@@ -289,9 +289,73 @@ export function textToNumber(str) {
 }
 
 
+/* ---- date and time text, as Excel (en-US) recognises it: 1/31/2026, 1/31/26, 2026-01-31, 31-Jan-26, 31 Jan 2026, Jan 31, 2026, Jan 31, 12:00, 12:00:30 PM and a date followed by a time ---- */
+const MONTH_NAMES = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+const RE_MDY = /^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/, RE_YMD = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
+const RE_DMON = /^(\d{1,2})[- ]([a-z]{3,9})(?:[- ,]+(\d{2}|\d{4}))?$/i, RE_MOND = /^([a-z]{3,9})[- ]?(\d{1,2})(?:(?:,\s*|[- ])(\d{2}|\d{4}))?$/i, RE_MONY = /^([a-z]{3,9})[- ](\d{4})$/i;
+const RE_TIME = /^(\d{1,2}):(\d{2})(?::(\d{2}))?(?:\s*([ap])\.?m?\.?)?$/i;
+const monthOf = name => { const i = MONTH_NAMES.findIndex(m => m.startsWith(name.toLowerCase())); return i >= 0 && (name.length >= 3 && (name.length === 3 || MONTH_NAMES[i] === name.toLowerCase())) ? i + 1 : 0; };
+const yearOf = y => y === undefined ? null : y.length === 4 ? +y : +y < 30 ? 2000 + +y : 1900 + +y;   // two-digit years: 00–29 → 2000s
+const serialOf = (y, m, d) => {   // Excel's 1900 system (the phantom 29 Feb 1900 included); null when the calendar has no such day
+  if (m < 1 || m > 12 || d < 1 || y < 1900 || y > 9999) return null;
+  if (y === 1900 && m === 2 && d === 29) return 60;
+  if (d > new Date(Date.UTC(y, m, 0)).getUTCDate()) return null;
+  const n = Math.floor((Date.UTC(y, m - 1, d) - Date.UTC(1899, 11, 30)) / 86400000);
+  return n < 61 ? n - 1 : n;
+};
+const timeOf = t => {   // the fraction of a day, or null
+  const m = RE_TIME.exec(t); if (!m) return null;
+  let h = +m[1]; const mi = +m[2], s = m[3] ? +m[3] : 0, ap = m[4] ? m[4].toLowerCase() : '';
+  if (mi > 59 || s > 59) return null;
+  if (ap) { if (h < 1 || h > 12) return null; h = h % 12 + (ap === 'p' ? 12 : 0); }   // without AM/PM, 24:00 and beyond read as elapsed hours, as Excel takes them
+  return (h * 3600 + mi * 60 + s) / 86400;
+};
+/** The Excel serial a date or time text denotes (en-US shapes), or null. A date with no year takes `yearNow()`'s. */
+export function dateTextToSerial(str, yearNow = () => new Date().getUTCFullYear()) {
+  const t = String(str).trim();
+  if (!t || t.length > 40 || !/\d/.test(t)) return null;
+  const dateOf = s => {
+    let m;
+    if ((m = RE_MDY.exec(s))) return serialOf(yearOf(m[3]), +m[1], +m[2]);
+    if ((m = RE_YMD.exec(s))) return serialOf(+m[1], +m[2], +m[3]);
+    if ((m = RE_DMON.exec(s))) { const mo = monthOf(m[2]); return mo ? serialOf(m[3] === undefined ? yearNow() : yearOf(m[3]), mo, +m[1]) : null; }
+    if ((m = RE_MOND.exec(s))) { const mo = monthOf(m[1]); return mo ? serialOf(m[3] === undefined ? yearNow() : yearOf(m[3]), mo, +m[2]) : null; }
+    if ((m = RE_MONY.exec(s))) { const mo = monthOf(m[1]); return mo ? serialOf(+m[2], mo, 1) : null; }
+    return null;
+  };
+  const whole = dateOf(t); if (whole !== null) return whole;
+  const time = timeOf(t); if (time !== null) return time;
+  const sp = t.search(/\s\d{1,2}:\d{2}/);   // a date then a time
+  if (sp > 0) { const d = dateOf(t.slice(0, sp).trim()), tm = timeOf(t.slice(sp).trim()); if (d !== null && tm !== null) return d + tm; }
+  return null;
+}
+
 const num15 = n => parseFloat(Number(n).toPrecision(15));
 
 function numeq(a, b) { return num15(a) === num15(b); }
+
+const cmpText = (a, b) => a.localeCompare(b, 'en', { sensitivity: 'accent' });
+/**
+ * Excel's comparison of two plain values (number | string | boolean | null) under = <> < <= > >=:
+ * numbers < text < booleans, text case-insensitive, a blank reads as the other side's zero ("" / 0 /
+ * FALSE). The operators use it, and so do the conditional-formatting presets (a Highlight Cells
+ * rule is the comparison =A1>5 evaluated per cell).
+ */
+export function compareValues(op, a, b) {
+  const rank = v => typeof v === 'number' ? 0 : typeof v === 'string' ? 1 : typeof v === 'boolean' ? 2 : -1;
+  if (a === null && b === null) return op === '=' || op === '<=' || op === '>=';
+  if (a === null) a = typeof b === 'string' ? '' : typeof b === 'boolean' ? false : 0;
+  if (b === null) b = typeof a === 'string' ? '' : typeof a === 'boolean' ? false : 0;
+  let d;
+  if (rank(a) !== rank(b)) d = rank(a) - rank(b);
+  else if (typeof a === 'number') d = numeq(a, b) ? 0 : (a < b ? -1 : 1);
+  else if (typeof a === 'string') d = cmpText(a, b);
+  else d = (a === b) ? 0 : (a ? 1 : -1);
+  switch (op) {
+    case '=': return d === 0; case '<>': return d !== 0; case '<': return d < 0;
+    case '<=': return d <= 0; case '>': return d > 0; default: return d >= 0;
+  }
+}
 
 /* ---- wildcards ("a*", "?ear", "~*") — an iterative glob, never a backtracking RegExp -------- */
 /** Compile a criteria pattern: '*' any run, '?' one char, '~x' the literal x. Case-insensitive. */
@@ -335,7 +399,12 @@ export function evalFormula(expr, ctx = {}) {
     return ctx.sheetRaw ? ctx.sheetRaw(k.slice(0, b), k.slice(b + 1)) : '#REF!';
   };
   const ROWS = ctx.rows || 20, COLS = ctx.cols || 10;
-  const ast = parseFormula(expr);   // SyntaxError propagates: the commit gate decides what to do
+  // a parsed AST (parseFormula) is taken as is, so a formula evaluated over many cells — a
+  // conditional-formatting rule — is parsed once; ctx.offset = {dr, dc} then shifts its relative
+  // references per cell, exactly as translateFormula would rewrite the text (a reference pushed
+  // above row 1 or left of column A is #REF!)
+  const ast = expr && typeof expr === 'object' ? expr : parseFormula(expr);   // SyntaxError propagates: the commit gate decides what to do
+  const OFF = ctx.offset && (ctx.offset.dr || ctx.offset.dc) ? ctx.offset : null;
 
   /* ---- value helpers -------------------------------------------------------- */
   const cellVal = key => { const v = raw(key); if (v === undefined) return null; if (isErrVal(v)) throw err(v); return v; };
@@ -351,8 +420,10 @@ export function evalFormula(expr, ctx = {}) {
     if (typeof v === 'boolean') return v ? 1 : 0;
     if (v === null) return 0;
     const n = textToNumber(v);
-    if (n === null) throw err('#VALUE!');
-    return n;
+    if (n !== null) return n;
+    const s = dateText(v);
+    if (s === null) throw err('#VALUE!');
+    return s;
   };
   const toText = v => {
     v = deref(v);
@@ -381,26 +452,14 @@ export function evalFormula(expr, ctx = {}) {
     return new Range(Math.min(A.r, B.r), Math.min(A.c, B.c), Math.max(A.r, B.r), Math.max(A.c, B.c), sheet);
   };
   function refParts(ref) {
-    const m = /^\$?([A-Z]{1,3})\$?(\d+)$/.exec(ref);
-    return { c: colIndex(m[1]), r: +m[2] };
+    const m = /^(\$?)([A-Z]{1,3})(\$?)(\d+)$/.exec(ref);
+    let c = colIndex(m[2]), r = +m[4];
+    if (OFF) { if (!m[1]) c += OFF.dc; if (!m[3]) r += OFF.dr; if (c < 1 || r < 1) throw err('#REF!'); }
+    return { c, r };
   }
-  const cmpText = (a, b) => a.localeCompare(b, 'en', { sensitivity: 'accent' });
-  function compare(op, a, b) {
-    a = deref(a); b = deref(b);
-    const rank = v => typeof v === 'number' ? 0 : typeof v === 'string' ? 1 : typeof v === 'boolean' ? 2 : -1;
-    if (a === null && b === null) return op === '=' || op === '<=' || op === '>=';
-    if (a === null) a = typeof b === 'string' ? '' : typeof b === 'boolean' ? false : 0;
-    if (b === null) b = typeof a === 'string' ? '' : typeof a === 'boolean' ? false : 0;
-    let d;
-    if (rank(a) !== rank(b)) d = rank(a) - rank(b);
-    else if (typeof a === 'number') d = numeq(a, b) ? 0 : (a < b ? -1 : 1);
-    else if (typeof a === 'string') d = cmpText(a, b);
-    else d = (a === b) ? 0 : (a ? 1 : -1);
-    switch (op) {
-      case '=': return d === 0; case '<>': return d !== 0; case '<': return d < 0;
-      case '<=': return d <= 0; case '>': return d > 0; default: return d >= 0;
-    }
-  }
+  const offCol = (letters, abs) => { const c = colIndex(letters) + (OFF && !abs ? OFF.dc : 0); if (c < 1) throw err('#REF!'); return c; };
+  const offRow = (n, abs) => { const r = n + (OFF && !abs ? OFF.dr : 0); if (r < 1) throw err('#REF!'); return r; };
+  function compare(op, a, b) { return compareValues(op, deref(a), deref(b)); }
 
   /* ---- criteria ("<>5", ">="&A1, "a*") for the *IF family ---------------- */
   function criterion(v) {
@@ -477,8 +536,10 @@ export function evalFormula(expr, ctx = {}) {
   // day behind the real calendar, and serial 60 itself is 1900-02-29.
   const serial = (y, m, d) => { if (y === 1900 && m === 2 && d >= 29) return 31 + d; const n = Math.floor((Date.UTC(y, m - 1, d) - EPOCH) / 86400000); return n < 61 ? n - 1 : n; };
   const dateOf = s => { s = Math.floor(s); if (s < 0) throw err('#NUM!'); return serialToDate(s < 60 ? s + 1 : s); };
-  const ymd = s => { s = Math.floor(s); if (s === 60) return { y: 1900, m: 2, d: 29, wd: 3 }; if (s === 0) return { y: 1900, m: 1, d: 0, wd: 6 }; const d = dateOf(s); return { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, d: d.getUTCDate(), wd: d.getUTCDay() }; };
+  // the weekday follows the serial (0 = Saturday, 1 = Sunday), so Jan–Feb 1900 sit a day off the real calendar, as in Excel
+  const ymd = s => { s = Math.floor(s); const wd = ((s - 1) % 7 + 7) % 7; if (s === 60) return { y: 1900, m: 2, d: 29, wd }; if (s === 0) return { y: 1900, m: 1, d: 0, wd }; const d = dateOf(s); return { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, d: d.getUTCDate(), wd }; };
   const todaySerial = () => ctx.today ? ctx.today() : Math.floor((Date.now() - EPOCH) / 86400000);
+  const dateText = s => dateTextToSerial(s, () => ymd(todaySerial()).y);   // "1/31/2026", "31-Jan-26", "12:00 PM" read as their serial, as Excel coerces them
 
   /* ---- lookups ----------------------------------------------------------------- */
   const SKIP = Symbol('error-cell');   // an error in a lookup column is stepped over, never propagated (only the returned cell's error is)
@@ -511,11 +572,13 @@ export function evalFormula(expr, ctx = {}) {
   const flatVals = rg => rg.keys().map(lookVal);
 
   /* ---- TEXT(value, format) — Excel number-format codes, via numfmt.js (the grid's engine) ---- */
-  // A numeric-looking string reads as its number; text passes through unless a text section dresses
-  // it; a bad code or a negative date is #VALUE!, as Excel reports it.
+  // A numeric- or date-looking string reads as its number; text passes through unless a text section
+  // dresses it; an empty format text formats to nothing; a bad code or a date out of range is
+  // #VALUE!, as Excel reports it.
   function textFormat(v, fmt) {
     v = deref(v);
-    if (typeof v === 'string') { const n = textToNumber(v); if (n !== null) v = n; }
+    if (fmt === '') return '';
+    if (typeof v === 'string') { const n = textToNumber(v); if (n !== null) v = n; else { const s = dateText(v); if (s !== null) v = s; } }
     else if (typeof v !== 'boolean' && typeof v !== 'number') v = toNum(v);
     try { return formatValue(v, String(fmt)).text; }
     catch (e) { if (e instanceof FormatError) throw err('#VALUE!'); throw e; }
@@ -727,7 +790,7 @@ export function evalFormula(expr, ctx = {}) {
         return t.split(o).join(nw); }
       case 'REPT': { const t = toText(args[0]); const k = toInt(args[1]); if (k < 0 || t.length * k > MAX_TEXT) throw err('#VALUE!'); return t.repeat(k); }
       case 'EXACT': return toText(args[0]) === toText(args[1]);
-      case 'VALUE': { const v = deref(args[0]); if (typeof v === 'number') return v; const x = textToNumber(toText(v)); if (x === null) throw err('#VALUE!'); return x; }
+      case 'VALUE': { const v = deref(args[0]); if (typeof v === 'number') return v; const t = toText(v); const x = textToNumber(t); if (x !== null) return x; const s = dateText(t); if (s === null) throw err('#VALUE!'); return s; }
       case 'TEXT': return textFormat(args[0], toText(args[1]));
       case 'T': { const v = deref(args[0]); return typeof v === 'string' ? v : ''; }
       case 'N': { const v = deref(args[0]); return typeof v === 'number' ? v : typeof v === 'boolean' ? (v ? 1 : 0) : 0; }
@@ -809,8 +872,8 @@ export function evalFormula(expr, ctx = {}) {
       case 'paren': return ev(node.x);
       case 'ref': { const p = refParts(node.ref); return new Range(p.r, p.c, p.r, p.c, node.sheet); }
       case 'range': return rangeOf(node.a, node.b, node.sheet);
-      case 'colrange': { const a = colIndex(node.a), b = colIndex(node.b); return new Range(1, Math.min(a, b), ROWS, Math.max(a, b)); }
-      case 'rowrange': return new Range(Math.min(node.a, node.b), 1, Math.max(node.a, node.b), COLS);
+      case 'colrange': { const a = offCol(node.a, node.absA), b = offCol(node.b, node.absB); return new Range(1, Math.min(a, b), ROWS, Math.max(a, b)); }
+      case 'rowrange': { const a = offRow(node.a, node.absA), b = offRow(node.b, node.absB); return new Range(Math.min(a, b), 1, Math.max(a, b), COLS); }
       case 'un': { const v = ev(node.x); if (node.op === '+') return v; return -toNum(v); }   // unary plus is a no-op in Excel: text stays text
       case 'pct': return toNum(ev(node.x)) / 100;
       case 'bin': {

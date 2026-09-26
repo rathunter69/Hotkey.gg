@@ -31,7 +31,7 @@
 //     Quick Access Toolbar, page setup) are RECORDED by real-looking dialogs (Alt F T, Alt P S P):
 //     the dialog edits a draft (`dlg`), ↵ = OK writes it into `settings`, Esc = Cancel discards it
 
-import { Sheet, FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES, CF_STYLE_KEYS, CF_BAR_COLORS, CF_SCALES } from './sheet.js';
+import { Sheet, FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES, CF_STYLE_KEYS, CF_BAR_COLORS, CF_SCALES, cfOperand } from './sheet.js';
 import { evalFormula, formulaRefs, translateFormula, parses } from './formula.js';
 import { builtinCode } from './numfmt.js';
 import { refKey, parseRef, parseRange, rangeText } from './refs.js';
@@ -173,14 +173,8 @@ const TYPED_DIALOGS = new Set(['renamesheet', 'find', 'numfmt']);   // a text fi
 export const NUMFMT_BAD_NOTE = 'Microsoft Excel cannot use the number format you typed.';
 export const CF_VALUE_NOTE = 'The value you entered is not a valid number, date, time, or string.';
 export const CF_FORMULA_NOTE = 'There\'s a problem with this formula.';
-/** A Highlight Cells value as a rule stores it: a number, a '=…' formula (kept as text), or null when Excel would refuse it. */
-function condOperand(text) {
-  const t = String(text == null ? '' : text).trim();
-  if (!t) return null;
-  if (t.startsWith('=')) return parses(t.slice(1)) ? t : null;
-  const n = Number(t.replace(/,/g, '').replace(/%$/, '')); if (!isFinite(n)) return null;
-  return /%$/.test(t) ? n / 100 : n;
-}
+/** A Highlight Cells value as a rule stores it (cfOperand: a number, a date's serial, TRUE / FALSE, text, or a '=…' formula kept as text), or null when Excel would refuse it. */
+const condOperand = text => cfOperand(text);
 /** Excel's messages around the sheet commands (the views show them verbatim). */
 export const LAST_SHEET_NOTE = 'A workbook must contain at least one visible worksheet.';
 export const FIND_NONE_NOTE = "We couldn't find what you were looking for.";
@@ -794,7 +788,8 @@ export class Session {
     const S = src.sheet; const j = S.toJSON();
     const colW = {}; S.colW.forEach((w, c) => { if (S.colSet[c]) colW[c] = w; });
     const copy = new Sheet({ rows: S.rows, cols: S.cols, cells: j.cells, colW, active: j.active, today: S.today || undefined,
-      rowH: j.rowH, hiddenRows: j.hiddenRows, hiddenCols: j.hiddenCols, freeze: j.freeze, groups: j.groups });
+      rowH: j.rowH, hiddenRows: j.hiddenRows, hiddenCols: j.hiddenCols, freeze: j.freeze, groups: j.groups,
+      condFmt: j.condFmt && j.condFmt.map(({ id, ...r }) => r) });   // the conditional formats come along; the copy mints its own rule ids
     copy.gridlines = S.gridlines;
     const at = this.addSheet(this.copySheetName(src.name), copy, before == null ? idx + 1 : Math.max(0, Math.min(this.sheets.length, before | 0)));
     this.switchSheet(at);
@@ -1261,13 +1256,17 @@ export class Session {
     const d = this.dlg; if (!d) return;
     if (key === 'Enter') {
       const style = CF_STYLE_KEYS[d.styleIdx]; let rule;
+      // a formula (a rule's, or a preset's '=…' value) is read for the ACTIVE cell of the selection, as
+      // Excel reads it, and stored re-based to the top-left of the Applies-to, where the rule keeps it
+      const S = this.sheet, act = S.dispActive(), top = S.selRects()[0];
+      const rebase = f => typeof f === 'string' && f.trimStart()[0] === '=' && (top.r1 !== act.r || top.c1 !== act.c) ? translateFormula(f, top.r1 - act.r, top.c1 - act.c) : f;
       if (d.op === 'formula') {
         const f = d.formula.trim(); if (!f || !parses(f)) { this.note = CF_FORMULA_NOTE; d.focus = 'formula'; return; }
-        rule = { kind: 'formula', formula: f, style };
+        rule = { kind: 'formula', formula: rebase(f), style };
       } else {
         const a = condOperand(d.v1); if (a === null) { this.note = CF_VALUE_NOTE; d.focus = 'v1'; return; }
         const b = d.op === 'between' ? condOperand(d.v2) : 0; if (b === null) { this.note = CF_VALUE_NOTE; d.focus = 'v2'; return; }
-        rule = { kind: 'cellValue', op: d.op, v1: a, v2: b, style };
+        rule = { kind: 'cellValue', op: d.op, v1: rebase(a), v2: rebase(b), style };
       }
       this.sheet.addCondFmt(rule); this.exitRibbon(true); return;
     }
@@ -1315,7 +1314,7 @@ export class Session {
     if (key === 'Delete' || key === 'Backspace') { S.removeCondFmt(cur.id); d.sel = Math.min(d.sel, Math.max(0, rules.length - 1)); return; }
     if (key === 'U') { if (S.moveCondFmt(cur.id, -1)) d.sel--; return; }
     if (key === 'D') { if (S.moveCondFmt(cur.id, 1)) d.sel++; return; }
-    if (key === 'S' || key === ' ') { S.setCondFmtStop(cur.id); }
+    if (key === 'S' || key === ' ') { S.setCondFmtStop(cur.id); }   // a data bar's or a colour scale's box is greyed out: the sheet refuses it
   }
   /** Ctrl+` / Formulas › Show Formulas: the view paints every formula's text instead of its value. */
   toggleShowFormulas() { this.startClock(); this.settings.showFormulas = !this.settings.showFormulas; this.emit('settings'); this.sheet.emit('layout'); }
