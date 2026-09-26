@@ -1,9 +1,11 @@
 // app2/content/workbooks/index.js — the module-workbook registry: workbook id → its states.
 // The runner and the schema resolve `lesson.module` + `lesson.state.before` through this.
 import * as voltlineWeekly from './voltline-weekly.js';
+import * as voltlinePnl from './voltline-pnl.js';
 
 export const WORKBOOKS = {
   'voltline-weekly': voltlineWeekly,
+  'voltline-pnl': voltlinePnl,
 };
 
 /** The named state of a workbook, deep-cloned; throws on an unknown workbook or state. */
