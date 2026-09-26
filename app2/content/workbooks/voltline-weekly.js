@@ -9,7 +9,7 @@
 // $0.13 = energy cost); sessions and tariffs arrive in Chapter 3. Figures are deterministic
 // (seeded once, rounded to tens) so checks can read the sheet and still assert exact numbers.
 import { mulberry32 } from '../../engine/rng.js';
-import { FMT_FIELDS, Sheet, ROWH_DEFAULT, normGroups, stepFsz } from '../../engine/sheet.js';
+import { FMT_FIELDS, Sheet, ROWH_DEFAULT, normGroups, normCondFmt, stepFsz } from '../../engine/sheet.js';
 
 export const SITES = ['Domain', 'Mueller', 'Riverside', 'South Lamar', 'Airport'];
 export const SITE_PRICE = { Domain: 0.45, Mueller: 0.44, Riverside: 0.46, 'South Lamar': 0.43, Airport: 0.48 };
@@ -611,7 +611,7 @@ export function sessionToState(ses) {
       S.colW.forEach((w, c) => { if (c >= 1 && S.colSet[c]) colW[c] = w; });
       S.rowH.forEach((h, r) => { if (r >= 1 && h !== ROWH_DEFAULT) rowH[r] = h; });
       return { name: e.name, cells: S.cells, colW, rowH, gridlines: S.gridlines === false ? false : undefined,
-        hiddenRows: [...S.hiddenRows], hiddenCols: [...S.hiddenCols], freeze: { ...S.freeze }, groups: S.groups };
+        hiddenRows: [...S.hiddenRows], hiddenCols: [...S.hiddenCols], freeze: { ...S.freeze }, groups: S.groups, condFmt: S.condFmt };
     }),
     settings: { calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat.slice(), pageSetup: clone(ses.settings.pageSetup) },
   };
@@ -665,6 +665,9 @@ export function diffStates(a, b) {
     if (!same(sa.freeze || { r: 0, c: 0 }, sb.freeze || { r: 0, c: 0 })) out.push({ sheet: name, kind: 'freeze', key: 'freeze', a: sa.freeze, b: sb.freeze });
     const NOG = { rows: [], cols: [] };
     if (!same(normGroups(sa.groups || NOG), normGroups(sb.groups || NOG))) out.push({ sheet: name, kind: 'groups', key: 'groups', a: sa.groups, b: sb.groups });
+    // conditional formatting (Chapter 2): the rules in order, ids aside (they are per-session)
+    const cfNorm = list => normCondFmt(list || []).map(({ id, ...r }) => r);
+    if (!same(cfNorm(sa.condFmt), cfNorm(sb.condFmt))) out.push({ sheet: name, kind: 'condFmt', key: 'condFmt', a: sa.condFmt, b: sb.condFmt });
   }
   if (!same(normSettings(a.settings), normSettings(b.settings))) out.push({ sheet: '*', kind: 'settings', key: 'settings', a: a.settings, b: b.settings });
   return out;

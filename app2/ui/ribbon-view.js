@@ -19,8 +19,9 @@
 
 import { TABS, MENUS, RIBBON_GROUPS, RIBBON_ICONS, RIBBON_MENU_ICONS, FMT_OPTS, PASTE_OPTS, PASTE_OP_OPTS, COMMANDS, tabName,
   QAT_COMMANDS, POPULAR_COMMANDS, OPTIONS_PAGES, OPTIONS_LIVE_PAGES } from '../engine/ribbon.js';
-import { FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES } from '../engine/sheet.js';
+import { FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES, CF_STYLES, CF_STYLE_KEYS, CF_BAR_COLORS, CF_SCALES, CF_OP_LABEL } from '../engine/sheet.js';
 import { DELETE_SHEET_PROMPT } from '../engine/keyboard.js';
+import { dispText } from '../engine/format.js';
 import { prefs } from '../app/prefs.js';
 import { RIBBON_COMMANDS, RIBBON_LAYOUT, MENU_META, VIRTUAL_MENUS, UNIMPLEMENTED_BY_ID, MODAL_DIALOGS, CARD_DIALOGS, MENU_ITEM_ICONS, QAT_ICONS,
   itemTip, keyTipAt, runCommand, runQatCommand, openMenuPath, recordMouse, closeDialog, leaveRibbon, menuEntries } from './ribbon-commands.js';
@@ -327,6 +328,67 @@ export class RibbonView {
       (d.replace ? `<div class="gt-ref"><label>Replace with:</label>${F(d.repl, d.focus === 'repl', 'dset:focus:repl', 'wide')}</div>` : '') +
       (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : `<div class="od-caplbl">${d.replace ? 'Tab switches fields · ↵ Find Next · Alt+A Replace All' : '↵ Find Next'} · esc close</div>`);
   }
+  /* ---- Chapter 2 cards: the Custom box and Conditional Formatting ---- */
+  numFmtHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const a = ss.sheet.dispActive(), cell = ss.sheet.get(a.r, a.c);
+    const sample = cell.value === null || cell.value === undefined || cell.value === '' ? '' : dispText({ value: cell.value, fmtStyle: 'custom', numFmt: d.code });
+    const val = d.selected ? `<span class="od-seltext">${esc(d.code)}</span>` : esc(d.code);   // prefilled and selected: typing replaces it
+    return '<div class="od-sect">Number › Custom</div>' +
+      `<div class="gt-ref"><label>Type:</label><span class="od-field foc wide">${val}<i class="od-caret"></i></span></div>` +
+      `<div class="od-caplbl">Sample: <b>${esc(sample)}</b></div>` +
+      '<div class="od-caplbl">#,##0_);(#,##0);"-"_) · 0.0%_);(0.0%);"-"_) · $#,##0,"k" · 0.0"x" · [Red]"ERROR";;"OK"</div>' +
+      (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">type a format code · ↵ OK · esc cancel</div>');
+  }
+  static cfChip(k, i, on, act) {
+    const st = CF_STYLES[k];
+    const sty = (st.fill ? 'background:' + st.fill + ';' : 'background:var(--surface);') + (st.fontColor ? 'color:' + st.fontColor + ';' : '') + (st.border ? 'box-shadow:inset 0 0 0 1px ' + st.border + ';' : '');
+    return `<span class="cf-chip${on ? ' on' : ''}"${act ? ` data-act="${act}"` : ''} style="${sty}">${esc(st.name)}</span>`;
+  }
+  condFmtHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const F = RibbonView.field;
+    let body;
+    if (d.op === 'formula') body = '<div class="od-sect">Format values where this formula is true:</div>' +
+      `<div class="gt-ref">${F(d.formula, d.focus === 'formula', 'dset:focus:formula', 'wide')}</div>`;
+    else body = `<div class="od-sect">Format cells that are ${esc((CF_OP_LABEL[d.op] || '').toUpperCase())}:</div>` +
+      `<div class="gt-ref">${F(d.v1, d.focus === 'v1', 'dset:focus:v1', 'wide')}${d.op === 'between' ? '<label>and</label>' + F(d.v2, d.focus === 'v2', 'dset:focus:v2', 'wide') : ''}</div>`;
+    body += '<div class="od-sect">with</div><div class="cf-styles' + (d.focus === 'style' ? ' foc' : '') + '">' +
+      CF_STYLE_KEYS.map((k, i) => RibbonView.cfChip(k, i, i === d.styleIdx, 'dset:style:' + i)).join('') + '</div>';
+    body += ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">' + (d.op === 'formula' ? 'type a formula for the top-left cell' : 'type a number or a =formula') + ' · ← → pick a style · ↵ OK · esc cancel</div>';
+    return body;
+  }
+  static cfRuleDesc(r) {
+    if (r.kind === 'cellValue') return 'Cell Value ' + (CF_OP_LABEL[r.op] || r.op).toLowerCase() + ' ' + r.v1 + (r.op === 'between' || r.op === 'notBetween' ? ' and ' + r.v2 : '');
+    if (r.kind === 'formula') return 'Formula: ' + r.formula;
+    if (r.kind === 'dataBar') return 'Data Bar';
+    return 'Graded Color Scale';
+  }
+  static cfRulePreview(r) {
+    if (r.kind === 'cellValue' || r.kind === 'formula') { const st = CF_STYLES[r.style] || CF_STYLES.lightred; return `<span class="cf-prev" style="${st.fill ? 'background:' + st.fill + ';' : ''}${st.fontColor ? 'color:' + st.fontColor + ';' : ''}${st.border ? 'box-shadow:inset 0 0 0 1px ' + st.border + ';' : ''}">AaBbCcYyZz</span>`; }
+    if (r.kind === 'dataBar') { const b = CF_BAR_COLORS.find(x => x.k === r.color) || CF_BAR_COLORS[0]; return `<span class="cf-prev" style="background:linear-gradient(90deg, ${b.hex} 65%, transparent 65%)"></span>`; }
+    const sc = CF_SCALES.find(x => x.k === r.scale) || CF_SCALES[0]; return `<span class="cf-prev" style="background:linear-gradient(90deg, ${sc.colors.join(', ')})"></span>`;
+  }
+  condRulesHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const rules = ss.sheet.condFmt;
+    let rows = '<div class="cf-rule cf-rule-h"><span>Rule (applied in order shown)</span><span>Format</span><span>Applies to</span><span>Stop If True</span></div>';
+    if (!rules.length) rows += '<div class="cf-empty">No rules on this worksheet.</div>';
+    rules.forEach((r, i) => { rows += `<div class="od-row cf-rule${i === d.sel ? ' on foc' : ''}" data-act="dset:rule:${i}"><span class="od-lbl">${esc(RibbonView.cfRuleDesc(r))}</span>${RibbonView.cfRulePreview(r)}<span class="od-lbl">=${esc(r.range)}</span><span class="od-box${r.stopIfTrue ? ' on' : ''}"></span></div>`; });
+    return '<div class="od-sect">Rules for this worksheet</div><div class="cf-rules">' + rows + '</div>' +
+      '<div class="cf-btns"><span class="pd-btn" data-act="dset:ruleact:Delete">Delete Rule <kbd>del</kbd></span><span class="pd-btn" data-act="dset:ruleact:U">Move Up <kbd>u</kbd></span><span class="pd-btn" data-act="dset:ruleact:D">Move Down <kbd>d</kbd></span><span class="pd-btn" data-act="dset:ruleact:S">Stop If True <kbd>s</kbd></span></div>' +
+      '<div class="od-caplbl">↑ ↓ pick a rule · every change applies at once · ↵ close · esc close</div>';
+  }
+  cfGalleryHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const bars = ss.dialog === 'databar';
+    const list = bars ? CF_BAR_COLORS : CF_SCALES;
+    const tile = (x, i) => bars
+      ? `<span class="cf-tile${i === d.idx ? ' on' : ''}" data-act="dset:pick:${i}" title="${esc(x.name)}"><i style="width:90%;background:${x.hex}"></i><i style="width:55%;background:${x.hex}"></i><i style="width:30%;background:${x.hex}"></i></span>`
+      : `<span class="cf-tile scale${i === d.idx ? ' on' : ''}" data-act="dset:pick:${i}" title="${esc(x.name)}" style="background:linear-gradient(180deg, ${x.colors.join(', ')})"></span>`;
+    return '<div class="od-sect">' + (bars ? 'Gradient Fill' : 'Color Scales') + '</div><div class="cf-gallery">' + list.map(tile).join('') + '</div>' +
+      `<div class="od-caplbl"><b>${esc(list[d.idx].name)}</b> · ← → pick · ↵ OK · esc cancel</div>`;
+  }
   gotoSpecialHtml() {
     const ss = this.session, d = ss.dlg; if (!d) return '';
     const R = RibbonView.radio;
@@ -480,7 +542,7 @@ export class RibbonView {
       else {
         fd.style.display = 'flex';
         const byK = {}; FMT_OPTS.forEach(([k, lbl]) => byK[k] = lbl);
-        const groups = [['number', ['G', 'N', 'C', 'P', 'X', 'D', 'S', 'M']], ['font', ['E', 'K']], ['alignment', ['A']]];
+        const groups = [['number', ['G', 'N', 'C', 'P', 'X', 'D', 'S', 'M', 'U']], ['font', ['E', 'K']], ['alignment', ['A']]];
         let frows = '';
         groups.forEach(([sect, keys]) => { frows += `<div class="pd-sect">${sect}</div>`;
           keys.forEach(k => { if (byK[k] !== undefined) frows += `<div class="pd-opt" data-act="letter:${k}"><span class="pd-key">${k.toLowerCase()}</span><span>${byK[k]}</span></div>`; }); });
@@ -531,6 +593,26 @@ export class RibbonView {
     if (ss.dialog === 'gotospecial' || this.specialDialog) {
       const d = this.specialDialog || (this.specialDialog = this.wideCard('gotoSpecialDialog', 'Go To Special', 'pd-mid'));
       this.showCard(d, ss.dialog === 'gotospecial' && !!ss.dlg, ss.dialog === 'gotospecial' ? this.gotoSpecialHtml() : '', RibbonView.okCancel('OK'));
+    }
+    // Chapter 2: the Custom box (Ctrl+1 › U) and the Conditional Formatting cards
+    if (ss.dialog === 'numfmt' || this.numfmtDialog) {
+      const d = this.numfmtDialog || (this.numfmtDialog = this.wideCard('numfmtDialog', 'Format Cells', 'pd-mid'));
+      this.showCard(d, ss.dialog === 'numfmt' && !!ss.dlg, ss.dialog === 'numfmt' ? this.numFmtHtml() : '', RibbonView.okCancel('OK'));
+    }
+    if (ss.dialog === 'condfmt' || this.condfmtDialog) {
+      const d = this.condfmtDialog || (this.condfmtDialog = this.wideCard('condfmtDialog', 'Conditional Formatting', 'pd-mid'));
+      if (ss.dialog === 'condfmt' && ss.dlg) d.querySelector('.pd-title').textContent = ss.dlg.op === 'formula' ? 'New Formatting Rule' : (CF_OP_LABEL[ss.dlg.op] || 'Conditional Formatting');
+      this.showCard(d, ss.dialog === 'condfmt' && !!ss.dlg, ss.dialog === 'condfmt' ? this.condFmtHtml() : '', RibbonView.okCancel('OK'));
+    }
+    if (ss.dialog === 'condrules' || this.condrulesDialog) {
+      const d = this.condrulesDialog || (this.condrulesDialog = this.wideCard('condrulesDialog', 'Conditional Formatting Rules Manager', 'pd-wide'));
+      this.showCard(d, ss.dialog === 'condrules' && !!ss.dlg, ss.dialog === 'condrules' ? this.condRulesHtml() : '', RibbonView.okCancel('OK'));
+    }
+    if (ss.dialog === 'databar' || ss.dialog === 'colorscale' || this.galleryDialog) {
+      const d = this.galleryDialog || (this.galleryDialog = this.wideCard('cfGalleryDialog', 'Data Bars', 'pd-mid'));
+      const on = (ss.dialog === 'databar' || ss.dialog === 'colorscale') && !!ss.dlg;
+      if (on) d.querySelector('.pd-title').textContent = ss.dialog === 'databar' ? 'Data Bars' : 'Color Scales';
+      this.showCard(d, on, on ? this.cfGalleryHtml() : '', RibbonView.okCancel('OK'));
     }
   }
 
@@ -883,6 +965,19 @@ export class RibbonView {
       return; }
     if (ss.dialog === 'movesheet') { el.className = 'ribbon show';
       el.innerHTML = '<span class="path">move or copy sheet →</span><span class="opt">↑ ↓ pick the sheet it goes before · C create a copy · ↵ OK · esc cancel</span>';
+      return; }
+    if (ss.dialog === 'numfmt') { el.className = 'ribbon show';   // the floating card carries the field
+      el.innerHTML = '<span class="path">custom format →</span><span class="opt" style="font-family:var(--mono)">' + esc(ss.dlg && ss.dlg.code ? ss.dlg.code : '…') + '</span><span class="opt">type a format code · ↵ OK · esc cancel</span>';
+      return; }
+    if (ss.dialog === 'condfmt') { el.className = 'ribbon show';
+      el.innerHTML = '<span class="path">conditional formatting →</span><span class="opt">' + (ss.dlg && ss.dlg.op === 'formula' ? 'type a formula' : 'type a value') + ' · ← → pick a style · ↵ OK · esc cancel</span>';
+      return; }
+    if (ss.dialog === 'condrules') { el.className = 'ribbon show';
+      el.innerHTML = '<span class="path">rules manager →</span><span class="opt">↑ ↓ pick · del delete · u / d move · s stop if true · ↵ close</span>';
+      return; }
+    if (ss.dialog === 'databar' || ss.dialog === 'colorscale') { el.className = 'ribbon show';
+      const list = ss.dialog === 'databar' ? CF_BAR_COLORS : CF_SCALES;
+      el.innerHTML = '<span class="path">' + (ss.dialog === 'databar' ? 'data bars' : 'color scales') + ' →</span><span class="opt">' + esc(ss.dlg ? list[ss.dlg.idx].name : '') + '</span><span class="opt">← → pick · ↵ apply · esc cancel</span>';
       return; }
     if (ss.dialog) {   // a dialog this painter has no card for — a minimal strip so Esc always reads
       el.className = 'ribbon show';

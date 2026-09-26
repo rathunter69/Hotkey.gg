@@ -136,3 +136,21 @@
 .gt-recent .gt-empty{font-family:var(--mono); font-size:11px; color:var(--faint); padding:4px 6px}
 .gt-ref{display:flex; align-items:center; gap:8px; margin:2px 0 4px}
 .gt-ref label{font-size:12px; color:var(--text); white-space:nowrap}
+
+/* ---- Conditional Formatting cards (Chapter 2): the style chips, the galleries, the Rules Manager ---- */
+.cf-styles{display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 6px; padding:3px; border-radius:6px}
+.cf-styles.foc{outline:2px solid var(--accent-glow)}
+.cf-chip{display:inline-block; padding:2px 8px; border-radius:4px; font-size:11.5px; line-height:1.5; border:1px solid var(--line); cursor:pointer; white-space:nowrap}
+.cf-chip.on{outline:2px solid var(--accent); outline-offset:1px}
+.cf-gallery{display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 6px}
+.cf-tile{display:inline-flex; flex-direction:column; justify-content:center; gap:3px; width:54px; height:40px; padding:5px; border:1px solid var(--line); border-radius:5px; background:var(--surface); cursor:pointer; box-sizing:border-box}
+.cf-tile.on{outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent)}
+.cf-tile i{display:block; height:6px; border-radius:2px}
+.cf-tile.scale{padding:0}
+.cf-rules{border:1px solid var(--line); border-radius:6px; background:var(--surface2); padding:4px; margin:4px 0 6px; min-width:460px}
+.cf-rule{display:grid; grid-template-columns:1fr 96px 110px 70px; gap:8px; align-items:center}
+.cf-rule-h{font-size:11px; color:var(--muted); font-weight:700; padding:2px 6px}
+.cf-rule .od-lbl{overflow:hidden; text-overflow:ellipsis}
+.cf-prev{display:inline-block; height:18px; line-height:18px; padding:0 4px; border-radius:3px; font-size:11px; text-align:center; background:var(--surface); border:1px solid var(--line); min-width:60px}
+.cf-empty{padding:8px 6px; font-size:12px; color:var(--muted)}
+.cf-btns{display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 4px}

@@ -201,6 +201,11 @@ html[data-dark="1"] td.fill-gray{background:#3c4149 !important; color:#dfe3e8}
 html[data-dark="1"] td.fill-yellow{background:#5c4a1c !important; color:#ffe08a}
 html[data-dark="1"] td.fill-green{background:#2c4321 !important; color:#c9e6b8}
 html[data-dark="1"] td.fill-red{background:#4d2222 !important; color:#f2bcbc}
+/* Conditional formatting (Chapter 2, sheet-view): a rule's paint wins over the cell's own fill and font colour, as in Excel. The colours are Excel's hexes, so they read the same in every theme. */
+.gridwrap td.cf-fill, html[data-dark="1"] .gridwrap td.cf-fill{background:var(--cf-fill) !important}
+.gridwrap td.cf-fc, html[data-dark="1"] .gridwrap td.cf-fc{color:var(--cf-fc) !important}
+.gridwrap td.cf-bd{box-shadow:inset 0 0 0 1px var(--cf-bd)}
+.gridwrap td.cf-bar, html[data-dark="1"] .gridwrap td.cf-bar{background-image:linear-gradient(90deg, var(--cf-bar) var(--cf-pct), transparent var(--cf-pct)) !important; background-repeat:no-repeat !important}
 /* r212: DARK CHROME, LIGHT SHEET — like real Excel in dark mode. On dark themes the grid renders
    on a fixed light sheet (dark ink, light gridlines), while the nav / ribbon / background keep the
    theme. Scoped to .gridwrap so only the sheet flips; CSS vars cascade to every cell. */

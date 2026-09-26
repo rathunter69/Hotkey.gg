@@ -16,7 +16,7 @@ export const TABS = [
 export const MENUS = {
   // File backstage (Excel's KeyTips): everything but Options is dead in the engine (DEAD below)
   'F': [['I', 'Info'], ['N', 'New'], ['O', 'Open'], ['S', 'Save'], ['A', 'Save As'], ['P', 'Print'], ['H', 'Share'], ['E', 'Export'], ['C', 'Close'], ['D', 'Account'], ['T', 'Options']],
-  'H': [['V', 'Paste'], ['1', 'Bold'], ['2', 'Italic'], ['3', 'Underline'], ['F', 'Font'], ['A', 'Align'], ['5', 'Indent −'], ['6', 'Indent +'], ['H', 'Fill'], ['B', 'Borders'], ['J', 'Cell styles'], ['W', 'Wrap'], ['K', 'Comma'], ['P', 'Percent'], ['9', 'Dec −'], ['0', 'Dec +'], ['I', 'Insert'], ['D', 'Delete'], ['O', 'Cells'], ['E', 'Clear'], ['U', 'Σ Sum']],
+  'H': [['V', 'Paste'], ['1', 'Bold'], ['2', 'Italic'], ['3', 'Underline'], ['F', 'Font'], ['A', 'Align'], ['5', 'Indent −'], ['6', 'Indent +'], ['H', 'Fill'], ['B', 'Borders'], ['L', 'Conditional Formatting'], ['J', 'Cell styles'], ['W', 'Wrap'], ['K', 'Comma'], ['P', 'Percent'], ['9', 'Dec −'], ['0', 'Dec +'], ['I', 'Insert'], ['D', 'Delete'], ['O', 'Cells'], ['E', 'Clear'], ['U', 'Σ Sum']],
   'HV': [['V', 'Paste values'], ['S', 'Paste special…']],
   'HE': [['A', 'Clear all'], ['F', 'Clear formats'], ['C', 'Clear contents']],
   'HI': [['R', 'Insert rows'], ['C', 'Insert columns'], ['S', 'Insert sheet']],
@@ -25,6 +25,10 @@ export const MENUS = {
   'HOU': [['R', 'Hide Rows'], ['C', 'Hide Columns'], ['O', 'Unhide Rows'], ['L', 'Unhide Columns']],
   'HB': [['O', 'Bottom'], ['P', 'Top'], ['L', 'Left'], ['R', 'Right'], ['N', 'No border'], ['A', 'All'], ['S', 'Outside'], ['T', 'Thick box'], ['B', 'Double bottom'], ['D', 'Top & bottom']],
   'HU': [['S', 'Sum']],
+  // Conditional Formatting (Chapter 2), Excel's KeyTips: H L H highlight presets, D data bars, S colour scales, N a formula rule, C clear, R manage
+  'HL': [['H', 'Highlight Cells Rules'], ['D', 'Data Bars'], ['S', 'Color Scales'], ['N', 'New Rule…'], ['C', 'Clear Rules'], ['R', 'Manage Rules…']],
+  'HLH': [['G', 'Greater Than…'], ['L', 'Less Than…'], ['B', 'Between…'], ['E', 'Equal To…']],
+  'HLC': [['S', 'Clear Rules from Selected Cells'], ['E', 'Clear Rules from Entire Sheet']],
   'HA': [['L', 'Left'], ['C', 'Center'], ['R', 'Right'], ['N', '$ Accounting']],
   'HF': [['C', 'Font color'], ['G', 'Grow font'], ['K', 'Shrink font'], ['I', 'Fill'], ['D', 'Find & Select']],   // Excel shares the H F prefix between Font and Fill / Find & Select
   'HFI': [['S', 'Series…'], ['D', 'Down'], ['R', 'Right']],
@@ -54,7 +58,7 @@ export const RIBBON_GROUPS = {
     ['Font', ['1', '2', '3', 'F', 'B', 'H']],
     ['Alignment', ['A', '5', '6', 'W']],
     ['Number', ['K', 'P', '9', '0']],
-    ['Styles', ['J']],
+    ['Styles', ['L', 'J']],
     ['Cells', ['I', 'D', 'O']],
     ['Editing', ['U', 'E']],
   ],
@@ -92,6 +96,7 @@ export const FMT_OPTS = [
   ['G', 'General'], ['N', '1,234'], ['C', '$1,234'], ['P', '12.3%'],
   ['X', '8.2x'], ['D', 'Mar-26'], ['S', '÷ 000s'], ['M', '÷ millions'],
   ['E', 'superscript ¹'], ['K', 'strikethrough'], ['A', 'center across'],
+  ['U', 'Custom…'],   // the Custom box: type an Excel format code (Chapter 2)
 ];
 export const PASTE_OP_OPTS = [['O', 'None', 'none'], ['M', 'Multiply', 'multiply'], ['D', 'Add', 'add'], ['S', 'Subtract', 'subtract'], ['I', 'Divide', 'divide']];
 export const PASTE_OPTS = [
@@ -178,6 +183,8 @@ export const COMMANDS = {
   'HFDF': 'Find…', 'HFDR': 'Replace…', 'HFDS': 'Go To Special…', 'HFDU': 'Select formulas', 'HFDN': 'Select constants',
   'HOH': 'Row height…', 'HOUR': 'Hide rows', 'HOUC': 'Hide columns', 'HOUO': 'Unhide rows', 'HOUL': 'Unhide columns',
   'WFF': 'Freeze panes', 'WFR': 'Freeze top row', 'WFC': 'Freeze first column',
+  'HLHG': 'Greater Than…', 'HLHL': 'Less Than…', 'HLHB': 'Between…', 'HLHE': 'Equal To…', 'HLN': 'New Formatting Rule…',
+  'HLD': 'Data Bars', 'HLS': 'Color Scales', 'HLCS': 'Clear Rules from Selected Cells', 'HLCE': 'Clear Rules from Entire Sheet', 'HLR': 'Manage Rules…',
 };
 
 /**

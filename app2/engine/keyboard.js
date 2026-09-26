@@ -31,8 +31,9 @@
 //     Quick Access Toolbar, page setup) are RECORDED by real-looking dialogs (Alt F T, Alt P S P):
 //     the dialog edits a draft (`dlg`), ↵ = OK writes it into `settings`, Esc = Cancel discards it
 
-import { Sheet, FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES } from './sheet.js';
-import { evalFormula, formulaRefs, translateFormula } from './formula.js';
+import { Sheet, FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES, CF_STYLE_KEYS, CF_BAR_COLORS, CF_SCALES } from './sheet.js';
+import { evalFormula, formulaRefs, translateFormula, parses } from './formula.js';
+import { builtinCode } from './numfmt.js';
 import { refKey, parseRef, parseRange, rangeText } from './refs.js';
 import { stepPath, PASTE_OPTS, PASTE_OP_OPTS, QAT_COMMANDS, QAT_DEFAULT, POPULAR_COMMANDS, OPTIONS_LIVE_PAGES } from './ribbon.js';
 
@@ -166,7 +167,19 @@ export function normFooterText(text) {
   const CANON = { file: 'File', date: 'Date', page: 'Page', pages: 'Pages', tab: 'Tab', time: 'Time', path: 'Path' };
   return String(text == null ? '' : text).slice(0, 64).replace(/&\[([a-z]+)\]/gi, (m, w) => (CANON[w.toLowerCase()] ? '&[' + CANON[w.toLowerCase()] + ']' : m));
 }
-const DIALOGS_WB = new Set(['goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group']);   // the dialogs dialogKey drives
+const DIALOGS_WB = new Set(['goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale']);   // the dialogs dialogKey drives
+const TYPED_DIALOGS = new Set(['renamesheet', 'find', 'numfmt']);   // a text field keeps the case typed (a format code's "k" is not "K")
+export const NUMFMT_BAD_NOTE = 'Microsoft Excel cannot use the number format you typed.';
+export const CF_VALUE_NOTE = 'The value you entered is not a valid number, date, time, or string.';
+export const CF_FORMULA_NOTE = 'There\'s a problem with this formula.';
+/** A Highlight Cells value as a rule stores it: a number, a '=…' formula (kept as text), or null when Excel would refuse it. */
+function condOperand(text) {
+  const t = String(text == null ? '' : text).trim();
+  if (!t) return null;
+  if (t.startsWith('=')) return parses(t.slice(1)) ? t : null;
+  const n = Number(t.replace(/,/g, '').replace(/%$/, '')); if (!isFinite(n)) return null;
+  return /%$/.test(t) ? n / 100 : n;
+}
 /** Excel's messages around the sheet commands (the views show them verbatim). */
 export const LAST_SHEET_NOTE = 'A workbook must contain at least one visible worksheet.';
 export const FIND_NONE_NOTE = "We couldn't find what you were looking for.";
@@ -502,6 +515,7 @@ export class Session {
       if (key === 'E') { S.toggleSuperscript(); return done(); }
       if (key === 'K') { S.toggleStrike(); return done(); }
       if (key === 'A') { S.centerAcross(); return done(); }
+      if (key === 'U') { this.openNumFmt(); return; }   // the Custom box (Chapter 2)
       return;
     }
     if (this.dialog === 'paste') {
@@ -596,6 +610,17 @@ export class Session {
       case 'HH': this.dialog = 'fillcolor'; this.fillColorIdx = 0; return;
       case 'HJ': this.dialog = 'cellstyle'; this.cellStyleIdx = 0; return;
       case 'HFIS': this.dialog = 'series'; return;
+      // Conditional Formatting (Chapter 2): the presets, a formula rule, the galleries, clear, manage
+      case 'HLHG': this.openCondFmt('>'); return;
+      case 'HLHL': this.openCondFmt('<'); return;
+      case 'HLHB': this.openCondFmt('between'); return;
+      case 'HLHE': this.openCondFmt('='); return;
+      case 'HLN': this.openCondFmt('formula'); return;
+      case 'HLD': this.openCondGallery('databar'); return;
+      case 'HLS': this.openCondGallery('colorscale'); return;
+      case 'HLCS': S.clearCondFmt('selection'); return done();
+      case 'HLCE': S.clearCondFmt('sheet'); return done();
+      case 'HLR': this.openCondRules(); return;
       case 'ASA': case 'ASD': {
         const dir = np === 'ASD' ? 'desc' : 'asc'; const r = S.selRange();
         if (r.c1 === r.c2 && r.r1 !== r.r2 && S.sortNeedsExpand()) { this.sortPend = { dir, r1: r.r1, r2: r.r2, key: S.dispActive().c }; this.dialog = 'sortwarn'; return; }
@@ -948,6 +973,7 @@ export class Session {
     const d = this.dlg; if (!d) return [];
     if (d.kind === 'pagesetup') return d.tab === 'hf' ? ['footL', 'footC', 'footR'] : d.tab === 'sheet' ? ['titlesRows', 'printGrid'] : ['orient', 'adjustTo', 'fitWide', 'fitTall'];
     if (d.kind === 'find') return d.replace ? ['find', 'repl'] : ['find'];
+    if (d.kind === 'condfmt') return d.op === 'formula' ? ['formula', 'style'] : d.op === 'between' ? ['v1', 'v2', 'style'] : ['v1', 'style'];
     if (d.kind !== 'options') return [];   // Rename Sheet, Delete Sheet and Move or Copy have one control each: nothing to Tab between
     if (d.page === 'formulas') return ['pages', 'calc', 'iter'].concat(d.iterative ? ['maxIter', 'maxChange'] : []);
     if (d.page === 'advanced') return ['pages', 'gridlines'];
@@ -968,6 +994,10 @@ export class Session {
     if (field === 'tab' && d.kind === 'pagesetup') { const L = { page: 'P', hf: 'H', sheet: 'S' }[value]; if (!L) return false; this.pageSetupKey('Alt+' + L); return true; }   // the card's tab strip
     if (field === 'grid' && d.kind === 'pagesetup') { this.pageSetupKey('Alt+G'); return true; }   // the card's Gridlines box
     if (field === 'replaceAll' && this.dialog === 'find' && d.kind === 'find' && d.replace) { this.findKey('ReplaceAll'); return true; }   // the card's Replace All button
+    if (field === 'style' && d.kind === 'condfmt') { const i = value | 0; if (i < 0 || i >= CF_STYLE_KEYS.length) return false; d.styleIdx = i; d.focus = 'style'; return true; }   // a click on a style chip
+    if (field === 'pick' && (d.kind === 'databar' || d.kind === 'colorscale')) { const n = d.kind === 'databar' ? CF_BAR_COLORS.length : CF_SCALES.length; const i = value | 0; if (i < 0 || i >= n) return false; d.idx = i; return true; }   // a click on a gallery tile
+    if (field === 'rule' && d.kind === 'condrules') { const i = value | 0; if (i < 0 || i >= this.sheet.condFmt.length) return false; d.sel = i; return true; }   // a click on a rule row
+    if (field === 'ruleact' && d.kind === 'condrules') { if (!['Delete', 'U', 'D', 'S'].includes(value)) return false; this.condRulesKey(value); return true; }   // the manager's buttons
     return false;
   }
   /**
@@ -985,6 +1015,10 @@ export class Session {
     if (this.dialog === 'deletesheet') return this.deleteKey(key);
     if (this.dialog === 'movesheet') return this.moveKey(key);
     if (this.dialog === 'group') return this.groupKey(key);
+    if (this.dialog === 'numfmt') return this.numFmtKey(key);
+    if (this.dialog === 'condfmt') return this.condFmtKey(key);
+    if (this.dialog === 'condrules') return this.condRulesKey(key);
+    if (this.dialog === 'databar' || this.dialog === 'colorscale') return this.condGalleryKey(key);
   }
   optionsKey(key) {
     const d = this.dlg; if (!d) return;
@@ -1101,10 +1135,12 @@ export class Session {
     if (k === 'Tab') { const t = e.shiftKey ? 'Shift+Tab' : 'Tab'; this.logKey(t); this.dlgKey(t); return true; }
     if (ARROWS[k]) { this.logKey(ARROWSYM[k]); this.dlgKey(k); return true; }
     if (k === 'Backspace') { this.logKey('⌫'); this.dlgKey('Backspace'); return true; }
+    if (k === 'Delete') { this.logKey('Del'); this.dlgKey('Delete'); return true; }
     if (k === ' ') { this.logKey('Space'); this.dlgKey(' '); return true; }
     if (k.length === 1 && !e.ctrlKey && !e.altKey) {
       const ch = /[a-z]/i.test(k) ? k.toUpperCase() : k; this.logKey(ch);
-      const typed = this.dialog === 'renamesheet' || this.dialog === 'find' || (this.dialog === 'pagesetup' && this.dlg && PAGESETUP_TEXT.has(this.dlg.focus));   // a text field keeps the case typed
+      const typed = TYPED_DIALOGS.has(this.dialog) || (this.dialog === 'pagesetup' && this.dlg && PAGESETUP_TEXT.has(this.dlg.focus))
+        || (this.dialog === 'condfmt' && this.dlg && this.dlg.focus !== 'style');   // a text field keeps the case typed
       this.dlgKey(typed ? k : ch); return true;
     }
     return true;   // a modal dialog swallows everything else
@@ -1191,6 +1227,94 @@ export class Session {
     const [a, b] = axis === 'r' ? [r.r1, r.r2] : [r.c1, r.c2];
     const ok = ungroup ? S.ungroupSpan(axis, a, b) : S.groupSpan(axis, a, b);
     if (!ok && ungroup) this.toast(NO_GROUP_NOTE);
+  }
+  /* ---------------- Format Cells › Custom, and Conditional Formatting (Chapter 2) ---------------- */
+  /** Ctrl+1 › U: the Custom box, prefilled with the active cell's code and selected (typing replaces it). ↵ applies; a code Excel would refuse keeps the box open with its note. */
+  openNumFmt() {
+    this.startClock();
+    const a = this.sheet.dispActive(); const cell = this.sheet.get(a.r, a.c);
+    const code = cell.fmtStyle === 'custom' && cell.numFmt ? cell.numFmt : builtinCode(cell.fmtStyle, cell.decimals, cell.scale);
+    this.openDialog('numfmt', this.mode === 'ribbon' ? this.path : []);
+    this.dlg = { kind: 'numfmt', code, selected: true };
+  }
+  numFmtKey(key) {
+    const d = this.dlg; if (!d) return;
+    if (key === 'Enter') {
+      if (!this.sheet.setCustomFormat(d.code)) { this.note = NUMFMT_BAD_NOTE; return; }   // the box stays open, as Excel's does
+      this.exitRibbon(true); return;
+    }
+    if (key === 'Backspace') { d.code = d.selected ? '' : d.code.slice(0, -1); d.selected = false; this.note = ''; return; }
+    if (key.length === 1) { const next = (d.selected ? '' : d.code) + key; if (next.length > 255) return; d.code = next; d.selected = false; this.note = ''; }
+  }
+  /**
+   * Alt H L H G / L / B / E (a Highlight Cells preset) or Alt H L N (a formula rule): the card takes
+   * the value(s) or the formula, ← → (or Tab to the style, then arrows) pick the style, ↵ adds the
+   * rule on top of the list. A value Excel would refuse keeps the card open with its note.
+   */
+  openCondFmt(op) {
+    this.startClock();
+    this.openDialog('condfmt', this.mode === 'ribbon' ? this.path : []);
+    this.dlg = { kind: 'condfmt', op, v1: '', v2: '', formula: '', styleIdx: 0, focus: op === 'formula' ? 'formula' : 'v1' };
+  }
+  condFmtKey(key) {
+    const d = this.dlg; if (!d) return;
+    if (key === 'Enter') {
+      const style = CF_STYLE_KEYS[d.styleIdx]; let rule;
+      if (d.op === 'formula') {
+        const f = d.formula.trim(); if (!f || !parses(f)) { this.note = CF_FORMULA_NOTE; d.focus = 'formula'; return; }
+        rule = { kind: 'formula', formula: f, style };
+      } else {
+        const a = condOperand(d.v1); if (a === null) { this.note = CF_VALUE_NOTE; d.focus = 'v1'; return; }
+        const b = d.op === 'between' ? condOperand(d.v2) : 0; if (b === null) { this.note = CF_VALUE_NOTE; d.focus = 'v2'; return; }
+        rule = { kind: 'cellValue', op: d.op, v1: a, v2: b, style };
+      }
+      this.sheet.addCondFmt(rule); this.exitRibbon(true); return;
+    }
+    if (key === 'Tab' || key === 'Shift+Tab') { const o = this.dialogTabOrder(); const i = Math.max(0, o.indexOf(d.focus)); d.focus = o[(i + (key === 'Tab' ? 1 : o.length - 1)) % o.length]; return; }
+    if (key === 'ArrowLeft' || key === 'ArrowUp') { d.styleIdx = (d.styleIdx - 1 + CF_STYLE_KEYS.length) % CF_STYLE_KEYS.length; return; }
+    if (key === 'ArrowRight' || key === 'ArrowDown') { d.styleIdx = (d.styleIdx + 1) % CF_STYLE_KEYS.length; return; }
+    if (d.focus === 'style') return;
+    if (key === 'Backspace') { d[d.focus] = d[d.focus].slice(0, -1); this.note = ''; return; }
+    if (key.length === 1) { if (d[d.focus].length < 255) d[d.focus] += key; this.note = ''; }
+  }
+  /** Alt H L D (Data Bars) / Alt H L S (Color Scales): a gallery — ← → pick, ↵ adds the rule over the selection. */
+  openCondGallery(kind) {
+    this.startClock();
+    this.openDialog(kind, this.mode === 'ribbon' ? this.path : []);
+    this.dlg = { kind, idx: 0 };
+  }
+  condGalleryKey(key) {
+    const d = this.dlg; if (!d) return;
+    const list = d.kind === 'databar' ? CF_BAR_COLORS : CF_SCALES;
+    if (key === 'Enter') {
+      const pick = list[d.idx];
+      this.sheet.addCondFmt(d.kind === 'databar' ? { kind: 'dataBar', color: pick.k } : { kind: 'colorScale', scale: pick.k });
+      this.exitRibbon(true); return;
+    }
+    if (key === 'ArrowLeft' || key === 'ArrowUp') { d.idx = (d.idx - 1 + list.length) % list.length; return; }
+    if (key === 'ArrowRight' || key === 'ArrowDown') { d.idx = (d.idx + 1) % list.length; return; }
+  }
+  /**
+   * Alt H L R: the Rules Manager for the sheet — ↑ ↓ pick a rule, Delete removes it, U / D move it
+   * up / down (Excel's Move Up / Move Down), S toggles Stop If True, ↵ closes. Every edit is live.
+   */
+  openCondRules() {
+    this.startClock();
+    this.openDialog('condrules', this.mode === 'ribbon' ? this.path : []);
+    this.dlg = { kind: 'condrules', sel: 0 };
+  }
+  condRulesKey(key) {
+    const d = this.dlg; if (!d) return;
+    const S = this.sheet, rules = S.condFmt;
+    if (key === 'Enter') { this.exitRibbon(true); return; }
+    const cur = rules[d.sel];
+    if (key === 'ArrowUp') { d.sel = Math.max(0, d.sel - 1); return; }
+    if (key === 'ArrowDown') { d.sel = Math.min(Math.max(0, rules.length - 1), d.sel + 1); return; }
+    if (!cur) return;
+    if (key === 'Delete' || key === 'Backspace') { S.removeCondFmt(cur.id); d.sel = Math.min(d.sel, Math.max(0, rules.length - 1)); return; }
+    if (key === 'U') { if (S.moveCondFmt(cur.id, -1)) d.sel--; return; }
+    if (key === 'D') { if (S.moveCondFmt(cur.id, 1)) d.sel++; return; }
+    if (key === 'S' || key === ' ') { S.setCondFmtStop(cur.id); }
   }
   /** Ctrl+` / Formulas › Show Formulas: the view paints every formula's text instead of its value. */
   toggleShowFormulas() { this.startClock(); this.settings.showFormulas = !this.settings.showFormulas; this.emit('settings'); this.sheet.emit('layout'); }

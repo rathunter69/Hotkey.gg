@@ -15,7 +15,7 @@
 //   view.destroy();
 
 import { COLW_DEFAULT, cellNumPx, cellTxtPx } from '../engine/sheet.js';
-import { dispText } from '../engine/format.js';
+import { dispText, dispColor } from '../engine/format.js';
 import { colLetter, refKey, parseRef } from '../engine/refs.js';
 import { formulaRefs, isErrVal } from '../engine/formula.js';
 import { recordMouse, MODAL_DIALOGS } from './ribbon-commands.js';
@@ -259,6 +259,7 @@ export class SheetView {
     groups.cols.forEach((g, i) => { for (let c = g.c1; c <= g.c2; c++) { if (g.collapsed) foldC.add(c); else olC.add(c); } const h = host(g.c2, g.c1, COLS); if (h) btnC[h] = { i, on: !!g.collapsed }; });
     groups.rows.forEach((g, i) => { for (let r = g.r1; r <= g.r2; r++) { if (g.collapsed) foldR.add(r); else olR.add(r); } const h = host(g.r2, g.r1, ROWS); if (h) btnR[h] = { i, on: !!g.collapsed }; });
     const showFx = !!(ss.settings && ss.settings.showFormulas);   // Ctrl+` (C2 gap 5): formula text in place of values
+    const cf = S.condFmt && S.condFmt.length ? S.condFmtMap() : null;   // conditional formatting (Chapter 2): evaluated once per paint
     for (let c = 1; c <= COLS; c++) { const w = hidC.has(c) || foldC.has(c) ? 0 : (colW[c] || COLW_DEFAULT); W[c] = w; totalW += w; L[c] = colLetter(c); }
     this.ew = W;
     const olBtn = (axis, b) => (b ? '<button type="button" tabindex="-1" class="ol-btn' + (b.on ? ' on' : '') + '" data-ol="' + axis + ':' + b.i + '" title="' + (b.on ? 'Show detail' : 'Hide detail') + '">' + (b.on ? '+' : '−') + '</button>' : '');
@@ -322,7 +323,8 @@ export class SheetView {
           if (cell.bt) cls += ' bt'; if (cell.bb) cls += ' bb'; if (cell.ball) cls += ' ball'; if (cell.bdbl) cls += ' bdbl';
           if (cell.bl) cls += ' bl'; if (cell.br) cls += ' br'; if (cell.thick) cls += ' thick';
           if (cell.align) cls += ' align-' + cell.align;
-          if (cell.fontColor) cls += ' fc-' + cell.fontColor;
+          const fcKey = dispColor(cell) || cell.fontColor;   // a custom code's [Red] section wins over the font colour, as in Excel
+          if (fcKey) cls += ' fc-' + fcKey;
 
           txt = escHtml(dispText(cell));
           const fxShown = showFx && !!cell.formula && !(editing && isActive);
@@ -365,6 +367,14 @@ export class SheetView {
             style += (cell.align === 'r') ? (';padding-right:' + pad + 'px') : (';padding-left:' + pad + 'px');
           }
           if (cell.fsz) style += ';font-size:' + cell.fsz + 'px';   // grow/shrink font (Alt H F G/K)
+        }
+        const cfc = cf && cf[key];   // a rule's paint: fill / font colour / border / data bar / colour scale, over the cell's own
+        if (cfc) {
+          const bg = cfc.fill || cfc.scale;
+          if (bg) { cls += ' cf-fill'; style += ';--cf-fill:' + bg; }
+          if (cfc.fontColor) { cls += ' cf-fc'; style += ';--cf-fc:' + cfc.fontColor; }
+          if (cfc.border) { cls += ' cf-bd'; style += ';--cf-bd:' + cfc.border; }
+          if (cfc.bar) { cls += ' cf-bar'; style += ';--cf-bar:' + cfc.bar.color + ';--cf-pct:' + Math.round(cfc.bar.pct * 100) + '%'; }
         }
 
         if (patch) {

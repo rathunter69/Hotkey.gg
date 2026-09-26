@@ -10,12 +10,16 @@
 //   value      number | string | boolean | null      formula   '=SUM(A1:A3)' | null
 //   txt        true when the value was typed as text (left-aligned, spills)
 //   bold it uline strike  fill fontColor  wrap  align 'l'|'c'|'r'|null  indent 0..8
-//   fmtStyle 'general'|'comma'|'currency'|'acct'|'percent'|'mult'|'date'   decimals  scale 0|3|6
+//   fmtStyle 'general'|'comma'|'currency'|'acct'|'percent'|'mult'|'date'|'custom'   decimals  scale 0|3|6
+//   numFmt     the Excel format code when fmtStyle is 'custom' (Chapter 2; numfmt.js renders it)
 //   bt bb bl br ball thick bdbl  (borders)   fsz (font px | null)   ca (center-across span)  cmt
+// Conditional formatting (Chapter 2) lives beside the cells as an ordered rule list, `condFmt`
+// (see normCondFmt); condFmtMap() evaluates it for the painter and the graders.
 
-import { colLetter, colIndex, refKey, parseRef, parseRange, rectRefs } from './refs.js';
+import { colLetter, colIndex, refKey, parseRef, parseRange, rectRefs, rangeText } from './refs.js';
 import { evalFormula, translateFormula, autocorrectFormula, adjustFormulaStructure, isErrVal, formulaRefs } from './formula.js';
 import { fmtNum, dispText } from './format.js';
+import { isValidFormat, normalizeCode, stepDecimals, codeDecimals } from './numfmt.js';
 
 export const COLW_DEFAULT = 64;   // px: Excel's default column width at 100% (8.43 characters); autofit widens beyond this
 export const ROWH_DEFAULT = 20;   // px: Excel's default row height at 100% (15pt)
@@ -35,12 +39,12 @@ export function blankCell() {
   return { value: null, formula: null, bold: false, fill: null, wrap: false,
     fmtStyle: 'general', decimals: 0, bt: false, bb: false, ball: false, txt: false,
     align: null, fontColor: null, uline: false, indent: 0, scale: 0, thick: false, fsz: null, bdbl: false,
-    it: false, strike: false, bl: false, br: false, cmt: false, ca: 0 };
+    it: false, strike: false, bl: false, br: false, cmt: false, ca: 0, numFmt: null };
 }
 
 /** The format fields copy/fill/paste-formats carry (everything but value/formula). */
 export const FMT_FIELDS = ['bold', 'it', 'strike', 'fill', 'wrap', 'fmtStyle', 'decimals', 'bt', 'bb', 'bl', 'br', 'ball',
-  'align', 'fontColor', 'uline', 'indent', 'scale', 'thick', 'fsz', 'bdbl', 'cmt', 'txt', 'ca'];
+  'align', 'fontColor', 'uline', 'indent', 'scale', 'thick', 'fsz', 'bdbl', 'cmt', 'txt', 'ca', 'numFmt'];
 /** What an inserted row/column inherits from its neighbour: formats (alignment incl. center-across, borders), never a comment or the typed-as-text flag. */
 export const INHERIT_FIELDS = FMT_FIELDS.filter(f => f !== 'cmt' && f !== 'txt');
 
@@ -90,8 +94,66 @@ const copyFmt = (dst, src) => { for (const k of FMT_FIELDS) dst[k] = src[k] === 
 export function cellNumPx(cell) {
   if (!cell || typeof cell.value !== 'number' || cell.wrap) return 0;
   const fz = cell.fsz ? cell.fsz / 13.5 : 1;
-  return fmtNum(cell.value, cell.fmtStyle, cell.decimals, cell.scale).length * CHARPX * fz + PAD_NUM;
+  return fmtNum(cell.value, cell.fmtStyle, cell.decimals, cell.scale, cell.numFmt).length * CHARPX * fz + PAD_NUM;
 }
+
+/* ---- conditional formatting (Chapter 2): the rule shapes the dialogs write and the painter reads ---- */
+/** Excel's Highlight Cells presets ("with: Light Red Fill with Dark Red Text" …), by key. */
+export const CF_STYLES = {
+  lightred: { name: 'Light Red Fill with Dark Red Text', fill: '#ffc7ce', fontColor: '#9c0006' },
+  yellow: { name: 'Yellow Fill with Dark Yellow Text', fill: '#ffeb9c', fontColor: '#9c5700' },
+  green: { name: 'Green Fill with Dark Green Text', fill: '#c6efce', fontColor: '#006100' },
+  redfill: { name: 'Light Red Fill', fill: '#ffc7ce', fontColor: null },
+  redtext: { name: 'Red Text', fill: null, fontColor: '#9c0006' },
+  redborder: { name: 'Red Border', fill: null, fontColor: null, border: '#9c0006' },
+};
+export const CF_STYLE_KEYS = Object.keys(CF_STYLES);
+/** Excel's gradient data-bar colours, in its gallery order. */
+export const CF_BAR_COLORS = [
+  { k: 'blue', hex: '#638ec6', name: 'Blue' }, { k: 'green', hex: '#63c384', name: 'Green' }, { k: 'red', hex: '#ff555a', name: 'Red' },
+  { k: 'orange', hex: '#ffb628', name: 'Orange' }, { k: 'lightblue', hex: '#008aef', name: 'Light Blue' }, { k: 'purple', hex: '#d6007b', name: 'Purple' },
+];
+/** Excel's colour-scale gallery, in its order (three-colour scales first, then two-colour). */
+export const CF_SCALES = [
+  { k: 'green-yellow-red', name: 'Green - Yellow - Red', colors: ['#63be7b', '#ffeb84', '#f8696b'] },
+  { k: 'red-yellow-green', name: 'Red - Yellow - Green', colors: ['#f8696b', '#ffeb84', '#63be7b'] },
+  { k: 'green-white-red', name: 'Green - White - Red', colors: ['#63be7b', '#fcfcff', '#f8696b'] },
+  { k: 'red-white-green', name: 'Red - White - Green', colors: ['#f8696b', '#fcfcff', '#63be7b'] },
+  { k: 'white-green', name: 'White - Green', colors: ['#fcfcff', '#63be7b'] },
+  { k: 'green-white', name: 'Green - White', colors: ['#63be7b', '#fcfcff'] },
+  { k: 'white-red', name: 'White - Red', colors: ['#fcfcff', '#f8696b'] },
+  { k: 'red-white', name: 'Red - White', colors: ['#f8696b', '#fcfcff'] },
+];
+export const CF_OPS = ['>', '<', '>=', '<=', '=', '<>', 'between', 'notBetween'];
+export const CF_OP_LABEL = { '>': 'Greater Than', '<': 'Less Than', '>=': 'Greater Than or Equal To', '<=': 'Less Than or Equal To', '=': 'Equal To', '<>': 'Not Equal To', between: 'Between', notBetween: 'Not Between' };
+let cfSeq = 0;
+/**
+ * A rule list with sane shapes, in priority order (first wins a conflict, as Excel's Manage
+ * Rules lists them). Each rule: { id, range, kind, stopIfTrue } plus, by kind:
+ *   cellValue   op (CF_OPS), v1, v2 (a number, or '=…' evaluated on the sheet), style (a CF_STYLES key)
+ *   formula     formula ('=B5<0', relative to the range's top-left), style
+ *   dataBar     color (a CF_BAR_COLORS key)
+ *   colorScale  scale (a CF_SCALES key)
+ * Anything malformed is dropped.
+ */
+export function normCondFmt(list) {
+  const out = [];
+  for (const x of Array.isArray(list) ? list : []) {
+    if (!x || typeof x !== 'object' || !parseRange(x.range)) continue;
+    const rule = { id: typeof x.id === 'string' && x.id ? x.id : 'cf' + (++cfSeq), range: rangeText(parseRange(x.range)), kind: x.kind, stopIfTrue: x.stopIfTrue === true };
+    if (x.kind === 'cellValue') { if (!CF_OPS.includes(x.op)) continue; rule.op = x.op; rule.v1 = x.v1 === undefined ? 0 : x.v1; if (x.op === 'between' || x.op === 'notBetween') rule.v2 = x.v2 === undefined ? 0 : x.v2; rule.style = CF_STYLES[x.style] ? x.style : 'lightred'; }
+    else if (x.kind === 'formula') { if (typeof x.formula !== 'string' || !x.formula.trim()) continue; rule.formula = x.formula.trim().startsWith('=') ? x.formula.trim() : '=' + x.formula.trim(); rule.style = CF_STYLES[x.style] ? x.style : 'lightred'; }
+    else if (x.kind === 'dataBar') rule.color = CF_BAR_COLORS.some(b => b.k === x.color) ? x.color : 'blue';
+    else if (x.kind === 'colorScale') rule.scale = CF_SCALES.some(s => s.k === x.scale) ? x.scale : 'green-yellow-red';
+    else continue;
+    out.push(rule);
+  }
+  return out;
+}
+const hexRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const rgbHex = a => '#' + a.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
+/** A colour `t` (0..1) of the way from hex `a` to hex `b`. */
+export function mixHex(a, b, t) { const A = hexRgb(a), B = hexRgb(b); return rgbHex(A.map((v, i) => v + (B[i] - v) * t)); }
 export function cellTxtPx(cell) {
   if (!cell || cell.wrap || typeof cell.value !== 'string' || cell.value === '') return 0;
   return cell.value.length * TXTPX + PAD_TXT;
@@ -124,6 +186,7 @@ export class Sheet {
     this.hiddenRows = new Set(); this.hiddenCols = new Set();
     this.freeze = { r: 0, c: 0 };          // rows/cols frozen above/left of the seam (0 = none)
     this.groups = { rows: [], cols: [] };  // the outline (C2 gap 4): [{r1,r2,collapsed}] / [{c1,c2,collapsed}], one level
+    this.condFmt = [];                     // conditional formatting rules in priority order (normCondFmt)
     this.multi = null;                     // Go To Special: an explicit list of cell keys, or null
     this.resolver = null;                  // name → Sheet, set by the Session that owns the workbook
     this.today = opts.today || null;
@@ -136,6 +199,7 @@ export class Sheet {
     if (opts.hiddenCols) for (const c of opts.hiddenCols) this.hiddenCols.add(c | 0);
     if (opts.freeze) this.freeze = { r: opts.freeze.r | 0, c: opts.freeze.c | 0 };
     if (opts.groups) this.groups = normGroups(opts.groups);
+    if (opts.condFmt) this.condFmt = normCondFmt(opts.condFmt);
     if (opts.gridlines === false) this.gridlines = false;
     if (opts.active) this.active = this.clamp(opts.active.r, opts.active.c);
     this.recalc();
@@ -327,7 +391,7 @@ export class Sheet {
 
   /* ---------------- undo ---------------- */
   snapshot() { return { cells: clone(this.cells), colW: this.colW.slice(), colSet: this.colSet.slice(), rows: this.rows, active: { ...this.active }, sel: this.sel && { ...this.sel },
-    rowH: this.rowH.slice(), hiddenRows: [...this.hiddenRows], hiddenCols: [...this.hiddenCols], freeze: { ...this.freeze }, groups: clone(this.groups) }; }
+    rowH: this.rowH.slice(), hiddenRows: [...this.hiddenRows], hiddenCols: [...this.hiddenCols], freeze: { ...this.freeze }, groups: clone(this.groups), condFmt: clone(this.condFmt) }; }
   /** Rewind cells AND the whole selection to one moment, so undo/redo re-select the range the operation touched (Excel). */
   restore(s) {
     this.cells = clone(s.cells); this.colW = s.colW.slice(); this.colSet = s.colSet.slice(); this.rows = s.rows;
@@ -335,6 +399,7 @@ export class Sheet {
     this.hiddenRows = new Set(s.hiddenRows || []); this.hiddenCols = new Set(s.hiddenCols || []);
     this.freeze = s.freeze ? { ...s.freeze } : { r: 0, c: 0 };
     this.groups = s.groups ? normGroups(s.groups) : { rows: [], cols: [] };
+    this.condFmt = s.condFmt ? normCondFmt(s.condFmt) : [];
     this.multi = null;
     if (s.active) this.active = this.clamp(s.active.r, s.active.c);
     this.sel = s.sel ? this.clamp(s.sel.r, s.sel.c) : null;
@@ -524,11 +589,139 @@ export class Sheet {
     return false;
   }
   setNumberFormat(style, decimals) {
-    this.formatSel(c => { c.fmtStyle = style; if (decimals !== undefined) c.decimals = decimals; if (style === 'general') c.scale = 0; });
+    this.formatSel(c => { c.fmtStyle = style; if (decimals !== undefined) c.decimals = decimals; if (style === 'general') c.scale = 0; if (style !== 'custom') c.numFmt = null; });
     this.autoGrowSelectedCols();
   }
-  changeDecimals(delta) { this.formatSel(c => { c.decimals = Math.max(0, Math.min(6, (c.decimals | 0) + delta)); }); this.autoGrowSelectedCols(); }
+  /**
+   * Format Cells › Custom (Chapter 2): an Excel format code on the selection. A code Excel would
+   * refuse is refused here too (false, nothing changes); the decimals field mirrors the code's
+   * first section so Alt H 9 / 0 keep working on it.
+   */
+  setCustomFormat(code) {
+    const c0 = normalizeCode(code);   // 0.0x is stored as 0.0"x", as Excel's box does
+    if (!c0) return false;
+    if (/^general$/i.test(c0)) { this.setNumberFormat('general', 0); return true; }
+    this.formatSel(c => { c.fmtStyle = 'custom'; c.numFmt = c0; c.decimals = codeDecimals(c0); c.scale = 0; });
+    this.autoGrowSelectedCols();
+    return true;
+  }
+  changeDecimals(delta) {
+    this.formatSel(c => {
+      if (c.fmtStyle === 'custom' && c.numFmt) { const next = stepDecimals(c.numFmt, delta); if (isValidFormat(next)) { c.numFmt = next; c.decimals = codeDecimals(next); } return; }
+      c.decimals = Math.max(0, Math.min(6, (c.decimals | 0) + delta));
+    });
+    this.autoGrowSelectedCols();
+  }
   setScale(scale) { this.formatSel(c => { c.scale = scale; }); }
+
+  /* ---------------- conditional formatting (Chapter 2) ---------------- */
+  /** Add a rule over the selection (or `rule.range`); new rules go on top, as Excel's Manage Rules lists them. Returns the rule, or null when malformed. */
+  addCondFmt(rule) {
+    const range = rule && rule.range ? rule.range : rangeText(this.selRange());
+    const [norm] = normCondFmt([{ ...rule, range }]);
+    if (!norm) return null;
+    this.pushUndo(); this.condFmt = [norm, ...this.condFmt]; this.commit('format');
+    return norm;
+  }
+  removeCondFmt(id) { const i = this.condFmt.findIndex(r => r.id === id); if (i < 0) return false; this.pushUndo(); this.condFmt.splice(i, 1); this.commit('format'); return true; }
+  /** Move a rule up (dir -1, higher priority) or down (dir +1). */
+  moveCondFmt(id, dir) {
+    const i = this.condFmt.findIndex(r => r.id === id); const j = i + (dir < 0 ? -1 : 1);
+    if (i < 0 || j < 0 || j >= this.condFmt.length) return false;
+    this.pushUndo(); const [r] = this.condFmt.splice(i, 1); this.condFmt.splice(j, 0, r); this.commit('format'); return true;
+  }
+  setCondFmtStop(id, on) { const r = this.condFmt.find(x => x.id === id); if (!r) return false; this.pushUndo(); r.stopIfTrue = on === undefined ? !r.stopIfTrue : !!on; this.commit('format'); return true; }
+  /** Clear Rules: 'sheet' drops every rule; 'selection' drops rules whose range meets the selection (Excel trims a rule's range; the desk set drops it). */
+  clearCondFmt(scope = 'selection') {
+    if (!this.condFmt.length) return false;
+    const before = this.condFmt.length;
+    const sr = this.selRange();
+    const meets = rg => !(rg.r2 < sr.r1 || rg.r1 > sr.r2 || rg.c2 < sr.c1 || rg.c1 > sr.c2);
+    const keep = scope === 'sheet' ? [] : this.condFmt.filter(r => !meets(parseRange(r.range)));
+    if (keep.length === before) return false;
+    this.pushUndo(); this.condFmt = keep; this.commit('format'); return true;
+  }
+  /** Rules whose range covers the cell, in priority order. */
+  condFmtRulesAt(r, c) { return this.condFmt.filter(x => { const rg = parseRange(x.range); return r >= rg.r1 && r <= rg.r2 && c >= rg.c1 && c <= rg.c2; }); }
+  /**
+   * Every rule evaluated over the sheet: { 'B5': { fill, fontColor, border, bar: { pct, color }, scale } }
+   * for the cells at least one rule paints. Rules run top-down; a rule that holds contributes the
+   * properties no higher rule set, and a Stop If True rule that holds ends the walk for that cell.
+   */
+  condFmtMap() {
+    const out = {};
+    if (!this.condFmt.length) return out;
+    const numAt = (r, c) => { const cell = this.cells[refKey(r, c)]; return cell && typeof cell.value === 'number' ? cell.value : null; };
+    const stats = new Map();   // range → { min, max, mid } over its numbers (data bars, colour scales)
+    const statsOf = rg => {
+      const key = rangeText(rg); if (stats.has(key)) return stats.get(key);
+      const vals = []; for (let r = rg.r1; r <= rg.r2; r++) for (let c = rg.c1; c <= rg.c2; c++) { const v = numAt(r, c); if (v !== null) vals.push(v); }
+      vals.sort((a, b) => a - b);
+      const s = vals.length ? { min: vals[0], max: vals[vals.length - 1], mid: vals[Math.floor((vals.length - 1) / 2)] } : null;
+      stats.set(key, s); return s;
+    };
+    const operand = (v, r, c) => {
+      if (typeof v === 'number') return v;
+      if (typeof v === 'string' && v.trim().startsWith('=')) { try { const x = evalFormula(v.trim().slice(1), this.evalCtx({ cell: { r, c } })); return typeof x === 'number' ? x : NaN; } catch (e) { return NaN; } }
+      const n = parseFloat(v); return isFinite(n) ? n : NaN;
+    };
+    const holds = (rule, r, c) => {
+      if (rule.kind === 'cellValue') {
+        const v = numAt(r, c); if (v === null) return false;
+        const a = operand(rule.v1, r, c); if (Number.isNaN(a)) return false;
+        if (rule.op === 'between' || rule.op === 'notBetween') { const b = operand(rule.v2, r, c); if (Number.isNaN(b)) return false; const lo = Math.min(a, b), hi = Math.max(a, b); const inside = v >= lo && v <= hi; return rule.op === 'between' ? inside : !inside; }
+        return rule.op === '>' ? v > a : rule.op === '<' ? v < a : rule.op === '>=' ? v >= a : rule.op === '<=' ? v <= a : rule.op === '=' ? v === a : v !== a;
+      }
+      if (rule.kind === 'formula') {
+        const rg = parseRange(rule.range);
+        try { const x = evalFormula(translateFormula(rule.formula, r - rg.r1, c - rg.c1).slice(1), this.evalCtx({ cell: { r, c } })); return x === true || (typeof x === 'number' && x !== 0); }
+        catch (e) { return false; }
+      }
+      return numAt(r, c) !== null;   // bars and scales paint every number in the range
+    };
+    for (const rule of this.condFmt) {
+      const rg = parseRange(rule.range);
+      for (let r = Math.max(1, rg.r1); r <= Math.min(this.rows, rg.r2); r++) for (let c = Math.max(1, rg.c1); c <= Math.min(this.cols, rg.c2); c++) {
+        const key = refKey(r, c);
+        if (out[key] && out[key].stop) continue;
+        if (!holds(rule, r, c)) continue;
+        const o = out[key] || (out[key] = {});
+        if (rule.kind === 'cellValue' || rule.kind === 'formula') {
+          const st = CF_STYLES[rule.style];
+          if (st.fill && !o.fill) o.fill = st.fill;
+          if (st.fontColor && !o.fontColor) o.fontColor = st.fontColor;
+          if (st.border && !o.border) o.border = st.border;
+        } else if (rule.kind === 'dataBar' && !o.bar) {
+          const s = statsOf(rg); const v = numAt(r, c);
+          const pct = !s || s.max === s.min ? 1 : Math.max(0.08, (v - s.min) / (s.max - s.min));
+          o.bar = { pct: Math.round(pct * 100) / 100, color: (CF_BAR_COLORS.find(b => b.k === rule.color) || CF_BAR_COLORS[0]).hex };
+        } else if (rule.kind === 'colorScale' && !o.scale) {
+          const s = statsOf(rg); const v = numAt(r, c); const cols = (CF_SCALES.find(x => x.k === rule.scale) || CF_SCALES[0]).colors;
+          let hex;
+          if (!s || s.max === s.min) hex = cols[cols.length - 1];
+          else if (cols.length === 2) hex = mixHex(cols[0], cols[1], (v - s.min) / (s.max - s.min));
+          else if (v <= s.mid) hex = mixHex(cols[0], cols[1], s.mid === s.min ? 1 : (v - s.min) / (s.mid - s.min));
+          else hex = mixHex(cols[1], cols[2], s.max === s.mid ? 1 : (v - s.mid) / (s.max - s.mid));
+          o.scale = hex;
+        }
+        if (rule.stopIfTrue) o.stop = true;
+      }
+    }
+    for (const k in out) delete out[k].stop;
+    return out;
+  }
+  /** The rule ranges and formulas after rows/columns are inserted (delta > 0) or deleted (delta < 0) at `at`. */
+  shiftCondFmt(axis, at, delta) {
+    const out = [];
+    for (const r of this.condFmt) {
+      const range = adjustFormulaStructure('=' + r.range, axis, at, delta).slice(1);
+      if (/#REF!/.test(range) || !parseRange(range)) continue;
+      const next = { ...r, range: rangeText(parseRange(range)) };
+      if (r.formula) next.formula = adjustFormulaStructure(r.formula, axis, at, delta);
+      out.push(next);
+    }
+    return out;
+  }
   setAlign(a) { this.formatSel(c => { c.align = a; }); }
   changeIndent(delta) { this.formatSel(c => { c.indent = Math.max(0, Math.min(8, (c.indent | 0) + delta)); }); }
   toggleWrap() { this.formatSel(c => { c.wrap = !c.wrap; }); }
@@ -655,7 +848,7 @@ export class Sheet {
       for (let i = 0; i < cb.w; i++) for (let j = 0; j < cb.h; j++) {
         const cell = this.ensure(r0 + i, c0 + j); const s = cb.data[j][i];
         cell.formula = null; cell.value = s.value; cell.txt = s.txt;
-        cell.bold = s.bold; cell.it = s.it; cell.strike = s.strike; cell.fmtStyle = s.fmtStyle; cell.decimals = s.decimals; cell.align = s.align; cell.fontColor = s.fontColor;
+        cell.bold = s.bold; cell.it = s.it; cell.strike = s.strike; cell.fmtStyle = s.fmtStyle; cell.decimals = s.decimals; cell.numFmt = s.numFmt || null; cell.align = s.align; cell.fontColor = s.fontColor;
       }
       this.lastFlash = { r1: r0, c1: c0, r2: r0 + cb.w - 1, c2: c0 + cb.h - 1 };
       this.sel = { r: r0, c: c0 }; this.active = { r: r0 + cb.w - 1, c: c0 + cb.h - 1 }; this.selA = null;
@@ -667,7 +860,7 @@ export class Sheet {
       const xl = f => (f && (fdr || fdc)) ? translateFormula(f, fdr, fdc) : f;
       if (kind === 'values') { cell.formula = null; cell.value = s.value; cell.txt = s.txt; }
       else if (kind === 'formulas') { cell.formula = xl(s.formula); cell.value = s.value; cell.txt = s.formula ? false : s.txt; }
-      else if (kind === 'valuesnum') { cell.formula = null; cell.value = s.value; cell.txt = s.txt; cell.fmtStyle = s.fmtStyle; cell.decimals = s.decimals; cell.scale = s.scale | 0; }
+      else if (kind === 'valuesnum') { cell.formula = null; cell.value = s.value; cell.txt = s.txt; cell.fmtStyle = s.fmtStyle; cell.decimals = s.decimals; cell.scale = s.scale | 0; cell.numFmt = s.numFmt || null; }
       else if (kind === 'formats') { copyFmt(cell, s); }
       else if (kind === 'colwidths') { this.colW[c0 + j] = cb.cols[j % cb.w]; this.colSet[c0 + j] = true; }
       else { cell.formula = xl(s.formula); cell.value = s.value; copyFmt(cell, s); }
@@ -865,10 +1058,12 @@ export class Sheet {
       this.hiddenRows = new Set([...this.hiddenRows].map(n => n >= r.r1 ? n + count : n).filter(n => n <= this.rows));
       if (this.freeze.r >= r.r1) this.freeze.r = Math.min(this.rows - 1, this.freeze.r + count);
       this.groups.rows = this.shiftGroups('r', r.r1, count);
+      this.condFmt = this.shiftCondFmt('r', r.r1, count);
     }
     else { this.shiftCells('c', r.c1, count);
       this.hiddenCols = new Set([...this.hiddenCols].map(n => n >= r.c1 ? n + count : n).filter(n => n <= this.cols));
       this.groups.cols = this.shiftGroups('c', r.c1, count);
+      this.condFmt = this.shiftCondFmt('c', r.c1, count);
       if (this.freeze.c >= r.c1) this.freeze.c = Math.min(this.cols - 1, this.freeze.c + count); for (let c = this.cols; c >= r.c1 + count; c--) { this.colW[c] = this.colW[c - count]; this.colSet[c] = this.colSet[c - count]; } const inh = r.c1 > 1 ? this.colW[r.c1 - 1] : COLW_DEFAULT; for (let c = r.c1; c < r.c1 + count && c <= this.cols; c++) { this.colW[c] = inh; this.colSet[c] = r.c1 > 1 ? this.colSet[r.c1 - 1] : false; } }
     this.commit('structure'); return true;
   }
@@ -879,11 +1074,13 @@ export class Sheet {
       this.rowH.splice(r.r1, count); while (this.rowH.length < this.rows + 1) this.rowH.push(ROWH_DEFAULT);
       this.hiddenRows = new Set([...this.hiddenRows].filter(n => n < r.r1 || n > r.r2).map(n => n > r.r2 ? n - count : n));
       this.groups.rows = this.shiftGroups('r', r.r1, -count);
+      this.condFmt = this.shiftCondFmt('r', r.r1, -count);
       if (this.freeze.r > r.r2) this.freeze.r -= count; else if (this.freeze.r >= r.r1) this.freeze.r = Math.max(0, r.r1 - 1);
       this.sel = null; this.selA = null; this.active = this.clamp(r.r1, a.c); }
     else { const count = r.c2 - r.c1 + 1; this.shiftCells('c', r.c1, -count);
       this.hiddenCols = new Set([...this.hiddenCols].filter(n => n < r.c1 || n > r.c2).map(n => n > r.c2 ? n - count : n));
       this.groups.cols = this.shiftGroups('c', r.c1, -count);
+      this.condFmt = this.shiftCondFmt('c', r.c1, -count);
       if (this.freeze.c > r.c2) this.freeze.c -= count; else if (this.freeze.c >= r.c1) this.freeze.c = Math.max(0, r.c1 - 1); for (let c = r.c1; c <= this.cols - count; c++) { this.colW[c] = this.colW[c + count]; this.colSet[c] = this.colSet[c + count]; } for (let c = Math.max(r.c1, this.cols - count + 1); c <= this.cols; c++) { this.colW[c] = COLW_DEFAULT; this.colSet[c] = false; } this.sel = null; this.selA = null; this.active = this.clamp(a.r, r.c1); }
     this.commit('structure');
   }
@@ -1118,6 +1315,7 @@ export class Sheet {
     if (this.hiddenCols.size) out.hiddenCols = [...this.hiddenCols];
     if (this.freeze.r || this.freeze.c) out.freeze = { ...this.freeze };
     if (this.groups.rows.length || this.groups.cols.length) out.groups = clone(this.groups);
+    if (this.condFmt.length) out.condFmt = clone(this.condFmt);
     return out;
   }
 }

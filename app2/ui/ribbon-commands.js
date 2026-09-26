@@ -29,9 +29,9 @@ export function recordMouse(session, what) {
 }
 
 /** Dialogs that own the input while open: the sheet and the bar behind them ignore clicks (Excel's modal cards). */
-export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'rowh', 'sortwarn', 'series', 'fxfix', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group']);
+export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'rowh', 'sortwarn', 'series', 'fxfix', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale']);
 /** The dialogs drawn as floating cards over the sheet (ribbon-view drawDialog), not as anchored dropdowns. */
-export const CARD_DIALOGS = new Set(['fmt', 'paste', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group']);
+export const CARD_DIALOGS = new Set(['fmt', 'paste', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale']);
 
 /** Leave the Alt walk without acting (a mouse command supersedes any open KeyTip path or dropdown). */
 export function leaveRibbon(session) { if (session.mode === 'ribbon') session.exitRibbon(false); }
@@ -81,6 +81,10 @@ export const ICON = {
   merge: svg('<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 12h6M15 12h6"/><path d="M7 9l3 3-3 3M17 9l-3 3 3 3"/>'),
   acct: glyph('$'),
   condFmt: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h5M7 12h9M7 16h3"/>'),
+  dataBar: svg('<path d="M4 6h12M4 12h16M4 18h7" stroke-width="4"/>'),
+  colorScale: svg('<rect x="3" y="3" width="18" height="6" rx="1" fill="currentColor" opacity=".25" stroke="none"/><rect x="3" y="9" width="18" height="6" fill="currentColor" opacity=".5" stroke="none"/><rect x="3" y="15" width="18" height="6" rx="1" fill="currentColor" opacity=".85" stroke="none"/>'),
+  newRule: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/>'),
+  manageRules: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/><path d="M15 15l2 2 3-3"/>'),
   fmtTable: svg('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16M15 4v16"/>'),
   fillMenu: svg('<rect x="6" y="3" width="12" height="6" rx="1"/><path d="M12 9v11M8 16l4 4 4-4"/>'),
   filter: svg('<path d="M4 5h16L14 12v6l-4 2v-8L4 5Z"/>'),
@@ -242,6 +246,17 @@ export const RIBBON_COMMANDS = {
   'H9': C('Decrease decimal', 'Number', 'H', ICON.decDec, direct(S => S.changeDecimals(-1))),
   // Home · Styles
   'HJ': C('Cell styles', 'Styles', 'H', ICON.cellStyles, dialog('cellstyle', s => { s.cellStyleIdx = 0; })),
+  // Home · Styles › Conditional Formatting (Chapter 2): the same Session openers the Alt walk calls, with an empty path
+  'HLHG': C('Greater Than…', 'Styles', 'H', ICON.condFmt, s => { leaveRibbon(s); s.openCondFmt('>'); }),
+  'HLHL': C('Less Than…', 'Styles', 'H', ICON.condFmt, s => { leaveRibbon(s); s.openCondFmt('<'); }),
+  'HLHB': C('Between…', 'Styles', 'H', ICON.condFmt, s => { leaveRibbon(s); s.openCondFmt('between'); }),
+  'HLHE': C('Equal To…', 'Styles', 'H', ICON.condFmt, s => { leaveRibbon(s); s.openCondFmt('='); }),
+  'HLN': C('New Formatting Rule…', 'Styles', 'H', ICON.newRule, s => { leaveRibbon(s); s.openCondFmt('formula'); }),
+  'HLD': C('Data Bars', 'Styles', 'H', ICON.dataBar, s => { leaveRibbon(s); s.openCondGallery('databar'); }),
+  'HLS': C('Color Scales', 'Styles', 'H', ICON.colorScale, s => { leaveRibbon(s); s.openCondGallery('colorscale'); }),
+  'HLCS': C('Clear Rules from Selected Cells', 'Styles', 'H', ICON.clearFormats, direct(S => S.clearCondFmt('selection'))),
+  'HLCE': C('Clear Rules from Entire Sheet', 'Styles', 'H', ICON.clearAll, direct(S => S.clearCondFmt('sheet'))),
+  'HLR': C('Manage Rules…', 'Styles', 'H', ICON.manageRules, s => { leaveRibbon(s); s.openCondRules(); }),
   // Home · Cells
   'HIR': C('Insert sheet rows', 'Cells', 'H', ICON.insertRows, direct(S => S.insert('r'))),
   'HIC': C('Insert sheet columns', 'Cells', 'H', ICON.insertCols, direct(S => S.insert('c'))),
@@ -352,7 +367,7 @@ export const UNIMPLEMENTED = [
   U('AlignTop', 'Top Align', 'Alignment', 'H', ICON.alignTop), U('AlignMiddle', 'Middle Align', 'Alignment', 'H', ICON.alignMid), U('AlignBottom', 'Bottom Align', 'Alignment', 'H', ICON.alignBot),
   U('Orientation', 'Orientation', 'Alignment', 'H', ICON.orient), U('MergeCenter', 'Merge & Center', 'Alignment', 'H', ICON.merge),
   U('NumberFormat', 'Number Format', 'Number', 'H'),
-  U('CondFormat', 'Conditional Formatting', 'Styles', 'H', ICON.condFmt), U('FormatTable', 'Format as Table', 'Styles', 'H', ICON.fmtTable),
+  U('FormatTable', 'Format as Table', 'Styles', 'H', ICON.fmtTable),
   U('Filter', 'Filter', 'Sort & Filter', 'H', ICON.filter), U('FindSelect', 'Find & Select', 'Editing', 'H', ICON.find),
   U('PivotTable', 'PivotTable', 'Tables', 'N', ICON.pivot), U('Table', 'Table', 'Tables', 'N', ICON.table),
   U('Pictures', 'Pictures', 'Illustrations', 'N', ICON.picture), U('Shapes', 'Shapes', 'Illustrations', 'N', ICON.shapes),
@@ -400,6 +415,7 @@ export const MENU_META = {
   'F': { label: 'File', icon: ICON.options }, 'HFD': { label: 'Find & Select', icon: ICON.find },
   'PO': { label: 'Orientation', icon: ICON.pageOrient }, 'PS': { label: 'Page Setup', icon: ICON.launcher, virtual: true },
   'HOU': { label: 'Hide & Unhide', icon: ICON.rowHeight }, 'WF': { label: 'Freeze Panes', icon: ICON.freeze },
+  'HL': { label: 'Conditional Formatting', icon: ICON.condFmt }, 'HLH': { label: 'Highlight Cells Rules', icon: ICON.condFmt }, 'HLC': { label: 'Clear Rules', icon: ICON.clearFormats },
 };
 export const VIRTUAL_MENUS = new Set(Object.keys(MENU_META).filter(k => MENU_META[k].virtual));
 /** Icons for menu items that are neither commands nor submenus (the dead entries of MENUS, engine/ribbon.js DEAD), by path. */
@@ -430,7 +446,7 @@ export const RIBBON_LAYOUT = {
       [{ box: 'General', dead: 'NumberFormat', w: 96 }],
       [ico({ cmd: 'HAN' }), ico({ cmd: 'HP' }), ico({ cmd: 'HK' }), ico({ cmd: 'H0' }), ico({ cmd: 'H9' })],
     ] }] },
-    { name: 'Styles', cols: [{ rows: [[{ dead: 'CondFormat', caret: true }], [{ dead: 'FormatTable', caret: true }], [{ cmd: 'HJ', caret: true }]] }] },
+    { name: 'Styles', cols: [{ rows: [[{ menu: 'HL' }], [{ dead: 'FormatTable', caret: true }], [{ cmd: 'HJ', caret: true }]] }] },
     { name: 'Cells', cols: [{ rows: [[{ menu: 'HI' }], [{ menu: 'HD' }], [{ menu: 'HO' }]] }] },
     { name: 'Editing', cols: [{ rows: [[{ menu: 'HU' }], [{ menu: 'HFI' }], [{ menu: 'HE' }]] }, { rows: [[{ menu: 'HSF' }], [{ menu: 'HFD' }]] }] },
   ],
