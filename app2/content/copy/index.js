@@ -590,6 +590,18 @@ export const COPY = {
    "convention_line": "Parentheses, never a leading minus · A dash, not 0.0 · Units live in the format, not typed text · One decimals setting per line",
    "mac_note": "",
    "story_beat": ""
+  },
+  "remix-format-on-the-pnl": {
+   "id": "remix-format-on-the-pnl",
+   "module": "remixes",
+   "order": "2.R.C",
+   "title": "Remix: the team’s format on a site P&L",
+   "brief": "Chapter 1’s format challenge on a P&L: a cluster’s FY26E site P&L arrived as a bordered grid of General numbers with one site at a loss. Give it the team’s format, figures to title, in three minutes.",
+   "closing": "",
+   "wow": "",
+   "convention_line": "Parentheses, never a leading minus · One decimals setting per line · A top border, never an all-borders grid · Inputs blue, formulas black · Merged cells break everything",
+   "mac_note": "",
+   "story_beat": ""
   }
  },
  "goals": {
@@ -3586,6 +3598,56 @@ export const COPY = {
     "why": "",
     "hint_stuck": ""
    }
+  ],
+  "remix-format-on-the-pnl": [
+   {
+    "lesson_id": "remix-format-on-the-pnl",
+    "goal_index": "0",
+    "text": "The figures C5:F10 are General with stray decimals: give them comma style, no decimals, and the Gross profit loss reads in parentheses.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "remix-format-on-the-pnl",
+    "goal_index": "1",
+    "text": "Margin % in G5:G10 is a fraction: show it as a percentage to one decimal, Total included.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "remix-format-on-the-pnl",
+    "goal_index": "2",
+    "text": "A grid of borders sits over the whole block A4:G10: remove every border from it, because a grid is not structure.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "remix-format-on-the-pnl",
+    "goal_index": "3",
+    "text": "The Total row A10:G10 is a total: make it bold and give it a single top border.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "remix-format-on-the-pnl",
+    "goal_index": "4",
+    "text": "Only the typed figures in C5:E9 are inputs: color them blue, and leave the formulas beside them in automatic black.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "remix-format-on-the-pnl",
+    "goal_index": "5",
+    "text": "The title in A1 belongs over the page: center it across A1:G1 with Center Across Selection, never a merge.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
   ]
  },
  "modules": {
@@ -3649,15 +3711,22 @@ export const COPY = {
    "id": "number-formats",
    "name": "Number formats",
    "objective": "The built-in styles on a raw P&L, costs shown as negatives, Accounting and percent lines, dates on the timeline: a page every number on which reads right.",
-   "story_beat": "",
+   "story_beat": "A three-year P&L, the way the export wrote it. || General numbers with stray cents, costs typed positive, a site count dressed as dollars, bare years over the timeline. The built-in styles first: comma, Accounting, percent and date, and the sign convention stated once up top.",
    "page_name": "The P&L, numbers to standard"
   },
   "custom-number-formats": {
    "id": "custom-number-formats",
    "name": "Custom number formats",
    "objective": "The four-section code, units in the format, headers built with TEXT, conditional codes and hidden zeros: the house number-format set from the Custom box.",
-   "story_beat": "",
+   "story_beat": "The house set is a code. || Four sections, positive, negative, zero and text; a unit that rides in the format; a header built from a date with TEXT; a condition or a color in front, an empty section to hide a zero. The Custom box, Ctrl+1 then U, does all of it.",
    "page_name": "The house number-format set"
+  },
+  "remixes": {
+   "id": "remixes",
+   "name": "Remixes",
+   "objective": "Chapter 1’s challenges re-clothed in this chapter’s material: the same keys on a new sheet, so old skills stay warm.",
+   "story_beat": "",
+   "page_name": "Old skills on the new page"
   }
  },
  "site": {

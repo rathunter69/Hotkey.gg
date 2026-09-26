@@ -52,6 +52,7 @@ import units_in_the_format from './lessons/units-in-the-format.js';
 import dynamic_headers_with_text from './lessons/dynamic-headers-with-text.js';
 import conditional_codes_and_hidden_zeros from './lessons/conditional-codes-and-hidden-zeros.js';
 import challenge_house_format_set from './lessons/challenge-house-format-set.js';
+import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // Chapter 1's format challenge, re-clothed (content/remix.js)
 
 export const CHAPTERS = [
   {
@@ -89,10 +90,12 @@ export const CHAPTERS = [
     sections: [
       { name: 'Number formats', blurb: 'The built-in styles on a raw P&L, costs shown as negatives, Accounting and percent lines, dates on the timeline: a page every number on which reads right.' },
       { name: 'Custom number formats', blurb: 'The four-section code, units in the format, headers built with TEXT, conditional codes and hidden zeros: the house number-format set from the Custom box.' },
+      { name: 'Remixes', blurb: 'Chapter 1’s challenges re-clothed in this chapter’s material: the same keys on a new sheet, so old skills stay warm.' },
     ],
     lessons: [
       built_in_formats_on_a_pnl, sign_convention_costs_negative, currency_and_percent_lines, dates_on_the_timeline, challenge_format_the_numbers,
       the_four_section_format, units_in_the_format, dynamic_headers_with_text, conditional_codes_and_hidden_zeros, challenge_house_format_set,
+      remix_format_on_the_pnl,
     ],
   },
 ];

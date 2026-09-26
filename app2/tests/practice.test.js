@@ -12,7 +12,7 @@ test('practice: every drill names the module that teaches its keys (chapter 1 fo
     const m = drillModule(d);
     assert.ok(m, `${d.id} has no teaching module`);
     assert.ok(ids.has(m.id), `${d.id} → unknown module ${m.id}`);
-    assert.match(m.n, d.kind === 'challenge' && d.chapter !== 'foundations' ? /^2\.[1-7]$/ : /^1\.[1-7]$/, `${d.id} → ${m.n}`);
+    assert.match(m.n, d.kind === 'challenge' && d.chapter !== 'foundations' ? /^2\.([1-7]|R)$/ : /^1\.[1-7]$/, `${d.id} → ${m.n}`);
   }
   // the map covers exactly the non-challenge drills (a new drill must be added to it)
   assert.deepEqual(Object.keys(DRILL_MODULE).sort(), DRILLS.filter(d => d.kind !== 'challenge').map(d => d.id).sort());

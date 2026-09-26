@@ -133,7 +133,7 @@ const moduleN = (id, k) => moduleNumber(id, k) || Object.keys(PLANNED_MODULE_IDS
 const PAGE_NAMES = {
   'open-and-set-up': 'The workbook, set up to standard', 'move-and-select': 'The feed, answered', 'enter-edit-copy-fill': 'The Report skeleton', structure: 'The Report, reshaped',
   format: 'The Report, formatted', formulas: 'The Report, live', 'present-and-audit': 'Page one of the pack', 'project-and-assessment': 'The weekly KPI report',
-  'number-formats': 'The P&L, numbers to standard', 'custom-number-formats': 'The house number-format set',
+  'number-formats': 'The P&L, numbers to standard', 'custom-number-formats': 'The house number-format set', remixes: 'Old skills on the new page',
 };
 
 /** Everything the screens say today, keyed the way rules.js SITE_KEYS names it. */
