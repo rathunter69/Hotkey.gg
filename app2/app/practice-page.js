@@ -37,10 +37,10 @@ export const DRILL_MODULE = {
 /** A drill's teaching module ({ id, n, title, lessons }) or null. */
 export function drillModule(drill) {
   const id = (drill && (drill.kind === 'challenge' ? drill.module : DRILL_MODULE[drill.id])) || null;
-  const ch1 = CHAPTERS[0];
-  const k = id && ch1 ? modulesOf(ch1).findIndex(m => m.id === id) : -1;
+  const ch = (drill && drill.kind === 'challenge' && CHAPTERS.find(c => c.id === drill.chapter)) || CHAPTERS[0];
+  const k = id && ch ? modulesOf(ch).findIndex(m => m.id === id) : -1;
   if (k < 0) return null;
-  const m = modulesOf(ch1)[k];
+  const m = modulesOf(ch)[k];
   return { id: m.id, n: moduleNumber(m.id, k + 1), title: m.title, lessons: m.lessons };
 }
 

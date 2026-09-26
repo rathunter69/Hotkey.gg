@@ -244,7 +244,7 @@ function canonSheet(patch = {}) {
   return new Sheet({ cells, gridlines });
 }
 const CANON_SPEC = {
-  range: 'B5:C8', rows: ['B7:C7', 'B8:C8'], costRows: 'B6:C6', units: true,
+  range: 'B5:C8', zeroDash: true, rows: ['B7:C7', 'B8:C8'], costRows: 'B6:C6', units: true,
   dollar: { range: 'B5:C8', rows: [5, 7] }, totals: ['B7', 'C7'], pctLines: 'B8:C8', indent: 'A6',
   headers: 'B4:C4', title: { ref: 'A1', span: 4 }, fontSize: 'A1:C8', gridlines: true, hidden: true, check: 'B10',
 };
@@ -254,6 +254,7 @@ test('fullCanon: a block that meets every rule passes', () => {
   assert.deepEqual(r, { ok: true, why: '' });
   assert.equal(fullCanon(null, CANON_SPEC).ok, false, 'a missing sheet fails');
   assert.equal(fullCanon(canonSheet(), {}).ok, true, 'an empty spec asks nothing');
+  assert.equal(fullCanon(canonSheet({ C6: { fmtStyle: 'comma', numFmt: null } }), { ...CANON_SPEC, zeroDash: undefined }).ok, true, 'without zeroDash a 0 is not graded (module 2.1)');
 });
 
 test('fullCanon: each broken rule returns its one line, naming the cell', () => {

@@ -169,6 +169,18 @@ export const CONCEPTS = {
   'audit-pass': 'the audit pass: Go To Special, show formulas and tracing find what a reviewer would',
   'ref-error': '#REF! means a formula pointed at a cell that was deleted; Ctrl+Z brings the cell and the formula back',
   'wrap-text': 'Wrap Text (Alt, H, W) folds a long entry inside its cell; AutoFit Row Height (Alt, H, O, A) then sizes the row to it',
+  // Chapter 2 (Project Volt, stage 2): number formats and custom number formats
+  'general-format': 'General is the no-format format: Ctrl+Shift+~ (or Ctrl+1, G) returns a cell to how its value was typed',
+  'accounting-format': 'Accounting Number Format (Alt, H, A, N) sets the $ at the cell\u2019s left edge, negatives in parentheses and zero as a dash',
+  'paste-special-operation': 'Paste Special\u2019s Operation (Ctrl+Alt+V, then V for values and M for Multiply) multiplies every selected cell by the copied value',
+  'date-format': 'a date is a serial number of days; Ctrl+1, D shows it as Jan-26, and the number underneath still sorts and subtracts',
+  'custom-number-format': 'Format Cells \u203a Custom (Ctrl+1, U) takes a code of up to four sections, positive;negative;zero;text, that says what each kind of value wears',
+  'format-units': 'a comma after the last digit placeholder divides by a thousand, and a unit rides along in quotes: #,##0,"k", 0.0"x", 0 "bps"',
+  'date-function': 'DATE(year, month, day) builds a date from its parts: =DATE(2026,12,31) is the FY26 year end',
+  'text-function': 'TEXT(value, "format") renders a number through a format code as text, so a header can be built from a date',
+  'concatenate-amp': '& joins text and cell values into one string: ="FY"&TEXT(B3,"yy")&"A"',
+  'conditional-format-code': 'a section may open with a condition or a color, [>=1000]0,"k" or [Red], and Excel uses the first section whose condition the value meets',
+  'hide-zeros': 'an empty section shows nothing: #,##0;(#,##0); hides the zeros of a working block',
 };
 
 /**

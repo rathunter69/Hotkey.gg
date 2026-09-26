@@ -248,8 +248,9 @@ export function oneFontSize(sheet, range, title = null) {
  * The full canon over a graded block (Chapter 2 onward: every Format/Formula/Structure/Project
  * grader applies it, BANKER_CONVENTIONS "Grader rules"). Runs each rule the spec names and
  * returns the first failure's one line. Every key is optional:
- *   range       the figure block ('B5:P18'): roleColour, negativesParen, zeroAsDash, noGrid,
+ *   range       the figure block ('B5:P18'): roleColour, negativesParen, noGrid,
  *               decimalsConsistent per line, noLiteralInFormula on every formula in it
+ *   zeroDash    true (the range) or a range: zeroAsDash — from module 2.2, once the dash is taught
  *   lines       'rows' (default) or 'cols', or an array of ranges: where decimals must agree
  *   formulas    an array of refs for the literal check (default: every formula in `range`)
  *   rows        ranges that must be one formula filled right (rowConsistent)
@@ -288,9 +289,9 @@ export function fullCanon(sheet, spec = {}) {
     if (spec.range) {
       run(negativesParen(sheet, spec.range));
       for (const line of linesOf(spec.range, spec.lines)) run(decimalsConsistent(sheet, line));
-      run(zeroAsDash(sheet, spec.range));
       run(noGrid(sheet, spec.range));
     }
+    if (spec.zeroDash) run(zeroAsDash(sheet, spec.zeroDash === true ? spec.range : spec.zeroDash));
     if (spec.dollar) run(dollarRows(sheet, spec.dollar.range, spec.dollar.rows));
     if (spec.totals) run(totalsTopBorder(sheet, spec.totals));
     for (const rng of list(spec.pctLines)) run(italicLines(sheet, rng));

@@ -41,6 +41,17 @@ import challenge_audit_before_you_send from './lessons/challenge-audit-before-yo
 import weekly_kpi_project from './lessons/weekly-kpi-project.js';
 import foundations_assessment from './lessons/foundations-assessment.js';
 import foundations_testout from './lessons/foundations-testout.js';
+// Chapter 2 · Formatting and presentation (Run 1: modules 2.1 and 2.2; 2.3–2.7 and the project follow)
+import built_in_formats_on_a_pnl from './lessons/built-in-formats-on-a-pnl.js';
+import sign_convention_costs_negative from './lessons/sign-convention-costs-negative.js';
+import currency_and_percent_lines from './lessons/currency-and-percent-lines.js';
+import dates_on_the_timeline from './lessons/dates-on-the-timeline.js';
+import challenge_format_the_numbers from './lessons/challenge-format-the-numbers.js';
+import the_four_section_format from './lessons/the-four-section-format.js';
+import units_in_the_format from './lessons/units-in-the-format.js';
+import dynamic_headers_with_text from './lessons/dynamic-headers-with-text.js';
+import conditional_codes_and_hidden_zeros from './lessons/conditional-codes-and-hidden-zeros.js';
+import challenge_house_format_set from './lessons/challenge-house-format-set.js';
 
 export const CHAPTERS = [
   {
@@ -67,6 +78,21 @@ export const CHAPTERS = [
       point_dont_type, sum_family_and_autosum, anchors_dollar_and_f4, link_across_sheets, one_formula_per_row_filled_right, read_the_error_follow_the_trail, challenge_the_site_pnl,
       fit_to_one_page, the_checks_row, hardcode_hunt, challenge_audit_before_you_send,
       weekly_kpi_project, foundations_assessment, foundations_testout,
+    ],
+  },
+  {
+    id: 'formatting',
+    title: 'Formatting and presentation',
+    access: 'paid',
+    blurb: 'The house number-format set, model formatting standards, alignment and structure, conditional formatting, dates and text, and a page that prints: a three-year P&L dressed the way a banker reads it.',
+    // Chapter 2's sections in order (SITE_SPEC · Chapter 2): modules 2.1 and 2.2 so far; 2.3–2.7 and the project block follow in Run 2.
+    sections: [
+      { name: 'Number formats', blurb: 'The built-in styles on a raw P&L, costs shown as negatives, Accounting and percent lines, dates on the timeline: a page every number on which reads right.' },
+      { name: 'Custom number formats', blurb: 'The four-section code, units in the format, headers built with TEXT, conditional codes and hidden zeros: the house number-format set from the Custom box.' },
+    ],
+    lessons: [
+      built_in_formats_on_a_pnl, sign_convention_costs_negative, currency_and_percent_lines, dates_on_the_timeline, challenge_format_the_numbers,
+      the_four_section_format, units_in_the_format, dynamic_headers_with_text, conditional_codes_and_hidden_zeros, challenge_house_format_set,
     ],
   },
 ];

@@ -41,10 +41,11 @@ test('every drill validates', () => {
   for (const d of DRILLS.filter(x => x.kind !== 'challenge')) assert.deepEqual(validateDrill(d), [], d.id);
   // the module challenges ride the catalogue as thin records over their (validated) lessons
   const ch = DRILLS.filter(x => x.kind === 'challenge');
-  assert.equal(ch.length, 7, 'the seven module challenges are registered');
-  for (const d of ch) { assert.ok(d.lesson && d.lesson.kind === 'challenge' && d.pars && d.pars.pass > d.pars.legendary, d.id); assert.equal(d.access, 'free'); }
+  assert.equal(ch.length, 9, 'the seven Chapter 1 module challenges and the two Chapter 2 ones are registered');
+  for (const d of ch) { assert.ok(d.lesson && d.lesson.kind === 'challenge' && d.pars && d.pars.pass > d.pars.legendary, d.id); assert.equal(d.access, d.chapter === 'foundations' ? 'free' : 'paid', d.id); }
   assert.deepEqual(ch.filter(d => d.benchmark).map(d => d.id), ['challenge-to-standard-in-three-minutes', 'challenge-the-site-pnl'], 'two challenges are benchmarks');
-  assert.ok(ch.every(d => DAILY_POOL.includes(d.id)), 'the Daily pool picks the challenges up');
+  assert.ok(ch.filter(d => d.access === 'free').every(d => DAILY_POOL.includes(d.id)), 'the Daily pool picks the free challenges up');
+  assert.ok(ch.filter(d => d.access === 'paid').every(d => !DAILY_POOL.includes(d.id)), 'the Daily never draws a paid challenge');
 });
 
 test('validateDrill rejects the broken shapes', () => {

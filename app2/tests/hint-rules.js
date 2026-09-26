@@ -7,16 +7,18 @@ import { workbookState } from '../content/workbooks/index.js';
 /** A hint as a keystroke script: glyphs → key names, '×N' repeats the key before it, connectives dropped, quoted text kept. */
 export function hintScript(hint) {
   const out = [];
-  for (const t of String(hint || '').match(/"[^"]*"|\S+/g) || []) {
+  for (const t of String(hint || '').match(/"[^"]*"|'[^']*'|\S+/g) || []) {
     if (/^(then|…|,|and|or)$/.test(t)) continue;
     const m = /^×(\d+)$/.exec(t);
     if (m) { if (!out.length) throw new Error(`"${hint}": ×N needs a key before it`); const last = out[out.length - 1]; for (let i = 1; i < +m[1]; i++) out.push(last); continue; }
-    out.push(t.startsWith('"') ? t : t.replace(/↑/g, 'Up').replace(/↓/g, 'Down').replace(/←/g, 'Left').replace(/→/g, 'Right').replace(/⌫/g, 'Backspace').replace(/↵/g, 'Enter'));
+    out.push(isQuoted(t) ? t : t.replace(/↑/g, 'Up').replace(/↓/g, 'Down').replace(/←/g, 'Left').replace(/→/g, 'Right').replace(/⌫/g, 'Backspace').replace(/↵/g, 'Enter'));
   }
   return out.join(' ');
 }
 
-export const hintTokens = keys => String(keys || '').match(/"[^"]*"|\S+/g) || [];
+/** A typed run in a hint: "…", or '…' when the text itself carries double quotes (a TEXT() formula, Chapter 2). */
+export const isQuoted = t => t.startsWith('"') || t.startsWith("'");
+export const hintTokens = keys => String(keys || '').match(/"[^"]*"|'[^']*'|\S+/g) || [];
 const CELL_RE = /^\$?([A-Z]{1,3})\$?(\d{1,7})$/;
 const cellRC = ref => { const m = CELL_RE.exec(String(ref).replace(/^.*!/, '').split(':')[0].replace(/\$/g, '')); if (!m) return null; let c = 0; for (const ch of m[1]) c = c * 26 + ch.charCodeAt(0) - 64; return { r: +m[2], c }; };
 const isArrow = t => /^(↑|↓|←|→|Up|Down|Left|Right)$/.test(t);
@@ -27,7 +29,7 @@ export function goToOffence(tokens, anchor) {
     if (tokens[i] !== 'Ctrl+G' && tokens[i] !== 'F5') continue;
     const after = tokens.slice(i + 1, i + 4);
     if (after.some(t => t === 'Alt+S')) { continue; }                       // the door to Go To Special
-    const quoted = after.find(t => t.startsWith('"'));
+    const quoted = after.find(isQuoted);
     const ref = quoted ? quoted.slice(1, -1) : '';
     if (ref.includes('!')) { anchor = cellRC(ref) || anchor; continue; }    // another sheet: a jump, not glue
     const to = cellRC(ref);
@@ -61,7 +63,7 @@ export function arrowGrind(tokens) {
 /** Where the hint's cursor last verifiably stood before goal `gi`: the previous goals' last typed ref, else the state's active cell. */
 export function anchorBefore(lesson, gi) {
   for (let j = gi - 1; j >= 0; j--) {
-    const qs = hintTokens(lesson.goals[j].keys).filter(t => t.startsWith('"'));
+    const qs = hintTokens(lesson.goals[j].keys).filter(isQuoted);
     for (let k = qs.length - 1; k >= 0; k--) { const rc = cellRC(qs[k].slice(1, -1).split(':').pop()); if (rc) return rc; }
   }
   try {

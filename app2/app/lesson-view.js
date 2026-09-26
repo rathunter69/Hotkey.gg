@@ -42,7 +42,7 @@ const rich = s => esc(s).replace(/`([^`]+)`/g, (m, k) => kbd(k));
  * A goal's keys: keycaps for keys, plain text for connectives ('then', '×5') and, as in a solution
  * script, a double-quoted run is text to type: '"1200" Enter' → type “1200” ⏎.
  */
-const keysHtml = s => s ? (s.match(/"[^"]*"|\S+/g) || []).map(t => t.startsWith('"') ? `<span class="kx">type “${esc(t.slice(1, -1))}”</span>` :
+const keysHtml = s => s ? (s.match(/"[^"]*"|'[^']*'|\S+/g) || []).map(t => t.startsWith('"') || t.startsWith("'") ? `<span class="kx">type “${esc(t.slice(1, -1))}”</span>` :
   /^(then|×\d+|,|and|or|…)$/.test(t) || /^[a-z]/.test(t) && !/^[a-z]$/.test(t) ? `<span class="kx">${esc(t)}</span>` : kbd(t)).join(' ') : '';
 
 /** The once-in-the-browser line on the first goal that uses Ctrl+PgUp/PgDn; site.csv tab_keys_note overrides. */

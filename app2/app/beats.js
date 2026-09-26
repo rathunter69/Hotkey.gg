@@ -25,6 +25,11 @@ const BEATS_DEFAULT = {
     body: 'Every figure on the Report links to Raw and Inputs, so a corrected feed flows through without retyping. SUM and its family, anchoring with F4, links across sheets, and what each error means.' },
   'present-and-audit': { eyebrow: 'Module 1.7 · present and audit', title: 'Sign the page off.',
     body: 'The buyer’s analyst opens page one first. Check the totals tie, the conventions hold, the print fits one page, and nothing is hardcoded that should not be. Then it goes in the pack.' },
+  // Chapter 2 · Formatting and presentation (Run 1: 2.1 and 2.2; the rest land with their modules)
+  'number-formats': { eyebrow: 'Module 2.1 · number formats', title: 'A three-year P&L, the way the export wrote it.',
+    body: 'General numbers with stray cents, costs typed positive, a site count dressed as dollars, bare years over the timeline. The built-in styles first: comma, Accounting, percent and date, and the sign convention stated once up top.' },
+  'custom-number-formats': { eyebrow: 'Module 2.2 · custom number formats', title: 'The house set is a code.',
+    body: 'Four sections, positive, negative, zero and text; a unit that rides in the format; a header built from a date with TEXT; a condition or a color in front, an empty section to hide a zero. The Custom box, Ctrl+1 then U, does all of it.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

@@ -14,7 +14,7 @@ import { COPY_DIR, FILES, HEADERS, readCopyDir, renderIndex } from './copy-build
 import { parseCsv, toCsv } from '../content/copy/csv.js';
 import { joinParas } from '../content/copy/apply.js';
 import { SITE_KEYS } from '../content/copy/rules.js';
-import { CHAPTERS, modulesOf, moduleOf } from '../content/index.js';
+import { CHAPTERS, modulesOf, moduleOf, sectionsOf } from '../content/index.js';
 import { CONVENTIONS } from '../content/conventions.js';
 import { BRIEFING, ORIENTATION } from '../app/first-run-next.js';
 import { HEADLINES, SUBHEAD, MODES } from '../app/landing-next.js';
@@ -24,6 +24,7 @@ import { STAGES } from '../app/deal-strip.js';
 import { DASH_LINES, DUE_LINES, SAVE_NUDGE } from '../app/home-next.js';
 import { INSTALL_PROMPT } from '../app/install.js';
 import { MICRO } from '../app/schedule.js';
+import { moduleNumber } from '../app/numbering.js';
 
 const conv = ids => (ids || []).map(id => (CONVENTIONS[id] ? CONVENTIONS[id].short : id)).join(' · ');
 
@@ -128,10 +129,11 @@ export const PLANNED = [
 
 /** The map's module numbers by module id (the retired Welcome module is not counted). */
 export const PLANNED_MODULE_IDS = { '1.1': 'open-and-set-up', '1.2': 'move-and-select', '1.3': 'enter-edit-copy-fill', '1.4': 'structure', '1.5': 'format', '1.6': 'formulas', '1.7': 'present-and-audit' };
-const moduleN = (id, k) => Object.keys(PLANNED_MODULE_IDS).find(n => PLANNED_MODULE_IDS[n] === id) || '1.' + k;
+const moduleN = (id, k) => moduleNumber(id, k) || Object.keys(PLANNED_MODULE_IDS).find(n => PLANNED_MODULE_IDS[n] === id) || '1.' + k;
 const PAGE_NAMES = {
   'open-and-set-up': 'The workbook, set up to standard', 'move-and-select': 'The feed, answered', 'enter-edit-copy-fill': 'The Report skeleton', structure: 'The Report, reshaped',
   format: 'The Report, formatted', formulas: 'The Report, live', 'present-and-audit': 'Page one of the pack', 'project-and-assessment': 'The weekly KPI report',
+  'number-formats': 'The P&L, numbers to standard', 'custom-number-formats': 'The house number-format set',
 };
 
 /** Everything the screens say today, keyed the way rules.js SITE_KEYS names it. */
@@ -152,13 +154,13 @@ export function siteDefaults() {
 
 /** The merged copy set: existing cells win, then the JS copy, then the drafts. Pure over `current`. */
 export function exportCopy(current) {
-  const ch1 = CHAPTERS[0];
   const lessons = [], goals = [], modules = [], site = [];
   const fill = (row, key, value) => { if (!(typeof row[key] === 'string' && row[key].trim()) && value != null && value !== '') row[key] = String(value); };
   const seen = new Set();
   const lessonRow = id => { const r = { ...(current.lessons[id] || {}) }; for (const h of HEADERS['lessons.csv']) if (r[h] == null) r[h] = ''; r.id = id; return r; };
-  // module lessons in catalog order (legacy lessons keep their JS copy until the rewrite replaces them)
-  for (const l of ch1.lessons) {
+  // module lessons in catalog order, every chapter (legacy lessons keep their JS copy until the rewrite replaces them;
+  // a later chapter's rows arrive as drafts of its JS copy, for Wolf's rewrite)
+  for (const l of CHAPTERS.flatMap(ch => ch.lessons)) {
     if (typeof l.module !== 'string' || l.module === 'welcome') continue;
     const at = moduleOf(l);
     const r = lessonRow(l.id);
@@ -186,7 +188,7 @@ export function exportCopy(current) {
   for (const id of current.order) if (!seen.has(id)) { lessons.push(lessonRow(id)); for (const g of current.goals[id] || []) goals.push({ ...g }); }
   lessons.sort((a, b) => orderKey(a.order) - orderKey(b.order) || a.id.localeCompare(b.id));
   // modules: the built ones first, then the planned, then anything only the CSV knows
-  const built = modulesOf(ch1).filter(m => m.id !== 'welcome');
+  const built = CHAPTERS.flatMap(ch => modulesOf(ch)).filter(m => m.id !== 'welcome');
   const mseen = new Set();
   const moduleRow = (id, name, objective) => {
     const r = { ...(current.modules[id] || {}) }; for (const h of HEADERS['modules.csv']) if (r[h] == null) r[h] = ''; r.id = id;
@@ -194,7 +196,7 @@ export function exportCopy(current) {
     fill(r, 'name', name); fill(r, 'objective', objective); fill(r, 'story_beat', beat ? joinParas([beat.title, beat.body]) : ''); fill(r, 'page_name', PAGE_NAMES[id]);
     modules.push(r); mseen.add(id);
   };
-  for (const m of built) { const plan = PLANNED_MODULES.find(p => p.title === m.title) || {}; moduleRow(m.id, m.title, plan.objective || ''); }
+  for (const m of built) { const plan = PLANNED_MODULES.find(p => p.title === m.title) || {}; const sec = CHAPTERS.flatMap(ch => sectionsOf(ch)).find(x => x.name === m.title) || {}; moduleRow(m.id, m.title, plan.objective || sec.blurb || ''); }
   for (const p of PLANNED_MODULES) { const id = PLANNED_MODULE_IDS[p.n]; if (id && !mseen.has(id)) moduleRow(id, p.title, p.objective); }
   if (!mseen.has('project-and-assessment')) moduleRow('project-and-assessment', 'Project, assessment, test-out', 'Build the weekly report end to end, then prove it against the clock; or test out of the chapter.');
   for (const id in current.modules) if (!mseen.has(id)) moduleRow(id, '', '');

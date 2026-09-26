@@ -268,8 +268,8 @@ function safeCheck(g, sheet, session) { try { return !!g.check(sheet, session); 
 const HINT_GLYPHS = { '↵': 'Enter', '⌫': 'Backspace', '↑': 'Up', '↓': 'Down', '←': 'Left', '→': 'Right', Esc: 'Escape' };
 export function hintToScript(keys) {
   const out = [];
-  for (const t of String(keys || '').match(/"[^"]*"|\S+/g) || []) {
-    if (t.startsWith('"')) { out.push(t); continue; }
+  for (const t of String(keys || '').match(/"[^"]*"|'[^']*'|\S+/g) || []) {
+    if (t.startsWith('"') || t.startsWith("'")) { out.push(t); continue; }   // '…' carries text with double quotes inside (Chapter 2's TEXT() formulas)
     const rep = /^×(\d+)$/.exec(t);
     if (rep) { const last = out[out.length - 1]; if (last) for (let i = 1; i < Math.min(+rep[1], 50); i++) out.push(last); continue; }
     const norm = t.split('+').map(p => HINT_GLYPHS[p] || p).join('+');

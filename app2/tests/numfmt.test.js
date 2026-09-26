@@ -78,8 +78,8 @@ test('the Custom box is lenient where Excel is: lone letters are quoted, real co
 test('the built-in styles as codes; Increase / Decrease Decimal rewrite a code section by section', () => {
   assert.equal(builtinCode('comma', 2), '#,##0.00_);(#,##0.00)'); assert.equal(builtinCode('currency', 0, 3), '$#,##0,_);($#,##0,)');
   assert.equal(builtinCode('percent', 1), '0.0%'); assert.equal(builtinCode('mult', 1), '0.0"x"'); assert.equal(builtinCode('date'), 'mmm-yy'); assert.equal(builtinCode('general'), 'General');
-  assert.equal(stepDecimals(HOUSE_FORMATS.plain, 1), '#,##0.0_);(#,##0.0);"-"_)');
-  assert.equal(stepDecimals('#,##0.0_);(#,##0.0);"-"_)', -1), HOUSE_FORMATS.plain);
+  assert.equal(stepDecimals(HOUSE_FORMATS.plain, 1), '#,##0.0_);(#,##0.0);-_)');
+  assert.equal(stepDecimals('#,##0.0_);(#,##0.0);-_)', -1), HOUSE_FORMATS.plain);
   assert.equal(stepDecimals('0.0%', -1), '0%'); assert.equal(stepDecimals('0%', -1), '0%'); assert.equal(stepDecimals('0.0"x"', 1), '0.00"x"');
   assert.equal(codeDecimals('0.00%'), 2); assert.equal(codeDecimals(HOUSE_FORMATS.plain), 0); assert.equal(codeDecimals('mmm-yy'), 0);
   assert.equal(F(1234.5, stepDecimals(HOUSE_FORMATS.plain, 1)), '1,234.5 ');
@@ -103,7 +103,7 @@ test('Sheet.setCustomFormat: the selection takes the code, decimals mirror it, G
   assert.equal(S.setCustomFormat(HOUSE_FORMATS.plain), true);
   for (const r of ['A1', 'A2', 'A3']) { assert.equal(S.cellAt(r).fmtStyle, 'custom'); assert.equal(S.cellAt(r).numFmt, HOUSE_FORMATS.plain); }
   assert.deepEqual(['A1', 'A2', 'A3'].map(r => S.text(r)), ['1,235 ', '(2)', '- ']);
-  S.changeDecimals(1); assert.equal(S.cellAt('A1').numFmt, '#,##0.0_);(#,##0.0);"-"_)'); assert.equal(S.cellAt('A1').decimals, 1); assert.equal(S.text('A1'), '1,234.5 ');
+  S.changeDecimals(1); assert.equal(S.cellAt('A1').numFmt, '#,##0.0_);(#,##0.0);-_)'); assert.equal(S.cellAt('A1').decimals, 1); assert.equal(S.text('A1'), '1,234.5 ');
   S.changeDecimals(-1); assert.equal(S.cellAt('A1').numFmt, HOUSE_FORMATS.plain);
   S.goTo(1, 2); assert.equal(S.setCustomFormat('0.0x'), true); assert.equal(S.cellAt('B1').numFmt, '0.0"x"'); assert.equal(S.text('B1'), '2.5x');
   assert.equal(S.setCustomFormat('0;0;0;0;0'), false); assert.equal(S.cellAt('B1').numFmt, '0.0"x"');   // five sections: refused, nothing changes

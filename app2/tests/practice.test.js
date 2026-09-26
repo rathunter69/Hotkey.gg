@@ -6,13 +6,13 @@ import { DRILLS } from '../content/drills.js';
 import { lessonById, CHAPTERS, modulesOf } from '../content/index.js';
 import { DRILL_MODULE, drillModule, moduleTaught, runLabel, challengeName, fmtSecs } from '../app/practice-page.js';
 
-test('practice: every drill names the chapter 1 module that teaches its keys', () => {
-  const ids = new Set(modulesOf(CHAPTERS[0]).map(m => m.id));
+test('practice: every drill names the module that teaches its keys (chapter 1 for the keyed drills, its own chapter for a challenge)', () => {
+  const ids = new Set(CHAPTERS.flatMap(ch => modulesOf(ch).map(m => m.id)));
   for (const d of DRILLS) {
     const m = drillModule(d);
     assert.ok(m, `${d.id} has no teaching module`);
     assert.ok(ids.has(m.id), `${d.id} → unknown module ${m.id}`);
-    assert.match(m.n, /^1\.[1-7]$/, `${d.id} → ${m.n}`);
+    assert.match(m.n, d.kind === 'challenge' && d.chapter !== 'foundations' ? /^2\.[1-7]$/ : /^1\.[1-7]$/, `${d.id} → ${m.n}`);
   }
   // the map covers exactly the non-challenge drills (a new drill must be added to it)
   assert.deepEqual(Object.keys(DRILL_MODULE).sort(), DRILLS.filter(d => d.kind !== 'challenge').map(d => d.id).sort());

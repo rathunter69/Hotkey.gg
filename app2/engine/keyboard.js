@@ -111,7 +111,8 @@ export function parseKeyScript(script) {
   while (i < s.length) {
     const ch = s[i];
     if (/\s/.test(ch)) { i++; continue; }
-    if (ch === '"') { let j = i + 1, t = ''; while (j < s.length && s[j] !== '"') { t += s[j++]; } out.push({ type: 'text', text: t }); i = j + 1; continue; }
+    // "…" types its characters; '…' does the same for text that itself carries double quotes (a TEXT() formula)
+    if (ch === '"' || ch === "'") { let j = i + 1, t = ''; while (j < s.length && s[j] !== ch) { t += s[j++]; } out.push({ type: 'text', text: t }); i = j + 1; continue; }
     let j = i; while (j < s.length && !/\s/.test(s[j])) j++;
     const tok = s.slice(i, j); i = j;
     if (/^[0-9.]{2,}$/.test(tok)) { out.push({ type: 'text', text: tok }); continue; }   // 20 types two digits; a single digit is the same either way
@@ -935,7 +936,7 @@ export class Session {
       return;
     }
     if (key === 'Backspace') { this.dialogBuf = this.dialogBuf.slice(0, -1); this.note = ''; return; }
-    if (key.length === 1 && /[A-Za-z0-9:$!' ]/.test(key) && this.dialogBuf.length < 64) { this.dialogBuf += key.toUpperCase(); this.note = ''; }
+    if (key.length === 1 && /[A-Za-z0-9:$!' &_.()\-]/.test(key) && this.dialogBuf.length < 64) { this.dialogBuf += key.toUpperCase(); this.note = ''; }   // a sheet name may carry & . _ - ( ) ('P&L'!D23)
   }
 
   /* ---------------- Excel Options (Alt F T) and Page Setup (Alt P S P): recorded settings ---------------- */
