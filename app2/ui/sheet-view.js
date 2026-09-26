@@ -15,7 +15,7 @@
 //   view.destroy();
 
 import { COLW_DEFAULT, cellNumPx, cellTxtPx } from '../engine/sheet.js';
-import { dispText } from '../engine/format.js';
+import { dispText, dispColor, HASHES } from '../engine/format.js';
 import { colLetter, refKey, parseRef } from '../engine/refs.js';
 import { formulaRefs, isErrVal } from '../engine/formula.js';
 import { recordMouse, MODAL_DIALOGS } from './ribbon-commands.js';
@@ -145,11 +145,27 @@ export class SheetView {
     const th = t.closest('th'); if (!th || !this.grid.contains(th)) return null;
     const tr = th.parentElement; const S = this.sheet = this.session.sheet;
     if (tr === this.grid.rows[0]) return th.cellIndex === 0 ? { hdr: 'all' } : { hdr: 'col', c: th.cellIndex };
-    const r = parseInt(th.textContent, 10);
+    const r = parseInt(th.dataset.row || th.textContent, 10);   // data-row: the header's text may start with the outline's ⊖ / ⊕
     return (r >= 1 && r <= S.rows) ? { hdr: 'row', r } : null;
   }
   onMouseDown(e) {
     if (e.button !== 0) return;
+    // the outline bar's ⊖ / ⊕ (C2 gap 4): fold or unfold that group, recorded like any header click
+    const ob = e.target && e.target.closest ? e.target.closest('.ol-btn') : null;
+    if (ob && this.grid.contains(ob)) {
+      e.preventDefault();
+      if (e.detail > 1) return;   // the second press of a double-click: one fold, not two
+      const ss0 = this.session, S0 = this.sheet = ss0.sheet;
+      if (ss0.dialog && MODAL_DIALOGS.has(ss0.dialog)) return;
+      if (ss0.mode === 'ribbon') ss0.exitRibbon(false);
+      if (ss0.editing && !ss0.commitEdit(0, 0, { kind: 'move' })) { ss0.emit('mouse'); return; }
+      const [axis, idx] = String(ob.dataset.ol || '').split(':');
+      const g = S0.groups[axis === 'r' ? 'rows' : 'cols'][+idx];
+      if (g) { ss0.startClock(); S0.setGroupFold(axis, +idx, !g.collapsed); }
+      recordMouse(ss0, 'header');
+      ss0.emit('mouse');
+      return;
+    }
     const h = this.hit(e); if (!h) return;
     e.preventDefault();   // the sheet keeps the keyboard; no text selection starts
     if (e.detail > 1) return;   // the second press of a double-click: dblclick handles it
@@ -233,9 +249,21 @@ export class SheetView {
     const hidC = S.hiddenCols || new Set(), hidR = S.hiddenRows || new Set();
     const rowH = S.rowH || [];
     const freeze = S.freeze || { r: 0, c: 0 };
-    for (let c = 1; c <= COLS; c++) { const w = hidC.has(c) ? 0 : (colW[c] || COLW_DEFAULT); W[c] = w; totalW += w; L[c] = colLetter(c); }
+    // the outline (C2 gap 4): a collapsed group folds its rows / columns away in the view — never
+    // through hiddenRows / hiddenCols, so graders can tell grouped from hidden — and every group
+    // draws a bracket on the header with a ⊖ / ⊕ on the row or column just past it (Excel's bar)
+    const groups = S.groups || { rows: [], cols: [] };
+    const foldC = new Set(), foldR = new Set(), olC = new Set(), olR = new Set(), btnC = {}, btnR = {};
+    // the button sits just past the band (Excel's summary row / column); a band ending on the sheet's last row or column keeps it just before, where it stays reachable folded
+    const host = (g2, g1, max) => (g2 < max ? g2 + 1 : g1 > 1 ? g1 - 1 : 0);
+    groups.cols.forEach((g, i) => { for (let c = g.c1; c <= g.c2; c++) { if (g.collapsed) foldC.add(c); else olC.add(c); } const h = host(g.c2, g.c1, COLS); if (h) btnC[h] = { i, on: !!g.collapsed }; });
+    groups.rows.forEach((g, i) => { for (let r = g.r1; r <= g.r2; r++) { if (g.collapsed) foldR.add(r); else olR.add(r); } const h = host(g.r2, g.r1, ROWS); if (h) btnR[h] = { i, on: !!g.collapsed }; });
+    const showFx = !!(ss.settings && ss.settings.showFormulas);   // Ctrl+` (C2 gap 5): formula text in place of values
+    const cf = S.condFmt && S.condFmt.length ? S.condFmtMap() : null;   // conditional formatting (Chapter 2): evaluated once per paint
+    for (let c = 1; c <= COLS; c++) { const w = hidC.has(c) || foldC.has(c) ? 0 : (colW[c] || COLW_DEFAULT); W[c] = w; totalW += w; L[c] = colLetter(c); }
     this.ew = W;
-    const N = ROWS * COLS, shape = ROWS + 'x' + COLS + ':' + W.join(',') + '|' + [...hidR].join('.') + '|' + rowH.join('.') + '|' + freeze.r + ',' + freeze.c;
+    const olBtn = (axis, b) => (b ? '<button type="button" tabindex="-1" class="ol-btn' + (b.on ? ' on' : '') + '" data-ol="' + axis + ':' + b.i + '" title="' + (b.on ? 'Show detail' : 'Hide detail') + '">' + (b.on ? '+' : '−') + '</button>' : '');
+    const N = ROWS * COLS, shape = ROWS + 'x' + COLS + ':' + W.join(',') + '|' + [...hidR].join('.') + '|' + rowH.join('.') + '|' + freeze.r + ',' + freeze.c + '|' + JSON.stringify(groups);
     const patch = this._shape === shape && !!this._tds && this._tds.length === N && this.grid.rows.length === ROWS + 1;
     if (!patch) { this._cls = new Array(N); this._sty = new Array(N); this._txt = new Array(N); }
     const oldCls = this._cls, oldSty = this._sty, oldTxt = this._txt, tds = this._tds;
@@ -243,7 +271,8 @@ export class SheetView {
     const sr = S.selRange(), hasSel = !!S.sel;
     let refColors = {};
     if (ss.editing) refColors = parseFormulaRefs(ss.editBuf).cellColors;
-    const editing = ss.editing, editPointer = ss.editPointer;
+    // an entry pointing on another sheet (Ctrl+PgDn mid-formula) shows only in the formula bar here: the editor box stays on its own sheet
+    const editing = ss.editing && (ss.editOrigin == null || ss.editOrigin === ss.sheetIndex), editPointer = ss.editPointer;
     // the DISPLAYED active cell is the selection ANCHOR (Excel-true)
     const dA = S.dispActive();
 
@@ -255,7 +284,7 @@ export class SheetView {
       gh = '<colgroup><col style="width:' + ROWHDR_W + 'px">';
       for (let c = 1; c <= COLS; c++) gh += '<col style="width:' + W[c] + 'px">';
       gh += '</colgroup><tr><th class="rowhdr"></th>';
-      for (let c = 1; c <= COLS; c++) gh += '<th class="' + (hidC.has(c) ? 'hidc' : hidC.has(c - 1) ? 'seam-c' : '') + '">' + L[c] + '</th>';
+      for (let c = 1; c <= COLS; c++) gh += '<th class="' + (hidC.has(c) || foldC.has(c) ? 'hidc' : hidC.has(c - 1) ? 'seam-c' : '') + (olC.has(c) ? ' ol-c' : '') + (btnC[c] ? ' ol-host' : '') + '">' + olBtn('c', btnC[c]) + L[c] + '</th>';
       gh += '</tr>';
     }
 
@@ -263,13 +292,13 @@ export class SheetView {
     for (let r = 1; r <= ROWS; r++) {
       const rowIn = hasSel && r >= sr.r1 && r <= sr.r2;
       const rh = rowH[r] || ROW_H;
-      let row = patch ? '' : '<tr' + (hidR.has(r) ? ' class="hidrow"' : rh !== ROW_H ? ' style="height:' + rh + 'px"' : '') + '><th class="rowhdr' + (hidR.has(r - 1) ? ' seam-r' : '') + '">' + r + '</th>';
+      let row = patch ? '' : '<tr' + (hidR.has(r) || foldR.has(r) ? ' class="hidrow"' : rh !== ROW_H ? ' style="height:' + rh + 'px"' : '') + '><th class="rowhdr' + (hidR.has(r - 1) ? ' seam-r' : '') + (olR.has(r) ? ' ol-r' : '') + (btnR[r] ? ' ol-host' : '') + '" data-row="' + r + '">' + olBtn('r', btnR[r]) + r + '</th>';
       for (let c = 1; c <= COLS; c++, i++) {
         const isActive = (r === dA.r && c === dA.c);
         const inSel = rowIn && c >= sr.c1 && c <= sr.c2;
         const isPoint = !!(editing && editPointer && r === editPointer.r && c === editPointer.c);
         let cls = isActive ? 'active' : (inSel ? 'sel' : '');
-        if (hidC.has(c)) cls += ' hidc';
+        if (hidC.has(c) || foldC.has(c)) cls += ' hidc';
         if (freeze.r && r === freeze.r) cls += ' frz-b';
         if (freeze.c && c === freeze.c) cls += ' frz-r';
         if (isPoint) cls += ' point';
@@ -294,15 +323,22 @@ export class SheetView {
           if (cell.bt) cls += ' bt'; if (cell.bb) cls += ' bb'; if (cell.ball) cls += ' ball'; if (cell.bdbl) cls += ' bdbl';
           if (cell.bl) cls += ' bl'; if (cell.br) cls += ' br'; if (cell.thick) cls += ' thick';
           if (cell.align) cls += ' align-' + cell.align;
-          if (cell.fontColor) cls += ' fc-' + cell.fontColor;
+          const fcKey = dispColor(cell) || cell.fontColor;   // a custom code's [Red] section wins over the font colour, as in Excel
+          if (fcKey) { if (fcKey[0] === '#') style += ';color:' + fcKey; else cls += ' fc-' + fcKey; }   // [Color 9]: a palette hex the swatches lack
 
-          txt = escHtml(dispText(cell));
+          const shown = dispText(cell);
+          // the td collapses spaces (white-space:nowrap): a number keeps every one — the _) pad that lines
+          // 1,235 up under (1,235), the accounting $   -   — and text keeps its leading and trailing run
+          txt = isNum ? escHtml(shown).replace(/ /g, '&nbsp;') : escHtml(shown).replace(/^ +| +$/g, m => '&nbsp;'.repeat(m.length));
+          const fxShown = showFx && !!cell.formula && !(editing && isActive);
+          if (fxShown) { cls += ' txt fxshow'; txt = escHtml(cell.formula); }   // show formulas: the text, left-aligned, no #### verdict
           if (editing && isActive) {
             // Editing cell: the formula buffer with coloured refs (matches the formula bar), in the pop-out overlay
             const { refs } = parseFormulaRefs(ss.editBuf);
             cls += ' editing';
             txt = '<span class="edbox"><span class="edin">' + buildFormulaHTML(ss.editBuf, refs, ss.editCaret) + '</span></span>';
           }
+          else if (fxShown) { /* painted above */ }
           else if (cell.txt && (cell.ca | 0) > 1 && typeof cell.value === 'string') {
             // CENTER ACROSS SELECTION — the anchor's text centers over its stored span; no merged cells
             let caw = 0; for (let k2 = 0; k2 < cell.ca && c + k2 <= COLS; k2++) caw += W[c + k2];
@@ -324,9 +360,10 @@ export class SheetView {
             }
           }
           else if (isNum && !cell.wrap) {
-            // #### when the number needs more than the column's engine width
+            // #### when the number needs more than the column's engine width, or when its format cannot
+            // show it at all (a negative date, a value no section fits): the engine's own # fill
             const tw = cellNumPx(cell);
-            if (tw > W[c]) { cls += ' over'; txt = '#'.repeat(Math.max(3, Math.floor((W[c] - 2 * CELL_PAD) / HASH_PX))); }
+            if (tw > W[c] || shown === HASHES) { cls += ' over'; txt = '#'.repeat(Math.max(3, Math.floor((W[c] - 2 * CELL_PAD) / HASH_PX))); }
           }
 
           if (cell.indent) {   // Alt H 6/5 indent — pad the content gutter (right edge for right-aligned cells)
@@ -334,6 +371,21 @@ export class SheetView {
             style += (cell.align === 'r') ? (';padding-right:' + pad + 'px') : (';padding-left:' + pad + 'px');
           }
           if (cell.fsz) style += ';font-size:' + cell.fsz + 'px';   // grow/shrink font (Alt H F G/K)
+        }
+        const cfc = cf && cf[key];   // a rule's paint: fill (a colour scale's too) / font colour / border / data bar, over the cell's own
+        if (cfc) {
+          if (cfc.fill) { cls += ' cf-fill'; style += ';--cf-fill:' + cfc.fill; }
+          if (cfc.fontColor) { cls += ' cf-fc'; style += ';--cf-fc:' + cfc.fontColor; }
+          if (cfc.border) { cls += ' cf-bd'; style += ';--cf-bd:' + cfc.border; }
+          if (cfc.bar) {
+            // Excel's automatic bar: a positive value runs right from the axis (where zero sits: the left
+            // edge unless the range holds negatives) in the rule colour, a negative runs left from it in red
+            const b = cfc.bar, axis = b.axis || 0;
+            const x1 = b.neg ? axis * (1 - b.pct) : axis, x2 = b.neg ? axis : axis + b.pct * (1 - axis), col = b.neg ? '#ff0000' : b.color;
+            const pc = x => (Math.round(x * 1000) / 10) + '%';
+            cls += ' cf-bar';   // the class keeps the bar from repeating; the gradient itself is inline, since the stylesheet's template only knows a left-anchored bar
+            style += ';background-image:linear-gradient(90deg, transparent ' + pc(x1) + ', ' + col + ' ' + pc(x1) + ', ' + col + ' ' + pc(x2) + ', transparent ' + pc(x2) + ') !important';
+          }
         }
 
         if (patch) {
@@ -449,10 +501,11 @@ export class SheetView {
     ss.pageRows = Math.max(1, nr); ss.pageCols = Math.max(1, nc);
   }
 
-  /** The marching ants over the copied block (sheet.clipboard.rect), placed over the live cells. */
+  /** The marching ants over the copied block (sheet.clipboard.rect), placed over the live cells — only on the sheet the block was copied from. */
   positionMarquee() {
     const m = this.marquee; if (!m) return;
-    const rect = this.sheet.clipboard && this.sheet.clipboard.rect;
+    const cb = this.sheet.clipboard;
+    const rect = cb && (!cb.src || cb.src === this.sheet) ? cb.rect : null;
     if (!rect) { m.style.display = 'none'; return; }
     const a = this.grid.querySelector(`td[data-r="${rect.r1}"][data-c="${rect.c1}"]`);
     const b = this.grid.querySelector(`td[data-r="${rect.r2}"][data-c="${rect.c2}"]`);

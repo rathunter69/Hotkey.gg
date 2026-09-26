@@ -14,7 +14,8 @@ import { ACCOUNT_ITEMS } from '../ui/nav.js';
 
 /* ---------------- prefs ---------------- */
 test('prefs: defaults follow the detected platform', () => {
-  assert.deepEqual(defaultPrefs('mac'), { platform: 'mac', experience: null, firstRunDone: false, skipped: [], ribbon: null, mute: false, effects: 'full', ghost: true });
+  assert.deepEqual(defaultPrefs('mac'), { platform: 'mac', experience: null, firstRunDone: false, skipped: [], ribbon: null, mute: false, effects: 'full', ghost: true,
+    density: 'comfortable', panelSide: 'overlay', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false, dashHintsSeen: false, pagesDelivered: [], tabKeysNoted: false });
   assert.equal(defaultPrefs('amiga').platform, 'win');
   assert.equal(PREFS_KEY, 'hk2_prefs');
 });
@@ -28,7 +29,8 @@ test('prefs: corrupt and wrong-typed values normalise to defaults', () => {
 
 test('prefs: valid values survive; skipped keeps unique non-empty strings, capped', () => {
   const p = normalisePrefs({ platform: 'mac', experience: 'daily', firstRunDone: true, skipped: ['a', 'a', '', 7, null, 'b'], ribbon: 'slim', mute: true }, 'win');
-  assert.deepEqual(p, { platform: 'mac', experience: 'daily', firstRunDone: true, skipped: ['a', 'b'], ribbon: 'slim', mute: true, effects: 'full', ghost: true });
+  assert.deepEqual(p, { platform: 'mac', experience: 'daily', firstRunDone: true, skipped: ['a', 'b'], ribbon: 'slim', mute: true, effects: 'full', ghost: true,
+    density: 'comfortable', panelSide: 'overlay', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false, dashHintsSeen: false, pagesDelivered: [], tabKeysNoted: false });
   const many = normalisePrefs({ skipped: Array.from({ length: 2000 }, (_, i) => 'l' + i) }, 'win');
   assert.equal(many.skipped.length, 500);
 });
@@ -77,13 +79,15 @@ test('pickNextLesson: the first lesson neither completed nor skipped, in catalog
 });
 
 test('pickNextLesson: works on the real catalogue with placement skips', () => {
-  // 'move' skips the Welcome race, the workbook lesson and the Moving section; 'select' the Selecting section;
-  // the section-1 Options and Page Setup lessons are never skipped, so a daily user starts there at the latest
+  // 'move' skips 1.2.1, 'select' 1.2.2, 'type-bold' 1.1.2: the first lesson (1.1.1) is never skipped, so everyone starts there
   const skipped = skipsFor(['move', 'select']);
-  const next = pickNextLesson(LESSONS, {}, skipped);
-  assert.equal(next.id, 'managing-sheets');   // the first lesson no placement task covers
-  assert.equal(pickNextLesson(LESSONS, {}, skipsFor(['move', 'select', 'type-bold'])).id, 'managing-sheets');   // no placement task covers sheet management
-  assert.equal(pickNextLesson(LESSONS, {}, []).id, 'welcome-race');
+  assert.equal(pickNextLesson(LESSONS, {}, skipped).id, 'inherited-workbook');
+  assert.equal(pickNextLesson(LESSONS, {}, []).id, 'inherited-workbook');
+  // once 1.1 is done, the placement skips steer past the skipped lessons to the first uncovered one
+  const done = Object.fromEntries(['inherited-workbook', 'ribbon-by-keyboard', 'analyst-setup', 'colour-label-hardcode', 'challenge-inherited-file'].map(id => [id, { completed: true }]));
+  assert.equal(pickNextLesson(LESSONS, done, []).id, 'jump-dont-scroll');
+  assert.equal(pickNextLesson(LESSONS, done, skipped).id, 'around-the-workbook');
+  assert.equal(pickNextLesson(LESSONS, done, skipsFor(['move'])).id, 'select-like-you-mean-it');
 });
 
 test('matchesFilters: status, difficulty, access and a word search', () => {
@@ -138,7 +142,7 @@ test('parseRoute: every documented route, with params and query', () => {
 });
 
 test('navKeyFor and titleFor', () => {
-  assert.equal(navKeyFor('root'), 'learn'); assert.equal(navKeyFor('lesson'), 'learn'); assert.equal(navKeyFor('start'), 'learn');
+  assert.equal(navKeyFor('root'), ''); assert.equal(navKeyFor('landing'), ''); assert.equal(navKeyFor('lesson'), 'learn'); assert.equal(navKeyFor('start'), ''); assert.equal(navKeyFor('learn'), 'learn');
   assert.equal(navKeyFor('drill'), 'practice'); assert.equal(navKeyFor('leaderboard'), 'leaderboard'); assert.equal(navKeyFor('reference'), 'reference');
   assert.equal(navKeyFor('pricing'), '');
   assert.equal(titleFor('learn'), 'Learn · hotkey.gg');
@@ -150,12 +154,12 @@ test('navKeyFor and titleFor', () => {
 /* ---------------- placement, teams form, shell lists ---------------- */
 test('placement: passed tasks map to skipped lessons that exist, without duplicates', () => {
   assert.deepEqual(skipsFor([]), []);
-  assert.deepEqual(skipsFor(['move']), ['welcome-race', 'workbook-sheets-cells', 'active-cell', 'moving-around']);
-  assert.deepEqual(skipsFor(['move', 'move', 'select']), ['welcome-race', 'workbook-sheets-cells', 'active-cell', 'moving-around', 'selecting-ranges']);
-  assert.deepEqual(skipsFor(['type-bold']), ['ribbon-and-keytips', 'entering-data', 'ribbon-commands']);
+  assert.deepEqual(skipsFor(['move']), ['jump-dont-scroll']);
+  assert.deepEqual(skipsFor(['move', 'move', 'select']), ['jump-dont-scroll', 'select-like-you-mean-it']);
+  assert.deepEqual(skipsFor(['type-bold']), ['ribbon-by-keyboard']);
   const ids = new Set(LESSONS.map(l => l.id));
   for (const t of PLACEMENT_TASKS) for (const id of t.skips) assert.ok(ids.has(id), `${t.id} skips a real lesson: ${id}`);
-  for (const id of ['excel-options', 'page-setup']) assert.ok(!skipsFor(PLACEMENT_TASKS.map(t => t.id)).includes(id), `${id} is never skipped by placement`);
+  for (const id of ['inherited-workbook', 'analyst-setup', 'colour-label-hardcode']) assert.ok(!skipsFor(PLACEMENT_TASKS.map(t => t.id)).includes(id), `${id} is never skipped by placement`);
   assert.equal(PLACEMENT_TASKS.length, 3);
 });
 
@@ -209,4 +213,49 @@ test('legal pages: real drafts, DRAFT banner gated on LEGAL_STATUS.reviewed, dis
   }
   assert.match(renderLegal('contact'), /hello@hotkey\.gg/, 'contact page has the support address');
   assert.match(renderLegal('privacy'), /privacy@hotkey\.gg/);
+});
+
+/* ---------------- the Learn path model (C2 gap 9) ---------------- */
+import { moduleStatus, pathModel } from '../app/learn-page.js';
+import { CHAPTERS, modulesOf, moduleOf } from '../content/index.js';
+
+const MOD = { id: 'open-and-set-up', lessons: [{ id: 'm1' }, { id: 'm2' }], challenge: { id: 'mc', title: 'The challenge' } };
+test('moduleStatus: lessons plus the challenge pass make complete; lessons alone stop at lessons-done', () => {
+  assert.equal(moduleStatus(MOD, {}), 'todo');
+  assert.equal(moduleStatus(MOD, { m1: { started: true } }), 'started');
+  assert.equal(moduleStatus(MOD, { m1: { completed: true } }), 'started');
+  assert.equal(moduleStatus(MOD, { m1: { completed: true }, m2: { completed: true } }), 'lessons-done');
+  assert.equal(moduleStatus(MOD, { m1: { completed: true }, m2: { completed: true }, mc: { challenge: true, tier: 'pass' } }), 'complete');
+  assert.equal(moduleStatus({ ...MOD, challenge: null }, { m1: { completed: true }, m2: { completed: true } }), 'complete', 'a module without a challenge (the Welcome) completes on its lessons');
+  assert.equal(moduleStatus(MOD, { mc: { challenge: true } }), 'started', 'a challenge pass alone is a start, not completion');
+});
+
+test('pathModel: items in order with the challenge last, one next-up, ring counts', () => {
+  const chapter = { id: 'x', lessons: [
+    { id: 'a', title: 'A', module: 'one', section: 'One' },
+    { id: 'b', title: 'B', module: 'one', section: 'One' },
+    { id: 'c', title: 'C', module: 'one', section: 'One', kind: 'challenge' },
+    { id: 'd', title: 'D', module: 'two', section: 'Two' },
+  ] };
+  const mods = pathModel(chapter, { a: { completed: true }, c: { challenge: true, tier: 'pro' } }, []);
+  assert.equal(mods.length, 2);
+  assert.deepEqual(mods[0].items.map(i => i.kind), ['lesson', 'lesson', 'challenge']);
+  assert.equal(mods[0].items[2].tier, 'pro');
+  assert.equal(mods[0].done, 2, 'the done ring counts lessons and the challenge alike');
+  assert.equal(mods[0].total, 3);
+  const nexts = mods.flatMap(m => m.items.filter(i => i.next));
+  assert.equal(nexts.length, 1, 'exactly one item pulses as next up');
+  assert.equal(nexts[0].id, 'b', 'the first open item in path order');
+  assert.equal(pathModel(CHAPTERS[0], {}, []).length, modulesOf(CHAPTERS[0]).length, 'the real chapter renders its authored modules');
+});
+
+test('moduleOf places a lesson inside its module and counts the chapter\'s modules', () => {
+  assert.equal(moduleOf({ id: 'legacy' }), null, 'legacy lessons sit in no module');
+  const mods = modulesOf(CHAPTERS[0]);
+  for (const m of mods) {
+    for (const [i, l] of m.lessons.entries()) {
+      const at = moduleOf(l);
+      assert.equal(at.module.id, m.id); assert.equal(at.n, i + 1); assert.equal(at.of, m.lessons.length); assert.equal(at.of7, mods.length);
+    }
+  }
 });

@@ -55,6 +55,7 @@ function navHtml(links, active, account) {
   }).join('\n          ');
   const acct = account ? `
           <div class="auth-slot" id="authSlot">
+            <a class="nav-signin" id="navSignIn" href="#/account">Sign in</a>
             <div class="user-menu" id="userMenu">
               <button class="user-btn" id="userBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="userDropdown" title="account">${NAV_ICONS.user}<span class="user-guest" id="userState">guest</span><span class="um-caret">▾</span></button>
               <div class="user-dropdown" id="userDropdown" role="menu" aria-labelledby="userBtn">
@@ -203,6 +204,7 @@ export function mountNav(el, opts = {}) {
    */
   function setUser(user) {
     signedIn = !!user;
+    const si = el.querySelector('#navSignIn'); if (si) si.hidden = !!user;
     const state = el.querySelector('#userState');
     if (state) {
       state.textContent = user ? (user.handle || '…') : 'guest';
@@ -227,7 +229,7 @@ export function mountNav(el, opts = {}) {
   /** The level chip (Phase D): shows from level 2 — a fresh visitor sees no game furniture. */
   function setLevel(lvl) {
     let chip = el.querySelector('#navLevel');
-    if (!Number.isFinite(lvl) || lvl < 2) { if (chip) chip.remove(); return; }
+    if (!Number.isFinite(lvl) || lvl < 1) { if (chip) chip.remove(); return; }   // L1 shows too: the orientation card points at it
     if (!chip) {
       chip = document.createElement('span'); chip.id = 'navLevel'; chip.className = 'nav-level';
       const tools = el.querySelector('.topnav-tools'); if (tools) tools.insertBefore(chip, tools.firstChild);

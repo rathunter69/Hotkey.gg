@@ -1,6 +1,7 @@
 // npm run check — the whole gate for the rebuild branch. Must finish in < 30 s.
 //   1. syntax: every app2/**/*.js parses as an ES module (node --check)
 //   2. isolation: nothing under app2/ imports from outside app2/ (the old build is off-limits)
+//   2b. public pages and content/copy/index.js are generated and must not drift; copy-check's rules hold
 //   3. unit tests: node --test app2/tests/
 // No dependencies, no framework, no browser.
 import { spawnSync } from 'node:child_process';
@@ -32,7 +33,8 @@ for (const f of files) {
 console.log(`syntax ok: ${files.length} modules`);
 
 // 2. isolation — static import specifiers must stay inside app2/
-const IMPORT_RX = /(?:^|[^\w$])(?:import|export)\s*(?:[\w${},*\s]+from\s*)?['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+// [^\w$-]: a hyphen before the keyword means a kebab-case id ('welcome-export'), not a statement
+const IMPORT_RX = /(?:^|[^\w$-])(?:import|export)\s*(?:[\w${},*\s]+from\s*)?['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
 for (const f of files) {
   const src = readFileSync(f, 'utf8');
   let m;
@@ -58,6 +60,13 @@ console.log('isolation ok: no imports from outside app2/');
 const pp = spawnSync(process.execPath, [join(here, 'public-pages.js')], { encoding: 'utf8' });
 if (pp.status !== 0) fail((pp.stderr || pp.stdout).trim());
 console.log(pp.stdout.trim());
+
+// 2c. the copy layer: content/copy/index.js is inlined from the CSVs and must not drift; the copy rules hold
+for (const script of ['copy-build.js', 'copy-check.js']) {
+  const r = spawnSync(process.execPath, [join(here, script)], { encoding: 'utf8' });
+  if (r.status !== 0) fail((r.stderr || r.stdout).trim());
+  const lines = (r.stdout + r.stderr).trim().split('\n'); console.log(lines[lines.length - 1]);
+}
 
 // 3. unit tests
 const testFiles = files.filter(f => f.endsWith('.test.js')).sort();

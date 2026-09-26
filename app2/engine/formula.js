@@ -31,6 +31,8 @@
 
 import { colLetter, colIndex, refKey } from './refs.js';
 import { serialToDate } from './format.js';
+import { formatValue, FormatError, numToText } from './numfmt.js';
+export { numToText };
 
 export const ERROR_CODES = ['#NULL!', '#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '#NUM!', '#N/A'];
 
@@ -177,7 +179,7 @@ export function parseFormula(src) {
         // whole-row range: 1:1, $1:$1
         const c = peek();
         if (c && c.t === 'op' && c.v === ':' && toks[p + 1] && toks[p + 1].t === 'num' && Number.isInteger(tk.v) && Number.isInteger(toks[p + 1].v)) {
-          p += 2; return { k: 'rowrange', a: tk.v, b: toks[p - 1].v };
+          p += 2; return { k: 'rowrange', a: tk.v, b: toks[p - 1].v, absA: !!tk.abs, absB: !!toks[p - 1].abs };   // the $ flags, for an offset evaluation (conditional formatting)
         }
         if (tk.abs) throw new SyntaxError('unexpected $');
         return { k: 'num', v: tk.v };
@@ -198,7 +200,7 @@ export function parseFormula(src) {
         const c = peek();
         if (c && c.t === 'op' && c.v === ':' && /^[A-Z]{1,3}$/.test(nm)) {
           const d = toks[p + 1];
-          if (d && d.t === 'name' && /^\$?[A-Z]{1,3}$/.test(d.v)) { p += 2; return { k: 'colrange', a: nm, b: d.v.replace(/^\$/, '') }; }
+          if (d && d.t === 'name' && /^\$?[A-Z]{1,3}$/.test(d.v)) { p += 2; return { k: 'colrange', a: nm, b: d.v.replace(/^\$/, ''), absA: tk.v[0] === '$', absB: d.v[0] === '$' }; }
         }
         if (nm === 'TRUE') return { k: 'bool', v: true };
         if (nm === 'FALSE') return { k: 'bool', v: false };
@@ -286,21 +288,74 @@ export function textToNumber(str) {
   return pct ? n / 100 : n;
 }
 
-/** General-format text of a number, as & and text functions see it (15 significant digits). */
-export function numToText(n) {
-  if (!isFinite(n)) return '#NUM!';
-  if (Object.is(n, -0)) n = 0;
-  const v = parseFloat(Number(n).toPrecision(15));
-  const a = Math.abs(v);
-  let s;
-  if (v !== 0 && (a >= 1e15 || a < 1e-4)) { s = v.toExponential().replace(/\.?0+e/, 'e'); const m = /^(-?[\d.]+)e([+-]\d+)$/.exec(s); s = m ? m[1] + 'E' + m[2][0] + String(Math.abs(+m[2])).padStart(2, '0') : s; }
-  else s = String(v);
-  return s.replace(/e\+?(-?\d+)$/i, (m, e) => 'E' + (e[0] === '-' ? '-' : '+') + String(Math.abs(+e)).padStart(2, '0'));
+
+/* ---- date and time text, as Excel (en-US) recognises it: 1/31/2026, 1/31/26, 2026-01-31, 31-Jan-26, 31 Jan 2026, Jan 31, 2026, Jan 31, 12:00, 12:00:30 PM and a date followed by a time ---- */
+const MONTH_NAMES = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+const RE_MDY = /^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/, RE_YMD = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
+const RE_DMON = /^(\d{1,2})[- ]([a-z]{3,9})(?:[- ,]+(\d{2}|\d{4}))?$/i, RE_MOND = /^([a-z]{3,9})[- ]?(\d{1,2})(?:(?:,\s*|[- ])(\d{2}|\d{4}))?$/i, RE_MONY = /^([a-z]{3,9})[- ](\d{4})$/i;
+const RE_TIME = /^(\d{1,2}):(\d{2})(?::(\d{2}))?(?:\s*([ap])\.?m?\.?)?$/i;
+const monthOf = name => { const i = MONTH_NAMES.findIndex(m => m.startsWith(name.toLowerCase())); return i >= 0 && (name.length >= 3 && (name.length === 3 || MONTH_NAMES[i] === name.toLowerCase())) ? i + 1 : 0; };
+const yearOf = y => y === undefined ? null : y.length === 4 ? +y : +y < 30 ? 2000 + +y : 1900 + +y;   // two-digit years: 00–29 → 2000s
+const serialOf = (y, m, d) => {   // Excel's 1900 system (the phantom 29 Feb 1900 included); null when the calendar has no such day
+  if (m < 1 || m > 12 || d < 1 || y < 1900 || y > 9999) return null;
+  if (y === 1900 && m === 2 && d === 29) return 60;
+  if (d > new Date(Date.UTC(y, m, 0)).getUTCDate()) return null;
+  const n = Math.floor((Date.UTC(y, m - 1, d) - Date.UTC(1899, 11, 30)) / 86400000);
+  return n < 61 ? n - 1 : n;
+};
+const timeOf = t => {   // the fraction of a day, or null
+  const m = RE_TIME.exec(t); if (!m) return null;
+  let h = +m[1]; const mi = +m[2], s = m[3] ? +m[3] : 0, ap = m[4] ? m[4].toLowerCase() : '';
+  if (mi > 59 || s > 59) return null;
+  if (ap) { if (h < 1 || h > 12) return null; h = h % 12 + (ap === 'p' ? 12 : 0); }   // without AM/PM, 24:00 and beyond read as elapsed hours, as Excel takes them
+  return (h * 3600 + mi * 60 + s) / 86400;
+};
+/** The Excel serial a date or time text denotes (en-US shapes), or null. A date with no year takes `yearNow()`'s. */
+export function dateTextToSerial(str, yearNow = () => new Date().getUTCFullYear()) {
+  const t = String(str).trim();
+  if (!t || t.length > 40 || !/\d/.test(t)) return null;
+  const dateOf = s => {
+    let m;
+    if ((m = RE_MDY.exec(s))) return serialOf(yearOf(m[3]), +m[1], +m[2]);
+    if ((m = RE_YMD.exec(s))) return serialOf(+m[1], +m[2], +m[3]);
+    if ((m = RE_DMON.exec(s))) { const mo = monthOf(m[2]); return mo ? serialOf(m[3] === undefined ? yearNow() : yearOf(m[3]), mo, +m[1]) : null; }
+    if ((m = RE_MOND.exec(s))) { const mo = monthOf(m[1]); return mo ? serialOf(m[3] === undefined ? yearNow() : yearOf(m[3]), mo, +m[2]) : null; }
+    if ((m = RE_MONY.exec(s))) { const mo = monthOf(m[1]); return mo ? serialOf(+m[2], mo, 1) : null; }
+    return null;
+  };
+  const whole = dateOf(t); if (whole !== null) return whole;
+  const time = timeOf(t); if (time !== null) return time;
+  const sp = t.search(/\s\d{1,2}:\d{2}/);   // a date then a time
+  if (sp > 0) { const d = dateOf(t.slice(0, sp).trim()), tm = timeOf(t.slice(sp).trim()); if (d !== null && tm !== null) return d + tm; }
+  return null;
 }
 
 const num15 = n => parseFloat(Number(n).toPrecision(15));
 
 function numeq(a, b) { return num15(a) === num15(b); }
+
+const cmpText = (a, b) => a.localeCompare(b, 'en', { sensitivity: 'accent' });
+/**
+ * Excel's comparison of two plain values (number | string | boolean | null) under = <> < <= > >=:
+ * numbers < text < booleans, text case-insensitive, a blank reads as the other side's zero ("" / 0 /
+ * FALSE). The operators use it, and so do the conditional-formatting presets (a Highlight Cells
+ * rule is the comparison =A1>5 evaluated per cell).
+ */
+export function compareValues(op, a, b) {
+  const rank = v => typeof v === 'number' ? 0 : typeof v === 'string' ? 1 : typeof v === 'boolean' ? 2 : -1;
+  if (a === null && b === null) return op === '=' || op === '<=' || op === '>=';
+  if (a === null) a = typeof b === 'string' ? '' : typeof b === 'boolean' ? false : 0;
+  if (b === null) b = typeof a === 'string' ? '' : typeof a === 'boolean' ? false : 0;
+  let d;
+  if (rank(a) !== rank(b)) d = rank(a) - rank(b);
+  else if (typeof a === 'number') d = numeq(a, b) ? 0 : (a < b ? -1 : 1);
+  else if (typeof a === 'string') d = cmpText(a, b);
+  else d = (a === b) ? 0 : (a ? 1 : -1);
+  switch (op) {
+    case '=': return d === 0; case '<>': return d !== 0; case '<': return d < 0;
+    case '<=': return d <= 0; case '>': return d > 0; default: return d >= 0;
+  }
+}
 
 /* ---- wildcards ("a*", "?ear", "~*") — an iterative glob, never a backtracking RegExp -------- */
 /** Compile a criteria pattern: '*' any run, '?' one char, '~x' the literal x. Case-insensitive. */
@@ -344,7 +399,12 @@ export function evalFormula(expr, ctx = {}) {
     return ctx.sheetRaw ? ctx.sheetRaw(k.slice(0, b), k.slice(b + 1)) : '#REF!';
   };
   const ROWS = ctx.rows || 20, COLS = ctx.cols || 10;
-  const ast = parseFormula(expr);   // SyntaxError propagates: the commit gate decides what to do
+  // a parsed AST (parseFormula) is taken as is, so a formula evaluated over many cells — a
+  // conditional-formatting rule — is parsed once; ctx.offset = {dr, dc} then shifts its relative
+  // references per cell, exactly as translateFormula would rewrite the text (a reference pushed
+  // above row 1 or left of column A is #REF!)
+  const ast = expr && typeof expr === 'object' ? expr : parseFormula(expr);   // SyntaxError propagates: the commit gate decides what to do
+  const OFF = ctx.offset && (ctx.offset.dr || ctx.offset.dc) ? ctx.offset : null;
 
   /* ---- value helpers -------------------------------------------------------- */
   const cellVal = key => { const v = raw(key); if (v === undefined) return null; if (isErrVal(v)) throw err(v); return v; };
@@ -360,8 +420,10 @@ export function evalFormula(expr, ctx = {}) {
     if (typeof v === 'boolean') return v ? 1 : 0;
     if (v === null) return 0;
     const n = textToNumber(v);
-    if (n === null) throw err('#VALUE!');
-    return n;
+    if (n !== null) return n;
+    const s = dateText(v);
+    if (s === null) throw err('#VALUE!');
+    return s;
   };
   const toText = v => {
     v = deref(v);
@@ -390,26 +452,14 @@ export function evalFormula(expr, ctx = {}) {
     return new Range(Math.min(A.r, B.r), Math.min(A.c, B.c), Math.max(A.r, B.r), Math.max(A.c, B.c), sheet);
   };
   function refParts(ref) {
-    const m = /^\$?([A-Z]{1,3})\$?(\d+)$/.exec(ref);
-    return { c: colIndex(m[1]), r: +m[2] };
+    const m = /^(\$?)([A-Z]{1,3})(\$?)(\d+)$/.exec(ref);
+    let c = colIndex(m[2]), r = +m[4];
+    if (OFF) { if (!m[1]) c += OFF.dc; if (!m[3]) r += OFF.dr; if (c < 1 || r < 1) throw err('#REF!'); }
+    return { c, r };
   }
-  const cmpText = (a, b) => a.localeCompare(b, 'en', { sensitivity: 'accent' });
-  function compare(op, a, b) {
-    a = deref(a); b = deref(b);
-    const rank = v => typeof v === 'number' ? 0 : typeof v === 'string' ? 1 : typeof v === 'boolean' ? 2 : -1;
-    if (a === null && b === null) return op === '=' || op === '<=' || op === '>=';
-    if (a === null) a = typeof b === 'string' ? '' : typeof b === 'boolean' ? false : 0;
-    if (b === null) b = typeof a === 'string' ? '' : typeof a === 'boolean' ? false : 0;
-    let d;
-    if (rank(a) !== rank(b)) d = rank(a) - rank(b);
-    else if (typeof a === 'number') d = numeq(a, b) ? 0 : (a < b ? -1 : 1);
-    else if (typeof a === 'string') d = cmpText(a, b);
-    else d = (a === b) ? 0 : (a ? 1 : -1);
-    switch (op) {
-      case '=': return d === 0; case '<>': return d !== 0; case '<': return d < 0;
-      case '<=': return d <= 0; case '>': return d > 0; default: return d >= 0;
-    }
-  }
+  const offCol = (letters, abs) => { const c = colIndex(letters) + (OFF && !abs ? OFF.dc : 0); if (c < 1) throw err('#REF!'); return c; };
+  const offRow = (n, abs) => { const r = n + (OFF && !abs ? OFF.dr : 0); if (r < 1) throw err('#REF!'); return r; };
+  function compare(op, a, b) { return compareValues(op, deref(a), deref(b)); }
 
   /* ---- criteria ("<>5", ">="&A1, "a*") for the *IF family ---------------- */
   function criterion(v) {
@@ -486,8 +536,10 @@ export function evalFormula(expr, ctx = {}) {
   // day behind the real calendar, and serial 60 itself is 1900-02-29.
   const serial = (y, m, d) => { if (y === 1900 && m === 2 && d >= 29) return 31 + d; const n = Math.floor((Date.UTC(y, m - 1, d) - EPOCH) / 86400000); return n < 61 ? n - 1 : n; };
   const dateOf = s => { s = Math.floor(s); if (s < 0) throw err('#NUM!'); return serialToDate(s < 60 ? s + 1 : s); };
-  const ymd = s => { s = Math.floor(s); if (s === 60) return { y: 1900, m: 2, d: 29, wd: 3 }; if (s === 0) return { y: 1900, m: 1, d: 0, wd: 6 }; const d = dateOf(s); return { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, d: d.getUTCDate(), wd: d.getUTCDay() }; };
+  // the weekday follows the serial (0 = Saturday, 1 = Sunday), so Jan–Feb 1900 sit a day off the real calendar, as in Excel
+  const ymd = s => { s = Math.floor(s); const wd = ((s - 1) % 7 + 7) % 7; if (s === 60) return { y: 1900, m: 2, d: 29, wd }; if (s === 0) return { y: 1900, m: 1, d: 0, wd }; const d = dateOf(s); return { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, d: d.getUTCDate(), wd }; };
   const todaySerial = () => ctx.today ? ctx.today() : Math.floor((Date.now() - EPOCH) / 86400000);
+  const dateText = s => dateTextToSerial(s, () => ymd(todaySerial()).y);   // "1/31/2026", "31-Jan-26", "12:00 PM" read as their serial, as Excel coerces them
 
   /* ---- lookups ----------------------------------------------------------------- */
   const SKIP = Symbol('error-cell');   // an error in a lookup column is stepped over, never propagated (only the returned cell's error is)
@@ -519,165 +571,18 @@ export function evalFormula(expr, ctx = {}) {
   const rowVals = (rg, r) => { const out = []; for (let c = 0; c < rg.cols; c++) out.push(lookVal(rg.at(r, c))); return out; };
   const flatVals = rg => rg.keys().map(lookVal);
 
-  /* ---- TEXT(value, format) — Excel number-format codes ------------------------ */
-  // Sections (positive;negative;zero;text), digit placeholders 0 # ?, thousands and scaling commas,
-  // percent, scientific E+00, quoted / escaped literals, dates (yyyy mmm dddd …), times (h:mm:ss
-  // AM/PM, [h]), General and @. An unquoted letter that is not a format code is #VALUE!.
-  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const pad2 = n => String(n).padStart(2, '0');
-  function fmtSections(f) {   // split on unquoted ';' (backslash escapes honoured)
-    const out = []; let cur = '', q = false;
-    for (let i = 0; i < f.length; i++) {
-      const ch = f[i];
-      if (ch === '"') { q = !q; cur += ch; }
-      else if (ch === '\\' && !q) { cur += ch + (f[i + 1] || ''); i++; }
-      else if (ch === ';' && !q) { out.push(cur); cur = ''; }
-      else cur += ch;
-    }
-    out.push(cur);
-    return out;
-  }
-  function fmtTokens(sec) {
-    const toks = [];
-    for (let i = 0; i < sec.length; i++) {
-      const ch = sec[i], rest = sec.slice(i);
-      let m;
-      if (ch === '"') { const j = sec.indexOf('"', i + 1); const end = j < 0 ? sec.length : j; toks.push({ t: 'lit', v: sec.slice(i + 1, end) }); i = end; continue; }
-      if (ch === '\\') { toks.push({ t: 'lit', v: sec[i + 1] || '' }); i++; continue; }
-      if (ch === '_') { toks.push({ t: 'lit', v: ' ' }); i++; continue; }        // _x: the width of x → a space
-      if (ch === '*') { i++; continue; }                                           // *x: fill the cell → nothing in TEXT
-      if (ch === '[') {
-        const j = sec.indexOf(']', i); if (j < 0) throw err('#VALUE!');
-        const inner = sec.slice(i + 1, j);
-        if (/^(?:h+|m+|s+)$/i.test(inner)) toks.push({ t: 'elapsed', v: inner[0].toLowerCase() });
-        else if (!/^(?:black|blue|cyan|green|magenta|red|white|yellow|color ?\d{1,2})$/i.test(inner)) throw err('#VALUE!');   // colours are ignored; conditions are not supported
-        i = j; continue;
-      }
-      if (ch === '0' || ch === '#' || ch === '?') { toks.push({ t: 'ph', v: ch }); continue; }
-      if (ch === '.') { toks.push({ t: 'dot' }); continue; }
-      if (ch === ',') { toks.push({ t: 'comma' }); continue; }
-      if (ch === '%') { toks.push({ t: 'pct' }); continue; }
-      if (ch === '@') { toks.push({ t: 'at' }); continue; }
-      if ((ch === 'E' || ch === 'e') && (sec[i + 1] === '+' || sec[i + 1] === '-')) { toks.push({ t: 'exp', e: ch, sign: sec[i + 1] }); i++; continue; }
-      if ((m = /^general/i.exec(rest))) { toks.push({ t: 'general' }); i += m[0].length - 1; continue; }
-      if ((m = /^(?:AM\/PM|A\/P)/i.exec(rest))) { toks.push({ t: 'ampm', v: m[0] }); i += m[0].length - 1; continue; }
-      if (/[ymdhs]/i.test(ch)) { let j = i + 1; while (j < sec.length && sec[j].toLowerCase() === ch.toLowerCase()) j++; toks.push({ t: 'date', v: ch.toLowerCase(), n: j - i }); i = j - 1; continue; }
-      if (/[A-Za-z]/.test(ch)) throw err('#VALUE!');   // a letter that is not a format code — Excel needs it quoted
-      toks.push({ t: 'lit', v: ch });                     // $ - + / ( ) : ! ^ & ' ~ { } < > = space …
-    }
-    return toks;
-  }
-  const renderLits = (toks, text) => toks.map(t => t.t === 'lit' ? t.v : (t.t === 'at' || t.t === 'general') ? text : t.t === 'comma' ? ',' : t.t === 'dot' ? '.' : t.t === 'pct' ? '%' : '').join('');
-  function renderDate(toks, n) {
-    const d = ymd(n);
-    const total = Math.floor(Math.round((n - Math.floor(n)) * 86400 * 1000) / 1000);   // whole seconds into the day
-    const hh = Math.floor(total / 3600), mi = Math.floor(total / 60) % 60, ss = total % 60;
-    const twelve = toks.some(t => t.t === 'ampm');
-    const near = (i, step) => { for (let j = i + step; j >= 0 && j < toks.length; j += step) { if (toks[j].t === 'date' || toks[j].t === 'elapsed') return toks[j]; if (toks[j].t !== 'lit') return null; } return null; };
-    let out = '';
-    for (let i = 0; i < toks.length; i++) {
-      const t = toks[i];
-      if (t.t === 'lit') out += t.v;
-      else if (t.t === 'comma') out += ','; else if (t.t === 'dot') out += '.'; else if (t.t === 'pct') out += '%';
-      else if (t.t === 'ampm') { const up = t.v[0] === 'A'; const s = t.v.length === 3 ? (hh >= 12 ? 'P' : 'A') : (hh >= 12 ? 'PM' : 'AM'); out += up ? s : s.toLowerCase(); }
-      else if (t.t === 'elapsed') out += String(t.v === 'h' ? Math.floor(n) * 24 + hh : t.v === 'm' ? (Math.floor(n) * 24 + hh) * 60 + mi : Math.floor(n) * 86400 + total);
-      else if (t.t === 'date') {
-        const k = t.n;
-        if (t.v === 'y') out += k <= 2 ? pad2(d.y % 100) : String(d.y);
-        else if (t.v === 'd') out += k === 1 ? String(d.d) : k === 2 ? pad2(d.d) : k === 3 ? DAYS[d.wd].slice(0, 3) : DAYS[d.wd];
-        else if (t.v === 'h') { const h = twelve ? (hh % 12 || 12) : hh; out += k === 1 ? String(h) : pad2(h); }
-        else if (t.v === 's') out += k === 1 ? String(ss) : pad2(ss);
-        else {   // m is minutes right after an hour code or right before a seconds code, otherwise the month
-          const prev = near(i, -1), next = near(i, 1);
-          const minute = k <= 2 && ((prev && prev.v === 'h') || (next && next.t === 'date' && next.v === 's'));
-          if (minute) out += k === 1 ? String(mi) : pad2(mi);
-          else out += k === 1 ? String(d.m) : k === 2 ? pad2(d.m) : k === 3 ? MONTHS[d.m - 1].slice(0, 3) : k === 4 ? MONTHS[d.m - 1] : MONTHS[d.m - 1][0];
-        }
-      }
-    }
-    return out;
-  }
-  function renderNumber(toks, n) {   // n ≥ 0; the caller supplies the sign
-    let pct = 0; for (const t of toks) if (t.t === 'pct') pct++;
-    n *= 100 ** pct;
-    const expI = toks.findIndex(t => t.t === 'exp');
-    const dotI = toks.findIndex((t, i) => t.t === 'dot' && (expI < 0 || i < expI));
-    const intToks = toks.slice(0, dotI >= 0 ? dotI : expI >= 0 ? expI : toks.length);
-    const fracToks = dotI >= 0 ? toks.slice(dotI + 1, expI >= 0 ? expI : toks.length) : [];
-    const expToks = expI >= 0 ? toks.slice(expI + 1) : [];
-    const count = a => a.filter(t => t.t === 'ph').length;
-    const intCount = count(intToks), fracCount = count(fracToks), expCount = count(expToks);
-    if (fracCount > 30) throw err('#VALUE!');   // Excel formats show at most 30 decimal places
-    // a comma between integer placeholders groups thousands; commas after the last one scale by 1000 each
-    let grouped = false, scale = 0, seenPh = false;
-    for (const t of intToks) { if (t.t === 'ph') { seenPh = true; if (scale) grouped = true; scale = 0; } else if (t.t === 'comma' && seenPh) scale++; }
-    n /= 1000 ** scale;
-    let exp = null;
-    if (expI >= 0) {
-      const w = Math.max(intCount, 1);
-      let e = n === 0 ? 0 : Math.floor(Math.log10(n)) - w + 1;
-      let m = roundHalfAway(n / 10 ** e, fracCount);
-      if (m >= 10 ** w) { e += 1; m = roundHalfAway(m / 10, fracCount); }
-      n = m; exp = e;
-    } else n = roundHalfAway(n, fracCount);
-    const fixed = n < 1e21 ? n.toFixed(fracCount) : BigInt(Math.round(n)).toString() + (fracCount ? '.' + '0'.repeat(fracCount) : '');
-    let [ip, fp = ''] = fixed.split('.');
-    if (ip === '0') ip = '';   // a zero integer part shows only where a 0 placeholder demands it (TEXT(0.5,"#.0") → ".5")
-    // integer area, filled right to left; the leftmost placeholder takes any excess digits
-    const firstPh = intToks.findIndex(t => t.t === 'ph');
-    const rev = []; let di = ip.length, emitted = 0;
-    const digit = ch => { if (grouped && emitted > 0 && emitted % 3 === 0) rev.push(','); rev.push(ch); emitted++; };
-    if (firstPh < 0) while (di > 0) digit(ip[--di]);   // no integer placeholders: the digits still sit left of the point
-    for (let k = intToks.length - 1; k >= 0; k--) {
-      const t = intToks[k];
-      if (t.t === 'ph') {
-        if (di > 0) { digit(ip[--di]); if (k === firstPh) while (di > 0) digit(ip[--di]); }
-        else if (t.v === '0') digit('0');
-        else if (t.v === '?') rev.push(' ');
-      } else if (t.t === 'lit') { for (let q = t.v.length - 1; q >= 0; q--) rev.push(t.v[q]); }
-      else if (t.t === 'pct') rev.push('%');
-    }
-    let out = rev.reverse().join('');
-    // fraction area, filled left to right; trailing zeros drop from # and ? placeholders
-    if (dotI >= 0) {
-      out += '.';
-      let j = 0;
-      for (const t of fracToks) {
-        if (t.t === 'ph') { const ch = fp[j] || '0', more = /[1-9]/.test(fp.slice(j)); j++; if (t.v === '0' || more) out += ch; else if (t.v === '?') out += ' '; }
-        else if (t.t === 'lit') out += t.v; else if (t.t === 'pct') out += '%';
-      }
-    }
-    if (exp !== null) {
-      const x = toks[expI];
-      out += x.e + (exp < 0 ? '-' : x.sign === '+' ? '+' : '') + String(Math.abs(exp)).padStart(expCount, '0');
-      for (const t of expToks) { if (t.t === 'lit') out += t.v; else if (t.t === 'pct') out += '%'; }
-    }
-    return out;
-  }
+  /* ---- TEXT(value, format) — Excel number-format codes, via numfmt.js (the grid's engine) ---- */
+  // A numeric- or date-looking string reads as its number; text passes through unless a text section
+  // dresses it; an empty format text formats to nothing; a bad code or a date out of range is
+  // #VALUE!, as Excel reports it.
   function textFormat(v, fmt) {
     v = deref(v);
-    if (typeof v === 'boolean') return v ? 'TRUE' : 'FALSE';
-    const secs = fmtSections(String(fmt));
-    if (typeof v === 'string' && textToNumber(v) === null) {
-      // text passes through unchanged, unless a fourth (text) section or a lone "@" section formats it
-      const sec = secs.length >= 4 ? secs[3] : (secs.length === 1 && secs[0].includes('@')) ? secs[0] : null;
-      return sec === null ? v : renderLits(fmtTokens(sec), v);
-    }
-    let n = toNum(v), sec, neg = false; const negative = n < 0;
-    if (n < 0 && secs.length >= 2) { sec = secs[1]; n = -n; }             // the negative section supplies its own sign
-    else if (n === 0 && secs.length >= 3) sec = secs[2];
-    else { sec = secs[0]; if (n < 0) { neg = true; n = -n; } }
-    const toks = fmtTokens(sec);
-    const kinds = new Set(toks.map(t => t.t));
-    let body;
-    if (kinds.has('general') || kinds.has('at')) body = renderLits(toks, numToText(n));
-    else if (kinds.has('date') || kinds.has('elapsed') || kinds.has('ampm')) { if (kinds.has('ph') || kinds.has('exp') || negative) throw err('#VALUE!'); body = renderDate(toks, n); }   // no negative dates
-    else if (kinds.has('ph') || kinds.has('exp')) body = renderNumber(toks, n);
-    else body = renderLits(toks, '');   // a section with no placeholders shows its literals only ("-" for zero)
-    return (neg ? '-' : '') + body;
+    if (fmt === '') return '';
+    if (typeof v === 'string') { const n = textToNumber(v); if (n !== null) v = n; else { const s = dateText(v); if (s !== null) v = s; } }
+    else if (typeof v !== 'boolean' && typeof v !== 'number') v = toNum(v);
+    try { return formatValue(v, String(fmt)).text; }
+    catch (e) { if (e instanceof FormatError) throw err('#VALUE!'); throw e; }
   }
-
   /* ---- the function table --------------------------------------------------------- */
   function callFn(name, node) {
     const slots = node.args;   // null = omitted slot; arity was checked by the parser
@@ -885,7 +790,7 @@ export function evalFormula(expr, ctx = {}) {
         return t.split(o).join(nw); }
       case 'REPT': { const t = toText(args[0]); const k = toInt(args[1]); if (k < 0 || t.length * k > MAX_TEXT) throw err('#VALUE!'); return t.repeat(k); }
       case 'EXACT': return toText(args[0]) === toText(args[1]);
-      case 'VALUE': { const v = deref(args[0]); if (typeof v === 'number') return v; const x = textToNumber(toText(v)); if (x === null) throw err('#VALUE!'); return x; }
+      case 'VALUE': { const v = deref(args[0]); if (typeof v === 'number') return v; const t = toText(v); const x = textToNumber(t); if (x !== null) return x; const s = dateText(t); if (s === null) throw err('#VALUE!'); return s; }
       case 'TEXT': return textFormat(args[0], toText(args[1]));
       case 'T': { const v = deref(args[0]); return typeof v === 'string' ? v : ''; }
       case 'N': { const v = deref(args[0]); return typeof v === 'number' ? v : typeof v === 'boolean' ? (v ? 1 : 0) : 0; }
@@ -967,8 +872,8 @@ export function evalFormula(expr, ctx = {}) {
       case 'paren': return ev(node.x);
       case 'ref': { const p = refParts(node.ref); return new Range(p.r, p.c, p.r, p.c, node.sheet); }
       case 'range': return rangeOf(node.a, node.b, node.sheet);
-      case 'colrange': { const a = colIndex(node.a), b = colIndex(node.b); return new Range(1, Math.min(a, b), ROWS, Math.max(a, b)); }
-      case 'rowrange': return new Range(Math.min(node.a, node.b), 1, Math.max(node.a, node.b), COLS);
+      case 'colrange': { const a = offCol(node.a, node.absA), b = offCol(node.b, node.absB); return new Range(1, Math.min(a, b), ROWS, Math.max(a, b)); }
+      case 'rowrange': { const a = offRow(node.a, node.absA), b = offRow(node.b, node.absB); return new Range(Math.min(a, b), 1, Math.max(a, b), COLS); }
       case 'un': { const v = ev(node.x); if (node.op === '+') return v; return -toNum(v); }   // unary plus is a no-op in Excel: text stays text
       case 'pct': return toNum(ev(node.x)) / 100;
       case 'bin': {

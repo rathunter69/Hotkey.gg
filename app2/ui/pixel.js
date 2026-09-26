@@ -57,7 +57,8 @@ export function glyphColours(glyph) {
   return [...new Set(String(glyph).replace(/[.\n]/g, ''))];
 }
 
-const DEFAULT_PALETTE = { a: 'var(--ink)', b: 'var(--accent)', c: 'var(--bg)', d: 'var(--surface)' };
+// --ink is the theme's text colour (app.css :root); the fallback keeps an outline where app.css is absent
+const DEFAULT_PALETTE = { a: 'var(--ink, var(--text, #38352d))', b: 'var(--accent)', c: 'var(--bg)', d: 'var(--surface)' };
 
 /**
  * Render a glyph to an SVG string. `palette` maps slot letters to CSS colours;
@@ -77,10 +78,10 @@ export function renderPixel(glyph, palette = {}, opts = {}) {
   return `<svg class="px ${opts.cls || ''}" width="${size}" height="${size}" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">${rects.join('')}</svg>`;
 }
 
-/** Rarity → the badge body colour (slot 'b') and ring class. */
+/** Rarity → the badge body colour (slot 'b') and ring class: theme tokens (app.css :root, §6a), the old fixed hues as fallbacks. */
 export const RARITY_COLOURS = {
-  common: 'var(--accent)',
-  rare: '#4a9eda',
-  epic: '#a06bd6',
-  legendary: '#e0913f',
+  common: 'var(--rar-common, var(--accent))',
+  rare: 'var(--rar-rare, #4a9eda)',
+  epic: 'var(--rar-epic, #a06bd6)',
+  legendary: 'var(--rar-legendary, #e0913f)',
 };

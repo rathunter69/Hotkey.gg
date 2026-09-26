@@ -2,11 +2,10 @@
    their tokens (Daylight paper by default, mono chrome, rounded cards). reference-page.js injects
    this file itself, so the page looks right wherever it is mounted. */
 
-.ref{max-width:1180px; margin:18px auto 40px; font-family:var(--sans)}
+.ref{margin:6px auto 40px; font-family:var(--sans)}   /* the width is every page's (scale.css): this file is injected last, so a max-width here would win */
 .ref [hidden]{display:none !important}   /* the flex rules below must never outrank the hidden attribute */
-.ref-head h1{font-family:var(--mono); font-size:22px; font-weight:700; letter-spacing:-.3px; margin:6px 0 4px}
-.ref-head h1 .em{color:var(--accent)}
-.ref-sub{color:var(--muted); font-size:14px; margin:0 0 10px; max-width:72ch}
+.ref-head h1{font-family:var(--mono); font-size:22px; font-weight:700; letter-spacing:-.3px; margin:6px 0 6px}   /* the title as every page sets it (.page-head h1) */
+.ref-sub{color:var(--muted); font-size:14.5px; line-height:1.55; margin:0 0 10px; max-width:72ch}
 .ref-legend{display:flex; gap:18px; flex-wrap:wrap; align-items:center; font-family:var(--mono); font-size:12px; color:var(--muted); margin:0 0 4px}
 .ref-legend > span{display:inline-flex; align-items:center; gap:5px}
 
@@ -49,8 +48,8 @@
 .ref-grid{display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:16px; padding:8px 0 20px}
 @media(max-width:900px){ .ref-grid{grid-template-columns:1fr} }
 .ref-card{background:var(--surface); border:1px solid var(--line); border-radius:12px; overflow:hidden; padding-bottom:6px; align-self:start}
-.ref-card h2{font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
-  min-height:34px; padding:6px 14px; margin:0; display:flex; align-items:center; gap:9px; background:var(--surface2); border-bottom:1px solid var(--line)}
+.ref-card h2{font-family:var(--mono); font-size:10.5px; font-weight:400; letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+  min-height:34px; padding:6px 16px; margin:0; display:flex; align-items:center; gap:9px; background:var(--surface2); border-bottom:1px solid var(--line)}   /* the card caption, as .pcard-cap */
 .ref-card h2 .n{margin-left:auto; color:var(--faint); font-size:11px; letter-spacing:0}
 .ref-cardnote{font-family:var(--mono); font-size:10.5px; color:var(--faint); padding:8px 14px 2px; margin:0; line-height:1.5}
 .ref-cardnote.warn{color:var(--warn)}
@@ -58,8 +57,8 @@
 /* the add-ins: one collapsed section under the native cards (a <details>; nothing is saved).
    Its summary is styled like a card header so closed it reads as one more card, folded. */
 .ref-addins{margin:0 0 4px}
-.ref-addins-sum{list-style:none; cursor:pointer; user-select:none; display:flex; align-items:center; flex-wrap:wrap; gap:9px; min-height:38px; padding:7px 14px;
-  font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+.ref-addins-sum{list-style:none; cursor:pointer; user-select:none; display:flex; align-items:center; flex-wrap:wrap; gap:9px; min-height:38px; padding:7px 16px;
+  font-family:var(--mono); font-size:10.5px; font-weight:400; letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
   background:var(--surface2); border:1px solid var(--line); border-radius:12px; transition:color .14s, border-color .14s}
 .ref-addins-sum::-webkit-details-marker{display:none}
 .ref-addins-sum::marker{content:""}
@@ -72,16 +71,16 @@
 .ref-addins-grid{padding:16px 0 12px}
 .ref-addins .ref-disclaimer{margin:0}
 
-/* one shortcut */
-.ref-row{display:flex; align-items:center; gap:14px; padding:9px 16px; border-top:1px solid color-mix(in srgb, var(--line) 55%, transparent);
+/* one shortcut: a grid row (keys | words | lesson link), so every title in a card starts on one line */
+.ref-row{display:grid; grid-template-columns:minmax(0,190px) minmax(0,1fr) auto; align-items:center; gap:14px; padding:9px 16px; border-top:1px solid color-mix(in srgb, var(--line) 55%, transparent);
   outline:none; cursor:default; position:relative; scroll-margin-top:150px; transition:background .12s}
 .ref-row:first-of-type{border-top:0}
 .ref-row:hover{background:var(--surface2)}
 .ref-row:focus, .ref-row:focus-visible{background:var(--accent-glow); outline:2px solid var(--accent); outline-offset:-2px; border-radius:6px}
 .ref-row.taught::before{content:""; position:absolute; left:0; top:8px; bottom:8px; width:2px; background:var(--accent); border-radius:2px}
-.ref-keys{flex:0 0 auto; display:flex; align-items:center; gap:4px; flex-wrap:wrap; max-width:min(40%, 215px)}
+.ref-keys{display:flex; align-items:center; gap:4px; flex-wrap:wrap; min-width:0}
 .ref-macnote{font-family:var(--mono); font-size:10.5px; color:var(--faint); white-space:nowrap}
-.ref-text{flex:1 1 auto; min-width:130px; font-size:13.5px; line-height:1.35}
+.ref-text{min-width:0; font-size:13.5px; line-height:1.35}
 .ref-name{font-weight:600; color:var(--text)}
 .ref-what{display:block; color:var(--muted); font-size:12.5px}
 .ref-note{color:var(--faint); font-size:11.5px}
@@ -102,10 +101,8 @@
 .ref-foot{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin:8px 0 0}
 
 @media(max-width:560px){
-  .ref-row{flex-wrap:wrap; row-gap:4px}
-  .ref-text{flex-basis:100%; order:2}
-  .ref-keys{order:1; max-width:100%}
-  .ref-lesson, .ref-soon{order:1; margin-left:auto}
+  .ref-row{grid-template-columns:minmax(0,1fr) auto; row-gap:4px}
+  .ref-text{grid-column:1 / -1; grid-row:2}
   .ref-chips{flex-wrap:nowrap; overflow-x:auto; padding-bottom:4px; -webkit-overflow-scrolling:touch}
   .ref-chip{flex:0 0 auto}
   .ref-plat{margin-left:0}

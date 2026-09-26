@@ -49,11 +49,16 @@
 import { Sheet } from '../engine/sheet.js';
 import { Session } from '../engine/keyboard.js';
 import { parseRef } from '../engine/refs.js';
+import { CONVENTIONS } from './conventions.js';
+import { WORKBOOKS, workbookState, applyStatePatch } from './workbooks/index.js';
+import { mulberry32 } from '../engine/rng.js';
 
 export const DIFFICULTIES = ['easy', 'medium', 'hard'];
 export const ACCESS = ['free', 'paid'];
-export const MODES = ['guided', 'solo', 'timed'];   // how a lesson is played; the Read phase precedes them
-export const KINDS = ['lesson', 'project', 'assessment', 'testout'];   // ordinary lesson, chapter project, timed assessment, chapter test-out
+export const MODES = ['guided', 'solo', 'timed', 'challenge'];   // how a lesson is played; the Brief precedes them
+export const KINDS = ['lesson', 'project', 'assessment', 'testout', 'challenge'];   // + C2: the module's timed, seeded challenge
+/** The kinds whose workbook wears a seed's clothing before the first key (runner and validator agree). */
+export const SEEDED_KINDS = ['challenge', 'assessment', 'testout'];
 
 /** Concept ids and their display names — the vocabulary lessons teach and require. */
 export const CONCEPTS = {
@@ -142,6 +147,7 @@ export const CONCEPTS = {
   'autosum': 'AutoSum (Alt+=) proposes =SUM over the numbers above or to the left; Enter accepts it',
   'relative-absolute': 'a relative reference (B3) shifts when copied; $ anchors it: $B$3 never moves',
   'f4-anchor': 'F4 cycles the anchors on the reference at the insertion point: B3, $B$3, B$3, $B3',
+  'f4-repeat': 'F4 outside a formula repeats the last action — a format, a border, a width, an insert — on the new selection',
   'cross-sheet-ref': 'a reference on another sheet names the sheet first: =Costs!B3',
   'formula-errors': '#DIV/0!, #NAME?, #VALUE! and #REF! each say what broke: the input, the name, the type, the reference',
   // Copy, paste and fill (phase C)
@@ -150,10 +156,48 @@ export const CONCEPTS = {
   'paste-special': 'Paste Special (Ctrl+Alt+V) pastes one aspect: values V, formats T, transpose E, or an operation',
   'fill-series': 'Fill Series (Alt, H, F, I, S) continues the step your first two cells set',
   'flash-fill': 'Flash Fill (Ctrl+E in Excel) fills a column by the pattern of your examples',
+  'qat-run': 'Alt then a number runs that Quick Access Toolbar command from anywhere',
+  // C2 (Project Volt): the module lessons' additions
+  'enter-tab-direction': 'Tab commits and moves right; Enter after a Tab run returns to the column you started in, one row down',
+  'replace-all': 'Replace All (Ctrl+H, then Alt+A) swaps every match on the sheet in one step and reports how many cells changed',
+  'group-ungroup': 'Alt+Shift+→ groups the selected whole rows or columns into an outline that folds and unfolds; Alt+Shift+← ungroups',
+  'show-formulas': 'Ctrl+` shows every formula\'s text in place of its value; press it again to return',
+  'print-titles': 'Page Setup › Sheet: the rows to repeat at the top of every printed page, and the footer with its file, date and page fields',
+  'pointing': 'while a formula is open, an arrow key points at a cell and writes its reference for you',
+  'counta': 'COUNT counts numbers; COUNTA counts every non-empty cell, text included',
+  'check-cell': 'a check cell is a live difference between two things that must agree, so it reads 0 when they tie',
+  'audit-pass': 'the audit pass: Go To Special, show formulas and tracing find what a reviewer would',
+  'ref-error': '#REF! means a formula pointed at a cell that was deleted; Ctrl+Z brings the cell and the formula back',
+  'wrap-text': 'Wrap Text (Alt, H, W) folds a long entry inside its cell; AutoFit Row Height (Alt, H, O, A) then sizes the row to it',
+  // Chapter 2 (Project Volt, stage 2): number formats and custom number formats
+  'general-format': 'General is the no-format format: Ctrl+Shift+~ (or Ctrl+1, G) returns a cell to how its value was typed',
+  'accounting-format': 'Accounting Number Format (Alt, H, A, N) sets the $ at the cell\u2019s left edge, negatives in parentheses and zero as a dash',
+  'paste-special-operation': 'Paste Special\u2019s Operation (Ctrl+Alt+V, then V for values and M for Multiply) multiplies every selected cell by the copied value',
+  'date-format': 'a date is a serial number of days; Ctrl+1, D shows it as Jan-26, and the number underneath still sorts and subtracts',
+  'custom-number-format': 'Format Cells \u203a Custom (Ctrl+1, U) takes a code of up to four sections, positive;negative;zero;text, that says what each kind of value wears',
+  'format-units': 'a comma after the last digit placeholder divides by a thousand, and a unit rides along in quotes: #,##0,"k", 0.0"x", 0 "bps"',
+  'date-function': 'DATE(year, month, day) builds a date from its parts: =DATE(2026,12,31) is the FY26 year end',
+  'text-function': 'TEXT(value, "format") renders a number through a format code as text, so a header can be built from a date',
+  'concatenate-amp': '& joins text and cell values into one string: ="FY"&TEXT(B3,"yy")&"A"',
+  'conditional-format-code': 'a section may open with a condition or a color, [>=1000]0,"k" or [Red], and Excel uses the first section whose condition the value meets',
+  'hide-zeros': 'an empty section shows nothing: #,##0;(#,##0); hides the zeros of a working block',
 };
 
-/** How many goals a lesson of this kind may carry: ordinary lessons stay 3-6; a project, assessment or test-out combines a section's work in 6-10. */
-export function goalBounds(kind) { return kind && kind !== 'lesson' ? { min: 3, max: 10 } : { min: 3, max: 6 }; }
+/**
+ * How many goals a lesson of this kind may carry. Module lessons (C2, framework v2) run denser:
+ * one job of 5-8 goals; challenges 4-7; projects 10-15. The legacy bounds hold for the old
+ * lessons until the rewrite deletes them. A lesson's closer (goal.closer, the "does it tie"
+ * beat the platform plays at the end) is not counted: countedGoals() leaves it out.
+ */
+export function goalBounds(kind, moduleLesson = false) {
+  if (moduleLesson) {
+    return { lesson: { min: 5, max: 8 }, challenge: { min: 4, max: 7 }, project: { min: 10, max: 15 }, assessment: { min: 8, max: 14 }, testout: { min: 8, max: 10 } }[kind || 'lesson'] || { min: 5, max: 8 };
+  }
+  return kind && kind !== 'lesson' ? { min: 3, max: 10 } : { min: 3, max: 6 };
+}
+
+/** The goals that count towards the band: every goal but the closer. */
+export const countedGoals = goals => (Array.isArray(goals) ? goals : []).filter(g => !(g && g.closer));
 
 /** Sentences in a text: terminators followed by a space or the end. Decimals (5.0%, 1,200.00) and Excel error codes (#NAME?, #DIV/0!) are not terminators. */
 export function sentenceCount(text) {
@@ -175,21 +219,69 @@ export function validateLesson(l) {
   need(Array.isArray(l.tags), 'tags must be an array');
   need(ACCESS.includes(l.access), 'access must be free | paid');
   const kind = l.kind === undefined ? 'lesson' : l.kind;
-  need(KINDS.includes(kind), 'kind must be lesson | project | assessment | testout');
+  const moduleLesson = typeof l.module === 'string' && l.module.length > 0;   // C2 framework v2
+  need(KINDS.includes(kind), 'kind must be lesson | project | assessment | testout | challenge');
   if (kind === 'assessment' || kind === 'testout') need(typeof l.timeLimit === 'number' && l.timeLimit > 0, kind + ' needs a timeLimit (seconds)');
-  else need(l.timeLimit === undefined, 'only an assessment or test-out carries a timeLimit');
-  // a project/assessment/testout combines taught material: it may teach nothing new
-  need(Array.isArray(l.concepts) && (l.concepts.length > 0 || kind !== 'lesson'), 'concepts must list what the lesson teaches');
-  const concepts = Array.isArray(l.concepts) ? l.concepts : [];
+  else if (kind === 'challenge') need(typeof l.timeLimit === 'number' && l.timeLimit >= 150 && l.timeLimit <= 180, 'a challenge needs a timeLimit of 150-180 seconds');
+  else need(l.timeLimit === undefined, 'only an assessment, test-out or challenge carries a timeLimit');
+  // v2 renames concepts → teaches; the alias holds through the migration. A project, assessment,
+  // test-out or challenge combines taught material: it may teach nothing new.
+  const conceptsRaw = l.teaches !== undefined ? l.teaches : l.concepts;
+  need(kind === 'lesson'
+    ? Array.isArray(conceptsRaw) && conceptsRaw.length > 0
+    : conceptsRaw === undefined || Array.isArray(conceptsRaw), 'teaches/concepts must list what the lesson teaches');
+  const concepts = Array.isArray(conceptsRaw) ? conceptsRaw : [];
   for (const c of concepts) need(CONCEPTS[c], `unknown concept "${c}"`);
-  need(Array.isArray(l.prerequisites), 'prerequisites must be an array');
-  need(isObject(l.sheet), 'sheet (starting sheet) missing');
+  if (l.uses !== undefined) { need(Array.isArray(l.uses), 'uses must be an array of concept ids'); for (const c of Array.isArray(l.uses) ? l.uses : []) need(CONCEPTS[c], `unknown concept in uses: "${c}"`); }
+  need(Array.isArray(l.prerequisites) || moduleLesson, 'prerequisites must be an array');
+  if (moduleLesson) {
+    need(WORKBOOKS[l.workbook], `unknown workbook "${l.workbook}" (content/workbooks)`);
+    need(isObject(l.state) && typeof l.state.before === 'string', 'a module lesson needs state.before');
+    need(SEEDED_KINDS.includes(kind) || typeof l.state.after === 'string', 'a module lesson needs state.after (a seeded kind is graded by its goals)');
+    if (l.plant !== undefined) need(isObject(l.plant) && Object.keys(l.plant).every(k => /^[A-Za-z0-9 ]+!(#?[A-Za-z]+[0-9]*)$/.test(k)), 'plant is a state patch: { "Sheet!A1": cell | null, "Sheet!#colW": {…} }');
+    if (kind !== 'challenge') {
+      need(typeof l.headline === 'string' && l.headline.trim(), 'headline (the one concept the lesson exists to teach) missing');
+      need(Array.isArray(l.conventions) && l.conventions.length > 0 && l.conventions.every(id => CONVENTIONS[id]), 'every module lesson carries at least one canon convention id');
+    } else if (l.conventions !== undefined) {
+      need(Array.isArray(l.conventions) && l.conventions.every(id => CONVENTIONS[id]), 'challenge conventions must be canon ids');
+    }
+    need(typeof l.minutes === 'number' && l.minutes > 0 && l.minutes <= 15, 'minutes (5-7 for lessons, 2-3 for challenges) missing');
+  }
+  if (kind === 'challenge') {
+    need(typeof l.seed === 'function', 'a challenge is a generator: seed(rng) → patch');
+    need(Array.isArray(l.graders) && l.graders.length > 0 && l.graders.every(g => typeof g === 'function'), 'a challenge carries graders: [(session) => {ok, why}]');
+    need(isObject(l.pars) && l.pars.pass > l.pars.pro && l.pars.pro > l.pars.legendary && l.pars.legendary > 0, 'challenge pars must fall strictly: pass > pro > legendary > 0');
+  }
+  // A module's assessment and test-out are seeded like a challenge (fresh clothing every run) and
+  // may carry pars for the efficiency tier; the project, assessment and test-out combine taught
+  // material, so no goal teaches (C2 Run 4).
+  if (moduleLesson && (kind === 'assessment' || kind === 'testout')) need(typeof l.seed === 'function', kind + ' is seeded: seed(rng) → patch');
+  if (kind !== 'challenge' && l.seed !== undefined) need(typeof l.seed === 'function' && (kind === 'assessment' || kind === 'testout'), 'only a challenge, assessment or test-out carries a seed');
+  if (kind !== 'challenge' && l.pars !== undefined) need(isObject(l.pars) && (kind === 'assessment' || kind === 'testout') && l.pars.pass > l.pars.pro && l.pars.pro > l.pars.legendary && l.pars.legendary > 0, 'pars (pass > pro > legendary > 0) belong to a challenge, assessment or test-out');
+  if (kind !== 'lesson') for (const g of Array.isArray(l.goals) ? l.goals : []) need(g && g.teach === undefined, `a ${kind} goal carries no teach line`);
+  need(isObject(l.sheet) || moduleLesson, 'sheet (starting sheet) missing');
   need(l.sheets === undefined || (Array.isArray(l.sheets) && l.sheets.every(isObject)), 'sheets must be an array of { name, cells } records');
   for (const sh of Array.isArray(l.sheets) ? l.sheets.filter(isObject) : []) need(typeof sh.name === 'string' && /^[^[\]:*?/\\]{1,31}$/.test(sh.name), `sheet name "${sh.name}" is not Excel-legal`);
-  // The Read phase: two or three sentences, total (what the lesson is, what you will do, why it pays off).
-  need(typeof l.read === 'string' && l.read.trim(), 'read missing (two or three sentences)');
-  if (typeof l.read === 'string') { const n = sentenceCount(l.read); need(n >= 2 && n <= 3, `read must be two or three sentences (it has ${n})`); need(wordCount(l.read) <= 80, 'read is over 80 words'); need(!/`/.test(l.read) || true, ''); }
-  need(typeof l.par === 'number' && l.par > 0, 'par (timed-mode seconds) missing');
+  if (moduleLesson) {
+    // The Brief (v2): the situation, the task, the payoff — at most three sentences, ending in
+    // the headline keycap; a challenge carries one line.
+    need(typeof l.brief === 'string' && l.brief.trim(), 'brief missing');
+    if (typeof l.brief === 'string') {
+      const n = sentenceCount(l.brief);
+      if (kind === 'challenge') need(n <= 2 && wordCount(l.brief) <= 40, 'a challenge brief is one line');
+      else {
+        need(n >= 1 && n <= 3, `brief must be at most three sentences (it has ${n})`);
+        need(wordCount(l.brief) <= 70, 'brief is over 70 words');
+        need(/`[^`]+`[.!]?\s*$/.test(l.brief.trim()), 'the brief ends with the headline keycap (`Ctrl+…`)');
+      }
+    }
+  } else {
+    // The Read phase (legacy): two or three sentences, total.
+    need(typeof l.read === 'string' && l.read.trim(), 'read missing (two or three sentences)');
+    if (typeof l.read === 'string') { const n = sentenceCount(l.read); need(n >= 2 && n <= 3, `read must be two or three sentences (it has ${n})`); need(wordCount(l.read) <= 80, 'read is over 80 words'); }
+  }
+  if (kind === 'challenge') need(l.par === undefined, 'a challenge carries pars, not par');
+  else if (!moduleLesson) need(typeof l.par === 'number' && l.par > 0, 'par (timed-mode seconds) missing');
   need(Array.isArray(l.goals) && l.goals.length > 0, 'goals missing');
   const goals = Array.isArray(l.goals) ? l.goals.filter(isObject) : [];
   const ids = new Set();
@@ -197,10 +289,23 @@ export function validateLesson(l) {
   for (const g of goals) {
     need(typeof g.id === 'string' && g.id, 'goal id missing'); need(!ids.has(g.id), `duplicate goal id ${g.id}`); ids.add(g.id);
     need(typeof g.text === 'string' && g.text.trim(), `goal ${g.id}: text missing`);
-    if (typeof g.text === 'string') { need(sentenceCount(g.text) === 1 && /[.!?]$/.test(g.text.trim()), `goal ${g.id}: the action must be one sentence ending in a full stop`); need(wordCount(g.text) <= 26, `goal ${g.id}: the action is over 26 words`); }
+    if (typeof g.text === 'string') {
+      // one action sentence; the closer may open with its question ("Does it tie? Watch …")
+      const n = sentenceCount(g.text);
+      need((g.closer ? n >= 1 && n <= 2 : n === 1) && /[.!?]$/.test(g.text.trim()), `goal ${g.id}: the action must be one sentence ending in a full stop`);
+      need(wordCount(g.text) <= 26, `goal ${g.id}: the action is over 26 words`);
+    }
     need(typeof g.check === 'function', `goal ${g.id}: check must be a function`);
-    need(Array.isArray(g.requires), `goal ${g.id}: requires must list concept ids`);
+    need(Array.isArray(g.requires) || kind === 'challenge', `goal ${g.id}: requires must list concept ids`);
     for (const c of Array.isArray(g.requires) ? g.requires : []) need(CONCEPTS[c], `goal ${g.id}: unknown concept "${c}"`);
+    if (g.convention !== undefined) need(CONVENTIONS[g.convention], `goal ${g.id}: unknown convention "${g.convention}"`);
+    if (g.closer !== undefined) {
+      // The "does it tie" closer (C2 addendum): the last goal, played by the platform as a ghost —
+      // it perturbs an input, the learner watches the sheet answer, the sheet goes back as it was.
+      need(g.closer === true && moduleLesson && kind !== 'challenge', `goal ${g.id}: closer is only a module lesson's (or project's, assessment's, test-out's) last goal`);
+      need(goals[goals.length - 1] === g, `goal ${g.id}: the closer must be the last goal`);
+      need(isObject(g.demo), `goal ${g.id}: a closer is a demo the platform plays (demo: { script })`);
+    }
     if (g.demo !== undefined) {
       need(isObject(g.demo) && typeof g.demo.script === 'string' && g.demo.script.trim(), `goal ${g.id}: demo needs a script`);
       need(g.demo === undefined || g.keys === undefined, `goal ${g.id}: a demo goal has no keys (the platform presses them)`);
@@ -210,7 +315,7 @@ export function validateLesson(l) {
     // one-line teaching point; a goal that only reuses taught concepts carries none.
     const fresh = (Array.isArray(g.requires) ? g.requires : []).filter(c => concepts.includes(c) && !introduced.has(c));
     if (fresh.length) { need(typeof g.teach === 'string' && g.teach.trim(), `goal ${g.id}: introduces ${fresh.join(', ')} and needs a one-line teach`); fresh.forEach(c => introduced.add(c)); }
-    else if (Array.isArray(l.concepts) && Array.isArray(g.requires)) need(g.teach === undefined, `goal ${g.id}: reuses taught concepts only, so it must not carry a teach line`);
+    else if (Array.isArray(conceptsRaw) && Array.isArray(g.requires)) need(g.teach === undefined, `goal ${g.id}: reuses taught concepts only, so it must not carry a teach line`);
     if (typeof g.teach === 'string') { need(sentenceCount(g.teach) === 1 && /[.!?]$/.test(g.teach.trim()), `goal ${g.id}: teach must be one sentence ending in a full stop`); need(wordCount(g.teach) <= 30, `goal ${g.id}: teach is over 30 words`); }
   }
   need(l.race === undefined || (Array.isArray(l.race) && l.race.length >= 1 && l.race.every(r => isObject(r) && typeof r.label === 'string' && ids.has(r.slow) && ids.has(r.fast))), 'race must be pairs { label, slow, fast } naming goals');
@@ -219,7 +324,7 @@ export function validateLesson(l) {
   const ends = Array.isArray(l.endState) ? l.endState.filter(isObject) : [];
   for (const e of ends) { need(typeof e.text === 'string', 'endState entries need text'); need(typeof e.check === 'function', 'endState entries need a check'); }
   need(typeof l.solution === 'string' && l.solution.trim(), 'solution keystrokes missing');
-  if (isObject(l.sheet)) validateStartingSheet(l, goals, ends, need);
+  if (isObject(l.sheet) || moduleLesson) validateStartingSheet(l, goals, ends, need, { moduleLesson, kind });
   return errs;
 }
 
@@ -229,29 +334,49 @@ export function validateLesson(l) {
  * the starting sheet already satisfies (nothing for the learner to do) are all reported. Later goals
  * may legitimately hold at the start — they are gated behind the earlier ones.
  */
-function validateStartingSheet(l, goals, ends, need) {
-  const spec = l.sheet;
-  const cells = isObject(spec.cells) ? spec.cells : {};
-  need(spec.cells === undefined || isObject(spec.cells), 'sheet: cells must be an object of cell records');
-  for (const k in cells) { need(parseRef(k), `sheet: bad cell key "${k}"`); need(isObject(cells[k]), `sheet: cell ${k} must be a record such as { value }`); }
-  const rows = spec.rows || 100, cols = spec.cols || 26;   // the Sheet defaults
-  if (spec.active !== undefined) {
-    const a = spec.active;
-    need(isObject(a) && Number.isInteger(a.r) && Number.isInteger(a.c) && a.r >= 1 && a.r <= rows && a.c >= 1 && a.c <= cols, `sheet: active ${JSON.stringify(a)} is outside the ${rows}×${cols} grid`);
-  }
+function validateStartingSheet(l, goals, ends, need, opts = {}) {
+  const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells, colW: sp.colW, active: sp.active, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups });
   let sheet, session;
-  const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells, colW: sp.colW, active: sp.active, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze });
-  try {
-    sheet = build({ ...spec, cells });
-    session = new Session(sheet, {}); session.demoDone = new Set();
-    // the workbook, exactly as LessonRun.reset assembles it, so cross-sheet checks probe correctly
-    const sheets = Array.isArray(l.sheets) ? l.sheets : [];
-    if (sheets.length) {
-      if (sheets[0] && sheets[0].name) session.sheets[0].name = sheets[0].name;
-      for (const sh of sheets.slice(1)) session.addSheet(sh.name, build(sh));
+  if (opts.moduleLesson) {
+    // a module lesson starts from the previous lesson's `after` (the named workbook state);
+    // a challenge additionally wears the seed's clothing before the first key
+    let state;
+    try { state = workbookState(l.workbook, l.state.before); } catch (e) { need(false, e.message); return; }
+    if (SEEDED_KINDS.includes(opts.kind) && typeof l.seed === 'function') {
+      let patch;
+      try { patch = l.seed(mulberry32(1)); } catch (e) { need(false, `seed throws: ${e.message}`); return; }
+      need(isObject(patch), 'seed must return a patch object');
+      for (const key in patch || {}) { const shName = key.includes('!') ? key.split('!')[0] : state.sheets[0].name; need(state.sheets.some(x => x.name === shName), `seed patches unknown sheet in "${key}"`); }
+      applyStatePatch(state, patch || {});
     }
-  }   // as the runner sets it up
-  catch (e) { need(false, `sheet does not build: ${e.message}`); return; }
+    try {
+      session = new Session(build(state.sheets[0]), {}); session.demoDone = new Set();
+      session.sheets[0].name = state.sheets[0].name;
+      for (const sh of state.sheets.slice(1)) session.addSheet(sh.name, build(sh));
+      sheet = session.sheet;
+    } catch (e) { need(false, `module state does not build: ${e.message}`); return; }
+  } else {
+    const spec = l.sheet;
+    const cells = isObject(spec.cells) ? spec.cells : {};
+    need(spec.cells === undefined || isObject(spec.cells), 'sheet: cells must be an object of cell records');
+    for (const k in cells) { need(parseRef(k), `sheet: bad cell key "${k}"`); need(isObject(cells[k]), `sheet: cell ${k} must be a record such as { value }`); }
+    const rows = spec.rows || 100, cols = spec.cols || 26;   // the Sheet defaults
+    if (spec.active !== undefined) {
+      const a = spec.active;
+      need(isObject(a) && Number.isInteger(a.r) && Number.isInteger(a.c) && a.r >= 1 && a.r <= rows && a.c >= 1 && a.c <= cols, `sheet: active ${JSON.stringify(a)} is outside the ${rows}×${cols} grid`);
+    }
+    try {
+      sheet = build({ ...spec, cells });
+      session = new Session(sheet, {}); session.demoDone = new Set();
+      // the workbook, exactly as LessonRun.reset assembles it, so cross-sheet checks probe correctly
+      const sheets = Array.isArray(l.sheets) ? l.sheets : [];
+      if (sheets.length) {
+        if (sheets[0] && sheets[0].name) session.sheets[0].name = sheets[0].name;
+        for (const sh of sheets.slice(1)) session.addSheet(sh.name, build(sh));
+      }
+    }   // as the runner sets it up
+    catch (e) { need(false, `sheet does not build: ${e.message}`); return; }
+  }
   session.goalMark = 0;
   const probe = (label, check) => {
     if (typeof check !== 'function') return null;
@@ -265,7 +390,7 @@ const isObject = v => typeof v === 'object' && v !== null && !Array.isArray(v);
 
 /** Every concept available to a lesson: its own plus its prerequisites', transitively. */
 export function availableConcepts(lesson, byId, seen = new Set()) {
-  const out = new Set(lesson.concepts || []);
+  const out = new Set(lesson.teaches || lesson.concepts || []);
   for (const pid of lesson.prerequisites || []) {
     if (seen.has(pid)) continue; seen.add(pid);
     const p = byId[pid]; if (!p) continue;

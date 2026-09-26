@@ -38,11 +38,18 @@ test('the catalogue: ids unique, lookups work, benchmarks and the Daily pool are
 });
 
 test('every drill validates', () => {
-  for (const d of DRILLS) assert.deepEqual(validateDrill(d), [], d.id);
+  for (const d of DRILLS.filter(x => x.kind !== 'challenge')) assert.deepEqual(validateDrill(d), [], d.id);
+  // the module challenges ride the catalogue as thin records over their (validated) lessons
+  const ch = DRILLS.filter(x => x.kind === 'challenge');
+  assert.equal(ch.length, 10, 'the seven Chapter 1 module challenges, the two Chapter 2 ones and the remix are registered');
+  for (const d of ch) { assert.ok(d.lesson && d.lesson.kind === 'challenge' && d.pars && d.pars.pass > d.pars.legendary, d.id); assert.equal(d.access, d.chapter === 'foundations' ? 'free' : 'paid', d.id); }
+  assert.deepEqual(ch.filter(d => d.benchmark).map(d => d.id), ['challenge-to-standard-in-three-minutes', 'challenge-the-site-pnl'], 'two challenges are benchmarks');
+  assert.ok(ch.filter(d => d.access === 'free').every(d => DAILY_POOL.includes(d.id)), 'the Daily pool picks the free challenges up');
+  assert.ok(ch.filter(d => d.access === 'paid').every(d => !DAILY_POOL.includes(d.id)), 'the Daily never draws a paid challenge');
 });
 
 test('validateDrill rejects the broken shapes', () => {
-  const good = DRILLS[0];
+  const good = DRILLS.find(d => d.kind !== 'challenge');
   assert.ok(validateDrill({ ...good, pars: { pass: 10, pro: 10, legendary: 5 } }).some(e => /strictly/.test(e)), 'flat pars');
   assert.ok(validateDrill({ ...good, optimalKeys: 0 }).some(e => /optimalKeys/.test(e)), 'zero optimal');
   assert.ok(validateDrill({ ...good, goals: good.goals.map(g => ({ ...g, teach: 'no.' })) }).some(e => /no teach/.test(e)), 'teach refused');
@@ -50,7 +57,7 @@ test('validateDrill rejects the broken shapes', () => {
 });
 
 test('every solution replays to a finish inside the optimal keystroke count; pars are hittable', () => {
-  for (const d of DRILLS) {
+  for (const d of DRILLS.filter(x => x.kind !== 'challenge')) {
     const run = new LessonRun(d, { mode: 'timed' });
     run.run(d.solution);
     assert.ok(run.finished, `${d.id}: solution finishes the drill`);
@@ -60,7 +67,7 @@ test('every solution replays to a finish inside the optimal keystroke count; par
 });
 
 test('each checkpoint\'s keys hint replays chained from the previous end state', () => {
-  for (const d of DRILLS) {
+  for (const d of DRILLS.filter(x => x.kind !== 'challenge')) {
     const run = new LessonRun(d, { mode: 'timed' });
     d.goals.forEach((g, i) => {
       run.run(hintScript(g.keys));

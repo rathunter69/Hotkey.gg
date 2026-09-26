@@ -29,12 +29,14 @@ a.btn{text-decoration:none}
 .page-head h1{font-family:var(--mono); font-size:22px; font-weight:700; letter-spacing:-.3px; margin:0 0 6px}
 .page-sub{font-size:14.5px; color:var(--muted); max-width:70ch; line-height:1.55; margin:0}
 .page-sub b{color:var(--text); font-weight:600}
-.page-fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); line-height:1.7; margin:14px 0 0}
+.page-fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); line-height:1.7; margin:14px 0 0; max-width:80ch}
 .page-fine a, .page p a, .plain-list a{color:var(--accent); text-decoration:none}
 .page-fine a:hover, .page p a:hover, .plain-list a:hover{text-decoration:underline}
 .page h2{font-family:var(--sans); font-size:17px; font-weight:700; letter-spacing:-.3px; margin:0 0 8px}
 .page h3{font-size:13.5px; font-weight:600; margin:14px 0 6px}
-.page p{font-size:14px; line-height:1.6; color:var(--muted); margin:0 0 10px}
+/* body copy: the lowest specificity there is (0-0-1), so any class on a paragraph (.page-fine, .coming,
+   .l-alt, .lb-sub, .form-msg …) sets its own size and margins; a bare <p> gets these */
+:where(.page) p{font-size:14px; line-height:1.6; color:var(--muted); margin:0 0 10px}
 .page p b{color:var(--text); font-weight:600}
 .plain-list{list-style:none; margin:0 0 10px; padding:0; font-size:14px; line-height:1.6; color:var(--muted)}
 .plain-list li{display:flex; justify-content:space-between; gap:12px; padding:5px 0; border-bottom:1px solid color-mix(in srgb, var(--line) 55%, transparent)}
@@ -182,6 +184,9 @@ html[data-dark="1"] .l-sheet td.l-in{color:#6ea8f7}
 .l-price .l-or{margin:0 4px; color:var(--muted)}
 .l-alt{font-family:var(--mono); font-size:11.5px; color:var(--muted); line-height:1.6; margin:-6px 0 0}
 .l-alt b{color:var(--text); font-weight:600}
+/* the student price keeps the size it has always shown at (a pricing-page change waits for Wolf's go-ahead) */
+.page .l-alt{font-size:14px; margin:0 0 10px}
+html[data-density="comfortable"] .page .l-alt{font-size:15px}
 .l-tier ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px}
 .l-tier li{position:relative; padding-left:21px; font-size:13.5px; color:var(--muted); line-height:1.55}
 .l-tier li::before{content:"\2192"; position:absolute; left:0; top:0; font-family:var(--mono); font-size:12px; color:var(--accent)}
@@ -254,7 +259,7 @@ html[data-dark="1"] .l-sheet td.l-in{color:#6ea8f7}
 .hc-crumb{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-bottom:6px}
 .home h1{font-family:var(--mono); font-size:22px; font-weight:700; letter-spacing:-.4px; margin:0 0 8px}
 .home h2{font-size:16px; font-weight:700; margin:0 0 6px}
-.home p{font-size:14px; color:var(--muted); line-height:1.6; margin:0 0 12px; max-width:70ch}
+:where(.home) p{font-size:14px; color:var(--muted); line-height:1.6; margin:0 0 12px; max-width:70ch}
 .hc-actions{display:flex; gap:10px; flex-wrap:wrap}
 .home-grid{display:grid; grid-template-columns:1.3fr .7fr; gap:16px; align-items:start}
 .home-col{display:flex; flex-direction:column; gap:16px}
@@ -275,18 +280,24 @@ html[data-dark="1"] .l-sheet td.l-in{color:#6ea8f7}
 @media (max-width:900px){ .home-grid{grid-template-columns:1fr} }
 
 /* ---------- 7. practice ---------- */
-.practice-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+/* the drill list (Timed runs under it) takes two thirds; the rail stacks the Daily, Keep sharp,
+   rapid-fire and the sandbox. Below 1000px one column, the rail first as a 2 × 2 grid. */
+.practice-grid{display:grid; grid-template-columns:minmax(0,2fr) minmax(300px,1fr); gap:16px; align-items:start}
+.practice-main, .practice-rail{display:flex; flex-direction:column; gap:16px; min-width:0}
 .pcard, .tcard, .acard{background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden; display:flex; flex-direction:column}
 .pcard-now{border-color:var(--accent-dim)}
 .pcard-body, .tcard-body, .acard-body{padding:18px 20px 20px; display:flex; flex-direction:column; gap:6px; align-items:flex-start; flex:1}
-.pcard-body p, .tcard-body p, .acard-body p{margin:0 0 8px}
-.pcard-body .plain-list, .acard-body .plain-list{width:100%}
-@media (max-width:800px){ .practice-grid{grid-template-columns:1fr} }
+:where(.pcard-body, .tcard-body, .acard-body) p{margin:0 0 8px}
+/* the body keeps buttons at their own width (flex-start); lists and grids take the full width */
+.pcard-body .plain-list, .acard-body .plain-list, .pcard-body .drill-list, .acard-body .stats-grid, .acard-body .stats-badges{width:100%; align-self:stretch}
+.pcard h2 .pl-n{font-family:var(--mono); font-size:.8em; font-weight:500; color:var(--muted)}
+@media (max-width:1000px){ .practice-grid{grid-template-columns:minmax(0,1fr)} .practice-rail{order:-1; display:grid; grid-template-columns:1fr 1fr} }
+@media (max-width:640px){ .practice-rail{grid-template-columns:1fr} }
 
 /* ---------- 8. drill workspace (index.html 1485–1500, 1308–1370, 1412–1440, 824–845, 760–768) ---------- */
 .drill-page{max-width:1380px; margin:0 auto 24px; font-family:var(--sans)}
 .drillbar{display:flex; align-items:center; gap:6px; margin-bottom:6px}
-.db-nav{font-family:var(--mono); font-size:15px; line-height:1; color:var(--muted); background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:8px 11px; cursor:pointer; transition:.13s}
+.db-nav{font-family:var(--mono); font-size:15px; line-height:1; color:var(--muted); background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:8px 11px; cursor:pointer; transition:.13s; text-decoration:none}
 .db-nav:hover:not(:disabled){color:var(--accent); border-color:var(--accent-dim)}
 .db-current{flex:1 1 auto; min-width:0; display:flex; align-items:center; gap:11px; text-align:left; font-family:var(--sans); background:var(--surface); border:1px solid var(--line);
   border-radius:8px; padding:8px 13px; cursor:pointer; transition:.13s; color:var(--text); text-decoration:none}
@@ -319,7 +330,11 @@ html[data-dark="1"] .l-sheet td.l-in{color:#6ea8f7}
 .cl-label{flex:1; min-width:0}
 .cl-keys{flex-basis:100%; margin:3px 0 2px 28px; font-size:11.5px; color:var(--muted); line-height:1.9}
 .cl-keys kbd{font-size:10.5px}
-.cl-esc{margin-top:auto; padding-top:8px; border-top:1px dashed var(--line); font-family:var(--mono); font-size:10.5px; color:var(--faint); line-height:1.8}
+/* the foot's two hints on two lines: each key in the first column, its words beside it (a grid
+   makes each run of text between the keys its own cell, so a hint never wraps under a key) */
+.cl-esc{margin-top:auto; padding-top:8px; border-top:1px dashed var(--line); font-family:var(--mono); font-size:10.5px; color:var(--faint); line-height:1.5;
+  display:grid; grid-template-columns:auto minmax(0,1fr); gap:5px 8px; align-items:baseline}
+.cl-esc kbd{justify-self:start}
 .cl-esc kbd{font-size:9.5px}
 .task-panel .help-panel{margin:0}
 .sheettabs{display:flex; align-items:flex-end; gap:3px; padding:0 10px; height:38px; background:var(--surface2); border-top:1px solid var(--line); overflow-x:auto; scrollbar-width:none}
@@ -343,14 +358,14 @@ html.hk-fs .drill-page{max-width:none; padding:0 12px}
 .lb-tab.on{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
 .boards{display:grid; grid-template-columns:repeat(2,1fr); gap:20px; align-items:start}
 .lb .board{background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden}
-.lb .board-cap{display:flex; align-items:center; justify-content:space-between; min-height:34px; padding:6px 14px; background:var(--surface2); border-bottom:1px solid var(--line)}
-.lb .board-cap h2{font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:0}
-.lb .board-cap .lvl{font-family:var(--mono); font-size:11px; color:var(--faint); text-transform:uppercase; letter-spacing:1px}
+.lb .board-cap{display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:34px; padding:6px 16px; background:var(--surface2); border-bottom:1px solid var(--line)}
+.lb .board-cap h2{font-family:var(--mono); font-size:10.5px; font-weight:400; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:0}   /* the card caption, as .pcard-cap */
+.lb .board-cap .lvl{font-family:var(--mono); font-size:9.5px; color:var(--faint); text-transform:uppercase; letter-spacing:.1em}
 .lb .row{display:grid; grid-template-columns:48px minmax(0,1fr) auto 92px; column-gap:10px; align-items:center; min-height:42px; padding:9px 14px; border-bottom:1px solid var(--line); font-size:13.5px; font-family:var(--mono)}
 .lb .rk{font-weight:700; color:var(--muted)}
 .lb .tm{text-align:right; font-weight:500}
 .lb .empty{padding:18px 14px; color:var(--faint); font-family:var(--mono); font-size:13px; text-align:center}
-.lb-sub{font-family:var(--mono); font-size:12px; color:var(--muted); margin:16px 0 0 !important}
+.lb-sub{font-family:var(--mono); font-size:12px; color:var(--muted); line-height:1.7; margin:16px 0 0 !important; max-width:80ch}
 .lb-desk-prompt{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-top:28px; padding:14px 18px; background:var(--surface); border:1px solid var(--line); border-radius:12px; font-size:14px}
 @media (max-width:680px){ .boards{grid-template-columns:1fr} .lb .row{grid-template-columns:48px minmax(0,1fr) 92px} .lb .row .mid{display:none} }
 
@@ -383,6 +398,7 @@ html.hk-fs .drill-page{max-width:none; padding:0 12px}
 .acct-col{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
 .acard-signin{border-color:var(--accent-dim)}
 .acard + .acard, .account > .acard{margin-top:16px}
+.acct-col > .acard{margin-top:0}   /* side by side in a row, the cards' tops line up */
 .acard.flash{box-shadow:0 0 0 2px var(--accent)}
 .settings-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px 22px; align-items:start}
 .set{display:flex; flex-direction:column; gap:6px; font-size:13.5px; font-weight:600; color:var(--text)}
@@ -425,9 +441,11 @@ html.hk-fs .drill-page{max-width:none; padding:0 12px}
 .pace s,.pace u{position:absolute; top:0; bottom:0; width:2px; text-decoration:none}
 .pace s{background:color-mix(in srgb, var(--ink) 35%, transparent)}
 .pace u{background:var(--warn, #d90); width:3px}
-.start-card{position:absolute; inset:0; z-index:30; display:flex; align-items:center; justify-content:center; background:color-mix(in srgb, var(--bg) 68%, transparent); backdrop-filter:blur(1.5px)}
+/* the start card docks at the foot of the sheet with no wash, so the data stays readable during the
+   free reading time; the layer still spans the sheet, so nothing is clicked before the clock starts */
+.start-card{position:absolute; inset:0; z-index:30; display:flex; align-items:flex-end; justify-content:center; padding:0 16px 24px; background:transparent}
 .drill-host{position:relative}
-.sc-inner{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:26px 34px; text-align:center; box-shadow:0 12px 40px color-mix(in srgb, var(--ink) 12%, transparent)}
+.sc-inner{background:var(--surface); border:1px solid var(--accent-dim); border-radius:14px; padding:18px 30px; text-align:center; box-shadow:0 12px 40px color-mix(in srgb, var(--ink) 16%, transparent)}
 .sc-title{font-size:20px; font-weight:800}
 .sc-sub{color:var(--muted); font-size:13px; margin-top:6px}
 .sc-pars{font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:12px}
@@ -463,35 +481,64 @@ html.hk-fs .drill-page{max-width:none; padding:0 12px}
 .badge .px{image-rendering:pixelated}
 .badge-name{font-size:11px; color:var(--muted); line-height:1.2}
 .badge.earned .badge-name{color:var(--ink)}
-.badge.r-rare{border-color:#4a9eda66}
-.badge.r-epic{border-color:#a06bd666}
-.badge.r-legendary{border-color:#e0913f88; box-shadow:0 0 12px #e0913f22}
+/* rarity colours are theme tokens (app.css :root), so every theme's shelf reads natively (§6a) */
+.badge.r-rare{border-color:color-mix(in srgb, var(--rar-rare) 40%, transparent)}
+.badge.r-epic{border-color:color-mix(in srgb, var(--rar-epic) 40%, transparent)}
+.badge.r-legendary{border-color:color-mix(in srgb, var(--rar-legendary) 55%, transparent); box-shadow:0 0 12px color-mix(in srgb, var(--rar-legendary) 14%, transparent)}
 .badge-q{font-size:26px; font-weight:800; color:var(--muted); height:34px; display:flex; align-items:center}
 .badge-prog{width:70%; height:4px; border-radius:3px; background:color-mix(in srgb, var(--line) 60%, transparent); overflow:hidden}
 .badge-prog i{display:block; height:100%; background:var(--accent)}
 
 /* ---------- fx banners (named moments) ---------- */
-.fx-banner{position:fixed; top:64px; left:50%; transform:translate(-50%,-16px); opacity:0; z-index:220; background:var(--surface); border:1px solid var(--accent); border-radius:12px; padding:10px 18px; font-weight:700; box-shadow:0 10px 34px color-mix(in srgb, var(--ink) 16%, transparent); transition:.28s; pointer-events:none; display:flex; gap:10px; align-items:baseline}
-.fx-banner.in{opacity:1; transform:translate(-50%,0)}
+.fx-banner{position:fixed; left:24px; bottom:calc(24px + var(--fx-i, 0) * 60px); transform:translateX(-18px); opacity:0; z-index:220; max-width:min(380px, calc(100vw - 48px)); background:var(--surface); border:1px solid var(--accent); border-radius:12px; padding:10px 18px; font-weight:700; box-shadow:0 10px 34px color-mix(in srgb, var(--ink) 16%, transparent); transition:opacity .28s, transform .28s; pointer-events:none; display:flex; flex-wrap:wrap; gap:2px 10px; align-items:baseline}
+.fx-banner.in{opacity:1; transform:none}
+/* Subtle and reduced motion: a fade in place (effects.js bannerMotion); Off: shown still, no transition */
+.fx-banner.fx-fade{transform:none; transition:opacity .25s}
+.fx-banner.fx-static{transform:none; transition:none}
+@media (prefers-reduced-motion: reduce){ .fx-banner{transform:none; transition:opacity .25s} .fx-banner.fx-static{transition:none} }
 .fx-banner.subtle{border-color:var(--line); font-weight:600}
 .fx-banner span{color:var(--muted); font-weight:500; font-size:12.5px}
-.fx-banner.r-rare{border-color:#4a9eda}
-.fx-banner.r-epic{border-color:#a06bd6}
-.fx-banner.r-legendary{border-color:#e0913f}
+.fx-banner.r-rare{border-color:var(--rar-rare)}
+.fx-banner.r-epic{border-color:var(--rar-epic)}
+.fx-banner.r-legendary{border-color:var(--rar-legendary)}
+/* the Daily card's BOARD cell for a guest (ui/result-card.js boardCell) */
+.dc .dc-signin{color:var(--accent); text-decoration:none}
+.dc .dc-signin:hover, .dc .dc-signin:focus-visible{text-decoration:underline}
 
-/* ---------- practice drill list ---------- */
-.drill-list{display:flex; flex-direction:column; gap:8px; margin-top:8px}
-.drow{display:flex; align-items:center; gap:12px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:var(--surface); text-decoration:none; color:var(--ink)}
-.drow:hover{border-color:var(--accent-dim)}
-.drow .dt{flex:1; min-width:0}
-.drow .dt b{display:block}
-.drow .dt span{color:var(--muted); font-size:12.5px}
-.drow .dpars{font-family:var(--mono); font-size:12px; color:var(--muted); white-space:nowrap}
-.drow .dpb{font-family:var(--mono); font-size:12.5px; min-width:86px; text-align:right}
-.drow .dtier{font-family:var(--mono); font-size:11px; border:1px solid var(--line); border-radius:6px; padding:3px 7px; color:var(--muted)}
-.drow .dtier.t-pass{color:var(--ink); border-color:var(--ink)}
-.drow .dtier.t-pro{color:#4a9eda; border-color:#4a9eda}
-.drow .dtier.t-legendary{color:#e0913f; border-color:#e0913f}
+/* ---------- practice drill list: one grid template for the header and every row, so the pars,
+   the tier and the best line up under their labels. a.drow is the row's link (its title,
+   stretched over the whole row); the module tag sits above it as a link of its own. ---------- */
+.drill-list{display:flex; flex-direction:column; gap:8px}
+.drill-head, .drill-row{display:grid; grid-template-columns:minmax(0,1fr) 44px 44px 64px 84px 72px; column-gap:10px; align-items:center}
+.drill-head{padding:0 13px; font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); text-align:right; margin-bottom:-2px}
+.drill-head span:nth-child(5){text-align:center}
+.drill-row{position:relative; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:var(--surface); color:var(--text); transition:border-color .13s}
+.drill-row:hover{border-color:var(--accent-dim)}
+.drill-row:has(.drow:focus-visible){outline:2px solid var(--accent); outline-offset:2px}
+.drill-row .drow{color:var(--text); font-size:14.5px; font-weight:700; text-decoration:none; margin-right:3px}   /* spacing sits on the right of each piece, so a wrapped line never starts indented */
+.drill-row .drow::after{content:""; position:absolute; inset:0; border-radius:inherit}
+.drill-row .drow:focus-visible{outline:none}
+.drill-row .dt{min-width:0}
+.dt-line{display:block}
+.dt-task{display:block; color:var(--muted); font-size:12.5px; line-height:1.45; margin-top:2px}
+.dnum{font-family:var(--mono); font-size:12px; font-weight:500; color:var(--muted)}
+.dflag{font-family:var(--mono); font-size:10.5px; color:var(--muted); margin-right:3px}
+.dmod{position:relative; z-index:1; margin-right:3px; font-family:var(--mono); font-size:11px; color:var(--accent); text-decoration:none; white-space:nowrap}
+.dmod:hover{text-decoration:underline}
+.dmod.dmod-later{color:var(--faint)}
+.dpar, .dpb{font-family:var(--mono); text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums}
+.dpar{font-size:12px; color:var(--muted)}
+.dpb{font-size:12.5px; color:var(--text)}
+.dpb.none{font-size:11.5px; color:var(--faint)}
+/* a held tier is a pill in the theme's tier colour; none yet is a faint dash, never a box */
+.dtier{justify-self:center; font-family:var(--mono); font-size:11px; color:var(--faint); border:1px solid transparent; border-radius:6px; padding:2px 7px}
+.dtier.t-pass{color:var(--tier-pass); border-color:var(--tier-pass)}
+.dtier.t-pro{color:var(--tier-pro); border-color:var(--tier-pro)}
+.dtier.t-legendary{color:var(--tier-legendary); border-color:var(--tier-legendary)}
+@media (max-width:640px){
+  .drill-row{grid-template-columns:minmax(0,1fr) auto auto}
+  .drill-head, .drill-row .dpar{display:none}
+}
 .lb-mine .row .tm{font-family:var(--mono)}
 .theme-locked{opacity:.45; position:relative}
 .theme-locked .pc-lock{font-size:10px; color:var(--muted)}

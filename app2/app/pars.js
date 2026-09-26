@@ -13,11 +13,20 @@ export function parsFrom(legendary, over = {}) {
   };
 }
 
-/** The tier a clean time earns against a drill's pars; 'none' when over pass or not clean. */
-export function tierFor(secs, pars) {
-  if (!Number.isFinite(secs) || !pars) return 'none';
-  if (secs <= pars.legendary) return 'legendary';
-  if (secs <= pars.pro) return 'pro';
+/**
+ * The tier a clean time earns against a set of pars; 'none' when over pass or not clean. With
+ * `opts.keys` and `opts.optimalKeys` the efficiency axis applies too (C2 addendum): pro needs
+ * ≤ 1.5× the reference route's keys, legendary ≤ 1.2×; pass is time only. A run past its time
+ * limit (`opts.timedOut`) earns no tier however fast its goals landed.
+ */
+export const KEY_RATIO = { pro: 1.5, legendary: 1.2 };
+export function tierFor(secs, pars, opts = {}) {
+  if (!Number.isFinite(secs) || !pars || opts.timedOut) return 'none';
+  const opt = Number.isFinite(opts.optimalKeys) && opts.optimalKeys > 0 ? opts.optimalKeys : null;
+  const keys = Number.isFinite(opts.keys) ? opts.keys : null;
+  const keysOk = tier => opt == null || keys == null || keys <= opt * KEY_RATIO[tier];
+  if (secs <= pars.legendary && keysOk('legendary')) return 'legendary';
+  if (secs <= pars.pro && keysOk('pro')) return 'pro';
   if (secs <= pars.pass) return 'pass';
   return 'none';
 }

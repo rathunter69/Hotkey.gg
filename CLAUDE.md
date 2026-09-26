@@ -3,7 +3,7 @@
 You are the sole developer of hotkey.gg. Wolf is the founder and product owner; he is non-technical. You write and ship all the code.
 
 ## What the product is
-A learning-first, beginner-friendly Excel platform with a real in-browser spreadsheet and ribbon. The loop is teach -> guided -> solo -> timed. Speed and competition are the payoff layer learners graduate into, not the entry point. Nobody gets dropped in the deep end.
+A learning-first, beginner-friendly Excel platform with a real in-browser spreadsheet and ribbon. The loop is teach -> guided -> challenge -> timed. Speed and competition are the payoff layer learners graduate into, not the entry point. Nobody gets dropped in the deep end.
 - Free: learning the basics (navigation, editing, formatting, basic formulas, the ribbon), with repeats and personal bests on that content.
 - Paid: advanced Excel, full model builds, and the serious timed/competitive play on that content. $9/mo, $90/yr; student $7/mo, $70/yr; no trial; 14-day guarantee on first payment.
 - Audience: anyone who never got taught Excel properly, through to finance/IB analysts and MBAs. Long-term: B2B pre-onboarding for banks and training providers.
@@ -25,7 +25,7 @@ A full rebuild is in progress. Read `docs/REBUILD_PLAN.md` (sequence, status, op
 ## Technical rules
 - Static site: HTML, CSS, ES modules. No framework, no build step. Supabase backend (project ref `vshtftzrlepedydmkcnm`). Only the publishable anon key may appear in client code; never service-role or Stripe secret keys.
 - New code lives under `app2/`: `engine/` (grid, formulas, input, ribbon), `ui/` (nav, themes, shell), `content/` (lessons as data), `app/` (progression, storage), `supabase/` (migrations, functions, tests), `tests/`.
-- The engine grades spreadsheet END-STATE and accepts any legitimate route. Where a live formula is required, grade liveness with one shared rule (perturb an input and check the result moves), not a regex.
+- The engine grades spreadsheet END-STATE and accepts any legitimate route. Where a live formula is required, grade liveness with one shared rule (perturb an input and check the result moves), not a regex. Convention graders inspect parsed formula tokens, only on cells a goal names as a convention check; any legitimate route still passes.
 - Formula functions must match Excel. Every function fix ships with a node unit test.
 - Lessons are data. Goals name visible elements ("Make Weekly Sales Report bold"), use professional Excel terminology, and never ask for a concept that has not been taught. Every lesson carries a reference solution that the generic solver test replays.
 - Database: RLS on every table; no direct client writes, RPC only; entitlement checked server-side; separate public profile fields from owner-only data. New forward migrations only; never rewrite applied history. Run the Supabase security advisors after every schema change.

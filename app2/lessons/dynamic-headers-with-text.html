@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 47: Dynamic headers with TEXT — Formatting and presentation · hotkey.gg</title>
+<meta name="description" content="undefined">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Formatting and presentation</a> › Custom number formats</div>
+<h1>Lesson 47: Dynamic headers with TEXT</h1>
+<div class="meta">Formatting and presentation · Custom number formats · medium · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">undefined</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li><span class="muted">DATE(year, month, day) builds a date from its parts, so =DATE(2024,12,31) is FY24’s year end as a number the sheet can read.</span> Label A3 Year end, then put the three year ends in B3:D3 as =DATE(2024,12,31), =DATE(2025,12,31) and =DATE(2026,12,31), Tab between.</li><li>The year ends show as serials: step back onto D3, select to B3 with Shift+← twice, and dress them as dates with Ctrl+1 then D.</li><li><span class="muted">TEXT(value, &quot;format&quot;) renders a number through a format code as text, and &amp; joins the pieces: =&quot;FY&quot;&amp;TEXT(B3,&quot;yy&quot;)&amp;&quot;A&quot; reads FY24A from the date in B3.</span> Replace the typed FY24A in B4 with a label built from its year end: =&quot;FY&quot;&amp;TEXT(B3,&quot;yy&quot;)&amp;&quot;A&quot;.</li><li>FY25A in C4 is the same formula one column over: step up onto B4, select C4 with it and fill right with Ctrl+R.</li><li>FY26 is an estimate: in D4 write =&quot;FY&quot;&amp;TEXT(D3,&quot;yy&quot;)&amp;&quot;E&quot; so the label ends in E.</li><li>The title in A1 reads from the labels: join the company name, &quot;Profit and loss, &quot;, B4, &quot; to &quot; and D4 with &amp;.</li><li>Monthly’s title A1 reads from its own headers: =&quot;Voltline - monthly operating data, &quot;&amp;TEXT(B4,&quot;mmm-yy&quot;)&amp;&quot; to &quot;&amp;TEXT(M4,&quot;mmm-yy&quot;).</li><li>Does it follow? Watch the FY26E year end in D3 move to 2027, and the label in D4 and the title in A1 rewrite to FY27E.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/dynamic-headers-with-text">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="units-in-the-format.html">Lesson 46: Units in the format</a></span><span><a href="conditional-codes-and-hidden-zeros.html">Lesson 48: Conditional codes and hidden zeros</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>

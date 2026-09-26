@@ -31,8 +31,9 @@
 //     Quick Access Toolbar, page setup) are RECORDED by real-looking dialogs (Alt F T, Alt P S P):
 //     the dialog edits a draft (`dlg`), ↵ = OK writes it into `settings`, Esc = Cancel discards it
 
-import { Sheet, FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES } from './sheet.js';
-import { evalFormula, formulaRefs, translateFormula } from './formula.js';
+import { Sheet, FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES, CF_STYLE_KEYS, CF_BAR_COLORS, CF_SCALES, cfOperand } from './sheet.js';
+import { evalFormula, formulaRefs, translateFormula, parses } from './formula.js';
+import { builtinCode } from './numfmt.js';
 import { refKey, parseRef, parseRange, rangeText } from './refs.js';
 import { stepPath, PASTE_OPTS, PASTE_OP_OPTS, QAT_COMMANDS, QAT_DEFAULT, POPULAR_COMMANDS, OPTIONS_LIVE_PAGES } from './ribbon.js';
 
@@ -110,7 +111,8 @@ export function parseKeyScript(script) {
   while (i < s.length) {
     const ch = s[i];
     if (/\s/.test(ch)) { i++; continue; }
-    if (ch === '"') { let j = i + 1, t = ''; while (j < s.length && s[j] !== '"') { t += s[j++]; } out.push({ type: 'text', text: t }); i = j + 1; continue; }
+    // "…" types its characters; '…' does the same for text that itself carries double quotes (a TEXT() formula)
+    if (ch === '"' || ch === "'") { let j = i + 1, t = ''; while (j < s.length && s[j] !== ch) { t += s[j++]; } out.push({ type: 'text', text: t }); i = j + 1; continue; }
     let j = i; while (j < s.length && !/\s/.test(s[j])) j++;
     const tok = s.slice(i, j); i = j;
     if (/^[0-9.]{2,}$/.test(tok)) { out.push({ type: 'text', text: tok }); continue; }   // 20 types two digits; a single digit is the same either way
@@ -142,16 +144,43 @@ function makeSettings(session) {
   const st = { calcMode: 'automatic', iterative: false, maxIterations: 100, maxChange: 0.001 };
   Object.defineProperty(st, 'gridlines', { enumerable: true, get: () => !!session.sheet.gridlines, set: v => { session.sheet.gridlines = !!v; } });
   st.qat = QAT_DEFAULT.slice();
-  st.pageSetup = { orientation: 'portrait', scaling: 'adjust', adjustTo: 100, fitWide: 1, fitTall: 1 };
+  st.showFormulas = false;   // Ctrl+` / Formulas › Show Formulas (C2 gap 5): the view paints formula text instead of values
+  st.pageSetup = { orientation: 'portrait', scaling: 'adjust', adjustTo: 100, fitWide: 1, fitTall: 1,
+    titlesRows: '', footer: { left: '', centre: '', right: '' }, printGridlines: false };   // C2 gap 6: Sheet and Header/Footer pages
   return st;
 }
 const clampInt = (v, lo, hi, dflt) => { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : dflt; };
-const DIALOGS_WB = new Set(['goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial']);   // the dialogs dialogKey drives
+/** Page Setup's typed-text controls (Sheet › Rows to repeat at top; Header/Footer › the three footer sections). */
+const PAGESETUP_TEXT = new Set(['titlesRows', 'footL', 'footC', 'footR']);
+/** 'Rows to repeat at top' as Excel shows it back: '$1:$3' / '1:3' / '2' → '$1:$3' / '$2:$2'; blank is no titles (''); anything else is not a reference (null — Excel refuses it). */
+export function normTitlesRows(text) {
+  const t = String(text == null ? '' : text);
+  if (!t.trim()) return '';
+  const m = /^\s*\$?(\d{1,7})(?:\s*:\s*\$?(\d{1,7}))?\s*$/.exec(t);
+  if (!m) return null;
+  const a = +m[1], b = m[2] == null ? a : +m[2];
+  if (a < 1 || b < a) return null;
+  return '$' + a + ':$' + b;
+}
+export const REF_NOT_VALID = 'Reference is not valid.';
+/** Footer text with Excel's field codes canonical: &[file] → &[File], &[DATE] → &[Date], &[page] → &[Page], &[pages] → &[Pages], &[tab] → &[Tab]. */
+export function normFooterText(text) {
+  const CANON = { file: 'File', date: 'Date', page: 'Page', pages: 'Pages', tab: 'Tab', time: 'Time', path: 'Path' };
+  return String(text == null ? '' : text).slice(0, 64).replace(/&\[([a-z]+)\]/gi, (m, w) => (CANON[w.toLowerCase()] ? '&[' + CANON[w.toLowerCase()] + ']' : m));
+}
+const DIALOGS_WB = new Set(['goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale']);   // the dialogs dialogKey drives
+const TYPED_DIALOGS = new Set(['renamesheet', 'find', 'numfmt']);   // a text field keeps the case typed (a format code's "k" is not "K")
+export const NUMFMT_BAD_NOTE = 'Microsoft Excel cannot use the number format you typed.';
+export const CF_VALUE_NOTE = 'The value you entered is not a valid number, date, time, or string.';
+export const CF_FORMULA_NOTE = 'There\'s a problem with this formula.';
+/** A Highlight Cells value as a rule stores it (cfOperand: a number, a date's serial, TRUE / FALSE, text, or a '=…' formula kept as text), or null when Excel would refuse it. */
+const condOperand = text => cfOperand(text);
 /** Excel's messages around the sheet commands (the views show them verbatim). */
 export const LAST_SHEET_NOTE = 'A workbook must contain at least one visible worksheet.';
 export const FIND_NONE_NOTE = "We couldn't find what you were looking for.";
 export const SPECIAL_NONE_NOTE = 'No cells were found.';
 export const DELETE_SHEET_PROMPT = 'Microsoft Excel will permanently delete this sheet. Do you want to continue?';
+export const NO_GROUP_NOTE = 'No group here.';
 
 export class Session {
   /**
@@ -173,6 +202,8 @@ export class Session {
     this.sheets = [{ name: 'Sheet1', sheet: this.sheet }];
     this.sheetIndex = 0;
     this._xr = false;   // cross-sheet recalc reentry guard
+    this._clip = null;  // the workbook's one clipboard (every sheet reads and writes it: wireSheet)
+    this._repeat = null;   // what F4 repeats (C2 gap 10), workbook-wide like the clipboard
     this.pageRows = 0; this.pageCols = 0;   // a screenful for PageDown / Alt+PageDown — the view sets them; 0 = 10
     this.settings = makeSettings(this);
     this.dialogBuf = '';     // Go To's Reference field
@@ -187,6 +218,11 @@ export class Session {
    * mutation — two passes, so an A → B → A chain settles (recalc never emits: no loops).
    */
   wireSheet(sh) {
+    // one clipboard per workbook (Excel): a block copied on one sheet pastes on another. The sheet's
+    // own field becomes an accessor onto the Session's, so Sheet.copy/paste/pasteDrop need no workbook awareness.
+    if (sh.clipboard && !this._clip) this._clip = sh.clipboard;
+    Object.defineProperty(sh, 'clipboard', { configurable: true, enumerable: true, get: () => this._clip, set: v => { this._clip = v; } });
+    Object.defineProperty(sh, 'lastAction', { configurable: true, enumerable: true, get: () => this._repeat, set: v => { this._repeat = v; } });   // F4 repeats across sheets too
     sh.resolver = name => { const e = this.sheets.find(x => x.name.toLowerCase() === String(name).toLowerCase()); return e ? e.sheet : null; };
     sh.allSheets = () => this.sheets.map(e => ({ name: e.name, sheet: e.sheet }));
     sh.onChange(what => {
@@ -201,6 +237,7 @@ export class Session {
   resetEdit() {
     this.editing = false; this.editBuf = ''; this.editCaret = 0; this.editMode = 'enter';
     this.editAnchor = null; this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null; this.editPointed = false;
+    this.editOrigin = null;   // the sheet an open formula entry belongs to while another sheet shows for pointing (Ctrl+PgDn mid-formula)
     this.autoSumEdit = false;
   }
   onChange(fn) { this.listeners.add(fn); return () => this.listeners.delete(fn); }
@@ -251,7 +288,11 @@ export class Session {
     this.editAnchor = { r: a.r, c: a.c };
     this.endPoint(); this.editPointed = false;
   }
-  cancelEdit() { this.autoSumEdit = false; this.editing = false; this.editBuf = ''; this.editAnchor = null; this.endPoint(); }
+  cancelEdit() { this.leaveOrigin(); this.autoSumEdit = false; this.editing = false; this.editBuf = ''; this.editAnchor = null; this.endPoint(); }
+  /** Pointing across sheets is over (commit, cancel): the entry's own sheet shows again. */
+  leaveOrigin() { const i = this.editOrigin; if (i == null) return; this.editOrigin = null; if (i !== this.sheetIndex && this.sheets[i]) { this.sheetIndex = i; this.sheet = this.sheets[i].sheet; this.emit('sheet'); } }
+  /** `Sheet!` for a ref pointed on another sheet than the entry's own; '' at home. */
+  sheetPrefix() { if (this.editOrigin == null || this.editOrigin === this.sheetIndex) return ''; const n = this.sheets[this.sheetIndex].name; return (/^[A-Za-z_][A-Za-z0-9_.]*$/.test(n) ? n : "'" + n.replace(/'/g, "''") + "'") + '!'; }
   /** The cell an edit writes to: the displayed active cell it opened on. */
   editCell() { const a = this.editAnchor || this.sheet.dispActive(); return { r: a.r, c: a.c }; }
   endPoint() { this.editPointer = null; this.editPointerStart = -1; this.editPointerBase = null; }
@@ -263,6 +304,7 @@ export class Session {
    * `via` ({kind:'enter'|'tab'|'move', shift}) is remembered so an accepted autocorrect replays the same key.
    */
   commitEdit(dr, dc, via) {
+    this.leaveOrigin();
     const S = this.sheet;
     const asStay = this.autoSumEdit; this.autoSumEdit = false;
     const buf = this.editBuf.trim();
@@ -280,6 +322,7 @@ export class Session {
   }
   /** Ctrl+Enter: the buffer into every selected cell (formulas translate from the edited cell); the cursor stays. */
   commitEditAll() {
+    this.leaveOrigin();
     const S = this.sheet;
     const buf = this.editBuf.trim();
     const { r: ar, c: ac } = this.editCell();
@@ -324,10 +367,12 @@ export class Session {
   /** Where a pointer step lands: one cell (clamped), or with Ctrl the block edge Sheet.ctrlJump finds. */
   pointTarget(from, dr, dc, ctrl) { const S = this.sheet; return ctrl ? S.ctrlJump(from.r, from.c, dr, dc) : S.clamp(from.r + dr, from.c + dc); }
   startPointerFromArrow(dr, dc, ctrl) {
-    const t = this.pointTarget(this.editAnchor, dr, dc, ctrl);
-    if (t.r === this.editAnchor.r && t.c === this.editAnchor.c) return false;
+    const pre = this.sheetPrefix();
+    const base = pre ? this.sheet.dispActive() : this.editAnchor;   // on another sheet the pointer sets off from that sheet's active cell
+    const t = this.pointTarget(base, dr, dc, ctrl);
+    if (t.r === base.r && t.c === base.c) return false;
     this.editPointerStart = this.editBuf.length; this.editPointer = { r: t.r, c: t.c }; this.editPointerBase = null;
-    this.editBuf += refKey(t.r, t.c); this.editCaret = this.editBuf.length; this.editPointed = true;
+    this.editBuf += pre + refKey(t.r, t.c); this.editCaret = this.editBuf.length; this.editPointed = true;
     return true;
   }
   /** An arrow with no live pointer: re-point a bare trailing in-sheet ref, else append anchor+step (=LOG10 ↓ → =LOG10C6, never =J11). */
@@ -335,14 +380,15 @@ export class Session {
     const S = this.sheet;
     const m = refTail(this.editBuf);
     if (m && !OPERATOR_BOUNDARY.test(this.editBuf)) {
-      const pr = parseRef(m.ref);
-      if (pr && S.inb(pr.r, pr.c)) { this.editPointerStart = m.start; this.editPointer = { r: pr.r, c: pr.c }; this.editPointerBase = null; return this.movePointer(dr, dc, false, ctrl); }
+      const pr = parseRef(m.ref); const pre = this.sheetPrefix();
+      const prefixed = pre && this.editBuf.slice(Math.max(0, m.start - pre.length), m.start) === pre;   // a Sheet!ref pointed here re-points as one token
+      if (pr && S.inb(pr.r, pr.c) && (!pre || prefixed)) { this.editPointerStart = m.start - (prefixed ? pre.length : 0); this.editPointer = { r: pr.r, c: pr.c }; this.editPointerBase = null; return this.movePointer(dr, dc, false, ctrl); }
     }
     return this.startPointerFromArrow(dr, dc, ctrl);
   }
   writePointerRef() {
     const p = this.editPointer, b = this.editPointerBase;
-    this.editBuf = this.editBuf.slice(0, this.editPointerStart) + (b ? refKey(b.r, b.c) + ':' + refKey(p.r, p.c) : refKey(p.r, p.c));
+    this.editBuf = this.editBuf.slice(0, this.editPointerStart) + this.sheetPrefix() + (b ? refKey(b.r, b.c) + ':' + refKey(p.r, p.c) : refKey(p.r, p.c));
     this.editCaret = this.editBuf.length;
   }
   movePointer(dr, dc, extend, ctrl) {
@@ -369,11 +415,13 @@ export class Session {
       const nx = cyc(m[1], m[3]); const rep = nx[0] + m[2] + nx[1] + m[4]; const start = this.editCaret - m[0].length;
       this.editBuf = this.editBuf.slice(0, start) + rep + this.editBuf.slice(this.editCaret); this.editCaret = start + rep.length; return true;
     }
-    const cur = this.editBuf.slice(this.editPointerStart);
+    const whole = this.editBuf.slice(this.editPointerStart);
+    const pm = /^((?:'[^']+'|[A-Za-z_][\w.]*)!)?/.exec(whole); const pre = pm ? pm[1] || '' : '';   // a pointer on another sheet carries Sheet! — the anchors cycle behind it
+    const cur = whole.slice(pre.length), base = this.editBuf.slice(0, this.editPointerStart) + pre;
     const mr = /^(\$?)([A-Z]{1,3})(\$?)(\d+):(\$?)([A-Z]{1,3})(\$?)(\d+)$/.exec(cur);
-    if (mr) { const nx = cyc(mr[1], mr[3]); this.editBuf = this.editBuf.slice(0, this.editPointerStart) + nx[0] + mr[2] + nx[1] + mr[4] + ':' + nx[0] + mr[6] + nx[1] + mr[8]; this.editCaret = this.editBuf.length; return true; }
+    if (mr) { const nx = cyc(mr[1], mr[3]); this.editBuf = base + nx[0] + mr[2] + nx[1] + mr[4] + ':' + nx[0] + mr[6] + nx[1] + mr[8]; this.editCaret = this.editBuf.length; return true; }
     const m = /^(\$?)([A-Z]{1,3})(\$?)(\d+)$/.exec(cur); if (!m) return false;
-    const nx = cyc(m[1], m[3]); this.editBuf = this.editBuf.slice(0, this.editPointerStart) + nx[0] + m[2] + nx[1] + m[4]; this.editCaret = this.editBuf.length; return true;
+    const nx = cyc(m[1], m[3]); this.editBuf = base + nx[0] + m[2] + nx[1] + m[4]; this.editCaret = this.editBuf.length; return true;
   }
 
   /* ---------------- tab-run latch ---------------- */
@@ -396,6 +444,8 @@ export class Session {
   openDialog(name, path) { this.mode = 'ribbon'; this.path = path || []; this.dialog = name; this.note = ''; }
   ribbonKey(e) {
     const k = e.key;
+    // a held Alt+Shift+→ / ← (Group / Ungroup): the Alt press already opened the KeyTips, the chord closes them and acts
+    if (!this.dialog && !this.path.length && e.altKey && e.shiftKey && !e.ctrlKey && (k === 'ArrowRight' || k === 'ArrowLeft')) { this.exitRibbon(false); this.groupChord(k === 'ArrowRight'); return true; }
     if (DIALOGS_WB.has(this.dialog)) return this.dialogKey(e);
     if (k === 'Escape') {
       if (this.dialog) { this.dialog = null; this.pasteKind = null; this.note = ''; this.sortPend = null; this.colwBuf = ''; this.rowhBuf = ''; if (this.path.length) return true; this.exitRibbon(false); return true; }
@@ -460,6 +510,7 @@ export class Session {
       if (key === 'E') { S.toggleSuperscript(); return done(); }
       if (key === 'K') { S.toggleStrike(); return done(); }
       if (key === 'A') { S.centerAcross(); return done(); }
+      if (key === 'U') { this.openNumFmt(); return; }   // the Custom box (Chapter 2)
       return;
     }
     if (this.dialog === 'paste') {
@@ -536,6 +587,13 @@ export class Session {
     switch (np) {
       case '=': this.exitRibbon(false); this.doAutoSum(); return;
       case 'WVG': case 'WG': S.gridlines = !S.gridlines; this.toast(S.gridlines ? 'gridlines shown' : 'gridlines hidden — Alt W V G to show'); return done();
+      case 'AGG': this.exitRibbon(false); this.groupChord(true, true); return;     // Data › Group › Group… (= Alt+Shift+→)
+      case 'AUU': this.exitRibbon(false); this.groupChord(false, true); return;    // Data › Ungroup › Ungroup… (= Alt+Shift+←)
+      case 'AUC': this.exitRibbon(false); this.startClock(); if (!S.clearOutline()) this.toast(NO_GROUP_NOTE); return;   // Data › Ungroup › Clear Outline
+      case 'AH': this.exitRibbon(false); this.startClock(); if (!S.foldAtActive(true)) this.toast(NO_GROUP_NOTE); return;    // Data › Hide Detail
+      case 'AJ': this.exitRibbon(false); this.startClock(); if (!S.foldAtActive(false)) this.toast(NO_GROUP_NOTE); return;   // Data › Show Detail
+      case 'MH': this.exitRibbon(false); this.toggleShowFormulas(); return;        // Formulas › Show Formulas (= Ctrl+`)
+      case 'PI': this.openPageSetup('sheet'); return;                             // Page Layout › Print Titles: Page Setup on its Sheet page
       case 'HVV': S.paste('values'); return done();
       case 'HVS': case 'ES': this.dialog = 'paste'; this.pasteKind = 'all'; this.pasteOp = 'none'; return;
       case 'OE': case 'HOE': this.dialog = 'fmt'; return;
@@ -547,6 +605,17 @@ export class Session {
       case 'HH': this.dialog = 'fillcolor'; this.fillColorIdx = 0; return;
       case 'HJ': this.dialog = 'cellstyle'; this.cellStyleIdx = 0; return;
       case 'HFIS': this.dialog = 'series'; return;
+      // Conditional Formatting (Chapter 2): the presets, a formula rule, the galleries, clear, manage
+      case 'HLHG': this.openCondFmt('>'); return;
+      case 'HLHL': this.openCondFmt('<'); return;
+      case 'HLHB': this.openCondFmt('between'); return;
+      case 'HLHE': this.openCondFmt('='); return;
+      case 'HLN': this.openCondFmt('formula'); return;
+      case 'HLD': this.openCondGallery('databar'); return;
+      case 'HLS': this.openCondGallery('colorscale'); return;
+      case 'HLCS': S.clearCondFmt('selection'); return done();
+      case 'HLCE': S.clearCondFmt('sheet'); return done();
+      case 'HLR': this.openCondRules(); return;
       case 'ASA': case 'ASD': {
         const dir = np === 'ASD' ? 'desc' : 'asc'; const r = S.selRange();
         if (r.c1 === r.c2 && r.r1 !== r.r2 && S.sortNeedsExpand()) { this.sortPend = { dir, r1: r.r1, r2: r.r2, key: S.dispActive().c }; this.dialog = 'sortwarn'; return; }
@@ -719,7 +788,8 @@ export class Session {
     const S = src.sheet; const j = S.toJSON();
     const colW = {}; S.colW.forEach((w, c) => { if (S.colSet[c]) colW[c] = w; });
     const copy = new Sheet({ rows: S.rows, cols: S.cols, cells: j.cells, colW, active: j.active, today: S.today || undefined,
-      rowH: j.rowH, hiddenRows: j.hiddenRows, hiddenCols: j.hiddenCols, freeze: j.freeze });
+      rowH: j.rowH, hiddenRows: j.hiddenRows, hiddenCols: j.hiddenCols, freeze: j.freeze, groups: j.groups,
+      condFmt: j.condFmt && j.condFmt.map(({ id, ...r }) => r) });   // the conditional formats come along; the copy mints its own rule ids
     copy.gridlines = S.gridlines;
     const at = this.addSheet(this.copySheetName(src.name), copy, before == null ? idx + 1 : Math.max(0, Math.min(this.sheets.length, before | 0)));
     this.switchSheet(at);
@@ -861,7 +931,7 @@ export class Session {
       return;
     }
     if (key === 'Backspace') { this.dialogBuf = this.dialogBuf.slice(0, -1); this.note = ''; return; }
-    if (key.length === 1 && /[A-Za-z0-9:$!' ]/.test(key) && this.dialogBuf.length < 64) { this.dialogBuf += key.toUpperCase(); this.note = ''; }
+    if (key.length === 1 && /[A-Za-z0-9:$!' &_.()\-]/.test(key) && this.dialogBuf.length < 64) { this.dialogBuf += key.toUpperCase(); this.note = ''; }   // a sheet name may carry & . _ - ( ) ('P&L'!D23)
   }
 
   /* ---------------- Excel Options (Alt F T) and Page Setup (Alt P S P): recorded settings ---------------- */
@@ -873,12 +943,22 @@ export class Session {
       calcMode: st.calcMode, iterative: !!st.iterative, maxIterations: String(st.maxIterations), maxChange: String(st.maxChange),
       gridlines: !!st.gridlines, qat: st.qat.slice(), qatPick: 0, qatSel: 0 };
   }
-  pageSetupDraft() {
-    const p = this.settings.pageSetup;
-    return { kind: 'pagesetup', tab: 'page', focus: 'orient', orientation: p.orientation, scaling: p.scaling, adjustTo: String(p.adjustTo), fitWide: String(p.fitWide), fitTall: String(p.fitTall) };
+  /**
+   * The Page Setup draft: three pages of Excel's dialog — Page (orientation, scaling), Header/Footer
+   * (the three footer sections; &[File] &[Date] &[Page] &[Pages] &[Tab] are the tokens) and Sheet
+   * (rows to repeat at top, print gridlines). Text fields take typed characters as typed; every
+   * control answers to Alt+letter from anywhere, and to its bare letter when no text field has focus.
+   */
+  pageSetupDraft(tab) {
+    const p = this.settings.pageSetup; const f = p.footer || {};
+    const t = tab === 'hf' || tab === 'sheet' ? tab : 'page';
+    return { kind: 'pagesetup', tab: t, focus: t === 'hf' ? 'footL' : t === 'sheet' ? 'titlesRows' : 'orient',
+      orientation: p.orientation, scaling: p.scaling, adjustTo: String(p.adjustTo), fitWide: String(p.fitWide), fitTall: String(p.fitTall),
+      titlesRows: String(p.titlesRows || ''), printGridlines: !!p.printGridlines,
+      footL: String(f.left || ''), footC: String(f.centre || ''), footR: String(f.right || '') };
   }
   openOptions(page) { this.startClock(); this.openDialog('options', this.mode === 'ribbon' ? this.path : []); this.dlg = this.optionsDraft(page); }
-  openPageSetup() { this.startClock(); this.openDialog('pagesetup', this.mode === 'ribbon' ? this.path : []); this.dlg = this.pageSetupDraft(); }
+  openPageSetup(tab) { this.startClock(); this.openDialog('pagesetup', this.mode === 'ribbon' ? this.path : []); this.dlg = this.pageSetupDraft(tab); }
   /** Esc / Cancel: the draft goes; a dialog opened from a menu returns to it, one opened by a chord closes to the grid. */
   cancelDialog() {
     this.dlg = null; this.dialogBuf = ''; this.note = ''; this.dialog = null;
@@ -887,8 +967,9 @@ export class Session {
   /** The Tab order of the open dialog's controls. */
   dialogTabOrder() {
     const d = this.dlg; if (!d) return [];
-    if (d.kind === 'pagesetup') return ['orient', 'adjustTo', 'fitWide', 'fitTall'];
+    if (d.kind === 'pagesetup') return d.tab === 'hf' ? ['footL', 'footC', 'footR'] : d.tab === 'sheet' ? ['titlesRows', 'printGrid'] : ['orient', 'adjustTo', 'fitWide', 'fitTall'];
     if (d.kind === 'find') return d.replace ? ['find', 'repl'] : ['find'];
+    if (d.kind === 'condfmt') return d.op === 'formula' ? ['formula', 'style'] : d.op === 'between' ? ['v1', 'v2', 'style'] : ['v1', 'style'];
     if (d.kind !== 'options') return [];   // Rename Sheet, Delete Sheet and Move or Copy have one control each: nothing to Tab between
     if (d.page === 'formulas') return ['pages', 'calc', 'iter'].concat(d.iterative ? ['maxIter', 'maxChange'] : []);
     if (d.page === 'advanced') return ['pages', 'gridlines'];
@@ -906,7 +987,13 @@ export class Session {
     if (field === 'qatSel' && d.kind === 'options') { const i = value | 0; if (i < 0 || i >= d.qat.length) return false; d.qatSel = i; d.focus = 'qatRight'; return true; }
     if (field === 'before' && d.kind === 'movesheet') { const i = value | 0; if (i < 0 || i > this.sheets.length) return false; d.before = i; return true; }   // a click on a "Before sheet" row
     if (field === 'special' && this.dialog === 'goto') { this.openGoToSpecial(); return true; }        // the Go To card's Special… button
+    if (field === 'tab' && d.kind === 'pagesetup') { const L = { page: 'P', hf: 'H', sheet: 'S' }[value]; if (!L) return false; this.pageSetupKey('Alt+' + L); return true; }   // the card's tab strip
+    if (field === 'grid' && d.kind === 'pagesetup') { this.pageSetupKey('Alt+G'); return true; }   // the card's Gridlines box
     if (field === 'replaceAll' && this.dialog === 'find' && d.kind === 'find' && d.replace) { this.findKey('ReplaceAll'); return true; }   // the card's Replace All button
+    if (field === 'style' && d.kind === 'condfmt') { const i = value | 0; if (i < 0 || i >= CF_STYLE_KEYS.length) return false; d.styleIdx = i; d.focus = 'style'; return true; }   // a click on a style chip
+    if (field === 'pick' && (d.kind === 'databar' || d.kind === 'colorscale')) { const n = d.kind === 'databar' ? CF_BAR_COLORS.length : CF_SCALES.length; const i = value | 0; if (i < 0 || i >= n) return false; d.idx = i; return true; }   // a click on a gallery tile
+    if (field === 'rule' && d.kind === 'condrules') { const i = value | 0; if (i < 0 || i >= this.sheet.condFmt.length) return false; d.sel = i; return true; }   // a click on a rule row
+    if (field === 'ruleact' && d.kind === 'condrules') { if (!['Delete', 'U', 'D', 'S'].includes(value)) return false; this.condRulesKey(value); return true; }   // the manager's buttons
     return false;
   }
   /**
@@ -923,6 +1010,11 @@ export class Session {
     if (this.dialog === 'renamesheet') return this.renameKey(key);
     if (this.dialog === 'deletesheet') return this.deleteKey(key);
     if (this.dialog === 'movesheet') return this.moveKey(key);
+    if (this.dialog === 'group') return this.groupKey(key);
+    if (this.dialog === 'numfmt') return this.numFmtKey(key);
+    if (this.dialog === 'condfmt') return this.condFmtKey(key);
+    if (this.dialog === 'condrules') return this.condRulesKey(key);
+    if (this.dialog === 'databar' || this.dialog === 'colorscale') return this.condGalleryKey(key);
   }
   optionsKey(key) {
     const d = this.dlg; if (!d) return;
@@ -973,21 +1065,37 @@ export class Session {
   }
   pageSetupKey(key) {
     const d = this.dlg; if (!d) return;
-    const field = { adjustTo: 3, fitWide: 2, fitTall: 2 };   // digits each field takes
+    const field = { adjustTo: 3, fitWide: 2, fitTall: 2 };   // digits each numeric field takes
+    const textFocus = PAGESETUP_TEXT.has(d.focus);
     if (key === 'Enter') { this.pageSetupOk(); return; }
-    if (key === 'Tab' || key === 'Shift+Tab') { const o = this.dialogTabOrder(); const i = Math.max(0, o.indexOf(d.focus)); d.focus = o[(i + (key === 'Tab' ? 1 : o.length - 1)) % o.length]; return; }
-    if (key === 'T') { d.orientation = 'portrait'; d.focus = 'orient'; return; }
-    if (key === 'L') { d.orientation = 'landscape'; d.focus = 'orient'; return; }
-    if (key === 'A') { d.scaling = 'adjust'; d.focus = 'adjustTo'; return; }
-    if (key === 'F') { d.scaling = 'fit'; d.focus = 'fitWide'; return; }
+    this.note = '';   // a refused reference's note clears on the next key
+    if (key === 'Tab' || key === 'Shift+Tab') { const o = this.dialogTabOrder(); const i = Math.max(0, o.indexOf(d.focus)); d.focus = o[(i + (key === 'Tab' ? 1 : o.length - 1)) % o.length]; d.fresh = d.focus; return; }   // a freshly focused field: the first digit replaces what it held (Excel selects the field's text)
+    // accelerators: Alt+letter from anywhere; the bare letter only when no text field has the focus
+    const acc = key.startsWith('Alt+') ? key.slice(4) : (!textFocus && /^[A-Z]$/.test(key) ? key : null);
+    if (acc) {
+      if (acc === 'P') { d.tab = 'page'; d.focus = 'orient'; return; }
+      if (acc === 'H') { d.tab = 'hf'; d.focus = 'footL'; return; }
+      if (acc === 'S') { d.tab = 'sheet'; d.focus = 'titlesRows'; return; }
+      if (d.tab === 'hf' && (acc === 'L' || acc === 'C' || acc === 'R')) { d.focus = acc === 'L' ? 'footL' : acc === 'C' ? 'footC' : 'footR'; return; }   // the three sections (Excel's Footer dialog: Alt+L / C / R)
+      if (acc === 'R') { d.tab = 'sheet'; d.focus = 'titlesRows'; return; }
+      if (acc === 'G') { d.tab = 'sheet'; d.focus = 'printGrid'; d.printGridlines = !d.printGridlines; return; }
+      if (d.tab === 'sheet') return;
+      if (acc === 'T') { d.orientation = 'portrait'; d.focus = 'orient'; return; }
+      if (acc === 'L') { d.orientation = 'landscape'; d.focus = 'orient'; return; }
+      if (acc === 'A') { d.scaling = 'adjust'; d.focus = 'adjustTo'; d.fresh = 'adjustTo'; return; }
+      if (acc === 'F') { d.scaling = 'fit'; d.focus = 'fitWide'; d.fresh = 'fitWide'; return; }
+      return;
+    }
     if (key === 'ArrowUp' || key === 'ArrowDown') {
       const up = key === 'ArrowUp';
       if (d.focus === 'orient') d.orientation = up ? 'portrait' : 'landscape';
       else if (field[d.focus]) { const n = clampInt(d[d.focus], 0, 9999, 0) + (up ? 1 : -1); d[d.focus] = String(Math.max(d.focus === 'adjustTo' ? 10 : 1, n)); }   // the spinner
       return;
     }
-    if (key === 'Backspace') { if (field[d.focus]) d[d.focus] = d[d.focus].slice(0, -1); return; }
-    if (/^[0-9]$/.test(key) && field[d.focus] && d[d.focus].length < field[d.focus]) d[d.focus] += key;
+    if (key === ' ') { if (d.focus === 'printGrid') { d.printGridlines = !d.printGridlines; return; } if (!textFocus) return; }   // a space types into a text field
+    if (key === 'Backspace') { if (field[d.focus]) d[d.focus] = d[d.focus].slice(0, -1); else if (textFocus) d[d.focus] = d[d.focus].slice(0, -1); return; }
+    if (textFocus) { if (key.length === 1 && d[d.focus].length < 64) d[d.focus] += key; return; }
+    if (/^[0-9]$/.test(key) && field[d.focus]) { if (d.fresh === d.focus) { d[d.focus] = key; d.fresh = null; } else if (d[d.focus].length < field[d.focus]) d[d.focus] += key; }
   }
   pageSetupOk() {
     const d = this.dlg, p = this.settings.pageSetup; if (!d) return;
@@ -996,6 +1104,11 @@ export class Session {
     p.adjustTo = clampInt(d.adjustTo, 10, 400, p.adjustTo);
     p.fitWide = clampInt(d.fitWide, 1, 99, p.fitWide);
     p.fitTall = clampInt(d.fitTall, 1, 99, p.fitTall);
+    const titles = normTitlesRows(d.titlesRows);
+    if (titles === null) { d.tab = 'sheet'; d.focus = 'titlesRows'; this.note = REF_NOT_VALID; return; }   // Excel refuses the reference and keeps the dialog open
+    p.titlesRows = titles;
+    p.footer = { left: normFooterText(d.footL), centre: normFooterText(d.footC), right: normFooterText(d.footR) };
+    p.printGridlines = !!d.printGridlines;
     this.exitRibbon(true);
     this.emit('settings');
   }
@@ -1010,6 +1123,7 @@ export class Session {
       const ch = k.toUpperCase();
       if (this.dialog === 'goto' && ch === 'S') { this.logKey('Alt+S'); this.openGoToSpecial(); return true; }
       if (this.dialog === 'find' && ch === 'A') { this.logKey('Alt+A'); this.findKey('ReplaceAll'); return true; }
+      if (this.dialog === 'pagesetup') { this.logKey('Alt+' + ch); this.pageSetupKey('Alt+' + ch); return true; }
       return true;
     }
     if (k === 'Escape') { this.logKey('Esc'); this.cancelDialog(); return true; }
@@ -1017,8 +1131,14 @@ export class Session {
     if (k === 'Tab') { const t = e.shiftKey ? 'Shift+Tab' : 'Tab'; this.logKey(t); this.dlgKey(t); return true; }
     if (ARROWS[k]) { this.logKey(ARROWSYM[k]); this.dlgKey(k); return true; }
     if (k === 'Backspace') { this.logKey('⌫'); this.dlgKey('Backspace'); return true; }
+    if (k === 'Delete') { this.logKey('Del'); this.dlgKey('Delete'); return true; }
     if (k === ' ') { this.logKey('Space'); this.dlgKey(' '); return true; }
-    if (k.length === 1 && !e.ctrlKey && !e.altKey) { const ch = /[a-z]/i.test(k) ? k.toUpperCase() : k; this.logKey(ch); this.dlgKey(this.dialog === 'renamesheet' || this.dialog === 'find' ? k : ch); return true; }
+    if (k.length === 1 && !e.ctrlKey && !e.altKey) {
+      const ch = /[a-z]/i.test(k) ? k.toUpperCase() : k; this.logKey(ch);
+      const typed = TYPED_DIALOGS.has(this.dialog) || (this.dialog === 'pagesetup' && this.dlg && PAGESETUP_TEXT.has(this.dlg.focus))
+        || (this.dialog === 'condfmt' && this.dlg && this.dlg.focus !== 'style');   // a text field keeps the case typed
+      this.dlgKey(typed ? k : ch); return true;
+    }
     return true;   // a modal dialog swallows everything else
   }
 
@@ -1056,6 +1176,11 @@ export class Session {
     const S = this.sheet; const a = S.dispActive(); const c = S.get(a.r, a.c); if (!c.formula) return;
     const refs = formulaRefs(c.formula, { rows: S.rows, cols: S.cols }); if (!refs.length) return;
     const first = refs[0]; const p = first.key ? parseRef(first.key) : { r: first.range.r1, c: first.range.c1 };
+    if (first.sheet) {   // a link: the precedent is on another sheet (Excel follows it)
+      const i = this.sheets.findIndex(x => x.name.toLowerCase() === String(first.sheet).toLowerCase()); if (i < 0) return;
+      const T = this.sheets[i].sheet; if (!T.inb(p.r, p.c)) return;
+      this.switchSheet(i); T.goTo(p.r, p.c); return;
+    }
     if (!S.inb(p.r, p.c)) return;
     S.goTo(p.r, p.c);
   }
@@ -1068,6 +1193,131 @@ export class Session {
       if (reads) { S.goTo(p.r, p.c); return; }
     }
   }
+
+  /**
+   * Group (Alt+Shift+→) or ungroup (Alt+Shift+←) the selection's whole rows or columns — one outline
+   * level, folded and unfolded from the outline bar or Data › Hide / Show Detail. A selection that is
+   * neither whole rows nor whole columns does nothing but say so. The chord is logged as one key;
+   * the ribbon route logs its own walk.
+   */
+  groupChord(isGroup, fromRibbon) {
+    const S = this.sheet; const r = S.selRange();
+    this.startClock();
+    if (!fromRibbon) this.logKey(isGroup ? 'Alt+Shift+→' : 'Alt+Shift+←');
+    const axis = r.c1 === 1 && r.c2 === S.cols ? 'r' : r.r1 === 1 && r.r2 === S.rows ? 'c' : null;
+    if (!axis) {   // a cell range: Excel asks Rows or Columns (the Group / Ungroup dialog, Rows preselected — Enter groups the rows)
+      this.openDialog('group', []); this.dlg = { kind: 'group', ungroup: !isGroup, axis: 'r' }; return false;
+    }
+    const ok = isGroup ? S.group(axis) : S.ungroup(axis);
+    if (!ok && !isGroup) this.toast(NO_GROUP_NOTE);
+    return ok;
+  }
+  /** The Group / Ungroup dialog's keys: ↑ ↓ or R / C pick Rows or Columns, Enter = OK over the selection's rows or columns. */
+  groupKey(key) {
+    const d = this.dlg; if (!d) return;
+    if (key === 'ArrowUp' || key === 'R') { d.axis = 'r'; return; }
+    if (key === 'ArrowDown' || key === 'C') { d.axis = 'c'; return; }
+    if (key !== 'Enter') return;
+    const S = this.sheet, r = S.selRange(), { ungroup, axis } = d;
+    this.exitRibbon(false);
+    const [a, b] = axis === 'r' ? [r.r1, r.r2] : [r.c1, r.c2];
+    const ok = ungroup ? S.ungroupSpan(axis, a, b) : S.groupSpan(axis, a, b);
+    if (!ok && ungroup) this.toast(NO_GROUP_NOTE);
+  }
+  /* ---------------- Format Cells › Custom, and Conditional Formatting (Chapter 2) ---------------- */
+  /** Ctrl+1 › U: the Custom box, prefilled with the active cell's code and selected (typing replaces it). ↵ applies; a code Excel would refuse keeps the box open with its note. */
+  openNumFmt() {
+    this.startClock();
+    const a = this.sheet.dispActive(); const cell = this.sheet.get(a.r, a.c);
+    const code = cell.fmtStyle === 'custom' && cell.numFmt ? cell.numFmt : builtinCode(cell.fmtStyle, cell.decimals, cell.scale);
+    this.openDialog('numfmt', this.mode === 'ribbon' ? this.path : []);
+    this.dlg = { kind: 'numfmt', code, selected: true };
+  }
+  numFmtKey(key) {
+    const d = this.dlg; if (!d) return;
+    if (key === 'Enter') {
+      if (!this.sheet.setCustomFormat(d.code)) { this.note = NUMFMT_BAD_NOTE; return; }   // the box stays open, as Excel's does
+      this.exitRibbon(true); return;
+    }
+    if (key === 'Backspace') { d.code = d.selected ? '' : d.code.slice(0, -1); d.selected = false; this.note = ''; return; }
+    if (key.length === 1) { const next = (d.selected ? '' : d.code) + key; if (next.length > 255) return; d.code = next; d.selected = false; this.note = ''; }
+  }
+  /**
+   * Alt H L H G / L / B / E (a Highlight Cells preset) or Alt H L N (a formula rule): the card takes
+   * the value(s) or the formula, ← → (or Tab to the style, then arrows) pick the style, ↵ adds the
+   * rule on top of the list. A value Excel would refuse keeps the card open with its note.
+   */
+  openCondFmt(op) {
+    this.startClock();
+    this.openDialog('condfmt', this.mode === 'ribbon' ? this.path : []);
+    this.dlg = { kind: 'condfmt', op, v1: '', v2: '', formula: '', styleIdx: 0, focus: op === 'formula' ? 'formula' : 'v1' };
+  }
+  condFmtKey(key) {
+    const d = this.dlg; if (!d) return;
+    if (key === 'Enter') {
+      const style = CF_STYLE_KEYS[d.styleIdx]; let rule;
+      // a formula (a rule's, or a preset's '=…' value) is read for the ACTIVE cell of the selection, as
+      // Excel reads it, and stored re-based to the top-left of the Applies-to, where the rule keeps it
+      const S = this.sheet, act = S.dispActive(), top = S.selRects()[0];
+      const rebase = f => typeof f === 'string' && f.trimStart()[0] === '=' && (top.r1 !== act.r || top.c1 !== act.c) ? translateFormula(f, top.r1 - act.r, top.c1 - act.c) : f;
+      if (d.op === 'formula') {
+        const f = d.formula.trim(); if (!f || !parses(f)) { this.note = CF_FORMULA_NOTE; d.focus = 'formula'; return; }
+        rule = { kind: 'formula', formula: rebase(f), style };
+      } else {
+        const a = condOperand(d.v1); if (a === null) { this.note = CF_VALUE_NOTE; d.focus = 'v1'; return; }
+        const b = d.op === 'between' ? condOperand(d.v2) : 0; if (b === null) { this.note = CF_VALUE_NOTE; d.focus = 'v2'; return; }
+        rule = { kind: 'cellValue', op: d.op, v1: rebase(a), v2: rebase(b), style };
+      }
+      this.sheet.addCondFmt(rule); this.exitRibbon(true); return;
+    }
+    if (key === 'Tab' || key === 'Shift+Tab') { const o = this.dialogTabOrder(); const i = Math.max(0, o.indexOf(d.focus)); d.focus = o[(i + (key === 'Tab' ? 1 : o.length - 1)) % o.length]; return; }
+    if (key === 'ArrowLeft' || key === 'ArrowUp') { d.styleIdx = (d.styleIdx - 1 + CF_STYLE_KEYS.length) % CF_STYLE_KEYS.length; return; }
+    if (key === 'ArrowRight' || key === 'ArrowDown') { d.styleIdx = (d.styleIdx + 1) % CF_STYLE_KEYS.length; return; }
+    if (d.focus === 'style') return;
+    if (key === 'Backspace') { d[d.focus] = d[d.focus].slice(0, -1); this.note = ''; return; }
+    if (key.length === 1) { if (d[d.focus].length < 255) d[d.focus] += key; this.note = ''; }
+  }
+  /** Alt H L D (Data Bars) / Alt H L S (Color Scales): a gallery — ← → pick, ↵ adds the rule over the selection. */
+  openCondGallery(kind) {
+    this.startClock();
+    this.openDialog(kind, this.mode === 'ribbon' ? this.path : []);
+    this.dlg = { kind, idx: 0 };
+  }
+  condGalleryKey(key) {
+    const d = this.dlg; if (!d) return;
+    const list = d.kind === 'databar' ? CF_BAR_COLORS : CF_SCALES;
+    if (key === 'Enter') {
+      const pick = list[d.idx];
+      this.sheet.addCondFmt(d.kind === 'databar' ? { kind: 'dataBar', color: pick.k } : { kind: 'colorScale', scale: pick.k });
+      this.exitRibbon(true); return;
+    }
+    if (key === 'ArrowLeft' || key === 'ArrowUp') { d.idx = (d.idx - 1 + list.length) % list.length; return; }
+    if (key === 'ArrowRight' || key === 'ArrowDown') { d.idx = (d.idx + 1) % list.length; return; }
+  }
+  /**
+   * Alt H L R: the Rules Manager for the sheet — ↑ ↓ pick a rule, Delete removes it, U / D move it
+   * up / down (Excel's Move Up / Move Down), S toggles Stop If True, ↵ closes. Every edit is live.
+   */
+  openCondRules() {
+    this.startClock();
+    this.openDialog('condrules', this.mode === 'ribbon' ? this.path : []);
+    this.dlg = { kind: 'condrules', sel: 0 };
+  }
+  condRulesKey(key) {
+    const d = this.dlg; if (!d) return;
+    const S = this.sheet, rules = S.condFmt;
+    if (key === 'Enter') { this.exitRibbon(true); return; }
+    const cur = rules[d.sel];
+    if (key === 'ArrowUp') { d.sel = Math.max(0, d.sel - 1); return; }
+    if (key === 'ArrowDown') { d.sel = Math.min(Math.max(0, rules.length - 1), d.sel + 1); return; }
+    if (!cur) return;
+    if (key === 'Delete' || key === 'Backspace') { S.removeCondFmt(cur.id); d.sel = Math.min(d.sel, Math.max(0, rules.length - 1)); return; }
+    if (key === 'U') { if (S.moveCondFmt(cur.id, -1)) d.sel--; return; }
+    if (key === 'D') { if (S.moveCondFmt(cur.id, 1)) d.sel++; return; }
+    if (key === 'S' || key === ' ') { S.setCondFmtStop(cur.id); }   // a data bar's or a colour scale's box is greyed out: the sheet refuses it
+  }
+  /** Ctrl+` / Formulas › Show Formulas: the view paints every formula's text instead of its value. */
+  toggleShowFormulas() { this.startClock(); this.settings.showFormulas = !this.settings.showFormulas; this.emit('settings'); this.sheet.emit('layout'); }
 
   /* ---------------- the dispatcher ---------------- */
   dispatch(e) {
@@ -1108,6 +1358,10 @@ export class Session {
       this.startEdit(initial, 'edit'); return true;
     }
     if (k === 'F5' && !e.ctrlKey && !e.altKey && !e.shiftKey) { this.logKey('F5'); this.openGoTo(); return true; }
+    if (k === 'F4' && !e.ctrlKey && !e.altKey && !e.shiftKey) {   // repeat the last action on the current selection (Excel's F4 / Ctrl+Y outside Edit mode)
+      if (S.lastAction) { this.startClock(); this.logKey('F4'); S.repeatLast(); }
+      return true;
+    }
     if (k === 'F11' && e.shiftKey && !e.ctrlKey && !e.altKey) { this.startClock(); this.logKey('Shift+F11'); this.insertSheet(); return true; }
     if (k === 'F9' && !e.ctrlKey && !e.altKey && !e.shiftKey) { this.startClock(); this.logKey('F9'); S.commit('recalc'); return true; }   // Calculate Now (every sheet is always current: recorded manual mode changes nothing)
     if (k === 'Delete' && !e.ctrlKey && !e.altKey) { this.startClock(); this.logKey('Delete'); S.deleteContents(); return true; }
@@ -1121,6 +1375,7 @@ export class Session {
     if (k === 'Alt' && !e.shiftKey && !e.ctrlKey) { this.logKey('Alt'); this.enterRibbon(); return true; }
     if (e.altKey && !e.ctrlKey) {
       if (k === '=') { this.logKey('Alt'); this.logKey('='); this.doAutoSum(); return true; }
+      if (e.shiftKey && (k === 'ArrowRight' || k === 'ArrowLeft')) { this.groupChord(k === 'ArrowRight'); return true; }   // Group / Ungroup
       if (k === 'PageDown' || k === 'PageUp') {   // a screen right / left
         this.startClock(); this.logKey('Alt+' + (k === 'PageDown' ? 'PgDn' : 'PgUp'));
         S.move(0, (this.pageCols || 10) * (k === 'PageDown' ? 1 : -1), e.shiftKey, false); return true;
@@ -1183,6 +1438,7 @@ export class Session {
       if (k === '~') { this.startClock(); this.logKey('Ctrl+Shift+~'); S.setNumberFormat('general', 0); return true; }
       if (k === '1' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+1'); this.openDialog('fmt'); return true; }
       if (k === ';' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+;'); const da = S.dispActive(); S.dateStamp(da.r, da.c); return true; }
+      if (k === '`' && !e.shiftKey) { this.logKey('Ctrl+`'); this.toggleShowFormulas(); return true; }
       if (k === '[') { this.startClock(); this.logKey('Ctrl+['); this.jumpPrecedent(); return true; }
       if (k === ']') { this.startClock(); this.logKey('Ctrl+]'); this.jumpDependent(); return true; }
       if (lk === 'g' && !e.shiftKey) { this.logKey('Ctrl+G'); this.openGoTo(); return true; }
@@ -1202,7 +1458,12 @@ export class Session {
       return true;
     }
     if (k === 'F2') { this.editMode = this.editMode === 'edit' ? 'enter' : 'edit'; this.endPoint(); this.logKey('F2'); return true; }   // F2 ends point mode: the ref becomes plain text
-    if ((k === 'PageDown' || k === 'PageUp') && e.ctrlKey && !e.altKey) {   // the next / previous sheet: an Enter-mode entry commits first (as an arrow would); F2 and point mode swallow it
+    if ((k === 'PageDown' || k === 'PageUp') && e.ctrlKey && !e.altKey) {   // the next / previous sheet: an Enter-mode entry commits first (as an arrow would); F2 swallows it
+      if (this.editBuf[0] === '=' && this.editMode !== 'edit') {   // a formula being entered stays open on its cell: the next sheet shows, and arrows point there as Sheet!refs (Excel)
+        const idx = Math.max(0, Math.min(this.sheets.length - 1, this.sheetIndex + (k === 'PageDown' ? 1 : -1)));
+        if (idx !== this.sheetIndex) { if (this.editOrigin == null) this.editOrigin = this.sheetIndex; this.sheetIndex = idx; this.sheet = this.sheets[idx].sheet; this.endPoint(); this.logKey(k === 'PageDown' ? 'Ctrl+PgDn' : 'Ctrl+PgUp'); this.emit('sheet'); }
+        return true;
+      }
       if (this.editMode === 'edit' || this.editPointer) return true;
       S.tabHome = null;
       if (!this.commitEdit(0, 0, { kind: 'move' })) return true;
@@ -1224,7 +1485,7 @@ export class Session {
       this.logKey(e.shiftKey ? 'Shift+↵' : '↵'); this.commitEnter(e.shiftKey); return true;
     }
     if (k === 'Tab') { this.logKey(e.shiftKey ? 'Shift+Tab' : 'Tab'); this.commitTab(e.shiftKey); return true; }
-    if (k === 'Escape') { this.cancelEdit(); return true; }
+    if (k === 'Escape') { this.logKey('Esc'); this.cancelEdit(); return true; }
     if (k === 'F4') { if (this.cycleAnchor()) this.logKey('F4'); return true; }
     if (k === 'F9') {
       if (this.editBuf[0] === '=' || this.editBuf[0] === '+') {
@@ -1238,6 +1499,7 @@ export class Session {
       else if (this.editCaret > 0) { this.editBuf = this.editBuf.slice(0, this.editCaret - 1) + this.editBuf.slice(this.editCaret); this.editCaret--; }
       this.logKey('⌫'); return true;
     }
+    if (ARROWS[k] && e.altKey) return true;   // Alt+Shift+→ mid-entry is nothing, not a commit
     if (ARROWS[k]) {
       const [dr, dc] = ARROWS[k]; const ctrl = e.ctrlKey ? 'Ctrl+' : '';
       if (this.editPointer) { if (this.movePointer(dr, dc, e.shiftKey, e.ctrlKey)) this.logKey(ctrl + (e.shiftKey ? '⇧+' : '') + ARROWSYM[k]); return true; }

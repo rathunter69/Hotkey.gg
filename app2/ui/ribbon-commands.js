@@ -12,6 +12,7 @@
 //   recordMouse(session, 'ribbon:H1');    // SITE_SPEC §6: every workspace click is recorded
 
 import { COMMANDS, MENUS, TABS, RIBBON_ICONS, RIBBON_MENU_ICONS, QAT_COMMANDS } from '../engine/ribbon.js';
+import { NO_GROUP_NOTE } from '../engine/keyboard.js';
 
 /* ---------------- mouse recording (SITE_SPEC §6) ---------------- */
 /**
@@ -28,9 +29,9 @@ export function recordMouse(session, what) {
 }
 
 /** Dialogs that own the input while open: the sheet and the bar behind them ignore clicks (Excel's modal cards). */
-export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'rowh', 'sortwarn', 'series', 'fxfix', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial']);
+export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'rowh', 'sortwarn', 'series', 'fxfix', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale']);
 /** The dialogs drawn as floating cards over the sheet (ribbon-view drawDialog), not as anchored dropdowns. */
-export const CARD_DIALOGS = new Set(['fmt', 'paste', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial']);
+export const CARD_DIALOGS = new Set(['fmt', 'paste', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale']);
 
 /** Leave the Alt walk without acting (a mouse command supersedes any open KeyTip path or dropdown). */
 export function leaveRibbon(session) { if (session.mode === 'ribbon') session.exitRibbon(false); }
@@ -80,6 +81,10 @@ export const ICON = {
   merge: svg('<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 12h6M15 12h6"/><path d="M7 9l3 3-3 3M17 9l-3 3 3 3"/>'),
   acct: glyph('$'),
   condFmt: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h5M7 12h9M7 16h3"/>'),
+  dataBar: svg('<path d="M4 6h12M4 12h16M4 18h7" stroke-width="4"/>'),
+  colorScale: svg('<rect x="3" y="3" width="18" height="6" rx="1" fill="currentColor" opacity=".25" stroke="none"/><rect x="3" y="9" width="18" height="6" fill="currentColor" opacity=".5" stroke="none"/><rect x="3" y="15" width="18" height="6" rx="1" fill="currentColor" opacity=".85" stroke="none"/>'),
+  newRule: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/>'),
+  manageRules: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/><path d="M15 15l2 2 3-3"/>'),
   fmtTable: svg('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16M15 4v16"/>'),
   fillMenu: svg('<rect x="6" y="3" width="12" height="6" rx="1"/><path d="M12 9v11M8 16l4 4 4-4"/>'),
   filter: svg('<path d="M4 5h16L14 12v6l-4 2v-8L4 5Z"/>'),
@@ -173,6 +178,11 @@ export const ICON = {
   breaks: svg('<rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 12h18" stroke-dasharray="3 3"/><path d="M12 3v18" stroke-dasharray="3 3"/>'),
   background: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l5-5 4 4 3-3 6 6"/><circle cx="16" cy="8" r="1.5"/>'),
   printTitles: svg('<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9h18" stroke-width="3"/><path d="M3 14h18"/>'),
+  // the Outline group (C2 gap 4): a bracket with a plus / minus, and the fold buttons
+  group: svg('<path d="M4 6h16"/><path d="M4 6v4M20 6v4"/><rect x="9" y="13" width="6" height="6" rx="1"/><path d="M12 14.5v3M10.5 16h3"/>'),
+  ungroup: svg('<path d="M4 6h16" stroke-dasharray="3 2"/><path d="M4 6v4M20 6v4"/><rect x="9" y="13" width="6" height="6" rx="1"/><path d="M10.5 16h3"/>'),
+  hideDetail: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8"/>'),
+  showDetail: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M12 8v8"/>'),
   undo: svg('<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>'),
   redo: svg('<path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/>'),
   colors: svg('<circle cx="7" cy="8" r="3"/><circle cx="17" cy="8" r="3"/><circle cx="12" cy="16" r="3"/>'),
@@ -236,6 +246,17 @@ export const RIBBON_COMMANDS = {
   'H9': C('Decrease decimal', 'Number', 'H', ICON.decDec, direct(S => S.changeDecimals(-1))),
   // Home · Styles
   'HJ': C('Cell styles', 'Styles', 'H', ICON.cellStyles, dialog('cellstyle', s => { s.cellStyleIdx = 0; })),
+  // Home · Styles › Conditional Formatting (Chapter 2): the same Session openers the Alt walk calls, with an empty path
+  'HLHG': C('Greater Than…', 'Styles', 'H', ICON.condFmt, s => { leaveRibbon(s); s.openCondFmt('>'); }),
+  'HLHL': C('Less Than…', 'Styles', 'H', ICON.condFmt, s => { leaveRibbon(s); s.openCondFmt('<'); }),
+  'HLHB': C('Between…', 'Styles', 'H', ICON.condFmt, s => { leaveRibbon(s); s.openCondFmt('between'); }),
+  'HLHE': C('Equal To…', 'Styles', 'H', ICON.condFmt, s => { leaveRibbon(s); s.openCondFmt('='); }),
+  'HLN': C('New Formatting Rule…', 'Styles', 'H', ICON.newRule, s => { leaveRibbon(s); s.openCondFmt('formula'); }),
+  'HLD': C('Data Bars', 'Styles', 'H', ICON.dataBar, s => { leaveRibbon(s); s.openCondGallery('databar'); }),
+  'HLS': C('Color Scales', 'Styles', 'H', ICON.colorScale, s => { leaveRibbon(s); s.openCondGallery('colorscale'); }),
+  'HLCS': C('Clear Rules from Selected Cells', 'Styles', 'H', ICON.clearFormats, direct(S => S.clearCondFmt('selection'))),
+  'HLCE': C('Clear Rules from Entire Sheet', 'Styles', 'H', ICON.clearAll, direct(S => S.clearCondFmt('sheet'))),
+  'HLR': C('Manage Rules…', 'Styles', 'H', ICON.manageRules, s => { leaveRibbon(s); s.openCondRules(); }),
   // Home · Cells
   'HIR': C('Insert sheet rows', 'Cells', 'H', ICON.insertRows, direct(S => S.insert('r'))),
   'HIC': C('Insert sheet columns', 'Cells', 'H', ICON.insertCols, direct(S => S.insert('c'))),
@@ -266,6 +287,14 @@ export const RIBBON_COMMANDS = {
   // Data
   'ASA': C('Sort A to Z', 'Sort & Filter', 'A', ICON.sortAZ, sortRun('asc')),
   'ASD': C('Sort Z to A', 'Sort & Filter', 'A', ICON.sortZA, sortRun('desc')),
+  // Data · Outline (C2 gap 4): the same Session route the chords take, so a click and Alt+Shift+→ leave one state
+  'AGG': C('Group…', 'Outline', 'A', ICON.group, s => { leaveRibbon(s); s.groupChord(true, true); }, 'Alt+Shift+→'),
+  'AUU': C('Ungroup…', 'Outline', 'A', ICON.ungroup, s => { leaveRibbon(s); s.groupChord(false, true); }, 'Alt+Shift+←'),
+  'AUC': C('Clear outline', 'Outline', 'A', ICON.ungroup, direct((S, s) => { if (!S.clearOutline()) s.toast(NO_GROUP_NOTE); })),
+  'AH': C('Hide detail', 'Outline', 'A', ICON.hideDetail, direct((S, s) => { if (!S.foldAtActive(true)) s.toast(NO_GROUP_NOTE); })),
+  'AJ': C('Show detail', 'Outline', 'A', ICON.showDetail, direct((S, s) => { if (!S.foldAtActive(false)) s.toast(NO_GROUP_NOTE); })),
+  // Formulas · Formula Auditing: Show Formulas (C2 gap 5)
+  'MH': C('Show formulas', 'Formula Auditing', 'M', ICON.showFormulas, s => { leaveRibbon(s); s.toggleShowFormulas(); }, 'Ctrl+`'),
   // View
   'WVG': C('Gridlines', 'Show', 'W', ICON.gridlines, gridlines),
   'WG': C('Gridlines', 'Show', 'W', ICON.gridlines, gridlines),
@@ -290,6 +319,7 @@ export const RIBBON_COMMANDS = {
   'WFC': C('Freeze first column', 'Window', 'W', ICON.freeze, direct(S => { S.freeze = { r: 0, c: 1 }; S.commit('layout'); })),
   // Page Layout · Page Setup
   'PSP': C('Page Setup…', 'Page Setup', 'P', ICON.launcher, s => { leaveRibbon(s); s.openPageSetup(); }),
+  'PI': C('Print Titles…', 'Page Setup', 'P', ICON.printTitles, s => { leaveRibbon(s); s.openPageSetup('sheet'); }),
   'POP': C('Portrait', 'Page Setup', 'P', ICON.portrait, direct((S, s) => { s.setOrientation('portrait'); S.commit('ribbon'); })),
   'POL': C('Landscape', 'Page Setup', 'P', ICON.landscape, direct((S, s) => { s.setOrientation('landscape'); S.commit('ribbon'); })),
   // Mouse-only faces of engine features that have a chord but no Alt path (Excel's Clipboard buttons)
@@ -337,7 +367,7 @@ export const UNIMPLEMENTED = [
   U('AlignTop', 'Top Align', 'Alignment', 'H', ICON.alignTop), U('AlignMiddle', 'Middle Align', 'Alignment', 'H', ICON.alignMid), U('AlignBottom', 'Bottom Align', 'Alignment', 'H', ICON.alignBot),
   U('Orientation', 'Orientation', 'Alignment', 'H', ICON.orient), U('MergeCenter', 'Merge & Center', 'Alignment', 'H', ICON.merge),
   U('NumberFormat', 'Number Format', 'Number', 'H'),
-  U('CondFormat', 'Conditional Formatting', 'Styles', 'H', ICON.condFmt), U('FormatTable', 'Format as Table', 'Styles', 'H', ICON.fmtTable),
+  U('FormatTable', 'Format as Table', 'Styles', 'H', ICON.fmtTable),
   U('Filter', 'Filter', 'Sort & Filter', 'H', ICON.filter), U('FindSelect', 'Find & Select', 'Editing', 'H', ICON.find),
   U('PivotTable', 'PivotTable', 'Tables', 'N', ICON.pivot), U('Table', 'Table', 'Tables', 'N', ICON.table),
   U('Pictures', 'Pictures', 'Illustrations', 'N', ICON.picture), U('Shapes', 'Shapes', 'Illustrations', 'N', ICON.shapes),
@@ -346,12 +376,12 @@ export const UNIMPLEMENTED = [
   U('Themes', 'Themes', 'Themes', 'P', ICON.themes), U('ThemeColors', 'Colors', 'Themes', 'P', ICON.colors), U('ThemeFonts', 'Fonts', 'Themes', 'P', ICON.fonts), U('ThemeEffects', 'Effects', 'Themes', 'P', ICON.effects),
   U('Margins', 'Margins', 'Page Setup', 'P', ICON.margins), U('PageOrientation', 'Orientation', 'Page Setup', 'P', ICON.pageOrient),
   U('PageSize', 'Size', 'Page Setup', 'P', ICON.pageSize), U('PrintArea', 'Print Area', 'Page Setup', 'P', ICON.printArea),
-  U('Breaks', 'Breaks', 'Page Setup', 'P', ICON.breaks), U('Background', 'Background', 'Page Setup', 'P', ICON.background), U('PrintTitles', 'Print Titles', 'Page Setup', 'P', ICON.printTitles),
+  U('Breaks', 'Breaks', 'Page Setup', 'P', ICON.breaks), U('Background', 'Background', 'Page Setup', 'P', ICON.background),
   U('ScaleWidth', 'Width', 'Scale to Fit', 'P'), U('ScaleHeight', 'Height', 'Scale to Fit', 'P'), U('ScaleScale', 'Scale', 'Scale to Fit', 'P'),
   U('SheetGridlines', 'Gridlines', 'Sheet Options', 'P', ICON.gridlines), U('SheetHeadings', 'Headings', 'Sheet Options', 'P', ICON.headings),
   U('InsertFunction', 'Insert Function', 'Function Library', 'M', ICON.fx), U('RecentlyUsed', 'Recently Used', 'Function Library', 'M'),
   U('Financial', 'Financial', 'Function Library', 'M'), U('Logical', 'Logical', 'Function Library', 'M'), U('TextFn', 'Text', 'Function Library', 'M'),
-  U('RemoveArrows', 'Remove Arrows', 'Formula Auditing', 'M', ICON.removeArrows), U('ShowFormulas', 'Show Formulas', 'Formula Auditing', 'M', ICON.showFormulas),
+  U('RemoveArrows', 'Remove Arrows', 'Formula Auditing', 'M', ICON.removeArrows),
   U('EvaluateFormula', 'Evaluate Formula', 'Formula Auditing', 'M', ICON.evaluate), U('CalculateNow', 'Calculate Now', 'Calculation', 'M', ICON.calc),
   U('FromText', 'From Text/CSV', 'Get & Transform Data', 'A', ICON.fromText), U('FromWeb', 'From Web', 'Get & Transform Data', 'A', ICON.fromWeb),
   U('SortDialog', 'Sort', 'Sort & Filter', 'A', ICON.sortAZ), U('DataFilter', 'Filter', 'Sort & Filter', 'A', ICON.filter), U('ClearFilter', 'Clear', 'Sort & Filter', 'A', ICON.clear),
@@ -377,6 +407,7 @@ export const MENU_META = {
   'HV': { label: 'Paste', icon: ICON.paste }, 'HB': { label: 'Borders', icon: ICON.borders },
   'HI': { label: 'Insert', icon: ICON.insert }, 'HD': { label: 'Delete', icon: ICON.del }, 'HO': { label: 'Format', icon: ICON.format },
   'HE': { label: 'Clear', icon: ICON.clear }, 'HFI': { label: 'Fill', icon: ICON.fillMenu }, 'HU': { label: 'AutoSum', icon: ICON.sum }, 'MU': { label: 'AutoSum', icon: ICON.sum },
+  'AG': { label: 'Group', icon: ICON.group }, 'AU': { label: 'Ungroup', icon: ICON.ungroup },
   'HA': { label: 'Alignment', icon: ICON.alignL, virtual: true }, 'HF': { label: 'Font', icon: ICON.fontName, virtual: true },
   'WV': { label: 'Show', icon: ICON.gridlines, virtual: true }, 'AS': { label: 'Sort', icon: ICON.sortAZ, virtual: true },
   'E': { label: 'Edit', icon: ICON.paste }, 'O': { label: 'Format', icon: ICON.format },
@@ -384,6 +415,7 @@ export const MENU_META = {
   'F': { label: 'File', icon: ICON.options }, 'HFD': { label: 'Find & Select', icon: ICON.find },
   'PO': { label: 'Orientation', icon: ICON.pageOrient }, 'PS': { label: 'Page Setup', icon: ICON.launcher, virtual: true },
   'HOU': { label: 'Hide & Unhide', icon: ICON.rowHeight }, 'WF': { label: 'Freeze Panes', icon: ICON.freeze },
+  'HL': { label: 'Conditional Formatting', icon: ICON.condFmt }, 'HLH': { label: 'Highlight Cells Rules', icon: ICON.condFmt }, 'HLC': { label: 'Clear Rules', icon: ICON.clearFormats },
 };
 export const VIRTUAL_MENUS = new Set(Object.keys(MENU_META).filter(k => MENU_META[k].virtual));
 /** Icons for menu items that are neither commands nor submenus (the dead entries of MENUS, engine/ribbon.js DEAD), by path. */
@@ -414,7 +446,7 @@ export const RIBBON_LAYOUT = {
       [{ box: 'General', dead: 'NumberFormat', w: 96 }],
       [ico({ cmd: 'HAN' }), ico({ cmd: 'HP' }), ico({ cmd: 'HK' }), ico({ cmd: 'H0' }), ico({ cmd: 'H9' })],
     ] }] },
-    { name: 'Styles', cols: [{ rows: [[{ dead: 'CondFormat', caret: true }], [{ dead: 'FormatTable', caret: true }], [{ cmd: 'HJ', caret: true }]] }] },
+    { name: 'Styles', cols: [{ rows: [[{ menu: 'HL' }], [{ dead: 'FormatTable', caret: true }], [{ cmd: 'HJ', caret: true }]] }] },
     { name: 'Cells', cols: [{ rows: [[{ menu: 'HI' }], [{ menu: 'HD' }], [{ menu: 'HO' }]] }] },
     { name: 'Editing', cols: [{ rows: [[{ menu: 'HU' }], [{ menu: 'HFI' }], [{ menu: 'HE' }]] }, { rows: [[{ menu: 'HSF' }], [{ menu: 'HFD' }]] }] },
   ],
@@ -429,19 +461,20 @@ export const RIBBON_LAYOUT = {
   // Orientation ▾ is a real menu (Alt P O P / L); the rest render disabled
   P: [
     { name: 'Themes', cols: [big({ dead: 'Themes', caret: true }), { rows: [[{ dead: 'ThemeColors', caret: true }], [{ dead: 'ThemeFonts', caret: true }], [{ dead: 'ThemeEffects', caret: true }]] }] },
-    { name: 'Page Setup', launcher: 'PSP', cols: [big({ dead: 'Margins', caret: true }), big({ menu: 'PO' }), big({ dead: 'PageSize', caret: true }), big({ dead: 'PrintArea', caret: true }), big({ dead: 'Breaks', caret: true }), big({ dead: 'Background' }), big({ dead: 'PrintTitles' })] },
+    { name: 'Page Setup', launcher: 'PSP', cols: [big({ dead: 'Margins', caret: true }), big({ menu: 'PO' }), big({ dead: 'PageSize', caret: true }), big({ dead: 'PrintArea', caret: true }), big({ dead: 'Breaks', caret: true }), big({ dead: 'Background' }), big({ cmd: 'PI' })] },
     { name: 'Scale to Fit', cols: [{ rows: [[{ box: 'Width: Automatic', dead: 'ScaleWidth', w: 110 }], [{ box: 'Height: Automatic', dead: 'ScaleHeight', w: 110 }], [{ box: 'Scale: 100%', dead: 'ScaleScale', w: 110 }]] }] },
     { name: 'Sheet Options', cols: [{ rows: [[{ dead: 'SheetGridlines' }], [{ dead: 'SheetHeadings' }]] }] },
   ],
   M: [
     { name: 'Function Library', cols: [big({ dead: 'InsertFunction' }), big({ menu: 'MU', cmd: 'MUS', label: 'AutoSum' }), { rows: [[{ dead: 'RecentlyUsed' }], [{ dead: 'Financial' }], [{ dead: 'Logical' }]] }, { rows: [[{ dead: 'TextFn' }]] }] },
-    { name: 'Formula Auditing', cols: [{ rows: [[{ cmd: 'MP' }], [{ cmd: 'MD' }], [{ dead: 'RemoveArrows' }]] }, { rows: [[{ dead: 'ShowFormulas' }], [{ dead: 'EvaluateFormula' }]] }] },
+    { name: 'Formula Auditing', cols: [{ rows: [[{ cmd: 'MP' }], [{ cmd: 'MD' }], [{ dead: 'RemoveArrows' }]] }, { rows: [[{ cmd: 'MH', check: 'showFormulas' }], [{ dead: 'EvaluateFormula' }]] }] },
     { name: 'Calculation', cols: [big({ dead: 'CalculateNow' })] },
   ],
   A: [
     { name: 'Get & Transform Data', cols: [big({ dead: 'FromText' }), big({ dead: 'FromWeb' })] },
     { name: 'Sort & Filter', cols: [{ rows: [[ico({ cmd: 'ASA' })], [ico({ cmd: 'ASD' })]] }, big({ dead: 'SortDialog' }), big({ dead: 'DataFilter' }), { rows: [[{ dead: 'ClearFilter' }]] }] },
     { name: 'Data Tools', cols: [big({ dead: 'TextToColumns' }), big({ dead: 'RemoveDuplicates' }), big({ dead: 'DataValidation' })] },
+    { name: 'Outline', cols: [big({ menu: 'AG', cmd: 'AGG', label: 'Group' }), big({ menu: 'AU', cmd: 'AUU', label: 'Ungroup' }), { rows: [[{ cmd: 'AH' }], [{ cmd: 'AJ' }]] }] },
   ],
   R: [
     { name: 'Proofing', cols: [big({ dead: 'Spelling' }), big({ dead: 'Thesaurus' })] },

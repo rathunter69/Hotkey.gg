@@ -12,7 +12,7 @@ export function levelOf(xp) {
   return { lvl, into: total - floor, need, pct: Math.min(100, Math.round(100 * (total - floor) / need)) };
 }
 
-const DAY_CAPS = { 'lesson-repeat': 3, 'drill-repeat': 3, rapid: 3 };
+const DAY_CAPS = { 'lesson-repeat': 3, 'drill-repeat': 3, 'challenge-repeat': 3, rapid: 3 };
 
 /**
  * XP one event earns, given the events already awarded (earlier in time, same shapes).
@@ -44,6 +44,14 @@ export function xpForEvent(e, history = []) {
     if (e.clean && firstClean) { e._tag = 'drill-first'; return 40; }
     if (sameDayCount('drill-repeat') >= DAY_CAPS['drill-repeat']) return 0;
     e._tag = 'drill-repeat'; return 10;
+  }
+  if (e.kind === 'challenge') {
+    // a recorded challenge attempt IS a pass (failed runs never record): first pass pays the
+    // module's completion bonus, repeats pay like drill repeats
+    const first = !h.some(x => x.kind === 'challenge' && x.ref === e.ref && x._tag === 'challenge-first');
+    if (first) { e._tag = 'challenge-first'; return 50; }
+    if (sameDayCount('challenge-repeat') >= DAY_CAPS['challenge-repeat']) return 0;
+    e._tag = 'challenge-repeat'; return 10;
   }
   if (e.kind === 'daily') {
     if (h.some(x => x.kind === 'daily' && x.day === e.day)) return 0;
@@ -81,6 +89,7 @@ export function eventsFrom(progressAll, attempts) {
   }
   for (const a of attempts || []) {
     if (a.kind === 'drill') evs.push({ kind: 'drill', ref: a.ref, day: a.day || day(a.at), clean: a.clean, _at: a.at || 0 });
+    else if (a.kind === 'challenge') evs.push({ kind: 'challenge', ref: a.ref, day: a.day || day(a.at), clean: a.clean, _at: a.at || 0 });
     else if (a.kind === 'daily') evs.push({ kind: 'daily', day: a.day || day(a.at), _at: a.at || 0 });
     else if (a.kind === 'rapid') evs.push({ kind: 'rapid', day: a.day || day(a.at), _at: a.at || 0 });
   }

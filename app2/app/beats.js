@@ -1,0 +1,63 @@
+// app2/app/beats.js — the story beats (experience pass, decision 4): one short card at each
+// module boundary, shown once, in the deal-team voice — what just came in, what the module
+// delivers. Nothing mid-lesson; the task card and one coach line per goal carry the work. The
+// chapter-end moment ("page delivered") reads from the same table.
+//
+//   beatFor(lesson, moduleAt)  → { id, eyebrow, title, body } for the first lesson of a module, else null
+import { PLANNED_MODULES } from './learn-next.js';
+import { moduleCopy, siteCopy, splitParas } from '../content/copy/apply.js';
+
+/** The chapter-end line's shape; site.csv page_delivered overrides. {n} the module number, {module} its name, {page} modules.csv page_name. */
+export const PAGE_DELIVERED = 'Page {n} — {page} — delivered to the data room.';
+
+const BEATS_DEFAULT = {
+  'open-and-set-up': { eyebrow: 'Module 1.1 · open and set up', title: 'The file arrived the way inherited files do.',
+    body: 'A tab still called Sheet2, a dead half-export, no page for the report, a price buried inside a formula. Set it up to house standard first: the tab names you choose now are the names every reference carries later.' },
+  'move-and-select': { eyebrow: 'Module 1.2 · move and select', title: 'The associate has questions about the feed.',
+    body: 'Last row, last column, the first blank cost, the notes below the data. Answer each one by landing on the cell that holds it, and select what you will format later. Jumps, never scrolls: the mouse is for reviewing, not building.' },
+  'enter-edit-copy-fill': { eyebrow: 'Module 1.3 · enter, edit, copy and fill', title: 'A day is missing and the figures have typos.',
+    body: 'Airport’s Saturday never came through; management emailed the four figures. Enter them, fix the feed in place, and build the Report skeleton from Raw with the clipboard and the fill keys.' },
+  structure: { eyebrow: 'Module 1.4 · structure', title: 'Cedar Park opened this week.',
+    body: 'A sixth site row, a margin column, a stale column to remove, and a total that has to follow every edit. Then the widths, heights, groups and frozen panes that make the page readable.' },
+  format: { eyebrow: 'Module 1.5 · format', title: 'Numbers a banker can read.',
+    body: 'Thousands separators, no stray decimals, negatives in parentheses; bold totals with a top border; inputs blue with a light tint; the title centered across the page. The standard, applied once and then repeated in a single pass.' },
+  formulas: { eyebrow: 'Module 1.6 · formulas', title: 'Make the page live.',
+    body: 'Every figure on the Report links to Raw and Inputs, so a corrected feed flows through without retyping. SUM and its family, anchoring with F4, links across sheets, and what each error means.' },
+  'present-and-audit': { eyebrow: 'Module 1.7 · present and audit', title: 'Sign the page off.',
+    body: 'The buyer’s analyst opens page one first. Check the totals tie, the conventions hold, the print fits one page, and nothing is hardcoded that should not be. Then it goes in the pack.' },
+  // Chapter 2 · Formatting and presentation (Run 1: 2.1 and 2.2; the rest land with their modules)
+  'number-formats': { eyebrow: 'Module 2.1 · number formats', title: 'A three-year P&L, the way the export wrote it.',
+    body: 'General numbers with stray cents, costs typed positive, a site count dressed as dollars, bare years over the timeline. The built-in styles first: comma, Accounting, percent and date, and the sign convention stated once up top.' },
+  'custom-number-formats': { eyebrow: 'Module 2.2 · custom number formats', title: 'The house set is a code.',
+    body: 'Four sections, positive, negative, zero and text; a unit that rides in the format; a header built from a date with TEXT; a condition or a color in front, an empty section to hide a zero. The Custom box, Ctrl+1 then U, does all of it.' },
+  'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
+    body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
+};
+
+/** modules.csv story_beat ("Title || body") overrides a module's built-in beat; a row with only a body keeps the built-in title. */
+export const MODULE_BEATS = Object.fromEntries(Object.entries(BEATS_DEFAULT).map(([id, b]) => {
+  const row = moduleCopy(id); const paras = row ? splitParas(row.story_beat) : [];
+  if (!paras.length) return [id, b];
+  return [id, { eyebrow: b.eyebrow, title: paras.length > 1 ? paras[0] : b.title, body: paras.length > 1 ? paras.slice(1).join(' ') : paras[0] }];
+}));
+
+/** The beat for a lesson, when it opens a module the learner has not seen the beat for. Pure over `seen`. */
+export function beatFor(lesson, at, seen = []) {
+  if (!lesson || !at || at.n !== 1 || lesson.kind === 'challenge') return null;
+  const id = lesson.module;
+  if (id === 'welcome') return null;   // retired (B2): the Welcome's moves open 1.1.1
+  if (!id || seen.includes(id)) return null;
+  const b = MODULE_BEATS[id];
+  if (b) return { id, ...b };
+  const planned = PLANNED_MODULES.find(p => p.title === at.module.title);
+  return { id, eyebrow: `Module ${(planned && planned.n) || '1.' + at.k} · ${at.module.title.toLowerCase()}`, title: at.module.title + '.', body: (planned && planned.objective) || '' };
+}
+
+/** The chapter-end line when a module's challenge passes: what page went into the pack. */
+export function pageDelivered(at) {
+  if (!at) return '';
+  const planned = PLANNED_MODULES.find(p => p.title === at.module.title);
+  const row = moduleCopy(at.module.id);
+  const page = (row && row.page_name && row.page_name.trim()) || at.module.title;
+  return siteCopy('page_delivered', PAGE_DELIVERED).replace(/\{n\}/g, (planned && planned.n) || '1.' + at.k).replace(/\{module\}/g, at.module.title).replace(/\{page\}/g, page);
+}

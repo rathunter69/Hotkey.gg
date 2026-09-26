@@ -8,7 +8,7 @@ const KEY = 'hk2_records_v1';
 const MAX_ATTEMPTS = 500;   // a runaway history cannot eat localStorage
 const MAX_TRACE = 600;      // ghost trace entries per PB (the brief's cap)
 
-export const ATTEMPT_KINDS = ['drill', 'daily', 'rapid', 'lesson-timed'];
+export const ATTEMPT_KINDS = ['drill', 'daily', 'rapid', 'lesson-timed', 'challenge'];
 const TIERS = ['none', 'pass', 'pro', 'legendary'];
 
 const isPlainObject = v => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -27,6 +27,8 @@ export function cleanAttempt(a) {
   out.helped = a.helped === true;
   out.mouse = Number.isInteger(a.mouse) && a.mouse >= 0 ? a.mouse : 0;
   out.tier = TIERS.includes(a.tier) ? a.tier : 'none';
+  out.first = a.first === true;         // the first attempt at this ref (a soft-timed challenge run, C2 addendum)
+  out.timedOut = a.timedOut === true;   // finished past the time limit: completes the module, earns no tier
   out.splits = Array.isArray(a.splits) ? a.splits.filter(finite).slice(0, 32) : [];
   out.trace = out.clean && Array.isArray(a.trace)
     ? a.trace.filter(e => isPlainObject(e) && typeof e.k === 'string' && finite(e.t)).slice(0, MAX_TRACE).map(e => ({ k: e.k, t: e.t, cell: typeof e.cell === 'string' ? e.cell : null }))
@@ -92,6 +94,30 @@ export const records = {
   },
   /** The ghost trace of the ref's PB run: [{k, t, cell}]; empty when there is none. */
   trace(ref) { return load().traces[ref] || []; },
+  /** No attempt at this ref yet: the next run is the first (soft-timed for a challenge). */
+  first(ref) { return !load().attempts.some(a => a.ref === ref); },
+  /**
+   * Seed PBs from the account (rpc_my_game rows) after sign-in: a server PB takes the slot when
+   * this device has none or a slower one. The ghost trace of a PB set elsewhere stays empty.
+   */
+  importPbs(rows) {
+    if (!Array.isArray(rows) || !rows.length) return false;
+    try {
+      const s = load();
+      let changed = false;
+      for (const r of rows) {
+        const secs = r && r.secs != null ? Number(r.secs) : NaN;
+        if (!r || typeof r.ref !== 'string' || !finite(secs) || secs < 0) continue;
+        const prev = s.pbs[r.ref];
+        if (prev && prev.secs <= secs) continue;
+        const at = r.at ? Date.parse(r.at) : NaN;
+        s.pbs[r.ref] = { ref: r.ref, secs, keys: Number.isInteger(r.keys) ? r.keys : 0, attemptId: typeof r.attempt_id === 'string' ? r.attempt_id : null, at: finite(at) ? at : 0 };
+        if (!prev || prev.attemptId !== s.pbs[r.ref].attemptId) delete s.traces[r.ref];
+        changed = true;
+      }
+      return changed ? save(s) : false;
+    } catch (e) { return false; }
+  },
   clear() { try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } },
 };
 

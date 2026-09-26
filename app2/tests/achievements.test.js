@@ -40,7 +40,7 @@ test('every test({}) returns {done:false} without throwing; progress stays withi
 
 test('a played ctx earns the right badges', () => {
   const ctx = {
-    progress: { 'welcome-race': { completed: true } },
+    progress: Object.fromEntries(['inherited-workbook', 'ribbon-by-keyboard', 'analyst-setup', 'colour-label-hardcode'].map(id => [id, { completed: true }])),   // every lesson of Open and set up
     attempts: [
       { kind: 'drill', ref: 'edge-jumps', day: '2026-09-22', secs: 3.9, keys: 8, clean: true, helped: false, mouse: 0, tier: 'legendary', at: Date.parse('2026-09-22T13:00:00Z') },
       { kind: 'rapid', ref: 'rapid-60', day: '2026-09-22', secs: 60, keys: 40, clean: false, mouse: 0, tier: 'none', splits: [12, 2, 11, 520], at: Date.parse('2026-09-22T13:10:00Z') },
@@ -49,9 +49,10 @@ test('a played ctx earns the right badges', () => {
     level: 5, streakDays: 7,
   };
   const done = earnedSet(ctx);
-  for (const id of ['first-lesson', 'sec-welcome', 'drill-1', 'pb-1', 'tier-pass', 'tier-pro', 'tier-legend', 'no-waste', 'rapid-1', 'rapid-500', 'combo-10', 'level-5', 'streak-7', 'blink'])
+  for (const id of ['first-lesson', 'mod-setup', 'drill-1', 'pb-1', 'tier-pass', 'tier-pro', 'tier-legend', 'no-waste', 'rapid-1', 'rapid-500', 'combo-10', 'level-5', 'streak-7', 'blink'])
     assert.ok(done.has(id), id + ' earned');
   assert.ok(!done.has('ch1-complete'));
+  assert.ok(!done.has('mod-move'), 'the next module is untouched');
   assert.ok(!done.has('old-habits'), 'no mouse was used');
 });
 

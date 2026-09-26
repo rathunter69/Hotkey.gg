@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>hotkey.gg — Learn Excel by doing</title>
-<meta name="description" content="Learn Excel by doing: guided lessons and real-world drills on a real spreadsheet in your browser. Chapter 1 is free. No account needed to start.">
+<title>hotkey.gg — Excel isn’t learned. It’s practiced.</title>
+<meta name="description" content="Learn Excel the way analysts are taught: on a real sheet, one job at a time. Lessons, challenges, drills and the Daily in your browser. Chapter 1 is free. No account needed to start.">
 <link rel="icon" href="./favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <!-- the saved palette lands before the first paint: a classic script restores the vars themes.js persisted -->
-<script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}
+try{var f=localStorage.getItem('hk2_flow');document.documentElement.setAttribute('data-flow',f==='off'?'live':'next');var p=JSON.parse(localStorage.getItem('hk2_prefs')||'{}');document.documentElement.setAttribute('data-density',p.density==='compact'?'compact':'comfortable');document.documentElement.setAttribute('data-panel',p.panelSide==='left'?'left':p.panelSide==='right'?'right':'overlay');}catch(e){}</script>
 <script type="module">import { loadTheme } from './ui/themes.js'; loadTheme();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,14 +21,21 @@
 <link rel="stylesheet" href="./ui/reference.css">
 <link rel="stylesheet" href="./ui/lesson.css" id="lessonCss">
 <link rel="stylesheet" href="./ui/workbook.css">
+<link rel="stylesheet" href="./ui/scale.css">
+<link rel="stylesheet" href="./ui/next.css">
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#16a862">
 </head>
 <body>
-<div id="navMount"></div>
-<div class="app"><main id="root"></main></div>
+<!-- the shell paints with the HTML: a nav bar and a page shape stand in until the app mounts over them -->
+<div id="navMount"><nav class="topnav" aria-label="site"><div class="topnav-in"><a class="topnav-brand" href="#/">hotkey<b>.gg</b></a></div></nav></div>
+<div class="app"><main id="root"><div class="sk sk-boot" role="status" aria-label="Loading"><span class="sk-sr">Loading…</span><div class="sk-bar sk-title"></div><div class="sk-bar sk-sub"></div><div class="sk-col"><div class="sk-card"></div><div class="sk-card"></div></div></div></main></div>
 <div id="footMount"></div>
+<!-- boot watchdog: if the app never replaces the boot shape (a module failed, or the network stalled), say so and offer a reload -->
+<script>(function(){function stuck(){var r=document.getElementById('root');if(!r||!r.querySelector('.sk-boot'))return;r.innerHTML='<div class="err-card" role="alert"><div class="err-cap">hotkey.gg · could not load</div><div class="err-body"><h1>hotkey.gg did not finish loading.</h1><p>Part of the site did not arrive. Check your connection and reload.</p><div class="err-actions"><button class="btn btn-primary" type="button" onclick="location.reload()">Reload</button></div></div></div>';}window.__hkBootFail=stuck;setTimeout(stuck,12000);})();</script>
 <!-- pinned supabase-js UMD (classic script, never imported): exposes window.supabase for app/auth.js -->
 <script defer src="./vendor/supabase.js"></script>
-<script type="module">
+<script type="module" onerror="window.__hkBootFail&&window.__hkBootFail()">
   import { startApp } from './app/main.js';
   startApp({ navEl: document.getElementById('navMount'), rootEl: document.getElementById('root'), footEl: document.getElementById('footMount') });
 </script>

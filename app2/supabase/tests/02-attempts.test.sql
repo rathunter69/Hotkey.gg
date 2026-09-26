@@ -85,18 +85,18 @@ select is((select completions from public.lesson_progress where user_id = pg_tem
 select is((select xp from public.profiles where id = pg_temp.uid(1)), 100, 'clean first completion pays 100 XP');
 select is((select level from public.profiles where id = pg_temp.uid(1)), 2, 'level follows 1 + floor(sqrt(xp/100))');
 
--- ================================================= assisted first completion: 60, then the clean solo tops up to 100
+-- ================================================= assisted first completion: 60 flat (0008 — no withheld debt)
 set local role authenticated;
 select pg_temp.actor(1);
 select lives_ok($p$select public.rpc_record_attempt(jsonb_build_object('id', pg_temp.att(2), 'lesson_id', 'moving-around', 'mode', 'guided', 'secs', 40, 'assisted', true))$p$, 'assisted completion records');
 reset role;
 select is((select xp from public.profiles where id = pg_temp.uid(1)), 160, 'assisted first completion pays 60');
-select is((select xp_pending from public.lesson_progress where user_id = pg_temp.uid(1) and lesson_id = 'moving-around'), 40, 'the withheld 40 is remembered');
+select is((select xp_pending from public.lesson_progress where user_id = pg_temp.uid(1) and lesson_id = 'moving-around'), 0, 'no debt is written: xp_pending stays zero');
 set local role authenticated;
 select pg_temp.actor(1);
 select lives_ok($p$select public.rpc_record_attempt(jsonb_build_object('id', pg_temp.att(3), 'lesson_id', 'moving-around', 'mode', 'solo', 'secs', 33))$p$, 'clean solo records');
 reset role;
-select is((select xp from public.profiles where id = pg_temp.uid(1)), 200, 'the clean solo collects the 40: the lesson totals 100');
+select is((select xp from public.profiles where id = pg_temp.uid(1)), 170, 'the clean solo is a paid repeat: 10, not a 40 top-up');
 select is((select xp_pending from public.lesson_progress where user_id = pg_temp.uid(1) and lesson_id = 'moving-around'), 0, 'nothing left pending');
 
 -- ================================================= timed runs: help or mouse means no best

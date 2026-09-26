@@ -15,6 +15,19 @@
   --mono:'JetBrains Mono',ui-monospace,monospace;
   --cellfont:Arial,'Calibri','Segoe UI',system-ui,sans-serif;   /* r72 doctrine: ARIAL leads in the sheet cells; everything outside the grid = JetBrains Mono / Hanken */
   --sans:'Hanken Grotesk',system-ui,sans-serif;
+  /* derived tokens — every theme gets them from its own palette (themes.js writes only the palette
+     keys on <html>, and these resolve against them there). --ink: text-coloured shadows and the
+     pixel-art outline. Tiers and rarities keep the site's idiom (pro/rare blue, epic violet,
+     legendary amber) but take their lightness from the theme's text and a tint of its accent and
+     warn, so they sit natively on light and dark themes alike (§6a). */
+  --ink:var(--text);
+  --tier-pass:var(--accent);
+  --tier-pro:color-mix(in oklab, color-mix(in oklab, #4a9eda 80%, var(--accent)) 75%, var(--text));
+  --tier-legendary:color-mix(in oklab, color-mix(in oklab, #e0913f 70%, var(--warn, #d9892b)) 82%, var(--text));
+  --rar-common:var(--accent);
+  --rar-rare:var(--tier-pro);
+  --rar-epic:color-mix(in oklab, color-mix(in oklab, #a06bd6 80%, var(--accent)) 75%, var(--text));
+  --rar-legendary:var(--tier-legendary);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scrollbar-gutter:stable; height:100%}
@@ -188,6 +201,11 @@ html[data-dark="1"] td.fill-gray{background:#3c4149 !important; color:#dfe3e8}
 html[data-dark="1"] td.fill-yellow{background:#5c4a1c !important; color:#ffe08a}
 html[data-dark="1"] td.fill-green{background:#2c4321 !important; color:#c9e6b8}
 html[data-dark="1"] td.fill-red{background:#4d2222 !important; color:#f2bcbc}
+/* Conditional formatting (Chapter 2, sheet-view): a rule's paint wins over the cell's own fill and font colour, as in Excel. The colours are Excel's hexes, so they read the same in every theme. */
+.gridwrap td.cf-fill, html[data-dark="1"] .gridwrap td.cf-fill{background:var(--cf-fill) !important}
+.gridwrap td.cf-fc, html[data-dark="1"] .gridwrap td.cf-fc{color:var(--cf-fc) !important}
+.gridwrap td.cf-bd{box-shadow:inset 0 0 0 1px var(--cf-bd)}
+.gridwrap td.cf-bar, html[data-dark="1"] .gridwrap td.cf-bar{background-image:linear-gradient(90deg, var(--cf-bar) var(--cf-pct), transparent var(--cf-pct)) !important; background-repeat:no-repeat !important}
 /* r212: DARK CHROME, LIGHT SHEET — like real Excel in dark mode. On dark themes the grid renders
    on a fixed light sheet (dark ink, light gridlines), while the nav / ribbon / background keep the
    theme. Scoped to .gridwrap so only the sheet flips; CSS vars cascade to every cell. */
@@ -275,8 +293,16 @@ td.sel-r{border-right:1.5px solid var(--cell-cursor)}
 td.fh::after{content:''; position:absolute; right:0; bottom:0; width:6px; height:6px;
   background:var(--cell-cursor); z-index:6}   /* r317: flush + tight in the corner, Excel-style */
 td.editing.fh::after, td.point.fh::after{display:none}   /* no handle mid-edit / while pointing */
-@keyframes pasteflash{0%{background:var(--accent)}100%{background:transparent}}
-td.pasted{animation:pasteflash .5s ease-out}
+/* the paste flash (§6a: opacity only): an accent veil over each pasted cell fades out. It rides
+   ::before, which stays rendered for as long as the cell is .pasted (even as the active cell or a
+   spill), so moving the selection never restarts it; multiply keeps the cell's text dark under it.
+   A pasted cell that is still selected carries its grey selection veil as a background layer instead. */
+@keyframes pasteflash{0%{opacity:.9}100%{opacity:0}}
+td.pasted::before{content:''; display:block; position:absolute; inset:0; background:var(--accent); mix-blend-mode:multiply;
+  pointer-events:none; opacity:0; animation:pasteflash .5s ease-out}
+td.pasted.active::before, td.pasted.spill::before{display:block}
+td.pasted.sel:not(.spill){background-image:linear-gradient(var(--sel-grey),var(--sel-grey))}
+td.pasted.sel.active{background-image:none}
 .pastedest{position:absolute; display:none; pointer-events:none; z-index:5;
   border:2px solid var(--cell-cursor); opacity:.95; border-radius:2px;
   box-shadow:0 0 0 2px color-mix(in srgb, var(--cell-cursor) 22%, transparent)}
@@ -371,16 +397,20 @@ td.thick.ball::after{border-width:3px}
 .ribbon.ribbon-lean .ri-g{font-size:13px}
 .ribbon.ribbon-lean .ri-key{position:static; font-size:9.5px; line-height:1.5; order:2}
 .ribbon.ribbon-lean .rgrp-ico{padding:1px 6px}
-/* r426: THE OPEN MENU — an overlay with room to breathe: wraps instead of scrolling, every glyph
-   steps up to a legible size (KeyTip 9→11px, labels 11→12.5px, icons 15→18px, glyphs 13→15px). */
-.ribbon.ribbon-open{padding-right:12px; flex-wrap:wrap; overflow-x:visible; row-gap:3px}
-.ribbon.ribbon-open .rgrp-ico .rgrp-chips{flex-wrap:wrap}
+/* r426: THE OPEN MENU — every glyph steps up to a legible size (KeyTip 9→11px, labels 11→12.5px,
+   icons 15→18px, glyphs 13→15px). It stays ONE row, like the lean bar: a second row landed as an
+   orphan over the formula bar, so a menu too wide for the sheet scrolls sideways instead (the
+   KeyTips still reach every command). Groups sit a little tighter so Home fits at 1280. */
+.ribbon.ribbon-open{padding-right:12px; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden}
+.ribbon.ribbon-open .rgrp-ico .rgrp-chips{flex-wrap:nowrap}
+.ribbon.ribbon-lean.ribbon-open .rgrp-ico{padding:1px 3px}
+.ribbon.ribbon-open > .path{flex:none; white-space:nowrap}   /* "Home →" never folds onto two lines */
 .ribbon.ribbon-open .ri-key{font-size:11px; font-weight:800; line-height:1.35}
 .ribbon.ribbon-open .ri-lbl{font-size:12.5px}
 .ribbon.ribbon-open .ri-g{font-size:15px}
 .ribbon.ribbon-open .ri-ico{height:20px}
 .ribbon.ribbon-open .ri-ico svg{width:18px; height:18px}
-.ribbon.ribbon-open .ri-cmd{padding:2px 4px; gap:4px}
+.ribbon.ribbon-open .ri-cmd{padding:2px; gap:3px}
 /* r343: menus without icons use badge+label chips — same family, same 34px row */
 .ribbon.ribbon-lean .ri-cmd.ri-txt{gap:5px}
 .ribbon.ribbon-lean .ri-lbl{font-family:var(--mono); font-size:11px; color:var(--text); white-space:nowrap}
@@ -409,8 +439,8 @@ td.thick.ball::after{border-width:3px}
   color:var(--on-accent,#0c0d0e); background:var(--accent); border-radius:3px; padding:0 3px; line-height:1.5}
 
 /* ---------- 9. solved flash (778–779), dead tabs / note / swatches / filter chips (781–793), paste-special + format-cells card (799–822) ---------- */
-@keyframes flash{0%{background:var(--accent-glow)}100%{background:transparent}}
-.gridwrap.solved{animation:flash .5s ease-out}
+/* (the old whole-sheet "solved" background flash is gone: nothing sets .solved in the rebuild, and
+   the finish ring in 12b is the one completion cue) */
 .ribbon .rtab.dim{color:var(--faint); background:transparent; border-color:transparent}
 .ribbon .rtab.dim k{color:var(--faint); background:var(--surface2)}
 .ribbon .rnote{color:var(--warn); margin-left:6px}
@@ -515,11 +545,19 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 .fx-tick.out{animation:fxTickOut .28s ease-in forwards}
 @keyframes fxTick{0%{opacity:0; transform:translateY(-50%) scale(.4)}60%{opacity:1; transform:translateY(-50%) scale(1.15)}100%{opacity:1; transform:translateY(-50%) scale(1)}}
 @keyframes fxTickOut{0%{opacity:1; transform:translateY(-50%) scale(1)}100%{opacity:0; transform:translateY(-50%) scale(.6)}}
-.fx-finish{animation:fxFinish .75s ease-out}
-@keyframes fxFinish{0%{box-shadow:0 0 0 0 var(--accent), 0 0 0 0 var(--accent-glow)}
-  40%{box-shadow:0 0 0 3px var(--accent), 0 0 0 14px var(--accent-glow)}
-  100%{box-shadow:0 0 0 0 transparent, 0 0 0 24px transparent}}
-@media (prefers-reduced-motion: reduce){ .fx-tick, .fx-tick.out, .fx-finish{animation:none} .fx-tick{opacity:1; transform:translateY(-50%)} .fx-tick.out{opacity:0} }
+/* reduced motion: the tick fades in still and fades out (movement swapped for a fade, never dropped) */
+.fx-tick.still{transform:translateY(-50%); animation:fxTickFade .2s ease-out forwards}
+.fx-tick.still.out{animation:fxTickFadeOut .25s ease-in forwards}
+@keyframes fxTickFade{0%{opacity:0}100%{opacity:1}}
+@keyframes fxTickFadeOut{0%{opacity:1}100%{opacity:0}}
+/* the finish: a fixed layer on the stage's box (effects.js places it) whose accent ring fades out
+   while it grows a touch — opacity and transform only; the ring under the result overlay (z 40) */
+.fx-ring{position:fixed; z-index:30; pointer-events:none; opacity:0; transform-origin:center;
+  box-shadow:0 0 0 3px var(--accent), 0 0 0 12px var(--accent-glow); animation:fxRing .75s ease-out forwards}
+.fx-ring.still{animation-name:fxRingFade}
+@keyframes fxRing{0%{opacity:0; transform:scale(.992)}35%{opacity:1; transform:scale(1)}100%{opacity:0; transform:scale(1.012)}}
+@keyframes fxRingFade{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){ .fx-tick{transform:translateY(-50%); animation:fxTickFade .2s ease-out forwards} .fx-tick.out{animation:fxTickFadeOut .25s ease-in forwards} .fx-ring{animation-name:fxRingFade} }
 
 /* ---------- 12c. the FULL RIBBON (SITE_SPEC §4): tab row, groups, labelled buttons, KeyTips ---------- */
 /* the slot stays a constant height in each mode, so the sheet never moves when a menu opens */
@@ -542,10 +580,14 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 .rf-body::-webkit-scrollbar{display:none}
 .rf-grp{display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:0 6px 1px; border-right:1px solid var(--line); flex:none}
 .rf-grp:last-child{border-right:0}
-.rf-cols{display:flex; align-items:flex-start; gap:2px; flex:1 1 auto}
+.rf-cols{display:flex; align-items:flex-start; gap:2px; flex:1 1 auto; min-height:0}
 .rf-col{display:flex; flex-direction:column; gap:1px}
 .rf-row{display:flex; align-items:center; gap:1px}
-.rf-gname{font-family:var(--mono); font-size:9px; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); font-weight:600; line-height:1; padding-top:2px; white-space:nowrap}
+/* the number-format row ($ % , and the two decimal buttons): its glyphs (",000", ".00") are wider than an
+   icon button, so the buttons fit their glyphs and keep 2px apart instead of running together */
+.rf-row:has(> [data-tip="H0"]){gap:2px}
+.rf-row:has(> [data-tip="H0"]) > .rf-btn.ico{width:auto; min-width:22px; padding:0 3px}
+.rf-gname{font-family:var(--mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); font-weight:600; line-height:1; padding-top:2px; white-space:nowrap; flex:none}   /* its row is reserved: nothing above ever prints on it */
 /* buttons: small (icon + label in a row) and big (icon over label); both carry a KeyTip badge in the corner */
 .rf-btn{position:relative; display:inline-flex; align-items:center; gap:4px; height:17px; padding:0 4px; border:1px solid transparent; border-radius:5px;
   background:transparent; color:var(--text); font-family:var(--mono); font-size:10px; line-height:1; cursor:pointer; white-space:nowrap; transition:background .1s, border-color .1s}
@@ -566,6 +608,12 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 .rf-btn.big .rf-ico svg{width:22px; height:22px}
 .rf-btn.big .rf-ico .ri-g{font-size:18px}
 .rf-btn.big .rf-lbl{font-size:10px; line-height:1.15; max-width:52px}
+/* a big label is set on at most two lines (ribbon-view bigLabelLines: "Page Break" / "Preview", as Excel sets it); a line never
+   rewraps, so the button widens past its 52/60px for a long line instead of spilling onto a neighbour or the caption row */
+.rf-btn.big:not(.rf-grpbtn){min-width:max-content}
+.ribbon.ribbon-full .rf-btn.big .rf-lbl{max-width:none; flex:none}   /* beats the density step's max-width (scale.css); never squeezed, so a second line is never cut */
+.rf-btn.big .rf-ln{display:block; white-space:nowrap}
+.rf-btn.big .rf-ln .rf-caret{margin-left:3px}   /* a two-line label's menu arrow sits after its last word ("Panes ▾"), not on a third row */
 .rf-btn.dis, .rf-box.dis{opacity:.42; cursor:not-allowed}
 .rf-btn.dis:hover{background:transparent; border-color:transparent}
 .rf-btn.dis .rf-ico, .rf-btn.dis .rf-lbl{color:var(--muted)}
@@ -582,20 +630,26 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 .rf-split.open .rf-arrow{background:var(--surface); border-color:var(--accent-dim)}
 /* a folded group (the bar is too narrow for its buttons): one big button, its live KeyTips stacked beneath */
 .rf-grp.rf-collapsed .rf-grpbtn{width:50px}
+.ribbon.ribbon-full .rf-btn.rf-grpbtn .rf-lbl{max-width:100%}
+.rf-btn.rf-grpbtn .rf-ln{overflow:hidden; text-overflow:ellipsis}
 .rf-grptips{position:absolute; left:50%; bottom:9px; transform:translateX(-50%); display:flex; gap:2px; z-index:3}
 .ribbon-full .rf-grptips .ri-key{position:static; transform:none}
 .rdrop-item.on .rdrop-lbl{color:var(--accent)}
 /* the disabled name / size / number-format boxes */
 .rf-box{position:relative; display:inline-flex; align-items:center; justify-content:space-between; height:17px; padding:0 5px; border:1px solid var(--line); border-radius:4px;
   background:var(--surface); font-family:var(--mono); font-size:10px; color:var(--text); white-space:nowrap; overflow:hidden}
-/* the KeyTip badge on a full-bar control: hangs under a small control and sits on a big one's label (Excel), never in the layout flow */
-.ribbon-full .ri-key, .rdrop-menu .ri-key, .rdrop-dialog .ri-key{position:absolute; top:auto; left:50%; bottom:-6px; transform:translateX(-50%); font-family:var(--mono); font-size:10px; font-weight:800; line-height:1.3;
+.rf-row > .rf-box:only-child{flex:1 0 auto}   /* the Excel width is a floor (inline min-width): a box grows to its text, and a column's boxes share one width */
+.rf-box > .rf-caret{margin-left:6px}   /* a box sized to its text keeps its arrow clear of the last letter */
+/* the KeyTip badge on a full-bar control: hangs under a small control and sits on a big one's icon, never in the layout flow;
+   sized to its letters (right:auto: the base .ribbon .ri-key's right:2px plus a left stretched it over the whole button, hiding the label) */
+.ribbon-full .ri-key, .rdrop-menu .ri-key, .rdrop-dialog .ri-key{position:absolute; top:auto; left:50%; right:auto; bottom:-6px; width:max-content; transform:translateX(-50%); font-family:var(--mono); font-size:10px; font-weight:800; line-height:1.3;
   color:var(--on-accent); background:var(--accent); border:1px solid color-mix(in srgb, var(--accent-dim) 60%, transparent); border-radius:3px; padding:0 3px; z-index:3; box-shadow:0 1px 3px rgba(0,0,0,.3); pointer-events:none; white-space:nowrap}
-.rf-btn.big > .ri-key, .rf-split.big > .ri-key{bottom:12px}
+.rf-btn.big > .ri-key, .rf-split.big > .ri-key{top:1.4em; bottom:auto}   /* on the icon's lower half: the label under it stays readable at either density */
 .rf-btn.ico > .ri-key{left:auto; right:-4px; transform:none}
 .rf-btn:not(.ico):not(.big) > .ri-key, .rf-box > .ri-key{left:-2px; transform:none}   /* a labelled small button: under its icon, the label stays readable */
 /* menus and small dialogs as anchored dropdowns */
 .rdrop.rdrop-menu, .rdrop.rdrop-dialog{padding:8px 6px 6px; min-width:200px}
+.rdrop-menu .rdrop-hint{white-space:nowrap; padding:5px 8px 3px 10px; margin-top:4px; border-top:1px solid var(--line)}   /* the footer hint: one line, lined up with the items, off the menu's edge */
 .rdrop-item{position:relative; display:flex; align-items:center; gap:9px; padding:4px 8px 4px 10px; border-radius:6px; font-family:var(--mono); font-size:12px; color:var(--text); cursor:pointer}
 .rdrop-item:hover{background:var(--accent-glow)}
 .rdrop-item.dis{opacity:.45; cursor:not-allowed}
@@ -647,3 +701,13 @@ td.cmt::after{content:''; position:absolute; top:0; right:0; width:0; height:0;
 #grid th.rowhdr.seam-r{border-top:3px double var(--line)}
 #grid td.frz-b{border-bottom:2px solid var(--faint)}
 #grid td.frz-r{border-right:2px solid var(--faint)}
+
+/* ---- C2 gap 4: the outline bar — a bracket over a grouped band, ⊖ / ⊕ on the row or column past it; a folded band hides like Excel's ---- */
+#grid tr:first-child th.ol-c{box-shadow:inset 0 3px 0 var(--accent)}
+#grid th.rowhdr.ol-r{box-shadow:inset 3px 0 0 var(--accent)}
+#grid th.ol-host{overflow:visible}
+#grid th .ol-btn{position:absolute; left:1px; top:1px; width:13px; height:13px; padding:0; line-height:11px; font-family:var(--mono); font-size:11px; font-weight:700; color:var(--accent); background:var(--surface); border:1px solid var(--accent); border-radius:2px; cursor:pointer; z-index:9}
+#grid th .ol-btn:hover{background:var(--accent); color:var(--on-accent)}
+#grid tr:first-child th .ol-btn{left:auto; right:1px; top:auto; bottom:1px}
+/* ---- C2 gap 5: show formulas (Ctrl+`) — formula text sits left like text, never a #### verdict ---- */
+#grid td.fxshow{font-family:var(--mono); font-size:12px; text-align:left !important}   /* formula text reads left whatever the cell's alignment */

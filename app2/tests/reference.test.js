@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { REFERENCE, CATEGORIES, CATEGORY_NOTES, ADDIN_DISCLAIMER, macChord, macNote, parseChord, referenceByChord, referenceById, lessonForConcept } from '../content/reference.js';
-import { LESSONS_BY_ID, lessonNumber } from '../content/index.js';
+import { LESSONS, LESSONS_BY_ID, lessonNumber } from '../content/index.js';
 import { CONCEPTS } from '../content/schema.js';
 import { detectPlatform, chordHtml, searchText, groupCategories, chipList, inCategory, ADDINS_CAT, ADDINS_TITLE, ADDINS_CLOSED, addinsOpen, addinsAfterSearch, addinsAfterToggle } from '../app/reference-page.js';
 import { renderShortcutsIndex } from './public-pages.js';
@@ -35,7 +35,7 @@ test('every lessonId exists in the catalogue and matches the entry concept', () 
     if (e.lessonId === null) { assert.equal(lessonForConcept(e.concept), null, `${e.id}: concept ${e.concept} is taught, lessonId should be set`); continue; }
     const lesson = LESSONS_BY_ID[e.lessonId];
     assert.ok(lesson, `${e.id}: lesson ${e.lessonId} is in the catalogue`);
-    assert.ok(e.concept && lesson.concepts.includes(e.concept), `${e.id}: lesson ${e.lessonId} teaches "${e.concept}"`);
+    assert.ok(e.concept && (lesson.teaches || lesson.concepts || []).includes(e.concept), `${e.id}: lesson ${e.lessonId} teaches "${e.concept}"`);
   }
 });
 
@@ -49,28 +49,33 @@ test('every category is in CATEGORIES, in display order, and CATEGORIES has no e
   for (const name of Object.keys(CATEGORY_NOTES)) assert.ok(CATEGORIES.includes(name));
 });
 
-test('the Foundations shortcuts resolve to the lesson that teaches them', () => {
+test('the Foundations shortcuts resolve to the module lesson that teaches them', () => {
+  // lessonId is derived: the first catalogue lesson whose teaches/concepts include the entry's concept
+  const teacherOf = concept => { const l = LESSONS.find(x => (x.teaches || x.concepts || []).includes(concept)); return l ? l.id : null; };
   const expect = {
-    'ctrl-b': 'ribbon-commands',
-    'alt-h-1': 'ribbon-commands',
-    'alt-h-b-o': 'ribbon-commands',
-    'ctrl-1': 'dialog-boxes',
-    'ctrl-arrow': 'moving-around',
-    'ctrl-shift-arrow': 'selecting-ranges',
-    'shift-space': 'selecting-ranges',
-    'ctrl-space': 'selecting-ranges',
-    'ctrl-a': 'selecting-ranges',
-    'f2-edit': 'editing-cells',
+    'alt-h-b-o': 'fonts-fills-borders',          // borders-menu
+    'ctrl-1': 'ribbon-by-keyboard',              // format-cells-dialog
+    'ctrl-arrow': 'inherited-workbook',          // ctrl-arrow (1.1.1's opening goals)
+    'ctrl-shift-arrow': 'inherited-workbook',    // ctrl-shift-arrow
+    'shift-space': 'select-like-you-mean-it',    // row-col-select
+    'ctrl-space': 'select-like-you-mean-it',
+    'ctrl-a': 'select-like-you-mean-it',         // ctrl-a
+    'f2-edit': 'colour-label-hardcode',          // edit-mode-f2
   };
   for (const [id, lessonId] of Object.entries(expect)) {
     const e = referenceById(id);
     assert.ok(e, `${id} is in the reference`);
+    assert.ok(LESSONS_BY_ID[lessonId] && typeof LESSONS_BY_ID[lessonId].module === 'string', `${lessonId} is a module lesson`);
+    assert.equal(teacherOf(e.concept), lessonId, `${id}: the catalogue's first teacher of ${e.concept} is ${lessonId}`);
+    assert.ok(e.lessonId, `${id} (${e.win}) links to a lesson`);
     assert.equal(e.lessonId, lessonId, `${id} (${e.win}) links to ${lessonId}`);
   }
-  // by chord too: Ctrl+B and Alt H 1 are the same command, both taught in lesson 6
-  assert.equal(referenceByChord('Ctrl+B')[0].lessonId, 'ribbon-commands');
-  assert.equal(referenceByChord('Alt H 1')[0].lessonId, 'ribbon-commands');
-  assert.equal(referenceByChord('ctrl + 1')[0].lessonId, 'dialog-boxes');
+  // the modules teach bold as bold-italic-underline, so the bold-command rows link nowhere until a lesson teaches that concept
+  assert.equal(teacherOf('bold-command'), null);
+  assert.equal(referenceById('ctrl-b').lessonId, null); assert.equal(referenceById('alt-h-1').lessonId, null);
+  // by chord too
+  assert.equal(referenceByChord('Alt H B O')[0].lessonId, 'fonts-fills-borders');
+  assert.equal(referenceByChord('ctrl + 1')[0].lessonId, 'ribbon-by-keyboard');
   assert.ok(REFERENCE.filter(e => e.lessonId).length >= 30, 'Foundations covers at least 30 rows');
 });
 
@@ -148,8 +153,11 @@ test('page helpers: platform detection, keycap markup, search text', () => {
   assert.ok(html.includes('<span class="ref-plus">+</span>'));
   assert.equal((chordHtml('Alt H B O', parseChord).match(/class="ref-seq"/g) || []).length, 4);
   assert.ok(chordHtml('<b>', parseChord).includes('&lt;b&gt;'), 'keys are escaped');
-  const e = referenceById('ctrl-b'); const t = searchText(e, LESSONS_BY_ID[e.lessonId]);
-  for (const q of ['ctrl b', 'ctrl+b', 'bold', 'cmd b', 'command b', `lesson ${lessonNumber(e.lessonId)}`, 'formatting']) assert.ok(t.includes(q.replace('+', ' ')), `"${q}" finds Ctrl+B`);
+  const e = referenceById('ctrl-b'); const t = searchText(e, null);
+  for (const q of ['ctrl b', 'ctrl+b', 'bold', 'cmd b', 'command b', 'formatting']) assert.ok(t.includes(q.replace('+', ' ')), `"${q}" finds Ctrl+B`);
+  const e1 = referenceById('ctrl-1'); const t1 = searchText(e1, LESSONS_BY_ID[e1.lessonId]);
+  assert.ok(e1.lessonId, 'Ctrl+1 links to the lesson that teaches Format Cells');
+  for (const q of ['ctrl 1', 'format cells', `lesson ${lessonNumber(e1.lessonId)}`]) assert.ok(t1.includes(q), `"${q}" finds Ctrl+1`);
   assert.ok(searchText(referenceById('ctrl-9'), null).includes('coming soon'));
 });
 

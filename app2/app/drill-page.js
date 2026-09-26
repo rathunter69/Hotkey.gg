@@ -17,6 +17,8 @@ import { DRILLS, drillById } from '../content/drills.js';
 import { DrillRun } from './drill-run.js';
 import { store } from './store.js';
 import { dailyDrill, shareText } from './daily.js';
+import { dailyCardHtml } from '../ui/result-card.js';
+import { flowNext } from './flow.js';
 import { dayOf } from './records.js';
 import { gameCtx, celebrate } from './stats.js';
 
@@ -58,6 +60,8 @@ export function mountDrillPage(root, ctx = {}) {
   const daily = !!(ctx.params && ctx.params.daily) && (() => { const d = dailyDrill(dayOf()); return d.drill ? d : null; })();
   const id = daily ? daily.drill.id : (ctx.params && ctx.params.id) || 'sandbox';
   const drill = daily ? daily.drill : id === 'sandbox' ? SANDBOX : drillById(id) || SANDBOX;
+  // a module challenge in the catalogue runs in the lesson workspace (seeded, timed, tier-scored); the Daily passes its seed
+  if (drill.kind === 'challenge') { location.replace('#/lesson/' + encodeURIComponent(drill.id) + (daily ? '?daily=1&seed=' + daily.seed : '')); return { destroy() {} }; }
   const pos = NAV.findIndex(d => d.id === drill.id) + 1;
   const prev = daily ? null : NAV[pos - 2] || null, next = daily ? null : NAV[pos] || null;
   const graded = drill !== SANDBOX;
@@ -377,6 +381,15 @@ export function mountDrillPage(root, ctx = {}) {
         <button class="btn btn-ghost" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button>
       </div>
     </div>`;
+    // the Daily's shareable card (experience pass, decision 14): replaces the bare time on the Daily's overlay
+    if (daily && flowNext()) {
+      const host = document.createElement('div');
+      host.innerHTML = dailyCardHtml({ day: dayOf(), title: drill.title, secs: attempt.secs, tier: attempt.tier, keys: attempt.keys, refKeys: drill.optimalKeys, pos: null, of: null, attempts: attemptsToday(), clean: attempt.clean, handle: (store.profile() || {}).handle || null });
+      const card = overlay.querySelector('.rm-card');
+      const time = card.querySelector('.rm-time'); const stamps = card.querySelector('.tier-stamps');
+      if (time) time.replaceWith(host.firstElementChild); if (stamps) stamps.remove();
+      card.classList.add('rm-card-daily');
+    }
     const share = overlay.querySelector('[data-act="share"]');
     if (share) share.onclick = () => {
       const text = shareText(dayOf(), drill.title, attempt.secs, attempt.tier);
@@ -405,10 +418,10 @@ export function mountDrillPage(root, ctx = {}) {
     if (e.key === 'Escape' && document.documentElement.classList.contains('hk-fs') && !document.fullscreenElement) { document.documentElement.classList.remove('hk-fs'); $('fsToggle').classList.remove('on'); }
     if (!overlay.hidden) {
       if (e.key === 'Escape') { e.preventDefault(); overlay.hidden = true; focusStage(); }
-      else if (e.key === 'Enter' || e.key === 'r' || e.key === 'R') { e.preventDefault(); retry(); }
+      else if (e.key === 'Enter' || e.key === 'r' || e.key === 'R' || e.key === 'n' || e.key === 'N') { e.preventDefault(); retry(); }
       return;
     }
-    if (run.finished) { if (e.key === 'Enter' || e.key === 'r' || e.key === 'R') { e.preventDefault(); retry(); } return; }
+    if (run.finished) { if (e.key === 'Enter' || e.key === 'r' || e.key === 'R' || e.key === 'n' || e.key === 'N') { e.preventDefault(); retry(); } return; }
     if (replay) { if (e.key === 'Escape') { e.preventDefault(); stopReplay(); $('demoBtn').classList.remove('on'); } return; }   // watching: your keys wait
     if (!started) {
       // the start card's key: dismiss and swallow — it never lands on the sheet

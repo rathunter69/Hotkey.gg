@@ -19,8 +19,9 @@
 
 import { TABS, MENUS, RIBBON_GROUPS, RIBBON_ICONS, RIBBON_MENU_ICONS, FMT_OPTS, PASTE_OPTS, PASTE_OP_OPTS, COMMANDS, tabName,
   QAT_COMMANDS, POPULAR_COMMANDS, OPTIONS_PAGES, OPTIONS_LIVE_PAGES } from '../engine/ribbon.js';
-import { FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES } from '../engine/sheet.js';
+import { FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES, CF_STYLES, CF_STYLE_KEYS, CF_BAR_COLORS, CF_SCALES, CF_OP_LABEL } from '../engine/sheet.js';
 import { DELETE_SHEET_PROMPT } from '../engine/keyboard.js';
+import { dispText } from '../engine/format.js';
 import { prefs } from '../app/prefs.js';
 import { RIBBON_COMMANDS, RIBBON_LAYOUT, MENU_META, VIRTUAL_MENUS, UNIMPLEMENTED_BY_ID, MODAL_DIALOGS, CARD_DIALOGS, MENU_ITEM_ICONS, QAT_ICONS,
   itemTip, keyTipAt, runCommand, runQatCommand, openMenuPath, recordMouse, closeDialog, leaveRibbon, menuEntries } from './ribbon-commands.js';
@@ -77,6 +78,41 @@ export function leanRibbonHtml(menuKey, withExtra) {
       html += '<span class="rgrp rgrp-ico"><span class="rgrp-chips">' + c + '</span></span>'; }
   }
   return html;
+}
+
+/**
+ * A big button's label as Excel sets it: one line when it is short or a single word, else two lines
+ * split at the space that keeps the longer line shortest ("Page Break" / "Preview", "Text to" /
+ * "Columns"). Never three: the third line is what overprinted the group caption. `fit` is the
+ * characters a 52px button holds on one line at the compact size (mono, 10px).
+ */
+export function bigLabelLines(label, fit = 7) {
+  const s = String(label == null ? '' : label).trim().replace(/\s+/g, ' ');
+  const words = s.split(' ');
+  if (words.length < 2 || s.length <= fit) return [s];
+  let best = null;
+  for (let i = 1; i < words.length; i++) {
+    const a = words.slice(0, i).join(' '), b = words.slice(i).join(' ');
+    const cost = Math.max(a.length, b.length);
+    if (!best || cost < best.cost) best = { cost, lines: [a, b] };
+  }
+  return best.lines;
+}
+/** The label (and menu arrow) of a big button: a two-line label carries its arrow after the last word, a one-line label keeps it on its own row. */
+function bigLabelHtml(label, caret) {
+  const lines = bigLabelLines(label); const inline = caret && lines.length > 1;
+  return '<span class="rf-lbl">' + lines.map((ln, i) => '<span class="rf-ln">' + esc(ln) + (inline && i === lines.length - 1 ? '<span class="rf-caret">▾</span>' : '') + '</span>').join('') + '</span>' +
+    (caret && !inline ? '<span class="rf-caret">▾</span>' : '');
+}
+
+/**
+ * Where a dropdown `w` wide opens under an anchor spanning [aL, aR]: left edges aligned, or right edges
+ * aligned when that would cross `hi` (Excel flips a menu opened near the window's edge), always inside [lo, hi].
+ */
+export function dropLeft(aL, aR, w, lo, hi) {
+  let x = aL;
+  if (x + w > hi) x = aR - w;
+  return Math.round(Math.max(lo, Math.min(x, hi - w)));
 }
 
 const swatchesHtml = (SW, idx) => SW.map((sw, i) => { const bg = (sw.k === null) ? 'repeating-linear-gradient(45deg,#bbb 0 4px,#eee 4px 8px)' : sw.hex;
@@ -232,7 +268,7 @@ export class RibbonView {
     if (!d) {
       d = document.createElement('div'); d.className = 'pd-backdrop'; d.id = id;
       d.innerHTML = '<div class="pd-box">' +
-        '<div class="pd-title">' + title + ' <span class="x">esc to cancel</span></div>' +
+        '<div class="pd-title">' + title + '</div>' +
         '<div class="pd-group">' + (groupTitle ? '<h4>' + groupTitle + '</h4>' : '') + '<div class="pd-opts"></div></div>' +
         '<div class="pd-foot">' + footer + '</div>' +
         '</div>';
@@ -256,7 +292,7 @@ export class RibbonView {
     let d = document.getElementById(id);
     if (!d) {
       d = document.createElement('div'); d.className = 'pd-backdrop wb-card'; d.id = id;
-      d.innerHTML = '<div class="pd-box ' + cls + '"><div class="pd-title">' + title + ' <span class="x">esc to cancel</span></div><div class="wb-body"></div><div class="pd-foot"></div></div>';
+      d.innerHTML = '<div class="pd-box ' + cls + '"><div class="pd-title">' + title + '</div><div class="wb-body"></div><div class="pd-foot"></div></div>';
       document.body.appendChild(d);
       d.addEventListener('click', this._onClick);
       d.addEventListener('mousedown', this._onDown);
@@ -291,6 +327,70 @@ export class RibbonView {
     return `<div class="gt-ref"><label>Find what:</label>${F(d.find, d.focus === 'find', 'dset:focus:find', 'wide')}</div>` +
       (d.replace ? `<div class="gt-ref"><label>Replace with:</label>${F(d.repl, d.focus === 'repl', 'dset:focus:repl', 'wide')}</div>` : '') +
       (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : `<div class="od-caplbl">${d.replace ? 'Tab switches fields · ↵ Find Next · Alt+A Replace All' : '↵ Find Next'} · esc close</div>`);
+  }
+  /* ---- Chapter 2 cards: the Custom box and Conditional Formatting ---- */
+  numFmtHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const a = ss.sheet.dispActive(), cell = ss.sheet.get(a.r, a.c);
+    const sample = cell.value === null || cell.value === undefined || cell.value === '' ? '' : dispText({ value: cell.value, fmtStyle: 'custom', numFmt: d.code });
+    const val = d.selected ? `<span class="od-seltext">${esc(d.code)}</span>` : esc(d.code);   // prefilled and selected: typing replaces it
+    return '<div class="od-sect">Number › Custom</div>' +
+      `<div class="gt-ref"><label>Type:</label><span class="od-field foc wide">${val}<i class="od-caret"></i></span></div>` +
+      `<div class="od-caplbl">Sample: <b>${esc(sample)}</b></div>` +
+      '<div class="od-caplbl">#,##0_);(#,##0);"-"_) · 0.0%_);(0.0%);"-"_) · $#,##0,"k" · 0.0"x" · [Red]"ERROR";;"OK"</div>' +
+      (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">type a format code · ↵ OK · esc cancel</div>');
+  }
+  static cfChip(k, i, on, act) {
+    const st = CF_STYLES[k];
+    const sty = (st.fill ? 'background:' + st.fill + ';' : 'background:var(--surface);') + (st.fontColor ? 'color:' + st.fontColor + ';' : '') + (st.border ? 'box-shadow:inset 0 0 0 1px ' + st.border + ';' : '');
+    return `<span class="cf-chip${on ? ' on' : ''}"${act ? ` data-act="${act}"` : ''} style="${sty}">${esc(st.name)}</span>`;
+  }
+  condFmtHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const F = RibbonView.field;
+    let body;
+    if (d.op === 'formula') body = '<div class="od-sect">Format values where this formula is true:</div>' +
+      `<div class="gt-ref">${F(d.formula, d.focus === 'formula', 'dset:focus:formula', 'wide')}</div>`;
+    else body = `<div class="od-sect">Format cells that are ${esc((CF_OP_LABEL[d.op] || '').toUpperCase())}:</div>` +
+      `<div class="gt-ref">${F(d.v1, d.focus === 'v1', 'dset:focus:v1', 'wide')}${d.op === 'between' ? '<label>and</label>' + F(d.v2, d.focus === 'v2', 'dset:focus:v2', 'wide') : ''}</div>`;
+    body += '<div class="od-sect">with</div><div class="cf-styles' + (d.focus === 'style' ? ' foc' : '') + '">' +
+      CF_STYLE_KEYS.map((k, i) => RibbonView.cfChip(k, i, i === d.styleIdx, 'dset:style:' + i)).join('') + '</div>';
+    body += ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">' + (d.op === 'formula' ? 'type a formula for the active cell' : 'type a number, text, a date or a =formula') + ' · ← → pick a style · ↵ OK · esc cancel</div>';
+    return body;
+  }
+  /** A preset's value as the Rules Manager prints it: text in quotes, TRUE / FALSE, a number or a =formula as stored. */
+  static cfValueText(v) { return typeof v === 'boolean' ? (v ? 'TRUE' : 'FALSE') : typeof v === 'string' && v.trimStart()[0] !== '=' ? '"' + v + '"' : String(v); }
+  static cfRuleDesc(r) {
+    if (r.kind === 'cellValue') return 'Cell Value ' + (CF_OP_LABEL[r.op] || r.op).toLowerCase() + ' ' + RibbonView.cfValueText(r.v1) + (r.op === 'between' || r.op === 'notBetween' ? ' and ' + RibbonView.cfValueText(r.v2) : '');
+    if (r.kind === 'formula') return 'Formula: ' + r.formula;
+    if (r.kind === 'dataBar') return 'Data Bar';
+    return 'Graded Color Scale';
+  }
+  static cfRulePreview(r) {
+    if (r.kind === 'cellValue' || r.kind === 'formula') { const st = CF_STYLES[r.style] || CF_STYLES.lightred; return `<span class="cf-prev" style="${st.fill ? 'background:' + st.fill + ';' : ''}${st.fontColor ? 'color:' + st.fontColor + ';' : ''}${st.border ? 'box-shadow:inset 0 0 0 1px ' + st.border + ';' : ''}">AaBbCcYyZz</span>`; }
+    if (r.kind === 'dataBar') { const b = CF_BAR_COLORS.find(x => x.k === r.color) || CF_BAR_COLORS[0]; return `<span class="cf-prev" style="background:linear-gradient(90deg, ${b.hex} 65%, transparent 65%)"></span>`; }
+    const sc = CF_SCALES.find(x => x.k === r.scale) || CF_SCALES[0]; return `<span class="cf-prev" style="background:linear-gradient(90deg, ${sc.colors.join(', ')})"></span>`;
+  }
+  condRulesHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const rules = ss.sheet.condFmt;
+    let rows = '<div class="cf-rule cf-rule-h"><span>Rule (applied in order shown)</span><span>Format</span><span>Applies to</span><span>Stop If True</span></div>';
+    if (!rules.length) rows += '<div class="cf-empty">No rules on this worksheet.</div>';
+    // Stop If True is greyed out on a data bar or a colour scale, as Excel greys it; the Applies-to lists every area, comma-joined
+    rules.forEach((r, i) => { const noStop = r.kind === 'dataBar' || r.kind === 'colorScale'; rows += `<div class="od-row cf-rule${i === d.sel ? ' on foc' : ''}" data-act="dset:rule:${i}"><span class="od-lbl">${esc(RibbonView.cfRuleDesc(r))}</span>${RibbonView.cfRulePreview(r)}<span class="od-lbl">=${esc(r.range)}</span><span class="od-box${r.stopIfTrue ? ' on' : ''}"${noStop ? ' style="opacity:.35" title="Not available for this rule type"' : ''}></span></div>`; });
+    return '<div class="od-sect">Rules for this worksheet</div><div class="cf-rules">' + rows + '</div>' +
+      '<div class="cf-btns"><span class="pd-btn" data-act="dset:ruleact:Delete">Delete Rule <kbd>del</kbd></span><span class="pd-btn" data-act="dset:ruleact:U">Move Up <kbd>u</kbd></span><span class="pd-btn" data-act="dset:ruleact:D">Move Down <kbd>d</kbd></span><span class="pd-btn" data-act="dset:ruleact:S">Stop If True <kbd>s</kbd></span></div>' +
+      '<div class="od-caplbl">↑ ↓ pick a rule · every change applies at once · ↵ close · esc close</div>';
+  }
+  cfGalleryHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const bars = ss.dialog === 'databar';
+    const list = bars ? CF_BAR_COLORS : CF_SCALES;
+    const tile = (x, i) => bars
+      ? `<span class="cf-tile${i === d.idx ? ' on' : ''}" data-act="dset:pick:${i}" title="${esc(x.name)}"><i style="width:90%;background:${x.hex}"></i><i style="width:55%;background:${x.hex}"></i><i style="width:30%;background:${x.hex}"></i></span>`
+      : `<span class="cf-tile scale${i === d.idx ? ' on' : ''}" data-act="dset:pick:${i}" title="${esc(x.name)}" style="background:linear-gradient(180deg, ${x.colors.join(', ')})"></span>`;
+    return '<div class="od-sect">' + (bars ? 'Gradient Fill' : 'Color Scales') + '</div><div class="cf-gallery">' + list.map(tile).join('') + '</div>' +
+      `<div class="od-caplbl"><b>${esc(list[d.idx].name)}</b> · ← → pick · ↵ OK · esc cancel</div>`;
   }
   gotoSpecialHtml() {
     const ss = this.session, d = ss.dlg; if (!d) return '';
@@ -356,9 +456,23 @@ export class RibbonView {
     return `<div class="od-wrap">${pages}<div class="od-body">${body}</div></div>`;
   }
   pageSetupHtml() {
-    const d = this.session.dlg; if (!d) return '';
-    const R = RibbonView.radio, F = RibbonView.field;
-    return '<div class="ps-tabs"><span class="ps-tab on">Page</span><span class="ps-tab dis">Margins</span><span class="ps-tab dis">Header/Footer</span><span class="ps-tab dis">Sheet</span></div>' +
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const R = RibbonView.radio, F = RibbonView.field, C = RibbonView.check;
+    const tab = (key, label) => `<span class="ps-tab${d.tab === key ? ' on' : ''}" data-act="dset:tab:${key}">${label}</span>`;
+    const tabs = '<div class="ps-tabs">' + tab('page', '<u>P</u>age') + '<span class="ps-tab dis">Margins</span>' + tab('hf', '<u>H</u>eader/Footer') + tab('sheet', '<u>S</u>heet') + '</div>';
+    if (d.tab === 'hf') {   // the three footer sections (Excel's Custom Footer dialog, folded onto the tab): Alt+L / C / R, Tab between them
+      const sect = (key, label, u) => `<div class="gt-ref"><label><u>${u}</u>${label}:</label>${F(d[key], d.focus === key, 'dset:focus:' + key, 'wide')}</div>`;
+      return tabs + '<div class="od-sect">Footer</div>' + sect('footL', 'eft section', 'L') + sect('footC', 'enter section', 'C') + sect('footR', 'ight section', 'R') +
+        '<div class="od-caplbl">&amp;[Page] &amp;[Pages] &amp;[File] &amp;[Tab] &amp;[Date] are the codes · Tab moves between sections · Alt+L Alt+C Alt+R</div>';
+    }
+    if (d.tab === 'sheet') {
+      return tabs + '<div class="od-sect">Print titles</div>' +
+        `<div class="gt-ref"><label><u>R</u>ows to repeat at top:</label>${F(d.titlesRows, d.focus === 'titlesRows', 'dset:focus:titlesRows', 'wide')}</div>` +
+        '<div class="od-row dis"><span class="od-lbl">Columns to repeat at left:</span><span class="od-field dis" style="min-width:120px"></span></div>' +
+        '<div class="od-sect">Print</div>' + C(d.printGridlines, 'dset:grid:1', '<u>G</u>ridlines', 'G', { foc: d.focus === 'printGrid' }) +
+        (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">rows as $1:$3 or 1:3 · Tab moves between fields · Space or Alt+G toggles Gridlines</div>');
+    }
+    return tabs +
       '<div class="od-sect">Orientation</div><div class="ps-orient">' +
       R(d.orientation === 'portrait', 'letter:T', '<span class="ps-page"></span>Portrait', 'T', { foc: d.focus === 'orient' }) +
       R(d.orientation === 'landscape', 'letter:L', '<span class="ps-page land"></span>Landscape', 'L', { foc: d.focus === 'orient' }) + '</div>' +
@@ -370,6 +484,14 @@ export class RibbonView {
       '<div class="od-row dis"><span class="od-lbl">Print quality:</span><span class="od-combo" style="min-width:120px">600 dpi</span></div>' +
       '<div class="od-row dis"><span class="od-lbl">First page number:</span><span class="od-field dis">Auto</span></div>' +
       '<div class="od-sub" style="margin-top:6px">↑ ↓ change the focused control · Tab moves between fields · digits type into the focused field</div>';
+  }
+  /** The Group / Ungroup dialog (Alt+Shift+→ / ← or Alt A G G / Alt A U U over a cell range): Rows or Columns, Rows preselected. */
+  groupHtml() {
+    const d = this.session.dlg; if (!d) return '';
+    const R = RibbonView.radio;
+    return '<div class="od-sect">' + (d.ungroup ? 'Ungroup' : 'Group') + '</div>' +
+      R(d.axis === 'r', 'letter:R', '<u>R</u>ows', 'R') + R(d.axis === 'c', 'letter:C', '<u>C</u>olumns', 'C') +
+      '<div class="od-caplbl">↑ ↓ or R / C choose · ↵ OK · esc cancel</div>';
   }
   /* ---- the sheet cards (Rename Sheet, Delete Sheet, Move or Copy): one control each, every row clickable ---- */
   renameHtml() {
@@ -423,7 +545,7 @@ export class RibbonView {
       else {
         fd.style.display = 'flex';
         const byK = {}; FMT_OPTS.forEach(([k, lbl]) => byK[k] = lbl);
-        const groups = [['number', ['G', 'N', 'C', 'P', 'X', 'D', 'S', 'M']], ['font', ['E', 'K']], ['alignment', ['A']]];
+        const groups = [['number', ['G', 'N', 'C', 'P', 'X', 'D', 'S', 'M', 'U']], ['font', ['E', 'K']], ['alignment', ['A']]];
         let frows = '';
         groups.forEach(([sect, keys]) => { frows += `<div class="pd-sect">${sect}</div>`;
           keys.forEach(k => { if (byK[k] !== undefined) frows += `<div class="pd-opt" data-act="letter:${k}"><span class="pd-key">${k.toLowerCase()}</span><span>${byK[k]}</span></div>`; }); });
@@ -446,6 +568,11 @@ export class RibbonView {
         RibbonView.okCancel('OK', '<span class="pd-btn dis" aria-disabled="true">Print…</span><span class="pd-btn dis" aria-disabled="true">Print Preview</span><span class="pd-btn dis" aria-disabled="true">Options…</span>'));
     }
     // the sheet cards: Rename Sheet (Alt H O R, a double-click on the tab), Delete Sheet's confirm (Alt H D S), Move or Copy (Alt H O M)
+    if (ss.dialog === 'group' || this.groupDialog) {
+      const d = this.groupDialog || (this.groupDialog = this.wideCard('groupDialog', 'Group', 'pd-mid'));
+      if (ss.dlg && ss.dlg.kind === 'group') { const t = d.querySelector('.pd-title'); if (t && t.firstChild) t.firstChild.nodeValue = ss.dlg.ungroup ? 'Ungroup' : 'Group'; }
+      this.showCard(d, ss.dialog === 'group' && !!ss.dlg, ss.dialog === 'group' ? this.groupHtml() : '', RibbonView.okCancel('OK'));
+    }
     if (ss.dialog === 'renamesheet' || this.renameDialog) {
       const d = this.renameDialog || (this.renameDialog = this.wideCard('renameSheetDialog', 'Rename Sheet', 'pd-mid'));
       this.showCard(d, ss.dialog === 'renamesheet' && !!ss.dlg, ss.dialog === 'renamesheet' ? this.renameHtml() : '', RibbonView.okCancel('OK'));
@@ -470,6 +597,26 @@ export class RibbonView {
       const d = this.specialDialog || (this.specialDialog = this.wideCard('gotoSpecialDialog', 'Go To Special', 'pd-mid'));
       this.showCard(d, ss.dialog === 'gotospecial' && !!ss.dlg, ss.dialog === 'gotospecial' ? this.gotoSpecialHtml() : '', RibbonView.okCancel('OK'));
     }
+    // Chapter 2: the Custom box (Ctrl+1 › U) and the Conditional Formatting cards
+    if (ss.dialog === 'numfmt' || this.numfmtDialog) {
+      const d = this.numfmtDialog || (this.numfmtDialog = this.wideCard('numfmtDialog', 'Format Cells', 'pd-mid'));
+      this.showCard(d, ss.dialog === 'numfmt' && !!ss.dlg, ss.dialog === 'numfmt' ? this.numFmtHtml() : '', RibbonView.okCancel('OK'));
+    }
+    if (ss.dialog === 'condfmt' || this.condfmtDialog) {
+      const d = this.condfmtDialog || (this.condfmtDialog = this.wideCard('condfmtDialog', 'Conditional Formatting', 'pd-mid'));
+      if (ss.dialog === 'condfmt' && ss.dlg) d.querySelector('.pd-title').textContent = ss.dlg.op === 'formula' ? 'New Formatting Rule' : (CF_OP_LABEL[ss.dlg.op] || 'Conditional Formatting');
+      this.showCard(d, ss.dialog === 'condfmt' && !!ss.dlg, ss.dialog === 'condfmt' ? this.condFmtHtml() : '', RibbonView.okCancel('OK'));
+    }
+    if (ss.dialog === 'condrules' || this.condrulesDialog) {
+      const d = this.condrulesDialog || (this.condrulesDialog = this.wideCard('condrulesDialog', 'Conditional Formatting Rules Manager', 'pd-wide'));
+      this.showCard(d, ss.dialog === 'condrules' && !!ss.dlg, ss.dialog === 'condrules' ? this.condRulesHtml() : '', RibbonView.okCancel('OK'));
+    }
+    if (ss.dialog === 'databar' || ss.dialog === 'colorscale' || this.galleryDialog) {
+      const d = this.galleryDialog || (this.galleryDialog = this.wideCard('cfGalleryDialog', 'Data Bars', 'pd-mid'));
+      const on = (ss.dialog === 'databar' || ss.dialog === 'colorscale') && !!ss.dlg;
+      if (on) d.querySelector('.pd-title').textContent = ss.dialog === 'databar' ? 'Data Bars' : 'Color Scales';
+      this.showCard(d, on, on ? this.cfGalleryHtml() : '', RibbonView.okCancel('OK'));
+    }
   }
 
   /* ---- the anchored dropdown (colours, galleries, menus, small dialogs) ---- */
@@ -483,7 +630,13 @@ export class RibbonView {
     const a = typeof anchor === 'string' ? this.el.querySelector('.ri-cmd[data-k="' + anchor + '"]') : anchor;
     const ar = (a || this.el).getBoundingClientRect();
     const dw = d.offsetWidth;
-    d.style.left = Math.max(8, Math.min(window.innerWidth - dw - 8, ar.left)) + 'px';
+    // inside the workspace frame (the ribbon spans it), never past it; clientWidth, not innerWidth, so a page
+    // scrollbar cannot squeeze the menu and push its hint onto a second line
+    const vw = document.documentElement.clientWidth || window.innerWidth;
+    const fr = this.el.getBoundingClientRect();
+    let lo = Math.max(8, fr.left), hi = Math.min(vw - 8, fr.right);
+    if (hi - lo < dw) { lo = 8; hi = vw - 8; }   // a frame narrower than the menu: the window bounds it
+    d.style.left = dropLeft(ar.left, ar.right, dw, lo, hi) + 'px';
     d.style.top = (ar.bottom + 4) + 'px';
   }
   /** The full bar's control for a KeyTip path (button or split), else the tab row. */
@@ -665,7 +818,7 @@ export class RibbonView {
     return '<div class="rf-grp rf-collapsed" data-group="' + esc(g.name) + '"><div class="rf-cols">' +
       `<button type="button" tabindex="-1" class="rf-btn big rf-grpbtn${open ? ' open' : ''}${live ? '' : ' dis'}" data-act="group:${esc(g.name)}" aria-haspopup="menu" aria-expanded="${open}"${live ? '' : ' aria-disabled="true"'} title="${esc(g.name)} — open the group">` +
       (tips.length ? '<span class="rf-grptips">' + tips.map(t => '<span class="ri-key">' + t + '</span>').join('') + '</span>' : '') +
-      `<span class="rf-ico">${icon}</span><span class="rf-lbl">${esc(g.name)}</span><span class="rf-caret">▾</span></button></div><div class="rf-gname">${esc(g.name)}${this.launcherHtml(g, pathStr, walking)}</div></div>`;
+      `<span class="rf-ico">${icon}</span>${bigLabelHtml(g.name, true)}</button></div><div class="rf-gname">${esc(g.name)}${this.launcherHtml(g, pathStr, walking)}</div></div>`;
   }
   /** A folded group's dropdown: every item of the group, live ones clickable, menus one level deeper, KeyTips while walking. */
   groupDropHtml(name) {
@@ -682,7 +835,8 @@ export class RibbonView {
         if (it.cmd) { const cmd = RIBBON_COMMANDS[it.cmd]; html += '<div class="rdrop-item" data-act="cmd:' + it.cmd + '">' + key + '<span class="rdrop-ico">' + cmd.icon + '</span><span class="rdrop-lbl">' + esc(it.label || cmd.label) + '</span></div>'; }
         html += '<div class="rdrop-item" data-act="menu:' + it.menu + '">' + (it.cmd ? '' : key) + '<span class="rdrop-ico">' + (meta.icon || '') + '</span><span class="rdrop-lbl">' + esc(meta.label) + ' ›</span></div>'; return; }
       const cmd = RIBBON_COMMANDS[it.cmd]; if (!cmd) return;
-      html += '<div class="rdrop-item' + (it.check && ss.sheet.gridlines ? ' on' : '') + '" data-act="cmd:' + it.cmd + '">' + key + '<span class="rdrop-ico">' + cmd.icon + '</span><span class="rdrop-lbl">' + esc(it.label || cmd.label) + '</span></div>';
+      const on = it.check === 'showFormulas' ? !!ss.settings.showFormulas : it.check ? !!ss.sheet.gridlines : false;
+      html += '<div class="rdrop-item' + (on ? ' on' : '') + '" data-act="cmd:' + it.cmd + '">' + key + '<span class="rdrop-ico">' + cmd.icon + '</span><span class="rdrop-lbl">' + esc(it.label || cmd.label) + '</span></div>';
     });
     if (g.launcher && RIBBON_COMMANDS[g.launcher]) {   // the group's dialog launcher rides along when the group is folded
       const cmd = RIBBON_COMMANDS[g.launcher]; const badge = walking ? keyTipAt(g.launcher, pathStr) : '';
@@ -700,7 +854,7 @@ export class RibbonView {
     const badgeHtml = badge ? '<span class="ri-key">' + badge + '</span>' : '';
     if (it.box) {
       const u = UNIMPLEMENTED_BY_ID[it.dead] || { label: it.dead };
-      return `<span class="rf-box dis" aria-disabled="true" title="${esc(u.label)} — not available yet" style="width:${it.w | 0}px">${badgeHtml}<span class="rf-box-v">${esc(it.box)}</span><span class="rf-caret">▾</span></span>`;
+      return `<span class="rf-box dis" aria-disabled="true" title="${esc(u.label)} — not available yet" style="min-width:${it.w | 0}px">${badgeHtml}<span class="rf-box-v">${esc(it.box)}</span><span class="rf-caret">▾</span></span>`;
     }
     if (it.dead) {
       const u = UNIMPLEMENTED_BY_ID[it.dead] || { label: it.dead, icon: '' };
@@ -721,15 +875,16 @@ export class RibbonView {
     const cmd = RIBBON_COMMANDS[it.cmd]; if (!cmd) return '';
     const label = it.label || cmd.label;
     const title = label + (cmd.keys ? ' (' + cmd.keys + ')' : '') + (COMMANDS[it.cmd] !== undefined ? ' · Alt ' + spaced(it.cmd) : '');
-    const pressed = it.check ? !!ss.sheet.gridlines : undefined;
+    const pressed = it.check ? (it.check === 'showFormulas' ? !!ss.settings.showFormulas : !!ss.sheet.gridlines) : undefined;   // a toggle's pressed state
     return this.btnHtml({ act: 'cmd:' + it.cmd, tip: it.cmd, label, icon: cmd.icon, big: it.big, iconOnly: it.iconOnly, caret: it.caret, badge: badgeHtml, title, pressed });
   }
   btnHtml(o) {
     const cls = 'rf-btn' + (o.big ? ' big' : '') + (o.iconOnly ? ' ico' : '') + (o.cls ? ' ' + o.cls : '') + (o.open ? ' open' : '') + (o.pressed ? ' on' : '');
     const attrs = (o.act ? ' data-act="' + o.act + '"' : '') + (o.tip ? ' data-tip="' + o.tip + '"' : '') + (o.disabled ? ' aria-disabled="true"' : '') +
       (o.haspopup ? ' aria-haspopup="menu" aria-expanded="' + !!o.open + '"' : '') + (o.pressed !== undefined ? ' aria-pressed="' + !!o.pressed + '"' : '');
+    const caret = o.caret ? '<span class="rf-caret">▾</span>' : '';
     return `<button type="button" tabindex="-1" class="${cls}"${attrs} title="${esc(o.title || o.label)}">${o.badge || ''}<span class="rf-ico">${o.icon || ''}</span>` +
-      (o.iconOnly ? '' : `<span class="rf-lbl">${esc(o.label)}</span>`) + (o.caret ? '<span class="rf-caret">▾</span>' : '') + '</button>';
+      (o.iconOnly ? caret : o.big ? bigLabelHtml(o.label, o.caret) : `<span class="rf-lbl">${esc(o.label)}</span>` + caret) + '</button>';
   }
 
   /* ================= slim mode (today's strip) ================= */
@@ -813,6 +968,19 @@ export class RibbonView {
       return; }
     if (ss.dialog === 'movesheet') { el.className = 'ribbon show';
       el.innerHTML = '<span class="path">move or copy sheet →</span><span class="opt">↑ ↓ pick the sheet it goes before · C create a copy · ↵ OK · esc cancel</span>';
+      return; }
+    if (ss.dialog === 'numfmt') { el.className = 'ribbon show';   // the floating card carries the field
+      el.innerHTML = '<span class="path">custom format →</span><span class="opt" style="font-family:var(--mono)">' + esc(ss.dlg && ss.dlg.code ? ss.dlg.code : '…') + '</span><span class="opt">type a format code · ↵ OK · esc cancel</span>';
+      return; }
+    if (ss.dialog === 'condfmt') { el.className = 'ribbon show';
+      el.innerHTML = '<span class="path">conditional formatting →</span><span class="opt">' + (ss.dlg && ss.dlg.op === 'formula' ? 'type a formula' : 'type a value') + ' · ← → pick a style · ↵ OK · esc cancel</span>';
+      return; }
+    if (ss.dialog === 'condrules') { el.className = 'ribbon show';
+      el.innerHTML = '<span class="path">rules manager →</span><span class="opt">↑ ↓ pick · del delete · u / d move · s stop if true · ↵ close</span>';
+      return; }
+    if (ss.dialog === 'databar' || ss.dialog === 'colorscale') { el.className = 'ribbon show';
+      const list = ss.dialog === 'databar' ? CF_BAR_COLORS : CF_SCALES;
+      el.innerHTML = '<span class="path">' + (ss.dialog === 'databar' ? 'data bars' : 'color scales') + ' →</span><span class="opt">' + esc(ss.dlg ? list[ss.dlg.idx].name : '') + '</span><span class="opt">← → pick · ↵ apply · esc cancel</span>';
       return; }
     if (ss.dialog) {   // a dialog this painter has no card for — a minimal strip so Esc always reads
       el.className = 'ribbon show';

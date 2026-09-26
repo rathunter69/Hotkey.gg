@@ -15,6 +15,8 @@ export const PLATFORMS = ['win', 'mac'];
 export const EXPERIENCES = ['new', 'sometimes', 'daily'];
 export const RIBBON_MODES = ['full', 'slim'];
 export const EFFECT_LEVELS = ['full', 'subtle', 'off'];   // celebration intensity (SITE_SPEC §1)
+export const DENSITIES = ['comfortable', 'compact'];       // the two-state density switch (experience pass, decision 6)
+export const PANEL_SIDES = ['overlay', 'right', 'left'];   // the lesson panel: the adaptive floating card (default, B4), or docked right / left
 
 const isPlainObject = v => typeof v === 'object' && v !== null && !Array.isArray(v);
 
@@ -34,7 +36,9 @@ export function detectPlatform(nav) {
 
 /** Defaults for a device that has never saved anything. */
 export function defaultPrefs(detected) {
-  return { platform: PLATFORMS.includes(detected) ? detected : 'win', experience: null, firstRunDone: false, skipped: [], ribbon: null, mute: false, effects: 'full', ghost: true };
+  return { platform: PLATFORMS.includes(detected) ? detected : 'win', experience: null, firstRunDone: false, skipped: [], ribbon: null, mute: false, effects: 'full', ghost: true,
+    density: 'comfortable', panelSide: 'overlay', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false, dashHintsSeen: false,
+    pagesDelivered: [], tabKeysNoted: false };
 }
 
 /**
@@ -58,6 +62,25 @@ export function normalisePrefs(raw, detected) {
   out.mute = raw.mute === true;
   if (EFFECT_LEVELS.includes(raw.effects)) out.effects = raw.effects;
   out.ghost = raw.ghost !== false;   // the PB ghost defaults on; it only exists once a PB does
+  if (DENSITIES.includes(raw.density)) out.density = raw.density;
+  if (PANEL_SIDES.includes(raw.panelSide)) out.panelSide = raw.panelSide;
+  out.briefingDone = raw.briefingDone === true;
+  out.installPromptAt = Number.isFinite(raw.installPromptAt) && raw.installPromptAt > 0 ? raw.installPromptAt : 0;
+  if (Array.isArray(raw.beatsSeen)) {
+    const seen = new Set();
+    for (const id of raw.beatsSeen) { if (typeof id === 'string' && id && !seen.has(id) && seen.size < 200) seen.add(id); }
+    out.beatsSeen = [...seen];
+  }
+  out.saveNudgeDone = raw.saveNudgeDone === true;
+  out.dashHintsSeen = raw.dashHintsSeen === true;
+  // the pack pages whose delivery moment has played (C2): it plays once per page, never again
+  if (Array.isArray(raw.pagesDelivered)) {
+    const seen = new Set();
+    for (const id of raw.pagesDelivered) { if (typeof id === 'string' && id && !seen.has(id) && seen.size < 100) seen.add(id); }
+    out.pagesDelivered = [...seen];
+  }
+  // the one note, in a browser tab, that the browser may take Ctrl+PgUp/PgDn (C2)
+  out.tabKeysNoted = raw.tabKeysNoted === true;
   return out;
 }
 
@@ -71,7 +94,12 @@ function writeRaw(rec) {
 }
 function reflect(rec) {
   try {
-    if (typeof document !== 'undefined') document.documentElement.setAttribute('data-platform', rec.platform);
+    if (typeof document !== 'undefined') {
+      const h = document.documentElement;
+      h.setAttribute('data-platform', rec.platform);
+      h.setAttribute('data-density', rec.density);
+      h.setAttribute('data-panel', rec.panelSide);
+    }
     if (typeof window !== 'undefined' && typeof CustomEvent === 'function') window.dispatchEvent(new CustomEvent('hk:prefs', { detail: rec }));
   } catch (e) { /* no DOM */ }
 }

@@ -2,9 +2,11 @@
 // Chapter 1, per-lesson status / difficulty / tags / access, filters, search, "next up", and
 // full keyboard navigation (`/` focuses search, arrows move through lessons, Enter opens).
 // The pure helpers (statusOf, pickNextLesson, matchesFilters) are shared with Home and tested.
-import { CHAPTERS, LESSONS, lessonNumber, sectionsOf } from '../content/index.js';
+import { CHAPTERS, LESSONS, lessonNumber, sectionsOf, modulesOf } from '../content/index.js';
 import { store } from './store.js';
 import { prefs } from './prefs.js';
+import { ring } from '../ui/ring.js';
+import { entitlement } from './entitlement.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -42,6 +44,9 @@ export function statusOf(id, all, skipped) {
 }
 
 /** The first lesson in catalog order that is neither completed nor skipped; null when none is left. Pure. */
+/** The lessons this account can open: a paid lesson is out until the account holds the tier (the lock page, otherwise). */
+export const openLessons = lessons => lessons.filter(l => !entitlement.locked(l));
+
 export function pickNextLesson(lessons, all, skipped) {
   for (const l of lessons) { const s = statusOf(l.id, all, skipped); if (s !== 'done' && s !== 'mastered' && s !== 'skipped') return l; }
   return null;
@@ -60,6 +65,43 @@ export function matchesFilters(lesson, status, f) {
   return true;
 }
 
+/**
+ * A module's standing from the progress map (C2 gap 9): 'complete' needs every lesson done AND the
+ * challenge passed at any tier; all lessons without the challenge is 'lessons-done'; anything
+ * touched is 'started'; else 'todo'. Pure.
+ */
+export function moduleStatus(module, all) {
+  const ids = (module.lessons || []).map(l => (typeof l === 'string' ? l : l.id));
+  const p = id => (all && all[id]) || null;
+  const done = ids.filter(id => p(id) && p(id).completed).length;
+  const chId = module.challenge && (typeof module.challenge === 'string' ? module.challenge : module.challenge.id);
+  const chPassed = !!(chId && p(chId) && (p(chId).challenge || p(chId).completed));
+  if (ids.length && done === ids.length) return chPassed || !chId ? 'complete' : 'lessons-done';
+  if (done || chPassed || ids.some(id => p(id) && (p(id).started || p(id).completed))) return 'started';
+  return 'todo';
+}
+
+/**
+ * The Learn path's data (C2 gap 9): a chapter's modules with status, ring counts and their items
+ * in order — the challenge last, carrying its best tier. `next` marks the first open item. Pure.
+ */
+export function pathModel(chapter, all, skipped) {
+  const mods = modulesOf(chapter);
+  let nextMarked = false;
+  return mods.map(m => {
+    const items = [...m.lessons.map(l => ({ id: l.id, title: l.title, kind: 'lesson', st: statusOf(l.id, all, skipped) }))];
+    if (m.challenge) {
+      const p = (all && all[m.challenge.id]) || null;
+      items.push({ id: m.challenge.id, title: m.challenge.title, kind: 'challenge', st: p && (p.challenge || p.completed) ? 'done' : 'todo', tier: (p && p.tier) || null });
+    }
+    for (const it of items) {
+      if (!nextMarked && it.st !== 'done' && it.st !== 'mastered' && it.st !== 'skipped') { it.next = true; nextMarked = true; }
+    }
+    const done = items.filter(i => i.st === 'done' || i.st === 'mastered').length;
+    return { id: m.id, title: m.title, status: moduleStatus(m, all), done, total: items.length, items };
+  });
+}
+
 /** Group a chapter's lessons by `section` (in first-seen order), falling back to "Basics". Pure. */
 export function groupBySection(lessons) {
   const out = []; const idx = {};
@@ -76,6 +118,7 @@ export function mountLearnPage(root) {
   el.className = 'plist';
   const filters = { q: '', status: 'all', difficulty: 'all', access: 'all' };
   let focusId = null;   // the lesson row that carries the keyboard focus
+  let view = 'path';    // 'path' | 'list' — the module path or the flat table (C2 gap 9)
 
   function counts() {
     const all = store.all(); const skipped = prefs.get().skipped;
@@ -85,10 +128,10 @@ export function mountLearnPage(root) {
 
   function render() {
     const all = store.all(); const skipped = prefs.get().skipped;
-    const next = pickNextLesson(LESSONS, all, skipped);
+    const next = pickNextLesson(openLessons(LESSONS), all, skipped);
     const c = counts();
     let html = `<div class="plist-head"><h1>Learn</h1>
-      <p class="plist-sub">Six chapters, from the first cell to a full model. Chapter 1 is free. Your progress is ${store.saveState() === 'device' ? 'saved on this device' : 'saved to your account'}.</p>
+      <p class="plist-sub">Six chapters, from the first cell to a full model. Chapter 1 is free. Your progress is ${esc(store.saveLine())}.</p>
       <p class="plist-stat"><b>${c.done}</b> of <b>${c.total}</b> lessons done${c.skipped ? ` · <b>${c.skipped}</b> skipped` : ''}${next ? ` · next up: <a href="#/lesson/${esc(next.id)}">${esc(next.title)}</a>` : ' · Chapter 1 complete'}</p></div>`;
     html += `<div class="cat-tools" role="search">
       <label class="cat-search"><span class="vis-hidden">Search lessons</span><input id="catSearch" type="search" placeholder="Search lessons  ( / )" autocomplete="off" value="${esc(filters.q)}"></label>
@@ -105,16 +148,40 @@ export function mountLearnPage(root) {
     const ch1Cleared = !!gate.testout || (ch1 && ch1.lessons.every(l => { const p = all[l.id]; return p && p.completed; }));
     for (const plan of CHAPTER_PLAN) {
       const ch = CHAPTERS.find(x => x.id === plan.id);
-      if (!ch) {
-        const unlock = plan.n === 2 ? `<p class="chapter-unlock">${ch1Cleared ? 'Unlocked — Chapter 1 is behind you. Its lessons arrive with the paid tier.' : 'Unlocks when Chapter 1 is complete or tested out.'}</p>` : '';
-        html += `<section class="chapter chapter-locked"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(plan.title)}</h2><span class="access ${plan.n === 2 && ch1Cleared ? 'access-free">Unlocked · coming' : 'access-paid">Paid · coming'}</span></div><p class="chapter-blurb">${esc(plan.line)}</p>${unlock}</section>`;
+      // a chapter not built yet, or a built paid chapter this account cannot open (Chapter 2 on): the locked card, its lessons behind the paid line
+      if (!ch || (ch.access === 'paid' && !entitlement.entitled())) {
+        const built = !!ch;
+        const unlock = plan.n === 2 ? `<p class="chapter-unlock">${ch1Cleared ? 'Unlocked — Chapter 1 is behind you. Its lessons ' + (built ? 'open' : 'arrive') + ' with the paid tier.' : 'Unlocks when Chapter 1 is complete or tested out' + (built ? ', with the paid tier.' : '.')} ${built ? '<a href="#/pricing">See pricing →</a>' : ''}</p>` : '';
+        const count = built ? `<p class="chapter-count">${ch.lessons.length} lessons in, the first two modules — ${ch.lessons.filter(l => l.kind === 'challenge').length} timed challenges.</p>` : '';
+        html += `<section class="chapter chapter-locked"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(ch ? ch.title : plan.title)}</h2><span class="access ${plan.n === 2 && ch1Cleared ? 'access-free">Unlocked · ' + (built ? 'paid' : 'coming') : 'access-paid">Paid' + (built ? '' : ' · coming')}</span></div><p class="chapter-blurb">${esc(ch ? ch.blurb : plan.line)}</p>${count}${unlock}</section>`;
         continue;
       }
       const testout = plan.id === 'foundations' ? (gate.testout ? '<span class="chapter-testout tested">Tested out ✓</span>' : '<a class="chapter-testout" href="#/lesson/foundations-testout">Already know this? Test out</a>') : '';
-      html += `<section class="chapter"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(ch.title)}</h2><span class="access access-free">Free</span>${testout}</div><p class="chapter-blurb">${esc(ch.blurb)}</p>`;
+      html += `<section class="chapter"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(ch.title)}</h2><span class="access ${ch.access === 'paid' ? 'access-paid">Paid · yours' : 'access-free">Free'}</span>${testout}</div><p class="chapter-blurb">${esc(ch.blurb)}</p>`;
       const filtering = !!(filters.q || (filters.status && filters.status !== 'all') || (filters.difficulty && filters.difficulty !== 'all') || (filters.access && filters.access !== 'all'));
+      // The module path (C2 gap 9): modules as nodes with a ring, lesson dots and the challenge
+      // flag; the flat table stays behind the List toggle. Legacy lessons (no module) keep their
+      // sectioned table below the path until the rewrite replaces them.
+      const mods = pathModel(ch, all, skipped);
+      const pathOn = mods.length > 0 && view === 'path' && !filtering;
+      if (mods.length) {
+        html += `<div class="mp-toggle" role="tablist" aria-label="Catalog view">
+          <button type="button" class="mp-tbtn${view === 'path' ? ' on' : ''}" data-view="path">Path</button>
+          <button type="button" class="mp-tbtn${view === 'list' ? ' on' : ''}" data-view="list">List</button></div>`;
+      }
+      if (pathOn) {
+        html += `<div class="mpath">${mods.map(m => `
+          <div class="mp-module mp-${esc(m.status)}">
+            <div class="mp-node"><span class="mp-ring">${ring(m.done, m.total, { size: 26 })}</span><span class="mp-title">${esc(m.title)}</span></div>
+            <div class="mp-items">${m.items.map(it => it.kind === 'challenge'
+              ? `<a class="mp-flag st-${esc(it.st)}${it.next ? ' mp-next' : ''}${it.tier ? ' tier-' + esc(it.tier) : ''}" href="#/lesson/${esc(it.id)}" title="${esc(it.title)}${it.tier ? ' · ' + esc(it.tier) : ''}">⚑</a>`
+              : `<a class="mp-dot st-${esc(it.st)}${it.next ? ' mp-next' : ''}" href="#/lesson/${esc(it.id)}" title="${esc(it.title)}"></a>`).join('<span class="mp-link"></span>')}</div>
+          </div>`).join('<span class="mp-conn" aria-hidden="true"></span>')}</div>`;
+      }
       for (const sec of (typeof sectionsOf === 'function' ? sectionsOf(ch) : groupBySection(ch.lessons))) {
-        const rows = sec.lessons.filter(l => matchesFilters(l, statusOf(l.id, all, skipped), filters));
+        const inModule = l => typeof l.module === 'string';
+        const rows = sec.lessons.filter(l => (!pathOn || !inModule(l)) && matchesFilters(l, statusOf(l.id, all, skipped), filters));
+        if (pathOn && sec.lessons.length && sec.lessons.every(inModule)) continue;   // the path already shows this section's module
         if (!rows.length) {
           // A section with nothing built yet still shows (SITE_SPEC §7: the chapter's shape is visible), unless the learner is filtering.
           if (!sec.lessons.length && !filtering) html += `<h3 class="section-h section-upcoming">${esc(sec.name)} <span class="upcoming">Upcoming</span></h3><p class="section-blurb">${esc(sec.blurb || '')}</p>`;
@@ -163,6 +230,7 @@ export function mountLearnPage(root) {
       const sel = el.querySelector('#' + id); sel.onchange = () => { filters[key] = sel.value; render(); el.querySelector('#' + id).focus(); };
     }
     const clear = el.querySelector('#catClear'); if (clear) clear.onclick = () => { Object.assign(filters, { q: '', status: 'all', difficulty: 'all', access: 'all' }); render(); el.querySelector('#catSearch').focus(); };
+    for (const b of el.querySelectorAll('.mp-tbtn')) b.onclick = () => { view = b.dataset.view; render(); };
     const all = rows();
     const keep = all.find(r => r.dataset.id === focusId) || el.querySelector('.prow.next-up') || all[0];
     setFocus(keep, false, false);   // the pick is the page's, not the learner's: not remembered

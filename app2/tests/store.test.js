@@ -22,14 +22,14 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 test('guest path: store.record delegates to progress.js unchanged', () => {
   mem.clear();
   assert.equal(store.saveState(), 'device');
-  assert.equal(store.record('active-cell', 'timed', 21.5, { clean: true }), true);
-  assert.deepEqual(progress.get('active-cell'), store.get('active-cell'));
-  assert.equal(store.get('active-cell').best, 21.5);
-  assert.equal(store.status('active-cell'), 'mastered');
+  assert.equal(store.record('inherited-workbook', 'timed', 21.5, { clean: true }), true);
+  assert.deepEqual(progress.get('inherited-workbook'), store.get('inherited-workbook'));
+  assert.equal(store.get('inherited-workbook').best, 21.5);
+  assert.equal(store.status('inherited-workbook'), 'mastered');
   assert.equal(mem.has(OUTBOX_KEY), false, 'no outbox for a guest');
   // help or mouse: no best, exactly as progress.js
-  store.record('active-cell', 'timed', 5, { clean: false });
-  assert.equal(store.get('active-cell').best, 21.5);
+  store.record('inherited-workbook', 'timed', 5, { clean: false });
+  assert.equal(store.get('inherited-workbook').best, 21.5);
   progress.clear();
 });
 
@@ -106,4 +106,40 @@ test('guest reads ignore any lingering account cache (signed out = progress.js o
   mem.set(CACHE_KEY, JSON.stringify({ uid: 'user-A', lessons: { ghost: { completed: true } } }));
   assert.equal(store.get('ghost'), null, 'a signed-out visitor never sees another account’s cache');
   mem.clear();
+});
+
+test('attemptToWire shapes a records attempt for rpc_submit_game_attempt', async () => {
+  const { attemptToWire } = await import('../app/store.js');
+  const w = attemptToWire({
+    id: 'a1b2c3d4-0000-4000-8000-000000000001', kind: 'drill', ref: 'edge-jumps', day: '2026-09-22',
+    seed: 7, secs: 6.505, keys: 9, clean: true, helped: false, mouse: 0, tier: 'pass',
+    splits: [1.5, 2], trace: [{ k: 'Ctrl+↓', t: 0, cell: 'A6' }], at: 1758500000000,
+  });
+  assert.equal(w.client_at, new Date(1758500000000).toISOString());
+  assert.equal(w.at, undefined, 'at becomes client_at');
+  assert.equal(w.secs, 6.51, 'seconds round as records.js rounds them');
+  assert.equal(w.kind, 'drill'); assert.equal(w.tier, 'pass');
+  assert.deepEqual(w.trace, [{ k: 'Ctrl+↓', t: 0, cell: 'A6' }], 'a clean run keeps its trace');
+  assert.equal(attemptToWire({ id: 'x' }), null, 'junk stays home');
+  const dirty = attemptToWire({ id: 'a1b2c3d4-0000-4000-8000-000000000002', kind: 'drill', ref: 'x', clean: false, trace: [{ k: 'A', t: 1 }], at: 1 });
+  assert.deepEqual(dirty.trace, [], 'an unclean run sends no trace');
+});
+
+test('the game outbox is uid-owned like the lesson outbox', async () => {
+  const { ownedOutbox: owned, GAME_OUTBOX_KEY } = await import('../app/store.js');
+  assert.equal(typeof GAME_OUTBOX_KEY, 'string');
+  assert.deepEqual(owned({ uid: 'u1', items: [{ id: 'a' }] }, 'u2'), [], 'a foreign account’s queued attempts are never sent');
+  assert.deepEqual(owned({ uid: 'u1', items: [{ id: 'a' }] }, 'u1'), [{ id: 'a' }]);
+});
+
+test('mergeRun carries the challenge kind: flag, clean best and a tier that never regresses', () => {
+  let l = {};
+  l = mergeRun(l, 'ch', 'challenge', 80, true, { tier: 'pass' });
+  assert.deepEqual(l.ch, { completed: true, challenge: true, best: 80, tier: 'pass', at: l.ch.at });
+  l = mergeRun(l, 'ch', 'challenge', 55, true, { tier: 'legendary' });
+  assert.equal(l.ch.tier, 'legendary'); assert.equal(l.ch.best, 55);
+  l = mergeRun(l, 'ch', 'challenge', 70, false, { tier: 'pass' });
+  assert.equal(l.ch.tier, 'legendary', 'a later lower tier never regresses the stamp');
+  assert.equal(l.ch.best, 55, 'an unclean run sets no best');
+  assert.equal(l.ch.timed, undefined, 'a challenge is not a timed lesson');
 });

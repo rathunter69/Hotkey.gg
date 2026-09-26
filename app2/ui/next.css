@@ -1,0 +1,652 @@
+/* app2/ui/next.css — the experience pass (2026-09-23): the first-run frame, the self-playing
+   demo, the landing, the Home dashboard, the data-room Learn page, the workspace strip and cues,
+   the Daily result card. Every colour is a theme token. Loaded after scale.css; the screens
+   themselves only mount behind the ?flow=next flag (app/flow.js), so nothing here reaches the
+   live pages until Wolf says go. */
+
+/* ---------- 1. the first-run frame: one size for the whole sequence ---------- */
+.fr2{font-family:var(--sans); display:flex; justify-content:center; padding:8px 0 24px}
+.fr2-frame{width:min(1180px, 100%); height:clamp(560px, calc(100vh - 150px), 760px); display:flex; flex-direction:column;
+  background:var(--surface); border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:0 30px 70px -40px rgba(0,0,0,.45)}
+.fr2-head{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 22px; height:40px; flex:none;
+  background:var(--surface2); border-bottom:1px solid var(--line); font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+.fr2-keys{text-transform:none; letter-spacing:0; color:var(--faint); display:inline-flex; gap:6px; align-items:center}
+.fr2-keys kbd{font-size:10.5px}
+/* the cards sit at one height, not centered: a heading stays put from step to step (the top gap shrinks on a short screen so the tallest card still fits) */
+.fr2-body{flex:1 1 auto; min-height:0; display:flex; align-items:flex-start; justify-content:center; padding:clamp(24px, calc(30vh - 190px), 110px) 32px 26px; position:relative}
+.fr2-foot{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 22px; border-top:1px solid var(--line); flex:none}
+.fr2-dots{display:inline-flex; gap:6px}
+.fr2-dots i{width:8px; height:8px; border-radius:99px; background:var(--line); display:block; transition:background .15s, transform .15s}
+.fr2-dots i.past{background:var(--accent-dim); opacity:.6}
+.fr2-dots i.now{background:var(--accent); transform:scale(1.25)}
+.fr2-actions{display:inline-flex; gap:10px}
+/* the briefing cards */
+.fr2-card{max-width:720px; width:100%; animation:fr2In .28s cubic-bezier(.2,.7,.2,1)}
+@keyframes fr2In{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
+@media (prefers-reduced-motion: reduce){ .fr2-card{animation:none} }
+.fr2-card-eyebrow{font-family:var(--mono); font-size:11.5px; letter-spacing:1.6px; text-transform:uppercase; color:var(--accent); margin-bottom:16px}
+.fr2-card h1{font-family:var(--sans); font-size:clamp(26px, 2.6vw, 34px); line-height:1.12; font-weight:800; letter-spacing:-.9px; margin:0 0 16px; color:var(--text); text-wrap:balance}
+.fr2-card p{font-size:17px; line-height:1.6; color:var(--muted); margin:0 0 12px; max-width:62ch}
+.fr2-card p:last-child{margin-bottom:0}
+.fr2-fine{font-family:var(--mono); font-size:12px !important; color:var(--faint) !important; line-height:1.7 !important; margin-top:16px !important}
+/* the orientation map */
+.fr2-map{display:grid; grid-template-columns:1fr 1fr; gap:14px 22px; margin:6px 0 0}
+.fr2-map > div{background:var(--surface2); border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+.fr2-map dt{font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin:0 0 6px; font-weight:700}
+.fr2-map dd{margin:0; font-size:14.5px; line-height:1.55; color:var(--text)}
+/* the picker */
+.fr2-picker h1{margin-bottom:18px}
+.fr2-q{margin:0 0 18px}
+.fr2-qt{font-size:13px; font-weight:700; color:var(--text); margin:0 0 8px; font-family:var(--mono); letter-spacing:.06em; text-transform:uppercase}
+.fr2-options{margin:0}
+.fr2-options .fr-opt{padding:12px 14px}
+/* the demo step: caption left, the player filling the rest */
+.fr2-demo{width:100%; height:100%; display:flex; flex-direction:column; gap:14px; min-height:0}
+.fr2-demo-cap{display:flex; align-items:baseline; gap:18px; flex-wrap:wrap}
+.fr2-demo-cap h1{font-family:var(--sans); font-size:24px; line-height:1.15; font-weight:800; letter-spacing:-.6px; margin:0}
+.fr2-demo-cap p{font-size:15px; line-height:1.5; color:var(--muted); margin:0}
+.fr2-demo-host{flex:1 1 auto; min-width:0; min-height:0; display:flex}
+.fr2-demo-host .dp{flex:1 1 auto}
+.fr2 .fr2-body:has(.fr2-demo){padding:18px 22px 20px}
+@media (max-width:1000px){ .fr2-map{grid-template-columns:1fr} }
+
+/* ---------- 2. the self-playing demo (ui/demo-player.js) ---------- */
+.dp{position:relative; display:flex; flex-direction:column; min-width:0; min-height:0; background:var(--bg); border:1px solid var(--line); border-radius:14px; overflow:hidden}
+.dp-head{display:flex; align-items:center; gap:10px; height:34px; padding:0 14px; background:var(--surface2); border-bottom:1px solid var(--line); flex:none;
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+.dp-dots{display:inline-flex; gap:5px}
+.dp-dots i{width:8px; height:8px; border-radius:50%; background:var(--line); display:block}
+.dp-count{margin-left:auto; color:var(--accent); letter-spacing:.08em}
+.dp-grid{flex:1 1 auto; min-height:0; display:grid; grid-template-columns:1fr 270px; gap:0}
+.dp-stage{min-width:0; min-height:0; display:flex; flex-direction:column; padding:10px 0 10px 10px}
+.dp-stage .stage{flex:1 1 auto; min-height:0; border-radius:10px}
+.dp-stage .stage-row{min-height:0; flex:1 1 auto}
+.dp-stage .stage-main{min-height:0}
+.dp[tabindex]{outline:none; transition:border-color .15s, box-shadow .15s}
+.dp[tabindex]:focus-within{border-color:var(--accent)}
+.dp[tabindex]:focus-visible{box-shadow:0 0 0 3px var(--accent-glow), 0 30px 68px -32px rgba(0,0,0,.42)}
+.dp-stage{position:relative}
+.dp-panel{min-width:0; min-height:0; display:flex; flex-direction:column; padding:10px 10px 10px 10px; gap:0; overflow:hidden}
+.dp-panel .task-card{border:1px solid var(--accent-dim); border-radius:10px; background:color-mix(in srgb, var(--accent-glow) 70%, var(--surface)); padding:12px 14px}
+.dp-panel .task-goal{font-size:15px}
+.dp-panel .task-teach{font-size:13px}
+.dp-panel .task-keys{margin-top:8px}
+.dp-panel .task-keys kbd, .dp-panel .task-teach kbd{font-family:var(--mono); font-size:11.5px; color:var(--text); background:var(--surface2); border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:1px 6px; white-space:nowrap}
+.dp-goals{position:relative; margin:10px 0 0; padding:0; list-style:none; font-size:13.5px; flex:0 1 auto; min-height:0; overflow:hidden}
+.dp-goals .goal{padding:7px 9px; margin-bottom:3px}
+.dp-goals.dp-goals-more{-webkit-mask-image:linear-gradient(#000 calc(100% - 26px), transparent); mask-image:linear-gradient(#000 calc(100% - 26px), transparent)}
+.dp-hand{margin-top:auto; font-size:13px; color:var(--muted); background:var(--surface); border:1px solid var(--accent-dim); border-radius:10px; padding:10px 12px; line-height:1.5; flex:none}
+.dp-hand b{color:var(--accent)}
+/* the key echo has a band of its own and never sits over the cells: the foot of the task panel here, a sheet-tab strip in the compact card */
+.dp-keyband{flex:none; margin-top:auto; padding:10px 2px 0; border-top:1px solid var(--line); min-height:78px; display:flex; flex-direction:column; gap:8px}
+.dp-panel .dp-hand:not([hidden]) + .dp-keyband{margin-top:10px}
+.dp-keyband-cap{font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
+.dp .keyflash.dp-keys{position:static; left:auto; right:auto; bottom:auto; transform:none; z-index:auto; flex-wrap:wrap; align-content:flex-end; gap:6px; min-height:0; overflow:hidden}
+.dp .keyflash.dp-keys.show{opacity:1}
+.dp .keyflash.demo .kchip{font-size:14px; padding:4px 10px; border-radius:7px; box-shadow:none}
+@media (max-height:760px){ .dp-keyband{min-height:46px; padding-top:8px} .dp-keyband-cap{display:none} }
+/* reduced motion: the demo waits on its first frame with a way to start it */
+.dp-play{position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); z-index:5; font-family:var(--mono); font-size:14px; font-weight:700; color:var(--on-accent); background:var(--accent);
+  border:0; border-radius:10px; padding:12px 20px; cursor:pointer; box-shadow:0 10px 34px var(--accent-glow)}
+.dp-play:hover{filter:brightness(1.08)}
+.dp-play:focus-visible{outline:2px solid var(--text); outline-offset:3px}
+/* the compact card on the landing: task on top, sheet, keys along the bottom */
+.dp-compact .dp-grid{grid-template-columns:1fr; grid-template-rows:auto 1fr}
+.dp-compact .dp-panel{order:-1; padding:10px 10px 0; flex-direction:row; align-items:stretch; gap:10px}
+.dp-compact .dp-panel .task-card{flex:1 1 auto}
+.dp-compact .dp-goals{display:none}
+.dp-compact .dp-hand{margin:0; flex:0 0 200px}
+.dp-compact .dp-stage{padding:10px}
+.dp-compact .dp-stage .ribbon-slot{display:none}
+.dp-compact .dp-keyband{margin:0; min-height:0; height:36px; padding:0 8px 0 0; border-top:1px solid var(--line); background:var(--surface2); flex-direction:row; align-items:center; justify-content:space-between; gap:10px; overflow:hidden}
+.dp-sheettab{align-self:stretch; display:flex; align-items:center; padding:0 14px; margin-top:-1px; background:var(--surface); border:1px solid var(--line); border-top-color:var(--surface);
+  font-family:var(--cellfont, var(--sans)); font-size:12.5px; font-weight:600; color:var(--accent); white-space:nowrap}
+.dp-compact .keyflash.dp-keys{flex-wrap:nowrap; justify-content:flex-end; gap:5px; min-width:0}
+.dp-compact .keyflash.demo .kchip{font-size:12.5px; padding:2px 8px; border-radius:5px; line-height:1.5}
+
+/* ---------- 3. the landing (app/landing-next.js) ---------- */
+.ld2{position:relative; font-family:var(--sans); margin:-20px -32px 0; padding:0 32px; overflow:hidden}
+.ld2::before{content:""; position:absolute; inset:0 0 auto 0; height:720px; z-index:0; pointer-events:none;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px); background-size:42px 30px; opacity:.22;
+  mask-image:radial-gradient(ellipse 95% 62% at 50% 0%,#000 0%,transparent 76%); -webkit-mask-image:radial-gradient(ellipse 95% 62% at 50% 0%,#000 0%,transparent 76%)}
+.ld2 > *{position:relative; z-index:1}
+.ld2-hero{padding:44px 0 56px}
+.ld2-hero-grid{position:relative; display:grid; grid-template-columns:minmax(0, .92fr) minmax(0, 1.08fr); gap:52px; align-items:center}
+.ld2 h1{font-family:var(--sans); font-size:clamp(34px, 3.3vw, 48px); line-height:1.04; font-weight:800; letter-spacing:-1.8px; margin:0 0 20px; max-width:18ch}
+.ld2 h1 em{font-style:normal; color:var(--accent)}
+.ld2 .lede{font-size:18px; color:var(--muted); line-height:1.55; max-width:44ch; margin:0 0 28px}
+.ld2 h2{font-family:var(--sans); font-size:clamp(22px, 2.5vw, 30px); font-weight:700; letter-spacing:-.8px; line-height:1.15; margin:0 0 12px; text-wrap:balance}
+.ld2 h3{font-family:var(--sans); font-size:16px; font-weight:700; letter-spacing:-.3px; line-height:1.3; margin:0 0 6px}
+.ld2 .l-teams h2{font-size:22px; margin-bottom:8px}
+.ld2 .l-close h2{margin-bottom:8px}
+.ld2 .landing-cta{display:flex; gap:14px; align-items:center; flex-wrap:wrap}
+.ld2-return{margin:18px 0 0; font-size:13.5px; color:var(--muted)}
+.ld2-signin{font-weight:700; color:var(--text)}
+.ld2 .micro{margin-top:18px}
+/* the small print: each clause whole; the separator belongs to the clause after it and is clipped when that clause starts a line */
+.ld2-micro{overflow:hidden}
+.ld2-micro-list{display:flex; flex-wrap:wrap; margin-left:-1.6em}
+.ld2-micro-list > span{white-space:nowrap}
+.ld2-micro-list > span::before{content:"·"; display:inline-block; width:1.6em; text-align:center}
+.ld2-hero-demo{min-width:0; display:flex; flex-direction:column; gap:10px}
+.ld2-hero-demo .dp{height:460px; box-shadow:0 30px 68px -32px rgba(0,0,0,.42)}
+.ld2-hero-demo .dp[tabindex]{cursor:pointer}
+.ld2-hero-demo .dp[tabindex]:focus-within{cursor:auto}
+.ld2-demo-note{font-family:var(--mono); font-size:12px; color:var(--muted); text-align:center; line-height:1.6}
+.ld2-demo-note b{color:var(--accent)}
+.ld2-demo-note a{color:var(--text)}
+/* the modes, composed: a bento of clips, the lesson and the boards wide; a short card's clip grows to the row's height */
+.ld2-bento{display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-top:26px}
+.ld2-mode{grid-column:span 1; position:relative; display:flex; flex-direction:column; background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden; color:var(--text); transition:transform .15s, border-color .15s}
+.ld2-mode:hover{transform:translateY(-2px); border-color:var(--accent-dim)}
+.ld2-mode:has(.ld2-mode-link:focus-visible){outline:2px solid var(--accent); outline-offset:2px}
+.ld2-mode.wide{grid-column:span 2}
+.ld2-mode-link{color:inherit; text-decoration:none; outline:none}
+.ld2-mode-link::after{content:""; position:absolute; inset:0; z-index:1}   /* the whole card is the link */
+.ld2-clip{position:relative; flex:1 0 auto; aspect-ratio:16 / 10; background:var(--surface2); border-bottom:1px solid var(--line); overflow:hidden}
+.ld2-mode.wide .ld2-clip{aspect-ratio:16 / 8}
+.ld2-clip video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:top left; display:block; background:transparent}
+.ld2-clip video[hidden]{display:none}
+/* behind the clip: a card that still reads when neither the clip nor its poster loads — a mini grid, the mode's glyph, its name */
+.ld2-clip-fb{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; color:var(--accent);
+  background-image:linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size:48px 20px; background-position:-1px -1px}
+.ld2-clip-fb::before{content:""; position:absolute; inset:0; background:radial-gradient(ellipse 60% 70% at 50% 50%, var(--surface2) 25%, transparent 100%)}
+.ld2-clip-glyph, .ld2-clip-name{position:relative}
+.ld2-clip-glyph svg{width:34px; height:34px; display:block}
+.ld2-clip-name{font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--muted)}
+.ld2-clip-play{position:absolute; left:10px; bottom:10px; z-index:2; width:32px; height:32px; border-radius:99px; border:1px solid var(--line); background:var(--surface); color:var(--text);
+  font-size:12px; line-height:1; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.ld2-clip-play[hidden]{display:none}
+.ld2-clip-play:hover{border-color:var(--accent-dim); color:var(--accent)}
+.ld2-clip-play:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.ld2-mode-text{padding:14px 16px 16px; display:flex; flex-direction:column; gap:4px}
+.ld2-mode-where{font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent)}
+.ld2-mode h3{font-size:16px; font-weight:800; letter-spacing:-.3px; margin:0}
+.ld2-mode p{font-size:13.5px; line-height:1.55; color:var(--muted); margin:0}
+/* project volt */
+.ld2-volt-grid{display:grid; grid-template-columns:.9fr 1.1fr; gap:40px; align-items:start}
+.ld2-stages{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px}
+.ld2-stages li{display:grid; grid-template-columns:34px 1fr auto; gap:12px; align-items:center; padding:11px 14px; background:var(--surface); border:1px solid var(--line); border-radius:11px; opacity:.72}
+.ld2-stages li.free{opacity:1; border-color:var(--accent-dim)}
+.ld2-stage-n{font-family:var(--mono); font-size:15px; font-weight:700; color:var(--accent); text-align:center}
+.ld2-stage-body{display:flex; flex-direction:column; gap:2px; min-width:0}
+.ld2-stage-body b{font-size:14.5px}
+.ld2-stage-body span{font-size:12.5px; color:var(--muted); line-height:1.4}
+@media (max-width:1100px){ .ld2-bento{grid-template-columns:1fr 1fr} .ld2-mode.wide{grid-column:span 2} .ld2-hero-grid{grid-template-columns:1fr; gap:32px} .ld2-volt-grid{grid-template-columns:1fr} }
+@media (max-width:640px){ .ld2{margin:-20px -16px 0; padding:0 16px} .ld2-bento{grid-template-columns:1fr} .ld2-mode.wide{grid-column:span 1} .ld2-hero-demo .dp{height:380px} }
+
+/* ---------- 4. the deal strip (app/deal-strip.js) ---------- */
+.deal{display:flex; align-items:center; gap:14px; flex-wrap:wrap; padding:11px 16px; margin:16px 0; background:var(--surface); border:1px solid var(--line); border-radius:12px; font-size:13.5px; color:var(--muted); line-height:1.5}
+.deal-pips{display:inline-flex; gap:4px; flex:none}
+.deal-pips i{width:18px; height:6px; border-radius:99px; background:var(--line); display:block}
+.deal-pips i.past{background:var(--accent-dim)}
+.deal-pips i.now{background:var(--accent); box-shadow:0 0 0 3px var(--accent-glow)}
+.deal-stage b{color:var(--text); font-weight:700}
+.deal-deliver{color:var(--muted)}
+.deal-count{margin-left:auto; font-family:var(--mono); font-size:11.5px; color:var(--faint); white-space:nowrap}
+.deal-compact{padding:8px 12px; font-size:12.5px}
+
+/* ---------- 5. Home as a dashboard (app/home-next.js) ---------- */
+.hm{font-family:var(--sans); margin:6px auto 40px}
+.hm-cap{min-height:36px; display:flex; align-items:center; gap:8px; padding:6px 18px; background:var(--surface2); border-bottom:1px solid var(--line); font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+.hm-cap span{margin-left:auto; color:var(--faint); letter-spacing:.06em; text-transform:none}
+.hm-continue{display:grid; grid-template-columns:1fr auto; gap:0; background:var(--surface); border:1px solid var(--accent-dim); border-radius:16px; overflow:hidden; margin-bottom:16px}
+.hm-continue .hm-cap{grid-column:1 / -1; color:var(--accent); background:var(--accent-glow); border-bottom-color:var(--accent-dim)}
+.hm-c-main{padding:22px 26px 26px}
+.hm-crumb{font-family:var(--mono); font-size:12px; color:var(--muted); margin-bottom:8px}
+.hm h1{font-family:var(--sans); font-size:28px; font-weight:800; letter-spacing:-.7px; margin:0 0 8px; line-height:1.15}
+.hm p{font-size:15px; color:var(--muted); line-height:1.6; margin:0 0 16px; max-width:70ch}
+.hm-actions{display:flex; gap:10px; flex-wrap:wrap}
+.hm-c-ring{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:22px 30px; border-left:1px solid var(--line); color:var(--accent); font-family:var(--mono); font-size:11.5px; text-transform:uppercase; letter-spacing:.1em}
+.hm-c-ring .ring text{font-family:var(--mono); font-weight:700}
+.hm-halves{display:grid; grid-template-columns:1.2fr .8fr; gap:18px; align-items:start}
+.hm-half{display:flex; flex-direction:column; gap:14px; min-width:0}
+.hm-half-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; padding:2px 4px 0}
+.hm-half-head h2{font-family:var(--mono); font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0}
+.hm-half-head p{font-size:13.5px; color:var(--muted); margin:0}
+.hm-continue{margin-bottom:0}
+.hm-card{background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden; display:flex; flex-direction:column}
+.hm-due-list{list-style:none; margin:0; padding:6px 10px}
+.hm-due-list li a{display:grid; grid-template-columns:30px 1fr auto; gap:12px; align-items:center; padding:11px 10px; border-radius:10px; text-decoration:none; color:var(--text); transition:background .12s}
+.hm-due-list li a:hover, .hm-due-list li a:focus-visible{background:var(--accent-glow)}
+.hm-due-n{font-family:var(--mono); font-size:13px; font-weight:700; color:var(--accent); width:26px; height:26px; border:1px solid var(--accent-dim); border-radius:8px; display:grid; place-items:center}
+.hm-due-body{display:flex; flex-direction:column; gap:2px; min-width:0}
+.hm-due-body b{font-size:15px}
+.hm-due-body span{font-size:13px; color:var(--muted); line-height:1.45}
+.hm-due-secs{font-family:var(--mono); font-size:12px; color:var(--faint); white-space:nowrap}
+.hm p.hm-due-foot, .hm p.hm-fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); line-height:1.6; margin:auto 18px 14px; padding-top:10px}
+.hm-empty{padding:22px 18px; font-size:15px; color:var(--muted)}
+.hm-empty b{color:var(--text)}
+.hm-daily-body{padding:18px 20px 20px; display:flex; flex-direction:column; gap:14px; flex:1}
+.hm-daily-title{font-size:19px; font-weight:800; letter-spacing:-.3px}
+.hm-daily-stats{display:flex; gap:22px}
+.hm-daily-stats div{display:flex; flex-direction:column; gap:3px}
+.hm-daily-stats span{font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint)}
+.hm-daily-stats b{font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text)}
+.hm-daily .btn{align-self:flex-start; margin-top:auto}
+.hm-rings{display:flex; gap:6px; padding:16px 14px 18px; flex-wrap:wrap}
+.hm-ring{display:flex; flex-direction:column; align-items:center; gap:6px; width:104px; padding:10px 6px; border-radius:12px; text-decoration:none; color:var(--muted); transition:background .12s}
+.hm-ring:hover{background:var(--surface2)}
+.hm-ring .ring{color:var(--muted)}
+.hm-ring.hm-complete .ring, .hm-ring.hm-started .ring, .hm-ring.hm-lessons-done .ring{color:var(--accent)}
+.hm-ring-n{font-family:var(--mono); font-size:12px; font-weight:700; color:var(--text)}
+.hm-ring-t{font-size:11.5px; text-align:center; line-height:1.3}
+.hm-level-body{display:flex; align-items:center; gap:16px; padding:18px 20px 6px}
+.hm-level-chip{font-family:var(--mono); font-size:22px; font-weight:800; color:var(--accent); border:2px solid var(--accent-dim); border-radius:12px; padding:8px 12px; line-height:1}
+.hm-level-bar{flex:1; display:flex; flex-direction:column; gap:6px; font-family:var(--mono); font-size:12px; color:var(--muted)}
+.hm-level-track{height:8px; border-radius:99px; background:var(--surface2); overflow:hidden}
+.hm-level-track i{display:block; height:100%; background:var(--accent); border-radius:99px; transition:width .4s cubic-bezier(.2,.7,.2,1)}
+.hm p.hm-demo-note{margin:14px 0 0; text-align:center}
+@media (max-width:900px){ .hm-halves{grid-template-columns:1fr} .hm-continue{grid-template-columns:1fr} .hm-c-ring{border-left:0; border-top:1px solid var(--line)} }
+
+/* ---------- 6. the data room (app/learn-next.js) ---------- */
+.dr{font-family:var(--sans); margin:8px auto 40px}
+.dr-head{display:flex; align-items:flex-end; justify-content:space-between; gap:16px}
+.dr-head h1{font-family:var(--mono); font-size:22px; font-weight:700; letter-spacing:-.3px; margin:6px 0 4px}
+.dr-sub{color:var(--muted); font-size:14.5px; margin:0; max-width:80ch; line-height:1.55}
+.dr-grid{display:grid; grid-template-columns:280px 1fr; gap:18px; align-items:start; margin-top:4px}
+.dr-tree{display:flex; flex-direction:column; gap:4px; position:sticky; top:12px}
+.dr-folder{display:grid; grid-template-columns:14px auto 1fr auto; gap:6px 8px; align-items:center; text-align:left; width:100%; padding:11px 12px; background:var(--surface); border:1px solid var(--line); border-radius:11px; color:var(--text); font-family:var(--sans); cursor:pointer; transition:border-color .12s, background .12s}
+.dr-folder:hover{border-color:var(--accent-dim)}
+.dr-folder.open{background:var(--accent-glow); border-color:var(--accent-dim)}
+.dr-folder.locked{color:var(--muted)}
+.dr-folder-ico{font-family:var(--mono); font-size:11px; color:var(--faint)}
+.dr-folder-n{font-family:var(--mono); font-size:12.5px; color:var(--faint); font-weight:700}
+.dr-folder-t{font-size:14.5px; font-weight:700; letter-spacing:-.2px; min-width:0; line-height:1.25}
+.dr-folder-meta{display:inline-flex; gap:6px; align-items:center}
+.dr-count{font-family:var(--mono); font-size:11px; color:var(--muted)}
+.dr-tease{grid-column:2 / -1; font-size:12px; color:var(--faint); line-height:1.4}
+.dr-main{min-width:0}
+.dr-ch-head{display:flex; justify-content:space-between; gap:16px; align-items:flex-start; padding:18px 22px; background:var(--surface); border:1px solid var(--line); border-radius:14px; margin-bottom:12px}
+.dr-ch-eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:6px}
+.dr-ch-head h2{font-family:var(--sans); font-size:24px; font-weight:800; letter-spacing:-.6px; margin:0 0 8px; display:flex; align-items:center; gap:10px}
+.dr-ch-head p{font-size:14.5px; color:var(--muted); line-height:1.6; margin:0 0 6px; max-width:78ch}
+.dr-ch-head p b{color:var(--text); font-weight:600}
+.dr-lock{font-family:var(--mono); font-size:12px}
+.dr-lock a{color:var(--accent); text-decoration:none}
+.dr-ch-tools{flex:none}
+.dr-docs{display:flex; flex-direction:column; gap:10px}
+.dr-doc{display:grid; grid-template-columns:64px 1fr 220px; gap:0; background:var(--surface); border:1px solid var(--line); border-radius:14px; overflow:hidden}
+.dr-doc.dr-started, .dr-doc.dr-lessons-done{border-color:var(--accent-dim)}
+.dr-doc.dr-coming{opacity:.62}
+.dr-doc-num{display:flex; flex-direction:column; align-items:center; gap:8px; padding:16px 8px; border-right:1px solid var(--line); background:var(--surface2); font-family:var(--mono); font-size:15px; font-weight:700; color:var(--text)}
+.dr-doc-num .ring{color:var(--accent)}
+.dr-doc-main{padding:14px 18px 12px; min-width:0}
+.dr-doc-row{display:flex; align-items:center; justify-content:space-between; gap:12px}
+.dr-doc h3{font-size:17px; font-weight:800; letter-spacing:-.3px; margin:0}
+.dr-status{font-family:var(--mono); font-size:11px; padding:2px 8px; border-radius:99px; border:1px solid var(--line); color:var(--muted); white-space:nowrap}
+.dr-status.st-complete{color:var(--accent); border-color:var(--accent-dim); background:var(--accent-glow)}
+.dr-status.st-started, .dr-status.st-lessons-done{color:var(--warn); border-color:var(--warn)}
+.dr-obj{font-size:13.5px; color:var(--muted); line-height:1.5; margin:4px 0 10px}
+.dr-steps{list-style:none; margin:0; padding:0}
+.dr-step a{display:grid; grid-template-columns:56px 1fr auto 96px; gap:10px; align-items:center; padding:7px 8px; border-radius:8px; text-decoration:none; color:var(--text); font-size:14px; transition:background .1s}
+.dr-step a:hover, .dr.kb-mode .dr-step a.kb-focus, .dr-step a:focus-visible{background:var(--accent-glow); outline:none}
+.dr.kb-mode .dr-step a.kb-focus, .dr-step a:focus-visible{box-shadow:inset 3px 0 0 var(--accent)}
+.dr-step-n{font-family:var(--mono); font-size:12px; color:var(--faint)}
+.dr-step-t{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.dr-step-m{font-family:var(--mono); font-size:11px; color:var(--faint); white-space:nowrap}
+.dr-step-st{font-family:var(--mono); font-size:11.5px; color:var(--accent); text-align:right; white-space:nowrap}
+.dr-step.dr-st-done .dr-step-t, .dr-step.dr-st-mastered .dr-step-t{color:var(--muted)}
+.dr-step.next .dr-step-t{font-weight:700}
+.dr-step.next .dr-step-st{color:var(--accent); text-transform:uppercase; letter-spacing:.1em; font-size:10px}
+.dr-challenge{margin-top:4px; border-top:1px dashed var(--line); padding-top:4px}
+.dr-challenge .dr-step-n{color:var(--accent); font-size:14px}
+.dr-doc-page{border-left:1px solid var(--line); background:var(--surface2); padding:12px 14px; display:flex; flex-direction:column; gap:8px; align-items:stretch}
+.dr-thumb{background:#fff; border:1px solid var(--line); border-radius:6px; overflow:hidden; filter:grayscale(1) opacity(.55); transition:filter .3s}
+html[data-dark="1"] .dr-thumb{background:#f7f6f1}
+.dr-doc-page.filled .dr-thumb{filter:none; box-shadow:0 8px 20px -10px rgba(0,0,0,.35)}
+.dr-thumb-tab{font-family:var(--mono); font-size:8.5px; letter-spacing:.08em; text-transform:uppercase; color:#666; background:#eee; padding:2px 6px; border-bottom:1px solid #ddd}
+.dr-thumb table{width:100%; border-collapse:collapse; table-layout:fixed; font-family:var(--cellfont); font-size:7.5px; color:#222}
+.dr-thumb td{height:11px; padding:0 3px; border:1px solid #e6e6e6; overflow:hidden; white-space:nowrap; text-align:left}
+.dr-thumb td.num{text-align:right}
+.dr-thumb td.b{font-weight:700}
+.dr-thumb td.blue{color:#1c62d6}
+/* the page is paper in every theme: its cells keep paper ink (the global td colour would follow a dark theme's text) */
+.dr-thumb td{color:#222}
+.dr-thumb td.blue{color:#1c62d6}
+.dr-thumb .dr-thumb-tab{color:#555}
+.dr-page-cap{font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.5}
+.dr-page-cap b{color:var(--text)}
+.dr-doc-page.filled .dr-page-cap b{color:var(--accent)}
+.dr-replay{font-family:var(--mono); font-size:11.5px; color:var(--accent); text-decoration:none}
+.dr-archive{margin-top:14px}
+.dr-archive-btn{background:transparent}
+.dr-archive-list{margin-top:8px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:6px}
+@media (max-width:1000px){ .dr-grid{grid-template-columns:1fr} .dr-tree{position:static; flex-direction:row; flex-wrap:wrap} .dr-folder{width:auto} .dr-tease{display:none} .dr-doc{grid-template-columns:52px 1fr} .dr-doc-page{grid-column:1 / -1; border-left:0; border-top:1px solid var(--line)} }
+
+/* ---------- 7. the workspace: the you-are-here strip, cues, the stuck hint, the story beat ---------- */
+.ws{display:flex; flex-direction:column}
+.ws-strip{display:flex; align-items:center; justify-content:space-between; gap:12px; margin:8px 0 0; padding:5px 8px 5px 14px; background:var(--surface); border:1px solid var(--line); border-radius:10px; font-family:var(--mono); font-size:12.5px; color:var(--muted); min-height:38px}
+.ws-crumb{display:flex; align-items:center; gap:6px; flex-wrap:wrap; min-width:0}
+.ws-crumb a{color:var(--muted); text-decoration:none}
+.ws-crumb a:hover{color:var(--accent)}
+.ws-crumb b{color:var(--text); font-weight:700}
+.ws-ring{display:inline-flex; margin-left:6px; color:var(--accent)}
+.ws-tools{display:flex; gap:6px; align-items:center; flex:none}
+/* every control in the strip is one height and one type size, the level chip included */
+.ws-tools .ws-level, .ws-tools .mb-tool, .ws-tools .fx-mute{height:30px; box-sizing:border-box; display:inline-flex; align-items:center; font-size:12px; line-height:1; padding-top:0; padding-bottom:0}
+html[data-density="compact"] .ws-tools .ws-level, html[data-density="compact"] .ws-tools .mb-tool, html[data-density="compact"] .ws-tools .fx-mute{height:26px; font-size:11.5px}
+#wsMute{display:inline-flex}
+.ws-tools .fx-mute{gap:5px}
+.ws-level{font-weight:700; color:var(--accent); border:1px solid var(--accent-dim); border-radius:7px; padding:3px 9px; white-space:nowrap}
+.ws-level i{font-style:normal; color:var(--muted); font-weight:500; margin-left:5px}
+.ws-next .lesson{width:100%; align-self:stretch}
+html.hk-fs .app{max-width:none}
+.ws-next .panel-head .lesson-crumb, .ws-next .module-line{display:none}
+.ws-next .panel-head{padding-top:12px}
+/* the panel's side (decision 6): a setting, right by default */
+html[data-panel="left"] .ws-next .lesson{flex-direction:row-reverse}
+/* the floating panel (B4, the default): a card over the sheet that docks to the emptiest quadrant, never over the
+   target or the ribbon (its top is the grid's top), collapses to a one-line pill while a cell is edited; the goal list
+   opens from the Goals toggle or by clicking the pill. Ctrl+Shift+K hides it, Ctrl+Shift+J moves it. */
+.lesson.panel-overlay{position:relative}
+.lesson.panel-overlay .lesson-divider{display:none}
+.lesson.panel-overlay .lesson-panel{position:absolute; top:14px; left:auto; right:auto; width:380px; flex:none; height:auto; max-height:calc(100% - 28px); box-shadow:0 24px 60px -20px rgba(0,0,0,.5); z-index:20; border-color:var(--accent-dim); background:color-mix(in srgb, var(--surface) 96%, transparent); backdrop-filter:blur(3px); transition:left .22s cubic-bezier(.2,.7,.2,1), top .22s cubic-bezier(.2,.7,.2,1)}
+.lesson.panel-overlay .panel-body{display:none}
+.lesson.panel-overlay.goals-open .panel-body{display:block; max-height:38vh}
+/* the pill: one line, the current goal, out of the way */
+.lesson.panel-overlay.pill .lesson-panel{width:auto; max-width:420px; border-radius:99px; cursor:pointer}
+.lesson.panel-overlay.pill .panel-head, .lesson.panel-overlay.pill .panel-tabs, .lesson.panel-overlay.pill .panel-body, .lesson.panel-overlay.pill .panel-actions,
+.lesson.panel-overlay.pill .task-label, .lesson.panel-overlay.pill .task-teach, .lesson.panel-overlay.pill .task-why, .lesson.panel-overlay.pill .task-stuck, .lesson.panel-overlay.pill .task-keys, .lesson.panel-overlay.pill .task-extra, .lesson.panel-overlay.pill .conv-chip, .lesson.panel-overlay.pill .goal-nudge, .lesson.panel-overlay.pill .task-list{display:none}
+.lesson.panel-overlay.pill .task-card{padding:8px 16px; border:0; background:transparent; display:flex; align-items:center; gap:10px}
+.lesson.panel-overlay.pill .task-label{margin:0}
+.lesson.panel-overlay.pill .task-label .task-count{margin-left:6px}
+.lesson.panel-overlay.pill .task-goal::before{content:'now · '; color:var(--accent); font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase}
+.lesson.panel-overlay.pill .task-goal{font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:360px}
+/* hidden by Ctrl+Shift+K: a small pill brings it back */
+.lesson.panel-hidden .lesson-panel{display:none}
+.panel-show{position:absolute; right:16px; bottom:56px; z-index:20; font-family:var(--mono); font-size:11.5px; color:var(--muted); background:var(--surface); border:1px solid var(--line); border-radius:99px; padding:6px 12px; cursor:pointer}
+.panel-show:hover{color:var(--accent); border-color:var(--accent-dim)}
+/* the perimeter outline (B7): one ring around the target range, drawn inside the scroll box like the marquee */
+@keyframes cueRing{0%{opacity:0} 15%{opacity:1} 70%{opacity:1} 100%{opacity:0}}
+@keyframes cueHalo{0%{opacity:.9; transform:scale(1)} 100%{opacity:0; transform:scale(1.06)}}
+.cue-ring{position:absolute; pointer-events:none; z-index:6; border:2px solid var(--accent); border-radius:2px; box-sizing:border-box; animation:cueRing 1.8s ease-out 1 forwards}
+.cue-ring::after{content:''; position:absolute; inset:-5px; border:4px solid var(--accent-glow); border-radius:4px; animation:cueHalo .7s ease-out .1s 1 both}
+@media (prefers-reduced-motion: reduce){ .cue-ring{animation:none; opacity:1; box-shadow:0 0 0 3px var(--accent-glow)} }
+/* cues (decision 4): the target pulses once at goal start; a Ribbon route glows the tab, then the button */
+@keyframes cueTab{0%,100%{box-shadow:none} 50%{box-shadow:0 0 0 3px var(--accent-glow); border-top-color:var(--accent)}}
+.wb-tab.cue-pulse{animation:cueTab 1.1s ease-in-out 2}
+@keyframes cueGlow{0%,100%{box-shadow:0 0 0 2px var(--accent), 0 0 10px var(--accent-glow)} 50%{box-shadow:0 0 0 3px var(--accent), 0 0 18px var(--accent-glow)}}
+.cue-glow{position:relative; z-index:2; border-radius:6px; box-shadow:0 0 0 2px var(--accent), 0 0 10px var(--accent-glow); animation:cueGlow 1.3s ease-in-out 3}
+.rf-tab.cue-glow{color:var(--text)}
+@media (prefers-reduced-motion: reduce){ .cue-glow{animation:none; box-shadow:0 0 0 2px var(--accent)} .wb-tab.cue-pulse{animation:none; border-top-color:var(--accent)} }
+/* the ~8 s stuck hint and the 20 s Help pulse */
+.task-keys.task-hint::before{content:'hint'; font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); margin-right:4px}
+@keyframes tabPulse{0%,100%{opacity:1} 50%{opacity:.55}}
+.panel-tab.pulse{background:var(--accent-glow); color:var(--accent); animation:tabPulse 1.2s ease-in-out 3}
+/* the story beat: once per module, before its first lesson */
+.ws-beat{position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; z-index:45}
+.ws-beat-card{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:28px 32px 26px; width:640px; max-width:calc(100vw - 32px); box-shadow:0 30px 80px rgba(0,0,0,.45); font-family:var(--sans); animation:fr2In .28s cubic-bezier(.2,.7,.2,1)}
+.ws-beat-card h1{font-size:28px; font-weight:800; letter-spacing:-.8px; margin:0 0 12px; line-height:1.15; font-family:var(--sans)}
+.ws-beat-card p{font-size:16.5px; line-height:1.6; color:var(--muted); margin:0 0 22px}
+.ws-beat-acts{display:flex; justify-content:flex-end}
+/* the page delivered line and the install card on the completion overlay */
+.rm-page{display:flex; align-items:center; gap:14px; text-align:left; margin:2px 0 14px; padding:10px 12px; border:1px solid var(--accent-dim); border-radius:10px; background:color-mix(in srgb, var(--accent-glow) 60%, var(--surface))}
+.rm-page-line{font-family:var(--mono); font-size:12px; color:var(--accent); font-weight:700; line-height:1.5}
+/* the page slots in: a small copy of the delivered page drops into its place, once (C2) */
+.rm-page-slot{flex:0 0 112px; border-radius:6px; background:repeating-linear-gradient(0deg, transparent 0 8px, color-mix(in srgb, var(--line) 50%, transparent) 8px 9px); border:1px dashed var(--line)}
+.rm-page-slot .dr-thumb{animation:rmSlot .5s cubic-bezier(.2,.8,.25,1) .35s both}
+.rm-page-slot .dr-thumb table{font-size:5.5px}
+.rm-page-slot .dr-thumb td{height:8px; padding:0 2px}
+.rm-page-slot .dr-stamp{font-size:7px; padding:0 3px; right:3px; top:1px; bottom:auto}
+@keyframes rmSlot{0%{opacity:0; transform:translateY(-14px) scale(.92)} 100%{opacity:1; transform:none}}
+@media (prefers-reduced-motion: reduce){ .rm-page-slot .dr-thumb{animation:none} }
+.rm-install-acts{display:flex; gap:8px; margin-top:10px}
+
+/* ---------- 8. the nav's Sign in (decision 2), the storyboard index ---------- */
+.nav-signin{display:none; font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--text); text-decoration:none; border:1px solid var(--line); border-radius:8px; padding:6px 12px; margin-right:6px; transition:.13s; white-space:nowrap}
+.nav-signin{display:inline-flex}
+.nav-signin:hover{border-color:var(--accent-dim); color:var(--accent)}
+.nav-signin[hidden]{display:none !important}
+@media (max-width:760px){ .nav-signin{display:none !important} }
+.sb-group{margin:18px 0}
+.sb-group h2{font-family:var(--mono); font-size:13px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin:0 0 6px}
+.storyboard code{font-family:var(--mono); font-size:12px; background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:0 5px}
+
+/* ---------- 9. the Daily result card (ui/result-card.js) ---------- */
+.dc{width:380px; max-width:100%; margin:0 auto; background:var(--surface); border:1px solid var(--line); border-radius:16px; overflow:hidden; text-align:left; font-family:var(--sans); box-shadow:0 20px 50px -24px rgba(0,0,0,.5); position:relative}
+.dc::before{content:''; position:absolute; inset:0 0 auto 0; height:4px; background:var(--accent)}
+.dc-pro::before{background:linear-gradient(90deg, var(--accent), var(--tier-pro, #4a9eda))}
+.dc-legendary::before{background:linear-gradient(90deg, var(--accent), var(--tier-legendary, #e0913f), var(--tier-legendary, #e0913f))}
+.dc-none::before{background:var(--line)}
+.dc-head{display:flex; justify-content:space-between; align-items:center; padding:14px 18px 0; font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)}
+.dc-brand{font-weight:700; color:var(--text); letter-spacing:-.4px; text-transform:none; font-size:14px}
+.dc-brand b{color:var(--accent)}
+.dc-title{padding:14px 18px 0; font-size:20px; font-weight:800; letter-spacing:-.4px}
+.dc-main{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; padding:8px 18px 4px}
+.dc-time{display:flex; align-items:baseline; gap:4px}
+.dc-num{font-family:var(--mono); font-size:56px; font-weight:700; letter-spacing:-2.5px; line-height:1; color:var(--text)}
+.dc-unit{font-family:var(--mono); font-size:18px; color:var(--muted)}
+.dc-tier{display:flex; flex-direction:column; align-items:flex-end; gap:2px; padding-bottom:6px}
+.dc-mark{font-size:22px; letter-spacing:2px; color:var(--accent); line-height:1}
+.dc-pro .dc-mark{color:var(--tier-pro, #4a9eda)}
+.dc-legendary .dc-mark{color:var(--tier-legendary, #e0913f)}
+.dc-none .dc-mark{color:var(--faint)}
+.dc-word{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--text); font-weight:700}
+.dc-sub{font-family:var(--mono); font-size:10.5px; color:var(--faint)}
+.dc-stats{display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin:12px 18px 0; padding:12px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+.dc-stats div{display:flex; flex-direction:column; gap:3px}
+.dc-stats span{font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint)}
+.dc-stats b{font-family:var(--mono); font-size:15px; font-weight:600; color:var(--text)}
+.dc-stats b i{font-style:normal; color:var(--faint); font-weight:400; font-size:12px}
+.dc-foot{display:flex; justify-content:space-between; padding:10px 18px 14px; font-family:var(--mono); font-size:11px; color:var(--muted)}
+.dc-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(380px, 1fr)); gap:20px; justify-items:center}
+.rm-card.rm-card-daily{width:440px}
+.rm-card-daily .dc{margin:6px auto 4px}
+.hm-nudge{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:12px 18px; margin:0 0 14px; background:var(--surface); border:1px solid var(--accent-dim); border-radius:12px; font-size:14px; color:var(--muted)}
+.hm-nudge b{color:var(--text)}
+.hm-nudge-acts{display:inline-flex; gap:8px}
+
+/* ---------- experience pass C: the strip's More menu, the key echo in the tab bar ---------- */
+.ws-more-wrap{position:relative}
+.ws-more span{font-size:9px; margin-left:4px; color:var(--muted)}
+.ws-menu{position:absolute; right:0; top:calc(100% + 6px); z-index:80; min-width:300px; padding:6px; background:var(--surface); border:1px solid var(--line); border-radius:10px; box-shadow:0 18px 40px -18px color-mix(in srgb, var(--ink, #000) 45%, transparent); font-family:var(--mono); font-size:12px}
+.ws-menu[hidden]{display:none}
+.ws-menu-cap{font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); padding:6px 8px 4px}
+.ws-menu-item{display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; white-space:nowrap; padding:7px 8px; background:none; border:0; border-radius:6px; color:var(--text); font:inherit; text-align:left; cursor:pointer}
+.ws-menu-item:hover, .ws-menu-item:focus-visible{background:var(--surface2); outline:none}
+.ws-menu-item.on{color:var(--accent)}
+.ws-menu-item i{font-style:normal; color:var(--accent)}
+.ws-menu-item kbd{font-family:var(--mono); font-size:10.5px; color:var(--muted); background:var(--surface2); border:1px solid var(--line); border-bottom-width:2px; border-radius:4px; padding:0 5px}
+.ws-menu-sep{height:1px; background:var(--line); margin:5px 4px}
+/* the key echo, inside the lesson frame: the empty right end of the sheet-tab bar */
+html .keyflash.in-frame{position:absolute; right:10px; bottom:0; height:38px; z-index:25; max-width:60%; overflow:hidden; justify-content:flex-end; align-items:center; gap:5px}
+html .keyflash.in-frame .kchip{font-size:12px; padding:2px 8px; border-radius:5px; box-shadow:none; line-height:1.5}
+html[data-density="comfortable"] .keyflash.in-frame .kchip{font-size:13px; padding:2px 9px}
+/* the floating card, slimmer (C2): one-line title, tighter rows, so it fits beside a target on a 13-inch screen */
+.lesson.panel-overlay .panel-head{padding:10px 16px 2px}
+.lesson.panel-overlay .lesson-title{font-size:16px; line-height:1.3; margin:0 0 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+html[data-density="comfortable"] .lesson.panel-overlay .lesson-title{font-size:17px}
+.lesson.panel-overlay .panel-head .lesson-meta{margin-bottom:2px}
+.lesson.panel-overlay .panel-tab{padding:6px 9px}
+html[data-density="comfortable"] .lesson.panel-overlay .panel-tab{padding:6px 10px}
+.lesson.panel-overlay .task-card{padding:10px 16px}
+html[data-density="comfortable"] .lesson.panel-overlay .task-card{padding:11px 18px}
+.lesson.panel-overlay .panel-actions{padding:8px 16px 10px}
+/* the demo's poster (C2, item 9): a still of the real lesson, painted at once; the live demo replaces it */
+.dp-poster{display:flex; flex-direction:column}
+.dp-poster-img{flex:1 1 auto; min-height:0; overflow:hidden; background:var(--surface2); display:flex; align-items:flex-start; justify-content:center}
+.dp-poster-img img{display:block; width:100%; height:100%; object-fit:cover; object-position:top left; color:var(--muted); font-family:var(--mono); font-size:12px}
+.dp-poster-note{padding:8px 14px; font-family:var(--mono); font-size:12px; color:var(--muted); border-top:1px solid var(--line)}
+.dp-poster-note[hidden]{display:none}
+.dp-poster-note a{color:var(--accent)}
+/* the loading skeleton (C2, item 9): the page's shape while its module arrives */
+.sk{max-width:1340px; margin:8px auto 24px; display:flex; flex-direction:column; gap:12px}
+.sk-sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+@keyframes skShimmer{0%{opacity:.55} 50%{opacity:1} 100%{opacity:.55}}
+.sk-bar, .sk-card, .sk-grid{background:color-mix(in srgb, var(--line) 55%, var(--surface)); border-radius:8px; animation:skShimmer 1.2s ease-in-out infinite}
+.sk-bar{height:12px}
+.sk-bar.sk-short{width:55%}
+.sk-bar.sk-cap{width:30%; height:10px; margin-bottom:6px}
+.sk-bar.sk-strip{height:40px; border-radius:10px}
+.sk-bar.sk-title{height:26px; width:38%}
+.sk-bar.sk-sub{height:14px; width:60%}
+.sk-card{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px; display:flex; flex-direction:column; gap:10px; animation:none}
+.sk-card .sk-bar{background:color-mix(in srgb, var(--line) 70%, var(--surface))}
+.sk-card.sk-tall{min-height:220px}
+.sk-col{display:flex; flex-direction:column; gap:12px; min-width:0; flex:1 1 0}
+.sk-halves{display:grid; grid-template-columns:3fr 2fr; gap:16px}
+.sk-frame{position:relative; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:0; display:flex; flex-direction:column; min-height:clamp(420px, calc(100vh - 230px), 820px); overflow:hidden}
+.sk-frame .sk-bar{border-radius:0}
+.sk-bar.sk-ribbon{height:98px; animation:none; background:var(--surface2); border-bottom:1px solid var(--line)}
+.sk-bar.sk-fbar{height:30px; animation:none; background:var(--surface); border-bottom:1px solid var(--line)}
+.sk-frame .sk-grid{flex:1 1 auto; border-radius:0; background:repeating-linear-gradient(0deg, transparent 0 19px, var(--line) 19px 20px), repeating-linear-gradient(90deg, transparent 0 63px, var(--line) 63px 64px); opacity:.5}
+.sk-float{position:absolute; right:24px; top:150px; width:360px}
+.sk-dr{display:grid; grid-template-columns:280px 1fr; gap:18px}
+.sk-hero{display:grid; grid-template-columns:minmax(0, .92fr) minmax(0, 1.08fr); gap:52px; align-items:center; padding:44px 0 56px}
+.sk-bar.sk-h1{height:40px; width:88%; border-radius:10px}
+.sk-bar.sk-h1.sk-short{width:60%}
+.sk-bar.sk-cta{height:44px; width:200px; border-radius:11px; margin-top:14px}
+.sk-card.sk-demo{height:clamp(320px, 42vh, 460px)}
+.sk-card.sk-fr{width:min(1180px, 100%); height:clamp(560px, calc(100vh - 150px), 760px); align-self:center}
+.sk-tree{display:flex; flex-direction:column; gap:10px}
+.sk-tree .sk-bar{height:44px; border-radius:10px}
+@media (prefers-reduced-motion: reduce){ .sk-bar, .sk-card, .sk-grid{animation:none} }
+/* the data room, second pass (C2): the challenge row names the job, its pars sit under it; a delivered page is filled
+   and stamped, an open slot reads as an empty page; the locked chapters are one line each */
+.dr-challenge .dr-step-t{white-space:normal; display:flex; flex-direction:column; gap:1px}
+.dr-pars{display:block; font-family:var(--mono); font-size:10.5px; color:var(--faint); font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.dr-thumb{position:relative; border-style:dashed; filter:grayscale(1) opacity(.42)}
+.dr-thumb.delivered{border-style:solid; border-color:var(--accent-dim); filter:none; box-shadow:0 8px 20px -10px rgba(0,0,0,.35)}
+.dr-stamp{position:absolute; right:6px; top:1px; bottom:auto; font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); background:color-mix(in srgb, var(--surface) 88%, transparent); border:1.5px solid var(--accent); border-radius:4px; padding:1px 5px; transform:rotate(-4deg)}   /* on the tab row, never on the page's figures */
+.dr-thumb-slot{height:118px; border:1px dashed var(--line); border-radius:6px; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:11px; color:var(--faint); background:repeating-linear-gradient(0deg, transparent 0 10px, color-mix(in srgb, var(--line) 45%, transparent) 10px 11px)}
+.dr-thumb-slot.delivered{border-style:solid; border-color:var(--accent-dim); color:var(--accent)}
+.dr-replay{display:inline-block; margin-top:2px}
+.dr-replay:hover{text-decoration:underline}
+.dr-folder-t{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.dr-tease{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+/* the rail: a title may take two lines (never an ellipsis); the tag stays on the title row; the teaser gets the whole second row */
+.dr-folder-t{white-space:normal; overflow:visible; text-overflow:clip}
+.dr-tease{grid-column:2 / -1}
+/* Home, second pass (C2): the eight module rings in one row (two even rows of four when narrow); the two halves' headings line up */
+.hm-rings{display:grid; grid-template-columns:repeat(8, minmax(0, 1fr)); gap:2px; padding:14px 10px 16px}
+.hm-ring{width:auto; padding:8px 2px}
+.hm-ring-t{font-size:11px}
+@media (max-width:1180px){ .hm-rings{grid-template-columns:repeat(4, minmax(0, 1fr))} }
+.hm-half-head p{line-height:1.45; min-height:calc(2 * 1.45em)}
+/* both column heads are one shape (label above, hint below, two lines reserved) so the first cards line up; flush with the card edges */
+.hm-half-head{display:block; padding:2px 0 0}
+.hm-half-head p{margin-top:4px; text-wrap:pretty}
+.hm-ring-t{text-wrap:balance}
+.hm-cap .hm-streak{color:var(--accent); font-weight:700}
+/* the narrow-screen notice: a gap under its cap, and the lesson's brief readable */
+.narrow-msg h1{margin-top:16px}
+.narrow-lesson .narrow-brief{font-size:15px; line-height:1.55; color:var(--text)}
+
+/* ---------- the floating card, third pass (C2): a flexible body, one progress count, the tick on the card ---------- */
+.lesson.panel-overlay .lesson-panel{display:flex; flex-direction:column}
+.lesson.panel-overlay .task-card{flex:0 1 auto; min-height:0; overflow:auto}
+.lesson.panel-overlay .panel-body{min-height:0; overflow:auto}
+.lesson.panel-overlay .panel-actions{flex:none}
+/* one count: the footer's Goals n/m (the NOW label and the meta line drop theirs on the floating card) */
+.lesson.panel-overlay .task-label .task-count, .lesson.panel-overlay .lesson-meta .lesson-progress{display:none}
+/* a goal lands: it stays on the card ticked for a beat, then the next slides up */
+.task-label-done{color:var(--accent)}
+.task-goal-done{color:var(--muted); display:flex; gap:8px; align-items:flex-start}
+.task-check{flex:none; width:16px; height:16px; margin-top:3px; border-radius:50%; background:var(--accent); position:relative; animation:taskCheck .22s cubic-bezier(.2,.9,.3,1.3) both}
+.task-check::after{content:''; position:absolute; left:5px; top:2px; width:4px; height:8px; border:solid var(--on-accent, #fff); border-width:0 2px 2px 0; transform:rotate(45deg)}
+@keyframes taskCheck{0%{opacity:0; transform:scale(.4)} 100%{opacity:1; transform:none}}
+.task-in{animation:taskIn .18s ease-out both}
+@keyframes taskIn{0%{opacity:0; transform:translateY(8px)} 100%{opacity:1; transform:none}}
+/* the convention chip earns its colour when its goal lands */
+.conv-chip.earned{color:var(--accent); border-color:var(--accent); background:var(--accent-glow); font-weight:700; animation:taskCheck .24s ease-out both}
+@media (prefers-reduced-motion: reduce){ .task-check, .task-in, .conv-chip.earned{animation:none} }
+/* the Shortcuts used count, which pops when a new shortcut is used */
+.tab-count{font-family:var(--mono); font-size:10.5px; color:var(--accent); margin-left:4px; display:inline-block}
+.tab-count:empty{display:none}
+.tab-count.pop{animation:tabCountPop .3s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes tabCountPop{0%{transform:scale(1)} 40%{transform:scale(1.5)} 100%{transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){ .tab-count.pop{animation:none} }
+/* before the first key of a timed run: when the clock starts, quietly */
+.lesson-timer.pre{color:var(--faint); font-size:11px; font-family:var(--mono)}
+.panel-head .lesson-timer.pre{white-space:normal; flex-basis:100%; line-height:1.4}
+.lesson-timer.pre .nw{white-space:nowrap}   /* the pre-run line wraps inside the card, never past its edge */
+/* the once-in-the-browser note on the first Ctrl+PgUp/PgDn goal */
+.task-tabkeys{margin-top:8px; padding:8px 10px; font-size:12.5px; line-height:1.45; color:var(--text); background:var(--surface); border:1px dashed var(--accent-dim); border-radius:8px}
+.task-tabkeys .btn{margin-top:6px; padding:3px 10px; font-size:12px}
+/* the sheet the goal is about, while the learner is elsewhere: a quiet accent on its tab */
+.wb-tab.cue-target{border-top-color:var(--accent); color:var(--text); box-shadow:inset 0 2px 0 var(--accent)}
+/* the strip's module ring says what it counts */
+.ws-ring{display:inline-flex; align-items:center; gap:5px; margin-left:8px}
+.ws-ring-n{font-family:var(--mono); font-size:11px; color:var(--faint)}
+/* the strip's toggles read as toggles, not as the page's main action; the level shows once (the strip's, on a workspace) */
+.ws-tools .fx-mute, .ws-tools .fx-mute.on{background:var(--surface2); color:var(--text); border-color:var(--line)}
+.ws-tools .mb-tool.on{color:var(--accent); border-color:var(--accent-dim); background:var(--surface2)}
+body[data-route="lesson"] #navLevel, body[data-route="due"] #navLevel{display:none}
+.keyflash .kchip.typed{font-style:normal; color:var(--muted)}
+/* the workspace fills the window and the page does not scroll under it (SITE_SPEC §4: the sheet never scrolls off screen).
+   One flex column from <body> down to the frame: whatever the nav, the strip and the density take, the frame gets the rest,
+   with no hand-tuned heights. The nav stays where it is on every page (no jump entering a lesson); only the gap under it
+   tightens, and the strip sits closer (experience pass C, item 5). */
+body[data-route="lesson"], body[data-route="due"]{height:100vh; min-height:0; padding-bottom:0; display:flex; flex-direction:column; overflow:hidden}
+body[data-route="lesson"] > *, body[data-route="due"] > *{flex:none}
+body[data-route="lesson"] #navMount .topnav, body[data-route="due"] #navMount .topnav{margin-bottom:4px}
+body[data-route="lesson"] .site-footer, body[data-route="due"] .site-footer, body[data-route="lesson"] #footMount, body[data-route="due"] #footMount{display:none}
+body[data-route="lesson"] > .app, body[data-route="due"] > .app{flex:1 1 auto; min-height:0; display:flex; flex-direction:column; padding-bottom:10px}
+body[data-route="lesson"] #root, body[data-route="due"] #root{flex:1 1 auto; min-height:0; display:flex; flex-direction:column}
+body[data-route="lesson"] #root > .ws-next, body[data-route="due"] #root > .ws-next{flex:1 1 auto; min-height:0}
+body[data-route="lesson"] .ws-next .ws-strip, body[data-route="due"] .ws-next .ws-strip{margin-top:0}
+body[data-route="lesson"] .ws-next .lesson, body[data-route="due"] .ws-next .lesson{height:auto; flex:1 1 auto; min-height:420px; margin:8px 0 0}
+html.hk-fs body[data-route="lesson"] > .app, html.hk-fs body[data-route="due"] > .app{padding-top:8px}
+/* a status toast on a workspace floats just above the sheet-tab bar, never on it */
+body[data-route="lesson"] #hkToast, body[data-route="due"] #hkToast, body[data-route="drill"] #hkToast{bottom:62px}
+html.hk-fs body[data-route="lesson"] #hkToast, html.hk-fs body[data-route="due"] #hkToast{bottom:56px}
+/* the drill and Daily workspace: no footer under the sheet, and the sheet takes the room the footer left (critic pass) */
+body[data-route="drill"] .site-footer, body[data-route="drill"] #footMount{display:none}
+body[data-route="drill"] .drill-page .stage-row{min-height:clamp(400px, calc(100vh - 304px), 900px)}
+html[data-density="compact"] body[data-route="drill"] .drill-page .stage-row{min-height:clamp(400px, calc(100vh - 284px), 900px)}
+/* Compact means more sheet: a shorter nav on every page (so it never jumps between pages) and a slimmer strip */
+html[data-density="compact"] .topnav-in{height:52px}
+html[data-density="compact"] .ws-strip{min-height:32px; padding-top:2px; padding-bottom:2px}
+
+/* ---------- the data room and Home, third pass (C2, the dashboard review) ---------- */
+@media (min-width:1260px){ .dr-grid{grid-template-columns:300px 1fr} }
+/* finished rows are quiet, the next one is the loud one: an accent bar and bold, and it pulses once on arrival */
+.dr-step.dr-st-done a, .dr-step.dr-st-mastered a{background:none}
+.dr-step.next a{box-shadow:inset 3px 0 0 var(--accent)}
+.dr-step.next .dr-step-t{color:var(--text)}
+.dr-step.pulse-once a{position:relative}
+.dr-step.pulse-once a::after{content:''; position:absolute; inset:0; border-radius:8px; background:var(--accent-glow); opacity:0; animation:drPulse 1.2s ease-out .25s 1}
+@keyframes drPulse{0%{opacity:0} 30%{opacity:1} 100%{opacity:0}}
+.dr-doc.dr-flash{animation:drFlash 1.2s ease-out 1}
+@keyframes drFlash{0%{outline:2px solid var(--accent); outline-offset:2px} 100%{outline:2px solid transparent; outline-offset:6px}}
+@media (prefers-reduced-motion: reduce){ .dr-step.pulse-once a::after, .dr-doc.dr-flash{animation:none} }
+.dr-step-st{font-size:11px}
+.dr-thumb col.c1{width:40%}
+.dr-replay{white-space:nowrap}
+.dr-price{white-space:nowrap}
+/* a locked chapter open in the rail: a neutral fill with an accent edge, its tag still readable */
+.dr-folder.locked.open{background:var(--surface2); border-color:var(--line); box-shadow:inset 3px 0 0 var(--accent)}
+.dr-folder.locked .l-tag{color:var(--muted)}
+/* what the learner needs to read is --muted, not --faint (2.1:1 on the surface) */
+.deal-count, .hm-cap span, .dr-step-m, .dr-pars, .hm p.hm-due-foot, .hm p.hm-fine{color:var(--muted)}
+.deal-count a{color:var(--accent)}
+/* Home: the deal strip leads; the current module's ring is marked; a ring that moved since the last visit says so once */
+.hm > .deal{margin:0 0 16px}
+.hm-ring.hm-now{background:var(--surface2); box-shadow:inset 0 0 0 1px var(--accent-dim)}
+.hm-ring.hm-moved .ring{animation:hmMoved .9s ease-out .2s 1}
+@keyframes hmMoved{0%{transform:scale(1)} 35%{transform:scale(1.14)} 100%{transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){ .hm-ring.hm-moved .ring{animation:none} }
+.hm-daily-line{font-size:13.5px; color:var(--muted); line-height:1.5; margin:6px 0 14px}
+.hm p.hm-demo-note{max-width:none; margin:14px auto 0}
+.hm-chapter-done .hm-actions{flex-wrap:wrap}
+/* compact density on the new pages: tighter cards, rows and rings (scale.css only knew the old page classes) */
+html[data-density="compact"] .hm-c-main{padding:16px 20px}
+html[data-density="compact"] .hm h1{font-size:24px}
+html[data-density="compact"] .hm-card .hm-cap, html[data-density="compact"] .hm-continue .hm-cap{padding:8px 16px}
+html[data-density="compact"] .hm-rings{padding:10px 8px 12px}
+html[data-density="compact"] .hm-ring{padding:6px 2px; gap:4px}
+html[data-density="compact"] .hm-halves{gap:14px}
+html[data-density="compact"] .hm-half{gap:10px}
+html[data-density="compact"] .dr-step a{padding:5px 8px; font-size:13.5px}
+html[data-density="compact"] .dr-doc-main{padding:10px 14px 8px}
+html[data-density="compact"] .dr-doc h3{font-size:16px}
+html[data-density="compact"] .dr-folder{padding:8px 10px}
+html[data-density="compact"] .deal{padding:8px 14px; font-size:13px}
+
+/* the theme picker (critic pass): the grid scrolls inside the card so the close link never falls below the fold,
+   and a locked card's label sits clear of its swatch bars */
+.pc-card:has(.th-grid){overflow:hidden}
+.pc-card .th-grid{flex:1 1 auto; min-height:0; overflow-y:auto; padding:2px 2px 8px; margin-bottom:0; border-bottom:1px solid var(--line)}
+.pc-card:has(.th-grid) .pc-foot{flex:none; margin-top:12px}
+.th-card .pc-lock{margin-top:6px}
