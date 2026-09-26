@@ -157,10 +157,17 @@ try {
     const day = await page.evaluate(() => new Date().toISOString().slice(0, 10));   // the Daily's day key (records.js dayOf)
     const daily = DRILLS.find(d => d.id === dailyFor(day).drillId);
     await page.goto(base + '#/daily');
-    if (!(await page.waitForSelector('.start-card', { timeout: 5000 }).catch(() => null))) fail('journey: the Daily has no start card');
-    await page.keyboard.press('Space'); await page.waitForTimeout(120);
-    if (daily) await play(daily.solution); else fail('journey: no Daily drill for ' + day);
-    if (!(await page.waitForSelector('.lesson-done:not([hidden]) .dc', { timeout: 5000 }).catch(() => null))) fail('journey: the Daily did not end on its result card');
+    if (daily && daily.kind === 'challenge') {
+      // a module challenge drawn as the Daily runs in the lesson workspace on the day's seed (drill-page.js),
+      // so it has no start card; check it opens there (lessons.test.js replays every challenge headless)
+      if (!(await page.waitForURL(u => u.hash.startsWith('#/lesson/' + daily.id) && u.hash.includes('daily=1'), { timeout: 5000 }).then(() => true).catch(() => false))) fail('journey: the Daily challenge did not open in the lesson workspace');
+      else if (!(await page.waitForSelector('.goal, #startBtn', { timeout: 5000, state: 'attached' }).catch(() => null))) fail('journey: the Daily challenge did not open');
+    } else {
+      if (!(await page.waitForSelector('.start-card', { timeout: 5000 }).catch(() => null))) fail('journey: the Daily has no start card');
+      await page.keyboard.press('Space'); await page.waitForTimeout(120);
+      if (daily) await play(daily.solution); else fail('journey: no Daily drill for ' + day);
+      if (!(await page.waitForSelector('.lesson-done:not([hidden]) .dc', { timeout: 5000 }).catch(() => null))) fail('journey: the Daily did not end on its result card');
+    }
     t('the Daily');
   }
 
