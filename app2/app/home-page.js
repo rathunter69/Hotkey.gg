@@ -4,7 +4,7 @@
 import { CHAPTERS, LESSONS, lessonNumber, chapterOf } from '../content/index.js';
 import { store } from './store.js';
 import { prefs } from './prefs.js';
-import { CHAPTER_PLAN, pickNextLesson, statusOf } from './learn-page.js';
+import { CHAPTER_PLAN, pickNextLesson, openLessons, statusOf } from './learn-page.js';
 import { DRILLS } from '../content/drills.js';
 import { dailyFor } from './daily.js';
 import { dayOf } from './records.js';
@@ -20,7 +20,7 @@ export function mountHomePage(root) {
   const ctx = gameCtx();
   const pbCount = Object.keys(ctx.pbs).length;
   const legendaries = DRILLS.filter(d => bestTier(store.attempts({ ref: d.id })) === 'legendary').length;
-  const next = pickNextLesson(LESSONS, all, skipped);
+  const next = pickNextLesson(openLessons(LESSONS), all, skipped);
   const ch1 = CHAPTERS.find(c => c.id === 'foundations') || { lessons: [] };
   const done = ch1.lessons.filter(l => ['done', 'mastered'].includes(statusOf(l.id, all, skipped))).length;
   const skippedN = ch1.lessons.filter(l => statusOf(l.id, all, skipped) === 'skipped').length;

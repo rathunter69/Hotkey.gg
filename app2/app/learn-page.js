@@ -6,6 +6,7 @@ import { CHAPTERS, LESSONS, lessonNumber, sectionsOf, modulesOf } from '../conte
 import { store } from './store.js';
 import { prefs } from './prefs.js';
 import { ring } from '../ui/ring.js';
+import { entitlement } from './entitlement.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -43,6 +44,9 @@ export function statusOf(id, all, skipped) {
 }
 
 /** The first lesson in catalog order that is neither completed nor skipped; null when none is left. Pure. */
+/** The lessons this account can open: a paid lesson is out until the account holds the tier (the lock page, otherwise). */
+export const openLessons = lessons => lessons.filter(l => !entitlement.locked(l));
+
 export function pickNextLesson(lessons, all, skipped) {
   for (const l of lessons) { const s = statusOf(l.id, all, skipped); if (s !== 'done' && s !== 'mastered' && s !== 'skipped') return l; }
   return null;
@@ -124,7 +128,7 @@ export function mountLearnPage(root) {
 
   function render() {
     const all = store.all(); const skipped = prefs.get().skipped;
-    const next = pickNextLesson(LESSONS, all, skipped);
+    const next = pickNextLesson(openLessons(LESSONS), all, skipped);
     const c = counts();
     let html = `<div class="plist-head"><h1>Learn</h1>
       <p class="plist-sub">Six chapters, from the first cell to a full model. Chapter 1 is free. Your progress is ${esc(store.saveLine())}.</p>
@@ -144,13 +148,16 @@ export function mountLearnPage(root) {
     const ch1Cleared = !!gate.testout || (ch1 && ch1.lessons.every(l => { const p = all[l.id]; return p && p.completed; }));
     for (const plan of CHAPTER_PLAN) {
       const ch = CHAPTERS.find(x => x.id === plan.id);
-      if (!ch) {
-        const unlock = plan.n === 2 ? `<p class="chapter-unlock">${ch1Cleared ? 'Unlocked — Chapter 1 is behind you. Its lessons arrive with the paid tier.' : 'Unlocks when Chapter 1 is complete or tested out.'}</p>` : '';
-        html += `<section class="chapter chapter-locked"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(plan.title)}</h2><span class="access ${plan.n === 2 && ch1Cleared ? 'access-free">Unlocked · coming' : 'access-paid">Paid · coming'}</span></div><p class="chapter-blurb">${esc(plan.line)}</p>${unlock}</section>`;
+      // a chapter not built yet, or a built paid chapter this account cannot open (Chapter 2 on): the locked card, its lessons behind the paid line
+      if (!ch || (ch.access === 'paid' && !entitlement.entitled())) {
+        const built = !!ch;
+        const unlock = plan.n === 2 ? `<p class="chapter-unlock">${ch1Cleared ? 'Unlocked — Chapter 1 is behind you. Its lessons ' + (built ? 'open' : 'arrive') + ' with the paid tier.' : 'Unlocks when Chapter 1 is complete or tested out' + (built ? ', with the paid tier.' : '.')} ${built ? '<a href="#/pricing">See pricing →</a>' : ''}</p>` : '';
+        const count = built ? `<p class="chapter-count">${ch.lessons.length} lessons in, the first two modules — ${ch.lessons.filter(l => l.kind === 'challenge').length} timed challenges.</p>` : '';
+        html += `<section class="chapter chapter-locked"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(ch ? ch.title : plan.title)}</h2><span class="access ${plan.n === 2 && ch1Cleared ? 'access-free">Unlocked · ' + (built ? 'paid' : 'coming') : 'access-paid">Paid' + (built ? '' : ' · coming')}</span></div><p class="chapter-blurb">${esc(ch ? ch.blurb : plan.line)}</p>${count}${unlock}</section>`;
         continue;
       }
       const testout = plan.id === 'foundations' ? (gate.testout ? '<span class="chapter-testout tested">Tested out ✓</span>' : '<a class="chapter-testout" href="#/lesson/foundations-testout">Already know this? Test out</a>') : '';
-      html += `<section class="chapter"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(ch.title)}</h2><span class="access access-free">Free</span>${testout}</div><p class="chapter-blurb">${esc(ch.blurb)}</p>`;
+      html += `<section class="chapter"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(ch.title)}</h2><span class="access ${ch.access === 'paid' ? 'access-paid">Paid · yours' : 'access-free">Free'}</span>${testout}</div><p class="chapter-blurb">${esc(ch.blurb)}</p>`;
       const filtering = !!(filters.q || (filters.status && filters.status !== 'all') || (filters.difficulty && filters.difficulty !== 'all') || (filters.access && filters.access !== 'all'));
       // The module path (C2 gap 9): modules as nodes with a ring, lesson dots and the challenge
       // flag; the flat table stays behind the List toggle. Legacy lessons (no module) keep their

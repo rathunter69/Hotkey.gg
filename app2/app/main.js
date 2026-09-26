@@ -24,6 +24,7 @@ import { prefs } from './prefs.js';
 import { applyFlowQuery, reflectFlow } from './flow.js';
 import { store } from './store.js';
 import { auth } from './auth.js';
+import { entitlement } from './entitlement.js';
 import { track, installErrorLog } from './telemetry.js';
 import { captureInstall } from './install.js';
 import { LEGACY_IDS } from './progress.js';
@@ -78,7 +79,7 @@ export function parseRoute(hash) {
 
 /** Which nav link a route lights up. The landing, the first run and Home light none: they are not Learn. */
 export function navKeyFor(name) {
-  if (name === 'learn' || name === 'lesson') return 'learn';
+  if (name === 'learn' || name === 'lesson' || name === 'locked') return 'learn';
   if (name === 'practice' || name === 'drill' || name === 'rapid' || name === 'due') return 'practice';
   if (name === 'leaderboard' || name === 'reference') return name;
   return '';
@@ -90,7 +91,7 @@ export const HOME_TITLE = 'hotkey.gg — Excel isn\u2019t learned. It\u2019s pra
 /** The document title for a route. */
 export function titleFor(name, extra) {
   const T = { root: HOME_TITLE, landing: HOME_TITLE, home: 'Home · hotkey.gg', start: 'Get started · hotkey.gg', learn: 'Learn · hotkey.gg',
-    lesson: (extra ? extra + ' · ' : '') + 'hotkey.gg', practice: 'Practice · hotkey.gg', drill: (extra ? extra + ' · ' : '') + 'Practice · hotkey.gg', leaderboard: 'Leaderboard · hotkey.gg',
+    lesson: (extra ? extra + ' · ' : '') + 'hotkey.gg', locked: (extra ? extra + ' · ' : '') + 'Paid tier · hotkey.gg', practice: 'Practice · hotkey.gg', drill: (extra ? extra + ' · ' : '') + 'Practice · hotkey.gg', leaderboard: 'Leaderboard · hotkey.gg',
     reference: 'Reference · hotkey.gg', pricing: 'Pricing · hotkey.gg', teams: 'Teams · hotkey.gg', account: 'Account · hotkey.gg', about: 'About · hotkey.gg',
     terms: 'Terms · hotkey.gg', privacy: 'Privacy · hotkey.gg', eula: 'EULA · hotkey.gg', contact: 'Contact · hotkey.gg', notfound: 'Page not found · hotkey.gg',
     due: 'Due today · hotkey.gg', storyboard: 'Storyboard · hotkey.gg' };
@@ -130,6 +131,7 @@ const LOADERS = {
   due: { file: './home-next.js', pick: m => m.mountDuePage },
   storyboard: { file: './storyboard.js', pick: m => m.mountStoryboard },
   lesson: { file: './lesson-view.js', pick: m => m.mountLessonView },
+  locked: { file: './lock-page.js', pick: m => m.mountLockPage },   // a paid lesson, to an account without the tier
   practice: { file: './practice-page.js', pick: m => m.mountPracticePage },
   drill: { file: './drill-page.js', pick: m => m.mountDrillPage },
   rapid: { file: './rapid-fire.js', pick: m => m.mountRapidPage },
@@ -300,6 +302,11 @@ export function startApp({ navEl, rootEl, footEl }) {
       if (myGen !== gen) return;
       lesson = content.lessonById(r.params.id);
       if (!lesson) { if (LEGACY_IDS.has(r.params.id)) { location.replace('#/learn'); return; } name = 'notfound'; }   // a deleted lesson's URL goes to the catalog (Run 4)
+      // a paid lesson (Chapter 2 on): the account's entitlement decides between the lesson and the lock page — never a 404
+      if (lesson && entitlement.locked(lesson)) {
+        if (auth.state() === 'in') { await entitlement.refresh(); if (myGen !== gen) return; }
+        if (entitlement.locked(lesson)) name = 'locked';
+      }
     }
     let drill = null;
     if (name === 'drill' && !r.params.daily && r.params.id !== 'sandbox') {
@@ -332,7 +339,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     if (myGen !== gen) return;
     if (rootEl.querySelector('.sk')) rootEl.innerHTML = '';
     try {
-      const ctx = { query: r.query, params: r.params, nav };
+      const ctx = { query: r.query, params: r.params, nav, lesson };
       let res = name === 'lesson' ? mount(rootEl, lesson, { mode: r.query.mode || 'guided', panel: r.query.panel, seed: r.query.seed, daily: r.query.daily }) : mount(rootEl, ctx);
       // a page that mounts asynchronously still hands back its destroy(); a route that moved on meanwhile tears it down at once
       if (res && typeof res.then === 'function') { res = await res; if (myGen !== gen) { if (res && typeof res.destroy === 'function') { try { res.destroy(); } catch (e) { /* ignore */ } } return; } }

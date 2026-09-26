@@ -7,7 +7,7 @@
 import { CHAPTERS, LESSONS, lessonNumber, chapterOf, modulesOf, moduleOf, lessonById } from '../content/index.js';
 import { store } from './store.js';
 import { prefs } from './prefs.js';
-import { pickNextLesson, statusOf, moduleStatus, pathModel } from './learn-page.js';
+import { pickNextLesson, openLessons, statusOf, moduleStatus, pathModel } from './learn-page.js';
 import { DRILLS } from '../content/drills.js';
 import { dailyFor } from './daily.js';
 import { siteCopy } from '../content/copy/apply.js';
@@ -77,7 +77,7 @@ export function mountHomePage(root, pageCtx = {}) {
   const all = c.all; const skipped = c.demo ? [] : prefs.get().skipped;
   const el = document.createElement('div');
   el.className = 'hm';
-  const next = pickNextLesson(liveLessons(), all, skipped);
+  const next = pickNextLesson(openLessons(liveLessons()), all, skipped);
   const at = next ? moduleOf(next) : null;
   const started = next && all[next.id] && all[next.id].started;
   const day = dayOf();

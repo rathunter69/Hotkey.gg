@@ -68,7 +68,7 @@ function ensureCss() {
 export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt, seed: seedOpt, daily: dailyOpt } = {}) {
   ensureCss();
   const chapter = chapterOf(lesson);
-  const fullRibbon = chapter && chapter.id === 'foundations';   // Chapter 1: the full ribbon bar is on by default (§4)
+  const fullRibbon = chapter && (chapter.id === 'foundations' || chapter.id === 'formatting');   // Chapters 1 and 2: the full ribbon bar is on by default (§4)
   const timedOnly = lesson.kind === 'assessment' || lesson.kind === 'testout';   // these run against the clock, no help, no other mode
   if (timedOnly) mode = 'timed';
   const isChallenge = lesson.kind === 'challenge';   // the module challenge: seeded, all goals at once, countdown, tier pars (C2)

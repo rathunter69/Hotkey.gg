@@ -7,6 +7,7 @@
 // legacy lessons wait in an Archive folder until the rewrite replaces them.
 import { CHAPTERS, LESSONS, lessonNumber, sectionsOf, modulesOf } from '../content/index.js';
 import { store } from './store.js';
+import { auth } from './auth.js';
 import { prefs } from './prefs.js';
 import { statusOf, moduleStatus, pathModel, CHAPTER_PLAN } from './learn-page.js';
 import { STAGES, dealStripHtml } from './deal-strip.js';
@@ -14,6 +15,8 @@ import { workbookState, WORKBOOKS } from '../content/workbooks/index.js';
 import { ring } from '../ui/ring.js';
 import { moduleCopy, siteCopy } from '../content/copy/apply.js';
 import { moduleNumber, itemNumber, isFinalItem, FINAL_MODULE } from './numbering.js';
+import { entitlement } from './entitlement.js';
+import { PAID_LINE } from './lock-page.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const TIER_MARK = { legendary: '◆◆◆', pro: '◆◆', pass: '◆' };
@@ -107,7 +110,8 @@ export function mountLearnPage(root, ctx = {}) {
       const st = STAGES.find(s => s.id === pl.id) || {};
       const open = pl.id === openChapter;
       const count = pl.id === 'foundations' ? `${modsDone}/${st.modules || mods.length}` : '';
-      return `<button type="button" class="dr-folder${open ? ' open' : ''}${pl.access === 'paid' ? ' locked' : ''}" data-ch="${esc(pl.id)}" aria-expanded="${open}">
+      const held = pl.access !== 'paid' || (CHAPTERS.some(c => c.id === pl.id) && entitlement.entitled());   // a built paid chapter this account holds
+      return `<button type="button" class="dr-folder${open ? ' open' : ''}${held ? '' : ' locked'}" data-ch="${esc(pl.id)}" aria-expanded="${open}">
         <span class="dr-folder-ico" aria-hidden="true">${open ? '▾' : '▸'}</span>
         <span class="dr-folder-n">${pl.n}.</span><span class="dr-folder-t">${esc(pl.title)}</span>
         <span class="dr-folder-meta">${count ? `<span class="dr-count">${count}</span>` : ''}<span class="l-tag ${pl.access === 'free' ? 'l-free' : ''}">${pl.access}</span></span>
@@ -175,13 +179,54 @@ export function mountLearnPage(root, ctx = {}) {
         docs += `<article class="dr-doc dr-coming"><div class="dr-doc-num"><span>${esc(plan.n)}</span></div><div class="dr-doc-main"><div class="dr-doc-row"><h3>${esc(plan.title)}</h3><span class="dr-status st-coming">Coming</span></div><p class="dr-obj">${esc(plan.objective)}</p></div><div class="dr-doc-page"><div class="dr-page-cap"><b>Page ${esc(plan.n)}</b> not yet</div></div></article>`;
       }
       docs += '</div>';
+    } else if (CHAPTERS.some(c => c.id === openChapter) && entitlement.entitled()) {
+      // a built paid chapter the account holds (Chapter 2 on): its modules as documents, the same shape as Chapter 1's
+      const ch = CHAPTERS.find(c => c.id === openChapter);
+      const pl = CHAPTER_PLAN.find(p => p.id === openChapter) || {};
+      const st = STAGES.find(s => s.id === pl.id) || {};
+      const cmods = modulesOf(ch); const cpath = pathModel(ch, all, skipped);
+      docs += `<div class="dr-ch-head"><div><div class="dr-ch-eyebrow">Folder ${pl.n} · stage ${st.n} of 6 · ${esc(st.stage || '')}</div><h2>${esc(ch.title)} <span class="l-tag">paid · yours</span></h2>
+          <p><b>Management sends:</b> ${esc(st.sends || '')}.<br><b>You deliver:</b> ${esc(st.delivers || '')}.</p><p>${esc(ch.blurb)}</p></div></div>`;
+      docs += '<div class="dr-docs">';
+      cmods.forEach((m, k) => {
+        const pm = cpath[k] || { done: 0, total: m.lessons.length, items: [] };
+        const sec = (sectionsOf(ch).find(s => s.name === m.title) || {});
+        const chP = m.challenge ? (all[m.challenge.id] || null) : null;
+        const passed = !!(chP && (chP.challenge || chP.completed));
+        const tier = chP && chP.tier;
+        const status = moduleStatus(m, all);
+        const statusText = status === 'complete' ? 'Complete' : status === 'lessons-done' ? 'Lessons done · challenge open' : status === 'started' ? 'In progress' : 'Not started';
+        const no = docNo(pl.n, k, m.id);
+        docs += `<article class="dr-doc dr-${esc(status)}" data-doc="${esc(m.id)}">
+          <div class="dr-doc-num"><span>${esc(no)}</span>${ring(pm.done, pm.total, { size: 30, stroke: 3.5 })}</div>
+          <div class="dr-doc-main">
+            <div class="dr-doc-row"><h3>${esc(m.title)}</h3><span class="dr-status st-${esc(status)}">${statusText}</span></div>
+            <p class="dr-obj">${esc(sec.blurb || '')}</p>
+            <ol class="dr-steps">
+              ${m.lessons.map((l, i) => { const stt = statusOf(l.id, all, skipped); const isNext = pm.items[i] && pm.items[i].next; return `<li class="dr-step dr-st-${esc(stt)}${isNext ? ' next' : ''}"><a href="#/lesson/${esc(l.id)}" data-open="${esc(l.id)}"><span class="dr-step-n">${esc(itemNumber(l, { module: m, k: k + 1, n: i + 1 }) || no + '.' + (i + 1))}</span><span class="dr-step-t">${esc(l.title)}</span><span class="dr-step-m">${l.minutes ? l.minutes + ' min' : ''}</span><span class="dr-step-st">${stepMark(stt, isNext)}</span></a></li>`; }).join('')}
+              ${m.challenge ? `<li class="dr-step dr-challenge dr-st-${passed ? 'done' : 'todo'}${pm.items[pm.items.length - 1] && pm.items[pm.items.length - 1].next ? ' next' : ''}"><a href="#/lesson/${esc(m.challenge.id)}" data-open="${esc(m.challenge.id)}"><span class="dr-step-n">⚑</span><span class="dr-step-t">${esc(challengeName(m.challenge.title))}<span class="dr-pars">${m.challenge.pars ? 'challenge · pass ' + m.challenge.pars.pass + ' s · pro ' + m.challenge.pars.pro + ' s · legendary ' + m.challenge.pars.legendary + ' s' : 'challenge'}</span></span><span class="dr-step-m">${m.challenge.minutes ? m.challenge.minutes + ' min' : ''}</span><span class="dr-step-st">${passed ? (tier && TIER_MARK[tier] ? TIER_MARK[tier] + ' ' + tier : '✓ passed') : ''}</span></a></li>` : ''}
+            </ol>
+          </div>
+          <div class="dr-doc-page${passed ? ' filled' : ''}">
+            ${pageThumbHtml(m, passed)}
+            <div class="dr-page-cap"><b>Page ${esc(no)}</b> ${passed ? `${esc(pageName(m))} · delivered` : 'fills in when the challenge passes'}</div>
+            ${m.challenge && passed ? `<a class="dr-replay" href="#/lesson/${esc(m.challenge.id)}?seed=new" title="Replay the challenge on a fresh sheet">Replay · new sheet →</a>` : ''}
+          </div>
+        </article>`;
+      });
+      for (let k = cmods.length; k < (st.modules || cmods.length); k++) {
+        docs += `<article class="dr-doc dr-coming"><div class="dr-doc-num"><span>${esc(pl.n + '.' + (k + 1))}</span></div><div class="dr-doc-main"><div class="dr-doc-row"><h3>Module ${esc(pl.n + '.' + (k + 1))}</h3><span class="dr-status st-coming">Coming</span></div><p class="dr-obj">Lands with the next run of the chapter.</p></div><div class="dr-doc-page"><div class="dr-page-cap"><b>Page ${esc(pl.n + '.' + (k + 1))}</b> not yet</div></div></article>`;
+      }
+      docs += '</div>';
     } else {
       const pl = CHAPTER_PLAN.find(p => p.id === openChapter) || CHAPTER_PLAN[1];
       const st = STAGES.find(s => s.id === pl.id) || {};
+      const built = CHAPTERS.find(c => c.id === pl.id) || null;   // authored, locked to this account: the lessons are in, the door is shut
       const ch1Cleared = !!gate.testout || !!gate.assessment || (ch1 && modulesOf(ch1).filter(m => m.id !== 'welcome').every(m => moduleStatus(m, all) === 'complete'));
-      docs += `<div class="dr-ch-head"><div><div class="dr-ch-eyebrow">Folder ${pl.n} · stage ${st.n} of 6 · ${esc(st.stage || '')}</div><h2>${esc(pl.title)} <span class="l-tag">paid</span></h2>
-          <p><b>Management sends:</b> ${esc(st.sends || '')}.<br><b>You deliver:</b> ${esc(st.delivers || '')}.</p><p>${esc(pl.line)}</p>
-          <p class="dr-lock">${pl.n === 2 ? (ch1Cleared ? 'Unlocked — Chapter 1 is behind you. Its lessons arrive with the paid tier.' : 'Opens when Chapter 1 is complete or tested out, with the paid tier.') : 'Arrives with the paid tier, in order.'} <a class="dr-price" href="#/pricing">See pricing →</a></p></div></div>`;
+      docs += `<div class="dr-ch-head"><div><div class="dr-ch-eyebrow">Folder ${pl.n} · stage ${st.n} of 6 · ${esc(st.stage || '')}</div><h2>${esc(built ? built.title : pl.title)} <span class="l-tag">paid</span></h2>
+          <p><b>Management sends:</b> ${esc(st.sends || '')}.<br><b>You deliver:</b> ${esc(st.delivers || '')}.</p><p>${esc(built ? built.blurb : pl.line)}</p>
+          ${built ? `<p>${esc(PAID_LINE)}</p><p class="dr-lock">${built.lessons.length} lessons are in: ${modulesOf(built).map(m => esc(m.title)).join(', ')}, each with a timed challenge.</p>` : ''}
+          <p class="dr-lock">${pl.n === 2 ? (ch1Cleared ? 'Unlocked — Chapter 1 is behind you. Its lessons ' + (built ? 'open' : 'arrive') + ' with the paid tier.' : 'Opens when Chapter 1 is complete or tested out, with the paid tier.') : 'Arrives with the paid tier, in order.'} <a class="dr-price" href="#/pricing">See pricing →</a>${built && auth.state() !== 'in' ? ' · <a class="dr-price" href="#/account">Sign in →</a>' : ''}</p></div></div>`;
     }
 
     el.innerHTML = `<div class="dr-head"><div><h1>Project Volt · data room</h1><p class="dr-sub">One deal, six chapters. Each chapter is a stage of the sale and produces one page of the pack. Your progress is ${esc(store.saveLine())}.</p></div>
