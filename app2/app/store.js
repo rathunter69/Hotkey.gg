@@ -398,6 +398,10 @@ async function maybeCarryOver(sb, t) {
   } catch (e) { /* network: try again next sign-in */ }
 }
 
+/** Global boards read on the Leaderboard, per account|ref|seed, kept for BOARD_TTL ms. */
+const boardCache = new Map();
+const BOARD_TTL = 30000;
+
 /* ------------------------------------------------------------------ the facade */
 
 export const store = {
@@ -473,6 +477,30 @@ export const store = {
     return records.attempts({ ref }).filter(a => a.clean && a.secs != null)
       .sort((x, y) => x.secs - y.secs)
       .map(a => ({ secs: a.secs, keys: a.keys, tier: a.tier, at: a.at, mine: true }));
+  },
+  /** Signed in: the Leaderboard reads the global field (rpc_board); signed out it stays local (§2). */
+  liveBoards() { return signedIn(); },
+  /**
+   * One global board from rpc_board (0007/0008): p_seed null is the all-time board, a seed is
+   * that sheet's board (the Daily). Resolves { rows, me } — rows best-first as the server ranks
+   * them, `mine` flagged by the caller's handle — or null when signed out or the read failed.
+   * Reads are cached briefly so switching tabs does not refetch every board.
+   */
+  async globalBoard(ref, { seed = null, limit = 200 } = {}) {
+    if (!signedIn()) return null;
+    const sb = auth.client(); if (!sb) return null;
+    const t = auth.token();
+    const key = acct() + '|' + ref + '|' + (seed == null ? '' : seed);
+    const hit = boardCache.get(key);
+    if (hit && Date.now() - hit.at < BOARD_TTL) return hit.v;
+    try {
+      const { data, error } = await sb.rpc('rpc_board', { p_ref: ref, p_limit: limit, p_seed: seed == null ? null : seed });
+      if (!auth.current(t) || error || !Array.isArray(data)) return null;
+      const me = profile && profile.handle;
+      const v = { me: me || null, rows: data.map(r => ({ pos: Number(r.pos), handle: r.handle, level: r.level, secs: Number(r.secs), keys: r.keys, tier: r.tier, mine: !!me && r.handle === me })) };
+      boardCache.set(key, { at: Date.now(), v });
+      return v;
+    } catch (e) { return null; }
   },
   /** Rank needs real boards (Phase B): every guest is Unranked, honestly. */
   rank() { return null; },
@@ -561,6 +589,7 @@ export const store = {
   /** Drop the in-memory account state (sign-out path; auth cleared the device keys already). */
   reset() {
     profile = null; cacheLessons = null; hydrated = false; flushDelay = 1000; gameFlushDelay = 1000;
+    boardCache.clear();
     clearFlushTimer(); if (gameFlushTimer) { clearTimeout(gameFlushTimer); gameFlushTimer = null; }
     lastSave = auth.lostUid && auth.lostUid() && (readOutbox().length || readGameOutbox().length) ? 'retry' : 'account';
     announce(this.saveState());
