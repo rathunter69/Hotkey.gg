@@ -17,8 +17,8 @@
 // (see normCondFmt); condFmtMap() evaluates it for the painter and the graders.
 
 import { colLetter, colIndex, refKey, parseRef, parseRange, rectRefs, rangeText } from './refs.js';
-import { evalFormula, parseFormula, translateFormula, normalizeFormula, autocorrectFormula, adjustFormulaStructure, isErrVal, formulaRefs, parses, dateTextToSerial, compareValues } from './formula.js';
-import { fmtNum, dispText } from './format.js';
+import { evalFormula, parseFormula, translateFormula, normalizeFormula, autocorrectFormula, adjustFormulaStructure, isErrVal, formulaRefs, parses, dateTextValue, compareValues } from './formula.js';
+import { fmtNum, dispText, serialToDate } from './format.js';
 import { isValidFormat, normalizeCode, stepDecimals, codeDecimals } from './numfmt.js';
 
 export const COLW_DEFAULT = 64;   // px: Excel's default column width at 100% (8.43 characters); autofit widens beyond this
@@ -192,27 +192,29 @@ export function rectsOfKeys(keys) {
 }
 /** A rule's Applies-to as rectangles; the first one's top-left is where its formulas are written. */
 const cfRects = rule => parseRanges(rule.range) || [];
+/** The sheet's size, for translateFormula's `wrap`: a rule's formula re-based past row 1 or column A runs round the sheet edge, as Excel's does, never #REF!. */
+const wrapOf = sheet => ({ rows: sheet.rows, cols: sheet.cols });
 /** Apply `fn` to every formula a rule carries: `formula`, and the '=…' operands v1 / v2 of a preset. */
 function cfMapFormulas(rule, fn) {
   for (const k of ['formula', 'v1', 'v2']) if (typeof rule[k] === 'string' && rule[k].trimStart()[0] === '=') rule[k] = fn(rule[k]);
   return rule;
 }
-/** `rule` over `rects`: its formulas re-based from the old first cell to the new one, so every remaining cell keeps its meaning. */
-function cfWithRects(rule, rects) {
+/** `rule` over `rects`: its formulas re-based from the old first cell to the new one (wrapping round the sheet `wrap` sizes), so every remaining cell keeps its meaning. */
+function cfWithRects(rule, rects, wrap) {
   const old = cfRects(rule)[0], nw = rects[0];
   const next = { ...rule, range: rangesText(rects) };
   const dr = nw.r1 - old.r1, dc = nw.c1 - old.c1;
-  if (dr || dc) cfMapFormulas(next, f => translateFormula(f, dr, dc));
+  if (dr || dc) cfMapFormulas(next, f => translateFormula(f, dr, dc, wrap));
   return next;
 }
 /** The rules with the cells of `cuts` taken out of their Applies-to (a rule left with no cell goes; one flagged `_keep` is left alone); null when no rule met them. */
-function cfWithout(rules, cuts) {
+function cfWithout(rules, cuts, wrap) {
   let changed = false; const out = [];
   for (const r of rules) {
     const rects = cfRects(r); const rest = r._keep ? rects : subtractRects(rects, cuts);
     if (rest.length === rects.length && rest.every((x, i) => x === rects[i])) { out.push(r); continue; }
     changed = true;
-    if (rest.length) out.push(cfWithRects(r, rest));
+    if (rest.length) out.push(cfWithRects(r, rest, wrap));
   }
   return changed ? out : null;
 }
@@ -232,17 +234,19 @@ function relocateRefs(f, rect, dr, dc) {
  * A Highlight Cells value as Excel's box reads it and the rule stores it: a number (1,000 / 12% /
  * $5 / (3); a date or time as its serial), TRUE / FALSE, an '=…' formula kept as text (its relative
  * references walk the range, as a formula rule's do), or the text itself ("North" is matched as
- * text, case aside). Null when Excel refuses the entry: an empty box, or a formula that does not parse.
+ * text, case aside). The box reads its entry by the grid's own rule (Sheet.classifyInput), so a
+ * rule means what a cell typed the same way holds: a year-less date (Jan 5) takes its year from
+ * the sheet's `today` (TODAY()'s clock), and 1e400, past Excel's largest number, is text. Null
+ * when Excel refuses the entry: an empty box, a formula that does not parse, or a number no cell can hold.
  */
-export function cfOperand(v) {
-  if (typeof v === 'number' || typeof v === 'boolean') return v;
+export function cfOperand(v, today) {
+  if (typeof v === 'number') return isFinite(v) ? v : null;
+  if (typeof v === 'boolean') return v;
   const t = String(v == null ? '' : v).trim();
   if (!t) return null;
   if (t[0] === '=') return parses(t.slice(1)) ? normalizeFormula(t) : null;
-  const cls = Sheet.classifyInput(t, null);
-  if (cls.kind === 'value' && !cls.txt && !isErrVal(cls.value)) return cls.value;
-  const serial = dateTextToSerial(t);
-  return serial === null ? t : serial;
+  const cls = Sheet.classifyInput(t, null, today);
+  return cls.kind === 'value' && !cls.txt && !isErrVal(cls.value) ? cls.value : t;
 }
 /**
  * A rule list with sane shapes, in priority order (first wins a conflict, as Excel's Manage
@@ -255,8 +259,9 @@ export function cfOperand(v) {
  * (a duplicate, or a missing one, is minted) and the numbering carries on past any loaded 'cfN'.
  * Between with the bounds reversed is stored low bound first, as Excel's box swaps them; Stop If
  * True is never set on a data bar or a colour scale (Excel greys the box out). Anything malformed is dropped.
+ * `today` is the sheet's TODAY() clock, for a preset's year-less date operand.
  */
-export function normCondFmt(list) {
+export function normCondFmt(list, today) {
   const out = []; const seen = new Set();
   const src = Array.isArray(list) ? list : [];
   for (const x of src) { const m = x && typeof x.id === 'string' ? /^cf(\d+)$/.exec(x.id) : null; if (m && +m[1] > cfSeq) cfSeq = +m[1]; }
@@ -268,9 +273,9 @@ export function normCondFmt(list) {
     if (x.kind === 'cellValue') {
       if (!CF_OPS.includes(x.op)) continue;
       rule.op = x.op;
-      const v1 = cfOperand(x.v1 === undefined ? 0 : x.v1); if (v1 === null) continue; rule.v1 = v1;
+      const v1 = cfOperand(x.v1 === undefined ? 0 : x.v1, today); if (v1 === null) continue; rule.v1 = v1;
       if (x.op === 'between' || x.op === 'notBetween') {
-        const v2 = cfOperand(x.v2 === undefined ? 0 : x.v2); if (v2 === null) continue; rule.v2 = v2;
+        const v2 = cfOperand(x.v2 === undefined ? 0 : x.v2, today); if (v2 === null) continue; rule.v2 = v2;
         if (typeof v1 === 'number' && typeof v2 === 'number' && v1 > v2) { rule.v1 = v2; rule.v2 = v1; }
       }
       rule.style = CF_STYLES[x.style] ? x.style : 'lightred';
@@ -334,7 +339,7 @@ export class Sheet {
     if (opts.hiddenCols) for (const c of opts.hiddenCols) this.hiddenCols.add(c | 0);
     if (opts.freeze) this.freeze = { r: opts.freeze.r | 0, c: opts.freeze.c | 0 };
     if (opts.groups) this.groups = normGroups(opts.groups);
-    if (opts.condFmt) this.condFmt = normCondFmt(opts.condFmt);
+    if (opts.condFmt) this.condFmt = normCondFmt(opts.condFmt, this.today);
     if (opts.gridlines === false) this.gridlines = false;
     if (opts.active) this.active = this.clamp(opts.active.r, opts.active.c);
     this.recalc();
@@ -535,7 +540,7 @@ export class Sheet {
     this.hiddenRows = new Set(s.hiddenRows || []); this.hiddenCols = new Set(s.hiddenCols || []);
     this.freeze = s.freeze ? { ...s.freeze } : { r: 0, c: 0 };
     this.groups = s.groups ? normGroups(s.groups) : { rows: [], cols: [] };
-    this.condFmt = s.condFmt ? normCondFmt(s.condFmt) : [];
+    this.condFmt = s.condFmt ? normCondFmt(s.condFmt, this.today) : [];
     this._cfMap = null;
     this.multi = null;
     if (s.active) this.active = this.clamp(s.active.r, s.active.c);
@@ -623,9 +628,11 @@ export class Sheet {
   /* ---------------- commit parsing (what a typed entry becomes) ---------------- */
   /**
    * Classify typed text. Returns {kind:'formula'|'value', ...} or {kind:'fix', fixed} / {kind:'bad'}
-   * for a formula that needs the autocorrect ladder. Pure; does not touch the sheet.
+   * for a formula that needs the autocorrect ladder. Pure; does not touch the sheet. `today` is the
+   * sheet's TODAY() clock (a function returning the serial), which a year-less date (1/31, Jan 5)
+   * takes its year from; without it, the real clock's.
    */
-  static classifyInput(text, cell) {
+  static classifyInput(text, cell, today) {
     let buf = String(text).trim();
     if (buf === '') return { kind: 'empty' };
     if (buf[0] === '=') {
@@ -639,8 +646,9 @@ export class Sheet {
     const fmt = (cell && cell.fmtStyle) || 'general';
     const pctIn = n => fmt === 'percent' ? n / 100 : n;                                   // automatic percent entry: a bare number into a percent cell is scaled
     const typedDec = b => Math.min(6, (b.split('.')[1] || '').replace(/\D/g, '').length);   // Excel keeps the typed precision (1,234.56 → 2 places)
-    // number grammar mirrors the formula tokenizer: '1.', '.5', '.5e2', '1.e2' are numbers; '.', '+', '-' are not
-    if (/^[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?$/.test(buf)) return { kind: 'value', value: pctIn(parseFloat(buf)) };
+    // number grammar mirrors the formula tokenizer: '1.', '.5', '.5e2', '1.e2' are numbers; '.', '+', '-' are not;
+    // past Excel's largest number (9.99999999999999E+307) the entry is text, as Excel keeps 1e400
+    if (/^[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?$/.test(buf) && isFinite(parseFloat(buf))) return { kind: 'value', value: pctIn(parseFloat(buf)) };
     if (/^[-+]?\d{1,3}(,\d{3})+(\.\d*)?$/.test(buf)) return { kind: 'value', value: pctIn(parseFloat(buf.replace(/,/g, ''))), fmtStyle: fmt === 'general' ? 'comma' : undefined, decimals: fmt === 'general' ? typedDec(buf) : undefined };
     if (/^[-+]?(?:\d+\.?\d*|\.\d+)%$/.test(buf)) return { kind: 'value', value: parseFloat(buf) / 100, fmtStyle: 'percent', decimals: typedDec(buf) };
     if (/^\$-?(?:\d[\d,]*\.?\d*|\.\d+)$/.test(buf)) return { kind: 'value', value: parseFloat(buf.replace(/[$,]/g, '')), fmtStyle: 'currency', decimals: /\./.test(buf) ? 2 : 0 };
@@ -648,6 +656,10 @@ export class Sheet {
     const up = buf.toUpperCase();
     if (up === 'TRUE' || up === 'FALSE') return { kind: 'value', value: up === 'TRUE' };
     if (isErrVal(up)) return { kind: 'value', value: up };
+    // a date or a time (en-US shapes: 1/31/2026, 1/31, 31-Jan-26, Jan 2026, 12:00 …) is its serial, as Excel
+    // stores it, dressed in the format Excel gives the shape typed; a cell that already has a number format keeps it
+    const dv = dateTextValue(buf, today ? () => serialToDate(today()).getUTCFullYear() : undefined);
+    if (dv) return fmt === 'general' ? { kind: 'value', value: dv.serial, fmtStyle: 'custom', numFmt: dv.code } : { kind: 'value', value: dv.serial };
     return { kind: 'value', value: buf, txt: true };
   }
 
@@ -657,7 +669,7 @@ export class Sheet {
    */
   commitInput(text, r, c, { pushUndo = true } = {}) {
     const cell = this.get(r, c);
-    const cls = Sheet.classifyInput(text, cell);
+    const cls = Sheet.classifyInput(text, cell, this.today);
     if (cls.kind === 'fix' || cls.kind === 'bad' || cls.kind === 'empty') return cls;   // an empty entry changes nothing: no undo frame, redo kept
     if (pushUndo) this.pushUndo();
     const target = this.ensure(r, c);
@@ -676,10 +688,14 @@ export class Sheet {
     target.formula = null; target.value = cls.value; target.txt = !!cls.txt;
     if (cls.fmtStyle) target.fmtStyle = cls.fmtStyle;
     if (cls.decimals !== undefined) target.decimals = cls.decimals;
+    if (cls.numFmt) {   // a typed date: its format, and the column widens to show it when its width was never set by hand, as Excel's does
+      target.numFmt = cls.numFmt;
+      if (!this.colSet[c]) { const need = this.neededWidth(c, r, r); if (need > this.colW[c]) this.colW[c] = need; }
+    }
   }
   /** Ctrl+Enter: the same text into every selected cell; formulas translate relative to the anchor. */
   commitInputAll(text, ar, ac) {
-    const cls = Sheet.classifyInput(text, this.get(ar, ac));
+    const cls = Sheet.classifyInput(text, this.get(ar, ac), this.today);
     if (cls.kind === 'fix' || cls.kind === 'bad' || cls.kind === 'empty') return cls;
     this.pushUndo();
     this.eachSel((cell, rr, cc) => {
@@ -695,8 +711,8 @@ export class Sheet {
   /* ---------------- clearing ---------------- */
   deleteContents() { this.pushUndo(); this.eachSel(c => { c.value = null; c.formula = null; c.txt = false; }); this.commit('edit'); }
   /** Clear All / Clear Formats take the selected cells out of every conditional-formatting rule too (Excel: "removes all conditional formats and all other cell formats for selected cells"). */
-  clearAll() { this.pushUndo(); this.eachSel(c => { for (const k in c) delete c[k]; Object.assign(c, blankCell()); }); this.condFmt = cfWithout(this.condFmt, this.selRects()) || this.condFmt; this.commit('edit'); }
-  clearFormats() { this.pushUndo(); this.eachSel(c => { const v = c.value, f = c.formula, t = c.txt; for (const k in c) delete c[k]; Object.assign(c, blankCell()); c.value = v; c.formula = f; c.txt = t; }); this.condFmt = cfWithout(this.condFmt, this.selRects()) || this.condFmt; this.commit('format'); }
+  clearAll() { this.pushUndo(); this.eachSel(c => { for (const k in c) delete c[k]; Object.assign(c, blankCell()); }); this.condFmt = cfWithout(this.condFmt, this.selRects(), wrapOf(this)) || this.condFmt; this.commit('edit'); }
+  clearFormats() { this.pushUndo(); this.eachSel(c => { const v = c.value, f = c.formula, t = c.txt; for (const k in c) delete c[k]; Object.assign(c, blankCell()); c.value = v; c.formula = f; c.txt = t; }); this.condFmt = cfWithout(this.condFmt, this.selRects(), wrapOf(this)) || this.condFmt; this.commit('format'); }
   clearContents() { this.pushUndo(); this.eachSel(c => { c.value = null; c.formula = null; }); this.commit('edit'); }
 
   /* ---------------- formatting ---------------- */
@@ -760,7 +776,7 @@ export class Sheet {
   addCondFmt(rule) {
     const { id, ...spec } = rule || {};   // the sheet mints every id itself, so two rules can never share one
     const range = spec.range ? spec.range : rangesText(this.selRects());
-    const [norm] = normCondFmt([{ ...spec, range }]);
+    const [norm] = normCondFmt([{ ...spec, range }], this.today);
     if (!norm) return null;
     this.pushUndo(); this.condFmt = [norm, ...this.condFmt]; this.commit('format');
     return norm;
@@ -777,7 +793,7 @@ export class Sheet {
   /** Clear Rules: 'sheet' drops every rule; 'selection' takes the selected cells out of every rule's Applies-to (a rule with no cell left goes), as Excel trims them. False when nothing changed. */
   clearCondFmt(scope = 'selection') {
     if (!this.condFmt.length) return false;
-    const next = scope === 'sheet' ? [] : cfWithout(this.condFmt, this.selRects());
+    const next = scope === 'sheet' ? [] : cfWithout(this.condFmt, this.selRects(), wrapOf(this));
     if (!next) return false;
     this.pushUndo(); this.condFmt = next; this.commit('format'); return true;
   }
@@ -795,9 +811,10 @@ export class Sheet {
     const numAt = (r, c) => { const cell = this.cells[refKey(r, c)]; return cell && typeof cell.value === 'number' ? cell.value : null; };
     const clampRect = rg => ({ r1: Math.max(1, rg.r1), c1: Math.max(1, rg.c1), r2: Math.min(this.rows, rg.r2), c2: Math.min(this.cols, rg.c2) });
     // a rule's formulas are parsed once and evaluated per cell with the offset from the first area's
-    // top-left, where they are written — what translating the text per cell would read
+    // top-left, where they are written — what translating the text per cell would read; a relative
+    // reference walked past the sheet edge runs round to the far edge, as Excel's do (translateFormula's wrap)
     const astOf = f => { try { return parseFormula(f); } catch (e) { return null; } };
-    const evalAt = (ast, r, c, a) => { if (!ast) return '#NAME?'; try { return evalFormula(ast, this.evalCtx({ cell: { r, c }, offset: { dr: r - a.r, dc: c - a.c } })); } catch (e) { return '#NAME?'; } };
+    const evalAt = (ast, r, c, a) => { if (!ast) return '#NAME?'; try { return evalFormula(ast, this.evalCtx({ cell: { r, c }, offset: { dr: r - a.r, dc: c - a.c, wrap: true } })); } catch (e) { return '#NAME?'; } };
     for (const rule of this.condFmt) {
       const all = cfRects(rule); if (!all.length) continue;
       const a = { r: all[0].r1, c: all[0].c1 };
@@ -891,7 +908,7 @@ export class Sheet {
       if (!kept.length) continue;
       const a = { r: rects[0].r1, c: rects[0].c1 };
       const next = { ...r, range: rangesText(kept) };
-      cfMapFormulas(next, f => adjustFormulaStructure(pre.r === a.r && pre.c === a.c ? f : translateFormula(f, pre.r - a.r, pre.c - a.c), axis, at, delta));
+      cfMapFormulas(next, f => adjustFormulaStructure(pre.r === a.r && pre.c === a.c ? f : translateFormula(f, pre.r - a.r, pre.c - a.c, wrapOf(this)), axis, at, delta));
       out.push(next);
     }
     return out;
@@ -905,20 +922,20 @@ export class Sheet {
    * its destination for one tile; the transpose paste flips it.
    */
   cfPasteRules(cb, dest, carry, tiles) {
-    const kept = cfWithout(this.condFmt, [dest]) || this.condFmt;
+    const kept = cfWithout(this.condFmt, [dest], wrapOf(this)) || this.condFmt;
     if (!carry) { this.condFmt = kept; return; }
     const src = cb.src || this; const added = [];
     for (const rule of src.condFmt) {
       const rects = cfRects(rule); const hit = rects.map(rg => intersectRect(rg, cb.rect)).filter(Boolean);
       if (!hit.length) continue;
       const a = { r: rects[0].r1, c: rects[0].c1 };
-      const placed = tiles.flatMap(place => hit.map(place));
-      const t0 = placed[0];
-      const { id, ...spec } = rule; const next = { ...spec, range: rangesText(mergeRects(placed)) };
-      cfMapFormulas(next, f => translateFormula(f, t0.r1 - a.r, t0.c1 - a.c));   // written for the first pasted cell as the copy there reads; every other pasted cell reads its own offset from it
+      const merged = mergeRects(tiles.flatMap(place => hit.map(place)));   // the tidy Applies-to; its first cell is where the new rule's formulas are written
+      const t0 = merged[0];
+      const { id, ...spec } = rule; const next = { ...spec, range: rangesText(merged) };
+      cfMapFormulas(next, f => translateFormula(f, t0.r1 - a.r, t0.c1 - a.c, wrapOf(this)));   // written for that cell as the copy there reads (a pasted cell's formula is the source's shifted by its move); every other pasted cell reads its own offset from it
       added.push(next);
     }
-    this.condFmt = [...normCondFmt(added), ...kept];
+    this.condFmt = [...normCondFmt(added, this.today), ...kept];
   }
   /**
    * A cut pasted at (r0, c0): the part of every rule inside the cut block follows the cells — a
@@ -937,13 +954,13 @@ export class Sheet {
       const rest = subtractRects(rects, [cb.rect]);
       const a = { r: rects[0].r1, c: rects[0].c1 }, x0 = { r: hit[0].r1, c: hit[0].c1 };
       const mv = { ...rule, range: rangesText(hit.map(rg => shiftRect(rg, dr, dc))), _keep: true };
-      cfMapFormulas(mv, f => relocateRefs(translateFormula(f, x0.r - a.r, x0.c - a.c), cb.rect, dr, dc));
-      if (rest.length) { stay.push(cfWithRects(rule, rest)); delete mv.id; }
+      cfMapFormulas(mv, f => relocateRefs(translateFormula(f, x0.r - a.r, x0.c - a.c, wrapOf(src)), cb.rect, dr, dc));
+      if (rest.length) { stay.push(cfWithRects(rule, rest, wrapOf(src))); delete mv.id; }
       if (from) { delete mv.id; moved.push(mv); } else stay.push(mv);
     }
-    const settle = list => (cfWithout(list, [dest]) || list).map(r => { const { _keep, ...rule } = r; return rule; });
-    if (from) { from.condFmt = stay; this.condFmt = [...normCondFmt(moved), ...settle(this.condFmt)]; }
-    else this.condFmt = normCondFmt(settle(stay));
+    const settle = list => (cfWithout(list, [dest], wrapOf(this)) || list).map(r => { const { _keep, ...rule } = r; return rule; });
+    if (from) { from.condFmt = stay; this.condFmt = [...normCondFmt(moved, this.today), ...settle(this.condFmt)]; }
+    else this.condFmt = normCondFmt(settle(stay), this.today);
   }
   /** A fill from the line `src` over `dest`: the filled cells lose the rules they had and take those of the source line, extended over them (a fill copies conditional formats); the rule's formulas keep their base. */
   cfFillRules(src, dest, vertical) {
@@ -955,7 +972,7 @@ export class Sheet {
       if (!grown.length && rest.length === rects.length && rest.every((x, i) => x === rects[i])) return rule;
       changed = true;
       const next = mergeRects([...rest, ...grown]);
-      return next.length ? cfWithRects(rule, next) : null;
+      return next.length ? cfWithRects(rule, next, wrapOf(this)) : null;
     }).filter(Boolean);
     if (changed) this.condFmt = out;
   }

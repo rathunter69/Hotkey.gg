@@ -144,7 +144,11 @@ table('dates are serial numbers', [
   // date and time text coerces to its serial, as in arithmetic and VALUE (en-US shapes); a date with no year takes the current one (TODAY() is 45000: 2023)
   ['="1/31/2026"+0', 46053], ['=VALUE("1/31/2026")', 46053], ['=YEAR("1/31/2026")', 2026], ['=VALUE("2026-01-31")', 46053], ['=VALUE("31-Jan-26")', 46053], ['=VALUE("Jan 31, 2026")', 46053], ['=VALUE("31 January 2026")', 46053],
   ['=VALUE("1/31/26")', 46053], ['=YEAR("1/1/29")', 2029], ['=YEAR("1/1/30")', 1930], ['=VALUE("12:00")', 0.5], ['=VALUE("12:30:15 PM")', 0.5210069444444444], ['=VALUE("1/31/2026 12:30")', 46053.520833333336], ['=VALUE("24:00")', 1],
-  ['=MONTH("Jan"&1)', 1], ['=YEAR("Jan 5")', 2023], ['=VALUE("2/29/1900")', 60], ['=VALUE("1/1/1900")', 1], ['=VALUE("2/30/2026")', '#VALUE!'], ['=VALUE("13/1/2026")', '#VALUE!'], ['="1/2"+0', '#VALUE!'], ['="abc"+0', '#VALUE!'],
+  ['=MONTH("Jan"&1)', 1], ['=YEAR("Jan 5")', 2023], ['=VALUE("2/29/1900")', 60], ['=VALUE("1/1/1900")', 1], ['=VALUE("2/30/2026")', '#VALUE!'], ['=VALUE("13/1/2026")', '#VALUE!'], ['="abc"+0', '#VALUE!'],
+  // the year-less m/d shape (the VALUE("1/2") gotcha: 2 January of this year), m/yyyy, one-digit years, yyyy/m/d, elapsed hours, fractional seconds, Sept, a month-year read from an impossible day, a typed fraction
+  ['="1/2"+0', 44928], ['=VALUE("1/2")', 44928], ['=VALUE("1/31")', 44957], ['="5-3"+0', 45049], ['="1-5"+0', 44931], ['=TEXT("1/2","mmm d")', 'Jan 2'], ['=TEXT("12/31","d-mmm")', '31-Dec'], ['=VALUE("1/2026")', 46023], ['="1-2026"+0', 46023],
+  ['="1/2/3"+0', 37623], ['=VALUE("1/2/26")', 46024], ['="2026/1/31"+0', 46053], ['="100:00"+0', 100 / 24], ['=VALUE("9999:59:59")', (9999 * 3600 + 59 * 60 + 59) / 86400], ['="12:00:30.5"+0', (12 * 3600 + 30.5) / 86400], ['=VALUE("12:00:60")', '#VALUE!'],
+  ['="Sept 5"+0', 45174], ['=VALUE("5 Sept 2026")', 46270], ['="Jan-32"+0', 11689], ['=YEAR("Feb 29")', 2029], ['=VALUE("Feb 30")', 10990], ['="3 3/8"+0', 3.375], ['=VALUE("0 1/2")', 0.5], ['=VALUE("-1 1/4")', -1.25], ['=VALUE("3 3/0")', '#VALUE!'], ['=VALUE("2/30")', '#VALUE!'],
   ['=EOMONTH(45000,0)', 45016], ['=EOMONTH(45000,1)', 45046], ['=EDATE(45000,1)', 45031], ['=EDATE(DATE(2024,1,31),1)', 45351], ['=YEARFRAC(DATE(2024,1,1),DATE(2024,7,1))', 0.5], ['=YEARFRAC(DATE(2024,1,31),DATE(2024,3,31))', 60 / 360],
   // WEEKDAY return types 11–17 start the week on Monday…Sunday; 4–10 are #NUM!
   ['=WEEKDAY(45000,11)', 3], ['=WEEKDAY(45000,12)', 2], ['=WEEKDAY(45000,13)', 1], ['=WEEKDAY(45000,16)', 5], ['=WEEKDAY(45000,17)', 4], ['=WEEKDAY(45000,3)', 2], ['=WEEKDAY(45004,2)', 7], ['=WEEKDAY(45004,17)', 1], ['=WEEKDAY(45000,4)', '#NUM!'], ['=WEEKDAY(45000,0)', '#NUM!'], ['=WEEKDAY(45000,18)', '#NUM!'],
@@ -288,4 +292,21 @@ test('autocorrect ladder: ok / fix / bad', () => {
 test('parseFormula builds the expected tree shape', () => {
   const ast = parseFormula('=-2^2');
   assert.equal(ast.k, 'bin'); assert.equal(ast.op, '^'); assert.equal(ast.l.k, 'un');
+});
+
+test('normalizeFormula keeps a sheet name\'s spelling: only the reference after ! is upper-cased (=Sheet2!E2, never =ShEET2!E2)', () => {
+  assert.equal(normalizeFormula('=Sheet2!E2'), '=Sheet2!E2'); assert.equal(normalizeFormula('=sheet2!e2'), '=sheet2!E2'); assert.equal(normalizeFormula('=Data2!A1'), '=Data2!A1'); assert.equal(normalizeFormula('=SUM(Sheet12!a1:a3)'), '=SUM(Sheet12!A1:A3)');
+  assert.equal(normalizeFormula("='FY24 plan'!b2"), "='FY24 plan'!B2"); assert.equal(normalizeFormula('=wk37!B4'), '=wk37!B4'); assert.equal(normalizeFormula('=Costs!b4*2'), '=Costs!B4*2'); assert.equal(normalizeFormula('=Sheet2!E2>5'), '=Sheet2!E2>5');
+  assert.equal(normalizeFormula('=a1+sum(b2:c3)'), '=A1+SUM(B2:C3)'); assert.equal(normalizeFormula('=$a$1+a$2+$a3'), '=$A$1+A$2+$A3'); assert.equal(normalizeFormula('=log10(aa1)'), '=LOG10(AA1)'); assert.equal(normalizeFormula('="a1"&a1'), '="a1"&A1'); assert.equal(normalizeFormula('=a01'), '=A1');
+  assert.equal(autocorrectFormula('=Sheet2!e2').buf, '=Sheet2!E2'); assert.equal(autocorrectFormula('=sum(Sheet2!e2:e4').fixed, '=SUM(Sheet2!E2:E4)');
+});
+
+test('COUNT and the *IF criteria read date and time text as serials, as arithmetic and VALUE do (Excel\'s COUNT and COUNTIFS documentation)', () => {
+  const c = { A1: 46053, A2: 46000, A3: 47000, T1: '1/31/2026', M2: 1, M3: 2, M4: 3, M5: 4, M6: 5, M7: 6, N2: 40664, N3: 40665, N4: 40666, N5: 40667, N6: 40668, N7: 40669 };
+  const ev2 = f => evalFormula(f, { raw: k => (k in c ? c[k] : null), rows: 20, cols: 30, today: () => 45000 });
+  assert.equal(ev2('=COUNT("12:00")'), 1); assert.equal(ev2('=COUNT("1/31/2026")'), 1); assert.equal(ev2('=COUNT("5")'), 1); assert.equal(ev2('=COUNT("abc")'), 0); assert.equal(ev2('=COUNT("1/31/2026","x",3)'), 2);
+  assert.equal(ev2('=COUNTIF(A1:A3,">1/15/2026")'), 2); assert.equal(ev2('=COUNTIF(A1:A3,">"&"1/15/2026")'), 2); assert.equal(ev2('=SUMIF(A1:A3,"<1/15/2026")'), 46000); assert.equal(ev2('=COUNTIF(A1,"1/31/2026")'), 1); assert.equal(ev2('=AVERAGEIF(A1:A3,">1/15/2026")'), 46526.5);
+  assert.equal(ev2('=COUNTIFS(M2:M7,"<5",N2:N7,"<5/3/2011")'), 2);   // Microsoft's COUNTIFS example 2
+  assert.equal(ev2('=COUNTIF(T1,"1/31/2026")'), 1); assert.equal(ev2('=COUNTIF(T1,46053)'), 1); assert.equal(ev2('=COUNTIF(T1,"<>1/31/2026")'), 0);   // a text cell that reads as the same date matches, as a text "5" matches 5
+  assert.equal(ev2('=COUNTIF(A1:A3,"12:00")'), 0); assert.equal(ev2('=SUMIF(A1:A3,">=1/31/2026")'), 93053);
 });

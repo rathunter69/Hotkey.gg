@@ -162,13 +162,18 @@ test('F7 fractional seconds: ss.00, h:mm:ss.000, [ss].00 and mm:ss.0 show hundre
   const S = new Sheet({ cells: { A1: { value: v } } }); S.goTo(1, 1); assert.equal(S.setCustomFormat('h:mm:ss.00'), true); assert.equal(S.text('A1'), '12:00:36.75');
 });
 
-test('F8 TEXT() reads the bare letters Excel prints as themselves (x, k, bps); date and era letters still need quotes; the box still quotes', () => {
+test('F8 + F10 TEXT() reads the bare letters Excel prints as themselves, in either case (x, k, X, K, A); date and era letters (b, s, g) still need quotes beside digits; the box still quotes', () => {
   const ev = f => evalFormula(f, { raw: () => null, rows: 100, cols: 26 });
   assert.equal(ev('=TEXT(2.5,"0.0x")'), '2.5x'); assert.equal(ev('=TEXT(1234567,"#,##0,k")'), '1,235k'); assert.equal(ev('=TEXT(2.5,"0.0 x")'), '2.5 x');
-  assert.equal(ev('=TEXT(5,"0 kg")'), '#VALUE!'); assert.equal(ev('=TEXT(25,"0 bps")'), '#VALUE!');   // g is an era code, b the Buddhist year: Excel refuses them beside digits
-  assert.equal(F(2.456, '0.0x'), '2.5x'); assert.equal(isValidFormat('0.0X'), false); assert.equal(isValidFormat('0 n'), false);
-  assert.equal(fmtNum(2.456, 'custom', 0, 0, '0.0x'), '2.5x');   // a code stored unquoted by content data renders
-  assert.equal(normalizeCode('0.0x'), '0.0"x"'); assert.equal(normalizeCode('#,##0,k'), '#,##0,"k"');   // the Custom box keeps quoting, as Excel's does
+  assert.equal(ev('=TEXT(2.5,"0.0X")'), '2.5X'); assert.equal(ev('=TEXT(1234567,"#,##0,K")'), '1,235K'); assert.equal(ev('=TEXT(5,"0 A")'), '5 A'); assert.equal(ev('=TEXT(5,"0 K")'), '5 K');
+  assert.equal(ev('=TEXT(1,"A""TODO""")'), 'ATODO');   // SSF's Excel-verified oddities corpus: A"TODO" on 1 is ATODO
+  assert.equal(ev('=TEXT(5,"0 kg")'), '#VALUE!'); assert.equal(ev('=TEXT(25,"0 bps")'), '#VALUE!');   // g is an era code, b the Buddhist year, s the seconds: refused beside digits (LibreOffice and numfmt refuse them too)
+  assert.equal(F(2.456, '0.0x'), '2.5x'); assert.equal(F(2.456, '0.0X'), '2.5X'); assert.equal(F(1, 'A"TODO"'), 'ATODO'); assert.equal(isValidFormat('0 n'), false); assert.equal(isValidFormat('0 N'), false);
+  for (const ch of 'abcdefghijklmnopqrstuvwxyz') assert.equal(isValidFormat('0 ' + ch), isValidFormat('0 ' + ch.toUpperCase()), ch);   // a letter's case never changes the verdict
+  assert.equal(fmtNum(2.456, 'custom', 0, 0, '0.0x'), '2.5x'); assert.equal(fmtNum(2.456, 'custom', 0, 0, '0.0X'), '2.5X');   // a code stored unquoted by content data renders
+  assert.equal(normalizeCode('0.0x'), '0.0"x"'); assert.equal(normalizeCode('#,##0,k'), '#,##0,"k"'); assert.equal(normalizeCode('0.0X'), '0.0"X"'); assert.equal(normalizeCode('0 bps'), '0 "bps"');   // the Custom box keeps quoting, as Excel's does
+  // the box is lenient and TEXT() strict, as Excel's are: what the box stores, TEXT() always reads
+  for (const [v, code] of [[2.5, '0.0x'], [2.5, '0.0X'], [25, '0 bps'], [5, '0 kg'], [1234567, '#,##0,K'], [5, '0 A']]) { const stored = normalizeCode(code); assert.equal(ev('=TEXT(' + v + ',"' + stored.replace(/"/g, '""') + '")'), F(v, stored), code); }
 });
 
 test('F9 + F30 the accounting family: the dash section carries one ? per decimal, never .0; builtinCode writes Excel\'s 42 / 44', () => {
@@ -275,9 +280,11 @@ test('F28 [Color n] is 1–56 and every index paints: a swatch key where the gri
   const s = new Session(new Sheet({ cells: { A1: { value: 5 } } }), { now: () => 0 }); s.run('Ctrl+1 U "[Color 57]0" Enter'); assert.equal(s.dialog, 'numfmt'); assert.equal(s.note, NUMFMT_BAD_NOTE);
 });
 
-test('F29 the section grammar Excel refuses: lone conditions, conditions past the second section, @ beside digits or General, two colours or conditions', () => {
-  for (const code of ['[>10]0', '[Red][>10]0', '[>10]0;[>5]0;[>0]0', '0;0;[>5]0', 'General@', '0@', '@0', '[Red][Blue]0', '[>0][>1]0', '[<0]"neg"']) assert.equal(isValidFormat(code), false, code);
-  for (const code of ['[>10]General', '[Red][>10]General', '[>=1000000]#,##0.0,,"m";[>=1000]#,##0,"k";#,##0', '[<0]"neg";[>10]"big"', '[Red]"ERROR";[Red]"ERROR";"OK"', '0;[<0]0']) assert.equal(isValidFormat(code), true, code);
+test('F29 the section grammar: conditions past the second section, @ beside digits or General, two colours or conditions are refused; a lone conditional section is accepted', () => {
+  // the lone condition is an engine decision, not a documented Excel rule: Excel's box is reported to store [>100]0 as [>100]0;General and numfmt's
+  // Excel-derived corpus renders [<=0]"B"0 alone (see the F1 case) — whoever checks it in Excel, note the result here
+  for (const code of ['[>10]0;[>5]0;[>0]0', '0;0;[>5]0', 'General@', '0@', '@0', '[Red][Blue]0', '[>0][>1]0']) assert.equal(isValidFormat(code), false, code);
+  for (const code of ['[>10]0', '[Red][>10]0', '[<0]"neg"', '[>10]General', '[Red][>10]General', '[>=1000000]#,##0.0,,"m";[>=1000]#,##0,"k";#,##0', '[<0]"neg";[>10]"big"', '[Red]"ERROR";[Red]"ERROR";"OK"', '0;[<0]0']) assert.equal(isValidFormat(code), true, code);
   const s = new Session(new Sheet({ cells: { A1: { value: 5 } } }), { now: () => 0 }); s.run('Ctrl+1 U "General@" Enter'); assert.equal(s.dialog, 'numfmt'); assert.equal(s.note, NUMFMT_BAD_NOTE);
 });
 
@@ -319,13 +326,100 @@ test('F38 the grid\'s General agrees with & and TEXT(…,"General") on the E+nn 
   assert.equal(fmtNum(999999999999999, 'general'), '1E+15'); assert.equal(fmtNum(1 / 3, 'general'), '0.3333333333'); assert.equal(fmtNum(1234.5, 'general'), '1234.5'); assert.equal(fmtNum(0.1 + 0.2, 'general'), '0.3');
 });
 
-test('F40 only a section whose condition catches negatives supplies the sign: [<>0] keeps the minus', () => {
+test('F40 + F11 only a section whose condition catches negatives alone supplies the sign ([<0], [<=-4], [=-5]); [<>0] and [<=0] keep the minus', () => {
   assert.equal(F(-1234.5, '[<>0]0;"zero"'), '-1235'); assert.equal(F(-5, '[<>0]0;"zero"'), '-5'); assert.equal(F(0, '[<>0]0;"zero"'), 'zero'); assert.equal(F(-5, '[<>0]0.00;"-"'), '-5.00');
-  assert.equal(F(-1234.5, '[<0]0;0'), '1235'); assert.equal(F(-1234.5, '[<=0]0;0'), '1235'); assert.equal(F(-1234.5, '[<-100]0;0'), '1235'); assert.equal(F(-1234.5, '[<5]0;0'), '-1235'); assert.equal(F(-1234.5, '[>-5000]0;0'), '-1235');
+  assert.equal(F(-1234.5, '[<0]0;0'), '1235'); assert.equal(F(-1234.5, '[<=0]0;0'), '-1235'); assert.equal(F(-1234.5, '[<-100]0;0'), '1235'); assert.equal(F(-1234.5, '[<5]0;0'), '-1235'); assert.equal(F(-1234.5, '[>-5000]0;0'), '-1235');
+  // numfmt's Excel-derived corpus (conditionals.spec.ts lines 8, 18, 64, 83, 89): <= keeps the sign at 0 and drops it below; = drops it below 0
+  assert.equal(F(-6.3, '[>=100]"A"0;[<=0]"B"0;"C"0'), '-B6'); assert.equal(F(-6.3, '[<=0]"B"0'), '-B6'); assert.equal(F(-5, '[=-5]\\A0;\\B0'), 'A5'); assert.equal(F(-5, '[<-4]\\A0;[=-5]\\B0;\\C0'), 'A5'); assert.equal(F(-5, '[<=-4]\\A0;[=-5]\\B0;\\C0'), 'A5');
+  assert.equal(F(-5, '[=-5]0;0'), '5'); assert.equal(F(-5, '[<=-4]0;0'), '5'); assert.equal(F(-5, '[<=-5]0;0'), '5'); assert.equal(F(-5, '[<=-6]0;0'), '-5'); assert.equal(F(-5, '[=-6]0;0'), '-5'); assert.equal(F(-6.3, '[>=100]"A"0;[<=-100]"B"0;"C"0'), '-C6');
+  const ev = f => evalFormula(f, { raw: () => null, rows: 100, cols: 26 });
+  assert.equal(ev('=TEXT(-6.3,"[>=100]""A""0;[<=0]""B""0;""C""0")'), '-B6'); assert.equal(ev('=TEXT(-1234.5,"[<=0]0;0")'), '-1235'); assert.equal(ev('=TEXT(-5,"[=-5]0;0")'), '5');
+  assert.equal(dispText({ value: -1234.5, fmtStyle: 'custom', numFmt: '[<=0]0;0' }), '-1235');
 });
 
 test('F41 a custom-dressed text value measures as its painted text, so it spills and autofits', () => {
   const S = new Sheet({ cells: { A1: { value: 'n/a', fmtStyle: 'custom', numFmt: '"Site name: "@' }, A2: { value: 'Site name: n/a' } } });
   assert.equal(cellTxtPx(S.cellAt('A1')), cellTxtPx(S.cellAt('A2'))); assert.ok(cellTxtPx(S.cellAt('A1')) > 100);
   S.select('A1'); S.autofitCols(); assert.equal(S.colW[1], S.neededWidth(1)); assert.ok(S.colW[1] > 100);
+});
+
+/* ---- the review's fixes on the parity pass: F1, F4, F9, F12–F15 ---- */
+
+test('F1 a lone conditional section: the values it catches take it, the rest show as General with their sign; two failed conditions still fill with #', () => {
+  assert.equal(F(500, '[>100]0'), '500'); assert.equal(F(50, '[>100]0'), '50'); assert.equal(F(-50, '[>100]0'), '-50'); assert.equal(F(5, '[>10]General'), '5'); assert.equal(F(1500, '[>=1000]#,##0,"k"'), '2k'); assert.equal(F(999, '[>=1000]#,##0,"k"'), '999');
+  assert.equal(F(5, '[>10]0;General'), '5'); assert.equal(F(-5, '[>10]0;General'), '-5');   // the explicit fallback Excel's box writes reads the same
+  // numfmt's Excel-derived corpus (conditionals.spec.ts lines 17–20, 50, 57): the fallback keeps the sign
+  assert.equal(F(6.3, '[<=0]"B"0'), '6.3'); assert.equal(F(-6.3, '[<=0]"B"0'), '-B6'); assert.equal(F(6.3, '[=6.3]"B"0'), 'B6'); assert.equal(F(-6.3, '[=6.3]"B"0'), '-6.3'); assert.equal(F(-5, '[=-5]\\A0'), 'A5'); assert.equal(F(-5, '[>2]\\A0'), '-5');
+  assert.equal(F(6.3, '[>=100]"A"0;[<=-100]"B"0'), '########'); assert.equal(F(5, '[<0]"neg";[>10]"big"'), '########');
+  assert.equal(normalizeCode('[>100]0'), '[>100]0'); assert.equal(normalizeCode('[>=1000]#,##0,k'), '[>=1000]#,##0,"k"'); assert.equal(normalizeCode('[<0]"neg"'), '[<0]"neg"');
+  const ev = f => evalFormula(f, { raw: () => null, rows: 100, cols: 26 });
+  assert.equal(ev('=TEXT(500,"[>100]0")'), '500'); assert.equal(ev('=TEXT(50,"[>100]0")'), '50'); assert.equal(ev('=TEXT(50,"[>100]General")'), '50'); assert.equal(ev('=TEXT(6.3,"[<=0]""B""0")'), '6.3'); assert.equal(ev('=TEXT(1500,"[>=1000]#,##0,""k""")'), '2k');
+  assert.equal(fmtNum(50, 'custom', 0, 0, '[>100]0'), '50'); assert.equal(fmtNum(5, 'custom', 0, 0, '[>10]General'), '5');
+  for (const [v, code, text] of [[500, '[>100]0', '500'], [50, '[>100]0', '50'], [1500, '[>=1000]#,##0,k', '2k'], [5, '[>10]General', '5']]) {   // the Custom box takes the code (Ctrl+1 › U) and the cell shows it
+    const s = new Session(new Sheet({ cells: { A1: { value: v } } }), { now: () => 0 }); s.run('Ctrl+1 U "' + code + '" Enter');
+    assert.equal(s.dialog, null, code); assert.equal(s.note, '', code); assert.equal(s.sheet.cellAt('A1').numFmt, normalizeCode(code), code); assert.equal(s.sheet.text('A1'), text, code);
+  }
+});
+
+test('F4 fractions come from the whole value\'s continued fraction (Microsoft\'s 123.456: 123 1/2, 123 26/57, 123 57/125); the denominator stops at 7 digits', () => {
+  assert.equal(F(123.456, '# ?/?'), '123 1/2'); assert.equal(F(123.456, '# ??/??'), '123 26/57'); assert.equal(F(123.456, '# ???/???'), '123  57/125');
+  // SSF's Excel-derived corpus (ssf-fraction.spec.ts): the whole value drives the convergents, so 0.3 is 2/7 but 12.3 is 12 1/3
+  assert.equal(F(12.3, '# ?/?'), '12 1/3'); assert.equal(F(1.3, '# ?/?'), '1 1/3'); assert.equal(F(0.3, '# ?/?'), ' 2/7'); assert.equal(F(2.3, '# ?/?'), '2 2/7'); assert.equal(F(-1.2, '# ?/?'), '-1 1/5'); assert.equal(F(-123.456, '# ?/?'), '-123 1/2');
+  assert.equal(F(12.3, '# ??/??'), '12  3/10'); assert.equal(F(-123.456, '# ??/??'), '-123 26/57'); assert.equal(F(-1234.5678, '# ??/??'), '-1234 46/81'); assert.equal(F(1234.567, '# ???/???'), '1234  55/97 '); assert.equal(F(-12345.67891, '# ???/???'), '-12345 573/844');
+  assert.equal(F(-123.456, '??/??'), '-7037/57'); assert.equal(F(-1.2, '??/??'), '- 6/5 '); assert.equal(F(12345.6789, '??/??'), '1000000/81'); assert.equal(F(1, '# ??/16'), '1      '); assert.equal(F(-1.2, '# ?/2'), '-1    ');
+  assert.equal(F(0.123251512342345, '# ??/?????????'), ' 480894/3901729  ');   // 8425007/68356216 would fit nine placeholders: Excel stops at seven digits
+  assert.equal(F(0.1, '# ?/?'), '0    '); assert.equal(F(10.1, '# ?/?'), '10    ');   // no convergent below 1/10 fits one digit, so the slot stays blank (SSF and numfmt agree; not in the corpus)
+  const ev = f => evalFormula(f, { raw: () => null, rows: 100, cols: 26 });
+  assert.equal(ev('=TEXT(12.3,"# ?/?")'), '12 1/3'); assert.equal(ev('=TEXT(123.456,"# ??/??")'), '123 26/57'); assert.equal(dispText({ value: 12.3, fmtStyle: 'custom', numFmt: '# ?/?' }), '12 1/3');
+});
+
+test('F9 time and elapsed codes share the serial range: past 31 Dec 9999 (or beyond any finite count) they fill with #, never 0:00, Infinity or NaN', () => {
+  for (const v of [2958466, 1e9, 1e20, 1e300, 1e307, Number.MAX_VALUE]) for (const code of ['h:mm', '[h]:mm', 'hh:mm:ss AM/PM', '[h]', 's', '[ss]', '[mm]:ss.00']) assert.throws(() => formatValue(v, code), FormatError, `${v} ${code}`);
+  assert.equal(F(2958465.5, '[h]:mm'), '71003172:00'); assert.equal(F(2958465.99, '[h]'), '71003183'); assert.equal(F(2958465.5, 'h:mm'), '12:00');   // the last hours Excel shows
+  assert.equal(fmtNum(1e9, 'custom', 0, 0, 'h:mm'), '########'); assert.equal(fmtNum(1e307, 'custom', 0, 0, '[h]:mm'), '########'); assert.equal(fmtNum(2958466, 'custom', 0, 0, 'h:mm AM/PM'), '########');
+  assert.equal(dispText({ value: 1e307, fmtStyle: 'custom', numFmt: '[h]:mm' }), '########'); assert.equal(dispText({ value: 1e20, fmtStyle: 'custom', numFmt: '[h]' }), '########');
+  const S = new Sheet({ cells: { A1: { value: 1e307 } } }); S.goTo(1, 1); S.setCustomFormat('[h]:mm'); assert.equal(S.text('A1'), '########');
+  const ev = f => evalFormula(f, { raw: () => null, rows: 100, cols: 26 });
+  for (const f of ['=TEXT(1E9,"h:mm")', '=TEXT(1E307,"[h]:mm")', '=TEXT(1E20,"[h]")', '=TEXT(2958466,"hh:mm:ss AM/PM")', '=TEXT(1E307,"s")']) assert.equal(ev(f), '#VALUE!', f);
+  assert.equal(ev('=ISTEXT(TEXT(1E307,"[h]:mm"))'), false); assert.equal(ev('=TEXT(2958465.5,"[h]:mm")'), '71003172:00');
+});
+
+test('F12 a whole number under fraction placeholders: 0 always prints (0 0/0 on 1 is 1 0/1, 0 0/8 on 3 is 3 0/8), # prints nothing (# #/# on 123 is 123), ? pads', () => {
+  // numfmt's Excel-derived corpus (ssf-fraction.spec.ts, "More fraction cases")
+  assert.equal(F(0, '0 0/0'), '0 0/1'); assert.equal(F(1, '0 0/0'), '1 0/1'); assert.equal(F(123, '0 0/0'), '123 0/1'); assert.equal(F(12.345, '0 0/0'), '12 1/3');
+  assert.equal(F(0, '# #/#'), '0'); assert.equal(F(1, '# #/#'), '1'); assert.equal(F(123, '# #/#'), '123'); assert.equal(F(12.345, '# #/#'), '12 1/3');
+  assert.equal(F(0, '? ?/?'), '0    '); assert.equal(F(1, '? ?/?'), '1    '); assert.equal(F(123, '? ?/?'), '123    '); assert.equal(F(12.345, '? ?/?'), '12 1/3');
+  assert.equal(F(0, '0/0'), '0/1'); assert.equal(F(1, '0/0'), '1/1'); assert.equal(F(123, '0/0'), '123/1'); assert.equal(F(12.345, '0/0'), '37/3'); assert.equal(F(0, '#/#'), '0/1'); assert.equal(F(0, '?/?'), '0/1');
+  // a fixed or zero-padded denominator (rule-based, as LibreOffice shows them)
+  assert.equal(F(3, '0 0/8'), '3 0/8'); assert.equal(F(3, '# 0/8'), '3 0/8'); assert.equal(F(2, '# 00/00'), '2 00/01'); assert.equal(F(1, '# ?/?'), '1    '); assert.equal(F(5.001, '# ?/?'), '5    ');
+  const ev = f => evalFormula(f, { raw: () => null, rows: 100, cols: 26 });
+  assert.equal(ev('=TEXT(3,"0 0/8")'), '3 0/8'); assert.equal(ev('=TEXT(123,"# #/#")'), '123'); assert.equal(ev('=TEXT(1,"0 0/0")'), '1 0/1');
+});
+
+test('F13 spaces around the bar keep a fraction a fraction (# ?? / ??): the numerator and denominator sit either side of them', () => {
+  assert.equal(F(0.5, '# ?? / ??'), '  1 / 2 '); assert.equal(F(1.5, '# ?? / ??'), '1  1 / 2 '); assert.equal(F(3, '# ?? / ??'), '3        '); assert.equal(F(0, '# ?? / ??'), '0        ');
+  assert.equal(F(0.123251512342345, '# ?? / ?????????'), ' 480894 / 3901729  ');   // SSF's Excel-derived corpus
+  assert.equal(compileFormat('# ?? / ??').sections[0].kind, 'fraction'); assert.equal(F(46053, 'm / d / yyyy'), '1 / 31 / 2026'); assert.equal(F(12, '0" / "0'), '1 / 2');   // a date's bar and a quoted one are still separators
+  assert.equal(stepDecimals('# ?? / ??', 1), '# ?? / ??'); assert.equal(codeDecimals('# ?? / ??'), 0);
+  const ev = f => evalFormula(f, { raw: () => null, rows: 100, cols: 26 });
+  assert.equal(ev('=TEXT(1.5,"# ?? / ??")'), '1  1 / 2 '); assert.equal(dispText({ value: 1.5, fmtStyle: 'custom', numFmt: '# ?? / ??' }), '1  1 / 2 ');
+  const S = new Sheet({ cells: { A1: { value: 1.5 } } }); S.goTo(1, 1); assert.equal(S.setCustomFormat('# ?? / ??'), true); assert.equal(S.text('A1'), '1  1 / 2 ');
+});
+
+test('F14 Increase Decimal on a code with a quoted prefix steps its placeholders ("Qty: "??? → "Qty: "???.0); only the accounting dash after a * fill gains a ?', () => {
+  assert.equal(stepDecimals('"Qty: "???', 1), '"Qty: "???.0'); assert.equal(stepDecimals('"Qty: "???.0', -1), '"Qty: "???'); assert.equal(stepDecimals('"Qty: "???', -1), '"Qty: "???'); assert.equal(stepDecimals('"-"??', 1), '"-"??.0');
+  assert.equal(stepDecimals('_($* "-"??_)', 1), '_($* "-"???_)'); assert.equal(stepDecimals('_($* "-"??_)', -1), '_($* "-"?_)'); assert.equal(stepDecimals('_(* "-"_)', 1), '_(* "-"?_)');
+  assert.equal(codeDecimals('"Qty: "???.0'), 1); assert.equal(F(5, '"Qty: "???.0'), 'Qty:   5.0');
+  const s = new Session(new Sheet({ cells: { A1: { value: 5 } } }), { now: () => 0 }); s.sheet.select('A1'); s.sheet.setCustomFormat('"Qty: "???');
+  assert.equal(s.sheet.text('A1'), 'Qty:   5'); s.run('Alt H 0'); assert.equal(s.sheet.cellAt('A1').numFmt, '"Qty: "???.0'); assert.equal(s.sheet.cellAt('A1').decimals, 1); assert.equal(s.sheet.text('A1'), 'Qty:   5.0');
+  s.run('Alt H 0'); assert.equal(s.sheet.text('A1'), 'Qty:   5.00'); s.run('Alt H 9 Alt H 9'); assert.equal(s.sheet.cellAt('A1').numFmt, '"Qty: "???'); assert.equal(s.sheet.text('A1'), 'Qty:   5');
+});
+
+test('F15 a number under a text-only code shows as General, none of the section\'s literals; text still takes them', () => {
+  assert.equal(F(5, '@@'), '5'); assert.equal(F(-1, '@@'), '-1'); assert.equal(F(0, '@@'), '0'); assert.equal(F('sheetjs', '@@'), 'sheetjssheetjs');   // SSF's Excel-verified oddities corpus
+  assert.equal(F(5, '"Site: "@'), '5'); assert.equal(F(5, '"a"@"b"'), '5'); assert.equal(F('x', '"Site: "@'), 'Site: x'); assert.equal(F(1234.5, '@'), '1234.5'); assert.equal(F(5, '@'), '5');
+  assert.equal(F(5, '0;"Site: "@'), '5'); assert.equal(F('x', '0;"Site: "@'), 'Site: x'); assert.deepEqual(formatValue(5, '[Red]@'), { text: '5', color: 'red' });
+  assert.equal(dispText({ value: 5, fmtStyle: 'custom', numFmt: '"Site: "@' }), '5'); assert.equal(dispText({ value: 'x', fmtStyle: 'custom', numFmt: '"Site: "@' }), 'Site: x'); assert.equal(dispText({ value: 5, fmtStyle: 'custom', numFmt: '@@' }), '5');
+  const ev = (f, cells = {}) => evalFormula(f, { raw: k => cells[k] === undefined ? null : cells[k], rows: 100, cols: 26 });
+  assert.equal(ev('=TEXT(5,"@@")'), '5'); assert.equal(ev('=TEXT(-1,"@@")'), '-1'); assert.equal(ev('=TEXT(5,"""a""@""b""")'), '5'); assert.equal(ev('=TEXT(A1,"@@")', { A1: 'apple' }), 'appleapple'); assert.equal(ev('=TEXT(A1,"""Site: ""@")', { A1: 'x' }), 'Site: x');
 });

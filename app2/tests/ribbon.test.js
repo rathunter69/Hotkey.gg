@@ -3,8 +3,10 @@
 // anchored dropdown opens inside the workspace frame, flipping to its button's right edge near the edge.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { bigLabelLines, dropLeft } from '../ui/ribbon-view.js';
+import { bigLabelLines, dropLeft, RibbonView } from '../ui/ribbon-view.js';
 import { RIBBON_LAYOUT, RIBBON_COMMANDS, MENU_META, UNIMPLEMENTED_BY_ID } from '../ui/ribbon-commands.js';
+import { Session } from '../engine/keyboard.js';
+import { Sheet } from '../engine/sheet.js';
 
 test('a short label or a single word stays on one line', () => {
   assert.deepEqual(bigLabelLines('Normal'), ['Normal']);
@@ -55,4 +57,21 @@ test('near the frame edge a dropdown right-aligns to its button instead of hangi
   assert.ok(dropLeft(1065, 1196, 244, 33, 1237) + 244 <= 1237);
   assert.equal(dropLeft(1200, 1260, 244, 33, 1237), 993);        // a button past the edge: the frame bounds it
   assert.equal(dropLeft(40, 80, 300, 33, 250), 33);              // wider than the room: pinned to the left edge
+});
+
+test('the Rules Manager describes a preset with its value as Excel prints it: text in quotes, TRUE / FALSE, a number or a =formula as stored', () => {
+  assert.equal(RibbonView.cfValueText('North'), '"North"'); assert.equal(RibbonView.cfValueText(true), 'TRUE'); assert.equal(RibbonView.cfValueText(false), 'FALSE');
+  assert.equal(RibbonView.cfValueText(30), '30'); assert.equal(RibbonView.cfValueText(0.12), '0.12'); assert.equal(RibbonView.cfValueText('=$C$2'), '=$C$2');
+  assert.equal(RibbonView.cfRuleDesc({ kind: 'cellValue', op: '=', v1: 'North' }), 'Cell Value equal to "North"');
+  assert.equal(RibbonView.cfRuleDesc({ kind: 'cellValue', op: '>', v1: true }), 'Cell Value greater than TRUE');
+  assert.equal(RibbonView.cfRuleDesc({ kind: 'cellValue', op: '<', v1: '=$C$2' }), 'Cell Value less than =$C$2');
+  assert.equal(RibbonView.cfRuleDesc({ kind: 'cellValue', op: 'between', v1: 30, v2: 80 }), 'Cell Value between 30 and 80');
+  assert.equal(RibbonView.cfRuleDesc({ kind: 'cellValue', op: 'notBetween', v1: 'Apple', v2: 'Pear' }), 'Cell Value not between "Apple" and "Pear"');
+  assert.equal(RibbonView.cfRuleDesc({ kind: 'formula', formula: '=$B2<$C2' }), 'Formula: =$B2<$C2');
+  assert.equal(RibbonView.cfRuleDesc({ kind: 'dataBar' }), 'Data Bar'); assert.equal(RibbonView.cfRuleDesc({ kind: 'colorScale' }), 'Graded Color Scale');
+  // the manager's rows carry the same text, escaped, from the rules the card stored
+  const s = new Session(new Sheet({ cells: { A2: { value: 'North' }, A3: { value: 'South' } } }), { now: () => 0 }); s.sheet.select('A2:A3');
+  s.run('Alt H L H E "North" Enter'); s.run('Alt H L H B "Apple" Tab "Pear" Enter'); s.run('Alt H L R');
+  const html = RibbonView.prototype.condRulesHtml.call({ session: s });
+  assert.ok(html.includes('Cell Value equal to &quot;North&quot;') && html.includes('Cell Value between &quot;Apple&quot; and &quot;Pear&quot;'), html);
 });

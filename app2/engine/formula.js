@@ -278,6 +278,8 @@ const RE_PAREN_NEG = /^\s*\(\s*\$?\s*(?:\d{1,3}(?:,\d{3})+|\d+)?(?:\.\d*)?\s*\)\
 export function textToNumber(str) {
   const t = String(str);
   if (!/\d/.test(t)) return null;
+  const fm = /^\s*([-+]?)(\d+)\s+(\d{1,3})\/(\d{1,3})\s*$/.exec(t);   // a typed fraction: "3 3/8" is 3.375 (a bare "3/8" is a date, as Excel reads it)
+  if (fm && +fm[4] > 0) return (fm[1] === '-' ? -1 : 1) * (+fm[2] + +fm[3] / +fm[4]);
   if (RE_PAREN_NEG.test(t)) { const n = parseFloat(t.replace(/[\s()$,]/g, '')); return isNaN(n) ? null : -n; }
   if (!RE_NUMERIC_TEXT.test(t)) return null;
   let u = t.replace(/[\s$,]/g, ''), pct = false;
@@ -289,13 +291,13 @@ export function textToNumber(str) {
 }
 
 
-/* ---- date and time text, as Excel (en-US) recognises it: 1/31/2026, 1/31/26, 2026-01-31, 31-Jan-26, 31 Jan 2026, Jan 31, 2026, Jan 31, 12:00, 12:00:30 PM and a date followed by a time ---- */
+/* ---- date and time text, as Excel (en-US) recognises it: 1/31/2026, 1/31/26, 1/2/3, 1/31 and 5-3 (this year), 1/2026 (the 1st), 2026-01-31, 2026/1/31, 31-Jan-26, 31 Jan 2026, Jan 31, 2026, Jan 31, Sept 5, Jan-32 (the year, when the day is impossible), 12:00, 12:00:30.5 PM, 100:00 (elapsed hours) and a date followed by a time ---- */
 const MONTH_NAMES = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
-const RE_MDY = /^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/, RE_YMD = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
+const RE_MDY = /^(\d{1,2})\/(\d{1,2})\/(\d{1,4})$/, RE_MD = /^(\d{1,2})[/-](\d{1,2})$/, RE_MY = /^(\d{1,2})[/-](\d{4})$/, RE_YMD = /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/;
 const RE_DMON = /^(\d{1,2})[- ]([a-z]{3,9})(?:[- ,]+(\d{2}|\d{4}))?$/i, RE_MOND = /^([a-z]{3,9})[- ]?(\d{1,2})(?:(?:,\s*|[- ])(\d{2}|\d{4}))?$/i, RE_MONY = /^([a-z]{3,9})[- ](\d{4})$/i;
-const RE_TIME = /^(\d{1,2}):(\d{2})(?::(\d{2}))?(?:\s*([ap])\.?m?\.?)?$/i;
-const monthOf = name => { const i = MONTH_NAMES.findIndex(m => m.startsWith(name.toLowerCase())); return i >= 0 && (name.length >= 3 && (name.length === 3 || MONTH_NAMES[i] === name.toLowerCase())) ? i + 1 : 0; };
-const yearOf = y => y === undefined ? null : y.length === 4 ? +y : +y < 30 ? 2000 + +y : 1900 + +y;   // two-digit years: 00–29 → 2000s
+const RE_TIME = /^(\d{1,4}):(\d{2})(?::(\d{2}(?:\.\d+)?))?(?:\s*([ap])\.?m?\.?)?$/i;   // up to 9999:59:59 typed elapsed, seconds with a fraction
+const monthOf = name => { const n = name.toLowerCase(); if (n === 'sept') return 9; const i = MONTH_NAMES.findIndex(m => m.startsWith(n)); return i >= 0 && n.length >= 3 && (n.length === 3 || MONTH_NAMES[i] === n) ? i + 1 : 0; };
+const yearOf = y => y === undefined ? null : y.length >= 3 ? +y : +y < 30 ? 2000 + +y : 1900 + +y;   // one- and two-digit years: 0–29 → 2000s, 30–99 → 1900s
 const serialOf = (y, m, d) => {   // Excel's 1900 system (the phantom 29 Feb 1900 included); null when the calendar has no such day
   if (m < 1 || m > 12 || d < 1 || y < 1900 || y > 9999) return null;
   if (y === 1900 && m === 2 && d === 29) return 60;
@@ -306,27 +308,44 @@ const serialOf = (y, m, d) => {   // Excel's 1900 system (the phantom 29 Feb 190
 const timeOf = t => {   // the fraction of a day, or null
   const m = RE_TIME.exec(t); if (!m) return null;
   let h = +m[1]; const mi = +m[2], s = m[3] ? +m[3] : 0, ap = m[4] ? m[4].toLowerCase() : '';
-  if (mi > 59 || s > 59) return null;
+  if (mi > 59 || s >= 60) return null;
   if (ap) { if (h < 1 || h > 12) return null; h = h % 12 + (ap === 'p' ? 12 : 0); }   // without AM/PM, 24:00 and beyond read as elapsed hours, as Excel takes them
   return (h * 3600 + mi * 60 + s) / 86400;
 };
 /** The Excel serial a date or time text denotes (en-US shapes), or null. A date with no year takes `yearNow()`'s. */
-export function dateTextToSerial(str, yearNow = () => new Date().getUTCFullYear()) {
+export function dateTextToSerial(str, yearNow) { const v = dateTextValue(str, yearNow); return v ? v.serial : null; }
+/**
+ * A typed date or time (en-US shapes) as { serial, code }: the serial it denotes and the number
+ * format Excel gives a General cell for the shape typed — 1/31/2026 and 2026-01-31 → m/d/yyyy,
+ * 1/31 and Jan 31 → d-mmm, 31-Jan-26 and Jan 31, 2026 → d-mmm-yy, 1/2026 and Jan 2026 → mmm-yy,
+ * 12:00 → h:mm (h:mm:ss with seconds, AM/PM when typed, [h]:mm:ss past 23 hours), a date and a
+ * time → m/d/yyyy h:mm. Null when the text is no date. A date with no year takes `yearNow()`'s.
+ */
+export function dateTextValue(str, yearNow = () => new Date().getUTCFullYear()) {
   const t = String(str).trim();
   if (!t || t.length > 40 || !/\d/.test(t)) return null;
+  const v = (serial, code) => serial === null ? null : { serial, code };
   const dateOf = s => {
     let m;
-    if ((m = RE_MDY.exec(s))) return serialOf(yearOf(m[3]), +m[1], +m[2]);
-    if ((m = RE_YMD.exec(s))) return serialOf(+m[1], +m[2], +m[3]);
-    if ((m = RE_DMON.exec(s))) { const mo = monthOf(m[2]); return mo ? serialOf(m[3] === undefined ? yearNow() : yearOf(m[3]), mo, +m[1]) : null; }
-    if ((m = RE_MOND.exec(s))) { const mo = monthOf(m[1]); return mo ? serialOf(m[3] === undefined ? yearNow() : yearOf(m[3]), mo, +m[2]) : null; }
-    if ((m = RE_MONY.exec(s))) { const mo = monthOf(m[1]); return mo ? serialOf(+m[2], mo, 1) : null; }
+    if ((m = RE_MDY.exec(s))) return v(serialOf(yearOf(m[3]), +m[1], +m[2]), 'm/d/yyyy');
+    if ((m = RE_MD.exec(s))) return v(serialOf(yearNow(), +m[1], +m[2]), 'd-mmm');    // 1/31, 5-3: month and day of this year (13/1 and 1/32 stay text)
+    if ((m = RE_MY.exec(s))) return v(serialOf(+m[2], +m[1], 1), 'mmm-yy');             // 1/2026: the first of the month
+    if ((m = RE_YMD.exec(s))) return v(serialOf(+m[1], +m[2], +m[3]), 'm/d/yyyy');
+    if ((m = RE_DMON.exec(s))) { const mo = monthOf(m[2]); return mo ? v(serialOf(m[3] === undefined ? yearNow() : yearOf(m[3]), mo, +m[1]), m[3] === undefined ? 'd-mmm' : 'd-mmm-yy') : null; }
+    if ((m = RE_MOND.exec(s))) {
+      const mo = monthOf(m[1]); if (!mo) return null;
+      if (m[3] !== undefined) return v(serialOf(yearOf(m[3]), mo, +m[2]), 'd-mmm-yy');
+      const d = serialOf(yearNow(), mo, +m[2]);
+      return d !== null || +m[2] < 1 ? v(d, 'd-mmm') : v(serialOf(yearOf(m[2]), mo, 1), 'mmm-yy');   // Jan-32, Feb 29 in a common year: the number is a year (1 Jan 1932, 1 Feb 2029), as Excel reads it
+    }
+    if ((m = RE_MONY.exec(s))) { const mo = monthOf(m[1]); return mo ? v(serialOf(+m[2], mo, 1), 'mmm-yy') : null; }
     return null;
   };
-  const whole = dateOf(t); if (whole !== null) return whole;
-  const time = timeOf(t); if (time !== null) return time;
+  const timeCode = s => { const m = RE_TIME.exec(s); return +m[1] > 23 ? '[h]:mm:ss' : 'h:mm' + (m[3] ? ':ss' : '') + (m[4] ? ' AM/PM' : ''); };
+  const whole = dateOf(t); if (whole) return whole;
+  const time = timeOf(t); if (time !== null) return { serial: time, code: timeCode(t) };
   const sp = t.search(/\s\d{1,2}:\d{2}/);   // a date then a time
-  if (sp > 0) { const d = dateOf(t.slice(0, sp).trim()), tm = timeOf(t.slice(sp).trim()); if (d !== null && tm !== null) return d + tm; }
+  if (sp > 0) { const d = dateOf(t.slice(0, sp).trim()), tm = timeOf(t.slice(sp).trim()); if (d && tm !== null) return { serial: d.serial + tm, code: 'm/d/yyyy h:mm' }; }
   return null;
 }
 
@@ -402,9 +421,11 @@ export function evalFormula(expr, ctx = {}) {
   // a parsed AST (parseFormula) is taken as is, so a formula evaluated over many cells — a
   // conditional-formatting rule — is parsed once; ctx.offset = {dr, dc} then shifts its relative
   // references per cell, exactly as translateFormula would rewrite the text (a reference pushed
-  // above row 1 or left of column A is #REF!)
+  // above row 1 or left of column A is #REF! — or, with offset.wrap, runs round the sheet edge,
+  // as Excel's conditional-formatting references do)
   const ast = expr && typeof expr === 'object' ? expr : parseFormula(expr);   // SyntaxError propagates: the commit gate decides what to do
   const OFF = ctx.offset && (ctx.offset.dr || ctx.offset.dc) ? ctx.offset : null;
+  const offR = r => OFF.wrap ? wrapIndex(r, ROWS) : r, offC = c => OFF.wrap ? wrapIndex(c, COLS) : c;
 
   /* ---- value helpers -------------------------------------------------------- */
   const cellVal = key => { const v = raw(key); if (v === undefined) return null; if (isErrVal(v)) throw err(v); return v; };
@@ -454,11 +475,11 @@ export function evalFormula(expr, ctx = {}) {
   function refParts(ref) {
     const m = /^(\$?)([A-Z]{1,3})(\$?)(\d+)$/.exec(ref);
     let c = colIndex(m[2]), r = +m[4];
-    if (OFF) { if (!m[1]) c += OFF.dc; if (!m[3]) r += OFF.dr; if (c < 1 || r < 1) throw err('#REF!'); }
+    if (OFF) { if (!m[1]) c = offC(c + OFF.dc); if (!m[3]) r = offR(r + OFF.dr); if (c < 1 || r < 1) throw err('#REF!'); }
     return { c, r };
   }
-  const offCol = (letters, abs) => { const c = colIndex(letters) + (OFF && !abs ? OFF.dc : 0); if (c < 1) throw err('#REF!'); return c; };
-  const offRow = (n, abs) => { const r = n + (OFF && !abs ? OFF.dr : 0); if (r < 1) throw err('#REF!'); return r; };
+  const offCol = (letters, abs) => { const c = OFF && !abs ? offC(colIndex(letters) + OFF.dc) : colIndex(letters); if (c < 1) throw err('#REF!'); return c; };
+  const offRow = (n, abs) => { const r = OFF && !abs ? offR(n + OFF.dr) : n; if (r < 1) throw err('#REF!'); return r; };
   function compare(op, a, b) { return compareValues(op, deref(a), deref(b)); }
 
   /* ---- criteria ("<>5", ">="&A1, "a*") for the *IF family ---------------- */
@@ -472,9 +493,11 @@ export function evalFormula(expr, ctx = {}) {
     if (typeof c.val === 'string' && c.val !== '') c.glob = compileGlob(c.val);   // compiled once, tested per cell
     return c;
   }
+  /** Numeric or date text as its number ("1,000", "1/15/2026", "12:00"), else null: the criteria and COUNT read text as Excel coerces it. */
+  const numOfText = s => { const n = textToNumber(s); return n !== null ? n : dateText(s); };
   function parseCritVal(t) {
     if (t === '') return '';
-    const n = textToNumber(t);
+    const n = numOfText(t);   // ">1/15/2026" compares serials, as Excel's criteria do
     if (n !== null) return n;
     const u = t.trim().toUpperCase();
     if (u === 'TRUE') return true;
@@ -491,7 +514,7 @@ export function evalFormula(expr, ctx = {}) {
     if (op === '=' || op === '<>') {
       let eq;
       if (val === '') eq = (cell === null || cell === '');
-      else if (typeof val === 'number') eq = (typeof cell === 'number' && numeq(cell, val)) || (typeof cell === 'string' && textToNumber(cell) !== null && numeq(textToNumber(cell), val));
+      else if (typeof val === 'number') eq = (typeof cell === 'number' && numeq(cell, val)) || (typeof cell === 'string' && numOfText(cell) !== null && numeq(numOfText(cell), val));
       else if (typeof val === 'boolean') eq = cell === val;
       else eq = typeof cell === 'string' && globTest(crit.glob, cell);
       return op === '=' ? eq : !eq;
@@ -646,7 +669,7 @@ export function evalFormula(expr, ctx = {}) {
         if (v === undefined) continue;
         if (isRange(v)) { for (const key of v.keys()) { const x = raw(key); if (name === 'COUNT' ? typeof x === 'number' : (x !== null && x !== undefined)) k++; } }
         else if (v && v.__err) { if (name === 'COUNTA') k++; }
-        else if (name === 'COUNT') { if (typeof v === 'number' || typeof v === 'boolean' || (typeof v === 'string' && textToNumber(v) !== null)) k++; }
+        else if (name === 'COUNT') { if (typeof v === 'number' || typeof v === 'boolean' || (typeof v === 'string' && numOfText(v) !== null)) k++; }   // a literal "12:00" or "1/31/2026" counts, as Excel's COUNT documents
         else if (v !== null) k++;
       }
       return k;
@@ -965,26 +988,32 @@ export function formulaFunctions(expr) {
   try { return [...new Set(tokenize(s).filter(t => t.t === 'fn').map(t => t.v))]; } catch (e) { return []; }
 }
 
+/** Row / column `n` wrapped onto a sheet `size` long: 0 is the last one, size + 1 the first — Excel's conditional-formatting references run round the sheet edge. */
+export const wrapIndex = (n, size) => ((n - 1) % size + size) % size + 1;
 /**
  * Shift relative references by (dr, dc) — what copy/paste and fill do. Absolute parts ($) stay.
  * A reference pushed off the sheet becomes one #REF! token (a range, A:A or 1:1 included, is a
  * unit: either corner off the sheet makes the whole reference #REF!). Text outside references is
- * preserved exactly.
+ * preserved exactly. With `wrap` ({rows, cols}, the sheet's size) a reference pushed off the
+ * sheet wraps round to its far edge instead, as Excel re-bases a conditional-formatting formula
+ * (=$C1048575 for a reference two rows above row 1): the formula keeps working for every cell
+ * where the reference exists.
  */
-export function translateFormula(f, dr, dc) {
+export function translateFormula(f, dr, dc, wrap) {
   const src = String(f);
   const eq = src.trimStart()[0] === '=';
   const body = eq ? src.slice(src.indexOf('=') + 1) : src;
   let toks; try { toks = tokenize(body); } catch (e) { return src; }
+  const wrapRow = r => wrap ? wrapIndex(r, wrap.rows) : r, wrapCol = c => wrap ? wrapIndex(c, wrap.cols) : c;
   const shiftRef = ref => {   // null = off the sheet
     const m = /^(\$?)([A-Z]{1,3})(\$?)(\d+)$/.exec(ref);
     let c = colIndex(m[2]), r = +m[4];
-    if (!m[1]) c += dc; if (!m[3]) r += dr;
+    if (!m[1]) c = wrapCol(c + dc); if (!m[3]) r = wrapRow(r + dr);
     if (c < 1 || r < 1) return null;
     return m[1] + colLetter(c) + m[3] + r;
   };
-  const shiftCol = t => { const abs = t.v[0] === '$'; const c = colIndex(t.v.replace('$', '')) + (abs ? 0 : dc); return c < 1 ? null : (abs ? '$' : '') + colLetter(c); };
-  const shiftRow = t => { const abs = body[t.pos] === '$'; const r = t.v + (abs ? 0 : dr); return r < 1 ? null : (abs ? '$' : '') + r; };
+  const shiftCol = t => { const abs = t.v[0] === '$'; const c = abs ? colIndex(t.v.slice(1)) : wrapCol(colIndex(t.v) + dc); return c < 1 ? null : (abs ? '$' : '') + colLetter(c); };
+  const shiftRow = t => { const abs = body[t.pos] === '$'; const r = abs ? t.v : wrapRow(t.v + dr); return r < 1 ? null : (abs ? '$' : '') + r; };
   const pair = (a, b) => (a === null || b === null) ? '#REF!' : a + ':' + b;
   let out = '', last = 0;
   for (let i = 0; i < toks.length; i++) {
@@ -1021,12 +1050,12 @@ export function autocorrectFormula(buf) {
   return { kind: 'bad', buf: norm };
 }
 
-/** Upper-case references, function names, TRUE/FALSE and error literals outside string literals. */
+/** Upper-case references, function names, TRUE/FALSE and error literals outside string literals. A sheet name keeps its spelling (=Sheet2!E2, never =ShEET2!E2): a reference never starts inside a name or ends at a '!'. */
 export function normalizeFormula(str) {
   const s = String(str);
   const parts = s.split(/("(?:[^"]|"")*"|'(?:[^']|'')*')/);
   return parts.map((seg, k) => k % 2 ? seg : seg
-    .replace(/(\$?[A-Za-z]{1,3}\$?)0*(\d+)(?![A-Za-z0-9_.])/g, (m, a, r) => (a + r).toUpperCase())
+    .replace(/(?<![A-Za-z0-9_.])(\$?[A-Za-z]{1,3}\$?)0*(\d+)(?![A-Za-z0-9_.!(])/g, (m, a, r) => (a + r).toUpperCase())
     .replace(/[A-Za-z_][A-Za-z0-9_.]*(?=\s*\()/g, m => m.toUpperCase())
     .replace(/\b(true|false)\b/gi, m => m.toUpperCase())
     .replace(/#(?:NULL!|DIV\/0!|VALUE!|REF!|NAME\?|NUM!|N\/A)/gi, m => m.toUpperCase())).join('');

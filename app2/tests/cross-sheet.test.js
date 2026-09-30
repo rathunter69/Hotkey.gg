@@ -37,6 +37,17 @@ test('editing the source sheet ripples into the readers (two-pass workbook recal
   assert.equal(s.sheet.value('D3'), 100, 'the reader moved with its source');
 });
 
+test('an A → B → A chain settles on the edited sheet too: Costs!B3 = Sales!A2+1, Sales!A1 = Costs!B3*2', () => {
+  const s = book(); const S = s.sheet;   // Sales
+  s.sheets[1].sheet.commitInput('=Sales!A2+1', 3, 2);   // Costs!B3
+  S.commitInput('=Costs!B3*2', 1, 1); S.commitInput('5', 2, 1);
+  assert.equal(s.sheets[1].sheet.value('B3'), 6); assert.equal(S.value('A1'), 12);
+  S.select('A2'); s.run('"10" Enter');
+  assert.equal(s.sheets[1].sheet.value('B3'), 11); assert.equal(S.value('A1'), 22, 'the edited sheet sees the value its dependant pushed back, before any later edit');
+  s.switchSheet(1); s.sheet.select('B3'); s.run('"=Sales!A2+5" Enter');
+  assert.equal(s.sheet.value('B3'), 15); assert.equal(S.value('A1'), 30, 'the other way round too');
+});
+
 test('fill-down keeps the sheet prefix and shifts the relative row (Excel)', () => {
   const s = book(); const S = s.sheet;
   S.commitInput('=B3-Costs!B3', 3, 5);

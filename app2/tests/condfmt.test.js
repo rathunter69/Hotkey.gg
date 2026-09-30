@@ -4,8 +4,9 @@
 // serialisation, and the Alt H L walk / mouse reaching the same state.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Sheet, normCondFmt, cfOperand, subtractRect, rectsOfKeys, mergeRects, CF_STYLES, CF_BAR_COLORS, CF_SCALES, mixHex } from '../engine/sheet.js';
+import { Sheet, normCondFmt, cfOperand, subtractRect, rectsOfKeys, mergeRects, CF_STYLES, CF_BAR_COLORS, CF_SCALES, mixHex, COLW_DEFAULT } from '../engine/sheet.js';
 import { Session, CF_VALUE_NOTE, CF_FORMULA_NOTE } from '../engine/keyboard.js';
+import { dateTextToSerial, translateFormula } from '../engine/formula.js';
 import { runCommand } from '../ui/ribbon-commands.js';
 import { sessionToState, diffStates } from '../content/workbooks/voltline-weekly.js';
 
@@ -468,4 +469,145 @@ test('F47: a rule over a range far beyond the sheet costs what its cells on the 
   const fit = new Sheet({ cells: { B2: { value: 10 }, B3: { value: 20 } }, condFmt: [{ range: 'B1:B100', kind: 'dataBar' }, { range: 'B2:Z100', kind: 'colorScale' }] });
   const t0 = performance.now(); const m = huge.condFmtMap(); const ms = performance.now() - t0;
   assert.deepEqual(m, fit.condFmtMap()); assert.ok(ms < 300, 'took ' + ms.toFixed(1) + ' ms');
+});
+
+test('F2: a year-less date in the Highlight Cells box (1/2, 12/31) is that day of this year, as a cell entry reads it, so a date rule compares serials', () => {
+  const year = new Date().getUTCFullYear();
+  assert.equal(typeof cfOperand('1/2'), 'number'); assert.equal(cfOperand('1/2'), cfOperand('1/2/' + year)); assert.equal(cfOperand('1/2'), cfOperand('2-Jan')); assert.equal(cfOperand('12/31'), cfOperand('31-Dec')); assert.equal(cfOperand('5-3'), cfOperand('May 3'));
+  assert.equal(dateTextToSerial('12/31', () => 2026), 46387); assert.equal(dateTextToSerial('1/2', () => 2026), 46024); assert.equal(dateTextToSerial('1/2026', () => 2026), 46023); assert.equal(dateTextToSerial('13/1', () => 2026), null);
+  const cells = { B2: { value: 46096 }, B3: { value: 46023 }, B4: { value: 45000 } };   // 15 Mar 2026, 1 Jan 2026, 15 Mar 2023
+  const card = keys => { const s = new Session(new Sheet({ cells: structuredClone(cells) }), { now: () => 0 }); s.sheet.select('B2:B4'); s.run(keys); return [s.sheet.condFmt[0].v1, Object.keys(s.sheet.condFmtMap()).sort()]; };
+  assert.deepEqual(card('Alt H L H G "1/2/2026" Enter'), [46024, ['B2']]); assert.deepEqual(card('Alt H L H G "2-Jan-2026" Enter'), [46024, ['B2']]);
+  const v1 = cfOperand('1/2'), painted = Object.keys(cells).filter(k => cells[k].value > v1).sort();   // 2 January of the host's year: what it paints follows the clock
+  assert.deepEqual(card('Alt H L H G "1/2" Enter'), [v1, painted]);
+});
+
+test('F3: a cross-sheet formula rule keeps the sheet name\'s spelling (=Sheet2!E2>5, never =ShEET2!E2>5) and follows the other sheet\'s cells', () => {
+  const s = new Session(new Sheet(), { now: () => 0 }); const S1 = s.sheet;
+  const i = s.addSheet(); s.sheets[i].sheet.commitInput('7', 2, 5);   // Sheet2!E2 = 7
+  assert.equal(s.sheets[i].name, 'Sheet2');
+  S1.select('A1:A2'); s.run('Alt H L N "=Sheet2!E2>5" Enter');
+  assert.equal(S1.condFmt[0].formula, '=Sheet2!E2>5'); assert.deepEqual(Object.keys(S1.condFmtMap()), ['A1']);
+  assert.equal(normCondFmt([{ range: 'A1', kind: 'formula', formula: '=Sheet2!A1>5' }])[0].formula, '=Sheet2!A1>5'); assert.equal(normCondFmt([{ range: 'A1', kind: 'cellValue', op: '>', v1: '=Data2!b1' }])[0].v1, '=Data2!B1');
+  s.sheets[i].sheet.commitInput('1', 2, 5); assert.deepEqual(Object.keys(S1.condFmtMap()), [], 'a change on Sheet2 repaints Sheet1');
+  const again = new Sheet(S1.toJSON()); assert.equal(again.condFmt[0].formula, '=Sheet2!E2>5');
+});
+
+/* ---- the second condfmt review (R2): each test fails on the engine before its fix ---- */
+
+test('R2/F5: a typed date is its serial, dressed as Excel dresses the shape, so a date rule matches a cell typed the same way; a year-less date takes the sheet\'s TODAY() year', () => {
+  // the grid's entry rule reads the box's grammar: Highlight Cells and a cell entry mean the same thing
+  assert.deepEqual(Sheet.classifyInput('1/1/2024'), { kind: 'value', value: 45292, fmtStyle: 'custom', numFmt: 'm/d/yyyy' });
+  assert.deepEqual(Sheet.classifyInput('31-Jan-26'), { kind: 'value', value: 46053, fmtStyle: 'custom', numFmt: 'd-mmm-yy' });
+  assert.deepEqual(Sheet.classifyInput('Jan 2026'), { kind: 'value', value: 46023, fmtStyle: 'custom', numFmt: 'mmm-yy' });
+  assert.deepEqual(Sheet.classifyInput('12:00'), { kind: 'value', value: 0.5, fmtStyle: 'custom', numFmt: 'h:mm' });
+  assert.deepEqual(Sheet.classifyInput('1/5', null, () => 45000), { kind: 'value', value: 44931, fmtStyle: 'custom', numFmt: 'd-mmm' }, 'a year-less date takes the sheet\'s year (45000 is 15 Mar 2023)');
+  assert.deepEqual(Sheet.classifyInput('1/1/2024', { fmtStyle: 'comma' }), { kind: 'value', value: 45292 }, 'a cell that already has a number format keeps it, as in Excel');
+  assert.deepEqual(Sheet.classifyInput('13/1'), { kind: 'value', value: '13/1', txt: true }); assert.deepEqual(Sheet.classifyInput('w/c 15 Sep'), { kind: 'value', value: 'w/c 15 Sep', txt: true });
+  const mk = () => { const T = new Sheet(); T.commitInput('1/1/2024', 2, 2); T.commitInput('45292', 3, 2); T.commitInput('6/15/2024', 4, 2); T.commitInput('12/31/2023', 5, 2); T.commitInput('3/1/2025', 6, 2); return T; };
+  const S = mk(); assert.equal(S.value('B2'), 45292); assert.equal(S.cellAt('B2').txt, false); assert.equal(S.text('B2'), '1/1/2024'); assert.ok(S.colW[2] > COLW_DEFAULT && !S.colSet[2], 'the column widened to show the date, as Excel\'s does');
+  const paint = keys => { const s = new Session(mk(), { now: () => 0 }); s.sheet.select('B2:B6'); s.run(keys); return Object.keys(s.sheet.condFmtMap()).sort(); };
+  assert.deepEqual(paint('Alt H L H E "1/1/2024" Enter'), ['B2', 'B3'], 'a typed date and its raw serial both equal the operand');
+  assert.deepEqual(paint('Alt H L H L "1/1/2025" Enter'), ['B2', 'B3', 'B4', 'B5']);
+  assert.deepEqual(paint('Alt H L H G "1/1/2025" Enter'), ['B6']);
+  assert.deepEqual(paint('Alt H L H B "1/1/2024" Tab "12/31/2024" Enter'), ['B2', 'B3', 'B4']);
+  // the year of a year-less date is the sheet's TODAY(), never the wall clock's: a lesson's rule replays the same on New Year
+  const T = new Sheet({ today: () => 45000 }); T.commitInput('=YEAR(TODAY())', 1, 1); assert.equal(T.value('A1'), 2023);
+  assert.equal(cfOperand('Jan 5', T.today), 44931); T.commitInput('Jan 5', 2, 1); assert.equal(T.value('A2'), 44931); assert.equal(T.text('A2'), '5-Jan');
+  T.select('A2'); T.addCondFmt({ kind: 'cellValue', op: '=', v1: 'Jan 5', style: 'green' }); assert.equal(T.condFmt[0].v1, 44931); assert.deepEqual(Object.keys(T.condFmtMap()), ['A2']);
+  assert.equal(new Sheet({ today: () => 45000, condFmt: [{ range: 'A1', kind: 'cellValue', op: '=', v1: '1/5' }] }).condFmt[0].v1, 44931, 'an authored rule too');
+  const s = new Session(new Sheet({ today: () => 45000 }), { now: () => 0 }); s.sheet.select('A1'); s.run('Alt H L H E "Jan 5" Enter'); assert.equal(s.sheet.condFmt[0].v1, 44931, 'the card too');
+  s.sheet.goTo(3, 1); s.run('"1/2" Enter'); assert.equal(s.sheet.value('A3'), 44928, 'the editor: 2 January of the sheet\'s year');
+});
+
+test('R2/F6: a rule re-based past row 1 or column A wraps round the sheet edge, as Excel\'s =$C1048575 does, and keeps painting wherever the reference exists', () => {
+  const wrap = { rows: 100, cols: 26 };
+  assert.equal(translateFormula('=B5<B1', -3, 0, wrap), '=B2<B98'); assert.equal(translateFormula('=B5<B1', -3, 0), '=B2<#REF!', 'a copied cell\'s formula still reads #REF!');
+  assert.equal(translateFormula('=SUM(A:A)+SUM(1:1)+$A$1+B2', -3, -2, wrap), '=SUM(Y:Y)+SUM(98:98)+$A$1+Z99');
+  const cells = { B1: { value: 10 }, B2: { value: 1 }, B3: { value: 2 }, B4: { value: 3 }, B5: { value: 4 } };
+  const s = new Session(new Sheet({ cells: structuredClone(cells) }), { now: () => 0 }); const S = s.sheet;
+  S.goTo(5, 2); s.run('Shift+Up Shift+Up Shift+Up Alt H L N "=B5<B1" Enter');
+  assert.equal(S.condFmt[0].formula, '=B2<B98'); assert.deepEqual(Object.keys(S.condFmtMap()), ['B5'], '4 < 10 holds for B5; the rows above read the blank bottom of the sheet');
+  S.clearCondFmt('sheet'); S.goTo(5, 2); s.run('Shift+Up Shift+Up Shift+Up Alt H L H L "=B1" Enter');
+  assert.equal(S.condFmt[0].v1, '=B98'); assert.deepEqual(Object.keys(S.condFmtMap()), ['B5'], 'a preset\'s operand wraps the same way');
+  assert.deepEqual(Object.keys(new Sheet(S.toJSON()).condFmtMap()), ['B5'], 'and reads the same after a reload');
+  // the documented case (Microsoft Q&A 4972691): A3:D7 selected from D7, =IF($C3<55,TRUE) typed for row 7 — Excel stores $C1048575 and paints rows 3, 4 and 7
+  const t = new Session(new Sheet({ cells: { C1: { value: 'Score' }, C2: { value: 90 }, C3: { value: 40 }, C4: { value: 70 }, C5: { value: 20 }, C6: { value: 60 }, C7: { value: 10 } } }), { now: () => 0 }); const T = t.sheet;
+  T.goTo(7, 4); t.run('Shift+Up Shift+Up Shift+Up Shift+Up Shift+Left Shift+Left Shift+Left'); assert.equal(T.selectionText(), 'A3:D7');
+  t.run('Alt H L N "=IF($C3<55,TRUE)" Enter'); assert.equal(T.condFmt[0].formula, '=IF($C99<55,TRUE)');
+  assert.deepEqual(Object.keys(T.condFmtMap()).sort(), ['A3', 'A4', 'A7', 'B3', 'B4', 'B7', 'C3', 'C4', 'C7', 'D3', 'D4', 'D7'], 'rows 3 and 4 read the blank bottom rows (0 < 55), row 7 reads $C3');
+  // Clear Rules on the cell a rule was written for re-bases the rest the same way; so does a fill upward
+  const V = new Sheet({ cells: structuredClone(cells) }); V.addCondFmt({ range: 'B5,B2:B4', kind: 'formula', formula: '=B5<B1', style: 'green' }); assert.deepEqual(Object.keys(V.condFmtMap()), ['B5']);
+  V.select('B5'); V.clearCondFmt('selection'); assert.equal(V.condFmt[0].range, 'B2:B4'); assert.equal(V.condFmt[0].formula, '=B2<B98'); assert.deepEqual(V.condFmtMap(), {});
+  const W = new Sheet({ cells: { ...structuredClone(cells), B6: { value: 1 }, B7: { value: 9 }, B8: { value: 5 } } }); W.addCondFmt({ range: 'B5:B8', kind: 'formula', formula: '=B5>B3', style: 'green' }); assert.deepEqual(Object.keys(W.condFmtMap()), ['B5', 'B7', 'B8']);
+  W.select('B2:B5'); W.fill('up'); assert.equal(W.condFmt[0].range, 'B2:B8'); assert.equal(W.condFmt[0].formula, '=B2>B100'); assert.deepEqual(Object.keys(W.condFmtMap()), ['B2', 'B7', 'B8'], 'B2 reads the blank B100, B3 reads B1 = 10; the cells that worked still do');
+});
+
+test('R2/F7: New Formatting Rule takes a formula typed without its "=" as the same formula: gated, normalised and re-based for the active cell like its "="-prefixed twin', () => {
+  const cells = { B2: { value: 10 }, C2: { value: 80 }, B3: { value: 40 }, C3: { value: 60 }, B4: { value: 70 }, C4: { value: 70 }, B5: { value: 50 }, C5: { value: 10 } };
+  const run = f => { const s = new Session(new Sheet({ cells: structuredClone(cells) }), { now: () => 0 }); const S = s.sheet; S.goTo(5, 2); s.run('Shift+Up Shift+Up Shift+Up'); s.run('Alt H L N "' + f + '" Enter'); return s.dialog ? s.note : [S.condFmt[0].formula, Object.keys(S.condFmtMap()).join(',')]; };
+  assert.deepEqual(run('=$B5>$C5'), ['=$B2>$C2', 'B5']); assert.deepEqual(run('$B5>$C5'), ['=$B2>$C2', 'B5'], 'the same rule without the =');
+  assert.deepEqual(run('b5>c5'), ['=B2>C2', 'B5'], 'normalised too');
+  assert.equal(run('B2>'), CF_FORMULA_NOTE); assert.equal(run('=B2>'), CF_FORMULA_NOTE); assert.equal(run('abc')[1], '', 'a bare name fires nowhere');
+  const m = new Session(new Sheet({ cells: structuredClone(cells) }), { now: () => 0 }); m.sheet.goTo(5, 2); m.run('Shift+Up Shift+Up Shift+Up'); runCommand(m, 'HLN'); m.run('"$B5>$C5" Enter');
+  assert.equal(m.sheet.condFmt[0].formula, '=$B2>$C2', 'the mouse route is the same card'); assert.deepEqual(Object.keys(m.sheet.condFmtMap()), ['B5']);
+});
+
+test('R2/F8: a pasted rule whose areas land out of top-left order is written for the merged first area, so every pasted cell reads its own row', () => {
+  const mk = () => new Sheet({ cells: { B2: { value: 100 }, B3: { value: 40 }, B4: { value: 70 }, B5: { value: 0 }, C2: { value: 80 }, C3: { value: 60 }, C4: { value: 70 }, C5: { value: 10 } } });
+  const painted = (S, col) => Object.keys(S.condFmtMap()).filter(k => k[0] === col).sort();
+  let S = mk(); S.select('B2:C5'); S.addCondFmt({ kind: 'formula', formula: '=B2>50', style: 'green' });
+  S.select('B2:B3'); S.clearCondFmt('selection'); assert.deepEqual([S.condFmt[0].range, S.condFmt[0].formula], ['B4:C5,C2:C3', '=B4>50'], 'the shape Clear Rules leaves: the first area is not the top one');
+  S.select('C2:C5'); S.copy(false); S.goTo(2, 6); S.paste('all');
+  assert.deepEqual([S.condFmt[0].range, S.condFmt[0].formula], ['F2:F5', '=F2>50']); assert.deepEqual(painted(S, 'F'), ['F2', 'F3', 'F4'], '80, 60, 70 > 50');
+  S.select('C2:C5'); S.copy(false); S.select('H2:I5'); S.paste('all');
+  assert.deepEqual([S.condFmt[0].range, S.condFmt[0].formula], ['H2:I5', '=H2>50']); assert.deepEqual(painted(S, 'H'), ['H2', 'H3', 'H4']); assert.deepEqual(painted(S, 'I'), ['I2', 'I3', 'I4'], 'a tiled paste too');
+  S = mk(); [80, 60, 70, 10].forEach((v, i) => S.setCell('F' + (i + 2), { value: v })); S.recalc(); S.addCondFmt({ range: 'B4:C5,C2:C3', kind: 'formula', formula: '=B4>50', style: 'green' });
+  S.select('C2:C5'); S.copy(false); S.goTo(2, 6); S.paste('formats'); assert.equal(S.condFmt[0].formula, '=F2>50'); assert.deepEqual(painted(S, 'F'), ['F2', 'F3', 'F4'], 'paste formats too');
+  assert.deepEqual(mergeRects([{ r1: 4, c1: 6, r2: 5, c2: 6 }, { r1: 2, c1: 6, r2: 3, c2: 6 }]), [{ r1: 2, c1: 6, r2: 5, c2: 6 }], 'the merge puts the top area first');
+});
+
+test('R2/F17: deleting, renaming or adding a sheet recalculates the workbook at once: a rule or a cell reading the sheet by name repaints without waiting for an edit', () => {
+  const mk = () => { const s = new Session(new Sheet({ cells: { B2: { value: 100 }, B3: { value: 40 } } }), { now: () => 0 }); s.addSheet('Sheet2', new Sheet({ cells: { B1: { value: 50 } } })); const S1 = s.sheet; S1.select('B2:B3'); S1.addCondFmt({ kind: 'cellValue', op: '>', v1: '=Sheet2!$B$1', style: 'green' }); S1.commitInput('=Sheet2!B1', 5, 2); return s; };
+  const state = S => [Object.keys(S.condFmtMap()), S.value('B5')];
+  let s = mk(); let S1 = s.sheet; assert.deepEqual(state(S1), [['B2'], 50]);
+  s.key({ key: 'PageDown', ctrlKey: true }); assert.equal(s.sheetIndex, 1);
+  const paints = []; s.onChange(() => paints.push(state(S1)));   // sheet-view.js renders on every session event
+  s.askDeleteSheet(); s.key({ key: 'Enter' });   // Alt H D S, Enter: Sheet2 holds a value, so the confirm card, then OK
+  assert.equal(s.sheets.length, 1); assert.deepEqual(state(S1), [[], '#REF!'], 'the highlight and the value go the moment the sheet does');
+  assert.ok(paints.length >= 2 && paints.every(p => p[0].length === 0 && p[1] === '#REF!'), 'no repaint after the delete shows the stale highlight');
+  s = mk(); S1 = s.sheet; assert.equal(s.renameSheet(1, 'Data'), true); assert.deepEqual(state(S1), [[], '#REF!'], 'a rename: the old name resolves no more');
+  assert.equal(s.renameSheet(1, 'Sheet2'), true); assert.deepEqual(state(S1), [['B2'], 50], 'and back');
+  s = mk(); S1 = s.sheet; s.deleteSheet(1); assert.deepEqual(state(S1), [[], '#REF!']);
+  s.addSheet('Sheet2', new Sheet({ cells: { B1: { value: 50 } } })); assert.deepEqual(state(S1), [['B2'], 50], 'a sheet added under a name a formula already uses resolves at once');
+  s = mk(); s.run('Alt H O M C Enter'); assert.equal(s.sheets[0].name, 'Sheet1 (2)'); assert.equal(s.sheet.value('B5'), 50, 'a copied sheet\'s cross-sheet formulas read at once too');
+});
+
+test('R2/F21: a number past Excel\'s largest (1e400) is text, in a cell and in the box alike; no rule carries a non-finite operand, so every rule survives undo and reload', () => {
+  assert.deepEqual(Sheet.classifyInput('1e400'), { kind: 'value', value: '1e400', txt: true }); assert.deepEqual(Sheet.classifyInput('1e308'), { kind: 'value', value: 1e308 });
+  assert.equal(cfOperand('1e400'), '1e400'); assert.equal(cfOperand('-1e309'), '-1e309'); assert.equal(cfOperand(Infinity), null); assert.equal(cfOperand(NaN), null); assert.equal(cfOperand(1e308), 1e308);
+  assert.deepEqual(normCondFmt([{ range: 'B2:B3', kind: 'cellValue', op: '<', v1: Infinity }, { range: 'B2:B3', kind: 'cellValue', op: 'between', v1: 1, v2: -Infinity }]), [], 'a non-finite operand is no rule');
+  const s = fresh(); const S = s.sheet; S.select('B2:B3'); s.run('Alt H L H L "1e400" Enter');
+  assert.equal(s.mode, 'normal'); assert.equal(S.condFmt[0].v1, '1e400'); assert.deepEqual(Object.keys(S.condFmtMap()).sort(), ['B2', 'B3'], 'compared as text: every number ranks below it');
+  S.select('B2'); s.run('Alt H L D Enter'); assert.deepEqual(S.condFmt.map(r => r.kind), ['dataBar', 'cellValue']);
+  s.run('Ctrl+Z'); assert.deepEqual(S.condFmt.map(r => r.kind), ['cellValue'], 'undoing the bar leaves the rule'); s.run('Ctrl+Y'); assert.deepEqual(S.condFmt.map(r => r.kind), ['dataBar', 'cellValue']);
+  assert.equal(new Sheet(JSON.parse(JSON.stringify(S.toJSON()))).condFmt.length, 2, 'a reload keeps both');
+  S.commitInput('1e400', 1, 1); assert.equal(S.value('A1'), '1e400'); assert.equal(S.cellAt('A1').txt, true, 'a cell entry of 1e400 is text, as in Excel');
+});
+
+test('R2/F24: a cut pasted on another sheet takes its rules along: the source sheet\'s list is trimmed, the moved part lands on top here, and undo on each sheet restores its side', () => {
+  const s = new Session(new Sheet({ cells: { B2: { value: 100 }, B3: { value: 1 } } }), { now: () => 0 }); const S1 = s.sheet;
+  S1.select('B2:B3'); S1.addCondFmt({ kind: 'cellValue', op: '>', v1: 50, style: 'green' });
+  s.run('Ctrl+X Shift+F11'); const S2 = s.sheet; assert.notEqual(S2, S1); assert.equal(s.sheetIndex, 0); S2.goTo(1, 1); s.run('Ctrl+V');
+  assert.deepEqual(S1.condFmt, []); assert.deepEqual(S2.condFmt.map(r => r.range), ['A1:A2']); assert.deepEqual(Object.keys(S2.condFmtMap()), ['A1']); assert.equal(S1.value('B2'), null); assert.equal(S2.value('A1'), 100);
+  s.run('Ctrl+Z'); assert.deepEqual(S2.condFmt, [], 'undo on the destination takes the landed rule back'); assert.equal(S2.value('A1'), null);
+  s.switchSheet(1); assert.equal(s.sheet, S1); s.run('Ctrl+Z'); assert.deepEqual(S1.condFmt.map(r => r.range), ['B2:B3'], 'undo on the source brings its rule home'); assert.equal(S1.value('B2'), 100);
+  // a partial cut leaves the rest behind on the source sheet; the moved part follows its cells, references into the block included; the destination's own rules over the pasted cells go
+  const t = new Session(new Sheet({ cells: { B2: { value: 100 }, B3: { value: 1 }, B4: { value: 70 }, B5: { value: 0 } } }), { now: () => 0 }); const T1 = t.sheet;
+  T1.select('B2:B5'); T1.addCondFmt({ kind: 'formula', formula: '=$B2>50', style: 'green' }); T1.select('B4:B5'); t.run('Ctrl+X Shift+F11'); const T2 = t.sheet;
+  T2.select('E2:E5'); T2.addCondFmt({ kind: 'cellValue', op: '>', v1: 50, style: 'lightred' }); T2.goTo(2, 5); t.run('Ctrl+V');
+  assert.deepEqual(T1.condFmt.map(r => [r.range, r.formula]), [['B2:B3', '=$B2>50']]); assert.deepEqual(T2.condFmt.map(r => [r.range, r.formula || r.op]), [['E2:E3', '=$E2>50'], ['E4:E5', '>']]);
+  assert.deepEqual(Object.keys(T1.condFmtMap()), ['B2']); assert.deepEqual(Object.keys(T2.condFmtMap()), ['E2'], 'E2 holds the moved 70');
+  assert.equal(new Set([...T1.condFmt, ...T2.condFmt].map(r => r.id)).size, 3, 'the landed rule has an id of its own');
+  assert.deepEqual(new Sheet(T2.toJSON()).condFmt.map(r => r.range), ['E2:E3', 'E4:E5']);
 });

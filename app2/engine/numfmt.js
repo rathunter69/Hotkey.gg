@@ -9,8 +9,10 @@
 // condition ([>=1000], [<0]); with conditions, the first section whose condition holds wins and
 // the first section without one takes the rest. A two- or three-section code whose last section
 // is @ keeps that section for text, as Excel stores its own d-mmm-yy;@ codes. An unquoted letter
-// that is a date or era code needs its context (0 kg is refused: g is an era); the letters Excel
-// prints as themselves (x k bps …) are literals, as TEXT() reads them.
+// that is a date or era code needs its context (0 kg and 0 bps are refused: g is an era, b and s
+// date codes — LibreOffice and numfmt refuse them too); the letters Excel prints as themselves
+// (x k X K A …, either case) are literals, as TEXT() reads them. A lone conditional section is
+// accepted and falls back to General, as Excel's box stores [>100]0 as [>100]0;General.
 //
 //   formatValue(value, code)  → { text, color }   color: a FONT_SWATCHES key, a #hex from Excel's palette, or null
 //   compileFormat(code)       → the parsed sections (cached); throws FormatError on a bad code
@@ -35,8 +37,8 @@ const PALETTE = ['black', 'white', 'red', 'green', 'blue', 'yellow', 'purple', '
   '#00ccff', '#ccffff', '#ccffcc', '#ffff99', '#99ccff', '#ff99cc', '#cc99ff', '#ffcc99',
   '#3366ff', '#33cccc', '#99cc00', '#ffcc00', '#ff9900', '#ff6600', '#666699', 'gray',
   '#003366', '#339966', '#003300', '#333300', '#993300', '#993366', '#333399', 'darkgray'];
-/** The letters Excel prints as themselves when unquoted (as TEXT() reads a code); the rest are date, era, E+ or General codes, or need quotes. */
-const LITERAL_LETTERS = 'acfijklopqrtuvwxzP';
+/** The letters Excel prints as themselves when unquoted (as TEXT() reads a code), in either case; the rest (b d e g h m n s y) are date, era, E+ or General codes and need quotes beside digits. */
+const LITERAL_LETTERS = 'acfijklopqrtuvwxzACFIJKLOPQRTUVWXZ';
 const LAST_SERIAL = 2958466;   // 31 Dec 9999 is 2958465: the last date Excel recognises
 
 /** General-format text of a number, as & and text functions see it (15 significant digits). */
@@ -101,6 +103,8 @@ function splitSections(f) {   // split on unquoted ';' (backslash escapes honour
   return out;
 }
 const COND_RX = /^(<=|>=|<>|<|>|=)\s*(-?\d+(?:\.\d+)?)$/;
+/** A plain space literal (typed or quoted, never an _x pad): the gap a fraction's bar may sit in. */
+const isGap = t => t.t === 'lit' && t.v === ' ' && !t.pad;
 function tokenizeSection(sec) {
   const toks = []; let cond = null, color = null;
   const last = () => toks[toks.length - 1];
@@ -131,9 +135,12 @@ function tokenizeSection(sec) {
     if (ch === ',') { toks.push({ t: 'comma' }); continue; }
     if (ch === '%') { toks.push({ t: 'pct' }); continue; }
     if (ch === '@') { toks.push({ t: 'at' }); continue; }
-    if (ch === '/' && last() && last().t === 'ph') {   // a fraction's bar: # ?/? (placeholders) or # ?/8 (a fixed denominator)
-      if ((m = /^\/([1-9]\d*)/.exec(rest))) { toks.push({ t: 'slash', den: +m[1] }); i += m[0].length - 1; continue; }
-      if (/^\/[0#?]/.test(rest)) { toks.push({ t: 'slash', den: 0 }); continue; }
+    if (ch === '/') {   // a fraction's bar after a placeholder run, plain spaces between allowed (# ?? / ??): # ?/? (placeholders) or # ?/8 (a fixed denominator)
+      let k = toks.length - 1; while (k >= 0 && isGap(toks[k])) k--;
+      if (k >= 0 && toks[k].t === 'ph') {
+        if ((m = /^\/([1-9]\d*)/.exec(rest))) { toks.push({ t: 'slash', den: +m[1] }); i += m[0].length - 1; continue; }
+        if (/^\/ *[0#?]/.test(rest)) { toks.push({ t: 'slash', den: 0 }); continue; }   // the spaces after the bar stay literals, re-emitted around it
+      }
     }
     if ((ch === 'E' || ch === 'e') && (sec[i + 1] === '+' || sec[i + 1] === '-')) { toks.push({ t: 'exp', e: ch, sign: sec[i + 1] }); i++; continue; }
     if ((m = /^general/i.exec(rest))) { toks.push({ t: 'general' }); i += m[0].length - 1; continue; }
@@ -179,7 +186,7 @@ export function compileFormat(code) {
       if (di >= 0) { const ei = s.toks.findIndex((t, i) => t.t === 'exp' && i > di); if (s.toks.slice(di + 1, ei >= 0 ? ei : undefined).filter(t => t.t === 'ph').length > 30) throw bad('more than 30 decimals'); }   // Excel shows at most 30
       if (s.cond && i >= 2) throw bad('condition past the second section');
     }
-    if (sections.length === 1 && sections[0].cond && sections[0].kind !== 'general') throw bad('a lone condition needs General');
+    // a lone conditional section ([>100]0, [<=0]"B"0) is accepted: formatValue falls back to General for the values it does not catch
     // the text section: the fourth, or a trailing @ section of a two- or three-section code ([$-409]d-mmm-yy;@ as Excel stores it)
     let numeric = sections.slice(0, 3), text = sections[3] || null;
     if ((sections.length === 2 || sections.length === 3) && sections[sections.length - 1].kind === 'text') { text = sections[sections.length - 1]; numeric = sections.slice(0, -1); }
@@ -201,6 +208,8 @@ function renderDate(toks, n) {
   const unit = 10 ** k, dayUnits = 86400 * unit;
   const T = Math.round(n * dayUnits);
   const day = Math.floor(T / dayUnits), rem = T - day * dayUnits;
+  // every date and time code, elapsed [h] included, shows serials from 0 to 31 Dec 9999 only: past that Excel fills the cell with # (TEXT: #VALUE!), never a garbage count
+  if (!Number.isFinite(T) || day < 0 || day >= LAST_SERIAL) throw bad('date out of range');
   const secs = Math.floor(rem / unit), fracDigits = String(rem % unit).padStart(k, '0');
   const hh = Math.floor(secs / 3600), mi = Math.floor(secs / 60) % 60, ss = secs % 60;
   let D = null; const d = () => D || (D = ymd(day));   // the calendar only where a code asks for it (out of range → FormatError)
@@ -307,51 +316,64 @@ function renderNumber(toks, n) {   // n ≥ 0; the caller supplies the sign
   }
   return out;
 }
-/** The fraction closest to x ≥ 0 with a denominator of at most D (a convergent or a semi-convergent of its continued fraction; ties keep the smaller denominator). */
-function bestFraction(x, D) {
+/**
+ * Excel's fraction of x ≥ 0 with a denominator of at most D: the last convergent of the WHOLE
+ * value's continued fraction that still fits (SSF's frac(), which is how Excel shows 12.3 as
+ * 12 1/3 but 0.3 as 2/7, and Microsoft's own 123.456 as 123 1/2, 123 26/57, 123 57/125). [P, Q].
+ */
+function contFraction(x, D) {
   D = Math.max(1, D);
-  let p0 = 0, q0 = 1, p1 = 1, q1 = 0, r = x;
-  for (let k = 0; k < 64; k++) {
-    const a = Math.floor(r);
-    const p2 = a * p1 + p0, q2 = a * q1 + q0;
-    if (q2 > D) {
-      const j = Math.floor((D - q0) / q1), ps = p0 + j * p1, qs = q0 + j * q1;   // the best semi-convergent that still fits
-      return qs >= 1 && Math.abs(x - ps / qs) < Math.abs(x - p1 / q1) ? [ps, qs] : [p1, q1];
-    }
-    p0 = p1; q0 = q1; p1 = p2; q1 = q2;
-    const f = r - a;
-    if (f < 1e-12) break;
-    r = 1 / f;
+  let P2 = 0, P1 = 1, P = 0, Q2 = 1, Q1 = 0, Q = 0, B = x;
+  for (let k = 0; Q1 < D && k < 64; k++) {
+    const A = Math.floor(B);
+    P = A * P1 + P2; Q = A * Q1 + Q2;
+    if (B - A < 5e-8) break;
+    B = 1 / (B - A);
+    P2 = P1; P1 = P; Q2 = Q1; Q1 = Q;
   }
-  return [p1, q1];
+  if (Q > D) { if (Q1 > D) { Q = Q2; P = P2; } else { Q = Q1; P = P1; } }
+  return [P, Q];
 }
 function renderFraction(toks, n) {   // n ≥ 0: "# ?/?" shows 4.34 as 4 1/3, "?/?" shows 1.5 as 3/2, "# ?/8" shows 3.375 as 3 3/8
-  const si = toks.findIndex(t => t.t === 'slash');
-  let ns = si; while (ns > 0 && toks[ns - 1].t === 'ph') ns--;
-  let de = si + 1; if (!toks[si].den) while (de < toks.length && toks[de].t === 'ph') de++;
-  const wholeToks = toks.slice(0, ns), numToks = toks.slice(ns, si), denToks = toks.slice(si + 1, de), tail = toks.slice(de);
+  const si = toks.findIndex(t => t.t === 'slash'), fixed = toks[si].den;
+  // the numerator run sits before the bar and the denominator run after it; plain spaces between them (# ?? / ??) are literals re-emitted around the bar
+  let ne = si; while (ne > 0 && isGap(toks[ne - 1])) ne--;
+  let ns = ne; while (ns > 0 && toks[ns - 1].t === 'ph') ns--;
+  let ds = si + 1; if (!fixed) while (ds < toks.length && isGap(toks[ds])) ds++;
+  let de = ds; if (!fixed) while (de < toks.length && toks[de].t === 'ph') de++;
+  const wholeToks = toks.slice(0, ns), numToks = toks.slice(ns, ne), gapL = toks.slice(ne, si), gapR = toks.slice(si + 1, ds), denToks = toks.slice(ds, de), tail = toks.slice(de);
   const hasWhole = wholeToks.some(t => t.t === 'ph');
-  let whole = hasWhole ? Math.floor(n) : 0;
-  const frac = hasWhole ? n - whole : n;
-  let num, den;
-  if (toks[si].den) { den = toks[si].den; num = Math.round(frac * den); }                    // a fixed denominator: 0.5 under ?/4 is 2/4
-  else [num, den] = bestFraction(frac, 10 ** denToks.length - 1);                            // k placeholders: the closest fraction with a denominator below 10^k
-  if (hasWhole && num === den) { whole += 1; num = 0; }
-  const blank = hasWhole && num === 0;   // a whole number: the fraction slot stays blank ("0    " for zero)
+  let whole = 0, num, den;
+  if (fixed) {   // a fixed denominator: 0.5 under ?/4 is 2/4, and the carry rolls up (2.999 under # ?/8 is 3)
+    den = fixed; whole = hasWhole ? Math.floor(n) : 0; num = Math.round((n - whole) * den);
+    if (hasWhole && num === den) { whole += 1; num = 0; }
+  } else {
+    const [P, Q] = contFraction(n, 10 ** Math.min(denToks.length, 7) - 1);   // k placeholders: a denominator below 10^k, and Excel never goes past 7 digits (# ??/????????? on 0.12325… is 480894/3901729)
+    den = Q; if (hasWhole) { whole = Math.floor(P / Q); num = P - whole * Q; } else num = P;
+  }
+  const forced = [...numToks, ...denToks].some(t => t.v === '0');   // a 0 placeholder always prints: a whole number shows 0/1 (0 0/0 on 1 is 1 0/1, 0 0/8 on 3 is 3 0/8)
+  const blank = hasWhole && num === 0 && !forced;                    // a whole number under ? and # placeholders: the fraction slot stays blank ("0    " for zero)
+  const anyQ = [...numToks, ...denToks].some(t => t.v === '?');      // ? pads with spaces; # shows nothing, and takes the gaps and the bar with it (# #/# on 123 is 123)
   const ip = whole || (hasWhole && blank) ? String(whole) : '';
   let grouped = false, seenPh = false, run = 0;   // #,##0 ?/?: a comma between whole placeholders groups thousands
   for (const t of wholeToks) { if (t.t === 'ph') { seenPh = true; if (run) grouped = true; run = 0; } else if (t.t === 'comma' && seenPh) run++; }
-  let out = fillInt(wholeToks, ip, grouped);
-  const padOf = t => t.v === '?' ? ' ' : t.v === '0' ? '0' : '';
-  if (blank) { out += numToks.map(padOf).join('') + ' ' + (toks[si].den ? ' '.repeat(String(toks[si].den).length) : denToks.map(padOf).join('')); }
-  else {
-    out += fillInt(numToks, String(num), false) + '/';
-    if (toks[si].den) out += String(den);
-    else { const ds = String(den); let j = 0; for (const t of denToks) out += j < ds.length ? ds[j++] : padOf(t); }
+  let wt = wholeToks; if (blank && !anyQ) { let k = wt.length; while (k > 0 && isGap(wt[k - 1])) k--; wt = wt.slice(0, k); }
+  let out = fillInt(wt, ip, grouped);
+  const padOf = t => t.v === '?' ? ' ' : '';
+  if (blank) {
+    if (anyQ) out += numToks.map(padOf).join('') + renderLits(gapL, '') + ' ' + renderLits(gapR, '') + (fixed ? ' '.repeat(String(fixed).length) : denToks.map(padOf).join(''));
+  } else {
+    out += fillInt(numToks, String(num), false) + renderLits(gapL, '') + '/' + renderLits(gapR, '');
+    const dstr = String(den);
+    if (fixed) out += dstr;
+    else if (forced) out += fillInt(denToks, dstr, false);   // 0 placeholders: digits right-aligned, zero-filled (# 00/00 on 2 is 2 00/01)
+    else { let j = 0; for (const t of denToks) out += j < dstr.length ? dstr[j++] : padOf(t); }   // ? placeholders: digits left-aligned, space-filled (# ???/??? on 1234.567 is 1234  55/97 )
   }
   return out + renderLits(tail, '');
 }
 const holds = (c, n) => c.op === '<' ? n < c.v : c.op === '<=' ? n <= c.v : c.op === '>' ? n > c.v : c.op === '>=' ? n >= c.v : c.op === '=' ? n === c.v : n !== c.v;
+/** A condition only negatives can satisfy ([<0], [<=-4], [=-5]): its section supplies the sign itself. [<=0], [<>0] and the rest keep the minus (numfmt's Excel-derived corpus: [<=0]"B"0 on -6.3 is -B6, [=-5]\A0 is A5). */
+const negOnly = c => (c.op === '<' && c.v <= 0) || (c.op === '<=' && c.v < 0) || (c.op === '=' && c.v < 0);
 
 /**
  * A value in a format code → { text, color }. Numbers pick their section (conditions first when
@@ -371,10 +393,11 @@ export function formatValue(v, code) {
   let sec, neg = false;
   if (numeric.some(s => s.cond)) {
     sec = numeric.find(s => s.cond && holds(s.cond, n)) || numeric.find(s => !s.cond && s.kind !== 'text');
-    if (!sec) return { text: '#'.repeat(8), color: null };   // Excel fills a cell no section can show with ####
-    if (n < 0 && !sec.cond) { neg = true; n = -n; }
-    else if (n < 0 && sec.cond && !((sec.cond.op === '<' || sec.cond.op === '<=') && sec.cond.v <= 0)) { neg = true; n = -n; }   // only a section that catches negatives supplies its own sign ([<>0] does not)
-    else n = Math.abs(n);
+    if (!sec) {
+      if (numeric.length === 1) return { text: numToText(n), color: null };   // a lone condition falls back to General, as Excel stores [>100]0 as [>100]0;General (50 shows as 50)
+      return { text: '#'.repeat(8), color: null };                             // two conditions that both fail: Excel fills the cell with ####
+    }
+    if (n < 0) { n = -n; if (!sec.cond || !negOnly(sec.cond)) neg = true; }   // a section only negatives can satisfy supplies its own sign; any other (the fallback included) keeps the minus
   } else {
     const negative = n < 0;
     if (negative && numeric.length >= 2) { sec = numeric[1]; n = -n; }              // the negative section supplies its own sign
@@ -383,7 +406,7 @@ export function formatValue(v, code) {
   }
   let body;
   if (sec.kind === 'general') body = renderLits(sec.toks, numToText(n));
-  else if (sec.kind === 'text') body = renderLits(sec.toks, numToText(n));
+  else if (sec.kind === 'text') body = numToText(n);   // a number under a text-only code shows as General, none of the section's literals (@@ on 5 is 5, "Site: "@ on 5 is 5)
   else if (sec.kind === 'date') { if (neg) throw bad('negative date'); body = renderDate(sec.toks, n); }
   else if (sec.kind === 'number') body = renderNumber(sec.toks, n);
   else if (sec.kind === 'fraction') body = renderFraction(sec.toks, n);
@@ -433,10 +456,10 @@ export function stepDecimals(code, delta) {
       if (ch === '0' || ch === '#' || ch === '?') {
         const r = runs[runs.length - 1];
         if (r && r.end === i) { r.end = i + 1; if (ch !== '?') r.figure = true; }
-        else runs.push({ start: i, end: i + 1, figure: ch !== '?', pad: sec[i - 1] === '"' });
+        else runs.push({ start: i, end: i + 1, figure: ch !== '?', pad: sec[i - 1] === '"' && fill >= 0 });   // the pad: a ? run on the dash literal after a * fill, never "Qty: "???
       }
       else if (ch === '.' && runs.length && dot < 0) dot = i;
-      else if (ch === '/' && runs.length && runs[runs.length - 1].end === i) return sec;   // a fraction: no decimals to step
+      else if (ch === '/' && runs.length && !sec.slice(runs[runs.length - 1].end, i).trim()) return sec;   // a fraction (# ?/?, # ?? / ??): no decimals to step
       else if ((ch === 'E' || ch === 'e') && (sec[i + 1] === '+' || sec[i + 1] === '-')) break;
     }
     const isPad = r => !r.figure && r.pad;                       // "-"??: an alignment pad, one ? per decimal

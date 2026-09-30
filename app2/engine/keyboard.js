@@ -173,8 +173,8 @@ const TYPED_DIALOGS = new Set(['renamesheet', 'find', 'numfmt']);   // a text fi
 export const NUMFMT_BAD_NOTE = 'Microsoft Excel cannot use the number format you typed.';
 export const CF_VALUE_NOTE = 'The value you entered is not a valid number, date, time, or string.';
 export const CF_FORMULA_NOTE = 'There\'s a problem with this formula.';
-/** A Highlight Cells value as a rule stores it (cfOperand: a number, a date's serial, TRUE / FALSE, text, or a '=…' formula kept as text), or null when Excel would refuse it. */
-const condOperand = text => cfOperand(text);
+/** A Highlight Cells value as a rule stores it (cfOperand: a number, a date's serial (a year-less one dated by the sheet's `today`), TRUE / FALSE, text, or a '=…' formula kept as text), or null when Excel would refuse it. */
+const condOperand = (text, today) => cfOperand(text, today);
 /** Excel's messages around the sheet commands (the views show them verbatim). */
 export const LAST_SHEET_NOTE = 'A workbook must contain at least one visible worksheet.';
 export const FIND_NONE_NOTE = "We couldn't find what you were looking for.";
@@ -214,8 +214,9 @@ export class Session {
   /**
    * Workbook plumbing every sheet gets: the resolver cross-sheet formulas read through
    * (name → Sheet, case-insensitive, live over `sheets`), the sheet list (live.js clones the
-   * whole workbook), and a change listener that recalculates the OTHER sheets after any
-   * mutation — two passes, so an A → B → A chain settles (recalc never emits: no loops).
+   * whole workbook), and a change listener that recalculates the workbook after any mutation
+   * (recalcAll: the other sheets, then every sheet again, so an A → B → A chain settles on the
+   * edited sheet too; recalc never emits: no loops).
    */
   wireSheet(sh) {
     // one clipboard per workbook (Excel): a block copied on one sheet pastes on another. The sheet's
@@ -226,13 +227,22 @@ export class Session {
     sh.resolver = name => { const e = this.sheets.find(x => x.name.toLowerCase() === String(name).toLowerCase()); return e ? e.sheet : null; };
     sh.allSheets = () => this.sheets.map(e => ({ name: e.name, sheet: e.sheet }));
     sh.onChange(what => {
-      if (!this._xr && this.sheets.length > 1 && what !== 'select' && what !== 'clipboard') {
-        this._xr = true;
-        try { for (let pass = 0; pass < 2; pass++) for (const e of this.sheets) if (e.sheet !== sh) e.sheet.recalc(); }
-        finally { this._xr = false; }
-      }
+      if (this.sheets.length > 1 && what !== 'select' && what !== 'clipboard') this.recalcAll(sh);
       this.emit('sheet');
     });
+  }
+  /**
+   * Recalculate every sheet of the workbook, two passes, so an A → B → A chain settles: the first
+   * pass skips `except` (the sheet whose own commit just recalculated it), the second takes every
+   * sheet, so the edited sheet sees the values its dependants pushed back. Each recalc also drops
+   * that sheet's conditional-formatting memo, so a rule reading another sheet repaints. Re-entrant
+   * calls (a recalc never emits, but a listener might) are ignored.
+   */
+  recalcAll(except) {
+    if (this._xr) return;
+    this._xr = true;
+    try { for (let pass = 0; pass < 2; pass++) for (const e of this.sheets) if (pass > 0 || e.sheet !== except) e.sheet.recalc(); }
+    finally { this._xr = false; }
   }
   resetEdit() {
     this.editing = false; this.editBuf = ''; this.editCaret = 0; this.editMode = 'enter';
@@ -309,7 +319,7 @@ export class Session {
     const asStay = this.autoSumEdit; this.autoSumEdit = false;
     const buf = this.editBuf.trim();
     const { r, c } = this.editCell();
-    const cls = Sheet.classifyInput(buf, S.get(r, c));
+    const cls = Sheet.classifyInput(buf, S.get(r, c), S.today);
     if (cls.kind === 'fix') { this.fxfixPend = { fixed: cls.fixed, dr, dc, all: false, via: via || null }; this.dialog = 'fxfix'; return false; }
     if (cls.kind === 'bad') { this.refuse(); return false; }
     this.editing = false; this.editBuf = ''; this.editAnchor = null; this.endPoint();
@@ -326,7 +336,7 @@ export class Session {
     const S = this.sheet;
     const buf = this.editBuf.trim();
     const { r: ar, c: ac } = this.editCell();
-    const cls = Sheet.classifyInput(buf, S.get(ar, ac));
+    const cls = Sheet.classifyInput(buf, S.get(ar, ac), S.today);
     if (cls.kind === 'fix') { this.fxfixPend = { fixed: cls.fixed, dr: 0, dc: 0, all: true, via: null }; this.dialog = 'fxfix'; return false; }
     if (cls.kind === 'bad') { this.refuse(); return false; }
     this.editing = false; this.editBuf = ''; this.editAnchor = null; this.endPoint();
@@ -702,6 +712,7 @@ export class Session {
     const i = at == null ? this.sheets.length : Math.max(0, Math.min(this.sheets.length, at | 0));
     this.sheets.splice(i, 0, { name: nm, sheet: sh });
     this.sheetIndex = this.sheets.findIndex(x => x.sheet === this.sheet);   // the active entry may have moved right
+    this.recalcAll();   // a formula (or a rule) naming the new sheet resolves now, not on the next edit
     this.emit('sheets');
     return i;
   }
@@ -738,7 +749,7 @@ export class Session {
     const idx = i | 0; if (!this.sheets[idx]) return false;
     const nm = String(name == null ? '' : name);
     if (this.sheetNameProblem(nm, idx)) return false;
-    if (this.sheets[idx].name !== nm) { this.sheets[idx].name = nm; this.emit('sheets'); }
+    if (this.sheets[idx].name !== nm) { this.sheets[idx].name = nm; this.recalcAll(); this.emit('sheets'); }   // references to the old name read #REF! at once, to the new one resolve
     return true;
   }
   /**
@@ -754,6 +765,7 @@ export class Session {
     this.sheets.splice(idx, 1);
     if (wasActive) { this.sheetIndex = Math.min(idx, this.sheets.length - 1); this.sheet = this.sheets[this.sheetIndex].sheet; }
     else this.sheetIndex = this.sheets.findIndex(x => x.sheet === this.sheet);
+    this.recalcAll();   // every reference to the deleted sheet — a cell's, a rule's — reads #REF! at once, as in Excel
     this.emit('sheets');
     if (wasActive) this.emit('sheet');
     return true;
@@ -1258,14 +1270,16 @@ export class Session {
       const style = CF_STYLE_KEYS[d.styleIdx]; let rule;
       // a formula (a rule's, or a preset's '=…' value) is read for the ACTIVE cell of the selection, as
       // Excel reads it, and stored re-based to the top-left of the Applies-to, where the rule keeps it
+      // (a reference the re-base pushes past row 1 or column A runs round the sheet edge, as Excel's =$C1048575 does: the rule keeps working wherever the reference exists)
       const S = this.sheet, act = S.dispActive(), top = S.selRects()[0];
-      const rebase = f => typeof f === 'string' && f.trimStart()[0] === '=' && (top.r1 !== act.r || top.c1 !== act.c) ? translateFormula(f, top.r1 - act.r, top.c1 - act.c) : f;
+      const rebase = f => typeof f === 'string' && f.trimStart()[0] === '=' && (top.r1 !== act.r || top.c1 !== act.c) ? translateFormula(f, top.r1 - act.r, top.c1 - act.c, { rows: S.rows, cols: S.cols }) : f;
       if (d.op === 'formula') {
-        const f = d.formula.trim(); if (!f || !parses(f)) { this.note = CF_FORMULA_NOTE; d.focus = 'formula'; return; }
+        let f = d.formula.trim(); if (f && f[0] !== '=') f = '=' + f;   // typed without its '=': the same formula, gated and re-based like its '='-prefixed twin (never a formula read for the wrong cell)
+        if (!f || !parses(f)) { this.note = CF_FORMULA_NOTE; d.focus = 'formula'; return; }
         rule = { kind: 'formula', formula: rebase(f), style };
       } else {
-        const a = condOperand(d.v1); if (a === null) { this.note = CF_VALUE_NOTE; d.focus = 'v1'; return; }
-        const b = d.op === 'between' ? condOperand(d.v2) : 0; if (b === null) { this.note = CF_VALUE_NOTE; d.focus = 'v2'; return; }
+        const a = condOperand(d.v1, S.today); if (a === null) { this.note = CF_VALUE_NOTE; d.focus = 'v1'; return; }
+        const b = d.op === 'between' ? condOperand(d.v2, S.today) : 0; if (b === null) { this.note = CF_VALUE_NOTE; d.focus = 'v2'; return; }
         rule = { kind: 'cellValue', op: d.op, v1: rebase(a), v2: rebase(b), style };
       }
       this.sheet.addCondFmt(rule); this.exitRibbon(true); return;
