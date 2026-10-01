@@ -19,6 +19,7 @@ import { dispText, dispColor, PAD_MARK } from '../engine/format.js';
 import { colLetter, refKey, parseRef } from '../engine/refs.js';
 import { formulaRefs, isErrVal } from '../engine/formula.js';
 import { recordMouse, MODAL_DIALOGS } from './ribbon-commands.js';
+import { isFormulaText } from '../engine/keyboard.js';
 
 // Excel's classic formula-highlighting palette — saturated, universally recognizable, works on
 // both dark and light themes. Same as Office Theme Accents 1, Red, Green, Purple, Accent 2, Gray.
@@ -41,9 +42,10 @@ export function escHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '
  */
 export function parseFormulaRefs(buf) {
   const refs = [], cellColors = {}, refToColor = {};
-  if (!buf || buf[0] !== '=') return { refs, cellColors };
+  if (!buf || !isFormulaText(buf)) return { refs, cellColors };
+  const off = buf[0] === '=' ? 0 : 1;   // +D5-E5 (M63) is read as =+D5-E5; positions index the buffer as typed
   let ix = 0;
-  for (const ref of formulaRefs(buf)) {
+  for (const ref of formulaRefs(off ? '=' + buf : buf)) {
     if (ref.sheet) continue;   // a cross-sheet ref outlines nothing here (its cells are not on this grid)
     let r1, c1, r2, c2;
     if (ref.range) ({ r1, c1, r2, c2 } = ref.range);
@@ -51,7 +53,7 @@ export function parseFormulaRefs(buf) {
     const coordKey = r1 + ',' + c1 + ',' + r2 + ',' + c2;
     let color = refToColor[coordKey];
     if (!color) { color = REF_PALETTE[ix++ % REF_PALETTE.length]; refToColor[coordKey] = color; }
-    refs.push({ raw: ref.text, r1, c1, r2, c2, color, start: ref.pos, end: ref.end });
+    refs.push({ raw: ref.text, r1, c1, r2, c2, color, start: ref.pos - off, end: ref.end - off });
     for (let rr = r1; rr <= r2; rr++) for (let cc = c1; cc <= c2; cc++) {
       const k = refKey(rr, cc);
       if (!cellColors[k]) cellColors[k] = color;   // first-colour-wins on overlaps so the visual stays stable
@@ -99,8 +101,25 @@ export class SheetView {
     const gw = document.createElement('div'); gw.className = 'gridwrap';
     gw.innerHTML = '<table id="grid"></table><div class="marquee"></div>';
     el.classList.add('sheet-view');   // the flex-column chain (app.css) so the grid fills its frame from any host element
-    el.appendChild(fbar); el.appendChild(gw);
-    this.fbar = fbar; this.nameBox = fbar.querySelector('.namebox'); this.fContent = fbar.querySelector('.fcontent'); this.fxActions = fbar.querySelector('.fx-actions');
+    const sbar = document.createElement('div'); sbar.className = 'sbar';   // the status bar (M40, M65): the mode word, the selection's figures, the zoom
+    sbar.innerHTML = '<span class="sb-mode"></span><span class="sb-group"></span><span class="sb-fill"></span><span class="sb-stats"></span><span class="sb-menu" hidden></span><span class="sb-zoom"></span>';
+    el.appendChild(fbar); el.appendChild(gw); el.appendChild(sbar);
+    this.sbar = sbar;
+    this._onSbarMenu = e => { e.preventDefault(); const m = sbar.querySelector('.sb-menu'); m.hidden = !m.hidden; this.renderStatus(); };
+    this._onSbarClick = e => { const it = e.target.closest && e.target.closest('[data-sb]'); if (!it) return; this.session.toggleStatusItem(it.dataset.sb); this.renderStatus(); };
+    sbar.addEventListener('contextmenu', this._onSbarMenu); sbar.addEventListener('click', this._onSbarClick);
+    // the Name Box list (M40): a click drops the workbook's names; picking one goes there
+    this._onNameBox = e => {
+      const it = e.target.closest && e.target.closest('[data-name]');
+      if (it) { this.session.goToName(it.dataset.name); this.nbList.hidden = true; this.session.emit('mouse'); return; }
+      const names = this.session.definedNames ? this.session.definedNames() : [];
+      if (!names.length) return;
+      this.nbList.innerHTML = names.map(n => '<div class="nb-item" data-name="' + escHtml(n.name) + '">' + escHtml(n.name) + '</div>').join('');
+      this.nbList.hidden = !this.nbList.hidden;
+    };
+    this.nbList = document.createElement('div'); this.nbList.className = 'nb-list'; this.nbList.hidden = true; fbar.appendChild(this.nbList);
+    this.fbar = fbar; this.nameBox = fbar.querySelector('.namebox');
+    this.nameBox.addEventListener('click', this._onNameBox); this.nbList.addEventListener('click', this._onNameBox); this.fContent = fbar.querySelector('.fcontent'); this.fxActions = fbar.querySelector('.fx-actions');
     this.gw = gw; this.grid = gw.querySelector('table'); this.marquee = gw.querySelector('.marquee');
     this._roPend = false; this._rzT = null;
     this.ew = [];   // the column widths the last render painted with (the engine's colW; index = column)
@@ -135,7 +154,8 @@ export class SheetView {
     window.removeEventListener('resize', this._onResize); clearTimeout(this._rzT);
     this.endDrag();
     this.gw.removeEventListener('mousedown', this._onDown); this.gw.removeEventListener('dblclick', this._onDbl);
-    this.fbar.remove(); this.gw.remove(); this.el.classList.remove('sheet-view');
+    this.sbar.removeEventListener('contextmenu', this._onSbarMenu); this.sbar.removeEventListener('click', this._onSbarClick);
+    this.fbar.remove(); this.gw.remove(); this.sbar.remove(); this.el.classList.remove('sheet-view');
   }
 
   /* ---------------- mouse ---------------- */
@@ -262,10 +282,12 @@ export class SheetView {
     groups.rows.forEach((g, i) => { for (let r = g.r1; r <= g.r2; r++) { if (g.collapsed) foldR.add(r); else olR.add(r); } const h = host(g.r2, g.r1, ROWS); if (h) btnR[h] = { i, on: !!g.collapsed }; });
     const showFx = !!(ss.settings && ss.settings.showFormulas);   // Ctrl+` (C2 gap 5): formula text in place of values
     const cf = S.condFmt && S.condFmt.length ? S.condFmtMap() : null;   // conditional formatting (Chapter 2): evaluated once per paint
-    for (let c = 1; c <= COLS; c++) { const w = hidC.has(c) || foldC.has(c) ? 0 : (colW[c] || COLW_DEFAULT); W[c] = w; totalW += w; L[c] = colLetter(c); }
+    const z = (S.zoom || 100) / 100, Z = px => Math.round(px * z);   // the sheet's zoom (M44, M99): every painted size scales, the engine's widths stay
+    totalW = Z(ROWHDR_W);
+    for (let c = 1; c <= COLS; c++) { const w = hidC.has(c) || foldC.has(c) ? 0 : (colW[c] || COLW_DEFAULT); W[c] = w; totalW += Z(w); L[c] = colLetter(c); }
     this.ew = W;
     const olBtn = (axis, b) => (b ? '<button type="button" tabindex="-1" class="ol-btn' + (b.on ? ' on' : '') + '" data-ol="' + axis + ':' + b.i + '" title="' + (b.on ? 'Show detail' : 'Hide detail') + '">' + (b.on ? '+' : '−') + '</button>' : '');
-    const N = ROWS * COLS, shape = ROWS + 'x' + COLS + ':' + W.join(',') + '|' + [...hidR].join('.') + '|' + rowH.join('.') + '|' + freeze.r + ',' + freeze.c + '|' + JSON.stringify(groups);
+    const N = ROWS * COLS, shape = z + '@' + ROWS + 'x' + COLS + ':' + W.join(',') + '|' + [...hidR].join('.') + '|' + rowH.join('.') + '|' + freeze.r + ',' + freeze.c + '|' + JSON.stringify(groups);
     const patch = this._shape === shape && !!this._tds && this._tds.length === N && this.grid.rows.length === ROWS + 1;
     if (!patch) { this._cls = new Array(N); this._sty = new Array(N); this._txt = new Array(N); }
     const oldCls = this._cls, oldSty = this._sty, oldTxt = this._txt, tds = this._tds;
@@ -280,11 +302,11 @@ export class SheetView {
 
     let gh = '';
     if (!patch) {
-      gw.style.setProperty('--cellh', ROW_H + 'px'); gw.style.setProperty('--cellpad', CELL_PAD + 'px');
+      gw.style.setProperty('--cellh', Z(ROW_H) + 'px'); gw.style.setProperty('--cellpad', CELL_PAD + 'px'); gw.style.setProperty('--zoom', String(z));
       this.grid.style.width = totalW + 'px';   // table-layout:fixed — the <col> widths are the column widths
       // column widths, then the header row — no active-column highlight (the old build had none)
-      gh = '<colgroup><col style="width:' + ROWHDR_W + 'px">';
-      for (let c = 1; c <= COLS; c++) gh += '<col style="width:' + W[c] + 'px">';
+      gh = '<colgroup><col style="width:' + Z(ROWHDR_W) + 'px">';
+      for (let c = 1; c <= COLS; c++) gh += '<col style="width:' + Z(W[c]) + 'px">';
       gh += '</colgroup><tr><th class="rowhdr"></th>';
       for (let c = 1; c <= COLS; c++) gh += '<th class="' + (hidC.has(c) || foldC.has(c) ? 'hidc' : hidC.has(c - 1) ? 'seam-c' : '') + (olC.has(c) ? ' ol-c' : '') + (btnC[c] ? ' ol-host' : '') + '">' + olBtn('c', btnC[c]) + L[c] + '</th>';
       gh += '</tr>';
@@ -294,7 +316,7 @@ export class SheetView {
     for (let r = 1; r <= ROWS; r++) {
       const rowIn = hasSel && r >= sr.r1 && r <= sr.r2;
       const rh = rowH[r] || ROW_H;
-      let row = patch ? '' : '<tr' + (hidR.has(r) || foldR.has(r) ? ' class="hidrow"' : rh !== ROW_H ? ' style="height:' + rh + 'px"' : '') + '><th class="rowhdr' + (hidR.has(r - 1) ? ' seam-r' : '') + (olR.has(r) ? ' ol-r' : '') + (btnR[r] ? ' ol-host' : '') + '" data-row="' + r + '">' + olBtn('r', btnR[r]) + r + '</th>';
+      let row = patch ? '' : '<tr' + (hidR.has(r) || foldR.has(r) ? ' class="hidrow"' : rh !== ROW_H ? ' style="height:' + Z(rh) + 'px"' : '') + '><th class="rowhdr' + (hidR.has(r - 1) ? ' seam-r' : '') + (olR.has(r) ? ' ol-r' : '') + (btnR[r] ? ' ol-host' : '') + '" data-row="' + r + '">' + olBtn('r', btnR[r]) + r + '</th>';
       for (let c = 1; c <= COLS; c++, i++) {
         const isActive = (r === dA.r && c === dA.c);
         const inSel = rowIn && c >= sr.c1 && c <= sr.c2;
@@ -340,14 +362,17 @@ export class SheetView {
             // Editing cell: the formula buffer with coloured refs (matches the formula bar), in the pop-out overlay
             const { refs } = parseFormulaRefs(ss.editBuf);
             cls += ' editing';
-            txt = '<span class="edbox"><span class="edin">' + buildFormulaHTML(ss.editBuf, refs, ss.editCaret) + '</span></span>';
+            const rest = ss.acFull && ss.acFull.length > ss.editBuf.length ? '<span class="ac-rest">' + escHtml(ss.acFull.slice(ss.editBuf.length)) + '</span>' : '';
+            const L2 = ss.fxList;
+            const list = L2 ? '<span class="ac-list" role="listbox">' + L2.items.slice(Math.max(0, L2.idx - 7), Math.max(0, L2.idx - 7) + 8).map(it => '<span class="ac-item' + (it === L2.items[L2.idx] ? ' on' : '') + (it.kind === 'name' ? ' ac-name' : '') + '">' + escHtml(it.name) + '</span>').join('') + '</span>' : '';
+            txt = '<span class="edbox"><span class="edin">' + buildFormulaHTML(ss.editBuf, refs, ss.editCaret) + rest + '</span>' + list + '</span>';
           }
           else if (fxShown) { /* painted above */ }
           else if (cell.txt && (cell.ca | 0) > 1 && typeof cell.value === 'string') {
             // CENTER ACROSS SELECTION — the anchor's text centers over its stored span; no merged cells
             let caw = 0; for (let k2 = 0; k2 < cell.ca && c + k2 <= COLS; k2++) caw += W[c + k2];
             cls += ' spill';
-            txt = '<span class="sp" style="width:' + (caw - 2 * CELL_PAD) + 'px;max-width:' + (caw - 2 * CELL_PAD) + 'px;text-align:center;display:inline-block">' + txt + '</span>';
+            txt = '<span class="sp" style="width:' + (Z(caw) - 2 * CELL_PAD) + 'px;max-width:' + (Z(caw) - 2 * CELL_PAD) + 'px;text-align:center;display:inline-block">' + txt + '</span>';
           }
           else if (cell.txt && !cell.wrap && typeof cell.value === 'string') {
             // EXCEL PARITY — long text SPILLS across empty right neighbours, clipping at the first occupied cell
@@ -358,22 +383,22 @@ export class SheetView {
               if (spillW > W[c]) {
                 cls += ' spill';
                 // the highlighted anchor's outline/tint covers ONLY its own cell; the text paints on top
-                const hi = (isActive || inSel) ? '<span class="sphi" style="width:' + W[c] + 'px"></span>' : '';
-                txt = hi + '<span class="sp" style="max-width:' + (spillW - 2 * CELL_PAD) + 'px">' + txt + '</span>';
+                const hi = (isActive || inSel) ? '<span class="sphi" style="width:' + Z(W[c]) + 'px"></span>' : '';
+                txt = hi + '<span class="sp" style="max-width:' + (Z(spillW) - 2 * CELL_PAD) + 'px">' + txt + '</span>';
               }
             }
           }
           else if (isNum && !cell.wrap) {
             // #### when the number needs more than the column's engine width, or when its format cannot
             // show it at all (a negative date, a value no section fits): the engine's own # fill
-            if (fit.over) { cls += ' over'; txt = '#'.repeat(Math.max(3, Math.floor((W[c] - 2 * CELL_PAD) / HASH_PX))); }
+            if (fit.over) { cls += ' over'; txt = '#'.repeat(Math.max(3, Math.floor((Z(W[c]) - 2 * CELL_PAD) / (HASH_PX * z)))); }
           }
 
           if (cell.indent) {   // Alt H 6/5 indent — pad the content gutter (right edge for right-aligned cells)
             const pad = CELL_PAD + (cell.indent | 0) * 13;
             style += (cell.align === 'r') ? (';padding-right:' + pad + 'px') : (';padding-left:' + pad + 'px');
           }
-          if (cell.fsz) style += ';font-size:' + cell.fsz + 'px';   // grow/shrink font (Alt H F G/K)
+          if (cell.fsz) style += ';font-size:' + (Math.round(cell.fsz * z * 100) / 100) + 'px';   // grow/shrink font (Alt H F G/K)
         }
         const cfc = cf && cf[key];   // a rule's paint: fill (a colour scale's too) / font colour / border / data bar, over the cell's own
         if (cfc) {
@@ -420,6 +445,27 @@ export class SheetView {
     this.positionMarquee();
     this.measurePage();
     this.updateFormulaBar();
+    this.renderStatus();
+  }
+  /** The status bar: Ready / Enter / Edit / Point, Group when sheets are grouped, Average / Count / Sum (and Minimum / Maximum when ticked) of a selection of two or more filled cells, the zoom. */
+  renderStatus() {
+    const ss = this.session, sb = this.sbar; if (!sb || !ss.statusInfo) return;
+    const st = ss.statusInfo();
+    sb.querySelector('.sb-mode').textContent = st.mode;
+    sb.querySelector('.sb-group').textContent = st.grouped ? 'Group' : '';
+    const parts = [];
+    if (st.show) {
+      if (st.numCount) parts.push(['Average', st.text.average]);
+      parts.push(['Count', st.text.count]);
+      if (st.numCount && st.showMin) parts.push(['Min', st.text.min]);
+      if (st.numCount && st.showMax) parts.push(['Max', st.text.max]);
+      if (st.numCount) parts.push(['Sum', st.text.sum]);
+    }
+    sb.querySelector('.sb-stats').innerHTML = parts.map(([k, v]) => '<span class="sb-stat">' + k + ': <b>' + escHtml(String(v).trim()) + '</b></span>').join('');
+    const menu = sb.querySelector('.sb-menu');
+    if (!menu.hidden) menu.innerHTML = '<span class="sb-item' + (st.showMin ? ' on' : '') + '" data-sb="min">Minimum</span><span class="sb-item' + (st.showMax ? ' on' : '') + '" data-sb="max">Maximum</span>';
+    sb.querySelector('.sb-zoom').textContent = st.zoom + '%';
+    this.fbar.classList.toggle('expanded', !!(ss.settings && ss.settings.formulaBarExpanded));
   }
 
   /** The box changed size: the grid stands, the scroll position and the screen count follow. */
@@ -502,6 +548,8 @@ export class SheetView {
       if (l >= -0.5) nc++;
     }
     ss.pageRows = Math.max(1, nr); ss.pageCols = Math.max(1, nc);
+    const z = (this.sheet.zoom || 100) / 100;
+    ss.viewSize = { width: Math.round(b.viewW / z * 1) + ROWHDR_W, height: Math.round(b.viewH / z) + ROW_H };   // the sheet area at 100%, for Zoom › Fit selection
   }
 
   /** The marching ants over the copied block (sheet.clipboard.rect), placed over the live cells — only on the sheet the block was copied from. */
@@ -536,7 +584,9 @@ export class SheetView {
     fxa.classList.remove('on');
     const dA = S.dispActive();
     const cell = S.get(dA.r, dA.c);
-    this.nameBox.textContent = refKey(dA.r, dA.c);
+    const sr = S.selRange(), here = (ss.sheets[ss.sheetIndex] || {}).name;
+    const named = ss.definedNames ? ss.definedNames().find(n => n.sheet === here && n.ref.replace(/\$/g, '') === (sr.r1 === sr.r2 && sr.c1 === sr.c2 ? refKey(sr.r1, sr.c1) : refKey(sr.r1, sr.c1) + ':' + refKey(sr.r2, sr.c2))) : null;
+    this.nameBox.textContent = named ? named.name : refKey(dA.r, dA.c);
     if (cell.formula) {
       fc.className = 'fcontent isfx';
       const { refs } = parseFormulaRefs(cell.formula);

@@ -27,7 +27,7 @@ export class LessonRun {
   reset(mode) {
     if (mode) this.mode = mode;
     this.ghostSnap = null; this.ghosting = false;   // a restart mid-ghost: the freeze belongs to the session being thrown away
-    const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells ? structuredCloneCells(sp.cells) : undefined, colW: sp.colW, active: sp.active, today: this.opts.today, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups, condFmt: sp.condFmt });
+    const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells ? structuredCloneCells(sp.cells) : undefined, colW: sp.colW, active: sp.active, today: this.opts.today, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups, condFmt: sp.condFmt, zoom: sp.zoom });
     // A module lesson (C2): the starting workbook is a named state of the module workbook — the
     // file the previous lesson left — not an inline sheet. The legacy path stays for drills and
     // the old lessons until the rewrite completes.
@@ -61,7 +61,10 @@ export class LessonRun {
       if (st.iterative !== undefined) this.session.settings.iterative = !!st.iterative;
       if (Array.isArray(st.qat)) this.session.settings.qat = st.qat.slice();
       if (st.pageSetup && typeof st.pageSetup === 'object') { const p = JSON.parse(JSON.stringify(st.pageSetup)); this.session.settings.pageSetup = { ...this.session.settings.pageSetup, ...p, footer: { ...this.session.settings.pageSetup.footer, ...(p.footer || {}) } }; }
+      if (st.enterMoves === false) this.session.settings.enterMoves = false;   // 1.1.4 on: Enter commits and stays (Options › Advanced)
     }
+    // the workbook's defined names ({ CostPerWash: 'Inputs!$B$4' }, from 1.3.5's Define Name)
+    if (moduleState && moduleState.names && typeof moduleState.names === 'object' && Object.keys(moduleState.names).length) this.session.names = moduleState.names;
     this.landedAt = [];   // when each goal landed (the session clock), for split times
     // Demo goals (goal.demo = { script, cadence }): the platform plays the keys itself while the
     // learner watches. The session records which demos have finished so the goal's check can read it.
@@ -185,7 +188,7 @@ export class LessonRun {
       sheets: ses.sheets.map(e => ({ snap: e.sheet.snapshot(), gridlines: e.sheet.gridlines, undo: e.sheet.undoStack.length, redo: e.sheet.redoStack.length })),
       clip: ses.sheet.clipboard,   // the workbook's one clipboard
       idx: ses.sheetIndex, t0: ses.t0, keyLen: ses.keyLog.length, mouse: ses.mouse.count,
-      settings: JSON.parse(JSON.stringify({ calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat, pageSetup: ses.settings.pageSetup, showFormulas: !!ses.settings.showFormulas })),
+      settings: JSON.parse(JSON.stringify({ calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat, pageSetup: ses.settings.pageSetup, showFormulas: !!ses.settings.showFormulas, enterMoves: ses.settings.enterMoves !== false })),
       at: this.opts.now ? this.opts.now() : Date.now(),   // when the ghost began: a closer's playback is the platform's time, not the learner's
     };
     this.ghosting = true;
@@ -200,7 +203,7 @@ export class LessonRun {
     g.sheets.forEach((s, i) => { const sh = ses.sheets[i].sheet; sh.restore(s.snap); sh.gridlines = s.gridlines; sh.undoStack.length = s.undo; sh.redoStack.length = s.redo; });
     ses.sheetIndex = g.idx; ses.sheet = ses.sheets[g.idx].sheet; ses.sheet.clipboard = g.clip;
     ses.t0 = g.t0; ses.keyLog.length = g.keyLen; ses.mouse.count = g.mouse;
-    Object.assign(ses.settings, g.settings);
+    Object.assign(ses.settings, g.settings); ses.group = null;
     ses.resetEdit(); ses.mode = 'normal'; ses.path = []; ses.dialog = null; ses.dlg = null; ses.dialogBuf = ''; ses.pasteKind = null; ses.note = '';
     this.ghostSnap = null; this.ghosting = false;
     this.emit('session');

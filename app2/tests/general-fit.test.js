@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { fitGeneral, dispMarked, dispText, PAD_MARK } from '../engine/format.js';
 import { formatValue, formatMarked } from '../engine/numfmt.js';
 import { Sheet, cellShown, COLW_DEFAULT } from '../engine/sheet.js';
-import { padHtml } from '../ui/sheet-view.js';
+import { padHtml, parseFormulaRefs } from '../ui/sheet-view.js';
 
 test('fitGeneral: the full General text when it fits', () => {
   assert.equal(fitGeneral(1234, 6), '1234');
@@ -61,4 +61,11 @@ test('the _x pad is marked for the painter and a space for everything else', () 
   assert.equal(dispText({ value: 1234, fmtStyle: 'comma', decimals: 0 }), '1,234');
   assert.equal(padHtml('1,234' + PAD_MARK + ')'), '1,234<span class="padx" aria-hidden="true">)</span>');
   assert.equal(padHtml('x' + PAD_MARK + '&nbsp;'), 'x<span class="padx" aria-hidden="true">&nbsp;</span>');
+});
+
+test('M63: a formula typed with + or - colors its references like one typed with =', () => {
+  const p = parseFormulaRefs('+D5-E5');
+  assert.deepEqual(p.refs.map(r => [r.raw, r.start, r.end]), [['D5', 1, 3], ['E5', 4, 6]], 'positions index the buffer as typed');
+  assert.equal(parseFormulaRefs('-A1').refs.length, 1);
+  assert.equal(parseFormulaRefs('D5').refs.length, 0, 'plain text is not a formula');
 });

@@ -241,3 +241,18 @@ test('M41 / M44 / M99: Alt+PgDn and Ctrl+Alt+PgDn are the sheet keys; zoom is th
   assert.equal(zoomToFit(s.sheet, { width: 300, height: 300, floor: 50 }), 50, 'a large one is held at the floor');
   assert.equal(zoomToFit(s.sheet, {}), 100);
 });
+
+/* ---------------- the runner applies the new state fields ---------------- */
+import { WORKBOOKS } from '../content/workbooks/index.js';
+import { LessonRun } from '../app/runner.js';
+test('the runner applies a state\'s settings.enterMoves, its defined names and a sheet\'s zoom', () => {
+  WORKBOOKS['__probe'] = { stateOf: () => ({ sheets: [{ name: 'Report', cells: { B6: { value: 100 }, C6: { formula: '=B6*CostPerWash' } }, zoom: 85 }, { name: 'Inputs', cells: { B4: { value: 1.5 } } }],
+    settings: { enterMoves: false }, names: { CostPerWash: 'Inputs!$B$4' } }) };
+  try {
+    const run = new LessonRun({ id: 'probe', workbook: '__probe', state: { before: 'S1' }, goals: [{ id: 'g', text: 'x', check: () => false }] }, { now: () => 0 });
+    const ses = run.session;
+    assert.equal(ses.settings.enterMoves, false); assert.deepEqual(ses.names, { CostPerWash: 'Inputs!$B$4' });
+    assert.equal(ses.sheet.value('C6'), 150, 'the name reads in a formula from the start'); assert.equal(ses.sheet.zoom, 85);
+    ses.run('"1" Enter'); assert.equal(ses.sheet.selectionText(), 'A1', 'Enter stays');
+  } finally { delete WORKBOOKS['__probe']; }
+});

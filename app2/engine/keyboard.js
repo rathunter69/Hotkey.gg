@@ -1112,6 +1112,10 @@ export class Session {
     if (field === 'special' && this.dialog === 'goto') { this.openGoToSpecial(); return true; }        // the Go To card's Special… button
     if (field === 'tab' && d.kind === 'pagesetup') { if (!PAGESETUP_TABS.some(t => t.k === value)) return false; d.tab = value; d.focus = 'tabs'; d.sub = null; this.lastTabs.pagesetup = value; return true; }   // the card's tab strip
     if (field === 'tab' && d.kind === 'formatcells') { if (!this.fcOrder || !['number', 'alignment', 'font', 'border', 'fill', 'protection'].includes(value)) return false; this.fcSetTab(value); return true; }
+    if (field === 'key' && typeof value === 'string' && /^(?:Alt\+)?[A-Z0-9]$/.test(value)) { this.dlgKey(value); return true; }   // a click on a control with an accelerator: the same key
+    if (field === 'noteDone' && d.kind === 'note') { this.noteKey('Escape'); return true; }   // the note's Done: leaves it, saved, as Esc does
+    if (field === 'cat' && d.kind === 'formatcells') { const i = value | 0; if (i < 0 || i >= 12) return false; this.fcSetCat(i); d.focus = 'category'; return true; }
+    if (field === 'neg' && d.kind === 'formatcells') { if (!['minus', 'red', 'paren', 'parenRed'].includes(value)) return false; d.neg = value; d.focus = 'neg'; d.dirty.number = true; return true; }
     if (field === 'grid' && d.kind === 'pagesetup') { this.pageSetupKey('Alt+G'); return true; }   // the card's Gridlines box
     if (field === 'replaceAll' && this.dialog === 'find' && d.kind === 'find' && d.replace) { this.findKey('ReplaceAll'); return true; }   // the card's Replace All button
     if (field === 'style' && d.kind === 'condfmt') { const i = value | 0; if (i < 0 || i >= CF_STYLE_KEYS.length) return false; d.styleIdx = i; d.focus = 'style'; return true; }   // a click on a style chip

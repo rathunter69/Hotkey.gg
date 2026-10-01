@@ -154,3 +154,24 @@
 .cf-prev{display:inline-block; height:18px; line-height:18px; padding:0 4px; border-radius:3px; font-size:11px; text-align:center; background:var(--surface); border:1px solid var(--line); min-width:60px}
 .cf-empty{padding:8px 6px; font-size:12px; color:var(--muted)}
 .cf-btns{display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 4px}
+
+/* run R1 engine work: Format Cells, Series, Margins, Find All, the note, grouped tabs */
+.wb-tab.grp{background:var(--surface2); border-top-color:var(--accent-dim)}
+.ps-tabs.foc .ps-tab.on{box-shadow:0 0 0 2px var(--accent-glow)}
+.ps-btns{display:flex; gap:6px; justify-content:flex-end; margin:6px 0 2px}
+.ps-margins{display:grid; grid-template-columns:repeat(3, auto); gap:6px 14px; padding:4px 6px 8px; justify-content:start}
+.ps-margin{display:flex; align-items:center; gap:6px; font-size:12px}
+.fc-number{display:grid; grid-template-columns:160px 1fr; gap:12px}
+.fc-cats{height:220px}
+.fc-right .od-list{height:auto; max-height:120px}
+.fc-sample{min-height:20px; padding:2px 6px; margin-bottom:6px; border-bottom:1px solid var(--line); font-family:var(--mono); font-size:12px; color:var(--text)}
+.od-item.fc-red{color:var(--bad)}
+.od-item.fc-red.on{color:var(--on-accent)}
+.fc-swatches{display:flex; flex-wrap:wrap; gap:4px; align-items:center}
+.fc-swatch{width:16px; height:16px; border:1px solid var(--line); border-radius:3px}
+.fc-swatch.on{outline:2px solid var(--accent); outline-offset:1px}
+.sr-cols{display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:6px}
+.fd-results{height:auto; max-height:150px; margin-top:6px}
+.fd-results .od-item{display:grid; grid-template-columns:1fr 60px 1fr 1fr; gap:6px}
+.fd-results .fd-h{font-weight:700; color:var(--muted); cursor:default}
+.nt-box{min-height:70px; padding:6px 8px; border:1px solid var(--line); border-radius:4px; background:var(--note-bg); color:var(--note-text); font-family:var(--sans); font-size:12px; white-space:pre-wrap}
