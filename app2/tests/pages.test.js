@@ -15,7 +15,7 @@ import { ACCOUNT_ITEMS } from '../ui/nav.js';
 /* ---------------- prefs ---------------- */
 test('prefs: defaults follow the detected platform', () => {
   assert.deepEqual(defaultPrefs('mac'), { platform: 'mac', experience: null, firstRunDone: false, skipped: [], ribbon: null, mute: false, effects: 'full', ghost: true,
-    density: 'comfortable', panelSide: 'overlay', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false, dashHintsSeen: false, pagesDelivered: [], tabKeysNoted: false });
+    density: 'comfortable', panelSide: 'overlay', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false, dashHintsSeen: false, pagesDelivered: [], tabKeysNoted: false, coachMarksDone: false });
   assert.equal(defaultPrefs('amiga').platform, 'win');
   assert.equal(PREFS_KEY, 'hk2_prefs');
 });
@@ -30,7 +30,7 @@ test('prefs: corrupt and wrong-typed values normalise to defaults', () => {
 test('prefs: valid values survive; skipped keeps unique non-empty strings, capped', () => {
   const p = normalisePrefs({ platform: 'mac', experience: 'daily', firstRunDone: true, skipped: ['a', 'a', '', 7, null, 'b'], ribbon: 'slim', mute: true }, 'win');
   assert.deepEqual(p, { platform: 'mac', experience: 'daily', firstRunDone: true, skipped: ['a', 'b'], ribbon: 'slim', mute: true, effects: 'full', ghost: true,
-    density: 'comfortable', panelSide: 'overlay', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false, dashHintsSeen: false, pagesDelivered: [], tabKeysNoted: false });
+    density: 'comfortable', panelSide: 'overlay', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false, dashHintsSeen: false, pagesDelivered: [], tabKeysNoted: false, coachMarksDone: false });
   const many = normalisePrefs({ skipped: Array.from({ length: 2000 }, (_, i) => 'l' + i) }, 'win');
   assert.equal(many.skipped.length, 500);
 });
@@ -191,7 +191,7 @@ test('teams: the group-access request validates every field', () => {
 });
 
 test('the footer and account menu carry the spec lists', () => {
-  assert.deepEqual(FOOTER_LINKS.map(l => l.label), ['Pricing', 'Teams', 'About', 'Terms', 'Privacy', 'Contact']);
+  assert.deepEqual(FOOTER_LINKS.map(l => l.label), ['Pricing', 'For teams', 'About', 'Contact', 'Privacy', 'Terms of Use', 'EULA'], '3.0: the footer on every site page');
   assert.deepEqual(ACCOUNT_ITEMS.map(i => i.key), ['profile', 'settings', 'billing', 'certificate'], '3.0: the account row opens Profile, Settings, Plan and billing, Your certificate');
   assert.ok(ACCOUNT_ITEMS.every(i => i.href.startsWith('#/account')));
 });

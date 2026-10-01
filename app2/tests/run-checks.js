@@ -62,7 +62,8 @@ if (pp.status !== 0) fail((pp.stderr || pp.stdout).trim());
 console.log(pp.stdout.trim());
 
 // 2c. the copy layer: content/copy/index.js is inlined from the CSVs and must not drift; the copy rules hold
-for (const script of ['copy-build.js', 'copy-check.js']) {
+// 2d. the CSS check (M94): what a machine can check of 3.0's tells, over every stylesheet and module
+for (const script of ['copy-build.js', 'copy-check.js', 'css-check.js']) {
   const r = spawnSync(process.execPath, [join(here, script)], { encoding: 'utf8' });
   if (r.status !== 0) fail((r.stderr || r.stdout).trim());
   const lines = (r.stdout + r.stderr).trim().split('\n'); console.log(lines[lines.length - 1]);

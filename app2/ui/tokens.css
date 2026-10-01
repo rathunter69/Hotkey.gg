@@ -38,7 +38,7 @@
   --font:'Hanken Grotesk',system-ui,sans-serif;          /* every label, button, heading and sentence */
   --mono:'JetBrains Mono',ui-monospace,monospace;        /* keys, addresses, formulas, times, the wordmark */
   --cellfont:Arial,'Calibri','Segoe UI',system-ui,sans-serif;   /* the sheet's own face */
-  --fs-landing:64px; --fs-prompt:52px; --fs-time:34px; --fs-title:28px; --fs-head:22px; --fs-clock:26px;
+  --fs-landing:52px; --fs-prompt:52px; --fs-time:34px; --fs-title:28px; --fs-head:22px; --fs-clock:26px;
   --fs-item:18px; --fs-panel:17px; --fs-body:15px; --fs-name:14.5px; --fs-label:13px; --fs-key:12.5px; --fs-min:12px;
   --fw-heavy:800; --fw-bold:700; --fw-semi:600; --fw-key:500; --fw-body:400;
   --lh-tight:1.0; --lh-body:1.5;
@@ -55,7 +55,7 @@
   --rail-w:232px; --content-top:30px; --content-side:36px; --side-col:336px;
   --panel-w:340px; --card-w:330px; --card-gap:16px;
   --tabrow-h:34px; --ribbon-h:96px; --ribbon-groups-h:72px; --ribbon-tabs-h:24px; --qat-h:26px;
-  --cursor-w:2px; --cursor-handle:6px; --mode-mark:9px; --mode-rule:3px; --key-edge:3px; --route-bar:3px;
+  --cursor-w:2px; --bw-1-5:1.5px; --bw-2:2px; --bw-3:3px; --tick-check:5px; --cursor-handle:6px; --mode-mark:9px; --mode-rule:3px; --key-edge:3px; --route-bar:3px;
   --theme-tile-w:64px; --theme-tile-h:46px; --demo-w:640px; --demo-h:560px; --narrow:900px;
   /* the site pages' parts (M89, M104): goal segments, the level and field bars, tier marks, badge tiles, the sheet preview, a table row */
   --seg-w:24px; --seg-h:5px; --bar-h:6px; --field-bar-w:200px; --tier-mark:9px; --badge-tile:48px; --preview-h:300px; --sp-row:17px; --row-h:36px; --level-tile:40px;

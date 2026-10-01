@@ -38,7 +38,7 @@ export function detectPlatform(nav) {
 export function defaultPrefs(detected) {
   return { platform: PLATFORMS.includes(detected) ? detected : 'win', experience: null, firstRunDone: false, skipped: [], ribbon: null, mute: false, effects: 'full', ghost: true,
     density: 'comfortable', panelSide: 'overlay', briefingDone: false, installPromptAt: 0, beatsSeen: [], saveNudgeDone: false, dashHintsSeen: false,
-    pagesDelivered: [], tabKeysNoted: false };
+    pagesDelivered: [], tabKeysNoted: false, coachMarksDone: false };
 }
 
 /**
@@ -81,6 +81,8 @@ export function normalisePrefs(raw, detected) {
   }
   // the one note, in a browser tab, that the browser may take Ctrl+PgUp/PgDn (C2)
   out.tabKeysNoted = raw.tabKeysNoted === true;
+  // the coach marks on the rail after the first lesson (3.0, The first run; M92): shown once
+  out.coachMarksDone = raw.coachMarksDone === true;
   return out;
 }
 

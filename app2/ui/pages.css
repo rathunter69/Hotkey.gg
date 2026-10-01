@@ -40,12 +40,12 @@
 /* ---------- the table ---------- */
 .tbl{width:100%; border-collapse:collapse; font-size:var(--fs-name); font-variant-numeric:tabular-nums}
 .tbl th, .tbl td{text-align:left; padding:0 var(--s2); height:var(--row-h); vertical-align:middle; border:0; border-bottom:1px solid var(--line); white-space:nowrap; overflow:visible; position:static; font-family:inherit; transition:none; background:none}
-.tbl th{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2); border-top:2px solid var(--ink); border-bottom:1px solid var(--line); height:auto; padding-top:var(--s2); padding-bottom:var(--s2)}
+.tbl th{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2); border-top:var(--bw-2) solid var(--ink); border-bottom:1px solid var(--line); height:auto; padding-top:var(--s2); padding-bottom:var(--s2)}
 .tbl td:first-child, .tbl th:first-child{padding-left:var(--s3)}
 .tbl td:last-child, .tbl th:last-child{padding-right:var(--s3)}
 .tbl .num{text-align:right}
 .tbl .mid{text-align:center}
-.tbl td[data-col="n"]{font-family:var(--mono); font-size:var(--fs-key); color:var(--ink-2); width:1%}
+.tbl td[data-col="n"]{font-family:var(--font); font-variant-numeric:tabular-nums; font-size:var(--fs-key); color:var(--ink-2); width:1%}
 .tbl td[data-col="min"], .tbl td[data-col="time"], .tbl td[data-col="best"]{font-family:var(--mono); font-size:var(--fs-key)}
 .tbl td[data-col="min"], .tbl th[data-col="min"]{width:1%}
 .tbl td[data-col="tier"]{width:1%}
@@ -67,9 +67,9 @@
 .tbl-today td:last-child{padding-right:var(--s1)}
 .tbl-today td.n{width:1%; padding-right:0}
 .tbl-today .row-name{white-space:nowrap}
-.tbl-today td.len, .tbl-today td.xp{white-space:nowrap; width:1%; font-family:var(--mono); font-size:var(--fs-key)}
+.tbl-today td.len, .tbl-today td.xp{white-space:nowrap; width:1%; font-family:var(--font); font-variant-numeric:tabular-nums; font-size:var(--fs-key)}
 .tbl-today .mode-mark{margin-right:var(--s2); vertical-align:1px}
-.tbl-today td.xp{color:var(--mode-ink); font-weight:var(--fw-semi); font-family:var(--mono); font-size:var(--fs-key)}
+.tbl-today td.xp{color:var(--mode-ink); font-weight:var(--fw-semi); font-family:var(--font); font-variant-numeric:tabular-nums; font-size:var(--fs-key)}
 .tbl-today tr.done .row-name{color:var(--ink-2)}
 .tbl-today tr.done td.xp{color:var(--ink-2); font-family:var(--font)}
 .tbl-set td[data-col="n"]{width:1%}
@@ -82,7 +82,7 @@
 .tab{display:inline-flex; align-items:center; gap:var(--s2); font:inherit; font-size:var(--fs-body); font-weight:var(--fw-semi); color:var(--ink-2); background:transparent; border:0; border-bottom:var(--mode-rule) solid transparent; margin-bottom:-1px; padding:var(--s2) var(--s4) var(--s3); cursor:pointer; position:relative}
 .tab:hover{color:var(--ink)}
 .tab.on{color:var(--ink); border-bottom-color:var(--mode)}
-.tab:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:-2px; border-radius:var(--r-btn)}
+.tab:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:calc(-1 * var(--bw-2)); border-radius:var(--r-btn)}
 .mode-mark{display:inline-block; width:var(--mode-mark); height:var(--mode-mark); background:var(--mark, var(--mode)); flex:none}
 
 /* ---------- buttons and keycaps (3.0: a filled primary button; a quiet button on chrome with an edge that passes 3 to 1; the key beside the label) ---------- */
@@ -92,15 +92,15 @@
 .btn2-primary:hover{background:var(--mode-ink); border-color:var(--mode-ink)}
 .btn2-primary .key{color:var(--on-fill); background:transparent; border-color:var(--on-fill); box-shadow:none}
 .btn2-quiet{background:var(--chrome)}
-.btn2:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:2px}
+.btn2:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:var(--bw-2)}
 .key{display:inline-block; font-family:var(--mono); font-weight:var(--fw-key); font-size:var(--fs-key); line-height:1; color:var(--ink); background:var(--sheet); border:1px solid var(--edge); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); padding:var(--s1) var(--s2); white-space:nowrap}
 .link-btn{font:inherit; font-size:inherit; color:var(--mode-ink); background:none; border:0; padding:0; cursor:pointer; text-decoration:underline; font-weight:var(--fw-semi)}
 .picker{display:inline-flex; align-items:center; gap:var(--s2); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
 .picker select{font-family:var(--font); font-size:var(--fs-body); font-weight:var(--fw-semi); color:var(--ink); background-color:var(--sheet); border:1px solid var(--edge); border-radius:var(--r-btn); padding:var(--s3) var(--s8) var(--s3) var(--s4)}
 
 /* ---------- the marks: tier diamonds, goal segments, bars, the level chip, a tick ---------- */
-.tiers{display:inline-flex; gap:3px; align-items:center; vertical-align:middle}
-.tiers i{display:inline-block; width:var(--tier-mark); height:var(--tier-mark); transform:rotate(45deg) scale(.8); border:1.5px solid var(--clock); box-sizing:border-box; background:transparent}
+.tiers{display:inline-flex; gap:var(--bw-3); align-items:center; vertical-align:middle}
+.tiers i{display:inline-block; width:var(--tier-mark); height:var(--tier-mark); transform:rotate(45deg) scale(.8); border:var(--bw-1-5) solid var(--clock); box-sizing:border-box; background:transparent}
 .tiers i.on{background:var(--clock)}
 .tiers-none i{border-color:var(--edge)}
 .segs{display:inline-flex; gap:var(--s1); align-items:center}
@@ -112,24 +112,24 @@
 .bar-field{width:var(--field-bar-w); background:var(--mode-tint); display:inline-block; vertical-align:middle}
 .bar-level{margin-top:var(--s1)}
 .bar-ach{margin-top:var(--s2)}
-.lvl-chip{display:inline-block; font-family:var(--mono); font-size:var(--fs-min); line-height:1; color:var(--ink-2); border:1px solid var(--line); border-radius:var(--r-btn); padding:2px var(--s1); margin-left:var(--s2); vertical-align:1px}
+.lvl-chip{display:inline-block; font-family:var(--font); font-variant-numeric:tabular-nums; font-size:var(--fs-min); line-height:1; color:var(--ink-2); border:1px solid var(--line); border-radius:var(--r-btn); padding:var(--bw-2) var(--s1); margin-left:var(--s2); vertical-align:1px}
 .move{margin-left:var(--s2); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--mode-ink)}
-.tick{display:inline-block; width:var(--s4); height:var(--s4); border:1px solid var(--edge); border-radius:2px; vertical-align:middle; position:relative; background:var(--sheet)}
+.tick{display:inline-block; width:var(--s4); height:var(--s4); border:1px solid var(--edge); border-radius:var(--bw-2); vertical-align:middle; position:relative; background:var(--sheet)}
 .tick.on{background:var(--mode); border-color:var(--mode)}
-.tick.on::after{content:''; position:absolute; left:5px; top:2px; width:4px; height:8px; border:solid var(--on-fill); border-width:0 2px 2px 0; transform:rotate(45deg)}
+.tick.on::after{content:''; position:absolute; left:var(--tick-check); top:var(--bw-2); width:var(--s1); height:var(--s2); border:solid var(--on-fill); border-width:0 var(--bw-2) var(--bw-2) 0; transform:rotate(45deg)}
 
 /* ---------- Home ---------- */
 .panel-next .panel-head{align-items:center}
 .panel-next .btn2{flex:none}
 .level-next{display:flex; align-items:center; gap:var(--s3); font-size:var(--fs-name); color:var(--ink-2)}
-.level-tile{display:inline-grid; place-items:center; width:var(--level-tile); height:var(--level-tile); font-family:var(--mono); font-weight:var(--fw-bold); font-size:var(--fs-body); color:var(--clock-ink); background:var(--clock-tint); border:1px solid var(--clock); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); flex:none}
+.level-tile{display:inline-grid; place-items:center; width:var(--level-tile); height:var(--level-tile); font-family:var(--font); font-variant-numeric:tabular-nums; font-weight:var(--fw-bold); font-size:var(--fs-body); color:var(--clock-ink); background:var(--clock-tint); border:1px solid var(--clock); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); flex:none}
 .streak-row{display:flex; align-items:center; justify-content:space-between; gap:var(--s3); padding-top:var(--s2)}
-.week{display:inline-flex; gap:3px}
+.week{display:inline-flex; gap:var(--bw-3)}
 .week i{display:inline-grid; place-items:center; width:var(--s6); height:var(--s5); font-style:normal; font-family:var(--mono); font-size:var(--fs-min); line-height:1; color:var(--ink-2); background:var(--chrome)}
 .week i.on{background:var(--learn); color:var(--on-fill)}
 .week i.today{outline:1px solid var(--ink); outline-offset:-1px}
 .badge-grid{display:grid; grid-template-columns:repeat(5, var(--badge-tile)); gap:var(--s3)}
-.badge-tile{display:inline-grid; place-items:center; width:var(--badge-tile); height:var(--badge-tile); background:var(--chrome); border-radius:var(--r-btn); color:var(--ink-2); font-family:var(--mono); font-weight:var(--fw-bold)}
+.badge-tile{display:inline-grid; place-items:center; width:var(--badge-tile); height:var(--badge-tile); background:var(--chrome); border-radius:var(--r-btn); color:var(--ink-2); font-family:var(--font); font-variant-numeric:tabular-nums; font-weight:var(--fw-bold)}
 .badge-tile.on{background:var(--sheet); border:1px solid var(--line)}
 .badge-tile.locked{border:1px solid var(--line); background:var(--sheet)}
 .badge-tile .px{display:block}
@@ -156,7 +156,7 @@
 .sp td.fill-yellow{background:var(--note)}
 .sp td.fill-blue{background:var(--drills-tint)}
 .sp td.fill-green{background:var(--learn-tint)}
-.sp-tab{align-self:flex-start; font-family:var(--font); font-size:var(--fs-min); color:var(--ink-2); background:var(--chrome); padding:2px var(--s3); border-top:1px solid var(--line); border-right:1px solid var(--line)}
+.sp-tab{align-self:flex-start; font-family:var(--font); font-size:var(--fs-min); color:var(--ink-2); background:var(--chrome); padding:var(--bw-2) var(--s3); border-top:1px solid var(--line); border-right:1px solid var(--line)}
 
 /* ---------- the Practice pages' header block ---------- */
 .hdr{flex-direction:row; align-items:center; justify-content:space-between; gap:var(--s6); padding:var(--s6) var(--s6)}

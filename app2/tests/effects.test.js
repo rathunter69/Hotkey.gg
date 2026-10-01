@@ -5,7 +5,7 @@
 import { test, mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { MOMENT_PRIORITY, MOMENT_WINDOW_MS, BANNER_HOLD_MS, pickMoment, bannerMotion, masterGain, freeSlot, mountEffects, finishSound } from '../ui/effects.js';
+import { MOMENT_PRIORITY, MOMENT_WINDOW_MS, BANNER_HOLD_MS, pickMoment, bannerMotion, masterGain, freeSlot, mountEffects, finishSound, MOMENTS, MOMENT_NAMES, RESULT_STEPS, parseMs, momentPlan, stepsAfter, readDurations } from '../ui/effects.js';
 import { RARITY_COLOURS, renderPixel, GLYPHS } from '../ui/pixel.js';
 import { boardCell, dailyCardHtml } from '../ui/result-card.js';
 
@@ -49,7 +49,7 @@ test('effects: banners always show — reduced motion and Subtle fade in place, 
   assert.equal(bannerMotion('subtle', false), 'fade');
   assert.equal(bannerMotion('off', false), 'static');
   assert.equal(bannerMotion('off', true), 'static');
-  assert.ok(BANNER_HOLD_MS <= 2600, 'a short hold');
+  assert.equal(BANNER_HOLD_MS, 4000, 'four seconds or any key (3.0)');
   assert.equal(freeSlot([]), 0);
   assert.equal(freeSlot([0, 1]), 2);
   assert.equal(freeSlot([1, 2]), 0, 'a slot freed at the bottom is reused, never overprinting a visible banner');

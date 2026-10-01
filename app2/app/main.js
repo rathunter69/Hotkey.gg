@@ -21,6 +21,7 @@
 import { mountNav, weekCells } from '../ui/nav.js';
 import { createKeyTips } from '../ui/components/keytips.js';
 import { createCursor } from '../ui/components/cursor.js';
+import { mountCoachMarks, coachMarksDue } from '../ui/components/coachmarks.js';
 import { mountFooter } from '../ui/footer.js';
 import { prefs } from './prefs.js';
 import { settings } from './settings.js';
@@ -153,6 +154,7 @@ const LOADERS = {
   rapid: { file: './rapid-fire.js', pick: m => m.mountRapidPage },
   leaderboard: { file: './leaderboard-page.js', pick: m => m.mountLeaderboardPage },
   reference: { file: './reference-page.js', pick: m => m.mountReferencePage },
+  settings: { file: './settings-page.js', pick: m => m.mountSettingsPage },   // #/account?section=settings: the page rendered from SETTINGS_GROUPS (M101)
   pricing: { file: './pricing-page.js', pick: m => m.mountPricingPage },
   teams: { file: './teams-page.js', pick: m => m.mountTeamsPage },
   account: { file: './account-page.js', pick: m => m.mountAccountPage },
@@ -300,6 +302,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     current = null;
     keytips.clear();
     if (cursor) { cursor.destroy(); cursor = null; }
+    if (coach) { coach.destroy(); coach = null; }
     rootEl.innerHTML = '';
     document.body.classList.remove('hide-gridlines');
     document.body.dataset.route = '';
@@ -344,7 +347,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     // the workspace routes need a keyboard and width; below the breakpoint show the notice instead
     if ((name === 'lesson' || name === 'drill' || name === 'rapid' || name === 'due') && narrowMq && narrowMq.matches) { current = narrowNotice(rootEl, lesson, content); return; }
 
-    const base = LOADERS[name] || LOADERS.notfound;
+    const base = (name === 'account' && r.query.section === 'settings' ? LOADERS.settings : LOADERS[name]) || LOADERS.notfound;
     const entry = next && base.next ? base.next : base;
     let mount;
     // a page module that is not in hand within 50 ms gets the page's shape painted meanwhile (C2)
@@ -367,10 +370,22 @@ export function startApp({ navEl, rootEl, footEl }) {
       // a page that mounts asynchronously still hands back its destroy(); a route that moved on meanwhile tears it down at once
       if (res && typeof res.then === 'function') { res = await res; if (myGen !== gen) { if (res && typeof res.destroy === 'function') { try { res.destroy(); } catch (e) { /* ignore */ } } return; } }
       current = res && typeof res.destroy === 'function' ? res : { destroy() { rootEl.innerHTML = ''; } };
+      // the first visit to Home after a lesson: one coach mark on each rail item, once (3.0, The first run; M92)
+      if (name === 'home') showCoachMarks();
     } catch (e) {
       console.error(e);
       errorCard(rootEl, { name, params: r.params, kind: 'mount' }, route);
     }
+  }
+  let coach = null;
+  function showCoachMarks() {
+    try {
+      const all = store.all();
+      const done = Object.values(all).filter(e => e && e.completed).length;
+      if (!coachMarksDue(prefs.get(), done)) return;
+      if (coach) coach.destroy();
+      coach = mountCoachMarks({ railEl: navEl, onDone: () => { coach = null; prefs.set({ coachMarksDone: true }); } });
+    } catch (e) { /* a page without records: no marks today */ }
   }
   let retrying = false;
   function retryRoute() { retrying = true; route(); }

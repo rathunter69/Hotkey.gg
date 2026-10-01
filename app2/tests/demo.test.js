@@ -5,8 +5,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { teachTokens, teachHtml, fitDemoColumns, DEMO_LESSON } from '../ui/demo-player.js';
 import { LessonRun } from '../app/runner.js';
-import { landingKeyRoute, microClauses, landingHtml, MODES } from '../app/landing-next.js';
-import { finishPatch, pickerMove, FIRST_MODULE, FIRST_LESSON } from '../app/first-run-next.js';
+import { landingKeyRoute, landingHtml } from '../app/landing-next.js';
+import { finishPatch, pickerMove, answersAt, QUESTIONS, FIRST_MODULE, FIRST_LESSON } from '../app/first-run-next.js';
 import { LESSONS } from '../content/index.js';
 
 const keys = line => teachTokens(line).filter(t => t.key).map(t => t.key);
@@ -73,38 +73,28 @@ test('landing keys: the demo gets keys only while it has focus; Tab, Space and p
   assert.equal(landingKeyRoute(k('Shift', { shiftKey: true }), true), null, 'a lone modifier press is nobody\'s');
 });
 
-test('landing: the small print is whole clauses; the modes link where a guest can go; the hero has one call to action', () => {
-  assert.deepEqual(microClauses('Chapter 1 is free · no account to start · nothing to install · progress saved on this device'),
-    ['Chapter 1 is free', 'no account to start', 'nothing to install', 'progress saved on this device']);
-  assert.deepEqual(microClauses(''), []);
+test('landing: the hero has one call to action and the facts each in their own place; no dot-joined fragments', () => {
   const html = landingHtml(0);
-  const hero = html.slice(0, html.indexOf('id="lModes"'));
-  assert.ok(hero.includes('id="startLearning"'));
-  assert.doesNotMatch(hero, /#\/account/, 'the nav carries Sign in; the hero does not repeat it');
-  assert.doesNotMatch(html, /<video[^>]*\sautoplay/, 'clips start when they are on screen, not on load');
-  assert.equal((html.match(/class="ld2-clip-fb"/g) || []).length, 6, 'every clip has a card behind it');
-  assert.deepEqual(MODES.map(m => m.href), ['#/start', '#/start', '#/practice', '#/practice', '#/practice', '#/leaderboard']);
-  // the micro line renders as spans, never a literal separator
-  const micro = html.slice(html.indexOf('ld2-micro-list'), html.indexOf('</div>', html.indexOf('ld2-micro-list')));
-  assert.doesNotMatch(micro, /·/);
+  const hero = html.slice(0, html.indexOf('id="path"'));
+  assert.equal((hero.match(/id="startLearning"/g) || []).length, 1);
+  assert.doesNotMatch(hero, /#\/account/, 'the top bar carries Sign in; the hero does not repeat it');
+  assert.doesNotMatch(html.replace(/<[^>]+>/g, ' '), /\s·\s/, 'no facts joined by middle dots');
+  assert.equal((html.match(/class="lp-facts"/g) || []).length, 1, 'the course in three facts under the start cell');
+  assert.ok(html.includes('class="plate"'), 'a proof plate per section');
 });
 
-test('first run: ← → pick within a question, ↑ ↓ move between the two', () => {
-  assert.deepEqual(pickerMove('ArrowRight', 'platform', 0, 2), { pick: 1 });
-  assert.deepEqual(pickerMove('ArrowRight', 'platform', 1, 2), { pick: 0 }, 'wraps');
-  assert.deepEqual(pickerMove('ArrowLeft', 'experience', 0, 3), { pick: 2 });
-  assert.deepEqual(pickerMove('ArrowDown', 'platform', 0, 2), { group: 'experience' }, '↓ never changes the keyboard');
-  assert.deepEqual(pickerMove('ArrowUp', 'experience', 2, 3), { group: 'platform' });
-  assert.deepEqual(pickerMove('ArrowDown', 'experience', 0, 3), { stay: true });
-  assert.deepEqual(pickerMove('ArrowUp', 'platform', 1, 2), { stay: true });
-  assert.equal(pickerMove('Enter', 'platform', 0, 2), null);
+test('first run: ↑ ↓ move the highlight down one list across both questions, and the highlight is the answer', () => {
+  assert.equal(pickerMove('ArrowDown', 0, 5), 1);
+  assert.equal(pickerMove('ArrowDown', 4, 5), 4, 'clamped at the end');
+  assert.equal(pickerMove('ArrowUp', 0, 5), 0, 'clamped at the start');
+  assert.equal(pickerMove('ArrowUp', 3, 5), 2);
+  assert.equal(pickerMove('Enter', 2, 5), 2);
+  const a = answersAt(QUESTIONS, { platform: 'win', experience: 'new' }, 1);
+  assert.deepEqual(a, { platform: 'mac', experience: 'new' }, 'the highlight on Mac answers the keyboard question');
+  assert.deepEqual(answersAt(QUESTIONS, a, 4), { platform: 'mac', experience: 'daily' }, 'moving into the second question keeps the first answer');
 });
 
-test('first run hand-off: the choices and flags; 1.1\'s beat marked seen only when the deal was read', () => {
+test('first run hand-off: the choices and the flags', () => {
   assert.equal(LESSONS.find(l => l.id === FIRST_LESSON).module, FIRST_MODULE);
-  const read = finishPatch({ platform: 'mac', experience: 'daily', sawDeal: true }, ['move-and-select']);
-  assert.deepEqual(read, { platform: 'mac', experience: 'daily', firstRunDone: true, briefingDone: true, skipped: [], beatsSeen: ['move-and-select', FIRST_MODULE] });
-  assert.deepEqual(finishPatch({ platform: 'win', experience: 'new', sawDeal: true }, [FIRST_MODULE]).beatsSeen, [FIRST_MODULE], 'no duplicate');
-  const skipped = finishPatch({ platform: 'win', experience: 'new', sawDeal: false }, []);
-  assert.equal('beatsSeen' in skipped, false, 'Esc past the deal: the beat still plays in 1.1.1');
+  assert.deepEqual(finishPatch({ platform: 'mac', experience: 'daily' }), { platform: 'mac', experience: 'daily', firstRunDone: true, briefingDone: true, skipped: [] });
 });
