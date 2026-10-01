@@ -26,7 +26,7 @@ import { INSTALL_PROMPT } from '../app/install.js';
 import { MICRO } from '../app/schedule.js';
 import { moduleNumber } from '../app/numbering.js';
 
-const conv = ids => (ids || []).map(id => (CONVENTIONS[id] ? CONVENTIONS[id].short : id)).join(' · ');
+const conv = ids => (ids || []).map(id => (CONVENTIONS[id] ? CONVENTIONS[id].short : id)).join('; ');
 
 /** The mapped-but-unwritten Chapter 1 items (docs/screenplay/screenplay.md, section 5), in
  *  Wolf's voice as far as a draft can be: the brief is the map's task in ≤3 sentences, the wow line is

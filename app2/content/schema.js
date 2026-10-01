@@ -207,7 +207,7 @@ export const CONCEPTS = {
  */
 export function goalBounds(kind, moduleLesson = false) {
   if (moduleLesson) {
-    return { lesson: { min: 5, max: 9 }, challenge: { min: 4, max: 7 }, project: { min: 10, max: 15 }, assessment: { min: 8, max: 14 }, testout: { min: 8, max: 10 } }[kind || 'lesson'] || { min: 5, max: 9 };
+    return { lesson: { min: 5, max: 9 }, challenge: { min: 4, max: 7 }, project: { min: 10, max: 15 }, assessment: { min: 8, max: 16 }, testout: { min: 8, max: 16 } }[kind || 'lesson'] || { min: 5, max: 9 };
   }
   return kind && kind !== 'lesson' ? { min: 3, max: 10 } : { min: 3, max: 6 };
 }
