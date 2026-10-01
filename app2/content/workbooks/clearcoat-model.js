@@ -122,6 +122,7 @@ const across = fn => (col, r) => COLS.includes(col) ? fn(col, r) : null;
  * `nodash` (a flag or counter shows its zero), `boldAt` (columns shown bold). Returns the sheet.
  */
 function page(spec) {
+  if (firstPass) { ROWS[spec.name] = dryRows(spec); return null; }   // the layout pass needs only where the rows land
   const { sheet, at } = buildPage(spec);
   const cells = sheet.cells;
   ROWS[spec.name] = at;
@@ -145,13 +146,20 @@ function page(spec) {
   if (spec.colWExtra) Object.assign(sheet.colW, spec.colWExtra);
   return sheet;
 }
+/** Where buildPage will put each keyed row (its first pass, without building the sheet): one empty row between blocks, a title row, a header row, then the rows. */
+function dryRows(spec) {
+  const at = {}; let r = 5;
+  spec.blocks.forEach((b, bi) => { if (bi > 0) r++; if (b.title) r++; if (b.header) r++; for (const row of b.rows) { if (row.key) at[row.key] = r; r++; } });
+  return at;
+}
 /** The timeline row on a model sheet: links to Inputs row 4, green, in the FY format. */
 function timeline(sheet, cols = COLS) {
+  if (!sheet) return;
   for (const col of cols) sheet.cells[col + '4'] = { formula: `=Inputs!${col}4`, fontColor: 'green', bold: true, align: 'r', ...FY_FMT };
 }
 /** A page title that names the case: Company: page, Case case. */
 const caseTitle = what => `=${inp('company')}&": ${what}, "&Cover!$C$${R('Cover', 'case')}&" case"`;
-const titled = (sheet, formula) => { sheet.cells.A1 = { ...sheet.cells.A1, formula, value: undefined }; delete sheet.cells.A1.value; };
+const titled = (sheet, formula) => { if (!sheet) return; sheet.cells.A1 = { ...sheet.cells.A1, formula, value: undefined }; delete sheet.cells.A1.value; };
 
 /* ---- Cover ---- */
 function pageCover() {
@@ -290,6 +298,7 @@ function pageInputs() {
       ...MAPPING.map(([m, n], i) => ({ ['M' + (5 + i)]: { value: m }, ['N' + (5 + i)]: { value: n } }))),
     colWExtra: { 13: 170, 14: 200 },
   });
+  if (!sheet) return null;
   // the timeline: the first year end typed once, the rest EOMONTH twelve months on (5.2.2)
   sheet.cells.C4 = { value: FIRST_YEAR_END, fontColor: 'blue', bold: true, align: 'r', ...FY_FMT };
   for (const col of COLS.slice(1)) sheet.cells[col + '4'] = { formula: `=EOMONTH(${prev(col)}4,12)`, bold: true, align: 'r', ...FY_FMT };
@@ -626,6 +635,7 @@ function pageChecks() {
     ],
     source: 'Each check is wrapped in ROUND(…,2); a pending check stays empty with "pending" beside it, never a typed zero.',
   });
+  if (!sheet) return null;
   timeline(sheet);
   sheet.cells['K' + R(me, 'su')] = { value: 'pending', it: true };
   sheet.condFmt = [{ kind: 'cellValue', op: '<>', v1: 0, range: `C${R(me, 'bs')}:J${R(me, 'npv')}`, style: 'redtext' }];
@@ -721,6 +731,7 @@ function pageDCF() {
     ],
     source: 'The exit value is a sale at the end of FY31 and takes the end-year factor whatever the switch says; the perpetuity keeps arriving mid-year.',
   });
+  if (!sheet) return null;
   timeline(sheet);
   sheet.cells.K4 = { value: 'FY31 normalized', bold: true, align: 'r' };
   for (const prefix of ['sg', 'sm']) for (let i = 0; i < 5; i++) for (const col of ['D', 'E', 'F', 'G', 'H']) Object.assign(sheet.cells[col + R(me, prefix + i)], MILLIONS);
