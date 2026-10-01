@@ -42,7 +42,7 @@ export function moduleCtx(all) {
 
 /** A seeded first-week state for the storyboard: four lessons done, the fifth started, a Daily played, the queue as demoState(). */
 export function demoCtx(now = Date.now()) {
-  const done = ['inherited-workbook', 'ribbon-by-keyboard', 'analyst-setup'];
+  const done = ['inherited-workbook', 'know-the-screen', 'ribbon-by-keyboard', 'analyst-setup'];
   const all = {};
   for (const id of done) all[id] = { completed: true, started: true, at: now - 2 * 86400000, best: 140 };
   all['colour-label-hardcode'] = { started: true, at: now - 3600000 };

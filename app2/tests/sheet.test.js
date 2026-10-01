@@ -47,6 +47,10 @@ test('selection model: move, extend, ctrl-jump, collapse from the displayed anch
   s.goTo(1, 1); s.selectAll(); assert.equal(s.selectionText(), 'A1:B3'); s.selectAll(); assert.equal(s.selectionText(), 'A1:J20');
   s.goTo(2, 3); s.moveHome(false, false); assert.equal(s.selectionText(), 'A2'); s.moveHome(true, false); assert.equal(s.selectionText(), 'A1');
   s.moveEnd(true, false); assert.equal(s.selectionText(), 'B3');
+  // Ctrl+Shift+Arrow reads the active cell's row or column, not the moving corner's (Excel: "in the same column or row as the active cell")
+  const t = new Sheet({ cells: { A1: { value: 'a' }, B1: { value: 'b' }, C1: { value: 'c' }, A2: { value: 1 }, A3: { value: 2 }, A4: { value: 3 }, B2: { value: 1 } } });
+  t.goTo(1, 1); t.move(1, 0, true, true); assert.equal(t.selectionText(), 'A1:A4'); t.move(0, 1, true, true); assert.equal(t.selectionText(), 'A1:C4', 'row 1 decides the width, though row 4 stops at A');
+  t.goTo(1, 1); t.move(0, 1, true, true); assert.equal(t.selectionText(), 'A1:C1'); t.move(1, 0, true, true); assert.equal(t.selectionText(), 'A1:C4', 'column A decides the depth, though column C stops at row 1');
 });
 
 test('formatting: mixed-selection toggle, number formats, borders, undo/redo', () => {

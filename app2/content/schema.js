@@ -169,6 +169,13 @@ export const CONCEPTS = {
   'audit-pass': 'the audit pass: Go To Special, show formulas and tracing find what a reviewer would',
   'ref-error': '#REF! means a formula pointed at a cell that was deleted; Ctrl+Z brings the cell and the formula back',
   'wrap-text': 'Wrap Text (Alt, H, W) folds a long entry inside its cell; AutoFit Row Height (Alt, H, O, A) then sizes the row to it',
+  // Run R1 (Clearcoat, script-ch1.md): 1.1.2 Know the screen, 1.1.4's Enter setting, 1.1.5's link color
+  'formula-bar-expand': 'Ctrl+Shift+U expands the formula bar to several lines and collapses it again, so a long entry reads in full',
+  'ribbon-collapse': 'Ctrl+F1 collapses the Ribbon to its tab names and shows it again; Alt still works while it is collapsed',
+  'status-bar': 'the status bar totals whatever is selected, with no formula written: Sum, Average and Count',
+  'zoom': 'Zoom (Alt, W, Q) sets the sheet\'s zoom; Alt, W, J is 100% in one press',
+  'enter-stays': 'Excel Options \u203a Advanced: with "After pressing Enter, move selection" off, Enter commits the entry and stays on the cell',
+  'link-colour-convention': 'a link to another sheet is green and a link to another file red, so a reader sees which figures come from elsewhere',
   // Chapter 2 (Project Volt, stage 2): number formats and custom number formats
   'general-format': 'General is the no-format format: Ctrl+Shift+~ (or Ctrl+1, G) returns a cell to how its value was typed',
   'accounting-format': 'Accounting Number Format (Alt, H, A, N) sets the $ at the cell\u2019s left edge, negatives in parentheses and zero as a dash',
@@ -191,7 +198,7 @@ export const CONCEPTS = {
  */
 export function goalBounds(kind, moduleLesson = false) {
   if (moduleLesson) {
-    return { lesson: { min: 5, max: 8 }, challenge: { min: 4, max: 7 }, project: { min: 10, max: 15 }, assessment: { min: 8, max: 14 }, testout: { min: 8, max: 10 } }[kind || 'lesson'] || { min: 5, max: 8 };
+    return { lesson: { min: 5, max: 9 }, challenge: { min: 4, max: 7 }, project: { min: 10, max: 15 }, assessment: { min: 8, max: 14 }, testout: { min: 8, max: 10 } }[kind || 'lesson'] || { min: 5, max: 9 };
   }
   return kind && kind !== 'lesson' ? { min: 3, max: 10 } : { min: 3, max: 6 };
 }
@@ -263,15 +270,15 @@ export function validateLesson(l) {
   need(l.sheets === undefined || (Array.isArray(l.sheets) && l.sheets.every(isObject)), 'sheets must be an array of { name, cells } records');
   for (const sh of Array.isArray(l.sheets) ? l.sheets.filter(isObject) : []) need(typeof sh.name === 'string' && /^[^[\]:*?/\\]{1,31}$/.test(sh.name), `sheet name "${sh.name}" is not Excel-legal`);
   if (moduleLesson) {
-    // The Brief (v2): the situation, the task, the payoff — at most three sentences, ending in
-    // the headline keycap; a challenge carries one line.
+    // The Brief (v2, limits raised by M28): the situation, the task, the payoff, at most five
+    // sentences and 110 words, ending in the headline keycap; a challenge carries one line.
     need(typeof l.brief === 'string' && l.brief.trim(), 'brief missing');
     if (typeof l.brief === 'string') {
       const n = sentenceCount(l.brief);
       if (kind === 'challenge') need(n <= 2 && wordCount(l.brief) <= 40, 'a challenge brief is one line');
       else {
-        need(n >= 1 && n <= 3, `brief must be at most three sentences (it has ${n})`);
-        need(wordCount(l.brief) <= 70, 'brief is over 70 words');
+        need(n >= 1 && n <= 5, `brief must be at most five sentences (it has ${n})`);
+        need(wordCount(l.brief) <= 110, 'brief is over 110 words');
         need(/`[^`]+`[.!]?\s*$/.test(l.brief.trim()), 'the brief ends with the headline keycap (`Ctrl+…`)');
       }
     }
@@ -311,12 +318,11 @@ export function validateLesson(l) {
       need(g.demo === undefined || g.keys === undefined, `goal ${g.id}: a demo goal has no keys (the platform presses them)`);
       need(!isObject(g.demo) || g.demo.cadence === undefined || (typeof g.demo.cadence === 'number' && g.demo.cadence >= 40 && g.demo.cadence <= 1000), `goal ${g.id}: demo cadence is milliseconds per key, 40-1000`);
     } else need(typeof g.keys === 'string' && g.keys.trim(), `goal ${g.id}: keys (the route as keycaps) missing`);
-    // Adaptive rule (SITE_SPEC §4): the goal that first uses a concept this lesson teaches carries the
-    // one-line teaching point; a goal that only reuses taught concepts carries none.
+    // The goal that first uses a concept this lesson teaches carries a teach line; any goal may carry
+    // one (M28: the why rides inside the teach line, up to three sentences).
     const fresh = (Array.isArray(g.requires) ? g.requires : []).filter(c => concepts.includes(c) && !introduced.has(c));
-    if (fresh.length) { need(typeof g.teach === 'string' && g.teach.trim(), `goal ${g.id}: introduces ${fresh.join(', ')} and needs a one-line teach`); fresh.forEach(c => introduced.add(c)); }
-    else if (Array.isArray(conceptsRaw) && Array.isArray(g.requires)) need(g.teach === undefined, `goal ${g.id}: reuses taught concepts only, so it must not carry a teach line`);
-    if (typeof g.teach === 'string') { need(sentenceCount(g.teach) === 1 && /[.!?]$/.test(g.teach.trim()), `goal ${g.id}: teach must be one sentence ending in a full stop`); need(wordCount(g.teach) <= 30, `goal ${g.id}: teach is over 30 words`); }
+    if (fresh.length) { need(typeof g.teach === 'string' && g.teach.trim(), `goal ${g.id}: introduces ${fresh.join(', ')} and needs a teach line`); fresh.forEach(c => introduced.add(c)); }
+    if (typeof g.teach === 'string') { const tn = sentenceCount(g.teach); need(tn >= 1 && tn <= 3 && /[.!?]$/.test(g.teach.trim()), `goal ${g.id}: teach is one to three sentences ending in a full stop`); }
   }
   need(l.race === undefined || (Array.isArray(l.race) && l.race.length >= 1 && l.race.every(r => isObject(r) && typeof r.label === 'string' && ids.has(r.slow) && ids.has(r.fast))), 'race must be pairs { label, slow, fast } naming goals');
   need(l.closing === undefined || (Array.isArray(l.closing) && l.closing.every(t => typeof t === 'string')), 'closing must be an array of paragraphs');
