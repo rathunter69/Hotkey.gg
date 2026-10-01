@@ -476,10 +476,10 @@ export const COPY = {
    "module": "number-formats",
    "order": "2.1.1",
    "title": "Built-in formats on a P&L",
-   "brief": "Management’s P&L export arrived as raw General numbers: cents on every line, no thousands separators, and a site count dressed as $28.00. Give the whole block the format a reader can scan in one selection, free the count of its dress, and finish the Inputs page. The key is `Ctrl+1`.",
-   "closing": "Every figure on the P&L now reads with one decimals setting down each line (D2): the block took one selection and one chord, the count lost the dress the export gave it, and the per-site figure carries its $. The margins in rows 11 and 18 still read as 0; the next lessons give them their sign and their percent. || Ctrl+1 did the dialog work and Ctrl+Shift+1 and 4 did the same in one press; FY24A’s public charging still moves Total revenue, all the way to column P’s check.",
+   "brief": "A P&L is what the company earned and spent over a year, top line to bottom line, and this one arrived as raw numbers: 18000.4 where a reader wants 18,000. Every line gets one format, set on the whole line at once: the desk number format from Chapter 1 for dollars in thousands (a separator, no decimals, a negative in parentheses), and the memo lines in their own formats. Ctrl+1 then N sets it from the Number tab, and F4 repeats it on the next block. The key is `Ctrl+1`.",
+   "closing": "Every line on the P&L now reads as figures, one format per line. || Three blocks of dollars took one dialog and two presses of F4, the counts took a third, and revenue per wash kept its cents. The costs still read as positives and nothing says what the figures are in; the next lesson fixes both.",
    "wow": "",
-   "convention_line": "One decimals setting per line",
+   "convention_line": "One decimals setting per line, and a negative in parentheses.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -487,11 +487,11 @@ export const COPY = {
    "id": "sign-convention-costs-negative",
    "module": "number-formats",
    "order": "2.1.2",
-   "title": "Sign convention: costs negative",
-   "brief": "The export writes every cost as a positive figure and subtracts it later, so nothing on the page says which lines are costs. The house convention is chosen once and stated once: income positive, costs negative, subtotals as sums. One -1 and Paste Special flip five lines in two pastes; the key is `Ctrl+Alt+V`.",
-   "closing": "Costs read in parentheses down every line and every subtotal is a sum, so a reader can tell a cost from a revenue at a glance and never wonders which sign a formula flips (C4, D1). The units line says so once, in A2, and the check in D23 still reads zero all the way to column P. || Two pastes did the work of retyping sixty figures: Paste Special multiplies the copied value into the selection, which is the same dialog that freezes values and copies formats (E4).",
+   "title": "Sign convention: costs negative, stated once",
+   "brief": "The export shows every cost as a positive, so a reader has to know which lines to subtract. On a page we show costs as negatives, in parentheses, and say so once at the top: then the page adds down and nobody guesses the signs. Chemicals and water are the cost of a wash; the crew, rent, utilities, maintenance, card fees and marketing are the site costs a site pays whether or not a car comes through. Paste Special Multiply flips a whole block in one paste. The key is `Ctrl+Alt+V`.",
+   "closing": "Costs read in parentheses, the page says so once, and the totals add straight down. || Two pastes did the work of retyping twenty-four figures: Paste Special multiplies the copied value into the selection, the same dialog that pastes values and formats. Stopping above row 20 kept the total a formula, so it still adds whatever the lines say.",
    "wow": "",
-   "convention_line": "Income positive, costs negative · Parentheses, never a leading minus · Values to snapshot, never over live formulas",
+   "convention_line": "Income positive and costs negative, stated once in the units line.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -500,10 +500,10 @@ export const COPY = {
    "module": "number-formats",
    "order": "2.1.3",
    "title": "Currency and percent lines",
-   "brief": "The block reads in comma style, but a page of dollar figures carries its $ on the first row and the totals only, and the margins still read as 0 because a comma style makes nothing of a fraction. Put the $ where it belongs and the margins in percent, one decimal. The route is `Alt H A N`.",
-   "closing": "The $ now sits on the first row and the totals only, the lines between read as plain figures, and both margins read as percentages to one decimal: one decimals setting down each line, the currency sign where a reader expects it (D4, D2). || Accounting Number Format did the $ rows in one route each; the same page will wear the house’s own four-section codes in the next module, and this is the shape they reproduce.",
+   "brief": "Head office is the people and systems above the sites; take it off site contribution and what’s left is EBITDA (earnings before interest, tax, depreciation and amortization), the profit from running the washes before financing, tax and the tunnels wearing out, and the number every buyer prices from. A buyer reads it two ways: as dollars, and as a margin (a line as a share of revenue). Add the margins and growth block, format the percentages to one decimal in italic, and put the $ where it belongs: on the first and total rows only. The key is `Ctrl+Shift+5`.",
+   "closing": "The page now says what a buyer asks first: how much, and what share of revenue. || EBITDA runs from 29.6% of revenue in FY24 to 33.2% in FY26E, and revenue compounds at about 23% a year. The $ sits on the first row and the totals, so the eye finds the dollars without the page shouting them.",
    "wow": "",
-   "convention_line": "$ on the first and total rows · One decimals setting per line · Parentheses, never a leading minus",
+   "convention_line": "The $ on the first and total rows only, one decimals setting per line, each formula written once and filled right.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -512,10 +512,10 @@ export const COPY = {
    "module": "number-formats",
    "order": "2.1.4",
    "title": "Dates on the timeline",
-   "brief": "The header row is still the export’s: bare years over the annual columns and bare serial numbers over the months. A timeline row heads every page a reader opens, so label the years the way the book will, dress the month ends as dates, and set the row over its numbers. The key is `Ctrl+1`.",
-   "closing": "One timeline row heads the page, FY24A to FY26E then Jan-26 to Dec-26, bold and right-aligned over its numbers (C2, D6). The A and E in the labels say which years are actual and which is an estimate, so a reader never has to ask. || The month headers are still numbers underneath: a date is a serial of days wearing a format, which is why the next module can build labels from them with TEXT.",
+   "brief": "The column headers are text, FY2024 typed by the system, and text can’t be added to, compared or rolled forward. A fiscal year is the twelve months the accounts cover, and a timeline is real dates: the year end of each, formatted to read the way the page wants. A is actual; E is the estimate for the year still running. Put real dates in row 4, format them, and add the A and E flags underneath, so the headers can write themselves in module 2.6. The key is `Ctrl+1`.",
+   "closing": "The timeline is real dates now, and the page can roll forward a year in one edit. || Each header is a count of days shown through a date format, which is why Ctrl+1 can show it any way the page likes. The flags under the years say which two happened and which one is the forecast.",
    "wow": "",
-   "convention_line": "Timeline on top, equal widths · Indent sub-items; headers over numbers",
+   "convention_line": "The timeline on top as real dates, its headers right over their numbers, the A and E flags marked.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -523,11 +523,11 @@ export const COPY = {
    "id": "challenge-format-the-numbers",
    "module": "number-formats",
    "order": "2.1.C",
-   "title": "Challenge: a raw P&L to standard in three minutes",
-   "brief": "A cluster’s three-year P&L arrived as General numbers with the costs typed positive and the site count dressed as dollars: bring every number to the house standard, signs included, in three minutes.",
+   "title": "Challenge: a raw P&L’s numbers to standard",
+   "brief": "A fresh export from another cluster has the same faults as the company’s. Bring its formats, signs, margins and dates to standard in three minutes.",
    "closing": "",
    "wow": "",
-   "convention_line": "Parentheses, never a leading minus · One decimals setting per line · $ on the first and total rows · Income positive, costs negative · A units line: \"USD unless stated\"",
+   "convention_line": "Negatives in parentheses, one decimals setting per line, the $ on the first and total rows, costs negative and stated once.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -536,10 +536,10 @@ export const COPY = {
    "module": "custom-number-formats",
    "order": "2.2.1",
    "title": "The four-section format",
-   "brief": "The built-in styles got the page readable; the house’s own codes make it exact. A custom format is a code of up to four sections, positive, negative, zero and text, so the same line shows a parenthesis, a dash and a space where a parenthesis would sit. Dress the block in the house set; the door is `Ctrl+1`.",
-   "closing": "Every figure on the page now wears one of three house codes: a negative in parentheses, a zero as a dash, a positive padded so the columns line up (D1, D3). Nothing was typed beside a number to get there: the format does the labelling (D9). || Ctrl+1 then U opened the Custom box, and F4 repeated a code on the next line the way it repeats any format; the next lessons put units and conditions into the same codes.",
+   "brief": "A number format is a code with up to four sections separated by semicolons (positive; negative; zero; text), and each section says how that kind of value shows. The desk number format you set in Chapter 1 is one such code, and you’ve been using it without reading it. Write your own: #,##0_) for a positive, (#,##0) for a negative and a dash for zero, and watch a zero become a dash without a formula changing. The key is `Ctrl+1`.",
+   "closing": "One code with four sections, and the page decides how every kind of value reads. || A negative takes parentheses, a zero takes a dash, and a positive leaves a gap where the bracket would be, so the columns line up. Nothing was typed beside a number to get there; the format does the work, and F4 carried each code to the next block.",
    "wow": "",
-   "convention_line": "A dash, not 0.0 · Units live in the format, not typed text · Parentheses, never a leading minus",
+   "convention_line": "A zero reads as a dash, a negative in parentheses, and the $ sits on the first and total rows.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -547,11 +547,11 @@ export const COPY = {
    "id": "units-in-the-format",
    "module": "custom-number-formats",
    "order": "2.2.2",
-   "title": "Units in the format",
-   "brief": "A unit typed beside a number turns it into text: the leverage on Inputs reads 2.9x and no formula can use it. The format carries the unit instead, so per-site revenue reads in $k, a multiple reads with its x and a tariff step in bps, while the number underneath stays a number. The door is `Ctrl+1`.",
-   "closing": "Every unit on the three pages now lives in a format: $k on the per-site line, x on the multiples, bps on the tariff step, k on the kWh (D9). The figures underneath are plain numbers, so a formula can link to any of them and the decimals stay consistent down each line (D2). || The Custom box quoted the letters for you: what you typed as 0.0x it stored as 0.0\"x\", which is exactly what Excel’s box does.",
+   "title": "Units in the format: k, m, x, bps",
+   "brief": "The figures are in thousands, and a page that says so once at the top is fine, until a figure travels alone onto a slide or into an email. The unit can live in the format: a literal \"k\" after the number, \"m\" with a comma that divides by a thousand, \"x\" for a multiple, \"bps\" for a spread. The value stays a plain number that formulas can read; only the display carries the unit. The key is `Ctrl+1`.",
+   "closing": "The unit rides in the format, so the number stays a number. || Revenue reads 50.0m, a site 1,250k, the multiple 12.0x and the spread 356 bps, and every one of those cells holds a plain number a formula can link to. The Custom box quoted the letters for you: what you typed as 0.0x it stored as 0.0\"x\", which is what Excel’s box does.",
    "wow": "",
-   "convention_line": "Units live in the format, not typed text · One decimals setting per line · A units line: \"USD unless stated\"",
+   "convention_line": "The unit lives in the format, never in typed text.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -559,11 +559,11 @@ export const COPY = {
    "id": "dynamic-headers-with-text",
    "module": "custom-number-formats",
    "order": "2.2.3",
-   "title": "Dynamic headers with TEXT",
-   "brief": "A typed header goes stale the day the timeline moves; a header built from a date never does. Put the three year ends in row 3, build the FY labels from them with TEXT, and build both page titles from the labels, so one changed date rewrites the page. The function is `TEXT`.",
-   "closing": "Every label on the page now reads from a date: the year ends in row 3, the FY labels from them, the titles from the labels (D9, G3). Move one year end and the whole header rewrites itself, which is what a timeline row is for (C2). || TEXT rendered a date through a format code and & joined the pieces, the same two moves that build any dynamic label: a week-of line, a \"USD thousands\" note, a period count.",
+   "title": "Custom date codes on the timeline",
+   "brief": "The timeline holds real dates, and a custom date code can make them read the way the book does: FY24A, FY25A, FY26E. The code \"FY\"yy writes FY and the two-digit year from the date; for now the A or E rides in the code, and in module 2.6 the header writes itself in one cell. The parts you will use most are yy and yyyy for the year, mmm and mmmm for the month, and d and dd for the day. The key is `Ctrl+1`.",
+   "closing": "The headers read FY24A to FY26E, and every one of them is still a date underneath. || The code took the year from the date and the letters from the quotes, so rolling the page forward is one edit to a date. Monthly reads Jan-26 to Dec-26 the same way: a date shown through a format, never a label typed over it.",
    "wow": "",
-   "convention_line": "Units live in the format, not typed text · Attention to detail is judged first · Timeline on top, equal widths",
+   "convention_line": "The timeline is real dates shown through a format, right over its numbers.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -572,10 +572,10 @@ export const COPY = {
    "module": "custom-number-formats",
    "order": "2.2.4",
    "title": "Conditional codes and hidden zeros",
-   "brief": "A format section can open with a condition or a color, and an empty section shows nothing at all. Let the kWh line pick k or m by size, hide the zeros in the working rows, and make every check read a red ERROR or a plain OK instead of a bare 0. The door is `Ctrl+1`.",
-   "closing": "The working rows read as marks, the kWh line picks its own unit, and every check on the three pages reads OK or shouts ERROR in red the moment two things disagree (D3, D9, F1). Not one of those cells holds anything but a number. || That is the whole house number-format set: four sections, a unit in the code, a condition or a color in front, an empty section to hide. The challenge asks for all of it on a fresh sheet.",
+   "brief": "A format section can carry a color and a condition: [Red] paints a negative, [<1000] applies a code only to small values, and an empty section hides a value altogether. Three semicolons and a cell shows nothing while still holding its number. Use them sparingly; the page’s conventions do most of the talking. Here the checks paint a negative red, the washes pick their code by size, and the flags hide and come back. The key is `Ctrl+1`.",
+   "closing": "A format can color, scale and hide, and the value never moves. || The checks stay quiet at zero and go red the moment two figures disagree; the switch reads On and still multiplies like the 1 it is. The same On and Off code comes back on the switches of the model in Chapters 5 and 6.",
    "wow": "",
-   "convention_line": "A dash, not 0.0 · Units live in the format, not typed text · The check is a live difference → 0",
+   "convention_line": "A check is a live difference that reads zero, and a format never changes the value under it.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -583,11 +583,11 @@ export const COPY = {
    "id": "challenge-house-format-set",
    "module": "custom-number-formats",
    "order": "2.2.C",
-   "title": "Challenge: the house number-format set",
-   "brief": "A cluster’s P&L wears the built-in styles and the leverage on Inputs is typed as text with its x: dress the page in the house codes, units in the format and the numbers left as numbers.",
+   "title": "Challenge: the number-format set",
+   "brief": "A fresh cluster export with a monthly block, still in the built-in formats. Apply the set: the four-section codes on dollars and percents, FY codes, mmm-yy on the months, units on the summary and red on the check.",
    "closing": "",
    "wow": "",
-   "convention_line": "Parentheses, never a leading minus · A dash, not 0.0 · Units live in the format, not typed text · One decimals setting per line",
+   "convention_line": "A zero as a dash, the $ on the first and total rows, units in the format and a check that turns red.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -596,10 +596,10 @@ export const COPY = {
    "module": "remixes",
    "order": "2.R.C",
    "title": "Remix: the team’s format on a site P&L",
-   "brief": "Chapter 1’s format challenge on a P&L: a cluster’s FY26E site P&L arrived as a bordered grid of General numbers with one site at a loss. Give it the team’s format, figures to title, in three minutes.",
+   "brief": "Chapter 1’s format challenge on a P&L: a cluster’s FY26E site P&L arrived as a bordered grid of General numbers, with one new site at a loss. Give it the team’s format, figures to title, in three minutes.",
    "closing": "",
    "wow": "",
-   "convention_line": "Parentheses, never a leading minus · One decimals setting per line · A top border, never an all-borders grid · Inputs blue, formulas black · Merged cells break everything",
+   "convention_line": "Negatives in parentheses, one decimals setting per line, a top border on the total, inputs blue and nothing merged.",
    "mac_note": "",
    "story_beat": ""
   }
@@ -3031,231 +3031,263 @@ export const COPY = {
    {
     "lesson_id": "built-in-formats-on-a-pnl",
     "goal_index": "0",
-    "text": "Select the figure block B5:P18 in one go, from B5 with Ctrl+Shift+→ then Ctrl+Shift+↓, and give it comma style with no decimals.",
+    "text": "Land on C7 and read 18000.4 in the formula bar, then press Ctrl+↓ to see the revenue lines end at C10.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C7 · The figures start two columns right of the account codes."
    },
    {
     "lesson_id": "built-in-formats-on-a-pnl",
     "goal_index": "1",
-    "text": "The site count in B20:P20 arrived dressed as currency: select the row and return it to General with Ctrl+Shift+~.",
-    "teach": "General is the no-format format: Ctrl+Shift+~ (or Ctrl+1, G) returns a cell to how its value was typed, so a count dressed as $28.00 reads as 28 again.",
+    "text": "Select the revenue lines C7:E10 and give them the desk number format with Ctrl+1, then N for Number.",
+    "teach": "One format per line, set on the whole line at once: Ctrl+1 then N gives dollars the desk number format, a separator, no decimals and a negative in parentheses.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C7:E10 · The block runs from retail wash revenue down to its total."
    },
    {
     "lesson_id": "built-in-formats-on-a-pnl",
     "goal_index": "2",
-    "text": "Revenue per site in B21:P21 is a dollar figure: give it currency with Ctrl+Shift+4, then Alt H 9 twice for no decimals.",
+    "text": "Select the site costs C13:E20 and repeat the format with F4.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C13:E20 · F4 repeats the last format on whatever is selected now."
    },
    {
     "lesson_id": "built-in-formats-on-a-pnl",
     "goal_index": "3",
-    "text": "On Inputs, the lease per site B9:D9 is a dollar figure: jump there with Go To and make it currency, no decimals, Ctrl+1 then C.",
+    "text": "Site contribution, head office and EBITDA in C22:E24 take the same format: select them and press F4.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C22:E24 · The last block on the page ends on EBITDA."
    },
    {
     "lesson_id": "built-in-formats-on-a-pnl",
     "goal_index": "4",
-    "text": "Sites at year end in B11:D11 is a count: give it thousands separators with no decimals, Ctrl+1 then N.",
+    "text": "Sites and washes in C33:E34 are counts that read the same way: select both rows and press F4.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C33:E34 · The memo lines sit below the answer, under a gap."
    },
    {
     "lesson_id": "built-in-formats-on-a-pnl",
     "goal_index": "5",
-    "text": "Does it tie? Watch FY24A’s public charging in B5 change to 9,000,000 and Total revenue in B8 answer, thousands separators and all.",
+    "text": "Revenue per wash in C35:E35 is dollars and cents: select the row and give it two decimals with Ctrl+Shift+1.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C35:E35 · A ticket of $13.75 needs its cents to read right."
+   },
+   {
+    "lesson_id": "built-in-formats-on-a-pnl",
+    "goal_index": "6",
+    "text": "Does it tie? Watch C7 change to 18500, and total revenue in C10 and EBITDA in C24 answer in the format you set.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C24 · The totals are live, so they move with the line."
    }
   ],
   "sign-convention-costs-negative": [
    {
     "lesson_id": "sign-convention-costs-negative",
     "goal_index": "0",
-    "text": "Park a -1 well below the page: Go To B30, type -1 and press Enter, step back up onto it and copy it with Ctrl+C.",
+    "text": "Type -1 in the spare cell G19, beside the last cost line, then copy it with Ctrl+C.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell G19 · The spare cell sits one empty column right of the figures."
    },
    {
     "lesson_id": "sign-convention-costs-negative",
     "goal_index": "1",
-    "text": "Energy cost B9:P9 is a cost: jump to B9, select the line with Ctrl+Shift+→, and multiply it by the copied -1 with Paste Special.",
-    "teach": "Paste Special’s Operation multiplies the copied value into every selected cell: Ctrl+Alt+V, V for values, M for Multiply, Enter — the figures flip, nothing is retyped.",
+    "text": "Select the cost lines C13:E19, stopping above the total in row 20, and Paste Special Multiply with Ctrl+Alt+V, V, M, Enter.",
+    "teach": "Paste Special Multiply, Ctrl+Alt+V then V and M, multiplies every selected cell by the copied value, so one -1 flips a whole block.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C13:E19 · Row 20 is a formula; paste arithmetic would rewrite it."
    },
    {
     "lesson_id": "sign-convention-costs-negative",
     "goal_index": "2",
-    "text": "The four operating cost lines B12:P15 are costs too: select the block from B12 and multiply it by the same -1 in one paste.",
+    "text": "Head office in C23:E23 is a cost too: select the line and multiply it by the same -1.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C23:E23 · The -1 is still on the clipboard."
    },
    {
     "lesson_id": "sign-convention-costs-negative",
     "goal_index": "3",
-    "text": "Gross profit still subtracts: in B10 write it as the sum =B8+B9, then fill the line right to P10 with Ctrl+R.",
+    "text": "Site contribution still subtracts: type =C10+C20 in C22, then select C22:E22 and fill it right with Ctrl+R.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C22 · Costs are negative now, so the total adds them."
    },
    {
     "lesson_id": "sign-convention-costs-negative",
     "goal_index": "4",
-    "text": "EBITDA in B17 becomes the sum =B10+B16 the same way, filled right to P17 with Ctrl+R.",
+    "text": "EBITDA in C24 becomes =C22+C23 the same way, filled right across C24:E24 with Ctrl+R.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C24 · Head office is negative too, so EBITDA adds it."
    },
    {
     "lesson_id": "sign-convention-costs-negative",
     "goal_index": "5",
-    "text": "State the convention once, in the units line A2: USD unless stated; costs shown as negatives.",
+    "text": "The -1 in G19 has done its job: go back to it and clear it with Delete.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell G19 · Nothing stray stays beside the page."
    },
    {
     "lesson_id": "sign-convention-costs-negative",
     "goal_index": "6",
-    "text": "The -1 in B30 has done its job: Go To B30 and clear it with Delete, so nothing stray sits below the page.",
+    "text": "State the convention once: in A2 type USD thousands unless stated; costs shown as negatives, then make it italic.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell A2 · The units line sits right under where the title will go."
    },
    {
     "lesson_id": "sign-convention-costs-negative",
     "goal_index": "7",
-    "text": "Does it tie? Watch FY24A’s energy cost in B9 change to (5,000,000) and Gross profit in B10 fall with it, a cost added, not subtracted.",
+    "text": "Does it tie? Watch rent in C15 typed as (4500), parentheses and all, and site contribution C22 and EBITDA C24 fall.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C24 · Excel reads parentheses as a minus."
    }
   ],
   "currency-and-percent-lines": [
    {
     "lesson_id": "currency-and-percent-lines",
     "goal_index": "0",
-    "text": "Public charging B5:P5 is the block’s first row: select it and give it Accounting Number Format with Alt H A N.",
-    "teach": "Accounting Number Format, Alt H A N, puts the $ at the cell’s left edge, negatives in parentheses and zero as a dash: the dress a $ row wears.",
+    "text": "Type Margins and growth in B26, then Gross margin, Site contribution margin, EBITDA margin and Revenue growth down B27:B30.",
+    "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B26 · The block sits under the P&L, labels in column B."
    },
    {
     "lesson_id": "currency-and-percent-lines",
     "goal_index": "1",
-    "text": "Total revenue B8:P8 is a total: three rows down, select the line and give it the same Accounting format.",
-    "teach": "",
+    "text": "Type =(C10+C13)/C10 in C27 for gross margin, then select C27:E27 and fill it right with Ctrl+R.",
+    "teach": "A margin is a line as a share of revenue, and gross margin adds the negative chemicals line to revenue: what is left of each dollar after the wash.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C27 · Revenue is in row 10 and chemicals and water in row 13."
    },
    {
     "lesson_id": "currency-and-percent-lines",
     "goal_index": "2",
-    "text": "Gross profit B10:P10 is a total too: two rows down, the same selection and the same format.",
+    "text": "Type =C22/C10 in C28 and =C24/C10 in C29, then select C28:E29 and fill both right with Ctrl+R.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C28:E29 · Each margin divides its line by revenue in row 10."
    },
    {
     "lesson_id": "currency-and-percent-lines",
     "goal_index": "3",
-    "text": "Gross margin % B11:P11 is a fraction: one row down, select it, Ctrl+Shift+5 for percent, then Alt H 0 for one decimal.",
+    "text": "Growth starts in the second year: type =D10/C10-1 in D30, fill it right to E30, and leave C30 empty.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell D30 · FY24 has no year before it to grow from."
    },
    {
     "lesson_id": "currency-and-percent-lines",
     "goal_index": "4",
-    "text": "Total operating costs and EBITDA, B16:P17, are totals too: jump to the foot, up two, select both lines and apply Alt H A N.",
-    "teach": "",
+    "text": "Label F29 CAGR, then put the two-year CAGR in F30: =(E10/C10)^(1/(COLUMNS(C10:E10)-1))-1.",
+    "teach": "CAGR, compound annual growth, is the one growth figure a buyer quotes, and COLUMNS(C10:E10)-1 counts its periods, three columns less one, so no 2 gets typed.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell F30 · The last year over the first, to the power of one over the periods."
    },
    {
     "lesson_id": "currency-and-percent-lines",
     "goal_index": "5",
-    "text": "EBITDA margin % B18:P18 reads as a percentage to one decimal, like the gross margin above it.",
+    "text": "Select C27:F30 and make it percentages to one decimal with Ctrl+Shift+5 and Alt H 0, then italic with Ctrl+I.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C27:F30 · The whole block, the CAGR column included."
    },
    {
     "lesson_id": "currency-and-percent-lines",
     "goal_index": "6",
-    "text": "Does it tie? Watch FY24A’s public charging in B5 change to $ 9,000,000 and the gross margin in B11 answer to one decimal.",
+    "text": "Put the $ on C7:E7, C10:E10 and C24:E24 as currency with no decimals: Ctrl+1 then C, and F4 for the next two.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C7:E7 · The first row and the totals carry the currency sign."
+   },
+   {
+    "lesson_id": "currency-and-percent-lines",
+    "goal_index": "7",
+    "text": "Revenue per wash in C35:E35 is dollars and cents: give it currency with two decimals, Ctrl+Shift+4.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse range C35:E35 · The memo line at the foot of the page."
+   },
+   {
+    "lesson_id": "currency-and-percent-lines",
+    "goal_index": "8",
+    "text": "Does it tie? Watch membership revenue in E8 change to 24000, and EBITDA margin E29 and growth E30 move with it.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell E29 · Every margin reads revenue, so it moves too."
    }
   ],
   "dates-on-the-timeline": [
    {
     "lesson_id": "dates-on-the-timeline",
     "goal_index": "0",
-    "text": "The year columns B4:D4 are labelled 2024, 2025, 2026: type FY24A, FY25A and FY26E over them with Tab between, ending on E4.",
-    "teach": "",
+    "text": "Type the three year ends into C4:E4 as a Tab run: 12/31/2024, 12/31/2025 and 12/31/2026.",
+    "teach": "A date is a serial number of days shown in a date format: 12/31/2024 is 45657 underneath, so it sorts, subtracts and rolls forward.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C4 · Type over the text headers; Tab moves right after each."
    },
    {
     "lesson_id": "dates-on-the-timeline",
     "goal_index": "1",
-    "text": "The month headers E4:P4 are bare serials: select them with Ctrl+Shift+→ and dress them as dates, Ctrl+1 then D.",
-    "teach": "A date is a serial number of days, and Ctrl+1 then D dresses it as Jan-26: the number underneath still sorts, subtracts and feeds a formula.",
+    "text": "Select C4:E4 and show the dates the way the page reads them with Ctrl+1 then D, which gives Dec-24.",
+    "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C4:E4 · Enter after a Tab run lands one row under the first date."
    },
    {
     "lesson_id": "dates-on-the-timeline",
     "goal_index": "2",
-    "text": "Headers sit over their numbers: from B4 select the row to P4 and right-align it with Alt H A R.",
+    "text": "Label the row: type Fiscal year ending in B4 and right-align it over the dates with Alt H A R.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B4 · The label goes left of the first date, over the labels column."
    },
    {
     "lesson_id": "dates-on-the-timeline",
     "goal_index": "3",
-    "text": "The whole header row A4:P4 is the timeline: select it from A4 and make it bold with Ctrl+B.",
+    "text": "Type the flags A, A and E into C5:E5 as a Tab run, one under each year.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C5 · Two actual years, then the estimate."
    },
    {
     "lesson_id": "dates-on-the-timeline",
     "goal_index": "4",
-    "text": "The Monthly page heads its columns with the same serials: Go To Monthly!B4, select to M4 and dress them as dates.",
+    "text": "Select the flags C5:E5, right-align them with Alt H A R, then set them in italic with Ctrl+I.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C5:E5 · The flags sit right under the dates they describe."
    },
    {
     "lesson_id": "dates-on-the-timeline",
     "goal_index": "5",
-    "text": "Is it a number? Watch P4 drop its dress with Ctrl+1 G, show the serial 46387 underneath, and take the dress back with Ctrl+1 D.",
+    "text": "Bold the timeline: select row 4 with Shift+Space and press Ctrl+B.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse row 4 · Shift+Space takes the whole row of the active cell."
+   },
+   {
+    "lesson_id": "dates-on-the-timeline",
+    "goal_index": "6",
+    "text": "Does it tie? Watch C4 change to 12/31/2023 and the header read Dec-23: the page rolls with one edit.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C4 · The header shows whatever date is underneath."
    }
   ],
   "challenge-format-the-numbers": [
    {
     "lesson_id": "challenge-format-the-numbers",
     "goal_index": "0",
-    "text": "The figure block B5:D18 is General with the export’s stray cents: give it comma style with no decimals.",
+    "text": "Give the dollar lines C7:E10, C13:E20 and C22:E24 the desk number format with Ctrl+1 then N, and F4.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3263,7 +3295,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-format-the-numbers",
     "goal_index": "1",
-    "text": "Energy cost B9:D9 and the four operating cost lines B12:D15 are typed positive: park a -1 in B30 and multiply them by it with Paste Special.",
+    "text": "Park a -1 in G19, copy it, and Paste Special Multiply the costs C13:E19 and head office C23:E23 by it.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3271,7 +3303,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-format-the-numbers",
     "goal_index": "2",
-    "text": "Gross profit B10:D10 and EBITDA B17:D17 still subtract: rewrite each as a sum, =B8+B9 and =B10+B16, filled right with Ctrl+R.",
+    "text": "Make site contribution C22 =C10+C20 and EBITDA C24 =C22+C23, each filled right, then clear G19.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3279,7 +3311,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-format-the-numbers",
     "goal_index": "3",
-    "text": "Rows 5, 8, 10, 16 and 17 carry the $: give each line Accounting Number Format with Alt H A N.",
+    "text": "State the convention in A2: USD thousands unless stated; costs shown as negatives.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3287,7 +3319,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-format-the-numbers",
     "goal_index": "4",
-    "text": "Gross margin % B11:D11 and EBITDA margin % B18:D18 are fractions: show each as a percentage to one decimal.",
+    "text": "Show the margins block C27:E30 as percentages to one decimal, in italic.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3295,7 +3327,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-format-the-numbers",
     "goal_index": "5",
-    "text": "The site count B20:D20 arrived dressed as dollars: return it to General, then give Revenue per site B21:D21 currency with no decimals.",
+    "text": "Put the $ on C7:E7, C10:E10 and C24:E24 as currency with no decimals.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3303,7 +3335,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-format-the-numbers",
     "goal_index": "6",
-    "text": "State the convention in A2, USD unless stated; costs shown as negatives, and clear the -1 out of B30.",
+    "text": "Type 12/31/2024, 12/31/2025 and 12/31/2026 into C4:E4 and show them as dates with Ctrl+1 then D.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3313,239 +3345,215 @@ export const COPY = {
    {
     "lesson_id": "the-four-section-format",
     "goal_index": "0",
-    "text": "Select the figure block B5:P18 and give it the house plain code: Ctrl+1, U, then #,##0_);(#,##0);-_) and Enter.",
-    "teach": "Format Cells › Custom, Ctrl+1 then U, takes a code of up to four sections separated by semicolons, positive;negative;zero;text: _) leaves a space the width of a parenthesis.",
+    "text": "Select the P&L lines C7:E24 and type the code #,##0_);(#,##0);-_) into the Custom box: Ctrl+1, U, Enter.",
+    "teach": "In the Custom box, Ctrl+1 then U, 0 always prints a digit and # only when there is one, and _) leaves a bracket-wide gap so the columns line up.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C7:E24 · Ctrl+Shift+↓ keeps jumping across the gaps until EBITDA."
    },
    {
     "lesson_id": "the-four-section-format",
     "goal_index": "1",
-    "text": "The first row B5:P5 carries the $: back to B5 with Home and →, select the line and give it $#,##0_);($#,##0);-_) the same way.",
+    "text": "The memo counts in C33:E34 take the same code: select them and press F4.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C33:E34 · Sites and washes, under the margins block."
    },
    {
     "lesson_id": "the-four-section-format",
     "goal_index": "2",
-    "text": "Total revenue B8:P8 and Gross profit B10:P10 wear the same $ code: select each line in turn and press F4 to repeat it.",
+    "text": "The first row carries the $: select C7:E7 and type $#,##0_);($#,##0);-_) into the Custom box.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C7:E7 · The same code with a $ in front of each number section."
    },
    {
     "lesson_id": "the-four-section-format",
     "goal_index": "3",
-    "text": "Gross margin % B11:P11 gets the percent code 0.0%_);(0.0%);-_), one decimal and the same dash for a zero.",
+    "text": "Total revenue C10:E10 and EBITDA C24:E24 are totals: select each in turn and press F4 to repeat the $ code.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C10:E10 · F4 repeats the code you just typed."
    },
    {
     "lesson_id": "the-four-section-format",
     "goal_index": "4",
-    "text": "Total operating costs and EBITDA, B16:P17, are totals: jump to the foot, up two, select both lines and type the $ code again.",
+    "text": "Give the margins block C27:F30 the percent code 0.0%_);(0.0%);-_), so a zero reads as a dash there too.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C27:F30 · The margins block, CAGR column included."
    },
    {
     "lesson_id": "the-four-section-format",
     "goal_index": "5",
-    "text": "EBITDA margin % B18:P18 gets the percent code too, so both margins read alike.",
+    "text": "Does it tie? Watch other revenue in E9 change to 0 and read as a dash, and total revenue in E10 answer.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
-   },
-   {
-    "lesson_id": "the-four-section-format",
-    "goal_index": "6",
-    "text": "Does it tie? Watch January’s maintenance in E13 go to 0 and read as a dash, and Total operating costs in E16 answer.",
-    "teach": "",
-    "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell E9 · The third section decides how a zero reads."
    }
   ],
   "units-in-the-format": [
    {
     "lesson_id": "units-in-the-format",
     "goal_index": "0",
-    "text": "Revenue per site B21:P21 reads better in thousands: select the line and give it $#,##0,k_);($#,##0,k);-_) in the Custom box.",
-    "teach": "A comma after the last digit placeholder divides by a thousand, and a unit rides along in quotes: the Custom box turns $#,##0,k into $#,##0,\"k\" for you.",
+    "text": "On Inputs, show FY26E revenue in B15 in millions: give it #,##0.0,\"m\" in the Custom box.",
+    "teach": "A comma after the last digit divides the display by a thousand and text in quotes rides along, so 50000 thousand reads 50.0m while the cell still holds 50000.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B15 · The comma before the quotes does the dividing."
    },
    {
     "lesson_id": "units-in-the-format",
     "goal_index": "1",
-    "text": "On Inputs the leverage B10:D10 was typed as text, 2.9x: Go To Inputs!B10 and retype the three figures as 2.9, 2.4 and 1.9 with Tab.",
+    "text": "Revenue per site in B16 is already in thousands: give it #,##0k so it reads 1,250k.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B16 · No comma this time: the figure is in thousands already."
    },
    {
     "lesson_id": "units-in-the-format",
     "goal_index": "2",
-    "text": "Now give B10:D10 the multiple code 0.0x, so the x is in the format and the numbers stay numbers.",
+    "text": "The multiple in B13 was typed as text, 12.0x, and no formula can use it: retype it as the number 12.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B13 · Text sits left in its cell; a number sits right."
    },
    {
     "lesson_id": "units-in-the-format",
     "goal_index": "3",
-    "text": "The tariff increase B8:D8 is quoted in basis points: two rows up, select it and give it the code 0 bps.",
+    "text": "Give B13 the code 0.0x, so the x lives in the format and the 12 stays a number.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B13 · The Custom box quotes the x for you."
    },
    {
     "lesson_id": "units-in-the-format",
     "goal_index": "4",
-    "text": "On Monthly, kWh sold B6:M6 runs to seven digits: Go To Monthly!B6, select the line and give it #,##0,k.",
+    "text": "The margin change in B14 is a spread: give it the code 0 bps.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B14 · A basis point is a hundredth of a percent."
    },
    {
     "lesson_id": "units-in-the-format",
     "goal_index": "5",
-    "text": "kWh per session B8:M8 straddles 20: two rows down, give it 0.0 so every month shows one decimal.",
+    "text": "On the P&L, give revenue per wash C35:E35 the code $0.00\" /wash\" so the unit travels with it.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C35:E35 · Text in quotes prints exactly as typed, space and all."
    },
    {
     "lesson_id": "units-in-the-format",
     "goal_index": "6",
-    "text": "Is it a number? Watch FY24A’s leverage in B10 change to 3.5 and read 3.5x: the x lives in the format, not the cell.",
+    "text": "Is it a number? Watch the multiple in Inputs B13 change to 13.5 and read 13.5x: the x lives in the format.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B13 · The cell holds 13.5; the format adds the x."
    }
   ],
   "dynamic-headers-with-text": [
    {
     "lesson_id": "dynamic-headers-with-text",
     "goal_index": "0",
-    "text": "Label A3 Year end, then put the three year ends in B3:D3 as =DATE(2024,12,31), =DATE(2025,12,31) and =DATE(2026,12,31), Tab between.",
-    "teach": "DATE(year, month, day) builds a date from its parts, so =DATE(2024,12,31) is FY24’s year end as a number the sheet can read.",
+    "text": "Select the timeline C4:E4 and give it the custom code \"FY\"yy, so the dates read FY24, FY25 and FY26.",
+    "teach": "A date code writes a date its own way: yy is the two-digit year and text in quotes rides along, so \"FY\"yy reads FY24 from 12/31/2024.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C4:E4 · The dates are still there under Dec-24."
    },
    {
     "lesson_id": "dynamic-headers-with-text",
     "goal_index": "1",
-    "text": "The year ends show as serials: step back onto D3, select to B3 with Shift+← twice, and dress them as dates with Ctrl+1 then D.",
+    "text": "The actual years say so: select C4:D4 and give them the code \"FY\"yy\"A\".",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C4:D4 · The A flags in row 5 sit under these two."
    },
    {
     "lesson_id": "dynamic-headers-with-text",
     "goal_index": "2",
-    "text": "Replace the typed FY24A in B4 with a label built from its year end: =\"FY\"&TEXT(B3,\"yy\")&\"A\".",
-    "teach": "TEXT(value, \"format\") renders a number through a format code as text, and & joins the pieces: =\"FY\"&TEXT(B3,\"yy\")&\"A\" reads FY24A from the date in B3.",
+    "text": "And the estimate: give E4 the code \"FY\"yy\"E\".",
+    "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell E4 · The one year still running."
    },
    {
     "lesson_id": "dynamic-headers-with-text",
     "goal_index": "3",
-    "text": "FY25A in C4 is the same formula one column over: step up onto B4, select C4 with it and fill right with Ctrl+R.",
+    "text": "On Monthly, the month ends in C4:N4 arrived as bare serials: select the header row and show them as dates with Ctrl+1 then D.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C4:N4 · 46053 is January 31, 2026 in days."
    },
    {
     "lesson_id": "dynamic-headers-with-text",
     "goal_index": "4",
-    "text": "FY26 is an estimate: in D4 write =\"FY\"&TEXT(D3,\"yy\")&\"E\" so the label ends in E.",
+    "text": "Headers sit over their figures: right-align Monthly’s header row C4:O4 with Alt H A R.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C4:O4 · The selection from the last step is still the one you want."
    },
    {
     "lesson_id": "dynamic-headers-with-text",
     "goal_index": "5",
-    "text": "The title in A1 reads from the labels: join the company name, \"Profit and loss, \", B4, \" to \" and D4 with &.",
+    "text": "Does it tie? Watch C4 on the P&L change to 12/31/2025 and read FY25A: the code reads whatever date is underneath.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
-   },
-   {
-    "lesson_id": "dynamic-headers-with-text",
-    "goal_index": "6",
-    "text": "Monthly’s title A1 reads from its own headers: =\"Voltline - monthly operating data, \"&TEXT(B4,\"mmm-yy\")&\" to \"&TEXT(M4,\"mmm-yy\").",
-    "teach": "",
-    "why": "",
-    "hint_stuck": ""
-   },
-   {
-    "lesson_id": "dynamic-headers-with-text",
-    "goal_index": "7",
-    "text": "Does it follow? Watch the FY26E year end in D3 move to 2027, and the label in D4 and the title in A1 rewrite to FY27E.",
-    "teach": "",
-    "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C4 · Only the date changed; the code stayed."
    }
   ],
   "conditional-codes-and-hidden-zeros": [
    {
     "lesson_id": "conditional-codes-and-hidden-zeros",
     "goal_index": "0",
-    "text": "On Monthly, give kWh sold B6:M6 the tiered code [>=1000000]0.0,,\\m;[>=1000]0,\\k;0 so each month reads in k or m by size.",
-    "teach": "A section may open with a condition, [>=1000000], and Excel uses the first section whose condition the value meets; \\m adds a single letter without quotes.",
+    "text": "The checks C39:C40 read zero when the page ties: give them 0_);[Red](0);-_) so a negative check paints itself red.",
+    "teach": "A section can open with a color or a condition: [Red] paints that section’s values red, and [<1000] uses a section only for values under 1,000.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C39:C40 · The checks block sits at the foot of the page."
    },
    {
     "lesson_id": "conditional-codes-and-hidden-zeros",
     "goal_index": "1",
-    "text": "Sites opened and Fleet contracts signed, B9:M10, are mostly zeros: select the two rows and give them #,##0;(#,##0); to hide them.",
-    "teach": "An empty section shows nothing: #,##0;(#,##0); has a third section with no code, so a zero leaves the cell blank and a working block reads as marks.",
+    "text": "Washes in C34:E34 are thousands: give them [<1000]0;#,##0 so a small count and a large one each read right.",
+    "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C34:E34 · The condition picks the section, not the sign."
    },
    {
     "lesson_id": "conditional-codes-and-hidden-zeros",
     "goal_index": "2",
-    "text": "The check row B12:M12 reads 0 when it ties: three rows down, select it and give it [Red]ERROR;[Red]ERROR;OK so a tie says OK.",
-    "teach": "",
+    "text": "Hide the flags C5:E5 with the code ;;; so the cells keep their A and E but the page stops showing them.",
+    "teach": "An empty section shows nothing, so ;;; hides every kind of value while the cell still holds it for any formula that reads it.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C5:E5 · Three semicolons and nothing in any section."
    },
    {
     "lesson_id": "conditional-codes-and-hidden-zeros",
     "goal_index": "3",
-    "text": "The P&L’s check in D23 gets the same code: Go To ’P&L’!D23 and give it [Red]ERROR;[Red]ERROR;OK.",
-    "teach": "",
+    "text": "Set C5:E5 back to General with Ctrl+1 then G, and the flags show again.",
+    "teach": "General is the format with no format: Ctrl+1 then G returns a cell to showing its value as typed.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse range C5:E5 · The A and E never left the cells."
    },
    {
     "lesson_id": "conditional-codes-and-hidden-zeros",
     "goal_index": "4",
-    "text": "On Inputs, the last actual month in B12 can label itself: give it the code \"Actuals to \"mmm-yy, quotes included.",
+    "text": "On Inputs, the switch in B12 holds a 1: give it the code On;;Off so it reads On and still multiplies as a number.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B12 · Positive; negative; zero: a 0 would read Off."
    },
    {
     "lesson_id": "conditional-codes-and-hidden-zeros",
     "goal_index": "5",
-    "text": "Does it catch it? Watch January’s site count in B5 change to 40 and the check in B12 turn into a red ERROR.",
+    "text": "Does it catch it? Watch total revenue in C10 typed over as 32000, and the check in C39 leave zero and turn red.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C39 · A typed total no longer matches its lines."
    }
   ],
   "challenge-house-format-set": [
    {
     "lesson_id": "challenge-house-format-set",
     "goal_index": "0",
-    "text": "Select the figure block B5:D18 and give it the house plain code #,##0_);(#,##0);-_) in the Custom box.",
+    "text": "Give the P&L lines C7:E24 the plain code #,##0_);(#,##0);-_) in the Custom box.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3553,7 +3561,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-house-format-set",
     "goal_index": "1",
-    "text": "The first row and the totals in rows 8 and 10 wear the $ code $#,##0_);($#,##0);-_): type it on B5:D5 and repeat it with F4.",
+    "text": "Give the actual years C4:D4 the code \"FY\"yy\"A\" and the estimate E4 the code \"FY\"yy\"E\".",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3561,7 +3569,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-house-format-set",
     "goal_index": "2",
-    "text": "Gross margin % B11:D11 and EBITDA margin % B18:D18 wear the percent code 0.0%_);(0.0%);-_), typed once and repeated with F4.",
+    "text": "On Inputs, show FY26E revenue in B15 in millions with the code #,##0.0,\"m\".",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3569,7 +3577,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-house-format-set",
     "goal_index": "3",
-    "text": "Total operating costs and EBITDA, B16:D17, are totals: two rows up, select both lines and type the $ code again.",
+    "text": "On Monthly, show the month ends in C4:N4 as dates with Ctrl+1 then D.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3577,7 +3585,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-house-format-set",
     "goal_index": "4",
-    "text": "Revenue per site B21:D21 reads in thousands: give it $#,##0,k_);($#,##0,k);-_) so the k lives in the format.",
+    "text": "On the P&L, give the check in C39 the code 0_);[Red](0);-_) so a miss turns red.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3585,7 +3593,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-house-format-set",
     "goal_index": "5",
-    "text": "On Inputs the leverage B10:D10 is text, 2.9x: retype it as 2.9, 2.4 and 1.9 with Tab, then give the line the code 0.0x.",
+    "text": "Put the $ code $#,##0_);($#,##0);-_) on C7:E7, then on total revenue C10:E10 and EBITDA C24:E24 with F4.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3593,7 +3601,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-house-format-set",
     "goal_index": "6",
-    "text": "The tariff increase B8:D8 is quoted in basis points: two rows up, give it the code 0 bps.",
+    "text": "Give the margins block C27:F30 the percent code 0.0%_);(0.0%);-_).",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3603,7 +3611,7 @@ export const COPY = {
    {
     "lesson_id": "remix-format-on-the-pnl",
     "goal_index": "0",
-    "text": "The figures C5:F10 are General with stray decimals: give them comma style, no decimals, and the Gross profit loss reads in parentheses.",
+    "text": "The figures C5:F10 are General with stray decimals: comma style, no decimals, so the new site’s loss reads in parentheses.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3710,16 +3718,16 @@ export const COPY = {
   "number-formats": {
    "id": "number-formats",
    "name": "Number formats",
-   "objective": "The built-in styles on a raw P&L, costs shown as negatives, Accounting and percent lines, dates on the timeline: a page every number on which reads right.",
-   "story_beat": "A three-year P&L, the way the export wrote it. || General numbers with stray cents, costs typed positive, a site count dressed as dollars, bare years over the timeline. The built-in styles first: comma, Accounting, percent and date, and the sign convention stated once up top.",
-   "page_name": "The P&L, numbers to standard"
+   "objective": "Number formats on a P&L: the desk number format and decimals by line, the sign convention stated once, currency and percent lines, real dates on the timeline.",
+   "story_beat": "The P&L came out of the accounting system. || The owners have hired advisers to run the sale, and the first document is the book: the information memorandum that describes the company to buyers. Its financials section starts with three years of P&L, and what the accounting system exported is account codes in capitals, costs as positives and numbers to four decimal places. Before anyone reads it, the figures have to read like figures.",
+   "page_name": "The P&L, formatted"
   },
   "custom-number-formats": {
    "id": "custom-number-formats",
    "name": "Custom number formats",
-   "objective": "The four-section code, units in the format, headers built with TEXT, conditional codes and hidden zeros: the house number-format set from the Custom box.",
-   "story_beat": "The house set is a code. || Four sections, positive, negative, zero and text; a unit that rides in the format; a header built from a date with TEXT; a condition or a color in front, an empty section to hide a zero. The Custom box, Ctrl+1 then U, does all of it.",
-   "page_name": "The house number-format set"
+   "objective": "Custom number formats: the four-section code, units in the format, custom date codes for the timeline, conditions and hidden zeros.",
+   "story_beat": "Every number on the page has to say what it is. || A buyer flips to the financials and reads margins, multiples and thousands without a legend, so the number format has to carry the unit. A format code can write k or m after a figure, show a zero as a dash, color a negative and turn a plain date into FY26E, with the value underneath untouched. This module is the format code, one section at a time.",
+   "page_name": "The number-format set"
   },
   "remixes": {
    "id": "remixes",

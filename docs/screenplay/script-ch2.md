@@ -762,3 +762,17 @@ From screenplay 10.3, rows 2.1–2.7: Ctrl+1 and its Number, Alignment, Border a
   - Where the checks block lives on the P&L (rows 40–42 assumed) and what the three Chapter 2 checks compare: total revenue to the sum of lines; the P&L's FY26 to Monthly's full year; Print to P&L.
   - Mechanics the engine needs for this chapter (to become M-requests when the shell locks): custom number-format codes with sections, conditions and colors; the A/E right border; Cell Styles; Format Painter; conditional-formatting rules with formula type and Manage Rules; outline levels and the outline symbols; hyperlinks to a named place; print areas, fit-to-wide, page-break preview and manual breaks; TEXT, EOMONTH, EDATE, TRIM, PROPER, SUBSTITUTE, LOWER; sheet-group selection for a shared footer.
   - Source pass (2026-09-30): the fold-back plan in claude/source-checklist.md (section H) is applied to this chapter as DRAFT: 27 edits, plus the CAGR exponent that counts its own periods in 2.1.3 (held item G081, pulled back). Wolf's calls of that day are in the decision log (screenplay 11); what was held back stays listed in the checklist's section B.
+
+## Built differently
+
+- Layout: buildPage puts the source in B36 and the checks block in B38:C40 (two checks, C39 and C40), not rows 37 and 40 to 42; the second check compares FY26E revenue to Monthly's full year.
+- Check labels read "Revenue: the total less its lines" and "FY26E revenue less Monthly", since the sheet standard reads a label that starts with Total as a total row.
+- 2.1.1: sites take the desk number format with F4 (washes with them) instead of Number without a separator; reading the formula bar is folded into the teach and the closer.
+- 2.1.2: the spare cell for the -1 is G19; site contribution C22 and EBITDA C24 are retyped as additions (C20 stays a SUM) rather than edited with F2; the confirm-C13 goal is dropped and "(4500)" lives in the closing.
+- 2.1.3: the $ rows take currency through Ctrl+1 then C, not Accounting; CAGR counts its periods with COLUMNS, since RRI is not in the engine.
+- 2.1.4: the serial-reading goal is dropped (the teach says it), and the flags are typed in one goal and set right and italic in the next.
+- 2.2.1: codes use a plain hyphen for zero and no text section; the $ rows get the $ code after the plain code; the read-back goals are dropped.
+- 2.2.2: the units live on Inputs (multiple B13 retyped as 12 then 0.0x, bps B14, millions B15, k B16) and revenue per wash on the P&L, not on Print; the millions code is typed with its m in quotes.
+- 2.2.3: Monthly's month ends arrive as bare serials and take Ctrl+1 then D plus a right-align goal, since Fill Series has no month step in the engine.
+- 2.2.4: the switch is Inputs B12, and the wrong-figure demo is the closer; General is taught here, bringing the hidden flags back.
+- 2.1.C: the cluster varies by seed across four Texas clusters, not always San Antonio. 2.2.C: seven goals (the $ rows split from the plain code), units on Inputs B15, and only the revenue check, since a cluster has no Monthly to tie to.

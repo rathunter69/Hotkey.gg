@@ -8,12 +8,12 @@ import { evalFormula } from '../engine/formula.js';
 import { Sheet, cellTxtPx } from '../engine/sheet.js';
 import { Session, NUMFMT_BAD_NOTE } from '../engine/keyboard.js';
 import { runCommand } from '../ui/ribbon-commands.js';
-import { HOUSE_FORMATS } from '../content/workbooks/voltline-pnl.js';
+import { CODES as HOUSE_FORMATS } from '../content/workbooks/clearcoat-pnl.js';
 
 const F = (v, code) => formatValue(v, code).text;
 const JAN31 = 46053;   // 2026-01-31
 
-test('the four sections: positive; negative; zero; text — the house set from the P&L workbook', () => {
+test('the four sections: positive; negative; zero; text — the number-format set from the P&L workbook', () => {
   assert.equal(F(1234.5, HOUSE_FORMATS.plain), '1,235 ');
   assert.equal(F(-1234.5, HOUSE_FORMATS.plain), '(1,235)');
   assert.equal(F(0, HOUSE_FORMATS.plain), '- ');
@@ -22,8 +22,10 @@ test('the four sections: positive; negative; zero; text — the house set from t
   assert.equal(F(0.1234, HOUSE_FORMATS.pct), '12.3% ');
   assert.equal(F(-0.05, HOUSE_FORMATS.pct), '(5.0%)');
   assert.equal(F(0, HOUSE_FORMATS.pct), '- ');
-  assert.equal(F(1500000, HOUSE_FORMATS.perSite), '$1,500k ');
-  assert.equal(F(-2500, HOUSE_FORMATS.perSite), '($3k)');   // 2.5 rounds half away from zero, as Excel rounds
+  assert.equal(F(50000, HOUSE_FORMATS.millions), '50.0m');   // the trailing comma divides by a thousand
+  assert.equal(F(1250, HOUSE_FORMATS.thousandsK), '1,250k');
+  assert.equal(F(12, HOUSE_FORMATS.multiple), '12.0x');
+  assert.equal(F(1, HOUSE_FORMATS.onOff), 'On'); assert.equal(F(0, HOUSE_FORMATS.onOff), 'Off');
   assert.equal(F(JAN31, HOUSE_FORMATS.month), 'Jan-26');
   assert.equal(F('n/a', '0;(0);"-";"text: "@'), 'text: n/a');   // the fourth section dresses text
   assert.equal(F('n/a', '0;(0);"-"'), 'n/a');                    // no text section: text passes through

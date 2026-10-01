@@ -1,69 +1,69 @@
-// Chapter 2 · 2.2.2 — Units in the format (voltline-pnl, S2a → S2b)
-// Bankers never type a unit beside a number: the format carries it (D9). A comma after the last
-// digit placeholder divides by a thousand, and a unit rides along in quotes, so revenue per site
-// reads $383k, leverage reads 2.9x, a tariff step reads 150 bps and kWh reads 936k, while the
-// number underneath stays a number a formula can use. The associate had typed the leverage as
-// text with its x; that gets retyped as numbers and dressed. The closer changes it to 3.5x.
-import { PERIOD_COLS, ANNUAL_COLS, MONTHLY_COLS, HOUSE_FORMATS } from '../workbooks/voltline-pnl.js';
+// Chapter 2 · 2.2.2 Units in the format: k, m, x, bps (clearcoat-pnl, S2a → S2b)
+// The figures are in thousands, and a page that says so once at the top is fine until a figure
+// travels alone. The unit can live in the format (D9): FY26E revenue on Inputs reads 50.0m (a comma
+// divides by a thousand), revenue per site 1,250k, the illustrative multiple, typed as text with
+// its x, is retyped as a number and coded 0.0x, the margin change reads in bps, and revenue per
+// wash on the P&L carries "/wash". The closer changes the multiple and the x stays in the format.
+import { YEAR_COLS, CODES, TYPED, MULTIPLE } from '../workbooks/clearcoat-pnl.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
 const pnl = ses => sheetOf(ses, 'P&L');
 const inputs = ses => sheetOf(ses, 'Inputs');
-const monthly = ses => sheetOf(ses, 'Monthly');
 const settled = ses => !ses.editing && !ses.dialog;
-const rows = (cols, rs) => cols.flatMap(col => rs.map(r => col + r));
 const codeIs = (sh, refs, code) => refs.every(ref => { const c = sh.cellAt(ref); return c.fmtStyle === 'custom' && c.numFmt === code; });
 
-const PER_SITE = rows(PERIOD_COLS, [21]);
-const LEVERAGE = rows(ANNUAL_COLS, [10]);
-const BPS = rows(ANNUAL_COLS, [8]);
-const KWH = rows(MONTHLY_COLS, [6]);
-const PER_SESSION = rows(MONTHLY_COLS, [8]);
-const LEVERAGE_NUMBERS = [2.9, 2.4, 1.9];
-const leverageTyped = sh => ANNUAL_COLS.every((col, i) => sh.value(col + '10') === LEVERAGE_NUMBERS[i]);
+const PER_WASH = YEAR_COLS.map(col => col + '35');
+const retyped = sh => sh.value('B13') === MULTIPLE;
 
 export default {
   id: 'units-in-the-format',
   chapter: 'formatting',
   section: 'Custom number formats',
   module: 'custom-number-formats',
-  workbook: 'voltline-pnl',
+  workbook: 'clearcoat-pnl',
   state: { before: 'S2a', after: 'S2b' },
-  title: 'Units in the format',
+  title: 'Units in the format: k, m, x, bps',
   difficulty: 'medium',
   tags: ['format', 'custom-number-formats', 'units', 'inputs'],
   access: 'paid',
   minutes: 6,
   headline: 'Ctrl+1',
-  conventions: ['D9', 'D2', 'C5'],
+  conventions: ['D9', 'C5'],
   teaches: ['format-units'],
-  uses: ['custom-number-format', 'go-to', 'sheet-reference', 'tab-commits', 'ctrl-shift-arrow', 'ctrl-arrow'],
+  uses: ['custom-number-format', 'go-to', 'sheet-reference', 'type-to-enter', 'shift-arrow'],
   prerequisites: ['the-four-section-format'],
-  brief: 'A unit typed beside a number turns it into text: the leverage on Inputs reads 2.9x and no formula can use it. The format carries the unit instead, so per-site revenue reads in $k, a multiple reads with its x and a tariff step in bps, while the number underneath stays a number. The door is `Ctrl+1`.',
+  brief: 'The figures are in thousands, and a page that says so once at the top is fine, until a figure travels alone onto a slide or into an email. The unit can live in the format: a literal "k" after the number, "m" with a comma that divides by a thousand, "x" for a multiple, "bps" for a spread. The value stays a plain number that formulas can read; only the display carries the unit. The key is `Ctrl+1`.',
   goals: [
-    { id: 'per-site-k', teach: 'A comma after the last digit placeholder divides by a thousand, and a unit rides along in quotes: the Custom box turns $#,##0,k into $#,##0,"k" for you.', text: 'Revenue per site B21:P21 reads better in thousands: select the line and give it $#,##0,k_);($#,##0,k);-_) in the Custom box.', keys: 'Ctrl+↓ ×2 ↓ → Ctrl+↓ ×2 ↓ Ctrl+Shift+→ Ctrl+1 U "$#,##0,k_);($#,##0,k);-_)" ↵', requires: ['format-units', 'custom-number-format', 'ctrl-arrow', 'ctrl-shift-arrow'], convention: 'D9',
-      check: (s, ses) => { const sh = pnl(ses); return !!sh && codeIs(sh, PER_SITE, HOUSE_FORMATS.perSite) && settled(ses); } },
-    { id: 'retype-leverage', text: 'On Inputs the leverage B10:D10 was typed as text, 2.9x: Go To Inputs!B10 and retype the three figures as 2.9, 2.4 and 1.9 with Tab.', keys: 'Ctrl+G "Inputs!B10" ↵ "2.9" Tab "2.4" Tab "1.9" ↵', requires: ['go-to', 'sheet-reference', 'tab-commits'], convention: 'D9',
-      check: (s, ses) => { const sh = inputs(ses); return !!sh && leverageTyped(sh) && settled(ses); } },
-    { id: 'leverage-x', text: 'Now give B10:D10 the multiple code 0.0x, so the x is in the format and the numbers stay numbers.', keys: '↑ Ctrl+Shift+→ Ctrl+1 U "0.0x" ↵', requires: ['format-units', 'custom-number-format', 'ctrl-shift-arrow'], convention: 'D9',
-      check: (s, ses) => { const sh = inputs(ses); return !!sh && leverageTyped(sh) && codeIs(sh, LEVERAGE, HOUSE_FORMATS.multiple) && settled(ses); } },
-    { id: 'bps-code', text: 'The tariff increase B8:D8 is quoted in basis points: two rows up, select it and give it the code 0 bps.', keys: '↑ ×2 Ctrl+Shift+→ Ctrl+1 U "0 bps" ↵', requires: ['format-units', 'custom-number-format', 'ctrl-shift-arrow'], convention: 'C5',
-      check: (s, ses) => { const sh = inputs(ses); return !!sh && codeIs(sh, BPS, HOUSE_FORMATS.bps) && settled(ses); } },
-    { id: 'kwh-thousands', text: 'On Monthly, kWh sold B6:M6 runs to seven digits: Go To Monthly!B6, select the line and give it #,##0,k.', keys: 'Ctrl+G "Monthly!B6" ↵ Ctrl+Shift+→ Ctrl+1 U "#,##0,k" ↵', requires: ['format-units', 'go-to', 'sheet-reference', 'ctrl-shift-arrow'], convention: 'D9',
-      check: (s, ses) => { const sh = monthly(ses); return !!sh && codeIs(sh, KWH, HOUSE_FORMATS.thousands) && settled(ses); } },
-    { id: 'per-session-decimal', text: 'kWh per session B8:M8 straddles 20: two rows down, give it 0.0 so every month shows one decimal.', keys: '↓ ×2 Ctrl+Shift+→ Ctrl+1 U "0.0" ↵', requires: ['custom-number-format', 'ctrl-shift-arrow'], convention: 'D2',
-      check: (s, ses) => { const sh = monthly(ses); return !!sh && codeIs(sh, PER_SESSION, HOUSE_FORMATS.oneDecimal) && settled(ses); } },
-    { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Inputs!B10" Enter "3.5" Enter Escape Escape Escape', cadence: 320 }, text: 'Is it a number? Watch FY24A’s leverage in B10 change to 3.5 and read 3.5x: the x lives in the format, not the cell.', requires: [],
+    { id: 'revenue-m', teach: 'A comma after the last digit divides the display by a thousand and text in quotes rides along, so 50000 thousand reads 50.0m while the cell still holds 50000.', text: 'On Inputs, show FY26E revenue in B15 in millions: give it #,##0.0,"m" in the Custom box.', keys: `Ctrl+G "Inputs!B15" ↵ Ctrl+1 U '${TYPED.millions}' ↵`, requires: ['format-units', 'custom-number-format', 'go-to', 'sheet-reference'], convention: 'D9',
+      hintStuck: 'pulse cell B15 · The comma before the quotes does the dividing.',
+      check: (s, ses) => { const sh = inputs(ses); return !!sh && codeIs(sh, ['B15'], CODES.millions) && settled(ses); } },
+    { id: 'per-site-k', text: 'Revenue per site in B16 is already in thousands: give it #,##0k so it reads 1,250k.', keys: `↓ Ctrl+1 U "${TYPED.thousandsK}" ↵`, requires: ['format-units', 'custom-number-format'], convention: 'D9',
+      hintStuck: 'pulse cell B16 · No comma this time: the figure is in thousands already.',
+      check: (s, ses) => { const sh = inputs(ses); return !!sh && codeIs(sh, ['B16'], CODES.thousandsK) && settled(ses); } },
+    { id: 'retype-multiple', text: 'The multiple in B13 was typed as text, 12.0x, and no formula can use it: retype it as the number 12.', keys: `↑ ×3 "${MULTIPLE}" ↵`, requires: ['type-to-enter'], convention: 'D9',
+      hintStuck: 'pulse cell B13 · Text sits left in its cell; a number sits right.',
+      check: (s, ses) => { const sh = inputs(ses); return !!sh && retyped(sh) && settled(ses); } },
+    { id: 'multiple-x', text: 'Give B13 the code 0.0x, so the x lives in the format and the 12 stays a number.', keys: `↑ Ctrl+1 U "${TYPED.multiple}" ↵`, requires: ['format-units', 'custom-number-format'], convention: 'D9',
+      hintStuck: 'pulse cell B13 · The Custom box quotes the x for you.',
+      check: (s, ses) => { const sh = inputs(ses); return !!sh && retyped(sh) && codeIs(sh, ['B13'], CODES.multiple) && settled(ses); } },
+    { id: 'bps', text: 'The margin change in B14 is a spread: give it the code 0 bps.', keys: `↓ Ctrl+1 U "${TYPED.bps}" ↵`, requires: ['format-units', 'custom-number-format'], convention: 'D9',
+      hintStuck: 'pulse cell B14 · A basis point is a hundredth of a percent.',
+      check: (s, ses) => { const sh = inputs(ses); return !!sh && codeIs(sh, ['B14'], CODES.bps) && settled(ses); } },
+    { id: 'per-wash', text: 'On the P&L, give revenue per wash C35:E35 the code $0.00" /wash" so the unit travels with it.', keys: `Ctrl+G "'P&L'!C35" ↵ Shift+→ ×2 Ctrl+1 U '${TYPED.perWash}' ↵`, requires: ['format-units', 'custom-number-format', 'go-to', 'sheet-reference', 'shift-arrow'], convention: 'D9',
+      hintStuck: 'pulse range C35:E35 · Text in quotes prints exactly as typed, space and all.',
+      check: (s, ses) => { const sh = pnl(ses); return !!sh && codeIs(sh, PER_WASH, CODES.perWash) && settled(ses); } },
+    { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Inputs!B13" Enter "13.5" Enter Escape Escape Escape', cadence: 320 }, text: 'Is it a number? Watch the multiple in Inputs B13 change to 13.5 and read 13.5x: the x lives in the format.', requires: [],
+      hintStuck: 'pulse cell B13 · The cell holds 13.5; the format adds the x.',
       check: (s, ses) => ses.demoDone.has('tie') },
   ],
   endState: [
-    { text: 'Revenue per site reads in $k', check: (s, ses) => { const sh = pnl(ses); return !!sh && codeIs(sh, PER_SITE, HOUSE_FORMATS.perSite); } },
-    { text: 'The leverage is three numbers wearing an x, and the tariff increase reads in bps', check: (s, ses) => { const sh = inputs(ses); return !!sh && leverageTyped(sh) && codeIs(sh, LEVERAGE, HOUSE_FORMATS.multiple) && codeIs(sh, BPS, HOUSE_FORMATS.bps); } },
-    { text: 'On Monthly, kWh reads in thousands and kWh per session to one decimal', check: (s, ses) => { const sh = monthly(ses); return !!sh && codeIs(sh, KWH, HOUSE_FORMATS.thousands) && codeIs(sh, PER_SESSION, HOUSE_FORMATS.oneDecimal); } },
+    { text: 'On Inputs, revenue reads in millions, revenue per site in k, the multiple in x and the spread in bps', check: (s, ses) => { const sh = inputs(ses); return !!sh && codeIs(sh, ['B15'], CODES.millions) && codeIs(sh, ['B16'], CODES.thousandsK) && codeIs(sh, ['B13'], CODES.multiple) && codeIs(sh, ['B14'], CODES.bps); } },
+    { text: 'The multiple is a number', check: (s, ses) => { const sh = inputs(ses); return !!sh && retyped(sh); } },
+    { text: 'Revenue per wash carries its unit', check: (s, ses) => { const sh = pnl(ses); return !!sh && codeIs(sh, PER_WASH, CODES.perWash); } },
   ],
   closing: [
-    'Every unit on the three pages now lives in a format: $k on the per-site line, x on the multiples, bps on the tariff step, k on the kWh (D9). The figures underneath are plain numbers, so a formula can link to any of them and the decimals stay consistent down each line (D2).',
-    'The Custom box quoted the letters for you: what you typed as 0.0x it stored as 0.0"x", which is exactly what Excel’s box does.',
+    'The unit rides in the format, so the number stays a number.',
+    'Revenue reads 50.0m, a site 1,250k, the multiple 12.0x and the spread 356 bps, and every one of those cells holds a plain number a formula can link to. The Custom box quoted the letters for you: what you typed as 0.0x it stored as 0.0"x", which is what Excel’s box does.',
   ],
-  solution: 'Ctrl+Down Ctrl+Down Down Right Ctrl+Down Ctrl+Down Down Ctrl+Shift+Right Ctrl+1 U "$#,##0,k_);($#,##0,k);-_)" Enter Ctrl+G "Inputs!B10" Enter "2.9" Tab "2.4" Tab "1.9" Enter Up Ctrl+Shift+Right Ctrl+1 U "0.0x" Enter Up Up Ctrl+Shift+Right Ctrl+1 U "0 bps" Enter Ctrl+G "Monthly!B6" Enter Ctrl+Shift+Right Ctrl+1 U "#,##0,k" Enter Down Down Ctrl+Shift+Right Ctrl+1 U "0.0" Enter',
+  solution: `Ctrl+G "Inputs!B15" Enter Ctrl+1 U '${TYPED.millions}' Enter Down Ctrl+1 U "${TYPED.thousandsK}" Enter Up Up Up "${MULTIPLE}" Enter Up Ctrl+1 U "${TYPED.multiple}" Enter Down Ctrl+1 U "${TYPED.bps}" Enter Ctrl+G "'P&L'!C35" Enter Shift+Right Shift+Right Ctrl+1 U '${TYPED.perWash}' Enter`,
 };

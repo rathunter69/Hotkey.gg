@@ -85,11 +85,11 @@ export const CHAPTERS = [
     id: 'formatting',
     title: 'Formatting and presentation',
     access: 'paid',
-    blurb: 'The house number-format set, model formatting standards, alignment and structure, conditional formatting, dates and text, and a page that prints: a three-year P&L dressed the way a banker reads it.',
+    blurb: 'Number formats and the format code, the anatomy of a financial page, conditional formatting, dates and text, and a page that prints: a three-year P&L brought to the standard a buyer reads.',
     // Chapter 2's sections in order (SITE_SPEC · Chapter 2): modules 2.1 and 2.2 so far; 2.3–2.7 and the project block follow in Run 2.
     sections: [
-      { name: 'Number formats', blurb: 'The built-in styles on a raw P&L, costs shown as negatives, Accounting and percent lines, dates on the timeline: a page every number on which reads right.' },
-      { name: 'Custom number formats', blurb: 'The four-section code, units in the format, headers built with TEXT, conditional codes and hidden zeros: the house number-format set from the Custom box.' },
+      { name: 'Number formats', blurb: 'Number formats on a P&L: the desk number format and decimals by line, the sign convention stated once, currency and percent lines, real dates on the timeline.' },
+      { name: 'Custom number formats', blurb: 'Custom number formats: the four-section code, units in the format, custom date codes for the timeline, conditions and hidden zeros.' },
       { name: 'Remixes', blurb: 'Chapter 1’s challenges re-clothed in this chapter’s material: the same keys on a new sheet, so old skills stay warm.' },
     ],
     lessons: [

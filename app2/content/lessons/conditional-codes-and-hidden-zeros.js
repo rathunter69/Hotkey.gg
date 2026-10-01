@@ -1,62 +1,67 @@
-// Chapter 2 · 2.2.4 — Conditional codes and hidden zeros (voltline-pnl, S2c → S2d)
-// A section can open with a condition or a colour, and an empty section shows nothing. The
-// Monthly kWh line reads 936k or 1.1m by size; the sites-opened and contracts-signed rows hide
-// their zeros so a working block reads as marks, not noise; the checks read a red ERROR or OK
-// instead of a bare 0 (F1); the last-actual date labels itself. The closer breaks a check.
-import { MONTHLY_COLS, HOUSE_FORMATS } from '../workbooks/voltline-pnl.js';
+// Chapter 2 · 2.2.4 Conditional codes and hidden zeros (clearcoat-pnl, S2c → S2d)
+// A format section can carry a color and a condition, and an empty section hides a value. The
+// checks C39:C40 paint a negative red (F1), washes pick their code by size, the A/E flags hide
+// with ;;; and come back with General, and the 1/0 switch on Inputs reads On or Off while it stays
+// a number a formula can multiply by. The closer types a wrong total and the check turns red.
+import { YEAR_COLS, CODES, TYPED } from '../workbooks/clearcoat-pnl.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
 const pnl = ses => sheetOf(ses, 'P&L');
 const inputs = ses => sheetOf(ses, 'Inputs');
-const monthly = ses => sheetOf(ses, 'Monthly');
 const settled = ses => !ses.editing && !ses.dialog;
-const rows = (cols, rs) => cols.flatMap(col => rs.map(r => col + r));
 const codeIs = (sh, refs, code) => refs.every(ref => { const c = sh.cellAt(ref); return c.fmtStyle === 'custom' && c.numFmt === code; });
 
-const KWH = rows(MONTHLY_COLS, [6]);
-const MARKS = rows(MONTHLY_COLS, [9, 10]);
-const MONTHLY_CHECKS = rows(MONTHLY_COLS, [12]);
+const CHECKS = ['C39', 'C40'];
+const WASHES = YEAR_COLS.map(col => col + '34');
+const FLAG_CELLS = YEAR_COLS.map(col => col + '5');
+const flagsShown = sh => FLAG_CELLS.every(ref => { const c = sh.cellAt(ref); return (!c.fmtStyle || c.fmtStyle === 'general') && !c.numFmt; });
 
 export default {
   id: 'conditional-codes-and-hidden-zeros',
   chapter: 'formatting',
   section: 'Custom number formats',
   module: 'custom-number-formats',
-  workbook: 'voltline-pnl',
+  workbook: 'clearcoat-pnl',
   state: { before: 'S2c', after: 'S2d' },
   title: 'Conditional codes and hidden zeros',
   difficulty: 'medium',
-  tags: ['format', 'custom-number-formats', 'checks', 'monthly'],
+  tags: ['format', 'custom-number-formats', 'checks'],
   access: 'paid',
   minutes: 6,
   headline: 'Ctrl+1',
-  conventions: ['D3', 'D9', 'F1'],
-  teaches: ['conditional-format-code', 'hide-zeros'],
-  uses: ['custom-number-format', 'go-to', 'sheet-reference', 'ctrl-shift-arrow', 'shift-arrow', 'check-cell'],
+  conventions: ['F1', 'D9', 'D3'],
+  teaches: ['conditional-format-code', 'hide-zeros', 'general-format'],
+  uses: ['custom-number-format', 'format-cells-tabs', 'go-to', 'sheet-reference', 'ctrl-arrow', 'shift-arrow', 'check-cell'],
   prerequisites: ['dynamic-headers-with-text'],
-  brief: 'A format section can open with a condition or a color, and an empty section shows nothing at all. Let the kWh line pick k or m by size, hide the zeros in the working rows, and make every check read a red ERROR or a plain OK instead of a bare 0. The door is `Ctrl+1`.',
+  brief: 'A format section can carry a color and a condition: [Red] paints a negative, [<1000] applies a code only to small values, and an empty section hides a value altogether. Three semicolons and a cell shows nothing while still holding its number. Use them sparingly; the page’s conventions do most of the talking. Here the checks paint a negative red, the washes pick their code by size, and the flags hide and come back. The key is `Ctrl+1`.',
   goals: [
-    { id: 'kwh-tiers', teach: 'A section may open with a condition, [>=1000000], and Excel uses the first section whose condition the value meets; \\m adds a single letter without quotes.', text: 'On Monthly, give kWh sold B6:M6 the tiered code [>=1000000]0.0,,\\m;[>=1000]0,\\k;0 so each month reads in k or m by size.', keys: 'Ctrl+G "Monthly!B6" ↵ Ctrl+Shift+→ Ctrl+1 U "[>=1000000]0.0,,\\m;[>=1000]0,\\k;0" ↵', requires: ['conditional-format-code', 'custom-number-format', 'go-to', 'sheet-reference', 'ctrl-shift-arrow'], convention: 'D9',
-      check: (s, ses) => { const sh = monthly(ses); return !!sh && codeIs(sh, KWH, HOUSE_FORMATS.kwhTiers) && settled(ses); } },
-    { id: 'hide-zeros', teach: 'An empty section shows nothing: #,##0;(#,##0); has a third section with no code, so a zero leaves the cell blank and a working block reads as marks.', text: 'Sites opened and Fleet contracts signed, B9:M10, are mostly zeros: select the two rows and give them #,##0;(#,##0); to hide them.', keys: '↓ ×3 Ctrl+Shift+→ Shift+↓ Ctrl+1 U "#,##0;(#,##0);" ↵', requires: ['hide-zeros', 'custom-number-format', 'ctrl-shift-arrow', 'shift-arrow'], convention: 'D3',
-      check: (s, ses) => { const sh = monthly(ses); return !!sh && codeIs(sh, MARKS, HOUSE_FORMATS.hideZeros) && settled(ses); } },
-    { id: 'monthly-checks', text: 'The check row B12:M12 reads 0 when it ties: three rows down, select it and give it [Red]ERROR;[Red]ERROR;OK so a tie says OK.', keys: '↓ ×3 Ctrl+Shift+→ Ctrl+1 U "[Red]ERROR;[Red]ERROR;OK" ↵', requires: ['conditional-format-code', 'custom-number-format', 'check-cell', 'ctrl-shift-arrow'], convention: 'F1',
-      check: (s, ses) => { const sh = monthly(ses); return !!sh && codeIs(sh, MONTHLY_CHECKS, HOUSE_FORMATS.check) && settled(ses); } },
-    { id: 'pnl-check', text: 'The P&L’s check in D23 gets the same code: Go To ’P&L’!D23 and give it [Red]ERROR;[Red]ERROR;OK.', keys: `Ctrl+G "'P&L'!D23" ↵ Ctrl+1 U "[Red]ERROR;[Red]ERROR;OK" ↵`, requires: ['conditional-format-code', 'custom-number-format', 'go-to', 'sheet-reference', 'check-cell'], convention: 'F1',
-      check: (s, ses) => { const sh = pnl(ses); return !!sh && codeIs(sh, ['D23'], HOUSE_FORMATS.check) && settled(ses); } },
-    { id: 'actuals-to', text: 'On Inputs, the last actual month in B12 can label itself: give it the code "Actuals to "mmm-yy, quotes included.', keys: `Ctrl+G "Inputs!B12" ↵ Ctrl+1 U '"Actuals to "mmm-yy' ↵`, requires: ['custom-number-format', 'go-to', 'sheet-reference'], convention: 'D9',
-      check: (s, ses) => { const sh = inputs(ses); return !!sh && codeIs(sh, ['B12'], HOUSE_FORMATS.actualsTo) && settled(ses); } },
-    { id: 'tie', closer: true, demo: { script: 'Ctrl+G "Monthly!B5" Enter "40" Enter Ctrl+G "Monthly!B12" Enter Escape Escape Escape', cadence: 320 }, text: 'Does it catch it? Watch January’s site count in B5 change to 40 and the check in B12 turn into a red ERROR.', requires: [],
+    { id: 'red-checks', teach: 'A section can open with a color or a condition: [Red] paints that section’s values red, and [<1000] uses a section only for values under 1,000.', text: 'The checks C39:C40 read zero when the page ties: give them 0_);[Red](0);-_) so a negative check paints itself red.', keys: `Ctrl+G "C39" ↵ Shift+↓ Ctrl+1 U "${TYPED.check}" ↵`, requires: ['conditional-format-code', 'custom-number-format', 'check-cell', 'go-to', 'shift-arrow'], convention: 'F1',
+      hintStuck: 'pulse range C39:C40 · The checks block sits at the foot of the page.',
+      check: (s, ses) => { const sh = pnl(ses); return !!sh && codeIs(sh, CHECKS, CODES.check) && settled(ses); } },
+    { id: 'washes-scaled', text: 'Washes in C34:E34 are thousands: give them [<1000]0;#,##0 so a small count and a large one each read right.', keys: `Ctrl+↑ ↑ Shift+→ ×2 Ctrl+1 U "${TYPED.washes}" ↵`, requires: ['conditional-format-code', 'custom-number-format', 'ctrl-arrow', 'shift-arrow'], convention: 'D9',
+      hintStuck: 'pulse range C34:E34 · The condition picks the section, not the sign.',
+      check: (s, ses) => { const sh = pnl(ses); return !!sh && codeIs(sh, WASHES, CODES.washes) && settled(ses); } },
+    { id: 'hide-flags', teach: 'An empty section shows nothing, so ;;; hides every kind of value while the cell still holds it for any formula that reads it.', text: 'Hide the flags C5:E5 with the code ;;; so the cells keep their A and E but the page stops showing them.', keys: `Ctrl+G "C5" ↵ Shift+→ ×2 Ctrl+1 U "${TYPED.hide}" ↵`, requires: ['hide-zeros', 'custom-number-format', 'go-to', 'shift-arrow'], convention: 'D3',
+      hintStuck: 'pulse range C5:E5 · Three semicolons and nothing in any section.',
+      check: (s, ses) => { const sh = pnl(ses); return !!sh && codeIs(sh, FLAG_CELLS, CODES.hide) && settled(ses); } },
+    { id: 'flags-back', teach: 'General is the format with no format: Ctrl+1 then G returns a cell to showing its value as typed.', text: 'Set C5:E5 back to General with Ctrl+1 then G, and the flags show again.', keys: 'Ctrl+1 G', requires: ['general-format', 'format-cells-tabs'],
+      hintStuck: 'pulse range C5:E5 · The A and E never left the cells.',
+      check: (s, ses) => { const sh = pnl(ses); return !!sh && flagsShown(sh) && settled(ses); } },
+    { id: 'on-off', text: 'On Inputs, the switch in B12 holds a 1: give it the code On;;Off so it reads On and still multiplies as a number.', keys: `Ctrl+G "Inputs!B12" ↵ Ctrl+1 U "${TYPED.onOff}" ↵`, requires: ['custom-number-format', 'go-to', 'sheet-reference'], convention: 'D9',
+      hintStuck: 'pulse cell B12 · Positive; negative; zero: a 0 would read Off.',
+      check: (s, ses) => { const sh = inputs(ses); return !!sh && codeIs(sh, ['B12'], CODES.onOff) && settled(ses); } },
+    { id: 'tie', closer: true, demo: { script: `Ctrl+G "'P&L'!C10" Enter "32000" Enter Ctrl+G "C39" Enter Escape Escape Escape`, cadence: 320 }, text: 'Does it catch it? Watch total revenue in C10 typed over as 32000, and the check in C39 leave zero and turn red.', requires: [],
+      hintStuck: 'pulse cell C39 · A typed total no longer matches its lines.',
       check: (s, ses) => ses.demoDone.has('tie') },
   ],
   endState: [
-    { text: 'kWh sold reads in k or m by size, and the two working rows hide their zeros', check: (s, ses) => { const sh = monthly(ses); return !!sh && codeIs(sh, KWH, HOUSE_FORMATS.kwhTiers) && codeIs(sh, MARKS, HOUSE_FORMATS.hideZeros); } },
-    { text: 'Every check reads OK or a red ERROR', check: (s, ses) => { const m = monthly(ses), p = pnl(ses); return !!m && !!p && codeIs(m, MONTHLY_CHECKS, HOUSE_FORMATS.check) && codeIs(p, ['D23'], HOUSE_FORMATS.check); } },
-    { text: 'The last actual month labels itself', check: (s, ses) => { const sh = inputs(ses); return !!sh && codeIs(sh, ['B12'], HOUSE_FORMATS.actualsTo); } },
+    { text: 'The checks paint a negative red, and the washes read by size', check: (s, ses) => { const sh = pnl(ses); return !!sh && codeIs(sh, CHECKS, CODES.check) && codeIs(sh, WASHES, CODES.washes); } },
+    { text: 'The flags show in General', check: (s, ses) => { const sh = pnl(ses); return !!sh && flagsShown(sh); } },
+    { text: 'The switch reads On and is still a number', check: (s, ses) => { const sh = inputs(ses); return !!sh && codeIs(sh, ['B12'], CODES.onOff) && sh.value('B12') === 1; } },
   ],
   closing: [
-    'The working rows read as marks, the kWh line picks its own unit, and every check on the three pages reads OK or shouts ERROR in red the moment two things disagree (D3, D9, F1). Not one of those cells holds anything but a number.',
-    'That is the whole house number-format set: four sections, a unit in the code, a condition or a color in front, an empty section to hide. The challenge asks for all of it on a fresh sheet.',
+    'A format can color, scale and hide, and the value never moves.',
+    'The checks stay quiet at zero and go red the moment two figures disagree; the switch reads On and still multiplies like the 1 it is. The same On and Off code comes back on the switches of the model in Chapters 5 and 6.',
   ],
-  solution: `Ctrl+G "Monthly!B6" Enter Ctrl+Shift+Right Ctrl+1 U "[>=1000000]0.0,,\\m;[>=1000]0,\\k;0" Enter Down Down Down Ctrl+Shift+Right Shift+Down Ctrl+1 U "#,##0;(#,##0);" Enter Down Down Down Ctrl+Shift+Right Ctrl+1 U "[Red]ERROR;[Red]ERROR;OK" Enter Ctrl+G "'P&L'!D23" Enter Ctrl+1 U "[Red]ERROR;[Red]ERROR;OK" Enter Ctrl+G "Inputs!B12" Enter Ctrl+1 U '"Actuals to "mmm-yy' Enter`,
+  solution: `Ctrl+G "C39" Enter Shift+Down Ctrl+1 U "${TYPED.check}" Enter Ctrl+Up Up Shift+Right Shift+Right Ctrl+1 U "${TYPED.washes}" Enter Ctrl+G "C5" Enter Shift+Right Shift+Right Ctrl+1 U "${TYPED.hide}" Enter Ctrl+1 G Ctrl+G "Inputs!B12" Enter Ctrl+1 U "${TYPED.onOff}" Enter`,
 };

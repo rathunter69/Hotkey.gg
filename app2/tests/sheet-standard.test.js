@@ -15,7 +15,7 @@ import { sheetStandard } from '../app/graders.js';
 
 // Built before the standard existed and rebuilt on it in run R1 (the Clearcoat re-skin and the
 // drills moved onto the skeleton, M108). This list only shrinks; R1 is not done until it is empty.
-const PENDING_WORKBOOKS = new Set(['voltline-weekly', 'voltline-pnl']);
+const PENDING_WORKBOOKS = new Set(['voltline-weekly']);
 const PENDING_DRILLS = new Set(['bold-and-borders', 'edge-jumps', 'fill-factory', 'find-and-fix', 'format-cells-numbers',
   'formula-sprint', 'go-anywhere', 'paste-surgeon', 'row-wrangler', 'select-blocks', 'type-the-column', 'weekly-sales-report']);
 

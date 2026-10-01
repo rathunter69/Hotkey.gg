@@ -2,12 +2,12 @@
 // The runner and the schema resolve `lesson.module` + `lesson.state.before` through this.
 import * as voltlineWeekly from './voltline-weekly.js';
 import * as clearcoatWeekly from './clearcoat-weekly.js';
-import * as voltlinePnl from './voltline-pnl.js';
+import * as clearcoatPnl from './clearcoat-pnl.js';
 
 export const WORKBOOKS = {
   'voltline-weekly': voltlineWeekly,
   'clearcoat-weekly': clearcoatWeekly,
-  'voltline-pnl': voltlinePnl,
+  'clearcoat-pnl': clearcoatPnl,
 };
 
 /** The named state of a workbook, deep-cloned; throws on an unknown workbook or state. */

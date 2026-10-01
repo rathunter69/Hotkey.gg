@@ -1,31 +1,30 @@
-// Chapter 2 · 2.1.1 — Built-in formats on a P&L (voltline-pnl, S1raw → S1a)
-// Management's P&L export arrived as raw General numbers: cents on every line, no thousands
-// separators, a site count the accounting system dressed as "$28.00". The built-in formats do
-// the first pass from one dialog or one chord: comma style down the whole block in one
-// selection, the count freed with General, the per-site figure and the Inputs figures dressed.
-// The closer perturbs FY24A's public charging and Total revenue answers in its new dress.
-import { PERIOD_COLS, ANNUAL_COLS, LAST_COL } from '../workbooks/voltline-pnl.js';
+// Chapter 2 · 2.1.1 Built-in formats on a P&L (clearcoat-pnl, S1raw → S1a)
+// Clearcoat’s three-year P&L came out of the accounting system as raw numbers: 18000.4 where a
+// reader wants 18,000. Every line gets one format, set on the whole line at once: the desk number
+// format on the dollar blocks (Ctrl+1 then N, F4 down the page), the same on the memo counts, and
+// revenue per wash to the cent. The closer moves C7 and total revenue and EBITDA answer.
+import { YEAR_COLS } from '../workbooks/clearcoat-pnl.js';
 
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
 const pnl = ses => sheetOf(ses, 'P&L');
-const inputs = ses => sheetOf(ses, 'Inputs');
 const settled = ses => !ses.editing && !ses.dialog;
 /** Every cell in `refs` carries the number format `style` with `dec` decimals. */
 const fmtIs = (sh, refs, style, dec) => refs.every(ref => { const c = sh.cellAt(ref); return c.fmtStyle === style && (c.decimals | 0) === dec; });
-const rows = (cols, rs) => cols.flatMap(col => rs.map(r => col + r));
+const rows = (rs) => YEAR_COLS.flatMap(col => rs.map(r => col + r));
+const at = (sh, ref) => sh.selectionText && sh.selectionText() === ref;
 
-const BLOCK = rows(PERIOD_COLS, [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]);   // B5:P18, the figure block
-const SITES = rows(PERIOD_COLS, [20]);
-const PER_SITE = rows(PERIOD_COLS, [21]);
-const LEASE = rows(ANNUAL_COLS, [9]);
-const SITES_IN = rows(ANNUAL_COLS, [11]);
+const REVENUE = rows([7, 8, 9, 10]);
+const SITE_COSTS = rows([13, 14, 15, 16, 17, 18, 19, 20]);
+const BOTTOM = rows([22, 23, 24]);
+const COUNTS = rows([33, 34]);
+const PER_WASH = rows([35]);
 
 export default {
   id: 'built-in-formats-on-a-pnl',
   chapter: 'formatting',
   section: 'Number formats',
   module: 'number-formats',
-  workbook: 'voltline-pnl',
+  workbook: 'clearcoat-pnl',
   state: { before: 'S1raw', after: 'S1a' },
   title: 'Built-in formats on a P&L',
   difficulty: 'medium',
@@ -33,33 +32,42 @@ export default {
   access: 'paid',
   minutes: 5,
   headline: 'Ctrl+1',
-  conventions: ['D2'],
-  teaches: ['general-format'],
-  uses: ['number-formats', 'format-cells-tabs', 'format-cells-dialog', 'ctrl-shift-arrow', 'ctrl-arrow', 'go-to', 'sheet-reference'],
+  conventions: ['D2', 'D1'],
+  teaches: ['line-formats'],
+  uses: ['number-formats', 'format-cells-tabs', 'ctrl-shift-arrow', 'ctrl-arrow', 'f4-repeat', 'formula-bar', 'shift-arrow'],
   prerequisites: ['challenge-audit-before-you-send'],
-  brief: 'Management’s P&L export arrived as raw General numbers: cents on every line, no thousands separators, and a site count dressed as $28.00. Give the whole block the format a reader can scan in one selection, free the count of its dress, and finish the Inputs page. The key is `Ctrl+1`.',
+  brief: 'A P&L is what the company earned and spent over a year, top line to bottom line, and this one arrived as raw numbers: 18000.4 where a reader wants 18,000. Every line gets one format, set on the whole line at once: the desk number format from Chapter 1 for dollars in thousands (a separator, no decimals, a negative in parentheses), and the memo lines in their own formats. Ctrl+1 then N sets it from the Number tab, and F4 repeats it on the next block. The key is `Ctrl+1`.',
   goals: [
-    { id: 'block-comma', text: 'Select the figure block B5:P18 in one go, from B5 with Ctrl+Shift+→ then Ctrl+Shift+↓, and give it comma style with no decimals.', keys: 'Ctrl+↓ ×2 ↓ → Ctrl+Shift+→ Ctrl+Shift+↓ Ctrl+Shift+1 then Alt H 9 Alt H 9', requires: ['number-formats', 'ctrl-shift-arrow', 'ctrl-arrow'], convention: 'D2',
-      check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, BLOCK, 'comma', 0) && settled(ses); } },
-    { id: 'sites-general', teach: 'General is the no-format format: Ctrl+Shift+~ (or Ctrl+1, G) returns a cell to how its value was typed, so a count dressed as $28.00 reads as 28 again.', text: 'The site count in B20:P20 arrived dressed as currency: select the row and return it to General with Ctrl+Shift+~.', keys: 'Ctrl+↓ ×2 Ctrl+Shift+→ Ctrl+Shift+~', requires: ['general-format', 'ctrl-shift-arrow', 'ctrl-arrow'],
-      check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, SITES, 'general', 0) && sh.value('B20') === 28 && settled(ses); } },
-    { id: 'per-site-currency', text: 'Revenue per site in B21:P21 is a dollar figure: give it currency with Ctrl+Shift+4, then Alt H 9 twice for no decimals.', keys: '↓ Ctrl+Shift+→ Ctrl+Shift+4 then Alt H 9 Alt H 9', requires: ['number-formats', 'ctrl-shift-arrow'], convention: 'D2',
-      check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, PER_SITE, 'currency', 0) && settled(ses); } },
-    { id: 'lease-currency', text: 'On Inputs, the lease per site B9:D9 is a dollar figure: jump there with Go To and make it currency, no decimals, Ctrl+1 then C.', keys: 'Ctrl+G "Inputs!B9" ↵ Ctrl+Shift+→ Ctrl+1 C', requires: ['go-to', 'sheet-reference', 'format-cells-tabs', 'ctrl-shift-arrow'],
-      check: (s, ses) => { const sh = inputs(ses); return !!sh && fmtIs(sh, LEASE, 'currency', 0) && settled(ses); } },
-    { id: 'sites-in-comma', text: 'Sites at year end in B11:D11 is a count: give it thousands separators with no decimals, Ctrl+1 then N.', keys: '↓ ×2 Ctrl+Shift+→ Ctrl+1 N', requires: ['format-cells-tabs', 'ctrl-shift-arrow'], convention: 'D2',
-      check: (s, ses) => { const sh = inputs(ses); return !!sh && fmtIs(sh, SITES_IN, 'comma', 0) && settled(ses); } },
-    { id: 'tie', closer: true, demo: { script: `Ctrl+G "'P&L'!B5" Enter "9000000" Enter Ctrl+G "'P&L'!B8" Enter Escape Escape Escape`, cadence: 320 }, text: 'Does it tie? Watch FY24A’s public charging in B5 change to 9,000,000 and Total revenue in B8 answer, thousands separators and all.', requires: [],
+    { id: 'read-export', text: 'Land on C7 and read 18000.4 in the formula bar, then press Ctrl+↓ to see the revenue lines end at C10.', keys: 'Ctrl+↓ ×2 → ×2 Ctrl+↓', requires: ['ctrl-arrow', 'formula-bar'],
+      hintStuck: 'pulse cell C7 · The figures start two columns right of the account codes.',
+      check: (s, ses) => { const sh = pnl(ses); return !!sh && at(sh, 'C10') && settled(ses); } },
+    { id: 'revenue-desk', teach: 'One format per line, set on the whole line at once: Ctrl+1 then N gives dollars the desk number format, a separator, no decimals and a negative in parentheses.', text: 'Select the revenue lines C7:E10 and give them the desk number format with Ctrl+1, then N for Number.', keys: 'Ctrl+↑ Ctrl+Shift+→ Ctrl+Shift+↓ Ctrl+1 N', requires: ['line-formats', 'format-cells-tabs', 'ctrl-shift-arrow', 'ctrl-arrow'], convention: 'D2',
+      hintStuck: 'pulse range C7:E10 · The block runs from retail wash revenue down to its total.',
+      check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, REVENUE, 'comma', 0) && settled(ses); } },
+    { id: 'site-costs-f4', text: 'Select the site costs C13:E20 and repeat the format with F4.', keys: 'Ctrl+↓ ×2 Ctrl+Shift+→ Ctrl+Shift+↓ F4', requires: ['f4-repeat', 'ctrl-shift-arrow', 'ctrl-arrow'], convention: 'D2',
+      hintStuck: 'pulse range C13:E20 · F4 repeats the last format on whatever is selected now.',
+      check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, SITE_COSTS, 'comma', 0) && settled(ses); } },
+    { id: 'bottom-f4', text: 'Site contribution, head office and EBITDA in C22:E24 take the same format: select them and press F4.', keys: 'Ctrl+↓ ×2 Ctrl+Shift+→ Ctrl+Shift+↓ F4', requires: ['f4-repeat', 'ctrl-shift-arrow', 'ctrl-arrow'], convention: 'D2',
+      hintStuck: 'pulse range C22:E24 · The last block on the page ends on EBITDA.',
+      check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, BOTTOM, 'comma', 0) && settled(ses); } },
+    { id: 'counts-f4', text: 'Sites and washes in C33:E34 are counts that read the same way: select both rows and press F4.', keys: 'Ctrl+↓ ×2 Ctrl+Shift+→ Shift+↓ F4', requires: ['f4-repeat', 'ctrl-shift-arrow', 'shift-arrow'], convention: 'D2',
+      hintStuck: 'pulse range C33:E34 · The memo lines sit below the answer, under a gap.',
+      check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, COUNTS, 'comma', 0) && settled(ses); } },
+    { id: 'per-wash-cents', text: 'Revenue per wash in C35:E35 is dollars and cents: select the row and give it two decimals with Ctrl+Shift+1.', keys: '↓ ×2 Ctrl+Shift+→ Ctrl+Shift+1', requires: ['number-formats', 'ctrl-shift-arrow'], convention: 'D2',
+      hintStuck: 'pulse range C35:E35 · A ticket of $13.75 needs its cents to read right.',
+      check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, PER_WASH, 'comma', 2) && settled(ses); } },
+    { id: 'tie', closer: true, demo: { script: 'Ctrl+G "C7" Enter "18500" Enter Ctrl+G "C24" Enter Escape Escape Escape', cadence: 320 }, text: 'Does it tie? Watch C7 change to 18500, and total revenue in C10 and EBITDA in C24 answer in the format you set.', requires: [],
+      hintStuck: 'pulse cell C24 · The totals are live, so they move with the line.',
       check: (s, ses) => ses.demoDone.has('tie') },
   ],
   endState: [
-    { text: 'B5:P18 read with thousands separators and no decimals', check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, BLOCK, 'comma', 0); } },
-    { text: 'The site count is General, revenue per site is currency with no decimals', check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, SITES, 'general', 0) && fmtIs(sh, PER_SITE, 'currency', 0); } },
-    { text: 'On Inputs the lease is currency and the site count comma style, no decimals', check: (s, ses) => { const sh = inputs(ses); return !!sh && fmtIs(sh, LEASE, 'currency', 0) && fmtIs(sh, SITES_IN, 'comma', 0); } },
+    { text: 'Every dollar line reads in the desk number format', check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, [...REVENUE, ...SITE_COSTS, ...BOTTOM], 'comma', 0); } },
+    { text: 'Sites and washes read as counts', check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, COUNTS, 'comma', 0); } },
+    { text: 'Revenue per wash reads to the cent', check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, PER_WASH, 'comma', 2); } },
   ],
   closing: [
-    `Every figure on the P&L now reads with one decimals setting down each line (D2): the block took one selection and one chord, the count lost the dress the export gave it, and the per-site figure carries its $. The margins in rows 11 and 18 still read as 0; the next lessons give them their sign and their percent.`,
-    `Ctrl+1 did the dialog work and Ctrl+Shift+1 and 4 did the same in one press; FY24A’s public charging still moves Total revenue, all the way to column ${LAST_COL}’s check.`,
+    'Every line on the P&L now reads as figures, one format per line.',
+    'Three blocks of dollars took one dialog and two presses of F4, the counts took a third, and revenue per wash kept its cents. The costs still read as positives and nothing says what the figures are in; the next lesson fixes both.',
   ],
-  solution: 'Ctrl+Down Ctrl+Down Down Right Ctrl+Shift+Right Ctrl+Shift+Down Ctrl+Shift+1 Alt H 9 Alt H 9 Ctrl+Down Ctrl+Down Ctrl+Shift+Right Ctrl+Shift+~ Down Ctrl+Shift+Right Ctrl+Shift+4 Alt H 9 Alt H 9 Ctrl+G "Inputs!B9" Enter Ctrl+Shift+Right Ctrl+1 C Down Down Ctrl+Shift+Right Ctrl+1 N',
+  solution: 'Ctrl+Down Ctrl+Down Right Right Ctrl+Down Ctrl+Up Ctrl+Shift+Right Ctrl+Shift+Down Ctrl+1 N Ctrl+Down Ctrl+Down Ctrl+Shift+Right Ctrl+Shift+Down F4 Ctrl+Down Ctrl+Down Ctrl+Shift+Right Ctrl+Shift+Down F4 Ctrl+Down Ctrl+Down Ctrl+Shift+Right Shift+Down F4 Down Down Ctrl+Shift+Right Ctrl+Shift+1',
 };

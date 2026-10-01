@@ -169,12 +169,16 @@ export const CONCEPTS = {
   'audit-pass': 'the audit pass: Go To Special, show formulas and tracing find what a reviewer would',
   'ref-error': '#REF! means a formula pointed at a cell that was deleted; Ctrl+Z brings the cell and the formula back',
   'wrap-text': 'Wrap Text (Alt, H, W) folds a long entry inside its cell; AutoFit Row Height (Alt, H, O, A) then sizes the row to it',
-  // Chapter 2 (Project Volt, stage 2): number formats and custom number formats
+  // Chapter 2 (Project Rinse, the book): number formats and custom number formats
+  'line-formats': 'one number format per line, set on the whole line at once: dollars in the desk number format, counts plain, a per-wash figure to the cent',
+  'margins-and-growth': 'a margin is a line as a share of revenue (=C24/C10); growth is this year over last, less one (=D10/C10-1)',
+  'cagr': 'CAGR, compound annual growth, is (last/first)^(1/periods)-1, and COLUMNS(C10:E10)-1 counts the periods so no number gets typed',
+  'custom-date-code': 'a date code in the Custom box writes a date its own way: yy is the two-digit year, mmm the month, and text in quotes rides along, so "FY"yy"A" reads FY24A',
   'general-format': 'General is the no-format format: Ctrl+Shift+~ (or Ctrl+1, G) returns a cell to how its value was typed',
   'accounting-format': 'Accounting Number Format (Alt, H, A, N) sets the $ at the cell\u2019s left edge, negatives in parentheses and zero as a dash',
   'paste-special-operation': 'Paste Special\u2019s Operation (Ctrl+Alt+V, then V for values and M for Multiply) multiplies every selected cell by the copied value',
   'date-format': 'a date is a serial number of days; Ctrl+1, D shows it as Jan-26, and the number underneath still sorts and subtracts',
-  'custom-number-format': 'Format Cells \u203a Custom (Ctrl+1, U) takes a code of up to four sections, positive;negative;zero;text, that says what each kind of value wears',
+  'custom-number-format': 'Format Cells \u203a Custom (Ctrl+1, U) takes a code of up to four sections, positive;negative;zero;text, that says how each kind of value reads',
   'format-units': 'a comma after the last digit placeholder divides by a thousand, and a unit rides along in quotes: #,##0,"k", 0.0"x", 0 "bps"',
   'date-function': 'DATE(year, month, day) builds a date from its parts: =DATE(2026,12,31) is the FY26 year end',
   'text-function': 'TEXT(value, "format") renders a number through a format code as text, so a header can be built from a date',
@@ -263,15 +267,15 @@ export function validateLesson(l) {
   need(l.sheets === undefined || (Array.isArray(l.sheets) && l.sheets.every(isObject)), 'sheets must be an array of { name, cells } records');
   for (const sh of Array.isArray(l.sheets) ? l.sheets.filter(isObject) : []) need(typeof sh.name === 'string' && /^[^[\]:*?/\\]{1,31}$/.test(sh.name), `sheet name "${sh.name}" is not Excel-legal`);
   if (moduleLesson) {
-    // The Brief (v2): the situation, the task, the payoff — at most three sentences, ending in
+    // The Brief (v2): the situation, the task, the payoff — at most five sentences (M28), ending in
     // the headline keycap; a challenge carries one line.
     need(typeof l.brief === 'string' && l.brief.trim(), 'brief missing');
     if (typeof l.brief === 'string') {
       const n = sentenceCount(l.brief);
       if (kind === 'challenge') need(n <= 2 && wordCount(l.brief) <= 40, 'a challenge brief is one line');
       else {
-        need(n >= 1 && n <= 3, `brief must be at most three sentences (it has ${n})`);
-        need(wordCount(l.brief) <= 70, 'brief is over 70 words');
+        need(n >= 1 && n <= 5, `brief must be at most five sentences (it has ${n})`);   // M28: five sentences, 110 words
+        need(wordCount(l.brief) <= 110, 'brief is over 110 words');
         need(/`[^`]+`[.!]?\s*$/.test(l.brief.trim()), 'the brief ends with the headline keycap (`Ctrl+…`)');
       }
     }

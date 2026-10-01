@@ -26,10 +26,10 @@ const BEATS_DEFAULT = {
   'present-and-audit': { eyebrow: 'Module 1.7 · present and audit', title: 'Sign the page off.',
     body: 'The buyer’s analyst opens page one first. Check the totals tie, the conventions hold, the print fits one page, and nothing is hardcoded that should not be. Then it goes in the pack.' },
   // Chapter 2 · Formatting and presentation (Run 1: 2.1 and 2.2; the rest land with their modules)
-  'number-formats': { eyebrow: 'Module 2.1 · number formats', title: 'A three-year P&L, the way the export wrote it.',
-    body: 'General numbers with stray cents, costs typed positive, a site count dressed as dollars, bare years over the timeline. The built-in styles first: comma, Accounting, percent and date, and the sign convention stated once up top.' },
-  'custom-number-formats': { eyebrow: 'Module 2.2 · custom number formats', title: 'The house set is a code.',
-    body: 'Four sections, positive, negative, zero and text; a unit that rides in the format; a header built from a date with TEXT; a condition or a color in front, an empty section to hide a zero. The Custom box, Ctrl+1 then U, does all of it.' },
+  'number-formats': { eyebrow: 'Module 2.1 · number formats', title: 'The P&L came out of the accounting system.',
+    body: 'The owners have hired advisers to run the sale, and the first document is the book: the information memorandum that describes the company to buyers. Its financials section starts with three years of P&L, and what the accounting system exported is account codes in capitals, costs as positives and numbers to four decimal places. Before anyone reads it, the figures have to read like figures.' },
+  'custom-number-formats': { eyebrow: 'Module 2.2 · custom number formats', title: 'Every number on the page has to say what it is.',
+    body: 'A buyer flips to the financials and reads margins, multiples and thousands without a legend, so the number format has to carry the unit. A format code can write k or m after a figure, show a zero as a dash, color a negative and turn a plain date into FY26E, with the value underneath untouched. This module is the format code, one section at a time.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };
