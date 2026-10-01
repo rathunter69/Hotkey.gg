@@ -5,7 +5,7 @@
 export const TABS = [
   { k: 'F', name: 'File', live: true, backstage: true },   // the backstage: a menu, not a tab of groups
   { k: 'H', name: 'Home', live: true },
-  { k: 'N', name: 'Insert', live: false },
+  { k: 'N', name: 'Insert', live: true },
   { k: 'P', name: 'Page Layout', live: true },
   { k: 'M', name: 'Formulas', live: true },
   { k: 'A', name: 'Data', live: true },
@@ -37,13 +37,19 @@ export const MENUS = {
   'P': [['M', 'Margins'], ['O', 'Orientation'], ['S', 'Page Setup'], ['A', 'Print Area'], ['B', 'Breaks'], ['G', 'Background'], ['I', 'Print Titles']],
   'PO': [['P', 'Portrait'], ['L', 'Landscape']],
   'PS': [['P', 'Page Setup…'], ['Z', 'Size']],
-  'M': [['U', 'Σ AutoSum'], ['M', 'Define Name'], ['P', 'Trace precedents'], ['D', 'Trace dependents'], ['H', 'Show formulas']],
+  'M': [['U', 'Σ AutoSum'], ['M', 'Define Name'], ['P', 'Trace Precedents'], ['D', 'Trace Dependents'], ['A', 'Remove Arrows'], ['H', 'Show Formulas'], ['K', 'Error Checking'], ['V', 'Evaluate Formula'], ['X', 'Calculation Options']],
+  'MA': [['A', 'Remove Arrows'], ['P', 'Remove Precedent Arrows'], ['D', 'Remove Dependent Arrows']],
+  'MX': [['A', 'Automatic'], ['E', 'Automatic Except for Data Tables'], ['M', 'Manual']],
   'MM': [['D', 'Define Name…']],
+  'N': [['V', 'PivotTable']],
+  'NV': [['T', 'From Table/Range…']],
   'MU': [['S', 'Sum']],
-  'A': [['S', 'Sort'], ['G', 'Group'], ['U', 'Ungroup'], ['H', 'Hide detail'], ['J', 'Show detail']],   // Excel's Outline group: Group, Ungroup, Hide / Show Detail
+  'A': [['K', 'Edit Links'], ['S', 'Sort'], ['T', 'Filter'], ['E', 'Text to Columns'], ['F', 'Flash Fill'], ['M', 'Remove Duplicates'], ['V', 'Data Validation'], ['W', 'What-If Analysis'], ['G', 'Group'], ['U', 'Ungroup'], ['H', 'Hide detail'], ['J', 'Show detail']],   // Excel's Data tab: Queries & Connections, Sort & Filter, Data Tools, Forecast, Outline
+  'AV': [['V', 'Data Validation…']],
+  'AW': [['G', 'Goal Seek…'], ['T', 'Data Table…']],
   'AG': [['G', 'Group…'], ['A', 'Auto Outline']],      // split buttons, as in Excel: Alt A G G groups, Alt A U U ungroups
   'AU': [['U', 'Ungroup…'], ['C', 'Clear Outline']],
-  'AS': [['A', 'Sort A→Z'], ['D', 'Sort Z→A']],
+  'AS': [['A', 'Sort A→Z'], ['D', 'Sort Z→A'], ['S', 'Sort…']],
   'E': [['S', 'Paste special…']],
   'W': [['V', 'Show'], ['Q', 'Zoom'], ['J', '100%'], ['F', 'Freeze Panes']],
   'WV': [['G', 'Gridlines']],
@@ -52,7 +58,8 @@ export const MENUS = {
 
 /** Excel's real Home-tab groups — the renderer draws each as a labelled cluster. */
 export const RIBBON_GROUPS = {
-  'A': [['Sort & Filter', ['S']], ['Outline', ['G', 'U', 'H', 'J']]],
+  'A': [['Queries & Connections', ['K']], ['Sort & Filter', ['S', 'T']], ['Data Tools', ['E', 'F', 'M', 'V']], ['Forecast', ['W']], ['Outline', ['G', 'U', 'H', 'J']]],
+  'N': [['Tables', ['V']]],
   'P': [['Page Setup', ['M', 'O', 'S', 'A', 'B', 'G', 'I']]],
   'H': [
     ['Clipboard', ['V']],
@@ -187,6 +194,9 @@ export const COMMANDS = {
   'WFF': 'Freeze panes', 'WFR': 'Freeze top row', 'WFC': 'Freeze first column',
   'HLHG': 'Greater Than…', 'HLHL': 'Less Than…', 'HLHB': 'Between…', 'HLHE': 'Equal To…', 'HLN': 'New Formatting Rule…',
   'HLD': 'Data Bars', 'HLS': 'Color Scales', 'HLCS': 'Clear Rules from Selected Cells', 'HLCE': 'Clear Rules from Entire Sheet', 'HLR': 'Manage Rules…',
+  'MAA': 'Remove Arrows', 'MAP': 'Remove Precedent Arrows', 'MAD': 'Remove Dependent Arrows', 'MV': 'Evaluate Formula', 'MK': 'Error Checking',
+  'MXA': 'Automatic', 'MXE': 'Automatic Except for Data Tables', 'MXM': 'Manual',
+  'AE': 'Text to Columns…', 'AF': 'Flash Fill', 'AM': 'Remove Duplicates…', 'AVV': 'Data Validation…', 'AK': 'Edit Links…', 'AT': 'Filter', 'ASS': 'Sort…', 'AWG': 'Goal Seek…', 'AWT': 'Data Table…', 'NVT': 'PivotTable…',
 };
 
 /**

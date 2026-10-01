@@ -1045,6 +1045,7 @@ export function evalFormula(expr, ctx = {}) {
       case 'num': return node.v;
       case 'str': return node.v;
       case 'bool': return node.v;
+      case 'val': { const x = node.v; if (isErrVal(x)) throw err(x); return x; }   // a piece Evaluate Formula has already computed (a scalar or an Arr)
       case 'err': throw err(node.v);
       case 'name': {   // a defined name (Define Name, M40): ctx.name resolves it to its cell or range, on this sheet or another
         const t = ctx.name ? ctx.name(node.v) : null;
@@ -1125,6 +1126,85 @@ export const AUTOCOMPLETE_FUNCTIONS = [...new Set(FUNCTION_NAMES.concat(['ACOS',
 
 /** True when text is a formula that parses. */
 export function parses(expr) { try { parseFormula(expr); return true; } catch (e) { return false; } }
+
+/* ============================================================================
+   EVALUATE FORMULA (Formulas › Evaluate Formula, Alt M V) — a stepper over the AST
+   ============================================================================ */
+/** A value as formula text: 6, "ab", TRUE, #N/A, or {…} for an array (its first cells). */
+export function valueText(v) {
+  if (v === null || v === undefined) return '0';
+  if (typeof v === 'number') return numToText(v);
+  if (typeof v === 'boolean') return v ? 'TRUE' : 'FALSE';
+  if (isArr(v)) { const rows = v.toRows().slice(0, 3).map(r => r.slice(0, 5).map(valueText).join(',')); return '{' + rows.join(';') + (v.rows > 3 || v.cols > 5 ? ';…' : '') + '}'; }
+  if (isErrVal(v)) return v;
+  return '"' + String(v).replace(/"/g, '""') + '"';
+}
+/** The text of an AST, as the formula bar would show it (references upper-case, sheet names quoted when needed). `mark` wraps one node in \u0001…\u0002 so the caller can find its span. */
+export function unparseAst(node, mark) {
+  const sheetTxt = n => n ? (/^[A-Z_][A-Z0-9_.]*$/i.test(n) ? n : "'" + n.replace(/'/g, "''") + "'") + '!' : '';
+  const u = n => {
+    const t = (() => {
+      switch (n.k) {
+        case 'num': return numToText(n.v);
+        case 'str': return '"' + n.v.replace(/"/g, '""') + '"';
+        case 'bool': return n.v ? 'TRUE' : 'FALSE';
+        case 'err': return n.v;
+        case 'val': return valueText(n.v);
+        case 'name': return n.v;
+        case 'ref': return sheetTxt(n.sheet) + n.ref + (n.spill ? '#' : '');
+        case 'range': return sheetTxt(n.sheet) + n.a + ':' + n.b;
+        case 'colrange': return (n.absA ? '$' : '') + n.a + ':' + (n.absB ? '$' : '') + n.b;
+        case 'rowrange': return (n.absA ? '$' : '') + n.a + ':' + (n.absB ? '$' : '') + n.b;
+        case 'paren': return '(' + u(n.x) + ')';
+        case 'un': return n.op + u(n.x);
+        case 'pct': return u(n.x) + '%';
+        case 'bin': return u(n.l) + n.op + u(n.r);
+        case 'fn': return n.name + '(' + n.args.map(a => a === null ? '' : u(a)).join(',') + ')';
+        default: return '';
+      }
+    })();
+    return n === mark ? '\u0001' + t + '\u0002' : t;
+  };
+  return u(node);
+}
+const LEAF = new Set(['num', 'str', 'bool', 'err', 'val', 'range', 'colrange', 'rowrange', 'name']);
+/** The next node Excel's Evaluate Formula underlines: the first unevaluated piece in evaluation order (arguments left to right, innermost first); null when only a value is left. */
+function nextStep(node) {
+  if (LEAF.has(node.k)) return null;
+  if (node.k === 'ref') return node;   // a cell reference is the first thing shown as its value
+  const kids = node.k === 'fn' ? node.args.filter(a => a !== null) : node.k === 'bin' ? [node.l, node.r] : [node.x];
+  for (const kid of kids) { const n = nextStep(kid); if (n) return n; }
+  return node.k === 'paren' ? null : node;   // brackets vanish once their inside is a value
+}
+function withoutParens(node) {   // (6) reads 6: a bracket around a value is dropped in the shown text
+  if (node.k === 'paren' && LEAF.has(node.x.k)) return node.x;
+  if (node.k === 'fn') node.args = node.args.map(a => a === null ? null : withoutParens(a));
+  else if (node.k === 'bin') { node.l = withoutParens(node.l); node.r = withoutParens(node.r); }
+  else if (node.k === 'paren' || node.k === 'un' || node.k === 'pct') node.x = withoutParens(node.x);
+  return node;
+}
+/**
+ * Evaluate Formula, as a stepper: `text` is the formula so far with the next piece to evaluate
+ * between \u0001 and \u0002 (none once only the value is left); `step()` replaces that piece by its
+ * value (Evaluate); `done` when nothing is left to evaluate. ctx is the sheet's evalCtx (with cell).
+ */
+export function evaluateStepper(formula, ctx) {
+  let ast = withoutParens(parseFormula(formula));
+  const st = {
+    get done() { return nextStep(ast) === null; },
+    get text() { const n = nextStep(ast); return '=' + unparseAst(ast, n); },
+    get value() { const n = nextStep(ast); return n ? undefined : evalFormula(ast, ctx); },
+    step() {
+      const n = nextStep(ast); if (!n) return false;
+      const sub = { k: 'paren', x: n };   // evaluate the piece on its own
+      let rows = null; const v = evalFormula(sub, { ...ctx, onSpill: r => { rows = r; } });   // an array result stays an array for the piece around it
+      n.k = 'val'; n.v = rows ? Arr.of(rows) : v; for (const key of ['args', 'l', 'r', 'x', 'name', 'ref', 'op']) delete n[key];
+      ast = withoutParens(ast);
+      return true;
+    },
+  };
+  return st;
+}
 
 // whole-column / whole-row corners as the tokenizer emits them: name A / $A, integer num 1 / $1
 const isColTok = t => !!t && t.t === 'name' && /^\$?[A-Z]{1,3}$/.test(t.v);

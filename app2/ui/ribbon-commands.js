@@ -135,6 +135,10 @@ export const ICON = {
   rowHeight: svg('<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M12 8v8M9 11l3-3 3 3M9 13l3 3 3-3"/>'),
   series: svg('<path d="M4 18l4-5 4 2 8-9"/><path d="M16 6h4v4"/>'),
   fillDown: svg('<rect x="6" y="3" width="12" height="6" rx="1"/><path d="M12 9v11M8 16l4 4 4-4"/>'),
+  errorCheck: svg('<path d="M12 3 2 21h20L12 3z"/><path d="M12 10v5M12 18h.01"/>'),
+  flashFill: svg('<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/>'),
+  goalSeek: svg('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>'),
+  dataTable: svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>'),
   fillRight: svg('<rect x="3" y="6" width="6" height="12" rx="1"/><path d="M9 12h11M16 8l4 4-4 4"/>'),
   noBorder: svg('<rect x="3" y="3" width="18" height="18" rx="1" stroke-dasharray="2 2"/>'),
   borderTop: svg('<rect x="3" y="3" width="18" height="18" rx="1" stroke-dasharray="2 2"/><path d="M3 3h18" stroke-width="3"/>'),
@@ -202,6 +206,8 @@ const sortRun = dir => s => {
   S.sort(dir);
 };
 const autoSum = s => { leaveRibbon(s); s.startClock(); s.doAutoSum(); };
+// the tools of engine/tools.js (auditing, calculation, the Data tab's tools, PivotTables): the mouse runs the same Session route the Alt walk takes, so one state results
+const tool = id => s => { leaveRibbon(s); s.startClock(); s.toolCommand(id); };
 const gridlines = direct((S, s) => { S.gridlines = !S.gridlines; s.toast(S.gridlines ? 'gridlines shown' : 'gridlines hidden — Alt W V G to show'); S.commit('ribbon'); });
 const fmtCells = s => { leaveRibbon(s); s.openFormatCells(); };
 const pasteSpecial = dialog('paste', s => { s.pasteKind = 'all'; s.pasteOp = 'none'; });
@@ -286,11 +292,30 @@ export const RIBBON_COMMANDS = {
   'WJ': C('Zoom to 100%', 'Zoom', 'W', ICON.goTo, direct((S, s) => { S.setZoom(100); s.emit('settings'); })),
   // Formulas
   'MUS': C('AutoSum', 'Function Library', 'M', ICON.sum, autoSum, 'Alt+='),
-  'MP': C('Trace precedents', 'Formula Auditing', 'M', ICON.precedents, direct((S, s) => s.jumpPrecedent()), 'Ctrl+['),
-  'MD': C('Trace dependents', 'Formula Auditing', 'M', ICON.dependents, direct((S, s) => s.jumpDependent()), 'Ctrl+]'),
+  'MP': C('Trace precedents', 'Formula Auditing', 'M', ICON.precedents, direct((S, s) => s.traceArrows('precedent')), 'Ctrl+['),
+  'MD': C('Trace dependents', 'Formula Auditing', 'M', ICON.dependents, direct((S, s) => s.traceArrows('dependent')), 'Ctrl+]'),
+  'MAA': C('Remove Arrows', 'Formula Auditing', 'M', ICON.removeArrows, tool('MAA')),
+  'MAP': C('Remove Precedent Arrows', 'Formula Auditing', 'M', ICON.removeArrows, tool('MAP')),
+  'MAD': C('Remove Dependent Arrows', 'Formula Auditing', 'M', ICON.removeArrows, tool('MAD')),
+  'MV': C('Evaluate Formula', 'Formula Auditing', 'M', ICON.evaluate, tool('MV')),
+  'MK': C('Error Checking', 'Formula Auditing', 'M', ICON.errorCheck, tool('MK')),
+  'MXA': C('Automatic', 'Calculation', 'M', ICON.calc, tool('MXA')),
+  'MXE': C('Automatic Except for Data Tables', 'Calculation', 'M', ICON.calc, tool('MXE')),
+  'MXM': C('Manual', 'Calculation', 'M', ICON.calc, tool('MXM')),
+  // Insert
+  'NVT': C('From Table/Range…', 'Tables', 'N', ICON.pivot, tool('NVT')),
   // Data
   'ASA': C('Sort A to Z', 'Sort & Filter', 'A', ICON.sortAZ, sortRun('asc')),
   'ASD': C('Sort Z to A', 'Sort & Filter', 'A', ICON.sortZA, sortRun('desc')),
+  'ASS': C('Sort…', 'Sort & Filter', 'A', ICON.sortAZ, tool('ASS')),
+  'AT': C('Filter', 'Sort & Filter', 'A', ICON.filter, tool('AT'), 'Ctrl+Shift+L'),
+  'AK': C('Edit Links', 'Queries & Connections', 'A', ICON.link, tool('AK')),
+  'AE': C('Text to Columns', 'Data Tools', 'A', ICON.textToCols, tool('AE')),
+  'AF': C('Flash Fill', 'Data Tools', 'A', ICON.flashFill, tool('AF'), 'Ctrl+E'),
+  'AM': C('Remove Duplicates', 'Data Tools', 'A', ICON.removeDupes, tool('AM')),
+  'AVV': C('Data Validation…', 'Data Tools', 'A', ICON.validation, tool('AVV')),
+  'AWG': C('Goal Seek…', 'Forecast', 'A', ICON.goalSeek, tool('AWG')),
+  'AWT': C('Data Table…', 'Forecast', 'A', ICON.dataTable, tool('AWT')),
   // Data · Outline (C2 gap 4): the same Session route the chords take, so a click and Alt+Shift+→ leave one state
   'AGG': C('Group…', 'Outline', 'A', ICON.group, s => { leaveRibbon(s); s.groupChord(true, true); }, 'Alt+Shift+→'),
   'AUU': C('Ungroup…', 'Outline', 'A', ICON.ungroup, s => { leaveRibbon(s); s.groupChord(false, true); }, 'Alt+Shift+←'),
@@ -373,7 +398,7 @@ export const UNIMPLEMENTED = [
   U('NumberFormat', 'Number Format', 'Number', 'H'),
   U('FormatTable', 'Format as Table', 'Styles', 'H', ICON.fmtTable),
   U('Filter', 'Filter', 'Sort & Filter', 'H', ICON.filter), U('FindSelect', 'Find & Select', 'Editing', 'H', ICON.find),
-  U('PivotTable', 'PivotTable', 'Tables', 'N', ICON.pivot), U('Table', 'Table', 'Tables', 'N', ICON.table),
+  U('Table', 'Table', 'Tables', 'N', ICON.table),
   U('Pictures', 'Pictures', 'Illustrations', 'N', ICON.picture), U('Shapes', 'Shapes', 'Illustrations', 'N', ICON.shapes),
   U('ChartColumn', 'Column', 'Charts', 'N', ICON.chartCol), U('ChartLine', 'Line', 'Charts', 'N', ICON.chartLine), U('ChartPie', 'Pie', 'Charts', 'N', ICON.chartPie),
   U('Link', 'Link', 'Links', 'N', ICON.link), U('TextBox', 'Text Box', 'Text', 'N', ICON.textBox), U('HeaderFooter', 'Header & Footer', 'Text', 'N', ICON.headerFooter),
@@ -385,11 +410,10 @@ export const UNIMPLEMENTED = [
   U('SheetGridlines', 'Gridlines', 'Sheet Options', 'P', ICON.gridlines), U('SheetHeadings', 'Headings', 'Sheet Options', 'P', ICON.headings),
   U('InsertFunction', 'Insert Function', 'Function Library', 'M', ICON.fx), U('RecentlyUsed', 'Recently Used', 'Function Library', 'M'),
   U('Financial', 'Financial', 'Function Library', 'M'), U('Logical', 'Logical', 'Function Library', 'M'), U('TextFn', 'Text', 'Function Library', 'M'),
-  U('RemoveArrows', 'Remove Arrows', 'Formula Auditing', 'M', ICON.removeArrows),
-  U('EvaluateFormula', 'Evaluate Formula', 'Formula Auditing', 'M', ICON.evaluate), U('CalculateNow', 'Calculate Now', 'Calculation', 'M', ICON.calc),
+  U('CalculateNow', 'Calculate Now', 'Calculation', 'M', ICON.calc),
   U('FromText', 'From Text/CSV', 'Get & Transform Data', 'A', ICON.fromText), U('FromWeb', 'From Web', 'Get & Transform Data', 'A', ICON.fromWeb),
-  U('SortDialog', 'Sort', 'Sort & Filter', 'A', ICON.sortAZ), U('DataFilter', 'Filter', 'Sort & Filter', 'A', ICON.filter), U('ClearFilter', 'Clear', 'Sort & Filter', 'A', ICON.clear),
-  U('TextToColumns', 'Text to Columns', 'Data Tools', 'A', ICON.textToCols), U('RemoveDuplicates', 'Remove Duplicates', 'Data Tools', 'A', ICON.removeDupes), U('DataValidation', 'Data Validation', 'Data Tools', 'A', ICON.validation),
+  U('ClearFilter', 'Clear', 'Sort & Filter', 'A', ICON.clear),
+  U('ForecastSheet', 'Forecast Sheet', 'Forecast', 'A', ICON.chartLine),
   U('Spelling', 'Spelling', 'Proofing', 'R', ICON.spelling), U('Thesaurus', 'Thesaurus', 'Proofing', 'R', ICON.thesaurus),
   U('NewComment', 'New Comment', 'Comments', 'R', ICON.comment), U('DeleteComment', 'Delete', 'Comments', 'R', ICON.del), U('ShowComments', 'Show Comments', 'Comments', 'R', ICON.comment),
   U('ProtectSheet', 'Protect Sheet', 'Protect', 'R', ICON.lock), U('ProtectWorkbook', 'Protect Workbook', 'Protect', 'R', ICON.lock),
@@ -412,6 +436,8 @@ export const MENU_META = {
   'HI': { label: 'Insert', icon: ICON.insert }, 'HD': { label: 'Delete', icon: ICON.del }, 'HO': { label: 'Format', icon: ICON.format },
   'HE': { label: 'Clear', icon: ICON.clear }, 'HFI': { label: 'Fill', icon: ICON.fillMenu }, 'HU': { label: 'AutoSum', icon: ICON.sum }, 'MU': { label: 'AutoSum', icon: ICON.sum }, 'MM': { label: 'Define Name', icon: ICON.fx },
   'AG': { label: 'Group', icon: ICON.group }, 'AU': { label: 'Ungroup', icon: ICON.ungroup },
+  'MA': { label: 'Remove Arrows', icon: ICON.removeArrows }, 'MX': { label: 'Calculation Options', icon: ICON.calc },
+  'AV': { label: 'Data Validation', icon: ICON.validation }, 'AW': { label: 'What-If Analysis', icon: ICON.goalSeek }, 'NV': { label: 'PivotTable', icon: ICON.pivot },
   'HA': { label: 'Alignment', icon: ICON.alignL, virtual: true }, 'HF': { label: 'Font', icon: ICON.fontName, virtual: true },
   'WV': { label: 'Show', icon: ICON.gridlines, virtual: true }, 'AS': { label: 'Sort', icon: ICON.sortAZ, virtual: true },
   'E': { label: 'Edit', icon: ICON.paste }, 'O': { label: 'Format', icon: ICON.format },
@@ -455,7 +481,7 @@ export const RIBBON_LAYOUT = {
     { name: 'Editing', cols: [{ rows: [[{ menu: 'HU' }], [{ menu: 'HFI' }], [{ menu: 'HE' }]] }, { rows: [[{ menu: 'HSF' }], [{ menu: 'HFD' }]] }] },
   ],
   N: [
-    { name: 'Tables', cols: [big({ dead: 'PivotTable' }), big({ dead: 'Table' })] },
+    { name: 'Tables', cols: [big({ menu: 'NV', cmd: 'NVT', label: 'PivotTable' }), big({ dead: 'Table' })] },
     { name: 'Illustrations', cols: [big({ dead: 'Pictures' }), big({ dead: 'Shapes' })] },
     { name: 'Charts', cols: [{ rows: [[{ dead: 'ChartColumn' }], [{ dead: 'ChartLine' }], [{ dead: 'ChartPie' }]] }] },
     { name: 'Links', cols: [big({ dead: 'Link' })] },
@@ -471,13 +497,15 @@ export const RIBBON_LAYOUT = {
   ],
   M: [
     { name: 'Function Library', cols: [big({ dead: 'InsertFunction' }), big({ menu: 'MU', cmd: 'MUS', label: 'AutoSum' }), { rows: [[{ dead: 'RecentlyUsed' }], [{ dead: 'Financial' }], [{ dead: 'Logical' }]] }, { rows: [[{ dead: 'TextFn' }]] }] },
-    { name: 'Formula Auditing', cols: [{ rows: [[{ cmd: 'MP' }], [{ cmd: 'MD' }], [{ dead: 'RemoveArrows' }]] }, { rows: [[{ cmd: 'MH', check: 'showFormulas' }], [{ dead: 'EvaluateFormula' }]] }] },
-    { name: 'Calculation', cols: [big({ dead: 'CalculateNow' })] },
+    { name: 'Formula Auditing', cols: [{ rows: [[{ cmd: 'MP' }], [{ cmd: 'MD' }], [{ menu: 'MA', cmd: 'MAA', label: 'Remove Arrows' }]] }, { rows: [[{ cmd: 'MH', check: 'showFormulas' }], [{ cmd: 'MK' }], [{ cmd: 'MV' }]] }] },
+    { name: 'Calculation', cols: [big({ menu: 'MX' }), big({ dead: 'CalculateNow' })] },
   ],
   A: [
     { name: 'Get & Transform Data', cols: [big({ dead: 'FromText' }), big({ dead: 'FromWeb' })] },
-    { name: 'Sort & Filter', cols: [{ rows: [[ico({ cmd: 'ASA' })], [ico({ cmd: 'ASD' })]] }, big({ dead: 'SortDialog' }), big({ dead: 'DataFilter' }), { rows: [[{ dead: 'ClearFilter' }]] }] },
-    { name: 'Data Tools', cols: [big({ dead: 'TextToColumns' }), big({ dead: 'RemoveDuplicates' }), big({ dead: 'DataValidation' })] },
+    { name: 'Queries & Connections', cols: [big({ cmd: 'AK' })] },
+    { name: 'Sort & Filter', cols: [{ rows: [[ico({ cmd: 'ASA' })], [ico({ cmd: 'ASD' })]] }, big({ cmd: 'ASS' }), big({ cmd: 'AT', check: 'autoFilter' }), { rows: [[{ dead: 'ClearFilter' }]] }] },
+    { name: 'Data Tools', cols: [big({ cmd: 'AE' }), big({ cmd: 'AF' }), big({ cmd: 'AM' }), big({ menu: 'AV', cmd: 'AVV', label: 'Data Validation' })] },
+    { name: 'Forecast', cols: [big({ menu: 'AW' }), big({ dead: 'ForecastSheet' })] },
     { name: 'Outline', cols: [big({ menu: 'AG', cmd: 'AGG', label: 'Group' }), big({ menu: 'AU', cmd: 'AUU', label: 'Ungroup' }), { rows: [[{ cmd: 'AH' }], [{ cmd: 'AJ' }]] }] },
   ],
   R: [

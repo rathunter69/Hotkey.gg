@@ -1512,6 +1512,23 @@ export class Sheet {
     let rg = this.selRange();
     if (!this.sel) rg = this.regionAround(this.active.r, this.active.c);
     const keys = [];
+    if (kind === 'rowdiff' || kind === 'coldiff') {
+      // Row differences: each row against the cell in the active cell's column; Column differences:
+      // each column against the cell in the active cell's row. A formula is the same when its
+      // relative shape is (=B2*2 beside =C2*2); a constant differs from a formula; values compare as values.
+      const a = this.dispActive();
+      const differs = (cell, base, dr, dc) => {
+        if (cell.formula || base.formula) { if (!cell.formula || !base.formula) return true; return translateFormula(base.formula, dr, dc) !== cell.formula; }
+        const v = cell.value === undefined ? null : cell.value, b = base.value === undefined ? null : base.value; return v !== b;
+      };
+      for (let rr = rg.r1; rr <= rg.r2; rr++) for (let cc = rg.c1; cc <= rg.c2; cc++) {
+        const br = kind === 'rowdiff' ? rr : a.r, bc = kind === 'rowdiff' ? a.c : cc;
+        if (br === rr && bc === cc) continue;
+        if (differs(this.get(rr, cc), this.get(br, bc), rr - br, cc - bc)) keys.push(refKey(rr, cc));
+      }
+      if (!keys.length) return false;
+      const first = parseRef(keys[0]); this.sel = null; this.selA = null; this.tabHome = null; this.active = { r: first.r, c: first.c }; this.multi = keys; this.emit('select'); return true;
+    }
     for (let rr = rg.r1; rr <= rg.r2; rr++) for (let cc = rg.c1; cc <= rg.c2; cc++) {
       const cell = this.get(rr, cc);
       const isFormula = !!cell.formula;

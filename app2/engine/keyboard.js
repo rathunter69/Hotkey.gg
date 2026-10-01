@@ -32,10 +32,11 @@
 //     the dialog edits a draft (`dlg`), ↵ = OK writes it into `settings`, Esc = Cancel discards it
 
 import { Sheet, FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES, CF_STYLE_KEYS, CF_BAR_COLORS, CF_SCALES, cfOperand } from './sheet.js';
-import { evalFormula, formulaRefs, translateFormula, parses, AUTOCOMPLETE_FUNCTIONS } from './formula.js';
+import { evalFormula, formulaRefs, translateFormula, parses, valueText, AUTOCOMPLETE_FUNCTIONS } from './formula.js';
 import { serialToDate } from './format.js';
 import { builtinCode } from './numfmt.js';
 import { installDialogs, tabStepOf, isValidName } from './dialogs.js';
+import { installTools, TOOL_DIALOGS, TOOL_TYPED } from './tools.js';
 import { refKey, parseRef, parseRange, rangeText, colLetter as colLetterOf } from './refs.js';
 import { stepPath, PASTE_OPTS, PASTE_OP_OPTS, QAT_COMMANDS, QAT_DEFAULT, POPULAR_COMMANDS, OPTIONS_LIVE_PAGES } from './ribbon.js';
 
@@ -179,8 +180,8 @@ export function normFooterText(text) {
   const CANON = { file: 'File', date: 'Date', page: 'Page', pages: 'Pages', tab: 'Tab', time: 'Time', path: 'Path' };
   return String(text == null ? '' : text).slice(0, 64).replace(/&\[([a-z]+)\]/gi, (m, w) => (CANON[w.toLowerCase()] ? '&[' + CANON[w.toLowerCase()] + ']' : m));
 }
-const DIALOGS_WB = new Set(['goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale', 'formatcells', 'series', 'zoom', 'definename', 'note']);   // the dialogs dialogKey drives
-const TYPED_DIALOGS = new Set(['renamesheet', 'find', 'numfmt', 'definename', 'note']);   // a text field keeps the case typed (a format code's "k" is not "K")
+const DIALOGS_WB = new Set(['goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale', 'formatcells', 'series', 'zoom', 'definename', 'note', ...TOOL_DIALOGS]);   // the dialogs dialogKey drives
+const TYPED_DIALOGS = new Set(['renamesheet', 'find', 'numfmt', 'definename', 'note', ...TOOL_TYPED]);   // a text field keeps the case typed (a format code's "k" is not "K")
 export const NUMFMT_BAD_NOTE = 'Microsoft Excel cannot use the number format you typed.';
 export const CF_VALUE_NOTE = 'The value you entered is not a valid number, date, time, or string.';
 export const CF_FORMULA_NOTE = 'There\'s a problem with this formula.';
@@ -198,7 +199,7 @@ export const CIRCULAR_NOTE = 'There are one or more circular references where a 
 export const NUMBER_SHORTCUT_CODE = '#,##0.00';
 export const COMMA_STYLE_CODE = '_(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(@_)';
 /** The dialogs whose Alt+letter accelerators reach a control. */
-const ALT_DIALOGS = new Set(['formatcells', 'series', 'zoom', 'options']);
+const ALT_DIALOGS = new Set(['formatcells', 'series', 'zoom', 'options', ...TOOL_DIALOGS]);
 const FIND_ALTS = new Set(['T', 'H', 'L', 'I', 'N', 'S']);
 
 export class Session {
@@ -274,6 +275,7 @@ export class Session {
     this.editing = false; this.editBuf = ''; this.editCaret = 0; this.editMode = 'enter';
     this.editAnchor = null; this.editPointer = null; this.editPointerStart = -1; this.editPointerEnd = -1; this.editPointerBase = null; this.editPointed = false;
     this.editOrigin = null;   // the sheet an open formula entry belongs to while another sheet shows for pointing (Ctrl+PgDn mid-formula)
+    this.editSel = null;      // a selected stretch of the buffer in Edit mode ({start, end}, Shift+←/→), for F9
     this.autoSumEdit = false;
   }
   onChange(fn) { this.listeners.add(fn); return () => this.listeners.delete(fn); }
@@ -648,6 +650,7 @@ export class Session {
   execCommand(np) {
     const S = this.sheet;
     const done = (act = true) => this.exitRibbon(act);
+    if (this.toolCommand(np)) return;   // the Formulas and Data tab tools (tools.js)
     switch (np) {
       case '=': this.exitRibbon(false); this.doAutoSum(); return;
       case 'WVG': case 'WG': S.gridlines = !S.gridlines; this.toast(S.gridlines ? 'gridlines shown' : 'gridlines hidden — Alt W V G to show'); return done();
@@ -1023,8 +1026,10 @@ export class Session {
     if (key === 'O') { d.pick = 'constants'; return; }
     if (key === 'F') { d.pick = 'formulas'; return; }
     if (key === 'N') { d.pick = 'notes'; return; }   // M68: Go To Special › Notes
+    if (key === 'W') { d.pick = 'rowdiff'; return; }   // Row differences
+    if (key === 'M') { d.pick = 'coldiff'; return; }   // Column differences
     if (key === 'ArrowUp' || key === 'ArrowDown') {
-      const order = ['notes', 'blanks', 'constants', 'formulas'];
+      const order = ['notes', 'blanks', 'constants', 'formulas', 'rowdiff', 'coldiff'];
       const i = order.indexOf(d.pick);
       d.pick = order[Math.max(0, Math.min(order.length - 1, i + (key === 'ArrowDown' ? 1 : -1)))];
       return;
@@ -1171,6 +1176,7 @@ export class Session {
     if (this.dialog === 'zoom') return this.zoomKey(key);
     if (this.dialog === 'definename') return this.defineNameKey(key);
     if (this.dialog === 'note') return this.noteKey(key);
+    if (TOOL_DIALOGS.has(this.dialog)) return this.toolKey(key);
   }
   optionsKey(key) {
     const d = this.dlg; if (!d) return;
@@ -1337,7 +1343,7 @@ export class Session {
       if (k === 'Enter') { this.logKey('↵'); this.noteKey('Enter'); return true; }
     }
     if (k === 'Home' || k === 'End') { this.logKey(k); this.dlgKey(k); return true; }
-    if (k === 'Escape') { this.logKey('Esc'); this.cancelDialog(); return true; }
+    if (k === 'Escape') { this.logKey('Esc'); if (TOOL_DIALOGS.has(this.dialog)) this.exitRibbon(false); else this.cancelDialog(); return true; }   // a tool dialog closes to the grid, as Excel's do
     if (k === 'Enter') { this.logKey('↵'); this.dlgKey('Enter'); return true; }
     if (k === 'Tab') { const t = e.shiftKey ? 'Shift+Tab' : 'Tab'; this.logKey(t); this.dlgKey(t); return true; }
     if (ARROWS[k]) { this.logKey(ARROWSYM[k]); this.dlgKey(k); return true; }
@@ -1383,6 +1389,26 @@ export class Session {
       this.editPointerBase = (a.r === b.r && a.c === b.c) ? null : { r: a.r, c: a.c };
       this.writePointerRef();
     }
+  }
+  /** Ctrl+[: select every cell the active cell's formula reads directly (a Go To Special-style multi-selection; a precedent on another sheet switches there). */
+  selectPrecedents() {
+    const S = this.sheet; const a = S.dispActive(); const c = S.get(a.r, a.c); if (!c.formula) return;
+    const refs = formulaRefs(c.formula, { rows: S.rows, cols: S.cols }); if (!refs.length) return;
+    if (refs[0].sheet) { this.jumpPrecedent(); return; }
+    const keys = []; for (const ref of refs) { if (ref.sheet) continue; if (ref.key) keys.push(ref.key); else { const rg = ref.range; for (let r = Math.max(1, rg.r1); r <= Math.min(rg.r2, S.rows); r++) for (let cc = Math.max(1, rg.c1); cc <= Math.min(rg.c2, S.cols); cc++) keys.push(refKey(r, cc)); } }
+    this.selectKeys([...new Set(keys)]);
+  }
+  /** Ctrl+]: select every formula cell that reads the active cell directly. */
+  selectDependents() {
+    const S = this.sheet; const { r, c } = S.dispActive();
+    const keys = Object.keys(S.cells).map(k => ({ k, p: parseRef(k) })).filter(x => x.p).sort((a, b) => (a.p.r - b.p.r) || (a.p.c - b.p.c))
+      .filter(({ k }) => { const cell = S.cells[k]; return cell && cell.formula && formulaRefs(cell.formula, { rows: S.rows, cols: S.cols }).some(ref => !ref.sheet && (ref.key ? ref.key === refKey(r, c) : (r >= ref.range.r1 && r <= ref.range.r2 && c >= ref.range.c1 && c <= ref.range.c2))); }).map(x => x.k);
+    this.selectKeys(keys);
+  }
+  /** A multi-selection of cell keys (the first is the active cell), as Go To Special leaves one. */
+  selectKeys(keys) {
+    const S = this.sheet; if (!keys.length) return false;
+    const first = parseRef(keys[0]); S.sel = null; S.selA = null; S.tabHome = null; S.active = { r: first.r, c: first.c }; S.multi = keys.length > 1 ? keys : null; S.emit('select'); return true;
   }
   jumpPrecedent() {
     const S = this.sheet; const a = S.dispActive(); const c = S.get(a.r, a.c); if (!c.formula) return;
@@ -1655,14 +1681,18 @@ export class Session {
       if (k === 'Tab') { this.startClock(); this.logKey(e.shiftKey ? 'Ctrl+Shift+Tab' : 'Ctrl+Tab'); return true; }
       if (k === ';' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+;'); const da = S.dispActive(); S.dateStamp(da.r, da.c); return true; }   // today (the sheet's `today`: the runner's case date), dated
       if (k === '`' && !e.shiftKey) { this.logKey('Ctrl+`'); this.toggleShowFormulas(); return true; }
-      if (k === '[') { this.startClock(); this.logKey('Ctrl+['); this.jumpPrecedent(); return true; }
-      if (k === ']') { this.startClock(); this.logKey('Ctrl+]'); this.jumpDependent(); return true; }
+      if (k === '[') { this.startClock(); this.logKey('Ctrl+['); this.selectPrecedents(); return true; }
+      if (k === ']') { this.startClock(); this.logKey('Ctrl+]'); this.selectDependents(); return true; }
+      if (lk === 'l' && e.shiftKey) { this.startClock(); this.logKey('Ctrl+Shift+L'); this.toggleAutoFilter(); return true; }   // Filter
+      if (lk === 'e' && !e.shiftKey) { this.startClock(); this.logKey('Ctrl+E'); this.flashFill(); return true; }
       if (lk === 'g' && !e.shiftKey) { this.logKey('Ctrl+G'); this.openGoTo(); return true; }
       if (lk === 'f' && !e.shiftKey) { this.logKey('Ctrl+F'); this.openFind(false); return true; }
       if (lk === 'h' && !e.shiftKey) { this.logKey('Ctrl+H'); this.openFind(true); return true; }
       return true;   // unknown chords are swallowed, never typed
     }
     if (e.ctrlKey && e.altKey && (k === 'PageDown' || k === 'PageUp')) { this.startClock(); this.sheetStep(k === 'PageDown' ? 1 : -1, e.shiftKey); return true; }
+    if (e.altKey && !e.ctrlKey && k === 'ArrowDown') { this.startClock(); this.logKey('Alt+↓'); this.openDropDown(); return true; }   // the in-cell drop-down: a validation list, or an AutoFilter header's menu
+    if (e.altKey && !e.ctrlKey && k === 'F5') { this.startClock(); this.logKey('Alt+F5'); this.refreshPivots(); return true; }
     if (e.ctrlKey && e.altKey && k.toLowerCase() === 'v') { this.startClock(); this.logKey('Ctrl+Alt+V'); this.openDialog('paste'); this.pasteKind = 'all'; this.pasteOp = 'none'; return true; }
     return false;
   }
@@ -1772,8 +1802,11 @@ export class Session {
     if (this.editMode === 'edit') {
       if (k === 'ArrowLeft' || k === 'ArrowRight') {
         this.fxList = null;
+        const from = this.editCaret;
         if (e.ctrlKey) this.wordCaret(k === 'ArrowLeft' ? -1 : 1);
         else this.editCaret = Math.max(0, Math.min(this.editBuf.length, this.editCaret + (k === 'ArrowLeft' ? -1 : 1)));
+        if (e.shiftKey) { const sel = this.editSel || { anchor: from }; this.editSel = { anchor: sel.anchor, start: Math.min(sel.anchor, this.editCaret), end: Math.max(sel.anchor, this.editCaret) }; if (this.editSel.start === this.editSel.end) this.editSel = null; }
+        else this.editSel = null;
         return true;
       }
       if (k === 'ArrowUp') { this.editCaret = 0; return true; }
@@ -1787,6 +1820,12 @@ export class Session {
     if (k === 'Escape') { this.logKey('Esc'); this.acFull = null; this.fxList = null; this.cancelEdit(); return true; }
     if (k === 'F4') { if (this.cycleAnchor()) this.logKey('F4'); return true; }
     if (k === 'F9') {
+      if (this.editSel && this.bufIsFormula()) {   // F9 on a selected part: the part becomes its value (Esc restores the formula)
+        const { start, end } = this.editSel; const part = this.editBuf.slice(start, end);
+        try { const v = evalFormula('=' + part.replace(/^=/, ''), S.evalCtx({ cell: this.editCell() })); const t = valueText(v);
+          this.editBuf = this.editBuf.slice(0, start) + t + this.editBuf.slice(end); this.editCaret = start + t.length; this.editSel = null; this.endPoint(); this.logKey('F9'); } catch (err) { /* keep buffer */ }
+        return true;
+      }
       if (this.bufIsFormula()) {
         try { const v = evalFormula(this.editBuf[0] === '=' ? this.editBuf : '=' + this.editBuf, S.evalCtx({ cell: this.editCell() }));
           if (v !== undefined && v !== null) { this.editBuf = typeof v === 'boolean' ? (v ? 'TRUE' : 'FALSE') : String(v); this.editCaret = this.editBuf.length; this.endPoint(); this.logKey('F9'); } } catch (err) { /* keep buffer */ }
@@ -1825,3 +1864,4 @@ export function isFormulaText(t) {
 }
 
 installDialogs(Session);
+installTools(Session);

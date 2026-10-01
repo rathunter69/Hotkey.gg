@@ -71,7 +71,7 @@ test('the Alt ribbon walk: tabs, menus, commands, dialogs, Escape one level at a
   s.run('Alt H O E Tab N Alt+D 0 Alt+U Alt+N Down Down Enter'); assert.equal(S.cellAt('A1').fmtStyle, 'comma'); assert.equal(S.cellAt('A1').decimals, 0);   // Format Cells › Number: 0 decimals, the separator, (1,234): the desk format
   s.run('Alt H E F'); assert.equal(S.cellAt('A1').bold, false); assert.equal(S.value('A1'), 1234.567);
   s.run('Alt Q'); assert.equal(s.mode, 'ribbon'); s.run('Z'); assert.equal(s.mode, 'ribbon'); assert.deepEqual(s.path, []); s.run('Escape');
-  s.run('Alt N'); assert.match(s.note, /Insert/); s.run('Escape');
+  s.run('Alt N'); assert.deepEqual(s.path, ['N']); s.run('Escape Escape'); assert.equal(s.mode, 'normal');
   s.run('Alt W V G'); assert.equal(S.gridlines, false); s.run('Alt W G'); assert.equal(S.gridlines, true);
   s.run('Down Alt H I R'); assert.equal(S.value('A3'), 'x'); assert.equal(S.value('A2'), null);
   s.run('Alt H D R'); assert.equal(S.value('A2'), 'x');
