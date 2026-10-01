@@ -118,3 +118,25 @@ test('a circle across sheets settles with iterative calculation on (interest on 
   s.sheet.commitInput('=Two!A2*0.5+1', 2, 1);
   assert.ok(Math.abs(s.sheet.value('A2') - 2) < 0.0001, 'A2 = A2/2 + 1 settles at 2: ' + s.sheet.value('A2'));
 });
+
+test('INDEX and OFFSET over a range on another sheet read that sheet (the slice keeps its sheet)', () => {
+  const s = book(); const S = s.sheet;   // Sales: B3 100, B4 200; Costs: B3 40, B4 70
+  S.commitInput('=INDEX(Costs!B3:B4,2)', 7, 4);
+  assert.equal(S.value('D7'), 70, 'INDEX on Costs!B3:B4 reads Costs, not Sales');
+  S.commitInput('=SUM(INDEX(Costs!A3:B4,0,2))', 9, 4);
+  assert.equal(S.value('D9'), 110, 'the column slice sums the other sheet');
+  S.commitInput('=INDEX(Costs!$B$3:$B$4,MATCH(70,Costs!$B$3:$B$4,0))', 10, 4);
+  assert.equal(S.value('D10'), 70, 'INDEX/MATCH across sheets');
+  S.commitInput('=SUM(OFFSET(Costs!B3,0,0,2,1))', 11, 4);
+  assert.equal(S.value('D11'), 110, 'OFFSET keeps the base range\'s sheet');
+});
+
+test('addSheet with recalc: false defers the workbook recalculation to one recalcAll (a loader adding many sheets)', () => {
+  const s = new Session(new Sheet({ cells: { A1: { formula: '=Two!A1+Three!A1' } } }));
+  s.renameSheet(0, 'One');
+  s.addSheet('Two', new Sheet({ cells: { A1: { value: 2 } } }), undefined, { recalc: false });
+  assert.equal(s.sheet.value('A1'), null, 'nothing recalculated yet');
+  s.addSheet('Three', new Sheet({ cells: { A1: { value: 3 } } }), undefined, { recalc: false });
+  s.recalcAll();
+  assert.equal(s.sheet.value('A1'), 5);
+});

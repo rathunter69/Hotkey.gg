@@ -752,7 +752,7 @@ export class Session {
    * Append (or insert at `at`) a sheet. `name` defaults to the next free Sheet<n>; it must be
    * Excel-legal (isSheetName) and unique, case-insensitively, or this throws. Returns the new index.
    */
-  addSheet(name, sheet, at) {
+  addSheet(name, sheet, at, { recalc = true } = {}) {
     const nm = name == null || name === '' ? nextSheetName(this.sheets) : String(name);
     if (!isSheetName(nm)) throw new Error('addSheet: "' + nm + '" is not a legal sheet name (1–31 characters, none of [ ] : * ? / \\)');
     if (this.sheets.some(x => x.name.toLowerCase() === nm.toLowerCase())) throw new Error('addSheet: a sheet named "' + nm + '" already exists');
@@ -762,7 +762,7 @@ export class Session {
     this.sheets.splice(i, 0, { name: nm, sheet: sh });
     this.sheetIndex = this.sheets.findIndex(x => x.sheet === this.sheet);   // the active entry may have moved right
     this.forgetValues();
-    this.recalcAll();   // a formula (or a rule) naming the new sheet resolves now, not on the next edit
+    if (recalc) this.recalcAll();   // a formula (or a rule) naming the new sheet resolves now, not on the next edit (a loader adding many sheets passes recalc: false and recalculates once)
     this.emit('sheets');
     return i;
   }
