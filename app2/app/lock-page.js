@@ -4,11 +4,12 @@
 import { auth } from './auth.js';
 import { chapterOf, moduleOf } from '../content/index.js';
 import { itemNumber } from './numbering.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 /** The paid line the catalog shows on a locked chapter; one source for the lock page and the lists. */
-export const PAID_LINE = 'Chapter 2 on is the paid tier: the house formatting, full model builds and the serious timed play. Chapter 1 stays free, personal bests and all.';
+export const PAID_LINE = siteCopy('paywall_line', 'Go Pro for the rest of the content.');
 
 export function mountLockPage(root, ctx = {}) {
   const lesson = ctx.lesson || null;
@@ -18,14 +19,13 @@ export function mountLockPage(root, ctx = {}) {
   const el = document.createElement('div');
   el.className = 'page notfound locked';
   el.innerHTML = `<div class="nf-card lk-card">
-      <div class="nf-cap">hotkey.gg · ${ch ? esc(ch.title) : 'paid tier'}</div>
+      <div class="nf-cap">${ch ? esc(ch.title) : 'Pro'}</div>
       <div class="nf-body">
-        <div class="nf-ref">=IF(paid, <b>open</b>, "locked") → <b>locked</b></div>
-        <h1>${lesson ? `${n ? esc(n) + ' · ' : ''}${esc(lesson.title)}` : 'This lesson'} is in the paid tier.</h1>
+        <h1>${lesson ? `${n ? esc(n) + ' ' : ''}${esc(lesson.title)}` : 'This lesson'} is in Pro.</h1>
         <p>${esc(PAID_LINE)}</p>
-        <p>${signedIn ? 'This account does not hold it yet. A redeem code opens it on the Account page; pricing is on its own page.' : 'Sign in if your account holds it, or see the pricing.'}</p>
+        <p>${esc(signedIn ? siteCopy('paywall_signed_in', 'This account isn’t Pro yet. Go Pro, or redeem a code on the Account page.') : 'Sign in if your account is Pro, or go Pro.')}</p>
         <div class="nf-row">
-          <a class="btn btn-primary" href="#/pricing">See pricing</a>
+          <a class="btn btn-primary" href="#/pricing">Go Pro</a>
           ${signedIn ? '<a class="btn btn-ghost" href="#/account">Redeem a code</a>' : '<a class="btn btn-ghost" href="#/account">Sign in</a>'}
           <a class="btn btn-ghost" href="#/learn">Back to Learn</a>
         </div>

@@ -27,7 +27,7 @@ test('formulas: typing, auto-close, point mode, F4, F2 edit mode, Ctrl+Enter', (
   s.run('Right Up Up "=" Left'); assert.equal(s.editBuf, '=A3'); assert.deepEqual(s.editPointer, { r: 3, c: 1 });
   s.run('Shift+Up'); assert.equal(s.editBuf, '=A3:A2'); s.run('F4'); assert.equal(s.editBuf, '=$A$3:$A$2'); s.run('F4'); assert.equal(s.editBuf, '=A$3:A$2');
   s.run('Backspace'); assert.equal(s.editBuf, '='); s.run('Left "*2" Enter'); assert.equal(S.formula('B3'), '=A3*2'); assert.equal(S.value('B3'), 60);
-  s.run('Up F2'); assert.equal(s.editMode, 'edit'); assert.equal(s.editCaret, s.editBuf.length); s.run('Home'); assert.equal(s.editCaret, 1); s.run('End Left Left "+1" Enter'); assert.equal(S.formula('B3'), '=A3+1*2');
+  s.run('Up F2'); assert.equal(s.editMode, 'edit'); assert.equal(s.editCaret, s.editBuf.length); s.run('Home'); assert.equal(s.editCaret, 0, 'Home goes before the = (Excel)'); s.run('End Left Left "+1" Enter'); assert.equal(S.formula('B3'), '=A3+1*2');
   s.run('Ctrl+Home Right Right Shift+Down Shift+Down "=A1*10" Ctrl+Enter'); assert.equal(S.formula('C3'), '=A3*10'); assert.equal(S.value('C3'), 300); assert.equal(S.selectionText(), 'C1:C3');
   s.run('Ctrl+Home "=1+" Enter'); assert.equal(s.dialog, 'fxfix'); s.run('Enter'); assert.equal(S.formula('A1'), '=1'); assert.equal(s.dialog, null);
   s.run('"=@@" Enter'); assert.equal(s.editing, true); assert.ok(s.log.includes('⚠')); s.run('Escape'); assert.equal(s.editing, false); assert.equal(S.formula('A1'), '=1');
@@ -52,7 +52,7 @@ test('format chords', () => {
   const s = fresh({ A1: { value: 0.5 } }); const S = s.sheet;
   s.run('Ctrl+B Ctrl+I Ctrl+U Ctrl+5'); const c = S.cellAt('A1'); assert.deepEqual([c.bold, c.it, c.uline, c.strike], [true, true, true, true]);
   s.run('Ctrl+Shift+5'); assert.equal(S.text('A1'), '50%'); s.run('Ctrl+Shift+4'); assert.equal(S.text('A1'), '$0.50'); s.run('Ctrl+Shift+1'); assert.equal(S.text('A1'), '0.50'); s.run('Ctrl+Shift+`'); assert.equal(S.text('A1'), '0.5');
-  s.run('Ctrl+1'); assert.equal(s.dialog, 'fmt'); s.run('P'); assert.equal(S.text('A1'), '50.0%'); assert.equal(s.mode, 'normal');
+  s.run('Ctrl+1'); assert.equal(s.dialog, 'formatcells'); s.run('Tab P Enter'); assert.equal(S.text('A1'), '50.00%'); assert.equal(s.mode, 'normal');
   s.run('Ctrl+1 Escape'); assert.equal(s.mode, 'normal'); assert.equal(s.dialog, null);
   s.run('Ctrl+;'); assert.equal(S.cellAt('A1').fmtStyle, 'date');
 });
@@ -62,13 +62,13 @@ test('the Alt ribbon walk: tabs, menus, commands, dialogs, Escape one level at a
   s.run('Alt'); assert.equal(s.mode, 'ribbon'); assert.deepEqual(s.path, []);
   s.run('H'); assert.deepEqual(s.path, ['H']); s.run('B'); assert.deepEqual(s.path, ['H', 'B']); s.run('Escape'); assert.deepEqual(s.path, ['H']); s.run('Escape'); assert.deepEqual(s.path, []); assert.equal(s.mode, 'ribbon'); s.run('Escape'); assert.equal(s.mode, 'normal');
   s.run('Alt H B O'); assert.equal(S.cellAt('A1').bb, true); assert.equal(s.mode, 'normal');
-  s.run('Alt H K'); assert.equal(S.text('A1'), '1,234.57'); s.run('Alt H 9'); assert.equal(S.text('A1'), '1,234.6'); s.run('Alt H 0 Alt H 0'); assert.equal(S.text('A1'), '1,234.567');
+  s.run('Alt H K'); assert.equal(S.text('A1').trim(), '1,234.57'); assert.equal(S.cellAt('A1').numFmt, '_(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(@_)'); s.run('Alt H 9'); assert.equal(S.text('A1').trim(), '1,234.6'); s.run('Alt H 0 Alt H 0'); assert.equal(S.text('A1').trim(), '1,234.567');
   s.run('Alt H P'); assert.equal(S.text('A1'), '123457%'); s.run('Alt H A C'); assert.equal(S.cellAt('A1').align, 'c'); s.run('Alt H 1'); assert.equal(S.cellAt('A1').bold, true);
   s.run('Alt H H'); assert.equal(s.dialog, 'fillcolor'); s.run('Right Enter'); assert.equal(S.cellAt('A1').fill, 'gray'); assert.equal(s.mode, 'normal');
   s.run('Alt H F C Right Right Right Right Enter'); assert.equal(S.cellAt('A1').fontColor, 'blue');
   s.run('Alt H J Right Right Right Enter'); assert.equal(S.cellAt('A1').fsz, 16);
   s.run('Alt H O W "20" Enter'); assert.equal(S.colW[1], 145); s.run('Alt H O W 12 Enter'); assert.equal(S.colW[1], 89);
-  s.run('Alt H O E N'); assert.equal(S.cellAt('A1').fmtStyle, 'comma'); assert.equal(S.cellAt('A1').decimals, 0);
+  s.run('Alt H O E Tab N Alt+D 0 Alt+U Alt+N Down Down Enter'); assert.equal(S.cellAt('A1').fmtStyle, 'comma'); assert.equal(S.cellAt('A1').decimals, 0);   // Format Cells › Number: 0 decimals, the separator, (1,234): the desk format
   s.run('Alt H E F'); assert.equal(S.cellAt('A1').bold, false); assert.equal(S.value('A1'), 1234.567);
   s.run('Alt Q'); assert.equal(s.mode, 'ribbon'); s.run('Z'); assert.equal(s.mode, 'ribbon'); assert.deepEqual(s.path, []); s.run('Escape');
   s.run('Alt N'); assert.match(s.note, /Insert/); s.run('Escape');
@@ -173,9 +173,9 @@ test('#34: Ctrl+Alt+V opens Paste Special with no KeyTip path, so one Escape ret
 
 test('#35: Alt+Enter while editing never commits', () => {
   const s = fresh(); const S = s.sheet;
-  s.run('"line one" Alt+Enter'); assert.equal(s.editing, true); assert.equal(s.editBuf, 'line one'); assert.equal(S.value('A1'), null); assert.equal(S.selectionText(), 'A1');
-  s.run('F2 Alt+Enter'); assert.equal(s.editing, true);
-  s.run('Enter'); assert.equal(S.value('A1'), 'line one'); assert.equal(S.selectionText(), 'A2');
+  s.run('"line one" Alt+Enter'); assert.equal(s.editing, true); assert.equal(s.editBuf, 'line one\n', 'a line break inside the cell (M40)'); assert.equal(S.value('A1'), null); assert.equal(S.selectionText(), 'A1');
+  s.run('F2 "line two" Alt+Enter Backspace'); assert.equal(s.editing, true);
+  s.run('Enter'); assert.equal(S.value('A1'), 'line one\nline two'); assert.equal(S.cellAt('A1').wrap, true, 'the commit turns Wrap Text on'); assert.equal(S.selectionText(), 'A2');
 });
 
 test('#36: commit keys pressed while editing are logged, on the edited cell, before the commit', () => {
@@ -187,8 +187,9 @@ test('#36: commit keys pressed while editing are logged, on the edited cell, bef
 });
 
 test('#56: point mode and F4 leave LOG10-style names and out-of-sheet refs alone', () => {
-  const cases = [['"=LOG10" Down', '=LOG10C6'], ['"=DAYS360" Down', '=DAYS360C6'], ['"=ATAN2" Down', '=ATAN2C6'], ['"=ZZ5" Down', '=ZZ5C6'], ['"=K5" Down', '=K5C6'],
-    ['"=SUM(A1:A3)+LOG10" Down', '=SUM(A1:A3)+LOG10C6'], ['"=LOG10(" Down', '=LOG10(C6'], ['"=1+A1" Down', '=1+A2'],
+  // a function name being typed opens Formula AutoComplete (M83): there ↓ walks the list, it does not point
+  const cases = [['"=LOG10" Down', '=LOG10'], ['"=DAYS360" Down', '=DAYS360'], ['"=ATAN2" Down', '=ATAN2'], ['"=ZZ5" Down', '=ZZ5C6'], ['"=K5" Down', '=K5C6'],
+    ['"=SUM(A1:A3)+LOG10" Down', '=SUM(A1:A3)+LOG10'], ['"=LOG10(" Down', '=LOG10(C6'], ['"=1+A1" Down', '=1+A2'], ['"=LOG10" Escape Down', '=LOG10C6'],
     ['"=LOG10" F4', '=LOG10'], ['"=DAYS360" F4', '=DAYS360'], ['"=ATAN2" F4', '=ATAN2'], ['"=K5" F4', '=K5'], ['"=B2" F4', '=$B$2'], ['"=A1:B2" F4', '=$A$1:$B$2']];
   for (const [script, buf] of cases) {
     const s = fresh(undefined, { active: { r: 5, c: 3 }, ...SMALL });   // ten columns: K5 and ZZ5 lie outside the sheet
@@ -227,7 +228,7 @@ test('#61: Home and End move the insertion point in Enter mode too', () => {
   const s = fresh(); const S = s.sheet;
   s.run('"abc" Home "X"'); assert.equal(s.editBuf, 'Xabc'); assert.equal(s.editCaret, 1); assert.equal(s.editMode, 'enter');
   s.run('End "Y"'); assert.equal(s.editBuf, 'XabcY'); s.run('Right'); assert.equal(S.value('A1'), 'XabcY'); assert.equal(S.selectionText(), 'B1');   // still Enter mode: an arrow commits
-  s.run('"=1+2" Home "5" Enter'); assert.equal(S.formula('B1'), '=51+2');
+  s.run('"=1+2" F2 Home Right "5" Enter'); assert.equal(S.formula('B1'), '=51+2');
   s.run('"=" Down Home'); assert.equal(s.editPointer, null); s.run('Escape');   // Home leaves point mode
 });
 
@@ -272,34 +273,50 @@ test('Ctrl+` toggles show formulas, as does Formulas › Show Formulas (Alt M H)
 
 test('Page Setup (Alt P S P): rows to repeat, the footer sections and print gridlines are typed fields; Alt+letter reaches any control; OK records them', () => {
   const s = fresh();
-  s.run('Alt P S P'); assert.equal(s.dialog, 'pagesetup'); assert.equal(s.dlg.tab, 'page');
-  s.run('L F'); assert.equal(s.dlg.orientation, 'landscape'); assert.equal(s.dlg.scaling, 'fit');
+  s.run('Alt P S P'); assert.equal(s.dialog, 'pagesetup'); assert.equal(s.dlg.tab, 'page'); assert.equal(s.dlg.focus, 'tabs', 'the keyboard starts on the row of tabs (M66)');
+  s.run('Tab L F'); assert.equal(s.dlg.orientation, 'landscape'); assert.equal(s.dlg.scaling, 'fit');
   s.run('Alt+R'); assert.equal(s.dlg.tab, 'sheet'); assert.equal(s.dlg.focus, 'titlesRows');
   s.run('"$1:$3"'); assert.equal(s.dlg.titlesRows, '$1:$3', 'a text field takes what is typed');
-  s.run('Alt+H'); assert.equal(s.dlg.tab, 'hf'); assert.equal(s.dlg.focus, 'footL');
+  s.run('Alt+H'); assert.equal(s.dlg.tab, 'sheet', 'Alt+H does nothing in Page Setup (M66)');
+  s.run('Shift+Tab H'); assert.equal(s.dlg.tab, 'hf', 'on the row of tabs a letter picks a tab'); assert.equal(s.dlg.focus, 'tabs');
+  s.run('Alt+U'); assert.equal(s.dlg.sub, 'footer', 'Alt+U opens Custom Footer'); assert.equal(s.dlg.focus, 'footL', 'the cursor in the left section');
   s.run('"&[file]" Tab "Voltline" Tab "&[Date]"'); assert.equal(s.dlg.footL, '&[file]'); assert.equal(s.dlg.footC, 'Voltline'); assert.equal(s.dlg.footR, '&[Date]');
   s.run('Alt+C'); assert.equal(s.dlg.focus, 'footC'); s.run('" Energy"'); assert.equal(s.dlg.footC, 'Voltline Energy', 'a space types into a section');
-  s.run('Alt+R'); assert.equal(s.dlg.tab, 'hf'); assert.equal(s.dlg.focus, 'footR', 'Alt+R on the Header/Footer page is the Right section, not the Sheet page');
-  s.run('Alt+S'); assert.equal(s.dlg.tab, 'sheet'); assert.equal(s.dlg.focus, 'titlesRows', 'Alt+S is the Sheet page'); s.run('Alt+H');
-  s.run('Alt+G'); assert.equal(s.dlg.tab, 'sheet'); assert.equal(s.dlg.printGridlines, true);
+  s.run('Enter'); assert.equal(s.dlg.sub, null, 'Enter is the footer box\'s OK'); assert.equal(s.dialog, 'pagesetup');
+  s.run('Alt+U "x" Escape'); assert.equal(s.dlg.sub, null); assert.equal(s.dlg.footL, '&[file]', 'Esc cancels the footer box only'); assert.equal(s.dialog, 'pagesetup');
+  s.run('Ctrl+PageDown Alt+G'); assert.equal(s.dlg.tab, 'sheet'); assert.equal(s.dlg.printGridlines, true);
   s.run('Alt+G'); assert.equal(s.dlg.printGridlines, false);
   s.run('Enter'); assert.equal(s.mode, 'normal'); assert.equal(s.dialog, null);
   const p = s.settings.pageSetup;
   assert.equal(p.orientation, 'landscape'); assert.equal(p.scaling, 'fit');
   assert.equal(p.titlesRows, '$1:$3', 'stored as Excel shows it back'); assert.deepEqual(p.footer, { left: '&[File]', centre: 'Voltline Energy', right: '&[Date]' }); assert.equal(p.printGridlines, false);
-  assert.ok(s.log.includes('Alt+R') && s.log.includes('Alt+H'), 'the accelerators are logged as chords');
+  assert.ok(s.log.includes('Alt+R') && s.log.includes('Alt+U'), 'the accelerators are logged as chords');
   // Print Titles (Alt P I) opens the Sheet page directly; Esc cancels the draft
   s.run('Alt P I'); assert.equal(s.dialog, 'pagesetup'); assert.equal(s.dlg.tab, 'sheet'); assert.equal(s.dlg.titlesRows, '$1:$3');
   s.run('Backspace Backspace Backspace Backspace Backspace "9" Escape'); assert.equal(s.settings.pageSetup.titlesRows, '$1:$3', 'Cancel discards the draft');
   s.run('Escape Escape'); assert.equal(s.mode, 'normal');   // Cancel returns to the Page Layout tab it was opened from; Esc backs out of the walk
-  // the bare letter only acts when no text field has the focus: on the Page page L is Landscape, in a footer field it types
-  s.run('Alt P S P T'); assert.equal(s.dlg.orientation, 'portrait'); s.run('L'); assert.equal(s.dlg.orientation, 'landscape');
-  s.run('Alt+H "L"'); assert.equal(s.dlg.footL, '&[File]L'); s.run('Escape Escape Escape Escape'); assert.equal(s.mode, 'normal');
+  // the dialog reopens on the tab last used; Ctrl+PgUp / Ctrl+PgDn (and the Alt+PgUp alias) step the tabs
+  s.run('Alt P S P'); assert.equal(s.dlg.tab, 'sheet'); s.run('Ctrl+PageUp'); assert.equal(s.dlg.tab, 'hf'); s.run('Alt+PageUp'); assert.equal(s.dlg.tab, 'margins'); s.run('Ctrl+Tab'); assert.equal(s.dlg.tab, 'hf');
+  s.run('P Tab T'); assert.equal(s.dlg.orientation, 'portrait'); s.run('L'); assert.equal(s.dlg.orientation, 'landscape');
+  s.run('Escape Escape Escape Escape'); assert.equal(s.mode, 'normal');
   // an invalid rows-to-repeat is refused: the dialog stays open and says so (Excel); a blank one clears the titles
   s.run('Alt P I Backspace Backspace Backspace Backspace Backspace "x" Enter'); assert.equal(s.dialog, 'pagesetup'); assert.equal(s.note, 'Reference is not valid.'); assert.equal(s.settings.pageSetup.titlesRows, '$1:$3');
   s.run('Backspace'); assert.equal(s.note, '', 'the next key clears the note'); s.run('"2" Enter'); assert.equal(s.settings.pageSetup.titlesRows, '$2:$2'); assert.equal(s.mode, 'normal');
   s.run('Alt P I Backspace Backspace Backspace Backspace Backspace Enter'); assert.equal(s.settings.pageSetup.titlesRows, ''); assert.equal(s.mode, 'normal');
-  s.run('Alt P S P F "2" Tab "3" Enter'); assert.deepEqual([s.settings.pageSetup.fitWide, s.settings.pageSetup.fitTall], [2, 3], 'the first digit into a fresh field replaces the pre-filled 1');
+  s.run('Alt P S P P Alt+F "2" Tab "3" Enter'); assert.deepEqual([s.settings.pageSetup.fitWide, s.settings.pageSetup.fitTall], [2, 3], 'the first digit into a fresh field replaces the pre-filled 1');
+});
+
+test('Page Setup › Margins (M66): the four margins, the header and footer margins and Center on page', () => {
+  const s = fresh();
+  s.run('Alt P S P M'); assert.equal(s.dlg.tab, 'margins');
+  assert.deepEqual([s.dlg.mTop, s.dlg.mBottom, s.dlg.mLeft, s.dlg.mRight, s.dlg.mHeader, s.dlg.mFooter], ['0.75', '0.75', '0.7', '0.7', '0.3', '0.3'], 'Excel\'s Normal margins');
+  assert.equal(s.settings.pageSetup.margins, undefined, 'an untouched Margins page writes nothing');
+  s.run('Alt+Z'); assert.equal(s.dlg.centerH, true); s.run('Alt+A "0.2"'); assert.equal(s.dlg.mHeader, '0.2');
+  s.run('Alt+T Up'); assert.equal(s.dlg.mTop, '1'); s.run('Alt+L "0.5"'); s.run('Alt+V Alt+V'); assert.equal(s.dlg.centerV, false);
+  s.run('Enter'); const p = s.settings.pageSetup;
+  assert.equal(p.centerH, true); assert.equal(p.centerV, undefined); assert.deepEqual(p.margins, { top: 1, bottom: 0.75, left: 0.5, right: 0.7, header: 0.2, footer: 0.3 });
+  s.run('Alt P S P'); assert.equal(s.dlg.tab, 'margins', 'reopens on Margins'); assert.equal(s.dlg.focus, 'tabs');
+  s.run('Escape Escape Escape');
 });
 
 test('Esc that discards an entry in progress is logged, on the edited cell', () => {
@@ -314,7 +331,8 @@ test('Esc that discards an entry in progress is logged, on the edited cell', () 
 test('Fill Series continues the weekday and month lists from one cell; numbers still step; a range AutoFit fits the selected cells only', () => {
   const s = fresh({ B14: { value: 'Mon' }, B16: { value: 'JAN' }, A1: { value: 'A very long title sits in the first row of the report' }, A5: { value: 'South Lamar' }, A6: { value: 'Airport' } });
   const S = s.sheet;
-  S.select('B14:G14'); s.run('Alt H F I S Enter');
+  S.select('B14:G14'); s.run('Alt H F I S Enter'); assert.equal(S.value('C14'), null, 'Series opens on Linear: a day name is left alone (M67)');
+  S.select('B14:G14'); s.run('Alt H F I S Alt+F Enter');
   assert.deepEqual(['B14', 'C14', 'D14', 'E14', 'F14', 'G14'].map(r => S.value(r)), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
   assert.equal(S.cellAt('D14').txt, true);
   S.select('B16:E16'); S.fillSeries(); assert.deepEqual(['C16', 'D16', 'E16'].map(r => S.value(r)), ['FEB', 'MAR', 'APR'], 'the list keeps the cell’s case');
@@ -331,8 +349,8 @@ test('F4 outside Edit mode repeats the last action on the new selection: formats
   s.run('F4'); assert.equal(s.log.includes('F4'), false, 'nothing to repeat yet: no-op, unlogged');
   s.run('Ctrl+B Right Down F4'); assert.equal(S.cellAt('B2').bold, true); assert.equal(s.log.at(-1), 'F4');
   s.run('Ctrl+B F4'); assert.equal(S.cellAt('B2').bold, false, 'F4 repeats the state the toggle set, not a toggle');
-  S.goTo(1, 3); s.run('Ctrl+Shift+! Right F4'); assert.equal(S.cellAt('D1').fmtStyle, 'comma'); assert.equal(S.cellAt('D1').decimals, 2);
-  s.run('Alt H 0 Left F4'); assert.equal(S.cellAt('C1').decimals, 3, 'a decimals step repeats');
+  S.goTo(1, 3); s.run('Ctrl+Shift+! Right F4'); assert.equal(S.cellAt('D1').numFmt, '#,##0.00');
+  s.run('Alt H 0 Left F4'); assert.equal(S.cellAt('C1').numFmt, '#,##0.000', 'a decimals step repeats');
   S.goTo(1, 1); s.run('Alt H B P Down Down Down Down F4'); assert.equal(S.cellAt('A1').bt, true); assert.equal(S.cellAt('A5').bt, true, 'a border repeats');
   S.goTo(1, 1); s.run('Ctrl+Space Alt H O W "12" Enter Right Ctrl+Space F4'); assert.equal(S.colW[1], 89); assert.equal(S.colW[2], 89, 'a column width repeats');
   S.goTo(2, 1); s.run('Shift+Space Ctrl+Shift+= F4'); assert.equal(S.value('B4'), 2, 'the insert repeats (B2 moved down twice)');

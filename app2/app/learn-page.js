@@ -156,7 +156,7 @@ export function mountLearnPage(root) {
         html += `<section class="chapter chapter-locked"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(ch ? ch.title : plan.title)}</h2><span class="access ${plan.n === 2 && ch1Cleared ? 'access-free">Unlocked · ' + (built ? 'paid' : 'coming') : 'access-paid">Paid' + (built ? '' : ' · coming')}</span></div><p class="chapter-blurb">${esc(ch ? ch.blurb : plan.line)}</p>${count}${unlock}</section>`;
         continue;
       }
-      const testout = plan.id === 'foundations' ? (gate.testout ? '<span class="chapter-testout tested">Tested out ✓</span>' : '<a class="chapter-testout" href="#/lesson/foundations-testout">Already know this? Test out</a>') : '';
+      const testout = plan.id === 'foundations' ? (gate.testout ? '<span class="chapter-testout tested">Verified</span>' : '<a class="chapter-testout" href="#/lesson/foundations-testout">Already know this? Take the assessment.</a>') : '';
       html += `<section class="chapter"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(ch.title)}</h2><span class="access ${ch.access === 'paid' ? 'access-paid">Paid · yours' : 'access-free">Free'}</span>${testout}</div><p class="chapter-blurb">${esc(ch.blurb)}</p>`;
       const filtering = !!(filters.q || (filters.status && filters.status !== 'all') || (filters.difficulty && filters.difficulty !== 'all') || (filters.access && filters.access !== 'all'));
       // The module path (C2 gap 9): modules as nodes with a ring, lesson dots and the challenge

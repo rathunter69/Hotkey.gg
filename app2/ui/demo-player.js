@@ -18,6 +18,7 @@ import { SheetView } from './sheet-view.js';
 import { RibbonView } from './ribbon-view.js';
 import { mountKeycaps } from './keycaps.js';
 import { keyLabel } from '../app/prefs.js';
+import { siteCopy } from '../content/copy/apply.js';
 import { COLW_DEFAULT, COLW_MAX, FIT_SLACK, cellTxtPx } from '../engine/sheet.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -139,7 +140,7 @@ export function mountDemo(host, o = {}) {
     const cur = run.current;
     $('demoTask').innerHTML = cur && !run.finished
       ? `<div class="task-label">${taken ? 'Now' : 'Watch'}</div><div class="task-goal">${esc(cur.text)}</div>${cur.teach ? `<div class="task-teach">${teachHtml(cur.teach)}</div>` : ''}<div class="task-keys">${cur.keys.split(/\s+/).map(k => /^(then|×\d+)$/.test(k) ? `<span class="kx">${esc(k)}</span>` : `<kbd>${esc(keyLabel(k))}</kbd>`).join(' ')}</div>`
-      : `<div class="task-label">Done</div><div class="task-goal">Four goals, twelve keys, no mouse.</div><div class="task-teach">That is a lesson. The sheet is graded on what it ends up as, so any correct route counts.</div>`;
+      : `<div class="task-label">Done</div><div class="task-teach">${esc(siteCopy('demo_done', 'That was a lesson. The sheet is graded on how it ends up, so any route that gets there counts, and the next one is yours.'))}</div>`;
     const list = $('demoGoals');
     list.innerHTML = states.map(g => `<li class="goal ${g.done ? 'done' : g.current ? 'current' : ''}"><span class="goal-mark">${g.done ? '✓' : g.current ? '›' : ''}</span><span class="goal-text">${esc(g.text)}</span></li>`).join('');
     // a short frame shows fewer goals: the list keeps the current one in view, at its top (the ticked ones scroll away above it)

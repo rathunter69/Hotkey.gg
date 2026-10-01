@@ -891,7 +891,11 @@ export function evalFormula(expr, ctx = {}) {
       case 'str': return node.v;
       case 'bool': return node.v;
       case 'err': throw err(node.v);
-      case 'name': throw err('#NAME?');
+      case 'name': {   // a defined name (Define Name, M40): ctx.name resolves it to its cell or range, on this sheet or another
+        const t = ctx.name ? ctx.name(node.v) : null;
+        if (!t) throw err('#NAME?');
+        return new Range(t.r1, t.c1, t.r2, t.c2, t.sheet || undefined);
+      }
       case 'paren': return ev(node.x);
       case 'ref': { const p = refParts(node.ref); return new Range(p.r, p.c, p.r, p.c, node.sheet); }
       case 'range': return rangeOf(node.a, node.b, node.sheet);
@@ -929,6 +933,27 @@ export function evalFormula(expr, ctx = {}) {
 /* ============================================================================
    FORMULA TEXT UTILITIES (all token-based — never regex over raw formula text)
    ============================================================================ */
+
+/** Every function the evaluator computes (formula.test.js keeps this list and callFn in step). */
+export const FUNCTION_NAMES = ['ABS', 'AND', 'AVERAGE', 'AVERAGEIF', 'AVERAGEIFS', 'CHOOSE', 'COLUMN', 'COLUMNS', 'CONCAT', 'CONCATENATE', 'COUNT', 'COUNTA',
+  'COUNTBLANK', 'COUNTIF', 'COUNTIFS', 'DATE', 'DAY', 'DAYS', 'EDATE', 'EOMONTH', 'EXACT', 'EXP', 'FALSE', 'FIND', 'FV', 'HLOOKUP', 'IF', 'IFERROR', 'IFNA',
+  'IFS', 'INDEX', 'INT', 'IRR', 'ISBLANK', 'ISERR', 'ISERROR', 'ISLOGICAL', 'ISNA', 'ISNONTEXT', 'ISNUMBER', 'ISTEXT', 'LARGE', 'LEFT', 'LEN', 'LN', 'LOG',
+  'LOG10', 'LOWER', 'MATCH', 'MAX', 'MAXIFS', 'MEDIAN', 'MID', 'MIN', 'MINIFS', 'MOD', 'MONTH', 'N', 'NA', 'NOT', 'NPV', 'OFFSET', 'OR', 'PI', 'PMT',
+  'POWER', 'PRODUCT', 'PROPER', 'PV', 'RAND', 'RANK', 'RANK.EQ', 'REPT', 'RIGHT', 'ROUND', 'ROUNDDOWN', 'ROUNDUP', 'ROW', 'ROWS', 'SEARCH', 'SIGN',
+  'SMALL', 'SQRT', 'SUBSTITUTE', 'SUM', 'SUMIF', 'SUMIFS', 'SUMPRODUCT', 'SWITCH', 'T', 'TEXT', 'TEXTJOIN', 'TODAY', 'TRIM', 'TRUE', 'TRUNC', 'UPPER',
+  'VALUE', 'VLOOKUP', 'WEEKDAY', 'XLOOKUP', 'XOR', 'YEAR', 'YEARFRAC'];
+/**
+ * The functions Formula AutoComplete lists (M83): desktop Excel's catalogue, so =AV offers AVEDEV
+ * first as Excel's list does; the evaluator's own set plus the common ones it does not compute.
+ */
+export const AUTOCOMPLETE_FUNCTIONS = [...new Set(FUNCTION_NAMES.concat(['ACOS', 'ADDRESS', 'AGGREGATE', 'ASIN', 'ATAN', 'ATAN2', 'AVEDEV', 'AVERAGEA', 'CEILING',
+  'CEILING.MATH', 'CELL', 'CHAR', 'CHOOSECOLS', 'CHOOSEROWS', 'CLEAN', 'CODE', 'COMBIN', 'CORREL', 'COS', 'COUNTUNIQUEIFS', 'DATEDIF', 'DATEVALUE', 'DAYS360', 'DB', 'DDB',
+  'DEGREES', 'DOLLAR', 'DROP', 'EFFECT', 'EVEN', 'EXPAND', 'FACT', 'FILTER', 'FIXED', 'FLOOR', 'FLOOR.MATH', 'FORECAST', 'FORMULATEXT', 'GCD', 'GROWTH', 'HOUR',
+  'HSTACK', 'HYPERLINK', 'INDIRECT', 'INTERCEPT', 'IPMT', 'ISEVEN', 'ISFORMULA', 'ISODD', 'ISREF', 'LAMBDA', 'LCM', 'LET', 'LINEST', 'MINUTE', 'MIRR', 'MODE',
+  'MROUND', 'NETWORKDAYS', 'NOMINAL', 'NOW', 'NPER', 'NUMBERVALUE', 'ODD', 'PERCENTILE', 'PERCENTRANK', 'PPMT', 'QUARTILE', 'QUOTIENT', 'RADIANS', 'RANDARRAY',
+  'RANDBETWEEN', 'RATE', 'SECOND', 'SEQUENCE', 'SIN', 'SLN', 'SLOPE', 'SORT', 'SORTBY', 'STDEV', 'STDEV.P', 'STDEV.S', 'SUBTOTAL', 'SYD', 'TAKE', 'TAN',
+  'TEXTAFTER', 'TEXTBEFORE', 'TEXTSPLIT', 'TIME', 'TIMEVALUE', 'TOCOL', 'TOROW', 'TRANSPOSE', 'TREND', 'TYPE', 'UNIQUE', 'VAR', 'VAR.P', 'VAR.S', 'VSTACK',
+  'WORKDAY', 'XIRR', 'XMATCH', 'XNPV']))].filter(n => n !== 'TRUE' && n !== 'FALSE' && n !== 'COUNTUNIQUEIFS').sort();
 
 /** True when text is a formula that parses. */
 export function parses(expr) { try { parseFormula(expr); return true; } catch (e) { return false; } }
@@ -1023,6 +1048,37 @@ export function translateFormula(f, dr, dc, wrap) {
     else if (isColonTok(n1) && isColTok(t) && isColTok(n2)) { rep = pair(shiftCol(t), shiftCol(n2)); end = n2.end; i += 2; }
     else if (isColonTok(n1) && isRowTok(t) && isRowTok(n2)) { rep = pair(shiftRow(t), shiftRow(n2)); end = n2.end; i += 2; }
     else if (t.t === 'ref') { rep = shiftRef(t.v); if (rep === null) rep = '#REF!'; else if (t.sheetTxt) rep = t.sheetTxt + rep; }
+    if (rep !== null) { out += body.slice(last, t.pos) + rep; last = end; }
+  }
+  out += body.slice(last);
+  return (eq ? '=' : '') + out;
+}
+
+/**
+ * A formula copied from (sr, sc) and pasted Transposed at (tr, tc) (M68): a fully relative
+ * reference turns with the block, its row offset becoming the column offset and back (=A1+B1 in
+ * A2 pasted transposed into E1 reads =D1+D2 when the block A1:B2 landed at D1). An absolute or a
+ * mixed reference moves as an ordinary paste would move it; a reference off the sheet is #REF!.
+ */
+export function transposeFormula(f, sr, sc, tr, tc) {
+  const src = String(f);
+  const eq = src.trimStart()[0] === '=';
+  const body = eq ? src.slice(src.indexOf('=') + 1) : src;
+  let toks; try { toks = tokenize(body); } catch (e) { return src; }
+  const turn = ref => {
+    const m = /^(\$?)([A-Z]{1,3})(\$?)(\d+)$/.exec(ref); if (!m) return ref;
+    let c = colIndex(m[2]), r = +m[4];
+    if (!m[1] && !m[3]) { const dr = r - sr, dc = c - sc; r = tr + dc; c = tc + dr; }
+    else { if (!m[1]) c += tc - sc; if (!m[3]) r += tr - sr; }
+    if (c < 1 || r < 1) return null;
+    return m[1] + colLetter(c) + m[3] + r;
+  };
+  let out = '', last = 0;
+  for (let i = 0; i < toks.length; i++) {
+    const t = toks[i], n1 = toks[i + 1], n2 = toks[i + 2];
+    let rep = null, end = t.end;
+    if (isColonTok(n1) && t.t === 'ref' && n2 && n2.t === 'ref') { const a = turn(t.v), b = turn(n2.v); rep = a === null || b === null ? '#REF!' : (t.sheetTxt || '') + a + ':' + b; end = n2.end; i += 2; }
+    else if (t.t === 'ref') { const a = turn(t.v); rep = a === null ? '#REF!' : (t.sheetTxt || '') + a; }
     if (rep !== null) { out += body.slice(last, t.pos) + rep; last = end; }
   }
   out += body.slice(last);
