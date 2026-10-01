@@ -6,30 +6,8 @@
    build's, so the old CSS applies unchanged to the new painter. */
 
 /* ---------- 1. tokens, reset, body, .app (index.html 75–95) ---------- */
-:root{
-  /* static fallback = Daylight, the default theme, so a first visit paints right before themes.js runs */
-  --bg:#dbd8d1; --surface:#ecebe6; --surface2:#e1dfd8; --line:#c6c2b8;
-  --text:#38352d; --muted:#6b665d; --faint:#a09a8f;
-  --accent:#16a862; --accent-dim:#0e7a45; --accent-glow:rgba(22,168,98,.16); --on-accent:#ffffff;
-  --warn:#9a6700; --bad:#b3261e;
-  --note-bg:#fff6b8; --note-text:#2b2820;   /* a cell note's yellow paper, the same in every theme (Excel's) */
-  --mono:'JetBrains Mono',ui-monospace,monospace;
-  --cellfont:Arial,'Calibri','Segoe UI',system-ui,sans-serif;   /* r72 doctrine: ARIAL leads in the sheet cells; everything outside the grid = JetBrains Mono / Hanken */
-  --sans:'Hanken Grotesk',system-ui,sans-serif;
-  /* derived tokens — every theme gets them from its own palette (themes.js writes only the palette
-     keys on <html>, and these resolve against them there). --ink: text-coloured shadows and the
-     pixel-art outline. Tiers and rarities keep the site's idiom (pro/rare blue, epic violet,
-     legendary amber) but take their lightness from the theme's text and a tint of its accent and
-     warn, so they sit natively on light and dark themes alike (§6a). */
-  --ink:var(--text);
-  --tier-pass:var(--accent);
-  --tier-pro:color-mix(in oklab, color-mix(in oklab, #4a9eda 80%, var(--accent)) 75%, var(--text));
-  --tier-legendary:color-mix(in oklab, color-mix(in oklab, #e0913f 70%, var(--warn, #d9892b)) 82%, var(--text));
-  --rar-common:var(--accent);
-  --rar-rare:var(--tier-pro);
-  --rar-epic:color-mix(in oklab, color-mix(in oklab, #a06bd6 80%, var(--accent)) 75%, var(--text));
-  --rar-legendary:var(--tier-legendary);
-}
+/* the tokens (every color, size, radius, space and duration) live in ui/tokens.css (M87); the
+   names this file was written against (--bg, --surface, --text, --accent …) are aliases there */
 *{box-sizing:border-box;margin:0;padding:0}
 html{scrollbar-gutter:stable; height:100%}
 body{

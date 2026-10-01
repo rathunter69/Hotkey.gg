@@ -1,14 +1,45 @@
-// app2/ui/themes.js — the 27 hotkey.gg palettes and the theme switch. Lifted verbatim from
-// themes.js (THEMES 5–153, THEME_ORDER/themeList 155–171, hkOnAccent 188–193, scrollbar
-// injection 195–208, applyTheme 212–221, initial apply 228–236) as an ES module.
+// app2/ui/themes.js — the hotkey.gg palettes and the theme switch (screenplay 3.0, Color; M87).
+// Workbook is the default theme and the one 3.0's table describes; the 27 older palettes stay
+// as themes a learner picks or earns (6.9). Every theme supplies the same tokens (ui/tokens.css):
+// the ground and the ink, the rail's four, the note's two, the red, and the six mode colors with
+// their ink and tint. An older palette states its legacy keys (bg, surface, text, accent …) and
+// tokensFor() derives the tokens from them, so a theme never reaches into a stylesheet and the
+// contrast test (tests/contrast.test.js) holds every theme to the same pairs.
 //
 // Importing this module applies NOTHING. The page calls loadTheme() as early as it can (an
 // inline module in <head>) so the saved palette lands before first paint; applyTheme() writes
-// every palette key as --<key> on <html>, derives --on-accent, sets html[data-dark] and refreshes
-// every [data-theme-label]. Persistence is saveTheme() (localStorage 'hotkey_theme'), kept apart
-// from applyTheme() exactly as the old build did.
+// every token as --<name> on <html>, sets html[data-dark] and refreshes every [data-theme-label].
+// Persistence is saveTheme() (localStorage 'hotkey_theme'), kept apart from applyTheme().
+
+/** The token names every theme supplies (the contrast test checks them all). */
+export const TOKEN_NAMES = ['paper', 'sheet', 'chrome', 'line', 'grid', 'edge', 'ink', 'ink-2', 'rail', 'rail-hi', 'rail-text', 'rail-sub', 'note', 'note-ink', 'note-edge', 'red', 'on-fill', 'plate-neutral',
+  'learn', 'learn-ink', 'learn-tint', 'drills', 'drills-ink', 'drills-tint', 'daily', 'daily-ink', 'daily-tint', 'rapid', 'rapid-ink', 'rapid-tint', 'challenges', 'challenges-ink', 'challenges-tint', 'clock', 'clock-ink', 'clock-tint'];
+export const MODES = ['learn', 'drills', 'daily', 'rapid', 'challenges', 'clock'];
+
+/** The mode colors on a light ground (3.0's table): white text on every fill, the ink on a tint or the paper. */
+export const LIGHT_MODES = {
+  learn: '#0F7B45', 'learn-ink': '#0B6338', 'learn-tint': '#E1F1E8',
+  drills: '#1F4FD1', 'drills-ink': '#183FA8', 'drills-tint': '#E6ECFB',
+  daily: '#B8501A', 'daily-ink': '#8A3A10', 'daily-tint': '#FCEBDD',
+  rapid: '#C42B6A', 'rapid-ink': '#9E1F52', 'rapid-tint': '#FBE7EF',
+  challenges: '#6B3FC4', 'challenges-ink': '#5A33A8', 'challenges-tint': '#EEE8FA',
+  clock: '#F0A81C', 'clock-ink': '#7A4F00', 'clock-tint': '#FDF1D3',
+};
+/** The mode colors on a dark ground: brighter fills that read against the dark paper (3 to 1), dark text on them, light inks for the tints; the tint is derived per theme. */
+export const DARK_MODES = {
+  learn: '#3DBE7E', 'learn-ink': '#6FDCA3',
+  drills: '#7A9CF7', 'drills-ink': '#A9BEFF',
+  daily: '#F08A4B', 'daily-ink': '#FFAE7A',
+  rapid: '#F073A6', 'rapid-ink': '#FF9DC2',
+  challenges: '#AE93F2', 'challenges-ink': '#CBB8FF',
+  clock: '#F0A81C', 'clock-ink': '#F7C65E',
+};
 
 export const THEMES = {
+  workbook: { name: 'Workbook', dark: false, tokens: {
+    paper: '#F6F7F6', sheet: '#FFFFFF', chrome: '#ECEFED', line: '#D6DBD8', grid: '#E3E7E5', edge: '#7A857F', ink: '#17201B', 'ink-2': '#525D57',
+    rail: '#16201A', 'rail-hi': '#2B3A31', 'rail-text': '#C9D3CD', 'rail-sub': '#AEBBB4', note: '#FFF6C7', 'note-ink': '#17201B', 'note-edge': '#B9A53C', red: '#C23B2A', 'on-fill': '#FFFFFF', 'plate-neutral': '#EEF3EF',
+    ...LIGHT_MODES } },
   default: { name: 'Graphite', dark: true, vars: {
     bg: '#292b31', surface: '#383b42', surface2: '#43474f', line: '#5a5e68',
     text: '#f0f1ec', muted: '#a8adb3', faint: '#767d87',
@@ -146,9 +177,10 @@ export const THEMES = {
     warn: '#ffd24a', bad: '#ff6a4a' } },
 };
 
-/* Picker order — LIGHT/paper first (Daylight leads), then DARK roughly light → dark. Any theme
-   missing from the list still shows (appended), so a new theme can't vanish. */
+/* Picker order — Workbook first, then LIGHT/paper (Daylight leads), then DARK roughly light → dark.
+   Any theme missing from the list still shows (appended), so a new theme can't vanish. */
 export const THEME_ORDER = [
+  'workbook',
   // light / paper
   'daylight', 'github', 'light', 'phoebes', 'newsprint', 'frost', 'ledger', 'serika', 'sepia',
   // dark, ~lightest → darkest
@@ -165,65 +197,136 @@ export function themeList() {
 }
 
 export const STORAGE_KEY = 'hotkey_theme';
-export const DEFAULT_THEME = 'daylight';
+export const DEFAULT_THEME = 'workbook';
 
 let current = DEFAULT_THEME;
 export function currentTheme() { return current; }
 
-/* relative luminance (sRGB → linear), for auto-contrast ink selection */
-function schLum(hex) {
-  const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '').trim()); if (!m) return 0;
-  const n = parseInt(m[1], 16), ch = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => {
-    v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+/* ---------------- color arithmetic (sRGB), shared with the contrast test ---------------- */
+export function hexToRgb(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '').trim()); if (!m) return null;
+  const n = parseInt(m[1], 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+export const rgbToHex = ([r, g, b]) => '#' + [r, g, b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('').toUpperCase();
+/** Relative luminance (WCAG). */
+export function luminance(hex) {
+  const rgb = hexToRgb(hex); if (!rgb) return 0;
+  const ch = rgb.map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
   return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
 }
-/** Readable label colour on an accent fill: white on dark accents, near-black on light ones. */
+/** WCAG contrast ratio between two hex colors. */
+export function contrast(a, b) {
+  const la = luminance(a), lb = luminance(b);
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+}
+/** Mix `a` into `b` by `t` (0..1 of a), in sRGB. */
+export function mix(a, b, t) {
+  const A = hexToRgb(a), B = hexToRgb(b); if (!A || !B) return a;
+  return rgbToHex(A.map((v, i) => v * t + B[i] * (1 - t)));
+}
+/** Readable label colour on a fill: white on dark fills, near-black on light ones. */
 export function onAccent(accent) {
-  const L = schLum(accent);
-  const rDark = (Math.max(L, 0) + 0.05) / (0 + 0.05);   // vs near-black (lum≈0)
-  const rWhite = (1 + 0.05) / (L + 0.05);               // vs white   (lum≈1)
+  const L = luminance(accent);
+  const rDark = (Math.max(L, 0) + 0.05) / (0 + 0.05);
+  const rWhite = (1 + 0.05) / (L + 0.05);
   return rWhite > rDark ? '#ffffff' : '#0d1013';
+}
+
+/**
+ * Every token for a theme (ui/tokens.css names → hex). A theme that states `tokens` supplies them
+ * outright (Workbook); an older palette's legacy `vars` derive: paper = bg, sheet = surface,
+ * chrome = surface2, ink = text, ink-2 = muted, edge = faint, grid between line and sheet, the rail
+ * from the theme's own dark surfaces on a dark theme and Workbook's rail on a light one, the mode
+ * colors from LIGHT_MODES or DARK_MODES with each tint mixed from the fill and the paper. A theme
+ * may override any token in `tokens` beside its `vars` (the contrast fixes do).
+ */
+export function tokensFor(name) {
+  const t = THEMES[name] || THEMES[DEFAULT_THEME];
+  const v = t.vars || {};
+  const dark = !!t.dark;
+  const paper = v.bg || '#F6F7F6', sheet = v.surface || paper, chrome = v.surface2 || sheet;
+  const towards = dark ? '#FFFFFF' : '#000000';   // a failing color moves toward this until it passes
+  const grounds = [paper, sheet, chrome];
+  const rail = dark ? sheet : '#16201A', railHi = dark ? chrome : '#2B3A31';
+  const out = {
+    paper, sheet, chrome, line: v.line || '#D6DBD8', grid: mix(v.line || '#D6DBD8', sheet, 0.5),
+    edge: fit(v.faint || '#7A857F', grounds, 3, towards),
+    ink: fit(v.text || '#17201B', grounds, 4.5, towards), 'ink-2': fit(v.muted || '#525D57', grounds, 4.5, towards),
+    rail, 'rail-hi': railHi,
+    'rail-text': fit(dark ? (v.text || '#C9D3CD') : '#C9D3CD', [rail, railHi], 4.5, '#FFFFFF'),
+    'rail-sub': fit(dark ? (v.muted || '#AEBBB4') : '#AEBBB4', [rail, railHi], 4.5, '#FFFFFF'),
+    note: '#FFF6C7', 'note-ink': '#17201B', 'note-edge': '#B9A53C',
+    red: fit(dark ? (v.bad || '#FF6A5A') : '#C23B2A', [paper, sheet], 4.5, towards),
+    'on-fill': dark ? paper : '#FFFFFF',
+    'plate-neutral': dark ? mix(sheet, paper, 0.5) : '#EEF3EF',
+  };
+  const modes = dark ? DARK_MODES : LIGHT_MODES;
+  for (const m of MODES) {
+    // the fill reads against the ground (3 to 1) and carries on-fill as text (4.5), except amber, which is never text's ground
+    const fill = m === 'clock' ? modes[m] : fit(modes[m], [paper, sheet], 3, dark ? '#FFFFFF' : '#000000', c => contrast(c, out['on-fill']) >= 4.5);
+    out[m] = fill;
+    const tint = modes[m + '-tint'] || mix(fill, paper, dark ? 0.22 : 0.12);
+    out[m + '-tint'] = tint;
+    out[m + '-ink'] = fit(modes[m + '-ink'], [paper, sheet, tint], 4.5, towards);
+  }
+  const over = { ...out, ...(t.tokens || {}) };
+  // body text on every tint
+  over.ink = fit(over.ink, [over.paper, over.sheet, over.chrome, ...MODES.map(m => over[m + '-tint'])], 4.5, towards);
+  return over;
+}
+
+/**
+ * Move `color` toward `towards` in small steps until it holds `min` against every ground in `bgs`
+ * (and `also(color)` holds, when given). A color that already passes comes back unchanged, so a
+ * theme's own values stand wherever they can.
+ */
+export function fit(color, bgs, min, towards, also) {
+  const ok = c => bgs.every(b => contrast(c, b) >= min) && (!also || also(c));
+  if (ok(color)) return color;
+  for (let t = 0.04; t <= 1.0001; t += 0.04) { const c = mix(towards, color, t); if (ok(c)) return c; }
+  return towards;
 }
 
 /** Write the active theme's name into every [data-theme-label]. */
 export function syncThemeLabels() {
-  const t = THEMES[current] || THEMES.default;
+  const t = THEMES[current] || THEMES[DEFAULT_THEME];
   try { document.querySelectorAll('[data-theme-label]').forEach(el => { el.textContent = t.name; }); } catch (e) { /* no DOM yet */ }
 }
 
 /* THEMED SCROLLBARS — every overflow scroller rides the theme instead of the OS default. Injected
-   once (id-guarded); colours come from the CSS vars so every theme is covered automatically. */
+   once (id-guarded); colours come from the tokens so every theme is covered automatically. */
 function ensureScrollbarStyle() {
   try {
     if (document.getElementById('hk-scrollbars')) return;
     const st = document.createElement('style'); st.id = 'hk-scrollbars';
-    st.textContent = '*{scrollbar-width:thin; scrollbar-color:var(--line,#555) transparent}' +
+    st.textContent = '*{scrollbar-width:thin; scrollbar-color:var(--line) transparent}' +
       '*::-webkit-scrollbar{width:9px;height:9px}' +
       '*::-webkit-scrollbar-track{background:transparent}' +
-      '*::-webkit-scrollbar-thumb{background:var(--line,#555);border-radius:99px;border:2px solid transparent;background-clip:padding-box}' +
-      '*::-webkit-scrollbar-thumb:hover{background:var(--faint,#777);border:2px solid transparent;background-clip:padding-box}' +
+      '*::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px;border:2px solid transparent;background-clip:padding-box}' +
+      '*::-webkit-scrollbar-thumb:hover{background:var(--edge);border:2px solid transparent;background-clip:padding-box}' +
       '*::-webkit-scrollbar-corner{background:transparent}';
     (document.head || document.documentElement).appendChild(st);
   } catch (e) { /* ignore */ }
 }
 
-/** Apply a palette: --<key> vars on <html>, --on-accent, html[data-dark], labels. Does not persist. */
-export const VARS_KEY = 'hotkey_theme_vars';   // the applied palette, for the no-flash inline restore in index.html
+/** Apply a theme: every token as --<name> on <html>, html[data-dark], labels. Does not persist. */
+export const VARS_KEY = 'hotkey_theme_vars';   // the applied tokens, for the no-flash inline restore in index.html
 export function applyTheme(name) {
-  const t = THEMES[name] || THEMES.default;
+  const key = THEMES[name] ? name : DEFAULT_THEME;
+  const t = THEMES[key];
+  const tokens = tokensFor(key);
   const root = document.documentElement;
-  for (const k in t.vars) root.style.setProperty('--' + k, t.vars[k]);
-  /* themes may pin the CTA text colour explicitly (daylight: green + WHITE text); the contrast
-     formula stays the fallback. */
-  root.style.setProperty('--on-accent', t.vars.onAccent || onAccent(t.vars.accent || '#6ec9a0'));
+  // the legacy names are aliases in tokens.css; an inline value left by an older build would shadow them
+  for (const k of ['bg', 'surface', 'surface2', 'text', 'muted', 'faint', 'accent', 'accent-dim', 'accent-glow', 'on-accent', 'warn', 'bad', 'onAccent']) root.style.removeProperty('--' + k);
+  for (const k in tokens) root.style.setProperty('--' + k, tokens[k]);
   root.setAttribute('data-dark', t.dark ? '1' : '0');   // drives cell-colour visibility overrides
-  current = THEMES[name] ? name : 'default';
-  try { localStorage.setItem(VARS_KEY, JSON.stringify({ dark: t.dark, vars: { ...t.vars, 'on-accent': root.style.getPropertyValue('--on-accent') } })); } catch (e) { /* storage blocked */ }
+  current = key;
+  try { localStorage.setItem(VARS_KEY, JSON.stringify({ dark: t.dark, vars: tokens })); } catch (e) { /* storage blocked */ }
   ensureScrollbarStyle();
   syncThemeLabels();
 }
 
-/** Apply the saved theme (localStorage 'hotkey_theme') or Daylight, the unconditional default. */
+/** Apply the saved theme (localStorage 'hotkey_theme') or Workbook, the default. */
 export function loadTheme() {
   let saved = null;
   try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) { /* storage blocked */ }
@@ -231,7 +334,7 @@ export function loadTheme() {
   return current;
 }
 
-/** Persist a pick (the account sync the old nav.js did is auth logic and lives elsewhere). */
+/** Persist a pick (the account sync lives in app/store.js). */
 export function saveTheme(name) {
   try { localStorage.setItem(STORAGE_KEY, name); } catch (e) { /* storage blocked */ }
 }

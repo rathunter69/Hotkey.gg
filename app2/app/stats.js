@@ -23,6 +23,7 @@ export function gameCtx() {
     level: lvl.lvl, levelInfo: lvl,
     rank: store.rank(), rankIndex: 0,
     streakDays: practiceStreak([...new Set(days)], dayOf()),
+    days: [...new Set(days)],   // every day with a run or a lesson, for the rail's week cells (M88)
   };
 }
 

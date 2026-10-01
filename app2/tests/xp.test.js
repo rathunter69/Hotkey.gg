@@ -3,15 +3,17 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { levelOf, xpForEvent, totalXP, eventsFrom } from '../app/xp.js';
 
-test('levelOf follows the old curve: 150 / 300 / 450, then flat 600', () => {
-  assert.deepEqual(levelOf(0), { lvl: 1, into: 0, need: 150, pct: 0 });
-  assert.deepEqual(levelOf(149), { lvl: 1, into: 149, need: 150, pct: 99 });
-  assert.deepEqual(levelOf(150), { lvl: 2, into: 0, need: 300, pct: 0 });
-  assert.deepEqual(levelOf(450), { lvl: 3, into: 0, need: 450, pct: 0 });
-  assert.deepEqual(levelOf(900), { lvl: 4, into: 0, need: 600, pct: 0 });
-  assert.deepEqual(levelOf(1500), { lvl: 5, into: 0, need: 600, pct: 0 });
-  assert.equal(levelOf(1500 + 599).lvl, 5);
-  assert.equal(levelOf(1500 + 600).lvl, 6);
+test('levelOf follows the 6.10 curve: level n to n+1 costs 150n, capped at 30', () => {
+  assert.deepEqual(levelOf(0), { lvl: 1, into: 0, need: 150, pct: 0, next: 150 });
+  assert.deepEqual(levelOf(149), { lvl: 1, into: 149, need: 150, pct: 99, next: 150 });
+  assert.deepEqual(levelOf(150), { lvl: 2, into: 0, need: 300, pct: 0, next: 450 });
+  assert.deepEqual(levelOf(450), { lvl: 3, into: 0, need: 450, pct: 0, next: 900 });
+  assert.deepEqual(levelOf(900), { lvl: 4, into: 0, need: 600, pct: 0, next: 1500 });
+  assert.deepEqual(levelOf(1500), { lvl: 5, into: 0, need: 750, pct: 0, next: 2250 });
+  assert.equal(levelOf(1500 + 749).lvl, 5);
+  assert.equal(levelOf(2250).lvl, 6);
+  assert.equal(levelOf(6750).lvl, 10); assert.equal(levelOf(28500).lvl, 20); assert.equal(levelOf(65250).lvl, 30);
+  assert.equal(levelOf(1e9).lvl, 30, 'capped'); assert.equal(levelOf(1e9).pct, 100);
   assert.equal(levelOf(NaN).lvl, 1); assert.equal(levelOf(-50).lvl, 1);
 });
 

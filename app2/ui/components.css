@@ -1,0 +1,98 @@
+/* app2/ui/components.css — the components of the interface standard (screenplay 3.0; M88 so far):
+   the site frame with the rail at the left, the rail itself, the KeyTips letters and the cell
+   cursor. Tokens only (ui/tokens.css): no hex value, pixel size or duration appears here.
+   Loaded after the older stylesheets, so it wins where they disagree. */
+
+/* ---------- the site frame: the rail at the left (232px), the content to its right ---------- */
+body{padding-top:0}
+#navMount{position:fixed; left:0; top:0; bottom:0; width:var(--rail-w); z-index:50}
+body > .app{margin-left:var(--rail-w); max-width:none; padding:var(--content-top) var(--content-side) 0; width:auto}
+body > #footMount{margin-left:var(--rail-w)}
+#footMount .site-footer{margin-top:var(--s12)}
+/* the workspace, the first run and the landing page have no rail (3.0, The rail; the landing page has the top bar) */
+body[data-route="lesson"] #navMount, body[data-route="drill"] #navMount, body[data-route="rapid"] #navMount, body[data-route="due"] #navMount, body[data-route="start"] #navMount{display:none}
+body[data-route="lesson"] > .app, body[data-route="drill"] > .app, body[data-route="rapid"] > .app, body[data-route="due"] > .app, body[data-route="start"] > .app, body[data-route="landing"] > .app,
+body[data-route="lesson"] > #footMount, body[data-route="drill"] > #footMount, body[data-route="rapid"] > #footMount, body[data-route="due"] > #footMount, body[data-route="start"] > #footMount, body[data-route="landing"] > #footMount{margin-left:0}
+body[data-route="lesson"] > .app, body[data-route="drill"] > .app, body[data-route="rapid"] > .app, body[data-route="due"] > .app{padding-top:0}
+body[data-route="landing"] #navMount{position:static; width:auto; bottom:auto}
+
+/* ---------- the rail ---------- */
+.rail{display:flex; flex-direction:column; height:100%; background:var(--rail); color:var(--rail-text); font-family:var(--font); font-size:var(--fs-body); user-select:none}
+.rail a{color:inherit; text-decoration:none}
+.rail-top{display:flex; align-items:center; justify-content:space-between; padding:var(--s6) var(--s6) var(--s5)}
+.rail-mark{font-family:var(--mono); font-weight:var(--fw-bold); font-size:var(--fs-item); color:var(--rail-text)}
+.rail-mark b{color:var(--learn); font-weight:var(--fw-bold)}
+.rail-landing .rail-mark b{color:var(--learn)}
+.rail-menu{display:none; font:inherit; font-weight:var(--fw-semi); color:var(--rail-text); background:var(--rail-hi); border:0; border-radius:var(--r-btn); padding:var(--s2) var(--s3); cursor:pointer}
+.rail-nav{display:flex; flex-direction:column; gap:var(--s1); padding:0 var(--s4); flex:1 1 auto; min-height:0; overflow-y:auto}
+.rail-item{display:flex; align-items:center; gap:var(--s2); padding:var(--s3) var(--s3); border-radius:var(--r-btn); font-weight:var(--fw-semi); font-size:var(--fs-body); color:var(--rail-text); position:relative; transition:background var(--d-cursor)}
+.rail-item:hover{background:var(--rail-hi)}
+.rail-item.on{background:var(--rail-hi); color:var(--sheet)}
+.rail-item:focus-visible{outline:var(--cursor-w) solid var(--learn); outline-offset:0}
+.rail-word{flex:1 1 auto}
+.rail-children{display:flex; flex-direction:column; gap:var(--s1); padding-left:var(--s6)}
+.rail-mode{font-weight:var(--fw-body); color:var(--rail-sub); padding-top:var(--s2); padding-bottom:var(--s2)}
+.rail-mode.on{color:var(--sheet)}
+.rail-dot{display:inline-block; width:var(--mode-mark); height:var(--mode-mark); background:var(--mark); flex:none}
+/* the KeyTips letters: small green keys at the right of each item, shown on Alt */
+.kt{display:none; font-family:var(--mono); font-weight:var(--fw-key); font-size:var(--fs-min); line-height:1; color:var(--on-fill); background:var(--learn); border-radius:var(--r-btn); padding:var(--s1) var(--s2); margin-left:auto}
+body.keytips-on .kt{display:inline-block}
+.kt-page{position:absolute; right:var(--s2); top:var(--s2); margin:0; z-index:2}
+/* the foot: the level, the streak, the account row */
+.rail-foot{padding:var(--s4) var(--s4) var(--s5); border-top:1px solid var(--rail-hi); display:flex; flex-direction:column; gap:var(--s4)}
+.rail-row{display:flex; align-items:baseline; justify-content:space-between; gap:var(--s2)}
+.rail-level-word{font-weight:var(--fw-bold); color:var(--sheet)}
+.rail-sub-word{font-size:var(--fs-label); color:var(--rail-sub)}
+.rail-level .rail-sub-word{font-variant-numeric:tabular-nums}
+.rail-bar{height:var(--s1); background:var(--rail-hi); margin-top:var(--s2); overflow:hidden}
+.rail-bar i{display:block; height:100%; width:0; background:var(--learn); transition:width var(--d-goal)}
+.rail-pro{display:inline-block; margin-top:var(--s2); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--rail-sub)}
+.rail-pro:hover{color:var(--sheet)}
+.rail-streak .rail-row{align-items:center}
+.rail-week{display:inline-flex; gap:2px; flex:none}
+.rail-week i{display:inline-grid; place-items:center; width:var(--s4); height:var(--s4); font-style:normal; font-family:var(--mono); font-size:var(--fs-min); line-height:1; color:var(--rail-sub); background:var(--rail-hi)}
+.rail-week i.on{background:var(--learn); color:var(--on-fill)}
+.rail-week i.today{outline:1px solid var(--rail-text); outline-offset:-1px}
+.rail-acct{display:flex; align-items:center; gap:var(--s2); width:100%; font:inherit; font-size:var(--fs-name); font-weight:var(--fw-semi); color:var(--rail-text); background:transparent; border:0; border-radius:var(--r-btn); padding:var(--s2); cursor:pointer; text-align:left; position:relative}
+.rail-acct:hover, .rail-acct.open{background:var(--rail-hi)}
+.rail-acct:focus-visible{outline:var(--cursor-w) solid var(--learn)}
+.rail-avatar{display:inline-grid; place-items:center; width:var(--s8); height:var(--s8); border-radius:50%; background:var(--learn); color:var(--on-fill); font-family:var(--mono); font-size:var(--fs-min); font-weight:var(--fw-bold); flex:none}
+.rail-avatar.guest{background:var(--rail-hi); color:var(--rail-sub)}
+.rail-handle{flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.rail-acct-word{display:inline-flex; align-items:center; gap:var(--s2); font-size:var(--fs-label); font-weight:var(--fw-body); color:var(--rail-sub)}
+body.keytips-on .rail-acct-label{display:none}   /* the letter takes the word's place so the handle keeps its room */
+.rail-acct-items{display:flex; flex-direction:column; gap:var(--s1); padding:var(--s2) 0 0 var(--s2)}
+.rail-acct-items[hidden]{display:none}   /* closed until the account row opens it */
+.rail-acct-item{display:block; padding:var(--s2) var(--s3); border-radius:var(--r-btn); font-size:var(--fs-name); color:var(--rail-text)}
+.rail-acct-item:hover, .rail-acct-item:focus-visible{background:var(--rail-hi); outline:none; color:var(--sheet)}
+.rail-save{font-size:var(--fs-min); color:var(--rail-sub); padding:var(--s2) var(--s3) var(--s1)}
+.rail-acct-auth{color:var(--rail-sub)}
+/* the landing page's top bar in place of the rail */
+.rail-landing{flex-direction:row; align-items:center; justify-content:space-between; height:auto; background:var(--paper); color:var(--ink); padding:0 var(--content-side)}
+.rail-landing .rail-top{padding:var(--s4) 0}
+.rail-landing .rail-mark{color:var(--ink)}
+.rail-landing-items{display:flex; gap:var(--s2)}
+.rail-landing-item{padding:var(--s2) var(--s3); border-radius:var(--r-btn); font-weight:var(--fw-semi); color:var(--ink)}
+.rail-landing-item:hover{background:var(--chrome)}
+.rail-landing-item:last-child{background:var(--learn); color:var(--on-fill)}
+.rail-landing-item:last-child:hover{background:var(--learn-ink)}
+/* below 900px the rail folds into a top bar with a Menu button */
+@media (max-width:900px){
+  #navMount{position:static; width:auto; bottom:auto}
+  body > .app, body > #footMount{margin-left:0}
+  body > .app{padding:var(--s4) var(--s4) 0}
+  .rail{height:auto}
+  .rail-top{padding:var(--s3) var(--s4)}
+  .rail-menu{display:inline-block}
+  .rail-nav, .rail-foot{display:none}
+  .rail.open .rail-nav, .rail.open .rail-foot{display:flex}
+  .rail-nav{padding-bottom:var(--s3)}
+}
+
+/* ---------- the cell cursor: the focus mark on site pages ---------- */
+[data-cursor]{position:relative; outline:none}
+.cursor-on{outline:var(--cursor-w) solid var(--mode); outline-offset:calc(-1 * var(--cursor-w)); transition:outline-color var(--d-cursor)}
+.cursor-on::after{content:''; position:absolute; right:calc(-1 * var(--cursor-w)); bottom:calc(-1 * var(--cursor-w)); width:var(--cursor-handle); height:var(--cursor-handle); background:var(--mode); border:1px solid var(--sheet); box-sizing:content-box; pointer-events:none}
+tr.cursor-on{outline-offset:0}
+tr.cursor-on > td:first-child, tr.cursor-on > th:first-child{box-shadow:inset var(--cursor-w) 0 0 var(--mode)}
+@media (prefers-reduced-motion: reduce){ .cursor-on, .rail-item, .rail-bar i{transition:none} }

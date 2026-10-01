@@ -142,8 +142,8 @@ test('parseRoute: every documented route, with params and query', () => {
 });
 
 test('navKeyFor and titleFor', () => {
-  assert.equal(navKeyFor('root'), ''); assert.equal(navKeyFor('landing'), ''); assert.equal(navKeyFor('lesson'), 'learn'); assert.equal(navKeyFor('start'), ''); assert.equal(navKeyFor('learn'), 'learn');
-  assert.equal(navKeyFor('drill'), 'practice'); assert.equal(navKeyFor('leaderboard'), 'leaderboard'); assert.equal(navKeyFor('reference'), 'reference');
+  assert.equal(navKeyFor('root'), 'home'); assert.equal(navKeyFor('landing'), ''); assert.equal(navKeyFor('lesson'), 'learn'); assert.equal(navKeyFor('start'), ''); assert.equal(navKeyFor('learn'), 'learn');
+  assert.equal(navKeyFor('drill'), 'practice'); assert.equal(navKeyFor('drill', { daily: true }), 'daily'); assert.equal(navKeyFor('practice', { mode: 'rapid' }), 'rapid'); assert.equal(navKeyFor('practice', { mode: 'drills' }), 'practice'); assert.equal(navKeyFor('leaderboard'), 'leaderboard'); assert.equal(navKeyFor('reference'), 'reference');
   assert.equal(navKeyFor('pricing'), '');
   assert.equal(titleFor('learn'), 'Learn · hotkey.gg');
   assert.equal(titleFor('lesson', 'The active cell'), 'The active cell · hotkey.gg');
@@ -192,8 +192,8 @@ test('teams: the group-access request validates every field', () => {
 
 test('the footer and account menu carry the spec lists', () => {
   assert.deepEqual(FOOTER_LINKS.map(l => l.label), ['Pricing', 'Teams', 'About', 'Terms', 'Privacy', 'Contact']);
-  assert.deepEqual(ACCOUNT_ITEMS.filter(i => !i.divider).map(i => i.label), ['Sign in', 'Desks', 'Stats', 'Profile', 'Settings']);
-  assert.ok(ACCOUNT_ITEMS.filter(i => !i.divider).every(i => i.href.startsWith('#/account')));
+  assert.deepEqual(ACCOUNT_ITEMS.map(i => i.key), ['profile', 'settings', 'billing', 'certificate'], '3.0: the account row opens Profile, Settings, Plan and billing, Your certificate');
+  assert.ok(ACCOUNT_ITEMS.every(i => i.href.startsWith('#/account')));
 });
 
 /* ---------------- legal pages ---------------- */

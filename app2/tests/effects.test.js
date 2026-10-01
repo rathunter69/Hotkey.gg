@@ -125,12 +125,12 @@ test('effects: achievements queue while busy and none is lost when a run starts 
   fx.destroy();
 }));
 
-test('reward colours: rarities and tiers are theme tokens, --ink and the tokens are defined at :root', () => {
+test('reward colours: rarities and tiers are theme tokens, --ink and the tokens are defined at :root in tokens.css', () => {
   for (const [k, v] of Object.entries(RARITY_COLOURS)) assert.match(v, /^var\(--rar-/, k);
   const svg = renderPixel(GLYPHS.star);
   assert.ok(svg.includes('var(--ink'), 'outline follows --ink');
-  const css = readFileSync(new URL('../ui/app.css', import.meta.url), 'utf8');
-  const root = css.slice(css.indexOf(':root{'), css.indexOf('}', css.indexOf(':root{')));
+  const css = readFileSync(new URL('../ui/tokens.css', import.meta.url), 'utf8');   // M87: every token lives in tokens.css
+  const root = css.slice(css.indexOf(':root{'), css.indexOf('\n}\n', css.indexOf(':root{')));
   for (const t of ['--ink', '--tier-pass', '--tier-pro', '--tier-legendary', '--rar-common', '--rar-rare', '--rar-epic', '--rar-legendary']) assert.ok(root.includes(t + ':'), t);
   const site = readFileSync(new URL('../ui/site.css', import.meta.url), 'utf8');
   assert.ok(!/#4a9eda|#a06bd6|#e0913f/i.test(site), 'no fixed reward hues left in site.css');
