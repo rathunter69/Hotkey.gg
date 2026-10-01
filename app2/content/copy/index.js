@@ -128,10 +128,10 @@ export const COPY = {
    "module": "enter-edit-copy-fill",
    "order": "1.3.1",
    "title": "Enter the missing day",
-   "brief": "Airport’s Saturday never came through on the platform feed, and management has emailed the four figures. Enter the day, put 0 into the five blank energy costs in one press, and clear a stray note — the site totals answer the moment the day lands. A row of figures goes in without touching the arrow keys: the key is `Tab`.",
-   "closing": "The emailed day is on the feed, and the Airport total moved the moment it landed. Read what Excel tells you (F5): Go To Special lights up the five blanks before you commit, and a total that answers says the entry is in.",
-   "wow": "",
-   "convention_line": "The count, the proposal, the error code",
+   "brief": "Airport’s Saturday never came through on the feed, and the manager has emailed the four figures. Enter commits and stays on the cell, Tab commits and moves right, and Ctrl+Enter puts one entry into every selected cell at once. Enter the day, zero the blank wash costs in one press, label two things on Inputs. The key is `Tab`.",
+   "closing": "Enter commits and stays, arrows move, Tab runs a row, Ctrl+Enter fills a selection, Esc backs out, Alt+Enter breaks a line. That’s every way a figure or a label gets into a sheet, and the site total answering the moment the day landed is the point of a live sheet. || Best practice: when a figure arrives by email, the source goes next to it, who sent it and when, so the next person doesn’t have to ask.",
+   "wow": "Four figures went in as one Tab run, and the total moved the moment the last one landed.",
+   "convention_line": "Read what Excel tells you; units stated once; document every hardcode",
    "mac_note": "",
    "story_beat": ""
   },
@@ -140,10 +140,10 @@ export const COPY = {
    "module": "enter-edit-copy-fill",
    "order": "1.3.2",
    "title": "Fix it in place",
-   "brief": "The feed is complete but not clean: two site names are misspelled, one kWh figure was typed as text, and E41 shows 81500 for a single day's revenue. Find each cell, open it and change only what is wrong — a reviewer trusts the person who reads a cell before retyping it. The key is `F2`.",
-   "closing": "Every fix went in place: F2 opened the cell, the insertion point moved, only the wrong characters changed — and the site totals beside the feed answered without being asked. || Read what Excel shows you: a figure on the left is text, and a revenue far above its neighbors is a typo, not a record day.",
-   "wow": "",
-   "convention_line": "Build references by pointing; F2 to read back · The count, the proposal, the error code",
+   "brief": "The feed is complete but not clean: two site names are misspelled, one wash count was typed as text, and one day’s revenue is ten times its neighbors. Analysts find these by flicking through cells (arrow to a cell, F2 to see exactly what is in it, Esc to leave it untouched) and fix them in place with F2, Home, End and the arrows, changing only what is wrong. Ctrl+Z undoes a change and Ctrl+Y puts it back; F4 repeats a fix on the next cell. The key is `F2`.",
+   "closing": "F2 to look, Esc to leave, F2 again to fix: that flick down a column is how a reviewer reads a sheet, and it is faster than any search because you see everything, not just what you searched for. || Read what Excel shows you: a figure sitting on the left is text, not a number, and a revenue ten times its neighbors is a typo, not a record day.",
+   "wow": "Four fixes without retyping a cell, and the totals answered on their own.",
+   "convention_line": "Point, don’t type: F2 to read back; read what Excel tells you",
    "mac_note": "",
    "story_beat": ""
   },
@@ -152,10 +152,10 @@ export const COPY = {
    "module": "enter-edit-copy-fill",
    "order": "1.3.3",
    "title": "Copy, cut, paste, fill",
-   "brief": "Report is still blank and the associate wants its skeleton before the figures arrive: title, units, headers, the site list and the week label, plus the feed’s Notes block moved beside the feed. Nothing is typed twice — the headers already sit on Raw, the sites on Inputs, and one label fills five rows and six columns. The key is `Ctrl+C`.",
-   "closing": "The Report has its shape, and nothing on it was typed twice: the headers came from Raw, the sites from Inputs, and one week label went down five rows and across six columns from a single copy — fill, don’t retype (E3). || The Notes block now sits beside the feed where a reader finds it, and the feed’s block ends where the data ends.",
-   "wow": "",
-   "convention_line": "Ctrl+D down, Ctrl+R across · Inputs, calcs, outputs — in that order",
+   "brief": "Report is still blank and the CFO wants its skeleton before the figures arrive: title, units, headers, the site list and the week label, plus the feed’s Notes block moved beside the feed. Nothing gets typed twice: the headers already sit on Raw, the sites on Inputs, and one label fills five rows and six columns. Ctrl+C copies (the original stays), Ctrl+X cuts (the original moves), Ctrl+V pastes; Ctrl+D fills a selection down from its top row and Ctrl+R fills it right from its left column. The key is `Ctrl+C`.",
+   "closing": "The headers came from Raw, the sites from Inputs, and one week label went down five rows and across six columns from a single copy, which is the habit: fill it, never retype it. Copy leaves the original where it was, and cut takes it with you. || The Notes block now sits beside the feed, where a reader opening the file will find it. The feed itself now ends where the data ends.",
+   "wow": "The Report has its shape, and nothing on it was typed twice.",
+   "convention_line": "Fill, don’t retype: Ctrl+D down, Ctrl+R across",
    "mac_note": "",
    "story_beat": ""
   },
@@ -163,11 +163,11 @@ export const COPY = {
    "id": "paste-special-values",
    "module": "enter-edit-copy-fill",
    "order": "1.3.4",
-   "title": "Paste Special: values, formats, transpose",
-   "brief": "The Report needs this week’s site totals and last week’s revenue beside them — as numbers that stay put once the page is sent, not links that move with the feed. Paste Special brings one aspect of what you copied: values only, formats only, or a block turned on its side, so the snapshot is taken on purpose. The key is `Ctrl+Alt+V`.",
-   "closing": "The Report now carries this week’s and last week’s site figures as a snapshot: the feed can move, the page will not — Paste Special on purpose (E4). || The total row went in plain, and its SUM followed the paste to C5:C9; the site list stands across the sensitivity table without a name retyped.",
-   "wow": "",
-   "convention_line": "Values to snapshot, never over live formulas",
+   "title": "Paste Special: values, formats, math",
+   "brief": "The Report needs this week’s site totals and last week’s revenue beside them, as numbers that stay put once the page is sent, not links that move with the feed. Paste Special brings one part of what you copied (values only, formats only, a block turned on its side) or does arithmetic on the cells you paste over: copy a −1 and Multiply flips a block’s sign; copy 1000 and Divide turns dollars into thousands. Every desk lives in this dialog. Ctrl+Alt+V opens it, and Alt, E, S, V is the old route people still say out loud. The key is `Ctrl+Alt+V`.",
+   "closing": "Paste values for a snapshot, paste formats to dress a row, transpose to turn a list on its side, and Multiply or Divide to fix a block’s sign or units where it sits. None of it needs a formula or a retyped figure. || The total row went in plain and its SUM followed the paste to C5:C9; the site list stands across the sensitivity table without a name retyped.",
+   "wow": "You copied the numbers, not the links, and flipped a whole block’s sign without writing a formula.",
+   "convention_line": "Paste Special on purpose: values to snapshot, never over live formulas",
    "mac_note": "",
    "story_beat": ""
   },
@@ -175,11 +175,11 @@ export const COPY = {
    "id": "find-replace-timeline",
    "module": "enter-edit-copy-fill",
    "order": "1.3.5",
-   "title": "Find, replace, fill a timeline",
-   "brief": "Last week’s label, w/c 08 Sep (week commencing), still sits in twelve cells across the Report and Inputs, one Airport row on the feed is spelled Airprot, and the daily table has no day header. Replace the label on the Report and on Inputs, reading the count each time, find and fix the typo, then let Fill Series write Mon–Sat and the dates. The key is `Ctrl+H`.",
-   "closing": "The stale week label is gone from both sheets in two Replace Alls, and Excel reported how many cells it touched each time — read what it tells you (F5). || The daily table now carries one timeline row: Mon to Sat with the dates under them, written as a series rather than typed six times (C2).",
-   "wow": "",
-   "convention_line": "The count, the proposal, the error code · Timeline on top, equal widths",
+   "title": "Names, notes and the small keys",
+   "brief": "A handful of small keys separate people who work in Excel from people who fight it. Replace All swaps every match on the active sheet in one press and tells you how many it touched, so read that number every time. A named cell can be jumped to and referenced by name; a note (Shift+F2) carries a source where it cannot be lost; Ctrl+; types today’s date; Ctrl+Backspace snaps the view back to the cell you are on; Fill Series writes a week from one day. None of these is a lesson on its own, and you will use all of them by Friday. The key is `Ctrl+H`.",
+   "closing": "Replace All only touches the active sheet, so it took one pass on the Report and one on Inputs, and Excel told you the count each time: eleven, then one. || The cost per wash now has a name and a note, and the daily table carries a timeline: Mon to Sat with the dates under them, written as a series instead of typed six times.",
+   "wow": "Twelve stale labels went in two presses, the cost per wash has a name and a source, and the week wrote itself.",
+   "convention_line": "Read the count; one timeline row; document every hardcode",
    "mac_note": "",
    "story_beat": ""
   },
@@ -188,8 +188,8 @@ export const COPY = {
    "module": "enter-edit-copy-fill",
    "order": "1.3.C",
    "title": "Challenge: complete the feed",
-   "brief": "A fresh cut of the Austin feed came in with a day missing, a text figure and typos: complete it, clean it, then start the Summary tab with a snapshot and the week’s timeline.",
-   "closing": "",
+   "brief": "A fresh cut of the Austin feed came in with a day missing, a text figure and typos. Complete it, clean it, then start a Summary tab with a snapshot and the week’s timeline, all on the clock.",
+   "closing": "You entered the missing day, fixed two names and a text figure, pasted a snapshot as values and filled a timeline: the whole of module 1.3 in one run. || The feed is now the shape the CFO expects every Monday.",
    "wow": "",
    "convention_line": "Values to snapshot, never over live formulas",
    "mac_note": "",
@@ -200,10 +200,10 @@ export const COPY = {
    "module": "structure",
    "order": "1.4.1",
    "title": "Rows and columns that keep the totals honest",
-   "brief": "Cedar Park opened this week and needs a row inside the Report block, the old platform’s Old code column has to go, and a Margin % column is coming. Insert and delete whole rows and columns and watch the total row follow every edit — then see what happens to a SUM when the column it reads is deleted. The key is `Ctrl+Shift+=`.",
-   "closing": "Cedar Park’s row went in inside the block, the Old code column came out and Margin % went in, and the total row followed every edit without a formula retyped — a total that follows its rows is the first check (F1). || Deleting the column a SUM reads turned it to #REF!: that is a message, not damage — read it (F5) — and Ctrl+Z put the feed and its totals back.",
-   "wow": "",
-   "convention_line": "The check is a live difference → 0 · Write once, fill right · The count, the proposal, the error code",
+   "brief": "You inserted and deleted in 1.2.3 on a sheet with no formulas. The Report has a Total row now, and this is what matters: a SUM whose range straddles an inserted row grows to take the new row in, and a SUM whose column you delete turns to #REF!, a message, not damage, and Ctrl+Z puts it back. Cedar Park needs a row inside the block, the old Old code column has to go, and a Margin % column is coming. Watch the total after every edit. The key is `Ctrl+Shift+=`.",
+   "closing": "A total that follows its rows is the first check on any page: insert inside the block and the SUM grows, delete a column it reads and it says #REF! instead of lying. Read the error, press Ctrl+Z, and it is back. || Margin % is in and sitting empty for now. It fills in module 1.6, once the page goes live.",
+   "wow": "The total followed every edit (a new site, a new column, a deleted one) without a formula retyped.",
+   "convention_line": "The total follows its rows; write once, fill right; read the error code",
    "mac_note": "",
    "story_beat": ""
   },
@@ -211,11 +211,11 @@ export const COPY = {
    "id": "widths-heights-autofit",
    "module": "structure",
    "order": "1.4.2",
-   "title": "Widths, heights, AutoFit",
-   "brief": "The Report’s columns are still Excel’s defaults: South Lamar is cut off at the default width, the header row is clipped, and every column sits at 8.43 characters wide. Set the day columns to one width and the comparison columns to another, fit the label column to its site names, size the title row, and wrap the headers so nothing is clipped. The key is `Alt H O W`.",
-   "closing": "The Report’s columns now read as a page: the six day columns share one width, the comparison columns another, the label column fits its longest site name, and nothing in the header row is clipped — equal period columns (C2). || AutoFit fits whatever happens to sit in a column — one stray label lower down in E breaks the equal period columns — so set period columns by hand, and let AutoFit size the labels and the wrapped rows.",
-   "wow": "",
-   "convention_line": "Timeline on top, equal widths",
+   "title": "The page’s columns",
+   "brief": "The Report’s columns are still Excel’s defaults: South Lamar is cut off, the headers are clipped, and every column is 8.43 characters wide. A page reads when its period columns share one width, its comparison columns another, its label column fits the longest name, and its headers wrap instead of spilling. Widths and AutoFit you know from 1.2.3; the new idea is which columns get set by hand and which get AutoFit. The key is `Alt H O W`.",
+   "closing": "Period columns are set by hand to one width, because AutoFit fits whatever happens to be in a column, and one stray label lower down leaves the days ragged. Label columns and wrapped header rows get AutoFit, because that is what it is for. || Top-bucket tip: keep column A narrow as a margin and put the labels in B. Then make every period column the same width to the character, because reviewers notice.",
+   "wow": "The days share one width, the labels fit and the headers wrap. It reads like a page now.",
+   "convention_line": "One timeline row, equal period columns",
    "mac_note": "",
    "story_beat": ""
   },
@@ -224,10 +224,10 @@ export const COPY = {
    "module": "structure",
    "order": "1.4.3",
    "title": "Hide, group, freeze",
-   "brief": "The Report’s Energy cost and Gross profit columns are workings the reader does not need, and a buyer’s analyst who finds a hidden column will wonder what else is hidden. Hide them the way most people do, then unhide them and group them instead, and freeze the heads so the page scrolls without losing them. The key is `Alt+Shift+→`.",
-   "closing": "The two working columns are grouped, not hidden: a hidden column vanishes and gets forgotten, a grouped one shows its button and folds away when the reader wants the page clean (C7). || The title, units, header row and site labels are frozen at B5, so the Report scrolls without losing its heads (C8) — and Cedar Park’s kWh still moves the Total.",
-   "wow": "",
-   "convention_line": "Hidden columns get forgotten · Keep the timeline and labels in view",
+   "brief": "The Report’s Wash cost and Gross profit columns are workings the reader does not need, and a buyer’s analyst who finds a hidden column will wonder what else is hidden. Hide them the way most people do, then unhide them and group them instead, because a grouped column shows a button and folds away while a hidden one disappears. Then freeze the heads so the page scrolls without losing them. The key is `Alt+Shift+→`.",
+   "closing": "A hidden column gets forgotten; a grouped one shows its button and folds away when the reader wants the page clean. Freeze panes at the first figure cell and the title, units, header row and site labels stay in view however far you scroll. || One more from the desk: Ctrl+Shift+0, the unhide-columns key, is blocked on most Windows machines by a keyboard-layout shortcut, so the reliable route is Alt, H, O, U, L. Now you know why nobody’s Ctrl+Shift+0 works.",
+   "wow": "The workings are grouped, not hidden, and the heads stay put when the page scrolls.",
+   "convention_line": "Group, don’t hide; freeze panes on long sheets",
    "mac_note": "",
    "story_beat": ""
   },
@@ -236,10 +236,10 @@ export const COPY = {
    "module": "structure",
    "order": "1.4.C",
    "title": "Challenge: reshape the report",
-   "brief": "A sister cluster’s KPI report arrived with a site missing, a stale column, uneven widths, a hidden column and nothing frozen: reshape it to house standard, and the totals must still tie.",
-   "closing": "",
+   "brief": "The San Antonio cluster’s report arrived with a site missing, a stale column, uneven widths, a hidden column and nothing frozen. Reshape it so it reads like a page, with the totals still tying, and do it on the clock.",
+   "closing": "You put a row inside the block, deleted a dead column, evened the widths, found the hidden column and grouped it instead, and froze the heads. And the total followed every edit. || That’s what reshaping a page means on a desk, and it’s the same six moves on every page you’ll ever inherit.",
    "wow": "",
-   "convention_line": "The check is a live difference → 0 · Timeline on top, equal widths · Hidden columns get forgotten · Keep the timeline and labels in view",
+   "convention_line": "Equal period columns; group, don’t hide; keep the heads in view",
    "mac_note": "",
    "story_beat": ""
   },
@@ -1112,171 +1112,187 @@ export const COPY = {
     "text": "Airport’s Saturday never came through: jump to the first blank cell of its row, Raw!C61.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C61 on Raw · Ctrl+PgDn to Raw, Ctrl+↓ to the last row, Ctrl+→, then → once: C61."
    },
    {
     "lesson_id": "enter-the-missing-day",
     "goal_index": "1",
-    "text": "Management emailed the day: enter 2,500 kWh in C61 and the price $0.48 in D61, moving right with Tab.",
-    "teach": "Tab commits the entry and steps one cell right, and Excel remembers where the run began — that is where Enter will return you.",
+    "text": "Enter 250 washes in C61 and press Enter: the cell stays selected, so read it back, then → to D61.",
+    "teach": "Enter commits; with \"move selection\" off the cursor stays put, which is how you check a figure before you leave it.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C61 · 250, Enter: you are still on C61; then → once."
    },
    {
     "lesson_id": "enter-the-missing-day",
     "goal_index": "2",
-    "text": "Finish the row with the revenue $1,200.00 in E61 and the energy cost $325.00 in F61, then Enter to land in C62.",
-    "teach": "Enter after a Tab run commits and drops to the column the run started in, one row down — where the next record begins.",
+    "text": "The rest of the row as a Tab run: 14 in D61, Tab, 3500 in E61, Tab, 375 in F61, Enter.",
+    "teach": "Tab commits and steps one cell right, so a row of figures goes in without an arrow key.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell D61 · 14, Tab, 3500, Tab, 375, Enter."
    },
    {
     "lesson_id": "enter-the-missing-day",
     "goal_index": "3",
-    "text": "Start retyping the site name over B61, then look again — Airport is right, so discard the entry and keep it.",
-    "teach": "Esc throws away an entry you have started: the cell keeps what it had, and nothing is committed.",
+    "text": "Type Airp over B61, AutoComplete offers Airport after three letters, and since it is already right, throw the entry away with Esc.",
+    "teach": "AutoComplete proposes an entry from the same column once you have typed enough letters; Esc discards what you started and the cell keeps what it had.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B61 · Home, → to B61, type Airp, watch the proposal, then Esc: the name is unchanged."
    },
    {
     "lesson_id": "enter-the-missing-day",
     "goal_index": "4",
-    "text": "Five Energy cost cells in column F are blank: select the feed from the top, pick out the blanks with Go To Special and count them.",
+    "text": "Five wash-cost cells in column F are blank: select the feed from the top, pick out the blanks with Go To Special and count them.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the Go To Special dialog · Ctrl+Home, Ctrl+A on the feed first; Alt, H, F, D, S; K is Blanks."
    },
    {
     "lesson_id": "enter-the-missing-day",
     "goal_index": "5",
-    "text": "Type 0 once and commit it into all five blank cells of the Energy cost column at the same time.",
-    "teach": "Ctrl+Enter commits one entry into every selected cell at once — five blanks, one press.",
+    "text": "Type 0 once and commit it into all five blank cells of the Wash cost column at the same time.",
+    "teach": "Ctrl+Enter commits one entry into every selected cell at once, so five blanks take one press.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the column F blanks · With the five cells still selected, type 0 and press Ctrl+Enter, not Enter."
    },
    {
     "lesson_id": "enter-the-missing-day",
     "goal_index": "6",
-    "text": "A stray “draft” note sits in H3, above the site totals block: clear it.",
-    "teach": "Delete clears what the cell holds and leaves its formatting behind — the italic stays for whatever is typed there next.",
+    "text": "Clear the stray \"draft\" in H3, then a two-line note in H4: Airport Sat missing, Alt+Enter, emailed manager 9/15.",
+    "teach": "Delete clears what a cell holds and leaves its format and any note behind.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell H3 · Land on H3 and press Delete; ↓ to H4, type the first line, Alt+Enter, the second line, then Enter."
    },
    {
     "lesson_id": "enter-the-missing-day",
     "goal_index": "7",
-    "text": "Does it tie? Watch Airport’s Saturday kWh in C61 change to 3,000 and the Airport line of the site totals, I12, answer.",
+    "text": "Two labels on Inputs: USD unless stated into A2, and per supplier quote into C4, beside the cost per wash.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell A2 on Inputs · Ctrl+PgDn to Inputs; A2, capital USD, Enter; then C4, three words, lowercase, Enter."
+   },
+   {
+    "lesson_id": "enter-the-missing-day",
+    "goal_index": "8",
+    "text": "Does it tie? Change Airport’s Saturday washes in C61 to 300 and watch the Airport line of the site totals, I12, answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell I12 · Back to Raw!C61, type 300, Enter; watch I12 change."
    }
   ],
   "fix-it-in-place": [
    {
     "lesson_id": "fix-it-in-place",
     "goal_index": "0",
-    "text": "Mueller is misspelled somewhere in the 60-row feed: move to Raw and find Muller.",
-    "teach": "Ctrl+F opens Find: type part of what you want, Enter jumps to the next cell containing it, Esc closes the card.",
+    "text": "Move to Raw and flick down the Site column from B10: ↓, F2, Esc, until you find Muller in B14.",
+    "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B14 · Ctrl+PgDn to Raw, land on B10, then ↓ F2 Esc, four times."
    },
    {
     "lesson_id": "fix-it-in-place",
     "goal_index": "1",
     "text": "Open B14 with F2, move the insertion point to just after Mu, and insert the e so it reads Mueller.",
-    "teach": "In Edit mode, Home and End send the insertion point to either end of the entry and ← → step it one character; typing inserts there.",
+    "teach": "In Edit mode, Home and End send the insertion point to either end of the entry and ← → step it one character; typing inserts where the caret is, and Enter keeps the change.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B14 · F2, Home, → twice, type e, Enter."
    },
    {
     "lesson_id": "fix-it-in-place",
     "goal_index": "2",
-    "text": "Riverside lost its e in one row: find Riversid, Find Next past the first hit (a correct Riverside), and add the e.",
+    "text": "Keep flicking: Riverside lost its e in one row further down, B27, so read each before you edit it, then add the e.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B27 · PgDn, then ↓ three times to B27; F2 puts the caret at the end; type e, Enter."
    },
    {
     "lesson_id": "fix-it-in-place",
     "goal_index": "3",
-    "text": "C33 shows 1,240 on the left — text with a trailing space: find it, open it, delete the space and commit it as a number.",
-    "teach": "A figure sitting on the left is text, not a number; Backspace deletes the character before the insertion point, so the trailing space goes and 1,240 snaps right.",
+    "text": "C33 shows 240 sitting on the left, which means text with a trailing space: open it, delete the space and commit it as a number.",
+    "teach": "A figure sitting on the left is text, not a number, and a total that reads it will skip it. Backspace deletes the character before the insertion point, so the trailing space goes and 240 snaps to the right.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C33 · → once and ↓ six times to C33; F2 puts the caret at the end; one Backspace removes the space; Enter."
    },
    {
     "lesson_id": "fix-it-in-place",
     "goal_index": "4",
-    "text": "E41 reads 81500 for one day of South Lamar revenue when kWh × price says 1075: find it and type 1075 over it.",
-    "teach": "Typing on a cell replaces its whole contents — no F2 when nothing in the old entry is worth keeping.",
+    "text": "E41 reads 81500 for one day of South Lamar revenue when washes times ticket says 3,150: type 3150 over it.",
+    "teach": "Typing on a cell replaces its whole entry: no F2 when nothing in the old entry is worth keeping. Sanity-check the magnitude; one site does not do $81,500 in a day.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell E41 · Land on E41, type 3150, Enter."
    },
    {
     "lesson_id": "fix-it-in-place",
     "goal_index": "5",
-    "text": "The associate asks what was there before: Ctrl+Z, and E41 shows 81500 again.",
-    "teach": "Ctrl+Z undoes the last change and Ctrl+Y puts it back, so a fix can be tried, read and kept.",
+    "text": "The CFO asks what was there before: Ctrl+Z, read 81500, then Ctrl+Y to put the fix back.",
+    "teach": "Ctrl+Z undoes the last change and Ctrl+Y puts it back, dozens of steps deep, so a fix can be tried, read and kept, or shown to someone who asks.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell E41 · One Ctrl+Z, read it, one Ctrl+Y."
    },
    {
     "lesson_id": "fix-it-in-place",
     "goal_index": "6",
-    "text": "The figure was wrong after all: Ctrl+Y puts 1075 back in E41.",
-    "teach": "",
+    "text": "One typo you cannot see from here, Airprot somewhere in sixty rows: Ctrl+F finds it, then type Airport over it.",
+    "teach": "Ctrl+F is for when you know the text but not the cell: type part of it, Enter jumps to the next match, Esc closes the box and leaves you there.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the Find box · Ctrl+F, Airprot, Enter, Esc, then type Airport, Enter."
    },
    {
     "lesson_id": "fix-it-in-place",
     "goal_index": "7",
-    "text": "Does it tie? Watch C33, a Riverside kWh figure, change to 2,000 and Riverside’s kWh total in I10 answer.",
+    "text": "Whoever flagged the errors filled E41, C33 and B14 yellow: clear the fill on E41 with Alt, H, H, N, then F4 on C33 and F4 on B14.",
+    "teach": "F4 repeats your last action on the cell you are on now: a format, a border, a width, an insert. Fix it once, F4 the rest. It does not repeat typing; for that there is Ctrl+Enter.",
+    "why": "",
+    "hint_stuck": "pulse cell E41 · Ctrl+F 3150 lands on E41; Alt, H, H, N clears a fill; then F4 on each of the other two."
+   },
+   {
+    "lesson_id": "fix-it-in-place",
+    "goal_index": "8",
+    "text": "Does it tie? Change C33, a Riverside wash count, to 260 and watch Riverside’s total in I10 answer.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell I10 · Type 260 over C33, Enter; I10 moves."
    }
   ],
   "copy-cut-paste-fill": [
    {
     "lesson_id": "copy-cut-paste-fill",
     "goal_index": "0",
-    "text": "Title the page: “Voltline - Austin Weekly KPI Report, w/c 15 Sep 2026” in A1, “USD unless stated” in A2, then Site and Week in A4:B4.",
+    "text": "Title the page: type “Clearcoat - Austin Weekly KPI Report, Week of Sep 15, 2026” in A1, USD unless stated in A2, Site and Week in A4:B4.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell A1 on Report · A1, Enter, ↓; A2, Enter; then A4, Tab, B4, Enter."
    },
    {
     "lesson_id": "copy-cut-paste-fill",
     "goal_index": "1",
     "text": "The feed’s totals block already carries the figure headers: copy Raw!I7:K7 and paste them onto C4:E4, then drop the marquee.",
-    "teach": "Ctrl+C copies and Ctrl+X cuts the selection; Ctrl+V pastes it at the cursor, formats included; Esc drops the marquee, the moving border around what you copied.",
+    "teach": "Ctrl+C copies the selection and leaves it where it was, Ctrl+X cuts it so the original goes blank when you paste; Ctrl+V pastes at the cursor, formats included; Esc drops the marquee, the moving border around what you copied. Copy the header row, do not retype it: retyping is where typos come from.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cells I7:K7 on Raw · Ctrl+G, Raw!I7, Enter; Shift+→ twice; Ctrl+C; Ctrl+PgUp to Report, C4, Ctrl+V, Esc."
    },
    {
     "lesson_id": "copy-cut-paste-fill",
     "goal_index": "2",
-    "text": "The site list lives on Inputs: copy Inputs!A9:A13 and drop it under Site at A5 with Enter.",
-    "teach": "After a copy, Enter pastes once and drops the marquee in the same press — the paste for a single destination.",
+    "text": "The site list lives on Inputs: copy Inputs!A18:A22 and drop it under Site at A5 with Enter.",
+    "teach": "After a copy, Enter pastes once and drops the marquee in the same press: the paste for a single destination. Five site names, one press.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cells A18:A22 on Inputs · Select A18:A22 on Inputs, Ctrl+C; on Report land on A5 and press Enter."
    },
    {
     "lesson_id": "copy-cut-paste-fill",
     "goal_index": "3",
     "text": "Copy the reporting week from Inputs!B3 onto B5, then fill it down the five site rows B5:B9 with Ctrl+D.",
-    "teach": "Ctrl+D fills the selection from its top row and Ctrl+R from its left column — one entry, filled, never retyped.",
+    "teach": "Ctrl+D fills the selection from its top row and Ctrl+R from its left column: one entry, filled, never retyped. Select from the cell that holds the value down through the cells that should.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cells B5:B9 · Copy Inputs!B3; paste it in B5 with Enter; select B5:B9 with Shift+↓; Ctrl+D."
    },
    {
     "lesson_id": "copy-cut-paste-fill",
     "goal_index": "4",
-    "text": "Label the daily block below the table: kWh sold by day in A12, then Week, Day and Date in A13:A15.",
+    "text": "Label the daily block below the table: Washes by day in A12, then Week, Day and Date in A13:A15.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell A12 · A12, Enter, ↓, and so on."
    },
    {
     "lesson_id": "copy-cut-paste-fill",
@@ -1284,7 +1300,7 @@ export const COPY = {
     "text": "The daily block needs the same five sites: copy A5:A9 and drop them at A16 with Enter.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cells A5:A9 · Select A5:A9, Ctrl+C, land on A16, Enter."
    },
    {
     "lesson_id": "copy-cut-paste-fill",
@@ -1292,162 +1308,178 @@ export const COPY = {
     "text": "The daily block’s Week row takes the same label: copy it from B9 to B13, then fill it right across B13:G13 with Ctrl+R.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cells B13:G13 · Copy B9, paste on B13 with Enter; select B13:G13 with Shift+→; Ctrl+R."
    },
    {
     "lesson_id": "copy-cut-paste-fill",
     "goal_index": "7",
-    "text": "The Notes block sits under the feed where nobody reads it: cut Raw!A64:A67 and paste it beside the feed at H1.",
+    "text": "The Notes block sits under the feed where nobody reads it: cut Raw!A64:A68 and paste it beside the feed at J1.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cells A64:A68 on Raw · Select A64:A68 on Raw, Ctrl+X, land on J1, Ctrl+V."
    },
    {
     "lesson_id": "copy-cut-paste-fill",
     "goal_index": "8",
-    "text": "Does it tie? Watch Domain’s Monday kWh in Raw!C8 change to 3,000 and Domain’s kWh total in I8 answer.",
+    "text": "Does it tie? Change Domain’s Monday washes in Raw!C8 to 300 and watch Domain’s total in I8 answer.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell I8 on Raw · Type 300 over Raw!C8, Enter; I8 moves."
    }
   ],
   "paste-special-values": [
    {
     "lesson_id": "paste-special-values",
     "goal_index": "0",
-    "text": "Two more figure columns are coming: type Gross profit ($) in F4 and Avg price ($/kWh) in G4 as one Tab run.",
+    "text": "Two more figure columns are coming: type Gross profit ($) in F4 and Avg ticket ($/wash) in G4 as one Tab run.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell F4 · F4, type, Tab, type, Enter."
    },
    {
     "lesson_id": "paste-special-values",
     "goal_index": "1",
-    "text": "The associate wants last week beside this week: copy Raw’s Prior week rev and Old code block L7:M12 and paste values only onto H4.",
-    "teach": "Paste Special, Ctrl+Alt+V, pastes one aspect of the copy — V values only, T formats only, E transposed — then Enter confirms.",
+    "text": "The CFO wants last week beside this week: copy Raw’s Prior week rev and Old code block L7:M12 and paste values only onto H4.",
+    "teach": "Paste Special, Ctrl+Alt+V, pastes one part of the copy (V values only, T formats only, F formulas only, E transposed), then Enter confirms. Formats only dresses the cells and leaves what they say alone; values only is how you take a snapshot: the numbers, not the formulas behind them.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the Paste Special dialog · Copy L7:M12 on Raw; on Report land on H4; Ctrl+Alt+V, V, Enter."
    },
    {
     "lesson_id": "paste-special-values",
     "goal_index": "2",
-    "text": "Four new headers, one style: copy the kWh sold header C4 and paste its format only onto F4:I4 with Paste Formats.",
-    "teach": "",
+    "text": "The prior-week revenue came out of the export as negatives: copy a −1 from spare cell K4, select H5:H9, Paste Special, Multiply.",
+    "teach": "Paste Special can do arithmetic on the cells you paste over: Add, Subtract, Multiply, Divide (M for Multiply, I for Divide) with the number you copied, so × −1 flips a block’s sign and ÷ 100 turns cents into dollars, no formula, nothing retyped. It rewrites formulas too, so select typed cells only (Go To Special, Constants) on a mixed block.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the Paste Special dialog · Type -1 in K4, Enter, Ctrl+C on it; select H5:H9; Ctrl+Alt+V, M, Enter."
    },
    {
     "lesson_id": "paste-special-values",
     "goal_index": "3",
-    "text": "Snapshot this week: copy the five sites’ live totals Raw!I8:K12 and paste values only onto C5, so the page holds numbers, not links.",
+    "text": "Same block, and the figures are in cents: copy 100 from the spare cell, select H5:H9, Paste Special Divide, then clear K4.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the Paste Special dialog · Type 100 in K4, Ctrl+C; select H5:H9; Ctrl+Alt+V, I for Divide, Enter; Delete on K4."
    },
    {
     "lesson_id": "paste-special-values",
     "goal_index": "4",
-    "text": "Type Total in A10, then copy Raw’s total row I13:K13 and paste it plain onto C10: the SUM re-points to C5:C9.",
-    "teach": "A pasted formula keeps its shape, not its cells: the references shift with the move, so =SUM(I8:I12) becomes =SUM(C5:C9) — a $ would pin them.",
+    "text": "Four new headers, one style: copy the Washes header C4 and paste its format only onto F4:I4 with Paste Formats.",
+    "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cells F4:I4 · Copy C4; select F4:I4; Ctrl+Alt+V, T, Enter."
    },
    {
     "lesson_id": "paste-special-values",
     "goal_index": "5",
-    "text": "Start the sensitivity block under the daily table: Energy cost sensitivity ($/wk) in A22 and Price per kWh in A23.",
+    "text": "Snapshot this week: copy the five sites’ live totals Raw!I8:K12 and paste values only onto C5, so the page holds numbers, not links.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C5 · Copy Raw!I8:K12; on Report, C5; Ctrl+Alt+V, V, Enter."
    },
    {
     "lesson_id": "paste-special-values",
     "goal_index": "6",
-    "text": "The sensitivity table needs the sites across its top: copy A5:A9 and paste them transposed onto B23, one row of five.",
-    "teach": "",
+    "text": "Type Total in A10, then copy Raw’s total row I13:K13 and paste it plain onto C10: the SUM re-points to C5:C9.",
+    "teach": "A pasted formula keeps its shape, not its cells: the references shift with the move, so =SUM(I8:I12) becomes =SUM(C5:C9). That is relative referencing, and a $ in front of a row or column would pin it (module 1.6).",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C10 · A10, type Total, Enter; copy I13:K13 on Raw; C10, Enter."
    },
    {
     "lesson_id": "paste-special-values",
     "goal_index": "7",
-    "text": "Does it tie? Watch Domain’s Monday kWh in Raw’s C8 change: the live total I8 moves, and the Report’s snapshot C5 stays put.",
+    "text": "Start the sensitivity block: Wash cost sensitivity ($/wk) in A22, Cost per wash in A23, then copy A5:A9 and paste them transposed onto B23.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B23 · A22, Enter, ↓, A23, Enter; copy A5:A9; land on B23; Ctrl+Alt+V, E, Enter."
+   },
+   {
+    "lesson_id": "paste-special-values",
+    "goal_index": "8",
+    "text": "Does it tie? Change Domain’s Monday washes in Raw’s C8: the live total I8 moves, and the Report’s snapshot C5 stays put.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C5 on Report · Change Raw!C8, watch I8 move, then look at Report!C5: unchanged."
    }
   ],
   "find-replace-timeline": [
    {
     "lesson_id": "find-replace-timeline",
     "goal_index": "0",
-    "text": "Eleven cells on the Report still read w/c 08 Sep: swap every one for w/c 15 Sep with Replace All and read the count — eleven.",
-    "teach": "Ctrl+H opens Replace: type what to find, Tab, what to put there, then Alt+A replaces every match on this sheet and reports how many cells changed.",
+    "text": "Eleven cells on the Report still read Week of Sep 8: swap every one for Week of Sep 15 with Replace All and read the count, eleven.",
+    "teach": "Ctrl+H opens Replace: type what to find, Tab, what to put there, then Alt+A replaces every match on this sheet and reports how many cells changed. If the count is not what you expected, Ctrl+Z and look.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the Replace box · Ctrl+H; Week of Sep 8; Tab; Week of Sep 15; Alt+A; read the count; Esc."
    },
    {
     "lesson_id": "find-replace-timeline",
     "goal_index": "1",
-    "text": "Replace All only touches the active sheet: move to Inputs and replace the stale week label in B3 the same way — the count reads one.",
+    "text": "Replace All only touches the active sheet: move to Inputs and replace the stale week label in B3 the same way, and the count reads one.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B3 on Inputs · Ctrl+PgDn twice to Inputs; the same Ctrl+H; count of one."
    },
    {
     "lesson_id": "find-replace-timeline",
     "goal_index": "2",
-    "text": "One Airport row on the feed is spelled Airprot: move to Raw and find it with Ctrl+F.",
-    "teach": "",
+    "text": "Name the cost per wash: on B4 open Define Name (Alt, M, M, D), type CostPerWash, Enter, then Ctrl+Home and jump back by name with Ctrl+G.",
+    "teach": "A name is a label for a cell or a range that you can jump to (Ctrl+G, then the name) and write into a formula (=B6*CostPerWash) so it reads like English. Name a few key inputs and never everything; Chapter 4 sets out the rules for which.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the Define Name dialog · On B4: Alt, M, M, D; type the name, no spaces; Enter; then Ctrl+Home, Ctrl+G, CostPerWash, Enter."
    },
    {
     "lesson_id": "find-replace-timeline",
     "goal_index": "3",
-    "text": "Nothing in Airprot is worth keeping: type Airport over B55.",
-    "teach": "",
+    "text": "Attach the source to the cell as a note: Shift+F2 on B4, type Supplier quote, Sep 15 2026, then Esc to close it.",
+    "teach": "Shift+F2 opens a note on the cell: a comment that travels with it, marked by a red corner. Best practice: every hardcode carries its source (a web link, a file path, a page number or a quote) in a note or in the next cell.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B4 · Shift+F2, type, then Esc to leave the note."
    },
    {
     "lesson_id": "find-replace-timeline",
     "goal_index": "4",
-    "text": "Back on the Report, the daily table needs its day header: type Mon in B14, select B14:G14 and let Fill Series carry it to Sat.",
-    "teach": "Fill Series (Alt, H, F, I, S) continues the pattern your first cells set across the selection: Mon runs to Sat, 15 and 16 run on to 20.",
+    "text": "Date the check: in D4 press Ctrl+; and Enter for today’s date, typed for you.",
+    "teach": "Ctrl+; enters today’s date and Ctrl+Shift+; the time, as values that do not change tomorrow. An \"as of\" date beside a figure says when someone last looked.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell D4 · Land on D4; Ctrl and the semicolon; Enter."
    },
    {
     "lesson_id": "find-replace-timeline",
     "goal_index": "5",
-    "text": "The dates go under the days: type the first two, 15 and 16, into B15 and C15 as a Tab run.",
-    "teach": "",
+    "text": "Scroll away with PgDn three times, then Ctrl+Backspace snaps the view back to the active cell.",
+    "teach": "Ctrl+Backspace scrolls the window back to the active cell without moving it. After you have paged down a long sheet to look at something, one press brings you home.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the PgDn keycap · PgDn three times, then Ctrl+Backspace."
    },
    {
     "lesson_id": "find-replace-timeline",
     "goal_index": "6",
-    "text": "Select B15:G15 and Fill Series carries 15 and 16 on to 20.",
-    "teach": "",
+    "text": "Back on the Report, the daily table needs its day header: type Mon in B14, select B14:G14 and let Fill Series carry it to Sat.",
+    "teach": "Fill Series (Alt, H, F, I, S) opens the Series dialog, which starts on Linear; its AutoFill type (Alt+F) continues the pattern your first cells set across the selection, so Mon runs to Sat. Excel knows the days of the week and the months; for numbers it needs two to see the step.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cells B14:G14 · Type Mon in B14, Enter; Shift+→ five times; Alt, H, F, I, S; Alt+F for AutoFill; Enter."
    },
    {
     "lesson_id": "find-replace-timeline",
     "goal_index": "7",
-    "text": "Does it tie? Watch Airport’s Monday kWh in Raw’s C56 change to 3,000 and the Airport line of the site totals, I12, answer.",
+    "text": "The dates go under the days: type 15 and 16 into B15 and C15 as a Tab run, then select B15:G15 and Fill Series carries them on to 20.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cells B15:G15 · 15, Tab, 16, Enter; back up to B15; Shift+→ five times; Alt, H, F, I, S, Enter."
+   },
+   {
+    "lesson_id": "find-replace-timeline",
+    "goal_index": "8",
+    "text": "Does it tie? Change Airport’s Monday washes in Raw’s C56 to 300 and watch the Airport line of the site totals, I12, answer.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell I12 on Raw · Raw!C56, 300, Enter; I12 moves."
    }
   ],
   "challenge-complete-the-feed": [
    {
     "lesson_id": "challenge-complete-the-feed",
     "goal_index": "0",
-    "text": "Airport’s Saturday never came through: enter management’s figures in C61:F61 — 2,500 kWh, $0.48, $1,200.00 revenue and $325.00 energy cost.",
+    "text": "Airport’s Saturday never came through: enter the manager’s figures in C61:F61 (250 washes, $14.00, $3,500.00 revenue and $375.00 wash cost).",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -1455,7 +1487,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-complete-the-feed",
     "goal_index": "1",
-    "text": "Mueller is misspelled Muller in one row of the 60-row feed: find it and fix it in place.",
+    "text": "Mueller reads Muller in one row and Riverside reads Riverisde in three: fix the one in place, Replace All the three, read the count.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -1463,7 +1495,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-complete-the-feed",
     "goal_index": "2",
-    "text": "Riverside reads Riverisde in three rows: Replace All of them in one step and read the count.",
+    "text": "Name the cost per wash on Inputs CostPerWash and put its source in a note on the cell.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -1471,7 +1503,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-complete-the-feed",
     "goal_index": "3",
-    "text": "The kWh figure “1,240” in the Riverside rows was typed as text and sits on the left: make it a number.",
+    "text": "The wash count \"240\" in the Riverside rows was typed as text and sits on the left: make it a number.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -1495,7 +1527,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-complete-the-feed",
     "goal_index": "6",
-    "text": "Under the snapshot, type Day in A8 and fill a Mon–Sat timeline across B8:G8.",
+    "text": "Under the snapshot, type Day in A8 and fill a Mon to Sat timeline across B8:G8.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -1505,10 +1537,10 @@ export const COPY = {
    {
     "lesson_id": "rows-cols-honest-totals",
     "goal_index": "0",
-    "text": "Cedar Park opened this week: select Airport’s row 9 and insert a blank row above it — the Total in C11 follows to =SUM(C5:C10).",
-    "teach": "Ctrl+Shift+= inserts whole rows or columns at the selection, Ctrl+- deletes them, and a SUM whose range straddles the insert grows to take the new row in.",
+    "text": "Cedar Park opened this week: select Airport’s row 9 and insert a blank row above it, and the Total in C11 follows to =SUM(C5:C10).",
+    "teach": "Shift+Space, then Ctrl+Shift+=. The same insert as 1.2.3, but now watch the formula bar on C11: a SUM whose range straddles the insert grows to take the new row in. Insert inside the block, never below it.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C11 · Shift+Space on row 9, Ctrl+Shift+=; then read C11 in the formula bar."
    },
    {
     "lesson_id": "rows-cols-honest-totals",
@@ -1516,39 +1548,39 @@ export const COPY = {
     "text": "Name the new site: type Cedar Park in A9, then fill the week label down from B8 into B9 with Ctrl+D.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell A9 · A9, type, Enter; then land on B8, Shift+↓, Ctrl+D."
    },
    {
     "lesson_id": "rows-cols-honest-totals",
     "goal_index": "2",
-    "text": "Enter Cedar Park’s week across C9:E9 with Tab: 2,140 kWh, $1,005.80 revenue, $278.20 energy cost — the totals in C11:E11 grow together.",
+    "text": "Enter Cedar Park’s week across C9:E9 with Tab: 210 washes, $2,940.00 revenue, $315.00 wash cost, and the totals in C11:E11 grow together.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C9 · 210, Tab, 2940, Tab, 315, Enter."
    },
    {
     "lesson_id": "rows-cols-honest-totals",
     "goal_index": "3",
-    "text": "The Old code column is the old platform’s: select column I from its header I4 and delete the whole column in one press.",
+    "text": "The Old code column is the old system’s: select column I from its header I4 and delete the whole column in one press.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse column I · Land on I4, Ctrl+Space, Ctrl+-."
    },
    {
     "lesson_id": "rows-cols-honest-totals",
     "goal_index": "4",
-    "text": "Margin % belongs before Prior week rev: insert a column at H and type Margin % in H4 — the header comes out bold.",
+    "text": "Margin % belongs before Prior week rev: insert a column at H and type Margin % in H4, and the header comes out bold.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell H4 · Land in column H, Ctrl+Space, Ctrl+Shift+=; H4, type, Enter."
    },
    {
     "lesson_id": "rows-cols-honest-totals",
     "goal_index": "5",
     "text": "On Raw, delete the Revenue column E and read the site totals block: every Revenue SUM now says #REF! instead of a number.",
-    "teach": "#REF! means the formula pointed at a cell that no longer exists: delete a column a SUM reads and it breaks, and Ctrl+Z brings both back.",
+    "teach": "#REF! means the formula pointed at a cell that no longer exists. Delete a column a SUM reads and it breaks, loudly, which is the point. Never paste a number over a #REF!; find what it read.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the totals block on Raw · Ctrl+PgDn to Raw; land in column E, Ctrl+Space, Ctrl+-; read I8."
    },
    {
     "lesson_id": "rows-cols-honest-totals",
@@ -1556,99 +1588,91 @@ export const COPY = {
     "text": "Read the error, then undo: Ctrl+Z brings the Revenue column back and Domain’s Revenue SUM in J8 reads a number again.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell J8 on Raw · One Ctrl+Z; J8 shows a figure again."
    },
    {
     "lesson_id": "rows-cols-honest-totals",
     "goal_index": "7",
-    "text": "Does it tie? Watch Cedar Park’s kWh in C9 change to 3,000 and the Total in C11 answer.",
+    "text": "Does it tie? Change Cedar Park’s washes in C9 to 300 and watch the Total in C11 answer.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C11 on Report · Ctrl+PgUp to Report; C9, 300, Enter; C11 moves."
    }
   ],
   "widths-heights-autofit": [
    {
     "lesson_id": "widths-heights-autofit",
     "goal_index": "0",
-    "text": "The daily table’s six day columns B:G should share one width: select them from its timeline row and set Column Width 12.",
-    "teach": "Column Width (Alt, H, O, W) sets every selected column to one width in Excel character units: select the columns first, then type the number and Enter.",
+    "text": "The daily table’s six day columns B:G should share one width: select them from the timeline row and set Column Width 12.",
+    "teach": "Select the columns first (Ctrl+Space, then Shift+→ across), then Alt, H, O, W, 12, Enter. One width for every period column is the convention on any page with a timeline.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse columns B:G · Land on B14, Ctrl+Shift+→, Ctrl+Space; Alt, H, O, W, 12, Enter."
    },
    {
     "lesson_id": "widths-heights-autofit",
     "goal_index": "1",
-    "text": "Margin % and Prior week rev ($) in H:I are the comparison columns: select both from the header row and set them to 14.",
+    "text": "Margin % and Prior week rev in H:I are the comparison columns: select both from the header row and set them to 14, or press F4.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse columns H:I · Land on I4, Ctrl+Space, Shift+←; Alt, H, O, W, 14, Enter."
    },
    {
     "lesson_id": "widths-heights-autofit",
     "goal_index": "2",
-    "text": "Fit the label column to its site names, not the title: select A5:A11 and AutoFit — column A sizes to South Lamar.",
-    "teach": "AutoFit Column Width (Alt, H, O, I) sizes a column to its content — a whole column fits everything in it, a selected range fits only those cells.",
+    "text": "Fit the label column to its site names, not the title: select A5:A11 and AutoFit, and column A sizes to South Lamar.",
+    "teach": "AutoFit on a selected range fits only those cells; AutoFit on a whole column fits everything in it, title included, which would make A absurdly wide. Select the names, then Alt, H, O, I.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cells A5:A11 · Select A5:A11 with Ctrl+Shift+↓, then Alt, H, O, I."
    },
    {
     "lesson_id": "widths-heights-autofit",
     "goal_index": "3",
-    "text": "The title row is cramped at the default height: from A1, set Row Height 24 points.",
-    "teach": "Row Height (Alt, H, O, H) sets the selected rows’ height in points; AutoFit Row Height (Alt, H, O, A) sizes a row back to its content.",
+    "text": "At these widths the headers B4:I4 are clipped: select them from B4, wrap the text, then AutoFit row 4 to two lines.",
+    "teach": "Wrap Text (Alt, H, W) folds a long header inside its cell; AutoFit Row Height (Alt, H, O, A) then sizes the row to the wrapped lines. Headers wrap; figures never do.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cells B4:I4 · Select B4:I4, Alt, H, W; then Alt, H, O, A."
    },
    {
     "lesson_id": "widths-heights-autofit",
     "goal_index": "4",
-    "text": "Twenty-four was a guess: AutoFit Row Height puts row 1 back to what its one line of text needs.",
-    "teach": "",
+    "text": "The title row is cramped: set row 1 to height 24.",
+    "teach": "Row Height (Alt, H, O, H) in points. A title row a little taller than the rest is the one height exception on a page.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse row 1 · Land on A1; Alt, H, O, H, 24, Enter."
    },
    {
     "lesson_id": "widths-heights-autofit",
     "goal_index": "5",
-    "text": "At these widths the headers B4:I4 are clipped: select them from B4, wrap the text, then AutoFit row 4 to two lines.",
-    "teach": "Wrap Text (Alt, H, W) folds a long entry onto more lines inside its cell, and AutoFit Row Height then sizes the row to the wrapped lines.",
+    "text": "See why the day columns were set by hand: AutoFit B:G at once, read the uneven widths, then Ctrl+Z puts the equal 12 back.",
+    "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse columns B:G · Select B:G, Alt, H, O, I, look, then Ctrl+Z."
    },
    {
     "lesson_id": "widths-heights-autofit",
     "goal_index": "6",
-    "text": "See why the day columns were set by hand: AutoFit B:G at once, read the uneven widths, then Ctrl+Z puts the equal 12 back.",
+    "text": "Does it tie? Change Cedar Park’s washes in C9 to 300 and watch the Total in C11 answer through the new widths.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
-   },
-   {
-    "lesson_id": "widths-heights-autofit",
-    "goal_index": "7",
-    "text": "Does it tie? Watch Cedar Park’s kWh in C9 change to 3,000 and the Total in C11 answer through the new widths.",
-    "teach": "",
-    "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C11 · C9, 300, Enter; C11 moves."
    }
   ],
   "hide-group-freeze": [
    {
     "lesson_id": "hide-group-freeze",
     "goal_index": "0",
-    "text": "Energy cost and Gross profit are working columns: select the whole of E:F from the header row and hide them with Ctrl+0.",
-    "teach": "Ctrl+0 hides the selected columns and Ctrl+9 the rows; Ctrl+Shift+) and Ctrl+Shift+( unhide whatever is hidden inside the selection.",
+    "text": "Wash cost and Gross profit are working columns: select the whole of E:F from the header row and hide them with Ctrl+0.",
+    "teach": "Ctrl+0 hides the selected columns and Ctrl+9 hides rows. The columns are still there (formulas still read them), but a reader cannot see them, and that is the problem.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse columns E:F · Land on E4, Ctrl+Space, Shift+→; then Ctrl+0."
    },
    {
     "lesson_id": "hide-group-freeze",
     "goal_index": "1",
-    "text": "A buyer’s analyst will find a hidden column and wonder what else is hidden: select D:G across the gap and unhide with Ctrl+Shift+).",
+    "text": "A buyer’s analyst will find a hidden column and wonder what else is hidden: select D:G across the gap and unhide with Alt, H, O, U, L.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse columns D:G · Land on G4, Ctrl+Space, Shift+← to D; Alt, H, O, U, L."
    },
    {
     "lesson_id": "hide-group-freeze",
@@ -1656,54 +1680,54 @@ export const COPY = {
     "text": "Rows hide the same way: select the whole daily table, rows 13:21, hide them with Ctrl+9, then bring them back with Ctrl+Shift+(.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse rows 13:21 · Land on A21, Ctrl+Shift+↑ to A13, Shift+Space; Ctrl+9; then Ctrl+Shift+(."
    },
    {
     "lesson_id": "hide-group-freeze",
     "goal_index": "3",
-    "text": "Group, don’t hide: select the whole of E:F again and group the two working columns with Alt+Shift+→.",
-    "teach": "Alt+Shift+→ groups the selected whole columns or rows into an outline with a button to fold and unfold; Alt+Shift+← ungroups them.",
+    "text": "Group, do not hide: select the whole of E:F again and group the two working columns with Alt+Shift+→.",
+    "teach": "Alt+Shift+→ groups the selected whole columns (or rows) into an outline with a button above them to fold and unfold; Alt+Shift+← ungroups. Alt, A, G, G is the Ribbon route. On a Mac, ⌘⇧K and ⌘⇧J.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse columns E:F · Land on E4, Ctrl+Space, Shift+→; Alt+Shift+→."
    },
    {
     "lesson_id": "hide-group-freeze",
     "goal_index": "4",
-    "text": "Fold the group with Hide Detail, Alt A H: the two columns tuck behind an outline button instead of vanishing.",
+    "text": "Fold the group with Hide Detail, Alt, A, H: the two columns tuck behind an outline button instead of vanishing.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the outline button · With a cell in E:F selected, Alt, A, H."
    },
    {
     "lesson_id": "hide-group-freeze",
     "goal_index": "5",
-    "text": "Unfold it with Show Detail, Alt A J: the workings are there when a reader wants them, and the group stays.",
+    "text": "Unfold it with Show Detail, Alt, A, J: the workings are there when a reader wants them, and the group stays.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the outline button · Alt, A, J from a cell beside the group."
    },
    {
     "lesson_id": "hide-group-freeze",
     "goal_index": "6",
-    "text": "The title, units, header row and site column must stay in view: land on B5 and freeze panes there with Alt W F F.",
-    "teach": "Freeze Panes (Alt W F F) pins every row above and every column left of the active cell so they stay in view as the sheet scrolls.",
+    "text": "The title, units, header row and site column must stay in view: land on B5 and freeze panes there with Alt, W, F, F.",
+    "teach": "Freeze Panes (Alt, W, F, F) pins every row above and every column left of the active cell so they stay put as the sheet scrolls. Land on the first figure cell, B5 here, and the heads and labels are frozen; Alt, W, F, F again unfreezes.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B5 · Ctrl+Home, ↓ three times, Tab, ↓ once; Alt, W, F, F."
    },
    {
     "lesson_id": "hide-group-freeze",
     "goal_index": "7",
-    "text": "Does it tie? Watch Cedar Park’s kWh in C9 change to 3,000 and the Total in C11 answer, with the heads frozen in place.",
+    "text": "Does it tie? Change Cedar Park’s washes in C9 to 300 and watch the Total in C11 answer, with the heads frozen in place.",
     "teach": "",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C11 · C9, 300, Enter; C11 moves; PgDn to see the heads hold."
    }
   ],
   "challenge-reshape-the-report": [
    {
     "lesson_id": "challenge-reshape-the-report",
     "goal_index": "0",
-    "text": "The Depot site opened: insert a row inside the block, above the last site, and enter Depot, 1,800 kWh, $828 revenue, $234 energy cost.",
+    "text": "The Depot site opened: insert a row inside the block, above the last site, and enter Depot, 180 washes, $2,520 revenue, $270 wash cost.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -1711,7 +1735,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-reshape-the-report",
     "goal_index": "1",
-    "text": "Old code in column H is the old platform’s site code: delete the whole column, not just its cells.",
+    "text": "Old code in column H is the old system’s site code: delete the whole column, not just its cells.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -1727,7 +1751,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-reshape-the-report",
     "goal_index": "3",
-    "text": "A figure column is hidden — a buyer’s analyst would find it and wonder: unhide it inside the same selection.",
+    "text": "A figure column is hidden, and a buyer’s analyst would find it and wonder: unhide it inside the same selection.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -1735,7 +1759,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-reshape-the-report",
     "goal_index": "4",
-    "text": "Gross profit and Avg price in E:F are working columns: group them rather than hiding them.",
+    "text": "Gross profit and Avg ticket in E:F are working columns: group them rather than hiding them.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3668,15 +3692,15 @@ export const COPY = {
   "enter-edit-copy-fill": {
    "id": "enter-edit-copy-fill",
    "name": "Enter, edit, copy and fill",
-   "objective": "The missing day, the typos, the Report skeleton, Paste Special, Find and Replace, a timeline.",
-   "story_beat": "A day is missing and the figures have typos. || Airport’s Saturday never came through; management emailed the four figures. Enter them, fix the feed in place, and build the Report skeleton from Raw with the clipboard and the fill keys.",
+   "objective": "Enter, edit, copy and fill: the missing day, the typos, the Report skeleton, Paste Special, Find and Replace, a timeline.",
+   "story_beat": "A day is missing, and some of the figures are wrong. || Airport’s Saturday never came through, so the manager emailed the four numbers over. Type them in, fix the typos where they sit, then start the Report page by pulling the headers, the site list and the week label across from Raw and Inputs with the clipboard and the fill keys, so nothing gets typed twice.",
    "page_name": "The Report skeleton"
   },
   "structure": {
    "id": "structure",
    "name": "Structure",
-   "objective": "Rows and columns that keep the totals honest; widths, heights, AutoFit; hide, group, freeze.",
-   "story_beat": "Cedar Park opened this week. || A sixth site row, a margin column, a stale column to remove, and a total that has to follow every edit. Then the widths, heights, groups and frozen panes that make the page readable.",
+   "objective": "Structure with formulas in play: rows and columns that keep the totals honest; the page’s columns; hide, group, freeze.",
+   "story_beat": "Cedar Park opened this week. || That means a sixth site row for the Report, a margin column the CFO asked for and a stale column to get rid of, with a total that has to keep up with every edit. Then make the page readable: give the columns equal widths, fit the headers, tuck the working columns away and freeze the heads so they never scroll off.",
    "page_name": "The Report, reshaped"
   },
   "format": {

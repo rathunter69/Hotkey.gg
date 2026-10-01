@@ -169,6 +169,11 @@ export const CONCEPTS = {
   'audit-pass': 'the audit pass: Go To Special, show formulas and tracing find what a reviewer would',
   'ref-error': '#REF! means a formula pointed at a cell that was deleted; Ctrl+Z brings the cell and the formula back',
   'wrap-text': 'Wrap Text (Alt, H, W) folds a long entry inside its cell; AutoFit Row Height (Alt, H, O, A) then sizes the row to it',
+  // 1.3.5 (Clearcoat): names, notes and the small keys
+  'defined-name': 'Define Name (Alt, M, M, D) labels a cell or range; Go To and formulas accept the name where they accept an address',
+  'cell-note': 'Shift+F2 opens a note on the cell: a comment that travels with it, where a hardcode\'s source belongs',
+  'date-stamp': 'Ctrl+; enters today\'s date and Ctrl+Shift+; the time, as values that do not change tomorrow',
+  'scroll-to-active': 'Ctrl+Backspace scrolls the window back to the active cell without moving it',
   // Chapter 2 (Project Volt, stage 2): number formats and custom number formats
   'general-format': 'General is the no-format format: Ctrl+Shift+~ (or Ctrl+1, G) returns a cell to how its value was typed',
   'accounting-format': 'Accounting Number Format (Alt, H, A, N) sets the $ at the cell\u2019s left edge, negatives in parentheses and zero as a dash',
@@ -263,15 +268,15 @@ export function validateLesson(l) {
   need(l.sheets === undefined || (Array.isArray(l.sheets) && l.sheets.every(isObject)), 'sheets must be an array of { name, cells } records');
   for (const sh of Array.isArray(l.sheets) ? l.sheets.filter(isObject) : []) need(typeof sh.name === 'string' && /^[^[\]:*?/\\]{1,31}$/.test(sh.name), `sheet name "${sh.name}" is not Excel-legal`);
   if (moduleLesson) {
-    // The Brief (v2): the situation, the task, the payoff — at most three sentences, ending in
-    // the headline keycap; a challenge carries one line.
+    // The Brief (v2): the situation, the task, the payoff — at most five sentences and 110 words
+    // (M28; screenplay 2, "What the site enforces"), ending in the headline keycap; a challenge carries one line.
     need(typeof l.brief === 'string' && l.brief.trim(), 'brief missing');
     if (typeof l.brief === 'string') {
       const n = sentenceCount(l.brief);
       if (kind === 'challenge') need(n <= 2 && wordCount(l.brief) <= 40, 'a challenge brief is one line');
       else {
-        need(n >= 1 && n <= 3, `brief must be at most three sentences (it has ${n})`);
-        need(wordCount(l.brief) <= 70, 'brief is over 70 words');
+        need(n >= 1 && n <= 5, `brief must be at most five sentences (it has ${n})`);
+        need(wordCount(l.brief) <= 110, 'brief is over 110 words');
         need(/`[^`]+`[.!]?\s*$/.test(l.brief.trim()), 'the brief ends with the headline keycap (`Ctrl+…`)');
       }
     }
@@ -293,7 +298,7 @@ export function validateLesson(l) {
       // one action sentence; the closer may open with its question ("Does it tie? Watch …")
       const n = sentenceCount(g.text);
       need((g.closer ? n >= 1 && n <= 2 : n === 1) && /[.!?]$/.test(g.text.trim()), `goal ${g.id}: the action must be one sentence ending in a full stop`);
-      need(wordCount(g.text) <= 26, `goal ${g.id}: the action is over 26 words`);
+      need(g.text.trim().length <= 140, `goal ${g.id}: the action is over 140 characters (M28)`);
     }
     need(typeof g.check === 'function', `goal ${g.id}: check must be a function`);
     need(Array.isArray(g.requires) || kind === 'challenge', `goal ${g.id}: requires must list concept ids`);
@@ -316,7 +321,8 @@ export function validateLesson(l) {
     const fresh = (Array.isArray(g.requires) ? g.requires : []).filter(c => concepts.includes(c) && !introduced.has(c));
     if (fresh.length) { need(typeof g.teach === 'string' && g.teach.trim(), `goal ${g.id}: introduces ${fresh.join(', ')} and needs a one-line teach`); fresh.forEach(c => introduced.add(c)); }
     else if (Array.isArray(conceptsRaw) && Array.isArray(g.requires)) need(g.teach === undefined, `goal ${g.id}: reuses taught concepts only, so it must not carry a teach line`);
-    if (typeof g.teach === 'string') { need(sentenceCount(g.teach) === 1 && /[.!?]$/.test(g.teach.trim()), `goal ${g.id}: teach must be one sentence ending in a full stop`); need(wordCount(g.teach) <= 30, `goal ${g.id}: teach is over 30 words`); }
+    // a teach line is up to three sentences, the why inside (M28), each ending in a full stop
+    if (typeof g.teach === 'string') { const n = sentenceCount(g.teach); need(n >= 1 && n <= 3 && /[.!?]$/.test(g.teach.trim()), `goal ${g.id}: teach must be one sentence ending in a full stop, or up to three (M28)`); need(wordCount(g.teach) <= 90, `goal ${g.id}: teach is over 90 words`); }
   }
   need(l.race === undefined || (Array.isArray(l.race) && l.race.length >= 1 && l.race.every(r => isObject(r) && typeof r.label === 'string' && ids.has(r.slow) && ids.has(r.fast))), 'race must be pairs { label, slow, fast } naming goals');
   need(l.closing === undefined || (Array.isArray(l.closing) && l.closing.every(t => typeof t === 'string')), 'closing must be an array of paragraphs');

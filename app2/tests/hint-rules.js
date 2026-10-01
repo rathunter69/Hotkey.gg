@@ -33,6 +33,7 @@ export function goToOffence(tokens, anchor) {
     const ref = quoted ? quoted.slice(1, -1) : '';
     if (ref.includes('!')) { anchor = cellRC(ref) || anchor; continue; }    // another sheet: a jump, not glue
     const to = cellRC(ref);
+    if (!to && /^[A-Za-z_\\][A-Za-z0-9_.]*$/.test(ref)) continue;   // a defined name (1.3.5): Go To by name is the name's own job, never glue
     if (!to) return `types "${ref}" — not a reference and not Go To Special`;
     if (anchor && Math.abs(to.r - anchor.r) < 20 && Math.abs(to.c - anchor.c) < 10) {
       return `jumps to ${ref} from ${'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[anchor.c - 1] || '?'}${anchor.r} — a screen or less away`;

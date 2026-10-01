@@ -1,12 +1,12 @@
-// Chapter 1 · 1.4.C — Challenge: reshape the report (seeded over S2a)
+// Chapter 1 · 1.4.C — Challenge: reshape the report (seeded over S2b)
 // A sister cluster's weekly KPI report arrives with the structure faults the module fixed one by
-// one: the Depot site opened and has no row, the old platform's Old code column is still there,
-// the figure columns are six different widths, one column is hidden and nothing is frozen. Insert
-// the row inside the block so the total follows, delete the column, set the six widths in one
-// press, unhide, group the working columns instead, freeze the heads. Seeds dress the city, the
-// site names, the figures and which column is hidden; the workload never moves.
+// one: the Depot site opened and has no row, the old system's Old code column is still there, the
+// figure columns are six different widths, one column is hidden and nothing is frozen. Insert the
+// row inside the block so the total follows, delete the column, set the six widths in one press,
+// unhide, group the working columns instead, freeze the heads. Seeds dress the city, the site
+// names, the figures and which column is hidden; the workload never moves.
 import { pickCluster, siteNames } from '../workbooks/clusters.js';
-import { WHOLESALE } from '../workbooks/voltline-weekly.js';
+import { COST_PER_WASH } from '../workbooks/clearcoat-weekly.js';
 import { noHidden, rowConsistent, liveness } from '../../app/graders.js';
 import { parsFrom } from '../../app/pars.js';
 
@@ -17,28 +17,30 @@ const near = (a, b) => isNum(a) && isNum(b) && Math.abs(a - b) < 1e-6;
 const blank = c => !c || (c.value == null && c.formula == null);
 const normFormula = f => String(f || '').replace(/\s|\$/g, '').toUpperCase();
 const r2 = v => Math.round(v * 100) / 100;
+/** The cluster pool still labels its weeks the British way (w/c 22 Sep 2026); the Clearcoat pack says Week of Sep 22, 2026. */
+const weekLabel = w => { const m = /^w\/c (\d{2}) (\w{3}) (\d{4})$/.exec(w); return m ? `Week of ${m[2]} ${+m[1]}, ${m[3]}` : w; };
 
-const HEADERS = ['Site', 'kWh sold', 'Revenue ($)', 'Energy cost ($)', 'Gross profit ($)', 'Avg price ($/kWh)', 'Prior week rev ($)', 'Old code'];
-const HEADER_ROW = 3, FIRST_SITE = 4, LAST_SITE = 8;   // five sites in rows 4–8; Total in row 9 until the Depot row goes in
+const HEADERS = ['Site', 'Washes', 'Revenue ($)', 'Wash cost ($)', 'Gross profit ($)', 'Avg ticket ($/wash)', 'Prior week rev ($)', 'Old code'];
+const HEADER_ROW = 3, FIRST_SITE = 4, LAST_SITE = 8;   // five sites in rows 4 to 8; Total in row 9 until the Depot row goes in
 const TOTAL_ROW = 10;                                 // the Total once a sixth site is in the block
-const SUM_COLS = ['B', 'C', 'D'];                     // kWh, Revenue, Energy cost — the SUMs the graders keep honest
-const FIGURE_COLS = [2, 3, 4, 5, 6, 7];               // B:G — the six figure columns that share one width
+const SUM_COLS = ['B', 'C', 'D'];                     // Washes, Revenue, Wash cost: the SUMs the graders keep honest
+const FIGURE_COLS = [2, 3, 4, 5, 6, 7];               // B:G, the six figure columns that share one width
 const W12 = 12 * 7 + 5;                               // Column Width 12 in Excel units → px (89), as the engine converts it
-const WORKING = { c1: 5, c2: 6 };                     // E:F — Gross profit, Avg price: the working columns to group
+const WORKING = { c1: 5, c2: 6 };                     // E:F, Gross profit and Avg ticket: the working columns to group
 const FREEZE_AT = { r: 3, c: 1 };                     // Freeze Panes at B4: title, units and header rows, the site column
-/** The fleet depot that opens in every cluster this week: management's emailed figures (1,800 kWh × $0.46; energy at $0.13). */
-export const DEPOT = { name: 'Depot', kwh: 1800, revenue: 828, energy: 234 };
+/** The depot site that opens in every cluster this week: the manager's emailed figures (180 washes at $14.00; wash cost at $1.50). */
+export const DEPOT = { name: 'Depot', washes: 180, revenue: 2520, cost: 270 };
 
 /** Depot's row, wherever inside the block it was inserted: its name in A and its three figures typed as numbers. */
 const depotRow = rep => {
   for (let r = FIRST_SITE; r <= LAST_SITE + 1; r++) {
     if (rep.value('A' + r) !== DEPOT.name) continue;
-    const ok = ['B', 'C', 'D'].every((col, i) => { const c = rep.cellAt(col + r); return !c.formula && c.value === [DEPOT.kwh, DEPOT.revenue, DEPOT.energy][i]; });
+    const ok = ['B', 'C', 'D'].every((col, i) => { const c = rep.cellAt(col + r); return !c.formula && c.value === [DEPOT.washes, DEPOT.revenue, DEPOT.cost][i]; });
     return ok ? r : 0;
   }
   return 0;
 };
-/** B10:D10 are SUMs over the six site rows 4–9 and each reads its column's sum — the total followed the insert. */
+/** B10:D10 are SUMs over the six site rows 4 to 9 and each reads its column's sum: the total followed the insert. */
 const totalsFollow = rep => rep.value('A' + TOTAL_ROW) === 'Total' && SUM_COLS.every(col => {
   if (normFormula(rep.formula(col + TOTAL_ROW)) !== `=SUM(${col}${FIRST_SITE}:${col}${LAST_SITE + 1})`) return false;
   let sum = 0; for (let r = FIRST_SITE; r <= LAST_SITE + 1; r++) { const v = rep.value(col + r); if (v != null && !isNum(v)) return false; sum += v || 0; }
@@ -58,8 +60,8 @@ export default {
   chapter: 'foundations',
   section: 'Structure',
   module: 'structure',
-  workbook: 'voltline-weekly',
-  state: { before: 'S2a' },
+  workbook: 'clearcoat-weekly',
+  state: { before: 'S2b' },
   kind: 'challenge',
   title: 'Challenge: reshape the report',
   difficulty: 'medium',
@@ -68,26 +70,26 @@ export default {
   minutes: 3,
   conventions: ['F1', 'C2', 'C7', 'C8'],
   prerequisites: ['hide-group-freeze'],
-  brief: 'A sister cluster’s KPI report arrived with a site missing, a stale column, uneven widths, a hidden column and nothing frozen: reshape it to house standard, and the totals must still tie.',
+  brief: 'The San Antonio cluster’s report arrived with a site missing, a stale column, uneven widths, a hidden column and nothing frozen. Reshape it so it reads like a page, with the totals still tying, and do it on the clock.',
   timeLimit: 170,
   pars: parsFrom(50, { pass: 150, pro: 90 }),
   seed: rng => {
     const cluster = pickCluster(rng);
     const sites = siteNames(cluster, 5);
     const patch = {
-      'Report!A1': { value: `Voltline — ${cluster.city} Weekly KPI Report, ${cluster.week}` },
+      'Report!A1': { value: `Clearcoat - ${cluster.city} Weekly KPI Report, ${weekLabel(cluster.week)}` },
       'Report!A2': { value: 'USD unless stated' },
     };
     HEADERS.forEach((h, i) => { patch[`Report!${String.fromCharCode(65 + i)}${HEADER_ROW}`] = { value: h, bold: true }; });
     sites.forEach((site, i) => {
       const r = FIRST_SITE + i;
-      const kwh = Math.round((4000 + rng() * 10000) / 10) * 10;
-      const price = Math.round(42 + rng() * 6) / 100;
-      const revenue = r2(kwh * price);
+      const washes = Math.round((900 + rng() * 1200) / 10) * 10;
+      const ticket = Math.round((13 + rng() * 2) * 4) / 4;
+      const revenue = r2(washes * ticket);
       patch[`Report!A${r}`] = { value: site };
-      patch[`Report!B${r}`] = { value: kwh };
+      patch[`Report!B${r}`] = { value: washes };
       patch[`Report!C${r}`] = { value: revenue };
-      patch[`Report!D${r}`] = { value: r2(kwh * WHOLESALE) };
+      patch[`Report!D${r}`] = { value: r2(washes * COST_PER_WASH) };
       patch[`Report!G${r}`] = { value: r2(revenue * (0.8 + 0.4 * rng())) };
       patch[`Report!H${r}`] = { value: `${cluster.city.slice(0, 3).toUpperCase()}-0${i + 1}` };
     });
@@ -98,17 +100,17 @@ export default {
     return patch;
   },
   goals: [
-    { id: 'depot-row', text: `The Depot site opened: insert a row inside the block, above the last site, and enter Depot, ${DEPOT.kwh.toLocaleString('en-US')} kWh, $${DEPOT.revenue} revenue, $${DEPOT.energy} energy cost.`, convention: 'F1',
-      keys: `Ctrl+↓ ↑ Shift+Space Ctrl+Shift+= "${DEPOT.name}" Tab "${DEPOT.kwh}" Tab "${DEPOT.revenue}" Tab "${DEPOT.energy}" ↵`,
+    { id: 'depot-row', text: `The Depot site opened: insert a row inside the block, above the last site, and enter Depot, ${DEPOT.washes} washes, $${DEPOT.revenue.toLocaleString('en-US')} revenue, $${DEPOT.cost} wash cost.`, convention: 'F1',
+      keys: `Ctrl+↓ ↑ Shift+Space Ctrl+Shift+= "${DEPOT.name}" Tab "${DEPOT.washes}" Tab "${DEPOT.revenue}" Tab "${DEPOT.cost}" ↵`,
       check: (s, ses) => { const rep = report(ses); return !!rep && depotRow(rep) > 0 && totalsFollow(rep) && settled(ses); } },
-    { id: 'old-code', text: 'Old code in column H is the old platform’s site code: delete the whole column, not just its cells.', keys: 'Ctrl+Home ↓ ×2 Ctrl+→ Ctrl+Space Ctrl+-',
+    { id: 'old-code', text: 'Old code in column H is the old system’s site code: delete the whole column, not just its cells.', keys: 'Ctrl+Home ↓ ×2 Ctrl+→ Ctrl+Space Ctrl+-',
       check: (s, ses) => { const rep = report(ses); return !!rep && codeColumnGone(rep) && settled(ses); } },
     { id: 'equal-widths', text: 'The six figure columns B:G are six different widths: select them from the header row and set Column Width 12.', convention: 'C2',
       keys: 'Home → Ctrl+Shift+→ Ctrl+Space then Alt H O W "12" ↵',
       check: (s, ses) => { const rep = report(ses); return !!rep && widthsEqual(rep) && settled(ses); } },
-    { id: 'unhide', text: 'A figure column is hidden — a buyer’s analyst would find it and wonder: unhide it inside the same selection.', keys: 'Ctrl+Shift+)',
+    { id: 'unhide', text: 'A figure column is hidden, and a buyer’s analyst would find it and wonder: unhide it inside the same selection.', keys: 'Alt H O U L',
       check: (s, ses) => { const rep = report(ses); return !!rep && nothingHidden(rep) && settled(ses); } },
-    { id: 'group-working', text: 'Gross profit and Avg price in E:F are working columns: group them rather than hiding them.', convention: 'C7', keys: '→ ×3 Ctrl+Space Shift+→ Alt+Shift+→',
+    { id: 'group-working', text: 'Gross profit and Avg ticket in E:F are working columns: group them rather than hiding them.', convention: 'C7', keys: '→ ×3 Ctrl+Space Shift+→ Alt+Shift+→',
       check: (s, ses) => { const rep = report(ses); return !!rep && workingGrouped(rep) && nothingHidden(rep) && settled(ses); } },
     { id: 'freeze', text: 'Freeze the panes at B4 so the title, units, header row and site column stay in view.', convention: 'C8', keys: 'Home → ↓ then Alt W F F',
       check: (s, ses) => { const rep = report(ses); return !!rep && frozenAt(rep) && settled(ses); } },
@@ -118,11 +120,11 @@ export default {
     ses => { const rep = report(ses); return rep ? rowConsistent(rep, `B${TOTAL_ROW}:D${TOTAL_ROW}`) : { ok: false, why: 'No Report sheet.' }; },
     ses => { const rep = report(ses); return rep ? liveness(rep, 'B' + TOTAL_ROW) : { ok: false, why: 'No Report sheet.' }; },
     ses => { const rep = report(ses); if (!rep) return { ok: false, why: 'No Report sheet.' };
-      return widthsEqual(rep) ? { ok: true } : { ok: false, why: 'the figure columns B:G are not all width 12 — equal period columns, set by hand' }; },
+      return widthsEqual(rep) ? { ok: true } : { ok: false, why: 'the figure columns B:G are not all width 12; equal period columns, set by hand' }; },
     ses => { const rep = report(ses); if (!rep) return { ok: false, why: 'No Report sheet.' };
-      return frozenAt(rep) ? { ok: true } : { ok: false, why: 'the heads are not frozen at B4 — the title, header row and site column scroll away' }; },
+      return frozenAt(rep) ? { ok: true } : { ok: false, why: 'the heads are not frozen at B4, so the title, header row and site column scroll away' }; },
     ses => { const rep = report(ses); if (!rep) return { ok: false, why: 'No Report sheet.' };
-      return workingGrouped(rep) ? { ok: true } : { ok: false, why: 'E:F are not grouped — a hidden column gets forgotten; a grouped one shows a button' }; },
+      return workingGrouped(rep) ? { ok: true } : { ok: false, why: 'E:F are not grouped; a hidden column gets forgotten, a grouped one shows a button' }; },
   ],
-  solution: `Ctrl+Down Up Shift+Space Ctrl+Shift+= "${DEPOT.name}" Tab "${DEPOT.kwh}" Tab "${DEPOT.revenue}" Tab "${DEPOT.energy}" Enter Ctrl+Home Down Down Ctrl+Right Ctrl+Space Ctrl+- Home Right Ctrl+Shift+Right Ctrl+Space Alt H O W "12" Enter Ctrl+Shift+) Right Right Right Ctrl+Space Shift+Right Alt+Shift+Right Home Right Down Alt W F F`,
+  solution: `Ctrl+Down Up Shift+Space Ctrl+Shift+= "${DEPOT.name}" Tab "${DEPOT.washes}" Tab "${DEPOT.revenue}" Tab "${DEPOT.cost}" Enter Ctrl+Home Down Down Ctrl+Right Ctrl+Space Ctrl+- Home Right Ctrl+Shift+Right Ctrl+Space Alt H O W "12" Enter Alt H O U L Right Right Right Ctrl+Space Shift+Right Alt+Shift+Right Home Right Down Alt W F F`,
 };

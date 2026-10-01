@@ -752,7 +752,7 @@ export function sessionToState(ses) {
 }
 /** The engine's Page Setup default: what a state means when it says nothing about printing. */
 export const PAGE_SETUP_DEFAULT = { orientation: 'portrait', scaling: 'adjust', adjustTo: 100, fitWide: 1, fitTall: 1, titlesRows: '', footer: { left: '', centre: '', right: '' }, printGridlines: false };
-const normSettings = st => ({ ...(st || {}), pageSetup: { ...PAGE_SETUP_DEFAULT, ...((st || {}).pageSetup || {}), footer: { ...PAGE_SETUP_DEFAULT.footer, ...(((st || {}).pageSetup || {}).footer || {}) } } });
+const normSettings = st => { const { pageSetup, ...rest } = st || {}; return { ...rest, pageSetup: { ...PAGE_SETUP_DEFAULT, ...(pageSetup || {}), footer: { ...PAGE_SETUP_DEFAULT.footer, ...((pageSetup || {}).footer || {}) } } }; };   // key order never decides: enterMoves may sit before or after pageSetup
 
 /* ---------------- diffing (the chain test and audit graders read this) ---------------- */
 
