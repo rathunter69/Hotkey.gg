@@ -262,7 +262,21 @@ export class Session {
   recalcAll(except) {
     if (this._xr) return;
     this._xr = true;
-    try { for (let pass = 0; pass < 2; pass++) for (const e of this.sheets) if (pass > 0 || e.sheet !== except) e.sheet.recalc(); }
+    // Passes run until no sheet moves: a chain that bounces between sheets (a schedule that reads
+    // a statement that reads the schedule) needs one pass per hop, and a circle built on purpose
+    // (interest on an average balance) settles geometrically. With iterative calculation on, the
+    // Options' limits apply (maximum iterations, maximum change); off, a few passes more than the
+    // sheet count covers any acyclic chain, and a circle stops there as Excel would stop warning.
+    const st = this.settings;
+    const cap = Math.max(2, st.iterative ? (st.maxIterations | 0) || 100 : this.sheets.length + 4);
+    const tol = st.iterative ? Math.max(0, +st.maxChange || 0) : 0;
+    try {
+      for (let pass = 0; pass < cap; pass++) {
+        let delta = 0;
+        for (const e of this.sheets) { if (pass === 0 && e.sheet === except) continue; const d = e.sheet.recalc() || 0; if (d > delta) delta = d; }
+        if (pass >= 1 && delta <= tol) break;
+      }
+    }
     finally { this._xr = false; }
   }
   resetEdit() {
@@ -747,10 +761,19 @@ export class Session {
     const i = at == null ? this.sheets.length : Math.max(0, Math.min(this.sheets.length, at | 0));
     this.sheets.splice(i, 0, { name: nm, sheet: sh });
     this.sheetIndex = this.sheets.findIndex(x => x.sheet === this.sheet);   // the active entry may have moved right
+    this.forgetValues();
     this.recalcAll();   // a formula (or a rule) naming the new sheet resolves now, not on the next edit
     this.emit('sheets');
     return i;
   }
+  /**
+   * Forget every formula value on every sheet, before a recalc that assembles or renames the
+   * workbook. A sheet built on its own evaluated its cross-sheet references and names to #REF! or
+   * #NAME?; left in place, those errors would circle for ever through a loop built on purpose
+   * (interest on an average balance), because an error in a circle is its own fixed point. From
+   * blank, the loop starts at zero and settles, as Excel's first iteration does.
+   */
+  forgetValues() { for (const e of this.sheets) for (const k in e.sheet.cells) { const c = e.sheet.cells[k]; if (c && c.formula) c.value = null; } }
   /** Make sheet `i` (clamped) the active one: an open edit is cancelled, the Ribbon walk closed. True when it changed. */
   switchSheet(i) {
     const idx = Math.max(0, Math.min(this.sheets.length - 1, i | 0));
@@ -789,6 +812,7 @@ export class Session {
       const a = '$' + colLetterOf(rg.c1) + '$' + rg.r1, b = '$' + colLetterOf(rg.c2) + '$' + rg.r2;
       e.sheet.names[String(name).toUpperCase()] = { name: String(name), ref: a === b ? a : a + ':' + b };
     }
+    this.forgetValues();
     this.recalcAll();
   }
   /** Shift+F11: a new sheet before the active one, made active (Excel). */
@@ -814,7 +838,7 @@ export class Session {
     const idx = i | 0; if (!this.sheets[idx]) return false;
     const nm = String(name == null ? '' : name);
     if (this.sheetNameProblem(nm, idx)) return false;
-    if (this.sheets[idx].name !== nm) { this.sheets[idx].name = nm; this.recalcAll(); this.emit('sheets'); }   // references to the old name read #REF! at once, to the new one resolve
+    if (this.sheets[idx].name !== nm) { this.sheets[idx].name = nm; this.forgetValues(); this.recalcAll(); this.emit('sheets'); }   // references to the old name read #REF! at once, to the new one resolve
     return true;
   }
   /**

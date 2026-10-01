@@ -141,12 +141,12 @@ export function tokenize(src) {
 const MIN_ARGS = { SUM: 1, MAX: 1, MIN: 1, ABS: 1, SIGN: 1, INT: 1, TRUNC: 1, AVERAGE: 1, PRODUCT: 1, MEDIAN: 1, COUNT: 1, COUNTA: 1, COUNTBLANK: 1, ROUND: 2, ROUNDUP: 2, ROUNDDOWN: 2, MOD: 2, SQRT: 1, POWER: 2, EXP: 1, LN: 1, LOG: 1, LOG10: 1,
   LARGE: 2, SMALL: 2, RANK: 2, 'RANK.EQ': 2, SUMPRODUCT: 1, SUMIF: 2, COUNTIF: 2, AVERAGEIF: 2, SUMIFS: 3, COUNTIFS: 2, AVERAGEIFS: 3, MAXIFS: 3, MINIFS: 3, AND: 1, OR: 1, XOR: 1, NOT: 1,
   IF: 2, IFS: 2, IFERROR: 2, IFNA: 2, CHOOSE: 2, SWITCH: 3, ISERROR: 1, ISERR: 1, ISNA: 1,
-  ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, MATCH: 2, INDEX: 2, VLOOKUP: 3, HLOOKUP: 3, XLOOKUP: 3, OFFSET: 3, ROWS: 1, COLUMNS: 1, LEN: 1, LEFT: 1, RIGHT: 1, MID: 3,
+  ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, ISFORMULA: 1, HYPERLINK: 1, MATCH: 2, INDEX: 2, VLOOKUP: 3, HLOOKUP: 3, XLOOKUP: 3, OFFSET: 3, ROWS: 1, COLUMNS: 1, LEN: 1, LEFT: 1, RIGHT: 1, MID: 3,
   FIND: 2, SEARCH: 2, TRIM: 1, UPPER: 1, LOWER: 1, PROPER: 1, CONCATENATE: 1, CONCAT: 1, TEXTJOIN: 3, SUBSTITUTE: 3, REPT: 2, EXACT: 2, VALUE: 1, TEXT: 2, T: 1, N: 1,
   DATE: 3, YEAR: 1, MONTH: 1, DAY: 1, WEEKDAY: 1, DAYS: 2, EDATE: 2, EOMONTH: 2, YEARFRAC: 2, NPV: 2, IRR: 1, PMT: 3, PV: 3, FV: 3 };
 const MAX_ARGS = { ABS: 1, SIGN: 1, INT: 1, TRUNC: 2, COUNTBLANK: 1, ROUND: 2, ROUNDUP: 2, ROUNDDOWN: 2, MOD: 2, SQRT: 1, POWER: 2, EXP: 1, LN: 1, LOG: 2, LOG10: 1, PI: 0, RAND: 0,
   LARGE: 2, SMALL: 2, RANK: 3, 'RANK.EQ': 3, SUMIF: 3, COUNTIF: 2, AVERAGEIF: 3, NOT: 1, TRUE: 0, FALSE: 0, NA: 0,
-  IF: 3, IFERROR: 2, IFNA: 2, ISERROR: 1, ISERR: 1, ISNA: 1, ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1,
+  IF: 3, IFERROR: 2, IFNA: 2, ISERROR: 1, ISERR: 1, ISNA: 1, ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, ISFORMULA: 1, HYPERLINK: 2,
   MATCH: 3, INDEX: 4, VLOOKUP: 4, HLOOKUP: 4, XLOOKUP: 6, OFFSET: 5, ROWS: 1, COLUMNS: 1, ROW: 1, COLUMN: 1, LEN: 1, LEFT: 2, RIGHT: 2, MID: 3,
   FIND: 3, SEARCH: 3, TRIM: 1, UPPER: 1, LOWER: 1, PROPER: 1, SUBSTITUTE: 4, REPT: 2, EXACT: 2, VALUE: 1, TEXT: 2, T: 1, N: 1,
   TODAY: 0, DATE: 3, YEAR: 1, MONTH: 1, DAY: 1, WEEKDAY: 2, DAYS: 2, EDATE: 2, EOMONTH: 2, YEARFRAC: 3, IRR: 2, PMT: 5, PV: 5, FV: 5 };
@@ -429,6 +429,15 @@ export function evalFormula(expr, ctx = {}) {
 
   /* ---- value helpers -------------------------------------------------------- */
   const cellVal = key => { const v = raw(key); if (v === undefined) return null; if (isErrVal(v)) throw err(v); return v; };
+  // ISFORMULA: whether a cell holds a formula (ctx.isFormula for this sheet, ctx.sheetIsFormula for NAME!B3; an unknown sheet is #REF!)
+  const hasFormula = k => {
+    const b = k.indexOf('!');
+    if (b < 0) return ctx.isFormula ? !!ctx.isFormula(k) : false;
+    if (!ctx.sheetIsFormula) throw err('#REF!');
+    const r = ctx.sheetIsFormula(k.slice(0, b), k.slice(b + 1));
+    if (r === null || r === undefined) throw err('#REF!');
+    return !!r;
+  };
   const deref = v => {
     if (v === undefined) return null;   // an omitted argument slot reads as a blank
     if (!isRange(v)) return v;
@@ -611,6 +620,22 @@ export function evalFormula(expr, ctx = {}) {
     const slots = node.args;   // null = omitted slot; arity was checked by the parser
     // lazy forms first: they choose which arguments to evaluate, or classify an error instead of propagating it
     switch (name) {
+      case 'ISFORMULA': {   // a reference, never a value: ISFORMULA(A1) is TRUE when A1 holds a formula; a value or a multi-cell range is #VALUE!
+        const v = evArg(slots[0]);
+        if (!isRange(v) || v.size !== 1) throw err('#VALUE!');
+        return hasFormula(v.cell(0));
+      }
+      case 'SUMPRODUCT': {   // M75: each argument evaluated cell by cell (arrays), non-numeric entries count as zero, an error anywhere propagates
+        const arrs = slots.map(s => { if (s === null) throw err('#VALUE!'); const v = evArr(s); return isRange(v) || isArr(v) ? v : new Arr(1, 1, [v]); });
+        const L = arrs[0].size; if (arrs.some(a => a.size !== L)) throw err('#VALUE!');
+        let t = 0;
+        for (let i = 0; i < L; i++) {
+          let m = 1;
+          for (const a of arrs) { const v = isRange(a) ? cellVal(a.cell(i)) : a.vals[i]; if (isErrVal(v)) throw err(v); m *= typeof v === 'number' ? v : 0; }
+          t += m;
+        }
+        return t;
+      }
       case 'IF': {
         const c = toBool(evArg(slots[0]));
         const pick = c ? slots[1] : slots[2];
@@ -707,8 +732,7 @@ export function evalFormula(expr, ctx = {}) {
       case 'LARGE': case 'SMALL': { const xs = collectNums([args[0]]).sort((a, b) => name === 'LARGE' ? b - a : a - b); const k = toInt(args[1]); if (k < 1 || k > xs.length) throw err('#NUM!'); return xs[k - 1]; }
       case 'RANK': case 'RANK.EQ': { const x = toNum(args[0]); const xs = collectNums([argRange(args[1])]); const asc = has(args, 2) && toNum(args[2]) !== 0;
         if (!xs.some(v => numeq(v, x))) throw err('#N/A'); return xs.filter(v => asc ? v < x : v > x).length + 1; }
-      case 'SUMPRODUCT': { const rgs = args.map(argRange); const L = rgs[0].size; if (rgs.some(r => r.size !== L)) throw err('#VALUE!');
-        let t = 0; for (let i = 0; i < L; i++) { let m = 1; for (const rg of rgs) { const v = cellVal(rg.cell(i)); m *= typeof v === 'number' ? v : 0; } t += m; } return t; }
+      case 'HYPERLINK': { const v = has(args, 1) ? deref(args[1]) : deref(args[0]); return v === null ? 0 : v; }   // the cell shows the friendly name (or the link text); nothing is followed here
       case 'SUMIF': case 'AVERAGEIF': case 'COUNTIF': {
         const rg = argRange(args[0]); const crit = criterion(args[1]);
         const sumRg = name === 'COUNTIF' ? null : (has(args, 2) ? argRange(args[2]) : rg);
@@ -884,6 +908,63 @@ export function evalFormula(expr, ctx = {}) {
     throw new SyntaxError('operator');
   }
 
+  /* ---- array evaluation inside SUMPRODUCT (M75) ------------------------------------- */
+  // An argument of SUMPRODUCT is evaluated cell by cell, as Excel's array evaluation does: a range
+  // stays a range; arithmetic, comparison, unary minus (the -- idiom) and the one-argument
+  // classifiers (ABS, N, NOT, ISERROR, ISERR, ISNA, ISNUMBER, ISTEXT, ISBLANK, ISLOGICAL, ISNONTEXT,
+  // ISFORMULA) over a range give an array of the same shape; a scalar or a single cell broadcasts.
+  // An error in one element stays in that element (ISERROR reads it, arithmetic carries it) and
+  // SUMPRODUCT propagates it; a blank reads as zero, so an empty check row adds nothing.
+  class Arr { constructor(rows, cols, vals) { this.rows = rows; this.cols = cols; this.vals = vals; } get size() { return this.vals.length; } }
+  const isArr = v => v instanceof Arr;
+  const ELEMENT_FNS = new Set(['ABS', 'N', 'NOT', 'ISERROR', 'ISERR', 'ISNA', 'ISNUMBER', 'ISTEXT', 'ISBLANK', 'ISLOGICAL', 'ISNONTEXT']);
+  const rawEl = key => { const v = raw(key); return v === undefined ? null : v; };
+  const arrayish = v => isArr(v) || (isRange(v) && v.size > 1);
+  const toArr = v => isArr(v) ? v : isRange(v) ? new Arr(v.rows, v.cols, v.keys().map(rawEl)) : v;
+  const scalarOf = v => isRange(v) ? cellVal(v.cell(0)) : v;   // a single cell broadcasts as its value (an error cell propagates)
+  const guarded = fn => { try { return fn(); } catch (e) { if (e instanceof FxError) return e.code; throw e; } };
+  function classify(name, x) {
+    if (name === 'ISERROR') return isErrVal(x);
+    if (name === 'ISERR') return isErrVal(x) && x !== '#N/A';
+    if (name === 'ISNA') return x === '#N/A';
+    if (name === 'ISNUMBER') return typeof x === 'number';
+    if (name === 'ISTEXT') return typeof x === 'string' && !isErrVal(x);
+    if (name === 'ISNONTEXT') return !(typeof x === 'string' && !isErrVal(x));
+    if (name === 'ISLOGICAL') return typeof x === 'boolean';
+    if (name === 'ISBLANK') return x === null;
+    if (isErrVal(x)) return x;
+    if (name === 'N') return typeof x === 'number' ? x : typeof x === 'boolean' ? (x ? 1 : 0) : 0;
+    if (name === 'NOT') return guarded(() => !toBool(x));
+    return guarded(() => Math.abs(toNum(x)));   // ABS
+  }
+  const mapArr = (a, fn) => new Arr(a.rows, a.cols, a.vals.map(fn));
+  function zipArr(op, l, r) {
+    const L = arrayish(l) ? toArr(l) : scalarOf(l), R = arrayish(r) ? toArr(r) : scalarOf(r);
+    const shape = isArr(L) ? L : R;
+    if (isArr(L) && isArr(R) && (L.rows !== R.rows || L.cols !== R.cols)) throw err('#VALUE!');
+    return mapArr(shape, (_, i) => {
+      const a = isArr(L) ? L.vals[i] : L, b = isArr(R) ? R.vals[i] : R;
+      if (isErrVal(a)) return a; if (isErrVal(b)) return b;
+      return guarded(() => binop(op, a, b));
+    });
+  }
+  function evArr(node) {
+    switch (node.k) {
+      case 'paren': return evArr(node.x);
+      case 'un': { const v = evArr(node.x); if (!arrayish(v)) return ev(node); return mapArr(toArr(v), x => isErrVal(x) ? x : node.op === '+' ? x : guarded(() => -toNum(x))); }
+      case 'pct': { const v = evArr(node.x); if (!arrayish(v)) return ev(node); return mapArr(toArr(v), x => isErrVal(x) ? x : guarded(() => toNum(x) / 100)); }
+      case 'bin': { const l = evArr(node.l), r = evArr(node.r); if (!arrayish(l) && !arrayish(r)) return ev(node); return zipArr(node.op, l, r); }
+      case 'fn': {
+        if (node.args.length !== 1 || node.args[0] === null) return ev(node);
+        if (node.name === 'ISFORMULA') { const v = ev(node.args[0]); if (!isRange(v)) throw err('#VALUE!'); if (v.size === 1) return hasFormula(v.cell(0)); return new Arr(v.rows, v.cols, v.keys().map(hasFormula)); }
+        if (!ELEMENT_FNS.has(node.name)) return ev(node);
+        const v = evArr(node.args[0]); if (!arrayish(v)) return ev(node);
+        return mapArr(toArr(v), x => classify(node.name, x));
+      }
+      default: return ev(node);
+    }
+  }
+
   /* ---- AST walker --------------------------------------------------------------- */
   function ev(node) {
     switch (node.k) {
@@ -937,7 +1018,7 @@ export function evalFormula(expr, ctx = {}) {
 /** Every function the evaluator computes (formula.test.js keeps this list and callFn in step). */
 export const FUNCTION_NAMES = ['ABS', 'AND', 'AVERAGE', 'AVERAGEIF', 'AVERAGEIFS', 'CHOOSE', 'COLUMN', 'COLUMNS', 'CONCAT', 'CONCATENATE', 'COUNT', 'COUNTA',
   'COUNTBLANK', 'COUNTIF', 'COUNTIFS', 'DATE', 'DAY', 'DAYS', 'EDATE', 'EOMONTH', 'EXACT', 'EXP', 'FALSE', 'FIND', 'FV', 'HLOOKUP', 'IF', 'IFERROR', 'IFNA',
-  'IFS', 'INDEX', 'INT', 'IRR', 'ISBLANK', 'ISERR', 'ISERROR', 'ISLOGICAL', 'ISNA', 'ISNONTEXT', 'ISNUMBER', 'ISTEXT', 'LARGE', 'LEFT', 'LEN', 'LN', 'LOG',
+  'HYPERLINK', 'IFS', 'INDEX', 'INT', 'IRR', 'ISBLANK', 'ISERR', 'ISERROR', 'ISFORMULA', 'ISLOGICAL', 'ISNA', 'ISNONTEXT', 'ISNUMBER', 'ISTEXT', 'LARGE', 'LEFT', 'LEN', 'LN', 'LOG',
   'LOG10', 'LOWER', 'MATCH', 'MAX', 'MAXIFS', 'MEDIAN', 'MID', 'MIN', 'MINIFS', 'MOD', 'MONTH', 'N', 'NA', 'NOT', 'NPV', 'OFFSET', 'OR', 'PI', 'PMT',
   'POWER', 'PRODUCT', 'PROPER', 'PV', 'RAND', 'RANK', 'RANK.EQ', 'REPT', 'RIGHT', 'ROUND', 'ROUNDDOWN', 'ROUNDUP', 'ROW', 'ROWS', 'SEARCH', 'SIGN',
   'SMALL', 'SQRT', 'SUBSTITUTE', 'SUM', 'SUMIF', 'SUMIFS', 'SUMPRODUCT', 'SWITCH', 'T', 'TEXT', 'TEXTJOIN', 'TODAY', 'TRIM', 'TRUE', 'TRUNC', 'UPPER',
