@@ -145,13 +145,13 @@ export function tokenize(src) {
 const MIN_ARGS = { SUM: 1, MAX: 1, MIN: 1, ABS: 1, SIGN: 1, INT: 1, TRUNC: 1, AVERAGE: 1, PRODUCT: 1, MEDIAN: 1, COUNT: 1, COUNTA: 1, COUNTBLANK: 1, ROUND: 2, ROUNDUP: 2, ROUNDDOWN: 2, MOD: 2, SQRT: 1, POWER: 2, EXP: 1, LN: 1, LOG: 1, LOG10: 1,
   LARGE: 2, SMALL: 2, RANK: 2, 'RANK.EQ': 2, SUMPRODUCT: 1, SUMIF: 2, COUNTIF: 2, AVERAGEIF: 2, SUMIFS: 3, COUNTIFS: 2, AVERAGEIFS: 3, MAXIFS: 3, MINIFS: 3, AND: 1, OR: 1, XOR: 1, NOT: 1,
   IF: 2, IFS: 2, IFERROR: 2, IFNA: 2, CHOOSE: 2, SWITCH: 3, ISERROR: 1, ISERR: 1, ISNA: 1,
-  ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, MATCH: 2, INDEX: 2, VLOOKUP: 3, HLOOKUP: 3, XLOOKUP: 3, OFFSET: 3, ROWS: 1, COLUMNS: 1, LEN: 1, LEFT: 1, RIGHT: 1, MID: 3,
+  ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, ISFORMULA: 1, HYPERLINK: 1, MATCH: 2, INDEX: 2, VLOOKUP: 3, HLOOKUP: 3, XLOOKUP: 3, OFFSET: 3, ROWS: 1, COLUMNS: 1, LEN: 1, LEFT: 1, RIGHT: 1, MID: 3,
   FIND: 2, SEARCH: 2, TRIM: 1, UPPER: 1, LOWER: 1, PROPER: 1, CONCATENATE: 1, CONCAT: 1, TEXTJOIN: 3, SUBSTITUTE: 3, REPT: 2, EXACT: 2, VALUE: 1, TEXT: 2, T: 1, N: 1,
   DATE: 3, YEAR: 1, MONTH: 1, DAY: 1, WEEKDAY: 1, DAYS: 2, EDATE: 2, EOMONTH: 2, YEARFRAC: 2, NPV: 2, IRR: 1, PMT: 3, PV: 3, FV: 3,
   REPLACE: 4, RRI: 3, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, ISFORMULA: 1, FILTER: 2, SORT: 1, UNIQUE: 1, SEQUENCE: 1, TRANSPOSE: 1, XMATCH: 2 };
 const MAX_ARGS = { ABS: 1, SIGN: 1, INT: 1, TRUNC: 2, COUNTBLANK: 1, ROUND: 2, ROUNDUP: 2, ROUNDDOWN: 2, MOD: 2, SQRT: 1, POWER: 2, EXP: 1, LN: 1, LOG: 2, LOG10: 1, PI: 0, RAND: 0,
   LARGE: 2, SMALL: 2, RANK: 3, 'RANK.EQ': 3, SUMIF: 3, COUNTIF: 2, AVERAGEIF: 3, NOT: 1, TRUE: 0, FALSE: 0, NA: 0,
-  IF: 3, IFERROR: 2, IFNA: 2, ISERROR: 1, ISERR: 1, ISNA: 1, ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1,
+  IF: 3, IFERROR: 2, IFNA: 2, ISERROR: 1, ISERR: 1, ISNA: 1, ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, ISFORMULA: 1, HYPERLINK: 2,
   MATCH: 3, INDEX: 4, VLOOKUP: 4, HLOOKUP: 4, XLOOKUP: 6, OFFSET: 5, ROWS: 1, COLUMNS: 1, ROW: 1, COLUMN: 1, LEN: 1, LEFT: 2, RIGHT: 2, MID: 3,
   FIND: 3, SEARCH: 3, TRIM: 1, UPPER: 1, LOWER: 1, PROPER: 1, SUBSTITUTE: 4, REPT: 2, EXACT: 2, VALUE: 1, TEXT: 2, T: 1, N: 1,
   TODAY: 0, DATE: 3, YEAR: 1, MONTH: 1, DAY: 1, WEEKDAY: 2, DAYS: 2, EDATE: 2, EOMONTH: 2, YEARFRAC: 3, IRR: 2, PMT: 5, PV: 5, FV: 5,
@@ -769,7 +769,7 @@ export function evalFormula(expr, ctx = {}) {
       }
       case 'ISFORMULA': {   // TRUE for a cell that holds a formula (the sheet answers through ctx.isFormula); over a range, one answer per cell (M75)
         const v = evArg(slots[0]); if (!isRange(v)) throw err('#VALUE!');
-        const f = k => !!(ctx.isFormula && ctx.isFormula(k));
+        const f = k => { const r = ctx.isFormula ? ctx.isFormula(k) : false; if (r === null) throw err('#REF!'); return !!r; };   // null: no such sheet
         return v.size === 1 ? f(v.cell(0)) : new Arr(v.rows, v.cols, v.keys().map(f));
       }
       case 'ROW': case 'COLUMN': {
@@ -831,6 +831,7 @@ export function evalFormula(expr, ctx = {}) {
       case 'SUMPRODUCT': {   // ranges or arrays of one shape: (A2:A9="x")*(B2:B9) arrives as one array of products, ABS(C2:C9) as one of absolutes; text and booleans read 0
         const gs = args.map(grid); const L = gs[0].size; if (gs.some(g => g.rows !== gs[0].rows || g.cols !== gs[0].cols)) throw err('#VALUE!');
         let t = 0; for (let i = 0; i < L; i++) { let m = 1; for (const g of gs) { const v = gval(g, i); m *= typeof v === 'number' ? v : 0; } t += m; } return t; }
+      case 'HYPERLINK': { const v = has(args, 1) ? deref(args[1]) : deref(args[0]); return v === null ? 0 : v; }   // the cell shows the friendly name (or the link text); nothing is followed here
       case 'SUMIF': case 'AVERAGEIF': case 'COUNTIF': {
         const rg = argRange(args[0]); const crit = criterion(args[1]);
         const sumRg = name === 'COUNTIF' ? null : (has(args, 2) ? argRange(args[2]) : rg);
@@ -898,7 +899,7 @@ export function evalFormula(expr, ctx = {}) {
       case 'OFFSET': { const base = argRange(args[0]); const dr = toInt(args[1]), dc = toInt(args[2]);
         const h = has(args, 3) ? toInt(args[3]) : base.rows, w = has(args, 4) ? toInt(args[4]) : base.cols;
         if (h < 1 || w < 1) throw err('#REF!'); const r1 = base.r1 + dr, c1 = base.c1 + dc; if (r1 < 1 || c1 < 1) throw err('#REF!');
-        return new Range(r1, c1, r1 + h - 1, c1 + w - 1); }
+        return new Range(r1, c1, r1 + h - 1, c1 + w - 1, base.sheet); }
       case 'ROWS': { const v = args[0]; if (!isRange(v) && !isArr(v)) throw err('#VALUE!'); return v.rows; }
       case 'COLUMNS': { const v = args[0]; if (!isRange(v) && !isArr(v)) throw err('#VALUE!'); return v.cols; }
       /* ---- dynamic arrays (M61): each gives an Arr, which spills at the top of a formula ---- */
@@ -1105,7 +1106,7 @@ export function evalFormula(expr, ctx = {}) {
 /** Every function the evaluator computes (formula.test.js keeps this list and callFn in step). */
 export const FUNCTION_NAMES = ['ABS', 'AND', 'AVERAGE', 'AVERAGEIF', 'AVERAGEIFS', 'CHOOSE', 'COLUMN', 'COLUMNS', 'CONCAT', 'CONCATENATE', 'COUNT', 'COUNTA',
   'COUNTBLANK', 'COUNTIF', 'COUNTIFS', 'DATE', 'DAY', 'DAYS', 'EDATE', 'EOMONTH', 'EXACT', 'EXP', 'FALSE', 'FIND', 'FV', 'HLOOKUP', 'IF', 'IFERROR', 'IFNA',
-  'IFS', 'INDEX', 'INT', 'IRR', 'ISBLANK', 'ISERR', 'ISERROR', 'ISLOGICAL', 'ISNA', 'ISNONTEXT', 'ISNUMBER', 'ISTEXT', 'LARGE', 'LEFT', 'LEN', 'LN', 'LOG',
+  'HYPERLINK', 'IFS', 'INDEX', 'INT', 'IRR', 'ISBLANK', 'ISERR', 'ISERROR', 'ISFORMULA', 'ISLOGICAL', 'ISNA', 'ISNONTEXT', 'ISNUMBER', 'ISTEXT', 'LARGE', 'LEFT', 'LEN', 'LN', 'LOG',
   'LOG10', 'LOWER', 'MATCH', 'MAX', 'MAXIFS', 'MEDIAN', 'MID', 'MIN', 'MINIFS', 'MOD', 'MONTH', 'N', 'NA', 'NOT', 'NPV', 'OFFSET', 'OR', 'PI', 'PMT',
   'POWER', 'PRODUCT', 'PROPER', 'PV', 'RAND', 'RANK', 'RANK.EQ', 'REPT', 'RIGHT', 'ROUND', 'ROUNDDOWN', 'ROUNDUP', 'ROW', 'ROWS', 'SEARCH', 'SIGN',
   'SMALL', 'SQRT', 'SUBSTITUTE', 'SUM', 'SUMIF', 'SUMIFS', 'SUMPRODUCT', 'SWITCH', 'T', 'TEXT', 'TEXTJOIN', 'TODAY', 'TRIM', 'TRUE', 'TRUNC', 'UPPER',

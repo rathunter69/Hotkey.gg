@@ -94,3 +94,49 @@ test('point mode and Go To: Ctrl+PgDn while pointing is swallowed; Go To Costs!B
 test('evalFormula without a workbook: a prefixed ref is #REF!, never a throw', () => {
   assert.equal(evalFormula('=Costs!B3', { raw: () => 1 }), '#REF!');
 });
+
+test('a chain that hops across three sheets in the wrong order settles in one edit (the workbook recalc runs until nothing moves)', () => {
+  const s = new Session(new Sheet({ cells: { A1: { formula: '=Two!A1+1' } } }));
+  s.renameSheet(0, 'One');
+  s.addSheet('Two', new Sheet({ cells: { A1: { formula: '=Three!A1*2' } } }));
+  s.addSheet('Three', new Sheet({ cells: { A1: { formula: '=One!B1+5' } } }));
+  s.switchSheet(0);
+  s.sheet.commitInput('10', 1, 2);   // One!B1
+  assert.equal(s.sheets[2].sheet.value('A1'), 15);
+  assert.equal(s.sheets[1].sheet.value('A1'), 30);
+  assert.equal(s.sheet.value('A1'), 31, 'the first sheet read the value three hops away on the same edit');
+  s.sheet.commitInput('1', 1, 2);
+  assert.equal(s.sheet.value('A1'), 13);
+});
+
+test('a circle across sheets settles with iterative calculation on (interest on an average balance), inside the Options limits', () => {
+  const s = new Session(new Sheet({ cells: { A2: { formula: '=Two!A2*0.5+1' } } }));
+  s.renameSheet(0, 'One');
+  s.addSheet('Two', new Sheet({ cells: { A2: { formula: '=One!A2' } } }));
+  s.settings.iterative = true; s.settings.maxIterations = 100; s.settings.maxChange = 0.000001;
+  s.switchSheet(0);
+  s.sheet.commitInput('=Two!A2*0.5+1', 2, 1);
+  assert.ok(Math.abs(s.sheet.value('A2') - 2) < 0.0001, 'A2 = A2/2 + 1 settles at 2: ' + s.sheet.value('A2'));
+});
+
+test('INDEX and OFFSET over a range on another sheet read that sheet (the slice keeps its sheet)', () => {
+  const s = book(); const S = s.sheet;   // Sales: B3 100, B4 200; Costs: B3 40, B4 70
+  S.commitInput('=INDEX(Costs!B3:B4,2)', 7, 4);
+  assert.equal(S.value('D7'), 70, 'INDEX on Costs!B3:B4 reads Costs, not Sales');
+  S.commitInput('=SUM(INDEX(Costs!A3:B4,0,2))', 9, 4);
+  assert.equal(S.value('D9'), 110, 'the column slice sums the other sheet');
+  S.commitInput('=INDEX(Costs!$B$3:$B$4,MATCH(70,Costs!$B$3:$B$4,0))', 10, 4);
+  assert.equal(S.value('D10'), 70, 'INDEX/MATCH across sheets');
+  S.commitInput('=SUM(OFFSET(Costs!B3,0,0,2,1))', 11, 4);
+  assert.equal(S.value('D11'), 110, 'OFFSET keeps the base range\'s sheet');
+});
+
+test('addSheet with recalc: false defers the workbook recalculation to one recalcAll (a loader adding many sheets)', () => {
+  const s = new Session(new Sheet({ cells: { A1: { formula: '=Two!A1+Three!A1' } } }));
+  s.renameSheet(0, 'One');
+  s.addSheet('Two', new Sheet({ cells: { A1: { value: 2 } } }), undefined, { recalc: false });
+  assert.equal(s.sheet.value('A1'), null, 'nothing recalculated yet');
+  s.addSheet('Three', new Sheet({ cells: { A1: { value: 3 } } }), undefined, { recalc: false });
+  s.recalcAll();
+  assert.equal(s.sheet.value('A1'), 5);
+});

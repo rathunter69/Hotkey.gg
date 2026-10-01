@@ -55,8 +55,7 @@ export class LessonRun {
     const sheets = moduleState ? moduleState.sheets : Array.isArray(this.lesson.sheets) ? this.lesson.sheets : [];
     if (sheets.length && this.session.sheets) {
       if (sheets[0] && sheets[0].name) this.session.sheets[0].name = sheets[0].name;
-      for (const sh of sheets.slice(1)) if (this.session.addSheet) this.session.addSheet(sh.name, build(sh));
-      for (let pass = 0; pass < 2; pass++) for (const e of this.session.sheets) e.sheet.recalc();   // cross-sheet links read their sheets once every sheet exists (no #REF! until the first edit)
+      for (const sh of sheets.slice(1)) if (this.session.addSheet) this.session.addSheet(sh.name, build(sh), undefined, { recalc: false });
     }
     if (moduleState && moduleState.settings) {
       const st = moduleState.settings;
@@ -67,7 +66,10 @@ export class LessonRun {
       if (st.enterMoves === false) this.session.settings.enterMoves = false;   // 1.1.4 on: Enter commits and stays (Options › Advanced)
     }
     // the workbook's defined names ({ CostPerWash: 'Inputs!$B$4' }, from 1.3.5's Define Name)
+    // (the setter recalculates the workbook); otherwise one recalculation now, so cross-sheet links read
+    // their sheets once every sheet exists and a chain across sheets settles (no #REF! until the first edit)
     if (moduleState && moduleState.names && typeof moduleState.names === 'object' && Object.keys(moduleState.names).length) this.session.names = moduleState.names;
+    else this.session.recalcAll();
     this.landedAt = [];   // when each goal landed (the session clock), for split times
     // Demo goals (goal.demo = { script, cadence }): the platform plays the keys itself while the
     // learner watches. The session records which demos have finished so the goal's check can read it.

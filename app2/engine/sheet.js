@@ -416,10 +416,11 @@ export class Sheet {
     return { raw: k => this.raw(k), rows: this.rows, cols: this.cols, today: this.today || undefined,
       // NAME!B3: another sheet of the workbook (the Session wires `resolver`); no workbook = #REF!
       sheetRaw: (name, key) => { const sh = this.resolver ? this.resolver(name) : null; return sh ? sh.raw(key) : '#REF!'; },
+      // ISFORMULA: whether a cell holds a formula, here or on another sheet (null = no such sheet)
       name: nm => this.resolveName(nm),
       rowHidden: r => this.hiddenRows.has(r) || this.filterRows.has(r) || this.isFolded('r', r),   // SUBTOTAL 101 to 111 skip hidden rows
       rowFiltered: r => this.filterRows.has(r),                                                       // SUBTOTAL 1 to 11 skip only the AutoFilter's
-      isFormula: k => { const sh = this.sheetOfKey(k); return !!(sh && sh.sheet.cells[sh.key] && sh.sheet.cells[sh.key].formula); },   // ISFORMULA
+      isFormula: k => { const sh = this.sheetOfKey(k); if (!sh) return null; const c = sh.sheet.cells[sh.key]; return !!(c && c.formula); },   // ISFORMULA (null: no such sheet)
       spillRange: k => { const sh = this.sheetOfKey(k); const c = sh && sh.sheet.cells[sh.key]; return c && c.spillTo ? { ...c.spillTo } : null; },   // A1#
       ...extra };
   }
@@ -635,6 +636,10 @@ export class Sheet {
    * found from the formula's references — token based); a genuine circular reference reads 0,
    * as Excel shows it with iterative calculation off. A fixed-point pass then settles anything the
    * static references cannot see (OFFSET/INDEX-built ranges).
+   *
+   * Returns how far the sheet moved: the largest change of any formula value (0 when none moved,
+   * Infinity when a value changed type or text), which the Session's workbook recalc reads to know
+   * when a cross-sheet chain or circle has settled.
    */
   recalc() {
     this._cfMap = null;   // every mutation ends in a recalc (commit): the conditional-formatting map is re-evaluated on the next read
@@ -651,7 +656,19 @@ export class Sheet {
     }
     const keys = []; for (const k in this.cells) if (this.cells[k] && this.cells[k].formula) keys.push(k);
     this.circular = [];
-    if (!keys.length) return;
+    if (!keys.length) return 0;
+    const before = new Map(); for (const k of keys) before.set(k, this.cells[k].value);
+    this.recalcOnce(keys, spillOwner);
+    let delta = 0;
+    for (const [k, v0] of before) {
+      const v1 = this.cells[k].value;
+      if (v1 === v0 || (Number.isNaN(v0) && Number.isNaN(v1))) continue;
+      if (typeof v0 === 'number' && typeof v1 === 'number') { const d = Math.abs(v1 - v0); if (d > delta) delta = d; }
+      else delta = Infinity;
+    }
+    return delta;
+  }
+  recalcOnce(keys, spillOwner) {
     const fset = new Set(keys);
     // Every formula-cell key a formula actually dereferences while evaluating is recorded, so a
     // dependency that only exists through OFFSET/INDEX/INDIRECT-built ranges still joins the graph.
