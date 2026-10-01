@@ -11,7 +11,7 @@ function memStorage() {
 
 const att = (over = {}) => ({
   id: over.id || 'id-' + Math.random().toString(36).slice(2),
-  kind: 'drill', ref: 'edge-jumps', day: '2026-09-22', seed: null,
+  kind: 'drill', ref: 'get-around', day: '2026-09-22', seed: null,
   secs: 10, keys: 8, clean: true, helped: false, mouse: 0, tier: 'pro',
   splits: [2, 3, 5], trace: [{ k: 'Ctrl+↓', t: 0, cell: 'A1' }, { k: 'Ctrl+→', t: 900, cell: 'A6' }],
   at: 1758500000000, ...over,
@@ -31,28 +31,28 @@ test('records: corrupt storage reads empty; add/pb/trace/attempts round-trip; ca
 
     // a clean attempt lands, becomes the PB and carries its trace to the ghost slot
     assert.ok(records.addAttempt(att({ id: 'a1', secs: 12 })));
-    assert.equal(records.pb('edge-jumps').secs, 12);
-    assert.equal(records.pb('edge-jumps').attemptId, 'a1');
-    assert.equal(records.trace('edge-jumps').length, 2);
-    assert.equal(records.attempts({ ref: 'edge-jumps' }).length, 1);
-    assert.equal(records.attempts({ ref: 'edge-jumps' })[0].trace.length, 0, 'the attempt row itself does not duplicate the trace');
+    assert.equal(records.pb('get-around').secs, 12);
+    assert.equal(records.pb('get-around').attemptId, 'a1');
+    assert.equal(records.trace('get-around').length, 2);
+    assert.equal(records.attempts({ ref: 'get-around' }).length, 1);
+    assert.equal(records.attempts({ ref: 'get-around' })[0].trace.length, 0, 'the attempt row itself does not duplicate the trace');
 
     // helped or mouse: recorded, never a PB
     records.addAttempt(att({ id: 'a2', secs: 5, clean: false, helped: true }));
     records.addAttempt(att({ id: 'a3', secs: 4, clean: false, mouse: 3 }));
-    assert.equal(records.pb('edge-jumps').secs, 12, 'assisted and moused runs never take the PB');
-    assert.equal(records.attempts({ ref: 'edge-jumps' }).length, 3);
+    assert.equal(records.pb('get-around').secs, 12, 'assisted and moused runs never take the PB');
+    assert.equal(records.attempts({ ref: 'get-around' }).length, 3);
 
     // a slower clean run keeps the PB; a faster one replaces PB and trace
     records.addAttempt(att({ id: 'a4', secs: 20 }));
-    assert.equal(records.pb('edge-jumps').secs, 12);
+    assert.equal(records.pb('get-around').secs, 12);
     records.addAttempt(att({ id: 'a5', secs: 9.5, trace: [{ k: 'Ctrl+Home', t: 0, cell: 'A1' }] }));
-    assert.equal(records.pb('edge-jumps').secs, 9.5);
-    assert.equal(records.pb('edge-jumps').attemptId, 'a5');
-    assert.deepEqual(records.trace('edge-jumps').map(e => e.k), ['Ctrl+Home'], 'the ghost is the new PB run');
+    assert.equal(records.pb('get-around').secs, 9.5);
+    assert.equal(records.pb('get-around').attemptId, 'a5');
+    assert.deepEqual(records.trace('get-around').map(e => e.k), ['Ctrl+Home'], 'the ghost is the new PB run');
 
     // filters
-    records.addAttempt(att({ id: 'a6', ref: 'select-blocks', day: '2026-09-21', kind: 'daily' }));
+    records.addAttempt(att({ id: 'a6', ref: 'find-and-fix', day: '2026-09-21', kind: 'daily' }));
     assert.equal(records.attempts({ day: '2026-09-21' }).length, 1);
     assert.equal(records.attempts({ kind: 'daily' }).length, 1);
 

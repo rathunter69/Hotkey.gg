@@ -45,11 +45,11 @@ test('tierOf: gates, the provisional cap, buckets', () => {
 });
 
 test('standing dedups per board, counts crowns/podiums, weights exposure', () => {
-  const boards = ['edge-jumps', 'weekly-sales-report'];
+  const boards = ['get-around', 'weekly-sales-report'];
   const runs = [
-    // edge-jumps board, best-first: me 1st of 3 (and a dup row that must not double-count)
-    { challenge: 'edge-jumps', user_id: 'me' }, { challenge: 'edge-jumps', user_id: 'me' },
-    { challenge: 'edge-jumps', user_id: 'u2' }, { challenge: 'edge-jumps', user_id: 'u3' },
+    // get-around board, best-first: me 1st of 3 (and a dup row that must not double-count)
+    { challenge: 'get-around', user_id: 'me' }, { challenge: 'get-around', user_id: 'me' },
+    { challenge: 'get-around', user_id: 'u2' }, { challenge: 'get-around', user_id: 'u3' },
     // weekly board: me 3rd of 4
     { challenge: 'weekly-sales-report', user_id: 'u2' }, { challenge: 'weekly-sales-report', user_id: 'u3' },
     { challenge: 'weekly-sales-report', user_id: 'me' }, { challenge: 'weekly-sales-report', user_id: 'u4' },

@@ -8,6 +8,7 @@ import { DRILLS } from '../content/drills.js';
 import { store } from './store.js';
 import { dailyFor } from './daily.js';
 import { dayOf } from './records.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 const BOARDS = [
   { key: 'benchmark', label: 'Benchmark', title: 'Benchmark drills', sub: 'Best clean times. The global field opens when you sign in; until then these are your own posted times, which carry over.', liveSub: 'Best clean times from everyone with a public profile. Your times on this device sit beneath each board.' },
@@ -89,7 +90,7 @@ export function panelHtml(tab, { live = false, global = {} } = {}) {
           <div class="row"><span class="rk">1</span><span class="nm muted">—</span><span class="mid"></span><span class="tm muted">—</span></div>
           <div class="row"><span class="rk">2</span><span class="nm muted">—</span><span class="mid"></span><span class="tm muted">—</span></div>
           <div class="row"><span class="rk">3</span><span class="nm muted">—</span><span class="mid"></span><span class="tm muted">—</span></div>
-          <div class="empty">Boards open with accounts.</div></div>`).join('');
+          <div class="empty">${esc(siteCopy('boards_closed', 'Desk and school boards open in a later phase.'))}</div></div>`).join('');
 }
 
 export function mountLeaderboardPage(root, ctx = {}) {
@@ -126,11 +127,11 @@ export function mountLeaderboardPage(root, ctx = {}) {
 
   function render() {
     const b = BOARDS.find(x => x.key === cur);
-    el.innerHTML = `<div class="page-head"><h1>Leaderboard</h1><p class="page-sub">Every timed drill has a board. Viewable by everyone; entries need a clean run: no help, no mouse on the workspace.</p></div>
+    el.innerHTML = `<div class="page-head"><h1>Leaderboards</h1><p class="page-sub">Every timed drill has a board. Viewable by everyone; entries need a clean run: no help, no mouse on the workspace.</p></div>
       <div class="lb-tabs" role="tablist" aria-label="boards">${BOARDS.map(x => `<button type="button" role="tab" class="lb-tab${x.key === cur ? ' on' : ''}" aria-selected="${x.key === cur}" tabindex="${x.key === cur ? 0 : -1}" data-key="${x.key}">${esc(x.label)}</button>`).join('')}</div>
       <div class="boards" role="tabpanel"></div>
       <p class="lb-sub">${esc(live() && b.liveSub ? b.liveSub : b.sub)}</p>
-      <div class="lb-desk-prompt"><span>Compete with your own group: start a desk.</span><a class="btn btn-ghost" href="#/teams">Teams and desks →</a></div>`;
+      <div class="lb-desk-prompt"><span>${esc(siteCopy('boards_desk_prompt', 'Start a desk to compete with your own group.'))}</span><a class="btn btn-ghost" href="#/teams">Teams and desks</a></div>`;
     drawPanel();
     load();
     const tabs = [...el.querySelectorAll('.lb-tab')];

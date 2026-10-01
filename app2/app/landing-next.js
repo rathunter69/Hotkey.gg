@@ -2,7 +2,7 @@
 // learned. It's practiced." (Wolf's pick) with two alternates behind ?h=2 / ?h=3, the subhead a non-banker self-selects into (decision 13), a live
 // self-playing lesson the visitor can take over by clicking it (or tabbing to it) and typing, the
 // six modes shown as short muted clips of the real product composed as a page, then how it works,
-// Project Volt, free vs paid, teams and the close (with a Sign in for returning learners; the nav
+// the case, free vs paid, teams and the close (with a Sign in for returning learners; the nav
 // carries the other). Enter anywhere starts.
 //
 // Keys reach the demo only while it has focus: page scrolling, Space, Tab and the browser's own
@@ -19,11 +19,11 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&a
 
 /** The headline and its two alternates (?h=2 and ?h=3 still show them). */
 export const HEADLINES = [
-  { a: siteCopy('landing_headline_a', 'Excel isn’t learned.'), b: siteCopy('landing_headline_b', 'It’s practiced.') },   // shipped (Wolf, 2026-09-23 B); site.csv overrides
-  { a: 'You don’t learn Excel by watching.', b: 'You learn it by doing it again.' },
-  { a: 'Nobody learned Excel from a video.', b: '' },
+  { a: siteCopy('landing_headline', 'The better way to master Excel'), b: '' },   // Wolf's landing line (screenplay 3.1, 2026-10-01); site.csv overrides
+  { a: 'Excel isn’t learned.', b: 'It’s practiced.' },   // the 2026-09-23 pick, behind ?h=2
+  { a: 'The better way to learn Excel', b: '' },
 ];
-export const SUBHEAD = siteCopy('landing_subhead', 'Learn Excel the way analysts are taught — on a real sheet, one job at a time.');
+export const SUBHEAD = siteCopy('landing_subhead', 'Learn like an analyst at a top firm, and build the muscle memory to make it stick.');
 
 /**
  * The six modes, in the order a learner meets them. Each clip is a muted loop of the real product;
@@ -32,12 +32,12 @@ export const SUBHEAD = siteCopy('landing_subhead', 'Learn Excel the way analysts
  * first run; the Practice modes and the boards open their pages, which a guest can browse as is.
  */
 const MODES_DEFAULT = [
-  { key: 'lesson', size: 'wide', title: 'Lessons', line: 'One job at a time on a live sheet. The keys are shown the first time; the sheet is graded on where it ends up, so any correct route counts.', where: 'Learn', href: '#/start' },
-  { key: 'challenge', size: '', title: 'Challenges', line: 'Every module ends in a seeded, timed run on a fresh file. Pass completes the module; pro and legendary are what you come back for.', where: 'Learn', href: '#/start' },
-  { key: 'drill', size: '', title: 'Drills', line: 'The same generators stripped of the story. Pars, personal bests, and a ghost of your own best run to race.', where: 'Practice', href: '#/practice' },
-  { key: 'daily', size: '', title: 'The Daily', line: 'Ninety seconds, the same sheet for everyone, once a day. A result card built to be shared.', where: 'Practice', href: '#/practice' },
-  { key: 'rapid', size: '', title: 'Rapid-fire', line: 'One shortcut at a time against the clock, drawn from the ones you remember least. Recall is the game.', where: 'Practice', href: '#/practice' },
-  { key: 'boards', size: 'wide', title: 'Boards', line: 'A board for every challenge and for the Daily. Clean runs only: no help, no mouse. Rank turns on when the field fills.', where: 'Leaderboard', href: '#/leaderboard' },
+  { key: 'lesson', size: 'wide', title: 'Lessons', line: 'Lessons: the learning path, one job at a time on a real sheet.', where: 'Learn', href: '#/start' },
+  { key: 'challenge', size: '', title: 'Challenges', line: 'Challenges: work through a full solution, timed.', where: 'Learn', href: '#/start' },
+  { key: 'drill', size: '', title: 'Drills', line: 'Drills: build muscle memory.', where: 'Practice', href: '#/practice' },
+  { key: 'daily', size: '', title: 'The Daily', line: 'Daily: a unique 90-second challenge, with a public leaderboard every day.', where: 'Practice', href: '#/practice' },
+  { key: 'rapid', size: '', title: 'Rapid-fire', line: 'Rapid-fire: reach flow state.', where: 'Practice', href: '#/practice' },
+  { key: 'boards', size: 'wide', title: 'Boards', line: 'Leaderboards: see who’s the fastest.', where: 'Leaderboard', href: '#/leaderboard' },
 ];
 export const MODES = MODES_DEFAULT.map(m => ({ ...m, line: siteCopy('mode_' + m.key, m.line) }));
 
@@ -78,13 +78,12 @@ export function landingHtml(h = 0) {
       <div class="l-glow"></div>
       <div class="ld2-hero-grid">
         <div class="ld2-hero-text">
-          <div class="eyebrow">learn excel by doing · keyboard first</div>
           <h1>${esc(head.a)}${head.b ? `<br><em>${esc(head.b)}</em>` : ''}</h1>
           <p class="lede">${esc(SUBHEAD)}</p>
           <div class="landing-cta">
             <a class="start-btn" id="startLearning" href="#/start">Start learning <kbd class="kbd-cta">↵</kbd></a>
           </div>
-          <div class="micro ld2-micro"><div class="ld2-micro-list">${microClauses(`Chapter 1 is free · no account to start · nothing to install · progress ${store.saveLine()}`).map(c => `<span>${esc(c)}</span>`).join('')}</div></div>
+          <div class="micro ld2-micro"><div class="ld2-micro-list">${microClauses(`${siteCopy('landing_start_note', 'Chapter 1 is free, and you don’t need an account.')} · Progress ${store.saveLine()}.`).map(c => `<span>${esc(c)}</span>`).join('')}</div></div>
         </div>
         <div class="ld2-hero-demo">
           <div id="ldDemo"></div>
@@ -96,7 +95,7 @@ export function landingHtml(h = 0) {
     <section class="l-sec ld2-modes" id="lModes">
       <div class="l-label">six ways to practice</div>
       <h2>One real sheet. Six ways to use it.</h2>
-      <p class="l-sub">Lessons teach. Everything else is repetition — the part a video cannot give you.</p>
+      <p class="l-sub">Lessons teach. Everything else is repetition, the part a video can’t give you.</p>
       <div class="ld2-bento">
         ${MODES.map(m => `<article class="ld2-mode ld2-mode-${m.key}${m.size ? ' ' + m.size : ''}">
           <div class="ld2-clip">
@@ -120,12 +119,12 @@ export function landingHtml(h = 0) {
     <section class="l-sec ld2-volt" id="lVolt">
       <div class="ld2-volt-grid">
         <div>
-          <div class="l-label">project volt</div>
-          <h2>One deal, six chapters, one pack.</h2>
-          <p class="l-sub">You are the analyst on the sale of Voltline Charging, a 40-site EV fast-charging network. Management sends data; you turn it into the pages a buyer will read. Each chapter is one stage of the sale, and every lesson is one job on that file.</p>
+          <div class="l-label">the case</div>
+          <h2>One company, sold in six stages. You build a page in each.</h2>
+          <p class="l-sub">Clearcoat Express runs 40 express car washes across Texas, and its owners are selling to private equity. You work on the finance team and build the pages the sale needs. Each chapter is one stage of the sale, and every lesson is one job on its files.</p>
         </div>
         <ol class="ld2-stages">
-          ${STAGES.map(s => `<li class="${s.access === 'free' ? 'free' : ''}"><span class="ld2-stage-n">${s.n}</span><span class="ld2-stage-body"><b>${esc(s.stage)}</b><span>${esc(s.delivers)}</span></span><span class="l-tag ${s.access === 'free' ? 'l-free' : ''}">${s.access}</span></li>`).join('')}
+          ${STAGES.map(s => `<li class="${s.access === 'free' ? 'free' : ''}"><span class="ld2-stage-n">${s.n}</span><span class="ld2-stage-body"><b>${esc(s.stage)}</b><span>${esc(s.delivers)}</span></span><span class="l-tag ${s.access === 'free' ? 'l-free' : ''}">${s.access === 'free' ? 'free' : 'Pro'}</span></li>`).join('')}
         </ol>
       </div>
     </section>
@@ -144,7 +143,7 @@ export function landingHtml(h = 0) {
               <li>The Daily, free for everyone</li>
               <li>One sample lesson from each paid chapter</li>
             </ul>
-            <a class="l-btn" href="#/start">Start learning →</a>
+            <a class="l-btn" href="#/start">Start learning</a>
           </div>
         </div>
         <div class="l-tier l-tier-pro">
@@ -158,7 +157,7 @@ export function landingHtml(h = 0) {
               <li>Timed and competitive play on that content</li>
               <li>Certificates: Completed and Verified</li>
             </ul>
-            <a class="l-btn" href="#/pricing">See pricing →</a>
+            <a class="l-btn" href="#/pricing">See pricing</a>
           </div>
         </div>
       </div>
@@ -166,14 +165,13 @@ export function landingHtml(h = 0) {
 
     <section class="l-sec" id="lTeams">
       <div class="l-teams">
-        <div><h2>Learning with a team or a class?</h2><p class="l-sub">Start a desk for a private board and assignments, or ask about group access for a bank, a training provider or a school.</p></div>
-        <a class="l-btn" href="#/teams">Teams and schools →</a>
+        <div><h2>${esc(siteCopy('landing_teams_title', 'Learning with a team or a class?'))}</h2><p class="l-sub">${esc(siteCopy('landing_teams_body', 'Set up a desk with its own board and assignments, or talk to us about group access for a bank, a training provider or a school.'))}</p></div>
+        <a class="l-btn" href="#/teams">Teams and schools</a>
       </div>
     </section>
 
     <section class="l-sec l-close">
       <h2>Your first lesson takes three minutes.</h2>
-      <p class="l-sub">one sheet · one job · your keyboard</p>
       <a class="start-btn" href="#/start">Start learning <kbd class="kbd-cta">↵</kbd></a>
       <p class="ld2-return">Learning here already? <a class="ld2-signin" id="ldSignIn" href="#/account">Sign in</a> to pick up where you left off.</p>
     </section>

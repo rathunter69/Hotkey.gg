@@ -62,10 +62,10 @@ test('the mouse-only Clipboard faces mirror the chords', () => {
 });
 
 test('dialog commands open the same dialog state the keyboard reaches, with an empty path so one Esc closes them', () => {
-  let s = fresh(); runCommand(s, 'HOE'); assert.equal(s.mode, 'ribbon'); assert.equal(s.dialog, 'fmt'); assert.deepEqual(s.path, []);
-  s.applyRibbon('N'); assert.equal(s.sheet.cellAt('A1').fmtStyle, 'comma'); assert.equal(s.mode, 'normal');
-  const k = fresh(); k.run('Alt H O E N'); assert.equal(state(s), state(k));
-  s = fresh(); runCommand(s, 'OE'); assert.equal(s.dialog, 'fmt'); s.run('Escape'); assert.equal(s.mode, 'normal'); assert.equal(s.dialog, null);
+  let s = fresh(); runCommand(s, 'HOE'); assert.equal(s.mode, 'ribbon'); assert.equal(s.dialog, 'formatcells'); assert.deepEqual(s.path, []);
+  s.run('Tab P Enter'); assert.equal(s.sheet.cellAt('A1').fmtStyle, 'percent'); assert.equal(s.mode, 'normal');
+  const k = fresh(); k.run('Alt H O E Tab P Enter'); assert.equal(state(s), state(k));
+  s = fresh(); runCommand(s, 'OE'); assert.equal(s.dialog, 'formatcells'); s.run('Escape'); assert.equal(s.mode, 'normal'); assert.equal(s.dialog, null);
   s = fresh(); s.run('Ctrl+C Down Down'); runCommand(s, 'HVS'); assert.equal(s.dialog, 'paste'); assert.equal(s.pasteKind, 'all'); assert.equal(s.pasteOp, 'none');
   s.applyRibbon('V'); s.applyRibbon('ENTER'); assert.equal(s.sheet.value('A3'), 1234.567); assert.equal(s.mode, 'normal');
   s = fresh(); runCommand(s, 'ES'); assert.equal(s.dialog, 'paste');
@@ -102,7 +102,7 @@ test('a click while editing commits the entry first; a refused entry keeps the e
 
 test('a command clicked while KeyTips or a menu are up leaves the walk, and a menu opens by path', () => {
   const s = fresh(); s.run('Alt H B'); assert.deepEqual(s.path, ['H', 'B']);
-  runCommand(s, 'HK'); assert.equal(s.mode, 'normal'); assert.deepEqual(s.path, []); assert.equal(s.sheet.text('A1'), '1,234.57');
+  runCommand(s, 'HK'); assert.equal(s.mode, 'normal'); assert.deepEqual(s.path, []); assert.equal(s.sheet.text('A1').trim(), '1,234.57');
   openMenuPath(s, 'HB'); assert.equal(s.mode, 'ribbon'); assert.deepEqual(s.path, ['H', 'B']); assert.equal(s.dialog, null);
   s.run('O'); assert.equal(s.sheet.cellAt('A1').bb, true); assert.equal(s.mode, 'normal');   // the keyboard finishes what the mouse opened
 });
@@ -169,7 +169,7 @@ test('the new commands have entries, and the mouse reaches the same dialog state
   k = fresh(); k.run('Alt F T Q A'); assert.deepEqual(k.dlg.qat, s.dlg.qat);
   // Page Setup: the launcher by click = Alt P S P; Orientation ▾ items = Alt P O P / L
   s = fresh(); runCommand(s, 'PSP'); assert.equal(s.dialog, 'pagesetup'); assert.deepEqual(s.path, []); k = fresh(); k.run('Alt P S P'); assert.deepEqual(k.dlg, s.dlg);
-  s.applyRibbon('L'); s.applyRibbon('ENTER'); assert.equal(s.settings.pageSetup.orientation, 'landscape'); assert.equal(s.mode, 'normal');
+  s.run('Tab'); s.applyRibbon('L'); s.applyRibbon('ENTER'); assert.equal(s.settings.pageSetup.orientation, 'landscape'); assert.equal(s.mode, 'normal');
   const { k: kl, m: ml } = sameAs('Alt P O L', 'POL'); assert.equal(ml.settings.pageSetup.orientation, 'landscape'); assert.equal(kl.settings.pageSetup.orientation, 'landscape');
   sameAs('Alt P O P', 'POP', x => x.run('Alt P O L'));
   // Go To: Home › Find & Select › Go To… by click = Alt H F D G = Ctrl+G

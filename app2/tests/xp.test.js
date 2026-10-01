@@ -63,8 +63,8 @@ test('the XP table: firsts, the withheld 20, repeats capped 3/day, the Daily onc
 test('eventsFrom folds progress + attempts into one ordered event list', () => {
   const progress = { 'active-cell': { completed: true, at: 100 }, started: { started: true, at: 50 } };
   const attempts = [
-    { kind: 'drill', ref: 'edge-jumps', day: '2026-09-22', clean: true, at: 200 },
-    { kind: 'daily', ref: 'edge-jumps', day: '2026-09-22', at: 300 },
+    { kind: 'drill', ref: 'get-around', day: '2026-09-22', clean: true, at: 200 },
+    { kind: 'daily', ref: 'get-around', day: '2026-09-22', at: 300 },
     { kind: 'rapid', ref: 'rapid', day: '2026-09-22', at: 400 },
     { kind: 'lesson-timed', ref: 'active-cell', day: '2026-09-22', at: 500 },   // not an XP event: the completion already is
   ];

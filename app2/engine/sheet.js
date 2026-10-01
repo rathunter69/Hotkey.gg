@@ -17,8 +17,8 @@
 // (see normCondFmt); condFmtMap() evaluates it for the painter and the graders.
 
 import { colLetter, colIndex, refKey, parseRef, parseRange, rectRefs, rangeText } from './refs.js';
-import { evalFormula, parseFormula, translateFormula, normalizeFormula, autocorrectFormula, adjustFormulaStructure, isErrVal, formulaRefs, parses, dateTextValue, compareValues } from './formula.js';
-import { fmtNum, dispText, serialToDate } from './format.js';
+import { evalFormula, parseFormula, translateFormula, transposeFormula, normalizeFormula, autocorrectFormula, adjustFormulaStructure, isErrVal, formulaRefs, parses, dateTextValue, compareValues } from './formula.js';
+import { fmtNum, dispText, dispMarked, fitGeneral, serialToDate, HASHES, PAD_MARK } from './format.js';
 import { isValidFormat, normalizeCode, stepDecimals, codeDecimals } from './numfmt.js';
 
 export const COLW_DEFAULT = 64;   // px: Excel's default column width at 100% (8.43 characters); autofit widens beyond this
@@ -27,6 +27,9 @@ export const CHARPX = 8.6;        // mono digit width the #### test assumes
 export const TXTPX = 6.9;         // proportional label glyph
 export const PAD_NUM = 12, PAD_TXT = 20, FIT_SLACK = 4, COLW_MAX = 220;
 export const FSZ_LADDER = [10, 11.5, 13.5, 16, 18, 20], FSZ_BASE = 13.5;
+/** Zoom (M44, M99): a sheet property in %, Excel's 10 to 400; 100 is the default. */
+export const ZOOM_DEFAULT = 100, ZOOM_MIN = 10, ZOOM_MAX = 400;
+export function clampZoom(z) { const n = Math.round(Number(z)); return Number.isFinite(n) ? Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, n)) : ZOOM_DEFAULT; }
 
 export function stepFsz(cur, dir) {
   let i = FSZ_LADDER.indexOf(cur == null ? FSZ_BASE : cur);
@@ -39,7 +42,7 @@ export function blankCell() {
   return { value: null, formula: null, bold: false, fill: null, wrap: false,
     fmtStyle: 'general', decimals: 0, bt: false, bb: false, ball: false, txt: false,
     align: null, fontColor: null, uline: false, indent: 0, scale: 0, thick: false, fsz: null, bdbl: false,
-    it: false, strike: false, bl: false, br: false, cmt: false, ca: 0, numFmt: null };
+    it: false, strike: false, bl: false, br: false, cmt: false, ca: 0, numFmt: null, apos: false };
 }
 
 /** The format fields copy/fill/paste-formats carry (everything but value/formula). */
@@ -94,7 +97,25 @@ const copyFmt = (dst, src) => { for (const k of FMT_FIELDS) dst[k] = src[k] === 
 export function cellNumPx(cell) {
   if (!cell || typeof cell.value !== 'number' || cell.wrap) return 0;
   const fz = cell.fsz ? cell.fsz / 13.5 : 1;
-  return fmtNum(cell.value, cell.fmtStyle, cell.decimals, cell.scale, cell.numFmt).length * CHARPX * fz + PAD_NUM;
+  return dispMarked(cell).split(PAD_MARK).join('').length * CHARPX * fz + PAD_NUM;   // the _) pad takes a bracket's room
+}
+
+/**
+ * What a number cell shows in a column `colPx` wide: { text, over }. `text` carries the _x pad
+ * markers (dispMarked) for the painter; `over` is the #### verdict. A General number never
+ * overflows while any form of it fits (fitGeneral, M107): it loses decimals, then goes to E
+ * notation; a formatted number or date that does not fit is ####, as in Excel.
+ */
+export function cellShown(cell, colPx) {
+  const text = dispMarked(cell);
+  if (!cell || typeof cell.value !== 'number' || cell.wrap) return { text, over: false };
+  const fz = cell.fsz ? cell.fsz / 13.5 : 1;
+  if ((cell.fmtStyle || 'general') === 'general' && !cell.scale) {
+    const fit = fitGeneral(cell.value, Math.floor((colPx - PAD_NUM) / (CHARPX * fz)));
+    return fit === null ? { text, over: true } : { text: fit, over: false };
+  }
+  const plain = text.split(PAD_MARK).join('');
+  return { text, over: plain === HASHES || plain.length * CHARPX * fz + PAD_NUM > colPx };
 }
 
 /* ---- conditional formatting (Chapter 2): the rule shapes the dialogs write and the painter reads ---- */
@@ -328,6 +349,8 @@ export class Sheet {
     this.condFmt = [];                     // conditional formatting rules in priority order (normCondFmt)
     this._cfMap = null;                    // condFmtMap() memoised until the cells or the rules change (recalc / restore / setCell drop it)
     this.multi = null;                     // Go To Special: an explicit list of cell keys, or null
+    this.names = {};                       // defined names that point at this sheet (M40): { UPPER: { name, ref: '$B$4' | '$B$4:$B$9' } }, workbook-wide through the Session
+    this.zoom = ZOOM_DEFAULT;              // the sheet's zoom, % (M99): a property of the sheet, as in Excel; the view scales by it
     this.resolver = null;                  // name → Sheet, set by the Session that owns the workbook
     this.today = opts.today || null;
     this.listeners = new Set();
@@ -341,6 +364,8 @@ export class Sheet {
     if (opts.groups) this.groups = normGroups(opts.groups);
     if (opts.condFmt) this.condFmt = normCondFmt(opts.condFmt, this.today);
     if (opts.gridlines === false) this.gridlines = false;
+    if (opts.names) for (const k in opts.names) { const n = opts.names[k]; if (n && n.ref) this.names[String(n.name || k).toUpperCase()] = { name: String(n.name || k), ref: String(n.ref) }; }
+    if (opts.zoom) this.zoom = clampZoom(opts.zoom);
     if (opts.active) this.active = this.clamp(opts.active.r, opts.active.c);
     this.recalc();
   }
@@ -385,7 +410,29 @@ export class Sheet {
     return { raw: k => this.raw(k), rows: this.rows, cols: this.cols, today: this.today || undefined,
       // NAME!B3: another sheet of the workbook (the Session wires `resolver`); no workbook = #REF!
       sheetRaw: (name, key) => { const sh = this.resolver ? this.resolver(name) : null; return sh ? sh.raw(key) : '#REF!'; },
+      name: nm => this.resolveName(nm),
       ...extra };
+  }
+
+  /* ---------------- defined names (Define Name, the Name Box list, Go To by name: M40) ---------------- */
+  /** Every sheet of the workbook (this one alone outside a Session). */
+  workbook() { return this.allSheets ? this.allSheets() : [{ name: 'Sheet1', sheet: this }]; }
+  /** A defined name's target for the evaluator: { r1, c1, r2, c2, sheet } (sheet null when it is this sheet), or null when no such name. Case-insensitive. */
+  resolveName(nm) {
+    const key = String(nm).toUpperCase();
+    for (const e of this.workbook()) {
+      const n = e.sheet.names && e.sheet.names[key]; if (!n) continue;
+      const rg = parseRange(n.ref.replace(/\$/g, '')); if (!rg) return null;
+      return { ...rg, sheet: e.sheet === this ? null : e.name.toUpperCase() };
+    }
+    return null;
+  }
+  /** Shift the names on this sheet for a structural insert / delete, as their cells move (a name whose cells all went reads #REF! and is dropped). */
+  shiftNames(axis, at, delta) {
+    for (const k of Object.keys(this.names)) {
+      const t = adjustFormulaStructure('=' + this.names[k].ref, axis, at, delta).slice(1);
+      if (/#REF!/.test(t)) delete this.names[k]; else this.names[k] = { ...this.names[k], ref: t };
+    }
   }
 
   /* ---------------- selection ---------------- */
@@ -447,6 +494,10 @@ export class Sheet {
     for (const k in this.cells) { const p = parseRef(k); if (!p) continue; if (p.r > maxR) maxR = p.r; if (p.c > maxC) maxC = p.c; }
     return { r: Math.min(maxR, this.rows), c: Math.min(maxC, this.cols) };
   }
+  /** Set the sheet's zoom (%), clamped to Excel's 10..400. Returns the zoom set. View state: no undo step. */
+  setZoom(z) { const n = clampZoom(z); if (n !== this.zoom) { this.zoom = n; this.emit('layout'); } return n; }
+  /** M99: zoom so the used range fills a sheet area `width` × `height` px (zoomToFit), and return it. */
+  fitZoom(opts) { return this.setZoom(zoomToFit(this, opts)); }
   /** Excel's current region: grow the box until a full border ring is empty. */
   regionAround(r, c) {
     let r1 = r, r2 = r, c1 = c, c2 = c;
@@ -532,7 +583,7 @@ export class Sheet {
 
   /* ---------------- undo ---------------- */
   snapshot() { return { cells: clone(this.cells), colW: this.colW.slice(), colSet: this.colSet.slice(), rows: this.rows, active: { ...this.active }, sel: this.sel && { ...this.sel },
-    rowH: this.rowH.slice(), hiddenRows: [...this.hiddenRows], hiddenCols: [...this.hiddenCols], freeze: { ...this.freeze }, groups: clone(this.groups), condFmt: clone(this.condFmt) }; }
+    rowH: this.rowH.slice(), hiddenRows: [...this.hiddenRows], hiddenCols: [...this.hiddenCols], freeze: { ...this.freeze }, groups: clone(this.groups), condFmt: clone(this.condFmt), names: clone(this.names) }; }
   /** Rewind cells AND the whole selection to one moment, so undo/redo re-select the range the operation touched (Excel). */
   restore(s) {
     this.cells = clone(s.cells); this.colW = s.colW.slice(); this.colSet = s.colSet.slice(); this.rows = s.rows;
@@ -541,6 +592,7 @@ export class Sheet {
     this.freeze = s.freeze ? { ...s.freeze } : { r: 0, c: 0 };
     this.groups = s.groups ? normGroups(s.groups) : { rows: [], cols: [] };
     this.condFmt = s.condFmt ? normCondFmt(s.condFmt, this.today) : [];
+    if (s.names) this.names = clone(s.names);
     this._cfMap = null;
     this.multi = null;
     if (s.active) this.active = this.clamp(s.active.r, s.active.c);
@@ -635,6 +687,8 @@ export class Sheet {
   static classifyInput(text, cell, today) {
     let buf = String(text).trim();
     if (buf === '') return { kind: 'empty' };
+    // a leading apostrophe makes the rest text, whatever it looks like ('=A1, '00123), and is kept as the cell's prefix, not its value (M71)
+    if (buf[0] === "'") return { kind: 'value', value: String(text).replace(/^\s*'/, '').replace(/\s+$/, ''), txt: true, apos: true };
     if (buf[0] === '=') {
       const opens = (buf.match(/\(/g) || []).length, closes = (buf.match(/\)/g) || []).length;
       if (opens > closes) buf += ')'.repeat(opens - closes);   // Excel auto-closes
@@ -660,6 +714,11 @@ export class Sheet {
     // stores it, dressed in the format Excel gives the shape typed; a cell that already has a number format keeps it
     const dv = dateTextValue(buf, today ? () => serialToDate(today()).getUTCFullYear() : undefined);
     if (dv) return fmt === 'general' ? { kind: 'value', value: dv.serial, fmtStyle: 'custom', numFmt: dv.code } : { kind: 'value', value: dv.serial };
+    // the keypad habit (M63): an entry starting with + or − that is not a number is a formula, stored as Excel stores it (+D5−E5 → =+D5−E5, −D5 → =−D5)
+    if ((buf[0] === '+' || buf[0] === '-') && buf.length > 1) {
+      const f = Sheet.classifyInput('=' + buf, cell, today);
+      if (f.kind === 'formula' || f.kind === 'fix') return f;
+    }
     return { kind: 'value', value: buf, txt: true };
   }
 
@@ -680,12 +739,13 @@ export class Sheet {
   applyInput(target, cls, r, c) {
     if (cls.kind === 'empty') return;
     if (cls.kind === 'formula') {
-      target.formula = cls.formula; target.txt = false;
+      target.formula = cls.formula; target.txt = false; target.apos = false;
       let v; try { v = evalFormula(cls.formula, this.evalCtx({ cell: { r, c } })); } catch (e) { v = '#NAME?'; }
       target.value = v;
       return;
     }
-    target.formula = null; target.value = cls.value; target.txt = !!cls.txt;
+    target.formula = null; target.value = cls.value; target.txt = !!cls.txt; target.apos = !!cls.apos;
+    if (typeof cls.value === 'string' && cls.value.includes('\n')) target.wrap = true;   // Alt+Enter: a line break turns Wrap Text on, as Excel does (M40)
     if (cls.fmtStyle) target.fmtStyle = cls.fmtStyle;
     if (cls.decimals !== undefined) target.decimals = cls.decimals;
     if (cls.numFmt) {   // a typed date: its format, and the column widens to show it when its width was never set by hand, as Excel's does
@@ -709,11 +769,17 @@ export class Sheet {
   }
 
   /* ---------------- clearing ---------------- */
-  deleteContents() { this.pushUndo(); this.eachSel(c => { c.value = null; c.formula = null; c.txt = false; }); this.commit('edit'); }
+  deleteContents() { this.pushUndo(); this.eachSel(c => { c.value = null; c.formula = null; c.txt = false; c.apos = false; }); this.commit('edit'); }
   /** Clear All / Clear Formats take the selected cells out of every conditional-formatting rule too (Excel: "removes all conditional formats and all other cell formats for selected cells"). */
   clearAll() { this.pushUndo(); this.eachSel(c => { for (const k in c) delete c[k]; Object.assign(c, blankCell()); }); this.condFmt = cfWithout(this.condFmt, this.selRects(), wrapOf(this)) || this.condFmt; this.commit('edit'); }
-  clearFormats() { this.pushUndo(); this.eachSel(c => { const v = c.value, f = c.formula, t = c.txt; for (const k in c) delete c[k]; Object.assign(c, blankCell()); c.value = v; c.formula = f; c.txt = t; }); this.condFmt = cfWithout(this.condFmt, this.selRects(), wrapOf(this)) || this.condFmt; this.commit('format'); }
-  clearContents() { this.pushUndo(); this.eachSel(c => { c.value = null; c.formula = null; }); this.commit('edit'); }
+  clearFormats() { this.pushUndo(); this.eachSel(c => { const v = c.value, f = c.formula, t = c.txt, n = c.cmt, ap = c.apos; for (const k in c) delete c[k]; Object.assign(c, blankCell()); c.value = v; c.formula = f; c.txt = t; c.cmt = n || false; c.apos = !!ap; }); /* a note is not a format: Clear Formats leaves it */ this.condFmt = cfWithout(this.condFmt, this.selRects(), wrapOf(this)) || this.condFmt; this.commit('format'); }
+  clearContents() { this.pushUndo(); this.eachSel(c => { c.value = null; c.formula = null; c.txt = false; c.apos = false; }); this.commit('edit'); }
+  /** Clear › Clear Comments and Notes (Alt H E M): the notes go, contents and formats stay (M68). */
+  clearNotes() { this.pushUndo(); this.eachSel(c => { c.cmt = false; }); this.commit('format'); }
+  /** Shift+F2's note on cell (r, c): its text (an empty note is a note), or false to remove it. A note travels with the cell and shows a red corner. */
+  setNote(r, c, text) { this.pushUndo(); const cell = this.ensure(r, c); cell.cmt = text === false || text == null ? false : String(text); this.commit('format'); }
+  /** The note on (r, c) as text, or null when the cell has none (a legacy true flag reads as an empty note). */
+  noteAt(r, c) { const n = this.get(r, c).cmt; return n === false || n == null ? null : n === true ? '' : String(n); }
 
   /* ---------------- formatting ---------------- */
   /** Excel's mixed-selection rule: set on all unless every cell already has it, then clear all. */
@@ -730,6 +796,7 @@ export class Sheet {
   /** F4 outside Edit mode: do the last format / border / width / height / insert / delete / hide again, on the current selection. False when there is nothing to repeat. */
   repeatLast() {
     const a = this.lastAction; if (!a) return false;
+    if (typeof a.run === 'function') { a.run(this); return true; }   // a dialog's whole action (Format Cells, Series) or a fill
     if (a.op === 'format') { this.formatSel(a.fn, a.what); return true; }
     if (a.op === 'border') { this.border(a.kind); return true; }
     if (a.op === 'centerAcross') { this.centerAcross(); return true; }
@@ -1022,8 +1089,10 @@ export class Sheet {
     for (let r = Math.max(1, r1); r <= Math.min(this.rows, r2); r++) { const cell = this.get(r, c); if (cell.wrap) continue; w = Math.max(w, cellNumPx(cell) + FIT_SLACK, cellTxtPx(cell) + FIT_SLACK); }
     return Math.min(Math.ceil(w), COLW_MAX);
   }
-  /** #### verdict: the column's widest number does not fit its own (unscaled) width. */
-  overflowsCol(c) { let px = 0; for (let r = 1; r <= this.rows; r++) px = Math.max(px, cellNumPx(this.get(r, c))); return px > (this.colW[c] || COLW_DEFAULT); }
+  /** #### verdict: some number in the column shows as #### at its width (a General number shrinks to fit first, as in Excel). */
+  overflowsCol(c) { const w = this.colW[c] || COLW_DEFAULT; for (let r = 1; r <= this.rows; r++) { const cell = this.cells[refKey(r, c)]; if (cell && cellShown(cell, w).over) return true; } return false; }
+  /** What cell (r, c) shows at its column's width: { text, over } (cellShown). */
+  shown(r, c) { return cellShown(this.get(r, c), this.colW[c] || COLW_DEFAULT); }
   /** Excel auto-widens a column whose width was never set by hand after a number-format change. */
   autoGrowSelectedCols() {
     const fr = this.selRange();
@@ -1090,6 +1159,9 @@ export class Sheet {
       for (let rr = cb.rect.r1; rr <= cb.rect.r2; rr++) for (let cc = cb.rect.c1; cc <= cb.rect.c2; cc++) delete (from || this).cells[refKey(rr, cc)];
       for (let i = 0; i < cb.h; i++) for (let j = 0; j < cb.w; j++) { const cell = this.ensure(r0 + i, c0 + j); const s = cb.data[i][j]; Object.assign(cell, clone(s)); }
       this.cfMoveRules(cb, r0, c0, from);   // the conditional formats travel with the moved cells
+      if (!from && (r0 !== cb.rect.r1 || c0 !== cb.rect.c1)) {   // M68: every formula that read the moved cells (and the moved formulas' references into their own block) follows them
+        for (const k in this.cells) { const cell = this.cells[k]; if (cell.formula) cell.formula = relocateRefs(cell.formula, cb.rect, r0 - cb.rect.r1, c0 - cb.rect.c1); }
+      }
       this.clipboard = null;
       this.lastFlash = { r1: r0, c1: c0, r2: r0 + cb.h - 1, c2: c0 + cb.w - 1 };
       this.sel = cb.h * cb.w > 1 ? { r: r0, c: c0 } : null; this.active = cb.h * cb.w > 1 ? { r: r0 + cb.h - 1, c: c0 + cb.w - 1 } : { r: r0, c: c0 }; this.selA = null;
@@ -1102,7 +1174,7 @@ export class Sheet {
     if (kind === 'transpose') {
       for (let i = 0; i < cb.w; i++) for (let j = 0; j < cb.h; j++) {
         const cell = this.ensure(r0 + i, c0 + j); const s = cb.data[j][i];
-        cell.formula = null; cell.value = s.value; cell.txt = s.txt;
+        cell.formula = s.formula ? transposeFormula(s.formula, cb.rect.r1 + j, cb.rect.c1 + i, r0 + i, c0 + j) : null; cell.value = s.value; cell.txt = s.formula ? false : s.txt;
         cell.bold = s.bold; cell.it = s.it; cell.strike = s.strike; cell.fmtStyle = s.fmtStyle; cell.decimals = s.decimals; cell.numFmt = s.numFmt || null; cell.align = s.align; cell.fontColor = s.fontColor;
       }
       // the rules come along, their areas flipped; a formula is read for the first pasted cell as a copy there would be
@@ -1142,6 +1214,7 @@ export class Sheet {
   /* ---------------- fill ---------------- */
   /** Ctrl+D / Ctrl+R (and up/left): the first cell of the selection fills the rest; formulas translate. */
   fill(dir) {
+    this.lastAction = { op: 'fill', dir, run: sh => sh.fill(dir) };   // F4 fills again (M40)
     const r = this.selRange(); const vertical = dir === 'down' || dir === 'up';
     const stamp = (cell, src, dr, dc) => { copyFmt(cell, src); if (src.formula) { cell.formula = translateFormula(src.formula, dr, dc); cell.value = 0; } else { cell.formula = null; cell.value = src.value; } };
     // the conditional formats of the source line extend over the filled cells (cfFillRules): the line and the rest of the selection, as rectangles
@@ -1324,12 +1397,12 @@ export class Sheet {
       this.hiddenRows = new Set([...this.hiddenRows].map(n => n >= r.r1 ? n + count : n).filter(n => n <= this.rows));
       if (this.freeze.r >= r.r1) this.freeze.r = Math.min(this.rows - 1, this.freeze.r + count);
       this.groups.rows = this.shiftGroups('r', r.r1, count);
-      this.condFmt = this.shiftCondFmt('r', r.r1, count);
+      this.condFmt = this.shiftCondFmt('r', r.r1, count); this.shiftNames('r', r.r1, count);
     }
     else { this.shiftCells('c', r.c1, count);
       this.hiddenCols = new Set([...this.hiddenCols].map(n => n >= r.c1 ? n + count : n).filter(n => n <= this.cols));
       this.groups.cols = this.shiftGroups('c', r.c1, count);
-      this.condFmt = this.shiftCondFmt('c', r.c1, count);
+      this.condFmt = this.shiftCondFmt('c', r.c1, count); this.shiftNames('c', r.c1, count);
       if (this.freeze.c >= r.c1) this.freeze.c = Math.min(this.cols - 1, this.freeze.c + count); for (let c = this.cols; c >= r.c1 + count; c--) { this.colW[c] = this.colW[c - count]; this.colSet[c] = this.colSet[c - count]; } const inh = r.c1 > 1 ? this.colW[r.c1 - 1] : COLW_DEFAULT; for (let c = r.c1; c < r.c1 + count && c <= this.cols; c++) { this.colW[c] = inh; this.colSet[c] = r.c1 > 1 ? this.colSet[r.c1 - 1] : false; } }
     this.commit('structure'); return true;
   }
@@ -1340,13 +1413,13 @@ export class Sheet {
       this.rowH.splice(r.r1, count); while (this.rowH.length < this.rows + 1) this.rowH.push(ROWH_DEFAULT);
       this.hiddenRows = new Set([...this.hiddenRows].filter(n => n < r.r1 || n > r.r2).map(n => n > r.r2 ? n - count : n));
       this.groups.rows = this.shiftGroups('r', r.r1, -count);
-      this.condFmt = this.shiftCondFmt('r', r.r1, -count);
+      this.condFmt = this.shiftCondFmt('r', r.r1, -count); this.shiftNames('r', r.r1, -count);
       if (this.freeze.r > r.r2) this.freeze.r -= count; else if (this.freeze.r >= r.r1) this.freeze.r = Math.max(0, r.r1 - 1);
       this.sel = null; this.selA = null; this.active = this.clamp(r.r1, a.c); }
     else { const count = r.c2 - r.c1 + 1; this.shiftCells('c', r.c1, -count);
       this.hiddenCols = new Set([...this.hiddenCols].filter(n => n < r.c1 || n > r.c2).map(n => n > r.c2 ? n - count : n));
       this.groups.cols = this.shiftGroups('c', r.c1, -count);
-      this.condFmt = this.shiftCondFmt('c', r.c1, -count);
+      this.condFmt = this.shiftCondFmt('c', r.c1, -count); this.shiftNames('c', r.c1, -count);
       if (this.freeze.c > r.c2) this.freeze.c -= count; else if (this.freeze.c >= r.c1) this.freeze.c = Math.max(0, r.c1 - 1); for (let c = r.c1; c <= this.cols - count; c++) { this.colW[c] = this.colW[c + count]; this.colSet[c] = this.colSet[c + count]; } for (let c = Math.max(r.c1, this.cols - count + 1); c <= this.cols; c++) { this.colW[c] = COLW_DEFAULT; this.colSet[c] = false; } this.sel = null; this.selA = null; this.active = this.clamp(a.r, r.c1); }
     this.commit('structure');
   }
@@ -1376,7 +1449,7 @@ export class Sheet {
       const cell = this.get(rr, cc);
       const isFormula = !!cell.formula;
       const isBlank = !isFormula && (cell.value === null || cell.value === '');
-      const ok = kind === 'blanks' ? isBlank : kind === 'formulas' ? isFormula : kind === 'constants' ? (!isFormula && !isBlank) : false;
+      const ok = kind === 'blanks' ? isBlank : kind === 'formulas' ? isFormula : kind === 'constants' ? (!isFormula && !isBlank) : kind === 'notes' ? !!cell.cmt : false;
       if (ok) keys.push(refKey(rr, cc));
     }
     if (!keys.length) return false;
@@ -1394,13 +1467,32 @@ export class Sheet {
    * after `from` (default: the active cell) and wrapping once. Moves the active cell there and
    * returns the key, or null (nothing moves) when there is no match.
    */
-  findNext(text, from) {
+  /**
+   * Whether `cell` holds `t` (lower-case) where Find's Look in points (M72): 'formulas' (Excel's
+   * default: a formula's text, a constant as typed), 'values' (what the cell shows) or 'notes'.
+   * With no lookIn, the formula text or the value (the original quick Find).
+   */
+  static findHit(cell, t, lookIn) {
+    if (!cell) return false;
+    if (lookIn === 'notes') return typeof cell.cmt === 'string' && cell.cmt.toLowerCase().includes(t);
+    if (lookIn === 'values') { if (cell.value === null || cell.value === '') return false; return dispText(cell).toLowerCase().includes(t); }
+    if (lookIn === 'formulas') { if (cell.formula) return String(cell.formula).toLowerCase().includes(t); return cell.value !== null && cell.value !== '' && String(cell.value).toLowerCase().includes(t); }
+    if (cell.value === null || cell.value === '') return false;
+    return String(cell.value).toLowerCase().includes(t) || (!!cell.formula && String(cell.formula).toLowerCase().includes(t));
+  }
+  /** `v` dressed in `cell`'s number format (the status bar's Sum / Average: M40). */
+  static fmtLike(cell, v) { return dispText({ ...blankCell(), ...cell, value: v, formula: null, txt: false }); }
+  /** Find All: every cell of this sheet that holds `text`, in row order: [{ key, r, c }]. */
+  findAll(text, lookIn) {
+    const t = String(text == null ? '' : text).toLowerCase(); if (!t) return [];
+    const out = [];
+    for (const k in this.cells) { if (Sheet.findHit(this.cells[k], t, lookIn)) { const p = parseRef(k); if (p) out.push({ key: k, r: p.r, c: p.c }); } }
+    return out.sort((a, b) => a.r - b.r || a.c - b.c);
+  }
+  findNext(text, from, lookIn) {
     const t = String(text == null ? '' : text).toLowerCase(); if (!t) return null;
     const start = from || this.dispActive();
-    const match = (r, c) => {
-      const cell = this.get(r, c); if (cell.value === null || cell.value === '') return false;
-      return String(cell.value).toLowerCase().includes(t) || (cell.formula && String(cell.formula).toLowerCase().includes(t));
-    };
+    const match = (r, c) => Sheet.findHit(this.cells[refKey(r, c)], t, lookIn);
     const total = this.rows * this.cols;
     let idx = (start.r - 1) * this.cols + (start.c - 1);
     for (let step = 1; step <= total; step++) {
@@ -1582,8 +1674,28 @@ export class Sheet {
     if (this.freeze.r || this.freeze.c) out.freeze = { ...this.freeze };
     if (this.groups.rows.length || this.groups.cols.length) out.groups = clone(this.groups);
     if (this.condFmt.length) out.condFmt = clone(this.condFmt);
+    if (Object.keys(this.names).length) out.names = clone(this.names);
+    if (this.zoom !== ZOOM_DEFAULT) out.zoom = this.zoom;
     return out;
   }
+}
+
+/**
+ * M99, zoom to fit: the zoom (%) at which the sheet's used range, from A1 to its last used cell
+ * with the row and column headers, fills an area `width` × `height` px, held between `floor`
+ * (the learner's sheet-zoom setting, default 100) and `max` (150), as a drill or challenge opens.
+ * Hidden rows and columns take no room. Never below the floor, so a big sheet opens at the
+ * learner's zoom and scrolls.
+ */
+export function zoomToFit(sheet, { width, height, floor = ZOOM_DEFAULT, max = 150, rowHdr = 36, colHdr = 20 } = {}) {
+  const lo = clampZoom(floor), hi = Math.max(lo, clampZoom(max));
+  if (!(width > 0) || !(height > 0)) return lo;
+  const u = sheet.usedRange();
+  let w = rowHdr, h = colHdr;
+  for (let c = 1; c <= u.c; c++) if (!sheet.hiddenCols.has(c)) w += sheet.colW[c] || COLW_DEFAULT;
+  for (let r = 1; r <= u.r; r++) if (!sheet.hiddenRows.has(r)) h += sheet.rowH[r] || ROWH_DEFAULT;
+  const z = Math.floor(Math.min(width / w, height / h) * 100);
+  return Math.max(lo, Math.min(hi, z));
 }
 
 /** A groups record with sane shapes: rows [{r1,r2,collapsed}], cols [{c1,c2,collapsed}], sorted, each band r1 ≤ r2. */

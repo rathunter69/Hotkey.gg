@@ -8,7 +8,7 @@ import { PLANNED_MODULES } from './learn-next.js';
 import { moduleCopy, siteCopy, splitParas } from '../content/copy/apply.js';
 
 /** The chapter-end line's shape; site.csv page_delivered overrides. {n} the module number, {module} its name, {page} modules.csv page_name. */
-export const PAGE_DELIVERED = 'Page {n} — {page} — delivered to the data room.';
+export const PAGE_DELIVERED = 'Page {n}, {page}, is done.';
 
 const BEATS_DEFAULT = {
   'open-and-set-up': { eyebrow: 'Module 1.1 · open and set up', title: 'The file arrived the way inherited files do.',

@@ -122,16 +122,16 @@ test('Sheet.setCustomFormat: the selection takes the code, decimals mirror it, G
 test('Ctrl+1 › U opens the Custom box on the cell\'s code, ↵ applies, a refused code keeps the box open with Excel\'s note', () => {
   const fresh = () => new Session(new Sheet({ cells: { A1: { value: 1234.5, fmtStyle: 'comma', decimals: 2 }, A2: { value: 7 } } }), { now: () => 0 });
   let s = fresh();
-  s.run('Ctrl+1 U'); assert.equal(s.dialog, 'numfmt'); assert.equal(s.dlg.code, '#,##0.00_);(#,##0.00)'); assert.equal(s.dlg.selected, true);
+  s.run('Ctrl+1 Tab End Alt+T'); assert.equal(s.dialog, 'formatcells'); assert.equal(s.dlg.code, '#,##0.00_);(#,##0.00)'); assert.equal(s.dlg.codeSel, true);
   s.type('#,##0_);(#,##0);"-"_)'); s.run('Enter');
   assert.equal(s.mode, 'normal'); assert.equal(s.dialog, null); assert.equal(s.sheet.cellAt('A1').numFmt, '#,##0_);(#,##0);"-"_)'); assert.equal(s.sheet.text('A1'), '1,235 ');
-  s.run('Ctrl+1 U'); assert.equal(s.dlg.code, '#,##0_);(#,##0);"-"_)');   // reopens on the custom code
-  s.run('"0.0 mm" Enter'); assert.equal(s.dialog, 'numfmt'); assert.equal(s.note, NUMFMT_BAD_NOTE); assert.equal(s.sheet.cellAt('A1').numFmt, '#,##0_);(#,##0);"-"_)');
+  s.run('Ctrl+1 Tab End Alt+T'); assert.equal(s.dlg.code, '#,##0_);(#,##0);"-"_)');   // reopens on the custom code
+  s.run('"0.0 mm" Enter'); assert.equal(s.dialog, 'formatcells'); assert.equal(s.note, NUMFMT_BAD_NOTE); assert.equal(s.sheet.cellAt('A1').numFmt, '#,##0_);(#,##0);"-"_)');
   s.run('Escape'); assert.equal(s.mode, 'normal'); assert.equal(s.dialog, null);
-  s = fresh(); s.run('Down Alt H O E U "0.0x" Enter'); assert.equal(s.sheet.cellAt('A2').numFmt, '0.0"x"'); assert.equal(s.sheet.text('A2'), '7.0x');   // the Alt walk reaches the same box, lenient like Excel's
+  s = fresh(); s.run('Down Alt H O E Tab End Alt+T "0.0x" Enter'); assert.equal(s.sheet.cellAt('A2').numFmt, '0.0"x"'); assert.equal(s.sheet.text('A2'), '7.0x');   // the Alt walk reaches the same box, lenient like Excel's
   s.run('Alt H 0'); assert.equal(s.sheet.text('A2'), '7.00x');   // Increase Decimal steps the code
-  s = fresh(); s.run('Ctrl+1 U Backspace "mmm" Enter'); assert.equal(s.sheet.cellAt('A1').numFmt, 'mmm');   // Backspace on the selected code clears it first
-  s = fresh(); runCommand(s, 'HOE'); s.applyRibbon('U'); assert.equal(s.dialog, 'numfmt'); assert.deepEqual(s.path, []);   // by mouse, one Esc away
+  s = fresh(); s.run('Ctrl+1 Tab End Alt+T Backspace "mmm" Enter'); assert.equal(s.sheet.cellAt('A1').numFmt, 'mmm');   // Backspace on the selected code clears it first
+  s = fresh(); runCommand(s, 'HOE'); assert.equal(s.dialog, 'formatcells'); assert.deepEqual(s.path, []);   // by mouse, one Esc away
   s.run('Escape'); assert.equal(s.mode, 'normal');
 });
 
@@ -191,7 +191,7 @@ test('F9 + F30 the accounting family: the dash section carries one ? per decimal
   assert.equal(builtinCode('acct', 0), id42); assert.equal(builtinCode('acct', 1), '_($* #,##0.0_);_($* (#,##0.0);_($* "-"?_);_(@_)'); assert.equal(builtinCode('acct', 2), id44);
   assert.equal(F(0, builtinCode('acct', 0)), ' $- '); assert.equal(F(1234, builtinCode('acct', 0)), ' $1,234 ');
   const s = new Session(new Sheet({ cells: { A1: { value: 0, fmtStyle: 'acct', decimals: 0 }, A2: { value: 1234.5, fmtStyle: 'acct', decimals: 0 } } }), { now: () => 0 });
-  s.sheet.select('A1:A2'); s.run('Ctrl+1 U'); assert.equal(s.dlg.code, id42); s.run('Enter Alt H 0');   // OK the box unchanged, then Increase Decimal
+  s.sheet.select('A1:A2'); s.run('Ctrl+1 Tab End Alt+T'); assert.equal(s.dlg.code, id42); s.run('Enter Alt H 0');   // OK the box unchanged, then Increase Decimal
   assert.equal(s.sheet.cellAt('A1').numFmt, '_($* #,##0.0_);_($* (#,##0.0);_($* "-"?_);_(@_)'); assert.equal(s.sheet.text('A1'), ' $-  '); assert.equal(s.sheet.text('A2'), ' $1,234.5 ');
 });
 
@@ -279,7 +279,7 @@ test('F28 [Color n] is 1–56 and every index paints: a swatch key where the gri
   for (let i = 1; i <= 56; i++) assert.ok(formatValue(5, `[Color ${i}]0`).color, `[Color ${i}]`);
   assert.equal(formatValue(5, '[Color 3]0').color, 'red'); assert.equal(formatValue(5, '[Color 9]0').color, '#800000'); assert.equal(formatValue(5, '[Color 11]0').color, '#000080'); assert.equal(formatValue(5, '[COLOR 10]0').color, 'green');
   assert.equal(dispColor({ value: 5, fmtStyle: 'custom', numFmt: '[Color 9]0' }), '#800000');
-  const s = new Session(new Sheet({ cells: { A1: { value: 5 } } }), { now: () => 0 }); s.run('Ctrl+1 U "[Color 57]0" Enter'); assert.equal(s.dialog, 'numfmt'); assert.equal(s.note, NUMFMT_BAD_NOTE);
+  const s = new Session(new Sheet({ cells: { A1: { value: 5 } } }), { now: () => 0 }); s.run('Ctrl+1 Tab End Alt+T "[Color 57]0" Enter'); assert.equal(s.dialog, 'formatcells'); assert.equal(s.note, NUMFMT_BAD_NOTE);
 });
 
 test('F29 the section grammar: conditions past the second section, @ beside digits or General, two colours or conditions are refused; a lone conditional section is accepted', () => {
@@ -287,7 +287,7 @@ test('F29 the section grammar: conditions past the second section, @ beside digi
   // Excel-derived corpus renders [<=0]"B"0 alone (see the F1 case) — whoever checks it in Excel, note the result here
   for (const code of ['[>10]0;[>5]0;[>0]0', '0;0;[>5]0', 'General@', '0@', '@0', '[Red][Blue]0', '[>0][>1]0']) assert.equal(isValidFormat(code), false, code);
   for (const code of ['[>10]0', '[Red][>10]0', '[<0]"neg"', '[>10]General', '[Red][>10]General', '[>=1000000]#,##0.0,,"m";[>=1000]#,##0,"k";#,##0', '[<0]"neg";[>10]"big"', '[Red]"ERROR";[Red]"ERROR";"OK"', '0;[<0]0']) assert.equal(isValidFormat(code), true, code);
-  const s = new Session(new Sheet({ cells: { A1: { value: 5 } } }), { now: () => 0 }); s.run('Ctrl+1 U "General@" Enter'); assert.equal(s.dialog, 'numfmt'); assert.equal(s.note, NUMFMT_BAD_NOTE);
+  const s = new Session(new Sheet({ cells: { A1: { value: 5 } } }), { now: () => 0 }); s.run('Ctrl+1 Tab End Alt+T "General@" Enter'); assert.equal(s.dialog, 'formatcells'); assert.equal(s.note, NUMFMT_BAD_NOTE);
 });
 
 test('F31 codeDecimals stops at the exponent: 0.00E+00 shows two decimals', () => {
@@ -358,7 +358,7 @@ test('F1 a lone conditional section: the values it catches take it, the rest sho
   assert.equal(ev('=TEXT(500,"[>100]0")'), '500'); assert.equal(ev('=TEXT(50,"[>100]0")'), '50'); assert.equal(ev('=TEXT(50,"[>100]General")'), '50'); assert.equal(ev('=TEXT(6.3,"[<=0]""B""0")'), '6.3'); assert.equal(ev('=TEXT(1500,"[>=1000]#,##0,""k""")'), '2k');
   assert.equal(fmtNum(50, 'custom', 0, 0, '[>100]0'), '50'); assert.equal(fmtNum(5, 'custom', 0, 0, '[>10]General'), '5');
   for (const [v, code, text] of [[500, '[>100]0', '500'], [50, '[>100]0', '50'], [1500, '[>=1000]#,##0,k', '2k'], [5, '[>10]General', '5']]) {   // the Custom box takes the code (Ctrl+1 › U) and the cell shows it
-    const s = new Session(new Sheet({ cells: { A1: { value: v } } }), { now: () => 0 }); s.run('Ctrl+1 U "' + code + '" Enter');
+    const s = new Session(new Sheet({ cells: { A1: { value: v } } }), { now: () => 0 }); s.run('Ctrl+1 Tab End Alt+T "' + code + '" Enter');
     assert.equal(s.dialog, null, code); assert.equal(s.note, '', code); assert.equal(s.sheet.cellAt('A1').numFmt, normalizeCode(code), code); assert.equal(s.sheet.text('A1'), text, code);
   }
 });

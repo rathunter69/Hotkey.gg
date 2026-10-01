@@ -22,16 +22,17 @@ const TIER_LABEL = { pass: 'pass', pro: 'pro', legendary: 'legendary' };
 export const fmtSecs = n => (Math.round(n * 10) / 10).toFixed(1) + ' s';
 
 /**
- * The module whose lessons teach each drill's keys: the LAST one it leans on (Type the column
- * types figures from 1.3 but ends on AutoSum, taught in 1.6). The module challenges carry their
+ * The module whose lessons teach each drill's keys: the LAST one it leans on (Insert and amend
+ * moves rows, from 1.4, but ends on amending a total, taught in 1.6; the benchmark sits with 1.7). The module challenges carry their
  * own module. A drill missing here gets no tag; the practice test keeps the map complete.
  */
 export const DRILL_MODULE = {
-  'edge-jumps': 'move-and-select', 'go-anywhere': 'move-and-select', 'select-blocks': 'move-and-select',
-  'find-and-fix': 'enter-edit-copy-fill', 'fill-factory': 'enter-edit-copy-fill', 'paste-surgeon': 'enter-edit-copy-fill',
+  'get-around': 'move-and-select',
+  'enter-and-fill': 'enter-edit-copy-fill', 'find-and-fix': 'enter-edit-copy-fill', 'paste-surgeon': 'enter-edit-copy-fill',
   'row-wrangler': 'structure',
-  'bold-and-borders': 'format', 'format-cells-numbers': 'format',
-  'type-the-column': 'formulas', 'formula-sprint': 'formulas', 'weekly-sales-report': 'formulas',
+  'format-the-weekly-page': 'format',
+  'insert-and-amend': 'formulas', 'formula-sprint': 'formulas', 'combine-two-tabs': 'formulas',
+  'before-you-send': 'present-and-audit', 'weekly-sales-report': 'present-and-audit',
 };
 
 /** A drill's teaching module ({ id, n, title, lessons }) or null. */

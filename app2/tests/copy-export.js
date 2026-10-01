@@ -143,7 +143,7 @@ export function siteDefaults() {
   out.orientation_eyebrow = ORIENTATION.eyebrow; out.orientation_title = ORIENTATION.title;
   for (const r of ORIENTATION.rows) out['orientation_' + r.where.toLowerCase()] = r.what;
   out.orientation_fine = ORIENTATION.fine;
-  out.landing_headline_a = HEADLINES[0].a; out.landing_headline_b = HEADLINES[0].b; out.landing_subhead = SUBHEAD;
+  out.landing_headline = HEADLINES[0].a; out.landing_subhead = SUBHEAD;
   for (const m of MODES) out['mode_' + m.key] = m.line;
   out.dash_learn = DASH_LINES.learn; out.dash_practice = DASH_LINES.practice;
   out.deal_strip_stage_1 = STAGES[0].stage; out.deal_strip_deliverable_1 = STAGES[0].delivers;

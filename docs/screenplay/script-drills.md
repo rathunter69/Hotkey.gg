@@ -879,3 +879,18 @@ Two new mechanics requests, written into screenplay 9.3, and a list of the exist
 ## What happens to these next
 
 The build session writes each drill's goal lines when it builds the drill, since they name the cells of that chapter's workbook, and sets the seeds and the pars from the reference routes. The screenplay's 6.2 keeps the catalog in one view: this doc is where a build session reads the detail.
+
+## Built differently
+
+What the Chapter 1 build (M108) changed from the sketches above, one line each.
+
+  - *before-you-send*: the two internal notes are lines typed in H6 and H9, not cell notes, since the engine has no notes yet (M68); the drill also deletes a stale Old wk37 tab, puts back a typed-over gross profit found with Go To Special Constants and turns the gridlines off.
+  - "Every tab on A1" became every tab on its home cell: B5 on a page with frozen panes, where Ctrl+Home lands in Excel, and A1 on the raw tab.
+  - The daily columns run Monday to Saturday, the Clearcoat week, not Monday to Friday.
+  - *combine-two-tabs*: the Combined block starts unformatted and takes its formats from Austin with Paste Special Formats, so a goal colors the cross-sheet links green; it adds AutoSum for the week and a last goal that traces a link with Ctrl+[.
+  - *insert-and-amend*: two waiting lines, Insurance and Utilities, not one, plus a goal for their formats and one for the Week formula; Paste Special Formulas carries the total across.
+  - The merged drills take new ids named after their titles: *get-around*, *enter-and-fill*, *format-the-weekly-page*. Old records under the removed ids are not carried over; nothing redirects drill ids.
+  - *formula-sprint* fills its columns with Ctrl+Enter rather than fill down, so the $ anchor is typed once on the first row.
+  - A drill may carry up to 20 goals (was 12), since the formatting drills step through a full page.
+  - The page builder no longer widens the label column to fit the source line, which overflows across empty cells as in Excel.
+  - Shares that always total 100% and links to another sheet are graded by what the formula reads, since the what-if check cannot move them.

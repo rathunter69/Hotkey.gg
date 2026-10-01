@@ -12,7 +12,7 @@
 //   recordMouse(session, 'ribbon:H1');    // SITE_SPEC §6: every workspace click is recorded
 
 import { COMMANDS, MENUS, TABS, RIBBON_ICONS, RIBBON_MENU_ICONS, QAT_COMMANDS } from '../engine/ribbon.js';
-import { NO_GROUP_NOTE } from '../engine/keyboard.js';
+import { NO_GROUP_NOTE, COMMA_STYLE_CODE } from '../engine/keyboard.js';
 
 /* ---------------- mouse recording (SITE_SPEC §6) ---------------- */
 /**
@@ -29,9 +29,9 @@ export function recordMouse(session, what) {
 }
 
 /** Dialogs that own the input while open: the sheet and the bar behind them ignore clicks (Excel's modal cards). */
-export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'rowh', 'sortwarn', 'series', 'fxfix', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale']);
+export const MODAL_DIALOGS = new Set(['fmt', 'paste', 'colw', 'rowh', 'sortwarn', 'series', 'fxfix', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale', 'formatcells', 'zoom', 'definename', 'note']);
 /** The dialogs drawn as floating cards over the sheet (ribbon-view drawDialog), not as anchored dropdowns. */
-export const CARD_DIALOGS = new Set(['fmt', 'paste', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale']);
+export const CARD_DIALOGS = new Set(['fmt', 'paste', 'goto', 'options', 'pagesetup', 'renamesheet', 'deletesheet', 'movesheet', 'find', 'gotospecial', 'group', 'numfmt', 'condfmt', 'condrules', 'databar', 'colorscale', 'formatcells', 'series', 'zoom', 'definename', 'note']);
 
 /** Leave the Alt walk without acting (a mouse command supersedes any open KeyTip path or dropdown). */
 export function leaveRibbon(session) { if (session.mode === 'ribbon') session.exitRibbon(false); }
@@ -203,7 +203,7 @@ const sortRun = dir => s => {
 };
 const autoSum = s => { leaveRibbon(s); s.startClock(); s.doAutoSum(); };
 const gridlines = direct((S, s) => { S.gridlines = !S.gridlines; s.toast(S.gridlines ? 'gridlines shown' : 'gridlines hidden — Alt W V G to show'); S.commit('ribbon'); });
-const fmtCells = dialog('fmt');
+const fmtCells = s => { leaveRibbon(s); s.openFormatCells(); };
 const pasteSpecial = dialog('paste', s => { s.pasteKind = 'all'; s.pasteOp = 'none'; });
 
 const C = (label, group, tab, icon, run, keys) => ({ label, group, tab, icon, run, keys: keys || '' });
@@ -241,7 +241,7 @@ export const RIBBON_COMMANDS = {
   // Home · Number
   'HAN': C('Accounting number format', 'Number', 'H', ICON.acct, direct(S => S.setNumberFormat('acct', 0))),
   'HP': C('Percent style', 'Number', 'H', ICON.percent, direct(S => S.setNumberFormat('percent', 0)), 'Ctrl+Shift+%'),
-  'HK': C('Comma style', 'Number', 'H', ICON.comma, direct(S => S.setNumberFormat('comma', 2)), 'Ctrl+Shift+!'),
+  'HK': C('Comma style', 'Number', 'H', ICON.comma, direct(S => S.setCustomFormat(COMMA_STYLE_CODE))),
   'H0': C('Increase decimal', 'Number', 'H', ICON.decInc, direct(S => S.changeDecimals(1))),
   'H9': C('Decrease decimal', 'Number', 'H', ICON.decDec, direct(S => S.changeDecimals(-1))),
   // Home · Styles
@@ -274,12 +274,16 @@ export const RIBBON_COMMANDS = {
   'HOM': C('Move or copy sheet…', 'Cells', 'H', ICON.moveSheet, s => { leaveRibbon(s); s.openMoveSheet(); }),
   // Home · Editing
   'HUS': C('AutoSum', 'Editing', 'H', ICON.sum, autoSum, 'Alt+='),
-  'HFIS': C('Series…', 'Editing', 'H', ICON.series, dialog('series')),
+  'HFIS': C('Series…', 'Editing', 'H', ICON.series, s => { leaveRibbon(s); s.openSeries(); }),
   'HFID': C('Fill down', 'Editing', 'H', ICON.fillDown, direct(S => S.fill('down')), 'Ctrl+D'),
   'HFIR': C('Fill right', 'Editing', 'H', ICON.fillRight, direct(S => S.fill('right')), 'Ctrl+R'),
   'HEA': C('Clear all', 'Editing', 'H', ICON.clearAll, direct(S => S.clearAll())),
   'HEF': C('Clear formats', 'Editing', 'H', ICON.clearFormats, direct(S => S.clearFormats())),
   'HEC': C('Clear contents', 'Editing', 'H', ICON.clearContents, direct(S => S.clearContents()), 'Delete'),
+  'HEM': C('Clear comments and notes', 'Editing', 'H', ICON.clearContents, direct(S => S.clearNotes())),
+  'MMD': C('Define Name…', 'Defined Names', 'M', ICON.fx, s => { leaveRibbon(s); s.openDefineName(); }),
+  'WQ': C('Zoom…', 'Zoom', 'W', ICON.goTo, s => { leaveRibbon(s); s.openZoom(); }),
+  'WJ': C('Zoom to 100%', 'Zoom', 'W', ICON.goTo, direct((S, s) => { S.setZoom(100); s.emit('settings'); })),
   // Formulas
   'MUS': C('AutoSum', 'Function Library', 'M', ICON.sum, autoSum, 'Alt+='),
   'MP': C('Trace precedents', 'Formula Auditing', 'M', ICON.precedents, direct((S, s) => s.jumpPrecedent()), 'Ctrl+['),
@@ -406,7 +410,7 @@ export const UNIMPLEMENTED_BY_ID = Object.fromEntries(UNIMPLEMENTED.map(u => [u.
 export const MENU_META = {
   'HV': { label: 'Paste', icon: ICON.paste }, 'HB': { label: 'Borders', icon: ICON.borders },
   'HI': { label: 'Insert', icon: ICON.insert }, 'HD': { label: 'Delete', icon: ICON.del }, 'HO': { label: 'Format', icon: ICON.format },
-  'HE': { label: 'Clear', icon: ICON.clear }, 'HFI': { label: 'Fill', icon: ICON.fillMenu }, 'HU': { label: 'AutoSum', icon: ICON.sum }, 'MU': { label: 'AutoSum', icon: ICON.sum },
+  'HE': { label: 'Clear', icon: ICON.clear }, 'HFI': { label: 'Fill', icon: ICON.fillMenu }, 'HU': { label: 'AutoSum', icon: ICON.sum }, 'MU': { label: 'AutoSum', icon: ICON.sum }, 'MM': { label: 'Define Name', icon: ICON.fx },
   'AG': { label: 'Group', icon: ICON.group }, 'AU': { label: 'Ungroup', icon: ICON.ungroup },
   'HA': { label: 'Alignment', icon: ICON.alignL, virtual: true }, 'HF': { label: 'Font', icon: ICON.fontName, virtual: true },
   'WV': { label: 'Show', icon: ICON.gridlines, virtual: true }, 'AS': { label: 'Sort', icon: ICON.sortAZ, virtual: true },

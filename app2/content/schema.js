@@ -404,7 +404,7 @@ export function availableConcepts(lesson, byId, seen = new Set()) {
 }
 
 /**
- * Validate a drill (SITE_SPEC §5): a timed exercise of 1-12 checkpoints with explicit pars and an
+ * Validate a drill (SITE_SPEC §5): a timed exercise of 1-20 checkpoints (screenplay 6.1: eight to twenty) with explicit pars and an
  * optimal keystroke count. Unlike a lesson it teaches nothing — no read, no teach lines, no
  * concept bookkeeping — so a checkpoint carries only { id, text, keys, check }. Returns a list of
  * problems (empty when valid); never throws.
@@ -426,7 +426,7 @@ export function validateDrill(d) {
   const p = d.pars;
   need(isObject(p) && ['pass', 'pro', 'legendary'].every(k => typeof p[k] === 'number' && Number.isFinite(p[k])), 'pars must give pass, pro and legendary in seconds');
   if (isObject(p)) need(p.pass > p.pro && p.pro > p.legendary && p.legendary > 0, 'pars must fall strictly: pass > pro > legendary > 0');
-  need(Array.isArray(d.goals) && d.goals.length >= 1 && d.goals.length <= 12, 'goals: 1-12 checkpoints');
+  need(Array.isArray(d.goals) && d.goals.length >= 1 && d.goals.length <= 20, 'goals: 1-20 checkpoints');
   const goals = Array.isArray(d.goals) ? d.goals.filter(isObject) : [];
   const ids = new Set();
   for (const g of goals) {

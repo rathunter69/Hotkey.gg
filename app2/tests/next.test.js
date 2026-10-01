@@ -47,7 +47,7 @@ test('router: error cards name pages as people do; the storyboard is local-only;
   assert.equal(pageLabel('home'), 'Home');
   assert.equal(pageLabel('learn'), 'Learn');
   assert.equal(pageLabel('drill', { daily: true }), 'The Daily');
-  assert.equal(pageLabel('drill', { id: 'edge-jumps' }), 'This drill');
+  assert.equal(pageLabel('drill', { id: 'get-around' }), 'This drill');
   assert.equal(pageLabel('start'), 'Getting started');
   assert.equal(pageLabel('notfound'), 'This page');
   for (const n of ['home', 'learn', 'practice', 'rapid', 'due', 'start', 'landing', 'lesson', 'reference']) assert.doesNotMatch(pageLabel(n), /^The (home|rapid|due|start|notfound) page/);
@@ -142,7 +142,7 @@ test('beats: once per module, on its first lesson, never on a challenge; every b
   const ch = LESSONS.find(l => l.id === 'challenge-inherited-file');
   assert.equal(beatFor(ch, moduleOf(ch), []), null);
   for (const l of LESSONS) { const m = moduleOf(l); if (m && m.n === 1 && l.kind !== 'challenge') assert.ok(MODULE_BEATS[l.module], 'a beat for ' + l.module); }
-  assert.match(pageDelivered(at), /^Page 1\.1 — The workbook, set up to standard — delivered/);
+  assert.match(pageDelivered(at), /^Page 1\.1, The workbook, set up to standard, is done\.$/);
   for (const k in MODULE_BEATS) for (const s of [MODULE_BEATS[k].title, MODULE_BEATS[k].body]) assert.doesNotMatch(s, /colour|practis|organis|centre|grey\b/i, 'American spelling in ' + k);
 });
 
@@ -174,7 +174,7 @@ test('first run: three briefing cards, the orientation names the five places and
   const all = [...BRIEFING.flatMap(b => [b.title, ...b.body]), ORIENTATION.title, ...ORIENTATION.rows.flatMap(r => [r.where, r.what]), ORIENTATION.fine];
   for (const s of all) assert.doesNotMatch(s, /colour|practis|organis|centre|grey\b|analyse/i, 'American spelling: ' + s.slice(0, 40));
   const orient = ORIENTATION.rows.map(r => r.what).join(' ');
-  for (const w of ['Lessons', 'challenge', 'Drills', 'rapid-fire', 'the Daily', 'board', 'XP', 'level']) assert.ok(orient.includes(w), w);
+  for (const w of ['course', 'challenge', 'Drills', 'rapid-fire', 'the Daily', 'board', 'XP', 'level']) assert.ok(orient.includes(w), w);
   assert.deepEqual(ORIENTATION.rows.map(r => r.where), ['Learn', 'Practice', 'Leaderboard', 'Level']);
   assert.deepEqual(stepsFor(false), ['demo', 'orient', 'who', 'sent', 'deliver', 'picker']);
   assert.equal(FIRST_LESSON, 'inherited-workbook', 'the first run hands off to 1.1.1');
@@ -188,15 +188,15 @@ test('first run: three briefing cards, the orientation names the five places and
 
 test('landing: the headline and its two alternates, the subhead, six modes, a Sign in, Enter starts', () => {
   assert.equal(HEADLINES.length, 3);
-  assert.equal(HEADLINES[0].a + ' ' + HEADLINES[0].b, 'Excel isn’t learned. It’s practiced.');
-  assert.equal(HEADLINES[1].a, 'You don’t learn Excel by watching.');
-  assert.equal(SUBHEAD, 'Learn Excel the way analysts are taught — on a real sheet, one job at a time.');
+  assert.equal(HEADLINES[0].a, 'The better way to master Excel');
+  assert.equal(HEADLINES[1].a + ' ' + HEADLINES[1].b, 'Excel isn’t learned. It’s practiced.');
+  assert.equal(SUBHEAD, 'Learn like an analyst at a top firm, and build the muscle memory to make it stick.');
   assert.deepEqual(MODES.map(m => m.key), ['lesson', 'challenge', 'drill', 'daily', 'rapid', 'boards']);
   const html = landingHtml(0);
   assert.ok(html.includes('id="ldSignIn"') && html.includes('href="#/account"'));
   assert.ok(html.includes('clips/lesson.webm') && html.includes('poster="./clips/boards.jpg"'));
-  assert.ok(landingHtml(2).includes('Nobody learned Excel from a video.'));
-  assert.ok(landingHtml(99).includes('Nobody learned'), 'clamped');
+  assert.ok(landingHtml(2).includes('The better way to learn Excel'));
+  assert.ok(landingHtml(99).includes('The better way to learn Excel'), 'clamped');
   for (const m of MODES) assert.doesNotMatch(m.line, /colour|practis|organis|centre/i);
 });
 

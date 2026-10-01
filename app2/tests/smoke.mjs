@@ -229,29 +229,29 @@ try {
   // the attempt lands in records, and after a reload the PB ghost toggle is enabled
   {
     const { DRILLS_BY_ID } = await import('../content/drills.js');
-    const drill = DRILLS_BY_ID['edge-jumps'];
-    await page.goto(base + '#/drill/edge-jumps');
+    const drill = DRILLS_BY_ID['get-around'];
+    await page.goto(base + '#/drill/get-around');
     const card = await page.waitForSelector('.start-card', { timeout: 5000 }).catch(() => null);
-    if (!card) fail('edge-jumps: no start card');
+    if (!card) fail('get-around: no start card');
     await page.keyboard.press('Space');
     await page.waitForTimeout(120);
-    if (await page.$('.start-card')) fail('edge-jumps: start card did not dismiss');
-    if (await page.evaluate(() => document.querySelector('#drKeys').textContent) !== '0') fail('edge-jumps: the start key landed on the sheet');
+    if (await page.$('.start-card')) fail('get-around: start card did not dismiss');
+    if (await page.evaluate(() => document.querySelector('#drKeys').textContent) !== '0') fail('get-around: the start key landed on the sheet');
     for (const step of parseKeyScript(drill.solution)) {
       if (step.type === 'text') await page.keyboard.type(step.text);
       else await page.keyboard.press(pwKey(step.spec));
     }
     const res = await page.waitForSelector('.lesson-done:not([hidden]) .tstamp.hit', { timeout: 4000 }).catch(() => null);
-    if (!res) fail('edge-jumps: no tier stamp on the result card');
+    if (!res) fail('get-around: no tier stamp on the result card');
     const rec = await page.evaluate(() => { try { return JSON.parse(localStorage.getItem('hk2_records_v1')); } catch (e) { return null; } });
-    const att = rec && rec.attempts && rec.attempts.find(a => a.ref === 'edge-jumps');
-    if (!att) fail('edge-jumps: no attempt recorded');
-    else if (!att.clean || att.tier === 'none') fail(`edge-jumps: attempt not clean/tiered (${JSON.stringify({ clean: att.clean, tier: att.tier })})`);
-    if (!(rec && rec.pbs && rec.pbs['edge-jumps'])) fail('edge-jumps: no PB recorded');
+    const att = rec && rec.attempts && rec.attempts.find(a => a.ref === 'get-around');
+    if (!att) fail('get-around: no attempt recorded');
+    else if (!att.clean || att.tier === 'none') fail(`get-around: attempt not clean/tiered (${JSON.stringify({ clean: att.clean, tier: att.tier })})`);
+    if (!(rec && rec.pbs && rec.pbs['get-around'])) fail('get-around: no PB recorded');
     await page.reload();
-    await page.waitForSelector('.start-card', { timeout: 5000 }).catch(() => fail('edge-jumps: reload lost the drill'));
+    await page.waitForSelector('.start-card', { timeout: 5000 }).catch(() => fail('get-around: reload lost the drill'));
     const ghost = await page.evaluate(() => { const b = document.querySelector('#ghostToggle'); return b ? !b.disabled : null; });
-    if (ghost !== true) fail('edge-jumps: ghost toggle not enabled after a PB');
+    if (ghost !== true) fail('get-around: ghost toggle not enabled after a PB');
   }
 
   // failure paths (experience pass C, item 9), in their own context so the module map starts clean: a page file that

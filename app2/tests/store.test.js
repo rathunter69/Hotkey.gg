@@ -111,7 +111,7 @@ test('guest reads ignore any lingering account cache (signed out = progress.js o
 test('attemptToWire shapes a records attempt for rpc_submit_game_attempt', async () => {
   const { attemptToWire } = await import('../app/store.js');
   const w = attemptToWire({
-    id: 'a1b2c3d4-0000-4000-8000-000000000001', kind: 'drill', ref: 'edge-jumps', day: '2026-09-22',
+    id: 'a1b2c3d4-0000-4000-8000-000000000001', kind: 'drill', ref: 'get-around', day: '2026-09-22',
     seed: 7, secs: 6.505, keys: 9, clean: true, helped: false, mouse: 0, tier: 'pass',
     splits: [1.5, 2], trace: [{ k: 'Ctrl+↓', t: 0, cell: 'A6' }], at: 1758500000000,
   });

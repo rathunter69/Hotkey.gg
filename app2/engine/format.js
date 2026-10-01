@@ -4,7 +4,8 @@
 // General never shows binary float noise. A cell with fmtStyle 'custom' carries an Excel format
 // code in numFmt (Chapter 2) and renders through numfmt.js — the same engine TEXT() uses.
 
-import { formatValue, compileFormat, numToText, FormatError } from './numfmt.js';
+import { formatValue, formatMarked, compileFormat, numToText, FormatError, PAD_MARK } from './numfmt.js';
+export { PAD_MARK };
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const loc = (n, dec, group = true) => n.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec, useGrouping: group });
@@ -72,4 +73,70 @@ export function dispColor(cell) {
   if (!cell || cell.fmtStyle !== 'custom' || !cell.numFmt || cell.value === null || cell.value === undefined || cell.value === '' || isErr(cell.value)) return null;
   const r = custom(cell.value, cell.numFmt);
   return r ? r.color : null;
+}
+
+/**
+ * The cell's display text with every _x pad marked (PAD_MARK + x) for the grid, which paints the
+ * gap at x's width: a custom code's pads, and the closing-bracket pad the built-in Comma and
+ * Currency styles (#,##0_);(#,##0)) put after a positive figure or zero so it lines up with (1,234).
+ * Everything else is dispText's.
+ */
+export function dispMarked(cell) {
+  if (!cell || typeof cell.value !== 'number') return dispText(cell);
+  if (cell.fmtStyle === 'custom' && cell.numFmt) {
+    try { compileFormat(cell.numFmt); } catch (e) { return dispText(cell); }
+    try { return formatMarked(cell.value, cell.numFmt).text; } catch (e) { return dispText(cell); }
+  }
+  const t = dispText(cell);
+  if ((cell.fmtStyle === 'comma' || cell.fmtStyle === 'currency' || cell.fmtStyle === 'acct') && !t.endsWith(')') && t !== HASHES && isFinite(cell.value)) return t.replace(/ +$/, '') + PAD_MARK + ')';
+  return t;
+}
+
+/** Excel rounds half away from zero on the decimal digits it shows. */
+function roundAway(n, d) {
+  const [m, e] = Math.abs(n).toPrecision(15).split('e');
+  const x = Math.round(Number(m + 'e' + ((e ? +e : 0) + d)));
+  return Math.sign(n) * Number(x + 'e-' + d);
+}
+/** Trailing zeros of a fixed-point string dropped, and a bare point with them. */
+const trimZeros = s => (s.includes('.') ? s.replace(/0+$/, '').replace(/\.$/, '') : s);
+
+/**
+ * What a General-format number shows in a column `maxChars` digits wide (M107). Excel never
+ * fills a General cell with # while it can show the figure: it drops decimals until the number
+ * fits (1234567.891 in a default column is 1234568), and an integer part too long for the column
+ * goes to scientific notation with as many mantissa digits as fit (123456789012 is 1.23E+11).
+ * Only a column too narrow for even the shortest scientific form gets #. Returns the text, or
+ * null when nothing fits.
+ */
+export function fitGeneral(n, maxChars) {
+  n = Number(n);
+  if (!isFinite(n)) return '#NUM!';
+  const full = fmtNum(n, 'general');
+  if (full.length <= maxChars) return full;
+  if (maxChars < 1) return null;
+  const neg = n < 0, a = Math.abs(n);
+  const sci = () => {
+    if (a === 0) return null;
+    let e = Math.floor(Math.log10(a));
+    for (let k = 9; k >= 0; k--) {
+      let m = roundAway(a / Math.pow(10, e), k), ee = e;
+      if (m >= 10) { m = roundAway(m / 10, k); ee += 1; }
+      const t = (neg ? '-' : '') + trimZeros(m.toFixed(k)) + 'E' + (ee < 0 ? '-' : '+') + String(Math.abs(ee)).padStart(2, '0');
+      if (t.length <= maxChars) return t;
+    }
+    return null;
+  };
+  if (full.includes('E')) return sci();
+  // fixed point: as many decimals as the column leaves room for
+  const intPart = String(Math.trunc(roundAway(a, 0)));
+  const intLen = (neg ? 1 : 0) + intPart.length;
+  if (intLen > maxChars) return sci();
+  for (let d = Math.max(0, maxChars - intLen - 1); d >= 0; d--) {
+    const r = roundAway(a, d);
+    if (r === 0 && a !== 0) return sci();          // every digit it could show is zero: Excel switches to E notation
+    const t = (neg && r !== 0 ? '-' : '') + trimZeros(r.toFixed(d));
+    if (t.length <= maxChars) return t;
+  }
+  return sci();
 }

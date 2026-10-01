@@ -1,4 +1,4 @@
-// app2/app/learn-next.js — Learn as the Project Volt data room (experience pass, decision 8):
+// app2/app/learn-next.js — Learn as the data room (experience pass, decision 8):
 // a VDR-style index. Chapters are folders (1. Foundations …), modules are numbered documents
 // (1.0, 1.1 …) with an objective, a status, the lessons as steps, the challenge with your tier,
 // and the pack page each produces (it fills in when the challenge passes; the challenge replays
@@ -122,9 +122,9 @@ export function mountLearnPage(root, ctx = {}) {
     let docs = '';
     if (openChapter === 'foundations') {
       const stage = STAGES[0];
-      docs += `<div class="dr-ch-head"><div><div class="dr-ch-eyebrow">Folder 1 · stage 1 of 6 · ${esc(stage.stage)}</div><h2>Foundations</h2>
-          <p>Management sent the weekly site report for the Austin cluster, untidy. The deliverable is the weekly KPI page: clean, live, formatted, checked, print-ready. Seven modules, each one job on that file, then the project and assessment.</p></div>
-          <div class="dr-ch-tools">${gate.testout ? '<span class="chapter-testout tested">Tested out ✓</span>' : '<a class="btn btn-ghost" href="#/lesson/foundations-testout">Already know this? Test out</a>'}</div></div>`;
+      docs += `<div class="dr-ch-head"><div><div class="dr-ch-eyebrow">Chapter 1, stage 1 of 6: ${esc(stage.stage)}</div><h2>Foundations</h2>
+          <p>The five Austin site managers sent their weekly sheets, and ops pasted them into one workbook. You’ll turn it into a weekly KPI report the CFO can sign off: seven modules, each one job on that file, then the project and the assessment.</p></div>
+          <div class="dr-ch-tools">${gate.testout ? `<span class="chapter-testout tested">${esc(siteCopy('learn_verified', 'Verified'))}</span>` : `<a class="btn btn-ghost" href="#/lesson/foundations-testout">${esc(siteCopy('learn_testout', 'Already know this? Take the assessment.'))}</a>`}</div></div>`;
       docs += '<div class="dr-docs">';
       mods.forEach((m, k) => {
         const pm = path[k]; const plan = PLANNED_MODULES[k] || {};
@@ -148,7 +148,7 @@ export function mountLearnPage(root, ctx = {}) {
           <div class="dr-doc-page${passed ? ' filled' : ''}">
             ${pageThumbHtml(m, passed)}
             <div class="dr-page-cap"><b>Page ${docNo(1, k, m.id)}</b> ${passed ? `${esc(pageName(m))} · delivered` : m.challenge ? 'fills in when the challenge passes' : 'fills in when the project is built'}</div>
-            ${m.challenge && passed ? `<a class="dr-replay" href="#/lesson/${esc(m.challenge.id)}?seed=new" title="Replay the challenge on a fresh sheet">Replay · new sheet →</a>` : ''}
+            ${m.challenge && passed ? `<a class="dr-replay" href="#/lesson/${esc(m.challenge.id)}?seed=new" title="Replay the challenge on a fresh sheet">${esc(siteCopy('learn_replay', 'Replay on a new sheet'))}</a>` : ''}
           </div>
         </article>`;
       });
@@ -210,7 +210,7 @@ export function mountLearnPage(root, ctx = {}) {
           <div class="dr-doc-page${passed ? ' filled' : ''}">
             ${pageThumbHtml(m, passed)}
             <div class="dr-page-cap"><b>Page ${esc(no)}</b> ${passed ? `${esc(pageName(m))} · delivered` : 'fills in when the challenge passes'}</div>
-            ${m.challenge && passed ? `<a class="dr-replay" href="#/lesson/${esc(m.challenge.id)}?seed=new" title="Replay the challenge on a fresh sheet">Replay · new sheet →</a>` : ''}
+            ${m.challenge && passed ? `<a class="dr-replay" href="#/lesson/${esc(m.challenge.id)}?seed=new" title="Replay the challenge on a fresh sheet">${esc(siteCopy('learn_replay', 'Replay on a new sheet'))}</a>` : ''}
           </div>
         </article>`;
       });
@@ -223,14 +223,14 @@ export function mountLearnPage(root, ctx = {}) {
       const st = STAGES.find(s => s.id === pl.id) || {};
       const built = CHAPTERS.find(c => c.id === pl.id) || null;   // authored, locked to this account: the lessons are in, the door is shut
       const ch1Cleared = !!gate.testout || !!gate.assessment || (ch1 && modulesOf(ch1).filter(m => m.id !== 'welcome').every(m => moduleStatus(m, all) === 'complete'));
-      docs += `<div class="dr-ch-head"><div><div class="dr-ch-eyebrow">Folder ${pl.n} · stage ${st.n} of 6 · ${esc(st.stage || '')}</div><h2>${esc(built ? built.title : pl.title)} <span class="l-tag">paid</span></h2>
-          <p><b>Management sends:</b> ${esc(st.sends || '')}.<br><b>You deliver:</b> ${esc(st.delivers || '')}.</p><p>${esc(built ? built.blurb : pl.line)}</p>
+      docs += `<div class="dr-ch-head"><div><div class="dr-ch-eyebrow">Chapter ${pl.n}, stage ${st.n} of 6: ${esc(st.stage || '')}</div><h2>${esc(built ? built.title : pl.title)} <span class="l-tag">Pro</span></h2>
+          <p><b>What arrives:</b> ${esc(st.sends || '')}.<br><b>What you build:</b> ${esc(st.delivers || '')}.</p><p>${esc(built ? built.blurb : pl.line)}</p>
           ${built ? `<p>${esc(PAID_LINE)}</p><p class="dr-lock">${built.lessons.length} lessons are in: ${modulesOf(built).map(m => esc(m.title)).join(', ')}, each with a timed challenge.</p>` : ''}
-          <p class="dr-lock">${pl.n === 2 ? (ch1Cleared ? 'Unlocked — Chapter 1 is behind you. Its lessons ' + (built ? 'open' : 'arrive') + ' with the paid tier.' : 'Opens when Chapter 1 is complete or tested out, with the paid tier.') : 'Arrives with the paid tier, in order.'} <a class="dr-price" href="#/pricing">See pricing →</a>${built && auth.state() !== 'in' ? ' · <a class="dr-price" href="#/account">Sign in →</a>' : ''}</p></div></div>`;
+          <p class="dr-lock">${pl.n === 2 ? (ch1Cleared ? 'Chapter 1 is behind you. These lessons ' + (built ? 'open' : 'arrive') + ' with Pro.' : 'Opens when Chapter 1 is complete or Verified, with Pro.') : 'Arrives with Pro, in order.'} <a class="dr-price" href="#/pricing">Go Pro</a>${built && auth.state() !== 'in' ? ' <a class="dr-price" href="#/account">Sign in</a>' : ''}</p></div></div>`;
     }
 
-    el.innerHTML = `<div class="dr-head"><div><h1>Project Volt · data room</h1><p class="dr-sub">One deal, six chapters. Each chapter is a stage of the sale and produces one page of the pack. Your progress is ${esc(store.saveLine())}.</p></div>
-        <span class="cat-keys"><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>Enter</kbd> open</span></div>
+    el.innerHTML = `<div class="dr-head"><div><h1>Learn</h1><p class="dr-sub">Six chapters, each one stage of the sale, and each with a finished page to build. Your progress is ${esc(store.saveLine())}.</p></div>
+        <span class="cat-keys"><kbd>↑</kbd><kbd>↓</kbd> move <kbd>Enter</kbd> open</span></div>
       ${dealStripHtml(all)}
       <div class="dr-grid"><nav class="dr-tree" aria-label="Chapters">${tree}</nav><section class="dr-main">${docs}</section></div>`;
     wire();

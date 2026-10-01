@@ -14,6 +14,16 @@ export function parsFrom(legendary, over = {}) {
 }
 
 /**
+ * A drill's pars from its reference route's time (screenplay 6.0): Pass at 2x the route, Expert
+ * (`pro`) at 1.4x, Legendary at 1.1x. Tuned aggressively; recalibrated from real runs after launch.
+ */
+export const ROUTE_MULT = { pass: 2, pro: 1.4, legendary: 1.1 };
+export function parsFromRoute(routeSecs) {
+  const x = m => Math.round(routeSecs * m * 1e6) / 1e6;   // 90 x 1.1 is 99, not 99.00000000000001
+  return parsFrom(x(ROUTE_MULT.legendary), { pass: x(ROUTE_MULT.pass), pro: x(ROUTE_MULT.pro) });
+}
+
+/**
  * The tier a clean time earns against a set of pars; 'none' when over pass or not clean. With
  * `opts.keys` and `opts.optimalKeys` the efficiency axis applies too (C2 addendum): pro needs
  * ≤ 1.5× the reference route's keys, legendary ≤ 1.2×; pass is time only. A run past its time

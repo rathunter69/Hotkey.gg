@@ -46,7 +46,7 @@ const keysHtml = s => s ? (s.match(/"[^"]*"|'[^']*'|\S+/g) || []).map(t => t.sta
   /^(then|×\d+|,|and|or|…)$/.test(t) || /^[a-z]/.test(t) && !/^[a-z]$/.test(t) ? `<span class="kx">${esc(t)}</span>` : kbd(t)).join(' ') : '';
 
 /** The once-in-the-browser line on the first goal that uses Ctrl+PgUp/PgDn; site.csv tab_keys_note overrides. */
-export const TAB_KEYS_NOTE = 'Your browser may keep Ctrl+PgDn and Ctrl+PgUp for its own tabs. Fullscreen hands them to the sheet, and so does the installed app.';
+export const TAB_KEYS_NOTE = 'Your browser keeps Ctrl+PgDn and Ctrl+PgUp for its own tabs. Fullscreen and the installed app hand the real keys to the sheet.';
 /** A challenge's name after the word "Challenge": 'Challenge: another cluster’s file' → 'Another cluster’s file'. */
 const challengeName = t => { const x = String(t || '').replace(/^Challenge:\s*/i, ''); return x.charAt(0).toUpperCase() + x.slice(1); };
 const PANEL_KEY = 'hk2_panel';
@@ -358,7 +358,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     if (ghost) {
       card.innerHTML = `<div class="task-label">Watch</div>
         <div class="task-goal">${esc(run.current ? run.current.text : '')}</div>
-        <div class="task-extra">The keys play on the sheet, then it goes back as it was. <kbd>Esc</kbd> hands back now; <kbd>←</kbd> <kbd>→</kbd> step.</div>`;
+        <div class="task-extra">${rich(siteCopy('lesson_show_me_playing', 'Watch the keys play on your sheet. When they’re done, the sheet goes back the way it was. `Esc` hands it back early; `←` `→` steps through.'))}</div>`;
       return;
     }
     // a goal just landed: it stays on the card, ticked (its convention chip earning its colour), for
@@ -392,7 +392,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
       ${isGoal && run.mode === 'guided' && cur.why ? `<div class="task-why">${rich(cur.why)}</div>` : ''}
       ${isGoal && hintAt === run.doneCount && cur.hintStuck ? `<div class="task-stuck">${rich(cur.hintStuck)}</div>` : ''}
       ${isGoal && keysShown(cur) && cur.keys ? `<div class="task-keys${hintAt === run.doneCount && !(run.mode === 'guided' && cur.teach) && !revealed ? ' task-hint' : ''}">${keysHtml(cur.keys)}</div>` : ''}
-      ${isGoal && nudgeAt === run.doneCount ? `<div class="goal-nudge">Try it with the keyboard${!keysShown(cur) && cur.keys ? ': the Help tab shows the keys' : ''}.</div>` : ''}
+      ${isGoal && nudgeAt === run.doneCount ? `<div class="goal-nudge">${esc(!keysShown(cur) && cur.keys ? siteCopy('lesson_nudge_help', 'Try it with the keyboard. F1 opens Help, which can show you the keys.') : siteCopy('lesson_nudge', 'Try it with the keyboard.'))}</div>` : ''}
       ${conv ? `<span class="conv-chip" title="${esc(conv.name)}">${esc(conv.short)}</span>` : ''}
       ${tabNote}`;
     const fsb = card.querySelector('[data-act="fs-now"]'); if (fsb) fsb.onclick = () => { toggleFullscreen(); };
@@ -450,7 +450,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     if (!cur) { p.innerHTML = `<p class="help-note">Every goal has landed.</p>` + notes; return; }
     const footer = `<p class="help-note">Press the keys one after another. <kbd>Esc</kbd> backs out of the Ribbon or a dialog box; ${kbd('Ctrl+Z')} undoes.</p>`;
     if (run.doneCount >= run.goals.length) {
-      p.innerHTML = `<div class="help-goal">${esc(cur.text)}</div><p class="help-note">Every goal has landed, but the sheet is not yet as the lesson expects. Put this right and the lesson completes; ${kbd('Ctrl+Z')} undoes.</p>` + notes;
+      p.innerHTML = `<div class="help-goal">${esc(cur.text)}</div><p class="help-note">${rich(siteCopy('lesson_sheet_off', 'Every goal’s done, but the sheet isn’t where it needs to be yet. Fix what’s listed to finish the lesson (`Ctrl+Z` undoes a step).'))}</p>` + notes;
       return;
     }
     const goalLine = `<div class="help-goal">${cur.teach && run.mode === 'guided' ? `<span class="goal-teach">${rich(cur.teach)}</span> ` : ''}${esc(cur.text)}</div>`;
@@ -474,7 +474,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     p.innerHTML = (used.length
       ? `<ul class="used-list">${used.map(u => `<li class="used-row"><span class="used-keys">${u.keys.split(' ').map(k => kbd(k)).join(' ')}</span><span class="used-count">${u.count > 1 ? '×' + u.count : ''}</span></li>`).join('')}</ul>`
       : `<p class="used-empty">No shortcuts yet. They are listed here as you press them, with how often.</p>`) +
-      (mouse ? `<p class="used-mouse">Mouse: ${mouse} ${mouse === 1 ? 'click' : 'clicks'} on the workspace. Allowed here; the keyboard is what you are practicing.</p>` : '');
+      (mouse ? `<p class="used-mouse">${esc(siteCopy('lesson_mouse', 'Mouse: {clicks}. It’s allowed in a lesson, but the keyboard is what you’re practicing.').replace(/\{clicks\}/g, mouse + (mouse === 1 ? ' click' : ' clicks')))}</p>` : '');
   }
 
   function renderActions() {
@@ -540,7 +540,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
   }
   const leadBold = t => { const m = /^(.*?[.!?])(\s+.*)?$/s.exec(String(t || '')); return m ? `<b>${esc(m[1])}</b>${m[2] ? esc(m[2]) : ''}` : esc(t); };
   const closingHtml = () => (lesson.wow ? `<p class="rm-wow">${rich(lesson.wow)}</p>` : '') + (lesson.closing || []).map(t => `<p class="rm-closing">${rich(t)}</p>`).join('');
-  const doneTitle = () => lesson.kind === 'assessment' ? 'Assessment passed' : lesson.kind === 'testout' ? 'Tested out — chapter cleared' : lesson.kind === 'project' ? 'Project complete' : 'Lesson complete';
+  const doneTitle = () => lesson.kind === 'assessment' || lesson.kind === 'testout' ? siteCopy('lesson_done_verified', 'Chapter Verified') : lesson.kind === 'project' ? siteCopy('lesson_done_project', 'Project complete') : siteCopy('lesson_done', 'Lesson complete');
   function statsLine() {
     const parts = [`<b>${run.startedAt == null ? '—' : fmtSecs(run.elapsed) + ' s'}</b>`, `<b>${run.session.keyLog.length}</b> keystrokes`, modeLabel().toLowerCase() + (assisted() ? ' · assisted' : '')];
     if (run.mouseCount) parts.push(`mouse ×${run.mouseCount}`);
@@ -636,13 +636,13 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
       ${lesson.race ? raceHtml() : `<div class="rm-time">${secs == null ? '—' : fmtSecs(secs)}<span>s</span></div>`}
       ${(isChallenge || timedOnly) && lesson.pars ? `<div class="tier-stamps">${TIERS.map((t, i) => `<span class="tstamp${i === tierIx ? ' got tier-' + t : i < tierIx ? ' hit' : ''}">${i < tierIx ? '✓ ' : ''}${t} ${lesson.pars[t]}s</span>`).join('')}</div>` : ''}
       <div class="rm-stats"><div>keys<b>${run.session.keyLog.length}${isChallenge && opt ? ' / ' + opt : ''}</b></div>${run.mouseCount ? `<div>mouse<b>×${run.mouseCount}</b></div>` : ''}${run.mode === 'timed' && run.par ? `<div>par<b>${run.par} s</b></div>` : ''}${xpGained ? `<div>earned<b class="rm-xp">+0 XP</b></div>` : ''}</div>
-      ${lastTimedOut ? `<div class="rm-note">${timedOnly ? `Over the limit — no tier, and the ${lesson.kind === 'testout' ? 'chapter is not skipped' : 'gate is not passed'}. The run still counts; the next attempt runs against a hard clock.` : 'Over the limit — no tier. The module still counts.'}</div>` : ''}
-      ${lastClean ? `<div class="rm-clean">✓ Clean sheet — no mouse, no help</div>` : assisted() ? `<div class="rm-note">Assisted — steps were shown on request.</div>` : ''}
+      ${lastTimedOut ? `<div class="rm-note">${esc(timedOnly ? siteCopy('over_limit_assessment', 'Over The Limit. Run It Again. The page is built, but the chapter isn’t Verified yet, and the clock is hard from here.') : siteCopy('over_limit', 'Over the limit: no tier, but the module counts.'))}</div>` : ''}
+      ${lastClean ? `<div class="rm-clean">${esc(siteCopy('lesson_clean', 'Clean sheet: you did every goal yourself, with no mouse.'))}</div>` : assisted() ? `<div class="rm-note">${esc(siteCopy('lesson_assisted', 'Assisted: Help played or did a goal for you.'))}</div>` : ''}
       ${deliveredNow ? `<div class="rm-page"><div class="rm-page-slot" aria-hidden="true">${pageThumbHtml(at.module, true)}</div><div class="rm-page-line">${esc(pageDelivered(at))}</div></div>` : ''}
       ${lesson.kind === 'project' && next ? projectEndHtml() : ''}
       ${closingHtml() ? `<div class="rm-closing-block">${closingHtml()}</div>` : ''}
       ${isMicro ? '' : nextJobHtml()}
-      ${saveBox ? `<div class="rm-save"><b>Your first lesson is done.</b> Progress is saved on this device. <a href="#/account">Create a free account</a> to keep it across devices — everything you have done carries over.</div>` : ''}
+      ${saveBox ? `<div class="rm-save">${esc(siteCopy('lesson_first_saved', 'Your first lesson is saved on this device, and a free account takes it to any computer.'))} <a href="#/account">Create a free account</a></div>` : ''}
       ${installOffer ? `<div class="rm-save rm-install">${leadBold(siteCopy('install_prompt', INSTALL_PROMPT))} <span class="rm-install-acts"><button class="btn" data-act="install" type="button">Install</button><button class="btn btn-ghost" data-act="install-no" type="button">Not now</button></span></div>` : ''}
       <div class="rm-opts">${doneButtonsHtml()}</div>
       <div class="rm-foot"><button class="rm-link" data-act="look" type="button">Look at the sheet <kbd>Esc</kbd></button>${(run.mode === 'timed' || isChallenge) && lesson.solution ? '<button class="rm-link" data-act="route" type="button">Watch the reference route</button>' : ''}${saveBox || !saveState ? '' : `<span class="rm-more">${esc(saveState)}</span>`}</div>
@@ -699,10 +699,10 @@ export function mountLessonView(root, lesson, { mode = 'guided', panel: panelOpt
     if (timerH) { clearInterval(timerH); timerH = null; }
     renderPanel();
     overlay.innerHTML = `<div class="rm-card">
-      <div class="rm-title" id="doneTitle">Time’s up — try again</div>
+      <div class="rm-title" id="doneTitle">${esc(siteCopy('times_up', 'Time’s Up. Keep Drilling.'))}</div>
       <div class="rm-lesson">${esc(itemNumber(lesson, at) || String(lessonNumber(lesson.id)))} · ${esc(lesson.title)}</div>
       <div class="rm-stats"><div>goals<b>${run.doneCount} / ${run.goals.length}</b></div><div>limit<b>${lesson.timeLimit} s</b></div></div>
-      <div class="rm-note">${lesson.kind === 'testout' ? 'No harm done: nothing is recorded, and the chapter’s lessons are always open.' : 'Nothing is recorded for a run that ran out. The report is the same every time — another run is more practice.'}</div>
+      <div class="rm-note">${lesson.kind === 'testout' ? 'No harm done: nothing is recorded, and the chapter’s lessons are always open.' : esc(siteCopy('times_up_note', 'Nothing’s recorded when the clock runs out.'))}</div>
       <div class="rm-opts"><button class="btn btn-primary" data-act="continue" type="button">Try again <kbd>Enter</kbd></button>
         ${isChallenge ? '<button class="btn" data-act="new" type="button">New sheet <kbd>N</kbd></button>' : ''}
         <a class="btn" href="#/learn">Back to Learn</a>

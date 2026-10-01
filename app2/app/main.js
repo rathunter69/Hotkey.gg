@@ -86,7 +86,7 @@ export function navKeyFor(name) {
 }
 
 /** index.html's own <title>: the landing keeps it, so the tab and a shared link agree. */
-export const HOME_TITLE = 'hotkey.gg — Excel isn\u2019t learned. It\u2019s practiced.';
+export const HOME_TITLE = 'hotkey.gg: the better way to master Excel';
 
 /** The document title for a route. */
 export function titleFor(name, extra) {
@@ -176,9 +176,9 @@ function errorCard(root, { name, params, kind }, retry) {
   const onHome = name === 'home' || name === 'root' || name === 'landing';
   const body = kind === 'mount'
     ? 'Something broke on our side. Retry, or go to ' + (onHome ? 'Learn' : 'Home') + '.'
-    : label + ' could not be fetched. Check your connection and try again.';
-  root.innerHTML = `<div class="err-card" role="alert"><div class="err-cap">hotkey.gg · could not load</div>
-    <div class="err-body"><h1>${esc(label)} did not load.</h1><p>${esc(body)}</p>
+    : label + ' couldn’t be fetched. Check your connection and try again.';
+  root.innerHTML = `<div class="err-card" role="alert"><div class="err-cap">Couldn’t load</div>
+    <div class="err-body"><h1>${esc(label)} didn’t load.</h1><p>${esc(body)}</p>
     <div class="err-actions"><button class="btn btn-primary" id="errRetry" type="button">Retry</button>${onHome ? '<a class="btn btn-ghost" href="#/learn">Learn</a>' : '<a class="btn btn-ghost" href="#/">Home</a>'}</div></div></div>`;
   const b = root.querySelector('#errRetry'); b.onclick = retry; b.focus();
 }

@@ -212,7 +212,7 @@ function sparse(c) {
  * the cells, set widths, row heights, hidden rows and columns, freeze, outline and gridlines it
  * leaves are written back in the authored shape. The state's other sheets are untouched.
  */
-function viaEngine(state, name, fn, { today } = {}) {
+export function viaEngine(state, name, fn, { today } = {}) {
   const sh = sheetOf(state, name);
   const S = new Sheet({ cells: clone(sh.cells || {}), colW: sh.colW, rowH: sh.rowH, hiddenRows: sh.hiddenRows, hiddenCols: sh.hiddenCols,
     freeze: sh.freeze, groups: sh.groups, gridlines: sh.gridlines, today: today ? () => today : undefined });

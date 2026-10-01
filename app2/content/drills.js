@@ -1,32 +1,34 @@
 // app2/content/drills.js — the drill catalogue (SITE_SPEC §5): timed exercises over taught
 // material. Order is catalog order (prev/next in the drill bar walks it). BENCHMARKS are the
 // boards that feed rank (Phase B/§9); DAILY_POOL is where the Daily draws from.
-import edge_jumps from './drills/edge-jumps.js';
-import go_anywhere from './drills/go-anywhere.js';
-import select_blocks from './drills/select-blocks-drill.js';
-import type_the_column from './drills/type-the-column.js';
+import get_around from './drills/get-around.js';
+import enter_and_fill from './drills/enter-and-fill.js';
 import find_and_fix from './drills/find-and-fix.js';
-import fill_factory from './drills/fill-factory.js';
-import row_wrangler from './drills/row-wrangler.js';
-import bold_and_borders from './drills/bold-and-borders.js';
-import format_cells_numbers from './drills/format-cells-numbers.js';
-import formula_sprint from './drills/formula-sprint.js';
 import paste_surgeon from './drills/paste-surgeon.js';
+import row_wrangler from './drills/row-wrangler.js';
+import format_the_weekly_page from './drills/format-the-weekly-page.js';
+import insert_and_amend from './drills/insert-and-amend.js';
+import formula_sprint from './drills/formula-sprint.js';
+import combine_two_tabs from './drills/combine-two-tabs.js';
+import before_you_send from './drills/before-you-send.js';
 import weekly_sales_report from './drills/weekly-sales-report.js';
 import { LESSONS } from './index.js';
 
+/**
+ * Chapter 1's eleven drills (screenplay 6.1, resized 2026-10-01; M108), in the order the chapter
+ * teaches them: one to three minutes each, eight to twenty goals, pars from each reference route.
+ */
 export const DRILLS = [
-  edge_jumps,
-  go_anywhere,
-  select_blocks,
-  type_the_column,
+  get_around,
+  enter_and_fill,
   find_and_fix,
-  fill_factory,
-  row_wrangler,
-  bold_and_borders,
-  format_cells_numbers,
-  formula_sprint,
   paste_surgeon,
+  row_wrangler,
+  format_the_weekly_page,
+  insert_and_amend,
+  formula_sprint,
+  combine_two_tabs,
+  before_you_send,
   weekly_sales_report,
 ];
 
