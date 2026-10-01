@@ -1,50 +1,31 @@
-// The experience pass (2026-09-23): the pure parts of the flag, the cues, the story beats, the
-// install offer, the Daily result card, the first-run copy and the demo script.
+// The pure parts of the first run, the landing, the cues, the story beats, the install offer, the
+// coach marks, the router's labels and the demo script.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { flowFromQuery, flowOn, DEFAULT_ON } from '../app/flow.js';
 import { inferTarget, altPath, cellsOf, rangeBox, rangeCorners, placeNear, SIDES, rangesOf, targetParts, coverage, unionBox } from '../ui/cues.js';
-import { beatFor, MODULE_BEATS, pageDelivered } from '../app/beats.js';
+import { beatFor, MODULE_BEATS, pageDelivered, PLANNED_MODULES } from '../app/beats.js';
 import { shouldOfferInstall } from '../app/install.js';
-import { dailyCardHtml, efficiency, prettyDay } from '../ui/result-card.js';
-import { BRIEFING, QUESTIONS, stepsFor, FIRST_LESSON } from '../app/first-run-next.js';
+import { BRIEFING, QUESTIONS, stepsFor, FIRST_LESSON } from '../app/first-run.js';
 import { COACH_MARKS, coachMarksDue, visibleMarks } from '../ui/components/coachmarks.js';
-import { HEADLINES, SUBHEAD, TABS, PATH, SECTIONS, courseFacts, landingHtml } from '../app/landing-next.js';
+import { HEADLINES, SUBHEAD, TABS, PATH, SECTIONS, courseFacts, landingHtml } from '../app/landing-page.js';
 import { DEMO_LESSON, demoScript } from '../ui/demo-player.js';
-import { STAGES, dealState } from '../app/deal-strip.js';
-import { PLANNED_MODULES } from '../app/learn-next.js';
 import { LessonRun } from '../app/runner.js';
-import { parseRoute, titleFor, navKeyFor, pageLabel, storyboardAllowed, HOME_TITLE } from '../app/main.js';
+import { parseRoute, titleFor, navKeyFor, pageLabel, HOME_TITLE } from '../app/main.js';
 import { skeletonHtml, shapeOf } from '../ui/skeleton.js';
 import { readFileSync } from 'node:fs';
 import { LESSONS, moduleOf } from '../content/index.js';
 import { EVENTS } from '../app/telemetry.js';
 
-test('flow: the flag is off by default, ?flow=next turns it on, ?flow=off turns it off', () => {
-  assert.equal(DEFAULT_ON, true);
-  assert.equal(flowFromQuery({ flow: 'next' }), 'next');
-  assert.equal(flowFromQuery({ flow: 'on' }), 'next');
-  assert.equal(flowFromQuery({ flow: 'off' }), 'off');
-  assert.equal(flowFromQuery({ flow: 'maybe' }), null);
-  assert.equal(flowFromQuery({}), null);
-  assert.equal(flowFromQuery(null), null);
-  assert.equal(flowOn(null), DEFAULT_ON);
-  assert.equal(flowOn('next'), true);
-  assert.equal(flowOn('off'), false);
-});
-
-test('routes: the due micro-drill and the storyboard parse; the flow query rides any route', () => {
+test('routes: the due refresher parses; the retired storyboard is a 404', () => {
   assert.deepEqual(parseRoute('#/due/ctrl-arrow').params, { id: 'ctrl-arrow' });
   assert.equal(parseRoute('#/due/ctrl-arrow').name, 'due');
   assert.equal(navKeyFor('due'), 'practice');
-  assert.equal(parseRoute('#/storyboard').params.id, 'index');
-  assert.equal(parseRoute('#/storyboard/daily-card').params.id, 'daily-card');
-  assert.equal(parseRoute('#/learn?flow=next').query.flow, 'next');
-  assert.equal(titleFor('storyboard'), 'Storyboard · hotkey.gg');
+  assert.equal(parseRoute('#/storyboard').name, 'notfound');
   assert.equal(titleFor('due'), 'Due today · hotkey.gg');
+  assert.equal(PLANNED_MODULES.length, 7, 'seven modules; the Welcome is retired');
 });
 
-test('router: error cards name pages as people do; the storyboard is local-only; one landing title', () => {
+test('router: error cards name pages as people do; one landing title', () => {
   assert.equal(pageLabel('home'), 'Home');
   assert.equal(pageLabel('learn'), 'Learn');
   assert.equal(pageLabel('drill', { daily: true }), 'The Daily');
@@ -52,10 +33,6 @@ test('router: error cards name pages as people do; the storyboard is local-only;
   assert.equal(pageLabel('start'), 'Getting started');
   assert.equal(pageLabel('notfound'), 'This page');
   for (const n of ['home', 'learn', 'practice', 'rapid', 'due', 'start', 'landing', 'lesson', 'reference']) assert.doesNotMatch(pageLabel(n), /^The (home|rapid|due|start|notfound) page/);
-  assert.equal(storyboardAllowed('127.0.0.1', {}), true);
-  assert.equal(storyboardAllowed('localhost', {}), true);
-  assert.equal(storyboardAllowed('hotkey.gg', {}), false);
-  assert.equal(storyboardAllowed('hotkey.gg', { dev: '1' }), true);
   // the landing's tab title is index.html's own, so a shared link and the tab agree
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   assert.equal(/<title>([^<]+)<\/title>/.exec(html)[1], HOME_TITLE);
@@ -74,8 +51,6 @@ test('skeleton: every routed page has a placeholder shaped like it', () => {
     assert.match(h, new RegExp('class="sk sk-' + shapeOf(r) + '"'), r);
     assert.match(h, /role="status"/);
   }
-  // the data room rail: one bar per chapter folder (six), so the page does not jump when it lands
-  assert.equal((skeletonHtml('learn').match(/<div class="sk-tree">(.*?)<\/div><div class="sk-col">/)[1].match(/sk-bar/g) || []).length, 6);
 });
 
 test('cues: the target is the last reference a goal names; rows, columns and other sheets count', () => {
@@ -156,19 +131,6 @@ test('install: offered once, after the second lesson, only when the browser can 
   assert.equal(shouldOfferInstall(null, 5, true), false);
 });
 
-test('result card: efficiency, the day, and the card carries tier, time, keys, board, date and mark', () => {
-  assert.equal(efficiency(26, 26), 100);
-  assert.equal(efficiency(52, 26), 50);
-  assert.equal(efficiency(20, 26), 100, 'better than the reference is 100');
-  assert.equal(efficiency(null, 26), null);
-  assert.equal(prettyDay('2026-09-23'), 'Wed, Sep 23, 2026');
-  const html = dailyCardHtml({ day: '2026-09-23', title: 'Go anywhere', secs: 38.42, tier: 'legendary', keys: 27, refKeys: 26, pos: 3, of: 41, attempts: 2, clean: true, handle: 'wolf' });
-  for (const s of ['dc-legendary', '38.42', '◆◆◆', 'Legendary', '27', '/ 26', '96%', '#3', 'of 41', 'Sep 23, 2026', '@wolf']) assert.ok(html.includes(s), s);
-  const assisted = dailyCardHtml({ day: '2026-09-23', title: 'x', secs: 10, tier: 'pass', keys: 5, refKeys: 5, clean: false });
-  assert.ok(assisted.includes('dc-none') && assisted.includes('assisted'), 'an assisted run carries no tier');
-  assert.ok(dailyCardHtml({ title: '<b>' }).includes('&lt;b&gt;'), 'escaped');
-});
-
 test('first run (3.0, M92): two questions then one story card, Wolf\'s line, American spelling, the coach marks name every rail item', () => {
   const card = BRIEFING();
   assert.equal(card.title, 'Welcome to the finance team.');
@@ -228,15 +190,6 @@ test('demo: the self-playing lesson completes on its own script and lasts about 
   const run2 = new LessonRun(DEMO_LESSON, { mode: 'guided' });
   for (const s of script) if (s.spec) run2.pressSpec(s.spec);
   assert.ok(run2.finished);
-});
-
-test('deal strip: six stages, the first free; the state counts modules from progress', () => {
-  assert.equal(STAGES.length, 6);
-  assert.equal(STAGES[0].access, 'free');
-  assert.ok(STAGES.every(s => s.stage && s.sends && s.delivers && s.modules > 0));
-  const d0 = dealState({});
-  assert.equal(d0.done, 0); assert.equal(d0.stage.n, 1); assert.equal(d0.planned, 8, 'seven modules plus Project and assessment');
-  assert.equal(PLANNED_MODULES.length, 7, 'seven modules; the Welcome is retired');
 });
 
 test('telemetry: the three new events exist', () => {

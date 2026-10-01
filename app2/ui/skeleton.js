@@ -12,8 +12,8 @@ const SHAPES = {
   ws: () => `${bar('sk-strip')}<div class="sk-frame">${bar('sk-ribbon')}${bar('sk-fbar')}<div class="sk-grid"></div><div class="sk-float">${card('', 4)}</div></div>`,
   // Home: Learn on the left (continue + modules), Practice on the right (due, the Daily, level)
   home: () => `<div class="sk-halves"><div class="sk-col">${card('sk-tall', 4)}${card('', 2)}</div><div class="sk-col">${card('', 2)}${card('', 3)}${card('', 2)}</div></div>${bar('sk-strip')}`,
-  // the data room: title, deal strip, the folder tree and the module documents
-  learn: () => `${bar('sk-title')}${bar('sk-sub')}${bar('sk-strip')}<div class="sk-dr"><div class="sk-tree">${Array.from({ length: 6 }, () => bar()).join('')}</div><div class="sk-col">${card('sk-tall', 5)}${card('', 5)}${card('', 5)}</div></div>`,
+  // Learn: the page tabs, then the chapter table beside the module's preview
+  learn: () => `${bar('sk-title')}${bar('sk-strip')}<div class="sk-dr"><div class="sk-col">${card('sk-tall', 8)}</div><div class="sk-side">${card('', 4)}</div></div>`,
   // the landing: the headline column beside the demo card
   hero: () => `<div class="sk-hero"><div class="sk-col">${bar('sk-h1')}${bar('sk-h1 sk-short')}${bar('sk-sub')}${bar('sk-sub sk-short')}${bar('sk-cta')}</div><div class="sk-card sk-demo"></div></div>`,
   // the first run: one frame, the size of the real one

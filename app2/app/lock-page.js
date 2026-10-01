@@ -9,7 +9,7 @@ import { itemNumber } from './numbering.js';
 import { mountPaywall, PAID_LINE as paidLine } from '../ui/components/paywall.js';
 import { siteCopy } from '../content/copy/apply.js';
 
-/** The paid line the catalog shows on a locked chapter (learn-next reads it). */
+/** The paid line the catalog shows on a locked chapter (the lists read it). */
 export const PAID_LINE = paidLine();
 
 /** The panel's heading: "Chapter {n}: {name}" when the chapter is known, else the lesson with its number. Pure. */

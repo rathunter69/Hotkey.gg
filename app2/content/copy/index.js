@@ -4610,7 +4610,9 @@ export const COPY = {
   "panel_daily_attempts": "Attempts today: {n}",
   "panel_copy_result": "Copy result",
   "panel_result_copied": "Result copied",
-  "panel_copy_blocked": "Couldn’t copy: the clipboard is blocked"
+  "panel_copy_blocked": "Couldn’t copy: the clipboard is blocked",
+  "due_none_title": "Nothing to drill here.",
+  "due_none_body": "That item is not in today’s queue."
  },
  "micro": {
   "enter-tab-direction": {

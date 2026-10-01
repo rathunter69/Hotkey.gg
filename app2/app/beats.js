@@ -4,8 +4,21 @@
 // chapter-end moment ("page delivered") reads from the same table.
 //
 //   beatFor(lesson, moduleAt)  → { id, eyebrow, title, body } for the first lesson of a module, else null
-import { PLANNED_MODULES } from './learn-next.js';
 import { moduleCopy, siteCopy, splitParas } from '../content/copy/apply.js';
+
+/** The Chapter 1 modules as the map plans them: the number, the title and the objective (modules.csv overrides by id). */
+const PLANNED_DEFAULT = [
+  { n: '1.1', title: 'Open and set up', objective: 'Tidy the file as it arrived: tabs, gridlines, Excel Options, the QAT, the color-and-label conventions.' },
+  { n: '1.2', title: 'Move and select', objective: 'Jumps, never scrolls: Ctrl+Arrow, the selection set, Go To, Go To Special.' },
+  { n: '1.3', title: 'Enter, edit, copy and fill', objective: 'The missing day, the typos, the Report skeleton, Paste Special, Find and Replace, a timeline.' },
+  { n: '1.4', title: 'Structure', objective: 'Rows and columns that keep the totals honest; widths, heights, AutoFit; hide, group, freeze.' },
+  { n: '1.5', title: 'Format', objective: 'Numbers a banker can read; fonts, fills, borders; alignment and titles; the style pass.' },
+  { n: '1.6', title: 'Formulas', objective: 'SUM and its family, relative and absolute references, links across sheets, the errors and what they mean.' },
+  { n: '1.7', title: 'Present and audit', objective: 'The KPI page checked, print-ready and signed off: page one of the pack.' },
+];
+export const PLANNED_IDS = { '1.1': 'open-and-set-up', '1.2': 'move-and-select', '1.3': 'enter-edit-copy-fill', '1.4': 'structure', '1.5': 'format', '1.6': 'formulas', '1.7': 'present-and-audit' };
+/** The seven planned modules; modules.csv (name, objective) overrides the built-in lines by module id. */
+export const PLANNED_MODULES = PLANNED_DEFAULT.map(p => { const row = moduleCopy(PLANNED_IDS[p.n]); return row ? { ...p, title: (row.name || '').trim() || p.title, objective: (row.objective || '').trim() || p.objective } : p; });
 
 /** The chapter-end line's shape; site.csv page_delivered overrides. {n} the module number, {module} its name, {page} modules.csv page_name. */
 export const PAGE_DELIVERED = 'Page {n}, {page}, is done.';

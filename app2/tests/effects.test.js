@@ -7,7 +7,6 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { MOMENT_PRIORITY, MOMENT_WINDOW_MS, BANNER_HOLD_MS, pickMoment, bannerMotion, masterGain, freeSlot, mountEffects, finishSound, MOMENTS, MOMENT_NAMES, RESULT_STEPS, parseMs, momentPlan, stepsAfter, readDurations } from '../ui/effects.js';
 import { RARITY_COLOURS, renderPixel, GLYPHS } from '../ui/pixel.js';
-import { boardCell, dailyCardHtml } from '../ui/result-card.js';
 
 /* a WebAudio stand-in that records the graph and every note */
 function fakeAudio() {
@@ -136,11 +135,3 @@ test('reward colours: rarities and tiers are theme tokens, --ink and the tokens 
   assert.ok(!/#4a9eda|#a06bd6|#e0913f/i.test(site), 'no fixed reward hues left in site.css');
 });
 
-test('Daily card: the BOARD cell says "sign in" for a guest, keeps a given position, and never says "local"', () => {
-  assert.ok(boardCell({ pos: null, handle: null }).includes('sign in'));
-  assert.equal(boardCell({ pos: 3, of: 41 }), '#3 <i>of 41</i>');
-  assert.equal(boardCell({ pos: null, handle: 'wolf' }), '—');
-  assert.equal(boardCell({ pos: null, clean: false }), '—');
-  const guest = dailyCardHtml({ day: '2026-09-25', title: 'x', secs: 1.6, tier: 'legendary', keys: 66, refKeys: 66, pos: null, of: null, attempts: 1, clean: true, handle: null });
-  assert.ok(guest.includes('sign in') && !guest.includes('local'));
-});

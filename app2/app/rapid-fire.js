@@ -11,7 +11,6 @@ import { store } from './store.js';
 import { attemptId, dayOf } from './records.js';
 import { mulberry32 } from '../engine/rng.js';
 import { schedule, rapidOrder, RAPID_CONCEPT } from './schedule.js';
-import { flowNext } from './flow.js';
 import { gameCtx, celebrate } from './stats.js';
 import { siteCopy } from '../content/copy/apply.js';
 
@@ -86,7 +85,7 @@ export function mountRapidPage(root) {
     dur = seconds; phase = 'run';
     hits = 0; misses = 0; combo = 0; bestCombo = 0; points = 0; oi = 0; progress = 0;
     // the experience pass (decision 12): prompts come from the least-remembered shortcuts first, not at random
-    order = flowNext() ? rapidOrder(RAPID_DECK, schedule.state(), Date.now() >>> 0) : deckOrder(Date.now() >>> 0);
+    order = rapidOrder(RAPID_DECK, schedule.state(), Date.now() >>> 0);
     el.innerHTML = `
       <div class="rf-head">
         <div class="rf-instr" id="rfInstr">—</div>

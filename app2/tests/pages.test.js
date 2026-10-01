@@ -7,7 +7,6 @@ import { normalisePrefs, defaultPrefs, detectPlatform, keyLabel, PREFS_KEY } fro
 import { statusOf, pickNextLesson, matchesFilters, groupBySection, CHAPTER_PLAN } from '../app/learn-page.js';
 import { parseRoute, navKeyFor, titleFor } from '../app/main.js';
 import { LESSONS } from '../content/index.js';
-import { skipsFor, PLACEMENT_TASKS } from '../app/first-run.js';
 import { validateRequest } from '../app/teams-page.js';
 import { FOOTER_LINKS } from '../ui/footer.js';
 import { ACCOUNT_ITEMS } from '../ui/nav.js';
@@ -78,18 +77,15 @@ test('pickNextLesson: the first lesson neither completed nor skipped, in catalog
   assert.equal(pickNextLesson(L, { c: { completed: true } }, ['c']).id, 'a', 'a skipped-and-completed lesson does not move the pointer past earlier work');
 });
 
-test('pickNextLesson: works on the real catalogue with placement skips', () => {
-  // 'move' skips 1.2.1, 'select' 1.2.2, 'type-bold' 1.1.2: the first lesson (1.1.1) is never skipped, so everyone starts there
-  const skipped = skipsFor(['move', 'select']);
-  assert.equal(pickNextLesson(LESSONS, {}, skipped).id, 'inherited-workbook');
+test('pickNextLesson: works on the real catalogue, with and without skipped lessons', () => {
+  const skipped = ['jump-dont-scroll', 'select-like-you-mean-it'];
+  assert.equal(pickNextLesson(LESSONS, {}, skipped).id, 'inherited-workbook', 'the first lesson is never skipped past');
   assert.equal(pickNextLesson(LESSONS, {}, []).id, 'inherited-workbook');
-  // once 1.1 is done, the placement skips steer past the skipped lessons to the first uncovered one
   const done = Object.fromEntries(['inherited-workbook', 'know-the-screen', 'ribbon-by-keyboard', 'analyst-setup', 'colour-label-hardcode', 'challenge-inherited-file'].map(id => [id, { completed: true }]));
   assert.equal(pickNextLesson(LESSONS, done, []).id, 'jump-dont-scroll');
   assert.equal(pickNextLesson(LESSONS, done, skipped).id, 'around-the-workbook');
-  assert.equal(pickNextLesson(LESSONS, done, skipsFor(['move'])).id, 'select-like-you-mean-it');
+  assert.equal(pickNextLesson(LESSONS, done, ['jump-dont-scroll']).id, 'select-like-you-mean-it');
 });
-
 test('matchesFilters: status, difficulty, access and a word search', () => {
   const none = { q: '', status: 'all', difficulty: 'all', access: 'all' };
   assert.equal(matchesFilters(L[0], 'todo', none), true);
@@ -151,36 +147,7 @@ test('navKeyFor and titleFor', () => {
   assert.equal(titleFor('whatever'), 'hotkey.gg');
 });
 
-/* ---------------- placement, teams form, shell lists ---------------- */
-test('placement: passed tasks map to skipped lessons that exist, without duplicates', () => {
-  assert.deepEqual(skipsFor([]), []);
-  assert.deepEqual(skipsFor(['move']), ['jump-dont-scroll']);
-  assert.deepEqual(skipsFor(['move', 'move', 'select']), ['jump-dont-scroll', 'select-like-you-mean-it']);
-  assert.deepEqual(skipsFor(['type-bold']), ['ribbon-by-keyboard']);
-  const ids = new Set(LESSONS.map(l => l.id));
-  for (const t of PLACEMENT_TASKS) for (const id of t.skips) assert.ok(ids.has(id), `${t.id} skips a real lesson: ${id}`);
-  for (const id of ['inherited-workbook', 'analyst-setup', 'colour-label-hardcode']) assert.ok(!skipsFor(PLACEMENT_TASKS.map(t => t.id)).includes(id), `${id} is never skipped by placement`);
-  assert.equal(PLACEMENT_TASKS.length, 3);
-});
-
-test('placement checks read the real engine', async () => {
-  const { Sheet } = await import('../engine/sheet.js');
-  const { Session } = await import('../engine/keyboard.js');
-  const sheet = new Sheet({ cells: { A1: { value: 'Weekly Sales Report', bold: true } }, active: { r: 1, c: 1 } });
-  const ses = new Session(sheet);
-  const [move, select, typeBold] = PLACEMENT_TASKS;
-  assert.equal(move.check(sheet, ses), false);
-  ses.run('Right Right Down Down Down');
-  assert.equal(move.check(sheet, ses), true, 'C4 is the active cell');
-  ses.run('Ctrl+Home Down Right Shift+Down Shift+Down Shift+Down Shift+Down');
-  assert.equal(select.check(sheet, ses), true, 'B2:B6 selected');
-  ses.run('Ctrl+Home');
-  for (let i = 0; i < 7; i++) ses.press('Down');
-  assert.equal(typeBold.check(sheet, ses), false);
-  ses.run('"Total" Enter Up Ctrl+B');
-  assert.equal(typeBold.check(sheet, ses), true, 'Total in A8, bold');
-});
-
+/* ---------------- teams form, shell lists ---------------- */
 test('teams: the group-access request validates every field', () => {
   const ok = validateRequest({ name: 'A', org: 'Bank', email: 'a@b.co', seats: '25', start: '2026-10-01' });
   assert.equal(ok.ok, true); assert.equal(ok.data.seats, 25);

@@ -5,8 +5,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { teachTokens, teachHtml, fitDemoColumns, DEMO_LESSON } from '../ui/demo-player.js';
 import { LessonRun } from '../app/runner.js';
-import { landingKeyRoute, landingHtml } from '../app/landing-next.js';
-import { finishPatch, pickerMove, answersAt, QUESTIONS, FIRST_MODULE, FIRST_LESSON } from '../app/first-run-next.js';
+import { landingKeyRoute, landingHtml } from '../app/landing-page.js';
+import { finishPatch, pickerMove, answersAt, QUESTIONS, FIRST_MODULE, FIRST_LESSON } from '../app/first-run.js';
 import { LESSONS } from '../content/index.js';
 
 const keys = line => teachTokens(line).filter(t => t.key).map(t => t.key);

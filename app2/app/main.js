@@ -2,18 +2,15 @@
 //
 //   #/                 Landing for a first-time visitor; Home once any progress or prefs exist
 //   #/landing          the landing page, always
-//   #/start            first run (platform, experience, placement)
-//   #/learn            the catalog
-//   #/lesson/<id>      a lesson (split pane); ?mode=solo|timed
-//   #/practice         timed drills, the Daily, rapid-fire (honest stubs) and the sandbox
-//   #/drill/sandbox    the drill workspace hosting the free sheet
+//   #/start            the first run (the two questions, the story card)
+//   #/learn            the chapter table
+//   #/lesson/<id>      a lesson in the workspace; ?mode=solo|timed
+//   #/practice         Drills; #/practice/daily, /rapid, /challenges the other three modes
+//   #/drill/<id>       a drill; #/daily the Daily; #/drill/sandbox the free sheet
 //   #/leaderboard  #/reference  #/pricing  #/teams  #/account
 //   #/about  #/terms  #/privacy  #/eula  #/contact
-//   #/due/<shortcut>   a due-today micro-drill (app/schedule.js), behind ?flow=next
-//   #/storyboard/<id>  unlisted: the experience-pass storyboard screens (app/storyboard.js)
+//   #/due/<shortcut>   a refresher rep from today's queue (app/due-page.js)
 //   anything else      404
-// `?flow=next` on any route turns the redesigned landing / first run / Home / Learn on for this
-// browser (app/flow.js); the LOADERS `next` entries are what it swaps in.
 //
 // Page modules load lazily with import(); a failed load renders an error card with Retry, never
 // an empty page. Below ~900px the lesson and drill routes show a readable notice instead of the
@@ -26,7 +23,6 @@ import { mountFooter } from '../ui/footer.js';
 import { prefs } from './prefs.js';
 import { settings } from './settings.js';
 import { dayOf } from './records.js';
-import { applyFlowQuery, reflectFlow } from './flow.js';
 import { store } from './store.js';
 import { auth } from './auth.js';
 import { entitlement } from './entitlement.js';
@@ -74,7 +70,6 @@ export function parseRoute(hash) {
   else if (path === '/daily') { name = 'drill'; params.daily = true; }
   else if (path === '/rapid') name = 'rapid';
   else if ((m = /^\/due\/([a-z0-9-]+)$/.exec(path))) { name = 'due'; params.id = m[1]; }
-  else if ((m = /^\/storyboard(?:\/([a-z0-9-]+))?$/.exec(path))) { name = 'storyboard'; params.id = m[1] || 'index'; }
   else if (['/leaderboard', '/reference', '/pricing', '/teams', '/account', '/about', '/terms', '/privacy', '/eula', '/contact'].includes(path)) name = path.slice(1);
   else name = 'notfound';
   return { name, params, query, path };
@@ -111,7 +106,7 @@ export function titleFor(name, extra) {
     lesson: (extra ? extra + ' · ' : '') + 'hotkey.gg', locked: (extra ? extra + ' · ' : '') + 'Paid tier · hotkey.gg', practice: 'Practice · hotkey.gg', drill: (extra ? extra + ' · ' : '') + 'Practice · hotkey.gg', leaderboard: 'Leaderboards · hotkey.gg',
     reference: 'Reference · hotkey.gg', pricing: 'Pricing · hotkey.gg', teams: 'Teams · hotkey.gg', account: 'Account · hotkey.gg', about: 'About · hotkey.gg',
     terms: 'Terms · hotkey.gg', privacy: 'Privacy · hotkey.gg', eula: 'EULA · hotkey.gg', contact: 'Contact · hotkey.gg', notfound: 'Page not found · hotkey.gg',
-    due: 'Due today · hotkey.gg', storyboard: 'Storyboard · hotkey.gg' };
+    due: 'Due today · hotkey.gg' };
   return T[name] || 'hotkey.gg';
 }
 
@@ -140,13 +135,11 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&a
  * module map, so a Retry re-imports the file under a fresh `?retry=N` query (see loadPage).
  */
 const LOADERS = {
-  // `next`: the experience-pass screens behind the ?flow=next flag (app/flow.js); on go they replace the live ones
-  landing: { file: './landing-page.js', pick: m => m.mountLandingPage, next: { file: './landing-next.js', pick: m => m.mountLandingPage } },
-  home: { file: './home-page.js', pick: m => m.mountHomePage },   // 3.0's Home (M89); home-next.js keeps only the due route
-  start: { file: './first-run.js', pick: m => m.mountFirstRun, next: { file: './first-run-next.js', pick: m => m.mountFirstRun } },
+  landing: { file: './landing-page.js', pick: m => m.mountLandingPage },   // the page as a sheet (M95)
+  home: { file: './home-page.js', pick: m => m.mountHomePage },   // 3.0's Home (M89)
+  start: { file: './first-run.js', pick: m => m.mountFirstRun },   // the two questions and the story card (M92)
   learn: { file: './learn-page.js', pick: m => m.mountLearnPage },   // 3.0's Learn (M89)
-  due: { file: './home-next.js', pick: m => m.mountDuePage },
-  storyboard: { file: './storyboard.js', pick: m => m.mountStoryboard },
+  due: { file: './due-page.js', pick: m => m.mountDuePage },
   lesson: { file: './lesson-view.js', pick: m => m.mountLessonView },
   locked: { file: './lock-page.js', pick: m => m.mountLockPage },   // a paid lesson, to an account without the tier
   practice: { file: './practice-page.js', pick: m => m.mountPracticePage },
@@ -227,18 +220,12 @@ function narrowNotice(root, lesson, content) {
   return { destroy() { el.remove(); } };
 }
 
-/** The storyboard is internal: it opens on a local server or with ?dev=1, and is a 404 elsewhere. */
-export function storyboardAllowed(host, query) {
-  return /^(localhost|127\.0\.0\.1|\[::1\])$/.test(String(host || '')) || !!(query && query.dev === '1');
-}
-
 export function startApp({ navEl, rootEl, footEl }) {
   let current = null;      // { destroy() }
   let gen = 0;             // bumps on every route: a slow import for an old route never mounts
   const legacy = legacyQuery(location.search);
   if (legacy) { try { history.replaceState(null, '', legacy); } catch (e) { /* file:// etc.: route as-is */ } }
   prefs.reflect();
-  reflectFlow();
   const nav = mountNav(navEl, { active: 'home', onSignOut: () => auth.signOut() });
   // one KeyTips registry for site pages (M88): never inside the workspace, where Alt is the Ribbon's; a setting switches it off
   const keytips = createKeyTips({ isWorkspace: () => WORKSPACE_ROUTES.has(document.body.dataset.route), enabled: () => { try { return settings.get().siteKeyTips !== false; } catch (e) { return true; } } });
@@ -312,10 +299,8 @@ export function startApp({ navEl, rootEl, footEl }) {
     const r = parseRoute(location.hash || '#/');
     const myGen = ++gen;
     unmount();
-    const next = applyFlowQuery(r.query); reflectFlow(next);
     let name = r.name;
     if (name === 'root') name = isReturning() ? 'home' : 'landing';
-    if (name === 'storyboard' && !storyboardAllowed(location.hostname, r.query)) name = 'notfound';
     let lesson = null, content = null;
     if (name === 'lesson') {
       const early = setTimeout(() => { if (myGen === gen && !rootEl.firstChild) rootEl.innerHTML = skeletonHtml('lesson'); }, 50);
@@ -347,8 +332,7 @@ export function startApp({ navEl, rootEl, footEl }) {
     // the workspace routes need a keyboard and width; below the breakpoint show the notice instead
     if ((name === 'lesson' || name === 'drill' || name === 'rapid' || name === 'due') && narrowMq && narrowMq.matches) { current = narrowNotice(rootEl, lesson, content); return; }
 
-    const base = (name === 'account' && r.query.section === 'settings' ? LOADERS.settings : LOADERS[name]) || LOADERS.notfound;
-    const entry = next && base.next ? base.next : base;
+    const entry = (name === 'account' && r.query.section === 'settings' ? LOADERS.settings : LOADERS[name]) || LOADERS.notfound;
     let mount;
     // a page module that is not in hand within 50 ms gets the page's shape painted meanwhile (C2)
     const skel = setTimeout(() => { if (myGen === gen && !rootEl.firstChild) rootEl.innerHTML = skeletonHtml(name); }, 50);
