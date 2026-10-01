@@ -41,8 +41,8 @@ A full rebuild is in progress. Read `docs/REBUILD_PLAN.md` (sequence, status, op
 ## Shipping
 - Blocking checks must stay fast: static checks + node unit tests + a 1-2 minute browser smoke. Full browser matrix runs nightly or on demand, never blocking.
 - Browser tests must block all non-local network traffic. Never test against production Supabase.
-- Work lands on `rebuild` (short-lived branches or direct commits, as the run needs) and Wolf plays the preview. Never push to `main` without his OK.
-- Database migrations are written under `app2/supabase/` with their pgTAP tests. They reach the live project only through the manual `db-deploy` workflow, which Wolf approves, or through the claude.ai project chat with his go-ahead. Never apply one yourself.
+- Work lands on `rebuild` (short-lived branches or direct commits, as the run needs) and is merged into `main` at the end of each run (Wolf, 2026-10-01: "Do period merges").
+- Database migrations are written under `app2/supabase/` with their pgTAP tests and applied to the live project as they land, through the Supabase connector, then the security advisors run (Wolf, 2026-10-01: "change the live database as you go").
 
 ## Business constraints
 - The LLC is formed; Mercury handles banking and accounting. Stripe stays in TEST mode until Wolf explicitly says to go live. No real charges, no marketing email sends, no change to live pricing or legal pages without his go-ahead.
