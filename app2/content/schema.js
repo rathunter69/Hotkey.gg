@@ -268,10 +268,10 @@ export function validateLesson(l) {
     need(typeof l.brief === 'string' && l.brief.trim(), 'brief missing');
     if (typeof l.brief === 'string') {
       const n = sentenceCount(l.brief);
-      if (kind === 'challenge') need(n <= 2 && wordCount(l.brief) <= 40, 'a challenge brief is one line');
+      if (kind === 'challenge') need(n <= 2 && wordCount(l.brief) <= 60, 'a challenge brief is two sentences at most, 60 words');   // the script's challenge briefs run to two sentences
       else {
-        need(n >= 1 && n <= 3, `brief must be at most three sentences (it has ${n})`);
-        need(wordCount(l.brief) <= 70, 'brief is over 70 words');
+        need(n >= 1 && n <= 5, `brief must be at most five sentences (it has ${n})`);   // M28: five sentences, 110 words
+        need(wordCount(l.brief) <= 110, 'brief is over 110 words');
         need(/`[^`]+`[.!]?\s*$/.test(l.brief.trim()), 'the brief ends with the headline keycap (`Ctrl+…`)');
       }
     }
@@ -293,7 +293,7 @@ export function validateLesson(l) {
       // one action sentence; the closer may open with its question ("Does it tie? Watch …")
       const n = sentenceCount(g.text);
       need((g.closer ? n >= 1 && n <= 2 : n === 1) && /[.!?]$/.test(g.text.trim()), `goal ${g.id}: the action must be one sentence ending in a full stop`);
-      need(wordCount(g.text) <= 26, `goal ${g.id}: the action is over 26 words`);
+      need(g.text.trim().length <= 140, `goal ${g.id}: the action is over 140 characters (M28)`);
     }
     need(typeof g.check === 'function', `goal ${g.id}: check must be a function`);
     need(Array.isArray(g.requires) || kind === 'challenge', `goal ${g.id}: requires must list concept ids`);
@@ -311,12 +311,11 @@ export function validateLesson(l) {
       need(g.demo === undefined || g.keys === undefined, `goal ${g.id}: a demo goal has no keys (the platform presses them)`);
       need(!isObject(g.demo) || g.demo.cadence === undefined || (typeof g.demo.cadence === 'number' && g.demo.cadence >= 40 && g.demo.cadence <= 1000), `goal ${g.id}: demo cadence is milliseconds per key, 40-1000`);
     } else need(typeof g.keys === 'string' && g.keys.trim(), `goal ${g.id}: keys (the route as keycaps) missing`);
-    // Adaptive rule (SITE_SPEC §4): the goal that first uses a concept this lesson teaches carries the
-    // one-line teaching point; a goal that only reuses taught concepts carries none.
+    // The teach line (M28): the goal that first uses a concept this lesson teaches must carry one;
+    // any other goal may (what the key does and why it matters, up to three sentences).
     const fresh = (Array.isArray(g.requires) ? g.requires : []).filter(c => concepts.includes(c) && !introduced.has(c));
-    if (fresh.length) { need(typeof g.teach === 'string' && g.teach.trim(), `goal ${g.id}: introduces ${fresh.join(', ')} and needs a one-line teach`); fresh.forEach(c => introduced.add(c)); }
-    else if (Array.isArray(conceptsRaw) && Array.isArray(g.requires)) need(g.teach === undefined, `goal ${g.id}: reuses taught concepts only, so it must not carry a teach line`);
-    if (typeof g.teach === 'string') { need(sentenceCount(g.teach) === 1 && /[.!?]$/.test(g.teach.trim()), `goal ${g.id}: teach must be one sentence ending in a full stop`); need(wordCount(g.teach) <= 30, `goal ${g.id}: teach is over 30 words`); }
+    if (fresh.length) { need(typeof g.teach === 'string' && g.teach.trim(), `goal ${g.id}: introduces ${fresh.join(', ')} and needs a teach line`); fresh.forEach(c => introduced.add(c)); }
+    if (typeof g.teach === 'string') { const tn = sentenceCount(g.teach); need(tn >= 1 && tn <= 3 && /[.!?]$/.test(g.teach.trim()), `goal ${g.id}: teach must be one to three sentences ending in a full stop`); }
   }
   need(l.race === undefined || (Array.isArray(l.race) && l.race.length >= 1 && l.race.every(r => isObject(r) && typeof r.label === 'string' && ids.has(r.slow) && ids.has(r.fast))), 'race must be pairs { label, slow, fast } naming goals');
   need(l.closing === undefined || (Array.isArray(l.closing) && l.closing.every(t => typeof t === 'string')), 'closing must be an array of paragraphs');

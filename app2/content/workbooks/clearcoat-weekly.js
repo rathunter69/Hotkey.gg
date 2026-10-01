@@ -236,6 +236,9 @@ const liveSheet = spec => new Sheet({ cells: clone(spec.cells), colW: spec.colW 
 const span = (col1, col2, r1, r2) => { const out = []; for (let c = col1.charCodeAt(0); c <= col2.charCodeAt(0); c++) for (let r = r1; r <= r2; r++) out.push(String.fromCharCode(c) + r); return out; };
 const each = (cells, refs, fn) => { for (const ref of refs) { cells[ref] = { ...(cells[ref] || {}) }; fn(cells[ref]); } };
 const fmt = (cells, refs, style, decimals) => each(cells, refs, c => { c.fmtStyle = style; c.decimals = decimals; });
+/** The counts format (1.5.1 goal 7): Ctrl+Shift+1 then Alt H 9 twice leaves Excel's #,##0, a thousands separator and no decimals, for a line that can never go negative. */
+export const COUNTS_FMT = { fmtStyle: 'custom', numFmt: '#,##0' };
+const counts = (cells, refs) => each(cells, refs, c => { c.fmtStyle = COUNTS_FMT.fmtStyle; c.numFmt = COUNTS_FMT.numFmt; delete c.decimals; });
 
 /* ---------------- module 1.1: open and set up ---------------- */
 
@@ -440,7 +443,7 @@ const S5a = derive(S4c, s => {
   fmt(c, ['D5', 'E5', 'F5', 'I5', 'D11', 'E11', 'F11'], 'currency', 0);
   fmt(c, span('G', 'G', 5, 11), 'currency', 2);
   fmt(c, span('H', 'H', 5, 11), 'percent', 1);
-  fmt(c, span('B', 'G', 17, 21), 'comma', 0);
+  counts(c, span('B', 'G', 17, 21));   // the daily block holds counts: Ctrl+Shift+1, Alt H 9 twice
   const inp = sheetOf(s, 'Inputs').cells;
   inp.B4 = { ...inp.B4, fmtStyle: 'currency', decimals: 2 };
 });
@@ -510,7 +513,7 @@ const S6a = derive(S5d, s => {
 // 1.6.2 SUM family and AutoSum: the gross-profit total by Alt+= over the block, the total row's avg ticket
 // and margin, a week summary (AVERAGE, MAX, MIN, COUNT, COUNTA)
 export const SUMMARY_LINES = [
-  ['Average washes per site', '=AVERAGE(C5:C10)', 'comma'], ['Best site (washes)', '=MAX(C5:C10)', 'comma'], ['Lowest site (washes)', '=MIN(C5:C10)', 'comma'],
+  ['Average washes per site', '=AVERAGE(C5:C10)', 'counts'], ['Best site (washes)', '=MAX(C5:C10)', 'counts'], ['Lowest site (washes)', '=MIN(C5:C10)', 'counts'],
   ['Sites with figures', '=COUNT(C5:C10)', 'general'], ['Sites listed', '=COUNTA(A5:A10)', 'general'],
 ];
 const S6b = derive(S6a, s => {
@@ -518,17 +521,17 @@ const S6b = derive(S6a, s => {
   c.F11 = { ...c.F11, formula: '=SUM(F5:F10)' };
   c.G11 = { ...c.G11, formula: '=D11/C11' }; c.H11 = { ...c.H11, formula: '=F11/D11' };
   c['A' + REPORT.summaryRow] = { value: 'Week summary', bold: true };
-  SUMMARY_LINES.forEach(([label, formula, style], i) => { const r = REPORT.summaryRow + 1 + i; c['A' + r] = { value: label }; c['B' + r] = { formula, ...(style === 'comma' ? { fmtStyle: 'comma', decimals: 0 } : {}) }; });
+  SUMMARY_LINES.forEach(([label, formula, style], i) => { const r = REPORT.summaryRow + 1 + i; c['A' + r] = { value: label }; c['B' + r] = { formula, ...(style === 'counts' ? COUNTS_FMT : {}) }; });
 });
 
 // 1.6.3 Anchors: the wash-cost scenario grid beside the report (sites down, three prices across), one formula
-// with mixed anchors filled both ways; the old sensitivity stub under the daily table cleared
+// with mixed anchors filled both ways, in the counts format (a cost grid never goes negative); the old
+// sensitivity stub under the daily table stays (the script's nine goals leave no room to clear it)
 const S6c = derive(S6b, s => {
   const c = sheetOf(s, 'Report').cells;
   c.J3 = { value: 'Wash cost at price ($/wk)', bold: true };
   SCENARIO_PRICES.forEach((p, j) => { const col = String.fromCharCode(74 + j); c[col + '4'] = { value: p, fontColor: 'blue', fmtStyle: 'currency', decimals: 2 }; });
-  for (const r of REPORT.siteRows) for (let j = 0; j < 3; j++) { const col = String.fromCharCode(74 + j); c[col + r] = { formula: `=$C${r}*${col}$4`, fmtStyle: 'comma', decimals: 0 }; }
-  for (const ref of span('A', 'F', 23, 24)) delete c[ref];
+  for (const r of REPORT.siteRows) for (let j = 0; j < 3; j++) { const col = String.fromCharCode(74 + j); c[col + r] = { formula: `=$C${r}*${col}$4`, ...COUNTS_FMT }; }
 });
 
 // 1.6.4 Link across sheets: the site figures link to Raw's totals (green), wash cost is washes × the cost per
@@ -549,8 +552,8 @@ const S6e = derive(S6d, s => {
 /** What 1.6.5 plants: the assistant filled rows 18–21 and retyped Riverside's Thursday (E19) over its formula. */
 export const PLANT_DAILY = (() => {
   const out = {};
-  REPORT.dailyRows.slice(1).forEach((r, i) => REPORT.dayCols.forEach((col, j) => { out[`Report!${col}${r}`] = { formula: `=Raw!${RAW_BYDAY.dayCols[j]}${RAW_BYDAY.firstRow + 1 + i}`, fmtStyle: 'comma', decimals: 0 }; }));
-  out['Report!E19'] = { value: WASHES.Riverside[9], fmtStyle: 'comma', decimals: 0 };   // Thursday retyped: the right number, dead
+  REPORT.dailyRows.slice(1).forEach((r, i) => REPORT.dayCols.forEach((col, j) => { out[`Report!${col}${r}`] = { formula: `=Raw!${RAW_BYDAY.dayCols[j]}${RAW_BYDAY.firstRow + 1 + i}`, ...COUNTS_FMT }; }));
+  out['Report!E19'] = { value: WASHES.Riverside[9], ...COUNTS_FMT };   // Thursday retyped: the right number, dead
   return out;
 })();
 
@@ -564,12 +567,12 @@ const S6f = derive(S6e, s => {
   c.A10 = { value: 'Cost per wash, site costs ($)' }; c.B10 = { formula: '=E9/B11', fmtStyle: 'currency', decimals: 2 };
   c.A11 = { value: 'Washes this week' }; c.B11 = { formula: '=Report!C11', fontColor: 'green', fmtStyle: 'comma', decimals: 0 };
 });
-/** What 1.6.6 plants: five errors on Costs (#REF!, #NAME?, #VALUE! from a text figure, #N/A, #DIV/0!) around the same lines, the totals colored blue. */
+/** What 1.6.6 plants: five errors on Costs (#REF!, #NAME?, #VALUE! from a text figure, #N/A, #DIV/0!) around the same lines, the totals colored blue (still bold, as 1.5.4 left them). */
 export const PLANT_COSTS_ERRORS = {
-  'Costs!E5': { formula: '=B5+C5+#REF!', fontColor: 'blue', fmtStyle: 'comma', decimals: 0 },
-  'Costs!E6': { formula: '=SUMM(B6:D6)', fontColor: 'blue', fmtStyle: 'comma', decimals: 0 },
-  'Costs!D7': { value: 'tbc', fontColor: 'blue' }, 'Costs!E7': { formula: '=B7+C7+D7', fontColor: 'blue', fmtStyle: 'comma', decimals: 0 },
-  'Costs!E8': { formula: '=VLOOKUP("Airport ",A4:D8,4,FALSE)', fontColor: 'blue', fmtStyle: 'comma', decimals: 0 },
+  'Costs!E5': { formula: '=B5+C5+#REF!', fontColor: 'blue', bold: true, fmtStyle: 'comma', decimals: 0 },
+  'Costs!E6': { formula: '=SUMM(B6:D6)', fontColor: 'blue', bold: true, fmtStyle: 'comma', decimals: 0 },
+  'Costs!D7': { value: 'tbc', fontColor: 'blue' }, 'Costs!E7': { formula: '=B7+C7+D7', fontColor: 'blue', bold: true, fmtStyle: 'comma', decimals: 0 },
+  'Costs!E8': { formula: '=VLOOKUP("Airport ",A4:D8,4,FALSE)', fontColor: 'blue', bold: true, fmtStyle: 'comma', decimals: 0 },
   'Costs!A9': { value: 'Total', bold: true }, 'Costs!E9': { formula: '=SUM(E4:E8)', bold: true, fmtStyle: 'comma', decimals: 0 },
   'Costs!A10': { value: 'Cost per wash, site costs ($)' }, 'Costs!B10': { formula: '=E9/B12', fmtStyle: 'currency', decimals: 2 },
   'Costs!A11': { value: 'Washes this week' }, 'Costs!B11': { formula: '=Report!C11', fontColor: 'green', fmtStyle: 'comma', decimals: 0 },
@@ -604,7 +607,7 @@ export const MUELLER_LAST_WEEK = [0, 1, 2, 3, 4, 5].reduce((t, d) => t + WASHES.
 export const PLANT_AUDIT = (() => {
   const out = {};
   out['Report!G6'] = { formula: `=D6/${MUELLER_LAST_WEEK}`, fmtStyle: 'currency', decimals: 2 };   // a literal where C6 belongs
-  out['Report!E18'] = { value: WASHES.Mueller[9], fontColor: 'green', fmtStyle: 'comma', decimals: 0 };   // Mueller's Thursday retyped
+  out['Report!E18'] = { value: WASHES.Mueller[9], fontColor: 'green', ...COUNTS_FMT };   // Mueller's Thursday retyped
   out['Report!A1'] = { value: '            ' + REPORT_TITLE, bold: true, fsz: TITLE_FSZ };              // centered by padding, Center Across gone
   out['Report!A2'] = null;                                                                            // the units line gone
   for (const ref of span('B', 'G', 15, 21)) out['Report!' + ref] = { ball: true };                   // a grid over the daily table…
@@ -752,7 +755,8 @@ export function sessionToState(ses) {
 }
 /** The engine's Page Setup default: what a state means when it says nothing about printing. */
 export const PAGE_SETUP_DEFAULT = { orientation: 'portrait', scaling: 'adjust', adjustTo: 100, fitWide: 1, fitTall: 1, titlesRows: '', footer: { left: '', centre: '', right: '' }, printGridlines: false };
-const normSettings = st => ({ ...(st || {}), pageSetup: { ...PAGE_SETUP_DEFAULT, ...((st || {}).pageSetup || {}), footer: { ...PAGE_SETUP_DEFAULT.footer, ...(((st || {}).pageSetup || {}).footer || {}) } } });
+// key order is canonical (enterMoves before pageSetup), since `same` compares JSON text: a session writes pageSetup before enterMoves, a state the other way round
+const normSettings = st => { const { pageSetup, enterMoves, ...rest } = st || {}; return { ...rest, ...(enterMoves === false ? { enterMoves: false } : {}), pageSetup: { ...PAGE_SETUP_DEFAULT, ...(pageSetup || {}), footer: { ...PAGE_SETUP_DEFAULT.footer, ...((pageSetup || {}).footer || {}) } } }; };
 
 /* ---------------- diffing (the chain test and audit graders read this) ---------------- */
 
