@@ -16,9 +16,6 @@ export const DRIFT_LESSONS = new Map(Object.entries({
   'challenge-to-standard-in-three-minutes': 'picker', 'point-dont-type': 'picker', 'sum-family-and-autosum': 'number',
   'anchors-dollar-and-f4': 'number', 'fit-to-one-page': 'pagesetup', 'the-checks-row': 'number', 'hardcode-hunt': 'picker',
   'challenge-audit-before-you-send': 'picker', 'weekly-kpi-project': 'picker', 'foundations-assessment': 'picker',
-  'built-in-formats-on-a-pnl': 'picker', 'dates-on-the-timeline': 'picker', 'challenge-format-the-numbers': 'picker',
-  'the-four-section-format': 'picker', 'units-in-the-format': 'picker', 'dynamic-headers-with-text': 'picker',
-  'conditional-codes-and-hidden-zeros': 'picker', 'challenge-house-format-set': 'picker', 'remix-format-on-the-pnl': 'picker',
 }));
 export const DRIFT_DRILLS = new Map();   // empty since M108: every Chapter 1 drill replays on the R1 engine
 export const DRIFT_MICRO = new Map(Object.entries({ 'fill-series': 'series', 'number-formats': 'picker', 'center-across': 'picker', 'f4-repeat': 'picker' }));

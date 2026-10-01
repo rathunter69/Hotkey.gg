@@ -53,8 +53,8 @@ export default {
   pars: parsFrom(80, { pass: 175, pro: 120 }),
   seed: rng => clusterPatch(rng, { margins: true }),
   goals: [
-    { id: 'desk-format', text: 'Give the dollar lines C7:E10, C13:E20 and C22:E24 the desk number format with Ctrl+1 then N, and F4.', convention: 'D2',
-      keys: 'Ctrl+↓ ×2 → ×2 Ctrl+Shift+→ Ctrl+Shift+↓ Ctrl+1 N Ctrl+↓ ×2 Ctrl+Shift+→ Ctrl+Shift+↓ F4 Ctrl+↓ ×2 Ctrl+Shift+→ Ctrl+Shift+↓ F4',
+    { id: 'desk-format', text: 'Give the dollar lines C7:E10, C13:E20 and C22:E24 the desk number format from Ctrl+1, and F4.', convention: 'D2',
+      keys: 'Ctrl+↓ ×2 → ×2 Ctrl+Shift+→ Ctrl+Shift+↓ Ctrl+1 N Tab N Alt+D 0 Alt+U Alt+N ↓ ↓ ↵ Ctrl+↓ ×2 Ctrl+Shift+→ Ctrl+Shift+↓ F4 Ctrl+↓ ×2 Ctrl+Shift+→ Ctrl+Shift+↓ F4',
       check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, LINES, 'comma', 0) && settled(ses); } },
     { id: 'costs-negative', text: 'Park a -1 in G19, copy it, and Paste Special Multiply the costs C13:E19 and head office C23:E23 by it.', convention: 'C4',
       keys: 'Ctrl+↑ ↑ Ctrl+→ → ×2 "-1" ↵ ↑ Ctrl+C Ctrl+← ← ×2 Ctrl+Shift+↑ Ctrl+Shift+→ Ctrl+Alt+V V M ↵ Ctrl+↓ ×2 ↓ Ctrl+Shift+→ Ctrl+Alt+V V M ↵',
@@ -69,10 +69,10 @@ export default {
       keys: 'Ctrl+G "C27" ↵ Shift+→ ×2 Shift+↓ ×3 Ctrl+Shift+5 Alt H 0 Ctrl+I',
       check: (s, ses) => { const sh = pnl(ses); return !!sh && pctItalic(sh) && settled(ses); } },
     { id: 'dollar-rows', text: 'Put the $ on C7:E7, C10:E10 and C24:E24 as currency with no decimals.', convention: 'D4',
-      keys: 'Ctrl+G "C7" ↵ Shift+→ ×2 Ctrl+1 C Ctrl+↓ Shift+→ ×2 F4 Ctrl+↓ ×4 Shift+→ ×2 F4',
+      keys: 'Ctrl+G "C7" ↵ Shift+→ ×2 Ctrl+1 N Tab C Alt+D 0 Alt+N ↓ ↓ ↓ ↑ ↵ Ctrl+↓ Shift+→ ×2 F4 Ctrl+↓ ×4 Shift+→ ×2 F4',
       check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, DOLLARS, 'currency', 0) && settled(ses); } },
-    { id: 'timeline', text: 'Type 12/31/2024, 12/31/2025 and 12/31/2026 into C4:E4 and show them as dates with Ctrl+1 then D.', convention: 'C2',
-      keys: 'Ctrl+Home Ctrl+↓ ×2 → ×2 "12/31/2024" Tab "12/31/2025" Tab "12/31/2026" ↵ ↑ Shift+→ ×2 Ctrl+1 D',
+    { id: 'timeline', text: 'Type 12/31/2024, 12/31/2025 and 12/31/2026 into C4:E4 and show them as dates with Ctrl+1, Date, mmm-yy.', convention: 'C2',
+      keys: 'Ctrl+Home Ctrl+↓ ×2 → ×2 "12/31/2024" Tab "12/31/2025" Tab "12/31/2026" ↵ ↑ Shift+→ ×2 Ctrl+1 N Tab D Alt+T ↓ ×7 ↵',
       check: (s, ses) => { const sh = pnl(ses); return !!sh && datesIn(sh) && settled(ses); } },
   ],
   graders: [
@@ -91,5 +91,5 @@ export default {
       if (!datesIn(sh)) return { ok: false, why: 'C4:E4 are not the three year ends shown as dates' };
       return { ok: true }; },
   ],
-  solution: `Ctrl+Down Ctrl+Down Right Right Ctrl+Shift+Right Ctrl+Shift+Down Ctrl+1 N Ctrl+Down Ctrl+Down Ctrl+Shift+Right Ctrl+Shift+Down F4 Ctrl+Down Ctrl+Down Ctrl+Shift+Right Ctrl+Shift+Down F4 Ctrl+Up Up Ctrl+Right Right Right "-1" Enter Up Ctrl+C Ctrl+Left Left Left Ctrl+Shift+Up Ctrl+Shift+Right Ctrl+Alt+V V M Enter Ctrl+Down Ctrl+Down Down Ctrl+Shift+Right Ctrl+Alt+V V M Enter Up "=C10+C20" Enter Up Ctrl+Shift+Right Ctrl+R Down Down "=C22+C23" Enter Up Ctrl+Shift+Right Ctrl+R Ctrl+Up Ctrl+Up Up Ctrl+Right Right Right Delete Ctrl+Home Down "${UNITS_LINE}" Enter Ctrl+G "C27" Enter Shift+Right Shift+Right Shift+Down Shift+Down Shift+Down Ctrl+Shift+5 Alt H 0 Ctrl+I Ctrl+G "C7" Enter Shift+Right Shift+Right Ctrl+1 C Ctrl+Down Shift+Right Shift+Right F4 Ctrl+Down Ctrl+Down Ctrl+Down Ctrl+Down Shift+Right Shift+Right F4 Ctrl+Home Ctrl+Down Ctrl+Down Right Right "12/31/2024" Tab "12/31/2025" Tab "12/31/2026" Enter Up Shift+Right Shift+Right Ctrl+1 D`,
+  solution: `Ctrl+Down Ctrl+Down Right Right Ctrl+Shift+Right Ctrl+Shift+Down Ctrl+1 N Tab N Alt+D 0 Alt+U Alt+N Down Down Enter Ctrl+Down Ctrl+Down Ctrl+Shift+Right Ctrl+Shift+Down F4 Ctrl+Down Ctrl+Down Ctrl+Shift+Right Ctrl+Shift+Down F4 Ctrl+Up Up Ctrl+Right Right Right "-1" Enter Up Ctrl+C Ctrl+Left Left Left Ctrl+Shift+Up Ctrl+Shift+Right Ctrl+Alt+V V M Enter Ctrl+Down Ctrl+Down Down Ctrl+Shift+Right Ctrl+Alt+V V M Enter Up "=C10+C20" Enter Up Ctrl+Shift+Right Ctrl+R Down Down "=C22+C23" Enter Up Ctrl+Shift+Right Ctrl+R Ctrl+Up Ctrl+Up Up Ctrl+Right Right Right Delete Ctrl+Home Down "${UNITS_LINE}" Enter Ctrl+G "C27" Enter Shift+Right Shift+Right Shift+Down Shift+Down Shift+Down Ctrl+Shift+5 Alt H 0 Ctrl+I Ctrl+G "C7" Enter Shift+Right Shift+Right Ctrl+1 N Tab C Alt+D 0 Alt+N Down Down Down Up Enter Ctrl+Down Shift+Right Shift+Right F4 Ctrl+Down Ctrl+Down Ctrl+Down Ctrl+Down Shift+Right Shift+Right F4 Ctrl+Home Ctrl+Down Ctrl+Down Right Right "12/31/2024" Tab "12/31/2025" Tab "12/31/2026" Enter Up Shift+Right Shift+Right Ctrl+1 N Tab D Alt+T Down Down Down Down Down Down Down Enter`,
 };

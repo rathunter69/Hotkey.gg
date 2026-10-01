@@ -776,3 +776,4 @@ From screenplay 10.3, rows 2.1–2.7: Ctrl+1 and its Number, Alignment, Border a
 - 2.2.3: Monthly's month ends arrive as bare serials and take Ctrl+1 then D plus a right-align goal, since Fill Series has no month step in the engine.
 - 2.2.4: the switch is Inputs B12, and the wrong-figure demo is the closer; General is taught here, bringing the hidden flags back.
 - 2.1.C: the cluster varies by seed across four Texas clusters, not always San Antonio. 2.2.C: seven goals (the $ rows split from the plain code), units on Inputs B15, and only the revenue check, since a cluster has no Monthly to tie to.
+- On the R1 engine, Format Cells walks replace the old Ctrl+1 letter picker (Number, Currency, Date mmm-yy, General, Custom), and revenue per wash in 2.1.1 takes Ctrl+Shift+1's #,##0.00, as Excel writes it.

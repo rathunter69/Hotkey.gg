@@ -36,12 +36,12 @@ export default {
   teaches: ['line-formats'],
   uses: ['number-formats', 'format-cells-tabs', 'ctrl-shift-arrow', 'ctrl-arrow', 'f4-repeat', 'formula-bar', 'shift-arrow'],
   prerequisites: ['challenge-audit-before-you-send'],
-  brief: 'A P&L is what the company earned and spent over a year, top line to bottom line, and this one arrived as raw numbers: 18000.4 where a reader wants 18,000. Every line gets one format, set on the whole line at once: the desk number format from Chapter 1 for dollars in thousands (a separator, no decimals, a negative in parentheses), and the memo lines in their own formats. Ctrl+1 then N sets it from the Number tab, and F4 repeats it on the next block. The key is `Ctrl+1`.',
+  brief: 'A P&L is what the company earned and spent over a year, top line to bottom line, and this one arrived as raw numbers: 18000.4 where a reader wants 18,000. Every line gets one format, set on the whole line at once: the desk number format from Chapter 1 for dollars in thousands (a separator, no decimals, a negative in parentheses), and the memo lines in their own formats. Ctrl+1 sets it from the Number category, and F4 repeats it on the next block. The key is `Ctrl+1`.',
   goals: [
     { id: 'read-export', text: 'Land on C7 and read 18000.4 in the formula bar, then press Ctrl+↓ to see the revenue lines end at C10.', keys: 'Ctrl+↓ ×2 → ×2 Ctrl+↓', requires: ['ctrl-arrow', 'formula-bar'],
       hintStuck: 'pulse cell C7 · The figures start two columns right of the account codes.',
       check: (s, ses) => { const sh = pnl(ses); return !!sh && at(sh, 'C10') && settled(ses); } },
-    { id: 'revenue-desk', teach: 'One format per line, set on the whole line at once: Ctrl+1 then N gives dollars the desk number format, a separator, no decimals and a negative in parentheses.', text: 'Select the revenue lines C7:E10 and give them the desk number format with Ctrl+1, then N for Number.', keys: 'Ctrl+↑ Ctrl+Shift+→ Ctrl+Shift+↓ Ctrl+1 N', requires: ['line-formats', 'format-cells-tabs', 'ctrl-shift-arrow', 'ctrl-arrow'], convention: 'D2',
+    { id: 'revenue-desk', teach: 'One format per line, set on the whole line at once: in Ctrl+1, Number with 0 decimal places, the separator and (1,234) is the desk number format.', text: 'Select the revenue lines C7:E10 and give them the desk number format from Ctrl+1: Number, 0 decimal places, the separator and (1,234).', keys: 'Ctrl+↑ Ctrl+Shift+→ Ctrl+Shift+↓ Ctrl+1 N Tab N Alt+D 0 Alt+U Alt+N ↓ ↓ ↵', requires: ['line-formats', 'format-cells-tabs', 'ctrl-shift-arrow', 'ctrl-arrow'], convention: 'D2',
       hintStuck: 'pulse range C7:E10 · The block runs from retail wash revenue down to its total.',
       check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, REVENUE, 'comma', 0) && settled(ses); } },
     { id: 'site-costs-f4', text: 'Select the site costs C13:E20 and repeat the format with F4.', keys: 'Ctrl+↓ ×2 Ctrl+Shift+→ Ctrl+Shift+↓ F4', requires: ['f4-repeat', 'ctrl-shift-arrow', 'ctrl-arrow'], convention: 'D2',
@@ -55,7 +55,7 @@ export default {
       check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, COUNTS, 'comma', 0) && settled(ses); } },
     { id: 'per-wash-cents', text: 'Revenue per wash in C35:E35 is dollars and cents: select the row and give it two decimals with Ctrl+Shift+1.', keys: '↓ ×2 Ctrl+Shift+→ Ctrl+Shift+1', requires: ['number-formats', 'ctrl-shift-arrow'], convention: 'D2',
       hintStuck: 'pulse range C35:E35 · A ticket of $13.75 needs its cents to read right.',
-      check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, PER_WASH, 'comma', 2) && settled(ses); } },
+      check: (s, ses) => { const sh = pnl(ses); return !!sh && PER_WASH.every(ref => sh.cellAt(ref).numFmt === '#,##0.00') && settled(ses); } },
     { id: 'tie', closer: true, demo: { script: 'Ctrl+G "C7" Enter "18500" Enter Ctrl+G "C24" Enter Escape Escape Escape', cadence: 320 }, text: 'Does it tie? Watch C7 change to 18500, and total revenue in C10 and EBITDA in C24 answer in the format you set.', requires: [],
       hintStuck: 'pulse cell C24 · The totals are live, so they move with the line.',
       check: (s, ses) => ses.demoDone.has('tie') },
@@ -63,11 +63,11 @@ export default {
   endState: [
     { text: 'Every dollar line reads in the desk number format', check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, [...REVENUE, ...SITE_COSTS, ...BOTTOM], 'comma', 0); } },
     { text: 'Sites and washes read as counts', check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, COUNTS, 'comma', 0); } },
-    { text: 'Revenue per wash reads to the cent', check: (s, ses) => { const sh = pnl(ses); return !!sh && fmtIs(sh, PER_WASH, 'comma', 2); } },
+    { text: 'Revenue per wash reads to the cent', check: (s, ses) => { const sh = pnl(ses); return !!sh && PER_WASH.every(ref => sh.cellAt(ref).numFmt === '#,##0.00'); } },
   ],
   closing: [
     'Every line on the P&L now reads as figures, one format per line.',
     'Three blocks of dollars took one dialog and two presses of F4, the counts took a third, and revenue per wash kept its cents. The costs still read as positives and nothing says what the figures are in; the next lesson fixes both.',
   ],
-  solution: 'Ctrl+Down Ctrl+Down Right Right Ctrl+Down Ctrl+Up Ctrl+Shift+Right Ctrl+Shift+Down Ctrl+1 N Ctrl+Down Ctrl+Down Ctrl+Shift+Right Ctrl+Shift+Down F4 Ctrl+Down Ctrl+Down Ctrl+Shift+Right Ctrl+Shift+Down F4 Ctrl+Down Ctrl+Down Ctrl+Shift+Right Shift+Down F4 Down Down Ctrl+Shift+Right Ctrl+Shift+1',
+  solution: 'Ctrl+Down Ctrl+Down Right Right Ctrl+Down Ctrl+Up Ctrl+Shift+Right Ctrl+Shift+Down Ctrl+1 N Tab N Alt+D 0 Alt+U Alt+N Down Down Enter Ctrl+Down Ctrl+Down Ctrl+Shift+Right Ctrl+Shift+Down F4 Ctrl+Down Ctrl+Down Ctrl+Shift+Right Ctrl+Shift+Down F4 Ctrl+Down Ctrl+Down Ctrl+Shift+Right Shift+Down F4 Down Down Ctrl+Shift+Right Ctrl+Shift+1',
 };

@@ -293,7 +293,7 @@ function builtinFormats(s) {
   viaEngine(s, 'P&L', (S, o) => {
     for (const rg of DOLLAR_BLOCKS) o.fmt(rg, 'comma', 0);
     o.fmt('C33:E34', 'comma', 0);
-    o.fmt('C35:E35', 'comma', 2);
+    o.code('C35:E35', '#,##0.00');   // Ctrl+Shift+1, Excel’s Number shortcut
   });
 }
 /** 2.1.2 Sign convention: costs negative (multiplied by a -1 beside them), the subtotals adding, the convention stated once. */

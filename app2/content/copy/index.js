@@ -476,7 +476,7 @@ export const COPY = {
    "module": "number-formats",
    "order": "2.1.1",
    "title": "Built-in formats on a P&L",
-   "brief": "A P&L is what the company earned and spent over a year, top line to bottom line, and this one arrived as raw numbers: 18000.4 where a reader wants 18,000. Every line gets one format, set on the whole line at once: the desk number format from Chapter 1 for dollars in thousands (a separator, no decimals, a negative in parentheses), and the memo lines in their own formats. Ctrl+1 then N sets it from the Number tab, and F4 repeats it on the next block. The key is `Ctrl+1`.",
+   "brief": "A P&L is what the company earned and spent over a year, top line to bottom line, and this one arrived as raw numbers: 18000.4 where a reader wants 18,000. Every line gets one format, set on the whole line at once: the desk number format from Chapter 1 for dollars in thousands (a separator, no decimals, a negative in parentheses), and the memo lines in their own formats. Ctrl+1 sets it from the Number category, and F4 repeats it on the next block. The key is `Ctrl+1`.",
    "closing": "Every line on the P&L now reads as figures, one format per line. || Three blocks of dollars took one dialog and two presses of F4, the counts took a third, and revenue per wash kept its cents. The costs still read as positives and nothing says what the figures are in; the next lesson fixes both.",
    "wow": "",
    "convention_line": "One decimals setting per line, and a negative in parentheses.",
@@ -3039,8 +3039,8 @@ export const COPY = {
    {
     "lesson_id": "built-in-formats-on-a-pnl",
     "goal_index": "1",
-    "text": "Select the revenue lines C7:E10 and give them the desk number format with Ctrl+1, then N for Number.",
-    "teach": "One format per line, set on the whole line at once: Ctrl+1 then N gives dollars the desk number format, a separator, no decimals and a negative in parentheses.",
+    "text": "Select the revenue lines C7:E10 and give them the desk number format from Ctrl+1: Number, 0 decimal places, the separator and (1,234).",
+    "teach": "One format per line, set on the whole line at once: in Ctrl+1, Number with 0 decimal places, the separator and (1,234) is the desk number format.",
     "why": "",
     "hint_stuck": "pulse range C7:E10 · The block runs from retail wash revenue down to its total."
    },
@@ -3203,7 +3203,7 @@ export const COPY = {
    {
     "lesson_id": "currency-and-percent-lines",
     "goal_index": "6",
-    "text": "Put the $ on C7:E7, C10:E10 and C24:E24 as currency with no decimals: Ctrl+1 then C, and F4 for the next two.",
+    "text": "Put the $ on C7:E7, C10:E10 and C24:E24 as currency with no decimals: Ctrl+1, Currency, 0 decimal places, and F4 for the next two.",
     "teach": "",
     "why": "",
     "hint_stuck": "pulse range C7:E7 · The first row and the totals carry the currency sign."
@@ -3237,7 +3237,7 @@ export const COPY = {
    {
     "lesson_id": "dates-on-the-timeline",
     "goal_index": "1",
-    "text": "Select C4:E4 and show the dates the way the page reads them with Ctrl+1 then D, which gives Dec-24.",
+    "text": "Select C4:E4 and show the dates the way the page reads them with Ctrl+1, Date, mmm-yy, which gives Dec-24.",
     "teach": "",
     "why": "",
     "hint_stuck": "pulse range C4:E4 · Enter after a Tab run lands one row under the first date."
@@ -3287,7 +3287,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-format-the-numbers",
     "goal_index": "0",
-    "text": "Give the dollar lines C7:E10, C13:E20 and C22:E24 the desk number format with Ctrl+1 then N, and F4.",
+    "text": "Give the dollar lines C7:E10, C13:E20 and C22:E24 the desk number format from Ctrl+1, and F4.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3335,7 +3335,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-format-the-numbers",
     "goal_index": "6",
-    "text": "Type 12/31/2024, 12/31/2025 and 12/31/2026 into C4:E4 and show them as dates with Ctrl+1 then D.",
+    "text": "Type 12/31/2024, 12/31/2025 and 12/31/2026 into C4:E4 and show them as dates with Ctrl+1, Date, mmm-yy.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3345,8 +3345,8 @@ export const COPY = {
    {
     "lesson_id": "the-four-section-format",
     "goal_index": "0",
-    "text": "Select the P&L lines C7:E24 and type the code #,##0_);(#,##0);-_) into the Custom box: Ctrl+1, U, Enter.",
-    "teach": "In the Custom box, Ctrl+1 then U, 0 always prints a digit and # only when there is one, and _) leaves a bracket-wide gap so the columns line up.",
+    "text": "Select the P&L lines C7:E24 and type the code #,##0_);(#,##0);-_) into the Custom box at the foot of Ctrl+1’s list.",
+    "teach": "In a code, 0 always prints a digit and # only when there is one, and _) leaves a bracket-wide gap so the columns line up.",
     "why": "",
     "hint_stuck": "pulse range C7:E24 · Ctrl+Shift+↓ keeps jumping across the gaps until EBITDA."
    },
@@ -3477,7 +3477,7 @@ export const COPY = {
    {
     "lesson_id": "dynamic-headers-with-text",
     "goal_index": "3",
-    "text": "On Monthly, the month ends in C4:N4 arrived as bare serials: select the header row and show them as dates with Ctrl+1 then D.",
+    "text": "On Monthly, the month ends in C4:N4 arrived as bare serials: select the header row and show them as dates with Ctrl+1, Date, mmm-yy.",
     "teach": "",
     "why": "",
     "hint_stuck": "pulse range C4:N4 · 46053 is January 31, 2026 in days."
@@ -3527,8 +3527,8 @@ export const COPY = {
    {
     "lesson_id": "conditional-codes-and-hidden-zeros",
     "goal_index": "3",
-    "text": "Set C5:E5 back to General with Ctrl+1 then G, and the flags show again.",
-    "teach": "General is the format with no format: Ctrl+1 then G returns a cell to showing its value as typed.",
+    "text": "Set C5:E5 back to General, the top of Ctrl+1’s list, and the flags show again.",
+    "teach": "General is the format with no format: General at the top of Ctrl+1’s list returns a cell to showing its value as typed.",
     "why": "",
     "hint_stuck": "pulse range C5:E5 · The A and E never left the cells."
    },
@@ -3577,7 +3577,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-house-format-set",
     "goal_index": "3",
-    "text": "On Monthly, show the month ends in C4:N4 as dates with Ctrl+1 then D.",
+    "text": "On Monthly, show the month ends in C4:N4 as dates with Ctrl+1, Date, mmm-yy.",
     "teach": "",
     "why": "",
     "hint_stuck": ""

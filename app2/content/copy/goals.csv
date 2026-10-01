@@ -293,7 +293,7 @@ foundations-testout,8,On Costs the typed figures in B4:D8 read black: select the
 foundations-testout,9,On Raw the site name in B14 has a doubled last letter: open it and remove the extra letter.,,,
 foundations-testout,10,"Does it tie? Watch the first site’s Monday on Raw change to 3,000 and the Total in C11 answer, with the checks below still reading zero.",,,
 built-in-formats-on-a-pnl,0,"Land on C7 and read 18000.4 in the formula bar, then press Ctrl+↓ to see the revenue lines end at C10.",,,pulse cell C7 · The figures start two columns right of the account codes.
-built-in-formats-on-a-pnl,1,"Select the revenue lines C7:E10 and give them the desk number format with Ctrl+1, then N for Number.","One format per line, set on the whole line at once: Ctrl+1 then N gives dollars the desk number format, a separator, no decimals and a negative in parentheses.",,pulse range C7:E10 · The block runs from retail wash revenue down to its total.
+built-in-formats-on-a-pnl,1,"Select the revenue lines C7:E10 and give them the desk number format from Ctrl+1: Number, 0 decimal places, the separator and (1,234).","One format per line, set on the whole line at once: in Ctrl+1, Number with 0 decimal places, the separator and (1,234) is the desk number format.",,pulse range C7:E10 · The block runs from retail wash revenue down to its total.
 built-in-formats-on-a-pnl,2,Select the site costs C13:E20 and repeat the format with F4.,,,pulse range C13:E20 · F4 repeats the last format on whatever is selected now.
 built-in-formats-on-a-pnl,3,"Site contribution, head office and EBITDA in C22:E24 take the same format: select them and press F4.",,,pulse range C22:E24 · The last block on the page ends on EBITDA.
 built-in-formats-on-a-pnl,4,Sites and washes in C33:E34 are counts that read the same way: select both rows and press F4.,,,"pulse range C33:E34 · The memo lines sit below the answer, under a gap."
@@ -313,24 +313,24 @@ currency-and-percent-lines,2,"Type =C22/C10 in C28 and =C24/C10 in C29, then sel
 currency-and-percent-lines,3,"Growth starts in the second year: type =D10/C10-1 in D30, fill it right to E30, and leave C30 empty.",,,pulse cell D30 · FY24 has no year before it to grow from.
 currency-and-percent-lines,4,"Label F29 CAGR, then put the two-year CAGR in F30: =(E10/C10)^(1/(COLUMNS(C10:E10)-1))-1.","CAGR, compound annual growth, is the one growth figure a buyer quotes, and COLUMNS(C10:E10)-1 counts its periods, three columns less one, so no 2 gets typed.",,"pulse cell F30 · The last year over the first, to the power of one over the periods."
 currency-and-percent-lines,5,"Select C27:F30 and make it percentages to one decimal with Ctrl+Shift+5 and Alt H 0, then italic with Ctrl+I.",,,"pulse range C27:F30 · The whole block, the CAGR column included."
-currency-and-percent-lines,6,"Put the $ on C7:E7, C10:E10 and C24:E24 as currency with no decimals: Ctrl+1 then C, and F4 for the next two.",,,pulse range C7:E7 · The first row and the totals carry the currency sign.
+currency-and-percent-lines,6,"Put the $ on C7:E7, C10:E10 and C24:E24 as currency with no decimals: Ctrl+1, Currency, 0 decimal places, and F4 for the next two.",,,pulse range C7:E7 · The first row and the totals carry the currency sign.
 currency-and-percent-lines,7,"Revenue per wash in C35:E35 is dollars and cents: give it currency with two decimals, Ctrl+Shift+4.",,,pulse range C35:E35 · The memo line at the foot of the page.
 currency-and-percent-lines,8,"Does it tie? Watch membership revenue in E8 change to 24000, and EBITDA margin E29 and growth E30 move with it.",,,"pulse cell E29 · Every margin reads revenue, so it moves too."
 dates-on-the-timeline,0,"Type the three year ends into C4:E4 as a Tab run: 12/31/2024, 12/31/2025 and 12/31/2026.","A date is a serial number of days shown in a date format: 12/31/2024 is 45657 underneath, so it sorts, subtracts and rolls forward.",,pulse cell C4 · Type over the text headers; Tab moves right after each.
-dates-on-the-timeline,1,"Select C4:E4 and show the dates the way the page reads them with Ctrl+1 then D, which gives Dec-24.",,,pulse range C4:E4 · Enter after a Tab run lands one row under the first date.
+dates-on-the-timeline,1,"Select C4:E4 and show the dates the way the page reads them with Ctrl+1, Date, mmm-yy, which gives Dec-24.",,,pulse range C4:E4 · Enter after a Tab run lands one row under the first date.
 dates-on-the-timeline,2,Label the row: type Fiscal year ending in B4 and right-align it over the dates with Alt H A R.,,,"pulse cell B4 · The label goes left of the first date, over the labels column."
 dates-on-the-timeline,3,"Type the flags A, A and E into C5:E5 as a Tab run, one under each year.",,,"pulse cell C5 · Two actual years, then the estimate."
 dates-on-the-timeline,4,"Select the flags C5:E5, right-align them with Alt H A R, then set them in italic with Ctrl+I.",,,pulse range C5:E5 · The flags sit right under the dates they describe.
 dates-on-the-timeline,5,Bold the timeline: select row 4 with Shift+Space and press Ctrl+B.,,,pulse row 4 · Shift+Space takes the whole row of the active cell.
 dates-on-the-timeline,6,Does it tie? Watch C4 change to 12/31/2023 and the header read Dec-23: the page rolls with one edit.,,,pulse cell C4 · The header shows whatever date is underneath.
-challenge-format-the-numbers,0,"Give the dollar lines C7:E10, C13:E20 and C22:E24 the desk number format with Ctrl+1 then N, and F4.",,,
+challenge-format-the-numbers,0,"Give the dollar lines C7:E10, C13:E20 and C22:E24 the desk number format from Ctrl+1, and F4.",,,
 challenge-format-the-numbers,1,"Park a -1 in G19, copy it, and Paste Special Multiply the costs C13:E19 and head office C23:E23 by it.",,,
 challenge-format-the-numbers,2,"Make site contribution C22 =C10+C20 and EBITDA C24 =C22+C23, each filled right, then clear G19.",,,
 challenge-format-the-numbers,3,State the convention in A2: USD thousands unless stated; costs shown as negatives.,,,
 challenge-format-the-numbers,4,"Show the margins block C27:E30 as percentages to one decimal, in italic.",,,
 challenge-format-the-numbers,5,"Put the $ on C7:E7, C10:E10 and C24:E24 as currency with no decimals.",,,
-challenge-format-the-numbers,6,"Type 12/31/2024, 12/31/2025 and 12/31/2026 into C4:E4 and show them as dates with Ctrl+1 then D.",,,
-the-four-section-format,0,"Select the P&L lines C7:E24 and type the code #,##0_);(#,##0);-_) into the Custom box: Ctrl+1, U, Enter.","In the Custom box, Ctrl+1 then U, 0 always prints a digit and # only when there is one, and _) leaves a bracket-wide gap so the columns line up.",,pulse range C7:E24 · Ctrl+Shift+↓ keeps jumping across the gaps until EBITDA.
+challenge-format-the-numbers,6,"Type 12/31/2024, 12/31/2025 and 12/31/2026 into C4:E4 and show them as dates with Ctrl+1, Date, mmm-yy.",,,
+the-four-section-format,0,"Select the P&L lines C7:E24 and type the code #,##0_);(#,##0);-_) into the Custom box at the foot of Ctrl+1’s list.","In a code, 0 always prints a digit and # only when there is one, and _) leaves a bracket-wide gap so the columns line up.",,pulse range C7:E24 · Ctrl+Shift+↓ keeps jumping across the gaps until EBITDA.
 the-four-section-format,1,The memo counts in C33:E34 take the same code: select them and press F4.,,,"pulse range C33:E34 · Sites and washes, under the margins block."
 the-four-section-format,2,"The first row carries the $: select C7:E7 and type $#,##0_);($#,##0);-_) into the Custom box.",,,pulse range C7:E7 · The same code with a $ in front of each number section.
 the-four-section-format,3,Total revenue C10:E10 and EBITDA C24:E24 are totals: select each in turn and press F4 to repeat the $ code.,,,pulse range C10:E10 · F4 repeats the code you just typed.
@@ -346,19 +346,19 @@ units-in-the-format,6,Is it a number? Watch the multiple in Inputs B13 change to
 dynamic-headers-with-text,0,"Select the timeline C4:E4 and give it the custom code ""FY""yy, so the dates read FY24, FY25 and FY26.","A date code writes a date its own way: yy is the two-digit year and text in quotes rides along, so ""FY""yy reads FY24 from 12/31/2024.",,pulse range C4:E4 · The dates are still there under Dec-24.
 dynamic-headers-with-text,1,"The actual years say so: select C4:D4 and give them the code ""FY""yy""A"".",,,pulse range C4:D4 · The A flags in row 5 sit under these two.
 dynamic-headers-with-text,2,"And the estimate: give E4 the code ""FY""yy""E"".",,,pulse cell E4 · The one year still running.
-dynamic-headers-with-text,3,"On Monthly, the month ends in C4:N4 arrived as bare serials: select the header row and show them as dates with Ctrl+1 then D.",,,"pulse range C4:N4 · 46053 is January 31, 2026 in days."
+dynamic-headers-with-text,3,"On Monthly, the month ends in C4:N4 arrived as bare serials: select the header row and show them as dates with Ctrl+1, Date, mmm-yy.",,,"pulse range C4:N4 · 46053 is January 31, 2026 in days."
 dynamic-headers-with-text,4,Headers sit over their figures: right-align Monthly’s header row C4:O4 with Alt H A R.,,,pulse range C4:O4 · The selection from the last step is still the one you want.
 dynamic-headers-with-text,5,Does it tie? Watch C4 on the P&L change to 12/31/2025 and read FY25A: the code reads whatever date is underneath.,,,pulse cell C4 · Only the date changed; the code stayed.
 conditional-codes-and-hidden-zeros,0,The checks C39:C40 read zero when the page ties: give them 0_);[Red](0);-_) so a negative check paints itself red.,"A section can open with a color or a condition: [Red] paints that section’s values red, and [<1000] uses a section only for values under 1,000.",,pulse range C39:C40 · The checks block sits at the foot of the page.
 conditional-codes-and-hidden-zeros,1,"Washes in C34:E34 are thousands: give them [<1000]0;#,##0 so a small count and a large one each read right.",,,"pulse range C34:E34 · The condition picks the section, not the sign."
 conditional-codes-and-hidden-zeros,2,Hide the flags C5:E5 with the code ;;; so the cells keep their A and E but the page stops showing them.,"An empty section shows nothing, so ;;; hides every kind of value while the cell still holds it for any formula that reads it.",,pulse range C5:E5 · Three semicolons and nothing in any section.
-conditional-codes-and-hidden-zeros,3,"Set C5:E5 back to General with Ctrl+1 then G, and the flags show again.",General is the format with no format: Ctrl+1 then G returns a cell to showing its value as typed.,,pulse range C5:E5 · The A and E never left the cells.
+conditional-codes-and-hidden-zeros,3,"Set C5:E5 back to General, the top of Ctrl+1’s list, and the flags show again.",General is the format with no format: General at the top of Ctrl+1’s list returns a cell to showing its value as typed.,,pulse range C5:E5 · The A and E never left the cells.
 conditional-codes-and-hidden-zeros,4,"On Inputs, the switch in B12 holds a 1: give it the code On;;Off so it reads On and still multiplies as a number.",,,pulse cell B12 · Positive; negative; zero: a 0 would read Off.
 conditional-codes-and-hidden-zeros,5,"Does it catch it? Watch total revenue in C10 typed over as 32000, and the check in C39 leave zero and turn red.",,,pulse cell C39 · A typed total no longer matches its lines.
 challenge-house-format-set,0,"Give the P&L lines C7:E24 the plain code #,##0_);(#,##0);-_) in the Custom box.",,,
 challenge-house-format-set,1,"Give the actual years C4:D4 the code ""FY""yy""A"" and the estimate E4 the code ""FY""yy""E"".",,,
 challenge-house-format-set,2,"On Inputs, show FY26E revenue in B15 in millions with the code #,##0.0,""m"".",,,
-challenge-house-format-set,3,"On Monthly, show the month ends in C4:N4 as dates with Ctrl+1 then D.",,,
+challenge-house-format-set,3,"On Monthly, show the month ends in C4:N4 as dates with Ctrl+1, Date, mmm-yy.",,,
 challenge-house-format-set,4,"On the P&L, give the check in C39 the code 0_);[Red](0);-_) so a miss turns red.",,,
 challenge-house-format-set,5,"Put the $ code $#,##0_);($#,##0);-_) on C7:E7, then on total revenue C10:E10 and EBITDA C24:E24 with F4.",,,
 challenge-house-format-set,6,Give the margins block C27:F30 the percent code 0.0%_);(0.0%);-_).,,,

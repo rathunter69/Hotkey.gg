@@ -41,7 +41,7 @@ export default {
     { id: 'type-year-ends', teach: 'A date is a serial number of days shown in a date format: 12/31/2024 is 45657 underneath, so it sorts, subtracts and rolls forward.', text: 'Type the three year ends into C4:E4 as a Tab run: 12/31/2024, 12/31/2025 and 12/31/2026.', keys: 'Ctrl+↓ ×2 → ×2 "12/31/2024" Tab "12/31/2025" Tab "12/31/2026" ↵', requires: ['date-format', 'tab-commits', 'ctrl-arrow'], convention: 'C2',
       hintStuck: 'pulse cell C4 · Type over the text headers; Tab moves right after each.',
       check: (s, ses) => { const sh = pnl(ses); return !!sh && yearEnds(sh) && settled(ses); } },
-    { id: 'show-as-dates', text: 'Select C4:E4 and show the dates the way the page reads them with Ctrl+1 then D, which gives Dec-24.', keys: '↑ Shift+→ ×2 Ctrl+1 D', requires: ['date-format', 'format-cells-tabs', 'shift-arrow'], convention: 'C2',
+    { id: 'show-as-dates', text: 'Select C4:E4 and show the dates the way the page reads them with Ctrl+1, Date, mmm-yy, which gives Dec-24.', keys: '↑ Shift+→ ×2 Ctrl+1 N Tab D Alt+T ↓ ×7 ↵', requires: ['date-format', 'format-cells-tabs', 'shift-arrow'], convention: 'C2',
       hintStuck: 'pulse range C4:E4 · Enter after a Tab run lands one row under the first date.',
       check: (s, ses) => { const sh = pnl(ses); return !!sh && yearEnds(sh) && shownAsDates(sh) && settled(ses); } },
     { id: 'label-row', text: 'Label the row: type Fiscal year ending in B4 and right-align it over the dates with Alt H A R.', keys: '← "Fiscal year ending" ↵ ↑ Alt H A R', requires: ['type-to-enter', 'align-command'], convention: 'D6',
@@ -69,5 +69,5 @@ export default {
     'The timeline is real dates now, and the page can roll forward a year in one edit.',
     'Each header is a count of days shown through a date format, which is why Ctrl+1 can show it any way the page likes. The flags under the years say which two happened and which one is the forecast.',
   ],
-  solution: 'Ctrl+Down Ctrl+Down Right Right "12/31/2024" Tab "12/31/2025" Tab "12/31/2026" Enter Up Shift+Right Shift+Right Ctrl+1 D Left "Fiscal year ending" Enter Up Alt H A R Down Right "A" Tab "A" Tab "E" Enter Up Shift+Right Shift+Right Alt H A R Ctrl+I Up Shift+Space Ctrl+B',
+  solution: 'Ctrl+Down Ctrl+Down Right Right "12/31/2024" Tab "12/31/2025" Tab "12/31/2026" Enter Up Shift+Right Shift+Right Ctrl+1 N Tab D Alt+T Down Down Down Down Down Down Down Enter Left "Fiscal year ending" Enter Up Alt H A R Down Right "A" Tab "A" Tab "E" Enter Up Shift+Right Shift+Right Alt H A R Ctrl+I Up Shift+Space Ctrl+B',
 };

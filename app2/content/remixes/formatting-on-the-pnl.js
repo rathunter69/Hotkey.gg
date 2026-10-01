@@ -13,7 +13,17 @@ const HEADERS = ['Site', 'FY', 'Washes (000s)', 'Revenue ($000)', 'Site costs ($
 const CLEAR = (() => { const out = []; for (let c = 65; c <= 72; c++) for (let r = 1; r <= 45; r++) out.push(String.fromCharCode(c) + r); return out; })();
 const r1 = v => Math.round(v * 10) / 10;
 
-export default remix(base, {
+/** The base challenge's keys on the R1 engine: the desk number format from Format Cells, Center Across from its Alignment tab. */
+const KEYS = {
+  'figures-comma': 'Ctrl+↓ ×2 ↓ → ×2 Ctrl+Shift+↓ Shift+→ ×3 Ctrl+1 N Tab N Alt+D 0 Alt+U Alt+N ↓ ↓ ↵',
+  'title-across': 'Ctrl+Home ↓ ×3 Ctrl+→ ↑ ×3 Ctrl+Shift+← Ctrl+1 A Alt+H ↓ ×4 ↵',
+};
+const SOLUTION = 'Ctrl+Down Ctrl+Down Down Right Right Ctrl+Shift+Down Shift+Right Shift+Right Shift+Right Ctrl+1 N Tab N Alt+D 0 Alt+U Alt+N Down Down Enter '
+  + 'Ctrl+Right Ctrl+Shift+Down Ctrl+Shift+5 Alt H 0 Ctrl+Up Ctrl+Left Ctrl+Shift+End Alt H B N Ctrl+Down Shift+Space Ctrl+B Alt H B P '
+  + 'Ctrl+Up Down Right Right Ctrl+Shift+End Alt H F D S O Enter Alt H F C Right Right Right Right Enter '
+  + 'Ctrl+Home Down Down Down Ctrl+Right Up Up Up Ctrl+Shift+Left Ctrl+1 A Alt+H Down Down Down Down Enter';
+
+const lesson = remix(base, {
   sheet: 'P&L', as: 'Report',
   lesson: {
     id: 'remix-format-on-the-pnl',
@@ -60,4 +70,7 @@ export default remix(base, {
     patch['P&L!G10'] = { formula: '=F10/D10', ball: true };
     return patch;
   },
+  solution: SOLUTION,
 });
+
+export default { ...lesson, goals: lesson.goals.map(g => (KEYS[g.id] ? { ...g, keys: KEYS[g.id] } : g)) };
