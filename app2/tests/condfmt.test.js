@@ -8,7 +8,7 @@ import { Sheet, normCondFmt, cfOperand, subtractRect, rectsOfKeys, mergeRects, C
 import { Session, CF_VALUE_NOTE, CF_FORMULA_NOTE } from '../engine/keyboard.js';
 import { dateTextToSerial, translateFormula } from '../engine/formula.js';
 import { runCommand } from '../ui/ribbon-commands.js';
-import { sessionToState, diffStates } from '../content/workbooks/voltline-weekly.js';
+import { sessionToState, diffStates } from '../content/workbooks/clearcoat-weekly.js';
 
 const CELLS = { A1: { value: 'Site' }, B1: { value: 'Rev' }, C1: { value: 'Cost' },
   A2: { value: 'North' }, B2: { value: 100 }, C2: { value: 80 },

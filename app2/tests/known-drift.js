@@ -13,6 +13,6 @@
 export const DRIFT_LESSONS = new Map(Object.entries({
 }));
 export const DRIFT_DRILLS = new Map();   // empty since M108: every Chapter 1 drill replays on the R1 engine
-export const DRIFT_MICRO = new Map(Object.entries({ 'fill-series': 'series', 'number-formats': 'picker', 'center-across': 'picker', 'f4-repeat': 'picker' }));
+export const DRIFT_MICRO = new Map();     // empty since run R1: every micro-drill replays on the Clearcoat workbook and the R1 engine
 /** node:test's skip option for an id: false, or the reason. */
 export const driftSkip = (map, id) => (map.has(id) ? 'known drift (' + map.get(id) + '): content awaits its rewrite' : false);

@@ -189,7 +189,7 @@ const onSheet = (ses, name) => ses.sheets && ses.sheets[ses.sheetIndex] && ses.s
 const cellOf = (ses, sheetName, ref) => { const sh = (ses.sheets || []).find(x => x.name === sheetName); return sh && sh.sheet ? sh.sheet.cellAt(ref) : null; };
 
 /**
- * The micro-drill for each shortcut Chapter 1 teaches, as tiny lessons on `voltline-weekly`
+ * The micro-drill for each shortcut Chapter 1 teaches, as tiny lessons on `clearcoat-weekly`
  * (the Austin feed at S0, the coloured Costs sheet at S2a). `secs` is the budget the queue adds
  * up; `goals` and `solution` are what the lesson workspace runs. Keyed by concept id so a lesson
  * goal's `requires` list feeds the queue with no extra authoring.
@@ -281,7 +281,7 @@ export function microLesson(id) {
   const m = MICRO[id]; if (!m) return null;
   return applyMicroCopy({
     id: 'due-' + id, kind: 'micro', chapter: 'foundations', section: 'Due today', title: m.title, difficulty: 'easy', tags: ['due'], access: 'free',
-    workbook: 'voltline-weekly', state: { before: m.state, after: m.state }, minutes: 1, concept: id, plant: m.plant,
+    workbook: 'clearcoat-weekly', state: { before: m.state, after: m.state }, minutes: 1, concept: id, plant: m.plant,
     brief: m.task, goals: m.goals, solution: m.solution, secs: m.secs, teaches: [], requires: [id],
   }, id);
 }

@@ -280,8 +280,8 @@ test('Page Setup (Alt P S P): rows to repeat, the footer sections and print grid
   s.run('Alt+H'); assert.equal(s.dlg.tab, 'sheet', 'Alt+H does nothing in Page Setup (M66)');
   s.run('Shift+Tab H'); assert.equal(s.dlg.tab, 'hf', 'on the row of tabs a letter picks a tab'); assert.equal(s.dlg.focus, 'tabs');
   s.run('Alt+U'); assert.equal(s.dlg.sub, 'footer', 'Alt+U opens Custom Footer'); assert.equal(s.dlg.focus, 'footL', 'the cursor in the left section');
-  s.run('"&[file]" Tab "Voltline" Tab "&[Date]"'); assert.equal(s.dlg.footL, '&[file]'); assert.equal(s.dlg.footC, 'Voltline'); assert.equal(s.dlg.footR, '&[Date]');
-  s.run('Alt+C'); assert.equal(s.dlg.focus, 'footC'); s.run('" Energy"'); assert.equal(s.dlg.footC, 'Voltline Energy', 'a space types into a section');
+  s.run('"&[file]" Tab "Clearcoat" Tab "&[Date]"'); assert.equal(s.dlg.footL, '&[file]'); assert.equal(s.dlg.footC, 'Clearcoat'); assert.equal(s.dlg.footR, '&[Date]');
+  s.run('Alt+C'); assert.equal(s.dlg.focus, 'footC'); s.run('" Express"'); assert.equal(s.dlg.footC, 'Clearcoat Express', 'a space types into a section');
   s.run('Enter'); assert.equal(s.dlg.sub, null, 'Enter is the footer box\'s OK'); assert.equal(s.dialog, 'pagesetup');
   s.run('Alt+U "x" Escape'); assert.equal(s.dlg.sub, null); assert.equal(s.dlg.footL, '&[file]', 'Esc cancels the footer box only'); assert.equal(s.dialog, 'pagesetup');
   s.run('Ctrl+PageDown Alt+G'); assert.equal(s.dlg.tab, 'sheet'); assert.equal(s.dlg.printGridlines, true);
@@ -289,7 +289,7 @@ test('Page Setup (Alt P S P): rows to repeat, the footer sections and print grid
   s.run('Enter'); assert.equal(s.mode, 'normal'); assert.equal(s.dialog, null);
   const p = s.settings.pageSetup;
   assert.equal(p.orientation, 'landscape'); assert.equal(p.scaling, 'fit');
-  assert.equal(p.titlesRows, '$1:$3', 'stored as Excel shows it back'); assert.deepEqual(p.footer, { left: '&[File]', centre: 'Voltline Energy', right: '&[Date]' }); assert.equal(p.printGridlines, false);
+  assert.equal(p.titlesRows, '$1:$3', 'stored as Excel shows it back'); assert.deepEqual(p.footer, { left: '&[File]', centre: 'Clearcoat Express', right: '&[Date]' }); assert.equal(p.printGridlines, false);
   assert.ok(s.log.includes('Alt+R') && s.log.includes('Alt+U'), 'the accelerators are logged as chords');
   // Print Titles (Alt P I) opens the Sheet page directly; Esc cancels the draft
   s.run('Alt P I'); assert.equal(s.dialog, 'pagesetup'); assert.equal(s.dlg.tab, 'sheet'); assert.equal(s.dlg.titlesRows, '$1:$3');

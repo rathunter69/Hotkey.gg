@@ -82,7 +82,7 @@ export const PLANNED = [
     wow: '', conventions: ['D1', 'D2', 'D5', 'D7', 'B1'] },
   // 1.6 formulas
   { id: 'point-dont-type', module: 'formulas', order: '1.6.1', title: 'Point, don’t type',
-    brief: 'Build gross profit, gross margin % and average price per kWh for one site by pointing at the cells with the arrow keys, never typing an address. Read each formula back with F2.',
+    brief: 'Build gross profit, gross margin % and average ticket per wash for one site by pointing at the cells with the arrow keys, never typing an address. Read each formula back with F2.',
     wow: 'Change the site’s revenue on Raw and watch all three lines move. You built them by pointing, so they point back.', conventions: ['E1'] },
   { id: 'sum-family-and-autosum', module: 'formulas', order: '1.6.2', title: 'SUM family and AutoSum',
     brief: 'Total the six sites with Alt+= in one press across the block. Then AVERAGE, MIN, MAX, COUNT and COUNTA for the week summary, and see what a blank does to AVERAGE.',

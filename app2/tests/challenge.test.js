@@ -17,7 +17,7 @@ const sheetOf = (ses, name) => ses.sheets.find(s => s.name === name).sheet;
 /** A fixture challenge over the real module workbook: content varies by seed, checks read the sheet. */
 const CH = {
   id: 'fixture-challenge', chapter: 'foundations', section: 'Open and set up', title: 'Fixture: another cluster’s file',
-  kind: 'challenge', module: 'open-and-set-up', workbook: 'voltline-weekly', state: { before: 'S1d' },
+  kind: 'challenge', module: 'open-and-set-up', workbook: 'clearcoat-weekly', state: { before: 'S1d' },
   difficulty: 'medium', tags: ['challenge'], access: 'free', minutes: 3,
   brief: 'Another cluster’s file came in: label it and link the check.',
   timeLimit: 180, pars: { pass: 90, pro: 54, legendary: 36 },
@@ -25,20 +25,20 @@ const CH = {
     const cluster = pickCluster(rng);
     return {
       'Raw!B2': { value: cluster.sites[0] },
-      'Raw!C2': { value: 500 + Math.floor(rng() * 200) * 10 },
-      'Inputs!B6': { value: 60000 + Math.floor(rng() * 400) * 100, fontColor: 'blue' },
+      'Raw!C2': { value: 150 + Math.floor(rng() * 40) * 5 },
+      'Inputs!B6': { value: 8000 + Math.floor(rng() * 40) * 100, fontColor: 'blue' },
     };
   },
   goals: [
     { id: 'title', text: 'Type Weekly check into A1 of Report.', keys: '"Weekly check" ↵', check: (s, ses) => sheetOf(ses, 'Report').value('A1') === 'Weekly check' },
-    { id: 'link', text: 'Link B1 to the first kWh figure on Raw.', keys: 'Ctrl+G "B1" ↵ "=Raw!C2" ↵', check: (s, ses) => sheetOf(ses, 'Report').value('B1') === sheetOf(ses, 'Raw').value('C2') && liveness(sheetOf(ses, 'Report'), 'B1').ok },
-    { id: 'double', text: 'Double it in B2.', keys: '"=B1*2" ↵', check: (s, ses) => sheetOf(ses, 'Report').value('B2') === sheetOf(ses, 'Raw').value('C2') * 2 },
-    { id: 'estimate', text: 'Copy the cluster kWh estimate from Inputs into B4.', keys: 'Ctrl+G "B4" ↵ "=Inputs!B6" ↵', check: (s, ses) => sheetOf(ses, 'Report').value('B4') === sheetOf(ses, 'Inputs').value('B6') },
+    { id: 'link', text: 'Link B1 to the first wash count on Raw.', keys: 'Ctrl+G "B1" ↵ "=Raw!C2" ↵', check: (s, ses) => sheetOf(ses, 'Report').value('B1') === sheetOf(ses, 'Raw').value('C2') && liveness(sheetOf(ses, 'Report'), 'B1').ok },
+    { id: 'double', text: 'Double it in B2.', keys: '↓ "=B1*2" ↵', check: (s, ses) => sheetOf(ses, 'Report').value('B2') === sheetOf(ses, 'Raw').value('C2') * 2 },
+    { id: 'estimate', text: 'Copy the cluster washes estimate from Inputs into B4.', keys: 'Ctrl+G "B4" ↵ "=Inputs!B6" ↵', check: (s, ses) => sheetOf(ses, 'Report').value('B4') === sheetOf(ses, 'Inputs').value('B6') },
   ],
   graders: [ses => unitsLabel(sheetOf(ses, 'Report'))],
-  solution: '"Weekly check" Enter Ctrl+G "B1" Enter "=Raw!C2" Enter "=B1*2" Enter Ctrl+G "B4" Enter "=Inputs!B6" Enter Ctrl+Home "x" Escape',
+  solution: '"Weekly check" Enter Ctrl+G "B1" Enter "=Raw!C2" Enter Down "=B1*2" Enter Ctrl+G "B4" Enter "=Inputs!B6" Enter Ctrl+Home "x" Escape',
 };
-const SOLUTION_CORE = '"Weekly check" Enter Ctrl+G "B1" Enter "=Raw!C2" Enter "=B1*2" Enter Ctrl+G "B4" Enter "=Inputs!B6" Enter';
+const SOLUTION_CORE = '"Weekly check" Enter Ctrl+G "B1" Enter "=Raw!C2" Enter Down "=B1*2" Enter Ctrl+G "B4" Enter "=Inputs!B6" Enter';
 const UNITS_FIX = 'Ctrl+G "A2" Enter "USD unless stated" Enter';
 
 test('a challenge validates, and the validator rejects the broken shapes', () => {
@@ -173,16 +173,16 @@ test('the runner: timedOut reads the limit against the clock; optimalKeys derive
 
 test('a closer goal plays as a ghost: the perturbation shows, then the sheet is exactly as it stood, and the goal lands', () => {
   const lesson = {
-    id: 'closer-fixture', chapter: 'foundations', section: 'Open and set up', title: 'x', kind: 'lesson', module: 'open-and-set-up', workbook: 'voltline-weekly',
+    id: 'closer-fixture', chapter: 'foundations', section: 'Open and set up', title: 'x', kind: 'lesson', module: 'open-and-set-up', workbook: 'clearcoat-weekly',
     state: { before: 'S1d', after: 'S1d' }, difficulty: 'easy', tags: [], access: 'free', minutes: 5, headline: 'x', conventions: ['B1'], teaches: ['type-to-enter'],
     brief: 'One goal, then the tie. Press `Enter`.',
     goals: [
       { id: 'a', teach: 'Type.', text: 'Type x into Report!A1.', keys: '"x" ↵', requires: ['type-to-enter'], check: (s, ses) => ses.sheets[0].sheet.value('A1') === 'x' },
-      { id: 'b', text: 'Move down.', keys: '↓', requires: [], check: (s, ses) => ses.sheets[0].sheet.selectionText() === 'A3' },
-      { id: 'c', text: 'Move down again.', keys: '↓', requires: [], check: (s, ses) => ses.sheets[0].sheet.selectionText() === 'A4' },
-      { id: 'd', text: 'Move down once more.', keys: '↓', requires: [], check: (s, ses) => ses.sheets[0].sheet.selectionText() === 'A5' },
-      { id: 'e', text: 'And once more.', keys: '↓', requires: [], check: (s, ses) => ses.sheets[0].sheet.selectionText() === 'A6' },
-      { id: 'tie', closer: true, demo: { script: 'Ctrl+PgDn Ctrl+PgDn Down Down Down Right "0.99" Enter Ctrl+Down Ctrl+Down Escape', cadence: 60 }, text: 'Does it tie? Watch the wholesale price change and the energy bill answer.', requires: [], check: (s, ses) => ses.demoDone.has('tie') },
+      { id: 'b', text: 'Move down.', keys: '↓', requires: [], check: (s, ses) => ses.sheets[0].sheet.selectionText() === 'A2' },
+      { id: 'c', text: 'Move down again.', keys: '↓', requires: [], check: (s, ses) => ses.sheets[0].sheet.selectionText() === 'A3' },
+      { id: 'd', text: 'Move down once more.', keys: '↓', requires: [], check: (s, ses) => ses.sheets[0].sheet.selectionText() === 'A4' },
+      { id: 'e', text: 'And once more.', keys: '↓', requires: [], check: (s, ses) => ses.sheets[0].sheet.selectionText() === 'A5' },
+      { id: 'tie', closer: true, demo: { script: 'Ctrl+PgDn Ctrl+PgDn Down Down Down Down Right "9.99" Enter Ctrl+Down Ctrl+Down Escape', cadence: 60 }, text: 'Does it tie? Watch the target ticket change and the revenue estimate answer.', requires: [], check: (s, ses) => ses.demoDone.has('tie') },
     ],
     solution: '"x" Enter Down Down Down Down',
   };
@@ -197,8 +197,8 @@ test('a closer goal plays as a ghost: the perturbation shows, then the sheet is 
   const before = JSON.stringify(run.session.sheets.map(e => e.sheet.snapshot()));
   const steps = run.demoSteps(run.pendingDemo());
   for (const st of steps.slice(0, 9)) run.demoStep(st);
-  assert.equal(run.session.sheets[2].sheet.value('B4'), 0.99, 'mid-demo the input has changed');
-  assert.ok(Math.abs(run.session.sheets[2].sheet.value('B14') - 84000 * 0.99) < 1e-6, 'and the dependent moved');
+  assert.equal(run.session.sheets[2].sheet.value('B5'), 9.99, 'mid-demo the input has changed');
+  assert.ok(Math.abs(run.session.sheets[2].sheet.value('B10') - 9000 * 9.99) < 1e-6, 'and the dependent moved');
   assert.equal(run.doneCount, 5, 'nothing a ghost presses lands a goal');
   run.session.settings.showFormulas = true; run.session.sheet.clipboard = { data: [[{ value: 1 }]], cols: [64], h: 1, w: 1, rect: { r1: 1, c1: 1, r2: 1, c2: 1 }, cut: false };   // what a ghost's Ctrl+` / Ctrl+C would leave
   for (const st of steps.slice(9)) run.demoStep(st);
@@ -211,7 +211,7 @@ test('a closer goal plays as a ghost: the perturbation shows, then the sheet is 
   const again = new LessonRun(lesson, { now: () => 0 });
   again.run(lesson.solution);
   assert.ok(again.finished);
-  assert.equal(again.session.sheets[2].sheet.value('B4'), 0.13, 'the perturbation went back');
+  assert.equal(again.session.sheets[2].sheet.value('B5'), 14, 'the perturbation went back');
   // the closer's playback is the platform's time, not the learner's: the recorded time stops when the ghost begins
   let t = 0; const timed = new LessonRun(lesson, { now: () => t });
   for (const ch of 'x') timed.key({ key: ch });

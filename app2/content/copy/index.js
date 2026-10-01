@@ -4205,7 +4205,7 @@ export const COPY = {
   },
   "number-formats": {
    "id": "number-formats",
-   "prompt": "Put comma format with no decimals on a block of figures in three presses.",
+   "prompt": "Put the thousands separator, no decimals, on a block of figures in three presses.",
    "teach": ""
   },
   "borders-menu": {
