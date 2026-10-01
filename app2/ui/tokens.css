@@ -64,6 +64,9 @@
   --d-cursor:80ms; --d-key:90ms; --d-menu:140ms; --d-beat:140ms; --d-route:150ms; --d-note:160ms; --d-card:200ms; --d-goal:250ms;
   --d-hit:250ms; --d-wrong:300ms; --d-open:500ms; --d-quests:600ms; --d-combo:700ms; --d-streak:900ms;
   --d-result:4000ms; --d-banner:4000ms; --d-nudge:8000ms; --d-help:20000ms;
+  /* the result's moments, in order (3.0, the timed run): the time counts up, then the tier, New best, the track, the rows, XP, a level-up, a quest */
+  --d-count:900ms; --d-result-tier:1000ms; --d-result-best:1450ms; --d-result-track:1500ms; --d-result-board:1900ms;
+  --d-result-xp:2300ms; --d-result-level:3200ms; --d-result-quest:3900ms;
 
   /* ---------- the one shadow, for floating things only ---------- */
   --shadow-float:0 14px 36px -14px rgba(0,0,0,.35);
