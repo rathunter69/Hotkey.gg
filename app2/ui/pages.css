@@ -1,0 +1,186 @@
+/* app2/ui/pages.css — the site pages' components (screenplay 3.0; M89, M104): the page and its
+   columns, the panel, the table, the page tabs, buttons and keycaps, the marks (tier diamonds,
+   goal segments, bars), the sheet preview, the Practice header block and the boards. Tokens only
+   (ui/tokens.css): no hex value, pixel size or duration appears here. Loaded after components.css.
+
+   Pages are laid out the way the course lays out a sheet (3.0, rule 4): one strong left edge, white
+   panels on the paper ground with no border and no shadow, tables with a rule above the header and
+   hairlines between rows, labels left and figures right in tabular numerals. Two-column pages are
+   1fr and 336px (or two equal halves for a catalog) and end on the same line. */
+
+/* ---------- the page and its columns ---------- */
+.pg{font-family:var(--font); color:var(--ink); font-size:var(--fs-body); line-height:var(--lh-body); display:flex; flex-direction:column; gap:var(--s4)}
+.pg-two{display:grid; grid-template-columns:minmax(0,1fr) var(--side-col); gap:var(--s4); align-items:stretch}
+.pg-main, .pg-side{display:flex; flex-direction:column; gap:var(--s4); min-width:0}
+.pg-cols{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:var(--s4); align-items:start}
+.pg-col{display:flex; flex-direction:column; gap:var(--s4); min-width:0}
+
+/* ---------- the panel ---------- */
+.panel{position:relative; background:var(--sheet); padding:var(--s5) var(--s6) var(--s6); display:flex; flex-direction:column; gap:var(--s3); min-width:0}
+.panel-mode{border-top:var(--mode-rule) solid var(--mode)}
+.panel-stretch{flex:1 1 auto}
+.panel-head{display:flex; align-items:baseline; justify-content:space-between; gap:var(--s4)}
+.panel-h{font-size:var(--fs-panel); font-weight:var(--fw-heavy); margin:0; line-height:1.25}
+.panel-head > .panel-h:not(.panel-h-page){flex:none}
+.panel-h-page{font-size:var(--fs-head); line-height:1.15}
+.panel-facts{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2); font-variant-numeric:tabular-nums; display:inline-flex; flex-wrap:wrap; justify-content:flex-end; text-align:right; gap:var(--s1) var(--s3); align-items:baseline; min-width:0}
+.panel-facts > *{white-space:nowrap}
+.panel-facts a{color:var(--mode-ink); text-decoration:none}
+.panel-facts a:hover{text-decoration:underline}
+.panel-line{margin:0; color:var(--ink-2); font-size:var(--fs-name)}
+.panel-link{color:var(--mode-ink); font-weight:var(--fw-semi); font-size:var(--fs-name); text-decoration:none}
+.panel-link:hover{text-decoration:underline}
+.facts{display:flex; flex-wrap:wrap; gap:var(--s2) var(--s4); align-items:center; font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2); font-variant-numeric:tabular-nums}
+.fact-segs{display:inline-flex; align-items:center; gap:var(--s2)}
+.btn-row{display:flex; gap:var(--s2); flex-wrap:wrap}
+.row-name{font-weight:var(--fw-semi); font-size:var(--fs-name)}
+.row-sub{display:block; font-size:var(--fs-label); color:var(--ink-2); font-weight:var(--fw-body)}
+.row-line{display:flex; justify-content:space-between; align-items:baseline; gap:var(--s3)}
+
+/* ---------- the table ---------- */
+.tbl{width:100%; border-collapse:collapse; font-size:var(--fs-name); font-variant-numeric:tabular-nums}
+.tbl th, .tbl td{text-align:left; padding:0 var(--s2); height:var(--row-h); vertical-align:middle; border:0; border-bottom:1px solid var(--line); white-space:nowrap; overflow:visible; position:static; font-family:inherit; transition:none; background:none}
+.tbl th{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2); border-top:2px solid var(--ink); border-bottom:1px solid var(--line); height:auto; padding-top:var(--s2); padding-bottom:var(--s2)}
+.tbl td:first-child, .tbl th:first-child{padding-left:var(--s3)}
+.tbl td:last-child, .tbl th:last-child{padding-right:var(--s3)}
+.tbl .num{text-align:right}
+.tbl .mid{text-align:center}
+.tbl td[data-col="n"]{font-family:var(--mono); font-size:var(--fs-key); color:var(--ink-2); width:1%}
+.tbl td[data-col="min"], .tbl td[data-col="time"], .tbl td[data-col="best"]{font-family:var(--mono); font-size:var(--fs-key)}
+.tbl td[data-col="min"], .tbl th[data-col="min"]{width:1%}
+.tbl td[data-col="tier"]{width:1%}
+.tbl td[data-col="status"]{color:var(--ink-2)}
+.tbl tr.current > td, .tbl tr.next > td{background:var(--mode-tint)}
+.tbl tr.current > td{color:var(--ink)}
+.tbl tr.current > td:nth-child(2), .tbl tr.current td[data-col="status"]{font-weight:var(--fw-semi); color:var(--ink)}
+.tbl tr[data-href]{cursor:pointer}
+.tbl tr[data-href]:hover > td{background:var(--chrome)}
+.tbl tr.later > td, .tbl tr.pro > td{color:var(--ink-2)}
+.tbl tr.pro td[data-col="best"]{font-family:var(--font); font-weight:var(--fw-semi)}
+.tbl td .row-name{font-weight:var(--fw-semi)}
+.tbl-chapter .row-lesson td{color:var(--ink-2)}
+.tbl-chapter .row-lesson td:nth-child(2){color:var(--ink); padding-left:var(--s5)}
+.tbl-chapter .row-lesson td[data-col="n"]{padding-left:var(--s6)}
+.tbl-chapter .row-module.open td{font-weight:var(--fw-semi)}
+.tbl-today td{height:auto; padding:var(--s2) var(--s1); white-space:normal}
+.tbl-today td:first-child{padding-left:var(--s1)}
+.tbl-today td:last-child{padding-right:var(--s1)}
+.tbl-today td.n{width:1%; padding-right:0}
+.tbl-today .row-name{white-space:nowrap}
+.tbl-today td.len, .tbl-today td.xp{white-space:nowrap; width:1%; font-family:var(--mono); font-size:var(--fs-key)}
+.tbl-today .mode-mark{margin-right:var(--s2); vertical-align:1px}
+.tbl-today td.xp{color:var(--mode-ink); font-weight:var(--fw-semi); font-family:var(--mono); font-size:var(--fs-key)}
+.tbl-today tr.done .row-name{color:var(--ink-2)}
+.tbl-today tr.done td.xp{color:var(--ink-2); font-family:var(--font)}
+.tbl-set td[data-col="n"]{width:1%}
+.tbl-runs td{color:var(--ink-2)}
+
+/* ---------- the page tabs (Learn, Leaderboards) ---------- */
+.tabs-row{display:flex; align-items:center; justify-content:space-between; gap:var(--s4); border-bottom:1px solid var(--line)}
+.tabs{display:flex; gap:var(--s1); border-bottom:1px solid var(--line)}
+.tabs-row .tabs{border-bottom:0}
+.tab{display:inline-flex; align-items:center; gap:var(--s2); font:inherit; font-size:var(--fs-body); font-weight:var(--fw-semi); color:var(--ink-2); background:transparent; border:0; border-bottom:var(--mode-rule) solid transparent; margin-bottom:-1px; padding:var(--s2) var(--s4) var(--s3); cursor:pointer; position:relative}
+.tab:hover{color:var(--ink)}
+.tab.on{color:var(--ink); border-bottom-color:var(--mode)}
+.tab:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:-2px; border-radius:var(--r-btn)}
+.mode-mark{display:inline-block; width:var(--mode-mark); height:var(--mode-mark); background:var(--mark, var(--mode)); flex:none}
+
+/* ---------- buttons and keycaps (3.0: a filled primary button; a quiet button on chrome with an edge that passes 3 to 1; the key beside the label) ---------- */
+.btn2{display:inline-flex; align-items:center; gap:var(--s3); font:inherit; font-size:var(--fs-body); font-weight:var(--fw-bold); line-height:1; color:var(--ink); background:var(--chrome); border:1px solid var(--edge); border-radius:var(--r-btn); padding:var(--s3) var(--s4); cursor:pointer; text-decoration:none; white-space:nowrap}
+.btn2:hover{background:var(--line)}
+.btn2-primary{color:var(--on-fill); background:var(--mode); border-color:var(--mode)}
+.btn2-primary:hover{background:var(--mode-ink); border-color:var(--mode-ink)}
+.btn2-primary .key{color:var(--on-fill); background:transparent; border-color:var(--on-fill); box-shadow:none}
+.btn2-quiet{background:var(--chrome)}
+.btn2:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:2px}
+.key{display:inline-block; font-family:var(--mono); font-weight:var(--fw-key); font-size:var(--fs-key); line-height:1; color:var(--ink); background:var(--sheet); border:1px solid var(--edge); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); padding:var(--s1) var(--s2); white-space:nowrap}
+.link-btn{font:inherit; font-size:inherit; color:var(--mode-ink); background:none; border:0; padding:0; cursor:pointer; text-decoration:underline; font-weight:var(--fw-semi)}
+.picker{display:inline-flex; align-items:center; gap:var(--s2); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
+.picker select{font-family:var(--font); font-size:var(--fs-body); font-weight:var(--fw-semi); color:var(--ink); background-color:var(--sheet); border:1px solid var(--edge); border-radius:var(--r-btn); padding:var(--s3) var(--s8) var(--s3) var(--s4)}
+
+/* ---------- the marks: tier diamonds, goal segments, bars, the level chip, a tick ---------- */
+.tiers{display:inline-flex; gap:3px; align-items:center; vertical-align:middle}
+.tiers i{display:inline-block; width:var(--tier-mark); height:var(--tier-mark); transform:rotate(45deg) scale(.8); border:1.5px solid var(--clock); box-sizing:border-box; background:transparent}
+.tiers i.on{background:var(--clock)}
+.tiers-none i{border-color:var(--edge)}
+.segs{display:inline-flex; gap:var(--s1); align-items:center}
+.segs i{display:inline-block; width:var(--seg-w); height:var(--seg-h); background:var(--line); border-radius:1px}
+.segs i.on{background:var(--mode)}
+.segs i.now{box-shadow:inset 0 0 0 1px var(--mode)}
+.bar{display:block; height:var(--bar-h); background:var(--line); overflow:hidden}
+.bar i{display:block; height:100%; background:var(--mode); transition:width var(--d-goal)}
+.bar-field{width:var(--field-bar-w); background:var(--mode-tint); display:inline-block; vertical-align:middle}
+.bar-level{margin-top:var(--s1)}
+.bar-ach{margin-top:var(--s2)}
+.lvl-chip{display:inline-block; font-family:var(--mono); font-size:var(--fs-min); line-height:1; color:var(--ink-2); border:1px solid var(--line); border-radius:var(--r-btn); padding:2px var(--s1); margin-left:var(--s2); vertical-align:1px}
+.move{margin-left:var(--s2); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--mode-ink)}
+.tick{display:inline-block; width:var(--s4); height:var(--s4); border:1px solid var(--edge); border-radius:2px; vertical-align:middle; position:relative; background:var(--sheet)}
+.tick.on{background:var(--mode); border-color:var(--mode)}
+.tick.on::after{content:''; position:absolute; left:5px; top:2px; width:4px; height:8px; border:solid var(--on-fill); border-width:0 2px 2px 0; transform:rotate(45deg)}
+
+/* ---------- Home ---------- */
+.panel-next .panel-head{align-items:center}
+.panel-next .btn2{flex:none}
+.level-next{display:flex; align-items:center; gap:var(--s3); font-size:var(--fs-name); color:var(--ink-2)}
+.level-tile{display:inline-grid; place-items:center; width:var(--level-tile); height:var(--level-tile); font-family:var(--mono); font-weight:var(--fw-bold); font-size:var(--fs-body); color:var(--clock-ink); background:var(--clock-tint); border:1px solid var(--clock); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); flex:none}
+.streak-row{display:flex; align-items:center; justify-content:space-between; gap:var(--s3); padding-top:var(--s2)}
+.week{display:inline-flex; gap:3px}
+.week i{display:inline-grid; place-items:center; width:var(--s6); height:var(--s5); font-style:normal; font-family:var(--mono); font-size:var(--fs-min); line-height:1; color:var(--ink-2); background:var(--chrome)}
+.week i.on{background:var(--learn); color:var(--on-fill)}
+.week i.today{outline:1px solid var(--ink); outline-offset:-1px}
+.badge-grid{display:grid; grid-template-columns:repeat(5, var(--badge-tile)); gap:var(--s3)}
+.badge-tile{display:inline-grid; place-items:center; width:var(--badge-tile); height:var(--badge-tile); background:var(--chrome); border-radius:var(--r-btn); color:var(--ink-2); font-family:var(--mono); font-weight:var(--fw-bold)}
+.badge-tile.on{background:var(--sheet); border:1px solid var(--line)}
+.badge-tile.locked{border:1px solid var(--line); background:var(--sheet)}
+.badge-tile .px{display:block}
+.ach-next{margin-top:auto; padding-top:var(--s3); border-top:1px solid var(--line)}
+
+/* ---------- the sheet preview (Home, Learn): a still of the sheet, read-only ---------- */
+.sheet-preview{display:flex; flex-direction:column; border:1px solid var(--line); background:var(--sheet)}
+.sp-scroll{overflow:hidden; max-height:var(--preview-h)}
+.sp{border-collapse:collapse; font-family:var(--cellfont); font-size:var(--fs-key); color:var(--ink); table-layout:auto; width:100%}
+.sp th, .sp td{border:1px solid var(--grid); padding:0 var(--s1); height:var(--sp-row); white-space:nowrap; overflow:hidden; text-overflow:clip; text-align:left; max-width:0; position:static; font-weight:var(--fw-body); vertical-align:middle; transition:none}
+.sp th{background:var(--chrome); color:var(--ink-2); text-align:center; font-family:var(--font); font-size:var(--fs-min); max-width:none}
+.sp tbody th{width:1%; padding:0 var(--s2)}
+.sp td.num{text-align:right}
+.sp td.mid, .sp td.ca{text-align:center}
+.sp td.b{font-weight:var(--fw-bold)}
+.sp td.i{font-style:italic}
+.sp td.bb{border-bottom:1px solid var(--ink)}
+.sp td.bt{border-top:1px solid var(--ink)}
+.sp td.fc-blue{color:var(--drills)}
+.sp td.fc-green{color:var(--learn)}
+.sp td.fc-red{color:var(--red)}
+.sp td.fc-gray, .sp td.fc-darkgray{color:var(--ink-2)}
+.sp td.fill-gray{background:var(--chrome)}
+.sp td.fill-yellow{background:var(--note)}
+.sp td.fill-blue{background:var(--drills-tint)}
+.sp td.fill-green{background:var(--learn-tint)}
+.sp-tab{align-self:flex-start; font-family:var(--font); font-size:var(--fs-min); color:var(--ink-2); background:var(--chrome); padding:2px var(--s3); border-top:1px solid var(--line); border-right:1px solid var(--line)}
+
+/* ---------- the Practice pages' header block ---------- */
+.hdr{flex-direction:row; align-items:center; justify-content:space-between; gap:var(--s6); padding:var(--s6) var(--s6)}
+.hdr-main{display:flex; flex-direction:column; gap:var(--s1); min-width:0}
+.hdr-row{display:flex; align-items:baseline; gap:var(--s4)}
+.hdr-title{font-size:var(--fs-title); font-weight:var(--fw-heavy); margin:0; line-height:1.15}
+.hdr-line{margin:0; color:var(--ink-2); font-size:var(--fs-name)}
+.hdr-acts{display:flex; align-items:center; gap:var(--s4); flex:none}
+.hdr .btn2{padding:var(--s4) var(--s6); font-size:var(--fs-panel)}
+.paywall .panel-line{font-size:var(--fs-body); color:var(--ink)}
+
+/* ---------- the boards ---------- */
+.tbl-board td, .tbl-board th{height:auto; padding-top:var(--s3); padding-bottom:var(--s3)}
+.tbl-board td[data-col="time"], .tbl-board td[data-col="gap"], .tbl-board td[data-col="keys"]{font-family:var(--mono); font-size:var(--fs-key)}
+.tbl-board td[data-col="gap"], .tbl-board td[data-col="keys"]{color:var(--ink-2)}
+.tbl-board td[data-col="time"]{font-weight:var(--fw-bold)}
+.tbl-board tr.mine > td{background:var(--mode-tint); color:var(--ink)}
+.tbl-board tr.pinned > td{border-top:var(--cursor-w) solid var(--mode)}
+.tbl-board tr.mine td[data-col="n"], .tbl-board tr.mine td[data-col="gap"], .tbl-board tr.mine td[data-col="keys"]{color:var(--mode-ink)}
+.board-host{display:flex; flex-direction:column; gap:var(--s4)}
+
+/* below 900px the columns stack */
+@media (max-width:900px){
+  .pg-two, .pg-cols{grid-template-columns:minmax(0,1fr)}
+  .hdr{flex-direction:column; align-items:stretch}
+}
+@media (prefers-reduced-motion: reduce){ .bar i{transition:none} }

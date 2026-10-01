@@ -1,14 +1,22 @@
-// app2/app/learn-page.js — the Learn catalog (SITE_SPEC §2): six chapters, sections inside
-// Chapter 1, per-lesson status / difficulty / tags / access, filters, search, "next up", and
-// full keyboard navigation (`/` focuses search, arrows move through lessons, Enter opens).
-// The pure helpers (statusOf, pickNextLesson, matchesFilters) are shared with Home and tested.
-import { CHAPTERS, LESSONS, lessonNumber, sectionsOf, modulesOf } from '../content/index.js';
+// app2/app/learn-page.js — Learn (screenplay 3.0 "Learn"; 3.5; M89): page tabs for the six
+// chapters, the chapter as a table (a row per module with its number, title, minutes, status and
+// tier marks, the open module's lessons under it, the next lesson selected), and beside it the
+// page the selected module builds. A Pro chapter on a free account shows the paywall panel in
+// place of its lessons. The case's name stays off the page. The pure helpers (statusOf,
+// pickNextLesson, moduleStatus, pathModel, chapterModel) are shared with Home and tested.
+import { CHAPTERS, LESSONS, modulesOf } from '../content/index.js';
 import { store } from './store.js';
 import { prefs } from './prefs.js';
-import { ring } from '../ui/ring.js';
 import { entitlement } from './entitlement.js';
+import { COURSE } from './progress-model.js';
+import { moduleNumber, FINAL_MODULE, isFinalItem } from './numbering.js';
+import { siteCopy, moduleCopy } from '../content/copy/apply.js';
+import { esc, fill, fmtMinutes } from '../ui/components/format.js';
+import { panelHtml, tableHtml, tabsHtml, wireTabs, buttonHtml, wireRows } from '../ui/components/table.js';
+import { tierMarksHtml } from '../ui/components/marks.js';
+import { sheetPreviewHtml, previewOfLesson } from '../ui/components/sheet-preview.js';
 
-const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const t = (key, vars) => fill(siteCopy(key, key), vars);
 
 /** The six chapters of SITE_SPEC §7. Chapter 1 is content/index.js; the rest are planned. */
 export const CHAPTER_PLAN = [
@@ -43,10 +51,10 @@ export function statusOf(id, all, skipped) {
   return 'todo';
 }
 
-/** The first lesson in catalog order that is neither completed nor skipped; null when none is left. Pure. */
 /** The lessons this account can open: a paid lesson is out until the account holds the tier (the lock page, otherwise). */
 export const openLessons = lessons => lessons.filter(l => !entitlement.locked(l));
 
+/** The first lesson in catalog order that is neither completed nor skipped; null when none is left. Pure. */
 export function pickNextLesson(lessons, all, skipped) {
   for (const l of lessons) { const s = statusOf(l.id, all, skipped); if (s !== 'done' && s !== 'mastered' && s !== 'skipped') return l; }
   return null;
@@ -113,149 +121,155 @@ export function groupBySection(lessons) {
   return out;
 }
 
-export function mountLearnPage(root) {
-  const el = document.createElement('div');
-  el.className = 'plist';
-  const filters = { q: '', status: 'all', difficulty: 'all', access: 'all' };
-  let focusId = null;   // the lesson row that carries the keyboard focus
-  let view = 'path';    // 'path' | 'list' — the module path or the flat table (C2 gap 9)
+/** The minutes a lesson takes: its own figure, else its time limit, else nothing. */
+export const lessonMinutes = l => (Number.isFinite(l && l.minutes) ? l.minutes : Number.isFinite(l && l.timeLimit) ? Math.max(1, Math.round(l.timeLimit / 60)) : 0);
+/** A challenge's name where the row already says it is one: 'Challenge: find and mark' → 'Find and mark'. */
+export const plainTitle = s => { const x = String(s || '').replace(/^Challenge:\s*/i, ''); return x.charAt(0).toUpperCase() + x.slice(1); };
 
-  function counts() {
-    const all = store.all(); const skipped = prefs.get().skipped;
-    let done = 0; for (const l of LESSONS) { const s = statusOf(l.id, all, skipped); if (s === 'done' || s === 'mastered') done++; }
-    return { done, total: LESSONS.length, skipped: LESSONS.filter(l => statusOf(l.id, all, skipped) === 'skipped').length };
-  }
-
-  function render() {
-    const all = store.all(); const skipped = prefs.get().skipped;
-    const next = pickNextLesson(openLessons(LESSONS), all, skipped);
-    const c = counts();
-    let html = `<div class="plist-head"><h1>Learn</h1>
-      <p class="plist-sub">Six chapters, from the first cell to a full model. Chapter 1 is free. Your progress is ${esc(store.saveLine())}.</p>
-      <p class="plist-stat"><b>${c.done}</b> of <b>${c.total}</b> lessons done${c.skipped ? ` · <b>${c.skipped}</b> skipped` : ''}${next ? ` · next up: <a href="#/lesson/${esc(next.id)}">${esc(next.title)}</a>` : ' · Chapter 1 complete'}</p></div>`;
-    html += `<div class="cat-tools" role="search">
-      <label class="cat-search"><span class="vis-hidden">Search lessons</span><input id="catSearch" type="search" placeholder="Search lessons  ( / )" autocomplete="off" value="${esc(filters.q)}"></label>
-      <label class="cat-filter">Status <select id="fStatus">${['all', 'todo', 'started', 'done', 'mastered', 'skipped'].map(v => `<option value="${v}"${filters.status === v ? ' selected' : ''}>${v === 'all' ? 'All' : STATUS_LABEL[v][0]}</option>`).join('')}</select></label>
-      <label class="cat-filter">Difficulty <select id="fDiff">${['all', 'easy', 'medium', 'hard'].map(v => `<option value="${v}"${filters.difficulty === v ? ' selected' : ''}>${v === 'all' ? 'All' : v[0].toUpperCase() + v.slice(1)}</option>`).join('')}</select></label>
-      <label class="cat-filter">Access <select id="fAccess">${['all', 'free', 'paid', 'sample'].map(v => `<option value="${v}"${filters.access === v ? ' selected' : ''}>${v === 'all' ? 'All' : ACCESS_LABEL[v]}</option>`).join('')}</select></label>
-      <span class="cat-keys"><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>Enter</kbd> open</span>
-    </div>`;
-    let shown = 0;
-    // Chapter 2 unlocks when Chapter 1 is complete (every lesson done) or tested out (SITE_SPEC §7);
-    // paid access itself arrives in Phase E — this is the catalog state only.
-    const ch1 = CHAPTERS.find(x => x.id === 'foundations');
-    const gate = store.chapter('foundations');
-    const ch1Cleared = !!gate.testout || (ch1 && ch1.lessons.every(l => { const p = all[l.id]; return p && p.completed; }));
-    for (const plan of CHAPTER_PLAN) {
-      const ch = CHAPTERS.find(x => x.id === plan.id);
-      // a chapter not built yet, or a built paid chapter this account cannot open (Chapter 2 on): the locked card, its lessons behind the paid line
-      if (!ch || (ch.access === 'paid' && !entitlement.entitled())) {
-        const built = !!ch;
-        const unlock = plan.n === 2 ? `<p class="chapter-unlock">${ch1Cleared ? 'Unlocked — Chapter 1 is behind you. Its lessons ' + (built ? 'open' : 'arrive') + ' with the paid tier.' : 'Unlocks when Chapter 1 is complete or tested out' + (built ? ', with the paid tier.' : '.')} ${built ? '<a href="#/pricing">See pricing →</a>' : ''}</p>` : '';
-        const count = built ? `<p class="chapter-count">${ch.lessons.length} lessons in, the first two modules — ${ch.lessons.filter(l => l.kind === 'challenge').length} timed challenges.</p>` : '';
-        html += `<section class="chapter chapter-locked"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(ch ? ch.title : plan.title)}</h2><span class="access ${plan.n === 2 && ch1Cleared ? 'access-free">Unlocked · ' + (built ? 'paid' : 'coming') : 'access-paid">Paid' + (built ? '' : ' · coming')}</span></div><p class="chapter-blurb">${esc(ch ? ch.blurb : plan.line)}</p>${count}${unlock}</section>`;
-        continue;
-      }
-      const testout = plan.id === 'foundations' ? (gate.testout ? '<span class="chapter-testout tested">Verified</span>' : '<a class="chapter-testout" href="#/lesson/foundations-testout">Already know this? Take the assessment.</a>') : '';
-      html += `<section class="chapter"><div class="chapter-row"><h2><span class="chapter-n">Chapter ${plan.n}</span> ${esc(ch.title)}</h2><span class="access ${ch.access === 'paid' ? 'access-paid">Paid · yours' : 'access-free">Free'}</span>${testout}</div><p class="chapter-blurb">${esc(ch.blurb)}</p>`;
-      const filtering = !!(filters.q || (filters.status && filters.status !== 'all') || (filters.difficulty && filters.difficulty !== 'all') || (filters.access && filters.access !== 'all'));
-      // The module path (C2 gap 9): modules as nodes with a ring, lesson dots and the challenge
-      // flag; the flat table stays behind the List toggle. Legacy lessons (no module) keep their
-      // sectioned table below the path until the rewrite replaces them.
-      const mods = pathModel(ch, all, skipped);
-      const pathOn = mods.length > 0 && view === 'path' && !filtering;
-      if (mods.length) {
-        html += `<div class="mp-toggle" role="tablist" aria-label="Catalog view">
-          <button type="button" class="mp-tbtn${view === 'path' ? ' on' : ''}" data-view="path">Path</button>
-          <button type="button" class="mp-tbtn${view === 'list' ? ' on' : ''}" data-view="list">List</button></div>`;
-      }
-      if (pathOn) {
-        html += `<div class="mpath">${mods.map(m => `
-          <div class="mp-module mp-${esc(m.status)}">
-            <div class="mp-node"><span class="mp-ring">${ring(m.done, m.total, { size: 26 })}</span><span class="mp-title">${esc(m.title)}</span></div>
-            <div class="mp-items">${m.items.map(it => it.kind === 'challenge'
-              ? `<a class="mp-flag st-${esc(it.st)}${it.next ? ' mp-next' : ''}${it.tier ? ' tier-' + esc(it.tier) : ''}" href="#/lesson/${esc(it.id)}" title="${esc(it.title)}${it.tier ? ' · ' + esc(it.tier) : ''}">⚑</a>`
-              : `<a class="mp-dot st-${esc(it.st)}${it.next ? ' mp-next' : ''}" href="#/lesson/${esc(it.id)}" title="${esc(it.title)}"></a>`).join('<span class="mp-link"></span>')}</div>
-          </div>`).join('<span class="mp-conn" aria-hidden="true"></span>')}</div>`;
-      }
-      for (const sec of (typeof sectionsOf === 'function' ? sectionsOf(ch) : groupBySection(ch.lessons))) {
-        const inModule = l => typeof l.module === 'string';
-        const rows = sec.lessons.filter(l => (!pathOn || !inModule(l)) && matchesFilters(l, statusOf(l.id, all, skipped), filters));
-        if (pathOn && sec.lessons.length && sec.lessons.every(inModule)) continue;   // the path already shows this section's module
-        if (!rows.length) {
-          // A section with nothing built yet still shows (SITE_SPEC §7: the chapter's shape is visible), unless the learner is filtering.
-          if (!sec.lessons.length && !filtering) html += `<h3 class="section-h section-upcoming">${esc(sec.name)} <span class="upcoming">Upcoming</span></h3><p class="section-blurb">${esc(sec.blurb || '')}</p>`;
-          continue;
-        }
-        shown += rows.length;
-        html += `<h3 class="section-h">${esc(sec.name)}</h3>
-          <table class="ptable"><thead><tr><th class="c-num">#</th><th class="c-status">Status</th><th class="c-title">Title</th><th class="c-diff">Difficulty</th><th class="c-tags">Tags</th><th class="c-access">Access</th></tr></thead><tbody>`;
-        for (const l of rows) {
-          const st = statusOf(l.id, all, skipped); const [label, cls] = STATUS_LABEL[st];
-          const p = all[l.id]; const isNext = next && next.id === l.id;
-          html += `<tr class="prow${isNext ? ' next-up' : ''}" data-id="${esc(l.id)}" tabindex="-1" aria-label="${esc(l.title)}">
-            <td class="c-num">${lessonNumber(l.id)}</td>
-            <td class="c-status"><span class="st ${cls}" title="${p && p.best != null ? 'best ' + p.best + ' s' : ''}">${label}</span></td>
-            <td class="c-title"><a href="#/lesson/${esc(l.id)}" tabindex="-1">${esc(l.title)}</a>${isNext ? '<span class="next-badge">Next up</span>' : ''}</td>
-            <td class="c-diff"><span class="diff diff-${esc(l.difficulty)}">${esc(l.difficulty)}</span></td>
-            <td class="c-tags">${(l.tags || []).map(t => `<span class="tag">${esc(t)}</span>`).join(' ')}</td>
-            <td class="c-access"><span class="access access-${esc(l.access || 'free')}">${ACCESS_LABEL[l.access] || 'Free'}</span></td></tr>`;
-        }
-        html += '</tbody></table>';
-      }
-      if (!shown) html += `<div class="cat-empty">No lessons match. <button class="btn btn-ghost" id="catClear" type="button">Clear filters</button></div>`;
-      html += '</section>';
-    }
-    el.innerHTML = html;
-    wire();
-  }
-
-  function rows() { return [...el.querySelectorAll('.prow')]; }
-  /** Move the visible focus to `row`. `remember` keeps it across re-renders (only when the learner chose it). */
-  function setFocus(row, viaKeyboard, remember = viaKeyboard) {
-    rows().forEach(r => { r.classList.remove('kb-focus'); r.tabIndex = -1; });
-    if (!row) return;
-    row.tabIndex = 0; row.classList.add('kb-focus');
-    if (remember) focusId = row.dataset.id;
-    if (viaKeyboard) { row.focus({ preventScroll: true }); row.scrollIntoView({ block: 'nearest' }); }
-  }
-  function wire() {
-    const search = el.querySelector('#catSearch');
-    search.oninput = () => { filters.q = search.value; const pos = search.selectionStart; render(); const s2 = el.querySelector('#catSearch'); s2.focus(); try { s2.setSelectionRange(pos, pos); } catch (e) { /* ignore */ } };
-    search.onkeydown = e => {
-      if (e.key === 'Escape') { e.preventDefault(); if (search.value) { search.value = ''; filters.q = ''; render(); el.querySelector('#catSearch').focus(); } else { const first = rows()[0]; if (first) setFocus(first, true); } }
-      if (e.key === 'ArrowDown' || e.key === 'Enter') { const first = el.querySelector('.prow.kb-focus') || rows()[0]; if (first) { e.preventDefault(); setFocus(first, true); } }
-    };
-    for (const [id, key] of [['fStatus', 'status'], ['fDiff', 'difficulty'], ['fAccess', 'access']]) {
-      const sel = el.querySelector('#' + id); sel.onchange = () => { filters[key] = sel.value; render(); el.querySelector('#' + id).focus(); };
-    }
-    const clear = el.querySelector('#catClear'); if (clear) clear.onclick = () => { Object.assign(filters, { q: '', status: 'all', difficulty: 'all', access: 'all' }); render(); el.querySelector('#catSearch').focus(); };
-    for (const b of el.querySelectorAll('.mp-tbtn')) b.onclick = () => { view = b.dataset.view; render(); };
-    const all = rows();
-    const keep = all.find(r => r.dataset.id === focusId) || el.querySelector('.prow.next-up') || all[0];
-    setFocus(keep, false, false);   // the pick is the page's, not the learner's: not remembered
-  }
-
-  function open(id) { location.hash = '#/lesson/' + id; }
-  el.addEventListener('click', e => { const row = e.target.closest('.prow'); if (row && !e.target.closest('a')) open(row.dataset.id); });
-  el.addEventListener('focusin', e => { const row = e.target.closest('.prow'); if (row) setFocus(row, false); });
-  el.addEventListener('keydown', e => {
-    const row = e.target.closest('.prow'); if (!row) return;
-    const all = rows(); const i = all.indexOf(row);
-    if (e.key === 'ArrowDown' || e.key === 'j') { e.preventDefault(); setFocus(all[Math.min(all.length - 1, i + 1)], true); }
-    else if (e.key === 'ArrowUp' || e.key === 'k') { e.preventDefault(); if (i === 0) el.querySelector('#catSearch').focus(); else setFocus(all[i - 1], true); }
-    else if (e.key === 'Home') { e.preventDefault(); setFocus(all[0], true); }
-    else if (e.key === 'End') { e.preventDefault(); setFocus(all[all.length - 1], true); }
-    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(row.dataset.id); }
+/**
+ * The chapter as the table shows it (3.0, Home and Learn; 3.5's status words): one row per module
+ * with its number, title, minutes, status, the challenge's tier and its lessons (the challenge
+ * last, then for module 1.8 the project, the assessment and the test-out), with the next open
+ * item marked. `gate` is the chapter's record ({ assessment, testout }). Pure.
+ */
+export function chapterModel(chapter, all = {}, skipped = [], gate = {}) {
+  const mods = modulesOf(chapter);
+  let nextMarked = false;
+  const mark = it => { if (!nextMarked && it.status !== 'done' && it.status !== 'skipped') { it.next = true; nextMarked = true; } return it; };
+  const lessonRow = (l, n) => mark({ id: l.id, n, title: l.kind === 'challenge' ? plainTitle(l.title) : l.title, kind: l.kind || 'lesson', minutes: lessonMinutes(l), status: lessonStatusWord(l, all, skipped) });
+  const rows = mods.map((m, k) => {
+    const num = moduleNumber(m.id, k + 1);
+    const lessons = m.lessons.map((l, i) => lessonRow(l, `${num}.${i + 1}`));
+    if (m.challenge) lessons.push(lessonRow(m.challenge, `${num}.C`));
+    const st = moduleStatus(m, all);
+    const ch = m.challenge ? all[m.challenge.id] : null;
+    const row = { id: m.id, n: num, title: m.title, minutes: lessons.reduce((s, l) => s + l.minutes, 0), status: st, tier: (ch && (ch.challenge || ch.completed) && ch.tier) || 'none', lessons };
+    const cur = lessons.find(l => l.next);
+    row.current = !!cur;
+    const main = lessons.filter(l => l.kind !== 'challenge');   // "Lesson n of m" counts the lessons, not the challenge, as Home does
+    row.statusText = statusWord(st, cur ? { n: Math.max(1, main.indexOf(cur) + 1), m: main.length } : null);
+    return row;
   });
-  const isTyping = t => !!t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
-  const onDocKey = e => {
-    if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (e.key === '/' && !isTyping(e.target)) { e.preventDefault(); const s = el.querySelector('#catSearch'); if (s) { s.focus(); s.select(); } }
-  };
-  document.addEventListener('keydown', onDocKey);
+  // module 1.8: the project, the assessment and the test-out, whether the catalog carries them as a module or a section
+  const verified = !!(gate && (gate.assessment || gate.testout));
+  const assess = chapter.lessons.find(l => l.kind === 'assessment');
+  const a = assess && all[assess.id];
+  const own = rows.find(r => r.id === FINAL_MODULE.id);
+  if (own) {
+    own.final = true;
+    if (verified) { own.status = 'complete'; own.statusText = t('status_verified'); own.tier = (a && a.tier) || own.tier; }
+  } else {
+    const finals = chapter.lessons.filter(l => isFinalItem(l));
+    if (finals.length) {
+      const main = finals.filter(l => l.kind !== 'testout');
+      const label = { project: 'P', assessment: 'A', testout: 'T' };
+      const lessons = finals.map(l => lessonRow(l, `${FINAL_MODULE.n}.${label[l.kind] || ''}`));
+      const doneN = main.filter(l => all[l.id] && all[l.id].completed).length;
+      const st = verified ? 'complete' : doneN || main.some(l => all[l.id] && all[l.id].started) ? 'started' : 'todo';
+      const copy = moduleCopy(FINAL_MODULE.id);
+      const cur = lessons.find(l => l.next && l.kind !== 'testout');
+      rows.push({ id: FINAL_MODULE.id, n: FINAL_MODULE.n, title: (copy && copy.name) || FINAL_MODULE.title, minutes: lessons.filter(l => l.kind !== 'testout').reduce((s, l) => s + l.minutes, 0), status: st, tier: (verified && a && a.tier) || 'none', lessons, current: !!cur, final: true,
+        statusText: verified ? t('status_verified') : statusWord(st, cur ? { n: main.findIndex(l => l.id === cur.id) + 1, m: main.length } : null) });
+    }
+  }
+  return rows;
+}
 
+function lessonStatusWord(l, all, skipped) {
+  const s = statusOf(l.id, all, skipped);
+  return s === 'done' || s === 'mastered' ? 'done' : s;
+}
+/** The status words of 3.5. */
+export function statusWord(status, cur) {
+  if (status === 'complete') return t('status_complete');
+  if (status === 'lessons-done') return t('status_lessons_done');
+  if (cur) return t('status_lesson_of', cur);   // the current module says where the learner is, started or not
+  if (status === 'started') return t('status_in_progress');
+  if (status === 'coming') return t('status_coming');
+  return t('status_not_started');
+}
+
+/** The chapters the page tabs offer: the six of the course, each with its built content when it has landed. */
+export function chapterTabs() {
+  return COURSE.chapters.map(c => {
+    const built = CHAPTERS.find(ch => ch.id === c.id) || CHAPTERS.find(ch => (CHAPTER_PLAN.find(p => p.id === ch.id) || {}).n === c.n) || null;
+    return { key: c.id, n: c.n, title: built ? built.title : c.title, built, access: c.n === 1 ? 'free' : 'paid' };
+  });
+}
+
+/** The page a module builds: its project's sheet when it has one, else its last lesson's; `delivered` shows the after state. */
+export function modulePreview(chapter, moduleId, delivered) {
+  const lessons = chapter.lessons.filter(l => l.module === moduleId && l.kind !== 'testout' && l.kind !== 'assessment');
+  const last = lessons.find(l => l.kind === 'project') || lessons[lessons.length - 1];
+  const first = lessons[0];
+  if (!last) return null;
+  return previewOfLesson(delivered ? last : first, delivered ? 'after' : 'before');
+}
+
+export function mountLearnPage(root, ctx = {}) {
+  const el = document.createElement('div');
+  el.className = 'pg pg-learn';
+  const tabs = chapterTabs();
+  const q = (ctx && ctx.query) || {};
+  let chapterKey = (tabs.find(x => x.key === q.ch) || tabs[0]).key;
+  let openModule = q.doc || null;
+  let unwire = null;
+
+  function render(focusTab) {
+    const tab = tabs.find(x => x.key === chapterKey);
+    const all = store.all(); const skipped = prefs.get().skipped;
+    const locked = tab.access === 'paid' && !entitlement.entitled();
+    const gate = store.chapter(tab.key);
+    const rows = tab.built ? chapterModel(tab.built, all, skipped, gate) : [];
+    if (!openModule || !rows.some(r => r.id === openModule)) openModule = (rows.find(r => r.current) || rows.find(r => r.status !== 'complete') || rows[0] || {}).id || null;
+    const open = rows.find(r => r.id === openModule) || null;
+    const columns = [{ key: 'n', label: '', cls: 'n' }, { key: 'title', label: t('col_module') }, { key: 'minutes', label: t('col_minutes'), align: 'right', cls: 'min' }, { key: 'status', label: t('col_status'), cls: 'status' }, { key: 'tier', label: '', align: 'right', cls: 'tier' }];
+    const trs = [];
+    for (const r of rows) {
+      trs.push({ cells: { n: esc(r.n), title: esc(r.title), minutes: fmtMinutes(r.minutes), status: esc(r.statusText), tier: tierMarksHtml(r.tier) }, cls: `row-module${r.id === openModule ? ' open' : ''}${r.current ? ' current' : ''}`, attrs: { 'data-module': r.id }, cursor: !locked });
+      if (r.id === openModule && !locked) for (const l of r.lessons) {
+        trs.push({ cells: { n: esc(l.n), title: esc(l.title), minutes: fmtMinutes(l.minutes), status: l.status === 'done' ? t('status_done') : l.status === 'started' ? t('status_in_progress') : l.status === 'skipped' ? t('status_skipped') : l.next ? t('status_lesson_of', { n: Math.max(1, r.lessons.filter(x => x.kind !== 'challenge').indexOf(l) + 1), m: r.lessons.filter(x => x.kind !== 'challenge').length }) : '', tier: '' }, cls: `row-lesson${l.next ? ' next' : ''}`, href: '#/lesson/' + l.id, attrs: { 'data-lesson': l.id } });
+      }
+    }
+    const heading = t('chapter_heading', { n: tab.n, name: tab.title });
+    const doneN = rows.filter(r => r.status === 'complete').length;
+    let facts = rows.length ? esc(t('chapter_modules_done', { d: doneN, m: rows.length })) : esc(t('status_coming'));
+    if (tab.n === 1 && tab.built) {
+      const to = tab.built.lessons.find(l => l.kind === 'testout');
+      if (to) facts = (gate.testout || gate.assessment ? esc(t('learn_verified')) : `<a href="#/lesson/${esc(to.id)}">${esc(t('learn_testout'))}</a>`) + ' ' + facts;
+    }
+    const table = rows.length ? tableHtml({ columns, rows: trs, cls: 'tbl-chapter', label: heading }) : `<p class="panel-line">${esc(t('learn_coming', { n: tab.n }))}</p>`;
+    const paywall = locked && tab.built ? panelHtml({ heading: esc(t('learn_pro_chapter', { n: tab.n })), body: `<p class="panel-line">${esc(siteCopy('paywall_line', 'Go Pro for the rest of the content.'))}</p><div class="btn-row">${buttonHtml({ label: t('paywall_go_pro'), key: 'Enter', href: '#/pricing', primary: true, id: 'learnGoPro' })}${buttonHtml({ label: t('paywall_not_now'), key: 'Esc', quiet: true, id: 'learnNotNow' })}</div>`, cls: 'paywall', mode: 'learn', attrs: { 'data-cursor': true, 'data-cursor-enter': '#learnGoPro', tabindex: '-1' } }) : '';
+    let side = '';
+    if (open && tab.built && !locked) {
+      const delivered = open.status === 'complete';
+      const sheet = modulePreview(tab.built, open.id, delivered);
+      const copy = moduleCopy(open.id);
+      const pageName = (copy && copy.page_name) || open.title;
+      side = panelHtml({ heading: esc(pageName), facts: delivered ? '' : '', body: `${sheet ? sheetPreviewHtml(sheet, { rows: 16, cols: 7, title: pageName }) : ''}<p class="panel-line">${esc(delivered ? t('learn_page_built', { page: pageName }) : t('learn_page_fill'))}</p>${delivered && open.lessons.some(l => l.kind === 'challenge') ? `<a class="panel-link" href="#/lesson/${esc(open.lessons.find(l => l.kind === 'challenge').id)}?seed=new">${esc(t('learn_replay'))}</a>` : ''}`, cls: 'learn-side', stretch: true });
+    } else if (locked && tab.built) side = paywall;
+    el.innerHTML = `${tabsHtml(tabs.map(x => ({ key: x.key, label: t('learn_tab', { n: x.n }), on: x.key === chapterKey })), t('rail_learn'))}
+      <div class="pg-two"><div class="pg-main">${panelHtml({ heading: esc(heading), facts, body: table, cls: 'learn-table', stretch: true })}</div><div class="pg-side">${side}</div></div>`;
+    wireTabs(el, (key, viaKeys) => { chapterKey = key; openModule = null; render(viaKeys); });
+    if (unwire) unwire();
+    unwire = wireRows(el);
+    el.querySelectorAll('.row-module').forEach(r => { r.addEventListener('click', () => { openModule = r.dataset.module; render(); selectNext(); }); });
+    const notNow = el.querySelector('#learnNotNow'); if (notNow) notNow.onclick = () => { chapterKey = tabs[0].key; openModule = null; render(); };
+    if (focusTab) { const on = el.querySelector('.tab.on'); if (on) on.focus(); }
+    if (ctx.keytips) ctx.keytips.register(tabs.map(x => ({ id: x.key, label: t('learn_tab', { n: x.n }), el: el.querySelector(`.tab[data-tab="${x.key}"]`) })));
+    if (ctx.cursor) ctx.cursor.refresh();
+  }
+  function selectNext() {
+    const c = ctx.cursor; if (!c) return;
+    const target = el.querySelector('.row-lesson.next') || el.querySelector('.row-module.open') || el.querySelector('[data-cursor]');
+    if (target) c.select(target, { focus: false });
+  }
+  const onKey = e => {
+    if (e.key === 'Escape' && !e.defaultPrevented) { const nn = el.querySelector('#learnNotNow'); if (nn) { e.preventDefault(); nn.click(); } }
+  };
+  document.addEventListener('keydown', onKey);
   render();
   root.appendChild(el);
-  return { destroy() { document.removeEventListener('keydown', onDocKey); el.remove(); } };
+  setTimeout(selectNext, 0);
+  return { destroy() { document.removeEventListener('keydown', onKey); if (unwire) unwire(); el.remove(); } };
 }

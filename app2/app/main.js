@@ -107,7 +107,7 @@ export const HOME_TITLE = 'hotkey.gg: the better way to master Excel';
 /** The document title for a route. */
 export function titleFor(name, extra) {
   const T = { root: HOME_TITLE, landing: HOME_TITLE, home: 'Home · hotkey.gg', start: 'Get started · hotkey.gg', learn: 'Learn · hotkey.gg',
-    lesson: (extra ? extra + ' · ' : '') + 'hotkey.gg', locked: (extra ? extra + ' · ' : '') + 'Paid tier · hotkey.gg', practice: 'Practice · hotkey.gg', drill: (extra ? extra + ' · ' : '') + 'Practice · hotkey.gg', leaderboard: 'Leaderboard · hotkey.gg',
+    lesson: (extra ? extra + ' · ' : '') + 'hotkey.gg', locked: (extra ? extra + ' · ' : '') + 'Paid tier · hotkey.gg', practice: 'Practice · hotkey.gg', drill: (extra ? extra + ' · ' : '') + 'Practice · hotkey.gg', leaderboard: 'Leaderboards · hotkey.gg',
     reference: 'Reference · hotkey.gg', pricing: 'Pricing · hotkey.gg', teams: 'Teams · hotkey.gg', account: 'Account · hotkey.gg', about: 'About · hotkey.gg',
     terms: 'Terms · hotkey.gg', privacy: 'Privacy · hotkey.gg', eula: 'EULA · hotkey.gg', contact: 'Contact · hotkey.gg', notfound: 'Page not found · hotkey.gg',
     due: 'Due today · hotkey.gg', storyboard: 'Storyboard · hotkey.gg' };
@@ -141,9 +141,9 @@ const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&a
 const LOADERS = {
   // `next`: the experience-pass screens behind the ?flow=next flag (app/flow.js); on go they replace the live ones
   landing: { file: './landing-page.js', pick: m => m.mountLandingPage, next: { file: './landing-next.js', pick: m => m.mountLandingPage } },
-  home: { file: './home-page.js', pick: m => m.mountHomePage, next: { file: './home-next.js', pick: m => m.mountHomePage } },
+  home: { file: './home-page.js', pick: m => m.mountHomePage },   // 3.0's Home (M89); home-next.js keeps only the due route
   start: { file: './first-run.js', pick: m => m.mountFirstRun, next: { file: './first-run-next.js', pick: m => m.mountFirstRun } },
-  learn: { file: './learn-page.js', pick: m => m.mountLearnPage, next: { file: './learn-next.js', pick: m => m.mountLearnPage } },
+  learn: { file: './learn-page.js', pick: m => m.mountLearnPage },   // 3.0's Learn (M89)
   due: { file: './home-next.js', pick: m => m.mountDuePage },
   storyboard: { file: './storyboard.js', pick: m => m.mountStoryboard },
   lesson: { file: './lesson-view.js', pick: m => m.mountLessonView },

@@ -1,84 +1,150 @@
-// app2/app/home-page.js — Home for a returning learner (SITE_SPEC §2): the Continue card first
-// (the next lesson not completed or skipped), chapter progress, the Daily (honest: it arrives with
-// timed play), and a link to the catalog.
-import { CHAPTERS, LESSONS, lessonNumber, chapterOf } from '../content/index.js';
+// app2/app/home-page.js — Home (screenplay 3.0 "Home"; 3.4; M89). Two columns, 1fr and 336px,
+// ending on the same line. Left: the next lesson, selected when the page opens, with Resume (or
+// Start) on Enter, one row of facts, a preview of the sheet the lesson opens on, and the chapter
+// as a table. Right: Level, Today and Achievements. No deal strip, no case name: the case lives
+// inside the lessons. Every line is a site.csv row; the pure parts (nextLessonModel, todayModel,
+// achievementsModel) are tested.
+import { CHAPTERS, LESSONS, moduleOf, chapterOf } from '../content/index.js';
 import { store } from './store.js';
 import { prefs } from './prefs.js';
-import { CHAPTER_PLAN, pickNextLesson, openLessons, statusOf } from './learn-page.js';
+import { pickNextLesson, openLessons, chapterModel, lessonMinutes, moduleStatus } from './learn-page.js';
+import { modulesOf } from '../content/index.js';
 import { DRILLS } from '../content/drills.js';
 import { dailyFor } from './daily.js';
 import { dayOf } from './records.js';
 import { gameCtx } from './stats.js';
-import { bestTier } from './practice-page.js';
+import { schedule, dueToday } from './schedule.js';
+import { rewardAt, MAX_LEVEL } from '../content/levels.js';
+import { evaluateAchievements } from '../ui/badges.js';
+import { GLYPHS, renderPixel, RARITY_COLOURS } from '../ui/pixel.js';
+import { weekCells, weekLetters } from '../ui/components/rail.js';
+import { siteCopy } from '../content/copy/apply.js';
+import { xpForEvent } from './xp.js';
+import { esc, fill, fmtMinutes, fmtClock } from '../ui/components/format.js';
+import { panelHtml, tableHtml, buttonHtml, wireRows } from '../ui/components/table.js';
+import { tierMarksHtml, segmentsHtml, barHtml, modeMarkHtml } from '../ui/components/marks.js';
+import { sheetPreviewHtml, previewOfLesson } from '../ui/components/sheet-preview.js';
+import { entitlement } from './entitlement.js';
 
-const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const t = (key, vars) => fill(siteCopy(key, key), vars);
+/** Retired lessons never come up as next. */
+export const RETIRED = new Set(['welcome-export', 'welcome-race']);
+export const liveLessons = () => LESSONS.filter(l => !RETIRED.has(l.id) && l.module !== 'welcome' && l.kind !== 'testout');
 
-export function mountHomePage(root) {
+/** The modules of Chapter 1 with what each teaches, for the refresher queue. */
+export function moduleCtx(all) {
+  const ch = CHAPTERS.find(c => c.id === 'foundations'); if (!ch) return { modules: [] };
+  return { modules: modulesOf(ch).map(m => ({ id: m.id, title: m.title, challengeId: m.challenge ? m.challenge.id : null, challengeSecs: m.challenge && m.challenge.pars ? m.challenge.pars.pass : null, complete: moduleStatus(m, all) === 'complete', teaches: [...new Set(m.lessons.flatMap(l => l.teaches || []))] })) };
+}
+
+/**
+ * The next-lesson block (3.0, Home; the defaults): the next open lesson with its module, place,
+ * goals and minutes; once the chapter's lessons are done, the assessment; once that is Verified,
+ * a free account sees the next chapter's first lesson with the paywall line. Pure over the data.
+ *   → { kind: 'lesson' | 'assessment' | 'pro' | 'none', lesson, started, module, n, of, goals, minutes, chapter }
+ */
+export function nextLessonModel(lessons, all, skipped, { locked = () => false } = {}) {
+  const open = lessons.filter(l => !locked(l));
+  const next = pickNextLesson(open, all, skipped);
+  if (next) {
+    const at = moduleOf(next);
+    const p = all[next.id];
+    return { kind: next.kind === 'assessment' ? 'assessment' : 'lesson', lesson: next, started: !!(p && p.started), module: at ? at.module.title : (next.section || ''), n: at ? at.n : 0, of: at ? at.of : 0,
+      goals: Array.isArray(next.goals) ? next.goals.length : 0, minutes: lessonMinutes(next), chapter: chapterOf(next) || null };
+  }
+  const first = lessons.find(l => locked(l));
+  if (first) return { kind: 'pro', lesson: first, started: false, module: first.section || '', n: 1, of: 0, goals: Array.isArray(first.goals) ? first.goals.length : 0, minutes: lessonMinutes(first), chapter: chapterOf(first) || null };
+  return { kind: 'none', lesson: null, chapter: CHAPTERS[0] || null };
+}
+
+/**
+ * Today's rows (3.0, Home; the defaults): the refreshers due as one row, the Daily as one row.
+ * The day's quests and the week's quests are R7's (6.6) and join these rows then. Pure.
+ *   → { rows: [{ id, mode, title, length, xp, done, href, line }], done, of, fresh }
+ */
+export function todayModel({ queue = { items: [], secs: 0 }, daily = { played: false }, dailyTitle = '', completedLessons = 0, dailyXp = 30 } = {}) {
+  const rows = [];
+  const refreshers = queue.items.filter(i => i.kind === 'micro');
+  if (refreshers.length) rows.push({ id: 'refreshers', mode: 'drills', title: t('home_refreshers', { n: refreshers.length }), length: t('home_seconds', { n: queue.secs }), xp: 0, done: false, href: '#/due/' + refreshers[0].id });
+  const keep = queue.items.find(i => i.kind === 'challenge');
+  if (keep) rows.push({ id: 'keep', mode: 'challenges', title: keep.title, length: t('home_seconds', { n: keep.secs }), xp: 0, done: false, href: '#/lesson/' + keep.id });
+  const dailyLine = daily.played && daily.clean ? (daily.place ? t('home_daily_played', { t: fmtClock(daily.secs, true), place: daily.place, n: daily.of }) : t('home_daily_played_local', { t: fmtClock(daily.secs, true) })) : daily.played ? t('home_daily_help') : '';
+  rows.push({ id: 'daily', mode: 'daily', title: t('home_daily_row'), length: daily.played ? '' : t('home_daily_len'), xp: daily.played ? 0 : dailyXp, done: !!daily.played, href: '#/daily', line: dailyLine, sub: dailyTitle });
+  const done = rows.filter(r => r.done).length;
+  return { rows, done, of: rows.length, fresh: completedLessons === 0 };
+}
+
+/** The latest badges and the next one to earn: the one closest to done among the unearned, visible ones. Pure. */
+export function achievementsModel(states, { latest = 10 } = {}) {
+  const earned = states.filter(s => s.done);
+  const shown = earned.slice(-latest);
+  const open = states.filter(s => !s.done && !s.def.hidden).sort((a, b) => (b.prog / b.goal) - (a.prog / a.goal) || states.indexOf(a) - states.indexOf(b));
+  return { shown, earned: earned.length, of: states.length, next: open[0] || null };
+}
+
+const badgeTile = s => `<span class="badge-tile${s.done ? ' on' : ''}" title="${esc(s.def.name)}">${renderPixel(GLYPHS[s.def.glyph] || GLYPHS.star, { b: RARITY_COLOURS[s.def.rarity] || RARITY_COLOURS.common }, { size: 28 })}</span>`;
+
+export function mountHomePage(root, ctx = {}) {
   const el = document.createElement('div');
-  el.className = 'home';
-  const all = store.all(); const p = prefs.get(); const skipped = p.skipped;
-  const ctx = gameCtx();
-  const pbCount = Object.keys(ctx.pbs).length;
-  const legendaries = DRILLS.filter(d => bestTier(store.attempts({ ref: d.id })) === 'legendary').length;
-  const next = pickNextLesson(openLessons(LESSONS), all, skipped);
-  const ch1 = CHAPTERS.find(c => c.id === 'foundations') || { lessons: [] };
-  const done = ch1.lessons.filter(l => ['done', 'mastered'].includes(statusOf(l.id, all, skipped))).length;
-  const skippedN = ch1.lessons.filter(l => statusOf(l.id, all, skipped) === 'skipped').length;
-  const started = next && all[next.id] && all[next.id].started;
-  const pct = ch1.lessons.length ? Math.round(100 * done / ch1.lessons.length) : 0;
+  el.className = 'pg pg-home';
+  const all = store.all(); const skipped = prefs.get().skipped;
+  const game = gameCtx();
+  const day = dayOf();
+  const next = nextLessonModel(liveLessons(), all, skipped, { locked: l => entitlement.locked(l) });
+  const chapter = next.chapter || CHAPTERS[0];
+  const gate = store.chapter(chapter.id);
+  const rows = chapterModel(chapter, all, skipped, gate);
+  const completedN = Object.values(all).filter(p => p && p.completed).length;
 
-  const continueCard = next
-    ? `<section class="home-continue">
-        <div class="hc-cap">${started ? 'continue' : done || skippedN ? 'next up' : 'start here'}</div>
-        <div class="hc-body">
-          <div class="hc-crumb">${esc(chapterOf(next).title)} · lesson ${lessonNumber(next.id)}</div>
-          <h1>${esc(next.title)}</h1>
-          <p>${esc(next.read || '').replace(/`([^`]+)`/g, '<kbd>$1</kbd>')}</p>
-          <div class="hc-actions"><a class="btn btn-primary" id="homeContinue" href="#/lesson/${esc(next.id)}">${started ? 'Continue' : 'Start'} <kbd>Enter</kbd></a><a class="btn btn-ghost" href="#/learn">All lessons</a></div>
-        </div>
-      </section>`
-    : `<section class="home-continue">
-        <div class="hc-cap">chapter 1 complete</div>
-        <div class="hc-body"><h1>Foundations: done.</h1><p>Every lesson in Chapter 1 is complete. Repeat any lesson solo or against the clock from Practice, or open the catalog.</p>
-          <div class="hc-actions"><a class="btn btn-primary" id="homeContinue" href="#/practice">Practice <kbd>Enter</kbd></a><a class="btn btn-ghost" href="#/learn">Catalog</a></div></div>
-      </section>`;
+  // ---- left: the next lesson, the preview, the chapter table
+  let heading, button, facts = '', sheet = null, line = '';
+  if (next.kind === 'none') { heading = t('home_all_done', { n: chapter === CHAPTERS[0] ? 1 : 2 }); button = buttonHtml({ label: t('rail_practice'), key: 'Enter', href: '#/practice', primary: true, id: 'homeResume' }); }
+  else {
+    const l = next.lesson;
+    if (next.kind === 'assessment') { heading = t('home_next_assessment', { n: 1 }); button = buttonHtml({ label: t('home_start_assessment'), key: 'Enter', href: '#/lesson/' + l.id, primary: true, id: 'homeResume' }); }
+    else if (next.kind === 'pro') { heading = t('home_next_lesson', { title: l.title }); line = siteCopy('paywall_line', 'Go Pro for the rest of the content.'); button = buttonHtml({ label: t('paywall_go_pro'), key: 'Enter', href: '#/pricing', primary: true, id: 'homeResume' }); }
+    else { heading = t('home_next_lesson', { title: l.title }); button = buttonHtml({ label: next.started ? t('home_resume') : t('home_start'), key: 'Enter', href: '#/lesson/' + l.id, primary: true, id: 'homeResume' }); }
+    facts = `<span>${esc(next.module)}</span>${next.of ? `<span>${esc(t('home_lesson_of', { n: next.n, m: next.of }))}</span>` : ''}${next.goals ? `<span class="fact-segs">${segmentsHtml(0, next.goals, true)}<span>${esc(t('home_goal_of', { n: 1, m: next.goals }))}</span></span>` : ''}${next.minutes ? `<span>${esc(t('home_minutes_left', { n: next.minutes }))}</span>` : ''}`;
+    sheet = previewOfLesson(l, 'before');
+  }
+  const nextPanel = `<section class="panel panel-mode panel-next" data-cursor data-cursor-enter="#homeResume" tabindex="-1" aria-label="${esc(heading)}">
+      <div class="panel-head"><h1 class="panel-h panel-h-page">${esc(heading)}</h1>${button}</div>
+      ${line ? `<p class="panel-line">${esc(line)}</p>` : ''}${facts ? `<div class="facts">${facts}</div>` : ''}
+      ${sheet ? sheetPreviewHtml(sheet, { rows: 16, cols: 9 }) : ''}
+    </section>`;
+  const chapterN = (CHAPTERS.indexOf(chapter) >= 0 ? CHAPTERS.indexOf(chapter) : 0) + 1;
+  const columns = [{ key: 'n', label: '', cls: 'n' }, { key: 'title', label: t('col_module') }, { key: 'minutes', label: t('col_minutes'), align: 'right', cls: 'min' }, { key: 'status', label: t('col_status'), cls: 'status' }, { key: 'tier', label: '', align: 'right', cls: 'tier' }];
+  const trs = rows.map(r => ({ cells: { n: esc(r.n), title: esc(r.title), minutes: fmtMinutes(r.minutes), status: esc(r.statusText), tier: tierMarksHtml(r.tier) }, cls: `row-module${r.current ? ' current' : ''}`, href: '#/learn?ch=' + chapter.id + '&doc=' + r.id }));
+  const chapterPanel = panelHtml({ heading: esc(t('chapter_heading', { n: chapterN, name: chapter.title })), facts: esc(t('chapter_modules_done', { d: rows.filter(r => r.status === 'complete').length, m: rows.length })), body: tableHtml({ columns, rows: trs, cls: 'tbl-chapter' }), cls: 'home-chapter', stretch: true });
 
-  const chapters = CHAPTER_PLAN.map(pl => {
-    if (pl.id === 'foundations') {
-      return `<div class="home-ch"><div class="home-ch-row"><b>Chapter ${pl.n} · ${esc(pl.title)}</b><span class="home-ch-n">${done}/${ch1.lessons.length}${skippedN ? ` · ${skippedN} skipped` : ''}</span></div>
-        <div class="cl-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${ch1.lessons.length}" aria-valuenow="${done}" aria-label="Chapter 1 progress"><div class="cl-bar-fill" style="width:${pct}%"></div></div>
-        <div class="home-ch-line">${esc(pl.line)}</div></div>`;
-    }
-    return `<div class="home-ch locked"><div class="home-ch-row"><b>Chapter ${pl.n} · ${esc(pl.title)}</b><span class="home-ch-n access access-paid">Paid · coming</span></div><div class="home-ch-line">${esc(pl.line)}</div></div>`;
-  }).join('');
+  // ---- right: Level, Today, Achievements
+  const lv = game.levelInfo;
+  const reward = lv.lvl < MAX_LEVEL ? rewardAt(lv.lvl + 1) : null;
+  const levelPanel = panelHtml({ heading: esc(t('home_level', { n: lv.lvl })), facts: esc(t('home_xp', { n: lv.into, next: lv.need })), body: `${barHtml(lv.pct, 'bar-level')}<div class="level-next"><span class="level-tile" aria-hidden="true">${lv.lvl < MAX_LEVEL ? lv.lvl + 1 : lv.lvl}</span><span>${esc(reward ? t('home_next_reward', { n: lv.lvl + 1, reward: reward.label }) : t('home_top_level'))}</span></div>`, cls: 'home-level' });
 
-  el.innerHTML = `${continueCard}
-    <div class="home-grid">
-      <section class="home-card">
-        <div class="hc-cap">chapters</div>
-        <div class="home-chs">${chapters}</div>
-        <div class="home-foot"><a href="#/learn">Open the catalog →</a></div>
-      </section>
-      <div class="home-col">
-        <section class="home-card">
-          <div class="hc-cap">the daily</div>
-          <div class="hc-body"><h2>One drill a day, same for everyone.</h2><p>Today: <b>${esc((DRILLS.find(d => d.id === dailyFor(dayOf()).drillId) || {}).title || '—')}</b>${ctx.streakDays > 1 ? ` · ${ctx.streakDays}-day streak` : ''}. Free for everyone; the streak never takes anything away.</p><a class="btn btn-ghost" href="#/daily">Play the Daily</a></div>
-        </section>
-        ${ctx.attempts.length ? `<section class="home-card">
-          <div class="hc-cap">your game</div>
-          <div class="hc-body"><p><b>Level ${ctx.level}</b> · ${ctx.levelInfo.into}/${ctx.levelInfo.need} XP${pbCount ? ` · ${pbCount} personal best${pbCount === 1 ? '' : 's'}` : ''}${legendaries ? ` · ${legendaries} legendary` : ''}</p>
-          <p class="muted-line">Rank: Unranked — boards open with accounts, and rank stays hidden until the field fills.</p>
-          <a href="#/practice">Practice →</a> · <a href="#/account?section=stats">Stats →</a></div>
-        </section>` : ''}
-        <section class="home-card">
-          <div class="hc-cap">${esc(store.saveLine())}</div>
-          <div class="hc-body"><p>${Object.keys(all).length} lesson${Object.keys(all).length === 1 ? '' : 's'} with progress · ${p.platform === 'mac' ? 'Mac' : 'Windows'} keys${p.experience ? ` · ${{ new: 'new to Excel', sometimes: 'uses Excel sometimes', daily: 'uses Excel daily' }[p.experience]}` : ''}</p><a href="#/account">Account and settings →</a></div>
-        </section>
-      </div>
-    </div>`;
+  const played = store.attempts({ kind: 'daily', day }).filter(a => a.secs != null);
+  const clean = played.filter(a => a.clean).sort((a, b) => a.secs - b.secs);
+  const daily = clean[0] ? { played: true, clean: true, secs: clean[0].secs, place: null, of: null } : played.length ? { played: true, clean: false } : { played: false };
+  const dailyDrill = DRILLS.find(d => d.id === dailyFor(day).drillId) || null;
+  const queue = dueToday(schedule.stateOrBackfill(all, liveLessons()), moduleCtx(all));
+  const today = todayModel({ queue, daily, dailyTitle: dailyDrill ? dailyDrill.title : '', completedLessons: completedN, dailyXp: xpForEvent({ kind: 'daily', day }, []) });
+  const week = weekCells(game.days || [], day); const letters = weekLetters();
+  const todayRows = today.rows.map(r => `<tr class="row-today${r.done ? ' done' : ''}" data-cursor tabindex="-1" data-href="${esc(r.href)}"><td class="n"><span class="tick${r.done ? ' on' : ''}" aria-hidden="true"></span></td><td>${modeMarkHtml(r.mode)}<span class="row-name">${esc(r.title)}</span>${r.line ? `<span class="row-sub">${esc(r.line)}</span>` : r.sub ? `<span class="row-sub">${esc(r.sub)}</span>` : ''}</td><td class="num len">${esc(r.length)}</td><td class="num xp">${r.xp ? esc(t('home_xp_plus', { n: r.xp })) : r.done ? esc(t('status_done')) : ''}</td></tr>`).join('');
+  const todayPanel = panelHtml({ heading: esc(t('home_today')), facts: esc(t('home_today_done', { d: today.done, n: today.of })), body: `${today.fresh ? `<p class="panel-line">${esc(t('quests_fresh'))}</p>` : ''}<table class="tbl tbl-today"><tbody>${todayRows}</tbody></table>
+      <div class="streak-row"><span class="week" aria-hidden="true">${week.cells.map((on, i) => `<i class="${on ? 'on' : ''}${i === week.today ? ' today' : ''}">${esc(letters[i] || '')}</i>`).join('')}</span><span class="panel-facts">${game.streakDays ? esc(t('home_streak_day', { n: game.streakDays })) : ''}</span></div>`, cls: 'home-today' });
+
+  const ach = achievementsModel(evaluateAchievements(game));
+  const achPanel = panelHtml({ heading: esc(t('home_achievements')), facts: esc(t('home_count_of', { n: ach.earned, m: ach.of })), body: `<div class="badge-grid">${ach.shown.map(badgeTile).join('')}${ach.earned < 5 ? Array.from({ length: 5 - ach.earned }, () => '<span class="badge-tile locked" aria-hidden="true">?</span>').join('') : ''}</div>
+      ${ach.next ? `<div class="ach-next" data-cursor tabindex="-1" data-href="#/account?section=profile"><div class="row-line"><span class="row-name">${esc(t('home_ach_next', { badge: ach.next.def.name }))}</span><span class="panel-facts">${esc(t('home_count_of', { n: ach.next.prog, m: ach.next.goal }))}</span></div><span class="row-sub">${esc(ach.next.def.desc)}</span>${barHtml(100 * ach.next.prog / ach.next.goal, 'bar-ach')}</div>` : ''}`, cls: 'home-ach', stretch: true });
+
+  el.innerHTML = `<div class="pg-two"><div class="pg-main">${nextPanel}${chapterPanel}</div><div class="pg-side">${levelPanel}${todayPanel}${achPanel}</div></div>`;
   root.appendChild(el);
-  const isTyping = t => !!t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.tagName === 'BUTTON' || t.tagName === 'A' || t.isContentEditable);
-  const onKey = e => { if (e.key === 'Enter' && !isTyping(e.target) && !e.defaultPrevented) { const a = el.querySelector('#homeContinue'); if (a) { e.preventDefault(); location.hash = a.getAttribute('href'); } } };
-  document.addEventListener('keydown', onKey);
-  return { destroy() { document.removeEventListener('keydown', onKey); el.remove(); } };
+  const unwire = wireRows(el);
+  if (ctx.keytips) ctx.keytips.register([
+    { id: 'resume', label: next.kind === 'pro' ? t('paywall_go_pro') : t('home_resume'), el: el.querySelector('#homeResume') },
+    { id: 'today', label: t('home_today'), el: el.querySelector('.home-today'), action: () => { const r = el.querySelector('.row-today'); if (r && ctx.cursor) ctx.cursor.select(r); } },
+    { id: 'achievements', label: t('home_achievements'), el: el.querySelector('.home-ach'), action: () => { location.hash = '#/account?section=profile'; } },
+  ]);
+  setTimeout(() => { if (ctx.cursor) ctx.cursor.select(0, { focus: false }); }, 0);
+  return { destroy() { unwire(); el.remove(); } };
 }
