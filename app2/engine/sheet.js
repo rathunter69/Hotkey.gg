@@ -1276,13 +1276,25 @@ export class Sheet {
   sort(dir, keyCol, rect) {
     const r = rect || this.selRange(); const sortCol = keyCol || this.dispActive().c;
     if (sortCol < r.c1 || sortCol > r.c2 || r.r1 === r.r2) return false;
+    return this.sortBy([{ col: sortCol, dir }], r);
+  }
+  /** The Sort dialog's sort: `levels` [{ col, dir: 'asc' | 'desc' }] in order, over `rect` (the list body). Numbers before text before booleans, text case-insensitive, blanks last whatever the order (Excel), ties kept in place. */
+  sortBy(levels, rect) {
+    const r = rect || this.selRange(); if (r.r1 === r.r2 || !levels.length) return false;
     const rows = []; for (let rr = r.r1; rr <= r.r2; rr++) { const row = []; for (let cc = r.c1; cc <= r.c2; cc++) row.push(clone(this.get(rr, cc))); row.r0 = rr; rows.push(row); }
-    const off = sortCol - r.c1;
     const rank = v => typeof v === 'number' ? 0 : typeof v === 'string' ? 1 : 2;
-    const cmp = (a, b) => { const va = a[off].value, vb = b[off].value; if (rank(va) !== rank(vb)) return rank(va) - rank(vb); if (typeof va === 'number') return va - vb; if (typeof va === 'string') return va.localeCompare(vb, 'en', { sensitivity: 'base' }); return (va ? 1 : 0) - (vb ? 1 : 0); };
-    const blanks = rows.filter(rw => rw[off].value == null || rw[off].value === ''), filled = rows.filter(rw => !(rw[off].value == null || rw[off].value === ''));
-    filled.sort(cmp); if (dir === 'desc') filled.reverse();
-    const all = [...filled, ...blanks];
+    const blank = v => v == null || v === '';
+    const cmp1 = (va, vb) => { if (rank(va) !== rank(vb)) return rank(va) - rank(vb); if (typeof va === 'number') return va - vb; if (typeof va === 'string') return va.localeCompare(vb, 'en', { sensitivity: 'base' }); return (va ? 1 : 0) - (vb ? 1 : 0); };
+    const cmp = (a, b) => {
+      for (const { col, dir } of levels) {
+        const off = col - r.c1; if (off < 0 || off >= a.length) continue;
+        const va = a[off].value, vb = b[off].value; const ba = blank(va), bb = blank(vb);
+        if (ba || bb) { if (ba && bb) continue; return ba ? 1 : -1; }
+        const c = cmp1(va, vb); if (c) return dir === 'desc' ? -c : c;
+      }
+      return a.r0 - b.r0;
+    };
+    const all = rows.slice().sort(cmp);
     this.pushUndo();
     // a row that moves takes its formulas with it as a moved cell would: relative refs shift by the row delta, $-anchored parts stay (Excel)
     let i = 0; for (let rr = r.r1; rr <= r.r2; rr++) { const dr = rr - all[i].r0; let j = 0; for (let cc = r.c1; cc <= r.c2; cc++) { const cell = all[i][j]; if (cell.formula && dr) cell.formula = translateFormula(cell.formula, dr, 0); this.cells[refKey(rr, cc)] = cell; j++; } i++; }

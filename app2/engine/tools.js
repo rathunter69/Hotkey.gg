@@ -350,6 +350,73 @@ const methods = {
     if (key === 'Enter') { const on = d.items.filter(it => it.checked); if (!on.length) return; apply(on.length === d.items.length ? null : { kind: 'values', values: on.map(it => it.text) }); }
   },
 
+  /* ---------------- the Sort dialog (Alt A S S) ---------------- */
+  /** Excel's guess for My data has headers: the first row is text throughout and the second row holds something that is not. */
+  listHeaders(rg) {
+    const S = this.sheet; if (rg.r1 === rg.r2) return false;
+    let text = 0, other = 0, below = 0;
+    for (let c = rg.c1; c <= rg.c2; c++) { const v = S.get(rg.r1, c).value; if (v === null || v === '') continue; if (typeof v === 'string' && !isErrVal(v)) text++; else other++; const w = S.get(rg.r1 + 1, c).value; if (w !== null && w !== '' && typeof w !== 'string') below++; }
+    return text > 0 && other === 0 && below > 0;
+  },
+  /** The list a Data tool works on: the selection when it is a range, else the current region around the active cell. */
+  listRange() {
+    const S = this.sheet; const sr = S.selRange(); const a = S.dispActive();
+    return sr.r1 === sr.r2 && sr.c1 === sr.c2 ? S.regionAround(a.r, a.c) : { r1: sr.r1, c1: sr.c1, r2: sr.r2, c2: sr.c2 };
+  },
+  /** What a column is called in a tool's list: its header when the data has headers, else Column C. */
+  columnLabel(rg, c, headers) { const t = headers ? dispText(this.sheet.get(rg.r1, c)) : ''; return t || 'Column ' + colLetter(c); },
+  /**
+   * The Sort dialog: Sort by (a column), Order (A to Z / Z to A, or Smallest to Largest for
+   * numbers), Add Level (Alt+A), Delete Level (Alt+D), My data has headers (Alt+H), OK (Enter),
+   * Cancel (Esc). Tab walks the fields; the arrows change a combo; a letter jumps to the column that
+   * starts with it, as the combo does.
+   */
+  openSortDialog() {
+    const S = this.sheet; this.startClock();
+    const rg = S.filter && S.dispActive().r >= S.filter.r1 && S.dispActive().r <= S.filter.r2 ? { r1: S.filter.r1, c1: S.filter.c1, r2: S.filter.r2, c2: S.filter.c2 } : this.listRange();
+    const headers = this.listHeaders(rg);
+    const a = S.dispActive(); const col = a.c >= rg.c1 && a.c <= rg.c2 ? a.c : rg.c1;
+    this.openDialog('sortdlg', []);
+    this.dlg = { kind: 'sortdlg', range: rg, headers, levels: [{ col, dir: 'asc' }], cur: 0, focus: 'col' };
+  },
+  sortDialogKey(key) {
+    const d = this.dlg; const S = this.sheet; if (!d) return;
+    const rg = d.range; const lvl = d.levels[d.cur];
+    if (key === 'Enter') {   // OK: the body (without the header row) sorts by the levels in order
+      const body = { r1: rg.r1 + (d.headers ? 1 : 0), c1: rg.c1, r2: rg.r2, c2: rg.c2 };
+      this.exitRibbon(false); if (body.r1 >= body.r2) return;
+      S.sortBy(d.levels.map(l => ({ col: l.col, dir: l.dir })), body); if (S.filter) this.applyFilter(); S.commit('edit'); return;
+    }
+    if (key === 'Alt+A') { const used = new Set(d.levels.map(l => l.col)); let c = rg.c1; while (used.has(c) && c < rg.c2) c++; d.levels.splice(d.cur + 1, 0, { col: c, dir: 'asc' }); d.cur++; d.focus = 'col'; return; }   // Add Level
+    if (key === 'Alt+D') { if (d.levels.length > 1) { d.levels.splice(d.cur, 1); d.cur = Math.min(d.cur, d.levels.length - 1); } return; }   // Delete Level
+    if (key === 'Alt+H') { d.headers = !d.headers; return; }   // My data has headers
+    if (key === 'Tab' || key === 'Shift+Tab') {   // the fields of every level, then the tick box and OK
+      const fwd = key === 'Tab';
+      if (d.focus === 'col' && fwd) d.focus = 'order';
+      else if (d.focus === 'order' && fwd) { if (d.cur + 1 < d.levels.length) { d.cur++; d.focus = 'col'; } else d.focus = 'headers'; }
+      else if (d.focus === 'headers') d.focus = fwd ? 'ok' : 'order';
+      else if (d.focus === 'ok') { if (fwd) { d.cur = 0; d.focus = 'col'; } else d.focus = 'headers'; }
+      else if (d.focus === 'order' && !fwd) d.focus = 'col';
+      else if (d.focus === 'col' && !fwd) { if (d.cur > 0) { d.cur--; d.focus = 'order'; } else d.focus = 'ok'; }
+      return;
+    }
+    if (d.focus === 'col') {
+      if (key === 'ArrowDown') { lvl.col = Math.min(rg.c2, lvl.col + 1); return; } if (key === 'ArrowUp') { lvl.col = Math.max(rg.c1, lvl.col - 1); return; }
+      if (key.length === 1) { const K = key.toUpperCase(); const n = rg.c2 - rg.c1 + 1; for (let i = 1; i <= n; i++) { const c = rg.c1 + ((lvl.col - rg.c1 + i) % n); if (this.columnLabel(rg, c, d.headers).toUpperCase().startsWith(K)) { lvl.col = c; return; } } }
+      return;
+    }
+    if (d.focus === 'order') { if (key === 'ArrowDown' || key === 'ArrowUp' || key === ' ') lvl.dir = lvl.dir === 'asc' ? 'desc' : 'asc'; return; }
+    if (d.focus === 'headers' && key === ' ') { d.headers = !d.headers; return; }
+    if (d.focus === 'ok' && key === ' ') this.sortDialogKey('Enter');
+  },
+  /** The dialog as the view paints it: each level's column label and order label (numbers sort Smallest to Largest). */
+  sortDialogView() {
+    const d = this.dlg; if (!d || d.kind !== 'sortdlg') return null; const S = this.sheet; const rg = d.range;
+    const numeric = c => { for (let r = rg.r1 + (d.headers ? 1 : 0); r <= rg.r2; r++) { const v = S.get(r, c).value; if (v !== null && v !== '') return typeof v === 'number'; } return false; };
+    return { headers: d.headers, cur: d.cur, focus: d.focus, columns: Array.from({ length: rg.c2 - rg.c1 + 1 }, (_, i) => this.columnLabel(rg, rg.c1 + i, d.headers)),
+      levels: d.levels.map(l => ({ col: l.col, label: this.columnLabel(rg, l.col, d.headers), dir: l.dir, order: numeric(l.col) ? (l.dir === 'asc' ? 'Smallest to Largest' : 'Largest to Smallest') : (l.dir === 'asc' ? 'A to Z' : 'Z to A') })) };
+  },
+
   /* ---------------- Evaluate Formula (Alt M V) ---------------- */
   /** The dialog on the active cell's formula: Evaluate (Enter / Alt+E) steps, Restart (Alt+R) after the last step, Close (Esc). A cell without a formula opens nothing, as in Excel. */
   openEvaluate() {

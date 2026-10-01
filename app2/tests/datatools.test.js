@@ -36,3 +36,16 @@ test('AutoFilter: Ctrl+Shift+L on the region, the header menu ticks values, Numb
   S.goTo(8, 8); s.run('Alt+ArrowDown'); assert.equal(s.dialog, null, 'no drop-down on a plain cell');
   assert.equal(wildMatch('a*n', 'Austin'), true); assert.equal(wildMatch('b?ston', 'Boston'), true); assert.equal(wildMatch('10~*', '10*'), true); assert.equal(wildMatch('a*', 'Boston'), false);
 });
+
+test('the Sort dialog (Alt A S S): levels by column, Add Level, orders, My data has headers, and a sort within a filtered list', () => {
+  const s = fresh({ ...LIST, D1: { value: 'Day' }, D2: { value: 3 }, D3: { value: 1 }, D4: { value: 2 }, D5: { value: 1 }, D6: { value: 2 } }); const S = s.sheet;
+  S.goTo(3, 2); s.run('Alt A S S'); assert.equal(s.dialog, 'sortdlg'); assert.equal(s.dlg.headers, true, 'a text first row over numbers: My data has headers'); assert.deepEqual(s.dlg.levels, [{ col: 2, dir: 'asc' }], 'Sort by starts on the active column');
+  assert.deepEqual(s.sortDialogView().levels[0], { col: 2, label: 'Region', dir: 'asc', order: 'A to Z' });
+  s.run('Alt+A D Enter');   // Add Level, jump to Day, OK: Region A to Z, then Day Smallest to Largest
+  assert.deepEqual([2, 3, 4, 5, 6].map(r => S.value('A' + r)), ['Boston', 'Erie', 'Dallas', 'Fresno', 'Austin']); assert.equal(S.value('A1'), 'Site', 'the header row stays');
+  s.run('Alt A S S W Tab Down Enter');   // Sort by Washes, Largest to Smallest
+  assert.deepEqual([2, 3, 4, 5, 6].map(r => S.value('C' + r)), [610, 420, 300, 150, 90]);
+  s.run('Alt A S S Alt+H Enter'); assert.equal(S.value('A1'), 'Boston', 'headers unticked: the first row sorts too (East, then the Region header, then West)'); s.run('Ctrl+Z');
+  s.run('Ctrl+Shift+L'); S.goTo(1, 1); s.run('Alt A S S Tab Down Enter'); assert.deepEqual([2, 3, 4, 5, 6].map(r => S.value('A' + r)), ['Fresno', 'Erie', 'Dallas', 'Boston', 'Austin'], 'inside a filtered list the dialog sorts the list');
+  assert.equal(s.dialog, null); assert.equal(s.mode, 'normal');
+});
