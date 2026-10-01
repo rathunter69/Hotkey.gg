@@ -390,3 +390,78 @@ export function unchangedExcept(sheet, before, allowed = []) {
   }
   return ok();
 }
+
+/**
+ * The sheet standard over a whole sheet (screenplay section 5, "The sheet standard"; M86). Reads
+ * the skeleton from the sheet itself, so it audits a page whichever way it was built: title A1,
+ * units A2, row 3 empty, headers row 4, labels in column A (Chapter 1) or B (Chapter 2 on), figures
+ * from row 5, the convention graders over the figure block, totals, one font size, nothing hidden,
+ * panes frozen at the first figure, gridlines off on a page someone reads. Returns every departure
+ * as a list of one-line reasons (empty when the sheet is to standard).
+ */
+export function sheetStandard(sheet, { chapter = 1, read = true } = {}) {
+  const out = [];
+  const add = r => { if (r && !r.ok) out.push(r.why); };
+  const labelCol = chapter <= 1 ? 1 : 2, figCol = labelCol + 1;
+  const cellAt = (r, c) => sheet.cells[refKey(r, c)];
+  let lastRow = 0, lastCol = 0;
+  for (const k in sheet.cells) {
+    if (isBlank(sheet.cells[k])) continue;
+    const p = parseRef(k); if (!p) continue;
+    if (p.r > lastRow) lastRow = p.r; if (p.c > lastCol) lastCol = p.c;
+  }
+  const title = sheet.cells.A1, units = sheet.cells.A2;
+  if (!title || typeof title.value !== 'string' || !title.value.trim()) out.push('A1 has no title');
+  else if (!title.bold) out.push('A1 is a title that is not bold');
+  if (!units || typeof units.value !== 'string' || !units.value.trim()) out.push('A2 has no units line');
+  else if (!units.it) out.push('A2 is the units line and is not italic');
+  for (let c = 1; c <= lastCol; c++) if (!isBlank(cellAt(3, c))) { out.push(`${refKey(3, c)} is filled, row 3 is the spacer`); break; }
+  let anyHeader = false;
+  for (let c = 1; c <= lastCol; c++) {
+    const h = cellAt(4, c);
+    if (isBlank(h)) continue;
+    anyHeader = true;
+    if (!h.bold) out.push(`${refKey(4, c)} is a header that is not bold`);
+  }
+  if (!anyHeader) out.push('row 4 has no headers');
+  if (lastCol >= figCol) add(headersRight(sheet, `${refKey(4, figCol)}:${refKey(4, lastCol)}`));
+  if (labelCol === 2) for (let r = 5; r <= lastRow; r++) {
+    const c = cellAt(r, 1);
+    if (c && typeof c.value === 'string' && c.value.length > 3) { out.push(`${refKey(r, 1)} holds a label, labels sit in column B from Chapter 2 on`); break; }
+  }
+  for (let r = 5; r <= lastRow; r++) {
+    const l = cellAt(r, labelCol);
+    if (l && typeof l.value === 'string' && /^\s/.test(l.value)) out.push(`${refKey(r, labelCol)} is indented with spaces, use the indent button`);
+  }
+  if (lastRow >= 5 && lastCol >= figCol) {
+    const block = `${refKey(5, figCol)}:${refKey(lastRow, lastCol)}`;
+    add(roleColour(sheet, block));
+    add(negativesParen(sheet, block));
+    for (const [, , ref] of eachRef(block)) {
+      const cell = sheet.cells[ref];
+      if (!cell || isBlank(cell)) continue;
+      const num = typeof cell.value === 'number' || isFormulaCell(cell);
+      if (num && typeof cell.value !== 'string' && (!cell.fmtStyle || cell.fmtStyle === 'general')) { out.push(`${ref} is a figure with no number format`); break; }
+    }
+    for (const [, , ref] of eachRef(block)) {
+      const cell = sheet.cells[ref];
+      if (cell && !isBlank(cell) && isPercentCell(cell) && !cell.it) { out.push(`${ref} is a percentage that is not italic`); break; }
+    }
+  }
+  add(noGrid(sheet, `A1:${refKey(Math.max(lastRow, 1), Math.max(lastCol, 1))}`));
+  add(oneFontSize(sheet, `A1:${refKey(Math.max(lastRow, 1), Math.max(lastCol, 1))}`, 'A1'));
+  add(noHidden(sheet));
+  for (let r = 5; r <= lastRow; r++) {
+    const l = cellAt(r, labelCol);
+    if (!l || typeof l.value !== 'string' || !/^Total\b/.test(l.value)) continue;
+    for (let c = figCol; c <= lastCol; c++) {
+      const f = cellAt(r, c);
+      if (isBlank(f)) continue;
+      if (!f.bold || !(f.bt || f.bdbl)) { out.push(`${refKey(r, c)} is a total that is not bold with a top border`); break; }
+    }
+  }
+  const fz = sheet.freeze || { r: 0, c: 0 };
+  if (fz.r !== 4 || fz.c !== labelCol) out.push(`panes are not frozen at ${refKey(5, figCol)}`);
+  if (read) add(gridlinesOff(sheet));
+  return out;
+}
