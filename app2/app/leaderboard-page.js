@@ -1,151 +1,182 @@
-// app2/app/leaderboard-page.js — the board layout (SITE_SPEC §2, §11a). Signed in, the Benchmark
-// and Daily tabs show the global field from rpc_board (the top rows, plus your own row when you
-// sit below them), with this device's clean times beneath as "your times", never merged in.
-// Signed out they show your own clean times only, honestly labelled. Real people only: no
-// seeded pace-setters here (those are ghosts inside runs). School and Desk keep their coming
-// states; the "start a desk" prompt stays.
-import { DRILLS } from '../content/drills.js';
+// app2/app/leaderboard-page.js — Leaderboards (screenplay 3.0 "Leaderboards"; 3.11; M104). Page
+// tabs: The Daily, Drills, Challenges, Desks. A board is a table: the place, the player with their
+// level, a bar showing the time against the field, the time, the gap to first and the keys used,
+// with the route's key count in the header. No tier marks on a board. The learner's own row is
+// pinned under the top ten with its move. Beside the board, the learner's last five runs on it and
+// one line on where the time is going. Signed in, the field is rpc_board through the store; signed
+// out, the board holds the learner's own clean runs and says the field opens on sign-in. The pure
+// parts (boardModel, whereTimeGoes, lastRuns) are tested; mountBoard is shared with the Daily's page.
+import { DRILLS, DRILLS_BY_ID } from '../content/drills.js';
+import { CATALOG } from '../content/catalog.js';
 import { store } from './store.js';
 import { dailyFor } from './daily.js';
 import { dayOf } from './records.js';
 import { siteCopy } from '../content/copy/apply.js';
+import { esc, fill, fmtClock, fmtGap, prettyDay, weekdayOf } from '../ui/components/format.js';
+import { panelHtml, tableHtml, tabsHtml, wireTabs, buttonHtml } from '../ui/components/table.js';
+import { barHtml, levelChipHtml } from '../ui/components/marks.js';
 
-const BOARDS = [
-  { key: 'benchmark', label: 'Benchmark', title: 'Benchmark drills', sub: 'Best clean times. The global field opens when you sign in; until then these are your own posted times, which carry over.', liveSub: 'Best clean times from everyone with a public profile. Your times on this device sit beneath each board.' },
-  { key: 'daily', label: 'Daily', title: 'The Daily', sub: 'One drill a day, the same board for everyone. Resets at midnight UTC. Your attempts show here; the global board opens when you sign in.', liveSub: 'One drill a day, the same sheet and the same board for everyone. Resets at midnight UTC.' },
-  { key: 'school', label: 'School', title: 'School boards', sub: 'Opt in with a verified school email to appear on your school’s board.', rows: ['Your school', 'All schools'] },
-  { key: 'desk', label: 'Desk', title: 'Desk boards', sub: 'Private boards for a desk: a study group, a finance club, an analyst class, a team at work.', rows: ['Your desks'] },
+const t = (key, vars) => fill(siteCopy(key, key), vars);
+/** Global rows shown per board before your own row is pinned below them. */
+export const TOP = 10;
+export const SEEN_KEY = 'hk2_board_seen_v1';
+export const BOARD_TABS = [
+  { key: 'daily', copy: 'boards_tab_daily', mode: 'daily' },
+  { key: 'drills', copy: 'boards_tab_drills', mode: 'drills' },
+  { key: 'challenges', copy: 'boards_tab_challenges', mode: 'challenges' },
+  { key: 'desks', copy: 'boards_tab_desks', mode: '' },
 ];
 
-/** Global rows shown per board before your own row is appended below them. */
-export const TOP = 10;
-
-const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-/** A local board: caption + your best clean rows (top 3) + the honest note. */
-function localBoard(caption, tag, rows, note) {
-  const filled = rows.slice(0, 3).map((r, i) => `<div class="row"><span class="rk">${i + 1}</span><span class="nm">you</span><span class="mid">${esc(r.mid || '')}</span><span class="tm">${r.secs.toFixed(2)}s</span></div>`);
-  while (filled.length < 3) filled.push(`<div class="row"><span class="rk">${filled.length + 1}</span><span class="nm muted">—</span><span class="mid"></span><span class="tm muted">—</span></div>`);
-  return `<div class="board lb-mine"><div class="board-cap"><h2>${esc(caption)}</h2><span class="lvl">${esc(tag)}</span></div>${filled.join('')}<div class="empty">${esc(note)}</div></div>`;
+/**
+ * The board as the table shows it. `rows` come best-first as the server ranks them
+ * ({ pos, handle, level, secs, keys, mine }); the top ten stay, your own row is pinned under them
+ * when you sit lower, with the move from `prevPlace`. Each row carries its gap to first and its
+ * bar against the slowest row shown. Pure.
+ */
+export function boardModel(rows, { top = TOP, prevPlace = null } = {}) {
+  const list = (rows || []).filter(r => r && Number.isFinite(r.secs)).map(r => ({ ...r, place: Number.isFinite(r.place) ? r.place : r.pos }));
+  const first = list.length ? list[0].secs : null;
+  const shown = list.slice(0, top);
+  const mine = list.find(r => r.mine) || null;
+  const pinned = mine && !shown.some(r => r.mine) ? mine : null;
+  const all = pinned ? shown.concat([pinned]) : shown;
+  const max = all.reduce((m, r) => Math.max(m, r.secs), 0) || 1;
+  const out = all.map(r => ({ place: r.place, handle: r.handle, level: r.level, secs: r.secs, keys: r.keys, mine: !!r.mine, gap: first == null ? 0 : r.secs - first, pct: 100 * r.secs / max, pinned: r === pinned }));
+  const move = mine && Number.isFinite(prevPlace) ? prevPlace - mine.place : null;
+  return { rows: out, first, mine: mine ? { place: mine.place, secs: mine.secs } : null, move, count: list.length };
 }
 
-/** A board's middle column: the tier, then keys against the reference route when known. Pure. */
-function midOf(tier, keys, optimalKeys) {
-  const t = tier && tier !== 'none' ? tier : '';
-  const k = keys != null && optimalKeys ? keys + '/~' + optimalKeys : '';
-  return t && k ? t + ' · ' + k : t || k;
+/** Your last five clean runs on a board, newest first: { day, secs, keys, at }. Pure. */
+export function lastRuns(attempts, n = 5) {
+  return (attempts || []).filter(a => a.clean && Number.isFinite(a.secs)).sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, n).map(a => ({ day: a.day || dayOf(a.at), secs: a.secs, keys: a.keys, at: a.at }));
+}
+
+/** Where the time goes: the goal with the largest mean split over the runs, { index, secs } or null. Pure. */
+export function whereTimeGoes(attempts) {
+  const sums = [], counts = [];
+  for (const a of attempts || []) {
+    if (!Array.isArray(a.splits)) continue;
+    a.splits.forEach((s, i) => { if (Number.isFinite(s)) { sums[i] = (sums[i] || 0) + s; counts[i] = (counts[i] || 0) + 1; } });
+  }
+  let best = -1, secs = 0;
+  sums.forEach((s, i) => { const m = s / counts[i]; if (m > secs) { secs = m; best = i; } });
+  return best < 0 ? null : { index: best, secs: Math.round(secs) };
+}
+
+/** Local rows (signed out, or your device's runs): your clean runs ranked as a field of one. */
+export function localRows(ref) {
+  return store.boards(ref).map((r, i) => ({ pos: i + 1, handle: 'you', level: null, secs: r.secs, keys: r.keys, mine: i === 0 }));
+}
+
+function seenPlaces() { try { return JSON.parse(localStorage.getItem(SEEN_KEY) || '{}') || {}; } catch (e) { return {}; } }
+function rememberPlace(key, place) { try { const m = seenPlaces(); m[key] = place; localStorage.setItem(SEEN_KEY, JSON.stringify(m)); } catch (e) { /* private window */ } }
+
+const goalText = (drill, i) => { const goals = drill && (drill.goals || (drill.lesson && drill.lesson.goals)) || []; const g = goals[i]; if (!g || !g.text) return ''; const s = String(g.text).replace(/[.!]$/, ''); return s.charAt(0).toLowerCase() + s.slice(1); };
+
+/** The board's table from a model. */
+export function boardTableHtml(model, { routeKeys = null } = {}) {
+  const columns = [{ key: 'place', label: t('col_place'), cls: 'n' }, { key: 'player', label: t('col_player') }, { key: 'field', label: t('col_field'), cls: 'field' }, { key: 'time', label: t('col_time'), align: 'right', cls: 'time' }, { key: 'gap', label: t('col_gap'), align: 'right', cls: 'gap' }, { key: 'keys', label: routeKeys ? t('boards_keys_route', { n: routeKeys }) : t('col_keys'), align: 'right', cls: 'keys' }];
+  const rows = model.rows.map(r => ({ cells: { place: String(r.place), player: `<span class="row-name">${esc(r.handle)}</span>${levelChipHtml(r.level)}${r.mine && model.move ? `<span class="move">${esc(model.move > 0 ? t('boards_up', { k: model.move }) : t('boards_down', { k: -model.move }))}</span>` : ''}`, field: barHtml(r.pct, 'bar-field'), time: fmtClock(r.secs, true), gap: fmtGap(r.gap), keys: r.keys != null ? String(r.keys) : '' }, cls: `row-board${r.mine ? ' mine' : ''}${r.pinned ? ' pinned' : ''}`, cursor: false }));
+  return tableHtml({ columns, rows, cls: 'tbl-board' });
+}
+
+/** The side panel: your last five runs and the line on where the time goes. */
+export function sidePanelHtml({ title, runs, where, drill, empty }) {
+  const columns = [{ key: 'day', label: '' }, { key: 'time', label: '', align: 'right', cls: 'time' }, { key: 'keys', label: '', align: 'right', cls: 'keys' }];
+  const rows = runs.map(r => ({ cells: { day: esc(prettyDay(r.day)), time: fmtClock(r.secs, true), keys: String(r.keys) }, cursor: false }));
+  const task = where ? goalText(drill, where.index) : '';
+  const body = runs.length ? `${tableHtml({ columns, rows, head: false, cls: 'tbl-runs', label: t('boards_last_five') })}${task ? `<p class="panel-line">${esc(t('boards_where', { task, s: where.secs }))}</p>` : ''}` : `<p class="panel-line">${esc(empty)}</p>`;
+  return panelHtml({ heading: esc(title), body, cls: 'board-side', stretch: true });
 }
 
 /**
- * A signed-in board: the global field on top, "your times" beneath. `global` is undefined while
- * loading, null when the read failed, else { rows } from store.globalBoard. Pure; exported for the
- * tests. The empty field says so in one line; nothing is padded or invented.
+ * Mount one board with its side panel into `el`: { ref, seed, title, yours, mode }. The field is
+ * read through the store when signed in; signed out it is the device's own runs. Returns { destroy }.
  */
-export function liveBoard(caption, tag, global, local, { optimalKeys, localEmpty = 'No clean time on this device yet.' } = {}) {
-  let field;
-  if (global === undefined) field = `<div class="empty">Loading the board…</div>`;
-  else if (global === null) field = `<div class="empty lb-failed">Couldn’t load the board. <button type="button" class="btn btn-ghost lb-retry">Try again</button></div>`;
-  else if (!global.rows.length) field = `<div class="empty">No one is on this board yet. A clean run puts you first.</div>`;
-  else {
-    const top = global.rows.slice(0, TOP);
-    const mine = top.some(r => r.mine) ? null : global.rows.find(r => r.mine);
-    field = top.concat(mine ? [mine] : []).map(r => `<div class="row${r.mine ? ' lb-me' : ''}"><span class="rk">${r.pos}</span><span class="nm">${esc(r.handle)}${r.mine ? ' <span class="muted">(you)</span>' : ''}</span><span class="mid">${esc(midOf(r.tier, r.keys, optimalKeys))}</span><span class="tm">${r.secs.toFixed(2)}s</span></div>`).join('');
+export function mountBoard(el, { ref, seed = null, title, yours, dayLabel = '' } = {}) {
+  let gone = false;
+  const drill = DRILLS_BY_ID[ref] || null;
+  const routeKeys = drill ? drill.optimalKeys : null;
+  const key = ref + '|' + (seed == null ? '' : seed);
+  const live = store.liveBoards();
+  let state = live ? undefined : { rows: localRows(ref) };
+  function draw() {
+    let table, facts = '', line = '';
+    if (state === undefined) table = `<p class="panel-line">${esc(t('boards_loading'))}</p>`;
+    else if (state === null) table = `<p class="panel-line">${esc(t('boards_failed'))} <button type="button" class="link-btn board-retry">${esc(t('boards_retry'))}</button></p>`;
+    else {
+      const model = boardModel(state.rows, { prevPlace: seenPlaces()[key] });
+      if (model.mine) rememberPlace(key, model.mine.place);
+      facts = esc(dayLabel ? t('boards_day_runs', { day: dayLabel, n: model.count }) : t('boards_clean_runs', { n: model.count }));
+      table = model.rows.length ? boardTableHtml(model, { routeKeys }) : `<p class="panel-line">${esc(t('boards_empty'))}</p>`;
+      if (!live) line = `<p class="panel-line">${esc(t('boards_signed_out'))}</p>`;
+    }
+    const attempts = store.attempts({ ref }).filter(a => seed == null || a.seed === seed);
+    const runs = lastRuns(attempts);
+    el.innerHTML = `<div class="pg-two"><div class="pg-main">${panelHtml({ heading: esc(title), facts, body: table + line, cls: 'board', stretch: true })}</div><div class="pg-side">${sidePanelHtml({ title: yours, runs, where: whereTimeGoes(attempts.filter(a => a.clean)), drill, empty: seed != null ? t('daily_not_played') : t('boards_none_yet') })}</div></div>`;
+    const retry = el.querySelector('.board-retry'); if (retry) retry.onclick = () => { state = undefined; draw(); load(); };
   }
-  const yours = local.length
-    ? local.slice(0, 3).map((r, i) => `<div class="row"><span class="rk">${i + 1}</span><span class="nm">you</span><span class="mid">${esc(r.mid || '')}</span><span class="tm">${r.secs.toFixed(2)}s</span></div>`).join('')
-    : `<div class="empty">${esc(localEmpty)}</div>`;
-  return `<div class="board lb-live"><div class="board-cap"><h2>${esc(caption)}</h2><span class="lvl">${esc(tag)}</span></div>${field}<div class="board-cap lb-yours"><h2>Your times</h2><span class="lvl">this device</span></div>${yours}</div>`;
+  function load() {
+    if (!live) return;
+    store.globalBoard(ref, { seed }).then(v => v, () => null).then(v => { if (gone) return; state = v; draw(); });
+  }
+  draw(); load();
+  return { destroy() { gone = true; } };
 }
 
-/** The boards a tab reads: [{ ref, seed, key }] (key is the page's state key). */
-function boardRefs(tab) {
-  if (tab === 'benchmark') return benchmarkDrills().map(d => ({ ref: d.id, seed: null, key: d.id }));
-  if (tab === 'daily') { const pick = dailyFor(dayOf()); return [{ ref: pick.drillId, seed: pick.seed, key: 'daily|' + pick.drillId + '|' + pick.seed }]; }
-  return [];
-}
-const benchmarkDrills = () => DRILLS.filter(d => d.benchmark).concat(DRILLS.filter(d => !d.benchmark));
-const localRows = d => store.boards(d.id).map(r => ({ ...r, mid: (r.tier && r.tier !== 'none' ? r.tier + ' · ' : '') + r.keys + '/~' + d.optimalKeys }));
-
-/**
- * The tab panel's boards. `live` = signed in; `global` maps a boardRefs key to its read state
- * (absent = loading, null = failed, { rows }). Exported for the tests.
- */
-export function panelHtml(tab, { live = false, global = {} } = {}) {
-  if (tab === 'benchmark') {
-    return benchmarkDrills().map(d => {
-      const local = localRows(d);
-      if (live) return liveBoard(d.title, d.benchmark ? 'benchmark' : 'drill', global[d.id], local, { optimalKeys: d.optimalKeys, localEmpty: 'No clean time on this device yet.' });
-      return localBoard(d.title, d.benchmark ? 'benchmark' : 'drill', local, local.length ? 'Your clean times, with keys against the reference route. The global field opens when you sign in.' : 'No clean time yet — a run without help or mouse posts here.');
-    }).join('');
-  }
-  if (tab === 'daily') {
-    const day = dayOf(); const pick = dailyFor(day); const drill = DRILLS.find(d => d.id === pick.drillId);
-    const rows = store.attempts({ kind: 'daily', day }).filter(a => a.clean && a.secs != null).sort((x, y) => x.secs - y.secs).map(a => ({ secs: a.secs, mid: a.tier !== 'none' ? a.tier : '' }));
-    const caption = `Today · ${drill ? drill.title : '—'}`;
-    if (live) return liveBoard(caption, day, global['daily|' + pick.drillId + '|' + pick.seed], rows, { optimalKeys: drill && drill.optimalKeys, localEmpty: 'No clean attempt on this device today.' });
-    return localBoard(caption, day, rows, rows.length ? 'Your clean attempts today. The worldwide board opens when you sign in.' : 'No clean attempt yet today.');
-  }
-  const b = BOARDS.find(x => x.key === tab);
-  return b.rows.map(r => `<div class="board"><div class="board-cap"><h2>${esc(r)}</h2><span class="lvl">${esc(b.label)}</span></div>
-          <div class="row"><span class="rk">1</span><span class="nm muted">—</span><span class="mid"></span><span class="tm muted">—</span></div>
-          <div class="row"><span class="rk">2</span><span class="nm muted">—</span><span class="mid"></span><span class="tm muted">—</span></div>
-          <div class="row"><span class="rk">3</span><span class="nm muted">—</span><span class="mid"></span><span class="tm muted">—</span></div>
-          <div class="empty">${esc(siteCopy('boards_closed', 'Desk and school boards open in a later phase.'))}</div></div>`).join('');
+/** The board a tab opens on: the drill with your latest clean run, else the first benchmark, else the first. */
+export function defaultRef(entries, attempts) {
+  const ids = new Set(entries.map(e => e.id));
+  const latest = (attempts || []).filter(a => a.clean && ids.has(a.ref)).sort((a, b) => (b.at || 0) - (a.at || 0))[0];
+  if (latest) return latest.ref;
+  const bench = entries.find(e => (e.tags || []).includes('benchmark') || e.benchmark);
+  return (bench || entries[0] || {}).id || null;
 }
 
 export function mountLeaderboardPage(root, ctx = {}) {
   const el = document.createElement('div');
-  el.className = 'page lb';
-  let cur = (ctx.query && BOARDS.find(b => b.key === ctx.query.board) || BOARDS[0]).key;
-  let gone = false;
-  const global = {};        // boardRefs key → null (failed) | { rows }; absent while loading
-  const inflight = new Set();
-  const live = () => store.liveBoards();
+  el.className = 'pg pg-boards';
+  const q = (ctx.query) || {};
+  let tab = (BOARD_TABS.find(b => b.key === q.board) || BOARD_TABS[0]).key;
+  let ref = q.ref || null;
+  let board = null;
+  const signedIn = () => store.liveBoards();
 
-  /** Fetch the current tab's global boards; each arrival redraws only the panel (focus stays put). */
-  function load() {
-    if (!live()) return;
-    for (const { ref, seed, key } of boardRefs(cur)) {
-      if (key in global || inflight.has(key)) continue;
-      inflight.add(key);
-      store.globalBoard(ref, { seed }).then(v => v, () => null).then(v => {
-        inflight.delete(key);
-        if (gone) return;
-        global[key] = v;
-        if (boardRefs(cur).some(b => b.key === key)) drawPanel();
-      });
+  function entriesFor(k) {
+    if (k === 'drills') return CATALOG.filter(e => e.mode === 'drill');
+    if (k === 'challenges') return DRILLS.filter(d => d.kind === 'challenge').map(d => ({ id: d.id, title: d.title.replace(/^Challenge:\s*/i, '').replace(/^./, c => c.toUpperCase()), chapter: d.chapter, benchmark: d.benchmark }));
+    return [];
+  }
+  function render(focusTab) {
+    if (board) { board.destroy(); board = null; }
+    document.body.dataset.mode = (BOARD_TABS.find(b => b.key === tab) || {}).mode || 'daily';
+    const tabsHtmlStr = tabsHtml(BOARD_TABS.map(b => ({ key: b.key, label: t(b.copy), mode: b.mode, on: b.key === tab })), t('boards_title'));
+    let picker = '', host = '<div class="board-host"></div>';
+    if (tab === 'desks') {
+      host = `<div class="pg-two"><div class="pg-main">${panelHtml({ heading: esc(t('boards_tab_desks')), body: `<p class="panel-line">${esc(signedIn() ? siteCopy('boards_desk_prompt', 'Start a desk to compete with your own group.') : t('boards_desks_signed_out'))}</p><div class="btn-row">${buttonHtml({ label: signedIn() ? t('boards_desk_link') : t('rail_sign_in'), key: 'Enter', href: signedIn() ? '#/teams' : '#/account', primary: true, id: 'boardsDesk' })}</div>`, cls: 'board', attrs: { 'data-cursor': true, 'data-cursor-enter': '#boardsDesk', tabindex: '-1' } })}</div></div>`;
+    } else if (tab !== 'daily') {
+      const entries = entriesFor(tab);
+      if (!ref || !entries.some(e => e.id === ref)) ref = defaultRef(entries, store.attempts());
+      picker = `<label class="picker"><span>${esc(t('boards_pick'))}</span><select id="boardPick">${entries.map(e => `<option value="${esc(e.id)}"${e.id === ref ? ' selected' : ''}>${esc(e.title)}</option>`).join('')}</select></label>`;
     }
-  }
-  function drawPanel() {
-    const panel = el.querySelector('.boards');
-    if (!panel) return;
-    panel.innerHTML = panelHtml(cur, { live: live(), global });
-    panel.querySelectorAll('.lb-retry').forEach(btn => {
-      btn.onclick = () => { for (const k of Object.keys(global)) if (global[k] === null) delete global[k]; drawPanel(); load(); };
-    });
-  }
-
-  function render() {
-    const b = BOARDS.find(x => x.key === cur);
-    el.innerHTML = `<div class="page-head"><h1>Leaderboards</h1><p class="page-sub">Every timed drill has a board. Viewable by everyone; entries need a clean run: no help, no mouse on the workspace.</p></div>
-      <div class="lb-tabs" role="tablist" aria-label="boards">${BOARDS.map(x => `<button type="button" role="tab" class="lb-tab${x.key === cur ? ' on' : ''}" aria-selected="${x.key === cur}" tabindex="${x.key === cur ? 0 : -1}" data-key="${x.key}">${esc(x.label)}</button>`).join('')}</div>
-      <div class="boards" role="tabpanel"></div>
-      <p class="lb-sub">${esc(live() && b.liveSub ? b.liveSub : b.sub)}</p>
-      <div class="lb-desk-prompt"><span>${esc(siteCopy('boards_desk_prompt', 'Start a desk to compete with your own group.'))}</span><a class="btn btn-ghost" href="#/teams">Teams and desks</a></div>`;
-    drawPanel();
-    load();
-    const tabs = [...el.querySelectorAll('.lb-tab')];
-    tabs.forEach((t, i) => {
-      t.onclick = () => { cur = t.dataset.key; render(); el.querySelector('.lb-tab.on').focus(); };
-      t.onkeydown = e => {
-        if (e.key === 'ArrowRight') { e.preventDefault(); cur = tabs[(i + 1) % tabs.length].dataset.key; render(); el.querySelector('.lb-tab.on').focus(); }
-        else if (e.key === 'ArrowLeft') { e.preventDefault(); cur = tabs[(i - 1 + tabs.length) % tabs.length].dataset.key; render(); el.querySelector('.lb-tab.on').focus(); }
-        else if (e.key === 'Home') { e.preventDefault(); cur = tabs[0].dataset.key; render(); el.querySelector('.lb-tab.on').focus(); }
-        else if (e.key === 'End') { e.preventDefault(); cur = tabs[tabs.length - 1].dataset.key; render(); el.querySelector('.lb-tab.on').focus(); }
-      };
-    });
+    el.innerHTML = `<div class="tabs-row">${tabsHtmlStr}${picker}</div>${host}`;
+    wireTabs(el, (key, viaKeys) => { tab = key; ref = null; render(viaKeys); });
+    const pick = el.querySelector('#boardPick'); if (pick) pick.onchange = () => { ref = pick.value; render(); };
+    const hostEl = el.querySelector('.board-host');
+    if (hostEl) {
+      if (tab === 'daily') {
+        const day = dayOf(); const p = dailyFor(day); const d = DRILLS_BY_ID[p.drillId];
+        board = mountBoard(hostEl, { ref: p.drillId, seed: p.seed, title: d ? d.title : t('daily_title'), yours: t('boards_yours', { board: t('rail_daily').replace(/^The /, '') }), dayLabel: weekdayOf(day) });
+      } else {
+        const e = entriesFor(tab).find(x => x.id === ref);
+        board = mountBoard(hostEl, { ref, title: e ? e.title : ref, yours: t('boards_yours', { board: e ? e.title : '' }) });
+      }
+    }
+    if (focusTab) { const on = el.querySelector('.tab.on'); if (on) on.focus(); }
+    if (ctx.keytips) ctx.keytips.register(BOARD_TABS.map(b => ({ id: b.key, label: t(b.copy), el: el.querySelector(`.tab[data-tab="${b.key}"]`) })));
+    if (ctx.cursor) ctx.cursor.refresh();
   }
   render();
   root.appendChild(el);
-  return { destroy() { gone = true; el.remove(); } };
+  return { destroy() { if (board) board.destroy(); el.remove(); } };
 }
