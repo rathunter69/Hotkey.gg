@@ -13,7 +13,7 @@ The words learners read live in four spreadsheets under `app2/content/copy/`. Ed
 
 Where each field shows:
 
-- **brief** — the task card when a lesson opens. At most 3 sentences, 70 words. Ends with the headline key in backticks: `` the key move is `Ctrl+↓` ``.
+- **brief**: the task card when a lesson opens. At most 5 sentences, 110 words. A lesson's brief ends with its headline key: `` The key is `Ctrl+↓`. ``
 - **closing** — the paragraphs on the "Lesson complete" overlay. Separate paragraphs with ` || `.
 - **wow** — the one-line payoff on the same overlay, above the closing ("Change a figure on Raw: the live block moves, the snapshot holds."). It is the "does it tie" moment.
 - **convention_line** — the banker-convention chip text. **mac_note** — the one line a Mac learner sees. **story_beat** — a lesson's own beat, rarely used; the module's beat usually carries it.
@@ -47,12 +47,15 @@ Bad, and why:
 
 ## Limits the checker enforces
 
+The voice and the full rules are docs/screenplay/screenplay.md, section 2 ("What the site enforces") and section 3.0 ("What the copy and the screen never do"). Where this file and the screenplay differ, the screenplay wins.
+
 | Field | Limit |
 |---|---|
-| brief | ≤ 3 sentences, ≤ 70 words |
-| goal text | ≤ 140 characters, one sentence, ends with . ! or ?, names a cell, range, sheet, quoted label, key or Ribbon command |
-| teach | one sentence |
-| why | one sentence, ≤ 110 characters |
-| anywhere | no British spellings, no "house style", no "first-year" |
+| brief | ≤ 5 sentences, ≤ 110 words; a lesson's brief ends "The key is `X`." |
+| goal text | ≤ 140 characters, one sentence, ends with a full stop, names a cell, range, sheet, quoted label, key or Ribbon command |
+| teach | up to three sentences, the why inside |
+| why | retired; leave it empty |
+| hint_stuck | "pulse <target> · <one subtle line>", never the answer |
+| anywhere | no dash as punctuation, no emoji or symbol icons, no facts joined by middle dots or pipes, no words in capitals (keys, Excel's function names and acronyms excepted), no British spellings, no "house style", no "first-year" |
 
 The checker prints the file, the row and the sentence it stopped on. Fix it in the sheet and send again; a folder that fails changes nothing on the site.
