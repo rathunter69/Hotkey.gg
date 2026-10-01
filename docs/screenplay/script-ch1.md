@@ -1436,3 +1436,36 @@ Every line a learner reads inside Chapter 1: the story cards, and for each lesso
 15.  Replace All on the Report: every Week of Sep 15 becomes Week of Sep 22; read the count.
 16.  Page setup: landscape, fit to one page, rows 1:4 as print titles, &[File] in the left footer and &[Date] in the right.
 17.  Does it tie? Change the first site's Monday washes on Raw to 300 and watch the Report's total in C10 answer while the checks stay zero.
+
+## Built differently
+
+Where the build departs from this script (run R1, 2026-10-01). Each line is one departure; the script text above is unchanged.
+
+- Inputs site list sits at A18:A22 (the script's block clashes with A9:A13); goals that copy Inputs!A9:A13 read A18:A22.
+- 1.3.3's Notes cut lands at J1, not H1, so it doesn't overwrite 1.3.1's H4 note.
+- 1.1.2 and 1.2.2 select C2:C60 and E1:E60 ("sixty cells"), because Airport's Saturday row 61 is blank in Raw.
+- 1.1.5 goals 4 and 5 are swapped (B12 green before B10) so each hint follows from the last; Automatic goes through Format Cells, since the palette has no Automatic entry.
+- 1.2.1 goal 8: Costs!B7 is South Lamar's rent, not Domain's maintenance; the copy says so.
+- 1.2.2 goal 3 (read the status bar) ends with Ctrl+Home so it has a key.
+- 1.2.3: AutoFit takes Ctrl+Space first, and wrapped rows take Alt H O A.
+- 1.2.4: Costs holds seventeen typed figures, one formula and two blanks (script said 15, 3 and 2).
+- 1.2.C: the used block is A1:N68, counting the inserted note row.
+- 1.1.C seed titles read "Clearcoat Express: {city} site costs, week of Sep 8, 2026".
+- 1.3.1 has 8 goals, not 10: Delete and the two-line note are one goal, and the two Inputs labels are one goal.
+- 1.3.2 reaches Riverside with PgDn and three Down arrows; clearing B14's fill finds Mueller with three Enters, since the by-day and totals blocks match first.
+- 1.3.3 folds the cut's teach line into goal 2's.
+- 1.3.4 has 8 goals: the sensitivity labels and the transpose are one goal; Paste Formats' teach is folded into goal 2's.
+- 1.3.5: Define Name and Go To by name are one goal; goal 6 reads "snaps the view back to the active cell", because PgDn moves the active cell; the brief is trimmed to 110 words.
+- 1.3.C has 7 goals: the Muller fix and the Riverisde Replace All are one goal; the name and the note are graded on Inputs!B4 with any note text.
+- 1.4.1 goal 6's cue reads I8, not J8, since the column letter shifts after the delete.
+- 1.4.C week labels read "Week of Sep 22, 2026".
+- 1.5.1 goal 3: the negatives choice is already set when Format Cells reopens on a comma cell, so the route is Ctrl+1, N, Tab, C, Alt+D, 0, Enter.
+- Counts lines (daily block, week summary, scenario grid) are Excel's #,##0, reached by Ctrl+Shift+1 then Alt H 9 twice.
+- Report is frozen at row 4, so "Ctrl+Home" cues are replaced; 1.6.4 goal 8 and 1.6.6 goal 6 return by Ctrl+PgUp.
+- 1.6.6 goal 7 resets E5:E8 to Automatic through Format Cells, Font, since the font color button has no Automatic swatch.
+- 1.7.1's teach says Alt+F picks Fit to; the footer's file name and date are set in two passes of Page Setup.
+- 1.7.2's label teach lists the four labels in a sentence.
+- 1.7.C and 1.8.A are fixed to San Antonio; the assessment plants a sixth site, Leon Valley, on Inputs row 26, plus stale week labels and an Old code column on the Report, so goal 3 copies sites only; its rows are total 11, daily 13 to 19, checks 21 to 24.
+- 1.8.P: the H column turns italic in the formats goal, check labels are indented, and print set-up is one Page Setup pass.
+- G6's typed figure in 1.7.3 is Mueller's last-week washes from the workbook, not 1,240.
+- The drills: twelve became eleven (M108) with new ids; Daily sheets run Monday to Saturday; before-you-send uses notes typed into H6 and H9.
