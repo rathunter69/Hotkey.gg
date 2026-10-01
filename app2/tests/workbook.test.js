@@ -101,19 +101,20 @@ test('sheets: Ctrl+PgDn / Ctrl+PgUp step without wrapping and always log; an ope
   assert.equal(s.sheets[2].name, 'Two');
 });
 
-test('page keys: PageDown / PageUp move by the view\'s screenful (10 rows until it says), Alt+PgDn / PgUp a screen sideways', () => {
+test('page keys: PageDown / PageUp move by the view\'s screenful (10 rows until it says); Alt+PgDn / PgUp are the sheet keys\' browser alias (M41)', () => {
   const s = fresh(); const S = s.sheet;
   s.run('PageDown'); assert.equal(S.selectionText(), 'A11'); s.run('PageUp'); assert.equal(S.selectionText(), 'A1');
   s.pageRows = 25; s.run('PageDown'); assert.equal(S.selectionText(), 'A26'); s.run('Shift+PageDown'); assert.equal(S.selectionText(), 'A26:A51');
-  s.pageCols = 8; s.run('Ctrl+Home Alt+PgDn'); assert.equal(S.selectionText(), 'I1'); s.run('Alt+PgUp'); assert.equal(S.selectionText(), 'A1');
-  assert.deepEqual(keys(s), ['PageDown', 'PageUp', 'PageDown', 'Shift+PageDown', 'Ctrl+Home', 'Alt+PgDn', 'Alt+PgUp']);
+  s.addSheet('Two'); s.run('Ctrl+Home Alt+PgDn'); assert.equal(s.sheetIndex, 1); s.run('Alt+PgUp'); assert.equal(s.sheetIndex, 0); s.run('Ctrl+Alt+PgDn'); assert.equal(s.sheetIndex, 1);
+  assert.deepEqual(keys(s), ['PageDown', 'PageUp', 'PageDown', 'Shift+PageDown', 'Ctrl+Home', 'Ctrl+PgDn', 'Ctrl+PgUp', 'Ctrl+PgDn'], 'the alias is logged as Excel\'s key');
 });
 
 /* ---------------- Excel Options ---------------- */
 test('settings: the recorded shape, gridlines mirroring the active sheet both ways', () => {
   const s = fresh();
   assert.deepEqual(JSON.parse(JSON.stringify(s.settings)), { calcMode: 'automatic', iterative: false, maxIterations: 100, maxChange: 0.001, gridlines: true, qat: ['save', 'undo', 'redo'], showFormulas: false,
-    pageSetup: { orientation: 'portrait', scaling: 'adjust', adjustTo: 100, fitWide: 1, fitTall: 1, titlesRows: '', footer: { left: '', centre: '', right: '' }, printGridlines: false } });
+    pageSetup: { orientation: 'portrait', scaling: 'adjust', adjustTo: 100, fitWide: 1, fitTall: 1, titlesRows: '', footer: { left: '', centre: '', right: '' }, printGridlines: false },
+    enterMoves: true, statusMin: false, statusMax: false, formulaBarExpanded: false, ribbonCollapsed: false });
   assert.deepEqual(s.settings.qat, QAT_DEFAULT); assert.notEqual(s.settings.qat, QAT_DEFAULT);   // a copy
   s.run('Alt W V G'); assert.equal(s.sheet.gridlines, false); assert.equal(s.settings.gridlines, false);
   s.settings.gridlines = true; assert.equal(s.sheet.gridlines, true);
@@ -164,7 +165,7 @@ test('Options › Advanced: G toggles gridlines in the draft; OK writes it to th
   s.run('G'); assert.equal(s.dlg.gridlines, false); assert.equal(s.sheet.gridlines, true);
   s.run('Escape'); assert.equal(s.sheet.gridlines, true); assert.equal(s.settings.gridlines, true); s.run('Escape Escape');
   s.run('Alt F T V G Enter'); assert.equal(s.sheet.gridlines, false); assert.equal(s.settings.gridlines, false);
-  s.run('Alt F T V Tab Tab Space Enter'); assert.equal(s.sheet.gridlines, true);   // V focuses the box; Tab to the page list and back, Space toggles
+  s.run('Alt F T V Tab Tab Tab Space Enter'); assert.equal(s.sheet.gridlines, true);   // V focuses the box; Tab round the page (After pressing Enter, the page list) and back, Space toggles
   s.run('Alt W V G'); assert.equal(s.settings.gridlines, false);
   s.run('Alt F T V'); assert.equal(s.dlg.gridlines, false); s.run('Escape Escape Escape');
 });
@@ -196,19 +197,20 @@ test('Options › Quick Access Toolbar: ↑↓ move the highlight, A adds, R rem
 test('Page Setup: Alt P S P opens the dialog; T/L, A/F, digits and Tab edit the draft; OK records, Cancel discards', () => {
   const s = fresh();
   s.run('Alt P'); assert.deepEqual(s.path, ['P']); s.run('S'); assert.deepEqual(s.path, ['P', 'S']); s.run('P');
-  assert.equal(s.dialog, 'pagesetup'); assert.deepEqual(s.path, ['P', 'S']); assert.equal(s.dlg.focus, 'orient'); assert.equal(s.dlg.orientation, 'portrait');
+  assert.equal(s.dialog, 'pagesetup'); assert.deepEqual(s.path, ['P', 'S']); assert.equal(s.dlg.focus, 'tabs'); assert.equal(s.dlg.orientation, 'portrait');
+  s.run('L'); assert.equal(s.dlg.orientation, 'portrait', 'on the row of tabs a letter no tab has does nothing (M66)'); s.run('Tab'); assert.equal(s.dlg.focus, 'orient');
   s.run('L'); assert.equal(s.dlg.orientation, 'landscape'); assert.equal(s.settings.pageSetup.orientation, 'portrait');
   s.run('Enter'); assert.equal(s.settings.pageSetup.orientation, 'landscape'); assert.equal(s.mode, 'normal'); assert.equal(s.dialog, null);
-  assert.deepEqual(keys(s), ['Alt', 'P', 'S', 'P', 'L', '↵']);
-  s.run('Alt P S P T Escape'); assert.equal(s.settings.pageSetup.orientation, 'landscape'); assert.deepEqual(s.path, ['P', 'S']); s.run('Escape Escape Escape'); assert.equal(s.mode, 'normal');
-  s.run('Alt P S P Down'); assert.equal(s.dlg.orientation, 'landscape'); s.run('Up'); assert.equal(s.dlg.orientation, 'portrait');
+  assert.deepEqual(keys(s), ['Alt', 'P', 'S', 'P', 'L', 'Tab', 'L', '↵']);
+  s.run('Alt P S P Tab T Escape'); assert.equal(s.settings.pageSetup.orientation, 'landscape'); assert.deepEqual(s.path, ['P', 'S']); s.run('Escape Escape Escape'); assert.equal(s.mode, 'normal');
+  s.run('Alt P S P Tab Down'); assert.equal(s.dlg.orientation, 'landscape'); s.run('Up'); assert.equal(s.dlg.orientation, 'portrait');
   s.run('A'); assert.equal(s.dlg.scaling, 'adjust'); assert.equal(s.dlg.focus, 'adjustTo'); s.run('Backspace Backspace Backspace 80'); assert.equal(s.dlg.adjustTo, '80');
   s.run('Up Up'); assert.equal(s.dlg.adjustTo, '82');   // the spinner
   s.run('F'); assert.equal(s.dlg.scaling, 'fit'); assert.equal(s.dlg.focus, 'fitWide'); s.run('Backspace 2'); assert.equal(s.dlg.fitWide, '2');
-  s.run('Tab'); assert.equal(s.dlg.focus, 'fitTall'); s.run('Backspace 3'); assert.equal(s.dlg.fitTall, '3'); s.run('Tab'); assert.equal(s.dlg.focus, 'orient'); s.run('Shift+Tab'); assert.equal(s.dlg.focus, 'fitTall');
+  s.run('Tab'); assert.equal(s.dlg.focus, 'fitTall'); s.run('Backspace 3'); assert.equal(s.dlg.fitTall, '3'); s.run('Tab'); assert.equal(s.dlg.focus, 'tabs'); s.run('Tab'); assert.equal(s.dlg.focus, 'orient'); s.run('Shift+Tab Shift+Tab'); assert.equal(s.dlg.focus, 'fitTall');
   s.run('Enter'); assert.deepEqual(s.settings.pageSetup, { orientation: 'portrait', scaling: 'fit', adjustTo: 82, fitWide: 2, fitTall: 3, titlesRows: '', footer: { left: '', centre: '', right: '' }, printGridlines: false });
-  s.run('Alt P S P A Backspace Backspace 5 Enter'); assert.equal(s.settings.pageSetup.adjustTo, 10);   // clamped to Excel's 10..400
-  s.run('Alt P S P F Backspace Enter'); assert.equal(s.settings.pageSetup.fitWide, 2);   // a blank field keeps its value
+  s.run('Alt P S P Alt+A Backspace Backspace 5 Enter'); assert.equal(s.settings.pageSetup.adjustTo, 10);   // clamped to Excel's 10..400
+  s.run('Alt P S P Alt+F Backspace Enter'); assert.equal(s.settings.pageSetup.fitWide, 2);   // a blank field keeps its value
   // Orientation ▾ on the tab itself, and the dead Page Layout items
   s.run('Alt P O L'); assert.equal(s.settings.pageSetup.orientation, 'landscape'); assert.equal(s.mode, 'normal');
   s.run('Alt P O P'); assert.equal(s.settings.pageSetup.orientation, 'portrait');

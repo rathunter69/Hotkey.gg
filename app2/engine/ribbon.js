@@ -18,7 +18,7 @@ export const MENUS = {
   'F': [['I', 'Info'], ['N', 'New'], ['O', 'Open'], ['S', 'Save'], ['A', 'Save As'], ['P', 'Print'], ['H', 'Share'], ['E', 'Export'], ['C', 'Close'], ['D', 'Account'], ['T', 'Options']],
   'H': [['V', 'Paste'], ['1', 'Bold'], ['2', 'Italic'], ['3', 'Underline'], ['F', 'Font'], ['A', 'Align'], ['5', 'Indent −'], ['6', 'Indent +'], ['H', 'Fill'], ['B', 'Borders'], ['L', 'Conditional Formatting'], ['J', 'Cell styles'], ['W', 'Wrap'], ['K', 'Comma'], ['P', 'Percent'], ['9', 'Dec −'], ['0', 'Dec +'], ['I', 'Insert'], ['D', 'Delete'], ['O', 'Cells'], ['E', 'Clear'], ['U', 'Σ Sum']],
   'HV': [['V', 'Paste values'], ['S', 'Paste special…']],
-  'HE': [['A', 'Clear all'], ['F', 'Clear formats'], ['C', 'Clear contents']],
+  'HE': [['A', 'Clear all'], ['F', 'Clear formats'], ['C', 'Clear contents'], ['M', 'Clear comments and notes']],
   'HI': [['R', 'Insert rows'], ['C', 'Insert columns'], ['S', 'Insert sheet']],
   'HD': [['R', 'Delete rows'], ['C', 'Delete columns'], ['S', 'Delete sheet']],
   'HO': [['H', 'Row height…'], ['A', 'Autofit height'], ['W', 'Column width…'], ['I', 'Autofit width'], ['U', 'Hide & Unhide'], ['R', 'Rename sheet'], ['M', 'Move or copy sheet…'], ['E', 'Format cells…']],   // Excel's Format menu: sizes, visibility, the sheet items, E last
@@ -37,14 +37,15 @@ export const MENUS = {
   'P': [['M', 'Margins'], ['O', 'Orientation'], ['S', 'Page Setup'], ['A', 'Print Area'], ['B', 'Breaks'], ['G', 'Background'], ['I', 'Print Titles']],
   'PO': [['P', 'Portrait'], ['L', 'Landscape']],
   'PS': [['P', 'Page Setup…'], ['Z', 'Size']],
-  'M': [['U', 'Σ AutoSum'], ['P', 'Trace precedents'], ['D', 'Trace dependents'], ['H', 'Show formulas']],
+  'M': [['U', 'Σ AutoSum'], ['M', 'Define Name'], ['P', 'Trace precedents'], ['D', 'Trace dependents'], ['H', 'Show formulas']],
+  'MM': [['D', 'Define Name…']],
   'MU': [['S', 'Sum']],
   'A': [['S', 'Sort'], ['G', 'Group'], ['U', 'Ungroup'], ['H', 'Hide detail'], ['J', 'Show detail']],   // Excel's Outline group: Group, Ungroup, Hide / Show Detail
   'AG': [['G', 'Group…'], ['A', 'Auto Outline']],      // split buttons, as in Excel: Alt A G G groups, Alt A U U ungroups
   'AU': [['U', 'Ungroup…'], ['C', 'Clear Outline']],
   'AS': [['A', 'Sort A→Z'], ['D', 'Sort Z→A']],
   'E': [['S', 'Paste special…']],
-  'W': [['V', 'Show'], ['F', 'Freeze Panes']],
+  'W': [['V', 'Show'], ['Q', 'Zoom'], ['J', '100%'], ['F', 'Freeze Panes']],
   'WV': [['G', 'Gridlines']],
   'WF': [['F', 'Freeze Panes'], ['R', 'Freeze Top Row'], ['C', 'Freeze First Column']],
 };
@@ -182,6 +183,7 @@ export const COMMANDS = {
   'AGG': 'Group…', 'AUU': 'Ungroup…', 'AUC': 'Clear outline', 'AH': 'Hide detail', 'AJ': 'Show detail', 'MH': 'Show formulas',
   'HFDF': 'Find…', 'HFDR': 'Replace…', 'HFDS': 'Go To Special…', 'HFDU': 'Select formulas', 'HFDN': 'Select constants',
   'HOH': 'Row height…', 'HOUR': 'Hide rows', 'HOUC': 'Hide columns', 'HOUO': 'Unhide rows', 'HOUL': 'Unhide columns',
+  'HEM': 'Clear comments and notes', 'MMD': 'Define Name…', 'WQ': 'Zoom…', 'WJ': 'Zoom to 100%',
   'WFF': 'Freeze panes', 'WFR': 'Freeze top row', 'WFC': 'Freeze first column',
   'HLHG': 'Greater Than…', 'HLHL': 'Less Than…', 'HLHB': 'Between…', 'HLHE': 'Equal To…', 'HLN': 'New Formatting Rule…',
   'HLD': 'Data Bars', 'HLS': 'Color Scales', 'HLCS': 'Clear Rules from Selected Cells', 'HLCE': 'Clear Rules from Entire Sheet', 'HLR': 'Manage Rules…',

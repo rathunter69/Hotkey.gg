@@ -22,6 +22,7 @@ import { TABS, MENUS, RIBBON_GROUPS, RIBBON_ICONS, RIBBON_MENU_ICONS, FMT_OPTS, 
 import { FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES, CF_STYLES, CF_STYLE_KEYS, CF_BAR_COLORS, CF_SCALES, CF_OP_LABEL } from '../engine/sheet.js';
 import { DELETE_SHEET_PROMPT } from '../engine/keyboard.js';
 import { dispText } from '../engine/format.js';
+import { FC_TABS, FC_CATEGORIES, FC_TYPES, FC_NEGATIVES, numberCode, numberTabResult, ZOOM_CHOICES } from '../engine/dialogs.js';
 import { prefs } from '../app/prefs.js';
 import { RIBBON_COMMANDS, RIBBON_LAYOUT, MENU_META, VIRTUAL_MENUS, UNIMPLEMENTED_BY_ID, MODAL_DIALOGS, CARD_DIALOGS, MENU_ITEM_ICONS, QAT_ICONS,
   itemTip, keyTipAt, runCommand, runQatCommand, openMenuPath, recordMouse, closeDialog, leaveRibbon, menuEntries } from './ribbon-commands.js';
@@ -324,8 +325,15 @@ export class RibbonView {
   findHtml() {
     const ss = this.session, d = ss.dlg; if (!d) return '';
     const F = RibbonView.field;
-    return `<div class="gt-ref"><label>Find what:</label>${F(d.find, d.focus === 'find', 'dset:focus:find', 'wide')}</div>` +
-      (d.replace ? `<div class="gt-ref"><label>Replace with:</label>${F(d.repl, d.focus === 'repl', 'dset:focus:repl', 'wide')}</div>` : '') +
+    const findVal = d.findSel ? `<span class="od-field wide${d.focus === 'find' ? ' foc' : ''}" data-act="dset:focus:find"><span class="od-seltext">${esc(d.find)}</span>${d.focus === 'find' ? '<i class="od-caret"></i>' : ''}</span>` : F(d.find, d.focus === 'find', 'dset:focus:find', 'wide');
+    const LOOK = { formulas: 'Formulas', values: 'Values', notes: 'Notes' };
+    const opts = d.options ? `<div class="od-row"><span class="od-lbl">Wit<u>h</u>in:</span><span class="od-combo" data-act="dset:key:Alt+H">${d.within === 'workbook' ? 'Workbook' : 'Sheet'}</span>` +
+      `<span class="od-lbl"><u>L</u>ook in:</span><span class="od-combo" data-act="dset:key:Alt+L">${LOOK[d.lookIn] || 'Formulas'}</span></div>` : '';
+    const results = d.results && d.results.length ? '<div class="od-list fd-results"><div class="od-item fd-h"><span>Sheet</span><span>Cell</span><span>Value</span><span>Formula</span></div>' +
+      d.results.map((r, i) => `<div class="od-item${i === d.sel ? ' on' : ''}"><span>${esc(r.sheet)}</span><span>${esc(r.cell)}</span><span>${esc(r.value)}</span><span>${esc(r.formula)}</span></div>`).join('') + '</div>' : '';
+    return `<div class="gt-ref"><label>Fi<u>n</u>d what:</label>${findVal}</div>` +
+      (d.replace ? `<div class="gt-ref"><label>R<u>e</u>place with:</label>${F(d.repl, d.focus === 'repl', 'dset:focus:repl', 'wide')}</div>` : '') + opts +
+      `<div class="ps-btns"><span class="pd-btn" data-act="dset:key:Alt+T">Op<u>t</u>ions ${d.options ? '&lt;&lt;' : '&gt;&gt;'}</span><span class="pd-btn" data-act="dset:key:Alt+I">F<u>i</u>nd All</span><span class="pd-btn" data-act="dset:key:Alt+F"><u>F</u>ind Next</span></div>` + results +
       (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : `<div class="od-caplbl">${d.replace ? 'Tab switches fields · ↵ Find Next · Alt+A Replace All' : '↵ Find Next'} · esc close</div>`);
   }
   /* ---- Chapter 2 cards: the Custom box and Conditional Formatting ---- */
@@ -399,6 +407,7 @@ export class RibbonView {
       R(d.pick === 'blanks', 'letter:K', 'Blan<u>k</u>s', 'K') +
       R(d.pick === 'constants', 'letter:O', 'C<u>o</u>nstants', 'O') +
       R(d.pick === 'formulas', 'letter:F', '<u>F</u>ormulas', 'F') +
+      R(d.pick === 'notes', 'letter:N', '<u>N</u>otes', 'N') +
       (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">within the selection (the region around the active cell when nothing is selected) · ↵ OK · esc cancel</div>');
   }
   gotoHtml() {
@@ -439,6 +448,7 @@ export class RibbonView {
         C(true, '', 'Show row and column headers') + C(false, '', 'Show formulas in cells instead of their calculated results') + C(false, '', 'Show page breaks') +
         C(true, '', 'Show a zero in cells that have zero value') + C(true, '', 'Show outline symbols if an outline is applied') +
         C(d.gridlines, 'letter:G', 'Show gridlines', 'G', { foc: d.focus === 'gridlines' }) +
+        '<div class="od-sect">Editing options</div>' + C(d.enterMoves !== false, 'letter:M', 'After pressing Enter, <u>m</u>ove selection', 'M', { foc: d.focus === 'enterMoves' }) +
         `<div class="od-row ind dis"><span class="od-lbl">Gridline color</span><span class="od-combo">Automatic</span></div>` +
         '<div class="od-sect">Display</div>' + C(true, '', 'Show formula bar') + C(true, '', 'Show function ScreenTips');
     } else {
@@ -458,12 +468,19 @@ export class RibbonView {
   pageSetupHtml() {
     const ss = this.session, d = ss.dlg; if (!d) return '';
     const R = RibbonView.radio, F = RibbonView.field, C = RibbonView.check;
-    const tab = (key, label) => `<span class="ps-tab${d.tab === key ? ' on' : ''}" data-act="dset:tab:${key}">${label}</span>`;
-    const tabs = '<div class="ps-tabs">' + tab('page', '<u>P</u>age') + '<span class="ps-tab dis">Margins</span>' + tab('hf', '<u>H</u>eader/Footer') + tab('sheet', '<u>S</u>heet') + '</div>';
-    if (d.tab === 'hf') {   // the three footer sections (Excel's Custom Footer dialog, folded onto the tab): Alt+L / C / R, Tab between them
+    const tabs = RibbonView.tabRow([{ k: 'page', html: 'Page' }, { k: 'margins', html: 'Margins' }, { k: 'hf', html: 'Header/Footer' }, { k: 'sheet', html: 'Sheet' }], d.tab, d.focus === 'tabs');
+    if (d.tab === 'hf') {   // the three footer sections; Alt+U opens Excel's Custom Footer box on them, the cursor in the left one
       const sect = (key, label, u) => `<div class="gt-ref"><label><u>${u}</u>${label}:</label>${F(d[key], d.focus === key, 'dset:focus:' + key, 'wide')}</div>`;
-      return tabs + '<div class="od-sect">Footer</div>' + sect('footL', 'eft section', 'L') + sect('footC', 'enter section', 'C') + sect('footR', 'ight section', 'R') +
-        '<div class="od-caplbl">&amp;[Page] &amp;[Pages] &amp;[File] &amp;[Tab] &amp;[Date] are the codes · Tab moves between sections · Alt+L Alt+C Alt+R</div>';
+      const foot = [d.footL, d.footC, d.footR].filter(Boolean).join('   ');
+      if (d.sub === 'footer') return tabs + '<div class="od-sect">Footer</div>' + sect('footL', 'eft section', 'L') + sect('footC', 'enter section', 'C') + sect('footR', 'ight section', 'R') +
+        '<div class="od-caplbl">The codes are &amp;[Page], &amp;[Pages], &amp;[File], &amp;[Tab] and &amp;[Date]. Enter returns to Page Setup.</div>';
+      return tabs + `<div class="od-sect">Footer</div><div class="od-row"><span class="od-combo" style="min-width:240px">${esc(foot || '(none)')}</span></div>` +
+        '<div class="ps-btns"><span class="pd-btn dis">Custom Header…</span><span class="pd-btn" data-act="dset:key:Alt+U">C<u>u</u>stom Footer…</span></div>';
+    }
+    if (d.tab === 'margins') {   // M66: the four margins, the header and footer margins (inches) and Center on page
+      const m = (key, label, u) => `<div class="ps-margin"><span class="od-lbl">${label.replace(u, '<u>' + u + '</u>')}:</span>${F(d[key], d.focus === key, 'dset:focus:' + key)}</div>`;
+      return tabs + '<div class="ps-margins">' + m('mHeader', 'Header', 'a') + m('mTop', 'Top', 'T') + m('mLeft', 'Left', 'L') + m('mRight', 'Right', 'R') + m('mBottom', 'Bottom', 'B') + m('mFooter', 'Footer', 'F') + '</div>' +
+        '<div class="od-sect">Center on page</div>' + C(d.centerH, 'dset:key:Alt+Z', 'Hori<u>z</u>ontally', '', { foc: d.focus === 'centerH' }) + C(d.centerV, 'dset:key:Alt+V', '<u>V</u>ertically', '', { foc: d.focus === 'centerV' });
     }
     if (d.tab === 'sheet') {
       return tabs + '<div class="od-sect">Print titles</div>' +
@@ -513,6 +530,92 @@ export class RibbonView {
       `<div class="od-caplbl" style="margin-top:6px">Before sheet:</div><div class="od-list foc mv-list" role="listbox" aria-label="Before sheet">${list}</div>` +
       RibbonView.check(d.copy, 'letter:C', 'Create a copy', 'C') +
       '<div class="od-caplbl">↑ ↓ pick the sheet it goes before · C toggles Create a copy · ↵ OK · esc cancel</div>';
+  }
+  /* ---- run R1 cards: Format Cells, Series, Zoom, Define Name, Note (engine/dialogs.js drafts) ---- */
+  /** A row of tabs: `on` the open one; the row itself shows focus when the keyboard is on it (M66). */
+  static tabRow(tabs, cur, rowFoc) {
+    return `<div class="ps-tabs${rowFoc ? ' foc' : ''}">` + tabs.map(t => `<span class="ps-tab${t.k === cur ? ' on' : ''}" data-act="dset:tab:${t.k}">${t.html}</span>`).join('') + '</div>';
+  }
+  formatCellsHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const R = RibbonView.radio, C = RibbonView.check, F = RibbonView.field;
+    const ul = (label, key) => { const i = label.indexOf(key); return i < 0 ? esc(label) : esc(label.slice(0, i)) + '<u>' + esc(label[i]) + '</u>' + esc(label.slice(i + 1)); };
+    const tabs = RibbonView.tabRow(FC_TABS.map(t => ({ k: t.k, html: ul(t.label, t.key) })), d.tab, d.focus === 'tabs');
+    const a = ss.sheet.dispActive(), cell = ss.sheet.get(a.r, a.c);
+    let body = '';
+    if (d.tab === 'number') {
+      const cats = FC_CATEGORIES.map((c, i) => `<div class="od-item${i === d.catIdx ? ' on' : ''}" data-act="dset:cat:${i}">${esc(c.label)}</div>`).join('');
+      const res = numberTabResult(d);
+      const sample = res && typeof cell.value === 'number' ? dispText({ ...cell, fmtStyle: res.style, decimals: res.decimals | 0, numFmt: res.numFmt, scale: 0 }) : '';
+      let right = `<div class="od-caplbl">Sample</div><div class="fc-sample">${esc(sample)}</div>`;
+      if (['number', 'currency', 'accounting', 'percentage', 'scientific'].includes(d.cat)) right += `<div class="od-row"><span class="od-lbl"><u>D</u>ecimal places:</span>${F(d.decimals, d.focus === 'decimals', 'dset:key:Alt+D')}</div>`;
+      if (d.cat === 'number') right += C(d.sep, 'dset:key:Alt+U', '<u>U</u>se 1000 Separator (,)', '', { foc: d.focus === 'sep' });
+      if (d.cat === 'number' || d.cat === 'currency') {
+        right += '<div class="od-caplbl"><u>N</u>egative numbers:</div>' + `<div class="od-list${d.focus === 'neg' ? ' foc' : ''}">` +
+          FC_NEGATIVES.map(n => { const code = numberCode(d.cat, parseInt(d.decimals, 10) || 0, d.cat === 'currency' || d.sep, n); const red = n === 'red' || n === 'parenRed';
+            return `<div class="od-item${n === d.neg ? ' on' : ''}${red ? ' fc-red' : ''}" data-act="dset:neg:${n}">${esc(dispText({ value: -1234.1, fmtStyle: 'custom', numFmt: code }).trim())}</div>`; }).join('') + '</div>';
+      }
+      if (FC_TYPES[d.cat]) right += `<div class="od-caplbl"><u>T</u>ype:</div><div class="od-list${d.focus === 'type' ? ' foc' : ''}">` + FC_TYPES[d.cat].map((t, i) => `<div class="od-item${i === (d.typeIdx | 0) ? ' on' : ''}">${esc(t)}</div>`).join('') + '</div>';
+      if (d.cat === 'custom') right += `<div class="gt-ref"><label><u>T</u>ype:</label><span class="od-field wide${d.focus === 'code' ? ' foc' : ''}">${d.codeSel ? `<span class="od-seltext">${esc(d.code)}</span>` : esc(d.code)}${d.focus === 'code' ? '<i class="od-caret"></i>' : ''}</span></div>`;
+      if (d.cat === 'general') right += '<div class="od-caplbl">General format cells have no specific number format.</div>';
+      body = `<div class="fc-number"><div><div class="od-caplbl"><u>C</u>ategory:</div><div class="od-list fc-cats${d.focus === 'category' ? ' foc' : ''}">${cats}</div></div><div class="fc-right">${right}</div></div>`;
+    } else if (d.tab === 'alignment') {
+      const AL = [['general', 'General'], ['l', 'Left (Indent)'], ['c', 'Center'], ['r', 'Right (Indent)'], ['ca', 'Center Across Selection']];
+      const cur = d.ca ? 'ca' : d.align;
+      body = '<div class="od-sect">Text alignment</div><div class="od-caplbl"><u>H</u>orizontal:</div>' + `<div class="od-list${d.focus === 'horizontal' ? ' foc' : ''}">` +
+        AL.map(([k, l]) => `<div class="od-item${k === cur ? ' on' : ''}">${esc(l)}</div>`).join('') + '</div>' +
+        `<div class="od-row"><span class="od-lbl"><u>I</u>ndent:</span>${F(d.indent, d.focus === 'indent', 'dset:key:Alt+I')}</div>` +
+        '<div class="od-sect">Text control</div>' + C(d.wrap, 'dset:key:Alt+W', '<u>W</u>rap text', '', { foc: d.focus === 'wrap' });
+    } else if (d.tab === 'font') {
+      const ST = [[false, false, 'Regular'], [false, true, 'Italic'], [true, false, 'Bold'], [true, true, 'Bold Italic']];
+      body = '<div class="od-caplbl">F<u>o</u>nt style:</div>' + `<div class="od-list${d.focus === 'style' ? ' foc' : ''}">` +
+        ST.map(([b, i, l]) => `<div class="od-item${b === d.bold && i === d.it ? ' on' : ''}">${esc(l)}</div>`).join('') + '</div>' +
+        C(d.uline, 'dset:key:Alt+U', '<u>U</u>nderline: Single', '', { foc: d.focus === 'underline' }) + C(d.strike, 'dset:key:Alt+K', 'Stri<u>k</u>ethrough', '', { foc: d.focus === 'strike' }) +
+        `<div class="od-row${d.focus === 'color' ? ' foc' : ''}"><span class="od-lbl"><u>C</u>olor:</span><span class="od-combo">${esc(d.fontColor ? ((FONT_SWATCHES.find(s => s.k === d.fontColor) || {}).name || d.fontColor) : 'Automatic')}</span></div>`;
+    } else if (d.tab === 'border') {
+      const B = [['none', 'None'], ['outside', 'Outline'], ['top', 'Top'], ['bottom', 'Bottom'], ['topbottom', 'Top and bottom'], ['double', 'Double bottom']];
+      body = '<div class="od-sect">Presets and edges</div>' + B.map(([k, l]) => R(d.border === k, '', esc(l), '')).join('');
+    } else if (d.tab === 'fill') {
+      body = '<div class="od-sect">Background color</div><div class="fc-swatches">' + R(!d.fill, 'dset:key:Alt+N', '<u>N</u>o Color', '') +
+        FILL_SWATCHES.map(s => `<span class="fc-swatch${s.k === d.fill ? ' on' : ''}" title="${esc(s.name || s.k)}" style="background:${s.hex || s.k}"></span>`).join('') + '</div>';
+    } else {
+      body = C(d.locked, 'dset:key:Alt+L', '<u>L</u>ocked', '', { foc: d.focus === 'locked' }) + C(d.hidden, 'dset:key:Alt+I', 'H<u>i</u>dden', '', { foc: d.focus === 'hidden' }) +
+        '<div class="od-caplbl">Locking cells or hiding formulas has no effect until you protect the worksheet.</div>';
+    }
+    return tabs + body + (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '');
+  }
+  seriesHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const R = RibbonView.radio, F = RibbonView.field;
+    const col = (title, items) => `<div class="sr-col"><div class="od-sect">${title}</div>${items}</div>`;
+    return '<div class="sr-cols">' +
+      col('Series in', R(d.dir === 'rows', 'dset:key:Alt+R', '<u>R</u>ows', '', { foc: d.focus === 'dir' }) + R(d.dir === 'cols', 'dset:key:Alt+C', '<u>C</u>olumns', '', { foc: d.focus === 'dir' })) +
+      col('Type', R(d.type === 'linear', 'dset:key:Alt+L', '<u>L</u>inear', '', { foc: d.focus === 'type' }) + R(d.type === 'growth', 'dset:key:Alt+G', '<u>G</u>rowth', '', { foc: d.focus === 'type' }) +
+        R(d.type === 'date', 'dset:key:Alt+D', '<u>D</u>ate', '', { foc: d.focus === 'type' }) + R(d.type === 'autofill', 'dset:key:Alt+F', 'Auto<u>F</u>ill', '', { foc: d.focus === 'type' })) +
+      col('Date unit', ['day', 'weekday', 'month', 'year'].map(u => { const L = { day: 'D<u>a</u>y', weekday: '<u>W</u>eekday', month: '<u>M</u>onth', year: '<u>Y</u>ear' }[u]; const k = { day: 'A', weekday: 'W', month: 'M', year: 'Y' }[u];
+        return R(d.unit === u, d.type === 'date' ? 'dset:key:Alt+' + k : '', L, '', { foc: d.focus === 'unit', cls: d.type === 'date' ? '' : 'dis' }); }).join('')) +
+      '</div>' +
+      `<div class="od-row"><span class="od-lbl"><u>S</u>tep value:</span>${F(d.step, d.focus === 'step', 'dset:key:Alt+S')}<span class="od-lbl">St<u>o</u>p value:</span>${F(d.stop, d.focus === 'stop', 'dset:key:Alt+O')}</div>` +
+      (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '');
+  }
+  zoomHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const ul = (label, k) => { const i = label.indexOf(k); return i < 0 ? esc(label) : esc(label.slice(0, i)) + '<u>' + esc(label[i]) + '</u>' + esc(label.slice(i + 1)); };
+    return '<div class="od-sect">Magnification</div>' + ZOOM_CHOICES.map(c => RibbonView.radio(d.pick === c.z, 'dset:key:Alt+' + c.k, ul(c.label, c.k) +
+      (c.z === 'custom' ? ' ' + RibbonView.field(d.custom, d.pick === 'custom', '') + ' %' : ''), '')).join('') +
+      (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '');
+  }
+  defineNameHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    const val = d.selected ? `<span class="od-seltext">${esc(d.name)}</span>` : esc(d.name);
+    return `<div class="gt-ref"><label><u>N</u>ame:</label><span class="od-field foc wide">${val}<i class="od-caret"></i></span></div>` +
+      '<div class="od-row dis"><span class="od-lbl"><u>S</u>cope:</span><span class="od-combo">Workbook</span></div>' +
+      `<div class="gt-ref"><label><u>R</u>efers to:</label><span class="od-field wide">${esc(d.refersTo)}</span></div>` +
+      (ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '');
+  }
+  noteHtml() {
+    const ss = this.session, d = ss.dlg; if (!d) return '';
+    return `<div class="nt-box">${esc(d.text)}<i class="od-caret"></i></div>`;
   }
   drawDialog() {
     const ss = this.session;
@@ -598,6 +701,17 @@ export class RibbonView {
       this.showCard(d, ss.dialog === 'gotospecial' && !!ss.dlg, ss.dialog === 'gotospecial' ? this.gotoSpecialHtml() : '', RibbonView.okCancel('OK'));
     }
     // Chapter 2: the Custom box (Ctrl+1 › U) and the Conditional Formatting cards
+    const R1_CARDS = [['formatcells', 'formatCellsDialog', 'Format Cells', 'pd-wide', 'formatCellsHtml'], ['series', 'seriesDialog', 'Series', 'pd-mid', 'seriesHtml'],
+      ['zoom', 'zoomDialog', 'Zoom', 'pd-mid', 'zoomHtml'], ['definename', 'defineNameDialog', 'New Name', 'pd-mid', 'defineNameHtml']];
+    for (const [name, id, title, cls, fn] of R1_CARDS) {
+      if (ss.dialog !== name && !this['_' + id]) continue;
+      const d = this['_' + id] || (this['_' + id] = this.wideCard(id, title, cls));
+      this.showCard(d, ss.dialog === name && !!ss.dlg, ss.dialog === name ? this[fn]() : '', RibbonView.okCancel('OK'));
+    }
+    if (ss.dialog === 'note' || this._noteDialog) {   // the note: a small yellow box beside the cell, typed into directly; Esc leaves it
+      const d = this._noteDialog || (this._noteDialog = this.wideCard('noteDialog', 'Note', 'pd-mid nt-card'));
+      this.showCard(d, ss.dialog === 'note' && !!ss.dlg, ss.dialog === 'note' ? this.noteHtml() : '', '<span class="pd-spacer"></span><span class="pd-btn ok" data-act="dset:noteDone:1">Done <kbd>esc</kbd></span>');
+    }
     if (ss.dialog === 'numfmt' || this.numfmtDialog) {
       const d = this.numfmtDialog || (this.numfmtDialog = this.wideCard('numfmtDialog', 'Format Cells', 'pd-mid'));
       this.showCard(d, ss.dialog === 'numfmt' && !!ss.dlg, ss.dialog === 'numfmt' ? this.numFmtHtml() : '', RibbonView.okCancel('OK'));
@@ -714,6 +828,7 @@ export class RibbonView {
 
   paint() {
     if (this.slot) this.slot.classList.toggle('rib-full', this.mode === 'full');
+    if (this.slot) this.slot.classList.toggle('rib-collapsed', !!(this.session.settings && this.session.settings.ribbonCollapsed) && !this.session.path.length);   // Ctrl+F1 (M40): tabs only until a KeyTip walk opens it
     this.drawDialog();
     this.dropKill();
     if (this.mode === 'full') this.paintFull(); else this.paintSlim();
@@ -761,7 +876,6 @@ export class RibbonView {
     if (ss.dialog === 'cellstyle') { this.dropShow(this.anchorFor('HJ'), this.styleDropHtml(), 'rdrop-gallery'); return; }
     if (ss.dialog === 'colw' || ss.dialog === 'rowh') { this.dropShow(this.anchorFor('HO'), this.smallDialogHtml(), 'rdrop-dialog'); return; }
     if (ss.dialog === 'sortwarn') { this.dropShow(this.anchorFor('ASA', 'HSF'), this.smallDialogHtml(), 'rdrop-dialog'); return; }
-    if (ss.dialog === 'series') { this.dropShow(this.anchorFor('HFI'), this.smallDialogHtml(), 'rdrop-dialog'); return; }
     if (ss.dialog === 'fxfix') { this.dropShow(this.anchorFor(), this.smallDialogHtml(), 'rdrop-dialog'); return; }
     if (CARD_DIALOGS.has(ss.dialog)) return;   // the cards carry the options
     if (ss.dialog) { this.dropShow(this.anchorFor(), this.smallDialogHtml(), 'rdrop-dialog'); return; }
@@ -940,11 +1054,6 @@ export class RibbonView {
       el.innerHTML = '<span class="path">sort warning →</span><span class="opt" data-act="letter:E"><k>e</k>Expand the selection</span><span class="opt" data-act="letter:C"><k>c</k>Continue with the current selection</span><span class="opt">data sits NEXT to your column — ↵ = expand (Excel’s default) · esc cancel</span>';
       return;
     }
-    if (ss.dialog === 'series') {
-      el.className = 'ribbon show';
-      el.innerHTML = '<span class="path">series →</span><span class="opt">linear, step from selection · <kbd>↵</kbd> apply · <kbd>esc</kbd> cancel</span>';
-      return;
-    }
     if (ss.dialog === 'find') { el.className = 'ribbon show';   // the floating card carries the fields
       el.innerHTML = '<span class="path">' + (ss.dlg && ss.dlg.replace ? 'replace' : 'find') + ' →</span><span class="opt" style="font-family:var(--mono)">' + esc(ss.dlg ? (ss.dlg.focus === 'repl' ? ss.dlg.repl : ss.dlg.find) || '…' : '…') + '</span><span class="opt">↵ find next' + (ss.dlg && ss.dlg.replace ? ' · alt+a replace all · tab switches fields' : '') + ' · esc close</span>';
       return; }
@@ -958,7 +1067,7 @@ export class RibbonView {
       el.innerHTML = '<span class="path">excel options →</span><span class="opt">F formulas · V advanced · Q quick access toolbar · letters pick · ↵ OK · esc cancel</span>';
       return; }
     if (ss.dialog === 'pagesetup') { el.className = 'ribbon show';
-      el.innerHTML = '<span class="path">page setup →</span><span class="opt">T portrait · L landscape · A adjust to · F fit to · ↵ OK · esc cancel</span>';
+      el.innerHTML = '<span class="path">page setup →</span><span class="opt">Ctrl+PgDn steps the tabs, Tab goes onto the page, Enter is OK</span>';
       return; }
     if (ss.dialog === 'renamesheet') { el.className = 'ribbon show';   // the floating card carries the field
       el.innerHTML = '<span class="path">rename sheet →</span><span class="opt" style="font-family:var(--mono)">' + esc(ss.dlg && ss.dlg.name ? ss.dlg.name : '…') + '</span><span class="opt">type the new name · ↵ OK · esc cancel</span>';

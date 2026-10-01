@@ -110,7 +110,7 @@ test('insert and delete rows/columns shift cells, formulas and widths', () => {
 });
 
 test('column widths: autofit, explicit width, auto-grow after number formats', () => {
-  const s = new Sheet({ cells: { A1: { value: 1234567.891 } } });
+  const s = new Sheet({ cells: { A1: { value: 1234567.891, fmtStyle: 'comma', decimals: 2 } } });   // a formatted number shows ####; a General one shrinks to fit (general-fit.test.js)
   assert.equal(s.overflowsCol(1), true);
   s.select('A1'); s.autofitCols(); assert.equal(s.overflowsCol(1), false); assert.ok(s.colW[1] > COLW_DEFAULT);
   s.setColWidth(10); assert.equal(s.colW[1], 75);
