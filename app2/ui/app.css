@@ -257,6 +257,7 @@ html[data-dark="1"] td.fc-orange   {color:#ed7d31 !important}   /* r160: darker 
 /* r204: on LIGHT sheets, black-formatted cells read as the softened graphite --text, not pure #000. */
 html[data-dark="0"] td.fc-black    {color:var(--text) !important}
 td.over{color:var(--warn); letter-spacing:1px}
+td .padx{visibility:hidden}   /* an _x pad in a number format: a gap the width of x (_) is a closing bracket), M64 */
 /* r253: the edit box POPS OUT beyond the column so a long formula reads in-cell (Excel behavior).
    The cell stops clipping; an absolute overlay grows to the formula's width and paints over the
    empty neighbors to the right. */

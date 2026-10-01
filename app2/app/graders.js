@@ -9,7 +9,7 @@ import { translateFormula } from '../engine/formula.js';
 import { isLiveFormula } from '../engine/live.js';
 import { parseRef, refKey, colLetter } from '../engine/refs.js';
 import { dispText } from '../engine/format.js';
-import { codeDecimals } from '../engine/numfmt.js';
+import { codeDecimals, builtinCode } from '../engine/numfmt.js';
 import { FSZ_BASE } from '../engine/sheet.js';
 
 const ok = () => ({ ok: true, why: '' });
@@ -390,3 +390,56 @@ export function unchangedExcept(sheet, before, allowed = []) {
   }
   return ok();
 }
+
+/* ---------------- M63 / M64: the desk number format and signed-formula starts ---------------- */
+/** The code a cell is dressed in, as Format Cells › Custom shows it: its own custom code, or the code of its built-in style. */
+export function cellFormatCode(cell) {
+  if (!cell) return 'General';
+  if (cell.fmtStyle === 'custom' && cell.numFmt) return cell.numFmt;
+  return builtinCode(cell.fmtStyle || 'general', cell.decimals | 0, cell.scale | 0);
+}
+/** A code's sections (split on ; outside quotes and brackets). */
+function codeSections(code) {
+  const out = []; let cur = '', q = false, b = false;
+  for (const ch of String(code)) {
+    if (ch === '"' && !b) q = !q; else if (ch === '[' && !q) b = true; else if (ch === ']' && !q) b = false;
+    if (ch === ';' && !q && !b) { out.push(cur); cur = ''; } else cur += ch;
+  }
+  out.push(cur); return out;
+}
+/** A section with its spacers (_x), fills (*x), quoted text and [colour] tags taken out: the digits and punctuation that show. */
+const bareSection = sec => String(sec).replace(/"[^"]*"/g, '').replace(/\[[^\]]*\]/g, '').replace(/[_*]./g, '').replace(/\s+/g, '');
+/**
+ * The desk number format (M64): a thousands separator, no decimals, negatives in brackets. Every
+ * route that writes it passes: Format Cells › Number (0 decimals, Use 1000 Separator, (1,234)) is
+ * #,##0_);(#,##0), red or not; Comma Style with its decimals taken off (Alt H K, Alt H 9 twice) is
+ * _(* #,##0_);_(* (#,##0);_(* "-"??_);_(@_). With `countsOk`, plain #,##0 passes too (a column of
+ * counts that can never be negative).
+ */
+export function isDeskNumberFormat(code, opts = {}) {
+  const secs = codeSections(code).map(bareSection);
+  if (!/^#,##0$/.test(secs[0] || '')) return false;
+  if (secs.length === 1) return !!opts.countsOk;
+  return /^\(#,##0\)$/.test(secs[1] || '');
+}
+/** Grade cells' format as the desk number format: { ok, why }. */
+export function deskNumberFormat(sheet, range, opts = {}) {
+  for (const [r, c, ref] of eachRef(range)) {
+    if (!isDeskNumberFormat(cellFormatCode(sheet.get(r, c)), opts)) return fail(cellName(ref) + ' is not in the desk number format: thousands separator, no decimals, negatives in brackets');
+  }
+  return ok();
+}
+/**
+ * A formula as a grader compares it (M63): the keypad habit's leading + is dropped (=+D5-E5 is
+ * =D5-E5; =-D5 stays), spaces outside quotes go, and the case outside quotes is evened.
+ */
+export function normalizeSignedFormula(f) {
+  let t = String(f == null ? '' : f).trim();
+  if (t[0] === '+' || t[0] === '-') t = '=' + t;
+  t = t.replace(/^=\s*\+\s*/, '=');
+  let out = '', q = false;
+  for (const ch of t) { if (ch === '"') q = !q; if (!q && /\s/.test(ch)) continue; out += q ? ch : ch.toUpperCase(); }
+  return out;
+}
+/** Two formulas are the same entry once the leading + is set aside (M63). */
+export const sameFormula = (a, b) => normalizeSignedFormula(a) === normalizeSignedFormula(b);

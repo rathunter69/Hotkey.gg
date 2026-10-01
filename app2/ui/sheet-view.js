@@ -14,8 +14,8 @@
 //   view.render();                                       // (re-runs on session.onChange)
 //   view.destroy();
 
-import { COLW_DEFAULT, cellNumPx, cellTxtPx } from '../engine/sheet.js';
-import { dispText, dispColor, HASHES } from '../engine/format.js';
+import { COLW_DEFAULT, cellShown, cellTxtPx } from '../engine/sheet.js';
+import { dispText, dispColor, PAD_MARK } from '../engine/format.js';
 import { colLetter, refKey, parseRef } from '../engine/refs.js';
 import { formulaRefs, isErrVal } from '../engine/formula.js';
 import { recordMouse, MODAL_DIALOGS } from './ribbon-commands.js';
@@ -30,6 +30,8 @@ export const ROWHDR_W = 36;    // px, the row-number column: three digits at 11p
 export const CELL_PAD = 3;     // px each side of a cell's text
 const HASH_PX = 9.2;           // one '#' of the #### verdict at the 11pt cell font (8.2px glyph + 1px letter-spacing)
 
+/** An escaped display text with each _x pad marker (PAD_MARK + x) as an invisible x: a gap exactly x wide (M64: _) is a bracket's width). */
+export function padHtml(s) { return String(s).replace(new RegExp(PAD_MARK + '(&[a-z#0-9]+;|.)', 'g'), (m, ch) => '<span class="padx" aria-hidden="true">' + ch + '</span>'); }
 export function escHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
 /**
@@ -326,10 +328,12 @@ export class SheetView {
           const fcKey = dispColor(cell) || cell.fontColor;   // a custom code's [Red] section wins over the font colour, as in Excel
           if (fcKey) { if (fcKey[0] === '#') style += ';color:' + fcKey; else cls += ' fc-' + fcKey; }   // [Color 9]: a palette hex the swatches lack
 
-          const shown = dispText(cell);
-          // the td collapses spaces (white-space:nowrap): a number keeps every one — the _) pad that lines
-          // 1,235 up under (1,235), the accounting $   -   — and text keeps its leading and trailing run
-          txt = isNum ? escHtml(shown).replace(/ /g, '&nbsp;') : escHtml(shown).replace(/^ +| +$/g, m => '&nbsp;'.repeat(m.length));
+          const fit = isNum ? cellShown(cell, W[c]) : null;
+          const shown = isNum ? fit.text : dispText(cell);
+          // the td collapses spaces (white-space:nowrap): a number keeps every one (the accounting $   -  ),
+          // an _x pad paints as an invisible x, so 1,235 lines up under (1,235) to the bracket's width,
+          // and text keeps its leading and trailing run
+          txt = isNum ? padHtml(escHtml(shown).replace(/ /g, '&nbsp;')) : escHtml(shown).replace(/^ +| +$/g, m => '&nbsp;'.repeat(m.length));
           const fxShown = showFx && !!cell.formula && !(editing && isActive);
           if (fxShown) { cls += ' txt fxshow'; txt = escHtml(cell.formula); }   // show formulas: the text, left-aligned, no #### verdict
           if (editing && isActive) {
@@ -362,8 +366,7 @@ export class SheetView {
           else if (isNum && !cell.wrap) {
             // #### when the number needs more than the column's engine width, or when its format cannot
             // show it at all (a negative date, a value no section fits): the engine's own # fill
-            const tw = cellNumPx(cell);
-            if (tw > W[c] || shown === HASHES) { cls += ' over'; txt = '#'.repeat(Math.max(3, Math.floor((W[c] - 2 * CELL_PAD) / HASH_PX))); }
+            if (fit.over) { cls += ' over'; txt = '#'.repeat(Math.max(3, Math.floor((W[c] - 2 * CELL_PAD) / HASH_PX))); }
           }
 
           if (cell.indent) {   // Alt H 6/5 indent — pad the content gutter (right edge for right-aligned cells)

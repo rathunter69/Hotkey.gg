@@ -113,7 +113,7 @@ function tokenizeSection(sec) {
     let m;
     if (ch === '"') { const j = sec.indexOf('"', i + 1); const end = j < 0 ? sec.length : j; toks.push({ t: 'lit', v: sec.slice(i + 1, end) }); i = end; continue; }
     if (ch === '\\') { toks.push({ t: 'lit', v: sec[i + 1] || '' }); i++; continue; }
-    if (ch === '_') { toks.push({ t: 'lit', v: ' ', pad: true }); i++; continue; }   // _x: the width of x → a space
+    if (ch === '_') { toks.push({ t: 'lit', v: ' ', pad: true, w: sec[i + 1] || ' ' }); i++; continue; }   // _x: the width of x → a space (formatMarked: a marker the view sizes as x)
     if (ch === '*') { i++; continue; }                                                // *x: fill the cell → nothing
     if (ch === '[') {
       const j = sec.indexOf(']', i); if (j < 0) throw bad('unclosed [');
@@ -199,7 +199,15 @@ export function compileFormat(code) {
 export function isValidFormat(code) { try { compileFormat(code); return true; } catch (e) { return false; } }
 
 /* ---- rendering ---- */
-const renderLits = (toks, text) => toks.map(t => t.t === 'lit' ? t.v : (t.t === 'at' || t.t === 'general') ? text : t.t === 'comma' ? ',' : t.t === 'dot' ? '.' : t.t === 'pct' ? '%' : t.t === 'slash' ? '/' + (t.den || '') : '').join('');
+/**
+ * While `markPads` is on (formatMarked), an _x pad renders as PAD_MARK followed by x instead of a
+ * space, so a view can paint a gap exactly the width of x (Excel's _) is a closing bracket's width,
+ * not a space's). Every renderer emits a literal through litOf.
+ */
+export const PAD_MARK = '\u0001';
+let markPads = false;
+const litOf = t => (markPads && t.pad ? PAD_MARK + t.w : t.v);
+const renderLits = (toks, text) => toks.map(t => t.t === 'lit' ? litOf(t) : (t.t === 'at' || t.t === 'general') ? text : t.t === 'comma' ? ',' : t.t === 'dot' ? '.' : t.t === 'pct' ? '%' : t.t === 'slash' ? '/' + (t.den || '') : '').join('');
 function renderDate(toks, n) {
   // Excel rounds the time to the finest unit the code shows — the second, or ss.00's hundredth —
   // and the carry rolls into the date (23:59:59.7 under h:mm is 0:00 of the next day); h and m
@@ -220,7 +228,7 @@ function renderDate(toks, n) {
   let out = '';
   for (let i = 0; i < toks.length; i++) {
     const t = toks[i];
-    if (t.t === 'lit') out += t.v;
+    if (t.t === 'lit') out += litOf(t);
     else if (t.t === 'comma') out += ','; else if (t.t === 'dot') out += '.'; else if (t.t === 'pct') out += '%';
     else if (t.t === 'ampm') { const up = t.v[0] === 'A'; const s = t.v.length === 3 ? (hh >= 12 ? 'P' : 'A') : (hh >= 12 ? 'PM' : 'AM'); out += up ? s : s.toLowerCase(); }
     else if (t.t === 'elapsed') {
@@ -258,7 +266,7 @@ function fillInt(intToks, ip, grouped) {
       if (di > 0) { digit(ip[--di]); if (k === firstPh) while (di > 0) digit(ip[--di]); }
       else if (t.v === '0') digit('0');
       else if (t.v === '?') rev.push(' ');
-    } else if (t.t === 'lit') { for (let q = t.v.length - 1; q >= 0; q--) rev.push(t.v[q]); }
+    } else if (t.t === 'lit') { const v = litOf(t); for (let q = v.length - 1; q >= 0; q--) rev.push(v[q]); }
     else if (t.t === 'pct') rev.push('%');
   }
   return rev.reverse().join('');
@@ -306,13 +314,13 @@ function renderNumber(toks, n) {   // n ≥ 0; the caller supplies the sign
     let j = 0;
     for (const t of fracToks) {
       if (t.t === 'ph') { const ch = fp[j] || '0', more = /[1-9]/.test(fp.slice(j)); j++; if (t.v === '0' || more) out += ch; else if (t.v === '?') out += ' '; }
-      else if (t.t === 'lit') out += t.v; else if (t.t === 'pct') out += '%';
+      else if (t.t === 'lit') out += litOf(t); else if (t.t === 'pct') out += '%';
     }
   }
   if (exp !== null) {
     const x = toks[expI];
     out += x.e + (exp < 0 ? '-' : x.sign === '+' ? '+' : '') + String(Math.abs(exp)).padStart(expCount, '0');
-    for (const t of expToks) { if (t.t === 'lit') out += t.v; else if (t.t === 'pct') out += '%'; }
+    for (const t of expToks) { if (t.t === 'lit') out += litOf(t); else if (t.t === 'pct') out += '%'; }
   }
   return out;
 }
@@ -413,6 +421,15 @@ export function formatValue(v, code) {
   else body = renderLits(sec.toks, '');   // a section with no placeholders shows its literals only ("-" for zero)
   // a leading minus sits before the digits, after any leading literal ($ stays outside: -$5 as Excel shows it)
   return { text: (neg ? '-' : '') + body, color: sec.color };
+}
+
+/**
+ * formatValue with every _x pad marked (PAD_MARK + x) rather than spaced: the grid paints the gap
+ * at x's width. Same rules, same errors; the text is otherwise identical to formatValue's.
+ */
+export function formatMarked(v, code) {
+  markPads = true;
+  try { return formatValue(v, code); } finally { markPads = false; }
 }
 
 /**
