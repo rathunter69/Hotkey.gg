@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Sheet } from '../engine/sheet.js';
 import { Session } from '../engine/keyboard.js';
-import { wildMatch } from '../engine/tools.js';
+import { wildMatch, DUPLICATES_NOTE, NO_DUPLICATES_NOTE } from '../engine/tools.js';
 
 const fresh = (cells, opts) => { const toasts = []; const s = new Session(new Sheet({ cells, ...(opts || {}) }), { onToast: m => toasts.push(m), now: () => 0 }); s.toasts = toasts; return s; };
 const LIST = { A1: { value: 'Site' }, B1: { value: 'Region' }, C1: { value: 'Washes' },
@@ -48,4 +48,14 @@ test('the Sort dialog (Alt A S S): levels by column, Add Level, orders, My data 
   s.run('Alt A S S Alt+H Enter'); assert.equal(S.value('A1'), 'Boston', 'headers unticked: the first row sorts too (East, then the Region header, then West)'); s.run('Ctrl+Z');
   s.run('Ctrl+Shift+L'); S.goTo(1, 1); s.run('Alt A S S Tab Down Enter'); assert.deepEqual([2, 3, 4, 5, 6].map(r => S.value('A' + r)), ['Fresno', 'Erie', 'Dallas', 'Boston', 'Austin'], 'inside a filtered list the dialog sorts the list');
   assert.equal(s.dialog, null); assert.equal(s.mode, 'normal');
+});
+
+test('Remove Duplicates (Alt A M): the ticked columns define a duplicate, the first stays, the rest shift up, and the count is reported', () => {
+  const s = fresh({ A1: { value: 'Site' }, B1: { value: 'Date' }, A2: { value: 'AUS-DOM' }, B2: { value: 1 }, A3: { value: 'aus-dom' }, B3: { value: 2 }, A4: { value: 'AUS-MUE' }, B4: { value: 1 }, A5: { value: 'AUS-DOM' }, B5: { value: 1 }, A6: { value: 'AUS-DMO' }, B6: { value: 3 }, C6: { formula: '=B6*2' } }); const S = s.sheet;
+  S.goTo(2, 1); s.run('Alt A M'); assert.equal(s.dialog, 'removedup'); assert.equal(s.dlg.headers, true); assert.deepEqual(s.removeDuplicatesView().columns.map(c => c.label + (c.checked ? '*' : '')), ['Site*', 'Date*', 'Column C*']);
+  s.run('Enter');   // both columns ticked: a row goes only when the pair repeats
+  assert.deepEqual([2, 3, 4, 5, 6].map(r => S.value('A' + r)), ['AUS-DOM', 'aus-dom', 'AUS-MUE', 'AUS-DMO', null]); assert.equal(S.formula('C5'), '=B5*2', 'a moved formula follows its row'); assert.deepEqual(s.toasts, [DUPLICATES_NOTE(1, 4)]);
+  s.run('Ctrl+Z'); S.goTo(2, 1); s.run('Alt A M Alt+U Space Enter');   // Site alone ticked: every later row for a site goes, case-insensitively
+  assert.deepEqual([2, 3, 4, 5, 6].map(r => S.value('A' + r)), ['AUS-DOM', 'AUS-MUE', 'AUS-DMO', null, null]); assert.equal(s.toasts[1], DUPLICATES_NOTE(2, 3));
+  s.run('Alt A M Enter'); assert.equal(s.toasts[2], NO_DUPLICATES_NOTE); assert.equal(s.mode, 'normal');
 });

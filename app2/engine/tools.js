@@ -28,6 +28,7 @@ import { Sheet } from './sheet.js';
 import { evalFormula, formulaRefs, evaluateStepper, valueText, translateFormula, isErrVal, textToNumber, dateTextValue, parses } from './formula.js';
 import { refKey, parseRef, parseRange, rangeText, colLetter } from './refs.js';
 import { dispText } from './format.js';
+const clone = x => JSON.parse(JSON.stringify(x));
 
 /** The dialogs this module drives (keyboard.js routes their keys to toolKey). */
 export const TOOL_DIALOGS = new Set(['evalfx', 'errcheck', 'texttocols', 'removedup', 'validation', 'dvlist', 'editlinks', 'autofilter', 'sortdlg', 'goalseek', 'datatable', 'pivot']);
@@ -42,6 +43,8 @@ export const GOALSEEK_NONE = (cell) => `Goal Seeking with Cell ${cell} may not h
 export const DATATABLE_INPUT_NOTE = 'Input cell reference is not valid.';
 export const NO_LINKS_NOTE = 'This workbook contains no links to other files.';
 export const TTC_OVERWRITE_NOTE = "There's already data here. Do you want to replace it?";
+export const DUPLICATES_NOTE = (n, m) => `${n} duplicate value${n === 1 ? '' : 's'} found and removed; ${m} unique value${m === 1 ? '' : 's'} remain${m === 1 ? 's' : ''}.`;
+export const NO_DUPLICATES_NOTE = 'No duplicate values found.';
 
 /* ======================================================================== */
 /* pure helpers (unit-tested through the Session)                           */
@@ -416,6 +419,47 @@ const methods = {
     return { headers: d.headers, cur: d.cur, focus: d.focus, columns: Array.from({ length: rg.c2 - rg.c1 + 1 }, (_, i) => this.columnLabel(rg, rg.c1 + i, d.headers)),
       levels: d.levels.map(l => ({ col: l.col, label: this.columnLabel(rg, l.col, d.headers), dir: l.dir, order: numeric(l.col) ? (l.dir === 'asc' ? 'Smallest to Largest' : 'Largest to Smallest') : (l.dir === 'asc' ? 'A to Z' : 'Z to A') })) };
   },
+
+  /* ---------------- Remove Duplicates (Alt A M) ---------------- */
+  /**
+   * One tick box per column (Select All Alt+A, Unselect All Alt+U, ↑ ↓ and Space), My data has
+   * headers (Alt+M), OK (Enter). A row is a duplicate when every ticked column repeats an earlier
+   * row's text, case-insensitively; the later rows go and the rest shift up inside the range.
+   */
+  openRemoveDuplicates() {
+    const S = this.sheet; this.startClock();
+    const rg = this.listRange(); const headers = this.listHeaders(rg);
+    this.openDialog('removedup', []);
+    const cols = []; for (let c = rg.c1; c <= rg.c2; c++) cols.push({ c, checked: true });
+    this.dlg = { kind: 'removedup', range: rg, headers, cols, idx: 0 };
+  },
+  removeDuplicatesKey(key) {
+    const d = this.dlg; const S = this.sheet; if (!d) return;
+    if (key === 'Alt+A') { for (const c of d.cols) c.checked = true; return; }
+    if (key === 'Alt+U') { for (const c of d.cols) c.checked = false; return; }
+    if (key === 'Alt+M') { d.headers = !d.headers; return; }
+    if (key === 'ArrowDown') { d.idx = Math.min(d.cols.length - 1, d.idx + 1); return; }
+    if (key === 'ArrowUp') { d.idx = Math.max(0, d.idx - 1); return; }
+    if (key === ' ') { d.cols[d.idx].checked = !d.cols[d.idx].checked; return; }
+    if (key !== 'Enter') return;
+    const rg = d.range; const keyCols = d.cols.filter(c => c.checked).map(c => c.c);
+    this.exitRibbon(false);
+    if (!keyCols.length) return;
+    const r1 = rg.r1 + (d.headers ? 1 : 0);
+    const seen = new Set(); const keep = [], gone = [];
+    for (let r = r1; r <= rg.r2; r++) { const k = keyCols.map(c => dispText(S.get(r, c)).toLowerCase()).join('\u0000'); if (seen.has(k)) gone.push(r); else { seen.add(k); keep.push(r); } }
+    if (!gone.length) { this.toast(NO_DUPLICATES_NOTE); return; }
+    S.pushUndo();
+    const rows = keep.map(r => { const row = []; for (let c = rg.c1; c <= rg.c2; c++) row.push(clone(S.get(r, c))); row.r0 = r; return row; });
+    for (let i = 0; i < rg.r2 - r1 + 1; i++) {
+      const r = r1 + i; const row = rows[i];
+      for (let c = rg.c1; c <= rg.c2; c++) { if (!row) { delete S.cells[refKey(r, c)]; continue; } const cell = row[c - rg.c1]; const dr = r - row.r0; if (cell.formula && dr) cell.formula = translateFormula(cell.formula, dr, 0); S.cells[refKey(r, c)] = cell; }
+    }
+    S.commit('edit');
+    this.toast(DUPLICATES_NOTE(gone.length, keep.length));
+  },
+  /** The dialog as the view paints it: the columns with their labels and ticks. */
+  removeDuplicatesView() { const d = this.dlg; if (!d || d.kind !== 'removedup') return null; return { headers: d.headers, idx: d.idx, columns: d.cols.map(c => ({ c: c.c, label: this.columnLabel(d.range, c.c, d.headers), checked: c.checked })) }; },
 
   /* ---------------- Evaluate Formula (Alt M V) ---------------- */
   /** The dialog on the active cell's formula: Evaluate (Enter / Alt+E) steps, Restart (Alt+R) after the last step, Close (Esc). A cell without a formula opens nothing, as in Excel. */
