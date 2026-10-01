@@ -1,0 +1,85 @@
+/* app2/ui/tokens.css — every color, size, radius, space and duration of the interface standard
+   (screenplay 3.0; M87), in one file. Nothing else in the CSS or the JS carries a raw value:
+   change a token here and every screen follows. The values are Workbook, the default theme;
+   ui/themes.js writes the same names on <html> for every other theme, so a theme never reaches
+   into a stylesheet. Loaded first, before app.css. */
+
+:root{
+  /* ---------- color (3.0, Color): the ground and the ink ---------- */
+  --paper:#F6F7F6;        /* the page ground, never pure white */
+  --sheet:#FFFFFF;        /* the sheet, panels, tables */
+  --chrome:#ECEFED;       /* the Ribbon's ground, the toolbar row, the Name Box, the sheet's headers, quiet buttons */
+  --line:#D6DBD8;         /* hairlines */
+  --grid:#E3E7E5;         /* the sheet's gridlines */
+  --edge:#7A857F;         /* a control's edge (3 to 1) */
+  --ink:#17201B;          /* text */
+  --ink-2:#525D57;        /* secondary text */
+  --rail:#16201A; --rail-hi:#2B3A31; --rail-text:#C9D3CD; --rail-sub:#AEBBB4;   /* the left rail */
+  --note:#FFF6C7; --note-ink:#17201B; --note-edge:#B9A53C;   /* a note on the sheet: Excel's yellow paper and dark ink, the same in every theme */
+  --red:#C23B2A;          /* the reviewer's pen, a note's corner, errors */
+  --on-fill:#FFFFFF;      /* text on a mode's fill */
+  --plate-neutral:#EEF3EF;   /* the landing page's neutral plate */
+
+  /* ---------- the mode colors: fill, ink (text on a tint or the ground), tint ---------- */
+  --learn:#0F7B45;      --learn-ink:#0B6338;      --learn-tint:#E1F1E8;        /* Learn, lessons, progress */
+  --drills:#1F4FD1;     --drills-ink:#183FA8;     --drills-tint:#E6ECFB;       /* Drills */
+  --daily:#B8501A;      --daily-ink:#8A3A10;      --daily-tint:#FCEBDD;        /* The Daily */
+  --rapid:#C42B6A;      --rapid-ink:#9E1F52;      --rapid-tint:#FBE7EF;        /* Rapid-fire */
+  --challenges:#6B3FC4; --challenges-ink:#5A33A8; --challenges-tint:#EEE8FA;   /* Challenges */
+  --clock:#F0A81C;      --clock-ink:#7A4F00;      --clock-tint:#FDF1D3;        /* the clock and the tiers; amber is never text */
+  /* the page's mode: body[data-mode] below picks, and every page takes its color from here */
+  --mode:var(--learn); --mode-ink:var(--learn-ink); --mode-tint:var(--learn-tint);
+
+  /* ---------- the tiers and rarities (3.0, Achievements): a colored word, never a glow ---------- */
+  --tier-pass:var(--learn-ink); --tier-pro:var(--drills-ink); --tier-legendary:var(--clock-ink);
+  --rar-common:var(--learn-ink); --rar-rare:var(--drills-ink); --rar-epic:var(--challenges-ink); --rar-legendary:var(--clock-ink);
+
+  /* ---------- type (3.0, Type) ---------- */
+  --font:'Hanken Grotesk',system-ui,sans-serif;          /* every label, button, heading and sentence */
+  --mono:'JetBrains Mono',ui-monospace,monospace;        /* keys, addresses, formulas, times, the wordmark */
+  --cellfont:Arial,'Calibri','Segoe UI',system-ui,sans-serif;   /* the sheet's own face */
+  --fs-landing:64px; --fs-prompt:52px; --fs-time:34px; --fs-title:28px; --fs-clock:26px;
+  --fs-item:18px; --fs-panel:17px; --fs-body:15px; --fs-name:14.5px; --fs-label:13px; --fs-key:12.5px; --fs-min:12px;
+  --fw-heavy:800; --fw-bold:700; --fw-semi:600; --fw-key:500; --fw-body:400;
+  --lh-tight:1.0; --lh-body:1.5;
+
+  /* ---------- space (3.0, Layout): one scale ---------- */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s8:32px; --s12:48px;
+
+  /* ---------- radii ---------- */
+  --r-btn:6px;    /* buttons, keys, inputs */
+  --r-card:8px;   /* the task card, menus, dialogs */
+  --r-plate:12px; /* plates on the landing page */
+
+  /* ---------- sizes ---------- */
+  --rail-w:232px; --content-top:30px; --content-side:36px; --side-col:336px;
+  --panel-w:340px; --card-w:330px; --card-gap:16px;
+  --tabrow-h:34px; --ribbon-h:96px; --ribbon-groups-h:72px; --ribbon-tabs-h:24px; --qat-h:26px;
+  --cursor-w:2px; --cursor-handle:6px; --mode-mark:9px; --mode-rule:3px; --key-edge:3px; --route-bar:3px;
+  --theme-tile-w:64px; --theme-tile-h:46px; --demo-w:640px; --demo-h:560px; --narrow:900px;
+
+  /* ---------- durations (3.0, Motion and moments) ---------- */
+  --d-cursor:80ms; --d-key:90ms; --d-menu:140ms; --d-beat:140ms; --d-route:150ms; --d-note:160ms; --d-card:200ms; --d-goal:250ms;
+  --d-hit:250ms; --d-wrong:300ms; --d-open:500ms; --d-quests:600ms; --d-combo:700ms; --d-streak:900ms;
+  --d-result:4000ms; --d-banner:4000ms; --d-nudge:8000ms; --d-help:20000ms;
+
+  /* ---------- the one shadow, for floating things only ---------- */
+  --shadow-float:0 14px 36px -14px rgba(0,0,0,.35);
+
+  /* ---------- the names the older stylesheets read: they resolve to the tokens above ----------
+     (app.css, shell.css, site.css, next.css and workbook.css were written against these; a theme
+     writes only the token names, so these stay aliases and never values) */
+  --bg:var(--paper); --surface:var(--sheet); --surface2:var(--chrome);
+  --text:var(--ink); --muted:var(--ink-2); --faint:var(--edge);
+  --accent:var(--learn); --accent-dim:var(--learn-ink); --accent-glow:color-mix(in srgb, var(--learn) 14%, transparent);
+  --on-accent:var(--on-fill); --warn:var(--clock-ink); --bad:var(--red);
+  --note-bg:var(--note); --note-text:var(--note-ink); --sans:var(--font); --ink-shadow:var(--ink);
+}
+
+/* the page's mode (3.0, Color: each mode has one; the route sets body[data-mode]) */
+body[data-mode="learn"]{--mode:var(--learn); --mode-ink:var(--learn-ink); --mode-tint:var(--learn-tint)}
+body[data-mode="drills"]{--mode:var(--drills); --mode-ink:var(--drills-ink); --mode-tint:var(--drills-tint)}
+body[data-mode="daily"]{--mode:var(--daily); --mode-ink:var(--daily-ink); --mode-tint:var(--daily-tint)}
+body[data-mode="rapid"]{--mode:var(--rapid); --mode-ink:var(--rapid-ink); --mode-tint:var(--rapid-tint)}
+body[data-mode="challenges"]{--mode:var(--challenges); --mode-ink:var(--challenges-ink); --mode-tint:var(--challenges-tint)}
+body[data-mode="clock"]{--mode:var(--clock); --mode-ink:var(--clock-ink); --mode-tint:var(--clock-tint)}

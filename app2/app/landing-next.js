@@ -9,7 +9,6 @@
 // shortcuts work as on any page. Motion: the clips play only while on screen, and with reduced
 // motion nothing plays by itself (posters with a play control; the demo waits on its first frame).
 import { mountDemoPoster, loadLiveDemo } from '../ui/demo-poster.js';
-import { NAV_ICONS } from '../ui/nav.js';
 import { store } from './store.js';
 import { track } from './telemetry.js';
 import { STAGES } from './deal-strip.js';
@@ -41,15 +40,15 @@ const MODES_DEFAULT = [
 ];
 export const MODES = MODES_DEFAULT.map(m => ({ ...m, line: siteCopy('mode_' + m.key, m.line) }));
 
-/** Each mode's glyph on its fallback card: the nav's line icons, and three more in the same hand. */
+/** Each mode's glyph on its fallback card (the retired nav's line icons, kept here until M95 redraws the landing page as a sheet). */
 const SVG = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
 const MODE_GLYPHS = {
-  lesson: NAV_ICONS.learn,
+  lesson: `<svg ${SVG}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/><path d="M9 7h7M9 11h5"/></svg>`,
   challenge: `<svg ${SVG}><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg>`,
-  drill: NAV_ICONS.practice,
+  drill: `<svg ${SVG}><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>`,
   daily: `<svg ${SVG}><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>`,
   rapid: `<svg ${SVG}><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>`,
-  boards: NAV_ICONS.leaderboard,
+  boards: `<svg ${SVG}><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H5a2 2 0 0 0 0 4h2"/><path d="M17 6h2a2 2 0 0 1 0 4h-2"/><path d="M12 14v3"/><path d="M8 21h8"/><path d="M10 21a2 2 0 0 1 4 0"/></svg>`,
 };
 
 /** The hero's small print as separate clauses (' · ' in the source), so a wrapped line never starts with a separator. Pure. */

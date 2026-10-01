@@ -18,9 +18,13 @@
 // Page modules load lazily with import(); a failed load renders an error card with Retry, never
 // an empty page. Below ~900px the lesson and drill routes show a readable notice instead of the
 // workspace (site.css hides the workspace too, so a resize mid-lesson degrades the same way).
-import { mountNav } from '../ui/nav.js';
+import { mountNav, weekCells } from '../ui/nav.js';
+import { createKeyTips } from '../ui/components/keytips.js';
+import { createCursor } from '../ui/components/cursor.js';
 import { mountFooter } from '../ui/footer.js';
 import { prefs } from './prefs.js';
+import { settings } from './settings.js';
+import { dayOf } from './records.js';
 import { applyFlowQuery, reflectFlow } from './flow.js';
 import { store } from './store.js';
 import { auth } from './auth.js';
@@ -35,12 +39,8 @@ import { itemNumber } from './numbering.js';
 const lessonsMod = () => import('../content/index.js');
 const statsMod = () => Promise.all([import('./stats.js'), import('../ui/badges.js'), import('./cosmetics.js')]);
 
-const NAV_LINKS = [
-  { key: 'learn', label: 'Learn', href: '#/learn' },
-  { key: 'practice', label: 'Practice', href: '#/practice' },
-  { key: 'leaderboard', label: 'Leaderboard', href: '#/leaderboard' },
-  { key: 'reference', label: 'Reference', href: '#/reference' },
-];
+/** The routes that are the workspace: no rail, Alt belongs to the Ribbon, the sheet gets the window (3.0). */
+export const WORKSPACE_ROUTES = new Set(['lesson', 'drill', 'rapid', 'due']);
 
 const NARROW_QUERY = '(max-width: 900px)';
 
@@ -66,6 +66,8 @@ export function parseRoute(hash) {
   else if (path === '/learn') name = 'learn';
   else if ((m = /^\/lesson\/([a-z0-9-]+)$/.exec(path))) { name = 'lesson'; params.id = m[1]; }
   else if (path === '/practice') name = 'practice';
+  else if ((m = /^\/practice\/(daily|drills|rapid|challenges)$/.exec(path))) { name = 'practice'; params.mode = m[1]; }   // the four modes under Practice (3.0, The rail)
+  else if (path === '/leaderboards') name = 'leaderboard';
   else if ((m = /^\/drill\/([a-z0-9-]+)$/.exec(path))) { name = 'drill'; params.id = m[1]; }
   else if (path === '/sandbox') { name = 'drill'; params.id = 'sandbox'; }
   else if (path === '/daily') { name = 'drill'; params.daily = true; }
@@ -77,12 +79,26 @@ export function parseRoute(hash) {
   return { name, params, query, path };
 }
 
-/** Which nav link a route lights up. The landing, the first run and Home light none: they are not Learn. */
-export function navKeyFor(name) {
+/** Which rail item a route lights up: Home, Learn, Practice or one of its four modes, Leaderboards, Reference. The landing and the first run light none. */
+export function navKeyFor(name, params = {}) {
+  if (name === 'root' || name === 'home') return 'home';
   if (name === 'learn' || name === 'lesson' || name === 'locked') return 'learn';
-  if (name === 'practice' || name === 'drill' || name === 'rapid' || name === 'due') return 'practice';
+  if (name === 'practice') return params.mode && params.mode !== 'drills' ? params.mode : 'practice';
+  if (name === 'drill') return params.daily ? 'daily' : 'practice';
+  if (name === 'rapid') return 'rapid';
+  if (name === 'due') return 'practice';
   if (name === 'leaderboard' || name === 'reference') return name;
   return '';
+}
+
+/** The page's mode color (3.0, Color: each mode has one; tokens.css reads body[data-mode]). */
+export function modeOf(name, params = {}) {
+  if (name === 'practice') return params.mode === 'daily' || params.mode === 'rapid' || params.mode === 'challenges' ? params.mode : 'drills';
+  if (name === 'drill') return params.daily ? 'daily' : 'drills';
+  if (name === 'rapid') return 'rapid';
+  if (name === 'due') return 'drills';
+  if (name === 'leaderboard') return 'daily';   // the page opens on The Daily's board
+  return 'learn';
 }
 
 /** index.html's own <title>: the landing keeps it, so the tab and a shared link agree. */
@@ -221,23 +237,24 @@ export function startApp({ navEl, rootEl, footEl }) {
   if (legacy) { try { history.replaceState(null, '', legacy); } catch (e) { /* file:// etc.: route as-is */ } }
   prefs.reflect();
   reflectFlow();
-  const nav = mountNav(navEl, {
-    links: NAV_LINKS, active: 'learn', account: true,
-    onTheme: k => store.setTheme(k), onSignOut: () => auth.signOut(),
-    // cosmetic locks (Phase D): resolved when the picker opens, from the stack loaded after first paint
-    themeLocks: () => {
-      if (!stats) return {};
-      const ctx = stats.gameCtx();
-      return Object.fromEntries(stats.themeStates({ level: ctx.level, earned: stats.earnedSet(ctx), rankIndex: ctx.rankIndex }).map(s => [s.key, s.lock]));
-    },
-  });
+  const nav = mountNav(navEl, { active: 'home', onSignOut: () => auth.signOut() });
+  // one KeyTips registry for site pages (M88): never inside the workspace, where Alt is the Ribbon's; a setting switches it off
+  const keytips = createKeyTips({ isWorkspace: () => WORKSPACE_ROUTES.has(document.body.dataset.route), enabled: () => { try { return settings.get().siteKeyTips !== false; } catch (e) { return true; } } });
+  let cursor = null;   // the cell cursor of the current site page (M88), remade on every route
   const footer = footEl ? mountFooter(footEl) : null;
   let stats = null;   // { gameCtx, earnedSet, themeStates } once the lazy stack arrives
-  // the level chip: none on the landing and the first run (a visitor has no level yet), L1 upward elsewhere
+  // the rail's foot: the level with its XP, the streak with the week's cells, Go Pro for a free account (none on the landing and the first run)
   function refreshLevel() {
     const name = document.body.dataset.route;
-    if (name === 'landing' || name === 'start') { nav.setLevel(null); return; }
-    const set = () => { try { nav.setLevel(stats.gameCtx().level); } catch (e) { /* records unreadable: no chip */ } };
+    if (name === 'landing' || name === 'start') { nav.setLevel(null); nav.setStreak(null); return; }
+    const set = () => {
+      try {
+        const ctx = stats.gameCtx();
+        nav.setLevel(ctx.levelInfo);
+        nav.setStreak({ day: ctx.streakDays || 0, ...weekCells(ctx.days || [], dayOf()) });
+      } catch (e) { /* records unreadable: no level */ }
+      try { nav.setPro(entitlement.entitled()); } catch (e) { /* no entitlement read: Go Pro shows */ }
+    };
     if (stats) set();
     else statsMod().then(([st, b, c]) => { stats = { gameCtx: st.gameCtx, earnedSet: b.earnedSet, themeStates: c.themeStates }; set(); }).catch(() => { /* retried on the next route */ });
   }
@@ -281,6 +298,8 @@ export function startApp({ navEl, rootEl, footEl }) {
   function unmount() {
     if (current && current.destroy) { try { current.destroy(); } catch (e) { /* a page that failed half-way must not block the next */ } }
     current = null;
+    keytips.clear();
+    if (cursor) { cursor.destroy(); cursor = null; }
     rootEl.innerHTML = '';
     document.body.classList.remove('hide-gridlines');
     document.body.dataset.route = '';
@@ -314,9 +333,11 @@ export function startApp({ navEl, rootEl, footEl }) {
       if (myGen !== gen) return;
       if (!drill) name = 'notfound';
     }
-    nav.setActive(navKeyFor(name === 'home' ? 'root' : name));
+    nav.setLanding(name === 'landing');
+    nav.setActive(navKeyFor(name, r.params));
     document.title = titleFor(name, lesson ? lesson.title : name === 'drill' ? (drill ? drill.title : 'Sandbox') : '');
     document.body.dataset.route = name;
+    document.body.dataset.mode = modeOf(name, r.params);
     refreshLevel();
     window.scrollTo(0, 0);
 
@@ -339,8 +360,10 @@ export function startApp({ navEl, rootEl, footEl }) {
     if (myGen !== gen) return;
     if (rootEl.querySelector('.sk')) rootEl.innerHTML = '';
     try {
-      const ctx = { query: r.query, params: r.params, nav, lesson };
+      const ctx = { query: r.query, params: r.params, nav, lesson, keytips };
       let res = name === 'lesson' ? mount(rootEl, lesson, { mode: r.query.mode || 'guided', panel: r.query.panel, seed: r.query.seed, daily: r.query.daily }) : mount(rootEl, ctx);
+      // the cell cursor on a site page: the arrows move it over whatever the page marked data-cursor, Enter does the item
+      if (!WORKSPACE_ROUTES.has(name)) { cursor = createCursor({ root: rootEl }); ctx.cursor = cursor; }
       // a page that mounts asynchronously still hands back its destroy(); a route that moved on meanwhile tears it down at once
       if (res && typeof res.then === 'function') { res = await res; if (myGen !== gen) { if (res && typeof res.destroy === 'function') { try { res.destroy(); } catch (e) { /* ignore */ } } return; } }
       current = res && typeof res.destroy === 'function' ? res : { destroy() { rootEl.innerHTML = ''; } };
@@ -362,5 +385,5 @@ export function startApp({ navEl, rootEl, footEl }) {
   window.addEventListener('hashchange', route);
   if (narrowMq && narrowMq.addEventListener) narrowMq.addEventListener('change', () => { const n = parseRoute(location.hash || '#/').name; if (n === 'lesson' || n === 'drill') route(); });
   route();
-  return { route, nav, footer };
+  return { route, nav, footer, keytips };
 }

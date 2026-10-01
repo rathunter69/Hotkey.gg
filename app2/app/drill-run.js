@@ -5,7 +5,9 @@
 
 import { LessonRun } from './runner.js';
 import { tierFor } from './pars.js';
-import { attemptId, dayOf, traceOf } from './records.js';
+import { attemptId, dayOf } from './records.js';
+import { fromRun, toAttempt } from './run-record.js';
+import { settings } from './settings.js';
 
 export class DrillRun extends LessonRun {
   /**
@@ -29,13 +31,12 @@ export class DrillRun extends LessonRun {
   get pars() { return this.drill.pars; }
   /** The tier this run's time earns — clean runs only; helped or moused runs grade 'none'. */
   get tier() { return this.finished && this.clean ? tierFor(this.elapsed, this.drill.pars) : 'none'; }
-  /** The attempt record for records.addAttempt (call once, on finish). */
-  toAttempt() {
-    return {
-      id: attemptId(), kind: this.kind, ref: this.drill.id, day: dayOf(), seed: this.seed,
-      secs: this.elapsed, keys: this.session.keyLog.length,
-      clean: this.clean, helped: this.helped, mouse: this.mouseCount, tier: this.tier,
-      splits: this.splits().filter(Number.isFinite), trace: traceOf(this.session.keyLog), at: Date.now(),
-    };
+  /** The run record (M96: one record per timed run, app/run-record.js), built once on finish. */
+  toRunRecord() {
+    let s = {};
+    try { s = settings.get(); } catch (e) { s = {}; }
+    return fromRun(this, { id: attemptId(), kind: this.kind, ref: this.drill.id, day: dayOf(), seed: this.seed, tier: this.tier, routeKeys: this.drill.optimalKeys, layout: s.layout, platform: s.keyLabels });
   }
+  /** The attempt record for records.addAttempt (call once, on finish): the run record in the device store's shape. */
+  toAttempt() { return toAttempt(this.toRunRecord()); }
 }

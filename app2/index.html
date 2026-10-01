@@ -15,6 +15,7 @@ try{var f=localStorage.getItem('hk2_flow');document.documentElement.setAttribute
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./ui/tokens.css">
 <link rel="stylesheet" href="./ui/app.css">
 <link rel="stylesheet" href="./ui/shell.css">
 <link rel="stylesheet" href="./ui/site.css">
@@ -23,12 +24,13 @@ try{var f=localStorage.getItem('hk2_flow');document.documentElement.setAttribute
 <link rel="stylesheet" href="./ui/workbook.css">
 <link rel="stylesheet" href="./ui/scale.css">
 <link rel="stylesheet" href="./ui/next.css">
+<link rel="stylesheet" href="./ui/components.css">
 <link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#16a862">
+<meta name="theme-color" content="#16201A">
 </head>
 <body>
-<!-- the shell paints with the HTML: a nav bar and a page shape stand in until the app mounts over them -->
-<div id="navMount"><nav class="topnav" aria-label="site"><div class="topnav-in"><a class="topnav-brand" href="#/">hotkey<b>.gg</b></a></div></nav></div>
+<!-- the shell paints with the HTML: the rail and a page shape stand in until the app mounts over them -->
+<div id="navMount"><nav class="rail" aria-label="site"><div class="rail-top"><a class="rail-mark" href="#/">hotkey<b>.gg</b></a></div></nav></div>
 <div class="app"><main id="root"><div class="sk sk-boot" role="status" aria-label="Loading"><span class="sk-sr">Loading…</span><div class="sk-bar sk-title"></div><div class="sk-bar sk-sub"></div><div class="sk-col"><div class="sk-card"></div><div class="sk-card"></div></div></div></main></div>
 <div id="footMount"></div>
 <!-- boot watchdog: if the app never replaces the boot shape (a module failed, or the network stalled), say so and offer a reload -->

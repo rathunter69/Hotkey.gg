@@ -1,16 +1,10 @@
-// app2/app/xp.js — XP and level, pure functions (SITE_SPEC §9). The level curve is the old
-// build's: 150 / 300 / 450 to level 4, then a flat 600 per level — the early drip is generous,
-// the grind never becomes a desert. XP events are deliberately modest and capped: XP measures
-// showing up and finishing things, never speed (pars and PBs own speed), and achievements pay
-// nothing — they are their own reward.
-
-/** Level from total XP: { lvl, into, need, pct } — `into`/`need` drive the level bar. */
-export function levelOf(xp) {
-  const total = Number.isFinite(xp) && xp > 0 ? Math.floor(xp) : 0;
-  let lvl = 1, need = 150, floor = 0;
-  while (total >= floor + need) { floor += need; lvl++; need = Math.min(150 * lvl, 600); }
-  return { lvl, into: total - floor, need, pct: Math.min(100, Math.round(100 * (total - floor) / need)) };
-}
+// app2/app/xp.js — XP and level, pure functions (SITE_SPEC §9; screenplay 6.10). The level curve
+// and its constants live in content/levels.js (M103: one data table for levels, titles and XP);
+// levelOf here is that function, re-exported so every reader keeps one import. XP events are
+// deliberately modest and capped: XP measures showing up and finishing things, never speed (pars
+// and PBs own speed), and achievements pay nothing — they are their own reward.
+import { levelOf } from '../content/levels.js';
+export { levelOf };
 
 const DAY_CAPS = { 'lesson-repeat': 3, 'drill-repeat': 3, 'challenge-repeat': 3, rapid: 3 };
 
