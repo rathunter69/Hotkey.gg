@@ -828,7 +828,7 @@ export class RibbonView {
 
   paint() {
     if (this.slot) this.slot.classList.toggle('rib-full', this.mode === 'full');
-    if (this.slot) this.slot.classList.toggle('rib-collapsed', !!(this.session.settings && this.session.settings.ribbonCollapsed) && !this.session.path.length);   // Ctrl+F1 (M40): tabs only until a KeyTip walk opens it
+    if (this.slot) this.slot.classList.toggle('rib-collapsed', !!(this.session.settings && this.session.settings.ribbonCollapsed) && (!this.session.path.length || !!this.session.dialog));   // Ctrl+F1 (M40): tabs only until a KeyTip walk opens it; a dialog the walk opened folds it back
     this.drawDialog();
     this.dropKill();
     if (this.mode === 'full') this.paintFull(); else this.paintSlim();
