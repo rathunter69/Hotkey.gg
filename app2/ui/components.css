@@ -49,7 +49,7 @@ body.keytips-on .kt{display:inline-block}
 .rail-pro{display:inline-block; margin-top:var(--s2); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--rail-sub)}
 .rail-pro:hover{color:var(--sheet)}
 .rail-streak .rail-row{align-items:center}
-.rail-week{display:inline-flex; gap:2px; flex:none}
+.rail-week{display:inline-flex; gap:calc(var(--s1) / 2); flex:none}
 .rail-week i{display:inline-grid; place-items:center; width:var(--s4); height:var(--s4); font-style:normal; font-family:var(--mono); font-size:var(--fs-min); line-height:1; color:var(--rail-sub); background:var(--rail-hi)}
 .rail-week i.on{background:var(--learn); color:var(--on-fill)}
 .rail-week i.today{outline:1px solid var(--rail-text); outline-offset:-1px}

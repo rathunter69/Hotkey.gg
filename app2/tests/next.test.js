@@ -7,8 +7,9 @@ import { inferTarget, altPath, cellsOf, rangeBox, rangeCorners, placeNear, SIDES
 import { beatFor, MODULE_BEATS, pageDelivered } from '../app/beats.js';
 import { shouldOfferInstall } from '../app/install.js';
 import { dailyCardHtml, efficiency, prettyDay } from '../ui/result-card.js';
-import { BRIEFING, ORIENTATION, stepsFor, FIRST_LESSON } from '../app/first-run-next.js';
-import { HEADLINES, SUBHEAD, MODES, landingHtml } from '../app/landing-next.js';
+import { BRIEFING, QUESTIONS, stepsFor, FIRST_LESSON } from '../app/first-run-next.js';
+import { COACH_MARKS, coachMarksDue, visibleMarks } from '../ui/components/coachmarks.js';
+import { HEADLINES, SUBHEAD, TABS, PATH, SECTIONS, courseFacts, landingHtml } from '../app/landing-next.js';
 import { DEMO_LESSON, demoScript } from '../ui/demo-player.js';
 import { STAGES, dealState } from '../app/deal-strip.js';
 import { PLANNED_MODULES } from '../app/learn-next.js';
@@ -168,36 +169,50 @@ test('result card: efficiency, the day, and the card carries tier, time, keys, b
   assert.ok(dailyCardHtml({ title: '<b>' }).includes('&lt;b&gt;'), 'escaped');
 });
 
-test('first run: three briefing cards, the orientation names the five places and level/XP, American spelling, steps', () => {
-  assert.equal(BRIEFING.length, 3);
-  assert.deepEqual(BRIEFING.map(b => b.key), ['who', 'sent', 'deliver']);
-  const all = [...BRIEFING.flatMap(b => [b.title, ...b.body]), ORIENTATION.title, ...ORIENTATION.rows.flatMap(r => [r.where, r.what]), ORIENTATION.fine];
-  for (const s of all) assert.doesNotMatch(s, /colour|practis|organis|centre|grey\b|analyse/i, 'American spelling: ' + s.slice(0, 40));
-  const orient = ORIENTATION.rows.map(r => r.what).join(' ');
-  for (const w of ['course', 'challenge', 'Drills', 'rapid-fire', 'the Daily', 'board', 'XP', 'level']) assert.ok(orient.includes(w), w);
-  assert.deepEqual(ORIENTATION.rows.map(r => r.where), ['Learn', 'Practice', 'Leaderboard', 'Level']);
-  assert.deepEqual(stepsFor(false), ['demo', 'orient', 'who', 'sent', 'deliver', 'picker']);
-  assert.equal(FIRST_LESSON, 'inherited-workbook', 'the first run hands off to 1.1.1');
-  // B3: plain sentences; any jargon is defined in the same breath; nobody is required to be an analyst
-  const joined = BRIEFING.flatMap(b => [b.title, ...b.body]).join(' ');
-  assert.ok(/data room: the folder buyers will read/.test(joined), 'the data room is defined where it appears');
-  assert.doesNotMatch(joined, /house style|VDR|sell-side|first-year/i);
-  for (const p of BRIEFING.flatMap(b => b.body)) for (const sentence of p.split(/(?<=[.!?])\s+/)) assert.ok(sentence.split(' ').length <= 30, 'short sentence: ' + sentence);
+test('first run (3.0, M92): two questions then one story card, Wolf\'s line, American spelling, the coach marks name every rail item', () => {
+  const card = BRIEFING();
+  assert.equal(card.title, 'Welcome to the finance team.');
+  assert.ok(card.body[0].startsWith('You work for Clearcoat, an express car-wash company'), 'Wolf\'s line opens the card');
+  assert.equal(card.body.length, 2);
+  for (const s of [card.title, ...card.body, ...COACH_MARKS.map(m => m.fallback)]) assert.doesNotMatch(s, /colour|practis|organis|centre|grey\b|analyse/i, 'American spelling: ' + s.slice(0, 40));
+  assert.doesNotMatch(card.body.join(' '), /house style|VDR|sell-side|first-year|data room|Voltline/i);
+  for (const p of card.body) for (const sentence of p.split(/(?<=[.!?])\s+/)) assert.ok(sentence.split(' ').length <= 30, 'short sentence: ' + sentence);
+  assert.deepEqual(stepsFor(false), ['picker', 'story']);
   assert.deepEqual(stepsFor(true), ['picker']);
+  assert.equal(FIRST_LESSON, 'inherited-workbook', 'the first run hands off to 1.1.1');
+  assert.deepEqual(QUESTIONS.map(q => q.key), ['platform', 'experience']);
+  assert.deepEqual(QUESTIONS[1].options.map(o => o.v), ['new', 'sometimes', 'daily']);
+  // the coach marks: one sentence each on Home, Learn, Practice, Leaderboards, Reference, the level and the streak (3.0 defaults)
+  assert.deepEqual(COACH_MARKS.map(m => m.key), ['home', 'learn', 'practice', 'leaderboard', 'reference', 'level', 'streak']);
+  for (const m of COACH_MARKS) assert.equal((m.fallback.match(/[.!?](\s|$)/g) || []).length, 1, 'one sentence: ' + m.fallback);
+  assert.equal(coachMarksDue({ firstRunDone: true, coachMarksDone: false }, 1), true);
+  assert.equal(coachMarksDue({ firstRunDone: true, coachMarksDone: false }, 0), false, 'not before the first lesson');
+  assert.equal(coachMarksDue({ firstRunDone: true, coachMarksDone: true }, 3), false, 'once');
+  assert.equal(coachMarksDue({ firstRunDone: false }, 3), false);
+  const found = { '#railLevel': { hidden: true }, '.rail-item[data-page="home"]': {}, '.rail-item[data-page="learn"]': {} };
+  assert.deepEqual(visibleMarks(sel => found[sel] || null).map(m => m.key), ['home', 'learn'], 'a hidden or missing rail element gets no mark');
 });
 
-test('landing: the headline and its two alternates, the subhead, six modes, a Sign in, Enter starts', () => {
+test('landing (3.0, M95): the page is a sheet, the headline and its two alternates, the subhead, the tabs, the path, five sections, pricing and teams', () => {
   assert.equal(HEADLINES.length, 3);
-  assert.equal(HEADLINES[0].a, 'The better way to master Excel');
-  assert.equal(HEADLINES[1].a + ' ' + HEADLINES[1].b, 'Excel isn’t learned. It’s practiced.');
-  assert.equal(SUBHEAD, 'Learn like an analyst at a top firm, and build the muscle memory to make it stick.');
-  assert.deepEqual(MODES.map(m => m.key), ['lesson', 'challenge', 'drill', 'daily', 'rapid', 'boards']);
+  assert.equal(HEADLINES[0](), 'The better way to master Excel');
+  assert.equal(HEADLINES[1](), 'Excel isn’t learned. It’s practiced.');
+  assert.equal(SUBHEAD(), 'Learn like an analyst at a top firm, and build the muscle memory to make it stick.');
   const html = landingHtml(0);
+  assert.ok(html.includes('class="lp-namebox mono">B2<') && html.includes('lp-formula') && html.includes('lp-cols') && html.includes('lp-rows'), 'the Name Box, the formula bar, the column letters and the row numbers');
+  assert.ok(html.includes('id="startLearning"') && html.includes('lp-start-note'), 'Start learning is the selected cell, the free line beside it');
   assert.ok(html.includes('id="ldSignIn"') && html.includes('href="#/account"'));
-  assert.ok(html.includes('clips/lesson.webm') && html.includes('poster="./clips/boards.jpg"'));
+  assert.deepEqual(TABS.map(x => x.id), ['start', 'path', 'drills', 'rapid-fire', 'leaderboards', 'challenges', 'certificate']);
+  for (const x of TABS) assert.ok(html.includes(`id="${x.id}"`), 'a section for the tab ' + x.id);
+  assert.equal(PATH.length, 6); assert.equal(PATH[0].access, 'free'); assert.ok(PATH.slice(1).every(c => c.access === 'pro'));
+  assert.deepEqual(SECTIONS.map(s => s.mode), ['drills', 'rapid', 'daily', 'challenges', 'learn'], 'each section on its mode\'s tint');
+  const facts = courseFacts();
+  assert.ok(facts.lessons > 0 && facts.challenges > 0 && facts.hours === 21, JSON.stringify(facts));
+  assert.ok(html.includes('The rest is $9 a month'), 'the live pricing line stays until Wolf says go');
+  assert.doesNotMatch(html, /Project Rinse|Clearcoat|Voltline/, 'the case stays inside the lessons');
+  assert.doesNotMatch(html, /<video|l-label|ld2-/, 'no clips, no label above a headline, nothing of the older landing');
   assert.ok(landingHtml(2).includes('The better way to learn Excel'));
   assert.ok(landingHtml(99).includes('The better way to learn Excel'), 'clamped');
-  for (const m of MODES) assert.doesNotMatch(m.line, /colour|practis|organis|centre/i);
 });
 
 test('demo: the self-playing lesson completes on its own script and lasts about twenty seconds', () => {

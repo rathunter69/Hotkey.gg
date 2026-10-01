@@ -1,0 +1,80 @@
+// app2/ui/components/coachmarks.js — the coach marks after the first lesson (screenplay 3.0 "The
+// first run"; 3.2; M92): one sentence on each rail item, one at a time, dismissed with Enter.
+// The mark is a small card beside the rail item it names, with a pointer on its left edge and
+// the Enter key; Esc dismisses the rest. The marks are data (COACH_MARKS: the rail element each
+// one sits by and its site.csv row), so adding one is a data edit.
+//
+//   coachMarksDue(prefs, lessonsDone)                → should Home show them now (pure)
+//   const marks = mountCoachMarks({ railEl, onDone });  marks.next(); marks.destroy();
+import { siteCopy } from '../../content/copy/apply.js';
+
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/** Each mark: the rail element it points at (a selector inside the rail) and its site.csv row. */
+export const COACH_MARKS = [
+  { key: 'home', at: '.rail-item[data-page="home"]', copy: 'orientation_home', fallback: 'Home picks up where you left off, with today’s quests on the right.' },
+  { key: 'learn', at: '.rail-item[data-page="learn"]', copy: 'orientation_learn', fallback: 'Learn is the course: six chapters of short modules, each ending in a timed challenge on a fresh file.' },
+  { key: 'practice', at: '.rail-item[data-page="practice"]', copy: 'orientation_practice', fallback: 'Drills, the Daily, rapid-fire and the challenges all live under Practice, on the clock.' },
+  { key: 'leaderboard', at: '.rail-item[data-page="leaderboard"]', copy: 'orientation_leaderboard', fallback: 'Each drill and challenge has a board, the Daily too, and only a run with no help and no mouse posts a time.' },
+  { key: 'reference', at: '.rail-item[data-page="reference"]', copy: 'orientation_reference', fallback: 'Reference has every key the course teaches, and shows which ones you’ve practiced.' },
+  { key: 'level', at: '#railLevel', copy: 'orientation_level', fallback: 'Everything you finish earns XP toward your next level, and speed is what puts you on the boards.' },
+  { key: 'streak', at: '#railStreak', copy: 'orientation_streak', fallback: 'Your first practice each day fills that day’s cell and adds a day to your streak.' },
+];
+
+/** The marks show on the first visit to Home after a lesson, once. Pure. */
+export function coachMarksDue(p, lessonsDone) {
+  return !!p && p.firstRunDone === true && p.coachMarksDone !== true && (lessonsDone | 0) >= 1;
+}
+
+/** The marks whose rail element exists (a guest with no level has no level or streak row). Pure over a lookup. */
+export function visibleMarks(find, marks = COACH_MARKS) {
+  return marks.filter(m => { const el = find(m.at); return !!el && !el.hidden; });
+}
+
+export function mountCoachMarks({ railEl, onDone, marks = COACH_MARKS } = {}) {
+  const find = sel => (railEl ? railEl.querySelector(sel) : null);
+  const list = visibleMarks(find, marks);
+  let i = -1;
+  const card = document.createElement('div');
+  card.className = 'coach';
+  card.setAttribute('role', 'dialog');
+  card.setAttribute('aria-live', 'polite');
+  document.body.appendChild(card);
+  let target = null;
+
+  function place() {
+    if (!target) return;
+    const r = target.getBoundingClientRect();
+    card.style.left = Math.round(r.right) + 'px';
+    card.style.top = Math.round(r.top + r.height / 2) + 'px';
+  }
+  function show(k) {
+    if (target) target.classList.remove('coach-target');
+    i = k;
+    const m = list[i];
+    if (!m) { finish(); return; }
+    target = find(m.at); if (target) target.classList.add('coach-target');
+    card.innerHTML = `<p class="coach-line">${esc(siteCopy(m.copy, m.fallback))}</p><div class="coach-foot"><span class="label">${esc(siteCopy('coach_count', '{n} of {m}').replace('{n}', i + 1).replace('{m}', list.length))}</span><button type="button" class="btn btn-primary btn-small" data-act="next">${esc(siteCopy('coach_next', i + 1 < list.length ? 'Next' : 'Done'))}<kbd class="key key-on-fill">Enter</kbd></button></div>`;
+    card.querySelector('[data-act="next"]').onclick = next;
+    place();
+    const b = card.querySelector('button'); if (b) b.focus({ preventScroll: true });
+  }
+  function next() { show(i + 1); }
+  let done = false;
+  function finish() {
+    if (done) return; done = true;
+    if (target) target.classList.remove('coach-target');
+    card.remove();
+    window.removeEventListener('keydown', onKey, true); window.removeEventListener('resize', place);
+    if (onDone) { try { onDone(); } catch (e) { /* host hook */ } }
+  }
+  const onKey = e => {
+    if (done) return;
+    if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); next(); }
+    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); finish(); }
+  };
+  window.addEventListener('keydown', onKey, true);
+  window.addEventListener('resize', place);
+  if (list.length) show(0); else finish();
+  return { next, destroy: finish, get index() { return i; }, get count() { return list.length; } };
+}

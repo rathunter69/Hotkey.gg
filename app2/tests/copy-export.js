@@ -16,8 +16,9 @@ import { joinParas } from '../content/copy/apply.js';
 import { SITE_KEYS } from '../content/copy/rules.js';
 import { CHAPTERS, modulesOf, moduleOf, sectionsOf } from '../content/index.js';
 import { CONVENTIONS } from '../content/conventions.js';
-import { BRIEFING, ORIENTATION } from '../app/first-run-next.js';
-import { HEADLINES, SUBHEAD, MODES } from '../app/landing-next.js';
+import { BRIEFING } from '../app/first-run-next.js';
+import { COACH_MARKS } from '../ui/components/coachmarks.js';
+import { HEADLINES, SUBHEAD } from '../app/landing-next.js';
 import { MODULE_BEATS, PAGE_DELIVERED } from '../app/beats.js';
 import { PLANNED_MODULES } from '../app/learn-next.js';
 import { STAGES } from '../app/deal-strip.js';
@@ -139,12 +140,9 @@ const PAGE_NAMES = {
 /** Everything the screens say today, keyed the way rules.js SITE_KEYS names it. */
 export function siteDefaults() {
   const out = {};
-  BRIEFING.forEach((c, i) => { out[`briefing_${i + 1}_eyebrow`] = c.eyebrow; out[`briefing_${i + 1}_title`] = c.title; out[`briefing_${i + 1}_body`] = joinParas(c.body); });
-  out.orientation_eyebrow = ORIENTATION.eyebrow; out.orientation_title = ORIENTATION.title;
-  for (const r of ORIENTATION.rows) out['orientation_' + r.where.toLowerCase()] = r.what;
-  out.orientation_fine = ORIENTATION.fine;
-  out.landing_headline = HEADLINES[0].a; out.landing_subhead = SUBHEAD;
-  for (const m of MODES) out['mode_' + m.key] = m.line;
+  const card = BRIEFING(); out.briefing_1_title = card.title; out.briefing_1_body = joinParas(card.body);   // the one story card (3.0, The first run)
+  for (const m of COACH_MARKS) out['orientation_' + m.key] = m.fallback;   // the coach marks on the rail
+  out.landing_headline = HEADLINES[0](); out.landing_subhead = SUBHEAD();
   out.dash_learn = DASH_LINES.learn; out.dash_practice = DASH_LINES.practice;
   out.deal_strip_stage_1 = STAGES[0].stage; out.deal_strip_deliverable_1 = STAGES[0].delivers;
   out.page_delivered = PAGE_DELIVERED; out.save_nudge = SAVE_NUDGE; out.install_prompt = INSTALL_PROMPT;

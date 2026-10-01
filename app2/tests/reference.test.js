@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { REFERENCE, CATEGORIES, CATEGORY_NOTES, ADDIN_DISCLAIMER, macChord, macNote, parseChord, referenceByChord, referenceById, lessonForConcept } from '../content/reference.js';
 import { LESSONS, LESSONS_BY_ID, lessonNumber } from '../content/index.js';
 import { CONCEPTS } from '../content/schema.js';
-import { detectPlatform, chordHtml, searchText, groupCategories, chipList, inCategory, ADDINS_CAT, ADDINS_TITLE, ADDINS_CLOSED, addinsOpen, addinsAfterSearch, addinsAfterToggle } from '../app/reference-page.js';
+import { detectPlatform, chordHtml, searchText, REFERENCE_GROUPS, groupRows, keyState, collectedCount, taughtIn, KEY_STATES } from '../app/reference-page.js';
 import { renderShortcutsIndex } from './public-pages.js';
 
 const nonEmpty = v => typeof v === 'string' && v.trim().length > 0;
@@ -149,9 +149,9 @@ test('page helpers: platform detection, keycap markup, search text', () => {
   assert.equal(detectPlatform({ platform: 'Linux x86_64', userAgent: 'X11' }), 'win');
   assert.equal(detectPlatform(null), 'win');
   const html = chordHtml('Ctrl+Shift+↓', parseChord);
-  assert.equal((html.match(/<kbd>/g) || []).length, 3);
-  assert.ok(html.includes('<span class="ref-plus">+</span>'));
-  assert.equal((chordHtml('Alt H B O', parseChord).match(/class="ref-seq"/g) || []).length, 4);
+  assert.equal((html.match(/<kbd class="key">/g) || []).length, 3);
+  assert.ok(html.includes('<span class="chord-plus">+</span>'));
+  assert.equal((chordHtml('Alt H B O', parseChord).match(/class="chord"/g) || []).length, 4);
   assert.ok(chordHtml('<b>', parseChord).includes('&lt;b&gt;'), 'keys are escaped');
   const e = referenceById('ctrl-b'); const t = searchText(e, null);
   for (const q of ['ctrl b', 'ctrl+b', 'bold', 'cmd b', 'command b', 'formatting']) assert.ok(t.includes(q.replace('+', ' ')), `"${q}" finds Ctrl+B`);
@@ -161,53 +161,42 @@ test('page helpers: platform detection, keycap markup, search text', () => {
   assert.ok(searchText(referenceById('ctrl-9'), null).includes('coming soon'));
 });
 
-test('the add-in categories group under one "Add-ins (Windows)" section, last, with one chip and one public heading', () => {
-  const g = groupCategories(REFERENCE, CATEGORIES);
-  assert.deepEqual(g.addins, ['Macabacus', 'FactSet']);
-  assert.deepEqual(g.native, CATEGORIES.slice(0, -2), 'every native category, in display order');
-  assert.deepEqual(CATEGORIES.slice(-2), g.addins, 'the add-in categories come last');
-  for (const c of g.native) assert.ok(REFERENCE.filter(e => e.category === c).every(e => !e.addin), `${c} carries no add-in rows`);
-  assert.equal(ADDINS_TITLE, 'Add-ins (Windows)');
-  // one chip for both add-ins, after the native chips
-  const chips = chipList(REFERENCE, CATEGORIES);
-  assert.deepEqual(chips.map(c => c.label), ['All', ...g.native, 'Add-ins']);
-  assert.equal(chips[0].cat, 'all'); assert.equal(chips[chips.length - 1].cat, ADDINS_CAT);
-  assert.ok(!chips.some(c => c.label === 'Macabacus' || c.label === 'FactSet'), 'no per-vendor chip');
-  assert.deepEqual(chipList(REFERENCE.filter(e => !e.addin), CATEGORIES).map(c => c.label), ['All', ...g.native], 'no Add-ins chip without add-in rows');
-  // the chip filter
-  assert.ok(inCategory(referenceById('macabacus-ctrl-shift-r'), ADDINS_CAT) && inCategory(referenceById('factset-ctrl-alt-k'), ADDINS_CAT));
-  const b = referenceById('ctrl-b');
-  assert.ok(!inCategory(b, ADDINS_CAT) && inCategory(b, 'all') && inCategory(b, 'Formatting') && !inCategory(b, 'Borders'));
-  assert.equal(REFERENCE.filter(e => inCategory(e, ADDINS_CAT)).length, 44);
-  // the public shortcuts index: the native categories, then the one heading with both lists and the disclaimer beneath them
+test('the public shortcuts index: the native categories, then one "Add-ins (Windows)" heading with both lists and the disclaimer', () => {
+  const native = CATEGORIES.filter(c => REFERENCE.filter(e => e.category === c).some(e => !e.addin));
+  assert.deepEqual(CATEGORIES.slice(-2), ['Macabacus', 'FactSet'], 'the add-in categories come last');
   const html = renderShortcutsIndex();
-  assert.deepEqual([...html.matchAll(/<h2>([^<]+)<\/h2>/g)].map(m => m[1]), [...g.native, 'Add-ins (Windows)']);
+  assert.deepEqual([...html.matchAll(/<h2>([^<]+)<\/h2>/g)].map(m => m[1]), [...native, 'Add-ins (Windows)']);
   const at = s => { const i = html.indexOf(s); assert.ok(i >= 0, `index has "${s.slice(0, 40)}"`); return i; };
   const heading = at('<h2>Add-ins (Windows)</h2>');
   assert.ok(heading > at('<h2>Workbook</h2>'), 'the add-ins come after the last native category');
   assert.ok(heading < at('<h3>Macabacus</h3>') && at('<h3>Macabacus</h3>') < at(CATEGORY_NOTES.Macabacus) && at(CATEGORY_NOTES.Macabacus) < at('macabacus-ctrl-shift-r.html'));
-  assert.ok(at('macabacus-ctrl-alt-minus.html') < at('<h3>FactSet</h3>') && at('<h3>FactSet</h3>') < at(CATEGORY_NOTES.FactSet) && at(CATEGORY_NOTES.FactSet) < at('factset-ctrl-alt-shift-k.html'));
   assert.ok(at('factset-ctrl-alt-k.html') < at(ADDIN_DISCLAIMER) && at(ADDIN_DISCLAIMER) < at('Open the reference'), 'the disclaimer sits under both lists');
   assert.equal((html.slice(heading).match(/<li>/g) || []).length, 44, 'every add-in row is under the heading');
   assert.equal((html.match(/<li>/g) || []).length, REFERENCE.length, 'every row is on the index');
 });
 
-test('the add-ins section: closed by default, a matching search opens it, clearing closes it unless the learner opened it', () => {
-  let s = ADDINS_CLOSED;
-  assert.equal(addinsOpen(s), false);
-  s = addinsAfterSearch(s, 'macabacus', true); assert.equal(addinsOpen(s), true, 'a search that matches an add-in row opens it');
-  s = addinsAfterSearch(s, 'macabacus fill', true); assert.equal(addinsOpen(s), true);
-  s = addinsAfterSearch(s, '', false); assert.equal(addinsOpen(s), false, 'clearing the search closes it again');
-  s = addinsAfterSearch(s, 'bold', false); assert.equal(addinsOpen(s), false, 'a search with no add-in match leaves it closed');
-  // closed by hand during a query: stays closed for that query, opens again when the query changes
-  s = addinsAfterSearch(s, 'ctrl shift', true); assert.equal(addinsOpen(s), true);
-  s = addinsAfterToggle(s, false); assert.equal(addinsOpen(s), false, 'the learner closes it');
-  s = addinsAfterSearch(s, 'ctrl shift', true); assert.equal(addinsOpen(s), false, 'the same query does not reopen what the learner closed');
-  s = addinsAfterSearch(s, 'ctrl shift r', true); assert.equal(addinsOpen(s), true, 'a changed query opens it again');
-  // opened by hand (the summary or the Add-ins chip): it stays open through and after a search
-  s = addinsAfterToggle(ADDINS_CLOSED, true); assert.equal(addinsOpen(s), true);
-  s = addinsAfterSearch(s, 'bold', false); assert.equal(addinsOpen(s), true, 'a search elsewhere does not close what the learner opened');
-  s = addinsAfterSearch(s, '', false); assert.equal(addinsOpen(s), true, 'clearing keeps it open');
-  s = addinsAfterToggle(s, false); assert.equal(addinsOpen(s), false, 'closed by hand');
-  assert.deepEqual(ADDINS_CLOSED, { user: false, auto: false, lastQ: '' }, 'the initial state is never mutated');
+test('Reference as 3.0 draws it (M106): the groups gather every native category, a Ribbon route folds into its key, the states and the count', () => {
+  const groups = groupRows(REFERENCE);
+  assert.deepEqual(groups.map(g => g.id), ['move', 'select', 'edit', 'format', 'formulas', 'ribbon', 'data']);
+  const covered = new Set(REFERENCE_GROUPS.flatMap(g => g.categories));
+  for (const c of CATEGORIES) if (REFERENCE.some(e => e.category === c && !e.addin)) assert.ok(covered.has(c), `${c} is in a group`);
+  const shown = groups.flatMap(g => g.rows);
+  assert.ok(shown.every(r => !r.entry.addin), 'no add-in rows on the page');
+  const bold = shown.find(r => r.entry.id === 'ctrl-b');
+  assert.ok(bold && bold.ribbon && bold.ribbon.id === 'alt-h-1', 'Bold shows its Ribbon route as a second row of keycaps');
+  assert.ok(!shown.some(r => r.entry.id === 'alt-h-1'), 'the folded route is not its own row');
+  const fc = shown.find(r => r.entry.id === 'ctrl-1');
+  assert.ok(fc && fc.ribbon && fc.ribbon.id === 'alt-h-o-e');
+  assert.equal(shown.length + shown.filter(r => r.ribbon).length, REFERENCE.filter(e => !e.addin).length, 'every native entry is a row or a folded route');
+  // the states
+  const e = referenceById('ctrl-1');
+  assert.deepEqual(KEY_STATES, ['not-yet', 'taught', 'practiced', 'under-par']);
+  assert.equal(keyState(e, {}), 'not-yet');
+  assert.equal(keyState(e, { done: new Set([e.lessonId]) }), 'taught');
+  assert.equal(keyState(e, { practiced: new Set([e.concept]) }), 'practiced');
+  assert.equal(keyState(e, { practiced: new Set([e.concept]), underPar: new Set([e.concept]) }), 'under-par');
+  assert.equal(keyState(referenceById('ctrl-9'), { done: new Set(['x']) }), 'not-yet', 'no lesson, no state');
+  assert.equal(collectedCount(shown, {}), 0);
+  assert.equal(collectedCount(shown, { done: new Set([e.lessonId]) }), shown.filter(r => r.entry.lessonId === e.lessonId).length);
+  assert.equal(taughtIn('1.5.2'), '1.5'); assert.equal(taughtIn('1.1.C'), '1.1'); assert.equal(taughtIn(''), '');
 });
