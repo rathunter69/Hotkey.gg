@@ -84,7 +84,7 @@ test('pickNextLesson: works on the real catalogue with placement skips', () => {
   assert.equal(pickNextLesson(LESSONS, {}, skipped).id, 'inherited-workbook');
   assert.equal(pickNextLesson(LESSONS, {}, []).id, 'inherited-workbook');
   // once 1.1 is done, the placement skips steer past the skipped lessons to the first uncovered one
-  const done = Object.fromEntries(['inherited-workbook', 'ribbon-by-keyboard', 'analyst-setup', 'colour-label-hardcode', 'challenge-inherited-file'].map(id => [id, { completed: true }]));
+  const done = Object.fromEntries(['inherited-workbook', 'know-the-screen', 'ribbon-by-keyboard', 'analyst-setup', 'colour-label-hardcode', 'challenge-inherited-file'].map(id => [id, { completed: true }]));
   assert.equal(pickNextLesson(LESSONS, done, []).id, 'jump-dont-scroll');
   assert.equal(pickNextLesson(LESSONS, done, skipped).id, 'around-the-workbook');
   assert.equal(pickNextLesson(LESSONS, done, skipsFor(['move'])).id, 'select-like-you-mean-it');

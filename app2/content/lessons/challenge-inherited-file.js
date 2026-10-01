@@ -1,65 +1,68 @@
-// Chapter 1 · 1.1.C — Challenge: another cluster's file (seeded over S0)
-// A sister cluster's workbook arrives in the same untidy shape: rename and reorder the tabs,
-// delete the stale one, gridlines off, inputs blue, units line in, hardcode split out. The seed
-// dresses the clothing (city, site names, figures); the workload never moves.
+// Chapter 1 · 1.1.C — Challenge: another location's file (seeded over S0)
+// Another cluster's workbook arrives in the same untidy shape: rename and reorder the tabs, delete
+// the stale one, gridlines off, the formulas read with F2, every cell on Inputs colored by what it
+// holds. The seed dresses the clothing (city, site names, the figures on Inputs); the workload
+// never moves. The learner-facing words live in content/copy/*.csv.
 import { pickCluster, siteNames } from '../workbooks/clusters.js';
-import { SITES, rawRow } from '../workbooks/voltline-weekly.js';
-import { roleColour, unitsLabel, noLiteralInFormula } from '../../app/graders.js';
+import { SITES, rawRow, INPUT_ROWS } from '../workbooks/clearcoat-weekly.js';
+import { roleColour } from '../../app/graders.js';
 
+const at = (sheet, ref) => !sheet.sel && sheet.selectionText() === ref;
+const windowKeys = ses => ses.keyLog.slice(ses.goalMark || 0).map(e => e.k);
 const names = ses => ses.sheets.map(x => x.name);
 const workbookIs = (...want) => ses => names(ses).length === want.length && names(ses).every((x, i) => x === want[i]);
 const sheetOf = (ses, name) => { const e = ses.sheets.find(x => x.name === name); return e ? e.sheet : null; };
+const onSheet = (ses, name) => ses.sheets[ses.sheetIndex] && ses.sheets[ses.sheetIndex].name === name;
 const cellIs = (ses, sheet, ref, fn) => { const sh = sheetOf(ses, sheet); return !!sh && fn(sh.cellAt(ref)); };
+const notBlue = c => c.fontColor !== 'blue';
 
 export default {
   id: 'challenge-inherited-file',
   chapter: 'foundations',
   section: 'Open and set up',
   module: 'open-and-set-up',
-  workbook: 'voltline-weekly',
+  workbook: 'clearcoat-weekly',
   state: { before: 'S0' },
   kind: 'challenge',
-  title: 'Challenge: another cluster’s file',
+  title: 'Challenge: another location’s file',
   difficulty: 'medium',
   tags: ['challenge', 'setup'],
   access: 'free',
   minutes: 3,
   prerequisites: ['colour-label-hardcode'],
-  brief: 'A sister cluster’s workbook just arrived in the same state: set it up to house standard.',
+  brief: 'The San Antonio cluster’s workbook has landed in the same state as Austin’s, so set it up the same way, this time on the clock.',
   timeLimit: 170,
   pars: { pass: 110, pro: 70, legendary: 45 },
   seed: rng => {
     const cluster = pickCluster(rng);
     const sites = siteNames(cluster, 5);
-    const patch = { 'Costs!A1': { value: `Voltline — ${cluster.city} site costs, ${cluster.week}`, bold: true } };
+    const patch = { 'Costs!A1': { value: `Clearcoat Express: ${cluster.city} site costs, week of Sep 8, 2026`, bold: true } };
     SITES.forEach((old, i) => {
       for (let d = 0; d < 12; d++) patch[`Raw!B${rawRow(old, d)}`] = { value: sites[i] };
-      patch[`Sheet2!A${9 + i}`] = { value: sites[i] };
+      patch[`Sheet2!A${INPUT_ROWS.sites[i]}`] = { value: sites[i] };
+      patch[`Costs!A${4 + i}`] = { value: sites[i] };
     });
-    patch['Sheet2!B5'] = { value: Math.round(55 + rng() * 20) / 100, fmtStyle: 'percent', decimals: 0 };
-    patch['Sheet2!B6'] = { value: (60000 + Math.floor(rng() * 400) * 100), fmtStyle: 'comma', decimals: 0 };
+    patch[`Sheet2!B${INPUT_ROWS.ticket}`] = { value: 13.5 + Math.round(rng() * 4) / 4 };
+    patch[`Sheet2!B${INPUT_ROWS.washes}`] = { value: 8000 + Math.floor(rng() * 40) * 50 };
     return patch;
   },
   goals: [
     { id: 'tidy-tabs', text: 'Rename Sheet2 to Inputs, delete Old wk37, and get a Report sheet in front.', keys: 'Ctrl+PgDn Alt H O R "Inputs" ↵ Ctrl+PgDn Alt H D S ↵ Shift+F11 Alt H O R "Report" ↵ Alt H O M ↑ ×2 ↵',
       check: (s, ses) => workbookIs('Report', 'Raw', 'Inputs', 'Costs')(ses) },
-    { id: 'gridlines', text: 'Gridlines off on Report — someone reads this page.', keys: 'Alt W V G',
+    { id: 'gridlines', text: 'Turn gridlines off on Report, because someone reads this page.', keys: 'Alt W V G',
       check: (s, ses) => { const sh = sheetOf(ses, 'Report'); return !!sh && sh.gridlines === false; } },
-    { id: 'units', text: 'State the units on Inputs: USD unless stated in A2.', keys: 'Ctrl+PgDn ×2 ↓ "USD unless stated" ↵',
-      check: (s, ses) => cellIs(ses, 'Inputs', 'A2', c => c.value === 'USD unless stated') },
-    { id: 'inputs-blue', text: 'Color the typed inputs B5 and B6 blue.', keys: '→ ↓ ×2 Shift+↓ Alt H F C → ×4 ↵',
-      check: (s, ses) => cellIs(ses, 'Inputs', 'B5', c => c.fontColor === 'blue') && cellIs(ses, 'Inputs', 'B6', c => c.fontColor === 'blue') },
-    { id: 'split', text: 'Put the wholesale price in B4 blue, label C4 per utility contract, and point the bill formula B14 at B4.', keys: '↑ "0.13" ↵ ↑ Alt H F C → ×4 ↵ → "per utility contract" ↵ ← Ctrl+↓ Ctrl+↓ F2 ⌫ ×4 "B4" ↵',
-      check: (s, ses) => cellIs(ses, 'Inputs', 'B4', c => c.value === 0.13 && c.fontColor === 'blue')
-        && cellIs(ses, 'Inputs', 'C4', c => c.value === 'per utility contract')
-        && cellIs(ses, 'Inputs', 'B14', c => c.formula === '=B6*B4') },
+    { id: 'formulas-black', text: 'Leave the formulas on Inputs black.', keys: 'Ctrl+PgDn ×2 Ctrl+↓ ↓ → Ctrl+↓ ↑ ×3',
+      check: (s, ses) => onSheet(ses, 'Inputs') && ['B10', 'B11', 'B14'].every(r => cellIs(ses, 'Inputs', r, notBlue)) },
+    { id: 'f2-look', text: 'Read B10 with F2 and leave it as it was.', keys: '↑ ↑ F2 Esc',
+      check: (s, ses) => onSheet(ses, 'Inputs') && ses.mode === 'normal' && at(s, 'B10') && windowKeys(ses).includes('F2') && cellIs(ses, 'Inputs', 'B10', c => c.formula === '=B5*B6') },
+    { id: 'colors', text: 'Color every typed figure on Inputs blue, the link green, and put the wrongly colored formula back to Automatic.', keys: 'Ctrl+↑ ↓ Shift+↓ ×5 Alt H F C → ×4 ↵ Ctrl+↓ ↑ ↑ Shift+↑ Alt H F C → ×8 ↵ Ctrl+↓ Ctrl+1 F Alt+C ← ×5 ↵',
+      check: (s, ses) => { const sh = sheetOf(ses, 'Inputs'); return !!sh && roleColour(sh, 'B4:B15').ok && ['B12', 'B13'].every(r => sh.cellAt(r).fontColor === 'green'); } },
   ],
   graders: [
-    ses => workbookIs('Report', 'Raw', 'Inputs', 'Costs')(ses) ? { ok: true } : { ok: false, why: 'The tabs must read Report, Raw, Inputs, Costs — report first, junk gone.' },
-    ses => { const sh = sheetOf(ses, 'Report'); return sh && sh.gridlines === false ? { ok: true } : { ok: false, why: 'Report still shows gridlines — it is a page someone reads.' }; },
-    ses => { const sh = sheetOf(ses, 'Inputs'); return sh ? unitsLabel(sh) : { ok: false, why: 'No Inputs sheet yet.' }; },
-    ses => { const sh = sheetOf(ses, 'Inputs'); return sh ? roleColour(sh, 'B4:B6') : { ok: false, why: 'No Inputs sheet yet.' }; },
-    ses => { const sh = sheetOf(ses, 'Inputs'); return sh ? noLiteralInFormula(sh, 'B14') : { ok: false, why: 'No Inputs sheet yet.' }; },
+    ses => workbookIs('Report', 'Raw', 'Inputs', 'Costs')(ses) ? { ok: true } : { ok: false, why: 'The tabs read Report, Raw, Inputs, Costs when the file is set up: the page first, the stale export gone.' },
+    ses => { const sh = sheetOf(ses, 'Report'); return sh && sh.gridlines === false ? { ok: true } : { ok: false, why: 'Report still shows gridlines. It is a page someone reads, so they go off.' }; },
+    ses => { const sh = sheetOf(ses, 'Inputs'); return sh ? roleColour(sh, 'B4:B15') : { ok: false, why: 'There is no Inputs sheet yet.' }; },
+    ses => { const sh = sheetOf(ses, 'Inputs'); if (!sh) return { ok: false, why: 'There is no Inputs sheet yet.' }; const r = ['B12', 'B13'].find(ref => sh.cellAt(ref).fontColor !== 'green'); return r ? { ok: false, why: `${r} reads another sheet and is shown ${sh.cellAt(r).fontColor || 'black'}. A link to another sheet is green.` } : { ok: true }; },
   ],
-  solution: 'Ctrl+PgDn Alt H O R "Inputs" Enter Ctrl+PgDn Alt H D S Enter Shift+F11 Alt H O R "Report" Enter Alt H O M Up Up Enter Alt W V G Ctrl+PgDn Ctrl+PgDn Down "USD unless stated" Enter Right Down Down Shift+Down Alt H F C Right Right Right Right Enter Up "0.13" Enter Up Alt H F C Right Right Right Right Enter Right "per utility contract" Enter Left Ctrl+Down Ctrl+Down F2 Backspace Backspace Backspace Backspace "B4" Enter',
+  solution: 'Ctrl+PgDn Alt H O R "Inputs" Enter Ctrl+PgDn Alt H D S Enter Shift+F11 Alt H O R "Report" Enter Alt H O M Up Up Enter Alt W V G Ctrl+PgDn Ctrl+PgDn Ctrl+Down Down Right Ctrl+Down Up Up Up Up Up F2 Escape Ctrl+Up Down Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Alt H F C Right Right Right Right Enter Ctrl+Down Up Up Shift+Up Alt H F C Right Right Right Right Right Right Right Right Enter Ctrl+Down Ctrl+1 F Alt+C Left Left Left Left Left Enter',
 };

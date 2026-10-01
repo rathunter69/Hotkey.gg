@@ -3,6 +3,7 @@
 // in its challenge, then the project, the assessment and the test-out (1.8).
 import inherited_workbook from './lessons/inherited-workbook.js';
 import { applyCopy } from './copy/apply.js';
+import know_the_screen from './lessons/know-the-screen.js';
 import ribbon_by_keyboard from './lessons/ribbon-by-keyboard.js';
 import analyst_setup from './lessons/analyst-setup.js';
 import colour_label_hardcode from './lessons/colour-label-hardcode.js';
@@ -71,7 +72,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'Build the weekly report end to end, then prove it against the clock; or test out of the chapter.' },
     ],
     lessons: [
-      inherited_workbook, ribbon_by_keyboard, analyst_setup, colour_label_hardcode, challenge_inherited_file,
+      inherited_workbook, know_the_screen, ribbon_by_keyboard, analyst_setup, colour_label_hardcode, challenge_inherited_file,
       jump_dont_scroll, select_like_you_mean_it, around_the_workbook, typed_vs_calculated, challenge_find_and_mark,
       enter_the_missing_day, fix_it_in_place, copy_cut_paste_fill, paste_special_values, find_replace_timeline, challenge_complete_the_feed,
       rows_cols_honest_totals, widths_heights_autofit, hide_group_freeze, challenge_reshape_the_report,

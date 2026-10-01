@@ -521,7 +521,14 @@ export class Sheet {
     this.tabHome = null; this.multi = null;
     if (!shift && this.sel) { const a = this.dispActive(); this.active = { r: a.r, c: a.c }; this.sel = null; this.selA = null; }
     let nr, nc;
-    if (ctrl) { const j = this.ctrlJump(this.active.r, this.active.c, dr, dc); nr = j.r; nc = j.c; }
+    if (ctrl && shift && this.sel) {
+      // Ctrl+Shift+Arrow extends "to the last nonblank cell in the same column or row as the active
+      // cell" (Excel's own words): the lane is the displayed active cell's row or column, the start is
+      // the moving corner's position in that lane. A1:A61 then Ctrl+Shift+→ reads row 1, not row 61.
+      const a = this.dispActive();
+      const j = this.ctrlJump(dc ? a.r : this.active.r, dr ? a.c : this.active.c, dr, dc);
+      nr = dr ? j.r : this.active.r; nc = dc ? j.c : this.active.c;
+    } else if (ctrl) { const j = this.ctrlJump(this.active.r, this.active.c, dr, dc); nr = j.r; nc = j.c; }
     else { nc = this.stepVisible('c', this.active.c, dc); nr = this.stepVisible('r', this.active.r, dr); }
     if (shift) { if (!this.sel) { this.sel = { r: this.active.r, c: this.active.c }; this.selA = null; } }
     else this.sel = null;

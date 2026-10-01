@@ -613,12 +613,15 @@ export function sessionToState(ses) {
       return { name: e.name, cells: S.cells, colW, rowH, gridlines: S.gridlines === false ? false : undefined,
         hiddenRows: [...S.hiddenRows], hiddenCols: [...S.hiddenCols], freeze: { ...S.freeze }, groups: S.groups, condFmt: S.condFmt };
     }),
-    settings: { calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat.slice(), pageSetup: clone(ses.settings.pageSetup) },
+    settings: { calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat.slice(), pageSetup: clone(ses.settings.pageSetup),
+      ...(ses.settings.enterMoves === false ? { enterMoves: false } : {}) },   // the Enter setting and the names: what a Clearcoat state carries (the tests diff every workbook through this)
+    ...(ses.names && Object.keys(ses.names).length ? { names: { ...ses.names } } : {}),
   };
 }
 /** The engine's Page Setup default: what a state means when it says nothing about printing. */
 export const PAGE_SETUP_DEFAULT = { orientation: 'portrait', scaling: 'adjust', adjustTo: 100, fitWide: 1, fitTall: 1, titlesRows: '', footer: { left: '', centre: '', right: '' }, printGridlines: false };
-const normSettings = st => ({ ...(st || {}), pageSetup: { ...PAGE_SETUP_DEFAULT, ...((st || {}).pageSetup || {}), footer: { ...PAGE_SETUP_DEFAULT.footer, ...(((st || {}).pageSetup || {}).footer || {}) } } });
+// key order is canonical (enterMoves before pageSetup), since `same` compares JSON text: a session writes pageSetup before enterMoves, a state the other way round
+const normSettings = st => { const { pageSetup, enterMoves, ...rest } = st || {}; return { ...rest, ...(enterMoves === false ? { enterMoves: false } : {}), pageSetup: { ...PAGE_SETUP_DEFAULT, ...(pageSetup || {}), footer: { ...PAGE_SETUP_DEFAULT.footer, ...((pageSetup || {}).footer || {}) } } }; };
 
 /* ---------------- diffing (the chain test and audit graders read this) ---------------- */
 
