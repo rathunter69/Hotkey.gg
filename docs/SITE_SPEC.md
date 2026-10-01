@@ -1,5 +1,7 @@
 # hotkey.gg site spec
 
+Where this file and docs/screenplay/ disagree, the screenplay wins. docs/REBUILD_PLAN.md, section 1c, lists the superseded sections.
+
 Decided with Wolf on 2026-09-21 (40-question review). This file says what each part of the site is and how it behaves. docs/REBUILD_PLAN.md says what gets built in which order. If they disagree, this file wins on behaviour and the plan wins on sequence. Decisions only; no history.
 
 ## 1. Look and feel

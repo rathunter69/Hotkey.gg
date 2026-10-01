@@ -1,6 +1,8 @@
 # hotkey.gg lesson framework (v2)
 
-Status: ACCEPTED 2026-09-23 (framework v2); applied through C2. The proposal it came from stays in `docs/proposals/`.
+Where this file and docs/screenplay/ disagree, the screenplay wins. docs/REBUILD_PLAN.md, section 1c, lists the superseded sections.
+
+Status: ACCEPTED 2026-09-23 (framework v2); applied through C2. The proposal it came from is in git history.
 
 Sections 1–9 are the framework. Section 10 is the evidence: how the reference courses teach, why the current 38 lessons read thin, and what changed as a result. Read §10 first if you want to know why; read §1–9 if you are writing a lesson.
 

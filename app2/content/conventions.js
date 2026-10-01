@@ -1,5 +1,5 @@
 // app2/content/conventions.js — the banker-conventions canon as data (C2): every id from
-// docs/proposals/BANKER_CONVENTIONS.proposed.md with its name and the short line the goal chip
+// docs/screenplay/screenplay.md section 7 with its name and the short line the goal chip
 // shows. Lessons carry `conventions: ['B1', …]`; graders and chips read this table. The full
 // sources, recurrence counts and taught/enforced mapping live in the canon document.
 
