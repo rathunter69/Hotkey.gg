@@ -11,7 +11,6 @@
 //   pagesetup   Page Setup opens on its row of tabs; a bare F is no longer Fit to, Alt+H does nothing (M66)
 
 export const DRIFT_LESSONS = new Map(Object.entries({
-  'find-replace-timeline': 'series', 'challenge-complete-the-feed': 'series',
   'numbers-a-banker-can-read': 'picker', 'alignment-and-titles': 'picker', 'the-style-pass': 'picker',
   'challenge-to-standard-in-three-minutes': 'picker', 'point-dont-type': 'picker', 'sum-family-and-autosum': 'number',
   'anchors-dollar-and-f4': 'number', 'fit-to-one-page': 'pagesetup', 'the-checks-row': 'number', 'hardcode-hunt': 'picker',

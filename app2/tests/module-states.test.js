@@ -162,7 +162,8 @@ test('every module lesson\'s solution replays to exactly its after state', () =>
     run.run(l.solution);
     assert.ok(run.finished, `${l.id}: solution finishes`);
     const after = workbookState(l.workbook, l.state.after);
-    const diff = diffStates(sessionToState(run.session), after);
+    const wb = WORKBOOKS[l.workbook];   // each workbook reads its own session: Clearcoat's carries enterMoves and the defined names
+    const diff = wb.diffStates(wb.sessionToState(run.session), after);
     assert.deepEqual(diff, [], `${l.id}: the solution leaves exactly ${l.state.after} — extra diffs: ${JSON.stringify(diff.slice(0, 4))}`);
   }
 });

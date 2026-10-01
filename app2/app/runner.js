@@ -4,7 +4,7 @@
 import { Sheet } from '../engine/sheet.js';
 import { Session, parseKeyScript, parseKeySpec } from '../engine/keyboard.js';
 import { stepPath } from '../engine/ribbon.js';
-import { workbookState, applyStatePatch } from '../content/workbooks/index.js';
+import { WORKBOOKS, workbookState, applyStatePatch } from '../content/workbooks/index.js';
 import { mulberry32 } from '../engine/rng.js';
 import { SEEDED_KINDS } from '../content/schema.js';
 
@@ -27,7 +27,10 @@ export class LessonRun {
   reset(mode) {
     if (mode) this.mode = mode;
     this.ghostSnap = null; this.ghosting = false;   // a restart mid-ghost: the freeze belongs to the session being thrown away
-    const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells ? structuredCloneCells(sp.cells) : undefined, colW: sp.colW, active: sp.active, today: this.opts.today, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups, condFmt: sp.condFmt, zoom: sp.zoom });
+    // the case's "today": a module workbook names it (CASE_TODAY, the Monday of its reporting week) so Ctrl+; and TODAY() date the sheet the way its states do
+    const wb = this.lesson.workbook ? WORKBOOKS[this.lesson.workbook] : null;
+    const today = this.opts.today || (wb && Number.isFinite(wb.CASE_TODAY) ? () => wb.CASE_TODAY : undefined);
+    const build = sp => new Sheet({ rows: sp.rows, cols: sp.cols, cells: sp.cells ? structuredCloneCells(sp.cells) : undefined, colW: sp.colW, active: sp.active, today, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups, condFmt: sp.condFmt, zoom: sp.zoom });
     // A module lesson (C2): the starting workbook is a named state of the module workbook — the
     // file the previous lesson left — not an inline sheet. The legacy path stays for drills and
     // the old lessons until the rewrite completes.

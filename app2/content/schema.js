@@ -176,6 +176,11 @@ export const CONCEPTS = {
   'zoom': 'Zoom (Alt, W, Q) sets the sheet\'s zoom; Alt, W, J is 100% in one press',
   'enter-stays': 'Excel Options \u203a Advanced: with "After pressing Enter, move selection" off, Enter commits the entry and stays on the cell',
   'link-colour-convention': 'a link to another sheet is green and a link to another file red, so a reader sees which figures come from elsewhere',
+  // 1.3.5 (Clearcoat): names, notes and the small keys
+  'defined-name': 'Define Name (Alt, M, M, D) labels a cell or range; Go To and formulas accept the name where they accept an address',
+  'cell-note': 'Shift+F2 opens a note on the cell: a comment that travels with it, where a hardcode\'s source belongs',
+  'date-stamp': 'Ctrl+; enters today\'s date and Ctrl+Shift+; the time, as values that do not change tomorrow',
+  'scroll-to-active': 'Ctrl+Backspace scrolls the window back to the active cell without moving it',
   // Chapter 2 (Project Rinse, the book): number formats and custom number formats
   'line-formats': 'one number format per line, set on the whole line at once: dollars in the desk number format, counts plain, a per-wash figure to the cent',
   'margins-and-growth': 'a margin is a line as a share of revenue (=C24/C10); growth is this year over last, less one (=D10/C10-1)',
@@ -304,7 +309,7 @@ export function validateLesson(l) {
       // one action sentence; the closer may open with its question ("Does it tie? Watch …")
       const n = sentenceCount(g.text);
       need((g.closer ? n >= 1 && n <= 2 : n === 1) && /[.!?]$/.test(g.text.trim()), `goal ${g.id}: the action must be one sentence ending in a full stop`);
-      need(wordCount(g.text) <= 26, `goal ${g.id}: the action is over 26 words`);
+      need(g.text.trim().length <= 140, `goal ${g.id}: the action is over 140 characters (M28)`);
     }
     need(typeof g.check === 'function', `goal ${g.id}: check must be a function`);
     need(Array.isArray(g.requires) || kind === 'challenge', `goal ${g.id}: requires must list concept ids`);
