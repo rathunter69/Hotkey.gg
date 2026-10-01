@@ -60,6 +60,21 @@ function fmtOf(kind, { dollar, dash }) {
   return null;
 }
 
+/**
+ * The cell format fields for a figure: Excel's built-in styles where one is the desk's code (Comma
+ * with no decimals is #,##0_);(#,##0), Currency is $#,##0_);($#,##0), as numfmt.builtinCode writes
+ * them), so a page built here and a page a learner formats carry the same fields. Codes with a dash
+ * for zero or an x have no built-in style and are custom.
+ */
+export function formatOf(kind, { dollar = false, dash = false } = {}) {
+  const code = fmtOf(kind, { dollar, dash });
+  if (!code) return {};
+  if (kind === 'pct') return { fmtStyle: 'percent', decimals: 1 };
+  if (!dash && (kind === 'money' || kind === 'count')) return { fmtStyle: dollar && kind === 'money' ? 'currency' : 'comma', decimals: 0 };
+  if (kind === 'unit') return { fmtStyle: dollar ? 'currency' : 'comma', decimals: 2 };
+  return { fmtStyle: 'custom', numFmt: code, decimals: kind === 'mult' ? 1 : 0 };
+}
+
 /** One figure cell: its value or formula, its role colour, its format. */
 function figure(src, kind, opts) {
   if (src == null || src === '') return null;
@@ -72,8 +87,7 @@ function figure(src, kind, opts) {
   } else {
     c.value = src; return c;   // text in a figure column (a week label, a code) carries no number format
   }
-  const code = fmtOf(kind, opts);
-  if (code) { c.fmtStyle = 'custom'; c.numFmt = code; }
+  Object.assign(c, formatOf(kind, opts));
   if (kind === 'pct') c.it = true;
   if (opts.total) { c.bold = true; c.bt = true; if (opts.final) c.bdbl = true; }
   return c;
@@ -163,7 +177,7 @@ export function buildPage(spec) {
       const rr = foot + 1 + i;
       cells[L + rr] = { value: ch.label, indent: 1 };
       const f = typeof ch.formula === 'function' ? ch.formula(figCols[0], rr, rowOf) : ch.formula;
-      cells[figCols[0] + rr] = { formula: f, fmtStyle: 'custom', numFmt: dash ? FMT.countDash : FMT.count, ...(allCrossSheet(f) ? { fontColor: 'green' } : {}) };
+      cells[figCols[0] + rr] = { formula: f, ...formatOf('count', { dash }), ...(allCrossSheet(f) ? { fontColor: 'green' } : {}) };
     });
     foot += spec.checks.length;
   }

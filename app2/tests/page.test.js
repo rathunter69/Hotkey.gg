@@ -61,6 +61,8 @@ test('a Chapter 2 page: a narrow helper A, labels in B, figures from C, zero as 
   assert.equal(c.E6.numFmt, FMT.moneyDash);
   assert.equal(c.E5.numFmt, FMT.moneyDollarDash, 'the first row carries the $');
   assert.equal(c.C5.numFmt, FMT.countDash, 'counts never carry the $');
+  const c1 = page(1).sheet.cells;
+  assert.deepEqual([c1.D6.fmtStyle, c1.D6.decimals, c1.D5.fmtStyle, c1.B5.fmtStyle], ['comma', 0, 'currency', 'comma'], 'Chapter 1 uses the built-in styles that write the desk codes');
 });
 
 test('the built pages pass the sheet standard', () => {
