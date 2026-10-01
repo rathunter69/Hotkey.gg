@@ -10,10 +10,7 @@
 //   series      Alt H F I S Enter fills Linear, which leaves day names alone (M67)
 //   pagesetup   Page Setup opens on its row of tabs; a bare F is no longer Fit to, Alt+H does nothing (M66)
 
-export const DRIFT_LESSONS = new Map(Object.entries({
-  'numbers-a-banker-can-read': 'picker', 'alignment-and-titles': 'picker', 'the-style-pass': 'picker',
-  'challenge-to-standard-in-three-minutes': 'picker', 'point-dont-type': 'picker', 'sum-family-and-autosum': 'number',
-  'anchors-dollar-and-f4': 'number', 'fit-to-one-page': 'pagesetup', 'the-checks-row': 'number', 'hardcode-hunt': 'picker',
+export const DRIFT_LESSONS = new Map(Object.entries({ 'fit-to-one-page': 'pagesetup', 'the-checks-row': 'number', 'hardcode-hunt': 'picker',
   'challenge-audit-before-you-send': 'picker', 'weekly-kpi-project': 'picker', 'foundations-assessment': 'picker',
 }));
 export const DRIFT_DRILLS = new Map();   // empty since M108: every Chapter 1 drill replays on the R1 engine

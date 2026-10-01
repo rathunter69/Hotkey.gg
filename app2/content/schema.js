@@ -284,7 +284,7 @@ export function validateLesson(l) {
     need(typeof l.brief === 'string' && l.brief.trim(), 'brief missing');
     if (typeof l.brief === 'string') {
       const n = sentenceCount(l.brief);
-      if (kind === 'challenge') need(n <= 2 && wordCount(l.brief) <= 40, 'a challenge brief is one line');
+      if (kind === 'challenge') need(n <= 2 && wordCount(l.brief) <= 60, 'a challenge brief is two sentences at most, 60 words');   // the script's challenge briefs run to two sentences
       else {
         need(n >= 1 && n <= 5, `brief must be at most five sentences (it has ${n})`);
         need(wordCount(l.brief) <= 110, 'brief is over 110 words');
