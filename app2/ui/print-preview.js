@@ -5,12 +5,13 @@
 // tinted green when they read zero. No interaction; it sits inside the done overlay.
 import { dispText } from '../engine/format.js';
 import { colLetter, parseRef } from '../engine/refs.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 /** Excel's footer field codes filled for a one-page print. */
-export function footerText(section, { file = 'voltline-weekly.xlsx', date = new Date(), tab = 'Report' } = {}) {
-  const d = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+export function footerText(section, { file = 'clearcoat-weekly.xlsx', date = new Date(), tab = 'Report' } = {}) {
+  const d = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;   // MM/DD/YYYY, as US Excel prints it
   return String(section || '').replace(/&\[File\]/gi, file).replace(/&\[Date\]/gi, d).replace(/&\[Page\]/gi, '1').replace(/&\[Pages\]/gi, '1').replace(/&\[Tab\]/gi, tab);
 }
 
@@ -72,26 +73,27 @@ export function printPreviewHtml(sheet, pageSetup = {}, opts = {}) {
   <div class="pp-cap">${landscape ? 'Landscape' : 'Portrait'} · ${pageSetup.scaling === 'fit' ? `fit to ${pageSetup.fitWide || 1} page wide` : `${pageSetup.adjustTo || 100}%`}${tr ? ` · rows ${tr[0]}–${tr[1]} repeat` : ''}${pageSetup.printGridlines ? ' · gridlines print' : ''}</div>`;
 }
 
-/** The first thing a careful associate would flag on the page, from a state diff (diffStates output), in one line. */
+/** The first thing the reviewer (the CFO in Chapter 1; screenplay 7.3) would send back, from a state diff (diffStates output), in one line. */
 export function associateLine(diffs, sheetName = 'Report') {
   const own = (diffs || []).filter(d => d.sheet === sheetName || d.sheet === '*');
-  if (!own.length) return 'Nothing to flag: the associate would have sent it as it is.';
+  if (!own.length) return siteCopy('review_clean', 'Nothing to flag: the CFO would have signed it off as it is.');
+  const flag = what => siteCopy('review_flag', 'The CFO would have sent it back for {what}.').replace(/\{what\}/g, what);
   const d = own[0];
   const where = d.sheet === '*' ? '' : ` on ${d.sheet}`;
   if (d.kind === 'cell') {
     const a = d.a || {}, b = d.b || {};
     let what;
-    if (!d.a && d.b) what = `${d.key} is empty where ${b.formula ? 'a formula' : 'a value'} belongs`;
-    else if (d.a && !d.b) what = `${d.key} holds something the page does not need`;
-    else if (String(a.formula || '') !== String(b.formula || '')) what = `${d.key} ${b.formula ? 'does not hold the formula the page needs' : 'holds a formula where a value belongs'}`;
-    else if (a.value !== b.value) what = `${d.key} reads differently from the feed`;
-    else if (a.fontColor !== b.fontColor) what = `${d.key} is the wrong color for what it holds`;
-    else if (a.fmtStyle !== b.fmtStyle || a.decimals !== b.decimals) what = `${d.key}'s number format is off the house style`;
-    else what = `${d.key}'s formatting is off the house style`;
-    return `The associate would have flagged ${what}${where}.`;
+    if (!d.a && d.b) what = `${d.key} being empty where ${b.formula ? 'a formula' : 'a value'} belongs`;
+    else if (d.a && !d.b) what = `${d.key} holding something the page doesn’t need`;
+    else if (String(a.formula || '') !== String(b.formula || '')) what = `${d.key} ${b.formula ? 'not holding the formula the page needs' : 'holding a formula where a value belongs'}`;
+    else if (a.value !== b.value) what = `${d.key} not matching the feed`;
+    else if (a.fontColor !== b.fontColor) what = `${d.key} being the wrong color for what it holds`;
+    else if (a.fmtStyle !== b.fmtStyle || a.decimals !== b.decimals) what = `the number format on ${d.key}`;
+    else what = `the formatting on ${d.key}`;
+    return flag(what + where);
   }
-  const byKind = { colW: 'the column widths', rowH: 'the row heights', gridlines: 'gridlines still showing', freeze: 'the panes not frozen at the heads', groups: 'the outline', hiddenCols: 'hidden columns', hiddenRows: 'hidden rows', settings: 'the print set-up', sheets: 'the sheet order' };
-  return `The associate would have flagged ${byKind[d.kind] || d.kind}${where}.`;
+  const byKind = { colW: 'the column widths', rowH: 'the row heights', gridlines: 'gridlines still showing', freeze: 'the panes not frozen at the heads', groups: 'the outline', hiddenCols: 'a hidden column', hiddenRows: 'a hidden row', settings: 'the print set-up', sheets: 'the sheet order' };
+  return flag((byKind[d.kind] || d.kind) + where);
 }
 
 export { parseRef };

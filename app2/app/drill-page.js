@@ -21,6 +21,7 @@ import { dailyCardHtml } from '../ui/result-card.js';
 import { flowNext } from './flow.js';
 import { dayOf } from './records.js';
 import { gameCtx, celebrate } from './stats.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const SVG = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"';
@@ -356,7 +357,7 @@ export function mountDrillPage(root, ctx = {}) {
     const pbSplits = pbAttempt ? pbAttempt.splits : [];
     const splits = run.splits();
     overlay.innerHTML = `<div class="rm-card">
-      <div class="rm-title">${attempt.clean ? (TIER_LABEL[attempt.tier] !== '—' ? TIER_LABEL[attempt.tier] + '!' : 'Finished') : 'Finished — assisted'}</div>
+      <div class="rm-title">${attempt.clean ? (TIER_LABEL[attempt.tier] !== '—' ? TIER_LABEL[attempt.tier] + '!' : 'Finished') : esc(siteCopy('drill_finished_assisted', 'Finished, Assisted'))}</div>
       <div class="rm-lesson">${esc(drill.title)}</div>
       <div class="rm-time">${fmtClock(attempt.secs)}<span>s</span></div>
       <div class="tier-stamps">${['pass', 'pro', 'legendary'].map(t => `<span class="tstamp ${attempt.clean && attempt.secs <= drill.pars[t] ? 'hit' : ''}">${TIER_LABEL[t]} ${drill.pars[t]}s</span>`).join('')}</div>
@@ -366,13 +367,13 @@ export function mountDrillPage(root, ctx = {}) {
         ${attempt.mouse ? `<div>mouse<b>×${attempt.mouse}</b></div>` : ''}
         <div>best<b>${newPb ? fmtSecs(attempt.secs) + 's ★ new' : pbBefore ? fmtSecs(pbBefore.secs) + 's' : '—'}</b></div>
       </div>
-      ${attempt.clean ? '' : `<div class="rm-note">${attempt.helped ? 'Help was used, so no personal best and no posted time — the practice still counts.' : 'The mouse touched the workspace, so no personal best — the keyboard is the game.'}</div>`}
+      ${attempt.clean ? '' : `<div class="rm-note">${esc(attempt.helped ? siteCopy('drill_help_used', 'You used Help, so this run won’t set a best or post a time, though it still counts as practice.') : siteCopy('drill_mouse_used', 'The mouse touched the sheet, so there’s no best and no posted time from this run.'))}</div>`}
       <div class="splits">${run.goals.map((g, i) => {
         const mine = splits[i], theirs = pbSplits[i];
         const d = mine != null && theirs != null ? mine - theirs : null;
         return `<div class="split-row"><span class="sp-name">${esc(g.text)}</span><span class="sp-time">${mine == null ? '—' : fmtSecs(mine) + 's'}</span><span class="sp-delta ${d == null ? '' : d <= 0 ? 'ahead' : 'behind'}">${d == null ? '' : (d <= 0 ? '−' : '+') + fmtSecs(Math.abs(d))}</span></div>`;
       }).join('')}</div>
-      ${daily ? `<div class="rm-note">Daily attempt ${attemptsToday()} today — the board is the same all day, so keep going.</div>` : ''}
+      ${daily ? `<div class="rm-note">${esc(siteCopy('drill_daily_attempt', 'That was attempt {n} today, and the board stays open until midnight UTC.').replace(/\{n\}/g, attemptsToday()))}</div>` : ''}
       <div class="rm-opts">
         <button class="btn btn-primary" data-act="retry" type="button">Retry <kbd>Enter</kbd></button>
         ${daily ? '<button class="btn" data-act="share" type="button">Copy result</button>' : ''}

@@ -14,12 +14,12 @@ import { siteCopy } from '../content/copy/apply.js';
 import { moduleNumber, isFinalItem, FINAL_MODULE } from './numbering.js';
 
 /** The dashboard's built-in lines; site.csv (dash_*, due_*, save_nudge) overrides. Exported for the copy export. */
-export const DASH_LINES = { learn: 'The path: chapters, modules, lessons and their challenges, one story on one file.', practice: 'The reps: timed, no story. What is due today, the Daily, drills and rapid-fire.' };
-export const DUE_LINES = { foot: 'Short reps on what you are about to forget. Nothing is lost by skipping a day.', empty: 'Nothing due. Play the Daily, or carry on with the next lesson.',
+export const DASH_LINES = { learn: 'Learn is the course: six chapters of short modules, each ending in a timed challenge on a fresh file.', practice: 'Drills, the Daily, rapid-fire and the challenges all live under Practice, on the clock.' };
+export const DUE_LINES = { foot: 'Short reps on what you’re about to forget. Nothing is lost by skipping a day.', empty: 'Nothing due. Play the Daily, or carry on with the next lesson.',
   fresh: 'Nothing here yet. Shortcuts you learn come back here the next day as thirty-second refreshers.' };
 /** The first sentence in bold, the rest plain (the nudge and the empty-queue line). */
 const lead = t => { const m = /^(.*?[.!?])(\s+.*)?$/s.exec(String(t || '')); return m ? `<b>${esc(m[1])}</b>${m[2] ? esc(m[2]) : ''}` : esc(t); };
-export const SAVE_NUDGE = 'Your progress is saved on this device. Create a free account to keep it across devices — everything carries over.';
+export const SAVE_NUDGE = 'Your progress is saved on this device. Make a free account and it follows you to any computer.';
 import { dayOf } from './records.js';
 import { gameCtx } from './stats.js';
 import { schedule, dueToday, demoState, microLesson } from './schedule.js';
@@ -101,8 +101,8 @@ export function mountHomePage(root, pageCtx = {}) {
         </div>
         ${at && pm ? `<div class="hm-c-ring">${ring(pm.done, pm.total, { size: 72, stroke: 6, label: 'auto' })}<span>module ${esc(moduleNumber(at.module.id, at.k))}</span></div>` : ''}
       </section>`
-    : `<section class="hm-continue hm-chapter-done"><div class="hm-cap">chapter 1 complete</div><div class="hm-c-main"><h1>Foundations: done.</h1><p>Page one of the pack is delivered. Keep it sharp from Practice, or look at what Chapter 2 brings.</p>
-        <div class="hm-actions"><a class="btn btn-primary" id="homeContinue" href="#/practice">Practice <kbd>Enter</kbd></a><a class="btn btn-ghost" href="#/learn?ch=formatting">See Chapter 2 →</a></div></div></section>`;
+    : `<section class="hm-continue hm-chapter-done"><div class="hm-cap">chapter 1 complete</div><div class="hm-c-main"><h1>Chapter 1 is done.</h1><p>Keep it sharp from Practice, or look at what Chapter 2 brings.</p>
+        <div class="hm-actions"><a class="btn btn-primary" id="homeContinue" href="#/practice">Practice <kbd>Enter</kbd></a><a class="btn btn-ghost" href="#/learn?ch=formatting">See Chapter 2</a></div></div></section>`;
 
   const dueEmpty = completedN ? siteCopy('due_empty', DUE_LINES.empty) : siteCopy('due_fresh', DUE_LINES.fresh);
   const dueCard = `<section class="hm-card hm-due" aria-label="Due today">
@@ -117,7 +117,7 @@ export function mountHomePage(root, pageCtx = {}) {
   const dailyStats = d.played && d.clean
     ? `<div class="hm-daily-stats"><div><span>today</span><b>${esc(TIER_MARK[d.tier] && d.tier !== 'none' ? TIER_MARK[d.tier] + ' ' + d.tier : 'no tier')}</b></div><div><span>time</span><b>${d.secs != null ? d.secs.toFixed(1) + ' s' : '—'}</b></div>${d.pos ? `<div><span>board</span><b>#${d.pos} of ${d.of}</b></div>` : ''}</div>`
     : d.played ? `<p class="hm-daily-line">Played today, with help or the mouse: no time posted. A clean run posts one.</p>`
-    : `<p class="hm-daily-line">${esc(siteCopy('mode_daily', 'Ninety seconds, the same sheet for everyone, once a day.'))}</p>`;
+    : `<p class="hm-daily-line">${esc(siteCopy('mode_daily', 'Daily: a unique 90-second challenge, with a public leaderboard every day.'))}</p>`;
   const dailyCard = `<section class="hm-card hm-daily" aria-label="The Daily">
       <div class="hm-cap">the daily <span>${esc(prettyDay(day))}${c.streak > 1 ? ` · <b class="hm-streak">${c.streak}-day streak</b>` : ''}</span></div>
       <div class="hm-daily-body">
