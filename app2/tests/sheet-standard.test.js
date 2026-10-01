@@ -11,6 +11,7 @@ import { WORKBOOKS } from '../content/workbooks/index.js';
 import { DRILLS } from '../content/drills.js';
 import { LessonRun } from '../app/runner.js';
 import { Sheet } from '../engine/sheet.js';
+import { Session } from '../engine/keyboard.js';
 import { sheetStandard } from '../app/graders.js';
 import { parseRef } from '../engine/refs.js';
 
@@ -35,7 +36,14 @@ test('every workbook declares its finished pages, and each one is to standard', 
       const st = wb.stateOf(stateId);
       const spec = st.sheets.find(s => s.name === name);
       assert.ok(spec, `${id} ${stateId} has a sheet ${name}`);
-      const out = sheetStandard(new Sheet(spec), { chapter: wb.CHAPTER || 1, read: opts.read !== false });
+      // the whole workbook, so a page's links to other sheets (a title from Inputs, a summary of the P&L) read their values
+      const build = sp => new Sheet({ cells: structuredClone(sp.cells || {}), colW: sp.colW, rowH: sp.rowH, hiddenRows: sp.hiddenRows, hiddenCols: sp.hiddenCols, freeze: sp.freeze, gridlines: sp.gridlines, groups: sp.groups, condFmt: sp.condFmt });
+      const ses = new Session(build(st.sheets[0]), { now: () => 0 });
+      ses.sheets[0].name = st.sheets[0].name;
+      for (const sh of st.sheets.slice(1)) ses.addSheet(sh.name, build(sh));
+      if (st.names) ses.names = st.names;
+      for (let i = 0; i < 2; i++) for (const e of ses.sheets) e.sheet.recalc();
+      const out = sheetStandard(ses.sheets.find(e => e.name === name).sheet, { chapter: wb.CHAPTER || 1, read: opts.read !== false });
       assert.deepEqual(out, [], `${id} ${stateId} ${name}`);
     }
     // every sheet of the workbook is either a page or a named exception

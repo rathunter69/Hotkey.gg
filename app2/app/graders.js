@@ -455,7 +455,17 @@ export function sheetStandard(sheet, { chapter = 1, read = true } = {}) {
       if (cell && !isBlank(cell) && isPercentCell(cell) && !cell.it) { out.push(`${ref} is a percentage that is not italic`); break; }
     }
   }
-  add(noGrid(sheet, `A1:${refKey(Math.max(lastRow, 1), Math.max(lastCol, 1))}`));
+  // no grid: a total's top border and the final double bottom are the only lines a block gets, plus the one
+  // vertical border a page allows, the A/E divider (a right border down one column, where the estimates start)
+  {
+    const dividerCols = new Set();
+    for (const k in sheet.cells) {
+      const cell = sheet.cells[k]; if (!cell) continue;
+      if (cell.ball || cell.bb || cell.bl) { out.push(`${k} carries a grid border. A total gets a top border, the block gets none`); break; }
+      if (cell.br) dividerCols.add(parseRef(k).c);
+    }
+    if (dividerCols.size > 1) out.push(`${colLetter([...dividerCols][1])} carries a vertical border. The A/E divider is the one vertical line a page allows`);
+  }
   add(oneFontSize(sheet, `A1:${refKey(Math.max(lastRow, 1), Math.max(lastCol, 1))}`, 'A1'));
   add(noHidden(sheet));
   for (let r = 5; r <= lastRow; r++) {
