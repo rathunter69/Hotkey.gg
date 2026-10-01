@@ -292,7 +292,7 @@ const methods = {
     return ['locked', 'hidden'];
   },
   fcSetTab(k) { const d = this.dlg; d.tab = k; d.focus = 'tabs'; this.lastTabs.formatcells = k; },
-  fcSetCat(i) { const d = this.dlg; d.catIdx = Math.max(0, Math.min(FC_CATEGORIES.length - 1, i)); d.cat = FC_CATEGORIES[d.catIdx].k; d.typeIdx = 0; d.dirty.number = true; if (d.cat === 'custom') d.codeSel = true; },
+  fcSetCat(i) { const d = this.dlg; d.catIdx = Math.max(0, Math.min(FC_CATEGORIES.length - 1, i)); const was = d.cat; d.cat = FC_CATEGORIES[d.catIdx].k; d.typeIdx = 0; d.dirty.number = true; if (d.cat !== was && HAS_DECIMALS.has(d.cat)) d.decimals = '2';   /* Excel shows each category's own default, 2 places */ if (d.cat === 'custom') d.codeSel = true; },
   formatCellsKey(key) {
     const d = this.dlg; if (!d) return;
     if (key === 'Enter') { this.formatCellsOk(); return; }
@@ -303,7 +303,7 @@ const methods = {
       d.focus = ring[(i + (key === 'Tab' ? 1 : ring.length - 1)) % ring.length]; d.fresh = d.focus === 'decimals' || d.focus === 'indent' ? d.focus : null; return;
     }
     // the row of tabs: a letter picks a tab (F steps between Font and Fill), ← → step; a letter no tab has does nothing
-    if (d.focus === 'tabs') {
+    if (d.focus === 'tabs' && !key.startsWith('Alt+')) {   // Alt with a control's letter reaches it from the tab row too
       if (key === 'ArrowRight' || key === 'ArrowLeft') { this.fcSetTab(stepIn(FC_TABS.map(t => t.k), d.tab, key === 'ArrowRight' ? 1 : -1)); return; }
       if (/^[A-Z]$/.test(key)) { const hits = FC_TABS.filter(t => t.key === key); if (hits.length) { const cur = hits.findIndex(t => t.k === d.tab); this.fcSetTab(hits[(cur + 1) % hits.length].k); } return; }
       if (key === 'ArrowDown') { d.focus = order[0]; }

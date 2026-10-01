@@ -1031,7 +1031,9 @@ export class Session {
       t = t.slice(bang + 1);
     }
     const S = target >= 0 ? this.sheets[target].sheet : this.sheet;
-    const rg = parseRange(t); if (!rg || !S.inb(rg.r1, rg.c1) || !S.inb(rg.r2, rg.c2)) return false;
+    const rg = parseRange(t);
+    if (!rg && target < 0 && this.goToName(t)) { const nm = t.trim(); this.gotoRecent = [nm].concat(this.gotoRecent.filter(x => x !== nm)).slice(0, 4); return true; }   // a defined name (M40)
+    if (!rg || !S.inb(rg.r1, rg.c1) || !S.inb(rg.r2, rg.c2)) return false;
     if (target >= 0) this.switchSheet(target);
     if (rg.r1 === rg.r2 && rg.c1 === rg.c2) S.goTo(rg.r1, rg.c1); else S.select(rangeText(rg));
     const where = (target >= 0 ? this.sheets[target].name + '!' : '') + rangeText(rg);
