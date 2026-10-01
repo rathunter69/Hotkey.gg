@@ -43,11 +43,11 @@ test('demo columns: a label cut off by a filled neighbour is widened; lone label
   const before = S.colW.slice();
   fitDemoColumns(S);
   for (let c = 1; c <= S.cols; c++) assert.ok(S.colW[c] >= before[c], 'never narrower: column ' + c);
-  // the header row: kWh sold (C), Price ($/kWh) (D), Revenue ($) (E), Energy cost ($) (F) now fit their labels
+  // the header row: Washes (C), Avg ticket ($) (D), Revenue ($) (E), Wash cost ($) (F) now fit their labels
   const need = (c, r = 1) => S.get(r, c).value.length * 6.9 + 20 + 4;
   for (const c of [3, 4, 5, 6]) assert.ok(S.colW[c] >= Math.floor(need(c)), 'header fits: column ' + c);
-  assert.ok(S.colW[3] > before[3], 'kWh sold was cut off by Price and is widened');
-  // H6 'Site totals (platform)' is a lone title over empty cells: it spills, and H is sized for the table below it
+  assert.ok(S.colW[4] > before[4], 'Avg ticket ($) was cut off by Revenue and is widened');
+  // H6 'Site totals (feed)' is a lone title over empty cells: it spills, and H is sized for the table below it
   assert.ok(S.colW[8] < need(8, 6), 'the title is not what sizes H');
   // a measurer can stand in for the engine's estimate; widths are capped the way AutoFit is
   const S2 = new LessonRun(DEMO_LESSON, { mode: 'guided' }).session.sheet;

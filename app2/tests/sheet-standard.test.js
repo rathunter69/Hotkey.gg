@@ -16,7 +16,7 @@ import { parseRef } from '../engine/refs.js';
 
 // Built before the standard existed and rebuilt on it in run R1 (the Clearcoat re-skin and the
 // drills moved onto the skeleton, M108). This list only shrinks; R1 is not done until it is empty.
-const PENDING_WORKBOOKS = new Set(['voltline-weekly']);
+const PENDING_WORKBOOKS = new Set();   // emptied by run R1: the Voltline workbook is retired, Clearcoat declares its pages
 const PENDING_DRILLS = new Set();   // emptied by M108: every Chapter 1 drill is built on the skeleton
 
 const chapterOf = ch => ch === 'foundations' || ch === 1 ? 1 : (typeof ch === 'number' ? ch : 2);

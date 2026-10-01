@@ -142,7 +142,7 @@ try {
       empty: [...document.querySelectorAll('.hm-card, .hm-continue, .deal')].filter(c => !c.innerText.trim()).map(c => c.className),
       cards: ['.hm-continue', '.hm-due', '.hm-daily', '.deal'].filter(sel => !document.querySelector(sel)),
     }));
-    if (!/Ribbon by keyboard/.test(home.next)) fail('journey: Home continue card reads "' + home.next + '", not the next lesson');
+    if (!/Know the screen/.test(home.next)) fail('journey: Home continue card reads "' + home.next + '", not the next lesson');
     if (home.empty.length) fail('journey: Home has empty boxes: ' + home.empty.join(', '));
     if (home.cards.length) fail('journey: Home is missing ' + home.cards.join(', '));
     // Learn: the data room shows module 1.1's document with the delivered page

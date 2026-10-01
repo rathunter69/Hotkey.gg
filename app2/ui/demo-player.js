@@ -27,7 +27,7 @@ const at = (sheet, ref) => !sheet.sel && sheet.selectionText() === ref;
 /** The demo lesson: four goals on the feed, each one real, each graded on the sheet's end state. */
 export const DEMO_LESSON = {
   id: 'demo', kind: 'lesson', chapter: 'foundations', section: 'Move and select', title: 'Jump, don’t scroll', difficulty: 'easy', tags: [], access: 'free',
-  workbook: 'voltline-weekly', state: { before: 'S0', after: 'S0' }, minutes: 1,
+  workbook: 'clearcoat-weekly', state: { before: 'S0', after: 'S0' }, minutes: 1,
   brief: 'Management sent the Austin feed. Get to the bottom of it, select the Revenue column, bold the header and turn the gridlines off.',
   goals: [
     { id: 'bottom', teach: 'Ctrl+↓ jumps to the edge of the data.', text: 'Jump to the bottom of the feed, A61.', keys: 'Ctrl+↓', requires: ['ctrl-arrow'], check: s => at(s, 'A61') },
