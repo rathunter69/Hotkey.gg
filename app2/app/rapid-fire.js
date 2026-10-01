@@ -13,6 +13,7 @@ import { mulberry32 } from '../engine/rng.js';
 import { schedule, rapidOrder, RAPID_CONCEPT } from './schedule.js';
 import { flowNext } from './flow.js';
 import { gameCtx, celebrate } from './stats.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -74,9 +75,9 @@ export function mountRapidPage(root) {
     if (sb) { sb.destroy(); sb = null; }
     if (tickH) { clearInterval(tickH); tickH = null; }
     el.innerHTML = `<div class="page rapid-pick">
-      <div class="page-head"><h1>Rapid-fire</h1><p class="page-sub">One shortcut at a time, on a real sheet. Hits build a combo; a wrong chord breaks it. The keys stay hidden until you stall — recall is the game.</p></div>
+      <div class="page-head"><h1>Rapid-fire</h1><p class="page-sub">${esc(siteCopy('rapid_intro', 'We name a command and you press its keys, which stay hidden until you stall.'))}</p></div>
       <div class="rapid-durs">${RAPID_DURATIONS.map((d, i) => `<button class="btn ${d === 60 ? 'btn-primary' : ''}" data-dur="${d}" type="button">${d >= 60 ? (d / 60) + ' minute' + (d > 60 ? 's' : '') : d + ' seconds'} <kbd>${i + 1}</kbd></button>`).join('')}</div>
-      <p class="page-fine">A round records as practice; it never sets a drill PB. <a href="#/practice">Back to Practice</a>.</p>
+      <p class="page-fine">${esc(siteCopy('rapid_fine', 'A round counts as practice and pays a little XP; it never sets a drill best.'))} <a href="#/practice">Back to Practice</a></p>
     </div>`;
     el.querySelectorAll('[data-dur]').forEach(b => { b.onclick = () => startRound(+b.dataset.dur); });
   }

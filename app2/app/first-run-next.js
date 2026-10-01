@@ -1,7 +1,7 @@
 // app2/app/first-run-next.js — the first run (experience pass, decision 1; order per Wolf's B
 // review): one frame, one size, for the whole sequence. Start learning → a ~20-second
 // self-playing demo of a real lesson → the orientation card (where things are: Learn, Practice,
-// the Daily, boards, level and XP) → the three Project Volt cards (the company and the sale /
+// the Daily, boards, level and XP) → the three deal cards (the company and the sale /
 // this week's report / the data room) → keyboard + experience → straight into lesson 1.1.1.
 // Enter advances, Esc skips the briefing, the briefing shows once (prefs.briefingDone). Nothing
 // jumps: the frame keeps its size from the first step to the last, and the cards sit at one
@@ -42,17 +42,17 @@ export function pickerMove(key, group, i, n) {
   return null;
 }
 
-/** The three Project Volt cards (B3 voice). Built-in lines here; site.csv (briefing_n_*) overrides. Exported so the copy is testable. */
+/** The three deal cards (screenplay 3.2). Built-in lines here; site.csv (briefing_n_*) overrides. Exported so the copy is testable. */
 const BRIEFING_DEFAULT = [
-  { key: 'who', eyebrow: 'The deal · 1 of 3', title: 'A company is being sold. You prepare the numbers.',
-    body: ['Voltline runs 40 electric-car charging sites. Its owners are selling the company.',
-      'Before any buyer sees a number, someone has to make the numbers clean, consistent and checked. That is you: an analyst, someone in finance or operations, a founder. It does not matter which.'] },
-  { key: 'sent', eyebrow: 'The deal · 2 of 3', title: 'It starts with this week’s site report.',
-    body: ['It arrived the way files usually do: a tab still called Sheet2, an old export nobody deleted, a price typed inside a formula.',
-      'You will turn it into a page a buyer can trust, using the methods investment banks train their people in. One job at a time, on the real file.'] },
-  { key: 'deliver', eyebrow: 'The deal · 3 of 3', title: 'Every finished page goes into the data room.',
+  { key: 'who', eyebrow: 'The deal, 1 of 3', title: 'Welcome to the finance team.',
+    body: ['You work for Clearcoat, an express car-wash company that’s getting ready to sell to private equity.',
+      'Before you can start a sale process, your company needs to clean data, compile documents, and reconcile financials. That’s where you come in, and the better you are in Excel, the less painful the process will be.'] },
+  { key: 'sent', eyebrow: 'The deal, 2 of 3', title: 'It starts with this week’s numbers.',
+    body: ['Before anyone can value the company, the company has to know its own numbers. What came in is five site managers’ spreadsheets that ops pasted into one workbook. It has a tab still called Sheet2, last week’s export sitting next to this week’s, and a cost typed straight into a formula.',
+      'You’ll turn it into one clean page the CFO can sign off, one job at a time. Every job is a hotkey you’ll use for the rest of your career.'] },
+  { key: 'deliver', eyebrow: 'The deal, 3 of 3', title: 'Every finished page goes into the data room.',
     body: ['A sale runs in stages. Each chapter here is one stage, and each one ends with a finished page.',
-      'The pages go into the data room: the folder buyers will read. By the end of Chapter 1, page one is in it, built by you.'] },
+      'The pages go into the data room: the folder buyers will read. By the end of Chapter 1, page one is in it, and you’ll have built it.'] },
 ];
 export const BRIEFING = BRIEFING_DEFAULT.map((c, i) => ({
   key: c.key, eyebrow: siteCopy(`briefing_${i + 1}_eyebrow`, c.eyebrow), title: siteCopy(`briefing_${i + 1}_title`, c.title),
@@ -62,12 +62,12 @@ export const BRIEFING = BRIEFING_DEFAULT.map((c, i) => ({
 const ORIENTATION_DEFAULT = {
   eyebrow: 'How this place works', title: 'Where things are.',
   rows: [
-    { where: 'Learn', what: 'The path. Lessons in short modules, each one job on the file. A module ends with a challenge: the same job on a fresh file, against the clock.' },
-    { where: 'Practice', what: 'The reps. Drills and rapid-fire with no story, and the Daily: one ninety-second sheet, the same for everyone, once a day.' },
-    { where: 'Leaderboard', what: 'A board for every challenge and for the Daily. Clean runs only: no help, no mouse.' },
-    { where: 'Level', what: 'Finishing lessons and challenges earns XP, and XP is your level, shown in the top bar. Speed earns places on the boards, not XP.' },
+    { where: 'Learn', what: 'Learn is the course: six chapters of short modules, each ending in a timed challenge on a fresh file.' },
+    { where: 'Practice', what: 'Drills, the Daily, rapid-fire and the challenges all live under Practice, on the clock.' },
+    { where: 'Leaderboard', what: 'Each drill and challenge has a board, the Daily too, and only a run with no help and no mouse posts a time.' },
+    { where: 'Level', what: 'Everything you finish earns XP toward your next level, and speed is what puts you on the boards.' },
   ],
-  fine: 'Keyboard first. Sound is on at low volume from your first key; the mute is on the workspace.',
+  fine: 'Use the arrows and Enter. Sound comes on quietly with your first key, and the sound button at the top of a lesson turns it off.',
 };
 export const ORIENTATION = {
   eyebrow: siteCopy('orientation_eyebrow', ORIENTATION_DEFAULT.eyebrow), title: siteCopy('orientation_title', ORIENTATION_DEFAULT.title),
@@ -111,12 +111,12 @@ export function mountFirstRun(root, ctx = {}) {
     const body = $('frBody');
     const n = idx + 1, of = steps.length;
     $('frDots').innerHTML = steps.map((k, i) => `<i class="${i < idx ? 'past' : i === idx ? 'now' : ''}"></i>`).join('');
-    // the deal cards count themselves (The deal · 1 of 3) and the dots count the whole run: the frame just names it there
-    $('frEyebrow').textContent = of < 2 ? 'Set up' : DEAL_STEPS.includes(s) ? 'Getting started' : `Getting started · ${n} of ${of}`;
+    // the deal cards count themselves (The deal, 1 of 3) and the dots count the whole run: the frame just names it there
+    $('frEyebrow').textContent = of < 2 ? 'Set up' : DEAL_STEPS.includes(s) ? 'Getting started' : `Getting started, ${n} of ${of}`;
     if (s === 'demo') {
-      $('frKeys').innerHTML = '<kbd>Enter</kbd> continue · <kbd>Esc</kbd> skip';
+      $('frKeys').innerHTML = '<kbd>Enter</kbd> continue <kbd>Esc</kbd> skip';
       body.innerHTML = `<div class="fr2-demo">
-          <div class="fr2-demo-cap"><h1>This is a lesson.</h1><p>The keys are pressed on a real sheet. The sheet is graded on what it ends up as, so any correct route counts.</p></div>
+          <div class="fr2-demo-cap"><h1>${esc(siteCopy('first_run_demo_title', 'This is a lesson.'))}</h1><p>${esc(siteCopy('first_run_demo_body', 'Real keys on a real sheet. You’re graded on how the sheet ends up, so any route that gets there counts.'))}</p></div>
           <div class="fr2-demo-host" id="frDemoHost"></div>
         </div>`;
       const host = $('frDemoHost');
@@ -131,21 +131,21 @@ export function mountFirstRun(root, ctx = {}) {
     } else if (DEAL_STEPS.includes(s)) {
       const c = BRIEFING.find(b => b.key === s);
       sawDeal = true;
-      $('frKeys').innerHTML = '<kbd>Enter</kbd> next · <kbd>Esc</kbd> skip';
+      $('frKeys').innerHTML = '<kbd>Enter</kbd> next <kbd>Esc</kbd> skip';
       body.innerHTML = `<article class="fr2-card fr2-deal"><div class="fr2-card-eyebrow">${esc(c.eyebrow)}</div><h1>${esc(c.title)}</h1>${c.body.map(p => `<p>${esc(p)}</p>`).join('')}</article>`;
       actions([{ id: 'back', label: 'Back' }, { id: 'next', label: s === 'deliver' ? 'Set up' : 'Next', primary: true, kbd: 'Enter' }]);
     } else if (s === 'orient') {
-      $('frKeys').innerHTML = '<kbd>Enter</kbd> next · <kbd>Esc</kbd> skip';
+      $('frKeys').innerHTML = '<kbd>Enter</kbd> next <kbd>Esc</kbd> skip';
       body.innerHTML = `<article class="fr2-card fr2-orient"><div class="fr2-card-eyebrow">${esc(ORIENTATION.eyebrow)}</div><h1>${esc(ORIENTATION.title)}</h1>
           <dl class="fr2-map">${ORIENTATION.rows.map(r => `<div><dt>${esc(r.where)}</dt><dd>${esc(r.what)}</dd></div>`).join('')}</dl>
           <p class="fr2-fine">${esc(ORIENTATION.fine)}</p></article>`;
       actions([{ id: 'back', label: 'Back' }, { id: 'next', label: 'The deal', primary: true, kbd: 'Enter' }]);
     } else {
-      $('frKeys').innerHTML = '<kbd>←</kbd><kbd>→</kbd> pick · <kbd>↑</kbd><kbd>↓</kbd> next question · <kbd>Enter</kbd> start';
+      $('frKeys').innerHTML = '<kbd>←</kbd><kbd>→</kbd> pick <kbd>↑</kbd><kbd>↓</kbd> next question <kbd>Enter</kbd> start';
       body.innerHTML = `<article class="fr2-card fr2-picker">
           <div class="fr2-card-eyebrow">Set up</div><h1>Two questions, then the first job.</h1>
           <div class="fr2-q"><div class="fr2-qt" id="frQPlatform">Which keyboard?</div>${options('platform', 'frQPlatform', [{ v: 'win', t: 'Windows', s: 'Ctrl, Alt, the Ribbon KeyTips' }, { v: 'mac', t: 'Mac', s: '⌘ and ⌥ stand in for Ctrl and Alt; KeyTips work the same' }], platform)}</div>
-          <div class="fr2-q"><div class="fr2-qt" id="frQExperience">How much Excel?</div>${options('experience', 'frQExperience', [{ v: 'new', t: 'New to Excel', s: 'Every lesson, in order' }, { v: 'sometimes', t: 'I use it sometimes', s: 'Same path; the challenges will move you fast' }, { v: 'daily', t: 'I use it daily', s: 'Same start; test out of Chapter 1 from Learn any time' }], experience)}</div>
+          <div class="fr2-q"><div class="fr2-qt" id="frQExperience">How much Excel?</div>${options('experience', 'frQExperience', [{ v: 'new', t: 'New to Excel', s: siteCopy('first_run_exp_new', 'Start at the first lesson and take them in order.') }, { v: 'sometimes', t: 'I use it sometimes', s: siteCopy('first_run_exp_sometimes', 'The same path, and you’ll move through the parts you know faster.') }, { v: 'daily', t: 'I use it daily', s: siteCopy('first_run_exp_daily', 'If Chapter 1 looks familiar, take its assessment from Learn and test out.') }], experience)}</div>
           <p class="fr2-fine">Instructions and keycaps follow the keyboard choice. Both settings change any time from Settings. Progress is saved on this device.</p>
         </article>`;
       wireOptions();

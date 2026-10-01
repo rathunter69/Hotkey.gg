@@ -122,5 +122,5 @@ test('copy-export: idempotent over the checked-in set; existing cells win; every
   const out2 = exportCopy(edited);
   assert.equal(out2.lessons.find(r => r.id === 'inherited-workbook').title, 'Wolf’s title');
   assert.equal(out2.site.find(r => r.key === 'landing_subhead').text, 'Wolf’s subhead');
-  assert.equal(siteDefaults().landing_headline_a, COPY.site.landing_headline_a);
+  assert.equal(siteDefaults().landing_headline, COPY.site.landing_headline);
 });

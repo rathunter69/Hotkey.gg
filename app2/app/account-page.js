@@ -14,6 +14,7 @@ import { showToast } from '../ui/toast.js';
 import { statsFor } from './stats.js';
 import { records } from './records.js';
 import { badgesHtml } from '../ui/badges.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const SECTIONS = ['desks', 'stats', 'profile', 'settings', 'data'];
@@ -156,14 +157,14 @@ export function mountAccountPage(root, ctx = {}) {
     const all = store.all(); const p = prefs.get();
     const ids = Object.keys(all);
     const secs = ids.reduce((n, id) => n + (all[id].best || 0), 0);
-    el.innerHTML = `<div class="page-head"><h1>Account</h1><p class="page-sub">${signedIn ? `Signed in. Progress is <b>${esc(store.saveText().toLowerCase())}</b>.` : 'You are a guest. Everything here is <b>saved on this device</b> only.'}</p></div>
+    el.innerHTML = `<div class="page-head"><h1>Account</h1><p class="page-sub">${signedIn ? `Signed in. Progress is <b>${esc(store.saveText().toLowerCase())}</b>.` : esc(siteCopy('account_guest', 'You’re a guest, so everything here is saved on this device only.'))}</p></div>
       <div class="acct-grid">
         ${signedIn ? profileCard() : signinCard()}
         <div class="acct-col">
           ${statsCard()}
-          ${[['desks', 'Desks', 'Create a desk, invite by code or link, a private board and assignments from a captain.', 'Desks arrive after accounts.'],
-            ['profile', 'Profile', 'Handle, level, rank, featured achievements, best times. School and desk by opt-in only.', 'The public profile page arrives with accounts.']].map(([id, t, d, note]) =>
-            `<section class="acard" id="sec-${id}"><div class="acard-cap">${t.toLowerCase()}</div><div class="acard-body"><h2>${t}</h2><p>${d}</p><p class="coming">${note} Coming in a later phase.</p></div></section>`).join('')}
+          ${[['desks', 'Desks', 'Create a desk, invite by code or link, a private board and assignments from a captain.', ''],
+            ['profile', 'Profile', 'Handle, level, rank, featured achievements, best times. School and desk by opt-in only.', '']].map(([id, t, d, note]) =>
+            `<section class="acard" id="sec-${id}"><div class="acard-cap">${t.toLowerCase()}</div><div class="acard-body"><h2>${t}</h2><p>${d}</p><p class="coming">Coming in a later phase.</p></div></section>`).join('')}
         </div>
       </div>
       <section class="acard" id="sec-settings">
