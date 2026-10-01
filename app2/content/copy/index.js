@@ -4522,6 +4522,7 @@ export const COPY = {
   "restart_body": "The sheet goes back to how the lesson started. Your other lessons aren’t touched.",
   "restart_action": "Restart",
   "dialog_cancel": "Cancel",
+  "card_intro": "This card shows your goal and its keys, and it follows the work around the sheet.",
   "card_help": "Help",
   "card_hide": "Hide",
   "card_type": "type",

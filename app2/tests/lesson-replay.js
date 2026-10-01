@@ -4,7 +4,6 @@
 // its budget as chapters land.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DRIFT_LESSONS, driftSkip } from './known-drift.js';
 import { LESSONS, LESSONS_BY_ID } from '../content/index.js';
 import { validateLesson, availableConcepts } from '../content/schema.js';
 import { LessonRun } from '../app/runner.js';
@@ -16,7 +15,7 @@ const fresh = (lesson, opts = {}) => new LessonRun(lesson, { now: () => 0, ...op
 export function registerReplays(shard) {
   const mine = LESSONS.filter((_, i) => i % SHARDS === shard);
   for (const lesson of mine) {
-    test(`${lesson.id}: validates, requires only taught concepts, solution replays`, { skip: driftSkip(DRIFT_LESSONS, lesson.id) }, () => {
+    test(`${lesson.id}: validates, requires only taught concepts, solution replays`, () => {
       const errs = validateLesson(lesson);
       assert.deepEqual(errs, [], errs.join('; '));
       const avail = availableConcepts(lesson, LESSONS_BY_ID);
@@ -37,7 +36,7 @@ export function registerReplays(shard) {
   }
 
   for (const lesson of mine) {
-    test(`${lesson.id}: every guided hint lands exactly its goal from where the previous goal left off`, { skip: driftSkip(DRIFT_LESSONS, lesson.id) }, () => {
+    test(`${lesson.id}: every guided hint lands exactly its goal from where the previous goal left off`, () => {
       const run = fresh(lesson);
       lesson.goals.forEach((g, i) => {
         if (g.demo) { run.run(''); assert.ok(run.doneCount >= i + 1, `${lesson.id} goal ${g.id}: the demo plays itself and lands its goal`); return; }

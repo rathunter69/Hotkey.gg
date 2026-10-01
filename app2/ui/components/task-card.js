@@ -225,11 +225,12 @@ export function createTaskCard(host, opts = {}) {
     const head = `<div class="tc-head">${segments(m.n, m.m)}<span class="tc-count">${esc(fill(siteCopy('ws_goal_count', 'Goal {n} of {m}'), { n: m.n, m: m.m }))}</span></div>`;
     const goal = `<div class="tc-goal">${m.state === 'done' ? '<span class="tc-tick" aria-hidden="true"></span>' : ''}${esc(m.goal)}</div>`;
     if (help) { el.innerHTML = head + goal + helpHtml(m); return; }
+    const intro = m.intro ? `<div class="tc-intro">${esc(m.intro)}</div>` : '';   // the card names itself once, in 1.1.1 (M92)
     const teach = m.teach ? `<div class="tc-teach">${esc(m.teach)}</div>` : '';
     const keys = m.keys && m.keys.length ? keysHtml(m.keys, m.progress || { matched: 0 }) : '';
     const live = m.live ? `<div class="tc-live${m.liveKind ? ' tc-live-' + m.liveKind : ''}">${esc(m.live)}</div>` : '';
     const foot = m.state === 'done' ? '' : `<div class="tc-foot"><span class="tc-foot-k">${kbd('F1')} ${esc(siteCopy('card_help', 'Help'))}</span><span class="tc-foot-k">${kbd('Ctrl+Shift+K')} ${esc(siteCopy('card_hide', 'Hide'))}</span></div>`;
-    el.innerHTML = head + goal + teach + keys + live + foot;
+    el.innerHTML = head + intro + goal + teach + keys + live + foot;
   }
   el.addEventListener('click', e => {
     const b = e.target.closest('[data-help]'); if (b && opts.onHelp) { opts.onHelp(b.dataset.help); return; }

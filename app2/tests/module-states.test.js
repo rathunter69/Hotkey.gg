@@ -4,7 +4,6 @@
 // lesson's before/after chains and replays.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DRIFT_LESSONS } from './known-drift.js';
 import { STATES, STATE_ORDER, stateOf, diffStates, sessionToState, WASHES, SITES, rawRow, SITE_TICKET, COST_PER_WASH, BLANK_F, MISSING_DAY, WRONG_FIGURE, STALE_WEEK, THIS_WEEK, NAMES, CEDAR_PARK, MUELLER_LAST_WEEK } from '../content/workbooks/clearcoat-weekly.js';
 import { SEEDED_KINDS } from '../content/schema.js';
 import { WORKBOOKS, workbookState } from '../content/workbooks/index.js';
@@ -170,7 +169,7 @@ test('every module lesson chains: before is the previous lesson\'s after', () =>
 
 /* ---------------- the solution produces exactly the after state (C2: the chain is real) ---------------- */
 test('every module lesson\'s solution replays to exactly its after state', () => {
-  for (const l of LESSONS.filter(x => x.workbook && x.state && !SEEDED_KINDS.includes(x.kind) && !DRIFT_LESSONS.has(x.id))) {
+  for (const l of LESSONS.filter(x => x.workbook && x.state && !SEEDED_KINDS.includes(x.kind))) {
     const run = new LessonRun(l, { now: () => 0 });
     run.run(l.solution);
     assert.ok(run.finished, `${l.id}: solution finishes`);

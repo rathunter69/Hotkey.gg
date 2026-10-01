@@ -193,9 +193,13 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     if (timedOnly) return false;
     return cfg.showKeys === 'always' || chapterOne || !!g.teach || revealedAt === run.doneCount || stalled;
   }
+  // the card names itself once, on the first goal of the course's first lesson (3.0, The first run; M92)
+  const namesItself = !timed && !isMicro && chapterOne && !!at && at.k === 1 && at.n === 1 && !prefs.get().cardNamed;
+  let named = false;
   function renderCard() {
     if (timed || phase !== 'play') { card.el.hidden = true; return; }
     const m = run.goals.length;
+    if (namesItself && !named && run.doneCount > 0) { named = true; prefs.set({ cardNamed: true }); }
     if (holdUntil && Date.now() < holdUntil && doneGoal) {
       card.set({ n: run.doneCount, m, goal: doneGoal.text, state: 'done' });
       if (!card.hidden) card.el.hidden = false;
@@ -214,7 +218,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     else if (mouseNudgeAt === run.doneCount && !progress.matched) { live = siteCopy(tokens.length ? 'card_live_mouse' : 'card_live_mouse_help', tokens.length ? 'Try it with the keyboard.' : 'Try it with the keyboard. F1 opens Help, which can show you the keys.'); liveKind = 'mouse'; }
     else if (!cur.keys && run.doneCount >= m) { live = siteCopy('panel_sheet_off', 'Every goal’s done, but the sheet isn’t where it needs to be yet. Fix what the pen marks to finish.'); liveKind = 'stuck'; }
     else if (tabKeysGoal === run.doneCount) { live = siteCopy('tab_keys_note', TAB_KEYS_NOTE); liveKind = 'stuck'; }
-    card.set({ n, m, goal: cur.text, teach: cur.teach || '', keys: tokens, progress, live, liveKind, state: cur.teach ? 'teaching' : 'repeat', helpNone: timedOnly ? siteCopy('card_help_none', 'No help in an assessment: every key this run needs was taught in the chapter.') : null });
+    card.set({ n, m, goal: cur.text, intro: namesItself && run.doneCount === 0 ? siteCopy('card_intro', 'This card shows your goal and its keys, and it follows the work around the sheet.') : '', teach: cur.teach || '', keys: tokens, progress, live, liveKind, state: cur.teach ? 'teaching' : 'repeat', helpNone: timedOnly ? siteCopy('card_help_none', 'No help in an assessment: every key this run needs was taught in the chapter.') : null });
     if (!card.hidden) card.el.hidden = false;
   }
   /** Where the card goes: beside the target on the side with the most room, clear of the selection, a note and the ranges read. */

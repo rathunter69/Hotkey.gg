@@ -18,8 +18,6 @@
 .ink-2{color:var(--ink-2)}
 .mono{font-family:var(--mono)}
 .num{font-variant-numeric:tabular-nums; text-align:right}
-.panel{background:var(--sheet); padding:var(--s5) var(--s6); display:flex; flex-direction:column; gap:var(--s4); min-width:0}
-.panel-mode{border-top:var(--mode-rule) solid var(--mode)}
 .panel-mode[data-mode="learn"]{--mode:var(--learn); --mode-ink:var(--learn-ink); --mode-tint:var(--learn-tint)}
 .row-panel{flex-direction:row; align-items:center; justify-content:space-between; gap:var(--s6)}
 .cols-2{display:grid; grid-template-columns:minmax(0,1fr) var(--side-col); gap:var(--s5); align-items:stretch}
@@ -27,12 +25,7 @@
 .col{display:flex; flex-direction:column; gap:var(--s5); min-width:0}
 .col > .panel:last-child{flex:1 1 auto}
 /* tables: a rule above the header, hairlines between rows, labels left and figures right */
-.tbl{width:100%; border-collapse:collapse; font-size:var(--fs-name)}
-/* the sheet's cell rules (app.css th, td) never reach a page table */
-.tbl th, .tbl td{border:0; height:auto; overflow:visible; white-space:normal; position:static; text-align:left; color:inherit; transition:none; display:table-cell}
-.tbl th{text-align:left; padding:var(--s2) var(--s2); border-bottom:1px solid var(--ink); font-weight:var(--fw-semi); font-size:var(--fs-label); color:var(--ink-2); font-family:var(--font)}
 .tbl th.num{text-align:right}
-.tbl td{padding:var(--s2) var(--s2); border-bottom:1px solid var(--line); vertical-align:middle; font-family:var(--font); font-size:var(--fs-name)}
 .tbl td.mono{font-family:var(--mono)}
 .tbl td.name{font-weight:var(--fw-semi)}
 .tbl tr:last-child td{border-bottom:0}
@@ -48,10 +41,8 @@
 .btn-ghost{background:transparent}
 .btn-small{padding:var(--s1) var(--s3); font-size:var(--fs-label)}
 .btn-danger{color:var(--red); border-color:var(--red)}
-.btn-row{display:flex; align-items:center; gap:var(--s3); flex-wrap:wrap}
 .keys-hint{display:inline-flex; align-items:center; gap:var(--s1); font-size:var(--fs-label); color:var(--ink-2); margin-right:auto}
 /* keycaps: mono on a key with a 3px bottom edge */
-.key{font-family:var(--mono); font-weight:var(--fw-key); font-size:var(--fs-key); line-height:1; color:var(--ink); background:var(--sheet); border:1px solid var(--edge); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); padding:var(--s1) var(--s2); white-space:nowrap; display:inline-block}
 .key-on-fill{color:var(--on-fill); background:transparent; border-color:var(--on-fill)}
 .chord{display:inline-flex; align-items:center; gap:var(--s1); margin-right:var(--s2)}
 .chord-plus, .chord-alt{font-family:var(--mono); font-size:var(--fs-key); color:var(--ink-2)}
@@ -77,11 +68,8 @@
 .ticks{list-style:none; margin:0; padding:0; display:flex; flex-direction:column}
 .ticks li{display:flex; align-items:flex-start; gap:var(--s3); padding:var(--s2) 0; border-bottom:1px solid var(--line); font-size:var(--fs-name); line-height:var(--lh-body)}
 .ticks li:last-child{border-bottom:0}
-.tick{flex:none; width:var(--s4); height:var(--s4); margin-top:var(--s1); background:var(--mode); border-radius:var(--s1); position:relative}
-.tick::after{content:''; position:absolute; left:calc(var(--s1) + 1px); top:var(--cursor-w); width:var(--s1); height:var(--s2); border:solid var(--on-fill); border-width:0 var(--cursor-w) var(--cursor-w) 0; transform:rotate(45deg)}
-.tiers{display:inline-flex; gap:var(--s1)}
-.tiers i{width:var(--mode-mark); height:var(--mode-mark); background:var(--line); display:inline-block}
-.tiers i.on{background:var(--clock)}
+.plan-tick{flex:none; width:var(--s4); height:var(--s4); margin-top:var(--s1); background:var(--mode); border-radius:var(--s1); position:relative}
+.plan-tick::after{content:''; position:absolute; left:calc(var(--s1) + 1px); top:var(--cursor-w); width:var(--s1); height:var(--s2); border:solid var(--on-fill); border-width:0 var(--cursor-w) var(--cursor-w) 0; transform:rotate(45deg)}
 .checklist{list-style:none; margin:0; padding:0; counter-reset:task}
 .checklist li{counter-increment:task; padding:var(--s2) var(--s2) var(--s2) var(--s8); position:relative; border-bottom:1px solid var(--line); font-size:var(--fs-name)}
 .checklist li::before{content:counter(task); position:absolute; left:var(--s2); font-variant-numeric:tabular-nums; color:var(--ink-2)}
@@ -135,9 +123,9 @@ body[data-route="landing"] > .app{padding:0 var(--content-side)}
 .lp-mode{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:var(--s8); align-items:center}
 .lp-mode-text{display:flex; flex-direction:column; gap:var(--s4)}
 .lp-mode-text .h-panel{font-size:var(--fs-title); line-height:var(--lh-tight)}
-.facts{display:flex; flex-direction:column}
-.fact{margin:0; padding:var(--s3) 0; border-bottom:1px solid var(--line); font-size:var(--fs-body); line-height:var(--lh-body)}
-.fact:first-child{border-top:1px solid var(--ink)}
+.lp-mode-facts{display:flex; flex-direction:column}
+.lp-mode-fact{margin:0; padding:var(--s3) 0; border-bottom:1px solid var(--line); font-size:var(--fs-body); line-height:var(--lh-body)}
+.lp-mode-fact:first-child{border-top:1px solid var(--ink)}
 .lp-teams{grid-template-columns:minmax(0,1fr) auto; align-items:center}
 .lp-return{font-size:var(--fs-name); color:var(--ink-2); margin:0}
 .lp-return a{color:var(--ink); font-weight:var(--fw-semi)}

@@ -3,7 +3,6 @@
 // reference solution replayed through the lesson runner.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DRIFT_MICRO } from './known-drift.js';
 import { grade, review, freshItem, strength, applyEvent, dueItems, dueToday, rapidOrder, normaliseState, demoState, MICRO, MICRO_IDS, microLesson, DAY, RAPID_CONCEPT, RAPID_UNSCORED, COLD_DAYS } from '../app/schedule.js';
 import { LessonRun } from '../app/runner.js';
 import { parseKeyScript } from '../engine/keyboard.js';
@@ -142,7 +141,6 @@ test('every micro-drill names a real concept and its solution replays to complet
     const lesson = microLesson(id);
     assert.equal(lesson.kind, 'micro');
     assert.ok(lesson.secs >= 30 && lesson.secs <= 45, id + ' budget in 30–45 s');
-    if (DRIFT_MICRO.has(id)) continue;   // known drift: the content awaits its rewrite
     const run = new LessonRun(lesson, { mode: 'guided' });
     const steps = parseKeyScript(lesson.solution);
     assert.ok(steps.length, id + ' has a solution');

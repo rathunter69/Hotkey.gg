@@ -14,6 +14,7 @@
 // course data (LESSONS and PATH). The live pricing line stays until Wolf says go.
 import { mountDemoPoster, loadLiveDemo } from '../ui/demo-poster.js';
 import { track } from './telemetry.js';
+import { tierMarksHtml } from '../ui/components/marks.js';
 import { LESSONS } from '../content/index.js';
 import { siteCopy, splitParas } from '../content/copy/apply.js';
 
@@ -83,7 +84,7 @@ const DEMO_NOTES = () => ({
 });
 
 /* ---------------- the proof plates: a real piece of the product, drawn from data ---------------- */
-const tierMarks = n => `<span class="tiers" aria-hidden="true">${[0, 1, 2].map(i => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</span>`;
+const tierMarks = n => tierMarksHtml(['none', 'pass', 'pro', 'legendary'][n] || 'none', { label: false });   // the one tier-marks component
 const PLATES = {
   drills: () => `<div class="plate-table"><div class="plate-head"><span>${esc(t('landing_plate_drills_title', 'Drills'))}</span><span>${esc(t('landing_plate_drills_facts', 'Six picked for you, about ten minutes'))}</span></div>
     <table class="tbl"><tbody>${[['Jump, don’t scroll', '60 s', '0:41.2', 3], ['Select to the edge', '60 s', '0:52.8', 2], ['Paste values', '90 s', '1:12.0', 1], ['AutoSum the column', '90 s', '', 0]].map(r => `<tr><td class="name">${esc(r[0])}</td><td class="num">${r[1]}</td><td class="num mono">${r[2]}</td><td>${tierMarks(r[3])}</td></tr>`).join('')}</tbody></table></div>`,
@@ -136,7 +137,7 @@ function sectionHtml(s) {
   const [heading, ...facts] = paras;
   return `<section class="lp-sec lp-mode" id="${s.id}" data-mode="${s.mode}">
     <div class="plate" style="--plate:var(--${s.mode}-tint)">${PLATES[s.plate]()}</div>
-    <div class="lp-mode-text"><h2 class="h-panel">${esc(heading || '')}</h2><div class="facts">${facts.map(f => `<p class="fact">${esc(f)}</p>`).join('')}</div></div>
+    <div class="lp-mode-text"><h2 class="h-panel">${esc(heading || '')}</h2><div class="lp-mode-facts">${facts.map(f => `<p class="lp-mode-fact">${esc(f)}</p>`).join('')}</div></div>
   </section>`;
 }
 
@@ -144,7 +145,7 @@ function pricingHtml() {
   const paras = splitParas(t('landing_pricing', 'Chapter 1 is free in full. || The rest is $9 a month.'));
   return `<section class="lp-sec lp-mode" id="pricing" aria-label="Pricing">
     <div class="plate" style="--plate:var(--plate-neutral)"><div class="plate-price"><div class="plate-price-row"><span>${esc(t('landing_free', 'Free'))}</span><span class="mono">$0</span></div><div class="plate-price-row"><span>${esc(t('landing_pro', 'Pro'))}</span><span class="mono">${esc(t('landing_pro_price', '$9 a month'))}</span></div></div></div>
-    <div class="lp-mode-text"><h2 class="h-panel">${esc(paras[0] || '')}</h2><div class="facts">${paras.slice(1).map(f => `<p class="fact">${esc(f)}</p>`).join('')}</div>
+    <div class="lp-mode-text"><h2 class="h-panel">${esc(paras[0] || '')}</h2><div class="lp-mode-facts">${paras.slice(1).map(f => `<p class="lp-mode-fact">${esc(f)}</p>`).join('')}</div>
       <div class="btn-row"><a class="btn btn-primary" href="#/start">${esc(t('landing_start', 'Start learning'))}</a><a class="btn" href="#/pricing">${esc(t('landing_see_pricing', 'See pricing'))}</a></div></div>
   </section>
   <section class="lp-sec lp-mode lp-teams" id="teams" aria-label="Teams">

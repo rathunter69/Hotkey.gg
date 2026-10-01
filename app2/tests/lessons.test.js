@@ -5,7 +5,6 @@
 // validator on malformed input, negative replays per lesson, and guest progress on corrupt storage.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DRIFT_LESSONS, driftSkip } from './known-drift.js';
 import { CHAPTERS, LESSONS, LESSONS_BY_ID, sectionsOf, sectionNames } from '../content/index.js';
 import { validateLesson, availableConcepts, sentenceCount, goalBounds, countedGoals } from '../content/schema.js';
 import { LessonRun, shortcutsUsed } from '../app/runner.js';
@@ -455,7 +454,6 @@ test('demo goals: the platform plays the script, the goal lands only when it has
   run.run('Ctrl+Up');
   assert.ok(run.finished);
   // a module lesson's closer is a demo the platform plays as a ghost: it lands last, and the sheet goes back as it stood
-  if (DRIFT_LESSONS.has('the-checks-row')) return;   // known drift: its solution awaits the rewrite
   const checks = byId('the-checks-row');
   const closer = checks.goals[checks.goals.length - 1];
   assert.ok(closer.closer && closer.demo && closer.demo.script, 'the closer is a demo');

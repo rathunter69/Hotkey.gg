@@ -30,7 +30,7 @@ export function proTerms(prices = PRICES) {
 export const FREE_ROWS = () => ['pricing_free_1', 'pricing_free_2', 'pricing_free_3', 'pricing_free_4'].map((k, i) => t(k, ['All of Chapter 1', 'Chapter 1’s drills and challenges', 'Rapid-fire and the Daily', 'Boards, streaks and achievements'][i]));
 export const PRO_ROWS = () => ['pricing_pro_1', 'pricing_pro_2', 'pricing_pro_3', 'pricing_pro_4'].map((k, i) => t(k, ['Chapters 2 to 6', 'Every drill, challenge and assessment', 'The certificate, with a page anyone can check', 'Themes and flair as you level'][i]));
 
-const tick = () => '<i class="tick" aria-hidden="true"></i>';
+const tick = () => '<i class="plan-tick" aria-hidden="true"></i>';
 const rows = list => `<ul class="ticks">${list.map(r => `<li>${tick()}<span>${esc(r)}</span></li>`).join('')}</ul>`;
 
 export function pricingHtml({ term = 'month', prices = PRICES } = {}) {

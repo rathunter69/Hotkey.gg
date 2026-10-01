@@ -25,7 +25,7 @@ test('pricing (M105): the live figures stay, Free and Pro side by side, the togg
   for (const s of ['Pricing', 'Free', 'Pro', '$0', '$9', 'Monthly', 'Yearly', '$7', '$70', 'Go Pro', 'Checkout opens at launch.', '14 days', 'Teams and classes']) assert.ok(t.includes(s), s);
   assert.ok(pricingHtml({ term: 'year' }).includes('id="proFigure">$90<'), 'the toggle swaps the figure');
   assert.equal(FREE_ROWS().length, 4); assert.equal(PRO_ROWS().length, 4);
-  assert.equal((html.match(/class="tick"/g) || []).length, 8, 'one ticked row each');
+  assert.equal((html.match(/class="plan-tick"/g) || []).length, 8, 'one ticked row each');
   assert.ok(html.includes('class="panel plan"') && html.includes('plan-pro'), 'two panels');
   assert.doesNotMatch(t, /→|·/, 'no arrow on a button, no dot-joined facts');
   assert.ok(html.includes('disabled'), 'Go Pro waits for checkout');

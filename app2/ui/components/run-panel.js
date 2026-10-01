@@ -244,7 +244,7 @@ export function createRunPanel(host, opts = {}) {
   }
   /** A module's story card: Wolf's line, then Enter starts the job. */
   function story(d) {
-    swap('story', `<div class="rp-eyebrow">${esc(d.eyebrow || '')}</div><div class="rp-title">${esc(d.title)}</div><p class="rp-para">${esc(d.body || '')}</p>`, d.buttons);
+    swap('story', `<div class="rp-title">${esc(d.title)}</div><p class="rp-para">${esc(d.body || '')}</p>`, d.buttons);   // no label above the heading (3.0)
   }
   /** Time's up: the line, the count, the way back in. */
   function timesUp(d) {
