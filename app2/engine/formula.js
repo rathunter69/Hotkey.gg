@@ -746,12 +746,14 @@ export function evalFormula(expr, ctx = {}) {
         const vals = flatVals(rg); const i = lookupIndex(args[0], vals, mode); if (i < 0) throw err('#N/A'); return i + 1; }
       case 'INDEX': { const rg = argRange(args[0]);
         const r = has(args, 1) ? toInt(args[1]) : 0, c = has(args, 2) ? toInt(args[2]) : (rg.rows === 1 && !has(args, 2) && has(args, 1) && rg.cols > 1 ? r : 0);
-        if (rg.rows === 1 && rg.cols > 1 && !has(args, 2) && has(args, 1)) { if (r < 1 || r > rg.cols) throw err('#REF!'); return new Range(rg.r1, rg.c1 + r - 1, rg.r1, rg.c1 + r - 1); }
+        // the piece INDEX returns stays on the sheet the range came from (=INDEX(Lists!C5:C10,n) reads Lists, not the formula's sheet)
+        const sub = (r1, c1, r2, c2) => new Range(r1, c1, r2, c2, rg.sheet);
+        if (rg.rows === 1 && rg.cols > 1 && !has(args, 2) && has(args, 1)) { if (r < 1 || r > rg.cols) throw err('#REF!'); return sub(rg.r1, rg.c1 + r - 1, rg.r1, rg.c1 + r - 1); }
         if (r < 0 || c < 0 || r > rg.rows || c > rg.cols) throw err('#REF!');
         if (r === 0 && c === 0) return rg;
-        if (r === 0) return new Range(rg.r1, rg.c1 + c - 1, rg.r2, rg.c1 + c - 1);
-        if (c === 0) { if (rg.cols === 1) return new Range(rg.r1 + r - 1, rg.c1, rg.r1 + r - 1, rg.c1); return new Range(rg.r1 + r - 1, rg.c1, rg.r1 + r - 1, rg.c2); }
-        return new Range(rg.r1 + r - 1, rg.c1 + c - 1, rg.r1 + r - 1, rg.c1 + c - 1); }
+        if (r === 0) return sub(rg.r1, rg.c1 + c - 1, rg.r2, rg.c1 + c - 1);
+        if (c === 0) { if (rg.cols === 1) return sub(rg.r1 + r - 1, rg.c1, rg.r1 + r - 1, rg.c1); return sub(rg.r1 + r - 1, rg.c1, rg.r1 + r - 1, rg.c2); }
+        return sub(rg.r1 + r - 1, rg.c1 + c - 1, rg.r1 + r - 1, rg.c1 + c - 1); }
       case 'VLOOKUP': case 'HLOOKUP': { const rg = argRange(args[1]); const idx = toInt(args[2]); const approx = has(args, 3) ? toBool(args[3]) : true;
         const vert = name === 'VLOOKUP'; if (idx < 1 || idx > (vert ? rg.cols : rg.rows)) throw err('#REF!');
         const keys = vert ? colVals(rg, 0) : rowVals(rg, 0); const i = lookupIndex(args[0], keys, approx ? 1 : 0); if (i < 0) throw err('#N/A');
@@ -784,7 +786,7 @@ export function evalFormula(expr, ctx = {}) {
       case 'OFFSET': { const base = argRange(args[0]); const dr = toInt(args[1]), dc = toInt(args[2]);
         const h = has(args, 3) ? toInt(args[3]) : base.rows, w = has(args, 4) ? toInt(args[4]) : base.cols;
         if (h < 1 || w < 1) throw err('#REF!'); const r1 = base.r1 + dr, c1 = base.c1 + dc; if (r1 < 1 || c1 < 1) throw err('#REF!');
-        return new Range(r1, c1, r1 + h - 1, c1 + w - 1); }
+        return new Range(r1, c1, r1 + h - 1, c1 + w - 1, base.sheet); }   // the offset stays on the base's sheet
       case 'INDIRECT': {
         // the text of a reference, read as one (A1 style; a sheet prefix and a range both work): an
         // unparseable text, or a text that is not a reference, is #REF!, as Excel reports it
