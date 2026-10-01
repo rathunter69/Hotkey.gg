@@ -354,6 +354,8 @@ export class Sheet {
     this.zoom = ZOOM_DEFAULT;              // the sheet's zoom, % (M99): a property of the sheet, as in Excel; the view scales by it
     this.resolver = null;                  // name → Sheet, set by the Session that owns the workbook
     this.today = opts.today || null;
+    this.calc = null;                      // the workbook's calculation settings (iterative, maxIterations, maxChange, tables), set by the Session; null = Excel's defaults
+    this.circular = [];                    // the formula cells in a circular reference after the last recalc, in sheet order (M78)
     this.listeners = new Set();
     this.lastFlash = null;   // {r1,c1,r2,c2} pasted footprint for the UI's one-shot flash
     if (opts.cells) for (const k in opts.cells) this.setCell(k, opts.cells[k]);
@@ -642,6 +644,7 @@ export class Sheet {
       if (c.spillTo) { if (c.formula) for (const kk of rectKeys(c.spillTo)) spillOwner[kk] = k; delete c.spillTo; }
     }
     const keys = []; for (const k in this.cells) if (this.cells[k] && this.cells[k].formula) keys.push(k);
+    this.circular = [];
     if (!keys.length) return;
     const fset = new Set(keys);
     // Every formula-cell key a formula actually dereferences while evaluating is recorded, so a
@@ -705,6 +708,23 @@ export class Sheet {
     // fold the reads of the last evaluation into deps; true when the graph gained an edge
     const merge = () => { let added = false; for (const k of keys) { if (!reads[k]) continue; for (const d of reads[k]) if (!deps[k].has(d)) { deps[k].add(d); added = true; } } return added; };
     let { cyclic, order } = detect();
+    const byPos = (a, b) => { const A = parseRef(a), B = parseRef(b); return (A.r - B.r) || (A.c - B.c); };
+    // iterative calculation (File › Options › Formulas, M78): the cells of a circle are not zeroed
+    // but evaluated again and again from their last values, up to Maximum Iterations times or until
+    // no value moves by more than Maximum Change, as Excel does — the interest-on-average-balance
+    // circle with its circuit breaker settles this way
+    const calc = this.calc || {};
+    if (calc.iterative) {
+      const maxIter = Math.max(1, calc.maxIterations | 0), maxChange = Number.isFinite(calc.maxChange) ? calc.maxChange : 0.001;
+      for (let pass = 0; pass < maxIter; pass++) {
+        let delta = 0;
+        for (const k of order) { const c = this.cells[k]; const v = evalOne(k); if (v !== c.value) { delta = Math.max(delta, typeof v === 'number' && typeof c.value === 'number' ? Math.abs(v - c.value) : Infinity); c.value = v; } }
+        if (merge()) ({ cyclic, order } = detect());
+        if (delta <= maxChange) break;
+      }
+      this.circular = [...cyclic].sort(byPos);
+      return;
+    }
     // a cell that depends on a cyclic cell inherits nothing special — it just reads the 0
     const evalAll = () => { for (const k of order) { const c = this.cells[k]; if (cyclic.has(k)) { clearSpill(k); c.value = 0; } else c.value = evalOne(k); } };
     evalAll();
@@ -720,6 +740,7 @@ export class Sheet {
       if (merge()) { ({ cyclic, order } = detect()); for (const k of cyclic) this.cells[k].value = 0; continue; }
       if (pass === CAP - 1) for (const k of moved) { cyclic.add(k); this.cells[k].value = 0; }
     }
+    this.circular = [...cyclic].sort(byPos);   // the cells in a circle, for the status bar and the warning (M78)
   }
 
   /* ---------------- commit parsing (what a typed entry becomes) ---------------- */

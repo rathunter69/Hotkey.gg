@@ -192,6 +192,8 @@ export const FIND_NONE_NOTE = "We couldn't find what you were looking for.";
 export const SPECIAL_NONE_NOTE = 'No cells were found.';
 export const DELETE_SHEET_PROMPT = 'Microsoft Excel will permanently delete this sheet. Do you want to continue?';
 export const NO_GROUP_NOTE = 'No group here.';
+/** Excel's circular-reference warning, raised when a circle appears with iterative calculation off (M78). */
+export const CIRCULAR_NOTE = 'There are one or more circular references where a formula refers to its own cell either directly or indirectly. This might cause them to calculate incorrectly. Try removing or changing these references, or moving the formulas to different cells.';
 /** Ctrl+Shift+1, Excel's Number shortcut, and Alt H K, Excel's Comma Style (M64). */
 export const NUMBER_SHORTCUT_CODE = '#,##0.00';
 export const COMMA_STYLE_CODE = '_(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(@_)';
@@ -246,11 +248,14 @@ export class Session {
     Object.defineProperty(sh, 'clipboard', { configurable: true, enumerable: true, get: () => this._clip, set: v => { this._clip = v; } });
     Object.defineProperty(sh, 'lastAction', { configurable: true, enumerable: true, get: () => this._repeat, set: v => { this._repeat = v; } });   // F4 repeats across sheets too
     sh.resolver = name => { const e = this.sheets.find(x => x.name.toLowerCase() === String(name).toLowerCase()); return e ? e.sheet : null; };
+    Object.defineProperty(sh, 'calc', { configurable: true, enumerable: false, get: () => this.settings });   // the workbook's calculation settings (Options › Formulas)
     sh.allSheets = () => this.sheets.map(e => ({ name: e.name, sheet: e.sheet }));
     sh.onChange(what => {
       if (this.sheets.length > 1 && what !== 'select' && what !== 'clipboard') this.recalcAll(sh);
+      if (what !== 'select' && what !== 'clipboard') this.checkCircular();
       this.emit('sheet');
     });
+    this._circKnown = new Set(this.circularRefs());   // a circle a loaded sheet brings is not an entry: no warning until a new one appears
   }
   /**
    * Recalculate every sheet of the workbook, two passes, so an A → B → A chain settles: the first
@@ -274,6 +279,24 @@ export class Session {
   onChange(fn) { this.listeners.add(fn); return () => this.listeners.delete(fn); }
   emit(what) { for (const fn of this.listeners) fn(what, this); }
   toast(msg) { if (this.opts.onToast) this.opts.onToast(msg); }
+  /** The circular references of the workbook, as 'Sheet!A1' keys in sheet order ('A1' on the active sheet): what the status bar names (M78). */
+  circularRefs() {
+    const out = [];
+    for (const e of this.sheets) for (const k of (e.sheet.circular || [])) out.push(e.sheet === this.sheet ? k : e.name + '!' + k);
+    return out;
+  }
+  /**
+   * After a change: with iterative calculation off, a circle that was not there before raises
+   * Excel's circular-reference warning once (the status bar keeps naming a cell while it lasts);
+   * with iteration on, nothing is raised.
+   */
+  checkCircular() {
+    const now = this.circularRefs();
+    const known = this._circKnown || new Set();
+    const fresh = now.filter(k => !known.has(k));
+    this._circKnown = new Set(now);
+    if (fresh.length && !this.settings.iterative) { this.circularWarned = fresh[0]; this.toast(CIRCULAR_NOTE); }
+  }
 
   /* ---------------- driving ---------------- */
   /**
