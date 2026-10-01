@@ -27,6 +27,7 @@
 import { Sheet } from './sheet.js';
 import { evalFormula, formulaRefs, evaluateStepper, valueText, translateFormula, isErrVal, textToNumber, dateTextValue, parses } from './formula.js';
 import { refKey, parseRef, parseRange, rangeText, colLetter } from './refs.js';
+import { dispText } from './format.js';
 
 /** The dialogs this module drives (keyboard.js routes their keys to toolKey). */
 export const TOOL_DIALOGS = new Set(['evalfx', 'errcheck', 'texttocols', 'removedup', 'validation', 'dvlist', 'editlinks', 'autofilter', 'sortdlg', 'goalseek', 'datatable', 'pivot']);
@@ -93,6 +94,58 @@ export function splitForColumns(text, spec) {
   out.push(cur);
   return out;
 }
+
+/* ---------------- AutoFilter criteria ---------------- */
+/** Excel's wildcard match for a filter / COUNTIF text: ? one character, * any run, ~ escapes; case-insensitive. */
+export function wildMatch(pattern, text) {
+  let re = '^'; const p = String(pattern);
+  for (let i = 0; i < p.length; i++) { const ch = p[i]; if (ch === '~' && i + 1 < p.length) { re += p[++i].replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); } else if (ch === '*') re += '.*'; else if (ch === '?') re += '.'; else re += ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  return new RegExp(re + '$', 'i').test(String(text));
+}
+/** The text a filter's value list shows for a cell: its display text, (Blanks) for an empty cell. */
+export const filterText = cell => { const t = dispText(cell); return t === '' ? '(Blanks)' : t; };
+const numOf = v => { if (typeof v === 'number') return v; if (typeof v === 'string' && v.trim() !== '' && isFinite(Number(v))) return Number(v); return null; };
+/** One Custom AutoFilter condition against a cell's value: numbers compare as numbers, text with wildcards, case-insensitive (Excel). */
+export function filterCond(op, want, cell) {
+  const v = cell.value; const wn = numOf(want), vn = typeof v === 'number' ? v : null;
+  const t = v == null ? '' : typeof v === 'number' ? dispText(cell) : String(v); const w = String(want == null ? '' : want);
+  switch (op) {
+    case 'eq': return wn !== null && vn !== null ? vn === wn : wildMatch(w, t);
+    case 'ne': return !(wn !== null && vn !== null ? vn === wn : wildMatch(w, t));
+    case 'gt': return wn !== null && vn !== null ? vn > wn : (wn === null && vn === null && t.localeCompare(w, 'en', { sensitivity: 'base' }) > 0);
+    case 'ge': return wn !== null && vn !== null ? vn >= wn : (wn === null && vn === null && t.localeCompare(w, 'en', { sensitivity: 'base' }) >= 0);
+    case 'lt': return wn !== null && vn !== null ? vn < wn : (wn === null && vn === null && t.localeCompare(w, 'en', { sensitivity: 'base' }) < 0);
+    case 'le': return wn !== null && vn !== null ? vn <= wn : (wn === null && vn === null && t.localeCompare(w, 'en', { sensitivity: 'base' }) <= 0);
+    case 'begins': return wildMatch(w + '*', t);
+    case 'nbegins': return !wildMatch(w + '*', t);
+    case 'ends': return wildMatch('*' + w, t);
+    case 'nends': return !wildMatch('*' + w, t);
+    case 'contains': return wildMatch('*' + w + '*', t);
+    case 'ncontains': return !wildMatch('*' + w + '*', t);
+  }
+  return true;
+}
+/** Does a row's cell pass a column's criterion? `colNums` (the column's numbers, body rows) serves Top 10 and Above / Below Average. */
+export function filterMatch(crit, cell, colNums) {
+  if (!crit) return true;
+  if (crit.kind === 'values') return crit.values.includes(filterText(cell));
+  if (crit.kind === 'custom') { const a = filterCond(crit.op1, crit.v1, cell); if (!crit.op2) return a; const b = filterCond(crit.op2, crit.v2, cell); return crit.and ? a && b : a || b; }
+  const v = typeof cell.value === 'number' ? cell.value : null; if (v === null) return false;
+  if (crit.kind === 'avg') { const m = colNums.length ? colNums.reduce((x, y) => x + y, 0) / colNums.length : 0; return crit.above ? v > m : v < m; }
+  if (crit.kind === 'top') {   // Top 10: the n largest (or smallest) items, or the top n percent of the items
+    const sorted = colNums.slice().sort((x, y) => crit.bottom ? x - y : y - x);
+    const n = crit.pct ? Math.max(1, Math.round(sorted.length * crit.n / 100)) : crit.n;
+    const cut = sorted[Math.min(n, sorted.length) - 1]; return cut === undefined ? false : (crit.bottom ? v <= cut : v >= cut);
+  }
+  return true;
+}
+/** Sort a column's distinct texts as the value list shows them: numbers (by value) first, then text A to Z, (Blanks) last. */
+export function sortFilterItems(items) {
+  const rank = it => it.text === '(Blanks)' ? 2 : it.n !== null ? 0 : 1;
+  return items.sort((a, b) => (rank(a) - rank(b)) || (rank(a) === 0 ? a.n - b.n : a.text.localeCompare(b.text, 'en', { sensitivity: 'base' })));
+}
+const AF_OPS = { E: 'eq', N: 'ne', G: 'gt', O: 'ge', L: 'lt', Q: 'le' };   // the Number Filters submenu's letters: Equals, Does Not Equal, Greater Than, Greater Than Or Equal To, Less Than, Less Than Or Equal To
+const AF_TEXT_OPS = { E: 'eq', N: 'ne', I: 'begins', T: 'ends', A: 'contains', D: 'ncontains' };   // Text Filters: Equals, Does Not Equal, Begins With, Ends With, Contains, Does Not Contain
 
 /** Goal Seek's search: the x that makes f(x) = target, by secant steps from x0 then bisection; null when none is found. Excel's own tolerance: 0.001 within 100 iterations. */
 export function goalSeek(f, x0, target, { maxIter = 100, tol = 0.001 } = {}) {
@@ -202,6 +255,100 @@ const methods = {
   },
   /** Remove Arrows: all, the precedent arrows or the dependent arrows. */
   removeArrows(which) { const S = this.sheet; this.startClock(); S.arrows = (S.arrows || []).filter(x => which !== 'all' && x.kind !== which); S.traceLevel = null; this.emit('sheet'); },
+
+  /* ---------------- AutoFilter (Ctrl+Shift+L / Alt A T) ---------------- */
+  /**
+   * Filter on / off: on, the current region around the active cell (or the selection when it is a
+   * range) gets a drop-down on each header cell, the header row being its first; off clears every
+   * criterion and shows every row, as Excel does.
+   */
+  toggleAutoFilter() {
+    const S = this.sheet; this.startClock(); S.pushUndo();
+    if (S.filter) { S.filter = null; S.filterRows = new Set(); S.commit('layout'); return false; }
+    const sr = S.selRange(); const a = S.dispActive();
+    const rg = sr.r1 === sr.r2 && sr.c1 === sr.c2 ? S.regionAround(a.r, a.c) : { r1: sr.r1, c1: sr.c1, r2: sr.r2, c2: sr.c2 };
+    S.filter = { ...rg, crit: {} }; S.filterRows = new Set(); S.commit('layout'); return true;
+  },
+  /** Recompute the rows the AutoFilter hides from its criteria (every column's must pass). */
+  applyFilter() {
+    const S = this.sheet; const f = S.filter; const rows = new Set();
+    if (f) {
+      const nums = {};
+      for (const c of Object.keys(f.crit)) { nums[c] = []; for (let r = f.r1 + 1; r <= f.r2; r++) { const v = S.get(r, +c).value; if (typeof v === 'number') nums[c].push(v); } }
+      for (let r = f.r1 + 1; r <= f.r2; r++) for (const c of Object.keys(f.crit)) if (!filterMatch(f.crit[c], S.get(r, +c), nums[c])) { rows.add(r); break; }
+    }
+    S.filterRows = rows;
+  },
+  /** The rows of the list that pass every column's criterion but `skipCol`'s (the value list of a column shows what the other filters leave). */
+  filterRowsPassing(skipCol) {
+    const S = this.sheet; const f = S.filter; const out = []; if (!f) return out;
+    const nums = {}; for (const c of Object.keys(f.crit)) { nums[c] = []; for (let r = f.r1 + 1; r <= f.r2; r++) { const v = S.get(r, +c).value; if (typeof v === 'number') nums[c].push(v); } }
+    for (let r = f.r1 + 1; r <= f.r2; r++) { let ok = true; for (const c of Object.keys(f.crit)) if (+c !== skipCol && !filterMatch(f.crit[c], S.get(r, +c), nums[c])) { ok = false; break; } if (ok) out.push(r); }
+    return out;
+  },
+  /** Alt+↓: the in-cell drop-down: a validation list on the cell, or an AutoFilter header's menu; nothing elsewhere. */
+  openDropDown() {
+    const S = this.sheet; const a = S.dispActive();
+    if (this.openDvList && this.openDvList(a)) return true;
+    const f = S.filter; if (f && a.r === f.r1 && a.c >= f.c1 && a.c <= f.c2) { this.openFilterMenu(a.c); return true; }
+    return false;
+  },
+  /**
+   * The header's menu as Excel lays it out: Sort A to Z (S), Sort Z to A (O), Clear Filter From
+   * "Header" (C), Text / Number Filters (F) with its submenu, Search (E), then the value list with
+   * (Select All) first: ↑ ↓ move, Space ticks, Enter is OK, Esc closes.
+   */
+  openFilterMenu(col) {
+    const S = this.sheet; const f = S.filter; this.startClock();
+    const rows = this.filterRowsPassing(col); const crit = f.crit[col] || null;
+    const seen = new Map();
+    for (const r of rows) { const cell = S.get(r, col); const t = filterText(cell); if (!seen.has(t)) seen.set(t, { text: t, n: typeof cell.value === 'number' ? cell.value : null, checked: crit ? crit.kind === 'values' ? crit.values.includes(t) : true : true }); }
+    const items = sortFilterItems([...seen.values()]);
+    const numeric = items.some(it => it.n !== null) && !items.some(it => it.n === null && it.text !== '(Blanks)');
+    this.openDialog('autofilter', []);
+    this.dlg = { kind: 'autofilter', col, header: dispText(S.get(f.r1, col)), numeric, items, idx: 0, focus: 'list', search: '', menu: null, custom: null, all: items.every(it => it.checked) };
+  },
+  autoFilterKey(key) {
+    const d = this.dlg; const S = this.sheet; const f = S.filter; if (!d || !f) return;
+    const body = { r1: f.r1 + 1, c1: f.c1, r2: f.r2, c2: f.c2 };
+    const close = () => this.exitRibbon(false);
+    const apply = crit => { S.pushUndo(); if (crit) f.crit[d.col] = crit; else delete f.crit[d.col]; this.applyFilter(); close(); S.commit('layout'); };
+    if (d.custom) {   // the Custom AutoFilter dialog: value boxes, And / Or (Alt+A / Alt+O), Tab between, Enter OK
+      const c = d.custom;
+      if (key === 'Enter') { apply({ kind: 'custom', op1: c.op1, v1: c.v1, and: c.and, op2: c.op2 && c.v2 !== '' ? c.op2 : null, v2: c.v2 }); return; }
+      if (key === 'Alt+A') { c.and = true; return; } if (key === 'Alt+O') { c.and = false; return; }
+      if (key === 'Tab' || key === 'Shift+Tab') { this.toolTab(c, key, ['v1', 'and', 'v2']); return; }
+      if (c.focus === 'and' && (key === 'ArrowLeft' || key === 'ArrowRight' || key === 'ArrowUp' || key === 'ArrowDown')) { c.and = !c.and; return; }
+      if (c.focus !== 'and') this.toolType(c, key, ['v1', 'v2']);
+      return;
+    }
+    if (d.menu === 'filters') {   // the Text Filters / Number Filters submenu
+      const ops = d.numeric ? AF_OPS : AF_TEXT_OPS; const K = key.toUpperCase();
+      if (ops[K]) { d.custom = { op1: ops[K], v1: '', and: true, op2: null, v2: '', focus: 'v1' }; d.menu = null; return; }
+      if (d.numeric && K === 'W') { d.custom = { op1: 'ge', v1: '', and: true, op2: 'le', v2: '', focus: 'v1' }; d.menu = null; return; }   // Between
+      if (d.numeric && K === 'T') { apply({ kind: 'top', n: 10, pct: false, bottom: false }); return; }   // Top 10 with its defaults
+      if (d.numeric && K === 'A') { apply({ kind: 'avg', above: true }); return; }
+      if (d.numeric && K === 'B') { apply({ kind: 'avg', above: false }); return; }
+      if (K === 'F') { d.custom = { op1: 'eq', v1: '', and: true, op2: null, v2: '', focus: 'v1' }; d.menu = null; return; }   // Custom Filter…
+      if (key === 'ArrowLeft') d.menu = null;
+      return;
+    }
+    if (d.focus === 'search') {
+      if (key === 'Enter') { const shown = d.items.filter(it => wildMatch('*' + d.search + '*', it.text)); apply(shown.length && shown.length < d.items.length ? { kind: 'values', values: shown.map(it => it.text) } : null); return; }
+      if (key === 'Tab') { d.focus = 'list'; return; }
+      this.toolType(d, key, ['search']); return;
+    }
+    const K = key.length === 1 ? key.toUpperCase() : key;
+    if (K === 'S' || K === 'O') { S.pushUndo(); S.sort(K === 'S' ? 'asc' : 'desc', d.col, body); this.applyFilter(); close(); S.commit('edit'); return; }
+    if (K === 'C') { apply(null); return; }
+    if (K === 'F') { d.menu = 'filters'; return; }
+    if (K === 'E') { d.focus = 'search'; return; }
+    if (key === 'ArrowDown') { d.idx = Math.min(d.items.length, d.idx + 1); return; }
+    if (key === 'ArrowUp') { d.idx = Math.max(0, d.idx - 1); return; }
+    if (key === 'Home') { d.idx = 0; return; } if (key === 'End') { d.idx = d.items.length; return; }
+    if (key === ' ') { if (d.idx === 0) { d.all = !d.all; for (const it of d.items) it.checked = d.all; } else { d.items[d.idx - 1].checked = !d.items[d.idx - 1].checked; d.all = d.items.every(it => it.checked); } return; }
+    if (key === 'Enter') { const on = d.items.filter(it => it.checked); if (!on.length) return; apply(on.length === d.items.length ? null : { kind: 'values', values: on.map(it => it.text) }); }
+  },
 
   /* ---------------- Evaluate Formula (Alt M V) ---------------- */
   /** The dialog on the active cell's formula: Evaluate (Enter / Alt+E) steps, Restart (Alt+R) after the last step, Close (Esc). A cell without a formula opens nothing, as in Excel. */

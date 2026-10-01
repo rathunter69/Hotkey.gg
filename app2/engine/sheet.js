@@ -345,6 +345,8 @@ export class Sheet {
     this.gridlines = true;
     this.rowH = new Array(this.rows + 1).fill(ROWH_DEFAULT);   // px per row (Excel default 20)
     this.hiddenRows = new Set(); this.hiddenCols = new Set();
+    this.filter = null;                    // the AutoFilter (Ctrl+Shift+L): { r1, c1, r2, c2, crit: { [col]: criterion } }; the header row is r1
+    this.filterRows = new Set();           // the rows the AutoFilter hides (apart from hiddenRows: Unhide does not show them, SUBTOTAL 101+ skips them)
     this.freeze = { r: 0, c: 0 };          // rows/cols frozen above/left of the seam (0 = none)
     this.groups = { rows: [], cols: [] };  // the outline (C2 gap 4): [{r1,r2,collapsed}] / [{c1,c2,collapsed}], one level
     this.condFmt = [];                     // conditional formatting rules in priority order (normCondFmt)
@@ -415,6 +417,8 @@ export class Sheet {
       // NAME!B3: another sheet of the workbook (the Session wires `resolver`); no workbook = #REF!
       sheetRaw: (name, key) => { const sh = this.resolver ? this.resolver(name) : null; return sh ? sh.raw(key) : '#REF!'; },
       name: nm => this.resolveName(nm),
+      rowHidden: r => this.hiddenRows.has(r) || this.filterRows.has(r) || this.isFolded('r', r),   // SUBTOTAL 101 to 111 skip hidden rows
+      rowFiltered: r => this.filterRows.has(r),                                                       // SUBTOTAL 1 to 11 skip only the AutoFilter's
       isFormula: k => { const sh = this.sheetOfKey(k); return !!(sh && sh.sheet.cells[sh.key] && sh.sheet.cells[sh.key].formula); },   // ISFORMULA
       spillRange: k => { const sh = this.sheetOfKey(k); const c = sh && sh.sheet.cells[sh.key]; return c && c.spillTo ? { ...c.spillTo } : null; },   // A1#
       ...extra };
@@ -547,7 +551,7 @@ export class Sheet {
     this.emit('select');
   }
   /** Row / column `n` is on screen: neither hidden (Ctrl+9 / Ctrl+0) nor inside a collapsed group. */
-  isVisible(axis, n) { return !(axis === 'r' ? this.hiddenRows : this.hiddenCols).has(n) && !this.isFolded(axis, n); }
+  isVisible(axis, n) { return !(axis === 'r' ? this.hiddenRows : this.hiddenCols).has(n) && !(axis === 'r' && this.filterRows.has(n)) && !this.isFolded(axis, n); }
   /** `d` visible steps from `from` on an axis, as the arrow keys walk (Excel skips hidden and folded rows / columns); stops at the edge. */
   stepVisible(axis, from, d) {
     if (!d) return from;
@@ -601,12 +605,14 @@ export class Sheet {
 
   /* ---------------- undo ---------------- */
   snapshot() { return { cells: clone(this.cells), colW: this.colW.slice(), colSet: this.colSet.slice(), rows: this.rows, active: { ...this.active }, sel: this.sel && { ...this.sel },
-    rowH: this.rowH.slice(), hiddenRows: [...this.hiddenRows], hiddenCols: [...this.hiddenCols], freeze: { ...this.freeze }, groups: clone(this.groups), condFmt: clone(this.condFmt), names: clone(this.names) }; }
+    rowH: this.rowH.slice(), hiddenRows: [...this.hiddenRows], hiddenCols: [...this.hiddenCols], freeze: { ...this.freeze }, groups: clone(this.groups), condFmt: clone(this.condFmt), names: clone(this.names),
+    filter: clone(this.filter), filterRows: [...this.filterRows], validation: clone(this.validation || null) }; }
   /** Rewind cells AND the whole selection to one moment, so undo/redo re-select the range the operation touched (Excel). */
   restore(s) {
     this.cells = clone(s.cells); this.colW = s.colW.slice(); this.colSet = s.colSet.slice(); this.rows = s.rows;
     if (s.rowH) this.rowH = s.rowH.slice();
     this.hiddenRows = new Set(s.hiddenRows || []); this.hiddenCols = new Set(s.hiddenCols || []);
+    this.filter = s.filter ? clone(s.filter) : null; this.filterRows = new Set(s.filterRows || []); this.validation = s.validation ? clone(s.validation) : null;
     this.freeze = s.freeze ? { ...s.freeze } : { r: 0, c: 0 };
     this.groups = s.groups ? normGroups(s.groups) : { rows: [], cols: [] };
     this.condFmt = s.condFmt ? normCondFmt(s.condFmt, this.today) : [];
@@ -1185,11 +1191,11 @@ export class Sheet {
   /* ---------------- clipboard ---------------- */
   copy(cut = false) {
     const r = this.selRange(); const data = [];
-    for (let rr = r.r1; rr <= r.r2; rr++) { const row = []; for (let cc = r.c1; cc <= r.c2; cc++) row.push(clone(this.get(rr, cc))); data.push(row); }
+    for (let rr = r.r1; rr <= r.r2; rr++) { if (this.filterRows.has(rr)) continue; const row = []; for (let cc = r.c1; cc <= r.c2; cc++) row.push(clone(this.get(rr, cc))); data.push(row); }   // a filtered list copies its visible rows only (Excel)
     const cols = []; for (let cc = r.c1; cc <= r.c2; cc++) cols.push(this.colW[cc]);
     // `src` is the sheet the block came from: a workbook shares one clipboard (Session.wireSheet), so a
     // cut pasted on another sheet clears its source there, and the marquee shows only on that sheet
-    this.clipboard = { data, cols, h: r.r2 - r.r1 + 1, w: r.c2 - r.c1 + 1, rect: { ...r }, cut: !!cut, src: this };
+    this.clipboard = { data, cols, h: data.length, w: r.c2 - r.c1 + 1, rect: { ...r }, cut: !!cut, src: this };
     this.emit('clipboard');
   }
   clearClipboard() { if (this.clipboard) { this.clipboard = null; this.emit('clipboard'); } }
@@ -1223,7 +1229,7 @@ export class Sheet {
     if (cb.cut) {
       const from = cb.src && cb.src !== this ? cb.src : null;   // a cut from another sheet: its cells go there (own undo entry)
       if (from) from.pushUndo();
-      for (let rr = cb.rect.r1; rr <= cb.rect.r2; rr++) for (let cc = cb.rect.c1; cc <= cb.rect.c2; cc++) delete (from || this).cells[refKey(rr, cc)];
+      for (let rr = cb.rect.r1; rr <= cb.rect.r2; rr++) { if ((from || this).filterRows.has(rr)) continue; for (let cc = cb.rect.c1; cc <= cb.rect.c2; cc++) delete (from || this).cells[refKey(rr, cc)]; }
       for (let i = 0; i < cb.h; i++) for (let j = 0; j < cb.w; j++) { const cell = this.ensure(r0 + i, c0 + j); const s = cb.data[i][j]; Object.assign(cell, clone(s)); }
       this.cfMoveRules(cb, r0, c0, from);   // the conditional formats travel with the moved cells
       if (!from && (r0 !== cb.rect.r1 || c0 !== cb.rect.c1)) {   // M68: every formula that read the moved cells (and the moved formulas' references into their own block) follows them
@@ -1373,8 +1379,8 @@ export class Sheet {
 
   /* ---------------- sort ---------------- */
   /** Sort the selected rows by the column of the active cell (or keyCol). Blanks stay last. */
-  sort(dir, keyCol) {
-    const r = this.selRange(); const sortCol = keyCol || this.dispActive().c;
+  sort(dir, keyCol, rect) {
+    const r = rect || this.selRange(); const sortCol = keyCol || this.dispActive().c;
     if (sortCol < r.c1 || sortCol > r.c2 || r.r1 === r.r2) return false;
     const rows = []; for (let rr = r.r1; rr <= r.r2; rr++) { const row = []; for (let cc = r.c1; cc <= r.c2; cc++) row.push(clone(this.get(rr, cc))); row.r0 = rr; rows.push(row); }
     const off = sortCol - r.c1;
@@ -1462,6 +1468,8 @@ export class Sheet {
       const inh = r.r1 > 1 ? this.rowH[r.r1 - 1] : ROWH_DEFAULT;
       this.rowH.splice(r.r1, 0, ...new Array(count).fill(inh)); this.rowH.length = this.rows + 1;
       this.hiddenRows = new Set([...this.hiddenRows].map(n => n >= r.r1 ? n + count : n).filter(n => n <= this.rows));
+      this.filterRows = new Set([...this.filterRows].map(n => n >= r.r1 ? n + count : n).filter(n => n <= this.rows));
+      if (this.filter) { if (this.filter.r1 >= r.r1) this.filter.r1 += count; if (this.filter.r2 >= r.r1) this.filter.r2 += count; }
       if (this.freeze.r >= r.r1) this.freeze.r = Math.min(this.rows - 1, this.freeze.r + count);
       this.groups.rows = this.shiftGroups('r', r.r1, count);
       this.condFmt = this.shiftCondFmt('r', r.r1, count); this.shiftNames('r', r.r1, count);
@@ -1479,6 +1487,8 @@ export class Sheet {
     if (axis === 'r') { const count = r.r2 - r.r1 + 1; this.shiftCells('r', r.r1, -count);
       this.rowH.splice(r.r1, count); while (this.rowH.length < this.rows + 1) this.rowH.push(ROWH_DEFAULT);
       this.hiddenRows = new Set([...this.hiddenRows].filter(n => n < r.r1 || n > r.r2).map(n => n > r.r2 ? n - count : n));
+      this.filterRows = new Set([...this.filterRows].filter(n => n < r.r1 || n > r.r2).map(n => n > r.r2 ? n - count : n));
+      if (this.filter) { const f = this.filter; if (f.r1 >= r.r1 && f.r1 <= r.r2) { this.filter = null; this.filterRows = new Set(); } else { if (f.r1 > r.r2) f.r1 -= count; f.r2 = f.r2 > r.r2 ? f.r2 - count : Math.min(f.r2, r.r1 - 1); } }
       this.groups.rows = this.shiftGroups('r', r.r1, -count);
       this.condFmt = this.shiftCondFmt('r', r.r1, -count); this.shiftNames('r', r.r1, -count);
       if (this.freeze.r > r.r2) this.freeze.r -= count; else if (this.freeze.r >= r.r1) this.freeze.r = Math.max(0, r.r1 - 1);

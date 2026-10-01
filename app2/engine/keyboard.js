@@ -1621,6 +1621,8 @@ export class Session {
       if (k === 'PageDown' || k === 'PageUp') {   // the browser keeps Ctrl+PgDn for its own tabs, so Alt+PgDn is the sheet key here (M41), logged as Excel's
         this.startClock(); this.sheetStep(k === 'PageDown' ? 1 : -1, e.shiftKey); return true;
       }
+      if (k === 'ArrowDown' && !e.shiftKey) { this.startClock(); this.logKey('Alt+↓'); this.openDropDown(); return true; }   // the in-cell drop-down: a validation list, or an AutoFilter header's menu
+      if (k === 'F5' && !e.shiftKey) { this.startClock(); this.logKey('Alt+F5'); this.refreshPivots(); return true; }
       return true;
     }
     if (k === 'Enter' && !e.ctrlKey && !e.altKey) {
@@ -1691,8 +1693,6 @@ export class Session {
       return true;   // unknown chords are swallowed, never typed
     }
     if (e.ctrlKey && e.altKey && (k === 'PageDown' || k === 'PageUp')) { this.startClock(); this.sheetStep(k === 'PageDown' ? 1 : -1, e.shiftKey); return true; }
-    if (e.altKey && !e.ctrlKey && k === 'ArrowDown') { this.startClock(); this.logKey('Alt+↓'); this.openDropDown(); return true; }   // the in-cell drop-down: a validation list, or an AutoFilter header's menu
-    if (e.altKey && !e.ctrlKey && k === 'F5') { this.startClock(); this.logKey('Alt+F5'); this.refreshPivots(); return true; }
     if (e.ctrlKey && e.altKey && k.toLowerCase() === 'v') { this.startClock(); this.logKey('Ctrl+Alt+V'); this.openDialog('paste'); this.pasteKind = 'all'; this.pasteOp = 'none'; return true; }
     return false;
   }
