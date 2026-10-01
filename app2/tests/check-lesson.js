@@ -10,7 +10,7 @@ import { readdirSync } from 'node:fs';
 import { validateLesson, availableConcepts, countedGoals, goalBounds, SEEDED_KINDS } from '../content/schema.js';
 import { LESSONS_BY_ID } from '../content/index.js';
 import { LessonRun } from '../app/runner.js';
-import { workbookState } from '../content/workbooks/index.js';
+import { workbookState, WORKBOOKS } from '../content/workbooks/index.js';
 import { diffStates, sessionToState } from '../content/workbooks/voltline-weekly.js';
 import { mulberry32 } from '../engine/rng.js';
 import { hintScript, hintTokens, goToOffence, arrowGrind, anchorBefore } from './hint-rules.js';
@@ -63,7 +63,9 @@ if (!problems.length) {
     try { run.run(lesson.solution); } catch (e) { bad(`solution throws: ${e.message}`); }
     if (!run.finished) bad(`solution does not finish — ${run.doneCount}/${run.goals.length} goals; pending: ${run.current ? run.current.text : '?'}`);
     else if (lesson.workbook && lesson.state && lesson.state.after) {
-      const diff = diffStates(sessionToState(run.session), workbookState(lesson.workbook, lesson.state.after));
+      const wb = WORKBOOKS[lesson.workbook] || {};   // the workbook's own extractor and differ (a clearcoat state carries settings voltline's never did)
+      const toState = wb.sessionToState || sessionToState, diff_ = wb.diffStates || diffStates;
+      const diff = diff_(toState(run.session), workbookState(lesson.workbook, lesson.state.after));
       for (const d of diff.slice(0, 12)) bad(`after-state diff on ${d.sheet}!${d.key} (${d.kind}): solution left ${JSON.stringify(d.a)} but ${lesson.state.after} has ${JSON.stringify(d.b)}`);
       if (diff.length > 12) bad(`… and ${diff.length - 12} more diffs`);
     }

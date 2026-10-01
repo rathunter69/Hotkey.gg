@@ -392,9 +392,9 @@ export const COPY = {
    "module": "present-and-audit",
    "order": "1.7.1",
    "title": "Fit to one page",
-   "brief": "The Report is finished and the deal team, the people running the sale, will print it and read it on paper, where a page that spills onto a second sheet reads as careless. Set it to print landscape on one page, with the title rows repeated and the file name and date in the footer, so every copy says what it is. The key is `Alt P S P`.",
-   "closing": "The Report now prints on one landscape page with its title rows on every sheet and the file name and date in the footer: the print set-up is part of the model (G1), and a page reads the way the buyer reads it, title, units, timeline, then the answer (G2). || Before it goes out, save it as a new version rather than over the only copy (A6); the sheet itself did not change, and Cedar Park’s kWh still moves the Total.",
-   "wow": "",
+   "brief": "The Report is finished and the CFO will print it and read it on paper, where a page that spills onto a second sheet reads as careless. Set it to print landscape on one page, with the title rows repeated and the file name and date in the footer, so every copy says what it is and when it was printed. Page Layout is Alt, P; Page Setup is the dialog behind it, and Ctrl+F2 shows you what the printer will get. The key is `Alt P S P`.",
+   "closing": "The print set-up is part of the page: landscape, fit to one, the title rows repeated, the footer saying which file and when. A page reads the way the reader reads it: title, units, timeline, then the answer. || Best practice: save a new version rather than over the only copy (Clearcoat_Weekly_KPI_v03_2026-09-15.xlsx, never \"final\"), and Ctrl+Home on every sheet before you send. A file with pay or deal figures that leaves by email gets a password first: File, Info (Alt, F, I), Protect Workbook, Encrypt with Password. Protect Sheet sits in the same menu, and desks rarely lock a model.",
+   "wow": "It prints on one landscape page, with the heads on every sheet and the file and date in the footer.",
    "convention_line": "Fit to page, titles, footer · Title, units, timeline, then the answer · Never overwrite the only copy",
    "mac_note": "",
    "story_beat": ""
@@ -404,9 +404,9 @@ export const COPY = {
    "module": "present-and-audit",
    "order": "1.7.2",
    "title": "The checks row",
-   "brief": "The Report is ready to print, but nothing on it says whether it is right: the deal team, the people running the sale, want a line for each thing that must agree before the page goes out. Three such lines under the week summary make a checks row, the first thing a reviewer looks for. The key is `=`.",
-   "closing": "The checks row goes to zero when the page ties: three live differences, one for each thing that must agree, so a broken link or a bad total shows as a number before anyone else sees it (F1). || The revenue check reads the feed across sheets, and Ctrl+[ takes a reviewer straight to the first figure it compares.",
-   "wow": "",
+   "brief": "The Report is ready to print, but nothing on it says whether it's right. The CFO wants a line for each thing that must agree before the page goes out, and so will every buyer after. A check is a live difference between two things that must agree: it reads zero when they tie and shows the gap when they don't. Three of them under the week summary make a checks row, the first thing a reviewer looks for on any page. The key is `=`.",
+   "closing": "The checks row goes to zero when the page ties: one for each thing that must agree, so a broken link or a bad total shows as a number before anyone else sees it. That's the convention on every page in this course and every model on a desk. || The revenue check reads the feed across sheets, and Ctrl+[ takes a reviewer straight to the first figure it compares.",
+   "wow": "Three live differences read zero, so the page now proves itself.",
    "convention_line": "The check is a live difference → 0",
    "mac_note": "",
    "story_beat": ""
@@ -416,9 +416,9 @@ export const COPY = {
    "module": "present-and-audit",
    "order": "1.7.3",
    "title": "Hardcode hunt",
-   "brief": "The associate’s marked-up copy of the Report came back with eight faults from the day-one list, the faults a reviewer checks first, and the page goes to the buyer tonight. The audit pass finds them the way a reviewer would, with Go To Special, show formulas and your eyes on the page, and you fix every one without changing anything else. The key is Ctrl with the backtick key, `Ctrl+Backtick`.",
-   "closing": "Eight faults found in a colleague’s file in two minutes, the way a reviewer finds them: Go To Special for the typed numbers, show formulas for the literal and the retyped Thursday, the page for the rest (F3). || Cedar Park’s emailed figures now read blue, so the one row that is not a link says so (B1), and the title is centered across the page, not merged (D7).",
-   "wow": "",
+   "brief": "The CFO's marked-up copy of the Report came back with eight faults from the day-one list, the faults a reviewer checks first, and the page goes out tonight. The audit pass finds them the way a reviewer would: Go To Special for typed numbers hiding among links, show formulas for a number in a formula row, and your eyes on the page for the rest. Fix every one without changing anything else. The key is `Ctrl+Backtick`.",
+   "closing": "Go To Special found the typed numbers, show formulas found the literal and the retyped Thursday, and your eyes found the rest. That's the audit pass, and it's the same three looks on every page you'll ever inherit. || Cedar Park's emailed figures read blue, so the one row that isn't a link says so on its face. The title is centered across the page rather than merged, the grid is gone, and page one is ready. || Best practice: give a file a fourth look before it leaves. Go To Special, Notes (Comments in older builds) selects every cell that carries a note, so keep the sources (1.3.5) and clear the rest with Alt, H, E, M.",
+   "wow": "Eight faults found in two minutes, the way a reviewer finds them.",
    "convention_line": "Go To Special, show formulas, trace · Inputs blue, formulas black · Merged cells break everything",
    "mac_note": "",
    "story_beat": ""
@@ -428,8 +428,8 @@ export const COPY = {
    "module": "present-and-audit",
    "order": "1.7.C",
    "title": "Challenge: audit before you send",
-   "brief": "A sister cluster’s finished Report goes to the buyer in three minutes and its checks row ties, yet it carries five faults an audit pass finds: fix every one, change nothing else, then add the page number.",
-   "closing": "",
+   "brief": "The San Antonio cluster's finished Report goes out in three minutes, and its checks row ties, yet it carries five faults an audit pass finds. Fix every one, change nothing else, then add the page number.",
+   "closing": "Three looks (Go To Special, show formulas, the page) found five faults, and you fixed them without touching anything else. || A checks row that ties is necessary, not sufficient. The audit pass is what a reviewer does after the checks say zero.",
    "wow": "",
    "convention_line": "Go To Special, show formulas, trace · Inputs blue, formulas black · Merged cells break everything · Fit to page, titles, footer",
    "mac_note": "",
@@ -440,9 +440,9 @@ export const COPY = {
    "module": "project-and-assessment",
    "order": "1.8.P",
    "title": "Project: the weekly KPI report",
-   "brief": "Management’s next feed is in, w/c 22 Sep, and the Report is blank: page one of the pack, the document the buyers read, is yours to build start to finish. Every step is one the chapter taught, from the title to the print set-up, and the page must tie before it goes out. The key is `Ctrl+PgDn`.",
-   "closing": "Page one of the pack is done: a fresh feed, a blank sheet, and fourteen steps later a linked, totaled, formatted and print-ready report whose checks read zero (F1). || The associate would have checked what the checks row checks — revenue ties to the feed, the sites sum to the total, the margin is plausible — then that every link is green (B2), every figure carries the team’s format with $ on the first and total rows, and the page prints on one landscape sheet with its heads repeated (G1).",
-   "wow": "",
+   "brief": "The CFO's next feed is in, Week of Sep 22, and the Report is blank: page one of the pack, the first document a buyer opens, is yours to build start to finish. Every step is one the chapter taught, from the title to the print set-up, and the page must tie before it goes out. From a garbled workbook to a finished page, in one sitting. The key is `Ctrl+PgDn`.",
+   "closing": "You started with a fresh feed and a blank sheet, and fifteen steps later the report is linked, totaled, formatted and print-ready with its checks at zero. || The CFO would have checked what the checks row checks (revenue ties to the feed, the sites sum to the total, the margin is plausible), then that every link is green, every figure carries the desk's format with $ on the first and total rows, and the page prints on one landscape sheet with its heads repeated. Now the same page on the clock.",
+   "wow": "You took a raw feed to a signed-off page in one sitting, and that is Chapter 1.",
    "convention_line": "Inputs blue, formulas black · Links green; external links avoided · One input, one cell; formulas reference it · A units line: \"USD unless stated\" · Parentheses, never a leading minus · One decimals setting per line · A top border, never an all-borders grid · Merged cells break everything · The check is a live difference → 0 · Fit to page, titles, footer",
    "mac_note": "",
    "story_beat": ""
@@ -452,10 +452,10 @@ export const COPY = {
    "module": "project-and-assessment",
    "order": "1.8.A",
    "title": "Assessment: Monday morning",
-   "brief": "Monday 7:10am. The associate wants the page before the 9:00: a sister cluster’s w/c 22 Sep feed sits on Raw, the Report is blank, and the page is the one the project built, links, totals, margins, daily block, checks, formats and print set-up, in eight minutes. The key is `Ctrl+PgDn`.",
-   "closing": "Page one of the pack, the document the buyers read, built from a blank sheet in one sitting on a feed you had never seen: every figure a live link or a formula, the checks at zero, the print set-up done. || The associate would have looked at the same things the goals did: green links and blue-free formulas (B1, B2), the price anchored on Inputs (B4), $ only on the first and total rows (D4), a top border on the total (D5), and a page that fits one sheet (G1).",
-   "wow": "",
-   "convention_line": "Inputs blue, formulas black · Links green; external links avoided · One input, one cell; formulas reference it · A units line: \"USD unless stated\" · Parentheses, never a leading minus · One decimals setting per line · A top border, never an all-borders grid · Merged cells break everything · The check is a live difference → 0 · Fit to page, titles, footer",
+   "brief": "Monday 7:10am. The CFO wants the page before the 9:00: the San Antonio cluster's Week of Sep 22 feed sits on Raw, the Report is blank, and the page is the one the project built (links, totals, margins, daily block, checks, formats and print set-up), on the clock, no help, keyboard only. Pass, and the chapter is Verified. This is also the test-out: if you already know all of this, prove it here. The key is `Ctrl+PgDn`.",
+   "closing": "Built from a feed you had never seen: every figure a live link or a formula, the checks at zero, the print set-up done. || The CFO would have looked at the same things the goals did: green links and black formulas, the price anchored on Inputs, $ only on the first and total rows, a top border on the total, a page that fits one sheet. That's the standard, and you just met it under a clock.",
+   "wow": "You built page one of the pack from a blank sheet on the clock, and the chapter is Verified.",
+   "convention_line": "Inputs blue, formulas black · Links green; external links avoided · One input, one cell; formulas reference it · A units line: \"USD unless stated\" · Hidden columns get forgotten · Keep the timeline and labels in view · Parentheses, never a leading minus · One decimals setting per line · A top border, never an all-borders grid · Merged cells break everything · The check is a live difference → 0 · Fit to page, titles, footer",
    "mac_note": "",
    "story_beat": ""
   },
@@ -463,11 +463,11 @@ export const COPY = {
    "id": "foundations-testout",
    "module": "project-and-assessment",
    "order": "1.8.T",
-   "title": "Test out of Foundations",
-   "brief": "Already know the chapter? A sister cluster’s finished Report arrived with ten faults across everything Foundations covers: the view, the inputs, the feed, the week label, the panes, a hidden column, a number format, a total and a link. Fix all ten in five minutes and the chapter is yours; the key that gets you to each one is `Ctrl+G`.",
-   "closing": "Ten faults across the seven modules of Foundations, found and fixed in one sitting: the page reads clean, every input says so in blue (B1), every link is live and green (B2), and the checks row ties. || That is the chapter: moving without the mouse, marking what is typed, keeping the formulas live, and leaving a page the reader can trust.",
-   "wow": "",
-   "convention_line": "Borders carry structure, not gridlines · Inputs blue, formulas black · Links green; external links avoided · Keep the timeline and labels in view · One decimals setting per line · Go To Special, show formulas, trace · Fit to page, titles, footer",
+   "title": "Test out of Chapter 1",
+   "brief": "Already know all of this? Monday 7:10am. The CFO wants the page before the 9:00: the San Antonio cluster's Week of Sep 22 feed sits on Raw, the Report is blank, and the page is the one the chapter builds (links, totals, margins, daily block, checks, formats and print set-up), on the clock, no help, keyboard only. Pass, and the chapter is yours. The key is `Ctrl+PgDn`.",
+   "closing": "Built from a feed you had never seen: every figure a live link or a formula, the checks at zero, the print set-up done. || That is the chapter: moving without the mouse, marking what is typed, keeping the formulas live, and leaving a page the reader can trust. Chapter 2 starts from here.",
+   "wow": "You built page one of the pack from a blank sheet on the clock, and Chapter 1 is yours.",
+   "convention_line": "Inputs blue, formulas black · Links green; external links avoided · One input, one cell; formulas reference it · A units line: \"USD unless stated\" · Hidden columns get forgotten · Keep the timeline and labels in view · Parentheses, never a leading minus · One decimals setting per line · A top border, never an all-borders grid · Merged cells break everything · The check is a live difference → 0 · Fit to page, titles, footer",
    "mac_note": "",
    "story_beat": ""
   },
@@ -2474,189 +2474,189 @@ export const COPY = {
     "lesson_id": "fit-to-one-page",
     "goal_index": "0",
     "text": "Before you set the page, read how far it runs: jump to the last used cell, Z31, then come back to the top of the sheet.",
-    "teach": "",
+    "teach": "Ctrl+End shows the sheet's extent: if it's further than your table, something stray is out there and it will print. Stray formats on emptied cells are the usual cause: Delete leaves them behind, so clear them with Clear All (Alt, H, E, A, from 1.3.1), save, and Ctrl+Home brings you back to the top.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell Z31 · Ctrl+End, look, Ctrl+Home."
    },
    {
     "lesson_id": "fit-to-one-page",
     "goal_index": "1",
-    "text": "A page wider than it is tall prints landscape: turn the Report with Alt P O L.",
-    "teach": "Page Layout › Orientation, Alt P O then L for landscape or P for portrait, turns the printed page without opening a dialog box.",
+    "text": "A page wider than it is tall prints landscape: turn the Report with Alt, P, O, L.",
+    "teach": "Page Layout › Orientation, Alt, P, O, then L for landscape or P for portrait, turns the printed page without opening a dialog.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the Page Layout tab · Alt, P, O, L."
    },
    {
     "lesson_id": "fit-to-one-page",
     "goal_index": "2",
     "text": "One page, however wide the columns run: open Page Setup, choose Fit to, leave the counts at 1 page wide by 1 tall, and OK it.",
-    "teach": "Page Setup, Alt P S P, holds every print setting on its tabbed pages; F picks Fit to, one page wide by one page tall, and Enter is OK.",
+    "teach": "Page Setup, Alt, P, S, P, holds every print setting on its tabbed pages; Alt+F picks Fit to, one page wide by one tall, and Enter is OK. Fit to one is the default for any page that goes to a reader.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the Page Setup dialog · Alt, P, S, P; Alt+F for Fit to; Enter."
    },
    {
     "lesson_id": "fit-to-one-page",
     "goal_index": "3",
-    "text": "The title, the units line and the header row must top every printed page: set Print Titles to rows 1:4 with Alt P I.",
-    "teach": "Print Titles, Alt P I, opens Page Setup on its Sheet page; the rows typed as Rows to repeat at top, 1:4, print at the top of every page.",
+    "text": "The title, the units line and the header row must top every printed page: set Print Titles to rows 1:4 with Alt, P, I.",
+    "teach": "Print Titles, Alt, P, I, opens Page Setup on its Sheet page; the rows typed as Rows to repeat at top, 1:4, print at the top of every page. On a one-page report it's insurance for the day it grows.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the Sheet tab of Page Setup · Alt, P, I; type 1:4 in Rows to repeat at top; Enter."
    },
    {
     "lesson_id": "fit-to-one-page",
     "goal_index": "4",
-    "text": "A printed page must say which file it came from: on Page Setup’s Header/Footer page (Alt+H), put &[File] in the left footer section.",
-    "teach": "",
+    "text": "A printed page must say which file it came from: on Page Setup's Header/Footer tab, open Custom Footer and put &[File] in the left section.",
+    "teach": "Header/Footer is a tab in Page Setup, and the tabs answer to their first letter as Format Cells' do, so H reaches it; Alt+U opens Custom Footer with the cursor in the left of its three sections, and &[File] is the code for the file name. Every printed page traces back to its file.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the Header/Footer tab · Alt, P, S, P; H for the Header/Footer tab; Alt+U for Custom Footer; type &[File] in the left section; OK, then OK."
    },
    {
     "lesson_id": "fit-to-one-page",
     "goal_index": "5",
     "text": "A printed page must also say when it was printed: on the Header/Footer page, Alt+R moves to the right section; put &[Date] there and OK it.",
-    "teach": "",
+    "teach": "&[Date] prints the date on the day it's printed, so a stale copy on a desk says so. &[Page] of &[Pages] goes in the center on a multi-page pack (the challenge).",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the right footer section · Alt+R in the footer dialog; &[Date]; Enter, Enter."
    },
    {
     "lesson_id": "fit-to-one-page",
     "goal_index": "6",
-    "text": "Does it tie? Watch Cedar Park’s kWh in C9 change to 3,000 and the Total in C11 answer: the print set-up changed nothing on the sheet.",
-    "teach": "",
+    "text": "Does it tie? Change Cedar Park's washes in C9 to 300 and watch the Total in C11 answer: the print set-up changed nothing on the sheet.",
+    "teach": "Print settings live beside the sheet, not in it. Ctrl+F2 shows what the printer will get; Esc comes back.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C11 · C9, 300, Enter; then Ctrl+F2 to see the page, Esc."
    }
   ],
   "the-checks-row": [
    {
     "lesson_id": "the-checks-row",
     "goal_index": "0",
-    "text": "Head a Checks block under the week summary: Checks in A33, bold, then the three check labels in A34:A36 as one Enter run.",
-    "teach": "",
+    "text": "Head a Checks block under the week summary: Checks in A33, bold, then the three check labels in A34:A36 as one Enter-and-↓ run.",
+    "teach": "The labels are Report revenue ties to the feed, Sites sum to the total, and Margin within 0-100%. A check has a name that says what it compares.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell A33 · A33, Ctrl+B, type, Enter, ↓; then each label."
    },
    {
     "lesson_id": "the-checks-row",
     "goal_index": "1",
-    "text": "In B34, take the five linked sites’ revenue D5:D8 and D10 and subtract the feed’s own total, pointing at Raw’s J13 across sheets.",
-    "teach": "A check cell is a live difference between two things that must agree, so it reads 0 when they tie and shows the gap when they do not.",
+    "text": "In B34, take the five linked sites' revenue D5:D8 and D10 and subtract the feed's own total, pointing at Raw's J13 across sheets.",
+    "teach": "=SUM(D5:D8,D10)-Raw!J13: the sum of what the page shows, less what the feed says. Zero means the page and the feed agree. Cedar Park's typed row is left out because the feed doesn't carry it yet.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B34 · B34, =SUM(D5:D8,D10)-, Alt+PgDn to Raw, point at J13, Enter."
    },
    {
     "lesson_id": "the-checks-row",
     "goal_index": "2",
-    "text": "In B35, the six sites’ kWh must sum to the Total row: enter =SUM(C5:C10)-C11, and it reads 0 while the total row is honest.",
-    "teach": "",
+    "text": "In B35, the six sites' washes must sum to the Total row: enter =SUM(C5:C10)-C11, and it reads 0 while the total row is honest.",
+    "teach": "A total that was typed over, or a row inserted below the block, shows up here as a non-zero, which is about as cheap as insurance gets.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B35 · B35, type =SUM(C5:C10)-C11, Enter."
    },
    {
     "lesson_id": "the-checks-row",
     "goal_index": "3",
     "text": "In B36, a margin outside 0 to 100% is a mistake somewhere: enter =IF(AND(H11>=0,H11<=1),0,1), which reads 0 while the margin is plausible.",
-    "teach": "",
+    "teach": "IF and AND arrive properly in Chapter 3; here they make a plausibility check: a margin can't be negative or over 100%, so if it is, the check fires. Sanity checks catch what tie-outs miss.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B36 · B36, type the formula exactly, Enter."
    },
    {
     "lesson_id": "the-checks-row",
     "goal_index": "4",
-    "text": "Give the three checks B34:B36 the figures’ format, comma style with no decimals, so all three read a plain 0.",
-    "teach": "",
+    "text": "Give the three checks B34:B36 the desk number format, so all three read a plain 0 and a failing one would read in parentheses.",
+    "teach": "Ctrl+1, Number, no decimals, the separator, (1,234): that's the desk number format from 1.5.1, and it matters here because a check can go negative, and then it reads (12), never -12. A checks row reads as a column of zeros, so anything else jumps out at you.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cells B34:B36 · Select B34:B36; Ctrl+1; N, Tab, N; Decimal places 0; Use 1000 Separator; (1,234); Enter."
    },
    {
     "lesson_id": "the-checks-row",
     "goal_index": "5",
     "text": "A reviewer will ask what the first check compares: from B34, Ctrl+[ follows the trail to D5, the first revenue figure it reads.",
-    "teach": "",
+    "teach": "Ctrl+[ on a check shows exactly which cells it compares, which answers \"what does this check check?\" in one press, and F5 then Enter brings you back to where you were.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B34 · B34, Ctrl+[; F5, Enter."
    },
    {
     "lesson_id": "the-checks-row",
     "goal_index": "6",
-    "text": "Does it tie? Watch a number typed over Mueller’s revenue link in D6 and the revenue check in B34 leave zero: the break is caught.",
-    "teach": "",
+    "text": "Does it tie? Type a number over Mueller's revenue link in D6 and watch the revenue check in B34 leave zero, then Ctrl+Z.",
+    "teach": "That's the checks row doing its job: a typed number where a link belonged, and the page says so before anyone else does. Undo puts the link back.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell B34 · D6, type 3000, Enter; read B34; Ctrl+Z."
    }
   ],
   "hardcode-hunt": [
    {
     "lesson_id": "hardcode-hunt",
     "goal_index": "0",
-    "text": "Typed numbers hide among the links: select C5:E10, run Go To Special for Constants, and color Cedar Park’s emailed figures blue.",
-    "teach": "The audit pass is three looks: Go To Special for typed numbers among links, show formulas for a number in a formula row, the page for the rest.",
+    "text": "Typed numbers hide among the links: select C5:E10, run Go To Special for Constants, and color Cedar Park's emailed figures blue.",
+    "teach": "The audit pass is three looks: Go To Special for typed numbers among links, show formulas for a number in a formula row, the page for the rest. Alt, H, F, D, S, O, Enter, then Font Color.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse the Go To Special dialog · Select C5:E10; Alt, H, F, D, S; O; Enter; Alt, H, F, C, blue."
    },
    {
     "lesson_id": "hardcode-hunt",
     "goal_index": "1",
-    "text": "E9 multiplies the emailed kWh, so the whole Cedar Park row is marked blue until the feed carries the site: move to E9 and press F4.",
-    "teach": "",
+    "text": "E9 multiplies the emailed washes, so the whole Cedar Park row is marked blue until the feed carries the site: move to E9 and press F4.",
+    "teach": "F4 repeats the color. A formula that reads a typed figure is marked with it, so the reader knows the whole row is provisional.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell E9 · E9, F4."
    },
    {
     "lesson_id": "hardcode-hunt",
     "goal_index": "2",
-    "text": "Mueller’s average price G6 divides by a typed 6850, which Ctrl+` shows at a glance: rewrite it as =D6/C6 by pointing.",
-    "teach": "",
+    "text": "Mueller's average ticket G6 divides by a typed 1425, which Ctrl+` shows at a glance: rewrite it as =D6/C6 by pointing.",
+    "teach": "Ctrl+` shows the literal inside the formula, a number typed where a reference belongs. Rewrite by pointing; the typed number was last week's washes and is already wrong.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell G6 · Ctrl+`; G6, =, ← ← ←, /, ← ← ← ←, Enter; Ctrl+` off."
    },
    {
     "lesson_id": "hardcode-hunt",
     "goal_index": "3",
-    "text": "In the daily table Mueller’s Thursday E18 is a number in a formula row: select B18:G18, F2 on the link in G18, Ctrl+Enter, Ctrl+` off.",
-    "teach": "",
+    "text": "In the daily table Mueller's Thursday E18 is a number in a formula row: select B18:G18, F2 on the link in G18, Ctrl+Enter, Ctrl+` off.",
+    "teach": "Refill the row from its own formula, the fix from 1.6.5. The typed Thursday goes, the pattern returns.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cells B18:G18 · Select B18:G18, F2 on G18, Ctrl+Enter; Ctrl+`."
    },
    {
     "lesson_id": "hardcode-hunt",
     "goal_index": "4",
-    "text": "Prior week rev is hidden between H and J, and a buyer who finds one hidden column looks for more: select H:J and press Ctrl+Shift+).",
-    "teach": "",
+    "text": "Prior week rev is hidden between H and J, and a buyer who finds one hidden column looks for more: select H:J and unhide the column.",
+    "teach": "Hidden columns get found and get you questions. Unhide, and if it should be out of the way, group it.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse columns H:J · Land on H4, Ctrl+Space, Shift+→ twice; Alt, H, O, U, L."
    },
    {
     "lesson_id": "hardcode-hunt",
     "goal_index": "5",
     "text": "The title was centered by typing spaces in front of it: retype it in A1 without them, then center it across A1:I1 with Ctrl+1 then A.",
-    "teach": "",
+    "teach": "Spaces in a title break Find, sorting and every reference to the cell. Retype it clean; Center Across Selection does the centering.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell A1 · A1, type the title, Enter; select A1:I1; Ctrl+1, A, Center Across Selection, Enter."
    },
    {
     "lesson_id": "hardcode-hunt",
     "goal_index": "6",
-    "text": "The units line is gone, so a reader cannot tell which currency the figures are in: in A2 press Ctrl+I, then type USD unless stated.",
-    "teach": "",
+    "text": "The units line is gone, so a reader can't tell which currency the figures are in: in A2 press Ctrl+I, then type USD unless stated.",
+    "teach": "Every page states its currency once. Italic, near the top, exactly that wording.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell A2 · A2, Ctrl+I, type, Enter."
    },
    {
     "lesson_id": "hardcode-hunt",
     "goal_index": "7",
-    "text": "A grid sits over the daily table with gridlines on: select B15:G21, take every border off with Alt H B N, then Alt W V G.",
-    "teach": "",
+    "text": "A grid sits over the daily table with gridlines on: select B15:G21, take every border off with Alt, H, B, N, then Alt, W, V, G.",
+    "teach": "Borders off the block, gridlines off the sheet. A page someone reads has neither; the top border on a total is the only line it needs.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cells B15:G21 · Select B15:G21; Alt, H, B, N; then Alt, W, V, G."
    },
    {
     "lesson_id": "hardcode-hunt",
     "goal_index": "8",
-    "text": "Does it tie? Watch Cedar Park’s kWh in C9 change to 3,000 and the Total in C11 answer: the page is clean and still live.",
-    "teach": "",
+    "text": "Does it tie? Change Cedar Park's washes in C9 to 300 and watch the Total in C11 answer: the page is clean and still live.",
+    "teach": "Eight faults out, nothing else changed, every link still moving. That's a page ready to sign off.",
     "why": "",
-    "hint_stuck": ""
+    "hint_stuck": "pulse cell C11 · C9, 300, Enter."
    }
   ],
   "challenge-audit-before-you-send": [
@@ -2671,7 +2671,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-audit-before-you-send",
     "goal_index": "1",
-    "text": "Cedar Park’s emailed figures sit black among the green links: Go To Special constants over C5:D10 finds them; color them blue.",
+    "text": "Cedar Park's emailed figures sit black among the green links: Go To Special constants over C5:D10 finds them; color them blue.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2679,7 +2679,7 @@ export const COPY = {
    {
     "lesson_id": "challenge-audit-before-you-send",
     "goal_index": "2",
-    "text": "Show formulas: one Avg price cell divides by a typed kWh figure, so rewrite G5:G10 as one formula, =D5/C5, with Ctrl+Enter.",
+    "text": "Show formulas: one Avg ticket cell divides by a typed wash figure, so rewrite G5:G10 as one formula, =D5/C5, with Ctrl+Enter.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2713,7 +2713,7 @@ export const COPY = {
    {
     "lesson_id": "weekly-kpi-project",
     "goal_index": "0",
-    "text": "Give the page its title in A1, bold and one size up, and the units line USD unless stated in A2 in italic.",
+    "text": "In A1 type \"Clearcoat - Austin Weekly KPI Report, Week of Sep 22, 2026\", bold and one size up; A2 italic: USD unless stated.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2729,7 +2729,7 @@ export const COPY = {
    {
     "lesson_id": "weekly-kpi-project",
     "goal_index": "2",
-    "text": "Copy the five site names from Inputs A9:A13 into A5:A9, then type the week label w/c 22 Sep in B5 and fill it down to B9.",
+    "text": "Copy the five site names from Inputs A18:A22 into A5:A9, then type Week of Sep 22 in B5 and fill it down to B9.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2737,7 +2737,7 @@ export const COPY = {
    {
     "lesson_id": "weekly-kpi-project",
     "goal_index": "3",
-    "text": "Point C5 and D5 at Raw’s I8 and J8 across sheets, E5 at C5 × the wholesale price on Inputs anchored, all three green.",
+    "text": "Point C5 and D5 at Raw's I8 and J8 across sheets, E5 at C5 × the cost per wash on Inputs anchored, all three green.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2745,7 +2745,7 @@ export const COPY = {
    {
     "lesson_id": "weekly-kpi-project",
     "goal_index": "4",
-    "text": "Point Domain’s gross profit F5 =D5-E5, average price G5 =D5/C5 and margin H5 =F5/D5, one after another with Tab.",
+    "text": "Point Domain's gross profit F5 =D5-E5, average ticket G5 =D5/C5 and margin H5 =F5/D5, one after another with Tab.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2753,7 +2753,7 @@ export const COPY = {
    {
     "lesson_id": "weekly-kpi-project",
     "goal_index": "5",
-    "text": "Row 5 is the page’s one formula row: select C5:H9 with Ctrl+Shift+End and fill it down the five sites with Ctrl+D.",
+    "text": "Row 5 is the page's one formula row: select C5:H9 and fill it down the five sites with Ctrl+D.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2769,7 +2769,7 @@ export const COPY = {
    {
     "lesson_id": "weekly-kpi-project",
     "goal_index": "7",
-    "text": "Format C5:F10 comma style with no decimals, G5:G10 currency 2, H5:H10 percent 1, then currency 0 on D5:F5 and again on D10:F10 with F4.",
+    "text": "Format C5:F10 in the desk number format, G5:G10 currency 2, H5:H10 percent 1 italic, then currency 0 on D5:F5 and again on D10:F10 with F4.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2777,7 +2777,7 @@ export const COPY = {
    {
     "lesson_id": "weekly-kpi-project",
     "goal_index": "8",
-    "text": "The Total row is bold with a top border, never a grid: select the whole row 10 with Shift+Space, Ctrl+B, then Alt H B P.",
+    "text": "The Total row is bold with a top border, never a grid: select the whole row 10 with Shift+Space, Ctrl+B, then Alt, H, B, P.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2785,7 +2785,7 @@ export const COPY = {
    {
     "lesson_id": "weekly-kpi-project",
     "goal_index": "9",
-    "text": "Head the daily block: A12 kWh sold by day bold, A13:G13 Site and Mon to Sat bold with the days right-aligned, A14:A18 the sites indented.",
+    "text": "Head the daily block: A12 Washes by day bold, A13:G13 Site and Mon to Sat bold with the days right-aligned, A14:A18 the sites indented.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2793,7 +2793,7 @@ export const COPY = {
    {
     "lesson_id": "weekly-kpi-project",
     "goal_index": "10",
-    "text": "Select A13:G18, Go To Special for Blanks, point one link at Raw’s I32 and Ctrl+Enter fills all thirty cells; comma 0, green.",
+    "text": "Select A13:G18, Go To Special for Blanks, point one link at Raw's I32 and Ctrl+Enter fills all thirty cells; desk number format, green.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2801,7 +2801,7 @@ export const COPY = {
    {
     "lesson_id": "weekly-kpi-project",
     "goal_index": "11",
-    "text": "Head a Checks block at A20 with its three labels, then the three checks in B21:B23 reading 0, the first pointed at Raw’s J13, comma 0.",
+    "text": "Head a Checks block at A20, three labels indented; B21:B23 hold the checks, reading 0 in the desk format, the first pointed at Raw's J13.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2825,7 +2825,7 @@ export const COPY = {
    {
     "lesson_id": "weekly-kpi-project",
     "goal_index": "14",
-    "text": "Does it tie? Watch Domain’s Monday kWh on Raw change to 3,000 and the Total in C10 answer while the checks in B21:B23 stay zero.",
+    "text": "Does it tie? Change Domain's Monday washes on Raw to 300 and watch the Total in C10 answer while the checks in B21:B23 stay zero.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2835,7 +2835,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-assessment",
     "goal_index": "0",
-    "text": "A1: Voltline - City Weekly KPI Report, w/c 22 Sep 2026, with the city as Costs A1 names it; A2: USD unless stated.",
+    "text": "In A1 type \"Clearcoat - San Antonio Weekly KPI Report, Week of Sep 22, 2026\", bold, larger, centered A1:H1; A2 italic USD unless stated.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2843,7 +2843,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-assessment",
     "goal_index": "1",
-    "text": "Row 4, bold: Site, Week, kWh sold, Revenue ($), Energy cost ($), Gross profit ($), Avg price ($/kWh), Margin % across A4:H4.",
+    "text": "Row 4, the eight headers Site through Margin % as one Tab run, bold, with C4:H4 right-aligned and wrapped.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2851,7 +2851,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-assessment",
     "goal_index": "2",
-    "text": "The five sites from Inputs A9:A13 into A5:A9, and the week label w/c 22 Sep in B5:B9.",
+    "text": "Copy the five sites from Inputs A18:A22 into A5:A9 with paste by Enter; the week labels in B5:B9 are last week's for now.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2859,7 +2859,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-assessment",
     "goal_index": "3",
-    "text": "kWh sold and revenue C5:D9 as live links to Raw’s site totals I8:J12, pointed across sheets.",
+    "text": "Washes and revenue C5:D9 as live links to Raw's site totals I8:J12, pointed across sheets, and colored green.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2867,7 +2867,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-assessment",
     "goal_index": "4",
-    "text": "Energy cost E5:E9 is kWh times the wholesale price, =C5*Inputs!$B$4 anchored, then color every link C5:E9 green.",
+    "text": "Wash cost E5:E9 is washes times the cost per wash: =C5*Inputs!$B$4, anchored with F4, committed into all five with Ctrl+Enter, green.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2875,7 +2875,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-assessment",
     "goal_index": "5",
-    "text": "F5:F9 =D5-E5, G5:G9 =D5/C5, H5:H9 =F5/D5 filled down; Total in A10, C10:F10 by AutoSum, G10 =D10/C10, H10 =F10/D10.",
+    "text": "F5:F9 =D5-E5, G5:G9 =D5/C5, H5:H9 =F5/D5 by pointing and filled down; Total in A10; C10:F10 by one AutoSum; G10 =D10/C10; H10 =F10/D10.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2883,7 +2883,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-assessment",
     "goal_index": "6",
-    "text": "Daily block: kWh sold by day in A12, Site and Mon–Sat bold in row 13, sites indented in A14:A18, B14:G18 green links to Raw’s by-day block.",
+    "text": "A sixth site opened, its figures on Inputs row 26: insert a row above Medical Center, type name and figures in blue, fill F9:H9 down.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2891,7 +2891,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-assessment",
     "goal_index": "7",
-    "text": "Checks in A20, bold; the three labels A21:A23; B21 =D10-Raw!J13, B22 =SUM(C5:C9)-C10, B23 =IF(AND(H10>=0,H10<=1),0,1), all reading 0.",
+    "text": "The stale Old code column at I is the old system's: delete the whole column.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2899,7 +2899,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-assessment",
     "goal_index": "8",
-    "text": "Number formats: C5:F10, B14:G18 and B21:B23 comma 0; G5:G10 currency 2; H5:H10 percent 1; D5:F5 and D10:F10 currency 0.",
+    "text": "Washes by day in A13 and Site, Mon to Sat in row 14, all bold; sites indented in A15:A19; B15:G19 green links to Raw's by-day block.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2907,7 +2907,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-assessment",
     "goal_index": "9",
-    "text": "Style: total row bold, top border; title bold, a size up, centered across A1:H1; A2 italic; C4:H4 wrapped; C4:H4 and B13:G13 right-aligned.",
+    "text": "Checks in A21, bold; labels A22:A24; B22 =SUM(D5:D8,D10)-Raw!J13, B23 =SUM(C5:C10)-C11, B24 =IF(AND(H11>=0,H11<=1),0,1), all reading 0.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2915,7 +2915,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-assessment",
     "goal_index": "10",
-    "text": "Widths: B:F 12, G:H 14, column A AutoFit to the sites, row 4 AutoFit; freeze panes at B5; gridlines off.",
+    "text": "Desk number format on C5:F11, B15:G19 and B22:B24; G5:G11 currency 2; H5:H11 percent 1, italic; D5:F5 and D11:F11 currency 0.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2923,7 +2923,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-assessment",
     "goal_index": "11",
-    "text": "Page setup: landscape, fit to one page, rows 1:4 as print titles, &[File] in the left footer and &[Date] in the right.",
+    "text": "Style: total row 11 bold with a top border and no grid; C4:H4 and B14:G14 right-aligned; nothing merged anywhere.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2931,7 +2931,39 @@ export const COPY = {
    {
     "lesson_id": "foundations-assessment",
     "goal_index": "12",
-    "text": "Does it tie? Watch the first site’s Monday kWh on Raw change to 3,000 and the Report’s total in C10 answer while the checks stay zero.",
+    "text": "Widths: B:F 12, G:H 14, column A AutoFit to the sites, row 4 AutoFit; the working columns E:F grouped, not hidden.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "13",
+    "text": "Freeze panes at B5; gridlines off.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "14",
+    "text": "Replace All on the Report: every Week of Sep 15 becomes Week of Sep 22; read the count.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "15",
+    "text": "Page setup: landscape, fit to one page, rows 1:4 as print titles, &[File] in the left footer and &[Date] in the right.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-assessment",
+    "goal_index": "16",
+    "text": "Does it tie? Change the first site's Monday washes on Raw to 300 and watch the Report's total in C11 answer while the checks stay zero.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2941,7 +2973,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-testout",
     "goal_index": "0",
-    "text": "The Report shows its gridlines: turn them off, as a page someone reads should be.",
+    "text": "In A1 type \"Clearcoat - San Antonio Weekly KPI Report, Week of Sep 22, 2026\", bold, larger, centered A1:H1; A2 italic USD unless stated.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2949,7 +2981,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-testout",
     "goal_index": "1",
-    "text": "Every week label on the Report still reads w/c 08 Sep: replace all of them with w/c 15 Sep in one pass.",
+    "text": "Row 4, the eight headers Site through Margin % as one Tab run, bold, with C4:H4 right-aligned and wrapped.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2957,7 +2989,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-testout",
     "goal_index": "2",
-    "text": "The panes are unfrozen, so the headers scroll away: freeze them at B5 so rows 1–4 and column A stay in view.",
+    "text": "Copy the five sites from Inputs A18:A22 into A5:A9 with paste by Enter; the week labels in B5:B9 are last week's for now.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2965,7 +2997,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-testout",
     "goal_index": "3",
-    "text": "The second site’s revenue in D6 is a typed number where its link belongs: make it =Raw!J9 again.",
+    "text": "Washes and revenue C5:D9 as live links to Raw's site totals I8:J12, pointed across sheets, and colored green.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2973,7 +3005,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-testout",
     "goal_index": "4",
-    "text": "The average prices in G5:G11 lost their format: show them as currency with two decimals.",
+    "text": "Wash cost E5:E9 is washes times the cost per wash: =C5*Inputs!$B$4, anchored with F4, committed into all five with Ctrl+Enter, green.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2981,7 +3013,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-testout",
     "goal_index": "5",
-    "text": "Margin % is hidden between G and I: select G:I and unhide it.",
+    "text": "F5:F9 =D5-E5, G5:G9 =D5/C5, H5:H9 =F5/D5 by pointing and filled down; Total in A10; C10:F10 by one AutoSum; G10 =D10/C10; H10 =F10/D10.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2989,7 +3021,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-testout",
     "goal_index": "6",
-    "text": "The gross-profit total in F11 was retyped as a number: make it =SUM(F5:F10) again.",
+    "text": "A sixth site opened, its figures on Inputs row 26: insert a row above Medical Center, type name and figures in blue, fill F9:H9 down.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -2997,7 +3029,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-testout",
     "goal_index": "7",
-    "text": "On Inputs the wholesale price in B4 is an input shown black: color it blue.",
+    "text": "The stale Old code column at I is the old system's: delete the whole column.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3005,7 +3037,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-testout",
     "goal_index": "8",
-    "text": "On Costs the typed figures in B4:D8 read black: select the constants with Go To Special and color them blue.",
+    "text": "Washes by day in A13 and Site, Mon to Sat in row 14, all bold; sites indented in A15:A19; B15:G19 green links to Raw's by-day block.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3013,7 +3045,7 @@ export const COPY = {
    {
     "lesson_id": "foundations-testout",
     "goal_index": "9",
-    "text": "On Raw the site name in B14 has a doubled last letter: open it and remove the extra letter.",
+    "text": "Checks in A21, bold; labels A22:A24; B22 =SUM(D5:D8,D10)-Raw!J13, B23 =SUM(C5:C10)-C11, B24 =IF(AND(H11>=0,H11<=1),0,1), all reading 0.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3021,7 +3053,55 @@ export const COPY = {
    {
     "lesson_id": "foundations-testout",
     "goal_index": "10",
-    "text": "Does it tie? Watch the first site’s Monday on Raw change to 3,000 and the Total in C11 answer, with the checks below still reading zero.",
+    "text": "Desk number format on C5:F11, B15:G19 and B22:B24; G5:G11 currency 2; H5:H11 percent 1, italic; D5:F5 and D11:F11 currency 0.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "11",
+    "text": "Style: total row 11 bold with a top border and no grid; C4:H4 and B14:G14 right-aligned; nothing merged anywhere.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "12",
+    "text": "Widths: B:F 12, G:H 14, column A AutoFit to the sites, row 4 AutoFit; the working columns E:F grouped, not hidden.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "13",
+    "text": "Freeze panes at B5; gridlines off.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "14",
+    "text": "Replace All on the Report: every Week of Sep 15 becomes Week of Sep 22; read the count.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "15",
+    "text": "Page setup: landscape, fit to one page, rows 1:4 as print titles, &[File] in the left footer and &[Date] in the right.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "foundations-testout",
+    "goal_index": "16",
+    "text": "Does it tie? Change the first site's Monday washes on Raw to 300 and watch the Report's total in C11 answer while the checks stay zero.",
     "teach": "",
     "why": "",
     "hint_stuck": ""
@@ -3697,14 +3777,14 @@ export const COPY = {
    "id": "present-and-audit",
    "name": "Present and audit",
    "objective": "The KPI page checked, print-ready and signed off: page one of the pack.",
-   "story_beat": "Sign the page off. || The buyer’s analyst opens page one first. Check the totals tie, the conventions hold, the print fits one page, and nothing is hardcoded that should not be. Then it goes in the pack.",
+   "story_beat": "Sign it off. || The CFO signs this page off and it goes into the data room as the company's current trading, the first thing a buyer's analyst opens. Check that the totals tie, that the conventions hold, that it prints on one page, and that nothing's typed where a link belongs. Then it goes in the pack.",
    "page_name": "Page one of the pack"
   },
   "project-and-assessment": {
    "id": "project-and-assessment",
-   "name": "Project, assessment, test-out",
-   "objective": "Build the weekly report end to end, then prove it against the clock; or test out of the chapter.",
-   "story_beat": "Management’s next feed is in. || A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.",
+   "name": "Project and assessment",
+   "objective": "Build the weekly report end to end, then prove it against the clock; the assessment is the test-out.",
+   "story_beat": "The CFO's next feed just landed. || New week, new feed, and nothing left to learn. You know every move this page needs. Time to execute: build it start to finish, then build it again on the clock. If you already knew all of this, the assessment is the test-out: pass it and the chapter is yours.",
    "page_name": "The weekly KPI report"
   },
   "number-formats": {

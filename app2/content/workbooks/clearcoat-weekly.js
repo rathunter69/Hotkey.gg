@@ -682,7 +682,7 @@ export function buildReport(state, { title = REPORT_TITLE_NEXT, week = WEEK_NEXT
   c['G' + t] = { formula: `=D${t}/C${t}`, fmtStyle: 'currency', decimals: 2 };
   c['H' + t] = { formula: `=F${t}/D${t}`, fmtStyle: 'percent', decimals: 1, it: true };
   for (const ref of ['D' + first, 'E' + first, 'F' + first, 'D' + t, 'E' + t, 'F' + t]) c[ref] = { ...c[ref], fmtStyle: 'currency', decimals: 0 };   // D4
-  each(c, span('A', 'H', t, t), x => { x.bold = true; x.bt = true; });   // D5: the total row bold with a top border
+  each(c, span('A', 'Z', t, t), x => { x.bold = true; x.bt = true; });   // D5: the total row bold with a top border (the whole row, Shift+Space, as S5b marks it)
   // the daily block: this week's washes by site and day, linked to Raw's by-day block, one formula filled across and down
   c['A' + R.dailyTitleRow] = { value: 'Washes by day', bold: true };
   c['A' + R.dailyHeaderRow] = { value: 'Site', bold: true };
@@ -745,8 +745,8 @@ export function sessionToState(ses) {
       return { name: e.name, cells: S.cells, colW, rowH, gridlines: S.gridlines === false ? false : undefined,
         hiddenRows: [...S.hiddenRows], hiddenCols: [...S.hiddenCols], freeze: { ...S.freeze }, groups: S.groups, condFmt: S.condFmt };
     }),
-    settings: { calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat.slice(), pageSetup: clone(ses.settings.pageSetup),
-      ...(ses.settings.enterMoves === false ? { enterMoves: false } : {}) },
+    settings: { calcMode: ses.settings.calcMode, iterative: ses.settings.iterative, qat: ses.settings.qat.slice(),
+      ...(ses.settings.enterMoves === false ? { enterMoves: false } : {}), pageSetup: clone(ses.settings.pageSetup) },   // the states' key order (S1c sets enterMoves, S7a adds pageSetup): diffStates compares by JSON
     ...(ses.names && Object.keys(ses.names).length ? { names: { ...ses.names } } : {}),
   };
 }

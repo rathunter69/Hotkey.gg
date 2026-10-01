@@ -162,7 +162,8 @@ test('every module lesson\'s solution replays to exactly its after state', () =>
     run.run(l.solution);
     assert.ok(run.finished, `${l.id}: solution finishes`);
     const after = workbookState(l.workbook, l.state.after);
-    const diff = diffStates(sessionToState(run.session), after);
+    const wb = WORKBOOKS[l.workbook] || {};   // the workbook's own extractor and differ (a clearcoat state carries settings voltline's never did)
+    const diff = (wb.diffStates || diffStates)((wb.sessionToState || sessionToState)(run.session), after);
     assert.deepEqual(diff, [], `${l.id}: the solution leaves exactly ${l.state.after} — extra diffs: ${JSON.stringify(diff.slice(0, 4))}`);
   }
 });

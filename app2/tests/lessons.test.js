@@ -169,12 +169,14 @@ test('the adaptive lesson format is enforced', () => {
   assert.ok(validateLesson(readShort).some(e => /read must be two or three sentences/.test(e)));
   const noTeach = { ...base, goals: base.goals.map((g, i) => (i === 0 ? { ...g, teach: undefined } : g)) };
   assert.ok(validateLesson(noTeach).some(e => /goal ctrl-down: introduces ctrl-arrow and needs a one-line teach/.test(e)));
-  const extraTeach = { ...base, goals: base.goals.map((g, i) => (i === 1 ? { ...g, teach: 'Ctrl+→ jumps right.' } : g)) };
-  assert.ok(validateLesson(extraTeach).some(e => /goal ctrl-right: reuses taught concepts only/.test(e)));
+  const extraTeach = { ...base, goals: base.goals.map((g, i) => (i === 1 ? { ...g, teach: 'Ctrl+→ jumps right. It stops at the edge of the data.' } : g)) };
+  assert.deepEqual(validateLesson(extraTeach), [], 'a reuse goal may carry a teach line of up to three sentences (M28)');
+  const longTeach = { ...base, goals: base.goals.map((g, i) => (i === 1 ? { ...g, teach: 'One. Two. Three. Four.' } : g)) };
+  assert.ok(validateLesson(longTeach).some(e => /goal ctrl-right: teach must be one to three sentences/.test(e)));
   const twoSentences = { ...base, goals: base.goals.map((g, i) => (i === 0 ? { ...g, text: 'Move down. Then stop.' } : g)) };
   assert.ok(validateLesson(twoSentences).some(e => /goal ctrl-down: the action must be one sentence/.test(e)));
   const noStop = { ...base, goals: base.goals.map((g, i) => (i === 0 ? { ...g, teach: 'Ctrl+↓ jumps to the edge of the data' } : g)) };
-  assert.ok(validateLesson(noStop).some(e => /goal ctrl-down: teach must be one sentence ending in a full stop/.test(e)));
+  assert.ok(validateLesson(noStop).some(e => /goal ctrl-down: teach must be one to three sentences ending in a full stop/.test(e)));
   assert.equal(sentenceCount('Numbers like 1,200.00 and 5.0% are not sentence ends. This is the second.'), 2);
   for (const l of LESSONS) {
     assert.ok(!/\b(awesome|super|easy peasy|magic|wow|gonna|kinda)\b/i.test(l.read + l.goals.map(g => (g.teach || '') + g.text).join(' ')), `${l.id}: tone`);
