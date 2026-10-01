@@ -79,8 +79,8 @@ const PROGRESS = { lessons: {
  * which is also true of a learner in 1.2. Times sit around the pars; tiers come from the real rule.
  */
 function boardRecords() {
-  const runs = { 'weekly-sales-report': [24.6, 27.9, 34.2], 'edge-jumps': [3.48, 3.91, 4.62], 'go-anywhere': [7.84, 9.16], 'select-blocks': [2.71, 3.35, 3.9],
-    'type-the-column': [12.6, 14.4], 'find-and-fix': [17.9, 22.3], 'fill-factory': [13.8, 15.2, 19.7], 'row-wrangler': [11.5, 13.1] };
+  const runs = { 'weekly-sales-report': [96.4, 118.7, 151.2], 'get-around': [31.8, 38.6, 47.3], 'enter-and-fill': [48.2, 57.9], 'find-and-fix': [32.5, 40.1, 52.6],
+    'paste-surgeon': [61.4, 74.8], 'row-wrangler': [32.9, 39.7], 'format-the-weekly-page': [64.3, 79.6, 102.5], 'before-you-send': [63.7, 81.2] };
   const attempts = []; const pbs = {}; let n = 0;
   for (const [ref, times] of Object.entries(runs)) {
     const d = drillById(ref);
@@ -150,10 +150,10 @@ const CLIPS = {
     await k.hold(650); k.poster(); await k.hold(450);
   } },
   // Drills: the start card, the key that starts the clock, the run, the result card.
-  drill: { route: '#/drill/edge-jumps', vp: [1280, 800], scale: 0.625, ready: '.start-card', async drive(k) {
+  drill: { route: '#/drill/get-around', vp: [1280, 800], scale: 0.625, ready: '.start-card', async drive(k) {
     await k.hold(1300);
     await k.press('Space', 450);
-    await k.play('Ctrl+Down Ctrl+Right', 480); await k.press('Ctrl+G', 520); await k.play('"B40"', 60, 90); await k.hold(300);
+    await k.play('Ctrl+Down Ctrl+Right', 480); await k.press('Ctrl+G', 520); await k.play('"B25"', 60, 90); await k.hold(300);
     k.poster(); await k.press('Enter', 520); await k.press('Ctrl+Home', 0);
     await k.hold(2600);
   } },

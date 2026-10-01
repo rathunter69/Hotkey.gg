@@ -49,7 +49,7 @@ export default {
   },
   goals: [
     { id: 'title', text: 'Bold the title in A1 and take it one size up.', keys: 'Ctrl+B Alt H F G', check: s => like(s, ['A1'], ['bold', 'fsz']) },
-    { id: 'across', text: 'Center the title across A1:E1, never merged.', keys: 'Ctrl+G "A1:E1" ↵ Ctrl+1 A', check: s => s.cellAt('A1').ca === 5 },
+    { id: 'across', text: 'Center the title across A1:E1, never merged.', keys: 'Ctrl+G "A1:E1" ↵ Ctrl+1 A Alt+H ↓ ×4 ↵', check: s => s.cellAt('A1').ca === 5 },
     { id: 'units', text: `Type the units line, ${UNITS}, into A2 in italics.`, keys: `Ctrl+G "A2" ↵ Ctrl+I "${UNITS}" ↵`,
       check: s => s.value('A2') === UNITS && s.cellAt('A2').it === true },
     { id: 'headers', text: 'Bold the headers A4:E4 and right-align B4:E4 over their figures.', keys: 'Ctrl+G "A4:E4" ↵ Ctrl+B Ctrl+G "B4:E4" ↵ Alt H A R',
@@ -58,9 +58,9 @@ export default {
       check: s => R.every(r => near(s.value('E' + r), s.value('C' + r) - s.value('D' + r)) && live(s, 'E' + r)) },
     { id: 'total', text: 'Type Total into A10 and AutoSum B10:E10.', keys: 'Ctrl+G "A10" ↵ "Total" ↵ Ctrl+G "B5:E10" ↵ Alt+=',
       check: s => s.value('A10') === 'Total' && ['B', 'C', 'D', 'E'].every(col => near(s.value(col + 10), sum(s, col)) && live(s, col + 10)) },
-    { id: 'format', text: 'Give the figures B5:E10 the desk number format with Ctrl+1.', keys: 'Ctrl+1 N',
+    { id: 'format', text: 'Give the figures B5:E10 the desk number format with Ctrl+1.', keys: 'Ctrl+1 N Tab N Alt+D 0 Alt+U Alt+N ↓ ↓ ↵',
       check: s => refsIn('B5:E10').every(ref => ['comma', 'currency'].includes(s.cellAt(ref).fmtStyle) && !s.cellAt(ref).decimals) },
-    { id: 'dollars', text: 'Put the $ on the first and total rows only: C5:E5 and C10:E10.', keys: 'Ctrl+G "C5:E5" ↵ Ctrl+1 C Ctrl+G "C10:E10" ↵ Ctrl+1 C',
+    { id: 'dollars', text: 'Put the $ on the first and total rows only: C5:E5 and C10:E10.', keys: 'Ctrl+G "C5:E5" ↵ Ctrl+1 N Tab C Alt+D 0 Alt+N ↓ ↓ ↓ ↑ ↵ Ctrl+G "C10:E10" ↵ F4',
       check: s => like(s, refsIn('B5:E10'), numFmt) },
     { id: 'blue', text: 'Color the typed figures B5:D9 blue.', keys: 'Ctrl+G "B5:D9" ↵ Alt H F C → ×4 ↵', check: s => refsIn('B5:D9').every(ref => s.cellAt(ref).fontColor === 'blue') },
     { id: 'rule', text: 'Bold the Total row A10:E10 and give it a top border.', keys: 'Ctrl+G "A10:E10" ↵ Ctrl+B Alt H B P', check: s => like(s, refsIn('A10:E10'), ['bold', 'bt']) },
@@ -70,10 +70,10 @@ export default {
   endState: [
     { text: 'The totals still add the five sites', check: s => ['B', 'C', 'D', 'E'].every(col => near(s.value(col + 10), sum(s, col)) && live(s, col + 10)) },
   ],
-  solution: 'Ctrl+B Alt H F G Ctrl+G "A1:E1" Enter Ctrl+1 A Ctrl+G "A2" Enter Ctrl+I "USD unless stated" Enter Ctrl+G "A4:E4" Enter Ctrl+B Ctrl+G "B4:E4" Enter Alt H A R '
-    + 'Ctrl+G "E5:E9" Enter "=C5-D5" Ctrl+Enter Ctrl+G "A10" Enter "Total" Enter Ctrl+G "B5:E10" Enter Alt+= Ctrl+1 N Ctrl+G "C5:E5" Enter Ctrl+1 C Ctrl+G "C10:E10" Enter Ctrl+1 C '
+  solution: 'Ctrl+B Alt H F G Ctrl+G "A1:E1" Enter Ctrl+1 A Alt+H Down Down Down Down Enter Ctrl+G "A2" Enter Ctrl+I "USD unless stated" Enter Ctrl+G "A4:E4" Enter Ctrl+B Ctrl+G "B4:E4" Enter Alt H A R '
+    + 'Ctrl+G "E5:E9" Enter "=C5-D5" Ctrl+Enter Ctrl+G "A10" Enter "Total" Enter Ctrl+G "B5:E10" Enter Alt+= Ctrl+1 N Tab N Alt+D 0 Alt+U Alt+N Down Down Enter Ctrl+G "C5:E5" Enter Ctrl+1 N Tab C Alt+D 0 Alt+N Down Down Down Up Enter Ctrl+G "C10:E10" Enter F4 '
     + 'Ctrl+G "B5:D9" Enter Alt H F C Right Right Right Right Enter Ctrl+G "A10:E10" Enter Ctrl+B Alt H B P Ctrl+G "B5" Enter Alt W F F Alt W V G',
-  optimalKeys: 155,
+  optimalKeys: 179,
   route: 90,
   pars: parsFromRoute(90),
 };

@@ -43,7 +43,7 @@ export default {
   sheet: start,
   sheets: [{ name: 'Washes' }],
   goals: [
-    { id: 'days', text: 'Fill the day names across C4:G4 from Mon in B4 with Fill Series.', keys: 'Ctrl+G "B4:G4" ↵ Alt H F I S ↵',
+    { id: 'days', text: 'Fill the day names across C4:G4 from Mon in B4 with Fill Series, AutoFill.', keys: 'Ctrl+G "B4:G4" ↵ Alt H F I S Alt+F ↵',
       check: s => DAY_NAMES.slice(1).every((d, i) => s.value(String.fromCharCode(67 + i) + '4') === d) },
     { id: 'saturday', text: `Type Saturday's washes down G5:G8, Enter after each: ${sat.join(', ')}.`, keys: `Ctrl+G "G5" ↵ ${sat.map(v => `"${v}" ↵`).join(' ')}`,
       check: s => sat.every((v, i) => s.value('G' + (5 + i)) === v) },
@@ -60,9 +60,9 @@ export default {
     { id: 'target-week', text: `Copy the Week formula from H9 into H${T}.`, keys: `Ctrl+G "H9" ↵ Ctrl+C Ctrl+G "H${T}" ↵ Ctrl+V`,
       check: s => near(s.value('H' + T), rowSum(s, T)) && live(s, 'H' + T) },
   ],
-  solution: `Ctrl+G "B4:G4" Enter Alt H F I S Enter Ctrl+G "G5" Enter ${sat.map(v => `"${v}" Enter`).join(' ')} Ctrl+G "B9" Enter ${airport.map(v => `"${v}"`).join(' Tab ')} Enter `
+  solution: `Ctrl+G "B4:G4" Enter Alt H F I S Alt+F Enter Ctrl+G "G5" Enter ${sat.map(v => `"${v}" Enter`).join(' ')} Ctrl+G "B9" Enter ${airport.map(v => `"${v}"`).join(' Tab ')} Enter `
     + `Ctrl+G "D6:E6" Enter "0" Ctrl+Enter Ctrl+G "B7" Enter F2 Backspace Enter Ctrl+G "H5:H9" Enter Ctrl+D Ctrl+G "B${T}:G${T}" Enter Ctrl+R Ctrl+G "H9" Enter Ctrl+C Ctrl+G "H${T}" Enter Ctrl+V`,
-  optimalKeys: 106,
+  optimalKeys: 107,
   route: 45,
   pars: parsFromRoute(45),
 };

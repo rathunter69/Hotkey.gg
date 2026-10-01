@@ -20,7 +20,7 @@ export const DRIFT_LESSONS = new Map(Object.entries({
   'the-four-section-format': 'picker', 'units-in-the-format': 'picker', 'dynamic-headers-with-text': 'picker',
   'conditional-codes-and-hidden-zeros': 'picker', 'challenge-house-format-set': 'picker', 'remix-format-on-the-pnl': 'picker',
 }));
-export const DRIFT_DRILLS = new Map(Object.entries({ 'format-cells-numbers': 'picker', 'weekly-sales-report': 'picker' }));
+export const DRIFT_DRILLS = new Map();   // empty since M108: every Chapter 1 drill replays on the R1 engine
 export const DRIFT_MICRO = new Map(Object.entries({ 'fill-series': 'series', 'number-formats': 'picker', 'center-across': 'picker', 'f4-repeat': 'picker' }));
 /** node:test's skip option for an id: false, or the reason. */
 export const driftSkip = (map, id) => (map.has(id) ? 'known drift (' + map.get(id) + '): content awaits its rewrite' : false);
