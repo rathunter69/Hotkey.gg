@@ -347,6 +347,7 @@ export class Sheet {
     this.hiddenRows = new Set(); this.hiddenCols = new Set();
     this.filter = null;                    // the AutoFilter (Ctrl+Shift+L): { r1, c1, r2, c2, crit: { [col]: criterion } }; the header row is r1
     this.filterRows = new Set();           // the rows the AutoFilter hides (apart from hiddenRows: Unhide does not show them, SUBTOTAL 101+ skips them)
+    this.validation = null;                // Data Validation rules by cell key: { allow, data, min, max, source, inCell, ignoreBlank, errTitle, errMsg, errStyle, inTitle, inMsg }
     this.freeze = { r: 0, c: 0 };          // rows/cols frozen above/left of the seam (0 = none)
     this.groups = { rows: [], cols: [] };  // the outline (C2 gap 4): [{r1,r2,collapsed}] / [{c1,c2,collapsed}], one level
     this.condFmt = [];                     // conditional formatting rules in priority order (normCondFmt)

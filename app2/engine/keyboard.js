@@ -36,7 +36,7 @@ import { evalFormula, formulaRefs, translateFormula, parses, valueText, AUTOCOMP
 import { serialToDate } from './format.js';
 import { builtinCode } from './numfmt.js';
 import { installDialogs, tabStepOf, isValidName } from './dialogs.js';
-import { installTools, TOOL_DIALOGS, TOOL_TYPED } from './tools.js';
+import { installTools, TOOL_DIALOGS, TOOL_TYPED, TABLE_CELL_NOTE } from './tools.js';
 import { CalcGraph } from './calc.js';
 import { refKey, parseRef, parseRange, rangeText, colLetter as colLetterOf } from './refs.js';
 import { stepPath, PASTE_OPTS, PASTE_OP_OPTS, QAT_COMMANDS, QAT_DEFAULT, POPULAR_COMMANDS, OPTIONS_LIVE_PAGES } from './ribbon.js';
@@ -370,6 +370,9 @@ export class Session {
     const cls = Sheet.classifyInput(buf, S.get(r, c), S.today);
     if (cls.kind === 'fix') { this.fxfixPend = { fixed: cls.fixed, dr, dc, all: false, via: via || null }; this.dialog = 'fxfix'; return false; }
     if (cls.kind === 'bad') { this.refuse(); return false; }
+    const dv = this.validationCheck(r, c, cls);   // Data Validation: the entry fails the cell's rule: Excel's alert, Retry (keeps the editor) or Cancel
+    if (dv) { this.dvPend = dv; this.dialog = 'dvalert'; this.logKey('⚠'); if (this.opts.onRefuse) this.opts.onRefuse(); return false; }
+    if (S.get(r, c).table) { this.toast(TABLE_CELL_NOTE); this.logKey('⚠'); return false; }   // part of a data table: Excel refuses the entry
     this.editing = false; this.editBuf = ''; this.editAnchor = null; this.endPoint();
     if (cls.kind !== 'empty') { S.pushUndo(); S.applyInput(S.ensure(r, c), cls, r, c); }
     else if (S.nonEmpty(r, c)) { S.pushUndo(); Session.clearCell(S.ensure(r, c)); }
@@ -1346,7 +1349,7 @@ export class Session {
       return true;
     }
     const step = tabStepOf(e);
-    if (step && (this.dialog === 'formatcells' || this.dialog === 'pagesetup')) { this.logKey(step === 'NextTab' ? 'Ctrl+PgDn' : 'Ctrl+PgUp'); this.dlgKey(step); return true; }
+    if (step && (this.dialog === 'formatcells' || this.dialog === 'pagesetup' || this.dialog === 'validation')) { this.logKey(step === 'NextTab' ? 'Ctrl+PgDn' : 'Ctrl+PgUp'); this.dlgKey(step); return true; }
     if (this.dialog === 'pagesetup' && this.dlg && this.dlg.sub && k === 'Escape') { this.logKey('Esc'); this.pageSetupKey('Escape'); return true; }
     if (this.dialog === 'note') {   // the note box is a text box: Esc leaves it (saved), Enter is a new line
       if (k === 'Escape') { this.logKey('Esc'); this.noteKey('Escape'); return true; }
@@ -1781,6 +1784,11 @@ export class Session {
     if (this.dialog === 'fxfix') {
       if (k === 'Enter') { this.logKey('↵'); this.applyRibbon('ENTER'); return true; }
       if (k === 'Escape') { this.dialog = null; this.fxfixPend = null; return true; }
+      return true;
+    }
+    if (this.dialog === 'dvalert') {   // the Data Validation alert over the open editor: Retry (Enter, R) keeps the entry to fix, Cancel (Esc, C) discards it
+      if (k === 'Enter' || k.toLowerCase() === 'r') { this.logKey(k === 'Enter' ? '↵' : 'R'); this.dialog = null; this.dvPend = null; return true; }
+      if (k === 'Escape' || k.toLowerCase() === 'c') { this.logKey(k === 'Escape' ? 'Esc' : 'C'); this.dialog = null; this.dvPend = null; this.cancelEdit(); return true; }
       return true;
     }
     const after = () => { this.refreshFxList(); this.refreshTextSuggest(); return true; };

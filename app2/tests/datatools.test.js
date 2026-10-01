@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Sheet } from '../engine/sheet.js';
 import { Session } from '../engine/keyboard.js';
-import { wildMatch, DUPLICATES_NOTE, NO_DUPLICATES_NOTE } from '../engine/tools.js';
+import { wildMatch, DUPLICATES_NOTE, NO_DUPLICATES_NOTE, VALIDATION_NOTE } from '../engine/tools.js';
 
 const fresh = (cells, opts) => { const toasts = []; const s = new Session(new Sheet({ cells, ...(opts || {}) }), { onToast: m => toasts.push(m), now: () => 0 }); s.toasts = toasts; return s; };
 const LIST = { A1: { value: 'Site' }, B1: { value: 'Region' }, C1: { value: 'Washes' },
@@ -58,4 +58,27 @@ test('Remove Duplicates (Alt A M): the ticked columns define a duplicate, the fi
   s.run('Ctrl+Z'); S.goTo(2, 1); s.run('Alt A M Alt+U Space Enter');   // Site alone ticked: every later row for a site goes, case-insensitively
   assert.deepEqual([2, 3, 4, 5, 6].map(r => S.value('A' + r)), ['AUS-DOM', 'AUS-MUE', 'AUS-DMO', null, null]); assert.equal(s.toasts[1], DUPLICATES_NOTE(2, 3));
   s.run('Alt A M Enter'); assert.equal(s.toasts[2], NO_DUPLICATES_NOTE); assert.equal(s.mode, 'normal');
+});
+
+test('Data Validation (Alt A V V): a list from a range or a name with the Alt+Down drop-down, the Stop alert with Retry and Cancel, a whole-number limit, a custom message', () => {
+  const s = fresh({ A1: { value: 'Base' }, A2: { value: 'Management' }, A3: { value: 'Downside' } }); const S = s.sheet;
+  S.goTo(1, 4); s.run('Alt A V V'); assert.equal(s.dialog, 'validation'); assert.equal(s.dlg.allow, 'any');
+  s.run('L Alt+S "=$A$1:$A$3" Enter'); assert.equal(s.dialog, null); assert.deepEqual({ allow: S.validation.D1.allow, source: S.validation.D1.source }, { allow: 'list', source: '=$A$1:$A$3' });
+  s.run('Alt+ArrowDown'); assert.equal(s.dialog, 'dvlist'); assert.deepEqual(s.dlg.items, ['Base', 'Management', 'Downside']);
+  s.run('Down Enter'); assert.equal(S.value('D1'), 'Management'); assert.equal(s.mode, 'normal');
+  s.run('"Mangement" Enter'); assert.equal(s.dialog, 'dvalert'); assert.equal(s.editing, true); assert.equal(s.dvPend.message, VALIDATION_NOTE);
+  s.run('Enter'); assert.equal(s.dialog, null); assert.equal(s.editing, true, 'Retry keeps the entry to fix'); assert.equal(s.editBuf, 'Mangement');
+  s.run('Escape'); assert.equal(s.editing, false); assert.equal(S.value('D1'), 'Management');
+  s.run('"Mangement" Enter Escape'); assert.equal(s.editing, false, 'Cancel on the alert discards the entry'); assert.equal(S.value('D1'), 'Management');
+  s.run('"downside" Enter'); assert.equal(S.value('D1'), 'downside', 'a list matches case-insensitively and keeps what was typed');
+  S.goTo(1, 4); s.run('Delete'); assert.equal(S.value('D1'), null, 'Ignore blank: clearing is allowed');
+  s.names = { Cases: 'Sheet1!$A$1:$A$3' }; S.goTo(2, 4); s.run('Alt A V V L Alt+S "=Cases" Enter'); s.run('Alt+ArrowDown'); assert.deepEqual(s.dlg.items, ['Base', 'Management', 'Downside'], 'a named list'); s.run('Escape');
+  // a whole number between 100 and 600, with a custom error message on the Error Alert tab
+  S.goTo(3, 4); s.run('Alt A V V W Alt+M 100 Alt+X 600 Ctrl+PageDown Ctrl+PageDown Alt+E "Washes a day: 100 to 600" Enter');
+  assert.deepEqual([S.validation.D3.allow, S.validation.D3.min, S.validation.D3.max, S.validation.D3.errMsg], ['whole', '100', '600', 'Washes a day: 100 to 600']);
+  s.run('"50" Enter'); assert.equal(s.dialog, 'dvalert'); assert.equal(s.dvPend.message, 'Washes a day: 100 to 600'); s.run('Escape');
+  s.run('"250.5" Enter'); assert.equal(s.dialog, 'dvalert', 'a decimal fails a whole-number rule'); s.run('Escape');
+  s.run('"250" Enter'); assert.equal(S.value('D3'), 250); s.run('Up "=125*4" Enter'); assert.equal(S.value('D3'), 500, 'a formula is judged by its result');
+  S.goTo(3, 4); s.run('Alt A V V Alt+C Enter'); assert.equal(S.validation.D3, undefined, 'Clear All removes the rule');
+  s.run('Ctrl+Z'); assert.ok(S.validation.D3, 'undo brings the rule back');
 });

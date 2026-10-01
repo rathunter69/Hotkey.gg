@@ -41,8 +41,11 @@ export const VALIDATION_NOTE = "This value doesn't match the data validation res
 export const GOALSEEK_FOUND = (cell) => `Goal Seeking with Cell ${cell} found a solution.`;
 export const GOALSEEK_NONE = (cell) => `Goal Seeking with Cell ${cell} may not have found a solution.`;
 export const DATATABLE_INPUT_NOTE = 'Input cell reference is not valid.';
+export const TABLE_CELL_NOTE = "Cannot change part of a data table.";
 export const NO_LINKS_NOTE = 'This workbook contains no links to other files.';
 export const TTC_OVERWRITE_NOTE = "There's already data here. Do you want to replace it?";
+export const ALLOW = [['any', 'Any value'], ['whole', 'Whole number'], ['decimal', 'Decimal'], ['list', 'List'], ['date', 'Date'], ['time', 'Time'], ['textlen', 'Text length'], ['custom', 'Custom']];
+export const DV_DATA = [['between', 'between'], ['notBetween', 'not between'], ['equal', 'equal to'], ['notEqual', 'not equal to'], ['greater', 'greater than'], ['less', 'less than'], ['greaterEq', 'greater than or equal to'], ['lessEq', 'less than or equal to']];
 export const DUPLICATES_NOTE = (n, m) => `${n} duplicate value${n === 1 ? '' : 's'} found and removed; ${m} unique value${m === 1 ? '' : 's'} remain${m === 1 ? 's' : ''}.`;
 export const NO_DUPLICATES_NOTE = 'No duplicate values found.';
 
@@ -460,6 +463,123 @@ const methods = {
   },
   /** The dialog as the view paints it: the columns with their labels and ticks. */
   removeDuplicatesView() { const d = this.dlg; if (!d || d.kind !== 'removedup') return null; return { headers: d.headers, idx: d.idx, columns: d.cols.map(c => ({ c: c.c, label: this.columnLabel(d.range, c.c, d.headers), checked: c.checked })) }; },
+
+  /* ---------------- Data Validation (Alt A V V) and the in-cell drop-down ---------------- */
+  /** The rule on a cell (null when none). */
+  validationFor(S, key) { return (S.validation && S.validation[key]) || null; },
+  /** A rule's bound or source evaluated: =A1 and =Cases read the sheet, 100 is 100, Base,Downside is text. */
+  validationEval(S, text, p) {
+    const t = String(text == null ? '' : text).trim(); if (t === '') return null;
+    if (t[0] === '=') { let rows = null; try { const v = evalFormula(t, S.evalCtx({ cell: p, onSpill: r => { rows = r; } })); return rows ? { data: rows.flat() } : v; } catch (e) { return '#NAME?'; } }   // a range or an array arrives as its cells
+    const n = textToNumber(t); if (n !== null) return n;
+    const d = dateTextValue(t, S.today); return d !== null && d !== undefined ? d : t;
+  },
+  /** The items of a list rule: the source's cells (their display text, blanks skipped) or the typed, comma-separated entries. */
+  validationItems(S, rule, p) {
+    const src = String(rule.source || '').trim(); if (!src) return [];
+    if (src[0] !== '=') return src.split(',').map(x => x.trim()).filter(x => x !== '');
+    const v = this.validationEval(S, src, p); const out = [];
+    const push = x => { if (x === null || x === undefined || x === '') return; out.push(typeof x === 'number' ? dispText({ value: x, formula: null }) : String(x)); };
+    if (v && typeof v === 'object' && v.data) for (const x of v.data) push(x);
+    else push(v);
+    return out;
+  },
+  /**
+   * Does an entry pass the cell's rule? `value` is what the commit would store (a formula's
+   * result for a formula). Lists compare text case-insensitively; whole numbers must be integers;
+   * dates and times are serials; the limits may be typed or point at cells.
+   */
+  validationAllows(S, rule, value, p) {
+    if (!rule || rule.allow === 'any') return true;
+    if (value === null || value === '') return rule.ignoreBlank !== false;
+    if (rule.allow === 'list') { const t = String(typeof value === 'number' ? dispText({ value, formula: null }) : value).toLowerCase(); return this.validationItems(S, rule, p).some(it => it.toLowerCase() === t); }
+    if (rule.allow === 'custom') { const v = this.validationEval(S, rule.source, p); return !!v && !isErrVal(v); }
+    let x;
+    if (rule.allow === 'textlen') x = String(value).length;
+    else { if (typeof value !== 'number') return false; x = value; if (rule.allow === 'whole' && !Number.isInteger(x)) return false; if (rule.allow === 'time' && (x < 0 || x >= 1)) return false; }
+    const lo = this.validationEval(S, rule.min, p), hi = this.validationEval(S, rule.max, p);
+    const num = v => typeof v === 'number' ? v : NaN;
+    switch (rule.data || 'between') {
+      case 'between': return x >= num(lo) && x <= num(hi);
+      case 'notBetween': return x < num(lo) || x > num(hi);
+      case 'equal': return x === num(lo);
+      case 'notEqual': return x !== num(lo);
+      case 'greater': return x > num(lo);
+      case 'less': return x < num(lo);
+      case 'greaterEq': return x >= num(lo);
+      case 'lessEq': return x <= num(lo);
+    }
+    return true;
+  },
+  /** The commit gate: null when the entry may go in, else the alert's { title, message } (Excel's Stop alert: Retry or Cancel). */
+  validationCheck(r, c, cls) {
+    const S = this.sheet; const rule = this.validationFor(S, refKey(r, c)); if (!rule) return null;
+    let value = cls.kind === 'empty' ? null : cls.kind === 'formula' ? (() => { try { return evalFormula(cls.formula, S.evalCtx({ cell: { r, c } })); } catch (e) { return '#NAME?'; } })() : cls.value;
+    if (value && typeof value === 'object') value = null;
+    if (this.validationAllows(S, rule, value, { r, c })) return null;
+    return { title: rule.errTitle || 'Microsoft Excel', message: rule.errMsg || VALIDATION_NOTE, style: rule.errStyle || 'stop' };
+  },
+  /**
+   * The dialog: Settings (Allow Alt+A, Data Alt+D, Minimum Alt+M, Maximum Alt+X, Source Alt+S,
+   * Ignore blank Alt+B, In-cell dropdown Alt+I, Clear All Alt+C), Input Message (Title Alt+T,
+   * Input message Alt+I) and Error Alert (Style Alt+Y, Title Alt+T, Error message Alt+E) on
+   * Ctrl+PgDn / Ctrl+PgUp; a combo takes ↑ ↓ or the entry's first letter; OK is Enter.
+   */
+  openValidation() {
+    const S = this.sheet; this.startClock(); const a = S.dispActive(); const sr = S.selRange();
+    const old = this.validationFor(S, refKey(a.r, a.c)) || {};
+    this.openDialog('validation', []);
+    this.dlg = { kind: 'validation', range: { ...sr }, tab: 'settings', focus: 'allow', allow: old.allow || 'any', data: old.data || 'between', min: old.min || '', max: old.max || '', source: old.source || '',
+      inCell: old.inCell !== false, ignoreBlank: old.ignoreBlank !== false, errStyle: old.errStyle || 'stop', errTitle: old.errTitle || '', errMsg: old.errMsg || '', inTitle: old.inTitle || '', inMsg: old.inMsg || '' };
+  },
+  validationKey(key) {
+    const d = this.dlg; const S = this.sheet; if (!d) return;
+    const TABS = ['settings', 'input', 'error'];
+    if (key === 'NextTab' || key === 'PrevTab') { d.tab = TABS[(TABS.indexOf(d.tab) + (key === 'NextTab' ? 1 : 2)) % 3]; d.focus = d.tab === 'settings' ? 'allow' : d.tab === 'input' ? 'inTitle' : 'errStyle'; return; }
+    if (key === 'Enter') {   // OK: the rule onto every selected cell (Any value removes it)
+      const rg = d.range; this.exitRibbon(false); S.pushUndo(); if (!S.validation) S.validation = {};
+      for (let r = rg.r1; r <= rg.r2; r++) for (let c = rg.c1; c <= rg.c2; c++) { const k = refKey(r, c); if (d.allow === 'any') delete S.validation[k]; else S.validation[k] = { allow: d.allow, data: d.data, min: d.min, max: d.max, source: d.source, inCell: d.inCell, ignoreBlank: d.ignoreBlank, errStyle: d.errStyle, errTitle: d.errTitle, errMsg: d.errMsg, inTitle: d.inTitle, inMsg: d.inMsg }; }
+      S.commit('validation'); return;
+    }
+    const ring = d.tab === 'settings' ? ['allow'].concat(d.allow === 'any' ? [] : d.allow === 'list' ? ['source', 'ignoreBlank', 'inCell'] : d.allow === 'custom' ? ['source', 'ignoreBlank'] : ['data'].concat(['between', 'notBetween'].includes(d.data) ? ['min', 'max'] : ['min'], ['ignoreBlank'])).concat(['ok'])
+      : d.tab === 'input' ? ['inTitle', 'inMsg', 'ok'] : ['errStyle', 'errTitle', 'errMsg', 'ok'];
+    if (key === 'Tab' || key === 'Shift+Tab') { this.toolTab(d, key, ring); return; }
+    if (d.tab === 'settings') {
+      if (key === 'Alt+A') { d.focus = 'allow'; return; } if (key === 'Alt+D') { d.focus = 'data'; return; } if (key === 'Alt+M') { d.focus = 'min'; return; } if (key === 'Alt+X') { d.focus = 'max'; return; }
+      if (key === 'Alt+S') { d.focus = 'source'; return; } if (key === 'Alt+B') { d.ignoreBlank = !d.ignoreBlank; return; } if (key === 'Alt+I') { d.inCell = !d.inCell; return; }
+      if (key === 'Alt+C') { Object.assign(d, { allow: 'any', data: 'between', min: '', max: '', source: '', inCell: true, ignoreBlank: true, errTitle: '', errMsg: '', inTitle: '', inMsg: '' }); d.focus = 'allow'; return; }   // Clear All
+    } else if (d.tab === 'input') { if (key === 'Alt+T') { d.focus = 'inTitle'; return; } if (key === 'Alt+I') { d.focus = 'inMsg'; return; } }
+    else { if (key === 'Alt+Y') { d.focus = 'errStyle'; return; } if (key === 'Alt+T') { d.focus = 'errTitle'; return; } if (key === 'Alt+E') { d.focus = 'errMsg'; return; } }
+    const combo = (list, field) => {   // ↑ ↓ step; a letter goes to the next entry that starts with it
+      const i = Math.max(0, list.findIndex(x => x[0] === d[field]));
+      if (key === 'ArrowDown') { d[field] = list[Math.min(list.length - 1, i + 1)][0]; return true; }
+      if (key === 'ArrowUp') { d[field] = list[Math.max(0, i - 1)][0]; return true; }
+      if (key.length === 1) { const K = key.toUpperCase(); for (let n = 1; n <= list.length; n++) { const e = list[(i + n) % list.length]; if (e[1].toUpperCase().startsWith(K)) { d[field] = e[0]; return true; } } }
+      return false;
+    };
+    if (d.focus === 'allow') { combo(ALLOW, 'allow'); return; }
+    if (d.focus === 'data') { combo(DV_DATA, 'data'); return; }
+    if (d.focus === 'errStyle') { combo([['stop', 'Stop'], ['warning', 'Warning'], ['information', 'Information']], 'errStyle'); return; }
+    if (d.focus === 'ignoreBlank' && key === ' ') { d.ignoreBlank = !d.ignoreBlank; return; }
+    if (d.focus === 'inCell' && key === ' ') { d.inCell = !d.inCell; return; }
+    this.toolType(d, key, ['min', 'max', 'source', 'errTitle', 'errMsg', 'inTitle', 'inMsg']);
+  },
+  /** Alt+↓ on a cell with a list rule: the drop-down (↑ ↓, a letter, Enter picks, Esc closes). True when it opened. */
+  openDvList(a) {
+    const S = this.sheet; const key = refKey(a.r, a.c); const rule = this.validationFor(S, key);
+    if (!rule || rule.allow !== 'list' || rule.inCell === false) return false;
+    const items = this.validationItems(S, rule, a); if (!items.length) return false;
+    this.startClock(); this.openDialog('dvlist', []);
+    const cur = dispText(S.get(a.r, a.c)).toLowerCase(); const idx = Math.max(0, items.findIndex(it => it.toLowerCase() === cur));
+    this.dlg = { kind: 'dvlist', cell: key, items, idx }; return true;
+  },
+  dvListKey(key) {
+    const d = this.dlg; const S = this.sheet; if (!d) return;
+    if (key === 'ArrowDown') { d.idx = Math.min(d.items.length - 1, d.idx + 1); return; } if (key === 'ArrowUp') { d.idx = Math.max(0, d.idx - 1); return; }
+    if (key === 'Home') { d.idx = 0; return; } if (key === 'End') { d.idx = d.items.length - 1; return; }
+    if (key === 'Enter') { const p = parseRef(d.cell); const text = d.items[d.idx]; this.exitRibbon(false); S.commitInput(text[0] === '=' || text[0] === "'" ? "'" + text : text, p.r, p.c); return; }
+    if (key.length === 1) { const K = key.toUpperCase(); for (let n = 1; n <= d.items.length; n++) { const i = (d.idx + n) % d.items.length; if (d.items[i].toUpperCase().startsWith(K)) { d.idx = i; return; } } }
+  },
 
   /* ---------------- Evaluate Formula (Alt M V) ---------------- */
   /** The dialog on the active cell's formula: Evaluate (Enter / Alt+E) steps, Restart (Alt+R) after the last step, Close (Esc). A cell without a formula opens nothing, as in Excel. */
