@@ -37,6 +37,7 @@ import { serialToDate } from './format.js';
 import { builtinCode } from './numfmt.js';
 import { installDialogs, tabStepOf, isValidName } from './dialogs.js';
 import { installTools, TOOL_DIALOGS, TOOL_TYPED } from './tools.js';
+import { CalcGraph } from './calc.js';
 import { refKey, parseRef, parseRange, rangeText, colLetter as colLetterOf } from './refs.js';
 import { stepPath, PASTE_OPTS, PASTE_OP_OPTS, QAT_COMMANDS, QAT_DEFAULT, POPULAR_COMMANDS, OPTIONS_LIVE_PAGES } from './ribbon.js';
 
@@ -251,38 +252,23 @@ export class Session {
     sh.resolver = name => { const e = this.sheets.find(x => x.name.toLowerCase() === String(name).toLowerCase()); return e ? e.sheet : null; };
     Object.defineProperty(sh, 'calc', { configurable: true, enumerable: false, get: () => this.settings });   // the workbook's calculation settings (Options › Formulas)
     sh.allSheets = () => this.sheets.map(e => ({ name: e.name, sheet: e.sheet }));
+    if (!this.book) this.book = new CalcGraph(() => this.sheets);   // one calculation graph for the workbook: a commit on any sheet brings its readers everywhere up to date
+    sh.book = this.book;
     sh.onChange(what => {
-      if (this.sheets.length > 1 && what !== 'select' && what !== 'clipboard') this.recalcAll(sh);
       if (what !== 'select' && what !== 'clipboard') this.checkCircular();
       this.emit('sheet');
     });
     this._circKnown = new Set(this.circularRefs());   // a circle a loaded sheet brings is not an entry: no warning until a new one appears
   }
   /**
-   * Recalculate every sheet of the workbook, two passes, so an A → B → A chain settles: the first
-   * pass skips `except` (the sheet whose own commit just recalculated it), the second takes every
-   * sheet, so the edited sheet sees the values its dependants pushed back. Each recalc also drops
-   * that sheet's conditional-formatting memo, so a rule reading another sheet repaints. Re-entrant
-   * calls (a recalc never emits, but a listener might) are ignored.
+   * Recalculate the whole workbook from scratch: the graph forgets what it knew, so every formula
+   * runs again (a sheet renamed, added or removed, names changed: references resolve afresh). An
+   * ordinary edit never needs this: the sheet's commit recalculates its readers on every sheet.
    */
-  recalcAll(except) {
+  recalcAll() {
     if (this._xr) return;
     this._xr = true;
-    // Passes run until no sheet moves: a chain that bounces between sheets (a schedule that reads
-    // a statement that reads the schedule) needs one pass per hop, and a circle built on purpose
-    // (interest on an average balance) settles geometrically. With iterative calculation on, the
-    // Options' limits apply (maximum iterations, maximum change); off, a few passes more than the
-    // sheet count covers any acyclic chain, and a circle stops there as Excel would stop warning.
-    const st = this.settings;
-    const cap = Math.max(2, st.iterative ? (st.maxIterations | 0) || 100 : this.sheets.length + 4);
-    const tol = st.iterative ? Math.max(0, +st.maxChange || 0) : 0;
-    try {
-      for (let pass = 0; pass < cap; pass++) {
-        let delta = 0;
-        for (const e of this.sheets) { if (pass === 0 && e.sheet === except) continue; const d = e.sheet.recalc() || 0; if (d > delta) delta = d; }
-        if (pass >= 1 && delta <= tol) break;
-      }
-    }
+    try { this.book.invalidate(); this.book.recalc(this.sheet); }
     finally { this._xr = false; }
   }
   resetEdit() {

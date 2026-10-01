@@ -37,7 +37,8 @@ export { numToText };
 export const ERROR_CODES = ['#NULL!', '#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '#NUM!', '#N/A', '#SPILL!', '#CALC!'];
 
 export class FxError extends Error {
-  constructor(code) { super(code); this.code = code; }
+  // thrown and caught thousands of times in a recalc (IFERROR, lookups): no stack trace is captured
+  constructor(code) { const lim = Error.stackTraceLimit; Error.stackTraceLimit = 0; super(code); Error.stackTraceLimit = lim; this.code = code; }
 }
 export const isErrVal = v => typeof v === 'string' && ERROR_CODES.includes(v);
 const err = code => new FxError(code);
@@ -384,7 +385,8 @@ const num15 = n => parseFloat(Number(n).toPrecision(15));
 
 function numeq(a, b) { return num15(a) === num15(b); }
 
-const cmpText = (a, b) => a.localeCompare(b, 'en', { sensitivity: 'accent' });
+const COLLATOR = new Intl.Collator('en', { sensitivity: 'accent' });
+const cmpText = (a, b) => a === b ? 0 : COLLATOR.compare(a, b);
 /**
  * Excel's comparison of two plain values (number | string | boolean | null) under = <> < <= > >=:
  * numbers < text < booleans, text case-insensitive, a blank reads as the other side's zero ("" / 0 /
@@ -438,6 +440,14 @@ function globTest(toks, str) {
 /* ============================================================================
    EVALUATOR
    ============================================================================ */
+// parsed formulas, by text: a recalc evaluates the same formulas again and again (the evaluator never mutates a tree)
+const PARSE_CACHE = new Map(); const PARSE_CACHE_MAX = 4000;
+function parseCached(expr) {
+  const key = String(expr); const hit = PARSE_CACHE.get(key); if (hit) return hit;
+  const ast = parseFormula(expr);
+  if (PARSE_CACHE.size >= PARSE_CACHE_MAX) PARSE_CACHE.clear();
+  PARSE_CACHE.set(key, ast); return ast;
+}
 export function evalFormula(expr, ctx = {}) {
   const rawIn = ctx.raw || (() => null);
   // a key of the form NAME!B3 comes from a sheet-prefixed reference: ctx.sheetRaw resolves it
@@ -454,7 +464,7 @@ export function evalFormula(expr, ctx = {}) {
   // references per cell, exactly as translateFormula would rewrite the text (a reference pushed
   // above row 1 or left of column A is #REF! — or, with offset.wrap, runs round the sheet edge,
   // as Excel's conditional-formatting references do)
-  const ast = expr && typeof expr === 'object' ? expr : parseFormula(expr);   // SyntaxError propagates: the commit gate decides what to do
+  const ast = expr && typeof expr === 'object' ? expr : parseCached(expr);   // SyntaxError propagates: the commit gate decides what to do
   const OFF = ctx.offset && (ctx.offset.dr || ctx.offset.dc) ? ctx.offset : null;
   const offR = r => OFF.wrap ? wrapIndex(r, ROWS) : r, offC = c => OFF.wrap ? wrapIndex(c, COLS) : c;
 

@@ -17,6 +17,7 @@
 // (see normCondFmt); condFmtMap() evaluates it for the painter and the graders.
 
 import { colLetter, colIndex, refKey, parseRef, parseRange, rectRefs, rangeText } from './refs.js';
+import { CalcGraph } from './calc.js';
 import { evalFormula, parseFormula, translateFormula, transposeFormula, normalizeFormula, autocorrectFormula, adjustFormulaStructure, isErrVal, formulaRefs, parses, dateTextValue, compareValues } from './formula.js';
 import { fmtNum, dispText, dispMarked, fitGeneral, serialToDate, HASHES, PAD_MARK } from './format.js';
 import { isValidFormat, normalizeCode, stepDecimals, codeDecimals } from './numfmt.js';
@@ -74,7 +75,6 @@ export const CELL_STYLES = [
 ];
 
 const clone = o => JSON.parse(JSON.stringify(o));
-const rectKeys = rg => { const out = []; for (let r = rg.r1; r <= rg.r2; r++) for (let c = rg.c1; c <= rg.c2; c++) out.push(refKey(r, c)); return out; };
 /** Excel's built-in fill lists: the weekday and month names, short and long. */
 const FILL_LISTS = [
   ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
@@ -632,138 +632,15 @@ export class Sheet {
 
   /* ---------------- recalc ---------------- */
   /**
-   * Recalculate every formula cell. Cells are evaluated in dependency order (precedents first,
-   * found from the formula's references — token based); a genuine circular reference reads 0,
-   * as Excel shows it with iterative calculation off. A fixed-point pass then settles anything the
-   * static references cannot see (OFFSET/INDEX-built ranges).
-   *
-   * Returns how far the sheet moved: the largest change of any formula value (0 when none moved,
-   * Infinity when a value changed type or text), which the Session's workbook recalc reads to know
-   * when a cross-sheet chain or circle has settled.
+   * Recompute what the last changes reach, through the workbook's calculation graph (calc.js):
+   * the changed cells' readers across every sheet, in dependency order; a genuine circular
+   * reference reads 0 (iterative calculation off) or iterates to Maximum Change (on). Sets
+   * `circular` and applies dynamic-array spills.
    */
   recalc() {
     this._cfMap = null;   // every mutation ends in a recalc (commit): the conditional-formatting map is re-evaluated on the next read
-    // dynamic arrays (M61): a spilled cell carries `spill` (its anchor's key) and no formula; the anchor
-    // carries `spillTo`. Every recalc starts from a clean slate: the spilled values are cleared and
-    // rewritten by the anchors as they evaluate (a blocked spill makes the anchor #SPILL!). The
-    // ranges of the previous recalc feed the dependency graph, so a reader of a spilled cell waits
-    // for its anchor; a range that moves is caught by the read log and the fixed-point pass.
-    const spillOwner = {};
-    for (const k in this.cells) {
-      const c = this.cells[k]; if (!c) continue;
-      if (c.spill) { if (!c.formula && c.value === c.spillVal) { c.value = null; c.txt = false; } delete c.spill; delete c.spillVal; }   // an entry typed over a spilled cell stays, and blocks the spill
-      if (c.spillTo) { if (c.formula) for (const kk of rectKeys(c.spillTo)) spillOwner[kk] = k; delete c.spillTo; }
-    }
-    const keys = []; for (const k in this.cells) if (this.cells[k] && this.cells[k].formula) keys.push(k);
-    this.circular = [];
-    if (!keys.length) return 0;
-    const before = new Map(); for (const k of keys) before.set(k, this.cells[k].value);
-    this.recalcOnce(keys, spillOwner);
-    let delta = 0;
-    for (const [k, v0] of before) {
-      const v1 = this.cells[k].value;
-      if (v1 === v0 || (Number.isNaN(v0) && Number.isNaN(v1))) continue;
-      if (typeof v0 === 'number' && typeof v1 === 'number') { const d = Math.abs(v1 - v0); if (d > delta) delta = d; }
-      else delta = Infinity;
-    }
-    return delta;
-  }
-  recalcOnce(keys, spillOwner) {
-    const fset = new Set(keys);
-    // Every formula-cell key a formula actually dereferences while evaluating is recorded, so a
-    // dependency that only exists through OFFSET/INDEX/INDIRECT-built ranges still joins the graph.
-    const reads = {}; let cur = null;
-    const ctx = this.evalCtx({ raw: kk => { if (cur) { if (fset.has(kk)) reads[cur].add(kk); else { const c = this.cells[kk]; if (c && c.spill && fset.has(c.spill)) reads[cur].add(c.spill); } } return this.raw(kk); } });
-    const clearSpill = k => { for (const kk in this.cells) { const c = this.cells[kk]; if (c && c.spill === k) { delete c.spill; delete c.spillVal; c.value = null; c.txt = false; } } if (this.cells[k]) delete this.cells[k].spillTo; };
-    const applySpill = (k, rows) => {   // the anchor's result block; null when a cell in the way (or the sheet's edge) blocks it
-      const p = parseRef(k); const h = rows.length, w = rows[0].length;
-      if (p.r + h - 1 > this.rows || p.c + w - 1 > this.cols) return false;
-      for (let r = 0; r < h; r++) for (let c = 0; c < w; c++) { if (!r && !c) continue; const t = this.cells[refKey(p.r + r, p.c + c)]; if (t && (t.formula || t.spill || (t.value !== null && t.value !== '' && t.value !== undefined))) return false; }
-      for (let r = 0; r < h; r++) for (let c = 0; c < w; c++) { if (!r && !c) continue; const t = this.ensure(p.r + r, p.c + c); const v = rows[r][c]; t.value = v === null || v === undefined ? 0 : v; t.txt = typeof t.value === 'string' && !isErrVal(t.value); t.spill = k; t.spillVal = t.value; }
-      this.cells[k].spillTo = { r1: p.r, c1: p.c, r2: p.r + h - 1, c2: p.c + w - 1 };
-      return true;
-    };
-    const evalOne = k => {
-      const c = this.cells[k];
-      const p = parseRef(k);
-      cur = k; reads[k] = new Set();
-      let spill = null;
-      try { const v = evalFormula(c.formula, { ...ctx, cell: p ? { r: p.r, c: p.c } : undefined, onSpill: rows => { spill = rows; } });
-        if (c.spillTo || spill) { clearSpill(k); if (spill && !applySpill(k, spill)) return '#SPILL!'; }
-        return v; }
-      catch (e) { return '#NAME?'; }   // a stored formula that no longer parses reads as an error
-      finally { cur = null; }
-    };
-    // static precedents (formula cells only), ranges clipped to the grid
-    const deps = {};
-    for (const k of keys) {
-      const d = new Set();
-      for (const ref of formulaRefs(this.cells[k].formula, { rows: this.rows, cols: this.cols })) {
-        if (ref.sheet) continue;   // another sheet's cell: the Session's cross-sheet recalc covers it
-        if (ref.key) { if (fset.has(ref.key)) d.add(ref.key); }
-        else { const rg = ref.range; for (let r = Math.max(1, rg.r1); r <= Math.min(rg.r2, this.rows); r++) for (let c = Math.max(1, rg.c1); c <= Math.min(rg.c2, this.cols); c++) { const kk = refKey(r, c); if (fset.has(kk)) d.add(kk); } }
-      }
-      // a reader of a spilled cell waits for its anchor (the ranges of the previous recalc)
-      for (const ref of formulaRefs(this.cells[k].formula, { rows: this.rows, cols: this.cols })) {
-        if (ref.sheet) continue;
-        if (ref.key) { if (spillOwner[ref.key] && spillOwner[ref.key] !== k) d.add(spillOwner[ref.key]); }
-        else { const rg = ref.range; for (let r = Math.max(1, rg.r1); r <= Math.min(rg.r2, this.rows); r++) for (let c = Math.max(1, rg.c1); c <= Math.min(rg.c2, this.cols); c++) { const o = spillOwner[refKey(r, c)]; if (o && o !== k) d.add(o); } }
-      }
-      deps[k] = d;
-    }
-    // cycle detection via iterative DFS colouring: a back edge to n marks the frames from the top
-    // of the stack down to n (exactly the loop's members) — never the ancestors below it
-    const detect = () => {
-      const state = {}; const cyclic = new Set(); const order = [];
-      const visit = start => {
-        const stack = [[start, [...deps[start]]]]; state[start] = 1;
-        while (stack.length) {
-          const top = stack[stack.length - 1]; const [k, rest] = top;
-          if (!rest.length) { state[k] = 2; order.push(k); stack.pop(); continue; }
-          const n = rest.pop();
-          if (state[n] === 1) { for (let i = stack.length - 1; i >= 0; i--) { cyclic.add(stack[i][0]); if (stack[i][0] === n) break; } continue; }
-          if (!state[n]) { state[n] = 1; stack.push([n, [...deps[n]]]); }
-        }
-      };
-      for (const k of keys) if (!state[k]) visit(k);
-      return { cyclic, order };
-    };
-    // fold the reads of the last evaluation into deps; true when the graph gained an edge
-    const merge = () => { let added = false; for (const k of keys) { if (!reads[k]) continue; for (const d of reads[k]) if (!deps[k].has(d)) { deps[k].add(d); added = true; } } return added; };
-    let { cyclic, order } = detect();
-    const byPos = (a, b) => { const A = parseRef(a), B = parseRef(b); return (A.r - B.r) || (A.c - B.c); };
-    // iterative calculation (File › Options › Formulas, M78): the cells of a circle are not zeroed
-    // but evaluated again and again from their last values, up to Maximum Iterations times or until
-    // no value moves by more than Maximum Change, as Excel does — the interest-on-average-balance
-    // circle with its circuit breaker settles this way
-    const calc = this.calc || {};
-    if (calc.iterative) {
-      const maxIter = Math.max(1, calc.maxIterations | 0), maxChange = Number.isFinite(calc.maxChange) ? calc.maxChange : 0.001;
-      for (let pass = 0; pass < maxIter; pass++) {
-        let delta = 0;
-        for (const k of order) { const c = this.cells[k]; const v = evalOne(k); if (v !== c.value) { delta = Math.max(delta, typeof v === 'number' && typeof c.value === 'number' ? Math.abs(v - c.value) : Infinity); c.value = v; } }
-        if (merge()) ({ cyclic, order } = detect());
-        if (delta <= maxChange) break;
-      }
-      this.circular = [...cyclic].sort(byPos);
-      return;
-    }
-    // a cell that depends on a cyclic cell inherits nothing special — it just reads the 0
-    const evalAll = () => { for (const k of order) { const c = this.cells[k]; if (cyclic.has(k)) { clearSpill(k); c.value = 0; } else c.value = evalOne(k); } };
-    evalAll();
-    if (merge()) { ({ cyclic, order } = detect()); evalAll(); }
-    // settle dynamic references (OFFSET etc.) with a short fixed-point pass; a loop that only
-    // forms once values move is caught by the read log, and anything still moving at the cap is
-    // treated as circular rather than left at an arbitrary iterate
-    const CAP = Math.min(50, keys.length + 2);
-    for (let pass = 0; pass < CAP; pass++) {
-      const moved = [];
-      for (const k of order) { if (cyclic.has(k)) continue; const c = this.cells[k]; const v = evalOne(k); if (v !== c.value) { c.value = v; moved.push(k); } }
-      if (!moved.length) break;
-      if (merge()) { ({ cyclic, order } = detect()); for (const k of cyclic) this.cells[k].value = 0; continue; }
-      if (pass === CAP - 1) for (const k of moved) { cyclic.add(k); this.cells[k].value = 0; }
-    }
-    this.circular = [...cyclic].sort(byPos);   // the cells in a circle, for the status bar and the warning (M78)
+    if (!this.book) this.book = new CalcGraph(() => this.workbook());   // a sheet on its own keeps its own graph; the Session wires one for the workbook
+    this.book.recalc(this);
   }
 
   /* ---------------- commit parsing (what a typed entry becomes) ---------------- */
