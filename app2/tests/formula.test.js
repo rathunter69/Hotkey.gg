@@ -165,6 +165,29 @@ test('PMT / PV / FV / IRR agree with Excel to 4 decimals', () => {
   const r = evalFormula('=IRR(A1:A4)', { raw: k => ({ A1: -100, A2: 50, A3: 40, A4: 30 })[k] ?? null }); assert.ok(Math.abs(r - 0.10652) < 5e-5, String(r));
 });
 
+table('CEILING, FLOOR, DATEVALUE, NETWORKDAYS and NETWORKDAYS.INTL agree with Excel (Chapter 3)', [
+    ['=CEILING(14.37,0.25)', 14.5], ['=CEILING(14.5,0.25)', 14.5], ['=CEILING(-2.5,-2)', -4], ['=CEILING(2.5,-2)', '#NUM!'], ['=CEILING(5,0)', 0], ['=CEILING(0.1+0.2,0.1)', 0.3],
+    ['=FLOOR(14.37,0.25)', 14.25], ['=FLOOR(-2.5,-2)', -2], ['=FLOOR(2.5,-2)', '#NUM!'], ['=FLOOR(5,0)', '#DIV/0!'], ['=FLOOR(14.5,0.25)', 14.5],
+    ['=DATEVALUE("2026-09-15")', 46280], ['=DATEVALUE("1/31/2026")', 46053], ['=DATEVALUE(5)', '#VALUE!'], ['=DATEVALUE("not a date")', '#VALUE!'],
+    // Sep 15, 2026 is a Tuesday: eleven weekdays to the 29th, fifteen calendar days
+    ['=NETWORKDAYS(DATE(2026,9,15),DATE(2026,9,29))', 11], ['=NETWORKDAYS(DATE(2026,9,29),DATE(2026,9,15))', -11], ['=NETWORKDAYS(DATE(2026,9,1),DATE(2026,9,30))', 22],
+    ['=NETWORKDAYS(DATE(2026,9,15),DATE(2026,9,29),DATE(2026,9,21))', 10], ['=NETWORKDAYS(DATE(2026,9,15),DATE(2026,9,29),DATE(2026,9,20))', 11],
+    ['=NETWORKDAYS.INTL(DATE(2026,9,15),DATE(2026,9,29),"0000000")', 15], ['=NETWORKDAYS.INTL(DATE(2026,9,15),DATE(2026,9,29),"0000000",DATE(2026,9,21))', 14],
+    ['=NETWORKDAYS.INTL(DATE(2026,9,15),DATE(2026,9,29),11)', 13], ['=NETWORKDAYS.INTL(DATE(2026,9,15),DATE(2026,9,29),1)', 11], ['=NETWORKDAYS.INTL(DATE(2026,9,15),DATE(2026,9,29),7)', 11],
+    ['=NETWORKDAYS.INTL(DATE(2026,9,15),DATE(2026,9,29),"1111111")', '#VALUE!'], ['=NETWORKDAYS.INTL(DATE(2026,9,15),DATE(2026,9,29),8)', '#NUM!'],
+]);
+test('IPMT, PPMT, XNPV and XIRR agree with Excel\'s documented examples', () => {
+  const near = (f, exp, tol, c = {}) => { const got = evalFormula(f, { raw: k => (k in c ? c[k] : null), rows: 20, cols: 30 }); assert.ok(typeof got === 'number' && Math.abs(got - exp) < tol, `${f} → ${got}, expected ${exp}`); };
+  near('=IPMT(0.1/12,1,36,8000)', -66.67, 0.005); near('=IPMT(0.1,3,3,8000)', -292.45, 0.005); near('=IPMT(0.1/12,1,36,8000,0,1)', 0, 1e-9);
+  near('=PPMT(0.1/12,1,24,2000)', -75.62, 0.005); near('=PPMT(0.08,10,10,200000)', -27598.05, 0.005);
+  near('=IPMT(0.07/12,1,120,3500000)', -20416.67, 0.005); near('=PPMT(0.07/12,1,120,3500000)+IPMT(0.07/12,1,120,3500000)-PMT(0.07/12,120,3500000)', 0, 1e-6);
+  assert.equal(ev('=IPMT(0.1,0,3,8000)'), '#NUM!'); assert.equal(ev('=PPMT(0.1,4,3,8000)'), '#NUM!');
+  const c = { A1: -10000, A2: 2750, A3: 4250, A4: 3250, A5: 2750, B1: 39448, B2: 39508, B3: 39751, B4: 39859, B5: 39904 };   // 1/1/2008, 3/1/2008, 10/30/2008, 2/15/2009, 4/1/2009
+  near('=XNPV(0.09,A1:A5,B1:B5)', 2086.65, 0.005, c); near('=XIRR(A1:A5,B1:B5)', 0.373362535, 1e-6, c);
+  assert.equal(evalFormula('=XNPV(0.09,A1:A5,B1:B4)', { raw: k => c[k] ?? null, rows: 20, cols: 30 }), '#NUM!');
+  assert.equal(evalFormula('=XIRR(A2:A5,B2:B5)', { raw: k => c[k] ?? null, rows: 20, cols: 30 }), '#NUM!', 'no sign change');
+});
+
 table('multi-letter columns, absolute refs, parsing edge cases', [
   ['=AA1*2', 14], ['=$A$1+$a2', 3], ['=a1+a2', 3], ['=sum(a1:a3)', 6], ['=SUM( A1 : A3 )', 6], ['=(A1)', 1], ['=SUM(-1,2)', 1], ['=-SUM(1,2)', -3], ['=SUM(A1:A3)*(A1>0)', 6],
   ['=IF(A1=1,"one","other")', 'one'], ['=IF(A1>=1,IF(A2>=2,"both","first"),"none")', 'both'], ['=IFS(A1>5,"a",A1>0,"b")', 'b'], ['=IFS(A1>5,"a")', '#N/A'], ['=SWITCH(A2,1,"one",2,"two","other")', 'two'], ['=SWITCH(A3,1,"one","other")', 'other'],
