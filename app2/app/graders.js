@@ -29,17 +29,17 @@ const isNumCell = cell => cell && cell.formula == null && typeof cell.value === 
 const isFormulaCell = cell => cell && typeof cell.formula === 'string' && cell.formula.length > 0;
 const isBlank = cell => !cell || (cell.value == null && cell.formula == null);
 
-/** Every precedent of the formula is on another sheet (a pure link line: green is right). */
-function allPrecedentsCrossSheet(cell) {
+/** The formula reads another sheet (a sheet name and an exclamation mark: green is right, script 1.1.5 and 1.6.4). */
+function readsAnotherSheet(cell) {
   try {
     const refs = formulaRefs(cell.formula);
-    return refs.length > 0 && refs.every(r => r.sheet);
+    return refs.some(r => r.sheet);
   } catch (e) { return false; }
 }
 
 /**
- * B1/B2: constants in the graded range are blue; formulas are black — or green when every
- * precedent lives on another sheet (a link line).
+ * B1/B2: constants in the graded range are blue; formulas are black, or green when they read
+ * another sheet (a link).
  */
 export function roleColour(sheet, range) {
   for (const [, , ref] of eachRef(range)) {
@@ -49,7 +49,7 @@ export function roleColour(sheet, range) {
     if (isNumCell(cell) && colour !== 'blue') return fail(`${cellName(ref)} is an input shown ${colour || 'black'} — inputs are blue`);
     if (isFormulaCell(cell)) {
       if (colour === 'blue') return fail(`${cellName(ref)} is a formula shown in blue`);
-      if (colour === 'green' && !allPrecedentsCrossSheet(cell)) return fail(`${cellName(ref)} is green but not a pure link line`);
+      if (colour === 'green' && !readsAnotherSheet(cell)) return fail(`${cellName(ref)} is green but reads nothing on another sheet`);
       if (colour && colour !== 'green' && colour !== 'black') return fail(`${cellName(ref)} is a formula shown in ${colour}`);
     }
   }
@@ -424,7 +424,14 @@ export function sheetStandard(sheet, { chapter = 1, read = true } = {}) {
     if (!h.bold) out.push(`${refKey(4, c)} is a header that is not bold`);
   }
   if (!anyHeader) out.push('row 4 has no headers');
-  if (lastCol >= figCol) add(headersRight(sheet, `${refKey(4, figCol)}:${refKey(4, lastCol)}`));
+  // a header over a column of figures sits right; a header over a text column (a week label) may sit left
+  let tableEnd = 5;   // the first table: row 5 down to the first empty row
+  while (tableEnd <= lastRow) { let any = false; for (let c = 1; c <= lastCol && !any; c++) any = !isBlank(cellAt(tableEnd + 1, c)); if (!any) break; tableEnd++; }
+  for (let c = figCol; c <= lastCol; c++) {
+    let figures = false;
+    for (let r = 5; r <= tableEnd && !figures; r++) { const x = cellAt(r, c); figures = !!x && (typeof x.value === 'number' || isFormulaCell(x)); }
+    if (figures) add(headersRight(sheet, refKey(4, c)));
+  }
   if (labelCol === 2) for (let r = 5; r <= lastRow; r++) {
     const c = cellAt(r, 1);
     if (c && typeof c.value === 'string' && c.value.length > 3) { out.push(`${refKey(r, 1)} holds a label, labels sit in column B from Chapter 2 on`); break; }
