@@ -152,7 +152,7 @@ test('zeroAsDash: a dash (custom fourth section or accounting) passes, a 0 or 0.
   assert.equal(zeroAsDash(sheet({ B6: custom(0, '#,##0;(#,##0);') }), 'B6').ok, true, 'a hidden zero shows no 0 either');
   const r = zeroAsDash(sheet({ B6: { value: 0, fmtStyle: 'comma', decimals: 1 } }), 'B6');
   assert.equal(r.ok, false);
-  assert.match(r.why, /B6 shows a zero as 0.0 — zero is a dash/);
+  assert.match(r.why, /B6 shows a zero as 0.0. Zero is a dash/);
   assert.equal(zeroAsDash(sheet({ B6: { value: 0 } }), 'B6').ok, false, 'General 0 is still a 0');
 });
 
@@ -272,7 +272,7 @@ test('fullCanon: each broken rule returns its one line, naming the cell', () => 
     [{ B6: { value: 400 } }, /B6 shows a cost as a positive/],
     [{ B6: { fmtStyle: 'general', numFmt: null } }, /B6 shows a minus/],
     [{ C6: { value: -10, numFmt: '#,##0.0_);(#,##0.0);-_)' } }, /C6 shows 1 decimals against 0 at B6/],
-    [{ C6: { fmtStyle: 'comma', numFmt: null } }, /C6 shows a zero as 0 — zero is a dash/],
+    [{ C6: { fmtStyle: 'comma', numFmt: null } }, /C6 shows a zero as 0. Zero is a dash/],
     [{ B6: { ball: true } }, /B6 carries a grid border/],
     [{ B6: { numFmt: DOLLAR } }, /B6 carries a \$/],
     [{ C7: { bt: false } }, /C7 is a total without a top border/],
@@ -287,4 +287,13 @@ test('fullCanon: each broken rule returns its one line, naming the cell', () => 
   }
   const hidden = canonSheet(); hidden.hiddenCols.add(3);
   assert.match(fullCanon(hidden, CANON_SPEC).why, /column C is hidden/);
+});
+
+test('every grader line a learner reads is free of the tells (M94)', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { tells } = await import('../content/copy/tells.js');
+  const src = readFileSync(new URL('../app/graders.js', import.meta.url), 'utf8');
+  const lines = [...src.matchAll(/fail\(`([^`]*)`\)/g)].map(m => m[1].replace(/\$\{[^}]*\}/g, 'B5'));
+  assert.ok(lines.length > 20);
+  for (const l of lines) assert.deepEqual(tells(l), [], l);
 });

@@ -46,7 +46,7 @@ export function roleColour(sheet, range) {
     const cell = sheet.cells[ref];
     if (isBlank(cell)) continue;
     const colour = cell.fontColor || null;
-    if (isNumCell(cell) && colour !== 'blue') return fail(`${cellName(ref)} is an input shown ${colour || 'black'} — inputs are blue`);
+    if (isNumCell(cell) && colour !== 'blue') return fail(`${cellName(ref)} is an input shown ${colour || 'black'}. Inputs are blue`);
     if (isFormulaCell(cell)) {
       if (colour === 'blue') return fail(`${cellName(ref)} is a formula shown in blue`);
       if (colour === 'green' && !readsAnotherSheet(cell)) return fail(`${cellName(ref)} is green but reads nothing on another sheet`);
@@ -65,7 +65,7 @@ export function noLiteralInFormula(sheet, ref) {
   try { toks = tokenize(cell.formula.replace(/^\s*=/, '')); } catch (e) { return ok(); }
   for (const t of toks) {
     if (t.t === 'num' && !t.abs && !LITERAL_ALLOWED.has(Math.abs(t.v)))
-      return fail(`${cellName(ref)} has ${t.v} typed inside the formula — inputs live in their own cell`);
+      return fail(`${cellName(ref)} has ${t.v} typed inside the formula. Inputs live in their own cell`);
   }
   return ok();
 }
@@ -84,7 +84,7 @@ export function rowConsistent(sheet, range) {
       const cell = sheet.cells[ref];
       const want = translateFormula(base.formula, 0, c - c1);
       if (!isFormulaCell(cell) || cell.formula.replace(/\s+/g, '') !== want.replace(/\s+/g, ''))
-        return fail(`${cellName(ref)} breaks its row's formula — one formula per row, filled right`);
+        return fail(`${cellName(ref)} breaks its row's formula. One formula per row, filled right`);
     }
   }
   return ok();
@@ -107,7 +107,7 @@ export function negativesParen(sheet, range) {
     if (isPercentCell(cell)) continue;
     if (['comma', 'currency', 'acct'].includes(cell.fmtStyle)) continue;
     if (cell.fmtStyle === 'custom' && /\(/.test(shown(cell))) continue;
-    return fail(`${cellName(ref)} shows a minus — the house uses parentheses`);
+    return fail(`${cellName(ref)} shows a minus. The house uses parentheses`);
   }
   return ok();
 }
@@ -123,7 +123,7 @@ export function decimalsConsistent(sheet, range) {
     if (!cell || cell.fmtStyle === undefined || cell.fmtStyle === 'general' || cell.fmtStyle == null) continue;
     const d = cellDecimals(cell);
     if (want === null) { want = d; first = ref; continue; }
-    if (d !== want) return fail(`${cellName(ref)} shows ${d} decimals against ${want} at ${first} — decimals are consistent down a line`);
+    if (d !== want) return fail(`${cellName(ref)} shows ${d} decimals against ${want} at ${first}. Decimals are consistent down a line`);
   }
   return ok();
 }
@@ -134,7 +134,7 @@ export function zeroAsDash(sheet, range) {
     const cell = sheet.cells[ref];
     if (!cell || typeof cell.value !== 'number' || cell.value !== 0) continue;
     const txt = shown(cell);
-    if (/\d/.test(txt)) return fail(`${cellName(ref)} shows a zero as ${txt.trim()} — zero is a dash`);
+    if (/\d/.test(txt)) return fail(`${cellName(ref)} shows a zero as ${txt.trim()}. Zero is a dash`);
   }
   return ok();
 }
@@ -149,8 +149,8 @@ export function dollarRows(sheet, range, rows) {
     const cell = sheet.cells[ref];
     if (!cell || typeof cell.value !== 'number' || cell.value === 0) continue;
     const has = /\$/.test(shown(cell));
-    if (has && !want.has(r)) return fail(`${cellName(ref)} carries a $ — the currency sign sits on the first and total rows only`);
-    if (!has && want.has(r) && !isPercentCell(cell)) return fail(`${cellName(ref)} has no $ — the first and total rows carry the currency sign`);
+    if (has && !want.has(r)) return fail(`${cellName(ref)} carries a $. The currency sign sits on the first and total rows only`);
+    if (!has && want.has(r) && !isPercentCell(cell)) return fail(`${cellName(ref)} has no $. The first and total rows carry the currency sign`);
   }
   return ok();
 }
@@ -160,7 +160,7 @@ export function costsNegative(sheet, range) {
   for (const [, , ref] of eachRef(range)) {
     const cell = sheet.cells[ref];
     if (!cell || typeof cell.value !== 'number') continue;
-    if (cell.value > 0) return fail(`${cellName(ref)} shows a cost as a positive — costs are negative, stated once up top`);
+    if (cell.value > 0) return fail(`${cellName(ref)} shows a cost as a positive. Costs are negative, stated once up top`);
   }
   return ok();
 }
@@ -184,7 +184,7 @@ export function noGrid(sheet, range) {
   for (const [, , ref] of eachRef(range)) {
     const cell = sheet.cells[ref];
     if (!cell) continue;
-    if (cell.ball || cell.bb || cell.bl || cell.br) return fail(`${cellName(ref)} carries a grid border — a total gets a top border, the block gets none`);
+    if (cell.ball || cell.bb || cell.bl || cell.br) return fail(`${cellName(ref)} carries a grid border. A total gets a top border, the block gets none`);
   }
   return ok();
 }
@@ -193,8 +193,8 @@ export function noGrid(sheet, range) {
 export function titleAcross(sheet, ref, span) {
   const cell = sheet.cells[ref];
   if (!cell || (cell.value == null && cell.formula == null)) return fail(`${cellName(ref)} has no title`);
-  if (typeof cell.value === 'string' && cell.value !== cell.value.trim()) return fail(`${cellName(ref)} is padded with spaces — Center Across Selection, never a merge`);
-  if ((cell.ca | 0) !== span) return fail(`${cellName(ref)} is not centered across ${span} columns — Center Across Selection, never a merge`);
+  if (typeof cell.value === 'string' && cell.value !== cell.value.trim()) return fail(`${cellName(ref)} is padded with spaces. Center Across Selection, never a merge`);
+  if ((cell.ca | 0) !== span) return fail(`${cellName(ref)} is not centered across ${span} columns. Center Across Selection, never a merge`);
   return ok();
 }
 
@@ -238,9 +238,9 @@ export function oneFontSize(sheet, range, title = null) {
     if (isBlank(cell)) continue;
     if (ref === title) { titleCell = cell; continue; }
     if (want === null) { want = size(cell); first = ref; continue; }
-    if (size(cell) !== want) return fail(`${cellName(ref)} is a different font size from ${first} — one size across the page`);
+    if (size(cell) !== want) return fail(`${cellName(ref)} is a different font size from ${first}. One size across the page`);
   }
-  if (titleCell && want !== null && size(titleCell) < want) return fail(`${cellName(title)} is a title smaller than the page — one size across, the title may be larger`);
+  if (titleCell && want !== null && size(titleCell) < want) return fail(`${cellName(title)} is a title smaller than the page. One size across, the title may be larger`);
   return ok();
 }
 
@@ -338,17 +338,17 @@ export function unitsLabel(sheet) {
 /** F1: a live check cell that evaluates to 0 (or TRUE) — two things that must agree, agreeing. */
 export function checkCell(sheet, ref) {
   const cell = sheet.cells[ref];
-  if (!isFormulaCell(cell)) return fail(`${cellName(ref)} is not a formula — a check is a live difference, not a typed 0`);
+  if (!isFormulaCell(cell)) return fail(`${cellName(ref)} is not a formula. A check is a live difference, not a typed 0`);
   if (!isLiveFormula(sheet, ref)) return fail(`${cellName(ref)} does not move with its inputs`);
   const v = cell.value;
   if (v === true || (typeof v === 'number' && Math.abs(v) < 1e-6)) return ok();
-  return fail(`${cellName(ref)} reads ${v} — the check does not tie`);
+  return fail(`${cellName(ref)} reads ${v}. The check does not tie`);
 }
 
 /** C7: nothing hidden on the sheet (grouped outlines are allowed; hiding is how columns get lost). */
 export function noHidden(sheet) {
-  if (sheet.hiddenCols && sheet.hiddenCols.size) return fail(`column ${colLetter([...sheet.hiddenCols][0])} is hidden — group it instead`);
-  if (sheet.hiddenRows && sheet.hiddenRows.size) return fail(`row ${[...sheet.hiddenRows][0]} is hidden — group it instead`);
+  if (sheet.hiddenCols && sheet.hiddenCols.size) return fail(`column ${colLetter([...sheet.hiddenCols][0])} is hidden. Group it instead`);
+  if (sheet.hiddenRows && sheet.hiddenRows.size) return fail(`row ${[...sheet.hiddenRows][0]} is hidden. Group it instead`);
   return ok();
 }
 
@@ -386,7 +386,7 @@ export function unchangedExcept(sheet, before, allowed = []) {
   const refs = new Set([...Object.keys(before || {}), ...Object.keys(sheet.cells || {})]);
   for (const ref of refs) {
     if (allow.has(ref)) continue;
-    if (norm(before[ref]) !== norm(sheet.cells[ref])) return fail(`${cellName(ref)} changed — fix the faults and nothing else`);
+    if (norm(before[ref]) !== norm(sheet.cells[ref])) return fail(`${cellName(ref)} changed. Fix the faults and nothing else`);
   }
   return ok();
 }
