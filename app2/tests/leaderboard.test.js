@@ -67,14 +67,14 @@ const tick = () => new Promise(r => setTimeout(r, 5));
 const row = (pos, handle, secs, tier = 'pass') => ({ pos, handle, level: 2, secs, keys: 20, tier, at: '2026-09-20T10:00:00Z' });
 const count = (s, re) => (s.match(re) || []).length;
 
-// one clean local run on edge-jumps, so every state has "your times" to keep
-records.addAttempt({ id: '30000000-0000-4000-8000-000000000001', kind: 'drill', ref: 'edge-jumps', secs: 7.25, keys: 11, clean: true, tier: 'pass', at: Date.now() });
+// one clean local run on get-around, so every state has "your times" to keep
+records.addAttempt({ id: '30000000-0000-4000-8000-000000000001', kind: 'drill', ref: 'get-around', secs: 7.25, keys: 11, clean: true, tier: 'pass', at: Date.now() });
 
 test('signed out: the page stays local, says the field opens on sign-in, never calls rpc_board', async () => {
   await auth.ready();
   assert.equal(auth.state(), 'out');
   assert.equal(store.liveBoards(), false);
-  assert.equal(await store.globalBoard('edge-jumps'), null);
+  assert.equal(await store.globalBoard('get-around'), null);
   assert.equal(server.calls.length, 0, 'no network read for a guest');
   const html = panelHtml('benchmark', { live: false });
   assert.match(html, /7\.25s/, 'your local clean time shows');
@@ -93,8 +93,8 @@ test('signed in with rows: top rows, your row appended below them, local times b
   const rows = [];
   for (let i = 1; i <= 14; i++) rows.push(row(i, 'player' + i, 5 + i / 10));
   rows.push(row(15, 'boardwalker', 7.1, 'none'));
-  server.boards['edge-jumps|'] = rows;
-  const g = await store.globalBoard('edge-jumps');
+  server.boards['get-around|'] = rows;
+  const g = await store.globalBoard('get-around');
   assert.equal(g.rows.length, 15);
   assert.equal(g.me, 'boardwalker');
   assert.deepEqual(g.rows.filter(r => r.mine).map(r => r.pos), [15], 'your row is flagged by your handle');
@@ -121,12 +121,12 @@ test('signed in with rows: top rows, your row appended below them, local times b
 
   // reads are cached briefly: tab switching does not refetch
   const n = server.calls.length;
-  await store.globalBoard('edge-jumps');
+  await store.globalBoard('get-around');
   assert.equal(server.calls.length, n);
 });
 
 test('signed in, empty board: one line says so, no placeholder rows, no pace-setters', async () => {
-  const g = await store.globalBoard('go-anywhere');
+  const g = await store.globalBoard('enter-and-fill');
   assert.deepEqual(g.rows, []);
   const html = liveBoard('Go anywhere', 'drill', g, []);
   const field = html.split('Your times')[0];
@@ -141,18 +141,18 @@ test('signed in, empty board: one line says so, no placeholder rows, no pace-set
 
 test('load failure: "couldn\'t load the board", local rows kept, and the failure is not cached', async () => {
   server.fail = true;
-  const g = await store.globalBoard('select-blocks');
+  const g = await store.globalBoard('find-and-fix');
   assert.equal(g, null);
   const html = liveBoard('Select blocks', 'drill', g, [{ secs: 7.25, mid: 'pass' }]);
   assert.match(html, /Couldn’t load the board\./);
   assert.match(html, /lb-retry/, 'with a way to try again');
   assert.match(html.split('Your times')[1], /7\.25s/, 'the local rows stay');
   server.fail = false;
-  server.boards['select-blocks|'] = [row(1, 'player1', 3.3)];
-  const again = await store.globalBoard('select-blocks');
+  server.boards['find-and-fix|'] = [row(1, 'player1', 3.3)];
+  const again = await store.globalBoard('find-and-fix');
   assert.equal(again.rows.length, 1, 'a retry reads again');
   // the whole signed-in panel: loading state for unread boards, failed for failed ones
-  const panel = panelHtml('benchmark', { live: true, global: { 'edge-jumps': null } });
+  const panel = panelHtml('benchmark', { live: true, global: { 'get-around': null } });
   assert.match(panel, /Couldn’t load the board/);
   assert.match(panel, /Loading the board/);
   assert.match(panel, /7\.25s/);

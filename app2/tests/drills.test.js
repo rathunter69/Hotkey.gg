@@ -6,8 +6,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DRILLS, DRILLS_BY_ID, drillById, BENCHMARKS, DAILY_POOL } from '../content/drills.js';
 import { validateDrill } from '../content/schema.js';
-import { parsFrom, tierFor, tierAtLeast } from '../app/pars.js';
+import { parsFrom, parsFromRoute, tierFor, tierAtLeast } from '../app/pars.js';
 import { LessonRun } from '../app/runner.js';
+import { tells } from '../content/copy/tells.js';
+import { BRITISH, namesVisibleThing, sentenceCount } from './copy-check.js';
 
 /** A deterministic rng for seed tests (mulberry32; the Daily uses the same in engine/rng.js). */
 function rng32(seed) {
@@ -28,7 +30,7 @@ function hintScript(hint) {
 }
 
 test('the catalogue: ids unique, lookups work, benchmarks and the Daily pool are real drills', () => {
-  assert.ok(DRILLS.length >= 6, 'at least the six Foundations drills');
+  assert.ok(DRILLS.length >= 11, 'at least the eleven Chapter 1 drills');
   const ids = DRILLS.map(d => d.id);
   assert.equal(new Set(ids).size, ids.length, 'ids unique');
   for (const d of DRILLS) assert.equal(DRILLS_BY_ID[d.id], d);
@@ -46,6 +48,40 @@ test('every drill validates', () => {
   assert.deepEqual(ch.filter(d => d.benchmark).map(d => d.id), ['challenge-to-standard-in-three-minutes', 'challenge-the-site-pnl'], 'two challenges are benchmarks');
   assert.ok(ch.filter(d => d.access === 'free').every(d => DAILY_POOL.includes(d.id)), 'the Daily pool picks the free challenges up');
   assert.ok(ch.filter(d => d.access === 'paid').every(d => !DAILY_POOL.includes(d.id)), 'the Daily never draws a paid challenge');
+});
+
+/** Chapter 1's drills as screenplay 6.1 lists them (resized 2026-10-01; M108): id and Pass par. */
+const CH1 = [['get-around', 60], ['enter-and-fill', 90], ['find-and-fix', 60], ['paste-surgeon', 90], ['row-wrangler', 60], ['format-the-weekly-page', 120],
+  ['insert-and-amend', 90], ['formula-sprint', 120], ['combine-two-tabs', 120], ['before-you-send', 120], ['weekly-sales-report', 180]];
+
+test("Chapter 1's eleven drills: 6.1's set and order, eight to twenty goals, pars from the reference route", () => {
+  const keyed = DRILLS.filter(d => d.kind !== 'challenge');
+  assert.deepEqual(keyed.map(d => d.id), CH1.map(([id]) => id));
+  for (const [id, pass] of CH1) {
+    const d = DRILLS_BY_ID[id];
+    assert.ok(d.goals.length >= 8 && d.goals.length <= 20, `${id}: ${d.goals.length} goals, 6.1 asks eight to twenty`);
+    assert.equal(d.route * 2, pass, `${id}: the reference route is half the Pass par`);
+    assert.deepEqual(d.pars, parsFromRoute(d.route), `${id}: pars from parsFromRoute`);
+    assert.equal(d.pars.pass, pass, `${id}: Pass par ${pass} s`);
+    assert.ok(d.optimalKeys / d.route <= 4, `${id}: ${d.optimalKeys} keys in a ${d.route} s route is faster than a fast hand`);
+    assert.equal(d.access, 'free', `${id}: Chapter 1 is free`);
+  }
+  assert.deepEqual(BENCHMARKS.filter(d => d.kind !== 'challenge').map(d => d.id), ['weekly-sales-report'], 'the weekly report is the benchmark');
+  for (const [id] of CH1) assert.ok(DAILY_POOL.includes(id), `${id} is in the Daily's pool`);
+});
+
+test('drill copy follows the copy rules: no tells, American spelling, one-sentence goals that name something visible', () => {
+  for (const d of DRILLS.filter(x => x.kind !== 'challenge')) {
+    for (const [field, text] of [['title', d.title], ['task', d.task], ...d.goals.map(g => [`goal ${g.id}`, g.text]), ...(d.endState || []).map((e, i) => [`endState ${i}`, e.text])]) {
+      assert.deepEqual(tells(text), [], `${d.id} ${field}: "${text}"`);
+      assert.doesNotMatch(text, BRITISH, `${d.id} ${field}: British spelling`);
+    }
+    for (const g of d.goals) {
+      assert.ok(g.text.length <= 140, `${d.id} ${g.id}: ${g.text.length} characters`);
+      assert.ok(namesVisibleThing(g.text), `${d.id} ${g.id} names nothing visible: "${g.text}"`);
+      assert.ok(sentenceCount(g.text) === 1 && /\.$/.test(g.text), `${d.id} ${g.id}: one sentence ending in a full stop`);
+    }
+  }
 });
 
 test('validateDrill rejects the broken shapes', () => {
@@ -90,6 +126,12 @@ test('a Daily seed patches figures without breaking the checks', () => {
     // determinism: the same day seed gives the same patch
     assert.deepEqual(d.seed(rng32(20260922)), patch, `${d.id}: seed is deterministic`);
   }
+});
+
+test('parsFromRoute sets Pass at 2x the route, Expert at 1.4x, Legendary at 1.1x (screenplay 6.0)', () => {
+  assert.deepEqual(parsFromRoute(30), { pass: 60, pro: 42, legendary: 33 });
+  assert.deepEqual(parsFromRoute(45), { pass: 90, pro: 63, legendary: 50 });
+  assert.deepEqual(parsFromRoute(90), { pass: 180, pro: 126, legendary: 99 });
 });
 
 test('parsFrom derives the old ladder and tierFor grades against it', () => {

@@ -47,7 +47,7 @@ test('router: error cards name pages as people do; the storyboard is local-only;
   assert.equal(pageLabel('home'), 'Home');
   assert.equal(pageLabel('learn'), 'Learn');
   assert.equal(pageLabel('drill', { daily: true }), 'The Daily');
-  assert.equal(pageLabel('drill', { id: 'edge-jumps' }), 'This drill');
+  assert.equal(pageLabel('drill', { id: 'get-around' }), 'This drill');
   assert.equal(pageLabel('start'), 'Getting started');
   assert.equal(pageLabel('notfound'), 'This page');
   for (const n of ['home', 'learn', 'practice', 'rapid', 'due', 'start', 'landing', 'lesson', 'reference']) assert.doesNotMatch(pageLabel(n), /^The (home|rapid|due|start|notfound) page/);

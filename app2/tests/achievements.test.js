@@ -42,10 +42,10 @@ test('a played ctx earns the right badges', () => {
   const ctx = {
     progress: Object.fromEntries(['inherited-workbook', 'ribbon-by-keyboard', 'analyst-setup', 'colour-label-hardcode'].map(id => [id, { completed: true }])),   // every lesson of Open and set up
     attempts: [
-      { kind: 'drill', ref: 'edge-jumps', day: '2026-09-22', secs: 3.9, keys: 8, clean: true, helped: false, mouse: 0, tier: 'legendary', at: Date.parse('2026-09-22T13:00:00Z') },
+      { kind: 'drill', ref: 'get-around', day: '2026-09-22', secs: 3.9, keys: 46, clean: true, helped: false, mouse: 0, tier: 'legendary', at: Date.parse('2026-09-22T13:00:00Z') },
       { kind: 'rapid', ref: 'rapid-60', day: '2026-09-22', secs: 60, keys: 40, clean: false, mouse: 0, tier: 'none', splits: [12, 2, 11, 520], at: Date.parse('2026-09-22T13:10:00Z') },
     ],
-    pbs: { 'edge-jumps': { ref: 'edge-jumps', secs: 3.9 } },
+    pbs: { 'get-around': { ref: 'get-around', secs: 3.9 } },
     level: 5, streakDays: 7,
   };
   const done = earnedSet(ctx);

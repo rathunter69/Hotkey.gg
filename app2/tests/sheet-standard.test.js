@@ -12,12 +12,12 @@ import { DRILLS } from '../content/drills.js';
 import { LessonRun } from '../app/runner.js';
 import { Sheet } from '../engine/sheet.js';
 import { sheetStandard } from '../app/graders.js';
+import { parseRef } from '../engine/refs.js';
 
 // Built before the standard existed and rebuilt on it in run R1 (the Clearcoat re-skin and the
 // drills moved onto the skeleton, M108). This list only shrinks; R1 is not done until it is empty.
 const PENDING_WORKBOOKS = new Set(['voltline-weekly', 'voltline-pnl']);
-const PENDING_DRILLS = new Set(['bold-and-borders', 'edge-jumps', 'fill-factory', 'find-and-fix', 'format-cells-numbers',
-  'formula-sprint', 'go-anywhere', 'paste-surgeon', 'row-wrangler', 'select-blocks', 'type-the-column', 'weekly-sales-report']);
+const PENDING_DRILLS = new Set();   // emptied by M108: every Chapter 1 drill is built on the skeleton
 
 const chapterOf = ch => ch === 'foundations' || ch === 1 ? 1 : (typeof ch === 'number' ? ch : 2);
 
@@ -53,6 +53,10 @@ test("every drill's solved sheet is to standard", () => {
     for (const { name, sheet } of run.session.sheets) {
       if (d.offStandard && d.offStandard[name]) continue;
       assert.deepEqual(sheetStandard(sheet, { chapter: chapterOf(d.chapter), read: !(d.working) }), [], `${d.id} ${name}`);
+      // a drill tab runs 5 to 40 rows by 5 to 11 columns (screenplay 5, "Drill sheets")
+      let rows = 0, cols = 0;
+      for (const k in sheet.cells) { const c = sheet.cells[k]; if (c.value == null && c.formula == null) continue; const p = parseRef(k); rows = Math.max(rows, p.r); cols = Math.max(cols, p.c); }
+      assert.ok(rows >= 5 && rows <= 40 && cols >= 5 && cols <= 11, `${d.id} ${name}: ${rows} rows by ${cols} columns, a drill tab is 5 to 40 by 5 to 11`);
     }
   }
 });

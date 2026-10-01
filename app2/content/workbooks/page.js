@@ -189,7 +189,9 @@ export function buildPage(spec) {
   const figW = spec.figureW || FIGURE_W;
   for (let c = figCol; c <= lastCol; c++) colW[c] = figW;
   const fit = new Sheet({ cells: JSON.parse(JSON.stringify(cells)), colW });
-  colW[labelCol] = spec.labelW || Math.max(FIGURE_W, fit.neededWidth(labelCol, 4, foot));
+  // the source line overflows to the right as text does; the labels and the check lines set the width
+  const fitTo = Math.max(FIGURE_W, fit.neededWidth(labelCol, 4, r - 1), checksRow ? fit.neededWidth(labelCol, checksRow, foot) : 0);
+  colW[labelCol] = spec.labelW || fitTo;
   // a wrapped header row grows to fit, as Excel's autofit would
   const sized = new Sheet({ cells: JSON.parse(JSON.stringify(cells)), colW });
   sized.select(`A4:${colLetter(lastCol)}4`); sized.autofitRows();

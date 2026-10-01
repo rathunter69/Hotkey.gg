@@ -20,14 +20,15 @@ test('practice: every drill names the module that teaches its keys (chapter 1 fo
 
 test('practice: a drill is tagged with the LAST module it leans on', () => {
   const n = id => drillModule(DRILLS.find(d => d.id === id)).n;
-  assert.equal(n('edge-jumps'), '1.2');
-  assert.equal(n('type-the-column'), '1.6');        // types figures (1.3), ends on AutoSum (1.6)
+  assert.equal(n('get-around'), '1.2');
+  assert.equal(n('insert-and-amend'), '1.6');       // moves rows (1.4), ends on amending the total (1.6)
   assert.equal(n('row-wrangler'), '1.4');
+  assert.equal(n('before-you-send'), '1.7');
   assert.equal(n('challenge-find-and-mark'), '1.2'); // a challenge carries its own module
 });
 
 test('practice: a module is taught once every lesson is completed or skipped, never by a challenge alone', () => {
-  const m = drillModule(DRILLS.find(d => d.id === 'edge-jumps'));
+  const m = drillModule(DRILLS.find(d => d.id === 'get-around'));
   const ids = m.lessons.map(l => l.id);
   assert.equal(moduleTaught(m, {}, []), false);
   const all = Object.fromEntries(ids.map(id => [id, { completed: true }]));

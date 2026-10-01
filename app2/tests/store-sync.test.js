@@ -117,7 +117,7 @@ async function authEvent(event, session) {
 test('first sign-in: guest lessons carry over and guest runs replay flagged p_guest', async () => {
   // a guest plays 1.1.1 and a drill on this device
   progress.record('inherited-workbook', 'guided', 40, {});
-  records.addAttempt({ id: '10000000-0000-4000-8000-000000000001', kind: 'drill', ref: 'edge-jumps', secs: 6.5, keys: 9, clean: true, tier: 'pass', trace: [{ k: 'Ctrl+↓', t: 0 }], at: Date.now() });
+  records.addAttempt({ id: '10000000-0000-4000-8000-000000000001', kind: 'drill', ref: 'get-around', secs: 6.5, keys: 9, clean: true, tier: 'pass', trace: [{ k: 'Ctrl+↓', t: 0 }], at: Date.now() });
   server.session = null;
   await auth.ready();
   assert.equal(auth.state(), 'out');
@@ -213,7 +213,7 @@ test('a 401 the refresh cannot fix: guest mode, nothing lost, the same account p
 });
 
 test('sign-out wipes the account traces now; a reply for the old token is dropped', async () => {
-  store.addAttempt({ id: '30000000-0000-4000-8000-000000000001', kind: 'drill', ref: 'edge-jumps', secs: 5, keys: 8, clean: true, tier: 'pro', at: Date.now() });
+  store.addAttempt({ id: '30000000-0000-4000-8000-000000000001', kind: 'drill', ref: 'get-around', secs: 5, keys: 8, clean: true, tier: 'pro', at: Date.now() });
   const t = auth.token();
   await auth.signOut();
   assert.equal(auth.current(t), false, 'the old generation is dead');
