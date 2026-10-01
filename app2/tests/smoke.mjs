@@ -93,8 +93,8 @@ try {
     form: !!document.querySelector('#authForm'),
     emailDisabled: !!(document.querySelector('#authEmail') && document.querySelector('#authEmail').disabled),
     notConfigured: /Sign-in is not configured/.test(document.body.innerText),
-    chip: (document.querySelector('#userState') || {}).textContent || '',
-    saveLine: (document.querySelector('#umState') || {}).textContent || '',
+    chip: document.querySelector('#railAvatar.guest') ? 'guest' : ((document.querySelector('#railAcctBtn') || {}).textContent || '').trim(),
+    saveLine: (document.querySelector('#railSave') || {}).textContent || '',
   }));
   if (!acct.form) fail('#/account: sign-in form missing');
   if (acct.hasVendor && (acct.emailDisabled || acct.notConfigured)) fail('#/account: form disabled although the client exists');
