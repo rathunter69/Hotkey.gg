@@ -186,27 +186,6 @@ test('the adaptive lesson format is enforced', () => {
   }
 });
 
-for (const lesson of LESSONS) {
-  test(`${lesson.id}: validates, requires only taught concepts, solution replays`, { skip: driftSkip(DRIFT_LESSONS, lesson.id) }, () => {
-    const errs = validateLesson(lesson);
-    assert.deepEqual(errs, [], errs.join('; '));
-    const avail = availableConcepts(lesson, LESSONS_BY_ID);
-    for (const g of lesson.goals) for (const c of g.requires || []) assert.ok(avail.has(c), `${lesson.id} goal ${g.id} requires "${c}" which is not taught here or earlier`);
-
-    let t = 0;
-    const run = new LessonRun(lesson, { mode: 'guided', now: () => (t += 100) });
-    assert.equal(run.finished, false);
-    run.evaluate();
-    assert.equal(run.doneCount, 0, 'no goal passes on the starting sheet');
-    run.run(lesson.solution);
-    const states = run.goalStates();
-    assert.ok(run.finished, `${lesson.id}: solution did not finish — done ${run.doneCount}/${lesson.goals.length}; first unmet: ${states.find(g => !g.done)?.text || run.endStates().find(e => !e.ok)?.text}`);
-    assert.equal(run.doneCount, lesson.goals.length);
-    assert.ok(run.elapsed > 0);
-    assert.equal(run.current, null);
-  });
-}
-
 /* ---------------- guided hints: each is the complete route from the previous goal's end state ---------------- */
 
 
@@ -216,20 +195,7 @@ test('hintScript turns a hint into a replayable script', () => {
   assert.equal(hintScript('↓ ↓ → Ctrl+Shift+↓ then Ctrl+1 N'), 'Down Down Right Ctrl+Shift+Down Ctrl+1 N');
 });
 
-for (const lesson of LESSONS) {
-  test(`${lesson.id}: every guided hint lands exactly its goal from where the previous goal left off`, { skip: driftSkip(DRIFT_LESSONS, lesson.id) }, () => {
-    const run = fresh(lesson);
-    lesson.goals.forEach((g, i) => {
-      if (g.demo) { run.run(''); assert.ok(run.doneCount >= i + 1, `${lesson.id} goal ${g.id}: the demo plays itself and lands its goal`); return; }
-      assert.ok(typeof g.keys === 'string' && g.keys.trim(), `${lesson.id} goal ${g.id} has a guided hint`);
-      run.run(hintScript(g.keys));
-      // a demo goal that follows plays itself as soon as this goal lands, so it may already be done too
-      let expect = i + 1; while (expect < lesson.goals.length && lesson.goals[expect].demo && run.doneCount > expect) expect++;
-      assert.equal(run.doneCount, expect, `${lesson.id} goal ${g.id}: pressing exactly the hint "${g.keys}" should land this goal and no other (selection now ${run.sheet.selectionText()})`);
-    });
-    assert.ok(run.finished, `${lesson.id}: the hints, one after another, complete the lesson`);
-  });
-}
+// the per-lesson replays and hint walks run sharded in lesson-replay-*.test.js, so they spread over the cores
 
 /* ---------------- runner contract ---------------- */
 
