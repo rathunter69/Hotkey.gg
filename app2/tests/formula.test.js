@@ -60,7 +60,7 @@ table('coercion of text, blanks and errors', [
   ['=F1+1', 1], ['=F1&"x"', 'x'], ['=F1', 0], ['=Z9', 0], ['=A1&F1&A2', '12'],
   ['=C1+1', '#N/A'], ['=SUM(A1:C1)', '#N/A'], ['=IFERROR(C1,0)', 0], ['=IFNA(C1,"missing")', 'missing'], ['=IFNA(1/0,0)', '#DIV/0!'],
   ['=1/0', '#DIV/0!'], ['=A1/F1', '#DIV/0!'], ['=0^-1', '#DIV/0!'], ['=SQRT(-1)', '#NUM!'], ['=FOO(1)', '#NAME?'], ['=foo', '#NAME?'], ['=#N/A', '#N/A'],
-  ['=A1:A3+1', '#VALUE!'], ['=ISERROR(1/0)', true], ['=ISERROR(1)', false], ['=ISNA(C1)', true], ['=ISBLANK(F1)', true], ['=ISBLANK(A1)', false], ['=ISNUMBER(B1)', false], ['=ISNUMBER(A1)', true], ['=ISTEXT(B1)', true],
+  ['=ISERROR(1/0)', true], ['=ISERROR(1)', false], ['=ISNA(C1)', true], ['=ISBLANK(F1)', true], ['=ISBLANK(A1)', false], ['=ISNUMBER(B1)', false], ['=ISNUMBER(A1)', true], ['=ISTEXT(B1)', true],
   // the IS* classifiers see an error as a value to classify, never as something to propagate (the ISNUMBER(MATCH()) / ISNUMBER(SEARCH()) idioms)
   ['=ISNUMBER(MATCH(99,D1:D3,0))', false], ['=IF(ISNUMBER(MATCH(99,D1:D3,0)),"found","missing")', 'missing'], ['=ISNUMBER(MATCH(20,D1:D3,0))', true], ['=IF(ISNUMBER(SEARCH("z",E1)),"yes","no")', 'no'], ['=ISNUMBER(SEARCH("p",E1))', true],
   ['=ISTEXT(1/0)', false], ['=ISLOGICAL(NA())', false], ['=ISNONTEXT(NA())', true], ['=ISBLANK(NA())', false], ['=ISNUMBER(C1)', false], ['=ISNONTEXT(C1)', true], ['=ISNUMBER("5")', false], ['=ISNUMBER(TRUE)', false],

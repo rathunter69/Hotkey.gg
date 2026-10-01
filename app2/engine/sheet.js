@@ -74,6 +74,7 @@ export const CELL_STYLES = [
 ];
 
 const clone = o => JSON.parse(JSON.stringify(o));
+const rectKeys = rg => { const out = []; for (let r = rg.r1; r <= rg.r2; r++) for (let c = rg.c1; c <= rg.c2; c++) out.push(refKey(r, c)); return out; };
 /** Excel's built-in fill lists: the weekday and month names, short and long. */
 const FILL_LISTS = [
   ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
@@ -390,6 +391,7 @@ export class Sheet {
     if (!p) throw new Error('bad ref ' + ref);
     this._cfMap = null;
     const cell = this.ensure(p.r, p.c);
+    if (spec.formula || spec.value !== undefined) { delete cell.spill; delete cell.spillVal; }
     if (spec.formula) { cell.formula = spec.formula; cell.txt = false; }
     else if (spec.value !== undefined) { cell.formula = null; cell.value = spec.value; cell.txt = typeof spec.value === 'string' && !isErrVal(spec.value); }
     for (const k in spec) if (k !== 'value' && k !== 'formula') cell[k] = spec[k];
@@ -411,7 +413,14 @@ export class Sheet {
       // NAME!B3: another sheet of the workbook (the Session wires `resolver`); no workbook = #REF!
       sheetRaw: (name, key) => { const sh = this.resolver ? this.resolver(name) : null; return sh ? sh.raw(key) : '#REF!'; },
       name: nm => this.resolveName(nm),
+      isFormula: k => { const sh = this.sheetOfKey(k); return !!(sh && sh.sheet.cells[sh.key] && sh.sheet.cells[sh.key].formula); },   // ISFORMULA
+      spillRange: k => { const sh = this.sheetOfKey(k); const c = sh && sh.sheet.cells[sh.key]; return c && c.spillTo ? { ...c.spillTo } : null; },   // A1#
       ...extra };
+  }
+  /** A key, possibly NAME!B3, as { sheet, key }; null when the sheet is unknown. */
+  sheetOfKey(k) {
+    const b = k.indexOf('!'); if (b < 0) return { sheet: this, key: k };
+    const sh = this.resolver ? this.resolver(k.slice(0, b)) : null; return sh ? { sheet: sh, key: k.slice(b + 1) } : null;
   }
 
   /* ---------------- defined names (Define Name, the Name Box list, Go To by name: M40) ---------------- */
@@ -621,18 +630,41 @@ export class Sheet {
    */
   recalc() {
     this._cfMap = null;   // every mutation ends in a recalc (commit): the conditional-formatting map is re-evaluated on the next read
+    // dynamic arrays (M61): a spilled cell carries `spill` (its anchor's key) and no formula; the anchor
+    // carries `spillTo`. Every recalc starts from a clean slate: the spilled values are cleared and
+    // rewritten by the anchors as they evaluate (a blocked spill makes the anchor #SPILL!). The
+    // ranges of the previous recalc feed the dependency graph, so a reader of a spilled cell waits
+    // for its anchor; a range that moves is caught by the read log and the fixed-point pass.
+    const spillOwner = {};
+    for (const k in this.cells) {
+      const c = this.cells[k]; if (!c) continue;
+      if (c.spill) { if (!c.formula && c.value === c.spillVal) { c.value = null; c.txt = false; } delete c.spill; delete c.spillVal; }   // an entry typed over a spilled cell stays, and blocks the spill
+      if (c.spillTo) { if (c.formula) for (const kk of rectKeys(c.spillTo)) spillOwner[kk] = k; delete c.spillTo; }
+    }
     const keys = []; for (const k in this.cells) if (this.cells[k] && this.cells[k].formula) keys.push(k);
     if (!keys.length) return;
     const fset = new Set(keys);
     // Every formula-cell key a formula actually dereferences while evaluating is recorded, so a
     // dependency that only exists through OFFSET/INDEX/INDIRECT-built ranges still joins the graph.
     const reads = {}; let cur = null;
-    const ctx = this.evalCtx({ raw: kk => { if (cur && fset.has(kk)) reads[cur].add(kk); return this.raw(kk); } });
+    const ctx = this.evalCtx({ raw: kk => { if (cur) { if (fset.has(kk)) reads[cur].add(kk); else { const c = this.cells[kk]; if (c && c.spill && fset.has(c.spill)) reads[cur].add(c.spill); } } return this.raw(kk); } });
+    const clearSpill = k => { for (const kk in this.cells) { const c = this.cells[kk]; if (c && c.spill === k) { delete c.spill; delete c.spillVal; c.value = null; c.txt = false; } } if (this.cells[k]) delete this.cells[k].spillTo; };
+    const applySpill = (k, rows) => {   // the anchor's result block; null when a cell in the way (or the sheet's edge) blocks it
+      const p = parseRef(k); const h = rows.length, w = rows[0].length;
+      if (p.r + h - 1 > this.rows || p.c + w - 1 > this.cols) return false;
+      for (let r = 0; r < h; r++) for (let c = 0; c < w; c++) { if (!r && !c) continue; const t = this.cells[refKey(p.r + r, p.c + c)]; if (t && (t.formula || t.spill || (t.value !== null && t.value !== '' && t.value !== undefined))) return false; }
+      for (let r = 0; r < h; r++) for (let c = 0; c < w; c++) { if (!r && !c) continue; const t = this.ensure(p.r + r, p.c + c); const v = rows[r][c]; t.value = v === null || v === undefined ? 0 : v; t.txt = typeof t.value === 'string' && !isErrVal(t.value); t.spill = k; t.spillVal = t.value; }
+      this.cells[k].spillTo = { r1: p.r, c1: p.c, r2: p.r + h - 1, c2: p.c + w - 1 };
+      return true;
+    };
     const evalOne = k => {
       const c = this.cells[k];
       const p = parseRef(k);
       cur = k; reads[k] = new Set();
-      try { return evalFormula(c.formula, { ...ctx, cell: p ? { r: p.r, c: p.c } : undefined }); }
+      let spill = null;
+      try { const v = evalFormula(c.formula, { ...ctx, cell: p ? { r: p.r, c: p.c } : undefined, onSpill: rows => { spill = rows; } });
+        if (c.spillTo || spill) { clearSpill(k); if (spill && !applySpill(k, spill)) return '#SPILL!'; }
+        return v; }
       catch (e) { return '#NAME?'; }   // a stored formula that no longer parses reads as an error
       finally { cur = null; }
     };
@@ -644,6 +676,12 @@ export class Sheet {
         if (ref.sheet) continue;   // another sheet's cell: the Session's cross-sheet recalc covers it
         if (ref.key) { if (fset.has(ref.key)) d.add(ref.key); }
         else { const rg = ref.range; for (let r = Math.max(1, rg.r1); r <= Math.min(rg.r2, this.rows); r++) for (let c = Math.max(1, rg.c1); c <= Math.min(rg.c2, this.cols); c++) { const kk = refKey(r, c); if (fset.has(kk)) d.add(kk); } }
+      }
+      // a reader of a spilled cell waits for its anchor (the ranges of the previous recalc)
+      for (const ref of formulaRefs(this.cells[k].formula, { rows: this.rows, cols: this.cols })) {
+        if (ref.sheet) continue;
+        if (ref.key) { if (spillOwner[ref.key] && spillOwner[ref.key] !== k) d.add(spillOwner[ref.key]); }
+        else { const rg = ref.range; for (let r = Math.max(1, rg.r1); r <= Math.min(rg.r2, this.rows); r++) for (let c = Math.max(1, rg.c1); c <= Math.min(rg.c2, this.cols); c++) { const o = spillOwner[refKey(r, c)]; if (o && o !== k) d.add(o); } }
       }
       deps[k] = d;
     }
@@ -668,7 +706,7 @@ export class Sheet {
     const merge = () => { let added = false; for (const k of keys) { if (!reads[k]) continue; for (const d of reads[k]) if (!deps[k].has(d)) { deps[k].add(d); added = true; } } return added; };
     let { cyclic, order } = detect();
     // a cell that depends on a cyclic cell inherits nothing special — it just reads the 0
-    const evalAll = () => { for (const k of order) { const c = this.cells[k]; c.value = cyclic.has(k) ? 0 : evalOne(k); } };
+    const evalAll = () => { for (const k of order) { const c = this.cells[k]; if (cyclic.has(k)) { clearSpill(k); c.value = 0; } else c.value = evalOne(k); } };
     evalAll();
     if (merge()) { ({ cyclic, order } = detect()); evalAll(); }
     // settle dynamic references (OFFSET etc.) with a short fixed-point pass; a loop that only
@@ -745,6 +783,7 @@ export class Sheet {
   }
   applyInput(target, cls, r, c) {
     if (cls.kind === 'empty') return;
+    delete target.spill; delete target.spillVal;   // an entry over a spilled cell is the cell's own (and blocks the spill)
     if (cls.kind === 'formula') {
       target.formula = cls.formula; target.txt = false; target.apos = false;
       let v; try { v = evalFormula(cls.formula, this.evalCtx({ cell: { r, c } })); } catch (e) { v = '#NAME?'; }
