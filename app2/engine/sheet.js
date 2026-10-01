@@ -411,6 +411,7 @@ export class Sheet {
       // NAME!B3: another sheet of the workbook (the Session wires `resolver`); no workbook = #REF!
       sheetRaw: (name, key) => { const sh = this.resolver ? this.resolver(name) : null; return sh ? sh.raw(key) : '#REF!'; },
       name: nm => this.resolveName(nm),
+      hidden: r => !this.isVisible('r', r),   // SUBTOTAL(1xx) skips the rows that do not show
       ...extra };
   }
 
