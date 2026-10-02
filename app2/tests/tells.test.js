@@ -23,7 +23,9 @@ test('facts joined by a middle dot or a pipe are a tell; the paragraph break is 
 test('capitals: shouting is a tell; keys, functions and acronyms are not', () => {
   assert.ok(capsTell('NEVER merge cells.'));
   assert.ok(capsTell('A BRAND new best.'));
-  for (const s of ['Use VLOOKUP or XLOOKUP.', 'EBITDA and the DCF.', 'QUARTILE.INC skips text.', 'The P&L sheet.', '#VALUE! means text.', 'Press `F4`.']) assert.equal(capsTell(s), null, s);
+  for (const s of ['Use VLOOKUP or XLOOKUP.', 'EBITDA and the DCF.', 'QUARTILE.INC skips text.', 'The P&L sheet.', '#VALUE! means text.', 'Press `F4`.', 'Label it ="Q"&I5&" "&YEAR(A5).', 'Then ="FY"&RIGHT(L5,2).']) assert.equal(capsTell(s), null, s);
+  assert.ok(capsTell('Q3 &NEVER joined.'), 'a word in capitals after an ampersand is still shouting');
+  assert.deepEqual(tells('Enter =NETWORKDAYS.INTL(E5,$I$5,"0000000",$C$13:$C$14) with Ctrl+Enter.'), [], 'a dotted function name in a typed formula');
 });
 
 test('an arrow at the end of a label is a tell; a key chord ending in an arrow is not', () => {

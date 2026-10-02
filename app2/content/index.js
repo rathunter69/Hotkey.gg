@@ -82,7 +82,45 @@ import one_page_summary from './lessons/one-page-summary.js';
 import challenge_print_pack from './lessons/challenge-print-pack.js';
 import ch2_project from './lessons/ch2-project.js';
 import ch2_assessment from './lessons/ch2-assessment.js';
+// Chapter 3 · Formulas and functions (Run R3): 3.5 Time value of money, 3.6 Auditing, 3.7 Project and assessment
+import pv_fv_pmt from './lessons/pv-fv-pmt.js';
+import npv_xnpv from './lessons/npv-xnpv.js';
+import irr_xirr from './lessons/irr-xirr.js';
+import payment_schedule from './lessons/payment-schedule.js';
+import challenge_new_site_case from './lessons/challenge-new-site-case.js';
+import trace_arrows_evaluate from './lessons/trace-arrows-evaluate.js';
+import f9_show_formulas_at_scale from './lessons/f9-show-formulas-at-scale.js';
+import hardcode_external_link_hunt from './lessons/hardcode-external-link-hunt.js';
+import checks_block_rollup from './lessons/checks-block-rollup.js';
+import challenge_six_faults from './lessons/challenge-six-faults.js';
+import ch3_project from './lessons/ch3-project.js';
+import ch3_assessment from './lessons/ch3-assessment.js';
 import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // Chapter 1's format challenge, re-clothed (content/remix.js)
+// Chapter 3 · Formulas and functions (Run R3, the KPI databook on clearcoat-databook): 3.1 logic, 3.2 dates
+import if_on_a_threshold from './lessons/if-on-a-threshold.js';
+import nested_if_ifs_min_max from './lessons/nested-if-ifs-min-max.js';
+import and_or_not from './lessons/and-or-not.js';
+import iferror_and_the_override from './lessons/iferror-and-the-override.js';
+import challenge_flags_block from './lessons/challenge-flags-block.js';
+import date_serials from './lessons/date-serials.js';
+import member_tenure from './lessons/member-tenure.js';
+import period_keys from './lessons/period-keys.js';
+import yearfrac_and_fiscal_periods from './lessons/yearfrac-and-fiscal-periods.js';
+import trading_calendar from './lessons/trading-calendar.js';
+import challenge_timeline_and_age from './lessons/challenge-timeline-and-age.js';
+// Chapter 3 · Formulas and functions (Run R3): 3.3 Math and aggregation, 3.4 Text
+import round_family from './lessons/round-family.js';
+import countif_countifs from './lessons/countif-countifs.js';
+import sumif_sumifs_averageifs from './lessons/sumif-sumifs-averageifs.js';
+import busiest_sites from './lessons/busiest-sites.js';
+import sumproduct_blended_ticket from './lessons/sumproduct-blended-ticket.js';
+import the_reconciliation from './lessons/the-reconciliation.js';
+import challenge_site_package_summary from './lessons/challenge-site-package-summary.js';
+import split_the_codes from './lessons/split-the-codes.js';
+import parse_the_memo from './lessons/parse-the-memo.js';
+import text_to_numbers from './lessons/text-to-numbers.js';
+import text_to_columns_flash_fill from './lessons/text-to-columns-flash-fill.js';
+import challenge_text_dump from './lessons/challenge-text-dump.js';
 
 export const CHAPTERS = [
   {
@@ -138,6 +176,31 @@ export const CHAPTERS = [
       print_areas_titles_footers, one_page_summary, challenge_print_pack,
       ch2_project, ch2_assessment,
       remix_format_on_the_pnl,
+    ],
+  },
+  {
+    id: 'formulas',
+    title: 'Formulas and functions',
+    access: 'paid',
+    blurb: 'Logic, dates, math and aggregation, text, time value of money and auditing: the point-of-sale export rolled up into a KPI databook where every number reconciles.',
+    // Chapter 3's sections in order (script-ch3.md): the six modules and the closing project block.
+    sections: [
+      { name: 'Logic', blurb: 'IF on a threshold; nested IF against IFS against MIN and MAX; AND, OR and NOT for compound flags; IFERROR and the override pattern.' },
+      { name: 'Dates', blurb: 'Serial numbers and DATE, YEAR, MONTH, DAY; member tenure from join and cancel dates; period keys for grouping; YEARFRAC and fiscal periods; NETWORKDAYS and WEEKDAY for the trading calendar.' },
+      { name: 'Math and aggregation', blurb: 'ROUND and its family; COUNTIFS, SUMIFS and AVERAGEIFS; MAXIFS, MINIFS, LARGE, SMALL and RANK; SUMPRODUCT; the reconciliation.' },
+      { name: 'Text', blurb: 'LEN, LEFT, RIGHT and MID; FIND, SEARCH and SUBSTITUTE; VALUE and DATEVALUE; Text to Columns and Flash Fill.' },
+      { name: 'Time value of money', blurb: 'PV, FV and PMT on the site-build loan; NPV and XNPV; IRR and XIRR; a payment schedule with anchors.' },
+      { name: 'Auditing', blurb: 'Trace precedents and dependents; F9 on a part and Go To Special at scale; the hardcode and external-link hunt; the checks block with a roll-up flag.' },
+      { name: 'Project and assessment', blurb: 'Rebuild the Summary so every number ties, then a fresh export against the clock.' },
+    ],
+    lessons: [
+      if_on_a_threshold, nested_if_ifs_min_max, and_or_not, iferror_and_the_override, challenge_flags_block,
+      date_serials, member_tenure, period_keys, yearfrac_and_fiscal_periods, trading_calendar, challenge_timeline_and_age,
+      round_family, countif_countifs, sumif_sumifs_averageifs, busiest_sites, sumproduct_blended_ticket, the_reconciliation, challenge_site_package_summary,
+      split_the_codes, parse_the_memo, text_to_numbers, text_to_columns_flash_fill, challenge_text_dump,
+      pv_fv_pmt, npv_xnpv, irr_xirr, payment_schedule, challenge_new_site_case,
+      trace_arrows_evaluate, f9_show_formulas_at_scale, hardcode_external_link_hunt, checks_block_rollup, challenge_six_faults,
+      ch3_project, ch3_assessment,
     ],
   },
 ];

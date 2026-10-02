@@ -153,7 +153,8 @@ const MIN_ARGS = { SUM: 1, MAX: 1, MIN: 1, ABS: 1, SIGN: 1, INT: 1, TRUNC: 1, AV
   FIND: 2, SEARCH: 2, TRIM: 1, UPPER: 1, LOWER: 1, PROPER: 1, CONCATENATE: 1, CONCAT: 1, TEXTJOIN: 3, SUBSTITUTE: 3, REPT: 2, EXACT: 2, VALUE: 1, TEXT: 2, T: 1, N: 1,
   DATE: 3, YEAR: 1, MONTH: 1, DAY: 1, WEEKDAY: 1, DAYS: 2, EDATE: 2, EOMONTH: 2, YEARFRAC: 2, NPV: 2, IRR: 1, PMT: 3, PV: 3, FV: 3,
   REPLACE: 4, RRI: 3, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, ISFORMULA: 1, FILTER: 2, SORT: 1, UNIQUE: 1, SEQUENCE: 1, TRANSPOSE: 1, XMATCH: 2,
-  'NETWORKDAYS.INTL': 2, DATEDIF: 3, RATE: 3, NPER: 3, ADDRESS: 2, GETPIVOTDATA: 2 };
+  'NETWORKDAYS.INTL': 2, DATEDIF: 3, RATE: 3, NPER: 3, ADDRESS: 2, GETPIVOTDATA: 2,
+  CEILING: 2, FLOOR: 2, DATEVALUE: 1, NETWORKDAYS: 2, XNPV: 3, XIRR: 2, PPMT: 4, IPMT: 4 };
 const MAX_ARGS = { ABS: 1, SIGN: 1, INT: 1, TRUNC: 2, COUNTBLANK: 1, ROUND: 2, ROUNDUP: 2, ROUNDDOWN: 2, MOD: 2, SQRT: 1, POWER: 2, EXP: 1, LN: 1, LOG: 2, LOG10: 1, PI: 0, RAND: 0,
   LARGE: 2, SMALL: 2, RANK: 3, 'RANK.EQ': 3, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, SUMIF: 3, COUNTIF: 2, AVERAGEIF: 3, NOT: 1, TRUE: 0, FALSE: 0, NA: 0,
   IF: 3, IFERROR: 2, IFNA: 2, ISERROR: 1, ISERR: 1, ISNA: 1, ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, ISFORMULA: 1, HYPERLINK: 2,
@@ -161,7 +162,8 @@ const MAX_ARGS = { ABS: 1, SIGN: 1, INT: 1, TRUNC: 2, COUNTBLANK: 1, ROUND: 2, R
   FIND: 3, SEARCH: 3, TRIM: 1, UPPER: 1, LOWER: 1, PROPER: 1, SUBSTITUTE: 4, REPT: 2, EXACT: 2, VALUE: 1, TEXT: 2, T: 1, N: 1,
   TODAY: 0, DATE: 3, YEAR: 1, MONTH: 1, DAY: 1, WEEKDAY: 2, DAYS: 2, EDATE: 2, EOMONTH: 2, YEARFRAC: 3, IRR: 2, PMT: 5, PV: 5, FV: 5,
   REPLACE: 4, RRI: 3, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, ISFORMULA: 1, FILTER: 3, SORT: 4, UNIQUE: 3, SEQUENCE: 4, TRANSPOSE: 1, XMATCH: 4,
-  'NETWORKDAYS.INTL': 4, DATEDIF: 3, RATE: 6, NPER: 5, ADDRESS: 5, GETPIVOTDATA: 254 };
+  'NETWORKDAYS.INTL': 4, DATEDIF: 3, RATE: 6, NPER: 5, ADDRESS: 5, GETPIVOTDATA: 254,
+  CEILING: 2, FLOOR: 2, DATEVALUE: 1, NETWORKDAYS: 3, XNPV: 3, XIRR: 3, PPMT: 6, IPMT: 6 };
 /**
  * The scalar functions Excel 365 lifts over a multi-cell argument, one call per cell, giving an
  * array: ABS(A1:A5) inside SUMPRODUCT, ROUND(B2:B9,0), LEN(A2:A9), TEXT(dates,"mmm"). The aggregates,
@@ -845,6 +847,12 @@ export function evalFormula(expr, ctx = {}) {
       case 'ROUND': return roundHalfAway(toNum(args[0]), toInt(args[1]));
       case 'ROUNDUP': return roundUp(toNum(args[0]), toInt(args[1]));
       case 'ROUNDDOWN': return roundDown(toNum(args[0]), toInt(args[1]));
+      // CEILING and FLOOR (the classic forms): round to a multiple of significance, away from zero
+      // (CEILING) or toward zero (FLOOR) when both are negative; mixed signs are #NUM!
+      case 'CEILING': { const x = toNum(args[0]), s = toNum(args[1]); if (s === 0) return 0; if ((x > 0 && s < 0)) throw err('#NUM!');
+        return num15(Math.ceil(num15(x / s)) * s); }
+      case 'FLOOR': { const x = toNum(args[0]), s = toNum(args[1]); if (s === 0) throw err('#DIV/0!'); if (x > 0 && s < 0) throw err('#NUM!');
+        return num15(Math.floor(num15(x / s)) * s); }
       case 'MOD': { const a = toNum(args[0]), b = toNum(args[1]); if (b === 0) throw err('#DIV/0!'); return a - b * Math.floor(a / b); }
       case 'SQRT': { const x = toNum(args[0]); if (x < 0) throw err('#NUM!'); return Math.sqrt(x); }
       case 'POWER': { const a = toNum(args[0]), b = toNum(args[1]); if (a === 0 && b < 0) throw err('#DIV/0!'); if (a === 0 && b === 0) throw err('#NUM!'); const v = Math.pow(a, b); if (isNaN(v)) throw err('#NUM!'); return checkNum(v); }
@@ -1008,6 +1016,26 @@ export function evalFormula(expr, ctx = {}) {
         const start = t === 1 ? 0 : (t === 2 || t === 3) ? 1 : (t >= 11 && t <= 17) ? (t - 10) % 7 : -1;
         if (start < 0) throw err('#NUM!'); const r = (d - start + 7) % 7; return t === 3 ? r : r + 1; }
       case 'DAYS': return Math.floor(toNum(args[0])) - Math.floor(toNum(args[1]));
+      case 'DATEVALUE': { const v = deref(args[0]); if (typeof v !== 'string') throw err('#VALUE!'); const s = dateText(v); if (s === null) throw err('#VALUE!'); return Math.floor(s); }
+      case 'NETWORKDAYS': case 'NETWORKDAYS.INTL': {
+        const a = Math.floor(toNum(args[0])), b = Math.floor(toNum(args[1]));
+        if (a < 0 || b < 0) throw err('#NUM!');
+        // the weekend mask, Monday first: NETWORKDAYS is Saturday and Sunday; .INTL takes a number (1–7, 11–17) or a seven-character "0000000" string
+        let mask = [0, 0, 0, 0, 0, 1, 1];
+        let holidaysArg = name === 'NETWORKDAYS' ? args[2] : args[3];
+        if (name === 'NETWORKDAYS.INTL' && has(args, 2)) {
+          const w = deref(args[2]);
+          if (typeof w === 'string') { if (!/^[01]{7}$/.test(w) || w === '1111111') throw err('#VALUE!'); mask = [...w].map(ch => +ch); }
+          else { const n = toInt(w); if (n >= 1 && n <= 7) { mask = [0, 0, 0, 0, 0, 0, 0]; mask[(n + 4) % 7] = 1; mask[(n + 5) % 7] = 1; }   // 1 = Sat+Sun … 7 = Fri+Sat
+            else if (n >= 11 && n <= 17) { mask = [0, 0, 0, 0, 0, 0, 0]; mask[(n - 11 + 6) % 7] = 1; }   // 11 = Sunday only … 17 = Saturday only
+            else throw err('#NUM!'); }
+        }
+        const hol = new Set((holidaysArg === undefined || holidaysArg === null) ? [] : collectNums([holidaysArg]).map(Math.floor));
+        const [lo, hi] = a <= b ? [a, b] : [b, a];
+        let k = 0;
+        for (let s = lo; s <= hi; s++) { const wd = ymd(s).wd; /* 0 = Sunday */ const mon = (wd + 6) % 7; if (mask[mon]) continue; if (hol.has(s)) continue; k++; }
+        return a <= b ? k : -k;
+      }
       case 'EDATE': case 'EOMONTH': { const d = dateOf(toNum(args[0])); const y = d.getUTCFullYear(), m = d.getUTCMonth() + toInt(args[1]), dd = d.getUTCDate();
         if (name === 'EOMONTH') return serial(y, m + 2, 0);
         const last = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(); return serial(y, m + 1, Math.min(dd, last)); }
@@ -1051,19 +1079,6 @@ export function evalFormula(expr, ctx = {}) {
         if (r === 0) return -(pmt * np + fv); const q = Math.pow(1 + r, np); return -(fv + pmt * (1 + r * type) * (q - 1) / r) / q; }
       case 'FV': { const r = toNum(args[0]), np = toNum(args[1]), pmt = toNum(args[2]), pv = has(args, 3) ? toNum(args[3]) : 0, type = has(args, 4) ? toNum(args[4]) : 0;
         if (r === 0) return -(pv + pmt * np); const q = Math.pow(1 + r, np); return -(pv * q + pmt * (1 + r * type) * (q - 1) / r); }
-      case 'NETWORKDAYS.INTL': {   // the working days from start to end, both counted: weekend 1..7 (a pair from Sat/Sun), 11..17 (one day from Sunday), or a "0000011" mask Monday first; the holidays come off when they are working days in the span
-        const a = Math.floor(toNum(args[0])), b = Math.floor(toNum(args[1])); if (a < 0 || b < 0) throw err('#NUM!');
-        let off = [false, false, false, false, false, true, true];   // by Monday-first index 0..6
-        if (has(args, 2)) { const w = deref(args[2]);
-          if (typeof w === 'string') { if (!/^[01]{7}$/.test(w)) throw err('#VALUE!'); if (w === '1111111') throw err('#VALUE!'); off = w.split('').map(x => x === '1'); }
-          else { const n = toInt(w); off = [0, 0, 0, 0, 0, 0, 0].map(() => false);
-            if (n >= 1 && n <= 7) { off[(n + 4) % 7] = true; off[(n + 5) % 7] = true; } else if (n >= 11 && n <= 17) off[(n - 11 + 6) % 7] = true; else throw err('#NUM!'); } }
-        const isOff = sr => off[(ymd(sr).wd + 6) % 7];
-        const lo = Math.min(a, b), hi = Math.max(a, b); let n = 0;
-        const full = Math.floor((hi - lo + 1) / 7); n += full * off.filter(x => !x).length;
-        for (let d = lo + full * 7; d <= hi; d++) if (!isOff(d)) n++;
-        if (has(args, 3)) { const hs = new Set(collectNums([args[3]]).map(Math.floor)); for (const h of hs) if (h >= lo && h <= hi && !isOff(h)) n--; }
-        return a <= b ? n : -n; }
       case 'DATEDIF': {   // the whole years, months or days between two dates; MD, YM and YD ignore the larger units
         const a = Math.floor(toNum(args[0])), b = Math.floor(toNum(args[1])); if (a > b) throw err('#NUM!');
         const A = ymd(a), B = ymd(b); const u = toText(args[2]).toUpperCase();
@@ -1092,6 +1107,31 @@ export function evalFormula(expr, ctx = {}) {
         const t = a1 ? (ac ? '$' : '') + colLetter(c) + (ar ? '$' : '') + r : 'R' + (ar ? r : '[' + r + ']') + 'C' + (ac ? c : '[' + c + ']');
         if (!has(args, 4)) return t; const sh = toText(args[4]); if (sh === '') return '!' + t;
         return (/^[A-Za-z_][A-Za-z0-9_.]*$/.test(sh) ? sh : "'" + sh.replace(/'/g, "''") + "'") + '!' + t; }
+      case 'IPMT': case 'PPMT': {
+        const r = toNum(args[0]), per = toNum(args[1]), np = toNum(args[2]), pv = toNum(args[3]), fv = has(args, 4) ? toNum(args[4]) : 0, type = has(args, 5) ? toNum(args[5]) : 0;
+        if (per < 1 || per >= np + 1 || np <= 0) throw err('#NUM!');
+        const pmtOf = () => { if (r === 0) return -(pv + fv) / np; const q = Math.pow(1 + r, np); return -(r * (pv * q + fv)) / ((1 + r * type) * (q - 1)); };
+        const fvOf = (n, t) => { if (r === 0) return -(pv + pmt * n); const q = Math.pow(1 + r, n); return -(pv * q + pmt * (1 + r * t) * (q - 1) / r); };
+        const pmt = pmtOf();
+        let ipmt;
+        if (type === 1) ipmt = per === 1 ? 0 : (fvOf(per - 2, 1) - pmt) * r;   // paid in advance: no interest in month 1
+        else ipmt = fvOf(per - 1, 0) * r;                                       // interest on the balance that opened the period
+        return checkNum(name === 'IPMT' ? ipmt : pmt - ipmt);
+      }
+      case 'XNPV': case 'XIRR': {
+        // dated cash flows: each flow discounted by (1 + rate) ^ (days from the first date / 365)
+        const rate = name === 'XNPV' ? toNum(args[0]) : null;
+        const vals = collectNums([name === 'XNPV' ? args[1] : args[0]]), dates = collectNums([name === 'XNPV' ? args[2] : args[1]]).map(Math.floor);
+        if (!vals.length || vals.length !== dates.length) throw err('#NUM!');
+        if (dates.some(d => d < 0)) throw err('#NUM!');
+        const d0 = dates[0]; if (dates.some(d => d < d0)) throw err('#NUM!');
+        const f = rt => { let t = 0; for (let i = 0; i < vals.length; i++) t += vals[i] / Math.pow(1 + rt, (dates[i] - d0) / 365); return t; };
+        if (name === 'XNPV') { if (rate <= -1) throw err('#NUM!'); return checkNum(f(rate)); }
+        if (!(vals.some(x => x > 0) && vals.some(x => x < 0))) throw err('#NUM!');
+        let lo = -0.999999, hi = 10, flo = f(lo), fhi = f(hi); if (!isFinite(flo) || !isFinite(fhi) || flo * fhi > 0) throw err('#NUM!');
+        for (let k = 0; k < 200; k++) { const mid = (lo + hi) / 2, fm = f(mid); if (flo * fm <= 0) { hi = mid; fhi = fm; } else { lo = mid; flo = fm; } }
+        return num15((lo + hi) / 2);
+      }
       default: throw err('#NAME?');
     }
   }
@@ -1185,7 +1225,8 @@ export const FUNCTION_NAMES = ['ABS', 'AND', 'AVERAGE', 'AVERAGEIF', 'AVERAGEIFS
   'SMALL', 'SQRT', 'SUBSTITUTE', 'SUM', 'SUMIF', 'SUMIFS', 'SUMPRODUCT', 'SWITCH', 'T', 'TEXT', 'TEXTJOIN', 'TODAY', 'TRIM', 'TRUE', 'TRUNC', 'UPPER',
   'VALUE', 'VLOOKUP', 'WEEKDAY', 'XLOOKUP', 'XOR', 'YEAR', 'YEARFRAC',
   'FILTER', 'ISFORMULA', 'PERCENTILE', 'PERCENTILE.INC', 'QUARTILE', 'QUARTILE.INC', 'REPLACE', 'RRI', 'SEQUENCE', 'SORT', 'TRANSPOSE', 'UNIQUE', 'XMATCH',
-  'NETWORKDAYS.INTL', 'DATEDIF', 'RATE', 'NPER', 'ADDRESS', 'GETPIVOTDATA'];
+  'NETWORKDAYS.INTL', 'DATEDIF', 'RATE', 'NPER', 'ADDRESS', 'GETPIVOTDATA',
+  'CEILING', 'FLOOR', 'DATEVALUE', 'NETWORKDAYS', 'XNPV', 'XIRR', 'PPMT', 'IPMT'];
 /**
  * The functions Formula AutoComplete lists (M83): desktop Excel's catalogue, so =AV offers AVEDEV
  * first as Excel's list does; the evaluator's own set plus the common ones it does not compute.

@@ -83,14 +83,14 @@ export function renderLessonPage(lesson) {
 <h1>Lesson ${n}: ${esc(lesson.title)}</h1>
 <div class="meta">${esc(ch.title)} · ${esc(lesson.section)} · ${esc(lesson.difficulty)} · <span class="${lesson.access === 'free' ? 'free' : ''}">${lesson.access === 'free' ? 'Free' : 'Paid'}</span></div>
 <div class="card">
-<p style="margin:0">${rich(lesson.read)}</p>
+<p style="margin:0">${rich(lesson.brief)}</p>
 </div>
 <h2>What you will do</h2>
 <ol class="goals">${lesson.goals.map(g => `<li>${g.teach ? `<span class="muted">${rich(g.teach)}</span> ` : ''}${esc(g.text)}</li>`).join('')}</ol>
 <div class="cta"><a class="btn" href="${app}#/lesson/${esc(lesson.id)}">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
 ${taught.length ? `<h2>Shortcuts in this lesson</h2><ul class="list">${taught.map(e => `<li><span class="k">${chordHtml(e.win)}</span> <a href="../shortcuts/${esc(e.id)}.html">${esc(e.name)}</a></li>`).join('')}</ul>` : ''}
 <div class="prevnext"><span>${prev ? `← <a href="${esc(prev.id)}.html">Lesson ${n - 1}: ${esc(prev.title)}</a>` : ''}</span><span>${next ? `<a href="${esc(next.id)}.html">Lesson ${n + 1}: ${esc(next.title)}</a> →` : ''}</span></div>`;
-  return frame({ title: `Lesson ${n}: ${lesson.title} — ${ch.title} · hotkey.gg`, description: plain(lesson.read), up, body });
+  return frame({ title: `Lesson ${n}: ${lesson.title} — ${ch.title} · hotkey.gg`, description: plain(lesson.brief), up, body });
 }
 
 export function renderLessonsIndex() {

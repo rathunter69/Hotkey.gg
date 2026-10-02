@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Sheet } from '../engine/sheet.js';
-import { isLiveFormula, liveFormulas, perturb, perturbations } from '../engine/live.js';
+import { isLiveFormula, isLiveFormulaByClone, liveFormulas, perturb, perturbations } from '../engine/live.js';
 
 test('a live formula moves when an input moves; hardcodes and dead formulas do not', () => {
   const s = new Sheet({ cells: {
@@ -77,4 +77,62 @@ test('probing stays within budget: precedents only, no recalc for a hardcode, fu
   assert.equal(isLiveFormula(o, 'H1'), true);   // B1 is not a static precedent: the dynamic fallback scans every input
   const t = new Sheet({ cells: { A1: { value: 1 }, B1: { formula: '=A1+1' }, C1: { formula: '=B1*2' } } });
   assert.equal(isLiveFormula(t, 'C1', { inputs: ['a1'] }), true);   // explicit inputs are normalised
+});
+
+test('a link to a formula on another sheet is live through that formula’s own inputs (=Sites!K5 where K5 =J5/365.25)', async () => {
+  const { Session } = await import('../engine/keyboard.js');
+  const s = new Session(new Sheet({ cells: { C5: { value: 1 } } }));
+  s.renameSheet(0, 'Summary');
+  s.addSheet('Sites', new Sheet({ cells: { I5: { value: 46280 }, E5: { value: 43539 }, J5: { formula: '=$I$5-E5' }, K5: { formula: '=J5/365.25' }, K6: { formula: '=Summary!C5*2' } } }));
+  s.switchSheet(0);
+  const sum = s.sheet;
+  sum.commitInput('=Sites!K5', 5, 12);      // L5
+  sum.commitInput('=Sites!K5*0', 5, 13);    // M5
+  sum.commitInput('=Sites!K6', 5, 14);      // N5
+  assert.ok(Math.abs(sum.value('L5') - 2741 / 365.25) < 1e-9);
+  assert.equal(isLiveFormula(sum, 'L5'), true, 'the chain reaches Sites!I5 and E5');
+  assert.equal(isLiveFormula(sum, 'M5'), false, 'times zero is still dead across sheets');
+  assert.equal(isLiveFormula(sum, 'N5'), true, 'a hop out and back to this sheet lands on its own input C5');
+  assert.equal(isLiveFormula(sum, 'N5', { inputs: ['C5'] }), true);
+  assert.ok(liveFormulas(sum).includes('L5') && !liveFormulas(sum).includes('M5'));
+});
+
+/* ---- the in-place probe: the nudge happens on the real workbook and must leave no trace ---- */
+const cellsOf = s => JSON.parse(JSON.stringify(s.cells));
+
+test('in place: a dynamic array that grows under a nudge, and a nudge over a spilled cell, both put back exactly', () => {
+  const s = new Sheet({ cells: { A1: { value: 3 }, B1: { formula: '=SEQUENCE(A1)' }, C1: { formula: '=SUM(B1:B5)' }, D1: { formula: '=B3*2' }, E1: { formula: '=SUM(B1#)' }, F1: { formula: '=G1*0' }, G1: { value: 5 } } });
+  const before = cellsOf(s);
+  for (const [k, opts] of [['C1', {}], ['D1', {}], ['E1', {}], ['F1', {}], ['C1', { inputs: ['A1'] }], ['C1', { inputs: ['B2'] }], ['D1', { inputs: ['B4'] }]]) {
+    assert.equal(isLiveFormula(s, k, opts), isLiveFormulaByClone(s, k, opts), k + ' ' + JSON.stringify(opts));
+    assert.deepEqual(cellsOf(s), before, 'after ' + k + ' ' + JSON.stringify(opts));
+  }
+  assert.equal(isLiveFormula(s, 'F1'), false);
+  s.cells.A1.value = 4; s.recalc();   // the graph is still right after the probes: the spill and its readers follow an edit
+  assert.equal(s.value('B4'), 4); assert.equal(s.value('C1'), 10); assert.equal(s.value('E1'), 10);
+});
+
+test('in place: dynamic reads probed and put back leave the graph reading the right cells', () => {
+  const s = new Sheet({ cells: { A1: { value: 1 }, A2: { value: 10 }, A3: { value: 20 }, B1: { formula: '=INDEX(A2:A3,A1)' }, C1: { formula: '=OFFSET(A1,A1,0)' } } });
+  const before = cellsOf(s);
+  assert.equal(isLiveFormula(s, 'B1'), true); assert.equal(isLiveFormula(s, 'C1'), true);
+  assert.deepEqual(cellsOf(s), before);
+  s.cells.A2.value = 11; s.recalc();   // A2 is what B1 and C1 read at A1 = 1: still an edge after the probes nudged A1 to 2 and back
+  assert.equal(s.value('B1'), 11); assert.equal(s.value('C1'), 11);
+});
+
+test('in place across sheets: the nudge lands on the sibling and comes back; a workbook with RAND takes the clone path untouched', async () => {
+  const { Session } = await import('../engine/keyboard.js');
+  const ses = new Session(new Sheet({ cells: { A1: { value: 2 } } }));
+  ses.renameSheet(0, 'Inputs');
+  ses.addSheet('Calc', new Sheet({ cells: { B1: { formula: '=Inputs!A1*3' }, B2: { formula: '=Inputs!A1*0' } } }));
+  const calc = ses.sheets[1].sheet, inputs = ses.sheets[0].sheet;
+  const b0 = cellsOf(calc), i0 = cellsOf(inputs);
+  assert.equal(isLiveFormula(calc, 'B1'), true); assert.equal(isLiveFormula(calc, 'B2'), false);
+  assert.deepEqual(cellsOf(calc), b0); assert.deepEqual(cellsOf(inputs), i0);
+  inputs.cells.A1.value = 5; inputs.recalc(); assert.equal(calc.value('B1'), 15);
+  calc.setCell('C1', { formula: '=RAND()' }); calc.setCell('C2', { formula: '=B1+1' }); calc.recalc();
+  const r0 = cellsOf(calc);
+  assert.equal(isLiveFormula(calc, 'C2'), true);
+  assert.deepEqual(cellsOf(calc), r0, 'RAND would move on an in-place recalc: the clone answers and the sheet keeps its draw');
 });

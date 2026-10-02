@@ -171,18 +171,7 @@ test('every module lesson chains: before is the previous lesson\'s after', () =>
   assert.ok(true);
 });
 
-/* ---------------- the solution produces exactly the after state (C2: the chain is real) ---------------- */
-test('every module lesson\'s solution replays to exactly its after state', () => {
-  for (const l of LESSONS.filter(x => x.workbook && x.state && !SEEDED_KINDS.includes(x.kind))) {
-    const run = new LessonRun(l, { now: () => 0 });
-    run.run(l.solution);
-    assert.ok(run.finished, `${l.id}: solution finishes`);
-    const after = workbookState(l.workbook, l.state.after);
-    const wb = WORKBOOKS[l.workbook];   // each workbook reads its own session: Clearcoat's carries enterMoves and the defined names
-    const diff = wb.diffStates(wb.sessionToState(run.session), after);
-    assert.deepEqual(diff, [], `${l.id}: the solution leaves exactly ${l.state.after} — extra diffs: ${JSON.stringify(diff.slice(0, 4))}`);
-  }
-});
+/* the solution produces exactly the after state (C2: the chain is real): checked in lesson-replay.js on the one replay of each lesson */
 
 /* ---------------- modules 1.5–1.7 (C2 Run 3): the format, formula, print and check states, and what the lessons plant ---------------- */
 import { PLANT_GRIDS, PLANT_DAILY, PLANT_COSTS_ERRORS, PLANT_AUDIT, REPORT_PAGE_SETUP, PAGE_SETUP_DEFAULT, COUNTS_FMT } from '../content/workbooks/clearcoat-weekly.js';

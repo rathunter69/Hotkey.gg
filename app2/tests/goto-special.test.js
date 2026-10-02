@@ -70,6 +70,34 @@ test('the dialog: Alt H F D S picks a kind with K/O/F, Enter applies; HFDU/HFDN 
   s.run('Escape Escape Escape Escape Escape');
 });
 
+test('Constants and Formulas narrow by the four boxes: Numbers (U), Text (X), Logicals (G), Errors (E), as Excel has them', () => {
+  const s = new Session(new Sheet({ rows: 20, cols: 8, cells: {
+    A1: { value: 1240 }, A2: { value: '12' }, A3: { value: true }, A4: { formula: '=A1*2' }, A5: { formula: '="OK"' }, A6: { formula: '=1/0' }, A7: { value: 'Note' },
+  } }));
+  const S = s.sheet;
+  const only = k => ({ numbers: k === 'numbers', text: k === 'text', logicals: k === 'logicals', errors: k === 'errors' });
+  S.select('A1:A7'); assert.equal(S.selectSpecial('constants', only('numbers')), true);
+  assert.equal(S.selectionText(), 'A1', 'Numbers only: the typed number lights alone');
+  S.select('A1:A7'); assert.equal(S.selectSpecial('constants', only('text')), true);
+  assert.deepEqual(S.multi, ['A2', 'A7'], 'Text only: a number typed as text is text');
+  S.select('A1:A7'); assert.equal(S.selectSpecial('constants', only('logicals')), true);
+  assert.equal(S.selectionText(), 'A3');
+  S.select('A1:A7'); assert.equal(S.selectSpecial('formulas', only('text')), true);
+  assert.equal(S.selectionText(), 'A5', 'Formulas, Text only: the formula that returns text');
+  S.select('A1:A7'); assert.equal(S.selectSpecial('formulas', only('errors')), true);
+  assert.equal(S.selectionText(), 'A6');
+  S.select('A1:A7'); assert.equal(S.selectSpecial('formulas', only('logicals')), false, 'no formula returns a logical: nothing found');
+  // the dialog: O for Constants, then X, G and E untick all but Numbers; Enter selects. The boxes start ticked.
+  S.select('A1:A7');
+  s.run('Alt H F D S O');
+  assert.deepEqual(s.dlg.types, { numbers: true, text: true, logicals: true, errors: true });
+  s.run('X G E Enter');
+  assert.equal(S.selectionText(), 'A1');
+  S.select('A1:A7');
+  s.run('Alt H F D S F U G E Enter');
+  assert.equal(S.selectionText(), 'A5', 'Formulas with Text only');
+});
+
 test('Go To opens Special with Alt+S', () => {
   const s = fresh(); const S = s.sheet;
   S.select('B2:B7');
@@ -86,4 +114,19 @@ test('Ctrl+Enter fills every cell of the multi (the Excel blanks-fill pattern)',
   assert.equal(S.value('B4'), 0);
   assert.equal(S.value('B6'), 0);
   assert.equal(S.value('B3'), 1200, 'filled cells untouched');
+});
+
+test('Go To Special narrows Constants and Formulas by type: Numbers U, Text X, Logicals G, Errors E', () => {
+  const s = new Session(new Sheet({ rows: 20, cols: 8, cells: {
+    B2: { value: 10 }, B3: { value: '20' }, B4: { value: true }, B5: { value: '#N/A' }, B6: { value: 15 }, B7: { formula: '=B2&"x"' }, B8: { formula: '=B2*2' },
+  } }));
+  const S = s.sheet;
+  S.select('B2:B8'); assert.equal(S.selectSpecial('constants', { numbers: false, text: true, logicals: false, errors: false }), true);
+  assert.deepEqual(S.multi, ['B3'], 'a number stored as text is Text');
+  S.select('B2:B8'); assert.equal(S.selectSpecial('formulas', { numbers: true, text: false, logicals: false, errors: false }), true);
+  assert.deepEqual(S.multi, ['B8']);
+  S.select('B2:B6'); s.run('Alt H F D S O U G E Enter');
+  assert.equal(S.selectionText(), 'B3', 'the dialog route: Constants with only Text ticked');
+  S.select('B2:B6'); s.run('Alt H F D S O Enter');
+  assert.equal(S.selectionText(), 'B2,B3,B4,B5,B6', 'every box is ticked when the dialog opens');
 });

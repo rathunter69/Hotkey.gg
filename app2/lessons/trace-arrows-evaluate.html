@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 108: Trace precedents and dependents — Formulas and functions · hotkey.gg</title>
+<meta name="description" content="Ctrl+[ jumps to what a cell reads; the trace arrows draw it on the sheet, so a whole chain shows at once, and Evaluate Formula steps through a formula one calculation at a time. On a sheet someone else built, those two tell you what a number is made of before you decide whether it is right. Trace the old Summary’s total back to its ranges. The key is Alt M P.">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Formulas and functions</a> › Auditing</div>
+<h1>Lesson 108: Trace precedents and dependents</h1>
+<div class="meta">Formulas and functions · Auditing · medium · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">Ctrl+[ jumps to what a cell reads; the trace arrows draw it on the sheet, so a whole chain shows at once, and Evaluate Formula steps through a formula one calculation at a time. On a sheet someone else built, those two tell you what a number is made of before you decide whether it is right. Trace the old Summary’s total back to its ranges. The key is <kbd>Alt M P</kbd>.</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li><span class="muted">Formulas › Trace Precedents (Alt, M, P) draws an arrow into the active cell from every cell it reads, and a box around a range it reads whole. Press it again and it traces one level further back.</span> On the Summary, land on the old block’s total in D72, which does not tie, and draw its precedents with Alt M P.</li><li><span class="muted">A formula that reads another sheet draws its arrow to a small sheet icon, and the range it names is in the formula itself: Transactions rows 5 to 93, while the export runs to row 94.</span> Airport’s cell D70 is a SUMIF, so trace its precedents too and read where its ranges end.</li><li><span class="muted">Trace Dependents (Alt, M, D) works the other way: arrows out of the active cell to every cell that reads it, so you see how far one wrong number has travelled.</span> D67 is a typed 1,240 in a column of formulas: draw its dependents with Alt M D and count the three cells it feeds.</li><li>Press Alt M D again for the next level: the total in D72 feeds the growth, the check and every share, so the 1,240 reached them all.</li><li>Clear every arrow off the sheet with Remove Arrows, Alt M A A.</li><li><span class="muted">Evaluate Formula (Alt, M, V) shows the formula with the next part to calculate underlined; each Enter replaces it with its result, until the formula is one value. Enter again closes it.</span> Step through Airport’s SUMIF in D70 with Evaluate Formula, Alt M V, until it reads its short total.</li><li><span class="muted">Replace with a range selected works inside the selection only, so one Replace All moves every range end in the block and leaves the rest of the sheet alone.</span> Close Evaluate, select the site rows D66:D71 and replace $93 with $94, so all five SUMIFs read the whole export.</li><li>Evaluate Airport’s SUMIF in D70 again with Alt M V: it now reads the export’s last wash too, then close it.</li><li>Does it tie? Watch a Domain wash on Transactions change and Domain’s fixed total in D66 move with it.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/trace-arrows-evaluate">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="challenge-new-site-case.html">Lesson 107: Challenge: a new-site case valued with NPV and IRR</a></span><span><a href="f9-show-formulas-at-scale.html">Lesson 109: F9 on a part, show formulas, Go To Special at scale</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>

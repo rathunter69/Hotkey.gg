@@ -65,6 +65,8 @@ export const CAPS_OK = new Set([
   'HTML', 'JSON', 'UTC', 'URL', 'FAQ', 'EULA', 'PDF', 'XLSX', 'CSV', 'ASAP', 'NULL', 'TRUE', 'FALSE', 'MMMM', 'YYYY', 'DDDD',
   'AUS', 'SATX', 'DFW', 'HOU', 'TBD', 'TBC', 'LLC', 'TEXAS', 'MACABACUS', 'EXCEL',
   'SUMM',   // the misspelled function 1.6.6 plants (#NAME?)
+  // a value the sheet shows: Chapter 3's roll-up flag reads OK or CHECK
+  'CHECK',
 ]);
 // Excel's function names (and the error codes) are exempt wholesale.
 const FUNCTION_NAMES = /^(?:SUM|SUMIF|SUMIFS|SUMPRODUCT|AVERAGE|AVERAGEIF|AVERAGEIFS|COUNT|COUNTA|COUNTIF|COUNTIFS|COUNTBLANK|MIN|MAX|MINIFS|MAXIFS|MEDIAN|LARGE|SMALL|RANK|ROUND|ROUNDUP|ROUNDDOWN|MROUND|CEILING|FLOOR|ABS|MOD|INT|TRUNC|SIGN|SQRT|POWER|PRODUCT|IF|IFS|IFERROR|IFNA|AND|OR|NOT|XOR|SWITCH|CHOOSE|INDEX|MATCH|XMATCH|VLOOKUP|HLOOKUP|XLOOKUP|LOOKUP|OFFSET|INDIRECT|ADDRESS|ROW|ROWS|COLUMN|COLUMNS|TEXT|VALUE|DATEVALUE|TRIM|CLEAN|PROPER|UPPER|LOWER|LEFT|RIGHT|MID|LEN|FIND|SEARCH|SUBSTITUTE|REPLACE|CONCAT|CONCATENATE|TEXTJOIN|DATE|YEAR|MONTH|DAY|TODAY|NOW|EOMONTH|EDATE|YEARFRAC|NETWORKDAYS|WORKDAY|WEEKDAY|WEEKNUM|DAYS|DATEDIF|PMT|PPMT|IPMT|PV|FV|NPV|XNPV|NPER|RATE|RRI|ISNUMBER|ISTEXT|ISBLANK|ISERROR|ISERR|ISNA|ISFORMULA|SUBTOTAL|AGGREGATE|UNIQUE|FILTER|SORT|SORTBY|SEQUENCE|GETPIVOTDATA|QUARTILE|PERCENTILE|STDEV|TRANSPOSE|HYPERLINK|N\/A|DIV\/0|REF|NAME|NUM|NULL|VALUE)$/;
@@ -75,7 +77,7 @@ export function capsTell(s) {
   for (const w of words) {
     const letters = w.replace(/[^A-Za-z]/g, '');
     if (letters.length < 4 || letters !== letters.toUpperCase()) continue;
-    const base = w.replace(/\.[A-Z]+$/, '');   // QUARTILE.INC → QUARTILE
+    const base = w.replace(/\.[A-Z]+$/, '').replace(/^&+|&+$/g, '');   // QUARTILE.INC → QUARTILE; &YEAR in a joined formula → YEAR
     if (CAPS_OK.has(w) || CAPS_OK.has(base) || FUNCTION_NAMES.test(base)) continue;
     return `"${w}" in capitals`;
   }
@@ -91,7 +93,7 @@ export function arrowLabelTell(s) {
 
 /** Text typed into a cell is exempt: strip quoted cell contents ("…" right after a cell ref or "type"). */
 export function stripCellText(s) {
-  return String(s || '').replace(/(?:type|types|typed|reads|read|enter|entered)\s+[“"][^”"]*[”"]/gi, ' ').replace(/=[^\s,.;]+/g, ' ');
+  return String(s || '').replace(/(?:type|types|typed|reads|read|enter|entered)\s+[“"][^”"]*[”"]/gi, ' ').replace(/=(?:[^\s,.;]|\.(?=[A-Za-z]))+/g, ' ');   // a dot inside a name (NETWORKDAYS.INTL) stays in the formula
 }
 
 /** Every tell in one displayed string, as a list of reasons (empty when clean). */

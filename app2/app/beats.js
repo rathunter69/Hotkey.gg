@@ -55,6 +55,23 @@ const BEATS_DEFAULT = {
     body: 'The financials section is three pages, and the book is a PDF that gets printed, so each page has to land on one sheet, carry its title rows, and say which file and which page it is. The one-page summary reads from the detail behind it. Set the pack up to print and it’s ready for the data room.' },
   'ch2-project-and-assessment': { eyebrow: 'Module 2.8 · project and assessment', title: 'The financials section, start to finish.',
     body: 'A fresh export has landed: the same accounting system, the same faults, a different three years. Everything the chapter taught goes onto one workbook, until three pages are ready for the data room. Build it, then build it again on the clock, because the assessment is the test-out.' },
+  // Chapter 3 · Formulas and functions (script-ch3.md story cards)
+  logic: { eyebrow: 'Module 3.1 · logic', title: 'Which sites are pulling their weight?',
+    body: 'The buyers’ first question is the CFO’s oldest one: which sites clear their daily target, which don’t, and what the managers earn when they do. The point-of-sale export has every wash; the Sites sheet has every target. A formula that can ask a question and act on the answer turns ninety rows into a page of flags.' },
+  dates: { eyebrow: 'Module 3.2 · dates', title: 'How old is each site, and how long do members stay?',
+    body: 'Two of the buyers’ questions are about time: how old each site is, because new ones ramp for two years, and how long a member stays before cancelling, because that’s what a $30-a-month fee is worth. Excel keeps a date as a number, days since the start of 1900, so dates subtract, add and compare like any figure once you know the functions that build and break them.' },
+  // Chapter 3 · Formulas and functions
+  'math-and-aggregation': { eyebrow: 'Module 3.3 · math and aggregation', title: 'Ninety rows into one page.',
+    body: 'The buyers want washes and revenue by site and by package, the busiest sites, the blended ticket, and the question that decides whether they believe anything: whether the POS export agrees with what the managers sent. Every one of those is a count or a sum with a condition on it. Build them, then build the reconciliation and drive its check to zero.' },
+  text: { eyebrow: 'Module 3.4 · text', title: 'The codes have to become words.',
+    body: 'The POS writes AUS-DOM where a buyer wants Austin and Domain in their own columns, it packs the package and channel into one memo, and when the terminal hiccups it sends amounts as text. Text functions take a string apart and put it back together, Text to Columns does the same for a whole column at once, and nothing gets retyped.' },
+  // Chapter 3 · Formulas
+  'time-value-of-money': { eyebrow: 'Module 3.5 · time value of money', title: 'What is a new site worth?',
+    body: 'Cedar Park cost $5m all in (the land, which Clearcoat owns there, and the build) and was funded with a $3.5m loan, and the buyers want two things: the loan’s schedule, and whether a site like it is worth building at all. A dollar next year is worth less than a dollar today, and the functions in this module say how much less: PMT for the loan, NPV and IRR for the site.' },
+  auditing: { eyebrow: 'Module 3.6 · auditing', title: 'Somebody else’s Summary doesn’t tie.',
+    body: 'Before you built yours, someone started a Summary sheet and left. It has a SUMIF pointing at a range a row short, a typed number in a formula column, a text "12", and a total that agrees with nothing. Chapter 1 taught the three looks; this module adds the tools a reviewer uses on a sheet they didn’t build, and the checks block that says, in one cell, whether the databook ties.' },
+  'ch3-project-and-assessment': { eyebrow: 'Module 3.7 · project and assessment', title: 'The databook, tied out.',
+    body: 'A fresh export, a fresh site list, a Summary someone else abandoned. Rebuild it so every number reads the export and the flag reads OK, then value the next site on the list. Build it, then build it again on the clock. The assessment is the test-out.' },
   'project-and-assessment': { eyebrow: 'Module 1.8 · project, assessment, test-out', title: 'Management’s next feed is in.',
     body: 'A fresh week, a blank Report, and everything the chapter taught. Build the page start to finish, then prove it against the clock on Monday morning; or test out of the chapter in five minutes.' },
 };

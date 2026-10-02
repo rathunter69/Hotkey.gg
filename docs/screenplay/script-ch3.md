@@ -692,3 +692,51 @@ IFS, MAXIFS, MINIFS, NETWORKDAYS.INTL, XNPV, XIRR, PPMT, IPMT, DATEVALUE, SEARCH
   - 3.5 goes further into finance than the other Chapter 3 modules (NPV, IRR, payback); it's here because the site-build loan is the natural place and Chapter 5's DCF assumes it. Keep, or move 3.5.2–3.5.3 to Chapter 5 and leave the loan here.
   - 3.6 leans on Chapter 1's audit lessons on purpose and adds only the new tools; if it feels thin, 3.6.2 can absorb the Watch Window and Error Checking (Alt M K, Alt M W).
   - Source pass (2026-09-30): the fold-back plan in claude/source-checklist.md (section H) is applied to this chapter as DRAFT: 15 edits, plus one aside in 3.3.6 on how diligence restates EBITDA (the rest of the diligence material is parked as an add-on, screenplay 4.10). Wolf's calls of that day are in the decision log (screenplay 11); what was held back stays listed in the checklist's section B.
+
+## Built differently
+
+  - A seventh sheet, Daily (point-of-sale day totals per site), feeds the Sep 15 flag block and MAXIFS/MINIFS; the script named no source for them.
+  - Summary blocks stack as the page module lays them out, so script rows shift: flags 5 to 10, site totals 15 to 21, packages 25 to 31, bands 34 to 37, site by package 41 to 47, reconciliation 51 to 57, period 59 to 62, inherited ops block 64 to 76, checks 80 to 87.
+  - The nested-IF tower in 3.1.2 sits in a spare column (Y), since H holds Sep 15 revenue; the ROUND family sits in T:X.
+  - Site ages are typed until 3.2.1 links them to Sites!K.
+  - Packages carries retail washes and prices so SUMPRODUCT ties to SUMIF; blended ticket is retail revenue over all washes (the script's formula gave about $20, above the price list).
+  - Loans: scalars in C, schedule rows 44 to 163, case years C25:H25, two ROUND-wrapped checks.
+  - Members: churn flag in L, fee at L2, as-of date at H2. Sites: holidays C13:C14, working and trading days in Q:R, Cedar Park stub C15.
+  - The two trailing-space sites tie at 3.3.6, move when 3.4.1 cleans the codes, and 3.4.3 re-ties with typed adjustments.
+- Each challenge carries its own seed (the workbook has no challengeSeed).
+- 3.1.1: the closer drops Mueller to 210, not 230, because 230 is still on target.
+- 3.1.2: the IF tower and IFS share column I, since H is revenue; the MIN cap is a teach line.
+- 3.1.3: the ages in L are typed until 3.2.1; OR and NOT are written bare before they are wrapped; the O7 read-back goal is gone.
+- 3.1.4: the learner types the override header and colors R blue; ISTEXT is a teach line; pointing the flags at S is a goal, not the closer; IFERROR goes on Q10 first, then the column, and Q10's goal is graded on its formula (0/0 can never register as live).
+- 3.2.1 links Summary L5:L10 to Sites!K in green.
+- 3.2.2: churn and the totals sit in L and row 45; the fill uses Paste Special, Formulas.
+- 3.2.3 teaches TEXT, & and EOMONTH (Chapter 2's 2.6 may not precede it on every route); its F2 read-back goal is gone; WEEKDAY is written and filled in one goal.
+- 3.2.4 drops the basis-1 read goal and the Inputs!B4 pointing (there is no Inputs sheet); the stub goes in Sites C15 and RIGHT is a teach line.
+- 3.2.5: the holidays are at Sites C13:C14; working and trading days are in Sites Q and R; per trading day reads 0 until 3.3.3 fills O; the closer moves Thanksgiving into the fortnight.
+- 3.2.C: the seed moves the opening dates, the as-of date and the export dates; site codes stay.
+- 3.3.1: works in T:X, not R:V; ROUND and ABS go on Domain's row first, then all six sites; no comparison of summed columns; fills use Ctrl+Enter, because Ctrl+D would copy row 5's $ down.
+- 3.3.2: the package COUNTIF directly follows the site one; the checks read (2), not zero, until 3.4.1 fixes the codes; the bands are colored green.
+- 3.3.3: the fee comes from Members!L2; O (fortnight washes) is the SUMIF payoff; AVERAGEIFS on Domain first, then all sites; SUMIFS on the Basic column, then Ctrl+R across; the C22 note is checked loosely.
+- 3.3.4: order is LARGE and SMALL, then RANK (one row, then all), then MAXIFS and MINIFS; the closer types C19.
+- 3.3.5: the blended ticket is retail revenue over all washes, with the weighted price first; the TRUE*number form is a teach line; C82 reads (60).
+- 3.3.6: no COUNTIFS hunt and no formatting goal, because the block is preformatted.
+- 3.3.C: San Antonio with the tallies prefilled; blended =C29/C21.
+- 3.4.1: order is LEFT, RIGHT, LEN, fix B25 and B66 at the source, then TRIM; MID only in a teach line; no cluster COUNTIF (no cell for it); the reconciliation moves here from 3.4.3.
+- 3.4.2: the second-space formula is a teach line; X and Y are written on rows 37 and 34 first, then filled; no best-practice goal.
+- 3.4.3 explains Domain and Mueller (+1 each, in blue); C82 is read instead of re-running the SUMIF; the AB5 times-one goal is VALUE's payoff.
+- 3.4.4: D1 gets AIR (the first code is AUS-AIR); Text to Columns uses destination $B$1 so A keeps the code; Scratch is inserted, then moved to the end; the Text to Columns and Flash Fill payoffs are read-the-cell goals.
+- 3.4.C: no text dates (the dates are real in every state); codes cleaned through a TRIM helper and Paste Values, then split by one Text to Columns into S:T.
+
+## 3.5 to 3.7 (r3-lessons-c)
+- Loans works in column C on different rows, not the script's column B.
+- 3.5.1 adds proof goals for PV and FV. The payment-timing argument is taught in a teach line.
+- 3.5.2 tries the trap in C35, then XNPV, a date slip and an undo.
+- 3.5.3 adds a date slip and an undo goal.
+- 3.5.4 uses Paste Special Formulas, so the $ format stays on the first row only.
+- 3.6.1 fixes the short ranges with Replace inside the selection and traces D70 as the SUMIF.
+- 3.6.2 links C69 with =C18 instead of VALUE.
+- 3.6.3 confirms Edit Links is empty instead of using Break Link.
+- 3.6.4 shows SUMPRODUCT(ABS) only in a teach line, and links the flag before the conditional format.
+- 3.6.C keeps the prior-year figure fixed at 710.
+- 3.7.P and 3.7.A fill each range with Ctrl+Enter, and the prior-year figure is fixed at 610.
+- The project and the assessment compare each formula with the finished databook, as the Chapter 2 project does. The project also accepts any formula that lands on the finished figure.

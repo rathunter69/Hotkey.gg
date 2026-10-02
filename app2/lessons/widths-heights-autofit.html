@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lesson 19: The page’s columns — Foundations · hotkey.gg</title>
-<meta name="description" content="undefined">
+<meta name="description" content="The Report’s columns are still Excel’s defaults: South Lamar is cut off, the headers are clipped, and every column is 8.43 characters wide. A page reads when its period columns share one width, its comparison columns another, its label column fits the longest name, and its headers wrap instead of spilling. Widths and AutoFit you know from 1.2.3; the new idea is which columns get set by hand and which get AutoFit. The key is Alt H O W.">
 <meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
 <script>try{var v=JSON.parse(localStorage.getItem('hk2_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
 <h1>Lesson 19: The page’s columns</h1>
 <div class="meta">Foundations · Structure · easy · <span class="free">Free</span></div>
 <div class="card">
-<p style="margin:0">undefined</p>
+<p style="margin:0">The Report’s columns are still Excel’s defaults: South Lamar is cut off, the headers are clipped, and every column is 8.43 characters wide. A page reads when its period columns share one width, its comparison columns another, its label column fits the longest name, and its headers wrap instead of spilling. Widths and AutoFit you know from 1.2.3; the new idea is which columns get set by hand and which get AutoFit. The key is <kbd>Alt H O W</kbd>.</p>
 </div>
 <h2>What you will do</h2>
 <ol class="goals"><li><span class="muted">Select the columns first (Ctrl+Space, then Shift+→ across), then Alt, H, O, W, 12, Enter. One width for every period column is the convention on any page with a timeline.</span> The daily table’s six day columns B:G should share one width: select them from the timeline row and set Column Width 12.</li><li>Margin % and Prior week rev in H:I are the comparison columns: select both from the header row and set them to 14, or press F4.</li><li><span class="muted">AutoFit on a selected range fits only those cells; AutoFit on a whole column fits everything in it, title included, which would make A absurdly wide. Select the names, then Alt, H, O, I.</span> Fit the label column to its site names, not the title: select A5:A11 and AutoFit, and column A sizes to South Lamar.</li><li><span class="muted">Wrap Text (Alt, H, W) folds a long header inside its cell; AutoFit Row Height (Alt, H, O, A) then sizes the row to the wrapped lines. Headers wrap; figures never do.</span> At these widths the headers B4:I4 are clipped: select them from B4, wrap the text, then AutoFit row 4 to two lines.</li><li><span class="muted">Row Height (Alt, H, O, H) in points. A title row a little taller than the rest is the one height exception on a page.</span> The title row is cramped: set row 1 to height 24.</li><li>See why the day columns were set by hand: AutoFit B:G at once, read the uneven widths, then Ctrl+Z puts the equal 12 back.</li><li>Does it tie? Change Cedar Park’s washes in C9 to 300 and watch the Total in C11 answer through the new widths.</li></ol>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lesson 18: Rows and columns that keep the totals honest — Foundations · hotkey.gg</title>
-<meta name="description" content="undefined">
+<meta name="description" content="You inserted and deleted in 1.2.3 on a sheet with no formulas. The Report has a Total row now, and this is what matters: a SUM whose range straddles an inserted row grows to take the new row in, and a SUM whose column you delete turns to #REF!, a message, not damage, and Ctrl+Z puts it back. Cedar Park needs a row inside the block, the old Old code column has to go, and a Margin % column is coming. Watch the total after every edit. The key is Ctrl+Shift+=.">
 <meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
 <script>try{var v=JSON.parse(localStorage.getItem('hk2_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
 <h1>Lesson 18: Rows and columns that keep the totals honest</h1>
 <div class="meta">Foundations · Structure · medium · <span class="free">Free</span></div>
 <div class="card">
-<p style="margin:0">undefined</p>
+<p style="margin:0">You inserted and deleted in 1.2.3 on a sheet with no formulas. The Report has a Total row now, and this is what matters: a SUM whose range straddles an inserted row grows to take the new row in, and a SUM whose column you delete turns to #REF!, a message, not damage, and Ctrl+Z puts it back. Cedar Park needs a row inside the block, the old Old code column has to go, and a Margin % column is coming. Watch the total after every edit. The key is <kbd>Ctrl+Shift+=</kbd>.</p>
 </div>
 <h2>What you will do</h2>
 <ol class="goals"><li><span class="muted">Shift+Space, then Ctrl+Shift+=. The same insert as 1.2.3, but now watch the formula bar on C11: a SUM whose range straddles the insert grows to take the new row in. Insert inside the block, never below it.</span> Cedar Park opened this week: select Airport’s row 9 and insert a blank row above it, and the Total in C11 follows to =SUM(C5:C10).</li><li>Name the new site: type Cedar Park in A9, then fill the week label down from B8 into B9 with Ctrl+D.</li><li>Enter Cedar Park’s week across C9:E9 with Tab: 210 washes, $2,940.00 revenue, $315.00 wash cost, and the totals in C11:E11 grow together.</li><li>The Old code column is the old system’s: select column I from its header I4 and delete the whole column in one press.</li><li>Margin % belongs before Prior week rev: insert a column at H and type Margin % in H4, and the header comes out bold.</li><li><span class="muted">#REF! means the formula pointed at a cell that no longer exists. Delete a column a SUM reads and it breaks, loudly, which is the point. Never paste a number over a #REF!; find what it read.</span> On Raw, delete the Revenue column E and read the site totals block: every Revenue SUM now says #REF! instead of a number.</li><li>Read the error, then undo: Ctrl+Z brings the Revenue column back and Domain’s Revenue SUM in J8 reads a number again.</li><li>Does it tie? Change Cedar Park’s washes in C9 to 300 and watch the Total in C11 answer.</li></ol>
