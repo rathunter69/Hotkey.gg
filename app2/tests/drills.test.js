@@ -66,7 +66,7 @@ test("Chapter 1's eleven drills: 6.1's set and order, eight to twenty goals, par
     assert.ok(d.optimalKeys / d.route <= 4, `${id}: ${d.optimalKeys} keys in a ${d.route} s route is faster than a fast hand`);
     assert.equal(d.access, 'free', `${id}: Chapter 1 is free`);
   }
-  assert.deepEqual(BENCHMARKS.filter(d => d.kind !== 'challenge').map(d => d.id), ['weekly-sales-report', 'ch2-pnl-to-standard', 'ch3-tie-it-out', 'ch5-revenue-build', 'ch6-paper-lbo'],
+  assert.deepEqual(BENCHMARKS.filter(d => d.kind !== 'challenge').map(d => d.id), ['weekly-sales-report', 'ch2-pnl-to-standard', 'ch3-tie-it-out', 'ch4-cube-it', 'ch5-revenue-build', 'ch6-paper-lbo'],
     'the weekly report and one benchmark a chapter from Chapter 2 on are the benchmarks');
   for (const [id] of CH1) assert.ok(DAILY_POOL.includes(id), `${id} is in the Daily's pool`);
 });
@@ -170,4 +170,21 @@ test('parsFrom derives the old ladder and tierFor grades against it', () => {
   assert.equal(tierFor(46, parsFrom(30)), 'none');
   assert.equal(tierFor(NaN, parsFrom(30)), 'none');
   assert.ok(tierAtLeast('pro', 'pass') && !tierAtLeast('pass', 'legendary'));
+});
+
+/** Chapter 4's keyed drills (screenplay 6.2, with sort and filter from script-drills D60, the two Wave 1 sketches and the puzzle) and Chapter 6's Wave 1 sketches. */
+const CH4 = ['ch4-lookup-relay', 'ch4-sort-and-filter', 'ch4-pivot-in-90', 'ch4-data-table', 'ch4-goal-seek', 'ch4-name-it', 'ch4-cube-it', 'ch4-six-tabs', 'ch4-two-pickers', 'puzzle-ch4'];
+const CH6_WAVE1 = ['ch6-three-ways-to-a-price', 'ch6-ltm-two-ways', 'ch6-napkin', 'ch6-cap-the-amort', 'ch6-lenders-return', 'ch6-ceiling-price'];
+
+test("Chapter 4's drills and Chapter 6's Wave 1 are registered, paid, on their packs, with pars from the reference route", () => {
+  assert.deepEqual(DRILLS.filter(d => d.kind !== 'challenge' && d.chapter === 'data-and-lookups').map(d => d.id), CH4);
+  for (const id of CH6_WAVE1) assert.ok(DRILLS_BY_ID[id], `${id} registered`);
+  for (const id of [...CH4, ...CH6_WAVE1]) {
+    const d = DRILLS_BY_ID[id];
+    assert.equal(d.access, 'paid', `${id}: paid`);
+    assert.equal(d.workbook, id.includes('ch4') ? 'clearcoat-pack' : 'clearcoat-valuation', `${id}: its chapter's pack`);
+    assert.ok(Number.isFinite(d.route) && d.route > 0, `${id}: a reference route`);
+    assert.deepEqual(d.pars, parsFromRoute(d.route), `${id}: pars from parsFromRoute`);
+    assert.ok(typeof d.module === 'string' && d.module, `${id}: the module that teaches it`);
+  }
 });

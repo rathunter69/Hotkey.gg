@@ -55,6 +55,10 @@ export const DRILL_MODULE = {
   // Chapter 3 (script-ch3.md's module ids)
   'ch3-if-ladder': 'logic', 'ch3-override': 'logic', 'ch3-date-math': 'dates', 'ch3-sumifs-sprint': 'math-and-aggregation', 'ch3-bands': 'math-and-aggregation',
   'ch3-text-split': 'text', 'ch3-loan-schedule': 'time-value-of-money', 'ch3-trace-the-error': 'auditing', 'ch3-tie-it-out': 'auditing', 'puzzle-ch3': 'dates',
+  // Chapter 4 (script-ch4.md's module ids)
+  'ch4-lookup-relay': 'lookups', 'ch4-two-pickers': 'lookups', 'ch4-sort-and-filter': 'lists-and-tables',
+  'ch4-cube-it': 'summaries-from-raw-rows', 'ch4-six-tabs': 'summaries-from-raw-rows', 'puzzle-ch4': 'summaries-from-raw-rows',
+  'ch4-pivot-in-90': 'pivot-tables', 'ch4-data-table': 'scenarios-and-sensitivity', 'ch4-goal-seek': 'scenarios-and-sensitivity', 'ch4-name-it': 'names-and-structure',
   // Chapter 5 (script-ch5.md's module ids)
   'ch5-statement-link': 'linking-the-statements', 'ch5-schedule-fill': 'schedules', 'ch5-balance-it': 'linking-the-statements',
   'ch5-discount-it': 'dcf', 'ch5-sweep': 'linking-the-statements', 'ch5-checks': 'auditing-a-model',
@@ -62,6 +66,8 @@ export const DRILL_MODULE = {
   // Chapter 6 (script-ch6.md's module ids)
   'ch6-spread-a-comp': 'trading-comps', 'ch6-median-and-range': 'trading-comps', 'ch6-sources-and-uses': 'lbo', 'ch6-irr-sprint': 'lbo',
   'ch6-waterfall': 'bids-and-waterfall', 'ch6-football-field': 'bids-and-waterfall', 'ch6-paper-lbo': 'lbo', 'puzzle-ch6': 'bids-and-waterfall',
+  'ch6-three-ways-to-a-price': 'trading-comps', 'ch6-ltm-two-ways': 'trading-comps', 'ch6-napkin': 'lbo', 'ch6-cap-the-amort': 'lbo',
+  'ch6-lenders-return': 'lbo', 'ch6-ceiling-price': 'lbo',
 };
 
 /** A drill's teaching module ({ id, n, title, lessons }) or null. */
