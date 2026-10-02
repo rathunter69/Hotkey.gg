@@ -2451,6 +2451,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "ch6-project": {
+   "id": "ch6-project",
+   "module": "ch6-project-and-assessment",
+   "order": "6.5.P",
+   "title": "Project: the valuation pack, built again",
+   "brief": "Fresh peers, fresh deals and three bids on a pack with every formula gone. Decide which peers and deals count, build the ranges, the LBO and its ceiling, price the bids and their waterfalls, then the page for the board. No clock, and nothing here is new. The key is `Ctrl+Enter`.",
+   "closing": "Peers and deals in, a pack out: comps and precedents spread, an LBO with its ceiling, three bids priced to the owners’ proceeds, and one page for the board. || This is the pack a sell side team sends before the board meets. Now part of it again, on the clock.",
+   "wow": "Peers and deals in, a valuation pack out: five ranges, a sponsor’s ceiling, three bids priced and a page for the board, and that is Chapter 6.",
+   "convention_line": "Write once, fill right; The check is a live difference → 0",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -15302,6 +15314,128 @@ export const COPY = {
     "lesson_id": "challenge-board-page",
     "goal_index": "5",
     "text": "Fill the checks in C36:C39: sources equal uses, the Cover’s flag, the ranges in order, the owners’ lines.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   }
+  ],
+  "ch6-project": [
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "0",
+    "text": "Build each peer’s last twelve months on Comps, rows 17 to 25, and carry LTM EBITDA into J5:J7.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "1",
+    "text": "Build each peer’s market value, enterprise value and multiples on Comps, columns E to M.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "2",
+    "text": "Mark all three peers in with 1 in N5:N7, then build the included multiples and their median, mean, quartiles, min and max.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "3",
+    "text": "Build the operating metrics in V5:Z13 and Clearcoat’s own line in row 14.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "4",
+    "text": "Build the comps range on Comps, rows 35 to 44: the multiples low, mid and high, enterprise value and equity value each way.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "5",
+    "text": "Read each deal’s reason in column R, type 1 or 0 in Q5:Q9, then build the multiples, the premiums and the included statistics.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "6",
+    "text": "Build the control premium reading in Precedents rows 18 to 23 and the precedents range in rows 35 to 41.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "7",
+    "text": "Build the sale and leaseback, sources and uses in LBO rows 31 to 48, and the check that they tie on Checks C14.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "8",
+    "text": "Build the cash flow, the cash sweep and every tranche in LBO rows 51 to 99, interest on the average balance.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "9",
+    "text": "Build the exit, the IRR and MOIC each way, the split between owners and lenders, and the value bridge in LBO rows 102 to 132.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "10",
+    "text": "Build the sensitivity in LBO rows 135 to 140 and the highest price each hurdle allows in rows 145 to 148.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "11",
+    "text": "Price the three bids on Bids, rows 11 to 27: cash at close, the earnout and the rollover valued, then the expected value and the ranks.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "12",
+    "text": "Build each bid’s waterfall in Bids rows 30 to 39 and your own stake in rows 42 and 43.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "13",
+    "text": "Build the Summary: units in A2, the field, the leading bid’s letter in C18 and its waterfall, a line in B33, the checks, no gridlines.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": ""
+   },
+   {
+    "lesson_id": "ch6-project",
+    "goal_index": "14",
+    "text": "Does it hold? Watch bid B’s earnout odds in Bids C58 go from 50% to 90%: its line on the football field moves with them.",
     "teach": "",
     "why": "",
     "hint_stuck": ""

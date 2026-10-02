@@ -136,6 +136,7 @@ const firstCol = fn => only(['C'], fn);
 function page(spec) {
   if (firstPass) { ROWS[spec.name] = dryRows(spec); return null; }
   const { sheet, at } = buildPage(spec);
+  if (spec.rows) sheet.rows = spec.rows;   // a page taller than the default canvas (the LBO runs to row 148)
   const cells = sheet.cells;
   ROWS[spec.name] = at;
   const colsOf = r => Object.keys(cells).filter(k => /^[A-Z]+\d+$/.test(k) && +k.replace(/^[A-Z]+/, '') === r).map(k => k.replace(/\d+$/, '')).filter(col => col !== 'A' && col !== 'B');
@@ -372,7 +373,7 @@ function pageLBO(T, given = null) {
   const first = col => `COLUMNS($D$4:${col}$4)`;
   const offs = [-1, -0.5, 0, 0.5, 1];
   const sheet = page({
-    name: me, chapter: CHAPTER, read: false, title: `${COMPANY}: the sponsor's LBO`, units: 'USD thousands unless stated; closing at the FY26 year end; EBITDA and free cash flow from the operating model',
+    name: me, chapter: CHAPTER, read: false, rows: 160, title: `${COMPANY}: the sponsor's LBO`, units: 'USD thousands unless stated; closing at the FY26 year end; EBITDA and free cash flow from the operating model',
     headers: LCOLS.map(() => null),
     blocks: [
       { title: 'The term sheet', rows: [
