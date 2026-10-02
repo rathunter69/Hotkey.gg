@@ -78,9 +78,9 @@ export function pathNodesHtml(items) {
  * A module's row: its number on a key, its name and minutes, the path of its lessons and its
  * challenge, and at the right the challenge's tier or the status word. opts: { open, locked, status, href }.
  */
-export function moduleRowHtml(row, { open = false, locked = false, status = '', minutes = '' } = {}) {
+export function moduleRowHtml(row, { open = false, locked = false, status = '', minutes = '', href = '' } = {}) {
   const st = row.status || 'todo';
-  return `<div class="mod-row row-module mod-${esc(st)}${open ? ' open' : ''}${row.current ? ' current' : ''}${locked ? ' locked' : ''}" data-module="${esc(row.id)}"${locked ? '' : ' data-cursor tabindex="-1"'} aria-expanded="${open ? 'true' : 'false'}">
+  return `<div class="mod-row row-module mod-${esc(st)}${open ? ' open' : ''}${row.current ? ' current' : ''}${locked ? ' locked' : ''}" data-module="${esc(row.id)}"${href ? ` data-href="${esc(href)}"` : ''}${locked ? '' : ' data-cursor tabindex="-1"'} aria-expanded="${open ? 'true' : 'false'}">
     <kbd class="mod-n">${esc(row.n)}</kbd>
     <span class="mod-main"><span class="mod-head"><span class="mod-title">${esc(row.title)}</span>${minutes ? `<span class="mod-min">${esc(minutes)}</span>` : ''}</span>${pathNodesHtml(row.nodes)}</span>
     <span class="mod-end">${status ? `<span class="mod-status">${esc(status)}</span>` : ''}${tierMarksHtml(row.tier || 'none')}</span>
@@ -106,4 +106,20 @@ export function drillTileHtml(d, words = {}) {
     ${keysRowHtml(d.keys || [], { max: 4 })}
     <span class="dt-foot">${foot}</span>
   </${tag}>`;
+}
+
+/**
+ * The one obvious next step (Home, Learn): the lesson's number on a key, its title, where it sits,
+ * the keys it teaches, the module's path with this lesson ringed, and the button on Enter. The panel
+ * is the page's selected item; Enter presses the button. c: { num, title, where, keys, nodes, place,
+ * line, button (markup), id (the button's id), eyebrow }.
+ */
+export function continueHtml(c) {
+  return `<section class="panel panel-mode learn-continue" data-cursor data-cursor-enter="#${esc(c.id)}" tabindex="-1" aria-label="${esc(c.title)}">
+    ${c.num ? `<kbd class="mod-n lc-n">${esc(c.num)}</kbd>` : ''}
+    <div class="lc-main">${c.eyebrow ? `<span class="lc-eyebrow">${esc(c.eyebrow)}</span>` : ''}<h1 class="lc-title">${esc(c.title)}</h1>
+      <div class="lc-sub">${c.where ? `<span>${esc(c.where)}</span>` : ''}${keysRowHtml(c.keys || [], { max: 5 })}</div>
+      ${c.nodes && c.nodes.length ? `<div class="lc-path">${pathNodesHtml(c.nodes)}${c.place ? `<span class="lc-place">${esc(c.place)}</span>` : ''}</div>` : ''}${c.line ? `<p class="panel-line">${esc(c.line)}</p>` : ''}</div>
+    ${c.button}
+  </section>`;
 }

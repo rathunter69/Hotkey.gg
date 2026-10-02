@@ -210,7 +210,12 @@
 .learn-continue.cursor-on::after{content:none}
 .lc-n{min-width:var(--lc-n-w); font-size:var(--fs-panel); padding:var(--s2) var(--s3)}
 .lc-main{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:var(--s2)}
-.lc-title{margin:0; font-size:var(--fs-head); font-weight:var(--fw-heavy); line-height:1.15}
+.lc-title{margin:0; font-size:var(--fs-title); font-weight:var(--fw-heavy); line-height:1.15}
+.lc-eyebrow{font-size:var(--fs-label); font-weight:var(--fw-bold); color:var(--mode-ink)}
+.lc-path{display:flex; align-items:center; gap:var(--s3)}
+.lc-place{font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
+.learn-keys{display:flex}
+.xp-why{font-size:var(--fs-label)}
 .lc-sub{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s3); font-size:var(--fs-label); font-weight:var(--fw-semi); color:var(--ink-2)}
 .learn-continue .btn2{padding:var(--s4) var(--s6); font-size:var(--fs-panel); flex:none}
 
@@ -233,14 +238,14 @@
 
 /* a module: its number on a key, its name, its path of lessons ending on the challenge */
 .mod-list{display:flex; flex-direction:column; border-top:var(--bw-2) solid var(--ink)}
-.mod-row{display:grid; grid-template-columns:var(--mod-n-w) minmax(0,1fr) auto; align-items:center; gap:var(--s4); padding:var(--s3); border-bottom:1px solid var(--line); cursor:pointer}
+.mod-row{display:grid; grid-template-columns:var(--mod-n-w) minmax(0,1fr) auto; align-items:center; gap:var(--s4); padding:var(--s2) var(--s3); border-bottom:1px solid var(--line); cursor:pointer}
 .mod-row:hover{background:var(--chrome)}
 .mod-row.current{background:var(--mode-tint)}
 .mod-row.locked{cursor:default; color:var(--ink-2)}
 .mod-row.locked:hover{background:transparent}
 .mod-n{font-family:var(--mono); font-size:var(--fs-key); font-weight:var(--fw-bold); line-height:1; color:var(--ink); background:var(--sheet); border:1px solid var(--edge); border-bottom-width:var(--key-edge); border-radius:var(--r-btn); padding:var(--s1) var(--s2); text-align:center}
 .mod-complete .mod-n{background:var(--learn); color:var(--on-fill); border-color:var(--learn-ink)}
-.mod-main{display:flex; flex-direction:column; gap:var(--s2); min-width:0}
+.mod-main{display:flex; flex-direction:column; gap:var(--s1); min-width:0}
 .mod-head{display:flex; align-items:baseline; gap:var(--s3)}
 .mod-title{font-weight:var(--fw-bold); font-size:var(--fs-name)}
 .mod-min{font-size:var(--fs-min); color:var(--ink-2); font-variant-numeric:tabular-nums}

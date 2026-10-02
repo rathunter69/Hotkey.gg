@@ -17,7 +17,7 @@ import { tierMarksHtml } from '../ui/components/marks.js';
 import { paywallHtml } from '../ui/components/paywall.js';
 import { auth } from './auth.js';
 import { sheetPreviewHtml, previewOfLesson } from '../ui/components/sheet-preview.js';
-import { routeKeys, keysRowHtml, chapterCardsHtml, moduleRowHtml } from '../ui/components/path.js';
+import { routeKeys, keysRowHtml, chapterCardsHtml, moduleRowHtml, continueHtml } from '../ui/components/path.js';
 import { ACHIEVEMENTS } from '../content/achievements.js';
 import { GLYPHS, renderPixel, RARITY_COLOURS } from '../ui/pixel.js';
 
@@ -256,16 +256,12 @@ export function mountLearnPage(root, ctx = {}) {
   }
 
   /** The continue strip: the one obvious next step, its number on a key, the keys it teaches, Enter. */
-  function continueHtml() {
+  function nextStepHtml() {
     if (!cont) return '';
     const l = cont.lesson;
     const label = cont.started ? t('home_resume') : t('home_start');
     const where = cont.module ? cont.module.title : '';
-    return `<section class="panel panel-mode learn-continue" data-cursor data-cursor-enter="#learnGo" tabindex="-1" aria-label="${esc(l.title)}">
-      <kbd class="mod-n lc-n">${esc(cont.num)}</kbd>
-      <div class="lc-main"><h1 class="lc-title">${esc(l.title)}</h1><div class="lc-sub"><span>${esc(where)}</span>${keysRowHtml(cont.keys, { max: 4 })}</div></div>
-      ${buttonHtml({ label, key: 'Enter', href: '#/lesson/' + l.id, primary: true, id: 'learnGo' })}
-    </section>`;
+    return continueHtml({ num: cont.num, title: l.title, where, keys: cont.keys, eyebrow: t('learn_up_next'), id: 'learnGo', button: buttonHtml({ label, key: 'Enter', href: '#/lesson/' + l.id, primary: true, id: 'learnGo' }) });
   }
 
   function render(focusTab) {
@@ -301,16 +297,17 @@ export function mountLearnPage(root, ctx = {}) {
     const paywall = locked ? paywallHtml({ heading: t('paywall_chapter', { n: tab.n, name: tab.title }), signedIn: auth.state() === 'in', mode: 'learn', ids: { go: 'learnGoPro', notNow: 'learnNotNow' } }) : '';   // the one paywall panel (M105)
     let side = '';
     if (open && tab.built && !locked) {
-      const delivered = open.status === 'complete' || prefs.get().pagesDelivered.includes(open.id);   // the module's challenge hands the page in (lesson-view.js), so Learn shows it built from then
-      const sheet = modulePreview(tab.built, open.id, delivered);
+      const delivered = open.status === 'complete' || prefs.get().pagesDelivered.includes(open.id);   // the module's challenge hands the page in (lesson-view.js)
       const copy = moduleCopy(open.id);
       const pageName = (copy && copy.page_name) || open.title;
+      const beat = copy && copy.story_beat ? String(copy.story_beat).split('||')[0].trim() : '';
+      const modKeys = [...new Set(open.lessons.flatMap(l => { const x = LESSONS.find(y => y.id === l.id); return routeKeys(x && x.solution, 4); }))];
       const badge = moduleBadge(open.title);
       const earned = open.status === 'complete';
       const reward = badge ? `<div class="learn-reward${earned ? ' on' : ''}">${renderPixel(GLYPHS[badge.glyph] || GLYPHS.star, { b: RARITY_COLOURS[badge.rarity] || RARITY_COLOURS.common }, earned ? { size: 40 } : { size: 40, mono: 'var(--line)' })}<span><span class="row-name">${esc(badge.name)}</span><span class="row-sub">${esc(earned ? t('learn_reward_earned') : t('learn_reward', { module: open.title }))}</span></span></div>` : '';
-      side = panelHtml({ heading: esc(pageName), body: `${sheet ? sheetPreviewHtml(sheet, { rows: 16, cols: 7, title: pageName }) : ''}<p class="panel-line">${esc(delivered ? t('learn_page_built', { page: pageName }) : t('learn_page_fill'))}</p>${delivered && open.lessons.some(l => l.kind === 'challenge') ? `<a class="panel-link" href="#/lesson/${esc(open.lessons.find(l => l.kind === 'challenge').id)}?seed=new">${esc(t('learn_replay'))}</a>` : ''}${reward}`, cls: 'learn-side', stretch: true });
+      side = panelHtml({ heading: esc(open.title), facts: esc(t('learn_keys_n', { n: modKeys.length })), body: `${beat ? `<p class="panel-line learn-beat">${esc(beat)}</p>` : ''}<div class="learn-keys">${keysRowHtml(modKeys, { max: 14 })}</div><p class="panel-line ink-2">${esc(delivered ? t('learn_page_built', { page: pageName }) : t('learn_page_fill'))}</p>${delivered && open.lessons.some(l => l.kind === 'challenge') ? `<a class="panel-link" href="#/lesson/${esc(open.lessons.find(l => l.kind === 'challenge').id)}?seed=new">${esc(t('learn_replay'))}</a>` : ''}${reward}`, cls: 'learn-side', stretch: true });
     } else if (locked) side = paywall;
-    el.innerHTML = `${continueHtml()}${chapterCardsHtml(cards(all, skipped), t('rail_learn'))}
+    el.innerHTML = `${nextStepHtml()}${chapterCardsHtml(cards(all, skipped), t('rail_learn'))}
       <div class="pg-two"><div class="pg-main">${panelHtml({ heading: esc(heading), facts, body, cls: 'learn-table', stretch: true })}</div><div class="pg-side">${side}</div></div>`;
     wireTabs(el, (key, viaKeys) => { chapterKey = key; openModule = null; render(viaKeys); });
     if (unwire) unwire();

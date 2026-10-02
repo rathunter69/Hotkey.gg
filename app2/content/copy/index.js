@@ -4278,7 +4278,7 @@ export const COPY = {
   "paywall_go_pro": "Get full access",
   "paywall_not_now": "Not now",
   "learn_tab": "Chapter {n}",
-  "learn_page_fill": "Pass the challenge to fill this in.",
+  "learn_page_fill": "Pass its challenge to finish the module and earn its badge.",
   "learn_page_built": "{page}, built",
   "learn_coming": "Chapter {n} is being written. Its modules land here.",
   "practice_drills": "Drills",
@@ -4688,7 +4688,12 @@ export const COPY = {
   "learn_up_next": "Up next",
   "learn_reward": "Finish {module} to earn it",
   "learn_reward_earned": "Earned",
-  "practice_chapter_coming": "Chapter {n} is being written. Its drills land here as its lessons do."
+  "practice_chapter_coming": "Chapter {n} is being written. Its drills land here as its lessons do.",
+  "learn_keys_n": "{n} keys",
+  "home_xp_why": "Lessons, drills and the Daily pay XP. Every level opens a reward.",
+  "save_title": "Save your progress",
+  "save_line": "Your progress lives in this browser for now. A free account keeps it on any device and puts your times on the boards.",
+  "save_go": "Make a free account"
  },
  "micro": {
   "enter-tab-direction": {
