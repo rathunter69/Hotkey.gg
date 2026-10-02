@@ -611,7 +611,7 @@ export const COPY = {
    "brief": "A number format hides decimals; ROUND removes them, and the two are not the same thing: a page that adds up its displayed figures can land a dollar off its own total. ROUND(x,2) rounds to the cent, ROUND(x,0) to the dollar and ROUND(x,-3) to the thousand; ROUNDUP and ROUNDDOWN force the direction; CEILING and FLOOR round to a step, like the nearest $0.25 on a ticket; ABS drops the sign. Use them on the ticket figures in Summary, where the arithmetic has to be exact. The key is `ROUND`.",
    "closing": "A format hides decimals; ROUND removes them, and the total knows the difference. || The ticket columns now read to the cent and to the quarter, the washes in thousands and the gap to target as a size. Best practice: round where a figure gets added up or printed as a price, and keep the full figure everywhere else, because every rounding throws a little away.",
    "wow": "",
-   "convention_line": "One decimals setting per line · $ on the first and total rows",
+   "convention_line": "Round where a figure gets added up or printed as a price, and keep one decimals setting down each line.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -623,7 +623,7 @@ export const COPY = {
    "brief": "A count with a condition is the first question anyone asks of an export: how many washes at Domain, how many Ultimate washes, how many member washes at Domain. COUNTIF takes one range and one condition; COUNTIFS takes as many range and condition pairs as you need. The condition can be a cell, a text, or a comparison in quotes, like \">=250\". Build the site and package count blocks on Summary from Transactions, rows 5 to 94. The key is `COUNTIFS`.",
    "closing": "Ninety rows counted six ways, and the blocks agree with each other except where the export lies. || The package block counts all 90 washes and the site block finds 88, because two site codes in the export end in a space and match nothing in B15:B20. The checks in C80:C81 caught it before a buyer did; module 3.4 finds the two rows and fixes them. Best practice: write the criteria range once, anchor it, and fill; a range that slips by a row is the commonest wrong number in a databook.",
    "wow": "",
-   "convention_line": "Alt+= once, across the block · The check is a live difference → 0 · Links green; external links avoided",
+   "convention_line": "Anchor the criteria range once and fill, and let a live check say when two blocks disagree.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -635,7 +635,7 @@ export const COPY = {
    "brief": "Counting says how many; summing says how much. SUMIF adds the rows that meet one condition, SUMIFS puts the range to add first and then the condition pairs, and AVERAGEIFS averages instead. A member wash carries $0 because the member paid on the first of the month, so membership revenue is active members times the fee, not a sum of rows, and the databook has to say so or a buyer will think member washes are free. Build the revenue columns on Summary. The key is `SUMIFS`.",
    "closing": "The page now says how much, by site and by package, and what a member wash is worth. || Retail revenue is a sum of the export; membership revenue is members times the fee, and the note in C22 says so before a buyer asks. Best practice: a SUMIFS lists the range to add first, a SUMIF last, and mixing the two up is the commonest slip in a databook, so read one back with F2 before you fill.",
    "wow": "",
-   "convention_line": "Alt+= once, across the block · Label the source (\"per utility contract\")",
+   "convention_line": "Total each block with one AutoSum, and type a note wherever a number needs its source explained.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -647,7 +647,7 @@ export const COPY = {
    "brief": "\"Which site was busiest, and on which day?\" MAXIFS finds the biggest value that meets a condition and MINIFS the smallest; LARGE and SMALL find the nth biggest or smallest in a range; RANK places every site in order. Together they turn the site block into a league table without sorting anything, which matters because the block has to stay where every link expects it. The key is `LARGE`.",
    "closing": "A league table with nothing sorted, so every link still points where it should. || MAXIFS and MINIFS read the busiest and quietest day straight off the day totals; LARGE, SMALL and RANK put the six sites in order beside them. Best practice: never sort a block that other cells link to; rank it in a column instead, and the links keep their rows.",
    "wow": "",
-   "convention_line": "Ctrl+D down, Ctrl+R across",
+   "convention_line": "Fill one formula down the block, and rank a block in a column rather than sorting what other cells link to.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -659,7 +659,7 @@ export const COPY = {
    "brief": "The blended ticket is revenue over every wash, member washes included, so it sits well below the price list, and it is the number a buyer uses to value a wash. SUMPRODUCT multiplies two ranges pair by pair and adds the products in one call: retail washes by package times the price by package, with no helper column. It also does conditional sums the old way, before SUMIFS existed, and you will meet that in other people’s models. The key is `SUMPRODUCT`.",
    "closing": "SUMPRODUCT summed washes times prices in one call, and the blended ticket is the number a buyer prices a wash from. || The check in C82 reads (60): three amounts in the export are text, and a row carries a site code with a trailing space, so the SUMIFs miss them while the price list does not. Leave it red; module 3.4 cleans the export and the check comes back to zero on its own. Best practice: when two routes to one number disagree, the check is doing its job, so fix the data, never the check.",
    "wow": "",
-   "convention_line": "The check is a live difference → 0",
+   "convention_line": "When two routes to one number disagree, the check is doing its job: fix the data, never the check.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -671,7 +671,7 @@ export const COPY = {
    "brief": "A reconciliation is two counts of the same thing from two sources, with the difference explained line by line until it reaches zero. The managers’ weekly tallies came in by email; the POS counts are the ones you built from the export. They won’t agree, because a manager counted a re-wash and another tallied a day the export doesn’t cover, and the databook shows each difference and what explains it. Build the block and drive the check to zero. The key is `=`.",
    "closing": "Two counts of the same thing agree now, every difference is explained, and the check reads zero. || The POS is the truth; the managers’ number is adjusted to it, never the other way, and every adjustment says why in words. The same three columns (the reported figure, each adjustment explained, the adjusted figure) are how a buyer’s diligence team restates EBITDA for one-time items, and buyers price off the adjusted number.",
    "wow": "",
-   "convention_line": "The check is a live difference → 0 · Cash balances the sheet; nothing is forced · Inputs blue, formulas black · Label the source (\"per utility contract\") · Alt+= once, across the block",
+   "convention_line": "Every difference gets a reason in words and a typed adjustment in blue, until the check reads zero.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -683,7 +683,7 @@ export const COPY = {
    "brief": "A fresh export from the San Antonio cluster. Count and sum it by site and package, rank the sites, price the blended ticket, and bring the reconciliation check to zero.",
    "closing": "",
    "wow": "",
-   "convention_line": "The check is a live difference → 0 · Inputs blue, formulas black · Alt+= once, across the block",
+   "convention_line": "Every figure is a live formula on the export, and every typed adjustment is blue.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -695,7 +695,7 @@ export const COPY = {
    "brief": "A site code is two facts in one cell: AUS-DOM is the cluster and the site. LEFT takes characters from the start, RIGHT from the end, MID from a position, and LEN counts them, so the cluster is LEFT(B5,3) and the site is RIGHT(B5,3). Split the codes into their own columns on Transactions, so the cluster can be counted on, and let LEN find the two codes that have been hiding a space since the counts. The key is `LEFT`.",
    "closing": "One code became two columns, and the trailing spaces gave themselves away. || LEN found what no eye could, LEFT and RIGHT split the code, and TRIM inside the formula means the next dirty export cannot break it. The reconciliation moved because two washes the managers never counted are on the POS now, and two lessons on they get their line in the reconciliation. Best practice: clean inside the formula when the export refreshes, and fix the source when it is yours to fix.",
    "wow": "",
-   "convention_line": "The check is a live difference → 0 · The count, the proposal, the error code",
+   "convention_line": "Read what LEN tells you, fix the data at its source, and let the checks confirm it.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -707,7 +707,7 @@ export const COPY = {
    "brief": "The memo packs three facts into one string: \"Wash D @ AUS-DOM (kiosk)\". FIND returns the position of a character, so the site code is whatever sits after \"@ \", and the channel is whatever sits between the brackets: MID with FIND tells it where to cut. SEARCH is FIND without caring about case, and SUBSTITUTE swaps text for text. Pull the site, the channel and the package out of the memo, and leave the memo itself alone. The key is `FIND`.",
    "closing": "You pulled three facts out of one string, and the raw memo is still there for the audit. || FIND and SEARCH say where to cut, MID cuts, UPPER and SUBSTITUTE make the pieces read one way. Best practice: parse into helper columns and never overwrite the raw text, so anyone can check a parsed value against the string it came from.",
    "wow": "",
-   "convention_line": "Inputs, calcs, outputs — in that order · The count, the proposal, the error code",
+   "convention_line": "Parse into helper columns and keep the raw text beside them as the audit trail.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -719,7 +719,7 @@ export const COPY = {
    "brief": "Three amounts in the export sit on the left of their cells, which means they are text, not numbers, and every SUMIFS skips them. VALUE turns a text number into a number and DATEVALUE turns a text date into a date, and when you are in a hurry, multiplying by 1 does the same job. Paste the values over the originals, so the export holds numbers and the sums come out right. The key is `VALUE`.",
    "closing": "Three text amounts became numbers, and the sums finally counted them. || Go To Special found the text, VALUE in a helper turned it into numbers, and Paste Special Values put them back where the formulas look. Best practice: convert in a helper you can read, paste values once you trust it, and delete the helper so nothing depends on it.",
    "wow": "",
-   "convention_line": "Values to snapshot, never over live formulas · The check is a live difference → 0 · Inputs blue, formulas black",
+   "convention_line": "Paste values only to snapshot a helper you trust, then clear the helper so nothing depends on it.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -731,7 +731,7 @@ export const COPY = {
    "brief": "When a whole column needs splitting once, a formula is more than the job needs. Text to Columns (Alt, A, E) splits by a delimiter, like the hyphen in AUS-DOM, or by a fixed width, in one pass; Flash Fill (Ctrl+E) watches you type the first result and fills the pattern down. Both write values, not formulas, so they are for a one-time clean, not a live model. Split a copy of the codes both ways. The key is `Alt A E`.",
    "closing": "A whole column split in one pass, and you know why the result is values. || Text to Columns split ninety codes at the hyphen and Flash Fill copied a pattern from one example, both without a formula. Best practice: Text to Columns and Flash Fill for a one-time clean; LEFT, RIGHT and MID when the export refreshes, because only a formula follows the data.",
    "wow": "",
-   "convention_line": "Name the tabs; outputs left, data right · Values to snapshot, never over live formulas",
+   "convention_line": "A one-time clean goes on its own sheet at the end of the workbook, and writes values on purpose.",
    "mac_note": "",
    "story_beat": ""
   },
@@ -743,7 +743,7 @@ export const COPY = {
    "brief": "A raw dump from the San Antonio cluster: codes with stray spaces, memos with three facts, amounts as text. Make it a table the formulas can read, and bring the checks to zero.",
    "closing": "",
    "wow": "",
-   "convention_line": "Values to snapshot, never over live formulas · The check is a live difference → 0",
+   "convention_line": "Clean through a helper, paste the values, and let the checks block say the table is usable.",
    "mac_note": "",
    "story_beat": ""
   },

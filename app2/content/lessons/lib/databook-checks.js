@@ -87,7 +87,7 @@ export const sameText = (a, b) => typeof a === 'string' && typeof b === 'string'
 /** Rows matching every predicate. */
 export const countRows = (rows, ...preds) => rows.filter(x => preds.every(p => p(x))).length;
 export const sumRows = (rows, field, ...preds) => rows.filter(x => preds.every(p => p(x))).reduce((t, x) => t + (isNum(x[field]) ? x[field] : 0), 0);
-/** The export's criteria, as Excel reads them. */
+/** Criteria on the export rows, as Excel reads them. */
 export const atSite = code => x => sameText(x.site, code);
 export const ofPackage = code => x => sameText(x.pkg, code);
 export const isMember = x => x.member != null && x.member !== '';
