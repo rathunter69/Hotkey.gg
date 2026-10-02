@@ -19,11 +19,12 @@
 
 import { TABS, MENUS, RIBBON_GROUPS, RIBBON_ICONS, RIBBON_MENU_ICONS, FMT_OPTS, PASTE_OPTS, PASTE_OP_OPTS, COMMANDS, tabName,
   QAT_COMMANDS, POPULAR_COMMANDS, OPTIONS_PAGES, OPTIONS_LIVE_PAGES } from '../engine/ribbon.js';
-import { FONT_SWATCHES, FILL_SWATCHES, CELL_STYLES, CF_STYLES, CF_STYLE_KEYS, CF_BAR_COLORS, CF_SCALES, CF_OP_LABEL } from '../engine/sheet.js';
+import { FONT_SWATCHES, FILL_SWATCHES, TAB_COLORS, CELL_STYLES, CF_STYLES, CF_STYLE_KEYS, CF_BAR_COLORS, CF_SCALES, CF_OP_LABEL } from '../engine/sheet.js';
 import { DELETE_SHEET_PROMPT } from '../engine/keyboard.js';
 import { dispText } from '../engine/format.js';
 import { FC_TABS, FC_CATEGORIES, FC_TYPES, FC_NEGATIVES, numberCode, numberTabResult, ZOOM_CHOICES } from '../engine/dialogs.js';
 import { prefs } from '../app/prefs.js';
+import { TOOL_CARDS, toolCard } from './tool-cards.js';
 import { RIBBON_COMMANDS, RIBBON_LAYOUT, MENU_META, VIRTUAL_MENUS, UNIMPLEMENTED_BY_ID, MODAL_DIALOGS, CARD_DIALOGS, MENU_ITEM_ICONS, QAT_ICONS,
   itemTip, keyTipAt, runCommand, runQatCommand, openMenuPath, recordMouse, closeDialog, leaveRibbon, menuEntries } from './ribbon-commands.js';
 
@@ -253,11 +254,12 @@ export class RibbonView {
     }
     if (kind === 'letter') { const d = ss.dialog; ss.applyRibbon(arg.toUpperCase()); recordMouse(ss, 'dialog:' + (d || arg)); ss.emit('mouse'); return; }
     if (kind === 'enter') { const d = ss.dialog; ss.applyRibbon('ENTER'); recordMouse(ss, 'dialog:' + (d || 'enter')); ss.emit('mouse'); return; }
-    if (kind === 'cancel') { const d = ss.dialog; closeDialog(ss); recordMouse(ss, 'dialog:' + (d || 'cancel')); ss.emit('mouse'); return; }
+    if (kind === 'cancel') { const d = ss.dialog; if (TOOL_CARDS[d] && ss.toolEscape) ss.toolEscape(); else closeDialog(ss); recordMouse(ss, 'dialog:' + (d || 'cancel')); ss.emit('mouse'); return; }
     if (kind === 'swatch') {
       const i = +arg;
       if (ss.dialog === 'fontcolor') { ss.fontColorIdx = i; ss.applyRibbon('ENTER'); recordMouse(ss, 'ribbon:HFC'); }
       else if (ss.dialog === 'fillcolor') { ss.fillColorIdx = i; ss.applyRibbon('ENTER'); recordMouse(ss, 'ribbon:HH'); }
+      else if (ss.dialog === 'tabcolor' && TAB_COLORS[i]) { ss.tabColorIdx = i; ss.setTabColor(TAB_COLORS[i].k); ss.exitRibbon(false); recordMouse(ss, 'ribbon:HOT'); }
       ss.emit('mouse'); return;
     }
     if (kind === 'style') { if (ss.dialog === 'cellstyle') { ss.cellStyleIdx = +arg; ss.applyRibbon('ENTER'); recordMouse(ss, 'ribbon:HJ'); } ss.emit('mouse'); }
@@ -357,13 +359,15 @@ export class RibbonView {
     const ss = this.session, d = ss.dlg; if (!d) return '';
     const F = RibbonView.field;
     let body;
-    if (d.op === 'formula') body = '<div class="od-sect">Format values where this formula is true:</div>' +
+    if (d.op === 'duplicate') body = '<div class="od-sect">Format cells that contain:</div>' +   // Duplicate Values: Duplicate / Unique, then the style
+      `<div class="gt-ref"><span class="od-combo${d.focus === 'which' ? ' tc-foc' : ''}" data-act="dset:focus:which">${d.unique ? 'Unique' : 'Duplicate'}</span><label>values with</label></div>`;
+    else if (d.op === 'formula') body = '<div class="od-sect">Format values where this formula is true:</div>' +
       `<div class="gt-ref">${F(d.formula, d.focus === 'formula', 'dset:focus:formula', 'wide')}</div>`;
     else body = `<div class="od-sect">Format cells that are ${esc((CF_OP_LABEL[d.op] || '').toUpperCase())}:</div>` +
       `<div class="gt-ref">${F(d.v1, d.focus === 'v1', 'dset:focus:v1', 'wide')}${d.op === 'between' ? '<label>and</label>' + F(d.v2, d.focus === 'v2', 'dset:focus:v2', 'wide') : ''}</div>`;
     body += '<div class="od-sect">with</div><div class="cf-styles' + (d.focus === 'style' ? ' foc' : '') + '">' +
       CF_STYLE_KEYS.map((k, i) => RibbonView.cfChip(k, i, i === d.styleIdx, 'dset:style:' + i)).join('') + '</div>';
-    body += ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">' + (d.op === 'formula' ? 'type a formula for the active cell' : 'type a number, text, a date or a =formula') + ' · ← → pick a style · ↵ OK · esc cancel</div>';
+    body += ss.note ? `<div class="wb-err">${esc(ss.note)}</div>` : '<div class="od-caplbl">' + (d.op === 'formula' ? 'type a formula for the active cell' : d.op === 'duplicate' ? '↑ ↓ Duplicate or Unique' : 'type a number, text, a date or a =formula') + ' · ← → pick a style · ↵ OK · esc cancel</div>';
     return body;
   }
   /** A preset's value as the Rules Manager prints it: text in quotes, TRUE / FALSE, a number or a =formula as stored. */
@@ -371,11 +375,12 @@ export class RibbonView {
   static cfRuleDesc(r) {
     if (r.kind === 'cellValue') return 'Cell Value ' + (CF_OP_LABEL[r.op] || r.op).toLowerCase() + ' ' + RibbonView.cfValueText(r.v1) + (r.op === 'between' || r.op === 'notBetween' ? ' and ' + RibbonView.cfValueText(r.v2) : '');
     if (r.kind === 'formula') return 'Formula: ' + r.formula;
+    if (r.kind === 'duplicate') return r.unique ? 'Unique Values' : 'Duplicate Values';
     if (r.kind === 'dataBar') return 'Data Bar';
     return 'Graded Color Scale';
   }
   static cfRulePreview(r) {
-    if (r.kind === 'cellValue' || r.kind === 'formula') { const st = CF_STYLES[r.style] || CF_STYLES.lightred; return `<span class="cf-prev" style="${st.fill ? 'background:' + st.fill + ';' : ''}${st.fontColor ? 'color:' + st.fontColor + ';' : ''}${st.border ? 'box-shadow:inset 0 0 0 1px ' + st.border + ';' : ''}">AaBbCcYyZz</span>`; }
+    if (r.kind === 'cellValue' || r.kind === 'formula' || r.kind === 'duplicate') { const st = CF_STYLES[r.style] || CF_STYLES.lightred; return `<span class="cf-prev" style="${st.fill ? 'background:' + st.fill + ';' : ''}${st.fontColor ? 'color:' + st.fontColor + ';' : ''}${st.border ? 'box-shadow:inset 0 0 0 1px ' + st.border + ';' : ''}">AaBbCcYyZz</span>`; }
     if (r.kind === 'dataBar') { const b = CF_BAR_COLORS.find(x => x.k === r.color) || CF_BAR_COLORS[0]; return `<span class="cf-prev" style="background:linear-gradient(90deg, ${b.hex} 65%, transparent 65%)"></span>`; }
     const sc = CF_SCALES.find(x => x.k === r.scale) || CF_SCALES[0]; return `<span class="cf-prev" style="background:linear-gradient(90deg, ${sc.colors.join(', ')})"></span>`;
   }
@@ -718,7 +723,7 @@ export class RibbonView {
     }
     if (ss.dialog === 'condfmt' || this.condfmtDialog) {
       const d = this.condfmtDialog || (this.condfmtDialog = this.wideCard('condfmtDialog', 'Conditional Formatting', 'pd-mid'));
-      if (ss.dialog === 'condfmt' && ss.dlg) d.querySelector('.pd-title').textContent = ss.dlg.op === 'formula' ? 'New Formatting Rule' : (CF_OP_LABEL[ss.dlg.op] || 'Conditional Formatting');
+      if (ss.dialog === 'condfmt' && ss.dlg) d.querySelector('.pd-title').textContent = ss.dlg.op === 'formula' ? 'New Formatting Rule' : ss.dlg.op === 'duplicate' ? 'Duplicate Values' : (CF_OP_LABEL[ss.dlg.op] || 'Conditional Formatting');
       this.showCard(d, ss.dialog === 'condfmt' && !!ss.dlg, ss.dialog === 'condfmt' ? this.condFmtHtml() : '', RibbonView.okCancel('OK'));
     }
     if (ss.dialog === 'condrules' || this.condrulesDialog) {
@@ -731,6 +736,24 @@ export class RibbonView {
       if (on) d.querySelector('.pd-title').textContent = ss.dialog === 'databar' ? 'Data Bars' : 'Color Scales';
       this.showCard(d, on, on ? this.cfGalleryHtml() : '', RibbonView.okCancel('OK'));
     }
+    // the Formulas and Data tools (ui/tool-cards.js): one card each, drawn from the draft; a pane docks at the sheet's right edge
+    this._toolCards = this._toolCards || {};
+    for (const name in TOOL_CARDS) {
+      const spec = TOOL_CARDS[name];
+      if (ss.dialog !== name && !this._toolCards[name]) continue;
+      const d = this._toolCards[name] || (this._toolCards[name] = this.wideCard(spec.id, '', spec.cls));
+      const card = ss.dialog === name ? toolCard(ss) : null;
+      if (card) d.querySelector('.pd-title').textContent = card.title;
+      d.classList.toggle('wb-pane', !!(card && card.pane));
+      this.showCard(d, !!card, card ? card.body : '', card ? card.foot : '');
+      if (card && card.pane) this.dockPane(d);
+    }
+  }
+  /** A pane (the Watch Window, the PivotTable field list) sits at the right edge of the sheet, from its top, as Excel docks it. */
+  dockPane(d) {
+    try { const gw = (this.slot && this.slot.parentElement && this.slot.parentElement.querySelector('.gridwrap')) || document.querySelector('.gridwrap'); if (!gw) return;
+      const wr = gw.getBoundingClientRect(); const w = d.offsetWidth || 320;
+      d.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, wr.right - w - 8)) + 'px'; d.style.top = Math.max(8, wr.top + 8) + 'px'; } catch (e) { /* not laid out */ }
   }
 
   /* ---- the anchored dropdown (colours, galleries, menus, small dialogs) ---- */
@@ -764,15 +787,23 @@ export class RibbonView {
     return this.el.querySelector('.rf-tabs') || this.el;
   }
   swatchDropHtml() {
-    const ss = this.session; const isFont = ss.dialog === 'fontcolor';
-    const SW = isFont ? FONT_SWATCHES : FILL_SWATCHES, idx = isFont ? ss.fontColorIdx : ss.fillColorIdx;
-    return '<div class="rdrop-cap">' + (isFont ? 'font color' : 'fill color') + '</div><div class="rdrop-sw">' + swatchesHtml(SW, idx) + '</div>' +
+    const ss = this.session; const isFont = ss.dialog === 'fontcolor', isTab = ss.dialog === 'tabcolor';
+    const SW = isTab ? TAB_COLORS : isFont ? FONT_SWATCHES : FILL_SWATCHES, idx = (isTab ? ss.tabColorIdx : isFont ? ss.fontColorIdx : ss.fillColorIdx) | 0;
+    return '<div class="rdrop-cap">' + (isTab ? 'tab color' : isFont ? 'font color' : 'fill color') + '</div><div class="rdrop-sw">' + swatchesHtml(SW, idx) + '</div>' +
       '<div class="rdrop-name">' + SW[idx].name + '</div><div class="rdrop-hint">← → pick · ↵ apply · esc cancel · or click a swatch</div>';
   }
   styleDropHtml() {
     const ss = this.session;
-    return '<div class="rdrop-cap">cell styles</div><div class="rdrop-chips">' + CELL_STYLES.map((st, i) => `<span class="opt${i === ss.cellStyleIdx ? ' on' : ''}" data-act="style:${i}">${st.name}</span>`).join('') +
-      '</div><div class="rdrop-hint">← → pick · ↵ apply · esc cancel · or click a style</div>';
+    return '<div class="rdrop-cap">cell styles</div>' + RibbonView.styleChips(ss, 'rdrop-chips') +
+      '<div class="rdrop-item" data-act="letter:N"><span class="ri-key">N</span><span class="rdrop-lbl">New Cell Style…</span></div>' +
+      '<div class="rdrop-hint">← → pick · ↵ apply · esc cancel · or click a style</div>';
+  }
+  /** The gallery's chips: Excel's built-in styles, then the workbook's own under Custom, in the order ← → walks them (session.cellStyleList). */
+  static styleChips(ss, cls) {
+    const all = ss.cellStyleList ? ss.cellStyleList() : CELL_STYLES.map(st => ({ name: st.name, builtin: true }));
+    const chip = (st, i) => `<span class="opt${i === ss.cellStyleIdx ? ' on' : ''}${st.custom ? ' st-custom' : ''}" data-act="style:${i}">${esc(st.name)}</span>`;
+    const built = all.map((st, i) => st.custom ? '' : chip(st, i)).join(''), mine = all.map((st, i) => st.custom ? chip(st, i) : '').join('');
+    return `<div class="${cls}">${built}</div>` + (mine ? `<div class="rdrop-cap">custom</div><div class="${cls}">${mine}</div>` : '');
   }
   /** A menu as a dropdown: the Alt path's MENUS items (with their KeyTips) or a view-owned list. */
   menuDropHtml(key) {
@@ -874,6 +905,7 @@ export class RibbonView {
     // what floats under the bar
     if (ss.dialog === 'fontcolor' || ss.dialog === 'fillcolor') { this.dropShow(this.anchorFor(ss.dialog === 'fontcolor' ? 'HFC' : 'HH'), this.swatchDropHtml()); return; }
     if (ss.dialog === 'cellstyle') { this.dropShow(this.anchorFor('HJ'), this.styleDropHtml(), 'rdrop-gallery'); return; }
+    if (ss.dialog === 'tabcolor') { this.dropShow(this.anchorFor('HO'), this.swatchDropHtml()); return; }
     if (ss.dialog === 'colw' || ss.dialog === 'rowh') { this.dropShow(this.anchorFor('HO'), this.smallDialogHtml(), 'rdrop-dialog'); return; }
     if (ss.dialog === 'sortwarn') { this.dropShow(this.anchorFor('ASA', 'HSF'), this.smallDialogHtml(), 'rdrop-dialog'); return; }
     if (ss.dialog === 'fxfix') { this.dropShow(this.anchorFor(), this.smallDialogHtml(), 'rdrop-dialog'); return; }
@@ -1032,10 +1064,11 @@ export class RibbonView {
       this.dropShow(ss.dialog === 'fontcolor' ? 'f' : 'h', this.swatchDropHtml());
       return;
     }
+    if (ss.dialog === 'tabcolor') { el.className = 'ribbon show ribbon-ico ribbon-lean ribbon-open'; el.innerHTML = leanRibbonHtml('H', true); this.dropShow('h', this.swatchDropHtml()); return; }   // Format › Tab Color: the palette under the Home row
     if (ss.dialog === 'cellstyle') {   // cell-styles gallery — chip row, arrows walk it, ↵ applies, a click applies too
       el.className = 'ribbon show';
       let html = '<span class="path">cell styles →</span>';
-      CELL_STYLES.forEach((st, i) => { html += `<span class="opt${i === ss.cellStyleIdx ? ' on' : ''}" data-act="style:${i}">${st.name}</span>`; });
+      (ss.cellStyleList ? ss.cellStyleList() : CELL_STYLES).forEach((st, i) => { html += `<span class="opt${i === ss.cellStyleIdx ? ' on' : ''}${st.custom ? ' st-custom' : ''}" data-act="style:${i}">${esc(st.name)}</span>`; });
       html += '<span class="opt">← → pick · ↵ apply · esc cancel</span>';
       el.innerHTML = html; return;
     }
@@ -1093,7 +1126,8 @@ export class RibbonView {
       return; }
     if (ss.dialog) {   // a dialog this painter has no card for — a minimal strip so Esc always reads
       el.className = 'ribbon show';
-      el.innerHTML = '<span class="path">' + esc(ss.dialog) + ' →</span><span class="opt">esc cancel</span>';
+      const tc = TOOL_CARDS[ss.dialog] && ss.dlg ? TOOL_CARDS[ss.dialog].title(ss).toLowerCase() : ss.dialog;   // a tool's card carries the controls; the strip names it
+      el.innerHTML = '<span class="path">' + esc(tc) + ' →</span><span class="opt">esc cancel</span>';
       return;
     }
     el.className = 'ribbon show';

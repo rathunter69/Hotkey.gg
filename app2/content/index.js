@@ -1,5 +1,5 @@
 // app2/content/index.js — the catalogue: chapters in order, each with its lessons in order.
-// Chapter 1 (C2, framework v2): seven modules of lessons on the Project Volt workbook, each ending
+// Chapter 1 (C2, framework v2): seven modules of lessons on the Clearcoat weekly workbook (Project Rinse), each ending
 // in its challenge, then the project, the assessment and the test-out (1.8).
 import inherited_workbook from './lessons/inherited-workbook.js';
 import { applyCopy } from './copy/apply.js';
@@ -53,6 +53,35 @@ import units_in_the_format from './lessons/units-in-the-format.js';
 import dynamic_headers_with_text from './lessons/dynamic-headers-with-text.js';
 import conditional_codes_and_hidden_zeros from './lessons/conditional-codes-and-hidden-zeros.js';
 import challenge_house_format_set from './lessons/challenge-house-format-set.js';
+// 2.3 The page a buyer reads, 2.4 Alignment and structure (run R2)
+import title_units_timeline_answer from './lessons/title-units-timeline-answer.js';
+import actuals_vs_estimates_divider from './lessons/actuals-vs-estimates-divider.js';
+import borders_that_mean_something from './lessons/borders-that-mean-something.js';
+import labels_footnotes_sources from './lessons/labels-footnotes-sources.js';
+import widths_and_the_label_column from './lessons/widths-and-the-label-column.js';
+import cell_styles_format_painter from './lessons/cell-styles-format-painter.js';
+import challenge_pnl_presentation_quality from './lessons/challenge-pnl-presentation-quality.js';
+import alignment_at_scale from './lessons/alignment-at-scale.js';
+import grouping_and_outline_levels from './lessons/grouping-and-outline-levels.js';
+import hide_group_or_separate_sheet from './lessons/hide-group-or-separate-sheet.js';
+import navigation_column from './lessons/navigation-column.js';
+import challenge_grouped_navigable from './lessons/challenge-grouped-navigable.js';
+import highlight_rules from './lessons/highlight-rules.js';
+import formula_driven_rules from './lessons/formula-driven-rules.js';
+import data_bars_and_scales from './lessons/data-bars-and-scales.js';
+import managing_rules from './lessons/managing-rules.js';
+import challenge_checks_flags from './lessons/challenge-checks-flags.js';
+import text_for_labels from './lessons/text-for-labels.js';
+import eomonth_edate from './lessons/eomonth-edate.js';
+import dynamic_titles from './lessons/dynamic-titles.js';
+import cleaning_imported_labels from './lessons/cleaning-imported-labels.js';
+import units_and_period_line from './lessons/units-and-period-line.js';
+import challenge_dynamic_header_block from './lessons/challenge-dynamic-header-block.js';
+import print_areas_titles_footers from './lessons/print-areas-titles-footers.js';
+import one_page_summary from './lessons/one-page-summary.js';
+import challenge_print_pack from './lessons/challenge-print-pack.js';
+import ch2_project from './lessons/ch2-project.js';
+import ch2_assessment from './lessons/ch2-assessment.js';
 import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // Chapter 1's format challenge, re-clothed (content/remix.js)
 
 export const CHAPTERS = [
@@ -87,15 +116,27 @@ export const CHAPTERS = [
     title: 'Formatting and presentation',
     access: 'paid',
     blurb: 'Number formats and the format code, the anatomy of a financial page, conditional formatting, dates and text, and a page that prints: a three-year P&L brought to the standard a buyer reads.',
-    // Chapter 2's sections in order (SITE_SPEC · Chapter 2): modules 2.1 and 2.2 so far; 2.3–2.7 and the project block follow in Run 2.
+    // Chapter 2's sections in order (script-ch2.md): modules 2.1 to 2.7, the project and assessment (2.8), then the remixes.
     sections: [
       { name: 'Number formats', blurb: 'Number formats on a P&L: the desk number format and decimals by line, the sign convention stated once, currency and percent lines, real dates on the timeline.' },
       { name: 'Custom number formats', blurb: 'Custom number formats: the four-section code, units in the format, custom date codes for the timeline, conditions and hidden zeros.' },
+      { name: 'The page a buyer reads', blurb: 'The anatomy of a financial page: title, units, timeline, sections and the answer; the actuals-to-estimates divider; borders that mean something; labels, footnotes and sources; widths and the label column; one page’s formats carried to the next, the total line as a cell style.' },
+      { name: 'Alignment and structure', blurb: 'Alignment and outline at scale: headers and wraps on a long page; grouping on two levels; hiding against grouping against a separate sheet; a linked navigation column.' },
+      { name: 'Conditional formatting', blurb: 'Conditional formatting: highlight rules for negatives and exceptions, formula-driven rules, data bars and scales and when not to use them, managing the rules.' },
+      { name: 'Dates and text for presentation', blurb: 'Text and date functions for presentation: TEXT for labels and headers, EOMONTH and EDATE for period ends, dynamic titles with &, cleaning imported labels, a units line that writes itself.' },
+      { name: 'Printing and page layout', blurb: 'Printing at pack scale: landscape, fit to one page wide, the title rows repeated, one footer on every page, and the one-page summary linked from the detail.' },
+      { name: 'Project and assessment', blurb: 'Build the historical financials section end to end from a raw export, then build it again on the clock; the assessment is the test-out.' },
       { name: 'Remixes', blurb: 'Chapter 1’s challenges re-clothed in this chapter’s material: the same keys on a new sheet, so old skills stay warm.' },
     ],
     lessons: [
       built_in_formats_on_a_pnl, sign_convention_costs_negative, currency_and_percent_lines, dates_on_the_timeline, challenge_format_the_numbers,
       the_four_section_format, units_in_the_format, dynamic_headers_with_text, conditional_codes_and_hidden_zeros, challenge_house_format_set,
+      title_units_timeline_answer, actuals_vs_estimates_divider, borders_that_mean_something, labels_footnotes_sources, widths_and_the_label_column, cell_styles_format_painter, challenge_pnl_presentation_quality,
+      alignment_at_scale, grouping_and_outline_levels, hide_group_or_separate_sheet, navigation_column, challenge_grouped_navigable,
+      highlight_rules, formula_driven_rules, data_bars_and_scales, managing_rules, challenge_checks_flags,
+      text_for_labels, eomonth_edate, dynamic_titles, cleaning_imported_labels, units_and_period_line, challenge_dynamic_header_block,
+      print_areas_titles_footers, one_page_summary, challenge_print_pack,
+      ch2_project, ch2_assessment,
       remix_format_on_the_pnl,
     ],
   },

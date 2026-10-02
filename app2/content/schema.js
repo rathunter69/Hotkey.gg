@@ -157,7 +157,7 @@ export const CONCEPTS = {
   'fill-series': 'Fill Series (Alt, H, F, I, S) continues the step your first two cells set',
   'flash-fill': 'Flash Fill (Ctrl+E in Excel) fills a column by the pattern of your examples',
   'qat-run': 'Alt then a number runs that Quick Access Toolbar command from anywhere',
-  // C2 (Project Volt): the module lessons' additions
+  // C2 (Chapter 1): the module lessons' additions
   'enter-tab-direction': 'Tab commits and moves right; Enter after a Tab run returns to the column you started in, one row down',
   'replace-all': 'Replace All (Ctrl+H, then Alt+A) swaps every match on the sheet in one step and reports how many cells changed',
   'group-ungroup': 'Alt+Shift+→ groups the selected whole rows or columns into an outline that folds and unfolds; Alt+Shift+← ungroups',
@@ -197,6 +197,38 @@ export const CONCEPTS = {
   'concatenate-amp': '& joins text and cell values into one string: ="FY"&TEXT(B3,"yy")&"A"',
   'conditional-format-code': 'a section may open with a condition or a color, [>=1000]0,"k" or [Red], and Excel uses the first section whose condition the value meets',
   'hide-zeros': 'an empty section shows nothing: #,##0;(#,##0); hides the zeros of a working block',
+  // Chapter 2, modules 2.3 and 2.4: the page a buyer reads, alignment and structure
+  'page-anatomy': 'a financial page reads in one order: the title, the units line, the timeline, the sections and the answer they add down to',
+  'indent-levels': 'Increase Indent (Alt, H, 6) moves a label one level in and Decrease Indent (Alt, H, 5) one level out, so a sub-line reads as part of its total',
+  'font-size-step': 'Increase Font Size (Alt, H, F, G) takes the selection one step up the size list; Alt, H, F, K takes it one step down',
+  'clear-all': 'Clear All (Alt, H, E, A) empties the cells and takes their formats with them',
+  'ae-divider': 'the A/E divider: one right border down the last actual column and a shade on the estimate header, so a reader sees where the forecast starts',
+  'border-meaning': 'a top border says the row adds up what is above it, a double bottom marks the final answer, and a grid says nothing at all',
+  'source-line': 'every table carries a source line under it, and a footnote marker where a figure needs a word',
+  'label-column': 'a page has a shape: a narrow margin in A, the labels fitted in B, and one set width across the period columns',
+  'paste-formats-tile': 'Paste Special Formats from one column onto a wider block repeats the column’s formats across every column of the block',
+  'header-alignment': 'headers sit bold and right-aligned over their figures, and a long header wraps inside its column rather than widening it',
+  'outline-detail': 'Hide Detail (Alt, A, H) folds a group to its total and Show Detail (Alt, A, J) opens it again',
+  'group-not-hide': 'hidden rows get forgotten: group detail that belongs on the page, and give a different page its own sheet',
+  'navigation-column': 'a navigation column lists a long sheet’s named blocks at the top, and Go To with a name lands on each one',
+  'cell-style': 'New Cell Style (Alt, H, J, N) saves the active cell’s look under a name, with ticks for the parts it carries; the Cell Styles gallery (Alt, H, J) applies it anywhere in the workbook',
+  'outline-levels': 'grouping rows that hold a group nests it a level deeper; Hide Detail folds the innermost group at the cell, and the outline numbers fold every group of a level at once',
+  'hyperlink': 'Insert Hyperlink (Ctrl+K) › Place in This Document links a cell to a sheet, a cell or a defined name; Shift+F10, O follows it',
+  // Chapter 2, modules 2.5 and 2.6: conditional formatting, and dates and text for presentation
+  'highlight-rule': 'Conditional Formatting (Alt, H, L) › Highlight Cells Rules: Less Than, Greater Than, Between, Equal To paint a cell whose value meets the test',
+  'manage-rules': 'Manage Rules (Alt, H, L, R) lists the sheet\u2019s rules in the order they run: read, delete, move up or down, Stop If True',
+  'formula-rule': 'New Rule › Use a formula (Alt, H, L, N): written for the top-left cell of the selection and read in every cell as if filled, so $A7 locks the column and lets the row move',
+  'duplicate-values': 'Highlight Cells Rules › Duplicate Values (Alt, H, L, H, D) lights every value that appears more than once in the range',
+  'rule-order': 'rules run top-down; Move Up puts one first, and Stop If True ends the walk for a cell where it holds',
+  'data-bars': 'Data Bars and Color Scales (Alt, H, L, D and S) draw a chart inside the cells; Clear Rules (Alt, H, L, C) takes rules off the selection or the sheet',
+  'eomonth-edate': 'EOMONTH(date, n) is the last day of the month n months on; EDATE(date, n) the same day n months on',
+  'clean-text': 'TRIM strips stray spaces, PROPER capitalizes each word, SUBSTITUTE swaps one piece of text for another: together they clean an imported label',
+  'dynamic-title': 'a title built with & from the inputs: the company name lives in one cell and every page reads it',
+  'single-source-line': 'a line every page shows is built once from the inputs and read everywhere, so one edit changes every page',
+  // Chapter 2 · 2.7 Printing and page layout
+  'page-numbers-footer': 'Page &[Page] of &[Pages] in the footer numbers every printed page of a pack, beside the file and the date',
+  'center-on-page': 'Page Setup › Margins: Center on page Horizontally (Alt+Z) sits a narrow page in the middle of the paper',
+  'summary-links': 'a summary page holds no typed figure: every number is a link to the detail behind it, so the two can never disagree',
 };
 
 /**
@@ -254,7 +286,7 @@ export function validateLesson(l) {
     need(WORKBOOKS[l.workbook], `unknown workbook "${l.workbook}" (content/workbooks)`);
     need(isObject(l.state) && typeof l.state.before === 'string', 'a module lesson needs state.before');
     need(SEEDED_KINDS.includes(kind) || typeof l.state.after === 'string', 'a module lesson needs state.after (a seeded kind is graded by its goals)');
-    if (l.plant !== undefined) need(isObject(l.plant) && Object.keys(l.plant).every(k => /^[A-Za-z0-9 ]+!(#?[A-Za-z]+[0-9]*)$/.test(k)), 'plant is a state patch: { "Sheet!A1": cell | null, "Sheet!#colW": {…} }');
+    if (l.plant !== undefined) need(isObject(l.plant) && Object.keys(l.plant).every(k => /^[A-Za-z0-9 &]+!(#?[A-Za-z]+[0-9]*)$/.test(k)), 'plant is a state patch: { "Sheet!A1": cell | null, "Sheet!#colW": {…} }');
     if (kind !== 'challenge') {
       need(typeof l.headline === 'string' && l.headline.trim(), 'headline (the one concept the lesson exists to teach) missing');
       need(Array.isArray(l.conventions) && l.conventions.length > 0 && l.conventions.every(id => CONVENTIONS[id]), 'every module lesson carries at least one canon convention id');
@@ -364,6 +396,7 @@ function validateStartingSheet(l, goals, ends, need, opts = {}) {
       for (const key in patch || {}) { const shName = key.includes('!') ? key.split('!')[0] : state.sheets[0].name; need(state.sheets.some(x => x.name === shName), `seed patches unknown sheet in "${key}"`); }
       applyStatePatch(state, patch || {});
     }
+    if (isObject(l.plant)) applyStatePatch(state, JSON.parse(JSON.stringify(l.plant)));   // the planting lands before the first key, as the runner lays it
     try {
       session = new Session(build(state.sheets[0]), {}); session.demoDone = new Set();
       session.sheets[0].name = state.sheets[0].name;

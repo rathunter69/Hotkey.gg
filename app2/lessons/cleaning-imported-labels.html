@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 71: Cleaning imported labels: TRIM, PROPER, SUBSTITUTE — Formatting and presentation · hotkey.gg</title>
+<meta name="description" content="undefined">
+<meta name="generator" content="app2/tests/public-pages.js — generated from lesson data; do not edit by hand">
+<script>try{var v=JSON.parse(localStorage.getItem('hotkey_theme_vars'));if(v&&v.vars){var r=document.documentElement;for(var k in v.vars)r.style.setProperty('--'+k,v.vars[k]);r.setAttribute('data-dark',v.dark?'1':'0');}}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ui/public.css">
+</head>
+<body>
+<nav class="top"><a class="brand" href="../index.html#/">hotkey<b>.gg</b></a><a href="../index.html#/learn">Learn</a><a href="../index.html#/practice">Practice</a><a href="../index.html#/leaderboard">Leaderboard</a><a href="../index.html#/reference">Reference</a></nav>
+<main>
+<div class="crumb"><a href="../index.html#/learn">Learn</a> › <a href="index.html">Formatting and presentation</a> › Dates and text for presentation</div>
+<h1>Lesson 71: Cleaning imported labels: TRIM, PROPER, SUBSTITUTE</h1>
+<div class="meta">Formatting and presentation · Dates and text for presentation · medium · <span class="">Paid</span></div>
+<div class="card">
+<p style="margin:0">undefined</p>
+</div>
+<h2>What you will do</h2>
+<ol class="goals"><li><span class="muted">Read it from the inside out: SUBSTITUTE swaps each _ for a space, TRIM strips the doubled and trailing spaces, and PROPER capitalizes each word. Column R is free, past the navigation column.</span> In Monthly detail!R5 enter =PROPER(TRIM(SUBSTITUTE(B5,&quot;_&quot;,&quot; &quot;))) and read Austin.</li><li>Select R5:R69 with Go To and fill the formula down with Ctrl+D, to the head office line.</li><li><span class="muted">R8 still reads Other Revenue (1): the marker belongs in a footnote, not in the label. A second SUBSTITUTE swaps &quot;(1)&quot; for nothing, and Ctrl+Enter writes the formula into every selected cell at once.</span> With R5:R69 still selected, type =PROPER(TRIM(SUBSTITUTE(SUBSTITUTE(B5,&quot;_&quot;,&quot; &quot;),&quot;(1)&quot;,&quot;&quot;))) and press Ctrl+Enter.</li><li><span class="muted">Paste Special Values writes the words and drops the formulas, so the labels stand on their own once the helper goes. Stop at row 69: PROPER would write EBITDA in B70 as Ebitda.</span> Copy R5:R69 and paste it as values over the labels at B5 with Ctrl+Alt+V, V.</li><li><span class="muted">A formula that returns nothing pastes as empty text, and Excel counts empty text as content: the four gaps between the blocks now hold it. Delete makes them truly empty again.</span> Clear the gap rows the paste filled with empty text, B19, B34, B49 and B64, with Delete.</li><li>Clear the helper column R5:R69 with Delete, now that the labels stand on their own.</li><li>Does it tie? Nothing here moved a number: watch Austin’s chemicals in C10 change to 900 and the total in C17 answer.</li></ol>
+<div class="cta"><a class="btn" href="../index.html#/lesson/cleaning-imported-labels">Start this lesson</a><span class="path">Read → Guided → Try solo → Timed</span></div>
+
+<div class="prevnext"><span>← <a href="dynamic-titles.html">Lesson 70: Dynamic titles with &amp;</a></span><span><a href="units-and-period-line.html">Lesson 72: A units line that writes itself</a> →</span></div>
+</main>
+<footer><a href="../index.html#/pricing">Pricing</a><a href="../index.html#/teams">Teams</a><a href="../index.html#/about">About</a><a href="../index.html#/terms">Terms</a><a href="../index.html#/privacy">Privacy</a><a href="../index.html#/contact">Contact</a><span>© hotkey.gg</span></footer>
+</body>
+</html>
