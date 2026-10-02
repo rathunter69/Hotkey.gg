@@ -169,6 +169,7 @@ import ch4_assessment from './lessons/ch4-assessment.js';
 // Chapter 5 · Finance and Accounting (Run R5): 5.1 The three statements, 5.2 Model setup
 import the_income_statement from './lessons/the-income-statement.js';
 import accrual_and_cash from './lessons/accrual-and-cash.js';
+import the_cash_flow_statement from './lessons/the-cash-flow-statement.js';
 
 export const CHAPTERS = [
   {
@@ -302,7 +303,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'The operating model with its DCF page, then one schedule and the links from it against the clock.' },
     ],
     lessons: [
-      the_income_statement, accrual_and_cash,
+      the_income_statement, accrual_and_cash, the_cash_flow_statement,
     ],
   },
 ];

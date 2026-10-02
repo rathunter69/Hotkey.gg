@@ -1863,6 +1863,18 @@ export const COPY = {
    "mac_note": "",
    "story_beat": ""
   },
+  "the-cash-flow-statement": {
+   "id": "the-cash-flow-statement",
+   "module": "the-three-statements",
+   "order": "5.1.3",
+   "title": "The cash flow statement",
+   "brief": "The cash flow statement starts from net income and walks back to cash in three parts. Operations adds back depreciation, because nothing was paid for the wear, and adjusts for the working-capital gaps from 5.1.2; investing is the cash spent on tunnels and equipment, capex; financing is loans drawn and repaid. The three sum to the change in cash, and opening cash plus the change is closing cash. Build Domain’s for September, the indirect way. The key is `=`.",
+   "closing": "The statement walks from net income back to the cash in the bank, in three parts. || Domain made $15,561, kept $26,003 from operations, spent $2,085 on equipment and repaid $6,250 of the loan: $17,668 more cash than it started the month with. Best practice: one sign convention, stated once, so a buyer adds the three parts without reading a single label.",
+   "wow": "From net income to the cash in the bank, in three parts, and every line a link.",
+   "convention_line": "Income positive, costs negative; Cash balances the sheet; nothing is forced",
+   "mac_note": "",
+   "story_beat": ""
+  },
   "remix-format-on-the-pnl": {
    "id": "remix-format-on-the-pnl",
    "module": "remixes",
@@ -11811,6 +11823,56 @@ export const COPY = {
     "teach": "",
     "why": "",
     "hint_stuck": "pulse cell C61 · A payable that is paid is cash out; one that never existed is not."
+   }
+  ],
+  "the-cash-flow-statement": [
+   {
+    "lesson_id": "the-cash-flow-statement",
+    "goal_index": "0",
+    "text": "Operations starts in C64: net income =C52, then depreciation added back in C65, =-C47.",
+    "teach": "The indirect method starts from net income and adds back what wasn’t cash: depreciation was a cost, but no money left for it. Cash in reads positive and cash out negative, stated once in the heading (2.1.2).",
+    "why": "",
+    "hint_stuck": "pulse range C64:C65 · Depreciation is a negative in C47, so the add-back flips its sign."
+   },
+   {
+    "lesson_id": "the-cash-flow-statement",
+    "goal_index": "1",
+    "text": "The gaps in C66:C68, receivables =-(C60-C28), payables =C59-C27, deferred revenue =C57-0, and SUM them into C69.",
+    "teach": "The working-capital lines are changes, not balances: receivables rose, so that cash isn’t in yet and the line is negative; payables rose, so cash was kept and the line is positive.",
+    "why": "",
+    "hint_stuck": "pulse range C66:C69 · Closing less opening for each; deferred revenue opened at nil."
+   },
+   {
+    "lesson_id": "the-cash-flow-statement",
+    "goal_index": "2",
+    "text": "Investing: maintenance capex in C70, =-C33*C26, and cash from investing =C70 in C71.",
+    "teach": "Investing is the cash spent on what the business will use for years. Here it is maintenance capex, 2% of revenue, and it goes out negative.",
+    "why": "",
+    "hint_stuck": "pulse range C70:C71 · Revenue is C33 and the capex rate C26."
+   },
+   {
+    "lesson_id": "the-cash-flow-statement",
+    "goal_index": "3",
+    "text": "Financing: a month of loan amortization in C72, =-C20/12, and cash from financing =C72 in C73.",
+    "teach": "Financing is cash to and from the lenders and the owners. The site’s share of the loan repays $75,000 a year, so a month of it leaves negative; the interest already sits in net income.",
+    "why": "",
+    "hint_stuck": "pulse range C72:C73 · The yearly amortization is in C20."
+   },
+   {
+    "lesson_id": "the-cash-flow-statement",
+    "goal_index": "4",
+    "text": "Net change =C69+C71+C73 in C74, opening cash =C29 in C75, and closing cash =C75+C74 in C76.",
+    "teach": "The three parts sum to the change in cash, and opening cash plus the change is closing cash. Best practice: depreciation is added back because it was never cash, and capex is where the cash for the tunnel actually went.",
+    "why": "",
+    "hint_stuck": "pulse range C74:C76 · Opening cash is the input in C29."
+   },
+   {
+    "lesson_id": "the-cash-flow-statement",
+    "goal_index": "5",
+    "text": "Does it tie? Watch the capex rate in C26 halve to 1%: closing cash rises by exactly the capex saved.",
+    "teach": "",
+    "why": "",
+    "hint_stuck": "pulse cell C76 · Capex is the only line the rate moves."
    }
   ]
  },

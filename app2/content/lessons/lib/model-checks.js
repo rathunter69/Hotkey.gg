@@ -104,3 +104,8 @@ export function weekLines(sh, keys, model = sh && weekModel(sh)) {
   if (!sh) return false;
   return keys.every(k => { const ref = at('One week', k); return !!sh.formula(ref) && near(sh.value(ref), model[k], 0.01); });
 }
+
+/** The keys pressed since the current goal began, as the key log writes them. */
+export const windowKeys = ses => (ses.keyLog || []).slice(ses.goalMark || 0).map(e => e.k);
+/** The active sheet is `name`. */
+export const onSheet = (ses, name) => !!ses.sheets[ses.sheetIndex] && ses.sheets[ses.sheetIndex].name === name;
