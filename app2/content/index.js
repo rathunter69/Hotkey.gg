@@ -57,7 +57,7 @@ import remix_format_on_the_pnl from './remixes/formatting-on-the-pnl.js';   // C
 // Chapter 3 · Formulas and functions (Run R3): 3.3 Math and aggregation, 3.4 Text
 import round_family from './lessons/round-family.js';
 import countif_countifs from './lessons/countif-countifs.js';
-// PENDING import sumif_sumifs_averageifs from './lessons/sumif-sumifs-averageifs.js';
+import sumif_sumifs_averageifs from './lessons/sumif-sumifs-averageifs.js';
 // PENDING import busiest_sites from './lessons/busiest-sites.js';
 // PENDING import sumproduct_blended_ticket from './lessons/sumproduct-blended-ticket.js';
 // PENDING import the_reconciliation from './lessons/the-reconciliation.js';
@@ -128,7 +128,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'Rebuild the Summary so every number ties, then a fresh export against the clock.' },
     ],
     lessons: [
-      round_family, countif_countifs, /*PENDING1*/
+      round_family, countif_countifs, sumif_sumifs_averageifs, /*PENDING1*/
       /*PENDING2*/
     ],
   },
