@@ -14,7 +14,7 @@ export const qa = ses => sheetIn(ses, 'Q&A');
 export const scenarios = ses => sheetIn(ses, 'Scenarios');
 export const copySheet = ses => sheetIn(ses, 'Export sort');
 
-/** The POS export's rows (A to I), read off a sheet as they stand: { r, date, site, retail, member, total, revenue, hours, week, day }. */
+/** The POS export’s rows (A to I), read off a sheet as they stand: { r, date, site, retail, member, total, revenue, hours, week, day }. */
 export function rowsOf(sh, first = 5, last = 94) {
   if (!sh) return [];
   const out = [];

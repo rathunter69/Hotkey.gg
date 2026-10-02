@@ -92,7 +92,7 @@ export default {
   graders: [
     ses => (sorted(ses) ? { ok: true } : { ok: false, why: 'Export sort is not in site then date order with all ninety rows. Sort the copy by both levels in one dialog' }),
     ses => (rowsOf(exportSheet(ses)).every((x, i, all) => i === 0 || x.date >= all[i - 1].date) ? { ok: true } : { ok: false, why: 'the export itself has been reordered. Sorting only ever happens on the copy' }),
-    ses => (proof(ses) ? { ok: true } : { ok: false, why: 'the COUNTIF proof on Lists does not total ninety from live formulas. Each code is counted against the export' }),
+    ses => (proof(ses) ? { ok: true } : { ok: false, why: 'the COUNTIF proof on Lists does not total ninety from live formulas. Each code is counted against the export data' }),
   ],
   solution: 'Ctrl+G "\'Export sort\'!A5" Enter Alt A S S S Alt+A Enter '
     + `Ctrl+Shift+L Up Right Alt+Down E "AIR" Enter Up Up Ctrl+Right Right "${F.count}" Enter `

@@ -1,8 +1,8 @@
 // Chapter 4 · 4.2.1 Sort and multi-level sort (clearcoat-pack, S42 → S421)
-// Sorting changes the data's order for good, so it runs on a copy: the export's block copied onto a
-// new sheet, Export sort, beside the export, pasted with the export's column widths, then sorted by
+// Sorting changes the data's order for good, so it runs on a copy: the export’s block copied onto a
+// new sheet, Export sort, beside the export, pasted with the export’s column widths, then sorted by
 // site and date in one Sort dialog with two levels, then by retail revenue largest first. The closer
-// changes a revenue figure on the copy and the export's own row stays put.
+// changes a revenue figure on the copy and the export’s own row stays put.
 import { exportSheet, copySheet, rowsOf, sameText, sheetNames, isNum } from './lib/pack-checks.js';
 
 const COLS = 'ABCDEFG';
@@ -15,7 +15,7 @@ const copied = ses => {
   return !!e && e.name === 'Export' && cb.rect.r1 === 4 && cb.rect.c1 === 1 && cb.rect.c2 === 7 && cb.rect.r2 >= 94;
 };
 const key = x => [x.date, x.site, x.retail, x.member, x.revenue, x.hours].join('|');
-/** Every one of the export's ninety rows is on the copy (in any order), with the headers and the export's widths. */
+/** Every one of the export’s ninety rows is on the copy (in any order), with the headers and the export’s widths. */
 const sameRows = ses => {
   const ex = exportSheet(ses), cp = copySheet(ses); if (!ex || !cp) return false;
   if (![...COLS].every(c => sameText(cp.value(c + '4'), ex.value(c + '4')))) return false;
@@ -70,7 +70,7 @@ export default {
       check: (s, ses) => ses.demoDone.has('tie') },
   ],
   endState: [
-    { text: 'Export sort sits right after Export and holds all ninety rows of the export', check: (s, ses) => copyPlaced(ses) && sameRows(ses) && widths(ses) },
+    { text: 'Export sort sits right after Export and holds all ninety rows of the export data', check: (s, ses) => copyPlaced(ses) && sameRows(ses) && widths(ses) },
     { text: 'The copy is sorted by retail revenue, largest first, and the export is still in date order', check: (s, ses) => revenueDesc(ses) && exportKept(ses) },
   ],
   closing: [

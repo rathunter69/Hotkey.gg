@@ -1303,7 +1303,13 @@ export class Sheet {
         if (!this.nonEmpty(r2.r2, r2.c1)) colSum(r2.c1, r2.r2 - 1, r2.r2);
         else if (r2.r2 < this.rows) colSum(r2.c1, r2.r2, r2.r2 + 1);
       } else {                                // a block
-        if (blankRow(r2.r2)) { for (let cc = r2.c1; cc <= r2.c2; cc++) colSum(cc, r2.r2 - 1, r2.r2); }
+        if (blankRow(r2.r2) && blankCol(r2.c2)) {   // both edges empty (Excel): column totals along the bottom, row totals down the right, the grand total in the corner
+          for (let cc = r2.c1; cc < r2.c2; cc++) colSum(cc, r2.r2 - 1, r2.r2);
+          const before = targets.length;
+          for (let rr = r2.r1; rr < r2.r2; rr++) rowSum(rr, r2.c2 - 1, r2.c2);
+          if (targets.length > before) targets.push({ r: r2.r2, c: r2.c2, f: '=SUM(' + refKey(r2.r1, r2.c2) + ':' + refKey(r2.r2 - 1, r2.c2) + ')' });
+        }
+        else if (blankRow(r2.r2)) { for (let cc = r2.c1; cc <= r2.c2; cc++) colSum(cc, r2.r2 - 1, r2.r2); }
         else if (blankCol(r2.c2)) { for (let rr = r2.r1; rr <= r2.r2; rr++) rowSum(rr, r2.c2 - 1, r2.c2); }
         else if (r2.r2 < this.rows) { for (let cc = r2.c1; cc <= r2.c2; cc++) colSum(cc, r2.r2, r2.r2 + 1); }
       }

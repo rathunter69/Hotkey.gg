@@ -1,6 +1,7 @@
 // Select Visible Cells (Alt+;) and Paste Special's Skip blanks (4.2.5): a block with rows hidden by
 // hand copies every row unless Alt+; came first, a pasted formula shifts by its own row's distance,
-// and a partial column pasted with Skip blanks lands only its filled cells.
+// and a partial column pasted with Skip blanks lands only its filled cells. Also the two engine
+// fixes Chapter 4's lists needed: Data, Clear (Alt A C) and AutoSum on a block with both edges empty.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Session } from '../engine/keyboard.js';
@@ -44,6 +45,15 @@ test('Paste Special with Skip blanks (B) lands only the filled cells of a partia
   S.select('E2:E6'); s.run('Ctrl+C'); S.goTo(2, 1); s.run('Ctrl+Alt+V Enter');
   assert.equal(S.value('A3'), null, 'without the tick the blanks wipe what was there');
   assert.equal(s.pasteSkip, false, 'the tick does not outlive its paste');
+});
+
+test('AutoSum on a block whose bottom row and right column are both empty fills both, and the corner', () => {
+  const s = new Session(new Sheet({ rows: 20, cols: 8, cells: { A1: { value: 1 }, B1: { value: 2 }, A2: { value: 3 }, B2: { value: 4 } } }));
+  const S = s.sheet;
+  S.select('A1:C3'); s.run('Alt+=');
+  assert.equal(S.formula('A3'), '=SUM(A1:A2)'); assert.equal(S.formula('B3'), '=SUM(B1:B2)');
+  assert.equal(S.formula('C1'), '=SUM(A1:B1)'); assert.equal(S.formula('C2'), '=SUM(A2:B2)');
+  assert.equal(S.formula('C3'), '=SUM(C1:C2)'); assert.equal(S.value('C3'), 10);
 });
 
 test('Data, Clear (Alt A C) takes every filter off and keeps the arrows', () => {

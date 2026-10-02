@@ -1,5 +1,5 @@
 // Chapter 4 · 4.2.3 Remove Duplicates and the unique site list (clearcoat-pack, S422 → S423)
-// The export's Site column copied to Lists, Remove Duplicates on the copy: seven codes, one of them
+// The export’s Site column copied to Lists, Remove Duplicates on the copy: seven codes, one of them
 // the misspelling AUS-DMO. Ctrl+F finds it on Export and it is fixed, the stray code comes off the
 // list, and a COUNTIF beside each code proves the six cover all ninety rows, with a check under the
 // lists. The closer types a new code into the export and the proof falls short by one.
@@ -9,7 +9,7 @@ const CODES = ['AUS-DOM', 'AUS-MUE', 'AUS-RIV', 'AUS-SLA', 'AUS-AIR', 'AUS-CED']
 const PROOF = ['O4', ...refsIn('O5:O11'), 'B25', 'B26', 'C26'];
 const F = { countif: '=COUNTIF(Export!$B$5:$B$94,N5)', check: '=O11-COUNTA(Export!$B$5:$B$94)' };
 const listed = sh => { const out = []; for (let r = 5; r <= 94; r++) { const v = sh.value('N' + r); if (v == null || v === '') break; out.push(v); } return out; };
-/** The Site column sits on Lists from N4: the header and the export's ninety codes, in the export's order. */
+/** The Site column sits on Lists from N4: the header and the export’s ninety codes, in the export’s order. */
 const pasted = ses => { const l = lists(ses), ex = exportSheet(ses); return !!l && sameText(l.value('N4'), 'Site') && rowsOf(ex).every(x => sameText(l.value('N' + x.r), x.site)); };
 /** Remove Duplicates has run: each code once, the first of each kept, nothing below. */
 const deduped = ses => { const l = lists(ses); const v = listed(l); return v.length >= 6 && v.length <= 7 && new Set(v.map(x => String(x).toUpperCase())).size === v.length && (l.value('N' + (5 + v.length)) == null || l.value('N' + (5 + v.length)) === ''); };

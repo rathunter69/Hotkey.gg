@@ -7,7 +7,7 @@ import { exportSheet, rowsOf, sameText, calls, near, isNum, settled, shellOf, fi
 
 const TOTALS = ['D96', 'D97', 'D98', 'E96', 'E97', 'E98'];
 const F = { sum: '=SUM(E5:E94)', sub: '=SUBTOTAL(109,E5:E94)', count: '=SUBTOTAL(103,A5:A94)' };
-/** The export's filter: arrows on the header row (row 4) across the block, down to the last row. */
+/** The export’s filter: arrows on the header row (row 4) across the block, down to the last row. */
 const filterOnBlock = sh => !!sh && !!sh.filter && sh.filter.r1 === 4 && sh.filter.c1 === 1 && sh.filter.c2 >= 9 && sh.filter.r2 >= 94;
 const showing = sh => rowsOf(sh).filter(x => !sh.filterRows.has(x.r));
 const domainOnly = sh => { const v = showing(sh); return v.length > 0 && v.length < 90 && v.every(x => sameText(x.site, 'AUS-DOM')) && v.length === rowsOf(sh).filter(x => sameText(x.site, 'AUS-DOM')).length; };
@@ -62,7 +62,7 @@ export default {
       check: (s, ses) => ses.demoDone.has('tie') },
   ],
   endState: [
-    { text: 'E96:E98 hold the SUM, the SUBTOTAL(109) and the SUBTOTAL(103) under the export', check: (s, ses) => { const sh = exportSheet(ses); return sumCell(sh) && subCell(sh) && countCell(sh); } },
+    { text: 'E96:E98 hold the SUM, the SUBTOTAL(109) and the SUBTOTAL(103) under the export data', check: (s, ses) => { const sh = exportSheet(ses); return sumCell(sh) && subCell(sh) && countCell(sh); } },
     { text: 'Every filter on the export is cleared', check: (s, ses) => cleared(exportSheet(ses)) },
   ],
   closing: [
