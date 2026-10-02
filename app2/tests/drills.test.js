@@ -20,11 +20,11 @@ function rng32(seed) {
 /** A keys hint as a replayable script (glyphs → key names, ×N expanded, connectives dropped). */
 function hintScript(hint) {
   const out = [];
-  for (const t of hint.match(/"[^"]*"|\S+/g) || []) {
+  for (const t of hint.match(/"[^"]*"|'[^']*'|\S+/g) || []) {   // a typed string in double quotes, or single when it holds a double quote
     if (/^(then|…|,|and|or)$/.test(t)) continue;
     const m = /^×(\d+)$/.exec(t);
     if (m) { const last = out[out.length - 1]; for (let i = 1; i < +m[1]; i++) out.push(last); continue; }
-    out.push(t.startsWith('"') ? t : t.replace(/↑/g, 'Up').replace(/↓/g, 'Down').replace(/←/g, 'Left').replace(/→/g, 'Right').replace(/⌫/g, 'Backspace').replace(/↵/g, 'Enter'));
+    out.push(t.startsWith('"') || t.startsWith("'") ? t : t.replace(/↑/g, 'Up').replace(/↓/g, 'Down').replace(/←/g, 'Left').replace(/→/g, 'Right').replace(/⌫/g, 'Backspace').replace(/↵/g, 'Enter'));
   }
   return out.join(' ');
 }
@@ -66,8 +66,34 @@ test("Chapter 1's eleven drills: 6.1's set and order, eight to twenty goals, par
     assert.ok(d.optimalKeys / d.route <= 4, `${id}: ${d.optimalKeys} keys in a ${d.route} s route is faster than a fast hand`);
     assert.equal(d.access, 'free', `${id}: Chapter 1 is free`);
   }
-  assert.deepEqual(BENCHMARKS.filter(d => d.kind !== 'challenge').map(d => d.id), ['weekly-sales-report', 'ch5-revenue-build', 'ch6-paper-lbo'], 'the weekly report, Chapter 5\'s revenue build and Chapter 6\'s paper LBO are the benchmarks');
+  assert.deepEqual(BENCHMARKS.filter(d => d.kind !== 'challenge').map(d => d.id), ['weekly-sales-report', 'ch2-pnl-to-standard', 'ch3-tie-it-out', 'ch5-revenue-build', 'ch6-paper-lbo'],
+    'the weekly report and one benchmark a chapter from Chapter 2 on are the benchmarks');
   for (const [id] of CH1) assert.ok(DAILY_POOL.includes(id), `${id} is in the Daily's pool`);
+});
+
+/** Chapters 2 and 3: screenplay 6.2's planned seven (one the benchmark), the puzzle, and the two Wave 1 sketches each from script-drills.md. */
+const CH23 = {
+  formatting: { workbook: 'clearcoat-pnl', benchmark: 'ch2-pnl-to-standard', puzzle: 'puzzle-ch2',
+    ids: ['ch2-format-sprint', 'ch2-to-thousands', 'ch2-flip-and-tie', 'ch2-custom-code', 'ch2-the-divider', 'ch2-top-and-bottom', 'ch2-flag-it', 'ch2-print-it', 'ch2-pnl-to-standard', 'puzzle-ch2'] },
+  formulas: { workbook: 'clearcoat-databook', benchmark: 'ch3-tie-it-out', puzzle: 'puzzle-ch3',
+    ids: ['ch3-if-ladder', 'ch3-override', 'ch3-date-math', 'ch3-sumifs-sprint', 'ch3-bands', 'ch3-text-split', 'ch3-loan-schedule', 'ch3-trace-the-error', 'ch3-tie-it-out', 'puzzle-ch3'] },
+};
+
+test("Chapters 2 and 3: the planned set, the puzzle and the Wave 1 sketches, on each chapter's workbook, pars from the reference route", () => {
+  for (const [chapter, want] of Object.entries(CH23)) {
+    const keyed = DRILLS.filter(d => d.kind !== 'challenge' && d.chapter === chapter);
+    assert.deepEqual(keyed.map(d => d.id), want.ids, `${chapter}: the set and its order`);
+    for (const d of keyed) {
+      assert.equal(d.workbook, want.workbook, `${d.id} runs on ${want.workbook}`);
+      assert.equal(d.access, 'paid', `${d.id}: Chapters 2 to 6 are Full Access`);
+      assert.deepEqual(d.pars, parsFromRoute(d.route), `${d.id}: pars from parsFromRoute`);
+      assert.ok(d.pars.pass >= 60 && d.pars.pass <= 180, `${d.id}: Pass par ${d.pars.pass} s sits in the 60 to 180 second class`);
+      assert.ok(d.optimalKeys / d.route <= 4.5, `${d.id}: ${d.optimalKeys} keys in a ${d.route} s route is faster than a fast hand`);
+      assert.ok(!DAILY_POOL.includes(d.id), `${d.id}: the Daily draws free drills only`);
+    }
+    assert.deepEqual(keyed.filter(d => d.benchmark).map(d => d.id), [want.benchmark], `${chapter}: one benchmark`);
+    assert.equal(keyed[keyed.length - 1].id, want.puzzle, `${chapter}: the puzzle closes the set`);
+  }
 });
 
 test('drill copy follows the copy rules: no tells, American spelling, one-sentence goals that name something visible', () => {

@@ -12,6 +12,26 @@ import formula_sprint from './drills/formula-sprint.js';
 import combine_two_tabs from './drills/combine-two-tabs.js';
 import before_you_send from './drills/before-you-send.js';
 import weekly_sales_report from './drills/weekly-sales-report.js';
+import ch2_format_sprint from './drills/ch2-format-sprint.js';
+import ch2_to_thousands from './drills/ch2-to-thousands.js';
+import ch2_flip_and_tie from './drills/ch2-flip-and-tie.js';
+import ch2_custom_code from './drills/ch2-custom-code.js';
+import ch2_the_divider from './drills/ch2-the-divider.js';
+import ch2_top_and_bottom from './drills/ch2-top-and-bottom.js';
+import ch2_flag_it from './drills/ch2-flag-it.js';
+import ch2_print_it from './drills/ch2-print-it.js';
+import ch2_pnl_to_standard from './drills/ch2-pnl-to-standard.js';
+import puzzle_ch2 from './drills/puzzle-ch2.js';
+import ch3_if_ladder from './drills/ch3-if-ladder.js';
+import ch3_override from './drills/ch3-override.js';
+import ch3_date_math from './drills/ch3-date-math.js';
+import ch3_sumifs_sprint from './drills/ch3-sumifs-sprint.js';
+import ch3_bands from './drills/ch3-bands.js';
+import ch3_text_split from './drills/ch3-text-split.js';
+import ch3_loan_schedule from './drills/ch3-loan-schedule.js';
+import ch3_trace_the_error from './drills/ch3-trace-the-error.js';
+import ch3_tie_it_out from './drills/ch3-tie-it-out.js';
+import puzzle_ch3 from './drills/puzzle-ch3.js';
 import ch5_statement_link from './drills/ch5-statement-link.js';
 import ch5_schedule_fill from './drills/ch5-schedule-fill.js';
 import ch5_balance_it from './drills/ch5-balance-it.js';
@@ -47,6 +67,28 @@ export const DRILLS = [
   combine_two_tabs,
   before_you_send,
   weekly_sales_report,
+  // Chapter 2 (screenplay 6.2, script-drills Wave 1): the planned set on the P&L book in teaching order, the benchmark and the puzzle
+  ch2_format_sprint,
+  ch2_to_thousands,
+  ch2_flip_and_tie,
+  ch2_custom_code,
+  ch2_the_divider,
+  ch2_top_and_bottom,
+  ch2_flag_it,
+  ch2_print_it,
+  ch2_pnl_to_standard,
+  puzzle_ch2,
+  // Chapter 3 (screenplay 6.2, script-drills Wave 1): the planned set on the KPI databook in teaching order, the benchmark and the puzzle
+  ch3_if_ladder,
+  ch3_override,
+  ch3_date_math,
+  ch3_sumifs_sprint,
+  ch3_bands,
+  ch3_text_split,
+  ch3_loan_schedule,
+  ch3_trace_the_error,
+  ch3_tie_it_out,
+  puzzle_ch3,
   // Chapter 5 (screenplay 6.2): the planned set on the operating model, the benchmark and the puzzle
   ch5_statement_link,
   ch5_schedule_fill,
