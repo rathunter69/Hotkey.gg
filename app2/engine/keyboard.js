@@ -222,6 +222,7 @@ export class Session {
     this._clip = null;  // the workbook's one clipboard (every sheet reads and writes it: wireSheet)
     this._repeat = null;   // what F4 repeats (C2 gap 10), workbook-wide like the clipboard
     this.pageRows = 0; this.pageCols = 0;   // a screenful for PageDown / Alt+PageDown — the view sets them; 0 = 10
+    this.pageJump = null;   // PgDn / PgUp leave the rows they moved here: the view scrolls the window by as many (sheet-view pageScroll)
     this.settings = makeSettings(this);
     this.dialogBuf = '';     // Go To's Reference field
     this.dlg = null;         // an Options / Page Setup draft while its dialog is open
@@ -1572,6 +1573,9 @@ export class Session {
       if (k === 'PageDown' || k === 'PageUp') {   // the browser keeps Ctrl+PgDn for its own tabs, so Alt+PgDn is the sheet key here (M41), logged as Excel's
         this.startClock(); this.sheetStep(k === 'PageDown' ? 1 : -1, e.shiftKey); return true;
       }
+      if (!e.shiftKey && (k === 'ArrowRight' || k === 'ArrowLeft')) {   // ⌥→ and ⌥←, Mac Excel's sheet keys, work on every keyboard here, logged as Excel's
+        this.startClock(); this.sheetStep(k === 'ArrowRight' ? 1 : -1, false); return true;
+      }
       return true;
     }
     if (k === 'Enter' && !e.ctrlKey && !e.altKey) {
@@ -1597,7 +1601,10 @@ export class Session {
       const down = k === 'PageDown';
       if (e.ctrlKey) { this.sheetStep(down ? 1 : -1, e.shiftKey); return true; }   // Ctrl+PgDn, and Ctrl+Alt+PgDn (the alias) alike
       this.logKey((e.shiftKey ? 'Shift+' : '') + k);
-      const step = (this.pageRows || 10) * (down ? 1 : -1); S.move(step, 0, e.shiftKey, false); return true;
+      const step = (this.pageRows || 10) * (down ? 1 : -1);
+      const from = S.active.r; S.move(step, 0, e.shiftKey, false);
+      this.pageJump = { rows: S.active.r - from };   // the view scrolls the window by the same rows, so the cursor keeps its place on the screen (Excel)
+      return true;
     }
     if (k === 'Home' && !e.altKey) { this.startClock(); this.logKey((e.ctrlKey ? 'Ctrl+' : '') + (e.shiftKey ? 'Shift+' : '') + 'Home'); S.moveHome(e.ctrlKey, e.shiftKey); return true; }
     if (k === 'End' && !e.altKey) { this.startClock(); this.logKey((e.ctrlKey ? 'Ctrl+' : '') + (e.shiftKey ? 'Shift+' : '') + 'End'); S.moveEnd(e.ctrlKey, e.shiftKey); return true; }

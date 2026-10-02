@@ -23,6 +23,8 @@
 //                                                         the teaching point rides the first use; reuse shows the action only)
 //       text: 'Move from A3 (Monday) to A7 (Friday).',   the action, one sentence
 //       keys: 'Ctrl+↓',                      the route as keycaps; shown with a teach line, else through Help
+//       alt: 'Alt H I C',                    optional: another route Excel offers (or a list of them), shown as "Also works";
+//                                            the grader takes any route, so alt only teaches
 //       requires: ['ctrl-arrow'],            concept ids this goal needs (must be taught here or earlier)
 //       check: (sheet, session) => boolean }, end-state predicate
 //   ],
@@ -52,6 +54,9 @@ import { parseRef } from '../engine/refs.js';
 import { CONVENTIONS } from './conventions.js';
 import { WORKBOOKS, workbookState, applyStatePatch } from './workbooks/index.js';
 import { mulberry32 } from '../engine/rng.js';
+
+/** A goal's alt: one route as keycaps, or a list of them, each a non-empty string. Pure. */
+export const isAltKeys = a => (typeof a === 'string' && !!a.trim()) || (Array.isArray(a) && a.length > 0 && a.every(x => typeof x === 'string' && x.trim()));
 
 export const DIFFICULTIES = ['easy', 'medium', 'hard'];
 export const ACCESS = ['free', 'paid'];
@@ -327,6 +332,8 @@ export function validateLesson(l) {
       need(g.demo === undefined || g.keys === undefined, `goal ${g.id}: a demo goal has no keys (the platform presses them)`);
       need(!isObject(g.demo) || g.demo.cadence === undefined || (typeof g.demo.cadence === 'number' && g.demo.cadence >= 40 && g.demo.cadence <= 1000), `goal ${g.id}: demo cadence is milliseconds per key, 40-1000`);
     } else need(typeof g.keys === 'string' && g.keys.trim(), `goal ${g.id}: keys (the route as keycaps) missing`);
+    // alt: another route Excel offers for the same goal, shown under the keys as "Also works" (Wolf, 2026-10-02)
+    if (g.alt !== undefined) need(isAltKeys(g.alt) && g.keys !== undefined, `goal ${g.id}: alt is another route as keycaps (a string or a list of strings), on a goal with keys`);
     // The goal that first uses a concept this lesson teaches carries a teach line; any goal may carry
     // one (M28: the why rides inside the teach line, up to three sentences).
     const fresh = (Array.isArray(g.requires) ? g.requires : []).filter(c => concepts.includes(c) && !introduced.has(c));
@@ -446,6 +453,7 @@ export function validateDrill(d) {
     need(typeof g.keys === 'string' && g.keys.trim(), `goal ${g.id}: keys (the route as keycaps) missing`);
     need(typeof g.check === 'function', `goal ${g.id}: check must be a function`);
     need(g.teach === undefined && g.requires === undefined && g.demo === undefined, `goal ${g.id}: a drill checkpoint carries no teach, requires or demo`);
+    need(g.alt === undefined || isAltKeys(g.alt), `goal ${g.id}: alt is another route as keycaps (a string or a list of strings)`);
   }
   need(d.endState === undefined || Array.isArray(d.endState), 'endState must be an array');
   const ends = Array.isArray(d.endState) ? d.endState.filter(isObject) : [];

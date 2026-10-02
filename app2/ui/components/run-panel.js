@@ -13,6 +13,7 @@
 //   boardLine(place, of, move)              "31st of 212, up 9"                                 pure
 //   factsLine(parts)                        the facts row (each fact its own place)             pure
 //   createRunPanel(host, opts)              → panel.ready(d) .run(d) .result(d) .complete(d) .story(d) .timesUp(d) .hide() .keyFor(key)
+import { EXIT_KEY } from './chrome.js';
 import { siteCopy } from '../../content/copy/apply.js';
 import { keyLabel } from '../../app/prefs.js';
 import { view as checklistView } from '../../app/checklist.js';
@@ -166,7 +167,7 @@ export function createRunPanel(host, opts = {}) {
     const model = trackModel(d.pars, { secs: d.secs || 0, best: d.best });
     const html = `<div class="rp-head"><div class="rp-head-row"><span class="rp-clock">${fmtClock(d.secs || 0)}</span><span class="rp-pace">${esc(paceLabel(d.pace))}</span></div>${trackHtml(model)}</div>` +
       `<div class="rp-check"></div>` +
-      `<div class="rp-line rp-run-foot"><span class="rp-keys">${esc(t('panel_keys_so_far', 'Keys so far: {n}', { n: d.keys || 0 }))}</span><span class="rp-esc">${kbd('Esc', platform())} ${esc(siteCopy('panel_esc_ends', 'ends the run'))}</span></div>`;
+      `<div class="rp-line rp-run-foot"><span class="rp-keys">${esc(t('panel_keys_so_far', 'Keys so far: {n}', { n: d.keys || 0 }))}</span><span class="rp-esc">${kbd(EXIT_KEY, platform())} ${esc(siteCopy('panel_exit_ends', 'leaves the run'))}</span></div>`;
     swap('run', html, [], () => checklist(d.checklist, d.showKeys));   // the checklist paints into the run beat once it has painted, not into the Ready it replaces
   }
   /** The checklist from app/checklist.js: done tasks folded into one line, the current one with the cursor, the next three, "{n} more after these". */

@@ -433,6 +433,7 @@ export class SheetView {
       this._shape = shape;
     }
 
+    this.paintHeaders(sr, patch);
     try { document.body.classList.toggle('hide-gridlines', !S.gridlines); } catch (e) { /* no body */ }
     const f = S.lastFlash;
     if (f) { S.lastFlash = null;   // the one-shot paste flash: drop the class, flush, add it, so a repeat paste animates again
@@ -441,11 +442,48 @@ export class SheetView {
         const td = this.grid.querySelector('td[data-r="' + r + '"][data-c="' + c + '"]'); if (td) { td.classList.remove('pasted'); hit.push(td); } }
       if (hit.length) { void this.grid.offsetWidth; for (const td of hit) td.classList.add('pasted'); }
     }
+    this.pageScroll();
     this.keepActiveInView();
     this.positionMarquee();
     this.measurePage();
     this.updateFormulaBar();
     this.renderStatus();
+  }
+  /**
+   * Excel lights the headers of the rows and columns the selection holds (the letters and numbers turn
+   * green on a darker ground), so where you are reads from the edges of the window as well as from the
+   * cursor. One class, hd-on, on the column letters c1..c2 and the row numbers r1..r2; only the
+   * headers that change are touched.
+   */
+  paintHeaders(sr, patch) {
+    const rows = this.grid.rows; if (!rows || !rows.length || !sr) return;
+    const key = sr.r1 + ',' + sr.c1 + ':' + sr.r2 + ',' + sr.c2;
+    if (patch && this._hdrKey === key) return;
+    const prev = patch ? (this._hdrOn || []) : [];
+    for (const th of prev) th.classList.remove('hd-on');
+    const on = [];
+    const head = rows[0].cells;
+    for (let c = Math.max(1, sr.c1); c <= Math.min(head.length - 1, sr.c2); c++) on.push(head[c]);
+    for (let r = Math.max(1, sr.r1); r <= Math.min(rows.length - 1, sr.r2); r++) { const th = rows[r].cells[0]; if (th) on.push(th); }
+    for (const th of on) th.classList.add('hd-on');
+    this._hdrOn = on; this._hdrKey = key;
+  }
+  /**
+   * PgDn and PgUp (and Alt+PgDn / Alt+PgUp, Excel's screen right and left, where the engine leaves them
+   * to the view): Excel moves the window a screen along with the cursor, so the cursor keeps its place
+   * on the screen. The session leaves the rows it moved in session.pageJump; the box scrolls by those
+   * rows here, and keepActiveInView then only tidies the edge.
+   */
+  pageScroll() {
+    const ss = this.session, j = ss.pageJump; if (!j) return;
+    ss.pageJump = null;
+    const gw = this.gw, rows = this.grid.rows, b = this.box(); if (!b || !rows || rows.length < 2) return;
+    const st = gw.scrollTop;
+    // the first row showing at the top, then the row `j.rows` further on (clamped to the grid)
+    let top = 1; while (top < rows.length - 1 && rows[top].offsetTop - b.y0 + rows[top].offsetHeight <= st + 0.5) top++;
+    const to = Math.max(1, Math.min(rows.length - 1, top + (j.rows | 0)));
+    const max = Math.max(0, gw.scrollHeight - gw.clientHeight);
+    gw.scrollTop = Math.max(0, Math.min(max, Math.round(rows[to].offsetTop - b.y0)));
   }
   /** The status bar: Ready / Enter / Edit / Point, Group when sheets are grouped, Average / Count / Sum (and Minimum / Maximum when ticked) of a selection of two or more filled cells, the zoom. */
   renderStatus() {

@@ -20,6 +20,22 @@
   --on-fill:#FFFFFF;      /* text on a mode's fill */
   --plate-neutral:#EEF3EF;   /* the landing page's neutral plate */
 
+  /* ---------- the workspace's Excel chrome (Wolf, 2026-10-02): the Ribbon, the title bar and the sheet's foot read as
+     Windows Excel's, the same in every light theme (like the note's yellow); a dark theme maps them onto its own chrome below ---------- */
+  --xl-green:#107C41;     /* Excel's green: the File tab, the selected tab's bar, the cell cursor (5.4 to 1 on white) */
+  --xl-green-ink:#0E6B38; /* Excel's green as text on the bar and the body */
+  --xl-bar:#F3F3F3;       /* the title bar and the tab row */
+  --xl-body:#FBFBFB;      /* the Ribbon's body */
+  --xl-line:#E1E1E1;      /* the Ribbon's hairlines and group separators */
+  --xl-hover:#E6E6E6;     /* a Ribbon control under the pointer */
+  --xl-press:#D6EBDD;     /* a Ribbon toggle that is on */
+  --xl-ink:#242424;       /* Ribbon labels (15 to 1 on the body) */
+  --xl-ink-2:#5C5C5C;     /* group names, the dimmed tabs (6.6 to 1 on the body) */
+  --xl-hdr:#E6E6E6;       /* the sheet's headers for the selected rows and columns */
+  --xl-hdr-ink:#0E6B38;   /* their numbers and letters */
+  --cell-cursor:var(--xl-green);   /* the active cell's outline and the selection's edge */
+  --xl-font:'Segoe UI','Segoe UI Variable Text',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;   /* the Ribbon's face, as Windows draws it */
+
   /* ---------- the mode colors: fill, ink (text on a tint or the ground), tint ---------- */
   --learn:#0F7B45;      --learn-ink:#0B6338;      --learn-tint:#E1F1E8;        /* Learn, lessons, progress */
   --drills:#1F4FD1;     --drills-ink:#183FA8;     --drills-tint:#E6ECFB;       /* Drills */
@@ -43,6 +59,9 @@
   --fw-heavy:800; --fw-bold:700; --fw-semi:600; --fw-key:500; --fw-body:400;
   --lh-tight:1.0; --lh-body:1.5;
 
+  /* the workspace's Excel type: the Ribbon keeps Excel's own sizes (3.0, Type: exempt from the floor) */
+  --xl-fs:12px; --xl-btn-h:18px; --xl-big-h:50px; --xl-fs-tab:12.5px; --xl-fs-group:11px; --xl-fs-small:11px; --fs-namebox:14px;
+
   /* ---------- space (3.0, Layout): one scale ---------- */
   --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s8:32px; --s12:48px;
 
@@ -54,7 +73,7 @@
   /* ---------- sizes ---------- */
   --rail-w:232px; --content-top:30px; --content-side:36px; --side-col:336px;
   --panel-w:340px; --card-w:330px; --card-gap:16px;
-  --tabrow-h:34px; --sbar-h:22px; --ws-foot-h:calc(var(--s8) + var(--s2) + var(--sbar-h) + 1px); --ribbon-h:96px; --ribbon-groups-h:72px; --ribbon-tabs-h:24px; --qat-h:26px;
+  --tabrow-h:34px; --titlebar-h:32px; --xl-tabs-h:28px; --foot-h:30px; --cursor-cell-w:3px; --sel-edge-w:2px; --veil-w:420px; --sbar-h:22px; --ws-foot-h:calc(var(--foot-h) + 1px); --ribbon-h:96px; --ribbon-groups-h:72px; --ribbon-tabs-h:24px; --qat-h:26px;
   --cursor-w:2px; --bw-1-5:1.5px; --bw-2:2px; --bw-3:3px; --tick-check:5px; --cursor-handle:6px; --mode-mark:9px; --mode-rule:3px; --key-edge:3px; --route-bar:3px;
   --theme-tile-w:64px; --theme-tile-h:46px; --demo-w:640px; --demo-h:560px; --narrow:900px;
   /* the site pages' parts (M89, M104): goal segments, the level and field bars, tier marks, badge tiles, the sheet preview, a table row */
@@ -63,7 +82,7 @@
   /* ---------- durations (3.0, Motion and moments) ---------- */
   --d-cursor:80ms; --d-key:90ms; --d-menu:140ms; --d-beat:140ms; --d-route:150ms; --d-note:160ms; --d-card:200ms; --d-goal:250ms;
   --d-hit:250ms; --d-wrong:300ms; --d-open:500ms; --d-quests:600ms; --d-combo:700ms; --d-streak:900ms;
-  --d-unlock:600ms; --d-result:4000ms; --d-banner:4000ms; --d-nudge:8000ms; --d-help:20000ms;
+  --d-unlock:600ms; --d-ping:700ms; --d-wrong-wait:1200ms; --d-result:4000ms; --d-banner:4000ms; --d-nudge:8000ms; --d-help:20000ms;
   /* the result's moments, in order (3.0, the timed run): the time counts up, then the tier, New best, the track, the rows, XP, a level-up, a quest */
   --d-count:900ms; --d-result-tier:1000ms; --d-result-best:1450ms; --d-result-track:1500ms; --d-result-board:1900ms;
   --d-result-xp:2300ms; --d-result-level:3200ms; --d-result-quest:3900ms;
@@ -88,3 +107,6 @@ body[data-mode="daily"]{--mode:var(--daily); --mode-ink:var(--daily-ink); --mode
 body[data-mode="rapid"]{--mode:var(--rapid); --mode-ink:var(--rapid-ink); --mode-tint:var(--rapid-tint)}
 body[data-mode="challenges"]{--mode:var(--challenges); --mode-ink:var(--challenges-ink); --mode-tint:var(--challenges-tint)}
 body[data-mode="clock"]{--mode:var(--clock); --mode-ink:var(--clock-ink); --mode-tint:var(--clock-tint)}
+
+/* a dark theme: the workspace's Excel chrome takes the theme's own ground and ink (Excel's dark mode does the same) */
+html[data-dark="1"]{--xl-green:var(--learn); --xl-green-ink:var(--learn-ink); --xl-bar:var(--chrome); --xl-body:var(--sheet); --xl-line:var(--line); --xl-hover:var(--paper); --xl-press:var(--learn-tint); --xl-ink:var(--ink); --xl-ink-2:var(--ink-2); --xl-hdr:var(--paper); --xl-hdr-ink:var(--learn-ink)}

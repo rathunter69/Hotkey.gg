@@ -40,7 +40,7 @@ save_nudge,Your progress is saved on this device. Make a free account and it fol
 due_empty,"Nothing due. Play the Daily, or carry on with the next lesson."
 due_foot,Short reps on what you’re about to forget. Nothing is lost by skipping a day.
 due_fresh,Nothing here yet. Shortcuts you learn come back here the next day as thirty-second refreshers.
-tab_keys_note,Your browser keeps Ctrl+PgDn and Ctrl+PgUp for its own tabs. Fullscreen and the installed app hand the real keys to the sheet.
+tab_keys_note,"Your browser keeps Ctrl+PgDn and Ctrl+PgUp for its own tabs, so here Alt+PgDn and Alt+PgUp switch sheets and count the same. Full screen, from the button by the sheet tabs, or the installed app hands the real keys to the sheet."
 lesson_nudge,Try it with the keyboard.
 lesson_nudge_help,"Try it with the keyboard. F1 opens Help, which can show you the keys."
 lesson_show_me_playing,"Watch the keys play on your sheet. When they’re done, the sheet goes back the way it was. `Esc` hands it back early; `←` `→` steps through."
@@ -493,6 +493,27 @@ ws_lesson_menu_hint,Arrows and Enter to move between lessons
 ws_close,close
 ws_done,Done
 ws_esc_again,Esc again to leave.
+ws_exit,Exit
+ws_exit_hint,"To leave, use Exit at the top left or {key}."
+ws_sheet_keys,Sheets
+ws_sheet_keys_or,in the browser
+ws_full_screen,Full screen
+ws_full_screen_tip,Full screen hands Ctrl+PgDn and Ctrl+PgUp to the sheet
+ws_focus_title,Click here or press any key to continue
+ws_focus_where,Your cursor is on
+ws_focus_clock,The clock is still running.
+more_exit,Exit
+leave_title,Leave this lesson?
+leave_body,Your finished lessons stay saved. This one starts again from its first goal.
+leave_run_title,Leave this run?
+leave_run_body,No time is posted for a run you leave. Your finished lessons stay saved.
+leave_drill_title,Leave this drill?
+leave_action,Leave
+leave_stay,Stay
+card_also_works,Also works
+card_alt_or,or
+card_live_try,Not quite. Try {key}.
+card_live_works,That works too. The keys this goal teaches: {keys}.
 ws_sub_lesson,"{module}, lesson {n} of {m}"
 ws_sub_challenge,"{module}, challenge"
 ws_sub_item,"{module}, {kind}"
@@ -557,6 +578,7 @@ panel_ready_foot_assessment,"No help in an assessment, and the clock is hard fro
 panel_back,back
 panel_keys_so_far,Keys so far: {n}
 panel_esc_ends,ends the run
+panel_exit_ends,leaves the run
 panel_done_n,{n} done
 panel_more_after,{n} more after these
 panel_all_done,All done
