@@ -163,6 +163,11 @@ function page(spec) {
   }
   if (spec.condFmt) sheet.condFmt = clone(spec.condFmt);
   if (spec.colWExtra) Object.assign(sheet.colW, spec.colWExtra);
+  // a page longer or wider than the default grid (100 rows, 26 columns) carries its size, so Go To reaches its last line
+  const used = Object.keys(cells).map(k => /^([A-Z]+)(\d+)$/.exec(k)).filter(Boolean);
+  const maxR = Math.max(...used.map(m => +m[2])), maxC = Math.max(...used.map(m => colNum(m[1])));
+  if (maxR > 90) sheet.rows = Math.ceil((maxR + 20) / 10) * 10;
+  if (maxC > 24) sheet.cols = maxC + 4;
   return sheet;
 }
 function dryRows(spec) {
