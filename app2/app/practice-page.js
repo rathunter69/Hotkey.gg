@@ -275,15 +275,19 @@ function rapidPage(el, ctx) {
   const go = n => { keepRapidLen(n); location.hash = '#/rapid?len=' + n; };
   function render() {
     const rounds = bestRounds(store.attempts({ kind: 'rapid' }));
-    const tiles = RAPID_LENS.map((n, i) => { const r = rounds.find(x => x.secs === n);
-      return `<button type="button" class="rf-len${n === len ? ' on' : ''}" data-len="${n}" data-cursor tabindex="-1"><span class="rf-len-top"><kbd class="key">${i + 1}</kbd><span class="rf-len-n">${esc(t('rapid_len_' + n))}</span></span><span class="rf-len-best">${r ? `<span><b>${r.hits}</b> ${esc(t('col_hits'))}</span><span><b>${r.combo}</b> ${esc(t('col_combo'))}</span>` : `<span>${esc(t('rapid_none'))}</span>`}</span></button>`; }).join('');
-    const deck = RAPID_DECK.map(d => `<div class="rf-card"><span class="rf-card-t">${esc(d.text)}</span>${keysRowHtml(d.keys.split(' '), { max: 3 })}</div>`).join('');
+    // the lengths as Monkeytype's toolbar: the three numbers in a row, the chosen one lit, each on its key
+    const lens = `<div class="rf-lens" role="radiogroup" aria-label="${esc(t('rapid_lengths'))}">${RAPID_LENS.map((n, i) => `<button type="button" role="radio" aria-checked="${n === len}" class="rf-len${n === len ? ' on' : ''}" data-len="${n}"><kbd class="key">${i + 1}</kbd><span>${esc(t('rapid_len_short_' + n))}</span></button>`).join('')}</div>`;
+    // the deck as a sheet: each command, its keys, and your best at each length beside
+    const deck = tableHtml({ sheet: true, cls: 'tbl-deck', label: t('rapid_deck'), columns: [{ key: 'cmd', label: t('col_command') }, { key: 'keys', label: t('col_keys_press') }],
+      rows: RAPID_DECK.map(d => ({ cells: { cmd: esc(d.text), keys: keysRowHtml(d.keys.split(' '), { max: 3 }) }, cursor: false })) });
+    const best = tableHtml({ sheet: true, cls: 'tbl-rounds', columns: [{ key: 'len', label: t('col_length') }, { key: 'hits', label: t('col_hits'), align: 'right' }, { key: 'combo', label: t('col_combo'), align: 'right' }],
+      rows: RAPID_LENS.map(n => { const r = rounds.find(x => x.secs === n); return { cells: { len: esc(t('rapid_len_' + n)), hits: r ? `<b>${r.hits}</b>` : '', combo: r ? String(r.combo) : '' }, cls: n === len ? 'next' : '', cursor: false }; }) });
     const how = ['rapid_how_1', 'rapid_how_2', 'rapid_how_3'].map((k, i) => `<li><kbd class="key set-n">${i + 1}</kbd><span>${esc(t(k))}</span></li>`).join('');
-    el.innerHTML = `${headerBlockHtml({ title: t('rapid_title'), line: esc(siteCopy('rapid_intro', '')), button: buttonHtml({ label: t('rapid_start_len', { len: t('rapid_len_' + len) }), key: 'Enter', href: '#/rapid?len=' + len, primary: true, id: 'startRound' }), cls: 'hdr-rapid' })}
-      <div class="pg-two"><div class="pg-main">${panelHtml({ heading: esc(t('rapid_lengths')), facts: esc(t('rapid_keys_hint')), body: `<div class="rf-lens" data-cursor-cols="3">${tiles}</div>`, cls: 'rounds' })}${panelHtml({ heading: esc(t('rapid_deck')), facts: esc(t('rapid_deck_n', { n: RAPID_DECK.length })), body: `<div class="rf-deck">${deck}</div>`, cls: 'rf-deck-panel', stretch: true })}</div>
-      <div class="pg-side">${panelHtml({ heading: esc(t('rapid_how')), body: `<ol class="how-list">${how}</ol><p class="panel-line ink-2">${esc(siteCopy('rapid_fine', ''))}</p>`, cls: 'rf-how', stretch: true })}</div></div>`;
+    el.innerHTML = `${headerBlockHtml({ title: t('rapid_title'), line: esc(siteCopy('rapid_intro', '')), control: lens, button: buttonHtml({ label: t('rapid_start'), key: 'Enter', href: '#/rapid?len=' + len, primary: true, id: 'startRound' }), cls: 'hdr-rapid' })}
+      <div class="pg-two"><div class="pg-main">${panelHtml({ heading: esc(t('rapid_deck')), facts: esc(t('rapid_deck_n', { n: RAPID_DECK.length })), body: deck, cls: 'rf-deck-panel', stretch: true })}</div>
+      <div class="pg-side">${panelHtml({ heading: esc(t('rapid_best')), body: best, cls: 'rounds' })}${panelHtml({ heading: esc(t('rapid_how')), body: `<ol class="how-list">${how}</ol><p class="panel-line ink-2">${esc(siteCopy('rapid_fine', ''))}</p>`, cls: 'rf-how', stretch: true })}</div></div>`;
     const startBtn = el.querySelector('#startRound'); if (startBtn) startBtn.onclick = e => { e.preventDefault(); go(len); };
-    el.querySelectorAll('.rf-len').forEach(b => { b.onclick = () => go(Number(b.dataset.len)); });
+    el.querySelectorAll('.rf-len').forEach(b => { b.onclick = () => { len = Number(b.dataset.len); keepRapidLen(len); render(); }; });
     if (ctx.keytips) ctx.keytips.register([{ id: 'start', label: t('rapid_start'), el: el.querySelector('#startRound') }]);
     if (ctx.cursor) ctx.cursor.refresh();
   }

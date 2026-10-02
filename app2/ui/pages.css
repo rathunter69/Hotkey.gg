@@ -184,7 +184,10 @@
 .hdr-main{display:flex; flex-direction:column; gap:var(--s1); min-width:0}
 .hdr-row{display:flex; align-items:baseline; gap:var(--s4)}
 .hdr-title{font-size:var(--fs-title); font-weight:var(--fw-heavy); margin:0; line-height:1.15}
-.hdr-line{margin:0; color:var(--ink-2); font-size:var(--fs-name)}
+.hdr-main{flex:1 1 auto}
+.hdr-fx{display:flex; align-items:stretch; border:1px solid var(--grid); background:var(--sheet); min-height:var(--row-h); margin-top:var(--s2); max-width:calc(var(--side-col) * 2.2)}   /* the line sits in a formula bar: fx, then the words */
+.hdr-fx-mark{display:flex; align-items:center; padding:0 var(--s3); border-right:1px solid var(--grid); background:var(--chrome); color:var(--ink-2); font-style:italic; font-family:var(--fx-font); font-size:var(--fs-name)}
+.hdr-line{margin:0; display:flex; align-items:center; padding:var(--s1) var(--s3); color:var(--ink); font-size:var(--fs-name); font-family:var(--cellfont)}
 .hdr-acts{display:flex; align-items:center; gap:var(--s4); flex:none}
 .hdr .btn2{padding:var(--s4) var(--s6); font-size:var(--fs-panel)}
 .paywall .panel-line{font-size:var(--fs-body); color:var(--ink)}
@@ -293,7 +296,7 @@ a.pn:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:var
 /* the badge a module pays out, under its page */
 .learn-reward{display:flex; align-items:center; gap:var(--s3); padding-top:var(--s3); border-top:1px solid var(--line)}
 .learn-reward .px{flex:none}
-@media (max-width:900px){ .rf-deck{grid-template-columns:minmax(0,1fr)} .ch-cards .ch-card{flex:none; width:var(--side-col)} .learn-continue{flex-wrap:wrap} }
+@media (max-width:900px){ .ch-cards .ch-card{flex:none; width:var(--side-col)} .learn-continue{flex-wrap:wrap} }
 
 /* a drill's state in the catalog sheet: your time, not played, or the lock and why */
 .dt-time{font-family:var(--mono); font-weight:var(--fw-bold); font-size:var(--fs-key); font-variant-numeric:tabular-nums}
@@ -310,18 +313,15 @@ a.pn:focus-visible{outline:var(--cursor-w) solid var(--mode); outline-offset:var
 .set-main{display:flex; flex-direction:column; min-width:0}
 .set-len{font-size:var(--fs-min); color:var(--ink-2); text-align:right; font-variant-numeric:tabular-nums}
 
-/* Rapid-fire: the three lengths as tiles, the deck, how a round works */
-.rf-lens{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:var(--s3)}
-.rf-len{display:flex; flex-direction:column; align-items:stretch; gap:var(--s3); padding:var(--s4); text-align:left; background:var(--sheet); color:var(--ink); border:1px solid var(--line); border-top:var(--mode-rule) solid var(--line); cursor:pointer; font:inherit}
-.rf-len:hover{background:var(--chrome)}
-.rf-len.on{border-top-color:var(--mode); background:var(--mode-tint)}
-.rf-len-top{display:flex; align-items:center; gap:var(--s3)}
-.rf-len-n{font-size:var(--fs-item); font-weight:var(--fw-bold)}
-.rf-len-best{display:flex; gap:var(--s4); font-size:var(--fs-label); color:var(--ink-2)}
-.rf-len-best b{color:var(--ink); font-size:var(--fs-panel); font-variant-numeric:tabular-nums}
-.rf-deck{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); column-gap:var(--s6); border-top:var(--bw-2) solid var(--ink)}
-.rf-card{display:flex; justify-content:space-between; align-items:center; gap:var(--s3); min-height:var(--row-h); border-bottom:1px solid var(--line); font-size:var(--fs-name)}
-.rf-card-t{min-width:0}
+/* Rapid-fire: the lengths as a toolbar in the header (Monkeytype's row of numbers), the deck as a sheet */
+.rf-lens{display:flex; align-items:center; gap:var(--s1); padding:var(--s1); background:var(--chrome); border-radius:var(--r-btn)}
+.rf-len{display:inline-flex; align-items:center; gap:var(--s2); padding:var(--s2) var(--s3); background:transparent; border:0; border-radius:var(--r-btn); color:var(--ink-2); font:inherit; font-size:var(--fs-body); font-weight:var(--fw-semi); cursor:pointer}
+.rf-len:hover{color:var(--ink)}
+.rf-len.on{background:var(--sheet); color:var(--mode-ink); font-weight:var(--fw-heavy)}
+.rf-len .key{font-size:var(--fs-min)}
+.tbl-deck td:nth-child(3){width:1%}
+.tbl-sheet .keys-row{flex-wrap:nowrap}
+.tbl-rounds td b{font-size:var(--fs-panel)}
 .how-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:var(--s3)}
 .how-list li{display:grid; grid-template-columns:auto minmax(0,1fr); gap:var(--s3); align-items:start; font-size:var(--fs-name); line-height:1.45}
 

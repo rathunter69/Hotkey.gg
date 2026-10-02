@@ -39,6 +39,7 @@
   --font:'Hanken Grotesk',system-ui,sans-serif;          /* every label, button, heading and sentence */
   --mono:'JetBrains Mono',ui-monospace,monospace;        /* keys, addresses, formulas, times, the wordmark */
   --cellfont:Arial,'Calibri','Segoe UI',system-ui,sans-serif;   /* the sheet's own face */
+  --fx-font:Georgia,'Times New Roman',serif;   /* the formula bar's italic fx */
   --fs-landing:52px; --fs-prompt:52px; --fs-time:34px; --fs-title:28px; --fs-head:22px; --fs-clock:26px;
   --fs-item:18px; --fs-panel:17px; --fs-body:15px; --fs-name:14.5px; --fs-label:13px; --fs-key:12.5px; --fs-min:12px;
   --fw-heavy:800; --fw-bold:700; --fw-semi:600; --fw-key:500; --fw-body:400;

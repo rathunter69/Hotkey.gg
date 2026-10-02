@@ -11,6 +11,8 @@ export const RIBBON_WORDS = [
 
 export const SITE_KEYS = [
   // the interface match (2026-10-02)
+  'rapid_len_short_30', 'rapid_len_short_60', 'rapid_len_short_120', 'col_command', 'col_keys_press',
+  // the interface match (2026-10-02)
   'home_tour',
   // the interface match (2026-10-02)
   'coach_done', 'signin_head', 'signin_line', 'signin_google', 'signin_fine',

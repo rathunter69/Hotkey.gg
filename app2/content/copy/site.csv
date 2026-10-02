@@ -703,3 +703,8 @@ signin_line,Type your email and we send a 6-digit code. New here? The same code 
 signin_google,Continue with Google
 signin_fine,Your progress in this browser moves to the account. Chapter 1 stays free either way.
 home_tour,Take the tour
+rapid_len_short_30,30 s
+rapid_len_short_60,60 s
+rapid_len_short_120,120 s
+col_command,Command
+col_keys_press,Keys

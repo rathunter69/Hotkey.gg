@@ -85,7 +85,7 @@ export function buttonHtml({ label, key = '', href = '', primary = false, quiet 
 /** The header block of a Practice page: the title, one line, a control at the right and the primary button. */
 export function headerBlockHtml({ title, line = '', control = '', button = '', facts = '', cls = '' } = {}) {
   // the block is the page's selected item when it opens: the cursor sits on it and Enter presses its primary button
-  return `<section class="panel hdr ${esc(cls)}" data-cursor data-cursor-enter=".btn2-primary" tabindex="-1" aria-label="${esc(title)}"><div class="hdr-main"><div class="hdr-row"><h1 class="hdr-title">${esc(title)}</h1>${facts ? `<span class="panel-facts">${facts}</span>` : ''}</div>${line ? `<p class="hdr-line">${line}</p>` : ''}</div><div class="hdr-acts">${control}${button}</div></section>`;
+  return `<section class="panel hdr ${esc(cls)}" data-cursor data-cursor-enter=".btn2-primary" tabindex="-1" aria-label="${esc(title)}"><div class="hdr-main"><div class="hdr-row"><h1 class="hdr-title">${esc(title)}</h1>${facts ? `<span class="panel-facts">${facts}</span>` : ''}</div>${line ? `<div class="hdr-fx"><i class="hdr-fx-mark" aria-hidden="true">fx</i><p class="hdr-line">${line}</p></div>` : ''}</div><div class="hdr-acts">${control}${button}</div></section>`;
 }
 
 /** A click anywhere on a row that carries data-href follows it (a link inside the row keeps its own). */
