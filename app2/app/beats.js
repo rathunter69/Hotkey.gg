@@ -21,7 +21,7 @@ export const PLANNED_IDS = { '1.1': 'open-and-set-up', '1.2': 'move-and-select',
 export const PLANNED_MODULES = PLANNED_DEFAULT.map(p => { const row = moduleCopy(PLANNED_IDS[p.n]); return row ? { ...p, title: (row.name || '').trim() || p.title, objective: (row.objective || '').trim() || p.objective } : p; });
 
 /** The chapter-end line's shape; site.csv page_delivered overrides. {n} the module number, {module} its name, {page} modules.csv page_name. */
-export const PAGE_DELIVERED = 'Page {n}, {page}, is done.';
+export const PAGE_DELIVERED = 'Page {n} is done: {page}.';
 
 const BEATS_DEFAULT = {
   'open-and-set-up': { eyebrow: 'Module 1.1 · open and set up', title: 'The file arrived the way inherited files do.',

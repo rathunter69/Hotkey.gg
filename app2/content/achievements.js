@@ -17,6 +17,8 @@ const B = c => (c && typeof c.pbs === 'object' && c.pbs) || {};
 const n = (done, prog, goal) => ({ done: !!done, prog: Math.min(prog || 0, goal), goal });
 const count = (done, goal) => n(done >= goal, done, goal);
 
+const CH1 = LESSONS.filter(l => l.chapter === 'foundations');
+const ch1Done = c => CH1.filter(l => { const p = P(c)[l.id]; return p && p.completed; }).length;
 const lessonsDone = c => LESSONS.filter(l => { const p = P(c)[l.id]; return p && p.completed; }).length;
 const sectionDone = (c, section) => {
   const ls = LESSONS.filter(l => l.section === section && (l.kind === undefined || l.kind === 'lesson'));
@@ -46,17 +48,17 @@ export const ACHIEVEMENTS = [
   { id: 'scenic-route', glyph: 'snail', rarity: 'common', name: 'Scenic Route', desc: 'Finish a drill with twice the keys its route needs', test: c => count(drillAttempts(c).filter(a => { const o = optimalOf(a.ref); return o != null && a.keys >= 2 * o; }).length, 1) },
   // ---- the campaign: sections and the chapter ----
   { id: 'first-lesson', glyph: 'seed', rarity: 'common', name: 'First Steps', desc: 'Complete your first lesson', test: c => count(lessonsDone(c), 1) },
-  { id: 'mod-setup', glyph: 'flag', rarity: 'common', name: 'Through the Door', desc: 'Finish Open and set up', test: c => sectionDone(c, 'Open and set up') },
-  { id: 'mod-move', glyph: 'arrows', rarity: 'common', name: 'Navigator', desc: 'Finish Move and select', test: c => sectionDone(c, 'Move and select') },
-  { id: 'mod-edit', glyph: 'pencil', rarity: 'common', name: 'Editor', desc: 'Finish Enter, edit, copy and fill', test: c => sectionDone(c, 'Enter, edit, copy and fill') },
-  { id: 'mod-structure', glyph: 'rows', rarity: 'common', name: 'Structural', desc: 'Finish Structure', test: c => sectionDone(c, 'Structure') },
-  { id: 'mod-format', glyph: 'ribbon', rarity: 'common', name: 'House Style', desc: 'Finish Format', test: c => sectionDone(c, 'Format') },
-  { id: 'mod-formulas', glyph: 'sigma', rarity: 'common', name: 'Calculator', desc: 'Finish Formulas', test: c => sectionDone(c, 'Formulas') },
-  { id: 'mod-present', glyph: 'book', rarity: 'common', name: 'Signed Off', desc: 'Finish Present and audit', test: c => sectionDone(c, 'Present and audit') },
+  { id: 'mod-setup', glyph: 'flag', rarity: 'common', name: 'Through the Door', desc: 'Finish the Open and set up module', test: c => sectionDone(c, 'Open and set up') },
+  { id: 'mod-move', glyph: 'arrows', rarity: 'common', name: 'Navigator', desc: 'Finish the Move and select module', test: c => sectionDone(c, 'Move and select') },
+  { id: 'mod-edit', glyph: 'pencil', rarity: 'common', name: 'Editor', desc: 'Finish the Enter, edit, copy and fill module', test: c => sectionDone(c, 'Enter, edit, copy and fill') },
+  { id: 'mod-structure', glyph: 'rows', rarity: 'common', name: 'Structural', desc: 'Finish the Structure module', test: c => sectionDone(c, 'Structure') },
+  { id: 'mod-format', glyph: 'ribbon', rarity: 'common', name: 'To Standard', desc: 'Finish the Format module', test: c => sectionDone(c, 'Format') },
+  { id: 'mod-formulas', glyph: 'sigma', rarity: 'common', name: 'Calculator', desc: 'Finish the Formulas module', test: c => sectionDone(c, 'Formulas') },
+  { id: 'mod-present', glyph: 'book', rarity: 'common', name: 'Signed Off', desc: 'Finish the Present and audit module', test: c => sectionDone(c, 'Present and audit') },
   { id: 'ch1-project', glyph: 'grid', rarity: 'rare', name: 'Report Builder', desc: 'Complete the weekly report project', test: c => count(P(c)['weekly-kpi-project'] && P(c)['weekly-kpi-project'].completed ? 1 : 0, 1) },
-  { id: 'ch1-assessment', glyph: 'clock', rarity: 'rare', name: 'Under the Clock', desc: 'Pass the Foundations assessment', test: c => count(P(c)['foundations-assessment'] && P(c)['foundations-assessment'].completed ? 1 : 0, 1) },
-  { id: 'ch1-testout', glyph: 'bolt', rarity: 'rare', name: 'Skipped Ahead', desc: 'Test out of Foundations', test: c => count(P(c)['foundations-testout'] && P(c)['foundations-testout'].completed ? 1 : 0, 1) },
-  { id: 'ch1-complete', glyph: 'trophy', rarity: 'epic', name: 'Foundations Poured', desc: 'Complete every Foundations lesson', test: c => count(lessonsDone(c), LESSONS.length) },
+  { id: 'ch1-assessment', glyph: 'clock', rarity: 'rare', name: 'Under the Clock', desc: 'Pass the Chapter 1 assessment', test: c => count(P(c)['foundations-assessment'] && P(c)['foundations-assessment'].completed ? 1 : 0, 1) },
+  { id: 'ch1-testout', glyph: 'bolt', rarity: 'rare', name: 'Skipped Ahead', desc: 'Test out of Chapter 1', test: c => count(P(c)['foundations-testout'] && P(c)['foundations-testout'].completed ? 1 : 0, 1) },
+  { id: 'ch1-complete', glyph: 'trophy', rarity: 'epic', name: 'Foundations Poured', desc: 'Complete every Chapter 1 lesson', test: c => count(ch1Done(c), CH1.length) },
   // ---- solo and timed lessons ----
   { id: 'solo-1', glyph: 'star', rarity: 'common', name: 'No Training Wheels', desc: 'Complete a lesson solo', test: c => count(soloCount(c), 1) },
   { id: 'solo-5', glyph: 'star', rarity: 'rare', name: 'Own Two Hands', desc: 'Five lessons solo', test: c => count(soloCount(c), 5) },
@@ -67,16 +69,16 @@ export const ACHIEVEMENTS = [
   { id: 'drill-tour', glyph: 'target', rarity: 'rare', name: 'Tourist', desc: 'Attempt every drill', test: c => count(drillsTried(c), DRILLS.length) },
   { id: 'pb-1', glyph: 'medal', rarity: 'common', name: 'On the Board', desc: 'Set your first personal best', test: c => count(Object.keys(B(c)).length, 1) },
   { id: 'pb-all', glyph: 'medal', rarity: 'epic', name: 'Collector', desc: 'A personal best on every drill', test: c => count(Object.keys(B(c)).filter(r => DRILLS.some(d => d.id === r)).length, DRILLS.length) },
-  { id: 'tier-pass', glyph: 'medal', rarity: 'common', name: 'Cleared', desc: 'Beat a pass clock clean', test: c => count(tierRuns(c, 'pass').length, 1) },
-  { id: 'tier-pro', glyph: 'medal', rarity: 'rare', name: 'Professional', desc: 'Beat a pro clock clean', test: c => count(tierRuns(c, 'pro').length, 1) },
-  { id: 'tier-legend', glyph: 'flame', rarity: 'epic', name: 'Legendary', desc: 'Beat a legendary clock clean', test: c => count(tierRuns(c, 'legendary').length, 1) },
+  { id: 'tier-pass', glyph: 'medal', rarity: 'common', name: 'Cleared', desc: 'Beat a Pass time clean', test: c => count(tierRuns(c, 'pass').length, 1) },
+  { id: 'tier-pro', glyph: 'medal', rarity: 'rare', name: 'Professional', desc: 'Beat an Expert time clean', test: c => count(tierRuns(c, 'pro').length, 1) },
+  { id: 'tier-legend', glyph: 'flame', rarity: 'epic', name: 'Legendary', desc: 'Beat a Legendary time clean', test: c => count(tierRuns(c, 'legendary').length, 1) },
   { id: 'legend-3', glyph: 'flame', rarity: 'epic', name: 'Heating Up', desc: 'Legendary on three different drills', test: c => count(tierDrills(c, 'legendary'), 3) },
   { id: 'legend-all', glyph: 'crown', rarity: 'legendary', name: 'Untouchable', desc: 'Legendary on every drill', test: c => count(tierDrills(c, 'legendary'), DRILLS.length) },
   // ---- the Daily and streaks ----
   { id: 'daily-1', glyph: 'calendar', rarity: 'common', name: 'Showed Up', desc: 'Finish a Daily', test: c => count(dailyDays(c), 1) },
   { id: 'daily-7', glyph: 'calendar', rarity: 'rare', name: 'Regular', desc: 'Seven Dailies on seven days', test: c => count(dailyDays(c), 7) },
   { id: 'daily-30', glyph: 'calendar', rarity: 'epic', name: 'Fixture', desc: 'Thirty Dailies on thirty days', test: c => count(dailyDays(c), 30) },
-  { id: 'streak-7', glyph: 'flame', rarity: 'rare', name: 'Momentum', desc: 'Practise seven days in a row', test: c => count((c && c.streakDays) || 0, 7) },
+  { id: 'streak-7', glyph: 'flame', rarity: 'rare', name: 'Momentum', desc: 'Practice seven days in a row', test: c => count((c && c.streakDays) || 0, 7) },
   // ---- efficiency ----
   { id: 'no-waste', glyph: 'gem', rarity: 'rare', name: 'No Wasted Keys', desc: 'Finish a drill clean at the optimal keystroke count', test: c => count(atOptimal(c).length, 1) },
   { id: 'econ-10', glyph: 'gem', rarity: 'epic', name: 'Economist', desc: 'Ten clean runs at or under optimal keys', test: c => count(atOptimal(c).length, 10) },

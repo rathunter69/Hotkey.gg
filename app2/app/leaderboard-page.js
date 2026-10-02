@@ -76,7 +76,12 @@ export function localRows(ref) {
 function seenPlaces() { try { return JSON.parse(localStorage.getItem(SEEN_KEY) || '{}') || {}; } catch (e) { return {}; } }
 function rememberPlace(key, place) { try { const m = seenPlaces(); m[key] = place; localStorage.setItem(SEEN_KEY, JSON.stringify(m)); } catch (e) { /* private window */ } }
 
-const goalText = (drill, i) => { const goals = drill && (drill.goals || (drill.lesson && drill.lesson.goals)) || []; const g = goals[i]; if (!g || !g.text) return ''; const s = String(g.text).replace(/[.!]$/, ''); return s.charAt(0).toLowerCase() + s.slice(1); };
+/** The goal as the learner read it, a whole sentence with its own capital and full stop: it is quoted, never spliced mid-sentence. */
+const goalText = (drill, i) => { const goals = drill && (drill.goals || (drill.lesson && drill.lesson.goals)) || []; const g = goals[i]; if (!g || !g.text) return ''; const s = String(g.text).trim(); return /[.!?]$/.test(s) ? s : s + '.'; };
+/** "1 second" / "12 seconds": a count that reads. */
+const secsText = n => t(n === 1 ? 'boards_second' : 'boards_seconds', { n });
+/** "1 clean run" / "12 clean runs". */
+const runsText = n => t(n === 1 ? 'boards_clean_run' : 'boards_clean_runs', { n });
 
 /** The board's table from a model. */
 export function boardTableHtml(model, { routeKeys = null } = {}) {
@@ -90,7 +95,7 @@ export function sidePanelHtml({ title, runs, where, drill, empty }) {
   const columns = [{ key: 'day', label: '' }, { key: 'time', label: '', align: 'right', cls: 'time' }, { key: 'keys', label: '', align: 'right', cls: 'keys' }];
   const rows = runs.map(r => ({ cells: { day: esc(prettyDay(r.day)), time: fmtClock(r.secs, true), keys: String(r.keys) }, cursor: false }));
   const task = where ? goalText(drill, where.index) : '';
-  const body = runs.length ? `${tableHtml({ columns, rows, head: false, cls: 'tbl-runs', label: t('boards_last_five') })}${task ? `<p class="panel-line">${esc(t('boards_where', { task, s: where.secs }))}</p>` : ''}` : `<p class="panel-line">${esc(empty)}</p>`;
+  const body = runs.length ? `${tableHtml({ columns, rows, head: false, cls: 'tbl-runs', label: t('boards_last_five') })}${task ? `<p class="panel-line">${esc(t('boards_where', { secs: secsText(where.secs) }))}</p><p class="panel-line">${esc(task)}</p>` : ''}` : `<p class="panel-line">${esc(empty)}</p>`;
   return panelHtml({ heading: esc(title), body, cls: 'board-side', stretch: true });
 }
 
@@ -112,7 +117,7 @@ export function mountBoard(el, { ref, seed = null, title, yours, dayLabel = '', 
     else {
       const model = boardModel(state.rows, { prevPlace: seenPlaces()[key] });
       if (model.mine) rememberPlace(key, model.mine.place);
-      facts = esc(dayLabel ? t(model.count === 1 ? 'boards_day_runs_one' : 'boards_day_runs', { day: dayLabel, n: model.count }) : t(model.count === 1 ? 'boards_clean_runs_one' : 'boards_clean_runs', { n: model.count }));
+      facts = esc(dayLabel ? t('boards_day_runs', { day: dayLabel, runs: runsText(model.count) }) : runsText(model.count));
       table = model.rows.length ? boardTableHtml(model, { routeKeys }) : `<p class="panel-line">${esc(t('boards_empty'))}</p>`;
       if (!live) line = `<p class="panel-line">${esc(t('boards_signed_out'))}</p>`;
     }
@@ -172,10 +177,10 @@ export function mountLeaderboardPage(root, ctx = {}) {
     if (hostEl) {
       if (tab === 'daily') {
         const day = dayOf(); const p = dailyFor(day); const d = DRILLS_BY_ID[p.drillId];
-        board = mountBoard(hostEl, { ref: p.drillId, seed: p.seed, title: d ? d.title : t('daily_title'), yours: t('boards_yours', { board: t('rail_daily').replace(/^The /, '') }), dayLabel: weekdayOf(day), side: boardSide() });
+        board = mountBoard(hostEl, { ref: p.drillId, seed: p.seed, title: d ? d.title : t('daily_title'), yours: t('boards_yours_daily'), dayLabel: weekdayOf(day), side: boardSide() });
       } else {
         const e = entriesFor(tab).find(x => x.id === ref);
-        board = mountBoard(hostEl, { ref, title: e ? e.title : ref, yours: t('boards_yours', { board: e ? e.title : '' }), side: boardSide() });
+        board = mountBoard(hostEl, { ref, title: e ? e.title : ref, yours: t('boards_yours'), side: boardSide() });
       }
     }
     if (focusTab) { const on = el.querySelector('.tab.on'); if (on) on.focus(); }

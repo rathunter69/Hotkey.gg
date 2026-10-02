@@ -109,7 +109,7 @@ export default {
   closing: [
     '= then the arrow keys wrote D5 and E5 for you, and F2 showed them lit in color when you read them back. One row of three formulas, filled down the sites in one press, and Domain’s average ticket answers the moment its washes change.',
     'Fix from earlier: the cost per wash was typed inside a formula on Inputs. Now it references its own cell, by address or by the name you gave it, and one change moves every formula that reads it.',
-    'Desk habit worth knowing: + starts a formula too. Type +D5-E5 and Excel writes =+D5-E5, the same formula, because on a numeric keypad + sits under your hand and = doesn’t, and the analysts who live on the keypad start every formula that way. Here it counts the same as = (M63).',
+    'Desk habit worth knowing: + starts a formula too. Type +D5-E5 and Excel writes =+D5-E5, the same formula, because on a numeric keypad + sits under your hand and = doesn’t, and the analysts who live on the keypad start every formula that way. Here it counts the same as =.',
   ],
   solution: 'Ctrl+Down Ctrl+Down Down Ctrl+Right Right "=" Left Left "-" Left Enter Right "=" Left Left Left "/" Ctrl+Left Ctrl+Left Right Right Enter Right "=" Left Left "/" Ctrl+Left Ctrl+Left Right Right Right Enter Left Left F2 Escape Shift+Right Shift+Right Shift+Down Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+D Left Down Ctrl+C Right Shift+Down Shift+Down Shift+Down Shift+Down Ctrl+Alt+V T Enter Ctrl+PgDn Ctrl+PgDn Ctrl+Down Up Right F2 Backspace Backspace Backspace "B4" Enter F2 Backspace Backspace "CostPerWash" Enter',
 };

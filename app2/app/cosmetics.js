@@ -9,7 +9,7 @@ export const FREE_THEMES = ['workbook', 'contrast', 'default'];
 
 /** A few themes carry story unlocks instead of a level. */
 export const SPECIAL_THEMES = {
-  bloomberg: { ach: 'ch1-complete', label: 'Complete Foundations' },
+  bloomberg: { ach: 'ch1-complete', label: 'Complete Chapter 1' },
   crimson: { rank: 6, label: 'Reach MD' },   // rank.js TIERS index
 };
 

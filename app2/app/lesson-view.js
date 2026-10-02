@@ -20,7 +20,7 @@ import { mountSheetTabs } from '../ui/sheet-tabs.js';
 import { mountKeycaps } from '../ui/keycaps.js';
 import { mountEffects } from '../ui/effects.js';
 import { showToast } from '../ui/toast.js';
-import { prefs } from './prefs.js';
+import { prefs, keyLabel } from './prefs.js';
 import { inferTarget, altPath, glowRibbon, targetBoxes, targetParts, unionBox, rangesOf, rangeCorners } from '../ui/cues.js';
 import { moduleNumber, itemNumber, isFinalItem, FINAL_MODULE } from './numbering.js';
 import { beatFor, pageDelivered } from './beats.js';
@@ -32,9 +32,12 @@ import { fitZoomFor, opensFitted } from './zoom.js';
 import { pace } from './run-record.js';
 import { createChecklist, landTo, assist as assistTask } from './checklist.js';
 import { titleAt, rewardAt } from '../content/levels.js';
-import { createChrome, confirmDialog, escLadder, lessonRows } from '../ui/components/chrome.js';
-import { createTaskCard, placeCard, routeTokens, routeProgress, liveLine, stuckLine, SIDES } from '../ui/components/task-card.js';
-import { paintTarget, paintNote, paintPen, paintCheck, clearMarks } from '../ui/components/sheet-marks.js';
+import { createChrome, confirmDialog, lessonRows, isExitKey, EXIT_KEY, sheetKeys, noteSheetKey, sheetKeysDelivered, canFullscreen, fullscreenKeys } from '../ui/components/chrome.js';
+import { createTaskCard, placeCard, routeTokens, routeProgress, liveLine, stuckLine, SIDES, alternates, offRoute, tryLine, worksToo, worksTooLine } from '../ui/components/task-card.js';
+import { paintTarget, paintNote, paintPen, paintCheck, clearMarks, pingMark, paintBeacon } from '../ui/components/sheet-marks.js';
+import { createFocusVeil } from '../ui/components/focus-veil.js';
+import { parseMs } from '../ui/effects.js';
+import { refKey } from '../engine/refs.js';
 import { createRunPanel, fmtPar, aboutLength } from '../ui/components/run-panel.js';
 
 const fill = (s, vars) => String(s).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] != null ? vars[k] : m));
@@ -42,7 +45,12 @@ const t = (key, fb, vars) => fill(siteCopy(key, fb), vars);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const KIND_WORD = { project: ['ws_kind_project', 'project'], assessment: ['ws_kind_assessment', 'assessment'], testout: ['ws_kind_testout', 'test out'] };
 /** The once-in-the-browser line on the first goal that uses Ctrl+PgUp/PgDn; site.csv tab_keys_note overrides. */
-export const TAB_KEYS_NOTE = 'Your browser keeps Ctrl+PgDn and Ctrl+PgUp for its own tabs, so here Alt+PgDn and Alt+PgUp switch sheets and count the same. Fullscreen and the installed app hand the real keys to the sheet.';
+export const TAB_KEYS_NOTE = 'Your browser keeps Ctrl+PgDn and Ctrl+PgUp for its own tabs, so here Alt+PgDn and Alt+PgUp switch sheets and count the same. Full screen, from the button by the sheet tabs, or the installed app hands the real keys to the sheet.';
+/** The marks a new goal clears; the ping keeps playing through the change. */
+const GOAL_MARKS = ['target', 'note', 'pen', 'check', 'beacon'];
+const clearGoalMarks = gw => { for (const k of GOAL_MARKS) clearMarks(gw, k); };
+/** How long a learner may be off the route before the card says so (--d-wrong-wait). */
+const wrongWait = () => { try { return parseMs(getComputedStyle(document.documentElement).getPropertyValue('--d-wrong-wait')) || 1200; } catch (e) { return 1200; } };
 const HOLD_DONE = 420;      // the ticked goal stays on the card this long before the glide (the tick, then the card moves)
 const GHOST_MS = 350, DO_MS = 180;
 
@@ -68,8 +76,9 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
   const moduleLessons = at ? at.module.lessons.map(l => ({ id: l.id, num: itemNumber(l, moduleOf(l)), title: l.title, href: '#/lesson/' + encodeURIComponent(l.id) })) : null;
   const chrome = createChrome(root, {
     kind: isChallenge ? 'challenge' : timedOnly ? 'assessment' : 'lesson', title: lesson.title, subtitle, lessons: moduleLessons, hasCard: !timed,
-    onBack: () => leave(), onPick: id => { if (id !== lesson.id) location.hash = '#/lesson/' + encodeURIComponent(id); },
+    onBack: () => askLeave(), onPick: id => { if (id !== lesson.id) location.hash = '#/lesson/' + encodeURIComponent(id); },
     onMore: id => onMore(id), onSound: () => setSound(!effects.isMuted()), onQat: act => { if (ribbonView) ribbonView.act(act); }, platform,
+    onFullscreen: () => { fullscreenKeys().then(() => { paintSheetKeys(); focusStage(); }); },
   });
   const effects = mountEffects();
   const keycaps = mountKeycaps(null, { parent: chrome.stage, cls: 'in-frame' });
@@ -108,7 +117,9 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
   const hinted = new Set();
   let notedDone = 0;
   let movedSide = null;        // Ctrl+Shift+J: the side asked for, until the next goal
-  let armedEsc = false, armedH = null;
+  let leaving = false;         // the Exit dialog is up
+  let tryAt = null, tryH = null, tryPending = null;   // off the route: { goal, n } once the pause has passed
+  let lastMark = 0, shownFor = null, aside = null;     // the key window of the goal just landed; what the card showed; "That works too"
   let tabKeysGoal = -1;
   let busyOn = false;
   let timerH = null, scrollRaf = 0;
@@ -127,6 +138,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     ribbonView = new RibbonView(chrome.ribbonSlot.querySelector('.ribbon'), run.session, { mode: 'full' });
     if (ribbonView.mode !== 'full') ribbonView.setMode('full');   // the layout is the standard's; Ctrl+F1 collapses it
     sheetTabs = mountSheetTabs(chrome.tabsMount, run.session);
+    chrome.adoptStatus(sheetView.sbar);   // Excel's foot: the status shares the tabs' row
     // lessons open with the Ribbon full, challenges and assessments with it collapsed; both are settings
     run.session.settings.ribbonCollapsed = (timed ? cfg.ribbonDrills : cfg.ribbonLessons) === 'tabs';
     syncChrome();
@@ -163,20 +175,33 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     if (timed) chrome.setProgress({ d: run.doneCount, n: m });
     else chrome.setProgress({ n: Math.min(run.doneCount + 1, m), m });
     if (moduleLessons) chrome.setLessons(lessonRows(moduleLessons, { currentId: lesson.id, progress: store.all(), goalLine: t('ws_goal_count', 'Goal {n} of {m}', { n: Math.min(run.doneCount + 1, m), m }) }));
+    paintSheetKeys();
+  }
+  /** The sheet keys beside the tabs: Excel's, and the browser's alias until the real keys arrive. */
+  function paintSheetKeys() {
+    chrome.setSheetKeys(sheetKeys({ sheets: (run.session.sheets || []).length, delivered: sheetKeysDelivered(), platform: platform() }), { fullscreen: canFullscreen(), isFull: typeof document !== 'undefined' && !!document.fullscreenElement });
+  }
+  /** The ping: a ring grows out of the cell cursor, so the eye finds it (after a goal, back from another window). */
+  function pingCursor() {
+    if (!sheetView || !run.session.sheet) return;
+    const a = run.session.sheet.dispActive();
+    const el = pingMark(sheetView.gw, sheetView.cellRect(refKey(a.r, a.c)));
+    if (el) effects.play('cursor-ping', el);
   }
   function focusStage() {
     const st = chrome.stage; if (!st.hasAttribute('tabindex')) st.setAttribute('tabindex', '-1');
     try { window.focus(); } catch (e) { /* ignore */ }
     try { st.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
-    paintFocusHint();
   }
-  function paintFocusHint() {
-    const st = chrome.stage; let hint = st.querySelector('.focus-hint');
-    const away = typeof document.hasFocus === 'function' && !document.hasFocus();
-    if (away && !hint) { hint = document.createElement('div'); hint.className = 'focus-hint'; hint.textContent = 'Click the sheet to start typing'; st.appendChild(hint); }
-    if (!away && hint) hint.remove();
-  }
-  window.addEventListener('focus', paintFocusHint); window.addEventListener('blur', paintFocusHint);
+  // the window lost the keyboard: a veil over the sheet; the click or key that brings it back never lands on a cell
+  const veil = createFocusVeil(chrome.stage, {
+    active: () => phase === 'play' && !run.finished && !leaving,
+    where: () => (sheetView ? sheetView.nameBox.textContent : ''),
+    line: () => (timed ? siteCopy('ws_focus_clock', 'The clock is still running.') : ''),
+    onResume: () => { focusStage(); if (sheetView) sheetView.keepActiveInView(); pingCursor(); },
+  });
+  const onFullChange = () => paintSheetKeys();
+  document.addEventListener('fullscreenchange', onFullChange);
 
   /* ---------------- the card ---------------- */
   const activeSheetName = () => { const sh = run.session.sheets && run.session.sheets[run.session.sheetIndex]; return sh ? sh.name : null; };
@@ -209,20 +234,49 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     if (!cur) { card.el.hidden = true; return; }
     const n = Math.min(run.doneCount + 1, m);
     const tokens = keysShown(cur) ? routeTokens(cur.keys) : [];
-    const progress = routeProgress(tokens, run.session.keyLog.slice(run.session.goalMark || 0));
-    let live = tokens.length ? liveLine(progress, tokens, platform()) : '', liveKind = progress.wrong ? 'wrong' : '';
+    const alts = tokens.length ? alternates(cur, { browserTab: !sheetKeysDelivered() }).map(routeTokens) : [];
+    const pressed = run.session.keyLog.slice(run.session.goalMark || 0);
+    const progress = routeProgress(tokens, pressed);
+    shownFor = { goal: run.doneCount, tokens, alts };
+    // off the route: the row resets at once, but the card waits for a pause before it says so, and says it gently
+    const off = offRoute(tokens, alts, pressed);
+    armTry(off, pressed.length);
+    const quiet = progress.wrong ? { ...progress, wrong: null } : progress;
+    let live = tokens.length ? liveLine(quiet, tokens, platform()) : '', liveKind = '';
+    if (off && tryAt && tryAt.goal === run.doneCount && tryAt.n === pressed.length) { live = tryLine(progress, tokens, platform()); liveKind = 'try'; }
     if (ghost) { live = siteCopy('card_live_watch', 'Watch the keys play on your sheet. When they’re done, the sheet goes back the way it was. Esc hands it back early.'); liveKind = 'stuck'; }
     else if (doing) { live = siteCopy('card_live_doing', 'Doing it for you.'); liveKind = 'stuck'; }
     else if (demo) { live = siteCopy('card_live_demo', 'Watch it once. Esc skips to your turn.'); liveKind = 'demo'; }
     else if (stalled && stuckLine(cur.hintStuck) && !progress.matched) { live = stuckLine(cur.hintStuck); liveKind = 'stuck'; }
     else if (mouseNudgeAt === run.doneCount && !progress.matched) { live = siteCopy(tokens.length ? 'card_live_mouse' : 'card_live_mouse_help', tokens.length ? 'Try it with the keyboard.' : 'Try it with the keyboard. F1 opens Help, which can show you the keys.'); liveKind = 'mouse'; }
     else if (!cur.keys && run.doneCount >= m) { live = siteCopy('panel_sheet_off', 'Every goal’s done, but the sheet isn’t where it needs to be yet. Fix what the pen marks to finish.'); liveKind = 'stuck'; }
-    else if (tabKeysGoal === run.doneCount) { live = siteCopy('tab_keys_note', TAB_KEYS_NOTE); liveKind = 'stuck'; }
-    card.set({ n, m, goal: cur.text, intro: namesItself && run.doneCount === 0 ? siteCopy('card_intro', 'This card shows your goal and its keys, and it follows the work around the sheet.') : '', teach: cur.teach || '', keys: tokens, progress, live, liveKind, state: cur.teach ? 'teaching' : 'repeat', helpNone: timedOnly ? siteCopy('card_help_none', 'No help in an assessment: every key this run needs was taught in the chapter.') : null });
+    else if (tabKeysGoal === run.doneCount && liveKind !== 'try') { live = siteCopy('tab_keys_note', TAB_KEYS_NOTE); liveKind = 'stuck'; }
+    const asideText = aside && aside.goal === run.doneCount && pressed.length < 3 ? aside.text : '';
+    card.set({ n, m, goal: cur.text, alts, aside: asideText, intro: namesItself && run.doneCount === 0 ? siteCopy('card_intro', 'This card shows your goal and its keys, and it follows the work around the sheet.') : '', teach: cur.teach || '', keys: tokens, progress, live, liveKind, state: cur.teach ? 'teaching' : 'repeat', helpNone: timedOnly ? siteCopy('card_help_none', 'No help in an assessment: every key this run needs was taught in the chapter.') : null });
     if (!card.hidden) card.el.hidden = false;
+  }
+  /** Off the route: after a pause with no new key, the card's line says what to press (renderCard reads tryAt). */
+  function armTry(off, n) {
+    if (!off) { if (tryH) clearTimeout(tryH); tryH = null; tryPending = null; tryAt = null; return; }
+    const idx = run.doneCount;
+    if (tryPending && tryPending.goal === idx && tryPending.n === n) return;
+    if (tryH) clearTimeout(tryH);
+    tryPending = { goal: idx, n };
+    tryH = setTimeout(() => { tryH = null; if (phase !== 'play' || run.doneCount !== idx) return; tryAt = { goal: idx, n }; renderCard(); placeNow(); }, wrongWait());
+  }
+  /** The target off the screen: a pill on the sheet's edge with its address and the way to go. */
+  function paintBeaconNow() {
+    if (!sheetView) return;
+    const gw = sheetView.gw;
+    if (timed || phase !== 'play' || !cueTarget || targetElsewhere() || demo || ghost) { clearMarks(gw, 'beacon'); return; }
+    const tb = currentTargetBox(), b = sheetView.box();
+    const label = rangesOf(targetParts(cueTarget).ref)[0] || '';
+    if (!tb || !b || !label || /^[A-Z]{1,2}1:[A-Z]{1,2}100$/.test(label)) { clearMarks(gw, 'beacon'); return; }
+    paintBeacon(gw, tb, { sl: gw.scrollLeft, st: gw.scrollTop, w: gw.clientWidth, h: gw.clientHeight, x0: b.x0, y0: b.y0 }, label);
   }
   /** Where the card goes: beside the target on the side with the most room, clear of the selection, a note and the ranges read. */
   function placeNow() {
+    paintBeaconNow();
     if (timed || phase !== 'play' || !sheetView || card.hidden || card.pill) return;
     const gw = sheetView.gw; const b = sheetView.box(); if (!b) return;
     const g = gw.getBoundingClientRect(), st = chrome.stage.getBoundingClientRect();
@@ -279,12 +333,12 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
       cueTokens = cur ? altPath(cur.keys) : [];
       cueTarget = cur && !demo && !ghost ? inferTarget(cur, (run.session.sheets || []).map(x => x.name)) : null;
       lastSheet = run.session.sheetIndex;
-      clearMarks(gw);
+      clearGoalMarks(gw);
       noteRect = null; noteGoal = -1;
-      if (cur && tabKeysGoal < 0 && /Ctrl\+Pg(Up|Dn)/.test(cur.keys || '') && !prefs.get().tabKeysNoted) { tabKeysGoal = run.doneCount; prefs.set({ tabKeysNoted: true }); }
+      if (cur && tabKeysGoal < 0 && /Ctrl\+Pg(Up|Dn)/.test(cur.keys || '') && !prefs.get().tabKeysNoted && !sheetKeysDelivered()) { tabKeysGoal = run.doneCount; prefs.set({ tabKeysNoted: true }); }
       armStuck();
     }
-    if (run.session.sheetIndex !== lastSheet) { lastSheet = run.session.sheetIndex; clearMarks(gw); noteRect = null; }
+    if (run.session.sheetIndex !== lastSheet) { lastSheet = run.session.sheetIndex; clearGoalMarks(gw); noteRect = null; }
     paintCurrent();
   }
   /** The target outline, the note, the pen: drawn from the current goal, on the sheet that shows. */
@@ -333,11 +387,20 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
   }
   function stopStuck() { if (stuckH) clearTimeout(stuckH); if (helpH) clearTimeout(helpH); stuckH = helpH = null; }
   function goalLanded() {
-    const landed = run.doneCount;
+    const landed = run.doneCount, prev = seenDone;
     doneGoal = run.goals[landed - 1] || null;
     seenDone = landed;
+    // the key window of the goal that just landed: a route other than the one shown is "That works too"
+    const from = lastMark; lastMark = run.session.goalMark || 0;
+    aside = null;
+    if (!timed && landed - prev === 1 && shownFor && shownFor.goal === landed - 1 && shownFor.tokens.length && mouseNudgeAt !== landed - 1 && !assistedGoals.has(landed - 1)) {
+      const keysIn = run.session.keyLog.slice(from, lastMark);
+      if (worksToo(shownFor.tokens, shownFor.alts, keysIn)) aside = { goal: landed, text: worksTooLine(shownFor.tokens, platform()) };
+    }
+    tryAt = null; tryPending = null; if (tryH) { clearTimeout(tryH); tryH = null; }
     if (checklist) checklist = landTo(checklist, landed);
     if (timed) return;
+    pingCursor();
     effects.goalTick(card.el);
     holdUntil = Date.now() + HOLD_DONE;
     if (holdH) clearTimeout(holdH);
@@ -441,9 +504,19 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     if (isMicro) { location.hash = '#/'; return; }
     location.hash = dailyOpt ? '#/practice/daily' : '#/learn';
   }
-  function armLeave() {
-    armedEsc = true; chrome.hint(siteCopy('ws_esc_again', 'Esc again to leave.'), 3000);
-    clearTimeout(armedH); armedH = setTimeout(() => { armedEsc = false; }, 3000);
+  /** Exit (its button, More, Ctrl+Shift+X): part-way, a small dialog asks first, with Stay focused so Enter keeps you here. */
+  async function askLeave() {
+    if (leaving) return;
+    const partWay = phase === 'play' && !run.finished && (run.doneCount > 0 || run.session.keyLog.length > 0);
+    if (!partWay) { leave(); return; }
+    leaving = true; chrome.closeMenu(); card.closeHelp();
+    const ok = await confirmDialog({
+      title: timed ? siteCopy('leave_run_title', 'Leave this run?') : siteCopy('leave_title', 'Leave this lesson?'),
+      body: timed ? siteCopy('leave_run_body', 'No time is posted for a run you leave. Your finished lessons stay saved.') : siteCopy('leave_body', 'Your finished lessons stay saved. This one starts again from its first goal.'),
+      action: siteCopy('leave_action', 'Leave'), cancel: siteCopy('leave_stay', 'Stay'), focus: 'cancel', platform: platform(),
+    });
+    leaving = false;
+    if (ok) leave(); else focusStage();
   }
 
   /* ---------------- the timed run: Ready, Run, Result ---------------- */
@@ -474,8 +547,6 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     panel.tick({ secs, pace: pc, pars: lesson.pars || null, keys: run.session.keyLog.length });
     if (lesson.timeLimit && !run.opts.soft && secs > lesson.timeLimit && !run.finished) timeUp();
   }
-  /** Esc mid-run ends the run without a time: back to Ready on a fresh file. */
-  function endRun() { restart(); }
   function timeUp() {
     stopDemo();
     phase = 'timeup';
@@ -626,6 +697,7 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     phase = timed ? 'ready' : 'play';
     seenDone = 0; holdUntil = 0; if (holdH) { clearTimeout(holdH); holdH = null; }
     cueGoal = -1; cueTarget = null; lastSheet = -1; noteRect = null; noteGoal = -1; stalled = false; mouseNudgeAt = -1; revealedAt = -1;
+    lastMark = 0; shownFor = null; aside = null; tryAt = null; tryPending = null; if (tryH) { clearTimeout(tryH); tryH = null; }
     assistedGoals.clear(); hinted.clear(); notedDone = 0; movedSide = null; showKeysTimed = false; lastTimedOut = false; deliveredNow = false;
     checklist = timed ? createChecklist(lesson.goals) : null;
     busyOn = false; if (effects.setBusy) effects.setBusy(false);
@@ -670,6 +742,8 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     const tg = e.target; const tag = tg && tg.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (tg && tg.isContentEditable)) return;
     if ((tag === 'BUTTON' || tag === 'A') && (e.key === 'Enter' || e.key === ' ')) return;   // a control keeps its own activation
+    if (isExitKey(e)) { e.preventDefault(); askLeave(); return; }   // Exit, from anywhere in the workspace
+    if (noteSheetKey(e)) paintSheetKeys();   // Excel's own sheet key arrived: this window hands it over
     if (chrome.menu) { e.preventDefault(); chrome.menuKey(e.key); if (!chrome.menu) focusStage(); return; }
     if (card.help) { e.preventDefault(); card.helpKey(e.key); return; }
     if (e.ctrlKey && e.shiftKey && !e.altKey && (e.key === 'K' || e.key === 'k')) { e.preventDefault(); if (!timed) toggleCard(); return; }
@@ -700,14 +774,16 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     if (doing) { e.preventDefault(); if (e.key === 'Escape') stopDoing(); return; }
     if (demo) { if (e.key === 'Escape') skipDemo(); if (!e.ctrlKey && !e.metaKey && !e.altKey && e.key.length > 1) e.preventDefault(); return; }
     if (e.key === 'Escape') {
+      // Esc does what it does in Excel: cancels an edit, closes a dialog, a menu or a note, drops the
+      // marching ants. It never leaves; with nothing to close, the title bar says how to
       const ss = run.session;
       const engineOwns = ss.editing || ss.mode === 'ribbon' || !!ss.dialog || !!ss.note || !!(ss.sheet && ss.sheet.clipboard);   // Esc clears copy mode's marching ants first, as Excel's does
       if (engineOwns) { if (run.key(e)) e.preventDefault(); return; }
       e.preventDefault();
       if (noteRect) { clearNote(); return; }
-      if (timed) { endRun(); return; }   // mid-run: ends the run without a time
-      const rung = escLadder({ partWay: ss.t0 != null && !run.finished, armed: armedEsc });
-      if (rung === 'arm') armLeave(); else leave();
+      const ants = !!(ss.sheet && ss.sheet.clipboard);
+      run.key(e);
+      if (!ants) chrome.hint(t('ws_exit_hint', 'To leave, use Exit at the top left or {key}.', { key: keyLabel(EXIT_KEY, platform()) }), 3000);
       return;
     }
     if (run.key(e)) { e.preventDefault(); effects.armSounds(); if (!busyOn && effects.setBusy) { busyOn = true; effects.setBusy(true); } }
@@ -727,12 +803,12 @@ export function mountLessonView(root, lesson, { mode = 'guided', seed: seedOpt, 
     destroy() {
       if (ghost) { clearInterval(ghost.timer); ghost = null; run.endGhost(); }
       stopDemo(); stopDoing(); stopStuck();
-      clearTimeout(armedH); if (holdH) clearTimeout(holdH); if (pillH) clearTimeout(pillH);
+      if (tryH) clearTimeout(tryH); if (holdH) clearTimeout(holdH); if (pillH) clearTimeout(pillH);
       if (timerH) clearInterval(timerH);
       if (scrollRaf) cancelAnimationFrame(scrollRaf);
       if (glowObs) glowObs.disconnect();
       window.removeEventListener('resize', onResize);
-      window.removeEventListener('focus', paintFocusHint); window.removeEventListener('blur', paintFocusHint);
+      veil.destroy(); document.removeEventListener('fullscreenchange', onFullChange);
       document.removeEventListener('keydown', onKey); document.removeEventListener('keyup', onKeyUp);
       if (sheetView && sheetView.gw) sheetView.gw.removeEventListener('scroll', onSheetScroll);
       if (sheetView) sheetView.destroy(); if (ribbonView) ribbonView.destroy(); if (sheetTabs) sheetTabs.destroy();
