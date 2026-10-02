@@ -20,6 +20,7 @@ import { buttonHtml } from '../ui/components/table.js';
 import { planDetails, openPortal, planDate } from './billing.js';
 import { parseDeskCode, joinHref } from './desks.js';
 import { entitlement } from './entitlement.js';
+import { consentHtml } from '../ui/components/consent.js';
 
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const SECTIONS = ['stats', 'profile', 'data', 'billing'];
@@ -108,7 +109,8 @@ export function mountAccountPage(root, ctx = {}) {
             <button class="btn btn-ghost" type="button" id="googleBtn"${unavailable || busy ? ' disabled' : ''}>Google</button>
           </div>
           ${unavailable ? `<p class="form-msg" role="status">${esc(siteCopy('acct_unavailable', 'Sign-in is not configured.'))}</p>` : ''}
-          ${tab === 'signup' ? `<p class="fine">${esc(siteCopy('acct_signup_fine', 'You pick a handle right after, and one is suggested. Minimum age 13.'))}</p>` : ''}
+          ${tab === 'signup' ? `<p class="fine">${esc(siteCopy('acct_signup_fine', 'You pick a handle right after, and one is suggested.'))}</p>` : ''}
+          ${consentHtml('account')}
         </form>`;
     return `<section class="panel acct-panel" id="sec-profile">
           <div class="panel-head"><h2 class="panel-h">${esc(siteCopy('acct_keep_head', 'Keep your progress across devices.'))}</h2></div>
@@ -177,6 +179,7 @@ export function mountAccountPage(root, ctx = {}) {
   function deleteConfirmHtml() {
     return `<div class="acct-form acct-delete" role="group" aria-labelledby="delTitle">
         <p id="delTitle"><b>${esc(siteCopy('acct_delete_head', 'Delete your account for good.'))}</b> ${esc(siteCopy('acct_delete_line', 'Profile, attempts, bests and board entries go, and it cannot be undone. Type {word} to confirm.')).replace('{word}', `<kbd>${esc(deleteWord())}</kbd>`)}</p>
+        ${plan && plan.kind === 'subscription' && plan.renews ? `<p class="form-msg form-err" id="deleteSubNote" role="status">${esc(siteCopy('account_delete_sub', 'Your subscription still renews. Deleting the account does not stop it, so cancel it first under Plan and billing.'))}</p>` : ''}
         <label>${esc(siteCopy('acct_confirm', 'Confirm'))}<input id="deleteWordInput" type="text" autocomplete="off" spellcheck="false" autocapitalize="off"></label>
         <p class="form-msg form-err" id="deleteMsg" role="alert"></p>
         <div class="data-actions">

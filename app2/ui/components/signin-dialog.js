@@ -8,6 +8,7 @@ import { siteCopy } from '../../content/copy/apply.js';
 import { auth } from '../../app/auth.js';
 import { buttonHtml } from './table.js';
 import { esc, fill } from './format.js';
+import { consentHtml } from './consent.js';
 
 const t = (k, fb) => siteCopy(k, fb);
 const EMAIL_RX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -34,7 +35,7 @@ export function openSigninDialog({ heading = t('signin_head', 'Sign in or make a
         <div class="btn-row">${buttonHtml({ label: t('checkout_verify', 'Continue'), key: 'Enter', primary: true, attrs: { type: 'submit', disabled: state.busy } })}${buttonHtml({ label: t('checkout_other_email', 'Use another email'), quiet: true, id: 'sdBack' })}</div></form>`
       : `<form class="co-form" id="sdEmailForm" novalidate><label class="label" for="sdEmail">${esc(t('checkout_email', 'Email'))}</label>
         <input class="input" id="sdEmail" type="email" autocomplete="email" value="${esc(state.email)}" required>${err}
-        <div class="btn-row">${buttonHtml({ label: t('checkout_send_code', 'Send code'), key: 'Enter', primary: true, attrs: { type: 'submit', disabled: state.busy } })}${buttonHtml({ label: t('signin_google', 'Continue with Google'), id: 'sdGoogle' })}</div></form>`;
+        <div class="btn-row">${buttonHtml({ label: t('checkout_send_code', 'Send code'), key: 'Enter', primary: true, attrs: { type: 'submit', disabled: state.busy } })}${buttonHtml({ label: t('signin_google', 'Continue with Google'), id: 'sdGoogle' })}</div>${consentHtml('account')}</form>`;
     el.innerHTML = `<section class="panel pop-card"><div class="panel-head"><h2 class="panel-h">${esc(heading)}</h2>${buttonHtml({ label: t('paywall_not_now', 'Not now'), key: 'Esc', quiet: true, id: 'sdClose' })}</div>
       ${line ? `<p class="panel-line">${esc(line)}</p>` : ''}${form}<p class="fine">${esc(t('signin_fine', ''))}</p></section>`;
     el.querySelector('#sdClose').onclick = () => close();

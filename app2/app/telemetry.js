@@ -16,14 +16,17 @@ export const EVENTS = ['landing_view', 'lesson_start', 'lesson_complete', 'lesso
   'pricing_view', 'checkout_view', 'checkout_signin', 'checkout_start', 'checkout_unlocked', 'checkout_timeout', 'cancel_click', 'course_complete_email'];
 export const EVENT_NAME_RE = /^[a-z_]{1,40}$/;
 
-const SESSION_KEY = 'hk2_session';
-
-/** One key per browser session (sessionStorage), for the rate cap and funnel stitching. */
+/**
+ * One random key per page load, held in memory only, for the rate cap and funnel stitching. It is
+ * never written to the device (liability checklist, R9): with no analytics storage, everything the
+ * site keeps in the browser is what the product needs to work, so no cookie banner is required.
+ * A reload starts a new key. Null where there is no crypto (Node without a global), never a throw.
+ */
+let pageKey = null;
 export function sessionKey() {
   try {
-    let k = sessionStorage.getItem(SESSION_KEY);
-    if (!k) { k = crypto.randomUUID(); sessionStorage.setItem(SESSION_KEY, k); }
-    return k;
+    if (!pageKey && globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') pageKey = globalThis.crypto.randomUUID();
+    return pageKey;
   } catch (e) { return null; }
 }
 
