@@ -82,21 +82,21 @@ select lives_ok($p$select public.rpc_record_attempt(jsonb_build_object('id', pg_
 reset role;
 select is((select count(*) from public.attempts where user_id = pg_temp.uid(1)), 1::bigint, 'same id twice stores one attempt');
 select is((select completions from public.lesson_progress where user_id = pg_temp.uid(1) and lesson_id = 'active-cell'), 1, 'and one completion');
-select is((select xp from public.profiles where id = pg_temp.uid(1)), 100, 'clean first completion pays 100 XP');
-select is((select level from public.profiles where id = pg_temp.uid(1)), 2, 'level follows 1 + floor(sqrt(xp/100))');
+select is((select xp from public.profiles where id = pg_temp.uid(1)), 50, 'a first completion pays 50 XP (screenplay 6.10; 0016)');
+select is((select level from public.profiles where id = pg_temp.uid(1)), 1, 'level follows the 6.10 curve: level 2 begins at 150 (0016)');
 
 -- ================================================= assisted first completion: 60 flat (0008 — no withheld debt)
 set local role authenticated;
 select pg_temp.actor(1);
 select lives_ok($p$select public.rpc_record_attempt(jsonb_build_object('id', pg_temp.att(2), 'lesson_id', 'moving-around', 'mode', 'guided', 'secs', 40, 'assisted', true))$p$, 'assisted completion records');
 reset role;
-select is((select xp from public.profiles where id = pg_temp.uid(1)), 160, 'assisted first completion pays 60');
+select is((select xp from public.profiles where id = pg_temp.uid(1)), 100, 'an assisted first completion pays 50 as well (0016)');
 select is((select xp_pending from public.lesson_progress where user_id = pg_temp.uid(1) and lesson_id = 'moving-around'), 0, 'no debt is written: xp_pending stays zero');
 set local role authenticated;
 select pg_temp.actor(1);
 select lives_ok($p$select public.rpc_record_attempt(jsonb_build_object('id', pg_temp.att(3), 'lesson_id', 'moving-around', 'mode', 'solo', 'secs', 33))$p$, 'clean solo records');
 reset role;
-select is((select xp from public.profiles where id = pg_temp.uid(1)), 170, 'the clean solo is a paid repeat: 10, not a 40 top-up');
+select is((select xp from public.profiles where id = pg_temp.uid(1)), 100, 'a repeat pays nothing, and no 40 top-up (0016)');
 select is((select xp_pending from public.lesson_progress where user_id = pg_temp.uid(1) and lesson_id = 'moving-around'), 0, 'nothing left pending');
 
 -- ================================================= timed runs: help or mouse means no best

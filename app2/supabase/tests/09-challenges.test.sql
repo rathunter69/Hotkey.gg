@@ -110,20 +110,20 @@ set local role authenticated;
 select pg_temp.actor(1);
 select lives_ok($p$select public.rpc_record_attempt(jsonb_build_object('id', pg_temp.att(70), 'lesson_id', 'inherited-workbook', 'mode', 'guided', 'secs', 90, 'assisted', true))$p$, 'assisted first completion records');
 reset role;
-select is((select xp from public.profiles where id = pg_temp.uid(1)), 60, 'assisted first completion pays 60 flat');
+select is((select xp from public.profiles where id = pg_temp.uid(1)), 140, 'an assisted first completion pays 50 flat (0016), over the 90 its earlier runs paid');
 select is((select xp_pending from public.lesson_progress where user_id = pg_temp.uid(1) and lesson_id = 'inherited-workbook'), 0, 'nothing is withheld');
 set local role authenticated;
 select pg_temp.actor(1);
 select lives_ok($p$select public.rpc_record_attempt(jsonb_build_object('id', pg_temp.att(71), 'lesson_id', 'inherited-workbook', 'mode', 'guided', 'secs', 60))$p$, 'a later clean completion records');
 reset role;
-select is((select xp from public.profiles where id = pg_temp.uid(1)), 70, 'the repeat pays 10 — no 40 debt appears');
+select is((select xp from public.profiles where id = pg_temp.uid(1)), 140, 'the repeat pays nothing (0016), and no 40 debt appears');
 select is((select xp_pending from public.lesson_progress where user_id = pg_temp.uid(1) and lesson_id = 'inherited-workbook'), 0, 'xp_pending stays zero');
 -- an unassisted first completion still pays 100
 set local role authenticated;
 select pg_temp.actor(2);
 select lives_ok($p$select public.rpc_record_attempt(jsonb_build_object('id', pg_temp.att(72), 'lesson_id', 'jump-dont-scroll', 'mode', 'guided', 'secs', 70))$p$, 'clean first completion records');
 reset role;
-select is((select xp from public.profiles where id = pg_temp.uid(2)), 100, 'a clean first completion still pays 100');
+select is((select xp from public.profiles where id = pg_temp.uid(2)), 175, 'a clean first completion pays 50 (0016), over the 125 its challenge runs paid');
 
 select * from finish();
 rollback;

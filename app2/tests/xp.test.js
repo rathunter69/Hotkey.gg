@@ -81,3 +81,21 @@ test('M10: one XP story. Every line that says where XP comes from names every ru
     assert.ok(!/achievement/.test(line), `${key}: achievements pay nothing, so the story leaves them out`);
   }
 });
+
+test('the database pays the same table: 0016 xp_run_amount, the day caps and the curve agree with XP_TABLE and levels.js', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { DAY_CAPS } = await import('../app/xp.js');
+  const sql = readFileSync(new URL('../supabase/migrations/0016_xp_amounts.sql', import.meta.url), 'utf8');
+  const amount = k => Number((new RegExp(`when '${k}' then (\\d+)`).exec(sql) || [])[1]);
+  assert.equal(amount('lesson'), XP_TABLE.lesson);
+  assert.equal(amount('drill-first'), XP_TABLE.drillFirstClean);
+  assert.equal(amount('drill-repeat'), XP_TABLE.drillRepeat);
+  assert.equal(amount('challenge'), XP_TABLE.challenge);
+  assert.equal(amount('challenge-expert'), XP_TABLE.challengeExpert);
+  assert.equal(amount('challenge-legendary'), XP_TABLE.challengeLegendary);
+  assert.equal(amount('daily'), XP_TABLE.daily);
+  assert.equal(amount('rapid'), XP_TABLE.rapid);
+  assert.match(sql, /while n < 30 and x >= 75::bigint \* \(n \+ 1\) \* n loop/, 'level n begins at 75 n (n - 1), capped at 30, as levels.js');
+  const caps = Object.fromEntries([...sql.matchAll(/if n < (\d+) then xp := public\.xp_run_amount\('(drill-repeat|rapid)'\)/g)].map(m => [m[2], Number(m[1])]));
+  assert.deepEqual(caps, DAY_CAPS);
+});
