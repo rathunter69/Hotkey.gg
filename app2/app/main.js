@@ -172,6 +172,7 @@ const LOADERS = {
   pricing: { file: './pricing-page.js', pick: m => m.mountPricingPage },
   teams: { file: './teams-page.js', pick: m => m.mountTeamsPage },
   account: { file: './account-page.js', pick: m => m.mountAccountPage },
+  profile: { file: './profile-page.js', pick: m => m.mountProfilePage },   // #/account (profile, certificate): the band, the shelf, the level titles; the certificate as progress
   checkout: { file: './checkout-page.js', pick: m => m.mountCheckoutPage },   // Phase E: the embedded form, behind the payments flag
   about: { file: './legal-pages.js', pick: m => m.mountAboutPage },
   terms: { file: './legal-pages.js', pick: m => r => m.mountLegalPage(r, 'terms') },
@@ -358,7 +359,8 @@ export function startApp({ navEl, rootEl, footEl }) {
     // the workspace routes need a keyboard and width; below the breakpoint show the notice instead
     if ((name === 'lesson' || name === 'drill' || name === 'rapid' || name === 'due') && narrowMq && narrowMq.matches) { current = narrowNotice(rootEl, lesson, content); return; }
 
-    const entry = (name === 'account' && r.query.section === 'settings' ? LOADERS.settings : LOADERS[name]) || LOADERS.notfound;
+    const sec = name === 'account' ? (r.query.section || 'profile') : '';
+    const entry = (sec === 'settings' ? LOADERS.settings : sec === 'profile' || sec === 'certificate' ? LOADERS.profile : LOADERS[name]) || LOADERS.notfound;
     let mount;
     // a page module that is not in hand within 50 ms gets the page's shape painted meanwhile (C2)
     const skel = setTimeout(() => { if (myGen === gen && !rootEl.firstChild) rootEl.innerHTML = skeletonHtml(name); }, 50);

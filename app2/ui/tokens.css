@@ -62,7 +62,7 @@
   /* the site pages' parts (M89, M104): goal segments, the level and field bars, tier marks, badge tiles, the sheet preview, a table row */
   --seg-w:24px; --seg-h:5px; --bar-h:6px; --field-bar-w:200px; --tier-mark:9px; --badge-tile:48px; --preview-h:300px; --sp-row:17px; --row-h:36px; --level-tile:40px;
   /* the path (Learn, the drill catalog): a lesson's node, the node where the learner is, the line between them, a module's key, a lesson row's status column */
-  --set-len-w:56px;
+  --set-len-w:56px; --prof-lvl:72px; --ach-art:48px; --cert-bar-w:120px; --cert-n:28px;
   --pn:14px; --pn-now:20px; --pn-gap:14px; --mod-n-w:48px; --ls-st-w:96px; --lc-n-w:64px;
 
   /* ---------- durations (3.0, Motion and moments) ---------- */

@@ -11,6 +11,8 @@ export const RIBBON_WORDS = [
 
 export const SITE_KEYS = [
   // the interface match (2026-10-02)
+  'ach_hidden_name', 'ach_hidden_desc', 'rarity_common', 'rarity_rare', 'rarity_epic', 'rarity_legendary', 'profile_guest', 'profile_lessons', 'profile_drills_pass', 'profile_dailies', 'profile_best_daily', 'col_level', 'col_title', 'col_reward', 'profile_levels', 'profile_you_are', 'profile_levels_line', 'profile_account_link', 'cert_next_done', 'cert_next_writing', 'cert_next_assess', 'cert_next_lessons', 'cert_next_lessons_one', 'cert_issued', 'cert_not_yet', 'cert_awarded_to', 'cert_you', 'cert_issued_at', 'cert_see', 'cert_verified_time', 'cert_verified', 'cert_ready', 'cert_lessons', 'cert_next_k', 'cert_go', 'cert_earn_head', 'cert_earn_1', 'cert_earn_2', 'cert_earn_3', 'cert_how',
+  // the interface match (2026-10-02)
   'rapid_len_short_30', 'rapid_len_short_60', 'rapid_len_short_120', 'col_command', 'col_keys_press',
   // the interface match (2026-10-02)
   'home_tour',

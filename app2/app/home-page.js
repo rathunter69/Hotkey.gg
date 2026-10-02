@@ -27,6 +27,7 @@ import { sheetPreviewHtml, previewOfLesson } from '../ui/components/sheet-previe
 import { entitlement } from './entitlement.js';
 import { routeKeys, moduleRowHtml, continueHtml } from '../ui/components/path.js';
 import { saveNudgeHtml, wireSaveNudge } from '../ui/components/nudge.js';
+import { courseNow, certTeaserHtml } from '../ui/components/certificate.js';
 
 const t = (key, vars) => fill(siteCopy(key, key), vars);
 /** Retired lessons never come up as next. */
@@ -145,7 +146,7 @@ export function mountHomePage(root, ctx = {}) {
       ${ach.next ? `<div class="ach-next" data-cursor tabindex="-1" data-href="#/account?section=profile"><div class="row-line"><span class="row-name">${esc(t('home_ach_next', { badge: ach.next.def.name }))}</span><span class="panel-facts">${esc(t('home_count_of', { n: ach.next.prog, m: ach.next.goal }))}</span></div><span class="row-sub">${esc(ach.next.def.desc)}</span>${barHtml(100 * ach.next.prog / ach.next.goal, 'bar-ach')}</div>` : ''}`, cls: 'home-ach', stretch: true });
 
   const nudge = completedN >= 1 ? saveNudgeHtml() : '';
-  el.innerHTML = `<div class="pg-two"><div class="pg-main">${nextPanel}${chapterPanel}</div><div class="pg-side">${nudge}${levelPanel}${todayPanel}${achPanel}</div></div>`;
+  el.innerHTML = `<div class="pg-two"><div class="pg-main">${nextPanel}${chapterPanel}</div><div class="pg-side">${nudge}${levelPanel}${todayPanel}${achPanel}${certTeaserHtml(courseNow())}</div></div>`;
   wireSaveNudge(el);
   root.appendChild(el);
   const unwire = wireRows(el);

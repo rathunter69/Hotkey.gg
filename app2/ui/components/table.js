@@ -25,7 +25,7 @@ export function panelHtml({ heading = '', facts = '', body = '', mode = '', cls 
 
 export const colLetter = i => { let s = ''; i += 1; while (i > 0) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
 
-export function tableHtml({ columns = [], rows = [], head = true, cls = '', label = '', sheet = false } = {}) {
+export function tableHtml({ columns = [], rows = [], head = true, cls = '', label = '', sheet = false, fill = 0 } = {}) {
   const col = c => `${c.align === 'right' ? ' class="num"' : c.align === 'center' ? ' class="mid"' : ''}`;
   if (sheet) {
     const letters = `<thead><tr class="sh-letters"><th class="sh-corner" aria-hidden="true"></th>${columns.map((c, i) => `<th class="sh-col${c.align === 'right' ? ' num' : ''}"${c.cls ? ` data-col="${esc(c.cls)}"` : ''} aria-hidden="true">${colLetter(i)}</th>`).join('')}</tr></thead>`;
@@ -39,7 +39,9 @@ export function tableHtml({ columns = [], rows = [], head = true, cls = '', labe
       if (r.enter) a['data-cursor-enter'] = r.enter;
       return `<tr class="${esc(r.cls || '')}"${attrsOf(a)}><td class="sh-row" aria-hidden="true">${k + first}</td>${tds}</tr>`;
     }).join('');
-    return `<table class="tbl tbl-sheet ${esc(cls)}"${label ? ` aria-label="${esc(label)}"` : ''}>${letters}<tbody>${labels}${body}</tbody></table>`;
+    // fill: blank gridded rows to that many, so a short board still reads as a sheet waiting for its rows
+    const blanks = Array.from({ length: Math.max(0, fill - rows.length) }, (_, k) => `<tr class="sh-blank" aria-hidden="true"><td class="sh-row">${rows.length + k + first}</td>${columns.map(() => '<td></td>').join('')}</tr>`).join('');
+    return `<table class="tbl tbl-sheet ${esc(cls)}"${label ? ` aria-label="${esc(label)}"` : ''}>${letters}<tbody>${labels}${body}${blanks}</tbody></table>`;
   }
   const thead = head && columns.some(c => c.label) ? `<thead><tr>${columns.map(c => `<th${col(c)}${c.cls ? ` data-col="${esc(c.cls)}"` : ''}>${c.label || ''}</th>`).join('')}</tr></thead>` : '';
   const body = rows.map(r => {
