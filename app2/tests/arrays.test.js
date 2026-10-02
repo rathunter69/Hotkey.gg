@@ -84,3 +84,29 @@ test('the Chapter 2 to 6 functions: RRI, REPLACE, QUARTILE.INC, PERCENTILE.INC, 
   assert.equal(ev('=ISFORMULA(D1)'), true); assert.equal(ev('=ISFORMULA(D2)'), false); assert.equal(ev('=ISFORMULA(5)'), '#VALUE!');
   assert.equal(ev('=MEDIAN(D1:D5)'), 7, 'MEDIAN skips text and blanks (M81)');
 });
+
+test('more Chapter 2 to 6 functions, against Excel\'s documented answers: NETWORKDAYS.INTL, DATEDIF, RATE, NPER, ADDRESS', () => {
+  const S = new Sheet({ cells: { K12: { value: 38719 }, K13: { value: 38733 } } });   // 2006-01-02 and 2006-01-16
+  const e = f => ev(f, S);
+  assert.equal(e('=NETWORKDAYS.INTL(DATE(2006,1,1),DATE(2006,1,31))'), 22);
+  assert.equal(e('=NETWORKDAYS.INTL(DATE(2006,2,28),DATE(2006,1,31))'), -21);
+  assert.equal(e('=NETWORKDAYS.INTL(DATE(2006,1,1),DATE(2006,2,1),7,K12:K13)'), 22);
+  assert.equal(e('=NETWORKDAYS.INTL(DATE(2006,1,1),DATE(2006,2,1),"0010001",K12:K13)'), 20);
+  assert.equal(e('=NETWORKDAYS.INTL(DATE(2006,1,1),DATE(2006,1,31),"0000000",K12:K13)'), 29, 'a seven-day trading week less the holidays (script 3)');
+  assert.equal(e('=NETWORKDAYS.INTL(DATE(2006,1,1),DATE(2006,1,31),11)'), 26, 'Sunday only');
+  assert.equal(e('=NETWORKDAYS.INTL(1,2,"1111111")'), '#VALUE!'); assert.equal(e('=NETWORKDAYS.INTL(1,2,9)'), '#NUM!');
+  assert.equal(e('=DATEDIF(DATE(2001,1,1),DATE(2003,1,1),"Y")'), 2);
+  assert.equal(e('=DATEDIF(DATE(2001,6,1),DATE(2002,8,15),"D")'), 440);
+  assert.equal(e('=DATEDIF(DATE(2001,6,1),DATE(2002,8,15),"YD")'), 75);
+  assert.equal(e('=DATEDIF(DATE(2001,6,1),DATE(2002,8,15),"MD")'), 14);
+  assert.equal(e('=DATEDIF(DATE(2001,6,1),DATE(2002,8,15),"M")'), 14); assert.equal(e('=DATEDIF(DATE(2001,6,1),DATE(2002,8,15),"YM")'), 2);
+  assert.equal(e('=DATEDIF(DATE(2003,1,1),DATE(2001,1,1),"Y")'), '#NUM!');
+  assert.ok(Math.abs(e('=RATE(48,-200,8000)') - 0.00770147248820165) < 1e-12);
+  assert.ok(Math.abs(e('=RATE(5,0,-100,200)') - e('=RRI(5,100,200)')) < 1e-12, 'RATE on two points agrees with RRI');
+  assert.ok(Math.abs(e('=NPER(0.12/12,-100,-1000,10000,1)') - 59.6738656742946) < 1e-9);
+  assert.ok(Math.abs(e('=NPER(0.12/12,-100,-1000,10000)') - 60.0821228537617) < 1e-9);
+  assert.ok(Math.abs(e('=NPER(0.12/12,-100,-1000)') - -9.57859403981306) < 1e-9);
+  assert.equal(e('=ADDRESS(2,3)'), '$C$2'); assert.equal(e('=ADDRESS(2,3,2)'), 'C$2'); assert.equal(e('=ADDRESS(2,3,2,FALSE)'), 'R2C[3]');
+  assert.equal(e('=ADDRESS(2,3,1,FALSE,"[Book1]Sheet1")'), "'[Book1]Sheet1'!R2C3"); assert.equal(e('=ADDRESS(2,3,1,FALSE,"EXCEL SHEET")'), "'EXCEL SHEET'!R2C3");
+  assert.equal(e('=ADDRESS(5,28,4,TRUE,"Inputs")'), 'Inputs!AB5'); assert.equal(e('=ADDRESS(0,1)'), '#VALUE!');
+});

@@ -149,14 +149,16 @@ const MIN_ARGS = { SUM: 1, MAX: 1, MIN: 1, ABS: 1, SIGN: 1, INT: 1, TRUNC: 1, AV
   ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, ISFORMULA: 1, HYPERLINK: 1, MATCH: 2, INDEX: 2, VLOOKUP: 3, HLOOKUP: 3, XLOOKUP: 3, OFFSET: 3, ROWS: 1, COLUMNS: 1, LEN: 1, LEFT: 1, RIGHT: 1, MID: 3,
   FIND: 2, SEARCH: 2, TRIM: 1, UPPER: 1, LOWER: 1, PROPER: 1, CONCATENATE: 1, CONCAT: 1, TEXTJOIN: 3, SUBSTITUTE: 3, REPT: 2, EXACT: 2, VALUE: 1, TEXT: 2, T: 1, N: 1,
   DATE: 3, YEAR: 1, MONTH: 1, DAY: 1, WEEKDAY: 1, DAYS: 2, EDATE: 2, EOMONTH: 2, YEARFRAC: 2, NPV: 2, IRR: 1, PMT: 3, PV: 3, FV: 3,
-  REPLACE: 4, RRI: 3, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, ISFORMULA: 1, FILTER: 2, SORT: 1, UNIQUE: 1, SEQUENCE: 1, TRANSPOSE: 1, XMATCH: 2 };
+  REPLACE: 4, RRI: 3, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, ISFORMULA: 1, FILTER: 2, SORT: 1, UNIQUE: 1, SEQUENCE: 1, TRANSPOSE: 1, XMATCH: 2,
+  'NETWORKDAYS.INTL': 2, DATEDIF: 3, RATE: 3, NPER: 3, ADDRESS: 2 };
 const MAX_ARGS = { ABS: 1, SIGN: 1, INT: 1, TRUNC: 2, COUNTBLANK: 1, ROUND: 2, ROUNDUP: 2, ROUNDDOWN: 2, MOD: 2, SQRT: 1, POWER: 2, EXP: 1, LN: 1, LOG: 2, LOG10: 1, PI: 0, RAND: 0,
   LARGE: 2, SMALL: 2, RANK: 3, 'RANK.EQ': 3, SUMIF: 3, COUNTIF: 2, AVERAGEIF: 3, NOT: 1, TRUE: 0, FALSE: 0, NA: 0,
   IF: 3, IFERROR: 2, IFNA: 2, ISERROR: 1, ISERR: 1, ISNA: 1, ISBLANK: 1, ISNUMBER: 1, ISTEXT: 1, ISNONTEXT: 1, ISLOGICAL: 1, ISFORMULA: 1, HYPERLINK: 2,
   MATCH: 3, INDEX: 4, VLOOKUP: 4, HLOOKUP: 4, XLOOKUP: 6, OFFSET: 5, ROWS: 1, COLUMNS: 1, ROW: 1, COLUMN: 1, LEN: 1, LEFT: 2, RIGHT: 2, MID: 3,
   FIND: 3, SEARCH: 3, TRIM: 1, UPPER: 1, LOWER: 1, PROPER: 1, SUBSTITUTE: 4, REPT: 2, EXACT: 2, VALUE: 1, TEXT: 2, T: 1, N: 1,
   TODAY: 0, DATE: 3, YEAR: 1, MONTH: 1, DAY: 1, WEEKDAY: 2, DAYS: 2, EDATE: 2, EOMONTH: 2, YEARFRAC: 3, IRR: 2, PMT: 5, PV: 5, FV: 5,
-  REPLACE: 4, RRI: 3, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, ISFORMULA: 1, FILTER: 3, SORT: 4, UNIQUE: 3, SEQUENCE: 4, TRANSPOSE: 1, XMATCH: 4 };
+  REPLACE: 4, RRI: 3, QUARTILE: 2, 'QUARTILE.INC': 2, PERCENTILE: 2, 'PERCENTILE.INC': 2, ISFORMULA: 1, FILTER: 3, SORT: 4, UNIQUE: 3, SEQUENCE: 4, TRANSPOSE: 1, XMATCH: 4,
+  'NETWORKDAYS.INTL': 4, DATEDIF: 3, RATE: 6, NPER: 5, ADDRESS: 5 };
 /**
  * The scalar functions Excel 365 lifts over a multi-cell argument, one call per cell, giving an
  * array: ABS(A1:A5) inside SUMPRODUCT, ROUND(B2:B9,0), LEN(A2:A9), TEXT(dates,"mmm"). The aggregates,
@@ -1029,6 +1031,47 @@ export function evalFormula(expr, ctx = {}) {
         if (r === 0) return -(pmt * np + fv); const q = Math.pow(1 + r, np); return -(fv + pmt * (1 + r * type) * (q - 1) / r) / q; }
       case 'FV': { const r = toNum(args[0]), np = toNum(args[1]), pmt = toNum(args[2]), pv = has(args, 3) ? toNum(args[3]) : 0, type = has(args, 4) ? toNum(args[4]) : 0;
         if (r === 0) return -(pv + pmt * np); const q = Math.pow(1 + r, np); return -(pv * q + pmt * (1 + r * type) * (q - 1) / r); }
+      case 'NETWORKDAYS.INTL': {   // the working days from start to end, both counted: weekend 1..7 (a pair from Sat/Sun), 11..17 (one day from Sunday), or a "0000011" mask Monday first; the holidays come off when they are working days in the span
+        const a = Math.floor(toNum(args[0])), b = Math.floor(toNum(args[1])); if (a < 0 || b < 0) throw err('#NUM!');
+        let off = [false, false, false, false, false, true, true];   // by Monday-first index 0..6
+        if (has(args, 2)) { const w = deref(args[2]);
+          if (typeof w === 'string') { if (!/^[01]{7}$/.test(w)) throw err('#VALUE!'); if (w === '1111111') throw err('#VALUE!'); off = w.split('').map(x => x === '1'); }
+          else { const n = toInt(w); off = [0, 0, 0, 0, 0, 0, 0].map(() => false);
+            if (n >= 1 && n <= 7) { off[(n + 4) % 7] = true; off[(n + 5) % 7] = true; } else if (n >= 11 && n <= 17) off[(n - 11 + 6) % 7] = true; else throw err('#NUM!'); } }
+        const isOff = sr => off[(ymd(sr).wd + 6) % 7];
+        const lo = Math.min(a, b), hi = Math.max(a, b); let n = 0;
+        const full = Math.floor((hi - lo + 1) / 7); n += full * off.filter(x => !x).length;
+        for (let d = lo + full * 7; d <= hi; d++) if (!isOff(d)) n++;
+        if (has(args, 3)) { const hs = new Set(collectNums([args[3]]).map(Math.floor)); for (const h of hs) if (h >= lo && h <= hi && !isOff(h)) n--; }
+        return a <= b ? n : -n; }
+      case 'DATEDIF': {   // the whole years, months or days between two dates; MD, YM and YD ignore the larger units
+        const a = Math.floor(toNum(args[0])), b = Math.floor(toNum(args[1])); if (a > b) throw err('#NUM!');
+        const A = ymd(a), B = ymd(b); const u = toText(args[2]).toUpperCase();
+        let months = (B.y - A.y) * 12 + (B.m - A.m); if (B.d < A.d) months--;
+        if (u === 'D') return b - a;
+        if (u === 'M') return months;
+        if (u === 'Y') return Math.floor(months / 12);
+        if (u === 'YM') return ((months % 12) + 12) % 12;
+        if (u === 'MD') { if (B.d >= A.d) return B.d - A.d; const prevLast = new Date(Date.UTC(B.y, B.m - 1, 0)).getUTCDate(); return prevLast - A.d + B.d; }
+        if (u === 'YD') { let y = B.y; let st = serial(y, A.m, A.d); if (st > b) st = serial(y - 1, A.m, A.d); return b - st; }
+        throw err('#NUM!'); }
+      case 'RATE': {   // the rate per period, by Newton's method from the guess (10%): 20 tries to agree to 1e-7, else #NUM!
+        const np = toNum(args[0]), pmt = toNum(args[1]), pv = toNum(args[2]), fv = has(args, 3) ? toNum(args[3]) : 0, type = has(args, 4) ? toNum(args[4]) : 0;
+        let r = has(args, 5) ? toNum(args[5]) : 0.1; if (np <= 0) throw err('#NUM!');
+        const f = x => x === 0 ? pv + pmt * np + fv : pv * Math.pow(1 + x, np) + pmt * (1 + x * type) * (Math.pow(1 + x, np) - 1) / x + fv;
+        for (let i = 0; i < 100; i++) { const y = f(r), h = 1e-7 * Math.max(1, Math.abs(r)); const d = (f(r + h) - f(r - h)) / (2 * h); if (!isFinite(y) || !isFinite(d) || d === 0) break;
+          const nr = r - y / d; if (Math.abs(nr - r) < 1e-10) return num15(nr); r = nr; if (r <= -1) break; }
+        throw err('#NUM!'); }
+      case 'NPER': { const r = toNum(args[0]), pmt = toNum(args[1]), pv = toNum(args[2]), fv = has(args, 3) ? toNum(args[3]) : 0, type = has(args, 4) ? toNum(args[4]) : 0;
+        if (r === 0) { if (pmt === 0) throw err('#NUM!'); return -(pv + fv) / pmt; }
+        const k = pmt * (1 + r * type); const x = (k - fv * r) / (k + pv * r); if (!(x > 0) || r <= -1) throw err('#NUM!'); return Math.log(x) / Math.log(1 + r); }
+      case 'ADDRESS': {   // the address as text: abs_num 1 $A$1, 2 A$1, 3 $A1, 4 A1; a1 FALSE gives R1C1 (relative parts in brackets); a sheet name goes in front, quoted when it needs it
+        const r = toInt(args[0]), c = toInt(args[1]); const abs = has(args, 2) ? toInt(args[2]) : 1; const a1 = has(args, 3) ? toBool(deref(args[3])) : true;
+        if (r < 1 || c < 1 || r > 1048576 || c > 16384 || abs < 1 || abs > 4) throw err('#VALUE!');
+        const ar = abs === 1 || abs === 2, ac = abs === 1 || abs === 3;
+        const t = a1 ? (ac ? '$' : '') + colLetter(c) + (ar ? '$' : '') + r : 'R' + (ar ? r : '[' + r + ']') + 'C' + (ac ? c : '[' + c + ']');
+        if (!has(args, 4)) return t; const sh = toText(args[4]); if (sh === '') return '!' + t;
+        return (/^[A-Za-z_][A-Za-z0-9_.]*$/.test(sh) ? sh : "'" + sh.replace(/'/g, "''") + "'") + '!' + t; }
       default: throw err('#NAME?');
     }
   }
@@ -1121,7 +1164,8 @@ export const FUNCTION_NAMES = ['ABS', 'AND', 'AVERAGE', 'AVERAGEIF', 'AVERAGEIFS
   'POWER', 'PRODUCT', 'PROPER', 'PV', 'RAND', 'RANK', 'RANK.EQ', 'REPT', 'RIGHT', 'ROUND', 'ROUNDDOWN', 'ROUNDUP', 'ROW', 'ROWS', 'SEARCH', 'SIGN',
   'SMALL', 'SQRT', 'SUBSTITUTE', 'SUM', 'SUMIF', 'SUMIFS', 'SUMPRODUCT', 'SWITCH', 'T', 'TEXT', 'TEXTJOIN', 'TODAY', 'TRIM', 'TRUE', 'TRUNC', 'UPPER',
   'VALUE', 'VLOOKUP', 'WEEKDAY', 'XLOOKUP', 'XOR', 'YEAR', 'YEARFRAC',
-  'FILTER', 'ISFORMULA', 'PERCENTILE', 'PERCENTILE.INC', 'QUARTILE', 'QUARTILE.INC', 'REPLACE', 'RRI', 'SEQUENCE', 'SORT', 'TRANSPOSE', 'UNIQUE', 'XMATCH'];
+  'FILTER', 'ISFORMULA', 'PERCENTILE', 'PERCENTILE.INC', 'QUARTILE', 'QUARTILE.INC', 'REPLACE', 'RRI', 'SEQUENCE', 'SORT', 'TRANSPOSE', 'UNIQUE', 'XMATCH',
+  'NETWORKDAYS.INTL', 'DATEDIF', 'RATE', 'NPER', 'ADDRESS'];
 /**
  * The functions Formula AutoComplete lists (M83): desktop Excel's catalogue, so =AV offers AVEDEV
  * first as Excel's list does; the evaluator's own set plus the common ones it does not compute.
