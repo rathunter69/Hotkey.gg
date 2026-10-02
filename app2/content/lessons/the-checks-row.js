@@ -58,7 +58,7 @@ export default {
   wow: 'Three live differences read zero, so the page now proves itself.',
   goals: [
     { id: 'labels', text: 'Head a Checks block under the week summary: Checks in A33, bold, then the three check labels in A34:A36 as one Enter-and-↓ run.',
-      teach: 'The labels are Report revenue ties to the feed, Sites sum to the total, and Margin within 0-100%. A check has a name that says what it compares.',
+      teach: 'The labels are "Report revenue ties to the feed", "Sites sum to the total" and "Margin within 0-100%". A check has a name that says what it compares.',
       hintStuck: 'pulse cell A33 · A33, Ctrl+B, type, Enter, ↓; then each label.',
       keys: `Ctrl+End Home ↓ ×2 Ctrl+B "Checks" ↵ ${LABEL_RUN}`, requires: ['type-to-enter', 'bold-italic-underline', 'ctrl-home-end', 'home-key', 'arrow-keys'],
       check: (s, ses) => { const rep = report(ses); return !!rep && labelsIn(rep) && settled(ses); } },

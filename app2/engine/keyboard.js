@@ -229,6 +229,7 @@ export class Session {
     this._clip = null;  // the workbook's one clipboard (every sheet reads and writes it: wireSheet)
     this._repeat = null;   // what F4 repeats (C2 gap 10), workbook-wide like the clipboard
     this.pageRows = 0; this.pageCols = 0;   // a screenful for PageDown / Alt+PageDown — the view sets them; 0 = 10
+    this.pageJump = null;   // PgDn / PgUp leave the rows they moved here: the view scrolls the window by as many (sheet-view pageScroll)
     this.settings = makeSettings(this);
     this.dialogBuf = '';     // Go To's Reference field
     this.dlg = null;         // an Options / Page Setup draft while its dialog is open
@@ -427,7 +428,7 @@ export class Session {
     const prev = this.editCell(), was = S.tabHome;
     if (this.commitEdit(0, shift ? -1 : 1, { kind: 'tab', shift: !!shift })) this.tabArm(prev, shift, was);
   }
-  refuse() { this.logKey('⚠'); this.toast('There’s a problem with this formula — fix it or press Esc to discard'); if (this.opts.onRefuse) this.opts.onRefuse(); }
+  refuse() { this.logKey('⚠'); this.toast('There’s a problem with this formula. Fix it, or press Esc to discard it.'); if (this.opts.onRefuse) this.opts.onRefuse(); }
 
   /* ---------------- point mode ---------------- */
   /** Where a pointer step lands: one cell (clamped), or with Ctrl the block edge Sheet.ctrlJump finds. */
@@ -668,7 +669,7 @@ export class Session {
     if (this.toolCommand(np)) return;   // the Formulas and Data tab tools (tools.js)
     switch (np) {
       case '=': this.exitRibbon(false); this.doAutoSum(); return;
-      case 'WVG': case 'WG': S.gridlines = !S.gridlines; this.toast(S.gridlines ? 'gridlines shown' : 'gridlines hidden — Alt W V G to show'); return done();
+      case 'WVG': case 'WG': S.gridlines = !S.gridlines; this.toast(S.gridlines ? 'Gridlines shown.' : 'Gridlines hidden. Alt W V G shows them.'); return done();
       case 'AGG': this.exitRibbon(false); this.groupChord(true, true); return;     // Data › Group › Group… (= Alt+Shift+→)
       case 'AUU': this.exitRibbon(false); this.groupChord(false, true); return;    // Data › Ungroup › Ungroup… (= Alt+Shift+←)
       case 'AUC': this.exitRibbon(false); this.startClock(); if (!S.clearOutline()) this.toast(NO_GROUP_NOTE); return;   // Data › Ungroup › Clear Outline
@@ -1686,6 +1687,9 @@ export class Session {
         this.startClock(); this.sheetStep(k === 'PageDown' ? 1 : -1, e.shiftKey); return true;
       }
       if (k === 'ArrowDown' && !e.shiftKey) { this.startClock(); this.logKey('Alt+↓'); this.openDropDown(); return true; }   // the in-cell drop-down: a validation list, or an AutoFilter header's menu
+      if (!e.shiftKey && (k === 'ArrowRight' || k === 'ArrowLeft')) {   // ⌥→ and ⌥←, Mac Excel's sheet keys, work on every keyboard here, logged as Excel's
+        this.startClock(); this.sheetStep(k === 'ArrowRight' ? 1 : -1, false); return true;
+      }
       return true;
     }
     if (k === 'Enter' && !e.ctrlKey && !e.altKey) {
@@ -1711,7 +1715,10 @@ export class Session {
       const down = k === 'PageDown';
       if (e.ctrlKey) { this.sheetStep(down ? 1 : -1, e.shiftKey); return true; }   // Ctrl+PgDn, and Ctrl+Alt+PgDn (the alias) alike
       this.logKey((e.shiftKey ? 'Shift+' : '') + k);
-      const step = (this.pageRows || 10) * (down ? 1 : -1); S.move(step, 0, e.shiftKey, false); return true;
+      const step = (this.pageRows || 10) * (down ? 1 : -1);
+      const from = S.active.r; S.move(step, 0, e.shiftKey, false);
+      this.pageJump = { rows: S.active.r - from };   // the view scrolls the window by the same rows, so the cursor keeps its place on the screen (Excel)
+      return true;
     }
     if (k === 'Home' && !e.altKey) { this.startClock(); this.logKey((e.ctrlKey ? 'Ctrl+' : '') + (e.shiftKey ? 'Shift+' : '') + 'Home'); S.moveHome(e.ctrlKey, e.shiftKey); return true; }
     if (k === 'End' && !e.altKey) { this.startClock(); this.logKey((e.ctrlKey ? 'Ctrl+' : '') + (e.shiftKey ? 'Shift+' : '') + 'End'); S.moveEnd(e.ctrlKey, e.shiftKey); return true; }

@@ -10,7 +10,7 @@ import { SheetView } from '../ui/sheet-view.js';
 import { RibbonView } from '../ui/ribbon-view.js';
 import { mountKeycaps } from '../ui/keycaps.js';
 import { mountEffects } from '../ui/effects.js';
-import { prefs } from './prefs.js';
+import { prefs, keyLabel } from './prefs.js';
 import { showToast } from '../ui/toast.js';
 import { track } from './telemetry.js';
 import { DRILLS, drillById } from '../content/drills.js';
@@ -29,8 +29,12 @@ import { fitZoomFor } from './zoom.js';
 import { itemNumber } from './numbering.js';
 import { titleAt, rewardAt } from '../content/levels.js';
 import { siteCopy } from '../content/copy/apply.js';
-import { createChrome, confirmDialog } from '../ui/components/chrome.js';
+import { createChrome, confirmDialog, isExitKey, EXIT_KEY, sheetKeys, noteSheetKey, sheetKeysDelivered, canFullscreen, fullscreenKeys } from '../ui/components/chrome.js';
+import { createFocusVeil } from '../ui/components/focus-veil.js';
+import { pingMark } from '../ui/components/sheet-marks.js';
+import { refKey } from '../engine/refs.js';
 import { createRunPanel, aboutLength } from '../ui/components/run-panel.js';
+const shortDay = d => { try { return new Date(d + 'T12:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }); } catch (e) { return String(d || ''); } };
 
 const fill = (s, vars) => String(s).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] != null ? vars[k] : m));
 const t = (key, fb, vars) => fill(siteCopy(key, fb), vars);
@@ -64,11 +68,12 @@ export function mountDrillPage(root, ctx = {}) {
   const chapterNo = Math.max(1, CHAPTERS.findIndex(ch => ch.id === drill.chapter) + 1);
   const entry = catalogById(drill.id);
   const taught = entry && entry.lesson ? LESSONS.find(l => l.id === entry.lesson) : null;
-  const subtitle = daily ? t('ws_sub_daily', 'The Daily, {day}', { day: dayOf() })
+  const subtitle = daily ? t('ws_sub_daily', 'The Daily, {day}', { day: shortDay(dayOf()) })
     : taught ? t('ws_sub_drill', 'Chapter {n}, taught in {m}', { n: chapterNo, m: itemNumber(taught, moduleOf(taught)) || '' }) : '';
   const chrome = createChrome(root, {
     kind: daily ? 'daily' : 'drill', title: drill.title, subtitle, lessons: null, hasCard: false,
-    onBack: () => leave(), onMore: id => onMore(id), onSound: () => setSound(!effects.isMuted()), onQat: act => { if (ribbonView) ribbonView.act(act); }, platform,
+    onBack: () => askLeave(), onMore: id => onMore(id), onSound: () => setSound(!effects.isMuted()), onQat: act => { if (ribbonView) ribbonView.act(act); }, platform,
+    onFullscreen: () => { fullscreenKeys().then(() => { paintSheetKeys(); focusStage(); }); },
   });
   const effects = mountEffects();
   const keycaps = mountKeycaps(null, { parent: chrome.stage, cls: 'in-frame' });
@@ -78,6 +83,19 @@ export function mountDrillPage(root, ctx = {}) {
   chrome.setSound(effects.isMuted());
   function setSound(m) { effects.setMuted(m); prefs.set({ mute: m }); chrome.setSound(m); }
   function leave() { location.hash = daily ? '#/practice/daily' : '#/practice'; }
+  let leaving = false;
+  /** Exit (its button, More, Ctrl+Shift+X): mid-run, a small dialog asks first, with Stay focused so Enter keeps the run going. */
+  async function askLeave() {
+    if (leaving) return;
+    if (phase !== 'run') { leave(); return; }
+    leaving = true; chrome.closeMenu();
+    const ok = await confirmDialog({
+      title: siteCopy('leave_drill_title', 'Leave this drill?'), body: siteCopy('leave_run_body', 'No time is posted for a run you leave. Your finished lessons stay saved.'),
+      action: siteCopy('leave_action', 'Leave'), cancel: siteCopy('leave_stay', 'Stay'), focus: 'cancel', platform: platform(),
+    });
+    leaving = false;
+    if (ok) leave(); else focusStage();
+  }
 
   let run = null, sheetView = null, ribbonView = null, tabs = null, ghostEl = null;
   let phase = 'ready';           // 'ready' | 'run' | 'done'
@@ -102,6 +120,7 @@ export function mountDrillPage(root, ctx = {}) {
     ribbonView = new RibbonView(chrome.ribbonSlot.querySelector('.ribbon'), run.session, { mode: 'full' });
     if (ribbonView.mode !== 'full') ribbonView.setMode('full');
     tabs = mountSheetTabs(chrome.tabsMount, run.session);
+    chrome.adoptStatus(sheetView.sbar);   // Excel's foot: the status shares the tabs' row
     run.session.settings.ribbonCollapsed = cfg.ribbonDrills !== 'full';   // drills open with the Ribbon collapsed; a setting
     run.session.onChange(() => syncChrome());
     // the PB ghost: a faint outline cursor inside the scroll box; never focusable, never filled
@@ -130,11 +149,31 @@ export function mountDrillPage(root, ctx = {}) {
     const walking = ss.mode === 'ribbon' && !ss.dialog;
     chrome.renderQat(ribbonView ? ribbonView.qatHtml(walking, (ss.path || []).join('')) : '');
     chrome.setProgress({ d: run.doneCount, n: run.goals.length });
+    paintSheetKeys();
+  }
+  function paintSheetKeys() {
+    if (!run) return;
+    chrome.setSheetKeys(sheetKeys({ sheets: (run.session.sheets || []).length, delivered: sheetKeysDelivered(), platform: platform() }), { fullscreen: canFullscreen(), isFull: typeof document !== 'undefined' && !!document.fullscreenElement });
+  }
+  function pingCursor() {
+    if (!sheetView || !run || !run.session.sheet) return;
+    const a = run.session.sheet.dispActive();
+    const el = pingMark(sheetView.gw, sheetView.cellRect(refKey(a.r, a.c)));
+    if (el) effects.play('cursor-ping', el);
   }
   function focusStage() {
     const st = chrome.stage; if (!st.hasAttribute('tabindex')) st.setAttribute('tabindex', '-1');
     try { st.focus({ preventScroll: true }); } catch (e) { /* ignore */ }
   }
+  // the window lost the keyboard mid-run: the veil; the clock keeps running (a run is timed end to end)
+  const veil = createFocusVeil(chrome.stage, {
+    active: () => phase === 'run' && !leaving,
+    where: () => (sheetView ? sheetView.nameBox.textContent : ''),
+    line: () => siteCopy('ws_focus_clock', 'The clock is still running.'),
+    onResume: () => { focusStage(); if (sheetView) sheetView.keepActiveInView(); pingCursor(); },
+  });
+  const onFullChange = () => paintSheetKeys();
+  document.addEventListener('fullscreenchange', onFullChange);
 
   /* ---------------- Ready, Run ---------------- */
   function showReady() {
@@ -258,6 +297,8 @@ export function mountDrillPage(root, ctx = {}) {
   const onKeyDown = e => {
     if (isTyping(e.target)) return;
     if (e.target && (e.target.tagName === 'BUTTON' || e.target.tagName === 'A') && (e.key === 'Enter' || e.key === ' ')) return;
+    if (isExitKey(e)) { e.preventDefault(); askLeave(); return; }
+    if (noteSheetKey(e)) paintSheetKeys();
     if (chrome.menu) { e.preventDefault(); chrome.menuKey(e.key); if (!chrome.menu) focusStage(); return; }
     if (phase === 'done') {
       if (MODS.has(e.key)) return;
@@ -276,9 +317,11 @@ export function mountDrillPage(root, ctx = {}) {
     }
     if (e.key === 'F1' && !e.ctrlKey) { e.preventDefault(); help(); return; }
     if (e.key === 'Escape') {
+      // Esc is Excel's (cancel, close, drop the marching ants) and never ends the run: Exit does
       const ss = run.session;
-      if (ss.editing || ss.mode === 'ribbon' || !!ss.dialog || !!ss.note) { if (run.key(e)) e.preventDefault(); return; }
-      e.preventDefault(); mountRun();   // Esc ends the run without a time: back to Ready
+      const ants = !!(ss.sheet && ss.sheet.clipboard), owned = ss.editing || ss.mode === 'ribbon' || !!ss.dialog || !!ss.note;
+      if (run.key(e)) e.preventDefault();
+      if (!owned && !ants) chrome.hint(fill(siteCopy('ws_exit_hint', 'To leave, use Exit at the top left or {key}.'), { key: keyLabel(EXIT_KEY, platform()) }), 3000);
       return;
     }
     if (run.key(e)) { e.preventDefault(); effects.armSounds(); }
@@ -295,6 +338,7 @@ export function mountDrillPage(root, ctx = {}) {
       stopReplay();
       document.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('keyup', onKeyUp, { capture: true });
+      veil.destroy(); document.removeEventListener('fullscreenchange', onFullChange);
       if (sheetView) sheetView.destroy(); if (ribbonView) ribbonView.destroy(); if (tabs) tabs.destroy();
       keycaps.destroy(); if (effects.destroy) effects.destroy();
       panel.destroy(); chrome.destroy();

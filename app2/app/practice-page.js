@@ -193,7 +193,7 @@ function dailyPage(el, ctx) {
   const day = dayOf(); const pick = dailyFor(day); const drill = DRILLS_BY_ID[pick.drillId] || null;
   const chapterN = drill ? (COURSE.chapters.find(c => c.id === drill.chapter) || {}).n : 1;
   const proNote = drill && drill.access === 'paid' && !entitlement.entitled() ? `<p class="panel-line">${esc(t('daily_pro_note', { n: chapterN }))}</p>` : '';
-  el.innerHTML = `${headerBlockHtml({ title: t('daily_title'), facts: esc(prettyDay(day)), line: esc(t('daily_line', { drill: drill ? drill.title : '' })), button: buttonHtml({ label: t('daily_play'), key: 'Enter', href: '#/daily', primary: true, id: 'playDaily' }), cls: 'hdr-daily' })}${proNote}<div class="board-host"></div>`;
+  el.innerHTML = `${headerBlockHtml({ title: t('daily_title'), facts: esc(prettyDay(day)), line: esc(t('daily_line', { drill: drill ? String(drill.title).replace(/^Challenge:\s*/i, '').replace(/^The /, 'the ') : '' })), button: buttonHtml({ label: t('daily_play'), key: 'Enter', href: '#/daily', primary: true, id: 'playDaily' }), cls: 'hdr-daily' })}${proNote}<div class="board-host"></div>`;
   const board = mountBoard(el.querySelector('.board-host'), { ref: pick.drillId, seed: pick.seed, title: drill ? drill.title : t('daily_title'), yours: t('boards_yours', { board: t('rail_daily').replace(/^The /, '') }), dayLabel: '' });
   if (ctx.keytips) ctx.keytips.register([{ id: 'play', label: t('daily_play'), el: el.querySelector('#playDaily') }]);
   setTimeout(() => { if (ctx.cursor) ctx.cursor.select(el.querySelector('.hdr'), { focus: false }); }, 0);

@@ -17,7 +17,7 @@ const near = (a, b) => isNum(a) && isNum(b) && Math.abs(a - b) < 1e-6;
 const blank = c => !c || (c.value == null && c.formula == null);
 const normFormula = f => String(f || '').replace(/\s|\$/g, '').toUpperCase();
 const r2 = v => Math.round(v * 100) / 100;
-/** The cluster pool still labels its weeks the British way (w/c 22 Sep 2026); the Clearcoat pack says Week of Sep 22, 2026. */
+/** The cluster pool labels its weeks the Clearcoat way (Week of Sep 22, 2026); an older w/c label still converts. */
 const weekLabel = w => { const m = /^w\/c (\d{2}) (\w{3}) (\d{4})$/.exec(w); return m ? `Week of ${m[2]} ${+m[1]}, ${m[3]}` : w; };
 
 const HEADERS = ['Site', 'Washes', 'Revenue ($)', 'Wash cost ($)', 'Gross profit ($)', 'Avg ticket ($/wash)', 'Prior week rev ($)', 'Old code'];

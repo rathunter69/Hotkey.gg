@@ -20,6 +20,7 @@
 // sum into a loud cluster. Visual effects run whether or not sound is on. Every storage access is guarded.
 
 import { prefs } from '../app/prefs.js';
+import { siteCopy } from '../content/copy/apply.js';
 
 /* ---------------- pure rules (unit-tested in tests/effects.test.js) ---------------- */
 
@@ -44,6 +45,7 @@ export const MOMENTS = {
   'menu': { when: 'The account menu, More, Help opens', token: 'd-menu', skip: false },
   'key': { when: 'A key in a taught route', token: 'd-key', skip: false },
   'goal-done': { when: 'A goal lands', token: 'd-goal' },
+  'cursor-ping': { when: 'A goal lands, the window comes back, a sheet changes: a ring grows out of the cell cursor', token: 'd-ping', skip: false },
   'marker': { when: 'A timed run: the marker moves with the clock', token: null, skip: false },
   'beat': { when: 'The panel changes beat', token: 'd-beat', skip: false },
   'result': { when: 'A timed run ends', token: 'd-result', sequence: true },
@@ -379,10 +381,10 @@ export function mountEffects(opts = {}) {
   const goalDone = el => goalTick(el);
   const lessonDone = stageEl => finish(stageEl);
   function newShortcut() { tone(1175, 0, 0.08, 0.06); tone(1568, 0.07, 0.1, 0.06); }   // pop (its own moment, not a finish)
-  function newPB() { moment('pb'); banner('★ New personal best', 'fx-pb'); }
+  function newPB() { moment('pb'); banner(siteCopy('fx_new_pb', 'New personal best'), 'fx-pb'); }
   function parTier(tier) { moment('tier', tier); }
-  function levelUp(lvl) { moment('level'); banner('▲ Level ' + lvl, 'fx-level'); }
-  function rankUp(name) { moment('rank'); banner('◆ ' + String(name), 'fx-rank'); }
+  function levelUp(lvl) { moment('level'); banner(siteCopy('fx_level', 'Level {n}').replace('{n}', String(lvl)), 'fx-level'); }
+  function rankUp(name) { moment('rank'); banner(String(name), 'fx-rank'); }
   /**
    * An achievement landed. Banners always show one at a time (a legendary first run can earn
    * half a dozen at once); while a run is live (setBusy(true)) they hold until it rests.

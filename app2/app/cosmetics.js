@@ -9,8 +9,8 @@ export const FREE_THEMES = ['daylight', 'github', 'light', 'default', 'nord', 'd
 
 /** A few themes carry story unlocks instead of a level. */
 export const SPECIAL_THEMES = {
-  bloomberg: { ach: 'ch1-complete', label: 'Complete Foundations' },
-  terminal: { ach: 'tier-legend', label: 'Beat a legendary clock' },
+  bloomberg: { ach: 'ch1-complete', label: 'Complete Chapter 1' },
+  terminal: { ach: 'tier-legend', label: 'Beat a Legendary time' },
   synthwave: { ach: 'combo-10', label: 'A ten-hit rapid-fire combo' },
   crimson: { rank: 6, label: 'Reach MD' },   // rank.js TIERS index
 };

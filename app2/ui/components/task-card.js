@@ -14,6 +14,7 @@
 //   routeTokens(keys)                     → [{ key } | { text }]   a goal's keys as the keycaps show them (pure)
 //   routeProgress(tokens, pressed)        → { matched, wrong, next, done }   which keycaps are filled (pure)
 //   liveLine(progress, tokens, copy)      → the one live line under the keys (pure)
+//   alternates(goal), offRoute(…), tryLine(…), worksToo(…), worksTooLine(…)   the other routes and the gentle wrong-key lines (pure)
 //   createTaskCard(host, opts)            → the component
 import { siteCopy } from '../../content/copy/apply.js';
 import { keyLabel } from '../../app/prefs.js';
@@ -167,9 +168,58 @@ export function liveLine(progress, tokens, platform) {
   const label = tok => (tok.text != null ? '“' + tok.text + '”' : keyLabel(tok.key, platform));
   if (progress.wrong) return fill(siteCopy('card_live_wrong', 'That was {key}. Start again with {key1}.'), { key: keyLabel(progress.wrong, platform), key1: label(tokens[0]) });
   if (progress.done) return siteCopy('card_live_done', 'Every key is in.');
-  if (progress.matched === 0 && !progress.chars) return fill(siteCopy('card_live_start', 'Press {key}.'), { key: label(tokens[0]) });
+  // a typed token reads "Type “…”", a key "Press …": never "Press “Clearcoat …”"
+  const typed = tok => !!tok && tok.text != null;
+  if (progress.matched === 0 && !progress.chars) return typed(tokens[0]) ? fill(siteCopy('card_live_start_type', 'Type {text}.'), { text: label(tokens[0]) }) : fill(siteCopy('card_live_start', 'Press {key}.'), { key: label(tokens[0]) });
   const n = progress.matched;
+  if (typed(progress.next)) return n === 0 ? fill(siteCopy('card_live_typing', 'Keep typing {text}.'), { text: label(progress.next) }) : fill(siteCopy(n === 1 ? 'card_live_one_type' : 'card_live_keys_type', n === 1 ? 'One key in. Type {text}.' : '{n} keys in. Type {text}.'), { n: WORDS[n] || n, text: label(progress.next) });
   return fill(siteCopy(n === 1 ? 'card_live_one' : 'card_live_keys', n === 1 ? 'One key in. Press {key}.' : '{n} keys in. Press {key}.'), { n: WORDS[n] || n, key: label(progress.next) });
+}
+/**
+ * The other routes a goal shows under its keys as "Also works": the goal's own alt data (another
+ * route Excel offers, schema.js), and in a browser tab the alias for Excel's sheet keys (Alt+PgDn for
+ * Ctrl+PgDn, which the browser keeps). → a list of key strings, never the route itself. Pure.
+ */
+export function alternates(goal, { browserTab = true } = {}) {
+  if (!goal || !goal.keys) return [];
+  const out = [];
+  if (goal.alt) for (const a of (Array.isArray(goal.alt) ? goal.alt : [goal.alt])) out.push(String(a).trim());
+  if (browserTab && /Ctrl\+Pg(Up|Dn)/.test(goal.keys)) {
+    // a route of sheet keys alone shows whole ("Alt+PgDn ×3"); inside a longer route, the alias keys alone
+    if (/^(?:Ctrl\+Pg(?:Up|Dn)|×\d+|\s)+$/.test(goal.keys)) out.push(goal.keys.replace(/Ctrl\+Pg(Up|Dn)/g, 'Alt+Pg$1'));
+    else for (const m of goal.keys.match(/Ctrl\+Pg(?:Up|Dn)/g)) out.push(m.replace('Ctrl', 'Alt'));
+  }
+  return [...new Set(out)].filter(a => a && a !== goal.keys);
+}
+/**
+ * Whether the keys pressed since the goal began have left the route the card shows and every
+ * alternate too (an alternate under way is never "off the route"). Pure.
+ */
+export function offRoute(tokens, altTokens, pressed) {
+  if (!tokens || !tokens.length) return false;
+  if (!routeProgress(tokens, pressed).wrong) return false;
+  return !(altTokens || []).some(t => { const p = routeProgress(t, pressed); return !p.wrong && (p.matched > 0 || p.chars > 0 || p.done); });
+}
+/** The gentle line after a pause off the route: "Not quite. Try {key}." Pure. */
+export function tryLine(progress, tokens, platform) {
+  if (!tokens || !tokens.length) return '';
+  const tok = tokens[Math.min(progress && progress.matched || 0, tokens.length - 1)];
+  const label = tok.text != null ? '“' + tok.text + '”' : keyLabel(tok.key, platform);
+  return fill(siteCopy('card_live_try', 'Not quite. Try {key}.'), { key: label });
+}
+/**
+ * A goal landed by a route other than the one the card showed (and none of its alternates): the
+ * sheet is right, so the card says "That works too" and names the keys the lesson teaches. Pure.
+ */
+export function worksToo(tokens, altTokens, pressed) {
+  if (!tokens || !tokens.length || !pressed || !pressed.length) return false;
+  if (routeProgress(tokens, pressed).done) return false;
+  return !(altTokens || []).some(t => routeProgress(t, pressed).done);
+}
+/** The line for worksToo: "That works too. The keys here: Ctrl+↓." Pure. */
+export function worksTooLine(tokens, platform) {
+  const keys = (tokens || []).map(tok => (tok.text != null ? '“' + tok.text + '”' : keyLabel(tok.key, platform))).join(' ');
+  return fill(siteCopy('card_live_works', 'That works too. The keys this goal teaches: {keys}.'), { keys });
 }
 /** The stuck cue's subtle line: "pulse B5 · Ctrl+↓ jumps to the edge" → the part after the separator (the pulse is the target's). Pure. */
 export function stuckLine(hintStuck) {
@@ -228,9 +278,11 @@ export function createTaskCard(host, opts = {}) {
     const intro = m.intro ? `<div class="tc-intro">${esc(m.intro)}</div>` : '';   // the card names itself once, in 1.1.1 (M92)
     const teach = m.teach ? `<div class="tc-teach">${esc(m.teach)}</div>` : '';
     const keys = m.keys && m.keys.length ? keysHtml(m.keys, m.progress || { matched: 0 }) : '';
+    const alts = m.keys && m.keys.length && m.alts && m.alts.length ? `<div class="tc-alt"><span class="tc-alt-label">${esc(siteCopy('card_also_works', 'Also works'))}</span>${m.alts.map(a => `<span class="tc-alt-route">${a.map(tok => (tok.text != null ? `<span class="tc-type">“${esc(tok.text)}”</span>` : `<kbd class="tc-key tc-key-sm">${esc(keyLabel(tok.key, platform()))}</kbd>`)).join('')}</span>`).join(`<span class="tc-alt-or">${esc(siteCopy('card_alt_or', 'or'))}</span>`)}</div>` : '';
+    const aside = m.aside ? `<div class="tc-aside">${esc(m.aside)}</div>` : '';
     const live = m.live ? `<div class="tc-live${m.liveKind ? ' tc-live-' + m.liveKind : ''}">${esc(m.live)}</div>` : '';
     const foot = m.state === 'done' ? '' : `<div class="tc-foot"><span class="tc-foot-k">${kbd('F1')} ${esc(siteCopy('card_help', 'Help'))}</span><span class="tc-foot-k">${kbd('Ctrl+Shift+K')} ${esc(siteCopy('card_hide', 'Hide'))}</span></div>`;
-    el.innerHTML = head + intro + goal + teach + keys + live + foot;
+    el.innerHTML = head + intro + aside + goal + teach + keys + alts + live + foot;
   }
   el.addEventListener('click', e => {
     const b = e.target.closest('[data-help]'); if (b && opts.onHelp) { opts.onHelp(b.dataset.help); return; }
