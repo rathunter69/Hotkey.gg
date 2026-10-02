@@ -88,6 +88,28 @@ async function guardText(label) {
 }
 
 try {
+  // a freshly loaded lesson tab takes the learner's first key: no click, no warm-up key (its own context and
+  // page, so a real load that leaves the main run's storage alone; the same loopback-only rule)
+  {
+    const freshCtx = await browser.newContext({ viewport: { width: 1400, height: 900 }, serviceWorkers: 'block' });
+    await freshCtx.route('**/*', route => {
+      let origin; try { origin = new URL(route.request().url()).origin; } catch (e) { return route.abort('blockedbyclient'); }
+      return origin === `http://127.0.0.1:${PORT}` ? route.continue() : route.abort('blockedbyclient');
+    });
+    const fresh = await freshCtx.newPage();
+    fresh.on('pageerror', e => errors.push('pageerror (fresh tab): ' + e.message));
+    await fresh.goto(base + '#/lesson/know-the-screen');
+    const card = await fresh.waitForSelector('.tc', { state: 'visible', timeout: 8000 }).catch(() => null);
+    if (!card) fail('fresh lesson tab: no task card');
+    else {
+      const nb = () => fresh.evaluate(() => (document.querySelector('.namebox') || {}).textContent);
+      const before = await nb();
+      await fresh.keyboard.press('ArrowDown');
+      await fresh.waitForTimeout(100);
+      if ((await nb()) === before) fail(`fresh lesson tab: the first key was lost (the cursor stayed on ${before})`);
+    }
+    await freshCtx.close();
+  }
   // every route renders
   for (const route of ['#/', '#/learn', '#/practice', '#/practice/daily', '#/practice/rapid', '#/practice/challenges', '#/leaderboard', '#/leaderboard?board=drills', '#/leaderboard?board=challenges', '#/reference', '#/pricing', '#/teams', '#/desk', '#/desk/join/TEAM-ABCD-EFGH', '#/leaderboard?board=desks', '#/account', '#/account?section=settings', '#/about', '#/terms', '#/privacy', '#/contact', '#/checkout', '#/checkout/done', '#/nope']) {
     await page.goto(base + route);
