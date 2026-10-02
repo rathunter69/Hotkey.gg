@@ -1124,13 +1124,20 @@ export class Sheet {
   }
 
   /* ---------------- clipboard ---------------- */
+  /** Select Visible Cells (Alt+;): the selection stays, but the next copy of it leaves hidden and folded rows and columns behind. */
+  selectVisible() { this.visibleSel = { ...this.selRange() }; this.emit('select'); }
+  /** Whether Alt+; was pressed on exactly the current selection. */
+  visibleOnly() { const v = this.visibleSel, r = this.selRange(); return !!v && v.r1 === r.r1 && v.c1 === r.c1 && v.r2 === r.r2 && v.c2 === r.c2; }
   copy(cut = false) {
     const r = this.selRange(); const data = [];
-    for (let rr = r.r1; rr <= r.r2; rr++) { if (this.filterRows.has(rr)) continue; const row = []; for (let cc = r.c1; cc <= r.c2; cc++) row.push(clone(this.get(rr, cc))); data.push(row); }   // a filtered list copies its visible rows only (Excel)
-    const cols = []; for (let cc = r.c1; cc <= r.c2; cc++) cols.push(this.colW[cc]);
+    // a filtered list copies its visible rows only (Excel); rows hidden by hand or folded in a group come too, unless Alt+; selected the visible cells first
+    const vis = this.visibleOnly(); const skipRow = rr => this.filterRows.has(rr) || (vis && !this.isVisible('r', rr)); const keepCol = cc => !vis || this.isVisible('c', cc);
+    const srcRows = [], srcCols = [];   // where each copied row and column came from, so a pasted formula shifts by its own row's distance
+    for (let rr = r.r1; rr <= r.r2; rr++) { if (skipRow(rr)) continue; const row = []; for (let cc = r.c1; cc <= r.c2; cc++) if (keepCol(cc)) row.push(clone(this.get(rr, cc))); data.push(row); srcRows.push(rr); }
+    const cols = []; for (let cc = r.c1; cc <= r.c2; cc++) if (keepCol(cc)) { cols.push(this.colW[cc]); srcCols.push(cc); }
     // `src` is the sheet the block came from: a workbook shares one clipboard (Session.wireSheet), so a
     // cut pasted on another sheet clears its source there, and the marquee shows only on that sheet
-    this.clipboard = { data, cols, h: data.length, w: r.c2 - r.c1 + 1, rect: { ...r }, cut: !!cut, src: this };
+    this.clipboard = { data, cols, h: data.length, w: cols.length, rect: { ...r }, srcRows, srcCols, cut: !!cut, src: this };
     this.emit('clipboard');
   }
   clearClipboard() { if (this.clipboard) { this.clipboard = null; this.emit('clipboard'); } }
@@ -1138,7 +1145,7 @@ export class Sheet {
    * Paste at the selection's top-left. kind: 'all' | 'values' | 'formulas' | 'formats' |
    * 'valuesnum' | 'colwidths' | 'transpose'. op: 'none' | 'add' | 'subtract' | 'multiply' | 'divide'.
    */
-  paste(kind = 'all', op = 'none') {
+  paste(kind = 'all', op = 'none', { skipBlanks = false } = {}) {
     const cb = this.clipboard; if (!cb) return false;
     this.multi = null;
     const sr = this.selRange(); const r0 = sr.r1, c0 = sr.c1;
@@ -1194,9 +1201,11 @@ export class Sheet {
       this.sel = { r: r0, c: c0 }; this.active = { r: r0 + cb.w - 1, c: c0 + cb.h - 1 }; this.selA = null;
       this.commit('paste'); return true;
     }
+    const blank = s => !s.formula && (s.value === null || s.value === undefined || s.value === '');
     for (let i = 0; i < tileH; i++) for (let j = 0; j < tileW; j++) {
+      if (skipBlanks && blank(cb.data[i % cb.h][j % cb.w])) continue;   // Skip blanks: a blank in the copied block leaves the cell under it as it was
       const cell = this.ensure(r0 + i, c0 + j); const s = cb.data[i % cb.h][j % cb.w];
-      const fdr = (r0 + i) - (cb.rect.r1 + (i % cb.h)), fdc = (c0 + j) - (cb.rect.c1 + (j % cb.w));
+      const fdr = (r0 + i) - (cb.srcRows ? cb.srcRows[i % cb.h] : cb.rect.r1 + (i % cb.h)), fdc = (c0 + j) - (cb.srcCols ? cb.srcCols[j % cb.w] : cb.rect.c1 + (j % cb.w));
       const xl = f => (f && (fdr || fdc)) ? translateFormula(f, fdr, fdc) : f;
       if (kind === 'values') { cell.formula = null; cell.value = s.value; cell.txt = s.txt; }
       else if (kind === 'formulas') { cell.formula = xl(s.formula); cell.value = s.value; cell.txt = s.formula ? false : s.txt; }

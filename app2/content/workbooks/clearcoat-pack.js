@@ -16,6 +16,15 @@
 import { mulberry32 } from '../../engine/rng.js';
 import { dateToSerial } from '../../engine/format.js';
 import { buildPage, FMT } from './page.js';
+import { diffStates, sessionToState as sessionToStateBase } from './clearcoat-weekly.js';
+
+export { diffStates };
+/** A live session in the authored-state shape (clearcoat-weekly's reader), less the cells a dynamic array spilled into: the state holds the anchor's formula, the engine writes the rest. */
+export function sessionToState(ses) {
+  const st = sessionToStateBase(ses);
+  st.sheets = st.sheets.map(sh => ({ ...sh, cells: Object.fromEntries(Object.entries(sh.cells).filter(([, c]) => !(c && c.spill))) }));
+  return st;
+}
 
 export const CHAPTER = 4;
 export const UNITS = 'USD unless stated; costs shown as negatives';
@@ -573,10 +582,10 @@ const COLS = s => s.split('');
 export function cutStart({ state: solved, rows, weeks, ex, sites, S, C }) {
   return derive(solved, s => {
     // Export: the misspelling, no key column, no working cells
-    const ex = sheetOf(s, 'Export');
-    ex.cells['B' + exportRow(PLANT.misspelt.day, PLANT.misspelt.site)] = { value: PLANT.misspelt.code };
-    for (const ref in EXPORT_WORK.key) delete ex.cells[ref];
-    for (const ref in EXPORT_WORK.totals) delete ex.cells[ref];
+    const exSheet = sheetOf(s, 'Export');
+    exSheet.cells['B' + exportRow(PLANT.misspelt.day, PLANT.misspelt.site)] = { value: PLANT.misspelt.code };
+    for (const ref in EXPORT_WORK.key) delete exSheet.cells[ref];
+    for (const ref in EXPORT_WORK.totals) delete exSheet.cells[ref];
     // Lists: no unique list, no check
     drop(s, 'Lists', [...LISTS_UNIQUE, 'B25', 'B26', 'C26']);
     // Q&A: every question open; question 1's answer typed
@@ -726,23 +735,31 @@ const S41Cdone = challenge41(S418, 'fixed');
 // S42: the module's start: module 4.1's scaffolds cleared, the site block on the standard route (name and capacity by INDEX/MATCH)
 const S42 = derive(S418, s => { drop(s, 'Summary', SCAFFOLD_41_REFS); take(s, SOLVED, 'Summary', blockRefs(SITE_R, COLS('CD'))); });
 
-/** The sorted copy of the export (4.2.1): A4:G94 pasted as values on a new sheet, then sorted. `by` is a comparator over the rows. */
+/**
+ * The sorted copy of the export (4.2.1): A4:G94 copied onto a new sheet with Ctrl+V (the Total
+ * washes formula travels and re-points at its own row) and the column widths pasted, then sorted.
+ * `by` is a comparator over the rows, or a list of them applied in turn (stable sorts, as the
+ * Sort dialog run twice leaves the rows).
+ */
 export function exportCopy(rows, by) {
   const cells = { A4: { value: 'Date', bold: true }, B4: { value: 'Site', bold: true }, C4: { value: 'Retail washes', bold: true }, D4: { value: 'Member washes', bold: true }, E4: { value: 'Total washes', bold: true }, F4: { value: 'Retail revenue ($)', bold: true }, G4: { value: 'Hours open', bold: true } };
-  const sorted = rows.map((r, i) => ({ ...r, i })).sort(by || ((a, b) => a.i - b.i));
+  let sorted = rows.map((r, i) => ({ ...r, i }));
+  for (const cmp of [].concat(by || [])) sorted = sorted.slice().sort(cmp);
   sorted.forEach((x, k) => {
     const r = 5 + k;
     cells['A' + r] = { value: x.date, ...DATE_FMT }; cells['B' + r] = { value: x.code };
-    if (x.retail != null) { cells['C' + r] = { value: x.retail }; cells['D' + r] = { value: x.member }; cells['E' + r] = { value: x.retail + x.member }; cells['F' + r] = { value: x.revenue, fmtStyle: 'comma', decimals: 2 }; cells['G' + r] = { value: x.hours }; }
+    if (x.retail != null) { cells['C' + r] = { value: x.retail }; cells['D' + r] = { value: x.member }; cells['E' + r] = { formula: `=C${r}+D${r}` }; cells['F' + r] = { value: x.revenue, fmtStyle: 'comma', decimals: 2 }; cells['G' + r] = { value: x.hours }; }
   });
   return { name: 'Export sort', cells, colW: { 1: 72, 2: 72, 3: 92, 4: 100, 5: 92, 6: 118, 7: 80 }, active: { r: 4, c: 1 } };
 }
 export const BY_SITE_DATE = (a, b) => a.code.localeCompare(b.code) || a.date - b.date || a.i - b.i;
 export const BY_REVENUE_DESC = (a, b) => ((b.revenue || 0) - (a.revenue || 0)) || a.i - b.i;
+/** Retail revenue largest first, ties left in the order the rows stand (the second sort of 4.2.1, run on the site-then-date order). */
+const REVENUE_DESC_STABLE = (a, b) => (b.revenue || 0) - (a.revenue || 0);
 /** The misspelt row's data on the copy still carries the misspelling (the copy was taken before 4.2.3 fixed it). */
 const rowsAsExported = rows => rows.map((r, i) => i === exportRow(PLANT.misspelt.day, PLANT.misspelt.site) - 5 ? { ...r, code: PLANT.misspelt.code } : r);
 // 4.2.1 Sort and multi-level sort: the copy, sorted by site then date, then by retail revenue largest first (how the lesson leaves it)
-const S421 = derive(S42, s => { s.sheets.splice(7, 0, exportCopy(rowsAsExported(ROWS), BY_REVENUE_DESC)); });
+const S421 = derive(S42, s => { s.sheets.splice(7, 0, exportCopy(rowsAsExported(ROWS), [BY_SITE_DATE, REVENUE_DESC_STABLE])); });
 
 // 4.2.2 AutoFilter and SUBTOTAL: the filters cleared; a SUM under the block, SUBTOTAL(109) and SUBTOTAL(103) beside it
 const S422 = derive(S421, s => { plant(s, 'Export', EXPORT_WORK.totals); });
@@ -768,13 +785,28 @@ const S425 = derive(S425start, s => {
   const copy = sheetOf(s, 'Export sort').cells;
   const scratch = {};
   let k = 1;
-  for (let r = 4; r <= 94; r++) { if (r >= 20 && r <= 34) continue; for (const col of COLS('ABCDEFG')) if (copy[col + r]) scratch[col + k] = clone(copy[col + r]); k++; }
-  s.sheets.splice(8, 0, { name: 'Scratch', cells: scratch, colW: { 1: 72, 2: 72, 3: 92, 4: 100, 5: 92, 6: 118, 7: 80 } });
+  for (let r = 4; r <= 94; r++) { if (r >= 20 && r <= 34) continue; for (const col of COLS('ABCDEFG')) if (copy[col + r]) { scratch[col + k] = clone(copy[col + r]); if (scratch[col + k].formula) scratch[col + k].formula = `=C${k}+D${k}`; } k++; }
+  s.sheets.splice(8, 0, { name: 'Scratch', cells: scratch, colW: {} });   // a plain Ctrl+V: the widths stay the sheet's own
   for (const r in CORRECTIONS.rows) copy['G' + r] = { value: CORRECTIONS.rows[r], fontColor: 'blue' };
   plant(s, 'Export', EXPORT_WORK.wildcards);
 });
-// 4.2.6 UNIQUE, FILTER and SORT: the state stays on the helper route (the unique list of 4.2.3); the engine spills all three (clearcoat-pack-tools.test.js), so the lesson can add a spilled list
-const S426 = S425;
+/**
+ * 4.2.6's dynamic arrays, written on the Scratch sheet beside the pasted rows (a working sheet, so
+ * the pack a buyer opens keeps the classic tools): each anchor's formula, its label above it; the
+ * engine spills the rest. FILTER's date column carries the date format so its rows read as dates.
+ */
+export const DYNAMIC = {
+  labels: { I1: 'UNIQUE', J1: 'SORT(UNIQUE)', L1: 'FILTER, Domain', K18: 'Domain washes', T1: 'SEQUENCE' },
+  anchors: { I2: '=UNIQUE(Export!B5:B94)', J2: '=SORT(UNIQUE(Export!B5:B94))', L2: '=FILTER(Export!A5:G94,Export!B5:B94="AUS-DOM")', L18: '=SUM(P2:P16)', T2: '=SEQUENCE(12)' },
+  dates: refsIn('L2:L16'),
+};
+// 4.2.6 UNIQUE, FILTER and SORT: the four spilled lists and a sum of the filtered washes on Scratch
+const S426 = derive(S425, s => {
+  const c = sheetOf(s, 'Scratch').cells;
+  for (const ref in DYNAMIC.labels) c[ref] = { value: DYNAMIC.labels[ref], bold: true };
+  for (const ref of DYNAMIC.dates) c[ref] = { ...DATE_FMT };
+  for (const ref in DYNAMIC.anchors) c[ref] = { ...(c[ref] || {}), formula: DYNAMIC.anchors[ref] };
+});
 // 4.2.C: a raw dump on a copy (the sorted copy back to export order, the scratch sheet gone)
 const S42C = derive(S425, s => { s.sheets = s.sheets.filter(x => x.name !== 'Scratch'); const i = s.sheets.findIndex(x => x.name === 'Export sort'); s.sheets[i] = exportCopy(ROWS); drop(s, 'Export', Object.keys(EXPORT_WORK.wildcards)); });
 
@@ -808,9 +840,14 @@ const PH = S.perHour;
 const S435 = derive(S434, s => { take(s, SOLVED, 'Summary', ['B' + PH.title, ...rowRefs(PH.header, COLS('CDEF')), ...blockRefs([...PH.rows, PH.leader], COLS('BCDEF'))]); take(s, SOLVED, 'Q&A', ['E11', 'F11']); });
 // 4.3.6 3D references and grouped sheets: the roll-up from the six site tabs, each tab's check row, the roll-up check line
 const RU = S.rollup;
+/** 4.3.6's roll-up lines as 3D references across the six tabs (Domain:CedarPark), and the check row typed once on the grouped tabs: one formula, the same on every tab. */
+export const ROLLUP_3D = { retail: 5, member: 6, revenue: 8 };
+export const TAB_CHECK = { B12: { value: 'Checks', bold: true }, B13: { value: 'Total washes tie to retail plus member', indent: 1 }, C13: { formula: '=F7-F5-F6', fmtStyle: 'comma' } };
 const S436 = derive(S435, s => {
   take(s, SOLVED, 'Summary', ['B' + RU.title, ...rowRefs(RU.header, COLS('CDEF')), ...blockRefs([RU.retail, RU.member, RU.total, RU.revenue], COLS('BCDEF')), 'C' + S.checkRows[4]]);
-  for (const site of SITES) take(s, SOLVED, site.tab, ['B12', 'B13', 'C13']);
+  const c = sheetOf(s, 'Summary').cells;
+  for (const k in ROLLUP_3D) for (const col of COLS('CDE')) c[col + RU[k]] = { ...c[col + RU[k]], formula: `=SUM(${SITES[0].tab}:${SITES.at(-1).tab}!${col}${ROLLUP_3D[k]})` };
+  for (const site of SITES) plant(s, site.tab, TAB_CHECK);
 });
 const S43C = S436;
 

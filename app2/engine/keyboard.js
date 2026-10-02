@@ -39,7 +39,7 @@ import { installDialogs, tabStepOf, isValidName } from './dialogs.js';
 import { installTools, TOOL_DIALOGS, TOOL_TYPED, TABLE_CELL_NOTE } from './tools.js';
 import { CalcGraph } from './calc.js';
 import { refKey, parseRef, parseRange, rangeText, colLetter as colLetterOf } from './refs.js';
-import { stepPath, PASTE_OPTS, PASTE_OP_OPTS, QAT_COMMANDS, QAT_DEFAULT, POPULAR_COMMANDS, OPTIONS_LIVE_PAGES } from './ribbon.js';
+import { stepPath, PASTE_OPTS, PASTE_OP_OPTS, PASTE_SKIP_BLANKS, QAT_COMMANDS, QAT_DEFAULT, POPULAR_COMMANDS, OPTIONS_LIVE_PAGES } from './ribbon.js';
 
 const ARROWS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
 const ARROWSYM = { ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→' };
@@ -599,7 +599,8 @@ export class Session {
     if (this.dialog === 'paste') {
       const op2 = PASTE_OP_OPTS.find(o => o[0] === key); if (op2) { this.pasteOp = op2[2]; return; }
       const opt = PASTE_OPTS.find(o => o[0] === key); if (opt) { this.pasteKind = opt[2]; return; }
-      if (key === 'ENTER') { S.paste(this.pasteKind || 'all', this.pasteOp); this.pasteOp = 'none'; return done(); }
+      if (key === PASTE_SKIP_BLANKS[0]) { this.pasteSkip = !this.pasteSkip; return; }   // Skip blanks: a tick box beside the options (Excel's Alt+B)
+      if (key === 'ENTER') { S.paste(this.pasteKind || 'all', this.pasteOp, { skipBlanks: !!this.pasteSkip }); this.pasteOp = 'none'; this.pasteSkip = false; return done(); }
       return;
     }
     if (this.dialog === 'colw') {
@@ -678,7 +679,7 @@ export class Session {
       case 'MH': this.exitRibbon(false); this.toggleShowFormulas(); return;        // Formulas › Show Formulas (= Ctrl+`)
       case 'PI': this.openPageSetup('sheet'); return;                             // Page Layout › Print Titles: Page Setup on its Sheet page
       case 'HVV': S.paste('values'); return done();
-      case 'HVS': case 'ES': this.dialog = 'paste'; this.pasteKind = 'all'; this.pasteOp = 'none'; return;
+      case 'HVS': case 'ES': this.dialog = 'paste'; this.pasteKind = 'all'; this.pasteOp = 'none'; this.pasteSkip = false; return;
       case 'OE': case 'HOE': this.openFormatCells(); return;
       case 'HEM': S.clearNotes(); return done();                 // Clear › Comments and Notes
       case 'WQ': this.openZoom(); return;                          // View › Zoom
@@ -1682,6 +1683,7 @@ export class Session {
     if (k === 'Alt' && !e.shiftKey && !e.ctrlKey) { this.logKey('Alt'); this.enterRibbon(); return true; }
     if (e.altKey && !e.ctrlKey) {
       if (k === '=') { this.logKey('Alt'); this.logKey('='); this.doAutoSum(); return true; }
+      if (k === ';' && !e.shiftKey) { this.startClock(); this.logKey('Alt+;'); S.selectVisible(); return true; }   // Select Visible Cells: the next copy leaves hidden and folded rows behind
       if (e.shiftKey && (k === 'ArrowRight' || k === 'ArrowLeft')) { this.groupChord(k === 'ArrowRight'); return true; }   // Group / Ungroup
       if (k === 'PageDown' || k === 'PageUp') {   // the browser keeps Ctrl+PgDn for its own tabs, so Alt+PgDn is the sheet key here (M41), logged as Excel's
         this.startClock(); this.sheetStep(k === 'PageDown' ? 1 : -1, e.shiftKey); return true;
@@ -1764,7 +1766,7 @@ export class Session {
       return true;   // unknown chords are swallowed, never typed
     }
     if (e.ctrlKey && e.altKey && (k === 'PageDown' || k === 'PageUp')) { this.startClock(); this.sheetStep(k === 'PageDown' ? 1 : -1, e.shiftKey); return true; }
-    if (e.ctrlKey && e.altKey && k.toLowerCase() === 'v') { this.startClock(); this.logKey('Ctrl+Alt+V'); this.openDialog('paste'); this.pasteKind = 'all'; this.pasteOp = 'none'; return true; }
+    if (e.ctrlKey && e.altKey && k.toLowerCase() === 'v') { this.startClock(); this.logKey('Ctrl+Alt+V'); this.openDialog('paste'); this.pasteKind = 'all'; this.pasteOp = 'none'; this.pasteSkip = false; return true; }
     return false;
   }
 

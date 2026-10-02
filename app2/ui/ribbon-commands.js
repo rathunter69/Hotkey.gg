@@ -211,7 +211,7 @@ const autoSum = s => { leaveRibbon(s); s.startClock(); s.doAutoSum(); };
 const tool = id => s => { leaveRibbon(s); s.startClock(); s.toolCommand(id); };
 const gridlines = direct((S, s) => { S.gridlines = !S.gridlines; s.toast(S.gridlines ? 'Gridlines shown.' : 'Gridlines hidden. Alt W V G shows them.'); S.commit('ribbon'); });
 const fmtCells = s => { leaveRibbon(s); s.openFormatCells(); };
-const pasteSpecial = dialog('paste', s => { s.pasteKind = 'all'; s.pasteOp = 'none'; });
+const pasteSpecial = dialog('paste', s => { s.pasteKind = 'all'; s.pasteOp = 'none'; s.pasteSkip = false; });
 
 const C = (label, group, tab, icon, run, keys) => ({ label, group, tab, icon, run, keys: keys || '' });
 

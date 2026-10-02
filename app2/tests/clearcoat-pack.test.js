@@ -159,7 +159,8 @@ test('each state carries what its lesson reads', () => {
   const copy = cells('S421', 'Export sort');
   assert.ok(copy.F5.value >= copy.F6.value && copy.F6.value >= copy.F7.value, 'the copy is sorted by revenue, largest first');
   assert.ok(Object.values(copy).some(c => c.value === 'AUS-DMO'), 'the copy carries the misspelling it was taken with');
-  assert.equal(copy.E5.formula, undefined, 'pasted as values');
+  assert.match(copy.E5.formula, /^=C5\+D5$/, 'a plain Ctrl+V: the Total washes formula re-points at its own row');
+  for (let r = 6; r <= 94; r++) if (copy['F' + r] && copy['F' + (r - 1)]) assert.ok(copy['F' + (r - 1)].value >= copy['F' + r].value, 'largest revenue first, row ' + r);
   assert.match(cells('S422', 'Export').E97.formula, /SUBTOTAL\(109,E5:E94\)/); assert.match(cells('S422', 'Export').E98.formula, /SUBTOTAL\(103,A5:A94\)/);
   assert.equal(cells('S422', 'Export')['B' + exportRow(PLANT.misspelt.day, PLANT.misspelt.site)].value, 'AUS-DMO');
   assert.equal(cells('S423', 'Export')['B' + exportRow(PLANT.misspelt.day, PLANT.misspelt.site)].value, 'AUS-DOM');
@@ -170,7 +171,9 @@ test('each state carries what its lesson reads', () => {
   const scratch = cells('S425', 'Scratch');
   assert.equal(Object.keys(scratch).filter(k => k[0] === 'B').length, 76, 'seventy-five rows and the header');
   assert.match(cells('S425', 'Export').J96.formula, /"AUS-\*"/); assert.match(cells('S425', 'Export').J98.formula, /"\*R"/);
-  assert.deepEqual(stateOf('S426'), stateOf('S425'), '4.2.6 stays on the helper route');
+  assert.match(cells('S426', 'Scratch').J2.formula, /^=SORT\(UNIQUE\(Export!B5:B94\)\)$/); assert.match(cells('S426', 'Scratch').L2.formula, /^=FILTER\(/);
+  assert.equal(cells('S425', 'Scratch').J2, undefined, 'the dynamic arrays are 4.2.6\'s');
+  assert.match(cells('S425', 'Scratch').E2.formula, /^=C2\+D2$/, 'the scratch paste re-points its formulas');
   assert.equal(cells('S42C', 'Export sort').A5.value, cells('S42C', 'Export').A5.value, 'the challenge copy is in export order');
   // 4.3: the cube live, the KPI block, the window, the title from Inputs, the ranking, the roll-up
   assert.equal(stateOf('S43').sheets.some(s => s.name === 'Scratch' || s.name === 'Export sort'), false);
@@ -182,7 +185,7 @@ test('each state carries what its lesson reads', () => {
   assert.match(sm('S434').A1.formula, /Inputs!\$C\$14/); assert.equal(sm('S433').A1.formula, undefined); assert.ok(sm('S434')['C' + S.checkRows[5]]); assert.equal(sm('S434')['C' + S.checkRows[4]], undefined);
   assert.deepEqual(stateOf('S434').settings.pageSetup.orientation, 'landscape');
   assert.match(sm('S435')['F' + S.perHour.rows[0]].formula, /^=RANK/); assert.match(qa('S435').F11.formula, /an hour"$/);
-  assert.match(sm('S436')['C' + S.rollup.retail].formula, /^=Domain!C5\+Mueller!C5/); assert.ok(sm('S436')['C' + S.checkRows[4]]); assert.ok(cells('S436', 'Airport').C13);
+  assert.equal(sm('S436')['C' + S.rollup.retail].formula, '=SUM(Domain:CedarPark!C5)'); assert.ok(sm('S436')['C' + S.checkRows[4]]); assert.equal(cells('S436', 'Airport').C13.formula, cells('S436', 'Domain').C13.formula, 'one check, typed once on the grouped tabs');
   // 4.5: the switch and live column, the grids, break-even, the driver, the table on the switch
   assert.equal(sc('S45').G5, undefined);
   assert.match(sc('S451').G5.formula, /^=CHOOSE\(\$C\$11,C5,D5,E5\)$/); assert.match(sc('S451').G6.formula, /^=INDEX\(C6:E6,\$C\$11\)$/);

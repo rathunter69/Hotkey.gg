@@ -282,6 +282,21 @@ export const CONCEPTS = {
   'goto-special-types': 'Go To Special’s Numbers, Text, Logicals and Errors boxes narrow Constants or Formulas to one kind of value',
   'edit-links': 'Edit Links (Alt A K) lists every other workbook the file reads; when no cell reads one, Excel says the workbook has no links',
   'rollup-flag': 'a roll-up flag: COUNTIF counts the checks that are not zero and IF turns the count into OK or CHECK, so one cell says whether the book ties',
+  // Chapter 4, lists and tables (4.2) and summaries from raw rows (4.3)
+  'sort-dialog': 'the Sort dialog (Alt A S S): sort a list by more than one column at once, each level with its own order, on a working copy so the export stays as it came',
+  'autofilter': 'AutoFilter (Ctrl+Shift+L): arrows on the header row; Alt+Down opens a column\'s list to show only the rows you tick, and Alt A C clears every filter',
+  'subtotal-visible': 'SUBTOTAL with 109 (sum) or 103 (count) adds only the rows a filter shows, where SUM keeps adding the hidden ones too',
+  'remove-duplicates': 'Remove Duplicates (Alt A M) on a pasted copy of a column leaves one of each value, which turns a long column into the list of its distinct entries',
+  'data-validation': 'Data Validation (Alt A V V): a cell takes only what its rule allows, either a dropdown of a list\'s cells or a whole number between limits, with an error message for the rest',
+  'visible-cells': 'Select Visible Cells (Alt+;): a copy of a block with hidden rows takes only the rows you can see',
+  'wildcards': 'wildcards in a criteria: * stands for any run of characters and ? for exactly one, so "AUS-*" matches every Austin site code',
+  'skip-blanks': 'Paste Special with Skip blanks (Ctrl+Alt+V, B): the blank cells of the copy leave what is under them alone, so a partial column of corrections lands only where it has a figure',
+  'dynamic-arrays': 'dynamic arrays: UNIQUE, SORT, FILTER and SEQUENCE write one formula that spills its answer down as many cells as it needs',
+  'sumifs-cube': 'a SUMIFS cube: one formula with mixed references ($B15 and C$14) fills a grid of sites by weeks straight from the raw rows',
+  'kpi-ratios': 'KPI ratios built from the cube: each one a figure divided by the base it is measured against, with the total row worked from totals, not an average of the rows',
+  'date-window': 'a date window in a criteria: ">="&C48 and "<="&C49 join the operator to the date cell, so moving a date moves every figure',
+  'three-d-reference': 'a 3D reference such as =SUM(Domain:CedarPark!C5) adds the same cell across every tab from the first named to the last',
+  'group-sheets': 'grouped sheets (Ctrl+Shift+PgDn from the first tab): what you type on one lands on every tab in the group, until you click a tab outside it',
 };
 
 /**

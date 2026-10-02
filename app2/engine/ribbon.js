@@ -108,6 +108,8 @@ export const FMT_OPTS = [
   ['E', 'superscript ¹'], ['K', 'strikethrough'], ['A', 'center across'],
   ['U', 'Custom…'],   // the Custom box: type an Excel format code (Chapter 2)
 ];
+/** Paste Special's Skip blanks tick box: a blank in the copied block leaves the cell under it alone. */
+export const PASTE_SKIP_BLANKS = ['B', 'Skip blanks'];
 export const PASTE_OP_OPTS = [['O', 'None', 'none'], ['M', 'Multiply', 'multiply'], ['D', 'Add', 'add'], ['S', 'Subtract', 'subtract'], ['I', 'Divide', 'divide']];
 export const PASTE_OPTS = [
   ['A', 'All', 'all'], ['F', 'Formulas', 'formulas'], ['V', 'Values', 'values'],
