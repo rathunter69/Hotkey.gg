@@ -59,6 +59,7 @@ import if_on_a_threshold from './lessons/if-on-a-threshold.js';
 import nested_if_ifs_min_max from './lessons/nested-if-ifs-min-max.js';
 import and_or_not from './lessons/and-or-not.js';
 import iferror_and_the_override from './lessons/iferror-and-the-override.js';
+import challenge_flags_block from './lessons/challenge-flags-block.js';
 
 export const CHAPTERS = [
   {
@@ -120,7 +121,7 @@ export const CHAPTERS = [
       { name: 'Project and assessment', blurb: 'Rebuild the Summary so every number ties, then a fresh export against the clock.' },
     ],
     lessons: [
-      if_on_a_threshold, nested_if_ifs_min_max, and_or_not, iferror_and_the_override,
+      if_on_a_threshold, nested_if_ifs_min_max, and_or_not, iferror_and_the_override, challenge_flags_block,
     ],
   },
 ];
