@@ -132,12 +132,13 @@ function page(spec) {
   for (const b of spec.blocks) for (const row of b.rows) {
     if (!row.key) continue;
     const r = at[row.key];
+    // a row's format patch reaches every figure, whether or not the timeline is on row 4 yet (a date row reads as a date)
+    if (row.fmt) for (const col of ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']) if (cells[col + r]) { Object.assign(cells[col + r], row.fmt); if (row.fmt.numFmt) delete cells[col + r].decimals; }
     if (row.a === true) cells['A' + r] = { formula: `=INDEX(Inputs!$N$5:$N$40,MATCH($B${r},Inputs!$M$5:$M$40,0))` };
     else if (typeof row.a === 'string') cells['A' + r] = { value: row.a };
     for (const col of allCols) {
       const c = cells[col + r]; if (!c) continue;
       if (row.green && c.formula && c.formula.includes('!')) c.fontColor = 'green';
-      if (row.fmt) Object.assign(c, row.fmt);
       if (row.nodash) Object.assign(c, NODASH);
       if (row.boldAt && row.boldAt.includes(col)) c.bold = true;
     }
