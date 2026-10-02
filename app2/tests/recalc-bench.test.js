@@ -39,15 +39,15 @@ test('the Chapter 5 model: an edit on Inputs recalculates its readers only, leav
   assert.ok(key, 'an input to edit');
   const p = parseRef(key); const was = inputs.value(key);
   const bsBefore = sh(s, 'BS').value('J25');
-  const t0 = performance.now(); const N = 5;
+  const t0 = process.cpuUsage(); const N = 5;   // CPU time, not wall: the gate runs its files side by side, often on a busy box
   for (let i = 0; i < N; i++) inputs.commitInput(String((typeof was === 'number' ? was : 0.03) + 0.01 * (i + 1)), p.r, p.c);
-  const per = (performance.now() - t0) / N;
+  const used = process.cpuUsage(t0); const per = (used.user + used.system) / 1000 / N;
   assert.ok(book.dirtyCount < formulas * 0.8, `an Inputs edit reaches ${book.dirtyCount} formulas, not the ${formulas} of the model`);
   assert.ok(book.evals < formulas * 8, `the circle's iterations stay bounded: ${book.evals} evaluations`);
   assert.ok(book.dirtyCount > 50, 'the edit reaches the statements: ' + book.dirtyCount + ' cells dirty');
   assert.notEqual(sh(s, 'BS').value('J25'), bsBefore, 'the balance sheet moved with the input');
   assert.deepEqual(staleCells(s), [], 'nothing is stale after the edits');
-  assert.ok(per < 400, `an edit on the model takes ${per.toFixed(0)} ms (bound 400 ms; it runs near 40 ms unloaded)`);
+  assert.ok(per < 400, `an edit on the model takes ${per.toFixed(0)} ms of CPU (bound 400 ms; it runs near 40 ms)`);
   const cover = sh(s, 'Cover'); cover.commitInput('a note', 2, 9);
   assert.equal(book.evals, 0, 'a plain cell nobody reads costs no evaluation'); assert.equal(book.dirtyCount, 0);
   inputs.commitInput(String(was), p.r, p.c); const back = sh(s, 'BS').value('J25');
