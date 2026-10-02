@@ -681,7 +681,7 @@ function pageDCF() {
         { key: 'fcfShare', label: 'FCF as a share of EBITDA (memo)', kind: 'pct', indent: 1, fill: col => `=IFERROR(${c('fcf', col)}/${c('ebitda', col)},"-")` },
       ] },
       { title: 'Discounting (projected years; t counts from the valuation date)', rows: [
-        { key: 't', label: 'Period, t (mid-year when the switch is 1)', kind: 'unit', indent: 1, fill: proj(col => `=IF(${flag(col)}=1,${pcnt(col)}-IF(${inp('mid')}=1,0.5,0),0)`) },
+        { key: 't', label: 'Period, t (mid-year when the switch is 1)', kind: 'unit', dollar: false, indent: 1, fill: proj(col => `=IF(${flag(col)}=1,${pcnt(col)}-IF(${inp('mid')}=1,0.5,0),0)`) },
         { key: 'df', label: 'Discount factor, 1 over (1 + WACC) to the t', kind: 'unit', indent: 1, fill: proj(col => `=IF(${flag(col)}=1,1/(1+WACC)^${c('t', col)},0)`) },
         { key: 'pv', label: 'Present value of free cash flow', indent: 1, fill: proj(col => `=${c('fcf', col)}*${c('df', col)}`) },
         one('pvSum', 'Sum of present values', () => `=SUM(C${R(me, 'pv')}:J${R(me, 'pv')})`, { total: true }),
@@ -697,7 +697,7 @@ function pageDCF() {
         one('tv', 'Terminal value used', () => `=CHOOSE(C${R(me, 'method')},C${R(me, 'tvPerp')},C${R(me, 'tvExit')})`, { total: true }),
       ] },
       { title: 'Enterprise value to equity value', rows: [
-        one('dfPerp', 'Discount factor for the perpetuity (year 5, mid-year aware)', () => `=J${R(me, 'df')}`, { kind: 'unit' }),
+        one('dfPerp', 'Discount factor for the perpetuity (year 5, mid-year aware)', () => `=J${R(me, 'df')}`, { kind: 'unit', dollar: false }),
         one('dfExit', 'Discount factor for the exit (a sale at the end of FY31)', () => `=1/(1+WACC)^Inputs!$J$${R('Inputs', 'pcnt')}`, { kind: 'unit' }),
         one('pvTvPerp', 'PV of the terminal value, perpetuity', () => `=C${R(me, 'tvPerp')}*C${R(me, 'dfPerp')}`),
         one('pvTvExit', 'PV of the terminal value, exit multiple', () => `=C${R(me, 'tvExit')}*C${R(me, 'dfExit')}`),
